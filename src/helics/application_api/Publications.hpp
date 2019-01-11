@@ -11,6 +11,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 
 namespace helics
 {
+/** define a publication object in the C++98 interface*/
 class Publication
 {
   protected:

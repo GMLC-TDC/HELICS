@@ -12,6 +12,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 
 namespace helics
 {
+/** base date type for id types*/
 using identififier_base_type = int32_t;
 
 /** class defining a local_federate_id
@@ -25,9 +26,9 @@ class local_federate_id
     using base_type = identififier_base_type;
     /** default constructor*/
     constexpr local_federate_id () = default;
-
+    /** convert a base type value into a local_federate id*/
     constexpr explicit local_federate_id (base_type val) noexcept : fid (val){};
-
+    /** extract the base value of the id code*/
     constexpr base_type baseValue () const { return fid; }
     /** equality operator*/
     bool operator== (local_federate_id id) const noexcept { return (fid == id.fid); };
@@ -35,6 +36,8 @@ class local_federate_id
     bool operator!= (local_federate_id id) const noexcept { return (fid != id.fid); };
     /** less than operator for sorting*/
     bool operator< (local_federate_id id) const noexcept { return (fid < id.fid); };
+    /** check if the operator is valid
+    @details valid operators have been set to something other than the default value*/
     bool isValid () const { return (fid != -2'000'000'000); }
 
   private:
@@ -58,7 +61,7 @@ class interface_handle
     constexpr interface_handle () = default;
 
     constexpr explicit interface_handle (base_type val) noexcept : hid (val){};
-
+    /** extract the base value of the id code*/
     constexpr base_type baseValue () const { return hid; }
     /** equality operator*/
     bool operator== (interface_handle id) const noexcept { return (hid == id.hid); };
@@ -102,7 +105,7 @@ class global_broker_id
     constexpr global_broker_id () = default;
 
     constexpr explicit global_broker_id (base_type val) noexcept : gid (val){};
-
+    /** extract the base value of the id code*/
     constexpr base_type baseValue () const { return gid; }
     /** equality operator*/
     bool operator== (global_broker_id id) const noexcept { return (gid == id.gid); };
@@ -158,9 +161,14 @@ class global_federate_id
     bool operator< (global_broker_id id) const noexcept { return (gid < id.gid); };
     /** greater than operator for sorting*/
     bool operator> (global_broker_id id) const noexcept { return (gid > id.gid); };
+    /** return true if the broker_id is a valid federate id code*/
     bool isFederate () const { return ((gid >= global_federate_id_shift) && (gid < global_broker_id_shift)); }
+    /** return true if the broker_id is a valid broker id code*/
     bool isBroker () const { return (gid >= global_broker_id_shift); }
+    /** return true if the broker_id is a valid broker id code*/
     bool isValid () const { return (gid != -2'010'000'000); }
+    /** generate a local offset index
+    @details the global_id is shifted by a certain amount*/
     constexpr base_type localIndex () const { return gid - global_federate_id_shift; }
 
   private:
@@ -175,16 +183,21 @@ std::ostream &operator<< (std::ostream &os, global_federate_id id);
 class global_handle
 {
   public:
-    global_federate_id fed_id = global_federate_id{};
-    interface_handle handle = interface_handle{};
+    global_federate_id fed_id = global_federate_id{};  //!< the federate id component
+    interface_handle handle = interface_handle{};  //!< the interface handle component
+    /** default constructor*/
     constexpr global_handle () = default;
+    /** construct directly from a federate_id and interface_handle*/
     constexpr global_handle (global_federate_id fed, interface_handle hand) : fed_id (fed), handle (hand){};
+    /** convert to a uint64_t
+    @details for use in maps and other things*/
     explicit operator uint64_t () const
     {
         auto key = static_cast<uint64_t> (fed_id.baseValue ()) << 32u;
         key += static_cast<uint64_t> (handle.baseValue ()) & (0x0000'0000'FFFF'FFFF);
         return key;
     }
+    /** equality operator*/
     bool operator== (global_handle id) const noexcept { return ((fed_id == id.fed_id) && (handle == id.handle)); };
     /** inequality operator*/
     bool operator!= (global_handle id) const noexcept { return ((fed_id != id.fed_id) || (handle != id.handle)); };
@@ -201,15 +214,16 @@ class global_handle
  */
 std::ostream &operator<< (std::ostream &os, global_handle id);
 
+/** class defining a specific type for labeling a route*/
 class route_id
 {
   public:
     using base_type = identififier_base_type;
     /** default constructor*/
     constexpr route_id () = default;
-
+    /** construct from a base_type value*/
     constexpr explicit route_id (base_type val) noexcept : rid (val){};
-
+    /** explicitly convert to a base value */
     constexpr base_type baseValue () const { return rid; }
     /** equality operator*/
     bool operator== (route_id id) const noexcept { return (rid == id.rid); };
@@ -217,6 +231,7 @@ class route_id
     bool operator!= (route_id id) const noexcept { return (rid != id.rid); };
     /** less than operator for sorting*/
     bool operator< (route_id id) const noexcept { return (rid < id.rid); };
+    /** check if the route is valid*/
     bool isValid () const { return (rid != -1'295'148'000); }
 
   private:
@@ -233,6 +248,7 @@ std::ostream &operator<< (std::ostream &os, route_id id);
 
 namespace std
 {
+/** define a hash function for local_federate_id*/
 template <>
 struct hash<helics::local_federate_id>
 {
@@ -244,6 +260,7 @@ struct hash<helics::local_federate_id>
     }
 };
 
+/** define a template specialization for hash function for interface_handle so it can be used in unordered_map*/
 template <>
 struct hash<helics::interface_handle>
 {
@@ -255,6 +272,7 @@ struct hash<helics::interface_handle>
     }
 };
 
+/** define a template specialization for hash function for global_federate_id so it can be used in unordered_map*/
 template <>
 struct hash<helics::global_federate_id>
 {
@@ -266,6 +284,7 @@ struct hash<helics::global_federate_id>
     }
 };
 
+/** define a template specialization for hash function for global_broker_id so it can be used in unordered_map*/
 template <>
 struct hash<helics::global_broker_id>
 {
@@ -277,6 +296,7 @@ struct hash<helics::global_broker_id>
     }
 };
 
+/** define a template specialization for hash function for route_id so it can be used in unordered_map*/
 template <>
 struct hash<helics::route_id>
 {
@@ -288,6 +308,8 @@ struct hash<helics::route_id>
     }
 };
 
+/** define a template specialization for hash function for global_handle so it can be used in unordered_map
+@details based on hash of std::uint64_t*/
 template <>
 struct hash<helics::global_handle>
 {
@@ -301,30 +323,40 @@ struct hash<helics::global_handle>
 
 }  // namespace std
 
+/** override the is_easily_hashable type_trait for use in DualMappedVector and some other types that may optionally
+ * use std::map or std::unordered_map*/
 template <>
 struct is_easily_hashable<helics::global_federate_id>
 {
     static constexpr bool value = true;
 };
 
+/** override the is_easily_hashable type_trait for use in DualMappedVector and some other types that may optionally
+ * use std::map or std::unordered_map*/
 template <>
 struct is_easily_hashable<helics::local_federate_id>
 {
     static constexpr bool value = true;
 };
 
+/** override the is_easily_hashable type_trait for use in DualMappedVector and some other types that may optionally
+ * use std::map or std::unordered_map*/
 template <>
 struct is_easily_hashable<helics::global_broker_id>
 {
     static constexpr bool value = true;
 };
 
+/** override the is_easily_hashable type_trait for use in DualMappedVector and some other types that may optionally
+ * use std::map or std::unordered_map*/
 template <>
 struct is_easily_hashable<helics::route_id>
 {
     static constexpr bool value = true;
 };
 
+/** override the is_easily_hashable type_trait for use in DualMappedVector and some other types that may optionally
+ * use std::map or std::unordered_map*/
 template <>
 struct is_easily_hashable<helics::global_handle>
 {

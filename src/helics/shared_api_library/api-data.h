@@ -41,10 +41,11 @@ extern "C"
 
     /** time definition used in the C interface to helics*/
     typedef double helics_time;
-    const helics_time helics_time_zero = 0.0;
-    const helics_time helics_time_epsilon = 1.0e-9;
-    const helics_time helics_time_invalid = -1.785e39;
-    const helics_time helics_time_maxtime = 1e53;
+    const helics_time helics_time_zero = 0.0; /*!< definition of time zero-the beginning of simulation*/
+    const helics_time helics_time_epsilon = 1.0e-9; /*!< definition of the minimum time resolution*/
+    const helics_time helics_time_invalid = -1.785e39; /*!< definition of an invalid time that has no meaning*/
+    const helics_time helics_time_maxtime =
+      1e53; /*!< definition of time signifying the federate has terminated or to run until the end of the simulation*/
 
     /** defining a boolean type for use in the helics interface*/
     typedef int helics_bool;

@@ -5,48 +5,50 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
 
 #pragma once
-#include "helicsApp.hpp"
 #include "../application_api/Endpoints.hpp"
 #include "../application_api/Publications.hpp"
+#include "helicsApp.hpp"
 
 #include "../application_api/HelicsPrimaryTypes.hpp"
 #include <map>
 
 #include <set>
 
-
 namespace helics
 {
 namespace apps
 {
+/** helper class for containing a signal generator source*/
 class SourceObject
 {
   public:
     Publication pub;
     Time period;
     Time nextTime;
-    int generatorIndex=-1;
+    int generatorIndex = -1;
     std::string generatorName;
     // source type
 };
 
+/** parent class for a signal generator which generates values to feed into a helics federation*/
 class SignalGenerator
 {
-protected:
+  protected:
     Time lastTime = timeZero;
     Time keyTime = timeZero;
-public:
-    SignalGenerator() = default;
-    virtual ~SignalGenerator() = default;
+
+  public:
+    SignalGenerator () = default;
+    virtual ~SignalGenerator () = default;
     /** set a numerical parameter*/
-    virtual void set(const std::string &parameter, double val);
+    virtual void set (const std::string &parameter, double val);
     /** set a string parameter*/
-    virtual void setString(const std::string &parameter, const std::string &val);
+    virtual void setString (const std::string &parameter, const std::string &val);
     /** generate a new value at time signalTime
     @return a value and a defV object*/
-    virtual defV generate(Time signalTime) = 0;
+    virtual defV generate (Time signalTime) = 0;
     /** set the key time*/
-    void setTime(Time indexTime) { keyTime = indexTime; }
+    void setTime (Time indexTime) { keyTime = indexTime; }
 };
 
 /** class implementing a source federate, which is capable of generating signals of various kinds
@@ -54,7 +56,7 @@ and sending signals at the appropriate times
 @details  the source class is NOT threadsafe,  don't try to use it from multiple threads without external
 protection, that will result in undefined behavior
 */
-class Source:public App
+class Source : public App
 {
   public:
     /** default constructor*/
@@ -88,7 +90,7 @@ class Source:public App
     /** initialize the source federate
     @details connect all sources with a generator
     */
-    virtual void initialize() override;
+    virtual void initialize () override;
 
     /** run the source until the specified time
     @param stopTime_input the desired stop time
@@ -102,7 +104,11 @@ class Source:public App
     @param period the period of the publication
     @param units the units associated with the publication
     */
-    void addPublication (const std::string &key,const std::string &generator, data_type type, Time period, const std::string &units = std::string());
+    void addPublication (const std::string &key,
+                         const std::string &generator,
+                         data_type type,
+                         Time period,
+                         const std::string &units = std::string ());
 
     /** add a publication to a source
     @param key the key of the publication to add
@@ -110,45 +116,44 @@ class Source:public App
     @param period the period of the publication
     @param units the units associated with the publication
     */
-    void addPublication(const std::string &key, data_type type, Time period, const std::string &units = std::string())
+    void
+    addPublication (const std::string &key, data_type type, Time period, const std::string &units = std::string ())
     {
-        addPublication(key, std::string(), type, period, units);
+        addPublication (key, std::string (), type, period, units);
     }
     /** add a signal generator to the source object
     @return an index for later reference of the signal generator
     */
-    int addSignalGenerator(const std::string &name, const std::string &type);
+    int addSignalGenerator (const std::string &name, const std::string &type);
     /** set the start time for a publication */
-    void setStartTime(const std::string &key, Time startTime);
+    void setStartTime (const std::string &key, Time startTime);
     /** set the start time for a publication */
     void setPeriod (const std::string &key, Time period);
     /** tie a publication to a signal generator*/
-    void linkPublicationToGenerator(const std::string &key, const std::string &generator);
+    void linkPublicationToGenerator (const std::string &key, const std::string &generator);
     /** tie a publication to a signal generator*/
-    void linkPublicationToGenerator(const std::string &key, int genIndex);
+    void linkPublicationToGenerator (const std::string &key, int genIndex);
     /** get a pointer to the signal generator*/
-    std::shared_ptr<SignalGenerator> getGenerator(int index);
+    std::shared_ptr<SignalGenerator> getGenerator (int index);
 
   private:
     int loadArguments (boost::program_options::variables_map &vm_map);
     /** load from a jsonString
     @param either a JSON filename or a string containing JSON
     */
-    virtual void loadJsonFile(const std::string &jsonString) override;
+    virtual void loadJsonFile (const std::string &jsonString) override;
     /** execute a source object and update its time return the next execution time*/
-    Time runSource(SourceObject &obj, Time currentTime);
+    Time runSource (SourceObject &obj, Time currentTime);
     /** execute all the sources*/
-    Time runSourceLoop(Time currentTime);
-  private:
+    Time runSourceLoop (Time currentTime);
 
+  private:
     std::vector<SourceObject> sources;  //!< the actual publication objects
-    std::vector<std::shared_ptr<SignalGenerator>> generators; //!< the signal generators
-    std::map<std::string, int> generatorLookup; //!< map of generator names to indices
+    std::vector<std::shared_ptr<SignalGenerator>> generators;  //!< the signal generators
+    std::map<std::string, int> generatorLookup;  //!< map of generator names to indices
     std::vector<Endpoint> endpoints;  //!< the actual endpoint objects
     std::map<std::string, int> pubids;  //!< publication id map
-    Time defaultPeriod = 1.0; //!< the default period of publication
-
+    Time defaultPeriod = 1.0;  //!< the default period of publication
 };
 }  // namespace apps
-} // namespace helics
-
+}  // namespace helics

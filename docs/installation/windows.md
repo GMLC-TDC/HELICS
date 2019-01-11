@@ -101,10 +101,10 @@ Windows installers are available with the different [releases](https://github.co
 ## Testing
 
 A quick test is to double check the versions of the HELICS player and
-recorder (located in the 'build\src\helics\apps\player\Debug' folder):
+recorder (located in the 'build/src/helics/apps/player/Debug' folder):
 
 ```bash
-> cd C:\Path\To\build\src\helics\apps\Debug
+> cd C:/Path/To/build/src/helics/apps/Debug
 
 > helics_player.exe --version
 1.0.2 04-28-2018

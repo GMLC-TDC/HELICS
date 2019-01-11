@@ -65,6 +65,21 @@ helics_federate_info helicsCreateFederateInfo ()
     return reinterpret_cast<void *> (fi);
 }
 
+helics_federate_info helicsFederateInfoClone (helics_federate_info fi, helics_error *err)
+{
+    if (fi == nullptr)
+    {
+        if (err != nullptr)
+        {
+            err->error_code = helics_error_invalid_object;
+            err->message = invalidFedInfoString;
+        }
+        return nullptr;
+    }
+    auto *fi_new = new helics::FederateInfo (*reinterpret_cast<helics::FederateInfo *> (fi));
+    return reinterpret_cast<void *> (fi_new);
+}
+
 // typedef enum {
 
 //    helics_ok = 0, /*!< the function executed successfully */

@@ -61,15 +61,15 @@ extern "C"
     HELICS_EXPORT helics_core
     helicsCreateCoreFromArgs (const char *type, const char *name, int argc, const char *const *argv, helics_error *err);
 
-    /** create a new reference to an existing broker
+    /** create a new reference to an existing core
     @details this will create a new broker object that references the existing broker it must be freed as well
-    @param broker an existing helics_broker
+    @param core an existing helics_core
     @param err an error object that will contain an error code and string if any error occurred during the execution of the function
     @return a new reference to the same broker*/
     HELICS_EXPORT helics_core helicsCoreClone (helics_core core, helics_error *err);
 
     /** check if a core object is a valid object
-    @paramcore the helics_core object to test*/
+    @param core the helics_core object to test*/
     HELICS_EXPORT helics_bool helicsCoreIsValid (helics_core core);
 
     /** create a broker object
@@ -78,9 +78,10 @@ extern "C"
     @param initString an initialization string to send to the core-the format is similar to command line arguments
     typical options include a broker address  --broker="XSSAF" if this is a subbroker or the number of federates or the address
     @param err an error object that will contain an error code and string if any error occurred during the execution of the function
-    @return a helics_core object
+    @return a helics_broker object, will be NULL if there was an error indicated in the err object
     */
     HELICS_EXPORT helics_broker helicsCreateBroker (const char *type, const char *name, const char *initString, helics_error *err);
+
     /** create a core object by passing command line arguments
     @param type the type of the core to create
     @param name the name of the core , may be a nullptr or empty string to have a name automatically assigned
@@ -186,6 +187,7 @@ extern "C"
     /** set the core to ready to init
     @details this function is used for cores that have filters but no federates so there needs to be
     a direct signal to the core to trigger the federation initialization
+    @param core the core object to enable init values for
     @param err an error object that will contain an error code and string if any error occurred during the execution of the function
     */
     HELICS_EXPORT void helicsCoreSetReadyToInit (helics_core core, helics_error *err);
@@ -229,6 +231,7 @@ extern "C"
     /* Creation and destruction of Federates */
     /** create a value federate from a federate info object
     @details helics_federate objects can be used in all functions that take a helics_federate or helics_federate object as an argument
+    @param fedName the name of the federate to create, can NULL or an empty string to use the default name from fi or an assigned name
     @param fi the federate info object that contains details on the federate
     @param err an error object that will contain an error code and string if any error occurred during the execution of the function
     @return an opaque value federate object
@@ -246,6 +249,7 @@ extern "C"
     /** create a message federate from a federate info object
     @details helics_message_federate objects can be used in all functions that take a helics_message_federate or helics_federate object as
     an argument
+    @param fedName the name of the federate to create
     @param fi the federate info object that contains details on the federate
     @param err an error object that will contain an error code and string if any error occurred during the execution of the function
     @return an opaque message federate object
@@ -264,6 +268,7 @@ extern "C"
     /** create a combination federate from a federate info object
     @details combination federates are both value federates and message federates, objects can be used in all functions that take a
     helics_federate, helics_message_federate or helics_federate object as an argument
+    @param fedName a string with the name of the federate, can be NULL or an empty string to pull the default name from fi
     @param fi the federate info object that contains details on the federate
     @param err an error object that will contain an error code and string if any error occurred during the execution of the function
     @return an opaque value federate object nullptr if the object creation failed
@@ -290,6 +295,11 @@ extern "C"
     @return a helics_federate_info object which is a reference to the created object
     */
     HELICS_EXPORT helics_federate_info helicsCreateFederateInfo ();
+
+    /** create a federate info object from an existing one and clone the information
+    @return a helics_federate_info object which is a reference to the created object
+    */
+    HELICS_EXPORT helics_federate_info helicsFederateInfoClone (helics_federate_info fi, helics_error *err);
 
     /**load a federate info from command line arguments
     @param fi a federateInfo object
@@ -455,20 +465,27 @@ extern "C"
     @details the initialization state allows initial values to be set and received if the iteration is requested on entry to
     the execution state
     This is a blocking call and will block until the core allows it to proceed
+    @param fed the federate to operate on
+    @param err an error object that will contain an error code and string if any error occurred during the execution of the function
     */
     HELICS_EXPORT void helicsFederateEnterInitializingMode (helics_federate fed, helics_error *err);
 
-    /** non blocking alternative to @helicsFederateEnterInitializingMode
+    /** non blocking alternative to \ref helicsFederateEnterInitializingMode
     the function helicsFederateEnterInitializationModeFinalize must be called to finish the operation
+    @param fed the federate to operate on
+    @param err an error object that will contain an error code and string if any error occurred during the execution of the function
     */
     HELICS_EXPORT void helicsFederateEnterInitializingModeAsync (helics_federate fed, helics_error *err);
 
     /** check if the current Asynchronous operation has completed
     @param fed the federate to operate on
-    @return 0 if not completed, 1 if completed*/
+    @param err an error object that will contain an error code and string if any error occurred during the execution of the function
+    @return helics_false if not completed, helics_true if completed*/
     HELICS_EXPORT helics_bool helicsFederateIsAsyncOperationCompleted (helics_federate fed, helics_error *err);
 
-    /** finalize the entry to initialize mode that was initiated with @heliceEnterInitializingModeAsync*/
+    /** finalize the entry to initialize mode that was initiated with @heliceEnterInitializingModeAsync
+    @param fed the federate desiring to complete the initialization step
+    @param err an error object that will contain an error code and string if any error occurred during the execution of the function*/
     HELICS_EXPORT void helicsFederateEnterInitializingModeComplete (helics_federate fed, helics_error *err);
 
     /** request that the federate enter the Execution mode
@@ -481,7 +498,7 @@ extern "C"
 
     /** request that the federate enter the Execution mode
     @details this call is non-blocking and will return immediately call /ref helicsFederateEnterExecutingModeComplete to finish the call
-    sequence /ref
+    sequence /ref helicsFederateEnterExecutingModeComplete
     */
     HELICS_EXPORT void helicsFederateEnterExecutingModeAsync (helics_federate fed, helics_error *err);
 
@@ -689,6 +706,7 @@ extern "C"
 
     /** set a federation global value
     @details this overwrites any previous value for this name
+    @param broker the broker to set the global through
     @param valueName the name of the global to set
     @param value the value of the global
     @param err an error object that will contain an error code and string if any error occurred during the execution of the function
