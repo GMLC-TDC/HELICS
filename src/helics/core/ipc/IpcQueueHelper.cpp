@@ -7,6 +7,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include "IpcQueueHelper.h"
 #include <thread>
 
+#define BOOST_DATE_TIME_NO_LIB
 #include <boost/date_time/posix_time/ptime.hpp>
 
 namespace boostipc = boost::interprocess;
