@@ -12,6 +12,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 
 namespace helicscpp
 {
+/** C++98 interface for a helics Input*/
 class Input
 {
   public:

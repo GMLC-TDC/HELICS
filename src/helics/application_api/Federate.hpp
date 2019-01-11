@@ -149,7 +149,7 @@ class Federate
     void error (int errorcode, const std::string &message);
 
     /** specify a separator to use for naming separation between the federate name and the interface name
-    @example setSeparator('.') will result in future registrations of local endpoints such as fedName.endpoint
+     setSeparator('.') will result in future registrations of local endpoints such as fedName.endpoint
     setSeparator('/') will result in fedName/endpoint
     the default is '/'  any character can be used though many will not make that much sense.  This call is not
     thread safe and should be called before any local interfaces are created otherwise it may not be possible to

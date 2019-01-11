@@ -7,11 +7,12 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #define HELICS_CPP98_COMBINATION_FEDERATE_HPP_
 #pragma once
 
-#include "ValueFederate.hpp"
 #include "MessageFederate.hpp"
+#include "ValueFederate.hpp"
 
 namespace helicscpp
 {
+/** combination federate object in the C++98 API*/
 class CombinationFederate : public ValueFederate, public MessageFederate
 {
   public:
@@ -19,12 +20,11 @@ class CombinationFederate : public ValueFederate, public MessageFederate
     {
         fed = helicsCreateCombinationFederate (name.c_str (), fi.getInfo (), hThrowOnError ());
     }
-    
+
     explicit CombinationFederate (const std::string &configString)
     {
         fed = helicsCreateCombinationFederateFromConfig (configString.c_str (), hThrowOnError ());
     }
 };
-} //namespace helicscpp
+}  // namespace helicscpp
 #endif
-

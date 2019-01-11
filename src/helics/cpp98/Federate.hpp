@@ -19,6 +19,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 
 namespace helicscpp
 {
+/** hold federate information in the C++98 API*/
 class FederateInfo
 {
   public:
@@ -29,6 +30,32 @@ class FederateInfo
         fi = helicsCreateFederateInfo ();
         helicsFederateInfoSetCoreTypeFromString (fi, coretype.c_str (), hThrowOnError ());
     }
+    /** copy constructor for federate info*/
+    FederateInfo (const FederateInfo &fedInfo) { fi = helicsFederateClone (fedInfo.fi, hThrowOnError ()); }
+    /** copy assignment for federateInfo*/
+    FederateInfo &operator= (const FederateInfo &fedInfo)
+    {
+        helics_federate_info fi_new = helicsFederateClone (fedInfo.fi, hThrowOnError ());
+        helicsFederateInfoFree (fi);
+        fi = fi_new;
+        return *this;
+    }
+#ifdef HELICS_HAS_RVALUE_REFS
+    /** move constructor for federateInfo*/
+    FederateInfo (FederateInfo &&fedInfo)
+    {
+        fi = fedInfo.fi;
+        fedInfo.fi = NULL;
+    }
+    /** move assignment for federateInfo*/
+    FederateInfo &operator= (FederateInfo &&fedInfo)
+    {
+        helicsFederateInfoFree (fi);
+        fi = fedInfo.fi;
+        fedInfo.fi = NULL;
+        return *this;
+    }
+#endif
 
     ~FederateInfo () { helicsFederateInfoFree (fi); }
 
@@ -61,9 +88,10 @@ class FederateInfo
     helics_federate_info getInfo () { return fi; }
 
   private:
-    helics_federate_info fi;
+    helics_federate_info fi;  //!< handle for the underlying federate_info object
 };
 
+/** an iteration time structure */
 typedef struct
 {
   public:
@@ -71,6 +99,7 @@ typedef struct
     helics_iteration_result status;  //!< the convergence state
 } helics_iteration_time;
 
+/** Federate object managing a C++98 Federate object*/
 class Federate
 {
   public:

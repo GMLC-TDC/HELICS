@@ -20,13 +20,15 @@ extern "C"
     /** pick a core type depending on compile configuration usually either ZMQ if available or TCP */
     typedef enum
     {
-        helics_core_type_default = 0,
+        helics_core_type_default = 0, /*!< a default core type that will default to something available*/
         helics_core_type_zmq = 1, /*!< use the Zero MQ networking protocol */
         helics_core_type_mpi = 2, /*!< use MPI for operation on a parallel cluster */
         helics_core_type_test = 3, /*!< use the Test core if all federates are in the same process */
         /** interprocess uses memory mapped files to transfer data (for use when all federates are
         on the same machine */
         helics_core_type_interprocess = 4,
+        /** interprocess uses memory mapped files to transfer data (for use when all federates are
+        on the same machine ipc is the same as /ref helics_core_type_interprocess*/
         helics_core_type_ipc = 5,
         helics_core_type_tcp = 6, /*!< use a generic TCP protocol message stream to send messages */
         helics_core_type_udp = 7, /** use UDP packets to send the data */
@@ -38,6 +40,7 @@ extern "C"
         helics_core_type_http = 12 /*!< a core type using http for communication*/
     } helics_core_type;
 
+    /** enumeration of allowable data types for publications and inputs*/
     typedef enum
     {
         /** a sequence of characters*/
@@ -69,6 +72,7 @@ extern "C"
 /** single character data type  this is intentionally the same as string*/
 #define helics_data_type_char helics_data_type_string
 
+    /** enumeration of possible federate flags*/
     typedef enum
     {
         /** flag indicating that a federate is observe only*/
@@ -131,7 +135,6 @@ extern "C"
      */
     typedef enum
     {
-
         helics_ok = 0, /*!< the function executed successfully */
         helics_error_registration_failure = (-1), /*!< registration has failed*/
         helics_error_connection_failure = (-2), /*!< the operation to connect has failed*/
@@ -150,21 +153,33 @@ extern "C"
         other_error_type = -203 /*!< a non helics error was produced*/
     } helics_error_types;
 
+    /** enumeration of properties that apply to federates*/
     typedef enum
     {
         /** the property controlling the minimum time delta for a federate*/
         helics_property_time_delta = 137,
+        /** the property controlling the period for a federate*/
         helics_property_time_period = 140,
+        /** the property controlling time offset for the period of federate*/
         helics_property_time_offset = 141,
+        /** the property controlling real time lag for a federate the max time a federate can lag real time*/
         helics_property_time_rt_lag = 143,
+        /** the property controlling real time lead for a federate the max time a federate can be ahead of real
+           time*/
         helics_property_time_rt_lead = 144,
+        /** the property controlling real time tolerance for a federate sets both rt_lag and rt_lead*/
         helics_property_time_rt_tolerance = 145,
+        /** the property controlling input delay for a federate*/
         helics_property_time_input_delay = 148,
+        /** the property controlling output delay for a federate*/
         helics_property_time_output_delay = 150,
+        /** the property controlling the maximum number of iterations in a federate*/
         helics_property_int_max_iterations = 259,
+        /** the property controlling the log level in a federate see /ref helics_log_levels*/
         helics_property_int_log_level = 271
     } helics_properties;
 
+    /** enumeration of options that apply to handles*/
     typedef enum
     {
         /** specify that a connection is required for an interface and will generate an error if not available*/

@@ -650,7 +650,8 @@ data_block typeConvert (data_type type, int64_t val)
     case data_type::helics_string:
         return std::to_string (val);
     case data_type::helics_named_point:
-        if (std::abs (val) > (2ull << 51u))  // this checks whether the actual value will fit in a double
+        if (static_cast<uint64_t> (std::abs (val)) >
+            (2ull << 51u))  // this checks whether the actual value will fit in a double
         {
             return ValueConverter<NamedPoint>::convert (NamedPoint{std::to_string (val), std::nan ("0")});
         }
