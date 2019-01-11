@@ -94,7 +94,7 @@ extern "C"
     /** get a filter by its name typically already created via registerInterfaces file or something of that nature
     @param fed the federate object to use to get the filter
     @param name the name of the filter
-    @param err the error object to complete if there is an error
+    @param[in,out] err the error object to complete if there is an error
     @return a helics_filter object, the object will not be valid and err will contain an error code if no filter with the specified
     name exists
     */
@@ -159,7 +159,7 @@ extern "C"
     /** set the data in the info field for an filter
     @param inp the filter to query
     @param info the string to set
-    @param err an error object to fill out in case of an error*/
+    @param[in,out] err an error object to fill out in case of an error*/
     HELICS_EXPORT void helicsFilterSetInfo (helics_filter filt, const char *info, helics_error *err);
 
     HELICS_EXPORT void helicsFilterSetOption (helics_filter filt, int option, helics_bool value, helics_error *err);

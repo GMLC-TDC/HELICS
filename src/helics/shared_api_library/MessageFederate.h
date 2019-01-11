@@ -51,7 +51,7 @@ extern "C"
     /** get an endpoint object from a name
     @param fed the message federate object to use to get the endpoint
     @param name the name of the endpoint
-    @param err the error object to complete if there is an error
+    @param[in,out] err the error object to complete if there is an error
     @return a helics_endpoint object, the object will not be valid and err will contain an error code if no endpoint with the specified
     name exists
     */
@@ -71,12 +71,12 @@ extern "C"
     */
     HELICS_EXPORT void helicsEndpointSetDefaultDestination (helics_endpoint endpoint, const char *dest, helics_error *err);
 
-	/** get the default destination for an endpoint
+    /** get the default destination for an endpoint
 
-	@param endpoint the endpoint to set the destination for
-	@return a string with the default destination
-	*/
-	HELICS_EXPORT const char * helicsEndpointGetDefaultDestination(helics_endpoint endpoint);
+    @param endpoint the endpoint to set the destination for
+    @return a string with the default destination
+    */
+    HELICS_EXPORT const char *helicsEndpointGetDefaultDestination (helics_endpoint endpoint);
 
     /** send a message to the specified destination
     @param endpoint the endpoint to send the data from
@@ -167,15 +167,15 @@ extern "C"
     @return (-1) if fed was not a valid federate otherwise returns the number of subscriptions*/
     HELICS_EXPORT int helicsFederateGetEndpointCount (helics_federate fed);
 
-	/** get the data in the info field of an filter
-	@param inp the filter to query
-	@return a string with the info field string*/
-	HELICS_EXPORT const char *helicsEndpointGetInfo(helics_endpoint end);
-	/** set the data in the info field for an filter
+    /** get the data in the info field of an filter
+    @param inp the filter to query
+    @return a string with the info field string*/
+    HELICS_EXPORT const char *helicsEndpointGetInfo (helics_endpoint end);
+    /** set the data in the info field for an filter
     @param inp the filter to query
     @param info the string to set
-    @param err an error object to fill out in case of an error*/
-	HELICS_EXPORT void helicsEndpointSetInfo(helics_endpoint end, const char *info, helics_error *err);
+    @param[in,out] err an error object to fill out in case of an error*/
+    HELICS_EXPORT void helicsEndpointSetInfo (helics_endpoint end, const char *info, helics_error *err);
 
     HELICS_EXPORT void helicsEndpointSetOption (helics_endpoint end, int option, helics_bool value, helics_error *err);
 

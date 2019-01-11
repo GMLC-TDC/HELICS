@@ -56,7 +56,7 @@ Time loadTimeFromString (const std::string &timeString);
 
 /** generate a time from a string,
 @details the string can be a double or with units
-@example "1.234"  or "1032ms"
+for example "1.234"  or "1032ms"
 @return a helics time generated from the string
 @throws invalid_argument if the string is not a valid time
 */

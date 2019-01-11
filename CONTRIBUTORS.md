@@ -8,6 +8,8 @@ If you would like to contribute to the HELICS project see [CONTRIBUTING](CONTRIB
  - Jason Fuller*
  - Shwetha Niddodi*
  - Monish Mukherjee*
+ - Jacob Hansen*
+ - Marc Eberlein*
 
 ### Lawrence Livermore National Lab
  - Ryan Mast*
@@ -29,7 +31,7 @@ If you would like to contribute to the HELICS project see [CONTRIBUTING](CONTRIB
 ## Used Libraries or Code
 
 ### [BOOST](www.boost.org)
-  Boost is used throughout the code, inluding Asio for the TCP and UDP protocols and Timers.  The unit, integration, and system test suite is written using boost test.  The IPC core uses the boost interprocess library, the program options library is used for parsing command line options and the filesystem library is used frequently when file manipulation is needed.  Some algorithms and other libraries are also used throughout the code. Boost ls licensed under the boost license
+  Boost is used throughout the code, including Asio for the TCP and UDP protocols and Timers.  The unit, integration, and system test suite is written using boost test.  The IPC core uses the boost interprocess library, the program options library is used for parsing command line options and the filesystem library is used frequently when file manipulation is needed.  Some algorithms and other libraries are also used throughout the code. Boost ls licensed under the boost license
 
 ### [zmq](www.zeromq.org)
   ZeroMQ message passing is used in the ZMQ core networking.  The autobuild currently uses version 4.2.5. No zmq library code is included in the HELICS source.  Helics installers include ZeroMQ binary libraries. ZeroMQ is licensed under [LGPL](https://github.com/zeromq/libzmq/blob/master/COPYING.LESSER) with a modification to allow for linking and in various forms and distribution of the binary under different terms if the library was not modified.  No modification of the ZMQ library or any of the ZeroMQ source files is included in the HELICS source code.  
@@ -59,7 +61,7 @@ The cereal library is used for serialization of messages sent around inside HELI
 While not used directly much of the inspiration for HELICS comes from three separate projects at the different National Labs.  These include FNCS at PNNL, FSKIT at LLNL(unreleased), and IGMS(unreleased) at NREL.  The lessons learned from these three co-simulation platforms was fed directly into the design of HELICS, and the hope that the combination and partnership is better than any one lab could have accomplished on their own.  
 
 ### [c++17 headers](https://github.com/tcbrindle/cpp17_headers)
-HELICS makes use of C++17 headers, but due to C++14 compatibility requirements these are not available on all supported compilers.  So included library headers are used from @tcbrindle including std::any, std::optional and std::string_view.  These fall under the boost license, this library is an aggregate from a number of different sources, see the readme at the above link for more details.  The Boost versions of these libraries are not used due to incompatibilities through different boost versions that HELICS supports, so a single stable source was used.  When the minimum boost version and compiler is updated this code will likely be removed.     
+HELICS makes use of `C++17` headers, but due to `C++14` compatibility requirements these are not available on all supported compilers.  So included library headers are used from @tcbrindle including std::any, std::optional and std::string_view.  These fall under the boost license, this library is an aggregate from a number of different sources, see the readme at the above link for more details.  The Boost versions of these libraries are not used due to incompatibilities through different boost versions that HELICS supports, so a single stable source was used.  When the minimum boost version and compiler is updated this code will likely be removed.     
 
 ### [mpark/variant](https://github.com/mpark/variant)
 this variant was chosen for compatibility with C++17 over boost variant and better cross platform support than some of the other versions available.  The single header version is included with the source.  [Boost Software License](https://github.com/mpark/variant/blob/master/LICENSE.md)
