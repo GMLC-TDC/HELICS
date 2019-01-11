@@ -65,6 +65,8 @@ helics_federate_info helicsCreateFederateInfo ()
     return reinterpret_cast<void *> (fi);
 }
 
+static const char *invalidFedInfoString = "helics Federate info object was not valid";
+
 helics_federate_info helicsFederateInfoClone (helics_federate_info fi, helics_error *err)
 {
     if (fi == nullptr)
@@ -175,8 +177,6 @@ void helicsErrorHandler (helics_error *err) noexcept
 void helicsFederateInfoFree (helics_federate_info fi) { delete reinterpret_cast<helics::FederateInfo *> (fi); }
 
 static const std::string nullstr;
-
-static const char *invalidFedInfoString = "helics Federate info object was not valid";
 
 static helics::FederateInfo *getFedInfo (helics_federate_info fi, helics_error *err)
 {
