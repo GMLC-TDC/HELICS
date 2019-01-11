@@ -41,9 +41,11 @@ if (NOT ZeroMQ_LIBRARY_ONLY)
   )
 
   find_path(ZeroMQ_INCLUDE_DIR zmq.h ${ZeroMQ_ROOT_DIR}/include)
-  if (MSVC)
-      # Read registry key holding version
-      get_filename_component(ZeroMQ_NAME "[HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\ZeroMQ (x64);DisplayVersion]" NAME)
+endif()
+
+ if (MSVC)
+    # Read registry key holding version
+    get_filename_component(ZeroMQ_NAME "[HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\ZeroMQ (x64);DisplayVersion]" NAME)
 
     # Replace dots with underscores
     string(REGEX REPLACE "\\." "_" ZeroMQ_NAME ${ZeroMQ_NAME})
@@ -69,8 +71,8 @@ if (NOT ZeroMQ_LIBRARY_ONLY)
 		  set(ZeroMQ_DEBUG_LIBRARY_NAME "libzmq-v${CMAKE_VS_PLATFORM_TOOLSET}-mt-gd-${ZeroMQ_NAME}")
 	  endforeach()
     endif()
-  endif()
 endif()
+
 
 find_library(ZeroMQ_LIBRARY
   NAMES
