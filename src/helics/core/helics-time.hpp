@@ -46,15 +46,15 @@ struct iteration_time
     constexpr iteration_time (Time t, iteration_result iterate) noexcept : grantedTime (t), state (iterate){};
 };
 
-/** generate a time from a string,
+/** generate a time from a string
 @details the string can be a double or with units
-@example "1.234",  or "1032ms"
+for example "1.234",  or "1032ms" or "10423425 ns"
 @return a helics time generated from the string
 @throw, invalid_argument if the string is not a valid time
 */
 Time loadTimeFromString (const std::string &timeString);
 
-/** generate a time from a string,
+/** generate a time from a string
 @details the string can be a double or with units
 for example "1.234"  or "1032ms"
 @return a helics time generated from the string

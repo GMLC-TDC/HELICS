@@ -149,37 +149,43 @@ extern "C"
 
     /** get the type specified for an endpoint
     @param endpoint  the endpoint object in question
-    @param[out] outputString the location where the string is stored
-    @param[in] maxlen the maximum string length that can be stored in str
-    @return a status variable
+    @return the defined type of the endpoint
     */
     HELICS_EXPORT const char *helicsEndpointGetType (helics_endpoint endpoint);
 
     /** get the name of an endpoint
     @param endpoint  the endpoint object in question
-    @param[out] outputString the location where the string is stored
-    @param[in] maxlen the maximum string length that can be stored in str
-    @return a status variable
+    @return the name of the endpoint
     */
     HELICS_EXPORT const char *helicsEndpointGetName (helics_endpoint endpoint);
 
     /** get the number of endpoints in a federate
-    @return (-1) if fed was not a valid federate otherwise returns the number of subscriptions*/
+    @param fed the message federate to query
+    @return (-1) if fed was not a valid federate otherwise returns the number of endpoints*/
     HELICS_EXPORT int helicsFederateGetEndpointCount (helics_federate fed);
 
     /** get the data in the info field of an filter
-    @param inp the filter to query
+    @param end the filter to query
     @return a string with the info field string*/
     HELICS_EXPORT const char *helicsEndpointGetInfo (helics_endpoint end);
     /** set the data in the info field for an filter
-    @param inp the filter to query
+    @param end the endpoint to query
     @param info the string to set
     @param[in,out] err an error object to fill out in case of an error*/
     HELICS_EXPORT void helicsEndpointSetInfo (helics_endpoint end, const char *info, helics_error *err);
 
+    /** set a handle option on an endpoint
+    @param end the endpoint to modify
+    @param option integer code for the option to set /ref helics_handle_options
+    @param value the value to set the option
+     @param[in,out] err an error object to fill out in case of an error*/
     HELICS_EXPORT void helicsEndpointSetOption (helics_endpoint end, int option, helics_bool value, helics_error *err);
-
+    /** set a handle option on an endpoint
+    @param end the endpoint to modify
+    @param option integer code for the option to set /ref helics_handle_options
+    */
     HELICS_EXPORT helics_bool helicsEndpointGetOption (helics_endpoint end, int option);
+
 #ifdef __cplusplus
 } /* end of extern "C" { */
 #endif

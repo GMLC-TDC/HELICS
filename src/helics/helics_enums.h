@@ -206,12 +206,20 @@ extern "C"
     /** enumeration of the predefined filter types*/
     typedef enum
     {
+        /** a custom filter type that executes a user defined callback*/
         helics_filter_type_custom = 0,
+        /** a filter type that executes a fixed delay on a message*/
         helics_filter_type_delay = 1,
+        /** a filter type that executes a random delay on the messages*/
         helics_filter_type_random_delay = 2,
+        /** a filter type that randomly drops messages*/
         helics_filter_type_random_drop = 3,
+        /** a filter type that reroutes a message to a different destination than originally specified*/
         helics_filter_type_reroute = 4,
+        /** a filter type that duplicates a message and sends the copy to a different destination*/
         helics_filter_type_clone = 5,
+        /** a customizable filter type that can perform different actions on a message based on firewall like
+           rules*/
         helics_filter_type_firewall = 6
 
     } helics_filter_type;

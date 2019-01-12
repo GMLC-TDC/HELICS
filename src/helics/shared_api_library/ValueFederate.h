@@ -26,7 +26,7 @@ extern "C"
     helicsCreateCombinationFederate
     @param key the identifier matching a publication to get a subscription for
     @param units a string listing the units of the subscription maybe NULL
-    param[in,out] err a pointer to an error object for catching errors
+    @param[in,out] err a pointer to an error object for catching errors
     @return an object containing the subscription
     */
     HELICS_EXPORT helics_input helicsFederateRegisterSubscription (helics_federate fed,
@@ -103,7 +103,7 @@ extern "C"
     @return an object containing the input
     */
     HELICS_EXPORT helics_input
-    helicsFederateRegisterInput (helics_federate fed, const char *name, helics_data_type type, const char *units, helics_error *err);
+    helicsFederateRegisterInput (helics_federate fed, const char *key, helics_data_type type, const char *units, helics_error *err);
 
     /** register an input with a defined type
     @details the input becomes part of the federate and is destroyed when the federate is freed so there are no separate free
@@ -123,6 +123,7 @@ extern "C"
     functions for subscriptions and publications
     @param fed the federate object in which to create a publication
     @param key the identifier for the publication
+    @param type a code identifying the type of the input see /ref helics_data_type for available options
     @param units a string listing the units of the subscription maybe NULL
     @return an object containing the publication
     */
@@ -134,9 +135,7 @@ extern "C"
     functions for subscriptions and publications
     @param fed the federate object in which to create a publication
     @param key the identifier for the publication
-    @param type a code identifying the type of the publication one of helics_data_type_string, helics_data_type_int,
-    HELICS_DATA_TYPE_DOUBLE, HELICS_DATA_TYPE_COMPLEX, HELICS_DATA_TYPE_VECTOR, HELICS_DATA_TYPE_NAMEDPOINT, HELICS_DATA_TYPE_BOOLEAN
-    HELICS_DATA_TYPE_RAW
+   @param type a string defining the type of the input
     @param units a string listing the units of the subscription maybe NULL
     @param[in,out] err a pointer to an error object for catching errors
     @return an object containing the publication
@@ -260,7 +259,7 @@ extern "C"
     @param[in,out] err a pointer to an error object for catching errors
     */
     HELICS_EXPORT void
-    helicsPublicationPublishVector (helics_publication pub, const double *vectorInput, int vectorlength, helics_error *err);
+    helicsPublicationPublishVector (helics_publication pub, const double *vectorInput, int vectorLength, helics_error *err);
 
     /** publish a named point
     @param pub the publication to publish for
@@ -386,7 +385,7 @@ extern "C"
 
     /** get a named point from a subscription
     @param ipt the input to get the result for
-    @param[out] str storage for copying a null terminated string
+    @param[out] outputString storage for copying a null terminated string
     @param maxStringLen the maximum size of information that str can hold
     @param[out] actualLength the actual length of the string
     @param[out] val the double value for the named point
@@ -435,7 +434,8 @@ extern "C"
     /** set the default as a double
     @param ipt the input to set the default for
     @param val the default double value
-    @return helics_ok if everything was OK
+     @param[in,out] err an error object that will contain an error code and string if any error occurred during the execution of the
+    function
     */
     HELICS_EXPORT void helicsInputSetDefaultTime (helics_input ipt, helics_time val, helics_error *err);
 
@@ -463,11 +463,11 @@ extern "C"
 
     /** set the default as a vector of doubles
     @param ipt the input to set the default for
-    @param data a pointer to an array of double data
-    @param len the number of points to publish
+    @param vectorInput a pointer to an array of double data
+    @param vectorLength the number of points to publish
     @param[in,out] err an error object that will contain an error code and string if any error occurred during the execution of the function
     */
-    HELICS_EXPORT void helicsInputSetDefaultVector (helics_input ipt, const double *vectorInput, int vectorlength, helics_error *err);
+    HELICS_EXPORT void helicsInputSetDefaultVector (helics_input ipt, const double *vectorInput, int vectorLength, helics_error *err);
 
     /** set the default as a NamedPoint
     @param ipt the input to set the default for
