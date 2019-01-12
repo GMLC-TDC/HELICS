@@ -8,7 +8,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include <thread>
 
 #define BOOST_DATE_TIME_NO_LIB
-#include <boost/date_time/posix_time/ptime.hpp>
+//#include <boost/date_time/posix_time/ptime.hpp>
 
 namespace boostipc = boost::interprocess;
 
@@ -129,14 +129,14 @@ stx::optional<ActionMessage> OwnedQueue::getMessage (int timeout)
     {
         if (timeout >= 0)
         {
-            boost::posix_time::ptime abs_time =
+            /*boost::posix_time::ptime abs_time =
               boost::date_time::microsec_clock<boost::posix_time::ptime>::universal_time ();
             abs_time += boost::posix_time::milliseconds (timeout);
             bool res = rqueue->timed_receive (buffer.data (), mxSize, rx_size, priority, abs_time);
             if (!res)
             {
                 return stx::nullopt;
-            }
+            }*/
         }
         else if (timeout <= 0)
         {
