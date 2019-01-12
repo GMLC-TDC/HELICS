@@ -109,7 +109,7 @@ or the interface doesn't use port numbers
 std::pair<std::string, std::string> extractInterfaceandPortString (const std::string &address);
 
 /** strip any protocol strings from the interface and return a new string
-@example tcp://127.0.0.1 -> 127.0.0.1*/
+for example tcp://127.0.0.1 -> 127.0.0.1*/
 std::string stripProtocol (const std::string &networkAddress);
 /** strip any protocol strings from the interface and return a new string*/
 void removeProtocol (std::string &networkAddress);

@@ -75,6 +75,7 @@ class data_block
         m_data = std::move (str);
         return *this;
     }
+    /** assign the data block from a const char * */
     data_block &operator= (const char *s)
     {
         m_data.assign (s);
@@ -133,6 +134,7 @@ class data_block
     void push_back (char newchar) { m_data.push_back (newchar); }
 };
 
+/** operator to check if two data blocks are not equal to eachother*/
 inline bool operator!= (const data_block &db1, const data_block &db2) { return !(db1 == db2); }
 
 /** class containing a message structure*/
@@ -211,13 +213,18 @@ inline bool isValidIndex (sizeType testSize, const SizedDataType &vec)
 {
     return ((testSize >= sizeType (0)) && (testSize < static_cast<sizeType> (vec.size ())));
 }
-
+/** check if two data types are compatible with eachother
+@param type1 the first type to match
+@param type2 the second type to check
+@return true if the types are compatible with eachother
+*/
 bool matchingTypes (const std::string &type1, const std::string &type2);
 
 }  // namespace helics
 
 namespace std
 {
+/** overloaded swap function for helics::data_black*/
 template <>
 inline void swap (helics::data_block &db1, helics::data_block &db2) noexcept
 {
@@ -227,6 +234,7 @@ inline void swap (helics::data_block &db1, helics::data_block &db2) noexcept
 
 namespace std
 {
+/** overloaded swap function for helics::message*/
 template <>
 inline void swap (helics::Message &m1, helics::Message &m2) noexcept
 {

@@ -25,10 +25,13 @@ using Time = TimeRepresentation<count_time<12>>;
 using Time = TimeRepresentation<count_time<9>>;
 #endif
 
+/** constexpr definition for starting time*/
 constexpr Time timeZero = Time::zeroVal ();
+/** definition of the minimum time resolution*/
 constexpr Time timeEpsilon = Time::epsilon ();
+/** definition of the smallest negative increment of time*/
 constexpr Time negEpsilon = -Time::epsilon ();
-
+/** user defined literal for a time variable*/
 constexpr Time operator"" _t (long double val) { return Time (val); }  // NOLINT
 
 /** simple structure with the time and completion marker for iterations or dense time steps*/
@@ -55,7 +58,7 @@ Time loadTimeFromString (const std::string &timeString);
 @details the string can be a double or with units
 @example "1.234"  or "1032ms"
 @return a helics time generated from the string
-@throw, invalid_argument if the string is not a valid time
+@throws invalid_argument if the string is not a valid time
 */
 Time loadTimeFromString (const std::string &timeString, time_units defUnit);
 

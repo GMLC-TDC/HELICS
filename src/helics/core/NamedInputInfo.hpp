@@ -17,11 +17,13 @@ namespace helics
 class NamedInputInfo
 {
   public:
+    /** data structure containing a helics data value recorded from a publication*/
     struct dataRecord
     {
-        Time time = Time::minVal ();
-        unsigned int iteration = 0;
-        std::shared_ptr<const data_block> data;
+        Time time = Time::minVal ();  //!< the time of the data value
+        unsigned int iteration = 0;  //!< the iteration number of the data value
+        std::shared_ptr<const data_block> data;  //!< the data value
+        /** default constructor*/
         dataRecord () = default;
         dataRecord (Time recordTime, std::shared_ptr<const data_block> recordData)
             : time (recordTime), data (std::move (recordData))

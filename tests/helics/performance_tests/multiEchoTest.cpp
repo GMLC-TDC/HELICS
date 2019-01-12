@@ -21,7 +21,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include <thread>
 
 using helics::operator"" _t ;
-static constexpr helics::Time tend = 3600.0_t;  // simulation end time
+// static constexpr helics::Time tend = 3600.0_t;  // simulation end time
 namespace bdata = boost::unit_test::data;
 
 /** class implementing the hub for an echo test*/

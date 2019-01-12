@@ -10,9 +10,11 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include <functional>
 #include <utility>
 
-/**
- * HELICS Core API
- */
+/*! @namespace  helics
+@brief the main namespace for the helics co-simulation library
+
+User functions will be in the helics namespace with internal functions possible in a lower level namespace
+*/
 namespace helics
 {
 /** @file

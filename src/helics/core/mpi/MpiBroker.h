@@ -13,7 +13,7 @@ namespace helics
 namespace mpi
 {
 class MpiComms;
-
+/** broker object implementing mpi communications for HELICS*/
 class MpiBroker final : public CommsBroker<MpiComms, CoreBroker>
 {
   public:
@@ -36,6 +36,5 @@ class MpiBroker final : public CommsBroker<MpiComms, CoreBroker>
     int brokerRank;
     int brokerTag;
 };
-} // namespace mpi
-} // namespace helics
-
+}  // namespace mpi
+}  // namespace helics

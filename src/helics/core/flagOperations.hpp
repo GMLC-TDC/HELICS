@@ -31,7 +31,12 @@ enum operation_flags : uint16_t
     nameless_interface_flag = 15,  //!< flag indicating the interface is nameless
 };
 
-/** template function to set a flag in an object containing a flags field*/
+/** template function to set a flag in an object containing a flags field
+@tparam FlagContainer an object with a .flags field
+@tparam FlagIndex a type that can be used as part of a shift to index into a flag object
+@param M the container to set the flag in
+@param flag the flag to set
+*/
 template <class FlagContainer, class FlagIndex>
 inline void setActionFlag (FlagContainer &M, FlagIndex flag)
 {
@@ -60,13 +65,16 @@ inline void clearActionFlag (FlagContainer &M, FlagIndex flag)
     M.flags &= ~(static_cast<decltype (M.flags)> (1) << (flag));
 }
 
+/** helper function to facilitate make a flag variable*/
 inline constexpr uint16_t make_flags (unsigned int flag) { return static_cast<uint16_t> (1) << (flag); }
 
+/** helper function to facilitate make a flag variable out of two flags*/
 inline constexpr uint16_t make_flags (unsigned int flag1, unsigned int flag2)
 {
     return make_flags (flag1) | make_flags (flag2);
 }
 
+/** helper function to facilitate make a flag variable out of three flags*/
 inline constexpr uint16_t make_flags (unsigned int flag1, unsigned int flag2, unsigned int flag3)
 {
     return make_flags (flag1, flag2) | make_flags (flag3);

@@ -15,6 +15,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
  */
 namespace helics
 {
+/** generic class for holding information about interfaces for a core federate structure*/
 class InterfaceInfo
 {
   public:

@@ -158,6 +158,8 @@ std::unique_ptr<Message> FirewallOperator::process (std::unique_ptr<Message> mes
                 setActionFlag (*message, extra_flag3);
             }
             break;
+        case operations::none:
+            break;
         }
     }
     return message;
