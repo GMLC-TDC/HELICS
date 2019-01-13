@@ -7,6 +7,10 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 
 #include "Inputs.hpp"
 
+/** @file
+@details helper function for generate subscriptions of specify types
+*/
+
 namespace helics
 {
 inline Input &
@@ -206,7 +210,6 @@ class VectorSubscription2d
     VectorSubscription2d () noexcept {};
 
     /**constructor to build a subscription object
-    @param[in] required a flag indicating that the subscription is required to have a matching publication
     @param[in] valueFed  the ValueFederate to use
      @param[in] key the identifier for the publication to subscribe to
     @param[in] startIndex_x the index to start with in the x dimension
@@ -272,13 +275,12 @@ class VectorSubscription2d
     @return the value*/
     const std::vector<X> &getVals () const { return vals; }
     /** get the value in the given variable
-    @param[out] out the location to store the value
+    @param index the location to retrieve the value for
     */
     const X &operator[] (int index) const { return vals[index]; }
 
-    /** get the value in the given variable
-    @param[out] out the location to store the value
-    */
+    /** get the value in the given variable at a particular 2d index
+     */
     const X &at (int index_x, int index_y) const
     {
         return vals[(index_x - indices[0]) * indices[3] + (index_y - indices[2])];

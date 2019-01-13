@@ -107,7 +107,7 @@ We are always looking for help adding support for more tools, so please contact 
 
 # [Contributors](CONTRIBUTORS.md)
 
-# [Contributing](CONTRIBUTING.md)  [Code of Conduct](code-of-conduct.md)
+# [Contributing](CONTRIBUTING.md)  [Code of Conduct](.github/CODE_OF_CONDUCT.md)
 
 # Publications
 

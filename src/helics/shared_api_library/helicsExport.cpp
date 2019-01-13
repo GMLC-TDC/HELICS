@@ -359,6 +359,7 @@ void helicsFederateInfoSetFlagOption (helics_federate_info fi, int flag, helics_
     }
     hfi->setFlagOption (flag, (value != helics_false));
 }
+
 void helicsFederateInfoSetTimeProperty (helics_federate_info fi, int timeProperty, helics_time propertyValue, helics_error *err)
 {
     auto hfi = getFedInfo (fi, err);

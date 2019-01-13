@@ -50,7 +50,7 @@ struct iteration_time
 @details the string can be a double or with units
 for example "1.234",  or "1032ms" or "10423425 ns"
 @return a helics time generated from the string
-@throw, invalid_argument if the string is not a valid time
+@throw invalid_argument if the string is not a valid time
 */
 Time loadTimeFromString (const std::string &timeString);
 
@@ -64,7 +64,7 @@ Time loadTimeFromString (const std::string &timeString, time_units defUnit);
 
 /** generate a time related unit,
 @return a time_units enumeration value
-@throw, invalid_argument if the string is not a valid unit
+@throw invalid_argument if the string is not a valid unit
 */
 time_units timeUnitsFromString (const std::string &unitString);
 

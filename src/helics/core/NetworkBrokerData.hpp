@@ -82,9 +82,9 @@ class NetworkBrokerData
 };
 
 /** generate a string with a full address based on an interface string and port number
-@details,  how things get merged depend on what interface is used some use port number some do not
+@details  how things get merged depend on what interface is used some use port number some do not
 
-@param[in] interface a string with an interface description i.e 127.0.0.1
+@param[in] networkInterface a string with an interface description i.e 127.0.0.1
 @param portNumber the number of the port to use
 @return a string with the merged address
 */

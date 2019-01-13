@@ -1,12 +1,8 @@
-/**
-  @mainpage  HELICS
-
+/** @mainpage  HELICS
 @image html HELICS_Logo.png width=5cm
-       <p>HELICS (Hierarchical Engine for Large-Scale infrastructure Co-Simulation) is a co-simulation platform
-           <p/> <br/>
+HELICS (Hierarchical Engine for Large-Scale infrastructure Co-Simulation) is a co-simulation platform
+           
 [readMe](../../README.md)
-<br/>
 [Disclaimer](../../DISCLAIMER)
-<br/>
 [license](../../LICENSE)
  */

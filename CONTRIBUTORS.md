@@ -30,10 +30,10 @@ If you would like to contribute to the HELICS project see [CONTRIBUTING](CONTRIB
 
 ## Used Libraries or Code
 
-### [BOOST](www.boost.org)
+### [BOOST](http://www.boost.org)
   Boost is used throughout the code, including Asio for the TCP and UDP protocols and Timers.  The unit, integration, and system test suite is written using boost test.  The IPC core uses the boost interprocess library, the program options library is used for parsing command line options and the filesystem library is used frequently when file manipulation is needed.  Some algorithms and other libraries are also used throughout the code. Boost ls licensed under the boost license
 
-### [zmq](www.zeromq.org)
+### [zmq](http://www.zeromq.org)
   ZeroMQ message passing is used in the ZMQ core networking.  The autobuild currently uses version 4.2.5. No zmq library code is included in the HELICS source.  Helics installers include ZeroMQ binary libraries. ZeroMQ is licensed under [LGPL](https://github.com/zeromq/libzmq/blob/master/COPYING.LESSER) with a modification to allow for linking and in various forms and distribution of the binary under different terms if the library was not modified.  No modification of the ZMQ library or any of the ZeroMQ source files is included in the HELICS source code.  
 
 ### [cppzmq](https://github.com/zeromq/cppzmq)

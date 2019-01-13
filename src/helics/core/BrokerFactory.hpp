@@ -32,7 +32,7 @@ create (core_type type, const std::string &broker_name, const std::string &initi
 std::shared_ptr<Broker> create (core_type type, const std::string &broker_name, int argc, const char *const *argv);
 
 /** locate a coreBroker by name
-@param name the name of the broker
+@param brokerName the name of the broker
 @return a shared_ptr to the Broker*/
 std::shared_ptr<Broker> findBroker (const std::string &brokerName);
 
