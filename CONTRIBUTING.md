@@ -7,9 +7,11 @@ The following is a set of guidelines for contributing to HELICS and associated p
 #### Table Of Contents
 
 
-#  [Code of Conduct](code-of-conduct.md)
+#  [Code of Conduct](.github/CODE_OF_CONDUCT.md)
 
 If you just have a question check out [![Gitter chat](https://badges.gitter.im/GMLC-TDC/HELICS-src.png)](https://gitter.im/GMLC-TDC/HELICS-src)
+
+and there are a few questions answered on the github [WIKI](https://github.com/GMLC-TDC/HELICS-src/wiki) page for HELICS.
 
 ## How Can I Contribute?
 
@@ -27,6 +29,8 @@ This section guides you through submitting a feature request, or enhancement for
 
  Please include as much detail as possible including the steps that you imagine you would take if the feature you're requesting existed, and the rational and reasoning of why this feature would be a good idea for a co-simulation framework.
 
+ A pull request including a bug fix or feature will always be welcome.  
+
 
 #### Before Submitting An Enhancement Suggestion
 
@@ -37,7 +41,10 @@ This section guides you through submitting a feature request, or enhancement for
 ### Your First Code Contribution
 
 Unsure where to begin contributing to HELICS? You can start by looking for `beginner` and `help-wanted` issues:
-Help with documentation and test cases is always welcome.
+Help with documentation and test cases is always welcome.  Take a look at the [code coverage reports](https://codecov.io/gh/GMLC-TDC/HELICS-src) for some ideas on places that need more testing
+
+### Submitting a pull request
+Typically you would want to submit a pull request against the develop branch.  That branch gets merged into master periodically but the develop branch is the active development branch where all the code is tested an merged before making a release.  There is a [Pull request template](.github/PULL_REQUEST_TEMPLATE.md) that will guide you through the needed information.  The pull requests are run through several automated checks in travis and Appveyor and for the most part must pass these tests before merging.  The Codacy check is evaluated but not required as the checks are sometimes a bit aggressive.  
 
 ## Styleguides
-Code formatting is controlled via clang-format, a somewhat higher level style guide can be found [HERE](https://gmlc-tdc.github.io/HELICS-src/developer-guide/style.html)
+Code formatting is controlled via clang-format, a somewhat higher level style guide can be found [HERE](https://gmlc-tdc.github.io/HELICS-src/developer-guide/style.html)  The code is not fully conformant to this yet but we are slowly working on it.  
