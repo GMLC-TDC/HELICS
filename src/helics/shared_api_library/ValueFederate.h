@@ -125,6 +125,7 @@ extern "C"
     @param key the identifier for the publication
     @param type a code identifying the type of the input see /ref helics_data_type for available options
     @param units a string listing the units of the subscription maybe NULL
+    @param[in,out] err a pointer to an error object for catching errors
     @return an object containing the publication
     */
     HELICS_EXPORT helics_publication

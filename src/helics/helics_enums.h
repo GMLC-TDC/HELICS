@@ -57,13 +57,10 @@ extern "C"
         helics_data_type_complex_vector = 5,
         /** a named point consisting of a string and a double*/
         helics_data_type_named_point = 6,
-
         /** a boolean data type*/
         helics_data_type_boolean = 7,
-
         /** time data type*/
         helics_data_type_time = 8,
-
         /** raw data type*/
         helics_data_type_raw = 25,
         helics_data_type_any = 25262

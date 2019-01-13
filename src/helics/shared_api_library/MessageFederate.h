@@ -27,6 +27,7 @@ extern "C"
     helicsCreateCombinationFederate
     @param name the identifier for the endpoint,  this will be prepended with the federate name for the global identifier
     @param type a string describing the expected type of the publication may be NULL
+    @param[in,out] err a pointer to an error object for catching errors
     @return an object containing the endpoint, nullptr on failure
     */
     HELICS_EXPORT helics_endpoint helicsFederateRegisterEndpoint (helics_federate fed,
@@ -41,6 +42,7 @@ extern "C"
     helicsCreateCombinationFederate
     @param name the identifier for the endpoint,  the given name is the global identifier
     @param type a string describing the expected type of the publication may be NULL
+    @param[in,out] err a pointer to an error object for catching errors
     @return an object containing the endpoint, nullptr on failure
     */
     HELICS_EXPORT helics_endpoint helicsFederateRegisterGlobalEndpoint (helics_federate fed,
@@ -60,19 +62,19 @@ extern "C"
 
     @param fed the federate object in which to create a publication
     @param index the index of the publication to get
+    @param[in,out] err a pointer to an error object for catching errors
     @return a helics_endpoint, which will be NULL if an invalid index
     */
     HELICS_EXPORT helics_endpoint helicsFederateGetEndpointByIndex (helics_federate fed, int index, helics_error *err);
 
     /** set the default destination for an endpoint if no other endpoint is given
-
     @param endpoint the endpoint to set the destination for
     @param dest a string naming the desired default endpoint
+    @param[in,out] err a pointer to an error object for catching errors
     */
     HELICS_EXPORT void helicsEndpointSetDefaultDestination (helics_endpoint endpoint, const char *dest, helics_error *err);
 
     /** get the default destination for an endpoint
-
     @param endpoint the endpoint to set the destination for
     @return a string with the default destination
     */
@@ -82,8 +84,8 @@ extern "C"
     @param endpoint the endpoint to send the data from
     @param dest the target destination (nullptr to use the default destination)
     @param data the data to send
-    @param len the length of the data to send
-    @return helics_ok if everything worked
+    @param inputDataLength the length of the data to send
+    @param[in,out] err a pointer to an error object for catching errors
     */
     HELICS_EXPORT void
     helicsEndpointSendMessageRaw (helics_endpoint endpoint, const char *dest, const void *data, int inputDataLength, helics_error *err);
@@ -92,9 +94,9 @@ extern "C"
     @param endpoint the endpoint to send the data from
     @param dest the target destination (nullptr to use the default destination
     @param data the data to send
-    @param len the length of the data to send
+    @param inputDataLength the length of the data to send
     @param time the time the message should be sent
-    @return helics_ok if everything worked
+    @param[in,out] err a pointer to an error object for catching errors
     */
     HELICS_EXPORT void helicsEndpointSendEventRaw (helics_endpoint endpoint,
                                                    const char *dest,
@@ -106,22 +108,23 @@ extern "C"
     /** send a message object from a specific endpoint
     @param endpoint the endpoint to send the data from
     @param message the actual message to send
-    @return helics_ok if everything worked
+    @param[in,out] err a pointer to an error object for catching errors
     */
     HELICS_EXPORT void helicsEndpointSendMessage (helics_endpoint endpoint, helics_message *message, helics_error *err);
 
     /** subscribe an endpoint to a publication
     @param endpoint the endpoint to use
     @param key the name of the publication
+    @param[in,out] err a pointer to an error object for catching errors
     */
     HELICS_EXPORT void helicsEndpointSubscribe (helics_endpoint endpoint, const char *key, helics_error *err);
     /** check if the federate has any outstanding messages
     @param fed the federate to check if it has
-    @return helics_true if the federate has a message waiting false otherwise*/
+    @return helics_true if the federate has a message waiting helics_false otherwise*/
     HELICS_EXPORT helics_bool helicsFederateHasMessage (helics_federate fed);
     /** check if a given endpoint has any unread messages
     @param endpoint the endpoint to check
-    @return helics_true if the endpoint has a message, false otherwise*/
+    @return helics_true if the endpoint has a message, helics_false otherwise*/
     HELICS_EXPORT helics_bool helicsEndpointHasMessage (helics_endpoint endpoint);
 
     /**
@@ -178,7 +181,7 @@ extern "C"
     @param end the endpoint to modify
     @param option integer code for the option to set /ref helics_handle_options
     @param value the value to set the option
-     @param[in,out] err an error object to fill out in case of an error*/
+    @param[in,out] err an error object to fill out in case of an error*/
     HELICS_EXPORT void helicsEndpointSetOption (helics_endpoint end, int option, helics_bool value, helics_error *err);
     /** set a handle option on an endpoint
     @param end the endpoint to modify
