@@ -81,7 +81,7 @@
 
 //
 //// typemap for vector input functions
-//%typemap(in) (const double *vectorInput, int vectorlength) {
+//%typemap(in) (const double *vectorInput, int vectorLength) {
 //  int i;
 //  if (!PyList_Check($input)) {
 //    PyErr_SetString(PyExc_ValueError,"Expected a list");
@@ -105,11 +105,11 @@
 //  }
 //}
 //
-//%typemap(argout) (const double *vectorInput, int vectorlength)
+//%typemap(argout) (const double *vectorInput, int vectorLength)
 //{
 //}
 //
-//%typemap(freearg) (const double *vectorInput, int vectorlength) {
+//%typemap(freearg) (const double *vectorInput, int vectorLength) {
 //   if ($1) free($1);
 //}
 //

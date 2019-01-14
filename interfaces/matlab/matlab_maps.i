@@ -159,7 +159,7 @@ static void throwHelicsMatlabError(helics_error *err) {
 }
 
 // typemap for vector input functions
-%typemap(in) (const double *vectorInput, int vectorlength) {
+%typemap(in) (const double *vectorInput, int vectorLength) {
   if (!mxIsDouble($input)) {
     SWIG_exception_fail(SWIG_ArgError(3), "argument must be a double array");
     return NULL;
@@ -168,7 +168,7 @@ static void throwHelicsMatlabError(helics_error *err) {
   $1=mxGetPr($input);
 }
 
-%typemap(argout) (const double *vectorInput, int vectorlength)
+%typemap(argout) (const double *vectorInput, int vectorLength)
 {
 }
 

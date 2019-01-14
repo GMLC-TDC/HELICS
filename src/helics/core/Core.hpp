@@ -10,13 +10,6 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include <functional>
 #include <utility>
 
-/*! @namespace  helics
-@brief the main namespace for the helics co-simulation library
-
-User functions will be in the helics namespace with internal functions possible in a lower level namespace
-*/
-namespace helics
-{
 /** @file
  * The HELICS core interface.  Abstract class that is
  * implemented for the specific communication systems (e.g. ZMQ and
@@ -32,6 +25,12 @@ namespace helics
  * Note: Methods should all be pure virtual.
  */
 
+/** @namespace  helics
+@brief the main namespace for the helics co-simulation library
+User functions will be in the helics namespace with internal functions possible in a lower level namespace
+*/
+namespace helics
+{
 class CoreFederateInfo;
 
 /** the class defining the core interface through an abstract class*/

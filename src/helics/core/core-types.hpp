@@ -85,7 +85,7 @@ enum class iteration_request : signed char
 std::string to_string (core_type type);
 
 /** generate a core type value from a std::string
-@param a string describing the desired core type
+@param type a string describing the desired core type
 @return a value of the helics_core_type enumeration
 helics::core_type::unrecognized if the type is not valid
 */

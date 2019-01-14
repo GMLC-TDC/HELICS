@@ -25,7 +25,7 @@ class data_view
     /** default constructor*/
     data_view () = default;
     /** construct from a shared_ptr to a data_block*/
-    data_view (std::shared_ptr<const data_block> dt) : dblock (dt->m_data), ref (std::move (dt)){};
+    data_view (std::shared_ptr<const data_block> dt) : dblock (dt->m_data), ref (std::move (dt)){};  // NOLINT
     /** construct from a regular data_block*/
     data_view (const data_block &dt) noexcept : dblock (dt.m_data){};  // NOLINT
     /** copy constructor*/

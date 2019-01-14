@@ -69,37 +69,37 @@ class ValueFederateManager
     /** add a shortcut for locating a subscription
     @details primarily for use in looking up an id from a different location
     creates a local shortcut for referring to a subscription which may have a long actual name
-    @param[in] the subscription identifier
-    @param[in] shortcutName the name of the shortcut
+    @param inp the subscription identifier
+    @param shortcutName the name of the shortcut
     */
     void addAlias (const Input &inp, const std::string &shortcutName);
 
     /** add a alias/shortcut for locating a publication
     @details primarily for use in looking up an id from a different location
     creates a local shortcut for referring to a subscription which may have a long actual name
-    @param[in] the subscription identifier
+    @param[in] pub the subscription identifier
     @param[in] shortcutName the name of the shortcut
     */
     void addAlias (const Publication &pub, const std::string &shortcutName);
     /** add a destination target to a publication
-   @param id the identifier of the input
-   target the name of the input to send the data to
+   @param pub the identifier of the input
+   @param target the name of the input to send the data to
    */
     void addTarget (const Publication &pub, const std::string &target);
     /** add a source target to an input/subscription
-    @param id the identifier of the publication
-    target the name of the input to send the data to
+    @param inp the identifier of the publication
+    @param target the name of the input to send the data to
     */
     void addTarget (const Input &inp, const std::string &target);
 
     /** remove a destination target from a publication
-    @param id the identifier of the input
-    target the name of the input to remove
+    @param pub the identifier of the input
+    @param target the name of the input to remove
     */
     void removeTarget (const Publication &pub, const std::string &target);
     /** remove a source target from an input/subscription
-    @param id the identifier of the publication
-    target the name of the publication to remove
+    @param inp the identifier of the publication
+    @param target the name of the publication to remove
     */
     void removeTarget (const Input &inp, const std::string &target);
 
@@ -111,7 +111,7 @@ class ValueFederateManager
     void setDefaultValue (const Input &inp, const data_view &block);
 
     /** get a value as raw data block from the system
-    @param[in] id the identifier for the subscription
+    @param inp the identifier for the subscription
     @return a constant data block
     */
     data_view getValue (const Input &inp);

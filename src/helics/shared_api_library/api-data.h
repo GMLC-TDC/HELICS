@@ -50,8 +50,8 @@ extern "C"
     /** defining a boolean type for use in the helics interface*/
     typedef int helics_bool;
 
-    const helics_bool helics_true = 1;  //!< indicator used for a true response
-    const helics_bool helics_false = 0;  //!< indicator used for a false response
+    const helics_bool helics_true = 1; /*!< indicator used for a true response */
+    const helics_bool helics_false = 0; /*!< indicator used for a false response */
 
     /** enumeration of the different iteration results*/
     typedef enum

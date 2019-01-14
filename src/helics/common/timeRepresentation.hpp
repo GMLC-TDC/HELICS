@@ -364,8 +364,8 @@ class TimeRepresentation
     }
 
 #else
-    /** normal time constructor from a double representation of seconds*/
-    constexpr TimeRepresentation (double t) noexcept : internalTimeCode (Tconv::convert (t)) {}
+    /** normal time constructor from a double representation of seconds intended explicit*/
+    constexpr TimeRepresentation (double t) noexcept : internalTimeCode (Tconv::convert (t)) {}  // NOLINT
     CHRONO_CONSTEXPR TimeRepresentation (std::chrono::nanoseconds nsTime) noexcept
         : internalTimeCode (Tconv::convert (nsTime))
     {
@@ -424,7 +424,7 @@ class TimeRepresentation
         return std::chrono::nanoseconds (Tconv::toCount (internalTimeCode, time_units::ns));
     }
     /** direct conversion to double static cast overload*/
-    constexpr operator double () const noexcept { return Tconv::toDouble (internalTimeCode); }
+    constexpr operator double () const noexcept { return Tconv::toDouble (internalTimeCode); }  // NOLINT
 
     TimeRepresentation &operator+= (const TimeRepresentation &rhs) noexcept
     {

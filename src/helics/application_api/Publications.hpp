@@ -460,7 +460,7 @@ this function should not be used as the primary means of publications as it does
 operation vs the member publish calls
 @param fed a reference to a valueFederate
 @param pubKey  the name of the publication
-@tparam pargs any combination of arguments that go into the other publish commands
+@param pargs any combination of arguments that go into the other publish commands
 */
 template <class... Us>
 void publish (ValueFederate &fed, const std::string &pubKey, Us... pargs)

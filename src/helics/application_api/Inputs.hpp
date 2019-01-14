@@ -296,7 +296,7 @@ class Input
     template <class X>
     X getValue_impl (std::integral_constant<int, primaryType> /*V*/)
     {
-        X val;
+        X val;  // NOLINT
         getValue_impl (std::integral_constant<int, primaryType> (), val);
         return val;
     }
