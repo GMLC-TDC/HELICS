@@ -605,7 +605,9 @@ class TimeRepresentation
         os << Tconv::toDouble (t1.internalTimeCode) << 's';
         return os;
     }
-    friend bool operator== (double lhs, TimeRepresentation t1) { return (TimeRepresentation<Tconv> (lhs) == t1); }
+    friend bool operator== (double lhs, TimeRepresentation t1) { return (TimeRepresentation (lhs) == t1); }
+
+    friend bool operator!= (double lhs, TimeRepresentation t1) { return (TimeRepresentation (lhs) != t1); }
 };
 
 /** defining some additional operators for TimeRepresentation that were not covered
@@ -692,12 +694,6 @@ template <class Tconv>
 inline bool operator<= (TimeRepresentation<Tconv> t1, double rhs)
 {
     return (t1 <= TimeRepresentation<Tconv> (rhs));
-}
-
-template <class Tconv>
-inline bool operator!= (double lhs, TimeRepresentation<Tconv> t1)
-{
-    return (TimeRepresentation<Tconv> (lhs) != t1);
 }
 
 template <class Tconv>
