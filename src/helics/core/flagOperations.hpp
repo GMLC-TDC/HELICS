@@ -40,7 +40,7 @@ enum operation_flags : uint16_t
 template <class FlagContainer, class FlagIndex>
 inline void setActionFlag (FlagContainer &M, FlagIndex flag)
 {
-    M.flags |= (static_cast<decltype (M.flags)> (1) << (flag));
+    M.flags |= (static_cast<decltype (M.flags)> (1) << (static_cast<uint16_t> ((flag))));
 }
 
 /** check a flag value on a specified index*/
@@ -48,21 +48,21 @@ inline void setActionFlag (FlagContainer &M, FlagIndex flag)
 template <class FlagIndex>
 inline bool checkActionFlag (uint16_t flags, FlagIndex flag)
 {
-    return ((flags & (static_cast<uint16_t> (1) << (flag))) != 0u);
+    return ((flags & (static_cast<uint16_t> (1) << (static_cast<uint16_t> ((flag))))) != 0u);
 }
 
 /** template function to check a flag in an object containing a flags field*/
 template <class FlagContainer, class FlagIndex>
 inline bool checkActionFlag (const FlagContainer &M, FlagIndex flag)
 {
-    return ((M.flags & (static_cast<decltype (M.flags)> (1) << (flag))) != 0u);
+    return ((M.flags & (static_cast<decltype (M.flags)> (1) << (static_cast<uint16_t> ((flag))))) != 0u);
 }
 
 /** template function to clear a flag in an object containing a flags field*/
 template <class FlagContainer, class FlagIndex>
 inline void clearActionFlag (FlagContainer &M, FlagIndex flag)
 {
-    M.flags &= ~(static_cast<decltype (M.flags)> (1) << (flag));
+    M.flags &= ~(static_cast<decltype (M.flags)> (1) << (static_cast<uint16_t> ((flag))));
 }
 
 /** helper function to facilitate make a flag variable*/

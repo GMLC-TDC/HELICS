@@ -176,7 +176,13 @@ Federate::~Federate ()
 {
     if (coreObject)
     {
-        finalize ();
+        try
+        {
+            finalize ();
+        }
+        catch (...)  // do not allow a throw inside the destructor
+        {
+        }
     }
 }
 
@@ -1239,11 +1245,11 @@ Filter &Federate::getFilter (const std::string &filterName)
 
 int Federate::getFilterCount () const { return fManager->getFilterCount (); }
 
-void Federate::setFilterOperator (const Filter &filt, std::shared_ptr<FilterOperator> mo)
+void Federate::setFilterOperator (const Filter &filt, std::shared_ptr<FilterOperator> op)
 {
     if (coreObject)
     {
-        coreObject->setFilterOperator (filt.getHandle (), std::move (mo));
+        coreObject->setFilterOperator (filt.getHandle (), std::move (op));
     }
     else
     {

@@ -63,7 +63,7 @@ class Federate
     local_federate_id fedID;  //!< the federate ID of the object for use in the core
   protected:
     std::shared_ptr<Core> coreObject;  //!< reference to the core simulation API
-    Time currentTime;  //!< the current simulation time
+    Time currentTime = Time::minVal ();  //!< the current simulation time
   private:
     std::unique_ptr<libguarded::shared_guarded<AsyncFedCallInfo, std::mutex>>
       asyncCallInfo;  //!< pointer to a class defining the async call information
@@ -91,7 +91,9 @@ class Federate
     Federate (const std::string &fedname, const std::string &configString);
     /**default constructor*/
     Federate () noexcept;
+    /** move constructor*/
     Federate (Federate &&fed) noexcept;
+    /** deleted copy constructor*/
     Federate (const Federate &fed) = delete;
     /** virtual destructor function */
     virtual ~Federate ();

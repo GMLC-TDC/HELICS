@@ -27,7 +27,7 @@ namespace ipc
 IpcComms::IpcComms ()
 {
     // override the default value for this comm system
-    maxMessageCount_ = 256;
+    maxMessageCount = 256;
 }
 /** destructor*/
 IpcComms::~IpcComms () { disconnect (); }
@@ -63,7 +63,7 @@ void IpcComms::loadNetworkInfo (const NetworkBrokerData &netInfo)
 void IpcComms::queue_rx_function ()
 {
     OwnedQueue rxQueue;
-    bool connected = rxQueue.connect (localTargetAddress, maxMessageCount_, maxMessageSize_);
+    bool connected = rxQueue.connect (localTargetAddress, maxMessageCount, maxMessageSize);
     if (!connected)
     {
         disconnecting = true;
@@ -87,7 +87,7 @@ void IpcComms::queue_rx_function ()
             ipcbackchannel = 0;
             goto DISCONNECT_RX_QUEUE;
         case IPC_BACKCHANNEL_TRY_RESET:
-            connected = rxQueue.connect (localTargetAddress, maxMessageCount_, maxMessageSize_);
+            connected = rxQueue.connect (localTargetAddress, maxMessageCount, maxMessageSize);
             if (!connected)
             {
                 disconnecting = true;

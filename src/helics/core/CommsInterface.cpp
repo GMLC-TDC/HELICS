@@ -36,8 +36,8 @@ void CommsInterface::loadNetworkInfo (const NetworkBrokerData &netInfo)
         brokerTargetAddress = netInfo.brokerAddress;
         brokerName = netInfo.brokerName;
         interfaceNetwork = netInfo.interfaceNetwork;
-        maxMessageSize_ = netInfo.maxMessageSize;
-        maxMessageCount_ = netInfo.maxMessageCount;
+        maxMessageSize = netInfo.maxMessageSize;
+        maxMessageCount = netInfo.maxMessageCount;
         autoBroker = netInfo.autobroker;
         switch (netInfo.server_mode)
         {
@@ -436,17 +436,17 @@ void CommsInterface::setLoggingCallback (
     loggingCallback = std::move (callback);
 }
 
-void CommsInterface::setMessageSize (int maxMessageSize, int maxMessageCount)
+void CommsInterface::setMessageSize (int maxMsgSize, int maxCount)
 {
     if (propertyLock ())
     {
-        if (maxMessageSize > 0)
+        if (maxMsgSize > 0)
         {
-            maxMessageSize_ = maxMessageSize;
+            maxMessageSize = maxMsgSize;
         }
-        if (maxMessageCount > 0)
+        if (maxCount > 0)
         {
-            maxMessageCount_ = maxMessageCount;
+            maxMessageCount = maxCount;
         }
         propertyUnLock ();
     }

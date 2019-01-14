@@ -91,10 +91,7 @@ bool MessageFederateManager::hasMessage (const Endpoint &ept) const
         auto eptDat = reinterpret_cast<EndpointData *> (ept.dataReference);
         return (!eptDat->messages.empty ());
     }
-    else
-    {
-        return false;
-    }
+    return false;
 }
 
 /**
@@ -107,10 +104,7 @@ uint64_t MessageFederateManager::pendingMessages (const Endpoint &ept) const
         auto eptDat = reinterpret_cast<EndpointData *> (ept.dataReference);
         return eptDat->messages.size ();
     }
-    else
-    {
-        return 0;
-    }
+    return 0;
 }
 /**
 * Returns the number of pending receives for the specified destination endpoint.
@@ -160,14 +154,16 @@ std::unique_ptr<Message> MessageFederateManager::getMessage ()
     return nullptr;
 }
 
-void MessageFederateManager::sendMessage (const Endpoint &source, const std::string &dest, data_view message)
+void MessageFederateManager::sendMessage (const Endpoint &source,
+                                          const std::string &dest,
+                                          const data_view &message)
 {
     coreObject->send (source.handle, dest, message.data (), message.size ());
 }
 
 void MessageFederateManager::sendMessage (const Endpoint &source,
                                           const std::string &dest,
-                                          data_view message,
+                                          const data_view &message,
                                           Time sendTime)
 {
     coreObject->sendEvent (sendTime, source.handle, dest, message.data (), message.size ());

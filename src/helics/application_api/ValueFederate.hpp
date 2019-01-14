@@ -58,6 +58,8 @@ class ValueFederate : public virtual Federate  // using virtual inheritance to a
 
     /** default move assignment*/
     ValueFederate &operator= (ValueFederate &&fed) noexcept;
+    /** delete copy assignment*/
+    ValueFederate &operator= (const ValueFederate &fed) = delete;
     /** register a publication
     @details call is only valid in startup mode
     @param[in] key the name of the publication

@@ -213,7 +213,7 @@ double randDouble (random_dists_t dist, double p1, double p2)
 class randomDelayGenerator
 {
   public:
-    std::atomic<random_dists_t> dist;  //!< the distribution
+    std::atomic<random_dists_t> dist{random_dists_t::uniform};  //!< the distribution
     std::atomic<double> param1{0.0};  //!< parameter 1 typically mean or min
     std::atomic<double> param2{0.0};  //!< parameter 2 typically stddev or max
 
@@ -315,8 +315,8 @@ void RerouteFilterOperation::setString (const std::string &property, const std::
         catch (const std::regex_error &re)
         {
             std::cerr << "filter expression is not a valid Regular expression " << re.what () << std::endl;
-            throw (helics::InvalidParameter (
-              (std::string ("filter expression is not a valid Regular expression ") + re.what ()).c_str ()));
+            throw (helics::InvalidParameter (std::string ("filter expression is not a valid Regular expression ") +
+                                             re.what ()));
         }
     }
 }
@@ -333,9 +333,9 @@ std::string newDestGeneration (const std::string &src, const std::string &dest, 
         return formula;
     }
     std::string newDest = formula;
-    std::regex srcreg ("\\$\\{source\\}");
+    std::regex srcreg (R"(\$\{source\})");
     std::regex_replace (newDest, srcreg, src);
-    std::regex destreg ("\\$\\{dest\\}");
+    std::regex destreg (R"(\$\{dest\})");
     std::regex_replace (newDest, destreg, dest);
     return newDest;
 }
@@ -359,30 +359,23 @@ std::string RerouteFilterOperation::rerouteOperation (const std::string &src, co
     return dest;
 }
 
-
 FirewallFilterOperation::FirewallFilterOperation ()
 {
-    op = std::make_shared<FirewallOperator> (
-      [this](const Message *mess) { return allowPassed (mess); });
+    op = std::make_shared<FirewallOperator> ([this](const Message *mess) { return allowPassed (mess); });
 }
 
 FirewallFilterOperation::~FirewallFilterOperation () = default;
 
 void FirewallFilterOperation::set (const std::string & /*property*/, double /*val*/) {}
 
-void FirewallFilterOperation::setString (const std::string & /*property*/, const std::string & /*val*/)
-{
-    
-}
+void FirewallFilterOperation::setString (const std::string & /*property*/, const std::string & /*val*/) {}
 
 std::shared_ptr<FilterOperator> FirewallFilterOperation::getOperator ()
 {
     return std::static_pointer_cast<FilterOperator> (op);
 }
 
-
-bool FirewallFilterOperation::allowPassed (const Message * /*mess*/) const
-{ return true; }
+bool FirewallFilterOperation::allowPassed (const Message * /*mess*/) const { return true; }
 
 CloneFilterOperation::CloneFilterOperation (Core *core) : coreptr (core)
 {

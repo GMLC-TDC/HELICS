@@ -189,7 +189,7 @@ void TcpCommsSS::queue_tx_function ()
     if (serverMode)
     {
         server =
-          TcpServer::create (ioserv->getBaseService (), localTargetAddress, PortNumber, true, maxMessageSize_);
+          TcpServer::create (ioserv->getBaseService (), localTargetAddress, PortNumber, true, maxMessageSize);
         while (!server->isReady ())
         {
             logWarning ("retrying tcp bind");
@@ -256,7 +256,7 @@ void TcpCommsSS::queue_tx_function ()
             {
                 brokerConnection =
                   makeConnection (ioserv->getBaseService (), brokerTargetAddress, std::to_string (brokerPort),
-                                  maxMessageSize_, std::chrono::milliseconds (connectionTimeout));
+                                  maxMessageSize, std::chrono::milliseconds (connectionTimeout));
                 if (!brokerConnection)
                 {
                     logError ("initial connection to broker timed out");

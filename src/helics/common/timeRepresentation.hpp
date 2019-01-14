@@ -198,7 +198,7 @@ class count_time
     }
     static constexpr double toDouble (baseType val) noexcept
     {
-        return (static_cast<double> (val / iFactor) + static_cast<double> (val % iFactor) * ddivFactor);
+        return (static_cast<double> (val / iFactor) + static_cast<double> (val % iFactor) * ddivFactor);  // NOLINT
     }
 
     static std::int64_t toCount (baseType val, time_units units) noexcept
@@ -366,7 +366,7 @@ class TimeRepresentation
 #else
     /** normal time constructor from a double representation of seconds intended explicit*/
     constexpr TimeRepresentation (double t) noexcept : internalTimeCode (Tconv::convert (t)) {}  // NOLINT
-    CHRONO_CONSTEXPR TimeRepresentation (std::chrono::nanoseconds nsTime) noexcept
+    CHRONO_CONSTEXPR TimeRepresentation (std::chrono::nanoseconds nsTime) noexcept  // NOLINT
         : internalTimeCode (Tconv::convert (nsTime))
     {
     }

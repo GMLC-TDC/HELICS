@@ -11,7 +11,7 @@ namespace helics
 {
 Input::Input (ValueFederate *valueFed,
               const std::string &key,
-              const std::string &defType,
+              const std::string &defaultType,
               const std::string &units)
 {
     auto &inp = valueFed->getInput (key);
@@ -21,25 +21,25 @@ Input::Input (ValueFederate *valueFed,
     }
     else
     {
-        operator= (valueFed->registerInput (key, defType, units));
+        operator= (valueFed->registerInput (key, defaultType, units));
     }
 }
 
 Input::Input (interface_visibility locality,
               ValueFederate *valueFed,
               const std::string &key,
-              const std::string &defType,
+              const std::string &defaultType,
               const std::string &units)
 {
     try
     {
         if (locality == interface_visibility::global)
         {
-            operator= (valueFed->registerGlobalInput (key, defType, units));
+            operator= (valueFed->registerGlobalInput (key, defaultType, units));
         }
         else
         {
-            operator= (valueFed->registerInput (key, defType, units));
+            operator= (valueFed->registerInput (key, defaultType, units));
         }
     }
     catch (const RegistrationFailure &e)

@@ -73,7 +73,7 @@ class CommsInterface
       std::function<void(int level, const std::string &name, const std::string &message)> callback);
     /** set the max message size and max Queue size
      */
-    void setMessageSize (int maxMessageSize, int maxMessageCount);
+    void setMessageSize (int maxMsgSize, int maxCount);
     /** check if the commInterface is connected
      */
     bool isConnected () const;
@@ -130,8 +130,8 @@ class CommsInterface
     bool autoBroker = false;  //!< the broker should be automatically generated if needed
     std::chrono::milliseconds connectionTimeout{
       4000};  // timeout for the initial connection to a broker or to bind a broker port(in ms)
-    int maxMessageSize_ = 16 * 1024;  //!< the maximum message size for the queues (if needed)
-    int maxMessageCount_ = 512;  //!< the maximum number of message to buffer (if needed)
+    int maxMessageSize = 16 * 1024;  //!< the maximum message size for the queues (if needed)
+    int maxMessageCount = 512;  //!< the maximum number of message to buffer (if needed)
     std::atomic<bool> requestDisconnect{false};  //!< flag gets set when disconnect is called
     std::function<void(ActionMessage &&)> ActionCallback;  //!< the callback for what to do with a received message
     std::function<void(int level, const std::string &name, const std::string &message)>
@@ -169,7 +169,7 @@ class CommsInterface
 };
 
 template <class X>
-class conditionalChangeOnDestroy
+class ConditionalChangeOnDestroy
 {
   private:
     std::atomic<X> &aref;
@@ -177,11 +177,11 @@ class conditionalChangeOnDestroy
     X expectedValue;
 
   public:
-    conditionalChangeOnDestroy (std::atomic<X> &var, X finalValue, X expValue)
+    ConditionalChangeOnDestroy (std::atomic<X> &var, X finalValue, X expValue)
         : aref (var), fval (std::move (finalValue)), expectedValue (std::move (expValue))
     {
     }
-    ~conditionalChangeOnDestroy () { aref.compare_exchange_strong (expectedValue, fval); }
+    ~ConditionalChangeOnDestroy () { aref.compare_exchange_strong (expectedValue, fval); }
 };
 
 }  // namespace helics

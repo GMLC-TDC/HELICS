@@ -54,6 +54,6 @@ class CombinationFederate : public ValueFederate, public MessageFederate
     virtual std::string localQuery (const std::string &queryStr) const override;
 
   public:
-    virtual void registerInterfaces (const std::string &jsonString) override;
+    virtual void registerInterfaces (const std::string &configString) override;
 };
 }  // namespace helics

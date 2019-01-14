@@ -194,7 +194,7 @@ class LoggerManager
     but does not necessarily destroy the Logger*/
     static void closeLogger (const std::string &loggerName = "");
     /** sends a message to the default Logger*/
-    static void logMessage (const std::string &message);
+    static void logMessage (std::string message);
 
     /*destructor*/
     virtual ~LoggerManager ();

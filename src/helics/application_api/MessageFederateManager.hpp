@@ -73,10 +73,10 @@ class MessageFederateManager
     std::unique_ptr<Message> getMessage ();
 
     /**/
-    void sendMessage (const Endpoint &source, const std::string &dest, data_view message);
-
-    void sendMessage (const Endpoint &source, const std::string &dest, data_view message, Time sendTime);
-
+    void sendMessage (const Endpoint &source, const std::string &dest, const data_view &message);
+    /**/
+    void sendMessage (const Endpoint &source, const std::string &dest, const data_view &message, Time sendTime);
+    /**/
     void sendMessage (const Endpoint &source, std::unique_ptr<Message> message);
 
     /** update the time from oldTime to newTime
@@ -136,7 +136,7 @@ class MessageFederateManager
     shared_guarded<DualMappedVector<Endpoint, std::string, interface_handle, reference_stability::stable>>
       local_endpoints;  //!< storage for the local endpoint information
     atomic_guarded<std::function<void(Endpoint &, Time)>> allCallback;
-    Time CurrentTime;  //!< the current simulation time
+    Time CurrentTime = Time::minVal ();  //!< the current simulation time
     Core *coreObject;  //!< the pointer to the actual core
     MessageFederate *mFed;  //!< pointer back to the message Federate
     const local_federate_id fedID;  //!< storage for the federate ID

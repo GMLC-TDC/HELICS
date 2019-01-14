@@ -39,7 +39,7 @@ class BasicFedInfo
     global_federate_id global_id;  //!< the identification code for the federate
     route_id route;  //!< the routing information for data to be sent to the federate
     global_broker_id parent;  //!< the id of the parent broker/core
-    bool _disconnected = false;
+    bool isDisconnected = false;
     explicit BasicFedInfo (const std::string &fedname) : name (fedname){};
 };
 
@@ -53,7 +53,7 @@ class BasicBrokerInfo
     route_id route;  //!< the identifier for the route to take to the broker
     global_broker_id parent;  //!< the id of the parent broker/core
     bool _initRequested = false;  //!< flag indicating the broker has requesting initialization
-    bool _disconnected = false;  //!< flag indicating that the broker has disconnected
+    bool isDisconnected = false;  //!< flag indicating that the broker has disconnected
     bool _hasTimeDependency = false;  //!< flag indicating that a broker has endpoints it is coordinating
     bool _core = false;  //!< if set to true the broker is a core false is a broker;
     bool _nonLocal = false;  //!< indicator that the broker has a subbroker as a parent.

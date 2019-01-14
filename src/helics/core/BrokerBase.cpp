@@ -61,7 +61,14 @@ BrokerBase::~BrokerBase ()
 {
     if (!queueDisabled)
     {
-        joinAllThreads ();
+        try
+        {
+            joinAllThreads ();
+        }
+        catch (...)
+        {
+            // no exceptions in the destructor
+        }
     }
 }
 

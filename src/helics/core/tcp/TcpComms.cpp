@@ -161,7 +161,7 @@ void TcpComms::queue_rx_function ()
     }
     auto ioserv = AsioServiceManager::getServicePointer ();
     auto server = helics::tcp::TcpServer::create (ioserv->getBaseService (), localTargetAddress, PortNumber,
-                                                  reuse_address, maxMessageSize_);
+                                                  reuse_address, maxMessageSize);
     while (!server->isReady ())
     {
         if ((autoPortNumber) && (hasBroker))
@@ -169,7 +169,7 @@ void TcpComms::queue_rx_function ()
             server->close ();
             ++PortNumber;
             server = helics::tcp::TcpServer::create (ioserv->getBaseService (), localTargetAddress, PortNumber,
-                                                     reuse_address, maxMessageSize_);
+                                                     reuse_address, maxMessageSize);
         }
         else
         {
@@ -261,7 +261,7 @@ bool TcpComms::establishBrokerConnection (std::shared_ptr<AsioServiceManager> &i
     {
         brokerConnection =
           makeConnection (ioserv->getBaseService (), brokerTargetAddress, std::to_string (brokerPort),
-                          maxMessageSize_, std::chrono::milliseconds (connectionTimeout));
+                          maxMessageSize, std::chrono::milliseconds (connectionTimeout));
         if (!brokerConnection)
         {
             logError ("initial connection to broker timed out");

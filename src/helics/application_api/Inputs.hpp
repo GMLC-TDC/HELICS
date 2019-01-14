@@ -50,16 +50,16 @@ class Input
     }
 
     Input (ValueFederate *valueFed,
-           const std::string &name,
+           const std::string &key,
            const std::string &defaultType = "def",
            const std::string &units = std::string ());
 
     template <class FedPtr>
     Input (FedPtr &valueFed,
-           const std::string &name,
+           const std::string &key,
            const std::string &defaultType = "def",
            const std::string &units = std::string ())
-        : Input (std::addressof (*valueFed), name, defaultType, units)
+        : Input (std::addressof (*valueFed), key, defaultType, units)
     {
         static_assert (std::is_base_of<ValueFederate, std::remove_reference_t<decltype (*valueFed)>>::value,
                        "first argument must be a pointer to a ValueFederate");
