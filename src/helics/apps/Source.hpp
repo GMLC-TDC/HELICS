@@ -139,7 +139,7 @@ class Source : public App
   private:
     int loadArguments (boost::program_options::variables_map &vm_map);
     /** load from a jsonString
-    @param either a JSON filename or a string containing JSON
+    @param jsonString either a JSON filename or a string containing JSON
     */
     virtual void loadJsonFile (const std::string &jsonString) override;
     /** execute a source object and update its time return the next execution time*/

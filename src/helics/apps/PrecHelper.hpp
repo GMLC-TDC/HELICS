@@ -9,10 +9,10 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 namespace helics
 {
 class FederateInfo;
-}
+}  // namespace helics
 
 helics::data_type getType (const std::string &typeString);
 
 char typeCharacter (helics::data_type type);
 
-bool isBinaryData(helics::data_block &data);
+bool isBinaryData (helics::data_block &data);

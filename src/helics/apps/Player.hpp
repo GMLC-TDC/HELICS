@@ -62,10 +62,11 @@ class Player : public App
     */
     Player (const std::string &name, const std::shared_ptr<Core> &core, const FederateInfo &fi);
     /**constructor taking a file with the required information
-    @param[in] name the name of the app
-    @param[in] jsonString file or JSON string defining the federate information and other configuration
+    @param[in] appName the name of the app
+    @param[in] configString JSON, TOML or text file or JSON string defining the federate information and other
+    configuration
     */
-    Player (const std::string &name, const std::string &jsonString);
+    Player (const std::string &appName, const std::string &configString);
 
     /** move construction*/
     Player (Player &&other_player) = default;
@@ -182,11 +183,11 @@ class Player : public App
   private:
     int loadArguments (boost::program_options::variables_map &vm_map);
     /** load from a jsonString
-    @param either a JSON filename or a string containing JSON
+    @param jsonString either a JSON filename or a string containing JSON
     */
     virtual void loadJsonFile (const std::string &jsonString) override;
     /** load a text file*/
-    virtual void loadTextFile (const std::string &textFile) override;
+    virtual void loadTextFile (const std::string &filename) override;
     /** helper function to sort through the tags*/
     void sortTags ();
     /** helper function to generate the publications*/

@@ -39,7 +39,7 @@ class SineGenerator : public SignalGenerator
     double amplitude = 0.0;  //!< the Peak amplitude of the sinusoid
     double dAdt = 0.0;  //!< the rate of change of the amplitude
     double dfdt = 0.0;  //!< the rate of change of frequency
-    double period;  //!< the period of the sinusoid.  the inverse of the frequency
+    double period = 1e7;  //!< the period of the sinusoid.  the inverse of the frequency
     Time lastCycle = timeZero;
 
   public:

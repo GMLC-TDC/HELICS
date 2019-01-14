@@ -97,10 +97,10 @@ static void setGeneratorProperty (SignalGenerator *gen, const std::string &name,
     }
 }
 
-void Source::loadJsonFile (const std::string &jsonFile)
+void Source::loadJsonFile (const std::string &jsonString)
 {
     // we want to load the default period before constructing the interfaces so the default period works
-    auto doc = loadJson (jsonFile);
+    auto doc = loadJson (jsonString);
 
     if (doc.isMember ("source"))
     {
@@ -111,7 +111,7 @@ void Source::loadJsonFile (const std::string &jsonFile)
         }
     }
 
-    loadJsonFileConfiguration ("source", jsonFile);
+    loadJsonFileConfiguration ("source", jsonString);
     auto pubCount = fed->getPublicationCount ();
     for (int ii = 0; ii < pubCount; ++ii)
     {

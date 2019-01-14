@@ -48,7 +48,22 @@ Echo::Echo (const std::string &name, const std::shared_ptr<Core> &core, const Fe
 
 Echo::Echo (const std::string &name, const std::string &jsonString) : App (name, jsonString)
 {
-    loadJsonFile (jsonString);
+    Echo::loadJsonFile (jsonString);
+}
+
+Echo::Echo (Echo &&other_echo)
+    : App (std::move (other_echo)), endpoints (std::move (other_echo.endpoints)), delayTime (other_echo.delayTime)
+{
+}
+
+Echo &Echo::operator= (Echo &&other_echo)
+{
+    endpoints = std::move (other_echo.endpoints);
+    std::lock_guard<std::mutex> lock (delayTimeLock);
+    delayTime = other_echo.delayTime;
+    echoCounter = other_echo.echoCounter;
+    App::operator= (std::move (other_echo));
+    return *this;
 }
 
 void Echo::runTo (Time stopTime_input)
