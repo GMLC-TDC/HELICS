@@ -565,6 +565,8 @@ class TimeRepresentation
         return (internalTimeCode == rhs.internalTimeCode);
     }
 
+    bool operator== (double rhs) const noexcept { return (*this == TimeRepresentation<Tconv> (rhs)); }
+
     bool operator!= (const TimeRepresentation &rhs) const noexcept
     {
         return (internalTimeCode != rhs.internalTimeCode);
@@ -603,6 +605,7 @@ class TimeRepresentation
         os << Tconv::toDouble (t1.internalTimeCode) << 's';
         return os;
     }
+    friend bool operator== (double lhs, TimeRepresentation t1) { return (TimeRepresentation<Tconv> (lhs) == t1); }
 };
 
 /** defining some additional operators for TimeRepresentation that were not covered
@@ -662,12 +665,6 @@ inline TimeRepresentation<Tconv> operator+ (double x, TimeRepresentation<Tconv> 
 }
 
 template <class Tconv>
-inline bool operator== (TimeRepresentation<Tconv> t1, double rhs)
-{
-    return (t1 == TimeRepresentation<Tconv> (rhs));
-}
-
-template <class Tconv>
 inline bool operator!= (TimeRepresentation<Tconv> t1, double rhs)
 {
     return (t1 != TimeRepresentation<Tconv> (rhs));
@@ -695,12 +692,6 @@ template <class Tconv>
 inline bool operator<= (TimeRepresentation<Tconv> t1, double rhs)
 {
     return (t1 <= TimeRepresentation<Tconv> (rhs));
-}
-
-template <class Tconv>
-inline bool operator== (double lhs, TimeRepresentation<Tconv> t1)
-{
-    return (TimeRepresentation<Tconv> (lhs) == t1);
 }
 
 template <class Tconv>
