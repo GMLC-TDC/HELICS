@@ -163,7 +163,7 @@ bool TimeCoordinator::updateNextExecutionTime ()
         {
             time_exec = (iterating) ? time_granted : getNextPossibleTime ();
         }
-        if ((time_exec - time_granted) > 0.0)
+        if ((time_exec - time_granted) > timeZero)
         {
             time_exec = generateAllowedTime (time_exec);
         }
