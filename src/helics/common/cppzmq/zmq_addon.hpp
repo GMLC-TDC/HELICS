@@ -38,7 +38,7 @@ namespace zmq
 /*
     This class handles multipart messaging. It is the C++ equivalent of zmsg.h,
     which is part of CZMQ (the high-level C binding). Furthermore, it is a major
-    improvement compared to zmsg.hpp, which is part of the examples in the ?MQ
+    improvement compared to zmsg.hpp, which is part of the examples in the ØMQ
     Guide. Unnecessary copying is avoided by using move semantics to efficiently
     add/remove parts.
 */
