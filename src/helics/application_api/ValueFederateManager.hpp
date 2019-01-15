@@ -144,16 +144,16 @@ class ValueFederateManager
     const std::string &getTarget (const Input &inp) const;
 
     /** get an Input from Its Name
-    @param name the identifier or shortcut of the input
+    @param key the identifier or shortcut of the input
     @return ivalid_input_id if name is not a recognized*/
-    Input &getInput (const std::string &name);
-    const Input &getInput (const std::string &name) const;
+    Input &getInput (const std::string &key);
+    const Input &getInput (const std::string &key) const;
     /** get an input by index*/
     Input &getInput (int index);
     const Input &getInput (int index) const;
     /** get the id of a subscription
     @param key the target of a subscription
-  @return ivalid_input_id if name is not a recognized*/
+    @return ivalid_input_id if name is not a recognized*/
     const Input &getSubscription (const std::string &key) const;
     Input &getSubscription (const std::string &key);
 

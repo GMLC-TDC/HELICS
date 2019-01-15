@@ -174,7 +174,7 @@ BOOST_AUTO_TEST_CASE (testcore_messagefilter_callback_test)
         {
             msg->source = filterName;
 
-            if (msg->data.size () > 0)
+            if (!msg->data.empty ())
             {
                 ++msg->data[0];
             }

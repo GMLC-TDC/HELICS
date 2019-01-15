@@ -128,10 +128,7 @@ helics::Time Player::extractTime (const std::string &str, int lineNumber) const
         {
             return helics::Time (std::stoll (str), time_units::ns);
         }
-        else
-        {
-            return loadTimeFromString (str, units);
-        }
+        return loadTimeFromString (str, units);
     }
     catch (const std::invalid_argument &ia)
     {
@@ -173,7 +170,7 @@ void Player::loadTextFile (const std::string &filename)
             }
             continue;
         }
-        else if (str[fc] == '#')
+        if (str[fc] == '#')
         {
             if (fc + 2 < str.size ())
             {
@@ -224,7 +221,7 @@ void Player::loadTextFile (const std::string &filename)
             }
             continue;
         }
-        else if (str[fc] == '#')
+        if (str[fc] == '#')
         {
             if (fc + 2 < str.size ())
             {
@@ -396,9 +393,9 @@ void Player::loadTextFile (const std::string &filename)
     }
 }
 
-void Player::loadJsonFile (const std::string &jsonFile)
+void Player::loadJsonFile (const std::string &jsonString)
 {
-    loadJsonFileConfiguration ("player", jsonFile);
+    loadJsonFileConfiguration ("player", jsonString);
 
     auto pubCount = fed->getPublicationCount ();
     for (int ii = 0; ii < pubCount; ++ii)
@@ -413,7 +410,7 @@ void Player::loadJsonFile (const std::string &jsonFile)
         eptids[endpoints.back ().getName ()] = static_cast<int> (endpoints.size () - 1);
     }
 
-    auto doc = loadJson (jsonFile);
+    auto doc = loadJson (jsonString);
 
     if (doc.isMember ("player"))
     {

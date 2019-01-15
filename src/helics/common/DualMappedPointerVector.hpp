@@ -29,6 +29,7 @@ class DualMappedPointerVector
     DualMappedPointerVector &operator= (DualMappedPointerVector &&mp) = default;
     DualMappedPointerVector (const DualMappedPointerVector &mp) = delete;
     DualMappedPointerVector &operator= (const DualMappedPointerVector &mp) = delete;
+    ~DualMappedPointerVector () = default;
     /** insert a new element into the vector directly from an existing unique ptr*/
     stx::optional<size_t>
     insert (const searchType1 &searchValue1, const searchType2 &searchValue2, std::unique_ptr<VType> &&ptr)

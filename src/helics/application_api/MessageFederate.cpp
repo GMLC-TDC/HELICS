@@ -45,7 +45,7 @@ MessageFederate::MessageFederate ()
     // default constructor
 }
 
-MessageFederate::MessageFederate (bool)
+MessageFederate::MessageFederate (bool /*unused*/)
 {  // this constructor should only be called by child class that has already constructed the underlying federate in
    // a virtual inheritance
     mfManager = std::make_unique<MessageFederateManager> (coreObject.get (), this, getID ());
@@ -54,12 +54,11 @@ MessageFederate::MessageFederate (MessageFederate &&) noexcept = default;
 
 MessageFederate &MessageFederate::operator= (MessageFederate &&mFed) noexcept
 {
-    if (getID () !=
-        mFed.getID ())  // the id won't be moved, as it is copied so use it as a test if it has moved already
-    {
+    mfManager = std::move (mFed.mfManager);
+    if (getID () != mFed.getID ())
+    {  // the id won't be moved, as it is copied so use it as a test if it has moved already
         Federate::operator= (std::move (mFed));
     }
-    mfManager = std::move (mFed.mfManager);
     return *this;
 }
 
@@ -202,17 +201,12 @@ void MessageFederate::registerMessageInterfacesToml (const std::string &tomlStri
     }
 }
 
-void MessageFederate::subscribe (const Endpoint &ept, const std::string &key)
-{
-    mfManager->subscribe (ept, key);
-    return;
-}
+void MessageFederate::subscribe (const Endpoint &ept, const std::string &key) { mfManager->subscribe (ept, key); }
 
 void MessageFederate::registerKnownCommunicationPath (const Endpoint &localEndpoint,
                                                       const std::string &remoteEndpoint)
 {
     mfManager->registerKnownCommunicationPath (localEndpoint, remoteEndpoint);
-    return;
 }
 
 bool MessageFederate::hasMessage () const
@@ -269,17 +263,17 @@ std::unique_ptr<Message> MessageFederate::getMessage (const Endpoint &ept)
     return nullptr;
 }
 
-void MessageFederate::sendMessage (const Endpoint &source, const std::string &dest, const data_view &data)
+void MessageFederate::sendMessage (const Endpoint &source, const std::string &dest, const data_view &message)
 {
-    mfManager->sendMessage (source, dest, data);
+    mfManager->sendMessage (source, dest, message);
 }
 
 void MessageFederate::sendMessage (const Endpoint &source,
                                    const std::string &dest,
-                                   const data_view &data,
+                                   const data_view &message,
                                    Time sendTime)
 {
-    mfManager->sendMessage (source, dest, data, sendTime);
+    mfManager->sendMessage (source, dest, message, sendTime);
 }
 
 void MessageFederate::sendMessage (const Endpoint &source, std::unique_ptr<Message> message)
@@ -304,14 +298,14 @@ Endpoint &MessageFederate::getEndpoint (const std::string &eptName) const
 
 Endpoint &MessageFederate::getEndpoint (int index) const { return mfManager->getEndpoint (index); }
 
-void MessageFederate::setMessageNotificationCallback (const std::function<void(Endpoint &ept, Time)> &func)
+void MessageFederate::setMessageNotificationCallback (const std::function<void(Endpoint &ept, Time)> &callback)
 {
-    mfManager->setEndpointNotificationCallback (func);
+    mfManager->setEndpointNotificationCallback (callback);
 }
 void MessageFederate::setMessageNotificationCallback (const Endpoint &ept,
-                                                      const std::function<void(Endpoint &ept, Time)> &func)
+                                                      const std::function<void(Endpoint &ept, Time)> &callback)
 {
-    mfManager->setEndpointNotificationCallback (ept, func);
+    mfManager->setEndpointNotificationCallback (ept, callback);
 }
 
 /** get a count of the number endpoints registered*/

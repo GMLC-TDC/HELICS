@@ -57,9 +57,18 @@ class AsioServiceManager : public std::enable_shared_from_this<AsioServiceManage
         {
             if (serviceManager)
             {
-                serviceManager->haltServiceLoop ();
+                try
+                {
+                    serviceManager->haltServiceLoop ();
+                }
+                catch (...)
+                {
+                    // no exceptions in a destructor
+                }
             }
         }
+        /** move constructor*/
+        Servicer (Servicer &&sv) = default;
 
       private:
         std::shared_ptr<AsioServiceManager> serviceManager;  //!< a pointer to the service manager

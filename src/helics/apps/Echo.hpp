@@ -45,9 +45,9 @@ class Echo:public App
     Echo (const std::string &name, const std::string &jsonString);
 
     /** move construction*/
-    Echo (Echo &&other_echo) = default;
+    Echo (Echo &&other_echo);
     /** move assignment*/
-    Echo &operator= (Echo &&fed) = default;
+    Echo &operator= (Echo &&fed);
 
     /** run the Echo federate until the specified time
     @param stopTime_input the desired stop time

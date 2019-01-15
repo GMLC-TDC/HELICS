@@ -501,7 +501,7 @@ void CoreBroker::processPriorityCommand (ActionMessage &&command)
         auto brk = getBrokerById (global_broker_id (command.source_id));
         if (brk != nullptr)
         {
-            brk->_disconnected = true;
+            brk->isDisconnected = true;
         }
         if (allDisconnected ())
         {
@@ -614,14 +614,14 @@ void CoreBroker::labelAsDisconnected (global_broker_id brkid)
     {
         if (brk.parent == brkid)
         {
-            brk._disconnected = true;
+            brk.isDisconnected = true;
         }
     }
     for (auto &fed : _federates)
     {
         if (fed.parent == brkid)
         {
-            fed._disconnected = true;
+            fed.isDisconnected = true;
         }
     }
 }
@@ -632,12 +632,12 @@ void CoreBroker::sendDisconnect ()
     bye.source_id = global_broker_id_local;
     for (auto &brk : _brokers)
     {
-        if (!brk._disconnected)
+        if (!brk.isDisconnected)
         {
             if (brk.parent == global_broker_id_local)
             {
                 routeMessage (bye, brk.global_id);
-                brk._disconnected = true;
+                brk.isDisconnected = true;
             }
             if (hasTimeDependency)
             {
@@ -896,7 +896,7 @@ void CoreBroker::processCommand (ActionMessage &&command)
         auto fed = _federates.find (command.source_id);
         if (fed != _federates.end ())
         {
-            fed->_disconnected = true;
+            fed->isDisconnected = true;
         }
         if (!isRootc)
         {
@@ -1163,7 +1163,7 @@ void CoreBroker::checkForNamedInterface (ActionMessage &command)
         if (pub != nullptr)
         {
             auto fed = _federates.find (pub->getFederateId ());
-            if (!fed->_disconnected)
+            if (!fed->isDisconnected)
             {
                 command.setAction (CMD_ADD_SUBSCRIBER);
                 command.setDestination (pub->handle);
@@ -1193,7 +1193,7 @@ void CoreBroker::checkForNamedInterface (ActionMessage &command)
         if (inp != nullptr)
         {
             auto fed = _federates.find (inp->getFederateId ());
-            if (!fed->_disconnected)
+            if (!fed->isDisconnected)
             {
                 command.setAction (CMD_ADD_PUBLISHER);
                 command.setDestination (inp->handle);
@@ -1248,7 +1248,7 @@ void CoreBroker::checkForNamedInterface (ActionMessage &command)
         if (ept != nullptr)
         {
             auto fed = _federates.find (ept->getFederateId ());
-            if (!fed->_disconnected)
+            if (!fed->isDisconnected)
             {
                 command.setAction (CMD_ADD_FILTER);
                 command.setDestination (ept->handle);
@@ -1806,9 +1806,9 @@ void CoreBroker::broadcast (ActionMessage &cmd)
 {
     for (auto &broker : _brokers)
     {
-        if ((!broker._nonLocal) && (!broker._disconnected))
+        if ((!broker._nonLocal) && (!broker.isDisconnected))
         {
-        	cmd.dest_id = broker.global_id;
+            cmd.dest_id = broker.global_id;
             transmit (broker.route, cmd);
         }
     }
@@ -2140,8 +2140,8 @@ void CoreBroker::processDisconnect (ActionMessage &command)
                     {
                         if (brk != nullptr)
                         {
-                            command.setAction((brk->_core) ? CMD_DISCONNECT_CORE : CMD_DISCONNECT_BROKER);
-                            transmit(parent_route_id, command);
+                            command.setAction ((brk->_core) ? CMD_DISCONNECT_CORE : CMD_DISCONNECT_BROKER);
+                            transmit (parent_route_id, command);
                         }
                     }
                 }
@@ -2179,7 +2179,7 @@ void CoreBroker::processDisconnect (ActionMessage &command)
 
 void CoreBroker::disconnectBroker (BasicBrokerInfo &brk)
 {
-    brk._disconnected = true;
+    brk.isDisconnected = true;
     if (brokerState < broker_state_t::operating)
     {
         if (isRootc)
@@ -2876,7 +2876,7 @@ bool CoreBroker::allInitReady () const
 bool CoreBroker::allDisconnected () const
 {
     return std::all_of (_brokers.begin (), _brokers.end (),
-                        [](const auto &brk) { return ((brk._nonLocal) || (brk._disconnected)); });
+                        [](const auto &brk) { return ((brk._nonLocal) || (brk.isDisconnected)); });
 }
 
 }  // namespace helics

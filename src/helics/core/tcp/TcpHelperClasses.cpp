@@ -609,7 +609,13 @@ TcpServer::TcpServer (boost::asio::io_service &io_service, int portNum, int nomi
     initialConnect ();
 }
 
-TcpServer::~TcpServer () { close (); }
+TcpServer::~TcpServer () try
+{
+    close ();
+}
+catch (...)
+{
+}
 
 void TcpServer::initialConnect ()
 {

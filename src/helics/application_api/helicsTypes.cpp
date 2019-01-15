@@ -419,9 +419,9 @@ std::complex<double> getComplexFromString (const std::string &val)
         }
         if (V.size () == 1)
         {
-            return std::complex<double> (V[0], 0.0);
+            return {V[0], 0.0};
         }
-        return std::complex<double> (V[0], V[1]);
+        return {V[0], V[1]};
     }
     if (val.front () == 'c')
     {

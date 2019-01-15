@@ -28,8 +28,6 @@ using namespace std::literals::chrono_literals;
 
 BOOST_AUTO_TEST_SUITE (IPCCore_tests, *utf::label ("ci"))
 
-using helics::Core;
-
 BOOST_AUTO_TEST_CASE (ipccomms_broker_test)
 {
     std::atomic<int> counter{0};
@@ -58,7 +56,7 @@ BOOST_AUTO_TEST_CASE (ipccomms_rx_test)
 {
     std::atomic<int> counter{0};
     guarded<helics::ActionMessage> act;
-    std::string brokerLoc = "";
+    std::string brokerLoc;
     std::string localLoc = "localIPC";
     helics::ipc::IpcComms comm;
     comm.loadTargetInfo (localLoc, brokerLoc);
@@ -172,6 +170,7 @@ BOOST_AUTO_TEST_CASE (ipcComm_transmit_add_route)
     connected = comm.connect ();
     BOOST_REQUIRE (connected);
     connected = comm3.connect ();
+    BOOST_REQUIRE (connected);
     std::this_thread::sleep_for (100ms);
     comm.transmit (helics::parent_route_id, helics::CMD_ACK);
 

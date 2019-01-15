@@ -69,14 +69,16 @@ std::unique_ptr<Message> MessageDestOperator::process (std::unique_ptr<Message> 
     return message;
 }
 
-MessageConditionalOperator::MessageConditionalOperator (std::function<bool(const Message *)> userConditionFunction)
-    : evalFunction (std::move (userConditionFunction))
+MessageConditionalOperator::MessageConditionalOperator (
+  std::function<bool(const Message *)> userConditionalFunction)
+    : evalFunction (std::move (userConditionalFunction))
 {
 }
 
-void MessageConditionalOperator::setConditionFunction (std::function<bool(const Message *)> userConditionFunction)
+void MessageConditionalOperator::setConditionFunction (
+  std::function<bool(const Message *)> userConditionalFunction)
 {
-    evalFunction = std::move (userConditionFunction);
+    evalFunction = std::move (userConditionalFunction);
 }
 
 std::unique_ptr<Message> MessageConditionalOperator::process (std::unique_ptr<Message> message)

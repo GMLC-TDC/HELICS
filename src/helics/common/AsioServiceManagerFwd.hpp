@@ -9,7 +9,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 
 class AsioServiceManager;
 
-#if (BOOST_VERSION/100 >= 1066)
+#if (BOOST_VERSION / 100 >= 1066)
 namespace boost
 {
 namespace asio
@@ -24,7 +24,7 @@ namespace boost
 namespace asio
 {
 class io_service;
-}
+}  // namespace asio
 }  // namespace boost
 #endif
 
@@ -33,5 +33,5 @@ namespace boost
 namespace system
 {
 class error_code;
-}
+}  // namespace system
 }  // namespace boost

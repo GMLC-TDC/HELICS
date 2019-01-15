@@ -116,8 +116,8 @@ BOOST_AUTO_TEST_CASE (endpointinfo_test)
     helics::EndpointInfo endPI ({helics::global_federate_id (5), helics::interface_handle (13)}, "name", "type");
     BOOST_CHECK_EQUAL (endPI.id.handle.baseValue (), 13);
     BOOST_CHECK_EQUAL (endPI.id.fed_id.baseValue (), 5);
-    BOOST_CHECK (endPI.key.compare ("name") == 0);
-    BOOST_CHECK (endPI.type.compare ("type") == 0);
+    BOOST_CHECK_EQUAL (endPI.key, "name");
+    BOOST_CHECK_EQUAL (endPI.type, "type");
 
     // Check proper return values for empty queue
     // size 0 for any time given

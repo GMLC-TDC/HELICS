@@ -157,7 +157,13 @@ LoggingCore::~LoggingCore ()
     {
         loggingQueue.emplace (-1, "!!>close");
     }
-    loggingThread.join ();
+	try
+	{
+		loggingThread.join();
+	}
+    catch(...)
+	{
+	}
 }
 
 void LoggingCore::addMessage (std::string &&message) { loggingQueue.emplace (-1, std::move (message)); }
@@ -325,7 +331,7 @@ void LoggerManager::closeLogger (const std::string &loggerName)
     }
 }
 
-void LoggerManager::logMessage (const std::string &message)
+void LoggerManager::logMessage (std::string message)
 {
     std::lock_guard<std::mutex> loglock (loggerLock);
     auto fnd = loggers.find (std::string ());
@@ -333,7 +339,7 @@ void LoggerManager::logMessage (const std::string &message)
     {
         if (fnd->second->loggingControl)
         {
-            fnd->second->loggingControl->addMessage (message);
+            fnd->second->loggingControl->addMessage (std::move(message));
             return;
         }
     }

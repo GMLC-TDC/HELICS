@@ -109,12 +109,19 @@ void AsioServiceManager::setServiceToLeakOnDelete (const std::string &serviceNam
 AsioServiceManager::~AsioServiceManager ()
 {
     //  std::cout << "deleting service manager\n";
+
     if (running)
     {
-        std::lock_guard<std::mutex> nullLock (runningLoopLock);
-        nullwork.reset ();
-        iserv->stop ();
-        loopRet.get ();
+        try
+        {
+            std::lock_guard<std::mutex> nullLock (runningLoopLock);
+            nullwork.reset ();
+            iserv->stop ();
+            loopRet.get ();
+        }
+        catch (...)
+        {
+        }
     }
     if (leakOnDelete)
     {

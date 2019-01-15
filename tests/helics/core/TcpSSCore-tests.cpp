@@ -299,7 +299,7 @@ BOOST_AUTO_TEST_CASE (tcpSSComm_transmit_add_route)
     connected = comm.connect ();
     BOOST_REQUIRE (connected);
     connected = comm3.connect ();
-
+    BOOST_REQUIRE (connected);
     comm.transmit (helics::route_id (0), helics::CMD_ACK);
 
     std::this_thread::sleep_for (250ms);

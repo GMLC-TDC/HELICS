@@ -82,7 +82,7 @@ Tracer::Tracer (const std::string &appName, const std::shared_ptr<Core> &core, c
 Tracer::Tracer (const std::string &name, const std::string &jsonString) : App (name, jsonString)
 {
     fed->setFlagOption (helics_flag_observer);
-    loadJsonFile (jsonString);
+    Tracer::loadJsonFile (jsonString);
 }
 
 Tracer::~Tracer () = default;
@@ -469,7 +469,7 @@ void Tracer::addEndpoint (const std::string &endpoint)
     auto res = eptNames.find (endpoint);
     if ((res == eptNames.end ()) || (res->second == -1))
     {
-        endpoints.push_back (helics::Endpoint (GLOBAL, fed, endpoint));
+        endpoints.emplace_back (GLOBAL, fed, endpoint);
         auto index = static_cast<int> (endpoints.size ()) - 1;
         eptNames[endpoint] = index;  // this is a potential replacement
     }

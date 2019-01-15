@@ -9,19 +9,18 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 
 namespace helics
 {
-	Endpoint::Endpoint(interface_visibility locality,
-		MessageFederate *mFed,
-		const std::string &name,
-		const std::string &type)
-	{
-		if (locality == interface_visibility::global)
-		{
-            operator= (mFed->registerGlobalEndpoint (name, type));
-		}
-		else
-		{
-            operator= (mFed->registerEndpoint (name, type));
-		}
-	}
+Endpoint::Endpoint (interface_visibility locality,
+                    MessageFederate *mFed,
+                    const std::string &name,
+                    const std::string &type)
+{
+    if (locality == interface_visibility::global)
+    {
+        operator= (mFed->registerGlobalEndpoint (name, type));
+    }
+    else
+    {
+        operator= (mFed->registerEndpoint (name, type));
+    }
 }
-
+}  // namespace helics

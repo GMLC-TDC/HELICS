@@ -368,14 +368,14 @@ BOOST_AUTO_TEST_CASE (check_conversions)
     BOOST_CHECK_EQUAL (cmdStr, std::string (cmdVec.data (), cmdVec.size ()));
 
     auto testBuffer1 = std::make_unique<char[]> (cmdStr.size () + 20);
-    auto testBuffer2 = std::make_unique<char[]> (cmdStr.size () >> 2);  // make a too small buffer
+    auto testBuffer2 = std::make_unique<char[]> (cmdStr.size () >> 2u);  // make a too small buffer
 
     auto res = cmd.toByteArray (testBuffer1.get (), static_cast<int> (cmdStr.size () + 20));
     BOOST_CHECK_EQUAL (res, cmdStr.size ());
     // just check to make sure the same string was written
     BOOST_CHECK_EQUAL (cmdStr, std::string (testBuffer1.get (), res));
     // this should return -1
-    res = cmd.toByteArray (testBuffer2.get (), static_cast<int> (cmdStr.size () >> 2));
+    res = cmd.toByteArray (testBuffer2.get (), static_cast<int> (cmdStr.size () >> 2u));
     BOOST_CHECK_EQUAL (res, -1);
 }
 

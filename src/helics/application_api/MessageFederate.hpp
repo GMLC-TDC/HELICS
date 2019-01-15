@@ -100,11 +100,10 @@ class MessageFederate : public virtual Federate  // using virtual inheritance to
     */
     void registerKnownCommunicationPath (const Endpoint &localEndpoint, const std::string &remoteEndpoint);
     /** subscribe to valueFederate publication to be delivered as Messages to the given endpoint
-    @param[in] endpoint the specified endpoint to deliver the values
-    @param[in] name the name of the publication to subscribe
-    @param[in] type the type of publication
+    @param ept the specified endpoint to deliver the values
+    @param key the name of the publication to subscribe
     */
-    void subscribe (const Endpoint &ept, const std::string &name);
+    void subscribe (const Endpoint &ept, const std::string &key);
     /** check if the federate has any outstanding messages*/
     bool hasMessage () const;
     /* check if a given endpoint has any unread messages*/

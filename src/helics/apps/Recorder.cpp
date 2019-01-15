@@ -89,7 +89,13 @@ Recorder::Recorder (const std::string &appName, const std::string &jsonString) :
     Recorder::loadJsonFile (jsonString);
 }
 
-Recorder::~Recorder () { saveFile (outFileName); }
+Recorder::~Recorder () try
+{
+    saveFile (outFileName);
+}
+catch (...)
+{
+}
 
 void Recorder::loadJsonFile (const std::string &jsonString)
 {
