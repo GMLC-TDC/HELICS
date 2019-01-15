@@ -18,10 +18,12 @@ class MessageFederate : public virtual Federate  // using virtual inheritance to
 {
   public:
     /**constructor taking a federate information structure and using the default core
+    @param fedName the name of the messageFederate, can be left empty to use a default or one from fi
     @param[in] fi  a federate information structure
     */
     explicit MessageFederate (const std::string &fedName, const FederateInfo &fi);
     /**constructor taking a core and a federate information structure, sore information in fi is ignored
+    @param fedName the name of the messageFederate, can be left empty to use a default or one from fi
     @param[in] core a shared ptr to a core to join
     @param[in] fi  a federate information structure
     */
@@ -31,7 +33,7 @@ class MessageFederate : public virtual Federate  // using virtual inheritance to
     */
     explicit MessageFederate (const std::string &configString);
     /**constructor taking a string with the required information
-    @param[in] name the name of the federate
+    @param[in] name the name of the federate, can be empty to get name from config
     @param[in] configString can be either a JSON file, TOML file or a string containing JSON code
     */
     MessageFederate (const std::string &name, const std::string &configString);
@@ -69,6 +71,7 @@ class MessageFederate : public virtual Federate  // using virtual inheritance to
     @param[in] type the defined type of the interface for endpoint checking if requested
     */
     Endpoint &registerGlobalEndpoint (const std::string &name, const std::string &type = std::string ());
+
     virtual void registerInterfaces (const std::string &configString) override;
 
     /** register a set Message interfaces
@@ -79,15 +82,15 @@ class MessageFederate : public virtual Federate  // using virtual inheritance to
     void registerMessageInterfaces (const std::string &configString);
 
   private:
-    /** register a set Message interfaces
+    /** register a set Message interfaces from JSON
  @details call is only valid in startup mode it is a protected call to add an
- @param[in] configString  the location of the file or JSON String to load to generate the interfaces
+ @param[in] jsonString  the location of the file or JSON String to load to generate the interfaces
  */
     void registerMessageInterfacesJson (const std::string &jsonString);
 
-    /** register a set Message interfaces
+    /** register a set Message interfaces using a toml file
   @details call is only valid in startup mode it is a protected call to add an
-  @param[in] configString  the location of the TOML to load to generate the interfaces
+  @param[in] tomlString  the location of the TOML to load to generate the interfaces
   */
     void registerMessageInterfacesToml (const std::string &tomlString);
 
@@ -132,11 +135,11 @@ class MessageFederate : public virtual Federate  // using virtual inheritance to
     @param[in] source the source endpoint
     @param[in] dest a string naming the destination
     @param[in] data a buffer containing the data
-    @param[in] len the length of the data buffer
+    @param[in] dataLength the length of the data buffer
     */
-    void sendMessage (const Endpoint &source, const std::string &dest, const char *data, size_t len)
+    void sendMessage (const Endpoint &source, const std::string &dest, const char *data, size_t dataLength)
     {
-        sendMessage (source, dest, data_view (data, len));
+        sendMessage (source, dest, data_view (data, dataLength));
     }
     /** send a message
     @details send a message to a specific destination
@@ -150,19 +153,23 @@ class MessageFederate : public virtual Federate  // using virtual inheritance to
     @param[in] source the source endpoint
     @param[in] dest a string naming the destination
     @param[in] data a buffer containing the data
-    @param[in] len the length of the data buffer
-    @param[in] Time the time the message should be sent
+    @param[in] dataLength the length of the data buffer
+    @param[in] sendTime the time the message should be sent
     */
-    void sendMessage (const Endpoint &source, const std::string &dest, const char *data, size_t len, Time sendTime)
+    void sendMessage (const Endpoint &source,
+                      const std::string &dest,
+                      const char *data,
+                      size_t dataLength,
+                      Time sendTime)
     {
-        sendMessage (source, dest, data_view (data, len), sendTime);
+        sendMessage (source, dest, data_view (data, dataLength), sendTime);
     }
     /** send an event message at a particular time
     @details send a message to a specific destination
     @param[in] source the source endpoint
     @param[in] dest a string naming the destination
     @param[in] message a data_view of the message data to send
-    @param[in] Time the time the message should be sent
+    @param[in] sendTime the time the message should be sent
     */
     void sendMessage (const Endpoint &source, const std::string &dest, const data_view &message, Time sendTime);
     /** send an event message at a particular time
@@ -194,7 +201,7 @@ class MessageFederate : public virtual Federate  // using virtual inheritance to
     */
     void setMessageNotificationCallback (const std::function<void(Endpoint &, Time)> &callback);
     /** register a callback for a specific endpoint
-    @param[in] ep the endpoint to associate with the specified callback
+    @param[in] ept the endpoint to associate with the specified callback
     @param[in] callback the function to execute upon receipt of a message for the given endpoint
     */
     void

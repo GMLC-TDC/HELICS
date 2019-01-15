@@ -47,9 +47,8 @@ class MessageFederateManager
     */
     void registerKnownCommunicationPath (const Endpoint &localEndpoint, const std::string &remoteEndpoint);
     /** subscribe to valueFederate publication to be delivered as Messages to the given endpoint
-    @param[in] endpoint the specified endpoint to deliver the values
-    @param[in] name the name of the publication to subscribe
-    @param[in] type the type of publication
+    @param[in] ept the specified endpoint to deliver the values
+    @param[in] pubName the name of the publication to subscribe
     */
     void subscribe (const Endpoint &ept, const std::string &pubName);
     /** check if the federate has any outstanding messages*/
@@ -66,7 +65,7 @@ class MessageFederateManager
      */
     uint64_t pendingMessages () const;
     /** receive a packet from a particular endpoint
-    @param[in] endpoint the identifier for the endpoint
+    @param ept the identifier for the endpoint
     @return a message object*/
     std::unique_ptr<Message> getMessage (const Endpoint &ept);
     /* receive a communication message for any endpoint in the federate*/
@@ -91,7 +90,7 @@ class MessageFederateManager
     /** generate results for a local query */
     std::string localQuery (const std::string &queryStr) const;
     /** get the name of an endpoint from its id
-    @param[in] id the endpoint to query
+    @param ept the endpoint to query
     @return empty string if an invalid id is passed*/
     const std::string &getEndpointName (const Endpoint &ept) const;
 
@@ -110,7 +109,7 @@ class MessageFederateManager
     */
     void setEndpointNotificationCallback (const std::function<void(Endpoint &, Time)> &callback);
     /** register a callback function to call when the specified endpoint receives a message
-    @param[in] id  the endpoint id to register the callback for
+    @param[in] ept  the endpoint id to register the callback for
     @param[in] callback the function to call
     */
     void

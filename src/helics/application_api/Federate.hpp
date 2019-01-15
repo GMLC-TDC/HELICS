@@ -302,9 +302,7 @@ class Federate
     @param value the value of the global
     */
     void setGlobal (const std::string &valueName, const std::string &value);
-    /** define a filter interface
-    @details a source filter will be sent any packets that come from a particular source
-    if multiple filters are defined on the same source, they will be placed in some order defined by the core
+    /** define a named global filter interface
     @param[in] the name of the endpoint
     @param[in] the inputType which the source filter can receive
     */
@@ -313,8 +311,7 @@ class Federate
                                   const std::string &outputType = std::string ());
 
     /** define a cloning filter interface on a source
-    @details a source filter will be sent any packets that come from a particular source
-    if multiple filters are defined on the same source, they will be placed in some order defined by the core
+    @details a cloning filter will modify copy of messages coming from or going to target endpoints
     @param filterName the name of the filter
     @param inputType the inputType which the filter can handle
     @param outputType the outputType of the filter which the filter produces
@@ -324,10 +321,10 @@ class Federate
                                                 const std::string &outputType = std::string ());
 
     /** define a filter interface
-    @details a source filter will be sent any packets that come from a particular source
-    if multiple filters are defined on the same source, they will be placed in some order defined by the core
-    @param[in] the name of the endpoint
-    @param[in] the inputType which the source filter can receive
+    @details a filter will modify messages coming from or going to target endpoints
+    @param filterName the name of the filter
+    @param inputType the inputType which the filter can handle
+    @param outputType the outputType of the filter which the filter produces
     */
     Filter &registerFilter (const std::string &filterName,
                             const std::string &inputType = std::string (),
@@ -344,20 +341,12 @@ class Federate
                                           const std::string &inputType = std::string (),
                                           const std::string &outputType = std::string ());
 
-    /** define a filter interface on a source
-    @details a source filter will be sent any packets that come from a particular source
-    if multiple filters are defined on the same source, they will be placed in some order defined by the core
-    @param[in] the name of the endpoint
-    @param[in] the inputType which the source filter can receive
-    */
+    /** define a nameless filter interface
+     */
     Filter &registerFilter () { return registerGlobalFilter (std::string (), std::string (), std::string ()); }
 
-    /** define a cloning filter interface on a source
-    @details a source filter will be sent any packets that come from a particular source
-    if multiple filters are defined on the same source, they will be placed in some order defined by the core
-    @param[in] the name of the endpoint
-    @param[in] the inputType which the source filter can receive
-    */
+    /** define a nameless cloning filter interface on a source
+     */
     CloningFilter &registerCloningFilter ()
     {
         return registerGlobalCloningFilter (std::string (), std::string (), std::string ());
@@ -365,12 +354,12 @@ class Federate
 
     /** add a source target to a filter
    @param id the identifier of the filter
-   target the name of the endpoint to filter the data from
+   @param targetEndpoint the name of the endpoint to filter the data from
    */
     void addSourceTarget (const Filter &filt, const std::string &targetEndpoint);
     /** add a destination target to a filter
-  @param id the identifier of the filter
-  target the name of the endpoint to filter the data going to
+  @param filt a filter object
+  @param targetEndpoint the name of the endpoint to filter the data going to
   */
     void addDestinationTarget (const Filter &filt, const std::string &targetEndpoint);
 
@@ -382,30 +371,30 @@ class Federate
 
     /** get the id of a source filter from the name of the endpoint
     @param[in] filterName the name of the filter
-    @return invalid_filter_id if name is not recognized otherwise returns the filter id*/
+    @return a reference to a filter object which could be invalid if filterName is not valid*/
     const Filter &getFilter (const std::string &filterName) const;
 
     /** get the id of a source filter from the name of the endpoint
   @param[in] filterName the name of the filter
-  @return invalid_filter_id if name is not recognized otherwise returns the filter id*/
+  @return a reference to a filter object which could be invalid if index is not valid*/
     const Filter &getFilter (int index) const;
 
     /** get the id of a source filter from the name of the endpoint
   @param[in] filterName the name of the filter
-  @return invalid_filter_id if name is not recognized otherwise returns the filter id*/
+ @return a reference to a filter object which could be invalid if filteName is not valid*/
     Filter &getFilter (const std::string &filterName);
 
     /** get the id of a source filter from the name of the endpoint
-  @param[in] filterName the name of the filter
-  @return invalid_filter_id if name is not recognized otherwise returns the filter id*/
+  @param[in] index the index location of the filter
+  @return a reference to a filter object which could be invalid if index is not valid*/
     Filter &getFilter (int index);
 
     /** @brief register a operator for the specified filter
     @details
     The FilterOperator gets called when there is a message to filter, There is no order or state to this
     messages can come in any order.
-    @param[in] filter the identifier for the filter to trigger
-    @param[in] op a shared_ptr to a message operator
+    @param[in] filt the filter object to set the operation on
+    @param[in] op a shared_ptr to a \ref FilterOperator
     */
     void setFilterOperator (const Filter &filt, std::shared_ptr<FilterOperator> op);
 
@@ -489,12 +478,12 @@ class Federate
   private:
     /** register filter interfaces defined in  file or string
   @details call is only valid in startup mode
-  @param[in] configString  the location of the file or config String to load to generate the interfaces
+  @param[in] jsonString  the location of the file or config String to load to generate the interfaces
   */
     void registerFilterInterfacesJson (const std::string &jsonString);
     /** register filter interfaces defined in  file or string
     @details call is only valid in startup mode
-    @param[in] configString  the location of the file or config String to load to generate the interfaces
+    @param[in] tomlString  the location of the file or config String to load to generate the interfaces
     */
     void registerFilterInterfacesToml (const std::string &tomlString);
 };

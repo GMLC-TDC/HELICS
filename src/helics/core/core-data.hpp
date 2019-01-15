@@ -16,8 +16,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 @details defining data used for storing the data for values and for messages
 */
 
-/**
- * HELICS Core API
+/** HELICS Core API
  */
 namespace helics
 {

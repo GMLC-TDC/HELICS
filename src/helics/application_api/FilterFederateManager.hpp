@@ -30,21 +30,25 @@ class FilterFederateManager
     /** construct from a pointer to a core and a specified federate id
      */
     FilterFederateManager (Core *coreObj, Federate *fFed, local_federate_id id);
+    /** destructor */
     ~FilterFederateManager ();
+
     /** register a Filter
     @details call is only valid in startup mode
     @param[in] name the name of the endpoint
-    @param[in] type the defined type of the interface for endpoint checking if requested
+    @param type_in the type the filter is expecting as an input
+    @param type_out the type the filter generates
     */
-    Filter &registerFilter (const std::string &name, const std::string &type_int, const std::string &type_out);
+    Filter &registerFilter (const std::string &name, const std::string &type_in, const std::string &type_out);
 
     /** register a cloningFilter
     @details call is only valid in startup mode
     @param[in] name the name of the endpoint
-    @param[in] type the defined type of the interface for endpoint checking if requested
+    @param type_in the type the filter is expecting as an input
+    @param type_out the type the filter generates
     */
     CloningFilter &
-    registerCloningFilter (const std::string &name, const std::string &type_int, const std::string &type_out);
+    registerCloningFilter (const std::string &name, const std::string &type_in, const std::string &type_out);
 
     /** register a Filter
     @details call is only valid in startup mode

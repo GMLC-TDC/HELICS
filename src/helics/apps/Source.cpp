@@ -63,11 +63,11 @@ Source::Source (const std::string &appName, const std::shared_ptr<Core> &core, c
     fed->setFlagOption (helics_flag_source_only);
 }
 
-Source::Source (const std::string &name, const std::string &jsonString) : App (name, jsonString)
+Source::Source (const std::string &name, const std::string &configString) : App (name, configString)
 {
     fed->setFlagOption (helics_flag_source_only);
 
-    Source::loadJsonFile (jsonString);
+    Source::loadJsonFile (configString);
 }
 
 static void setGeneratorProperty (SignalGenerator *gen, const std::string &name, const Json::Value &prop)

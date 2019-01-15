@@ -389,67 +389,65 @@ class ValueFederate : public virtual Federate  // using virtual inheritance to a
     virtual std::string localQuery (const std::string &queryStr) const override;
 
   public:
-    /** get a list of all the values that have been updated since the last call
-    @return a vector of subscription_ids with all the values that have not been retrieved since updated
+    /** get a list of all the indices of all inputs that have been updated since the last call
+    @return a vector of input indices with all the values that have not been retrieved since updated
     */
     std::vector<int> queryUpdates ();
 
-    /** get the key or the string identifier of an from its id
-    @return empty string if an invalid id is passed*/
+    /** get the name of the first target for an input
+    @return empty string if an invalid input is passed or it has no target*/
     const std::string &getTarget (const Input &inp) const;
     /** get the id of a subscription
-    @return ivalid_subscription_id if name is not a recognized*/
+    @return an invalid input object if the target is valid otherwise a reference to the corresponding input*/
     const Input &getInput (const std::string &key) const;
     /** get the id of a subscription
-    @return ivalid_subscription_id if name is not a recognized*/
+    @return an invalid input object if the target is valid otherwise a reference to the corresponding input*/
     Input &getInput (const std::string &key);
     /** get the id of a subscription
-    @return ivalid_subscription_id if name is not a recognized*/
+    @return an invalid input object if the target is valid otherwise a reference to the corresponding input*/
     const Input &getInput (int index) const;
     /** get the id of a subscription
-    @return ivalid_subscription_id if name is not a recognized*/
+    @return an invalid input object if the target is valid otherwise a reference to the corresponding input*/
     Input &getInput (int index);
     /** get the id of a subscription from a vector of subscriptions
-    @return ivalid_subscription_id if name is not a recognized*/
+    @return an invalid input object if the target is valid otherwise a reference to the corresponding input*/
     const Input &getInput (const std::string &key, int index1) const;
     /** get the id of a subscription from a 2-d vector of subscriptions
-    @return ivalid_subscription_id if name is not a recognized*/
+    @return an invalid input object if the target is valid otherwise a reference to the corresponding input*/
     const Input &getInput (const std::string &key, int index1, int index2) const;
 
     /** get the input id based on target
-    @return an input_id_t from the object, or invalid_id if no input was found
-    */
+    @return an invalid input object if the target is valid otherwise a reference to the corresponding input*/
     const Input &getSubscription (const std::string &target) const;
 
     /** get the input id based on target
-    @return an input_id_t from the object, or invalid_id if no input was found
-    */
+   @return an invalid input object if the target is valid otherwise a reference to the corresponding input*/
     Input &getSubscription (const std::string &target);
 
     /** get the id of a registered publication from its id
-    @param[in] name the name of the publication
-    @return ivalid_publication_id if name is not recognized otherwise returns the publication_id*/
+    @param[in] key the name of the publication
+    @return an invalid publication if the index is valid otherwise a reference to the corresponding publication*/
     Publication &getPublication (const std::string &key);
     /** get the id of a registered publication from its id
-    @param[in] name the name of the publication
-    @return ivalid_publication_id if name is not recognized otherwise returns the publication_id*/
+    @param[in] key the name of the publication
+    @return an invalid publication if the index is valid otherwise a reference to the corresponding publication*/
     const Publication &getPublication (const std::string &key) const;
-    /** get the id of a registered publication from its id
-   @param[in] name the name of the publication
-   @return ivalid_publication_id if name is not recognized otherwise returns the publication_id*/
+    /** get a publication from its index
+    @param index the 0 based index of the publication to retrieve
+    @return an invalid publication if the index is valid otherwise a reference to the corresponding publication*/
     Publication &getPublication (int index);
-    /** get the id of a registered publication from its id
-    @param[in] name the name of the publication
-    @return ivalid_publication_id if name is not recognized otherwise returns the publication_id*/
+    /** get a publication from its index
+    @param index the 0 based index of the publication to retrieve
+    @return an invalid publication if the index is valid otherwise the corresponding publication*/
     const Publication &getPublication (int index) const;
 
     /** get the id of a registered publication from its id
     @param[in] name the name of the publication
-    @return ivalid_publication_id if name is not recognized otherwise returns the publication_id*/
+    @return an invalid publication if the index is valid otherwise the corresponding publication*/
     const Publication &getPublication (const std::string &key, int index1) const;
     /** get the id of a registered publication from its id
-    @param[in] name the name of the publication
-    @return ivalid_publication_id if name is not recognized otherwise returns the publication_id*/
+    @param[in] key the name of the publication
+    @return an invalid publication if the index is valid otherwise the corresponding publication*/
     const Publication &getPublication (const std::string &key, int index1, int index2) const;
 
     /** register a callback function to call when any subscribed value is updated
@@ -458,7 +456,7 @@ class ValueFederate : public virtual Federate  // using virtual inheritance to a
     */
     void setInputNotificationCallback (std::function<void(Input &, Time)> callback);
     /** register a callback function to call when the specified subscription is updated
-    @param[in] id  the id to register the callback for
+    @param[in] inp an input to set the notification callback for
     @param[in] callback the function to call
     */
     void setInputNotificationCallback (Input &inp, std::function<void(Input &, Time)> callback);

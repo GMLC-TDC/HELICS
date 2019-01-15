@@ -85,15 +85,18 @@ class Filter
     const std::string &getInjectionType () const;
     /** get the specified output type of the filter*/
     const std::string &getExtractionType () const;
-    /** set a property on a filter
-    @param property the name of the property of the filter to change
-    @param val the numerical value of the property
-    */
+
     /** get the interface information field of the publication*/
     const std::string &getInfo () const { return corePtr->getInterfaceInfo (handle); }
     /** set the interface information field of the publication*/
     void setInfo (const std::string &info) { corePtr->setInterfaceInfo (handle, info); }
+
+    /** set a property on a filter
+    @param property the name of the property of the filter to change
+    @param val the numerical value of the property
+    */
     virtual void set (const std::string &property, double val);
+
     /** set a string property on a filter
     @param property the name of the property of the filter to change
     @param val the numerical value of the property

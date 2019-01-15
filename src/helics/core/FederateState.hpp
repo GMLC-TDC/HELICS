@@ -211,15 +211,15 @@ class FederateState
     */
     message_processing_result processActionMessage (ActionMessage &cmd);
     /** fill event list
-    @param the time of the update
+    @param currentTime the time of the update
     */
     void fillEventVectorUpTo (Time currentTime);
     /** fill event list
-    @param the time of the update
+    @param currentTime the time of the update
     */
     void fillEventVectorInclusive (Time currentTime);
     /** fill event list
-    @param the time of the update
+    @param currentTime the time of the update
     */
     void fillEventVectorNextIteration (Time currentTime);
     /** add a dependency to the timing coordination*/
@@ -255,14 +255,13 @@ class FederateState
     /** process until the initialization state has been entered or there is a failure*/
     iteration_result enterInitializingMode ();
     /** function to call when entering execution state
-    @param converged indicator of whether the fed should iterate if need be or not
+    @param iterate indicator of whether the fed should iterate if need be or not
     returns either converged or nonconverged depending on whether an iteration is needed
     */
     iteration_result enterExecutingMode (iteration_request iterate);
     /** request a time advancement
     @param nextTime the time of the requested advancement
-    @param converged set to complete to end dense time step iteration, nonconverged to continue iterating if need
-    be
+    @param iterate the type of iteration requested
     @return an iteration time with two elements the granted time and the convergence state
     */
     iteration_time requestTime (Time nextTime, iteration_request iterate);

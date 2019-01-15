@@ -13,6 +13,9 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include <boost/asio/io_service.hpp>
 #include <boost/asio/ip/tcp.hpp>
 
+/** @file
+various helper classes and functions for handling TCP connections
+*/
 namespace helics
 {
 namespace tcp
@@ -21,6 +24,7 @@ namespace tcp
 class TcpConnection : public std::enable_shared_from_this<TcpConnection>
 {
   public:
+    /** enumeration of the possible states of a connection*/
     enum class connection_state_t
     {
         prestart = -1,
@@ -100,16 +104,13 @@ class TcpConnection : public std::enable_shared_from_this<TcpConnection>
     }
 
     /**perform an asynchronous receive operation
-    @param buffer the data to send
-    @param dataLength the length of the data
-    @param callback a callback function of the form void handler(
-    const boost::system::error_code& error, // Result of operation.
-    std::size_t bytes_transferred           // Number of bytes received.
-    );
+   @param callback the callback function to execute when data has been received with signature
+   void(TcpConnection::pointer, const char *buffer, size_t dataLength, const boost::system::error_code &error)
     */
-    void async_receive (
-      std::function<void(TcpConnection::pointer, const char *, size_t, const boost::system::error_code &error)>
-        callback)
+    void async_receive (std::function<void(TcpConnection::pointer,
+                                           const char *buffer,
+                                           size_t dataLength,
+                                           const boost::system::error_code &error)> callback)
     {
         socket_.async_receive (boost::asio::buffer (data, data.size ()),
                                [connection = shared_from_this (),
@@ -128,6 +129,7 @@ class TcpConnection : public std::enable_shared_from_this<TcpConnection>
     @return true if connected, false if the timeout was reached
     */
     bool waitUntilConnected (std::chrono::milliseconds timeOut);
+    /** get the id code for the socket*/
     int getIdentifier () const { return idcode; };
 
   private:

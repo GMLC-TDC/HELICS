@@ -33,7 +33,7 @@ class Publication
   public:
     Publication () = default;
     /** constructor for a publication used by the valueFederateManager
-    @param a valueFed a pointer the link valueFederate
+    @param valueFed a pointer the link valueFederate
     @param id the interface_handle from the core
     @param key the identifier for the publication
     @param type the type of the publication
@@ -103,7 +103,7 @@ class Publication
     /**constructor to build a publication object
   @param[in] valueFed  the ValueFederate to use
   @param[in] key the identifier for the publication
-  @param type_ the defined type of the publication
+  @param type the defined type of the publication
   @param[in] units the units associated with a Federate
   */
     Publication (ValueFederate *valueFed,
@@ -116,7 +116,7 @@ class Publication
     /**constructor to build a publication object
     @param[in] valueFed  the ValueFederate to use
     @param[in] key the identifier for the publication
-    @param type_ the defined type of the publication
+    @param type the defined type of the publication
     @param[in] units the units associated with a Federate
     */
     template <class FedPtr>
@@ -131,7 +131,7 @@ class Publication
     @param locality  set to global for a global publication or local for a local one
     @param[in] valueFed  the ValueFederate to use
     @param[in] key the identifier for the publication
-    @param type_ the defined type of the publication
+    @param type the defined type of the publication
     @param[in] units the units associated with a Federate
     */
     Publication (interface_visibility locality,
@@ -147,7 +147,7 @@ class Publication
     @param locality  set to global for a global publication or local for a local one
     @param[in] valueFed  the ValueFederate to use
     @param[in] key the identifier for the publication
-    @param type_ the defined type of the publication
+    @param type the defined type of the publication
     @param[in] units the units associated with a Federate
     */
     template <class FedPtr>
@@ -378,6 +378,7 @@ class PublicationT : public Publication
     {
     }
     /**constructor to build a publication object
+     @param[in] locality  define the visibility of the publication (local or global)
     @param[in] valueFed  the ValueFederate to use
     @param[in] key the identifier for the publication
     @param[in] units the units associated with a Federate
@@ -397,9 +398,10 @@ class PublicationT : public Publication
     @param[in] val the value to publish
     @param[in] units  the units association with the publication
     */
-    void publish (const X &val, const std::string & /*units*/)
+    void publish (const X &val, const std::string &units)
     {
         // TODO:: figure out units
+        (void)(units);
         Publication::publish (val);
     }
 };

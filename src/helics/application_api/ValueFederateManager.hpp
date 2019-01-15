@@ -105,7 +105,7 @@ class ValueFederateManager
 
     /** set the default value for a subscription
     @details this is the value returned prior to any publications
-    @param[in] id the subscription identifier
+    @param[in] inp the subscription identifier
     @param[in] block the data block representing the default value
     */
     void setDefaultValue (const Input &inp, const data_view &block);
@@ -172,7 +172,7 @@ class ValueFederateManager
     */
     void setInputNotificationCallback (std::function<void(Input &, Time)> callback);
     /** register a callback function to call when the specified subscription is updated
-    @param[in] id  the id to register the callback for
+    @param[in] inp  the id to register the callback for
     @param[in] callback the function to call
     */
     void setInputNotificationCallback (const Input &inp, std::function<void(Input &, Time)> callback);

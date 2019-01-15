@@ -53,10 +53,12 @@ class Player : public App
     */
     Player (int argc, char *argv[]);
     /** construct from a federate info object
+    @param name the name of the federate (can be empty to use defaults from fi)
     @param fi a pointer info object containing information on the desired federate configuration
     */
     explicit Player (const std::string &name, const FederateInfo &fi);
     /**constructor taking a federate information structure and using the given core
+    @param name the name of the federate (can be empty to use defaults from fi)
     @param core a pointer to core object which the federate can join
     @param[in] fi  a federate information structure
     */
@@ -88,14 +90,13 @@ class Player : public App
     /** add a publication to a Player
     @param key the key of the publication to add
     @param type the type of the publication
-    @param units the units associated with the publication
+    @param pubUnits the units associated with the publication
     */
     void addPublication (const std::string &key, data_type type, const std::string &pubUnits = std::string ());
 
     /** add a publication to a Player
     @param key the key of the publication to add
-    @param type the type of the publication
-    @param units the units associated with the publication
+    @param pubUnits the units associated with the publication
     */
     template <class valType>
     typename std::enable_if_t<helicsType<valType> () != data_type::helics_custom>
@@ -134,6 +135,7 @@ class Player : public App
 
     /** add a data point to publish through a Player
     @param pubTime the time of the publication
+    @param iteration the iteration count on which the value should be published
     @param key the key for the publication
     @param val the value to publish
     */
@@ -147,7 +149,7 @@ class Player : public App
         points.back ().value = val;
     }
     /** add a message to a Player queue
-    @param pubTime  the time the message should be sent
+    @param sendTime  the time the message should be sent
     @param src the source endpoint of the message
     @param dest the destination endpoint of the message
     @param payload the payload of the message

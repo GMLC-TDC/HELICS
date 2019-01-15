@@ -244,7 +244,7 @@ class Input
     }
 
     /** set the minimum delta for change detection
-    @param detltaV a double with the change in a value in order to register a different value
+    @param deltaV a double with the change in a value in order to register a different value
     */
     void setMinimumChange (double deltaV)
     {
