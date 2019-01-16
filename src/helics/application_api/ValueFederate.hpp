@@ -357,7 +357,7 @@ class ValueFederate : public virtual Federate  // using virtual inheritance to a
                            int index1,
                            const std::string &units = std::string ())
     {
-        addTarget (id, target + '_' + std::to_string (index1), units);
+        addTarget (iObject, target + '_' + std::to_string (index1), units);
     }
 
     /** add an indexed target to an interface
