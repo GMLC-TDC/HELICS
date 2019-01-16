@@ -64,16 +64,21 @@ void IpcComms::queue_rx_function ()
 {
     OwnedQueue rxQueue;
     bool connected = rxQueue.connect (localTargetAddress, maxMessageCount, maxMessageSize);
-    if (!connected)
+    while (!connected)
     {
-        disconnecting = true;
-        ActionMessage err (CMD_ERROR);
-        err.messageID = defs::errors::connection_failure;
-        err.payload = rxQueue.getError ();
-        ActionCallback (std::move (err));
-        setRxStatus (connection_status::error);  // the connection has failed
-        rxQueue.changeState (queue_state_t::closing);
-        return;
+        std::this_thread::sleep_for (connectionTimeout);
+        connected = rxQueue.connect (localTargetAddress, maxMessageCount, maxMessageSize);
+        if (!connected)
+        {
+            disconnecting = true;
+            ActionMessage err (CMD_ERROR);
+            err.messageID = defs::errors::connection_failure;
+            err.payload = rxQueue.getError ();
+            ActionCallback (std::move (err));
+            setRxStatus (connection_status::error);  // the connection has failed
+            rxQueue.changeState (queue_state_t::closing);
+            return;
+        }
     }
     setRxStatus (connection_status::connected);  // this is a atomic indicator that the rx queue is ready
     bool IPCoperating = false;
@@ -161,17 +166,22 @@ void IpcComms::queue_tx_function ()
         bool conn = brokerQueue.connect (brokerTargetAddress, true, 20);
         if (!conn)
         {
-            ActionMessage err (CMD_ERROR);
-            err.payload = fmt::format ("Unable to open broker connection -> {}", brokerQueue.getError ());
-            err.messageID = defs::errors::connection_failure;
-            ActionCallback (std::move (err));
-            setTxStatus (connection_status::error);
-            return;
+            std::this_thread::sleep_for (connectionTimeout);
+            conn = brokerQueue.connect (brokerTargetAddress, true, 20);
+            if (!conn)
+            {
+                ActionMessage err (CMD_ERROR);
+                err.payload = fmt::format ("Unable to open broker connection -> {}", brokerQueue.getError ());
+                err.messageID = defs::errors::connection_failure;
+                ActionCallback (std::move (err));
+                setTxStatus (connection_status::error);
+                return;
+            }
         }
         hasBroker = true;
     }
     // wait for the receiver to startup
-    if (!rxTrigger.wait_forActivation (std::chrono::milliseconds (3000)))
+    if (!rxTrigger.wait_forActivation (connectionTimeout))
     {
         ActionMessage err (CMD_ERROR);
         err.messageID = defs::errors::connection_failure;

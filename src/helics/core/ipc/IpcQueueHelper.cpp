@@ -61,7 +61,6 @@ bool OwnedQueue::connect (const std::string &connection, int maxMessages, int ma
     // Map the whole shared memory in this process
     boostipc::mapped_region region (*queue_state, boostipc::read_write);
 
-    // auto *sstate = reinterpret_cast<SharedQueueState *> (region.get_address ());
     auto *sstate = new (region.get_address ()) SharedQueueState;
     sstate->setState (queue_state_t::startup);
 
