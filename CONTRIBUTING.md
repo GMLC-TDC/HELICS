@@ -40,7 +40,7 @@ This section guides you through submitting a feature request, or enhancement for
 
 ### Your First Code Contribution
 
-Unsure where to begin contributing to HELICS? You can start by looking for `beginner` and `help-wanted` issues:
+Unsure where to begin contributing to HELICS? You can start by looking for [`help wanted`](https://github.com/GMLC-TDC/HELICS-src/issues?utf8=%E2%9C%93&q=is%3Aissue+is%3Aopen+label%3A%22help+wanted%22) [`beginner`](https://github.com/GMLC-TDC/HELICS-src/issues?utf8=%E2%9C%93&q=is%3Aissue+is%3Aopen+label%3A%22help+wanted%22+label%3A%22beginner%22) issues:
 Help with documentation and test cases is always welcome.  Take a look at the [code coverage reports](https://codecov.io/gh/GMLC-TDC/HELICS-src) for some ideas on places that need more testing
 
 ### Submitting a pull request
