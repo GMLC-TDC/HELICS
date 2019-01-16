@@ -10,7 +10,7 @@ Requirements
 * git
 * Boost 1.58 or newer
 * ZeroMQ 4.1.4 or newer (if ZeroMQ support is needed)
-* [for future versions] OpenMPI v8 or newer (if MPI support is needed)
+* MPI-2 implementation (if MPI support is needed)
 
 Setup
 -----
