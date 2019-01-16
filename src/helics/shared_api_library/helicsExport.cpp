@@ -1,5 +1,4 @@
 /*
-
 Copyright © 2017-2019,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
@@ -89,15 +88,12 @@ static helics::FederateInfo *getFedInfo (helics_federate_info fi, helics_error *
     auto ptr = reinterpret_cast<helics::FederateInfo *> (fi);
     if (ptr->uniqueKey != FederateInfoValidationIdentifier)
     {
-        if (fi == nullptr)
+        if (err != nullptr)
         {
-            if (err != nullptr)
-            {
-                err->error_code = helics_error_invalid_object;
-                err->message = invalidFedInfoString;
-            }
-            return nullptr;
+            err->error_code = helics_error_invalid_object;
+            err->message = invalidFedInfoString;
         }
+        return nullptr;
     }
     return ptr;
 }
@@ -208,12 +204,12 @@ void helicsErrorHandler (helics_error *err) noexcept
 void helicsFederateInfoFree (helics_federate_info fi)
 {
     auto info = getFedInfo (fi, nullptr);
-    info->uniqueKey = 0;
     if (info == nullptr)
     {
         fprintf (stderr, "The helics_federate_info object is not valid");
         return;
     }
+    info->uniqueKey = 0;
     delete info;
 }
 
