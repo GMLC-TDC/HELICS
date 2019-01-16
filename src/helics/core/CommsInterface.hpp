@@ -79,7 +79,7 @@ class CommsInterface
     bool isConnected () const;
 
     /** set the timeout for the initial broker connection
-    @param timeout the value is in milliseconds
+    @param timeOut the value is in milliseconds
     */
     void setTimeout (std::chrono::milliseconds timeOut);
     /** set a flag for the comms system*/

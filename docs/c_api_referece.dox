@@ -1,8 +1,10 @@
 /**
  \page C_api_index C API function reference
-Index of functions available in the C and by extension the language API's
+\section enumerations Helics Enumerations s
+ Many of the functions take properties or options that are defined by the enumerations available in the HELICS library see ef helics_enumIndex of functions available in the C and by extension the language API's
 
- General Functions in the HELICS C library
+ \section general General Functions
+ in the HELICS C library
  - \ref helicsGetVersion
  - \ref helicsErrorInitialize
  - \ref helicsErrorClear
@@ -13,7 +15,7 @@ Index of functions available in the C and by extension the language API's
  - \ref helicsCloseLibrary
  - \ref helicsCleanupLibrary
 
- Functions to create the different objects in the library
+ \section create Creation Function Functions to create the different objects in the library
  - \ref helicsCreateCore
  - \ref helicsCreateCoreFromArgs
  - \ref helicsCreateBroker
@@ -27,7 +29,8 @@ Index of functions available in the C and by extension the language API's
  - \ref helicsCreateFederateInfo
  - \ref helicsCreateQuery
 
- Core Functions -- functions applying to a \ref helics_core object
+ \section core Core Functions 
+functions applying to a \ref helics_core object
  - \ref helicsCoreClone
  - \ref helicsCoreIsValid
  - \ref helicsCoreIsConnected
@@ -44,7 +47,8 @@ Index of functions available in the C and by extension the language API's
  - \ref helicsCoreRegisterFilter
  - \ref helicsCoreRegisterCloningFilter
 
- Broker Functions -- functions applying to a \ref helics_broker object
+ \section general broker Broker Functions 
+Functions applying to a \ref helics_broker object
  - \ref helicsBrokerClone
  - \ref helicsBrokerIsValid
  - \ref helicsBrokerIsConnected
@@ -60,7 +64,8 @@ Index of functions available in the C and by extension the language API's
  - \ref helicsBrokerSetGlobal
  - \ref helicsBrokerAddLoggingCallback
 
- Federate Info Functions -- functions applying to a \ref helics_federate_info object
+ \section fedinfo Federate Info Functions 
+Functions applying to a \ref helics_federate_info object
  - \ref helicsFederateInfoClone
  - \ref helicsFederateInfoLoadFromArgs
  - \ref helicsFederateInfoFree
@@ -76,7 +81,8 @@ Index of functions available in the C and by extension the language API's
  - \ref helicsFederateInfoSetTimeProperty
  - \ref helicsFederateInfoSetIntegerProperty
 
- Federate Functions -- functions applying to all \ref helics_federate objects
+ \section federate Federate Functions 
+Functions applying to all \ref helics_federate objects
  - \ref helicsFederateDestroy
  - \ref helicsFederateClone
  - \ref helicsFederateIsValid
@@ -116,7 +122,8 @@ Index of functions available in the C and by extension the language API's
  - \ref helicsFederateSetGlobal
  - \ref helicsFederateAddLoggingCallback
 
- Value Federate Functions -- functions applying to federates created as a value or combination federate \ref helics_federate objects
+ \section vfederate Value Federate Functions 
+functions applying to federates created as a value or combination federate \ref helics_federate objects
  - \ref helicsFederateRegisterSubscription
  - \ref helicsFederateRegisterPublication
  - \ref helicsFederateRegisterTypePublication
@@ -134,7 +141,8 @@ Index of functions available in the C and by extension the language API's
  - \ref helicsFederateGetPublicationCount
  - \ref helicsFederateGetInputCount
 
- Publication interface Functions -- functions applying to a \ref helics_publication object
+ \section pub Publication interface Functions 
+functions applying to a \ref helics_publication object
  - \ref helicsPublicationPublishRaw
  - \ref helicsPublicationPublishString
  - \ref helicsPublicationPublishInteger
@@ -154,7 +162,8 @@ Index of functions available in the C and by extension the language API's
  - \ref helicsPublicationGetOption
  - \ref helicsPublicationSetOption
 
- Input interface Functions -- functions applying to a \ref helics_input object
+ \section input Input interface Functions 
+functions applying to a \ref helics_input object
  - \ref helicsInputAddTarget
  - \ref helicsInputGetRawValueSize
  - \ref helicsInputGetRawValue
@@ -192,7 +201,8 @@ Index of functions available in the C and by extension the language API's
  - \ref helicsInputIsUpdated
  - \ref helicsInputLastUpdateTime
 
- Message Federate Functions -- functions applying to federates created as a value or combination federate \ref helics_federate objects
+ \section message Message Federate Functions 
+Functions applying to federates created as a value or combination federate \ref helics_federate objects
  - \ref helicsFederateRegisterEndpoint
  - \ref helicsFederateRegisterGlobalEndpoint
  - \ref helicsFederateGetEndpoint
@@ -202,7 +212,8 @@ Index of functions available in the C and by extension the language API's
  - \ref helicsFederateGetMessage
  - \ref helicsFederateGetEndpointCount
 
- Endpoint interface Functions -- functions applying to a \ref helics_endpoint object
+ \section endpoint Endpoint interface Functions 
+functions applying to a \ref helics_endpoint object
  - \ref helicsEndpointSetDefaultDestination
  - \ref helicsEndpointGetDefaultDestination
  - \ref helicsEndpointSendMessageRaw
@@ -219,7 +230,8 @@ Index of functions available in the C and by extension the language API's
  - \ref helicsEndpointSetOption
  - \ref helicsEndpointGetOption
 
- Filter Federate Functions -- functions applying to all federates but related to \ref helics_filter 
+ \section filterfed Filter Federate Functions 
+Functions applying to all federates but related to \ref helics_filter 
  - \ref helicsFederateRegisterFilter
  - \ref helicsFederateRegisterGlobalFilter
  - \ref helicsFederateRegisterCloningFilter
@@ -228,7 +240,8 @@ Index of functions available in the C and by extension the language API's
  - \ref helicsFederateGetFilter
  - \ref helicsFederateGetFilterByIndex
 
- Filter interface Functions -- functions applying to a \ref helics_filter object
+ \section filter Filter interface Functions 
+Functions applying to a \ref helics_filter object
  - \ref helicsFilterGetName
  - \ref helicsFilterSet
  - \ref helicsFilterSetString
@@ -242,7 +255,8 @@ Index of functions available in the C and by extension the language API's
  - \ref helicsFilterSetOption
  - \ref helicsFilterGetOption
 
- Query Functions -- functions applying to a \ref helics_query object
+ \section query Query Functions 
+functions applying to a \ref helics_query object
  - \ref helicsQueryExecute
  - \ref helicsQueryCoreExecute
  - \ref helicsQueryBrokerExecute

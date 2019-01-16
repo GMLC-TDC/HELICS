@@ -79,10 +79,10 @@ Tracer::Tracer (const std::string &appName, const std::shared_ptr<Core> &core, c
     fed->setFlagOption (helics_flag_observer);
 }
 
-Tracer::Tracer (const std::string &name, const std::string &jsonString) : App (name, jsonString)
+Tracer::Tracer (const std::string &name, const std::string &file) : App (name, file)
 {
     fed->setFlagOption (helics_flag_observer);
-    Tracer::loadJsonFile (jsonString);
+    Tracer::loadJsonFile (file);
 }
 
 Tracer::~Tracer () = default;

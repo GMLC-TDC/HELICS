@@ -174,6 +174,7 @@ class CloningFilter : public Filter
 Filter &make_filter (filter_types type, Federate *fed, const std::string &name = EMPTY_STRING);
 
 /** create a  filter
+@param locality the visibility of the filter global or local
 @param type the type of filter to create
 @param fed the federate to create the filter through
 @param name the name of the filter (optional)

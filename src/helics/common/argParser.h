@@ -35,7 +35,7 @@ class ArgDescriptor
     /** constructor that takes a key, a type and a description string
     @param arg the key for the flag of the for "key", or "key,k" if a short argument is desired
     @param type the type of the argument
-    @parm desc a descriptor displayed in the help window for a string*/
+    @param desc a descriptor displayed in the help window for a string*/
     ArgDescriptor (std::string arg, arg_type_t type, std::string desc)
         : arg_ (std::move (arg)), type_ (type), desc_ (std::move (desc))
     {
@@ -55,11 +55,11 @@ constexpr int helpReturn (-1);
 constexpr int versionReturn (-2);
 
 /** using boost argument_parser to process a set of command line arguments
-@param[in] argc the number of arguments
-@param[in] argv the actual strings in the argument
+@param argc the number of arguments
+@param argv the actual strings in the argument
 @param[out] vm_map the variable_map of all the arguments
-@param[in] argDefinitions the definition targets used for the processing
-@param[in] posName  (optional) the name of a positional argument
+@param argDefinitions the definition targets used for the processing
+@param posName  (optional) the name of a positional argument
 @return helpReturn(-1) if the help argument was called and displayed, versionReturn(-2) if version argument was
 used 0 otherwise
 */

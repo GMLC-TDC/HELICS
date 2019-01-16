@@ -45,18 +45,20 @@ class Endpoint
                        "first argument must be a pointer to a MessageFederate");
     }
     /**constructor to build an endpoint object
-    @param[in] mFed  the MessageFederate to use
-    @param[in] name the name of the endpoint
-    @param[in] type a named type associated with the endpoint
+    @param locality visibility of the endpoint either global or local
+    @param mFed  the MessageFederate to use
+    @param name the name of the endpoint
+    @param type a named type associated with the endpoint
     */
     Endpoint (interface_visibility locality,
               MessageFederate *mFed,
               const std::string &name,
               const std::string &type = std::string ());
     /**constructor to build an endpoint object
-    @param[in] mFed  the MessageFederate to use
-    @param[in] name the name of the endpoint
-    @param[in] type a named type associated with the endpoint
+    @param locality visibility of the endpoint either global or local
+    @param mFed  the MessageFederate to use
+    @param name the name of the endpoint
+    @param type a named type associated with the endpoint
     */
     template <class FedPtr>
     Endpoint (interface_visibility locality,
@@ -74,9 +76,9 @@ class Endpoint
     bool operator!= (const Endpoint &ept) const { return (handle != ept.handle); }
     bool operator< (const Endpoint &ept) const { return (handle < ept.handle); }
     /** send a data block and length
-    @param[in] dest string name of the destination
-    @param[in] data pointer to data location
-    @param[in] data_size the length of the data
+    @param dest string name of the destination
+    @param data pointer to data location
+    @param data_size the length of the data
     */
     void send (const std::string &dest, const char *data, size_t data_size) const
     {
@@ -86,17 +88,18 @@ class Endpoint
     /** subscribe the endpoint to a particular publication*/
     void subscribe (const std::string &key) { fed->subscribe (*this, key); }
     /** send a data block and length
-    @param[in] dest string name of the destination
-    @param[in] data pointer to data location
-    @param[in] data_size the length of the data
+    @param dest string name of the destination
+    @param data pointer to data location
+    @param data_size the length of the data
+    @param sendTime the time to send the message
     */
     void send (const std::string &dest, const char *data, size_t data_size, Time sendTime) const
     {
         fed->sendMessage (*this, dest, data_view (data, data_size), sendTime);
     }
     /** send a data block and length
-    @param[in] data pointer to data location
-    @param[in] data_size the length of the data
+    @param data pointer to data location
+    @param data_size the length of the data
     @param sendTime the time to send the message
     */
     void send (const char *data, size_t data_size, Time sendTime) const
@@ -106,24 +109,24 @@ class Endpoint
     /** send a data_view
     @details a data view can convert from many different formats so this function should
     be catching many of the common use cases
-    @param[in] dest string name of the destination
-    @param[in] data the information to send
+    @param dest string name of the destination
+    @param data the information to send
     */
     void send (const std::string &dest, const data_view &data) const { fed->sendMessage (*this, dest, data); }
     /** send a data_view
     @details a data view can convert from many different formats so this function should
     be catching many of the common use cases
-    @param[in] dest string name of the destination
-    @param[in] data data representation to send
-    @param[in] sendTime  the time the message should be sent
+    @param dest string name of the destination
+    @param data data representation to send
+    @param sendTime  the time the message should be sent
     */
     void send (const std::string &dest, const data_view &data, Time sendTime) const
     {
         fed->sendMessage (*this, dest, data, sendTime);
     }
     /** send a data block and length to the target destination
-    @param[in] data pointer to data location
-    @param[in] data_size the length of the data
+    @param data pointer to data location
+    @param data_size the length of the data
     */
     void send (const char *data, size_t data_size) const
     {
@@ -132,14 +135,14 @@ class Endpoint
     /** send a data_view to the target destination
     @details a data view can convert from many different formats so this function should
     be catching many of the common use cases
-    @param[in] data the information to send
+    @param data the information to send
     */
     void send (const data_view &data) const { fed->sendMessage (*this, targetDest, data); }
     /** send a data_view to the specified target destination
     @details a data view can convert from many different formats so this function should
     be catching many of the common use cases
-    @param[in] data a representation to send
-    @param[in] sendTime  the time the message should be sent
+    @param data a representation to send
+    @param sendTime  the time the message should be sent
     */
     void send (const data_view &data, Time sendTime) const
     {
@@ -147,7 +150,7 @@ class Endpoint
     }
     /** send a message object
     @details this is to send a pre-built message
-    @param[in] mess a reference to an actual message object
+    @param mess a reference to an actual message object
     */
     void send (const Message &mess) const { fed->sendMessage (*this, mess); }
     /** get an available message if there is no message the returned object is empty*/
@@ -158,7 +161,7 @@ class Endpoint
     auto pendingMessages () const { return fed->pendingMessages (*this); }
     /** register a callback for an update notification
     @details the callback is called in the just before the time request function returns
-    @param[in] callback a function with signature void(endpoint_id_t, Time)
+    @param callback a function with signature void(endpoint_id_t, Time)
     time is the time the value was updated  This callback is a notification callback and doesn't return the value
     */
     void setCallback (const std::function<void(const Endpoint &, Time)> &callback)

@@ -60,12 +60,12 @@ class Player : public App
     /**constructor taking a federate information structure and using the given core
     @param name the name of the federate (can be empty to use defaults from fi)
     @param core a pointer to core object which the federate can join
-    @param[in] fi  a federate information structure
+    @param fi  a federate information structure
     */
     Player (const std::string &name, const std::shared_ptr<Core> &core, const FederateInfo &fi);
     /**constructor taking a file with the required information
-    @param[in] appName the name of the app
-    @param[in] configString JSON, TOML or text file or JSON string defining the federate information and other
+    @param appName the name of the app
+    @param configString JSON, TOML or text file or JSON string defining the federate information and other
     configuration
     */
     Player (const std::string &appName, const std::string &configString);

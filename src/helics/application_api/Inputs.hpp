@@ -148,7 +148,7 @@ class Input
     bool operator> (const Input &inp) const { return (handle > inp.handle); }
     /** register a callback for an update notification
     @details the callback is called in the just before the time request function returns
-    @param[in] callback a function with signature void( Time time)
+    @param callback a function with signature void( Time time)
     time is the time the value was updated  This callback is a notification callback and doesn't return the value
     */
     void registerNotificationCallback (std::function<void(Time)> callback)
@@ -200,7 +200,7 @@ class Input
 
     /** register a callback for the update
     @details the callback is called in the just before the time request function returns
-    @param[in] callback a function with signature void(X val, Time time)
+    @param callback a function with signature void(X val, Time time)
     val is the new value and time is the time the value was updated
     */
     template <class X>
@@ -378,18 +378,18 @@ class InputT : public Input
   public:
     InputT () = default;
     /**constructor to build an input with a defined object type
-    @param[in] valueFed  the ValueFederate to use
-    @param[in] name the name of the input
-    @param[in] units the units associated with a Federate
+    @param valueFed  the ValueFederate to use
+    @param name the name of the input
+    @param units the units associated with a Federate
     */
     InputT (ValueFederate *valueFed, const std::string &name, const std::string &units = std::string ())
         : Input (valueFed, name, ValueConverter<X>::type (), units)
     {
     }
     /**constructor to build an input with a defined type
-    @param[in] valueFed  the ValueFederate to use
-    @param[in] name the name of the input
-    @param[in] units the units associated with a Federate
+    @param valueFed  the ValueFederate to use
+    @param name the name of the input
+    @param units the units associated with a Federate
     */
     template <class FedPtr>
     InputT (FedPtr &valueFed, const std::string &name, const std::string &units = std::string ())
@@ -408,7 +408,7 @@ class InputT : public Input
 
     /** register a callback for the update
     @details the callback is called in the just before the time request function returns
-    @param[in] callback a function with signature void(X val, Time time)
+    @param callback a function with signature void(X val, Time time)
     val is the new value and time is the time the value was updated
     */
     void setInputNotificationCallback (std::function<void(X, Time)> callback)

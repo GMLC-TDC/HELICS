@@ -8,7 +8,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #ifndef _HELICS_ENUMS_
 #define _HELICS_ENUMS_
 #pragma once
-/** @file
+/** @file helics_enums
 @details base helics enumerations for C and C++ API's
 */
 
@@ -31,7 +31,7 @@ extern "C"
         on the same machine ipc is the same as /ref helics_core_type_interprocess*/
         helics_core_type_ipc = 5,
         helics_core_type_tcp = 6, /*!< use a generic TCP protocol message stream to send messages */
-        helics_core_type_udp = 7, /** use UDP packets to send the data */
+        helics_core_type_udp = 7, /*!< use UDP packets to send the data */
         helics_core_type_zmq_test =
           10, /*!< single socket version of ZMQ core usually for high fed count on the same system*/
         helics_core_type_nng = 9, /*!< for using the nanomsg communications */
@@ -63,6 +63,7 @@ extern "C"
         helics_data_type_time = 8,
         /** raw data type*/
         helics_data_type_raw = 25,
+        /** open type that can be anything*/
         helics_data_type_any = 25262
     } helics_data_type;
 
@@ -105,7 +106,8 @@ extern "C"
         helics_flag_ignore_time_mismatch_warnings = 67
     } helics_federate_flags;
 
-    /* log level definitions*/
+    /** log level definitions
+     */
     typedef enum
     {
         /** don't print anything except a few catastrophic errors*/
@@ -170,9 +172,9 @@ extern "C"
         helics_property_time_input_delay = 148,
         /** the property controlling output delay for a federate*/
         helics_property_time_output_delay = 150,
-        /** the property controlling the maximum number of iterations in a federate*/
+        /** integer property controlling the maximum number of iterations in a federate*/
         helics_property_int_max_iterations = 259,
-        /** the property controlling the log level in a federate see /ref helics_log_levels*/
+        /** integer property controlling the log level in a federate see \ref helics_log_levels*/
         helics_property_int_log_level = 271
     } helics_properties;
 

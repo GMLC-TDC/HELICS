@@ -634,7 +634,7 @@ void Federate::requestTimeAsync (Time nextInternalTimeStep)
 }
 
 /** request a time advancement
-@param[in] the next requested time step
+@param the next requested time step
 @return the granted time step*/
 void Federate::requestTimeIterativeAsync (Time nextInternalTimeStep, iteration_request iterate)
 {
@@ -653,9 +653,6 @@ void Federate::requestTimeIterativeAsync (Time nextInternalTimeStep, iteration_r
     }
 }
 
-/** request a time advancement
-@param[in] the next requested time step
-@return the granted time step*/
 Time Federate::requestTimeComplete ()
 {
     auto exp = modes::pending_time;

@@ -45,21 +45,25 @@ class ValueStats
 class Recorder : public App
 {
   public:
-    /** construct from a FederateInfo structure*/
+    /** construct from a FederateInfo structure
+    @param name the name of the Recorder, can be left empty for the default or to pull from the federateInfo object
+    @param fi  a federate information structure
+    */
     explicit Recorder (const std::string &name, FederateInfo &fi);
     /** construct from command line arguments*/
     Recorder (int argc, char *argv[]);
 
     /**constructor taking a federate information structure and using the given core
+    @param name the name of the Recorder, can be left empty for the default or to pull from the federateInfo object
     @param core a pointer to core object which the federate can join
-    @param[in] fi  a federate information structure
+    @param fi  a federate information structure
     */
     Recorder (const std::string &name, const std::shared_ptr<Core> &core, const FederateInfo &fi);
     /**constructor taking a file with the required information
-    @param[in] name the name of the app
-    @param[in] file a file defining the federate information
+    @param name the name of the app
+    @param file a file defining the federate information in JSon or text
     */
-    Recorder (const std::string &name, const std::string &jsonString);
+    Recorder (const std::string &name, const std::string &file);
     /** move construction*/
     Recorder (Recorder &&other_recorder) = default;
     /** move assignment*/

@@ -25,6 +25,7 @@ class MappedVector
   public:
     /** insert an element into the mapped vector
     @param searchValue the unique index to use for the value if it exists the existing value is replaced
+    @param data all other arguments required to create a new data value
     @return an optional with the index of the value placed if it was placed
     */
     template <typename... Us>
@@ -53,6 +54,7 @@ class MappedVector
 
     /** insert an element into the mapped vector
     @param searchValue the unique index to use for the value if it exists the existing value is replaced
+    @param data all other values and parameters required to create a new searchType object
     @return the index of the value placed
     */
     template <typename... Us>
