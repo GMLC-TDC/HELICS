@@ -7,7 +7,7 @@ The following is a set of guidelines for contributing to HELICS and associated p
 #### Table Of Contents
 
 
-#  [Code of Conduct](.github/CODE_OF_CONDUCT.md)
+##  [Code of Conduct](.github/CODE_OF_CONDUCT.md)
 
 If you just have a question check out [![Gitter chat](https://badges.gitter.im/GMLC-TDC/HELICS-src.png)](https://gitter.im/GMLC-TDC/HELICS-src)
 
