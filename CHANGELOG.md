@@ -9,7 +9,7 @@ A note on future revisions.
 
 ## [2.0.0] - 2019-01-23
 
-This is a major revision so this changelog will not capture all the changes that have been made in detail some highlights
+This is a major revision so this changelog will not capture all the changes that have been made in detail. Some highlights:
   - major revision to the API including
     - use of an error object in the C api function instead of a return code.
     - better match the C++ api in terms of function names and layers.
