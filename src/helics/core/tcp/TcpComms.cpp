@@ -259,9 +259,8 @@ bool TcpComms::establishBrokerConnection (std::shared_ptr<AsioServiceManager> &i
     }
     try
     {
-        brokerConnection =
-          makeConnection (ioserv->getBaseService (), brokerTargetAddress, std::to_string (brokerPort),
-                          maxMessageSize, std::chrono::milliseconds (connectionTimeout));
+        brokerConnection = makeConnection (ioserv->getBaseService (), brokerTargetAddress,
+                                           std::to_string (brokerPort), maxMessageSize, connectionTimeout);
         if (!brokerConnection)
         {
             logError ("initial connection to broker timed out");
