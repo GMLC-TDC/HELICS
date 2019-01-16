@@ -135,11 +135,10 @@ class Core
      * Change the federate state to the Executing state.
      *
      * May only be invoked in Initializing state.
-     @param[in] federateID  the identifier of the federate
-     @param[in] iterationCompleted  if true no more iterations on this federate are requested
+     @param federateID  the identifier of the federate
+     @param iterate  the requested iteration mode
      if nonconverged the federate requests an iterative update
-     @return nonconverged if the executing state has not been entered and there are updates, complete if the
-     simulation is ready to move on to the executing state
+     @return an iteration result enumeration value indicating the current state of iterations
      */
     virtual iteration_result
     enterExecutingMode (local_federate_id federateID, iteration_request iterate = NO_ITERATION) = 0;
@@ -189,7 +188,8 @@ class Core
      *
      * Iterative federates may not invoke this method.
      *
-     * @param next
+     * @param federateID the identification of the federate requesting the time
+     @param next the next time that is requested from the federate
      */
     virtual Time timeRequest (local_federate_id federateID, Time next) = 0;
 
@@ -229,92 +229,35 @@ class Core
      */
     virtual uint64_t getCurrentReiteration (local_federate_id federateID) const = 0;
 
+    /** set a timebased property on a federate
+    @param federateID the federate to set a time based property on
+    @param property the property to set see /ref defs::properties
+    @param timeValue the requested value of the property
+    */
     virtual void setTimeProperty (local_federate_id federateID, int32_t property, Time timeValue) = 0;
-
+    /** get a timebased property on a federate
+    @param federateID the federate to set a time based property on
+    @param property the property to set see /ref defs::properties
+    @return the current value of the requested property
+    */
     virtual Time getTimeProperty (local_federate_id federateID, int32_t property) const = 0;
-
+    /** set an integer property on a federate
+    @param federateID the federate to set a time based property on
+    @param property the property to set see /ref defs::properties
+    @param propValue the requested value of the property
+    */
     virtual void setIntegerProperty (local_federate_id federateID, int32_t property, int16_t propValue) = 0;
-
+    /** get an integer property on a federate
+    @param federateID the federate to set a time based property on
+    @param property the property to set see /ref defs::properties
+    @return the current value of the property
+    */
     virtual int16_t getIntegerProperty (local_federate_id federateID, int32_t property) const = 0;
     /** get the most recent granted Time
     @param federateID, the id of the federate to get the time
     @return the most recent granted time or the startup time
     */
     virtual Time getCurrentTime (local_federate_id federateID) const = 0;
-    /**
-     * Set the maximum number of iterations allowed.
-     *
-     * The minimum value set in any federate is used.
-     *
-     * Default value is the maximum allowed value for uint64_t.
-     *
-     * May only be invoked in the initialize state.
-     */
-
-    //  virtual void setMaximumIterations (local_federate_id federateID, int32_t iterations) = 0;
-
-    /**
-     * Set the minimum time resolution for the specified federate.
-     *
-     * The value is used to constrain when the timeRequest methods
-     * return to values that are multiples of the specified delta.
-     * This is useful for federates that are time-stepped and making
-     * sub-time-step updates is not meaningful.
-     *
-     * @param time
-     */
-    //   virtual void setTimeProperty (helics_property_time_delta, local_federate_id federateID, Time time) = 0;
-
-    /**
-     * Set the outputDelay time for the specified federate.
-     *
-     * The value is used to determine the interaction amongst various federates as to
-     * when a specific federate can influence another
-     * @param federateID  the identifier for the federate
-     * @param timeoutputDelay
-     */
-    //  virtual void setOutputDelay (local_federate_id federateID, Time timeoutputDelay) = 0;
-    /**
-     * Set the period for a specified federate.
-     *
-     * The value is used to determine the interaction amongst various federates as to
-     * when a specific federate can influence another
-     * @param federateID  the identifier for the federate
-     * @param timeoutputDelay
-     */
-    //  virtual void setTimeProperty (helics_property_time_period, local_federate_id federateID, Time timePeriod) =
-    //  0;
-    /**
-    * Set the periodic offset for a specified federate.
-    *
-    * The value is used as a time shift for calculating the allowable time in a federate
-    the granted time must one of N*period+offset
-
-
-
-
-    * @param federateID  the identifier for the federate
-    * @param timeOffset the periodic phase shift
-    */
-    // virtual void setTimeOffset (local_federate_id federateID, Time timeOffset) = 0;
-    /**
-     * Set the inputDelay time.
-     *
-     * The value is used to determine the interaction amongst various federates as to
-     * when a specific federate can influence another
-     * @param federateID  the identifier for the federate
-     * @param timeImpact the length of time it take outside message to propagate into a federate
-     */
-    // virtual void setInputDelay (local_federate_id federateID, Time timeImpact) = 0;
-    /**
-    Set the logging level
-    @details set the logging level for an individual federate
-    set federateID to 0 for the core logging level
-    * @param federateID  the identifier for the federate
-    * @param loggingLevel the level of logging to enable
-    <0-no logging, 0 -error only, 1- warnings, 2-normal, 3-debug, 4-trace
-    */
-    //  virtual void setLoggingLevel (local_federate_id federateID, int loggingLevel) = 0;
 
     /**
     Set a flag in a a federate
@@ -352,7 +295,7 @@ class Core
 
     /** get a publication Handle from its key
     @param federateID the identifier for the federate
-    @key the name of the publication
+    @param key the name of the publication
      @return a handle to identify the publication*/
     virtual interface_handle getPublication (local_federate_id federateID, const std::string &key) const = 0;
 
@@ -360,10 +303,10 @@ class Core
      * Register a control input for the specified federate.
      *
      * May only be invoked in the initialize state.
-     * @param[in] federateID
-     * @param[in] key the name of the control input
-     * @param[in] type a string describing the type of the federate
-     * @param[in] units a string naming the units of the federate
+     * @param federateID
+     * @param key the name of the control input
+     * @param type a string describing the type of the federate
+     * @param units a string naming the units of the federate
      */
     virtual interface_handle registerInput (local_federate_id federateID,
                                             const std::string &key,
@@ -371,7 +314,7 @@ class Core
                                             const std::string &units) = 0;
     /** get a subscription Handle from its key
     @param federateID the identifier for the federate
-    @key the tag of the named input
+    @param key the tag of the named input
     @return a handle to identify the input*/
     virtual interface_handle getInput (local_federate_id federateID, const std::string &key) const = 0;
 
@@ -405,14 +348,13 @@ class Core
     /** set a handle option
     @param handle the handle from the publication, input, endpoint or filter
     @param option the option to set
-    @param value the value to set the option (mostly 0 or 1)
+    @param option_value the value to set the option (mostly 0 or 1)
     */
     virtual void setHandleOption (interface_handle handle, int32_t option, bool option_value) = 0;
 
     /** get a handle option
     @param handle the handle from the publication, input, endpoint or filter
-    @param option the option to set
-    @param value the value to set the option (mostly 0 or 1)
+    @param option the option to set see /ref defs::options
     */
     virtual bool getHandleOption (interface_handle handle, int32_t option) const = 0;
 
@@ -423,8 +365,8 @@ class Core
     /**
      * Publish specified data to the specified key.
      *
-     * @param handle the handle from the publication, input, endpoint or filter
-     @param[in] data the raw data to send
+     @param handle the handle from the publication, input, endpoint or filter
+     @param data the raw data to send
      @param len the size of the data
      */
     virtual void setValue (interface_handle handle, const char *data, uint64_t len) = 0;
@@ -496,12 +438,8 @@ class Core
     @details a filter will create an additional processing step for messages before they get to a
     destination endpoint, for publications this will establish a linkage from the publication to the named input
     *
-    * May only be invoked in the Initialization state.
-    @param filterName the name of the filter (may be left blank)
+    @param handle an interface to add the target to
     @param dest the target endpoint for the filter
-    @param type_in the input type of the filter (may be left blank,  this is for error checking and will produce a
-    warning if it doesn't match with the input type of the target endpoint
-    @return the handle for the new filter
     */
     virtual void addDestinationTarget (interface_handle handle, const std::string &dest) = 0;
 
@@ -525,8 +463,8 @@ class Core
     dependencies
     * adding a dependency gives additional information to the core that the specified federate(given by id) will be
     sending Messages to the named Federate(by federateName)
-    @param[in] federateID  the identifier for the federate
-    @param[in] federateName the name of the dependent federate
+    @param federateID  the identifier for the federate
+    @param federateName the name of the dependent federate
     */
     virtual void addDependency (local_federate_id federateID, const std::string &federateName) = 0;
     /**
@@ -545,12 +483,13 @@ class Core
     @param source the name of the publication
     @param target the name of the input*/
     virtual void dataLink (const std::string &source, const std::string &target) = 0;
-    /** create a filter connection between a named publication and a named input
-    @param source the name of the filter
+    /** create a filter connection between a named filter and a named endpoint for messages coming from that
+    endpoint
+    @param filter the name of the filter
     @param target the name of the source target*/
     virtual void addSourceFilterToEndpoint (const std::string &filter, const std::string &target) = 0;
-    /** create a filter connection between a named publication and a named input
-    @param source the name of the filter
+    /** create a filter connection between a named filter and a named endpoint for destination processing
+    @param filter the name of the filter
     @param target the name of the source target*/
     virtual void addDestinationFilterToEndpoint (const std::string &filter, const std::string &target) = 0;
     /**
@@ -615,7 +554,7 @@ class Core
      @param federateID the identifier for the federate
      @param[out] endpoint_id the endpoint handle related to the message gets stored here
      */
-    virtual std::unique_ptr<Message> receiveAny (local_federate_id federateID, interface_handle &enpoint_id) = 0;
+    virtual std::unique_ptr<Message> receiveAny (local_federate_id federateID, interface_handle &endpoint_id) = 0;
 
     /**
      * Returns number of messages for all destinations.
@@ -623,15 +562,15 @@ class Core
     virtual uint64_t receiveCountAny (local_federate_id federateID) = 0;
 
     /** send a log message to the Core for logging
-    @param[in] federateID the federate that is sending the log message
-    @param[in] logLevel  an integer for the log level (0- error, 1- warning, 2-status, 3-debug)
-    @param[in] messageToLog
+    @param federateID the federate that is sending the log message
+    @param logLevel  an integer for the log level (0- error, 1- warning, 2-status, 3-debug)
+    @param messageToLog
     */
     virtual void logMessage (local_federate_id federateID, int logLevel, const std::string &messageToLog) = 0;
 
     /** set the filter callback operator
-    @param[in] filter  the handle of the filter
-    @param[in] operator pointer to the operator class executing the filter
+    @param filter  the handle of the filter
+    @param callback pointer to the operator class executing the filter
     */
     virtual void setFilterOperator (interface_handle filter, std::shared_ptr<FilterOperator> callback) = 0;
 

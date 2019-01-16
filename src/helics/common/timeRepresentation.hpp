@@ -62,7 +62,7 @@ inline constexpr double toSecondMultiplier (time_units units)
 inline constexpr double toUnitMultiplier (time_units units) { return timeCountForward[static_cast<int> (units)]; }
 
 /** generate powers to two as a constexpr
-@param[in] exponent the power of 2 desired*/
+@param exponent the power of 2 desired*/
 inline constexpr double pow2 (unsigned int exponent)
 {
     return (exponent == 0) ? 1.0 : (2.0 * pow2 (exponent - 1));

@@ -1,0 +1,267 @@
+/**
+ \page C_api_index C API function reference
+\section enumerations Helics Enumerations s
+ Many of the functions take properties or options that are defined by the enumerations available in the HELICS library see ef helics_enumIndex of functions available in the C and by extension the language API's
+
+ \section general General Functions
+ in the HELICS C library
+ - \ref helicsGetVersion
+ - \ref helicsErrorInitialize
+ - \ref helicsErrorClear
+ - \ref helicsIsCoreTypeAvailable
+ - \ref helicsGetFederateByName
+ - \ref helicsGetPropertyIndex
+ - \ref helicsGetOptionIndex
+ - \ref helicsCloseLibrary
+ - \ref helicsCleanupLibrary
+
+ \section create Creation Function Functions to create the different objects in the library
+ - \ref helicsCreateCore
+ - \ref helicsCreateCoreFromArgs
+ - \ref helicsCreateBroker
+ - \ref helicsCreateBrokerFromArgs
+ - \ref helicsCreateValueFederate
+ - \ref helicsCreateValueFederateFromConfig
+ - \ref helicsCreateMessageFederate
+ - \ref helicsCreateMessageFederateFromConfig
+ - \ref helicsCreateCombinationFederate
+ - \ref helicsCreateCombinationFederateFromConfig
+ - \ref helicsCreateFederateInfo
+ - \ref helicsCreateQuery
+
+ \section core Core Functions 
+functions applying to a \ref helics_core object
+ - \ref helicsCoreClone
+ - \ref helicsCoreIsValid
+ - \ref helicsCoreIsConnected
+ - \ref helicsCoreDataLink
+ - \ref helicsCoreAddSourceFilterToEndpoint
+ - \ref helicsCoreAddDestinationFilterToEndpoint
+ - \ref helicsCoreGetIdentifier
+ - \ref helicsCoreSetReadyToInit
+ - \ref helicsCoreDisconnect
+ - \ref helicsCoreDestroy
+ - \ref helicsCoreFree
+ - \ref helicsCoreSetGlobal
+ - \ref helicsCoreAddLoggingCallback
+ - \ref helicsCoreRegisterFilter
+ - \ref helicsCoreRegisterCloningFilter
+
+ \section general broker Broker Functions 
+Functions applying to a \ref helics_broker object
+ - \ref helicsBrokerClone
+ - \ref helicsBrokerIsValid
+ - \ref helicsBrokerIsConnected
+ - \ref helicsBrokerDataLink
+ - \ref helicsBrokerAddSourceFilterToEndpoint
+ - \ref helicsBrokerAddDestinationFilterToEndpoint
+ - \ref helicsBrokerWaitForDisconnect
+ - \ref helicsBrokerGetIdentifier
+ - \ref helicsBrokerGetAddress
+ - \ref helicsBrokerDisconnect
+ - \ref helicsBrokerDestroy
+ - \ref helicsBrokerFree
+ - \ref helicsBrokerSetGlobal
+ - \ref helicsBrokerAddLoggingCallback
+
+ \section fedinfo Federate Info Functions 
+Functions applying to a \ref helics_federate_info object
+ - \ref helicsFederateInfoClone
+ - \ref helicsFederateInfoLoadFromArgs
+ - \ref helicsFederateInfoFree
+ - \ref helicsFederateInfoSetCoreName
+ - \ref helicsFederateInfoSetCoreInitString
+ - \ref helicsFederateInfoSetCoreType
+ - \ref helicsFederateInfoSetCoreTypeFromString
+ - \ref helicsFederateInfoSetBroker
+ - \ref helicsFederateInfoSetBrokerPort
+ - \ref helicsFederateInfoSetLocalPort
+ - \ref helicsFederateInfoSetFlagOption
+ - \ref helicsFederateInfoSetSeparator
+ - \ref helicsFederateInfoSetTimeProperty
+ - \ref helicsFederateInfoSetIntegerProperty
+
+ \section federate Federate Functions 
+Functions applying to all \ref helics_federate objects
+ - \ref helicsFederateDestroy
+ - \ref helicsFederateClone
+ - \ref helicsFederateIsValid
+ - \ref helicsFederateRegisterInterfaces
+ - \ref helicsFederateFinalize
+ - \ref helicsFederateFinalizeAsync
+ - \ref helicsFederateFinalizeComplete
+ - \ref helicsFederateFree
+ - \ref helicsFederateEnterInitializingMode
+ - \ref helicsFederateEnterInitializingModeAsync
+ - \ref helicsFederateIsAsyncOperationCompleted
+ - \ref helicsFederateEnterInitializingModeComplete
+ - \ref helicsFederateEnterExecutingMode
+ - \ref helicsFederateEnterExecutingModeAsync
+ - \ref helicsFederateEnterExecutingModeComplete
+ - \ref helicsFederateEnterExecutingModeIterative
+ - \ref helicsFederateEnterExecutingModeIterativeAsync
+ - \ref helicsFederateEnterExecutingModeIterativeComplete
+ - \ref helicsFederateGetState
+ - \ref helicsFederateGetCoreObject
+ - \ref helicsFederateRequestTime
+ - \ref helicsFederateRequestNextStep
+ - \ref helicsFederateRequestTimeIterative
+ - \ref helicsFederateRequestTimeAsync
+ - \ref helicsFederateRequestTimeComplete
+ - \ref helicsFederateRequestTimeIterativeAsync
+ - \ref helicsFederateRequestTimeIterativeComplete
+ - \ref helicsFederateGetName
+ - \ref helicsFederateSetTimeProperty
+ - \ref helicsFederateSetFlagOption
+ - \ref helicsFederateSetSeparator
+ - \ref helicsFederateSetIntegerProperty
+ - \ref helicsFederateGetTimeProperty
+ - \ref helicsFederateGetFlagOption
+ - \ref helicsFederateGetIntegerProperty
+ - \ref helicsFederateGetCurrentTime
+ - \ref helicsFederateSetGlobal
+ - \ref helicsFederateAddLoggingCallback
+
+ \section vfederate Value Federate Functions 
+functions applying to federates created as a value or combination federate \ref helics_federate objects
+ - \ref helicsFederateRegisterSubscription
+ - \ref helicsFederateRegisterPublication
+ - \ref helicsFederateRegisterTypePublication
+ - \ref helicsFederateRegisterGlobalPublication
+ - \ref helicsFederateRegisterGlobalTypePublication
+ - \ref helicsFederateRegisterInput
+ - \ref helicsFederateRegisterTypeInput
+ - \ref helicsFederateRegisterGlobalInput
+ - \ref helicsFederateRegisterGlobalTypeInput
+ - \ref helicsFederateGetPublication
+ - \ref helicsFederateGetPublicationByIndex
+ - \ref helicsFederateGetInput
+ - \ref helicsFederateGetInputByIndex
+ - \ref helicsFederateGetSubscription
+ - \ref helicsFederateGetPublicationCount
+ - \ref helicsFederateGetInputCount
+
+ \section pub Publication interface Functions 
+functions applying to a \ref helics_publication object
+ - \ref helicsPublicationPublishRaw
+ - \ref helicsPublicationPublishString
+ - \ref helicsPublicationPublishInteger
+ - \ref helicsPublicationPublishBoolean
+ - \ref helicsPublicationPublishDouble
+ - \ref helicsPublicationPublishTime
+ - \ref helicsPublicationPublishChar
+ - \ref helicsPublicationPublishComplex
+ - \ref helicsPublicationPublishVector
+ - \ref helicsPublicationPublishNamedPoint
+ - \ref helicsPublicationAddTarget
+ - \ref helicsPublicationGetType
+ - \ref helicsPublicationGetKey
+ - \ref helicsPublicationGetUnits
+ - \ref helicsPublicationGetInfo
+ - \ref helicsPublicationSetInfo
+ - \ref helicsPublicationGetOption
+ - \ref helicsPublicationSetOption
+
+ \section input Input interface Functions 
+functions applying to a \ref helics_input object
+ - \ref helicsInputAddTarget
+ - \ref helicsInputGetRawValueSize
+ - \ref helicsInputGetRawValue
+ - \ref helicsInputGetStringSize
+ - \ref helicsInputGetString
+ - \ref helicsInputGetInteger
+ - \ref helicsInputGetBoolean
+ - \ref helicsInputGetDouble
+ - \ref helicsInputGetTime
+ - \ref helicsInputGetChar
+ - \ref helicsInputGetComplexObject
+ - \ref helicsInputGetComplex
+ - \ref helicsInputGetVectorSize
+ - \ref helicsInputGetVector
+ - \ref helicsInputGetNamedPoint
+ - \ref helicsInputSetDefaultRaw
+ - \ref helicsInputSetDefaultString
+ - \ref helicsInputSetDefaultInteger
+ - \ref helicsInputSetDefaultBoolean
+ - \ref helicsInputSetDefaultTime
+ - \ref helicsInputSetDefaultChar
+ - \ref helicsInputSetDefaultDouble
+ - \ref helicsInputSetDefaultComplex
+ - \ref helicsInputSetDefaultVector
+ - \ref helicsInputSetDefaultNamedPoint
+ - \ref helicsInputGetType
+ - \ref helicsInputGetPublicationType
+ - \ref helicsInputGetKey
+ - \ref helicsSubscriptionGetKey
+ - \ref helicsInputGetUnits
+ - \ref helicsInputGetInfo
+ - \ref helicsInputSetInfo
+ - \ref helicsInputGetOption
+ - \ref helicsInputSetOption
+ - \ref helicsInputIsUpdated
+ - \ref helicsInputLastUpdateTime
+
+ \section message Message Federate Functions 
+Functions applying to federates created as a value or combination federate \ref helics_federate objects
+ - \ref helicsFederateRegisterEndpoint
+ - \ref helicsFederateRegisterGlobalEndpoint
+ - \ref helicsFederateGetEndpoint
+ - \ref helicsFederateGetEndpointByIndex
+ - \ref helicsFederateHasMessage
+ - \ref helicsFederatePendingMessages
+ - \ref helicsFederateGetMessage
+ - \ref helicsFederateGetEndpointCount
+
+ \section endpoint Endpoint interface Functions 
+functions applying to a \ref helics_endpoint object
+ - \ref helicsEndpointSetDefaultDestination
+ - \ref helicsEndpointGetDefaultDestination
+ - \ref helicsEndpointSendMessageRaw
+ - \ref helicsEndpointSendEventRaw
+ - \ref helicsEndpointSendMessage
+ - \ref helicsEndpointSubscribe
+ - \ref helicsEndpointHasMessage
+ - \ref helicsEndpointPendingMessages
+ - \ref helicsEndpointGetMessage
+ - \ref helicsEndpointGetType
+ - \ref helicsEndpointGetName
+ - \ref helicsEndpointGetInfo
+ - \ref helicsEndpointSetInfo
+ - \ref helicsEndpointSetOption
+ - \ref helicsEndpointGetOption
+
+ \section filterfed Filter Federate Functions 
+Functions applying to all federates but related to \ref helics_filter 
+ - \ref helicsFederateRegisterFilter
+ - \ref helicsFederateRegisterGlobalFilter
+ - \ref helicsFederateRegisterCloningFilter
+ - \ref helicsFederateRegisterGlobalCloningFilter
+ - \ref helicsFederateGetFilterCount
+ - \ref helicsFederateGetFilter
+ - \ref helicsFederateGetFilterByIndex
+
+ \section filter Filter interface Functions 
+Functions applying to a \ref helics_filter object
+ - \ref helicsFilterGetName
+ - \ref helicsFilterSet
+ - \ref helicsFilterSetString
+ - \ref helicsFilterAddDestinationTarget
+ - \ref helicsFilterAddSourceTarget
+ - \ref helicsFilterAddDeliveryEndpoint
+ - \ref helicsFilterRemoveTarget
+ - \ref helicsFilterRemoveDeliveryEndpoint
+ - \ref helicsFilterGetInfo
+ - \ref helicsFilterSetInfo
+ - \ref helicsFilterSetOption
+ - \ref helicsFilterGetOption
+
+ \section query Query Functions 
+functions applying to a \ref helics_query object
+ - \ref helicsQueryExecute
+ - \ref helicsQueryCoreExecute
+ - \ref helicsQueryBrokerExecute
+ - \ref helicsQueryExecuteAsync
+ - \ref helicsQueryExecuteComplete
+ - \ref helicsQueryIsCompleted
+ - \ref helicsQueryFree
+*/

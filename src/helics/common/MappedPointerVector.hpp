@@ -102,7 +102,7 @@ class MappedPointerVector
     }
 
     /** remove an element at a specific index
-    @param[in] index the index of the element to remove*/
+    @param index the index of the element to remove*/
     void removeIndex (size_t index)
     {
         if (index >= dataStorage.size ())

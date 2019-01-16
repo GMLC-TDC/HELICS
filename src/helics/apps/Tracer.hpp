@@ -27,15 +27,16 @@ class Tracer : public App
     Tracer (int argc, char *argv[]);
 
     /**constructor taking a federate information structure and using the given core
+    @param name the name of the tracer object, if empty it tries to figure it out from fi
     @param core a pointer to core object which the federate can join
-    @param[in] fi  a federate information structure
+    @param fi  a federate information structure
     */
     Tracer (const std::string &name, const std::shared_ptr<Core> &core, const FederateInfo &fi);
     /**constructor taking a file with the required information
-    @param[in] name the name of the app
-    @param[in] file a file defining the federate information
+    @param name the name of the app may be empty to pull name from the file
+    @param file a file defining the federate information
     */
-    Tracer (const std::string &name, const std::string &jsonString);
+    Tracer (const std::string &name, const std::string &file);
     /** move construction*/
     Tracer (Tracer &&other_tracer) = default;
     /** move assignment*/
@@ -82,6 +83,7 @@ class Tracer : public App
     }
     /** turn the screen display on for values and messages*/
     void enableTextOutput () { printMessage = true; }
+    /** turn the screen display off for values and messages*/
     void disableTextOutput () { printMessage = false; }
 
   private:
@@ -89,7 +91,7 @@ class Tracer : public App
      */
     int loadArguments (boost::program_options::variables_map &vm_map);
     /** load from a jsonString
-    @param either a JSON filename or a string containing JSON
+    @param jsonString either a JSON filename or a string containing JSON
     */
     virtual void loadJsonFile (const std::string &jsonString) override;
     /** load a text file*/

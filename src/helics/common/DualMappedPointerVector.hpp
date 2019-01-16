@@ -213,7 +213,7 @@ class DualMappedPointerVector
     /** get a pointer to the last element inserted*/
     VType *back () { return dataStorage.back ().get (); }
     /** remove an element at a specific index
-    @param[in] index the index of the element to remove*/
+    @param index the index of the element to remove*/
     void removeIndex (size_t index)
     {
         if (index >= dataStorage.size ())

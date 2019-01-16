@@ -77,8 +77,8 @@ class ValueFederateManager
     /** add a alias/shortcut for locating a publication
     @details primarily for use in looking up an id from a different location
     creates a local shortcut for referring to a subscription which may have a long actual name
-    @param[in] pub the subscription identifier
-    @param[in] shortcutName the name of the shortcut
+    @param pub the subscription identifier
+    @param shortcutName the name of the shortcut
     */
     void addAlias (const Publication &pub, const std::string &shortcutName);
     /** add a destination target to a publication
@@ -105,8 +105,8 @@ class ValueFederateManager
 
     /** set the default value for a subscription
     @details this is the value returned prior to any publications
-    @param[in] id the subscription identifier
-    @param[in] block the data block representing the default value
+    @param inp the subscription identifier
+    @param block the data block representing the default value
     */
     void setDefaultValue (const Input &inp, const data_view &block);
 
@@ -125,8 +125,8 @@ class ValueFederateManager
     Time getLastUpdateTime (const Input &inp) const;
 
     /** update the time from oldTime to newTime
-    @param[in] newTime the newTime of the federate
-    @param[in] oldTime the oldTime of the federate
+    @param newTime the newTime of the federate
+    @param oldTime the oldTime of the federate
     */
     void updateTime (Time newTime, Time oldTime);
     /** transition from Startup To the Initialize State*/
@@ -168,12 +168,12 @@ class ValueFederateManager
 
     /** register a callback function to call when any subscribed value is updated
     @details there can only be one generic callback
-    @param[in] callback the function to call
+    @param callback the function to call
     */
     void setInputNotificationCallback (std::function<void(Input &, Time)> callback);
     /** register a callback function to call when the specified subscription is updated
-    @param[in] id  the id to register the callback for
-    @param[in] callback the function to call
+    @param inp  the id to register the callback for
+    @param callback the function to call
     */
     void setInputNotificationCallback (const Input &inp, std::function<void(Input &, Time)> callback);
 

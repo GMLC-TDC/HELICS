@@ -111,13 +111,13 @@ class CoreBroker : public Broker, public BrokerBase
     std::array<AirLock<stx::any>, 3> dataAirlocks;  //!< airlocks for updating filter operators and other functions
   private:
     /** function that processes all the messages
-    @param[in] command -- the message to process
+    @param command -- the message to process
     */
     virtual void processCommand (ActionMessage &&command) override;
     /** function to process a priority command independent of the main queue
-    @detailed called from addMessage function which detects if the command is a priority command
+    @details called from addMessage function which detects if the command is a priority command
     this mainly deals with some of the registration functions
-    @param[in] command the command to process
+    @param command the command to process
     */
     void processPriorityCommand (ActionMessage &&command) override;
 
@@ -193,26 +193,26 @@ class CoreBroker : public Broker, public BrokerBase
     /** this function is the one that will change for various flavors of broker communication
     @details it takes a route info- a code of where to send the data and an action message
     and proceeds to transmit it to the appropriate location
-    @param[in] route -the identifier for the routing information
-    @param[in] command the actionMessage to transmit
+    @param route -the identifier for the routing information
+    @param command the actionMessage to transmit
     */
     virtual void transmit (route_id route, const ActionMessage &command) = 0;
     /** this function is the one that will change for various flavors of broker communication
     @details it takes a route info- a code of where to send the data and an action message
     and proceeds to transmit it to the appropriate location, this variant does a move operation instead of copy
-    @param[in] route -the identifier for the routing information
-    @param[in] command the actionMessage to transmit
+    @param route -the identifier for the routing information
+    @param command the actionMessage to transmit
     */
     virtual void transmit (route_id route, ActionMessage &&command) = 0;
     /** add a route to the type specific routing information and establish the connection
     @details add a route to a table, the connection information is contained in the string with the described
     identifier
-    @param[in] route_id  the identifier for the route
-    @param[in] routeInfo  a string describing the connection info
+    @param rid  the identifier for the route
+    @param routeInfo  a string describing the connection info
     */
     virtual void addRoute (route_id rid, const std::string &routeInfo) = 0;
     /** remove or disconnect a route from use
-    @param route_id the identification of the route
+    @param rid the identification of the route
     */
     virtual void removeRoute (route_id rid) = 0;
 

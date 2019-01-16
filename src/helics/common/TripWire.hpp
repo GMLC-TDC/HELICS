@@ -40,11 +40,17 @@ class TripWireDetector
 class TripWireTrigger
 {
   public:
+    /** default constructor*/
     TripWireTrigger ();
+    /** destructor*/
     ~TripWireTrigger ();
+    /** move constructor*/
     TripWireTrigger (TripWireTrigger &&twt) = default;
+    /** deleted copy constructor*/
     TripWireTrigger (const TripWireTrigger &twt) = delete;
+    /** move assignment*/
     TripWireTrigger &operator= (TripWireTrigger &&twt) = default;
+    /** deleted copy assignment*/
     TripWireTrigger &operator= (const TripWireTrigger &twt) = delete;
 
   private:

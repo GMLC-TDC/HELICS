@@ -7,10 +7,10 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include "MapTraits.hpp"
 #include "helics_includes/optional.hpp"
 #include <algorithm>
+#include <deque>
 #include <map>
 #include <string>
 #include <unordered_map>
-#include <deque>
 #include <vector>
 
 /** class combining a vector of objects with a map to search them by a separate index term
@@ -25,7 +25,8 @@ class MappedVector
   public:
     /** insert an element into the mapped vector
     @param searchValue the unique index to use for the value if it exists the existing value is replaced
-    @return the index of the value placed
+    @param data all other arguments required to create a new data value
+    @return an optional with the index of the value placed if it was placed
     */
     template <typename... Us>
     stx::optional<size_t> insert (const searchType &searchValue, Us &&... data)
@@ -41,8 +42,7 @@ class MappedVector
         return index;
     }
     /** insert an element into the mapped vector
-    @param searchValue the unique index to use for the value if it exists the existing value is replaced
-    @return the index of the value placed
+    @return an optional with the index of the value placed if it was placed
     */
     template <typename... Us>
     stx::optional<size_t> insert (std::nullptr_t /*searchValue*/, Us &&... data)
@@ -54,6 +54,7 @@ class MappedVector
 
     /** insert an element into the mapped vector
     @param searchValue the unique index to use for the value if it exists the existing value is replaced
+    @param data all other values and parameters required to create a new searchType object
     @return the index of the value placed
     */
     template <typename... Us>

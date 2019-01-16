@@ -67,19 +67,21 @@ class Source : public App
     */
     Source (int argc, char *argv[]);
     /** construct from a federate info object
+    @param name the name of the source object (can be empty to use defaults from fi)
     @param fi a pointer info object containing information on the desired federate configuration
     */
     Source (const std::string &name, const FederateInfo &fi);
     /**constructor taking a federate information structure and using the given core
+    @param name the name of the source object (can be empty to use defaults from fi)
     @param core a pointer to core object which the federate can join
-    @param[in] fi  a federate information structure
+    @param fi  a federate information structure
     */
     Source (const std::string &name, const std::shared_ptr<Core> &core, const FederateInfo &fi);
     /**constructor taking a file with the required information
-    @param[in] name the name of the app
-    @param[in] jsonString file or JSON string defining the federate information and other configuration
+    @param name the name of the source object (can be empty to use defaults from fi)
+    @param configString file a JSON or TOML file or string containing configuration informatino
     */
-    Source (const std::string &name, const std::string &jsonString);
+    Source (const std::string &name, const std::string &configString);
 
     /** move construction*/
     Source (Source &&other_source) = default;

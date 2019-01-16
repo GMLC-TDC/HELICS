@@ -16,8 +16,9 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 @details defining data used for storing the data for values and for messages
 */
 
-/**
- * HELICS Core API
+/** \namespace helics
+@details the core namespace for the helics C++ library
+all user functions are found in this namespace along with many other functions in the Core API
  */
 namespace helics
 {

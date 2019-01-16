@@ -30,12 +30,12 @@ class CharMapper
     */
     void addKey (unsigned char x, V val) { key[x] = val; }
     /** get the value assigned to a character
-     * @param[in] x the character to test or convert
+     * @param x the character to test or convert
      * @return the resulting value,  0 if nothing in particular is specified in a given map
      */
     V at (unsigned char x) const { return key[x]; }
     /** get the value assigned to a character by bracket notation
-     * @param[in] x the character to test or convert
+     * @param x the character to test or convert
      * @return the resulting value,  0 if nothing in particular is specified in a given map
      */
     V operator[] (unsigned char x) const { return key[x]; }

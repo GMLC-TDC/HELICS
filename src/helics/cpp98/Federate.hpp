@@ -295,7 +295,6 @@ class Federate
     /** create a cloning Filter on the specified federate
     @details cloning filters copy a message and send it to multiple locations source and destination can be added
     through other functions
-    @param fed the fed to register through
     @param deliveryEndpoint the specified endpoint to deliver the message
     @return a helics_filter object
     */
@@ -313,9 +312,8 @@ class Federate
     /** create a cloning Filter on the specified federate
     @details cloning filters copy a message and send it to multiple locations source and destination can be added
     through other functions
-    @param fed the fed to register through
     @param deliveryEndpoint the specified endpoint to deliver the message
-    @return a helics_filter object
+    @return a CloningFilter object
     */
     CloningFilter registerGlobalCloningFilter (const std::string &deliveryEndpoint)
     {

@@ -124,7 +124,6 @@ class AsioServiceManager : public std::enable_shared_from_this<AsioServiceManage
     /** run a single thread for the service manager to execute asynchronous services in
     @details will run a single thread for the io_service,  it will not stop the thread until either the service
     manager is closed or the haltServiceLoop function is called and there is no more work
-    @param in the name of the service
     */
     LoopHandle startServiceLoop ();
 

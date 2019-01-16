@@ -98,23 +98,23 @@ class Logger
     /**destructor*/
     ~Logger ();
     /** open a file to write the log messages
-    @param[in] file the name of the file to write messages to*/
+    @param file the name of the file to write messages to*/
     void openFile (const std::string &file);
     /** function to start the logging thread
-    @param[in] cLevel the console print level
-    @param[in] fLevel the file print level  messages coming in below these levels will be printed*/
+    @param cLevel the console print level
+    @param fLevel the file print level  messages coming in below these levels will be printed*/
     void startLogging (int cLevel, int fLevel);
     /** overload of @see startLogging with unspecified logging levels*/
     void startLogging () { startLogging (consoleLevel, fileLevel); }
     /** stop logging for a time messages received while halted are ignored*/
     void haltLogging ();
     /** log a message at a particular level
-    @param[in] level the level of the message
-    @param[in] logMessage the actual message to log
+    @param level the level of the message
+    @param logMessage the actual message to log
     */
     void log (int level, std::string logMessage);
     /** message to log without regard for levels*
-    @param[in] logMessage the message to log
+    @param logMessage the message to log
     */
     void log (std::string logMessage) { log (-100000, std::move (logMessage)); }
     /** flush the log queue*/
@@ -122,8 +122,8 @@ class Logger
     /** check if the Logger is running*/
     bool isRunning () const;
     /** alter the printing levels
-    @param[in] cLevel the level to print to the console
-    @param[in] fLevel the level to print to the file if it is open*/
+    @param cLevel the level to print to the console
+    @param fLevel the level to print to the file if it is open*/
     void changeLevels (int cLevel, int fLevel);
 
   private:
@@ -145,23 +145,23 @@ class LoggerNoThread
     /**this does nothing with the argument since it is not threaded here to match the API of Logger*/
     explicit LoggerNoThread (const std::shared_ptr<LoggingCore> &core);
     /** open a file to write the log messages
-    @param[in] file the name of the file to write messages to*/
+    @param file the name of the file to write messages to*/
     void openFile (const std::string &file);
     /** function to start the logging thread
-    @param[in] cLevel the console print level
-    @param[in] fLevel the file print level  messages coming in below these levels will be printed*/
+    @param cLevel the console print level
+    @param fLevel the file print level  messages coming in below these levels will be printed*/
     void startLogging (int cLevel, int fLevel);
-    /** overload of ::startLogging with unspecified logging levels*/
+    /** overload of /ref startLogging with unspecified logging levels*/
     void startLogging () { startLogging (consoleLevel, fileLevel); }
     // NOTE:: the interface for log in the noThreadLogging is slightly different
     // due to the threaded Logger making use of move semantics which isn't that useful in the noThreadLogger
     /** log a message at a particular level
-    @param[in] level the level of the message
-    @param[in] logMessage the actual message to log
+    @param level the level of the message
+    @param logMessage the actual message to log
     */
     void log (int level, const std::string &logMessage);
     /** message to log without regard for levels*
-    @param[in] logMessage the message to log
+    @param logMessage the message to log
     */
     void log (const std::string &logMessage) { log (-100000, logMessage); }
     /** check if the logging thread is running*/
@@ -169,8 +169,8 @@ class LoggerNoThread
     /** flush the log queue*/
     void flush ();
     /** alter the printing levels
-    @param[in] cLevel the level to print to the console
-    @param[in] fLevel the level to print to the file if it is open*/
+    @param cLevel the level to print to the console
+    @param fLevel the level to print to the file if it is open*/
     void changeLevels (int cLevel, int fLevel);
 };
 

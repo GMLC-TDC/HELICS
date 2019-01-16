@@ -4,13 +4,16 @@ Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
 #pragma once
-/** @file
+/** @file helics_definitions
 @details base helics enumerations for C++ API's,  a namespace wrapper for the definitions defined in helics_enums.h
 */
 #include "helics/helics_enums.h"
 
 namespace helics
 {
+/** @namespace defs enum definitions for use in the C++ api
+The defs namespace contains several enumerations for use in functions that take property types or values
+or small sets of options*/
 namespace defs
 {
 /** flags that can be used to set different options for a federate*/

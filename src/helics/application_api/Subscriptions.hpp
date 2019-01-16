@@ -13,18 +13,21 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 
 namespace helics
 {
+/** generate a subscription object from a value federate*/
 inline Input &
 make_subscription (ValueFederate *valueFed, const std::string &key, const std::string &units = std::string ())
 {
     return valueFed->registerSubscription (key, units);
 }
 
+/** generate a subscription object from a value federate*/
 inline Input &
 make_subscription (ValueFederate &valueFed, const std::string &key, const std::string &units = std::string ())
 {
     return valueFed.registerSubscription (key, units);
 }
 
+/** generate a typed subscription object from a value federate*/
 template <class X>
 inline InputT<X>
 make_subscription (ValueFederate *valueFed, const std::string &key, const std::string &units = std::string ())
@@ -34,6 +37,7 @@ make_subscription (ValueFederate *valueFed, const std::string &key, const std::s
     return ipt;
 }
 
+/** generate a typed subscription object from a value federate*/
 template <class X>
 inline InputT<X>
 make_subscription (ValueFederate &valueFed, const std::string &key, const std::string &units = std::string ())
@@ -51,9 +55,9 @@ operation vs the member getValue calls
 @param key  the name of the publication
 */
 template <class X>
-X getValue (ValueFederate &fed, const std::string &Key)
+X getValue (ValueFederate &fed, const std::string &key)
 {
-    return fed.getInput (Key).getValue<X> ();
+    return fed.getInput (key).getValue<X> ();
 }
 
 /** get a value directly from the subscription key name
@@ -65,9 +69,9 @@ operation vs the member getValue calls
 @param obj the obj to store the retrieved value
 */
 template <class X>
-void getValue (ValueFederate &fed, const std::string &Key, X &obj)
+void getValue (ValueFederate &fed, const std::string &key, X &obj)
 {
-    fed.getSubscription (Key).getValue<X> (obj);
+    fed.getSubscription (key).getValue<X> (obj);
 }
 
 /** class to handle a Vector Subscription
@@ -86,12 +90,12 @@ class VectorSubscription
   public:
     VectorSubscription () noexcept {};
     /**constructor to build a subscription object
-   @param[in] valueFed  the ValueFederate to use
-   @param[in] key the identifier for the publication to subscribe to
-   @param[in] startIndex the index to start with
-   @param[in] count the number of values to subscribe to
-   @param[in] defValue the default value
-   @param[in] units the units associated with the Subscription
+   @param valueFed  the ValueFederate to use
+   @param key the identifier for the publication to subscribe to
+   @param startIndex the index to start with
+   @param count the number of values to subscribe to
+   @param defValue the default value
+   @param units the units associated with the Subscription
    */
     VectorSubscription (ValueFederate *valueFed,
                         const std::string &key,
@@ -116,12 +120,12 @@ class VectorSubscription
         }
     }
     /**constructor to build a subscription object
-    @param[in] valueFed  the ValueFederate to use
-    @param[in] key the identifier for the publication to subscribe to
-    @param[in] startIndex the index to start with
-    @param[in] count the number of values to subscribe to
-    @param[in] defValue the default value
-    @param[in] units the units associated with the Subscription
+    @param valueFed  the ValueFederate to use
+    @param key the identifier for the publication to subscribe to
+    @param startIndex the index to start with
+    @param count the number of values to subscribe to
+    @param defValue the default value
+    @param units the units associated with the Subscription
     */
     template <class FedPtr>
     VectorSubscription (FedPtr valueFed,
@@ -166,13 +170,12 @@ class VectorSubscription
     /** get the most recent value
     @return the value*/
     const std::vector<X> &getVals () const { return vals; }
-    /** store the value in the given variable
-    @param[out] out the location to store the value
-    */
+    /**get a value through its index
+     */
     const X &operator[] (int index) const { return vals[index]; }
     /** register a callback for the update
     @details the callback is called in the just before the time request function returns
-    @param[in] callback a function with signature void(X val, Time time)
+    @param callback a function with signature void(X val, Time time)
     val is the new value and time is the time the value was updated
     */
     void setInputNotificationCallback (std::function<void(int, Time)> callback)
@@ -210,14 +213,14 @@ class VectorSubscription2d
     VectorSubscription2d () noexcept {};
 
     /**constructor to build a subscription object
-    @param[in] valueFed  the ValueFederate to use
-     @param[in] key the identifier for the publication to subscribe to
-    @param[in] startIndex_x the index to start with in the x dimension
-    @param[in] count_x the number of values in the x direction
-    @param[in] startIndex_y the index to start with in the x dimension
-    @param[in] count_y the number of values in the x direction
-    @param[in] defValue the default value
-    @param[in] units the units associated with the Subscription
+    @param valueFed  the ValueFederate to use
+     @param key the identifier for the publication to subscribe to
+    @param startIndex_x the index to start with in the x dimension
+    @param count_x the number of values in the x direction
+    @param startIndex_y the index to start with in the x dimension
+    @param count_y the number of values in the x direction
+    @param defValue the default value
+    @param units the units associated with the Subscription
     */
     template <class FedPtr>
     VectorSubscription2d (FedPtr valueFed,
@@ -287,7 +290,7 @@ class VectorSubscription2d
     }
     /** register a callback for the update
     @details the callback is called in the just before the time request function returns
-    @param[in] callback a function with signature void(X val, Time time)
+    @param callback a function with signature void(X val, Time time)
     val is the new value and time is the time the value was updated
     */
     void setInputNotificationCallback (std::function<void(int, Time)> callback)
