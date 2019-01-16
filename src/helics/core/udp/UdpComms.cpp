@@ -212,8 +212,8 @@ void UdpComms::queue_tx_function ()
                                         std::to_string (brokerPort));
             // Setup the control socket for comms with the receiver
             broker_endpoint = *resolver.resolve (query);
-
-            if (PortNumber <= 0)
+            int retries = 0;
+            while (PortNumber <= 0)
             {
                 ActionMessage m (CMD_PROTOCOL_PRIORITY);
                 m.messageID = REQUEST_PORTS;
@@ -221,9 +221,41 @@ void UdpComms::queue_tx_function ()
                 if (error)
                 {
                     logError (fmt::format ("error in initial send to broker {}", error.message ()));
+                    PortNumber = -1;
+                    promisePort.set_value (-1);
+                    setTxStatus (connection_status::error);
+                    return;
                 }
+                auto startTime = std::chrono::steady_clock::now ();
+                bool timeout = false;
+                std::this_thread::yield ();
                 std::vector<char> rx (128);
                 udp::endpoint brk;
+
+                while ((transmitSocket.available () == 0) && (!timeout))
+                {
+                    if (std::chrono::steady_clock::now () - startTime > connectionTimeout)
+                    {
+                        timeout = true;
+                    }
+                    std::this_thread::yield ();
+                }
+                if (timeout)
+                {
+                    ++retries;
+                    if (retries > maxRetries)
+                    {
+                        logError ("the max number of retries has been exceeded");
+                        PortNumber = -1;
+                        promisePort.set_value (-1);
+                        setTxStatus (connection_status::error);
+                        return;
+                    }
+                    else
+                    {
+                        continue;
+                    }
+                }
                 auto len = transmitSocket.receive_from (boost::asio::buffer (rx), brk);
                 m = ActionMessage (rx.data (), len);
                 if (isProtocolCommand (m))
