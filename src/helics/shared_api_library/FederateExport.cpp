@@ -23,7 +23,7 @@ static constexpr char nullcstr[] = "";
 
 namespace helics
 {
-FedObject *getFedObject (helics_federate fed, helics_error *err)
+FedObject *getFedObject (helics_federate fed, helics_error *err) noexcept
 {
     HELICS_ERROR_CHECK (err, nullptr);
     if (fed == nullptr)

@@ -414,7 +414,7 @@ static constexpr char invalidBrokerString[] = "broker object is not valid";
 
 namespace helics
 {
-CoreObject *getCoreObject (helics_core core, helics_error *err)
+CoreObject *getCoreObject (helics_core core, helics_error *err) noexcept
 {
     if ((err != nullptr) && (err->error_code != 0))
     {
@@ -442,7 +442,7 @@ CoreObject *getCoreObject (helics_core core, helics_error *err)
     return nullptr;
 }
 
-BrokerObject *getBrokerObject (helics_broker broker, helics_error *err)
+BrokerObject *getBrokerObject (helics_broker broker, helics_error *err) noexcept
 {
     if ((err != nullptr) && (err->error_code != 0))
     {

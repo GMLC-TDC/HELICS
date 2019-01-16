@@ -63,4 +63,26 @@ BOOST_AUTO_TEST_CASE (test_mistaken_free)
     helicsFederateInfoFree (fi);  // now do the correct frees
     helicsFederateFree (vFed1);
 }
+
+/** test simple creation and destruction*/
+BOOST_AUTO_TEST_CASE (test_mistaken_finalize)
+{
+    SetupTest (helicsCreateValueFederate, "test", 1);
+    auto vFed1 = GetFederateAt (0);
+    auto fi = helicsCreateFederateInfo ();
+    CE (helicsFederateInfoSetBroker (fi, "broker test", &err));
+    CE (helicsFederateEnterInitializingMode (vFed1, &err));
+    helicsFederateFinalize (fi, &err);
+
+    BOOST_CHECK_NE (err.error_code, 0);
+
+    helicsFederateInfoFree (vFed1);  // this is totally wrong but we are testing it
+    helicsFederateFree (fi);  // this is also backwards
+
+    helicsQueryFree (fi);  // also bad
+    helicsQueryFree (vFed1);
+
+    helicsFederateInfoFree (fi);  // now do the correct frees
+    helicsFederateFree (vFed1);
+}
 BOOST_AUTO_TEST_SUITE_END ()
