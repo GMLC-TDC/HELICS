@@ -616,7 +616,7 @@ def helicsBrokerFree(broker: 'helics_broker') -> "void":
     """
     return _helics.helicsBrokerFree(broker)
 
-def helicsCreateValueFederate(fedName: 'char const *', fi: 'helics_federate_info const') -> "helics_federate":
+def helicsCreateValueFederate(fedName: 'char const *', fi: 'helics_federate_info') -> "helics_federate":
     """
 
 
@@ -641,7 +641,7 @@ def helicsCreateValueFederateFromConfig(configFile: 'char const *') -> "helics_f
     return _helics.helicsCreateValueFederateFromConfig(configFile)
 helicsCreateValueFederateFromConfig = _helics.helicsCreateValueFederateFromConfig
 
-def helicsCreateMessageFederate(fedName: 'char const *', fi: 'helics_federate_info const') -> "helics_federate":
+def helicsCreateMessageFederate(fedName: 'char const *', fi: 'helics_federate_info') -> "helics_federate":
     """
 
 
@@ -666,7 +666,7 @@ def helicsCreateMessageFederateFromConfig(configFile: 'char const *') -> "helics
     return _helics.helicsCreateMessageFederateFromConfig(configFile)
 helicsCreateMessageFederateFromConfig = _helics.helicsCreateMessageFederateFromConfig
 
-def helicsCreateCombinationFederate(fedName: 'char const *', fi: 'helics_federate_info const') -> "helics_federate":
+def helicsCreateCombinationFederate(fedName: 'char const *', fi: 'helics_federate_info') -> "helics_federate":
     """
 
 
@@ -699,6 +699,10 @@ helicsFederateClone = _helics.helicsFederateClone
 def helicsCreateFederateInfo() -> "helics_federate_info":
     return _helics.helicsCreateFederateInfo()
 helicsCreateFederateInfo = _helics.helicsCreateFederateInfo
+
+def helicsFederateInfoClone(fi: 'helics_federate_info') -> "helics_federate_info":
+    return _helics.helicsFederateInfoClone(fi)
+helicsFederateInfoClone = _helics.helicsFederateInfoClone
 
 def helicsFederateInfoLoadFromArgs(fi: 'helics_federate_info', argc: 'int') -> "void":
     """
@@ -1238,14 +1242,14 @@ def helicsQueryIsCompleted(query: 'helics_query') -> "helics_bool":
     """
     return _helics.helicsQueryIsCompleted(query)
 
-def helicsQueryFree(arg1: 'helics_query') -> "void":
+def helicsQueryFree(query: 'helics_query') -> "void":
     """
 
 
     free the memory associated with a query object
 
     """
-    return _helics.helicsQueryFree(arg1)
+    return _helics.helicsQueryFree(query)
 
 def helicsCleanupLibrary() -> "void":
     return _helics.helicsCleanupLibrary()
@@ -1308,8 +1312,8 @@ def helicsFederateRegisterGlobalTypePublication(fed: 'helics_federate', key: 'ch
     """
     return _helics.helicsFederateRegisterGlobalTypePublication(fed, key, type, units)
 
-def helicsFederateRegisterInput(fed: 'helics_federate', name: 'char const *', type: 'helics_data_type', units: 'char const *') -> "helics_input":
-    return _helics.helicsFederateRegisterInput(fed, name, type, units)
+def helicsFederateRegisterInput(fed: 'helics_federate', key: 'char const *', type: 'helics_data_type', units: 'char const *') -> "helics_input":
+    return _helics.helicsFederateRegisterInput(fed, key, type, units)
 helicsFederateRegisterInput = _helics.helicsFederateRegisterInput
 
 def helicsFederateRegisterTypeInput(fed: 'helics_federate', key: 'char const *', type: 'char const *', units: 'char const *') -> "helics_input":
@@ -1841,15 +1845,15 @@ def helicsFilterGetName(filt: 'helics_filter') -> "char const *":
     """
     return _helics.helicsFilterGetName(filt)
 
-def helicsFilterSet(filt: 'helics_filter', property: 'char const *', val: 'double') -> "void":
+def helicsFilterSet(filt: 'helics_filter', prop: 'char const *', val: 'double') -> "void":
     """
 
 
     """
-    return _helics.helicsFilterSet(filt, property, val)
+    return _helics.helicsFilterSet(filt, prop, val)
 
-def helicsFilterSetString(filt: 'helics_filter', property: 'char const *', val: 'char const *') -> "void":
-    return _helics.helicsFilterSetString(filt, property, val)
+def helicsFilterSetString(filt: 'helics_filter', prop: 'char const *', val: 'char const *') -> "void":
+    return _helics.helicsFilterSetString(filt, prop, val)
 helicsFilterSetString = _helics.helicsFilterSetString
 
 def helicsFilterAddDestinationTarget(filt: 'helics_filter', dest: 'char const *') -> "void":
@@ -1873,8 +1877,8 @@ def helicsFilterAddDeliveryEndpoint(filt: 'helics_filter', deliveryEndpoint: 'ch
     """
     return _helics.helicsFilterAddDeliveryEndpoint(filt, deliveryEndpoint)
 
-def helicsFilterRemoveTarget(filt: 'helics_filter', dest: 'char const *') -> "void":
-    return _helics.helicsFilterRemoveTarget(filt, dest)
+def helicsFilterRemoveTarget(filt: 'helics_filter', target: 'char const *') -> "void":
+    return _helics.helicsFilterRemoveTarget(filt, target)
 helicsFilterRemoveTarget = _helics.helicsFilterRemoveTarget
 
 def helicsFilterRemoveDeliveryEndpoint(filt: 'helics_filter', deliveryEndpoint: 'char const *') -> "void":

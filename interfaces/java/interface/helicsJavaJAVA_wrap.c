@@ -2559,7 +2559,7 @@ SWIGEXPORT void JNICALL Java_com_java_helics_helicsJNI_helicsBrokerFree(JNIEnv *
 SWIGEXPORT jlong JNICALL Java_com_java_helics_helicsJNI_helicsCreateValueFederate(JNIEnv *jenv, jclass jcls, jstring jarg1, jlong jarg2) {
   jlong jresult = 0 ;
   char *arg1 = (char *) 0 ;
-  helics_federate_info arg2 = (helics_federate_info) (helics_federate_info)0 ;
+  helics_federate_info arg2 = (helics_federate_info) 0 ;
   helics_error *arg3 = (helics_error *) 0 ;
   helics_error etemp3 ;
   helics_federate result;
@@ -2625,7 +2625,7 @@ SWIGEXPORT jlong JNICALL Java_com_java_helics_helicsJNI_helicsCreateValueFederat
 SWIGEXPORT jlong JNICALL Java_com_java_helics_helicsJNI_helicsCreateMessageFederate(JNIEnv *jenv, jclass jcls, jstring jarg1, jlong jarg2) {
   jlong jresult = 0 ;
   char *arg1 = (char *) 0 ;
-  helics_federate_info arg2 = (helics_federate_info) (helics_federate_info)0 ;
+  helics_federate_info arg2 = (helics_federate_info) 0 ;
   helics_error *arg3 = (helics_error *) 0 ;
   helics_error etemp3 ;
   helics_federate result;
@@ -2691,7 +2691,7 @@ SWIGEXPORT jlong JNICALL Java_com_java_helics_helicsJNI_helicsCreateMessageFeder
 SWIGEXPORT jlong JNICALL Java_com_java_helics_helicsJNI_helicsCreateCombinationFederate(JNIEnv *jenv, jclass jcls, jstring jarg1, jlong jarg2) {
   jlong jresult = 0 ;
   char *arg1 = (char *) 0 ;
-  helics_federate_info arg2 = (helics_federate_info) (helics_federate_info)0 ;
+  helics_federate_info arg2 = (helics_federate_info) 0 ;
   helics_error *arg3 = (helics_error *) 0 ;
   helics_error etemp3 ;
   helics_federate result;
@@ -2789,6 +2789,33 @@ SWIGEXPORT jlong JNICALL Java_com_java_helics_helicsJNI_helicsCreateFederateInfo
   (void)jcls;
   result = (helics_federate_info)helicsCreateFederateInfo();
   *(helics_federate_info *)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_com_java_helics_helicsJNI_helicsFederateInfoClone(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  jlong jresult = 0 ;
+  helics_federate_info arg1 = (helics_federate_info) 0 ;
+  helics_error *arg2 = (helics_error *) 0 ;
+  helics_error etemp2 ;
+  helics_federate_info result;
+  
+  (void)jenv;
+  (void)jcls;
+  {
+    etemp2=helicsErrorInitialize();
+    arg2=&etemp2;
+  }
+  arg1 = *(helics_federate_info *)&jarg1; 
+  result = (helics_federate_info)helicsFederateInfoClone(arg1,arg2);
+  *(helics_federate_info *)&jresult = result; 
+  {
+    if (arg2->error_code!=helics_ok)
+    {
+      jclass clazz = (*jenv)->FindClass(jenv, "java/lang/Exception");
+      (*jenv)->ThrowNew(jenv, clazz, arg2->message);
+    }
+  }
   return jresult;
 }
 
