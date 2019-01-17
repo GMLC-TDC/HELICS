@@ -166,6 +166,7 @@ public class helicsJNI {
   public final static native long helicsCreateCombinationFederateFromConfig(String jarg1);
   public final static native long helicsFederateClone(long jarg1);
   public final static native long helicsCreateFederateInfo();
+  public final static native long helicsFederateInfoClone(long jarg1);
   public final static native void helicsFederateInfoLoadFromArgs(long jarg1, String[] jarg2);
   public final static native void helicsFederateInfoFree(long jarg1);
   public final static native int helicsFederateIsValid(long jarg1);
