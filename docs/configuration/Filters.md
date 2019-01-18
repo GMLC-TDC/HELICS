@@ -59,6 +59,9 @@ This filter will randomly drop a message, the drop probability is specified, and
 #### clone
 this message will copy a message and send it to the original destination plus a new one.  
 
+#### firewall
+The firewall filter will eventually be able to execute firewall like rules on messages and perform certain actions on them, that can set flags, or drop or reroute the message.  The nature of this is still in development and will be available at a later release. 
+
 #### custom filters
 Custom filters are allowed as well, these require a callback operator that can be called from any thread
 and modify the message in some way.   

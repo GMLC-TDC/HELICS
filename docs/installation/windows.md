@@ -16,8 +16,8 @@ To set up your environment:
 
 1. Install Microsoft Visual C++ 2015 or newer
 2. Install
-   [Boost](http://www.boost.org/doc/libs/1_64_0/more/getting_started/windows.html)
-    [Windows downloads](https://dl.bintray.com/boostorg/release/1.66.0/binaries/)
+   [Boost](http://www.boost.org/doc/libs/1_69_0/more/getting_started/windows.html)
+    [Windows downloads](https://dl.bintray.com/boostorg/release/1.69.0/binaries/)
    1.61 or later recommended (core library should build with 1.58,
    but tests will not). For CMake to detect it automatically either
    extract Boost to the root of your drive, or set the BOOST\_INSTALL\_PATH

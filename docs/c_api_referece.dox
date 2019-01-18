@@ -1,7 +1,8 @@
 /**
  \page C_api_index C API function reference
 \section enumerations Helics Enumerations s
- Many of the functions take properties or options that are defined by the enumerations available in the HELICS library see ef helics_enumIndex of functions available in the C and by extension the language API's
+ Many of the functions take properties or options that are defined by the enumerations available in the HELICS library see \ref helics_enums.h 
+Index of functions available in the C and by extension the language API's
 
  \section general General Functions
  in the HELICS C library

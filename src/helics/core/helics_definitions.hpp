@@ -4,8 +4,9 @@ Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
 #pragma once
-/** @file helics_definitions
-@details base helics enumerations for C++ API's,  a namespace wrapper for the definitions defined in helics_enums.h
+/** @file
+@brief base helics enumerations for C++ API's, a namespace wrapper for the definitions defined in \ref
+helics_enums.h
 */
 #include "helics/helics_enums.h"
 

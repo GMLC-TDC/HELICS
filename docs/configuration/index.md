@@ -16,4 +16,6 @@ federate interacts with others.  This can be through file configurations (JSON) 
   Filters
   Timing
   FederateInfo
+  FederateFlags
+  CoreTypes
 ```
