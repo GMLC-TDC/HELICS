@@ -52,7 +52,7 @@ class BrokerObject
 };
 
 /** get the brokerObject from a helics_broker and verify it is valid*/
-BrokerObject *getBrokerObject (helics_broker broker, helics_error *err);
+BrokerObject *getBrokerObject (helics_broker broker, helics_error *err) noexcept;
 /** object wrapping a core for the c-api*/
 class CoreObject
 {
@@ -66,7 +66,7 @@ class CoreObject
 };
 
 /** get the CoreObject from a helics_core and verify it is valid*/
-CoreObject *getCoreObject (helics_core core, helics_error *err);
+CoreObject *getCoreObject (helics_core core, helics_error *err) noexcept;
 
 class InputObject;
 class PublicationObject;
@@ -90,7 +90,7 @@ class FedObject
 };
 
 /** get the FedObject from a helics_broker and verify it is valid*/
-FedObject *getFedObject (helics_federate fed, helics_error *err);
+FedObject *getFedObject (helics_federate fed, helics_error *err) noexcept;
 
 /** object wrapping a subscription*/
 class InputObject

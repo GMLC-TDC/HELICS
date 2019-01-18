@@ -14,7 +14,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include <vector>
 
 // random integer for validation purposes of endpoints
-static const int EndpointValidationIdentifier = 0xB453'94C2;
+static constexpr int EndpointValidationIdentifier = 0xB453'94C2;
 
 static inline void addEndpoint (helics_federate fed, std::unique_ptr<helics::EndpointObject> ept)
 {

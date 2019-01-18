@@ -1,5 +1,4 @@
 /*
-
 Copyright © 2017-2019,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
@@ -59,16 +58,24 @@ helics_bool helicsIsCoreTypeAvailable (const char *type)
     return (helics::isCoreTypeAvailable (coreType)) ? helics_true : helics_false;
 }
 
+// random integer for validation purposes of endpoints
+static constexpr int FederateInfoValidationIdentifier = 0x6bfb'bce1;
+
 helics_federate_info helicsCreateFederateInfo ()
 {
     auto *fi = new helics::FederateInfo;
+    fi->uniqueKey = FederateInfoValidationIdentifier;
     return reinterpret_cast<void *> (fi);
 }
 
 static const char *invalidFedInfoString = "helics Federate info object was not valid";
 
-helics_federate_info helicsFederateInfoClone (helics_federate_info fi, helics_error *err)
+static helics::FederateInfo *getFedInfo (helics_federate_info fi, helics_error *err)
 {
+    if ((err != nullptr) && (err->error_code != 0))
+    {
+        return nullptr;
+    }
     if (fi == nullptr)
     {
         if (err != nullptr)
@@ -78,7 +85,27 @@ helics_federate_info helicsFederateInfoClone (helics_federate_info fi, helics_er
         }
         return nullptr;
     }
-    auto *fi_new = new helics::FederateInfo (*reinterpret_cast<helics::FederateInfo *> (fi));
+    auto ptr = reinterpret_cast<helics::FederateInfo *> (fi);
+    if (ptr->uniqueKey != FederateInfoValidationIdentifier)
+    {
+        if (err != nullptr)
+        {
+            err->error_code = helics_error_invalid_object;
+            err->message = invalidFedInfoString;
+        }
+        return nullptr;
+    }
+    return ptr;
+}
+
+helics_federate_info helicsFederateInfoClone (helics_federate_info fi, helics_error *err)
+{
+    auto info = getFedInfo (fi, err);
+    if (info == nullptr)
+    {
+        return nullptr;
+    }
+    auto *fi_new = new helics::FederateInfo (*info);
     return reinterpret_cast<void *> (fi_new);
 }
 
@@ -174,27 +201,19 @@ void helicsErrorHandler (helics_error *err) noexcept
     }
 }
 
-void helicsFederateInfoFree (helics_federate_info fi) { delete reinterpret_cast<helics::FederateInfo *> (fi); }
+void helicsFederateInfoFree (helics_federate_info fi)
+{
+    auto info = getFedInfo (fi, nullptr);
+    if (info == nullptr)
+    {
+        fprintf (stderr, "The helics_federate_info object is not valid");
+        return;
+    }
+    info->uniqueKey = 0;
+    delete info;
+}
 
 static const std::string nullstr;
-
-static helics::FederateInfo *getFedInfo (helics_federate_info fi, helics_error *err)
-{
-    if ((err != nullptr) && (err->error_code != 0))
-    {
-        return nullptr;
-    }
-    if (fi == nullptr)
-    {
-        if (err != nullptr)
-        {
-            err->error_code = helics_error_invalid_object;
-            err->message = invalidFedInfoString;
-        }
-        return nullptr;
-    }
-    return reinterpret_cast<helics::FederateInfo *> (fi);
-}
 
 void helicsFederateInfoLoadFromArgs (helics_federate_info fi, int argc, const char *const *argv, helics_error *err)
 {
@@ -395,7 +414,7 @@ static constexpr char invalidBrokerString[] = "broker object is not valid";
 
 namespace helics
 {
-CoreObject *getCoreObject (helics_core core, helics_error *err)
+CoreObject *getCoreObject (helics_core core, helics_error *err) noexcept
 {
     if ((err != nullptr) && (err->error_code != 0))
     {
@@ -423,7 +442,7 @@ CoreObject *getCoreObject (helics_core core, helics_error *err)
     return nullptr;
 }
 
-BrokerObject *getBrokerObject (helics_broker broker, helics_error *err)
+BrokerObject *getBrokerObject (helics_broker broker, helics_error *err) noexcept
 {
     if ((err != nullptr) && (err->error_code != 0))
     {
@@ -1059,6 +1078,8 @@ void helicsCloseLibrary ()
 
 static const char *invalidQueryString = "Query object is invalid";
 
+static const int validQueryIdentifier = 0x2706'3885;
+
 static helics::QueryObject *getQueryObj (helics_query query, helics_error *err)
 {
     if ((err != nullptr) && (err->error_code != 0))
@@ -1074,14 +1095,25 @@ static helics::QueryObject *getQueryObj (helics_query query, helics_error *err)
         }
         return nullptr;
     }
-    return reinterpret_cast<helics::QueryObject *> (query);
+    auto queryPtr = reinterpret_cast<helics::QueryObject *> (query);
+    if (queryPtr->valid != validQueryIdentifier)
+    {
+        if (err != nullptr)
+        {
+            err->error_code = helics_error_invalid_object;
+            err->message = invalidQueryString;
+        }
+        return nullptr;
+    }
+    return queryPtr;
 }
 
 helics_query helicsCreateQuery (const char *target, const char *query)
 {
     auto queryObj = new helics::QueryObject;
-    queryObj->query = (query != nullptr) ? std::string (query) : std::string{};
-    queryObj->target = (target != nullptr) ? std::string (target) : std::string{};
+    queryObj->query = AS_STRING (query);
+    queryObj->target = AS_STRING (target);
+    queryObj->valid = validQueryIdentifier;
     return reinterpret_cast<void *> (queryObj);
 }
 
@@ -1224,8 +1256,17 @@ helics_bool helicsQueryIsCompleted (helics_query query)
     return helics_false;
 }
 
-void helicsQueryFree (helics_query query) { delete reinterpret_cast<helics::QueryObject *> (query); }
-
+void helicsQueryFree (helics_query query)
+{
+    auto queryObj = getQueryObj (query, nullptr);
+    if (queryObj == nullptr)
+    {
+        fprintf (stderr, "invalid query object");
+        return;
+    }
+    queryObj->valid = 0;
+    delete queryObj;
+}
 void helicsCleanupLibrary ()
 {
     helics::cleanupHelicsLibrary ();

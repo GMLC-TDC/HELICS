@@ -12,7 +12,11 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include <iostream>
 #include <thread>
 #include <boost/algorithm/string.hpp>
-
+#if HELICS_HAVE_ZEROMQ > 0
+#include "../common/cppzmq/zmq.hpp"
+#include "../common/zmqContextManager.h"
+#endif
+/** function to run the online terminal program*/
 void terminalFunction (int argc, char *argv[]);
 
 int main (int argc, char *argv[])
@@ -31,7 +35,8 @@ int main (int argc, char *argv[])
     {
         autorestart = true;
     }
-    else if ((boost::iequals (firstarg, "help")) || (firstarg == "-?") || (firstarg == "-h") || (firstarg == "--help"))
+    else if ((boost::iequals (firstarg, "help")) || (firstarg == "-?") || (firstarg == "-h") ||
+             (firstarg == "--help"))
     {
         std::cout << "helics_broker term <broker args...> will start a broker and open a terminal control window "
                      "for the broker run help in a terminal for more commands\n";
@@ -44,6 +49,7 @@ int main (int argc, char *argv[])
             return ret;
         }
     }
+    // shift the arguments
     if ((runterminal) || (autorestart))
     {
         argc -= 1;
@@ -91,6 +97,14 @@ int main (int argc, char *argv[])
         ret = -4;
     }
 
+#if HELICS_HAVE_ZEROMQ > 0
+#ifdef __APPLE__
+    if (ZmqContextManager::setContextToLeakOnDelete ())
+    {
+        ZmqContextManager::getContext ().close ();
+    }
+#endif
+#endif
     helics::cleanupHelicsLibrary ();
     return ret;
 }
@@ -166,7 +180,7 @@ void terminalFunction (int argc, char *argv[])
         {
             if (!broker)
             {
-                broker = std::make_unique<helics::apps::BrokerApp>(argc, argv);
+                broker = std::make_unique<helics::apps::BrokerApp> (argc, argv);
                 std::cout << "broker has started\n";
             }
             else if (broker->isActive ())
@@ -184,7 +198,7 @@ void terminalFunction (int argc, char *argv[])
         {
             if (!broker)
             {
-                broker = std::make_unique<helics::apps::BrokerApp>(argc, argv);
+                broker = std::make_unique<helics::apps::BrokerApp> (argc, argv);
             }
             else if ((cmdVec.size () >= 2) && (cmdVec[1] == "restart"))
             {

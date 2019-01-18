@@ -13,6 +13,7 @@ namespace helics
 class FederateInfo : public CoreFederateInfo
 {
   public:
+    int uniqueKey = 0;  //!< location for keying the info for application purposes
     char separator = '/';  //!< separator for global name of localFederates
     bool autobroker = false;  //!< specify that the core should generate a broker if not found otherwise
     core_type coreType = core_type::ZMQ;  //!< the type of the core
