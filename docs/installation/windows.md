@@ -16,7 +16,7 @@ To set up your environment:
 
 1. Install Microsoft Visual C++ 2015 or newer
 2. Install
-   [Boost](http://www.boost.org/doc/libs/1_69_0/more/getting_started/windows.html)
+   [Boost](https://www.boost.org/doc/libs/1_69_0/more/getting_started/windows.html)
     [Windows downloads](https://dl.bintray.com/boostorg/release/1.69.0/binaries/)
    1.61 or later recommended (core library should build with 1.58,
    but tests will not). For CMake to detect it automatically either
@@ -27,18 +27,17 @@ To set up your environment:
     or newer.  Use 14.0 versions for Visual Studio 2015, 14.1 files for Visual studio 2017.
     Boost 1.66 with cmake 3.11 is the current recommended configuration.
 3. *Optional* Install [ZeroMQ](http://zeromq.org/build:_start) if you
-   need ZeroMQ support and need a copy in a global system location.
+   need ZeroMQ support and don't need a copy in a global system location.
    We recommend skipping this step and running cmake with the
    `AUTOBUILD_ZMQ=ON` option to automatically set up a project-only
    copy of ZeroMQ later on. The ZeroMQ Windows installer is **very**
-   outdated and will not work with new versions of Visual Studio.
+   outdated and will not work with new versions of Visual Studio.  The cmake from ZeroMQ on windows is also function and can be used to store ZMQ in another location that will need to be specified for HELICS.
 4. *Optional* Install
    [MS-MPI](https://msdn.microsoft.com/en-us/library/bb524831(v=vs.85).aspx)
    if you need MPI support.
 5. *Optional* Install
    [SWIG](http://www.swig.org/download.html)
-   if you wish to generate the interface libraries, appropriate build files are
-    included in the repository so it shouldn't be necessary to regenerate unless the libraries are modified
+   if you wish to generate the interface libraries, appropriate build files are included in the repository so it shouldn't be necessary to regenerate unless the libraries are modified.  If you want to generate the MATLAB interface a modified version of swig is necessary see [MATLAB Swig](../introduction/matlab)
 6. Open a Visual Studio Command Prompt, and go to your working
    directory.
 7. Make sure *cmake* and *git* are available in the Command Prompt.
@@ -83,7 +82,7 @@ project. To avoid problems when building later, this should match the
 version of the Boost libraries you are using.
 
 If you installed boost into the root of the C or D drives with the
-default localtion (or the BOOST\_INSTALL\_PATH environment variable has been set),
+default location (or the BOOST\_INSTALL\_PATH environment variable has been set),
 cmake should automatically detect their location. Otherwise the
 location will need to be manually given to cmake.
 
@@ -143,7 +142,7 @@ Add the following to the Windows PYTHONPATH environment variable or run the foll
 set PYTHONPATH=C:\local\helics-v1.0.2\python;%PYTHONPATH%
 ```
 
-If you open a interactive Python session and import helics, you should be able to get the version of `helics` and an output that is similar to the following.
+If you open a interactive Python session and import HELICS, you should be able to get the version of `helics` and an output that is similar to the following.
 
 ```bash
 $ ipython
@@ -165,7 +164,7 @@ Out[2]: 'x.x.x (XX-XX-XX)'
 This section will layout the setting up of MSYS2 to compile and install HELICS. This guide will describe all the packages and install instructions for a 64bit build.
 
 ### Setting up MSYS2 ###
-MSYS2 provides a linux like terminal environment on your Windows system. MSYS2 can be installed from [here](https://www.msys2.org/). Once MSYS2 has been installed start up msys2.exe. Follow first time updates as described on the MSYS2 website. After MSYS2 has been successfully updated Some packages need to be installed in order to configure and build HELICS. The following packages need to be installed:
+MSYS2 provides a Linux like terminal environment on your Windows system. MSYS2 can be installed from [here](https://www.msys2.org/). Once MSYS2 has been installed start up msys2.exe. Follow first time updates as described on the MSYS2 website. After MSYS2 has been successfully updated Some packages need to be installed in order to configure and build HELICS. The following packages need to be installed:
 - base-devel
 - mingw-w64-x86_64-toolchain
 - git
@@ -188,14 +187,14 @@ Now that the MSYS2 environment has been setup and all prerequisite packages have
 ```bash
 $ git clone https://github.com/GMLC-TDC/HELICS-src.git
 ```
-git will clone the source code into a folder in the current working directory called HELICS-src. This path will be refered to by this guide as HELICS_ROOT_DIR.
+git will clone the source code into a folder in the current working directory called HELICS-src. This path will be referred to by this guide as HELICS_ROOT_DIR.
 
 ### Compiling HELICS From Source ###
 Change directories to HELICS_ROOT_DIR. Create a directory called helics-build. This can be accomplished by using the mkdir command. cd into this directory. Now type the following:
 ```bash
 $ cmake-gui ../
 ```
-If this failes that is because mingw-w64-x86_64-qt5 was not installed. If you did install it the cmake gui window should pop up. click the Advanced check box next to the search bar. Then click Configure. A window will pop up asking you to specify the generator for this project. Select MSYS Makesfiles from the dropdown menu. Then click the Specify native compilers check box and click next. Enter C:/msys64/mingw64/bin/gcc.exe for the C compiler and C:/msys64/mingw64/bin/g++.exe for the C++ compiler and click finish. Once the Configure process finished several variables will show up highlighted in red. Since this is the first time setup the Boost and ZeroMQ library. Below are the following cmake variables that need to be verified.
+If this fails that is because mingw-w64-x86_64-qt5 was not installed. If you did install it the cmake gui window should pop up. click the Advanced check box next to the search bar. Then click Configure. A window will pop up asking you to specify the generator for this project. Select MSYS Makefiles from the dropdown menu. Then click the Specify native compilers check box and click next. Enter C:/msys64/mingw64/bin/gcc.exe for the C compiler and C:/msys64/mingw64/bin/g++.exe for the C++ compiler and click finish. Once the Configure process finished several variables will show up highlighted in red. Since this is the first time setup the Boost and ZeroMQ library. Below are the following cmake variables that need to be verified.
 
 * BUILD_CXX_SHARED_LIB should be checked as GridLAB-D dynamically links with the shared c++ library of HELICS
 * Boost_FILESYSTEM_LIBRARY_DEBUG/RELEASE C:/msys64/mingw64/bin/libboost_filesystem-mt.dll
@@ -211,7 +210,7 @@ If this failes that is because mingw-w64-x86_64-qt5 was not installed. If you di
 * ZeroMQ_LIBRARY C:/msys64/mingw64/bin/libzmq.dll
 * ZeroMQ_ROOT_DIR C:/msys64/mingw64
 
-Once these cmake variables have been correctly varified click Configure. Once that is complete click Generate then once that is complete the CMake gui can be closed.
+Once these cmake variables have been correctly verified click Configure. Once that is complete click Generate then once that is complete the CMake GUI can be closed.
 
 Back in the MSYS2 command window type:
 ```bash
@@ -221,4 +220,4 @@ where x is the number of threads you can give the make process to speed up the b
 ```bash
 $ make install
 ```
-unless you changed the value of CMAKE_INSTALL_PREFIX everything the default install location /usr/local/helics_1_3_0. This install path will be refered to as HELICS_INSTALL for the next section.
+unless you changed the value of CMAKE_INSTALL_PREFIX everything the default install location /usr/local/helics_1_3_0. This install path will be referred to as HELICS_INSTALL for the next section.
