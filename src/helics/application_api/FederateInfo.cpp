@@ -13,7 +13,6 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include <fstream>
 #include <iostream>
 #include <set>
-#include <boost/filesystem.hpp>
 
 #include "../common/argParser.h"
 #include "../common/stringOps.h"
