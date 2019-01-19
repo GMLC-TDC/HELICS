@@ -69,9 +69,11 @@ The [HELICS-Tutorial repository](https://github.com/GMLC-TDC/HELICS-Tutorial) pr
 
 The [HELICS-Use-Cases repository](https://github.com/GMLC-TDC/HELICS-Use-Cases) includes examples for a growing range of research use cases for inspiration.
 
+A [Users guide](https://gmlc-tdc.github.io/HELICS-src/users_guide/index.html) for getting started
+
 # Documentation
 
-Our GitHub pages provides a rich set of [documentation](https://gmlc-tdc.github.io/HELICS-src/index.html) including a set of introductory [examples](https://gmlc-tdc.github.io/HELICS-src/introduction/index.html), a [developers guide](https://gmlc-tdc.github.io/HELICS-src/developer-guide/index.html), complete doxygen-auto-produced [API documentation](https://gmlc-tdc.github.io/HELICS-src/doxygen/), and more.
+Our GitHub pages provides a rich set of [documentation](https://gmlc-tdc.github.io/HELICS-src/index.html) including a set of introductory [examples](https://gmlc-tdc.github.io/HELICS-src/introduction/index.html), a [developers guide](https://gmlc-tdc.github.io/HELICS-src/developer-guide/index.html), complete doxygen-auto-produced [API documentation](https://gmlc-tdc.github.io/HELICS-src/doxygen/), and more.  A few more questions and answers are available on the [Wiki](https://github.com/GMLC-TDC/HELICS-src/wiki).
 
 Additionally, our initial requirements document can be found [here](https://github.com/GMLC-TDC/specification-doc/blob/master/src/specification.md), which describes a number of our early design considerations.
 

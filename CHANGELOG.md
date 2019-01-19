@@ -5,7 +5,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 A note on future revisions.  
-  Everything within a major version number should be code compatible.  With the exception of experimental interfaces.  The most notable example is the support for multiple source inputs.  The API's to deal with this will change in future minor releases.    Everything within a single minor release should be network compatible with other federates on the same minor release number.  Compatibility across minor release numbers may be possible in some situations but we are not going to guarantee this as those components are subject to performance improvements and may need to be modified at some point.  patch releases will be limited to bug fixes and other improvements not impacting the public API or network compatibility.  
+  Everything within a major version number should be code compatible (With the exception of experimental interfaces).  The most notable example of an experimental interface is the support for multiple source inputs.  The API's to deal with this will change in future minor releases.    Everything within a single minor release should be network compatible with other federates on the same minor release number.  Compatibility across minor release numbers may be possible in some situations but we are not going to guarantee this as those components are subject to performance improvements and may need to be modified at some point.  patch releases will be limited to bug fixes and other improvements not impacting the public API or network compatibility.  
 
 ## [2.0.0] - 2019-01-23
 
@@ -16,10 +16,10 @@ This is a major revision so this changelog will not capture all the changes that
     - the C++ api now uses objects for the interfaces instead of identification ids.
   - Filters can have multiple Targets
   - Define an input object which can be addressed from outside the federate
-  - add a ZMQ_SS core type targetted at large numbers of federates on a single machine.
+  - add a ZMQ_SS core type useful for large numbers of federates on a single machine.
   - add a TCP_SS socket for firewall usage though it may be applicable in other situations
   - numerous bug fixes and internal refactorings.
-  - add target function to the interface objects to add and remove targets
+  - add target functions to the interface objects to add and remove targets
   - functions to allow cores and brokers to add links between federates
   - an octave interface
   - an early version of the C# interface.
