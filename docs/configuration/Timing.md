@@ -68,5 +68,8 @@ Change is defined as binary equivalence,  Subscription objects can be used for n
 if set to true a federate will only transmit publishes if the value has changed.  Change is defined as binary equivalence.
 If numerical deltas and ranges are desired use Publication objects for finer grained control.  This flag applies federate wide.
 
+### wait_for_current_time_update
+if set to true a federate will wait on the requested time until all other federates have completed at least 1 iteration of the current time or have moved past it.  If it is known that 1 federate depends on others in a non-cyclic fashion, this can be used to optimize the order of execution without iterating.  
+
 ### realtime
 if set to true the federate uses rt_lag and rt_lead to match the time grants of a federate to the computer wall clock.  If the federate is running faster than real time this will insert additional delays.  If the federate is running slower than real time this will cause a force grant, which can lead to non-deterministic behavior.  rt_lag can be set to maxVal to disable force grant

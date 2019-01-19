@@ -185,7 +185,7 @@ extern "C"
     */
     HELICS_EXPORT const char *helicsBrokerGetAddress (helics_broker broker);
 
-    /** set the core to ready to init
+    /** set the core to ready for init
     @details this function is used for cores that have filters but no federates so there needs to be
     a direct signal to the core to trigger the federation initialization
     @param core the core object to enable init values for

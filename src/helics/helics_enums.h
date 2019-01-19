@@ -8,8 +8,9 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #ifndef _HELICS_ENUMS_
 #define _HELICS_ENUMS_
 #pragma once
-/** @file helics_enums
-@details base helics enumerations for C and C++ API's
+
+/** @file
+@brief base helics enumerations for C and C++ API's
 */
 
 #ifdef __cplusplus
