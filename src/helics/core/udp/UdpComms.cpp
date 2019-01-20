@@ -1,5 +1,5 @@
 /*
-Copyright © 2017-2018,
+Copyright © 2017-2019,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
@@ -97,7 +97,7 @@ void UdpComms::queue_rx_function ()
                 {
                     disconnecting = true;
                     logError (fmt::format ("unable to bind socket {} :{}",
-                                           makePortAddress (localTarget_, PortNumber), error.what ()));
+                                           makePortAddress (localTargetAddress, PortNumber), error.what ()));
                     socket.close ();
                     setRxStatus (connection_status::error);
                     return;
@@ -107,15 +107,15 @@ void UdpComms::queue_rx_function ()
             if (t_cnt == std::chrono::milliseconds (0))
             {
                 logWarning (fmt::format ("bind error on UDP socket {} :{}",
-                                         makePortAddress (localTarget_, PortNumber), error.what ()));
+                                         makePortAddress (localTargetAddress, PortNumber), error.what ()));
             }
             std::this_thread::sleep_for (std::chrono::milliseconds (200));
             t_cnt += std::chrono::milliseconds (200);
             if (t_cnt > connectionTimeout)
             {
                 disconnecting = true;
-                logError (fmt::format ("unable to bind socket {} :{}", makePortAddress (localTarget_, PortNumber),
-                                       error.what ()));
+                logError (fmt::format ("unable to bind socket {} :{}",
+                                       makePortAddress (localTargetAddress, PortNumber), error.what ()));
                 socket.close ();
                 setRxStatus (connection_status::error);
                 return;
@@ -196,7 +196,7 @@ void UdpComms::queue_tx_function ()
     std::map<route_id, udp::endpoint> routes;  // for all the other possible routes
     udp::endpoint broker_endpoint;
 
-    if (!brokerTarget_.empty ())
+    if (!brokerTargetAddress.empty ())
     {
         hasBroker = true;
     }
@@ -208,11 +208,12 @@ void UdpComms::queue_tx_function ()
         }
         try
         {
-            udp::resolver::query query (udpnet (interfaceNetwork), brokerTarget_, std::to_string (brokerPort));
+            udp::resolver::query query (udpnet (interfaceNetwork), brokerTargetAddress,
+                                        std::to_string (brokerPort));
             // Setup the control socket for comms with the receiver
             broker_endpoint = *resolver.resolve (query);
-
-            if (PortNumber <= 0)
+            int retries = 0;
+            while (PortNumber <= 0)
             {
                 ActionMessage m (CMD_PROTOCOL_PRIORITY);
                 m.messageID = REQUEST_PORTS;
@@ -220,9 +221,41 @@ void UdpComms::queue_tx_function ()
                 if (error)
                 {
                     logError (fmt::format ("error in initial send to broker {}", error.message ()));
+                    PortNumber = -1;
+                    promisePort.set_value (-1);
+                    setTxStatus (connection_status::error);
+                    return;
                 }
+                auto startTime = std::chrono::steady_clock::now ();
+                bool timeout = false;
+                std::this_thread::yield ();
                 std::vector<char> rx (128);
                 udp::endpoint brk;
+
+                while ((transmitSocket.available () == 0) && (!timeout))
+                {
+                    if (std::chrono::steady_clock::now () - startTime > connectionTimeout)
+                    {
+                        timeout = true;
+                    }
+                    std::this_thread::yield ();
+                }
+                if (timeout)
+                {
+                    ++retries;
+                    if (retries > maxRetries)
+                    {
+                        logError ("the max number of retries has been exceeded");
+                        PortNumber = -1;
+                        promisePort.set_value (-1);
+                        setTxStatus (connection_status::error);
+                        return;
+                    }
+                    else
+                    {
+                        continue;
+                    }
+                }
                 auto len = transmitSocket.receive_from (boost::asio::buffer (rx), brk);
                 m = ActionMessage (rx.data (), len);
                 if (isProtocolCommand (m))
@@ -259,7 +292,7 @@ void UdpComms::queue_tx_function ()
             promisePort.set_value (PortNumber);
         }
     }
-    udp::resolver::query queryLocal (udpnet (interfaceNetwork), localTarget_, std::to_string (PortNumber));
+    udp::resolver::query queryLocal (udpnet (interfaceNetwork), localTargetAddress, std::to_string (PortNumber));
 
     udp::endpoint rxEndpoint = *resolver.resolve (queryLocal);
     setTxStatus (connection_status::connected);
@@ -436,7 +469,7 @@ void UdpComms::closeReceiver ()
             {
                 // try connecting with the receiver socket
                 udp::resolver resolver (serv->getBaseService ());
-                udp::resolver::query queryLocal (udpnet (interfaceNetwork), localTarget_,
+                udp::resolver::query queryLocal (udpnet (interfaceNetwork), localTargetAddress,
                                                  std::to_string (PortNumber));
 
                 udp::endpoint rxEndpoint = *resolver.resolve (queryLocal);

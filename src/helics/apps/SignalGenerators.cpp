@@ -1,5 +1,5 @@
 /*
-Copyright © 2017-2018,
+Copyright © 2017-2019,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
@@ -63,7 +63,7 @@ void SineGenerator::set (const std::string &parameter, double val)
     }
     else if ((parameter == "amplitude") || (parameter == "amp") || (parameter == "a"))
     {
-        Amplitude = val;
+        amplitude = val;
     }
     else if (parameter == "level")
     {
@@ -85,9 +85,9 @@ defV SineGenerator::generate (Time signalTime)
     auto tdiff = signalTime - lastCycle;
     // account for the frequency shift
     frequency += dfdt * dt;
-    Amplitude += dAdt * dt;
+    amplitude += dAdt * dt;
     // compute the sine wave component
-    double newValue = level + Amplitude * sin (2.0 * pi * (frequency * tdiff) + offset);
+    double newValue = level + amplitude * sin (2.0 * pi * (frequency * tdiff) + offset);
     period = (frequency > 0.0) ? 1.0 / frequency : 1e36;
     while (tdiff > period)
     {
@@ -118,7 +118,7 @@ void PhasorGenerator::set (const std::string &parameter, double val)
     }
     else if ((parameter == "amplitude") || (parameter == "amp") || (parameter == "a"))
     {
-        Amplitude = val;
+        amplitude = val;
     }
     else if (parameter == "bias_real")
     {
@@ -166,11 +166,11 @@ defV PhasorGenerator::generate (Time signalTime)
     auto dt = signalTime - lastTime;
 
     frequency += dfdt * dt;
-    Amplitude += dAdt * dt;
+    amplitude += dAdt * dt;
     rotation = std::polar (1.0, frequency * dt * (2.0 * pi));
     state *= rotation;
     lastTime = signalTime;
-    return Amplitude * state + std::complex<double> (bias_real, bias_imag);
+    return amplitude * state + std::complex<double> (bias_real, bias_imag);
 }
 }  // namespace apps
 }  // namespace helics

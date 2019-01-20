@@ -1,3 +1,3 @@
 function varargout = helicsEndpointSetOption(varargin)
-  [varargout{1:nargout}] = helicsMEX(220, varargin{:});
+  [varargout{1:nargout}] = helicsMEX(223, varargin{:});
 end

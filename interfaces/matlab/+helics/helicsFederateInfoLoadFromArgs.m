@@ -14,5 +14,5 @@ function varargout = helicsFederateInfoLoadFromArgs(varargin)
     %-------
     %a helics_status enumeration indicating success or any potential errors
     %
-  [varargout{1:nargout}] = helicsMEX(70, varargin{:});
+  [varargout{1:nargout}] = helicsMEX(71, varargin{:});
 end

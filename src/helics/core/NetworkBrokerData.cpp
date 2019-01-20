@@ -1,5 +1,5 @@
 /*
-Copyright © 2017-2018,
+Copyright © 2017-2019,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
@@ -21,8 +21,10 @@ namespace helics
 static const ArgDescriptors extraArgs{
   {"interface"s, "the local interface to use for the receive ports"s},
   {"local_interface"s, "the local interface to use for the receive ports"s},
-  {"broker,b"s, "identifier for the broker"s},
+  {"broker,b"s,
+   "identifier for the broker, this is either the name or network address use --broker_address or --brokername to explicitly set the network address or name the search for the broker is first by name"s},
   {"broker_address"s, "location of the broker i.e network address"s},
+  {"network_retries"s, ArgDescriptor::arg_type_t::int_type, "the maximum number of network retries"s},
   {"brokername"s, "the name of the broker"s},
   {"brokerinit"s, "the initialization string for the broker"s},
   {"max_size"s, ArgDescriptor::arg_type_t::int_type, "maximum message buffer size (16*1024)"s},
@@ -154,6 +156,10 @@ void NetworkBrokerData::initializeFromArgs (int argc, const char *const *argv, c
         {
             maxMessageSize = msize;
         }
+    }
+    if (vm.count ("network_retries") > 0)
+    {
+        maxRetries = vm["network_retries"].as<int> ();
     }
     if (vm.count ("os_port") > 0)
     {

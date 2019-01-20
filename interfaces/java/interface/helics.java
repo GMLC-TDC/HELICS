@@ -204,6 +204,11 @@ public class helics {
     return (cPtr == 0) ? null : new SWIGTYPE_p_void(cPtr, false);
   }
 
+  public static SWIGTYPE_p_void helicsFederateInfoClone(SWIGTYPE_p_void fi) {
+    long cPtr = helicsJNI.helicsFederateInfoClone(SWIGTYPE_p_void.getCPtr(fi));
+    return (cPtr == 0) ? null : new SWIGTYPE_p_void(cPtr, false);
+  }
+
   public static void helicsFederateInfoLoadFromArgs(SWIGTYPE_p_void fi, String[] argc) {
     helicsJNI.helicsFederateInfoLoadFromArgs(SWIGTYPE_p_void.getCPtr(fi), argc);
   }
@@ -446,8 +451,8 @@ public class helics {
     return helicsJNI.helicsQueryIsCompleted(SWIGTYPE_p_void.getCPtr(query));
   }
 
-  public static void helicsQueryFree(SWIGTYPE_p_void arg0) {
-    helicsJNI.helicsQueryFree(SWIGTYPE_p_void.getCPtr(arg0));
+  public static void helicsQueryFree(SWIGTYPE_p_void query) {
+    helicsJNI.helicsQueryFree(SWIGTYPE_p_void.getCPtr(query));
   }
 
   public static void helicsCleanupLibrary() {
@@ -479,8 +484,8 @@ public class helics {
     return (cPtr == 0) ? null : new SWIGTYPE_p_void(cPtr, false);
   }
 
-  public static SWIGTYPE_p_void helicsFederateRegisterInput(SWIGTYPE_p_void fed, String name, helics_data_type type, String units) {
-    long cPtr = helicsJNI.helicsFederateRegisterInput(SWIGTYPE_p_void.getCPtr(fed), name, type.swigValue(), units);
+  public static SWIGTYPE_p_void helicsFederateRegisterInput(SWIGTYPE_p_void fed, String key, helics_data_type type, String units) {
+    long cPtr = helicsJNI.helicsFederateRegisterInput(SWIGTYPE_p_void.getCPtr(fed), key, type.swigValue(), units);
     return (cPtr == 0) ? null : new SWIGTYPE_p_void(cPtr, false);
   }
 
@@ -556,8 +561,8 @@ public class helics {
     helicsJNI.helicsPublicationPublishComplex(SWIGTYPE_p_void.getCPtr(pub), real, imag);
   }
 
-  public static void helicsPublicationPublishVector(SWIGTYPE_p_void pub, double[] vectorInput, int vectorlength) {
-    helicsJNI.helicsPublicationPublishVector(SWIGTYPE_p_void.getCPtr(pub), vectorInput, vectorlength);
+  public static void helicsPublicationPublishVector(SWIGTYPE_p_void pub, double[] vectorInput, int vectorLength) {
+    helicsJNI.helicsPublicationPublishVector(SWIGTYPE_p_void.getCPtr(pub), vectorInput, vectorLength);
   }
 
   public static void helicsPublicationPublishNamedPoint(SWIGTYPE_p_void pub, String str, double val) {
@@ -660,8 +665,8 @@ public class helics {
     helicsJNI.helicsInputSetDefaultComplex(SWIGTYPE_p_void.getCPtr(ipt), real, imag);
   }
 
-  public static void helicsInputSetDefaultVector(SWIGTYPE_p_void ipt, double[] vectorInput, int vectorlength) {
-    helicsJNI.helicsInputSetDefaultVector(SWIGTYPE_p_void.getCPtr(ipt), vectorInput, vectorlength);
+  public static void helicsInputSetDefaultVector(SWIGTYPE_p_void ipt, double[] vectorInput, int vectorLength) {
+    helicsJNI.helicsInputSetDefaultVector(SWIGTYPE_p_void.getCPtr(ipt), vectorInput, vectorLength);
   }
 
   public static void helicsInputSetDefaultNamedPoint(SWIGTYPE_p_void ipt, String str, double val) {
@@ -672,6 +677,10 @@ public class helics {
     return helicsJNI.helicsInputGetType(SWIGTYPE_p_void.getCPtr(ipt));
   }
 
+  public static String helicsInputGetPublicationType(SWIGTYPE_p_void ipt) {
+    return helicsJNI.helicsInputGetPublicationType(SWIGTYPE_p_void.getCPtr(ipt));
+  }
+
   public static String helicsPublicationGetType(SWIGTYPE_p_void pub) {
     return helicsJNI.helicsPublicationGetType(SWIGTYPE_p_void.getCPtr(pub));
   }
@@ -680,8 +689,8 @@ public class helics {
     return helicsJNI.helicsInputGetKey(SWIGTYPE_p_void.getCPtr(ipt));
   }
 
-  public static String helicsSubscriptionGetKey(SWIGTYPE_p_void sub) {
-    return helicsJNI.helicsSubscriptionGetKey(SWIGTYPE_p_void.getCPtr(sub));
+  public static String helicsSubscriptionGetKey(SWIGTYPE_p_void ipt) {
+    return helicsJNI.helicsSubscriptionGetKey(SWIGTYPE_p_void.getCPtr(ipt));
   }
 
   public static String helicsPublicationGetKey(SWIGTYPE_p_void pub) {
@@ -766,6 +775,10 @@ public class helics {
 
   public static void helicsEndpointSetDefaultDestination(SWIGTYPE_p_void endpoint, String dest) {
     helicsJNI.helicsEndpointSetDefaultDestination(SWIGTYPE_p_void.getCPtr(endpoint), dest);
+  }
+
+  public static String helicsEndpointGetDefaultDestination(SWIGTYPE_p_void endpoint) {
+    return helicsJNI.helicsEndpointGetDefaultDestination(SWIGTYPE_p_void.getCPtr(endpoint));
   }
 
   public static void helicsEndpointSendMessageRaw(SWIGTYPE_p_void endpoint, String dest, SWIGTYPE_p_void data, int inputDataLength) {
@@ -884,12 +897,12 @@ public class helics {
     return helicsJNI.helicsFilterGetName(SWIGTYPE_p_void.getCPtr(filt));
   }
 
-  public static void helicsFilterSet(SWIGTYPE_p_void filt, String property, double val) {
-    helicsJNI.helicsFilterSet(SWIGTYPE_p_void.getCPtr(filt), property, val);
+  public static void helicsFilterSet(SWIGTYPE_p_void filt, String prop, double val) {
+    helicsJNI.helicsFilterSet(SWIGTYPE_p_void.getCPtr(filt), prop, val);
   }
 
-  public static void helicsFilterSetString(SWIGTYPE_p_void filt, String property, String val) {
-    helicsJNI.helicsFilterSetString(SWIGTYPE_p_void.getCPtr(filt), property, val);
+  public static void helicsFilterSetString(SWIGTYPE_p_void filt, String prop, String val) {
+    helicsJNI.helicsFilterSetString(SWIGTYPE_p_void.getCPtr(filt), prop, val);
   }
 
   public static void helicsFilterAddDestinationTarget(SWIGTYPE_p_void filt, String dest) {
@@ -904,8 +917,8 @@ public class helics {
     helicsJNI.helicsFilterAddDeliveryEndpoint(SWIGTYPE_p_void.getCPtr(filt), deliveryEndpoint);
   }
 
-  public static void helicsFilterRemoveTarget(SWIGTYPE_p_void filt, String dest) {
-    helicsJNI.helicsFilterRemoveTarget(SWIGTYPE_p_void.getCPtr(filt), dest);
+  public static void helicsFilterRemoveTarget(SWIGTYPE_p_void filt, String target) {
+    helicsJNI.helicsFilterRemoveTarget(SWIGTYPE_p_void.getCPtr(filt), target);
   }
 
   public static void helicsFilterRemoveDeliveryEndpoint(SWIGTYPE_p_void filt, String deliveryEndpoint) {

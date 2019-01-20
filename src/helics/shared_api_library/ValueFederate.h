@@ -1,5 +1,5 @@
 /*
-Copyright © 2017-2018,
+Copyright © 2017-2019,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
@@ -26,6 +26,7 @@ extern "C"
     helicsCreateCombinationFederate
     @param key the identifier matching a publication to get a subscription for
     @param units a string listing the units of the subscription maybe NULL
+    @param[in,out] err a pointer to an error object for catching errors
     @return an object containing the subscription
     */
     HELICS_EXPORT helics_input helicsFederateRegisterSubscription (helics_federate fed,
@@ -38,10 +39,9 @@ extern "C"
     functions for subscriptions and publications
     @param fed the federate object in which to create a publication
     @param key the identifier for the publication the global publication key will be prepended with the federate name
-    @param type a known type identifier  helics_data_type_string, helics_data_type_int, HELICS_DATA_TYPE_DOUBLE,
-    HELICS_DATA_TYPE_COMPLEX, HELICS_DATA_TYPE_VECTOR, HELICS_DATA_TYPE_NAMEDPOINT, HELICS_DATA_TYPE_BOOLEAN,
-    HELICS_DATA_TYPE_RAW, HELICS_DATA_TYPE_ANY
+    @param type a code identifying the type of the input see /ref helics_data_type for available options
     @param units a string listing the units of the subscription maybe NULL
+    @param[in,out] err a pointer to an error object for catching errors
     @return an object containing the publication
     */
     HELICS_EXPORT helics_publication
@@ -52,10 +52,9 @@ extern "C"
     functions for subscriptions and publications
     @param fed the federate object in which to create a publication
     @param key the identifier for the publication
-    @param type a code identifying the type of the publication one of helics_data_type_string, helics_data_type_int,
-    HELICS_DATA_TYPE_DOUBLE, HELICS_DATA_TYPE_COMPLEX, HELICS_DATA_TYPE_VECTOR, HELICS_DATA_TYPE_NAMEDPOINT, HELICS_DATA_TYPE_BOOLEAN
-    HELICS_DATA_TYPE_RAW
+    @param type a string labeling the type of the publication
     @param units a string listing the units of the subscription maybe NULL
+    @param[in,out] err a pointer to an error object for catching errors
     @return an object containing the publication
     */
     HELICS_EXPORT helics_publication
@@ -66,8 +65,9 @@ extern "C"
     functions for subscriptions and publications
     @param fed the federate object in which to create a publication
     @param key the identifier for the publication
-    @param type a string describing the expected type of the publication
+    @param type a code identifying the type of the input see /ref helics_data_type for available options
     @param units a string listing the units of the subscription maybe NULL
+    @param[in,out] err a pointer to an error object for catching errors
     @return an object containing the publication
     */
     HELICS_EXPORT helics_publication helicsFederateRegisterGlobalPublication (helics_federate fed,
@@ -81,10 +81,9 @@ extern "C"
     functions for subscriptions and publications
     @param fed the federate object in which to create a publication
     @param key the identifier for the publication
-    @param type a code identifying the type of the publication one of helics_data_type_string, helics_data_type_int,
-    HELICS_DATA_TYPE_DOUBLE, HELICS_DATA_TYPE_COMPLEX, HELICS_DATA_TYPE_VECTOR, HELICS_DATA_TYPE_NAMEDPOINT, HELICS_DATA_TYPE_BOOLEAN
-    HELICS_DATA_TYPE_RAW
+    @param type a string describing the expected type of the publication
     @param units a string listing the units of the subscription maybe NULL
+    @param[in,out] err a pointer to an error object for catching errors
     @return an object containing the publication
     */
     HELICS_EXPORT helics_publication helicsFederateRegisterGlobalTypePublication (helics_federate fed,
@@ -94,26 +93,26 @@ extern "C"
                                                                                   helics_error *err);
 
     /** register a named input
-    @details the publication becomes part of the federate and is destroyed when the federate is freed so there are no separate free
-    functions for subscriptions and publications
-    @param fed the federate object in which to create a publication
-    @param key the identifier for the publication the global publication key will be prepended with the federate name
-    @param type a string describing the expected type of the publication
-    @param units a string listing the units of the subscription maybe NULL
-    @return an object containing the publication
+    @details the input becomes part of the federate and is destroyed when the federate is freed so there are no separate free
+    functions for subscriptions, inputs, and publications
+    @param fed the federate object in which to create an input
+    @param key the identifier for the publication the global input key will be prepended with the federate name
+    @param type a code identifying the type of the input see /ref helics_data_type for available options
+    @param units a string listing the units of the input maybe NULL
+    @param[in,out] err a pointer to an error object for catching errors
+    @return an object containing the input
     */
     HELICS_EXPORT helics_input
-    helicsFederateRegisterInput (helics_federate fed, const char *name, helics_data_type type, const char *units, helics_error *err);
+    helicsFederateRegisterInput (helics_federate fed, const char *key, helics_data_type type, const char *units, helics_error *err);
 
-    /** register a publication with a defined type
-    @details the publication becomes part of the federate and is destroyed when the federate is freed so there are no separate free
-    functions for subscriptions and publications
-    @param fed the federate object in which to create a publication
-    @param key the identifier for the publication
-    @param type a code identifying the type of the publication one of helics_data_type_string, helics_data_type_int,
-    HELICS_DATA_TYPE_DOUBLE, HELICS_DATA_TYPE_COMPLEX, HELICS_DATA_TYPE_VECTOR, HELICS_DATA_TYPE_NAMEDPOINT, HELICS_DATA_TYPE_BOOLEAN
-    HELICS_DATA_TYPE_RAW
-    @param units a string listing the units of the subscription maybe NULL
+    /** register an input with a defined type
+    @details the input becomes part of the federate and is destroyed when the federate is freed so there are no separate free
+    functions for subscriptions, inputs and publications
+    @param fed the federate object in which to create an input
+    @param key the identifier for the input
+    @param type a string describing the expected type of the input
+    @param units a string listing the units of the input maybe NULL
+    @param[in,out] err a pointer to an error object for catching errors
     @return an object containing the publication
     */
     HELICS_EXPORT helics_input
@@ -124,7 +123,9 @@ extern "C"
     functions for subscriptions and publications
     @param fed the federate object in which to create a publication
     @param key the identifier for the publication
+    @param type a code identifying the type of the input see /ref helics_data_type for available options
     @param units a string listing the units of the subscription maybe NULL
+    @param[in,out] err a pointer to an error object for catching errors
     @return an object containing the publication
     */
     HELICS_EXPORT helics_publication
@@ -135,10 +136,9 @@ extern "C"
     functions for subscriptions and publications
     @param fed the federate object in which to create a publication
     @param key the identifier for the publication
-    @param type a code identifying the type of the publication one of helics_data_type_string, helics_data_type_int,
-    HELICS_DATA_TYPE_DOUBLE, HELICS_DATA_TYPE_COMPLEX, HELICS_DATA_TYPE_VECTOR, HELICS_DATA_TYPE_NAMEDPOINT, HELICS_DATA_TYPE_BOOLEAN
-    HELICS_DATA_TYPE_RAW
+   @param type a string defining the type of the input
     @param units a string listing the units of the subscription maybe NULL
+    @param[in,out] err a pointer to an error object for catching errors
     @return an object containing the publication
     */
     HELICS_EXPORT helics_publication
@@ -147,7 +147,7 @@ extern "C"
     /** get a publication object from a key
     @param fed the value federate object to use to get the publication
     @param key the name of the publication
-    @param err the error object to complete if there is an error
+    @param[in,out] err the error object to complete if there is an error
     @return a helics_publication object, the object will not be valid and err will contain an error code if no publication with the
     specified key exists
     */
@@ -156,6 +156,7 @@ extern "C"
     /** get a publication by its index typically already created via registerInterfaces file or something of that nature
     @param fed the federate object in which to create a publication
     @param index the index of the publication to get
+    @param[in,out] err a pointer to an error object for catching errors
     @return a helics_publication
     */
     HELICS_EXPORT helics_publication helicsFederateGetPublicationByIndex (helics_federate fed, int index, helics_error *err);
@@ -163,7 +164,7 @@ extern "C"
     /** get an input object from a key
     @param fed the value federate object to use to get the publication
     @param key the name of the input
-    @param err the error object to complete if there is an error
+    @param[in,out] err the error object to complete if there is an error
     @return a helics_input object, the object will not be valid and err will contain an error code if no input with the specified
     key exists
     */
@@ -172,6 +173,7 @@ extern "C"
     /** get an input by its index typically already created via registerInterfaces file or something of that nature
     @param fed the federate object in which to create a publication
     @param index the index of the publication to get
+    @param[in,out] err a pointer to an error object for catching errors
     @return a helics_input, which will be NULL if an invalid index
     */
     HELICS_EXPORT helics_input helicsFederateGetInputByIndex (helics_federate fed, int index, helics_error *err);
@@ -179,7 +181,7 @@ extern "C"
     /** get an input object from a subscription target
     @param fed the value federate object to use to get the publication
     @param key the name of the publication that a subscription is targeting
-    @param err the error object to complete if there is an error
+    @param[in,out] err the error object to complete if there is an error
     @return a helics_input object, the object will not be valid and err will contain an error code if no input with the specified
     key exists
     */
@@ -196,50 +198,50 @@ extern "C"
     /** publish raw data from a char * and length
     @param pub the publication to publish for
     @param data a pointer to the raw data
-    @param len the size in bytes of the data to publish
-    @return helics_ok if everything was OK
+    @param inputDataLength the size in bytes of the data to publish
+    @param[in,out] err a pointer to an error object for catching errors
     */
     HELICS_EXPORT void helicsPublicationPublishRaw (helics_publication pub, const void *data, int inputDataLength, helics_error *err);
 
     /** publish a string
     @param pub the publication to publish for
     @param str a pointer to a NULL terminated string
-    @return helics_ok if everything was OK
+    @param[in,out] err a pointer to an error object for catching errors
     */
     HELICS_EXPORT void helicsPublicationPublishString (helics_publication pub, const char *str, helics_error *err);
 
     /** publish an integer value
     @param pub the publication to publish for
     @param val the numerical value to publish
-    @return helics_ok if everything was OK
+    @param[in,out] err a pointer to an error object for catching errors
     */
     HELICS_EXPORT void helicsPublicationPublishInteger (helics_publication pub, int64_t val, helics_error *err);
 
     /** publish a Boolean Value
     @param pub the publication to publish for
     @param val the boolean value to publish either helics_true or helics_false
-    @return helics_ok if everything was OK
+    @param[in,out] err a pointer to an error object for catching errors
     */
     HELICS_EXPORT void helicsPublicationPublishBoolean (helics_publication pub, helics_bool val, helics_error *err);
 
     /** publish a double floating point value
     @param pub the publication to publish for
     @param val the numerical value to publish
-    @return helics_ok if everything was OK
+    @param[in,out] err a pointer to an error object for catching errors
     */
     HELICS_EXPORT void helicsPublicationPublishDouble (helics_publication pub, double val, helics_error *err);
 
     /** publish a time value
     @param pub the publication to publish for
     @param val the numerical value to publish
-    @return helics_ok if everything was OK
+    @param[in,out] err a pointer to an error object for catching errors
     */
     HELICS_EXPORT void helicsPublicationPublishTime (helics_publication pub, helics_time val, helics_error *err);
 
     /** publish a single character
     @param pub the publication to publish for
     @param val the numerical value to publish
-    @return helics_ok if everything was OK
+    @param[in,out] err a pointer to an error object for catching errors
     */
     HELICS_EXPORT void helicsPublicationPublishChar (helics_publication pub, char val, helics_error *err);
 
@@ -247,38 +249,38 @@ extern "C"
     @param pub the publication to publish for
     @param real the real part of a complex number to publish
     @param imag the imaginary part of a complex number to publish
-    @return helics_ok if everything was OK
+    @param[in,out] err a pointer to an error object for catching errors
     */
     HELICS_EXPORT void helicsPublicationPublishComplex (helics_publication pub, double real, double imag, helics_error *err);
 
     /** publish a vector of doubles
     @param pub the publication to publish for
-    @param data a pointer to an array of double data
-    @param len the number of points to publish
-    @return helics_ok if everything was OK
+    @param vectorInput a pointer to an array of double data
+    @param vectorLength the number of points to publish
+    @param[in,out] err a pointer to an error object for catching errors
     */
     HELICS_EXPORT void
-    helicsPublicationPublishVector (helics_publication pub, const double *vectorInput, int vectorlength, helics_error *err);
+    helicsPublicationPublishVector (helics_publication pub, const double *vectorInput, int vectorLength, helics_error *err);
 
     /** publish a named point
     @param pub the publication to publish for
     @param str a pointer a null terminated string
     @param val a double val to publish
-    @return helics_ok if everything was OK
+    @param[in,out] err a pointer to an error object for catching errors
     */
     HELICS_EXPORT void helicsPublicationPublishNamedPoint (helics_publication pub, const char *str, double val, helics_error *err);
 
     /** add a named input to the list of targets a publication publishes to
     @param pub the publication to add the target for
     @param target the name of an input that the data should be sent to
-    @return helics_ok if everything was OK
+    @param[in,out] err a pointer to an error object for catching errors
     */
     HELICS_EXPORT void helicsPublicationAddTarget (helics_publication pub, const char *target, helics_error *err);
 
     /** add a publication to the list of data that an input subscribes to
     @param ipt the named input to modify
     @param target the name of a publication that an input should subscribe to
-    @return helics_ok if everything was OK
+    @param[in,out] err a pointer to an error object for catching errors
     */
     HELICS_EXPORT void helicsInputAddTarget (helics_input ipt, const char *target, helics_error *err);
 
@@ -299,7 +301,8 @@ extern "C"
     @param ipt the input to get the data for
     @param[out] data the memory location of the data
     @param maxlen the maximum size of information that data can hold
-    @param[out] actualLength  the actual length of data copied to data
+    @param[out] actualSize  the actual length of data copied to data
+    @param[in,out] err a pointer to an error object for catching errors
     */
     HELICS_EXPORT void helicsInputGetRawValue (helics_input ipt, void *data, int maxlen, int *actualSize, helics_error *err);
 
@@ -313,41 +316,41 @@ extern "C"
     @param[out] outputString storage for copying a null terminated string
     @param maxStringLen the maximum size of information that str can hold
     @param[out] actualLength the actual length of the string
-    @param[in,out] error term for capturing errors
+    @param[in,out] err error term for capturing errors
     */
     HELICS_EXPORT void helicsInputGetString (helics_input ipt, char *outputString, int maxStringLen, int *actualLength, helics_error *err);
 
     /** get an integer value from a subscription
     @param ipt the input to get the data for
-    @param[out] val memory location to place the value
-    @return a void value, helics_ok if everything went fine
+    @param[in,out] err a pointer to an error object for catching errors
+    @return an int64_t value with the current value of the input
     */
     HELICS_EXPORT int64_t helicsInputGetInteger (helics_input ipt, helics_error *err);
 
     /** get a boolean value from a subscription
     @param ipt the input to get the data for
-    @param[out] val memory location to place the value
-    @return a void value, helics_ok if everything went fine
+    @param[in,out] err a pointer to an error object for catching errors
+    @return a boolean value of current input value
     */
     HELICS_EXPORT helics_bool helicsInputGetBoolean (helics_input ipt, helics_error *err);
 
     /** get a double value from a subscription
     @param ipt the input to get the data for
-    @param[out] val memory location to place the value
-    @return a void value, helics_ok if everything went fine
+    @param[in,out] err a pointer to an error object for catching errors
+    @return the double value of the input
     */
     HELICS_EXPORT double helicsInputGetDouble (helics_input ipt, helics_error *err);
 
     /** get a double value from a subscription
     @param ipt the input to get the data for
-    @param err a pointer to an error object for catching errors
+    @param[in,out] err a pointer to an error object for catching errors
     @return the resulting double value
     */
     HELICS_EXPORT helics_time helicsInputGetTime (helics_input ipt, helics_error *err);
 
     /** get a single character value from an input
     @param ipt the input to get the data for
-    @param err a pointer to an error object for catching errors
+    @param[in,out] err a pointer to an error object for catching errors
     @return the resulting character value
     */
     HELICS_EXPORT char helicsInputGetChar (helics_input ipt, helics_error *err);
@@ -356,14 +359,14 @@ extern "C"
     @param ipt the input to get the data for
     @param[in,out] err a helic error object, if the object is not empty the function is bypassed otherwise it is filled in if there is an
     error
-    @return a void value, helics_ok if everything went fine
+    @return a helics_complex structure with the value
     */
     HELICS_EXPORT helics_complex helicsInputGetComplexObject (helics_input ipt, helics_error *err);
     /** get a pair of double forming a complex number from a subscriptions
     @param ipt the input to get the data for
     @param[out] real memory location to place the real part of a value
     @param[out] imag memory location to place the imaginary part of a value
-    @return a void value, helics_ok if everything went fine
+    @param[in,out] err an error object that will contain an error code and string if any error occurred during the execution of the function
     */
     HELICS_EXPORT void helicsInputGetComplex (helics_input ipt, double *real, double *imag, helics_error *err);
 
@@ -376,16 +379,18 @@ extern "C"
     @param ipt the input to get the result for
     @param[out] data the location to store the data
     @param maxlen the maximum size of the vector
-    @param actualLength location to place the actual length of the resulting vector
+    @param[out] actualSize location to place the actual length of the resulting vector
+    @param[in,out] err an error object that will contain an error code and string if any error occurred during the execution of the function
     */
     HELICS_EXPORT void helicsInputGetVector (helics_input ipt, double data[], int maxlen, int *actualSize, helics_error *err);
 
     /** get a named point from a subscription
     @param ipt the input to get the result for
-    @param[out] str storage for copying a null terminated string
+    @param[out] outputString storage for copying a null terminated string
     @param maxStringLen the maximum size of information that str can hold
-    @param[out] the actual length of the string
+    @param[out] actualLength the actual length of the string
     @param[out] val the double value for the named point
+    @param[in,out] err an error object that will contain an error code and string if any error occurred during the execution of the function
     */
     HELICS_EXPORT void
     helicsInputGetNamedPoint (helics_input ipt, char *outputString, int maxStringLen, int *actualLength, double *val, helics_error *err);
@@ -401,50 +406,51 @@ extern "C"
     /** set the default as a raw data array
     @param ipt the input to set the default for
     @param data a pointer to the raw data to use for the default
-    @param len the size of the raw data
-    @return helics_ok if everything was OK
+    @param inputDataLength the size of the raw data
+    @param[in,out] err an error object that will contain an error code and string if any error occurred during the execution of the function
     */
     HELICS_EXPORT void helicsInputSetDefaultRaw (helics_input ipt, const void *data, int inputDataLength, helics_error *err);
 
     /** set the default as a string
     @param ipt the input to set the default for
     @param str a pointer to the default string
-    @return helics_ok if everything was OK
+    @param[in,out] err an error object that will contain an error code and string if any error occurred during the execution of the function
     */
     HELICS_EXPORT void helicsInputSetDefaultString (helics_input ipt, const char *str, helics_error *err);
 
     /** set the default as an integer
     @param ipt the input to set the default for
     @param val the default integer
-    @return helics_ok if everything was OK
+    @param[in,out] err an error object that will contain an error code and string if any error occurred during the execution of the function
     */
     HELICS_EXPORT void helicsInputSetDefaultInteger (helics_input ipt, int64_t val, helics_error *err);
 
     /** set the default as a boolean
     @param ipt the input to set the default for
     @param val the default boolean value
-    @return helics_ok if everything was OK
+    @param[in,out] err an error object that will contain an error code and string if any error occurred during the execution of the function
     */
     HELICS_EXPORT void helicsInputSetDefaultBoolean (helics_input ipt, helics_bool val, helics_error *err);
 
     /** set the default as a double
     @param ipt the input to set the default for
     @param val the default double value
-    @return helics_ok if everything was OK
+     @param[in,out] err an error object that will contain an error code and string if any error occurred during the execution of the
+    function
     */
     HELICS_EXPORT void helicsInputSetDefaultTime (helics_input ipt, helics_time val, helics_error *err);
 
     /** set the default as a double
     @param ipt the input to set the default for
     @param val the default double value
-    @return helics_ok if everything was OK
+    @param[in,out] err an error object that will contain an error code and string if any error occurred during the execution of the function
     */
     HELICS_EXPORT void helicsInputSetDefaultChar (helics_input ipt, char val, helics_error *err);
 
     /** set the default as a double
     @param ipt the input to set the default for
     @param val the default double value
-    @return helics_ok if everything was OK
+    @param[in,out] err an error object that will contain an error code and string if any error occurred during the execution of the function
     */
     HELICS_EXPORT void helicsInputSetDefaultDouble (helics_input ipt, double val, helics_error *err);
 
@@ -452,22 +458,23 @@ extern "C"
     @param ipt the input to set the default for
     @param real the default real value
     @param imag the default imaginary value
-    @return helics_ok if everything was OK
+    @param[in,out] err an error object that will contain an error code and string if any error occurred during the execution of the function
     */
     HELICS_EXPORT void helicsInputSetDefaultComplex (helics_input ipt, double real, double imag, helics_error *err);
 
     /** set the default as a vector of doubles
     @param ipt the input to set the default for
-    @param data a pointer to an array of double data
-    @param len the number of points to publish
-    @return helics_ok if everything was OK
+    @param vectorInput a pointer to an array of double data
+    @param vectorLength the number of points to publish
+    @param[in,out] err an error object that will contain an error code and string if any error occurred during the execution of the function
     */
-    HELICS_EXPORT void helicsInputSetDefaultVector (helics_input ipt, const double *vectorInput, int vectorlength, helics_error *err);
+    HELICS_EXPORT void helicsInputSetDefaultVector (helics_input ipt, const double *vectorInput, int vectorLength, helics_error *err);
 
-    /** set the default as a named_point
+    /** set the default as a NamedPoint
     @param ipt the input to set the default for
     @param str a pointer to a string representing the name
     @param val a double value for the value of the named point
+    @param[in,out] err an error object that will contain an error code and string if any error occurred during the execution of the function
     @return helics_ok if everything was OK
     */
     HELICS_EXPORT void helicsInputSetDefaultNamedPoint (helics_input ipt, const char *str, double val, helics_error *err);
@@ -526,36 +533,40 @@ extern "C"
     /** set the data in the info field for an input
     @param inp the input to query
     @param info the string to set
-    @param err an error object to fill out in case of an error*/
+    @param[in,out] err an error object to fill out in case of an error*/
     HELICS_EXPORT void helicsInputSetInfo (helics_input inp, const char *info, helics_error *err);
 
     /** get the data in the info field of an publication
-    @param inp the publication to query
+    @param pub the publication to query
     @return a string with the info field string*/
     HELICS_EXPORT const char *helicsPublicationGetInfo (helics_publication pub);
     /** set the data in the info field for an publication
-    @param inp the publication to query
+    @param pub the publication to set the info field for
     @param info the string to set
-    @param err an error object to fill out in case of an error*/
+    @param[in,out] err an error object to fill out in case of an error*/
     HELICS_EXPORT void helicsPublicationSetInfo (helics_publication pub, const char *info, helics_error *err);
     /** get the data in the info field of an input
     @param inp the input to query
+    @param option integer representation of the option in question see /ref helics_handle_options
     @return a string with the info field string*/
     HELICS_EXPORT helics_bool helicsInputGetOption (helics_input inp, int option);
     /** set the data in the info field for an input
     @param inp the input to query
-    @param info the string to set
-    @param err an error object to fill out in case of an error*/
+    @param option the option to set for the input /ref helics_handle_options
+    @param value the value to set the option to
+    @param[in,out] err an error object to fill out in case of an error*/
     HELICS_EXPORT void helicsInputSetOption (helics_input inp, int option, helics_bool value, helics_error *err);
 
     /** get the data in the info field of an publication
-    @param inp the publication to query
+    @param pub the publication to query
+    @param option the value to query see /ref helics_handle_options
     @return a string with the info field string*/
     HELICS_EXPORT helics_bool helicsPublicationGetOption (helics_publication pub, int option);
     /** set the data in the info field for an publication
-    @param inp the publication to query
-    @param info the string to set
-    @param err an error object to fill out in case of an error*/
+    @param pub the publication to query
+    @param option integer code for the option to set /ref helics_handle_options
+    @param val the value to set the option to
+    @param[in,out] err an error object to fill out in case of an error*/
     HELICS_EXPORT void helicsPublicationSetOption (helics_publication pub, int option, helics_bool val, helics_error *err);
     /**@}*/
 

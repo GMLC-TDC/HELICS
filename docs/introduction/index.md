@@ -13,7 +13,8 @@ Introduction
     types-of-federates
     pubsub-vs-message
     filters
-    interfaces
+    LanguageAPIs
+    Endpoints
+    Inputs
+    Publications
 ```
-
-

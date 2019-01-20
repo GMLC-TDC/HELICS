@@ -1,5 +1,5 @@
 /*
-Copyright © 2017-2018,
+Copyright © 2017-2019,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
@@ -23,7 +23,7 @@ static constexpr char nullcstr[] = "";
 
 namespace helics
 {
-FedObject *getFedObject (helics_federate fed, helics_error *err)
+FedObject *getFedObject (helics_federate fed, helics_error *err) noexcept
 {
     HELICS_ERROR_CHECK (err, nullptr);
     if (fed == nullptr)
@@ -162,7 +162,7 @@ std::shared_ptr<helics::MessageFederate> getMessageFedSharedPtr (helics_federate
 }
 
 /* Creation and destruction of Federates */
-helics_federate helicsCreateValueFederate (const char *fedName, const helics_federate_info fi, helics_error *err)
+helics_federate helicsCreateValueFederate (const char *fedName, helics_federate_info fi, helics_error *err)
 {
     HELICS_ERROR_CHECK (err, nullptr);
     auto FedI = std::make_unique<helics::FedObject> ();
@@ -170,13 +170,11 @@ helics_federate helicsCreateValueFederate (const char *fedName, const helics_fed
     {
         if (fi == nullptr)
         {
-            FedI->fedptr =
-              std::make_shared<helics::ValueFederate> ((fedName != nullptr) ? std::string (fedName) : nullstr, helics::FederateInfo ());
+            FedI->fedptr = std::make_shared<helics::ValueFederate> (AS_STRING (fedName), helics::FederateInfo ());
         }
         else
         {
-            FedI->fedptr = std::make_shared<helics::ValueFederate> ((fedName != nullptr) ? std::string (fedName) : nullstr,
-                                                                    *reinterpret_cast<helics::FederateInfo *> (fi));
+            FedI->fedptr = std::make_shared<helics::ValueFederate> (AS_STRING (fedName), *reinterpret_cast<helics::FederateInfo *> (fi));
         }
     }
     catch (...)
@@ -197,7 +195,7 @@ helics_federate helicsCreateValueFederateFromConfig (const char *configFile, hel
     auto FedI = std::make_unique<helics::FedObject> ();
     try
     {
-        FedI->fedptr = std::make_shared<helics::ValueFederate> ((configFile != nullptr) ? std::string (configFile) : nullstr);
+        FedI->fedptr = std::make_shared<helics::ValueFederate> (AS_STRING (configFile));
     }
     catch (...)
     {
@@ -212,7 +210,7 @@ helics_federate helicsCreateValueFederateFromConfig (const char *configFile, hel
 }
 
 /* Creation and destruction of Federates */
-helics_federate helicsCreateMessageFederate (const char *fedName, const helics_federate_info fi, helics_error *err)
+helics_federate helicsCreateMessageFederate (const char *fedName, helics_federate_info fi, helics_error *err)
 {
     HELICS_ERROR_CHECK (err, nullptr);
     auto FedI = std::make_unique<helics::FedObject> ();
@@ -220,13 +218,11 @@ helics_federate helicsCreateMessageFederate (const char *fedName, const helics_f
     {
         if (fi == nullptr)
         {
-            FedI->fedptr =
-              std::make_shared<helics::MessageFederate> ((fedName != nullptr) ? std::string (fedName) : nullstr, helics::FederateInfo ());
+            FedI->fedptr = std::make_shared<helics::MessageFederate> (AS_STRING (fedName), helics::FederateInfo ());
         }
         else
         {
-            FedI->fedptr = std::make_shared<helics::MessageFederate> ((fedName != nullptr) ? std::string (fedName) : nullstr,
-                                                                      *reinterpret_cast<helics::FederateInfo *> (fi));
+            FedI->fedptr = std::make_shared<helics::MessageFederate> (AS_STRING (fedName), *reinterpret_cast<helics::FederateInfo *> (fi));
         }
     }
     catch (...)
@@ -248,7 +244,7 @@ helics_federate helicsCreateMessageFederateFromConfig (const char *configFile, h
 
     try
     {
-        FedI->fedptr = std::make_shared<helics::MessageFederate> ((configFile != nullptr) ? std::string (configFile) : nullstr);
+        FedI->fedptr = std::make_shared<helics::MessageFederate> (AS_STRING (configFile));
     }
     catch (...)
     {
@@ -263,7 +259,7 @@ helics_federate helicsCreateMessageFederateFromConfig (const char *configFile, h
 }
 
 /* Creation and destruction of Federates */
-helics_federate helicsCreateCombinationFederate (const char *fedName, const helics_federate_info fi, helics_error *err)
+helics_federate helicsCreateCombinationFederate (const char *fedName, helics_federate_info fi, helics_error *err)
 {
     HELICS_ERROR_CHECK (err, nullptr);
     auto FedI = std::make_unique<helics::FedObject> ();
@@ -271,13 +267,12 @@ helics_federate helicsCreateCombinationFederate (const char *fedName, const heli
     {
         if (fi == nullptr)
         {
-            FedI->fedptr = std::make_shared<helics::CombinationFederate> ((fedName != nullptr) ? std::string (fedName) : nullstr,
-                                                                          helics::FederateInfo ());
+            FedI->fedptr = std::make_shared<helics::CombinationFederate> (AS_STRING (fedName), helics::FederateInfo ());
         }
         else
         {
-            FedI->fedptr = std::make_shared<helics::CombinationFederate> ((fedName != nullptr) ? std::string (fedName) : nullstr,
-                                                                          *reinterpret_cast<helics::FederateInfo *> (fi));
+            FedI->fedptr =
+              std::make_shared<helics::CombinationFederate> (AS_STRING (fedName), *reinterpret_cast<helics::FederateInfo *> (fi));
         }
     }
     catch (...)
@@ -298,7 +293,7 @@ helics_federate helicsCreateCombinationFederateFromConfig (const char *configFil
     auto FedI = std::make_unique<helics::FedObject> ();
     try
     {
-        FedI->fedptr = std::make_shared<helics::CombinationFederate> ((configFile != nullptr) ? std::string (configFile) : nullstr);
+        FedI->fedptr = std::make_shared<helics::CombinationFederate> (AS_STRING (configFile));
     }
     catch (...)
     {

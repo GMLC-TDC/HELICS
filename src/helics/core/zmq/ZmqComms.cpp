@@ -1,5 +1,5 @@
 /*
-Copyright © 2017-2018,
+Copyright © 2017-2019,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
@@ -10,7 +10,6 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include "../ActionMessage.hpp"
 #include "../NetworkBrokerData.hpp"
 #include "ZmqRequestSets.h"
-//#include <boost/asio.hpp>
 //#include <csignal>
 #include <memory>
 
@@ -61,29 +60,29 @@ void ZmqComms::loadNetworkInfo (const NetworkBrokerData &netInfo)
     {
         return;
     }
-    if (!brokerTarget_.empty ())
+    if (!brokerTargetAddress.empty ())
     {
-        insertProtocol (brokerTarget_, interface_type::tcp);
+        insertProtocol (brokerTargetAddress, interface_type::tcp);
     }
-    if (!localTarget_.empty ())
+    if (!localTargetAddress.empty ())
     {
-        insertProtocol (localTarget_, interface_type::tcp);
+        insertProtocol (localTargetAddress, interface_type::tcp);
     }
-    if (localTarget_ == "tcp://localhost")
+    if (localTargetAddress == "tcp://localhost")
     {
-        localTarget_ = "tcp://127.0.0.1";
+        localTargetAddress = "tcp://127.0.0.1";
     }
-    else if (localTarget_ == "udp://localhost")
+    else if (localTargetAddress == "udp://localhost")
     {
-        localTarget_ = "udp://127.0.0.1";
+        localTargetAddress = "udp://127.0.0.1";
     }
-    if (brokerTarget_ == "tcp://localhost")
+    if (brokerTargetAddress == "tcp://localhost")
     {
-        brokerTarget_ = "tcp://127.0.0.1";
+        brokerTargetAddress = "tcp://127.0.0.1";
     }
-    else if (brokerTarget_ == "udp://localhost")
+    else if (brokerTargetAddress == "udp://localhost")
     {
-        brokerTarget_ = "udp://127.0.0.1";
+        brokerTargetAddress = "udp://127.0.0.1";
     }
     propertyUnLock ();
 }
@@ -153,7 +152,7 @@ int ZmqComms::replyToIncomingMessage (zmq::message_t &msg, zmq::socket_t &sock)
 
 void ZmqComms::queue_rx_function ()
 {
-    auto ctx = zmqContextManager::getContextPointer ();
+    auto ctx = ZmqContextManager::getContextPointer ();
     zmq::socket_t pullSocket (ctx->getContext (), ZMQ_PULL);
     pullSocket.setsockopt (ZMQ_LINGER, 200);
     zmq::socket_t controlSocket (ctx->getContext (), ZMQ_PAIR);
@@ -194,7 +193,7 @@ void ZmqComms::queue_rx_function ()
             }
             else if (M.messageID == NAME_NOT_FOUND)
             {
-                logError (std::string ("broker name ") + brokerName_ + " does not match broker connection");
+                logError (std::string ("broker name ") + brokerName + " does not match broker connection");
                 disconnecting = true;
                 setRxStatus (connection_status::error);
                 return;
@@ -215,20 +214,20 @@ void ZmqComms::queue_rx_function ()
     }
     if (serverMode)
     {
-        auto bindsuccess = bindzmqSocket (repSocket, localTarget_, PortNumber + 1, connectionTimeout);
+        auto bindsuccess = bindzmqSocket (repSocket, localTargetAddress, PortNumber + 1, connectionTimeout);
         if (!bindsuccess)
         {
             pullSocket.close ();
             repSocket.close ();
             disconnecting = true;
             logError (std::string ("Unable to bind zmq reply socket giving up ") +
-                      makePortAddress (localTarget_, PortNumber + 1));
+                      makePortAddress (localTargetAddress, PortNumber + 1));
             setRxStatus (connection_status::error);
             return;
         }
     }
 
-    auto bindsuccess = bindzmqSocket (pullSocket, localTarget_, PortNumber, connectionTimeout);
+    auto bindsuccess = bindzmqSocket (pullSocket, localTargetAddress, PortNumber, connectionTimeout);
 
     if (!bindsuccess)
     {
@@ -236,7 +235,7 @@ void ZmqComms::queue_rx_function ()
         repSocket.close ();
         disconnecting = true;
         logError (std::string ("Unable to bind zmq pull socket giving up ") +
-                  makePortAddress (localTarget_, PortNumber));
+                  makePortAddress (localTargetAddress, PortNumber));
         setRxStatus (connection_status::error);
         return;
     }
@@ -309,7 +308,7 @@ int ZmqComms::initializeBrokerConnections (zmq::socket_t &controlSocket)
     zmq::pollitem_t poller;
     if (hasBroker)
     {
-        auto ctx = zmqContextManager::getContextPointer ();
+        auto ctx = ZmqContextManager::getContextPointer ();
         if (brokerPort < 0)
         {
             brokerPort = DEFAULT_BROKER_PORT_NUMBER;
@@ -319,12 +318,12 @@ int ZmqComms::initializeBrokerConnections (zmq::socket_t &controlSocket)
         brokerReq.setsockopt (ZMQ_LINGER, 50);
         try
         {
-            brokerReq.connect (makePortAddress (brokerTarget_, brokerPort + 1));
+            brokerReq.connect (makePortAddress (brokerTargetAddress, brokerPort + 1));
         }
         catch (zmq::error_t &ze)
         {
             logError (std::string ("unable to connect with broker at ") +
-                      makePortAddress (brokerTarget_, brokerPort + 1) + ":(" + name + ")" + ze.what ());
+                      makePortAddress (brokerTargetAddress, brokerPort + 1) + ":(" + name + ")" + ze.what ());
             setTxStatus (connection_status::error);
             ActionMessage M (CMD_PROTOCOL);
             M.messageID = DISCONNECT_ERROR;
@@ -344,17 +343,41 @@ int ZmqComms::initializeBrokerConnections (zmq::socket_t &controlSocket)
                 brokerReq.send (str);
                 poller.socket = static_cast<void *> (brokerReq);
                 poller.events = ZMQ_POLLIN;
-                auto rc = zmq::poll (&poller, 1, std::chrono::milliseconds (3000));
-                if (rc < 0)
+                int rc = 0;
+                int cnt2 = 0;
+                while (rc == 0)
                 {
-                    logError ("unable to connect with zmq broker (2)");
-                    setTxStatus (connection_status::error);
+                    ++cnt2;
+                    rc = zmq::poll (&poller, 1, connectionTimeout);
+                    if (rc < 0)
+                    {
+                        logError ("ZMQ broker connection error (2)");
+                        setTxStatus (connection_status::error);
+                        break;
+                    }
+                    else if (rc == 0)
+                    {
+                        if (requestDisconnect.load (std::memory_order::memory_order_acquire))
+                        {
+                            return (-3);
+                        }
+                        if (cnt2 == 1)
+                        {
+                            logWarning ("zmq broker connection timed out, trying again (2)");
+                        }
+                        else if (cnt2 > maxRetries)
+                        {
+                            logError ("zmq broker connection timed out after trying 5 times (2)");
+                            setTxStatus (connection_status::error);
+                            break;
+                        }
+                        else
+                        {
+                            continue;
+                        }
+                    }
                 }
-                else if (rc == 0)
-                {
-                    logError ("zmq broker connection timed out (2)");
-                    setTxStatus (connection_status::error);
-                }
+
                 if (getTxStatus () == connection_status::error)
                 {
                     ActionMessage M (CMD_PROTOCOL);
@@ -387,7 +410,7 @@ int ZmqComms::initializeBrokerConnections (zmq::socket_t &controlSocket)
                 }
 
                 ++cnt;
-                if (cnt > 10)
+                if (cnt > maxRetries)
                 {
                     // we can't get the broker to respond with port numbers
                     setTxStatus (connection_status::error);
@@ -414,11 +437,11 @@ int ZmqComms::initializeBrokerConnections (zmq::socket_t &controlSocket)
 void ZmqComms::queue_tx_function ()
 {
     std::vector<char> buffer;
-    if (!brokerTarget_.empty ())
+    if (!brokerTargetAddress.empty ())
     {
         hasBroker = true;
     }
-    auto ctx = zmqContextManager::getContextPointer ();
+    auto ctx = ZmqContextManager::getContextPointer ();
     // Setup the control socket for comms with the receiver
     zmq::socket_t controlSocket (ctx->getContext (), ZMQ_PAIR);
     controlSocket.setsockopt (ZMQ_LINGER, 200);
@@ -429,7 +452,8 @@ void ZmqComms::queue_tx_function ()
         auto res = initializeBrokerConnections (controlSocket);
         if (res < 0)
         {
-            setTxStatus (connection_status::error);
+            setTxStatus ((res != -3) ? connection_status::error : connection_status::terminated);
+
             controlSocket.close ();
             return;
         }
@@ -447,8 +471,8 @@ void ZmqComms::queue_tx_function ()
 
     if (hasBroker)
     {
-        //   priority_routes.addRoutes (0, makePortAddress (brokerTarget_, brokerPort+1));
-        brokerPushSocket.connect (makePortAddress (brokerTarget_, brokerPort));
+        //   priority_routes.addRoutes (0, makePortAddress (brokerTargetAddress, brokerPort+1));
+        brokerPushSocket.connect (makePortAddress (brokerTargetAddress, brokerPort));
     }
     setTxStatus (connection_status::connected);
     zmq::message_t msg;
@@ -594,16 +618,16 @@ void ZmqComms::closeReceiver ()
         if (!disconnecting)
         {
             // try connecting with the receivers push socket
-            auto ctx = zmqContextManager::getContextPointer ();
+            auto ctx = ZmqContextManager::getContextPointer ();
             zmq::socket_t pushSocket (ctx->getContext (), ZMQ_PUSH);
             pushSocket.setsockopt (ZMQ_LINGER, 200);
-            if (localTarget_ == "tcp://*")
+            if (localTargetAddress == "tcp://*")
             {
                 pushSocket.connect (makePortAddress ("tcp://127.0.0.1", PortNumber));
             }
             else
             {
-                pushSocket.connect (makePortAddress (localTarget_, PortNumber));
+                pushSocket.connect (makePortAddress (localTargetAddress, PortNumber));
             }
 
             ActionMessage cmd (CMD_PROTOCOL);

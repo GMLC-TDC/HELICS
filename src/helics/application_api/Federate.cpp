@@ -1,5 +1,5 @@
 /*
-Copyright © 2017-2018,
+Copyright © 2017-2019,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
@@ -87,7 +87,7 @@ Federate::Federate (const std::string &fedName, const FederateInfo &fi)
     }
     // this call will throw an error on failure
     fedID = coreObject->registerFederate (name, fi);
-    separator_ = fi.separator;
+    nameSegmentSeparator = fi.separator;
     currentTime = coreObject->getCurrentTime (fedID);
     if (!singleThreadFederate)
     {
@@ -142,7 +142,7 @@ Federate::Federate (const std::string &fedName, const std::shared_ptr<Core> &cor
         currentMode = modes::error;
         return;
     }
-    separator_ = fi.separator;
+    nameSegmentSeparator = fi.separator;
     currentTime = coreObject->getCurrentTime (fedID);
     if (!singleThreadFederate)
     {
@@ -174,7 +174,7 @@ Federate::Federate (Federate &&fed) noexcept
     fedID = fed.fedID;
     coreObject = std::move (fed.coreObject);
     currentTime = fed.currentTime;
-    separator_ = fed.separator_;
+    nameSegmentSeparator = fed.nameSegmentSeparator;
     asyncCallInfo = std::move (fed.asyncCallInfo);
     fManager = std::move (fed.fManager);
     name = std::move (fed.name);
@@ -187,7 +187,7 @@ Federate &Federate::operator= (Federate &&fed) noexcept
     fedID = fed.fedID;
     coreObject = std::move (fed.coreObject);
     currentTime = fed.currentTime;
-    separator_ = fed.separator_;
+    nameSegmentSeparator = fed.nameSegmentSeparator;
     asyncCallInfo = std::move (fed.asyncCallInfo);
     fManager = std::move (fed.fManager);
     name = std::move (fed.name);
@@ -198,7 +198,13 @@ Federate::~Federate ()
 {
     if (coreObject)
     {
+        try
+        {
         finalize ();
+    }
+        catch (...)  // do not allow a throw inside the destructor
+        {
+        }
     }
 }
 
@@ -458,26 +464,37 @@ void Federate::setFlagOption (int flag, bool flagValue) { coreObject->setFlagOpt
 
 bool Federate::getFlagOption (int flag) { return coreObject->getFlagOption (fedID, flag); }
 void Federate::finalize ()
-{
+{  // since finalize is called in the destructor we can't allow any potential virtual function calls
     switch (currentMode)
     {
     case modes::startup:
         break;
     case modes::pending_init:
-        enterInitializingModeComplete ();
+    {
+        auto asyncInfo = asyncCallInfo->lock ();
+        try
+        {
+            asyncInfo->initFuture.get ();
+        }
+        catch (const std::exception &e)
+        {
+            currentMode = modes::error;
+            throw;
+        }
+    }
         break;
     case modes::initializing:
         break;
     case modes::pending_exec:
-        enterExecutingModeComplete ();
+        asyncCallInfo->lock ()->execFuture.get ();
         break;
     case modes::pending_time:
-        requestTimeComplete ();
+        asyncCallInfo->lock ()->timeRequestFuture.get ();
         break;
     case modes::executing:
         break;
     case modes::pending_iterative_time:
-        requestTimeIterativeComplete ();  // I don't care about the return any more
+        asyncCallInfo->lock ()->timeRequestIterativeFuture.get ();  // I don't care about the return any more
         break;
     case modes::finalize:
     case modes::error:
@@ -635,14 +652,11 @@ iteration_time Federate::requestTimeIterative (Time nextInternalTimeStep, iterat
         }
         return iterativeTime;
     }
-    else if (currentMode == modes::finalize)
+    if (currentMode == modes::finalize)
     {
-        return iteration_time (Time::maxVal (), iteration_result::halted);
+        return {Time::maxVal (), iteration_result::halted};
     }
-    else
-    {
         throw (InvalidFunctionCall ("cannot call request time in present state"));
-    }
 }
 
 void Federate::requestTimeAsync (Time nextInternalTimeStep)
@@ -666,7 +680,7 @@ void Federate::requestTimeAsync (Time nextInternalTimeStep)
 }
 
 /** request a time advancement
-@param[in] the next requested time step
+@param the next requested time step
 @return the granted time step*/
 void Federate::requestTimeIterativeAsync (Time nextInternalTimeStep, iteration_request iterate)
 {
@@ -689,9 +703,6 @@ void Federate::requestTimeIterativeAsync (Time nextInternalTimeStep, iteration_r
     }
 }
 
-/** request a time advancement
-@param[in] the next requested time step
-@return the granted time step*/
 Time Federate::requestTimeComplete ()
 {
     if (singleThreadFederate)
@@ -709,11 +720,8 @@ Time Federate::requestTimeComplete ()
         updateTime (newTime, oldTime);
         return newTime;
     }
-    else
-    {
         throw (InvalidFunctionCall (
           "cannot call finalize requestTime without first calling requestTimeIterative function"));
-    }
 }
 
 /** finalize the time advancement request
@@ -750,11 +758,8 @@ iteration_time Federate::requestTimeIterativeComplete ()
         }
         return iterativeTime;
     }
-    else
-    {
         throw (InvalidFunctionCall (
           "cannot call finalize requestTimeIterative without first calling requestTimeIterativeAsync function"));
-    }
 }
 
 void Federate::updateTime (Time /*newTime*/, Time /*oldTime*/)
@@ -801,24 +806,15 @@ static Filter &generateFilter (Federate *fed,
             return (global) ? fed->registerGlobalCloningFilter (name, inputType, outputType) :
                               fed->registerCloningFilter (name, inputType, outputType);
         }
-        else
-        {
             return (global) ? fed->registerGlobalFilter (name, inputType, outputType) :
                               fed->registerFilter (name, inputType, outputType);
         }
-    }
-    else
-    {
         if (cloning)
         {
             return (global) ? make_cloning_filter (GLOBAL, operation, fed, name) :
                               make_cloning_filter (operation, fed, name);
         }
-        else
-        {
             return (global) ? make_filter (GLOBAL, operation, fed, name) : make_filter (operation, fed, name);
-        }
-    }
 }
 
 const std::string emptyStr;
@@ -1086,7 +1082,7 @@ const Filter &Federate::getFilter (int index) const { return fManager->getFilter
 
 int Federate::filterCount () const { return fManager->getFilterCount (); }
 
-std::string Federate::localQuery (const std::string & /*queryStr*/) const { return std::string (); }
+std::string Federate::localQuery (const std::string & /*queryStr*/) const { return std::string{}; }
 
 std::string Federate::query (const std::string &queryStr)
 {
@@ -1221,7 +1217,8 @@ Filter &Federate::registerFilter (const std::string &filterName,
                                   const std::string &inputType,
                                   const std::string &outputType)
 {
-    return fManager->registerFilter ((!filterName.empty ()) ? (getName () + separator_ + filterName) : filterName,
+    return fManager->registerFilter ((!filterName.empty ()) ? (getName () + nameSegmentSeparator + filterName) :
+                                                              filterName,
                                      inputType, outputType);
 }
 
@@ -1229,7 +1226,8 @@ CloningFilter &Federate::registerCloningFilter (const std::string &filterName,
                                                 const std::string &inputType,
                                                 const std::string &outputType)
 {
-    return fManager->registerCloningFilter ((!filterName.empty ()) ? (getName () + separator_ + filterName) :
+    return fManager->registerCloningFilter ((!filterName.empty ()) ?
+                                              (getName () + nameSegmentSeparator + filterName) :
                                                                      filterName,
                                             inputType, outputType);
 }
@@ -1299,7 +1297,7 @@ const Filter &Federate::getFilter (const std::string &filterName) const
     auto &filt = fManager->getFilter (filterName);
     if (!filt.isValid ())
     {
-        auto &filt2 = fManager->getFilter (getName () + separator_ + filterName);
+        auto &filt2 = fManager->getFilter (getName () + nameSegmentSeparator + filterName);
         return filt2;
     }
     return filt;
@@ -1310,7 +1308,7 @@ Filter &Federate::getFilter (const std::string &filterName)
     auto &filt = fManager->getFilter (filterName);
     if (!filt.isValid ())
     {
-        auto &filt2 = fManager->getFilter (getName () + separator_ + filterName);
+        auto &filt2 = fManager->getFilter (getName () + nameSegmentSeparator + filterName);
         return filt2;
     }
     return filt;
@@ -1318,11 +1316,11 @@ Filter &Federate::getFilter (const std::string &filterName)
 
 int Federate::getFilterCount () const { return fManager->getFilterCount (); }
 
-void Federate::setFilterOperator (const Filter &filt, std::shared_ptr<FilterOperator> mo)
+void Federate::setFilterOperator (const Filter &filt, std::shared_ptr<FilterOperator> op)
 {
     if (coreObject)
     {
-        coreObject->setFilterOperator (filt.getHandle (), std::move (mo));
+        coreObject->setFilterOperator (filt.getHandle (), std::move (op));
     }
     else
     {

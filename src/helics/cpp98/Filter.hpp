@@ -1,5 +1,5 @@
 /*
-Copyright © 2017-2018,
+Copyright © 2017-2019,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
@@ -8,11 +8,12 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #pragma once
 
 #include "../shared_api_library/MessageFilters.h"
-#include <string>
 #include "helicsExceptions.hpp"
+#include <string>
 
 namespace helicscpp
 {
+/** object managing a filter in the C++98 interface*/
 class Filter
 {
   public:
@@ -32,10 +33,7 @@ class Filter
 
     helics_filter baseObject () const { return filt; }
 
-    const char *getName () const
-    {
-        return helicsFilterGetName (filt);
-    }
+    const char *getName () const { return helicsFilterGetName (filt); }
 
     void set (const std::string &property, double val)
     {
@@ -43,7 +41,7 @@ class Filter
     }
     void setString (const std::string &property, const std::string &val)
     {
-        helicsFilterSetString (filt, property.c_str (), val.c_str (),hThrowOnError());
+        helicsFilterSetString (filt, property.c_str (), val.c_str (), hThrowOnError ());
     }
 
     /** add a destination target to a cloning filter
@@ -61,7 +59,7 @@ class Filter
     }
 
     /** remove a destination target from a cloning filter*/
-    void removeTarget(const std::string &dest)
+    void removeTarget (const std::string &dest)
     {
         helicsFilterRemoveTarget (filt, dest.c_str (), hThrowOnError ());
     }
@@ -84,7 +82,6 @@ class CloningFilter : public Filter
         return *this;
     }
 
-   
     /** add a delivery endpoint to a cloning filter
     @details all cloned messages are sent to the delivery address(es)
     */

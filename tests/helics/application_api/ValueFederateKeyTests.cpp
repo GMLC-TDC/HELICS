@@ -1,5 +1,5 @@
 /*
-Copyright © 2017-2018,
+Copyright © 2017-2019,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
@@ -87,7 +87,7 @@ BOOST_DATA_TEST_CASE (value_federate_single_transfer_publisher, bdata::make (cor
     auto vFed1 = GetFederateAs<helics::ValueFederate> (0);
     BOOST_REQUIRE (vFed1);
     // register the publications
-    helics::Publication pubid (helics::GLOBAL, vFed1.get (), "pub1", helics::data_type::helicsString);
+    helics::Publication pubid (helics::GLOBAL, vFed1.get (), "pub1", helics::data_type::helics_string);
 
     auto &subid = vFed1->registerSubscription ("pub1");
     vFed1->setProperty (helics_property_time_delta, 1.0);

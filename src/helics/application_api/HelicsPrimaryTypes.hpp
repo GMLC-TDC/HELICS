@@ -1,5 +1,5 @@
 /*
-Copyright © 2017-2018,
+Copyright © 2017-2019,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
@@ -27,18 +27,18 @@ using defV = mpark::variant<double,
                             std::complex<double>,
                             std::vector<double>,
                             std::vector<std::complex<double>>,
-                            named_point>;
+                            NamedPoint>;
 
 /**enumeration of the order inside the variant so the Which function returns match the enumeration*/
 enum type_location
 {
-    doubleLoc = 0,
-    intLoc = 1,
-    stringLoc = 2,
-    complexLoc = 3,
-    vectorLoc = 4,
-    complexVectorLoc = 5,
-    namedPointLoc = 6
+    double_loc = 0,
+    int_loc = 1,
+    string_loc = 2,
+    complex_loc = 3,
+    vector_loc = 4,
+    complex_vector_loc = 5,
+    named_point_loc = 6
 };
 /** detect a change from the previous values*/
 bool changeDetected (const defV &prevValue, const std::string &val, double deltaV);
@@ -50,7 +50,7 @@ bool changeDetected (const defV &prevValue, const std::complex<double> &val, dou
 bool changeDetected (const defV &prevValue, double val, double deltaV);
 bool changeDetected (const defV &prevValue, int64_t val, double deltaV);
 bool changeDetected (const defV &prevValue, Time val, double deltaV);
-bool changeDetected (const defV &prevValue, const named_point &val, double deltaV);
+bool changeDetected (const defV &prevValue, const NamedPoint &val, double deltaV);
 bool changeDetected (const defV &prevValue, bool val, double deltaV);
 
 /** directly convert the boolean to integer*/
@@ -68,10 +68,7 @@ inline int64_t make_valid (Time val) { return val.getBaseTimeCode (); }
 
 inline double make_valid (float val) { return static_cast<double> (val); }
 
-inline std::complex<double> make_valid (const std::complex<float> &val)
-{
-    return std::complex<double> (val.real (), val.imag ());
-}
+inline std::complex<double> make_valid (const std::complex<float> &val) { return {val.real (), val.imag ()}; }
 
 /** this template should do nothing for most classes the specific overloads are the important ones*/
 template <class X>
@@ -92,7 +89,7 @@ void valueExtract (const defV &dv, std::vector<double> &val);
 void valueExtract (const defV &dv, std::vector<std::complex<double>> &val);
 
 /** extract the value from a variant to a named point*/
-void valueExtract (const defV &dv, named_point &val);
+void valueExtract (const defV &dv, NamedPoint &val);
 
 /** extract the value from a variant to a named point*/
 void valueExtract (const defV &dv, Time &val);
@@ -108,7 +105,7 @@ void valueExtract (const data_view &dv, data_type baseType, std::complex<double>
 
 void valueExtract (const data_view &dv, data_type baseType, std::vector<std::complex<double>> &val);
 
-void valueExtract (const data_view &dv, data_type baseType, named_point &val);
+void valueExtract (const data_view &dv, data_type baseType, NamedPoint &val);
 
 void valueExtract (const data_view &dv, data_type baseType, Time &val);
 
@@ -121,13 +118,13 @@ valueExtract (const defV &dv, X &val)
 {
     switch (dv.index ())
     {
-    case doubleLoc:  // double
+    case double_loc:  // double
         val = static_cast<X> (mpark::get<double> (dv));
         break;
-    case intLoc:  // int64_t
+    case int_loc:  // int64_t
         val = static_cast<X> (mpark::get<int64_t> (dv));
         break;
-    case stringLoc:  // string
+    case string_loc:  // string
     default:
         if
             IF_CONSTEXPR (std::is_integral<X>::value)
@@ -140,24 +137,24 @@ valueExtract (const defV &dv, X &val)
         }
 
         break;
-    case complexLoc:  // complex
+    case complex_loc:  // complex
         val = static_cast<X> (std::abs (mpark::get<std::complex<double>> (dv)));
         break;
-    case vectorLoc:  // vector
+    case vector_loc:  // vector
     {
         auto &vec = mpark::get<std::vector<double>> (dv);
         val = static_cast<X> (vectorNorm (vec));
         break;
     }
-    case complexVectorLoc:  // complex vector
+    case complex_vector_loc:  // complex vector
     {
         auto &vec = mpark::get<std::vector<std::complex<double>>> (dv);
         val = static_cast<X> (vectorNorm (vec));
         break;
     }
-    case namedPointLoc:
+    case named_point_loc:
     {
-        auto &np = mpark::get<named_point> (dv);
+        auto &np = mpark::get<NamedPoint> (dv);
         if (std::isnan (np.value))
         {
             val = static_cast<X> (getDoubleFromString (np.name));
@@ -177,7 +174,7 @@ std::enable_if_t<std::is_arithmetic<X>::value> valueExtract (const data_view &dv
 {
     switch (baseType)
     {
-    case data_type::helicsAny:
+    case data_type::helics_any:
     {
         if (dv.size () == 9)
         {
@@ -228,16 +225,16 @@ std::enable_if_t<std::is_arithmetic<X>::value> valueExtract (const data_view &dv
         }
         break;
     }
-    case data_type::helicsString:
+    case data_type::helics_string:
     default:
         val = static_cast<X> (getDoubleFromString (dv.string ()));
         break;
-    case data_type::helicsBool:
+    case data_type::helics_bool:
         val = static_cast<X> ((dv.string () != "0"));
         break;
-    case data_type::helicsNamedPoint:
+    case data_type::helics_named_point:
     {
-        auto npval = ValueConverter<named_point>::interpret (dv);
+        auto npval = ValueConverter<NamedPoint>::interpret (dv);
         if (std::isnan (npval.value))
         {
             try
@@ -257,39 +254,39 @@ std::enable_if_t<std::is_arithmetic<X>::value> valueExtract (const data_view &dv
 
         break;
     }
-    case data_type::helicsDouble:
+    case data_type::helics_double:
     {
         auto V = ValueConverter<double>::interpret (dv);
         val = static_cast<X> (V);
         break;
     }
-    case data_type::helicsInt:
-    case data_type::helicsTime:
+    case data_type::helics_int:
+    case data_type::helics_time:
     {
         auto V = ValueConverter<int64_t>::interpret (dv);
         val = static_cast<X> (V);
         break;
     }
 
-    case data_type::helicsVector:
+    case data_type::helics_vector:
     {
         auto V = ValueConverter<std::vector<double>>::interpret (dv);
         val = static_cast<X> (vectorNorm (V));
         break;
     }
-    case data_type::helicsComplex:
+    case data_type::helics_complex:
     {
         auto V = ValueConverter<std::complex<double>>::interpret (dv);
         val = static_cast<X> (std::abs (V));
         break;
     }
-    case data_type::helicsComplexVector:
+    case data_type::helics_complex_vector:
     {
         auto V = ValueConverter<std::vector<std::complex<double>>>::interpret (dv);
         val = static_cast<X> (vectorNorm (V));
         break;
     }
-    case data_type::helicsCustom:
+    case data_type::helics_custom:
         throw (std::invalid_argument ("unrecognized helics type"));
     }
 }

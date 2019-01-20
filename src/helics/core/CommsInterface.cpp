@@ -1,5 +1,5 @@
 /*
-Copyright © 2017-2018,
+Copyright © 2017-2019,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
@@ -32,12 +32,12 @@ void CommsInterface::loadNetworkInfo (const NetworkBrokerData &netInfo)
 {
     if (propertyLock ())
     {
-        localTarget_ = netInfo.localInterface;
-        brokerTarget_ = netInfo.brokerAddress;
-        brokerName_ = netInfo.brokerName;
+        localTargetAddress = netInfo.localInterface;
+        brokerTargetAddress = netInfo.brokerAddress;
+        brokerName = netInfo.brokerName;
         interfaceNetwork = netInfo.interfaceNetwork;
-        maxMessageSize_ = netInfo.maxMessageSize;
-        maxMessageCount_ = netInfo.maxMessageCount;
+        maxMessageSize = netInfo.maxMessageSize;
+        maxMessageCount = netInfo.maxMessageCount;
         autoBroker = netInfo.autobroker;
         switch (netInfo.server_mode)
         {
@@ -62,8 +62,8 @@ void CommsInterface::loadTargetInfo (const std::string &localTarget,
 {
     if (propertyLock ())
     {
-        localTarget_ = localTarget;
-        brokerTarget_ = brokerTarget;
+        localTargetAddress = localTarget;
+        brokerTargetAddress = brokerTarget;
         interfaceNetwork = targetNetwork;
         propertyUnLock ();
     }
@@ -226,11 +226,11 @@ bool CommsInterface::connect ()
     std::unique_lock<std::mutex> syncLock (threadSyncLock);
     if (name.empty ())
     {
-        name = localTarget_;
+        name = localTargetAddress;
     }
-    if (localTarget_.empty ())
+    if (localTargetAddress.empty ())
     {
-        localTarget_ = name;
+        localTargetAddress = name;
     }
     if (!singleThread)
     {
@@ -273,7 +273,7 @@ bool CommsInterface::connect ()
         }
         if (!singleThread)
         {
-            queue_watcher.join();
+            queue_watcher.join ();
         }
         return false;
     }
@@ -436,17 +436,17 @@ void CommsInterface::setLoggingCallback (
     loggingCallback = std::move (callback);
 }
 
-void CommsInterface::setMessageSize (int maxMessageSize, int maxMessageCount)
+void CommsInterface::setMessageSize (int maxMsgSize, int maxCount)
 {
     if (propertyLock ())
     {
-        if (maxMessageSize > 0)
+        if (maxMsgSize > 0)
         {
-            maxMessageSize_ = maxMessageSize;
+            maxMessageSize = maxMsgSize;
         }
-        if (maxMessageCount > 0)
+        if (maxCount > 0)
         {
-            maxMessageCount_ = maxMessageCount;
+            maxMessageCount = maxCount;
         }
         propertyUnLock ();
     }
@@ -481,6 +481,18 @@ void CommsInterface::setServerMode (bool serverActive)
 bool CommsInterface::isConnected () const
 {
     return ((tx_status == connection_status::connected) && (rx_status == connection_status::connected));
+}
+
+void CommsInterface::logMessage (const std::string &message) const
+{
+    if (loggingCallback)
+    {
+        loggingCallback (3, name, message);
+    }
+    else
+    {
+        std::cout << "commMessage||" << name << ":" << message << std::endl;
+    }
 }
 
 void CommsInterface::logWarning (const std::string &message) const

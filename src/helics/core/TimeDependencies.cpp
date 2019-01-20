@@ -1,5 +1,5 @@
 /*
-Copyright © 2017-2018,
+Copyright © 2017-2019,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
@@ -145,10 +145,10 @@ bool TimeDependencies::isDependency (global_federate_id ofed) const
     return (res->fedID == ofed);
 }
 
-const DependencyInfo *TimeDependencies::getDependencyInfo (global_federate_id ofed) const
+const DependencyInfo *TimeDependencies::getDependencyInfo (global_federate_id id) const
 {
-    auto res = std::lower_bound (dependencies.cbegin (), dependencies.cend (), ofed, dependencyCompare);
-    if ((res == dependencies.cend ()) || (res->fedID != ofed))
+    auto res = std::lower_bound (dependencies.cbegin (), dependencies.cend (), id, dependencyCompare);
+    if ((res == dependencies.cend ()) || (res->fedID != id))
     {
         return nullptr;
     }
@@ -156,10 +156,10 @@ const DependencyInfo *TimeDependencies::getDependencyInfo (global_federate_id of
     return &(*res);
 }
 
-DependencyInfo *TimeDependencies::getDependencyInfo (global_federate_id ofed)
+DependencyInfo *TimeDependencies::getDependencyInfo (global_federate_id id)
 {
-    auto res = std::lower_bound (dependencies.begin (), dependencies.end (), ofed, dependencyCompare);
-    if ((res == dependencies.end ()) || (res->fedID != ofed))
+    auto res = std::lower_bound (dependencies.begin (), dependencies.end (), id, dependencyCompare);
+    if ((res == dependencies.end ()) || (res->fedID != id))
     {
         return nullptr;
     }

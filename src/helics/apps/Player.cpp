@@ -1,5 +1,5 @@
 /*
-Copyright © 2017-2018,
+Copyright © 2017-2019,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
@@ -128,10 +128,7 @@ helics::Time Player::extractTime (const std::string &str, int lineNumber) const
         {
             return helics::Time (std::stoll (str), time_units::ns);
         }
-        else
-        {
-            return loadTimeFromString (str, units);
-        }
+        return loadTimeFromString (str, units);
     }
     catch (const std::invalid_argument &ia)
     {
@@ -173,7 +170,7 @@ void Player::loadTextFile (const std::string &filename)
             }
             continue;
         }
-        else if (str[fc] == '#')
+        if (str[fc] == '#')
         {
             if (fc + 2 < str.size ())
             {
@@ -224,7 +221,7 @@ void Player::loadTextFile (const std::string &filename)
             }
             continue;
         }
-        else if (str[fc] == '#')
+        if (str[fc] == '#')
         {
             if (fc + 2 < str.size ())
             {
@@ -396,9 +393,9 @@ void Player::loadTextFile (const std::string &filename)
     }
 }
 
-void Player::loadJsonFile (const std::string &jsonFile)
+void Player::loadJsonFile (const std::string &jsonString)
 {
-    loadJsonFileConfiguration ("player", jsonFile);
+    loadJsonFileConfiguration ("player", jsonString);
 
     auto pubCount = fed->getPublicationCount ();
     for (int ii = 0; ii < pubCount; ++ii)
@@ -413,7 +410,7 @@ void Player::loadJsonFile (const std::string &jsonFile)
         eptids[endpoints.back ().getName ()] = static_cast<int> (endpoints.size () - 1);
     }
 
-    auto doc = loadJson (jsonFile);
+    auto doc = loadJson (jsonString);
 
     if (doc.isMember ("player"))
     {
@@ -699,7 +696,7 @@ void Player::initialize ()
 
 void Player::sendInformation (Time sendTime, int iteration)
 {
-    if (isValidIndex(pointIndex,points))
+    if (isValidIndex (pointIndex, points))
     {
         while (points[pointIndex].time < sendTime)
         {
@@ -710,20 +707,20 @@ void Player::sendInformation (Time sendTime, int iteration)
                 break;
             }
         }
-        if (isValidIndex(pointIndex, points))
+        if (isValidIndex (pointIndex, points))
         {
             while ((points[pointIndex].time == sendTime) && (points[pointIndex].iteration == iteration))
             {
-                publications[points[pointIndex].index].publish(points[pointIndex].value);
+                publications[points[pointIndex].index].publish (points[pointIndex].value);
                 ++pointIndex;
-                if (pointIndex >= points.size())
+                if (pointIndex >= points.size ())
                 {
                     break;
                 }
             }
         }
     }
-    if (isValidIndex(messageIndex, messages))
+    if (isValidIndex (messageIndex, messages))
     {
         while (messages[messageIndex].sendTime <= sendTime)
         {
@@ -755,7 +752,7 @@ void Player::runTo (Time stopTime_input)
     else
     {
         auto ctime = fed->getCurrentTime ();
-        if (isValidIndex(pointIndex,points))
+        if (isValidIndex (pointIndex, points))
         {
             while (points[pointIndex].time <= ctime)
             {
@@ -766,7 +763,7 @@ void Player::runTo (Time stopTime_input)
                 }
             }
         }
-        if (isValidIndex(messageIndex, messages))
+        if (isValidIndex (messageIndex, messages))
         {
             while (messages[messageIndex].sendTime <= ctime)
             {
@@ -787,12 +784,12 @@ void Player::runTo (Time stopTime_input)
     while (moreToSend)
     {
         nextSendTime = Time::maxVal ();
-        if (isValidIndex(pointIndex, points))
+        if (isValidIndex (pointIndex, points))
         {
             nextSendTime = std::min (nextSendTime, points[pointIndex].time);
             nextIteration = points[pointIndex].iteration;
         }
-        if (isValidIndex(messageIndex, messages))
+        if (isValidIndex (messageIndex, messages))
         {
             nextSendTime = std::min (nextSendTime, messages[messageIndex].sendTime);
             nextIteration = 0;
@@ -885,7 +882,7 @@ int Player::loadArguments (boost::program_options::variables_map &vm_map)
     if (vm_map.count ("datatype") > 0)
     {
         defType = helics::getTypeFromString (vm_map["datatype"].as<std::string> ());
-        if (defType == helics::data_type::helicsCustom)
+        if (defType == helics::data_type::helics_custom)
         {
             std::cerr << vm_map["datatype"].as<std::string> () << " is not recognized as a valid type \n";
             return -3;
@@ -900,7 +897,8 @@ int Player::loadArguments (boost::program_options::variables_map &vm_map)
         }
         catch (...)
         {
-            std::cerr << vm_map["time_units"].as<std::string> () << " is not recognized as a valid unit of time \n";
+            std::cerr << vm_map["time_units"].as<std::string> ()
+                      << " is not recognized as a valid unit of time \n";
         }
     }
     if (vm_map.count ("marker") > 0)

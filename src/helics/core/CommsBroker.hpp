@@ -1,5 +1,5 @@
 /*
-Copyright © 2017-2018,
+Copyright © 2017-2019,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
@@ -22,7 +22,7 @@ class CommsBroker : public BrokerT
   protected:
     std::atomic<int> disconnectionStage{0};  //!< the stage of disconnection
     std::unique_ptr<COMMS> comms;  //!< the actual comms object
-    std::atomic<bool> initialized_{false};  //!< atomic protecting local initialization
+    std::atomic<bool> brokerInitialized{false};  //!< atomic protecting local initialization
   public:
     /** default constructor*/
     CommsBroker () noexcept;

@@ -1,5 +1,5 @@
 /*
-Copyright © 2017-2018,
+Copyright © 2017-2019,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
@@ -174,7 +174,7 @@ BOOST_AUTO_TEST_CASE (testcore_messagefilter_callback_test)
         {
             msg->source = filterName;
 
-            if (msg->data.size () > 0)
+            if (!msg->data.empty ())
             {
                 ++msg->data[0];
             }

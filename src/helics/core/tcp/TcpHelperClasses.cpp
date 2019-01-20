@@ -1,5 +1,5 @@
 /*
-Copyright © 2017-2018,
+Copyright © 2017-2019,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
@@ -329,9 +329,9 @@ size_t TcpConnection::send (const std::string &dataString)
     return sz;
 }
 
-size_t TcpConnection::receive (void *buffer, size_t maxDataLength)
+size_t TcpConnection::receive (void *buffer, size_t maxDataSize)
 {
-    return socket_.receive (boost::asio::buffer (buffer, maxDataLength));
+    return socket_.receive (boost::asio::buffer (buffer, maxDataSize));
 }
 
 bool TcpConnection::waitUntilConnected (std::chrono::milliseconds timeOut)
@@ -609,7 +609,13 @@ TcpServer::TcpServer (boost::asio::io_service &io_service, int portNum, int nomi
     initialConnect ();
 }
 
-TcpServer::~TcpServer () { close (); }
+TcpServer::~TcpServer () try
+{
+    close ();
+}
+catch (...)
+{
+}
 
 void TcpServer::initialConnect ()
 {
@@ -679,19 +685,19 @@ bool TcpServer::reConnect (std::chrono::milliseconds timeOut)
 TcpServer::pointer TcpServer::create (boost::asio::io_service &io_service,
                                       const std::string &address,
                                       int PortNum,
-                                      bool port_reuse,
+                                      bool reuse_port,
                                       int nominalBufferSize)
 {
-    return pointer (new TcpServer (io_service, address, PortNum, port_reuse, nominalBufferSize));
+    return pointer (new TcpServer (io_service, address, PortNum, reuse_port, nominalBufferSize));
 }
 
 TcpServer::pointer TcpServer::create (boost::asio::io_service &io_service,
                                       const std::string &address,
                                       const std::string &port,
-                                      bool port_reuse,
+                                      bool reuse_port,
                                       int nominalBufferSize)
 {
-    return pointer (new TcpServer (io_service, address, port, port_reuse, nominalBufferSize));
+    return pointer (new TcpServer (io_service, address, port, reuse_port, nominalBufferSize));
 }
 
 TcpServer::pointer TcpServer::create (boost::asio::io_service &io_service, int PortNum, int nominalBufferSize)

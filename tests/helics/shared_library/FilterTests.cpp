@@ -1,5 +1,5 @@
 /*
-Copyright © 2017-2018,
+Copyright © 2017-2019,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
@@ -382,7 +382,7 @@ BOOST_DATA_TEST_CASE (message_filter_function3, bdata::make (core_types), core_t
 
     helicsFederateRegisterEndpoint (fFed, "fout", "", &err);
     CE (auto f3 = helicsFederateRegisterFilter (fFed, helics_filter_type_random_delay, "filter3", &err));
-    helicsFilterAddSourceTarget (f3, "filter/fout", nullptr);
+    helicsFilterAddSourceTarget (f3, "filter0/fout", nullptr);
 
     CE (helicsFilterSet (f2, "delay", 2.5, &err));
 

@@ -1,5 +1,5 @@
 /*
-Copyright © 2017-2018,
+Copyright © 2017-2019,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
@@ -13,6 +13,11 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include <iostream>
 #include <memory>
 #include <stdexcept>
+
+/** check if a type_name has an index code*/
+bool hasIndexCode (const std::string &type_name);
+/** get the index code if it has one*/
+int getIndexCode (const std::string &type_name);
 
 struct FederateTestFixture
 {
@@ -236,8 +241,4 @@ struct FederateTestFixture
     std::string extraCoreArgs;
     std::string extraBrokerArgs;
     std::string ctype;
-
-  private:
-    bool hasIndexCode (const std::string &type_name);
-    int getIndexCode (const std::string &type_name);
 };

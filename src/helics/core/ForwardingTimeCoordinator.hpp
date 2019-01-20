@@ -1,5 +1,5 @@
 /*
-Copyright © 2017-2018,
+Copyright © 2017-2019,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
@@ -28,7 +28,7 @@ class ForwardingTimeCoordinator
     DependencyInfo::time_state_t time_state =
       DependencyInfo::time_state_t::time_requested;  //!< the current forwarding time state
     global_federate_id lastMinFed;  //!< the latest minimum fed
-    // Core::federate_id_t parent = invalid_fed_id;  //!< the id for the parent object which should also be a
+    // Core::local_federate_id parent = invalid_fed_id;  //!< the id for the parent object which should also be a
     // ForwardingTimeCoordinator
     TimeDependencies dependencies;  //!< federates which this Federate is temporally dependent on
     std::vector<global_federate_id> dependents;  //!< federates which temporally depend on this federate
@@ -46,9 +46,9 @@ class ForwardingTimeCoordinator
     ForwardingTimeCoordinator () = default;
 
     /** set the callback function used for the sending messages*/
-    void setMessageSender (std::function<void(const ActionMessage &)> sendMessageFunction_)
+    void setMessageSender (std::function<void(const ActionMessage &)> userSendMessageFunction)
     {
-        sendMessageFunction = std::move (sendMessageFunction_);
+        sendMessageFunction = std::move (userSendMessageFunction);
     }
 
     /** get a list of actual dependencies*/

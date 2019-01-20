@@ -1,5 +1,5 @@
 /*
-Copyright © 2017-2018,
+Copyright © 2017-2019,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
@@ -54,13 +54,13 @@ static const std::unordered_map<std::string, core_type> coreTypes{{"default", co
                                                                   {"zeromq", core_type::ZMQ},
                                                                   {"zeromq_ss", core_type::ZMQ_SS},
                                                                   {"zmq_ss", core_type::ZMQ_SS},
-																  {"ZMQ_SS", core_type::ZMQ_SS},
+                                                                  {"ZMQ_SS", core_type::ZMQ_SS},
                                                                   {"zeromq2", core_type::ZMQ_SS},
                                                                   {"zmq2", core_type::ZMQ_SS},
                                                                   {"ZMQ2", core_type::ZMQ_SS},
                                                                   {"interprocess", core_type::INTERPROCESS},
                                                                   {"ZeroMQ", core_type::ZMQ},
-																  {"ZeroMQ2", core_type::ZMQ_SS},
+                                                                  {"ZeroMQ2", core_type::ZMQ_SS},
                                                                   {"ipc", core_type::INTERPROCESS},
                                                                   {"interproc", core_type::INTERPROCESS},
                                                                   {"IPC", core_type::INTERPROCESS},
@@ -106,9 +106,9 @@ core_type coreTypeFromString (std::string type) noexcept
     {
         return fnd->second;
     }
-    if ((type.front() == '=') || (type.front() == '-'))
+    if ((type.front () == '=') || (type.front () == '-'))
     {
-        return coreTypeFromString(type.substr(1));
+        return coreTypeFromString (type.substr (1));
     }
     if (type.compare (0, 4, "zmq2") == 0)
     {

@@ -1,5 +1,5 @@
 /*
-Copyright © 2017-2018,
+Copyright © 2017-2019,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
@@ -20,7 +20,7 @@ namespace helics
 namespace Json
 {
 class Value;
-}
+}  // namespace Json
 namespace apps
 {
 /** class defining a basic helics App
@@ -39,16 +39,19 @@ class App
     */
     App (const std::string &defaultAppName, int argc, char *argv[]);
     /** construct from a federate info object
+    @param appName the name of the application, can be left empty to use a name specified in fi
     @param fi a pointer info object containing information on the desired federate configuration
     */
     App (const std::string &appName, const FederateInfo &fi);
     /**constructor taking a federate information structure and using the given core
+    @param appName the name of the application, can be left empty to use a name specified in fi
     @param core a pointer to core object which the federate can join
-    @param[in] fi  a federate information structure
+    @param fi  a federate information structure
     */
     App (const std::string &appName, const std::shared_ptr<Core> &core, const FederateInfo &fi);
     /**constructor taking a file with the required information
-    @param[in] jsonString file or JSON string defining the federate information and other configuration
+    @param appName the name of the application, can be left empty to use a name specified in jsonString
+    @param jsonString file or JSON string defining the federate information and other configuration
     */
     App (const std::string &appName, const std::string &jsonString);
 
@@ -57,9 +60,9 @@ class App
     /** don't allow the copy constructor*/
     App (const App &other_app) = delete;
     /** move assignment*/
-    App &operator= (App &&fed) = default;
+    App &operator= (App &&app) = default;
     /** don't allow the copy assignment,  the default would fail anyway since federates are not copyable either*/
-    App &operator= (const App &fed) = delete;
+    App &operator= (const App &app) = delete;
     virtual ~App ();
 
     /** load a file containing publication information
@@ -93,6 +96,7 @@ class App
     */
     virtual void loadJsonFile (const std::string &jsonString);
     /** load from a jsonString and check a field named appName for configuration options
+    @param appName the name of the app which may be used in section of the JSON for some local configuration
     @param jsonString either a JSON filename or a string containing JSON
     */
     void loadJsonFileConfiguration (const std::string &appName, const std::string &jsonString);

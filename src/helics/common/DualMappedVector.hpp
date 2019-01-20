@@ -1,5 +1,5 @@
 /*
-Copyright © 2017-2018,
+Copyright © 2017-2019,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
@@ -29,7 +29,11 @@ class DualMappedVector
 
     /** insert a new element into the vector
     @param searchValue1 the primary unique index of the vector
-    @param searchValue2 the secondary unique index of the vector*/
+    @param searchValue2 the secondary unique index of the vector
+    @param data the parameters necessary to create a new object
+    @return an optional value that indicates if the insertion was successful and if so contain the index of the
+    insertion
+    */
     template <typename... Us>
     stx::optional<size_t> insert (const searchType1 &searchValue1, const searchType2 &searchValue2, Us &&... data)
     {
@@ -51,7 +55,10 @@ class DualMappedVector
 
     /** insert a new element into the vector
     @param searchValue1 the primary unique index of the vector
-    @param searchValue2 the secondary unique index of the vector*/
+   @param data the parameters necessary to create a new object
+    @return an optional value that indicates if the insertion was successful and if so contain the index of the
+   insertion
+    */
     template <typename... Us>
     stx::optional<size_t> insert (const searchType1 &searchValue1, std::nullptr_t /*searchValue2*/, Us &&... data)
     {
@@ -67,8 +74,11 @@ class DualMappedVector
     }
 
     /** insert a new element into the vector
-    @param searchValue1 the primary unique index of the vector
-    @param searchValue2 the secondary unique index of the vector*/
+    @param searchValue2 the secondary unique index of the vector
+    @param data the parameters necessary to create a new object
+    @return an optional value that indicates if the insertion was successful and if so contain the index of the
+    insertion
+    */
     template <typename... Us>
     stx::optional<size_t> insert (std::nullptr_t /*searchValue1*/, const searchType2 &searchValue2, Us &&... data)
     {
@@ -83,9 +93,10 @@ class DualMappedVector
         return index;
     }
 
-	/** insert a new element into the vector
-    @param searchValue1 the primary unique index of the vector
-    @param searchValue2 the secondary unique index of the vector*/
+    /** insert a new element into the vector
+    @param data the parameters necessary to create a new object
+    @return an optional value that indicates if the insertion was successful and if so contain the index of the
+    insertion*/
     template <typename... Us>
     stx::optional<size_t> insert (std::nullptr_t /*searchValue1*/, std::nullptr_t /*searchValue2*/, Us &&... data)
     {
@@ -96,7 +107,9 @@ class DualMappedVector
 
     /** insert a new element into the vector
     @param searchValue1 the primary unique index of the vector
-    @param searchValue2 the secondary unique index of the vector*/
+    @param searchValue2 the secondary unique index of the vector
+    @param data the parameters and values necessary to create a new object
+    @return the index of the created or assigned value*/
     template <typename... Us>
     size_t insert_or_assign (const searchType1 &searchValue1, const searchType2 &searchValue2, Us &&... data)
     {
@@ -120,7 +133,8 @@ class DualMappedVector
 
     /** insert a new element into the vector
     @param searchValue1 the primary unique index of the vector
-    @param searchValue2 the secondary unique index of the vector*/
+    @param data the data required to create a new object
+    @return the index of the inserted or assigned value*/
     template <typename... Us>
     size_t insert_or_assign (const searchType1 &searchValue1, std::nullptr_t /*searchValue2*/, Us &&... data)
     {
@@ -140,8 +154,9 @@ class DualMappedVector
     }
 
     /** insert a new element into the vector
-    @param searchValue1 the primary unique index of the vector
-    @param searchValue2 the secondary unique index of the vector*/
+    @param searchValue2 the secondary unique index of the vector
+    @param data the parameters and value necessary to create a new object
+    @return the index of the inserted or assigned value*/
     template <typename... Us>
     size_t insert_or_assign (std::nullptr_t /*searchValue1*/, const searchType2 &searchValue2, Us &&... data)
     {

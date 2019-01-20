@@ -29,19 +29,20 @@ The interfaces (Publications, Subscriptions, Endpoints, and a Filters) are how a
 These can be set up through API calls or through Configuration Files
 Json files can also contain information for the FederateInfo structure including timing and connectivity information
 
-The specific different kinds of Federates define the patterns for different elements.  ValueFederates define the interfaces for publish and Subscribe mechanisms.
+The specific different kinds of Federates define the patterns for different elements.  ValueFederates define the interfaces for publications and Input mechanisms.
 MessageFederates define interfaces for endpoints and the basic Federate contains API's for interacting with Filters
 
 Filters can be configured via files the following is an example of a JSON file.  TOML configuration files are also supported.  [Examples](https://github.com/GMLC-TDC/HELICS-Examples/tree/bdbdf4/example_files)
 ```
+
 "filters":[
 {
 	"name":"filtername",  //filters can have names (optional)
-	"target":"ept1",  //this is a key field specifying the target endpoint
+	"sourcetargets":"ept1", // source target for the filter
 	//"inputType":"genmessage",  //can trigger some warnings if there is mismatches for custom filters only used if operation is "custom"
 	//"outputType":"genmessage",  //this could be useful if the filter actually translates the data and can be used to automatically order filters
-	"mode":"source",  //source is the default but can be "source","destination","clone","cloning"
 	"operation":"delay", //currently valid operations are "delay","clone","cloning","timedelay","randomdelay","randomdrop","reroute","redirect","custom"
+	"info":"this is an information string for use by the application",
 	"properties":  //additional properties for filters are specified in a property array or object if there is just a single one
 	{
 		"name":"delay",  //A delay filter just has a single property
@@ -50,8 +51,8 @@ Filters can be configured via files the following is an example of a JSON file. 
 },
 {
 	"name":"filtername2",  //filters can have names (optional)
-	"target":"filterFed/ept2",  //this is a key field specifying the target endpoint
-	"mode":"source",  //source is the default but can be "source","destination","clone","cloning"
+	"sourcetargets":["filterFed/ept2"],  //this is a key field specifying the source targets can be an array
+	//"dest":["dest targets"],  // field specifying destination targets
 	"operation":"reroute", //currently valid operations are "delay","clone","cloning","timedelay","randomdelay","randomdrop","reroute","redirect","custom"
 	"properties":  //additional properties for filters are specified in a property array or object if there is just a single one
 	{
@@ -61,21 +62,25 @@ Filters can be configured via files the following is an example of a JSON file. 
 },
 {
 	"name":"filterClone",  //filters can have names (optional)
-	"target":"ept2",  //for cloning filters the target is the delivery address
-	"mode":"clone",  //specify that this is cloning filter
-	//"operation":"clone", //cloning filters don't really need an operation since clone is all they do if one is specified it must be "clone" or "cloning"
+	"delivery":"ept2",  //cloning filters can have a delivery field
+	"cloning":true,  //specify that this is cloning filter
 	"properties":  //additional properties for filters are specified in a property array or object if there is just a single one
 	[{
 		"name":"destination",  //destination adds a cloning filter for all messages delivered to a particular
 		"value":"ept1"	//the value here the endpoint that will have its messages cloned
 	},
 	{
+
 		"name":"source",  //source adds a cloning filter for all messages send from a particular endpoint
 		"value":"ept1"	//the value here the endpoint that will have its messages cloned
 	}
 	]  //this pair of properties clone all messages to or from "ept1"  this could also be done in one property with "endpoint" but this seemed more instructive in this file
 }
 ]
+
+}
+
+
 
 ```
 

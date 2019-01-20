@@ -1,5 +1,5 @@
 /*
-Copyright © 2017-2018,
+Copyright © 2017-2019,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
@@ -41,7 +41,7 @@ BOOST_AUTO_TEST_CASE (simple_tracer_test)
     trace1.addSubscription ("pub1");
     trace1.setValueCallback (cb);
     helics::ValueFederate vfed ("block1", fi);
-    helics::Publication pub1 (helics::GLOBAL, &vfed, "pub1", helics::data_type::helicsDouble);
+    helics::Publication pub1 (helics::GLOBAL, &vfed, "pub1", helics::data_type::helics_double);
     auto fut = std::async (std::launch::async, [&trace1]() { trace1.runTo (4); });
     vfed.enterExecutingMode ();
     auto retTime = vfed.requestTime (1);
@@ -157,8 +157,8 @@ BOOST_DATA_TEST_CASE (simple_tracer_test_files, boost::unit_test::data::make (si
     trace1.loadFile (std::string (TEST_DIR) + file);
 
     helics::ValueFederate vfed ("block1", fi);
-    helics::Publication pub1 (helics::GLOBAL, &vfed, "pub1", helics::data_type::helicsDouble);
-    helics::Publication pub2 (helics::GLOBAL, &vfed, "pub2", helics::data_type::helicsDouble);
+    helics::Publication pub1 (helics::GLOBAL, &vfed, "pub1", helics::data_type::helics_double);
+    helics::Publication pub2 (helics::GLOBAL, &vfed, "pub2", helics::data_type::helics_double);
 
     auto fut = std::async (std::launch::async, [&trace1]() { trace1.runTo (4); });
     vfed.enterExecutingMode ();
@@ -209,8 +209,8 @@ BOOST_DATA_TEST_CASE (simple_tracer_test_message_files, boost::unit_test::data::
     trace1.setEndpointMessageCallback (cbm);
 
     helics::CombinationFederate cfed ("block1", fi);
-    helics::Publication pub1 (helics::GLOBAL, &cfed, "pub1", helics::data_type::helicsDouble);
-    helics::Publication pub2 (helics::GLOBAL, &cfed, "pub2", helics::data_type::helicsDouble);
+    helics::Publication pub1 (helics::GLOBAL, &cfed, "pub1", helics::data_type::helics_double);
+    helics::Publication pub2 (helics::GLOBAL, &cfed, "pub2", helics::data_type::helics_double);
     helics::Endpoint e1 (helics::GLOBAL, &cfed, "d1");
 
     auto fut = std::async (std::launch::async, [&trace1]() { trace1.runTo (5); });
@@ -252,7 +252,7 @@ BOOST_DATA_TEST_CASE (simple_tracer_test_message_files_cmd,
     brk->connect ();
     std::string exampleFile = std::string (TEST_DIR) + file;
 
-    StringToCmdLine cmdArg ("--name=rec --core=ipc " + exampleFile);
+    StringToCmdLine cmdArg ("--name=rec --coretype=ipc " + exampleFile);
 
     helics::apps::Tracer trace1 (cmdArg.getArgCount (), cmdArg.getArgV ());
     std::atomic<int> counter{0};
@@ -264,8 +264,8 @@ BOOST_DATA_TEST_CASE (simple_tracer_test_message_files_cmd,
     fi.coreInitString = "";
 
     helics::CombinationFederate cfed ("obj", fi);
-    helics::Publication pub1 (helics::GLOBAL, &cfed, "pub1", helics::data_type::helicsDouble);
-    helics::Publication pub2 (helics::GLOBAL, &cfed, "pub2", helics::data_type::helicsDouble);
+    helics::Publication pub1 (helics::GLOBAL, &cfed, "pub1", helics::data_type::helics_double);
+    helics::Publication pub2 (helics::GLOBAL, &cfed, "pub2", helics::data_type::helics_double);
     helics::Endpoint e1 (helics::GLOBAL, &cfed, "d1");
 
     auto fut = std::async (std::launch::async, [&trace1]() { trace1.runTo (5); });
@@ -613,7 +613,7 @@ BOOST_DATA_TEST_CASE (simple_tracer_test_message_files_exe,
     brk->connect ();
     std::string exampleFile = std::string (TEST_DIR) + file;
 
-    std::string cmdArg ("--name=tracer --core=ipc --stop=5 " + exampleFile);
+    std::string cmdArg ("--name=tracer --coretype=ipc --stop=5 " + exampleFile);
     exeTestRunner tracerExe (HELICS_INSTALL_LOC, HELICS_BUILD_LOC "apps/", "helics_app");
     BOOST_REQUIRE (tracerExe.isActive ());
     auto out = tracerExe.runCaptureOutputAsync (std::string ("tracer " + cmdArg));
@@ -622,8 +622,8 @@ BOOST_DATA_TEST_CASE (simple_tracer_test_message_files_exe,
     fi.coreInitString = "";
 
     helics::CombinationFederate cfed ("obj", fi);
-    helics::Publication pub1 (helics::GLOBAL, &cfed, "pub1", helics::data_type::helicsDouble);
-    helics::Publication pub2 (helics::GLOBAL, &cfed, "pub2", helics::data_type::helicsDouble);
+    helics::Publication pub1 (helics::GLOBAL, &cfed, "pub1", helics::data_type::helics_double);
+    helics::Publication pub2 (helics::GLOBAL, &cfed, "pub2", helics::data_type::helics_double);
     helics::Endpoint &e1 = cfed.registerGlobalEndpoint ("d1");
 
     cfed.enterExecutingMode ();

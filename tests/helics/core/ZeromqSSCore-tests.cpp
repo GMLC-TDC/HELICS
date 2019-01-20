@@ -1,5 +1,5 @@
 /*
-Copyright © 2017-2018,
+Copyright © 2017-2019,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
@@ -186,12 +186,14 @@ BOOST_AUTO_TEST_CASE (zmqSSCore_initialization_test)
     std::atomic<int> counter{0};
     std::vector<helics::ActionMessage> msgs;
     helics::zeromq::ZmqCommsSS comm;
+    std::mutex msgLock;
     comm.loadTargetInfo (host, std::string ());
     comm.setName ("test_broker");
     comm.setPortNumber (ZMQ_SS_BROKER_PORT);
     comm.setServerMode (true);
-    comm.setCallback ([&counter, &msgs](helics::ActionMessage m) {
+    comm.setCallback ([&counter, &msgs, &msgLock](helics::ActionMessage m) {
         ++counter;
+        std::lock_guard<std::mutex> lock (msgLock);
         msgs.push_back (m);
     });
     comm.connect ();
@@ -219,14 +221,19 @@ BOOST_AUTO_TEST_CASE (zmqSSCore_initialization_test)
             }
         }
         BOOST_CHECK_GE (counter, 1);
+        std::unique_lock<std::mutex> mLock (msgLock);
         if (!msgs.empty ())
         {
             auto rM = msgs.at (0);
+            mLock.unlock ();
             BOOST_CHECK_EQUAL (rM.name, "core1");
             std::cout << "rM.name: " << rM.name << std::endl;
             BOOST_CHECK (rM.action () == helics::action_message_def::action_t::cmd_protocol);
         }
-
+        else
+        {
+            mLock.unlock ();
+        }
         cnt = 0;
         while (counter == 1)
         {
@@ -238,12 +245,18 @@ BOOST_AUTO_TEST_CASE (zmqSSCore_initialization_test)
             }
         }
         BOOST_CHECK_GE (counter, 2);
+        mLock.lock ();
         if (!msgs.empty ())
         {
             auto rM2 = msgs.at (1);
+            mLock.unlock ();
             BOOST_CHECK_EQUAL (rM2.name, "core1");
-            std::cout << "rM.name: " << rM2.name << std::endl;
+            // std::cout << "rM.name: " << rM2.name << std::endl;
             BOOST_CHECK (rM2.action () == helics::action_message_def::action_t::cmd_reg_broker);
+        }
+        else
+        {
+            mLock.unlock ();
         }
     }
     core->disconnect ();
@@ -356,7 +369,7 @@ BOOST_AUTO_TEST_CASE (zmqSSMultiCoreInitialization_test)
       helics::BrokerFactory::create (helics::core_type::ZMQ_SS, "ZMQ_SS_broker", std::to_string (feds));
     std::vector<std::shared_ptr<helics::Core>> cores (feds);
     std::vector<FedTest> leafs (feds);
-
+    BOOST_TEST_CHECKPOINT ("created broker");
     for (int ii = 0; ii < feds; ++ii)
     {
         std::string initializationString = "-f 1 --name=core" + std::to_string (ii);
@@ -369,12 +382,14 @@ BOOST_AUTO_TEST_CASE (zmqSSMultiCoreInitialization_test)
         }
         leafs[ii].initialize (cores[ii]->getIdentifier (), ii, s_index);
     }
+    BOOST_TEST_CHECKPOINT ("initialized");
     std::this_thread::sleep_for (std::chrono::milliseconds (100));
     std::vector<std::thread> threads (feds);
     for (int ii = 0; ii < feds; ++ii)
     {
         threads[ii] = std::thread ([](FedTest &leaf) { leaf.run (); }, std::ref (leafs[ii]));
     }
+    BOOST_TEST_CHECKPOINT ("started threads");
     std::this_thread::yield ();
     std::this_thread::sleep_for (std::chrono::milliseconds (100));
     std::this_thread::yield ();

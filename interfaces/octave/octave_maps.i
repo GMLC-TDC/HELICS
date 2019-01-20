@@ -149,7 +149,7 @@ static octave_value throwHelicsOctaveError(helics_error *err) {
 }
 
 // typemap for vector input functions
-%typemap(in) (const double *vectorInput, int vectorlength) {
+%typemap(in) (const double *vectorInput, int vectorLength) {
   if (!$input.is_real_matrix()) {
     SWIG_exception_fail(SWIG_ArgError(3), "argument must be a double array");
     return octave_value_list();
@@ -158,7 +158,7 @@ static octave_value throwHelicsOctaveError(helics_error *err) {
   $1=reinterpret_cast<double *>($input.mex_get_data());
 }
 
-%typemap(argout) (const double *vectorInput, int vectorlength)
+%typemap(argout) (const double *vectorInput, int vectorLength)
 {
 }
 

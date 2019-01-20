@@ -1,5 +1,5 @@
 /*
-Copyright © 2017-2018,
+Copyright © 2017-2019,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
@@ -53,19 +53,22 @@ class Player : public App
     */
     Player (int argc, char *argv[]);
     /** construct from a federate info object
+    @param name the name of the federate (can be empty to use defaults from fi)
     @param fi a pointer info object containing information on the desired federate configuration
     */
     explicit Player (const std::string &name, const FederateInfo &fi);
     /**constructor taking a federate information structure and using the given core
+    @param name the name of the federate (can be empty to use defaults from fi)
     @param core a pointer to core object which the federate can join
-    @param[in] fi  a federate information structure
+    @param fi  a federate information structure
     */
     Player (const std::string &name, const std::shared_ptr<Core> &core, const FederateInfo &fi);
     /**constructor taking a file with the required information
-    @param[in] name the name of the app
-    @param[in] jsonString file or JSON string defining the federate information and other configuration
+    @param appName the name of the app
+    @param configString JSON, TOML or text file or JSON string defining the federate information and other
+    configuration
     */
-    Player (const std::string &name, const std::string &jsonString);
+    Player (const std::string &appName, const std::string &configString);
 
     /** move construction*/
     Player (Player &&other_player) = default;
@@ -87,17 +90,16 @@ class Player : public App
     /** add a publication to a Player
     @param key the key of the publication to add
     @param type the type of the publication
-    @param units the units associated with the publication
+    @param pubUnits the units associated with the publication
     */
     void addPublication (const std::string &key, data_type type, const std::string &pubUnits = std::string ());
 
     /** add a publication to a Player
     @param key the key of the publication to add
-    @param type the type of the publication
-    @param units the units associated with the publication
+    @param pubUnits the units associated with the publication
     */
     template <class valType>
-    typename std::enable_if_t<helicsType<valType> () != data_type::helicsCustom>
+    typename std::enable_if_t<helicsType<valType> () != data_type::helics_custom>
     addPublication (const std::string &key, const std::string &pubUnits = std::string ())
     {
         if (!useLocal)
@@ -133,6 +135,7 @@ class Player : public App
 
     /** add a data point to publish through a Player
     @param pubTime the time of the publication
+    @param iteration the iteration count on which the value should be published
     @param key the key for the publication
     @param val the value to publish
     */
@@ -146,7 +149,7 @@ class Player : public App
         points.back ().value = val;
     }
     /** add a message to a Player queue
-    @param pubTime  the time the message should be sent
+    @param sendTime  the time the message should be sent
     @param src the source endpoint of the message
     @param dest the destination endpoint of the message
     @param payload the payload of the message
@@ -175,17 +178,18 @@ class Player : public App
     /** get the number of endpoints*/
     auto endpointCount () const { return endpoints.size (); }
     /** get the point from an index*/
-    const auto &getPoint(int index) const { return points[index]; }
+    const auto &getPoint (int index) const { return points[index]; }
     /** get the messages from an index*/
-    const auto &getMessage(int index) const { return messages[index]; }
+    const auto &getMessage (int index) const { return messages[index]; }
+
   private:
     int loadArguments (boost::program_options::variables_map &vm_map);
     /** load from a jsonString
-    @param either a JSON filename or a string containing JSON
+    @param jsonString either a JSON filename or a string containing JSON
     */
     virtual void loadJsonFile (const std::string &jsonString) override;
     /** load a text file*/
-    virtual void loadTextFile (const std::string &textFile) override;
+    virtual void loadTextFile (const std::string &filename) override;
     /** helper function to sort through the tags*/
     void sortTags ();
     /** helper function to generate the publications*/
@@ -214,7 +218,7 @@ class Player : public App
     std::map<std::string, int> pubids;  //!< publication id map
     std::map<std::string, int> eptids;  //!< endpoint id maps
     helics::data_type defType =
-      helics::data_type::helicsString;  //!< the default data type unless otherwise specified
+      helics::data_type::helics_string;  //!< the default data type unless otherwise specified
     size_t pointIndex = 0;  //!< the current point index
     size_t messageIndex = 0;  //!< the current message index
     time_units units = time_units::sec;

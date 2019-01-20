@@ -1,5 +1,5 @@
 /*
-Copyright © 2017-2018,
+Copyright © 2017-2019,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
@@ -148,7 +148,7 @@ void FederateState::reset ()
 {
     global_id = global_federate_id ();
     interfaceInformation.setGlobalId (global_federate_id ());
-    local_id = federate_id_t ();
+    local_id = local_federate_id ();
     state = HELICS_CREATED;
     queue.clear ();
     delayQueues.clear ();
@@ -1367,8 +1367,17 @@ void FederateState::setInterfaceProperty (const ActionMessage &cmd)
                                                       checkActionFlag (cmd, indicator_flag));
         if (!used)
         {
-            LOG_WARNING (fmt::format ("property {} not used on input {}", cmd.messageID,
-                                      interfaceInformation.getInput (cmd.dest_handle)->key));
+            auto ipt = interfaceInformation.getInput(cmd.dest_handle);
+            if (ipt != nullptr)
+            {
+                LOG_WARNING(fmt::format("property {} not used on input {}", cmd.messageID,
+                    ipt->key));
+            }
+            else
+            {
+                LOG_WARNING(fmt::format("property {} not used on due to unknown input", cmd.messageID));
+            }
+           
         }
         break;
     case 'p':
@@ -1376,8 +1385,16 @@ void FederateState::setInterfaceProperty (const ActionMessage &cmd)
                                                             checkActionFlag (cmd, indicator_flag));
         if (!used)
         {
-            LOG_WARNING (fmt::format ("property {} not used on publication {}", cmd.messageID,
-                                      interfaceInformation.getPublication (cmd.dest_handle)->key));
+            auto pub = interfaceInformation.getPublication(cmd.dest_handle);
+            if (pub != nullptr)
+            {
+                LOG_WARNING(fmt::format("property {} not used on Publication {}", cmd.messageID,
+                    pub->key));
+            }
+            else
+            {
+                LOG_WARNING(fmt::format("property {} not used on due to unknown Publication", cmd.messageID));
+            }
         }
         break;
     case 'e':
@@ -1385,8 +1402,16 @@ void FederateState::setInterfaceProperty (const ActionMessage &cmd)
                                                       checkActionFlag (cmd, indicator_flag));
         if (!used)
         {
-            LOG_WARNING (fmt::format ("property {} not used on endpoint {}", cmd.messageID,
-                                      interfaceInformation.getEndpoint (cmd.dest_handle)->key));
+            auto ept = interfaceInformation.getEndpoint(cmd.dest_handle);
+            if (ept != nullptr)
+            {
+                LOG_WARNING(fmt::format("property {} not used on Endpoint {}", cmd.messageID,
+                    ept->key));
+            }
+            else
+            {
+                LOG_WARNING(fmt::format("property {} not used on due to unknown Endpoint", cmd.messageID));
+            }
         }
         break;
     default:

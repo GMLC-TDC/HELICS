@@ -1,5 +1,5 @@
 /*
-Copyright © 2017-2018,
+Copyright © 2017-2019,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
@@ -34,7 +34,13 @@ class Endpoint
         // returns int, 1 = true, 0 = false
         return helicsEndpointHasMessage (ep) > 0;
     }
-
+    /** set the default destination for an endpoint*/
+    void setDefaultDestination (const std::string &dest)
+    {
+        helicsEndpointSetDefaultDestination (ep, dest.c_str (), hThrowOnError ());
+    }
+    /** get the default destination for an endpoint*/
+    const char *getDefaultDestination () const { return helicsEndpointGetDefaultDestination (ep); }
     /** Returns the number of pending receives for endpoint **/
     uint64_t pendingMessages () const { return helicsEndpointPendingMessages (ep); }
 
@@ -42,9 +48,20 @@ class Endpoint
     helics_message getMessage () { return helicsEndpointGetMessage (ep); }
 
     /** Methods for sending a message **/
+    void sendMessage (const char *data, size_t len)
+    {
+        helicsEndpointSendMessageRaw (ep, NULL, data, static_cast<int> (len), hThrowOnError ());
+    }
+
+    /** Methods for sending a message **/
     void sendMessage (const std::string &dest, const char *data, size_t len)
     {
         helicsEndpointSendMessageRaw (ep, dest.c_str (), data, static_cast<int> (len), hThrowOnError ());
+    }
+
+    void sendMessage (const char *data, size_t len, helics_time time)
+    {
+        helicsEndpointSendEventRaw (ep, NULL, data, static_cast<int> (len), time, hThrowOnError ());
     }
 
     void sendMessage (const std::string &dest, const char *data, size_t len, helics_time time)
@@ -52,10 +69,22 @@ class Endpoint
         helicsEndpointSendEventRaw (ep, dest.c_str (), data, static_cast<int> (len), time, hThrowOnError ());
     }
     /** Methods for sending a message **/
+    void sendMessage (const std::string &data)
+    {
+        helicsEndpointSendMessageRaw (ep, NULL, data.c_str (), static_cast<int> (data.size ()), hThrowOnError ());
+    }
+
+    /** Methods for sending a message **/
     void sendMessage (const std::string &dest, const std::string &data)
     {
         helicsEndpointSendMessageRaw (ep, dest.c_str (), data.c_str (), static_cast<int> (data.size ()),
                                       hThrowOnError ());
+    }
+
+    void sendMessage (const std::string &data, helics_time time)
+    {
+        helicsEndpointSendEventRaw (ep, NULL, data.c_str (), static_cast<int> (data.size ()), time,
+                                    hThrowOnError ());
     }
 
     void sendMessage (const std::string &dest, const std::string &data, helics_time time)
@@ -65,10 +94,22 @@ class Endpoint
     }
 
     /** Methods for sending a message **/
+    void sendMessage (const std::vector<char> &data)
+    {
+        helicsEndpointSendMessageRaw (ep, NULL, data.data (), static_cast<int> (data.size ()), hThrowOnError ());
+    }
+
+    /** Methods for sending a message **/
     void sendMessage (const std::string &dest, const std::vector<char> &data)
     {
         helicsEndpointSendMessageRaw (ep, dest.c_str (), data.data (), static_cast<int> (data.size ()),
                                       hThrowOnError ());
+    }
+
+    void sendMessage (const std::vector<char> &data, helics_time time)
+    {
+        helicsEndpointSendEventRaw (ep, NULL, data.data (), static_cast<int> (data.size ()), time,
+                                    hThrowOnError ());
     }
 
     void sendMessage (const std::string &dest, const std::vector<char> &data, helics_time time)

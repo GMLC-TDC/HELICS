@@ -1,5 +1,5 @@
 /*
-Copyright © 2017-2018,
+Copyright © 2017-2019,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
@@ -42,7 +42,7 @@ class SimpleQueue
         pullElements.clear ();
     }
     /** constructor with a reservation size
-    @param[in] capacity  the initial storage capacity of the queue*/
+    @param capacity  the initial storage capacity of the queue*/
     explicit SimpleQueue (size_t capacity)
     {  // don't need to lock since we aren't out of the constructor yet
         pushElements.reserve (capacity);
@@ -96,7 +96,7 @@ class SimpleQueue
     }
     /** set the capacity of the queue
     actually double the requested the size will be reserved due to the use of two vectors internally
-    @param[in] capacity  the capacity to reserve
+    @param capacity  the capacity to reserve
     */
     void reserve (size_t capacity)
     {

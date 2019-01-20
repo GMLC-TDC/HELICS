@@ -1,5 +1,5 @@
 /*
-Copyright © 2017-2018,
+Copyright © 2017-2019,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
@@ -12,7 +12,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 
 namespace helics
 {
-FilterFederateManager::FilterFederateManager (Core *coreObj, Federate *ffed, federate_id_t id)
+FilterFederateManager::FilterFederateManager (Core *coreObj, Federate *ffed, local_federate_id id)
     : coreObject (coreObj), fed (ffed), fedID (id)
 {
 }
@@ -100,7 +100,7 @@ int FilterFederateManager::getFilterCount () const { return static_cast<int> (fi
 
 void FilterFederateManager::closeAllFilters ()
 {
-    if (coreObject)
+    if (coreObject != nullptr)
     {
         auto filts = filters.lock ();
         for (auto &filt : filts)

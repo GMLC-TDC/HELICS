@@ -1,5 +1,5 @@
 /*
-Copyright © 2017-2018,
+Copyright © 2017-2019,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
@@ -25,7 +25,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include <set>
 #include <stdexcept>
 #include <thread>
-#include "boost/filesystem.hpp"
+#include <boost/filesystem.hpp>
 
 namespace filesystem = boost::filesystem;
 
@@ -89,7 +89,13 @@ Recorder::Recorder (const std::string &appName, const std::string &jsonString) :
     Recorder::loadJsonFile (jsonString);
 }
 
-Recorder::~Recorder () { saveFile (outFileName); }
+Recorder::~Recorder () try
+{
+    saveFile (outFileName);
+}
+catch (...)
+{
+}
 
 void Recorder::loadJsonFile (const std::string &jsonString)
 {

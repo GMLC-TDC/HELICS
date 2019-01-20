@@ -14,9 +14,9 @@
 
 namespace utilities
 {
-charMapper<bool> numericMapper ()
+CharMapper<bool> numericMapper ()
 {
-    charMapper<bool> nm (false);
+    CharMapper<bool> nm (false);
     nm.addKey ('0', true);
     nm.addKey ('1', true);
     nm.addKey ('2', true);
@@ -36,9 +36,9 @@ charMapper<bool> numericMapper ()
     return nm;
 }
 
-charMapper<bool> numericStartMapper ()
+CharMapper<bool> numericStartMapper ()
 {
-    charMapper<bool> nm (false);
+    CharMapper<bool> nm (false);
     nm.addKey ('0', true);
     nm.addKey ('1', true);
     nm.addKey ('2', true);
@@ -60,9 +60,9 @@ charMapper<bool> numericStartMapper ()
     return nm;
 }
 
-charMapper<bool> numericEndMapper ()
+CharMapper<bool> numericEndMapper ()
 {
-    charMapper<bool> nm (false);
+    CharMapper<bool> nm (false);
     nm.addKey ('0', true);
     nm.addKey ('1', true);
     nm.addKey ('2', true);
@@ -81,9 +81,9 @@ charMapper<bool> numericEndMapper ()
     return nm;
 }
 
-charMapper<unsigned char> base64Mapper ()
+CharMapper<unsigned char> base64Mapper ()
 {
-    charMapper<unsigned char> b64 (0xFF);
+    CharMapper<unsigned char> b64 (0xFF);
     unsigned char val = 0;
     for (unsigned char c = 'A'; c <= 'Z'; ++c)
     {
@@ -105,9 +105,9 @@ charMapper<unsigned char> base64Mapper ()
     return b64;
 }
 
-charMapper<unsigned char> digitMapper ()
+CharMapper<unsigned char> digitMapper ()
 {
-    charMapper<unsigned char> dMap (0xFF);
+    CharMapper<unsigned char> dMap (0xFF);
     unsigned char val = 0;
     for (unsigned char c = '0'; c <= '9'; ++c)
     {
@@ -117,9 +117,9 @@ charMapper<unsigned char> digitMapper ()
     return dMap;
 }
 
-charMapper<unsigned char> hexMapper ()
+CharMapper<unsigned char> hexMapper ()
 {
-    charMapper<unsigned char> dMap (0xFF);
+    CharMapper<unsigned char> dMap (0xFF);
     unsigned char val = 0;
     for (unsigned char c = '0'; c <= '9'; ++c)
     {
@@ -140,9 +140,9 @@ charMapper<unsigned char> hexMapper ()
     return dMap;
 }
 
-charMapper<unsigned char> pairMapper ()
+CharMapper<unsigned char> pairMapper ()
 {
-    charMapper<unsigned char> dMap (0);
+    CharMapper<unsigned char> dMap (0);
     for (unsigned char ii = 0; ii < 255; ++ii)
     {
         dMap.addKey (ii, ii);

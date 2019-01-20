@@ -1,5 +1,5 @@
 /*
-Copyright © 2017-2018,
+Copyright © 2017-2019,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
@@ -178,6 +178,8 @@ void HandleManager::setHandleOption (interface_handle handle, int option, bool v
                 clearActionFlag (handles[index], optional_flag);
             }
             break;
+        default:
+            break;
         }
     }
 }
@@ -330,11 +332,11 @@ BasicHandleInfo *HandleManager::getFilter (interface_handle handle)
     return nullptr;
 }
 
-federate_id_t HandleManager::getLocalFedID (interface_handle id_) const
+local_federate_id HandleManager::getLocalFedID (interface_handle handle) const
 {
     // only activate the lock if we not in an operating state
-    auto index = id_.baseValue ();
-    return (isValidIndex (index, handles)) ? handles[index].local_fed_id : federate_id_t ();
+    auto index = handle.baseValue ();
+    return (isValidIndex (index, handles)) ? handles[index].local_fed_id : local_federate_id{};
 }
 
 void HandleManager::addSearchFields (const BasicHandleInfo &handle, int32_t index)

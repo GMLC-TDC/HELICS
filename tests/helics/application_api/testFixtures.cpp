@@ -1,5 +1,5 @@
 /*
-Copyright © 2017-2018,
+Copyright © 2017-2019,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
@@ -53,23 +53,6 @@ auto StartBrokerImp (const std::string &core_type_name, const std::string &initi
     return broker;
 }
 
-bool FederateTestFixture::hasIndexCode (const std::string &type_name)
-{
-    if (std::isdigit (type_name.back ()) != 0)
-    {
-        if (*(type_name.end () - 2) == '_')
-        {  // this setup ignores the setup mode
-            return true;
-        }
-    }
-    return false;
-}
-
-int FederateTestFixture::getIndexCode (const std::string &type_name)
-{
-    return static_cast<int> (type_name.back () - '0');
-}
-
 FederateTestFixture::~FederateTestFixture ()
 {
     for (auto &fed : federates)
@@ -89,7 +72,7 @@ FederateTestFixture::~FederateTestFixture ()
         }
         else
         {
-            broker->waitForDisconnect (std::chrono::milliseconds (2000));
+            broker->waitForDisconnect (std::chrono::milliseconds (200));
         }
 
         if (broker->isConnected ())

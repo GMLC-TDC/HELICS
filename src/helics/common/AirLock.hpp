@@ -1,5 +1,5 @@
 /*
-Copyright © 2017-2018,
+Copyright © 2017-2019,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
@@ -26,8 +26,6 @@ class AirLock
   public:
     /** default constructor */
     AirLock () = default;
-    /** destructor*/
-    ~AirLock () = default;
     /** try to load the airlock
     @return true if successful, false if not*/
     template <class Z>
