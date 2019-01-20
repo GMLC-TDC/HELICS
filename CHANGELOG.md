@@ -5,15 +5,16 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 A note on future revisions.  
-  Everything within a major version number should be code compatible (With the exception of experimental interfaces).  The most notable example of an experimental interface is the support for multiple source inputs.  The API's to deal with this will change in future minor releases.    Everything within a single minor release should be network compatible with other federates on the same minor release number.  Compatibility across minor release numbers may be possible in some situations but we are not going to guarantee this as those components are subject to performance improvements and may need to be modified at some point.  patch releases will be limited to bug fixes and other improvements not impacting the public API or network compatibility.  
+  Everything within a major version number should be code compatible (With the exception of experimental interfaces).  The most notable example of an experimental interface is the support for multiple source inputs.  The API's to deal with this will change in future minor releases.    Everything within a single minor release should be network compatible with other federates on the same minor release number.  Compatibility across minor release numbers may be possible in some situations but we are not going to guarantee this as those components are subject to performance improvements and may need to be modified at some point.  patch releases will be limited to bug fixes and other improvements not impacting the public API or network compatibility.  Check [here](./docs/Public_API.md) for details of what is included and excluded from the public API and version stability.
 
-## [2.0.0] - 2019-01-23
+
+## [2.0.0] - 2019-01-24
 
 This is a major revision so this changelog will not capture all the changes that have been made in detail. Some highlights:
   - major revision to the API including
     - use of an error object in the C api function instead of a return code.
     - better match the C++ api in terms of function names and layers.
-    - the C++ api now uses objects for the interfaces instead of identification ids.
+    - The C++ api now uses objects for the interfaces instead of identification ids.
   - Filters can have multiple Targets
   - Define an input object which can be addressed from outside the federate
   - add a ZMQ_SS core type useful for large numbers of federates on a single machine.
