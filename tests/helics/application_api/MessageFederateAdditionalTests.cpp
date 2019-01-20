@@ -1,5 +1,5 @@
 /*
-Copyright © 2017-2018,
+Copyright © 2017-2019,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
@@ -50,13 +50,13 @@ BOOST_DATA_TEST_CASE (message_federate_endpoint_registration, bdata::make (core_
 
     BOOST_CHECK (mFed1->getCurrentMode () == helics::Federate::modes::executing);
 
-    auto &sv = mFed1->getEndpointName (epid);
-    auto &sv2 = mFed1->getEndpointName (epid2);
+    auto &sv = mFed1->getInterfaceName (epid);
+    auto &sv2 = mFed1->getInterfaceName (epid2);
     BOOST_CHECK_EQUAL (sv, "fed0/ep1");
     BOOST_CHECK_EQUAL (sv2, "ep2");
 
-    BOOST_CHECK_EQUAL (mFed1->getEndpointType (epid), "");
-    BOOST_CHECK_EQUAL (mFed1->getEndpointType (epid2), "random");
+    BOOST_CHECK_EQUAL (mFed1->getExtractionType (epid), "");
+    BOOST_CHECK_EQUAL (mFed1->getExtractionType (epid2), "random");
 
     BOOST_CHECK (mFed1->getEndpoint ("ep1").getHandle () == epid.getHandle ());
     BOOST_CHECK (mFed1->getEndpoint ("fed0/ep1").getHandle () == epid.getHandle ());
@@ -255,7 +255,7 @@ BOOST_DATA_TEST_CASE (message_federate_send_receive_2fed_multisend_callback,
     mFed2->enterExecutingMode ();
     f1finish.wait ();
 
-    BOOST_CHECK (mFed1->getCurrentMode() == helics::Federate::modes::executing);
+    BOOST_CHECK (mFed1->getCurrentMode () == helics::Federate::modes::executing);
     BOOST_CHECK (mFed2->getCurrentMode () == helics::Federate::modes::executing);
 
     helics::data_block data1 (500, 'a');
@@ -435,7 +435,7 @@ class PingPongFed
 
 BOOST_DATA_TEST_CASE (threefedPingPong, bdata::make (core_types), core_type)
 {
-    if (core_type != "test")
+    if (core_type != std::string ("test"))
     {
         return;
     }
@@ -478,7 +478,7 @@ BOOST_DATA_TEST_CASE (test_file_load, bdata::make (config_files), file)
 
     BOOST_CHECK_EQUAL (mFed.getEndpointCount (), 2);
     auto id = mFed.getEndpoint ("ept1");
-    BOOST_CHECK_EQUAL (mFed.getEndpointType (id), "genmessage");
+    BOOST_CHECK_EQUAL (mFed.getExtractionType (id), "genmessage");
     BOOST_CHECK_EQUAL (id.getInfo (), "this is an information string for use by the application");
 
     BOOST_CHECK_EQUAL (mFed.query ("global", "global1"), "this is a global1 value");
@@ -496,7 +496,7 @@ BOOST_DATA_TEST_CASE (test_file_load_filter, bdata::make (filter_config_files), 
 
     BOOST_CHECK_EQUAL (mFed.getEndpointCount (), 3);
     auto id = mFed.getEndpoint ("ept1");
-    BOOST_CHECK_EQUAL (mFed.getEndpointType (id), "genmessage");
+    BOOST_CHECK_EQUAL (mFed.getExtractionType (id), "genmessage");
 
     BOOST_CHECK_EQUAL (mFed.filterCount (), 3);
 

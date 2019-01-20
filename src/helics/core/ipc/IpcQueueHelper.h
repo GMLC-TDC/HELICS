@@ -1,5 +1,5 @@
 /*
-Copyright © 2017-2018,
+Copyright © 2017-2019,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
@@ -43,7 +43,7 @@ enum class queue_state_t : int
 
 /** class defining a shared queue state meaning interaction with a queue the object is not the owner of
  */
-class shared_queue_state
+class SharedQueueState
 {
   private:
     using ipcmutex = boost::interprocess::interprocess_mutex;
@@ -92,7 +92,7 @@ class shared_queue_state
 };
 
 /** class implementing a queue owned by a particular object*/
-class ownedQueue
+class OwnedQueue
 {
   private:
     std::unique_ptr<ipc_queue> rqueue;
@@ -106,8 +106,8 @@ class ownedQueue
     bool connected = false;
 
   public:
-    ownedQueue () = default;
-    ~ownedQueue ();
+    OwnedQueue () = default;
+    ~OwnedQueue ();
     bool connect (const std::string &connection, int maxMessages, int maxSize);
 
     void changeState (queue_state_t newState);
@@ -119,7 +119,7 @@ class ownedQueue
 };
 
 /** class implementing interactions with a queue to transmit data*/
-class sendToQueue
+class SendToQueue
 {
   private:
     std::unique_ptr<ipc_queue> txqueue;  //!< the actual interprocess queue
@@ -130,7 +130,7 @@ class sendToQueue
     bool connected = false;  //!< flag indicating connectivity
 
   public:
-    sendToQueue () = default;
+    SendToQueue () = default;
 
     bool connect (const std::string &connection, bool initOnly, int retries);
 
@@ -140,4 +140,3 @@ class sendToQueue
 };
 }  // namespace ipc
 }  // namespace helics
-

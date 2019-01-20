@@ -1,23 +1,19 @@
-Pub/Sub vs Message
+Value vs Message
 ==================
 
-  -------------------------------------------------------------------
-  Publish/Subscribe                 Message
-  --------------------------------- ---------------------------------
-  Fixed routes at initialization    Routes at transmission time
 
-  1 to N relationship               All endpoints are routable -
-                                    Unless specified otherwise
+  |[Publication](./Publications)/[Input](./Inputs) Values            |  [Endpoint](./Endpoints)                         |
+  |---------------------------------|: ---------------------------------|
+  |Fixed routes at initialization    |Routes at transmission time|
+  |1 to N relationship (publications) N to 1 relationship for Inputs |              All endpoints are routable -Unless specified otherwise|
+  |Values exist until updated        |Destination specified|
+  |Default values                    |Rerouting/modification through filters|
+  |Associated units                  |Data exists as singular blobs -No records kept|
+  |No direct request mechanism                |May define a message time - Act as events|
 
-  Values exist until updated        Destination specified
 
-  Default values                    Rerouting through filters
 
-  Associated units                  Data exists as singular blobs -
-                                    No records kept
+Other Notes
+ - Endpoints can subscribe to publications to get a message for each data point
 
-  Publisher is Fixed                May define a message time - Act
-                                    as events
-
-  No direct request mechanism
-  -------------------------------------------------------------------
+ - Both can be nameless to be non-routable from outside the defining federate

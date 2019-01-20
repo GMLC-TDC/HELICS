@@ -1,16 +1,20 @@
 /*
-Copyright © 2017-2018,
+Copyright © 2017-2019,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
 #pragma once
 /** @file
-@details base helics enumerations for C++ API's,  a namespace wrapper for the definitions defined in helics_enums.h
+@brief base helics enumerations for C++ API's, a namespace wrapper for the definitions defined in \ref
+helics_enums.h
 */
 #include "helics/helics_enums.h"
 
 namespace helics
 {
+/** @namespace defs enum definitions for use in the C++ api
+The defs namespace contains several enumerations for use in functions that take property types or values
+or small sets of options*/
 namespace defs
 {
 /** flags that can be used to set different options for a federate*/

@@ -14,5 +14,5 @@ function varargout = helicsFederateGetName(varargin)
     %-------
     %helics_status object indicating success or error
     %
-  [varargout{1:nargout}] = helicsMEX(111, varargin{:});
+  [varargout{1:nargout}] = helicsMEX(112, varargin{:});
 end

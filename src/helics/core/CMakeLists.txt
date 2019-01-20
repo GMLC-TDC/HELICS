@@ -1,5 +1,5 @@
 #
-# Copyright © 2017-2018, Battelle Memorial Institute; Lawrence Livermore National
+# Copyright © 2017-2019, Battelle Memorial Institute; Lawrence Livermore National
 # Security, LLC; Alliance for Sustainable Energy, LLC All rights reserved. See LICENSE
 # file and DISCLAIMER for more details.
 #
@@ -62,6 +62,7 @@ set(
 	zmq/ZmqCore.cpp
 	zmq/ZmqBroker.cpp
 	zmq/ZmqComms.cpp
+	zmq/ZmqCommsSS.cpp
 	zmq/ZmqRequestSets.cpp
 )
 
@@ -139,7 +140,7 @@ ipc/IpcBlockingPriorityQueue.hpp
 ipc/IpcBlockingPriorityQueueImpl.hpp
 )
 
-set(ZMQ_HEADER_FILES zmq/ZmqCore.h zmq/ZmqBroker.h zmq/ZmqComms.h zmq/ZmqRequestSets.h)
+set(ZMQ_HEADER_FILES zmq/ZmqCore.h zmq/ZmqBroker.h zmq/ZmqComms.h zmq/ZmqCommsSS.h zmq/ZmqRequestSets.h)
 
 set(MPI_HEADER_FILES mpi/MpiCore.h mpi/MpiBroker.h mpi/MpiComms.h mpi/MpiService.h)
 

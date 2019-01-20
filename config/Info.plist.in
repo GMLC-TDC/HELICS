@@ -23,7 +23,7 @@
 	<key>CFBundleVersion</key>
 	<string>@HELICS_VERSION@</string>
 	<key>NSHumanReadableCopyright</key>
-	<string>Copyright © 2017-2018, Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC</string>
+	<string>Copyright © 2017-2019, Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC</string>
 	<key>NSPrincipalClass</key>
 	<string>NSApplication</string>
 </dict>

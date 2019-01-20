@@ -1,5 +1,5 @@
 /*
-Copyright © 2017-2018,
+Copyright © 2017-2019,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
@@ -17,15 +17,17 @@ namespace helics
 {
 enum class interface_networks : char;
 
-constexpr route_id control_route(-1);
-  /** implementation of a generic communications interface
+constexpr route_id control_route (-1);
+/** implementation of a generic communications interface
  */
 class CommsInterface
 {
   public:
+    /** enumeration of whether the threading system should generate a single thread or multiple threads*/
     enum class thread_generation
     {
-        single, dual
+        single,
+        dual
     };
     /** default constructor*/
     CommsInterface () = default;
@@ -33,11 +35,11 @@ class CommsInterface
     /** destructor*/
     virtual ~CommsInterface ();
 
-	/** load network information into the comms object*/
+    /** load network information into the comms object*/
     virtual void loadNetworkInfo (const NetworkBrokerData &netInfo);
-	void loadTargetInfo(const std::string &localTarget,
-                    const std::string &brokerTarget,
-                    interface_networks targetNetwork = interface_networks::local);
+    void loadTargetInfo (const std::string &localTarget,
+                         const std::string &brokerTarget,
+                         interface_networks targetNetwork = interface_networks::local);
     /** transmit a message along a particular route
      */
     void transmit (route_id rid, const ActionMessage &cmd);
@@ -71,23 +73,28 @@ class CommsInterface
       std::function<void(int level, const std::string &name, const std::string &message)> callback);
     /** set the max message size and max Queue size
      */
-    void setMessageSize (int maxMessageSize, int maxMessageCount);
+    void setMessageSize (int maxMsgSize, int maxCount);
     /** check if the commInterface is connected
      */
     bool isConnected () const;
 
     /** set the timeout for the initial broker connection
-    @param timeout the value is in milliseconds
+    @param timeOut the value is in milliseconds
     */
-	void setTimeout(std::chrono::milliseconds timeOut);
+    void setTimeout (std::chrono::milliseconds timeOut);
     /** set a flag for the comms system*/
-	virtual void setFlag (const std::string &flag, bool val);
-	/** enable or disable the server mode for the comms*/
-	void setServerMode(bool serverActive);
+    virtual void setFlag (const std::string &flag, bool val);
+    /** enable or disable the server mode for the comms*/
+    void setServerMode (bool serverActive);
 
   protected:
+    /** generate a log message as a warning*/
     void logWarning (const std::string &message) const;
+    /** generate a log message as an error*/
     void logError (const std::string &message) const;
+    /** generate a log message as a level above warning or error*/
+    void logMessage (const std::string &message) const;
+
   protected:
     // enumeration of the connection status flags for more immediate feedback from the processing threads
     enum class connection_status : int
@@ -107,32 +114,35 @@ class CommsInterface
     TriggerVariable rxTrigger;
 
     std::string name;  //!< the name of the object
-    std::string localTarget_;  //!< the base for the receive address
-    std::string brokerTarget_;  //!< the base for the broker address
-    std::string brokerName_;  //!< the identifier for the broker
-    std::string brokerInitString_;  //!< the initialization string for any automatically generated broker
+    std::string localTargetAddress;  //!< the base for the receive address
+    std::string brokerTargetAddress;  //!< the base for the broker address
+    std::string brokerName;  //!< the identifier for the broker
+    std::string brokerInitString;  //!< the initialization string for any automatically generated broker
   private:
     std::atomic<connection_status> tx_status{
       connection_status::startup};  //!< the status of the transmitter thread
     TriggerVariable txTrigger;
-    std::atomic<bool> operating;  //!< the comms interface is in startup mode
-    const bool singleThread = false;
+    std::atomic<bool> operating{false};  //!< the comms interface is in startup mode
+    const bool singleThread{false};
+
   protected:
-	 bool serverMode = true;  //!< some comms have a server mode and non-server mode
-    bool autoBroker = false; //!< the broker should be automatically generated if needed
-     std::chrono::milliseconds connectionTimeout{ 4000 };  // timeout for the initial connection to a broker or to bind a broker port(in ms)
-    int maxMessageSize_ = 16 * 1024;  //!< the maximum message size for the queues (if needed)
-    int maxMessageCount_ = 512;  //!< the maximum number of message to buffer (if needed)
-    std::atomic<bool> requestDisconnect{ false }; //!< flag gets set when disconnect is called
+    bool serverMode = true;  //!< some comms have a server mode and non-server mode
+    bool autoBroker = false;  //!< the broker should be automatically generated if needed
+    std::chrono::milliseconds connectionTimeout{
+      4000};  // timeout for the initial connection to a broker or to bind a broker port(in ms)
+    int maxMessageSize = 16 * 1024;  //!< the maximum message size for the queues (if needed)
+    int maxMessageCount = 512;  //!< the maximum number of message to buffer (if needed)
+    std::atomic<bool> requestDisconnect{false};  //!< flag gets set when disconnect is called
     std::function<void(ActionMessage &&)> ActionCallback;  //!< the callback for what to do with a received message
     std::function<void(int level, const std::string &name, const std::string &message)>
       loggingCallback;  //!< callback for logging
-    BlockingPriorityQueue<std::pair<route_id, ActionMessage>> txQueue;  //!< set of messages waiting to be transmitted
+    BlockingPriorityQueue<std::pair<route_id, ActionMessage>>
+      txQueue;  //!< set of messages waiting to be transmitted
     // closing the files or connection can take some time so there is a need for inter-thread communication to not
     // spit out warning messages if it is in the process of disconnecting
     std::atomic<bool> disconnecting{
       false};  //!< flag indicating that the comm system is in the process of disconnecting
-    interface_networks interfaceNetwork;
+    interface_networks interfaceNetwork = interface_networks::local;
 
   private:
     std::thread queue_transmitter;  //!< single thread for sending data
@@ -150,7 +160,7 @@ class CommsInterface
     connection_status getRxStatus () const { return rx_status.load (); }
     connection_status getTxStatus () const { return tx_status.load (); }
     /** function to protect certain properties in a threaded environment
-	these functions should be called in a pair*/
+    these functions should be called in a pair*/
     bool propertyLock ();
     void propertyUnLock ();
 
@@ -159,7 +169,7 @@ class CommsInterface
 };
 
 template <class X>
-class conditionalChangeOnDestroy
+class ConditionalChangeOnDestroy
 {
   private:
     std::atomic<X> &aref;
@@ -167,11 +177,11 @@ class conditionalChangeOnDestroy
     X expectedValue;
 
   public:
-    conditionalChangeOnDestroy (std::atomic<X> &var, X finalValue, X expValue)
+    ConditionalChangeOnDestroy (std::atomic<X> &var, X finalValue, X expValue)
         : aref (var), fval (std::move (finalValue)), expectedValue (std::move (expValue))
     {
     }
-    ~conditionalChangeOnDestroy () { aref.compare_exchange_strong (expectedValue, fval); }
+    ~ConditionalChangeOnDestroy () { aref.compare_exchange_strong (expectedValue, fval); }
 };
 
 }  // namespace helics

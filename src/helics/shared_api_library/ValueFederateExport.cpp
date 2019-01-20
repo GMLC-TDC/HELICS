@@ -1,5 +1,5 @@
 /*
-Copyright © 2017-2018,
+Copyright © 2017-2019,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
@@ -12,10 +12,10 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include <mutex>
 #include <vector>
 
-// random integer for validation purposes of inputs
+/** random integer for validation purposes of inputs */
 static const int InputValidationIdentifier = 0x3456'E052;
 
-// random integer for validation purposes of publications
+/** random integer for validation purposes of publications */
 static const int PublicationValidationIdentifier = 0x97B1'00A5;
 
 static const char *invalidInputString = "The given input object does not point to a valid object";
@@ -681,7 +681,7 @@ void helicsPublicationPublishComplex (helics_publication pub, double real, doubl
     }
 }
 
-void helicsPublicationPublishVector (helics_publication pub, const double *vectorInput, int vectorlength, helics_error *err)
+void helicsPublicationPublishVector (helics_publication pub, const double *vectorInput, int vectorLength, helics_error *err)
 {
     auto pubObj = verifyPublication (pub, err);
     if (pubObj == nullptr)
@@ -690,13 +690,13 @@ void helicsPublicationPublishVector (helics_publication pub, const double *vecto
     }
     try
     {
-        if ((vectorInput == nullptr) || (vectorlength <= 0))
+        if ((vectorInput == nullptr) || (vectorLength <= 0))
         {
             pubObj->pubPtr->publish (std::vector<double> ());
         }
         else
         {
-            pubObj->pubPtr->publish (vectorInput, vectorlength);
+            pubObj->pubPtr->publish (vectorInput, vectorLength);
         }
     }
     catch (...)
@@ -1056,7 +1056,7 @@ void helicsInputGetNamedPoint (helics_input inp, char *outputString, int maxStri
     }
     try
     {
-        helics::named_point np = inpObj->inputPtr->getValue<helics::named_point> ();
+        helics::NamedPoint np = inpObj->inputPtr->getValue<helics::NamedPoint> ();
         int length = std::min (static_cast<int> (np.name.size ()), maxStringLen);
         memcpy (outputString, np.name.data (), length);
 
@@ -1234,7 +1234,7 @@ void helicsInputSetDefaultComplex (helics_input inp, double real, double imag, h
     }
 }
 
-void helicsInputSetDefaultVector (helics_input inp, const double *vectorInput, int vectorlength, helics_error *err)
+void helicsInputSetDefaultVector (helics_input inp, const double *vectorInput, int vectorLength, helics_error *err)
 {
     auto inpObj = verifyInput (inp, err);
     if (inpObj == nullptr)
@@ -1243,13 +1243,13 @@ void helicsInputSetDefaultVector (helics_input inp, const double *vectorInput, i
     }
     try
     {
-        if ((vectorInput == nullptr) || (vectorlength <= 0))
+        if ((vectorInput == nullptr) || (vectorLength <= 0))
         {
             inpObj->inputPtr->setDefault (std::vector<double>{});
         }
         else
         {
-            inpObj->inputPtr->setDefault (std::vector<double> (vectorInput, vectorInput + vectorlength));
+            inpObj->inputPtr->setDefault (std::vector<double> (vectorInput, vectorInput + vectorLength));
         }
     }
     catch (...)
@@ -1267,7 +1267,7 @@ void helicsInputSetDefaultNamedPoint (helics_input inp, const char *str, double 
     }
     try
     {
-        inpObj->inputPtr->setDefault (helics::named_point (AS_STRING (str), val));
+        inpObj->inputPtr->setDefault (helics::NamedPoint (AS_STRING (str), val));
     }
     catch (...)
     {
@@ -1342,7 +1342,7 @@ const char *helicsInputGetKey (helics_input inp)
 
     try
     {
-        const std::string &key = inpObj->inputPtr->getName ();
+        const std::string &key = inpObj->inputPtr->getKey ();
         return key.c_str ();
     }
     catch (...)

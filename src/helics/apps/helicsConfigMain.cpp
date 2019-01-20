@@ -1,5 +1,5 @@
 /*
-Copyright © 2017-2018,
+Copyright © 2017-2019,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
@@ -50,7 +50,7 @@ path dir_path (const char *filename, const char *tail)
     {
         dpath = path (HELICS_INSTALL_PREFIX) / tail;
     }
-#if BOOST_VERSION_LEVEL > 0
+#if BOOST_VERSION_LEVEL > 60
     dpath = dpath.lexically_normal ();
 #endif
     return dpath.make_preferred ();
@@ -81,7 +81,7 @@ path base_path (const char *filename)
     {
         dpath = path (HELICS_INSTALL_PREFIX);
     }
-#if BOOST_VERSION_LEVEL > 0
+#if BOOST_VERSION_LEVEL > 60
     dpath = dpath.lexically_normal ();
 #endif
     return dpath.make_preferred ();
@@ -109,7 +109,7 @@ int main (int argc, char *argv[])
         else if (arg == "--prefix")
         {
             path bpath = base_path (argv[0]);
-#if BOOST_VERSION_LEVEL > 0
+#if BOOST_VERSION_LEVEL > 60
             bpath = bpath.lexically_normal ();
 #endif
             std::cout << bpath.make_preferred () << '\n';

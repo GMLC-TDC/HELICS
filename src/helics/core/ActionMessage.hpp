@@ -1,5 +1,5 @@
 /*
-Copyright © 2017-2018,
+Copyright © 2017-2019,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
@@ -37,7 +37,7 @@ class ActionMessage
     interface_handle dest_handle;  //!< 24 local handle for a targeted message
     uint16_t counter = 0;  //!< 26 counter for filter tracking or message counter
     uint16_t flags = 0;  //!<  28 set of messageFlags
-    uint32_t sequenceID;  //!< a sequence number for ordering
+    uint32_t sequenceID = 0;  //!< a sequence number for ordering
     Time actionTime = timeZero;  //!< 40 the time an action took place or will take place	//32
     std::string
       payload;  //!< string containing the data	//96 std::string is 32 bytes on most platforms (except libc++)
@@ -54,7 +54,7 @@ class ActionMessage
     @details this is intended to be an implicit constructor
     @param startingAction from an action message definition
     */
-    /* implicit */ ActionMessage (action_message_def::action_t startingAction);
+    /* implicit */ ActionMessage (action_message_def::action_t startingAction);  // NOLINT
     /** construct from action, source and destination id's
      */
     ActionMessage (action_message_def::action_t startingAction,
@@ -75,7 +75,7 @@ class ActionMessage
     /** copy constructor*/
     ActionMessage (const ActionMessage &act);
     /** copy operator*/
-    ActionMessage &operator= (const ActionMessage &);
+    ActionMessage &operator= (const ActionMessage &act);
     /** move assignment*/
     ActionMessage &operator= (ActionMessage &&act) noexcept;
     /** get the action of the message*/
@@ -174,7 +174,7 @@ class ActionMessage
     }
     /** convert a command to a raw data bytes
     @param[out] data pointer to memory to store the command
-    @param[in] buffer_size-- the size of the buffer
+    @param buffer_size  the size of the buffer
     @return the size of the buffer actually used
     */
     int toByteArray (char *data, int buffer_size) const;
@@ -237,6 +237,10 @@ inline bool isTimingCommand (const ActionMessage &command) noexcept
     switch (command.action ())
     {
     case CMD_DISCONNECT:
+    case CMD_BROADCAST_DISCONNECT:
+    case CMD_DISCONNECT_CORE:
+    case CMD_DISCONNECT_BROKER:
+    case CMD_DISCONNECT_FED:
     case CMD_TIME_GRANT:
     case CMD_TIME_REQUEST:
     case CMD_EXEC_GRANT:
@@ -274,6 +278,8 @@ inline bool isDisconnectCommand (const ActionMessage &command) noexcept
     case CMD_DISCONNECT_CHECK:
     case CMD_DISCONNECT_NAME:
     case CMD_USER_DISCONNECT:
+    case CMD_DISCONNECT_FED:
+    case CMD_DISCONNECT_CORE:
     case CMD_PRIORITY_DISCONNECT:
     case CMD_TERMINATE_IMMEDIATELY:
     case CMD_REMOVE_FILTER:
@@ -282,8 +288,11 @@ inline bool isDisconnectCommand (const ActionMessage &command) noexcept
     case CMD_DISCONNECT_CORE_ACK:
     case CMD_DISCONNECT_BROKER_ACK:
     case CMD_DISCONNECT_BROKER:
+    case CMD_BROADCAST_DISCONNECT:
     case CMD_STOP:
         return true;
+    case CMD_TIME_GRANT:
+        return (command.actionTime == Time::maxVal ());
     default:
         return false;
     }

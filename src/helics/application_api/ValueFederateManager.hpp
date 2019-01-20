@@ -1,5 +1,5 @@
 /*
-Copyright © 2017-2018,
+Copyright © 2017-2019,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
@@ -57,7 +57,7 @@ struct input_info
 class ValueFederateManager
 {
   public:
-    ValueFederateManager (Core *coreOb, ValueFederate *vfed, federate_id_t id);
+    ValueFederateManager (Core *coreOb, ValueFederate *vfed, local_federate_id id);
     ~ValueFederateManager ();
 
     Publication &registerPublication (const std::string &key, const std::string &type, const std::string &units);
@@ -69,50 +69,49 @@ class ValueFederateManager
     /** add a shortcut for locating a subscription
     @details primarily for use in looking up an id from a different location
     creates a local shortcut for referring to a subscription which may have a long actual name
-    @param[in] the subscription identifier
-    @param[in] shortcutName the name of the shortcut
+    @param inp the subscription identifier
+    @param shortcutName the name of the shortcut
     */
     void addAlias (const Input &inp, const std::string &shortcutName);
 
     /** add a alias/shortcut for locating a publication
     @details primarily for use in looking up an id from a different location
     creates a local shortcut for referring to a subscription which may have a long actual name
-    @param[in] the subscription identifier
-    @param[in] shortcutName the name of the shortcut
+    @param pub the subscription identifier
+    @param shortcutName the name of the shortcut
     */
     void addAlias (const Publication &pub, const std::string &shortcutName);
     /** add a destination target to a publication
-   @param id the identifier of the input
-   target the name of the input to send the data to
+   @param pub the identifier of the input
+   @param target the name of the input to send the data to
    */
     void addTarget (const Publication &pub, const std::string &target);
     /** add a source target to an input/subscription
-    @param id the identifier of the publication
-    target the name of the input to send the data to
+    @param inp the identifier of the publication
+    @param target the name of the input to send the data to
     */
     void addTarget (const Input &inp, const std::string &target);
 
-	/** remove a destination target from a publication
-	@param id the identifier of the input
-	target the name of the input to remove
-	*/
-	void removeTarget(const Publication &pub, const std::string &target);
-	/** remove a source target from an input/subscription
-	@param id the identifier of the publication
-	target the name of the publication to remove
-	*/
-	void removeTarget(const Input &inp, const std::string &target);
-
+    /** remove a destination target from a publication
+    @param pub the identifier of the input
+    @param target the name of the input to remove
+    */
+    void removeTarget (const Publication &pub, const std::string &target);
+    /** remove a source target from an input/subscription
+    @param inp the identifier of the publication
+    @param target the name of the publication to remove
+    */
+    void removeTarget (const Input &inp, const std::string &target);
 
     /** set the default value for a subscription
     @details this is the value returned prior to any publications
-    @param[in] id the subscription identifier
-    @param[in] block the data block representing the default value
+    @param inp the subscription identifier
+    @param block the data block representing the default value
     */
     void setDefaultValue (const Input &inp, const data_view &block);
 
     /** get a value as raw data block from the system
-    @param[in] id the identifier for the subscription
+    @param inp the identifier for the subscription
     @return a constant data block
     */
     data_view getValue (const Input &inp);
@@ -126,8 +125,8 @@ class ValueFederateManager
     Time getLastUpdateTime (const Input &inp) const;
 
     /** update the time from oldTime to newTime
-    @param[in] newTime the newTime of the federate
-    @param[in] oldTime the oldTime of the federate
+    @param newTime the newTime of the federate
+    @param oldTime the oldTime of the federate
     */
     void updateTime (Time newTime, Time oldTime);
     /** transition from Startup To the Initialize State*/
@@ -145,16 +144,16 @@ class ValueFederateManager
     const std::string &getTarget (const Input &inp) const;
 
     /** get an Input from Its Name
-    @param name the identifier or shortcut of the input
+    @param key the identifier or shortcut of the input
     @return ivalid_input_id if name is not a recognized*/
-    Input &getInput (const std::string &name);
-    const Input &getInput (const std::string &name) const;
+    Input &getInput (const std::string &key);
+    const Input &getInput (const std::string &key) const;
     /** get an input by index*/
     Input &getInput (int index);
     const Input &getInput (int index) const;
     /** get the id of a subscription
     @param key the target of a subscription
-  @return ivalid_input_id if name is not a recognized*/
+    @return ivalid_input_id if name is not a recognized*/
     const Input &getSubscription (const std::string &key) const;
     Input &getSubscription (const std::string &key);
 
@@ -169,12 +168,12 @@ class ValueFederateManager
 
     /** register a callback function to call when any subscribed value is updated
     @details there can only be one generic callback
-    @param[in] callback the function to call
+    @param callback the function to call
     */
     void setInputNotificationCallback (std::function<void(Input &, Time)> callback);
     /** register a callback function to call when the specified subscription is updated
-    @param[in] id  the id to register the callback for
-    @param[in] callback the function to call
+    @param inp  the id to register the callback for
+    @param callback the function to call
     */
     void setInputNotificationCallback (const Input &inp, std::function<void(Input &, Time)> callback);
 
@@ -193,7 +192,7 @@ class ValueFederateManager
     Time CurrentTime = Time (-1.0);  //!< the current simulation time
     Core *coreObject;  //!< the pointer to the actual core
     ValueFederate *fed;  //!< pointer back to the value Federate for creation of the Publication/Inputs
-    federate_id_t fedID;  //!< the federation ID from the core API
+    local_federate_id fedID;  //!< the federation ID from the core API
     atomic_guarded<std::function<void(Input &, Time)>> allCallback;  //!< the global callback function
     shared_guarded<std::vector<std::unique_ptr<input_info>>>
       inputData;  //!< the storage for the message queues and other unique Endpoint information

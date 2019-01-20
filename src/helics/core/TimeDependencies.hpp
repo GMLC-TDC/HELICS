@@ -1,5 +1,5 @@
 /*
-Copyright © 2017-2018,
+Copyright © 2017-2019,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
@@ -100,7 +100,7 @@ class TimeDependencies
     @param requestTime  the time that is being iterated*/
     void resetIteratingTimeRequests (Time requestTime);
     /** reset the tdeMin */
-    void resetDependentEvents (Time minTime);
+    void resetDependentEvents (Time grantTime);
     /** check if there are active dependencies*/
     bool hasActiveTimeDependencies () const;
 };

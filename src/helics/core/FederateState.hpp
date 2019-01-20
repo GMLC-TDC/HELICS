@@ -1,5 +1,5 @@
 /*
-Copyright © 2017-2018,
+Copyright © 2017-2019,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
@@ -54,7 +54,7 @@ class FederateState
     const std::string name;  //!< the name of the federate
     std::unique_ptr<TimeCoordinator> timeCoord;  //!< object that manages the time to determine granting
   public:
-    federate_id_t local_id;  //!< id code for the local federate descriptor
+    local_federate_id local_id;  //!< id code for the local federate descriptor
     std::atomic<global_federate_id> global_id;  //!< global id code, default to invalid
 
   private:
@@ -175,6 +175,16 @@ class FederateState
     int endpointCount () const;
     /** get the number of inputs*/
     int inputCount () const;
+    /** locks the processing*/
+    void lock ()
+    {
+        while (processing.test_and_set ())
+        {
+            ;  // spin
+        }
+    }
+    /** unlocks the processing*/
+    void unlock () { processing.clear (std::memory_order_release); }
 
   private:
     /** process the federate queue until returnable event
@@ -201,15 +211,15 @@ class FederateState
     */
     message_processing_result processActionMessage (ActionMessage &cmd);
     /** fill event list
-    @param the time of the update
+    @param currentTime the time of the update
     */
     void fillEventVectorUpTo (Time currentTime);
     /** fill event list
-    @param the time of the update
+    @param currentTime the time of the update
     */
     void fillEventVectorInclusive (Time currentTime);
     /** fill event list
-    @param the time of the update
+    @param currentTime the time of the update
     */
     void fillEventVectorNextIteration (Time currentTime);
     /** add a dependency to the timing coordination*/
@@ -245,14 +255,13 @@ class FederateState
     /** process until the initialization state has been entered or there is a failure*/
     iteration_result enterInitializingMode ();
     /** function to call when entering execution state
-    @param converged indicator of whether the fed should iterate if need be or not
+    @param iterate indicator of whether the fed should iterate if need be or not
     returns either converged or nonconverged depending on whether an iteration is needed
     */
     iteration_result enterExecutingMode (iteration_request iterate);
     /** request a time advancement
     @param nextTime the time of the requested advancement
-    @param converged set to complete to end dense time step iteration, nonconverged to continue iterating if need
-    be
+    @param iterate the type of iteration requested
     @return an iteration time with two elements the granted time and the convergence state
     */
     iteration_time requestTime (Time nextTime, iteration_request iterate);
@@ -305,6 +314,12 @@ class FederateState
 
     /** route a message either forward to parent or add to queue*/
     void routeMessage (const ActionMessage &msg);
+    /** create an interface*/
+    void createInterface (handle_type htype,
+                          interface_handle handle,
+                          const std::string &key,
+                          const std::string &type,
+                          const std::string &units);
     /** close an interface*/
     void closeInterface (interface_handle handle, handle_type type);
 };

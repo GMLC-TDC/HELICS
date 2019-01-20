@@ -14,7 +14,7 @@ Naming Conventions
 publication_id_t registerGlobalPublication (const std::string &name, const std::string &type, const std::string &units = "");
 ```
 
-2) All classes should be `PascalCase`
+2) All classes should be `PascalCase` except those noted below(namely classes which are wrappers for fundamental types)
 
 ``` {.sourceCode .cpp}
 class ValueFederate : public virtual Federate
@@ -27,7 +27,7 @@ public:
 3) class methods should be `camelCase`
 
     > ``` {.sourceCode .cpp}
-    > publication_id_t registerGlobalPublication (const std::string &name, const std::string &type, const std::string &units = "");
+    > Publication &registerGlobalPublication (const std::string &name, const std::string &type, const std::string &units = "");
     >
     > Exceptions:  functions that match standard library functions e.g. to_string()
     > ```
@@ -70,14 +70,14 @@ namespace helics
 6) C interface functions should begin with helicsXXXX
 
 ``` {.sourceCode .c}
-helics_bool_t helicsBrokerIsConnected (helics_broker broker);
+helics_bool helicsBrokerIsConnected (helics_broker broker);
 ```
 
 7) C interface function should be of the format helics{Class}{Action}
    or helics{Action} if no class is appropriate
 
 ``` {.sourceCode .c}
-int helicsBrokerIsConnected (helics_broker broker);
+helics_bool helicsBrokerIsConnected (helics_broker broker);
 
 const char *helicsGetVersion ();
 ```
@@ -86,4 +86,15 @@ const char *helicsGetVersion ();
 ```
 if as opposed to IF
 install vs INSTALL
+```
+
+9) Public interface functions should be documented consistent with Doxygen style comments
+non public ones should be documented as well with doxygen but we are a ways from that goal
+
+```
+/** get an identifier for the core
+    @param core the core to query
+    @return a string with the identifier of the core
+    */
+    HELICS_EXPORT const char *helicsCoreGetIdentifier (helics_core core);
 ```

@@ -1,5 +1,5 @@
 ##############################################################################
-#Copyright © 2017-2018,
+#Copyright © 2017-2019,
 #Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
 #All rights reserved. See LICENSE file and DISCLAIMER for more details.
 ##############################################################################
@@ -111,24 +111,16 @@ set(Boost_USE_STATIC_LIBS   ${USE_BOOST_STATIC_LIBS})
 find_package(Boost ${BOOST_MINIMUM_VERSION} COMPONENTS ${BOOST_REQUIRED_LIBRARIES} REQUIRED)
 
 # Minimum version of Boost required for building test suite
-if (Boost_VERSION LESS 106100)
-  set(BOOST_VERSION_LEVEL 0)
-elseif (Boost_VERSION GREATER 106599)
-	#in 1.166 there were some changes to asio and inclusion of beast that will enable other components
-	set(BOOST_VERSION_LEVEL 2)
-else()
-	set(BOOST_VERSION_LEVEL 1)
-endif()
-
+set(BOOST_VERSION_LEVEL ${Boost_MINOR_VERSION})
 
 #message(STATUS "Using Boost include files : ${Boost_INCLUDE_DIR}")
 #message(STATUS "Using Boost libraries in : ${Boost_LIBRARY_DIRS}")
 #message(STATUS "Using Boost libraries : ${Boost_LIBRARIES}")
 set(modifier,"")
 foreach(loop_var ${Boost_LIBRARIES})
-	if (${loop_var} MATCHES "debug")
+	if ("${loop_var}" STREQUAL "debug")
 		list(INSERT modifier 0 ${loop_var})
-	elseif(${loop_var} MATCHES "optimized")
+	elseif("${loop_var}" STREQUAL "optimized")
 		list(INSERT modifier 0 ${loop_var})
 	else()
 		#message("Boost_LIBRARIES ${loop_var}")
@@ -137,7 +129,7 @@ foreach(loop_var ${Boost_LIBRARIES})
 		else()
 			list(APPEND Boost_LIBRARIES_core ${modifier} ${loop_var})
 		endif()
-		if (${modifier} MATCHES "debug")
+		if ("${modifier}" STREQUAL "debug")
 			if(${loop_var} MATCHES "unit_test")
 				list(APPEND Boost_LIBRARIES_test_debug ${loop_var})
 			else()

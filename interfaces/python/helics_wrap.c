@@ -5591,7 +5591,7 @@ fail:
 SWIGINTERN PyObject *_wrap_helicsCreateValueFederate(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   char *arg1 = (char *) 0 ;
-  helics_federate_info arg2 = (helics_federate_info) (helics_federate_info)0 ;
+  helics_federate_info arg2 = (helics_federate_info) 0 ;
   helics_error *arg3 = (helics_error *) 0 ;
   int res1 ;
   char *buf1 = 0 ;
@@ -5614,7 +5614,7 @@ SWIGINTERN PyObject *_wrap_helicsCreateValueFederate(PyObject *SWIGUNUSEDPARM(se
   arg1 = (char *)(buf1);
   res2 = SWIG_ConvertPtr(obj1,SWIG_as_voidptrptr(&arg2), 0, 0);
   if (!SWIG_IsOK(res2)) {
-    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsCreateValueFederate" "', argument " "2"" of type '" "helics_federate_info const""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsCreateValueFederate" "', argument " "2"" of type '" "helics_federate_info""'"); 
   }
   result = (helics_federate)helicsCreateValueFederate((char const *)arg1,arg2,arg3);
   resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_void, 0 |  0 );
@@ -5688,7 +5688,7 @@ fail:
 SWIGINTERN PyObject *_wrap_helicsCreateMessageFederate(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   char *arg1 = (char *) 0 ;
-  helics_federate_info arg2 = (helics_federate_info) (helics_federate_info)0 ;
+  helics_federate_info arg2 = (helics_federate_info) 0 ;
   helics_error *arg3 = (helics_error *) 0 ;
   int res1 ;
   char *buf1 = 0 ;
@@ -5711,7 +5711,7 @@ SWIGINTERN PyObject *_wrap_helicsCreateMessageFederate(PyObject *SWIGUNUSEDPARM(
   arg1 = (char *)(buf1);
   res2 = SWIG_ConvertPtr(obj1,SWIG_as_voidptrptr(&arg2), 0, 0);
   if (!SWIG_IsOK(res2)) {
-    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsCreateMessageFederate" "', argument " "2"" of type '" "helics_federate_info const""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsCreateMessageFederate" "', argument " "2"" of type '" "helics_federate_info""'"); 
   }
   result = (helics_federate)helicsCreateMessageFederate((char const *)arg1,arg2,arg3);
   resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_void, 0 |  0 );
@@ -5785,7 +5785,7 @@ fail:
 SWIGINTERN PyObject *_wrap_helicsCreateCombinationFederate(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   char *arg1 = (char *) 0 ;
-  helics_federate_info arg2 = (helics_federate_info) (helics_federate_info)0 ;
+  helics_federate_info arg2 = (helics_federate_info) 0 ;
   helics_error *arg3 = (helics_error *) 0 ;
   int res1 ;
   char *buf1 = 0 ;
@@ -5808,7 +5808,7 @@ SWIGINTERN PyObject *_wrap_helicsCreateCombinationFederate(PyObject *SWIGUNUSEDP
   arg1 = (char *)(buf1);
   res2 = SWIG_ConvertPtr(obj1,SWIG_as_voidptrptr(&arg2), 0, 0);
   if (!SWIG_IsOK(res2)) {
-    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsCreateCombinationFederate" "', argument " "2"" of type '" "helics_federate_info const""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsCreateCombinationFederate" "', argument " "2"" of type '" "helics_federate_info""'"); 
   }
   result = (helics_federate)helicsCreateCombinationFederate((char const *)arg1,arg2,arg3);
   resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_void, 0 |  0 );
@@ -5928,6 +5928,46 @@ SWIGINTERN PyObject *_wrap_helicsCreateFederateInfo(PyObject *SWIGUNUSEDPARM(sel
   resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_void, 0 |  0 );
   return resultobj;
 fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_helicsFederateInfoClone(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  helics_federate_info arg1 = (helics_federate_info) 0 ;
+  helics_error *arg2 = (helics_error *) 0 ;
+  int res1 ;
+  helics_error etemp2 ;
+  PyObject * obj0 = 0 ;
+  helics_federate_info result;
+  
+  {
+    etemp2=helicsErrorInitialize();
+    arg2=&etemp2;
+  }
+  if (!PyArg_ParseTuple(args,(char *)"O:helicsFederateInfoClone",&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0,SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateInfoClone" "', argument " "1"" of type '" "helics_federate_info""'"); 
+  }
+  result = (helics_federate_info)helicsFederateInfoClone(arg1,arg2);
+  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_void, 0 |  0 );
+  {
+    if (arg2->error_code!=helics_ok)
+    {
+      throwHelicsPythonException(arg2);
+      return NULL;
+    }
+  }
+  return resultobj;
+fail:
+  {
+    if (arg2->error_code!=helics_ok)
+    {
+      throwHelicsPythonException(arg2);
+      return NULL;
+    }
+  }
   return NULL;
 }
 
@@ -11401,6 +11441,26 @@ fail:
 }
 
 
+SWIGINTERN PyObject *_wrap_helicsInputGetPublicationType(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  helics_input arg1 = (helics_input) 0 ;
+  int res1 ;
+  PyObject * obj0 = 0 ;
+  char *result = 0 ;
+  
+  if (!PyArg_ParseTuple(args,(char *)"O:helicsInputGetPublicationType",&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0,SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsInputGetPublicationType" "', argument " "1"" of type '" "helics_input""'"); 
+  }
+  result = (char *)helicsInputGetPublicationType(arg1);
+  resultobj = SWIG_FromCharPtr((const char *)result);
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
 SWIGINTERN PyObject *_wrap_helicsPublicationGetType(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   helics_publication arg1 = (helics_publication) 0 ;
@@ -12191,6 +12251,26 @@ fail:
       return NULL;
     }
   }
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_helicsEndpointGetDefaultDestination(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  helics_endpoint arg1 = (helics_endpoint) 0 ;
+  int res1 ;
+  PyObject * obj0 = 0 ;
+  char *result = 0 ;
+  
+  if (!PyArg_ParseTuple(args,(char *)"O:helicsEndpointGetDefaultDestination",&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0,SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsEndpointGetDefaultDestination" "', argument " "1"" of type '" "helics_endpoint""'"); 
+  }
+  result = (char *)helicsEndpointGetDefaultDestination(arg1);
+  resultobj = SWIG_FromCharPtr((const char *)result);
+  return resultobj;
+fail:
   return NULL;
 }
 
@@ -14155,6 +14235,7 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"helicsCreateCombinationFederateFromConfig", _wrap_helicsCreateCombinationFederateFromConfig, METH_VARARGS, NULL},
 	 { (char *)"helicsFederateClone", _wrap_helicsFederateClone, METH_VARARGS, NULL},
 	 { (char *)"helicsCreateFederateInfo", _wrap_helicsCreateFederateInfo, METH_VARARGS, NULL},
+	 { (char *)"helicsFederateInfoClone", _wrap_helicsFederateInfoClone, METH_VARARGS, NULL},
 	 { (char *)"helicsFederateInfoLoadFromArgs", _wrap_helicsFederateInfoLoadFromArgs, METH_VARARGS, (char *)"\n"
 		"\n"
 		"\n"
@@ -14623,6 +14704,7 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"helicsInputSetDefaultVector", _wrap_helicsInputSetDefaultVector, METH_VARARGS, NULL},
 	 { (char *)"helicsInputSetDefaultNamedPoint", _wrap_helicsInputSetDefaultNamedPoint, METH_VARARGS, NULL},
 	 { (char *)"helicsInputGetType", _wrap_helicsInputGetType, METH_VARARGS, NULL},
+	 { (char *)"helicsInputGetPublicationType", _wrap_helicsInputGetPublicationType, METH_VARARGS, NULL},
 	 { (char *)"helicsPublicationGetType", _wrap_helicsPublicationGetType, METH_VARARGS, (char *)"\n"
 		"\n"
 		"\n"
@@ -14667,6 +14749,7 @@ static PyMethodDef SwigMethods[] = {
 		"\n"
 		"\n"
 		""},
+	 { (char *)"helicsEndpointGetDefaultDestination", _wrap_helicsEndpointGetDefaultDestination, METH_VARARGS, NULL},
 	 { (char *)"helicsEndpointSendMessageRaw", _wrap_helicsEndpointSendMessageRaw, METH_VARARGS, (char *)"\n"
 		"\n"
 		"\n"

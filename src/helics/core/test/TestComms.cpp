@@ -1,5 +1,5 @@
 /*
-Copyright © 2017-2018,
+Copyright © 2017-2019,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
@@ -33,9 +33,9 @@ void TestComms::loadNetworkInfo (const NetworkBrokerData &netInfo)
     }
     // brokerPort = netInfo.brokerPort;
     // PortNumber = netInfo.portNumber;
-    if (localTarget_.empty ())
+    if (localTargetAddress.empty ())
     {
-        localTarget_ = name;
+        localTargetAddress = name;
     }
 
     // if (PortNumber > 0)
@@ -49,14 +49,14 @@ void TestComms::queue_rx_function () {}
 
 void TestComms::queue_tx_function ()
 {
-    // make sure the link to the localTarget_ is in place
-    if (name != localTarget_)
+    // make sure the link to the localTargetAddress is in place
+    if (name != localTargetAddress)
     {
-        if (!brokerName_.empty ())
+        if (!brokerName.empty ())
         {
-            if (!CoreFactory::copyCoreIdentifier (name, localTarget_))
+            if (!CoreFactory::copyCoreIdentifier (name, localTargetAddress))
             {
-                if (!BrokerFactory::copyBrokerIdentifier (name, localTarget_))
+                if (!BrokerFactory::copyBrokerIdentifier (name, localTargetAddress))
                 {
                     setRxStatus (connection_status::error);
                     setTxStatus (connection_status::error);
@@ -66,7 +66,7 @@ void TestComms::queue_tx_function ()
         }
         else
         {
-            if (!BrokerFactory::copyBrokerIdentifier (name, localTarget_))
+            if (!BrokerFactory::copyBrokerIdentifier (name, localTargetAddress))
             {
                 setRxStatus (connection_status::error);
                 setTxStatus (connection_status::error);
@@ -77,27 +77,27 @@ void TestComms::queue_tx_function ()
     setRxStatus (connection_status::connected);
     std::shared_ptr<CoreBroker> tbroker;
 
-    if (brokerName_.empty ())
+    if (brokerName.empty ())
     {
-        if (!brokerTarget_.empty ())
+        if (!brokerTargetAddress.empty ())
         {
-            brokerName_ = brokerTarget_;
+            brokerName = brokerTargetAddress;
         }
     }
 
-    if (!brokerName_.empty ())
+    if (!brokerName.empty ())
     {
         milliseconds totalSleep (0);
         while (!tbroker)
         {
-            auto broker = BrokerFactory::findBroker (brokerName_);
+            auto broker = BrokerFactory::findBroker (brokerName);
             tbroker = std::dynamic_pointer_cast<CoreBroker> (broker);
             if (!tbroker)
             {
                 if (autoBroker)
                 {
                     tbroker = std::static_pointer_cast<CoreBroker> (
-                      BrokerFactory::create (core_type::TEST, brokerName_, brokerInitString_));
+                      BrokerFactory::create (core_type::TEST, brokerName, brokerInitString));
                     tbroker->connect ();
                 }
                 else
@@ -116,7 +116,7 @@ void TestComms::queue_tx_function ()
             {
                 if (!tbroker->isOpenToNewFederates ())
                 {
-                    logError ("broker is not open to new federates " + brokerName_);
+                    logError ("broker is not open to new federates " + brokerName);
                     tbroker = nullptr;
                     broker = nullptr;
                     BrokerFactory::cleanUpBrokers (milliseconds (200));
@@ -143,7 +143,7 @@ void TestComms::queue_tx_function ()
                 if (autoBroker)
                 {
                     tbroker = std::static_pointer_cast<CoreBroker> (
-                      BrokerFactory::create (core_type::TEST, "", brokerInitString_));
+                      BrokerFactory::create (core_type::TEST, "", brokerInitString));
                     tbroker->connect ();
                 }
                 else
@@ -162,7 +162,7 @@ void TestComms::queue_tx_function ()
     }
     if (tbroker)
     {
-        if (tbroker->getIdentifier () == localTarget_)
+        if (tbroker->getIdentifier () == localTargetAddress)
         {
             logError ("broker == target");
         }
@@ -292,7 +292,7 @@ void TestComms::closeReceiver ()
     }
 }
 
-std::string TestComms::getAddress () const { return localTarget_; }
+std::string TestComms::getAddress () const { return localTargetAddress; }
 
 }  // namespace testcore
 

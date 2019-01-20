@@ -1,5 +1,5 @@
 ##############################################################################
-# Copyright © 2017-2018,
+# Copyright © 2017-2019,
 # Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
 #All rights reserved. See LICENSE file and DISCLAIMER for more details.
 ##############################################################################
@@ -63,7 +63,7 @@ set(trigger_build_dir ${CMAKE_BINARY_DIR}/autobuild/force_libzmq)
 ExternalProject_Add(libzmq
 	SOURCE_DIR ${PROJECT_BINARY_DIR}/Download/libzmq
     GIT_REPOSITORY  https://github.com/zeromq/libzmq.git
-	GIT_TAG v4.2.5
+	GIT_TAG v4.3.0
     DOWNLOAD_COMMAND " "
     UPDATE_COMMAND " "
 	BINARY_DIR ${PROJECT_BINARY_DIR}/ThirdParty/libzmq

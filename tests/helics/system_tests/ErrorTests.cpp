@@ -1,5 +1,5 @@
 /*
-Copyright © 2017-2018,
+Copyright © 2017-2019,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
@@ -133,11 +133,11 @@ BOOST_AUTO_TEST_CASE (duplicate_publication_names4)
     // all 3 of these should publish to the same thing
     auto &pubid = fed1->registerPublication ("testkey", "");
 
-    helics::Publication pub (fed1, "testkey", helics::data_type::helicsDouble);
+    helics::Publication pub (fed1, "testkey", helics::data_type::helics_double);
     // copy constructor
     helics::Publication pub2 (pubid);
 
-    auto &sub = fed1->registerSubscription (fed1->getPublicationKey (pubid));
+    auto &sub = fed1->registerSubscription (fed1->getInterfaceName (pubid));
     fed1->enterExecutingMode ();
     fed1->publish (pubid, 45.7);
     fed1->requestTime (1.0);
@@ -244,7 +244,7 @@ BOOST_DATA_TEST_CASE (test_duplicate_broker_name, bdata::make (core_types_simple
     helics::cleanupHelicsLibrary ();
 }
 
-const std::string networkCores[] = {"zmq", "tcp", "udp"};
+constexpr const char *networkCores[] = {"zmq", "udp"};
 
 /** test simple creation and destruction*/
 BOOST_DATA_TEST_CASE (test_duplicate_default_brokers, bdata::make (networkCores), core_type)

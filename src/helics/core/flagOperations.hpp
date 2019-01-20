@@ -1,5 +1,5 @@
 /*
-Copyright © 2017-2018,
+Copyright Â© 2017-2019,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
@@ -31,32 +31,51 @@ enum operation_flags : uint16_t
     nameless_interface_flag = 15,  //!< flag indicating the interface is nameless
 };
 
-/** template function to set a flag in an object containing a flags field*/
+/** template function to set a flag in an object containing a flags field
+@tparam FlagContainer an object with a .flags field
+@tparam FlagIndex a type that can be used as part of a shift to index into a flag object
+@param M the container to set the flag in
+@param flag the flag to set
+*/
 template <class FlagContainer, class FlagIndex>
 inline void setActionFlag (FlagContainer &M, FlagIndex flag)
 {
-    M.flags |= (static_cast<decltype (M.flags)> (1) << (flag));
+    M.flags |= (static_cast<decltype (M.flags)> (1) << (static_cast<uint16_t> ((flag))));
+}
+
+/** check a flag value on a specified index*/
+/** template function to check a flag in an object containing a flags field*/
+template <class FlagIndex>
+inline bool checkActionFlag (uint16_t flags, FlagIndex flag)
+{
+    return ((flags & (static_cast<uint16_t> (1) << (static_cast<uint16_t> ((flag))))) != 0u);
 }
 
 /** template function to check a flag in an object containing a flags field*/
 template <class FlagContainer, class FlagIndex>
 inline bool checkActionFlag (const FlagContainer &M, FlagIndex flag)
 {
-    return ((M.flags & (static_cast<decltype (M.flags)> (1) << (flag))) != 0);
+    return ((M.flags & (static_cast<decltype (M.flags)> (1) << (static_cast<uint16_t> ((flag))))) != 0u);
 }
 
 /** template function to clear a flag in an object containing a flags field*/
 template <class FlagContainer, class FlagIndex>
 inline void clearActionFlag (FlagContainer &M, FlagIndex flag)
 {
-    M.flags &= ~(static_cast<decltype (M.flags)> (1) << (flag));
+    M.flags &= ~(static_cast<decltype (M.flags)> (1) << (static_cast<uint16_t> ((flag))));
 }
 
-inline constexpr uint16_t make_flags (int flag) { return static_cast<uint16_t> (1) << (flag); }
+/** helper function to facilitate make a flag variable*/
+inline constexpr uint16_t make_flags (unsigned int flag) { return static_cast<uint16_t> (1) << (flag); }
 
-inline constexpr uint16_t make_flags (int flag1, int flag2) { return make_flags (flag1) | make_flags (flag2); }
+/** helper function to facilitate make a flag variable out of two flags*/
+inline constexpr uint16_t make_flags (unsigned int flag1, unsigned int flag2)
+{
+    return make_flags (flag1) | make_flags (flag2);
+}
 
-inline constexpr uint16_t make_flags (int flag1, int flag2, int flag3)
+/** helper function to facilitate make a flag variable out of three flags*/
+inline constexpr uint16_t make_flags (unsigned int flag1, unsigned int flag2, unsigned int flag3)
 {
     return make_flags (flag1, flag2) | make_flags (flag3);
 }

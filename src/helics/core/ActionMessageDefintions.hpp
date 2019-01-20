@@ -1,5 +1,5 @@
 /*
-Copyright © 2017-2018,
+Copyright © 2017-2019,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
@@ -30,7 +30,7 @@ enum class action_t : int32_t
     cmd_reg_fed = -105,  //!< register a federate
     cmd_priority_ack = -254,  //!< priority commands usually have an ack this is an ack that doesn't do anything
     cmd_query = -cmd_info_basis - 37,  //!< send a query this is a priority command
-	cmd_set_global = -cmd_info_basis-55,  //!< set a global value
+    cmd_set_global = -cmd_info_basis - 55,  //!< set a global value
     cmd_broker_query = -37,  //!< send a query to a core
     cmd_query_reply = -cmd_info_basis - 38,  //!< response to a query
     cmd_reg_broker = -cmd_info_basis - 40,  //!< for a broker to connect with a higher level broker
@@ -309,7 +309,7 @@ enum class action_t : int32_t
 */
 const char *actionMessageType (action_message_def::action_t action);
 /** return a string associated with a particular error code
-@param errorcode The error to get the string for
+@param[in,out] errorcode The error to get the string for
 @return a pointer to string with the name
 */
 const char *commandErrorString (int errorcode);

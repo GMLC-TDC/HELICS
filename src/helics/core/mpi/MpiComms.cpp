@@ -1,5 +1,5 @@
 /*
-Copyright © 2017-2018,
+Copyright © 2017-2019,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
@@ -10,6 +10,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include <iostream>
 #include <map>
 #include <memory>
+#include <boost/scope_exit.hpp>
 
 namespace helics
 {
@@ -18,8 +19,8 @@ namespace mpi
 MpiComms::MpiComms ()
 {
     auto &mpi_service = MpiService::getInstance ();
-    localTarget_ = mpi_service.addMpiComms (this);
-    std::cout << "MpiComms() - commAddress = " << localTarget_ << std::endl;
+    localTargetAddress = mpi_service.addMpiComms (this);
+    std::cout << "MpiComms() - commAddress = " << localTargetAddress << std::endl;
 }
 
 /** destructor*/
@@ -29,16 +30,16 @@ void MpiComms::setBrokerAddress (const std::string &address)
 {
     if (propertyLock ())
     {
-        brokerTarget_ = address;
+        brokerTargetAddress = address;
         propertyUnLock ();
     }
 }
 
-int MpiComms::processIncomingMessage (ActionMessage &M)
+int MpiComms::processIncomingMessage (ActionMessage &cmd)
 {
-    if (isProtocolCommand (M))
+    if (isProtocolCommand (cmd))
     {
-        switch (M.messageID)
+        switch (cmd.messageID)
         {
         case CLOSE_RECEIVER:
             return (-1);
@@ -46,12 +47,18 @@ int MpiComms::processIncomingMessage (ActionMessage &M)
             break;
         }
     }
-    ActionCallback (std::move (M));
+    ActionCallback (std::move (cmd));
     return 0;
 }
 
 void MpiComms::queue_rx_function ()
 {
+    BOOST_SCOPE_EXIT_ALL (this)
+    {
+        logMessage (std::string ("Shutdown RX Loop for ") + localTargetAddress);
+        shutdown = true;
+        setRxStatus (connection_status::terminated);
+    };
     setRxStatus (connection_status::connected);
 
     while (true)
@@ -70,26 +77,22 @@ void MpiComms::queue_rx_function ()
             {
                 if (M->messageID == CLOSE_RECEIVER)
                 {
-                    goto CLOSE_RX_LOOP;
+                    return;
                 }
             }
 
             auto res = processIncomingMessage (M.value ());
             if (res < 0)
             {
-                goto CLOSE_RX_LOOP;
+                return;
             }
         }
 
         if (shutdown)
         {
-            goto CLOSE_RX_LOOP;
+            return;
         }
     }
-CLOSE_RX_LOOP:
-    std::cout << "Shutdown RX Loop for " << localTarget_ << std::endl;
-    shutdown = true;
-    setRxStatus (connection_status::terminated);
 }
 
 void MpiComms::queue_tx_function ()
@@ -101,12 +104,13 @@ void MpiComms::queue_tx_function ()
     std::map<route_id, std::pair<int, int>> routes;  // for all the other possible routes
 
     std::pair<int, int> brokerLocation;
-    if (!brokerTarget_.empty ())
+    if (!brokerTargetAddress.empty ())
     {
         hasBroker = true;
-        auto addr_delim_pos = brokerTarget_.find (":");
-        brokerLocation.first = std::stoi (brokerTarget_.substr (0, addr_delim_pos));
-        brokerLocation.second = std::stoi (brokerTarget_.substr (addr_delim_pos + 1, brokerTarget_.length ()));
+        auto addr_delim_pos = brokerTargetAddress.find_last_of (':');
+        brokerLocation.first = std::stoi (brokerTargetAddress.substr (0, addr_delim_pos));
+        brokerLocation.second =
+          std::stoi (brokerTargetAddress.substr (addr_delim_pos + 1, brokerTargetAddress.length ()));
     }
 
     while (true)
@@ -126,7 +130,7 @@ void MpiComms::queue_tx_function ()
                 {
                     // cmd.payload would be the MPI rank of the destination
                     std::pair<int, int> routeLoc;
-                    auto addr_delim_pos = cmd.payload.find (":");
+                    auto addr_delim_pos = cmd.payload.find_last_of (':');
                     routeLoc.first = std::stoi (cmd.payload.substr (0, addr_delim_pos));
                     routeLoc.second = std::stoi (cmd.payload.substr (addr_delim_pos + 1, cmd.payload.length ()));
 
@@ -193,7 +197,7 @@ void MpiComms::queue_tx_function ()
         }
     }
 CLOSE_TX_LOOP:
-    std::cout << "Shutdown TX Loop for " << localTarget_ << std::endl;
+    logMessage (std::string ("Shutdown TX Loop for ") + localTargetAddress);
     routes.clear ();
     if (getRxStatus () == connection_status::connected)
     {

@@ -1,5 +1,5 @@
 /*
-Copyright © 2017-2018,
+Copyright © 2017-2019,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
@@ -13,11 +13,11 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include "../common/fmt_format.h"
 #include "ForwardingTimeCoordinator.hpp"
 #include "flagOperations.hpp"
+#include "loggingHelper.hpp"
 #include <iostream>
 #include <libguarded/guarded.hpp>
 #include <random>
 #include <boost/asio/steady_timer.hpp>
-#include "loggingHelper.hpp"
 
 static constexpr auto chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
 
@@ -26,10 +26,11 @@ static inline std::string genId (size_t seed)
     std::string nm = std::string (24, '-');
     if (seed == 0)
     {
-        seed = std::chrono::high_resolution_clock::now().time_since_epoch().count();
-        seed += std::hash<std::thread::id> {} (std::this_thread::get_id());
+        seed = std::chrono::high_resolution_clock::now ().time_since_epoch ().count ();
+        seed += std::hash<std::thread::id>{}(std::this_thread::get_id ());
     }
-    std::mt19937 rng (static_cast<unsigned int>(seed));  // random-number engine used (Mersenne-Twister in this case)
+    std::mt19937 rng (
+      static_cast<unsigned int> (seed));  // random-number engine used (Mersenne-Twister in this case)
     std::uniform_int_distribution<int> uni (0, 61);  // guaranteed unbiased
 
     for (int ii = 1; ii < 24; ii++)
@@ -40,9 +41,9 @@ static inline std::string genId (size_t seed)
         }
     }
 #ifdef _WIN32
-    std::string pid_str = std::to_string (GetCurrentProcessId ())+nm;
+    std::string pid_str = std::to_string (GetCurrentProcessId ()) + nm;
 #else
-    std::string pid_str = std::to_string (getpid ())+nm;
+    std::string pid_str = std::to_string (getpid ()) + nm;
 #endif
     return pid_str;
 }
@@ -60,7 +61,14 @@ BrokerBase::~BrokerBase ()
 {
     if (!queueDisabled)
     {
-        joinAllThreads ();
+        try
+        {
+            joinAllThreads ();
+        }
+        catch (...)
+        {
+            // no exceptions in the destructor
+        }
     }
 }
 
@@ -109,7 +117,7 @@ void BrokerBase::initializeFromCmdArgs (int argc, const char *const *argv)
 {
     variable_map vm;
     argumentParser (argc, argv, vm, extraArgs);
-   
+
     if (vm.count ("minfed") > 0)
     {
         minFederateCount = vm["minfed"].as<int> ();
@@ -154,13 +162,13 @@ void BrokerBase::initializeFromCmdArgs (int argc, const char *const *argv)
     }
     if (vm.count ("networktimeout") > 0)
     {
-        auto network_to = loadTimeFromString (vm["timeout"].as<std::string> (), timeUnits::ms);
-        networkTimeout = network_to.toCount (timeUnits::ms);
+        auto network_to = loadTimeFromString (vm["timeout"].as<std::string> (), time_units::ms);
+        networkTimeout = network_to.toCount (time_units::ms);
     }
     if (vm.count ("timeout") > 0)
     {
-        auto time_out = loadTimeFromString (vm["timeout"].as<std::string> (), timeUnits::ms);
-        timeout = time_out.toCount (timeUnits::ms);
+        auto time_out = loadTimeFromString (vm["timeout"].as<std::string> (), time_units::ms);
+        timeout = time_out.toCount (time_units::ms);
         if (networkTimeout < 0)
         {
             networkTimeout = timeout;
@@ -172,14 +180,14 @@ void BrokerBase::initializeFromCmdArgs (int argc, const char *const *argv)
     }
     if (vm.count ("tick") > 0)
     {
-        auto time_tick = loadTimeFromString (vm["tick"].as<std::string> (), timeUnits::ms);
-        tickTimer = time_tick.toCount (timeUnits::ms);
+        auto time_tick = loadTimeFromString (vm["tick"].as<std::string> (), time_units::ms);
+        tickTimer = time_tick.toCount (time_units::ms);
     }
     if (!noAutomaticID)
     {
         if (identifier.empty ())
         {
-            identifier = genId (reinterpret_cast<size_t>(this));
+            identifier = genId (reinterpret_cast<size_t> (this));
         }
     }
 
@@ -341,15 +349,15 @@ bool BrokerBase::tryReconnect () { return false; }
 //#define DISABLE_TICK
 void BrokerBase::queueProcessingLoop ()
 {
-	if (haltOperations)
-	{
+    if (haltOperations)
+    {
         mainLoopIsRunning.store (false);
         return;
-	}
+    }
     std::vector<ActionMessage> dumpMessages;
-    
+
     auto serv = AsioServiceManager::getServicePointer ();
-    auto serviceLoop = serv->startServiceLoop();
+    auto serviceLoop = serv->startServiceLoop ();
     boost::asio::steady_timer ticktimer (serv->getBaseService ());
     activeProtector active (true, false);
 
@@ -379,13 +387,13 @@ void BrokerBase::queueProcessingLoop ()
             }
         }
     };
-	if (haltOperations)
-	{
+    if (haltOperations)
+    {
         haltTimer (active, ticktimer);
         serviceLoop = nullptr;
         mainLoopIsRunning.store (false);
         return;
-	}
+    }
     while (true)
     {
         auto command = actionQueue.pop ();
@@ -393,7 +401,7 @@ void BrokerBase::queueProcessingLoop ()
         {
             dumpMessages.push_back (command);
         }
-        if (command.action() == CMD_IGNORE)
+        if (command.action () == CMD_IGNORE)
         {
             continue;
         }
@@ -414,7 +422,7 @@ void BrokerBase::queueProcessingLoop ()
             if (messagesSinceLastTick == 0)
             {
 #ifndef DISABLE_TICK
-                   
+
                 processCommand (std::move (command));
 #endif
             }
@@ -433,16 +441,15 @@ void BrokerBase::queueProcessingLoop ()
             mainLoopIsRunning.store (false);
             logDump ();
             {
-
-                auto tcmd = actionQueue.try_pop();
+                auto tcmd = actionQueue.try_pop ();
                 while (tcmd)
                 {
-					if (!isDisconnectCommand(*tcmd))
-					{
+                    if (!isDisconnectCommand (*tcmd))
+                    {
                         LOG_TRACE (global_broker_id_local, identifier,
-                                     std::string ("TI unprocessed command ") + prettyPrintString (*tcmd));
-					}
-                    tcmd = actionQueue.try_pop();
+                                   std::string ("TI unprocessed command ") + prettyPrintString (*tcmd));
+                    }
+                    tcmd = actionQueue.try_pop ();
                 }
             }
             return;  // immediate return
@@ -456,14 +463,15 @@ void BrokerBase::queueProcessingLoop ()
                 logDump ();
                 processDisconnect ();
             }
-            auto tcmd = actionQueue.try_pop();
+            auto tcmd = actionQueue.try_pop ();
             while (tcmd)
             {
                 if (!isDisconnectCommand (*tcmd))
                 {
-                    LOG_TRACE(global_broker_id_local, identifier, std::string("STOPPED unprocessed command ") + prettyPrintString(*tcmd));
+                    LOG_TRACE (global_broker_id_local, identifier,
+                               std::string ("STOPPED unprocessed command ") + prettyPrintString (*tcmd));
                 }
-                tcmd = actionQueue.try_pop();
+                tcmd = actionQueue.try_pop ();
             }
             return;
         }

@@ -1,5 +1,5 @@
 /*
-Copyright © 2017-2018,
+Copyright © 2017-2019,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
@@ -22,21 +22,24 @@ class ValueFederate : public virtual Federate  // using virtual inheritance to a
 {
   public:
     /**constructor taking a federate information structure and using the default core
-    @param[in] fi  a federate information structure
+    @param fedName the name of the federate, can be empty to use the name from fi or an auto generated one
+    @param fi  a federate information structure
     */
     ValueFederate (const std::string &fedName, const FederateInfo &fi);
     /**constructor taking a core and a federate information structure, sore information in fi is ignored
-    @param[in] core a shared ptr to a core to join
-    @param[in] fi  a federate information structure
+    @param fedName the name of the federate, can be empty to use the name from fi or an auto generated one
+    @param core a shared ptr to a core to join
+    @param fi  a federate information structure
     */
     ValueFederate (const std::string &fedName, const std::shared_ptr<Core> &core, const FederateInfo &fi);
     /**constructor taking a string with the required information
-    @param[in] configString can be either a JSON file a TOML file (with extension TOML) or a string containing JSON
+    @param configString can be either a JSON file a TOML file (with extension TOML) or a string containing JSON
     code
     */
     explicit ValueFederate (const std::string &configString);
     /**constructor taking a string with the required information
-    @param[in] configString can be either a JSON file a TOML file (with extension TOML) or a string containing JSON
+    @param fedName the name of the federate, can be empty to use the name from the configString
+    @param configString can be either a JSON file a TOML file (with extension TOML) or a string containing JSON
     code
     */
     ValueFederate (const std::string &fedName, const std::string &configString);
@@ -58,11 +61,13 @@ class ValueFederate : public virtual Federate  // using virtual inheritance to a
 
     /** default move assignment*/
     ValueFederate &operator= (ValueFederate &&fed) noexcept;
+    /** delete copy assignment*/
+    ValueFederate &operator= (const ValueFederate &fed) = delete;
     /** register a publication
     @details call is only valid in startup mode
-    @param[in] key the name of the publication
-    @param[in] type a string defining the type of the publication
-    @param[in] units a string defining the units of the publication [optional]
+    @param key the name of the publication
+    @param type a string defining the type of the publication
+    @param units a string defining the units of the publication [optional]
     @return a publication id object for use as an identifier
     */
     Publication &registerPublication (const std::string &key,
@@ -70,8 +75,8 @@ class ValueFederate : public virtual Federate  // using virtual inheritance to a
                                       const std::string &units = std::string ());
     /** register a publication
     @details call is only valid in startup mode by default prepends the name with the federate name
-    @param[in] key the name of the publication
-    @param[in] units  the optional units of the publication
+    @param key the name of the publication
+    @param units  the optional units of the publication
     @return an identifier for use with this publication
     */
     template <typename X>
@@ -82,9 +87,9 @@ class ValueFederate : public virtual Federate  // using virtual inheritance to a
 
     /** register a publication
     @details call is only valid in startup mode
-    @param[in] key the name of the publication
-    @param[in] type a string defining the type of the publication
-    @param[in] units a string defining the units of the publication [optional]
+    @param key the name of the publication
+    @param type a string defining the type of the publication
+    @param units a string defining the units of the publication [optional]
     @return a publication id object for use as an identifier
     */
     Publication &registerGlobalPublication (const std::string &key,
@@ -92,8 +97,8 @@ class ValueFederate : public virtual Federate  // using virtual inheritance to a
                                             const std::string &units = std::string ());
     /** register a publication
     @details call is only valid in startup mode by default prepends the name with the federate name
-    @param[in] key the name of the publication
-    @param[in] units  the optional units of the publication
+    @param key the name of the publication
+    @param units  the optional units of the publication
     @return an identifier for use with this publication
     */
     template <typename X>
@@ -105,9 +110,9 @@ class ValueFederate : public virtual Federate  // using virtual inheritance to a
     /** register a publication as part of an indexed structure
     @details call is only valid in startup mode by default prepends the name with the federate name
     the name is registered as a global structure with the index appended
-    @param[in] key the name of the publication
-    @param[in] index1 an index associated with the publication
-    @param[in] units  the optional units of the publication
+    @param key the name of the publication
+    @param index1 an index associated with the publication
+    @param units  the optional units of the publication
     @return an identifier for use with this publication
     */
     template <typename X>
@@ -119,10 +124,10 @@ class ValueFederate : public virtual Federate  // using virtual inheritance to a
     /** register a publication as part of a 2 dimensional indexed structure
     @details call is only valid in startup mode by default prepends the name with the federate name
     the name is registered as a global structure with the indices appended
-    @param[in] key the name of the publication
-    @param[in] index1 an index associated with the publication
-    @param[in] index2 a second index
-    @param[in] units  the optional units of the publication
+    @param key the name of the publication
+    @param index1 an index associated with the publication
+    @param index2 a second index
+    @param units  the optional units of the publication
     @return an identifier for use with this publication
     */
     template <typename X>
@@ -137,18 +142,18 @@ class ValueFederate : public virtual Federate  // using virtual inheritance to a
 
     /** register an input
     @details call is only valid in startup mode register a subscription with name type and units
-    @param[in] key the name of the publication to subscribe to
-    @param[in] type a string describing the type of the publication
-    @param[in] units a string describing the units on the publication
+    @param key the name of the publication to subscribe to
+    @param type a string describing the type of the publication
+    @param units a string describing the units on the publication
     */
     Input &
     registerInput (const std::string &key, const std::string &type, const std::string &units = std::string ());
 
     /** register a globally named input
     @details call is only valid in startup mode
-    @param[in] key the name of the input(can be blank in which case it is the same as a subscription
-    @param[in] type a string defining the type of the input
-    @param[in] units a string defining the units of the input [optional]
+    @param key the name of the input(can be blank in which case it is the same as a subscription
+    @param type a string defining the type of the input
+    @param units a string defining the units of the input [optional]
     @return a input id object for use as an identifier
     */
     Input &registerGlobalInput (const std::string &key,
@@ -171,9 +176,9 @@ class ValueFederate : public virtual Federate  // using virtual inheritance to a
 
     /** register a required subscription
     @details call is only valid in startup mode, register an optional subscription for a 1D array of values
-    @param[in] key the name of the subscription
-    @param[in] index1 the index into a 1 dimensional array of values
-    @param[in] units the optional units on the subscription
+    @param key the name of the subscription
+    @param index1 the index into a 1 dimensional array of values
+    @param units the optional units on the subscription
     */
     template <typename X>
     Input &registerInputIndexed (const std::string &key, int index1, const std::string &units = std::string ())
@@ -184,10 +189,10 @@ class ValueFederate : public virtual Federate  // using virtual inheritance to a
     /** register a publication as part of a 2 dimensional indexed structure
   @details call is only valid in startup mode by default prepends the name with the federate name
   the name is registered as a global structure with the indices appended
-  @param[in] key the name of the publication
-  @param[in] index1 an index associated with the publication
-  @param[in] index2 a second index
-  @param[in] units  the optional units of the publication
+  @param key the name of the publication
+  @param index1 an index associated with the publication
+  @param index2 a second index
+  @param units  the optional units of the publication
   @return an identifier for use with this publication
   */
     template <typename X>
@@ -200,17 +205,16 @@ class ValueFederate : public virtual Federate  // using virtual inheritance to a
     }
 
     /** register a subscription
-    @param[in] target the name of the publication to subscribe to
-    @param[in] type the type of the subscription
-    @param[in] units the units associated with the desired output
+    @param target the name of the publication to subscribe to
+    @param units the units associated with the desired output
     */
     Input &registerSubscription (const std::string &target, const std::string &units = std::string ());
 
     /** register a subscription
     @details register a subscription for a 1D array of values
-    @param[in] key the name of the subscription
-    @param[in] index1 the index into a 1 dimensional array of values
-    @param[in] units the optional units on the subscription
+    @param target the name of the publication to target
+    @param index1 the index into a 1 dimensional array of values
+    @param units the optional units on the subscription
     */
     Input &
     registerSubscriptionIndexed (const std::string &target, int index1, const std::string &units = std::string ())
@@ -220,10 +224,10 @@ class ValueFederate : public virtual Federate  // using virtual inheritance to a
 
     /** register a subscription for an index of a 2-D array of values
     @details call is only valid in startup mode
-    @param[in] key the name of the subscription
-    @param[in] index1 the first index of a 2-D value structure
-    @param[in] index2 the 2nd index of a 2-D value structure
-    @param[in] units the optional units on the subscription
+    @param target the name of the publication to subscribe to
+    @param index1 the first index of a 2-D value structure
+    @param index2 the 2nd index of a 2-D value structure
+    @param units the optional units on the subscription
     */
     Input &registerSubscriptionIndexed (const std::string &target,
                                         int index1,
@@ -236,30 +240,30 @@ class ValueFederate : public virtual Federate  // using virtual inheritance to a
     /** add a shortcut for locating an input
     @details primarily for use in looking up an id from a different location
     creates a local shortcut for referring to a input which may not have another name
-    @param[in] inp the input object
-    @param[in] shortcutName the name of the shortcut
+    @param inp the input object
+    @param shortcutName the name of the shortcut
     */
     void addAlias (const Input &inp, const std::string &shortcutName);
 
     /** add a shortcut for locating a publication
     @details primarily for use in looking up an id from a different location
     creates a local shortcut for referring to a publication which may not have another name
-    @param[in] pub the publication object
-    @param[in] shortcutName the name of the shortcut
+    @param pub the publication object
+    @param shortcutName the name of the shortcut
     */
     void addAlias (const Publication &pub, const std::string &shortcutName);
 
     /** set the default value for a subscription
     @details this is the value returned prior to any publications
-    @param[in] id the subscription identifier
-    @param[in] block the data view representing the default value
+    @param inp the subscription identifier
+    @param block the data view representing the default value
     @throw std::invalid_argument if id is invalid
     */
     void setDefaultValue (const Input &inp, data_view block);
 
     /** register a set of interfaces defined in a file
     @details call is only valid in startup mode to add an TOML files must have extension .toml or .TOML
-    @param[in] configString  the location of the file(JSON or TOML) or JSON String to load to generate the
+    @param configString  the location of the file(JSON or TOML) or JSON String to load to generate the
     interfaces
     */
     virtual void registerInterfaces (const std::string &configString) override;
@@ -267,7 +271,7 @@ class ValueFederate : public virtual Federate  // using virtual inheritance to a
     /** register a set of value interfaces (publications and subscriptions)
     @details call is only valid in startup mode it is a protected call to add an TOML files must have extension
     .toml or .TOML
-    @param[in] configString  the location of the file(JSON or TOML) or JSON String to load to generate the
+    @param configString  the location of the file(JSON or TOML) or JSON String to load to generate the
     interfaces
     */
     void registerValueInterfaces (const std::string &configString);
@@ -278,7 +282,7 @@ class ValueFederate : public virtual Federate  // using virtual inheritance to a
 
   public:
     /** get a value as raw data block from the system
-    @param[in] id the identifier for the subscription
+    @param inp an input object to get the data from
     @return a constant data block
     @throw std::invalid_argument if id is invalid
     */
@@ -289,16 +293,16 @@ class ValueFederate : public virtual Federate  // using virtual inheritance to a
     /** get a string value*/
     const std::string &getString (Input &inp);
     /** publish a value
-    @param[in] id the publication identifier
-    @param[in] a data block containing the data
+    @param pub the publication identifier
+    @param block a data block containing the data
     @throw invalid_argument if the publication id is invalid
     */
     void publishRaw (const Publication &pub, data_view block);
 
     /** publish data
-  @param[in] id the publication identifier
-  @param[in] data a const char pointer to raw data
-  @param[in] data_size the length of the data
+  @param pub the publication identifier
+  @param data a const char pointer to raw data
+  @param data_size the length of the data
   @throw invalid_argument if the publication id is invalid
   */
     void publishRaw (const Publication &pub, const char *data, size_t data_size)
@@ -306,70 +310,72 @@ class ValueFederate : public virtual Federate  // using virtual inheritance to a
         publishRaw (pub, data_view{data, data_size});
     }
 
-    /** publish a string
-@param[in] id the publication identifier
-@param[in] data a const char pointer to a string
-@throw invalid_argument if the publication id is invalid
-*/
+    /** direct publish a string
+   @param pub the publication to use
+   @param str a string to publish
+   @throw invalid_argument if the publication id is invalid
+   */
     void publish (Publication &pub, const std::string &str);
 
-    /** publish a double
- @param[in] id the publication identifier
- @param[in] val the value to publish
- @throw invalid_argument if the publication id is invalid
+    /** direct publish a double
+ @param pub the publication identifier
+ @param val the value to publish
+ @throw invalid_argument if the publication is invalid
  */
     void publish (Publication &pub, double val);
 
     /** add a destination target to a publication
     @param pub the publication object to add a target to
-    target the name of the input to send the data to
+    @param target the name of the input to send the data to
     */
     void addTarget (const Publication &pub, const std::string &target);
     /** add a source target to an input/subscription
     @param inp the input object to add a named publication
-    target the name of the publication to get data from
+    @param target the name of the publication to get data from
     */
     void addTarget (const Input &inp, const std::string &target);
     /** remove a destination target from a publication
     @param pub the publication object to add a target to
-    target the name of the input to remove
+    @param target the name of the input to remove
     */
     void removeTarget (const Publication &pub, const std::string &target);
     /** remove a publication from an input/subscription
     @param inp the input object to add a named publication
-    target the name of the publication to remove
+    @param target the name of the publication to remove
     */
     void removeTarget (const Input &inp, const std::string &target);
-    /** register an optional subscription
+    /** add a 1-d Indexed target to an interface
    @details call is only valid in startup mode, register an optional subscription for a 1D array of values
-   @param[in] target the name of the target
-   @param[in] index1 the index into a 1 dimensional array of values
-   @param[in] units the optional units on the subscription
+   @param iObject an interface object to add the target to
+   @param target the name of the target
+   @param index1 the index into a 1 dimensional array of values
+   @param units the optional units on the subscription
    */
     template <class iType>
-    void addTargetIndexed (const iType &id,
+    void addTargetIndexed (const iType &iObject,
                            const std::string &target,
                            int index1,
                            const std::string &units = std::string ())
     {
-        return addTarget (id, target + '_' + std::to_string (index1), units);
+        addTarget (iObject, target + '_' + std::to_string (index1), units);
     }
 
-    /** register an optional subscription for a 2-D array of values
+    /** add an indexed target to an interface
     @details call is only valid in startup mode
-    @param[in] key the name of the subscription
-    @param[in] index1 the first index of a 2-D value structure
-    @param[in] index2 the 2nd index of a 2-D value structure
-    @param[in] units the optional units on the subscription
+    @param iObject an interface object such as a publication, filter or input
+    @param target the name of the target
+    @param index1 the first index of a 2-D value structure
+    @param index2 the 2nd index of a 2-D value structure
+    @param units the optional units on the subscription
     */
     template <class iType>
-    void addTargetIndexed (const iType &id,
+    void addTargetIndexed (const iType &iObject,
                            const std::string &target,
                            int index1,
                            int index2,
                            const std::string &units = std::string ())
     {
-        return addTarget (id, target + '_' + std::to_string (index1) + '_' + std::to_string (index2), units);
+        addTarget (iObject, target + '_' + std::to_string (index1) + '_' + std::to_string (index2), units);
     }
 
     /** check if a given subscription has an update
@@ -387,110 +393,79 @@ class ValueFederate : public virtual Federate  // using virtual inheritance to a
     virtual std::string localQuery (const std::string &queryStr) const override;
 
   public:
-    /** get a list of all the values that have been updated since the last call
-    @return a vector of subscription_ids with all the values that have not been retrieved since updated
+    /** get a list of all the indices of all inputs that have been updated since the last call
+    @return a vector of input indices with all the values that have not been retrieved since updated
     */
     std::vector<int> queryUpdates ();
 
-    /** get the key or the string identifier of an from its id
-    @return empty string if an invalid id is passed*/
+    /** get the name of the first target for an input
+    @return empty string if an invalid input is passed or it has no target*/
     const std::string &getTarget (const Input &inp) const;
     /** get the id of a subscription
-    @return ivalid_subscription_id if name is not a recognized*/
-    const Input &getInput (const std::string &name) const;
+    @return an invalid input object if the target is valid otherwise a reference to the corresponding input*/
+    const Input &getInput (const std::string &key) const;
     /** get the id of a subscription
-    @return ivalid_subscription_id if name is not a recognized*/
-    Input &getInput (const std::string &name);
+    @return an invalid input object if the target is valid otherwise a reference to the corresponding input*/
+    Input &getInput (const std::string &key);
     /** get the id of a subscription
-    @return ivalid_subscription_id if name is not a recognized*/
+    @return an invalid input object if the target is valid otherwise a reference to the corresponding input*/
     const Input &getInput (int index) const;
     /** get the id of a subscription
-    @return ivalid_subscription_id if name is not a recognized*/
+    @return an invalid input object if the target is valid otherwise a reference to the corresponding input*/
     Input &getInput (int index);
     /** get the id of a subscription from a vector of subscriptions
-    @return ivalid_subscription_id if name is not a recognized*/
-    const Input &getInput (const std::string &name, int index1) const;
-    /** get the id of a subscription from a 2-d vector of subscriptions
-    @return ivalid_subscription_id if name is not a recognized*/
-    const Input &getInput (const std::string &name, int index1, int index2) const;
+    @return an invalid input object if the target is valid otherwise a reference to the corresponding input*/
+    const Input &getInput (const std::string &key, int index1) const;
+    /** get an input object from a 2-d vector of inputs
+    @return an invalid input object if the target is valid otherwise a reference to the corresponding input*/
+    const Input &getInput (const std::string &key, int index1, int index2) const;
 
     /** get the input id based on target
-    @return an input_id_t from the object, or invalid_id if no input was found
-    */
-    const Input &getSubscription (const std::string &key) const;
-    /** get the input id based on target
-    @return an input_id_t from the object, or invalid_id if no input was found
-    */
-    Input &getSubscription (const std::string &key);
+    @return an invalid input object if the target is valid otherwise a reference to the corresponding input*/
+    const Input &getSubscription (const std::string &target) const;
 
-    /** get the name of a publication from its id
-    @return empty string if an invalid id is passed*/
-    const std::string &getPublicationKey (const Publication &pub) const;
+    /** get an input based on target
+    @details this will only get the first subscription with a specific target
+   @return an invalid input object if the target is valid otherwise a reference to the corresponding input*/
+    Input &getSubscription (const std::string &target);
 
-    /** get the id of a registered publication from its id
-    @param[in] name the name of the publication
-    @return ivalid_publication_id if name is not recognized otherwise returns the publication_id*/
+    /** get a publication from its name
+    @param key the name of the publication
+    @return an invalid publication if the index is valid otherwise a reference to the corresponding publication*/
     Publication &getPublication (const std::string &key);
-    /** get the id of a registered publication from its id
-    @param[in] name the name of the publication
-    @return ivalid_publication_id if name is not recognized otherwise returns the publication_id*/
+    /** get a publication from its key
+    @param key the name of the publication
+    @return an invalid publication if the index is valid otherwise a reference to the corresponding publication*/
     const Publication &getPublication (const std::string &key) const;
-    /** get the id of a registered publication from its id
-   @param[in] name the name of the publication
-   @return ivalid_publication_id if name is not recognized otherwise returns the publication_id*/
+    /** get a publication from its index
+    @param index the 0 based index of the publication to retrieve
+    @return an invalid publication if the index is valid otherwise a reference to the corresponding publication*/
     Publication &getPublication (int index);
-    /** get the id of a registered publication from its id
-    @param[in] name the name of the publication
-    @return ivalid_publication_id if name is not recognized otherwise returns the publication_id*/
+    /** get a publication from its index
+    @param index the 0 based index of the publication to retrieve
+    @return an invalid publication if the index is valid otherwise the corresponding publication*/
     const Publication &getPublication (int index) const;
 
-    /** get the id of a registered publication from its id
-    @param[in] name the name of the publication
-    @return ivalid_publication_id if name is not recognized otherwise returns the publication_id*/
+    /** get a publication from its name
+    @param key the name of the publication
+    @param index1 the index into a vector of publications
+    @return an invalid publication if the index is valid otherwise the corresponding publication*/
     const Publication &getPublication (const std::string &key, int index1) const;
-    /** get the id of a registered publication from its id
-    @param[in] name the name of the publication
-    @return ivalid_publication_id if name is not recognized otherwise returns the publication_id*/
+    /** get a publication from a 2-d array of publications
+    @param key the name of the publication
+    @param index1 the first index of  2d array
+    @param index2 the second index of a 2d array of publications
+    @return an invalid publication if the index is valid otherwise the corresponding publication*/
     const Publication &getPublication (const std::string &key, int index1, int index2) const;
-
-    /** get the units of a subscriptions from its id
-    @param[in] id the subscription id to query
-    @return the name or empty string on unrecognized id*/
-    const std::string &getInputUnits (const Input &inp) const;
-
-    /** get the units of a publication from its id
-    @param[in] id the publication id to query
-    @return the units or empty string on unrecognized id*/
-    const std::string &getPublicationUnits (const Publication &pub) const;
-
-    /** get the key of an input from its id
-    @param[in] id the input id to query
-    @return the type or empty string on unrecognized id*/
-    const std::string &getInputKey (const Input &inp) const;
-
-    /** get the type of a input from its id
-    @param[in] id the input id to query
-    @return the type or empty string on unrecognized id*/
-    const std::string &getInputType (const Input &inp) const;
-
-    /** get the type of a publication from its id
-    @param[in] id the publication id to query
-    @return the type or empty string on unrecognized id*/
-    const std::string &getPublicationType (const Publication &pub) const;
-
-    /** get the type of the publication of a particular subscription
-    @param[in] inp the input to query
-    @return the type or empty string on invalid input*/
-    const std::string &getPublicationType (const Input &inp) const;
 
     /** register a callback function to call when any subscribed value is updated
     @details there can only be one generic callback
-    @param[in] callback the function to call signature void(input_id_t, Time)
+    @param callback the function to call signature void(input_id_t, Time)
     */
     void setInputNotificationCallback (std::function<void(Input &, Time)> callback);
     /** register a callback function to call when the specified subscription is updated
-    @param[in] id  the id to register the callback for
-    @param[in] callback the function to call
+    @param inp an input to set the notification callback for
+    @param callback the function to call
     */
     void setInputNotificationCallback (Input &inp, std::function<void(Input &, Time)> callback);
 

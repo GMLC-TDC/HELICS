@@ -1,5 +1,5 @@
 /*
-Copyright © 2017-2018,
+Copyright © 2017-2019,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
@@ -37,6 +37,8 @@ class DelayedObjects
     // not movable or copyable;
     DelayedObjects (const DelayedObjects &) = delete;
     DelayedObjects (DelayedObjects &&) = delete;
+    DelayedObjects &operator= (const DelayedObjects &) = delete;
+    DelayedObjects &operator= (DelayedObjects &&) = delete;
 
     void setDelayedValue (int index, const X &val)
     {

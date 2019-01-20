@@ -1,5 +1,5 @@
 /*
-Copyright © 2017-2018,
+Copyright © 2017-2019,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
@@ -44,28 +44,38 @@ class AsioServiceManager : public std::enable_shared_from_this<AsioServiceManage
     std::mutex runningLoopLock;  //!< lock protecting the nullwork object and the return future
     std::atomic<bool> terminateLoop{false};  //!< flag indicating that the loop should terminate
     std::future<void> loopRet;
-    AsioServiceManager (const std::string &serviceName);
+    /** constructor*/
+    explicit AsioServiceManager (const std::string &serviceName);
 
     /** servicing helper class to manage lifetimes of a service loop*/
-    class servicer
+    class Servicer
     {
       public:
-        explicit servicer (std::shared_ptr<AsioServiceManager> manager) : serviceManager (std::move (manager)) {}
+        explicit Servicer (std::shared_ptr<AsioServiceManager> manager) : serviceManager (std::move (manager)) {}
         /** this object halts the serviceLoop when deleted*/
-        ~servicer ()
+        ~Servicer ()
         {
             if (serviceManager)
             {
-                serviceManager->haltServiceLoop ();
+                try
+                {
+                    serviceManager->haltServiceLoop ();
+                }
+                catch (...)
+                {
+                    // no exceptions in a destructor
+                }
             }
         }
+        /** move constructor*/
+        Servicer (Servicer &&sv) = default;
 
       private:
         std::shared_ptr<AsioServiceManager> serviceManager;  //!< a pointer to the service manager
     };
 
   public:
-    using LoopHandle = std::unique_ptr<servicer>;
+    using LoopHandle = std::unique_ptr<Servicer>;
 
     /** return a pointer to a service manager
     @details the function will search for an existing service manager for the name
@@ -114,7 +124,6 @@ class AsioServiceManager : public std::enable_shared_from_this<AsioServiceManage
     /** run a single thread for the service manager to execute asynchronous services in
     @details will run a single thread for the io_service,  it will not stop the thread until either the service
     manager is closed or the haltServiceLoop function is called and there is no more work
-    @param in the name of the service
     */
     LoopHandle startServiceLoop ();
 

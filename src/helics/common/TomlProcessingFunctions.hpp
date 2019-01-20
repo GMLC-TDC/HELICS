@@ -1,5 +1,5 @@
 /*
-Copyright © 2017-2018,
+Copyright © 2017-2019,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
@@ -26,7 +26,7 @@ bool hasTomlExtension (const std::string &tomlString);
 toml::Value loadTomlStr (const std::string &tomlString);
 
 /** read a time from a TOML value element*/
-helics::Time loadTomlTime (const toml::Value &timeElement, timeUnits defaultUnits = timeUnits::sec);
+helics::Time loadTomlTime (const toml::Value &timeElement, time_units defaultUnits = time_units::sec);
 
 /** get a name or key from the element*/
 std::string getKey (const toml::Value &element);

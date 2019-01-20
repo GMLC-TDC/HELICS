@@ -17,4 +17,6 @@ Terminology
 5)  Federation – the set of all Federates executing together in a single
     co-simulation
 
+6)  Interface - a structure by which a federate can communicat with other federates.  Includes Endpoints, Publications, Filters, and Inputs
+
 ![image](../img/terminology-structure.png)

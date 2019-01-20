@@ -1,5 +1,5 @@
 /*
-Copyright © 2017-2018,
+Copyright © 2017-2019,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
@@ -14,7 +14,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include <vector>
 
 // random integer for validation purposes of endpoints
-static const int EndpointValidationIdentifier = 0xB453'94C2;
+static constexpr int EndpointValidationIdentifier = 0xB453'94C2;
 
 static inline void addEndpoint (helics_federate fed, std::unique_ptr<helics::EndpointObject> ept)
 {
@@ -182,11 +182,29 @@ void helicsEndpointSetDefaultDestination (helics_endpoint endpoint, const char *
     CHECK_NULL_STRING (dest, void());
     try
     {
-        endObj->endPtr->setTargetDestination (dest);
+        endObj->endPtr->setDefaultDestination (dest);
     }
     catch (...)
     {
         helicsErrorHandler (err);
+    }
+}
+
+const char *helicsEndpointGetDefaultDestination (helics_endpoint endpoint)
+{
+    auto endObj = verifyEndpoint (endpoint, nullptr);
+    if (endObj == nullptr)
+    {
+        return nullcstr;
+    }
+    try
+    {
+        auto &str = endObj->endPtr->getDefaultDestination ();
+        return str.c_str ();
+    }
+    catch (...)
+    {
+        return nullcstr;
     }
 }
 
@@ -214,11 +232,11 @@ void helicsEndpointSendMessageRaw (helics_endpoint endpoint, const char *dest, c
         {
             if ((dest == nullptr) || (std::string (dest).empty ()))
             {
-                endObj->endPtr->send ((const char *)data, inputDataLength);
+                endObj->endPtr->send (reinterpret_cast<const char *> (data), inputDataLength);
             }
             else
             {
-                endObj->endPtr->send (dest, (const char *)data, inputDataLength);
+                endObj->endPtr->send (dest, reinterpret_cast<const char *> (data), inputDataLength);
             }
         }
     }
@@ -257,11 +275,11 @@ void helicsEndpointSendEventRaw (helics_endpoint endpoint,
         {
             if ((dest == nullptr) || (std::string (dest).empty ()))
             {
-                endObj->endPtr->send ((const char *)data, inputDataLength, time);
+                endObj->endPtr->send (reinterpret_cast<const char *> (data), inputDataLength, time);
             }
             else
             {
-                endObj->endPtr->send (dest, (const char *)data, inputDataLength, time);
+                endObj->endPtr->send (dest, reinterpret_cast<const char *> (data), inputDataLength, time);
             }
         }
     }
@@ -287,6 +305,7 @@ void helicsEndpointSendMessage (helics_endpoint endpoint, helics_message *messag
             err->error_code = helics_error_invalid_argument;
             err->message = emptyMessageErrorString;
         }
+        return;
     }
 
     try
@@ -388,6 +407,8 @@ static helics_message emptyMessage ()
     empty.original_source = nullptr;
     empty.original_dest = nullptr;
     empty.source = nullptr;
+    empty.messageID = 0;
+    empty.flags = 0;
     return empty;
 }
 
@@ -443,7 +464,7 @@ helics_message helicsFederateGetMessage (helics_federate fed)
     return emptyMessage ();
 }
 
-bool checkOutArgString (char *outputString, int maxlen, helics_error *err)
+bool checkOutArgString (const char *outputString, int maxlen, helics_error *err)
 {
     static constexpr char invalidOutputString[] = "Output string location is invalid";
     if ((outputString == nullptr) || (maxlen <= 0))
@@ -507,71 +528,71 @@ int helicsFederateGetEndpointCount (helics_federate fed)
     return static_cast<int> (mfedObj->getEndpointCount ());
 }
 
-const char *helicsEndpointGetInfo(helics_endpoint end)
+const char *helicsEndpointGetInfo (helics_endpoint end)
 {
-    auto endObj = verifyEndpoint(end, nullptr);
+    auto endObj = verifyEndpoint (end, nullptr);
     if (endObj == nullptr)
     {
-        return emptyStr.c_str();
+        return emptyStr.c_str ();
     }
     try
     {
-        const std::string &info = endObj->endPtr->getInfo();
-        return info.c_str();
+        const std::string &info = endObj->endPtr->getInfo ();
+        return info.c_str ();
     }
     catch (...)
     {
-        return emptyStr.c_str();
+        return emptyStr.c_str ();
     }
 }
 
-void helicsEndpointSetInfo(helics_endpoint end, const char *info, helics_error *err)
+void helicsEndpointSetInfo (helics_endpoint end, const char *info, helics_error *err)
 {
-    auto endObj = verifyEndpoint(end, err);
+    auto endObj = verifyEndpoint (end, err);
     if (endObj == nullptr)
     {
         return;
     }
     try
     {
-        endObj->endPtr->setInfo(AS_STRING(info));
+        endObj->endPtr->setInfo (AS_STRING (info));
     }
     catch (...)
     {
-        helicsErrorHandler(err);
+        helicsErrorHandler (err);
     }
 }
 
-helics_bool helicsEndpointGetOption(helics_endpoint end, int option)
+helics_bool helicsEndpointGetOption (helics_endpoint end, int option)
 {
-	auto endObj = verifyEndpoint(end, nullptr);
-	if (endObj == nullptr)
-	{
-		return helics_false;
-	}
-	try
-	{
-		return (endObj->endPtr->getOption(option)) ? helics_true : helics_false;
-	}
-	catch (...)
-	{
-		return helics_false;
-	}
+    auto endObj = verifyEndpoint (end, nullptr);
+    if (endObj == nullptr)
+    {
+        return helics_false;
+    }
+    try
+    {
+        return (endObj->endPtr->getOption (option)) ? helics_true : helics_false;
+    }
+    catch (...)
+    {
+        return helics_false;
+    }
 }
 
 void helicsEndpointSetOption (helics_endpoint end, int option, helics_bool value, helics_error *err)
 {
-	auto endObj = verifyEndpoint(end, err);
-	if (endObj == nullptr)
-	{
-		return;
-	}
-	try
-	{
-		endObj->endPtr->setOption(option, (value == helics_true));
-	}
-	catch (...)
-	{
-		helicsErrorHandler(err);
-	}
+    auto endObj = verifyEndpoint (end, err);
+    if (endObj == nullptr)
+    {
+        return;
+    }
+    try
+    {
+        endObj->endPtr->setOption (option, (value == helics_true));
+    }
+    catch (...)
+    {
+        helicsErrorHandler (err);
+    }
 }

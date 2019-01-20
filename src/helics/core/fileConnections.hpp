@@ -1,5 +1,5 @@
 /*
-Copyright © 2017-2018,
+Copyright Â© 2017-2019,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
@@ -116,7 +116,7 @@ void makeConnectionsJson (brkX *brk, const std::string &file)
 {
     static_assert (std::is_base_of<Broker, brkX>::value || std::is_base_of<Core, brkX>::value,
                    "broker must be Core or broker");
-    Json_helics::Value doc;
+    Json::Value doc;
     try
     {
         doc = loadJson (file);

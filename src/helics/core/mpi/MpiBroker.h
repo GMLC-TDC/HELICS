@@ -1,5 +1,5 @@
 /*
-Copyright © 2017-2018,
+Copyright © 2017-2019,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
@@ -13,7 +13,7 @@ namespace helics
 namespace mpi
 {
 class MpiComms;
-
+/** broker object implementing mpi communications for HELICS*/
 class MpiBroker final : public CommsBroker<MpiComms, CoreBroker>
 {
   public:
@@ -36,6 +36,5 @@ class MpiBroker final : public CommsBroker<MpiComms, CoreBroker>
     int brokerRank;
     int brokerTag;
 };
-} // namespace mpi
-} // namespace helics
-
+}  // namespace mpi
+}  // namespace helics

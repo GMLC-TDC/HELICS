@@ -1,5 +1,5 @@
 /*
-Copyright © 2017-2018,
+Copyright © 2017-2019,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
@@ -63,14 +63,14 @@ Source::Source (const std::string &appName, const std::shared_ptr<Core> &core, c
     fed->setFlagOption (helics_flag_source_only);
 }
 
-Source::Source (const std::string &name, const std::string &jsonString) : App (name, jsonString)
+Source::Source (const std::string &name, const std::string &configString) : App (name, configString)
 {
     fed->setFlagOption (helics_flag_source_only);
 
-    Source::loadJsonFile (jsonString);
+    Source::loadJsonFile (configString);
 }
 
-static void setGeneratorProperty (SignalGenerator *gen, const std::string &name, const Json_helics::Value &prop)
+static void setGeneratorProperty (SignalGenerator *gen, const std::string &name, const Json::Value &prop)
 {
     if (prop.isDouble ())
     {
@@ -97,10 +97,10 @@ static void setGeneratorProperty (SignalGenerator *gen, const std::string &name,
     }
 }
 
-void Source::loadJsonFile (const std::string &jsonFile)
+void Source::loadJsonFile (const std::string &jsonString)
 {
     // we want to load the default period before constructing the interfaces so the default period works
-    auto doc = loadJson (jsonFile);
+    auto doc = loadJson (jsonString);
 
     if (doc.isMember ("source"))
     {
@@ -111,7 +111,7 @@ void Source::loadJsonFile (const std::string &jsonFile)
         }
     }
 
-    loadJsonFileConfiguration ("source", jsonFile);
+    loadJsonFileConfiguration ("source", jsonString);
     auto pubCount = fed->getPublicationCount ();
     for (int ii = 0; ii < pubCount; ++ii)
     {

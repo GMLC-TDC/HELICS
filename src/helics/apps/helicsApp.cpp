@@ -1,5 +1,5 @@
 /*
-Copyright © 2017-2018,
+Copyright © 2017-2019,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
@@ -83,11 +83,11 @@ App::App (const std::string &defaultAppName, int argc, char *argv[])
         return;
     }
     FederateInfo fi (argc, argv);
-    if (fi.defName.empty())
+    if (fi.defName.empty ())
     {
         fi.defName = defaultAppName;
     }
-    
+
     fed = std::make_shared<CombinationFederate> ("", fi);
     App::loadArguments (vm_map);
 }
@@ -175,7 +175,7 @@ void App::loadJsonFileConfiguration (const std::string &appName, const std::stri
     }
 }
 
-void App::loadConfigOptions (const Json_helics::Value &element)
+void App::loadConfigOptions (const Json::Value &element)
 {
     if (element.isMember ("stop"))
     {

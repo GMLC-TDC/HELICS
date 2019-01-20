@@ -1,5 +1,5 @@
 /*
-Copyright © 2017-2018,
+Copyright © 2017-2019,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
@@ -29,39 +29,43 @@ class FilterFederateManager
   public:
     /** construct from a pointer to a core and a specified federate id
      */
-    FilterFederateManager (Core *coreObj, Federate *fFed, federate_id_t id);
+    FilterFederateManager (Core *coreObj, Federate *fFed, local_federate_id id);
+    /** destructor */
     ~FilterFederateManager ();
+
     /** register a Filter
     @details call is only valid in startup mode
-    @param[in] name the name of the endpoint
-    @param[in] type the defined type of the interface for endpoint checking if requested
+    @param name the name of the endpoint
+    @param type_in the type the filter is expecting as an input
+    @param type_out the type the filter generates
     */
-    Filter &registerFilter (const std::string &name, const std::string &type_int, const std::string &type_out);
+    Filter &registerFilter (const std::string &name, const std::string &type_in, const std::string &type_out);
 
     /** register a cloningFilter
     @details call is only valid in startup mode
-    @param[in] name the name of the endpoint
-    @param[in] type the defined type of the interface for endpoint checking if requested
+    @param name the name of the endpoint
+    @param type_in the type the filter is expecting as an input
+    @param type_out the type the filter generates
     */
     CloningFilter &
-    registerCloningFilter (const std::string &name, const std::string &type_int, const std::string &type_out);
+    registerCloningFilter (const std::string &name, const std::string &type_in, const std::string &type_out);
 
     /** register a Filter
     @details call is only valid in startup mode
-    @param[in] name the name of the endpoint
-    @param[in] type the defined type of the interface for endpoint checking if requested
+    @param name the name of the endpoint
+    @param type the defined type of the interface for endpoint checking if requested
     */
     Filter &registerFilter (filter_types type, const std::string &name);
 
     /** register a cloningFilter
     @details call is only valid in startup mode
-    @param[in] name the name of the endpoint
-    @param[in] type the defined type of the interface for endpoint checking if requested
+    @param name the name of the endpoint
+    @param type the defined type of the interface for endpoint checking if requested
     */
     CloningFilter &registerCloningFilter (filter_types type, const std::string &name);
 
     /** get a registered Filter
-    @param[in] name the publication id
+    @param name the publication id
     @return ivalid_publication_id if name is not recognized otherwise returns the publication_id*/
     Filter &getFilter (const std::string &name);
     const Filter &getFilter (const std::string &name) const;
@@ -77,6 +81,6 @@ class FilterFederateManager
     Core *coreObject = nullptr;
     shared_guarded<MappedVector<std::unique_ptr<Filter>, std::string>> filters;
     Federate *fed = nullptr;  //!< pointer back to the message Federate
-    const federate_id_t fedID;  //!< storage for the federate ID
+    const local_federate_id fedID;  //!< storage for the federate ID
 };
 }  // namespace helics

@@ -1,5 +1,5 @@
 /*
-Copyright © 2017-2018,
+Copyright © 2017-2019,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
@@ -130,6 +130,20 @@ BOOST_AUTO_TEST_CASE (type_mismatch_error)
 
     vFed1->registerGlobalPublication<std::vector<double>> ("pub1");
     ipt1.setOption (helics::defs::options::strict_type_checking);
+    ipt1.addTarget ("pub1");
+    BOOST_CHECK_THROW (vFed1->enterExecutingMode (), helics::ConnectionFailure);
+    vFed1->finalize ();
+}
+
+BOOST_AUTO_TEST_CASE (type_mismatch_error_fed_level)
+{
+    SetupTest<helics::ValueFederate> ("test", 1, 1.0);
+    auto vFed1 = GetFederateAs<helics::ValueFederate> (0);
+    vFed1->setFlagOption (helics::defs::flags::strict_input_type_checking);
+    // register the publications
+    auto &ipt1 = vFed1->registerGlobalInput<double> ("ipt1");
+
+    vFed1->registerGlobalPublication<std::vector<double>> ("pub1");
     ipt1.addTarget ("pub1");
     BOOST_CHECK_THROW (vFed1->enterExecutingMode (), helics::ConnectionFailure);
     vFed1->finalize ();

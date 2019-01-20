@@ -1,5 +1,5 @@
 /*
-Copyright © 2017-2018,
+Copyright © 2017-2019,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
@@ -14,7 +14,7 @@ Publication::Publication (ValueFederate *valueFed,
                           const std::string &key,
                           const std::string &type,
                           const std::string &units)
-    : fed (valueFed), handle (id), key_ (key), units_ (units)
+    : fed (valueFed), handle (id), pubKey (key), pubUnits (units)
 {
     pubType = getTypeFromString (type);
 }
@@ -107,12 +107,12 @@ void Publication::publish (char val)
 {
     switch (pubType)
     {
-    case data_type::helicsBool:
+    case data_type::helics_bool:
         publish (!((val == '0') || (val == 'f') || (val == 0) || (val == 'F') || (val == '-')));
         break;
-    case data_type::helicsString:
-    case data_type::helicsNamedPoint:
-        publish (std::string (1,val));
+    case data_type::helics_string:
+    case data_type::helics_named_point:
+        publish (std::string (1, val));
         break;
     default:
         publishInt (static_cast<int64_t> (val));
@@ -286,7 +286,7 @@ void Publication::publish (std::complex<double> val)
     }
 }
 
-void Publication::publish (const named_point &np)
+void Publication::publish (const NamedPoint &np)
 {
     bool doPublish = true;
     if (changeDetectionEnabled)
@@ -312,7 +312,7 @@ void Publication::publish (const std::string &name, double val)
     bool doPublish = true;
     if (changeDetectionEnabled)
     {
-        named_point np (name, val);
+        NamedPoint np (name, val);
         if (changeDetected (prevValue, np, delta))
         {
             prevValue = std::move (np);
@@ -334,7 +334,7 @@ void Publication::publish (const char *name, double val)
     bool doPublish = true;
     if (changeDetectionEnabled)
     {
-        named_point np (name, val);
+        NamedPoint np{name, val};
         if (changeDetected (prevValue, np, delta))
         {
             prevValue = std::move (np);
@@ -355,21 +355,21 @@ data_block typeConvert (data_type type, const defV &val)
 {
     switch (val.index ())
     {
-    case doubleLoc:  // double
+    case double_loc:  // double
         return typeConvert (type, mpark::get<double> (val));
-    case intLoc:  // int64_t
+    case int_loc:  // int64_t
         return typeConvert (type, mpark::get<int64_t> (val));
-    case stringLoc:  // string
+    case string_loc:  // string
     default:
         return typeConvert (type, mpark::get<std::string> (val));
-    case complexLoc:  // complex
+    case complex_loc:  // complex
         return typeConvert (type, mpark::get<std::complex<double>> (val));
-    case vectorLoc:  // vector
+    case vector_loc:  // vector
         return typeConvert (type, mpark::get<std::vector<double>> (val));
-    case complexVectorLoc:  // complex
+    case complex_vector_loc:  // complex
         return typeConvert (type, mpark::get<std::vector<std::complex<double>>> (val));
-    case namedPointLoc:
-        return typeConvert (type, mpark::get<named_point> (val));
+    case named_point_loc:
+        return typeConvert (type, mpark::get<NamedPoint> (val));
     }
 }
 

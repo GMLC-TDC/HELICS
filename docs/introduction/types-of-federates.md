@@ -14,3 +14,5 @@ Types of Federates
     - For things such as Events, Communication packets, triggers
 
 3)  Combination Federate (Value+Message Federate)
+
+4) While not a separate type Filters are supported on all federate types and could be created on a simple federate that doesn't otherwise support value or Message interfaces.  

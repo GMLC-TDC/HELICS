@@ -10,27 +10,35 @@ the separator character between federateName and endpoint or publications that a
 
 The name of the core to connect with,  can be left blank to either find an available core or generate one automatically.
 
-**CoreInitString [string]**
+**coreInitString [string]**
 
 Command line arguments that are passed to the core when starting it.  Some examples are:
 
-  - "2" to specify 2 federates will connect
-  - "1 --broker=192.168.2.3:23444"  to specify a single federate and to connect to a broker at ipaddress 192.168.2.3 port 23444
+  - "-f2" to specify 2 federates will connect
+  - "-f1 --broker=192.168.2.3:23444"  to specify a single federate and to connect to a broker at ipaddress 192.168.2.3 port 23444
 
-**coreType[enum]**
+**coreType [enum]**
 
 Specify which type of core to use. See [core types](./CoreTypes) for more details
 
-  - DEFAULT = 0,  //!< pick a core type depending on compile configuration usually either ZMQ if available or UDP
-  - ZMQ = 1,  //!< use the Zero MQ networking protocol
-  - MPI = 2,  //!< use MPI for operation on a parallel cluster
-  - TEST = 3,  //!< use the Test core if all federates are in the same process
-  - INTERPROCESS = 4,  //!< interprocess uses memory mapped files to transfer data (for use when all federates are
-                      //!< on the same machine
-  - IPC = 5,  //!< same as INTERPROCESS
-  - TCP = 6,  //!< use a generic TCP protocol message stream to send messages
-  - UDP = 7,  //!< use UDP packets to send the data
-  the enumeration names in the C interface may be different.
+They can be generated from a string using the
+```
+core_type coreTypeFromString (std::string type) noexcept
+```
+function call.  The function
+```
+bool isCoreTypeAvailable (core_type type) noexcept;
+```
+Will check if the specified core type is available in the current build of the library on a specific platform.  
+
+**broker [string]**
+specify the broker to connect to,  can be an ipaddress, or a name of the broker depending on the core type and federation configuration.  
+
+**localport [string]**  
+The local ip port to use for incoming connections.  This is usually a number but depending on the system some ports can be named.  
+
+**properties [bool]**
+Federate info structures accept properties  as either Time values, integers, or flag values (bool).  These are entered through the `setProperty` calls or the `setFlagOption` call. The function calls take a propertyID and a value  From a description of the available options see [Timing](./Timing) and  [helics_enums](https://gmlc-tdc.github.io/HELICS-src/doxygen/helics__enums_8h.html) and [helics_definitions](https://gmlc-tdc.github.io/HELICS-src/doxygen/helics__definitions_8hpp.html)
 
 ## Timing control variables
 

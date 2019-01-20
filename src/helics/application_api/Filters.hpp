@@ -1,5 +1,5 @@
 /*
-Copyright © 2017-2018,
+Copyright © 2017-2019,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
@@ -60,8 +60,15 @@ class Filter
     /** virtual destructor*/
     virtual ~Filter () = default;
 
+    Filter (Filter &&filt) = default;
+    /** copy the filter, a copied filter will point to the same object*/
+    Filter (const Filter &filt) = default;
+    Filter &operator= (Filter &&filt) = default;
+    /** copy the filter, a copied filter will point to the same object as the original*/
+    Filter &operator= (const Filter &filt) = default;
+    /** check if the Filter links to a valid filter*/
     bool isValid () const { return handle.isValid (); }
-
+    /** check if the filter is a cloning filter*/
     bool isCloningFilter () const { return cloning; }
     /** set a message operator to process the message*/
     void setOperator (std::shared_ptr<FilterOperator> mo);
@@ -71,20 +78,25 @@ class Filter
     /** implicit conversion operator for extracting the handle*/
     operator interface_handle () const { return handle; }
     /** get the name for the filter*/
-    const std::string &getName () const;
+    const std::string &getName () const { return name; }
+    /** get the full global key for the filter*/
+    const std::string &getKey () const;
     /** get the specified input type of the filter*/
-    const std::string &getInputType () const;
+    const std::string &getInjectionType () const;
     /** get the specified output type of the filter*/
-    const std::string &getOutputType () const;
-    /** set a property on a filter
-    @param property the name of the property of the filter to change
-    @param val the numerical value of the property
-    */
+    const std::string &getExtractionType () const;
+
     /** get the interface information field of the publication*/
     const std::string &getInfo () const { return corePtr->getInterfaceInfo (handle); }
     /** set the interface information field of the publication*/
     void setInfo (const std::string &info) { corePtr->setInterfaceInfo (handle, info); }
+
+    /** set a property on a filter
+    @param property the name of the property of the filter to change
+    @param val the numerical value of the property
+    */
     virtual void set (const std::string &property, double val);
+
     /** set a string property on a filter
     @param property the name of the property of the filter to change
     @param val the numerical value of the property
@@ -131,7 +143,16 @@ class CloningFilter : public Filter
 
     /** constructor used by FilterFederateManager*/
     CloningFilter (Federate *ffed, const std::string &filtName, interface_handle handle);
-
+    /** move the filter to a new cloning filter*/
+    CloningFilter (CloningFilter &&filt) = default;
+    /** copy the filter, a copied filter will point to the same object*/
+    CloningFilter (const CloningFilter &filt) = default;
+    /** move assign the cloning filter*/
+    CloningFilter &operator= (CloningFilter &&filt) = default;
+    /** copy the filter, a copied filter will point to the same object as the original*/
+    CloningFilter &operator= (const CloningFilter &filt) = default;
+    /** destructor */
+    ~CloningFilter () = default;
     /** add a delivery address this is the name of an endpoint to deliver the message to*/
     void addDeliveryEndpoint (const std::string &endpoint);
 
@@ -147,18 +168,15 @@ class CloningFilter : public Filter
 /** create a  filter
 @param type the type of filter to create
 @param fed the federate to create the filter through
-@param target the target endpoint all message with the specified target as a destination will route through the
-filter
 @param name the name of the filter (optional)
 @return a unique pointer to a destination Filter object,  note destroying the object does not deactivate the filter
 */
 Filter &make_filter (filter_types type, Federate *fed, const std::string &name = EMPTY_STRING);
 
 /** create a  filter
+@param locality the visibility of the filter global or local
 @param type the type of filter to create
 @param fed the federate to create the filter through
-@param target the target endpoint all message with the specified target as a destination will route through the
-filter
 @param name the name of the filter (optional)
 @return a unique pointer to a destination Filter object,  note destroying the object does not deactivate the filter
 */
@@ -170,7 +188,6 @@ Filter &make_filter (interface_visibility locality,
 /** create a filter
 @param type the type of filter to create
 @param cr the core to create the filter through
-@param target the target endpoint all message coming from the specified source will route through the filter
 @param name the name of the filter (optional)
 @return a unique pointer to a source Filter object,  note destroying the object does not deactivate the filter
 */
@@ -179,8 +196,7 @@ std::unique_ptr<Filter> make_filter (filter_types type, Core *cr, const std::str
 /** create a  filter
 @param type the type of filter to create
 @param fed the federate to create the filter through
-@param target the target endpoint all message with the specified target as a destination will route through the
-filter
+@param delivery the endpoint to deliver the cloned message to
 @param name the name of the filter (optional)
 @return a unique pointer to a destination Filter object,  note destroying the object does not deactivate the filter
 */
@@ -189,11 +205,11 @@ CloningFilter &make_cloning_filter (filter_types type,
                                     const std::string &delivery,
                                     const std::string &name = EMPTY_STRING);
 
-/** create a  filter
+/** create a cloning filter with a specified visibility
+@param locality can be global or local
 @param type the type of filter to create
 @param fed the federate to create the filter through
-@param target the target endpoint all message with the specified target as a destination will route through the
-filter
+@param delivery the endpoint to deliver the cloned message to
 @param name the name of the filter (optional)
 @return a unique pointer to a destination Filter object,  note destroying the object does not deactivate the filter
 */
@@ -203,10 +219,10 @@ CloningFilter &make_cloning_filter (interface_visibility locality,
                                     const std::string &delivery,
                                     const std::string &name = EMPTY_STRING);
 
-/** create a filter
+/** create a cloning filter with a delivery location
 @param type the type of filter to create
 @param cr the core to create the filter through
-@param target the target endpoint all message coming from the specified source will route through the filter
+@param delivery the endpoint to deliver the cloned message to
 @param name the name of the filter (optional)
 @return a unique pointer to a source Filter object,  note destroying the object does not deactivate the filter
 */

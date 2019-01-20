@@ -1,5 +1,5 @@
 /*
-Copyright © 2017-2018,
+Copyright © 2017-2019,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
@@ -13,6 +13,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include "queryHelpers.hpp"
 #include <algorithm>
 #include <chrono>
+#include <mutex>
 #include <thread>
 
 #include "MessageTimer.hpp"
@@ -147,7 +148,7 @@ void FederateState::reset ()
 {
     global_id = global_federate_id ();
     interfaceInformation.setGlobalId (global_federate_id ());
-    local_id = federate_id_t ();
+    local_id = local_federate_id ();
     state = HELICS_CREATED;
     queue.clear ();
     delayQueues.clear ();
@@ -171,14 +172,10 @@ bool FederateState::checkAndSetValue (interface_handle pub_id, const char *data,
     {
         return true;
     }
-    while (!processing.test_and_set ())
-    {
-        ;  // spin
-    }
+    std::lock_guard<FederateState> plock (*this);
     // this function could be called externally in a multi-threaded context
     auto pub = interfaceInformation.getPublication (pub_id);
     auto res = pub->CheckSetValue (data, len);
-    processing.clear (std::memory_order_release);
     return res;
 }
 
@@ -270,13 +267,57 @@ void FederateState::addAction (ActionMessage &&action)
     }
 }
 
+void FederateState::createInterface (handle_type htype,
+                                     interface_handle handle,
+                                     const std::string &key,
+                                     const std::string &type,
+                                     const std::string &units)
+{
+    std::lock_guard<FederateState> plock (*this);
+    // this function could be called externally in a multi-threaded context
+    switch (htype)
+    {
+    case handle_type::publication:
+    {
+        interfaceInformation.createPublication (handle, key, type, units);
+        if (checkActionFlag (getInterfaceFlags (), required_flag))
+        {
+            interfaceInformation.setPublicationProperty (handle, defs::options::connection_required, true);
+        }
+        if (checkActionFlag (getInterfaceFlags (), optional_flag))
+        {
+            interfaceInformation.setPublicationProperty (handle, defs::options::connection_optional, true);
+        }
+    }
+    break;
+    case handle_type::input:
+    {
+        interfaceInformation.createInput (handle, key, type, units);
+        if (strict_input_type_checking)
+        {
+            interfaceInformation.setInputProperty (handle, defs::options::strict_type_checking, true);
+        }
+        if (checkActionFlag (getInterfaceFlags (), required_flag))
+        {
+            interfaceInformation.setInputProperty (handle, defs::options::connection_required, true);
+        }
+        if (checkActionFlag (getInterfaceFlags (), optional_flag))
+        {
+            interfaceInformation.setInputProperty (handle, defs::options::connection_optional, true);
+        }
+    }
+    break;
+    case handle_type::endpoint:
+    {
+        interfaceInformation.createEndpoint (handle, key, type);
+    }
+    default:
+        break;
+    }
+}
+
 void FederateState::closeInterface (interface_handle handle, handle_type type)
 {
-    while (!processing.test_and_set ())
-    {
-        ;  // spin
-    }
-    // this function could be called externally in a multi-threaded context
     switch (type)
     {
     case handle_type::publication:
@@ -286,6 +327,7 @@ void FederateState::closeInterface (interface_handle handle, handle_type type)
         {
             ActionMessage rem (CMD_REMOVE_PUBLICATION);
             rem.setSource (pub->id);
+            rem.actionTime = time_granted;
             for (auto &sub : pub->subscribers)
             {
                 rem.setDestination (sub);
@@ -311,6 +353,7 @@ void FederateState::closeInterface (interface_handle handle, handle_type type)
         {
             ActionMessage rem (CMD_REMOVE_SUBSCRIBER);
             rem.setSource (ipt->id);
+            rem.actionTime = time_granted;
             for (auto &pub : ipt->input_sources)
             {
                 rem.setDestination (pub);
@@ -324,7 +367,6 @@ void FederateState::closeInterface (interface_handle handle, handle_type type)
     default:
         break;
     }
-    processing.clear (std::memory_order_release);
 }
 
 stx::optional<ActionMessage> FederateState::processPostTerminationAction (const ActionMessage & /*action*/)
@@ -992,6 +1034,41 @@ message_processing_result FederateState::processActionMessage (ActionMessage &cm
             }
         }
         break;
+    case CMD_BROADCAST_DISCONNECT:
+    case CMD_DISCONNECT_BROKER:
+    case CMD_DISCONNECT_CORE:
+        switch (timeCoord->processTimeMessage (cmd))
+        {
+        case message_process_result::delay_processing:
+            addFederateToDelay (global_federate_id (cmd.source_id));
+            return message_processing_result::delay_message;
+        case message_process_result::no_effect:
+            return message_processing_result::continue_processing;
+        default:
+            break;
+        }
+        if (state != HELICS_EXECUTING)
+        {
+            break;
+        }
+        if (!timeGranted_mode)
+        {
+            auto ret = timeCoord->checkTimeGrant ();
+            if (returnableResult (ret))
+            {
+                time_granted = timeCoord->getGrantedTime ();
+                allowed_send_time = timeCoord->allowedSendTime ();
+                timeGranted_mode = true;
+                return ret;
+            }
+        }
+        break;
+    case CMD_CLOSE_INTERFACE:
+        if (cmd.source_id == global_id.load ())
+        {
+            closeInterface (cmd.source_handle, static_cast<handle_type> (cmd.counter));
+        }
+        break;
     case CMD_TIME_REQUEST:
         if ((cmd.source_id == global_id.load ()) && (cmd.dest_id == parent_broker_id))
         {  // this sets up a time request
@@ -1133,7 +1210,7 @@ message_processing_result FederateState::processActionMessage (ActionMessage &cm
             {
                 subI->inputType = cmd.getString (typeStringLoc);
             }
-            addDependency (global_federate_id (cmd.source_id));
+            addDependency (cmd.source_id);
         }
     }
     break;
@@ -1164,7 +1241,7 @@ message_processing_result FederateState::processActionMessage (ActionMessage &cm
         auto subI = interfaceInformation.getInput (cmd.dest_handle);
         if (subI != nullptr)
         {
-            subI->removeSource (cmd.getSource (), time_granted);
+            subI->removeSource (cmd.getSource (), (cmd.actionTime != timeZero) ? cmd.actionTime : time_granted);
         }
         break;
     }
@@ -1286,8 +1363,17 @@ void FederateState::setInterfaceProperty (const ActionMessage &cmd)
                                                       checkActionFlag (cmd, indicator_flag));
         if (!used)
         {
-            LOG_WARNING (fmt::format ("property {} not used on input {}", cmd.messageID,
-                                      interfaceInformation.getInput (cmd.dest_handle)->key));
+            auto ipt = interfaceInformation.getInput(cmd.dest_handle);
+            if (ipt != nullptr)
+            {
+                LOG_WARNING(fmt::format("property {} not used on input {}", cmd.messageID,
+                    ipt->key));
+            }
+            else
+            {
+                LOG_WARNING(fmt::format("property {} not used on due to unknown input", cmd.messageID));
+            }
+           
         }
         break;
     case 'p':
@@ -1295,8 +1381,16 @@ void FederateState::setInterfaceProperty (const ActionMessage &cmd)
                                                             checkActionFlag (cmd, indicator_flag));
         if (!used)
         {
-            LOG_WARNING (fmt::format ("property {} not used on publication {}", cmd.messageID,
-                                      interfaceInformation.getPublication (cmd.dest_handle)->key));
+            auto pub = interfaceInformation.getPublication(cmd.dest_handle);
+            if (pub != nullptr)
+            {
+                LOG_WARNING(fmt::format("property {} not used on Publication {}", cmd.messageID,
+                    pub->key));
+            }
+            else
+            {
+                LOG_WARNING(fmt::format("property {} not used on due to unknown Publication", cmd.messageID));
+            }
         }
         break;
     case 'e':
@@ -1304,8 +1398,16 @@ void FederateState::setInterfaceProperty (const ActionMessage &cmd)
                                                       checkActionFlag (cmd, indicator_flag));
         if (!used)
         {
-            LOG_WARNING (fmt::format ("property {} not used on endpoint {}", cmd.messageID,
-                                      interfaceInformation.getEndpoint (cmd.dest_handle)->key));
+            auto ept = interfaceInformation.getEndpoint(cmd.dest_handle);
+            if (ept != nullptr)
+            {
+                LOG_WARNING(fmt::format("property {} not used on Endpoint {}", cmd.messageID,
+                    ept->key));
+            }
+            else
+            {
+                LOG_WARNING(fmt::format("property {} not used on due to unknown Endpoint", cmd.messageID));
+            }
         }
         break;
     default:

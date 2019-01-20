@@ -1,5 +1,5 @@
 /*
-Copyright © 2017-2018,
+Copyright © 2017-2019,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
@@ -12,7 +12,11 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include <iostream>
 #include <thread>
 #include <boost/algorithm/string.hpp>
-
+#if HELICS_HAVE_ZEROMQ > 0
+#include "../common/cppzmq/zmq.hpp"
+#include "../common/zmqContextManager.h"
+#endif
+/** function to run the online terminal program*/
 void terminalFunction (int argc, char *argv[]);
 
 int main (int argc, char *argv[])
@@ -31,7 +35,8 @@ int main (int argc, char *argv[])
     {
         autorestart = true;
     }
-    else if ((boost::iequals (firstarg, "help")) || (firstarg == "-?") || (firstarg == "--help"))
+    else if ((boost::iequals (firstarg, "help")) || (firstarg == "-?") || (firstarg == "-h") ||
+             (firstarg == "--help"))
     {
         std::cout << "helics_broker term <broker args...> will start a broker and open a terminal control window "
                      "for the broker run help in a terminal for more commands\n";
@@ -44,6 +49,7 @@ int main (int argc, char *argv[])
             return ret;
         }
     }
+    // shift the arguments
     if ((runterminal) || (autorestart))
     {
         argc -= 1;
@@ -91,6 +97,14 @@ int main (int argc, char *argv[])
         ret = -4;
     }
 
+#if HELICS_HAVE_ZEROMQ > 0
+#ifdef __APPLE__
+    if (ZmqContextManager::setContextToLeakOnDelete ())
+    {
+        ZmqContextManager::getContext ().close ();
+    }
+#endif
+#endif
     helics::cleanupHelicsLibrary ();
     return ret;
 }
@@ -116,6 +130,11 @@ void terminalFunction (int argc, char *argv[])
         }
         else if (cmd1 == "terminate")
         {
+            if (!broker)
+            {
+                std::cout << "Broker has terminated\n";
+                continue;
+            }
             broker->forceTerminate ();
             while (broker->isActive ())
             {
@@ -128,6 +147,11 @@ void terminalFunction (int argc, char *argv[])
         }
         else if (cmd1 == "terminate*")
         {
+            if (!broker)
+            {
+                std::cout << "Broker has terminated\n";
+                continue;
+            }
             broker->forceTerminate ();
             while (broker->isActive ())
             {
@@ -139,8 +163,7 @@ void terminalFunction (int argc, char *argv[])
             }
             cmdcont = false;
         }
-        else if ((cmd1 == "help")
-            || (cmd1 == "?"))
+        else if ((cmd1 == "help") || (cmd1 == "?"))
         {
             std::cout << "`quit` -> close the terminal application and wait for broker to finish\n";
             std::cout << "`terminate` -> force the broker to stop\n";
@@ -155,7 +178,12 @@ void terminalFunction (int argc, char *argv[])
         }
         else if (cmd1 == "restart")
         {
-            if (broker->isActive ())
+            if (!broker)
+            {
+                broker = std::make_unique<helics::apps::BrokerApp> (argc, argv);
+                std::cout << "broker has started\n";
+            }
+            else if (broker->isActive ())
             {
                 std::cout << "broker is currently running unable to restart\n";
             }
@@ -168,7 +196,11 @@ void terminalFunction (int argc, char *argv[])
         }
         else if (cmd1 == "force")
         {
-            if ((cmdVec.size () >= 2) && (cmdVec[1] == "restart"))
+            if (!broker)
+            {
+                broker = std::make_unique<helics::apps::BrokerApp> (argc, argv);
+            }
+            else if ((cmdVec.size () >= 2) && (cmdVec[1] == "restart"))
             {
                 if (broker->isActive ())
                 {
@@ -183,65 +215,71 @@ void terminalFunction (int argc, char *argv[])
                 }
             }
         }
-		else if (cmd1 == "status")
-		{
+        else if (cmd1 == "status")
+        {
             if (!broker)
             {
                 std::cout << "Broker is not available\n";
+                continue;
             }
             auto accepting = (*broker)->isOpenToNewFederates ();
             auto connected = (*broker)->isConnected ();
             auto id = (*broker)->getIdentifier ();
             if (connected)
             {
-                auto cts = (*broker)->query ("broker","counts");
+                auto cts = (*broker)->query ("broker", "counts");
                 std::cout << "Broker (" << id << ") is connected and " << ((accepting) ? "is" : "is not")
-                          << "accepting new federates\n" << cts << '\n';
+                          << "accepting new federates\n"
+                          << cts << '\n';
             }
             else
             {
                 std::cout << "Broker (" << id << ") is not connected \n";
             }
-		}
-		else if (cmd1 == "info")
-		{
-			if (!broker)
-			{
-                std::cout << "Broker is not available\n";
-			}
-            auto accepting = (*broker)->isOpenToNewFederates ();
-            auto connected = (*broker)->isConnected();
-            auto id = (*broker)->getIdentifier ();
-			if (connected)
-			{
-                auto address = (*broker)->getAddress ();
-                std::cout << "Broker (" << id << ") is connected and " << ((accepting) ?
-                  "is" :
-                  "is not")
-                    << " accepting new federates\naddress=" << address << '\n';
-			}
-			else
-			{
-                std::cout << "Broker (" << id << ") is not connected \n";
-			}
-		}
-            else if (cmd1 == "query")
+        }
+        else if (cmd1 == "info")
+        {
+            if (!broker)
             {
-                std::string res;
-                if (cmdVec.size () == 2)
-                {
-                    res = (*broker)->query ("broker", cmdVec[1]);
-                }
-                else if (cmdVec.size () >= 3)
-                {
-                    res = (*broker)->query (cmdVec[1], cmdVec[2]);
-                }
-                auto qvec = vectorizeQueryResult (std::move (res));
-                std::cout << "results: ";
-                for (const auto &vres : qvec)
-                {
-                    std::cout << vres << '\n';
-                }
+                std::cout << "Broker is not available\n";
+                continue;
             }
+            auto accepting = (*broker)->isOpenToNewFederates ();
+            auto connected = (*broker)->isConnected ();
+            auto id = (*broker)->getIdentifier ();
+            if (connected)
+            {
+                auto address = (*broker)->getAddress ();
+                std::cout << "Broker (" << id << ") is connected and " << ((accepting) ? "is" : "is not")
+                          << " accepting new federates\naddress=" << address << '\n';
+            }
+            else
+            {
+                std::cout << "Broker (" << id << ") is not connected \n";
+            }
+        }
+        else if (cmd1 == "query")
+        {
+            if (!broker)
+            {
+                std::cout << "Broker is not available\n";
+                continue;
+            }
+            std::string res;
+            if (cmdVec.size () == 2)
+            {
+                res = (*broker)->query ("broker", cmdVec[1]);
+            }
+            else if (cmdVec.size () >= 3)
+            {
+                res = (*broker)->query (cmdVec[1], cmdVec[2]);
+            }
+            auto qvec = vectorizeQueryResult (std::move (res));
+            std::cout << "results: ";
+            for (const auto &vres : qvec)
+            {
+                std::cout << vres << '\n';
+            }
+        }
     }
 }

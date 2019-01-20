@@ -166,6 +166,7 @@ public class helicsJNI {
   public final static native long helicsCreateCombinationFederateFromConfig(String jarg1);
   public final static native long helicsFederateClone(long jarg1);
   public final static native long helicsCreateFederateInfo();
+  public final static native long helicsFederateInfoClone(long jarg1);
   public final static native void helicsFederateInfoLoadFromArgs(long jarg1, String[] jarg2);
   public final static native void helicsFederateInfoFree(long jarg1);
   public final static native int helicsFederateIsValid(long jarg1);
@@ -279,6 +280,7 @@ public class helicsJNI {
   public final static native void helicsInputSetDefaultVector(long jarg1, double[] jarg2, int jarg3);
   public final static native void helicsInputSetDefaultNamedPoint(long jarg1, String jarg2, double jarg3);
   public final static native String helicsInputGetType(long jarg1);
+  public final static native String helicsInputGetPublicationType(long jarg1);
   public final static native String helicsPublicationGetType(long jarg1);
   public final static native String helicsInputGetKey(long jarg1);
   public final static native String helicsSubscriptionGetKey(long jarg1);
@@ -302,6 +304,7 @@ public class helicsJNI {
   public final static native long helicsFederateGetEndpoint(long jarg1, String jarg2);
   public final static native long helicsFederateGetEndpointByIndex(long jarg1, int jarg2);
   public final static native void helicsEndpointSetDefaultDestination(long jarg1, String jarg2);
+  public final static native String helicsEndpointGetDefaultDestination(long jarg1);
   public final static native void helicsEndpointSendMessageRaw(long jarg1, String jarg2, long jarg3, int jarg4);
   public final static native void helicsEndpointSendEventRaw(long jarg1, String jarg2, long jarg3, int jarg4, double jarg5);
   public final static native void helicsEndpointSendMessage(long jarg1, long jarg2, helics_message jarg2_);

@@ -1,5 +1,5 @@
 /*
-Copyright © 2017-2018,
+Copyright © 2017-2019,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
@@ -116,8 +116,8 @@ BOOST_AUTO_TEST_CASE (endpointinfo_test)
     helics::EndpointInfo endPI ({helics::global_federate_id (5), helics::interface_handle (13)}, "name", "type");
     BOOST_CHECK_EQUAL (endPI.id.handle.baseValue (), 13);
     BOOST_CHECK_EQUAL (endPI.id.fed_id.baseValue (), 5);
-    BOOST_CHECK (endPI.key.compare ("name") == 0);
-    BOOST_CHECK (endPI.type.compare ("type") == 0);
+    BOOST_CHECK_EQUAL (endPI.key, "name");
+    BOOST_CHECK_EQUAL (endPI.type, "type");
 
     // Check proper return values for empty queue
     // size 0 for any time given

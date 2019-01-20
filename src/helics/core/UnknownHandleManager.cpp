@@ -1,5 +1,5 @@
 /*
-Copyright © 2017-2018,
+Copyright © 2017-2019,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
@@ -296,6 +296,54 @@ void UnknownHandleManager::clearFilter (const std::string &newFilter)
     unknown_filters.erase (newFilter);
     unknown_src_filters.erase (newFilter);
     unknown_dest_filters.erase (newFilter);
+}
+
+void UnknownHandleManager::clearFederateUnknowns (global_federate_id id)
+{
+    for (auto it = std::begin (unknown_publications); it != std::end (unknown_publications);)
+    {
+        if (it->second.first.fed_id == id)
+        {
+            it = unknown_publications.erase (it);  // previously this was something like m_map.erase(it++);
+        }
+        else
+        {
+            ++it;
+        }
+    }
+    for (auto it = std::begin (unknown_endpoints); it != std::end (unknown_endpoints);)
+    {
+        if (it->second.first.fed_id == id)
+        {
+            it = unknown_endpoints.erase (it);  // previously this was something like m_map.erase(it++);
+        }
+        else
+        {
+            ++it;
+        }
+    }
+    for (auto it = std::begin (unknown_filters); it != std::end (unknown_filters);)
+    {
+        if (it->second.first.fed_id == id)
+        {
+            it = unknown_filters.erase (it);  // previously this was something like m_map.erase(it++);
+        }
+        else
+        {
+            ++it;
+        }
+    }
+    for (auto it = std::begin (unknown_inputs); it != std::end (unknown_inputs);)
+    {
+        if (it->second.first.fed_id == id)
+        {
+            it = unknown_inputs.erase (it);  // previously this was something like m_map.erase(it++);
+        }
+        else
+        {
+            ++it;
+        }
+    }
 }
 
 }  // namespace helics

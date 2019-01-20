@@ -1,5 +1,5 @@
 /*
-Copyright © 2017-2018,
+Copyright © 2017-2019,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
@@ -13,23 +13,18 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include <fstream>
 #include <iostream>
 #include <set>
-#include <boost/filesystem.hpp>
 
 #include "../common/argParser.h"
 #include "../common/stringOps.h"
-
-namespace filesystem = boost::filesystem;
 
 namespace helics
 {
 using namespace std::string_literals;
 static const ArgDescriptors InfoArgs{
-  {"broker,b"s, "address of the broker to connect"s},
+  {"broker,b"s, "address or name of the broker to connect"s},
   {"name,n"s, "name of the federate"s},
   {"corename"s, "the name of the core to create or find"s},
-  {"core,c"s, "type of the core to connect to"s},
-  {"type,t"s, "type of the core to connect to"s},
-  {"coretype"s, "type of the core to connect to"s},
+  {"coretype,t"s, "type of the core to connect to"s},
   {"offset"s, "the offset of the time steps"s},
   {"period"s, "the period of the federate"s},
   {"timedelta"s, "the time delta of the federate"s},
@@ -87,6 +82,10 @@ static const std::map<std::string, int> propStringsTranslations{
   {"realtime", helics_flag_realtime},
   {"ignore_time_mismatch", helics_flag_ignore_time_mismatch_warnings},
   {"delayed_update", helics_flag_wait_for_current_time_update},
+  {"strict_input_type_checking", helics_handle_option_strict_type_checking},
+  {"buffer_data", helics_handle_option_buffer_data},
+  {"required", helics_handle_option_connection_required},
+  {"optional", helics_handle_option_connection_optional},
   {"wait_for_current_time", helics_flag_wait_for_current_time_update}};
 
 static const std::set<std::string> validTimeProperties{"period",      "timedelta",    "time_delta",  "offset",
@@ -96,11 +95,21 @@ static const std::set<std::string> validTimeProperties{"period",      "timedelta
 
 static const std::set<std::string> validIntProperties{"max_iterations", "loglevel", "log_level", "maxiterations"};
 
-static const std::set<std::string> validFlagOptions{
-  "interruptible",         "uninterruptible",         "observer",        "source_only", "sourceonly",
-  "only_update_on_change", "only_transmit_on_change", "forward_compute", "realtime",    "delayed_update",
-  "wait_for_current_time",
-};
+static const std::set<std::string> validFlagOptions{"interruptible",
+                                                    "uninterruptible",
+                                                    "observer",
+                                                    "source_only",
+                                                    "sourceonly",
+                                                    "only_update_on_change",
+                                                    "only_transmit_on_change",
+                                                    "forward_compute",
+                                                    "realtime",
+                                                    "delayed_update",
+                                                    "wait_for_current_time",
+                                                    "strict_input_type_checking",
+                                                    "buffer_data",
+                                                    "required",
+                                                    "optional"};
 
 static const std::map<std::string, int> optionStringsTranslations{
   {"buffer", helics_handle_option_buffer_data},
@@ -348,7 +357,7 @@ FederateInfo loadFederateInfo (const std::string &configString)
 FederateInfo loadFederateInfoJson (const std::string &jsonString)
 {
     FederateInfo fi;
-    Json_helics::Value doc;
+    Json::Value doc;
     try
     {
         doc = loadJson (jsonString);

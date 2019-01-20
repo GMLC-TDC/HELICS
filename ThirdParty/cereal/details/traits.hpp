@@ -873,15 +873,15 @@ namespace cereal
     {
       // const stripped away before reaching here, prevents errors on conversion from
       // construct<const T> to construct<T>
-    template<typename T, typename A>
+      template<typename T, typename A>
       struct has_member_load_and_construct_impl : std::integral_constant<bool,
-      std::is_same<decltype( access::load_and_construct<T>( std::declval<A&>(), std::declval< ::cereal::construct<T>&>() ) ), void>::value>
-    { };
+        std::is_same<decltype( access::load_and_construct<T>( std::declval<A&>(), std::declval< ::cereal::construct<T>&>() ) ), void>::value>
+      { };
 
-    template<typename T, typename A>
+      template<typename T, typename A>
       struct has_member_versioned_load_and_construct_impl : std::integral_constant<bool,
-      std::is_same<decltype( access::load_and_construct<T>( std::declval<A&>(), std::declval< ::cereal::construct<T>&>(), 0 ) ), void>::value>
-    { };
+        std::is_same<decltype( access::load_and_construct<T>( std::declval<A&>(), std::declval< ::cereal::construct<T>&>(), 0 ) ), void>::value>
+      { };
     } // namespace detail
 
     //! Member load and construct check

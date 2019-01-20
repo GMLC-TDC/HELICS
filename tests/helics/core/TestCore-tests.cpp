@@ -1,5 +1,5 @@
 /*
-Copyright © 2017-2018,
+Copyright © 2017-2019,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
@@ -66,12 +66,12 @@ BOOST_AUTO_TEST_CASE (testcore_pubsub_value_test)
 
     auto sub1 = core->registerInput (id, "", "type", "units");
     core->addSourceTarget (sub1, "sim1_pub");
-    BOOST_CHECK_EQUAL (core->getType (sub1), "type");
+    BOOST_CHECK_EQUAL (core->getExtractionType (sub1), "type");
     BOOST_CHECK_EQUAL (core->getUnits (sub1), "units");
 
     auto pub1 = core->registerPublication (id, "sim1_pub", "type", "units");
     BOOST_CHECK (core->getPublication (id, "sim1_pub") == pub1);
-    BOOST_CHECK_EQUAL (core->getType (pub1), "type");
+    BOOST_CHECK_EQUAL (core->getExtractionType (pub1), "type");
     BOOST_CHECK_EQUAL (core->getUnits (pub1), "units");
 
     core->enterInitializingMode (id);
@@ -134,10 +134,10 @@ BOOST_AUTO_TEST_CASE (testcore_send_receive_test)
     core->setTimeProperty (id, helics_property_time_delta, 1.0);
 
     auto end1 = core->registerEndpoint (id, "end1", "type");
-    BOOST_CHECK_EQUAL (core->getType (end1), "type");
+    BOOST_CHECK_EQUAL (core->getInjectionType (end1), "type");
 
     auto end2 = core->registerEndpoint (id, "end2", "type");
-    BOOST_CHECK_EQUAL (core->getType (end2), "type");
+    BOOST_CHECK_EQUAL (core->getInjectionType (end2), "type");
 
     core->enterInitializingMode (id);
 
@@ -174,7 +174,7 @@ BOOST_AUTO_TEST_CASE (testcore_messagefilter_callback_test)
         {
             msg->source = filterName;
 
-            if (msg->data.size () > 0)
+            if (!msg->data.empty ())
             {
                 ++msg->data[0];
             }
