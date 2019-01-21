@@ -37,7 +37,6 @@ _basic_env:
   os: linux
   compiler: gcc
 - &osx_base
-  if: branch IN (master, develop)
   os: osx
   compiler: clang
 
@@ -50,37 +49,22 @@ jobs:
     - script: scripts/trigger-dependent-ci-builds.sh
 
   include:
-    # XCode 6.4, OS X 10.10
+    # XCode 10.1, OS X 10.13
     - <<: *osx_base
-      name: "XCode 6.4 macOS 10.10"
+      name: "XCode 10.1, OS X 10.13"
       env:
-        - MATRIX_EVAL="COMPILER=clang && BUILD_TYPE=Release && TRAVIS_XCODE_VERSION=64"
+        - MATRIX_EVAL="COMPILER=clang && BUILD_TYPE=Release && TRAVIS_XCODE_VERSION=101"
         - HOMEBREW_NO_AUTO_UPDATE=1
-        - CI_BOOST_VERSION=1.58.0
-      osx_image: xcode6.4
-    # XCode 7.3, OS X 10.11
+      osx_image: xcode10.1
+
+    # XCode 8.3, OS X 10.12
     - <<: *osx_base
-      name: "XCode 7.3 macOS 10.11"
+      name: "XCode 8.3, macOS 10.12"
+      if: (branch = develop AND type IN (pull_request, cron)) OR (branch = master AND type IN (push, pull_request))
       env:
-        - MATRIX_EVAL="COMPILER=clang && BUILD_TYPE=Release && TRAVIS_XCODE_VERSION=73"
+        - MATRIX_EVAL="COMPILER=clang && BUILD_TYPE=Release && TRAVIS_XCODE_VERSION=83"
         - HOMEBREW_NO_AUTO_UPDATE=1
-      osx_image: xcode7.3
-
-    # XCode 8gm, OS X 10.11
-    - <<: *daily_osx
-      env:
-        - MATRIX_EVAL="COMPILER=clang && BUILD_TYPE=Release && TRAVIS_XCODE_VERSION=8gm"
-        - HOMEBREW_NO_AUTO_UPDATE=1
-      osx_image: xcode8
-
-    - name: "XCode 8gm, macOS 10.11"
-      if: branch =~ /^.*HELICS_2.*$/
-      os: osx
-      compiler: clang
-      env:
-        - MATRIX_EVAL="COMPILER=clang && BUILD_TYPE=Release && TRAVIS_XCODE_VERSION=8gm"
-        - HOMEBREW_NO_AUTO_UPDATE=1
-      osx_image: xcode8
+      osx_image: xcode8.3
 
     - <<: *linux_base
       name: "GCC 6"
@@ -217,13 +201,6 @@ jobs:
         - RUN_UBSAN=true
         - USE_MPI=mpich
         - JOB_OPTION_FLAGS="-C../scripts/ubsan-cache.cmake"
-    # XCode 8gm, OS X 10.11
-    - <<: *daily_osx
-      name: "XCode 8gm macOS 10.11"
-      env:
-        - MATRIX_EVAL="COMPILER=clang && BUILD_TYPE=Release && TRAVIS_XCODE_VERSION=8gm"
-        - HOMEBREW_NO_AUTO_UPDATE=1
-      osx_image: xcode8
       
     - stage: trigger dependent repositories
       if: branch == develop
