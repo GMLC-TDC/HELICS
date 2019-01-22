@@ -1,5 +1,5 @@
 /*
-Copyright © 2017-2018,
+Copyright Â© 2017-2019,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
@@ -10,7 +10,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 
 namespace helics
 {
-std::ostream &operator<< (std::ostream &os, federate_id_t fid)
+std::ostream &operator<< (std::ostream &os, local_federate_id fid)
 {
     os << fid.baseValue ();
     return os;
@@ -36,7 +36,7 @@ std::ostream &operator<< (std::ostream &os, global_federate_id id)
 
 std::ostream &operator<< (std::ostream &os, global_handle id)
 {
-    os << id.fed_id.baseValue()<<"::"<<id.handle.baseValue();
+    os << id.fed_id.baseValue () << "::" << id.handle.baseValue ();
     return os;
 }
 
@@ -45,4 +45,4 @@ std::ostream &operator<< (std::ostream &os, route_id id)
     os << id.baseValue ();
     return os;
 }
-}
+}  // namespace helics

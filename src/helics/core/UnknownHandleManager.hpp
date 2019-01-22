@@ -1,5 +1,5 @@
 /*
-Copyright © 2017-2018,
+Copyright © 2017-2019,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
@@ -70,7 +70,8 @@ class UnknownHandleManager
 
     /** specify a found source filter*/
     void clearFilter (const std::string &newFilter);
-
+    /** clear all unknowns belonging to a certain federate*/
+    void clearFederateUnknowns (global_federate_id id);
     /** check if there are any unknowns remaining*/
     bool hasUnknowns () const;
 

@@ -1,5 +1,5 @@
 /*
-Copyright © 2017-2018,
+Copyright © 2017-2019,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
@@ -160,16 +160,16 @@ void TcpComms::queue_rx_function ()
         return;
     }
     auto ioserv = AsioServiceManager::getServicePointer ();
-    auto server = helics::tcp::TcpServer::create (ioserv->getBaseService (), localTarget_, PortNumber,
-                                                  reuse_address, maxMessageSize_);
+    auto server = helics::tcp::TcpServer::create (ioserv->getBaseService (), localTargetAddress, PortNumber,
+                                                  reuse_address, maxMessageSize);
     while (!server->isReady ())
     {
         if ((autoPortNumber) && (hasBroker))
         {  // If we failed and we are on an automatically assigned port number,  just try a different port
             server->close ();
             ++PortNumber;
-            server = helics::tcp::TcpServer::create (ioserv->getBaseService (), localTarget_, PortNumber,
-                                                     reuse_address, maxMessageSize_);
+            server = helics::tcp::TcpServer::create (ioserv->getBaseService (), localTargetAddress, PortNumber,
+                                                     reuse_address, maxMessageSize);
         }
         else
         {
@@ -259,12 +259,27 @@ bool TcpComms::establishBrokerConnection (std::shared_ptr<AsioServiceManager> &i
     }
     try
     {
-        brokerConnection = makeConnection (ioserv->getBaseService (), brokerTarget_, std::to_string (brokerPort),
-                                           maxMessageSize_, std::chrono::milliseconds (connectionTimeout));
-        if (!brokerConnection)
+        brokerConnection = makeConnection (ioserv->getBaseService (), brokerTargetAddress,
+                                           std::to_string (brokerPort), maxMessageSize, connectionTimeout);
+        int retries = 0;
+        while (!brokerConnection)
         {
-            logError ("initial connection to broker timed out");
-            return terminate (connection_status::error);
+            if (retries == 0)
+            {
+                logWarning ("initial connection to broker timed out ");
+            }
+            ++retries;
+            if (retries > maxRetries)
+            {
+                logWarning ("initial connection to broker timed out exceeding max number of retries ");
+                return terminate (connection_status::error);
+            }
+            else
+            {
+                std::this_thread::yield ();
+                brokerConnection = makeConnection (ioserv->getBaseService (), brokerTargetAddress,
+                                                   std::to_string (brokerPort), maxMessageSize, connectionTimeout);
+            }
         }
         if (PortNumber <= 0)
         {
@@ -308,15 +323,11 @@ bool TcpComms::establishBrokerConnection (std::shared_ptr<AsioServiceManager> &i
                             rxMessageQueue.push (mess->second);
                             break;
                         }
-
-                        else if (mess->second.messageID == DISCONNECT)
+                        if (mess->second.messageID == DISCONNECT)
                         {
                             return terminate (connection_status::terminated);
                         }
-                        else
-                        {
-                            rxMessageQueue.push (mess->second);
-                        }
+                        rxMessageQueue.push (mess->second);
                     }
                     else
                     {
@@ -349,7 +360,7 @@ void TcpComms::queue_tx_function ()
     TcpConnection::pointer brokerConnection;
 
     std::map<route_id, TcpConnection::pointer> routes;  // for all the other possible routes
-    if (!brokerTarget_.empty ())
+    if (!brokerTargetAddress.empty ())
     {
         hasBroker = true;
     }
@@ -401,17 +412,17 @@ void TcpComms::queue_tx_function ()
                         std::tie (interface, port) = extractInterfaceandPortString (newroute);
                         auto new_connect = TcpConnection::create (ioserv->getBaseService (), interface, port);
 
-						routes.emplace(route_id{ cmd.getExtraData() }, std::move(new_connect));
+                        routes.emplace (route_id{cmd.getExtraData ()}, std::move (new_connect));
                     }
                     catch (std::exception &e)
                     {
-                        // TODO:: do something???
+                        // TODO(PT):: do something???
                     }
                     processed = true;
                 }
                 break;
                 case REMOVE_ROUTE:
-					routes.erase(route_id{ cmd.getExtraData() });
+                    routes.erase (route_id{cmd.getExtraData ()});
                     processed = true;
                     break;
                 case CLOSE_RECEIVER:
@@ -502,9 +513,9 @@ void TcpComms::queue_tx_function ()
                 }
                 else
                 {
-					if (!isDisconnectCommand(cmd))
-					{
-                        logWarning (std::string ("unknown message destination message dropped ") +
+                    if (!isDisconnectCommand (cmd))
+                    {
+                        logWarning (std::string ("(tcp) unknown message destination message dropped ") +
                                     prettyPrintString (cmd));
                     }
                 }

@@ -1,5 +1,5 @@
 /*
-Copyright © 2017-2018,
+Copyright © 2017-2019,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
@@ -159,8 +159,8 @@ BOOST_AUTO_TEST_CASE (subscriptionObject_type_tests_ext)
     runPubSubTypeTests<int64_t, double> (34, 34.0);
     runPubSubTypeTests<int64_t, std::string> (34, "34");
     runPubSubTypeTests<std::string, int64_t> ("34.14", 34);
-    runPubSubTypeTests<helics::named_point, double> ({std::string (), -3.14159}, -3.14159);
-    runPubSubTypeTests<helics::named_point, int64_t> ({std::string (), -3.14159}, -3);
+    runPubSubTypeTests<helics::NamedPoint, double> ({std::string (), -3.14159}, -3.14159);
+    runPubSubTypeTests<helics::NamedPoint, int64_t> ({std::string (), -3.14159}, -3);
 }
 
 BOOST_AUTO_TEST_CASE (subscriptionObject_bool_tests, *utf::label ("ci"))
@@ -176,8 +176,8 @@ BOOST_AUTO_TEST_CASE (subscriptionObject_bool_tests_ext)
     runPubSubTypeTests<bool, double> (false, 0.0);
     runPubSubTypeTests<int64_t, bool> (-10, true);
     runPubSubTypeTests<int64_t, bool> (0, false);
-    runPubSubTypeTests<helics::named_point, bool> ({std::string (), -3.14159}, true);
-    runPubSubTypeTests<helics::named_point, bool> ({"0", std::nan ("0")}, false);
+    runPubSubTypeTests<helics::NamedPoint, bool> ({std::string (), -3.14159}, true);
+    runPubSubTypeTests<helics::NamedPoint, bool> ({"0", std::nan ("0")}, false);
 }
 
 BOOST_AUTO_TEST_CASE (subscriptionObject_complex_tests, *utf::label ("ci"))
@@ -186,8 +186,8 @@ BOOST_AUTO_TEST_CASE (subscriptionObject_complex_tests, *utf::label ("ci"))
 
     runPubSubTypeTests<c, std::string> (c (12.4, 0.3), helics::helicsComplexString (c (12.4, 0.3)));
     runPubSubTypeTests<std::string, c> ("-3.14159 - 2i", c (-3.14159, -2));
-    runPubSubTypeTests<helics::named_point, c> ({"-3.14159 - 2i", std::nan ("0")}, c (-3.14159, -2));
-    runPubSubTypeTests<helics::named_point, c> ({"", -3.14159}, c (-3.14159, 0));
+    runPubSubTypeTests<helics::NamedPoint, c> ({"-3.14159 - 2i", std::nan ("0")}, c (-3.14159, -2));
+    runPubSubTypeTests<helics::NamedPoint, c> ({"", -3.14159}, c (-3.14159, 0));
     runPubSubTypeTests<c, double> (c (0, 2), 2.0);
 }
 
@@ -199,8 +199,8 @@ BOOST_AUTO_TEST_CASE (subscriptionObject_complex_tests_ext)
     runPubSubTypeTests<std::string, c> ("3.14159-2j", c (3.14159, -2));
     runPubSubTypeTests<std::string, c> ("-3.14159-2j", c (-3.14159, -2));
 
-    runPubSubTypeTests<c, helics::named_point> (c (-3.14159, -2), {"-3.14159 -2j", std::nan ("0")});
-    runPubSubTypeTests<c, helics::named_point> (c (-3.14159, 0), {"value", -3.14159});
+    runPubSubTypeTests<c, helics::NamedPoint> (c (-3.14159, -2), {"-3.14159 -2j", std::nan ("0")});
+    runPubSubTypeTests<c, helics::NamedPoint> (c (-3.14159, 0), {"value", -3.14159});
     runPubSubTypeTests<std::string, c> ("-3.14159 + 2i", c (-3.14159, 2));
 
     runPubSubTypeTests<std::string, c> ("2i", c (0, 2));
@@ -280,8 +280,8 @@ BOOST_AUTO_TEST_CASE (subscriptionObject_complex_vector_tests, *utf::label ("ci"
     runPubSubTypeTests<vc, std::string> (eVec, helics::helicsComplexVectorString (eVec));
     runPubSubTypeTests<std::string, vc> (helics::helicsComplexVectorString (eVec), eVec);
 
-    runPubSubTypeTests<vc, helics::named_point> (tcvec2,
-                                                 {helics::helicsComplexVectorString (tcvec2), std::nan ("0")});
+    runPubSubTypeTests<vc, helics::NamedPoint> (tcvec2,
+                                                {helics::helicsComplexVectorString (tcvec2), std::nan ("0")});
 }
 
 BOOST_AUTO_TEST_CASE (subscriptionObject_complex_vector_tests_ext)
@@ -426,11 +426,13 @@ BOOST_AUTO_TEST_CASE (subscriptionDefaults_test, *utf::label ("ci"))
     fi.coreInitString = "--autobroker";
 
     auto vFed = std::make_shared<helics::ValueFederate> ("test1", fi);
+    vFed->setFlagOption (helics_handle_option_connection_optional);
     // register the publications
     auto &subObj1 = vFed->registerSubscription ("pub1");
     auto &subObj2 = vFed->registerSubscription ("pub2");
     subObj1.setDefault (45.3);
     subObj2.setDefault (67.4);
+
     vFed->enterExecutingMode ();
     auto gtime = vFed->requestTime (1.0);
 

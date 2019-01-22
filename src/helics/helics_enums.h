@@ -1,5 +1,5 @@
 /*
-Copyright © 2017-2018,
+Copyright © 2017-2019,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
@@ -8,8 +8,9 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #ifndef _HELICS_ENUMS_
 #define _HELICS_ENUMS_
 #pragma once
+
 /** @file
-@details base helics enumerations for C and C++ API's
+@brief base helics enumerations for C and C++ API's
 */
 
 #ifdef __cplusplus
@@ -20,24 +21,27 @@ extern "C"
     /** pick a core type depending on compile configuration usually either ZMQ if available or TCP */
     typedef enum
     {
-        helics_core_type_default = 0,
+        helics_core_type_default = 0, /*!< a default core type that will default to something available*/
         helics_core_type_zmq = 1, /*!< use the Zero MQ networking protocol */
         helics_core_type_mpi = 2, /*!< use MPI for operation on a parallel cluster */
         helics_core_type_test = 3, /*!< use the Test core if all federates are in the same process */
         /** interprocess uses memory mapped files to transfer data (for use when all federates are
         on the same machine */
         helics_core_type_interprocess = 4,
+        /** interprocess uses memory mapped files to transfer data (for use when all federates are
+        on the same machine ipc is the same as /ref helics_core_type_interprocess*/
         helics_core_type_ipc = 5,
         helics_core_type_tcp = 6, /*!< use a generic TCP protocol message stream to send messages */
-        helics_core_type_udp = 7, /** use UDP packets to send the data */
+        helics_core_type_udp = 7, /*!< use UDP packets to send the data */
         helics_core_type_zmq_test =
-          10, /*!< test code for different type of ZMQ core usually for high fed count on the same system*/
+          10, /*!< single socket version of ZMQ core usually for high fed count on the same system*/
         helics_core_type_nng = 9, /*!< for using the nanomsg communications */
         helics_core_type_tcp_ss =
           11, /*!< a single socket version of the TCP core for more easily handling firewalls*/
         helics_core_type_http = 12 /*!< a core type using http for communication*/
     } helics_core_type;
 
+    /** enumeration of allowable data types for publications and inputs*/
     typedef enum
     {
         /** a sequence of characters*/
@@ -54,21 +58,20 @@ extern "C"
         helics_data_type_complex_vector = 5,
         /** a named point consisting of a string and a double*/
         helics_data_type_named_point = 6,
-
         /** a boolean data type*/
         helics_data_type_boolean = 7,
-
         /** time data type*/
         helics_data_type_time = 8,
-
         /** raw data type*/
         helics_data_type_raw = 25,
+        /** open type that can be anything*/
         helics_data_type_any = 25262
     } helics_data_type;
 
 /** single character data type  this is intentionally the same as string*/
 #define helics_data_type_char helics_data_type_string
 
+    /** enumeration of possible federate flags*/
     typedef enum
     {
         /** flag indicating that a federate is observe only*/
@@ -104,7 +107,8 @@ extern "C"
         helics_flag_ignore_time_mismatch_warnings = 67
     } helics_federate_flags;
 
-    /* log level definitions*/
+    /** log level definitions
+     */
     typedef enum
     {
         /** don't print anything except a few catastrophic errors*/
@@ -115,7 +119,7 @@ extern "C"
         helics_log_level_warning = 1,
         /** warning errors and summary level information*/
         helics_log_level_summary = 2,
-        /** summary+ notices about federate and broker connections*/
+        /** summary+ notices about federate and broker connections +messages about network connections*/
         helics_log_level_connections = 3,
         /** connections+ interface definitions*/
         helics_log_level_interfaces = 4,
@@ -131,7 +135,6 @@ extern "C"
      */
     typedef enum
     {
-
         helics_ok = 0, /*!< the function executed successfully */
         helics_error_registration_failure = (-1), /*!< registration has failed*/
         helics_error_connection_failure = (-2), /*!< the operation to connect has failed*/
@@ -150,21 +153,33 @@ extern "C"
         other_error_type = -203 /*!< a non helics error was produced*/
     } helics_error_types;
 
+    /** enumeration of properties that apply to federates*/
     typedef enum
     {
         /** the property controlling the minimum time delta for a federate*/
         helics_property_time_delta = 137,
+        /** the property controlling the period for a federate*/
         helics_property_time_period = 140,
+        /** the property controlling time offset for the period of federate*/
         helics_property_time_offset = 141,
+        /** the property controlling real time lag for a federate the max time a federate can lag real time*/
         helics_property_time_rt_lag = 143,
+        /** the property controlling real time lead for a federate the max time a federate can be ahead of real
+           time*/
         helics_property_time_rt_lead = 144,
+        /** the property controlling real time tolerance for a federate sets both rt_lag and rt_lead*/
         helics_property_time_rt_tolerance = 145,
+        /** the property controlling input delay for a federate*/
         helics_property_time_input_delay = 148,
+        /** the property controlling output delay for a federate*/
         helics_property_time_output_delay = 150,
+        /** integer property controlling the maximum number of iterations in a federate*/
         helics_property_int_max_iterations = 259,
+        /** integer property controlling the log level in a federate see \ref helics_log_levels*/
         helics_property_int_log_level = 271
     } helics_properties;
 
+    /** enumeration of options that apply to handles*/
     typedef enum
     {
         /** specify that a connection is required for an interface and will generate an error if not available*/
@@ -191,12 +206,20 @@ extern "C"
     /** enumeration of the predefined filter types*/
     typedef enum
     {
+        /** a custom filter type that executes a user defined callback*/
         helics_filter_type_custom = 0,
+        /** a filter type that executes a fixed delay on a message*/
         helics_filter_type_delay = 1,
+        /** a filter type that executes a random delay on the messages*/
         helics_filter_type_random_delay = 2,
+        /** a filter type that randomly drops messages*/
         helics_filter_type_random_drop = 3,
+        /** a filter type that reroutes a message to a different destination than originally specified*/
         helics_filter_type_reroute = 4,
+        /** a filter type that duplicates a message and sends the copy to a different destination*/
         helics_filter_type_clone = 5,
+        /** a customizable filter type that can perform different actions on a message based on firewall like
+           rules*/
         helics_filter_type_firewall = 6
 
     } helics_filter_type;

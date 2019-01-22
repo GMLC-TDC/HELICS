@@ -1,5 +1,5 @@
 /*
-Copyright © 2017-2018,
+Copyright © 2017-2019,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
@@ -8,26 +8,6 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include <boost/test/unit_test.hpp>
 
 #include <cctype>
-
-#ifndef DISABLE_TCP_CORE
-#ifdef HELICS_HAVE_ZEROMQ
-const std::vector<std::string> core_types = {"test",   "ipc",   "zmq",   "udp",   "tcp",
-                                             "test_2", "ipc_2", "zmq_2", "udp_2", "tcp_2"};
-const std::vector<std::string> core_types_single = {"test", "ipc", "tcp", "zmq", "udp"};
-#else
-const std::vector<std::string> core_types = {"test",  "ipc",   "udp",   "tcp",  "test_2",
-                                             "ipc_2", "zmq_2", "udp_2", "tcp_2"};
-const std::vector<std::string> core_types_single = {"test", "ipc", "tcp", "udp"};
-#endif
-#else
-#ifdef HELICS_HAVE_ZEROMQ
-const std::vector<std::string> core_types = {"test", "ipc", "zmq", "udp", "test_2", "ipc_2", "zmq_2", "udp_2"};
-const std::vector<std::string> core_types_single = {"test", "ipc", "zmq", "udp"};
-#else
-const std::vector<std::string> core_types = {"test", "ipc", "udp", "test_2", "ipc_2", "zmq_2", "udp_2"};
-const std::vector<std::string> core_types_single = {"test", "ipc", "udp"};
-#endif
-#endif
 
 static bool hasIndexCode (const std::string &type_name)
 {

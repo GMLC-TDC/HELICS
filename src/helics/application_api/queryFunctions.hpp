@@ -1,5 +1,5 @@
 /*
-Copyright © 2017-2018,
+Copyright © 2017-2019,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
@@ -38,8 +38,8 @@ std::vector<std::string> vectorizeAndSortQueryResult (const std::string &queryre
 /** helper function to wait for a particular federate has requested initialization mode
 @details this is useful for querying information and being reasonably certain the federate is done adding to its
 interface
-@param[in] fed  a pointer to the federate
-@param[in] fedName the name of the federate we are querying
+@param fed  a pointer to the federate
+@param fedName the name of the federate we are querying
 @param timeout the time to wait for the fed to initialize
 @return true if the federate is now trying to enter initialization false if the timeout was reached
 */
@@ -49,7 +49,7 @@ bool waitForInit (helics::Federate *fed,
 
 /** helper function to wait for a particular federate to be created
 @details this is useful if some reason we need to make sure a federate is created before proceeding
-@param[in] fed  a pointer to the federate
+@param fed  a pointer to the federate
 @param fedName the name of the federate we are querying
 @param timeout the amount of time in ms to wait before returning false
 @return true if the federate exists, false if the timeout occurred

@@ -1,5 +1,5 @@
 /*
-Copyright © 2017-2018,
+Copyright © 2017-2019,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
@@ -70,6 +70,20 @@ std::shared_ptr<Broker> makeBroker (core_type type, const std::string &name)
 
 #else
         throw (HelicsException ("ZMQ broker type is not available"));
+#endif
+        break;
+    case core_type::ZMQ_SS:
+#if HELICS_HAVE_ZEROMQ
+        if (name.empty ())
+        {
+            broker = std::make_shared<zeromq::ZmqBrokerSS> ();
+        }
+        else
+        {
+            broker = std::make_shared<zeromq::ZmqBrokerSS> (name);
+        }
+#else
+        throw (HelicsException ("ZMQ single socket broker type is not available"));
 #endif
         break;
     case core_type::MPI:
@@ -308,7 +322,7 @@ bool registerBroker (const std::shared_ptr<Broker> &broker)
         registered = searchableObjects.addObject (tbroker->getIdentifier (), tbroker);
     }
     cleanUpBrokers ();
-    if (!registered)
+    if ((!registered)&&(tbroker))
     {
         std::this_thread::sleep_for (std::chrono::milliseconds (200));
         registered = searchableObjects.addObject (tbroker->getIdentifier (), tbroker);

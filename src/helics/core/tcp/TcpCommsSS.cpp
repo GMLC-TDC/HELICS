@@ -1,5 +1,5 @@
 /*
-Copyright © 2017-2018,
+Copyright © 2017-2019,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
@@ -157,7 +157,7 @@ generateConnection (std::shared_ptr<AsioServiceManager> &ioserv, const std::stri
     }
     catch (std::exception &e)
     {
-        // TODO:: do something???
+        // TODO(PT):: do something???
     }
     return nullptr;
 }
@@ -188,7 +188,8 @@ void TcpCommsSS::queue_tx_function ()
 
     if (serverMode)
     {
-        server = TcpServer::create (ioserv->getBaseService (), localTarget_, PortNumber, true, maxMessageSize_);
+        server =
+          TcpServer::create (ioserv->getBaseService (), localTargetAddress, PortNumber, true, maxMessageSize);
         while (!server->isReady ())
         {
             logWarning ("retrying tcp bind");
@@ -239,7 +240,7 @@ void TcpCommsSS::queue_tx_function ()
     TcpConnection::pointer brokerConnection;
 
     std::map<route_id, TcpConnection::pointer> routes;  // for all the other possible routes
-    if (!brokerTarget_.empty ())
+    if (!brokerTargetAddress.empty ())
     {
         hasBroker = true;
     }
@@ -254,8 +255,8 @@ void TcpCommsSS::queue_tx_function ()
             try
             {
                 brokerConnection =
-                  makeConnection (ioserv->getBaseService (), brokerTarget_, std::to_string (brokerPort),
-                                  maxMessageSize_, std::chrono::milliseconds (connectionTimeout));
+                  makeConnection (ioserv->getBaseService (), brokerTargetAddress, std::to_string (brokerPort),
+                                  maxMessageSize, std::chrono::milliseconds (connectionTimeout));
                 if (!brokerConnection)
                 {
                     logError ("initial connection to broker timed out");
@@ -282,7 +283,7 @@ void TcpCommsSS::queue_tx_function ()
                 setRxStatus (connection_status::error);
                 return;
             }
-            established_routes[makePortAddress (brokerTarget_, brokerPort)] = parent_route_id;
+            established_routes[makePortAddress (brokerTargetAddress, brokerPort)] = parent_route_id;
         }
     }
 
@@ -311,8 +312,8 @@ void TcpCommsSS::queue_tx_function ()
                         {
                             if (!brokerConnection)
                             {  // check if the connection matches the broker
-                                if ((cmd.payload == brokerName_) ||
-                                    (cmd.payload == makePortAddress (brokerTarget_, brokerPort)))
+                                if ((cmd.payload == brokerName) ||
+                                    (cmd.payload == makePortAddress (brokerTargetAddress, brokerPort)))
                                 {
                                     brokerConnection = std::move (conn);
                                 }
@@ -321,6 +322,10 @@ void TcpCommsSS::queue_tx_function ()
                             {
                                 made_connections.emplace_back (cmd.payload, std::move (conn));
                             }
+                        }
+                        else
+                        {
+                            logWarning ("(tcpss) unable to locate socket");
                         }
                     }
                     break;
@@ -418,7 +423,7 @@ void TcpCommsSS::queue_tx_function ()
             }
             else
             {
-                logWarning (std::string ("no route to broker for message, message dropped :") +
+                logWarning (std::string ("(tcpss) no route to broker for message, message dropped :") +
                             actionMessageType (cmd.action ()));
             }
         }
@@ -468,7 +473,7 @@ void TcpCommsSS::queue_tx_function ()
                 {
                     if (!isDisconnectCommand (cmd))
                     {
-                        logWarning (std::string ("unknown message destination message dropped ") +
+                        logWarning (std::string ("(tcpss) unknown message destination message dropped ") +
                                     prettyPrintString (cmd));
                     }
                 }

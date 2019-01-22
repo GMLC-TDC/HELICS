@@ -1,5 +1,5 @@
 /*
-Copyright © 2017-2018,
+Copyright © 2017-2019,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
@@ -23,8 +23,8 @@ std::string to_string (core_type type)
         return "test_";
     case core_type::ZMQ:
         return "zmq_";
-    case core_type::ZMQ_TEST:
-        return "zmq_test_";
+    case core_type::ZMQ_SS:
+        return "zmqss_";
     case core_type::INTERPROCESS:
     case core_type::IPC:
         return "ipc_";
@@ -52,13 +52,15 @@ static const std::unordered_map<std::string, core_type> coreTypes{{"default", co
                                                                   {"0mq", core_type::ZMQ},
                                                                   {"zmq", core_type::ZMQ},
                                                                   {"zeromq", core_type::ZMQ},
-                                                                  {"zeromq_test", core_type::ZMQ_TEST},
-                                                                  {"zmq_test", core_type::ZMQ_TEST},
-                                                                  {"zeromq2", core_type::ZMQ_TEST},
-                                                                  {"zmq2", core_type::ZMQ_TEST},
-                                                                  {"ZMQ2", core_type::ZMQ_TEST},
+                                                                  {"zeromq_ss", core_type::ZMQ_SS},
+                                                                  {"zmq_ss", core_type::ZMQ_SS},
+                                                                  {"ZMQ_SS", core_type::ZMQ_SS},
+                                                                  {"zeromq2", core_type::ZMQ_SS},
+                                                                  {"zmq2", core_type::ZMQ_SS},
+                                                                  {"ZMQ2", core_type::ZMQ_SS},
                                                                   {"interprocess", core_type::INTERPROCESS},
                                                                   {"ZeroMQ", core_type::ZMQ},
+                                                                  {"ZeroMQ2", core_type::ZMQ_SS},
                                                                   {"ipc", core_type::INTERPROCESS},
                                                                   {"interproc", core_type::INTERPROCESS},
                                                                   {"IPC", core_type::INTERPROCESS},
@@ -104,13 +106,13 @@ core_type coreTypeFromString (std::string type) noexcept
     {
         return fnd->second;
     }
-    if ((type.front() == '=') || (type.front() == '-'))
+    if ((type.front () == '=') || (type.front () == '-'))
     {
-        return coreTypeFromString(type.substr(1));
+        return coreTypeFromString (type.substr (1));
     }
     if (type.compare (0, 4, "zmq2") == 0)
     {
-        return core_type::ZMQ_TEST;
+        return core_type::ZMQ_SS;
     }
     if (type.compare (0, 3, "zmq") == 0)
     {
@@ -182,7 +184,7 @@ bool isCoreTypeAvailable (core_type type) noexcept
         available = true;
 #endif
         break;
-    case core_type::ZMQ_TEST:
+    case core_type::ZMQ_SS:
 #if HELICS_HAVE_ZEROMQ
         available = false;
 #endif

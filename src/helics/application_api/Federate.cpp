@@ -1,5 +1,5 @@
 /*
-Copyright © 2017-2018,
+Copyright © 2017-2019,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
@@ -78,7 +78,7 @@ Federate::Federate (const std::string &fedName, const FederateInfo &fi) : name (
     }
     // this call will throw an error on failure
     fedID = coreObject->registerFederate (name, fi);
-    separator_ = fi.separator;
+    nameSegmentSeparator = fi.separator;
     currentTime = coreObject->getCurrentTime (fedID);
     asyncCallInfo = std::make_unique<shared_guarded_m<AsyncFedCallInfo>> ();
     fManager = std::make_unique<FilterFederateManager> (coreObject.get (), this, fedID);
@@ -123,7 +123,7 @@ Federate::Federate (const std::string &fedName, const std::shared_ptr<Core> &cor
         currentMode = modes::error;
         return;
     }
-    separator_ = fi.separator;
+    nameSegmentSeparator = fi.separator;
     currentTime = coreObject->getCurrentTime (fedID);
     asyncCallInfo = std::make_unique<shared_guarded_m<AsyncFedCallInfo>> ();
     fManager = std::make_unique<FilterFederateManager> (coreObject.get (), this, fedID);
@@ -152,7 +152,7 @@ Federate::Federate (Federate &&fed) noexcept
     fedID = fed.fedID;
     coreObject = std::move (fed.coreObject);
     currentTime = fed.currentTime;
-    separator_ = fed.separator_;
+    nameSegmentSeparator = fed.nameSegmentSeparator;
     asyncCallInfo = std::move (fed.asyncCallInfo);
     fManager = std::move (fed.fManager);
     name = std::move (fed.name);
@@ -165,7 +165,7 @@ Federate &Federate::operator= (Federate &&fed) noexcept
     fedID = fed.fedID;
     coreObject = std::move (fed.coreObject);
     currentTime = fed.currentTime;
-    separator_ = fed.separator_;
+    nameSegmentSeparator = fed.nameSegmentSeparator;
     asyncCallInfo = std::move (fed.asyncCallInfo);
     fManager = std::move (fed.fManager);
     name = std::move (fed.name);
@@ -176,7 +176,13 @@ Federate::~Federate ()
 {
     if (coreObject)
     {
-        finalize ();
+        try
+        {
+            finalize ();
+        }
+        catch (...)  // do not allow a throw inside the destructor
+        {
+        }
     }
 }
 
@@ -420,26 +426,37 @@ void Federate::setFlagOption (int flag, bool flagValue) { coreObject->setFlagOpt
 
 bool Federate::getFlagOption (int flag) { return coreObject->getFlagOption (fedID, flag); }
 void Federate::finalize ()
-{
+{  // since finalize is called in the destructor we can't allow any potential virtual function calls
     switch (currentMode)
     {
     case modes::startup:
         break;
     case modes::pending_init:
-        enterInitializingModeComplete ();
-        break;
+    {
+        auto asyncInfo = asyncCallInfo->lock ();
+        try
+        {
+            asyncInfo->initFuture.get ();
+        }
+        catch (const std::exception &e)
+        {
+            currentMode = modes::error;
+            throw;
+        }
+    }
+    break;
     case modes::initializing:
         break;
     case modes::pending_exec:
-        enterExecutingModeComplete ();
+        asyncCallInfo->lock ()->execFuture.get ();
         break;
     case modes::pending_time:
-        requestTimeComplete ();
+        asyncCallInfo->lock ()->timeRequestFuture.get ();
         break;
     case modes::executing:
         break;
     case modes::pending_iterative_time:
-        requestTimeIterativeComplete ();  // I don't care about the return any more
+        asyncCallInfo->lock ()->timeRequestIterativeFuture.get ();  // I don't care about the return any more
         break;
     case modes::finalize:
     case modes::error:
@@ -519,7 +536,7 @@ void Federate::error (int errorcode)
     currentMode = modes::error;
     if (!coreObject)
     {
-        throw(InvalidFunctionCall("cannot generate error on uninitialized or disconnected Federate"));
+        throw (InvalidFunctionCall ("cannot generate error on uninitialized or disconnected Federate"));
     }
     std::string errorString = "error " + std::to_string (errorcode) + " in federate " + name;
     coreObject->logMessage (fedID, errorcode, errorString);
@@ -530,7 +547,7 @@ void Federate::error (int errorcode, const std::string &message)
     currentMode = modes::error;
     if (!coreObject)
     {
-        throw(InvalidFunctionCall("cannot generate error on uninitialized or disconnected Federate"));
+        throw (InvalidFunctionCall ("cannot generate error on uninitialized or disconnected Federate"));
     }
     coreObject->logMessage (fedID, errorcode, message);
 }
@@ -593,14 +610,11 @@ iteration_time Federate::requestTimeIterative (Time nextInternalTimeStep, iterat
         }
         return iterativeTime;
     }
-    else if (currentMode == modes::finalize)
+    if (currentMode == modes::finalize)
     {
-        return iteration_time (Time::maxVal (), iteration_result::halted);
+        return {Time::maxVal (), iteration_result::halted};
     }
-    else
-    {
-        throw (InvalidFunctionCall ("cannot call request time in present state"));
-    }
+    throw (InvalidFunctionCall ("cannot call request time in present state"));
 }
 
 void Federate::requestTimeAsync (Time nextInternalTimeStep)
@@ -620,7 +634,7 @@ void Federate::requestTimeAsync (Time nextInternalTimeStep)
 }
 
 /** request a time advancement
-@param[in] the next requested time step
+@param the next requested time step
 @return the granted time step*/
 void Federate::requestTimeIterativeAsync (Time nextInternalTimeStep, iteration_request iterate)
 {
@@ -639,9 +653,6 @@ void Federate::requestTimeIterativeAsync (Time nextInternalTimeStep, iteration_r
     }
 }
 
-/** request a time advancement
-@param[in] the next requested time step
-@return the granted time step*/
 Time Federate::requestTimeComplete ()
 {
     auto exp = modes::pending_time;
@@ -655,11 +666,8 @@ Time Federate::requestTimeComplete ()
         updateTime (newTime, oldTime);
         return newTime;
     }
-    else
-    {
-        throw (InvalidFunctionCall (
-          "cannot call finalize requestTime without first calling requestTimeIterative function"));
-    }
+    throw (InvalidFunctionCall (
+      "cannot call finalize requestTime without first calling requestTimeIterative function"));
 }
 
 /** finalize the time advancement request
@@ -692,11 +700,8 @@ iteration_time Federate::requestTimeIterativeComplete ()
         }
         return iterativeTime;
     }
-    else
-    {
-        throw (InvalidFunctionCall (
-          "cannot call finalize requestTimeIterative without first calling requestTimeIterativeAsync function"));
-    }
+    throw (InvalidFunctionCall (
+      "cannot call finalize requestTimeIterative without first calling requestTimeIterativeAsync function"));
 }
 
 void Federate::updateTime (Time /*newTime*/, Time /*oldTime*/)
@@ -743,24 +748,15 @@ static Filter &generateFilter (Federate *fed,
             return (global) ? fed->registerGlobalCloningFilter (name, inputType, outputType) :
                               fed->registerCloningFilter (name, inputType, outputType);
         }
-        else
-        {
-            return (global) ? fed->registerGlobalFilter (name, inputType, outputType) :
-                              fed->registerFilter (name, inputType, outputType);
-        }
+        return (global) ? fed->registerGlobalFilter (name, inputType, outputType) :
+                          fed->registerFilter (name, inputType, outputType);
     }
-    else
+    if (cloning)
     {
-        if (cloning)
-        {
-            return (global) ? make_cloning_filter (GLOBAL, operation, fed, name) :
-                              make_cloning_filter (operation, fed, name);
-        }
-        else
-        {
-            return (global) ? make_filter (GLOBAL, operation, fed, name) : make_filter (operation, fed, name);
-        }
+        return (global) ? make_cloning_filter (GLOBAL, operation, fed, name) :
+                          make_cloning_filter (operation, fed, name);
     }
+    return (global) ? make_filter (GLOBAL, operation, fed, name) : make_filter (operation, fed, name);
 }
 
 const std::string emptyStr;
@@ -1028,7 +1024,7 @@ const Filter &Federate::getFilter (int index) const { return fManager->getFilter
 
 int Federate::filterCount () const { return fManager->getFilterCount (); }
 
-std::string Federate::localQuery (const std::string & /*queryStr*/) const { return std::string (); }
+std::string Federate::localQuery (const std::string & /*queryStr*/) const { return std::string{}; }
 
 std::string Federate::query (const std::string &queryStr)
 {
@@ -1056,7 +1052,7 @@ std::string Federate::query (const std::string &queryStr)
     {
         if (coreObject)
         {
-            res = coreObject->query(getName(), queryStr);
+            res = coreObject->query (getName (), queryStr);
         }
         else
         {
@@ -1138,7 +1134,8 @@ void Federate::setGlobal (const std::string &valueName, const std::string &value
     }
     else
     {
-        throw(InvalidFunctionCall("set set Global cannot be called on uninitialized federate or after finalize call"));
+        throw (InvalidFunctionCall (
+          "set set Global cannot be called on uninitialized federate or after finalize call"));
     }
 }
 
@@ -1146,7 +1143,8 @@ Filter &Federate::registerFilter (const std::string &filterName,
                                   const std::string &inputType,
                                   const std::string &outputType)
 {
-    return fManager->registerFilter ((!filterName.empty ()) ? (getName () + separator_ + filterName) : filterName,
+    return fManager->registerFilter ((!filterName.empty ()) ? (getName () + nameSegmentSeparator + filterName) :
+                                                              filterName,
                                      inputType, outputType);
 }
 
@@ -1154,8 +1152,9 @@ CloningFilter &Federate::registerCloningFilter (const std::string &filterName,
                                                 const std::string &inputType,
                                                 const std::string &outputType)
 {
-    return fManager->registerCloningFilter ((!filterName.empty ()) ? (getName () + separator_ + filterName) :
-                                                                     filterName,
+    return fManager->registerCloningFilter ((!filterName.empty ()) ?
+                                              (getName () + nameSegmentSeparator + filterName) :
+                                              filterName,
                                             inputType, outputType);
 }
 
@@ -1181,7 +1180,8 @@ void Federate::addSourceTarget (const Filter &filt, const std::string &targetEnd
     }
     else
     {
-        throw(InvalidFunctionCall("add source target cannot be called on uninitialized federate or after finalize call"));
+        throw (InvalidFunctionCall (
+          "add source target cannot be called on uninitialized federate or after finalize call"));
     }
 }
 
@@ -1193,7 +1193,8 @@ void Federate::addDestinationTarget (const Filter &filt, const std::string &targ
     }
     else
     {
-        throw(InvalidFunctionCall("add destination target cannot be called on uninitialized federate or after finalize call"));
+        throw (InvalidFunctionCall (
+          "add destination target cannot be called on uninitialized federate or after finalize call"));
     }
 }
 
@@ -1222,7 +1223,7 @@ const Filter &Federate::getFilter (const std::string &filterName) const
     auto &filt = fManager->getFilter (filterName);
     if (!filt.isValid ())
     {
-        auto &filt2 = fManager->getFilter (getName () + separator_ + filterName);
+        auto &filt2 = fManager->getFilter (getName () + nameSegmentSeparator + filterName);
         return filt2;
     }
     return filt;
@@ -1233,7 +1234,7 @@ Filter &Federate::getFilter (const std::string &filterName)
     auto &filt = fManager->getFilter (filterName);
     if (!filt.isValid ())
     {
-        auto &filt2 = fManager->getFilter (getName () + separator_ + filterName);
+        auto &filt2 = fManager->getFilter (getName () + nameSegmentSeparator + filterName);
         return filt2;
     }
     return filt;
@@ -1241,35 +1242,36 @@ Filter &Federate::getFilter (const std::string &filterName)
 
 int Federate::getFilterCount () const { return fManager->getFilterCount (); }
 
-void Federate::setFilterOperator (const Filter &filt, std::shared_ptr<FilterOperator> mo)
+void Federate::setFilterOperator (const Filter &filt, std::shared_ptr<FilterOperator> op)
 {
     if (coreObject)
     {
-        coreObject->setFilterOperator(filt.getHandle(), std::move(mo));
+        coreObject->setFilterOperator (filt.getHandle (), std::move (op));
     }
     else
     {
-        throw(InvalidFunctionCall("set FilterOperator cannot be called on uninitialized federate or after finalize call"));
+        throw (InvalidFunctionCall (
+          "set FilterOperator cannot be called on uninitialized federate or after finalize call"));
     }
-    
 }
 
 void Federate::setInterfaceOption (interface_handle handle, int32_t option, bool option_value)
 {
     if (coreObject)
     {
-        coreObject->setHandleOption(handle, option, option_value);
+        coreObject->setHandleOption (handle, option, option_value);
     }
     else
     {
-        throw(InvalidFunctionCall("set FilterOperator cannot be called on uninitialized federate or after finalize call"));
+        throw (InvalidFunctionCall (
+          "set FilterOperator cannot be called on uninitialized federate or after finalize call"));
     }
 }
 
 /** get the current value for an interface option*/
 bool Federate::getInterfaceOption (interface_handle handle, int32_t option)
 {
-    return (coreObject) ? coreObject->getHandleOption(handle, option) : false;
+    return (coreObject) ? coreObject->getHandleOption (handle, option) : false;
 }
 
 void Federate::closeInterface (interface_handle handle)
@@ -1278,7 +1280,7 @@ void Federate::closeInterface (interface_handle handle)
     {
         coreObject->closeHandle (handle);
     }
-    //well if there is no core object it already is closed
+    // well if there is no core object it already is closed
 }
 
 void Federate::setInfo (interface_handle handle, const std::string &info)
@@ -1289,7 +1291,7 @@ void Federate::setInfo (interface_handle handle, const std::string &info)
     }
     else
     {
-        throw(InvalidFunctionCall("cannot call set info on uninitialized or disconnected federate"));
+        throw (InvalidFunctionCall ("cannot call set info on uninitialized or disconnected federate"));
     }
 }
 

@@ -68,7 +68,7 @@ Next, open three terminals. In the first terminal, run the following
 command.
 
 ```bash
-$ ./helics_broker 2
+$ ./helics_broker -f2
 ```
 
 In the second terminal, run the following command.
@@ -93,44 +93,43 @@ of the “Hello, World” program in detail.
 
 The following block creates a ValueFederate. We will discuss what
 `FederateInfo` is and what a `ValueFederate` is, along with other types
-of Federates in more detail in a later chapter.
+of Federates in more detail in other documents.
 
 ```c
 fedinfo = helicsFederateInfoCreate();
-helicsFederateInfoSetFederateName(fedinfo, "hello_world_sender");
-helicsFederateInfoSetCoreTypeFromString(fedinfo, "zmq");
-helicsFederateInfoSetCoreInitString(fedinfo, "--federates=1");
-helicsFederateInfoSetPeriod(fedinfo, 1.0);
-vfed = helicsCreateValueFederate(fedinfo);
+helicsFederateInfoSetCoreTypeFromString(fedinfo,"zmq",&err);
+helicsFederateInfoSetCoreInitString(fedinfo,fedinitstring,&err);
+helicsFederateInfoSetTimeProperty(fedinfo,helicsGetPropertyIndex("period"), 1.0,&err);
+vfed = helicsCreateValueFederate("hello_world_sender",fedinfo,&err);
 ```
 
 The following registers a global publication.
 
 ```c
-pub = helicsFederateRegisterGlobalPublication(vfed,"hello","string","");
+pub = helicsFederateRegisterGlobalPublication(vfed, "hello", helics_data_type_string, "",&err);
 ```
 
 The following ensures that the federation has entered execution mode.
-if `helicsFederateEnterInitializationMode` is not included the call to
-`helicsFederateEnterExecutionMode` will automatically make the call in the background
+if `helicsFederateEnterInitializingnMode` is not included the call to
+`helicsFederateEnterExecutingMode` will automatically make the call in the background
 
 ```c
-helicsFederateEnterInitializationMode(vfed);
-helicsFederateEnterExecutionMode(vfed);
+  helicsFederateEnterInitializingMode(vfed,&err);
+  helicsFederateEnterExecutingMode(vfed,&err);
 ```
 
 These functions publish a String and make a RequestTime function call to
 advance time in the simulation
 
 ```c
-helicsPublicationPublishString(pub, "Hello, World");
-helicsFederateRequestTime(vfed,1.0, &currenttime);
+  helicsPublicationPublishString(pub, "Hello, World",&err);
+currenttime=helicsFederateRequestTime(vfed, 1.0, &err);
 ```
 
 And these functions finally frees the Federate.
 
 ```c
-helicsFederateFinalize(vfed);
+helicsFederateFinalize(vfed,&err);
 helicsFederateFree(vfed);
 helicsCloseLibrary();
 ```
@@ -140,26 +139,28 @@ uses a Subscription instead. A snippet of the code is shown below.
 
 ```c
 fedinfo = helicsFederateInfoCreate ();
-helicsFederateInfoSetFederateName (fedinfo, "hello_world_receiver");
-helicsFederateInfoSetCoreTypeFromString (fedinfo, "zmq");
-helicsFederateInfoSetCoreInitString (fedinfo, fedinitstring);
-helicsFederateInfoSetPeriod(fedinfo, 1.0);
+helicsFederateInfoSetCoreTypeFromString (fedinfo, "zmq",&err);
+helicsFederateInfoSetCoreInitString (fedinfo, fedinitstring,&err);
+helicsFederateInfoSetTimeProperty(fedinfo,helics_property_time_period, 1.0,&err);
 
-vfed = helicsCreateValueFederate (fedinfo);
-sub = helicsFederateRegisterSubscription (vfed, "hello", "string", "");
+vfed = helicsCreateValueFederate ("hello_world_receiver",fedinfo,&err);
+sub = helicsFederateRegisterSubscription (vfed, "hello",NULL,&err);
 
-helicsFederateEnterInitializationMode (vfed);
-helicsFederateEnterExecutionMode (vfed);
+helicsFederateEnterInitializingMode (vfed,&err);
+helicsFederateEnterExecutingMode (vfed,&err);
 
 /** request that helics grant the federate a time of 1.0
     the new time will be returned in currentime*/
-helicsFederateRequestTime (vfed, 1.0, &currenttime);
+currenttime=helicsFederateRequestTime (vfed, 1.0,&err);
 
-isupdated = helicsSubscriptionIsUpdated (sub);
-helicsSubscriptionGetString (sub, value, 128);
+isUpdated = helicsInputIsUpdated (sub);
+helicsInputGetString(sub, value, 128,&actualLen,&err)
 printf("%s\n", value);
 
-helicsFederateFinalize (vfed);
+helicsFederateFinalize (vfed,&err);
 helicsFederateFree (vfed);
 helicsCloseLibrary ();
 ```
+
+***A note on the `&err` term***
+Many functions in the C api take a pointer to a helics_error structure.  this can be created by a call to `helicsErrorInitialize`  and can be reset by `helicsErrorClear(helics_error *err)`.  If an error occurs during the execution of a function or some inputs were invalid an error code in the helics_error structure will be set and a message included.  For all functions if an error structure that already has an error in place is passed as an argument the function short circuits and does nothing.  So checks can be done after a sequence of calls if desired with no worry about side effects.  In the C++98 API an error triggers and exception and in the base C++ API these originate as exceptions.  

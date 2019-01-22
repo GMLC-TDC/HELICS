@@ -9,5 +9,5 @@ Developer Guide
    swig
    tests
    docs
-   contributing
+   ../../CONTRIBUTING
 ```

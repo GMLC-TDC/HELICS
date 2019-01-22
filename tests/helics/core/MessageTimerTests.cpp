@@ -1,5 +1,5 @@
 /*
-Copyright © 2017-2018,
+Copyright © 2017-2019,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
@@ -28,6 +28,12 @@ BOOST_AUTO_TEST_CASE (basic_test, *utf::label ("ci"))
     localLock.unlock ();
     std::this_thread::sleep_for (std::chrono::milliseconds (300));
     localLock.lock ();
+    if (M.action() != CMD_PROTOCOL)
+    {
+        localLock.unlock();
+        std::this_thread::sleep_for(std::chrono::milliseconds(500));
+        localLock.lock();
+    }
     BOOST_CHECK (M.action () == CMD_PROTOCOL);
 }
 

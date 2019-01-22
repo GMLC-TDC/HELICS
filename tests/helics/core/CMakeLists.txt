@@ -1,5 +1,5 @@
 #
-# Copyright © 2017-2018, Battelle Memorial Institute; Lawrence Livermore National
+# Copyright © 2017-2019, Battelle Memorial Institute; Lawrence Livermore National
 # Security, LLC; Alliance for Sustainable Energy, LLC All rights reserved. See LICENSE
 # file and DISCLAIMER for more details.
 #
@@ -28,7 +28,7 @@ set(
 )
 
 if(HELICS_HAVE_ZEROMQ)
-  list(APPEND core_test_sources ZeromqCore-tests.cpp)
+  list(APPEND core_test_sources ZeromqCore-tests.cpp ZeromqSSCore-tests.cpp)
 endif(HELICS_HAVE_ZEROMQ)
 
 if(NOT DISABLE_TCP_CORE)

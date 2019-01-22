@@ -1,5 +1,5 @@
 /*
-Copyright © 2017-2018,
+Copyright © 2017-2019,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
@@ -299,7 +299,7 @@ BOOST_AUTO_TEST_CASE (tcpSSComm_transmit_add_route)
     connected = comm.connect ();
     BOOST_REQUIRE (connected);
     connected = comm3.connect ();
-
+    BOOST_REQUIRE (connected);
     comm.transmit (helics::route_id (0), helics::CMD_ACK);
 
     std::this_thread::sleep_for (250ms);

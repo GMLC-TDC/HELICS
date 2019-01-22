@@ -1,5 +1,5 @@
 /*
-Copyright © 2017-2018,
+Copyright © 2017-2019,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
@@ -36,7 +36,7 @@ BOOST_AUTO_TEST_CASE (federate_delay_tests)
     fi.setProperty (helics::defs::properties::period, 0.5);
     auto fed = std::make_shared<helics::ValueFederate> ("test1", fi);
 
-    helics::Publication pubid (helics::GLOBAL, fed, "pub1", helics::data_type::helicsDouble);
+    helics::Publication pubid (helics::GLOBAL, fed, "pub1", helics::data_type::helics_double);
 
     fed->registerSubscription ("pub1");
     fed->enterExecutingMode ();
@@ -79,7 +79,7 @@ BOOST_AUTO_TEST_CASE (federate_trigger_tests_adelay)
     auto fed = std::make_shared<helics::ValueFederate> ("test1", fi);
     fi.setFlagOption (helics::defs::flags::realtime, false);
     auto fed2 = std::make_shared<helics::ValueFederate> ("test2", fi);
-    helics::Publication pubid (helics::GLOBAL, fed2, "pub1", helics::data_type::helicsDouble);
+    helics::Publication pubid (helics::GLOBAL, fed2, "pub1", helics::data_type::helics_double);
     std::atomic<int> warnCounter{0};
     fed->setLoggingCallback ([&warnCounter](int logLevel, const std::string &, const std::string &) {
         if (logLevel == 1)
@@ -133,7 +133,7 @@ BOOST_AUTO_TEST_CASE (federate_trigger_tests)
     auto fed = std::make_shared<helics::ValueFederate> ("test1", fi);
     fi.setFlagOption (helics::defs::flags::realtime, false);
     auto fed2 = std::make_shared<helics::ValueFederate> ("test2", fi);
-    helics::Publication pubid (helics::GLOBAL, fed2, "pub1", helics::data_type::helicsDouble);
+    helics::Publication pubid (helics::GLOBAL, fed2, "pub1", helics::data_type::helics_double);
 
     fed->registerSubscription ("pub1");
     fed2->enterExecutingModeAsync ();

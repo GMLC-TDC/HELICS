@@ -1,5 +1,5 @@
 #
-# Copyright © 2017-2018, Battelle Memorial Institute; Lawrence Livermore National
+# Copyright © 2017-2019, Battelle Memorial Institute; Lawrence Livermore National
 # Security, LLC; Alliance for Sustainable Energy, LLC All rights reserved. See LICENSE
 # file and DISCLAIMER for more details.
 #
@@ -12,8 +12,8 @@ project (HELICS VERSION 2.0.0)
 # -----------------------------------------------------------------------------
 # HELICS Version number
 #-----------------------------------------------------------------------------
-set (HELICS_VERSION_BUILD beta.2)
-set (HELICS_DATE "12-19-18")
+set (HELICS_VERSION_BUILD rc1)
+set (HELICS_DATE "01-18-19")
 
 set(
   HELICS_VERSION_UNDERSCORE
@@ -322,7 +322,7 @@ endif()
 # -------------------------------------------------------------
 if(MSYS)
   if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
-    if(BOOST_VERSION_LEVEL GREATER 1)
+    if(BOOST_VERSION_LEVEL GREATER 65)
 		set(DISABLE_TCP_CORE FALSE)
 		target_link_libraries(helics_base INTERFACE wsock32 ws2_32)
 			set(DISABLE_IPC_CORE TRUE)
@@ -517,6 +517,7 @@ hide_variable(FMT_DOC)
 hide_variable(FMT_INSTALL)
 hide_variable(FMT_PEDANTIC)
 hide_variable(FMT_TEST)
+hide_variable(FMT_WERROR)
 
 # -----------------------------------------------------------------------------
 # CMAKE Subdirectories

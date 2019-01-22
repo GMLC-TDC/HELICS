@@ -1,5 +1,5 @@
 /*
-Copyright © 2017-2018,
+Copyright © 2017-2019,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
@@ -14,7 +14,7 @@ triplineType TripWire::getline ()
 }
 
 TripWireDetector::TripWireDetector () : lineDetector (TripWire::getline ()) {}
-bool TripWireDetector::isTripped () const { return lineDetector->load (std::memory_order_acquire); }
+bool TripWireDetector::isTripped () const noexcept { return lineDetector->load (std::memory_order_acquire); }
 
 TripWireTrigger::TripWireTrigger () : lineTrigger (TripWire::getline ()) {}
 

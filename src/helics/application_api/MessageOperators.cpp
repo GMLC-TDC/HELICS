@@ -1,5 +1,5 @@
 /*
-Copyright © 2017-2018,
+Copyright © 2017-2019,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
@@ -69,14 +69,16 @@ std::unique_ptr<Message> MessageDestOperator::process (std::unique_ptr<Message> 
     return message;
 }
 
-MessageConditionalOperator::MessageConditionalOperator (std::function<bool(const Message *)> userConditionFunction)
-    : evalFunction (std::move (userConditionFunction))
+MessageConditionalOperator::MessageConditionalOperator (
+  std::function<bool(const Message *)> userConditionalFunction)
+    : evalFunction (std::move (userConditionalFunction))
 {
 }
 
-void MessageConditionalOperator::setConditionFunction (std::function<bool(const Message *)> userConditionFunction)
+void MessageConditionalOperator::setConditionFunction (
+  std::function<bool(const Message *)> userConditionalFunction)
 {
-    evalFunction = std::move (userConditionFunction);
+    evalFunction = std::move (userConditionalFunction);
 }
 
 std::unique_ptr<Message> MessageConditionalOperator::process (std::unique_ptr<Message> message)
@@ -125,40 +127,42 @@ std::unique_ptr<Message> FirewallOperator::process (std::unique_ptr<Message> mes
 {
     if (checkFunction)
     {
-        bool res=checkFunction (message.get ());
-		switch (operation)
-		{
+        bool res = checkFunction (message.get ());
+        switch (operation)
+        {
         case operations::drop:
-			if (res)
-			{
+            if (res)
+            {
                 message = nullptr;
-			}
+            }
             break;
         case operations::pass:
-			if (!res)
-			{
+            if (!res)
+            {
                 message = nullptr;
-			}
+            }
             break;
-        case operations::setFlag1:
-			if (res)
-			{
+        case operations::set_flag1:
+            if (res)
+            {
                 setActionFlag (*message, extra_flag1);
-			}
+            }
             break;
-        case operations::setFlag2:
+        case operations::set_flag2:
             if (res)
             {
                 setActionFlag (*message, extra_flag2);
             }
             break;
-        case operations::setFlag3:
+        case operations::set_flag3:
             if (res)
             {
                 setActionFlag (*message, extra_flag3);
             }
             break;
-		}
+        case operations::none:
+            break;
+        }
     }
     return message;
 }

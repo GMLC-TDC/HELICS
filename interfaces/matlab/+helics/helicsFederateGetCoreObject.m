@@ -10,5 +10,5 @@ function varargout = helicsFederateGetCoreObject(varargin)
     %-------
     %a core object, nullptr if invalid
     %
-  [varargout{1:nargout}] = helicsMEX(103, varargin{:});
+  [varargout{1:nargout}] = helicsMEX(104, varargin{:});
 end

@@ -1,5 +1,5 @@
 /*
-Copyright © 2017-2018,
+Copyright © 2017-2019,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
@@ -58,7 +58,7 @@ helics::Json::Value loadJsonStr (const std::string &jsonString)
 }
 
 /** read a time from a JSON value element*/
-helics::Time loadJsonTime (const helics::Json::Value &timeElement, timeUnits defaultUnits)
+helics::Time loadJsonTime (const helics::Json::Value &timeElement, time_units defaultUnits)
 {
     if (timeElement.isObject ())
     {

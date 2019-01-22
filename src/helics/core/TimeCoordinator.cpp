@@ -1,5 +1,5 @@
 /*
-Copyright © 2017-2018,
+Copyright © 2017-2019,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
@@ -163,7 +163,7 @@ bool TimeCoordinator::updateNextExecutionTime ()
         {
             time_exec = (iterating) ? time_granted : getNextPossibleTime ();
         }
-        if ((time_exec - time_granted) > 0.0)
+        if ((time_exec - time_granted) > timeZero)
         {
             time_exec = generateAllowedTime (time_exec);
         }
@@ -679,6 +679,9 @@ message_process_result TimeCoordinator::processTimeMessage (const ActionMessage 
         return message_process_result::no_effect;
     case CMD_DISCONNECT:
     case CMD_BROADCAST_DISCONNECT:
+    case CMD_DISCONNECT_CORE:
+    case CMD_DISCONNECT_FED:
+    case CMD_DISCONNECT_BROKER:
         // this command requires removing dependents as well as dealing with dependency processing
         removeDependent (global_federate_id (cmd.source_id));
         break;

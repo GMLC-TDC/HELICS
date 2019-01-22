@@ -1,5 +1,5 @@
 /*
-Copyright © 2017-2018,
+Copyright © 2017-2019,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
@@ -55,7 +55,7 @@ BOOST_AUTO_TEST_CASE (execution_iteration_test)
 std::pair<double, int> runInitIterations (helics::ValueFederate *vfed, int index, int total)
 {
     using namespace helics;
-    Publication pub (vfed, "pub", data_type::helicsDouble);
+    Publication pub (vfed, "pub", data_type::helics_double);
     pub.setMinimumChange (0.001);
     std::string low_target = "fed";
     low_target += std::to_string ((index == 0) ? total - 1 : index - 1);
@@ -247,7 +247,7 @@ BOOST_AUTO_TEST_CASE (test2fed_withSubPub)
     auto vFed1 = GetFederateAs<helics::ValueFederate> (0);
     auto vFed2 = GetFederateAs<helics::ValueFederate> (1);
     // register the publications
-    auto pub1 = helics::Publication (helics::GLOBAL, vFed1.get (), "pub1", helics::data_type::helicsDouble);
+    auto pub1 = helics::Publication (helics::GLOBAL, vFed1.get (), "pub1", helics::data_type::helics_double);
 
     auto &sub1 = vFed2->registerSubscription ("pub1");
     vFed1->setProperty (helics_property_time_delta, 1.0);
@@ -288,11 +288,11 @@ BOOST_AUTO_TEST_CASE (test_iteration_counter)
     auto vFed1 = GetFederateAs<helics::ValueFederate> (0);
     auto vFed2 = GetFederateAs<helics::ValueFederate> (1);
     // register the publications
-    auto pub1 = helics::Publication (helics::GLOBAL, vFed1.get (), "pub1", helics::data_type::helicsInt);
+    auto pub1 = helics::Publication (helics::GLOBAL, vFed1.get (), "pub1", helics::data_type::helics_int);
 
     auto &sub1 = vFed2->registerSubscription ("pub1");
 
-    auto pub2 = helics::Publication (helics::GLOBAL, vFed2.get (), "pub2", helics::data_type::helicsInt);
+    auto pub2 = helics::Publication (helics::GLOBAL, vFed2.get (), "pub2", helics::data_type::helics_int);
 
     auto &sub2 = vFed1->registerSubscription ("pub2");
     vFed1->setProperty (helics_property_time_period, 1.0);

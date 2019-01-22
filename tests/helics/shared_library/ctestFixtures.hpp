@@ -1,5 +1,5 @@
 /*
-Copyright © 2017-2018,
+Copyright © 2017-2019,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
@@ -9,6 +9,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include <boost/test/data/test_case.hpp>
 #include <boost/test/floating_point_comparison.hpp>
 
+#include "../coreTypeLists.hpp"
 #include "helics/chelics.h"
 #include "helics/helics-config.h"
 
@@ -18,9 +19,6 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
     BOOST_CHECK_MESSAGE (err.error_code == helics_ok, err.message)
 
 #define HELICS_SIZE_MAX 512
-
-extern const std::vector<std::string> core_types;
-extern const std::vector<std::string> core_types_single;
 
 typedef helics_federate (*FedCreator) (char const *, helics_federate_info, helics_error *err);
 

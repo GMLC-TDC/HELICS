@@ -1,6 +1,7 @@
 codecov:
   notify:
     require_ci_to_pass: no
+  branch: develop
 
 coverage:
   precision: 2
@@ -30,3 +31,10 @@ ignore:
   - "examples"
   - "tests"
   - "interfaces"
+  - "logger.*"
+  - "charMapper.*"
+  - "stringOps.*"
+  - "base64.*"
+  - "zmqHelper.*"
+  - "cppzmq/**"
+  - "generic_string_ops.hpp"

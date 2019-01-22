@@ -1,5 +1,5 @@
 /*
-Copyright © 2017-2018,
+Copyright © 2017-2019,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
@@ -25,11 +25,14 @@ using Time = TimeRepresentation<count_time<12>>;
 using Time = TimeRepresentation<count_time<9>>;
 #endif
 
+/** constexpr definition for starting time*/
 constexpr Time timeZero = Time::zeroVal ();
+/** definition of the minimum time resolution*/
 constexpr Time timeEpsilon = Time::epsilon ();
+/** definition of the smallest negative increment of time*/
 constexpr Time negEpsilon = -Time::epsilon ();
-
-constexpr Time operator"" _t (long double val) { return Time (val); }
+/** user defined literal for a time variable*/
+constexpr Time operator"" _t (long double val) { return Time (val); }  // NOLINT
 
 /** simple structure with the time and completion marker for iterations or dense time steps*/
 struct iteration_time
@@ -43,26 +46,26 @@ struct iteration_time
     constexpr iteration_time (Time t, iteration_result iterate) noexcept : grantedTime (t), state (iterate){};
 };
 
-/** generate a time from a string,
+/** generate a time from a string
 @details the string can be a double or with units
-@example "1.234",  or "1032ms"
+for example "1.234",  or "1032ms" or "10423425 ns"
 @return a helics time generated from the string
-@throw, invalid_argument if the string is not a valid time
+@throw invalid_argument if the string is not a valid time
 */
 Time loadTimeFromString (const std::string &timeString);
 
-/** generate a time from a string,
+/** generate a time from a string
 @details the string can be a double or with units
-@example "1.234"  or "1032ms"
+for example "1.234"  or "1032ms"
 @return a helics time generated from the string
-@throw, invalid_argument if the string is not a valid time
+@throws invalid_argument if the string is not a valid time
 */
-Time loadTimeFromString (const std::string &timeString, timeUnits defUnit);
+Time loadTimeFromString (const std::string &timeString, time_units defUnit);
 
 /** generate a time related unit,
-@return a timeUnits enumeration value
-@throw, invalid_argument if the string is not a valid unit
+@return a time_units enumeration value
+@throw invalid_argument if the string is not a valid unit
 */
-timeUnits timeUnitsFromString (const std::string &unitString);
+time_units timeUnitsFromString (const std::string &unitString);
 
 }  // namespace helics

@@ -1,5 +1,5 @@
 /*
-Copyright © 2017-2018,
+Copyright © 2017-2019,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
@@ -86,6 +86,21 @@ std::shared_ptr<Core> makeCore (core_type type, const std::string &name)
         else
         {
             core = std::make_shared<zeromq::ZmqCore> (name);
+        }
+
+#else
+        throw (HelicsException ("ZMQ core is not available"));
+#endif
+        break;
+    case core_type::ZMQ_SS:
+#if HELICS_HAVE_ZEROMQ
+        if (name.empty ())
+        {
+            core = std::make_shared<zeromq::ZmqCoreSS> ();
+        }
+        else
+        {
+            core = std::make_shared<zeromq::ZmqCoreSS> (name);
         }
 
 #else

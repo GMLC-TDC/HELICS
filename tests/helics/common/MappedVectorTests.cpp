@@ -1,5 +1,5 @@
 /*
-Copyright © 2017-2018,
+Copyright © 2017-2019,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
@@ -62,7 +62,6 @@ BOOST_AUTO_TEST_CASE (iterator_tests)
     BOOST_CHECK_EQUAL (Mvec.size (), 4);
 
     Mvec.transform ([](double val) { return val + 1; });
-
     BOOST_CHECK_EQUAL (Mvec[0], 3.2 + 1.0);
     BOOST_CHECK_EQUAL (Mvec[1], 4.3 + 1.0);
     BOOST_CHECK_EQUAL (Mvec[2], 9.7 + 1.0);

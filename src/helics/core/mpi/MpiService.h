@@ -1,6 +1,6 @@
 /*
 
-Copyright © 2017-2018,
+Copyright © 2017-2019,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
@@ -30,6 +30,11 @@ namespace mpi
 class MpiService
 {
   public:
+    /** deleted copy constructor*/
+    MpiService (const MpiService &) = delete;
+    /** deleted copy assignment*/
+    MpiService &operator= (const MpiService &) = delete;
+
     static MpiService &getInstance ();
     static void setMpiCommunicator (MPI_Comm communicator);
     static void setStartServiceThread (bool start);
@@ -40,7 +45,7 @@ class MpiService
     int getRank ();
     int getTag (MpiComms *comm);
 
-    void sendMessage (std::pair<int,int> address, std::vector<char> message)
+    void sendMessage (std::pair<int, int> address, std::vector<char> message)
     {
         txMessageQueue.emplace (address, std::move (message));
     }
@@ -49,24 +54,22 @@ class MpiService
     void drainRemainingMessages ();
 
   private:
-    MpiService ();
+    MpiService () = default;
     ~MpiService ();
-    MpiService (const MpiService &) = delete;
-    MpiService &operator= (const MpiService &) = delete;
 
-    int commRank;
+    int commRank = -1;
     static MPI_Comm mpiCommunicator;
     static bool startServiceThread;
 
-    std::mutex mpiDataLock; //!< lock for the comms and send_requests
+    std::mutex mpiDataLock;  //!< lock for the comms and send_requests
     std::vector<MpiComms *> comms;
     std::list<std::pair<MPI_Request, std::vector<char>>> send_requests;
-    BlockingQueue<std::pair<std::pair<int,int>, std::vector<char>>> txMessageQueue;
+    BlockingQueue<std::pair<std::pair<int, int>, std::vector<char>>> txMessageQueue;
 
-    bool helics_initialized_mpi;
-    std::atomic<int> comms_connected;
-    std::atomic<bool> startup_flag;
-    std::atomic<bool> stop_service;
+    bool helics_initialized_mpi{false};
+    std::atomic<int> comms_connected{0};
+    std::atomic<bool> startup_flag{false};
+    std::atomic<bool> stop_service{false};
     std::unique_ptr<std::thread> service_thread;
 
     void startService ();
@@ -75,6 +78,5 @@ class MpiService
     bool initMPI ();
 };
 
-} // namespace mpi
+}  // namespace mpi
 }  // namespace helics
-

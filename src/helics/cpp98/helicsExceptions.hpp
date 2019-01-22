@@ -1,5 +1,5 @@
 /*
-Copyright © 2017-2018,
+Copyright Â© 2017-2019,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
@@ -19,18 +19,22 @@ class HelicsException : public std::runtime_error
 {
   public:
     explicit HelicsException (int error_code, const char *s) : std::runtime_error (s), eCode (error_code) {}
+    /** get the error code */
     int errorCode () const { return eCode; }
 
   private:
-    int eCode;
+    int eCode;  //!< containing the error code value
 };
 
+/** helper class that will throw an error if the helics error object has a actual error in it
+@details it will throw an in the destructor*/
 class hThrowOnError
 {
   public:
+    /** constructor which creates and initializing an error object*/
     hThrowOnError () : eObj (helicsErrorInitialize ()) {}
     /** throwing destructor
-	@details if the error code object contains a non-zero error code the destructor will emit an exception */
+    @details if the error code object contains a non-zero error code the destructor will emit an exception */
     ~hThrowOnError () THROWS_EXCEPTION
     {
         if (eObj.error_code != 0)
@@ -42,7 +46,7 @@ class hThrowOnError
     operator helics_error * () { return &eObj; }
 
   private:
-    helics_error eObj;
+    helics_error eObj;  //!< holder for a helics error object which is used in the C interface
 };
 }  // namespace helicscpp
 

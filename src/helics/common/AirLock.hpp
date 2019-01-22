@@ -1,5 +1,5 @@
 /*
-Copyright © 2017-2018,
+Copyright © 2017-2019,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
@@ -26,21 +26,19 @@ class AirLock
   public:
     /** default constructor */
     AirLock () = default;
-    /** destructor*/
-    ~AirLock () = default;
     /** try to load the airlock
     @return true if successful, false if not*/
     template <class Z>
     bool try_load (Z &&val)
-    { //all modifications to loaded should be insde the mutex otherwise this will contain race conditions
-        if (!loaded.load(std::memory_order_acquire))
+    {  // all modifications to loaded should be inside the mutex otherwise this will contain race conditions
+        if (!loaded.load (std::memory_order_acquire))
         {
             std::lock_guard<std::mutex> lock (door);
-            //We can use relaxed here since we are behind the mutex
-            if (!loaded.load(std::memory_order_relaxed))
+            // We can use relaxed here since we are behind the mutex
+            if (!loaded.load (std::memory_order_relaxed))
             {
                 data = std::forward<Z> (val);
-                loaded.store(true, std::memory_order_release);
+                loaded.store (true, std::memory_order_release);
                 return true;
             }
         }
@@ -53,19 +51,19 @@ class AirLock
     void load (Z &&val)
     {
         std::unique_lock<std::mutex> lock (door);
-        if (!loaded.load(std::memory_order_relaxed))
+        if (!loaded.load (std::memory_order_relaxed))
         {
             data = std::forward<Z> (val);
-            loaded.store(true, std::memory_order_release);
+            loaded.store (true, std::memory_order_release);
         }
         else
         {
-            while (loaded.load(std::memory_order_acquire))
+            while (loaded.load (std::memory_order_acquire))
             {
                 condition.wait (lock);
             }
             data = std::forward<Z> (val);
-            loaded.store(true, std::memory_order_release);
+            loaded.store (true, std::memory_order_release);
         }
     }
 
@@ -74,14 +72,14 @@ class AirLock
     */
     stx::optional<T> try_unload ()
     {
-        if (loaded.load(std::memory_order_acquire))
+        if (loaded.load (std::memory_order_acquire))
         {
             std::lock_guard<std::mutex> lock (door);
-            //can use relaxed since we are behind a mutex
-            if (loaded.load(std::memory_order_relaxed))
+            // can use relaxed since we are behind a mutex
+            if (loaded.load (std::memory_order_relaxed))
             {
                 stx::optional<T> val{std::move (data)};
-                loaded.store(false, std::memory_order_release);
+                loaded.store (false, std::memory_order_release);
                 condition.notify_one ();
                 return val;
             }
@@ -92,7 +90,7 @@ class AirLock
     @details this may or may  not mean anything depending on usage
     it is correct but may be incorrect immediately after the call
     */
-    bool isLoaded () const { return loaded.load(std::memory_order_acquire); }
+    bool isLoaded () const { return loaded.load (std::memory_order_acquire); }
 
   private:
     std::atomic_bool loaded{false};  //!< flag if the airlock is loaded with cargo

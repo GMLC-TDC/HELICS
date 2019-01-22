@@ -83,7 +83,7 @@ template <class X>
 std::vector<X> generalized_section_splitting (const X &line,
                                               const X &delimiterCharacters,
                                               const X &sectionStartCharacters,
-                                              const utilities::charMapper<unsigned char> &sectionMatch,
+                                              const utilities::CharMapper<unsigned char> &sectionMatch,
                                               bool compress)
 {
     auto sectionLoc = line.find_first_of (sectionStartCharacters);

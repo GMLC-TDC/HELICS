@@ -1,5 +1,5 @@
 /*
-Copyright © 2017-2018,
+Copyright © 2017-2019,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
@@ -53,7 +53,8 @@ BOOST_AUTO_TEST_CASE (simple_timing_test2, *utf::label ("ci"))
     SetupTest<helics::ValueFederate> ("test", 2);
     auto vFed1 = GetFederateAs<helics::ValueFederate> (0);
     auto vFed2 = GetFederateAs<helics::ValueFederate> (1);
-
+    vFed1->setFlagOption (helics_flag_ignore_time_mismatch_warnings);
+    vFed2->setFlagOption (helics_flag_ignore_time_mismatch_warnings);
     vFed1->setProperty (helics_property_time_period, 0.5);
     vFed2->setProperty (helics_property_time_period, 0.5);
 
@@ -86,7 +87,8 @@ BOOST_AUTO_TEST_CASE (simple_timing_test_message, *utf::label ("ci"))
 
     vFed1->setProperty (helics_property_time_period, 0.6);
     vFed2->setProperty (helics_property_time_period, 0.45);
-
+    vFed1->setFlagOption (helics_flag_ignore_time_mismatch_warnings);
+    vFed2->setFlagOption (helics_flag_ignore_time_mismatch_warnings);
     auto &ept1 = vFed1->registerGlobalEndpoint ("e1");
     vFed2->registerGlobalEndpoint ("e2");
     vFed1->enterExecutingModeAsync ();
@@ -342,7 +344,7 @@ BOOST_AUTO_TEST_CASE (sender_finalize_timing_result, *utf::label ("ci"))
     auto vFed2 = GetFederateAs<helics::ValueFederate> (1);
 
     helics::Publication sender (helics::interface_visibility::global, vFed1, "pub",
-                                helics::data_type::helicsDouble);
+                                helics::data_type::helics_double);
     auto &receiver = vFed2->registerSubscription ("pub");
     vFed1->enterExecutingModeAsync ();
     vFed2->enterExecutingMode ();
@@ -405,7 +407,7 @@ BOOST_AUTO_TEST_CASE (sender_finalize_timing_result2, *utf::label ("ci"))
     auto vFed2 = GetFederateAs<helics::ValueFederate> (1);
 
     helics::Publication sender (helics::interface_visibility::global, vFed1, "pub",
-                                helics::data_type::helicsDouble);
+                                helics::data_type::helics_double);
     auto &receiver = vFed2->registerSubscription ("pub");
     vFed1->enterExecutingModeAsync ();
     vFed2->enterExecutingMode ();
@@ -473,7 +475,7 @@ BOOST_AUTO_TEST_CASE (fast_sender_tests)
     auto vFed2 = GetFederateAs<helics::ValueFederate> (1);
 
     helics::Publication sender (helics::interface_visibility::global, vFed1, "pub",
-                                helics::data_type::helicsDouble);
+                                helics::data_type::helics_double);
     auto &receiver = vFed2->registerSubscription ("pub");
     vFed1->enterExecutingModeAsync ();
     vFed2->enterExecutingMode ();
@@ -507,10 +509,10 @@ BOOST_AUTO_TEST_CASE (dual_fast_sender_tests)
     auto vFed2 = GetFederateAs<helics::ValueFederate> (1);
     auto vFed3 = GetFederateAs<helics::ValueFederate> (2);
     helics::Publication sender1 (helics::interface_visibility::global, vFed1, "pub1",
-                                 helics::data_type::helicsDouble);
+                                 helics::data_type::helics_double);
     auto &receiver1 = vFed2->registerSubscription ("pub1");
     helics::Publication sender2 (helics::interface_visibility::global, vFed3, "pub2",
-                                 helics::data_type::helicsDouble);
+                                 helics::data_type::helics_double);
     auto &receiver2 = vFed2->registerSubscription ("pub2");
     vFed1->enterExecutingModeAsync ();
     vFed3->enterExecutingModeAsync ();

@@ -1,5 +1,5 @@
 /*
-Copyright © 2017-2018,
+Copyright © 2017-2019,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
@@ -22,7 +22,7 @@ class Input
     int referenceIndex = -1;  //!< an index used for callback lookup
     void *dataReference = nullptr;  //!< pointer to a piece of containing data
 
-    data_type type = data_type::helicsUnknown;  //!< the underlying type the publication is using
+    data_type type = data_type::helics_unknown;  //!< the underlying type the publication is using
     bool changeDetectionEnabled = false;  //!< the change detection is enabled
     bool hasUpdate = false;  //!< the value has been updated
     bool disableAssign = false;  //!< disable assignment for the object
@@ -37,7 +37,7 @@ class Input
                    std::function<void(const std::complex<double> &, Time)>,
                    std::function<void(const std::vector<double> &, Time)>,
                    std::function<void(const std::vector<std::complex<double>> &, Time)>,
-                   std::function<void(const named_point &, Time)>,
+                   std::function<void(const NamedPoint &, Time)>,
                    std::function<void(const bool &, Time)>,
                    std::function<void(const Time &, Time)>>
       value_callback;  //!< callback function for the federate
@@ -50,16 +50,16 @@ class Input
     }
 
     Input (ValueFederate *valueFed,
-           const std::string &name,
+           const std::string &key,
            const std::string &defaultType = "def",
            const std::string &units = std::string ());
 
     template <class FedPtr>
     Input (FedPtr &valueFed,
-           const std::string &name,
+           const std::string &key,
            const std::string &defaultType = "def",
            const std::string &units = std::string ())
-        : Input (std::addressof (*valueFed), name, defaultType, units)
+        : Input (std::addressof (*valueFed), key, defaultType, units)
     {
         static_assert (std::is_base_of<ValueFederate, std::remove_reference_t<decltype (*valueFed)>>::value,
                        "first argument must be a pointer to a ValueFederate");
@@ -148,17 +148,18 @@ class Input
     bool operator> (const Input &inp) const { return (handle > inp.handle); }
     /** register a callback for an update notification
     @details the callback is called in the just before the time request function returns
-    @param[in] callback a function with signature void( Time time)
+    @param callback a function with signature void( Time time)
     time is the time the value was updated  This callback is a notification callback and doesn't return the value
     */
     void registerNotificationCallback (std::function<void(Time)> callback)
     {
-        fed->setInputNotificationCallback (*this, [this, callback](const Input &, Time time) {
-            if (isUpdated ())
-            {
-                callback (time);
-            }
-        });
+        fed->setInputNotificationCallback (*this,
+                                           [this, callback = std::move (callback)](const Input &, Time time) {
+                                               if (isUpdated ())
+                                               {
+                                                   callback (time);
+                                               }
+                                           });
     }
     /** get the Name/Key for the input
     @details the name is the local name if given, key is the full key name*/
@@ -170,7 +171,7 @@ class Input
     /** get the type of the data coming from the publication*/
     const std::string &getPublicationType () const
     {
-        return ((type == data_type::helicsUnknown) || (type == data_type::helicsCustom)) ?
+        return ((type == data_type::helics_unknown) || (type == data_type::helics_custom)) ?
                  fed->getInjectionType (*this) :
                  typeNameStringRef (type);
     }
@@ -199,14 +200,14 @@ class Input
 
     /** register a callback for the update
     @details the callback is called in the just before the time request function returns
-    @param[in] callback a function with signature void(X val, Time time)
+    @param callback a function with signature void(X val, Time time)
     val is the new value and time is the time the value was updated
     */
     template <class X>
     void setInputNotificationCallback (std::function<void(const X &, Time)> callback)
     {
         static_assert (
-          helicsType<X> () != data_type::helicsCustom,
+          helicsType<X> () != data_type::helics_custom,
           "callback type must be a primary helics type one of \"double, int64_t, named_point, bool, Time "
           "std::vector<double>, std::vector<std::complex<double>>, std::complex<double>\"");
         value_callback = std::move (callback);
@@ -243,7 +244,7 @@ class Input
     }
 
     /** set the minimum delta for change detection
-    @param detltaV a double with the change in a value in order to register a different value
+    @param deltaV a double with the change in a value in order to register a different value
     */
     void setMinimumChange (double deltaV)
     {
@@ -295,7 +296,7 @@ class Input
     template <class X>
     X getValue_impl (std::integral_constant<int, primaryType> /*V*/)
     {
-        X val;
+        X val;  // NOLINT
         getValue_impl (std::integral_constant<int, primaryType> (), val);
         return val;
     }
@@ -370,25 +371,25 @@ class InputT : public Input
       changeDetectionOperator;  //!< callback function for change detection
     // determine if we can convert to a primary type
     using is_convertible_to_primary_type =
-      std::conditional_t<((helicsType<X> () != data_type::helicsCustom) || (isConvertableType<X> ())),
+      std::conditional_t<((helicsType<X> () != data_type::helics_custom) || (isConvertableType<X> ())),
                          std::true_type,
                          std::false_type>;
 
   public:
     InputT () = default;
     /**constructor to build an input with a defined object type
-    @param[in] valueFed  the ValueFederate to use
-    @param[in] name the name of the input
-    @param[in] units the units associated with a Federate
+    @param valueFed  the ValueFederate to use
+    @param name the name of the input
+    @param units the units associated with a Federate
     */
     InputT (ValueFederate *valueFed, const std::string &name, const std::string &units = std::string ())
         : Input (valueFed, name, ValueConverter<X>::type (), units)
     {
     }
     /**constructor to build an input with a defined type
-    @param[in] valueFed  the ValueFederate to use
-    @param[in] name the name of the input
-    @param[in] units the units associated with a Federate
+    @param valueFed  the ValueFederate to use
+    @param name the name of the input
+    @param units the units associated with a Federate
     */
     template <class FedPtr>
     InputT (FedPtr &valueFed, const std::string &name, const std::string &units = std::string ())
@@ -407,7 +408,7 @@ class InputT : public Input
 
     /** register a callback for the update
     @details the callback is called in the just before the time request function returns
-    @param[in] callback a function with signature void(X val, Time time)
+    @param callback a function with signature void(X val, Time time)
     val is the new value and time is the time the value was updated
     */
     void setInputNotificationCallback (std::function<void(X, Time)> callback)
@@ -435,7 +436,7 @@ void Input::getValue_impl (std::integral_constant<int, primaryType> /*V*/, X &ou
     if (fed->isUpdated (*this) || (hasUpdate && !changeDetectionEnabled))
     {
         auto dv = fed->getValueRaw (*this);
-        if (type == data_type::helicsUnknown)
+        if (type == data_type::helics_unknown)
         {
             type = getTypeFromString (fed->getInjectionType (*this));
         }
@@ -475,15 +476,12 @@ template <>
 inline const std::string &getValueRefImpl (defV &val)
 {
     // don't convert a named point to a string
-    if ((val.index () == namedPointLoc))
+    if ((val.index () == named_point_loc))
     {
-        return mpark::get<named_point> (val).name;
+        return mpark::get<NamedPoint> (val).name;
     }
-    else
-    {
-        valueConvert (val, data_type::helicsString);
-        return mpark::get<std::string> (val);
-    }
+    valueConvert (val, data_type::helics_string);
+    return mpark::get<std::string> (val);
 }
 
 template <class X>
@@ -494,7 +492,7 @@ const X &Input::getValueRef ()
     if (fed->isUpdated (*this) || (hasUpdate && !changeDetectionEnabled))
     {
         auto dv = fed->getValueRaw (*this);
-        if (type == data_type::helicsUnknown)
+        if (type == data_type::helics_unknown)
         {
             type = getTypeFromString (fed->getInjectionType (*this));
         }

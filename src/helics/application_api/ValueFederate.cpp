@@ -1,5 +1,5 @@
 /*
-Copyright © 2017-2018,
+Copyright © 2017-2019,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
@@ -73,7 +73,8 @@ ValueFederate &ValueFederate::operator= (ValueFederate &&fed) noexcept
 Publication &
 ValueFederate::registerPublication (const std::string &key, const std::string &type, const std::string &units)
 {
-    return vfManager->registerPublication ((!key.empty ()) ? (getName () + separator_ + key) : key, type, units);
+    return vfManager->registerPublication ((!key.empty ()) ? (getName () + nameSegmentSeparator + key) : key, type,
+                                           units);
 }
 
 Publication &ValueFederate::registerGlobalPublication (const std::string &key,
@@ -85,7 +86,8 @@ Publication &ValueFederate::registerGlobalPublication (const std::string &key,
 
 Input &ValueFederate::registerInput (const std::string &key, const std::string &type, const std::string &units)
 {
-    return vfManager->registerInput ((!key.empty ()) ? (getName () + separator_ + key) : key, type, units);
+    return vfManager->registerInput ((!key.empty ()) ? (getName () + nameSegmentSeparator + key) : key, type,
+                                     units);
 }
 
 Input &
@@ -94,10 +96,10 @@ ValueFederate::registerGlobalInput (const std::string &key, const std::string &t
     return vfManager->registerInput (key, type, units);
 }
 
-Input &ValueFederate::registerSubscription (const std::string &key, const std::string &units)
+Input &ValueFederate::registerSubscription (const std::string &target, const std::string &units)
 {
-    auto &inp = vfManager->registerInput (std::string (), std::string (), units);
-    vfManager->addTarget (inp, key);
+    auto &inp = vfManager->registerInput (std::string{}, std::string{}, units);
+    vfManager->addTarget (inp, target);
     return inp;
 }
 
@@ -190,9 +192,9 @@ static void loadOptions (ValueFederate *fed, const Inp &data, Obj &objUpdate)
     addTargets (data, "targets", [&objUpdate](const std::string &target) { objUpdate.addTarget (target); });
 }
 
-void ValueFederate::registerValueInterfacesJson (const std::string &configString)
+void ValueFederate::registerValueInterfacesJson (const std::string &jsonString)
 {
-    auto doc = loadJson (configString);
+    auto doc = loadJson (jsonString);
 
     if (doc.isMember ("publications"))
     {
@@ -402,7 +404,7 @@ const Input &ValueFederate::getInput (const std::string &key) const
     auto &inp = vfManager->getInput (key);
     if (!inp.isValid ())
     {
-        return vfManager->getInput (getName () + separator_ + key);
+        return vfManager->getInput (getName () + nameSegmentSeparator + key);
     }
     return inp;
 }
@@ -412,7 +414,7 @@ Input &ValueFederate::getInput (const std::string &key)
     auto &inp = vfManager->getInput (key);
     if (!inp.isValid ())
     {
-        return vfManager->getInput (getName () + separator_ + key);
+        return vfManager->getInput (getName () + nameSegmentSeparator + key);
     }
     return inp;
 }
@@ -431,19 +433,19 @@ const Input &ValueFederate::getInput (const std::string &key, int index1, int in
     return vfManager->getInput (key + '_' + std::to_string (index1) + '_' + std::to_string (index2));
 }
 
-const Input &ValueFederate::getSubscription (const std::string &key) const
+const Input &ValueFederate::getSubscription (const std::string &target) const
 {
-    return vfManager->getSubscription (key);
+    return vfManager->getSubscription (target);
 }
 
-Input &ValueFederate::getSubscription (const std::string &key) { return vfManager->getSubscription (key); }
+Input &ValueFederate::getSubscription (const std::string &target) { return vfManager->getSubscription (target); }
 
 Publication &ValueFederate::getPublication (const std::string &key)
 {
     auto &pub = vfManager->getPublication (key);
     if (!pub.isValid ())
     {
-        return vfManager->getPublication (getName () + separator_ + key);
+        return vfManager->getPublication (getName () + nameSegmentSeparator + key);
     }
     return pub;
 }
@@ -453,7 +455,7 @@ const Publication &ValueFederate::getPublication (const std::string &key) const
     auto &pub = vfManager->getPublication (key);
     if (!pub.isValid ())
     {
-        return vfManager->getPublication (getName () + separator_ + key);
+        return vfManager->getPublication (getName () + nameSegmentSeparator + key);
     }
     return pub;
 }
@@ -474,12 +476,12 @@ const Publication &ValueFederate::getPublication (const std::string &key, int in
 
 void ValueFederate::setInputNotificationCallback (std::function<void(Input &, Time)> callback)
 {
-    vfManager->setInputNotificationCallback (callback);
+    vfManager->setInputNotificationCallback (std::move (callback));
 }
 
 void ValueFederate::setInputNotificationCallback (Input &inp, std::function<void(Input &, Time)> callback)
 {
-    vfManager->setInputNotificationCallback (inp, callback);
+    vfManager->setInputNotificationCallback (inp, std::move (callback));
 }
 
 /** get a count of the number publications registered*/

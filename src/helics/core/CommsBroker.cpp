@@ -1,5 +1,5 @@
 /*
-Copyright © 2017-2018,
+Copyright © 2017-2019,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
@@ -25,6 +25,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 
 #ifdef HELICS_HAVE_ZEROMQ
 #include "zmq/ZmqComms.h"
+#include "zmq/ZmqCommsSS.h"
 #endif
 
 #ifndef DISABLE_TCP_CORE
@@ -46,6 +47,8 @@ template class CommsBroker<ipc::IpcComms, CommonCore>;
 #ifdef HELICS_HAVE_ZEROMQ
 template class CommsBroker<zeromq::ZmqComms, CoreBroker>;
 template class CommsBroker<zeromq::ZmqComms, CommonCore>;
+template class CommsBroker<zeromq::ZmqCommsSS, CoreBroker>;
+template class CommsBroker<zeromq::ZmqCommsSS, CommonCore>;
 #endif
 
 #ifndef DISABLE_UDP_CORE

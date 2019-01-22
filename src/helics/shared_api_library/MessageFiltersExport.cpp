@@ -1,5 +1,5 @@
 /*
-Copyright © 2017-2018,
+Copyright © 2017-2019,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
@@ -518,7 +518,7 @@ helics_bool helicsFilterGetOption (helics_filter filt, int option)
     auto filtObj = getFilterObj (filt, nullptr);
     if (filtObj == nullptr)
     {
-        return false;
+        return helics_false;
     }
     try
     {
@@ -526,6 +526,6 @@ helics_bool helicsFilterGetOption (helics_filter filt, int option)
     }
     catch (...)
     {
-        return false;
+        return helics_false;
     }
 }

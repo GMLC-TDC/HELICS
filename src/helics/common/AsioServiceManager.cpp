@@ -1,5 +1,5 @@
 /*
-Copyright © 2017-2018,
+Copyright © 2017-2019,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
@@ -109,12 +109,19 @@ void AsioServiceManager::setServiceToLeakOnDelete (const std::string &serviceNam
 AsioServiceManager::~AsioServiceManager ()
 {
     //  std::cout << "deleting service manager\n";
+
     if (running)
     {
-        std::lock_guard<std::mutex> nullLock (runningLoopLock);
-        nullwork.reset ();
-        iserv->stop ();
-        loopRet.get ();
+        try
+        {
+            std::lock_guard<std::mutex> nullLock (runningLoopLock);
+            nullwork.reset ();
+            iserv->stop ();
+            loopRet.get ();
+        }
+        catch (...)
+        {
+        }
     }
     if (leakOnDelete)
     {
@@ -152,7 +159,7 @@ AsioServiceManager::LoopHandle AsioServiceManager::startServiceLoop ()
     if (running.compare_exchange_strong (exp, true))
     {
         auto ptr = shared_from_this ();
-		std::packaged_task<void()> serviceTask([ptr=std::move(ptr)]() { serviceProcessingLoop(std::move(ptr)); });
+        std::packaged_task<void()> serviceTask ([ptr = std::move (ptr)]() { serviceProcessingLoop (ptr); });
         //   std::cout << "run Service loop " << runCounter << "\n";
         std::unique_lock<std::mutex> nullLock (runningLoopLock);
 
@@ -189,7 +196,7 @@ AsioServiceManager::LoopHandle AsioServiceManager::startServiceLoop ()
             }
         }
     }
-    return std::make_unique<servicer> (shared_from_this ());
+    return std::make_unique<Servicer> (shared_from_this ());
 }
 
 void AsioServiceManager::haltServiceLoop ()

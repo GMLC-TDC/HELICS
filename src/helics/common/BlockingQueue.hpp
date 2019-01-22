@@ -1,5 +1,5 @@
 /*
-Copyright © 2017-2018,
+Copyright © 2017-2019,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
@@ -85,7 +85,7 @@ class BlockingQueue
     }
     /** set the capacity of the queue
     actually double the requested the size will be reserved due to the use of two vectors internally
-    @param[in] capacity  the capacity to reserve
+    @param capacity  the capacity to reserve
     */
     void reserve (size_t capacity)
     {
@@ -223,27 +223,27 @@ class BlockingQueue
     }
 
     /** blocking call to wait on an object from the stack with timeout*/
-    stx::optional<T> pop(std::chrono::milliseconds timeout)
+    stx::optional<T> pop (std::chrono::milliseconds timeout)
     {
-        auto val = try_pop();
+        auto val = try_pop ();
         while (!val)
         {
-            std::unique_lock<std::mutex> pullLock(m_pullLock);  // get the lock then wait
-            if (!pullElements.empty())  // make sure we are actually empty;
+            std::unique_lock<std::mutex> pullLock (m_pullLock);  // get the lock then wait
+            if (!pullElements.empty ())  // make sure we are actually empty;
             {
-                val = std::move(pullElements.back());
-                pullElements.pop_back();
+                val = std::move (pullElements.back ());
+                pullElements.pop_back ();
                 break;
             }
-            auto res=condition.wait_for(pullLock,timeout);  // now wait
-            if (!pullElements.empty())  // check for spurious wake-ups
+            auto res = condition.wait_for (pullLock, timeout);  // now wait
+            if (!pullElements.empty ())  // check for spurious wake-ups
             {
-                val = std::move(pullElements.back());
-                pullElements.pop_back();
+                val = std::move (pullElements.back ());
+                pullElements.pop_back ();
                 break;
             }
-            pullLock.unlock();
-            val = try_pop();
+            pullLock.unlock ();
+            val = try_pop ();
             if (res == std::cv_status::timeout)
             {
                 break;

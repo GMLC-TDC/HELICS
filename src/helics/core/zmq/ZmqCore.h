@@ -1,5 +1,5 @@
 /*
-Copyright © 2017-2018,
+Copyright © 2017-2019,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
@@ -8,6 +8,8 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 namespace helics {
 namespace zeromq {
 class ZmqComms;
+class ZmqCommsSS;
+
 /** implementation for the core that uses zmq messages to communicate*/
 class ZmqCore final: public NetworkCore<ZmqComms, interface_type::tcp> {
 
@@ -16,6 +18,20 @@ public:
   ZmqCore() noexcept;
   /** construct from with a core name*/
   ZmqCore(const std::string &core_name);
+
+private:
+	virtual bool brokerConnect() override;
+
+};
+
+/** implementation for the core that uses zmq messages to communicate*/
+class ZmqCoreSS final: public NetworkCore<ZmqCommsSS, interface_type::tcp> {
+
+public:
+	/** default constructor*/
+  ZmqCoreSS() noexcept;
+  /** construct from with a core name*/
+  ZmqCoreSS(const std::string &core_name);
 
 private:
 	virtual bool brokerConnect() override;

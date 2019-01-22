@@ -1,5 +1,5 @@
 #
-# Copyright © 2017-2018, Battelle Memorial Institute; Lawrence Livermore National
+# Copyright © 2017-2019, Battelle Memorial Institute; Lawrence Livermore National
 # Security, LLC; Alliance for Sustainable Energy, LLC All rights reserved. See LICENSE
 # file and DISCLAIMER for more details.
 #
@@ -38,10 +38,10 @@ set(
   # QueryTests.cpp
 )
 
-add_executable(shared-library-tests ${c_shared_library_test_sources} ctestFixtures.hpp)
+add_executable(shared-library-tests ${c_shared_library_test_sources} ctestFixtures.hpp ../coreTypeLists.hpp)
 
 add_executable(
-  shared-library-tests-cpp ${cpp_shared_library_test_sources} cpptestFixtures.hpp
+  shared-library-tests-cpp ${cpp_shared_library_test_sources} cpptestFixtures.hpp ../coreTypeLists.hpp
 )
 
 target_link_libraries(

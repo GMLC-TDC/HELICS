@@ -1,25 +1,24 @@
 /*
-Copyright © 2017-2018,
+Copyright © 2017-2019,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
 #pragma once
 
-#include "helicsApp.hpp"
 #include "../application_api/Endpoints.hpp"
 #include "../application_api/Subscriptions.hpp"
-#include <map>
+#include "helicsApp.hpp"
 #include <functional>
+#include <map>
 
 namespace helics
 {
-
 class CloningFilter;
 
 namespace apps
 {
 /** class designed to capture data points from a set of subscriptions or endpoints*/
-class Tracer: public App
+class Tracer : public App
 {
   public:
     /** construct from a FederateInfo structure*/
@@ -28,27 +27,27 @@ class Tracer: public App
     Tracer (int argc, char *argv[]);
 
     /**constructor taking a federate information structure and using the given core
+    @param name the name of the tracer object, if empty it tries to figure it out from fi
     @param core a pointer to core object which the federate can join
-    @param[in] fi  a federate information structure
+    @param fi  a federate information structure
     */
     Tracer (const std::string &name, const std::shared_ptr<Core> &core, const FederateInfo &fi);
     /**constructor taking a file with the required information
-    @param[in] name the name of the app
-    @param[in] file a file defining the federate information
+    @param name the name of the app may be empty to pull name from the file
+    @param file a file defining the federate information
     */
-    Tracer (const std::string &name, const std::string &jsonString);
+    Tracer (const std::string &name, const std::string &file);
     /** move construction*/
     Tracer (Tracer &&other_tracer) = default;
     /** move assignment*/
     Tracer &operator= (Tracer &&tracer) = default;
     /**destructor*/
-    ~Tracer();
-    /** run the Player until the specified time*/
-    virtual void runTo (Time stopTime) override;
+    ~Tracer ();
+    virtual void runTo (Time runToTime) override;
     /** add a subscription to capture*/
     void addSubscription (const std::string &key);
     /** add an endpoint*/
-    void addEndpoint(const std::string &endpoint);
+    void addEndpoint (const std::string &endpoint);
     /** copy all messages that come from a specified endpoint*/
     void addSourceEndpointClone (const std::string &sourceEndpoint);
     /** copy all messages that are going to a specific endpoint*/
@@ -61,61 +60,58 @@ class Tracer: public App
     /** set the callback for a message received through cloned interfaces
     @details the function signature will take the time in the Tracer a unique_ptr to the message
     */
-    void setClonedMessageCallback(std::function<void(Time, std::unique_ptr<Message>)> callback)
+    void setClonedMessageCallback (std::function<void(Time, std::unique_ptr<Message>)> callback)
     {
-        clonedMessageCallback = std::move(callback);
+        clonedMessageCallback = std::move (callback);
     }
     /** set the callback for a message received through endpoints
-    @details the function signature will take the time in the Tracer, the endpoint name as a string, and a unique_ptr to the message
+    @details the function signature will take the time in the Tracer, the endpoint name as a string, and a
+    unique_ptr to the message
     */
-    void setEndpointMessageCallback(std::function<void(Time, const std::string &, std::unique_ptr<Message>)> callback)
+    void
+    setEndpointMessageCallback (std::function<void(Time, const std::string &, std::unique_ptr<Message>)> callback)
     {
-        endpointMessageCallback = std::move(callback);
+        endpointMessageCallback = std::move (callback);
     }
     /** set the callback for a value published
-    @details the function signature will take the time in the Tracer, the publication key as a string, and the value as a string
+    @details the function signature will take the time in the Tracer, the publication key as a string, and the
+    value as a string
     */
-    void setValueCallback(std::function<void(Time, const std::string &, const std::string &)> callback)
+    void setValueCallback (std::function<void(Time, const std::string &, const std::string &)> callback)
     {
-        valueCallback = std::move(callback);
+        valueCallback = std::move (callback);
     }
     /** turn the screen display on for values and messages*/
-    void enableTextOutput() {
-        printMessage = true;
-    }
-    void disableTextOutput()
-    {
-        printMessage = false;
-    }
+    void enableTextOutput () { printMessage = true; }
+    /** turn the screen display off for values and messages*/
+    void disableTextOutput () { printMessage = false; }
 
   private:
     /** load arguments through a variable map created through command line arguments
      */
     int loadArguments (boost::program_options::variables_map &vm_map);
     /** load from a jsonString
-    @param either a JSON filename or a string containing JSON
+    @param jsonString either a JSON filename or a string containing JSON
     */
     virtual void loadJsonFile (const std::string &jsonString) override;
     /** load a text file*/
-    virtual void loadTextFile(const std::string &textFile) override;
+    virtual void loadTextFile (const std::string &textFile) override;
 
     virtual void initialize () override;
     void generateInterfaces ();
-    void captureForCurrentTime (Time currentTime, int iteration=0);
+    void captureForCurrentTime (Time currentTime, int iteration = 0);
     void loadCaptureInterfaces ();
 
-
-
   protected:
-      bool printMessage = false;
-      bool allow_iteration = false;  //!< flag to allow iteration of the federate for time requests
+    bool printMessage = false;
+    bool allow_iteration = false;  //!< flag to allow iteration of the federate for time requests
     std::unique_ptr<CloningFilter> cFilt;  //!< a pointer to a clone filter
 
     std::vector<Input> subscriptions;  //!< the actual subscription objects
     std::map<std::string, int> subkeys;  //!< translate subscription names to an index
 
     std::vector<Endpoint> endpoints;  //!< the actual endpoint objects
-    std::map<std::string, int> eptNames;    //!< translate endpoint name to index
+    std::map<std::string, int> eptNames;  //!< translate endpoint name to index
     std::unique_ptr<Endpoint> cloneEndpoint;  //!< the endpoint for cloned message delivery
     std::vector<std::string> captureInterfaces;  //!< storage for the interfaces to capture
 
@@ -125,5 +121,4 @@ class Tracer: public App
 };
 
 }  // namespace apps
-} // namespace helics
-
+}  // namespace helics
