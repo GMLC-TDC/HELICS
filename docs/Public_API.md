@@ -1,6 +1,6 @@
 This file defines what is included in what is considered the stable user API for HELICS.
 
-This API will be backwards code compatible across minor version numbers, though functions may be marked deprecated.  Functions an any other header will not be considered in versioning decisions.  If other headers become commonly used we will take that into consideration at a later time.
+This API will be backwards code compatible across minor version numbers, though functions may be marked deprecated.  Functions an any other header will not be considered in versioning decisions.  If other headers become commonly used we will take that into consideration at a later time.  Anything marked private is subject to change and most things marked protected can change as well though somewhat more consideration will be given.  
 
 The public API includes the following
  - Application API headers
@@ -54,8 +54,11 @@ The public API includes the following
  - Tracer.hpp
  - helicsApp.hpp
  - BrokerApp.hpp
+ - Exceptions:  the loadArguments functions will change when we remove boost::program_options
+
+ - Exceptions:  Any function dealing with Inputs concerning data from multiple sources is subject to change,  the vector subscription Objects, and vector Input objects are subject to change.
 
 
-  - C++98 Library --All headers are mostly stable.  Though we reserve the ability to make changes to make them better match the main C++ API.  This will likely undergo some modifications in the near future, possibly including the folder location and names.  
+  - C++98 Library --All headers are mostly stable.  Though we reserve the ability to make changes to make them better match the main C++ API.  This will likely undergo some modifications in the near future, possibly including the folder location and names, and additional definitions.  
 
-In the installed folder are some additional headers from third party libraries (cereal, helics_includes), we will try to make sure these are compatible in the features used in the HELICS API,  though changes in other aspects of those libraries will not be considered in HELICS versioning, this caveat includes anything in the helics/common directory as well.  Only changes which impact the signatures defined above will factor into versioning decisions.  You are free to use them but they are not guaranteed to be backwards compatible.  
+In the installed folder are some additional headers from third party libraries (cereal, helics_includes), we will try to make sure these are compatible in the features used in the HELICS API,  though changes in other aspects of those libraries will not be considered in HELICS versioning, this caveat includes anything in the helics/common directory as well.  Only changes which impact the signatures defined above will factor into versioning decisions.  You are free to use them but they are not guaranteed to be backwards compatible on version changes.
