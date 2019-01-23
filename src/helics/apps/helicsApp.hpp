@@ -89,8 +89,10 @@ class App
     /** check if the Player is ready to run*/
     bool isActive () const { return !deactivated; }
 
-  protected:
+protected:
+    /** load argument from a variable map to be removed in the future*/
     int loadArguments (boost::program_options::variables_map &vm_map);
+
     /** load from a jsonString
     @param jsonString either a JSON filename or a string containing JSON
     */
