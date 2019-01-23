@@ -15,10 +15,10 @@
         },
         {
             "directory":"./Distribution/",
-            "exec":"gridlabd IEEE_123_feeder_0.glm",
+            "exec":"gld_gcc IEEE_123_feeder_0.glm --verbose",
             "host":"localhost",
             "name":"GridLABDFederate"
         }
     ],
-    "name":"Example-1a-T-D-Cosimulation-HELICSRunner"
+    "name":"Example-1b-T-D-Cosimulation-HELICSRunner"
 }

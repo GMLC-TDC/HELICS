@@ -41,81 +41,68 @@
 	"filters":
 	[
 	{
-	"name":"filterEV6",  //filters can have names (optional)
-	"target":"EV_Controller/EV6",  //this is a key field specifying the target endpoint
-	//"inputType":"genmessage",  //can trigger some warnings if there is mismatches for custom filters only used if operation is "custom"
-	//"outputType":"genmessage",  //this could be useful if the filter actually translates the data and can be used to automatically order filters
-	"mode":"source",  //source is the default but can be "source","destination","clone","cloning"
-	"operation":"delay", //currently valid operations are "delay","clone","cloning","timedelay","randomdelay","randomdrop","reroute","redirect","custom"
-	"properties":  //additional properties for filters are specified in a property array or object if there is just a single one
+	"name":"filterEV6",
+	"target":"EV_Controller/EV6",
+	"mode":"source",
+	"operation":"delay",
+	"properties":
 	{
-		"name":"delay",  //A delay filter just has a single property
-		"value":600	//times default to seconds though units can also be specified "200 ms" or similar
+		"name":"delay",
+		"value":600
 	}
 	},
 	{
-	"name":"filterEV5",  //filters can have names (optional)
-	"target":"EV_Controller/EV5",  //this is a key field specifying the target endpoint
-	//"inputType":"genmessage",  //can trigger some warnings if there is mismatches for custom filters only used if operation is "custom"
-	//"outputType":"genmessage",  //this could be useful if the filter actually translates the data and can be used to automatically order filters
-	"mode":"source",  //source is the default but can be "source","destination","clone","cloning"
-	"operation":"delay", //currently valid operations are "delay","clone","cloning","timedelay","randomdelay","randomdrop","reroute","redirect","custom"
-	"properties":  //additional properties for filters are specified in a property array or object if there is just a single one
+	"name":"filterEV5",
+	"target":"EV_Controller/EV5",
+	"mode":"source",
+	"operation":"delay",
+	"properties":
 	{
-		"name":"delay",  //A delay filter just has a single property
-		"value":600	//times default to seconds though units can also be specified "200 ms" or similar
+		"name":"delay",
+		"value":600
 	}
 	},
 	{
-	"name":"filterEV4",  //filters can have names (optional)
-	"target":"EV_Controller/EV4",  //this is a key field specifying the target endpoint
-	//"inputType":"genmessage",  //can trigger some warnings if there is mismatches for custom filters only used if operation is "custom"
-	//"outputType":"genmessage",  //this could be useful if the filter actually translates the data and can be used to automatically order filters
-	"mode":"source",  //source is the default but can be "source","destination","clone","cloning"
-	"operation":"delay", //currently valid operations are "delay","clone","cloning","timedelay","randomdelay","randomdrop","reroute","redirect","custom"
-	"properties":  //additional properties for filters are specified in a property array or object if there is just a single one
+	"name":"filterEV4",
+	"target":"EV_Controller/EV4",
+	"operation":"delay",
+	"properties":
 	{
-		"name":"delay",  //A delay filter just has a single property
-		"value":600	//times default to seconds though units can also be specified "200 ms" or similar
+		"name":"delay",
+		"value":600
 	}
 	},
 	{
-	"name":"filterEV3",  //filters can have names (optional)
-	"target":"EV_Controller/EV3",  //this is a key field specifying the target endpoint
-	//"inputType":"genmessage",  //can trigger some warnings if there is mismatches for custom filters only used if operation is "custom"
-	//"outputType":"genmessage",  //this could be useful if the filter actually translates the data and can be used to automatically order filters
-	"mode":"source",  //source is the default but can be "source","destination","clone","cloning"
-	"operation":"delay", //currently valid operations are "delay","clone","cloning","timedelay","randomdelay","randomdrop","reroute","redirect","custom"
-	"properties":  //additional properties for filters are specified in a property array or object if there is just a single one
+	"name":"filterEV3",
+	"target":"EV_Controller/EV3",
+	"mode":"source",
+	"operation":"delay",
+	"properties":
 	{
-		"name":"delay",  //A delay filter just has a single property
-		"value":600	//times default to seconds though units can also be specified "200 ms" or similar
+		"name":"delay",
+		"value":600
 	}
 	},
 	{
-	"name":"filterEV2",  //filters can have names (optional)
-	"target":"EV_Controller/EV2",  //this is a key field specifying the target endpoint
-	//"inputType":"genmessage",  //can trigger some warnings if there is mismatches for custom filters only used if operation is "custom"
-	//"outputType":"genmessage",  //this could be useful if the filter actually translates the data and can be used to automatically order filters
-	"mode":"source",  //source is the default but can be "source","destination","clone","cloning"
-	"operation":"delay", //currently valid operations are "delay","clone","cloning","timedelay","randomdelay","randomdrop","reroute","redirect","custom"
-	"properties":  //additional properties for filters are specified in a property array or object if there is just a single one
+	"name":"filterEV2",
+	"target":"EV_Controller/EV2",
+	"mode":"source",
+	"operation":"delay",
+	"properties":
 	{
-		"name":"delay",  //A delay filter just has a single property
-		"value":600	//times default to seconds though units can also be specified "200 ms" or similar
+		"name":"delay",
+		"value":600
 	}
 	},
 	{
-	"name":"filterEV1",  //filters can have names (optional)
-	"target":"EV_Controller/EV1",  //this is a key field specifying the target endpoint
-	//"inputType":"genmessage",  //can trigger some warnings if there is mismatches for custom filters only used if operation is "custom"
-	//"outputType":"genmessage",  //this could be useful if the filter actually translates the data and can be used to automatically order filters
-	"mode":"source",  //source is the default but can be "source","destination","clone","cloning"
-	"operation":"delay", //currently valid operations are "delay","clone","cloning","timedelay","randomdelay","randomdrop","reroute","redirect","custom"
-	"properties":  //additional properties for filters are specified in a property array or object if there is just a single one
+	"name":"filterEV1",
+	"target":"EV_Controller/EV1",
+	"mode":"source",
+	"operation":"delay",
+	"properties":
 	{
-		"name":"delay",  //A delay filter just has a single property
-		"value":600	//times default to seconds though units can also be specified "200 ms" or similar
+		"name":"delay",
+		"value":600
 	}
 	}
 	],

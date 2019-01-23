@@ -25,7 +25,7 @@ To demonstrate the effects of filters, let's take the same model we were working
 
 ![Ex. 1c message topology](../img/ex1c_message_topology.pdf)
 
-The JSON configuration file adds a new `filter` section that implements the filtering:
+[The JSON configuration file](../../examples/user_guide_examples/Example_1c/EV_Controller/Control.json) adds a new `filter` section that implements the filtering:
 
 ```
 ...
@@ -61,7 +61,7 @@ The JSON configuration file adds a new `filter` section that implements the filt
 * **`target`** - Name of the endpoint to which this filter will apply
 * **`mode`** - Either `source` or `destination`, defining whether the filter should impact out-going or in-coming messages, respectively.
 * **`operation`** - Defines the type of filtering operation that will be applied to messages. As of v2.0, the supported types are: `delay`, `timedelay`, `randomdelay`, `randomdrop`, `reroute`, `redirect`, `clone`, `cloning`, and `custom`. Further details on filter types can be found [here](https://github.com/GMLC-TDC/HELICS-src/blob/master/docs/configuration/Filters.md).
-* **`properties`** - Each filter type has specific parameters that define how it operates. In this case, one of those parameters is the amount each message will be delayed.
+* **`properties`** - Each filter type has specific parameters that define how it operates. In this case, one of those parameters is the amount each message will be delayed, in seconds.
 
 Let's run [this co-simulation](../../examples/user_guide_examples/Example_1c/) and capture the same data as last time for direct comparison: total substation load and EV charging behavior, both as a function of time.
 
@@ -75,7 +75,7 @@ Granted that the charge controller communication system is ridiculously poor, th
 ## Explicit Communication System Modeling ##
 HELICS filters are a simple, easy step to adding a touch of realism to messages in the HELICS co-simulation. The simplicity of filters, though, may be inadequate at times. Real-world communication networks have dynamic delays and data loss rates, protocol effects, and more complex topologies. Sometimes, these effects are important (or may even be the point of the co-simulation) and an explicit communication system model is required to capture these effects. 
 
-The wonderful thing about the software architecture of HELICS is that simulators that have been properly modified to allow HELICS integration will seamlessly slide into the role of filters without having to reconfigure the sending and receiving federates. The move from native HELICS filters to full-blown communication system models is invisible. This is achieved by allowing user-defined nodes in a communication system model to be designated the filter for a given endpoint. All HELICS messages coming from that endpoint enter the communication system federate at that node and message being sent to that endpoint exit the communication system federate at that node. Conceptually, the change looks something like the the figure below:
+The wonderful thing about the software architecture of HELICS is that simulators that have been properly modified to allow HELICS integration will seamlessly slide into the role of filters without having to reconfigure the sending and receiving federates. The move from native HELICS filters to full-blown communication system models is invisible. This is achieved by allowing user-defined nodes in a communication system model to be designated the filter for a given endpoint. All HELICS messages coming from that endpoint enter the communication system federate at that node and message being sent to that endpoint exit the communication system federate at that node. Conceptually, the change looks something like the figure below:
 
 ![filters federate example](../img/filter_federate_example.pdf)
 
@@ -83,16 +83,15 @@ The wonderful thing about the software architecture of HELICS is that simulators
 ### Example 1d - EV charge controller with an ns-3 model ###
 For this co-simulation, we're going to use [ns-3](https://www.nsnam.org) as our communication system model. Like many other detailed simulators, ns-3 is a complicated simulator, more complicated than can easily be explained in any detail here. If you're so interested, the [ns-3 tutorial](https://www.nsnam.org/docs/release/3.29/tutorial/html/index.html) is excellent and is the best place to start to understand how it is used to model and simulate communication systems. For those not wanting to dig into that, here's the three sentence version: ns-3 models the communication system topology as a collection of nodes and communication channels connecting them. Depending on the type of channel used, various properties (e.g. delay) can be assigned to them. On top of this network, various protocols can be assigned to build up the protocol stack with applications at the top of the stack. 
 
-For the [version of ns-3 that includes HELICS integration](https://github.com/GMLC-TDC/ns-3-dev-git), the application that is installed is the bridge between the communication network and the rest of the HELICS federation. For each endpoint that is modeled in the communication network, a HELICS filter application is installed at a corresponding node in the ns-3 model. 
+When using HELICS and ns-3 together, the application that is installed is the bridge between the communication network and the rest of the HELICS federation. For each endpoint that is modeled in the communication network, a HELICS filter ns-3 application is installed at a corresponding node in the ns-3 model. 
 
 The specific ns-3 model built for this example uses the CSMA model built into ns-3 as a stand-in for a power-line carrier (PLC) communication system. Both CSMA and PLC use a bus topology with all transmitters attached to a common, shared communication channel. Each EV in the electrical network will be represented by a corresponding communication node. Older PLC implementations were known to be quite slow and we'll abuse and stretch this fact to force the average of the communication delays through the network to match that of the previous example. We'll also set the receiver at the substation to have a corresponding receive error rate. 
 
-First, you'll need to install the [HELICS-enabled version of ns-3](https://github.com/GMLC-TDC/helics-ns3). As the README indicates, HELICS for ns-3 is an extension that is simply plopped into the standard ns-3 distribution `contrib` folder and the configured with a few extra switches and compiled.
+First, you'll need to install [ns-3](https://www.nsnam.org/docs/release/3.29/tutorial/html/getting-started.html#downloading-ns-3-using-git) and add the [HELICS module](https://github.com/GMLC-TDC/helics-ns3). As the README indicates, HELICS for ns-3 is an extension that is simply plopped into the standard ns-3 distribution `contrib` folder and the configured with a few extra switches and compiled.
 
-**REMAINDER OF THIS SECTION IS TBD**
+**EXAMPLE USING NS-3 AND HELICS IS UNDER DEVELOPMENT**
 
 <!--
-Scott Harpool is developing the GLD model
 Touhid is developing the ns-3 model
 
 First, to make sure the model is working as intended, let's verify that performance of the communication system model is different when using the native HELICS filters vs a stand-alone communication network simulator.

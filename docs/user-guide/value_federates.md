@@ -118,7 +118,12 @@ To demonstrate how a to build a co-simulation, an example of a simple integrated
 
   1. [HELICS](https://gmlc-tdc.github.io/HELICS-src/installation/index.html)
   2. [GridLAB-D](https://github.com/gridlab-d/gridlab-d/tree/develop) - Enable HELICS, see instructions [here](http://gridlab-d.shoutwiki.com/wiki/Connection:helics_msg)
-  3. [Python](https://www.anaconda.com/download/) - Anaconda installation, if you don't already have Python installed
+  3. [Python](https://www.anaconda.com/download/) - Anaconda installation, if you don't already have Python installed. You may need to also install the following Python packages (`conda install` ...)
+	
+  	* matplotlib
+  	* time
+  	* logging
+
   4. [PyPower](https://pypi.org/project/PYPOWER/) - `pip install pypower`
   5. [helics_cli](https://github.com/GMLC-TDC/helics-runner) - `pip install git+git://github.com/GMLC-TDC/helics-runner.git@master`
 
@@ -137,12 +142,11 @@ In this particular case, the Python script executing the transmission model also
 
 
 ### Running co-simulations via helics_cli ###
-To run this simulation, the HELICS team has also developed an application called `helics_cli` (command line interface) which, among other uses, creates a standardized means of launching co-simulations. 
+To run this simulation, the HELICS team has also developed an application called `helics_cli` (command line interface) which, among other uses, creates a standardized means of launching co-simulations. The application can be downloaded from the [helics_cli repository](https://github.com/GMLC-TDC/helics-runner). Discussion of how to configure `helics_cli` for a given simulation is discussed in the [section on helics_cli](./helics_cli.md) but for all these examples, the configuration has already been done. In this case, that configuration is in the examples folder as "cosim_runner_1a.json" and looks like this:
 
 ```
 {
     "broker": false,
-    "name":"Example-1a-T-D-Cosimulation-HELICSRunner",
     "federates":[
         {
             "directory":"./Transmission/",
@@ -156,21 +160,22 @@ To run this simulation, the HELICS team has also developed an application called
             "host":"localhost",
             "name":"GridLABDFederate"
         }
-    ]
+    ],
+    "name":"Example-1a-T-D-Cosimulation-HELICSRunner"
 }
 ```
+Briefly, it's easy to guess what a few of these parameters do:
 
-* **`broker`** - xxxxxxx
-* **`name`** - The name of the co-simulation being run. (xxxxxxx - Why do we need a name?)
-* **`federates`** - List of all federates being launched in this co-simulation.
-  * `directory` - Directory of the model being used to create the federate.
-  * `exec` - command line command called to launch the federate
-  * `host` - xxxxxxx
-  * `name` - xxxxxxx 
+*  "directory" is the location of the model to be run
+*  "exec" is the command line call (with all necessary options) to launch the co-simulation
+
+With a properly written configuration file, launching the co-simulation becomes very straightforward:
+
+`helics run --path <path to helics_cli configuration file>`
 
 
 ### Experiment and Results ###
-To show the difference between running these two simulators in a stand-alone analysis and as a co-simulation, modify the JSON configurations and use helics_cli in both cases to run the analysis. To run the two as a co-simulation, leave publication and subscription entries in the JSON configuration. To run them as stand-alone federates with no interaction, delete the publications and subscriptions from both JSON configuration files. By removing the information transfer between the two they become disconnected but are still able to be executed as if they were participating in the federation. (xxxxxxx - verify this works)
+To show the difference between running these two simulators in a stand-alone analysis and as a co-simulation, modify the federate JSON configurations and use helics_cli in both cases to run the analysis. To run the two as a co-simulation, leave publication and subscription entries in the federate JSON configuration. To run them as stand-alone federates with no interaction, delete the publications and subscriptions from both JSON configuration files. By removing the information transfer between the two they become disconnected but are still able to be executed as if they were participating in the federation. (xxxxxxx - verify this works)
 
 The figure below shows the total load on the transmission node to which the distribution system model is attached over the course of the simulated day, both when operating stand-alone and when running in a co-simulation with the distribution system.
 

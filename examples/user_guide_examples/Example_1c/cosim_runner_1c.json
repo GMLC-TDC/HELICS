@@ -15,7 +15,7 @@
         },
         {
             "directory":"./Distribution/",
-            "exec":"gridlabd IEEE_123_feeder_0.glm",
+            "exec":"gld_gcc IEEE_123_feeder_0.glm",
             "host":"localhost",
             "name":"GridLABDFederate"
         }

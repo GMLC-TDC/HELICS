@@ -64,8 +64,8 @@ def destroy_federate(fed):
 #    status, state = h.helicsFederateGetState(fed)
 #    assert state == 3
 
-    while (h.helicsBrokerIsConnected(broker)):
-        time.sleep(1)
+#   while (h.helicsBrokerIsConnected(broker)):
+#        time.sleep(1)
 
     h.helicsFederateFree(fed)
     h.helicsCloseLibrary()

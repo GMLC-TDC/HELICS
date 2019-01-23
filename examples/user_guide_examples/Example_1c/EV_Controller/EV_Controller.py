@@ -4,21 +4,12 @@ Created on Thu Oct 11 10:08:26 2018
 
 @author: monish.mukherjee
 """
-import scipy.io as spio
 from pypower.api import case118, ppoption, runpf, runopf
-import math
-import numpy
-import copy
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
-from datetime import datetime, timedelta
 import time
 import helics as h
-import random
 import logging
-import json
-import sys
-import os
 import pandas as pd
 
 logger = logging.getLogger(__name__)
@@ -37,29 +28,18 @@ def create_broker():
 
 def destroy_federate(fed):
     status = h.helicsFederateFinalize(fed)
-
-    #state = h.helicsFederateGetState(fed)
-    #assert state == 3
-
-    #while (h.helicsBrokerIsConnected(broker)):
-        #time.sleep(1)
-
     h.helicsFederateFree(fed)
     h.helicsCloseLibrary()
 
 
 if __name__ == "__main__":
 
-    # broker = create_broker()
-    #fed = create_federate()
 
 #################################  Registering  federate from json  ########################################
     
     fed = h.helicsCreateCombinationFederateFromConfig('Control.json')
-    #status = h.helicsFederateRegisterInterfaces(fed, 'Control.json')
     federate_name = h.helicsFederateGetName(fed)
     print(federate_name)
-    #print(" Federate {} has been registered".format(federate_name))
     endpoint_count = h.helicsFederateGetEndpointCount(fed)
     subkeys_count = h.helicsFederateGetInputCount(fed)
     print(subkeys_count)
@@ -139,7 +119,6 @@ if __name__ == "__main__":
                 destination_name = (end_name.replace(federate_name, distribution_fed_name))
                 print('Endpoint Destination {}'.format(destination_name))
                 status = h.helicsEndpointSendMessageRaw(end, destination_name, str('0 + 0 j'))
-                #status = h.helicsEndpointSendMessageRaw(end, 'NULL', str('0 + 0 j'))
                 logger.info('Turning off {}'.format(end_name))
                 k=k+1
             else:
@@ -155,7 +134,6 @@ if __name__ == "__main__":
                 destination_name = (end_name.replace(federate_name,distribution_fed_name))
                 print('Endpoint Destination {}'.format(destination_name))
                 status = h.helicsEndpointSendMessageRaw(end, destination_name, str('200000 + 0 j'))
-                #status = h.helicsEndpointSendMessageRaw(end, 'NULL', str('200000 + 0 j'))
                 logger.info('Turning on {}'.format(end_name))
             else:
                 logger.info('All EVs are Turned on')

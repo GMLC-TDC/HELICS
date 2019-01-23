@@ -62,7 +62,7 @@ Once the message topology considering endpoints has been determined, the definit
 
 There are a few other configuration parameters that are applicable if the endpoint is interacting with a HELICS value message.
 
-* **`knownSubscription`** - The string in this field specifies the key for a HELICS value message that the message federate would like to receive. HELICS will generate a message and send it to this endpoint whenever the originating value federate updates to value.
+* **`knownSubscription`** - The string in this field specifies the key for a HELICS value message that the message federate would like to receive at the specified endpoint. HELICS will generate a message and send it to this endpoint whenever the originating value federate updates to value.
 * **`type`** and **`units`** - Just as in HELICS values, messages that come from value federates have associated data types and units. As in value federates, HELICS can use the specified `type` and `units` field to perform appropriate conversions. (As of v2.0, unit conversion is not supported.)
 
 
@@ -101,12 +101,14 @@ Taking these assumptions and specifications, it is not too difficult to write a 
 	"endpoints":[
 	{
 		"name": "EV_Controller/EV6",
+		"destination": "IEEE_123_feeder_0/EV6",
 		"type": "genmessage",
 		"global": true
 		
 	},  
 	{ 
 		"name": "EV_Controller/EV5",
+		"destination": "IEEE_123_feeder_0/EV5",
 		"type": "genmessage",
 		"global": true
 	},  
@@ -176,7 +178,6 @@ Looking at the [GridLAB-D JSON configuration file](../../examples/user_guide_exa
 	 "endpoints" : [
 		{
 			"global" : true, 
-			"knownSubscription" : "EV_Controller/EV6", 
 			"name" : "IEEE_123_feeder_0/EV6", 
 			"type" : "complex", 
 			"info" : "{
@@ -186,7 +187,6 @@ Looking at the [GridLAB-D JSON configuration file](../../examples/user_guide_exa
 		},
 		{
 			"global" : true, 
-			"knownSubscription" : "EV_Controller/EV5", 
 			"name" : "IEEE_123_feeder_0/EV5", 
 			"type" : "complex", 
 			"info" : "{
@@ -202,7 +202,7 @@ Looking at the [GridLAB-D JSON configuration file](../../examples/user_guide_exa
 GridLAB-D is publishing out the total load on the feeder as well as the individual EV charging loads. It also has endpoints set up for each of the EV chargers to receive messages from the controller. Based on the strings in the `info` field it appears that the received messages are used to define the EV charge power.
 
 
-[Running the example](../../examples/user_guide_examples/Example_1b/) and looking at the results, as the total load on the feeder exceeded the pre-defined maximum loading of the feeder (red line in the graph), the EV controller disconnected an additional EV load. Conversely, as the load dipped to the lower limit (green line), the controller reconnected the EV load. Looking at a graph of the EV charge power for each EV shows the timing of the EV charging for each load.
+Running [the example](../../examples/user_guide_examples/Example_1b/) and looking at the results, as the total load on the feeder exceeded the pre-defined maximum loading of the feeder (red line in the graph), the EV controller disconnected an additional EV load. Conversely, as the load dipped to the lower limit (green line), the controller reconnected the EV load. Looking at a graph of the EV charge power for each EV shows the timing of the EV charging for each load.
 
 ![Ex. 1b total feeder load](../img/Ex1b_Feeder_consumption.png)
 

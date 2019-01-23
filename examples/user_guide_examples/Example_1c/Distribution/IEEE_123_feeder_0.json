@@ -89,8 +89,7 @@
      ],
 	 "endpoints" : [
 		{
-			"global" : true, 
-			"knownSubscription" : "EV_Controller/EV6", 
+			"global" : true,  
 			"name" : "IEEE_123_feeder_0/EV6", 
 			"type" : "complex", 
 			"info" : "{
@@ -99,8 +98,7 @@
 			}"
 		},
 		{
-			"global" : true, 
-			"knownSubscription" : "EV_Controller/EV5", 
+			"global" : true,  
 			"name" : "IEEE_123_feeder_0/EV5", 
 			"type" : "complex", 
 			"info" : "{
@@ -109,8 +107,7 @@
 			}"
 		},		
 		{
-			"global" : true, 
-			"knownSubscription" : "EV_Controller/EV4", 
+			"global" : true,  
 			"name" : "IEEE_123_feeder_0/EV4", 
 			"type" : "complex", 
 			"info" : "{
@@ -119,8 +116,7 @@
 			}"
 		},
 		{
-			"global" : true, 
-			"knownSubscription" : "EV_Controller/EV3", 
+			"global" : true,  
 			"name" : "IEEE_123_feeder_0/EV3", 
 			"type" : "complex", 
 			"info" : "{
@@ -130,7 +126,6 @@
 		},
 		{
 			"global" : true, 
-			"knownSubscription" : "EV_Controller/EV2", 
 			"name" : "IEEE_123_feeder_0/EV2", 
 			"type" : "complex", 
 			"info" : "{
@@ -140,7 +135,6 @@
 		},
 		{
 			"global" : true, 
-			"knownSubscription" : "EV_Controller/EV1", 
 			"name" : "IEEE_123_feeder_0/EV1", 
 			"type" : "complex", 
 			"info" : "{

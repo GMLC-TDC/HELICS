@@ -5,11 +5,11 @@
             "directory":"./Transmission/",
             "exec":"python Transmission_simulator.py",
             "host":"localhost",
-            "name":"PythonCombinationFederate"
+            "name":"TransmissionFederate"
         },
         {
             "directory":"./Distribution/",
-            "exec":"gridlabd IEEE_123_feeder_0.glm",
+            "exec":"gridlabd.sh IEEE_123_feeder_0.glm",
             "host":"localhost",
             "name":"GridLABDFederate"
         }

@@ -1,6 +1,6 @@
 {
     "name" : "DistributionSim",
-	"loglevel": 5,
+	"loglevel": 6,
 	"coreType": "zmq",
 	"period" : 1.0,
     "publications" : [
@@ -89,8 +89,7 @@
      ],
 	 "endpoints" : [
 		{
-			"global" : true, 
-			"knownSubscription" : "EV_Controller/EV6", 
+			"global" : true,  
 			"name" : "IEEE_123_feeder_0/EV6", 
 			"type" : "complex", 
 			"info" : "{
@@ -100,7 +99,6 @@
 		},
 		{
 			"global" : true, 
-			"knownSubscription" : "EV_Controller/EV5", 
 			"name" : "IEEE_123_feeder_0/EV5", 
 			"type" : "complex", 
 			"info" : "{
@@ -110,7 +108,6 @@
 		},		
 		{
 			"global" : true, 
-			"knownSubscription" : "EV_Controller/EV4", 
 			"name" : "IEEE_123_feeder_0/EV4", 
 			"type" : "complex", 
 			"info" : "{
@@ -120,7 +117,6 @@
 		},
 		{
 			"global" : true, 
-			"knownSubscription" : "EV_Controller/EV3", 
 			"name" : "IEEE_123_feeder_0/EV3", 
 			"type" : "complex", 
 			"info" : "{
@@ -130,7 +126,6 @@
 		},
 		{
 			"global" : true, 
-			"knownSubscription" : "EV_Controller/EV2", 
 			"name" : "IEEE_123_feeder_0/EV2", 
 			"type" : "complex", 
 			"info" : "{
@@ -139,8 +134,7 @@
 			}"
 		},
 		{
-			"global" : true, 
-			"knownSubscription" : "EV_Controller/EV1", 
+			"global" : true,  
 			"name" : "IEEE_123_feeder_0/EV1", 
 			"type" : "complex", 
 			"info" : "{

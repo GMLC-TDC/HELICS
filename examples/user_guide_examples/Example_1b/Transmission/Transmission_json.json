@@ -1,6 +1,6 @@
 {
 	"name": "TransmissionSim",
-	"loglevel": 5,
+	"loglevel": 7,
 	"coreType": "zmq",
 	"timeDelta": 1.0,
 	"uninterruptible": true,
