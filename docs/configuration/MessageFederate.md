@@ -1,16 +1,16 @@
 # Message Federates
 
-Message Federates provide the interfaces for registering endpoints and sending and receiving messages through
-those endpoints.  Endpoints can be configured through API calls or through file configurations
+Message Federates provide the interfaces for registering endpoints and sending and receiving messages through those endpoints.
+Endpoints can be configured through API calls or through file configurations
 
 ## API calls
 
-endpoints can be declared through MessageFederate methods or through Endpoint objects
-these are defined in MessageFederate.hpp and Endpoints.hpp.  For the MessageFederate api the register calls return
-and endpoint_id_t value that must be used whenver the endpoint is referenced.  The Endpoint object api contains those calls in a separate object
+Endpoints can be declared through MessageFederate methods or through Endpoint objects.
+These are defined in MessageFederate.hpp and Endpoints.hpp.
+For the MessageFederate api the register calls return and `endpoint_id_t` value that must be used whenever the endpoint is referenced.
+The Endpoint object api contains those calls in a separate object.
 
-
-TODO:: add links to other generated documents
+<!-- TODO:: add links to other generated documents -->
 
 ### file configuration
 
@@ -48,7 +48,7 @@ File based configuration looks primarily at an "endpoints" JSON array
     "name":"ept2", // the name of the publication
     "type":"message2", // the type assocaited with a endpoint (optional)
  //the fact that there is no global value creates a local endpoint with global name messageFed/ept2
-    "knownDestinations":"ept1", //this value can be an array of strings or just a single one it names key paths 
+    "knownDestinations":"ept1", //this value can be an array of strings or just a single one it names key paths
  //knownDestinations can be used to optimize the communication pathways inside of HELICS
     "subscriptions":"fed2/sub1"  //subscribe an endpoint to a particular publication  this means that an endpoint will get a message whenever anything is published to that particular key
  //the message will be raw data so it would have to be translated to be useful. this can also be a JSON array to subscribe to multiple publications
@@ -56,5 +56,7 @@ File based configuration looks primarily at an "endpoints" JSON array
 ]
 }
 ```
-See the comments in the file for more information.  Endpoints can subscribe to publications in which case a message is delivered for every value published.
+
+See the comments in the file for more information.
+Endpoints can subscribe to publications in which case a message is delivered for every value published.
 
