@@ -1006,7 +1006,7 @@
     :project: helics
 
 
-.. doxygendefine:: helics_false
+.. doxygenvariable:: helics_false
     :project: helics
 
 
@@ -1282,31 +1282,31 @@
     :project: helics
 
 
-.. doxygendefine:: helics_time_epsilon
+.. doxygenvariable:: helics_time_epsilon
     :project: helics
 
 
-.. doxygendefine:: helics_time_invalid
+.. doxygenvariable:: helics_time_invalid
     :project: helics
 
 
-.. doxygendefine:: helics_time_maxtime
+.. doxygenvariable:: helics_time_maxtime
     :project: helics
 
 
-.. doxygendefine:: helics_time_zero
+.. doxygenvariable:: helics_time_zero
     :project: helics
 
 
-.. doxygendefine:: helics_true
+.. doxygenvariable:: helics_true
     :project: helics
 
 
-.. doxygendefine:: helics_warning
+.. doxygenenumvalue:: helics_warning
     :project: helics
 
 
-.. doxygendefine:: other_error_type
+.. doxygenenumvalue:: other_error_type
     :project: helics
 
 
