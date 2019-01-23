@@ -8,6 +8,21 @@ We’ll be showing number of commands as code snippets in the following presenta
 You don’t need to type in the `$` character; they are there to indicate the start of each command.
 Lines that don’t start with `$` are typically showing the output of the previous command.
 
+### Quick start
+
+```bash
+conda install -c conda-forge helics
+```
+
+```eval_rst
+.. toctree::
+    :maxdepth: 1
+
+    package_manager
+```
+
+### OS Specific installation
+
 
 ```eval_rst
 .. toctree::
