@@ -10,5 +10,4 @@ Developer Guide
    tests
    docs
    ../Public_API
-   ../../CONTRIBUTING
 ```
