@@ -870,451 +870,451 @@
     :project: helics
 
 
-.. doxygenfunction:: helics_complex
+.. doxygendefine:: helics_complex
     :project: helics
 
 
-.. doxygenfunction:: helics_complex_swigregister
+.. doxygendefine:: helics_complex_swigregister
     :project: helics
 
 
-.. doxygenfunction:: helics_core_type_default
+.. doxygendefine:: helics_core_type_default
     :project: helics
 
 
-.. doxygenfunction:: helics_core_type_http
+.. doxygendefine:: helics_core_type_http
     :project: helics
 
 
-.. doxygenfunction:: helics_core_type_interprocess
+.. doxygendefine:: helics_core_type_interprocess
     :project: helics
 
 
-.. doxygenfunction:: helics_core_type_ipc
+.. doxygendefine:: helics_core_type_ipc
     :project: helics
 
 
-.. doxygenfunction:: helics_core_type_mpi
+.. doxygendefine:: helics_core_type_mpi
     :project: helics
 
 
-.. doxygenfunction:: helics_core_type_nng
+.. doxygendefine:: helics_core_type_nng
     :project: helics
 
 
-.. doxygenfunction:: helics_core_type_tcp
+.. doxygendefine:: helics_core_type_tcp
     :project: helics
 
 
-.. doxygenfunction:: helics_core_type_tcp_ss
+.. doxygendefine:: helics_core_type_tcp_ss
     :project: helics
 
 
-.. doxygenfunction:: helics_core_type_test
+.. doxygendefine:: helics_core_type_test
     :project: helics
 
 
-.. doxygenfunction:: helics_core_type_udp
+.. doxygendefine:: helics_core_type_udp
     :project: helics
 
 
-.. doxygenfunction:: helics_core_type_zmq
+.. doxygendefine:: helics_core_type_zmq
     :project: helics
 
 
-.. doxygenfunction:: helics_core_type_zmq_test
+.. doxygendefine:: helics_core_type_zmq_test
     :project: helics
 
 
-.. doxygenfunction:: helics_data_type_any
+.. doxygendefine:: helics_data_type_any
     :project: helics
 
 
-.. doxygenfunction:: helics_data_type_boolean
+.. doxygendefine:: helics_data_type_boolean
     :project: helics
 
 
-.. doxygenfunction:: helics_data_type_complex
+.. doxygendefine:: helics_data_type_complex
     :project: helics
 
 
-.. doxygenfunction:: helics_data_type_complex_vector
+.. doxygendefine:: helics_data_type_complex_vector
     :project: helics
 
 
-.. doxygenfunction:: helics_data_type_double
+.. doxygendefine:: helics_data_type_double
     :project: helics
 
 
-.. doxygenfunction:: helics_data_type_int
+.. doxygendefine:: helics_data_type_int
     :project: helics
 
 
-.. doxygenfunction:: helics_data_type_named_point
+.. doxygendefine:: helics_data_type_named_point
     :project: helics
 
 
-.. doxygenfunction:: helics_data_type_raw
+.. doxygendefine:: helics_data_type_raw
     :project: helics
 
 
-.. doxygenfunction:: helics_data_type_string
+.. doxygendefine:: helics_data_type_string
     :project: helics
 
 
-.. doxygenfunction:: helics_data_type_time
+.. doxygendefine:: helics_data_type_time
     :project: helics
 
 
-.. doxygenfunction:: helics_data_type_vector
+.. doxygendefine:: helics_data_type_vector
     :project: helics
 
 
-.. doxygenfunction:: helics_error_connection_failure
+.. doxygendefine:: helics_error_connection_failure
     :project: helics
 
 
-.. doxygenfunction:: helics_error_discard
+.. doxygendefine:: helics_error_discard
     :project: helics
 
 
-.. doxygenfunction:: helics_error_execution_failure
+.. doxygendefine:: helics_error_execution_failure
     :project: helics
 
 
-.. doxygenfunction:: helics_error_invalid_argument
+.. doxygendefine:: helics_error_invalid_argument
     :project: helics
 
 
-.. doxygenfunction:: helics_error_invalid_function_call
+.. doxygendefine:: helics_error_invalid_function_call
     :project: helics
 
 
-.. doxygenfunction:: helics_error_invalid_object
+.. doxygendefine:: helics_error_invalid_object
     :project: helics
 
 
-.. doxygenfunction:: helics_error_invalid_state_transition
+.. doxygendefine:: helics_error_invalid_state_transition
     :project: helics
 
 
-.. doxygenfunction:: helics_error_other
+.. doxygendefine:: helics_error_other
     :project: helics
 
 
-.. doxygenfunction:: helics_error_registration_failure
+.. doxygendefine:: helics_error_registration_failure
     :project: helics
 
 
-.. doxygenfunction:: helics_error_system_failure
+.. doxygendefine:: helics_error_system_failure
     :project: helics
 
 
-.. doxygenfunction:: helics_false
+.. doxygendefine:: helics_false
     :project: helics
 
 
-.. doxygenfunction:: helics_filter_type_clone
+.. doxygendefine:: helics_filter_type_clone
     :project: helics
 
 
-.. doxygenfunction:: helics_filter_type_custom
+.. doxygendefine:: helics_filter_type_custom
     :project: helics
 
 
-.. doxygenfunction:: helics_filter_type_delay
+.. doxygendefine:: helics_filter_type_delay
     :project: helics
 
 
-.. doxygenfunction:: helics_filter_type_firewall
+.. doxygendefine:: helics_filter_type_firewall
     :project: helics
 
 
-.. doxygenfunction:: helics_filter_type_random_delay
+.. doxygendefine:: helics_filter_type_random_delay
     :project: helics
 
 
-.. doxygenfunction:: helics_filter_type_random_drop
+.. doxygendefine:: helics_filter_type_random_drop
     :project: helics
 
 
-.. doxygenfunction:: helics_filter_type_reroute
+.. doxygendefine:: helics_filter_type_reroute
     :project: helics
 
 
-.. doxygenfunction:: helics_flag_delay_init_entry
+.. doxygendefine:: helics_flag_delay_init_entry
     :project: helics
 
 
-.. doxygenfunction:: helics_flag_enable_init_entry
+.. doxygendefine:: helics_flag_enable_init_entry
     :project: helics
 
 
-.. doxygenfunction:: helics_flag_forward_compute
+.. doxygendefine:: helics_flag_forward_compute
     :project: helics
 
 
-.. doxygenfunction:: helics_flag_ignore_time_mismatch_warnings
+.. doxygendefine:: helics_flag_ignore_time_mismatch_warnings
     :project: helics
 
 
-.. doxygenfunction:: helics_flag_interruptible
+.. doxygendefine:: helics_flag_interruptible
     :project: helics
 
 
-.. doxygenfunction:: helics_flag_observer
+.. doxygendefine:: helics_flag_observer
     :project: helics
 
 
-.. doxygenfunction:: helics_flag_only_transmit_on_change
+.. doxygendefine:: helics_flag_only_transmit_on_change
     :project: helics
 
 
-.. doxygenfunction:: helics_flag_only_update_on_change
+.. doxygendefine:: helics_flag_only_update_on_change
     :project: helics
 
 
-.. doxygenfunction:: helics_flag_realtime
+.. doxygendefine:: helics_flag_realtime
     :project: helics
 
 
-.. doxygenfunction:: helics_flag_rollback
+.. doxygendefine:: helics_flag_rollback
     :project: helics
 
 
-.. doxygenfunction:: helics_flag_single_thread_federate
+.. doxygendefine:: helics_flag_single_thread_federate
     :project: helics
 
 
-.. doxygenfunction:: helics_flag_source_only
+.. doxygendefine:: helics_flag_source_only
     :project: helics
 
 
-.. doxygenfunction:: helics_flag_uninterruptible
+.. doxygendefine:: helics_flag_uninterruptible
     :project: helics
 
 
-.. doxygenfunction:: helics_flag_wait_for_current_time_update
+.. doxygendefine:: helics_flag_wait_for_current_time_update
     :project: helics
 
 
-.. doxygenfunction:: helics_handle_option_buffer_data
+.. doxygendefine:: helics_handle_option_buffer_data
     :project: helics
 
 
-.. doxygenfunction:: helics_handle_option_connection_optional
+.. doxygendefine:: helics_handle_option_connection_optional
     :project: helics
 
 
-.. doxygenfunction:: helics_handle_option_connection_required
+.. doxygendefine:: helics_handle_option_connection_required
     :project: helics
 
 
-.. doxygenfunction:: helics_handle_option_ignore_interrupts
+.. doxygendefine:: helics_handle_option_ignore_interrupts
     :project: helics
 
 
-.. doxygenfunction:: helics_handle_option_multiple_connections_allowed
+.. doxygendefine:: helics_handle_option_multiple_connections_allowed
     :project: helics
 
 
-.. doxygenfunction:: helics_handle_option_only_transmit_on_change
+.. doxygendefine:: helics_handle_option_only_transmit_on_change
     :project: helics
 
 
-.. doxygenfunction:: helics_handle_option_only_update_on_change
+.. doxygendefine:: helics_handle_option_only_update_on_change
     :project: helics
 
 
-.. doxygenfunction:: helics_handle_option_single_connection_only
+.. doxygendefine:: helics_handle_option_single_connection_only
     :project: helics
 
 
-.. doxygenfunction:: helics_handle_option_strict_type_checking
+.. doxygendefine:: helics_handle_option_strict_type_checking
     :project: helics
 
 
-.. doxygenfunction:: helics_iteration_request_force_iteration
+.. doxygendefine:: helics_iteration_request_force_iteration
     :project: helics
 
 
-.. doxygenfunction:: helics_iteration_request_iterate_if_needed
+.. doxygendefine:: helics_iteration_request_iterate_if_needed
     :project: helics
 
 
-.. doxygenfunction:: helics_iteration_request_no_iteration
+.. doxygendefine:: helics_iteration_request_no_iteration
     :project: helics
 
 
-.. doxygenfunction:: helics_iteration_result_error
+.. doxygendefine:: helics_iteration_result_error
     :project: helics
 
 
-.. doxygenfunction:: helics_iteration_result_halted
+.. doxygendefine:: helics_iteration_result_halted
     :project: helics
 
 
-.. doxygenfunction:: helics_iteration_result_iterating
+.. doxygendefine:: helics_iteration_result_iterating
     :project: helics
 
 
-.. doxygenfunction:: helics_iteration_result_next_step
+.. doxygendefine:: helics_iteration_result_next_step
     :project: helics
 
 
-.. doxygenfunction:: helics_log_level_connections
+.. doxygendefine:: helics_log_level_connections
     :project: helics
 
 
-.. doxygenfunction:: helics_log_level_data
+.. doxygendefine:: helics_log_level_data
     :project: helics
 
 
-.. doxygenfunction:: helics_log_level_error
+.. doxygendefine:: helics_log_level_error
     :project: helics
 
 
-.. doxygenfunction:: helics_log_level_interfaces
+.. doxygendefine:: helics_log_level_interfaces
     :project: helics
 
 
-.. doxygenfunction:: helics_log_level_no_print
+.. doxygendefine:: helics_log_level_no_print
     :project: helics
 
 
-.. doxygenfunction:: helics_log_level_summary
+.. doxygendefine:: helics_log_level_summary
     :project: helics
 
 
-.. doxygenfunction:: helics_log_level_timing
+.. doxygendefine:: helics_log_level_timing
     :project: helics
 
 
-.. doxygenfunction:: helics_log_level_trace
+.. doxygendefine:: helics_log_level_trace
     :project: helics
 
 
-.. doxygenfunction:: helics_log_level_warning
+.. doxygendefine:: helics_log_level_warning
     :project: helics
 
 
-.. doxygenfunction:: helics_message
+.. doxygendefine:: helics_message
     :project: helics
 
 
-.. doxygenfunction:: helics_message_swigregister
+.. doxygendefine:: helics_message_swigregister
     :project: helics
 
 
-.. doxygenfunction:: helics_ok
+.. doxygendefine:: helics_ok
     :project: helics
 
 
-.. doxygenfunction:: helics_property_int_log_level
+.. doxygendefine:: helics_property_int_log_level
     :project: helics
 
 
-.. doxygenfunction:: helics_property_int_max_iterations
+.. doxygendefine:: helics_property_int_max_iterations
     :project: helics
 
 
-.. doxygenfunction:: helics_property_time_delta
+.. doxygendefine:: helics_property_time_delta
     :project: helics
 
 
-.. doxygenfunction:: helics_property_time_input_delay
+.. doxygendefine:: helics_property_time_input_delay
     :project: helics
 
 
-.. doxygenfunction:: helics_property_time_offset
+.. doxygendefine:: helics_property_time_offset
     :project: helics
 
 
-.. doxygenfunction:: helics_property_time_output_delay
+.. doxygendefine:: helics_property_time_output_delay
     :project: helics
 
 
-.. doxygenfunction:: helics_property_time_period
+.. doxygendefine:: helics_property_time_period
     :project: helics
 
 
-.. doxygenfunction:: helics_property_time_rt_lag
+.. doxygendefine:: helics_property_time_rt_lag
     :project: helics
 
 
-.. doxygenfunction:: helics_property_time_rt_lead
+.. doxygendefine:: helics_property_time_rt_lead
     :project: helics
 
 
-.. doxygenfunction:: helics_property_time_rt_tolerance
+.. doxygendefine:: helics_property_time_rt_tolerance
     :project: helics
 
 
-.. doxygenfunction:: helics_state_error
+.. doxygendefine:: helics_state_error
     :project: helics
 
 
-.. doxygenfunction:: helics_state_execution
+.. doxygendefine:: helics_state_execution
     :project: helics
 
 
-.. doxygenfunction:: helics_state_finalize
+.. doxygendefine:: helics_state_finalize
     :project: helics
 
 
-.. doxygenfunction:: helics_state_initialization
+.. doxygendefine:: helics_state_initialization
     :project: helics
 
 
-.. doxygenfunction:: helics_state_pending_exec
+.. doxygendefine:: helics_state_pending_exec
     :project: helics
 
 
-.. doxygenfunction:: helics_state_pending_finalize
+.. doxygendefine:: helics_state_pending_finalize
     :project: helics
 
 
-.. doxygenfunction:: helics_state_pending_init
+.. doxygendefine:: helics_state_pending_init
     :project: helics
 
 
-.. doxygenfunction:: helics_state_pending_iterative_time
+.. doxygendefine:: helics_state_pending_iterative_time
     :project: helics
 
 
-.. doxygenfunction:: helics_state_pending_time
+.. doxygendefine:: helics_state_pending_time
     :project: helics
 
 
-.. doxygenfunction:: helics_state_startup
+.. doxygendefine:: helics_state_startup
     :project: helics
 
 
-.. doxygenfunction:: helics_time_epsilon
+.. doxygendefine:: helics_time_epsilon
     :project: helics
 
 
-.. doxygenfunction:: helics_time_invalid
+.. doxygendefine:: helics_time_invalid
     :project: helics
 
 
-.. doxygenfunction:: helics_time_maxtime
+.. doxygendefine:: helics_time_maxtime
     :project: helics
 
 
-.. doxygenfunction:: helics_time_zero
+.. doxygendefine:: helics_time_zero
     :project: helics
 
 
-.. doxygenfunction:: helics_true
+.. doxygendefine:: helics_true
     :project: helics
 
 
-.. doxygenfunction:: helics_warning
+.. doxygendefine:: helics_warning
     :project: helics
 
 
-.. doxygenfunction:: other_error_type
+.. doxygendefine:: other_error_type
     :project: helics
 
 
