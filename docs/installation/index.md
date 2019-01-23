@@ -14,7 +14,7 @@ Lines that don’t start with `$` are typically showing the output of the previo
 conda install -c conda-forge helics
 ```
 
-OR
+### Using a package manager
 
 Download pre-compiled libraries from the [releases page](https://github.com/GMLC-TDC/HELICS-src/releases) and add them to your PATH.
 
