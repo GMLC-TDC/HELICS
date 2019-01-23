@@ -915,13 +915,13 @@ SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_helics_1error_1other_1get
 }
 
 
-SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_other_1error_1type_1get(JNIEnv *jenv, jclass jcls) {
+SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_helics_1error_1external_1type_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
   helics_error_types result;
   
   (void)jenv;
   (void)jcls;
-  result = (helics_error_types)other_error_type;
+  result = (helics_error_types)helics_error_external_type;
   jresult = (jint)result; 
   return jresult;
 }

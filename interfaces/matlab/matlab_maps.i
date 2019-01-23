@@ -35,7 +35,7 @@ static void throwHelicsMatlabError(helics_error *err) {
   mexErrMsgIdAndTxt( "helics:execution_failure", err->message);
 	break;
   case   helics_error_other:
-  case   other_error_type:
+  case   helics_error_external_type:
   default:
   mexErrMsgIdAndTxt( "helics:error", err->message);
 	break;

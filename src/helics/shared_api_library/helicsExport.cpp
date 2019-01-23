@@ -144,7 +144,7 @@ void helicsErrorHandler (helics_error *err) noexcept
             }
             else
             {
-                err->error_code = other_error_type;
+                err->error_code = helics_error_external_type;
                 err->message = unknown_err_string;
             }
         }
@@ -185,18 +185,18 @@ void helicsErrorHandler (helics_error *err) noexcept
         }
         catch (const std::exception &exc)
         {
-            err->error_code = other_error_type;
+            err->error_code = helics_error_external_type;
             err->message = getMasterHolder ()->addErrorString (exc.what ());
         }
         catch (...)
         {
-            err->error_code = other_error_type;
+            err->error_code = helics_error_external_type;
             err->message = unknown_err_string;
         }
     }
     catch (...)
     {
-        err->error_code = other_error_type;
+        err->error_code = helics_error_external_type;
         err->message = unknown_err_string;
     }
 }

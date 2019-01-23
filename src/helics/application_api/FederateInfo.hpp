@@ -28,14 +28,16 @@ class FederateInfo : public CoreFederateInfo
 
     /** default constructor*/
     FederateInfo () = default;
-    /** construct from the name and type*/
+    /** construct from a type
+    @param cType the type of core to use for the federate*/
     explicit FederateInfo (core_type cType) : coreType (cType){};
     /** load a federateInfo object from command line arguments
+    @details calls /ref loadInfoFromArgs in the constructor
     @param argc the number of arguments
     @param argv an array of char * pointers to the arguments
     */
     FederateInfo (int argc, const char *const *argv);
-    /** load a federateInfo object from command line arguments
+    /** load a federateInfo object from command line arguments outside the constructor
     @param argc the number of arguments
     @param argv an array of char * pointers to the arguments
     */
@@ -49,10 +51,16 @@ FederateInfo loadFederateInfo (const std::string &configString);
 /** generate string for passing arguments to the core*/
 std::string generateFullCoreInitString (const FederateInfo &fi);
 
-/** get an integer property/flag from a string name of the property or flag*/
+/** get an integer property/flag from a string name of the property or flag
+@param val a name of property to get an integer index code for used in /ref CoreFederateInfo::setProperty
+@return the integer code for a given property
+*/
 int getPropertyIndex (std::string val);
 
-/** get an integer option index for an interface option */
+/** get an integer option index for a binary flag option
+@param val a name of flag option to get an integer index code for used in /ref CoreFederateInfo::setOptionFlag
+@return the integer code for a given property
+*/
 int getOptionIndex (std::string val);
 
 }  // namespace helics

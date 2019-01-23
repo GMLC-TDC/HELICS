@@ -150,7 +150,7 @@ extern "C"
           (-10), /*!< the call made was invalid in the present state of the calling object*/
         helics_error_execution_failure = (-14), /*!< the function execution has failed*/
         helics_error_other = -101, /*!< the function produced a helics error of some other type */
-        other_error_type = -203 /*!< a non helics error was produced*/
+        helics_error_external_type = -203 /*!< an unknown non-helics error was produced*/
     } helics_error_types;
 
     /** enumeration of properties that apply to federates*/
