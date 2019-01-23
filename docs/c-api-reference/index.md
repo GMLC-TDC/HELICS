@@ -1006,7 +1006,7 @@
     :project: helics
 
 
-.. doxygenenumvalue:: helics_false
+.. doxygendefine:: helics_false
     :project: helics
 
 
