@@ -14,6 +14,12 @@ Lines that don’t start with `$` are typically showing the output of the previo
 conda install -c conda-forge helics
 ```
 
+OR
+
+Download pre-compiled libraries from the [releases page](https://github.com/GMLC-TDC/HELICS-src/releases) and add them to your PATH.
+
+Alternatively, you can install it using one of the supported package managers or install from source
+
 ```eval_rst
 .. toctree::
     :maxdepth: 1
