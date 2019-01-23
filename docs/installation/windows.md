@@ -106,10 +106,10 @@ recorder (located in the 'build/src/helics/apps/player/Debug' folder):
 > cd C:/Path/To/build/src/helics/apps/Debug
 
 > helics_player.exe --version
-1.0.2 04-28-2018
+x.x.x XX-XX-XXXX
 
 > helics_recorder.exe --version
-1.0.2 04-28-2018
+x.x.x XX-XX-XXXX
 ```
 
 ## Building HELICS with python support
