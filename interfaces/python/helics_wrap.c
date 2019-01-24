@@ -3090,7 +3090,7 @@ static void throwHelicsPythonException(helics_error *err) {
     PyErr_SetString(pHelicsException, str);
 	break;
   case   helics_error_other:
-  case   other_error_type:
+  case   helics_error_external_type:
   default:
     strcat(str, "helics:error - ");
     strcat(str, err->message);
@@ -15757,7 +15757,7 @@ SWIG_init(void) {
   SWIG_Python_SetConstant(d, "helics_error_invalid_function_call",SWIG_From_int((int)(helics_error_invalid_function_call)));
   SWIG_Python_SetConstant(d, "helics_error_execution_failure",SWIG_From_int((int)(helics_error_execution_failure)));
   SWIG_Python_SetConstant(d, "helics_error_other",SWIG_From_int((int)(helics_error_other)));
-  SWIG_Python_SetConstant(d, "other_error_type",SWIG_From_int((int)(other_error_type)));
+  SWIG_Python_SetConstant(d, "helics_error_external_type",SWIG_From_int((int)(helics_error_external_type)));
   SWIG_Python_SetConstant(d, "helics_property_time_delta",SWIG_From_int((int)(helics_property_time_delta)));
   SWIG_Python_SetConstant(d, "helics_property_time_period",SWIG_From_int((int)(helics_property_time_period)));
   SWIG_Python_SetConstant(d, "helics_property_time_offset",SWIG_From_int((int)(helics_property_time_offset)));
