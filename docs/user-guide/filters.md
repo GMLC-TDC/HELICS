@@ -12,10 +12,11 @@ As was introduced in the [introductory section on federates](./federates.md), me
   
 The figure below is an example of a representation of the message topology of a generic co-simulation federation composed entirely of message federates. Source and destination filters have been implemented (indicated by the blue endpoints), each showing a different built-in HELICS filter function. 
   
-  * As a reminder, a single endpoint can be used to both send and receive messages (as shown by Federate 4) but a single filter will only act on messages sent or messages received. Both a source filter and a destination filter can be set up on a single endpoint.
+  * As a reminder, a single endpoint can be used to both send and receive messages (as shown by Federate 4). Both a source filter and a destination filter can be set up on a single endpoint.  In fact multiple source filters can be used on the same endpoint.
   * The source filter on Federate 3 delays the messages to both Federate 2 and Federate 4 by the same 0.5 seconds. Without establishing a separate endpoint devoted to each federate, there is no way to produce different delays in the messages sent along these two paths.
   * Because the filter on Federate 4 is a destination filter, the message it receives  from Federate 3 is affected by the filter but the message it sends to Federate 2 is not affected.
   * As constructed, the source filter on Federate 2 has no impact on this co-simulation as there are no messages sent from that endpoint.
+  * Individual filters can be targeted to act on multiple endpoints and act as both source and destination Filters.
 
 ![messages and filters example](../img/messages_and_filters_example.pdf)
   
@@ -33,8 +34,7 @@ To demonstrate the effects of filters, let's take the same model we were working
 	[
 		{
 		"name":"filterEV6",
-		"target":"EV_Controller/EV6",
-		"mode":"source", 
+		"sourcetarget":"EV_Controller/EV6",
 		"operation":"delay",
 		"properties":
 			{
@@ -44,8 +44,7 @@ To demonstrate the effects of filters, let's take the same model we were working
 		},
 		{
 		"name":"filterEV5",
-		"target":"EV_Controller/EV5",
-		"mode":"source", 
+		"sourcetarget":"EV_Controller/EV5",
 		"operation":"delay",
 		"properties":
 			{
@@ -58,8 +57,8 @@ To demonstrate the effects of filters, let's take the same model we were working
 ```
 
 * **`name`** (optional) - Name of the endpoint filter
-* **`target`** - Name of the endpoint to which this filter will apply
-* **`mode`** - Either `source` or `destination`, defining whether the filter should impact out-going or in-coming messages, respectively.
+* **`sourcetarget(s)`** - Name(s) of the endpoints to which this filter will apply a source filter
+* **`desttarget(s)`** - Name(s) of the endpoints to which this filter will apply a destination filter
 * **`operation`** - Defines the type of filtering operation that will be applied to messages. As of v2.0, the supported types are: `delay`, `timedelay`, `randomdelay`, `randomdrop`, `reroute`, `redirect`, `clone`, `cloning`, and `custom`. Further details on filter types can be found [here](https://github.com/GMLC-TDC/HELICS-src/blob/master/docs/configuration/Filters.md).
 * **`properties`** - Each filter type has specific parameters that define how it operates. In this case, one of those parameters is the amount each message will be delayed, in seconds.
 
