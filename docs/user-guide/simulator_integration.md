@@ -1,6 +1,6 @@
 # Integrating a Simulator into HELICS #
 
-At some point, maybe from the very beginning of your time with HELICS co-simulation, you'll have an interest or need to include a simulator in your co-simulation that HELICS doesn't support. Maybe its an existing open-source simulator, maybe its commercial software, maybe its a small controller simulator you'd like to test in an existing model. HELICS has been designed to make it as easy as possible to integrate a new simulator. Before writing code, though, it is important to more specifically define the task.
+At some point, maybe from the very beginning of your time with HELICS co-simulation, you'll have an interest or need to include a simulator in your co-simulation that HELICS doesn't support. Maybe it's an existing open-source simulator, maybe it's commercial software, maybe it's a small controller simulator you'd like to test in an existing model. HELICS has been designed to make it as easy as possible to integrate a new simulator. Before writing code, though, it is important to more specifically define the task.
 
 ## Simulator Integration Clarifying Questions##
   1. **What is the nature of the code-base being integrated?** Is this open-source code that can be fully modified? Is it a simulator, perhaps commercial, that provides an API that will be used?  How much control do you, the integrator, have in modifying the behavior of the simulator?
@@ -9,12 +9,13 @@ At some point, maybe from the very beginning of your time with HELICS co-simulat
   If you're writing your own simulator then you have a lot more freedom and the language you use may come down to personal preference and/or performance requirements of the federate.
   
   The languages currently supported by HELICS are: 
-    - C++
-    - C
-    - Python (2 and 3)
-    - Java
-    - MATLAB
-    - Octave
+   - C++
+   - C
+   - Python (2 and 3)
+   - Java
+   - MATLAB
+   - Octave
+   - C# (somewhat limited as of yet)
   3. **What is the simulators concept of time?** - Understanding how the simulator natively moves through time is essential when determining how time requests will need to be made. Does the simulator have a fixed time-step? Is it user-definable? Does the simulator have any concept of time or is it event-based?
   4. **What is the nature of the values it will send to and receive from the rest of the federation?** Depending on the nature of the simulator, this may or may not be specifically definable but a general understanding of how this simulator will be used in a co-simulation should be clear. As a stand-alone simulator, what are its inputs and outputs? What are its assumed or provided boundary conditions? What kinds of values will it be providing to the rest of the federation?
 
@@ -32,7 +33,7 @@ import helics as h
 Though not technically a pat of integrating a simulator its important to remember that as a part of running a co-simulation, a broker will need to be created. This can be done as part of what an existing federate does, as a part of a stand-alone broker-creation federate, or with helics_cli. Broker creation is done with just a single API call:
 
 ```
-broker = h.helicsCreateBroker("zmq", "main_broker", "2")
+broker = h.helicsCreateBroker("zmq", "main_broker", "--federates 2")
 
 ```
 The [Doxygen on this function](https://gmlc-tdc.github.io/HELICS-src/doxygen/helics_8h.html#aeb64e4cbbfd666b121a2814a0baef4de) shows that the first argument defines the core, the second the name of the broker, and the third is an initialization string which in this case, only specifies the number of federates in the federation.
@@ -80,7 +81,7 @@ Getting the number of the inputs/publications/endpoints and then looping over th
 
 
 ### Federate Execution ###
-Once any linking between wider federation and the custom federate being created is complete, the federate itself indicates it is ready to being federation initialization by calling:
+Once any linking between wider federation and the custom federate being created is complete, the federate itself indicates it is ready to begin advancing in time:
 
 ```
 h.helicsFederateEnterExecutingMode(fed)
@@ -95,11 +96,11 @@ And now begins the core of the co-simulation where the following several steps a
   grantedtime = h.helicsFederateRequestTime (fed, time)
   ```
   
-  Assuming any necessary calculations have been completed, the federate requests a simulated time. This time is determined by the nature of the simulator and generally represents the maximum time over which, in none of the inputs of the simulator change, no new outputs would need to be calculated. For simulators with fixed a fixed time-step, the time requested will be the next time-step. (For these types of simulators, it's a good idea to [set the "uninterruptible" flag](./timing.md) as well, just to keep the simulator on these intervals.) 
+  Assuming any necessary calculations have been completed, the federate requests a simulated time. This time is determined by the nature of the simulator and generally represents the maximum time over which, in none of the inputs of the simulator change, no new outputs would need to be calculated. For simulators with a fixed time-step, the time requested will be the next time-step. (For these types of simulators, it's a good idea to [set the "uninterruptible" flag](./timing.md) as well, just to keep the simulator on these intervals.) 
   
   For other types of simulators, controller for example, you may want to change an output every time an input changes, but never any other time. In these cases, you can make the time request of `maxTime`; this is the end of the simulation time and thus the federate will do nothing until a new input value changes and the federate is granted that time. (In this case, you would want to make sure the "uninterruptible" flag was NOT set so that the federate is woken up on these input changes.)
   
-  Like `helicsFederateEnterExecutingMode`, this method is a blocking call. Your federate will do nothing until the HELICS broker has granted a time to it. 
+  Like `helicsFederateEnterExecutingMode`, this method is a blocking call. Your federate will do nothing until the HELICS core has granted a time to it. 
   
 * **Get new input values**
   
@@ -134,10 +135,10 @@ Once the federate has completed its contribution to the it needs to close out it
 
 ```
 h.helicsFederateFinalize(fed)
-while (h.helicsBrokerIsConnected(broker)):
-  <pause for some small amount of time>
+#wait until the broker is finished (-1 is indefinite timeout otherwise it is the number of ms to wait)
+h.helicsBrokerWaitForDisconnect(broker, -1);
 h.helicsFederateFree(fed)
 h.helicsCloseLibrary()
 ```
 
-`helicsFederateFinalize()` signals to the broker that this federate is leaving the co-simulation. This process will take an indeterminate amount of time and thus it is necessary to poll the connection status to the broker. Once that connection has closed, the memory of the federate (associated with HELICS) is freed up with `helicsFederateFree()` and the processes in the HELICS library are terminated with `helicsCloseLibrary()`. At this point, the federate can safely end execution completely.
+`helicsFederateFinalize()` signals to the core and brokers that this federate is leaving the co-simulation. This process will take an indeterminate amount of time and thus it is necessary to poll the connection status to the broker. Once that connection has closed, the memory of the federate (associated with HELICS) is freed up with `helicsFederateFree()` and the processes in the HELICS library are terminated with `helicsCloseLibrary()`. At this point, the federate can safely end execution completely.

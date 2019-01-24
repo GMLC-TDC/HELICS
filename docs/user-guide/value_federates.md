@@ -10,19 +10,19 @@ There are four interface types for value federates that allow the interactions b
 * **Directed Outputs** - Sending interface where the federate core specifies the recipient of HELICS message
 * **Subscriptions** - Receiving interface where the federate core specifies the sender of HELICS message
 
-In all cases the configuration of the federate core declares the existence of the interface to use for communicating with other federates. The difference between "publication"/"name inputs" and "directed outputs"/"subscriptions" is where that federate core itself knows the specific names of the interfaces on the receiving/sending federate core. 
+In all cases the configuration of the federate core declares the existence of the interface to use for communicating with other federates. The difference between "publication"/"named inputs" and "directed outputs"/"subscriptions" is where that federate core itself knows the specific names of the interfaces on the receiving/sending federate core. 
 
 
 The message type used for a given federation configuration is often an expression of the preference of the user setting up the federation. There are a few important differences that may guide which interfaces to use:
 
 * **Which interfaces does the simulator support?** - Though it is the preference of the HELICS development team that all integrated simulators support all four types, that may not be the case. Limitations of the simulator may limit your options as a user of that simulator.
-* **Is portability of the federate and its configuration important?** - Because "publications" and "named inputs" don't require the federate to know who it is sending HELICS messages to and receiving HELICS messages from as part of the federate configuration, it affords a slightly higher degree of portability between different federations. The mapping of HELICS messages still needs to be done to configure a federation, its just done separately from the federate configuration file via a broker configuration file. The difference in location of this mapping may offer some configuration efficiencies in some circumstances.
+* **Is portability of the federate and its configuration important?** - Because "publications" and "named inputs" don't require the federate to know who it is sending HELICS messages to and receiving HELICS messages from as part of the federate configuration, it affords a slightly higher degree of portability between different federations. The mapping of HELICS messages still needs to be done to configure a federation, its just done separately from the federate configuration file via a broker or core configuration file. The difference in location of this mapping may offer some configuration efficiencies in some circumstances.
 
 Though all four message types are supported, the remainder of this guide will focus on publications and subscriptions as they are conceptually easily understood and can be comprehensively configured through the individual federate configuration files.
 
 
 ##Federate Configuration Options via JSON ##
-For any simulator that you didn't write for yourself, the most common way of configuring that simulator for use in a HELICS co-simulation will be through the use of an external JSON configuration file. This file is read when a federate is being created and initialized and it will provide all the necessary information to incorporate that federate into the co-simulation.
+For any simulator that you didn't write for yourself, the most common way of configuring that simulator for use in a HELICS co-simulation will be through the use of an external JSON configuration file. TOML files are also supported but we will concentrate on JSON for this discussion. This file is read when a federate is being created and initialized and it will provide all the necessary information to incorporate that federate into the co-simulation.
 
 As the fundamental role of the co-simulation platform is to manage the synchronization and data exchange between the federates, you may or may not be surprised to learn that there are generic configuration options available to all HELICS federates that deal precisely with these. In this section, we'll focus on the options related to data exchange as pertaining to value federates, those options  and in [Timing section](./timing.md) we'll look at the timing parameters. 
 
@@ -38,8 +38,8 @@ Though contained here in this section on value federates, the options below are 
 "coreType": "zmq"
 ...
 ```
-* **`name`** - Every federate must have a unique name across the entire federation; this is functionally the address of the federate and is used to determine where HELICS messages are sent.
-* **`coreType` [zmq]** - There are a number of technologies or message buses that can be used to send HELICS messages among federates. Every HELICS enabled simulator has code in it that creates a core which connects to a HELICS broker using one of these messaging technologies. ZeroMQ (zmq) is the default core type and most commonly used but there are also cores that use TCP and UDP networking protocols directly (forgoing ZMQ's guarantee of delivery), IPC (uses Boost's interprocess communication for fast in-memory message-passing but only works if all federates are running on the same physical computer), and MPI (for use on HPC clusters where MPI is installed).
+* **`name`** - Every federate must have a unique name across the entire federation; this is functionally the address of the federate and is used to determine where HELICS messages are sent. An error will be generated if the federate name is not unique.
+* **`coreType` [zmq]** - There are a number of technologies or message buses that can be used to send HELICS messages among federates. Every HELICS enabled simulator has code in it that creates a core which connects to a HELICS broker using one of these messaging technologies. ZeroMQ (zmq) is the default core type and most commonly used but there are also cores that use TCP and UDP networking protocols directly (forgoing ZMQ's guarantee of delivery and reconnection functions), IPC (uses Boost's interprocess communication for fast in-memory message-passing but only works if all federates are running on the same physical computer), and MPI (for use on HPC clusters where MPI is installed).
 
 
 ### Value Federate Data Exchange Options ###
@@ -55,7 +55,7 @@ Though contained here in this section on value federates, the options below are 
 ```
 * **`only_update_on_change` [false]** - In some cases a federate may have subscribed to a value that changes infrequently. If the publisher of that makes new publications regularly but the value itself has not changed, setting this flag on the receiving federate will prevent that federate from being sent the new, but unchanged value and having to reprocess it's received data when nothing has changed. Note that this flag will only prevent the old value from getting through if it is bit-for-bit identical to the old one. 
 
-* **`only_transmit_on_change` [false]** - Complementarily to `only_update_on_change`, this flag can be set to prevent identical values from being published to the federation if they have not changed.
+* **`only_transmit_on_change` [false]** - Complementary to `only_update_on_change`, this flag can be set to prevent identical values from being published to the federation if they have not changed.
 
 * **`source_only` [false]** - Some federates may exist only to provide data for the federation to use in their calculations. If using such a federate, set the `source_only` flag to `true`; doing so allows for slightly more efficient synchronization and higher performance of the federation.
 
@@ -107,7 +107,7 @@ Though contained here in this section on value federates, the options below are 
   * `publications` - At least one federate must subscribe to the publications.
   * `subscriptions` - The message being subscribed to must be provided by some other publisher in the federation.
 * **`type`** - HELICS supports data types and data type conversion ([as best it can](https://www.youtube.com/watch?v=mZOAn-3aATY)).
-* **`units`** - Eventually, HELICS will be able to do automatic unit conversion between federates. For example, one federate could publish a value in Watts and another federate could subscribe to it in kilo-Watts; rather than throwing an error, HELICS will do the unit conversion itself. As of v2.0 this feature is not implemented and the `units` field is ignored; it can still be used, though, as a documentation field to help the user ensure messages are being passed appropriately.
+* **`units`** - Eventually, HELICS will be able to do automatic unit conversion between federates. For example, one federate could publish a value in Watts and another federate could subscribe to it in kilo-Watts; rather than throwing an error, HELICS will do the unit conversion itself. As of v2.0 this feature is not implemented and the `units` field is passed around but ignored; it can still be used, though, as a documentation field to help the user ensure messages are being passed appropriately.
 * **`info`** - The `info` field is entirely ignored by HELICS and is used as a mechanism to pass configuration information to the federate so that it can properly integrate into the federation. Thus, there is no standard content or format for this field; it is entirely up to the individual simulators to decide how the data in this field (if any) should be used. Often it is used by simulators to map the HELICS names into internal variable names as shown in the above example. In this case, the object `network_node` has a property called `positive_sequence_voltage` that will be updated with the value from the subscription `TransmissionSim/transmission_voltage`.
 
 
