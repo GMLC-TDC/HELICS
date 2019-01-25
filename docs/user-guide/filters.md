@@ -16,7 +16,7 @@ The figure below is an example of a representation of the message topology of a 
   * The source filter on Federate 3 delays the messages to both Federate 2 and Federate 4 by the same 0.5 seconds. Without establishing a separate endpoint devoted to each federate, there is no way to produce different delays in the messages sent along these two paths.
   * Because the filter on Federate 4 is a destination filter, the message it receives  from Federate 3 is affected by the filter but the message it sends to Federate 2 is not affected.
   * As constructed, the source filter on Federate 2 has no impact on this co-simulation as there are no messages sent from that endpoint.
-  * Individual filters can be targeted to act on multiple endpoints and act as both source and destination Filters.
+  * Individual filters can be targeted to act on multiple endpoints and act as both source and destination filters.
 
 ![messages and filters example](../img/messages_and_filters_example.pdf)
   
@@ -57,8 +57,8 @@ To demonstrate the effects of filters, let's take the same model we were working
 ```
 
 * **`name`** (optional) - Name of the endpoint filter
-* **`sourcetarget(s)`** - Name(s) of the endpoints to which this filter will apply a source filter
-* **`desttarget(s)`** - Name(s) of the endpoints to which this filter will apply a destination filter
+* **`sourcetarget(s)`** - Name(s) of the endpoints to which this source filter will be applied
+* **`desttarget(s)`** - Name(s) of the endpoints to which this destination filter will be applied
 * **`operation`** - Defines the type of filtering operation that will be applied to messages. As of v2.0, the supported types are: `delay`, `timedelay`, `randomdelay`, `randomdrop`, `reroute`, `redirect`, `clone`, `cloning`, and `custom`. Further details on filter types can be found [here](https://github.com/GMLC-TDC/HELICS-src/blob/master/docs/configuration/Filters.md).
 * **`properties`** - Each filter type has specific parameters that define how it operates. In this case, one of those parameters is the amount each message will be delayed, in seconds.
 
