@@ -1899,6 +1899,7 @@ void CoreBroker::executeInitializationOperations ()
     {
         enteredExecutionMode = true;
     }
+    loggingObj->flush ();
 }
 
 void CoreBroker::FindandNotifyInputTargets (BasicHandleInfo &handleInfo)
