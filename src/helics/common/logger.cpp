@@ -157,13 +157,13 @@ LoggingCore::~LoggingCore ()
     {
         loggingQueue.emplace (-1, "!!>close");
     }
-	try
-	{
-		loggingThread.join();
-	}
-    catch(...)
-	{
-	}
+    try
+    {
+        loggingThread.join ();
+    }
+    catch (...)
+    {
+    }
 }
 
 void LoggingCore::addMessage (std::string &&message) { loggingQueue.emplace (-1, std::move (message)); }
@@ -232,6 +232,7 @@ void LoggingCore::processingLoop ()
                     {
                         continue;
                     }
+                    msg.push_back ('^');
                 }
                 if (msg.compare (3, 5, "close") == 0)
                 {
@@ -301,9 +302,8 @@ static std::mutex loggerLock;
 
 std::shared_ptr<LoggerManager> LoggerManager::getLoggerManager (const std::string &loggerName)
 {
-    std::lock_guard<std::mutex> loglock (
-      loggerLock);  // just to ensure that nothing funny happens if you try to get a context
-                    // while it is being constructed
+    std::lock_guard<std::mutex> loglock (loggerLock);  // just to ensure that nothing funny happens if you try to
+                                                       // get a context while it is being constructed
     auto fnd = loggers.find (loggerName);
     if (fnd != loggers.end ())
     {
@@ -339,7 +339,7 @@ void LoggerManager::logMessage (std::string message)
     {
         if (fnd->second->loggingControl)
         {
-            fnd->second->loggingControl->addMessage (std::move(message));
+            fnd->second->loggingControl->addMessage (std::move (message));
             return;
         }
     }
