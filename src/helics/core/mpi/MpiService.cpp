@@ -220,6 +220,7 @@ void MpiService::sendAndReceiveMessages ()
     // Using fixed size chunks for sending messages would allow posting blocks of irecv requests
     // If we know that a message will get received, a blocking MPI_Wait_any could be used for send requests
     // Also, a method of doing time synchronization using MPI reductions should be added
+    std::list<std::pair<MPI_Request, std::vector<char>>> send_requests;
     std::unique_lock<std::mutex> mpilock (mpiDataLock);
     for (unsigned int i = 0; i < comms.size (); i++)
     {

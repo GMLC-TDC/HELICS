@@ -100,6 +100,7 @@ static const ArgDescriptors extraArgs{
            "secondary actions are taken  (can also be entered as a time like '10s' or '45ms')"},
   {"dumplog", ArgDescriptor::arg_type_t::flag_type,
    "capture a record of all messages and dump a complete log to file or console on termination"},
+  {"force_logging_flush", ArgDescriptor::arg_type_t::flag_type, "flush the log after every message"},
   {"networktimeout",
    "milliseconds to wait to establish a network (can also be entered as a time like '500ms' or '2s') "},
   {"timeout",
@@ -143,6 +144,10 @@ void BrokerBase::initializeFromCmdArgs (int argc, const char *const *argv)
     if (vm.count ("dumplog") > 0)
     {
         dumplog = true;
+    }
+    if (vm.count ("force_logging_flush") > 0)
+    {
+        forceLoggingFlush = true;
     }
     if (vm.count ("identifier") > 0)
     {
@@ -223,6 +228,10 @@ bool BrokerBase::sendToLogger (global_federate_id federateID,
         else if (loggingObj)
         {
             loggingObj->log (logLevel, fmt::format ("{} ({})::{}", name, federateID.baseValue (), message));
+            if (forceLoggingFlush)
+            {
+                loggingObj->flush ();
+            }
         }
         return true;
     }
