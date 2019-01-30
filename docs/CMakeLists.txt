@@ -19,4 +19,9 @@ if(MSVC)
 
   add_custom_target(helics_docs SOURCES ${doc_sources})
 
+  file(GLOB user_guide_sources user-guide/*.md)
+
+  add_custom_target(helics_user_guide SOURCES ${user_guide_sources})
+
+  set_target_properties(helics_user_guide helics_docs PROPERTIES FOLDER docs)
 endif(MSVC)
