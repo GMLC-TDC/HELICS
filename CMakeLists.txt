@@ -683,6 +683,16 @@ if(BUILD_HELICS_TESTS AND BUILD_TESTING AND ENABLE_TEST_CORE)
     add_subdirectory(tests)
 endif()
 
+option(
+  BUILD_HELICS_BENCHMARKS
+  "Build some benchmark tests using google benchmark"
+  OFF
+)
+
+if (BUILD_HELICS_BENCHMARKS)
+ add_subdirectory(benchmarks)
+endif()
+
 # -----------------------------------------------------------------------------
 # Setup Examples
 # -----------------------------------------------------------------------------
