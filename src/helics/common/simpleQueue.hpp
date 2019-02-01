@@ -1,7 +1,8 @@
 /*
 Copyright © 2017-2019,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
-All rights reserved. See LICENSE file and DISCLAIMER for more details.
+All rights reserved.
+SPDX-License-Identifier: BSD-3-Clause
 */
 #pragma once
 
@@ -143,39 +144,39 @@ class SimpleQueue
         }
     }
 
-/** push a vector onto the queue
-    val the vector of values to push on the queue
-    */
+    /** push a vector onto the queue
+        val the vector of values to push on the queue
+        */
     void pushVector (const std::vector<X> &val)  // universal reference
     {
-        std::unique_lock<std::mutex> pushLock(m_pushLock);  // only one lock on this branch
-        if (!pushElements.empty())
+        std::unique_lock<std::mutex> pushLock (m_pushLock);  // only one lock on this branch
+        if (!pushElements.empty ())
         {
-            pushElements.insert(pushElements.end(), val.begin(), val.end());
+            pushElements.insert (pushElements.end (), val.begin (), val.end ());
         }
         else
         {
             bool expEmpty = true;
-            if (queueEmptyFlag.compare_exchange_strong(expEmpty, false))
+            if (queueEmptyFlag.compare_exchange_strong (expEmpty, false))
             {
                 // release the push lock
-                pushLock.unlock();
-                std::unique_lock<std::mutex> pullLock(m_pullLock);  // first pullLock
+                pushLock.unlock ();
+                std::unique_lock<std::mutex> pullLock (m_pullLock);  // first pullLock
                 queueEmptyFlag = false;
-                if (pullElements.empty())
+                if (pullElements.empty ())
                 {
-                    pullElements.insert(pullElements.end(), val.rbegin(), val.rend());
-                    pullLock.unlock();
+                    pullElements.insert (pullElements.end (), val.rbegin (), val.rend ());
+                    pullLock.unlock ();
                 }
                 else
                 {
-                    pushLock.lock();
-                    pushElements.insert(pushElements.end(), val.begin(), val.end());
+                    pushLock.lock ();
+                    pushElements.insert (pushElements.end (), val.begin (), val.end ());
                 }
             }
             else
             {
-                pushElements.insert(pushElements.end(), val.begin(), val.end());
+                pushElements.insert (pushElements.end (), val.begin (), val.end ());
             }
         }
     }

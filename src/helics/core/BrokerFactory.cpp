@@ -1,7 +1,8 @@
 /*
 Copyright © 2017-2019,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
-All rights reserved. See LICENSE file and DISCLAIMER for more details.
+All rights reserved.
+SPDX-License-Identifier: BSD-3-Clause
 */
 #include "BrokerFactory.hpp"
 #include "../common/TripWire.hpp"
@@ -322,7 +323,7 @@ bool registerBroker (const std::shared_ptr<Broker> &broker)
         registered = searchableObjects.addObject (tbroker->getIdentifier (), tbroker);
     }
     cleanUpBrokers ();
-    if ((!registered)&&(tbroker))
+    if ((!registered) && (tbroker))
     {
         std::this_thread::sleep_for (std::chrono::milliseconds (200));
         registered = searchableObjects.addObject (tbroker->getIdentifier (), tbroker);

@@ -6,6 +6,9 @@ The following is a set of guidelines for contributing to HELICS and associated p
 
 #### Table Of Contents
 
+## Licensing
+HELICS is distributed under the terms of the BSD-3 clause license. All new
+contributions must be made under this license. [LICENSE](LICENSE)
 
 ##  [Code of Conduct](.github/CODE_OF_CONDUCT.md)
 

@@ -11,7 +11,8 @@
 /*
 Copyright © 2017-2019,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
-All rights reserved. See LICENSE file and DISCLAIMER for more details.
+All rights reserved.
+SPDX-License-Identifier: BSD-3-Clause
 */
 /* @file  define a representation of time that works well for simulation environments*/
 // the include guards are left in place as this file might be used in multiple places

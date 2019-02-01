@@ -1,7 +1,8 @@
 /*
 Copyright © 2017-2019,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
-All rights reserved. See LICENSE file and DISCLAIMER for more details.
+All rights reserved.
+SPDX-License-Identifier: BSD-3-Clause
 */
 
 #include "core-data.hpp"
@@ -78,7 +79,6 @@ bool matchingTypes (const std::string &type1, const std::string &type2)
         return true;
     }
     res = global_match_strings.find (type2);
-    return (res != global_match_strings.end());
-   
+    return (res != global_match_strings.end ());
 }
 }  // namespace helics

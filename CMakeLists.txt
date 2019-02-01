@@ -1,7 +1,8 @@
 #
 # Copyright © 2017-2019, Battelle Memorial Institute; Lawrence Livermore National
-# Security, LLC; Alliance for Sustainable Energy, LLC All rights reserved. See LICENSE
-# file and DISCLAIMER for more details.
+# Security, LLC; Alliance for Sustainable Energy, LLC All rights reserved. 
+# 
+SPDX-License-Identifier: BSD-3-Clause
 #
 
 cmake_minimum_required(VERSION 3.4)
@@ -12,8 +13,8 @@ project (HELICS VERSION 2.0.0)
 # -----------------------------------------------------------------------------
 # HELICS Version number
 #-----------------------------------------------------------------------------
-set (HELICS_VERSION_BUILD rc1)
-set (HELICS_DATE "01-18-19")
+set (HELICS_VERSION_BUILD )
+set (HELICS_DATE "02-04-19")
 
 set(
   HELICS_VERSION_UNDERSCORE

@@ -1,7 +1,8 @@
 /*
 Copyright © 2017-2019,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
-All rights reserved. See LICENSE file and DISCLAIMER for more details.
+All rights reserved.
+SPDX-License-Identifier: BSD-3-Clause
 */
 #include <boost/test/unit_test.hpp>
 #include <boost/test/floating_point_comparison.hpp>
@@ -39,19 +40,19 @@ BOOST_AUTO_TEST_CASE (insertion_tests)
     BOOST_CHECK_EQUAL ((*V)[2], 1.7);
 
     auto V2 = Mvec[1];
-    BOOST_REQUIRE(V2 != nullptr);
+    BOOST_REQUIRE (V2 != nullptr);
     BOOST_CHECK_EQUAL (V2->size (), 45);
 
     auto V3 = Mvec.find ("el1");
-    BOOST_REQUIRE(V3 != nullptr);
+    BOOST_REQUIRE (V3 != nullptr);
     BOOST_CHECK_EQUAL (V3->size (), 3);
 
     auto V4 = Mvec.find ("a2");
-    BOOST_REQUIRE(V4 != nullptr);
+    BOOST_REQUIRE (V4 != nullptr);
     BOOST_CHECK_EQUAL (V4->size (), 45);
 
     auto V5 = Mvec.find (41);
-    BOOST_REQUIRE(V5 != nullptr);
+    BOOST_REQUIRE (V5 != nullptr);
     BOOST_CHECK_EQUAL (V5->size (), 3);
 }
 
@@ -68,9 +69,9 @@ BOOST_AUTO_TEST_CASE (iterator_tests)
 
     Mvec.apply ([](double *val) { *val = *val + 1; });
 
-    BOOST_REQUIRE(Mvec[0] != nullptr);
-    BOOST_REQUIRE(Mvec[1] != nullptr);
-    BOOST_REQUIRE(Mvec[2] != nullptr);
+    BOOST_REQUIRE (Mvec[0] != nullptr);
+    BOOST_REQUIRE (Mvec[1] != nullptr);
+    BOOST_REQUIRE (Mvec[2] != nullptr);
     BOOST_CHECK_EQUAL (*Mvec[0], 3.2 + 1.0);
     BOOST_CHECK_EQUAL (*Mvec[1], 4.3 + 1.0);
     BOOST_CHECK_EQUAL (*Mvec[2], 9.7 + 1.0);
@@ -92,18 +93,18 @@ BOOST_AUTO_TEST_CASE (remove_tests)
     BOOST_CHECK_EQUAL (Mvec.size (), 3);
     BOOST_CHECK (Mvec.find ("s2") == nullptr);
     BOOST_CHECK (Mvec.find (63) == nullptr);
-    BOOST_REQUIRE(Mvec[1] != nullptr);
+    BOOST_REQUIRE (Mvec[1] != nullptr);
     BOOST_CHECK_EQUAL (*Mvec[1], 9.7);
-    auto s4 = Mvec.find("s4");
-    BOOST_REQUIRE(s4 != nullptr);
+    auto s4 = Mvec.find ("s4");
+    BOOST_REQUIRE (s4 != nullptr);
     BOOST_CHECK_EQUAL (*s4, 11.4);
 
     Mvec.remove ("s1");
     BOOST_CHECK_EQUAL (Mvec.size (), 2);
-    s4 = Mvec.find("s4");
-    BOOST_REQUIRE(s4 != nullptr);
+    s4 = Mvec.find ("s4");
+    BOOST_REQUIRE (s4 != nullptr);
     BOOST_CHECK_EQUAL (*s4, 11.4);
-    BOOST_REQUIRE(Mvec[0] != nullptr);
+    BOOST_REQUIRE (Mvec[0] != nullptr);
     BOOST_CHECK_EQUAL (*Mvec[0], 9.7);
 
     auto MV2 = std::move (Mvec);

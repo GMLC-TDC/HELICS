@@ -1,7 +1,8 @@
 /*
 Copyright © 2017-2019,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
-All rights reserved. See LICENSE file and DISCLAIMER for more details.
+All rights reserved.
+SPDX-License-Identifier: BSD-3-Clause
 */
 
 #include "helics-time.hpp"
@@ -69,4 +70,4 @@ helics::Time loadTimeFromString (const std::string &timeString, time_units defUn
     std::string units = stringOps::trim (timeString.substr (pos));
     return Time (val * toSecondMultiplier (timeUnitsFromString (units)));
 }
-} //namespace helics
+}  // namespace helics
