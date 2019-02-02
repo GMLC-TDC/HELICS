@@ -703,6 +703,13 @@ install(
   COMPONENT libs
 )
 
+install(
+  FILES
+    LICENSE
+	NOTICE
+	DESTINATION ${CMAKE_INSTALL_PREFIX}
+  COMPONENT libs
+)
 # -------------------------------------------------------------
 # CPack
 # -------------------------------------------------------------

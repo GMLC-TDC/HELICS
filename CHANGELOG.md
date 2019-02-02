@@ -27,6 +27,8 @@ This is a major revision so this changelog will not capture all the changes that
   - an ability to set a global value (as a string) that can be queried.
   - a local info field for all the interfaces for user defined string data.  
   - many other small changes.
+  - License file changed to match BSD-3-clause exactly(terms are the same but the file had some extra disclaimers in it, now it matches the standard BSD-3-clause license)
+  - tag source files with
 
 ## [1.3.1] - 2018-09-23
 ### Changed

@@ -73,7 +73,7 @@ A [Users guide](https://gmlc-tdc.github.io/HELICS-src/users_guide/index.html) fo
 
 # Documentation
 
-Our GitHub pages provides a rich set of [documentation](https://gmlc-tdc.github.io/HELICS-src/index.html) including a set of introductory [examples](https://gmlc-tdc.github.io/HELICS-src/introduction/index.html), a [developers guide](https://gmlc-tdc.github.io/HELICS-src/developer-guide/index.html), complete doxygen-auto-produced [API documentation](https://gmlc-tdc.github.io/HELICS-src/doxygen/), and more.  A few more questions and answers are available on the [Wiki](https://github.com/GMLC-TDC/HELICS-src/wiki).
+Our GitHub pages provides a set of [documentation](https://gmlc-tdc.github.io/HELICS-src/index.html) including a set of introductory [examples](https://gmlc-tdc.github.io/HELICS-src/introduction/index.html), a [developers guide](https://gmlc-tdc.github.io/HELICS-src/developer-guide/index.html), complete doxygen generated [API documentation](https://gmlc-tdc.github.io/HELICS-src/doxygen/), and more.  A few more questions and answers are available on the [Wiki](https://github.com/GMLC-TDC/HELICS-src/wiki).
 
 Additionally, our initial requirements document can be found [here](https://github.com/GMLC-TDC/specification-doc/blob/master/src/specification.md), which describes a number of our early design considerations.
 
@@ -107,12 +107,15 @@ We are always looking for help adding support for more tools, so please contact 
 * [Player](https://gmlc-tdc.github.io/HELICS-src/apps/Player.html), which acts as a simple send-only federate that simply publishes a stream of timed HELICS messages from a user-defined file. HELICS Player is included in the HELICS distribution.
 * [Recorder](https://gmlc-tdc.github.io/HELICS-src/apps/Recorder.html), which acts as a simple receive-only federate that prints out or saves messages from one or more subscribed streams. HELICS Recorder is included in the HELICS distribution.
 
-# [Contributors](CONTRIBUTORS.md)
+# Contributing
+Contributors are welcome see the [Contributing](CONTRIBUTING.md) guidelines for me details on the process of contributing.  And the [Code of Conduct](.github/CODE_OF_CONDUCT.md) for guildelines on the community.  All prior contributors can be found [here](CONTRIBUTORS.md)
 
-# [Contributing](CONTRIBUTING.md)  [Code of Conduct](.github/CODE_OF_CONDUCT.md)
+### Optional components
+A list of optional component that are not included in HELICS but are optionally used by the library
 
-HELICS is distributed under the terms of the BSD-3 clause license. All new
-contributions must be made under this license. [LICENSE](LICENSE)
+##### [zmq](http://www.zeromq.org)
+  ZeroMQ message passing is used in the ZMQ core networking.  The autobuild currently uses version 4.2.5. No ZMQ library code is included in the HELICS source.  HELICS installers include ZeroMQ binary libraries. ZeroMQ is licensed under [LGPL](https://github.com/zeromq/libzmq/blob/master/COPYING.LESSER) with a modification to allow for linking and in various forms and distribution of the binary under different terms if the library was not modified.  No modification of the ZMQ library or any of the ZeroMQ source files is included in the HELICS source code.  It is an optional component and can be excluded by setting `ENABLE_ZeroMQ` to `Off` or setting `DISABLE_ZMQ_CORE` to `ON`
+
 
 # Publications
 
@@ -120,4 +123,12 @@ contributions must be made under this license. [LICENSE](LICENSE)
 
 [1] B. Palmintier, D. Krishnamurthy, P. Top, S. Smith, J. Daily, and J. Fuller, “Design of the HELICS High-Performance Transmission-Distribution-Communication-Market Co-Simulation Framework,” in *Proc. of the 2017 Workshop on Modeling and Simulation of Cyber-Physical Energy Systems*, Pittsburgh, PA, 2017. [pre-print](https://www.nrel.gov/docs/fy17osti/67928.pdf) [published](https://ieeexplore.ieee.org/document/8064542/)
 
+
+# Release
+HELICS is distributed under the terms of the BSD-3 clause license. All new
+contributions must be made under this license. [LICENSE](LICENSE)
+
 SPDX-License-Identifier: BSD-3-Clause
+
+portions of the code written by LLNL with release number
+LLNL-CODE-739319
