@@ -21,7 +21,7 @@ If you want to install it with the Python extension, you can use the
 following.
 
 ```bash
-brew reinstall helics --with-python --with-python-include-dir=$(python3-config --prefix)/include/python3.6m/
+brew reinstall helics --with-python
 ```
 
 You must pass `--with-python-include-dir` with a value. The easiest way
