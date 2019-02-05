@@ -29,12 +29,14 @@ sphinxdoxygen: doxygen html
 
 v1.3.1:
 	git checkout kd/fix-v1.3.1-docstrings
+	-rm -rf _build/html
 	make sphinxdoxygen
 	-rm -rf _build/v1.3.1
 	mv ./_build/html/ ./_build/v1.3.1
 
 v2.0.0:
 	git checkout kd/documentation-update
+	-rm -rf _build/html
 	make sphinxdoxygen
 	-rm -rf _build/v2.0.0
 	mv ./_build/html/ ./_build/v2.0.0
