@@ -30,22 +30,27 @@ sphinxdoxygen: doxygen html
 v1.3.1:
 	git checkout kd/fix-v1.3.1-docstrings
 	make sphinxdoxygen
+	-rm -rf _build/v1.3.1
 	mv ./_build/html/ ./_build/v1.3.1
 
 v2.0.0:
 	git checkout kd/documentation-update
 	make sphinxdoxygen
+	-rm -rf _build/v2.0.0
 	mv ./_build/html/ ./_build/v2.0.0
 
 alldocs:
 	echo "Ensure that you've run the targets v1.3.1 and v2.0.0 manually."
 	rm -rf _build/index.html
 	echo "<meta http-equiv=\"refresh\" content=\"0; url=http://gmlc-tdc.github.io/HELICS-src/v2.0.0\"/>" > _build/index.html
+	rm -rf _build/404.html
+	echo "<meta http-equiv=\"refresh\" content=\"0; url=http://gmlc-tdc.github.io/HELICS-src/v2.0.0\"/>" > _build/404.html
 	-rm -rf _build/html
 	mkdir -p ./_build/html
 	cp -r ./_build/v1.3.1 ./_build/html/v1.3.1
 	cp -r ./_build/v2.0.0 ./_build/html/v2.0.0
 	cp -r _build/index.html _build/html/index.html
+	cp -r _build/404.html _build/html/404.html
 
 github:
 	echo "Ensure you have built the docs correctly at the _build/html folder"
