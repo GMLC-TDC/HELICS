@@ -160,6 +160,6 @@ address=tcp://127.0.0.1:23404
 
 The `query` command allows any query to be executed from the command line, `query counts` displays the same count numbers as `status`.
 
-Other available queries are described in [Queries](../user-guide/queries.md).
+Other available queries are described in [Queries](../user-guide/queries.html).
 
-various restart options are also available, `terminate`, `restart`, `force restart`.  And finally `quit` will exit the terminal and wait for the broker to complete.  enter `terminate` before quit or `terminate*` to terminate and quit.  
+various restart options are also available, `terminate`, `restart`, `force restart`.  And finally `quit` will exit the terminal and wait for the broker to complete.  enter `terminate` before quit or `terminate*` to terminate and quit.

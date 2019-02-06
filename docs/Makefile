@@ -21,13 +21,41 @@ help:
 	@$(SPHINXBUILD) -M $@ "$(SOURCEDIR)" "$(BUILDDIR)" $(SPHINXOPTS) $(O)
 
 doxygen:
-	cd ../; mkdir -p build-doxygen; cd build-doxygen; cmake -DCMAKE_INSTALL_PREFIX=./install/helics_install -DGENERATE_DOXYGEN_DOC=ON ../; make doc;
+	cd ../; mkdir -p build-doxygen; rm -rf build-doxygen; mkdir -p build-doxygen; cd build-doxygen; cmake -DCMAKE_INSTALL_PREFIX=./install/helics_install -DGENERATE_DOXYGEN_DOC=ON ../; make doc;
 
-sphinxdoxygen: doxygen
+sphinxdoxygen: doxygen html
 	-rm -rf ./_build/html/doxygen
 	cp -r ../build-doxygen/docs/html/ ./_build/html/doxygen/
 
-github: html sphinxdoxygen
+v1.3.1:
+	git checkout kd/fix-v1.3.1-docstrings
+	-rm -rf _build/html
+	make sphinxdoxygen
+	-rm -rf _build/v1.3.1
+	mv ./_build/html/ ./_build/v1.3.1
+
+v2.0.0:
+	git checkout kd/documentation-update
+	-rm -rf _build/html
+	make sphinxdoxygen
+	-rm -rf _build/v2.0.0
+	mv ./_build/html/ ./_build/v2.0.0
+
+alldocs:
+	echo "Ensure that you've run the targets v1.3.1 and v2.0.0 manually."
+	rm -rf _build/index.html
+	echo "<meta http-equiv=\"refresh\" content=\"0; url=http://gmlc-tdc.github.io/HELICS-src/v2.0.0\"/>" > _build/index.html
+	rm -rf _build/404.html
+	echo "<meta http-equiv=\"refresh\" content=\"0; url=http://gmlc-tdc.github.io/HELICS-src/v2.0.0\"/>" > _build/404.html
+	-rm -rf _build/html
+	mkdir -p ./_build/html
+	cp -r ./_build/v1.3.1 ./_build/html/v1.3.1
+	cp -r ./_build/v2.0.0 ./_build/html/v2.0.0
+	cp -r _build/index.html _build/html/index.html
+	cp -r _build/404.html _build/html/404.html
+
+github:
+	echo "Ensure you have built the docs correctly at the _build/html folder"
 	-git branch -D gh-pages
 	-git push origin --delete gh-pages
 	ghp-import -n -b gh-pages -m "Update documentation" ./_build/html

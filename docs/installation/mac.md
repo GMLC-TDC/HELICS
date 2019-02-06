@@ -1,49 +1,6 @@
 Mac Installation
 ================
 
-Install using brew
-------------------
-
-Requirements
-------------
-
--   brew
-
-Install [brew](https://brew.sh/). It is a package manager for MacOS.
-
-Once you install brew, you can open a terminal and type the following.
-
-```bash
-brew tap GMLC-TDC/helics
-brew install helics
-```
-
-OR
-
-```bash
-brew install GMLC-TDC/helics/helics
-```
-
-If you want to install it with the Python extension, you can use the
-following.
-
-```bash
-brew reinstall helics --with-python --with-python-include-dir=$(python3-config --prefix)/include/python3.6m/
-```
-
-You must pass `--with-python-include-dir` with a value. The easiest way
-to find out what the `--with-python-include-dir` argument should be is
-by using `python3-config` as shown above.
-
-If you want to install using Python2 instead, you can use
-`--with-python-include-dir=$(python-config --prefix)/include/python2.7/`.
-It is important that the Python interpreter used to run `import helics`
-was built using the header files included in `python-config --prefix`.
-That is to say, you cannot build using Python3 and run using Python2.
-
-Additionally, if required, you can add `--HEAD` to install from the
-latest `develop` branch.
-
 Install from source
 -------------------
 
@@ -86,11 +43,11 @@ To set up your environment:
 
 4. Install most dependencies using homebrew.
 
-   ``` {.sourceCode .bash}
-   brew install boost
-   brew install zeromq
-   brew install cmake
-   ```
+    ```bash
+    brew install boost
+    brew install zeromq
+    brew install cmake
+    ```
 
 5. Make sure *cmake* and *git* are available in the Command Prompt
    with `which cmake` and `which git` If they aren't, add them to the
@@ -137,7 +94,7 @@ Building HELICS with python support
 Run the following:
 
 ```bash
-$ cmake -DBUILD_PYTHON_INTERFACE=ON -DPYTHON_INCLUDE_DIR=$(python3-config --prefix)/include/python3.6m/ -DPYTHON_LIBRARY=$(python3-config --prefix)/lib/python3.6m/libpython3.6m.dylib -DCMAKE_INSTALL_PREFIX=/Users/$(whoami)/local/helics-1.0.0/ ..
+$ cmake -DBUILD_PYTHON_INTERFACE=ON -DCMAKE_INSTALL_PREFIX=/Users/$(whoami)/local/helics-2.0.0/ ..
 $ make -j8
 $ make install
 ```
@@ -145,7 +102,7 @@ $ make install
 Add the following to your `~/.bashrc` file.
 
 ```bash
-export PYTHONPATH=/Users/$(whoami)/local/helics-1.0.0/python:$PYTHONPATH
+export PYTHONPATH=/Users/$(whoami)/local/helics-X.X.X/python:$PYTHONPATH
 ```
 
 If you open a interactive Python session and import helics, you should be able to get the version of `helics` and an output that is similar to the following.
@@ -187,7 +144,7 @@ This will install boost in the \~/local/boost-gcc-1.64 folder
 Next, you will need to build HELICS and tell it what the BOOST\_ROOT is.
 
 ```bash
-$ cmake -DCMAKE_INSTALL_PREFIX="/Users/$USER/local/helics-gcc-1.0.0/" -DBOOST_ROOT="/Users/$USER/local/boost-gcc-1.64" -DBUILD_PYTHON_INTERFACE=ON -DPYTHON_LIBRARY=$(python3-config --prefix)/lib/libpython3.6m.dylib -DPYTHON_INCLUDE_DIR=$(python3-config --prefix)/include/python3.6m -DCMAKE_C_COMPILER=/usr/local/Cellar/gcc/7.2.0_1/bin/gcc-7 -DCMAKE_CXX_COMPILER=/usr/local/Cellar/gcc/7.2.0_1/bin/g++-7 ../
+$ cmake -DCMAKE_INSTALL_PREFIX="/Users/$USER/local/helics-gcc-X.X.X/" -DBOOST_ROOT="/Users/$USER/local/boost-gcc-1.64" -DBUILD_PYTHON_INTERFACE=ON -DCMAKE_C_COMPILER=/usr/local/Cellar/gcc/7.2.0_1/bin/gcc-7 -DCMAKE_CXX_COMPILER=/usr/local/Cellar/gcc/7.2.0_1/bin/g++-7 ../
 $ make clean; make -j 4; make install
 ```
 

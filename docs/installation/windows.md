@@ -20,7 +20,7 @@ To set up your environment:
     [Windows downloads](https://dl.bintray.com/boostorg/release/1.69.0/binaries/)
    1.61 or later recommended (core library should build with 1.58,
    but tests will not). For CMake to detect it automatically either
-   extract Boost to the root of your drive, or set the BOOST\_INSTALL\_PATH
+   extract Boost to the root of your drive, or set the `BOOST_INSTALL_PATH`
    environment variable to the install location. The cmake will only automatically find
     boost 1.61 or newer.
    Building with Visual Studio 2017 will require boost 1.65.1 or newer and cmake 3.9
@@ -106,10 +106,10 @@ recorder (located in the 'build/src/helics/apps/player/Debug' folder):
 > cd C:/Path/To/build/src/helics/apps/Debug
 
 > helics_player.exe --version
-1.0.2 04-28-2018
+x.x.x XX-XX-XXXX
 
 > helics_recorder.exe --version
-1.0.2 04-28-2018
+x.x.x XX-XX-XXXX
 ```
 
 ## Building HELICS with python support
@@ -125,12 +125,12 @@ ZeroMQ will be built using the CMake build process.
 
 
 ```bash
-cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX="C:\local\helics-v1.0.0"  -DBUILD_PYTHON_INTERFACE=ON -G "Visual Studio 14 2015 Win64" ..
+cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX="C:\local\helics-X.X.X"  -DBUILD_PYTHON_INTERFACE=ON -G "Visual Studio 14 2015 Win64" ..
 cmake --build . --config Release --target install
 ```
 otherwise they can be set through CMAKE flags
 ```bash
-cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX="C:\local\helics-v1.0.0"  -DBUILD_PYTHON_INTERFACE=ON -G "Visual Studio 14 2015 Win64" -DPYTHON_INCLUDE_DIR=$(python3-config --prefix)\include\python3.6m\ -DPYTHON_LIBRARY=$(python3-config --prefix)\lib\python3.6m\libpython3.6m.dll ..
+cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX="C:\local\helics-X.X.X"  -DBUILD_PYTHON_INTERFACE=ON -G "Visual Studio 14 2015 Win64" ..
 cmake --build . --config Release --target install
 ```
 
@@ -139,7 +139,7 @@ cmake --build . --config Release --target install
 Add the following to the Windows PYTHONPATH environment variable or run the following in the command line.
 
 ```bash
-set PYTHONPATH=C:\local\helics-v1.0.2\python;%PYTHONPATH%
+set PYTHONPATH=C:\local\helics-X.X.X\python;%PYTHONPATH%
 ```
 
 If you open a interactive Python session and import HELICS, you should be able to get the version of `helics` and an output that is similar to the following.

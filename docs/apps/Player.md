@@ -53,7 +53,7 @@ configuration:
 ```
 also permissible are all arguments allowed for federates and any specific broker specified:
 
-[Command line reference](cmdArgs.md)
+[Command line reference](cmdArgs.html)
 
 the player executable also takes an untagged argument of a file name for example
 ```

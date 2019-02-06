@@ -8,6 +8,27 @@ We’ll be showing number of commands as code snippets in the following presenta
 You don’t need to type in the `$` character; they are there to indicate the start of each command.
 Lines that don’t start with `$` are typically showing the output of the previous command.
 
+### Quick start
+
+```bash
+conda install -c conda-forge helics
+```
+
+### Using a package manager
+
+Download pre-compiled libraries from the [releases page](https://github.com/GMLC-TDC/HELICS-src/releases) and add them to your PATH.
+
+Alternatively, you can install it using one of the supported package managers or install from source
+
+```eval_rst
+.. toctree::
+    :maxdepth: 1
+
+    package_manager
+```
+
+### OS Specific installation
+
 
 ```eval_rst
 .. toctree::

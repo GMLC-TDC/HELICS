@@ -54,14 +54,14 @@ federate configuration
 ```
 also permissible are all arguments allowed for federates and any specific broker specified:
 
-[Command line reference](cmdArgs.md)
+[Command line reference](cmdArgs.html)
 
 the tracer executable also takes an untagged argument of a file name for example
 ```
 helics_app tracer tracer_file.txt --stop 5
 ```
 
-Tracers support both delimited text files and JSON files some examples can be found in, they are otherwise the same as options for recorders.  
+Tracers support both delimited text files and JSON files some examples can be found in, they are otherwise the same as options for recorders.
 
 [Tracer configuration Examples](https://github.com/GMLC-TDC/HELICS-src/tree/master/tests/helics/apps/test_files)
 
