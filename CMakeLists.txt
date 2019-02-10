@@ -14,7 +14,7 @@ project(HELICS VERSION 2.0.0)
 # HELICS Version number
 # -----------------------------------------------------------------------------
 set(HELICS_VERSION_BUILD)
-set(HELICS_DATE "02-04-19")
+set(HELICS_DATE "02-12-19")
 
 set(
     HELICS_VERSION_UNDERSCORE
@@ -820,6 +820,7 @@ if(ENABLE_PACKAGE_BUILD)
         set(CPACK_NSIS_HELP_LINK "https://gmlc-tdc.github.io/HELICS-src/")
         set(CPACK_NSIS_CONTACT "helicsteam@helics.org")
         set(CPACK_NSIS_ENABLE_UNINSTALL_BEFORE_INSTALL ON)
+		set(CPACK_PACKAGE_INSTALL_DIRECTORY helics_${HELICS_VERSION_UNDERSCORE})
         set(CPACK_NSIS_MODIFY_PATH ON)
         set(CPACK_NSIS_EXECUTABLES_DIRECTORY ${CMAKE_INSTALL_BINDIR})
         set(
