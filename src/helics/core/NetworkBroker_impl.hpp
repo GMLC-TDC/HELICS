@@ -1,7 +1,7 @@
 /*
 Copyright � 2017-2019,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
-All rights reserved. 
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
+the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 #pragma once
@@ -12,7 +12,7 @@ SPDX-License-Identifier: BSD-3-Clause
 
 namespace helics
 {
-constexpr const char *tstr[] = {"default", "ZeroMQ", "MPI",   "TEST",   "IPC",      "interprocess",
+constexpr const char *tstr[] = {"default", "ZeroMQ", "MPI",   "TEST",   "IPC",    "interprocess",
                                 "TCP",     "UDP",    "undef", "nng",    "ZMQ_SS", "TCPSS",
                                 "undef",   "undef",  "http",  "unknown"};
 
@@ -63,7 +63,7 @@ template <class COMMS, interface_type baseline, int tcode>
 bool NetworkBroker<COMMS, baseline, tcode>::brokerConnect ()
 {
     std::lock_guard<std::mutex> lock (dataMutex);
-    if ((netInfo.brokerName.empty ())&&(netInfo.brokerAddress.empty ()))
+    if ((netInfo.brokerName.empty ()) && (netInfo.brokerAddress.empty ()))
     {
         CoreBroker::setAsRoot ();
     }
@@ -98,12 +98,16 @@ std::string NetworkBroker<COMMS, baseline, tcode>::generateLocalAddressString ()
         case interface_type::tcp:
         case interface_type::ip:
         case interface_type::udp:
-          if (!netInfo.localInterface.empty () && (netInfo.localInterface.back () == '*')) {
-              add = makePortAddress (netInfo.localInterface.substr (0, netInfo.localInterface.size () - 1),
-                                     netInfo.portNumber);
-          } else {
-              add = makePortAddress (netInfo.localInterface, netInfo.portNumber);
-          } break;
+            if (!netInfo.localInterface.empty () && (netInfo.localInterface.back () == '*'))
+            {
+                add = makePortAddress (netInfo.localInterface.substr (0, netInfo.localInterface.size () - 1),
+                                       netInfo.portNumber);
+            }
+            else
+            {
+                add = makePortAddress (netInfo.localInterface, netInfo.portNumber);
+            }
+            break;
         case interface_type::inproc:
         case interface_type::ipc:
         default:
@@ -113,7 +117,7 @@ std::string NetworkBroker<COMMS, baseline, tcode>::generateLocalAddressString ()
             }
             else
             {
-                add = CoreBroker::getIdentifier();
+                add = CoreBroker::getIdentifier ();
             }
             break;
         }

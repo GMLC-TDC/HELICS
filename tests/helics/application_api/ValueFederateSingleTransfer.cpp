@@ -1,21 +1,21 @@
 /*
 Copyright © 2017-2019,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
-All rights reserved. 
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
+the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 
 #include "ValueFederateTestTemplates.hpp"
-#include <boost/test/unit_test.hpp>
-#include <boost/test/data/test_case.hpp>
-#include <boost/test/floating_point_comparison.hpp>
-#include <future>
 #include "helics/application_api/Publications.hpp"
 #include "helics/application_api/Subscriptions.hpp"
 #include "helics/application_api/ValueFederate.hpp"
 #include "helics/core/BrokerFactory.hpp"
 #include "helics/core/CoreFactory.hpp"
 #include "testFixtures.hpp"
+#include <future>
+#include <boost/test/unit_test.hpp>
+#include <boost/test/data/test_case.hpp>
+#include <boost/test/floating_point_comparison.hpp>
 
 /** these test cases test out the value federates
  */
@@ -23,7 +23,6 @@ namespace bdata = boost::unit_test::data;
 namespace utf = boost::unit_test;
 
 BOOST_FIXTURE_TEST_SUITE (value_federate_single_transfer, FederateTestFixture)
-
 
 BOOST_DATA_TEST_CASE (value_federate_single_transfer_types1, bdata::make (core_types_single), core_type)
 {
@@ -74,7 +73,8 @@ BOOST_DATA_TEST_CASE (value_federate_single_transfer_types9, bdata::make (core_t
 
 BOOST_DATA_TEST_CASE (value_federate_single_transfer_types10, bdata::make (core_types_single), core_type)
 {
-    // this is a bizarre string since it contains a \0 and in icc 17 can't be used inside a boost data test case for some unknown reason
+    // this is a bizarre string since it contains a \0 and in icc 17 can't be used inside a boost data test case
+    // for some unknown reason
     decltype (auto) cstr = "this is the third\0 string";
     std::string specialString (cstr, sizeof (cstr));
     std::vector<std::string> sv1{"hip", "hop"};

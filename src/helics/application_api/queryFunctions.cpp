@@ -1,8 +1,8 @@
 /*
 
 Copyright © 2017-2019,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
-All rights reserved. 
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
+the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 #include "queryFunctions.hpp"
@@ -69,8 +69,8 @@ std::vector<std::string> vectorizeAndSortQueryResult (std::string &&queryres)
 bool waitForInit (helics::Federate *fed, const std::string &fedName, std::chrono::milliseconds timeout)
 {
     auto res = fed->query (fedName, "isinit");
-    std::chrono::milliseconds waitTime{ 0 };
-    const std::chrono::milliseconds delta{ 400 };
+    std::chrono::milliseconds waitTime{0};
+    const std::chrono::milliseconds delta{400};
     while (res != "true")
     {
         if (res == "#invalid")
@@ -91,8 +91,8 @@ bool waitForInit (helics::Federate *fed, const std::string &fedName, std::chrono
 bool waitForFed (helics::Federate *fed, const std::string &fedName, std::chrono::milliseconds timeout)
 {
     auto res = fed->query (fedName, "exists");
-    std::chrono::milliseconds waitTime{ 0 };
-    const std::chrono::milliseconds delta{ 400 };
+    std::chrono::milliseconds waitTime{0};
+    const std::chrono::milliseconds delta{400};
     while (res != "true")
     {
         std::this_thread::sleep_for (delta);

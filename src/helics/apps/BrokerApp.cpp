@@ -1,7 +1,7 @@
 /*
 Copyright © 2017-2019,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
-All rights reserved. 
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
+the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 #include "BrokerApp.hpp"
@@ -16,7 +16,8 @@ SPDX-License-Identifier: BSD-3-Clause
 
 static const helics::ArgDescriptors InfoArgs{
   {"name,n", "name of the broker"},
-  {"coretype,t", R"lit(type of the broker ("(zmq)", "ipc", "test", "mpi", "test", "tcp", "udp", "tcp_ss", "zmq_ss"))lit"}};
+  {"coretype,t",
+   R"lit(type of the broker ("(zmq)", "ipc", "test", "mpi", "test", "tcp", "udp", "tcp_ss", "zmq_ss"))lit"}};
 
 namespace helics
 {
@@ -44,10 +45,10 @@ BrokerApp::~BrokerApp ()
     {
         return;
     }
-	//this sleeps until disconnected
+    // this sleeps until disconnected
     broker->waitForDisconnect ();
     broker = nullptr;
-    helics::BrokerFactory::cleanUpBrokers (std::chrono::milliseconds(500));
+    helics::BrokerFactory::cleanUpBrokers (std::chrono::milliseconds (500));
 }
 
 void BrokerApp::loadFromArguments (int argc, char *argv[])

@@ -1,7 +1,8 @@
 /*
 Copyright © 2017-2019,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
-All rights reserved. 
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.
+See the top-level NOTICE for additional details.
+All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 
@@ -26,6 +27,7 @@ class MpiCore final : public CommsBroker<MpiComms, CommonCore>
 
   public:
     virtual std::string generateLocalAddressString () const override;
+
   private:
     mutable std::mutex dataMutex;  //!< mutex protecting the configuration information
     std::string brokerAddress;  //!< the mpi rank:tag of the broker
@@ -34,6 +36,5 @@ class MpiCore final : public CommsBroker<MpiComms, CommonCore>
     virtual bool brokerConnect () override;
 };
 
-} // namespace mpi
+}  // namespace mpi
 }  // namespace helics
-

@@ -1,7 +1,7 @@
 /*
 Copyright © 2017-2019,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
-All rights reserved. 
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
+the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 #include "TcpBroker.h"
@@ -48,7 +48,7 @@ void TcpBrokerSS::initializeFromArgs (int argc, const char *const *argv)
             {
                 connections = vm["connections"].as<std::vector<std::string>> ();
             }
-            if (vm.count("no_outgoing_connections") > 0)
+            if (vm.count ("no_outgoing_connections") > 0)
             {
                 no_outgoing_connections = true;
             }
@@ -67,7 +67,7 @@ bool TcpBrokerSS::brokerConnect ()
     }
     if (no_outgoing_connections)
     {
-        comms->setFlag("allow_outgoing",false);
+        comms->setFlag ("allow_outgoing", false);
     }
     lock.unlock ();
     return NetworkBroker::brokerConnect ();

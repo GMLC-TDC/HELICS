@@ -1,7 +1,7 @@
 /*
 Copyright © 2017-2019,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
-All rights reserved. 
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
+the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 
@@ -25,7 +25,7 @@ bool TriggerVariable::trigger ()
     std::lock_guard<std::mutex> lock (stateLock);
     if (activated)
     {
-        triggered.store (true,std::memory_order_release);
+        triggered.store (true, std::memory_order_release);
         cv_trigger.notify_all ();
         return true;
     }
@@ -47,7 +47,7 @@ bool TriggerVariable::wait_for (const std::chrono::milliseconds &duration) const
     std::unique_lock<std::mutex> lk (stateLock);
     if (activated && (!triggered.load (std::memory_order_acquire)))
     {
-        return cv_trigger.wait_for(lk, duration, [this] { return triggered.load(std::memory_order_acquire); });
+        return cv_trigger.wait_for (lk, duration, [this] { return triggered.load (std::memory_order_acquire); });
     }
     return true;
 }
