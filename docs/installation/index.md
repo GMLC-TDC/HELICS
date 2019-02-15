@@ -18,6 +18,8 @@ Use conda to install helics:
 
 ```bash
 conda install -c conda-forge helics
+# OR
+conda install -c gmlc-tdc helics
 ```
 
 ### Using a installer for your operating system
