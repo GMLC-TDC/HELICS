@@ -14,7 +14,7 @@ project(HELICS VERSION 2.0.0)
 # HELICS Version number
 # -----------------------------------------------------------------------------
 set(HELICS_VERSION_BUILD)
-set(HELICS_DATE "02-12-19")
+set(HELICS_DATE "02-18-19")
 
 set(
     HELICS_VERSION_UNDERSCORE
@@ -812,7 +812,7 @@ if(ENABLE_PACKAGE_BUILD)
             "${CMAKE_SOURCE_DIR}\\\\docs\\\\img\\\\HELICS.ico"
         )
         set(CPACK_NSIS_MUI_ICON "${CMAKE_SOURCE_DIR}/docs/img/HELICS.ico")
-        set(CPACK_NSIS_INSTALL_ROOT "C:\\\\local\\\\")
+        set(CPACK_NSIS_INSTALL_ROOT "C:\\\\local")
         set(
             CPACK_NSIS_URL_INFO_ABOUT
             "https://www.github.com/GMLC-TDC/Helics-src"
