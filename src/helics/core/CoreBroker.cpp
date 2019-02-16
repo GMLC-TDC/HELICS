@@ -625,9 +625,14 @@ std::string CoreBroker::generateFederationSummary () const
             break;
         }
     }
-    std::string output = fmt::format ("Federation Summary> \n\t{} federates\n\t{} brokers/cores\n\t{} "
-                                      "publications\n\t{} inputs\n\t{} endpoints\n\t{} filters\n<<<<<<<<<",
-                                      _federates.size (), _brokers.size (), pubs, ipts, epts, filt);
+    std::string output =
+      fmt::format ("Federation Summary> \n\t{} federates [min {}]\n\t{}/{} brokers/cores [min {}]\n\t{} "
+                   "publications\n\t{} inputs\n\t{} endpoints\n\t{} filters\n<<<<<<<<<",
+                   _federates.size (), minFederateCount,
+                   std::count_if (_brokers.begin (), _brokers.end (),
+                                  [](auto &brk) { return brk._core == false; }),
+                   std::count_if (_brokers.begin (), _brokers.end (), [](auto &brk) { return brk._core == true; }),
+                   minBrokerCount, pubs, ipts, epts, filt);
     return output;
 }
 
