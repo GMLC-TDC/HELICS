@@ -23,7 +23,8 @@ If you would like to contribute to the HELICS project see [CONTRIBUTING](CONTRIB
  - Bryan Richardson**
 
 ### Argonne National Lab
- - Shrirang Abhyankar*
+ - Shrirang Abhyankar
+ - Karthikeyan Balasubramaniam*
 
  `*` currently active
  `**` subcontractor
@@ -32,9 +33,6 @@ If you would like to contribute to the HELICS project see [CONTRIBUTING](CONTRIB
 
 ### [BOOST](https://www.boost.org)
   Boost is used throughout the code, including ASIO for the TCP and UDP protocols and Timers.  The unit, integration, and system test suite is written using boost test.  The IPC core uses the boost interprocess library, the program options library is used for parsing command line options and the filesystem library is used frequently when file manipulation is needed.  Some algorithms and other libraries are also used throughout the code. Boost is licensed under the boost license
-
-### [zmq](http://www.zeromq.org)
-  ZeroMQ message passing is used in the ZMQ core networking.  The autobuild currently uses version 4.2.5. No ZMQ library code is included in the HELICS source.  HELICS installers include ZeroMQ binary libraries. ZeroMQ is licensed under [LGPL](https://github.com/zeromq/libzmq/blob/master/COPYING.LESSER) with a modification to allow for linking and in various forms and distribution of the binary under different terms if the library was not modified.  No modification of the ZMQ library or any of the ZeroMQ source files is included in the HELICS source code.  
 
 ### [cppzmq](https://github.com/zeromq/cppzmq)
   The header only bindings for the ZeroMQ library are used to interact with the ZeroMQ library the header files are modified to include some string operations and are included in HELICS source.  Cppzmp is licensed under the [MIT](https://github.com/zeromq/cppzmq/blob/master/LICENSE) license.

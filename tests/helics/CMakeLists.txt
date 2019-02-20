@@ -1,7 +1,8 @@
 #
 # Copyright © 2017-2018, Battelle Memorial Institute; Lawrence Livermore National
-# Security, LLC; Alliance for Sustainable Energy, LLC All rights reserved. See LICENSE
-# file and DISCLAIMER for more details.
+# Security, LLC; Alliance for Sustainable Energy, LLC All rights reserved. 
+# 
+# SPDX-License-Identifier: BSD-3-Clause
 #
 
 # add a baseline library for underlying dependencies and flags for test executables

@@ -8,7 +8,7 @@ A note on future revisions.
   Everything within a major version number should be code compatible (With the exception of experimental interfaces).  The most notable example of an experimental interface is the support for multiple source inputs.  The API's to deal with this will change in future minor releases.    Everything within a single minor release should be network compatible with other federates on the same minor release number.  Compatibility across minor release numbers may be possible in some situations but we are not going to guarantee this as those components are subject to performance improvements and may need to be modified at some point.  patch releases will be limited to bug fixes and other improvements not impacting the public API or network compatibility.  Check [here](./docs/Public_API.md) for details of what is included and excluded from the public API and version stability.
 
 
-## [2.0.0] - 2019-01-24
+## [2.0.0] - 2019-02-12
 
 This is a major revision so this changelog will not capture all the changes that have been made in detail. Some highlights:
   - major revision to the API including
@@ -27,6 +27,8 @@ This is a major revision so this changelog will not capture all the changes that
   - an ability to set a global value (as a string) that can be queried.
   - a local info field for all the interfaces for user defined string data.  
   - many other small changes.
+  - License file changed to match BSD-3-clause exactly(terms are the same but the file had some extra disclaimers in it, now it matches the standard BSD-3-clause license)
+  - tag source files with
 
 ## [1.3.1] - 2018-09-23
 ### Changed

@@ -1,7 +1,8 @@
 /*
 Copyright © 2017-2019,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
-All rights reserved. See LICENSE file and DISCLAIMER for more details.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
+the top-level NOTICE for additional details. All rights reserved.
+SPDX-License-Identifier: BSD-3-Clause
 */
 
 #ifndef _HELICS_CPP98_API_
@@ -11,18 +12,13 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include "CombinationFederate.hpp"
 #include <string>
 
-
 /**
  * HELICS C++98 Interface
  */
 namespace helicscpp
 {
-
 /** get a string with the helics version info*/
-std::string getHelicsVersionString()
-{
-    return std::string(helicsGetVersion());
-}
+std::string getHelicsVersionString () { return std::string (helicsGetVersion ()); }
 
-} //namespace helicscpp
+}  // namespace helicscpp
 #endif

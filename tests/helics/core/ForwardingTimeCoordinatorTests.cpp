@@ -1,7 +1,8 @@
 /*
 Copyright © 2017-2019,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
-All rights reserved. See LICENSE file and DISCLAIMER for more details.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
+the top-level NOTICE for additional details. All rights reserved.
+SPDX-License-Identifier: BSD-3-Clause
 */
 #include "testFixtures.h"
 #include <boost/test/unit_test.hpp>
@@ -73,11 +74,11 @@ BOOST_AUTO_TEST_CASE (dependency_test_message)
     BOOST_CHECK (deps[0] == fed3);
 
     // remove unrecognized one
-    remDep.source_id = global_federate_id(10);
+    remDep.source_id = global_federate_id (10);
     ftc.processDependencyUpdateMessage (remDep);
     deps = ftc.getDependencies ();
     BOOST_CHECK (deps.size () == 1);
-    BOOST_CHECK (deps[0] ==fed3);
+    BOOST_CHECK (deps[0] == fed3);
 }
 
 BOOST_AUTO_TEST_CASE (dependent_tests)
@@ -137,7 +138,7 @@ BOOST_AUTO_TEST_CASE (dependent_test_message)
     BOOST_CHECK (deps[0] == fed3);
 
     // remove unrecognized one
-    remDep.source_id = global_federate_id(10);
+    remDep.source_id = global_federate_id (10);
     ftc.processDependencyUpdateMessage (remDep);
     BOOST_CHECK (deps.size () == 1);
     BOOST_CHECK (deps[0] == fed3);
@@ -198,12 +199,12 @@ BOOST_AUTO_TEST_CASE (timing_test1)
     ftc.addDependency (fed3);
     getFTCtoExecMode (ftc);
 
-    ftc.addDependent (global_federate_id(5));
+    ftc.addDependent (global_federate_id (5));
     ActionMessage lastMessage (CMD_INVALID);
-    ftc.source_id = global_federate_id(1);
+    ftc.source_id = global_federate_id (1);
     ftc.setMessageSender ([&lastMessage](const helics::ActionMessage &mess) { lastMessage = mess; });
 
-    ActionMessage timeUpdate (CMD_TIME_REQUEST, fed2, global_federate_id(1));
+    ActionMessage timeUpdate (CMD_TIME_REQUEST, fed2, global_federate_id (1));
     timeUpdate.actionTime = 1.0;
     timeUpdate.Te = 1.0;
     timeUpdate.Tdemin = 1.0;

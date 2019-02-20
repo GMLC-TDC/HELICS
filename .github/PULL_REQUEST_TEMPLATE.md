@@ -7,7 +7,7 @@ This fixes issue #123
 -->
 
 - [ ] I have reviewed the [Contributing Guidelines](../CONTRIBUTING.md)
-- [ ] I agree to license my contributions under the same license as in this repository (BSD 3 clause)
+- [ ] I agree to license my contributions under the same license as in this repository ([BSD 3 clause](../LICENSE))
 
 ### Description
 
@@ -16,7 +16,7 @@ If merged this pull request will
 
 ### Proposed changes
 
-<!-- Describe the proposed changes of Pull Request here -->
+<!-- Describe the highlights of the proposed changes here -->
 -
 -
 -

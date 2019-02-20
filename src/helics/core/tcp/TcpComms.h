@@ -1,12 +1,13 @@
 /*
 Copyright © 2017-2019,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
-All rights reserved. See LICENSE file and DISCLAIMER for more details.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
+the top-level NOTICE for additional details. All rights reserved.
+SPDX-License-Identifier: BSD-3-Clause
 */
 #pragma once
 
-#include "../../common/BlockingQueue.hpp"
 #include "../../common/AsioServiceManagerFwd.hpp"
+#include "../../common/BlockingQueue.hpp"
 #include "../NetworkCommsInterface.hpp"
 #include <atomic>
 #include <set>
@@ -28,8 +29,9 @@ class TcpComms final : public NetworkCommsInterface
     ~TcpComms ();
     /** load network information into the comms object*/
     virtual void loadNetworkInfo (const NetworkBrokerData &netInfo) override;
-   
-	virtual void setFlag (const std::string &flag, bool val) override;
+
+    virtual void setFlag (const std::string &flag, bool val) override;
+
   private:
     bool reuse_address = false;
     virtual int getDefaultBrokerPort () const override;
@@ -37,9 +39,10 @@ class TcpComms final : public NetworkCommsInterface
     virtual void queue_tx_function () override;  //!< the loop for transmitting data
 
     virtual void closeReceiver () override;  //!< function to instruct the receiver loop to close
-   
-	/** make the initial connection to a broker and get setup information*/
-	bool establishBrokerConnection(std::shared_ptr<AsioServiceManager> &ioserv, std::shared_ptr<TcpConnection> &brokerConnection);
+
+    /** make the initial connection to a broker and get setup information*/
+    bool establishBrokerConnection (std::shared_ptr<AsioServiceManager> &ioserv,
+                                    std::shared_ptr<TcpConnection> &brokerConnection);
     /** process an incoming message
     return code for required action 0=NONE, -1 TERMINATE*/
     int processIncomingMessage (ActionMessage &&cmd);
@@ -58,7 +61,6 @@ class TcpComms final : public NetworkCommsInterface
 
     bool commErrorHandler (std::shared_ptr<TcpConnection> connection, const boost::system::error_code &error);
     //  bool errorHandle()
-
 };
 
 }  // namespace tcp
