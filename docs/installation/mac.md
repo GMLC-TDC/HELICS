@@ -213,6 +213,6 @@ pireceiver
 
 ```bash
 matlab -nodesktop -nosplash
-cd ~/GitRepos/GMLC-TDC/HELICS-src/matlab
+cd ~/GitRepos/GMLC-TDC/HELICS-examples/matlab
 pisender
 ```
