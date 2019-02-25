@@ -183,17 +183,17 @@ To do that, you can follow the following instructions.
 The below generates the MATLAB interface using SWIG.
 
 ```bash
-cd ~/GitRepos/GMLC-TDC/HELICS-src/swig/
+cd ~/GitRepos/GMLC-TDC/HELICS-src/interfaces/
 mkdir matlab
 swig -I../src/helics/shared_api_library -outdir ./matlab -matlab ./helics.i
 mv helics_wrap.cxx matlab/helicsMEX.cxx
 ```
 
-You can copy these files into the respective `HELICS-src/swig/matlab/` folder and run the cmake command above.
+You can copy these files into the respective `HELICS-src/interfaces/matlab/` folder and run the cmake command above.
 Alternatively, you wish to build the MATLAB interface without using CMake, and you can do the following.
 
 ```bash
-cd ~/GitRepos/GMLC-TDC/HELICS-src/swig/
+cd ~/GitRepos/GMLC-TDC/HELICS-src/interfaces/
 mex -I../src/helics/shared_api_library ./matlab/helics_wrap.cxx -lhelicsSharedLib -L/path/to/helics_install/lib/helics/
 mv helicsMEX.* matlab/
 ```
@@ -207,12 +207,12 @@ Run the following in two separate windows.
 
 ```bash
 matlab -nodesktop -nosplash
-cd ~/GitRepos/GMLC-TDC/HELICS-src/swig/matlab
+cd ~/GitRepos/GMLC-TDC/HELICS-examples/matlab
 pireceiver
 ```
 
 ```bash
 matlab -nodesktop -nosplash
-cd ~/GitRepos/GMLC-TDC/HELICS-src/swig/matlab
+cd ~/GitRepos/GMLC-TDC/HELICS-src/matlab
 pisender
 ```

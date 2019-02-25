@@ -5,7 +5,7 @@
 Run the following:
 
 ```bash
-$ cmake -DBUILD_PYTHON_INTERFACE=ON -DPYTHON_INCLUDE_DIR=$(python3-config --prefix)/include/python3.6m/ -DPYTHON_LIBRARY=$(python3-config --prefix)/lib/python3.6m/libpython3.6m.dylib -DCMAKE_INSTALL_PREFIX=/Users/$(whoami)/local/helics-1.0.0/ ..
+$ cmake -DBUILD_PYTHON_INTERFACE=ON -DCMAKE_INSTALL_PREFIX=/Users/$(whoami)/local/helics-x.x.x/ ..
 $ make -j8
 $ make install
 ```
@@ -13,7 +13,7 @@ $ make install
 Add the following to your `~/.bashrc` file.
 
 ```bash
-export PYTHONPATH=/Users/$(whoami)/local/helics-1.0.0/python:$PYTHONPATH
+export PYTHONPATH=/Users/$(whoami)/local/helics-x.x.x/python:$PYTHONPATH
 ```
 
 If you open a interactive Python session and import helics, you should be able to get the version of `helics` and an output that is similar to the following.
@@ -36,7 +36,7 @@ Out[2]: 'x.x.x (XX-XX-XX)'
 Run the following:
 
 ```bash
-$ cmake -DBUILD_PYTHON2_INTERFACE=ON -DPYTHON_INCLUDE_DIR=$(python2-config --prefix)/include/python2.7/ -DPYTHON_LIBRARY=$(python2-config --prefix)/lib/python2.7/libpython2.7.dylib -DCMAKE_INSTALL_PREFIX=/Users/$(whoami)/local/helics-1.0.0/ ..
+$ cmake -DBUILD_PYTHON2_INTERFACE=ON -DPYTHON_INCLUDE_DIR=$(python2-config --prefix)/include/python2.7/ -DPYTHON_LIBRARY=$(python2-config --prefix)/lib/python2.7/libpython2.7.dylib -DCMAKE_INSTALL_PREFIX=/Users/$(whoami)/local/helics-x.x.x/ ..
 $ make -j8
 $ make install
 ```
@@ -44,7 +44,7 @@ $ make install
 Add the following to your `~/.bashrc` file.
 
 ```bash
-export PYTHONPATH=/Users/$(whoami)/local/helics-1.0.0/python:$PYTHONPATH
+export PYTHONPATH=/Users/$(whoami)/local/helics-x.x.x/python:$PYTHONPATH
 ```
 
 If you open a interactive Python session and import helics, you should be able to get the version of `helics` and an output that is similar to the following.
@@ -85,7 +85,7 @@ This will install boost in the `~/local/boost-gcc-1.64` folder
 Next, you will need to build HELICS and tell it what the BOOST\_ROOT is.
 
 ```bash
-$ cmake -DCMAKE_INSTALL_PREFIX="/Users/$USER/local/helics-gcc-1.0.0/" -DBOOST_ROOT="/Users/$USER/local/boost-gcc-1.64" -DBUILD_PYTHON_INTERFACE=ON -DPYTHON_LIBRARY=$(python3-config --prefix)/lib/libpython3.6m.dylib -DPYTHON_INCLUDE_DIR=$(python3-config --prefix)/include/python3.6m -DCMAKE_C_COMPILER=/usr/local/Cellar/gcc/7.2.0_1/bin/gcc-7 -DCMAKE_CXX_COMPILER=/usr/local/Cellar/gcc/7.2.0_1/bin/g++-7 ../
+$ cmake -DCMAKE_INSTALL_PREFIX="/Users/$USER/local/helics-gcc-x.x.x/" -DBOOST_ROOT="/Users/$USER/local/boost-gcc-1.64" -DBUILD_PYTHON_INTERFACE=ON -DPYTHON_LIBRARY=$(python3-config --prefix)/lib/libpython3.6m.dylib -DPYTHON_INCLUDE_DIR=$(python3-config --prefix)/include/python3.6m -DCMAKE_C_COMPILER=/usr/local/Cellar/gcc/7.2.0_1/bin/gcc-7 -DCMAKE_CXX_COMPILER=/usr/local/Cellar/gcc/7.2.0_1/bin/g++-7 ../
 $ make clean; make -j 4; make install
 ```
 
