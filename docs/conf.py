@@ -64,6 +64,15 @@ if which("pandoc") is None:
     warnings.warn("`pandoc` not found in PATH. Please consider installing Pandoc or consult the developer documentation")
     from recommonmark.parser import CommonMarkParser as MarkdownParser
 
+import subprocess
+import os
+
+read_the_docs_build = os.environ.get('READTHEDOCS', None) == 'True'
+
+if read_the_docs_build:
+    dir_name = os.path.realpath(os.path.dirname(__file__))
+    subprocess.call("cd {dir_name} && make rtddoxygen".format(dir_name=dir_name), shell=True)
+    html_extra_path = [os.path.abspath(os.path.join(dir_name, "../rtd-doxygen"))]
 
 extensions = [
     'sphinx.ext.mathjax',
@@ -209,7 +218,6 @@ man_pages = [(master_doc, 'helics-src', 'HELICS-src Documentation', [author], 1)
 texinfo_documents = [
     (master_doc, 'HELICS-src', 'HELICS-src Documentation', author, 'HELICS-src', 'One line description of project.', 'Miscellaneous'),
 ]
-
 
 def setup(app):
     app.add_stylesheet('css/custom.css')  # may also be an URL

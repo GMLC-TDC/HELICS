@@ -32,6 +32,7 @@ series simulation.
  developer-guide/index
  apps/index
  c-api-reference/index
- API Doxygen <https://gmlc-tdc.github.io/HELICS-src/doxygen/>
  ROADMAP
 ```
+
+You can find [Doxygen documentation here](doxygen/index.html).
