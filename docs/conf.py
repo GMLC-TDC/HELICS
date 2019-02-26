@@ -71,8 +71,7 @@ read_the_docs_build = os.environ.get('READTHEDOCS', None) == 'True'
 
 if read_the_docs_build:
     dir_name = os.path.realpath(os.path.dirname(__file__))
-    subprocess.call("apt-get install cmake".format(dir_name=dir_name), shell=True)
-    subprocess.call("cd {dir_name} && make doxygen".format(dir_name=dir_name), shell=True)
+    subprocess.call("cd {dir_name} && make rtddoxygen".format(dir_name=dir_name), shell=True)
 
 extensions = [
     'sphinx.ext.mathjax',

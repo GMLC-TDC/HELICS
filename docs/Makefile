@@ -20,6 +20,9 @@ help:
 %: Makefile
 	@$(SPHINXBUILD) -M $@ "$(SOURCEDIR)" "$(BUILDDIR)" $(SPHINXOPTS) $(O)
 
+rtddoxygen:
+	cd ../; mkdir -p build-doxygen; rm -rf build-doxygen; mkdir -p build-doxygen; python ./scripts/render-doxyfile.py; doxygen Doxyfile;
+
 doxygen:
 	cd ../; mkdir -p build-doxygen; rm -rf build-doxygen; mkdir -p build-doxygen; cd build-doxygen; cmake -DCMAKE_INSTALL_PREFIX=./install/helics_install -DGENERATE_DOXYGEN_DOC=ON ../; make doc;
 
