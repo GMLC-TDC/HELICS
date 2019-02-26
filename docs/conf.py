@@ -72,7 +72,7 @@ read_the_docs_build = os.environ.get('READTHEDOCS', None) == 'True'
 if read_the_docs_build:
     dir_name = os.path.realpath(os.path.dirname(__file__))
     subprocess.call("cd {dir_name} && make rtddoxygen".format(dir_name=dir_name), shell=True)
-    html_extra_path = [os.path.abspath(os.path.join(dir_name, "../build-doxygen/docs/html"))]
+    html_extra_path = [os.path.abspath(os.path.join(dir_name, "../rtd-doxygen"))]
 
 extensions = [
     'sphinx.ext.mathjax',
