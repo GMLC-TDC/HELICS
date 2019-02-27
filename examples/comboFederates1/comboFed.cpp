@@ -15,7 +15,7 @@ static const helics::ArgDescriptors InfoArgs{
   {"startbroker", "start a broker with the specified arguments"},
   {"target,t", "name of the target federate"},
   {"valuetarget", "name of the value federate to target"},
-  {"messgetarget", "name of the message federate to target"},
+  {"messagetarget", "name of the message federate to target"},
   {"endpoint,e", "name of the target endpoint"},
   {"source,s", "name of the source endpoint"}
   // name is captured in the argument processor for federateInfo
