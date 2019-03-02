@@ -27,7 +27,7 @@ using namespace std::literals::chrono_literals;
 
 BOOST_AUTO_TEST_SUITE (TcpSSCore_tests, *utf::label ("ci"))
 
-using boost::asio::ip::tcp;
+using asio::ip::tcp;
 using helics::Core;
 
 #define TCP_BROKER_PORT 33133
@@ -113,7 +113,7 @@ BOOST_AUTO_TEST_CASE (tcpSSComms_broker_test_transmit)
     BOOST_REQUIRE (connected);
     comm.transmit (helics::parent_route_id, helics::CMD_IGNORE);
 
-    boost::system::error_code error;
+    asio::error_code error;
     int cnt = 0;
     while (counter < 2)
     {

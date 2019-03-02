@@ -11,8 +11,8 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <functional>
 #include <memory>
 #include <string>
-#include <boost/asio/io_service.hpp>
-#include <boost/asio/ip/tcp.hpp>
+#include <asio/io_context.hpp>
+#include <asio/ip/tcp.hpp>
 
 /** @file
 various helper classes and functions for handling TCP connections
@@ -36,17 +36,17 @@ class TcpConnection : public std::enable_shared_from_this<TcpConnection>
     };
 
     using pointer = std::shared_ptr<TcpConnection>;
-    static pointer create (boost::asio::io_service &io_service,
+    static pointer create (asio::io_context &io_context,
                            const std::string &connection,
                            const std::string &port,
                            size_t bufferSize = 10192);
     /** create an RxConnection object using the specified service and bufferSize*/
-    static pointer create (boost::asio::io_service &io_service, size_t bufferSize)
+    static pointer create (asio::io_context &io_context, size_t bufferSize)
     {
-        return pointer (new TcpConnection (io_service, bufferSize));
+        return pointer (new TcpConnection (io_context, bufferSize));
     }
     /** get the underlying socket object*/
-    boost::asio::ip::tcp::socket &socket () { return socket_; }
+    asio::ip::tcp::socket &socket () { return socket_; }
     /** start the receiving loop*/
     void startReceive ();
     /** cancel ongoing socket operations*/
@@ -62,18 +62,18 @@ class TcpConnection : public std::enable_shared_from_this<TcpConnection>
     /** set the callback for the data object*/
     void setDataCall (std::function<size_t (TcpConnection::pointer, const char *, size_t)> dataFunc);
     /** set the callback for an error*/
-    void setErrorCall (std::function<bool(TcpConnection::pointer, const boost::system::error_code &)> errorFunc);
+    void setErrorCall (std::function<bool(TcpConnection::pointer, const std::error_code &)> errorFunc);
     /** set a logging function */
     void setLoggingFunction (std::function<void(int loglevel, const std::string &logMessage)> logFunc);
     /** send raw data
-    @throws boost::system::system_error on failure*/
+    @throws std::system_error on failure*/
     size_t send (const void *buffer, size_t dataLength);
     /** send a string
-    @throws boost::system::system_error on failure*/
+    @throws std::system_error on failure*/
     size_t send (const std::string &dataString);
 
     /** do a blocking receive on the socket
-    @throw boost::system::system_error on failure
+    @throw std::system_error on failure
     @return the number of bytes received
     */
     size_t receive (void *buffer, size_t maxDataSize);
@@ -81,41 +81,41 @@ class TcpConnection : public std::enable_shared_from_this<TcpConnection>
     @param buffer the data to send
     @param dataLength the length of the data
     @param callback a callback function of the form void handler(
-    const boost::system::error_code& error, // Result of operation.
+    const std::error_code& error, // Result of operation.
     std::size_t bytes_transferred           // Number of bytes received.
     );
     */
     template <typename Process>
     void send_async (const void *buffer, size_t dataLength, Process callback)
     {
-        socket_.async_send (boost::asio::buffer (buffer, dataLength), callback);
+        socket_.async_send (asio::buffer (buffer, dataLength), callback);
     }
     /**perform an asynchronous receive operation
     @param buffer the data to send
     @param dataLength the length of the data
     @param callback a callback function of the form void handler(
-    const boost::system::error_code& error, // Result of operation.
+    const std::error_code& error, // Result of operation.
     std::size_t bytes_transferred           // Number of bytes received.
     );
     */
     template <typename Process>
     void async_receive (void *buffer, size_t dataLength, Process callback)
     {
-        socket_.async_receive (boost::asio::buffer (buffer, dataLength), callback);
+        socket_.async_receive (asio::buffer (buffer, dataLength), callback);
     }
 
     /**perform an asynchronous receive operation
    @param callback the callback function to execute when data has been received with signature
-   void(TcpConnection::pointer, const char *buffer, size_t dataLength, const boost::system::error_code &error)
+   void(TcpConnection::pointer, const char *buffer, size_t dataLength, const std::error_code &error)
     */
     void async_receive (std::function<void(TcpConnection::pointer,
                                            const char *buffer,
                                            size_t dataLength,
-                                           const boost::system::error_code &error)> callback)
+                                           const std::error_code &error)> callback)
     {
-        socket_.async_receive (boost::asio::buffer (data, data.size ()),
+        socket_.async_receive (asio::buffer (data, data.size ()),
                                [connection = shared_from_this (),
-                                callback = std::move (callback)](const boost::system::error_code &error,
+                                callback = std::move (callback)](const std::error_code &error,
                                                                  size_t bytes_transferred) {
                                    connection->handle_read (bytes_transferred, error, callback);
                                });
@@ -134,20 +134,20 @@ class TcpConnection : public std::enable_shared_from_this<TcpConnection>
     int getIdentifier () const { return idcode; };
 
   private:
-    TcpConnection (boost::asio::io_service &io_service, size_t bufferSize)
-        : socket_ (io_service), data (bufferSize), idcode (idcounter++)
+    TcpConnection (asio::io_context &io_context, size_t bufferSize)
+        : socket_ (io_context), context_ (io_context), data (bufferSize), idcode (idcounter++)
     {
     }
-    TcpConnection (boost::asio::io_service &io_service,
+    TcpConnection (asio::io_context &io_context,
                    const std::string &connection,
                    const std::string &port,
                    size_t bufferSize);
     /** function for handling the asynchronous return from a read request*/
-    void handle_read (const boost::system::error_code &error, size_t bytes_transferred);
+    void handle_read (const std::error_code &error, size_t bytes_transferred);
     void handle_read (
       size_t message_size,
-      const boost::system::error_code &error,
-      std::function<void(TcpConnection::pointer, const char *, size_t, const boost::system::error_code &error)>
+      const std::error_code &error,
+      std::function<void(TcpConnection::pointer, const char *, size_t, const std::error_code &error)>
         callback)
     {
         callback (shared_from_this (), data.data (), message_size, error);
@@ -155,7 +155,8 @@ class TcpConnection : public std::enable_shared_from_this<TcpConnection>
     static std::atomic<int> idcounter;
 
     std::atomic<size_t> residBufferSize{0};
-    boost::asio::ip::tcp::socket socket_;
+    asio::ip::tcp::socket socket_;
+    asio::io_context& context_;
     std::vector<char> data;
     std::atomic<bool> triggerhalt{false};
     const bool connecting{false};
@@ -163,11 +164,11 @@ class TcpConnection : public std::enable_shared_from_this<TcpConnection>
     std::atomic<bool> connectionError{false};
     TriggerVariable connected;  //!< variable indicating connectivity
     std::function<size_t (TcpConnection::pointer, const char *, size_t)> dataCall;
-    std::function<bool(TcpConnection::pointer, const boost::system::error_code &)> errorCall;
+    std::function<bool(TcpConnection::pointer, const std::error_code &)> errorCall;
     std::function<void(int level, const std::string &logMessage)> logFunction;
     std::atomic<connection_state_t> state{connection_state_t::prestart};
     const int idcode;
-    void connect_handler (const boost::system::error_code &error);
+    void connect_handler (const std::error_code &error);
 };
 
 /** tcp acceptor*/
@@ -184,14 +185,14 @@ class TcpAcceptor : public std::enable_shared_from_this<TcpAcceptor>
     };
     using pointer = std::shared_ptr<TcpAcceptor>;
     /** create an RxConnection object using the specified service and bufferSize*/
-    static pointer create (boost::asio::io_service &io_service, boost::asio::ip::tcp::endpoint &ep)
+    static pointer create (asio::io_context &io_context, asio::ip::tcp::endpoint &ep)
     {
-        return pointer (new TcpAcceptor (io_service, ep));
+        return pointer (new TcpAcceptor (io_context, ep));
     }
 
-    static pointer create (boost::asio::io_service &io_service, int port)
+    static pointer create (asio::io_context &io_context, int port)
     {
-        return pointer (new TcpAcceptor (io_service, port));
+        return pointer (new TcpAcceptor (io_context, port));
     }
     /** destructor to make sure everything is closed without threading issues*/
     ~TcpAcceptor () try
@@ -223,7 +224,7 @@ class TcpAcceptor : public std::enable_shared_from_this<TcpAcceptor>
     }
 
     /** set the error path callback*/
-    void setErrorCall (std::function<bool(TcpAcceptor::pointer, const boost::system::error_code &)> errorFunc)
+    void setErrorCall (std::function<bool(TcpAcceptor::pointer, const std::error_code &)> errorFunc)
     {
         errorCall = std::move (errorFunc);
     }
@@ -237,16 +238,16 @@ class TcpAcceptor : public std::enable_shared_from_this<TcpAcceptor>
     std::string to_string () const;
 
   private:
-    TcpAcceptor (boost::asio::io_service &io_service, boost::asio::ip::tcp::endpoint &ep);
-    TcpAcceptor (boost::asio::io_service &io_service, int port);
+    TcpAcceptor (asio::io_context &io_context, asio::ip::tcp::endpoint &ep);
+    TcpAcceptor (asio::io_context &io_context, int port);
     /** function for handling the asynchronous return from a read request*/
     void handle_accept (TcpAcceptor::pointer ptr,
                         TcpConnection::pointer new_connection,
-                        const boost::system::error_code &error);
-    boost::asio::ip::tcp::acceptor acceptor_;
-    boost::asio::ip::tcp::endpoint endpoint_;
+                        const std::error_code &error);
+    asio::ip::tcp::acceptor acceptor_;
+    asio::ip::tcp::endpoint endpoint_;
     std::function<void(TcpAcceptor::pointer, TcpConnection::pointer)> acceptCall;
-    std::function<bool(TcpAcceptor::pointer, const boost::system::error_code &)> errorCall;
+    std::function<bool(TcpAcceptor::pointer, const std::error_code &)> errorCall;
     std::atomic<accepting_state_t> state{accepting_state_t::opened};
     TriggerVariable accepting;
 };
@@ -258,18 +259,18 @@ class TcpServer : public std::enable_shared_from_this<TcpServer>
   public:
     using pointer = std::shared_ptr<TcpServer>;
 
-    static pointer create (boost::asio::io_service &io_service,
+    static pointer create (asio::io_context &io_context,
                            const std::string &address,
                            const std::string &port,
                            bool reuse_port = false,
                            int nominalBufferSize = 10192);
 
-    static pointer create (boost::asio::io_service &io_service,
+    static pointer create (asio::io_context &io_context,
                            const std::string &address,
                            int PortNum,
                            bool reuse_port = false,
                            int nominalBufferSize = 10192);
-    static pointer create (boost::asio::io_service &io_service, int PortNum, int nominalBufferSize = 10192);
+    static pointer create (asio::io_context &io_context, int PortNum, int nominalBufferSize = 10192);
 
   public:
     ~TcpServer ();
@@ -290,7 +291,7 @@ class TcpServer : public std::enable_shared_from_this<TcpServer>
         dataCall = std::move (dataFunc);
     }
     /** set the error path callback*/
-    void setErrorCall (std::function<bool(TcpConnection::pointer, const boost::system::error_code &)> errorFunc)
+    void setErrorCall (std::function<bool(TcpConnection::pointer, const std::error_code &)> errorFunc)
     {
         errorCall = std::move (errorFunc);
     }
@@ -299,26 +300,26 @@ class TcpServer : public std::enable_shared_from_this<TcpServer>
     TcpConnection::pointer findSocket (int connectorID) const;
 
   private:
-    TcpServer (boost::asio::io_service &io_service,
+    TcpServer (asio::io_context &io_context,
                const std::string &address,
                int portNum,
                bool port_reuse,
                int nominalBufferSize);
-    TcpServer (boost::asio::io_service &io_service,
+    TcpServer (asio::io_context &io_context,
                const std::string &address,
                const std::string &port,
                bool port_reuse,
                int nominalBufferSize);
-    TcpServer (boost::asio::io_service &io_service, int portNum, int nominalBufferSize);
+    TcpServer (asio::io_context &io_context, int portNum, int nominalBufferSize);
 
     void initialConnect ();
-    boost::asio::io_service &ioserv;
+    asio::io_context &ioctx;
     mutable std::mutex accepting;
     std::vector<TcpAcceptor::pointer> acceptors;
-    std::vector<boost::asio::ip::tcp::endpoint> endpoints;
+    std::vector<asio::ip::tcp::endpoint> endpoints;
     size_t bufferSize;
     std::function<size_t (TcpConnection::pointer, const char *, size_t)> dataCall;
-    std::function<bool(TcpConnection::pointer, const boost::system::error_code &error)> errorCall;
+    std::function<bool(TcpConnection::pointer, const std::error_code &error)> errorCall;
     std::atomic<bool> halted{false};
     bool reuse_address = false;
     // this data structure is protected by the accepting mutex

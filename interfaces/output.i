@@ -212,7 +212,7 @@ C++ includes: argParser.h
 %feature("docstring") AsioServiceManager "
 
 class defining a (potential) singleton Asio Io_service manager for all
-boost::asio usage
+asio usage
 
 C++ includes: AsioServiceManager.h
 ";
@@ -9009,7 +9009,7 @@ send raw data
 
 Exceptions
 ----------
-* `boost::system::system_error` :
+* `asio::system_error` :
     on failure
 ";
 
@@ -9019,7 +9019,7 @@ send a string
 
 Exceptions
 ----------
-* `boost::system::system_error` :
+* `asio::system_error` :
     on failure
 ";
 
@@ -9029,7 +9029,7 @@ do a blocking receive on the socket
 
 Exceptions
 ----------
-* `boost::system::system_error` :
+* `asio::system_error` :
     on failure
 
 Returns
@@ -9049,7 +9049,7 @@ Parameters
     the length of the data
 * `callback` :
     a callback function of the form void handler( const
-    boost::system::error_code& error, // Result of operation. std::size_t
+    asio::error_code& error, // Result of operation. std::size_t
     bytes_transferred // Number of bytes received. );
 ";
 
@@ -9065,7 +9065,7 @@ Parameters
     the length of the data
 * `callback` :
     a callback function of the form void handler( const
-    boost::system::error_code& error, // Result of operation. std::size_t
+    asio::error_code& error, // Result of operation. std::size_t
     bytes_transferred // Number of bytes received. );
 ";
 
@@ -9081,7 +9081,7 @@ Parameters
     the length of the data
 * `callback` :
     a callback function of the form void handler( const
-    boost::system::error_code& error, // Result of operation. std::size_t
+    asio::error_code& error, // Result of operation. std::size_t
     bytes_transferred // Number of bytes received. );
 ";
 
@@ -9142,7 +9142,7 @@ send raw data
 
 Exceptions
 ----------
-* `boost::system::system_error` :
+* `asio::system_error` :
     on failure
 ";
 
@@ -9152,7 +9152,7 @@ send a string
 
 Exceptions
 ----------
-* `boost::system::system_error` :
+* `asio::system_error` :
     on failure
 ";
 

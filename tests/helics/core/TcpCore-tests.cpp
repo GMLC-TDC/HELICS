@@ -28,7 +28,7 @@ using namespace std::literals::chrono_literals;
 
 BOOST_AUTO_TEST_SUITE (TcpCore_tests, *utf::label ("ci"))
 
-using boost::asio::ip::tcp;
+using asio::ip::tcp;
 using helics::Core;
 
 #define TCP_BROKER_PORT 24160
@@ -99,7 +99,7 @@ BOOST_AUTO_TEST_CASE (tcpComms_broker_test_transmit)
     {
         comm.transmit (helics::parent_route_id, helics::CMD_IGNORE);
 
-        boost::system::error_code error;
+        asio::error_code error;
         int cnt = 0;
         while (counter != 1)
         {
@@ -470,7 +470,7 @@ BOOST_AUTO_TEST_CASE (tcpCore_initialization_test)
         BOOST_CHECK_EQUAL (rM.name, "core1");
         BOOST_CHECK (rM.action () == helics::action_message_def::action_t::cmd_reg_broker);
         // helics::ActionMessage resp (helics::CMD_PRIORITY_ACK);
-        //  rxSocket.send_to (boost::asio::buffer (resp.packetize ()), remote_endpoint, 0, error);
+        //  rxSocket.send_to (asio::buffer (resp.packetize ()), remote_endpoint, 0, error);
         // BOOST_CHECK (!error);
     }
     core->disconnect ();

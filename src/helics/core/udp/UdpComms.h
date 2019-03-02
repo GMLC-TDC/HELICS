@@ -6,29 +6,12 @@ SPDX-License-Identifier: BSD-3-Clause
 */
 #pragma once
 
+#include "../../common/AsioServiceManagerFwd.hpp"
 #include "../NetworkCommsInterface.hpp"
 #include "helics/helics-config.h"
 #include <future>
 #include <set>
 
-#if (BOOST_VERSION_LEVEL >= 66)
-namespace boost
-{
-namespace asio
-{
-class io_context;
-using io_service = io_context;
-}  // namespace asio
-}  // namespace boost
-#else
-namespace boost
-{
-namespace asio
-{
-class io_service;
-}  // namespace asio
-}  // namespace boost
-#endif
 namespace helics
 {
 namespace udp

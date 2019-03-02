@@ -27,9 +27,9 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <string>
 #include <vector>
 
-#include <boost/asio/io_service.hpp>
+#include <asio/io_context.hpp>
 
-/** class defining a (potential) singleton ASIO io_service manager for all boost::asio usage*/
+/** class defining a (potential) singleton ASIO io_context manager for all asio usage*/
 class AsioServiceManager : public std::enable_shared_from_this<AsioServiceManager>
 {
   private:
@@ -37,8 +37,8 @@ class AsioServiceManager : public std::enable_shared_from_this<AsioServiceManage
       services;  //!< container for pointers to all the available contexts
     std::atomic<int> runCounter{0};  //!< counter for the number of times the runServiceLoop has been called
     std::string name;  //!< service name
-    std::unique_ptr<boost::asio::io_service> iserv;  //!< pointer to the actual context
-    std::unique_ptr<boost::asio::io_service::work>
+    std::unique_ptr<asio::io_context> ictx;  //!< pointer to the actual context
+    std::unique_ptr<asio::io_context::work>
       nullwork;  //!< pointer to an object used to keep a service running
     bool leakOnDelete = false;  //!< this is done to prevent some warning messages for use in DLL's
     std::atomic<bool> running{false};
@@ -90,13 +90,13 @@ class AsioServiceManager : public std::enable_shared_from_this<AsioServiceManage
     */
     static std::shared_ptr<AsioServiceManager>
     getExistingServicePointer (const std::string &serviceName = std::string ());
-    /** get the boost io_service associated with the service manager
+    /** get the asio io_context associated with the service manager
      */
-    static boost::asio::io_service &getService (const std::string &serviceName = std::string ());
-    /** get the boost io_service associated with the service manager but only if the service exists
+    static asio::io_context &getService (const std::string &serviceName = std::string ());
+    /** get the asio io_context associated with the service manager but only if the service exists
     if it doesn't this will throw and invalid_argument exception
     */
-    static boost::asio::io_service &getExistingService (const std::string &serviceName = std::string ());
+    static asio::io_context &getExistingService (const std::string &serviceName = std::string ());
 
     static void closeService (const std::string &serviceName = std::string ());
     /** tell the service to free the pointer and leak the memory on delete
@@ -111,11 +111,11 @@ class AsioServiceManager : public std::enable_shared_from_this<AsioServiceManage
     /** get the name  of the current service manager*/
     const std::string &getName () const { return name; }
 
-    /** get the underlying boost::io_service reference*/
-    boost::asio::io_service &getBaseService () const { return *iserv; }
+    /** get the underlying asio::io_context reference*/
+    asio::io_context &getBaseService () const { return *ictx; }
 
     /** run a single thread for the service manager to execute asynchronous services in
-    @details will run a single thread for the io_service,  it will not stop the thread until either the service
+    @details will run a single thread for the io_context,  it will not stop the thread until either the service
     manager is closed or the haltServiceLoop function is called and there is no more work
     @param in the name of the service  This function can be called as a static function on a particularly named
     service
@@ -123,7 +123,7 @@ class AsioServiceManager : public std::enable_shared_from_this<AsioServiceManage
     static LoopHandle runServiceLoop (const std::string &serviceName = std::string{});
 
     /** run a single thread for the service manager to execute asynchronous services in
-    @details will run a single thread for the io_service,  it will not stop the thread until either the service
+    @details will run a single thread for the io_context,  it will not stop the thread until either the service
     manager is closed or the haltServiceLoop function is called and there is no more work
     */
     LoopHandle startServiceLoop ();

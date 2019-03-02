@@ -18,7 +18,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <iostream>
 #include <libguarded/guarded.hpp>
 #include <random>
-#include <boost/asio/steady_timer.hpp>
+#include <asio/steady_timer.hpp>
 
 static constexpr auto chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
 
@@ -305,7 +305,7 @@ void BrokerBase::addActionMessage (ActionMessage &&m)
 
 using activeProtector = libguarded::guarded<std::pair<bool, bool>>;
 
-static void haltTimer (activeProtector &active, boost::asio::steady_timer &tickTimer)
+static void haltTimer (activeProtector &active, asio::steady_timer &tickTimer)
 {
     bool TimerRunning = true;
     {
@@ -328,12 +328,12 @@ static void haltTimer (activeProtector &active, boost::asio::steady_timer &tickT
     }
 }
 
-static void timerTickHandler (BrokerBase *bbase, activeProtector &active, const boost::system::error_code &error)
+static void timerTickHandler (BrokerBase *bbase, activeProtector &active, const std::error_code &error)
 {
     auto p = active.lock ();
     if (p->first)
     {
-        if (error != boost::asio::error::operation_aborted)
+        if (error != asio::error::operation_aborted)
         {
             try
             {
@@ -368,10 +368,10 @@ void BrokerBase::queueProcessingLoop ()
 
     auto serv = AsioServiceManager::getServicePointer ();
     auto serviceLoop = serv->startServiceLoop ();
-    boost::asio::steady_timer ticktimer (serv->getBaseService ());
+    asio::steady_timer ticktimer (serv->getBaseService ());
     activeProtector active (true, false);
 
-    auto timerCallback = [this, &active](const boost::system::error_code &ec) {
+    auto timerCallback = [this, &active](const std::error_code &ec) {
         timerTickHandler (this, active, ec);
     };
     if (tickTimer > 0)

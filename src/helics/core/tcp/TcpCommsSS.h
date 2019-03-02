@@ -55,7 +55,7 @@ class TcpCommsSS final : public NetworkCommsInterface
     */
     size_t dataReceive (std::shared_ptr<TcpConnection> connection, const char *data, size_t bytes_received);
 
-    bool commErrorHandler (std::shared_ptr<TcpConnection> connection, const boost::system::error_code &error);
+    bool commErrorHandler (std::shared_ptr<TcpConnection> connection, const std::error_code &error);
     //  bool errorHandle()
 };
 

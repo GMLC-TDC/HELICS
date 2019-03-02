@@ -10,7 +10,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "ActionMessage.hpp"
 #include <memory>
 #include <mutex>
-#include <boost/asio/steady_timer.hpp>
+#include <asio/steady_timer.hpp>
 
 namespace helics
 {
@@ -48,7 +48,7 @@ class MessageTimer : public std::enable_shared_from_this<MessageTimer>
 
   private:
     std::mutex timerLock;  //!< lock protecting the timer buffers
-    std::vector<std::shared_ptr<boost::asio::steady_timer>> timers;
+    std::vector<std::shared_ptr<asio::steady_timer>> timers;
     const std::function<void(ActionMessage &&)> sendFunction;  //!< the callback to use when sending a message
     std::vector<ActionMessage> buffers;
     std::vector<time_type> expirationTimes;

@@ -10,8 +10,8 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "BrokerFactory.hpp"
 
 #include "../common/AsioServiceManager.h"
-#include <boost/asio/ip/host_name.hpp>
-#include <boost/asio/ip/tcp.hpp>
+#include <asio/ip/host_name.hpp>
+#include <asio/ip/tcp.hpp>
 
 #include <iostream>
 
@@ -459,10 +459,10 @@ std::string getLocalExternalAddressV4 ()
 {
     auto srv = AsioServiceManager::getServicePointer ();
 
-    boost::asio::ip::tcp::resolver resolver (srv->getBaseService ());
-    boost::asio::ip::tcp::resolver::query query (boost::asio::ip::tcp::v4 (), boost::asio::ip::host_name (), "");
-    boost::asio::ip::tcp::resolver::iterator it = resolver.resolve (query);
-    boost::asio::ip::tcp::endpoint endpoint = *it;
+    asio::ip::tcp::resolver resolver (srv->getBaseService ());
+    asio::ip::tcp::resolver::query query (asio::ip::tcp::v4 (), asio::ip::host_name (), "");
+    asio::ip::tcp::resolver::iterator it = resolver.resolve (query);
+    asio::ip::tcp::endpoint endpoint = *it;
 
     return endpoint.address ().to_string ();
 }
@@ -471,31 +471,31 @@ std::string getLocalExternalAddressV4 (const std::string &server)
 {
     auto srv = AsioServiceManager::getServicePointer ();
 
-    boost::asio::ip::tcp::resolver resolver (srv->getBaseService ());
+    asio::ip::tcp::resolver resolver (srv->getBaseService ());
 
-    boost::asio::ip::tcp::resolver::query query_server (boost::asio::ip::tcp::v4 (), server, "");
-    boost::system::error_code ec;
-    boost::asio::ip::tcp::resolver::iterator it_server = resolver.resolve (query_server, ec);
+    asio::ip::tcp::resolver::query query_server (asio::ip::tcp::v4 (), server, "");
+    std::error_code ec;
+    asio::ip::tcp::resolver::iterator it_server = resolver.resolve (query_server, ec);
     if (ec)
     {
         return getLocalExternalAddressV4 ();
     }
-    boost::asio::ip::tcp::endpoint servep = *it_server;
+    asio::ip::tcp::endpoint servep = *it_server;
 
-    boost::asio::ip::tcp::resolver::iterator end;
+    asio::ip::tcp::resolver::iterator end;
 
     auto sstring = (it_server == end) ? server : servep.address ().to_string ();
 
-    boost::asio::ip::tcp::resolver::query query (boost::asio::ip::tcp::v4 (), boost::asio::ip::host_name (), "");
-    boost::asio::ip::tcp::resolver::iterator it = resolver.resolve (query);
-    boost::asio::ip::tcp::endpoint endpoint = *it;
+    asio::ip::tcp::resolver::query query (asio::ip::tcp::v4 (), asio::ip::host_name (), "");
+    asio::ip::tcp::resolver::iterator it = resolver.resolve (query);
+    asio::ip::tcp::endpoint endpoint = *it;
     int cnt = 0;
     std::string def = endpoint.address ().to_string ();
     cnt = matchcount (sstring.begin (), sstring.end (), def.begin (), def.end ());
     ++it;
     while (it != end)
     {
-        boost::asio::ip::tcp::endpoint ept = *it;
+        asio::ip::tcp::endpoint ept = *it;
         std::string ndef = ept.address ().to_string ();
         auto mcnt = matchcount (sstring.begin (), sstring.end (), ndef.begin (), ndef.end ());
         if ((mcnt > cnt) && (mcnt >= 7))
@@ -512,10 +512,10 @@ std::string getLocalExternalAddressV6 ()
 {
     auto srv = AsioServiceManager::getServicePointer ();
 
-    boost::asio::ip::tcp::resolver resolver (srv->getBaseService ());
-    boost::asio::ip::tcp::resolver::query query (boost::asio::ip::tcp::v6 (), boost::asio::ip::host_name (), "");
-    boost::asio::ip::tcp::resolver::iterator it = resolver.resolve (query);
-    boost::asio::ip::tcp::endpoint endpoint = *it;
+    asio::ip::tcp::resolver resolver (srv->getBaseService ());
+    asio::ip::tcp::resolver::query query (asio::ip::tcp::v6 (), asio::ip::host_name (), "");
+    asio::ip::tcp::resolver::iterator it = resolver.resolve (query);
+    asio::ip::tcp::endpoint endpoint = *it;
 
     return endpoint.address ().to_string ();
 }
@@ -524,18 +524,18 @@ std::string getLocalExternalAddressV6 (const std::string &server)
 {
     auto srv = AsioServiceManager::getServicePointer ();
 
-    boost::asio::ip::tcp::resolver resolver (srv->getBaseService ());
+    asio::ip::tcp::resolver resolver (srv->getBaseService ());
 
-    boost::asio::ip::tcp::resolver::query query_server (boost::asio::ip::tcp::v6 (), server, "");
-    boost::asio::ip::tcp::resolver::iterator it_server = resolver.resolve (query_server);
-    boost::asio::ip::tcp::endpoint servep = *it_server;
-    boost::asio::ip::tcp::resolver::iterator end;
+    asio::ip::tcp::resolver::query query_server (asio::ip::tcp::v6 (), server, "");
+    asio::ip::tcp::resolver::iterator it_server = resolver.resolve (query_server);
+    asio::ip::tcp::endpoint servep = *it_server;
+    asio::ip::tcp::resolver::iterator end;
 
     auto sstring = (it_server == end) ? server : servep.address ().to_string ();
 
-    boost::asio::ip::tcp::resolver::query query (boost::asio::ip::tcp::v6 (), boost::asio::ip::host_name (), "");
-    boost::asio::ip::tcp::resolver::iterator it = resolver.resolve (query);
-    boost::asio::ip::tcp::endpoint endpoint = *it;
+    asio::ip::tcp::resolver::query query (asio::ip::tcp::v6 (), asio::ip::host_name (), "");
+    asio::ip::tcp::resolver::iterator it = resolver.resolve (query);
+    asio::ip::tcp::endpoint endpoint = *it;
 
     if (it == end)
     {
@@ -547,7 +547,7 @@ std::string getLocalExternalAddressV6 (const std::string &server)
     ++it;
     while (it != end)
     {
-        boost::asio::ip::tcp::endpoint ept = *it;
+        asio::ip::tcp::endpoint ept = *it;
         std::string ndef = ept.address ().to_string ();
         auto mcnt = matchcount (sstring.begin (), sstring.end (), ndef.begin (), ndef.end ());
         if ((mcnt > cnt) && (mcnt >= 9))

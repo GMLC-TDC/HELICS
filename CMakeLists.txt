@@ -404,6 +404,16 @@ target_include_directories(
 include(GNUInstallDirs)
 
 # -------------------------------------------------------------
+# ASIO include directories
+# -------------------------------------------------------------
+target_compile_definitions(helics_base_includes INTERFACE "-DASIO_STANDALONE")
+target_include_directories(
+    helics_base_includes SYSTEM
+    INTERFACE
+        $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/ThirdParty/asio/asio/include>
+)
+
+# -------------------------------------------------------------
 # setting the RPATH
 # -------------------------------------------------------------
 # use, i.e. don't skip the full RPATH for the build tree
