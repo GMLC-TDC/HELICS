@@ -32,7 +32,7 @@ If you would like to contribute to the HELICS project see [CONTRIBUTING](CONTRIB
 ## Used Libraries or Code
 
 ### [BOOST](https://www.boost.org)
-  Boost is used throughout the code, including ASIO for the TCP and UDP protocols and Timers.  The unit, integration, and system test suite is written using boost test.  The IPC core uses the boost interprocess library, the program options library is used for parsing command line options and the filesystem library is used frequently when file manipulation is needed.  Some algorithms and other libraries are also used throughout the code. Boost is licensed under the boost license
+  Boost is used throughout the code.  The unit, integration, and system test suite is written using boost test.  The IPC core uses the boost interprocess library, the program options library is used for parsing command line options and the filesystem library is used frequently when file manipulation is needed.  Some algorithms and other libraries are also used throughout the code. Boost is licensed under the boost license
 
 ### [cppzmq](https://github.com/zeromq/cppzmq)
   The header only bindings for the ZeroMQ library are used to interact with the ZeroMQ library the header files are modified to include some string operations and are included in HELICS source.  Cppzmp is licensed under the [MIT](https://github.com/zeromq/cppzmq/blob/master/LICENSE) license.
