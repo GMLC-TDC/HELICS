@@ -8,6 +8,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "TcpHelperClasses.h"
 #include <iostream>
 #include <thread>
+#include <algorithm>
 
 namespace helics
 {
