@@ -404,7 +404,7 @@ target_include_directories(
 include(GNUInstallDirs)
 
 # -------------------------------------------------------------
-# ASIO include directories
+# Asio include directories
 # -------------------------------------------------------------
 target_compile_definitions(helics_base_includes INTERFACE "-DASIO_STANDALONE")
 target_include_directories(
