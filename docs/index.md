@@ -19,7 +19,7 @@ series simulation.
 
 - [GitHub](https://github.com/GMLC-TDC/HELICS-src)
 - [Gitter](https://gitter.im/GMLC-TDC/HELICS-src)
-- [Documentation](https://gmlc-tdc.github.io/HELICS-src/v2.0.0)
+- [Documentation](https://helics.readthedocs.org)
 - [User Guide](user-guide/index.html)
 
 ```eval_rst

@@ -10,7 +10,7 @@ There are four interface types for value federates that allow the interactions b
 * **Directed Outputs** - Sending interface where the federate core specifies the recipient of HELICS message
 * **Subscriptions** - Receiving interface where the federate core specifies the sender of HELICS message
 
-In all cases the configuration of the federate core declares the existence of the interface to use for communicating with other federates. The difference between "publication"/"named inputs" and "directed outputs"/"subscriptions" is where that federate core itself knows the specific names of the interfaces on the receiving/sending federate core. 
+In all cases the configuration of the federate core declares the existence of the interface to use for communicating with other federates. The difference between "publication"/"named inputs" and "directed outputs"/"subscriptions" is where that federate core itself knows the specific names of the interfaces on the receiving/sending federate core.
 
 
 The message type used for a given federation configuration is often an expression of the preference of the user setting up the federation. There are a few important differences that may guide which interfaces to use:
@@ -24,7 +24,7 @@ Though all four message types are supported, the remainder of this guide will fo
 ##Federate Configuration Options via JSON ##
 For any simulator that you didn't write for yourself, the most common way of configuring that simulator for use in a HELICS co-simulation will be through the use of an external JSON configuration file. TOML files are also supported but we will concentrate on JSON for this discussion. This file is read when a federate is being created and initialized and it will provide all the necessary information to incorporate that federate into the co-simulation.
 
-As the fundamental role of the co-simulation platform is to manage the synchronization and data exchange between the federates, you may or may not be surprised to learn that there are generic configuration options available to all HELICS federates that deal precisely with these. In this section, we'll focus on the options related to data exchange as pertaining to value federates, those options  and in [Timing section](./timing.md) we'll look at the timing parameters. 
+As the fundamental role of the co-simulation platform is to manage the synchronization and data exchange between the federates, you may or may not be surprised to learn that there are generic configuration options available to all HELICS federates that deal precisely with these. In this section, we'll focus on the options related to data exchange as pertaining to value federates, those options  and in [Timing section](./timing.md) we'll look at the timing parameters.
 
 Let's look at a generic JSON configuration file as an example with the more common parameters shown; the default values are shown in "[ ]". (Further parameters and explanations can be found in the [developer documentation](../configuration/Timing.md)
 
@@ -53,7 +53,7 @@ Though contained here in this section on value federates, the options below are 
 "observer":false,
 ...
 ```
-* **`only_update_on_change` [false]** - In some cases a federate may have subscribed to a value that changes infrequently. If the publisher of that makes new publications regularly but the value itself has not changed, setting this flag on the receiving federate will prevent that federate from being sent the new, but unchanged value and having to reprocess it's received data when nothing has changed. Note that this flag will only prevent the old value from getting through if it is bit-for-bit identical to the old one. 
+* **`only_update_on_change` [false]** - In some cases a federate may have subscribed to a value that changes infrequently. If the publisher of that makes new publications regularly but the value itself has not changed, setting this flag on the receiving federate will prevent that federate from being sent the new, but unchanged value and having to reprocess it's received data when nothing has changed. Note that this flag will only prevent the old value from getting through if it is bit-for-bit identical to the old one.
 
 * **`only_transmit_on_change` [false]** - Complementary to `only_update_on_change`, this flag can be set to prevent identical values from being published to the federation if they have not changed.
 
@@ -88,7 +88,7 @@ Though contained here in this section on value federates, the options below are 
                "unit" : "V",
                "info" : "{
                     \"object\" : \"network_node\",
-                    \"property\" : \"positive_sequence_voltage\" 
+                    \"property\" : \"positive_sequence_voltage\"
 					}"
           },
           {
@@ -97,13 +97,13 @@ Though contained here in this section on value federates, the options below are 
      ]
  ...
 ```
- 
-* **`publications` and/or `subscriptions`** - These are lists of the values being sent to and from the given federate. 
-* **`key`** - 
+
+* **`publications` and/or `subscriptions`** - These are lists of the values being sent to and from the given federate.
+* **`key`** -
   * `publications` - The string in this field is the unique identifier (at the federate level) for the value that will be published to the federation. If `global` is set (see below) it must be unique to the entire federation.
   * `subscriptions` - This string identifies the federation-unique value that this federate  wishes to receive. Unless `global` has been set to `true` in the publishings JSON configuration file, the name of the value is formatted as `<federate name>/<publication key>`. Both of these strings can be found in the publishing federate's JSON configuration file as the `name` and `key` strings, respectively. If `global` is `true` the string is just the `key` value.
 * **`global` [false]** - (publications only) `global` is used to indicate that the value in `key`  will be used as a global name when other federates are subscribing to the message. This requires that the user ensure that the name is used only once across all federates. Setting `global` to `true` is handy for federations with a small number of federates and a small number of message exchanges as it allows the `key` string to be short and simple. For larger federations, it is likely to be easier to set the flag to `false` and accept the extra naming
-* **`required` [false]** - 
+* **`required` [false]** -
   * `publications` - At least one federate must subscribe to the publications.
   * `subscriptions` - The message being subscribed to must be provided by some other publisher in the federation.
 * **`type`** - HELICS supports data types and data type conversion ([as best it can](https://www.youtube.com/watch?v=mZOAn-3aATY)).
@@ -116,10 +116,10 @@ Though contained here in this section on value federates, the options below are 
 
 To demonstrate how a to build a co-simulation, an example of a simple integrated transmission system and distribution system powerflow can be built; all the necessary files are found [here](../../examples/user_guide_examples/Example_1a) but to use them you'll need to get some specific software installed; here are the instructions:
 
-  1. [HELICS](https://gmlc-tdc.github.io/HELICS-src/installation/index.html)
+  1. [HELICS](https://helics.readthedocs.org/latest/installation/index.html)
   2. [GridLAB-D](https://github.com/gridlab-d/gridlab-d/tree/develop) - Enable HELICS, see instructions [here](http://gridlab-d.shoutwiki.com/wiki/Connection:helics_msg)
   3. [Python](https://www.anaconda.com/download/) - Anaconda installation, if you don't already have Python installed. You may need to also install the following Python packages (`conda install` ...)
-	
+
   	* matplotlib
   	* time
   	* logging
@@ -136,7 +136,7 @@ This example has a very simple message topology (with only one message being sen
 
 * **Transmission system** - The transmission system model used is the IEEE-118 bus model. To a single bus in this model the GridLAB-D distribution system is attached. All other load buses in the model use a static load shape scaled proportionately so the peak of the load shape matches meet the model-defined load value. The generators are re-dispatched every fifteen minutes by running an optimal power flow (the so-called "ACOPF" which places constraints on the voltage at the nodes in the system) and every five minutes a powerflow is run the update the state of the system. To allow for the relatively modest size of the single distribution system attached to the transmission system, the distribution system load is amplified by a factor of fifteen before being applied to the transmission system.
 
-* **Distribution system** - A GridLAB-D model of the IEEE-123 node distribution system has been used. The model includes voltage regulators along the primary side of the system and includes secondary (or distribution) transformers with loads attached to the secondary of these transformers. The loads themselves are ZIP loads with a high impedance traction that are randomly scaled versions of the same time-varying load-shapes. 
+* **Distribution system** - A GridLAB-D model of the IEEE-123 node distribution system has been used. The model includes voltage regulators along the primary side of the system and includes secondary (or distribution) transformers with loads attached to the secondary of these transformers. The loads themselves are ZIP loads with a high impedance traction that are randomly scaled versions of the same time-varying load-shapes.
 
 In this particular case, the Python script executing the transmission model also creates the broker; this is a choice of convenience and could have been created by any other federates. This simulation is run for 24 hours.
 
@@ -175,7 +175,7 @@ With a properly written configuration file, launching the co-simulation becomes 
 
 
 ### Experiment and Results ###
-To show the difference between running these two simulators in a stand-alone analysis and as a co-simulation, modify the federate JSON configurations and use helics_cli in both cases to run the analysis. To run the two as a co-simulation, leave publication and subscription entries in the federate JSON configuration. To run them as stand-alone federates with no interaction, delete the publications and subscriptions from both JSON configuration files. By removing the information transfer between the two they become disconnected but are still able to be executed as if they were participating in the federation. 
+To show the difference between running these two simulators in a stand-alone analysis and as a co-simulation, modify the federate JSON configurations and use helics_cli in both cases to run the analysis. To run the two as a co-simulation, leave publication and subscription entries in the federate JSON configuration. To run them as stand-alone federates with no interaction, delete the publications and subscriptions from both JSON configuration files. By removing the information transfer between the two they become disconnected but are still able to be executed as if they were participating in the federation.
 
 The figure below shows the total load on the transmission node to which the distribution system model is attached over the course of the simulated day, both when operating stand-alone and when running in a co-simulation with the distribution system.
 
