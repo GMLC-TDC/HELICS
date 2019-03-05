@@ -116,4 +116,7 @@ In the header [`<helics\queryFunctions.hpp>`](https://helics.readthedocs.org/lat
 Queries in the C api work similarly but the mechanics are different.
 The basic operation is to create a query using [`helicsQueryCreate(target,query)`](https://helics.readthedocs.org/latest/doxygen/helics_8h.html#ac290df999ec7e7527cb4337c5d3b1461)
 
-This function returns a query object that can be used in one of the execute functions to generate results.  It can be called asyncrhonously on a federate. A query must be freed after use.  The interface api's (python, matlab, Java, etc) will work similarly.
+This function returns a query object that can be used in one of the execute functions to generate results.
+It can be called asynchronously on a federate.
+A query must be freed after use.
+The interface api's (python, matlab, Java, etc) will work similarly.
