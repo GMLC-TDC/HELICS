@@ -8,7 +8,7 @@ The following is a set of guidelines for contributing to HELICS and associated p
 
 ## Licensing
 HELICS is distributed under the terms of the BSD-3 clause license. All new
-contributions must be made under this license. [LICENSE](LICENSE)
+contributions must be made under this [LICENSE](LICENSE) in accordance with the Github [terms of service](https://help.github.com/en/articles/github-terms-of-service#6-contributions-under-repository-license), which uses inbound=outbound policy.  By submitting a pull request you are acknowledging that you have the right to license your code under these terms.
 
 ##  [Code of Conduct](.github/CODE_OF_CONDUCT.md)
 
@@ -38,7 +38,7 @@ This section guides you through submitting a feature request, or enhancement for
 #### Before Submitting An Enhancement Suggestion
 
 * check the issue list for any similar issues
-* take a look at the [RoadMap](ROADMAP.md) or projects to see if the feature is already planned
+* take a look at the [RoadMap](ROADMAP.md) or projects to see if the feature is already planned, and if so feel free to add some feedback if it could be improved.
 
 
 ### Your First Code Contribution
