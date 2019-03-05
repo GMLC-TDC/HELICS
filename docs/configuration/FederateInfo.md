@@ -45,7 +45,9 @@ The local ip port to use for incoming connections.  This is usually a number but
 
 **properties [bool]**
 
-Federate info structures accept properties  as either Time values, integers, or flag values (bool).  These are entered through the `setProperty` calls or the `setFlagOption` call. The function calls take a propertyID and a value  From a description of the available options see [Timing](./Timing) and  [helics_enums](https://gmlc-tdc.github.io/HELICS-src/doxygen/helics__enums_8h.html) and [helics_definitions](https://gmlc-tdc.github.io/HELICS-src/doxygen/helics__definitions_8hpp.html)
+Federate info structures accept properties  as either Time values, integers, or flag values (bool).  These are entered through the `setProperty` calls or the `setFlagOption` call.
+The function calls take a propertyID and a value.
+For a description of the available options see [Timing](./Timing) and  [helics_enums](https://helics.readthedocs.org/latest/doxygen/helics__enums_8h.html) and [helics_definitions](https://helics.readthedocs.org/latest/doxygen/helics__definitions_8hpp.html)
 
 ## Timing control variables
 
