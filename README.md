@@ -51,17 +51,17 @@ Welcome to the repository for the Hierarchical Engine for Large-scale Infrastruc
 
 ## Installation Instructions
 
-[Windows](https://gmlc-tdc.github.io/HELICS-src/v2.0.0/installation/windows.html)
+[Windows](https://helics.readthedocs.io/en/latest/installation/windows.html)
 
-[Mac](https://gmlc-tdc.github.io/HELICS-src/v2.0.0/installation/mac.html)
+[Mac](https://helics.readthedocs.io/en/latest/installation/mac.html)
 
-[Linux](https://gmlc-tdc.github.io/HELICS-src/v2.0.0/installation/linux.html)
+[Ubuntu](https://helics.readthedocs.io/en/latest/installation/linux.html)
 
 ## Getting Started
 
 We've created a series of roughly 10-minute mini-tutorial videos that discuss various design topics, concepts, and interfaces, including how to use the tool. They can be found on our [YouTube channel](https://www.youtube.com/channel/UCPa81c4BVXEYXt2EShTzbcg).   
 
-The [Introduction to the HELICS documentation](https://gmlc-tdc.github.io/HELICS-src/v2.0.0/introduction/index.html) goes through a series of examples that step through the basic usage and concepts of HELICS.
+The [Introduction to the HELICS documentation](https://helics.readthedocs.io/en/latest/introduction/index.html) goes through a series of examples that step through the basic usage and concepts of HELICS.
 
 Several examples of HELICS federates and projects are located in [HELICS-Examples](https://github.com/GMLC-TDC/HELICS-Examples).  This repo provides a number of examples using the different libraries and interfaces.
 
@@ -69,11 +69,11 @@ The [HELICS-Tutorial repository](https://github.com/GMLC-TDC/HELICS-Tutorial) pr
 
 The [HELICS-Use-Cases repository](https://github.com/GMLC-TDC/HELICS-Use-Cases) includes examples for a growing range of research use cases for inspiration.
 
-A [Users guide](https://gmlc-tdc.github.io/HELICS-src/v2.0.0/users_guide/index.html) for getting started
+A [Users guide](https://helics.readthedocs.io/en/latest/user-guide/index.html) for getting started
 
 ## Documentation
 
-Our GitHub pages provides a set of [documentation](https://gmlc-tdc.github.io/HELICS-src/v2.0.0/index.html) including a set of introductory [examples](https://gmlc-tdc.github.io/HELICS-src/v2.0.0/introduction/index.html), a [developers guide](https://gmlc-tdc.github.io/HELICS-src/v2.0.0/developer-guide/index.html), complete doxygen generated [API documentation](https://gmlc-tdc.github.io/HELICS-src/v2.0.0/doxygen/), and more.  A few more questions and answers are available on the [Wiki](https://github.com/GMLC-TDC/HELICS-src/wiki).
+Our GitHub pages provides a set of [documentation](https://helics.readthedocs.io/en/latest/index.html) including a set of introductory [examples](https://helics.readthedocs.io/en/latest/introduction/index.html), a [developers guide](https://helics.readthedocs.io/en/latest/developer-guide/index.html), complete doxygen generated [API documentation](https://helics.readthedocs.io/en/latest/doxygen/annotated.html), and more.  A few more questions and answers are available on the [Wiki](https://github.com/GMLC-TDC/HELICS-src/wiki).
 
 Additionally, our initial requirements document can be found [here](docs/introduction/original_specification.md), which describes a number of our early design considerations.
 
@@ -104,8 +104,8 @@ We are always looking for help adding support for more tools, so please contact 
 ### HELICS helper Apps
 
 * [HELICS CLI](https://github.com/GMLC-TDC/helics-cli) provides a simple way to automate configuring, starting, and stopping HELICS co-simulations.
-* [Player](https://gmlc-tdc.github.io/HELICS-src/v2.0.0/apps/Player.html), which acts as a simple send-only federate that simply publishes a stream of timed HELICS messages from a user-defined file. HELICS Player is included in the HELICS distribution.
-* [Recorder](https://gmlc-tdc.github.io/HELICS-src/v2.0.0/apps/Recorder.html), which acts as a simple receive-only federate that prints out or saves messages from one or more subscribed streams. HELICS Recorder is included in the HELICS distribution.
+* [Player](https://helics.readthedocs.io/en/latest/apps/Player.html), which acts as a simple send-only federate that simply publishes a stream of timed HELICS messages from a user-defined file. HELICS Player is included in the HELICS distribution.
+* [Recorder](https://helics.readthedocs.io/en/latest/apps/Recorder.html), which acts as a simple receive-only federate that prints out or saves messages from one or more subscribed streams. HELICS Recorder is included in the HELICS distribution.
 
 ## Contributing
 Contributors are welcome see the [Contributing](CONTRIBUTING.md) guidelines for me details on the process of contributing.  And the [Code of Conduct](.github/CODE_OF_CONDUCT.md) for guidelines on the community expectations.  All prior contributors can be found [here](CONTRIBUTORS.md)
