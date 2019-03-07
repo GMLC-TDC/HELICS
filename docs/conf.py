@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+﻿#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 #
 # HELICS-src documentation build configuration file, created by
@@ -104,7 +104,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = 'HELICS-src'
-copyright = 'Copyright © 2017-2018,\nBattelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC\nAll rights reserved. See LICENSE file and DISCLAIMER for more details.'
+copyright = 'Copyright © 2017-2019,\nBattelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.See the top-level NOTICE for additional details.\nAll rights reserved.\nSPDX-License-Identifier: BSD-3-Clause\n'
 author = 'Philip Top, Jeff Daily, Ryan Mast, Dheepak Krishnamurthy, Andrew Fisher, Himanshu Jain, Bryan Palmintier, Jason Fuller'
 
 # The version info for the project you're documenting, acts as replacement for
