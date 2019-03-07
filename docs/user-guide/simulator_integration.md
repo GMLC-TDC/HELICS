@@ -20,9 +20,9 @@ At some point, maybe from the very beginning of your time with HELICS co-simulat
   4. **What is the nature of the values it will send to and receive from the rest of the federation?** Depending on the nature of the simulator, this may or may not be specifically definable but a general understanding of how this simulator will be used in a co-simulation should be clear. As a stand-alone simulator, what are its inputs and outputs? What are its assumed or provided boundary conditions? What kinds of values will it be providing to the rest of the federation?
 
 ## The Essential APIs ##
-With the answers to those clarifying questions in mind, let's look at the normal execution process used by a HELICS federate when co-simulating and the associated APIs for each of the languages. Many of these APIs are wrappers for one or more lower level APIs; additionally, there are many more detailed APIs that won't be discussed at all. If, as the simulator integrator, you have needs beyond what is discussed here you'll have to dig into the [developer documentation on the APIs]((https://helics.readthedocs.org/latest/doxygen/)) to get the details you need.
+With the answers to those clarifying questions in mind, let's look at the normal execution process used by a HELICS federate when co-simulating and the associated APIs for each of the languages. Many of these APIs are wrappers for one or more lower level APIs; additionally, there are many more detailed APIs that won't be discussed at all. If, as the simulator integrator, you have needs beyond what is discussed here you'll have to dig into the [developer documentation on the APIs]((https://helics.readthedocs.io/latest/doxygen/)) to get the details you need.
 
-For the remainder of this section of the guide, we'll assume the use of a Python binding and thus, at the top of the Python script ([after installing the Python HELICS module](https://helics.readthedocs.org/latest/installation/index.html)), you'll have to do something like this:
+For the remainder of this section of the guide, we'll assume the use of a Python binding and thus, at the top of the Python script ([after installing the Python HELICS module](https://helics.readthedocs.io/latest/installation/index.html)), you'll have to do something like this:
 
 ```
 import helics as h
@@ -36,7 +36,7 @@ Though not technically a pat of integrating a simulator its important to remembe
 broker = h.helicsCreateBroker("zmq", "main_broker", "--federates 2")
 
 ```
-The [Doxygen on this function](https://helics.readthedocs.org/latest/doxygen/helics_8h.html#aeb64e4cbbfd666b121a2814a0baef4de) shows that the first argument defines the core, the second the name of the broker, and the third is an initialization string which in this case, only specifies the number of federates in the federation.
+The [Doxygen on this function](https://helics.readthedocs.io/latest/doxygen/helics_8h.html#aeb64e4cbbfd666b121a2814a0baef4de) shows that the first argument defines the core, the second the name of the broker, and the third is an initialization string which in this case, only specifies the number of federates in the federation.
 
 
 
