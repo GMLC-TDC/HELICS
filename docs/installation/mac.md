@@ -18,6 +18,8 @@ Requirements
 Setup
 -----
 
+*Note*: Keep in mind that your cmake version should be newer than the boost version. If you have an older cmake, you may want an older boost version. Alternatively, you can choose to upgrade your version of cmake.
+
 To set up your environment:
 
 1. (if needed) Install git on your system for easy access to the
@@ -125,9 +127,11 @@ Building HELICS using gcc and python
 
 Firstly, you'll need gcc. You can `brew install gcc`. Depending on the version of gcc you'll need to modify the following instructions slightly. These instructions are for `gcc-8.2.0`.
 
-First you will need to build boost using gcc from source. Download
-[boost](http://www.boost.org/users/history/version_1_69_0.html) from the
+First you will need to build boost using gcc from source. Download the latest version of boost from the
 boost.org website.
+In the following example we are doing to use [boost v1.69.0](http://www.boost.org/users/history/version_1_69_0.html)
+Keep in mind that your cmake version should be newer than the boost version, so if you have an older cmake you may want an older boost version. Alternatively, you can choose to upgrade your version of cmake as well.
+
 
 Unzip the folder `boost_1_69_0` to any location, for example Downloads.
 
@@ -165,7 +169,7 @@ This will install boost in the `~/local/boost-gcc-1.69.0` folder
 Next, you will need to build HELICS and tell it what the `BOOST_ROOT` is.
 
 ```bash
-$ cmake -DCMAKE_INSTALL_PREFIX="/Users/$USER/local/helics-gcc-X.X.X/" -DBOOST_ROOT="/Users/$USER/local/boost-gcc-1.64" -DBUILD_PYTHON_INTERFACE=ON -DCMAKE_C_COMPILER=/usr/local/Cellar/gcc/8.2.0/bin/gcc-8 -DCMAKE_CXX_COMPILER=/usr/local/Cellar/gcc/8.2.0/bin/g++-8 ../
+$ cmake -DCMAKE_INSTALL_PREFIX="/Users/$USER/local/helics-gcc-X.X.X/" -DBOOST_ROOT="/Users/$USER/local/boost-gcc-1.69.0" -DBUILD_PYTHON_INTERFACE=ON -DCMAKE_C_COMPILER=/usr/local/Cellar/gcc/8.2.0/bin/gcc-8 -DCMAKE_CXX_COMPILER=/usr/local/Cellar/gcc/8.2.0/bin/g++-8 ../
 $ make clean; make -j 4; make install
 ```
 
