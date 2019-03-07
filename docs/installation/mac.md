@@ -123,28 +123,49 @@ Out[2]: 'x.x.x (XX-XX-XX)'
 Building HELICS using gcc and python
 ------------------------------------
 
+Firstly, you'll need gcc. You can `brew install gcc`. Depending on the version of gcc you'll need to modify the following instructions slightly. These instructions are for `gcc-8.2.0`.
+
 First you will need to build boost using gcc from source. Download
-[boost](http://www.boost.org/users/history/version_1_64_0.html) from the
+[boost](http://www.boost.org/users/history/version_1_69_0.html) from the
 boost.org website.
 
-Unzip the folder boost\_1\_64\_0 to any location, for example Downloads.
+Unzip the folder `boost_1_69_0` to any location, for example Downloads.
 
 ```bash
-$ cd ~/Downloads/boost_1_64_0
-$ ./bootstrap.sh --with-python=/Users/$USER/miniconda3/python3 --prefix=/usr/local/Cellar/gcc/7.2.0_1/bin/gcc-7
-$ ./bootstrap.sh --prefix=/ --prefix=/Users/$USER/local/boost-gcc-1.64
+$ cd ~/Downloads/boost_1_69_0
+$ ./bootstrap.sh --prefix=/ --prefix=/Users/$USER/local/boost-gcc-1.69.0
+```
+
+Open `project-config.jam` and changes the lines as follows:
+
+```
+# Compiler configuration. This definition will be used unless
+# you already have defined some toolsets in your user-config.jam
+# file.
+# if ! darwin in [ feature.values <toolset> ]
+# {
+    # using darwin ;
+# }
+
+# project : default-build <toolset>darwin ;
+
+using gcc : 8.2 : /usr/local/bin/g++-8 ;
+```
+
+
+```
 $ ./b2
 $ ./b2 install
 $ # OR
 $ ./bjam cxxflags='-fPIC' cflags='-fPIC' -a link=static install # For static linking
 ```
 
-This will install boost in the \~/local/boost-gcc-1.64 folder
+This will install boost in the `~/local/boost-gcc-1.69.0` folder
 
-Next, you will need to build HELICS and tell it what the BOOST\_ROOT is.
+Next, you will need to build HELICS and tell it what the `BOOST_ROOT` is.
 
 ```bash
-$ cmake -DCMAKE_INSTALL_PREFIX="/Users/$USER/local/helics-gcc-X.X.X/" -DBOOST_ROOT="/Users/$USER/local/boost-gcc-1.64" -DBUILD_PYTHON_INTERFACE=ON -DCMAKE_C_COMPILER=/usr/local/Cellar/gcc/7.2.0_1/bin/gcc-7 -DCMAKE_CXX_COMPILER=/usr/local/Cellar/gcc/7.2.0_1/bin/g++-7 ../
+$ cmake -DCMAKE_INSTALL_PREFIX="/Users/$USER/local/helics-gcc-X.X.X/" -DBOOST_ROOT="/Users/$USER/local/boost-gcc-1.64" -DBUILD_PYTHON_INTERFACE=ON -DCMAKE_C_COMPILER=/usr/local/Cellar/gcc/8.2.0/bin/gcc-8 -DCMAKE_CXX_COMPILER=/usr/local/Cellar/gcc/8.2.0/bin/g++-8 ../
 $ make clean; make -j 4; make install
 ```
 
