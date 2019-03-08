@@ -4,7 +4,7 @@
 Co-simulation is a powerful analysis technique that allows simulators of different domains to interact through the course of the simulation, typically by dynamically exchanging values that define boundary conditions for other simulators. HELICS is a co-simulation platform that has been designed to allow integration of these simulators across a variety of computation platforms and languages. HELICS has been designed with power system simulation in mind ([GridLAB-D](https://github.com/gridlab-d/gridlab-d), [GridDyn](https://github.com/LLNL/GridDyn), [MATPOWER](https://github.com/GMLC-TDC/MATPOWER-wrapper), [OpenDSS](https://sourceforge.net/projects/electricdss/), [PSLF](https://github.com/GMLC-TDC/PSLF-wrapper), [InterPSS](https://github.com/InterPSS-Project/ipss-common), [FESTIV](https://www.nrel.gov/grid/festiv-model.html)) but is general enough to support a wide variety of simulators and co-simulation tasks. Support for other domains is anticipated to increase over time.
 
 ## Who Is This User Guide For? ##
-There are a number of classes of HELICS users: 
+There are a number of classes of HELICS users:
 
 * New users that have little to no experience with HELICS and co-simulation in general
 * Intermediate users that have run co-simulations with HELICS using simulators in which somebody else implemented the HELICS support
@@ -28,9 +28,9 @@ There are a number of classes of HELICS users:
 * **Large Co-Simulations in HELICS (forthcoming)** - How to run HELICS co-simulations with a large (100+) number of federates
 
 ## Additional Resources ##
-* [HELICS API](https://gmlc-tdc.github.io/HELICS-src/doxygen/) - Doxygen of the current API. If you need to know the details of the APIs and function calls, this is the place.
-* [HELICS federate configuration](https://gmlc-tdc.github.io/HELICS-src/developer-guide/index.html) - Details on how the federates can be configured
-* [Installation](https://gmlc-tdc.github.io/HELICS-src/installation/index.html) -  Instructions on how to install HELICS
-* [C API](https://gmlc-tdc.github.io/HELICS-src/c-api-reference/index.html)
-* [Developer's Guide](https://gmlc-tdc.github.io/HELICS-src/developer-guide/index.html) - Details on how the software is assembled and some of the underlying components.
+* [HELICS API](https://helics.readthedocs.io/en/latest/doxygen/) - Doxygen of the current API. If you need to know the details of the APIs and function calls, this is the place.
+* [HELICS federate configuration](https://helics.readthedocs.io/en/latest/developer-guide/index.html) - Details on how the federates can be configured
+* [Installation](https://helics.readthedocs.io/en/latest//installation/index.html) -  Instructions on how to install HELICS
+* [C API](https://helics.readthedocs.io/en/latest/c-api-reference/index.html)
+* [Developer's Guide](https://helics.readthedocs.io/en/latest/developer-guide/index.html) - Details on how the software is assembled and some of the underlying components.
 * [Youtube Channel](https://www.youtube.com/channel/UCPa81c4BVXEYXt2EShTzbcg/featured) - Throughout the development of HELICS, developers and users have given mini-tutorials providing overviews of the work they have been doing. Due to its nature, many of the specifics of the content are out of date but many of the general concepts of HELICS haven't changed. A good, broad overview of the project as a whole.

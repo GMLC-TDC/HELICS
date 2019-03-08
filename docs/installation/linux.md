@@ -15,6 +15,8 @@ Requirements
 Setup
 -----
 
+*Note*: Keep in mind that your cmake version should be newer than the boost version. If you have an older cmake, you may want an older boost version. Alternatively, you can choose to upgrade your version of cmake.
+
 To set up your environment:
 
 1. Install dependencies using apt-get.

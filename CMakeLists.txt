@@ -817,7 +817,7 @@ if(ENABLE_PACKAGE_BUILD)
             CPACK_NSIS_URL_INFO_ABOUT
             "https://www.github.com/GMLC-TDC/Helics-src"
         )
-        set(CPACK_NSIS_HELP_LINK "https://gmlc-tdc.github.io/HELICS-src/")
+        set(CPACK_NSIS_HELP_LINK "https://helics.readthedocs.io/en/latest")
         set(CPACK_NSIS_CONTACT "helicsteam@helics.org")
         set(CPACK_NSIS_ENABLE_UNINSTALL_BEFORE_INSTALL ON)
 		set(CPACK_PACKAGE_INSTALL_DIRECTORY helics_${HELICS_VERSION_UNDERSCORE})
@@ -827,7 +827,7 @@ if(ENABLE_PACKAGE_BUILD)
             CPACK_NSIS_MENU_LINKS
             "https://www.github.com/GMLC-TDC/Helics-src"
             "HELICS Github"
-            "https://gmlc-tdc.github.io/HELICS-src/"
+            "https://helics.readthedocs.io/en/latest"
             "Helics Documentation"
             "https://www.helics.org"
             "Helics Web page"

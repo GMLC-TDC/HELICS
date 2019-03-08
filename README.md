@@ -37,7 +37,7 @@
   <tr>
   <td>Documentation</td>
   <td colspan="2" align="center">
-  <a href="http://gmlc-tdc.github.io/HELICS-src"><img src="https://img.shields.io/badge/docs-ready-blue.svg" alt="Documentation" /></a></td></tr>
+  <a href="https://helics.readthedocs.io/en/latest"><img src="https://img.shields.io/badge/docs-ready-blue.svg" alt="Documentation" /></a></td></tr>
 </table>
 
 
@@ -59,7 +59,7 @@ Welcome to the repository for the Hierarchical Engine for Large-scale Infrastruc
 
 ## Getting Started
 
-We've created a series of roughly 10-minute mini-tutorial videos that discuss various design topics, concepts, and interfaces, including how to use the tool. They can be found on our [YouTube channel](https://www.youtube.com/channel/UCPa81c4BVXEYXt2EShTzbcg).   
+We've created a series of roughly 10-minute mini-tutorial videos that discuss various design topics, concepts, and interfaces, including how to use the tool. They can be found on our [YouTube channel](https://www.youtube.com/channel/UCPa81c4BVXEYXt2EShTzbcg).
 
 The [Introduction to the HELICS documentation](https://helics.readthedocs.io/en/latest/introduction/index.html) goes through a series of examples that step through the basic usage and concepts of HELICS.
 
@@ -82,7 +82,7 @@ Additionally, our initial requirements document can be found [here](docs/introdu
 
 ## Tools with HELICS support
 
-As a co-simulation framework, HELICS is designed to bring together domain-specific modeling tools so they interact during run time. It effectively tries to build on the shoulders of giants by not reinventing trusted simulation tools, but instead, merely acting as a mediator to coordinate such interactions. HELICS's full power is only apparent when you use it to combine these domain-specific tools.  
+As a co-simulation framework, HELICS is designed to bring together domain-specific modeling tools so they interact during run time. It effectively tries to build on the shoulders of giants by not reinventing trusted simulation tools, but instead, merely acting as a mediator to coordinate such interactions. HELICS's full power is only apparent when you use it to combine these domain-specific tools.
 
 Thankfully the HELICS API is designed to be minimally invasive and make it straightforward to connect most any tool that provides either a scripting interface or access to source code. As listed below, a growing set of energy domain tools have HELICS support either natively or through an external interface. We also provide a set of helper apps for various utility and testing purposes.
 

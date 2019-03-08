@@ -94,7 +94,7 @@ The Following queries will be answered by a broker.
 Queries that must traverse the network travel along priority paths.  The calls are blocking but they do not wait for time advancement from any federate and take priority over regular communication.
 
 #### Application API
-There are two basic calls in the application API as part of a [federate object](https://helics.readthedocs.org/latest/doxygen/classhelics_1_1Federate.html)
+There are two basic calls in the application API as part of a [federate object](https://helics.readthedocs.io/latest/doxygen/classhelics_1_1Federate.html)
 In addition to the call described above a second version without the target
 ```
 std::string 	query (const std::string &queryStr)
@@ -109,12 +109,12 @@ query_id_t 	queryAsync (const std::string &target, const std::string &queryStr)
 
 This call returns a `query_id_t` that can be use in `queryComplete` and `isQueryComplet` functions.
 
-In the header [`<helics\queryFunctions.hpp>`](https://helics.readthedocs.org/latest/doxygen/queryFunctions_8hpp.html) a few helper functions are defined to vectorize query results and some utility functions to wait for a federate to enter init, or wait for a federate to join the federation.
+In the header [`<helics\queryFunctions.hpp>`](https://helics.readthedocs.io/latest/doxygen/queryFunctions_8hpp.html) a few helper functions are defined to vectorize query results and some utility functions to wait for a federate to enter init, or wait for a federate to join the federation.
 
 #### C-api and interface API's.
 
 Queries in the C api work similarly but the mechanics are different.
-The basic operation is to create a query using [`helicsQueryCreate(target,query)`](https://helics.readthedocs.org/latest/doxygen/helics_8h.html#ac290df999ec7e7527cb4337c5d3b1461)
+The basic operation is to create a query using [`helicsQueryCreate(target,query)`](https://helics.readthedocs.io/latest/doxygen/helics_8h.html#ac290df999ec7e7527cb4337c5d3b1461)
 
 This function returns a query object that can be used in one of the execute functions to generate results.
 It can be called asynchronously on a federate.
