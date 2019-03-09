@@ -8,13 +8,11 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include "../application_api/CombinationFederate.hpp"
 #include "json/forwards.h"
-namespace boost
+
+namespace CLI
 {
-namespace program_options
-{
-class variables_map;
-}  // namespace program_options
-}  // namespace boost
+class App;
+}  // namespace CLI
 namespace Json
 {
 class Value;
@@ -91,9 +89,6 @@ class App
     bool isActive () const { return !deactivated; }
 
   protected:
-    /** load argument from a variable map to be removed in the future*/
-    int loadArguments (boost::program_options::variables_map &vm_map);
-
     /** load from a jsonString
     @param jsonString either a JSON filename or a string containing JSON
     */
@@ -117,6 +112,7 @@ class App
     bool fileLoaded = false;
     bool deactivated = false;
     bool quietMode = false;
+    std::vector<std::string> remArgs;
 };
 }  // namespace apps
 }  // namespace helics

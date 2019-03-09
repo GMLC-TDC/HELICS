@@ -106,6 +106,7 @@ set(
 	CommsBroker_impl.hpp
 	TimeoutMonitor.h
 	CoreBroker.hpp
+	helicsCLI11.hpp
 	InterfaceInfo.hpp
 	ActionMessageDefintions.hpp
 	ActionMessage.hpp

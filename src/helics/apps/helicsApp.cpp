@@ -10,7 +10,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <fstream>
 #include <iostream>
 
-#include "../common/argParser.h"
+#include "../core/helicsCLI11.hpp"
 #include <boost/filesystem.hpp>
 
 #include "../common/JsonProcessingFunctions.hpp"
@@ -37,52 +37,54 @@ namespace helics
 {
 namespace apps
 {
-static const ArgDescriptors basicAppArgs{{"local", ArgDescriptor::arg_type_t::flag_type,
-                                          "specify otherwise unspecified endpoints and publications as local( "
-                                          "i.e.the keys will be prepended with the player name"},
-                                         {"stop", "the time to stop the player"},
+static const ArgDescriptors basicAppArgs{{
+                                           "local",
+                                           ArgDescriptor::arg_type_t::flag_type,
+                                         },
+                                         {
+                                           "stop",
+                                         },
                                          {"quiet", ArgDescriptor::arg_type_t::flag_type,
                                           "turn off most display output"}};
 
 App::App (const std::string &defaultAppName, int argc, char *argv[])
 {
-    variable_map vm_map;
-    // check for quiet mode
-    for (int ii = 0; ii < argc; ++ii)
+    helicsCLI11 app ("helics App Parser");
+
+    app.add_flag ("--local", useLocal,
+                  "specify otherwise unspecified endpoints and publications as local( "
+                  "i.e.the keys will be prepended with the player name)");
+    app.add_option ("--stop", stopTime, "The time to stop the app")->type_name ("TIME");
+    app.add_option ("--input,input", masterFileName, "The primary input file")->check (CLI::ExistingFile);
+    app.allow_extras ();
+    auto ret = app.helics_parse (argc, argv);
+
+    if (ret == helicsCLI11::parse_return::help_return)
     {
-        if (argv[ii] != nullptr)
-        {
-            if (strcmp (argv[ii], "--quiet") == 0)
-            {
-                quietMode = true;
-            }
-        }
-    }
-    auto res = argumentParser (argc, argv, vm_map, basicAppArgs, "input");
-    if (vm_map.count ("quiet") > 0)
-    {
-        quietMode = true;
-    }
-    if (res == versionReturn)
-    {
-        if (!quietMode)
-        {
-            std::cout << helics::versionString << '\n';
-        }
-    }
-    if (res == helpReturn)
-    {
-        if (!quietMode)
+        if (!app.quiet)
         {
             // this is just to run the help output
             FederateInfo helpTemp (argc, argv);
         }
     }
-    if (res != 0)
+    if (ret != helicsCLI11::parse_return::ok)
     {
         deactivated = true;
         return;
     }
+
+    if (masterFileName.empty ())
+    {
+        if (!fileLoaded)
+        {
+            if (CLI::ExistingFile ("helics.json").empty ())
+            {
+                masterFileName = "helics.json";
+            }
+        }
+    }
+    remArgs = app.remaining ();
+
     FederateInfo fi (argc, argv);
     if (fi.defName.empty ())
     {
@@ -90,7 +92,6 @@ App::App (const std::string &defaultAppName, int argc, char *argv[])
     }
 
     fed = std::make_shared<CombinationFederate> ("", fi);
-    App::loadArguments (vm_map);
 }
 
 App::App (const std::string &appName, const FederateInfo &fi)
@@ -217,34 +218,6 @@ void App::run ()
 {
     runTo (stopTime);
     fed->disconnect ();
-}
-
-int App::loadArguments (boost::program_options::variables_map &vm_map)
-{
-    if (vm_map.count ("local") != 0u)
-    {
-        useLocal = true;
-    }
-    if (vm_map.count ("input") == 0)
-    {
-        if (!fileLoaded)
-        {
-            if (filesystem::exists ("helics.json"))
-            {
-                masterFileName = "helics.json";
-            }
-        }
-    }
-    else if (filesystem::exists (vm_map["input"].as<std::string> ()))
-    {
-        masterFileName = vm_map["input"].as<std::string> ();
-    }
-
-    if (vm_map.count ("stop") > 0)
-    {
-        stopTime = loadTimeFromString (vm_map["stop"].as<std::string> ());
-    }
-    return 0;
 }
 
 }  // namespace apps

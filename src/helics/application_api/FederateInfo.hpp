@@ -9,6 +9,7 @@ SPDX-License-Identifier: BSD-3-Clause
 
 namespace helics
 {
+class helicsCLI11App;
 /** data class defining federate properties and information
  */
 class FederateInfo : public CoreFederateInfo
@@ -38,11 +39,24 @@ class FederateInfo : public CoreFederateInfo
     @param argv an array of char * pointers to the arguments
     */
     FederateInfo (int argc, const char *const *argv);
+    /** load a federateInfo object from arguments stored in a vector
+    @details calls /ref loadInfoFromArgs in the constructor
+    @param argc the number of arguments
+    @param argv an array of char * pointers to the arguments
+    */
+    FederateInfo (std::vector<std::string> &args);
     /** load a federateInfo object from command line arguments outside the constructor
     @param argc the number of arguments
     @param argv an array of char * pointers to the arguments
     */
     void loadInfoFromArgs (int argc, const char *const *argv);
+    /** load a federateInfo object from command line arguments contained in a vector
+    @param[inout] args a vector of arguments to load
+    */
+    void loadInfoFromArgs (std::vector<std::string> &args);
+
+  private:
+    std::unique_ptr<helicsCLI11App> makeCLIApp ();
 };
 
 /** generate a FederateInfo object from a config file (JSON, TOML)

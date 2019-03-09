@@ -15,40 +15,14 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <iostream>
 #include <set>
 
-#include "../common/argParser.h"
 #include "../common/stringOps.h"
+#include "../core/helicsCLI11.hpp"
 
 namespace helics
 {
-using namespace std::string_literals;
-static const ArgDescriptors InfoArgs{
-  {"broker,b"s, "address or name of the broker to connect"s},
-  {"name,n"s, "name of the federate"s},
-  {"corename"s, "the name of the core to create or find"s},
-  {"coretype,t"s, "type of the core to connect to"s},
-  {"offset"s, "the offset of the time steps"s},
-  {"period"s, "the period of the federate"s},
-  {"timedelta"s, "the time delta of the federate"s},
-  {"rttolerance"s, "the time tolerance of the real time mode"s},
-  {"rt_lag"s, "the amount of the time the federate is allowed to lag realtime before corrective action is taken"s},
-  {"rt_lead"s,
-   "the amount of the time the federate is allowed to lead realtime before corrective action is taken"s},
-  {"coreinit,i"s, "the core initialization string"s},
-  {"coreinitstring"s, "the core initialization string"s},
-  {"maxiterations"s, ArgDescriptor::arg_type_t::int_type,
-   "the maximum number of iterations a federate is allowed to take"s},
-  {"log_level"s, ArgDescriptor::arg_type_t::int_type, "the logging level of a federate"s},
-  {"separator"s, "separator character for local federates"s},
-  {"inputdelay"s, "the input delay on incoming communication of the federate"s},
-  {"outputdelay"s, "the output delay for outgoing communication of the federate"s},
-  {"brokerport"s, ArgDescriptor::arg_type_t::int_type, "port number for the broker priority port"s},
-  {"localport"s, "port number for the local receive port"s},
-  {"autobroker"s, ArgDescriptor::arg_type_t::flag_type,
-   "tell the core to automatically generate a broker if needed"s},
-  {"port"s, ArgDescriptor::arg_type_t::int_type, "port number for the broker's port"s},
-  {"flags,f"s, ArgDescriptor::arg_type_t::vector_string, "named flag for the federate"s}};
-
 FederateInfo::FederateInfo (int argc, const char *const *argv) { loadInfoFromArgs (argc, argv); }
+
+FederateInfo::FederateInfo (std::vector<std::string> &args) { loadInfoFromArgs (args); }
 
 static const std::map<std::string, int> propStringsTranslations{
   {"period", helics_property_time_period},
@@ -151,6 +125,21 @@ static const std::map<std::string, int> optionStringsTranslations{
   {"stricttypematching", helics_handle_option_strict_type_checking},
   {"strict", helics_handle_option_strict_type_checking}};
 
+static const std::map<std::string, int> log_level_map{{"none", helics_log_level_no_print},
+                                                      {"no_print", helics_log_level_no_print},
+                                                      {"error", helics_log_level_error},
+                                                      {"warning", helics_log_level_warning},
+                                                      {"summary", helics_log_level_summary},
+                                                      {"connections", helics_log_level_connections},
+                                                      /** connections+ interface definitions*/
+                                                      {"interfaces", helics_log_level_interfaces},
+                                                      /** interfaces + timing message*/
+                                                      {"timing", helics_log_level_timing},
+                                                      /** timing+ data transfer notices*/
+                                                      {"data", helics_log_level_data},
+                                                      /** all internal messages*/
+                                                      {"trace", helics_log_level_trace}};
+
 static void loadFlags (FederateInfo &fi, const std::string &flags)
 {
     auto sflgs = stringOps::splitline (flags);
@@ -225,113 +214,126 @@ int getOptionIndex (std::string val)
     return -1;
 }
 
+using namespace std::string_literals;
+
+std::unique_ptr<helicsCLI11App> FederateInfo::makeCLIApp ()
+{
+    auto app = std::make_unique<helicsCLI11App> ("Federate Info Parsing");
+
+    app->add_option ("--name,-n", defName, "name of the federate");
+    app->add_option ("--corename", coreName, "the name of the core to create or find")->ignore_underscore ();
+    app->add_option_function<std::string> (
+      "--coretype,-t,--type,--core",
+      [this] (const std::string &val) {
+          coreType = helics::coreTypeFromString (val);
+          if (coreType == core_type::UNRECOGNIZED)
+              throw CLI::ValidationError (val + " is NOT a recognized core type");
+      },
+      "type of the core to connect to");
+    app->add_option ("--coreinitstring,-i,--coreinit", coreInitString, "The initialization arguments for the core")
+      ->transform ([] (std::string arg) {
+          arg.insert (arg.begin (), ' ');
+          return arg;
+      })
+      ->ignore_underscore ();
+    app->add_option ("--broker,--broker_address", broker, "address or name of the broker to connect")
+      ->ignore_underscore ();
+    app->add_option ("--brokerport", brokerPort, "Port number of the Broker")
+      ->ignore_underscore ()
+      ->check (CLI::PositiveNumber);
+
+    app
+      ->add_option_function<int> (
+        "--port",
+        [this] (int port) {
+            if (brokerPort > 0)
+                localport = std::to_string (port);
+            else
+                brokerPort = port;
+        },
+        "Specify the port number to use")
+      ->check (CLI::PositiveNumber);
+    app->add_option ("--localport", localport, "Port number to use for connections to this federate")
+      ->ignore_underscore ();
+    app->add_flag ("--autobroker", autobroker, "tell the core to automatically generate a broker if needed");
+
+    app->add_option_function<Time> (
+      "--offset", [this] (Time val) { setProperty (helics_property_time_offset, val); },
+      "the offset of the time steps");
+    app->add_option_function<Time> (
+      "--period", [this] (Time val) { setProperty (helics_property_time_period, val); },
+      "the execution cycle of the federate");
+    app->add_option_function<Time> (
+      "--time_delta", [this] (Time val) { setProperty (helics_property_time_delta, val); },
+      "The minimum time between time grants for a Federate");
+    app
+      ->add_option_function<Time> (
+        "--rt_lag", [this] (Time val) { setProperty (helics_property_time_rt_lag, val); },
+        "the amount of the time the federate is allowed to lag realtime before corrective action is taken")
+      ->ignore_underscore ();
+    app
+      ->add_option_function<Time> (
+        "--rt_lead", [this] (Time val) { setProperty (helics_property_time_rt_lead, val); },
+        "the amount of the time the federate is allowed to lead realtime before corrective action is taken")
+      ->ignore_underscore ();
+    app
+      ->add_option_function<Time> (
+        "--rt_tolerance", [this] (Time val) { setProperty (helics_property_time_rt_tolerance, val); },
+        "the time tolerance of the real time mode")
+      ->ignore_underscore ();
+
+    app
+      ->add_option_function<Time> (
+        "--input_delay", [this] (Time val) { setProperty (helics_property_time_input_delay, val); },
+        "the input delay on incoming communication of the federate")
+      ->ignore_underscore ();
+    app
+      ->add_option_function<Time> (
+        "--output_delay", [this] (Time val) { setProperty (helics_property_time_output_delay, val); },
+        "the output delay for outgoing communication of the federate")
+      ->ignore_underscore ();
+    app
+      ->add_option_function<int> (
+        "--maxiterations", [this] (int val) { setProperty (helics_property_int_max_iterations, val); },
+        "the maximum number of iterations a federate is allowed to take")
+      ->ignore_underscore ()
+      ->check (CLI::PositiveNumber);
+    app
+      ->add_option_function<int> (
+        "--log_level,--log-level", [this] (int val) { setProperty (helics_property_time_output_delay, val); },
+        "the logging level of a federate")
+      ->ignore_underscore ()
+      ->transform (CLI::CheckedTransformer (&log_level_map, CLI::ignore_case, CLI::ignore_underscore));
+
+    app
+      ->add_option (
+        "--separator",
+        [this] (CLI::results_t res) {
+            separator = res[0][0];
+            if (res[0].size () != 1)
+                return false;
+            return true;
+        },
+        "separator character for local federates")
+      ->default_str (std::string (1, separator))
+      ->type_size (1)
+      ->type_name ("CHAR");
+    app->add_option ("--flags,-f,--flag", "named flag for the federate")
+      ->type_size (-1)
+      ->delimiter (',')
+      ->each ([this] (const std::string &flag) { loadFlags (*this, flag); });
+}
+
 void FederateInfo::loadInfoFromArgs (int argc, const char *const *argv)
 {
-    variable_map vm;
-    auto res = argumentParser (argc, argv, vm, InfoArgs);
-    if (res == versionReturn)
-    {
-        std::cout << helics::versionString << '\n';
-    }
-    if (res < 0)
-    {
-        return;
-    }
-    if (vm.count ("name") > 0)
-    {
-        defName = vm["name"].as<std::string> ();
-    }
-    if (vm.count ("corename") > 0)
-    {
-        coreName = vm["corename"].as<std::string> ();
-    }
-    if (vm.count ("core") > 0)
-    {
-        coreType = helics::coreTypeFromString (vm["core"].as<std::string> ());
-    }
-    if (vm.count ("type") > 0)
-    {
-        coreType = helics::coreTypeFromString (vm["type"].as<std::string> ());
-    }
-    if (vm.count ("coretype") > 0)
-    {
-        coreType = helics::coreTypeFromString (vm["coretype"].as<std::string> ());
-    }
+    auto app = makeCLIApp ();
+    app->helics_parse (argc, argv);
+}
 
-    coreInitString = "";
-    if (vm.count ("coreinit") > 0)
-    {
-        coreInitString.push_back (' ');
-        coreInitString = vm["coreinit"].as<std::string> ();
-    }
-    if (vm.count ("coreinitstring") > 0)
-    {
-        coreInitString.push_back (' ');
-        coreInitString = vm["coreinitstring"].as<std::string> ();
-    }
-    if (vm.count ("broker") > 0)
-    {
-        broker = vm["broker"].as<std::string> ();
-    }
-    if (vm.count ("broker_address") > 0)
-    {
-        broker = vm["broker_address"].as<std::string> ();
-    }
-    if (vm.count ("port") > 0)
-    {  // there is some ambiguity of what port could mean this is dealt with later
-        brokerPort = vm["port"].as<int> ();
-    }
-    if (vm.count ("brokerport") > 0)
-    {
-        if (brokerPort >= 0)
-        {
-            localport = std::to_string (brokerPort);
-        }
-        else
-        {
-            brokerPort = vm["brokerport"].as<int> ();
-        }
-    }
-    if (vm.count ("localport") > 0)
-    {
-        localport = vm["localport"].as<std::string> ();
-    }
-    for (auto &tprop : validTimeProperties)
-    {
-        if (vm.count (tprop) > 0)
-        {
-            setProperty (propStringsTranslations.at (tprop), loadTimeFromString (vm[tprop].as<std::string> ()));
-        }
-    }
-    for (auto &iprop : validIntProperties)
-    {
-        if (vm.count (iprop) > 0)
-        {
-            setProperty (propStringsTranslations.at (iprop), vm[iprop].as<int> ());
-        }
-    }
-
-    if (vm.count ("separator") > 0)
-    {
-        auto sep = vm["separator"].as<std::string> ();
-        if (!sep.empty ())
-        {
-            separator = sep[0];
-        }
-    }
-
-    if (vm.count ("autobroker") > 0)
-    {
-        autobroker = true;
-    }
-    if (vm.count ("flags") > 0)
-    {
-        auto vflag = vm["flags"].as<std::vector<std::string>> ();
-        for (auto &flag : vflag)
-        {
-            loadFlags (*this, flag);
-        }
-    }
+void FederateInfo::loadInfoFromArgs (std::vector<std::string> &args)
+{
+    auto app = makeCLIApp ();
+    app->helics_parse (args);
 }
 
 static FederateInfo loadFederateInfoJson (const std::string &jsonString);
@@ -368,15 +370,15 @@ FederateInfo loadFederateInfoJson (const std::string &jsonString)
         throw (helics::InvalidParameter (ia.what ()));
     }
 
-    std::function<void(const std::string &, bool)> flagCall = [&fi](const std::string &fname, bool arg) {
+    std::function<void(const std::string &, bool)> flagCall = [&fi] (const std::string &fname, bool arg) {
         fi.setFlagOption (propStringsTranslations.at (fname), arg);
     };
 
-    std::function<void(const std::string &, Time)> timeCall = [&fi](const std::string &fname, Time arg) {
+    std::function<void(const std::string &, Time)> timeCall = [&fi] (const std::string &fname, Time arg) {
         fi.setProperty (propStringsTranslations.at (fname), arg);
     };
 
-    std::function<void(const std::string &, int)> intCall = [&fi](const std::string &fname, int arg) {
+    std::function<void(const std::string &, int)> intCall = [&fi] (const std::string &fname, int arg) {
         fi.setProperty (propStringsTranslations.at (fname), arg);
     };
 
@@ -497,15 +499,15 @@ FederateInfo loadFederateInfoToml (const std::string &tomlString)
     {
         throw (helics::InvalidParameter (ia.what ()));
     }
-    std::function<void(const std::string &, bool)> flagCall = [&fi](const std::string &fname, bool arg) {
+    std::function<void(const std::string &, bool)> flagCall = [&fi] (const std::string &fname, bool arg) {
         fi.setFlagOption (propStringsTranslations.at (fname), arg);
     };
 
-    std::function<void(const std::string &, Time)> timeCall = [&fi](const std::string &fname, Time arg) {
+    std::function<void(const std::string &, Time)> timeCall = [&fi] (const std::string &fname, Time arg) {
         fi.setProperty (propStringsTranslations.at (fname), arg);
     };
 
-    std::function<void(const std::string &, int)> intCall = [&fi](const std::string &fname, int arg) {
+    std::function<void(const std::string &, int)> intCall = [&fi] (const std::string &fname, int arg) {
         fi.setProperty (propStringsTranslations.at (fname), arg);
     };
 

@@ -11,7 +11,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <iostream>
 
 #include "../common/JsonProcessingFunctions.hpp"
-#include "../common/argParser.h"
+#include "../core/helicsCLI11.hpp"
 #include "../core/helicsVersion.hpp"
 #include <set>
 #include <stdexcept>
@@ -24,7 +24,8 @@ static const ArgDescriptors InfoArgs{{"delay", "the delay with which the echo ap
 
 Echo::Echo (int argc, char *argv[]) : App ("echo", argc, argv)
 {
-    variable_map vm_map;
+    helicsCLIApp app ("Parser for Echo object");
+    app.add_ variable_map vm_map;
     if (!deactivated)
     {
         argumentParser (argc, argv, vm_map, InfoArgs);
@@ -110,7 +111,7 @@ void Echo::addEndpoint (const std::string &endpointName, const std::string &endp
 {
     endpoints.emplace_back (fed->registerGlobalEndpoint (endpointName, endpointType));
     endpoints.back ().setCallback (
-      [this](const Endpoint &ept, Time messageTime) { echoMessage (ept, messageTime); });
+      [this] (const Endpoint &ept, Time messageTime) { echoMessage (ept, messageTime); });
 }
 
 int Echo::loadArguments (boost::program_options::variables_map &vm_map)
@@ -131,7 +132,7 @@ void Echo::loadJsonFile (const std::string &jsonFile)
     {
         endpoints.emplace_back (fed->getEndpoint (ii));
         endpoints.back ().setCallback (
-          [this](const Endpoint &ept, Time messageTime) { echoMessage (ept, messageTime); });
+          [this] (const Endpoint &ept, Time messageTime) { echoMessage (ept, messageTime); });
     }
 
     auto doc = loadJson (jsonFile);
