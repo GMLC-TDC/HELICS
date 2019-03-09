@@ -2,6 +2,11 @@
 <img src="docs/img/HELICS_Logo.png" width="400">
 </p>
 
+[![](https://badges.gitter.im/GMLC-TDC/HELICS-src.png)](https://gitter.im/GMLC-TDC/HELICS-src)
+[![](https://img.shields.io/badge/docs-ready-blue.svg)](https://helics.readthedocs.io/en/latest)
+[![](https://img.shields.io/conda/pn/gmlc-tdc/helics.svg)](https://anaconda.org/gmlc-tdc/helics/)
+[![Releases](https://img.shields.io/github/tag-date/GMLC-TDC/HELICS-src.svg)](https://github.com/GMLC-TDC/HELICS-src/releases)
+[![](https://img.shields.io/badge/License-BSD-blue.svg)](https://github.com/GMLC-TDC/HELICS-src/blob/master/LICENSE)
 ## Build Status
 <table>
   <tr>
@@ -29,15 +34,6 @@
   <td><a href="https://codecov.io/gh/GMLC-TDC/HELICS-src"><img src="https://codecov.io/gh/GMLC-TDC/HELICS-src/branch/master/graph/badge.svg" alt="codecov" /></a></td>
   <td><a href="https://codecov.io/gh/GMLC-TDC/HELICS-src/branch/develop"><img src="https://codecov.io/gh/GMLC-TDC/HELICS-src/branch/develop/graph/badge.svg" alt="codecov" /></a></td>
   </tr>
-  <tr>
-  <td>Gitter</td>
-  <td colspan="2" align="center">
-  <a href="https://gitter.im/GMLC-TDC/HELICS-src"><img src="https://badges.gitter.im/GMLC-TDC/HELICS-src.png" alt="Gitter Chat" /></a></td>
-  </tr>
-  <tr>
-  <td>Documentation</td>
-  <td colspan="2" align="center">
-  <a href="https://helics.readthedocs.io/en/latest"><img src="https://img.shields.io/badge/docs-ready-blue.svg" alt="Documentation" /></a></td></tr>
 </table>
 
 
