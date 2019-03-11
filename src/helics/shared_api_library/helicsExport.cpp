@@ -1,7 +1,8 @@
 /*
 Copyright © 2017-2019,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
-All rights reserved. See LICENSE file and DISCLAIMER for more details.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See the top-level NOTICE for
+additional details. All rights reserved.
+SPDX-License-Identifier: BSD-3-Clause
 */
 #include "../common/logger.h"
 #include "../core/BrokerFactory.hpp"
@@ -144,7 +145,7 @@ void helicsErrorHandler (helics_error *err) noexcept
             }
             else
             {
-                err->error_code = other_error_type;
+                err->error_code = helics_error_external_type;
                 err->message = unknown_err_string;
             }
         }
@@ -185,18 +186,18 @@ void helicsErrorHandler (helics_error *err) noexcept
         }
         catch (const std::exception &exc)
         {
-            err->error_code = other_error_type;
+            err->error_code = helics_error_external_type;
             err->message = getMasterHolder ()->addErrorString (exc.what ());
         }
         catch (...)
         {
-            err->error_code = other_error_type;
+            err->error_code = helics_error_external_type;
             err->message = unknown_err_string;
         }
     }
     catch (...)
     {
-        err->error_code = other_error_type;
+        err->error_code = helics_error_external_type;
         err->message = unknown_err_string;
     }
 }

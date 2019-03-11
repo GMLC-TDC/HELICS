@@ -1,7 +1,8 @@
 /*
 Copyright © 2017-2019,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
-All rights reserved. See LICENSE file and DISCLAIMER for more details.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
+the top-level NOTICE for additional details. All rights reserved.
+SPDX-License-Identifier: BSD-3-Clause
 */
 #pragma once
 
@@ -77,7 +78,8 @@ class CoreBroker : public Broker, public BrokerBase
     bool _gateway = false;  //!< set to true if this broker should act as a gateway.
   private:
     std::atomic<bool> _isRoot{false};  //!< set to true if this object is a root broker
-    bool isRootc = false;
+    bool isRootc{false};
+    bool connectionEstablished{false};  //!< the setup has been received by the core loop thread
     int routeCount = 1;  //!< counter for creating new routes;
     DualMappedVector<BasicFedInfo, std::string, global_federate_id> _federates;  //!< container for all federates
     DualMappedVector<BasicBrokerInfo, std::string, global_broker_id>
@@ -105,6 +107,7 @@ class CoreBroker : public Broker, public BrokerBase
     JsonMapBuilder dataflowMap;  //!< builder for the dependency graph
     std::vector<ActionMessage> dataflowMapRequestors;  //!< list of requesters for the dependency graph
 
+    std::vector<ActionMessage> earlyMessages;  //!< list of messages that came before connection
     TriggerVariable disconnection;  //!< controller for the disconnection process
     std::unique_ptr<TimeoutMonitor> timeoutMon;  //!< class to handle timeouts and disconnection notices
     std::atomic<uint16_t> nextAirLock{0};  //!< the index of the next airlock to use

@@ -1,19 +1,22 @@
 # Value Federates
 
-Value Federates provide the API for direct data transfer interfaces This includes Publications and Inputs.  Publications are outgoing data, and inputs are incoming data.  Value federates provide the API to generate and interact with those types of interfaces.  This can be done with configuration files or through API calls.
+Value Federates provide the API for direct data transfer interfaces This includes Publications and Inputs.
+Publications are outgoing data, and inputs are incoming data.
+Value federates provide the API to generate and interact with those types of interfaces.
+This can be done with configuration files or through API calls.
 
 ## API calls
 
 Publications and Inputs can be declared through ValueFederate methods.
-these are defined in ValueFederate.hpp and Publications.hpp and Inputs.hpp.  For the ValueFederate api the register calls return
-a Publication or Input reference These objects can be used through ValueFederate calls or as independent object with their own methods.    
+These are defined in ValueFederate.hpp and Publications.hpp and Inputs.hpp.
+For the ValueFederate api the register calls return a Publication or Input reference.
+These objects can be used through ValueFederate calls or as independent object with their own methods.
 
+<!-- TODO:: add links to other generated documents -->
 
-TODO:: add links to other generated documents
+### File configuration
 
-### file configuration
-
-File based configuration looks primarily at an "publications" or "subscriptions" JSON array
+File based configuration looks primarily at an "publications" or "subscriptions" JSON array.
 
 ```
 //this should be a valid json file (except comments are not recognized in standard JSON)
@@ -75,5 +78,7 @@ File based configuration looks primarily at an "publications" or "subscriptions"
 
 
 ```
-###### Notes
-Shortcuts just provide a shortcut name for later reference instead of having to use a potentially longer key, the shortcut is only relevant inside a single federate
+
+### Notes
+
+Shortcuts just provide a shortcut name for later reference instead of having to use a potentially longer key, the shortcut is only relevant inside a single federate.

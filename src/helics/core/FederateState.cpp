@@ -1,7 +1,8 @@
 /*
 Copyright © 2017-2019,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
-All rights reserved. See LICENSE file and DISCLAIMER for more details.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
+the top-level NOTICE for additional details. All rights reserved.
+SPDX-License-Identifier: BSD-3-Clause
 */
 #include "FederateState.hpp"
 
@@ -1363,17 +1364,15 @@ void FederateState::setInterfaceProperty (const ActionMessage &cmd)
                                                       checkActionFlag (cmd, indicator_flag));
         if (!used)
         {
-            auto ipt = interfaceInformation.getInput(cmd.dest_handle);
+            auto ipt = interfaceInformation.getInput (cmd.dest_handle);
             if (ipt != nullptr)
             {
-                LOG_WARNING(fmt::format("property {} not used on input {}", cmd.messageID,
-                    ipt->key));
+                LOG_WARNING (fmt::format ("property {} not used on input {}", cmd.messageID, ipt->key));
             }
             else
             {
-                LOG_WARNING(fmt::format("property {} not used on due to unknown input", cmd.messageID));
+                LOG_WARNING (fmt::format ("property {} not used on due to unknown input", cmd.messageID));
             }
-           
         }
         break;
     case 'p':
@@ -1381,15 +1380,14 @@ void FederateState::setInterfaceProperty (const ActionMessage &cmd)
                                                             checkActionFlag (cmd, indicator_flag));
         if (!used)
         {
-            auto pub = interfaceInformation.getPublication(cmd.dest_handle);
+            auto pub = interfaceInformation.getPublication (cmd.dest_handle);
             if (pub != nullptr)
             {
-                LOG_WARNING(fmt::format("property {} not used on Publication {}", cmd.messageID,
-                    pub->key));
+                LOG_WARNING (fmt::format ("property {} not used on Publication {}", cmd.messageID, pub->key));
             }
             else
             {
-                LOG_WARNING(fmt::format("property {} not used on due to unknown Publication", cmd.messageID));
+                LOG_WARNING (fmt::format ("property {} not used on due to unknown Publication", cmd.messageID));
             }
         }
         break;
@@ -1398,15 +1396,14 @@ void FederateState::setInterfaceProperty (const ActionMessage &cmd)
                                                       checkActionFlag (cmd, indicator_flag));
         if (!used)
         {
-            auto ept = interfaceInformation.getEndpoint(cmd.dest_handle);
+            auto ept = interfaceInformation.getEndpoint (cmd.dest_handle);
             if (ept != nullptr)
             {
-                LOG_WARNING(fmt::format("property {} not used on Endpoint {}", cmd.messageID,
-                    ept->key));
+                LOG_WARNING (fmt::format ("property {} not used on Endpoint {}", cmd.messageID, ept->key));
             }
             else
             {
-                LOG_WARNING(fmt::format("property {} not used on due to unknown Endpoint", cmd.messageID));
+                LOG_WARNING (fmt::format ("property {} not used on due to unknown Endpoint", cmd.messageID));
             }
         }
         break;

@@ -1,11 +1,11 @@
 # Core Types
 
 There are several different core/broker types available in HELICS
-These can be used in different circumstances depending on the platorm and system desires
+These can be used in different circumstances depending on the platform and system desires
 
 ### Test
 
-The Test core functions in a single process, and works through interthread communications.
+The Test core functions in a single process, and works through inter-thread communications.
 Its primary purpose is to test communication patterns and algorithms.  However, in situations
 where all federates can be run in a single process it is probably the fastest and easiest to setup, and it is fully operational.
 
@@ -18,7 +18,7 @@ multi tiered brokers.
 ### ZMQ
 
 The ZMQ is the primary core to use for multi-machine systems.  It uses the
-[ZMQ](zeromq.com) mechanisms.  Internally it makes use of the REQ/REP mechanics for priority
+[ZMQ](https://zeromq.org) mechanisms.  Internally it makes use of the REQ/REP mechanics for priority
 communications and PUSH/PULL for non-priority communication messages.
 
 ### ZMQ_SS

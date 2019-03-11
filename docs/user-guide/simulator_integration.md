@@ -7,8 +7,8 @@ At some point, maybe from the very beginning of your time with HELICS co-simulat
   2. **What programming language will be used?** - HELICS has bindings for a number of languages and the one that is best to use may or may not be obvious. If you're integration of the simulator will be through the API of the existing simulator, then you'll likely be writing a standalone executable that wraps that API. You may be constrained on the choice of languages based on the method of interaction with that API. If the API is accessed through a network socket then you likely have a lot of freedom in language choice. If the API is a library that you call from within wrapper, you will likely be best of using the language of that library.
 
   If you're writing your own simulator then you have a lot more freedom and the language you use may come down to personal preference and/or performance requirements of the federate.
-  
-  The languages currently supported by HELICS are: 
+
+  The languages currently supported by HELICS are:
    - C++
    - C
    - Python (2 and 3)
@@ -20,9 +20,9 @@ At some point, maybe from the very beginning of your time with HELICS co-simulat
   4. **What is the nature of the values it will send to and receive from the rest of the federation?** Depending on the nature of the simulator, this may or may not be specifically definable but a general understanding of how this simulator will be used in a co-simulation should be clear. As a stand-alone simulator, what are its inputs and outputs? What are its assumed or provided boundary conditions? What kinds of values will it be providing to the rest of the federation?
 
 ## The Essential APIs ##
-With the answers to those clarifying questions in mind, let's look at the normal execution process used by a HELICS federate when co-simulating and the associated APIs for each of the languages. Many of these APIs are wrappers for one or more lower level APIs; additionally, there are many more detailed APIs that won't be discussed at all. If, as the simulator integrator, you have needs beyond what is discussed here you'll have to dig into the [developer documentation on the APIs]((https://gmlc-tdc.github.io/HELICS-src/doxygen/)) to get the details you need.
+With the answers to those clarifying questions in mind, let's look at the normal execution process used by a HELICS federate when co-simulating and the associated APIs for each of the languages. Many of these APIs are wrappers for one or more lower level APIs; additionally, there are many more detailed APIs that won't be discussed at all. If, as the simulator integrator, you have needs beyond what is discussed here you'll have to dig into the [developer documentation on the APIs]((https://helics.readthedocs.io/latest/doxygen/)) to get the details you need.
 
-For the remainder of this section of the guide, we'll assume the use of a Python binding and thus, at the top of the Python script ([after installing the Python HELICS module](https://gmlc-tdc.github.io/HELICS-src/installation/index.html)), you'll have to do something like this:
+For the remainder of this section of the guide, we'll assume the use of a Python binding and thus, at the top of the Python script ([after installing the Python HELICS module](https://helics.readthedocs.io/latest/installation/index.html)), you'll have to do something like this:
 
 ```
 import helics as h
@@ -36,7 +36,7 @@ Though not technically a pat of integrating a simulator its important to remembe
 broker = h.helicsCreateBroker("zmq", "main_broker", "--federates 2")
 
 ```
-The [Doxygen on this function](https://gmlc-tdc.github.io/HELICS-src/doxygen/helics_8h.html#aeb64e4cbbfd666b121a2814a0baef4de) shows that the first argument defines the core, the second the name of the broker, and the third is an initialization string which in this case, only specifies the number of federates in the federation.
+The [Doxygen on this function](https://helics.readthedocs.io/latest/doxygen/helics_8h.html#aeb64e4cbbfd666b121a2814a0baef4de) shows that the first argument defines the core, the second the name of the broker, and the third is an initialization string which in this case, only specifies the number of federates in the federation.
 
 
 
@@ -91,45 +91,45 @@ This method call is a blocking call; your custom federate will sit there and do 
 And now begins the core of the co-simulation where the following several steps are looped over for the duration of the simulated time:
 
 * **Request a simulation time**
-  
+
   ```
   grantedtime = h.helicsFederateRequestTime (fed, time)
   ```
-  
-  Assuming any necessary calculations have been completed, the federate requests a simulated time. This time is determined by the nature of the simulator and generally represents the maximum time over which, in none of the inputs of the simulator change, no new outputs would need to be calculated. For simulators with a fixed time-step, the time requested will be the next time-step. (For these types of simulators, it's a good idea to [set the "uninterruptible" flag](./timing.md) as well, just to keep the simulator on these intervals.) 
-  
+
+  Assuming any necessary calculations have been completed, the federate requests a simulated time. This time is determined by the nature of the simulator and generally represents the maximum time over which, in none of the inputs of the simulator change, no new outputs would need to be calculated. For simulators with a fixed time-step, the time requested will be the next time-step. (For these types of simulators, it's a good idea to [set the "uninterruptible" flag](./timing.md) as well, just to keep the simulator on these intervals.)
+
   For other types of simulators, controller for example, you may want to change an output every time an input changes, but never any other time. In these cases, you can make the time request of `maxTime`; this is the end of the simulation time and thus the federate will do nothing until a new input value changes and the federate is granted that time. (In this case, you would want to make sure the "uninterruptible" flag was NOT set so that the federate is woken up on these input changes.)
-  
-  Like `helicsFederateEnterExecutingMode`, this method is a blocking call. Your federate will do nothing until the HELICS core has granted a time to it. 
-  
+
+  Like `helicsFederateEnterExecutingMode`, this method is a blocking call. Your federate will do nothing until the HELICS core has granted a time to it.
+
 * **Get new input values**
-  
+
   ```
   int_value = h.helicsInputGetInteger(sub_ID)
   float_value = h.helicsInputGetDouble(sub_ID)
   real_value, imag_value = h.helicsInputGetComplex(sub_ID)
   string_value = h.helicsInputGetChar(sub_ID)
   ...
-  
+
   ```
   Once granted a time, the federate is woken up and can begin execution. The granted time may or may not be the requested time as the arrival of new inputs from the federation can cause the federate to be woken up prior to the requested time. More than likely, your federate will want to check what time has been granted and may choose different paths of execution based on whether this was the requested time or not.
-  
-  As part of this execution the federate will almost certainly want to update all its inputs from the federation and use these in performing the key operations of the federate. The APIs above show how these call can be made. As can be seen, HELICS has built in type conversion ([where possible](https://www.youtube.com/watch?v=mZOAn-3aATY)) and regardless of how the sender of the data has formatted it, HELICS can present it as requested by the appropriate method call. 
-  
+
+  As part of this execution the federate will almost certainly want to update all its inputs from the federation and use these in performing the key operations of the federate. The APIs above show how these call can be made. As can be seen, HELICS has built in type conversion ([where possible](https://www.youtube.com/watch?v=mZOAn-3aATY)) and regardless of how the sender of the data has formatted it, HELICS can present it as requested by the appropriate method call.
+
 * **Output new values**
-  
+
   ```
   helicsPublicationPublishInteger(pub_ID, int_value)
   helicsPublicationPublishDouble(pub_ID, float_value)
   helicsPublicationPublishComplex(pub_ID, real_value, imag_value)
   helicsPublicationPublishChar(pub_ID, string_value)
   ...
-  
+
   ```
-  
+
   Once the new inputs have been collected and all necessary calculations made, the federate can update it's values for the rest of the federation to use. The API calls above allow these output values to be published out to the federation. As in when reading in new values, these output values can published as a variety of data types and HELICS can handle type conversion if one of the receivers of the value asks for it in a type different than published.
-  
-  
+
+
 ### Federate Finalization ###
 Once the federate has completed its contribution to the it needs to close out its connection to the federation. Typically a federate knows it has reached the end of the co-simulation when it is granted `maxTime`. To leave the federation cleanly (without causing errors for itself or others in the co-simulation) the following process needs to be followed:
 

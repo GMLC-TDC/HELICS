@@ -1,7 +1,8 @@
 /*
 Copyright © 2017-2019,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
-All rights reserved. See LICENSE file and DISCLAIMER for more details.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
+the top-level NOTICE for additional details. All rights reserved.
+SPDX-License-Identifier: BSD-3-Clause
 */
 #pragma once
 
@@ -23,11 +24,11 @@ class PublicationInfo
 {
   public:
     /** constructor from the basic information*/
-    PublicationInfo (global_handle pid, 
+    PublicationInfo (global_handle pid,
                      const std::string &pkey,
                      const std::string &ptype,
                      const std::string &punits)
-        :  id (pid), key (pkey), type (ptype), units (punits)
+        : id (pid), key (pkey), type (ptype), units (punits)
     {
     }
     const global_handle id;  //!< the identifier for the containing federate
@@ -43,7 +44,7 @@ class PublicationInfo
     bool single_destination = false;  //!< indicator that the publication should only have a single destination
     /** check the value if it is the same as the most recent data and if changed, store it*/
     bool CheckSetValue (const char *checkData, uint64_t len);
-	/** remove a subscriber*/
-	void removeSubscriber(global_handle subscriberToRemove);
+    /** remove a subscriber*/
+    void removeSubscriber (global_handle subscriberToRemove);
 };
 }  // namespace helics

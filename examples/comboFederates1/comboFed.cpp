@@ -1,7 +1,8 @@
 /*
 Copyright © 2017-2019,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
-All rights reserved. See LICENSE file and DISCLAIMER for more details.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
+the top-level NOTICE for additional details. All rights reserved.
+SPDX-License-Identifier: BSD-3-Clause
 */
 #include "helics/application_api/CombinationFederate.hpp"
 #include "helics/apps/BrokerApp.hpp"
@@ -14,7 +15,7 @@ static const helics::ArgDescriptors InfoArgs{
   {"startbroker", "start a broker with the specified arguments"},
   {"target,t", "name of the target federate"},
   {"valuetarget", "name of the value federate to target"},
-  {"messgetarget", "name of the message federate to target"},
+  {"messagetarget", "name of the message federate to target"},
   {"endpoint,e", "name of the target endpoint"},
   {"source,s", "name of the source endpoint"}
   // name is captured in the argument processor for federateInfo

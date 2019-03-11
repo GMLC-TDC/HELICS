@@ -9,5 +9,5 @@ Developer Guide
    swig
    tests
    docs
-   ../../CONTRIBUTING
+   ../Public_API
 ```

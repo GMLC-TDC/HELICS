@@ -1,49 +1,6 @@
 Mac Installation
 ================
 
-Install using brew
-------------------
-
-Requirements
-------------
-
--   brew
-
-Install [brew](https://brew.sh/). It is a package manager for MacOS.
-
-Once you install brew, you can open a terminal and type the following.
-
-```bash
-brew tap GMLC-TDC/helics
-brew install helics
-```
-
-OR
-
-```bash
-brew install GMLC-TDC/helics/helics
-```
-
-If you want to install it with the Python extension, you can use the
-following.
-
-```bash
-brew reinstall helics --with-python --with-python-include-dir=$(python3-config --prefix)/include/python3.6m/
-```
-
-You must pass `--with-python-include-dir` with a value. The easiest way
-to find out what the `--with-python-include-dir` argument should be is
-by using `python3-config` as shown above.
-
-If you want to install using Python2 instead, you can use
-`--with-python-include-dir=$(python-config --prefix)/include/python2.7/`.
-It is important that the Python interpreter used to run `import helics`
-was built using the header files included in `python-config --prefix`.
-That is to say, you cannot build using Python3 and run using Python2.
-
-Additionally, if required, you can add `--HEAD` to install from the
-latest `develop` branch.
-
 Install from source
 -------------------
 
@@ -60,6 +17,8 @@ Requirements
 
 Setup
 -----
+
+*Note*: Keep in mind that your cmake version should be newer than the boost version. If you have an older cmake, you may want an older boost version. Alternatively, you can choose to upgrade your version of cmake.
 
 To set up your environment:
 
@@ -86,11 +45,11 @@ To set up your environment:
 
 4. Install most dependencies using homebrew.
 
-   ``` {.sourceCode .bash}
-   brew install boost
-   brew install zeromq
-   brew install cmake
-   ```
+    ```bash
+    brew install boost
+    brew install zeromq
+    brew install cmake
+    ```
 
 5. Make sure *cmake* and *git* are available in the Command Prompt
    with `which cmake` and `which git` If they aren't, add them to the
@@ -137,7 +96,7 @@ Building HELICS with python support
 Run the following:
 
 ```bash
-$ cmake -DBUILD_PYTHON_INTERFACE=ON -DPYTHON_INCLUDE_DIR=$(python3-config --prefix)/include/python3.6m/ -DPYTHON_LIBRARY=$(python3-config --prefix)/lib/python3.6m/libpython3.6m.dylib -DCMAKE_INSTALL_PREFIX=/Users/$(whoami)/local/helics-1.0.0/ ..
+$ cmake -DBUILD_PYTHON_INTERFACE=ON -DCMAKE_INSTALL_PREFIX=/Users/$(whoami)/local/helics-2.0.0/ ..
 $ make -j8
 $ make install
 ```
@@ -145,7 +104,7 @@ $ make install
 Add the following to your `~/.bashrc` file.
 
 ```bash
-export PYTHONPATH=/Users/$(whoami)/local/helics-1.0.0/python:$PYTHONPATH
+export PYTHONPATH=/Users/$(whoami)/local/helics-X.X.X/python:$PYTHONPATH
 ```
 
 If you open a interactive Python session and import helics, you should be able to get the version of `helics` and an output that is similar to the following.
@@ -166,28 +125,51 @@ Out[2]: 'x.x.x (XX-XX-XX)'
 Building HELICS using gcc and python
 ------------------------------------
 
-First you will need to build boost using gcc from source. Download
-[boost](http://www.boost.org/users/history/version_1_64_0.html) from the
-boost.org website.
+Firstly, you'll need gcc. You can `brew install gcc`. Depending on the version of gcc you'll need to modify the following instructions slightly. These instructions are for `gcc-8.2.0`.
 
-Unzip the folder boost\_1\_64\_0 to any location, for example Downloads.
+First you will need to build boost using gcc from source. Download the latest version of boost from the
+boost.org website.
+In the following example we are doing to use [boost v1.69.0](http://www.boost.org/users/history/version_1_69_0.html)
+Keep in mind that your cmake version should be newer than the boost version, so if you have an older cmake you may want an older boost version. Alternatively, you can choose to upgrade your version of cmake as well.
+
+
+Unzip the folder `boost_1_69_0` to any location, for example Downloads.
 
 ```bash
-$ cd ~/Downloads/boost_1_64_0
-$ ./bootstrap.sh --with-python=/Users/$USER/miniconda3/python3 --prefix=/usr/local/Cellar/gcc/7.2.0_1/bin/gcc-7
-$ ./bootstrap.sh --prefix=/ --prefix=/Users/$USER/local/boost-gcc-1.64
+$ cd ~/Downloads/boost_1_69_0
+$ ./bootstrap.sh --prefix=/ --prefix=/Users/$USER/local/boost-gcc-1.69.0
+```
+
+Open `project-config.jam` and changes the lines as follows:
+
+```
+# Compiler configuration. This definition will be used unless
+# you already have defined some toolsets in your user-config.jam
+# file.
+# if ! darwin in [ feature.values <toolset> ]
+# {
+    # using darwin ;
+# }
+
+# project : default-build <toolset>darwin ;
+
+using gcc : 8.2 : /usr/local/bin/g++-8 ;
+```
+
+
+```
 $ ./b2
 $ ./b2 install
 $ # OR
 $ ./bjam cxxflags='-fPIC' cflags='-fPIC' -a link=static install # For static linking
 ```
 
-This will install boost in the \~/local/boost-gcc-1.64 folder
+This will install boost in the `~/local/boost-gcc-1.69.0` folder
 
-Next, you will need to build HELICS and tell it what the BOOST\_ROOT is.
+Next, you will need to build HELICS and tell it what the `BOOST_ROOT` is.
 
 ```bash
-$ cmake -DCMAKE_INSTALL_PREFIX="/Users/$USER/local/helics-gcc-1.0.0/" -DBOOST_ROOT="/Users/$USER/local/boost-gcc-1.64" -DBUILD_PYTHON_INTERFACE=ON -DPYTHON_LIBRARY=$(python3-config --prefix)/lib/libpython3.6m.dylib -DPYTHON_INCLUDE_DIR=$(python3-config --prefix)/include/python3.6m -DCMAKE_C_COMPILER=/usr/local/Cellar/gcc/7.2.0_1/bin/gcc-7 -DCMAKE_CXX_COMPILER=/usr/local/Cellar/gcc/7.2.0_1/bin/g++-7 ../
+$ cmake -DCMAKE_INSTALL_PREFIX="/Users/$USER/local/helics-gcc-X.X.X/" -DBOOST_ROOT="/Users/$USER/local/boost-gcc-1.69.0" -DBUILD_PYTHON_INTERFACE=ON -DCMAKE_C_COMPILER=/usr/local/Cellar/gcc/8.2.0/bin/gcc-8 -DCMAKE_CXX_COMPILER=/usr/local/Cellar/gcc/8.2.0/bin/g++-8 ../
 $ make clean; make -j 4; make install
 ```
 
@@ -226,17 +208,17 @@ To do that, you can follow the following instructions.
 The below generates the MATLAB interface using SWIG.
 
 ```bash
-cd ~/GitRepos/GMLC-TDC/HELICS-src/swig/
+cd ~/GitRepos/GMLC-TDC/HELICS-src/interfaces/
 mkdir matlab
 swig -I../src/helics/shared_api_library -outdir ./matlab -matlab ./helics.i
 mv helics_wrap.cxx matlab/helicsMEX.cxx
 ```
 
-You can copy these files into the respective `HELICS-src/swig/matlab/` folder and run the cmake command above.
+You can copy these files into the respective `HELICS-src/interfaces/matlab/` folder and run the cmake command above.
 Alternatively, you wish to build the MATLAB interface without using CMake, and you can do the following.
 
 ```bash
-cd ~/GitRepos/GMLC-TDC/HELICS-src/swig/
+cd ~/GitRepos/GMLC-TDC/HELICS-src/interfaces/
 mex -I../src/helics/shared_api_library ./matlab/helics_wrap.cxx -lhelicsSharedLib -L/path/to/helics_install/lib/helics/
 mv helicsMEX.* matlab/
 ```
@@ -250,12 +232,12 @@ Run the following in two separate windows.
 
 ```bash
 matlab -nodesktop -nosplash
-cd ~/GitRepos/GMLC-TDC/HELICS-src/swig/matlab
+cd ~/GitRepos/GMLC-TDC/HELICS-examples/matlab
 pireceiver
 ```
 
 ```bash
 matlab -nodesktop -nosplash
-cd ~/GitRepos/GMLC-TDC/HELICS-src/swig/matlab
+cd ~/GitRepos/GMLC-TDC/HELICS-examples/matlab
 pisender
 ```

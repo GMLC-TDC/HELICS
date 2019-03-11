@@ -1,7 +1,8 @@
 /*
 Copyright © 2017-2019,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
-All rights reserved. See LICENSE file and DISCLAIMER for more details.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
+the top-level NOTICE for additional details. All rights reserved.
+SPDX-License-Identifier: BSD-3-Clause
 */
 #pragma once
 /**
@@ -54,8 +55,9 @@ class BrokerBase
   private:
     std::atomic<bool> mainLoopIsRunning{false};  //!< flag indicating that the main processing loop is running
     bool dumplog = false;  //!< flag indicating the broker should capture a dump log
+    bool forceLoggingFlush = false;  //!< force the log to flush after every message
     bool queueDisabled = false;  //!< flag indicating that the message queue should not be used and all functions
-                                 //!< called directly instaed of distinct thread
+                                 //!< called directly instead of distinct thread
   protected:
     std::string logFile;  //< the file to log message to
     std::unique_ptr<ForwardingTimeCoordinator> timeCoord;  //!< object managing the time control
@@ -122,7 +124,7 @@ class BrokerBase
     /** start main broker loop*/
     void queueProcessingLoop ();
     /** helper function for doing some preprocessing on a command
-    @return (-1) if the command is a termination command*/
+    @return (CMD_IGNORE) if the command is a termination command*/
     action_message_def::action_t commandProcessor (ActionMessage &command);
 
   protected:

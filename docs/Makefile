@@ -20,14 +20,56 @@ help:
 %: Makefile
 	@$(SPHINXBUILD) -M $@ "$(SOURCEDIR)" "$(BUILDDIR)" $(SPHINXOPTS) $(O)
 
-doxygen:
-	cd ../; mkdir -p build-doxygen; cd build-doxygen; cmake -DCMAKE_INSTALL_PREFIX=./install/helics_install -DGENERATE_DOXYGEN_DOC=ON ../; make doc;
+rtddoxygen:
+	cd ../; mkdir -p build-doxygen; rm -rf build-doxygen; mkdir -p build-doxygen; python ./scripts/render-doxyfile.py; doxygen Doxyfile; mkdir -p rtd-doxygen; cp -r ./build-doxygen/docs/html ./rtd-doxygen/doxygen;
 
-sphinxdoxygen: doxygen
+doxygen:
+	cd ../; mkdir -p build-doxygen; rm -rf build-doxygen; mkdir -p build-doxygen; cd build-doxygen; cmake -DCMAKE_INSTALL_PREFIX=./install/helics_install -DGENERATE_DOXYGEN_DOC=ON ../; make doc;
+
+sphinxdoxygen: doxygen html
 	-rm -rf ./_build/html/doxygen
 	cp -r ../build-doxygen/docs/html/ ./_build/html/doxygen/
 
-github: html sphinxdoxygen
+v1.3.1:
+	git checkout kd/fix-v1.3.1-docstrings
+	-rm -rf _build/html
+	make sphinxdoxygen
+	-rm -rf _build/v1.3.1
+	mv ./_build/html/ ./_build/v1.3.1
+
+v2.0.0:
+	git checkout kd/documentation-update
+	-rm -rf _build/html
+	make sphinxdoxygen
+	-rm -rf _build/v2.0.0
+	mv ./_build/html/ ./_build/v2.0.0
+
+alldocs:
+	echo "Ensure that you've run the targets v1.3.1 and v2.0.0 manually."
+	mkdir -p _build
+	rm -rf _build/index.html
+	echo "<link rel='canonical' href='https://helics.readthedocs.io/en/latest'/>" > _build/404.html
+	echo "<script>" >> _build/404.html
+	echo "if (window.location.href.indexOf('https://gmlc-tdc.github.io/HELICS-src') === 0) {" >> _build/404.html
+	echo "url_link = window.location.href.replace('gmlc-tdc.github.io/HELICS-src', 'helics.readthedocs.io/en/latest')" >> _build/404.html
+	echo "window.location.href = url_link;" >> _build/404.html
+	echo "}" >> _build/404.html
+	echo "</script>" >> _build/404.html
+
+	echo "<link rel='canonical' href='https://helics.readthedocs.io/en/latest'/>" > _build/index.html
+	echo "<script>" >> _build/index.html
+	echo "if (window.location.href.indexOf('https://gmlc-tdc.github.io/HELICS-src') === 0) {" >> _build/index.html
+	echo "url_link = window.location.href.replace('gmlc-tdc.github.io/HELICS-src', 'helics.readthedocs.io/en/latest')" >> _build/index.html
+	echo "window.location.href = url_link;" >> _build/index.html
+	echo "}" >> _build/index.html
+	echo "</script>" >> _build/index.html
+	-rm -rf _build/html
+	mkdir -p ./_build/html
+	cp -r _build/index.html _build/html/index.html
+	cp -r _build/404.html _build/html/404.html
+
+github: alldocs
+	echo "Ensure you have built the docs correctly at the _build/html folder"
 	-git branch -D gh-pages
 	-git push origin --delete gh-pages
 	ghp-import -n -b gh-pages -m "Update documentation" ./_build/html

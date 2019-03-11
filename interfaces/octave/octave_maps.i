@@ -27,7 +27,7 @@ switch (err->error_code)
   case   helics_error_execution_failure:
 	return "helics:execution_failure";
   case   helics_error_other:
-  case   other_error_type:
+  case   helics_error_external_type:
   default:
     return "helics:error";
   }

@@ -1,7 +1,8 @@
 /*
 Copyright © 2017-2019,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
-All rights reserved. See LICENSE file and DISCLAIMER for more details.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
+the top-level NOTICE for additional details. All rights reserved.
+SPDX-License-Identifier: BSD-3-Clause
 */
 #pragma once
 
@@ -66,7 +67,7 @@ class SearchableObjectHolder
     bool addObject (const std::string &name, std::shared_ptr<X> obj)
     {
         std::lock_guard<std::mutex> lock (mapLock);
-        auto res = ObjectMap.emplace (name, std::move(obj));
+        auto res = ObjectMap.emplace (name, std::move (obj));
         return res.second;
     }
 

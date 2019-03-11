@@ -8,6 +8,47 @@ We’ll be showing number of commands as code snippets in the following presenta
 You don’t need to type in the `$` character; they are there to indicate the start of each command.
 Lines that don’t start with `$` are typically showing the output of the previous command.
 
+### Quick start
+
+Get the latest installers from [GitHub Releases](https://github.com/GMLC-TDC/HELICS-src/releases/latest).
+
+OR
+
+Use conda to install helics:
+
+```bash
+conda install -c conda-forge helics
+# OR
+conda install -c gmlc-tdc helics
+```
+
+### Using a installer for your operating system
+
+Download pre-compiled libraries from the [releases page](https://github.com/GMLC-TDC/HELICS-Src/releases/latest) and add them to your path.
+The installers come with bindings for Python (3.6), MATLAB, Java extensions precompiled as part of the installation.
+All you need to do is add the relevant folders to your User's PATH variables.
+
+On Windows, you can visit `Control Panel -> System -> Advanced System Settings -> Environment Variables` and edit your user environment variables to add the necessary Path, PYTHONPATH, JAVAPATH, MATLABPATH environment variables to the corresponding HELICS installed locations.
+
+On MacOS or Linux, you can edit your `~/.bashrc` to add the necessary PATH, PYTHONPATH, JAVAPATH, MATLABPATH environment variables to the corresponding HELICS installed locations.
+
+Be sure to restart your CMD prompt on Windows or Terminal on your MacOS/Linux to ensure the new environment variables are in effect.
+
+### Using a package manager for your operating system
+
+You can install it using one of the supported package managers.
+
+```eval_rst
+.. toctree::
+    :maxdepth: 1
+
+    package_manager
+```
+
+Alternatively, you can install from source. See the next section for more information.
+
+### OS Specific installation from source
+
 
 ```eval_rst
 .. toctree::

@@ -1,7 +1,8 @@
 /*
 Copyright © 2017-2019,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
-All rights reserved. See LICENSE file and DISCLAIMER for more details.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
+the top-level NOTICE for additional details. All rights reserved.
+SPDX-License-Identifier: BSD-3-Clause
 */
 #include "CombinationFederate.hpp"
 
@@ -9,24 +10,24 @@ namespace helics
 {
 CombinationFederate::CombinationFederate () = default;
 CombinationFederate::CombinationFederate (const std::string &fedName, const FederateInfo &fi)
-    : Federate (fedName,fi), ValueFederate (true), MessageFederate (true)
+    : Federate (fedName, fi), ValueFederate (true), MessageFederate (true)
 {
 }
 CombinationFederate::CombinationFederate (const std::string &fedName,
                                           const std::shared_ptr<Core> &core,
                                           const FederateInfo &fi)
-    : Federate (fedName,core, fi), ValueFederate (true), MessageFederate (true)
+    : Federate (fedName, core, fi), ValueFederate (true), MessageFederate (true)
 {
 }
 
 CombinationFederate::CombinationFederate (const std::string &configString)
-    : Federate (std::string(),loadFederateInfo (configString)), ValueFederate (true), MessageFederate (true)
+    : Federate (std::string (), loadFederateInfo (configString)), ValueFederate (true), MessageFederate (true)
 {
     CombinationFederate::registerInterfaces (configString);
 }
 
 CombinationFederate::CombinationFederate (const std::string &fedName, const std::string &configString)
-    : Federate (fedName,loadFederateInfo (configString)), ValueFederate (true), MessageFederate (true)
+    : Federate (fedName, loadFederateInfo (configString)), ValueFederate (true), MessageFederate (true)
 {
     CombinationFederate::registerInterfaces (configString);
 }
@@ -60,12 +61,12 @@ void CombinationFederate::initializeToExecuteStateTransition ()
     MessageFederate::initializeToExecuteStateTransition ();
 }
 
-std::string CombinationFederate::localQuery(const std::string &queryStr) const
+std::string CombinationFederate::localQuery (const std::string &queryStr) const
 {
-    std::string res = ValueFederate::localQuery(queryStr);
-    if (res.empty())
+    std::string res = ValueFederate::localQuery (queryStr);
+    if (res.empty ())
     {
-        res= MessageFederate::localQuery(queryStr);
+        res = MessageFederate::localQuery (queryStr);
     }
     return res;
 }

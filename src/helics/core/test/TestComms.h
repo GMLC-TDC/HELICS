@@ -1,18 +1,20 @@
 /*
 Copyright © 2017-2019,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
-All rights reserved. See LICENSE file and DISCLAIMER for more details.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
+the top-level NOTICE for additional details. All rights reserved.
+SPDX-License-Identifier: BSD-3-Clause
 */
 #pragma once
 
-#include "helics/helics-config.h"
 #include "../CommsInterface.hpp"
+#include "helics/helics-config.h"
 #include <future>
 #include <set>
 
 namespace helics
 {
-namespace testcore {
+namespace testcore
+{
 /** implementation for the communication interface that uses ZMQ messages to communicate*/
 class TestComms final : public CommsInterface
 {
@@ -22,20 +24,19 @@ class TestComms final : public CommsInterface
     /** destructor*/
     ~TestComms ();
 
-    virtual void loadNetworkInfo(const NetworkBrokerData &netInfo) override;
+    virtual void loadNetworkInfo (const NetworkBrokerData &netInfo) override;
+
   private:
     virtual void queue_rx_function () override;  //!< the functional loop for the receive queue
     virtual void queue_tx_function () override;  //!< the loop for transmitting data
     virtual void closeReceiver () override;  //!< function to instruct the receiver loop to close
 
   public:
-
-	  /** return a dummy port number*/
+    /** return a dummy port number*/
     int getPort () const { return -1; };
 
     std::string getAddress () const;
 };
 
-} // namespace testcore
+}  // namespace testcore
 }  // namespace helics
-
