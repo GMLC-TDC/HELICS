@@ -62,6 +62,13 @@ class Core
      */
     virtual void initializeFromArgs (int argc, const char *const *argv) = 0;
     /**
+     * Initialize the core from command line arguments contained in a vector
+     *
+     * Should be invoked a single time to initialize the co-simulation core.
+     *
+     */
+    virtual void initializeFromVector (std::vector<std::string> &args) = 0;
+    /**
      * Returns true if the core has been initialized.
      */
     virtual bool isInitialized () const = 0;

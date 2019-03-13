@@ -40,7 +40,7 @@ class helicsCLI11App : public CLI::App
     {
         try
         {
-            parse (std::forward<Args> (args...));
+            parse (std::forward<Args> (args)...);
             return parse_return::ok;
         }
         catch (const CLI::CallForHelp &ch)
@@ -55,7 +55,7 @@ class helicsCLI11App : public CLI::App
         {
             if (!quiet)
             {
-                exit (ch);
+                exit (ca);
             }
             return parse_return::help_all_return;
         }
@@ -73,6 +73,21 @@ class helicsCLI11App : public CLI::App
             return parse_return::error_return;
         }
     }
+
+    void remove_helics_specifics ()
+    {
+        set_help_flag ();
+        set_config ();
+        try
+        {
+            remove_option (get_option_no_throw ("-v"));
+            remove_subcommand (get_option_group ("quiet"));
+        }
+        catch (const CLI::Error &)
+        {
+            // must have been removed earlier
+        }
+    }
 };
 }  // namespace helics
 
@@ -82,7 +97,7 @@ namespace CLI
 namespace detail
 {
 template <>
-bool lexical_cast<helics::Time> (std::string input, helics::Time &output)
+inline bool lexical_cast<helics::Time> (std::string input, helics::Time &output)
 {
     try
     {

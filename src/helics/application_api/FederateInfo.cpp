@@ -322,6 +322,7 @@ std::unique_ptr<helicsCLI11App> FederateInfo::makeCLIApp ()
       ->type_size (-1)
       ->delimiter (',')
       ->each ([this] (const std::string &flag) { loadFlags (*this, flag); });
+    return app;
 }
 
 void FederateInfo::loadInfoFromArgs (int argc, const char *const *argv)

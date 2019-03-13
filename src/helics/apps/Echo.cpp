@@ -20,24 +20,22 @@ namespace helics
 {
 namespace apps
 {
-static const ArgDescriptors InfoArgs{{"delay", "the delay with which the echo app will echo message"}};
-
 Echo::Echo (int argc, char *argv[]) : App ("echo", argc, argv)
 {
-    helicsCLIApp app ("Parser for Echo object");
-    app.add_ variable_map vm_map;
+    helicsCLI11App app ("Options specific to the Echo App");
+    app.add_option ("--delay", delayTime, "the delay with which the echo app will echo message");
     if (!deactivated)
     {
-        argumentParser (argc, argv, vm_map, InfoArgs);
-        loadArguments (vm_map);
+        app.parse (remArgs);
         if (!masterFileName.empty ())
         {
             loadFile (masterFileName);
         }
     }
-    else
+    else if (helpMode)
     {
-        argumentParser (argc, argv, vm_map, InfoArgs);
+        app.remove_helics_specifics ();
+        std::cout << app.help ();
     }
 }
 
@@ -112,16 +110,6 @@ void Echo::addEndpoint (const std::string &endpointName, const std::string &endp
     endpoints.emplace_back (fed->registerGlobalEndpoint (endpointName, endpointType));
     endpoints.back ().setCallback (
       [this] (const Endpoint &ept, Time messageTime) { echoMessage (ept, messageTime); });
-}
-
-int Echo::loadArguments (boost::program_options::variables_map &vm_map)
-{
-    if (vm_map.count ("delay") > 0)
-    {
-        std::lock_guard<std::mutex> lock (delayTimeLock);
-        delayTime = loadTimeFromString (vm_map["delay"].as<std::string> ());
-    }
-    return 0;
 }
 
 void Echo::loadJsonFile (const std::string &jsonFile)

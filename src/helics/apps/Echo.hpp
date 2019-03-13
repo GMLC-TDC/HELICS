@@ -76,8 +76,6 @@ class Echo : public App
     auto endpointCount () const { return endpoints.size (); }
 
   private:
-    /** load information from a program options variable map*/
-    int loadArguments (boost::program_options::variables_map &vm_map);
     /** load information from a JSON file*/
     virtual void loadJsonFile (const std::string &filename) override;
     /** echo an actual message from an endpoint*/

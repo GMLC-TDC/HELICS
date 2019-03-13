@@ -103,9 +103,6 @@ class Recorder : public App
     std::unique_ptr<Message> getMessage (int index) const;
 
   private:
-    /** load arguments through a variable map created through command line arguments
-     */
-    int loadArguments (boost::program_options::variables_map &vm_map);
     /** load from a jsonString
     @param jsonString either a JSON filename or a string containing JSON
     */
@@ -123,6 +120,8 @@ class Recorder : public App
     void loadCaptureInterfaces ();
     /** encode the string in base64 if needed otherwise just return the string*/
     std::string encode (const std::string &str2encode);
+    /** build the command line argument processing application*/
+    std::shared_ptr<helicsCLI11App> buildArgParserApp ();
 
   protected:
     bool allow_iteration = false;  //!< trigger to allow Iteration

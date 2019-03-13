@@ -45,7 +45,10 @@ class Broker
     /** initialize from command line arguments
      */
     virtual void initializeFromArgs (int argc, const char *const *argv) = 0;
-
+    /** Initialize the Broker from command line arguments contained in a vector
+     * Should be invoked a single time to initialize the co-simulation broker.
+     */
+    virtual void initializeFromVector (std::vector<std::string> &args) = 0;
     /** get the local identification for the broker*/
     virtual const std::string &getIdentifier () const = 0;
     /** get the connection address for the broker*/

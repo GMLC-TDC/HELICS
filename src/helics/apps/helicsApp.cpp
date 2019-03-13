@@ -37,19 +37,9 @@ namespace helics
 {
 namespace apps
 {
-static const ArgDescriptors basicAppArgs{{
-                                           "local",
-                                           ArgDescriptor::arg_type_t::flag_type,
-                                         },
-                                         {
-                                           "stop",
-                                         },
-                                         {"quiet", ArgDescriptor::arg_type_t::flag_type,
-                                          "turn off most display output"}};
-
 App::App (const std::string &defaultAppName, int argc, char *argv[])
 {
-    helicsCLI11 app ("helics App Parser");
+    helicsCLI11App app ("helics App Parser");
 
     app.add_flag ("--local", useLocal,
                   "specify otherwise unspecified endpoints and publications as local( "
@@ -59,15 +49,16 @@ App::App (const std::string &defaultAppName, int argc, char *argv[])
     app.allow_extras ();
     auto ret = app.helics_parse (argc, argv);
 
-    if (ret == helicsCLI11::parse_return::help_return)
+    if (ret == helicsCLI11App::parse_return::help_return)
     {
         if (!app.quiet)
         {
             // this is just to run the help output
             FederateInfo helpTemp (argc, argv);
         }
+        helpMode = true;
     }
-    if (ret != helicsCLI11::parse_return::ok)
+    if (ret != helicsCLI11App::parse_return::ok)
     {
         deactivated = true;
         return;
@@ -85,7 +76,7 @@ App::App (const std::string &defaultAppName, int argc, char *argv[])
     }
     remArgs = app.remaining ();
 
-    FederateInfo fi (argc, argv);
+    FederateInfo fi (remArgs);
     if (fi.defName.empty ())
     {
         fi.defName = defaultAppName;

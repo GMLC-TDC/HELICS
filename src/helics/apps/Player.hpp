@@ -184,7 +184,6 @@ class Player : public App
     const auto &getMessage (int index) const { return messages[index]; }
 
   private:
-    int loadArguments (boost::program_options::variables_map &vm_map);
     /** load from a jsonString
     @param jsonString either a JSON filename or a string containing JSON
     */

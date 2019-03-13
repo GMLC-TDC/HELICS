@@ -4392,6 +4392,21 @@ class App {
         return subcommands_.back().get();
     }
 
+    /// Removes a subcommand from the App. Takes a subcommand pointer. Returns true if found and removed.
+    bool remove_subcommand(App *subcom) {
+        // Make sure no links exist
+        for(App_p &sub : subcommands_) {
+            sub->remove_excludes(subcom);
+        }
+
+        auto iterator = std::find_if(
+            std::begin(subcommands_), std::end(subcommands_), [subcom](const App_p &v) { return v.get() == subcom; });
+        if(iterator != std::end(subcommands_)) {
+            subcommands_.erase(iterator);
+            return true;
+        }
+        return false;
+    }
     /// Check to see if a subcommand is part of this command (doesn't have to be in command line)
     /// returns the first subcommand if passed a nullptr
     App *get_subcommand(App *subcom) const {
@@ -4440,6 +4455,16 @@ class App {
         if((index >= 0) && (index < static_cast<int>(subcommands_.size())))
             return subcommands_[index];
         throw OptionNotFound(std::to_string(index));
+    }
+
+    /// Check to see if an option group is part of this App
+    App *get_option_group(std::string group_name) const {
+        for(const App_p &app : subcommands_) {
+            if(app->name_.empty() && app->group_ == group_name) {
+                return app.get();
+            }
+        }
+        throw OptionNotFound(group_name);
     }
 
     /// No argument version of count counts the number of times this subcommand was

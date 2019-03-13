@@ -88,9 +88,6 @@ class Tracer : public App
     void disableTextOutput () { printMessage = false; }
 
   private:
-    /** load arguments through a variable map created through command line arguments
-     */
-    int loadArguments (boost::program_options::variables_map &vm_map);
     /** load from a jsonString
     @param jsonString either a JSON filename or a string containing JSON
     */
@@ -102,6 +99,9 @@ class Tracer : public App
     void generateInterfaces ();
     void captureForCurrentTime (Time currentTime, int iteration = 0);
     void loadCaptureInterfaces ();
+
+    /** build the command line argument processing application*/
+    std::shared_ptr<helicsCLI11App> buildArgParserApp ();
 
   protected:
     bool printMessage = false;

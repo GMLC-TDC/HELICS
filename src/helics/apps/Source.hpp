@@ -140,7 +140,6 @@ class Source : public App
     std::shared_ptr<SignalGenerator> getGenerator (int index);
 
   private:
-    int loadArguments (boost::program_options::variables_map &vm_map);
     /** load from a jsonString
     @param jsonString either a JSON filename or a string containing JSON
     */

@@ -108,10 +108,11 @@ class App
     std::shared_ptr<CombinationFederate> fed;  //!< the federate created for the Player
     Time stopTime = Time::maxVal ();  //!< the time the Player should stop
     std::string masterFileName;  //!< the name of the master file used to do the construction
-    bool useLocal = false;
-    bool fileLoaded = false;
-    bool deactivated = false;
-    bool quietMode = false;
+    bool useLocal{false};
+    bool fileLoaded{false};
+    bool deactivated{false};
+    bool quietMode{false};
+    bool helpMode{false};
     std::vector<std::string> remArgs;
 };
 }  // namespace apps
