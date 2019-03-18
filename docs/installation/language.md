@@ -105,7 +105,7 @@ make install
 
 On windows using visual studio the command line cmake would look like
 ```
-cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX="C:\local\helics-develop" -DDISABLE_SWIG -DBUILD_MATLAB_INTERFACE=ON -G "Visual Studio 15 2017 Win64" ..
+cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX="C:\local\helics-develop" -DENABLE_SWIG=OFF -DBUILD_MATLAB_INTERFACE=ON -G "Visual Studio 15 2017 Win64" ..
 
 cmake --build . --config Release --target INSTALL
 ```
@@ -116,7 +116,7 @@ For this operation to succeed MATLAB must be available and mex must be setup to 
 ```
 and follow the prompted instructions.
 
-Reconstructing the files requires a specific version of SWIG with MATLAB support. If swig is not used then adding `-DDISABLE_SWIG=ON` to the cmake command will bypass swig and use the included interface files directly.  If any modifications to the C library were made then swig must be used to regenerate the files appropriately, otherwise the existing files can be used.  The CMAKE scripts will detect if the swig is the appropriate version and act accordingly.
+Reconstructing the files requires a specific version of SWIG with MATLAB support. If swig is not used then adding `-DENABLE_SWIG=OFF` to the cmake command will bypass swig and use the included interface files directly.  If any modifications to the C library were made then swig must be used to regenerate the files appropriately, otherwise the existing files can be used.  The CMAKE scripts will detect if the swig is the appropriate version and act accordingly.
 
 Add the install directory path to the MATLAB files to your PATH. This can be the system path, or the MATLAB path through the addpath command or the graphical equivalent
 ```

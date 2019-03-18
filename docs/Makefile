@@ -46,18 +46,29 @@ v2.0.0:
 
 alldocs:
 	echo "Ensure that you've run the targets v1.3.1 and v2.0.0 manually."
+	mkdir -p _build
 	rm -rf _build/index.html
-	echo "<meta http-equiv=\"refresh\" content=\"0; url=http://gmlc-tdc.github.io/HELICS-src/v2.0.0\"/>" > _build/index.html
-	rm -rf _build/404.html
-	echo "<meta http-equiv=\"refresh\" content=\"0; url=http://gmlc-tdc.github.io/HELICS-src/v2.0.0\"/>" > _build/404.html
+	echo "<link rel='canonical' href='https://helics.readthedocs.io/en/latest'/>" > _build/404.html
+	echo "<script>" >> _build/404.html
+	echo "if (window.location.href.indexOf('https://gmlc-tdc.github.io/HELICS-src') === 0) {" >> _build/404.html
+	echo "url_link = window.location.href.replace('gmlc-tdc.github.io/HELICS-src', 'helics.readthedocs.io/en/latest')" >> _build/404.html
+	echo "window.location.href = url_link;" >> _build/404.html
+	echo "}" >> _build/404.html
+	echo "</script>" >> _build/404.html
+
+	echo "<link rel='canonical' href='https://helics.readthedocs.io/en/latest'/>" > _build/index.html
+	echo "<script>" >> _build/index.html
+	echo "if (window.location.href.indexOf('https://gmlc-tdc.github.io/HELICS-src') === 0) {" >> _build/index.html
+	echo "url_link = window.location.href.replace('gmlc-tdc.github.io/HELICS-src', 'helics.readthedocs.io/en/latest')" >> _build/index.html
+	echo "window.location.href = url_link;" >> _build/index.html
+	echo "}" >> _build/index.html
+	echo "</script>" >> _build/index.html
 	-rm -rf _build/html
 	mkdir -p ./_build/html
-	cp -r ./_build/v1.3.1 ./_build/html/v1.3.1
-	cp -r ./_build/v2.0.0 ./_build/html/v2.0.0
 	cp -r _build/index.html _build/html/index.html
 	cp -r _build/404.html _build/html/404.html
 
-github:
+github: alldocs
 	echo "Ensure you have built the docs correctly at the _build/html folder"
 	-git branch -D gh-pages
 	-git push origin --delete gh-pages

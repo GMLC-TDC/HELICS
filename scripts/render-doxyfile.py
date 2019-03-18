@@ -16,7 +16,7 @@ def get_version():
 def main():
 
     helics_version = get_version()
-    current_source_dir = os.path.abspath(os.path.join(dirname, "../src"))
+    current_source_dir = os.path.abspath(os.path.join(dirname, "../"))
     output_dir = os.path.abspath(os.path.join(dirname, "../build-doxygen/docs"))
 
     with open(os.path.join(dirname, "../config/Doxyfile.in")) as f:

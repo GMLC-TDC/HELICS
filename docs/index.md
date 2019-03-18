@@ -19,8 +19,8 @@ series simulation.
 
 - [GitHub](https://github.com/GMLC-TDC/HELICS-src)
 - [Gitter](https://gitter.im/GMLC-TDC/HELICS-src)
-- [Documentation](https://gmlc-tdc.github.io/HELICS-src)
-- [User Guide](https://gmlc-tdc.github.io/HELICS-src)
+- [Documentation](https://helics.readthedocs.io/en/latest)
+- [User Guide](user-guide/index.html)
 
 ```eval_rst
 .. toctree::

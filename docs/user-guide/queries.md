@@ -2,7 +2,7 @@ Queries
 =======
 
 Queries are asynchronous means within HELICS of asking for and receiving information from other federate components.
-Brokers, Federates, and Cores all have query functions.  Federates are also able to define a callback for answering custom queries.  
+Brokers, Federates, and Cores all have query functions.  Federates are also able to define a callback for answering custom queries.
 
 The general function appears like
 ```
@@ -11,7 +11,7 @@ std::string query (const std::string &target, const std::string &queryStr)
 
 ## Targets
 
-A target is specified, and can be one of the following.  A federate named one of the key words is valid for the federation, but cannot be queried using the name.  
+A target is specified, and can be one of the following.  A federate named one of the key words is valid for the federation, but cannot be queried using the name.
 
 | target | Description |
 | --- | --- |
@@ -24,7 +24,7 @@ A target is specified, and can be one of the following.  A federate named one of
 
 ## Queries
 
-The queryStr is a specific data to request, there are a number of different things that can be queried from the system.  
+The queryStr is a specific data to request, there are a number of different things that can be queried from the system.
 Unrecognized queries or targets return `#invalid`
 Answers to queries can be
  - "true"/"false" [T/F]
@@ -50,7 +50,7 @@ The following queries are defined for federates.  Federates may specify a callba
 Other strings may be defined for specific federates.
 
 ### Core queries
-The following queries will be answered by a core.  
+The following queries will be answered by a core.
 
 | queryString | Description |
 | --- | --- |
@@ -66,7 +66,7 @@ The following queries will be answered by a core.
 |`federate_map`| a Hierarchical map of the federates contained in a core [JSON]|
 |`dependency_graph`| a representation of the dependencies in the core and its contained federates [JSON]|
 
-The last two are valid but are not usually queried directly, but instead the same query is used on a broker and this query in the core is used as a building block.  
+The last two are valid but are not usually queried directly, but instead the same query is used on a broker and this query in the core is used as a building block.
 
 ### Broker Queries
 
@@ -88,32 +88,35 @@ The Following queries will be answered by a broker.
 |`federate_map`| a Hierarchical map of the federates contained in a broker [JSON]|
 |`dependency_graph`|a representation of the dependencies in the broker and all contained members [JSON]|
 
-`federate_map` and `dependency_graph` when called from the root broker will generate a JSON string containing the entire structure of the federation.  This can take some time to assemble since all members must be queried.  
+`federate_map` and `dependency_graph` when called from the root broker will generate a JSON string containing the entire structure of the federation.  This can take some time to assemble since all members must be queried.
 
 ## Usage Notes
-Queries that must traverse the network travel along priority paths.  The calls are blocking but they do not wait for time advancement from any federate and take priority over regular communication.  
+Queries that must traverse the network travel along priority paths.  The calls are blocking but they do not wait for time advancement from any federate and take priority over regular communication.
 
 #### Application API
-There are two basic calls in the application API as part of a [federate object](https://gmlc-tdc.github.io/HELICS-src/doxygen/classhelics_1_1Federate.html)
+There are two basic calls in the application API as part of a [federate object](https://helics.readthedocs.io/latest/doxygen/classhelics_1_1Federate.html)
 In addition to the call described above a second version without the target
 ```
 std::string 	query (const std::string &queryStr)
 ```
 
-make the query of the current federate.  
+make the query of the current federate.
 and Asynchronous version is also available.
 
 ```
 query_id_t 	queryAsync (const std::string &target, const std::string &queryStr)
 ```
 
-This call returns a `query_id_t` that can be use in `queryComplete` and `isQueryComplet` functions.  
+This call returns a `query_id_t` that can be use in `queryComplete` and `isQueryComplet` functions.
 
-In the header [`<helics\queryFunctions.hpp>`](https://gmlc-tdc.github.io/HELICS-src/doxygen/queryFunctions_8hpp.html) a few helper functions are defined to vectorize query results and some utility functions to wait for a federate to enter init, or wait for a federate to join the federation.  
+In the header [`<helics\queryFunctions.hpp>`](https://helics.readthedocs.io/latest/doxygen/queryFunctions_8hpp.html) a few helper functions are defined to vectorize query results and some utility functions to wait for a federate to enter init, or wait for a federate to join the federation.
 
 #### C-api and interface API's.
 
-Queries in the C api work similarly but the mechanics are different.  
-The basic operation is to create a query using [`helicsQueryCreate(target,query)`](https://gmlc-tdc.github.io/HELICS-src/doxygen/helics_8h.html#ac290df999ec7e7527cb4337c5d3b1461)
+Queries in the C api work similarly but the mechanics are different.
+The basic operation is to create a query using [`helicsQueryCreate(target,query)`](https://helics.readthedocs.io/latest/doxygen/helics_8h.html#ac290df999ec7e7527cb4337c5d3b1461)
 
-This function returns a query object that can be used in one of the execute functions to generate results.  It can be called asyncrhonously on a federate. A query must be freed after use.  The interface api's (python, matlab, Java, etc) will work similarly.  
+This function returns a query object that can be used in one of the execute functions to generate results.
+It can be called asynchronously on a federate.
+A query must be freed after use.
+The interface api's (python, matlab, Java, etc) will work similarly.
