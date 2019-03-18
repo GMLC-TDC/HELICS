@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+﻿#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 #
 # HELICS-src documentation build configuration file, created by
@@ -64,6 +64,15 @@ if which("pandoc") is None:
     warnings.warn("`pandoc` not found in PATH. Please consider installing Pandoc or consult the developer documentation")
     from recommonmark.parser import CommonMarkParser as MarkdownParser
 
+import subprocess
+import os
+
+read_the_docs_build = os.environ.get('READTHEDOCS', None) == 'True'
+
+if read_the_docs_build:
+    dir_name = os.path.realpath(os.path.dirname(__file__))
+    subprocess.call("cd {dir_name} && make rtddoxygen".format(dir_name=dir_name), shell=True)
+    html_extra_path = [os.path.abspath(os.path.join(dir_name, "../rtd-doxygen"))]
 
 extensions = [
     'sphinx.ext.mathjax',
@@ -95,7 +104,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = 'HELICS-src'
-copyright = 'Copyright © 2017-2018,\nBattelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC\nAll rights reserved. See LICENSE file and DISCLAIMER for more details.'
+copyright = 'Copyright © 2017-2019,\nBattelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.See the top-level NOTICE for additional details.\nAll rights reserved.\nSPDX-License-Identifier: BSD-3-Clause\n'
 author = 'Philip Top, Jeff Daily, Ryan Mast, Dheepak Krishnamurthy, Andrew Fisher, Himanshu Jain, Bryan Palmintier, Jason Fuller'
 
 # The version info for the project you're documenting, acts as replacement for
@@ -209,7 +218,6 @@ man_pages = [(master_doc, 'helics-src', 'HELICS-src Documentation', [author], 1)
 texinfo_documents = [
     (master_doc, 'HELICS-src', 'HELICS-src Documentation', author, 'HELICS-src', 'One line description of project.', 'Miscellaneous'),
 ]
-
 
 def setup(app):
     app.add_stylesheet('css/custom.css')  # may also be an URL

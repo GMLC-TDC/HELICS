@@ -57,7 +57,7 @@ static void throwHelicsPythonException(helics_error *err) {
     PyErr_SetString(pHelicsException, str);
 	break;
   case   helics_error_other:
-  case   other_error_type:
+  case   helics_error_external_type:
   default:
     strcat(str, "helics:error - ");
     strcat(str, err->message);

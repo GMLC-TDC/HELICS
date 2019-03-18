@@ -1,0 +1,16 @@
+{
+  "line_width": 80,
+  "dangle_parens": true,
+  "command_case": "lower",
+  "separate_fn_name_with_space": false,
+  "always_wrap": [],
+  "separate_ctrl_name_with_space": false,
+  "max_subargs_per_line": 3,
+  "tab_size": 4,
+  "keyword_case": "upper",
+  "enum_char": ".",
+  "bullet_char": "*",
+  "line_ending": "unix",
+  "first_comment_is_literal":true,
+  "literal_comment_pattern":"Copyright"
+}

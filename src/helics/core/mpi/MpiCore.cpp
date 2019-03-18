@@ -1,7 +1,9 @@
 /*
 Copyright © 2017-2019,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
-All rights reserved. See LICENSE file and DISCLAIMER for more details.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.
+See the top-level NOTICE for additional details.
+All rights reserved.
+SPDX-License-Identifier: BSD-3-Clause
 */
 #include "MpiCore.h"
 #include "MpiComms.h"
@@ -17,7 +19,9 @@ namespace mpi
 MpiCore::MpiCore () noexcept {}
 
 // MpiCore::~MpiCore () = default;
-MpiCore::~MpiCore () { /*std::cout << "MpiCore destructor for " << MpiCore::getAddress () << std::endl;*/}
+MpiCore::~MpiCore ()
+{ /*std::cout << "MpiCore destructor for " << MpiCore::getAddress () << std::endl;*/
+}
 MpiCore::MpiCore (const std::string &core_name) : CommsBroker (core_name) {}
 
 using namespace std::string_literals;
@@ -66,23 +70,20 @@ void MpiCore::initializeFromArgs (int argc, const char *const *argv)
 
 bool MpiCore::brokerConnect ()
 {
-     std::lock_guard<std::mutex> lock (dataMutex);  // mutex protecting the other information in the ipcBroker
+    std::lock_guard<std::mutex> lock (dataMutex);  // mutex protecting the other information in the ipcBroker
 
     if (brokerAddress.empty ())
     {
         brokerAddress = "0:0";
     }
     comms->setBrokerAddress (brokerAddress);
-    
+
     comms->setName (getIdentifier ());
 
-   return comms->connect ();
+    return comms->connect ();
 }
 
-std::string MpiCore::generateLocalAddressString () const
-{
-    return comms->getAddress ();
-}
+std::string MpiCore::generateLocalAddressString () const { return comms->getAddress (); }
 
 }  // namespace mpi
 }  // namespace helics

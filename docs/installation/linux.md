@@ -15,6 +15,8 @@ Requirements
 Setup
 -----
 
+*Note*: Keep in mind that your cmake version should be newer than the boost version. If you have an older cmake, you may want an older boost version. Alternatively, you can choose to upgrade your version of cmake.
+
 To set up your environment:
 
 1. Install dependencies using apt-get.
@@ -60,7 +62,7 @@ Run the following:
 
 ```bash
 $ sudo apt-get install python3-dev
-$ cmake -DBUILD_PYTHON_INTERFACE=ON -DPYTHON_INCLUDE_DIR=$(python3-config --prefix)/include/python3.6m/ -DPYTHON_LIBRARY=$(python3-config --prefix)/lib/x86_64-linux-gnu/libpython3.6m.so -DCMAKE_INSTALL_PREFIX=~/.local/helics-1.0.0/ ..
+$ cmake -DBUILD_PYTHON_INTERFACE=ON -DCMAKE_INSTALL_PREFIX=~/.local/helics-X.X.X/ ..
 $ make -j8
 $ make install
 ```
@@ -68,7 +70,7 @@ $ make install
 Add the following to your `~/.bashrc` file.
 
 ```bash
-export PYTHONPATH=~/.local/helics-1.0.0/python:$PYTHONPATH
+export PYTHONPATH=~/.local/helics-X.X.X/python:$PYTHONPATH
 export PATH=~/.local/bin:$PATH
 ```
 

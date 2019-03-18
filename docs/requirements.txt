@@ -1,0 +1,7 @@
+sphinx>=1.4.0,<=1.6.9
+sphinx_rtd_theme
+sphinxcontrib-pandoc-markdown
+ipython
+ipykernel
+nbsphinx
+breathe

@@ -1,7 +1,8 @@
 /*
 Copyright © 2017-2019,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
-All rights reserved. See LICENSE file and DISCLAIMER for more details.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
+the top-level NOTICE for additional details. All rights reserved.
+SPDX-License-Identifier: BSD-3-Clause
 */
 
 #include "CoreBroker.hpp"
@@ -212,10 +213,31 @@ void CoreBroker::processPriorityCommand (ActionMessage &&command)
         global_broker_id_local = global_id.load ();
         isRootc = _isRoot.load ();
         timeCoord->source_id = global_broker_id_local;
+        connectionEstablished = true;
+        if (!earlyMessages.empty ())
+        {
+            for (auto &M : earlyMessages)
+            {
+                if (isPriorityCommand (M))
+                {
+                    processPriorityCommand (std::move (M));
+                }
+                else
+                {
+                    processCommand (std::move (M));
+                }
+            }
+            earlyMessages.clear ();
+        }
         break;
     }
     case CMD_REG_FED:
     {
+        if (!connectionEstablished)
+        {
+            earlyMessages.push_back (std::move (command));
+            break;
+        }
         if (brokerState != operating)
         {
             if (allInitReady ())
@@ -288,21 +310,29 @@ void CoreBroker::processPriorityCommand (ActionMessage &&command)
     break;
     case CMD_REG_BROKER:
     {
+        if (!connectionEstablished)
+        {
+            earlyMessages.push_back (std::move (command));
+            break;
+        }
         if (command.counter > 0)
         {  // this indicates it is a resend
             auto brk = _brokers.find (command.name);
-            // we would get this if the ack didn't go through for some reason
-            brk->route = route_id{routeCount++};
-            addRoute (brk->route, command.getString (targetStringLoc));
-            routing_table[brk->global_id] = brk->route;
+            if (brk != _brokers.end ())
+            {
+                // we would get this if the ack didn't go through for some reason
+                brk->route = route_id{routeCount++};
+                addRoute (brk->route, command.getString (targetStringLoc));
+                routing_table[brk->global_id] = brk->route;
 
-            // sending the response message
-            ActionMessage brokerReply (CMD_BROKER_ACK);
-            brokerReply.source_id = global_broker_id_local;  // source is global root
-            brokerReply.dest_id = brk->global_id;  // the new id
-            brokerReply.name = command.name;  // the identifier of the broker
-            transmit (brk->route, brokerReply);
-            return;
+                // sending the response message
+                ActionMessage brokerReply (CMD_BROKER_ACK);
+                brokerReply.source_id = global_broker_id_local;  // source is global root
+                brokerReply.dest_id = brk->global_id;  // the new id
+                brokerReply.name = command.name;  // the identifier of the broker
+                transmit (brk->route, brokerReply);
+                return;
+            }
         }
         if (brokerState != operating)
         {
@@ -518,6 +548,11 @@ void CoreBroker::processPriorityCommand (ActionMessage &&command)
     case CMD_REG_ROUTE:
         break;
     case CMD_BROKER_QUERY:
+        if (!connectionEstablished)
+        {
+            earlyMessages.push_back (std::move (command));
+            break;
+        }
         if (command.dest_id == global_broker_id_local)
         {
             processLocalQuery (command);
@@ -591,9 +626,14 @@ std::string CoreBroker::generateFederationSummary () const
             break;
         }
     }
-    std::string output = fmt::format ("Federation Summary> \n\t{} federates\n\t{} brokers/cores\n\t{} "
-                                      "publications\n\t{} inputs\n\t{} endpoints\n\t{} filters\n<<<<<<<<<",
-                                      _federates.size (), _brokers.size (), pubs, ipts, epts, filt);
+    std::string output =
+      fmt::format ("Federation Summary> \n\t{} federates [min {}]\n\t{}/{} brokers/cores [min {}]\n\t{} "
+                   "publications\n\t{} inputs\n\t{} endpoints\n\t{} filters\n<<<<<<<<<",
+                   _federates.size (), minFederateCount,
+                   std::count_if (_brokers.begin (), _brokers.end (),
+                                  [](auto &brk) { return brk._core == false; }),
+                   std::count_if (_brokers.begin (), _brokers.end (), [](auto &brk) { return brk._core == true; }),
+                   minBrokerCount, pubs, ipts, epts, filt);
     return output;
 }
 
@@ -1620,9 +1660,6 @@ bool CoreBroker::connect ()
             auto res = brokerConnect ();
             if (res)
             {
-                LOG_CONNECTIONS (parent_broker_id, getIdentifier (),
-                                 fmt::format ("||connected on {}", getAddress ()));
-
                 disconnection.activate ();
                 brokerState = broker_state_t::connected;
                 ActionMessage setup (CMD_BROKER_SETUP);
@@ -1635,6 +1672,8 @@ bool CoreBroker::connect ()
                     m.setStringData (getAddress ());
                     transmit (parent_route_id, m);
                 }
+                LOG_CONNECTIONS (parent_broker_id, getIdentifier (),
+                                 fmt::format ("||connected on {}", getAddress ()));
             }
             else
             {
@@ -1899,6 +1938,7 @@ void CoreBroker::executeInitializationOperations ()
     {
         enteredExecutionMode = true;
     }
+    loggingObj->flush ();
 }
 
 void CoreBroker::FindandNotifyInputTargets (BasicHandleInfo &handleInfo)

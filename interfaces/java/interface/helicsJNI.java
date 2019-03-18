@@ -67,7 +67,7 @@ public class helicsJNI {
   public final static native int helics_error_invalid_function_call_get();
   public final static native int helics_error_execution_failure_get();
   public final static native int helics_error_other_get();
-  public final static native int other_error_type_get();
+  public final static native int helics_error_external_type_get();
   public final static native int helics_property_time_delta_get();
   public final static native int helics_property_time_period_get();
   public final static native int helics_property_time_offset_get();

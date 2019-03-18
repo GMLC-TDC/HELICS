@@ -19,8 +19,8 @@ series simulation.
 
 - [GitHub](https://github.com/GMLC-TDC/HELICS-src)
 - [Gitter](https://gitter.im/GMLC-TDC/HELICS-src)
-- [Documentation](https://gmlc-tdc.github.io/HELICS-src)
-- [User Guide](https://gmlc-tdc.github.io/HELICS-src)
+- [Documentation](https://helics.readthedocs.io/en/latest)
+- [User Guide](user-guide/index.html)
 
 ```eval_rst
 .. toctree::
@@ -32,5 +32,7 @@ series simulation.
  developer-guide/index
  apps/index
  c-api-reference/index
- API Doxygen <https://gmlc-tdc.github.io/HELICS-src/doxygen/>
+ ROADMAP
 ```
+
+You can find [Doxygen documentation here](doxygen/index.html).

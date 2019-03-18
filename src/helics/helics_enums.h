@@ -1,7 +1,8 @@
 /*
 Copyright © 2017-2019,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
-All rights reserved. See LICENSE file and DISCLAIMER for more details.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
+the top-level NOTICE for additional details. All rights reserved.
+SPDX-License-Identifier: BSD-3-Clause
 */
 
 /*defines left in this code as it is used in the shared library*/
@@ -150,7 +151,7 @@ extern "C"
           (-10), /*!< the call made was invalid in the present state of the calling object*/
         helics_error_execution_failure = (-14), /*!< the function execution has failed*/
         helics_error_other = -101, /*!< the function produced a helics error of some other type */
-        other_error_type = -203 /*!< a non helics error was produced*/
+        helics_error_external_type = -203 /*!< an unknown non-helics error was produced*/
     } helics_error_types;
 
     /** enumeration of properties that apply to federates*/

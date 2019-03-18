@@ -1,7 +1,8 @@
 /*
 Copyright © 2017-2019,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
-All rights reserved. See LICENSE file and DISCLAIMER for more details.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
+the top-level NOTICE for additional details. All rights reserved.
+SPDX-License-Identifier: BSD-3-Clause
 */
 #pragma once
 
@@ -21,7 +22,7 @@ class IpcComms final : public CommsInterface
     /** destructor*/
     ~IpcComms ();
 
-	virtual void loadNetworkInfo (const NetworkBrokerData &netInfo) override;
+    virtual void loadNetworkInfo (const NetworkBrokerData &netInfo) override;
 
   private:
     std::atomic<int> ipcbackchannel{0};  //!< a back channel message system if the primary is not working
@@ -29,11 +30,11 @@ class IpcComms final : public CommsInterface
     virtual void queue_tx_function () override;  //!< the loop for transmitting data
     virtual void closeReceiver () override;  //!< function to instruct the receiver loop to close
 
-public:
-	/** get the port number of the comms object to push message to*/
-	int getPort() const { return -1; };
+  public:
+    /** get the port number of the comms object to push message to*/
+    int getPort () const { return -1; };
 
-	std::string getAddress() const;
+    std::string getAddress () const;
 };
 
 #define IPC_BACKCHANNEL_TRY_RESET 2
@@ -41,4 +42,3 @@ public:
 
 }  // namespace ipc
 }  // namespace helics
-
