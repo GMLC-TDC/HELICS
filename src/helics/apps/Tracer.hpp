@@ -24,6 +24,11 @@ class Tracer : public App
   public:
     /** construct from a FederateInfo structure*/
     explicit Tracer (const std::string &name, FederateInfo &fi);
+    /** construct from command line arguments in a vector
+   @param args the command line arguments to pass in a reverse vector
+   */
+    explicit Tracer (std::vector<std::string> &args);
+
     /** construct from command line arguments*/
     Tracer (int argc, char *argv[]);
 
@@ -102,6 +107,8 @@ class Tracer : public App
 
     /** build the command line argument processing application*/
     std::shared_ptr<helicsCLI11App> buildArgParserApp ();
+    /** process remaining command line arguments*/
+    void processArgs ();
 
   protected:
     bool printMessage = false;

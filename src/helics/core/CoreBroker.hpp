@@ -141,7 +141,7 @@ class CoreBroker : public Broker, public BrokerBase
     /** transmit a message to the parent or root */
     void transmitToParent (ActionMessage &&cmd);
 
-    /** broacast a message to all immediate brokers*/
+    /** broadcast a message to all immediate brokers*/
     void broadcast (ActionMessage &cmd);
     /**/
     route_id fillMessageRouteInformation (ActionMessage &mess);
@@ -228,10 +228,12 @@ class CoreBroker : public Broker, public BrokerBase
     /** destructor*/
     virtual ~CoreBroker ();
     /** start up the broker with an initialization string containing commands and parameters*/
-    virtual void initialize (const std::string &initializationString) override final;
+    virtual void configure (const std::string &configureString) override final;
     /** initialize from command line arguments
      */
-    virtual void initializeFromArgs (int argc, const char *const *argv) override;
+    virtual void configureFromArgs (int argc, char *argv[]) override final;
+    /** initialize from command line arguments in a vector*/
+    virtual void configureFromVector (std::vector<std::string> &args) override final;
 
     /** check if all the local federates are ready to be initialized
     @return true if everyone is ready, false otherwise
@@ -253,6 +255,9 @@ class CoreBroker : public Broker, public BrokerBase
 
     virtual void
     addDestinationFilterToEndpoint (const std::string &filter, const std::string &endpoint) override final;
+
+  protected:
+    virtual std::shared_ptr<helicsCLI11App> generateCLI () override;
 
   private:
     /** check if we can remove some dependencies*/

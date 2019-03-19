@@ -8,6 +8,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #pragma once
 
 #include "CLI11/CLI11.hpp"
+#include "core-types.hpp"
 #include "helics-time.hpp"
 #include "helicsVersion.hpp"
 
@@ -21,13 +22,12 @@ class helicsCLI11App : public CLI::App
     {
         set_help_flag ("-h,-?,--help", "Print this help message and exit");
         set_config ("--config-file", "helics_config.ini", "specify base configuration file");
-        add_flag_callback ("--version,-v", [] () { throw (CLI::Success{}); });
+        add_flag_callback ("--version,-v", []() { throw (CLI::Success{}); });
         add_option_group ("quiet")->immediate_callback ()->add_flag ("--quiet", quiet,
                                                                      "silence most print output");
     }
-    bool quiet{false};
 
-    enum class parse_return
+    enum class parse_return : int
     {
         ok = 0,
         help_return,
@@ -35,12 +35,17 @@ class helicsCLI11App : public CLI::App
         version_return,
         error_return,
     };
+    bool quiet{false};
+    parse_return last_return{parse_return::ok};
+
     template <typename... Args>
     parse_return helics_parse (Args &&... args)
     {
         try
         {
             parse (std::forward<Args> (args)...);
+            getRemaining ();
+            last_return = parse_return::ok;
             return parse_return::ok;
         }
         catch (const CLI::CallForHelp &ch)
@@ -49,6 +54,7 @@ class helicsCLI11App : public CLI::App
             {
                 exit (ch);
             }
+            last_return = parse_return::help_return;
             return parse_return::help_return;
         }
         catch (const CLI::CallForAllHelp &ca)
@@ -57,6 +63,7 @@ class helicsCLI11App : public CLI::App
             {
                 exit (ca);
             }
+            last_return = parse_return::help_all_return;
             return parse_return::help_all_return;
         }
         catch (const CLI::Success &)
@@ -65,11 +72,13 @@ class helicsCLI11App : public CLI::App
             {
                 std::cout << helics::versionString << '\n';
             }
+            last_return = parse_return::version_return;
             return parse_return::version_return;
         }
         catch (const CLI::Error &ce)
         {
             exit (ce);
+            last_return = parse_return::error_return;
             return parse_return::error_return;
         }
     }
@@ -88,6 +97,46 @@ class helicsCLI11App : public CLI::App
             // must have been removed earlier
         }
     }
+    /** add a callback function to execute on parsing*/
+    void add_callback (std::function<void()> cback)
+    {
+        if (cbacks.empty ())
+        {
+            callback ([this]() {
+                for (auto &cb : cbacks)
+                {
+                    cb ();
+                }
+            });
+        }
+        cbacks.push_back (std::move (cback));
+    }
+    /// Return a reference to the remaining args
+    std::vector<std::string> &remaining_args () { return remArgs; }
+
+    void addTypeOption ()
+    {
+        auto og = add_option_group ("network type")->immediate_callback ();
+        og->add_option_function<std::string> ("--coretype,-t,--type,--core",
+                                              [this](const std::string &val) {
+                                                  coreType = helics::coreTypeFromString (val);
+                                                  if (coreType == core_type::UNRECOGNIZED)
+                                                      throw CLI::ValidationError (
+                                                        val + " is NOT a recognized core type");
+                                              },
+                                              "type of the core to connect to");
+    }
+    core_type getCoreType () const { return coreType; }
+
+  private:
+    void getRemaining ()
+    {
+        remArgs = remaining (true);
+        std::reverse (remArgs.begin (), remArgs.end ());
+    }
+    std::vector<std::function<void()>> cbacks;
+    std::vector<std::string> remArgs;
+    core_type coreType{core_type::DEFAULT};
 };
 }  // namespace helics
 
@@ -101,7 +150,7 @@ inline bool lexical_cast<helics::Time> (std::string input, helics::Time &output)
 {
     try
     {
-        output = helics::loadTimeFromString (input);
+        output = helics::loadTimeFromString (input, time_units::ms);
     }
     catch (std::invalid_argument &)
     {

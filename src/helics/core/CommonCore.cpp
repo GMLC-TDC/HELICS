@@ -6,7 +6,6 @@ SPDX-License-Identifier: BSD-3-Clause
 */
 #include "CommonCore.hpp"
 #include "../common/logger.h"
-#include "../common/stringToCmdLine.h"
 #include "ActionMessage.hpp"
 #include "BasicHandleInfo.hpp"
 #include "CoreFactory.hpp"
@@ -42,31 +41,56 @@ CommonCore::CommonCore (bool /*arg*/) noexcept : timeoutMon (new TimeoutMonitor)
 
 CommonCore::CommonCore (const std::string &core_name) : BrokerBase (core_name), timeoutMon (new TimeoutMonitor) {}
 
-void CommonCore::initialize (const std::string &initializationString)
+void CommonCore::configure (const std::string &configureString)
 {
-    if ((brokerState.load () ==
-         created))  // don't do the compare exchange here since we do that in the initialize fromArgs
-    {  // and we can tolerate a spurious call
-        StringToCmdLine cmdline (initializationString);
-        initializeFromArgs (cmdline.getArgCount (), cmdline.getArgV ());
+    broker_state_t exp = created;
+    if (brokerState.compare_exchange_strong (exp, broker_state_t::configuring))
+    {
+        // initialize the brokerbase
+        if (parseArgs (configureString) < 0)
+        {
+            brokerState = created;
+            return;
+        }
+        configureBase ();
     }
 }
 
-void CommonCore::initializeFromArgs (int argc, const char *const *argv)
+void CommonCore::configureFromArgs (int argc, char *argv[])
 {
     broker_state_t exp = created;
-    if (brokerState.compare_exchange_strong (exp, broker_state_t::initialized))
+    if (brokerState.compare_exchange_strong (exp, broker_state_t::configuring))
     {
         // initialize the brokerbase
-        initializeFromCmdArgs (argc, argv);
+        if (parseArgs (argc, argv) < 0)
+        {
+            brokerState = created;
+            return;
+        }
+        configureBase ();
+    }
+}
+
+void CommonCore::configureFromVector (std::vector<std::string> &args)
+{
+    broker_state_t exp = created;
+    if (brokerState.compare_exchange_strong (exp, broker_state_t::configuring))
+    {
+        // initialize the brokerbase
+        if (parseArgs (args) < 0)
+        {
+            brokerState = created;
+            return;
+        }
+        configureBase ();
     }
 }
 
 bool CommonCore::connect ()
 {
-    if (brokerState >= broker_state_t::initialized)
+    if (brokerState >= broker_state_t::configured)
     {
-        broker_state_t exp = broker_state_t::initialized;
+        broker_state_t exp = broker_state_t::configured;
         if (brokerState.compare_exchange_strong (exp, broker_state_t::connecting))
         {
             timeoutMon->setTimeout (std::chrono::milliseconds (timeout));
@@ -117,7 +141,7 @@ const std::string &CommonCore::getAddress () const
 
 void CommonCore::processDisconnect (bool skipUnregister)
 {
-    if (brokerState > broker_state_t::initialized)
+    if (brokerState > broker_state_t::configured)
     {
         if (brokerState < broker_state_t::terminating)
         {
@@ -289,7 +313,7 @@ route_id CommonCore::getRoute (global_federate_id global_fedid) const
     return (fnd != routing_table.end ()) ? fnd->second : parent_route_id;
 }
 
-bool CommonCore::isInitialized () const { return (brokerState >= initialized); }
+bool CommonCore::isConfigured () const { return (brokerState >= configured); }
 
 bool CommonCore::isOpenToNewFederates () const { return ((brokerState != created) && (brokerState < operating)); }
 void CommonCore::error (local_federate_id federateID, int errorCode)
@@ -3694,7 +3718,7 @@ bool CommonCore::waitCoreRegistration ()
                          fmt::format ("broker state={}, broker id={}, sleepcnt={}",
                                       static_cast<int> (brokerState.load ()), brkid.baseValue (), sleepcnt));
         }
-        if (brokerState.load () <= broker_state_t::initialized)
+        if (brokerState.load () <= broker_state_t::configured)
         {
             connect ();
         }
@@ -3717,7 +3741,7 @@ bool CommonCore::waitCoreRegistration ()
         std::this_thread::sleep_for (std::chrono::milliseconds (100));
         brkid = global_id.load ();
         ++sleepcnt;
-        if (sleepcnt * 100 > timeout)
+        if (Time (sleepcnt * 100, time_units::ms) > timeout)
         {
             return false;
         }

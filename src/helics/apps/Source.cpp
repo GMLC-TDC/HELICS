@@ -32,7 +32,11 @@ void SignalGenerator::setString (const std::string & /*parameter*/, const std::s
 
 using namespace std::string_literals;
 
-Source::Source (int argc, char *argv[]) : App ("source", argc, argv)
+Source::Source (int argc, char *argv[]) : App ("source", argc, argv) { processArgs (); }
+
+Source::Source (std::vector<std::string> &args) : App ("source", args) { processArgs (); }
+
+void Source::processArgs ()
 {
     helicsCLI11App app ("Options specific to the Source App");
     app.add_option ("--default_period", defaultPeriod, "the default period publications");
@@ -51,7 +55,6 @@ Source::Source (int argc, char *argv[]) : App ("source", argc, argv)
         std::cout << app.help ();
     }
 }
-
 Source::Source (const std::string &appName, const FederateInfo &fi) : App (appName, fi)
 {
     fed->setFlagOption (helics_flag_source_only);

@@ -13,7 +13,6 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "exeTestHelper.h"
 #include "helics/application_api/Endpoints.hpp"
 #include "helics/apps/Echo.hpp"
-#include "helics/common/stringToCmdLine.h"
 #include "helics/core/BrokerFactory.hpp"
 #include <future>
 

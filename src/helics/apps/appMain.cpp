@@ -7,7 +7,7 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include "../core/BrokerFactory.hpp"
 #include "../core/core-exceptions.hpp"
-#include "../core/helicsVersion.hpp"
+#include "../core/helicsCLI11.hpp"
 #include "BrokerApp.hpp"
 #include "Echo.hpp"
 #include "Player.hpp"
@@ -15,104 +15,57 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "Source.hpp"
 #include "Tracer.hpp"
 #include <iostream>
-#include <boost/algorithm/string.hpp>
 
-void showHelp ()
-{
-    std::cout << "helics_app <appName> <appArguments>...\n";
-    std::cout << "available apps: echo, source, player, recorder, broker, tracer\n";
-    std::cout << " helics_app -?, -h, or --help shows this help\n";
-    std::cout << "helics_app <appName> --help for application specific help\n";
-    std::cout << "helics_app --version or -v will show the helics version string\n";
-}
 int main (int argc, char *argv[])
 {
-    if (argc == 1)
-    {
-        showHelp ();
-        return 0;
-    }
-    std::string arg1 (argv[1]);
-    int ret = 0;
-    // now redo the arguments remove the second argument which is the app name
-    argc -= 1;
-    for (int ii = 2; ii <= argc; ++ii)
-    {
-        argv[ii - 1] = argv[ii];
-    }
-    try
-    {
-        if (boost::iequals (arg1, "player"))
+    helics::helicsCLI11App app ("", "helics_app");
+    app.ignore_case ();
+    app.prefix_command ();
+    app.add_subcommand ("Helics Player App", "player")->prefix_command ()->callback ([&app]() {
+        helics::apps::Player player (app.remaining_args ());
+        if (player.isActive ())
         {
-            helics::apps::Player player (argc, argv);
-            if (player.isActive ())
-            {
-                player.run ();
-            }
+            player.run ();
         }
-        else if (boost::iequals (arg1, "recorder"))
+    });
+
+    app.add_subcommand ("Helics Recorder App", "recorder")->prefix_command ()->callback ([&app]() {
+        helics::apps::Recorder recorder (app.remaining_args ());
+        if (recorder.isActive ())
         {
-            helics::apps::Recorder recorder (argc, argv);
-            if (recorder.isActive ())
-            {
-                recorder.run ();
-            }
+            recorder.run ();
         }
-        else if ((arg1 == "--version") || (arg1 == "-v"))
+    });
+    app.add_subcommand ("Helics Echo App", "echo")->prefix_command ()->callback ([&app]() {
+        helics::apps::Echo echo (app.remaining_args ());
+        if (echo.isActive ())
         {
-            std::cout << "helics_app\n" << helics::versionString << '\n';
+            echo.run ();
         }
-        else if ((arg1 == "--help") || (arg1 == "-?") || (arg1 == "-h"))
+    });
+
+    app.add_subcommand ("Helics Source App", "source")->prefix_command ()->callback ([&app]() {
+        helics::apps::Source source (app.remaining_args ());
+        if (source.isActive ())
         {
-            showHelp ();
+            source.run ();
         }
-        else if (boost::iequals (arg1, "echo"))
+    });
+
+    app.add_subcommand ("Helics Tracer App", "tracer")->prefix_command ()->callback ([&app]() {
+        helics::apps::Tracer tracer (app.remaining_args ());
+        if (tracer.isActive ())
         {
-            helics::apps::Echo echo (argc, argv);
-            if (echo.isActive ())
-            {
-                echo.run ();
-            }
+            tracer.run ();
         }
-        else if (boost::iequals (arg1, "source"))
-        {
-            helics::apps::Source source (argc, argv);
-            if (source.isActive ())
-            {
-                source.run ();
-            }
-        }
-        else if (boost::iequals (arg1, "broker"))
-        {
-            helics::apps::BrokerApp broker (argc, argv);
-            // broker just waits on the destructor if it was active so this is all we do
-        }
-        else if (boost::iequals (arg1, "tracer"))
-        {
-            helics::apps::Tracer Tracer (argc, argv);
-            if (Tracer.isActive ())
-            {
-                Tracer.enableTextOutput ();
-                Tracer.run ();
-            }
-        }
-        else
-        {
-            std::cout << "ERROR:  unrecognized app name\n";
-            showHelp ();
-        }
-    }
-    catch (const std::invalid_argument &ia)
-    {
-        std::cerr << ia.what () << std::endl;
-        ret = -2;
-    }
-    catch (const helics::HelicsException &he)
-    {
-        std::cerr << he.what () << std::endl;
-        ret = -4;
-    }
+    });
+
+    app.add_subcommand ("Helics Broker App", "broker")->prefix_command ()->callback ([&app]() {
+        helics::apps::BrokerApp broker (app.remaining_args ());
+    });
+
+    auto ret = app.helics_parse (argc, argv);
 
     helics::cleanupHelicsLibrary ();
-    return ret;
+    return (static_cast<int> (ret));
 }

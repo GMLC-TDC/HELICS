@@ -8,6 +8,7 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include "../core/core-types.hpp"
 #include "NetworkBroker.hpp"
+#include "helicsCLI11.hpp"
 #include <iostream>
 
 namespace helics
@@ -35,28 +36,12 @@ NetworkBroker<COMMS, baseline, tcode>::NetworkBroker (const std::string &broker_
 }
 
 template <class COMMS, interface_type baseline, int tcode>
-void NetworkBroker<COMMS, baseline, tcode>::displayHelp (bool local_only)
+std::shared_ptr<helicsCLI11App> NetworkBroker<COMMS, baseline, tcode>::generateCLI ()
 {
-    std::cout << " Help for " << tcodeStr (tcode) << " Broker: \n";
-    NetworkBrokerData::displayHelp ();
-    if (!local_only)
-    {
-        CoreBroker::displayHelp ();
-    }
-}
-
-template <class COMMS, interface_type baseline, int tcode>
-void NetworkBroker<COMMS, baseline, tcode>::initializeFromArgs (int argc, const char *const *argv)
-{
-    if (BrokerBase::brokerState == BrokerBase::created)
-    {
-        std::lock_guard<std::mutex> lock (dataMutex);
-        if (BrokerBase::brokerState == BrokerBase::created)
-        {
-            netInfo.initializeFromArgs (argc, argv, defInterface[static_cast<int> (baseline)]);
-            CoreBroker::initializeFromArgs (argc, argv);
-        }
-    }
+    auto app = CoreBroker::generateCLI ();
+    CLI::App_p netApp = netInfo.commandLineParser (defInterface[static_cast<int> (baseline)]);
+    app.add_subcommand (netApp);
+    return app;
 }
 
 template <class COMMS, interface_type baseline, int tcode>

@@ -46,32 +46,54 @@ class Core
     /**
      * Simulator control.
      */
-
     /**
-     * Initialize the core.
+     * Configure the core.
+     *
+     * Should be invoked a single time to configure the co-simulation core for operation
+     *
+     */
+    [[deprecated ("please use configure instead")]] void initialize (const std::string &configureString)
+    {
+        configure (configureString);
+    }
+    /**Configure the core from command line arguments.
+     *
+     * Should be invoked a single time to initialize the co-simulation core for operation
+     *
+     */
+    [[deprecated ("please use configureFromArgs instead")]] void initializeFromArgs (int argc, char *argv[])
+    {
+        configureFromArgs (argc, argv);
+    }
+    /**
+     * Configure the core from a configuration string
      *
      * Should be invoked a single time to initialize the co-simulation core.
      *
      */
-    virtual void initialize (const std::string &initializationString) = 0;
+    virtual void configure (const std::string &configureString) = 0;
     /**
-     * Initialize the core from command line arguments.
+     * Configure the core from command line arguments.
      *
-     * Should be invoked a single time to initialize the co-simulation core.
+     * Should be invoked a single time to configure the co-simulation core for operation
      *
      */
-    virtual void initializeFromArgs (int argc, const char *const *argv) = 0;
+    virtual void configureFromArgs (int argc, char *argv[]) = 0;
     /**
-     * Initialize the core from command line arguments contained in a vector
+     * Configure the core from command line arguments contained in a vector in reverse order
      *
-     * Should be invoked a single time to initialize the co-simulation core.
+     * Should be invoked a single time to configure the co-simulation core for operations
      *
      */
-    virtual void initializeFromVector (std::vector<std::string> &args) = 0;
+    virtual void configureFromVector (std::vector<std::string> &args) = 0;
     /**
-     * Returns true if the core has been initialized.
+     * Returns true if the core has been configured.
      */
-    virtual bool isInitialized () const = 0;
+    virtual bool isConfigured () const = 0;
+    /**
+     * Returns true if the core has been configured.
+     */
+    [[deprecated ("please use isConfigured")]] bool isInitialized () const { return isConfigured (); }
     /**
     * connect the core to a broker if needed
     @return true if the connection was successful

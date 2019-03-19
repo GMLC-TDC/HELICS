@@ -7,6 +7,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #pragma once
 
 #include "NetworkCore.hpp"
+#include "helicsCLI11.hpp"
 
 namespace helics
 {
@@ -27,17 +28,12 @@ NetworkCore<COMMS, baseline>::NetworkCore (const std::string &core_name)
 }
 
 template <class COMMS, interface_type baseline>
-void NetworkCore<COMMS, baseline>::initializeFromArgs (int argc, const char *const *argv)
+std::shared_ptr<helicsCLI11App> NetworkCore<COMMS, baseline>::generateCLI ()
 {
-    if (BrokerBase::brokerState == BrokerBase::created)
-    {
-        std::lock_guard<std::mutex> lock (dataMutex);
-        if (BrokerBase::brokerState == BrokerBase::created)
-        {
-            netInfo.initializeFromArgs (argc, argv, defLocalInterface[static_cast<int> (baseline)]);
-            CommonCore::initializeFromArgs (argc, argv);
-        }
-    }
+    auto app = CommonCore::generateCLI ();
+    CLI::App_p netApp = netInfo.commandLineParser (defInterface[static_cast<int> (baseline)]);
+    app.add_subcommand (netApp);
+    return app;
 }
 
 template <class COMMS, interface_type baseline>

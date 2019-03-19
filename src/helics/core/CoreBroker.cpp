@@ -6,10 +6,9 @@ SPDX-License-Identifier: BSD-3-Clause
 */
 
 #include "CoreBroker.hpp"
-#include "../common/stringToCmdLine.h"
 #include "BrokerFactory.hpp"
+#include "helicsCLI11.hpp"
 
-#include "../common/argParser.h"
 #include "../common/fmt_format.h"
 
 #include "../common/JsonProcessingFunctions.hpp"
@@ -25,19 +24,6 @@ SPDX-License-Identifier: BSD-3-Clause
 namespace helics
 {
 using namespace std::string_literals;
-
-static const ArgDescriptors extraArgs{
-  {"root"s, ArgDescriptor::arg_type_t::flag_type, "specify whether the broker is a root"s},
-};
-
-void CoreBroker::displayHelp ()
-{
-    std::cout << "Broker Specific options:\n";
-    variable_map vm;
-    const char *const argV[] = {"", "--help"};
-    argumentParser (2, argV, vm, extraArgs);
-    BrokerBase::displayHelp ();
-}
 
 CoreBroker::~CoreBroker ()
 {
@@ -1613,30 +1599,54 @@ CoreBroker::CoreBroker (const std::string &broker_name) : BrokerBase (broker_nam
 {
 }
 
-void CoreBroker::initialize (const std::string &initializationString)
+void CoreBroker::configure (const std::string &configureString)
 {
-    if (brokerState == broker_state_t::created)
+    broker_state_t exp = broker_state_t::created;
+    if (brokerState.compare_exchange_strong (exp, broker_state_t::configuring))
     {
-        StringToCmdLine cmdline (initializationString);
-        initializeFromArgs (cmdline.getArgCount (), cmdline.getArgV ());
+        if (parseArgs (configureString) < 0)
+        {
+            brokerState = broker_state_t::created;
+            return;
+        }
+        configureBase ();
     }
 }
 
-void CoreBroker::initializeFromArgs (int argc, const char *const *argv)
+void CoreBroker::configureFromArgs (int argc, char *argv[])
 {
     broker_state_t exp = broker_state_t::created;
-    if (brokerState.compare_exchange_strong (exp, broker_state_t::initialized))
+    if (brokerState.compare_exchange_strong (exp, broker_state_t::configuring))
     {
-        variable_map vm;
-        argumentParser (argc, argv, vm, extraArgs);
-        // Initialize the brokerBase component
-        initializeFromCmdArgs (argc, argv);
-
-        if (vm.count ("root") > 0)
+        if (parseArgs (argc, argv) < 0)
         {
-            setAsRoot ();
+            brokerState = broker_state_t::created;
+            return;
         }
+        configureBase ();
     }
+}
+
+void CoreBroker::configureFromVector (std::vector<std::string> &args)
+{
+    broker_state_t exp = broker_state_t::created;
+    if (brokerState.compare_exchange_strong (exp, broker_state_t::configuring))
+    {
+        if (parseArgs (args) < 0)
+        {
+            brokerState = broker_state_t::created;
+            return;
+        }
+        configureBase ();
+    }
+}
+
+std::shared_ptr<helicsCLI11App> CoreBroker::generateCLI ()
+{
+    auto app = std::make_shared<helicsCLI11App> ("Option for Broker");
+    app->remove_helics_specifics ();
+    app->add_flag_callback ("--root", [this]() { setAsRoot (); }, "specify whether the broker is a root");
+    return app;
 }
 
 void CoreBroker::setAsRoot ()
@@ -1652,7 +1662,7 @@ bool CoreBroker::connect ()
 {
     if (brokerState < broker_state_t::connected)
     {
-        broker_state_t exp = broker_state_t::initialized;
+        broker_state_t exp = broker_state_t::configured;
         if (brokerState.compare_exchange_strong (exp, broker_state_t::connecting))
         {
             LOG_CONNECTIONS (parent_broker_id, getIdentifier (), "connecting");
@@ -1677,7 +1687,7 @@ bool CoreBroker::connect ()
             }
             else
             {
-                brokerState = broker_state_t::initialized;
+                brokerState = broker_state_t::configured;
             }
             return res;
         }
@@ -1714,7 +1724,7 @@ void CoreBroker::processDisconnect (bool skipUnregister)
     {
         return;
     }
-    if (brokerState > broker_state_t::initialized)
+    if (brokerState > broker_state_t::configured)
     {
         LOG_CONNECTIONS (parent_broker_id, getIdentifier (), "||disconnecting");
         brokerState = broker_state_t::terminating;

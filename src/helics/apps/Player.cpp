@@ -50,40 +50,13 @@ static inline bool vComp (const ValueSetter &v1, const ValueSetter &v2)
 }
 static inline bool mComp (const MessageHolder &m1, const MessageHolder &m2) { return (m1.sendTime < m2.sendTime); }
 
-Player::Player (int argc, char *argv[]) : App ("player", argc, argv)
-{
-    helicsCLI11App app ("Command line options for the Player App");
-    app.add_option ("--marker", nextPrintTimeStep,
-                    "print a statement indicating time advancement every <arg> period during the simulation");
-    app
-      .add_option (
-        "--datatype",
-        [this] (CLI::results_t res) {
-            defType = helics::getTypeFromString (res[0]);
-            return (defType != helics::data_type::helics_custom);
-        },
-        "type of the publication data type to use", false)
-      ->take_last ()
-      ->ignore_underscore ();
+Player::Player (std::vector<std::string> &args) : App ("player", args) { processArgs (); }
 
-    app
-      .add_option (
-        "--time_units",
-        [this] (CLI::results_t res) {
-            try
-            {
-                units = timeUnitsFromString (res[0]);
-                timeMultiplier = toSecondMultiplier (units);
-                return true;
-            }
-            catch (...)
-            {
-                return false;
-            }
-        },
-        "the default units on the timestamps used in file based input", false)
-      ->take_last ()
-      ->ignore_underscore ();
+Player::Player (int argc, char *argv[]) : App ("player", argc, argv) { processArgs (); }
+
+void Player::processArgs ()
+{
+    helicsCLI11App app = generateParser ();
 
     if (!deactivated)
     {
@@ -99,6 +72,42 @@ Player::Player (int argc, char *argv[]) : App ("player", argc, argv)
         app.remove_helics_specifics ();
         std::cout << app.help ();
     }
+}
+
+helicsCLI11App Player::generateParser ()
+{
+    helicsCLI11App app ("Command line options for the Player App");
+    app.add_option ("--marker", nextPrintTimeStep,
+                    "print a statement indicating time advancement every <arg> period during the simulation");
+    app
+      .add_option ("--datatype",
+                   [this](CLI::results_t res) {
+                       defType = helics::getTypeFromString (res[0]);
+                       return (defType != helics::data_type::helics_custom);
+                   },
+                   "type of the publication data type to use", false)
+      ->take_last ()
+      ->ignore_underscore ();
+
+    app
+      .add_option ("--time_units",
+                   [this](CLI::results_t res) {
+                       try
+                       {
+                           units = timeUnitsFromString (res[0]);
+                           timeMultiplier = toSecondMultiplier (units);
+                           return true;
+                       }
+                       catch (...)
+                       {
+                           return false;
+                       }
+                   },
+                   "the default units on the timestamps used in file based input", false)
+      ->take_last ()
+      ->ignore_underscore ();
+
+    return app;
 }
 
 Player::Player (const std::string &appName, const FederateInfo &fi) : App (appName, fi)

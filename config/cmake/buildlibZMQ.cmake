@@ -121,7 +121,7 @@ ExternalProject_Add(libzmq
                     CMAKE_C_COMPILER=${c_compiler_string} -D
                     CMAKE_LINKER=${linker_string} -D
                     CMAKE_BUILD_TYPE=${MSVC_RELEASE_BUILD_TYPE} -G
-                    ${CMAKE_GENERATOR} -A ${CMAKE_GENERATOR_PLATFORM} ..
+                    ${CMAKE_GENERATOR} ..
                 WORKING_DIRECTORY ${trigger_build_dir}/build
                 OUTPUT_FILE
                     ${PROJECT_BINARY_DIR}/logs/zmq_autobuild_config_release.log
@@ -150,7 +150,7 @@ ExternalProject_Add(libzmq
                 COMMAND
                     ${CMAKE_COMMAND} -D CMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}
                     -D CMAKE_C_COMPILER=${CMAKE_C_COMPILER} -D
-                    CMAKE_BUILD_TYPE=Debug -G ${CMAKE_GENERATOR} -A ${CMAKE_GENERATOR_PLATFORM} ..
+                    CMAKE_BUILD_TYPE=Debug -G ${CMAKE_GENERATOR} ..
                 WORKING_DIRECTORY ${trigger_build_dir}/build
                 OUTPUT_FILE
                     ${PROJECT_BINARY_DIR}/logs/zmq_autobuild_config_debug.log
@@ -179,7 +179,7 @@ ExternalProject_Add(libzmq
                 ${CMAKE_COMMAND} -D CMAKE_CXX_COMPILER=${cxx_compiler_string} -D
                 CMAKE_C_COMPILER=${c_compiler_string} -D
                 CMAKE_LINKER=${linker_string} -D
-                CMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE} -G ${CMAKE_GENERATOR} -A ${CMAKE_GENERATOR_PLATFORM} ..
+                CMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE} -G ${CMAKE_GENERATOR} ..
             WORKING_DIRECTORY ${trigger_build_dir}/build
             OUTPUT_FILE ${PROJECT_BINARY_DIR}/logs/zmq_autobuild_config.log
         )

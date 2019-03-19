@@ -16,7 +16,6 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helics/application_api/Publications.hpp"
 #include "helics/apps/Tracer.hpp"
 #include "helics/common/stringOps.h"
-#include "helics/common/stringToCmdLine.h"
 #include "helics/core/BrokerFactory.hpp"
 #include <algorithm>
 #include <future>

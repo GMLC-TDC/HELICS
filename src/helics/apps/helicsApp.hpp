@@ -31,6 +31,11 @@ class App
   public:
     /** default constructor*/
     App () = default;
+    /** construct from command line arguments in a vector
+   @param defaultAppName the name to use if not specified in one of the arguments
+   @param args the command line arguments to pass in a reverse vector
+   */
+    App (const std::string &defaultAppName, std::vector<std::string> &args);
     /** construct from command line arguments
     @param defaultAppName the name to use if not specified in one of the arguments
     @param argc the number of arguments
@@ -103,6 +108,9 @@ class App
 
   private:
     void loadConfigOptions (const Json::Value &element);
+    /** generate the command line parser*/
+    std::unique_ptr<helicsCLI11App> generateParser ();
+    void processArgs (std::unique_ptr<helicsCLI11App> &app, const std::string &defaultAppName);
 
   protected:
     std::shared_ptr<CombinationFederate> fed;  //!< the federate created for the Player

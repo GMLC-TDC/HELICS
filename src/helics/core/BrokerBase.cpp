@@ -8,8 +8,8 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "BrokerBase.hpp"
 
 #include "../common/AsioContextManager.h"
-#include "../common/argParser.h"
 #include "../common/logger.h"
+#include "helicsCLI11.hpp"
 
 #include "../common/fmt_format.h"
 #include "ForwardingTimeCoordinator.hpp"
@@ -82,113 +82,104 @@ void BrokerBase::joinAllThreads ()
     }
 }
 
-static const ArgDescriptors extraArgs{
-  {"name,n", "name of the broker/core"},
-  {"federates,f", ArgDescriptor::arg_type_t::int_type, "the minimum number of federates that will be connecting"},
-  {"minfed,m", ArgDescriptor::arg_type_t::int_type, "the minimum number of federates that will be connecting"},
-  {"maxiter", ArgDescriptor::arg_type_t::int_type, "maximum number of iterations"},
-  {"logfile", "the file to log message to"},
-  {"loglevel", ArgDescriptor::arg_type_t::int_type,
-   "the level which to log the higher this is set to the more gets logs (-1) for no logging"},
-  {"log_level", ArgDescriptor::arg_type_t::int_type,
-   "the level which to log the higher this is set to the more gets logs (-1) for no logging"},
-  {"fileloglevel", ArgDescriptor::arg_type_t::int_type, "the level at which messages get sent to the file"},
-  {"consoleloglevel", ArgDescriptor::arg_type_t::int_type, "the level at which message get sent to the console"},
-  {"minbrokers", ArgDescriptor::arg_type_t::int_type,
-   "the minimum number of cores/brokers that need to be connected (ignored in cores)"},
-  {"identifier", "name of the core/broker"},
-  {"tick", "number of milliseconds per tick counter if there is no broker communication for 2 ticks then "
-           "secondary actions are taken  (can also be entered as a time like '10s' or '45ms')"},
-  {"dumplog", ArgDescriptor::arg_type_t::flag_type,
-   "capture a record of all messages and dump a complete log to file or console on termination"},
-  {"force_logging_flush", ArgDescriptor::arg_type_t::flag_type, "flush the log after every message"},
-  {"networktimeout",
-   "milliseconds to wait to establish a network (can also be entered as a time like '500ms' or '2s') "},
-  {"timeout",
-   "milliseconds to wait for a broker connection (can also be entered as a time like '10s' or '45ms') "}};
-
-void BrokerBase::displayHelp ()
+std::shared_ptr<helicsCLI11App> BrokerBase::generateCLI ()
 {
-    std::cout << " Global options for all Brokers:\n";
-    variable_map vm;
-    const char *const argV[] = {"", "-?"};
-    argumentParser (2, argV, vm, extraArgs);
+    auto hApp = std::make_shared<helicsCLI11App> ("Core/Broker specific arguments");
+    hApp->remove_helics_specifics ();
+    return hApp;
+}
+std::shared_ptr<helicsCLI11App> BrokerBase::generateBaseCLI ()
+{
+    auto hApp = std::make_shared<helicsCLI11App> ("Arguments applying to all Brokers and Cores");
+
+    hApp->add_option ("--federates,-f,--min_federates,--minfed,-m", minFederateCount,
+                      "the minimum number of federates that will be connecting");
+    hApp->add_option ("--name,-n,--identifier", identifier, "the name of the broker/core");
+    hApp->add_option ("--maxiter,--max_iterations", maxIterationCount, "the maximum number of iterations allowed",
+                      true);
+    hApp
+      ->add_option ("--minbrokers,--minbroker,--minbrokercount", minBrokerCount,
+                    "the minimum number of cores/brokers that need to be connected (ignored in cores)")
+      ->ignore_underscore ();
+    auto logging_group = hApp->add_option_group ("logging", "Options related to file and message logging");
+    logging_group->add_flag ("--force_logging_flush", forceLoggingFlush, "flush the log after every message");
+    logging_group->add_option ("--logfile", logFile, "the file to log the messages to")->ignore_underscore ();
+    logging_group
+      ->add_option ("--loglevel", maxLogLevel,
+                    "the level which to log the higher this is set to the more gets logs(-1) for no logging")
+      ->ignore_underscore ();
+    logging_group->add_option ("--fileloglevel", fileLogLevel, "the level at which messages get sent to the file")
+      ->ignore_underscore ();
+    logging_group
+      ->add_option ("--consoleloglevel", consoleLogLevel, "the level at which messages get sent to the file")
+      ->ignore_underscore ();
+    logging_group->add_flag (
+      "--dumplog", dumplog,
+      "capture a record of all messages and dump a complete log to file or console on termination");
+
+    auto timeout_group = hApp->add_option_group ("timeouts", "Options related to network and process timeouts");
+    timeout_group->add_option (
+      "--tick", tickTimer,
+      "heartbeat time in ms, if there is no broker communication for 2 ticks then "
+      "secondary actions are taken  (can also be entered as a time like '10s' or '45ms')");
+    timeout_group->add_option ("--timeout", timeout,
+                               "time to wait to establish a network default unit is in ms (can also be entered as "
+                               "a time like '10s' or '45ms') ");
+    timeout_group
+      ->add_option ("--networktimeout", networkTimeout,
+                    "time to wait for a broker connection default unit is in ms(can also be entered as a time "
+                    "like '10s' or '45ms') ")
+      ->ignore_underscore ();
+
+    return hApp;
 }
 
-void BrokerBase::initializeFromCmdArgs (int argc, const char *const *argv)
+int BrokerBase::parseArgs (int argc, char *argv[])
 {
-    variable_map vm;
-    argumentParser (argc, argv, vm, extraArgs);
+    auto app = generateBaseCLI ();
+    auto sApp = generateCLI ();
+    app->add_subcommand (sApp);
+    auto res = app->helics_parse (argc, argv);
+    if (res != helicsCLI11App::parse_return::ok)
+    {
+        return -1;
+    }
+    return 0;
+}
 
-    if (vm.count ("minfed") > 0)
+int BrokerBase::parseArgs (std::vector<std::string> &args)
+{
+    auto app = generateBaseCLI ();
+    auto sApp = generateCLI ();
+    app->add_subcommand (sApp);
+    auto res = app->helics_parse (args);
+    if (res != helicsCLI11App::parse_return::ok)
     {
-        minFederateCount = vm["minfed"].as<int> ();
+        return -1;
     }
-    if (vm.count ("federates") > 0)
+    return 0;
+}
+
+int BrokerBase::parseArgs (const std::string &initializationString)
+{
+    auto app = generateBaseCLI ();
+    auto sApp = generateCLI ();
+    app->add_subcommand (sApp);
+    auto res = app->helics_parse (initializationString);
+    if (res != helicsCLI11App::parse_return::ok)
     {
-        minFederateCount = vm["federates"].as<int> ();
+        return -1;
     }
-    if (vm.count ("minbrokers") > 0)
+    return 0;
+}
+
+void BrokerBase::configureBase ()
+{
+    if (networkTimeout < timeZero)
     {
-        minBrokerCount = vm["minbrokers"].as<int> ();
-    }
-    if (vm.count ("maxiter") > 0)
-    {
-        maxIterationCount = vm["maxiter"].as<int> ();
+        networkTimeout = 4.0;
     }
 
-    if (vm.count ("name") > 0)
-    {
-        identifier = vm["name"].as<std::string> ();
-    }
-
-    if (vm.count ("dumplog") > 0)
-    {
-        dumplog = true;
-    }
-    if (vm.count ("force_logging_flush") > 0)
-    {
-        forceLoggingFlush = true;
-    }
-    if (vm.count ("identifier") > 0)
-    {
-        identifier = vm["identifier"].as<std::string> ();
-    }
-    if (vm.count ("loglevel") > 0)
-    {
-        maxLogLevel = vm["loglevel"].as<int> ();
-    }
-    if (vm.count ("log_level") > 0)
-    {
-        maxLogLevel = vm["log_level"].as<int> ();
-    }
-    if (vm.count ("logfile") > 0)
-    {
-        logFile = vm["logfile"].as<std::string> ();
-    }
-    if (vm.count ("networktimeout") > 0)
-    {
-        auto network_to = loadTimeFromString (vm["timeout"].as<std::string> (), time_units::ms);
-        networkTimeout = network_to.toCount (time_units::ms);
-    }
-    if (vm.count ("timeout") > 0)
-    {
-        auto time_out = loadTimeFromString (vm["timeout"].as<std::string> (), time_units::ms);
-        timeout = time_out.toCount (time_units::ms);
-        if (networkTimeout < 0)
-        {
-            networkTimeout = timeout;
-        }
-    }
-    if (networkTimeout < 0)
-    {
-        networkTimeout = 4000;
-    }
-    if (vm.count ("tick") > 0)
-    {
-        auto time_tick = loadTimeFromString (vm["tick"].as<std::string> (), time_units::ms);
-        tickTimer = time_tick.toCount (time_units::ms);
-    }
     if (!noAutomaticID)
     {
         if (identifier.empty ())
@@ -208,6 +199,7 @@ void BrokerBase::initializeFromCmdArgs (int argc, const char *const *argv)
     loggingObj->startLogging (maxLogLevel, maxLogLevel);
     mainLoopIsRunning.store (true);
     queueProcessingThread = std::thread (&BrokerBase::queueProcessingLoop, this);
+    brokerState = broker_state_t::configured;
 }
 
 bool BrokerBase::sendToLogger (global_federate_id federateID,
@@ -374,11 +366,11 @@ void BrokerBase::queueProcessingLoop ()
     auto timerCallback = [this, &active](const std::error_code &ec) {
         timerTickHandler (this, active, ec);
     };
-    if (tickTimer > 0)
+    if (tickTimer > timeZero)
     {
-        if (tickTimer < 500)
+        if (tickTimer < Time (500, time_units::ms))
         {
-            tickTimer = 500;
+            tickTimer = Time (500, time_units::ms);
         }
         active = std::make_pair (true, true);
         ticktimer.expires_at (std::chrono::steady_clock::now () + std::chrono::milliseconds (tickTimer));

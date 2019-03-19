@@ -11,15 +11,11 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <iostream>
 
 #include "../core/helicsCLI11.hpp"
-#include <boost/filesystem.hpp>
 
 #include "../common/JsonProcessingFunctions.hpp"
 
 #include "../common/stringOps.h"
 #include "../core/helicsVersion.hpp"
-
-namespace filesystem = boost::filesystem;
-
 // static const std::regex creg
 // (R"raw((-?\d+(\.\d+)?|\.\d+)[\s,]*([^\s]*)(\s+[cCdDvVsSiIfF]?\s+|\s+)([^\s]*))raw");
 
@@ -37,24 +33,30 @@ namespace helics
 {
 namespace apps
 {
+App::App (const std::string &defaultAppName, std::vector<std::string> &args)
+{
+    auto app = generateParser ();
+    app->helics_parse (args);
+    processArgs (app, defaultAppName);
+}
+
 App::App (const std::string &defaultAppName, int argc, char *argv[])
 {
-    helicsCLI11App app ("helics App Parser");
+    auto app = generateParser ();
+    app->helics_parse (argc, argv);
+    processArgs (app, defaultAppName);
+}
 
-    app.add_flag ("--local", useLocal,
-                  "specify otherwise unspecified endpoints and publications as local( "
-                  "i.e.the keys will be prepended with the player name)");
-    app.add_option ("--stop", stopTime, "The time to stop the app")->type_name ("TIME");
-    app.add_option ("--input,input", masterFileName, "The primary input file")->check (CLI::ExistingFile);
-    app.allow_extras ();
-    auto ret = app.helics_parse (argc, argv);
-
+void App::processArgs (std::unique_ptr<helicsCLI11App> &app, const std::string &defaultAppName)
+{
+    remArgs = app->remaining ();
+    auto ret = app->last_return;
     if (ret == helicsCLI11App::parse_return::help_return)
     {
-        if (!app.quiet)
+        if (!app->quiet)
         {
             // this is just to run the help output
-            FederateInfo helpTemp (argc, argv);
+            FederateInfo helpTemp (std::vector<std::string>{"--help"});
         }
         helpMode = true;
     }
@@ -74,7 +76,6 @@ App::App (const std::string &defaultAppName, int argc, char *argv[])
             }
         }
     }
-    remArgs = app.remaining ();
 
     FederateInfo fi (remArgs);
     if (fi.defName.empty ())
@@ -106,9 +107,22 @@ App::App (const std::string &appName, const std::string &jsonString)
 
 App::~App () = default;
 
+std::unique_ptr<helicsCLI11App> App::generateParser ()
+{
+    auto app = std::make_unique<helicsCLI11App> ("helics App Parser");
+
+    app->add_flag ("--local", useLocal,
+                   "specify otherwise unspecified endpoints and publications as local( "
+                   "i.e.the keys will be prepended with the player name)");
+    app->add_option ("--stop", stopTime, "The time to stop the app")->type_name ("TIME");
+    app->add_option ("--input,input", masterFileName, "The primary input file")->check (CLI::ExistingFile);
+    app->allow_extras ();
+    return app;
+}
+
 void App::loadFile (const std::string &filename)
 {
-    auto ext = filesystem::path (filename).extension ().string ();
+    auto ext = filename.substr (filename.find_last_of ('.'));
     if ((ext == ".json") || (ext == ".JSON"))
     {
         loadJsonFile (filename);

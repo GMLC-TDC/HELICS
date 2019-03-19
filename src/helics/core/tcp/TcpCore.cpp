@@ -5,8 +5,8 @@ the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 #include "TcpCore.h"
-#include "../../common/argParser.h"
 #include "../NetworkCore_impl.hpp"
+#include "../helicsCLI11.hpp"
 #include "TcpComms.h"
 #include "TcpCommsSS.h"
 
@@ -19,33 +19,13 @@ TcpCoreSS::TcpCoreSS () noexcept {}
 
 TcpCoreSS::TcpCoreSS (const std::string &core_name) : NetworkCore (core_name) {}
 
-using namespace std::string_literals;
-static const ArgDescriptors extraArgs{{"connections"s, ArgDescriptor::arg_type_t::vector_string,
-                                       "target link connections"s},
-                                      {"no_outgoing_connections"s, ArgDescriptor::arg_type_t::flag_type,
-                                       "disable outgoing connections"s}};
-
-void TcpCoreSS::initializeFromArgs (int argc, const char *const *argv)
+std::shared_ptr<helicsCLI11App> TcpCoreSS::generateCLI ()
 {
-    if (brokerState == created)
-    {
-        std::unique_lock<std::mutex> lock (dataMutex);
-        if (brokerState == created)
-        {
-            variable_map vm;
-            argumentParser (argc, argv, vm, extraArgs);
-            if (vm.count ("connections") > 0)
-            {
-                connections = vm["connections"].as<std::vector<std::string>> ();
-            }
-            if (vm.count ("no_outgoing_connections") > 0)
-            {
-                no_outgoing_connections = true;
-            }
-        }
-        lock.unlock ();
-        NetworkCore::initializeFromArgs (argc, argv);
-    }
+    auto hApp = NetworkCore::generateCLI ();
+    hApp->description ("TCP Single Socket Core ");
+    hApp->add_option ("--connections", connections, "target link connections");
+    hApp->add_flag ("--no_outgoing_connection", no_outgoing_connections, "disable outgoing connections");
+    return hApp;
 }
 
 bool TcpCoreSS::brokerConnect ()

@@ -16,7 +16,6 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helics/application_api/Subscriptions.hpp"
 #include "helics/apps/Player.hpp"
 #include "helics/apps/Recorder.hpp"
-#include "helics/common/stringToCmdLine.h"
 #include "helics/core/BrokerFactory.hpp"
 #include <future>
 

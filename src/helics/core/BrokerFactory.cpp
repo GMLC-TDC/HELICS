@@ -182,15 +182,7 @@ namespace BrokerFactory
 {
 std::shared_ptr<Broker> create (core_type type, const std::string &initializationString)
 {
-    auto broker = makeBroker (type, std::string ());
-    broker->initialize (initializationString);
-    bool reg = registerBroker (broker);
-    if (!reg)
-    {
-        throw (helics::RegistrationFailure ("unable to register broker"));
-    }
-    broker->connect ();
-    return broker;
+    return create (type, std::string{}, initializationString);
 }
 
 std::shared_ptr<Broker>
@@ -207,9 +199,14 @@ create (core_type type, const std::string &broker_name, const std::string &initi
     return broker;
 }
 
-std::shared_ptr<Broker> create (core_type type, int argc, const char *const *argv)
+std::shared_ptr<Broker> create (core_type type, int argc, char *argv[])
 {
-    auto broker = makeBroker (type, "");
+    return create (type, std::string{}, argc, argv);
+}
+
+std::shared_ptr<Broker> create (core_type type, const std::string &broker_name, int argc, char *argv[])
+{
+    auto broker = makeBroker (type, broker_name);
     broker->initializeFromArgs (argc, argv);
     bool reg = registerBroker (broker);
     if (!reg)
@@ -220,10 +217,15 @@ std::shared_ptr<Broker> create (core_type type, int argc, const char *const *arg
     return broker;
 }
 
-std::shared_ptr<Broker> create (core_type type, const std::string &broker_name, int argc, const char *const *argv)
+std::shared_ptr<Broker> create (core_type type, std::vector<std::string> &args)
+{
+    return create (type, std::string{}, args);
+}
+
+std::shared_ptr<Broker> create (core_type type, const std::string &broker_name, std::vector<std::string> &args)
 {
     auto broker = makeBroker (type, broker_name);
-    broker->initializeFromArgs (argc, argv);
+    broker->configureFromVector (args);
     bool reg = registerBroker (broker);
     if (!reg)
     {

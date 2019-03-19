@@ -9,6 +9,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <chrono>
 #include <functional>
 #include <string>
+#include <vector>
 
 namespace helics
 {
@@ -41,14 +42,25 @@ class Broker
      */
     virtual bool isOpenToNewFederates () const = 0;
     /** start up the broker with an initialization string containing commands and parameters*/
-    virtual void initialize (const std::string &initializationString) = 0;
+    virtual void configure (const std::string &configureString) = 0;
     /** initialize from command line arguments
      */
-    virtual void initializeFromArgs (int argc, const char *const *argv) = 0;
+    virtual void configureFromArgs (int argc, char *argv[]) = 0;
+    /** start up the broker with an initialization string containing commands and parameters*/
+    [[deprecated ("please use configure instead")]] void initialize (const std::string &configureString)
+    {
+        configure (configureString);
+    }
+    /** initialize from command line arguments
+     */
+    [[deprecated ("please use configureFromArgs instead")]] void initializeFromArgs (int argc, char *argv[])
+    {
+        configureFromArgs (argc, argv);
+    }
     /** Initialize the Broker from command line arguments contained in a vector
      * Should be invoked a single time to initialize the co-simulation broker.
      */
-    virtual void initializeFromVector (std::vector<std::string> &args) = 0;
+    virtual void configureFromVector (std::vector<std::string> &args) = 0;
     /** get the local identification for the broker*/
     virtual const std::string &getIdentifier () const = 0;
     /** get the connection address for the broker*/
