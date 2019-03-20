@@ -254,9 +254,9 @@ BOOST_DATA_TEST_CASE (simple_recorder_test_message_files_cmd,
     brk->connect ();
     std::string exampleFile = std::string (TEST_DIR) + file;
 
-    StringToCmdLine cmdArg ("--name=rec --broker=ipc_broker --coretype=ipc " + exampleFile);
+    char *argv[5] = {"", "--name=rec", "--broker=ipc_broker", "--coretype=ipc", &(exampleFile[0])};
 
-    helics::apps::Recorder rec1 (cmdArg.getArgCount (), cmdArg.getArgV ());
+    helics::apps::Recorder rec1 (5, argv);
 
     helics::FederateInfo fi (helics::core_type::IPC);
     fi.coreInitString = "1 --broker=ipc_broker";
@@ -668,13 +668,13 @@ BOOST_AUTO_TEST_CASE (recorder_test_saveFile3)
 
 BOOST_AUTO_TEST_CASE (recorder_test_help)
 {
-    StringToCmdLine cmdArg ("--version --quiet");
-    helics::apps::Recorder rec1 (cmdArg.getArgCount (), cmdArg.getArgV ());
+    std::vector<std::string> args{"--quiet", "--version"};
+    helics::apps::Recorder rec1 (args);
 
     BOOST_CHECK (!rec1.isActive ());
 
-    StringToCmdLine cmdArg2 ("-? --quiet");
-    helics::apps::Recorder rec2 (cmdArg2.getArgCount (), cmdArg2.getArgV ());
+    args[1] = "-?";
+    helics::apps::Recorder rec2 (args);
 
     BOOST_CHECK (!rec2.isActive ());
 }

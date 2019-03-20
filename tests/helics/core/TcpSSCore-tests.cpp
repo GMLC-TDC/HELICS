@@ -347,7 +347,7 @@ BOOST_AUTO_TEST_CASE (tcpSSCore_initialization_test)
     auto core = helics::CoreFactory::create (helics::core_type::TCP_SS, initializationString);
 
     BOOST_REQUIRE (core);
-    BOOST_CHECK (core->isInitialized ());
+    BOOST_CHECK (core->isConfigured ());
     auto srv = AsioContextManager::getContextPointer ();
     auto contextLoop = srv->startContextLoop ();
 

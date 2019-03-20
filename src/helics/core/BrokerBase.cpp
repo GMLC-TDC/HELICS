@@ -105,8 +105,9 @@ std::shared_ptr<helicsCLI11App> BrokerBase::generateBaseCLI ()
     logging_group->add_flag ("--force_logging_flush", forceLoggingFlush, "flush the log after every message");
     logging_group->add_option ("--logfile", logFile, "the file to log the messages to")->ignore_underscore ();
     logging_group
-      ->add_option ("--loglevel", maxLogLevel,
-                    "the level which to log the higher this is set to the more gets logs(-1) for no logging")
+      ->add_option_function<int> (
+        "--loglevel", [this](int val) { setLogLevel (val); },
+        "the level which to log the higher this is set to the more gets logs(-1) for no logging")
       ->ignore_underscore ();
     logging_group->add_option ("--fileloglevel", fileLogLevel, "the level at which messages get sent to the file")
       ->ignore_underscore ();
@@ -368,12 +369,12 @@ void BrokerBase::queueProcessingLoop ()
     };
     if (tickTimer > timeZero)
     {
-        if (tickTimer < Time (500, time_units::ms))
+        if (tickTimer < Time (0.5))
         {
-            tickTimer = Time (500, time_units::ms);
+            tickTimer = Time (0.5);
         }
         active = std::make_pair (true, true);
-        ticktimer.expires_at (std::chrono::steady_clock::now () + std::chrono::milliseconds (tickTimer));
+        ticktimer.expires_at (std::chrono::steady_clock::now () + tickTimer.to_ns ());
         ticktimer.async_wait (timerCallback);
     }
     global_broker_id_local = global_id.load ();

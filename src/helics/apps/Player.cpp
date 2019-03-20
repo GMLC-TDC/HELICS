@@ -56,12 +56,12 @@ Player::Player (int argc, char *argv[]) : App ("player", argc, argv) { processAr
 
 void Player::processArgs ()
 {
-    helicsCLI11App app = generateParser ();
+    auto app = generateParser ();
 
     if (!deactivated)
     {
         fed->setFlagOption (helics_flag_source_only);
-        app.parse (remArgs);
+        app->helics_parse (remArgs);
         if (!masterFileName.empty ())
         {
             loadFile (masterFileName);
@@ -69,41 +69,41 @@ void Player::processArgs ()
     }
     else if (helpMode)
     {
-        app.remove_helics_specifics ();
-        std::cout << app.help ();
+        app->remove_helics_specifics ();
+        std::cout << app->help ();
     }
 }
 
-helicsCLI11App Player::generateParser ()
+std::unique_ptr<helicsCLI11App> Player::generateParser ()
 {
-    helicsCLI11App app ("Command line options for the Player App");
-    app.add_option ("--marker", nextPrintTimeStep,
-                    "print a statement indicating time advancement every <arg> period during the simulation");
+    auto app = std::make_unique<helicsCLI11App> ("Command line options for the Player App");
+    app->add_option ("--marker", nextPrintTimeStep,
+                     "print a statement indicating time advancement every <arg> period during the simulation");
     app
-      .add_option ("--datatype",
-                   [this](CLI::results_t res) {
-                       defType = helics::getTypeFromString (res[0]);
-                       return (defType != helics::data_type::helics_custom);
-                   },
-                   "type of the publication data type to use", false)
+      ->add_option ("--datatype",
+                    [this](CLI::results_t res) {
+                        defType = helics::getTypeFromString (res[0]);
+                        return (defType != helics::data_type::helics_custom);
+                    },
+                    "type of the publication data type to use", false)
       ->take_last ()
       ->ignore_underscore ();
 
     app
-      .add_option ("--time_units",
-                   [this](CLI::results_t res) {
-                       try
-                       {
-                           units = timeUnitsFromString (res[0]);
-                           timeMultiplier = toSecondMultiplier (units);
-                           return true;
-                       }
-                       catch (...)
-                       {
-                           return false;
-                       }
-                   },
-                   "the default units on the timestamps used in file based input", false)
+      ->add_option ("--time_units",
+                    [this](CLI::results_t res) {
+                        try
+                        {
+                            units = timeUnitsFromString (res[0]);
+                            timeMultiplier = toSecondMultiplier (units);
+                            return true;
+                        }
+                        catch (...)
+                        {
+                            return false;
+                        }
+                    },
+                    "the default units on the timestamps used in file based input", false)
       ->take_last ()
       ->ignore_underscore ();
 

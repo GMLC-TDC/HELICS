@@ -216,7 +216,7 @@ void helicsFederateInfoFree (helics_federate_info fi)
 
 static const std::string nullstr;
 
-void helicsFederateInfoLoadFromArgs (helics_federate_info fi, int argc, const char *const *argv, helics_error *err)
+void helicsFederateInfoLoadFromArgs (helics_federate_info fi, int argc, char *argv[], helics_error *err)
 {
     auto hfi = getFedInfo (fi, err);
     if (hfi == nullptr)
@@ -548,7 +548,7 @@ helics_core helicsCreateCore (const char *type, const char *name, const char *in
     return retcore;
 }
 
-helics_core helicsCreateCoreFromArgs (const char *type, const char *name, int argc, const char *const *argv, helics_error *err)
+helics_core helicsCreateCoreFromArgs (const char *type, const char *name, int argc, char *argv[], helics_error *err)
 {
     if ((err != nullptr) && (err->error_code != 0))
     {
@@ -664,7 +664,7 @@ helics_broker helicsCreateBroker (const char *type, const char *name, const char
     }
 }
 
-helics_broker helicsCreateBrokerFromArgs (const char *type, const char *name, int argc, const char *const *argv, helics_error *err)
+helics_broker helicsCreateBrokerFromArgs (const char *type, const char *name, int argc, char *argv[], helics_error *err)
 {
     if ((err != nullptr) && (err->error_code != 0))
     {

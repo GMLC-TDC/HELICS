@@ -424,6 +424,11 @@ class TimeRepresentation
     {
         return std::chrono::nanoseconds (Tconv::toCount (internalTimeCode, time_units::ns));
     }
+    /** direct conversion to chrono milliseconds*/
+    std::chrono::milliseconds to_ms () const
+    {
+        return std::chrono::milliseconds (Tconv::toCount (internalTimeCode, time_units::ms));
+    }
     /** direct conversion to double static cast overload*/
     constexpr operator double () const noexcept { return Tconv::toDouble (internalTimeCode); }  // NOLINT
 

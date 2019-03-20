@@ -56,7 +56,7 @@ void App::processArgs (std::unique_ptr<helicsCLI11App> &app, const std::string &
         if (!app->quiet)
         {
             // this is just to run the help output
-            FederateInfo helpTemp (std::vector<std::string>{"--help"});
+            FederateInfo helpTemp ("--help");
         }
         helpMode = true;
     }

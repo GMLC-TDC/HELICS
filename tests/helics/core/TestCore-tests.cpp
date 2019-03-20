@@ -26,14 +26,14 @@ BOOST_AUTO_TEST_CASE (testcore_initialization_test)
     auto broker = helics::BrokerFactory::create (helics::core_type::TEST, std::string ());
     BOOST_REQUIRE (broker);
     BOOST_CHECK (broker->isConnected ());
-    std::string initializationString = std::string ("-f 4") + " --broker=" + broker->getIdentifier ();
-    auto core = create (helics::core_type::TEST, initializationString);
+    std::string configureString = std::string ("-f 4") + " --broker=" + broker->getIdentifier ();
+    auto core = create (helics::core_type::TEST, configureString);
 
     auto Tcore = std::dynamic_pointer_cast<helics::testcore::TestCore> (core);
 
     BOOST_REQUIRE (core);
     BOOST_REQUIRE (Tcore);
-    BOOST_CHECK (core->isInitialized ());
+    BOOST_CHECK (core->isConfigured ());
 
     core->connect ();
 
@@ -48,11 +48,11 @@ BOOST_AUTO_TEST_CASE (testcore_initialization_test)
 
 BOOST_AUTO_TEST_CASE (testcore_pubsub_value_test)
 {
-    const char *initializationString = "-f 1 --autobroker";
-    auto core = create (helics::core_type::TEST, initializationString);
+    const char *configureString = "-f 1 --autobroker";
+    auto core = create (helics::core_type::TEST, configureString);
 
     BOOST_REQUIRE (core != nullptr);
-    BOOST_CHECK (core->isInitialized ());
+    BOOST_CHECK (core->isConfigured ());
     BOOST_CHECK_EQUAL (core->getFederationSize (), 0);
     core->connect ();
     BOOST_REQUIRE (core->isConnected ());
@@ -122,7 +122,7 @@ BOOST_AUTO_TEST_CASE (testcore_send_receive_test)
     auto core = create (helics::core_type::TEST, initializationString);
 
     BOOST_REQUIRE (core != nullptr);
-    BOOST_CHECK (core->isInitialized ());
+    BOOST_CHECK (core->isConfigured ());
 
     BOOST_CHECK_EQUAL (core->getFederationSize (), 0);
     core->connect ();
@@ -185,11 +185,11 @@ BOOST_AUTO_TEST_CASE (testcore_messagefilter_callback_test)
         std::string filterName;
     };
 
-    std::string initializationString = "--autobroker";
-    auto core = create (helics::core_type::TEST, initializationString);
+    std::string configureString = "--autobroker";
+    auto core = create (helics::core_type::TEST, configureString);
 
     BOOST_REQUIRE (core != nullptr);
-    BOOST_CHECK (core->isInitialized ());
+    BOOST_CHECK (core->isConfigured ());
     core->connect ();
     BOOST_REQUIRE (core->isConnected ());
     auto id = core->registerFederate ("sim1", helics::CoreFederateInfo ());

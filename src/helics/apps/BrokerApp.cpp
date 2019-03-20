@@ -16,14 +16,29 @@ namespace helics
 {
 namespace apps
 {
-BrokerApp::BrokerApp (core_type ctype, int argc, char *argv[]) : type (ctype) { loadFromArguments (argc, argv); }
+BrokerApp::BrokerApp (core_type ctype, std::vector<std::string> &args) : type (ctype)
+{
+    auto app = generateParser ();
+    app->helics_parse (args);
+    processArgs (app);
+}
+
+BrokerApp::BrokerApp (std::vector<std::string> &args) : BrokerApp (core_type::ZMQ, args) {}
+
+BrokerApp::BrokerApp (core_type ctype, int argc, char *argv[]) : type (ctype)
+{
+    auto app = generateParser ();
+    app->helics_parse (argc, argv);
+    processArgs (app);
+}
 
 BrokerApp::BrokerApp (int argc, char *argv[]) : BrokerApp (core_type::ZMQ, argc, argv) {}
 
 BrokerApp::BrokerApp (core_type ctype, const std::string &argString) : type (ctype)
 {
-    StringToCmdLine cmdargs (argString);
-    loadFromArguments (cmdargs.getArgCount (), cmdargs.getArgV ());
+    auto app = generateParser ();
+    app->helics_parse (argString);
+    processArgs (app);
 }
 
 BrokerApp::BrokerApp (const std::string &argString) : BrokerApp (core_type::ZMQ, argString) {}
@@ -43,14 +58,7 @@ BrokerApp::~BrokerApp ()
 std::unique_ptr<helicsCLI11App> BrokerApp::generateParser ()
 {
     auto app = std::make_unique<helicsCLI11App> ("Broker application");
-    app->add_option_function<std::string> ("--coretype,-t,--type,--core",
-                                           [this](const std::string &val) {
-                                               type = helics::coreTypeFromString (val);
-                                               if (type == core_type::UNRECOGNIZED)
-                                                   throw CLI::ValidationError (val +
-                                                                               " is NOT a recognized broker type");
-                                           },
-                                           "type of the broker to connect to");
+    app->addTypeOption ();
     app->add_option ("--name,-n", name, "name of the broker");
     return app;
 }
@@ -58,7 +66,7 @@ std::unique_ptr<helicsCLI11App> BrokerApp::generateParser ()
 void BrokerApp::processArgs (std::unique_ptr<helicsCLI11App> &app)
 {
     auto remArgs = app->remaining ();
-    broker = BrokerFactory::create (type, name, remArgs);
+    broker = BrokerFactory::create (app->getCoreType (), name, remArgs);
     if (!broker->isConnected ())
     {
         throw (ConnectionFailure ("Broker is unable to connect\n"));

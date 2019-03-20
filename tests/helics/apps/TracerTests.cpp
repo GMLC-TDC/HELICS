@@ -251,10 +251,15 @@ BOOST_DATA_TEST_CASE (simple_tracer_test_message_files_cmd,
     auto brk = helics::BrokerFactory::create (helics::core_type::IPC, "ipc_broker", "-f 2");
     brk->connect ();
     std::string exampleFile = std::string (TEST_DIR) + file;
+    std::vector<std::string> args{"", "--name = rec", "--coretype=ipc", exampleFile};
 
-    StringToCmdLine cmdArg ("--name=rec --coretype=ipc " + exampleFile);
+    char *argv[4];
+    argv[0] = &(args[0][0]);
+    argv[1] = &(args[1][0]);
+    argv[2] = &(args[2][0]);
+    argv[3] = &(args[3][0]);
 
-    helics::apps::Tracer trace1 (cmdArg.getArgCount (), cmdArg.getArgV ());
+    helics::apps::Tracer trace1 (4, argv);
     std::atomic<int> counter{0};
     auto cb = [&counter](helics::Time, const std::string &, const std::string &) { ++counter; };
     trace1.setValueCallback (cb);

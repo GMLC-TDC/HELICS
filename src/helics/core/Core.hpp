@@ -93,7 +93,7 @@ class Core
     /**
      * Returns true if the core has been configured.
      */
-    [[deprecated ("please use isConfigured")]] bool isInitialized () const { return isConfigured (); }
+    [[deprecated ("please use isConfigured instead")]] bool isInitialized () const { return isConfigured (); }
     /**
     * connect the core to a broker if needed
     @return true if the connection was successful

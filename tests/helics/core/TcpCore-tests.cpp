@@ -430,7 +430,7 @@ BOOST_AUTO_TEST_CASE (tcpCore_initialization_test)
     auto core = helics::CoreFactory::create (helics::core_type::TCP, initializationString);
 
     BOOST_REQUIRE (core);
-    BOOST_CHECK (core->isInitialized ());
+    BOOST_CHECK (core->isConfigured ());
     auto srv = AsioContextManager::getContextPointer ();
 
     auto server = helics::tcp::TcpServer::create (srv->getBaseContext (), "localhost", TCP_BROKER_PORT);

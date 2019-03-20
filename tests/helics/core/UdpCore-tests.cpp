@@ -294,7 +294,7 @@ BOOST_AUTO_TEST_CASE (udpCore_initialization_test)
     auto core = helics::CoreFactory::create (helics::core_type::UDP, initializationString);
 
     BOOST_REQUIRE (core != nullptr);
-    BOOST_CHECK (core->isInitialized ());
+    BOOST_CHECK (core->isConfigured ());
     auto srv = AsioContextManager::getContextPointer ();
     udp::socket rxSocket (AsioContextManager::getContext (), udp::endpoint (udp::v4 (), 23901));
 

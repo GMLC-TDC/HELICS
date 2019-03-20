@@ -293,9 +293,14 @@ BOOST_DATA_TEST_CASE (simple_player_test_files_cmdline, boost::unit_test::data::
     brk->connect ();
     std::string exampleFile = std::string (TEST_DIR) + file;
 
-    StringToCmdLine cmdArg ("--name=player --broker=ipc_broker --coretype=ipc " + exampleFile);
+    char *argv[5];
+    argv[0] = "";
+    argv[1] = "--name=player";
+    argv[2] = "--broker=ipc_broker";
+    argv[3] = "--coretype=ipc";
+    argv[4] = &(exampleFile[0]);
 
-    helics::apps::Player play1 (cmdArg.getArgCount (), cmdArg.getArgV ());
+    helics::apps::Player play1 (5, argv);
 
     helics::FederateInfo fi (helics::core_type::IPC);
     fi.coreInitString = "--broker=ipc_broker";
@@ -627,13 +632,13 @@ BOOST_DATA_TEST_CASE (simple_message_player_test_files, boost::unit_test::data::
 
 BOOST_AUTO_TEST_CASE (player_test_help)
 {
-    StringToCmdLine cmdArg ("--version --quiet");
-    helics::apps::Player play1 (cmdArg.getArgCount (), cmdArg.getArgV ());
+    std::vector<std::string> args{"--quiet", "--version"};
+    helics::apps::Player play1 (args);
 
     BOOST_CHECK (!play1.isActive ());
 
-    StringToCmdLine cmdArg2 ("-? --quiet");
-    helics::apps::Player play2 (cmdArg2.getArgCount (), cmdArg2.getArgV ());
+    args[1] = "-?";
+    helics::apps::Player play2 (args);
 
     BOOST_CHECK (!play2.isActive ());
 }

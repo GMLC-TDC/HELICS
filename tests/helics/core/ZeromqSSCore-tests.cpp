@@ -203,7 +203,7 @@ BOOST_AUTO_TEST_CASE (zmqSSCore_initialization_test)
     auto core = helics::CoreFactory::create (helics::core_type::ZMQ_SS, initializationString);
 
     BOOST_REQUIRE (core);
-    BOOST_CHECK (core->isInitialized ());
+    BOOST_CHECK (core->isConfigured ());
 
     std::this_thread::sleep_for (100ms);
     bool connected = core->connect ();

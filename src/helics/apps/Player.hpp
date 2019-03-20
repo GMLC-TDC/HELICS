@@ -48,10 +48,10 @@ class Player : public App
   public:
     /** default constructor*/
     Player () = default;
-	/** construct from command line arguments in a vector
+    /** construct from command line arguments in a vector
    @param args the command line arguments to pass in a reverse vector
    */
-	Player( std::vector<std::string> &args);
+    Player (std::vector<std::string> &args);
     /** construct from command line arguments
     @param argc the number of arguments
     @param argv the strings in the input
@@ -188,49 +188,49 @@ class Player : public App
     const auto &getMessage (int index) const { return messages[index]; }
 
   private:
-	  helicsCLI11App generateParser();
-	  /** process remaining command line arguments*/
-      void processArgs ();
-      /** load from a jsonString
-      @param jsonString either a JSON filename or a string containing JSON
-      */
-      virtual void loadJsonFile (const std::string &jsonString) override;
-      /** load a text file*/
-      virtual void loadTextFile (const std::string &filename) override;
-      /** helper function to sort through the tags*/
-      void sortTags ();
-      /** helper function to generate the publications*/
-      void generatePublications ();
-      /** helper function to generate the used Endpoints*/
-      void generateEndpoints ();
-      /** helper function to sort the points and link them to publications*/
-      void cleanUpPointList ();
+    std::unique_ptr<helicsCLI11App> generateParser ();
+    /** process remaining command line arguments*/
+    void processArgs ();
+    /** load from a jsonString
+    @param jsonString either a JSON filename or a string containing JSON
+    */
+    virtual void loadJsonFile (const std::string &jsonString) override;
+    /** load a text file*/
+    virtual void loadTextFile (const std::string &filename) override;
+    /** helper function to sort through the tags*/
+    void sortTags ();
+    /** helper function to generate the publications*/
+    void generatePublications ();
+    /** helper function to generate the used Endpoints*/
+    void generateEndpoints ();
+    /** helper function to sort the points and link them to publications*/
+    void cleanUpPointList ();
 
-      /** send all points and messages up to the specified time*/
-      void sendInformation (Time sendTime, int iteration = 0);
+    /** send all points and messages up to the specified time*/
+    void sendInformation (Time sendTime, int iteration = 0);
 
-      /** extract a time from the string based on Player parameters
-      @param str the string containing the time
-      @param lineNumber the lineNumber of the file which is used in case of invalid specification
-      */
-      helics::Time extractTime (const std::string &str, int lineNumber = 0) const;
+    /** extract a time from the string based on Player parameters
+    @param str the string containing the time
+    @param lineNumber the lineNumber of the file which is used in case of invalid specification
+    */
+    helics::Time extractTime (const std::string &str, int lineNumber = 0) const;
 
-    private:
-      std::vector<ValueSetter> points;  //!< the points to generate into the federation
-      std::vector<MessageHolder> messages;  //!< list of message to hold
-      std::map<std::string, std::string> tags;  //!< map of the key and type strings
-      std::set<std::string> epts;  //!< set of the used endpoints
-      std::vector<Publication> publications;  //!< the actual publication objects
-      std::vector<Endpoint> endpoints;  //!< the actual endpoint objects
-      std::map<std::string, int> pubids;  //!< publication id map
-      std::map<std::string, int> eptids;  //!< endpoint id maps
-      helics::data_type defType =
-        helics::data_type::helics_string;  //!< the default data type unless otherwise specified
-      size_t pointIndex = 0;  //!< the current point index
-      size_t messageIndex = 0;  //!< the current message index
-      time_units units = time_units::sec;
-      double timeMultiplier = 1.0;  //!< specify the time multiplier for different time specifications
-      Time nextPrintTimeStep = helics::timeZero;  //!< the time advancement period for printing markers
+  private:
+    std::vector<ValueSetter> points;  //!< the points to generate into the federation
+    std::vector<MessageHolder> messages;  //!< list of message to hold
+    std::map<std::string, std::string> tags;  //!< map of the key and type strings
+    std::set<std::string> epts;  //!< set of the used endpoints
+    std::vector<Publication> publications;  //!< the actual publication objects
+    std::vector<Endpoint> endpoints;  //!< the actual endpoint objects
+    std::map<std::string, int> pubids;  //!< publication id map
+    std::map<std::string, int> eptids;  //!< endpoint id maps
+    helics::data_type defType =
+      helics::data_type::helics_string;  //!< the default data type unless otherwise specified
+    size_t pointIndex = 0;  //!< the current point index
+    size_t messageIndex = 0;  //!< the current message index
+    time_units units = time_units::sec;
+    double timeMultiplier = 1.0;  //!< specify the time multiplier for different time specifications
+    Time nextPrintTimeStep = helics::timeZero;  //!< the time advancement period for printing markers
 };
 }  // namespace apps
 }  // namespace helics

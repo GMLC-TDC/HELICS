@@ -202,6 +202,8 @@ std::shared_ptr<Core> makeCore (core_type type, const std::string &name)
 
 namespace CoreFactory
 {
+static const std::string emptyString;
+
 std::shared_ptr<Core> create (const std::string &initializationString)
 {
     helicsCLI11App tparser;
@@ -209,15 +211,15 @@ std::shared_ptr<Core> create (const std::string &initializationString)
     tparser.addTypeOption ();
     tparser.allow_extras ();
     tparser.parse (initializationString);
-    return create (tparser.getCoreType (), std::string{}, tparser.remaining_args ());
+    return create (tparser.getCoreType (), emptyString, tparser.remaining_args ());
 }
 
 std::shared_ptr<Core> create (core_type type, const std::string &configureString)
 {
-    return create (type, std::string{}, configureString);
+    return create (type, emptyString, configureString);
 }
 
-std::shared_ptr<Core> create (core_type type, const std::string &core_name, std::string &configureString)
+std::shared_ptr<Core> create (core_type type, const std::string &core_name, const std::string &configureString)
 {
     auto core = makeCore (type, core_name);
     core->configure (configureString);
@@ -234,12 +236,12 @@ std::shared_ptr<Core> create (std::vector<std::string> &args)
 
     tparser.allow_extras ();
     tparser.parse (args);
-    return create (tparser.getCoreType (), std::string{}, tparser.remaining_args ());
+    return create (tparser.getCoreType (), emptyString, tparser.remaining_args ());
 }
 
 std::shared_ptr<Core> create (core_type type, std::vector<std::string> &args)
 {
-    return create (type, std::string{}, args);
+    return create (type, emptyString, args);
 }
 
 std::shared_ptr<Core> create (core_type type, const std::string &core_name, std::vector<std::string> &args)
@@ -264,7 +266,7 @@ std::shared_ptr<Core> create (int argc, char *argv[])
 
 std::shared_ptr<Core> create (core_type type, int argc, char *argv[])
 {
-    return create (type, std::string{}, argc, argv);
+    return create (type, emptyString, argc, argv);
 }
 
 std::shared_ptr<Core> create (core_type type, const std::string &core_name, int argc, char *argv[])

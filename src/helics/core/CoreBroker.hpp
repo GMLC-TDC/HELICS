@@ -175,8 +175,6 @@ class CoreBroker : public Broker, public BrokerBase
     virtual bool isRoot () const override final { return _isRoot; };
 
     virtual bool isOpenToNewFederates () const override;
-    /** display the help for command line arguments on the broker*/
-    static void displayHelp ();
 
     virtual void setLoggingCallback (
       const std::function<void(int, const std::string &, const std::string &)> &logFunction) override final;

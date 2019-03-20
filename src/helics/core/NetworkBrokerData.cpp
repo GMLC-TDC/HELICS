@@ -60,12 +60,13 @@ std::shared_ptr<helicsCLI11App> NetworkBrokerData::commandLineParser (const std:
       },
       "identifier for the broker, this is either the name or network address use --broker_address or --brokername "
       "to explicitly set the network address or name the search for the broker is first by name");
-    nbparser->add_option ("--broker_name", brokerName, "the name of the broker");
+    nbparser->add_option ("--brokername", brokerName, "the name of the broker")->ignore_underscore ();
     nbparser->add_option ("--max_size", maxMessageSize, "The message buffer size", true)
       ->check (CLI::PositiveNumber);
     nbparser->add_option ("--max_count", maxMessageCount, "The maximum number of message to have in a queue", true)
       ->check (CLI::PositiveNumber);
-    nbparser->add_option ("--network_retries", maxRetries, "the maximum number of network retries", true);
+    nbparser->add_option ("--network_retries", maxRetries, "the maximum number of network retries", true)
+      ->ignore_underscore ();
     nbparser
       ->add_flag ("--os_port,--use_os_port", use_os_port,
                   "specify that the ports should be allocated by the host operating system")

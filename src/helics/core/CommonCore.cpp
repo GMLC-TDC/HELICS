@@ -110,7 +110,7 @@ bool CommonCore::connect ()
             }
             else
             {
-                brokerState = broker_state_t::initialized;
+                brokerState = broker_state_t::configured;
             }
             return res;
         }

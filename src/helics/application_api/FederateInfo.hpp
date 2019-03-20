@@ -33,12 +33,17 @@ class FederateInfo : public CoreFederateInfo
     /** construct from a type
     @param cType the type of core to use for the federate*/
     explicit FederateInfo (core_type cType) : coreType (cType){};
+    /** load a federateInfo object from command line arguments in a string
+    @details calls /ref loadInfoFromArgs in the constructor
+    @param args a string containing the command line arguments
+    */
+    FederateInfo (const std::string &args);
     /** load a federateInfo object from command line arguments
     @details calls /ref loadInfoFromArgs in the constructor
     @param argc the number of arguments
     @param argv an array of char * pointers to the arguments
     */
-    FederateInfo (int argc, const char *const *argv);
+    FederateInfo (int argc, char *argv[]);
     /** load a federateInfo object from arguments stored in a vector
     @details calls /ref loadInfoFromArgs in the constructor
     @param argc the number of arguments
@@ -46,10 +51,14 @@ class FederateInfo : public CoreFederateInfo
     */
     FederateInfo (std::vector<std::string> &args);
     /** load a federateInfo object from command line arguments outside the constructor
+   @param args a string containing the command line arguments
+   */
+    void loadInfoFromArgs (const std::string &args);
+    /** load a federateInfo object from command line arguments outside the constructor
     @param argc the number of arguments
     @param argv an array of char * pointers to the arguments
     */
-    void loadInfoFromArgs (int argc, const char *const *argv);
+    void loadInfoFromArgs (int argc, char *argv[]);
     /** load a federateInfo object from command line arguments contained in a vector
     @param[inout] args a vector of arguments to load
     */

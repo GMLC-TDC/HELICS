@@ -27,15 +27,14 @@ SPDX-License-Identifier: BSD-3-Clause
 #ifndef DISABLE_IPC_CORE
 #include "../core/ipc/IpcComms.h"
 #endif
-#include "../common/argParser.h"
-#include "../common/stringToCmdLine.h"
 #include "../core/NetworkBrokerData.hpp"
+#include "../core/helicsCLI11.hpp"
 
 using namespace std::string_literals;
 
 namespace helics
 {
-static void loadTypeSpecificArgs (helics::core_type ctype, CommsInterface *comm, int argc, const char *const *argv)
+static void loadTypeSpecificArgs (helics::core_type ctype, CommsInterface *comm, std::vector<std::string> &args)
 {
     if (comm == nullptr)
     {
@@ -46,16 +45,15 @@ static void loadTypeSpecificArgs (helics::core_type ctype, CommsInterface *comm,
 #ifndef DISABLE_TCP_CORE
     case core_type::TCP_SS:
     {
-        static const ArgDescriptors extraArgs{
-          {"connections"s, ArgDescriptor::arg_type_t::vector_string, "target link connections"s}};
-        variable_map vm;
-        argumentParser (argc, argv, vm, extraArgs);
-
         auto cm = dynamic_cast<tcp::TcpCommsSS *> (comm);
-        if (vm.count ("connections") > 0)
-        {
-            cm->addConnections (vm["connections"].as<std::vector<std::string>> ());
-        }
+        helicsCLI11App tsparse;
+        tsparse.add_option_function<std::vector<std::string>> ("--connections",
+                                                               [cm](const std::vector<std::string> &conns) {
+                                                                   cm->addConnections (conns);
+                                                               },
+                                                               "target link connections");
+        tsparse.allow_extras ();
+        tsparse.helics_parse (args);
     }
     break;
 #endif
@@ -67,12 +65,14 @@ static void loadTypeSpecificArgs (helics::core_type ctype, CommsInterface *comm,
 }
 
 static std::unique_ptr<CommsInterface>
-generateComms (const std::string &type, const std::string &initString = std::string ())
+generateComms (const std::string &type, const std::string &initString = std::string{})
 {
     auto ctype = coreTypeFromString (type);
-    StringToCmdLine cmdargs (initString);
+
     NetworkBrokerData nbdata;
-    nbdata.initializeFromArgs (cmdargs.getArgCount (), cmdargs.getArgV (), "localhost");
+    auto parser = nbdata.commandLineParser ("localhost");
+    parser->helics_parse (initString);
+
     std::unique_ptr<CommsInterface> comm;
     switch (ctype)
     {
@@ -95,7 +95,7 @@ generateComms (const std::string &type, const std::string &initString = std::str
     case core_type::TCP_SS:
 #ifndef DISABLE_TCP_CORE
         comm = std::make_unique<tcp::TcpCommsSS> ();
-        loadTypeSpecificArgs (ctype, comm.get (), cmdargs.getArgCount (), cmdargs.getArgV ());
+        loadTypeSpecificArgs (ctype, comm.get (), parser->remaining_args ());
 #endif
         break;
     case core_type::UDP:

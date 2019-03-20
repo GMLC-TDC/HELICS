@@ -40,7 +40,7 @@ std::shared_ptr<helicsCLI11App> NetworkBroker<COMMS, baseline, tcode>::generateC
 {
     auto app = CoreBroker::generateCLI ();
     CLI::App_p netApp = netInfo.commandLineParser (defInterface[static_cast<int> (baseline)]);
-    app.add_subcommand (netApp);
+    app->add_subcommand (netApp);
     return app;
 }
 
@@ -54,7 +54,7 @@ bool NetworkBroker<COMMS, baseline, tcode>::brokerConnect ()
     }
     CommsBroker<COMMS, CoreBroker>::comms->setName (CoreBroker::getIdentifier ());
     CommsBroker<COMMS, CoreBroker>::comms->loadNetworkInfo (netInfo);
-    CommsBroker<COMMS, CoreBroker>::comms->setTimeout (std::chrono::milliseconds (BrokerBase::networkTimeout));
+    CommsBroker<COMMS, CoreBroker>::comms->setTimeout (BrokerBase::networkTimeout.to_ms ());
 
     auto res = CommsBroker<COMMS, CoreBroker>::comms->connect ();
     if (res)

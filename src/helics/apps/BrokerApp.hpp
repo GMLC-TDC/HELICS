@@ -10,6 +10,7 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include <memory>
 #include <string>
+#include <vector>
 
 namespace helics
 {
@@ -30,6 +31,11 @@ class BrokerApp
  @param args the command line arguments to pass in a reverse vector
  */
     BrokerApp (std::vector<std::string> &args);
+    /** construct from command line arguments in a vector
+	 @param ctype the type of broker to create
+@param args the command line arguments to pass in a reverse vector
+*/
+	BrokerApp(core_type ctype, std::vector<std::string> &args);
     /** construct from command line arguments
     @param argc the number of arguments
     @param argv the strings in the input

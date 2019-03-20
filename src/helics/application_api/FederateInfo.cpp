@@ -20,9 +20,11 @@ SPDX-License-Identifier: BSD-3-Clause
 
 namespace helics
 {
-FederateInfo::FederateInfo (int argc, const char *const *argv) { loadInfoFromArgs (argc, argv); }
+FederateInfo::FederateInfo (int argc, char *argv[]) { loadInfoFromArgs (argc, argv); }
 
 FederateInfo::FederateInfo (std::vector<std::string> &args) { loadInfoFromArgs (args); }
+
+FederateInfo::FederateInfo (const std::string &args) { loadInfoFromArgs (args); }
 
 static const std::map<std::string, int> propStringsTranslations{
   {"period", helics_property_time_period},
@@ -318,7 +320,14 @@ std::unique_ptr<helicsCLI11App> FederateInfo::makeCLIApp ()
     return app;
 }
 
-void FederateInfo::loadInfoFromArgs (int argc, const char *const *argv)
+void FederateInfo::loadInfoFromArgs (const std::string &args)
+{
+    auto app = makeCLIApp ();
+    app->helics_parse (args);
+    coreType = app->getCoreType ();
+}
+
+void FederateInfo::loadInfoFromArgs (int argc, char *argv[])
 {
     auto app = makeCLIApp ();
     app->helics_parse (argc, argv);

@@ -31,8 +31,8 @@ template <class COMMS, interface_type baseline>
 std::shared_ptr<helicsCLI11App> NetworkCore<COMMS, baseline>::generateCLI ()
 {
     auto app = CommonCore::generateCLI ();
-    CLI::App_p netApp = netInfo.commandLineParser (defInterface[static_cast<int> (baseline)]);
-    app.add_subcommand (netApp);
+    CLI::App_p netApp = netInfo.commandLineParser (defLocalInterface[static_cast<int> (baseline)]);
+    app->add_subcommand (netApp);
     return app;
 }
 
@@ -46,7 +46,7 @@ bool NetworkCore<COMMS, baseline>::brokerConnect ()
     }
     CommsBroker<COMMS, CommonCore>::comms->setName (CommonCore::getIdentifier ());
     CommsBroker<COMMS, CommonCore>::comms->loadNetworkInfo (netInfo);
-    CommsBroker<COMMS, CommonCore>::comms->setTimeout (std::chrono::milliseconds (BrokerBase::networkTimeout));
+    CommsBroker<COMMS, CommonCore>::comms->setTimeout (BrokerBase::networkTimeout.to_ms ());
     // comms->setMessageSize(maxMessageSize, maxMessageCount);
     auto res = CommsBroker<COMMS, CommonCore>::comms->connect ();
     if (res)

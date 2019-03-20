@@ -38,7 +38,7 @@ int main (int argc, char *argv[])
     helics::FederateInfo fi;
     if (ret == helics::helicsCLI11App::parse_return::help_return)
     {
-        fi.loadInfoFromArgs (std::vector<std::string>{"--help"});
+        fi.loadInfoFromArgs ("--help");
         return 0;
     }
     else if (ret != helics::helicsCLI11App::parse_return::ok)
@@ -49,10 +49,8 @@ int main (int argc, char *argv[])
     fi.loadInfoFromArgs (app.remaining_args ());
 
     std::string etarget = mtarget + "/" + targetEndpoint;
-    std::string myendpoint = "endpoint";
 
     fi.setProperty (helics::defs::properties::log_level, 5);
-    helics::apps::BrokerApp brk;
     if (app["--startbroker"]->count () > 0)
     {
         brk = helics::apps::BrokerApp (fi.coreType, brokerArgs);

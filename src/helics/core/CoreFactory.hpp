@@ -24,6 +24,13 @@ class CommonCore;
 
 namespace CoreFactory
 {
+/** create a core from a type, name, and initializationString
+@param type the type of core to create
+@param core_name the name for the core
+@param initializationString a string containing arguments for the core
+*/
+std::shared_ptr<Core>
+create (core_type type, const std::string &core_name, const std::string &initializationString);
 /**
  * Creates a Core API object of the specified type.
  *
@@ -58,13 +65,6 @@ std::shared_ptr<Core> create (core_type type, std::vector<std::string> &args);
 @return a pointer to the created core
 */
 std::shared_ptr<Core> create (int argc, char *argv[]);
-
-/** create a core from a type, name, and initializationString
-@param type the type of core to create
-@param core_name the name for the core
-@param initializationString a string containing arguments for the core
-*/
-std::shared_ptr<Core> create (core_type type, const std::string &core_name, std::string &initializationString);
 
 /** create a core from a type, name, and arguments
 @param type the type of core to create
