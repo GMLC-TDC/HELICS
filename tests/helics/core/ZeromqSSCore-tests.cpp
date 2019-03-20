@@ -366,15 +366,15 @@ class FedTest
 BOOST_AUTO_TEST_CASE (zmqSSMultiCoreInitialization_test)
 {
     int feds = 20;
-    auto broker =
-      helics::BrokerFactory::create (helics::core_type::ZMQ_SS, "ZMQ_SS_broker", std::to_string (feds));
+    auto broker = helics::BrokerFactory::create (helics::core_type::ZMQ_SS, "ZMQ_SS_broker",
+                                                 std::string ("-f ") + std::to_string (feds));
     std::vector<std::shared_ptr<helics::Core>> cores (feds);
     std::vector<FedTest> leafs (feds);
     BOOST_TEST_CHECKPOINT ("created broker");
     for (int ii = 0; ii < feds; ++ii)
     {
-        std::string initializationString = "-f 1 --name=core" + std::to_string (ii);
-        cores[ii] = helics::CoreFactory::create (helics::core_type::ZMQ_SS, initializationString);
+        std::string configureString = "-f 1 --name=core" + std::to_string (ii);
+        cores[ii] = helics::CoreFactory::create (helics::core_type::ZMQ_SS, configureString);
         cores[ii]->connect ();
         int s_index = ii + 1;
         if (ii == feds - 1)
