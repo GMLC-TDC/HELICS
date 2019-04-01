@@ -8,7 +8,7 @@ HELICS documentation
 ![image](https://api.codacy.com/project/badge/Grade/83ba19b36b714c729ec3a3d18504505e)
 
 
-This is the documentation for for the Hierarchical Engine for Large-scale Infrastructure Co-Simulation (HELICS). ELICS is a new
+This is the documentation for for the Hierarchical Engine for Large-scale Infrastructure Co-Simulation (HELICS). HELICS is an 
 open-source cyber-physical-energy co-simulation framework for energy systems, with a strong tie to the electric
 power system. Although, HELICS was designed to support very-large-scale (100,000+
 federates) co-simulations with off-the-shelf power-system,
