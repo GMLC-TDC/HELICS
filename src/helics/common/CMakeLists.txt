@@ -55,11 +55,10 @@ set(
 
 set(
   zmq_headers
-  # zmqReactor.h
-  zmqContextManager.h zmqHelper.h
-  # zmqSocketDescriptor.h
-  # zmqProxyHub.h
-  cppzmq/zmq.hpp cppzmq/zmq_addon.hpp
+  zmqContextManager.h 
+  zmqHelper.h
+  ${CMAKE_SOURCE_DIR}/ThirdParty/cppzmq/zmq.hpp 
+  ${CMAKE_SOURCE_DIR}/ThirdParty/cppzmq/zmq_addon.hpp
 )
 
 set(

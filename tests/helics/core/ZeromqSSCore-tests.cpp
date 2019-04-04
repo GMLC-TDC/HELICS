@@ -5,12 +5,12 @@ the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 
+#include "cppzmq/zmq.hpp"
 #include "helics/application_api/Inputs.hpp"
 #include "helics/application_api/Publications.hpp"
 #include "helics/application_api/Subscriptions.hpp"
 #include "helics/application_api/ValueFederate.hpp"
 #include "helics/common/GuardedTypes.hpp"
-#include "helics/common/cppzmq/zmq.hpp"
 #include "helics/common/zmqContextManager.h"
 #include "helics/core/ActionMessage.hpp"
 #include "helics/core/BrokerFactory.hpp"

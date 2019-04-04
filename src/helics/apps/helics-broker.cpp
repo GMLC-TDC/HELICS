@@ -14,8 +14,8 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <thread>
 #include <boost/algorithm/string.hpp>
 #if HELICS_HAVE_ZEROMQ > 0
-#include "../common/cppzmq/zmq.hpp"
 #include "../common/zmqContextManager.h"
+#include "cppzmq/zmq.hpp"
 #endif
 /** function to run the online terminal program*/
 void terminalFunction (int argc, char *argv[]);

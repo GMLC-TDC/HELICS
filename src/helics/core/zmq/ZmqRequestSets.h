@@ -6,9 +6,9 @@ SPDX-License-Identifier: BSD-3-Clause
 */
 #pragma once
 
-#include "../../common/cppzmq/zmq.hpp"
 #include "../../common/zmqContextManager.h"
 #include "../ActionMessage.hpp"
+#include "cppzmq/zmq.hpp"
 #include "helics_includes/optional.hpp"
 #include <deque>
 #include <map>
