@@ -32,7 +32,6 @@
 # ones.
 import os
 import sphinx_rtd_theme
-from sphinxcontrib.pandoc_markdown import MarkdownParser
 
 current_directory = os.path.dirname(os.path.realpath(__file__))
 
@@ -63,6 +62,8 @@ if which("pandoc") is None:
     import warnings
     warnings.warn("`pandoc` not found in PATH. Please consider installing Pandoc or consult the developer documentation")
     from recommonmark.parser import CommonMarkParser as MarkdownParser
+else:
+    from sphinxcontrib.pandoc_markdown import MarkdownParser
 
 import subprocess
 import os
@@ -75,9 +76,9 @@ if read_the_docs_build:
     html_extra_path = [os.path.abspath(os.path.join(dir_name, "../rtd-doxygen"))]
 
 extensions = [
+    'recommonmark',
     'sphinx.ext.mathjax',
     'sphinx.ext.githubpages',
-    'nbsphinx',
     'IPython.sphinxext.ipython_console_highlighting',
     'breathe',
 ]
@@ -94,10 +95,11 @@ templates_path = ['_templates']
 # The suffix(es) of source filenames.
 # You can specify multiple suffix as a list of string:
 #
-source_suffix = ['.rst', '.md']
-# source_suffix = '.rst'
-
-source_parsers = {'.md': MarkdownParser}
+source_suffix = {
+    '.rst': 'restructuredtext',
+    '.txt': 'markdown',
+    '.md': 'markdown',
+}
 
 # The master toctree document.
 master_doc = 'index'
