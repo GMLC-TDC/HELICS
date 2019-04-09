@@ -228,7 +228,7 @@ BOOST_AUTO_TEST_CASE (zmqSSCore_initialization_test)
             auto rM = msgs.at (0);
             mLock.unlock ();
             BOOST_CHECK_EQUAL (rM.name, "core1");
-            std::cout << "rM.name: " << rM.name << std::endl;
+            // std::cout << "rM.name: " << rM.name << std::endl;
             BOOST_CHECK (rM.action () == helics::action_message_def::action_t::cmd_protocol);
         }
         else

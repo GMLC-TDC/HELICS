@@ -195,7 +195,7 @@ BOOST_DATA_TEST_CASE (simple_tracer_test_message_files, boost::unit_test::data::
     helics::FederateInfo fi (helics::core_type::TEST);
     fi.coreName = std::string ("tcore1b") + file;
     fi.coreName.push_back (indx++);
-    fi.coreInitString = " - f 2 --autobroker";
+    fi.coreInitString = " -f 2 --autobroker";
     helics::apps::Tracer trace1 ("trace1", fi);
 
     trace1.loadFile (std::string (TEST_DIR) + file);
@@ -251,7 +251,7 @@ BOOST_DATA_TEST_CASE (simple_tracer_test_message_files_cmd,
     auto brk = helics::BrokerFactory::create (helics::core_type::IPC, "ipc_broker", "-f 2");
     brk->connect ();
     std::string exampleFile = std::string (TEST_DIR) + file;
-    std::vector<std::string> args{"", "--name = rec", "--coretype=ipc", exampleFile};
+    std::vector<std::string> args{"", "--name=rec", "--coretype=ipc", exampleFile};
 
     char *argv[4];
     argv[0] = &(args[0][0]);

@@ -673,7 +673,7 @@ BOOST_AUTO_TEST_CASE (recorder_test_help)
 
     BOOST_CHECK (!rec1.isActive ());
 
-    args[1] = "-?";
+    args.emplace_back ("-?");
     helics::apps::Recorder rec2 (args);
 
     BOOST_CHECK (!rec2.isActive ());

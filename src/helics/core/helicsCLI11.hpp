@@ -97,7 +97,7 @@ class helicsCLI11App : public CLI::App
             // must have been removed earlier
         }
     }
-    /** add a callback function to execute on parsing*/
+    /** Add a callback function to execute on parsing*/
     void add_callback (std::function<void()> cback)
     {
         if (cbacks.empty ())

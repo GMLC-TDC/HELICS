@@ -637,7 +637,7 @@ BOOST_AUTO_TEST_CASE (player_test_help)
 
     BOOST_CHECK (!play1.isActive ());
 
-    args[1] = "-?";
+    args.emplace_back ("-?");
     helics::apps::Player play2 (args);
 
     BOOST_CHECK (!play2.isActive ());
