@@ -58,13 +58,6 @@ def which(program):
 
     return None
 
-if which("pandoc") is None:
-    import warnings
-    warnings.warn("`pandoc` not found in PATH. Please consider installing Pandoc or consult the developer documentation")
-    from recommonmark.parser import CommonMarkParser as MarkdownParser
-else:
-    from sphinxcontrib.pandoc_markdown import MarkdownParser
-
 import subprocess
 import os
 
@@ -76,12 +69,21 @@ if read_the_docs_build:
     html_extra_path = [os.path.abspath(os.path.join(dir_name, "../rtd-doxygen"))]
 
 extensions = [
-    'recommonmark',
+    'sphinx.ext.autodoc',
+    'sphinx.ext.doctest',
+    'sphinx.ext.intersphinx',
+    'sphinx.ext.coverage',
     'sphinx.ext.mathjax',
+    'sphinx.ext.viewcode',
     'sphinx.ext.githubpages',
+    'sphinx.ext.napoleon',
+    'nbsphinx',
     'IPython.sphinxext.ipython_console_highlighting',
     'breathe',
 ]
+
+from recommonmark.parser import CommonMarkParser
+from recommonmark.transform import AutoStructify
 
 breathe_projects = {
     "helics": os.path.abspath(os.path.join(current_directory, "./../build-doxygen/docs/xml")),
@@ -95,11 +97,11 @@ templates_path = ['_templates']
 # The suffix(es) of source filenames.
 # You can specify multiple suffix as a list of string:
 #
-source_suffix = {
-    '.rst': 'restructuredtext',
-    '.txt': 'markdown',
-    '.md': 'markdown',
+
+source_parsers = {
+    '.md': CommonMarkParser,
 }
+source_suffix = ['.rst', '.md']
 
 # The master toctree document.
 master_doc = 'index'
@@ -221,5 +223,13 @@ texinfo_documents = [
     (master_doc, 'HELICS-src', 'HELICS-src Documentation', author, 'HELICS-src', 'One line description of project.', 'Miscellaneous'),
 ]
 
+from recommonmark.transform import AutoStructify
+
 def setup(app):
     app.add_stylesheet('css/custom.css')  # may also be an URL
+    app.add_config_value('recommonmark_config', {
+            'enable_eval_rst': True,
+            }, True)
+    app.add_transform(AutoStructify)
+
+
