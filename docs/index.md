@@ -1,12 +1,11 @@
 HELICS documentation
 ====================
 
-![image](https://travis-ci.org/GMLC-TDC/HELICS-src.svg?branch=master)
-![image](https://ci.appveyor.com/api/projects/status/afpa4mv0kgsjwvtn/branch/develop?svg=true)
-![image](https://badges.gitter.im/GMLC-TDC/HELICS-src.png)
-![image](https://img.shields.io/badge/docs-ready-blue.svg)
-![image](https://api.codacy.com/project/badge/Grade/83ba19b36b714c729ec3a3d18504505e)
-
+[![](https://badges.gitter.im/GMLC-TDC/HELICS-src.png)](https://gitter.im/GMLC-TDC/HELICS-src)
+[![](https://img.shields.io/badge/docs-ready-blue.svg)](https://helics.readthedocs.io/en/latest)
+[![](https://img.shields.io/conda/pn/gmlc-tdc/helics.svg)](https://anaconda.org/gmlc-tdc/helics/)
+[![](https://img.shields.io/github/tag-date/GMLC-TDC/HELICS-src.svg)](https://github.com/GMLC-TDC/HELICS-src/releases)
+[![](https://img.shields.io/badge/License-BSD-blue.svg)](https://github.com/GMLC-TDC/HELICS-src/blob/master/LICENSE)
 
 This is the documentation for the Hierarchical Engine for Large-scale Infrastructure Co-Simulation (HELICS). HELICS is an
 open-source cyber-physical-energy co-simulation framework for energy systems, with a strong tie to the electric
