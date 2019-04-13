@@ -223,8 +223,6 @@ texinfo_documents = [
     (master_doc, 'HELICS-src', 'HELICS-src Documentation', author, 'HELICS-src', 'One line description of project.', 'Miscellaneous'),
 ]
 
-from recommonmark.transform import AutoStructify
-
 def setup(app):
     app.add_stylesheet('css/custom.css')  # may also be an URL
     app.add_config_value('recommonmark_config', {
