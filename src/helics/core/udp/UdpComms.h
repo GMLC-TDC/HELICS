@@ -6,11 +6,16 @@ SPDX-License-Identifier: BSD-3-Clause
 */
 #pragma once
 
-#include "../../common/AsioServiceManagerFwd.hpp"
 #include "../NetworkCommsInterface.hpp"
 #include "helics/helics-config.h"
 #include <future>
 #include <set>
+
+class AsioContextManager;
+namespace asio
+{
+    class io_context;
+} // namespace asio
 
 namespace helics
 {
