@@ -60,8 +60,8 @@ void UdpComms::queue_rx_function ()
         setRxStatus (connection_status::error);
         return;
     }
-    auto ioctx = AsioContextManager::getServicePointer ();
-    udp::socket socket (ioctx->getBaseService ());
+    auto ioctx = AsioContextManager::getContextPointer ();
+    udp::socket socket (ioctx->getBaseContext ());
     socket.open (udpnet (interfaceNetwork));
     std::chrono::milliseconds t_cnt{0};
     bool bindsuccess = false;
@@ -183,10 +183,10 @@ CLOSE_RX_LOOP:
 void UdpComms::queue_tx_function ()
 {
     std::vector<char> buffer;
-    auto ioctx = AsioContextManager::getServicePointer ();
-    udp::resolver resolver (ioctx->getBaseService ());
+    auto ioctx = AsioContextManager::getContextPointer ();
+    udp::resolver resolver (ioctx->getBaseContext ());
     bool closingRx = false;
-    udp::socket transmitSocket (ioctx->getBaseService ());
+    udp::socket transmitSocket (ioctx->getBaseContext ());
     transmitSocket.open (udpnet (interfaceNetwork));
     if (PortNumber >= 0)
     {
@@ -465,17 +465,17 @@ void UdpComms::closeReceiver ()
     {
         try
         {
-            auto serv = AsioContextManager::getServicePointer ();
+            auto serv = AsioContextManager::getContextPointer ();
             if (serv)
             {
                 // try connecting with the receiver socket
-                udp::resolver resolver (serv->getBaseService ());
+                udp::resolver resolver (serv->getBaseContext ());
                 udp::resolver::query queryLocal (udpnet (interfaceNetwork), localTargetAddress,
                                                  std::to_string (PortNumber));
 
                 udp::endpoint rxEndpoint = *resolver.resolve (queryLocal);
 
-                udp::socket transmitter (serv->getBaseService (), udp::endpoint (udpnet (interfaceNetwork), 0));
+                udp::socket transmitter (serv->getBaseContext (), udp::endpoint (udpnet (interfaceNetwork), 0));
                 std::string cls ("close");
                 std::error_code error;
                 transmitter.send_to (asio::buffer (cls), rxEndpoint, 0, error);

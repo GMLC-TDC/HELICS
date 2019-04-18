@@ -366,9 +366,9 @@ void BrokerBase::queueProcessingLoop ()
     }
     std::vector<ActionMessage> dumpMessages;
 
-    auto serv = AsioContextManager::getServicePointer ();
-    auto serviceLoop = serv->startServiceLoop ();
-    asio::steady_timer ticktimer (serv->getBaseService ());
+    auto serv = AsioContextManager::getContextPointer ();
+    auto contextLoop = serv->startContextLoop ();
+    asio::steady_timer ticktimer (serv->getBaseContext ());
     activeProtector active (true, false);
 
     auto timerCallback = [this, &active](const std::error_code &ec) {
@@ -400,7 +400,7 @@ void BrokerBase::queueProcessingLoop ()
     if (haltOperations)
     {
         haltTimer (active, ticktimer);
-        serviceLoop = nullptr;
+        contextLoop = nullptr;
         mainLoopIsRunning.store (false);
         return;
     }
@@ -426,8 +426,8 @@ void BrokerBase::queueProcessingLoop ()
         case CMD_TICK:
             if (checkActionFlag (command, error_flag))
             {
-                serviceLoop = nullptr;
-                serviceLoop = serv->startServiceLoop ();
+                contextLoop = nullptr;
+                contextLoop = serv->startContextLoop ();
             }
             if (messagesSinceLastTick == 0)
             {
@@ -447,7 +447,7 @@ void BrokerBase::queueProcessingLoop ()
             break;
         case CMD_TERMINATE_IMMEDIATELY:
             haltTimer (active, ticktimer);
-            serviceLoop = nullptr;
+            contextLoop = nullptr;
             mainLoopIsRunning.store (false);
             logDump ();
             {
@@ -465,7 +465,7 @@ void BrokerBase::queueProcessingLoop ()
             return;  // immediate return
         case CMD_STOP:
             haltTimer (active, ticktimer);
-            serviceLoop = nullptr;
+            contextLoop = nullptr;
             if (!haltOperations)
             {
                 processCommand (std::move (command));

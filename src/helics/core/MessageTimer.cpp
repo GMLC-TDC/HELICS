@@ -11,10 +11,10 @@ SPDX-License-Identifier: BSD-3-Clause
 namespace helics
 {
 MessageTimer::MessageTimer (std::function<void(ActionMessage &&)> sFunction)
-    : sendFunction (std::move (sFunction)), servicePtr (AsioContextManager::getServicePointer ())
+    : sendFunction (std::move (sFunction)), contextPtr (AsioContextManager::getContextPointer ())
 {
     //  std::cout << "getting loop handle for timer" << std::endl;
-    loopHandle = servicePtr->startServiceLoop ();
+    loopHandle = contextPtr->startContextLoop ();
     // std::cout << "got loop handle for timer" << std::endl;
 }
 
@@ -42,7 +42,7 @@ int32_t MessageTimer::addTimerFromNow (std::chrono::nanoseconds time, ActionMess
 int32_t MessageTimer::addTimer (time_type expirationTime, ActionMessage mess)
 {
     // these two calls need to be before the lock
-    auto timer = std::make_shared<asio::steady_timer> (servicePtr->getBaseService ());
+    auto timer = std::make_shared<asio::steady_timer> (contextPtr->getBaseContext ());
     timer->expires_at (expirationTime);
     std::lock_guard<std::mutex> lock (timerLock);
     auto index = static_cast<int32_t> (timers.size ());

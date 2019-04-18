@@ -34,33 +34,33 @@ class AsioContextManager : public std::enable_shared_from_this<AsioContextManage
 {
   private:
     static std::map<std::string, std::shared_ptr<AsioContextManager>>
-      services;  //!< container for pointers to all the available contexts
-    std::atomic<int> runCounter{0};  //!< counter for the number of times the runServiceLoop has been called
-    std::string name;  //!< service name
+      contexts;  //!< container for pointers to all the available contexts
+    std::atomic<int> runCounter{0};  //!< counter for the number of times the runContextLoop has been called
+    std::string name;  //!< context name
     std::unique_ptr<asio::io_context> ictx;  //!< pointer to the actual context
     std::unique_ptr<asio::io_context::work>
-      nullwork;  //!< pointer to an object used to keep a service running
+      nullwork;  //!< pointer to an object used to keep a context running
     bool leakOnDelete = false;  //!< this is done to prevent some warning messages for use in DLL's
     std::atomic<bool> running{false};
     std::mutex runningLoopLock;  //!< lock protecting the nullwork object and the return future
     std::atomic<bool> terminateLoop{false};  //!< flag indicating that the loop should terminate
     std::future<void> loopRet;
     /** constructor*/
-    explicit AsioContextManager (const std::string &serviceName);
+    explicit AsioContextManager (const std::string &contextName);
 
-    /** servicing helper class to manage lifetimes of a service loop*/
+    /** servicing helper class to manage lifetimes of a context loop*/
     class Servicer
     {
       public:
-        explicit Servicer (std::shared_ptr<AsioContextManager> manager) : serviceManager (std::move (manager)) {}
-        /** this object halts the serviceLoop when deleted*/
+        explicit Servicer (std::shared_ptr<AsioContextManager> manager) : contextManager (std::move (manager)) {}
+        /** this object halts the contextLoop when deleted*/
         ~Servicer ()
         {
-            if (serviceManager)
+            if (contextManager)
             {
                 try
                 {
-                    serviceManager->haltServiceLoop ();
+                    contextManager->haltContextLoop ();
                 }
                 catch (...)
                 {
@@ -72,70 +72,70 @@ class AsioContextManager : public std::enable_shared_from_this<AsioContextManage
         Servicer (Servicer &&sv) = default;
 
       private:
-        std::shared_ptr<AsioContextManager> serviceManager;  //!< a pointer to the service manager
+        std::shared_ptr<AsioContextManager> contextManager;  //!< a pointer to the context manager
     };
 
   public:
     using LoopHandle = std::unique_ptr<Servicer>;
 
-    /** return a pointer to a service manager
-    @details the function will search for an existing service manager for the name
+    /** return a pointer to a context manager
+    @details the function will search for an existing context manager for the name
     if it doesn't find one it will create a new one
-    @param serviceName the name of the service to find or create*/
-    static std::shared_ptr<AsioContextManager> getServicePointer (const std::string &serviceName = std::string ());
-    /** return a pointer to a service manager
-    @details the function will search for an existing service manager for the name
+    @param contextName the name of the context to find or create*/
+    static std::shared_ptr<AsioContextManager> getContextPointer (const std::string &contextName = std::string ());
+    /** return a pointer to a context manager
+    @details the function will search for an existing context manager for the name
     if it doesn't find one it will return nullptr
-    @param serviceName the name of the service to find
+    @param contextName the name of the context to find
     */
     static std::shared_ptr<AsioContextManager>
-    getExistingServicePointer (const std::string &serviceName = std::string ());
-    /** get the asio io_context associated with the service manager
+    getExistingContextPointer (const std::string &contextName = std::string ());
+    /** get the asio io_context associated with the context manager
      */
-    static asio::io_context &getService (const std::string &serviceName = std::string ());
-    /** get the asio io_context associated with the service manager but only if the service exists
+    static asio::io_context &getContext (const std::string &contextName = std::string ());
+    /** get the asio io_context associated with the context manager but only if the context exists
     if it doesn't this will throw and invalid_argument exception
     */
-    static asio::io_context &getExistingService (const std::string &serviceName = std::string ());
+    static asio::io_context &getExistingContext (const std::string &contextName = std::string ());
 
-    static void closeService (const std::string &serviceName = std::string ());
-    /** tell the service to free the pointer and leak the memory on delete
+    static void closeContext (const std::string &contextName = std::string ());
+    /** tell the context to free the pointer and leak the memory on delete
     @details You may ask why, well in windows systems when operating in a DLL if this context is closed after
     certain other operations that happen when the DLL is unlinked bad things can happen, and since in nearly all
-    cases this happens at Shutdown leaking really doesn't matter that much and if you don't the service could
+    cases this happens at Shutdown leaking really doesn't matter that much and if you don't the context could
     terminate before some other parts of the program which cause all sorts of odd errors and issues
     */
-    static void setServiceToLeakOnDelete (const std::string &serviceName = std::string ());
+    static void setContextToLeakOnDelete (const std::string &contextName = std::string ());
     virtual ~AsioContextManager ();
 
-    /** get the name  of the current service manager*/
+    /** get the name  of the current context manager*/
     const std::string &getName () const { return name; }
 
     /** get the underlying asio::io_context reference*/
-    asio::io_context &getBaseService () const { return *ictx; }
+    asio::io_context &getBaseContext () const { return *ictx; }
 
-    /** run a single thread for the service manager to execute asynchronous services in
-    @details will run a single thread for the io_context,  it will not stop the thread until either the service
-    manager is closed or the haltServiceLoop function is called and there is no more work
-    @param in the name of the service  This function can be called as a static function on a particularly named
-    service
+    /** run a single thread for the context manager to execute asynchronous contexts in
+    @details will run a single thread for the io_context,  it will not stop the thread until either the context 
+    manager is closed or the haltContextLoop function is called and there is no more work
+    @param in the name of the context  This function can be called as a static function on a particularly named
+    context 
     */
-    static LoopHandle runServiceLoop (const std::string &serviceName = std::string{});
+    static LoopHandle runContextLoop (const std::string &contextName = std::string{});
 
-    /** run a single thread for the service manager to execute asynchronous services in
-    @details will run a single thread for the io_context,  it will not stop the thread until either the service
-    manager is closed or the haltServiceLoop function is called and there is no more work
+    /** run a single thread for the context manager to execute asynchronous contexts in
+    @details will run a single thread for the io_context,  it will not stop the thread until either the context 
+    manager is closed or the haltContextLoop function is called and there is no more work
     */
-    LoopHandle startServiceLoop ();
+    LoopHandle startContextLoop ();
 
   private:
-    /** halt the service loop thread if the counter==0
+    /** halt the context loop thread if the counter==0
     @details decrements the loop request counter and if it is 0 then will halt the
-    service loop
+    context loop
     */
-    void haltServiceLoop ();
+    void haltContextLoop ();
 
-    friend void serviceProcessingLoop (std::shared_ptr<AsioContextManager> ptr);
+    friend void contextProcessingLoop (std::shared_ptr<AsioContextManager> ptr);
 };
 
-void serviceProcessingLoop (std::shared_ptr<AsioContextManager> ptr);
+void contextProcessingLoop (std::shared_ptr<AsioContextManager> ptr);

@@ -154,7 +154,7 @@ generateConnection (std::shared_ptr<AsioContextManager> &ioctx, const std::strin
         std::string interface;
         std::string port;
         std::tie (interface, port) = extractInterfaceandPortString (address);
-        return TcpConnection::create (ioctx->getBaseService (), interface, port);
+        return TcpConnection::create (ioctx->getBaseContext (), interface, port);
     }
     catch (std::exception &e)
     {
@@ -177,8 +177,8 @@ void TcpCommsSS::queue_tx_function ()
         return;
     }
     TcpServer::pointer server;
-    auto ioctx = AsioContextManager::getServicePointer ();
-    auto serviceLoop = ioctx->startServiceLoop ();
+    auto ioctx = AsioContextManager::getContextPointer ();
+    auto contextLoop = ioctx->startContextLoop ();
     auto dataCall = [this](TcpConnection::pointer connection, const char *data, size_t datasize) {
         return dataReceive (connection, data, datasize);
     };
@@ -190,7 +190,7 @@ void TcpCommsSS::queue_tx_function ()
     if (serverMode)
     {
         server =
-          TcpServer::create (ioctx->getBaseService (), localTargetAddress, PortNumber, true, maxMessageSize);
+          TcpServer::create (ioctx->getBaseContext (), localTargetAddress, PortNumber, true, maxMessageSize);
         while (!server->isReady ())
         {
             logWarning ("retrying tcp bind");
@@ -256,7 +256,7 @@ void TcpCommsSS::queue_tx_function ()
             try
             {
                 brokerConnection =
-                  makeConnection (ioctx->getBaseService (), brokerTargetAddress, std::to_string (brokerPort),
+                  makeConnection (ioctx->getBaseContext (), brokerTargetAddress, std::to_string (brokerPort),
                                   maxMessageSize, std::chrono::milliseconds (connectionTimeout));
                 if (!brokerConnection)
                 {

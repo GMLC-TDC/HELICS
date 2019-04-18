@@ -40,7 +40,7 @@ class TcpConnection : public std::enable_shared_from_this<TcpConnection>
                            const std::string &connection,
                            const std::string &port,
                            size_t bufferSize = 10192);
-    /** create an RxConnection object using the specified service and bufferSize*/
+    /** create an RxConnection object using the specified context and bufferSize*/
     static pointer create (asio::io_context &io_context, size_t bufferSize)
     {
         return pointer (new TcpConnection (io_context, bufferSize));
@@ -184,7 +184,7 @@ class TcpAcceptor : public std::enable_shared_from_this<TcpAcceptor>
         closed = 4,
     };
     using pointer = std::shared_ptr<TcpAcceptor>;
-    /** create an RxConnection object using the specified service and bufferSize*/
+    /** create an RxConnection object using the specified context and bufferSize*/
     static pointer create (asio::io_context &io_context, asio::ip::tcp::endpoint &ep)
     {
         return pointer (new TcpAcceptor (io_context, ep));

@@ -211,89 +211,89 @@ C++ includes: argParser.h
 
 %feature("docstring") AsioContextManager "
 
-class defining a (potential) singleton Asio Io_service manager for all
+class defining a (potential) singleton Asio io_context manager for all
 asio usage
 
 C++ includes: AsioContextManager.h
 ";
 
-%feature("docstring") AsioContextManager::getServicePointer "
+%feature("docstring") AsioContextManager::getContextPointer "
 
-return a pointer to a service manager
+return a pointer to a context manager
 
-the function will search for an existing service manager for the name if it
+the function will search for an existing context manager for the name if it
 doesn't find one it will create a new one
 
 Parameters
 ----------
-* `serviceName` :
-    the name of the service to find or create
+* `contextName` :
+    the name of the context to find or create
 ";
 
-%feature("docstring") AsioContextManager::getExistingServicePointer "
+%feature("docstring") AsioContextManager::getExistingContextPointer "
 
-return a pointer to a service manager
+return a pointer to a context manager
 
-the function will search for an existing service manager for the name if it
+the function will search for an existing context manager for the name if it
 doesn't find one it will return nullptr
 
 Parameters
 ----------
-* `serviceName` :
-    the name of the service to find
+* `contextName` :
+    the name of the context to find
 ";
 
-%feature("docstring") AsioContextManager::getService "
+%feature("docstring") AsioContextManager::getContext "
 
-get the boost io_service associated with the service manager
+get the asio io_context associated with the context manager
 ";
 
-%feature("docstring") AsioContextManager::getExistingService "
+%feature("docstring") AsioContextManager::getExistingContext "
 
-get the boost io_service associated with the service manager but only if the
-service exists if it doesn't this will throw and invalid_argument exception
+get the asio io_context associated with the context manager but only if the
+context exists if it doesn't this will throw and invalid_argument exception
 ";
 
-%feature("docstring") AsioContextManager::closeService "
+%feature("docstring") AsioContextManager::closeContext "
 ";
 
-%feature("docstring") AsioContextManager::setServiceToLeakOnDelete "
+%feature("docstring") AsioContextManager::setContextToLeakOnDelete "
 
-tell the service to free the pointer and leak the memory on delete
+tell the context to free the pointer and leak the memory on delete
 
 You may ask why, well in windows systems when operating in a DLL if this context
 is closed after certain other operations that happen when the DLL is unlinked
 bad things can happen, and since in nearly all cases this happens at Shutdown
-leaking really doesn't matter that much and if you don't the service could
+leaking really doesn't matter that much and if you don't the context could
 terminate before some other parts of the program which cause all sorts of odd
 errors and issues
 ";
 
-%feature("docstring") AsioContextManager::runServiceLoop "
+%feature("docstring") AsioContextManager::runContextLoop "
 
-run a single thread for the service manager to execute asynchronous services in
+run a single thread for the context manager to execute asynchronous contexts in
 
-will run a single thread for the io_service, it will not stop the thread until
-either the service manager is closed or the haltServiceLoop function is called
+will run a single thread for the io_context, it will not stop the thread until
+either the context manager is closed or the haltContextLoop function is called
 and there is no more work
 
 Parameters
 ----------
 * `in` :
-    the name of the service
+    the name of the context 
 ";
 
-%feature("docstring") AsioContextManager::haltServiceLoop "
+%feature("docstring") AsioContextManager::haltContextLoop "
 
-halt the service loop thread if the counter==0
+halt the context loop thread if the counter==0
 
-decrements the loop request counter and if it is 0 then will halt the service
+decrements the loop request counter and if it is 0 then will halt the context 
 loop
 
 Parameters
 ----------
 * `in` :
-    the name of the service
+    the name of the context
 ";
 
 %feature("docstring") AsioContextManager::~AsioContextManager "
@@ -301,15 +301,15 @@ Parameters
 
 %feature("docstring") AsioContextManager::getName "
 
-get the name of the current service manager
+get the name of the current context manager
 ";
 
-%feature("docstring") AsioContextManager::getBaseService "
+%feature("docstring") AsioContextManager::getBaseContext "
 
-get the underlying boost::io_service reference
+get the underlying asio::io_context reference
 ";
 
-%feature("docstring") AsioContextManager::serviceRunLoop "
+%feature("docstring") AsioContextManager::contextRunLoop "
 ";
 
 // File: classhelics_1_1AsyncFedCallInfo.xml
@@ -11658,8 +11658,6 @@ C++ includes: zmqSocketDescriptor.h
 
 // File: namespaceboost.xml
 
-// File: namespaceboost_1_1asio.xml
-
 // File: namespaceboost_1_1program__options.xml
 
 // File: namespaceboost_1_1system.xml
@@ -12851,12 +12849,12 @@ map that all containing characters that come in pairs to the appropriate match
 
 // File: AsioContextManager_8cpp.xml
 
-%feature("docstring") serviceRunLoop "
+%feature("docstring") contextRunLoop "
 ";
 
 // File: AsioContextManager_8h.xml
 
-%feature("docstring") serviceRunLoop "
+%feature("docstring") contextRunLoop "
 ";
 
 // File: AsyncFedCallInfo_8hpp.xml

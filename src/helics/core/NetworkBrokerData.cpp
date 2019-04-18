@@ -457,9 +457,9 @@ auto matchcount (InputIt1 first1, InputIt1 last1, InputIt2 first2, InputIt2 last
 
 std::string getLocalExternalAddressV4 ()
 {
-    auto srv = AsioContextManager::getServicePointer ();
+    auto srv = AsioContextManager::getContextPointer ();
 
-    asio::ip::tcp::resolver resolver (srv->getBaseService ());
+    asio::ip::tcp::resolver resolver (srv->getBaseContext ());
     asio::ip::tcp::resolver::query query (asio::ip::tcp::v4 (), asio::ip::host_name (), "");
     asio::ip::tcp::resolver::iterator it = resolver.resolve (query);
     asio::ip::tcp::endpoint endpoint = *it;
@@ -469,9 +469,9 @@ std::string getLocalExternalAddressV4 ()
 
 std::string getLocalExternalAddressV4 (const std::string &server)
 {
-    auto srv = AsioContextManager::getServicePointer ();
+    auto srv = AsioContextManager::getContextPointer ();
 
-    asio::ip::tcp::resolver resolver (srv->getBaseService ());
+    asio::ip::tcp::resolver resolver (srv->getBaseContext ());
 
     asio::ip::tcp::resolver::query query_server (asio::ip::tcp::v4 (), server, "");
     std::error_code ec;
@@ -510,9 +510,9 @@ std::string getLocalExternalAddressV4 (const std::string &server)
 
 std::string getLocalExternalAddressV6 ()
 {
-    auto srv = AsioContextManager::getServicePointer ();
+    auto srv = AsioContextManager::getContextPointer ();
 
-    asio::ip::tcp::resolver resolver (srv->getBaseService ());
+    asio::ip::tcp::resolver resolver (srv->getBaseContext ());
     asio::ip::tcp::resolver::query query (asio::ip::tcp::v6 (), asio::ip::host_name (), "");
     asio::ip::tcp::resolver::iterator it = resolver.resolve (query);
     asio::ip::tcp::endpoint endpoint = *it;
@@ -522,9 +522,9 @@ std::string getLocalExternalAddressV6 ()
 
 std::string getLocalExternalAddressV6 (const std::string &server)
 {
-    auto srv = AsioContextManager::getServicePointer ();
+    auto srv = AsioContextManager::getContextPointer ();
 
-    asio::ip::tcp::resolver resolver (srv->getBaseService ());
+    asio::ip::tcp::resolver resolver (srv->getBaseContext ());
 
     asio::ip::tcp::resolver::query query_server (asio::ip::tcp::v6 (), server, "");
     asio::ip::tcp::resolver::iterator it_server = resolver.resolve (query_server);

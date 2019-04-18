@@ -160,8 +160,8 @@ void TcpComms::queue_rx_function ()
         setRxStatus (connection_status::error);
         return;
     }
-    auto ioctx = AsioContextManager::getServicePointer ();
-    auto server = helics::tcp::TcpServer::create (ioctx->getBaseService (), localTargetAddress, PortNumber,
+    auto ioctx = AsioContextManager::getContextPointer ();
+    auto server = helics::tcp::TcpServer::create (ioctx->getBaseContext (), localTargetAddress, PortNumber,
                                                   reuse_address, maxMessageSize);
     while (!server->isReady ())
     {
@@ -169,7 +169,7 @@ void TcpComms::queue_rx_function ()
         {  // If we failed and we are on an automatically assigned port number,  just try a different port
             server->close ();
             ++PortNumber;
-            server = helics::tcp::TcpServer::create (ioctx->getBaseService (), localTargetAddress, PortNumber,
+            server = helics::tcp::TcpServer::create (ioctx->getBaseContext (), localTargetAddress, PortNumber,
                                                      reuse_address, maxMessageSize);
         }
         else
@@ -186,7 +186,7 @@ void TcpComms::queue_rx_function ()
             }
         }
     }
-    auto serviceLoop = ioctx->startServiceLoop ();
+    auto contextLoop = ioctx->startContextLoop ();
     server->setDataCall ([this](TcpConnection::pointer connection, const char *data, size_t datasize) {
         return dataReceive (connection, data, datasize);
     });
@@ -260,7 +260,7 @@ bool TcpComms::establishBrokerConnection (std::shared_ptr<AsioContextManager> &i
     }
     try
     {
-        brokerConnection = makeConnection (ioctx->getBaseService (), brokerTargetAddress,
+        brokerConnection = makeConnection (ioctx->getBaseContext (), brokerTargetAddress,
                                            std::to_string (brokerPort), maxMessageSize, connectionTimeout);
         int retries = 0;
         while (!brokerConnection)
@@ -278,7 +278,7 @@ bool TcpComms::establishBrokerConnection (std::shared_ptr<AsioContextManager> &i
             else
             {
                 std::this_thread::yield ();
-                brokerConnection = makeConnection (ioctx->getBaseService (), brokerTargetAddress,
+                brokerConnection = makeConnection (ioctx->getBaseContext (), brokerTargetAddress,
                                                    std::to_string (brokerPort), maxMessageSize, connectionTimeout);
             }
         }
@@ -356,8 +356,8 @@ bool TcpComms::establishBrokerConnection (std::shared_ptr<AsioContextManager> &i
 void TcpComms::queue_tx_function ()
 {
     std::vector<char> buffer;
-    auto ioctx = AsioContextManager::getServicePointer ();
-    auto serviceLoop = ioctx->startServiceLoop ();
+    auto ioctx = AsioContextManager::getContextPointer ();
+    auto contextLoop = ioctx->startContextLoop ();
     TcpConnection::pointer brokerConnection;
 
     std::map<route_id, TcpConnection::pointer> routes;  // for all the other possible routes
@@ -411,7 +411,7 @@ void TcpComms::queue_tx_function ()
                         std::string interface;
                         std::string port;
                         std::tie (interface, port) = extractInterfaceandPortString (newroute);
-                        auto new_connect = TcpConnection::create (ioctx->getBaseService (), interface, port);
+                        auto new_connect = TcpConnection::create (ioctx->getBaseContext (), interface, port);
 
                         routes.emplace (route_id{cmd.getExtraData ()}, std::move (new_connect));
                     }

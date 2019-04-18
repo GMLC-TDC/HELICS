@@ -42,10 +42,10 @@ BOOST_AUTO_TEST_CASE (tcpComms_broker_test)
     helics::tcp::TcpComms comm;
     comm.loadTargetInfo (host, host);
 
-    auto srv = AsioContextManager::getServicePointer ();
+    auto srv = AsioContextManager::getContextPointer ();
 
-    auto server = helics::tcp::TcpServer::create (srv->getBaseService (), TCP_BROKER_PORT);
-    auto serviceLoop = srv->startServiceLoop ();
+    auto server = helics::tcp::TcpServer::create (srv->getBaseContext (), TCP_BROKER_PORT);
+    auto contextLoop = srv->startContextLoop ();
     std::vector<char> data (1024);
     server->setDataCall ([&counter](helics::tcp::TcpConnection::pointer, const char *, size_t data_avail) {
         ++counter;
@@ -75,9 +75,9 @@ BOOST_AUTO_TEST_CASE (tcpComms_broker_test_transmit)
     helics::tcp::TcpComms comm;
     comm.loadTargetInfo (host, host);
 
-    auto srv = AsioContextManager::getServicePointer ();
-    auto server = helics::tcp::TcpServer::create (srv->getBaseService (), host, TCP_BROKER_PORT);
-    auto serviceLoop = srv->startServiceLoop ();
+    auto srv = AsioContextManager::getContextPointer ();
+    auto server = helics::tcp::TcpServer::create (srv->getBaseContext (), host, TCP_BROKER_PORT);
+    auto contextLoop = srv->startContextLoop ();
     std::vector<char> data (1024);
     server->setDataCall (
       [&data, &counter, &len](helics::tcp::TcpConnection::pointer, const char *data_rec, size_t data_Size) {
@@ -132,10 +132,10 @@ BOOST_AUTO_TEST_CASE (tcpComms_rx_test)
     helics::tcp::TcpComms comm;
     comm.loadTargetInfo (host, host);
     std::mutex actguard;
-    auto srv = AsioContextManager::getServicePointer ();
+    auto srv = AsioContextManager::getContextPointer ();
 
-    auto server = helics::tcp::TcpServer::create (srv->getBaseService (), host, TCP_BROKER_PORT_STRING);
-    auto serviceLoop = srv->startServiceLoop ();
+    auto server = helics::tcp::TcpServer::create (srv->getBaseContext (), host, TCP_BROKER_PORT_STRING);
+    auto contextLoop = srv->startContextLoop ();
     std::vector<char> data (1024);
     server->setDataCall (
       [&data, &ServerCounter, &len](helics::tcp::TcpConnection::pointer, const char *data_rec, size_t data_Size) {
@@ -159,7 +159,7 @@ BOOST_AUTO_TEST_CASE (tcpComms_rx_test)
     bool connected = comm.connect ();
     BOOST_REQUIRE (connected);
 
-    auto txconn = helics::tcp::TcpConnection::create (srv->getBaseService (), host, "24180", 1024);
+    auto txconn = helics::tcp::TcpConnection::create (srv->getBaseContext (), host, "24180", 1024);
     auto res = txconn->waitUntilConnected (1000ms);
     BOOST_REQUIRE_EQUAL (res, true);
 
@@ -185,10 +185,10 @@ BOOST_AUTO_TEST_CASE (test_tcpServerConnections1)
     std::atomic<int> counter{0};
     std::string host = "127.0.0.1";
 
-    auto srv = AsioContextManager::getServicePointer ();
-    auto server = helics::tcp::TcpServer::create (srv->getBaseService (), host, TCP_BROKER_PORT);
+    auto srv = AsioContextManager::getContextPointer ();
+    auto server = helics::tcp::TcpServer::create (srv->getBaseContext (), host, TCP_BROKER_PORT);
     BOOST_REQUIRE (server->isReady ());
-    auto serviceLoop = srv->startServiceLoop ();
+    auto contextLoop = srv->startContextLoop ();
     std::vector<char> data (1024);
     std::atomic<bool> validData{true};
 
@@ -218,10 +218,10 @@ BOOST_AUTO_TEST_CASE (test_tcpServerConnections1)
     server->setDataCall (dataCheck);
     server->start ();
 
-    auto conn1 = helics::tcp::TcpConnection::create (srv->getBaseService (), host, "24160", 1024);
-    auto conn2 = helics::tcp::TcpConnection::create (srv->getBaseService (), host, "24160", 1024);
-    auto conn3 = helics::tcp::TcpConnection::create (srv->getBaseService (), host, "24160", 1024);
-    auto conn4 = helics::tcp::TcpConnection::create (srv->getBaseService (), host, "24160", 1024);
+    auto conn1 = helics::tcp::TcpConnection::create (srv->getBaseContext (), host, "24160", 1024);
+    auto conn2 = helics::tcp::TcpConnection::create (srv->getBaseContext (), host, "24160", 1024);
+    auto conn3 = helics::tcp::TcpConnection::create (srv->getBaseContext (), host, "24160", 1024);
+    auto conn4 = helics::tcp::TcpConnection::create (srv->getBaseContext (), host, "24160", 1024);
     BOOST_REQUIRE (conn1);
     BOOST_REQUIRE (conn2);
     BOOST_REQUIRE (conn3);
@@ -343,8 +343,8 @@ BOOST_AUTO_TEST_CASE (tcpComm_transmit_add_route)
     comm.loadTargetInfo (host, host);
     comm2.loadTargetInfo (host, std::string ());
     comm3.loadTargetInfo (host, host);
-    auto srv = AsioContextManager::getServicePointer ();
-    auto serviceLoop = srv->startServiceLoop ();
+    auto srv = AsioContextManager::getContextPointer ();
+    auto contextLoop = srv->startContextLoop ();
 
     comm.setBrokerPort (TCP_BROKER_PORT + 2);
     comm.setFlag ("reuse_address", true);
@@ -431,10 +431,10 @@ BOOST_AUTO_TEST_CASE (tcpCore_initialization_test)
 
     BOOST_REQUIRE (core);
     BOOST_CHECK (core->isInitialized ());
-    auto srv = AsioContextManager::getServicePointer ();
+    auto srv = AsioContextManager::getContextPointer ();
 
-    auto server = helics::tcp::TcpServer::create (srv->getBaseService (), "localhost", TCP_BROKER_PORT);
-    auto serviceLoop = srv->startServiceLoop ();
+    auto server = helics::tcp::TcpServer::create (srv->getBaseContext (), "localhost", TCP_BROKER_PORT);
+    auto contextLoop = srv->startContextLoop ();
     std::vector<char> data (1024);
     std::atomic<size_t> len{0};
     server->setDataCall (
