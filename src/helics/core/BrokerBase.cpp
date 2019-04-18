@@ -7,7 +7,7 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include "BrokerBase.hpp"
 
-#include "../common/AsioServiceManager.h"
+#include "../common/AsioContextManager.h"
 #include "../common/argParser.h"
 #include "../common/logger.h"
 
@@ -366,7 +366,7 @@ void BrokerBase::queueProcessingLoop ()
     }
     std::vector<ActionMessage> dumpMessages;
 
-    auto serv = AsioServiceManager::getServicePointer ();
+    auto serv = AsioContextManager::getServicePointer ();
     auto serviceLoop = serv->startServiceLoop ();
     asio::steady_timer ticktimer (serv->getBaseService ());
     activeProtector active (true, false);

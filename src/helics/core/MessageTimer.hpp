@@ -6,7 +6,7 @@ SPDX-License-Identifier: BSD-3-Clause
 */
 #pragma once
 
-#include "../common/AsioServiceManager.h"
+#include "../common/AsioContextManager.h"
 #include "ActionMessage.hpp"
 #include <memory>
 #include <mutex>
@@ -52,7 +52,7 @@ class MessageTimer : public std::enable_shared_from_this<MessageTimer>
     const std::function<void(ActionMessage &&)> sendFunction;  //!< the callback to use when sending a message
     std::vector<ActionMessage> buffers;
     std::vector<time_type> expirationTimes;
-    std::shared_ptr<AsioServiceManager> servicePtr;  //!< service manager to for handling real time operations
+    std::shared_ptr<AsioContextManager> servicePtr;  //!< service manager to for handling real time operations
     decltype (servicePtr->startServiceLoop ()) loopHandle;  //!< loop controller for async real time operations
 };
 }  // namespace helics

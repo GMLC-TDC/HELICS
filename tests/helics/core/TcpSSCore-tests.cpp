@@ -6,7 +6,7 @@ SPDX-License-Identifier: BSD-3-Clause
 */
 #include <boost/test/unit_test.hpp>
 
-#include "helics/common/AsioServiceManager.h"
+#include "helics/common/AsioContextManager.h"
 #include "helics/common/GuardedTypes.hpp"
 #include "helics/core/ActionMessage.hpp"
 #include "helics/core/BrokerFactory.hpp"
@@ -43,7 +43,7 @@ BOOST_AUTO_TEST_CASE (tcpSSComms_broker_test)
     helics::tcp::TcpCommsSS comm;
     comm.loadTargetInfo (host, host);
 
-    auto srv = AsioServiceManager::getServicePointer ();
+    auto srv = AsioContextManager::getServicePointer ();
 
     auto server = helics::tcp::TcpServer::create (srv->getBaseService (), TCP_BROKER_PORT);
     auto serviceLoop = srv->startServiceLoop ();
@@ -88,7 +88,7 @@ BOOST_AUTO_TEST_CASE (tcpSSComms_broker_test_transmit)
     helics::tcp::TcpCommsSS comm;
     comm.loadTargetInfo (host, host);
 
-    auto srv = AsioServiceManager::getServicePointer ();
+    auto srv = AsioContextManager::getServicePointer ();
     auto serviceLoop = srv->startServiceLoop ();
 
     auto server = helics::tcp::TcpServer::create (srv->getBaseService (), host, TCP_BROKER_PORT);
@@ -154,7 +154,7 @@ BOOST_AUTO_TEST_CASE (tcpSSComms_rx_test)
     helics::tcp::TcpCommsSS comm;
     comm.loadTargetInfo (host, "");
     std::mutex actguard;
-    auto srv = AsioServiceManager::getServicePointer ();
+    auto srv = AsioContextManager::getServicePointer ();
     auto serviceLoop = srv->startServiceLoop ();
     comm.setCallback ([&CommCounter, &act, &actguard](helics::ActionMessage m) {
         ++CommCounter;
@@ -195,7 +195,7 @@ BOOST_AUTO_TEST_CASE (tcpSSComm_transmit_through)
     std::atomic<int> counter2{0};
     guarded<helics::ActionMessage> act;
     guarded<helics::ActionMessage> act2;
-    auto srv = AsioServiceManager::getServicePointer ();
+    auto srv = AsioContextManager::getServicePointer ();
     auto serviceLoop = srv->startServiceLoop ();
 
     std::string host = "localhost";
@@ -257,7 +257,7 @@ BOOST_AUTO_TEST_CASE (tcpSSComm_transmit_add_route)
 
     std::string host = "localhost";
     helics::tcp::TcpCommsSS comm, comm2, comm3;
-    auto srv = AsioServiceManager::getServicePointer ();
+    auto srv = AsioContextManager::getServicePointer ();
     auto serviceLoop = srv->startServiceLoop ();
     comm.loadTargetInfo (host, host);
     comm2.loadTargetInfo (host, std::string ());
@@ -348,7 +348,7 @@ BOOST_AUTO_TEST_CASE (tcpSSCore_initialization_test)
 
     BOOST_REQUIRE (core);
     BOOST_CHECK (core->isInitialized ());
-    auto srv = AsioServiceManager::getServicePointer ();
+    auto srv = AsioContextManager::getServicePointer ();
     auto serviceLoop = srv->startServiceLoop ();
 
     auto server = helics::tcp::TcpServer::create (srv->getBaseService (), "localhost", TCP_BROKER_PORT);

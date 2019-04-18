@@ -30,10 +30,10 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <asio/io_context.hpp>
 
 /** class defining a (potential) singleton Asio io_context manager for all asio usage*/
-class AsioServiceManager : public std::enable_shared_from_this<AsioServiceManager>
+class AsioContextManager : public std::enable_shared_from_this<AsioContextManager>
 {
   private:
-    static std::map<std::string, std::shared_ptr<AsioServiceManager>>
+    static std::map<std::string, std::shared_ptr<AsioContextManager>>
       services;  //!< container for pointers to all the available contexts
     std::atomic<int> runCounter{0};  //!< counter for the number of times the runServiceLoop has been called
     std::string name;  //!< service name
@@ -46,13 +46,13 @@ class AsioServiceManager : public std::enable_shared_from_this<AsioServiceManage
     std::atomic<bool> terminateLoop{false};  //!< flag indicating that the loop should terminate
     std::future<void> loopRet;
     /** constructor*/
-    explicit AsioServiceManager (const std::string &serviceName);
+    explicit AsioContextManager (const std::string &serviceName);
 
     /** servicing helper class to manage lifetimes of a service loop*/
     class Servicer
     {
       public:
-        explicit Servicer (std::shared_ptr<AsioServiceManager> manager) : serviceManager (std::move (manager)) {}
+        explicit Servicer (std::shared_ptr<AsioContextManager> manager) : serviceManager (std::move (manager)) {}
         /** this object halts the serviceLoop when deleted*/
         ~Servicer ()
         {
@@ -72,7 +72,7 @@ class AsioServiceManager : public std::enable_shared_from_this<AsioServiceManage
         Servicer (Servicer &&sv) = default;
 
       private:
-        std::shared_ptr<AsioServiceManager> serviceManager;  //!< a pointer to the service manager
+        std::shared_ptr<AsioContextManager> serviceManager;  //!< a pointer to the service manager
     };
 
   public:
@@ -82,13 +82,13 @@ class AsioServiceManager : public std::enable_shared_from_this<AsioServiceManage
     @details the function will search for an existing service manager for the name
     if it doesn't find one it will create a new one
     @param serviceName the name of the service to find or create*/
-    static std::shared_ptr<AsioServiceManager> getServicePointer (const std::string &serviceName = std::string ());
+    static std::shared_ptr<AsioContextManager> getServicePointer (const std::string &serviceName = std::string ());
     /** return a pointer to a service manager
     @details the function will search for an existing service manager for the name
     if it doesn't find one it will return nullptr
     @param serviceName the name of the service to find
     */
-    static std::shared_ptr<AsioServiceManager>
+    static std::shared_ptr<AsioContextManager>
     getExistingServicePointer (const std::string &serviceName = std::string ());
     /** get the asio io_context associated with the service manager
      */
@@ -106,7 +106,7 @@ class AsioServiceManager : public std::enable_shared_from_this<AsioServiceManage
     terminate before some other parts of the program which cause all sorts of odd errors and issues
     */
     static void setServiceToLeakOnDelete (const std::string &serviceName = std::string ());
-    virtual ~AsioServiceManager ();
+    virtual ~AsioContextManager ();
 
     /** get the name  of the current service manager*/
     const std::string &getName () const { return name; }
@@ -135,7 +135,7 @@ class AsioServiceManager : public std::enable_shared_from_this<AsioServiceManage
     */
     void haltServiceLoop ();
 
-    friend void serviceProcessingLoop (std::shared_ptr<AsioServiceManager> ptr);
+    friend void serviceProcessingLoop (std::shared_ptr<AsioContextManager> ptr);
 };
 
-void serviceProcessingLoop (std::shared_ptr<AsioServiceManager> ptr);
+void serviceProcessingLoop (std::shared_ptr<AsioContextManager> ptr);

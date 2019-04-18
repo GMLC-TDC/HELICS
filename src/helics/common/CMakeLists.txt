@@ -19,7 +19,7 @@ set(
   JsonProcessingFunctions.hpp
   TomlProcessingFunctions.hpp
   stringToCmdLine.h
-  AsioServiceManager.h
+  AsioContextManager.h
   logger.h
   stringOps.h
   MapTraits.hpp
@@ -41,7 +41,7 @@ set(
 set(
   common_sources
   stringToCmdLine.cpp
-  AsioServiceManager.cpp
+  AsioContextManager.cpp
   JsonProcessingFunctions.cpp
   TomlProcessingFunctions.cpp
   logger.cpp
@@ -78,7 +78,7 @@ set(
   argParser.h
   JsonProcessingFunctions.hpp
   stringToCmdLine.h
-  AsioServiceManager.h
+  AsioContextManager.h
   AsioServiceManagerFwd.hpp
   logger.h
   stringOps.h

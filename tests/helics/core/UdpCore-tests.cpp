@@ -6,7 +6,7 @@ SPDX-License-Identifier: BSD-3-Clause
 */
 #include <boost/test/unit_test.hpp>
 
-#include "helics/common/AsioServiceManager.h"
+#include "helics/common/AsioContextManager.h"
 #include "helics/common/GuardedTypes.hpp"
 #include "helics/core/ActionMessage.hpp"
 #include "helics/core/BrokerFactory.hpp"
@@ -38,9 +38,9 @@ BOOST_AUTO_TEST_CASE (udpComms_broker_test)
     helics::udp::UdpComms comm;
     comm.loadTargetInfo (host, host);
 
-    auto srv = AsioServiceManager::getServicePointer ();
+    auto srv = AsioContextManager::getServicePointer ();
 
-    udp::socket rxSocket (AsioServiceManager::getService (), udp::endpoint (udp::v4 (), 23901));
+    udp::socket rxSocket (AsioContextManager::getService (), udp::endpoint (udp::v4 (), 23901));
 
     comm.setCallback ([&counter](helics::ActionMessage /*m*/) { ++counter; });
     comm.setBrokerPort (UDP_BROKER_PORT);
@@ -75,9 +75,9 @@ BOOST_AUTO_TEST_CASE (udpComms_broker_test_transmit)
     std::string host = "localhost";
     helics::udp::UdpComms comm;
     comm.loadTargetInfo (host, host);
-    auto srv = AsioServiceManager::getServicePointer ();
+    auto srv = AsioContextManager::getServicePointer ();
 
-    udp::socket rxSocket (AsioServiceManager::getService (), udp::endpoint (udp::v4 (), 23901));
+    udp::socket rxSocket (AsioContextManager::getService (), udp::endpoint (udp::v4 (), 23901));
 
     BOOST_CHECK (rxSocket.is_open ());
     comm.setCallback ([&counter](helics::ActionMessage /*m*/) { ++counter; });
@@ -111,10 +111,10 @@ BOOST_AUTO_TEST_CASE (udpComms_rx_test)
     helics::udp::UdpComms comm;
     comm.loadTargetInfo (host, host);
 
-    auto srv = AsioServiceManager::getServicePointer ();
+    auto srv = AsioContextManager::getServicePointer ();
 
-    udp::resolver resolver (AsioServiceManager::getService ());
-    udp::socket rxSocket (AsioServiceManager::getService (), udp::endpoint (udp::v4 (), 23901));
+    udp::resolver resolver (AsioContextManager::getService ());
+    udp::socket rxSocket (AsioContextManager::getService (), udp::endpoint (udp::v4 (), 23901));
 
     BOOST_CHECK (rxSocket.is_open ());
     comm.setCallback ([&counter, &act](helics::ActionMessage m) {
@@ -295,8 +295,8 @@ BOOST_AUTO_TEST_CASE (udpCore_initialization_test)
 
     BOOST_REQUIRE (core != nullptr);
     BOOST_CHECK (core->isInitialized ());
-    auto srv = AsioServiceManager::getServicePointer ();
-    udp::socket rxSocket (AsioServiceManager::getService (), udp::endpoint (udp::v4 (), 23901));
+    auto srv = AsioContextManager::getServicePointer ();
+    udp::socket rxSocket (AsioContextManager::getService (), udp::endpoint (udp::v4 (), 23901));
 
     BOOST_CHECK (rxSocket.is_open ());
 

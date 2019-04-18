@@ -16,7 +16,7 @@ SPDX-License-Identifier: BSD-3-Clause
  * LLNS Copyright End
  */
 
-#include "AsioServiceManager.h"
+#include "AsioContextManager.h"
 
 #include <chrono>
 #include <iostream>
@@ -26,15 +26,15 @@ SPDX-License-Identifier: BSD-3-Clause
 
 /** a storage system for the available core objects allowing references by name to the core
  */
-std::map<std::string, std::shared_ptr<AsioServiceManager>> AsioServiceManager::services;
+std::map<std::string, std::shared_ptr<AsioContextManager>> AsioContextManager::services;
 
 /** we expect operations on core object that modify the map to be rare but we absolutely need them to be thread
 safe so we are going to use a lock that is entirely controlled by this file*/
 static std::mutex serviceLock;
 
-std::shared_ptr<AsioServiceManager> AsioServiceManager::getServicePointer (const std::string &serviceName)
+std::shared_ptr<AsioContextManager> AsioContextManager::getServicePointer (const std::string &serviceName)
 {
-    std::shared_ptr<AsioServiceManager> servicePtr;
+    std::shared_ptr<AsioContextManager> servicePtr;
     std::lock_guard<std::mutex> serveLock (serviceLock);  // just to ensure that nothing funny happens if you try
                                                           // to get a context while it is being constructed
     auto fnd = services.find (serviceName);
@@ -44,13 +44,13 @@ std::shared_ptr<AsioServiceManager> AsioServiceManager::getServicePointer (const
         return servicePtr;
     }
 
-    servicePtr = std::shared_ptr<AsioServiceManager> (new AsioServiceManager (serviceName));
+    servicePtr = std::shared_ptr<AsioContextManager> (new AsioContextManager (serviceName));
     services.emplace (serviceName, servicePtr);
     return servicePtr;
     // if it doesn't find it make a new one with the appropriate name
 }
 
-std::shared_ptr<AsioServiceManager> AsioServiceManager::getExistingServicePointer (const std::string &serviceName)
+std::shared_ptr<AsioContextManager> AsioContextManager::getExistingServicePointer (const std::string &serviceName)
 {
     std::lock_guard<std::mutex> serveLock (serviceLock);  // just to ensure that nothing funny happens if you try
                                                           // to get a context while it is being constructed
@@ -63,12 +63,12 @@ std::shared_ptr<AsioServiceManager> AsioServiceManager::getExistingServicePointe
     return nullptr;
 }
 
-asio::io_context &AsioServiceManager::getService (const std::string &serviceName)
+asio::io_context &AsioContextManager::getService (const std::string &serviceName)
 {
     return getServicePointer (serviceName)->getBaseService ();
 }
 
-asio::io_context &AsioServiceManager::getExistingService (const std::string &serviceName)
+asio::io_context &AsioContextManager::getExistingService (const std::string &serviceName)
 {
     auto ptr = getExistingServicePointer (serviceName);
     if (ptr)
@@ -78,7 +78,7 @@ asio::io_context &AsioServiceManager::getExistingService (const std::string &ser
     throw (std::invalid_argument ("the service name specified was not available"));
 }
 
-void AsioServiceManager::closeService (const std::string &serviceName)
+void AsioContextManager::closeService (const std::string &serviceName)
 {
     std::unique_lock<std::mutex> servelock (serviceLock);
     auto fnd = services.find (serviceName);
@@ -98,7 +98,7 @@ void AsioServiceManager::closeService (const std::string &serviceName)
     }
 }
 
-void AsioServiceManager::setServiceToLeakOnDelete (const std::string &serviceName)
+void AsioContextManager::setServiceToLeakOnDelete (const std::string &serviceName)
 {
     std::lock_guard<std::mutex> servelock (serviceLock);
     auto fnd = services.find (serviceName);
@@ -107,7 +107,7 @@ void AsioServiceManager::setServiceToLeakOnDelete (const std::string &serviceNam
         fnd->second->leakOnDelete = true;
     }
 }
-AsioServiceManager::~AsioServiceManager ()
+AsioContextManager::~AsioContextManager ()
 {
     //  std::cout << "deleting service manager\n";
 
@@ -134,12 +134,12 @@ AsioServiceManager::~AsioServiceManager ()
     }
 }
 
-AsioServiceManager::AsioServiceManager (const std::string &serviceName)
+AsioContextManager::AsioContextManager (const std::string &serviceName)
     : name (serviceName), ictx (std::make_unique<asio::io_context> ())
 {
 }
 
-AsioServiceManager::LoopHandle AsioServiceManager::runServiceLoop (const std::string &serviceName)
+AsioContextManager::LoopHandle AsioContextManager::runServiceLoop (const std::string &serviceName)
 {
     std::unique_lock<std::mutex> servelock (serviceLock);
     auto fnd = services.find (serviceName);
@@ -152,7 +152,7 @@ AsioServiceManager::LoopHandle AsioServiceManager::runServiceLoop (const std::st
     throw (std::invalid_argument ("the service name specified was not available"));
 }
 
-AsioServiceManager::LoopHandle AsioServiceManager::startServiceLoop ()
+AsioContextManager::LoopHandle AsioContextManager::startServiceLoop ()
 {
     ++runCounter;  // atomic
 
@@ -200,7 +200,7 @@ AsioServiceManager::LoopHandle AsioServiceManager::startServiceLoop ()
     return std::make_unique<Servicer> (shared_from_this ());
 }
 
-void AsioServiceManager::haltServiceLoop ()
+void AsioContextManager::haltServiceLoop ()
 {
     if (running.load ())
     {
@@ -244,7 +244,7 @@ void AsioServiceManager::haltServiceLoop ()
     }
 }
 
-void serviceProcessingLoop (std::shared_ptr<AsioServiceManager> ptr)
+void serviceProcessingLoop (std::shared_ptr<AsioContextManager> ptr)
 {
     while ((ptr->runCounter > 0) && (!(ptr->terminateLoop)))
     {

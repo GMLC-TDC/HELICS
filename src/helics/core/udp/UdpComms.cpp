@@ -5,7 +5,7 @@ the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 #include "UdpComms.h"
-#include "../../common/AsioServiceManager.h"
+#include "../../common/AsioContextManager.h"
 #include "../../common/fmt_format.h"
 #include "../ActionMessage.hpp"
 #include "../NetworkBrokerData.hpp"
@@ -60,7 +60,7 @@ void UdpComms::queue_rx_function ()
         setRxStatus (connection_status::error);
         return;
     }
-    auto ioctx = AsioServiceManager::getServicePointer ();
+    auto ioctx = AsioContextManager::getServicePointer ();
     udp::socket socket (ioctx->getBaseService ());
     socket.open (udpnet (interfaceNetwork));
     std::chrono::milliseconds t_cnt{0};
@@ -183,7 +183,7 @@ CLOSE_RX_LOOP:
 void UdpComms::queue_tx_function ()
 {
     std::vector<char> buffer;
-    auto ioctx = AsioServiceManager::getServicePointer ();
+    auto ioctx = AsioContextManager::getServicePointer ();
     udp::resolver resolver (ioctx->getBaseService ());
     bool closingRx = false;
     udp::socket transmitSocket (ioctx->getBaseService ());
@@ -465,7 +465,7 @@ void UdpComms::closeReceiver ()
     {
         try
         {
-            auto serv = AsioServiceManager::getServicePointer ();
+            auto serv = AsioContextManager::getServicePointer ();
             if (serv)
             {
                 // try connecting with the receiver socket

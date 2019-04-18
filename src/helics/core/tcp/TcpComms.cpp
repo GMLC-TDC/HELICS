@@ -5,7 +5,7 @@ the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 #include "TcpComms.h"
-#include "../../common/AsioServiceManager.h"
+#include "../../common/AsioContextManager.h"
 #include "../ActionMessage.hpp"
 #include "../NetworkBrokerData.hpp"
 #include "TcpCommsCommon.h"
@@ -160,7 +160,7 @@ void TcpComms::queue_rx_function ()
         setRxStatus (connection_status::error);
         return;
     }
-    auto ioctx = AsioServiceManager::getServicePointer ();
+    auto ioctx = AsioContextManager::getServicePointer ();
     auto server = helics::tcp::TcpServer::create (ioctx->getBaseService (), localTargetAddress, PortNumber,
                                                   reuse_address, maxMessageSize);
     while (!server->isReady ())
@@ -240,7 +240,7 @@ void TcpComms::txReceive (const char *data, size_t bytes_received, const std::st
     }
 }
 
-bool TcpComms::establishBrokerConnection (std::shared_ptr<AsioServiceManager> &ioctx,
+bool TcpComms::establishBrokerConnection (std::shared_ptr<AsioContextManager> &ioctx,
                                           std::shared_ptr<TcpConnection> &brokerConnection)
 {
     // lambda function that does the proper termination
@@ -356,7 +356,7 @@ bool TcpComms::establishBrokerConnection (std::shared_ptr<AsioServiceManager> &i
 void TcpComms::queue_tx_function ()
 {
     std::vector<char> buffer;
-    auto ioctx = AsioServiceManager::getServicePointer ();
+    auto ioctx = AsioContextManager::getServicePointer ();
     auto serviceLoop = ioctx->startServiceLoop ();
     TcpConnection::pointer brokerConnection;
 

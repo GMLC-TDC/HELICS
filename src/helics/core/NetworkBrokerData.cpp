@@ -9,7 +9,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "../common/argParser.h"
 #include "BrokerFactory.hpp"
 
-#include "../common/AsioServiceManager.h"
+#include "../common/AsioContextManager.h"
 #include <asio/ip/host_name.hpp>
 #include <asio/ip/tcp.hpp>
 
@@ -457,7 +457,7 @@ auto matchcount (InputIt1 first1, InputIt1 last1, InputIt2 first2, InputIt2 last
 
 std::string getLocalExternalAddressV4 ()
 {
-    auto srv = AsioServiceManager::getServicePointer ();
+    auto srv = AsioContextManager::getServicePointer ();
 
     asio::ip::tcp::resolver resolver (srv->getBaseService ());
     asio::ip::tcp::resolver::query query (asio::ip::tcp::v4 (), asio::ip::host_name (), "");
@@ -469,7 +469,7 @@ std::string getLocalExternalAddressV4 ()
 
 std::string getLocalExternalAddressV4 (const std::string &server)
 {
-    auto srv = AsioServiceManager::getServicePointer ();
+    auto srv = AsioContextManager::getServicePointer ();
 
     asio::ip::tcp::resolver resolver (srv->getBaseService ());
 
@@ -510,7 +510,7 @@ std::string getLocalExternalAddressV4 (const std::string &server)
 
 std::string getLocalExternalAddressV6 ()
 {
-    auto srv = AsioServiceManager::getServicePointer ();
+    auto srv = AsioContextManager::getServicePointer ();
 
     asio::ip::tcp::resolver resolver (srv->getBaseService ());
     asio::ip::tcp::resolver::query query (asio::ip::tcp::v6 (), asio::ip::host_name (), "");
@@ -522,7 +522,7 @@ std::string getLocalExternalAddressV6 ()
 
 std::string getLocalExternalAddressV6 (const std::string &server)
 {
-    auto srv = AsioServiceManager::getServicePointer ();
+    auto srv = AsioContextManager::getServicePointer ();
 
     asio::ip::tcp::resolver resolver (srv->getBaseService ());
 

@@ -41,7 +41,7 @@ class TcpComms final : public NetworkCommsInterface
     virtual void closeReceiver () override;  //!< function to instruct the receiver loop to close
 
     /** make the initial connection to a broker and get setup information*/
-    bool establishBrokerConnection (std::shared_ptr<AsioServiceManager> &ioctx,
+    bool establishBrokerConnection (std::shared_ptr<AsioContextManager> &ioctx,
                                     std::shared_ptr<TcpConnection> &brokerConnection);
     /** process an incoming message
     return code for required action 0=NONE, -1 TERMINATE*/

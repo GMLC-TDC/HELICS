@@ -11,7 +11,7 @@ SPDX-License-Identifier: BSD-3-Clause
 namespace helics
 {
 MessageTimer::MessageTimer (std::function<void(ActionMessage &&)> sFunction)
-    : sendFunction (std::move (sFunction)), servicePtr (AsioServiceManager::getServicePointer ())
+    : sendFunction (std::move (sFunction)), servicePtr (AsioContextManager::getServicePointer ())
 {
     //  std::cout << "getting loop handle for timer" << std::endl;
     loopHandle = servicePtr->startServiceLoop ();

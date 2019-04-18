@@ -5,7 +5,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
 #pragma once
 
-class AsioServiceManager;
+class AsioContextManager;
 
 namespace asio
 {

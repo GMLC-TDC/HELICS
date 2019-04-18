@@ -206,18 +206,18 @@ C++ includes: argParser.h
 %feature("docstring") helics::ArgDescriptor::ArgDescriptor "
 ";
 
-// File: classAsioServiceManager.xml
+// File: classAsioContextManager.xml
 
 
-%feature("docstring") AsioServiceManager "
+%feature("docstring") AsioContextManager "
 
 class defining a (potential) singleton Asio Io_service manager for all
 asio usage
 
-C++ includes: AsioServiceManager.h
+C++ includes: AsioContextManager.h
 ";
 
-%feature("docstring") AsioServiceManager::getServicePointer "
+%feature("docstring") AsioContextManager::getServicePointer "
 
 return a pointer to a service manager
 
@@ -230,7 +230,7 @@ Parameters
     the name of the service to find or create
 ";
 
-%feature("docstring") AsioServiceManager::getExistingServicePointer "
+%feature("docstring") AsioContextManager::getExistingServicePointer "
 
 return a pointer to a service manager
 
@@ -243,21 +243,21 @@ Parameters
     the name of the service to find
 ";
 
-%feature("docstring") AsioServiceManager::getService "
+%feature("docstring") AsioContextManager::getService "
 
 get the boost io_service associated with the service manager
 ";
 
-%feature("docstring") AsioServiceManager::getExistingService "
+%feature("docstring") AsioContextManager::getExistingService "
 
 get the boost io_service associated with the service manager but only if the
 service exists if it doesn't this will throw and invalid_argument exception
 ";
 
-%feature("docstring") AsioServiceManager::closeService "
+%feature("docstring") AsioContextManager::closeService "
 ";
 
-%feature("docstring") AsioServiceManager::setServiceToLeakOnDelete "
+%feature("docstring") AsioContextManager::setServiceToLeakOnDelete "
 
 tell the service to free the pointer and leak the memory on delete
 
@@ -269,7 +269,7 @@ terminate before some other parts of the program which cause all sorts of odd
 errors and issues
 ";
 
-%feature("docstring") AsioServiceManager::runServiceLoop "
+%feature("docstring") AsioContextManager::runServiceLoop "
 
 run a single thread for the service manager to execute asynchronous services in
 
@@ -283,7 +283,7 @@ Parameters
     the name of the service
 ";
 
-%feature("docstring") AsioServiceManager::haltServiceLoop "
+%feature("docstring") AsioContextManager::haltServiceLoop "
 
 halt the service loop thread if the counter==0
 
@@ -296,20 +296,20 @@ Parameters
     the name of the service
 ";
 
-%feature("docstring") AsioServiceManager::~AsioServiceManager "
+%feature("docstring") AsioContextManager::~AsioContextManager "
 ";
 
-%feature("docstring") AsioServiceManager::getName "
+%feature("docstring") AsioContextManager::getName "
 
 get the name of the current service manager
 ";
 
-%feature("docstring") AsioServiceManager::getBaseService "
+%feature("docstring") AsioContextManager::getBaseService "
 
 get the underlying boost::io_service reference
 ";
 
-%feature("docstring") AsioServiceManager::serviceRunLoop "
+%feature("docstring") AsioContextManager::serviceRunLoop "
 ";
 
 // File: classhelics_1_1AsyncFedCallInfo.xml
@@ -12849,12 +12849,12 @@ map that all containing characters that come in pairs to the appropriate match
 
 // File: argParser_8h.xml
 
-// File: AsioServiceManager_8cpp.xml
+// File: AsioContextManager_8cpp.xml
 
 %feature("docstring") serviceRunLoop "
 ";
 
-// File: AsioServiceManager_8h.xml
+// File: AsioContextManager_8h.xml
 
 %feature("docstring") serviceRunLoop "
 ";

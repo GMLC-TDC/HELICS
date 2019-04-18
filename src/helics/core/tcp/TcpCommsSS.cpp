@@ -5,7 +5,7 @@ the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 #include "TcpCommsSS.h"
-#include "../../common/AsioServiceManager.h"
+#include "../../common/AsioContextManager.h"
 #include "../ActionMessage.hpp"
 #include "../NetworkBrokerData.hpp"
 #include "TcpCommsCommon.h"
@@ -147,7 +147,7 @@ void TcpCommsSS::queue_rx_function ()
 }
 
 static TcpConnection::pointer
-generateConnection (std::shared_ptr<AsioServiceManager> &ioctx, const std::string &address)
+generateConnection (std::shared_ptr<AsioContextManager> &ioctx, const std::string &address)
 {
     try
     {
@@ -177,7 +177,7 @@ void TcpCommsSS::queue_tx_function ()
         return;
     }
     TcpServer::pointer server;
-    auto ioctx = AsioServiceManager::getServicePointer ();
+    auto ioctx = AsioContextManager::getServicePointer ();
     auto serviceLoop = ioctx->startServiceLoop ();
     auto dataCall = [this](TcpConnection::pointer connection, const char *data, size_t datasize) {
         return dataReceive (connection, data, datasize);
