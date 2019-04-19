@@ -5,7 +5,7 @@ the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 #include "TcpCommsCommon.h"
-#include "../../common/AsioServiceManager.h"
+#include "../../common/AsioContextManager.h"
 #include "../ActionMessage.hpp"
 #include "../NetworkBrokerData.hpp"
 #include "TcpHelperClasses.h"
@@ -15,7 +15,7 @@ namespace helics
 {
 namespace tcp
 {
-TcpConnection::pointer makeConnection (boost::asio::io_service &io_service,
+TcpConnection::pointer makeConnection (asio::io_context &io_context,
                                        const std::string &connection,
                                        const std::string &port,
                                        size_t bufferSize,
@@ -26,7 +26,7 @@ TcpConnection::pointer makeConnection (boost::asio::io_service &io_service,
     auto tick = steady_clock::now ();
     milliseconds timeRemaining (timeOut);
     milliseconds timeRemPrev (timeOut);
-    TcpConnection::pointer connectionPtr = TcpConnection::create (io_service, connection, port, bufferSize);
+    TcpConnection::pointer connectionPtr = TcpConnection::create (io_context, connection, port, bufferSize);
     int trycnt = 1;
     while (!connectionPtr->waitUntilConnected (timeRemaining))
     {
@@ -50,7 +50,7 @@ TcpConnection::pointer makeConnection (boost::asio::io_service &io_service,
 
         // lets try to connect again
         ++trycnt;
-        connectionPtr = TcpConnection::create (io_service, connection, port, bufferSize);
+        connectionPtr = TcpConnection::create (io_context, connection, port, bufferSize);
     }
     return connectionPtr;
 }

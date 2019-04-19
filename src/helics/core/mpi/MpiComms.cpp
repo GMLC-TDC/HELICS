@@ -6,7 +6,6 @@ All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 #include "MpiComms.h"
-//#include "../../common/AsioServiceManager.h"
 #include "../../common/fmt_format.h"
 #include "../ActionMessage.hpp"
 #include "MpiService.h"

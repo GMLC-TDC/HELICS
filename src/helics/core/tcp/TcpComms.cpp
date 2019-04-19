@@ -5,7 +5,7 @@ the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 #include "TcpComms.h"
-#include "../../common/AsioServiceManager.h"
+#include "../../common/AsioContextManager.h"
 #include "../ActionMessage.hpp"
 #include "../NetworkBrokerData.hpp"
 #include "TcpCommsCommon.h"
@@ -18,7 +18,7 @@ namespace helics
 {
 namespace tcp
 {
-using boost::asio::ip::tcp;
+using asio::ip::tcp;
 
 TcpComms::TcpComms () noexcept : NetworkCommsInterface (interface_type::tcp) {}
 
@@ -93,7 +93,7 @@ size_t TcpComms::dataReceive (std::shared_ptr<TcpConnection> connection, const c
                 {
                     connection->send (rep.packetize ());
                 }
-                catch (const boost::system::system_error &se)
+                catch (const std::system_error &se)
                 {
                 }
             }
@@ -116,13 +116,13 @@ size_t TcpComms::dataReceive (std::shared_ptr<TcpConnection> connection, const c
 }
 
 bool TcpComms::commErrorHandler (std::shared_ptr<TcpConnection> /*connection*/,
-                                 const boost::system::error_code &error)
+                                 const std::error_code &error)
 {
     if (getRxStatus () == connection_status::connected)
     {
-        if ((error != boost::asio::error::eof) && (error != boost::asio::error::operation_aborted))
+        if ((error != asio::error::eof) && (error != asio::error::operation_aborted))
         {
-            if (error != boost::asio::error::connection_reset)
+            if (error != asio::error::connection_reset)
             {
                 logError (std::string ("error message while connected ") + error.message () + " code " +
                           std::to_string (error.value ()));
@@ -160,8 +160,8 @@ void TcpComms::queue_rx_function ()
         setRxStatus (connection_status::error);
         return;
     }
-    auto ioserv = AsioServiceManager::getServicePointer ();
-    auto server = helics::tcp::TcpServer::create (ioserv->getBaseService (), localTargetAddress, PortNumber,
+    auto ioctx = AsioContextManager::getContextPointer ();
+    auto server = helics::tcp::TcpServer::create (ioctx->getBaseContext (), localTargetAddress, PortNumber,
                                                   reuse_address, maxMessageSize);
     while (!server->isReady ())
     {
@@ -169,7 +169,7 @@ void TcpComms::queue_rx_function ()
         {  // If we failed and we are on an automatically assigned port number,  just try a different port
             server->close ();
             ++PortNumber;
-            server = helics::tcp::TcpServer::create (ioserv->getBaseService (), localTargetAddress, PortNumber,
+            server = helics::tcp::TcpServer::create (ioctx->getBaseContext (), localTargetAddress, PortNumber,
                                                      reuse_address, maxMessageSize);
         }
         else
@@ -186,11 +186,11 @@ void TcpComms::queue_rx_function ()
             }
         }
     }
-    auto serviceLoop = ioserv->startServiceLoop ();
+    auto contextLoop = ioctx->startContextLoop ();
     server->setDataCall ([this](TcpConnection::pointer connection, const char *data, size_t datasize) {
         return dataReceive (connection, data, datasize);
     });
-    server->setErrorCall ([this](TcpConnection::pointer connection, const boost::system::error_code &error) {
+    server->setErrorCall ([this](TcpConnection::pointer connection, const std::error_code &error) {
         return commErrorHandler (connection, error);
     });
     server->start ();
@@ -240,7 +240,7 @@ void TcpComms::txReceive (const char *data, size_t bytes_received, const std::st
     }
 }
 
-bool TcpComms::establishBrokerConnection (std::shared_ptr<AsioServiceManager> &ioserv,
+bool TcpComms::establishBrokerConnection (std::shared_ptr<AsioContextManager> &ioctx,
                                           std::shared_ptr<TcpConnection> &brokerConnection)
 {
     // lambda function that does the proper termination
@@ -260,7 +260,7 @@ bool TcpComms::establishBrokerConnection (std::shared_ptr<AsioServiceManager> &i
     }
     try
     {
-        brokerConnection = makeConnection (ioserv->getBaseService (), brokerTargetAddress,
+        brokerConnection = makeConnection (ioctx->getBaseContext (), brokerTargetAddress,
                                            std::to_string (brokerPort), maxMessageSize, connectionTimeout);
         int retries = 0;
         while (!brokerConnection)
@@ -278,7 +278,7 @@ bool TcpComms::establishBrokerConnection (std::shared_ptr<AsioServiceManager> &i
             else
             {
                 std::this_thread::yield ();
-                brokerConnection = makeConnection (ioserv->getBaseService (), brokerTargetAddress,
+                brokerConnection = makeConnection (ioctx->getBaseContext (), brokerTargetAddress,
                                                    std::to_string (brokerPort), maxMessageSize, connectionTimeout);
             }
         }
@@ -290,7 +290,7 @@ bool TcpComms::establishBrokerConnection (std::shared_ptr<AsioServiceManager> &i
             {
                 brokerConnection->send (m.packetize ());
             }
-            catch (const boost::system::system_error &error)
+            catch (const std::system_error &error)
             {
                 logError (std::string ("error in initial send to broker ") + error.what ());
                 return terminate (connection_status::error);
@@ -298,14 +298,14 @@ bool TcpComms::establishBrokerConnection (std::shared_ptr<AsioServiceManager> &i
             std::vector<char> rx (512);
             tcp::endpoint brk;
             brokerConnection->async_receive (rx.data (), 128,
-                                             [this, &rx](const boost::system::error_code &error, size_t bytes) {
+                                             [this, &rx](const std::error_code &error, size_t bytes) {
                                                  if (!error)
                                                  {
                                                      txReceive (rx.data (), bytes, std::string ());
                                                  }
                                                  else
                                                  {
-                                                     if (error != boost::asio::error::operation_aborted)
+                                                     if (error != asio::error::operation_aborted)
                                                      {
                                                          txReceive (rx.data (), bytes, error.message ());
                                                      }
@@ -356,8 +356,8 @@ bool TcpComms::establishBrokerConnection (std::shared_ptr<AsioServiceManager> &i
 void TcpComms::queue_tx_function ()
 {
     std::vector<char> buffer;
-    auto ioserv = AsioServiceManager::getServicePointer ();
-    auto serviceLoop = ioserv->startServiceLoop ();
+    auto ioctx = AsioContextManager::getContextPointer ();
+    auto contextLoop = ioctx->startContextLoop ();
     TcpConnection::pointer brokerConnection;
 
     std::map<route_id, TcpConnection::pointer> routes;  // for all the other possible routes
@@ -367,7 +367,7 @@ void TcpComms::queue_tx_function ()
     }
     if (hasBroker)
     {
-        if (!establishBrokerConnection (ioserv, brokerConnection))
+        if (!establishBrokerConnection (ioctx, brokerConnection))
         {
             ActionMessage m (CMD_PROTOCOL);
             m.messageID = CLOSE_RECEIVER;
@@ -411,7 +411,7 @@ void TcpComms::queue_tx_function ()
                         std::string interface;
                         std::string port;
                         std::tie (interface, port) = extractInterfaceandPortString (newroute);
-                        auto new_connect = TcpConnection::create (ioserv->getBaseService (), interface, port);
+                        auto new_connect = TcpConnection::create (ioctx->getBaseContext (), interface, port);
 
                         routes.emplace (route_id{cmd.getExtraData ()}, std::move (new_connect));
                     }
@@ -448,9 +448,9 @@ void TcpComms::queue_tx_function ()
                 {
                     brokerConnection->send (cmd.packetize ());
                 }
-                catch (const boost::system::system_error &se)
+                catch (const std::system_error &se)
                 {
-                    if (se.code () != boost::asio::error::connection_aborted)
+                    if (se.code () != asio::error::connection_aborted)
                     {
                         if (!isDisconnectCommand (cmd))
                         {
@@ -480,9 +480,9 @@ void TcpComms::queue_tx_function ()
                 {
                     rt_find->second->send (cmd.packetize ());
                 }
-                catch (const boost::system::system_error &se)
+                catch (const std::system_error &se)
                 {
-                    if (se.code () != boost::asio::error::connection_aborted)
+                    if (se.code () != asio::error::connection_aborted)
                     {
                         if (!isDisconnectCommand (cmd))
                         {
@@ -500,9 +500,9 @@ void TcpComms::queue_tx_function ()
                     {
                         brokerConnection->send (cmd.packetize ());
                     }
-                    catch (const boost::system::system_error &se)
+                    catch (const std::system_error &se)
                     {
-                        if (se.code () != boost::asio::error::connection_aborted)
+                        if (se.code () != asio::error::connection_aborted)
                         {
                             if (!isDisconnectCommand (cmd))
                             {
