@@ -7,7 +7,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #pragma once
 
 #include "../application_api/CombinationFederate.hpp"
-#include "json/json-forwards.h"
+#include "json/forwards.h"
 namespace boost
 {
 namespace program_options
@@ -15,13 +15,13 @@ namespace program_options
 class variables_map;
 }  // namespace program_options
 }  // namespace boost
-
-namespace helics
-{
 namespace Json
 {
 class Value;
 }  // namespace Json
+
+namespace helics
+{
 namespace apps
 {
 /** class defining a basic helics App
