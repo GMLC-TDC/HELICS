@@ -5,3 +5,6 @@
 	path = ThirdParty/jsoncpp
 	url = https://github.com/phlptp/jsoncpp.git
 	branch = fix_jsoncpp_shadow_warnings
+[submodule "ThirdParty/fmtlib"]
+	path = ThirdParty/fmtlib
+	url = https://github.com/fmtlib/fmt.git
