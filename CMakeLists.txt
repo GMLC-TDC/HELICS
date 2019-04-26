@@ -551,6 +551,8 @@ target_include_directories(
     INTERFACE
         $<BUILD_INTERFACE:${HELICS_SOURCE_DIR}/ThirdParty/jsoncpp/include>
 )
+
+install(TARGETS jsoncpp_lib EXPORT helics-targets)
 # -----------------------------------------------------------------------------
 # CMAKE Subdirectories
 # -----------------------------------------------------------------------------
