@@ -11,8 +11,17 @@ set(JSONCPP_DISABLE_CCACHE ON CACHE INTERNAL "")
 if(NOT CMAKE_CXX_STANDARD)
     set(CMAKE_CXX_STANDARD 14) # Supported values are ``11``, ``14``, and ``17``.
 endif()
+
+if (BUILD_SHARED_LIBS)
+   set(OLD_BUILD_SHARED_LIBS BUILD_SHARED_LIBS)
+   set(BUILD_SHARED_LIBS OFF)
+endif()
+
 add_subdirectory("${HELICS_SOURCE_DIR}/ThirdParty/jsoncpp" "${PROJECT_BINARY_DIR}/ThirdParty/jsoncpp")
 
+if (OLD_BUILD_SHARED_LIBS)
+   set(BUILD_SHARED_LIBS OLD_BUILD_SHARED_LIBS)
+endif()
 
 mark_as_advanced(
 JSONCPP_WITH_TESTS
