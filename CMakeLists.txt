@@ -542,6 +542,16 @@ hide_variable(FMT_PEDANTIC)
 hide_variable(FMT_TEST)
 hide_variable(FMT_WERROR)
 
+# --------------------------------------------------------------
+#  Create the target for jsoncpp
+# -----------------------------------------------------------
+include(addJsoncpp)
+target_include_directories(
+    helics_base_includes SYSTEM
+    INTERFACE
+        $<BUILD_INTERFACE:${HELICS_SOURCE_DIR}/ThirdParty/jsoncpp/include>
+)
+
 # -----------------------------------------------------------------------------
 # CMAKE Subdirectories
 # -----------------------------------------------------------------------------
