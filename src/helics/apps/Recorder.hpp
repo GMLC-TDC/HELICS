@@ -54,7 +54,7 @@ class Recorder : public App
     /** construct from command line arguments in a vector
    @param args the command line arguments to pass in a reverse vector
    */
-    explicit Recorder (std::vector<std::string> &args);
+    explicit Recorder (std::vector<std::string> args);
     /** construct from command line arguments*/
     Recorder (int argc, char *argv[]);
 

@@ -15,10 +15,10 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "ForwardingTimeCoordinator.hpp"
 #include "flagOperations.hpp"
 #include "loggingHelper.hpp"
+#include <asio/steady_timer.hpp>
 #include <iostream>
 #include <libguarded/guarded.hpp>
 #include <random>
-#include <asio/steady_timer.hpp>
 
 static constexpr auto chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
 
@@ -106,7 +106,7 @@ std::shared_ptr<helicsCLI11App> BrokerBase::generateBaseCLI ()
     logging_group->add_option ("--logfile", logFile, "the file to log the messages to")->ignore_underscore ();
     logging_group
       ->add_option_function<int> (
-        "--loglevel", [this](int val) { setLogLevel (val); },
+        "--loglevel", [this] (int val) { setLogLevel (val); },
         "the level which to log the higher this is set to the more gets logs(-1) for no logging")
       ->ignore_underscore ();
     logging_group->add_option ("--fileloglevel", fileLogLevel, "the level at which messages get sent to the file")
@@ -148,12 +148,12 @@ int BrokerBase::parseArgs (int argc, char *argv[])
     return 0;
 }
 
-int BrokerBase::parseArgs (std::vector<std::string> &args)
+int BrokerBase::parseArgs (std::vector<std::string> args)
 {
     auto app = generateBaseCLI ();
     auto sApp = generateCLI ();
     app->add_subcommand (sApp);
-    auto res = app->helics_parse (args);
+    auto res = app->helics_parse (std::move (args));
     if (res != helicsCLI11App::parse_return::ok)
     {
         return -1;
@@ -190,7 +190,7 @@ void BrokerBase::configureBase ()
     }
 
     timeCoord = std::make_unique<ForwardingTimeCoordinator> ();
-    timeCoord->setMessageSender ([this](const ActionMessage &msg) { addActionMessage (msg); });
+    timeCoord->setMessageSender ([this] (const ActionMessage &msg) { addActionMessage (msg); });
 
     loggingObj = std::make_unique<Logger> ();
     if (!logFile.empty ())
@@ -234,7 +234,8 @@ bool BrokerBase::sendToLogger (global_federate_id federateID,
 
 void BrokerBase::generateNewIdentifier () { identifier = genId (0); }
 
-void BrokerBase::setLoggerFunction (std::function<void(int, const std::string &, const std::string &)> logFunction)
+void BrokerBase::setLoggerFunction (
+  std::function<void (int, const std::string &, const std::string &)> logFunction)
 {
     loggerFunction = std::move (logFunction);
     if (loggerFunction)
@@ -364,9 +365,7 @@ void BrokerBase::queueProcessingLoop ()
     asio::steady_timer ticktimer (serv->getBaseContext ());
     activeProtector active (true, false);
 
-    auto timerCallback = [this, &active](const std::error_code &ec) {
-        timerTickHandler (this, active, ec);
-    };
+    auto timerCallback = [this, &active] (const std::error_code &ec) { timerTickHandler (this, active, ec); };
     if (tickTimer > timeZero)
     {
         if (tickTimer < Time (0.5))
@@ -379,7 +378,7 @@ void BrokerBase::queueProcessingLoop ()
     }
     global_broker_id_local = global_id.load ();
     int messagesSinceLastTick = 0;
-    auto logDump = [&, this]() {
+    auto logDump = [&, this] () {
         if (dumplog)
         {
             for (auto &act : dumpMessages)
@@ -431,7 +430,7 @@ void BrokerBase::queueProcessingLoop ()
             }
             messagesSinceLastTick = 0;
             // reschedule the timer
-            ticktimer.expires_at (std::chrono::steady_clock::now () + std::chrono::milliseconds (tickTimer));
+            ticktimer.expires_at (std::chrono::steady_clock::now () + tickTimer.to_ns ());
             active = std::make_pair (true, true);
             ticktimer.async_wait (timerCallback);
             break;

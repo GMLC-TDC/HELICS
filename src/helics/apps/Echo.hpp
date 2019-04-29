@@ -27,10 +27,10 @@ class Echo : public App
   public:
     /** default constructor*/
     Echo () = default;
-	/** construct from command line arguments
-   @param args a vector of command line arguments 
+    /** construct from command line arguments
+   @param args a vector of command line arguments
    */
-	Echo(std::vector < std::string> &args);
+    Echo (std::vector<std::string> args);
     /** construct from command line arguments
     @param argc the number of arguments
     @param argv the strings in the input
@@ -86,7 +86,7 @@ class Echo : public App
     void echoMessage (const Endpoint &ept, Time currentTime);
 
   private:
-	  /** process remaining command line arguments*/
+    /** process remaining command line arguments*/
     void processArgs ();
     std::vector<Endpoint> endpoints;  //!< the actual endpoint objects
     Time delayTime = timeZero;  //!< respond to each message with the specified delay

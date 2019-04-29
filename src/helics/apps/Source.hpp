@@ -65,7 +65,7 @@ class Source : public App
     /** construct from command line arguments in a vector
     @param args The vector of string, the remaining arguments are returned in the args
     */
-    explicit Source (std::vector<std::string> &args);
+    explicit Source (std::vector<std::string> args);
     /** construct from command line arguments
     @param argc the number of arguments
     @param argv the strings in the input

@@ -33,10 +33,10 @@ namespace helics
 {
 namespace apps
 {
-App::App (const std::string &defaultAppName, std::vector<std::string> &args)
+App::App (const std::string &defaultAppName, std::vector<std::string> args)
 {
     auto app = generateParser ();
-    app->helics_parse (args);
+    app->helics_parse (std::move (args));
     processArgs (app, defaultAppName);
 }
 
@@ -49,7 +49,7 @@ App::App (const std::string &defaultAppName, int argc, char *argv[])
 
 void App::processArgs (std::unique_ptr<helicsCLI11App> &app, const std::string &defaultAppName)
 {
-    remArgs = app->remaining ();
+    remArgs = app->remaining_for_passthrough ();
     auto ret = app->last_return;
     if (ret == helicsCLI11App::parse_return::help_return)
     {

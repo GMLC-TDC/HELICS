@@ -3881,18 +3881,21 @@ class App {
     }
 
     /// Add option for non-vectors (duplicate copy needed without defaulted to avoid `iostream << value`)
-    template <typename T, enable_if_t<!is_vector<T>::value & !std::is_const<T>::value, detail::enabler> = detail::dummy>
+
+    template <typename T,
+              typename XC = T,
+              enable_if_t<!is_vector<XC>::value && !std::is_const<XC>::value, detail::enabler> = detail::dummy>
     Option *add_option(std::string option_name,
                        T &variable, ///< The variable to set
                        std::string option_description = "",
                        bool defaulted = false) {
 
-        auto fun = [&variable](CLI::results_t res) { return detail::lexical_cast(res[0], variable); };
+        auto fun = [&variable](CLI::results_t res) { return detail::lexical_cast<XC>(res[0], variable); };
 
         Option *opt = add_option(option_name, fun, option_description, defaulted, [&variable]() {
             return std::string(CLI::detail::to_string(variable));
         });
-        opt->type_name(detail::type_name<T>());
+        opt->type_name(detail::type_name<XC>());
 
         return opt;
     }

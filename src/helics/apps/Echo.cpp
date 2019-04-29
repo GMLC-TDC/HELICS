@@ -20,7 +20,7 @@ namespace helics
 {
 namespace apps
 {
-Echo::Echo (std::vector<std::string> &args) : App ("echo", args) { processArgs (); }
+Echo::Echo (std::vector<std::string> args) : App ("echo", std::move (args)) { processArgs (); }
 
 Echo::Echo (int argc, char *argv[]) : App ("echo", argc, argv) { processArgs (); }
 
@@ -113,7 +113,7 @@ void Echo::addEndpoint (const std::string &endpointName, const std::string &endp
 {
     endpoints.emplace_back (fed->registerGlobalEndpoint (endpointName, endpointType));
     endpoints.back ().setCallback (
-      [this](const Endpoint &ept, Time messageTime) { echoMessage (ept, messageTime); });
+      [this] (const Endpoint &ept, Time messageTime) { echoMessage (ept, messageTime); });
 }
 
 void Echo::loadJsonFile (const std::string &jsonFile)
@@ -124,7 +124,7 @@ void Echo::loadJsonFile (const std::string &jsonFile)
     {
         endpoints.emplace_back (fed->getEndpoint (ii));
         endpoints.back ().setCallback (
-          [this](const Endpoint &ept, Time messageTime) { echoMessage (ept, messageTime); });
+          [this] (const Endpoint &ept, Time messageTime) { echoMessage (ept, messageTime); });
     }
 
     auto doc = loadJson (jsonFile);

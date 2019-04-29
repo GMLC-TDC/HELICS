@@ -21,12 +21,13 @@ int main (int argc, char *argv[])
     helics::apps::BrokerApp brk;
     std::string brokerArgs = "";
 
-    app.add_option_function<std::string> ("--target,-t",
-                                          [&vtarget, &mtarget](const std::string &name) {
-                                              vtarget = name;
-                                              mtarget = name;
-                                          },
-                                          "name of the federate to target");
+    app.add_option_function<std::string> (
+      "--target,-t",
+      [&vtarget, &mtarget] (const std::string &name) {
+          vtarget = name;
+          mtarget = name;
+      },
+      "name of the federate to target");
     app.add_option ("--valuetarget", vtarget, "name of the value federate to target", true);
     app.add_option ("--messagetarget", mtarget, "name of the message federate to target", true);
     app.add_option ("--endpoint,-e", targetEndpoint, "name of the target endpoint", true);
@@ -46,7 +47,7 @@ int main (int argc, char *argv[])
         return -1;
     }
     fi.defName = "fed";
-    fi.loadInfoFromArgs (app.remaining_args ());
+    fi.loadInfoFromArgs (app.remainArgs ());
 
     std::string etarget = mtarget + "/" + targetEndpoint;
 

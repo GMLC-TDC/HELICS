@@ -60,7 +60,7 @@ class Broker
     /** Initialize the Broker from command line arguments contained in a vector
      * Should be invoked a single time to initialize the co-simulation broker.
      */
-    virtual void configureFromVector (std::vector<std::string> &args) = 0;
+    virtual void configureFromVector (std::vector<std::string> args) = 0;
     /** get the local identification for the broker*/
     virtual const std::string &getIdentifier () const = 0;
     /** get the connection address for the broker*/
@@ -72,8 +72,8 @@ class Broker
     std::string &message) the function takes a level indicating the logging level string with the source name and a
     string with the message
     */
-    virtual void
-    setLoggingCallback (const std::function<void(int, const std::string &, const std::string &)> &logFunction) = 0;
+    virtual void setLoggingCallback (
+      const std::function<void (int, const std::string &, const std::string &)> &logFunction) = 0;
 
     /** waits in the current thread until the broker is disconnected
     @param msToWait  the timeout to wait for disconnect

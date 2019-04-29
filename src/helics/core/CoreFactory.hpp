@@ -50,13 +50,13 @@ std::shared_ptr<Core> create (core_type type, int argc, char *argv[]);
 @param args a vector of reversed command line arguments
 @return a pointer to the created core
 */
-std::shared_ptr<Core> create (std::vector<std::string> &args);
+std::shared_ptr<Core> create (std::vector<std::string> args);
 
 /** create a core from a type and command line arguments
 @param type the type of core to create
 @param args a vector of reversed command line arguments
 */
-std::shared_ptr<Core> create (core_type type, std::vector<std::string> &args);
+std::shared_ptr<Core> create (core_type type, std::vector<std::string> args);
 
 /** create a core from arguments
 @details an argument of '--coretype' must be specified to define the type,  otherwise the default type is used
@@ -81,7 +81,7 @@ std::shared_ptr<Core> create (core_type type, const std::string &core_name, int 
 @param args a vector of reversed command line arguments
 @return a pointer to the created core
 */
-std::shared_ptr<Core> create (core_type type, const std::string &core_name, std::vector<std::string> &args);
+std::shared_ptr<Core> create (core_type type, const std::string &core_name, std::vector<std::string> args);
 
 /** tries to find a named core if it fails it creates a new one
  */
@@ -94,7 +94,7 @@ std::shared_ptr<Core> FindOrCreate (core_type type, const std::string &coreName,
 
 /** tries to find a named core if it fails it creates a new one
  */
-std::shared_ptr<Core> FindOrCreate (core_type type, const std::string &coreName, std::vector<std::string> &args);
+std::shared_ptr<Core> FindOrCreate (core_type type, const std::string &coreName, std::vector<std::string> args);
 /** try to find a joinable core of a specific type*/
 std::shared_ptr<Core> findJoinableCoreOfType (core_type type);
 

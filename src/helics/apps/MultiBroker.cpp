@@ -34,7 +34,7 @@ using namespace std::string_literals;
 
 namespace helics
 {
-static void loadTypeSpecificArgs (helics::core_type ctype, CommsInterface *comm, std::vector<std::string> &args)
+static void loadTypeSpecificArgs (helics::core_type ctype, CommsInterface *comm, std::vector<std::string> args)
 {
     if (comm == nullptr)
     {
@@ -47,13 +47,11 @@ static void loadTypeSpecificArgs (helics::core_type ctype, CommsInterface *comm,
     {
         auto cm = dynamic_cast<tcp::TcpCommsSS *> (comm);
         helicsCLI11App tsparse;
-        tsparse.add_option_function<std::vector<std::string>> ("--connections",
-                                                               [cm](const std::vector<std::string> &conns) {
-                                                                   cm->addConnections (conns);
-                                                               },
-                                                               "target link connections");
+        tsparse.add_option_function<std::vector<std::string>> (
+          "--connections", [cm] (const std::vector<std::string> &conns) { cm->addConnections (conns); },
+          "target link connections");
         tsparse.allow_extras ();
-        tsparse.helics_parse (args);
+        tsparse.helics_parse (std::move (args));
     }
     break;
 #endif
@@ -95,7 +93,7 @@ generateComms (const std::string &type, const std::string &initString = std::str
     case core_type::TCP_SS:
 #ifndef DISABLE_TCP_CORE
         comm = std::make_unique<tcp::TcpCommsSS> ();
-        loadTypeSpecificArgs (ctype, comm.get (), parser->remaining_args ());
+        loadTypeSpecificArgs (ctype, comm.get (), parser->remaining_for_passthrough ());
 #endif
         break;
     case core_type::UDP:
@@ -136,7 +134,7 @@ MultiBroker::MultiBroker (const std::string & /*configFile*/) { loadComms (); }
 void MultiBroker::loadComms ()
 {
     masterComm = generateComms ("def");
-    masterComm->setCallback ([this](ActionMessage &&M) { BrokerBase::addActionMessage (std::move (M)); });
+    masterComm->setCallback ([this] (ActionMessage &&M) { BrokerBase::addActionMessage (std::move (M)); });
 }
 
 MultiBroker::~MultiBroker ()

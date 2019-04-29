@@ -177,7 +177,7 @@ class CoreBroker : public Broker, public BrokerBase
     virtual bool isOpenToNewFederates () const override;
 
     virtual void setLoggingCallback (
-      const std::function<void(int, const std::string &, const std::string &)> &logFunction) override final;
+      const std::function<void (int, const std::string &, const std::string &)> &logFunction) override final;
 
     virtual bool
     waitForDisconnect (std::chrono::milliseconds msToWait = std::chrono::milliseconds (0)) const override final;
@@ -231,7 +231,7 @@ class CoreBroker : public Broker, public BrokerBase
      */
     virtual void configureFromArgs (int argc, char *argv[]) override final;
     /** initialize from command line arguments in a vector*/
-    virtual void configureFromVector (std::vector<std::string> &args) override final;
+    virtual void configureFromVector (std::vector<std::string> args) override final;
 
     /** check if all the local federates are ready to be initialized
     @return true if everyone is ready, false otherwise

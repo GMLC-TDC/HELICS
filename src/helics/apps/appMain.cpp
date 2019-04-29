@@ -21,47 +21,47 @@ int main (int argc, char *argv[])
     helics::helicsCLI11App app ("", "helics_app");
     app.ignore_case ();
     app.prefix_command ();
-    app.add_subcommand ("Helics Player App", "player")->prefix_command ()->callback ([&app]() {
-        helics::apps::Player player (app.remaining_args ());
+    app.add_subcommand ("Helics Player App", "player")->prefix_command ()->callback ([&app] () {
+        helics::apps::Player player (app.remaining_for_passthrough ());
         if (player.isActive ())
         {
             player.run ();
         }
     });
 
-    app.add_subcommand ("Helics Recorder App", "recorder")->prefix_command ()->callback ([&app]() {
-        helics::apps::Recorder recorder (app.remaining_args ());
+    app.add_subcommand ("Helics Recorder App", "recorder")->prefix_command ()->callback ([&app] () {
+        helics::apps::Recorder recorder (app.remaining_for_passthrough ());
         if (recorder.isActive ())
         {
             recorder.run ();
         }
     });
-    app.add_subcommand ("Helics Echo App", "echo")->prefix_command ()->callback ([&app]() {
-        helics::apps::Echo echo (app.remaining_args ());
+    app.add_subcommand ("Helics Echo App", "echo")->prefix_command ()->callback ([&app] () {
+        helics::apps::Echo echo (app.remaining_for_passthrough ());
         if (echo.isActive ())
         {
             echo.run ();
         }
     });
 
-    app.add_subcommand ("Helics Source App", "source")->prefix_command ()->callback ([&app]() {
-        helics::apps::Source source (app.remaining_args ());
+    app.add_subcommand ("Helics Source App", "source")->prefix_command ()->callback ([&app] () {
+        helics::apps::Source source (app.remaining_for_passthrough ());
         if (source.isActive ())
         {
             source.run ();
         }
     });
 
-    app.add_subcommand ("Helics Tracer App", "tracer")->prefix_command ()->callback ([&app]() {
-        helics::apps::Tracer tracer (app.remaining_args ());
+    app.add_subcommand ("Helics Tracer App", "tracer")->prefix_command ()->callback ([&app] () {
+        helics::apps::Tracer tracer (app.remaining_for_passthrough ());
         if (tracer.isActive ())
         {
             tracer.run ();
         }
     });
 
-    app.add_subcommand ("Helics Broker App", "broker")->prefix_command ()->callback ([&app]() {
-        helics::apps::BrokerApp broker (app.remaining_args ());
+    app.add_subcommand ("Helics Broker App", "broker")->prefix_command ()->callback ([&app] () {
+        helics::apps::BrokerApp broker (app.remaining_for_passthrough ());
     });
 
     auto ret = app.helics_parse (argc, argv);

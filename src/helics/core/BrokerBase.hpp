@@ -50,7 +50,7 @@ class BrokerBase
       loggingObj;  //!< default logging object to use if the logging callback is not specified
     std::thread queueProcessingThread;  //!< thread for running the broker
     /** a logging function for logging or printing messages*/
-    std::function<void(int, const std::string &, const std::string &)> loggerFunction;
+    std::function<void (int, const std::string &, const std::string &)> loggerFunction;
 
     std::atomic<bool> haltOperations{false};  //!< flag indicating that no further message should be processed
   private:
@@ -93,7 +93,7 @@ class BrokerBase
     virtual ~BrokerBase ();
 
     int parseArgs (int argc, char *argv[]);
-    int parseArgs (std::vector<std::string> &args);
+    int parseArgs (std::vector<std::string> args);
     int parseArgs (const std::string &configureString);
     /** configure the base of all brokers and cores
      */
@@ -109,7 +109,7 @@ class BrokerBase
     std::string &message) the function takes a level indicating the logging level string with the source name and a
     string with the message
     */
-    void setLoggerFunction (std::function<void(int, const std::string &, const std::string &)> logFunction);
+    void setLoggerFunction (std::function<void (int, const std::string &, const std::string &)> logFunction);
 
     /** check if the main processing loop of a broker is running*/
     bool isRunning () const { return mainLoopIsRunning.load (); }

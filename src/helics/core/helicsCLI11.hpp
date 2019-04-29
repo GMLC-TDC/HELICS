@@ -22,7 +22,7 @@ class helicsCLI11App : public CLI::App
     {
         set_help_flag ("-h,-?,--help", "Print this help message and exit");
         set_config ("--config-file", "helics_config.ini", "specify base configuration file");
-        add_flag_callback ("--version,-v", []() { throw (CLI::Success{}); });
+        add_flag_callback ("--version,-v", [] () { throw (CLI::Success{}); });
         add_option_group ("quiet")->immediate_callback ()->add_flag ("--quiet", quiet,
                                                                      "silence most print output");
     }
@@ -44,8 +44,8 @@ class helicsCLI11App : public CLI::App
         try
         {
             parse (std::forward<Args> (args)...);
-            getRemaining ();
             last_return = parse_return::ok;
+            remArgs = remaining_for_passthrough ();
             return parse_return::ok;
         }
         catch (const CLI::CallForHelp &ch)
@@ -82,7 +82,7 @@ class helicsCLI11App : public CLI::App
             return parse_return::error_return;
         }
     }
-
+    std::vector<std::string> &remainArgs () { return remArgs; }
     void remove_helics_specifics ()
     {
         set_help_flag ();
@@ -98,11 +98,11 @@ class helicsCLI11App : public CLI::App
         }
     }
     /** Add a callback function to execute on parsing*/
-    void add_callback (std::function<void()> cback)
+    void add_callback (std::function<void ()> cback)
     {
         if (cbacks.empty ())
         {
-            callback ([this]() {
+            callback ([this] () {
                 for (auto &cb : cbacks)
                 {
                     cb ();
@@ -111,30 +111,23 @@ class helicsCLI11App : public CLI::App
         }
         cbacks.push_back (std::move (cback));
     }
-    /// Return a reference to the remaining args
-    std::vector<std::string> &remaining_args () { return remArgs; }
 
     void addTypeOption ()
     {
         auto og = add_option_group ("network type")->immediate_callback ();
-        og->add_option_function<std::string> ("--coretype,-t,--type,--core",
-                                              [this](const std::string &val) {
-                                                  coreType = helics::coreTypeFromString (val);
-                                                  if (coreType == core_type::UNRECOGNIZED)
-                                                      throw CLI::ValidationError (
-                                                        val + " is NOT a recognized core type");
-                                              },
-                                              "type of the core to connect to");
+        og->add_option_function<std::string> (
+          "--coretype,-t,--type,--core",
+          [this] (const std::string &val) {
+              coreType = helics::coreTypeFromString (val);
+              if (coreType == core_type::UNRECOGNIZED)
+                  throw CLI::ValidationError (val + " is NOT a recognized core type");
+          },
+          "type of the core to connect to");
     }
     core_type getCoreType () const { return coreType; }
 
   private:
-    void getRemaining ()
-    {
-        remArgs = remaining (true);
-        std::reverse (remArgs.begin (), remArgs.end ());
-    }
-    std::vector<std::function<void()>> cbacks;
+    std::vector<std::function<void ()>> cbacks;
     std::vector<std::string> remArgs;
     core_type coreType{core_type::DEFAULT};
 };

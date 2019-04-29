@@ -34,7 +34,7 @@ using namespace std::string_literals;
 
 Source::Source (int argc, char *argv[]) : App ("source", argc, argv) { processArgs (); }
 
-Source::Source (std::vector<std::string> &args) : App ("source", args) { processArgs (); }
+Source::Source (std::vector<std::string> args) : App ("source", std::move (args)) { processArgs (); }
 
 void Source::processArgs ()
 {

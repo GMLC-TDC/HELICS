@@ -35,7 +35,7 @@ class App
    @param defaultAppName the name to use if not specified in one of the arguments
    @param args the command line arguments to pass in a reverse vector
    */
-    App (const std::string &defaultAppName, std::vector<std::string> &args);
+    App (const std::string &defaultAppName, std::vector<std::string> args);
     /** construct from command line arguments
     @param defaultAppName the name to use if not specified in one of the arguments
     @param argc the number of arguments

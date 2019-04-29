@@ -16,14 +16,14 @@ namespace helics
 {
 namespace apps
 {
-BrokerApp::BrokerApp (core_type ctype, std::vector<std::string> &args) : type (ctype)
+BrokerApp::BrokerApp (core_type ctype, std::vector<std::string> args) : type (ctype)
 {
     auto app = generateParser ();
-    app->helics_parse (args);
+    app->helics_parse (std::move (args));
     processArgs (app);
 }
 
-BrokerApp::BrokerApp (std::vector<std::string> &args) : BrokerApp (core_type::ZMQ, args) {}
+BrokerApp::BrokerApp (std::vector<std::string> args) : BrokerApp (core_type::ZMQ, std::move (args)) {}
 
 BrokerApp::BrokerApp (core_type ctype, int argc, char *argv[]) : type (ctype)
 {

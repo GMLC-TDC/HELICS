@@ -71,7 +71,7 @@ class CommonCore : public Core, public BrokerBase
     virtual ~CommonCore () override;
     virtual void configure (const std::string &configureString) override final;
     virtual void configureFromArgs (int argc, char *argv[]) override final;
-    virtual void configureFromVector (std::vector<std::string> &args) override final;
+    virtual void configureFromVector (std::vector<std::string> args) override final;
     virtual bool isConfigured () const override final;
     virtual bool isOpenToNewFederates () const override final;
     virtual void error (local_federate_id federateID, int errorCode = -1) override final;
@@ -178,7 +178,7 @@ class CommonCore : public Core, public BrokerBase
     virtual void setLoggingLevel (int logLevel) override;
     virtual void setLoggingCallback (
       local_federate_id federateID,
-      std::function<void(int, const std::string &, const std::string &)> logFunction) override final;
+      std::function<void (int, const std::string &, const std::string &)> logFunction) override final;
 
     virtual std::string query (const std::string &target, const std::string &queryStr) override;
     virtual void setQueryCallback (local_federate_id federateID,

@@ -28,7 +28,7 @@ std::shared_ptr<Broker> create (core_type type, const std::string &initializatio
 /** Create a broker from command line arguments*/
 std::shared_ptr<Broker> create (core_type type, int argc, char *argv[]);
 /** Create a broker from command line arguments in a vector*/
-std::shared_ptr<Broker> create (core_type type, std::vector<std::string> &args);
+std::shared_ptr<Broker> create (core_type type, std::vector<std::string> args);
 
 std::shared_ptr<Broker>
 create (core_type type, const std::string &broker_name, const std::string &initializationString);
@@ -36,7 +36,7 @@ create (core_type type, const std::string &broker_name, const std::string &initi
 std::shared_ptr<Broker> create (core_type type, const std::string &broker_name, int argc, char *argv[]);
 
 /** Create a broker from command line arguments in a vector*/
-std::shared_ptr<Broker> create (core_type type, const std::string &broker_name, std::vector<std::string> &args);
+std::shared_ptr<Broker> create (core_type type, const std::string &broker_name, std::vector<std::string> args);
 
 /** locate a coreBroker by name
 @param brokerName the name of the broker
