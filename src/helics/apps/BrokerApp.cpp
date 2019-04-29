@@ -60,6 +60,7 @@ std::unique_ptr<helicsCLI11App> BrokerApp::generateParser ()
     auto app = std::make_unique<helicsCLI11App> ("Broker application");
     app->addTypeOption ();
     app->add_option ("--name,-n", name, "name of the broker");
+    app->allow_extras ();
     return app;
 }
 
