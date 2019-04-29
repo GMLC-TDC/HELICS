@@ -65,7 +65,7 @@ std::unique_ptr<helicsCLI11App> BrokerApp::generateParser ()
 
 void BrokerApp::processArgs (std::unique_ptr<helicsCLI11App> &app)
 {
-    auto remArgs = app->remaining ();
+    auto remArgs = app->remaining_for_passthrough ();
     broker = BrokerFactory::create (app->getCoreType (), name, remArgs);
     if (!broker->isConnected ())
     {
