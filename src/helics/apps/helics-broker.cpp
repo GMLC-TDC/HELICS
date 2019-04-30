@@ -185,27 +185,27 @@ void terminalFunction (std::vector<std::string> args)
     termProg.add_flag ("-q,--quit,--exit", cmdcont, "close the terminal and wait for the broker to exit");
     termProg.add_subcommand ("quit", "close the terminal and  wait for the broker to exit")
       ->callback ([&cmdcont] () { cmdcont = false; });
-    termProg.add_subcommand ("terminate", "terminate the broker")->callback (closeBroker);
+    //  termProg.add_subcommand ("terminate", "terminate the broker")->callback (closeBroker);
 
-    termProg.add_subcommand ("terminate!", "force terminate the broker and exit")
-      ->callback ([closeBroker, &cmdcont] () {
-          cmdcont = false;
-          closeBroker ();
-      });
-
+    /*  termProg.add_subcommand ("terminate!", "force terminate the broker and exit")
+        ->callback ([closeBroker, &cmdcont] () {
+            cmdcont = false;
+            closeBroker ();
+        });
+        */
     auto restart =
       termProg.add_subcommand ("restart", "restart the broker if it is not currently executing")->allow_extras ();
     restart->callback (
-      [restartBroker, restart] () { restartBroker (restart->remaining_for_passthrough (), false); });
+      [restartBroker, &restart] () { restartBroker (restart->remaining_for_passthrough (), false); });
 
     auto frestart = termProg.add_subcommand ("restart!", "terminate the broker and restart it")->allow_extras ();
     frestart->callback (
-      [restartBroker, restart] () { restartBroker (restart->remaining_for_passthrough (), true); });
+      [restartBroker, &restart] () { restartBroker (restart->remaining_for_passthrough (), true); });
 
-    termProg.add_subcommand ("status", "generate the current status of the broker")->callback ([status] () {
+    termProg.add_subcommand ("status", "generate the current status of the broker")->callback ([&status] () {
         status (false);
     });
-    termProg.add_subcommand ("info", "get the current broker status and connection info")->callback ([status] () {
+    termProg.add_subcommand ("info", "get the current broker status and connection info")->callback ([&status] () {
         status (true);
     });
 
@@ -234,13 +234,12 @@ void terminalFunction (std::vector<std::string> args)
             std::cout << vres << '\n';
         }
     };
-    /*
     auto querySub = termProg.add_subcommand (
       "query", "make a query of some target >>query <target> <query> or query <query> to query the broker");
     auto qgroup1 = querySub->add_option_group ("targetGroup")->enabled_by_default ();
     qgroup1->add_option ("target", target, "the name of object to target");
     auto qgroup2 = querySub->add_option_group ("queryGroup");
-    qgroup2->add_option ("query", query, "the query to use")->required ();
+    qgroup2->add_option ("query", query, "the query to make")->required ();
     querySub->preparse_callback ([qgroup1, &target] (size_t argcount) {
         if (argcount < 2)
         {
@@ -249,7 +248,6 @@ void terminalFunction (std::vector<std::string> args)
         }
     });
     querySub->callback (queryCall);
-    */
     while (cmdcont)
     {
         std::string cmdin;
