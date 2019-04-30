@@ -97,8 +97,9 @@ int main (int argc, char *argv[])
 }
 
 /** function to control a user terminal for the broker*/
-void terminalFunction (std::vector<std::string> args)
+void terminalFunction (std::vector<std::string> /*args*/)
 {
+    /*
     std::cout << "starting broker\n";
     auto broker = std::make_unique<helics::apps::BrokerApp> (args);
     auto closeBroker = [&broker] () {
@@ -185,14 +186,14 @@ void terminalFunction (std::vector<std::string> args)
     termProg.add_flag ("-q,--quit,--exit", cmdcont, "close the terminal and wait for the broker to exit");
     termProg.add_subcommand ("quit", "close the terminal and  wait for the broker to exit")
       ->callback ([&cmdcont] () { cmdcont = false; });
-    //  termProg.add_subcommand ("terminate", "terminate the broker")->callback (closeBroker);
+      termProg.add_subcommand ("terminate", "terminate the broker")->callback (closeBroker);
 
-    /*  termProg.add_subcommand ("terminate!", "force terminate the broker and exit")
+      termProg.add_subcommand ("terminate!", "force terminate the broker and exit")
         ->callback ([closeBroker, &cmdcont] () {
             cmdcont = false;
             closeBroker ();
         });
-        */
+        
     auto restart =
       termProg.add_subcommand ("restart", "restart the broker if it is not currently executing")->allow_extras ();
     restart->callback (
@@ -255,4 +256,5 @@ void terminalFunction (std::vector<std::string> args)
         std::getline (std::cin, cmdin);
         termProg.parse (cmdin);
     }
+    */
 }
