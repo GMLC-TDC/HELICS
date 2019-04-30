@@ -19,7 +19,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "cppzmq/zmq.hpp"
 #endif
 /** function to run the online terminal program*/
-void terminalFunction (const std::vector<std::string> &args);
+void terminalFunction (std::vector<std::string> args);
 
 int main (int argc, char *argv[])
 {
@@ -34,7 +34,7 @@ int main (int argc, char *argv[])
           "term", "helics_broker term <broker args...> will start a broker and open a terminal control window "
                   "for the broker run help in a terminal for more commands\n")
         ->prefix_command ();
-    term->callback ([&runterminal]() { runterminal = true; });
+    term->callback ([&runterminal] () { runterminal = true; });
     cmdLine.add_flag ("--autorestart", autorestart,
                       "helics_broker autorestart <broker args ...> will start a continually regenerating broker "
                       "there is a 3 second countdown on broker completion to halt the program via ctrl-C\n");
@@ -97,11 +97,11 @@ int main (int argc, char *argv[])
 }
 
 /** function to control a user terminal for the broker*/
-void terminalFunction (const std::vector<std::string> &args)
+void terminalFunction (std::vector<std::string> args)
 {
     std::cout << "starting broker\n";
     auto broker = std::make_unique<helics::apps::BrokerApp> (args);
-    auto closeBroker = [&broker]() {
+    auto closeBroker = [&broker] () {
         if (!broker)
         {
             std::cout << "Broker has terminated\n";
@@ -118,10 +118,14 @@ void terminalFunction (const std::vector<std::string> &args)
         }
     };
 
-    auto restartBroker = [&broker](std::vector<std::string> args, bool force) {
+    auto restartBroker = [&broker, &args] (std::vector<std::string> broker_args, bool force) {
+        if (!broker_args.empty ())
+        {
+            args = broker_args;
+        }
         if (!broker)
         {
-            broker = std::make_unique<helics::apps::BrokerApp> (std::move (args));
+            broker = std::make_unique<helics::apps::BrokerApp> (args);
             std::cout << "broker has started\n";
         }
         else if (broker->isActive ())
@@ -130,7 +134,7 @@ void terminalFunction (const std::vector<std::string> &args)
             {
                 broker->forceTerminate ();
                 broker = nullptr;
-                broker = std::make_unique<helics::apps::BrokerApp> (std::move (args));
+                broker = std::make_unique<helics::apps::BrokerApp> (args);
                 std::cout << "broker was forceably terminated and restarted\n";
             }
             else
@@ -141,12 +145,12 @@ void terminalFunction (const std::vector<std::string> &args)
         else
         {
             broker = nullptr;
-            broker = std::make_unique<helics::apps::BrokerApp> (std::move (args));
+            broker = std::make_unique<helics::apps::BrokerApp> (args);
             std::cout << "broker has restarted\n";
         }
     };
 
-    auto status = [&broker](bool addAddress) {
+    auto status = [&broker] (bool addAddress) {
         if (!broker)
         {
             std::cout << "Broker is not available\n";
@@ -179,29 +183,29 @@ void terminalFunction (const std::vector<std::string> &args)
     auto termProg = helics::helicsCLI11App ("helics broker command line terminal");
     termProg.ignore_case ();
     termProg.add_flag ("-q,--quit,--exit", cmdcont, "close the terminal and wait for the broker to exit");
-    termProg.add_subcommand ("quit")->callback ([&cmdcont]() { cmdcont = false; });
+    termProg.add_subcommand ("quit")->callback ([&cmdcont] () { cmdcont = false; });
     termProg.add_subcommand ("terminate")->callback (closeBroker);
 
-    termProg.add_subcommand ("terminate!")->callback ([closeBroker, &cmdcont]() {
+    termProg.add_subcommand ("terminate!")->callback ([closeBroker, &cmdcont] () {
         cmdcont = false;
         closeBroker ();
     });
 
     auto restart = termProg.add_subcommand ("restart")->allow_extras ();
     restart->callback (
-      [restartBroker, restart]() { restartBroker (restart->remaining_for_passthrough (), false); });
+      [restartBroker, restart] () { restartBroker (restart->remaining_for_passthrough (), false); });
 
     auto frestart = termProg.add_subcommand ("restart!")->allow_extras ();
     frestart->callback (
-      [restartBroker, restart]() { restartBroker (restart->remaining_for_passthrough (), true); });
+      [restartBroker, restart] () { restartBroker (restart->remaining_for_passthrough (), true); });
 
-    termProg.add_subcommand ("status")->callback ([status]() { status (false); });
-    termProg.add_subcommand ("info")->callback ([status]() { status (true); });
+    termProg.add_subcommand ("status")->callback ([status] () { status (false); });
+    termProg.add_subcommand ("info")->callback ([status] () { status (true); });
 
     std::string target;
     std::string query;
 
-    auto queryCall = [&broker, &target, &query]() {
+    auto queryCall = [&broker, &target, &query] () {
         if (!broker)
         {
             std::cout << "Broker is not available\n";
@@ -230,7 +234,7 @@ void terminalFunction (const std::vector<std::string> &args)
     qgroup1->add_option ("target", target, "the name of object to target");
     auto qgroup2 = querySub->add_option_group ("queryGroup");
     qgroup2->add_option ("query", query, "the query to use")->required ();
-    querySub->preparse_callback ([qgroup1, &target](size_t args) {
+    querySub->preparse_callback ([qgroup1, &target] (size_t args) {
         if (args < 2)
         {
             target.clear ();
