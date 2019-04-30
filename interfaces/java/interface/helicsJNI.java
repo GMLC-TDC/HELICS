@@ -130,11 +130,11 @@ public class helicsJNI {
   public final static native String helicsGetVersion();
   public final static native int helicsIsCoreTypeAvailable(String jarg1);
   public final static native long helicsCreateCore(String jarg1, String jarg2, String jarg3);
-  public final static native long helicsCreateCoreFromArgs(String jarg1, String jarg2, String[] jarg3);
+  public final static native long helicsCreateCoreFromArgs(String jarg1, String jarg2, int jarg3, long jarg4);
   public final static native long helicsCoreClone(long jarg1);
   public final static native int helicsCoreIsValid(long jarg1);
   public final static native long helicsCreateBroker(String jarg1, String jarg2, String jarg3);
-  public final static native long helicsCreateBrokerFromArgs(String jarg1, String jarg2, String[] jarg3);
+  public final static native long helicsCreateBrokerFromArgs(String jarg1, String jarg2, int jarg3, long jarg4);
   public final static native long helicsBrokerClone(long jarg1);
   public final static native int helicsBrokerIsValid(long jarg1);
   public final static native int helicsBrokerIsConnected(long jarg1);
@@ -167,7 +167,7 @@ public class helicsJNI {
   public final static native long helicsFederateClone(long jarg1);
   public final static native long helicsCreateFederateInfo();
   public final static native long helicsFederateInfoClone(long jarg1);
-  public final static native void helicsFederateInfoLoadFromArgs(long jarg1, String[] jarg2);
+  public final static native void helicsFederateInfoLoadFromArgs(long jarg1, int jarg2, long jarg3);
   public final static native void helicsFederateInfoFree(long jarg1);
   public final static native int helicsFederateIsValid(long jarg1);
   public final static native void helicsFederateInfoSetCoreName(long jarg1, String jarg2);

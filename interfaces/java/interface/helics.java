@@ -46,8 +46,8 @@ public class helics {
     return (cPtr == 0) ? null : new SWIGTYPE_p_void(cPtr, false);
   }
 
-  public static SWIGTYPE_p_void helicsCreateCoreFromArgs(String type, String name, String[] argc) {
-    long cPtr = helicsJNI.helicsCreateCoreFromArgs(type, name, argc);
+  public static SWIGTYPE_p_void helicsCreateCoreFromArgs(String type, String name, int argc, SWIGTYPE_p_p_char argv) {
+    long cPtr = helicsJNI.helicsCreateCoreFromArgs(type, name, argc, SWIGTYPE_p_p_char.getCPtr(argv));
     return (cPtr == 0) ? null : new SWIGTYPE_p_void(cPtr, false);
   }
 
@@ -65,8 +65,8 @@ public class helics {
     return (cPtr == 0) ? null : new SWIGTYPE_p_void(cPtr, false);
   }
 
-  public static SWIGTYPE_p_void helicsCreateBrokerFromArgs(String type, String name, String[] argc) {
-    long cPtr = helicsJNI.helicsCreateBrokerFromArgs(type, name, argc);
+  public static SWIGTYPE_p_void helicsCreateBrokerFromArgs(String type, String name, int argc, SWIGTYPE_p_p_char argv) {
+    long cPtr = helicsJNI.helicsCreateBrokerFromArgs(type, name, argc, SWIGTYPE_p_p_char.getCPtr(argv));
     return (cPtr == 0) ? null : new SWIGTYPE_p_void(cPtr, false);
   }
 
@@ -209,8 +209,8 @@ public class helics {
     return (cPtr == 0) ? null : new SWIGTYPE_p_void(cPtr, false);
   }
 
-  public static void helicsFederateInfoLoadFromArgs(SWIGTYPE_p_void fi, String[] argc) {
-    helicsJNI.helicsFederateInfoLoadFromArgs(SWIGTYPE_p_void.getCPtr(fi), argc);
+  public static void helicsFederateInfoLoadFromArgs(SWIGTYPE_p_void fi, int argc, SWIGTYPE_p_p_char argv) {
+    helicsJNI.helicsFederateInfoLoadFromArgs(SWIGTYPE_p_void.getCPtr(fi), argc, SWIGTYPE_p_p_char.getCPtr(argv));
   }
 
   public static void helicsFederateInfoFree(SWIGTYPE_p_void fi) {

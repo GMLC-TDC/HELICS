@@ -1832,12 +1832,12 @@ SWIGEXPORT jlong JNICALL Java_com_java_helics_helicsJNI_helicsCreateCore(JNIEnv 
 }
 
 
-SWIGEXPORT jlong JNICALL Java_com_java_helics_helicsJNI_helicsCreateCoreFromArgs(JNIEnv *jenv, jclass jcls, jstring jarg1, jstring jarg2, jobjectArray jarg3) {
+SWIGEXPORT jlong JNICALL Java_com_java_helics_helicsJNI_helicsCreateCoreFromArgs(JNIEnv *jenv, jclass jcls, jstring jarg1, jstring jarg2, jint jarg3, jlong jarg4) {
   jlong jresult = 0 ;
   char *arg1 = (char *) 0 ;
   char *arg2 = (char *) 0 ;
   int arg3 ;
-  char **arg4 = (char **) 0 ;
+  char **arg4 ;
   helics_error *arg5 = (helics_error *) 0 ;
   helics_error etemp5 ;
   helics_core result;
@@ -1858,31 +1858,13 @@ SWIGEXPORT jlong JNICALL Java_com_java_helics_helicsJNI_helicsCreateCoreFromArgs
     arg2 = (char *)(*jenv)->GetStringUTFChars(jenv, jarg2, 0);
     if (!arg2) return 0;
   }
-  {
-    int i = 0;
-    arg3=(*jenv)->GetArrayLength(jenv, jarg3);
-    arg4 = (char **) malloc((arg3+1)*sizeof(char *));
-    /* make a copy of each string */
-    for (i = 0; i<arg3; i++) {
-      jstring j_string = (jstring)(*jenv)->GetObjectArrayElement(jenv, jarg3, i);
-      const char * c_string = (*jenv)->GetStringUTFChars(jenv, j_string, 0);
-      arg4[i] = malloc((strlen(c_string)+1)*sizeof(char));
-      strcpy(arg4[i], c_string);
-      (*jenv)->ReleaseStringUTFChars(jenv, j_string, c_string);
-      (*jenv)->DeleteLocalRef(jenv, j_string);
-    }
-    arg4[i] = 0;
-  }
-  result = (helics_core)helicsCreateCoreFromArgs((char const *)arg1,(char const *)arg2,arg3,(char const *const *)arg4,arg5);
+  arg3 = (int)jarg3; 
+  arg4 = *(char ***)&jarg4; 
+  result = (helics_core)helicsCreateCoreFromArgs((char const *)arg1,(char const *)arg2,arg3,arg4,arg5);
   *(helics_core *)&jresult = result; 
   if (arg1) (*jenv)->ReleaseStringUTFChars(jenv, jarg1, (const char *)arg1);
   if (arg2) (*jenv)->ReleaseStringUTFChars(jenv, jarg2, (const char *)arg2);
-  {
-    int i;
-    for (i=0; i<arg3-1; i++)
-    free(arg4[i]);
-    free(arg4);
-  }
+  
   {
     if (arg5->error_code!=helics_ok)
     {
@@ -1981,12 +1963,12 @@ SWIGEXPORT jlong JNICALL Java_com_java_helics_helicsJNI_helicsCreateBroker(JNIEn
 }
 
 
-SWIGEXPORT jlong JNICALL Java_com_java_helics_helicsJNI_helicsCreateBrokerFromArgs(JNIEnv *jenv, jclass jcls, jstring jarg1, jstring jarg2, jobjectArray jarg3) {
+SWIGEXPORT jlong JNICALL Java_com_java_helics_helicsJNI_helicsCreateBrokerFromArgs(JNIEnv *jenv, jclass jcls, jstring jarg1, jstring jarg2, jint jarg3, jlong jarg4) {
   jlong jresult = 0 ;
   char *arg1 = (char *) 0 ;
   char *arg2 = (char *) 0 ;
   int arg3 ;
-  char **arg4 = (char **) 0 ;
+  char **arg4 ;
   helics_error *arg5 = (helics_error *) 0 ;
   helics_error etemp5 ;
   helics_broker result;
@@ -2007,31 +1989,13 @@ SWIGEXPORT jlong JNICALL Java_com_java_helics_helicsJNI_helicsCreateBrokerFromAr
     arg2 = (char *)(*jenv)->GetStringUTFChars(jenv, jarg2, 0);
     if (!arg2) return 0;
   }
-  {
-    int i = 0;
-    arg3=(*jenv)->GetArrayLength(jenv, jarg3);
-    arg4 = (char **) malloc((arg3+1)*sizeof(char *));
-    /* make a copy of each string */
-    for (i = 0; i<arg3; i++) {
-      jstring j_string = (jstring)(*jenv)->GetObjectArrayElement(jenv, jarg3, i);
-      const char * c_string = (*jenv)->GetStringUTFChars(jenv, j_string, 0);
-      arg4[i] = malloc((strlen(c_string)+1)*sizeof(char));
-      strcpy(arg4[i], c_string);
-      (*jenv)->ReleaseStringUTFChars(jenv, j_string, c_string);
-      (*jenv)->DeleteLocalRef(jenv, j_string);
-    }
-    arg4[i] = 0;
-  }
-  result = (helics_broker)helicsCreateBrokerFromArgs((char const *)arg1,(char const *)arg2,arg3,(char const *const *)arg4,arg5);
+  arg3 = (int)jarg3; 
+  arg4 = *(char ***)&jarg4; 
+  result = (helics_broker)helicsCreateBrokerFromArgs((char const *)arg1,(char const *)arg2,arg3,arg4,arg5);
   *(helics_broker *)&jresult = result; 
   if (arg1) (*jenv)->ReleaseStringUTFChars(jenv, jarg1, (const char *)arg1);
   if (arg2) (*jenv)->ReleaseStringUTFChars(jenv, jarg2, (const char *)arg2);
-  {
-    int i;
-    for (i=0; i<arg3-1; i++)
-    free(arg4[i]);
-    free(arg4);
-  }
+  
   {
     if (arg5->error_code!=helics_ok)
     {
@@ -2820,10 +2784,10 @@ SWIGEXPORT jlong JNICALL Java_com_java_helics_helicsJNI_helicsFederateInfoClone(
 }
 
 
-SWIGEXPORT void JNICALL Java_com_java_helics_helicsJNI_helicsFederateInfoLoadFromArgs(JNIEnv *jenv, jclass jcls, jlong jarg1, jobjectArray jarg2) {
+SWIGEXPORT void JNICALL Java_com_java_helics_helicsJNI_helicsFederateInfoLoadFromArgs(JNIEnv *jenv, jclass jcls, jlong jarg1, jint jarg2, jlong jarg3) {
   helics_federate_info arg1 = (helics_federate_info) 0 ;
   int arg2 ;
-  char **arg3 = (char **) 0 ;
+  char **arg3 ;
   helics_error *arg4 = (helics_error *) 0 ;
   helics_error etemp4 ;
   
@@ -2834,28 +2798,10 @@ SWIGEXPORT void JNICALL Java_com_java_helics_helicsJNI_helicsFederateInfoLoadFro
     arg4=&etemp4;
   }
   arg1 = *(helics_federate_info *)&jarg1; 
-  {
-    int i = 0;
-    arg2=(*jenv)->GetArrayLength(jenv, jarg2);
-    arg3 = (char **) malloc((arg2+1)*sizeof(char *));
-    /* make a copy of each string */
-    for (i = 0; i<arg2; i++) {
-      jstring j_string = (jstring)(*jenv)->GetObjectArrayElement(jenv, jarg2, i);
-      const char * c_string = (*jenv)->GetStringUTFChars(jenv, j_string, 0);
-      arg3[i] = malloc((strlen(c_string)+1)*sizeof(char));
-      strcpy(arg3[i], c_string);
-      (*jenv)->ReleaseStringUTFChars(jenv, j_string, c_string);
-      (*jenv)->DeleteLocalRef(jenv, j_string);
-    }
-    arg3[i] = 0;
-  }
-  helicsFederateInfoLoadFromArgs(arg1,arg2,(char const *const *)arg3,arg4);
-  {
-    int i;
-    for (i=0; i<arg2-1; i++)
-    free(arg3[i]);
-    free(arg3);
-  }
+  arg2 = (int)jarg2; 
+  arg3 = *(char ***)&jarg3; 
+  helicsFederateInfoLoadFromArgs(arg1,arg2,arg3,arg4);
+  
   {
     if (arg4->error_code!=helics_ok)
     {
