@@ -43,6 +43,7 @@ if(MSVC)
 
     set(
         boost_versions
+		boost_1_70_0
         boost_1_69_0
         boost_1_68_0
         boost_1_67_0
@@ -106,7 +107,7 @@ endif(MSVC)
 hide_variable(BOOST_TEST_PATH)
 
 if(NOT BOOST_REQUIRED_LIBRARIES)
-    set(BOOST_REQUIRED_LIBRARIES program_options filesystem system)
+    set(BOOST_REQUIRED_LIBRARIES filesystem system)
     if(BUILD_TESTING)
         message(STATUS "adding unit testing")
         list(APPEND BOOST_REQUIRED_LIBRARIES unit_test_framework)
