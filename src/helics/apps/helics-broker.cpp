@@ -234,7 +234,7 @@ void terminalFunction (std::vector<std::string> args)
             std::cout << vres << '\n';
         }
     };
-
+    /*
     auto querySub = termProg.add_subcommand (
       "query", "make a query of some target >>query <target> <query> or query <query> to query the broker");
     auto qgroup1 = querySub->add_option_group ("targetGroup")->enabled_by_default ();
@@ -249,7 +249,7 @@ void terminalFunction (std::vector<std::string> args)
         }
     });
     querySub->callback (queryCall);
-
+    */
     while (cmdcont)
     {
         std::string cmdin;
