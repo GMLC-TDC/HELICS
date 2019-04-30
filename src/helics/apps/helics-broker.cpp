@@ -183,24 +183,31 @@ void terminalFunction (std::vector<std::string> args)
     auto termProg = helics::helicsCLI11App ("helics broker command line terminal");
     termProg.ignore_case ();
     termProg.add_flag ("-q,--quit,--exit", cmdcont, "close the terminal and wait for the broker to exit");
-    termProg.add_subcommand ("quit")->callback ([&cmdcont] () { cmdcont = false; });
-    termProg.add_subcommand ("terminate")->callback (closeBroker);
+    termProg.add_subcommand ("quit", "close the terminal and  wait for the broker to exit")
+      ->callback ([&cmdcont] () { cmdcont = false; });
+    termProg.add_subcommand ("terminate", "terminate the broker")->callback (closeBroker);
 
-    termProg.add_subcommand ("terminate!")->callback ([closeBroker, &cmdcont] () {
-        cmdcont = false;
-        closeBroker ();
-    });
+    termProg.add_subcommand ("terminate!", "force terminate the broker and exit")
+      ->callback ([closeBroker, &cmdcont] () {
+          cmdcont = false;
+          closeBroker ();
+      });
 
-    auto restart = termProg.add_subcommand ("restart")->allow_extras ();
+    auto restart =
+      termProg.add_subcommand ("restart", "restart the broker if it is not currently executing")->allow_extras ();
     restart->callback (
       [restartBroker, restart] () { restartBroker (restart->remaining_for_passthrough (), false); });
 
-    auto frestart = termProg.add_subcommand ("restart!")->allow_extras ();
+    auto frestart = termProg.add_subcommand ("restart!", "terminate the broker and restart it")->allow_extras ();
     frestart->callback (
       [restartBroker, restart] () { restartBroker (restart->remaining_for_passthrough (), true); });
 
-    termProg.add_subcommand ("status")->callback ([status] () { status (false); });
-    termProg.add_subcommand ("info")->callback ([status] () { status (true); });
+    termProg.add_subcommand ("status", "generate the current status of the broker")->callback ([status] () {
+        status (false);
+    });
+    termProg.add_subcommand ("info", "get the current broker status and connection info")->callback ([status] () {
+        status (true);
+    });
 
     std::string target;
     std::string query;
@@ -234,8 +241,8 @@ void terminalFunction (std::vector<std::string> args)
     qgroup1->add_option ("target", target, "the name of object to target");
     auto qgroup2 = querySub->add_option_group ("queryGroup");
     qgroup2->add_option ("query", query, "the query to use")->required ();
-    querySub->preparse_callback ([qgroup1, &target] (size_t args) {
-        if (args < 2)
+    querySub->preparse_callback ([qgroup1, &target] (size_t argcount) {
+        if (argcount < 2)
         {
             target.clear ();
             qgroup1->disabled ();
@@ -246,7 +253,7 @@ void terminalFunction (std::vector<std::string> args)
     while (cmdcont)
     {
         std::string cmdin;
-        std::cout << "helics>>";
+        std::cout << "\nhelics>>";
         std::getline (std::cin, cmdin);
         termProg.parse (cmdin);
     }
