@@ -180,7 +180,7 @@ void terminalFunction (std::vector<std::string> args)
         }
     };
     bool cmdcont = true;
-    auto termProg = helics::helicsCLI11App ("helics broker command line terminal");
+    helics::helicsCLI11App termProg ("helics broker command line terminal");
     termProg.ignore_case ();
     termProg.add_flag ("-q,--quit,--exit", cmdcont, "close the terminal and wait for the broker to exit");
     termProg.add_subcommand ("quit", "close the terminal and  wait for the broker to exit")
