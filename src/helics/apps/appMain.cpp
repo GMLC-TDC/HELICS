@@ -5,6 +5,7 @@ the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 
+#include "../common/logger.h"
 #include "../core/BrokerFactory.hpp"
 #include "../core/core-exceptions.hpp"
 #include "../core/helicsCLI11.hpp"
@@ -55,11 +56,8 @@ int main (int argc, char *argv[])
         helics::apps::Tracer tracer (app.remaining_for_passthrough (true));
         if (tracer.isActive ())
         {
+            std::cout << "tracer is running\n";
             tracer.run ();
-        }
-        else
-        {
-            std::cout << "tracer is not active\n";
         }
     });
 
@@ -68,6 +66,7 @@ int main (int argc, char *argv[])
     });
 
     auto ret = app.helics_parse (argc, argv);
+    helics::LoggerManager::getLoggerCore ()->addMessage ("!!>flush");
 
     helics::cleanupHelicsLibrary ();
     return (static_cast<int> (ret));
