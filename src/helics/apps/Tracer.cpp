@@ -36,7 +36,11 @@ Tracer::Tracer (const std::string &appName, FederateInfo &fi) : App (appName, fi
     fed->setFlagOption (helics_flag_observer);
 }
 
-Tracer::Tracer (std::vector<std::string> args) : App ("tracer", std::move (args)) { processArgs (); }
+Tracer::Tracer (std::vector<std::string> args) : App ("tracer", std::move (args))
+{
+    std::cout << "GOT FILE " << masterFileName << '\n';
+    processArgs ();
+}
 
 Tracer::Tracer (int argc, char *argv[]) : App ("tracer", argc, argv) { processArgs (); }
 
@@ -491,7 +495,7 @@ std::shared_ptr<helicsCLI11App> Tracer::buildArgParserApp ()
     auto clone_group =
       app->add_option_group ("cloning", "Options related to endpoint cloning operations and specifications");
     clone_group->add_option ("--clone", "existing endpoints to clone all packets to and from")
-      ->each ([this] (const std::string &clone) {
+      ->each ([this](const std::string &clone) {
           addDestEndpointClone (clone);
           addSourceEndpointClone (clone);
       })
@@ -502,7 +506,7 @@ std::shared_ptr<helicsCLI11App> Tracer::buildArgParserApp ()
       ->add_option (
         "--sourceclone",
         "existing endpoints to capture generated packets from, this argument may be specified multiple time")
-      ->each ([this] (const std::string &clone) { addSourceEndpointClone (clone); })
+      ->each ([this](const std::string &clone) { addSourceEndpointClone (clone); })
       ->delimiter (',')
       ->ignore_underscore ()
       ->type_size (-1);
@@ -510,7 +514,7 @@ std::shared_ptr<helicsCLI11App> Tracer::buildArgParserApp ()
     clone_group
       ->add_option ("--destclone", "existing endpoints to capture all packets with the specified endpoint as a "
                                    "destination, this argument may be specified multiple time")
-      ->each ([this] (const std::string &clone) { addSourceEndpointClone (clone); })
+      ->each ([this](const std::string &clone) { addSourceEndpointClone (clone); })
       ->delimiter (',')
       ->ignore_underscore ()
       ->type_size (-1);
@@ -521,7 +525,7 @@ std::shared_ptr<helicsCLI11App> Tracer::buildArgParserApp ()
     capture_group
       ->add_option ("--tag,--publication,--pub",
                     "tags(publications) to record, this argument may be specified any number of times")
-      ->each ([this] (const std::string &tag) {
+      ->each ([this](const std::string &tag) {
           auto taglist = stringOps::splitlineQuotes (tag);
           for (const auto &tagname : taglist)
           {
@@ -531,7 +535,7 @@ std::shared_ptr<helicsCLI11App> Tracer::buildArgParserApp ()
       ->type_size (-1);
 
     capture_group->add_option ("--endpoints", "endpoints to capture, this argument may be specified multiple time")
-      ->each ([this] (const std::string &ept) {
+      ->each ([this](const std::string &ept) {
           auto eptlist = stringOps::splitlineQuotes (ept);
           for (const auto &eptname : eptlist)
           {
@@ -543,7 +547,7 @@ std::shared_ptr<helicsCLI11App> Tracer::buildArgParserApp ()
     capture_group
       ->add_option ("--capture", "capture all the publications of a particular federate capture=\"fed1;fed2\"  "
                                  "supports multiple arguments or a comma separated list")
-      ->each ([this] (const std::string &capt) {
+      ->each ([this](const std::string &capt) {
           auto captFeds = stringOps::splitlineQuotes (capt);
           for (auto &captFed : captFeds)
           {
