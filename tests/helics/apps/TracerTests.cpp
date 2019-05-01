@@ -654,7 +654,8 @@ BOOST_DATA_TEST_CASE (simple_tracer_test_message_files_exe,
     BOOST_CHECK_EQUAL (retTime, 5.0);
 
     cfed.finalize ();
-    std::string outAct = out.get ();
+    // std::string outAct = out.get ();
+    auto outAct = out;
     int mcount = 0;
     int valcount = 0;
     auto vec = stringOps::splitline (outAct, "\n\r", stringOps::delimiter_compression::on);
