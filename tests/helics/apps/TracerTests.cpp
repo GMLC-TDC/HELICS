@@ -615,15 +615,15 @@ BOOST_DATA_TEST_CASE (simple_tracer_test_message_files_exe,
                       file)
 {
     std::this_thread::sleep_for (300ms);
-    auto brk = helics::BrokerFactory::create (helics::core_type::IPC, "ipc_broker", "-f 2");
+    auto brk = helics::BrokerFactory::create (helics::core_type::ZMQ, "z_broker", "-f 2");
     brk->connect ();
     std::string exampleFile = std::string (TEST_DIR) + file;
 
-    std::string cmdArg ("--name=tracer --coretype=ipc --stop=5 --print --skiplog " + exampleFile);
+    std::string cmdArg ("--name=tracer --coretype=zmq --stop=5 --print --skiplog " + exampleFile);
     exeTestRunner tracerExe (HELICS_INSTALL_LOC, HELICS_BUILD_LOC "apps/", "helics_app");
     BOOST_REQUIRE (tracerExe.isActive ());
     auto out = tracerExe.runCaptureOutputAsync (std::string ("tracer " + cmdArg));
-    helics::FederateInfo fi (helics::core_type::IPC);
+    helics::FederateInfo fi (helics::core_type::ZMQ);
     fi.coreInitString = "";
 
     helics::CombinationFederate cfed ("obj", fi);
