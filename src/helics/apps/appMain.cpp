@@ -18,50 +18,49 @@ SPDX-License-Identifier: BSD-3-Clause
 
 int main (int argc, char *argv[])
 {
-    helics::helicsCLI11App app ("", "helics_app");
-    app.ignore_case ();
-    app.prefix_command ();
-    app.add_subcommand ("Helics Player App", "player")->prefix_command ()->callback ([&app] () {
-        helics::apps::Player player (app.remaining_for_passthrough ());
+    helics::helicsCLI11App app ("helics_app", "");
+    app.ignore_case ()->prefix_command ();
+    app.add_subcommand ("player", "Helics Player App")->callback ([&app]() {
+        helics::apps::Player player (app.remaining_for_passthrough (true));
         if (player.isActive ())
         {
             player.run ();
         }
     });
 
-    app.add_subcommand ("Helics Recorder App", "recorder")->prefix_command ()->callback ([&app] () {
-        helics::apps::Recorder recorder (app.remaining_for_passthrough ());
+    app.add_subcommand ("recorder", "Helics Recorder App")->callback ([&app]() {
+        helics::apps::Recorder recorder (app.remaining_for_passthrough (true));
         if (recorder.isActive ())
         {
             recorder.run ();
         }
     });
-    app.add_subcommand ("Helics Echo App", "echo")->prefix_command ()->callback ([&app] () {
-        helics::apps::Echo echo (app.remaining_for_passthrough ());
+    app.add_subcommand ("echo", "Helics Echo App")->callback ([&app]() {
+        helics::apps::Echo echo (app.remaining_for_passthrough (true));
         if (echo.isActive ())
         {
             echo.run ();
         }
     });
 
-    app.add_subcommand ("Helics Source App", "source")->prefix_command ()->callback ([&app] () {
-        helics::apps::Source source (app.remaining_for_passthrough ());
+    app.add_subcommand ("source", "Helics Source App")->callback ([&app]() {
+        helics::apps::Source source (app.remaining_for_passthrough (true));
         if (source.isActive ())
         {
             source.run ();
         }
     });
 
-    app.add_subcommand ("Helics Tracer App", "tracer")->prefix_command ()->callback ([&app] () {
-        helics::apps::Tracer tracer (app.remaining_for_passthrough ());
+    app.add_subcommand ("tracer", "Helics Tracer App")->callback ([&app]() {
+        helics::apps::Tracer tracer (app.remaining_for_passthrough (true));
         if (tracer.isActive ())
         {
             tracer.run ();
         }
     });
 
-    app.add_subcommand ("Helics Broker App", "broker")->prefix_command ()->callback ([&app] () {
-        helics::apps::BrokerApp broker (app.remaining_for_passthrough ());
+    app.add_subcommand ("broker", "Helics Broker App")->callback ([&app]() {
+        helics::apps::BrokerApp broker (app.remaining_for_passthrough (true));
     });
 
     auto ret = app.helics_parse (argc, argv);

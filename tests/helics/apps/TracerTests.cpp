@@ -622,8 +622,7 @@ BOOST_DATA_TEST_CASE (simple_tracer_test_message_files_exe,
     std::string cmdArg ("--name=tracer --coretype=ipc --stop=5 " + exampleFile);
     exeTestRunner tracerExe (HELICS_INSTALL_LOC, HELICS_BUILD_LOC "apps/", "helics_app");
     BOOST_REQUIRE (tracerExe.isActive ());
-    auto out = tracerExe.runCaptureOutput (std::string ("tracer " + cmdArg));
-    std::cout << out << std::endl;
+    auto out = tracerExe.runCaptureOutputAsync (std::string ("tracer " + cmdArg));
     helics::FederateInfo fi (helics::core_type::IPC);
     fi.coreInitString = "";
 
@@ -655,8 +654,8 @@ BOOST_DATA_TEST_CASE (simple_tracer_test_message_files_exe,
     BOOST_CHECK_EQUAL (retTime, 5.0);
 
     cfed.finalize ();
-    // std::string outAct = out.get ();
-    auto outAct = out;
+    std::string outAct = out.get ();
+
     int mcount = 0;
     int valcount = 0;
     auto vec = stringOps::splitline (outAct, "\n\r", stringOps::delimiter_compression::on);

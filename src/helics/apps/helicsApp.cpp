@@ -116,7 +116,7 @@ std::unique_ptr<helicsCLI11App> App::generateParser ()
                    "i.e.the keys will be prepended with the player name)");
     app->add_option ("--stop", stopTime, "The time to stop the app")->type_name ("TIME");
     app->add_option ("--input,input", masterFileName, "The primary input file")->check (CLI::ExistingFile);
-    app->allow_extras ();
+    app->allow_extras ()->validate_positionals ();
     return app;
 }
 
