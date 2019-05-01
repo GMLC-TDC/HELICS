@@ -491,7 +491,7 @@ std::shared_ptr<helicsCLI11App> Tracer::buildArgParserApp ()
 {
     auto app = std::make_shared<helicsCLI11App> ("Command line options for the Recorder App");
     app->add_flag ("--allow_iteration", allow_iteration, "allow iteration on values")->ignore_underscore ();
-
+    app->add_flag ("--print", printMessage, "print message to the screen");
     auto clone_group =
       app->add_option_group ("cloning", "Options related to endpoint cloning operations and specifications");
     clone_group->add_option ("--clone", "existing endpoints to clone all packets to and from")

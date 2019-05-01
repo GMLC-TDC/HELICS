@@ -56,7 +56,6 @@ int main (int argc, char *argv[])
         helics::apps::Tracer tracer (app.remaining_for_passthrough (true));
         if (tracer.isActive ())
         {
-            std::cout << "tracer is running\n";
             tracer.run ();
         }
     });
