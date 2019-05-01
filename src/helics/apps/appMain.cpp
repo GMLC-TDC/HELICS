@@ -57,6 +57,10 @@ int main (int argc, char *argv[])
         {
             tracer.run ();
         }
+        else
+        {
+            std::cout << "tracer is not active\n";
+        }
     });
 
     app.add_subcommand ("broker", "Helics Broker App")->callback ([&app]() {
