@@ -619,7 +619,7 @@ BOOST_DATA_TEST_CASE (simple_tracer_test_message_files_exe,
     brk->connect ();
     std::string exampleFile = std::string (TEST_DIR) + file;
 
-    std::string cmdArg ("--name=tracer --coretype=ipc --stop=5 --print --skiplog" + exampleFile);
+    std::string cmdArg ("--name=tracer --coretype=ipc --stop=5 --print --skiplog " + exampleFile);
     exeTestRunner tracerExe (HELICS_INSTALL_LOC, HELICS_BUILD_LOC "apps/", "helics_app");
     BOOST_REQUIRE (tracerExe.isActive ());
     auto out = tracerExe.runCaptureOutputAsync (std::string ("tracer " + cmdArg));
