@@ -18,7 +18,6 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <memory>
 #include <regex>
 #include <stdexcept>
-#include <boost/filesystem.hpp>
 
 #include "../common/JsonProcessingFunctions.hpp"
 #include "../common/fmt_format.h"
@@ -51,7 +50,7 @@ void Tracer::processArgs ()
         {
             loadFile (masterFileName);
         }
-        std::cout << "Print is " << (printMessage ? std::string ("active") : std::string ("deactivated")) << "\n";
+        std::cout << "Skiplog is " << (skiplog ? std::string ("active") : std::string ("deactivated")) << "\n";
     }
     else if (helpMode)
     {
@@ -318,7 +317,14 @@ void Tracer::captureForCurrentTime (Time currentTime, int iteration)
                           fmt::format ("[{}]value {}=block[{}]", currentTime, sub.getTarget (), val.size ());
                     }
                 }
-                logger->addMessage (std::move (valstr));
+                if (skiplog)
+                {
+                    std::cout << valstr << '\n';
+                }
+                else
+                {
+                    logger->addMessage (std::move (valstr));
+                }
             }
             if (valueCallback)
             {
@@ -345,7 +351,14 @@ void Tracer::captureForCurrentTime (Time currentTime, int iteration)
                     messstr = fmt::format ("[{}]message from {} to {}:: size {}", currentTime, mess->source,
                                            mess->dest, mess->data.size ());
                 }
-                logger->addMessage (std::move (messstr));
+                if (skiplog)
+                {
+                    std::cout << messstr << '\n';
+                }
+                else
+                {
+                    logger->addMessage (std::move (messstr));
+                }
             }
             if (endpointMessageCallback)
             {
@@ -373,7 +386,14 @@ void Tracer::captureForCurrentTime (Time currentTime, int iteration)
                     messstr = fmt::format ("[{}]message from %s to %s:: size %d", currentTime, mess->source,
                                            mess->original_dest, mess->data.size ());
                 }
-                logger->addMessage (std::move (messstr));
+                if (skiplog)
+                {
+                    std::cout << messstr << '\n';
+                }
+                else
+                {
+                    logger->addMessage (std::move (messstr));
+                }
             }
             if (clonedMessageCallback)
             {
@@ -489,6 +509,7 @@ std::shared_ptr<helicsCLI11App> Tracer::buildArgParserApp ()
     auto app = std::make_shared<helicsCLI11App> ("Command line options for the Tracer App");
     app->add_flag ("--allow_iteration", allow_iteration, "allow iteration on values")->ignore_underscore ();
     app->add_flag ("--print", printMessage, "print messages to the screen");
+    app->add_flag ("--skiplog", skiplog, "print messages to the screen through cout");
     auto clone_group =
       app->add_option_group ("cloning", "Options related to endpoint cloning operations and specifications");
     clone_group->add_option ("--clone", "existing endpoints to clone all packets to and from")

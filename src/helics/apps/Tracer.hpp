@@ -113,6 +113,7 @@ class Tracer : public App
   protected:
     bool printMessage = false;
     bool allow_iteration = false;  //!< flag to allow iteration of the federate for time requests
+    bool skiplog = false;  //!< skip the log function and print directly to cout
     std::unique_ptr<CloningFilter> cFilt;  //!< a pointer to a clone filter
 
     std::vector<Input> subscriptions;  //!< the actual subscription objects
