@@ -46,12 +46,12 @@ void Tracer::processArgs ()
     if (!deactivated)
     {
         fed->setFlagOption (helics_flag_observer);
-        std::cout << "Remaining args for processing " << CLI::detail::join (remArgs) << '\n';
         app->parse (remArgs);
         if (!masterFileName.empty ())
         {
             loadFile (masterFileName);
         }
+        std::cout << "Print is " << (printMessage ? std::string ("active") : std::string ("deactivated")) << "\n";
     }
     else if (helpMode)
     {
