@@ -53,12 +53,12 @@ class FederateInfo : public CoreFederateInfo
     /** load a federateInfo object from command line arguments outside the constructor
    @param args a string containing the command line arguments
    */
-    void loadInfoFromArgs (const std::string &args);
+    std::vector<std::string> loadInfoFromArgs (const std::string &args);
     /** load a federateInfo object from command line arguments outside the constructor
     @param argc the number of arguments
     @param argv an array of char * pointers to the arguments
     */
-    void loadInfoFromArgs (int argc, char *argv[]);
+    std::vector<std::string> loadInfoFromArgs (int argc, char *argv[]);
     /** load a federateInfo object from command line arguments contained in a vector
     @param[inout] args a vector of arguments to load
     */

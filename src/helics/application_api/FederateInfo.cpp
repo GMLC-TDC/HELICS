@@ -319,27 +319,32 @@ std::unique_ptr<helicsCLI11App> FederateInfo::makeCLIApp ()
       ->type_size (-1)
       ->delimiter (',')
       ->each ([this] (const std::string &flag) { loadFlags (*this, flag); });
+    app->allow_extras ();
     return app;
 }
 
-void FederateInfo::loadInfoFromArgs (const std::string &args)
+std::vector<std::string> FederateInfo::loadInfoFromArgs (const std::string &args)
 {
     auto app = makeCLIApp ();
     app->helics_parse (args);
     coreType = app->getCoreType ();
+    return app->remaining_for_passthrough ();
 }
 
-void FederateInfo::loadInfoFromArgs (int argc, char *argv[])
+std::vector<std::string> FederateInfo::loadInfoFromArgs (int argc, char *argv[])
 {
     auto app = makeCLIApp ();
     app->helics_parse (argc, argv);
     coreType = app->getCoreType ();
+    return app->remaining_for_passthrough ();
 }
 
 void FederateInfo::loadInfoFromArgs (std::vector<std::string> &args)
 {
     auto app = makeCLIApp ();
+    app->allow_extras ();
     app->helics_parse (args);
+
     coreType = app->getCoreType ();
 }
 
