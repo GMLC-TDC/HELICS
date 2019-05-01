@@ -489,7 +489,7 @@ void Tracer::addCapture (const std::string &captureDesc) { captureInterfaces.pus
 
 std::shared_ptr<helicsCLI11App> Tracer::buildArgParserApp ()
 {
-    auto app = std::make_shared<helicsCLI11App> ("Command line options for the Recorder App");
+    auto app = std::make_shared<helicsCLI11App> ("Command line options for the Tracer App");
     app->add_flag ("--allow_iteration", allow_iteration, "allow iteration on values")->ignore_underscore ();
     app->add_flag ("--print", printMessage, "print messages to the screen");
     auto clone_group =
