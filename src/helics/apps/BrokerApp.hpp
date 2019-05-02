@@ -30,7 +30,7 @@ class BrokerApp
     /** construct from command line arguments in a vector
  @param args the command line arguments to pass in a reverse vector
  */
-    BrokerApp (std::vector<std::string> args);
+    explicit BrokerApp (std::vector<std::string> args);
     /** construct from command line arguments in a vector
      @param ctype the type of broker to create
 @param args the command line arguments to pass in a reverse vector

@@ -59,7 +59,8 @@ extern "C"
     @param[in,out] err an error object that will contain an error code and string if any error occurred during the execution of the function
     @return a helics_core object
     */
-    HELICS_EXPORT helics_core helicsCreateCoreFromArgs (const char *type, const char *name, int argc, char *argv[], helics_error *err);
+    HELICS_EXPORT helics_core
+    helicsCreateCoreFromArgs (const char *type, const char *name, int argc, const char *const *argv, helics_error *err);
 
     /** create a new reference to an existing core
     @details this will create a new broker object that references the existing broker it must be freed as well
@@ -90,7 +91,8 @@ extern "C"
     @param[in,out] err an error object that will contain an error code and string if any error occurred during the execution of the function
     @return a helics_core object
     */
-    HELICS_EXPORT helics_broker helicsCreateBrokerFromArgs (const char *type, const char *name, int argc, char *argv[], helics_error *err);
+    HELICS_EXPORT helics_broker
+    helicsCreateBrokerFromArgs (const char *type, const char *name, int argc, const char *const *argv, helics_error *err);
 
     /** create a new reference to an existing broker
     @details this will create a new broker object that references the existing broker it must be freed as well
@@ -308,7 +310,7 @@ extern "C"
     @param argv an array of strings from the command line
     @param[in,out] err an error object that will contain an error code and string if any error occurred during the execution of the function
     */
-    HELICS_EXPORT void helicsFederateInfoLoadFromArgs (helics_federate_info fi, int argc, char *argv[], helics_error *err);
+    HELICS_EXPORT void helicsFederateInfoLoadFromArgs (helics_federate_info fi, int argc, const char *const *argv, helics_error *err);
 
     /** delete the memory associated with a federate info object*/
     HELICS_EXPORT void helicsFederateInfoFree (helics_federate_info fi);
