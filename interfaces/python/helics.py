@@ -326,7 +326,7 @@ def helicsCreateCore(type: 'char const *', name: 'char const *', initString: 'ch
     """
     return _helics.helicsCreateCore(type, name, initString)
 
-def helicsCreateCoreFromArgs(type: 'char const *', name: 'char const *', argc: 'int', argv: 'char *[]') -> "helics_core":
+def helicsCreateCoreFromArgs(type: 'char const *', name: 'char const *', argc: 'int') -> "helics_core":
     """
 
 
@@ -349,7 +349,7 @@ def helicsCreateCoreFromArgs(type: 'char const *', name: 'char const *', argc: '
     a helics_core object
 
     """
-    return _helics.helicsCreateCoreFromArgs(type, name, argc, argv)
+    return _helics.helicsCreateCoreFromArgs(type, name, argc)
 
 def helicsCoreClone(core: 'helics_core') -> "helics_core":
     return _helics.helicsCoreClone(core)
@@ -385,7 +385,7 @@ def helicsCreateBroker(type: 'char const *', name: 'char const *', initString: '
     """
     return _helics.helicsCreateBroker(type, name, initString)
 
-def helicsCreateBrokerFromArgs(type: 'char const *', name: 'char const *', argc: 'int', argv: 'char *[]') -> "helics_broker":
+def helicsCreateBrokerFromArgs(type: 'char const *', name: 'char const *', argc: 'int') -> "helics_broker":
     """
 
 
@@ -408,7 +408,7 @@ def helicsCreateBrokerFromArgs(type: 'char const *', name: 'char const *', argc:
     a helics_core object
 
     """
-    return _helics.helicsCreateBrokerFromArgs(type, name, argc, argv)
+    return _helics.helicsCreateBrokerFromArgs(type, name, argc)
 
 def helicsBrokerClone(broker: 'helics_broker') -> "helics_broker":
     return _helics.helicsBrokerClone(broker)
@@ -704,7 +704,7 @@ def helicsFederateInfoClone(fi: 'helics_federate_info') -> "helics_federate_info
     return _helics.helicsFederateInfoClone(fi)
 helicsFederateInfoClone = _helics.helicsFederateInfoClone
 
-def helicsFederateInfoLoadFromArgs(fi: 'helics_federate_info', argc: 'int', argv: 'char *[]') -> "void":
+def helicsFederateInfoLoadFromArgs(fi: 'helics_federate_info', argc: 'int') -> "void":
     """
 
 
@@ -724,7 +724,7 @@ def helicsFederateInfoLoadFromArgs(fi: 'helics_federate_info', argc: 'int', argv
     a helics_status enumeration indicating success or any potential errors
 
     """
-    return _helics.helicsFederateInfoLoadFromArgs(fi, argc, argv)
+    return _helics.helicsFederateInfoLoadFromArgs(fi, argc)
 
 def helicsFederateInfoFree(fi: 'helics_federate_info') -> "void":
     """

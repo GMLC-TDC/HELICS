@@ -18,11 +18,11 @@ class helicsCLI11App : public CLI::App
 {
   public:
     explicit helicsCLI11App (std::string app_description = "", std::string app_name = "")
-        : CLI::App (app_description, app_name, nullptr)
+        : CLI::App (std::move (app_description), app_name, nullptr)
     {
         set_help_flag ("-h,-?,--help", "Print this help message and exit");
         set_config ("--config-file", "helics_config.ini", "specify base configuration file");
-        add_flag_callback ("--version,-v", [] () { throw (CLI::Success{}); });
+        add_flag_callback ("--version,-v", []() { throw (CLI::Success{}); });
         add_option_group ("quiet")->immediate_callback ()->add_flag ("--quiet", quiet,
                                                                      "silence most print output");
     }
@@ -98,11 +98,11 @@ class helicsCLI11App : public CLI::App
         }
     }
     /** Add a callback function to execute on parsing*/
-    void add_callback (std::function<void ()> cback)
+    void add_callback (std::function<void()> cback)
     {
         if (cbacks.empty ())
         {
-            callback ([this] () {
+            callback ([this]() {
                 for (auto &cb : cbacks)
                 {
                     cb ();
@@ -115,19 +115,19 @@ class helicsCLI11App : public CLI::App
     void addTypeOption ()
     {
         auto og = add_option_group ("network type")->immediate_callback ();
-        og->add_option_function<std::string> (
-          "--coretype,-t,--type,--core",
-          [this] (const std::string &val) {
-              coreType = helics::coreTypeFromString (val);
-              if (coreType == core_type::UNRECOGNIZED)
-                  throw CLI::ValidationError (val + " is NOT a recognized core type");
-          },
-          "type of the core to connect to");
+        og->add_option_function<std::string> ("--coretype,-t,--type,--core",
+                                              [this](const std::string &val) {
+                                                  coreType = helics::coreTypeFromString (val);
+                                                  if (coreType == core_type::UNRECOGNIZED)
+                                                      throw CLI::ValidationError (
+                                                        val + " is NOT a recognized core type");
+                                              },
+                                              "type of the core to connect to");
     }
     core_type getCoreType () const { return coreType; }
 
   private:
-    std::vector<std::function<void ()>> cbacks;
+    std::vector<std::function<void()>> cbacks;
     std::vector<std::string> remArgs;
     core_type coreType{core_type::DEFAULT};
 };

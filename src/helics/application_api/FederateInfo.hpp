@@ -37,7 +37,7 @@ class FederateInfo : public CoreFederateInfo
     @details calls /ref loadInfoFromArgs in the constructor
     @param args a string containing the command line arguments
     */
-    FederateInfo (const std::string &args);
+    explicit FederateInfo (const std::string &args);
     /** load a federateInfo object from command line arguments
     @details calls /ref loadInfoFromArgs in the constructor
     @param argc the number of arguments
@@ -49,7 +49,7 @@ class FederateInfo : public CoreFederateInfo
     @param argc the number of arguments
     @param argv an array of char * pointers to the arguments
     */
-    FederateInfo (std::vector<std::string> &args);
+    explicit FederateInfo (std::vector<std::string> &args);
     /** load a federateInfo object from command line arguments outside the constructor
    @param args a string containing the command line arguments
    */

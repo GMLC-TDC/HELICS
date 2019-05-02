@@ -30,7 +30,7 @@ class Echo : public App
     /** construct from command line arguments
    @param args a vector of command line arguments
    */
-    Echo (std::vector<std::string> args);
+    explicit Echo (std::vector<std::string> args);
     /** construct from command line arguments
     @param argc the number of arguments
     @param argv the strings in the input
