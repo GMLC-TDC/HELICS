@@ -50,7 +50,6 @@ void Tracer::processArgs ()
         {
             loadFile (masterFileName);
         }
-        std::cout << "Skiplog is " << (skiplog ? std::string ("active") : std::string ("deactivated")) << "\n";
     }
     else if (helpMode)
     {

@@ -70,9 +70,7 @@ set(
 set(
   helics_public_common
   timeRepresentation.hpp
-  argParser.h
   JsonProcessingFunctions.hpp
-  stringToCmdLine.h
   AsioContextManager.h
   logger.h
   stringOps.h

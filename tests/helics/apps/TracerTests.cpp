@@ -655,7 +655,6 @@ BOOST_DATA_TEST_CASE (simple_tracer_test_message_files_exe,
 
     cfed.finalize ();
     std::string outAct = out.get ();
-    std::cout << outAct << std::endl;
     int mcount = 0;
     int valcount = 0;
     auto vec = stringOps::splitline (outAct, "\n\r", stringOps::delimiter_compression::on);
