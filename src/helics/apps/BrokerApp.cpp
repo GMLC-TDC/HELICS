@@ -19,8 +19,10 @@ namespace apps
 BrokerApp::BrokerApp (core_type ctype, std::vector<std::string> args) : type (ctype)
 {
     auto app = generateParser ();
-    app->helics_parse (std::move (args));
-    processArgs (app);
+    if (app->helics_parse (std::move (args)) == helicsCLI11App::parse_return::ok)
+    {
+        processArgs (app);
+    }
 }
 
 BrokerApp::BrokerApp (std::vector<std::string> args) : BrokerApp (core_type::ZMQ, std::move (args)) {}
@@ -28,8 +30,10 @@ BrokerApp::BrokerApp (std::vector<std::string> args) : BrokerApp (core_type::ZMQ
 BrokerApp::BrokerApp (core_type ctype, int argc, char *argv[]) : type (ctype)
 {
     auto app = generateParser ();
-    app->helics_parse (argc, argv);
-    processArgs (app);
+    if (app->helics_parse (argc, argv) == helicsCLI11App::parse_return::ok)
+    {
+        processArgs (app);
+    }
 }
 
 BrokerApp::BrokerApp (int argc, char *argv[]) : BrokerApp (core_type::ZMQ, argc, argv) {}
@@ -37,8 +41,10 @@ BrokerApp::BrokerApp (int argc, char *argv[]) : BrokerApp (core_type::ZMQ, argc,
 BrokerApp::BrokerApp (core_type ctype, const std::string &argString) : type (ctype)
 {
     auto app = generateParser ();
-    app->helics_parse (argString);
-    processArgs (app);
+    if (app->helics_parse (argString) == helicsCLI11App::parse_return::ok)
+    {
+        processArgs (app);
+    }
 }
 
 BrokerApp::BrokerApp (const std::string &argString) : BrokerApp (core_type::ZMQ, argString) {}
@@ -61,6 +67,10 @@ std::unique_ptr<helicsCLI11App> BrokerApp::generateParser ()
     app->addTypeOption ();
     app->add_option ("--name,-n", name, "name of the broker");
     app->allow_extras ();
+    app->footer ([] () {
+        BrokerFactory::displayHelp ();
+        return std::string ();
+    });
     return app;
 }
 

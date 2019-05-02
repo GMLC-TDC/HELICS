@@ -109,7 +109,7 @@ App::~App () = default;
 
 std::unique_ptr<helicsCLI11App> App::generateParser ()
 {
-    auto app = std::make_unique<helicsCLI11App> ("helics App Parser");
+    auto app = std::make_unique<helicsCLI11App> ("common options for all Helics Apps", "helics App");
 
     app->add_flag ("--local", useLocal,
                    "specify otherwise unspecified endpoints and publications as local( "

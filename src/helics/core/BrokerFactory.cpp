@@ -358,7 +358,7 @@ static const std::string helpStr{"--help"};
 
 void displayHelp (core_type type)
 {
-    if (type == core_type::DEFAULT)
+    if (type == core_type::DEFAULT || type == core_type::UNRECOGNIZED)
     {
         std::cout << "All core types have similar options\n";
         auto brk = makeBroker (core_type::ZMQ, emptyString);

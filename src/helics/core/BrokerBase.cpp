@@ -88,6 +88,22 @@ std::shared_ptr<helicsCLI11App> BrokerBase::generateCLI ()
     hApp->remove_helics_specifics ();
     return hApp;
 }
+
+static const std::map<std::string, int> log_level_map{{"none", helics_log_level_no_print},
+                                                      {"no_print", helics_log_level_no_print},
+                                                      {"error", helics_log_level_error},
+                                                      {"warning", helics_log_level_warning},
+                                                      {"summary", helics_log_level_summary},
+                                                      {"connections", helics_log_level_connections},
+                                                      /** connections+ interface definitions*/
+                                                      {"interfaces", helics_log_level_interfaces},
+                                                      /** interfaces + timing message*/
+                                                      {"timing", helics_log_level_timing},
+                                                      /** timing+ data transfer notices*/
+                                                      {"data", helics_log_level_data},
+                                                      /** all internal messages*/
+                                                      {"trace", helics_log_level_trace}};
+
 std::shared_ptr<helicsCLI11App> BrokerBase::generateBaseCLI ()
 {
     auto hApp = std::make_shared<helicsCLI11App> ("Arguments applying to all Brokers and Cores");
@@ -106,14 +122,18 @@ std::shared_ptr<helicsCLI11App> BrokerBase::generateBaseCLI ()
     logging_group->add_option ("--logfile", logFile, "the file to log the messages to")->ignore_underscore ();
     logging_group
       ->add_option_function<int> (
-        "--loglevel", [this] (int val) { setLogLevel (val); },
+        "--log_level,--log-level", [this] (int val) { setLogLevel (val); },
         "the level which to log the higher this is set to the more gets logs(-1) for no logging")
-      ->ignore_underscore ();
+      ->ignore_underscore ()
+      ->transform (CLI::CheckedTransformer (&log_level_map, CLI::ignore_case, CLI::ignore_underscore));
+
     logging_group->add_option ("--fileloglevel", fileLogLevel, "the level at which messages get sent to the file")
-      ->ignore_underscore ();
+      ->ignore_underscore ()
+      ->transform (CLI::CheckedTransformer (&log_level_map, CLI::ignore_case, CLI::ignore_underscore));
     logging_group
       ->add_option ("--consoleloglevel", consoleLogLevel, "the level at which messages get sent to the file")
-      ->ignore_underscore ();
+      ->ignore_underscore ()
+      ->transform (CLI::CheckedTransformer (&log_level_map, CLI::ignore_case, CLI::ignore_underscore));
     logging_group->add_flag (
       "--dumplog", dumplog,
       "capture a record of all messages and dump a complete log to file or console on termination");

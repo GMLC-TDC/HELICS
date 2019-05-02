@@ -38,8 +38,13 @@ int main (int argc, char *argv[])
     cmdLine.add_flag ("--autorestart", autorestart,
                       "helics_broker autorestart <broker args ...> will start a continually regenerating broker "
                       "there is a 3 second countdown on broker completion to halt the program via ctrl-C\n");
-    cmdLine.footer ("helics_broker <broker args ..> starts a broker with the given args and waits for it to "
-                    "complete\n");
+    cmdLine
+      .footer ("helics_broker <broker args ..> starts a broker with the given args and waits for it to "
+               "complete\n")
+      ->footer ([] () {
+          helics::apps::BrokerApp ("-?");
+          return std::string{};
+      });
     cmdLine.allow_extras ();
     auto res = cmdLine.helics_parse (argc, argv);
     if (res != helics::helicsCLI11App::parse_return::ok)
@@ -187,7 +192,7 @@ void terminalFunction (std::vector<std::string> args)
       ->callback ([&cmdcont] () { cmdcont = false; });
     termProg.add_subcommand ("terminate", "terminate the broker")->callback (closeBroker);
 
-    termProg.add_subcommand ("terminate!", "force terminate the broker and exit")
+    termProg.add_subcommand ("terminate!", "forceably terminate the broker and exit")
       ->callback ([closeBroker, &cmdcont] () {
           cmdcont = false;
           closeBroker ();
@@ -198,7 +203,8 @@ void terminalFunction (std::vector<std::string> args)
     restart->callback (
       [restartBroker, &restart] () { restartBroker (restart->remaining_for_passthrough (), false); });
 
-    auto frestart = termProg.add_subcommand ("restart!", "terminate the broker and restart it")->allow_extras ();
+    auto frestart =
+      termProg.add_subcommand ("restart!", "forceably terminate the broker and restart it")->allow_extras ();
     frestart->callback (
       [restartBroker, &restart] () { restartBroker (restart->remaining_for_passthrough (), true); });
 
@@ -208,7 +214,9 @@ void terminalFunction (std::vector<std::string> args)
     termProg.add_subcommand ("info", "get the current broker status and connection info")->callback ([&status] () {
         status (true);
     });
-
+    termProg.add_subcommand ("help", "display the help")->callback ([&termProg] () {
+        termProg.helics_parse ("-?");
+    });
     std::string target;
     std::string query;
 
@@ -253,6 +261,6 @@ void terminalFunction (std::vector<std::string> args)
         std::string cmdin;
         std::cout << "\nhelics>>";
         std::getline (std::cin, cmdin);
-        termProg.parse (cmdin);
+        termProg.helics_parse (cmdin);
     }
 }
