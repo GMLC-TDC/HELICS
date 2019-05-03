@@ -649,7 +649,8 @@ std::unique_ptr<Message> Recorder::getMessage (int index) const
 /** save the data to a file*/
 void Recorder::saveFile (const std::string &filename)
 {
-    auto ext = filename.substr (filename.find_last_of ('.'));
+    auto lastP = filename.find_last_of ('.');
+    auto ext = (lastP != std::string::npos) ? filename.substr (lastP) : std::string{};
     if ((ext == ".json") || (ext == ".JSON"))
     {
         writeJsonFile (filename);
@@ -669,7 +670,6 @@ std::shared_ptr<helicsCLI11App> Recorder::buildArgParserApp ()
     app->add_flag ("--verbose", verbose, "print all value results to the screen");
     app->add_option ("--mapfile", mapfile, "write progress to a map file for concurrent progress monitoring");
 
-    outFileName = "out.txt";
     app->add_option ("--output,-o", outFileName, "the output file for recording the data", true);
 
     auto clone_group =
