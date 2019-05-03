@@ -26,9 +26,6 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <set>
 #include <stdexcept>
 #include <thread>
-#include <boost/filesystem.hpp>
-
-namespace filesystem = boost::filesystem;
 
 namespace helics
 {
@@ -652,7 +649,7 @@ std::unique_ptr<Message> Recorder::getMessage (int index) const
 /** save the data to a file*/
 void Recorder::saveFile (const std::string &filename)
 {
-    auto ext = filesystem::path (filename).extension ().string ();
+    auto ext = filename.substr (filename.find_last_of ('.'));
     if ((ext == ".json") || (ext == ".JSON"))
     {
         writeJsonFile (filename);

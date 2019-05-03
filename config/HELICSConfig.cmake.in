@@ -56,11 +56,6 @@ set(CMAKE_MODULE_PATH ${PACKAGE_PREFIX_DIR}/@HELICS_CMAKECONFIG_INSTALL_DIR@)
 include(CMakeFindDependencyMacro)
 include(extraMacros)
 
-if (TARGET Boostlibs::core)
-else()
-	include(addBoost)
-endif()
-
 if (HELICS_HAVE_ZEROMQ)
 	if (NOT TARGET libzmq)
 		set(ZeroMQ_LIBRARY_ONLY ON)
@@ -93,12 +88,6 @@ if (NOT TARGET Threads::Threads)
 endif()
 
 include(${CMAKE_CURRENT_LIST_DIR}/helics-targets.cmake)
-
-get_target_property(_BOOST_SYSTEM_INCLUDE_DIR Boostlibs::core INTERFACE_SYSTEM_INCLUDE_DIRECTORIES)
-if(_BOOST_SYSTEM_INCLUDE_DIR)
-	set_property(TARGET HELICS::helics_base_includes APPEND PROPERTY INTERFACE_INCLUDE_DIRECTORIES ${_BOOST_SYSTEM_INCLUDE_DIR})
-endif()
-unset(_BOOST_SYSTEM_INCLUDE_DIR)
 
 if (TARGET HELICS::helicsSharedLib)
     if (NOT TARGET HELICS::helicsCpp98)
