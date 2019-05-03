@@ -151,5 +151,11 @@ inline bool lexical_cast<helics::Time> (std::string input, helics::Time &output)
     }
     return true;
 }
+
+template <>
+constexpr const char *type_name<helics::Time> ()
+{
+    return "TIME";
+}
 }  // namespace detail
 }  // namespace CLI

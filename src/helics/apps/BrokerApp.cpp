@@ -67,8 +67,10 @@ std::unique_ptr<helicsCLI11App> BrokerApp::generateParser ()
     app->addTypeOption ();
     app->add_option ("--name,-n", name, "name of the broker");
     app->allow_extras ();
-    app->footer ([] () {
-        BrokerFactory::displayHelp ();
+    auto app_p = app.get ();
+    app->footer ([app_p]() {
+        auto coreType = helics::coreTypeFromString ((*app_p)["--core"]->as<std::string> ());
+        BrokerFactory::displayHelp (coreType);
         return std::string ();
     });
     return app;
