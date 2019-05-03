@@ -404,6 +404,16 @@ target_include_directories(
 include(GNUInstallDirs)
 
 # -------------------------------------------------------------
+# Asio include directories
+# -------------------------------------------------------------
+target_compile_definitions(helics_base_includes INTERFACE "-DASIO_STANDALONE")
+target_include_directories(
+    helics_base_includes SYSTEM
+    INTERFACE
+        $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/ThirdParty/asio/asio/include>
+)
+
+# -------------------------------------------------------------
 # setting the RPATH
 # -------------------------------------------------------------
 # use, i.e. don't skip the full RPATH for the build tree
@@ -522,15 +532,17 @@ mark_as_advanced(ENABLE_DEBUG_LOGGING)
 # -----------------------------------------------------------------------------
 # create the fmt header only targets
 # -----------------------------------------------------------------------------
-set(FMT_ASSUME_CPP14_SUPPORT ON)
-set(FMT_SILENT ON)
-# get the FMT header only library
-add_subdirectory(ThirdParty/fmt EXCLUDE_FROM_ALL)
-hide_variable(FMT_DOC)
-hide_variable(FMT_INSTALL)
-hide_variable(FMT_PEDANTIC)
-hide_variable(FMT_TEST)
-hide_variable(FMT_WERROR)
+include(addfmt)
+
+# --------------------------------------------------------------
+#  Create the target for jsoncpp
+# -----------------------------------------------------------
+include(addJsoncpp)
+target_include_directories(
+    helics_base_includes SYSTEM
+    INTERFACE
+        $<BUILD_INTERFACE:${HELICS_SOURCE_DIR}/ThirdParty/jsoncpp/include>
+)
 
 # -----------------------------------------------------------------------------
 # CMAKE Subdirectories

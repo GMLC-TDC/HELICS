@@ -18,7 +18,9 @@ SPDX-License-Identifier: BSD-3-Clause
 */
 namespace helics
 {
-using identifier_type = uint32_t;
+using identifier_type = std::uint32_t;
+using std::int32_t;
+using std::int64_t;
 
 constexpr identifier_type invalid_id_value = static_cast<identifier_type> (-1);  //!< defining an invalid id value
 
@@ -476,13 +478,13 @@ constexpr double invalidValue<double> ()
 template <>
 constexpr int64_t invalidValue<int64_t> ()
 {
-    return std::numeric_limits<int64_t>::min ();
+    return (std::numeric_limits<int64_t>::min) ();
 }
 
 template <>
 constexpr uint64_t invalidValue<uint64_t> ()
 {
-    return std::numeric_limits<uint64_t>::max ();
+    return (std::numeric_limits<uint64_t>::max) ();
 }
 
 template <>

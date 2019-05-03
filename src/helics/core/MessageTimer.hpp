@@ -6,11 +6,11 @@ SPDX-License-Identifier: BSD-3-Clause
 */
 #pragma once
 
-#include "../common/AsioServiceManager.h"
+#include "../common/AsioContextManager.h"
 #include "ActionMessage.hpp"
 #include <memory>
 #include <mutex>
-#include <boost/asio/steady_timer.hpp>
+#include <asio/steady_timer.hpp>
 
 namespace helics
 {
@@ -48,11 +48,11 @@ class MessageTimer : public std::enable_shared_from_this<MessageTimer>
 
   private:
     std::mutex timerLock;  //!< lock protecting the timer buffers
-    std::vector<std::shared_ptr<boost::asio::steady_timer>> timers;
+    std::vector<std::shared_ptr<asio::steady_timer>> timers;
     const std::function<void(ActionMessage &&)> sendFunction;  //!< the callback to use when sending a message
     std::vector<ActionMessage> buffers;
     std::vector<time_type> expirationTimes;
-    std::shared_ptr<AsioServiceManager> servicePtr;  //!< service manager to for handling real time operations
-    decltype (servicePtr->startServiceLoop ()) loopHandle;  //!< loop controller for async real time operations
+    std::shared_ptr<AsioContextManager> contextPtr;  //!< context manager to for handling real time operations
+    decltype (contextPtr->startContextLoop ()) loopHandle;  //!< loop controller for async real time operations
 };
 }  // namespace helics

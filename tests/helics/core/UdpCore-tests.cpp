@@ -6,7 +6,7 @@ SPDX-License-Identifier: BSD-3-Clause
 */
 #include <boost/test/unit_test.hpp>
 
-#include "helics/common/AsioServiceManager.h"
+#include "helics/common/AsioContextManager.h"
 #include "helics/common/GuardedTypes.hpp"
 #include "helics/core/ActionMessage.hpp"
 #include "helics/core/BrokerFactory.hpp"
@@ -16,7 +16,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helics/core/udp/UdpBroker.h"
 #include "helics/core/udp/UdpComms.h"
 #include "helics/core/udp/UdpCore.h"
-#include <boost/asio/ip/udp.hpp>
+#include <asio/ip/udp.hpp>
 
 //#include "boost/process.hpp"
 #include <future>
@@ -26,7 +26,7 @@ using namespace std::literals::chrono_literals;
 
 BOOST_AUTO_TEST_SUITE (UdpCore_tests, *utf::label ("ci"))
 
-using boost::asio::ip::udp;
+using asio::ip::udp;
 using helics::Core;
 
 #define UDP_BROKER_PORT 23901
@@ -38,9 +38,9 @@ BOOST_AUTO_TEST_CASE (udpComms_broker_test)
     helics::udp::UdpComms comm;
     comm.loadTargetInfo (host, host);
 
-    auto srv = AsioServiceManager::getServicePointer ();
+    auto srv = AsioContextManager::getContextPointer ();
 
-    udp::socket rxSocket (AsioServiceManager::getService (), udp::endpoint (udp::v4 (), 23901));
+    udp::socket rxSocket (AsioContextManager::getContext (), udp::endpoint (udp::v4 (), 23901));
 
     comm.setCallback ([&counter](helics::ActionMessage /*m*/) { ++counter; });
     comm.setBrokerPort (UDP_BROKER_PORT);
@@ -50,8 +50,8 @@ BOOST_AUTO_TEST_CASE (udpComms_broker_test)
     std::vector<char> data (1024);
 
     udp::endpoint remote_endpoint;
-    boost::system::error_code error;
-    auto len = rxSocket.receive_from (boost::asio::buffer (data), remote_endpoint, 0, error);
+    asio::error_code error;
+    auto len = rxSocket.receive_from (asio::buffer (data), remote_endpoint, 0, error);
 
     BOOST_CHECK (!error);
     BOOST_CHECK_GT (len, 32);
@@ -59,7 +59,7 @@ BOOST_AUTO_TEST_CASE (udpComms_broker_test)
     helics::ActionMessage rM (data.data (), len);
     BOOST_CHECK (helics::isProtocolCommand (rM));
     rM.messageID = DISCONNECT;
-    rxSocket.send_to (boost::asio::buffer (rM.to_string ()), remote_endpoint, 0, error);
+    rxSocket.send_to (asio::buffer (rM.to_string ()), remote_endpoint, 0, error);
     BOOST_CHECK (!error);
     auto connected = confut.get ();
     BOOST_CHECK (!connected);
@@ -75,9 +75,9 @@ BOOST_AUTO_TEST_CASE (udpComms_broker_test_transmit)
     std::string host = "localhost";
     helics::udp::UdpComms comm;
     comm.loadTargetInfo (host, host);
-    auto srv = AsioServiceManager::getServicePointer ();
+    auto srv = AsioContextManager::getContextPointer ();
 
-    udp::socket rxSocket (AsioServiceManager::getService (), udp::endpoint (udp::v4 (), 23901));
+    udp::socket rxSocket (AsioContextManager::getContext (), udp::endpoint (udp::v4 (), 23901));
 
     BOOST_CHECK (rxSocket.is_open ());
     comm.setCallback ([&counter](helics::ActionMessage /*m*/) { ++counter; });
@@ -91,8 +91,8 @@ BOOST_AUTO_TEST_CASE (udpComms_broker_test_transmit)
     std::vector<char> data (1024);
 
     udp::endpoint remote_endpoint;
-    boost::system::error_code error;
-    auto len = rxSocket.receive_from (boost::asio::buffer (data), remote_endpoint, 0, error);
+    asio::error_code error;
+    auto len = rxSocket.receive_from (asio::buffer (data), remote_endpoint, 0, error);
 
     BOOST_CHECK_GT (len, 32);
     helics::ActionMessage rM (data.data (), len);
@@ -111,10 +111,10 @@ BOOST_AUTO_TEST_CASE (udpComms_rx_test)
     helics::udp::UdpComms comm;
     comm.loadTargetInfo (host, host);
 
-    auto srv = AsioServiceManager::getServicePointer ();
+    auto srv = AsioContextManager::getContextPointer ();
 
-    udp::resolver resolver (AsioServiceManager::getService ());
-    udp::socket rxSocket (AsioServiceManager::getService (), udp::endpoint (udp::v4 (), 23901));
+    udp::resolver resolver (AsioContextManager::getContext ());
+    udp::socket rxSocket (AsioContextManager::getContext (), udp::endpoint (udp::v4 (), 23901));
 
     BOOST_CHECK (rxSocket.is_open ());
     comm.setCallback ([&counter, &act](helics::ActionMessage m) {
@@ -135,7 +135,7 @@ BOOST_AUTO_TEST_CASE (udpComms_rx_test)
     helics::ActionMessage cmd (helics::CMD_ACK);
     std::string buffer = cmd.to_string ();
 
-    auto cnt = rxSocket.send_to (boost::asio::buffer (buffer), txendpoint);
+    auto cnt = rxSocket.send_to (asio::buffer (buffer), txendpoint);
     BOOST_REQUIRE_EQUAL (cnt, buffer.size ());
 
     std::this_thread::sleep_for (std::chrono::milliseconds (200));
@@ -295,8 +295,8 @@ BOOST_AUTO_TEST_CASE (udpCore_initialization_test)
 
     BOOST_REQUIRE (core != nullptr);
     BOOST_CHECK (core->isInitialized ());
-    auto srv = AsioServiceManager::getServicePointer ();
-    udp::socket rxSocket (AsioServiceManager::getService (), udp::endpoint (udp::v4 (), 23901));
+    auto srv = AsioContextManager::getContextPointer ();
+    udp::socket rxSocket (AsioContextManager::getContext (), udp::endpoint (udp::v4 (), 23901));
 
     BOOST_CHECK (rxSocket.is_open ());
 
@@ -306,9 +306,9 @@ BOOST_AUTO_TEST_CASE (udpCore_initialization_test)
     std::vector<char> data (1024);
 
     udp::endpoint remote_endpoint;
-    boost::system::error_code error;
+    asio::error_code error;
 
-    auto len = rxSocket.receive_from (boost::asio::buffer (data), remote_endpoint, 0, error);
+    auto len = rxSocket.receive_from (asio::buffer (data), remote_endpoint, 0, error);
     BOOST_REQUIRE (!error);
     BOOST_CHECK_GT (len, 32);
     helics::ActionMessage rM (data.data (), len);
@@ -316,7 +316,7 @@ BOOST_AUTO_TEST_CASE (udpCore_initialization_test)
     BOOST_CHECK_EQUAL (rM.name, "core1");
     BOOST_CHECK (rM.action () == helics::action_message_def::action_t::cmd_reg_broker);
     helics::ActionMessage resp (helics::CMD_PRIORITY_ACK);
-    rxSocket.send_to (boost::asio::buffer (resp.to_string ()), remote_endpoint, 0, error);
+    rxSocket.send_to (asio::buffer (resp.to_string ()), remote_endpoint, 0, error);
     BOOST_CHECK (!error);
     core->disconnect ();
     core = nullptr;

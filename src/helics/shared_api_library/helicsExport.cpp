@@ -21,8 +21,8 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "../core/helicsVersion.hpp"
 #include "helics/helics-config.h"
 #if HELICS_HAVE_ZEROMQ > 0
-#include "../common/cppzmq/zmq.hpp"
 #include "../common/zmqContextManager.h"
+#include "cppzmq/zmq.hpp"
 #endif
 
 const char *helicsGetVersion (void) { return helics::versionString; }

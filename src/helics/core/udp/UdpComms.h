@@ -11,24 +11,12 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <future>
 #include <set>
 
-#if (BOOST_VERSION_LEVEL >= 66)
-namespace boost
-{
+class AsioContextManager;
 namespace asio
 {
-class io_context;
-using io_service = io_context;
-}  // namespace asio
-}  // namespace boost
-#else
-namespace boost
-{
-namespace asio
-{
-class io_service;
-}  // namespace asio
-}  // namespace boost
-#endif
+    class io_context;
+} // namespace asio
+
 namespace helics
 {
 namespace udp

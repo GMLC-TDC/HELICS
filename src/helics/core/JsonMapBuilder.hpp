@@ -8,13 +8,13 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <map>
 #include <memory>
 
-namespace helics
-{
 namespace Json
 {
 class Value;
 }  // namespace Json
 
+namespace helics
+{
 /** class handling the construction in pieces of a JSON map*/
 class JsonMapBuilder
 {

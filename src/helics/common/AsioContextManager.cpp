@@ -16,7 +16,7 @@ SPDX-License-Identifier: BSD-3-Clause
  * LLNS Copyright End
  */
 
-#include "AsioServiceManager.h"
+#include "AsioContextManager.h"
 
 #include <chrono>
 #include <iostream>
@@ -26,36 +26,36 @@ SPDX-License-Identifier: BSD-3-Clause
 
 /** a storage system for the available core objects allowing references by name to the core
  */
-std::map<std::string, std::shared_ptr<AsioServiceManager>> AsioServiceManager::services;
+std::map<std::string, std::shared_ptr<AsioContextManager>> AsioContextManager::contexts;
 
 /** we expect operations on core object that modify the map to be rare but we absolutely need them to be thread
 safe so we are going to use a lock that is entirely controlled by this file*/
-static std::mutex serviceLock;
+static std::mutex contextLock;
 
-std::shared_ptr<AsioServiceManager> AsioServiceManager::getServicePointer (const std::string &serviceName)
+std::shared_ptr<AsioContextManager> AsioContextManager::getContextPointer (const std::string &contextName)
 {
-    std::shared_ptr<AsioServiceManager> servicePtr;
-    std::lock_guard<std::mutex> serveLock (serviceLock);  // just to ensure that nothing funny happens if you try
+    std::shared_ptr<AsioContextManager> contextPtr;
+    std::lock_guard<std::mutex> ctxlock (contextLock);  // just to ensure that nothing funny happens if you try
                                                           // to get a context while it is being constructed
-    auto fnd = services.find (serviceName);
-    if (fnd != services.end ())
+    auto fnd = contexts.find (contextName);
+    if (fnd != contexts.end ())
     {
-        servicePtr = fnd->second;
-        return servicePtr;
+        contextPtr = fnd->second;
+        return contextPtr;
     }
 
-    servicePtr = std::shared_ptr<AsioServiceManager> (new AsioServiceManager (serviceName));
-    services.emplace (serviceName, servicePtr);
-    return servicePtr;
+    contextPtr = std::shared_ptr<AsioContextManager> (new AsioContextManager (contextName));
+    contexts.emplace (contextName, contextPtr);
+    return contextPtr;
     // if it doesn't find it make a new one with the appropriate name
 }
 
-std::shared_ptr<AsioServiceManager> AsioServiceManager::getExistingServicePointer (const std::string &serviceName)
+std::shared_ptr<AsioContextManager> AsioContextManager::getExistingContextPointer (const std::string &contextName)
 {
-    std::lock_guard<std::mutex> serveLock (serviceLock);  // just to ensure that nothing funny happens if you try
+    std::lock_guard<std::mutex> ctxlock (contextLock);  // just to ensure that nothing funny happens if you try
                                                           // to get a context while it is being constructed
-    auto fnd = services.find (serviceName);
-    if (fnd != services.end ())
+    auto fnd = contexts.find (contextName);
+    if (fnd != contexts.end ())
     {
         return fnd->second;
     }
@@ -63,53 +63,53 @@ std::shared_ptr<AsioServiceManager> AsioServiceManager::getExistingServicePointe
     return nullptr;
 }
 
-boost::asio::io_service &AsioServiceManager::getService (const std::string &serviceName)
+asio::io_context &AsioContextManager::getContext (const std::string &contextName)
 {
-    return getServicePointer (serviceName)->getBaseService ();
+    return getContextPointer (contextName)->getBaseContext ();
 }
 
-boost::asio::io_service &AsioServiceManager::getExistingService (const std::string &serviceName)
+asio::io_context &AsioContextManager::getExistingContext (const std::string &contextName)
 {
-    auto ptr = getExistingServicePointer (serviceName);
+    auto ptr = getExistingContextPointer (contextName);
     if (ptr)
     {
-        return ptr->getBaseService ();
+        return ptr->getBaseContext ();
     }
-    throw (std::invalid_argument ("the service name specified was not available"));
+    throw (std::invalid_argument ("the context name specified was not available"));
 }
 
-void AsioServiceManager::closeService (const std::string &serviceName)
+void AsioContextManager::closeContext (const std::string &contextName)
 {
-    std::unique_lock<std::mutex> servelock (serviceLock);
-    auto fnd = services.find (serviceName);
-    //    std::cout << "closing service manager\n";
-    if (fnd != services.end ())
+    std::unique_lock<std::mutex> ctxlock (contextLock);
+    auto fnd = contexts.find (contextName);
+    //    std::cout << "closing context manager\n";
+    if (fnd != contexts.end ())
     {
         auto ptr = fnd->second;
-        services.erase (fnd);
-        servelock.unlock ();
+        contexts.erase (fnd);
+        ctxlock.unlock ();
         if (ptr->running)
         {
             std::lock_guard<std::mutex> nullLock (ptr->runningLoopLock);
             ptr->nullwork.reset ();
-            ptr->iserv->stop ();
+            ptr->ictx->stop ();
             ptr->loopRet.get ();
         }
     }
 }
 
-void AsioServiceManager::setServiceToLeakOnDelete (const std::string &serviceName)
+void AsioContextManager::setContextToLeakOnDelete (const std::string &contextName)
 {
-    std::lock_guard<std::mutex> servelock (serviceLock);
-    auto fnd = services.find (serviceName);
-    if (fnd != services.end ())
+    std::lock_guard<std::mutex> ctxlock (contextLock);
+    auto fnd = contexts.find (contextName);
+    if (fnd != contexts.end ())
     {
         fnd->second->leakOnDelete = true;
     }
 }
-AsioServiceManager::~AsioServiceManager ()
+AsioContextManager::~AsioContextManager ()
 {
-    //  std::cout << "deleting service manager\n";
+    //  std::cout << "deleting context manager\n";
 
     if (running)
     {
@@ -117,7 +117,7 @@ AsioServiceManager::~AsioServiceManager ()
         {
             std::lock_guard<std::mutex> nullLock (runningLoopLock);
             nullwork.reset ();
-            iserv->stop ();
+            ictx->stop ();
             loopRet.get ();
         }
         catch (...)
@@ -129,30 +129,30 @@ AsioServiceManager::~AsioServiceManager ()
         // yes I am purposefully leaking this PHILIP TOP
         // this capability is needed for some operations on particular OS's with the shared library operations that
         // will crash if this is closed before the library closes which really only happens at program termination
-        auto val = iserv.release ();
+        auto val = ictx.release ();
         (void)(val);
     }
 }
 
-AsioServiceManager::AsioServiceManager (const std::string &serviceName)
-    : name (serviceName), iserv (std::make_unique<boost::asio::io_service> ())
+AsioContextManager::AsioContextManager (const std::string &contextName)
+    : name (contextName), ictx (std::make_unique<asio::io_context> ())
 {
 }
 
-AsioServiceManager::LoopHandle AsioServiceManager::runServiceLoop (const std::string &serviceName)
+AsioContextManager::LoopHandle AsioContextManager::runContextLoop (const std::string &contextName)
 {
-    std::unique_lock<std::mutex> servelock (serviceLock);
-    auto fnd = services.find (serviceName);
-    if (fnd != services.end ())
+    std::unique_lock<std::mutex> ctxlock (contextLock);
+    auto fnd = contexts.find (contextName);
+    if (fnd != contexts.end ())
     {
         auto ptr = fnd->second;
-        servelock.unlock ();
-        return ptr->startServiceLoop ();
+        ctxlock.unlock ();
+        return ptr->startContextLoop ();
     }
-    throw (std::invalid_argument ("the service name specified was not available"));
+    throw (std::invalid_argument ("the context name specified was not available"));
 }
 
-AsioServiceManager::LoopHandle AsioServiceManager::startServiceLoop ()
+AsioContextManager::LoopHandle AsioContextManager::startContextLoop ()
 {
     ++runCounter;  // atomic
 
@@ -160,23 +160,23 @@ AsioServiceManager::LoopHandle AsioServiceManager::startServiceLoop ()
     if (running.compare_exchange_strong (exp, true))
     {
         auto ptr = shared_from_this ();
-        std::packaged_task<void()> serviceTask ([ptr = std::move (ptr)]() { serviceProcessingLoop (ptr); });
-        //   std::cout << "run Service loop " << runCounter << "\n";
+        std::packaged_task<void()> contextTask ([ptr = std::move (ptr)]() { contextProcessingLoop (ptr); });
+        //   std::cout << "run Context loop " << runCounter << "\n";
         std::unique_lock<std::mutex> nullLock (runningLoopLock);
 
-        nullwork = std::make_unique<boost::asio::io_service::work> (getBaseService ());
-        loopRet = serviceTask.get_future ();
+        nullwork = std::make_unique<asio::io_context::work> (getBaseContext ());
+        loopRet = contextTask.get_future ();
         nullLock.unlock ();
-        std::thread serviceThread (std::move (serviceTask));
-        serviceThread.detach ();
-        //  std::cout << "starting service loop thread " << runCounter << "\n";
+        std::thread contextThread (std::move (contextTask));
+        contextThread.detach ();
+        //  std::cout << "starting context loop thread " << runCounter << "\n";
     }
     else
     {
         std::unique_lock<std::mutex> nullLock (runningLoopLock);
-        if (getBaseService ().stopped ())
+        if (getBaseContext ().stopped ())
         {
-            // std::cout << "run Service loop already stopped" << runCounter << "\n";
+            // std::cout << "run Context loop already stopped" << runCounter << "\n";
             if (loopRet.valid ())
             {
                 loopRet.get ();
@@ -186,29 +186,29 @@ AsioServiceManager::LoopHandle AsioServiceManager::startServiceLoop ()
             if (running.compare_exchange_strong (exp, true))
             {
                 auto ptr = shared_from_this ();
-                std::packaged_task<void()> serviceTask (
-                  [ptr = std::move (ptr)]() { serviceProcessingLoop (ptr); });
+                std::packaged_task<void()> contextTask (
+                  [ptr = std::move (ptr)]() { contextProcessingLoop (ptr); });
                 nullLock.lock ();
-                nullwork = std::make_unique<boost::asio::io_service::work> (getBaseService ());
-                loopRet = serviceTask.get_future ();
+                nullwork = std::make_unique<asio::io_context::work> (getBaseContext ());
+                loopRet = contextTask.get_future ();
                 nullLock.unlock ();
-                std::thread serviceThread (std::move (serviceTask));
-                serviceThread.detach ();
+                std::thread contextThread (std::move (contextTask));
+                contextThread.detach ();
             }
         }
     }
     return std::make_unique<Servicer> (shared_from_this ());
 }
 
-void AsioServiceManager::haltServiceLoop ()
+void AsioContextManager::haltContextLoop ()
 {
     if (running.load ())
     {
-        // std::cout << "service loop halted "<<ptr->runCounter<<"\n";
+        // std::cout << "context loop halted "<<ptr->runCounter<<"\n";
         if (--runCounter <= 0)
         {
             std::lock_guard<std::mutex> nullLock (runningLoopLock);
-            //    std::cout << "calling halt on service loop \n";
+            //    std::cout << "calling halt on context loop \n";
 
             if (runCounter <= 0)
             {
@@ -216,7 +216,7 @@ void AsioServiceManager::haltServiceLoop ()
                 {
                     terminateLoop = true;
                     nullwork.reset ();
-                    iserv->stop ();
+                    ictx->stop ();
                     int lcnt = 0;
                     while (loopRet.wait_for (std::chrono::milliseconds (0)) == std::future_status::timeout)
                     {
@@ -228,11 +228,11 @@ void AsioServiceManager::haltServiceLoop ()
                         {
                             std::this_thread::sleep_for (std::chrono::milliseconds (50));
                             ++lcnt;
-                            iserv->stop ();
+                            ictx->stop ();
                         }
                     }
                     loopRet.get ();
-                    iserv->reset ();  // prepare for future runs
+                    ictx->reset ();  // prepare for future runs
                     terminateLoop = false;
                 }
             }
@@ -244,33 +244,33 @@ void AsioServiceManager::haltServiceLoop ()
     }
 }
 
-void serviceProcessingLoop (std::shared_ptr<AsioServiceManager> ptr)
+void contextProcessingLoop (std::shared_ptr<AsioContextManager> ptr)
 {
     while ((ptr->runCounter > 0) && (!(ptr->terminateLoop)))
     {
         auto clk = std::chrono::steady_clock::now ();
         try
         {
-            ptr->iserv->run ();
+            ptr->ictx->run ();
         }
-        catch (const boost::system::system_error &se)
+        catch (const std::system_error &se)
         {
             auto nclk = std::chrono::steady_clock::now ();
-            std::cerr << "boost system error in service loop " << se.what () << " ran for "
+            std::cerr << "asio system error in context loop " << se.what () << " ran for "
                       << (nclk - clk).count () / 1000000 << "ms" << std::endl;
         }
         catch (const std::exception &e)
         {
             auto nclk = std::chrono::steady_clock::now ();
-            std::cerr << "std::exception in service loop " << e.what () << " ran for "
+            std::cerr << "std::exception in context loop " << e.what () << " ran for "
                       << (nclk - clk).count () / 1000000 << "ms" << std::endl;
         }
         catch (...)
         {
-            std::cout << "caught other error in service loop" << std::endl;
+            std::cout << "caught other error in context loop" << std::endl;
         }
     }
 
-    //   std::cout << "service loop stopped\n";
+    //   std::cout << "context loop stopped\n";
     ptr->running.store (false);
 }

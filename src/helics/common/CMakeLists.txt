@@ -1,7 +1,7 @@
 #
 # Copyright © 2017-2019, Battelle Memorial Institute; Lawrence Livermore National
-# Security, LLC; Alliance for Sustainable Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved. 
-# 
+# Security, LLC; Alliance for Sustainable Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
+#
 # SPDX-License-Identifier: BSD-3-Clause
 #
 
@@ -19,7 +19,7 @@ set(
   JsonProcessingFunctions.hpp
   TomlProcessingFunctions.hpp
   stringToCmdLine.h
-  AsioServiceManager.h
+  AsioContextManager.h
   logger.h
   stringOps.h
   MapTraits.hpp
@@ -41,7 +41,7 @@ set(
 set(
   common_sources
   stringToCmdLine.cpp
-  AsioServiceManager.cpp
+  AsioContextManager.cpp
   JsonProcessingFunctions.cpp
   TomlProcessingFunctions.cpp
   logger.cpp
@@ -55,11 +55,10 @@ set(
 
 set(
   zmq_headers
-  # zmqReactor.h
-  zmqContextManager.h zmqHelper.h
-  # zmqSocketDescriptor.h
-  # zmqProxyHub.h
-  cppzmq/zmq.hpp cppzmq/zmq_addon.hpp
+  zmqContextManager.h 
+  zmqHelper.h
+  ${CMAKE_SOURCE_DIR}/ThirdParty/cppzmq/zmq.hpp 
+  ${CMAKE_SOURCE_DIR}/ThirdParty/cppzmq/zmq_addon.hpp
 )
 
 set(
@@ -78,8 +77,7 @@ set(
   argParser.h
   JsonProcessingFunctions.hpp
   stringToCmdLine.h
-  AsioServiceManager.h
-  AsioServiceManagerFwd.hpp
+  AsioContextManager.h
   logger.h
   stringOps.h
   MapTraits.hpp
@@ -91,8 +89,6 @@ if(HELICS_HAVE_ZEROMQ)
   list(APPEND common_headers ${zmq_headers})
   list(APPEND common_sources ${zmq_sources})
 endif(HELICS_HAVE_ZEROMQ)
-
-list(APPEND common_sources ${PROJECT_SOURCE_DIR}/ThirdParty/jsoncpp.cpp)
 
 add_library(helics_common OBJECT ${common_sources} ${common_headers})
 set_target_properties(helics_common PROPERTIES LINKER_LANGUAGE CXX)

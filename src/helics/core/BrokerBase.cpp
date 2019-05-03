@@ -7,7 +7,7 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include "BrokerBase.hpp"
 
-#include "../common/AsioServiceManager.h"
+#include "../common/AsioContextManager.h"
 #include "../common/argParser.h"
 #include "../common/logger.h"
 
@@ -18,7 +18,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <iostream>
 #include <libguarded/guarded.hpp>
 #include <random>
-#include <boost/asio/steady_timer.hpp>
+#include <asio/steady_timer.hpp>
 
 static constexpr auto chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
 
@@ -305,7 +305,7 @@ void BrokerBase::addActionMessage (ActionMessage &&m)
 
 using activeProtector = libguarded::guarded<std::pair<bool, bool>>;
 
-static void haltTimer (activeProtector &active, boost::asio::steady_timer &tickTimer)
+static void haltTimer (activeProtector &active, asio::steady_timer &tickTimer)
 {
     bool TimerRunning = true;
     {
@@ -328,12 +328,12 @@ static void haltTimer (activeProtector &active, boost::asio::steady_timer &tickT
     }
 }
 
-static void timerTickHandler (BrokerBase *bbase, activeProtector &active, const boost::system::error_code &error)
+static void timerTickHandler (BrokerBase *bbase, activeProtector &active, const std::error_code &error)
 {
     auto p = active.lock ();
     if (p->first)
     {
-        if (error != boost::asio::error::operation_aborted)
+        if (error != asio::error::operation_aborted)
         {
             try
             {
@@ -366,12 +366,12 @@ void BrokerBase::queueProcessingLoop ()
     }
     std::vector<ActionMessage> dumpMessages;
 
-    auto serv = AsioServiceManager::getServicePointer ();
-    auto serviceLoop = serv->startServiceLoop ();
-    boost::asio::steady_timer ticktimer (serv->getBaseService ());
+    auto serv = AsioContextManager::getContextPointer ();
+    auto contextLoop = serv->startContextLoop ();
+    asio::steady_timer ticktimer (serv->getBaseContext ());
     activeProtector active (true, false);
 
-    auto timerCallback = [this, &active](const boost::system::error_code &ec) {
+    auto timerCallback = [this, &active](const std::error_code &ec) {
         timerTickHandler (this, active, ec);
     };
     if (tickTimer > 0)
@@ -400,7 +400,7 @@ void BrokerBase::queueProcessingLoop ()
     if (haltOperations)
     {
         haltTimer (active, ticktimer);
-        serviceLoop = nullptr;
+        contextLoop = nullptr;
         mainLoopIsRunning.store (false);
         return;
     }
@@ -426,8 +426,8 @@ void BrokerBase::queueProcessingLoop ()
         case CMD_TICK:
             if (checkActionFlag (command, error_flag))
             {
-                serviceLoop = nullptr;
-                serviceLoop = serv->startServiceLoop ();
+                contextLoop = nullptr;
+                contextLoop = serv->startContextLoop ();
             }
             if (messagesSinceLastTick == 0)
             {
@@ -447,7 +447,7 @@ void BrokerBase::queueProcessingLoop ()
             break;
         case CMD_TERMINATE_IMMEDIATELY:
             haltTimer (active, ticktimer);
-            serviceLoop = nullptr;
+            contextLoop = nullptr;
             mainLoopIsRunning.store (false);
             logDump ();
             {
@@ -465,7 +465,7 @@ void BrokerBase::queueProcessingLoop ()
             return;  // immediate return
         case CMD_STOP:
             haltTimer (active, ticktimer);
-            serviceLoop = nullptr;
+            contextLoop = nullptr;
             if (!haltOperations)
             {
                 processCommand (std::move (command));

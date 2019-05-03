@@ -21,7 +21,7 @@ add_library(
   $<TARGET_OBJECTS:helics_common>
 )
 
-target_link_libraries(helics-static PUBLIC helics_base helics_base_includes)
+target_link_libraries(helics-static PUBLIC helics_base helics_base_includes jsoncpp_lib)
 # add and alias library to match the find_package
 add_library(HELICS::helics-static ALIAS helics-static)
 
@@ -36,7 +36,7 @@ if(BUILD_SHARED_LIBS)
   )
 
   add_library(HELICS::helics-shared ALIAS helics-shared)
-  target_link_libraries(helics-shared PRIVATE helics_base helics_base_includes)
+  target_link_libraries(helics-shared PRIVATE helics_base helics_base_includes jsoncpp_lib)
 
   if(WIN32)
     set_target_properties(helics-shared PROPERTIES WINDOWS_EXPORT_ALL_SYMBOLS TRUE)

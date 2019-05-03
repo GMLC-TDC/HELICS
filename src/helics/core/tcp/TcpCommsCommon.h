@@ -12,13 +12,18 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "TcpHelperClasses.h"
 #include <chrono>
 
-#include "../../common/AsioServiceManagerFwd.hpp"
+class AsioContextManager;
+namespace asio
+{
+    class io_context;
+} // namespace asio
+
 namespace helics
 {
 namespace tcp
 {
 /** establish a connection to a server by as associated timeout*/
-TcpConnection::pointer makeConnection (boost::asio::io_service &io_service,
+TcpConnection::pointer makeConnection (asio::io_context &io_context,
                                        const std::string &connection,
                                        const std::string &port,
                                        size_t bufferSize,

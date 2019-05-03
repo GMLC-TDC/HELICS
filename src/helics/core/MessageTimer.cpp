@@ -11,17 +11,17 @@ SPDX-License-Identifier: BSD-3-Clause
 namespace helics
 {
 MessageTimer::MessageTimer (std::function<void(ActionMessage &&)> sFunction)
-    : sendFunction (std::move (sFunction)), servicePtr (AsioServiceManager::getServicePointer ())
+    : sendFunction (std::move (sFunction)), contextPtr (AsioContextManager::getContextPointer ())
 {
     //  std::cout << "getting loop handle for timer" << std::endl;
-    loopHandle = servicePtr->startServiceLoop ();
+    loopHandle = contextPtr->startContextLoop ();
     // std::cout << "got loop handle for timer" << std::endl;
 }
 
 static void
-processTimerCallback (std::shared_ptr<MessageTimer> mtimer, int32_t index, const boost::system::error_code &ec)
+processTimerCallback (std::shared_ptr<MessageTimer> mtimer, int32_t index, const std::error_code &ec)
 {
-    if (ec != boost::asio::error::operation_aborted)
+    if (ec != asio::error::operation_aborted)
     {
         try
         {
@@ -42,11 +42,11 @@ int32_t MessageTimer::addTimerFromNow (std::chrono::nanoseconds time, ActionMess
 int32_t MessageTimer::addTimer (time_type expirationTime, ActionMessage mess)
 {
     // these two calls need to be before the lock
-    auto timer = std::make_shared<boost::asio::steady_timer> (servicePtr->getBaseService ());
+    auto timer = std::make_shared<asio::steady_timer> (contextPtr->getBaseContext ());
     timer->expires_at (expirationTime);
     std::lock_guard<std::mutex> lock (timerLock);
     auto index = static_cast<int32_t> (timers.size ());
-    auto timerCallback = [ptr = shared_from_this (), index](const boost::system::error_code &ec) {
+    auto timerCallback = [ptr = shared_from_this (), index](const std::error_code &ec) {
         processTimerCallback (ptr, index, ec);
     };
 
@@ -86,7 +86,7 @@ void MessageTimer::updateTimer (int32_t timerIndex, time_type expirationTime, Ac
     if ((timerIndex >= 0) && (timerIndex < static_cast<int32_t> (timers.size ())))
     {
         timers[timerIndex]->expires_at (expirationTime);
-        auto timerCallback = [ptr = shared_from_this (), timerIndex](const boost::system::error_code &ec) {
+        auto timerCallback = [ptr = shared_from_this (), timerIndex](const std::error_code &ec) {
             processTimerCallback (ptr, timerIndex, ec);
         };
         expirationTimes[timerIndex] = expirationTime;
@@ -102,7 +102,7 @@ bool MessageTimer::addTimeToTimer (int32_t timerIndex, std::chrono::nanoseconds 
     {
         auto newTime = timers[timerIndex]->expires_at () + time;
         timers[timerIndex]->expires_at (newTime);
-        auto timerCallback = [ptr = shared_from_this (), timerIndex](const boost::system::error_code &ec) {
+        auto timerCallback = [ptr = shared_from_this (), timerIndex](const std::error_code &ec) {
             processTimerCallback (ptr, timerIndex, ec);
         };
         expirationTimes[timerIndex] = newTime;
@@ -119,7 +119,7 @@ bool MessageTimer::updateTimer (int32_t timerIndex, time_type expirationTime)
     if ((timerIndex >= 0) && (timerIndex < static_cast<int32_t> (timers.size ())))
     {
         timers[timerIndex]->expires_at (expirationTime);
-        auto timerCallback = [ptr = shared_from_this (), timerIndex](const boost::system::error_code &ec) {
+        auto timerCallback = [ptr = shared_from_this (), timerIndex](const std::error_code &ec) {
             processTimerCallback (ptr, timerIndex, ec);
         };
         expirationTimes[timerIndex] = expirationTime;
