@@ -11,20 +11,17 @@ steps:
   commands:
   - uname -a
 
+- name: submodules
+  image: docker:git
+  commands:
+  - git submodule update --recursive --remote
+
 - name: build
   image: alpine
   commands:
   - apk update
   - apk add --no-cache alpine-sdk cmake boost-dev zeromq swig
   - gcc --version
-  - cmake --version
-  - git --version
-
-- name: env check2
-  image: alpine
-  commands:
-  - gcc --version
-  - clang --version
   - cmake --version
   - git --version
 
@@ -41,6 +38,11 @@ steps:
   image: alpine
   commands:
   - uname -a
+
+- name: submodules
+  image: docker:git
+  commands:
+  - git submodule update --recursive --remote
 
 - name: build
   image: alpine
