@@ -20,13 +20,13 @@ steps:
   image: alpine
   commands:
   - apk update
-  - apk add --no-cache clang-dev build-base git bash cmake ninja boost-dev zeromq-dev swig
+  - apk add --no-cache build-base git bash cmake ninja boost-dev zeromq-dev swig
   - gcc --version || echo "gcc not installed"
   - clang --version || echo "clang not installed"
   - cmake --version
   - git --version
   - mkdir build && cd build
-  - cmake -GNinja -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_BUILD_TYPE=Release ..
+  - cmake -GNinja ..
   - cmake --build .
   - ctest -L Continuous --output-on-failure
 
@@ -53,12 +53,12 @@ steps:
   image: alpine
   commands:
   - apk update
-  - apk add --no-cache clang-dev build-base git bash cmake ninja boost-dev zeromq-dev swig
+  - apk add --no-cache build-base git bash cmake ninja boost-dev zeromq-dev swig
   - gcc --version || echo "gcc not installed"
   - clang --version || echo "clang not installed"
   - cmake --version
   - git --version
   - mkdir build && cd build
-  - cmake -GNinja -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_BUILD_TYPE=Release ..
+  - cmake -GNinja ..
   - cmake --build .
   - ctest -L Continuous --output-on-failure
