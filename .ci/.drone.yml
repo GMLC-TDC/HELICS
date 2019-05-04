@@ -21,7 +21,7 @@ steps:
   commands:
   - apk update
   - apk add --no-cache clang-dev git bash cmake ninja boost-dev zeromq-dev swig
-  - gcc --version
+  - gcc --version || clang --version
   - cmake --version
   - git --version
   - mkdir build && cd build
@@ -53,7 +53,7 @@ steps:
   commands:
   - apk update
   - apk add --no-cache clang-dev git bash cmake ninja boost-dev zeromq-dev swig
-  - gcc --version
+  - gcc --version || clang --version
   - cmake --version
   - git --version
   - mkdir build && cd build
