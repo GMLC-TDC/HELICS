@@ -20,10 +20,13 @@ steps:
   image: alpine
   commands:
   - apk update
-  - apk add --no-cache alpine-sdk cmake boost-dev zeromq swig
+  - apk add --no-cache alpine-sdk cmake boost-dev libzmq swig
   - gcc --version
   - cmake --version
   - git --version
+  - mkdir build && cd build
+  - cmake ..
+  - cmake --build . --parallel 100
 
 ---
 kind: pipeline
@@ -49,5 +52,9 @@ steps:
   commands:
   - apk update
   - apk add --no-cache alpine-sdk cmake boost-dev libzmq swig
+  - gcc --version
+  - cmake --version
+  - git --version
   - mkdir build && cd build
   - cmake ..
+  - cmake --build . --parallel 100
