@@ -14,7 +14,7 @@ steps:
 - name: submodules
   image: docker:git
   commands:
-  - git submodule update --recursive --remote
+  - git submodule update --init --recursive --remote
 
 - name: build
   image: alpine
@@ -42,7 +42,7 @@ steps:
 - name: submodules
   image: docker:git
   commands:
-  - git submodule update --recursive --remote
+  - git submodule update --init --recursive --remote
 
 - name: build
   image: alpine
