@@ -25,7 +25,7 @@ steps:
   - cmake --version
   - git --version
   - mkdir build && cd build
-  - cmake ..
+  - cmake -DCMAKE_BUILD_TYPE=Release ..
   - cmake --build . --parallel 100
   - ctest -L Continuous --output-on-failure
 
@@ -57,6 +57,6 @@ steps:
   - cmake --version
   - git --version
   - mkdir build && cd build
-  - cmake ..
+  - cmake -DCMAKE_BUILD_TYPE=Release ..
   - cmake --build . --parallel 100
   - ctest -L Continuous --output-on-failure
