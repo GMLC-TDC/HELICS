@@ -1,0 +1,56 @@
+kind: pipeline
+name: arm
+
+platform:
+  os: linux
+  arch: arm
+
+steps:
+- name: uname
+  image: alpine
+  commands:
+  - uname -a
+
+- name: en
+  image: alpine
+  commands:
+  - echo hello
+  - echo world
+
+- name: es
+  image: alpine
+  commands:
+  - echo hola
+  - echo mundo
+
+- name: fr
+  image: alpine
+  commands:
+  - echo bonjour
+  - echo monde
+
+---
+kind: pipeline
+name: arm64
+
+platform:
+  os: linux
+  arch: arm64
+
+steps:
+- name: uname
+  image: alpine
+  commands:
+  - uname -a
+
+- name: en
+  image: alpine
+  commands:
+  - echo hello
+  - echo world
+
+- name: fr
+  image: alpine
+  commands:
+  - echo bonjour
+  - echo monde
