@@ -27,6 +27,7 @@ steps:
   - mkdir build && cd build
   - cmake ..
   - cmake --build . --parallel 100
+  - ctest -L Continuous
 
 ---
 kind: pipeline
@@ -58,3 +59,4 @@ steps:
   - mkdir build && cd build
   - cmake ..
   - cmake --build . --parallel 100
+  - ctest -L Continuous
