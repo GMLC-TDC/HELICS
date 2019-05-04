@@ -20,7 +20,7 @@ steps:
   image: alpine
   commands:
   - apk update
-  - apk add --no-cache alpine-sdk cmake boost-dev libzmq swig
+  - apk add --no-cache alpine-sdk cmake boost-dev zeromq-dev swig
   - gcc --version
   - cmake --version
   - git --version
@@ -51,7 +51,7 @@ steps:
   image: alpine
   commands:
   - apk update
-  - apk add --no-cache alpine-sdk cmake boost-dev libzmq swig
+  - apk add --no-cache alpine-sdk cmake boost-dev zeromq-dev swig
   - gcc --version
   - cmake --version
   - git --version
