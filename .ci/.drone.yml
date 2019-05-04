@@ -11,23 +11,31 @@ steps:
   commands:
   - uname -a
 
-- name: en
+- name: env check
   image: alpine
   commands:
-  - echo hello
-  - echo world
+  - gcc --version
+  - clang --version
+  - cmake --version
+  - git --version
 
-- name: es
+- name: build
   image: alpine
   commands:
-  - echo hola
-  - echo mundo
+  - apk update
+  - apk add --no-cache alpine-sdk cmake boost-dev zeromq swig
+  - gcc --version
+  - clang --version
+  - cmake --version
+  - git --version
 
-- name: fr
+- name: env check3
   image: alpine
   commands:
-  - echo bonjour
-  - echo monde
+  - gcc --version
+  - clang --version
+  - cmake --version
+  - git --version
 
 ---
 kind: pipeline
@@ -43,14 +51,8 @@ steps:
   commands:
   - uname -a
 
-- name: en
+- name: build
   image: alpine
   commands:
-  - echo hello
-  - echo world
-
-- name: fr
-  image: alpine
-  commands:
-  - echo bonjour
-  - echo monde
+  - apk update
+  - apk add --no-cache alpine-sdk cmake boost-dev libzmq swig
