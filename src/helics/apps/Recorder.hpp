@@ -50,7 +50,11 @@ class Recorder : public App
     @param name the name of the Recorder, can be left empty for the default or to pull from the federateInfo object
     @param fi  a federate information structure
     */
-    explicit Recorder (const std::string &name, FederateInfo &fi);
+    Recorder (const std::string &name, FederateInfo &fi);
+    /** construct from command line arguments in a vector
+   @param args the command line arguments to pass in a reverse vector
+   */
+    explicit Recorder (std::vector<std::string> args);
     /** construct from command line arguments*/
     Recorder (int argc, char *argv[]);
 
@@ -103,9 +107,6 @@ class Recorder : public App
     std::unique_ptr<Message> getMessage (int index) const;
 
   private:
-    /** load arguments through a variable map created through command line arguments
-     */
-    int loadArguments (boost::program_options::variables_map &vm_map);
     /** load from a jsonString
     @param jsonString either a JSON filename or a string containing JSON
     */
@@ -123,6 +124,10 @@ class Recorder : public App
     void loadCaptureInterfaces ();
     /** encode the string in base64 if needed otherwise just return the string*/
     std::string encode (const std::string &str2encode);
+    /** build the command line argument processing application*/
+    std::shared_ptr<helicsCLI11App> buildArgParserApp ();
+    /** process remaining command line arguments*/
+    void processArgs ();
 
   protected:
     bool allow_iteration = false;  //!< trigger to allow Iteration

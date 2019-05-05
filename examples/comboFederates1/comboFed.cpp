@@ -6,67 +6,58 @@ SPDX-License-Identifier: BSD-3-Clause
 */
 #include "helics/application_api/CombinationFederate.hpp"
 #include "helics/apps/BrokerApp.hpp"
-#include "helics/common/argParser.h"
+#include "helics/core/helicsCLI11.hpp"
 #include "helics/core/helics_definitions.hpp"
 #include <iostream>
 #include <thread>
 
-static const helics::ArgDescriptors InfoArgs{
-  {"startbroker", "start a broker with the specified arguments"},
-  {"target,t", "name of the target federate"},
-  {"valuetarget", "name of the value federate to target"},
-  {"messagetarget", "name of the message federate to target"},
-  {"endpoint,e", "name of the target endpoint"},
-  {"source,s", "name of the source endpoint"}
-  // name is captured in the argument processor for federateInfo
-};
-
 int main (int argc, char *argv[])
 {
-    helics::variable_map vm;
-    auto parseResult = argumentParser (argc, argv, vm, InfoArgs);
-    helics::FederateInfo fi;
-    fi.defName = "fed";
-    fi.loadInfoFromArgs (argc, argv);
-    if (parseResult != 0)
-    {
-        return 0;
-    }
-
+    helics::helicsCLI11App app ("Combination Fed", "ComboFed");
+    std::string targetEndpoint = "endpoint";
     std::string vtarget = "fed";
     std::string mtarget = "fed";
-    if (vm.count ("target") > 0)
-    {
-        mtarget = vm["target"].as<std::string> ();
-        vtarget = mtarget;
-    }
-    if (vm.count ("valuetarget") > 0)
-    {
-        vtarget = vm["valuetarget"].as<std::string> ();
-    }
-    if (vm.count ("messagetarget") > 0)
-    {
-        mtarget = vm["messagetarget"].as<std::string> ();
-    }
-    std::string targetEndpoint = "endpoint";
-    if (vm.count ("endpoint") > 0)
-    {
-        targetEndpoint = vm["endpoint"].as<std::string> ();
-    }
-    std::string etarget = mtarget + "/" + targetEndpoint;
     std::string myendpoint = "endpoint";
-    if (vm.count ("source") > 0)
-    {
-        myendpoint = vm["source"].as<std::string> ();
-    }
-    fi.setProperty (helics::defs::properties::log_level, 5);
     helics::apps::BrokerApp brk;
-    if (vm.count ("startbroker") > 0)
+    std::string brokerArgs = "";
+
+    app.add_option_function<std::string> (
+      "--target,-t",
+      [&vtarget, &mtarget] (const std::string &name) {
+          vtarget = name;
+          mtarget = name;
+      },
+      "name of the federate to target");
+    app.add_option ("--valuetarget", vtarget, "name of the value federate to target", true);
+    app.add_option ("--messagetarget", mtarget, "name of the message federate to target", true);
+    app.add_option ("--endpoint,-e", targetEndpoint, "name of the target endpoint", true);
+    app.add_option ("--source,-e", myendpoint, "name of the source endpoint", true);
+    app.add_option ("--startbroker", brokerArgs, "start a broker with the specified arguments");
+
+    auto ret = app.helics_parse (argc, argv);
+
+    helics::FederateInfo fi;
+    if (ret == helics::helicsCLI11App::parse_return::help_return)
     {
-        brk = helics::apps::BrokerApp (fi.coreType, vm["startbroker"].as<std::string> ());
+        fi.loadInfoFromArgs ("--help");
+        return 0;
+    }
+    else if (ret != helics::helicsCLI11App::parse_return::ok)
+    {
+        return -1;
+    }
+    fi.defName = "fed";
+    fi.loadInfoFromArgs (app.remainArgs ());
+
+    std::string etarget = mtarget + "/" + targetEndpoint;
+
+    fi.setProperty (helics::defs::properties::log_level, 5);
+    if (app["--startbroker"]->count () > 0)
+    {
+        brk = helics::apps::BrokerApp (fi.coreType, brokerArgs);
     }
 
-    auto cFed = std::make_unique<helics::CombinationFederate> (std::string (), fi);
+    auto cFed = std::make_unique<helics::CombinationFederate> (std::string{}, fi);
     auto name = cFed->getName ();
     std::cout << " registering endpoint '" << myendpoint << "' for " << name << '\n';
 

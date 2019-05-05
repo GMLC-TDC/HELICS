@@ -6,6 +6,7 @@ SPDX-License-Identifier: BSD-3-Clause
 */
 #pragma once
 
+#include <memory>
 #include <string>
 
 namespace helics
@@ -13,10 +14,10 @@ namespace helics
 /** define the network access*/
 enum class interface_networks : char
 {
-    local,  //!< just open local ports
-    ipv4,  //!< use external ipv4 ports
-    ipv6,  //!< use external ipv6 ports
-    all,  //!< use all external ports
+    local = 0,  //!< just open local ports
+    ipv4 = 4,  //!< use external ipv4 ports
+    ipv6 = 6,  //!< use external ipv6 ports
+    all = 10,  //!< use all external ports
 };
 
 /** define keys for particular interfaces*/
@@ -28,6 +29,8 @@ enum class interface_type : char
     ipc = 3,  //!< using ipc locations
     inproc = 4,  //!< using inproc sockets for communications
 };
+
+class helicsCLI11App;
 
 /** helper class designed to contain the common elements between networking brokers and cores
  */
@@ -63,15 +66,11 @@ class NetworkBrokerData
     NetworkBrokerData () = default;
     /** constructor from the allowed type*/
     explicit NetworkBrokerData (interface_type type) : allowedType (type){};
-    /** initialize the properties from input arguments
-    @param argc the number of arguments
-    @param argv the strings as they may have come from the command line
-    @param localAddress a predefined string containing the desired local only address
+
+    /** generate a command line argument parser for the network broker data
+     @param localAddress a predefined string containing the desired local only address
     */
-    void initializeFromArgs (int argc, const char *const *argv, const std::string &localAddress);
-    /** display the help line for the network information
-     */
-    static void displayHelp ();
+    std::shared_ptr<helicsCLI11App> commandLineParser (const std::string &localAddress);
     /** set the desired interface type
      */
     void setInterfaceType (interface_type type) { allowedType = type; }

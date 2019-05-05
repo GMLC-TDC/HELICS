@@ -11,7 +11,6 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "exeTestHelper.h"
 #include "helics/application_api/Publications.hpp"
 #include "helics/apps/Recorder.hpp"
-#include "helics/common/stringToCmdLine.h"
 #include "helics/core/BrokerFactory.hpp"
 #include <cstdio>
 #include <future>
@@ -30,7 +29,7 @@ BOOST_AUTO_TEST_CASE (simple_recorder_test)
 
     helics::ValueFederate vfed ("block1", fi);
     helics::Publication pub1 (helics::GLOBAL, &vfed, "pub1", helics::data_type::helics_double);
-    auto fut = std::async (std::launch::async, [&rec1]() { rec1.runTo (4); });
+    auto fut = std::async (std::launch::async, [&rec1] () { rec1.runTo (4); });
     vfed.enterExecutingMode ();
     auto retTime = vfed.requestTime (1);
     BOOST_CHECK_EQUAL (retTime, 1.0);
@@ -60,7 +59,7 @@ BOOST_AUTO_TEST_CASE (simple_recorder_test2)
 
     helics::ValueFederate vfed ("block1", fi);
     helics::Publication pub1 (helics::GLOBAL, &vfed, "pub1", helics::data_type::helics_double);
-    auto fut = std::async (std::launch::async, [&rec1]() { rec1.runTo (4); });
+    auto fut = std::async (std::launch::async, [&rec1] () { rec1.runTo (4); });
     vfed.enterExecutingMode ();
     auto retTime = vfed.requestTime (1);
     BOOST_CHECK_EQUAL (retTime, 1.0);
@@ -104,7 +103,7 @@ BOOST_AUTO_TEST_CASE (recorder_test_message)
 
     rec1.addEndpoint ("src1");
 
-    auto fut = std::async (std::launch::async, [&rec1]() { rec1.runTo (5.0); });
+    auto fut = std::async (std::launch::async, [&rec1] () { rec1.runTo (5.0); });
     mfed.enterExecutingMode ();
 
     auto retTime = mfed.requestTime (1.0);
@@ -138,7 +137,7 @@ BOOST_DATA_TEST_CASE (simple_recorder_test_files, boost::unit_test::data::make (
     helics::Publication pub1 (helics::GLOBAL, &vfed, "pub1", helics::data_type::helics_double);
     helics::Publication pub2 (helics::GLOBAL, &vfed, "pub2", helics::data_type::helics_double);
 
-    auto fut = std::async (std::launch::async, [&rec1]() { rec1.runTo (4); });
+    auto fut = std::async (std::launch::async, [&rec1] () { rec1.runTo (4); });
     vfed.enterExecutingMode ();
     auto retTime = vfed.requestTime (1);
     BOOST_CHECK_EQUAL (retTime, 1.0);
@@ -197,7 +196,7 @@ BOOST_DATA_TEST_CASE (simple_recorder_test_message_files,
     helics::Publication pub2 (helics::GLOBAL, &cfed, "pub2", helics::data_type::helics_double);
     helics::Endpoint e1 (helics::GLOBAL, &cfed, "d1");
 
-    auto fut = std::async (std::launch::async, [&rec1]() { rec1.runTo (5); });
+    auto fut = std::async (std::launch::async, [&rec1] () { rec1.runTo (5); });
     cfed.enterExecutingMode ();
     auto retTime = cfed.requestTime (1);
     BOOST_CHECK_EQUAL (retTime, 1.0);
@@ -255,19 +254,25 @@ BOOST_DATA_TEST_CASE (simple_recorder_test_message_files_cmd,
     brk->connect ();
     std::string exampleFile = std::string (TEST_DIR) + file;
 
-    StringToCmdLine cmdArg ("--name=rec --broker=ipc_broker --coretype=ipc " + exampleFile);
+    std::vector<std::string> args{"", "--name=rec", "--broker=ipc_broker", "--coretype=ipc", exampleFile};
+    char *argv[5];
+    argv[0] = &(args[0][0]);
+    argv[1] = &(args[1][0]);
+    argv[2] = &(args[2][0]);
+    argv[3] = &(args[3][0]);
+    argv[4] = &(args[4][0]);
 
-    helics::apps::Recorder rec1 (cmdArg.getArgCount (), cmdArg.getArgV ());
+    helics::apps::Recorder rec1 (5, argv);
 
     helics::FederateInfo fi (helics::core_type::IPC);
-    fi.coreInitString = "1 --broker=ipc_broker";
+    fi.coreInitString = "-f 1 --broker=ipc_broker";
 
     helics::CombinationFederate cfed ("obj", fi);
     helics::Publication pub1 (helics::GLOBAL, &cfed, "pub1", helics::data_type::helics_double);
     helics::Publication pub2 (helics::GLOBAL, &cfed, "pub2", helics::data_type::helics_double);
     helics::Endpoint e1 (helics::GLOBAL, &cfed, "d1");
 
-    auto fut = std::async (std::launch::async, [&rec1]() { rec1.runTo (5); });
+    auto fut = std::async (std::launch::async, [&rec1] () { rec1.runTo (5); });
     cfed.enterExecutingMode ();
     auto retTime = cfed.requestTime (1);
     BOOST_CHECK_EQUAL (retTime, 1.0);
@@ -335,7 +340,7 @@ BOOST_AUTO_TEST_CASE (recorder_test_destendpoint_clone)
     rec1.addDestEndpointClone ("d1");
     rec1.addDestEndpointClone ("d2");
 
-    auto fut = std::async (std::launch::async, [&rec1]() { rec1.runTo (5.0); });
+    auto fut = std::async (std::launch::async, [&rec1] () { rec1.runTo (5.0); });
     mfed2.enterExecutingModeAsync ();
     mfed.enterExecutingMode ();
     mfed2.enterExecutingModeComplete ();
@@ -381,7 +386,7 @@ BOOST_AUTO_TEST_CASE (recorder_test_srcendpoint_clone)
     rec1.addSourceEndpointClone ("d1");
     rec1.addSourceEndpointClone ("d2");
 
-    auto fut = std::async (std::launch::async, [&rec1]() { rec1.runTo (5.0); });
+    auto fut = std::async (std::launch::async, [&rec1] () { rec1.runTo (5.0); });
     mfed2.enterExecutingModeAsync ();
     mfed.enterExecutingMode ();
     mfed2.enterExecutingModeComplete ();
@@ -427,7 +432,7 @@ BOOST_AUTO_TEST_CASE (recorder_test_endpoint_clone)
     rec1.addDestEndpointClone ("d1");
     rec1.addSourceEndpointClone ("d1");
 
-    auto fut = std::async (std::launch::async, [&rec1]() { rec1.runTo (5.0); });
+    auto fut = std::async (std::launch::async, [&rec1] () { rec1.runTo (5.0); });
     mfed2.enterExecutingModeAsync ();
     mfed.enterExecutingMode ();
     mfed2.enterExecutingModeComplete ();
@@ -476,7 +481,7 @@ BOOST_DATA_TEST_CASE (simple_clone_test_file, boost::unit_test::data::make (simp
 
     rec1.loadFile (std::string (TEST_DIR) + file);
 
-    auto fut = std::async (std::launch::async, [&rec1]() { rec1.runTo (5.0); });
+    auto fut = std::async (std::launch::async, [&rec1] () { rec1.runTo (5.0); });
     mfed2.enterExecutingModeAsync ();
     mfed.enterExecutingMode ();
     mfed2.enterExecutingModeComplete ();
@@ -525,7 +530,7 @@ BOOST_AUTO_TEST_CASE (recorder_test_saveFile1)
     rec1.addDestEndpointClone ("d1");
     rec1.addSourceEndpointClone ("d1");
 
-    auto fut = std::async (std::launch::async, [&rec1]() { rec1.runTo (5.0); });
+    auto fut = std::async (std::launch::async, [&rec1] () { rec1.runTo (5.0); });
     mfed2.enterExecutingModeAsync ();
     mfed.enterExecutingMode ();
     mfed2.enterExecutingModeComplete ();
@@ -573,7 +578,7 @@ BOOST_AUTO_TEST_CASE (recorder_test_saveFile2)
 
     helics::ValueFederate vfed ("block1", fi);
     helics::Publication pub1 (helics::GLOBAL, &vfed, "pub1", helics::data_type::helics_double);
-    auto fut = std::async (std::launch::async, [&rec1]() { rec1.runTo (4); });
+    auto fut = std::async (std::launch::async, [&rec1] () { rec1.runTo (4); });
     vfed.enterExecutingMode ();
     auto retTime = vfed.requestTime (1);
     BOOST_CHECK_EQUAL (retTime, 1.0);
@@ -625,7 +630,7 @@ BOOST_AUTO_TEST_CASE (recorder_test_saveFile3)
 
     helics::Publication pub1 (helics::GLOBAL, &mfed, "pub1", helics::data_type::helics_double);
 
-    auto fut = std::async (std::launch::async, [&rec1]() { rec1.runTo (5.0); });
+    auto fut = std::async (std::launch::async, [&rec1] () { rec1.runTo (5.0); });
     mfed2.enterExecutingModeAsync ();
     mfed.enterExecutingMode ();
     mfed2.enterExecutingModeComplete ();
@@ -669,13 +674,13 @@ BOOST_AUTO_TEST_CASE (recorder_test_saveFile3)
 
 BOOST_AUTO_TEST_CASE (recorder_test_help)
 {
-    StringToCmdLine cmdArg ("--version --quiet");
-    helics::apps::Recorder rec1 (cmdArg.getArgCount (), cmdArg.getArgV ());
+    std::vector<std::string> args{"--quiet", "--version"};
+    helics::apps::Recorder rec1 (args);
 
     BOOST_CHECK (!rec1.isActive ());
 
-    StringToCmdLine cmdArg2 ("-? --quiet");
-    helics::apps::Recorder rec2 (cmdArg2.getArgCount (), cmdArg2.getArgV ());
+    args.emplace_back ("-?");
+    helics::apps::Recorder rec2 (args);
 
     BOOST_CHECK (!rec2.isActive ());
 }

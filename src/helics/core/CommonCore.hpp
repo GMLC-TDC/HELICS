@@ -69,13 +69,10 @@ class CommonCore : public Core, public BrokerBase
     explicit CommonCore (const std::string &core_name);
     /** virtual destructor*/
     virtual ~CommonCore () override;
-    virtual void initialize (const std::string &initializationString) override final;
-    /** initialize the core manager with command line arguments
-    @param argc the number of arguments
-    @param argv char pointers to the arguments
-    */
-    virtual void initializeFromArgs (int argc, const char *const *argv) override;
-    virtual bool isInitialized () const override final;
+    virtual void configure (const std::string &configureString) override final;
+    virtual void configureFromArgs (int argc, char *argv[]) override final;
+    virtual void configureFromVector (std::vector<std::string> args) override final;
+    virtual bool isConfigured () const override final;
     virtual bool isOpenToNewFederates () const override final;
     virtual void error (local_federate_id federateID, int errorCode = -1) override final;
     virtual void finalize (local_federate_id federateID) override final;
@@ -181,7 +178,7 @@ class CommonCore : public Core, public BrokerBase
     virtual void setLoggingLevel (int logLevel) override;
     virtual void setLoggingCallback (
       local_federate_id federateID,
-      std::function<void(int, const std::string &, const std::string &)> logFunction) override final;
+      std::function<void (int, const std::string &, const std::string &)> logFunction) override final;
 
     virtual std::string query (const std::string &target, const std::string &queryStr) override;
     virtual void setQueryCallback (local_federate_id federateID,

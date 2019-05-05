@@ -39,6 +39,7 @@ SPDX-License-Identifier: BSD-3-Clause
 
 namespace helics
 {
+const std::string emptyString;
 std::shared_ptr<Broker> makeBroker (core_type type, const std::string &name)
 {
     std::shared_ptr<Broker> broker;
@@ -180,24 +181,15 @@ std::shared_ptr<Broker> makeBroker (core_type type, const std::string &name)
 
 namespace BrokerFactory
 {
-std::shared_ptr<Broker> create (core_type type, const std::string &initializationString)
+std::shared_ptr<Broker> create (core_type type, const std::string &configureString)
 {
-    auto broker = makeBroker (type, std::string ());
-    broker->initialize (initializationString);
-    bool reg = registerBroker (broker);
-    if (!reg)
-    {
-        throw (helics::RegistrationFailure ("unable to register broker"));
-    }
-    broker->connect ();
-    return broker;
+    return create (type, emptyString, configureString);
 }
 
-std::shared_ptr<Broker>
-create (core_type type, const std::string &broker_name, const std::string &initializationString)
+std::shared_ptr<Broker> create (core_type type, const std::string &broker_name, const std::string &configureString)
 {
     auto broker = makeBroker (type, broker_name);
-    broker->initialize (initializationString);
+    broker->configure (configureString);
     bool reg = registerBroker (broker);
     if (!reg)
     {
@@ -207,23 +199,33 @@ create (core_type type, const std::string &broker_name, const std::string &initi
     return broker;
 }
 
-std::shared_ptr<Broker> create (core_type type, int argc, const char *const *argv)
+std::shared_ptr<Broker> create (core_type type, int argc, char *argv[])
 {
-    auto broker = makeBroker (type, "");
-    broker->initializeFromArgs (argc, argv);
-    bool reg = registerBroker (broker);
-    if (!reg)
-    {
-        throw (helics::RegistrationFailure ("unable to register broker"));
-    }
-    broker->connect ();
-    return broker;
+    return create (type, emptyString, argc, argv);
 }
 
-std::shared_ptr<Broker> create (core_type type, const std::string &broker_name, int argc, const char *const *argv)
+std::shared_ptr<Broker> create (core_type type, const std::string &broker_name, int argc, char *argv[])
 {
     auto broker = makeBroker (type, broker_name);
-    broker->initializeFromArgs (argc, argv);
+    broker->configureFromArgs (argc, argv);
+    bool reg = registerBroker (broker);
+    if (!reg)
+    {
+        throw (helics::RegistrationFailure ("unable to register broker"));
+    }
+    broker->connect ();
+    return broker;
+}
+
+std::shared_ptr<Broker> create (core_type type, std::vector<std::string> args)
+{
+    return create (type, emptyString, std::move (args));
+}
+
+std::shared_ptr<Broker> create (core_type type, const std::string &broker_name, std::vector<std::string> args)
+{
+    auto broker = makeBroker (type, broker_name);
+    broker->configureFromVector (std::move (args));
     bool reg = registerBroker (broker);
     if (!reg)
     {
@@ -235,7 +237,7 @@ std::shared_ptr<Broker> create (core_type type, const std::string &broker_name, 
 
 /** lambda function to join cores before the destruction happens to avoid potential problematic calls in the
  * loops*/
-static auto destroyerCallFirst = [](auto &broker) {
+static auto destroyerCallFirst = [] (auto &broker) {
     broker->processDisconnect (
       true);  // use true here as it is possible the searchableObjectHolder is deleted already
     broker->joinAllThreads ();
@@ -311,7 +313,7 @@ static bool isJoinableBrokerOfType (core_type type, const std::shared_ptr<Broker
 
 std::shared_ptr<Broker> findJoinableBrokerOfType (core_type type)
 {
-    return searchableObjects.findObject ([type](auto &ptr) { return isJoinableBrokerOfType (type, ptr); });
+    return searchableObjects.findObject ([type] (auto &ptr) { return isJoinableBrokerOfType (type, ptr); });
 }
 
 bool registerBroker (const std::shared_ptr<Broker> &broker)
@@ -348,68 +350,27 @@ void unregisterBroker (const std::string &name)
 {
     if (!searchableObjects.removeObject (name))
     {
-        searchableObjects.removeObject ([&name](auto &obj) { return (obj->getIdentifier () == name); });
+        searchableObjects.removeObject ([&name] (auto &obj) { return (obj->getIdentifier () == name); });
     }
 }
 
+static const std::string helpStr{"--help"};
+
 void displayHelp (core_type type)
 {
-    switch (type)
+    if (type == core_type::DEFAULT || type == core_type::UNRECOGNIZED)
     {
-    case core_type::ZMQ:
-#if HELICS_HAVE_ZEROMQ
-        zeromq::ZmqBroker::displayHelp (true);
-#endif
-        break;
-    case core_type::MPI:
-#if HELICS_HAVE_MPI
-        mpi::MpiBroker::displayHelp (true);
-#endif
-        break;
-    case core_type::TEST:
-#ifndef DISABLE_TEST_CORE
-        testcore::TestBroker::displayHelp (true);
-#endif
-        break;
-    case core_type::INTERPROCESS:
-    case core_type::IPC:
-#ifndef DISABLE_IPC_CORE
-        ipc::IpcBroker::displayHelp (true);
-#endif
-        break;
-    case core_type::TCP:
-#ifndef DISABLE_TCP_CORE
-        tcp::TcpBroker::displayHelp (true);
-#endif
-        break;
-    case core_type::UDP:
-#ifndef DISABLE_UDP_CORE
-        udp::UdpBroker::displayHelp (true);
-#endif
-        break;
-    default:
-#if HELICS_HAVE_ZEROMQ
-        zeromq::ZmqBroker::displayHelp (true);
-#endif
-#if HELICS_HAVE_MPI
-        mpi::MpiBroker::displayHelp (true);
-#endif
-#ifndef DISABLE_IPC_CORE
-        ipc::IpcBroker::displayHelp (true);
-#endif
-#ifndef DISABLE_TEST_CORE
-        testcore::TestBroker::displayHelp (true);
-#endif
-#ifndef DISABLE_TCP_CORE
-        tcp::TcpBroker::displayHelp (true);
-#endif
-#ifndef DISABLE_UDP_CORE
-        udp::UdpBroker::displayHelp (true);
-#endif
-        break;
+        std::cout << "All core types have similar options\n";
+        auto brk = makeBroker (core_type::ZMQ, emptyString);
+        brk->configure (helpStr);
+        brk = makeBroker (core_type::TCP_SS, emptyString);
+        brk->configure (helpStr);
     }
-
-    CoreBroker::displayHelp ();
+    else
+    {
+        auto brk = makeBroker (type, emptyString);
+        brk->configure (helpStr);
+    }
 }
 
 }  // namespace BrokerFactory

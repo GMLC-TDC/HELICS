@@ -18,10 +18,12 @@ and some common methods used cores and brokers
 #include <memory>
 #include <string>
 #include <thread>
+
 namespace helics
 {
 class Logger;
 class ForwardingTimeCoordinator;
+class helicsCLI11App;
 /** base class for broker like objects
  */
 class BrokerBase
@@ -31,16 +33,15 @@ class BrokerBase
       parent_broker_id};  //!< the unique identifier for the broker(core or broker)
     global_broker_id global_broker_id_local;  //!< meant to be the same as global_id but not atomically protected
     global_broker_id higher_broker_id{0};  //!< the id code of the broker 1 level about this broker
-    std::atomic<int32_t> maxLogLevel{1};  //!< the logging level to use levels >=this will be logged
+    std::atomic<int32_t> maxLogLevel{1};  //!< the logging level to use levels >=this will be ignored
     int32_t consoleLogLevel = 1;  //!< the logging level for console display
     int32_t fileLogLevel = 1;  //!< the logging level for logging to a file
     int32_t minFederateCount = 1;  //!< the minimum number of federates that must connect before entering init mode
     int32_t minBrokerCount = 0;  //!< the minimum number of brokers that must connect before entering init mode
     int32_t maxIterationCount = 10000;  //!< the maximum number of iterative loops that are allowed
-    int32_t tickTimer = 5000;  //!< counter for the length of a keep alive tick in milliseconds
-    int32_t timeout =
-      30000;  //!< timeout to wait to establish a broker connection before giving up in milliseconds
-    int32_t networkTimeout = -1;  //!< timeout to establish a socket connection before giving up
+    Time tickTimer{5.0};  //!< the length of each heartbeat tick
+    Time timeout{30.0};  //!< timeout to wait to establish a broker connection before giving up
+    Time networkTimeout{-1.0};  //!< timeout to establish a socket connection before giving up
     std::string identifier;  //!< an identifier for the broker
     // address is mutable since during initial phases it may not be fixed so to maintain a consistent public
     // interface for extracting it this variable may need to be updated in a constant function
@@ -49,7 +50,7 @@ class BrokerBase
       loggingObj;  //!< default logging object to use if the logging callback is not specified
     std::thread queueProcessingThread;  //!< thread for running the broker
     /** a logging function for logging or printing messages*/
-    std::function<void(int, const std::string &, const std::string &)> loggerFunction;
+    std::function<void (int, const std::string &, const std::string &)> loggerFunction;
 
     std::atomic<bool> haltOperations{false};  //!< flag indicating that no further message should be processed
   private:
@@ -65,8 +66,9 @@ class BrokerBase
     /** enumeration of the possible core states*/
     enum broker_state_t : int16_t
     {
-        created = -5,  //!< the broker has been created
-        initialized = -4,  //!< the broker itself has been initialized and is ready to connect
+        created = -6,  //!< the broker has been created
+        configuring = -5,  //!< the broker is in the processing of configuring
+        configured = -4,  //!< the broker itself has been configured and is ready to connect
         connecting = -3,  //!< the connection process has started
         connected = -2,  //!< the connection process has completed
         initializing = -1,  //!< the enter initialization process has started
@@ -85,18 +87,17 @@ class BrokerBase
     bool hasFilters = false;  //!< flag indicating filters come through the broker
 
   public:
-    /** display help messages for the broker*/
-    static void displayHelp ();
     explicit BrokerBase (bool DisableQueue = false) noexcept;
     explicit BrokerBase (const std::string &broker_name, bool DisableQueue = false);
 
     virtual ~BrokerBase ();
 
-    /** initialize the core manager with command line arguments
-    @param argc the number of arguments
-    @param argv char pointers to the arguments
-    */
-    virtual void initializeFromCmdArgs (int argc, const char *const *argv);
+    int parseArgs (int argc, char *argv[]);
+    int parseArgs (std::vector<std::string> args);
+    int parseArgs (const std::string &configureString);
+    /** configure the base of all brokers and cores
+     */
+    virtual void configureBase ();
 
     /** add an action Message to the process queue*/
     void addActionMessage (const ActionMessage &m);
@@ -108,7 +109,7 @@ class BrokerBase
     std::string &message) the function takes a level indicating the logging level string with the source name and a
     string with the message
     */
-    void setLoggerFunction (std::function<void(int, const std::string &, const std::string &)> logFunction);
+    void setLoggerFunction (std::function<void (int, const std::string &, const std::string &)> logFunction);
 
     /** check if the main processing loop of a broker is running*/
     bool isRunning () const { return mainLoopIsRunning.load (); }
@@ -126,6 +127,9 @@ class BrokerBase
     /** helper function for doing some preprocessing on a command
     @return (CMD_IGNORE) if the command is a termination command*/
     action_message_def::action_t commandProcessor (ActionMessage &command);
+
+    /** Generate the base CLI processor*/
+    std::shared_ptr<helicsCLI11App> generateBaseCLI ();
 
   protected:
     /** process a disconnect signal*/
@@ -156,6 +160,8 @@ class BrokerBase
     void generateNewIdentifier ();
     /** generate the local address information*/
     virtual std::string generateLocalAddressString () const = 0;
+    /** generate a CLI11 Application for subprocesses for processing of command line arguments*/
+    virtual std::shared_ptr<helicsCLI11App> generateCLI ();
 
   public:
     /** close all the threads*/

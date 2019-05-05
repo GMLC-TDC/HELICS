@@ -278,7 +278,7 @@ endif(GENERATE_DOXYGEN_DOC)
 # -------------------------------------------------------------
 # BOOST  find the boost libraries
 # -------------------------------------------------------------
-set(BOOST_REQUIRED_LIBRARIES program_options filesystem system)
+set(BOOST_REQUIRED_LIBRARIES filesystem system)
 if(BUILD_TESTING)
     list(APPEND BOOST_REQUIRED_LIBRARIES unit_test_framework)
 endif()

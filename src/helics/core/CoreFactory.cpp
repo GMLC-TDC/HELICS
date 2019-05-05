@@ -35,6 +35,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "tcp/TcpCore.h"
 #endif
 
+#include "helicsCLI11.hpp"
 #include <cassert>
 #include <cstring>
 
@@ -201,64 +202,83 @@ std::shared_ptr<Core> makeCore (core_type type, const std::string &name)
 
 namespace CoreFactory
 {
-std::shared_ptr<Core> create (core_type type, const std::string &initializationString)
-{
-    auto core = makeCore (type, std::string ());
-    core->initialize (initializationString);
-    registerCore (core);
+static const std::string emptyString;
 
-    return core;
+std::shared_ptr<Core> create (const std::string &initializationString)
+{
+    helicsCLI11App tparser;
+    tparser.remove_helics_specifics ();
+    tparser.addTypeOption ();
+    tparser.allow_extras ();
+    tparser.parse (initializationString);
+    return create (tparser.getCoreType (), emptyString, tparser.remaining_for_passthrough ());
 }
 
-std::shared_ptr<Core> create (core_type type, const std::string &core_name, std::string &initializationString)
+std::shared_ptr<Core> create (core_type type, const std::string &configureString)
 {
-    auto core = makeCore (type, core_name);
-    core->initialize (initializationString);
-    registerCore (core);
-
-    return core;
+    return create (type, emptyString, configureString);
 }
 
-std::shared_ptr<Core> create (int argc, const char *const *argv)
-{
-    core_type type = core_type::DEFAULT;
-    for (int ii = 1; ii < argc; ++ii)
-    {
-        if (strncmp ("coretype", argv[ii], 8) == 0)
-        {
-            if (strlen (argv[ii]) > 9)
-            {
-                type = coreTypeFromString (&(argv[ii][9]));
-            }
-            else
-            {
-                type = coreTypeFromString (argv[ii + 1]);
-            }
-            break;
-        }
-    }
-    return create (type, argc, argv);
-}
-
-std::shared_ptr<Core> create (core_type type, int argc, const char *const *argv)
-{
-    auto core = makeCore (type, "");
-    core->initializeFromArgs (argc, argv);
-    registerCore (core);
-    return core;
-}
-
-std::shared_ptr<Core> create (core_type type, const std::string &core_name, int argc, const char *const *argv)
+std::shared_ptr<Core> create (core_type type, const std::string &core_name, const std::string &configureString)
 {
     auto core = makeCore (type, core_name);
-    core->initializeFromArgs (argc, argv);
+    core->configure (configureString);
     registerCore (core);
 
     return core;
 }
 
-std::shared_ptr<Core>
-FindOrCreate (core_type type, const std::string &core_name, const std::string &initializationString)
+std::shared_ptr<Core> create (std::vector<std::string> args)
+{
+    helicsCLI11App tparser;
+    tparser.remove_helics_specifics ();
+    tparser.addTypeOption ();
+
+    tparser.allow_extras ();
+    tparser.parse (std::move (args));
+    return create (tparser.getCoreType (), emptyString, tparser.remaining_for_passthrough ());
+}
+
+std::shared_ptr<Core> create (core_type type, std::vector<std::string> args)
+{
+    return create (type, emptyString, std::move (args));
+}
+
+std::shared_ptr<Core> create (core_type type, const std::string &core_name, std::vector<std::string> args)
+{
+    auto core = makeCore (type, core_name);
+    core->configureFromVector (std::move (args));
+    registerCore (core);
+
+    return core;
+}
+
+std::shared_ptr<Core> create (int argc, char *argv[])
+{
+    helicsCLI11App tparser;
+    tparser.remove_helics_specifics ();
+    tparser.addTypeOption ();
+
+    tparser.allow_extras ();
+    tparser.parse (argc, argv);
+    return create (tparser.getCoreType (), tparser.remaining_for_passthrough ());
+}
+
+std::shared_ptr<Core> create (core_type type, int argc, char *argv[])
+{
+    return create (type, emptyString, argc, argv);
+}
+
+std::shared_ptr<Core> create (core_type type, const std::string &core_name, int argc, char *argv[])
+{
+    auto core = makeCore (type, core_name);
+    core->configureFromArgs (argc, argv);
+    registerCore (core);
+
+    return core;
+}
+
+std::shared_ptr<Core> FindOrCreate (core_type type, const std::string &core_name, std::vector<std::string> args)
 {
     std::shared_ptr<Core> core = findCore (core_name);
     if (core)
@@ -266,7 +286,7 @@ FindOrCreate (core_type type, const std::string &core_name, const std::string &i
         return core;
     }
     core = makeCore (type, core_name);
-    core->initialize (initializationString);
+    core->configureFromVector (std::move (args));
 
     bool success = registerCore (core);
     if (!success)
@@ -282,7 +302,30 @@ FindOrCreate (core_type type, const std::string &core_name, const std::string &i
 }
 
 std::shared_ptr<Core>
-FindOrCreate (core_type type, const std::string &core_name, int argc, const char *const *argv)
+FindOrCreate (core_type type, const std::string &core_name, const std::string &configureString)
+{
+    std::shared_ptr<Core> core = findCore (core_name);
+    if (core)
+    {
+        return core;
+    }
+    core = makeCore (type, core_name);
+    core->configure (configureString);
+
+    bool success = registerCore (core);
+    if (!success)
+    {
+        core = findCore (core_name);
+        if (core)
+        {
+            return core;
+        }
+    }
+
+    return core;
+}
+
+std::shared_ptr<Core> FindOrCreate (core_type type, const std::string &core_name, int argc, char *argv[])
 {
     std::shared_ptr<Core> core = findCore (core_name);
     if (core)
@@ -291,7 +334,7 @@ FindOrCreate (core_type type, const std::string &core_name, int argc, const char
     }
     core = makeCore (type, core_name);
 
-    core->initializeFromArgs (argc, argv);
+    core->configureFromArgs (argc, argv);
     bool success = registerCore (core);
     if (!success)
     {
@@ -307,7 +350,7 @@ FindOrCreate (core_type type, const std::string &core_name, int argc, const char
 
 /** lambda function to join cores before the destruction happens to avoid potential problematic calls in the
  * loops*/
-static auto destroyerCallFirst = [](auto &core) {
+static auto destroyerCallFirst = [] (auto &core) {
     core->processDisconnect (true);
     core->joinAllThreads ();
 };
@@ -386,7 +429,7 @@ static bool isJoinableCoreOfType (core_type type, const std::shared_ptr<CommonCo
 
 std::shared_ptr<Core> findJoinableCoreOfType (core_type type)
 {
-    return searchableObjects.findObject ([type](auto &ptr) { return isJoinableCoreOfType (type, ptr); });
+    return searchableObjects.findObject ([type] (auto &ptr) { return isJoinableCoreOfType (type, ptr); });
 }
 
 bool registerCore (const std::shared_ptr<Core> &core)
@@ -418,7 +461,7 @@ void unregisterCore (const std::string &name)
 {
     if (!searchableObjects.removeObject (name))
     {
-        searchableObjects.removeObject ([&name](auto &obj) { return (obj->getIdentifier () == name); });
+        searchableObjects.removeObject ([&name] (auto &obj) { return (obj->getIdentifier () == name); });
     }
 }
 

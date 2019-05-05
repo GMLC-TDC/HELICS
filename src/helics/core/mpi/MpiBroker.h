@@ -23,8 +23,10 @@ class MpiBroker final : public CommsBroker<MpiComms, CoreBroker>
     explicit MpiBroker (bool rootBroker = false) noexcept;
     explicit MpiBroker (const std::string &broker_name);
 
-    virtual void initializeFromArgs (int argc, const char *const *argv) override;
+  protected:
+    virtual std::shared_ptr<helicsCLI11App> generateCLI () override;
 
+  public:
     /**destructor*/
     virtual ~MpiBroker ();
 
@@ -35,8 +37,8 @@ class MpiBroker final : public CommsBroker<MpiComms, CoreBroker>
     virtual bool brokerConnect () override;
     mutable std::mutex dataMutex;  //!< mutex protecting the configuration information
     std::string brokerAddress;  //!< the mpi rank:tag of the parent broker
-    int brokerRank;
-    int brokerTag;
+    int brokerRank{0};
+    int brokerTag{0};
 };
 }  // namespace mpi
 }  // namespace helics

@@ -23,7 +23,9 @@ class MpiCore final : public CommsBroker<MpiComms, CommonCore>
     MpiCore () noexcept;
     explicit MpiCore (const std::string &core_name);
     ~MpiCore ();
-    virtual void initializeFromArgs (int argc, const char *const *argv) override;
+
+  protected:
+    virtual std::shared_ptr<helicsCLI11App> generateCLI () override;
 
   public:
     virtual std::string generateLocalAddressString () const override;
@@ -31,8 +33,8 @@ class MpiCore final : public CommsBroker<MpiComms, CommonCore>
   private:
     mutable std::mutex dataMutex;  //!< mutex protecting the configuration information
     std::string brokerAddress;  //!< the mpi rank:tag of the broker
-    int brokerRank;
-    int brokerTag;
+    int brokerRank{0};
+    int brokerTag{0};
     virtual bool brokerConnect () override;
 };
 

@@ -112,6 +112,10 @@ class SearchableObjectHolder
 
     std::shared_ptr<X> findObject (const std::string &name)
     {
+        if (trippedDetect.isTripped ())
+        {
+            return nullptr;
+        }
         std::lock_guard<std::mutex> lock (mapLock);
         auto fnd = ObjectMap.find (name);
         if (fnd != ObjectMap.end ())

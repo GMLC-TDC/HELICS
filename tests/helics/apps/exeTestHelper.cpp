@@ -136,7 +136,7 @@ std::string exeTestRunner::runCaptureOutput (const std::string &args) const
     {
         return "invalid executable";
     }
-    std::string rstr = exeString + " " + args + " > " + outFile;
+    std::string rstr = exeString + " " + args + " > " + outFile + " 2>&1";
     int ret = system (rstr.c_str ());
 
     std::ifstream t (outFile);
@@ -158,7 +158,7 @@ std::future<std::string> exeTestRunner::runCaptureOutputAsync (const std::string
         prom.set_value ("invalid executable");
         return fut;
     }
-    std::string rstr = exeString + " " + args + " > " + outFile;
+    std::string rstr = exeString + " " + args + " > " + outFile + " 2>&1";
     std::string oFile = outFile;
     return std::async (std::launch::async, [rstr, oFile]() {
         int ret = system (rstr.c_str ());

@@ -234,7 +234,7 @@ BOOST_AUTO_TEST_CASE (ipccore_initialization_test)
     auto core = helics::CoreFactory::create (helics::core_type::INTERPROCESS, initializationString);
 
     BOOST_REQUIRE (core != nullptr);
-    BOOST_CHECK (core->isInitialized ());
+    BOOST_CHECK (core->isConfigured ());
 
     helics::ipc::OwnedQueue mq;
     bool mqConn = mq.connect ("testBroker", 1024, 1024);

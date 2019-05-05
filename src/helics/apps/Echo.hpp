@@ -28,6 +28,10 @@ class Echo : public App
     /** default constructor*/
     Echo () = default;
     /** construct from command line arguments
+   @param args a vector of command line arguments
+   */
+    explicit Echo (std::vector<std::string> args);
+    /** construct from command line arguments
     @param argc the number of arguments
     @param argv the strings in the input
     */
@@ -76,14 +80,14 @@ class Echo : public App
     auto endpointCount () const { return endpoints.size (); }
 
   private:
-    /** load information from a program options variable map*/
-    int loadArguments (boost::program_options::variables_map &vm_map);
     /** load information from a JSON file*/
     virtual void loadJsonFile (const std::string &filename) override;
     /** echo an actual message from an endpoint*/
     void echoMessage (const Endpoint &ept, Time currentTime);
 
   private:
+    /** process remaining command line arguments*/
+    void processArgs ();
     std::vector<Endpoint> endpoints;  //!< the actual endpoint objects
     Time delayTime = timeZero;  //!< respond to each message with the specified delay
     size_t echoCounter = 0;  //!< the current message index
