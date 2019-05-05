@@ -280,7 +280,7 @@ endif(GENERATE_DOXYGEN_DOC)
 # -------------------------------------------------------------
 
 if(BUILD_TESTING)
-    list(APPEND BOOST_REQUIRED_LIBRARIES filesystem system unit_test_framework)
+    list(APPEND BOOST_REQUIRED_LIBRARIES unit_test_framework)
 endif()
 include(addBoost)
 
@@ -685,6 +685,12 @@ install(
 )
 install(
     DIRECTORY ThirdParty/cereal
+    DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+    COMPONENT headers
+)
+
+install(
+    DIRECTORY ThirdParty/CLI11
     DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
     COMPONENT headers
 )

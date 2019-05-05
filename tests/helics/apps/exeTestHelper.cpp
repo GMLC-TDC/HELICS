@@ -14,8 +14,14 @@
 #include <cstdlib>
 #include <fstream>
 #include <future>
+#ifdef _MSC_VER
+#pragma warning(push, 0)
+#include <helics_includes/filesystem.hpp>
+#pragma warning(pop)
+#else
+#include <helics_includes/filesystem.hpp>
+#endif
 #include <streambuf>
-#include <boost/filesystem.hpp>
 
 int exeTestRunner::counter = 1;
 
@@ -47,59 +53,59 @@ exeTestRunner::exeTestRunner (const std::string &baseLocation,
 
 bool exeTestRunner::findFileLocation (const std::string &baseLocation, const std::string &target)
 {
-    boost::filesystem::path sourcePath (baseLocation);
+    ghc::filesystem::path sourcePath (baseLocation);
 
     auto tryPath1 = sourcePath / target;
-    if (boost::filesystem::exists (tryPath1))
+    if (ghc::filesystem::exists (tryPath1))
     {
         exeString = tryPath1.string ();
         return true;
     }
 
     auto tryPath2 = sourcePath / (target + ".exe");
-    if (boost::filesystem::exists (tryPath2))
+    if (ghc::filesystem::exists (tryPath2))
     {
         exeString = tryPath2.string ();
         return true;
     }
 #ifndef NDEBUG
     auto tryPathD1 = sourcePath / "Debug" / target;
-    if (boost::filesystem::exists (tryPathD1))
+    if (ghc::filesystem::exists (tryPathD1))
     {
         exeString = tryPathD1.string ();
         return true;
     }
 
     auto tryPathD2 = sourcePath / "Debug" / (target + ".exe");
-    if (boost::filesystem::exists (tryPathD2))
+    if (ghc::filesystem::exists (tryPathD2))
     {
         exeString = tryPathD2.string ();
         return true;
     }
 #endif
     auto tryPathR1 = sourcePath / "Release" / target;
-    if (boost::filesystem::exists (tryPathR1))
+    if (ghc::filesystem::exists (tryPathR1))
     {
         exeString = tryPathR1.string ();
         return true;
     }
 
     auto tryPathR2 = sourcePath / "Release" / (target + ".exe");
-    if (boost::filesystem::exists (tryPathR2))
+    if (ghc::filesystem::exists (tryPathR2))
     {
         exeString = tryPathR2.string ();
         return true;
     }
 
-    boost::filesystem::path tryPatht1 = target;
-    if (boost::filesystem::exists (tryPatht1))
+    ghc::filesystem::path tryPatht1 = target;
+    if (ghc::filesystem::exists (tryPatht1))
     {
         exeString = tryPatht1.string ();
         return true;
     }
 
-    boost::filesystem::path tryPatht2 = (target + ".exe");
-    if (boost::filesystem::exists (tryPatht2))
+    ghc::filesystem::path tryPatht2 = (target + ".exe");
+    if (ghc::filesystem::exists (tryPatht2))
     {
         exeString = tryPatht2.string ();
         return true;
