@@ -108,11 +108,14 @@ std::shared_ptr<helicsCLI11App> BrokerBase::generateBaseCLI ()
 {
     auto hApp = std::make_shared<helicsCLI11App> ("Arguments applying to all Brokers and Cores");
 
-    hApp->add_option ("--federates,-f,--min_federates,--minfed,-m", minFederateCount,
-                      "the minimum number of federates that will be connecting");
+    hApp
+      ->add_option ("--federates,-f,--minfederates,--minfed,-m", minFederateCount,
+                    "the minimum number of federates that will be connecting")
+      ->ignore_underscore ();
     hApp->add_option ("--name,-n,--identifier", identifier, "the name of the broker/core");
-    hApp->add_option ("--maxiter,--max_iterations", maxIterationCount, "the maximum number of iterations allowed",
-                      true);
+    hApp->add_option ("--maxiter,--max_iterations", maxIterationCount, "the maximum number of iterations allowed")
+      ->ignore_underscore ()
+      ->capture_default_str ();
     hApp
       ->add_option ("--minbrokers,--minbroker,--minbrokercount", minBrokerCount,
                     "the minimum number of cores/brokers that need to be connected (ignored in cores)")
@@ -122,7 +125,7 @@ std::shared_ptr<helicsCLI11App> BrokerBase::generateBaseCLI ()
     logging_group->add_option ("--logfile", logFile, "the file to log the messages to")->ignore_underscore ();
     logging_group
       ->add_option_function<int> (
-        "--log_level,--log-level", [this] (int val) { setLogLevel (val); },
+        "--loglevel,--log-level", [this](int val) { setLogLevel (val); },
         "the level which to log the higher this is set to the more gets logs(-1) for no logging")
       ->ignore_underscore ()
       ->transform (CLI::CheckedTransformer (&log_level_map, CLI::ignore_case, CLI::ignore_underscore));
@@ -210,7 +213,7 @@ void BrokerBase::configureBase ()
     }
 
     timeCoord = std::make_unique<ForwardingTimeCoordinator> ();
-    timeCoord->setMessageSender ([this] (const ActionMessage &msg) { addActionMessage (msg); });
+    timeCoord->setMessageSender ([this](const ActionMessage &msg) { addActionMessage (msg); });
 
     loggingObj = std::make_unique<Logger> ();
     if (!logFile.empty ())
@@ -254,8 +257,7 @@ bool BrokerBase::sendToLogger (global_federate_id federateID,
 
 void BrokerBase::generateNewIdentifier () { identifier = genId (0); }
 
-void BrokerBase::setLoggerFunction (
-  std::function<void (int, const std::string &, const std::string &)> logFunction)
+void BrokerBase::setLoggerFunction (std::function<void(int, const std::string &, const std::string &)> logFunction)
 {
     loggerFunction = std::move (logFunction);
     if (loggerFunction)
@@ -385,7 +387,7 @@ void BrokerBase::queueProcessingLoop ()
     asio::steady_timer ticktimer (serv->getBaseContext ());
     activeProtector active (true, false);
 
-    auto timerCallback = [this, &active] (const std::error_code &ec) { timerTickHandler (this, active, ec); };
+    auto timerCallback = [this, &active](const std::error_code &ec) { timerTickHandler (this, active, ec); };
     if (tickTimer > timeZero)
     {
         if (tickTimer < Time (0.5))
@@ -398,7 +400,7 @@ void BrokerBase::queueProcessingLoop ()
     }
     global_broker_id_local = global_id.load ();
     int messagesSinceLastTick = 0;
-    auto logDump = [&, this] () {
+    auto logDump = [&, this]() {
         if (dumplog)
         {
             for (auto &act : dumpMessages)

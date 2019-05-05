@@ -21,21 +21,21 @@ namespace helics
 {
 std::shared_ptr<helicsCLI11App> NetworkBrokerData::commandLineParser (const std::string &localAddress)
 {
-    auto nbparser = std::make_shared<helicsCLI11App> ("Network connection information");
+    auto nbparser = std::make_shared<helicsCLI11App> (
+      "Network connection information \n(arguments allow '_' characters in the names and ignore them)");
+    nbparser->option_defaults ()->ignore_underscore ();
     nbparser
       ->add_flag ("--local{0},--ipv4{4},--ipv6{6},--all{10},--external{10}", interfaceNetwork,
                   "specify external interface to use, default is --local")
       ->disable_flag_override ();
-    nbparser
-      ->add_option_function<std::string> ("--broker_address",
-                                          [this, localAddress](const std::string &addr) {
-                                              auto brkprt = extractInterfaceandPort (addr);
-                                              brokerAddress = brkprt.first;
-                                              brokerPort = brkprt.second;
-                                              checkAndUpdateBrokerAddress (localAddress);
-                                          },
-                                          "location of the broker i.e network address")
-      ->ignore_underscore ();
+    nbparser->add_option_function<std::string> ("--brokeraddress",
+                                                [this, localAddress](const std::string &addr) {
+                                                    auto brkprt = extractInterfaceandPort (addr);
+                                                    brokerAddress = brkprt.first;
+                                                    brokerPort = brkprt.second;
+                                                    checkAndUpdateBrokerAddress (localAddress);
+                                                },
+                                                "location of the broker i.e network address");
     nbparser->add_flag ("--reuse_address", reuse_address,
                         "allow the server to reuse a bound address, mostly useful for tcp cores");
     nbparser->add_option_function<std::string> (
@@ -60,17 +60,17 @@ std::shared_ptr<helicsCLI11App> NetworkBrokerData::commandLineParser (const std:
       },
       "identifier for the broker, this is either the name or network address use --broker_address or --brokername "
       "to explicitly set the network address or name the search for the broker is first by name");
-    nbparser->add_option ("--brokername", brokerName, "the name of the broker")->ignore_underscore ();
-    nbparser->add_option ("--max_size", maxMessageSize, "The message buffer size", true)
+    nbparser->add_option ("--brokername", brokerName, "the name of the broker");
+    nbparser->add_option ("--maxsize", maxMessageSize, "The message buffer size")
+      ->capture_default_str ()
       ->check (CLI::PositiveNumber);
-    nbparser->add_option ("--max_count", maxMessageCount, "The maximum number of message to have in a queue", true)
+    nbparser->add_option ("--maxcount", maxMessageCount, "The maximum number of message to have in a queue")
+      ->capture_default_str ()
       ->check (CLI::PositiveNumber);
-    nbparser->add_option ("--network_retries", maxRetries, "the maximum number of network retries", true)
-      ->ignore_underscore ();
-    nbparser
-      ->add_flag ("--os_port,--use_os_port", use_os_port,
-                  "specify that the ports should be allocated by the host operating system")
-      ->ignore_underscore ();
+    nbparser->add_option ("--networkretries", maxRetries, "the maximum number of network retries")
+      ->capture_default_str ();
+    nbparser->add_flag ("--osport,--use_os_port", use_os_port,
+                        "specify that the ports should be allocated by the host operating system");
     nbparser->add_flag ("--autobroker", autobroker,
                         "allow a broker to be automatically created if one is not available");
     nbparser->add_option ("--brokerinit", brokerInitString, "the initialization string for the broker");
@@ -91,20 +91,17 @@ std::shared_ptr<helicsCLI11App> NetworkBrokerData::commandLineParser (const std:
                            },
                            "specify that the network connection should be a server or client")
       ->disable_flag_override ();
-    nbparser
-      ->add_option_function<std::string> ("--interface,--local_interface",
-                                          [this](const std::string &addr) {
-                                              auto localprt = extractInterfaceandPort (addr);
-                                              localInterface = localprt.first;
-                                              // this may get overridden later
-                                              portNumber = localprt.second;
-                                          },
-                                          "the local interface to use for the receive ports")
-      ->ignore_underscore ();
+    nbparser->add_option_function<std::string> ("--interface,--localinterface",
+                                                [this](const std::string &addr) {
+                                                    auto localprt = extractInterfaceandPort (addr);
+                                                    localInterface = localprt.first;
+                                                    // this may get overridden later
+                                                    portNumber = localprt.second;
+                                                },
+                                                "the local interface to use for the receive ports");
     nbparser->add_option ("--port,-p", portNumber, "port number to use")
       ->transform (CLI::Transformer ({{"auto", "-1"}}, CLI::ignore_case));
-    nbparser->add_option ("--brokerport", brokerPort, "The port number to use to connect with the broker")
-      ->ignore_underscore ();
+    nbparser->add_option ("--brokerport", brokerPort, "The port number to use to connect with the broker");
     nbparser
       ->add_option_function<int> ("--localport",
                                   [this](int port) {
