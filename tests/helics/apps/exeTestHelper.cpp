@@ -123,7 +123,7 @@ std::future<int> exeTestRunner::runAsync (const std::string &args) const
         return fut;
     }
     std::string rstr = exeString + " " + args;
-    return std::async (std::launch::async, [rstr]() { return system (rstr.c_str ()); });
+    return std::async (std::launch::async, [rstr] () { return system (rstr.c_str ()); });
 }
 
 int exeTestRunner::run (const std::string &args) const
@@ -166,7 +166,7 @@ std::future<std::string> exeTestRunner::runCaptureOutputAsync (const std::string
     }
     std::string rstr = exeString + " " + args + " > " + outFile + " 2>&1";
     std::string oFile = outFile;
-    return std::async (std::launch::async, [rstr, oFile]() {
+    return std::async (std::launch::async, [rstr, oFile] () {
         int ret = system (rstr.c_str ());
         std::ifstream t (oFile);
         std::string str ((std::istreambuf_iterator<char> (t)), std::istreambuf_iterator<char> ());

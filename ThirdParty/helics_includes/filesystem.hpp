@@ -1847,7 +1847,7 @@ GHC_INLINE file_status status_ex (const path &p,
         return file_status (file_type::unknown);
     }
     WIN32_FILE_ATTRIBUTE_DATA attr;
-    if (!::GetFileAttributesExW (p.wstring ().c_str (), GetFileExInfoStandard, &attr))
+    if (!::GetFileAttributesExA (p.string ().c_str (), GetFileExInfoStandard, &attr))
     {
         ec = std::error_code (::GetLastError (), std::system_category ());
     }
