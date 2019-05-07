@@ -284,22 +284,27 @@ if(BUILD_TESTING)
 endif()
 include(addBoost)
 
+
+option(ENABLE_MPI_CORE "Enable MPI networking library" OFF)
+option(ENABLE_ZMQ_CORE "Enable ZeroMQ networking library" ON)
+option(ENABLE_TCP_CORE "Enable TCP core types" ON)
+option(ENABLE_UDP_CORE "Enable UDP core types" ON)
+option(ENABLE_IPC_CORE "Enable Interprocess communication types" ON)
+option(ENABLE_TEST_CORE "Enable test inprocess core type" ON)
+mark_as_advanced(ENABLE_MPI_CORE ENABLE_ZMQ_CORE ENABLE_TCP_CORE ENABLE_UDP_CORE ENABLE_TEST_CORE ENABLE_IPC_CORE)
+
 # -------------------------------------------------------------
 # finding MPI
 # -------------------------------------------------------------
 
-option(ENABLE_MPI "Enable MPI networking library" OFF)
-if(ENABLE_MPI)
+if(ENABLE_MPI_CORE)
     include(addMPI)
     if(MPI_C_FOUND)
-        set(HELICS_HAVE_MPI TRUE)
         target_link_libraries(helics_base INTERFACE MPI::MPI_C)
     else()
-        message(SEND_ERROR "MPI not found")
+        message(FATAL_ERROR "MPI not found")
     endif(MPI_C_FOUND)
-else(ENABLE_MPI)
-    set(HELICS_HAVE_MPI FALSE)
-endif(ENABLE_MPI)
+endif(ENABLE_MPI_CORE)
 
 # -------------------------------------------------------------
 # add threading support
@@ -320,25 +325,10 @@ if(UNIX AND NOT APPLE)
 endif()
 
 # -------------------------------------------------------------
-# check for some things with TCP core and boost
+# add some additional libraries for MSYS
 # -------------------------------------------------------------
 if(MSYS)
-    if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
-        if(BOOST_VERSION_LEVEL GREATER 65)
-            set(DISABLE_TCP_CORE FALSE)
-            target_link_libraries(helics_base INTERFACE wsock32 ws2_32)
-            set(DISABLE_IPC_CORE TRUE)
-        else()
-            set(DISABLE_TCP_CORE TRUE)
-            message(STATUS, "disabling TCP core |${DISABLE_TCP_CORE}|")
-            target_link_libraries(helics_base INTERFACE ws2_32)
-            set(DISABLE_IPC_CORE FALSE)
-        endif()
-
-    else()
-        target_link_libraries(helics_base INTERFACE wsock32 ws2_32)
-    endif()
-
+    target_link_libraries(helics_base INTERFACE wsock32 ws2_32)
 endif(MSYS)
 
 # -------------------------------------------------------------
@@ -353,15 +343,14 @@ if(BUILD_DEBUG_ONLY AND BUILD_RELEASE_ONLY)
     )
 endif()
 
-option(ENABLE_ZeroMQ "Enable ZeroMQ networking library" ON)
-mark_as_advanced(ENABLE_ZeroMQ)
+option(ENABLE_ZMQ_CORE "Enable ZeroMQ networking library" ON)
+mark_as_advanced(ENABLE_ZMQ_CORE)
 # If ZeroMQ library is enabled try to locate it and link against it
 
-if(ENABLE_ZeroMQ AND NOT DISABLE_ZMQ_CORE)
+if(ENABLE_ZMQ_CORE)
     include(addZeroMQ)
 
     if(ZeroMQ_FOUND)
-        set(HELICS_HAVE_ZEROMQ TRUE)
         if(ZMQ_USE_STATIC_LIBRARY)
             set(ZeroMQ_DEPENDENCY libzmq-static)
             target_compile_definitions(
@@ -373,13 +362,8 @@ if(ENABLE_ZeroMQ AND NOT DISABLE_ZMQ_CORE)
         # message(STATUS "zmq dep ${ZeroMQ_DEPENDENCY}")
         target_link_libraries(helics_base INTERFACE ${ZeroMQ_DEPENDENCY})
     else(ZeroMQ_FOUND)
-        set(HELICS_HAVE_ZEROMQ FALSE)
+        message(FATAL_ERROR "ZeroMQ not found")
     endif(ZeroMQ_FOUND)
-else(ENABLE_ZeroMQ)
-    set(HELICS_HAVE_ZEROMQ FALSE)
-    if(ENABLE_ZeroMQ)
-        message(SEND_ERROR "ZeroMQ not found")
-    endif()
 endif()
 
 # -------------------------------------------------------------
@@ -468,7 +452,7 @@ endif()
 list(APPEND CMAKE_INSTALL_RPATH "./")
 
 if(NOT WIN32)
-    if(HELICS_HAVE_ZEROMQ AND NOT ZMQ_USE_STATIC_LIBRARY)
+    if(ENABLE_ZMQ_CORE)
         get_target_property(zmqlibfile libzmq IMPORTED_LOCATION)
         if(NOT zmqlibfile)
             get_target_property(zmqlibfile libzmq IMPORTED_LOCATION_RELEASE)
@@ -494,7 +478,7 @@ option(
 )
 
 file(GLOB KEY_LIBRARY_FILES ${AUTOBUILD_INSTALL_PATH}/bin/*)
-if(ZMQ_USE_STATIC_LIBRARY)
+if(ENABLE_ZMQ_CORE AND ZMQ_USE_STATIC_LIBRARY)
     # remove the zmq libraries from the key files list if we are using static
     # zeromq libraries
     set(NEW_LIST)
@@ -553,7 +537,7 @@ add_subdirectory(src)
 # Setup CTEST environment
 # -----------------------------------------------------------------------------
 
-if(BUILD_HELICS_TESTS AND BUILD_TESTING AND NOT DISABLE_TEST_CORE)
+if(BUILD_HELICS_TESTS AND BUILD_TESTING AND ENABLE_TEST_CORE)
     mark_as_advanced(BUILD_TESTING)
     add_subdirectory(tests)
 endif()
@@ -583,7 +567,7 @@ install(
     OPTIONAL
 )
 
-if(HELICS_HAVE_ZEROMQ)
+if(ENABLE_ZMQ_CORE)
     if(WIN32 AND NOT MSYS)
         install(
             FILES $<TARGET_LINKER_FILE:libzmq>

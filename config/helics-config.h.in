@@ -10,14 +10,12 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include "compiler-config.h"
 
-#cmakedefine01 HELICS_HAVE_MPI
-
-#cmakedefine01 HELICS_HAVE_ZEROMQ
-
-#cmakedefine DISABLE_TCP_CORE
-#cmakedefine DISABLE_IPC_CORE
-#cmakedefine DISABLE_UDP_CORE
-#cmakedefine DISABLE_TEST_CORE
+#cmakedefine ENABLE_MPI_CORE
+#cmakedefine ENABLE_ZMQ_CORE
+#cmakedefine ENABLE_TCP_CORE
+#cmakedefine ENABLE_IPC_CORE
+#cmakedefine ENABLE_UDP_CORE
+#cmakedefine ENABLE_TEST_CORE
 
 
 #cmakedefine ENABLE_LOGGING

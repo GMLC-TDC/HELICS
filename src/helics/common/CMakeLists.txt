@@ -79,10 +79,10 @@ set(
   generic_string_ops.hpp
 )
 
-if(HELICS_HAVE_ZEROMQ)
+if(ENABLE_ZMQ_CORE)
   list(APPEND common_headers ${zmq_headers})
   list(APPEND common_sources ${zmq_sources})
-endif(HELICS_HAVE_ZEROMQ)
+endif(ENABLE_ZMQ_CORE)
 
 add_library(helics_common OBJECT ${common_sources} ${common_headers})
 set_target_properties(helics_common PROPERTIES LINKER_LANGUAGE CXX)
@@ -105,12 +105,12 @@ target_compile_options(
   PRIVATE $<TARGET_PROPERTY:helics_base_includes,INTERFACE_COMPILE_OPTIONS>
 )
 
-if(HELICS_HAVE_ZEROMQ)
+if(ENABLE_ZMQ_CORE)
   target_include_directories(
     helics_common SYSTEM
     PRIVATE $<TARGET_PROPERTY:${ZeroMQ_DEPENDENCY},INTERFACE_INCLUDE_DIRECTORIES>
   )
-endif(HELICS_HAVE_ZEROMQ)
+endif(ENABLE_ZMQ_CORE)
 
 if(APPLE)
   target_compile_definitions(helics_common PUBLIC "-DSTX_NO_STD_ANY=1")

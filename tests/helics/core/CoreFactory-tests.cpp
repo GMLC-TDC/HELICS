@@ -14,7 +14,7 @@ namespace utf = boost::unit_test;
 
 BOOST_AUTO_TEST_SUITE (CoreFactory_tests, *utf::label ("ci"))
 
-#if HELICS_HAVE_ZEROMQ
+#ifdef ENABLE_ZMQ_CORE
 BOOST_AUTO_TEST_CASE (ZmqCore_test)
 {
     BOOST_CHECK_EQUAL (helics::isCoreTypeAvailable (helics::core_type::ZMQ), true);
@@ -24,15 +24,15 @@ BOOST_AUTO_TEST_CASE (ZmqCore_test)
     core->disconnect ();
     core = nullptr;
 }
-#else  // HELICS_HAVE_ZEROMQ
+#else  // ENABLE_ZMQ_CORE
 BOOST_AUTO_TEST_CASE (ZmqCore_test)
 {
     BOOST_CHECK_EQUAL (helics::isCoreTypeAvailable (helics::core_type::ZMQ), false);
 }
-#endif  // HELICS_HAVE_ZEROMQ
+#endif  // ENABLE_ZMQ_CORE
 
 /*
-#if HELICS_HAVE_MPI
+#ifdef ENABLE_MPI_CORE
 
 BOOST_AUTO_TEST_CASE (MpiCore_test)
 {
@@ -47,7 +47,7 @@ BOOST_AUTO_TEST_CASE (MpiCore_test)
 {
     BOOST_CHECK_EQUAL (helics::isCoreTypeAvailable (helics::core_type::MPI), false);
 }
-#endif  // HELICS_HAVE_MPI
+#endif  // ENABLE_MPI_CORE
 */
 
 BOOST_AUTO_TEST_CASE (TestCore_test)
@@ -59,7 +59,7 @@ BOOST_AUTO_TEST_CASE (TestCore_test)
     core->disconnect ();
     core = nullptr;
 }
-#ifndef DISABLE_IPC_CORE
+#ifdef ENABLE_IPC_CORE
 BOOST_AUTO_TEST_CASE (InterprocessCore_test)
 {
     BOOST_CHECK_EQUAL (helics::isCoreTypeAvailable (helics::core_type::INTERPROCESS), true);
@@ -83,7 +83,7 @@ BOOST_AUTO_TEST_CASE (InterprocessCore_test)
     BOOST_CHECK_EQUAL (helics::isCoreTypeAvailable (helics::core_type::IPC), false);
 }
 #endif
-#ifndef DISABLE_TCP_CORE
+#ifdef ENABLE_TCP_CORE
 BOOST_AUTO_TEST_CASE (tcpCore_test)
 {
     BOOST_CHECK_EQUAL (helics::isCoreTypeAvailable (helics::core_type::TCP), true);
@@ -100,7 +100,7 @@ BOOST_AUTO_TEST_CASE (tcpCore_test)
 }
 #endif
 
-#ifndef DISABLE_TCP_CORE
+#ifdef ENABLE_TCP_CORE
 BOOST_AUTO_TEST_CASE (tcpSSCore_test)
 {
     BOOST_CHECK_EQUAL (helics::isCoreTypeAvailable (helics::core_type::TCP_SS), true);
@@ -117,7 +117,7 @@ BOOST_AUTO_TEST_CASE (tcpSSCore_test)
 }
 #endif
 
-#ifndef DISABLE_UDP_CORE
+#ifdef ENABLE_UDP_CORE
 BOOST_AUTO_TEST_CASE (udpCore_test)
 {
     BOOST_CHECK_EQUAL (helics::isCoreTypeAvailable (helics::core_type::UDP), true);
