@@ -7,8 +7,8 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "testFixtures.h"
 #include <boost/test/unit_test.hpp>
 
-#include "helics/common/stringToCmdLine.h"
 #include "helics/core/NetworkBrokerData.hpp"
+#include "helics/core/helicsCLI11.hpp"
 
 namespace utf = boost::unit_test;
 
@@ -17,13 +17,12 @@ BOOST_AUTO_TEST_SUITE (networkData_tests, *utf::label ("ci"))
 BOOST_AUTO_TEST_CASE (basic_test)
 {
     helics::NetworkBrokerData bdata;
-    StringToCmdLine cmd ("--broker=bob --interface=harry --ipv4");
-    bdata.initializeFromArgs (cmd.getArgCount (), cmd.getArgV (), "local");
+    auto parser = bdata.commandLineParser ("local");
+    parser->helics_parse ("--broker=bob --interface=harry --ipv4");
     BOOST_CHECK_EQUAL (bdata.brokerAddress, "bob");
     BOOST_CHECK_EQUAL (bdata.localInterface, "harry");
     BOOST_CHECK (bdata.interfaceNetwork == helics::interface_networks::ipv4);
-    StringToCmdLine cmd2 ("--brokername=tom --brokerport=20755 --port 45");
-    bdata.initializeFromArgs (cmd2.getArgCount (), cmd2.getArgV (), "local");
+    parser->helics_parse ("--brokername=tom --brokerport=20755 --port 45");
     BOOST_CHECK_EQUAL (bdata.brokerName, "tom");
     BOOST_CHECK_EQUAL (bdata.brokerPort, 20755);
     BOOST_CHECK_EQUAL (bdata.portNumber, 45);

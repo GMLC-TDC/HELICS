@@ -10,8 +10,6 @@ Header file for inclusion of the entire CPP static library
 #pragma once
 
 #include "application_api.hpp"
-#include "common/argParser.h"
-#include "common/stringToCmdLine.h"
 #include "core/Broker.hpp"
 #include "core/BrokerFactory.hpp"
 #include "core/Core.hpp"

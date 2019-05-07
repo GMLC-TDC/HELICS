@@ -62,6 +62,10 @@ class Source : public App
   public:
     /** default constructor*/
     Source () = default;
+    /** construct from command line arguments in a vector
+    @param args The vector of string, the remaining arguments are returned in the args
+    */
+    explicit Source (std::vector<std::string> args);
     /** construct from command line arguments
     @param argc the number of arguments
     @param argv the strings in the input
@@ -140,7 +144,8 @@ class Source : public App
     std::shared_ptr<SignalGenerator> getGenerator (int index);
 
   private:
-    int loadArguments (boost::program_options::variables_map &vm_map);
+    /** process remaining command line arguments*/
+    void processArgs ();
     /** load from a jsonString
     @param jsonString either a JSON filename or a string containing JSON
     */

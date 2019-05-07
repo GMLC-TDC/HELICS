@@ -20,13 +20,11 @@ class NetworkBroker : public CommsBroker<COMMS, CoreBroker>
     explicit NetworkBroker (bool rootBroker = false) noexcept;
     explicit NetworkBroker (const std::string &broker_name);
 
-    void initializeFromArgs (int argc, const char *const *argv) override;
-
   public:
     virtual std::string generateLocalAddressString () const override;
-    static void displayHelp (bool local_only = false);
 
   protected:
+    virtual std::shared_ptr<helicsCLI11App> generateCLI () override;
     virtual bool brokerConnect () override;
     mutable std::mutex dataMutex;  //!< mutex protecting the configuration information
     NetworkBrokerData netInfo{baseline};  //!< structure containing the networking information

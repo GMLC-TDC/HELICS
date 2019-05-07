@@ -10,6 +10,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <chrono>
 #include <memory>
 #include <string>
+#include <vector>
 
 namespace helics
 {
@@ -23,6 +24,13 @@ class CommonCore;
 
 namespace CoreFactory
 {
+/** create a core from a type, name, and initializationString
+@param type the type of core to create
+@param core_name the name for the core
+@param initializationString a string containing arguments for the core
+*/
+std::shared_ptr<Core>
+create (core_type type, const std::string &core_name, const std::string &initializationString);
 /**
  * Creates a Core API object of the specified type.
  *
@@ -35,7 +43,20 @@ std::shared_ptr<Core> create (core_type type, const std::string &initializationS
 @param argc the number of command line arguments
 @param argv the actual string parameters for the command line
 */
-std::shared_ptr<Core> create (core_type type, int argc, const char *const *argv);
+std::shared_ptr<Core> create (core_type type, int argc, char *argv[]);
+
+/** create a core from arguments
+@details an argument of '--coretype' must be specified to define the type,  otherwise the default type is used
+@param args a vector of reversed command line arguments
+@return a pointer to the created core
+*/
+std::shared_ptr<Core> create (std::vector<std::string> args);
+
+/** create a core from a type and command line arguments
+@param type the type of core to create
+@param args a vector of reversed command line arguments
+*/
+std::shared_ptr<Core> create (core_type type, std::vector<std::string> args);
 
 /** create a core from arguments
 @details an argument of '--coretype' must be specified to define the type,  otherwise the default type is used
@@ -43,14 +64,7 @@ std::shared_ptr<Core> create (core_type type, int argc, const char *const *argv)
 @param argv the actual argument parameters
 @return a pointer to the created core
 */
-std::shared_ptr<Core> create (int argc, const char *const *argv);
-
-/** create a core from a type, name, and initializationString
-@param type the type of core to create
-@param core_name the name for the core
-@param initializationString a string containing arguments for the core
-*/
-std::shared_ptr<Core> create (core_type type, const std::string &core_name, std::string &initializationString);
+std::shared_ptr<Core> create (int argc, char *argv[]);
 
 /** create a core from a type, name, and arguments
 @param type the type of core to create
@@ -59,7 +73,16 @@ std::shared_ptr<Core> create (core_type type, const std::string &core_name, std:
 @param argv the actual argument parameters
 @return a pointer to the created core
 */
-std::shared_ptr<Core> create (core_type type, const std::string &core_name, int argc, const char *const *argv);
+std::shared_ptr<Core> create (core_type type, const std::string &core_name, int argc, char *argv[]);
+
+/** create a core from a type, name, and arguments
+@param type the type of core to create
+@param core_name the name for the core
+@param args a vector of reversed command line arguments
+@return a pointer to the created core
+*/
+std::shared_ptr<Core> create (core_type type, const std::string &core_name, std::vector<std::string> args);
+
 /** tries to find a named core if it fails it creates a new one
  */
 std::shared_ptr<Core>
@@ -67,8 +90,11 @@ FindOrCreate (core_type type, const std::string &coreName, const std::string &in
 
 /** tries to find a named core if it fails it creates a new one
  */
-std::shared_ptr<Core>
-FindOrCreate (core_type type, const std::string &coreName, int argc, const char *const *argv);
+std::shared_ptr<Core> FindOrCreate (core_type type, const std::string &coreName, int argc, char *argv[]);
+
+/** tries to find a named core if it fails it creates a new one
+ */
+std::shared_ptr<Core> FindOrCreate (core_type type, const std::string &coreName, std::vector<std::string> args);
 /** try to find a joinable core of a specific type*/
 std::shared_ptr<Core> findJoinableCoreOfType (core_type type);
 

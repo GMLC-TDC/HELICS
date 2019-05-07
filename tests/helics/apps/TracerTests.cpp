@@ -5,7 +5,6 @@ the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 #include <boost/test/unit_test.hpp>
-#include <boost/filesystem.hpp>
 #include <boost/test/data/test_case.hpp>
 #include <boost/test/floating_point_comparison.hpp>
 
@@ -16,10 +15,10 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helics/application_api/Publications.hpp"
 #include "helics/apps/Tracer.hpp"
 #include "helics/common/stringOps.h"
-#include "helics/common/stringToCmdLine.h"
 #include "helics/core/BrokerFactory.hpp"
 #include <algorithm>
 #include <future>
+#include <iostream>
 
 namespace utf = boost::unit_test;
 using namespace std::literals::chrono_literals;
@@ -196,7 +195,7 @@ BOOST_DATA_TEST_CASE (simple_tracer_test_message_files, boost::unit_test::data::
     helics::FederateInfo fi (helics::core_type::TEST);
     fi.coreName = std::string ("tcore1b") + file;
     fi.coreName.push_back (indx++);
-    fi.coreInitString = " - f 2 --autobroker";
+    fi.coreInitString = " -f 2 --autobroker";
     helics::apps::Tracer trace1 ("trace1", fi);
 
     trace1.loadFile (std::string (TEST_DIR) + file);
@@ -252,10 +251,15 @@ BOOST_DATA_TEST_CASE (simple_tracer_test_message_files_cmd,
     auto brk = helics::BrokerFactory::create (helics::core_type::IPC, "ipc_broker", "-f 2");
     brk->connect ();
     std::string exampleFile = std::string (TEST_DIR) + file;
+    std::vector<std::string> args{"", "--name=rec", "--coretype=ipc", exampleFile};
 
-    StringToCmdLine cmdArg ("--name=rec --coretype=ipc " + exampleFile);
+    char *argv[4];
+    argv[0] = &(args[0][0]);
+    argv[1] = &(args[1][0]);
+    argv[2] = &(args[2][0]);
+    argv[3] = &(args[3][0]);
 
-    helics::apps::Tracer trace1 (cmdArg.getArgCount (), cmdArg.getArgV ());
+    helics::apps::Tracer trace1 (4, argv);
     std::atomic<int> counter{0};
     auto cb = [&counter](helics::Time, const std::string &, const std::string &) { ++counter; };
     trace1.setValueCallback (cb);
@@ -610,16 +614,15 @@ BOOST_DATA_TEST_CASE (simple_tracer_test_message_files_exe,
                       file)
 {
     std::this_thread::sleep_for (300ms);
-    auto brk = helics::BrokerFactory::create (helics::core_type::IPC, "ipc_broker", "-f 2");
+    auto brk = helics::BrokerFactory::create (helics::core_type::ZMQ, "z_broker", "-f 2");
     brk->connect ();
     std::string exampleFile = std::string (TEST_DIR) + file;
 
-    std::string cmdArg ("--name=tracer --coretype=ipc --stop=5 " + exampleFile);
+    std::string cmdArg ("--name=tracer --coretype=zmq --stop=5s --print --skiplog " + exampleFile);
     exeTestRunner tracerExe (HELICS_INSTALL_LOC, HELICS_BUILD_LOC "apps/", "helics_app");
     BOOST_REQUIRE (tracerExe.isActive ());
     auto out = tracerExe.runCaptureOutputAsync (std::string ("tracer " + cmdArg));
-
-    helics::FederateInfo fi (helics::core_type::IPC);
+    helics::FederateInfo fi (helics::core_type::ZMQ);
     fi.coreInitString = "";
 
     helics::CombinationFederate cfed ("obj", fi);

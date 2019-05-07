@@ -110,8 +110,9 @@ FederateTestFixture::~FederateTestFixture ()
 
 helics_broker FederateTestFixture::AddBroker (const std::string &core_type_name, int count)
 {
-    return AddBroker (core_type_name, std::to_string (count));
+    return AddBroker (core_type_name, std::string ("-f") + std::to_string (count));
 }
+
 
 helics_broker
 FederateTestFixture::AddBroker (const std::string &core_type_name, const std::string &initialization_string)

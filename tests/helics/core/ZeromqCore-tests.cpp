@@ -548,7 +548,7 @@ BOOST_AUTO_TEST_CASE (zmqCore_initialization_test)
     auto core = helics::CoreFactory::create (helics::core_type::ZMQ, initializationString);
 
     BOOST_REQUIRE (core != nullptr);
-    BOOST_CHECK (core->isInitialized ());
+    BOOST_CHECK (core->isConfigured ());
     auto ctx = ZmqContextManager::getContextPointer ();
     zmq::socket_t repSocket (ctx->getContext (), ZMQ_REP);
     try

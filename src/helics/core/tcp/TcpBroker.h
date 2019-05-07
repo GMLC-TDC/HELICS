@@ -26,10 +26,8 @@ class TcpBrokerSS final
     explicit TcpBrokerSS (bool rootBroker = false) noexcept;
     explicit TcpBrokerSS (const std::string &broker_name);
 
-    void initializeFromArgs (int argc, const char *const *argv) override;
-
-  public:
-    static void displayHelp (bool local_only = false);
+  protected:
+    virtual std::shared_ptr<helicsCLI11App> generateCLI () override;
 
   private:
     virtual bool brokerConnect () override;

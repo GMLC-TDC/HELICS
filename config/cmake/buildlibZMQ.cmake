@@ -105,6 +105,13 @@ ExternalProject_Add(libzmq
     file(WRITE ${trigger_build_dir}/CMakeLists.txt "${CMAKE_LIST_CONTENT}")
 
     if(MSVC)
+	
+		if(${CMAKE_VERSION} VERSION_LESS "3.14.0") 
+			set(GENERATOR_ARGS -G ${CMAKE_GENERATOR})
+		else()
+			set(GENERATOR_ARGS -G ${CMAKE_GENERATOR} -A ${CMAKE_GENERATOR_PLATFORM})
+		endif()
+
         if(NOT BUILD_DEBUG_ONLY)
             if(NOT MSVC_RELEASE_BUILD_TYPE)
                 set(MSVC_RELEASE_BUILD_TYPE "Release")
@@ -120,8 +127,8 @@ ExternalProject_Add(libzmq
                     CMAKE_CXX_COMPILER=${cxx_compiler_string} -D
                     CMAKE_C_COMPILER=${c_compiler_string} -D
                     CMAKE_LINKER=${linker_string} -D
-                    CMAKE_BUILD_TYPE=${MSVC_RELEASE_BUILD_TYPE} -G
-                    ${CMAKE_GENERATOR} ..
+                    CMAKE_BUILD_TYPE=${MSVC_RELEASE_BUILD_TYPE}
+                    ${GENERATOR_ARGS} ..
                 WORKING_DIRECTORY ${trigger_build_dir}/build
                 OUTPUT_FILE
                     ${PROJECT_BINARY_DIR}/logs/zmq_autobuild_config_release.log
@@ -150,7 +157,7 @@ ExternalProject_Add(libzmq
                 COMMAND
                     ${CMAKE_COMMAND} -D CMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}
                     -D CMAKE_C_COMPILER=${CMAKE_C_COMPILER} -D
-                    CMAKE_BUILD_TYPE=Debug -G ${CMAKE_GENERATOR} ..
+                    CMAKE_BUILD_TYPE=Debug ${GENERATOR_ARGS} ..
                 WORKING_DIRECTORY ${trigger_build_dir}/build
                 OUTPUT_FILE
                     ${PROJECT_BINARY_DIR}/logs/zmq_autobuild_config_debug.log

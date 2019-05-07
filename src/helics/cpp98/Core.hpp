@@ -28,7 +28,7 @@ class Core
         core = helicsCreateCore (type.c_str (), name.c_str (), initString.c_str (), hThrowOnError ());
     }
     /** construct with type, core name and command line arguments */
-    Core (const std::string &type, const std::string &name, int argc, const char **argv)
+    Core (const std::string &type, const std::string &name, int argc, char **argv)
     {
         core = helicsCreateCoreFromArgs (type.c_str (), name.c_str (), argc, argv, hThrowOnError ());
     }

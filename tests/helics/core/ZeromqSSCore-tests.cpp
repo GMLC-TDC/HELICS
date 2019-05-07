@@ -203,7 +203,7 @@ BOOST_AUTO_TEST_CASE (zmqSSCore_initialization_test)
     auto core = helics::CoreFactory::create (helics::core_type::ZMQ_SS, initializationString);
 
     BOOST_REQUIRE (core);
-    BOOST_CHECK (core->isInitialized ());
+    BOOST_CHECK (core->isConfigured ());
 
     std::this_thread::sleep_for (100ms);
     bool connected = core->connect ();
@@ -228,7 +228,7 @@ BOOST_AUTO_TEST_CASE (zmqSSCore_initialization_test)
             auto rM = msgs.at (0);
             mLock.unlock ();
             BOOST_CHECK_EQUAL (rM.name, "core1");
-            std::cout << "rM.name: " << rM.name << std::endl;
+            // std::cout << "rM.name: " << rM.name << std::endl;
             BOOST_CHECK (rM.action () == helics::action_message_def::action_t::cmd_protocol);
         }
         else
@@ -366,15 +366,15 @@ class FedTest
 BOOST_AUTO_TEST_CASE (zmqSSMultiCoreInitialization_test)
 {
     int feds = 20;
-    auto broker =
-      helics::BrokerFactory::create (helics::core_type::ZMQ_SS, "ZMQ_SS_broker", std::to_string (feds));
+    auto broker = helics::BrokerFactory::create (helics::core_type::ZMQ_SS, "ZMQ_SS_broker",
+                                                 std::string ("-f ") + std::to_string (feds));
     std::vector<std::shared_ptr<helics::Core>> cores (feds);
     std::vector<FedTest> leafs (feds);
     BOOST_TEST_CHECKPOINT ("created broker");
     for (int ii = 0; ii < feds; ++ii)
     {
-        std::string initializationString = "-f 1 --name=core" + std::to_string (ii);
-        cores[ii] = helics::CoreFactory::create (helics::core_type::ZMQ_SS, initializationString);
+        std::string configureString = "-f 1 --name=core" + std::to_string (ii);
+        cores[ii] = helics::CoreFactory::create (helics::core_type::ZMQ_SS, configureString);
         cores[ii]->connect ();
         int s_index = ii + 1;
         if (ii == feds - 1)

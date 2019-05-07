@@ -15,10 +15,8 @@ set(
   delayedDestructor.hpp
   DelayedObjects.hpp
   searchableObjectHolder.hpp
-  argParser.h
   JsonProcessingFunctions.hpp
   TomlProcessingFunctions.hpp
-  stringToCmdLine.h
   AsioContextManager.h
   logger.h
   stringOps.h
@@ -40,7 +38,6 @@ set(
 
 set(
   common_sources
-  stringToCmdLine.cpp
   AsioContextManager.cpp
   JsonProcessingFunctions.cpp
   TomlProcessingFunctions.cpp
@@ -48,7 +45,6 @@ set(
   stringOps.cpp
   charMapper.cpp
   base64.cpp
-  argParser.cpp
   TripWire.cpp
   TriggerVariable.cpp
 )
@@ -74,9 +70,7 @@ set(
 set(
   helics_public_common
   timeRepresentation.hpp
-  argParser.h
   JsonProcessingFunctions.hpp
-  stringToCmdLine.h
   AsioContextManager.h
   logger.h
   stringOps.h

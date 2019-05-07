@@ -207,7 +207,7 @@ void helicsFederateInfoFree (helics_federate_info fi)
     auto info = getFedInfo (fi, nullptr);
     if (info == nullptr)
     {
-        fprintf (stderr, "The helics_federate_info object is not valid");
+        fprintf (stderr, "The helics_federate_info object is not valid\n");
         return;
     }
     info->uniqueKey = 0;
@@ -225,7 +225,13 @@ void helicsFederateInfoLoadFromArgs (helics_federate_info fi, int argc, const ch
     }
     try
     {
-        hfi->loadInfoFromArgs (argc, argv);
+        std::vector<std::string> args;
+        args.reserve (argc - 1);
+        for (int ii = argc - 1; ii > 0; --ii)
+        {
+            args.emplace_back (argv[ii]);
+        }
+        hfi->loadInfoFromArgs (args);
     }
     catch (...)
     {
@@ -566,13 +572,26 @@ helics_core helicsCreateCoreFromArgs (const char *type, const char *name, int ar
         return nullptr;
     }
     auto core = std::make_unique<helics::CoreObject> ();
+    try
+    {
+        core->valid = coreValidationIdentifier;
+        std::vector<std::string> args;
+        args.reserve (argc - 1);
+        for (int ii = argc - 1; ii > 0; ii--)
+        {
+            args.emplace_back (argv[ii]);
+        }
+        core->coreptr = helics::CoreFactory::FindOrCreate (ct, AS_STRING (name), args);
+        auto retcore = reinterpret_cast<helics_core> (core.get ());
+        getMasterHolder ()->addCore (std::move (core));
 
-    core->valid = coreValidationIdentifier;
-    core->coreptr = helics::CoreFactory::FindOrCreate (ct, AS_STRING (name), argc, argv);
-    auto retcore = reinterpret_cast<helics_core> (core.get ());
-    getMasterHolder ()->addCore (std::move (core));
-
-    return retcore;
+        return retcore;
+    }
+    catch (...)
+    {
+        helicsErrorHandler (err);
+        return nullptr;
+    }
 }
 
 helics_core helicsCoreClone (helics_core core, helics_error *err)
@@ -685,7 +704,13 @@ helics_broker helicsCreateBrokerFromArgs (const char *type, const char *name, in
     broker->valid = brokerValidationIdentifier;
     try
     {
-        broker->brokerptr = helics::BrokerFactory::create (ct, (name != nullptr) ? std::string (name) : nullstr, argc, argv);
+        std::vector<std::string> args;
+        args.reserve (argc - 1);
+        for (int ii = argc - 1; ii > 0; ii--)
+        {
+            args.emplace_back (argv[ii]);
+        }
+        broker->brokerptr = helics::BrokerFactory::create (ct, (name != nullptr) ? std::string (name) : nullstr, args);
         auto retbroker = reinterpret_cast<helics_broker> (broker.get ());
         getMasterHolder ()->addBroker (std::move (broker));
         return retbroker;

@@ -10,10 +10,12 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include <memory>
 #include <string>
+#include <vector>
 
 namespace helics
 {
 class Broker;
+class helicsCLI11App;
 
 namespace apps
 {
@@ -25,6 +27,15 @@ class BrokerApp
   public:
     /** default constructor*/
     BrokerApp () = default;
+    /** construct from command line arguments in a vector
+ @param args the command line arguments to pass in a reverse vector
+ */
+    explicit BrokerApp (std::vector<std::string> args);
+    /** construct from command line arguments in a vector
+     @param ctype the type of broker to create
+@param args the command line arguments to pass in a reverse vector
+*/
+    BrokerApp (core_type ctype, std::vector<std::string> args);
     /** construct from command line arguments
     @param argc the number of arguments
     @param argv the strings in the input
@@ -61,9 +72,11 @@ class BrokerApp
     auto *operator-> () const { return broker.operator-> (); }
 
   private:
-    void loadFromArguments (int argc, char *argv[]);
+    void processArgs (std::unique_ptr<helicsCLI11App> &app);
+    std::unique_ptr<helicsCLI11App> generateParser ();
     core_type type = core_type::ZMQ;
     std::shared_ptr<Broker> broker;  //!< the actual endpoint objects
+    std::string name;  //!< the name of the broker
 };
 }  // namespace apps
 }  // namespace helics
