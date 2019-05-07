@@ -7,7 +7,7 @@ shopt -s nocasematch
 # Setup the flags for configuring HELICS with CMake
 OPTION_FLAGS_ARR=()
 OPTION_FLAGS_ARR+=("-DBUILD_C_SHARED_LIB=ON" "-DBUILD_SHARED_LIBS=ON" "-DEXAMPLES_WARNINGS_AS_ERROR=ON")
-OPTION_FLAGS_ARR+=("-DZMQ_USE_STATIC_LIBRARY=ON -DUSE_BOOST_STATIC_LIBS=ON")
+OPTION_FLAGS_ARR+=("-DZMQ_USE_STATIC_LIBRARY=ON")
 
 # Options to control building swig interfaces
 if [[ "${DISABLE_INTERFACES}" != *"Java"* ]]; then
