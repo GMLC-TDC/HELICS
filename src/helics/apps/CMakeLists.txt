@@ -139,8 +139,7 @@ add_executable(
 target_include_directories(helics-config PRIVATE ${CMAKE_CURRENT_BINARY_DIR})
 set_target_properties(helics-config PROPERTIES FOLDER apps)
 
-target_link_libraries(helics-config PUBLIC Boostlibs::core)
-target_include_directories(helics-config SYSTEM PRIVATE ${Boost_INCLUDE_DIR})
+target_include_directories(helics-config SYSTEM PRIVATE ${HELICS_SOURCE_DIR}/ThirdParty)
 
 install(
   TARGETS helics-config

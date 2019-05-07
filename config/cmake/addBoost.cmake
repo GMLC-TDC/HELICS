@@ -24,6 +24,7 @@ if(UNIX)
 else(UNIX)
     if(MSYS)
         option(USE_BOOST_STATIC_LIBS "Build using boost static Libraries" OFF)
+		 set(Boost_USE_MULTITHREADED ON) # Needed if MT libraries not built
     else(MSYS)
         # this will be MSYS or stand alone Mingw
         option(USE_BOOST_STATIC_LIBS "Build using boost static Libraries" ON)
@@ -107,7 +108,7 @@ endif(MSVC)
 hide_variable(BOOST_TEST_PATH)
 
 if(NOT BOOST_REQUIRED_LIBRARIES)
-    set(BOOST_REQUIRED_LIBRARIES filesystem system)
+    set(BOOST_REQUIRED_LIBRARIES)
     if(BUILD_TESTING)
         message(STATUS "adding unit testing")
         list(APPEND BOOST_REQUIRED_LIBRARIES unit_test_framework)

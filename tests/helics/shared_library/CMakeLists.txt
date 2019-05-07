@@ -48,13 +48,11 @@ add_executable(
 target_link_libraries(
   shared-library-tests
   helicsSharedLib
-  ${Boost_LIBRARIES_core}
   helics_test_base
 )
 target_link_libraries(
   shared-library-tests-cpp
   helicsSharedLib
-  ${Boost_LIBRARIES_core}
   helics_test_base
 )
 

@@ -24,7 +24,8 @@ std::shared_ptr<helicsCLI11App> TcpCoreSS::generateCLI ()
     auto hApp = NetworkCore::generateCLI ();
     hApp->description ("TCP Single Socket Core ");
     hApp->add_option ("--connections", connections, "target link connections");
-    hApp->add_flag ("--no_outgoing_connection", no_outgoing_connections, "disable outgoing connections");
+    hApp->add_flag ("--no_outgoing_connection", no_outgoing_connections, "disable outgoing connections")
+      ->ignore_underscore ();
     return hApp;
 }
 

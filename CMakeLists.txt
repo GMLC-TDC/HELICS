@@ -278,13 +278,12 @@ endif(GENERATE_DOXYGEN_DOC)
 # -------------------------------------------------------------
 # BOOST  find the boost libraries
 # -------------------------------------------------------------
-set(BOOST_REQUIRED_LIBRARIES filesystem system)
+
 if(BUILD_TESTING)
     list(APPEND BOOST_REQUIRED_LIBRARIES unit_test_framework)
 endif()
 include(addBoost)
 
-target_link_libraries(helics_base INTERFACE Boostlibs::core)
 # -------------------------------------------------------------
 # finding MPI
 # -------------------------------------------------------------
@@ -691,6 +690,12 @@ install(
 )
 
 install(
+    DIRECTORY ThirdParty/CLI11
+    DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+    COMPONENT headers
+)
+
+install(
     DIRECTORY ThirdParty/helics_includes
     DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
     COMPONENT headers
@@ -722,7 +727,6 @@ install(
     FILES
         config/cmake/addMPI.cmake
         config/cmake/FindZeroMQ.cmake
-        config/cmake/addBoost.cmake
         config/cmake/extraMacros.cmake
     DESTINATION ${HELICS_CMAKECONFIG_INSTALL_DIR}
     COMPONENT libs

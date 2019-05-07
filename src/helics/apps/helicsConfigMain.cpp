@@ -6,11 +6,16 @@ SPDX-License-Identifier: BSD-3-Clause
 */
 
 #include "helicsConfigMain.h"
+#ifdef _MSC_VER
+#pragma warning(push, 0)
+#include <helics_includes/filesystem.hpp>
+#pragma warning(pop)
+#else
+#include <helics_includes/filesystem.hpp>
+#endif
+
 #include <iostream>
 #include <string>
-#include <boost/filesystem.hpp>
-
-using namespace boost::filesystem;
 
 static void show_usage (std::string const &name)
 {
@@ -26,9 +31,10 @@ static void show_usage (std::string const &name)
     std::cout << "--help, -h, -? returns this help display\n";
 }
 
+using namespace ghc::filesystem;
 path dir_path (const char *filename, const char *tail)
 {
-    path cfile = system_complete (path (filename));
+    path cfile = canonical (absolute (path (filename)));
     path bin_dir = (cfile.has_parent_path ()) ? cfile.parent_path () : current_path ();
     path base_dir = bin_dir.parent_path ();
     path dpath;
@@ -51,15 +57,13 @@ path dir_path (const char *filename, const char *tail)
     {
         dpath = path (HELICS_INSTALL_PREFIX) / tail;
     }
-#if BOOST_VERSION_LEVEL > 60
     dpath = dpath.lexically_normal ();
-#endif
     return dpath.make_preferred ();
 }
 
 path base_path (const char *filename)
 {
-    path cfile = system_complete (path (filename));
+    path cfile = canonical (absolute (path (filename)));
     path bin_dir = (cfile.has_parent_path ()) ? cfile.parent_path () : current_path ();
     path base_dir = bin_dir.parent_path ();
     path dpath;
@@ -82,9 +86,7 @@ path base_path (const char *filename)
     {
         dpath = path (HELICS_INSTALL_PREFIX);
     }
-#if BOOST_VERSION_LEVEL > 60
     dpath = dpath.lexically_normal ();
-#endif
     return dpath.make_preferred ();
 }
 
@@ -110,9 +112,7 @@ int main (int argc, char *argv[])
         else if (arg == "--prefix")
         {
             path bpath = base_path (argv[0]);
-#if BOOST_VERSION_LEVEL > 60
             bpath = bpath.lexically_normal ();
-#endif
             std::cout << bpath.make_preferred () << '\n';
         }
         else if ((arg == "--includes") || (arg == "-I") || (arg == "--include"))

@@ -5,7 +5,6 @@ the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 #include <boost/test/unit_test.hpp>
-#include <boost/filesystem.hpp>
 #include <boost/test/data/test_case.hpp>
 
 #include <cstdio>
