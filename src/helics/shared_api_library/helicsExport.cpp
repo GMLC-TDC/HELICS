@@ -20,14 +20,14 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include "../core/helicsVersion.hpp"
 #include "helics/helics-config.h"
-#if HELICS_HAVE_ZEROMQ > 0
+#ifdef ENABLE_ZMQ_CORE
 #include "../common/zmqContextManager.h"
 #include "cppzmq/zmq.hpp"
 #endif
 
 const char *helicsGetVersion (void) { return helics::versionString; }
 
-static const char *nullstrPtr = "";
+static constexpr const char *nullstrPtr = "";
 
 const std::string emptyStr;
 
@@ -1092,7 +1092,7 @@ void helicsCloseLibrary ()
     auto ret = std::async (std::launch::async, []() { helics::CoreFactory::cleanUpCores (2000ms); });
     helics::BrokerFactory::cleanUpBrokers (2000ms);
     ret.get ();
-#if HELICS_HAVE_ZEROMQ > 0
+#ifdef ENABLE_ZMQ_CORE
     if (ZmqContextManager::setContextToLeakOnDelete ())
     {
         ZmqContextManager::getContext ().close ();
@@ -1305,7 +1305,7 @@ MasterObjectHolder::MasterObjectHolder () noexcept {}
 
 MasterObjectHolder::~MasterObjectHolder ()
 {
-#if HELICS_HAVE_ZEROMQ > 0
+#ifdef ENABLE_ZMQ_CORE
     if (ZmqContextManager::setContextToLeakOnDelete ())
     {
         ZmqContextManager::getContext ().close ();
