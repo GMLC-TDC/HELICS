@@ -100,6 +100,13 @@ target_compile_definitions(
   $<TARGET_PROPERTY:helics_base_includes,INTERFACE_COMPILE_DEFINITIONS>
 )
 
+if (TARGET Boost::boost)
+target_include_directories(
+  helics_common SYSTEM
+  PRIVATE $<TARGET_PROPERTY:Boost::boost,INTERFACE_SYSTEM_INCLUDE_DIRECTORIES>
+)
+endif()
+
 target_compile_options(
   helics_common
   PRIVATE $<TARGET_PROPERTY:helics_base_includes,INTERFACE_COMPILE_OPTIONS>

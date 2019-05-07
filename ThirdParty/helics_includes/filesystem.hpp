@@ -1052,7 +1052,11 @@ GHC_INLINE std::error_code make_error_code(portable_error err)
         case portable_error::invalid_argument:
             return std::error_code(ERROR_INVALID_PARAMETER, std::system_category());
         case portable_error::is_a_directory:
+		#ifdef ERROR_DIRECTORY_NOT_SUPPORTED
             return std::error_code(ERROR_DIRECTORY_NOT_SUPPORTED, std::system_category());
+		#elif defined EISDIR
+			return std::error_code(EISDIR, std::system_category());
+		#endif
     }
 #else
     switch (err) {
@@ -1208,7 +1212,7 @@ inline StringType fromUtf8(const std::string& utf8String, const typename StringT
     unsigned utf8_state = S_STRT;
     std::uint32_t codepoint = 0;
     while (iter < utf8String.end()) {
-        if (!(utf8_state = consumeUtf8Fragment(utf8_state, (uint8_t)*iter++, codepoint))) {
+        if ((utf8_state = consumeUtf8Fragment(utf8_state, (uint8_t)*iter++, codepoint))==0) {
             if (sizeof(typename StringType::value_type) == 4) {
                 result += codepoint;
             }
