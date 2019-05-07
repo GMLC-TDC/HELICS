@@ -47,11 +47,9 @@ static void loadTypeSpecificArgs (helics::core_type ctype, CommsInterface *comm,
     {
         auto cm = dynamic_cast<tcp::TcpCommsSS *> (comm);
         helicsCLI11App tsparse;
-        tsparse.add_option_function<std::vector<std::string>> ("--connections",
-                                                               [cm](const std::vector<std::string> &conns) {
-                                                                   cm->addConnections (conns);
-                                                               },
-                                                               "target link connections");
+        tsparse.add_option_function<std::vector<std::string>> (
+          "--connections", [cm] (const std::vector<std::string> &conns) { cm->addConnections (conns); },
+          "target link connections");
         tsparse.allow_extras ();
         tsparse.helics_parse (std::move (args));
     }
@@ -83,7 +81,7 @@ generateComms (const std::string &type, const std::string &initString = std::str
         break;
     case core_type::DEFAULT:
     case core_type::ZMQ:
-#ifdef ENABLE_MPI_CORE
+#ifdef ENABLE_ZMQ_CORE
         comm = std::make_unique<zeromq::ZmqComms> ();
 #endif
         break;
@@ -136,7 +134,7 @@ MultiBroker::MultiBroker (const std::string & /*configFile*/) { loadComms (); }
 void MultiBroker::loadComms ()
 {
     masterComm = generateComms ("def");
-    masterComm->setCallback ([this](ActionMessage &&M) { BrokerBase::addActionMessage (std::move (M)); });
+    masterComm->setCallback ([this] (ActionMessage &&M) { BrokerBase::addActionMessage (std::move (M)); });
 }
 
 MultiBroker::~MultiBroker ()

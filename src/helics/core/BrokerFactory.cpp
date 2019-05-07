@@ -52,7 +52,11 @@ std::shared_ptr<Broker> makeBroker (core_type type, const std::string &name)
 #ifdef ENABLE_TCP_CORE
         type = core_type::TCP;
 #else
+#ifdef ENABLE_MPI_CORE
+        type = core_type::MPI;
+#else
         type = core_type::UDP;
+#endif
 #endif
 #endif
     }
@@ -237,7 +241,7 @@ std::shared_ptr<Broker> create (core_type type, const std::string &broker_name, 
 
 /** lambda function to join cores before the destruction happens to avoid potential problematic calls in the
  * loops*/
-static auto destroyerCallFirst = [](auto &broker) {
+static auto destroyerCallFirst = [] (auto &broker) {
     broker->processDisconnect (
       true);  // use true here as it is possible the searchableObjectHolder is deleted already
     broker->joinAllThreads ();
@@ -313,7 +317,7 @@ static bool isJoinableBrokerOfType (core_type type, const std::shared_ptr<Broker
 
 std::shared_ptr<Broker> findJoinableBrokerOfType (core_type type)
 {
-    return searchableObjects.findObject ([type](auto &ptr) { return isJoinableBrokerOfType (type, ptr); });
+    return searchableObjects.findObject ([type] (auto &ptr) { return isJoinableBrokerOfType (type, ptr); });
 }
 
 bool registerBroker (const std::shared_ptr<Broker> &broker)
@@ -350,7 +354,7 @@ void unregisterBroker (const std::string &name)
 {
     if (!searchableObjects.removeObject (name))
     {
-        searchableObjects.removeObject ([&name](auto &obj) { return (obj->getIdentifier () == name); });
+        searchableObjects.removeObject ([&name] (auto &obj) { return (obj->getIdentifier () == name); });
     }
 }
 
@@ -361,10 +365,12 @@ void displayHelp (core_type type)
     if (type == core_type::DEFAULT || type == core_type::UNRECOGNIZED)
     {
         std::cout << "All core types have similar options\n";
-        auto brk = makeBroker (core_type::ZMQ, emptyString);
+        auto brk = makeBroker (core_type::DEFAULT, emptyString);
         brk->configure (helpStr);
+#ifdef ENABLE_TCP_CORE
         brk = makeBroker (core_type::TCP_SS, emptyString);
         brk->configure (helpStr);
+#endif
     }
     else
     {
