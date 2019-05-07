@@ -7,7 +7,7 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #pragma once
 
-#include <CLI11/CLI11.hpp>
+#include "CLI11/CLI11.hpp"
 #include "core-types.hpp"
 #include "helics-time.hpp"
 #include "helicsVersion.hpp"
