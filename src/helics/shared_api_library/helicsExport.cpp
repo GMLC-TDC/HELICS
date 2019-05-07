@@ -27,7 +27,7 @@ SPDX-License-Identifier: BSD-3-Clause
 
 const char *helicsGetVersion (void) { return helics::versionString; }
 
-static constexpr char *nullstrPtr = "";
+static constexpr const char *nullstrPtr = "";
 
 const std::string emptyStr;
 
