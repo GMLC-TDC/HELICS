@@ -175,8 +175,8 @@ void TestComms::queue_tx_function ()
 
     setTxStatus (connection_status::connected);
     std::map<route_id, std::shared_ptr<BrokerBase>> routes;
-
-    while (true)
+    bool haltLoop{false};
+    while (!haltLoop)
     {
         route_id rid;
         ActionMessage cmd;
@@ -230,7 +230,8 @@ void TestComms::queue_tx_function ()
                     processed = true;
                     break;
                 case DISCONNECT:
-                    goto CLOSE_TX_LOOP;  // break out of loop
+                    haltLoop = true;
+                    continue;
                 }
             }
         }
@@ -274,8 +275,7 @@ void TestComms::queue_tx_function ()
                 }
             }
         }
-    }
-CLOSE_TX_LOOP:
+    }  // while (!haltLoop)
 
     routes.clear ();
     tbroker = nullptr;

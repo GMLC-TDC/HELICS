@@ -10,21 +10,21 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <atomic>
 #include <mutex>
 #include <thread>
-#ifndef DISABLE_UDP_CORE
+#ifdef ENABLE_UDP_CORE
 #include "../core/udp/UdpComms.h"
 #endif
-#ifndef DISABLE_TCP_CORE
+#ifdef ENABLE_TCP_CORE
 #include "../core/tcp/TcpComms.h"
 #include "../core/tcp/TcpCommsSS.h"
 #endif
-#if HELICS_HAVE_ZEROMQ != 0
+#ifdef ENABLE_ZMQ_CORE
 #include "../core/zmq/ZmqComms.h"
 #include "../core/zmq/ZmqCommsSS.h"
 #endif
-#if HELICS_HAVE_MPI != 0
+#ifdef ENABLE_MPI_CORE
 #include "../core/mpi/MpiComms.h"
 #endif
-#ifndef DISABLE_IPC_CORE
+#ifdef ENABLE_IPC_CORE
 #include "../core/ipc/IpcComms.h"
 #endif
 #include "../core/NetworkBrokerData.hpp"
@@ -42,7 +42,7 @@ static void loadTypeSpecificArgs (helics::core_type ctype, CommsInterface *comm,
     }
     switch (ctype)
     {
-#ifndef DISABLE_TCP_CORE
+#ifdef ENABLE_TCP_CORE
     case core_type::TCP_SS:
     {
         auto cm = dynamic_cast<tcp::TcpCommsSS *> (comm);
@@ -75,40 +75,40 @@ generateComms (const std::string &type, const std::string &initString = std::str
     switch (ctype)
     {
     case core_type::TCP:
-#ifndef DISABLE_TCP_CORE
+#ifdef ENABLE_TCP_CORE
         comm = std::make_unique<tcp::TcpComms> ();
 #endif
         break;
     case core_type::DEFAULT:
     case core_type::ZMQ:
-#if HELICS_HAVE_ZEROMQ != 0
+#ifdef ENABLE_ZMQ_CORE
         comm = std::make_unique<zeromq::ZmqComms> ();
 #endif
         break;
     case core_type::ZMQ_SS:
-#if HELICS_HAVE_ZEROMQ != 0
+#ifdef ENABLE_ZMQ_CORE
         comm = std::make_unique<zeromq::ZmqCommsSS> ();
 #endif
         break;
     case core_type::TCP_SS:
-#ifndef DISABLE_TCP_CORE
+#ifdef ENABLE_TCP_CORE
         comm = std::make_unique<tcp::TcpCommsSS> ();
         loadTypeSpecificArgs (ctype, comm.get (), parser->remaining_for_passthrough ());
 #endif
         break;
     case core_type::UDP:
-#ifndef DISABLE_UDP_CORE
+#ifdef ENABLE_UDP_CORE
         comm = std::make_unique<udp::UdpComms> ();
 #endif
         break;
     case core_type::IPC:
     case core_type::INTERPROCESS:
-#ifndef DISABLE_IPC_CORE
+#ifdef ENABLE_IPC_CORE
         comm = std::make_unique<ipc::IpcComms> ();
 #endif
         break;
     case core_type::MPI:
-#if HELICS_HAVE_MPI > 0
+#ifdef ENABLE_MPI_CORE
         comm = std::make_unique<mpi::MpiComms> ();
         break;
 #endif

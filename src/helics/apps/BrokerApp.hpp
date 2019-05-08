@@ -74,7 +74,7 @@ class BrokerApp
   private:
     void processArgs (std::unique_ptr<helicsCLI11App> &app);
     std::unique_ptr<helicsCLI11App> generateParser ();
-    core_type type = core_type::ZMQ;
+    core_type type = core_type::DEFAULT;
     std::shared_ptr<Broker> broker;  //!< the actual endpoint objects
     std::string name;  //!< the name of the broker
 };
