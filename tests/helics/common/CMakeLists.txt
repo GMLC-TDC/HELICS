@@ -14,14 +14,6 @@ set(common_test_headers)
 set(
   common_test_sources
   common-tests.cpp
-  MappedVectorTests.cpp
-  MappedPointerVectorTests.cpp
-  DualMappedVectorTests.cpp
-  DualMappedPointerVectorTests.cpp
-  BlockingQueueTests.cpp
-  PriorityBlockingQueueTests.cpp
-  SimpleQueueTests.cpp
-  AirLockTests.cpp
   TimeTests.cpp
 )
 

@@ -381,6 +381,7 @@ target_include_directories(
         $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/src>
         $<BUILD_INTERFACE:${AUTOBUILD_INSTALL_PATH}/include>
         $<INSTALL_INTERFACE:$<INSTALL_PREFIX>/include>
+		$<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/ThirdParty/containers>
 )
 
 target_include_directories(

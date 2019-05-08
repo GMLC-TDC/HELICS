@@ -14,10 +14,10 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <thread>
 #include <unordered_map>
 
-#include "../common/AirLock.hpp"
 #include "../common/DelayedObjects.hpp"
-#include "../common/DualMappedVector.hpp"
-#include "../common/simpleQueue.hpp"
+#include "containers/AirLock.hpp"
+#include "containers/DualMappedVector.hpp"
+#include "containers/simpleQueue.hpp"
 #include "helics_includes/any.hpp"
 
 #include "../common/TriggerVariable.hpp"
@@ -81,8 +81,9 @@ class CoreBroker : public Broker, public BrokerBase
     bool isRootc{false};
     bool connectionEstablished{false};  //!< the setup has been received by the core loop thread
     int routeCount = 1;  //!< counter for creating new routes;
-    DualMappedVector<BasicFedInfo, std::string, global_federate_id> _federates;  //!< container for all federates
-    DualMappedVector<BasicBrokerInfo, std::string, global_broker_id>
+    gmlc::containers::DualMappedVector<BasicFedInfo, std::string, global_federate_id>
+      _federates;  //!< container for all federates
+    gmlc::containers::DualMappedVector<BasicBrokerInfo, std::string, global_broker_id>
       _brokers;  //!< container for all the broker information
     std::string previous_local_broker_identifier;  //!< the previous identifier in case a rename is required
 
@@ -111,7 +112,8 @@ class CoreBroker : public Broker, public BrokerBase
     TriggerVariable disconnection;  //!< controller for the disconnection process
     std::unique_ptr<TimeoutMonitor> timeoutMon;  //!< class to handle timeouts and disconnection notices
     std::atomic<uint16_t> nextAirLock{0};  //!< the index of the next airlock to use
-    std::array<AirLock<stx::any>, 3> dataAirlocks;  //!< airlocks for updating filter operators and other functions
+    std::array<gmlc::containers::AirLock<stx::any>, 3>
+      dataAirlocks;  //!< airlocks for updating filter operators and other functions
   private:
     /** function that processes all the messages
     @param command -- the message to process
@@ -127,7 +129,7 @@ class CoreBroker : public Broker, public BrokerBase
     /** process configure commands for the broker*/
     void processBrokerConfigureCommands (ActionMessage &cmd);
 
-    SimpleQueue<ActionMessage>
+    gmlc::containers::SimpleQueue<ActionMessage>
       delayTransmitQueue;  //!< FIFO queue for transmissions to the root that need to be delayed for a certain time
     /* function to transmit the delayed messages*/
     void transmitDelayedMessages ();
@@ -177,7 +179,7 @@ class CoreBroker : public Broker, public BrokerBase
     virtual bool isOpenToNewFederates () const override;
 
     virtual void setLoggingCallback (
-      const std::function<void (int, const std::string &, const std::string &)> &logFunction) override final;
+      const std::function<void(int, const std::string &, const std::string &)> &logFunction) override final;
 
     virtual bool
     waitForDisconnect (std::chrono::milliseconds msToWait = std::chrono::milliseconds (0)) const override final;

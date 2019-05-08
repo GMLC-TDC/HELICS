@@ -7,10 +7,6 @@
 
 set(
   common_headers
-  AirLock.hpp
-  simpleQueue.hpp
-  BlockingQueue.hpp
-  BlockingPriorityQueue.hpp
   timeRepresentation.hpp
   delayedDestructor.hpp
   DelayedObjects.hpp
@@ -20,15 +16,10 @@ set(
   AsioContextManager.h
   logger.h
   stringOps.h
-  MapTraits.hpp
   GuardedTypes.hpp
   generic_string_ops.hpp
   charMapper.h
   base64.h
-  MappedVector.hpp
-  DualMappedVector.hpp
-  MappedPointerVector.hpp
-  DualMappedPointerVector.hpp
   TriggerVariable.hpp
   TripWire.hpp
   fmt_format.h
@@ -74,7 +65,6 @@ set(
   AsioContextManager.h
   logger.h
   stringOps.h
-  MapTraits.hpp
   GuardedTypes.hpp
   generic_string_ops.hpp
 )
