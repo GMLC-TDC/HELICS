@@ -9,7 +9,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "ActionMessage.hpp"
 #include "BrokerBase.hpp"
 #include "Core.hpp"
-#include "containers/simpleQueue.hpp"
+#include "containers/SimpleQueue.hpp"
 #include "helics-time.hpp"
 #include "helics/helics-config.h"
 

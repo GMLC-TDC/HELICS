@@ -10,7 +10,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "../core/Core.hpp"
 #include "Endpoints.hpp"
 #include "containers/DualMappedVector.hpp"
-#include "containers/simpleQueue.hpp"
+#include "containers/SimpleQueue.hpp"
 #include "data_view.hpp"
 #include <cstdint>
 #include <deque>
