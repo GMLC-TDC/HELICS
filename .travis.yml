@@ -32,7 +32,6 @@ _basic_env:
   os: osx
   compiler: clang
 - &linux_base
-  if: type != cron
   os: linux
   compiler: gcc
 - &osx_base
@@ -44,7 +43,7 @@ jobs:
   fast_finish: true
   allow_failures:
     - os: osx
-    - name: "Clang 4 Thread Sanitizer"
+    - name: "Clang 5 Thread Sanitizer"
     - script: scripts/trigger-dependent-ci-builds.sh
 
   include:
@@ -78,8 +77,27 @@ jobs:
         - USE_SWIG=true
         - USE_MPI=mpich
 
+    # Clang 5 build
+    - <<: *linux_base
+      name: "Clang 5"
+      compiler: clang
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+            - llvm-toolchain-trusty-5.0
+          packages:
+            - libstdc++-6-dev
+            - clang-5.0
+      env:
+        - MATRIX_EVAL="COMPILER=clang && CC='clang-5.0' && CXX='clang++-5.0'"
+        - CCACHE_CPP2=yes
+        - USE_SWIG=true
+        - CXX_STANDARD=17
+
     - <<: *linux_base
       name: "GCC 4.9 (No SWIG)"
+      if: (branch = develop AND type IN (pull_request, cron)) OR (branch != develop)
       addons:
         apt:
           sources:
@@ -96,6 +114,7 @@ jobs:
 
     - <<: *linux_base
       name: "Clang 3.6"
+      if: (branch = develop AND type IN (pull_request, cron)) OR (branch = master AND type IN (push, pull_request))
       compiler: clang
       addons:
         apt:
@@ -133,20 +152,9 @@ jobs:
         - GCOV_TOOL=gcov-6
         - USE_MPI=mpich
         - CTEST_VERBOSE=true
-    # GCC 5 build
+    # TSAN build
     - <<: *daily_linux
-      name: "GCC 5"
-      addons:
-        apt:
-          sources:
-            - ubuntu-toolchain-r-test
-          packages:
-            - g++-5
-      env:
-        - MATRIX_EVAL="COMPILER=gcc && CC='gcc-5' && CXX='g++-5'"
-    # Clang 5 build
-    - <<: *daily_linux
-      name: "Clang 5"
+      name: "Clang 5 Thread Sanitizer"
       compiler: clang
       addons:
         apt:
@@ -159,23 +167,6 @@ jobs:
       env:
         - MATRIX_EVAL="COMPILER=clang && CC='clang-5.0' && CXX='clang++-5.0'"
         - CCACHE_CPP2=yes
-        - USE_SWIG=true
-        - CXX_STANDARD=17
-    # TSAN build
-    - <<: *daily_linux
-      name: "Clang 4 Thread Sanitizer"
-      compiler: clang
-      addons:
-        apt:
-          sources:
-            - ubuntu-toolchain-r-test
-            - llvm-toolchain-trusty-4.0
-          packages:
-            - libstdc++-6-dev
-            - clang-4.0
-      env:
-        - MATRIX_EVAL="COMPILER=clang && CC='clang-4.0' && CXX='clang++-4.0'"
-        - CCACHE_CPP2=yes
         - CI_TEST_CONFIG="TSAN"
         - DISABLE_INTERFACES="Python,Java"
         - RUN_TSAN=true
@@ -183,18 +174,18 @@ jobs:
         - JOB_OPTION_FLAGS="-C../scripts/tsan-cache.cmake"
     # UBSAN build
     - <<: *daily_linux
-      name: "Clang 4 Undefined Behavior Sanitizer"
+      name: "Clang 5 Undefined Behavior Sanitizer"
       compiler: clang
       addons:
         apt:
           sources:
             - ubuntu-toolchain-r-test
-            - llvm-toolchain-trusty-4.0
+            - llvm-toolchain-trusty-5.0
           packages:
             - libstdc++-6-dev
-            - clang-4.0
+            - clang-5.0
       env:
-        - MATRIX_EVAL="COMPILER=clang && CC='clang-4.0' && CXX='clang++-4.0'"
+        - MATRIX_EVAL="COMPILER=clang && CC='clang-5.0' && CXX='clang++-5.0'"
         - CCACHE_CPP2=yes
         - DISABLE_INTERFACES="Python,Java"
         - RUN_UBSAN=true
