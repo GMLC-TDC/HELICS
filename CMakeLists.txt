@@ -329,6 +329,9 @@ endif()
 # -------------------------------------------------------------
 if(MSYS)
     target_link_libraries(helics_base INTERFACE wsock32 ws2_32)
+	if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+        set(ENABLE_IPC_CORE FALSE)
+    endif()
 endif(MSYS)
 
 # -------------------------------------------------------------
