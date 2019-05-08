@@ -176,6 +176,8 @@ if(VERSION_OPTION)
     endif(MSVC)
 endif(VERSION_OPTION)
 
+ target_compile_options(helics_base_includes INTERFACE -DENABLE_BOOST_IOSTREAMS)
+
 cmake_dependent_option(
     STATIC_STANDARD_LIB
     "Link against a static standard lib"
@@ -331,6 +333,7 @@ if(MSYS)
     target_link_libraries(helics_base INTERFACE wsock32 ws2_32)
 	if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
         set(ENABLE_IPC_CORE FALSE)
+		target_compile_definitions(helics_base_includes INTERFACE -DDISABLE_BOOST_IOSTREAMS)
     endif()
 endif(MSYS)
 
