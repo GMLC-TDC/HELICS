@@ -13,7 +13,6 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "BrokerApp.hpp"
 #include <iostream>
 #include <thread>
-#include <boost/algorithm/string.hpp>
 #ifdef ENABLE_ZMQ_CORE
 #include "../common/zmqContextManager.h"
 #include "cppzmq/zmq.hpp"
