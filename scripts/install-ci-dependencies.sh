@@ -3,8 +3,6 @@
 # Set variables based on build environment
 if [[ "$TRAVIS" == "true" ]]; then
     if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
-        HOMEBREW_NO_AUTO_UPDATE=1 brew install pcre
-        HOMEBREW_NO_AUTO_UPDATE=1 brew install ccache
         export PATH="/usr/local/opt/ccache/libexec:$PATH"
     fi
 
@@ -95,32 +93,57 @@ if [[ ! -d "${CI_DEPENDENCY_DIR}" ]]; then
     mkdir -p ${CI_DEPENDENCY_DIR};
 fi
 
-# Install CMake
-if [[ ! -d "${cmake_install_path}" ]]; then
-    ./scripts/install-dependency.sh cmake ${cmake_version} ${cmake_install_path}
-fi
+# Only compile these dependencies on Linux, to install them on macOS use the Brewfile .ci/Brewfile.travis
+if [[ $"os_name" == "Linux" ]]; then
+    # Install CMake
+    if [[ ! -d "${cmake_install_path}" ]]; then
+        ./scripts/install-dependency.sh cmake ${cmake_version} ${cmake_install_path}
+    fi
 
-# Set path to CMake executable depending on OS
-if [[ "$os_name" == "Linux" ]]; then
-    export PATH="${cmake_install_path}/bin:${PATH}"
-    echo "*** cmake installed ($PATH)"
-elif [[ "$os_name" == "Darwin" ]]; then
-    export PATH="${cmake_install_path}/CMake.app/Contents/bin:${PATH}"
-    echo "*** cmake installed ($PATH)"
-fi
+    # Set path to CMake executable depending on OS
+    if [[ "$os_name" == "Linux" ]]; then
+        export PATH="${cmake_install_path}/bin:${PATH}"
+        echo "*** cmake installed ($PATH)"
+    elif [[ "$os_name" == "Darwin" ]]; then
+        export PATH="${cmake_install_path}/CMake.app/Contents/bin:${PATH}"
+        echo "*** cmake installed ($PATH)"
+    fi
 
-# Install SWIG
-if [[ ! -d "${swig_install_path}" ]]; then
-    ./scripts/install-dependency.sh swig ${swig_version} ${swig_install_path}
-fi
-export PATH="${swig_install_path}/bin:${PATH}"
-echo "*** built swig successfully {$PATH}"
+    # Install SWIG
+    if [[ ! -d "${swig_install_path}" ]]; then
+        ./scripts/install-dependency.sh swig ${swig_version} ${swig_install_path}
+    fi
+    export PATH="${swig_install_path}/bin:${PATH}"
+    echo "*** built swig successfully {$PATH}"
 
-# Install ZeroMQ
-if [[ "$TRAVIS" != "true" && ! -d "${zmq_install_path}" ]]; then
-    echo "*** build libzmq"
-    ./scripts/install-dependency.sh zmq ${zmq_version} ${zmq_install_path}
-    echo "*** built zmq successfully"
+    # Install ZeroMQ
+    if [[ "$TRAVIS" != "true" && ! -d "${zmq_install_path}" ]]; then
+        echo "*** build libzmq"
+        ./scripts/install-dependency.sh zmq ${zmq_version} ${zmq_install_path}
+        echo "*** built zmq successfully"
+    fi
+
+    # Install Boost
+    if [[ ! -d "${boost_install_path}" ]]; then
+        echo "*** build boost"
+        local boost_sanitizer=""
+        if [[ "$RUN_TSAN" ]]; then
+            boost_sanitizer="BOOST_SANITIZER=thread"
+        fi
+        ${BOOST_SANITIZER} ${WAIT_COMMAND} ./scripts/install-dependency.sh boost ${boost_version} ${boost_install_path}
+        echo "*** built boost successfully"
+    fi
+
+    # Export ZMQ variables and set load library paths
+    export ZMQ_INCLUDE=${zmq_install_path}/include
+    export ZMQ_LIB=${zmq_install_path}/lib
+
+    if [[ "$os_name" == "Linux" ]]; then
+        export LD_LIBRARY_PATH=${zmq_install_path}/lib:${boost_install_path}/lib:$LD_LIBRARY_PATH
+    elif [[ "$os_name" == "Darwin" ]]; then
+        export DYLD_LIBRARY_PATH=${zmq_install_path}/lib:${boost_install_path}/lib:$DYLD_LIBRARY_PATH
+    fi
+# End of the Linux only dependency compiling
 fi
 
 # Install MPI if USE_MPI is set
@@ -133,27 +156,7 @@ if [[ "$USE_MPI" ]]; then
     fi
 fi
 
-# Install Boost
-if [[ ! -d "${boost_install_path}" ]]; then
-    echo "*** build boost"
-    local boost_sanitizer=""
-    if [[ "$RUN_TSAN" ]]; then
-        boost_sanitizer="BOOST_SANITIZER=thread"
-    fi
-    ${BOOST_SANITIZER} ${WAIT_COMMAND} ./scripts/install-dependency.sh boost ${boost_version} ${boost_install_path}
-    echo "*** built boost successfully"
-fi
-
-# Export variables and set load library paths
-export ZMQ_INCLUDE=${zmq_install_path}/include
-export ZMQ_LIB=${zmq_install_path}/lib
-
-if [[ "$os_name" == "Linux" ]]; then
-    export LD_LIBRARY_PATH=${zmq_install_path}/lib:${boost_install_path}/lib:$LD_LIBRARY_PATH
-elif [[ "$os_name" == "Darwin" ]]; then
-    export DYLD_LIBRARY_PATH=${zmq_install_path}/lib:${boost_install_path}/lib:$DYLD_LIBRARY_PATH
-fi
-
+# Export HELICS shared library variables and set load library paths
 if [[ "$os_name" == "Linux" ]]; then
     export LD_LIBRARY_PATH=${PWD}/build/src/helics/shared_api_library/:$LD_LIBRARY_PATH
 elif [[ "$os_name" == "Darwin" ]]; then

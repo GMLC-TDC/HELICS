@@ -38,6 +38,11 @@ _basic_env:
   os: osx
   compiler: clang
 
+# Install macOS dependencies using Homebrew
+addons:
+    homebrew:
+        brewfile: .ci/Brewfile.travis
+
 jobs:
   # On weekdays, the backlog for waiting OS X builds is huge
   fast_finish: true
@@ -213,7 +218,6 @@ install:
   
 script:
   - mkdir -p build && cd build
-  - HELICS_DEPENDENCY_FLAGS+="-DBOOST_INSTALL_PATH=${CI_DEPENDENCY_DIR}/boost"
   - cmake .. ${JOB_OPTION_FLAGS} ${HELICS_DEPENDENCY_FLAGS} ${HELICS_OPTION_FLAGS} -DCMAKE_C_COMPILER_LAUNCHER=ccache -DCMAKE_CXX_COMPILER_LAUNCHER=ccache
   - make ${MAKEFLAGS}
 
