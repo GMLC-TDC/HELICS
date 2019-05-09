@@ -1,0 +1,6 @@
+brew "pcre"
+brew "ccache"
+brew "cmake"
+brew "swig@4.0"
+brew "zeromq"
+brew "boost@1.69"
