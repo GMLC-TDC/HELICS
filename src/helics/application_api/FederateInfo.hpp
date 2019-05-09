@@ -46,8 +46,7 @@ class FederateInfo : public CoreFederateInfo
     FederateInfo (int argc, char *argv[]);
     /** load a federateInfo object from arguments stored in a vector
     @details calls /ref loadInfoFromArgs in the constructor
-    @param argc the number of arguments
-    @param argv an array of char * pointers to the arguments
+    @param[in,out] args a vector of arguments to load.  The unused arguments will be returned in the vector
     */
     explicit FederateInfo (std::vector<std::string> &args);
     /** load a federateInfo object from command line arguments outside the constructor
@@ -60,7 +59,7 @@ class FederateInfo : public CoreFederateInfo
     */
     std::vector<std::string> loadInfoFromArgs (int argc, char *argv[]);
     /** load a federateInfo object from command line arguments contained in a vector
-    @param[inout] args a vector of arguments to load
+    @param[in,out] args a vector of arguments to load.  The unused arguments will be returned in the vector
     */
     void loadInfoFromArgs (std::vector<std::string> &args);
 

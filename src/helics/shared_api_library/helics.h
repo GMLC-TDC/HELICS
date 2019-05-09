@@ -196,7 +196,6 @@ extern "C"
 
     /** get an identifier for the core
     @param core the core to query
-    @return a void enumeration indicating any error condition
     @param[in,out] err an error object that will contain an error code and string if any error occurred during the execution of the function
     */
     HELICS_EXPORT void helicsCoreDisconnect (helics_core core, helics_error *err);
@@ -594,7 +593,6 @@ extern "C"
     @param requestTime the next desired time
     @param iterate the requested iteration mode
     @param[in,out] err an error object that will contain an error code and string if any error occurred during the execution of the function
-    @return a void object with a return code of the result
     */
     HELICS_EXPORT void helicsFederateRequestTimeIterativeAsync (helics_federate fed,
                                                                 helics_time requestTime,
@@ -749,7 +747,6 @@ extern "C"
     @param query the query object to use in the query
     @param fed a federate to send the query through
     @param[in,out] err an error object that will contain an error code and string if any error occurred during the execution of the function
-    @return a helics status enumeration with the result of the query specification
     */
     HELICS_EXPORT void helicsQueryExecuteAsync (helics_query query, helics_federate fed, helics_error *err);
 
