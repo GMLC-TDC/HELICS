@@ -212,7 +212,6 @@ before_install:
   - $CXX --version
 
 install:
-  - export BOOST_USE_STATIC=true
   - source scripts/install-ci-dependencies.sh
   - source scripts/setup-helics-ci-options.sh
   
