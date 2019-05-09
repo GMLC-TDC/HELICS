@@ -226,7 +226,7 @@ target_compile_definitions(
   helics_core PRIVATE $<TARGET_PROPERTY:fmt-header-only,INTERFACE_COMPILE_DEFINITIONS>
 )
 
-if((NOT ENABLE_CXX_17) OR APPLE)
+if(NOT ENABLE_CXX_17)
 	target_compile_definitions(helics_core PUBLIC "-DSTX_NO_STD_ANY=1")
 endif()
 

@@ -51,9 +51,9 @@ set(
 
 set(
   zmq_headers
-  zmqContextManager.h 
+  zmqContextManager.h
   zmqHelper.h
-  ${CMAKE_SOURCE_DIR}/ThirdParty/cppzmq/zmq.hpp 
+  ${CMAKE_SOURCE_DIR}/ThirdParty/cppzmq/zmq.hpp
   ${CMAKE_SOURCE_DIR}/ThirdParty/cppzmq/zmq_addon.hpp
 )
 
@@ -111,10 +111,6 @@ if(HELICS_HAVE_ZEROMQ)
     PRIVATE $<TARGET_PROPERTY:${ZeroMQ_DEPENDENCY},INTERFACE_INCLUDE_DIRECTORIES>
   )
 endif(HELICS_HAVE_ZEROMQ)
-
-if(APPLE)
-  target_compile_definitions(helics_common PUBLIC "-DSTX_NO_STD_ANY=1")
-endif(APPLE)
 
 install(
   FILES ${helics_public_common}
