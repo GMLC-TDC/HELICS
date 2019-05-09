@@ -116,7 +116,7 @@ Though contained here in this section on value federates, the options below are 
 
 To demonstrate how a to build a co-simulation, an example of a simple integrated transmission system and distribution system powerflow can be built; all the necessary files are found [here](../../examples/user_guide_examples/Example_1a) but to use them you'll need to get some specific software installed; here are the instructions:
 
-  1. [HELICS](https://helics.readthedocs.io/latest/installation/index.html)
+  1. [HELICS](https://helics.readthedocs.io/en/latest/installation/index.html)
   2. [GridLAB-D](https://github.com/gridlab-d/gridlab-d/tree/develop) - Enable HELICS, see instructions [here](http://gridlab-d.shoutwiki.com/wiki/Connection:helics_msg)
   3. [Python](https://www.anaconda.com/download/) - Anaconda installation, if you don't already have Python installed. You may need to also install the following Python packages (`conda install` ...)
 
