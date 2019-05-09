@@ -94,7 +94,7 @@ if [[ ! -d "${CI_DEPENDENCY_DIR}" ]]; then
 fi
 
 # Only compile these dependencies on Linux, to install them on macOS use the Brewfile .ci/Brewfile.travis
-if [[ $"os_name" == "Linux" ]]; then
+if [[ "$os_name" == "Linux" ]]; then
     # Install CMake
     if [[ ! -d "${cmake_install_path}" ]]; then
         ./scripts/install-dependency.sh cmake ${cmake_version} ${cmake_install_path}
