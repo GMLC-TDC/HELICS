@@ -29,7 +29,7 @@
 #endif
 
 // disable usage of <optional> but allow <experimental/optional>
-#define DISABLE_STX_NO_STD_OPTIONAL 1
+#define STX_NO_STD_OPTIONAL 1
 
 #if defined(__has_include) && !defined(STX_NO_STD_OPTIONAL)
 #    if __has_include(<optional>) && (__cplusplus > 201402)
