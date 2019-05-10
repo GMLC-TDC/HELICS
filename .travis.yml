@@ -52,13 +52,13 @@ jobs:
     - script: scripts/trigger-dependent-ci-builds.sh
 
   include:
-    # XCode 10.1, OS X 10.13
+    # XCode 10.2, OS X 10.14
     - <<: *osx_base
-      name: "XCode 10.1, OS X 10.13"
+      name: "XCode 10.2, OS X 10.14"
       env:
         - MATRIX_EVAL="COMPILER=clang && BUILD_TYPE=Release && TRAVIS_XCODE_VERSION=102"
         - HOMEBREW_NO_AUTO_UPDATE=1
-      osx_image: xcode9.4
+      osx_image: xcode10.2
 
     # XCode 8.3, OS X 10.12
     - <<: *osx_base
