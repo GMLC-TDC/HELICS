@@ -119,6 +119,10 @@ if(ENABLE_ZMQ_CORE)
   )
 endif(ENABLE_ZMQ_CORE)
 
+if(APPLE)
+  target_compile_definitions(helics_common PUBLIC "-DSTX_NO_STD_ANY=1")
+endif(APPLE)
+
 install(
   FILES ${helics_public_common}
   DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/helics/common
