@@ -58,6 +58,7 @@ jobs:
       env:
         - MATRIX_EVAL="COMPILER=clang && BUILD_TYPE=Release && TRAVIS_XCODE_VERSION=102"
         - HOMEBREW_NO_AUTO_UPDATE=1
+        - CXX_STANDARD=17
       osx_image: xcode10.2
 
     # XCode 8.3, OS X 10.12
@@ -81,6 +82,7 @@ jobs:
         - MATRIX_EVAL="COMPILER=gcc && CC=gcc-6 && CXX=g++-6"
         - USE_SWIG=true
         - USE_MPI=mpich
+        - CXX_STANDARD=17
 
     # Clang 5 build
     - <<: *linux_base
