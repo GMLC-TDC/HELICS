@@ -9,10 +9,10 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helics/helics-config.h"
 #include <helics/application_api/Federate.hpp>
 //#include <iostream>
-
+ 
 #ifdef ENABLE_ZMQ_CORE
-#include "../common/zmqContextManager.h"
-#include "cppzmq/zmq.hpp"
+#include "../../../src/helics/common/zmqContextManager.h"
+#include "../../../ThirdParty/cppzmq/zmq.hpp"
 #endif
 
 #ifndef BOOST_STATIC
