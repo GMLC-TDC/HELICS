@@ -58,7 +58,6 @@ jobs:
       env:
         - MATRIX_EVAL="COMPILER=clang && BUILD_TYPE=Release && TRAVIS_XCODE_VERSION=102"
         - HOMEBREW_NO_AUTO_UPDATE=1
-        - CXX_STANDARD=17
       osx_image: xcode10.2
 
     # XCode 8.3, OS X 10.12
@@ -82,7 +81,6 @@ jobs:
         - MATRIX_EVAL="COMPILER=gcc && CC=gcc-6 && CXX=g++-6"
         - USE_SWIG=true
         - USE_MPI=mpich
-        - CXX_STANDARD=17
 
     # Clang 5 build
     - <<: *linux_base
@@ -117,6 +115,7 @@ jobs:
         - CI_BOOST_VERSION=1.61.0
         - ENABLE_CPACK=true
         - INSTALL_SYSTEM_LIBRARIES=true
+        - SKIP_TEST_RUN=true
       after_script: ${TRAVIS_BUILD_DIR}/scripts/upload-ci-artifact.sh
 
     - <<: *linux_base
@@ -230,7 +229,10 @@ script:
 
   # Run CI tests
   - export CTEST_OPTIONS="--output-on-failure"
-  - travis_wait ../scripts/run-ci-tests.sh ${CI_TEST_FLAGS}
+  - |
+    if [[ "$SKIP_TEST_RUN" != "true" ]]; then
+    travis_wait ../scripts/run-ci-tests.sh ${CI_TEST_FLAGS}
+    fi
 
   # Gather coverage results
   - if [[ "$BUILD_TYPE" == "Coverage" ]]; then pushd .. && scripts/lcov-helper.sh gather-coverage-info --gcov ${GCOV_TOOL} --codecov && popd ; fi

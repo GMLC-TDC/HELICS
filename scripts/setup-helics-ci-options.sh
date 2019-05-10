@@ -28,6 +28,8 @@ if [[ "$BUILD_TYPE" ]]; then
     if [[ "$BUILD_TYPE" == "Coverage" ]]; then
         OPTION_FLAGS_ARR+=("-DTEST_CODE_COVERAGE=ON")
     fi
+else
+    OPTION_FLAGS_ARR+=("-DCMAKE_BUILD_TYPE=Release")
 fi
 
 # CPack/Install options
