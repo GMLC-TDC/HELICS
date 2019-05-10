@@ -9,6 +9,12 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helics/helics-config.h"
 #include <helics/application_api/Federate.hpp>
 //#include <iostream>
+
+#ifdef ENABLE_ZMQ_CORE
+#include "../common/zmqContextManager.h"
+#include "cppzmq/zmq.hpp"
+#endif
+
 #ifndef BOOST_STATIC
 #define BOOST_TEST_DYN_LINK
 #endif
@@ -23,6 +29,15 @@ struct globalTestConfig
     globalTestConfig () = default;
     ~globalTestConfig ()
     {
+        // macOS ZeroMQ can have issues shutting down, if not built from source without CURVE
+#ifdef ENABLE_ZMQ_CORE
+#ifdef __APPLE__
+        if (ZmqContextManager::setContextToLeakOnDelete ())
+        {
+            ZmqContextManager::getContext ().close ();
+        }
+#endif
+#endif
         //    std::cout << "cleaning up" << std::endl;
         helics::cleanupHelicsLibrary ();
         //     std::cout << "finished cleaning up" << std::endl;

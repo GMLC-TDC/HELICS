@@ -6,6 +6,11 @@ SPDX-License-Identifier: BSD-3-Clause
 */
 #include "helics/helics-config.h"
 
+#ifdef ENABLE_ZMQ_CORE
+#include "../common/zmqContextManager.h"
+#include "cppzmq/zmq.hpp"
+#endif
+
 #ifndef BOOST_STATIC
 #define BOOST_TEST_DYN_LINK
 #endif
@@ -22,6 +27,14 @@ struct globalTestConfig
     globalTestConfig () {}
     ~globalTestConfig ()
     {
+#ifdef ENABLE_ZMQ_CORE
+#ifdef __APPLE__
+        if (ZmqContextManager::setContextToLeakOnDelete ())
+        {
+            ZmqContextManager::getContext ().close ();
+        }
+#endif
+#endif
         helics::CoreFactory::cleanUpCores ();
         helics::BrokerFactory::cleanUpBrokers ();
     }
