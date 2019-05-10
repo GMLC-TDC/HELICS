@@ -15,21 +15,7 @@ show_variable(
     "${BOOST_INSTALL_PATH}"
 )
 
-if(UNIX)
-    # Since default builds of boost library under Unix don't use CMake, turn off
-    # using CMake build and find include/libs the regular way.
-    set(Boost_NO_BOOST_CMAKE ON)
-    set(Boost_USE_MULTITHREADED OFF) # Needed if MT libraries not built
-    option(USE_BOOST_STATIC_LIBS "Build using boost static Libraries" OFF)
-else(UNIX)
-    if(MSYS)
-        option(USE_BOOST_STATIC_LIBS "Build using boost static Libraries" OFF)
-		 set(Boost_USE_MULTITHREADED ON) # Needed if MT libraries not built
-    else(MSYS)
-        # this will be MSYS or stand alone Mingw
-        option(USE_BOOST_STATIC_LIBS "Build using boost static Libraries" ON)
-    endif(MSYS)
-endif(UNIX)
+option(USE_BOOST_STATIC_LIBS "Build using boost static Libraries" ON)
 
 mark_as_advanced(USE_BOOST_STATIC_LIBS)
 
@@ -37,8 +23,6 @@ if(USE_BOOST_STATIC_LIBS)
     set(Boost_USE_STATIC_LIBS ON)
     set(BOOST_STATIC ON)
 endif()
-
-mark_as_advanced(USE_BOOST_STATIC_LIBS)
 
 if(MSVC)
 
@@ -109,7 +93,7 @@ hide_variable(BOOST_TEST_PATH)
 
 if(NOT BOOST_REQUIRED_LIBRARIES)
     set(BOOST_REQUIRED_LIBRARIES)
-    if(BUILD_TESTING)
+    if(BUILD_TESTING AND BUILD_HELICS_TESTS)
         message(STATUS "adding unit testing")
         list(APPEND BOOST_REQUIRED_LIBRARIES unit_test_framework)
     endif()
@@ -117,19 +101,26 @@ endif()
 
 # Minimum version of Boost required for building HELICS
 set(BOOST_MINIMUM_VERSION 1.58)
+
 set(Boost_USE_STATIC_LIBS ${USE_BOOST_STATIC_LIBS})
+if (BOOST_REQUIRED_LIBRARIES)
+message(STATUS "Finding with components\n")
 find_package(
     Boost ${BOOST_MINIMUM_VERSION}
     COMPONENTS ${BOOST_REQUIRED_LIBRARIES}
     REQUIRED
 )
-
+else()
+message(STATUS "Finding without components\n")
+set(Boost_DEBUG ON)
+find_package(Boost ${BOOST_MINIMUM_VERSION})
+endif()
 # Minimum version of Boost required for building test suite
 set(BOOST_VERSION_LEVEL ${Boost_MINOR_VERSION})
 
-# message(STATUS "Using Boost include files : ${Boost_INCLUDE_DIR}")
-# message(STATUS "Using Boost libraries in : ${Boost_LIBRARY_DIRS}")
-# message(STATUS "Using Boost libraries : ${Boost_LIBRARIES}")
+# message(STATUS "Using Boost include files : ${Boost_INCLUDE_DIR} |")
+# message(STATUS "Using Boost libraries in : ${Boost_LIBRARY_DIRS} |")
+# message(STATUS "Using Boost libraries : ${Boost_LIBRARIES} |")
 set(modifier,"")
 foreach(loop_var ${Boost_LIBRARIES})
     if("${loop_var}" STREQUAL "debug")
@@ -236,10 +227,13 @@ else()
     endforeach()
 endif()
 
+if (Boost_INCLUDE_DIR)
 set_target_properties(
     Boostlibs::core Boostlibs::test
     PROPERTIES INTERFACE_SYSTEM_INCLUDE_DIRECTORIES ${Boost_INCLUDE_DIR}
 )
+endif()
+if (BOOST_REQUIRED_LIBRARIES)
 set_target_properties(
     Boostlibs::core
     PROPERTIES INTERFACE_LINK_LIBRARIES "${boost_core_deps}"
@@ -260,7 +254,7 @@ else()
         PROPERTIES IMPORTED_LOCATION "${Boost_LIBRARIES_test_release}"
     )
 endif()
-
+endif()
 # message(STATUS "Using Boost core debug libraries :
 # ${Boost_LIBRARIES_core_debug}") message(STATUS "Using Boost core release
 # libraries : ${Boost_LIBRARIES_core_release}")

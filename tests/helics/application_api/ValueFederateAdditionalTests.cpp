@@ -41,6 +41,7 @@ BOOST_DATA_TEST_CASE (value_federate_initialize_tests, bdata::make (core_types_s
     BOOST_CHECK (vFed1->getCurrentMode () == helics::Federate::modes::finalize);
 }
 
+#ifdef ENABLE_ZMQ_CORE
 BOOST_DATA_TEST_CASE (value_federate_publication_registration, bdata::make (ztypes), core_type)
 {
     SetupTest<helics::ValueFederate> (core_type, 1);
@@ -71,7 +72,7 @@ BOOST_DATA_TEST_CASE (value_federate_publication_registration, bdata::make (ztyp
 
     BOOST_CHECK (vFed1->getCurrentMode () == helics::Federate::modes::finalize);
 }
-
+#endif
 BOOST_DATA_TEST_CASE (value_federate_publisher_registration, bdata::make (core_types_single), core_type)
 {
     SetupTest<helics::ValueFederate> (core_type, 1);

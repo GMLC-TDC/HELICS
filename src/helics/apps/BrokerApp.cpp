@@ -25,7 +25,7 @@ BrokerApp::BrokerApp (core_type ctype, std::vector<std::string> args) : type (ct
     }
 }
 
-BrokerApp::BrokerApp (std::vector<std::string> args) : BrokerApp (core_type::ZMQ, std::move (args)) {}
+BrokerApp::BrokerApp (std::vector<std::string> args) : BrokerApp (core_type::DEFAULT, std::move (args)) {}
 
 BrokerApp::BrokerApp (core_type ctype, int argc, char *argv[]) : type (ctype)
 {
@@ -36,7 +36,7 @@ BrokerApp::BrokerApp (core_type ctype, int argc, char *argv[]) : type (ctype)
     }
 }
 
-BrokerApp::BrokerApp (int argc, char *argv[]) : BrokerApp (core_type::ZMQ, argc, argv) {}
+BrokerApp::BrokerApp (int argc, char *argv[]) : BrokerApp (core_type::DEFAULT, argc, argv) {}
 
 BrokerApp::BrokerApp (core_type ctype, const std::string &argString) : type (ctype)
 {
@@ -47,7 +47,7 @@ BrokerApp::BrokerApp (core_type ctype, const std::string &argString) : type (cty
     }
 }
 
-BrokerApp::BrokerApp (const std::string &argString) : BrokerApp (core_type::ZMQ, argString) {}
+BrokerApp::BrokerApp (const std::string &argString) : BrokerApp (core_type::DEFAULT, argString) {}
 
 BrokerApp::~BrokerApp ()
 {
@@ -68,7 +68,7 @@ std::unique_ptr<helicsCLI11App> BrokerApp::generateParser ()
     app->add_option ("--name,-n", name, "name of the broker");
     app->allow_extras ();
     auto app_p = app.get ();
-    app->footer ([app_p]() {
+    app->footer ([app_p] () {
         auto coreType = helics::coreTypeFromString ((*app_p)["--core"]->as<std::string> ());
         BrokerFactory::displayHelp (coreType);
         return std::string ();

@@ -19,7 +19,7 @@ namespace helics
 class helicsCLI11App : public CLI::App
 {
   public:
-    explicit helicsCLI11App (std::string app_description = "", std::string app_name = "")
+    explicit helicsCLI11App (std::string app_description = "", const std::string &app_name = "")
         : CLI::App (std::move (app_description), app_name, nullptr)
     {
         set_help_flag ("-h,-?,--help", "Print this help message and exit");

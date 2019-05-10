@@ -124,8 +124,7 @@ size_t TcpCommsSS::dataReceive (std::shared_ptr<TcpConnection> connection, const
     return used_total;
 }
 
-bool TcpCommsSS::commErrorHandler (std::shared_ptr<TcpConnection> /*connection*/,
-                                   const std::error_code &error)
+bool TcpCommsSS::commErrorHandler (std::shared_ptr<TcpConnection> /*connection*/, const std::error_code &error)
 {
     if (getRxStatus () == connection_status::connected)
     {
@@ -179,11 +178,11 @@ void TcpCommsSS::queue_tx_function ()
     TcpServer::pointer server;
     auto ioctx = AsioContextManager::getContextPointer ();
     auto contextLoop = ioctx->startContextLoop ();
-    auto dataCall = [this](TcpConnection::pointer connection, const char *data, size_t datasize) {
+    auto dataCall = [this] (TcpConnection::pointer connection, const char *data, size_t datasize) {
         return dataReceive (connection, data, datasize);
     };
 
-    auto errorCall = [this](TcpConnection::pointer connection, const std::error_code &error) {
+    auto errorCall = [this] (TcpConnection::pointer connection, const std::error_code &error) {
         return commErrorHandler (connection, error);
     };
 
@@ -290,8 +289,9 @@ void TcpCommsSS::queue_tx_function ()
 
     setTxStatus (connection_status::connected);
 
+    bool haltLoop{false};
     //  std::vector<ActionMessage> txlist;
-    while (true)
+    while (!haltLoop)
     {
         route_id rid;
         ActionMessage cmd;
@@ -390,7 +390,8 @@ void TcpCommsSS::queue_tx_function ()
                     setRxStatus (connection_status::terminated);
                     break;
                 case DISCONNECT:
-                    goto CLOSE_TX_LOOP;  // break out of loop
+                    haltLoop = true;
+                    continue;
                 default:
                     logWarning ("unrecognized control command");
                     break;
@@ -480,8 +481,8 @@ void TcpCommsSS::queue_tx_function ()
                 }
             }
         }
-    }
-CLOSE_TX_LOOP:
+    }  // while (!haltLoop)
+
     for (auto &rt : made_connections)
     {
         if (rt.second)

@@ -17,6 +17,12 @@ if (BUILD_SHARED_LIBS)
    set(BUILD_SHARED_LIBS OFF)
 endif()
 
+#these are intenal variables used in JSONCPP that we know to be true based on the requirements in HELICS for newer compilers than JSONCPP supports
+set(HAVE_CLOCALE ON)
+set(HAVE_LOCALECONV ON)
+set(COMPILER_HAS_DEPRECATED ON)
+set(HAVE_STDINT_H ON)
+set(HAVE_DECIMAL_POINT ON)
 add_subdirectory("${HELICS_SOURCE_DIR}/ThirdParty/jsoncpp" "${PROJECT_BINARY_DIR}/ThirdParty/jsoncpp")
 
 if (OLD_BUILD_SHARED_LIBS)

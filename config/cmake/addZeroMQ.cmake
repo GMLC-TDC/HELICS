@@ -68,7 +68,7 @@ else()
         )
     endif()
 
-    if(NOT ZeroMQ_FOUND)
+    if(NOT ZeroMQ_FOUND OR NOT ZeroMQ_INCLUDE_DIR)
         # message(STATUS "initialZMQ not found")
         if(ZMQ_USE_STATIC_LIBRARY OR AUTOBUILD_ZMQ)
             include(buildlibZMQ)
@@ -85,7 +85,7 @@ else()
         else()
             set(ZeroMQ_FIND_QUIETLY ON)
             find_package(ZeroMQ)
-            if(NOT ZeroMQ_FOUND)
+            if(NOT ZeroMQ_FOUND OR NOT ZeroMQ_INCLUDE_DIR)
                 if(WIN32 AND NOT MSYS)
                     option(
                         AUTOBUILD_ZMQ

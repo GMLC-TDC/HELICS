@@ -11,27 +11,27 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "core-exceptions.hpp"
 #include "core-types.hpp"
 #include "helics/helics-config.h"
-#if HELICS_HAVE_ZEROMQ
+#ifdef ENABLE_ZMQ_CORE
 #include "zmq/ZmqBroker.h"
 #endif
 
-#if HELICS_HAVE_MPI
+#ifdef ENABLE_MPI_CORE
 #include "mpi/MpiBroker.h"
 #endif
 
-#ifndef DISABLE_TEST_CORE
+#ifdef ENABLE_TEST_CORE
 #include "test/TestBroker.h"
 #endif
 
-#ifndef DISABLE_IPC_CORE
+#ifdef ENABLE_IPC_CORE
 #include "ipc/IpcBroker.h"
 #endif
 
-#ifndef DISABLE_UDP_CORE
+#ifdef ENABLE_UDP_CORE
 #include "udp/UdpBroker.h"
 #endif
 
-#ifndef DISABLE_TCP_CORE
+#ifdef ENABLE_TCP_CORE
 #include "tcp/TcpBroker.h"
 #endif
 
@@ -46,13 +46,17 @@ std::shared_ptr<Broker> makeBroker (core_type type, const std::string &name)
 
     if (type == core_type::DEFAULT)
     {
-#if HELICS_HAVE_ZEROMQ
+#ifdef ENABLE_ZMQ_CORE
         type = core_type::ZMQ;
 #else
-#ifndef DISABLE_TCP_CORE
+#ifdef ENABLE_TCP_CORE
         type = core_type::TCP;
 #else
+#ifdef ENABLE_MPI_CORE
+        type = core_type::MPI;
+#else
         type = core_type::UDP;
+#endif
 #endif
 #endif
     }
@@ -60,7 +64,7 @@ std::shared_ptr<Broker> makeBroker (core_type type, const std::string &name)
     switch (type)
     {
     case core_type::ZMQ:
-#if HELICS_HAVE_ZEROMQ
+#ifdef ENABLE_ZMQ_CORE
         if (name.empty ())
         {
             broker = std::make_shared<zeromq::ZmqBroker> ();
@@ -75,7 +79,7 @@ std::shared_ptr<Broker> makeBroker (core_type type, const std::string &name)
 #endif
         break;
     case core_type::ZMQ_SS:
-#if HELICS_HAVE_ZEROMQ
+#ifdef ENABLE_ZMQ_CORE
         if (name.empty ())
         {
             broker = std::make_shared<zeromq::ZmqBrokerSS> ();
@@ -89,7 +93,7 @@ std::shared_ptr<Broker> makeBroker (core_type type, const std::string &name)
 #endif
         break;
     case core_type::MPI:
-#if HELICS_HAVE_MPI
+#ifdef ENABLE_MPI_CORE
         if (name.empty ())
         {
             broker = std::make_shared<mpi::MpiBroker> ();
@@ -103,7 +107,7 @@ std::shared_ptr<Broker> makeBroker (core_type type, const std::string &name)
 #endif
         break;
     case core_type::TEST:
-#ifndef DISABLE_TEST_CORE
+#ifdef ENABLE_TEST_CORE
         if (name.empty ())
         {
             broker = std::make_shared<testcore::TestBroker> ();
@@ -118,7 +122,7 @@ std::shared_ptr<Broker> makeBroker (core_type type, const std::string &name)
 #endif
     case core_type::INTERPROCESS:
     case core_type::IPC:
-#ifndef DISABLE_IPC_CORE
+#ifdef ENABLE_IPC_CORE
         if (name.empty ())
         {
             broker = std::make_shared<ipc::IpcBroker> ();
@@ -132,7 +136,7 @@ std::shared_ptr<Broker> makeBroker (core_type type, const std::string &name)
         throw (HelicsException ("ipc broker type is not available"));
 #endif
     case core_type::UDP:
-#ifndef DISABLE_UDP_CORE
+#ifdef ENABLE_UDP_CORE
         if (name.empty ())
         {
             broker = std::make_shared<udp::UdpBroker> ();
@@ -146,7 +150,7 @@ std::shared_ptr<Broker> makeBroker (core_type type, const std::string &name)
         throw (HelicsException ("udp broker type is not available"));
 #endif
     case core_type::TCP:
-#ifndef DISABLE_TCP_CORE
+#ifdef ENABLE_TCP_CORE
         if (name.empty ())
         {
             broker = std::make_shared<tcp::TcpBroker> ();
@@ -160,7 +164,7 @@ std::shared_ptr<Broker> makeBroker (core_type type, const std::string &name)
 #endif
         break;
     case core_type::TCP_SS:
-#ifndef DISABLE_TCP_CORE
+#ifdef ENABLE_TCP_CORE
         if (name.empty ())
         {
             broker = std::make_shared<tcp::TcpBrokerSS> ();
@@ -268,38 +272,38 @@ static bool isJoinableBrokerOfType (core_type type, const std::shared_ptr<Broker
         switch (type)
         {
         case core_type::ZMQ:
-#if HELICS_HAVE_ZEROMQ
+#ifdef ENABLE_ZMQ_CORE
             return (dynamic_cast<zeromq::ZmqBroker *> (ptr.get ()) != nullptr);
 #else
             break;
 #endif
         case core_type::MPI:
-#if HELICS_HAVE_MPI
+#ifdef ENABLE_MPI_CORE
             return (dynamic_cast<mpi::MpiBroker *> (ptr.get ()) != nullptr);
 #else
             break;
 #endif
         case core_type::TEST:
-#ifndef DISABLE_TEST_CORE
+#ifdef ENABLE_TEST_CORE
             return (dynamic_cast<testcore::TestBroker *> (ptr.get ()) != nullptr);
 #else
             return false;
 #endif
         case core_type::INTERPROCESS:
         case core_type::IPC:
-#ifndef DISABLE_IPC_CORE
+#ifdef ENABLE_IPC_CORE
             return (dynamic_cast<ipc::IpcBroker *> (ptr.get ()) != nullptr);
 #else
             return false;
 #endif
         case core_type::UDP:
-#ifndef DISABLE_UDP_CORE
+#ifdef ENABLE_UDP_CORE
             return (dynamic_cast<udp::UdpBroker *> (ptr.get ()) != nullptr);
 #else
             return false;
 #endif
         case core_type::TCP:
-#ifndef DISABLE_TCP_CORE
+#ifdef ENABLE_TCP_CORE
             return (dynamic_cast<tcp::TcpBroker *> (ptr.get ()) != nullptr);
 #else
             return false;
@@ -361,10 +365,12 @@ void displayHelp (core_type type)
     if (type == core_type::DEFAULT || type == core_type::UNRECOGNIZED)
     {
         std::cout << "All core types have similar options\n";
-        auto brk = makeBroker (core_type::ZMQ, emptyString);
+        auto brk = makeBroker (core_type::DEFAULT, emptyString);
         brk->configure (helpStr);
+#ifdef ENABLE_TCP_CORE
         brk = makeBroker (core_type::TCP_SS, emptyString);
         brk->configure (helpStr);
+#endif
     }
     else
     {

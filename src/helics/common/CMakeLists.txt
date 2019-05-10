@@ -79,10 +79,10 @@ set(
   generic_string_ops.hpp
 )
 
-if(HELICS_HAVE_ZEROMQ)
+if(ENABLE_ZMQ_CORE)
   list(APPEND common_headers ${zmq_headers})
   list(APPEND common_sources ${zmq_sources})
-endif(HELICS_HAVE_ZEROMQ)
+endif(ENABLE_ZMQ_CORE)
 
 add_library(helics_common OBJECT ${common_sources} ${common_headers})
 set_target_properties(helics_common PROPERTIES LINKER_LANGUAGE CXX)
@@ -100,17 +100,24 @@ target_compile_definitions(
   $<TARGET_PROPERTY:helics_base_includes,INTERFACE_COMPILE_DEFINITIONS>
 )
 
+if (TARGET Boost::boost)
+target_include_directories(
+  helics_common SYSTEM
+  PRIVATE $<TARGET_PROPERTY:Boost::boost,INTERFACE_SYSTEM_INCLUDE_DIRECTORIES>
+)
+endif()
+
 target_compile_options(
   helics_common
   PRIVATE $<TARGET_PROPERTY:helics_base_includes,INTERFACE_COMPILE_OPTIONS>
 )
 
-if(HELICS_HAVE_ZEROMQ)
+if(ENABLE_ZMQ_CORE)
   target_include_directories(
     helics_common SYSTEM
     PRIVATE $<TARGET_PROPERTY:${ZeroMQ_DEPENDENCY},INTERFACE_INCLUDE_DIRECTORIES>
   )
-endif(HELICS_HAVE_ZEROMQ)
+endif(ENABLE_ZMQ_CORE)
 
 install(
   FILES ${helics_public_common}

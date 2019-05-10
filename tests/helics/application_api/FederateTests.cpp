@@ -98,6 +98,7 @@ BOOST_AUTO_TEST_CASE (federate_broker_disconnect_test)
     BOOST_CHECK (Fed->getCurrentMode () == helics::Federate::modes::finalize);
 }
 
+#ifdef ENABLE_ZMQ_CORE
 // TODO PT:: make this work for all test types
 BOOST_AUTO_TEST_CASE (federate_bad_broker_error_zmq)
 {
@@ -114,6 +115,8 @@ BOOST_AUTO_TEST_CASE (federate_timeout_error_zmq)
 
     BOOST_CHECK_THROW (std::make_shared<helics::Federate> ("test1", fi), helics::RegistrationFailure);
 }
+
+#endif
 
 BOOST_AUTO_TEST_CASE (federate_multiple_federates, *utf::label ("ci"))
 {
