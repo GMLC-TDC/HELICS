@@ -79,9 +79,7 @@ if(UNIX)
         endif()
 		if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
 		    if(CMAKE_CXX_COMPILER_VERSION VERSION_GREATER 6.0)
-                add_compile_options(
-                    $<$<COMPILE_LANGUAGE:CXX>:-Wdocumentation>
-                )
+                add_compile_options(-Wdocumentation -Wdocumentation-pedantic -Wno-documentation-deprecated-sync)
 		    endif()
 		endif()
     endif(ENABLE_EXTRA_COMPILER_WARNINGS)
