@@ -11,8 +11,8 @@ SPDX-License-Identifier: BSD-3-Clause
 //#include <iostream>
  
 #ifdef ENABLE_ZMQ_CORE
-#include "../../../src/helics/common/zmqContextManager.h"
-#include "../../../ThirdParty/cppzmq/zmq.hpp"
+#include "helics/common/zmqContextManager.h"
+#include "cppzmq/zmq.hpp"
 #endif
 
 #ifndef BOOST_STATIC
