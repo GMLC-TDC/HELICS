@@ -389,7 +389,7 @@ include(GNUInstallDirs)
 # -------------------------------------------------------------
 # Asio include directories
 # -------------------------------------------------------------
-target_compile_definitions(helics_base_includes INTERFACE "-DASIO_STANDALONE=1")
+target_compile_definitions(helics_base_includes INTERFACE "-DASIO_STANDALONE")
 target_include_directories(
     helics_base_includes SYSTEM
     INTERFACE

@@ -11,10 +11,10 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include "../common/AsioContextManager.h"
 
-//#define ASIO_STANDALONE 1
+#define ASIO_STANDALONE 1
 #include <asio/ip/host_name.hpp>
 #include <asio/ip/tcp.hpp>
-//#undef ASIO_STANDALONE
+#undef ASIO_STANDALONE
 
 #include <iostream>
 
