@@ -12,8 +12,10 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "../common/AsioContextManager.h"
 
 #define ASIO_STANDALONE 1
+#define ASIO_ERROR_CATEGORY_NOEXCEPT noexcept(true)
 #include <asio/ip/host_name.hpp>
 #include <asio/ip/tcp.hpp>
+#undef ASIO_ERROR_CATEGORY_NOEXCEPT
 #undef ASIO_STANDALONE
 
 #include <iostream>
