@@ -133,6 +133,8 @@ jobs:
         - MATRIX_EVAL="COMPILER=clang && CC='clang-3.6' && CXX='clang++-3.6'"
         - CCACHE_CPP2=yes
         - USE_SWIG=true
+        - CI_BOOST_VERSION=1.58.0
+        - SKIP_TEST_RUN=true
 
    # ------------------------------------------------
    # Jobs for daily valgrind and code coverage tests
