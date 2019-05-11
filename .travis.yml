@@ -112,7 +112,7 @@ jobs:
       env:
         - MATRIX_EVAL="COMPILER=gcc && CC=gcc-4.9 && CXX=g++-4.9"
         - USE_SWIG=false
-        - CI_BOOST_VERSION=1.61.0
+        - CI_BOOST_VERSION=1.58.0
         - ENABLE_CPACK=true
         - INSTALL_SYSTEM_LIBRARIES=true
         - SKIP_TEST_RUN=true
@@ -133,7 +133,7 @@ jobs:
         - MATRIX_EVAL="COMPILER=clang && CC='clang-3.6' && CXX='clang++-3.6'"
         - CCACHE_CPP2=yes
         - USE_SWIG=true
-        - CI_BOOST_VERSION=1.58.0
+        - CI_BOOST_VERSION=1.61.0
         - SKIP_TEST_RUN=true
 
    # ------------------------------------------------
