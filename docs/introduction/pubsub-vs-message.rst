@@ -2,7 +2,7 @@ Value vs Message
 ==================
 
 +--------------------------------------------------------------------+--------------------------------------------------------+
-|`Publication <publications.html>`__/`Input <inputs.html>`__ Values  | `Endpoint <endpoints.html>`__                          |
+|`Publication <Publications.html>`__/`Input <Inputs.html>`__ Values  | `Endpoint <Endpoints.html>`__                          |
 +====================================================================+========================================================+
 |Fixed routes at initialization                                      |Routes at transmission time                             |
 +--------------------------------------------------------------------+--------------------------------------------------------+
