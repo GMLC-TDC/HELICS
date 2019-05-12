@@ -129,10 +129,11 @@
 #include <stack>
 #include <stdexcept>
 #include <string>
+#include <system_error>
 #include <type_traits>
 #include <utility>
 #include <vector>
-#include <system_error>
+
 #else  // GHC_EXPAND_IMPL
 #include <chrono>
 #include <fstream>
@@ -159,7 +160,7 @@
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 // ghc::filesystem version in decimal (major * 10000 + minor * 100 + patch)
-#define GHC_FILESYSTEM_VERSION 10102L
+#define GHC_FILESYSTEM_VERSION 10105L
 
 namespace ghc {
 namespace filesystem {
@@ -342,6 +343,8 @@ public:
     iterator end() const;
 
 private:
+    friend class directory_iterator;
+    void append_name(const char* name);
     static constexpr value_type generic_separator = '/';
     template <typename InputIterator>
     class input_iterator_range
@@ -737,13 +740,14 @@ public:
     void swap(recursive_directory_iterator& rhs);
 
 private:
-    struct recursive_directory_iterator_impl {
+    struct recursive_directory_iterator_impl
+    {
         directory_options _options;
         bool _recursion_pending;
         std::stack<directory_iterator> _dir_iter_stack;
         recursive_directory_iterator_impl(directory_options options, bool recursion_pending)
-        : _options(options)
-        , _recursion_pending(recursion_pending)
+            : _options(options)
+            , _recursion_pending(recursion_pending)
         {
         }
     };
@@ -1052,11 +1056,11 @@ GHC_INLINE std::error_code make_error_code(portable_error err)
         case portable_error::invalid_argument:
             return std::error_code(ERROR_INVALID_PARAMETER, std::system_category());
         case portable_error::is_a_directory:
-		#ifdef ERROR_DIRECTORY_NOT_SUPPORTED
-            return std::error_code(ERROR_DIRECTORY_NOT_SUPPORTED, std::system_category());
-		#elif defined EISDIR
-			return std::error_code(EISDIR, std::system_category());
-		#endif
+#ifdef ERROR_DIRECTORY_NOT_SUPPORTED
+            return std::error_code(ERROR_DIRECTORY_NOT_SUPPORTED, std::system_category()); 
+#else
+            return std::error_code(ERROR_NOT_SUPPORTED, std::system_category());
+#endif
     }
 #else
     switch (err) {
@@ -1212,7 +1216,7 @@ inline StringType fromUtf8(const std::string& utf8String, const typename StringT
     unsigned utf8_state = S_STRT;
     std::uint32_t codepoint = 0;
     while (iter < utf8String.end()) {
-        if ((utf8_state = consumeUtf8Fragment(utf8_state, (uint8_t)*iter++, codepoint))==0) {
+        if ((utf8_state = consumeUtf8Fragment(utf8_state, (uint8_t)*iter++, codepoint)) == S_STRT) {
             if (sizeof(typename StringType::value_type) == 4) {
                 result += codepoint;
             }
@@ -1381,20 +1385,20 @@ inline path::path(InputIterator first, InputIterator last, format fmt)
 
 namespace detail {
 
-GHC_INLINE bool compare_no_case(const char* str1, const char* str2)
+GHC_INLINE bool equals_simple_insensitive(const char* str1, const char* str2)
 {
 #ifdef GHC_OS_WINDOWS
 #  ifdef __GNUC__
     while (::tolower((unsigned char)*str1) == ::tolower((unsigned char)*str2++)) {
         if (*str1++ == 0)
-            return false;
+            return true;
     }
-    return true;
+    return false;
 #  else
-    return ::_stricmp(str1, str2);
+    return 0 == ::_stricmp(str1, str2);
 #  endif
 #else
-    return ::strcasecmp(str1, str2);
+    return 0 == ::strcasecmp(str1, str2);
 #endif
 }
 
@@ -1652,7 +1656,7 @@ GHC_INLINE file_status status_from_INFO(const path& p, const INFO* info, std::er
         prms = prms | perms::owner_write | perms::group_write | perms::others_write;
     }
     std::string ext = p.extension().generic_string();
-    if (!compare_no_case(ext.c_str(), ".exe") || !compare_no_case(ext.c_str(), ".cmd") || !compare_no_case(ext.c_str(), ".bat") || !compare_no_case(ext.c_str(), ".com")) {
+    if (equals_simple_insensitive(ext.c_str(), ".exe") || equals_simple_insensitive(ext.c_str(), ".cmd") || equals_simple_insensitive(ext.c_str(), ".bat") || equals_simple_insensitive(ext.c_str(), ".com")) {
         prms = prms | perms::owner_exec | perms::group_exec | perms::others_exec;
     }
     if (sz) {
@@ -1812,13 +1816,12 @@ GHC_INLINE u8arguments::u8arguments(int& argc, char**& argv)
 #if defined(__ANDROID__) && __ANDROID_API__ < 26
     _isvalid = true;
 #else
-    if (!detail::compare_no_case(::nl_langinfo(CODESET), "UTF-8")) {
+    if (detail::equals_simple_insensitive(::nl_langinfo(CODESET), "UTF-8")) {
         _isvalid = true;
     }
 #endif
 #endif
 }
-
 
 //-----------------------------------------------------------------------------
 // 30.10.8.4.1 constructors and destructor
@@ -1913,7 +1916,8 @@ inline path& path::assign(const Source& source)
 template <>
 inline path& path::assign<path>(const path& source)
 {
-    return assign(source._path);
+    _path = source._path;
+    return *this;
 }
 
 template <class InputIterator>
@@ -1961,6 +1965,19 @@ GHC_INLINE path& path::operator/=(const path& p)
         _path += (*iter++).generic_string();
     }
     return *this;
+}
+
+GHC_INLINE void path::append_name(const char* name)
+{
+    if (_path.empty()) {
+        this->operator/=(path(name));
+    }
+    else {
+        if (_path.back() != path::generic_separator) {
+            _path.push_back(path::generic_separator);
+        }
+        _path += name;
+    }
 }
 
 #endif  // GHC_EXPAND_IMPL
@@ -2415,7 +2432,7 @@ GHC_INLINE path path::lexically_normal() const
                 continue;
             }
             else if (*(--dest.end()) != "..") {
-                if(dest._path.back() == generic_separator) {
+                if (dest._path.back() == generic_separator) {
                     dest._path.pop_back();
                 }
                 dest.remove_filename();
@@ -3002,7 +3019,7 @@ GHC_INLINE void copy(const path& from, const path& to, copy_options options, std
         }
     }
 #ifdef LWG_2682_BEHAVIOUR
-    else if(is_directory(fs_from) && (options & copy_options::create_symlinks) != copy_options::none) {
+    else if (is_directory(fs_from) && (options & copy_options::create_symlinks) != copy_options::none) {
         ec = detail::make_error_code(detail::portable_error::is_a_directory);
     }
 #endif
@@ -4541,7 +4558,8 @@ public:
         if (_dirHandle != INVALID_HANDLE_VALUE) {
             do {
                 if (FindNextFileW(_dirHandle, &_findData)) {
-                    _current = _base / std::wstring(_findData.cFileName);
+                    _current = _base;
+                    _current.append_name(detail::toUtf8(_findData.cFileName).c_str());
                     copyToDirEntry(ec);
                 }
                 else {
@@ -4588,32 +4606,16 @@ public:
 // POSIX implementation
 class directory_iterator::impl
 {
-    size_t directory_entry_buffer_size(DIR* d)
-    {
-        size_t result = std::max(sizeof(::dirent), sizeof(::dirent) - sizeof(::dirent::d_name) + NAME_MAX) + 1;
-        if (d) {
-            long rc = ::fpathconf(dirfd(d), _PC_NAME_MAX);
-            if (rc > long(result)) {
-                result = static_cast<size_t>(rc);
-            }
-        }
-        return result;
-    }
-
 public:
     impl(const path& path, directory_options options)
         : _base(path)
         , _options(options)
-        , _dir((path.empty() ? nullptr : ::opendir(path.native().c_str())),
-               [](DIR* d) {
-                   if (d) {
-                       ::closedir(d);
-                   }
-               })
-        , _bufferSize(directory_entry_buffer_size(_dir.get()))
-        , _buffer(new char[_bufferSize])
-        , _entry(reinterpret_cast<::dirent*>(&_buffer[0]))
+        , _dir(nullptr)
+        , _entry(nullptr)
     {
+        if (!path.empty()) {
+            _dir = ::opendir(path.native().c_str());
+        }
         if (!path.empty()) {
             if (!_dir) {
                 auto error = errno;
@@ -4628,40 +4630,30 @@ public:
         }
     }
     impl(const impl& other) = delete;
-    int i_readdir_r(DIR* dir, struct dirent* entry, struct dirent** result)
+    ~impl()
     {
-#if defined(__GLIBC__) && (__GLIBC__ > 2 || (__GLIBC__ == 2 && __GLIBC_MINOR__ >= 24))
-        errno = 0;
-        auto de = readdir(dir);
-        if (de) {
-            *entry = *de;
-            *result = entry;
-            return 0;
+        if (_dir) {
+            ::closedir(_dir);
         }
-        return errno;
-#else
-        return ::readdir_r(dir, entry, result);
-#endif
     }
     void increment(std::error_code& ec)
     {
         if (_dir) {
             do {
-                dirent* result = 0;
-                if (0 == i_readdir_r(_dir.get(), _entry, &result)) {
-                    if (result) {
-                        _current = _base / path(_entry->d_name);
-                        _dir_entry = directory_entry(_current, ec);
-                    }
-                    else {
-                        _dir.reset();
-                        _current = path();
-                        break;
-                    }
+                errno = 0;
+                _entry = readdir(_dir);
+                if (_entry) {
+                    _current = _base;
+                    _current.append_name(_entry->d_name);
+                    _dir_entry = directory_entry(_current, ec);
                 }
                 else {
+                    ::closedir(_dir);
+                    _dir = nullptr;
                     _current = path();
-                    ec = std::error_code(errno, std::system_category());
+                    if (errno) {
+                        ec = std::error_code(errno, std::system_category());
+                    }
                     break;
                 }
             } while (std::strcmp(_entry->d_name, ".") == 0 || std::strcmp(_entry->d_name, "..") == 0);
@@ -4670,9 +4662,7 @@ public:
     path _base;
     directory_options _options;
     path _current;
-    std::shared_ptr<DIR> _dir;
-    size_t _bufferSize;
-    std::unique_ptr<char[]> _buffer;
+    DIR* _dir;
     struct ::dirent* _entry;
     directory_entry _dir_entry;
     std::error_code _ec;
@@ -4897,9 +4887,14 @@ GHC_INLINE recursive_directory_iterator& recursive_directory_iterator::increment
     else {
         _impl->_dir_iter_stack.top().increment(ec);
     }
-    while (depth() && _impl->_dir_iter_stack.top() == directory_iterator()) {
+    if (!ec) {
+        while (depth() && _impl->_dir_iter_stack.top() == directory_iterator()) {
+            _impl->_dir_iter_stack.pop();
+            _impl->_dir_iter_stack.top().increment(ec);
+        }
+    }
+    else if (!_impl->_dir_iter_stack.empty()) {
         _impl->_dir_iter_stack.pop();
-        _impl->_dir_iter_stack.top().increment(ec);
     }
     _impl->_recursion_pending = true;
     return *this;
@@ -4923,8 +4918,7 @@ GHC_INLINE void recursive_directory_iterator::pop(std::error_code& ec)
         do {
             _impl->_dir_iter_stack.pop();
             _impl->_dir_iter_stack.top().increment(ec);
-        }
-        while (depth() && _impl->_dir_iter_stack.top() == directory_iterator());
+        } while (depth() && _impl->_dir_iter_stack.top() == directory_iterator());
     }
 }
 
