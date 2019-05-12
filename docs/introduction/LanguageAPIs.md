@@ -3,11 +3,11 @@ Interfacing with HELICS
 
 The HELICS framework allows other tool developers to add HELICS
 components to enable co-simulation. Interfacing with HELICS can be done
-using the CPP Application API or the C Shared Library API. Developers
+using the C++ Application API or the C Shared Library API. Developers
 familiar with HELICS and the HELICS Application API can interface with
-HELICS using the CPP Application API. HELICS also provides an additional
-well defined C API built as a library that can be easily interfaced with
-from other tools. This C interface also supports easier integration with
+HELICS using the C++ Application API. HELICS also provides an additional
+well defined C API built as a shared library that can be easily interfaced
+with from other tools. This C interface also supports easier integration with
 tools developed in other languages. Developers can easily integrate
 HELICS into their application using the C Shared Library API using FFI.
 
@@ -18,7 +18,7 @@ build interfaces in the high level programming languages listed below.
 - MATLAB
 - Java
 - Octave
-- CSharp
+- C#
 
 
 SWIG allows cross platform support, i.e. extensions will work for
