@@ -27,11 +27,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <string>
 #include <vector>
 
-#define ASIO_STANDALONE 1
-#define ASIO_ERROR_CATEGORY_NOEXCEPT noexcept(true)
-#include <asio/io_context.hpp>
-#undef ASIO_ERROR_CATEGORY_NOEXCEPT
-#undef ASIO_STANDALONE
+#include <asio.hpp>
 
 /** class defining a (potential) singleton Asio io_context manager for all asio usage*/
 class AsioContextManager : public std::enable_shared_from_this<AsioContextManager>
