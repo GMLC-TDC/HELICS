@@ -19,7 +19,6 @@ Value vs Message
 +--------------------------------------------------------------------+--------------------------------------------------------+
 ```
 
-
 Other Notes:
 
  - Endpoints can subscribe to publications to get a message for each data point
