@@ -77,7 +77,7 @@ option(BUILD_HELICS_TESTS "Enable the test executables to be built" ON)
 # enable testing
 if(BUILD_HELICS_TESTS)
     include(CTest)
-endif(BUILD_HELICS_TESTS)
+endif()
 
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
@@ -176,6 +176,8 @@ if(VERSION_OPTION)
     endif(MSVC)
 endif(VERSION_OPTION)
 
+ target_compile_options(helics_base_includes INTERFACE -DENABLE_BOOST_IOSTREAMS)
+
 cmake_dependent_option(
     STATIC_STANDARD_LIB
     "Link against a static standard lib"
@@ -203,7 +205,7 @@ endif(MSVC)
 # -------------------------------------------------------------
 # add coverage target
 # -------------------------------------------------------------
-if(BUILD_HELICS_TESTS)
+if(BUILD_HELICS_TESTS AND BUILD_TESTING)
     cmake_dependent_option(
         TEST_CODE_COVERAGE
         "Build a target for testing code coverage"
@@ -237,7 +239,7 @@ if(BUILD_HELICS_TESTS)
             )
         endif()
     endif(TEST_CODE_COVERAGE)
-endif(BUILD_HELICS_TESTS)
+endif()
 mark_as_advanced(TEST_CODE_COVERAGE)
 
 # -------------------------------------------------------------
@@ -329,6 +331,10 @@ endif()
 # -------------------------------------------------------------
 if(MSYS)
     target_link_libraries(helics_base INTERFACE wsock32 ws2_32)
+	if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+        set(ENABLE_IPC_CORE FALSE)
+		target_compile_definitions(helics_base_includes INTERFACE -DDISABLE_BOOST_IOSTREAMS)
+    endif()
 endif(MSYS)
 
 # -------------------------------------------------------------
@@ -534,7 +540,7 @@ target_include_directories(
 add_subdirectory(src)
 
 # -----------------------------------------------------------------------------
-# Setup CTEST environment
+# Build the tests
 # -----------------------------------------------------------------------------
 
 if(BUILD_HELICS_TESTS AND BUILD_TESTING AND ENABLE_TEST_CORE)

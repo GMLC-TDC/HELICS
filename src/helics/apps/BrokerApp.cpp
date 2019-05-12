@@ -16,9 +16,10 @@ namespace helics
 {
 namespace apps
 {
-BrokerApp::BrokerApp (core_type ctype, std::vector<std::string> args) : type (ctype)
+BrokerApp::BrokerApp (core_type ctype, std::vector<std::string> args)
 {
     auto app = generateParser ();
+    app->setDefaultCoreType (ctype);
     if (app->helics_parse (std::move (args)) == helicsCLI11App::parse_return::ok)
     {
         processArgs (app);
@@ -27,9 +28,10 @@ BrokerApp::BrokerApp (core_type ctype, std::vector<std::string> args) : type (ct
 
 BrokerApp::BrokerApp (std::vector<std::string> args) : BrokerApp (core_type::DEFAULT, std::move (args)) {}
 
-BrokerApp::BrokerApp (core_type ctype, int argc, char *argv[]) : type (ctype)
+BrokerApp::BrokerApp (core_type ctype, int argc, char *argv[])
 {
     auto app = generateParser ();
+    app->setDefaultCoreType (ctype);
     if (app->helics_parse (argc, argv) == helicsCLI11App::parse_return::ok)
     {
         processArgs (app);
@@ -38,9 +40,10 @@ BrokerApp::BrokerApp (core_type ctype, int argc, char *argv[]) : type (ctype)
 
 BrokerApp::BrokerApp (int argc, char *argv[]) : BrokerApp (core_type::DEFAULT, argc, argv) {}
 
-BrokerApp::BrokerApp (core_type ctype, const std::string &argString) : type (ctype)
+BrokerApp::BrokerApp (core_type ctype, const std::string &argString)
 {
     auto app = generateParser ();
+    app->setDefaultCoreType (ctype);
     if (app->helics_parse (argString) == helicsCLI11App::parse_return::ok)
     {
         processArgs (app);

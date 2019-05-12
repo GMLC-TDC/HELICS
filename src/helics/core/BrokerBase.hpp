@@ -60,7 +60,7 @@ class BrokerBase
     bool queueDisabled = false;  //!< flag indicating that the message queue should not be used and all functions
                                  //!< called directly instead of distinct thread
   protected:
-    std::string logFile;  //< the file to log message to
+    std::string logFile;  //!< the file to log message to
     std::unique_ptr<ForwardingTimeCoordinator> timeCoord;  //!< object managing the time control
     BlockingPriorityQueue<ActionMessage> actionQueue;  //!< primary routing queue
     /** enumeration of the possible core states*/
@@ -144,7 +144,6 @@ class BrokerBase
     @details called when processing a priority command.  The priority command has a response message which gets
     sent this mainly deals with some of the registration functions
     @param command the command to process
-    @return a action message response to the priority command
     */
     virtual void processPriorityCommand (ActionMessage &&command) = 0;
 

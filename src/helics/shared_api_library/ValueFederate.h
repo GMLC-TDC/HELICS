@@ -476,7 +476,6 @@ extern "C"
     @param str a pointer to a string representing the name
     @param val a double value for the value of the named point
     @param[in,out] err an error object that will contain an error code and string if any error occurred during the execution of the function
-    @return helics_ok if everything was OK
     */
     HELICS_EXPORT void helicsInputSetDefaultNamedPoint (helics_input ipt, const char *str, double val, helics_error *err);
 

@@ -19,12 +19,12 @@ class CombinationFederate : public ValueFederate, public MessageFederate
     /** default constructor*/
     CombinationFederate ();
     /**constructor taking a federate information structure and using the default core
-    @param name the name of the federate, may be left empty to use a default or one found in fi
+    @param fedName the name of the federate, may be left empty to use a default or one found in fi
     @param fi  a federate information structure
     */
     explicit CombinationFederate (const std::string &fedName, const FederateInfo &fi);
     /**constructor taking a federate information structure and using the given core
-    @param name the name of the federate, may be left empty to use a default or one found in fi
+    @param fedName the name of the federate, may be left empty to use a default or one found in fi
     @param core a pointer to core object which the federate can join
     @param fi  a federate information structure
     */
