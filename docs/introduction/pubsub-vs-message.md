@@ -2,14 +2,14 @@ Value vs Message
 ==================
 
 
-  |[Publication](./Publications)/[Input](./Inputs) Values            |  [Endpoint](./Endpoints)                         |
-  |---------------------------------|: ---------------------------------|
-  |Fixed routes at initialization    |Routes at transmission time|
-  |1 to N relationship (publications) N to 1 relationship for Inputs |              All endpoints are routable -Unless specified otherwise|
-  |Values exist until updated        |Destination specified|
-  |Default values                    |Rerouting/modification through filters|
-  |Associated units                  |Data exists as singular blobs -No records kept|
-  |No direct request mechanism                |May define a message time - Act as events|
+  |[Publication](./Publications)/[Input](./Inputs) Values            |  [Endpoint](./Endpoints)                               |
+  |------------------------------------------------------------------|--------------------------------------------------------|
+  |Fixed routes at initialization                                    |Routes at transmission time                             |
+  |1 to N relationship (publications) N to 1 relationship for Inputs |All endpoints are routable - Unless otherwise specified |
+  |Values exist until updated                                        |Destination specified                                   |
+  |Default values                                                    |Rerouting/modification through filters                  |
+  |Associated units                                                  |Data exists as singular blobs - No records kept         |
+  |No direct request mechanism                                       |May define a message time - Act as events               |
 
 
 
