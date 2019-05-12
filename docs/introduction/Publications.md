@@ -14,13 +14,13 @@ The type of publication is represented as an open string but the Application API
 - int64
 - double
 - string
-- vector ( a series of doubles)
-- complex ( a pair of doubles)
-- vector_complex ( a series of complex numbers)
+- vector (a series of doubles)
+- complex (a pair of doubles)
+- vector_complex (a series of complex numbers)
 - char  
 - bool
 - time  (a HELICS time value)
-- named point ( a value with a string and a double)
+- named point (a value with a string and a double)
 
 These are all convertible and known to the Application API but some conversions are lossy, so there is a flag to allow only string matching if that is required.
 
