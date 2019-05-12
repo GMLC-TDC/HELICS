@@ -27,7 +27,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <string>
 #include <vector>
 
-#include <asio.hpp>
+#include <asio/io_context.hpp>
 
 /** class defining a (potential) singleton Asio io_context manager for all asio usage*/
 class AsioContextManager : public std::enable_shared_from_this<AsioContextManager>
