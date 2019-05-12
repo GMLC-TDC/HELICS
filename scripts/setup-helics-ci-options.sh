@@ -7,7 +7,10 @@ shopt -s nocasematch
 # Setup the flags for configuring HELICS with CMake
 OPTION_FLAGS_ARR=()
 OPTION_FLAGS_ARR+=("-DBUILD_C_SHARED_LIB=ON" "-DBUILD_SHARED_LIBS=ON" "-DEXAMPLES_WARNINGS_AS_ERROR=ON")
-OPTION_FLAGS_ARR+=("-DZMQ_USE_STATIC_LIBRARY=ON")
+
+if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
+    OPTION_FLAGS_ARR+=("-DZMQ_USE_STATIC_LIBRARY=ON")
+fi
 
 # Options to control building swig interfaces
 if [[ "${DISABLE_INTERFACES}" != *"Java"* ]]; then
@@ -26,6 +29,8 @@ if [[ "$BUILD_TYPE" ]]; then
     if [[ "$BUILD_TYPE" == "Coverage" ]]; then
         OPTION_FLAGS_ARR+=("-DTEST_CODE_COVERAGE=ON")
     fi
+else
+    OPTION_FLAGS_ARR+=("-DCMAKE_BUILD_TYPE=Release")
 fi
 
 # CPack/Install options
@@ -53,6 +58,11 @@ if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
     OPTION_FLAGS_ARR+=("-DDISABLE_SYSTEM_CALL_TESTS=ON")
 fi
 export HELICS_OPTION_FLAGS=${OPTION_FLAGS_ARR[@]}
+
+# Set any HELICS flags for finding dependencies
+if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
+    export HELICS_DEPENDENCY_FLAGS+="-DBOOST_INSTALL_PATH=${CI_DEPENDENCY_DIR}/boost"
+fi
 
 # Setup the flags for controlling test execution
 TEST_FLAGS_ARR=("$TEST_TYPE")
