@@ -32,19 +32,23 @@ _basic_env:
   os: osx
   compiler: clang
 - &linux_base
-  if: type != cron
   os: linux
   compiler: gcc
 - &osx_base
   os: osx
   compiler: clang
 
+# Install macOS dependencies using Homebrew
+addons:
+    homebrew:
+        brewfile: .ci/Brewfile.travis
+
 jobs:
   # On weekdays, the backlog for waiting OS X builds is huge
   fast_finish: true
   allow_failures:
     - os: osx
-    - name: "Clang 4 Thread Sanitizer"
+    - name: "Clang 5 Thread Sanitizer"
     - script: scripts/trigger-dependent-ci-builds.sh
 
   include:
@@ -78,8 +82,27 @@ jobs:
         - USE_SWIG=true
         - USE_MPI=mpich
 
+    # Clang 5 build
+    - <<: *linux_base
+      name: "Clang 5"
+      compiler: clang
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+            - llvm-toolchain-trusty-5.0
+          packages:
+            - libstdc++-6-dev
+            - clang-5.0
+      env:
+        - MATRIX_EVAL="COMPILER=clang && CC='clang-5.0' && CXX='clang++-5.0'"
+        - CCACHE_CPP2=yes
+        - USE_SWIG=true
+        - CXX_STANDARD=17
+
     - <<: *linux_base
       name: "GCC 4.9 (No SWIG)"
+      if: (branch = develop AND type IN (pull_request, cron)) OR (branch != develop)
       addons:
         apt:
           sources:
@@ -92,10 +115,12 @@ jobs:
         - CI_BOOST_VERSION=1.61.0
         - ENABLE_CPACK=true
         - INSTALL_SYSTEM_LIBRARIES=true
+        - SKIP_TEST_RUN=true
       after_script: ${TRAVIS_BUILD_DIR}/scripts/upload-ci-artifact.sh
 
     - <<: *linux_base
       name: "Clang 3.6"
+      if: (branch = develop AND type IN (pull_request, cron)) OR (branch = master AND type IN (push, pull_request))
       compiler: clang
       addons:
         apt:
@@ -108,6 +133,8 @@ jobs:
         - MATRIX_EVAL="COMPILER=clang && CC='clang-3.6' && CXX='clang++-3.6'"
         - CCACHE_CPP2=yes
         - USE_SWIG=true
+        - CI_BOOST_VERSION=1.58.0
+        - SKIP_TEST_RUN=true
 
    # ------------------------------------------------
    # Jobs for daily valgrind and code coverage tests
@@ -133,20 +160,9 @@ jobs:
         - GCOV_TOOL=gcov-6
         - USE_MPI=mpich
         - CTEST_VERBOSE=true
-    # GCC 5 build
+    # TSAN build
     - <<: *daily_linux
-      name: "GCC 5"
-      addons:
-        apt:
-          sources:
-            - ubuntu-toolchain-r-test
-          packages:
-            - g++-5
-      env:
-        - MATRIX_EVAL="COMPILER=gcc && CC='gcc-5' && CXX='g++-5'"
-    # Clang 5 build
-    - <<: *daily_linux
-      name: "Clang 5"
+      name: "Clang 5 Thread Sanitizer"
       compiler: clang
       addons:
         apt:
@@ -159,23 +175,6 @@ jobs:
       env:
         - MATRIX_EVAL="COMPILER=clang && CC='clang-5.0' && CXX='clang++-5.0'"
         - CCACHE_CPP2=yes
-        - USE_SWIG=true
-        - CXX_STANDARD=17
-    # TSAN build
-    - <<: *daily_linux
-      name: "Clang 4 Thread Sanitizer"
-      compiler: clang
-      addons:
-        apt:
-          sources:
-            - ubuntu-toolchain-r-test
-            - llvm-toolchain-trusty-4.0
-          packages:
-            - libstdc++-6-dev
-            - clang-4.0
-      env:
-        - MATRIX_EVAL="COMPILER=clang && CC='clang-4.0' && CXX='clang++-4.0'"
-        - CCACHE_CPP2=yes
         - CI_TEST_CONFIG="TSAN"
         - DISABLE_INTERFACES="Python,Java"
         - RUN_TSAN=true
@@ -183,18 +182,18 @@ jobs:
         - JOB_OPTION_FLAGS="-C../scripts/tsan-cache.cmake"
     # UBSAN build
     - <<: *daily_linux
-      name: "Clang 4 Undefined Behavior Sanitizer"
+      name: "Clang 5 Undefined Behavior Sanitizer"
       compiler: clang
       addons:
         apt:
           sources:
             - ubuntu-toolchain-r-test
-            - llvm-toolchain-trusty-4.0
+            - llvm-toolchain-trusty-5.0
           packages:
             - libstdc++-6-dev
-            - clang-4.0
+            - clang-5.0
       env:
-        - MATRIX_EVAL="COMPILER=clang && CC='clang-4.0' && CXX='clang++-4.0'"
+        - MATRIX_EVAL="COMPILER=clang && CC='clang-5.0' && CXX='clang++-5.0'"
         - CCACHE_CPP2=yes
         - DISABLE_INTERFACES="Python,Java"
         - RUN_UBSAN=true
@@ -221,7 +220,6 @@ install:
   
 script:
   - mkdir -p build && cd build
-  - HELICS_DEPENDENCY_FLAGS+="-DBOOST_INSTALL_PATH=${CI_DEPENDENCY_DIR}/boost"
   - cmake .. ${JOB_OPTION_FLAGS} ${HELICS_DEPENDENCY_FLAGS} ${HELICS_OPTION_FLAGS} -DCMAKE_C_COMPILER_LAUNCHER=ccache -DCMAKE_CXX_COMPILER_LAUNCHER=ccache
   - make ${MAKEFLAGS}
 
@@ -233,7 +231,10 @@ script:
 
   # Run CI tests
   - export CTEST_OPTIONS="--output-on-failure"
-  - travis_wait ../scripts/run-ci-tests.sh ${CI_TEST_FLAGS}
+  - |
+    if [[ "$SKIP_TEST_RUN" != "true" ]]; then
+    travis_wait ../scripts/run-ci-tests.sh ${CI_TEST_FLAGS}
+    fi
 
   # Gather coverage results
   - if [[ "$BUILD_TYPE" == "Coverage" ]]; then pushd .. && scripts/lcov-helper.sh gather-coverage-info --gcov ${GCOV_TOOL} --codecov && popd ; fi

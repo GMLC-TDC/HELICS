@@ -77,7 +77,7 @@ option(BUILD_HELICS_TESTS "Enable the test executables to be built" ON)
 # enable testing
 if(BUILD_HELICS_TESTS)
     include(CTest)
-endif(BUILD_HELICS_TESTS)
+endif()
 
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
@@ -205,7 +205,7 @@ endif(MSVC)
 # -------------------------------------------------------------
 # add coverage target
 # -------------------------------------------------------------
-if(BUILD_HELICS_TESTS)
+if(BUILD_HELICS_TESTS AND BUILD_TESTING)
     cmake_dependent_option(
         TEST_CODE_COVERAGE
         "Build a target for testing code coverage"
@@ -239,7 +239,7 @@ if(BUILD_HELICS_TESTS)
             )
         endif()
     endif(TEST_CODE_COVERAGE)
-endif(BUILD_HELICS_TESTS)
+endif()
 mark_as_advanced(TEST_CODE_COVERAGE)
 
 # -------------------------------------------------------------
@@ -540,7 +540,7 @@ target_include_directories(
 add_subdirectory(src)
 
 # -----------------------------------------------------------------------------
-# Setup CTEST environment
+# Build the tests
 # -----------------------------------------------------------------------------
 
 if(BUILD_HELICS_TESTS AND BUILD_TESTING AND ENABLE_TEST_CORE)

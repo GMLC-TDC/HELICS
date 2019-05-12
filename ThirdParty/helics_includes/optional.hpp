@@ -24,7 +24,7 @@
 #endif // __APPLE__
 
 // disable usage of <optional> from std libs
-#define STX_NO_STD_OPTIONAL
+#define STX_NO_STD_OPTIONAL 1
 
 // libstdc++ and libc++'s std::experimental::optional only work in C++14 mode
 #if !defined(STX_NO_STD_OPTIONAL) && defined(__GNUC__) && (__cplusplus < 201402)

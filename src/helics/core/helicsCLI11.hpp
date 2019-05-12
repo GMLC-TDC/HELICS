@@ -9,6 +9,7 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #define CLI11_EXPERIMENTAL_OPTIONAL 0
 #include "CLI11/CLI11.hpp"
+#undef CLI11_EXPERIMENTAL_OPTIONAL
 #include "core-types.hpp"
 #include "helics-time.hpp"
 #include "helicsVersion.hpp"

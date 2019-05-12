@@ -51,9 +51,9 @@ set(
 
 set(
   zmq_headers
-  zmqContextManager.h 
+  zmqContextManager.h
   zmqHelper.h
-  ${CMAKE_SOURCE_DIR}/ThirdParty/cppzmq/zmq.hpp 
+  ${CMAKE_SOURCE_DIR}/ThirdParty/cppzmq/zmq.hpp
   ${CMAKE_SOURCE_DIR}/ThirdParty/cppzmq/zmq_addon.hpp
 )
 
