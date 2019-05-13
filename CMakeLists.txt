@@ -535,7 +535,7 @@ include(addJsoncpp)
 target_include_directories(
     helics_base_includes SYSTEM
     INTERFACE
-        $<BUILD_INTERFACE:${HELICS_SOURCE_DIR}/ThirdParty/jsoncpp/include>
+    $<TARGET_PROPERTY:jsoncpp_lib,INTERFACE_INCLUDE_DIRECTORIES>
 )
 
 # -----------------------------------------------------------------------------

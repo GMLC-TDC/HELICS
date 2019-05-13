@@ -1,7 +1,7 @@
 #
 # Copyright © 2017-2019, Battelle Memorial Institute; Lawrence Livermore National
-# Security, LLC; Alliance for Sustainable Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved. 
-# 
+# Security, LLC; Alliance for Sustainable Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
+#
 # SPDX-License-Identifier: BSD-3-Clause
 #
 
@@ -47,11 +47,11 @@ if(BUILD_APPS)
   target_link_libraries(helics_apps PUBLIC helics-static)
   target_include_directories(
     helics_apps SYSTEM
-    PRIVATE $<TARGET_PROPERTY:fmt-header-only,INTERFACE_INCLUDE_DIRECTORIES>
+    PRIVATE $<TARGET_PROPERTY:fmt::fmt-header-only,INTERFACE_INCLUDE_DIRECTORIES>
   )
   target_compile_definitions(
     helics_apps PRIVATE
-    $<TARGET_PROPERTY:fmt-header-only,INTERFACE_COMPILE_DEFINITIONS>
+    $<TARGET_PROPERTY:fmt::fmt-header-only,INTERFACE_COMPILE_DEFINITIONS>
   )
   # add and alias library to match the find_package
   add_library(HELICS::helics_apps ALIAS helics_apps)
