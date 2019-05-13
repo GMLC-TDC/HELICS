@@ -278,6 +278,11 @@ endif(GENERATE_DOXYGEN_DOC)
 # add_definitions(-DWIN32_LEAN_AND_MEAN) endif()
 
 # -------------------------------------------------------------
+# Update git submodules
+# -------------------------------------------------------------
+include(updateGitSubmodules)
+
+# -------------------------------------------------------------
 # BOOST  find the boost libraries
 # -------------------------------------------------------------
 
