@@ -30,7 +30,10 @@ if(ENABLE_SWIG AND SWIG_EXECUTABLE)
   swig_link_libraries(JNIhelics ${JAVA_LIBRARIES})
 
   set_target_properties(JNIhelics PROPERTIES FOLDER interfaces)
-
+  #get rid of some annoying warnings coming from swig generated code
+  if (NOT MSVC)
+    target_compile_options(JNIhelics PRIVATE "-Wno-strict-aliasing")
+  endif()
 
 else()
   

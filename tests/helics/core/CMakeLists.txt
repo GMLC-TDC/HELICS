@@ -5,7 +5,7 @@
 # SPDX-License-Identifier: BSD-3-Clause
 #
 
-set(core_test_headers testFixtures.h)
+set(core_test_headers )
 
 set(
   core_test_sources
@@ -16,12 +16,15 @@ set(
   BrokerClassTests.cpp
   CoreFactory-tests.cpp 
   MessageTimerTests.cpp
-  TestCore-tests.cpp
   data-block-tests.cpp
   ForwardingTimeCoordinatorTests.cpp
   TimeCoordinatorTests.cpp
   networkInfoTests.cpp
 )
+
+if(ENABLE_TEST_CORE)
+  list(APPEND core_test_sources TestCore-tests.cpp)
+endif()
 
 if(ENABLE_ZMQ_CORE)
   list(APPEND core_test_sources ZeromqCore-tests.cpp ZeromqSSCore-tests.cpp)
