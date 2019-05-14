@@ -73,6 +73,7 @@ mark_as_advanced(AUTOBUILD_INSTALL_PATH)
 file(MAKE_DIRECTORY ${PROJECT_BINARY_DIR}/logs)
 
 option(BUILD_HELICS_TESTS "Enable the test executables to be built" ON)
+option(BUILD_HELICS_BOOST_TESTS "Enable the test executables built using boost unit tests" ON)
 # enable testing
 if(BUILD_HELICS_TESTS)
     include(CTest)
@@ -279,10 +280,6 @@ endif(GENERATE_DOXYGEN_DOC)
 # -------------------------------------------------------------
 # BOOST  find the boost libraries
 # -------------------------------------------------------------
-
-if(BUILD_TESTING)
-    list(APPEND BOOST_REQUIRED_LIBRARIES unit_test_framework)
-endif()
 include(addBoost)
 
 

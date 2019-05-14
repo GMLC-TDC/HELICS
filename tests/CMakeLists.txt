@@ -4,6 +4,7 @@
 # SPDX-License-Identifier: BSD-3-Clause
 #
 
+if (BUILD_HELICS_BOOST_TESTS)
 if(BOOST_VERSION_LEVEL GREATER 60)
   set(BUILD_BOOST_TESTS ON)
 else()
@@ -12,6 +13,9 @@ set(BUILD_BOOST_TESTS OFF)
     WARNING
       "Boost version >=1.61 required for building HELICS tests (Found Boost version ${Boost_MAJOR_VERSION}.${Boost_MINOR_VERSION})"
   )
+endif()
+else()
+set(BUILD_BOOST_TESTS OFF)
 endif()
 
 add_subdirectory(helics)

@@ -13,6 +13,12 @@ set(BUILD_SHARED_LIBS OFF)
 set(CMAKE_SUPPRESS_DEVELOPER_WARNINGS 1 CACHE BOOL "")
 add_subdirectory("${HELICS_SOURCE_DIR}/ThirdParty/googletest" "${HELICS_BINARY_DIR}/ThirdParty/googletest" EXCLUDE_FROM_ALL)
 
+if (NOT MSVC)
+target_Compile_options(gtest PRIVATE "-Wno-undef")
+target_Compile_options(gmock PRIVATE "-Wno-undef")
+target_Compile_options(gtest_main PRIVATE "-Wno-undef")
+target_Compile_options(gmock_main PRIVATE "-Wno-undef")
+endif()
 
 if(GOOGLE_TEST_INDIVIDUAL)
     if(NOT CMAKE_VERSION VERSION_LESS 3.9)
