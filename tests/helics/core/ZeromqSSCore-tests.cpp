@@ -23,11 +23,6 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include "gtest/gtest.h"
 
-#include <boost/test/data/monomorphic.hpp>
-#include <boost/test/data/test_case.hpp>
-#include <boost/test/floating_point_comparison.hpp>
-
-//#include "boost/process.hpp"
 #include <future>
 #include <iostream>
 

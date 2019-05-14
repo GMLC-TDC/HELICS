@@ -5,10 +5,6 @@
 # SPDX-License-Identifier: BSD-3-Clause
 #
 
-# -----------------------------------------------------------------------------
-# Core tests using Boost
-# -----------------------------------------------------------------------------
-
 set(core_test_headers testFixtures.h)
 
 set(
