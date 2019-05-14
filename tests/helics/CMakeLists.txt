@@ -11,7 +11,7 @@ target_link_libraries(helics_boost_test_base INTERFACE Boostlibs::test)
 target_link_libraries(helics_boost_test_base INTERFACE helics_base_includes)
 endif()
 
-include(addGoogletest)
+include(AddGoogletest)
 add_library(helics_google_test_base INTERFACE)
 target_link_libraries(helics_google_test_base INTERFACE gtest gtest_main gmock)
 target_link_libraries(helics_google_test_base INTERFACE helics_base_includes)
