@@ -26,7 +26,7 @@ set(
 )
 
 add_executable(common-tests ${common_test_sources} ${common_test_headers})
-target_link_libraries(common-tests PRIVATE helics-static helics_test_base)
+target_link_libraries(common-tests PRIVATE helics-static helics_boost_test_base)
 set_target_properties(common-tests PROPERTIES FOLDER tests)
 
 add_test(

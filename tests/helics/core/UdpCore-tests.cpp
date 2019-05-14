@@ -4,7 +4,7 @@ Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance
 the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
-#include <boost/test/unit_test.hpp>
+#include "gtest/gtest.h"
 
 #include "helics/common/AsioContextManager.h"
 #include "helics/common/GuardedTypes.hpp"
@@ -18,20 +18,16 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helics/core/udp/UdpCore.h"
 #include <asio/ip/udp.hpp>
 
-//#include "boost/process.hpp"
 #include <future>
 
-namespace utf = boost::unit_test;
 using namespace std::literals::chrono_literals;
-
-BOOST_AUTO_TEST_SUITE (UdpCore_tests, *utf::label ("ci"))
 
 using asio::ip::udp;
 using helics::Core;
 
 #define UDP_BROKER_PORT 23901
 #define UDP_SECONDARY_PORT 23905
-BOOST_AUTO_TEST_CASE (udpComms_broker_test)
+TEST (UdpCore_tests, udpComms_broker_test)
 {
     std::atomic<int> counter{0};
     std::string host = "localhost";
@@ -53,22 +49,22 @@ BOOST_AUTO_TEST_CASE (udpComms_broker_test)
     asio::error_code error;
     auto len = rxSocket.receive_from (asio::buffer (data), remote_endpoint, 0, error);
 
-    BOOST_CHECK (!error);
-    BOOST_CHECK_GT (len, 32);
+    EXPECT_TRUE (!error);
+    EXPECT_GT (len, 32);
 
     helics::ActionMessage rM (data.data (), len);
-    BOOST_CHECK (helics::isProtocolCommand (rM));
+    EXPECT_TRUE (helics::isProtocolCommand (rM));
     rM.messageID = DISCONNECT;
     rxSocket.send_to (asio::buffer (rM.to_string ()), remote_endpoint, 0, error);
-    BOOST_CHECK (!error);
+    EXPECT_TRUE (!error);
     auto connected = confut.get ();
-    BOOST_CHECK (!connected);
+    EXPECT_TRUE (!connected);
     rxSocket.close ();
     comm.disconnect ();
     std::this_thread::sleep_for (100ms);
 }
 
-BOOST_AUTO_TEST_CASE (udpComms_broker_test_transmit)
+TEST (UdpCore_tests, udpComms_broker_test_transmit)
 {
     std::this_thread::sleep_for (std::chrono::milliseconds (500));
     std::atomic<int> counter{0};
@@ -79,13 +75,13 @@ BOOST_AUTO_TEST_CASE (udpComms_broker_test_transmit)
 
     udp::socket rxSocket (AsioContextManager::getContext (), udp::endpoint (udp::v4 (), 23901));
 
-    BOOST_CHECK (rxSocket.is_open ());
+    EXPECT_TRUE (rxSocket.is_open ());
     comm.setCallback ([&counter](helics::ActionMessage /*m*/) { ++counter; });
     comm.setBrokerPort (UDP_BROKER_PORT);
     comm.setPortNumber (UDP_SECONDARY_PORT);
     comm.setName ("tests");
     bool connected = comm.connect ();
-    BOOST_REQUIRE (connected);
+    ASSERT_TRUE (connected);
     comm.transmit (helics::parent_route_id, helics::CMD_IGNORE);
 
     std::vector<char> data (1024);
@@ -94,15 +90,15 @@ BOOST_AUTO_TEST_CASE (udpComms_broker_test_transmit)
     asio::error_code error;
     auto len = rxSocket.receive_from (asio::buffer (data), remote_endpoint, 0, error);
 
-    BOOST_CHECK_GT (len, 32);
+    EXPECT_GT (len, 32);
     helics::ActionMessage rM (data.data (), len);
-    BOOST_CHECK (rM.action () == helics::action_message_def::action_t::cmd_ignore);
+    EXPECT_TRUE (rM.action () == helics::action_message_def::action_t::cmd_ignore);
     rxSocket.close ();
     comm.disconnect ();
     std::this_thread::sleep_for (100ms);
 }
 
-BOOST_AUTO_TEST_CASE (udpComms_rx_test)
+TEST (UdpCore_tests, udpComms_rx_test)
 {
     std::this_thread::sleep_for (std::chrono::milliseconds (500));
     std::atomic<int> counter{0};
@@ -116,7 +112,7 @@ BOOST_AUTO_TEST_CASE (udpComms_rx_test)
     udp::resolver resolver (AsioContextManager::getContext ());
     udp::socket rxSocket (AsioContextManager::getContext (), udp::endpoint (udp::v4 (), 23901));
 
-    BOOST_CHECK (rxSocket.is_open ());
+    EXPECT_TRUE (rxSocket.is_open ());
     comm.setCallback ([&counter, &act](helics::ActionMessage m) {
         ++counter;
         act = m;
@@ -126,7 +122,7 @@ BOOST_AUTO_TEST_CASE (udpComms_rx_test)
     comm.setName ("tests");
 
     bool connected = comm.connect ();
-    BOOST_REQUIRE (connected);
+    ASSERT_TRUE (connected);
 
     udp::resolver::query queryNew (udp::v4 (), "localhost", "23903");
 
@@ -136,17 +132,17 @@ BOOST_AUTO_TEST_CASE (udpComms_rx_test)
     std::string buffer = cmd.to_string ();
 
     auto cnt = rxSocket.send_to (asio::buffer (buffer), txendpoint);
-    BOOST_REQUIRE_EQUAL (cnt, buffer.size ());
+    ASSERT_EQ (cnt, buffer.size ());
 
     std::this_thread::sleep_for (std::chrono::milliseconds (200));
-    BOOST_REQUIRE_EQUAL (counter, 1);
-    BOOST_CHECK (act.lock ()->action () == helics::action_message_def::action_t::cmd_ack);
+    ASSERT_EQ (counter, 1);
+    EXPECT_TRUE (act.lock ()->action () == helics::action_message_def::action_t::cmd_ack);
     rxSocket.close ();
     comm.disconnect ();
     std::this_thread::sleep_for (100ms);
 }
 
-BOOST_AUTO_TEST_CASE (udpComm_transmit_through)
+TEST (UdpCore_tests, udpComm_transmit_through)
 {
     std::this_thread::sleep_for (std::chrono::milliseconds (500));
     std::atomic<int> counter{0};
@@ -179,9 +175,9 @@ BOOST_AUTO_TEST_CASE (udpComm_transmit_through)
     auto connected_fut = std::async (std::launch::async, [&comm] { return comm.connect (); });
 
     bool connected = comm2.connect ();
-    BOOST_REQUIRE (connected);
+    ASSERT_TRUE (connected);
     connected = connected_fut.get ();
-    BOOST_REQUIRE (connected);
+    ASSERT_TRUE (connected);
 
     comm.transmit (helics::parent_route_id, helics::CMD_ACK);
 
@@ -190,15 +186,15 @@ BOOST_AUTO_TEST_CASE (udpComm_transmit_through)
     {
         std::this_thread::sleep_for (500ms);
     }
-    BOOST_REQUIRE_EQUAL (counter2, 1);
-    BOOST_CHECK (act2.lock ()->action () == helics::action_message_def::action_t::cmd_ack);
+    ASSERT_EQ (counter2, 1);
+    EXPECT_TRUE (act2.lock ()->action () == helics::action_message_def::action_t::cmd_ack);
 
     comm.disconnect ();
     comm2.disconnect ();
     std::this_thread::sleep_for (100ms);
 }
 
-BOOST_AUTO_TEST_CASE (udpComm_transmit_add_route)
+TEST (UdpCore_tests, udpComm_transmit_add_route)
 {
     std::this_thread::sleep_for (std::chrono::milliseconds (500));
     std::atomic<int> counter{0};
@@ -242,23 +238,23 @@ BOOST_AUTO_TEST_CASE (udpComm_transmit_add_route)
     // auto connected_fut = std::async(std::launch::async, [&comm] {return comm.connect(); });
 
     bool connected = comm2.connect ();
-    BOOST_REQUIRE (connected);
+    ASSERT_TRUE (connected);
     // connected = connected_fut.get();
     connected = comm.connect ();
-    BOOST_REQUIRE (connected);
+    ASSERT_TRUE (connected);
     connected = comm3.connect ();
 
     comm.transmit (helics::route_id (0), helics::CMD_ACK);
 
     std::this_thread::sleep_for (250ms);
-    BOOST_REQUIRE_EQUAL (counter2, 1);
-    BOOST_CHECK (act2.lock ()->action () == helics::action_message_def::action_t::cmd_ack);
+    ASSERT_EQ (counter2, 1);
+    EXPECT_TRUE (act2.lock ()->action () == helics::action_message_def::action_t::cmd_ack);
 
     comm3.transmit (helics::route_id (0), helics::CMD_ACK);
 
     std::this_thread::sleep_for (250ms);
-    BOOST_REQUIRE_EQUAL (counter2, 2);
-    BOOST_CHECK (act2.lock ()->action () == helics::action_message_def::action_t::cmd_ack);
+    ASSERT_EQ (counter2, 2);
+    EXPECT_TRUE (act2.lock ()->action () == helics::action_message_def::action_t::cmd_ack);
 
     comm2.addRoute (helics::route_id (3), comm3.getAddress ());
     std::this_thread::sleep_for (250ms);
@@ -269,16 +265,16 @@ BOOST_AUTO_TEST_CASE (udpComm_transmit_add_route)
     {
         std::this_thread::sleep_for (250ms);
     }
-    BOOST_REQUIRE_EQUAL (counter3, 1);
-    BOOST_CHECK (act3.lock ()->action () == helics::action_message_def::action_t::cmd_ack);
+    ASSERT_EQ (counter3, 1);
+    EXPECT_TRUE (act3.lock ()->action () == helics::action_message_def::action_t::cmd_ack);
 
     comm2.addRoute (helics::route_id (4), comm.getAddress ());
 
     comm2.transmit (helics::route_id (4), helics::CMD_ACK);
 
     std::this_thread::sleep_for (250ms);
-    BOOST_REQUIRE_EQUAL (counter, 1);
-    BOOST_CHECK (act.lock ()->action () == helics::action_message_def::action_t::cmd_ack);
+    ASSERT_EQ (counter, 1);
+    EXPECT_TRUE (act.lock ()->action () == helics::action_message_def::action_t::cmd_ack);
 
     comm.disconnect ();
     comm2.disconnect ();
@@ -286,22 +282,22 @@ BOOST_AUTO_TEST_CASE (udpComm_transmit_add_route)
     std::this_thread::sleep_for (100ms);
 }
 
-BOOST_AUTO_TEST_CASE (udpCore_initialization_test)
+TEST (UdpCore_tests, udpCore_initialization_test)
 {
     std::this_thread::sleep_for (std::chrono::milliseconds (500));
     std::string initializationString =
       "-f 1 --brokerport=23901  --port=23950 --local_interface=localhost --name=core1";
     auto core = helics::CoreFactory::create (helics::core_type::UDP, initializationString);
 
-    BOOST_REQUIRE (core != nullptr);
-    BOOST_CHECK (core->isConfigured ());
+    ASSERT_TRUE (core != nullptr);
+    EXPECT_TRUE (core->isConfigured ());
     auto srv = AsioContextManager::getContextPointer ();
     udp::socket rxSocket (AsioContextManager::getContext (), udp::endpoint (udp::v4 (), 23901));
 
-    BOOST_CHECK (rxSocket.is_open ());
+    EXPECT_TRUE (rxSocket.is_open ());
 
     bool connected = core->connect ();
-    BOOST_REQUIRE (connected);
+    ASSERT_TRUE (connected);
 
     std::vector<char> data (1024);
 
@@ -309,15 +305,15 @@ BOOST_AUTO_TEST_CASE (udpCore_initialization_test)
     asio::error_code error;
 
     auto len = rxSocket.receive_from (asio::buffer (data), remote_endpoint, 0, error);
-    BOOST_REQUIRE (!error);
-    BOOST_CHECK_GT (len, 32);
+    ASSERT_TRUE (!error);
+    EXPECT_GT (len, 32);
     helics::ActionMessage rM (data.data (), len);
 
-    BOOST_CHECK_EQUAL (rM.name, "core1");
-    BOOST_CHECK (rM.action () == helics::action_message_def::action_t::cmd_reg_broker);
+    EXPECT_EQ (rM.name, "core1");
+    EXPECT_TRUE (rM.action () == helics::action_message_def::action_t::cmd_reg_broker);
     helics::ActionMessage resp (helics::CMD_PRIORITY_ACK);
     rxSocket.send_to (asio::buffer (resp.to_string ()), remote_endpoint, 0, error);
-    BOOST_CHECK (!error);
+    EXPECT_TRUE (!error);
     core->disconnect ();
     core = nullptr;
     helics::CoreFactory::cleanUpCores (100ms);
@@ -327,7 +323,7 @@ BOOST_AUTO_TEST_CASE (udpCore_initialization_test)
 also tests the automatic port determination for cores
 */
 
-BOOST_AUTO_TEST_CASE (udpCore_core_broker_default_test)
+TEST (UdpCore_tests, udpCore_core_broker_default_test)
 {
     std::this_thread::sleep_for (500ms);
     std::string initializationString = "-f 1";
@@ -336,13 +332,13 @@ BOOST_AUTO_TEST_CASE (udpCore_core_broker_default_test)
 
     auto core = helics::CoreFactory::create (helics::core_type::UDP, initializationString);
     bool connected = broker->isConnected ();
-    BOOST_CHECK (connected);
+    EXPECT_TRUE (connected);
     connected = core->connect ();
-    BOOST_CHECK (connected);
+    EXPECT_TRUE (connected);
 
     auto ccore = static_cast<helics::udp::UdpCore *> (core.get ());
     // this will test the automatic port allocation
-    BOOST_CHECK_EQUAL (ccore->getAddress (), "localhost:23961");
+    EXPECT_EQ (ccore->getAddress (), "localhost:23961");
     core->disconnect ();
     broker->disconnect ();
     core = nullptr;
@@ -350,5 +346,3 @@ BOOST_AUTO_TEST_CASE (udpCore_core_broker_default_test)
     helics::CoreFactory::cleanUpCores (100ms);
     helics::BrokerFactory::cleanUpBrokers (100ms);
 }
-
-BOOST_AUTO_TEST_SUITE_END ()
