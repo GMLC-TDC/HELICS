@@ -40,6 +40,8 @@ if(ENABLE_SWIG AND SWIG_EXECUTABLE)
   swig_link_libraries(helics helicsSharedLib)
   if (MSVC)
 	target_compile_options(_helics PRIVATE "/wd4100")
+  else(MSVC)
+   target_compile_options(_helics PRIVATE "-Wno-long-long")
   endif(MSVC)
   if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
     # https://groups.google.com/a/continuum.io/d/msg/anaconda/057P4uNWyCU/Iem6Ot jBCQAJ

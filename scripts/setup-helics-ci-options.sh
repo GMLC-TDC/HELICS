@@ -43,7 +43,7 @@ fi
 
 # MPI options
 if [[ "$USE_MPI" ]]; then
-    OPTION_FLAGS_ARR+=("-DENABLE_MPI=ON")
+    OPTION_FLAGS_ARR+=("-DENABLE_MPI_CORE=ON")
     CC=${CI_DEPENDENCY_DIR}/mpi/bin/mpicc
     CXX=${CI_DEPENDENCY_DIR}/mpi/bin/mpic++
 fi

@@ -5,7 +5,7 @@ the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 
-#include <boost/test/unit_test.hpp>
+#include <gtest/gtest.h>
 
 #include "helics/core/ActionMessage.hpp"
 #include "helics/core/BrokerFactory.hpp"
@@ -21,15 +21,11 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helics/common/GuardedTypes.hpp"
 #include "helics/core/ipc/IpcQueueHelper.h"
 
-//#include "boost/process.hpp"
 #include <future>
 
-namespace utf = boost::unit_test;
 using namespace std::literals::chrono_literals;
 
-BOOST_AUTO_TEST_SUITE (IPCCore_tests, *utf::label ("ci"))
-
-BOOST_AUTO_TEST_CASE (ipccomms_broker_test)
+TEST (IPCCore_tests, ipccomms_broker_test)
 {
     std::atomic<int> counter{0};
     std::string brokerLoc = "brokerIPC";
@@ -39,21 +35,21 @@ BOOST_AUTO_TEST_CASE (ipccomms_broker_test)
 
     helics::ipc::OwnedQueue mq;
     bool mqConn = mq.connect (brokerLoc, 1024, 1024);
-    BOOST_REQUIRE (mqConn);
+    ASSERT_TRUE (mqConn);
 
     comm.setCallback ([&counter](helics::ActionMessage /*m*/) { ++counter; });
 
     bool connected = comm.connect ();
-    BOOST_REQUIRE (connected);
+    ASSERT_TRUE (connected);
     comm.transmit (helics::parent_route_id, helics::CMD_IGNORE);
 
     helics::ActionMessage rM = mq.getMessage ();
-    BOOST_CHECK (rM.action () == helics::action_message_def::action_t::cmd_ignore);
+    EXPECT_TRUE (rM.action () == helics::action_message_def::action_t::cmd_ignore);
     comm.disconnect ();
     std::this_thread::sleep_for (100ms);
 }
 
-BOOST_AUTO_TEST_CASE (ipccomms_rx_test)
+TEST (IPCCore_tests, ipccomms_rx_test)
 {
     std::atomic<int> counter{0};
     guarded<helics::ActionMessage> act;
@@ -68,7 +64,7 @@ BOOST_AUTO_TEST_CASE (ipccomms_rx_test)
     });
 
     bool connected = comm.connect ();
-    BOOST_REQUIRE (connected);
+    ASSERT_TRUE (connected);
     helics::ipc::SendToQueue mq;
     mq.connect (localLoc, true, 2);
 
@@ -76,13 +72,13 @@ BOOST_AUTO_TEST_CASE (ipccomms_rx_test)
 
     mq.sendMessage (cmd, 1);
     std::this_thread::sleep_for (250ms);
-    BOOST_REQUIRE_EQUAL (counter, 1);
-    BOOST_CHECK (act.lock ()->action () == helics::action_message_def::action_t::cmd_ack);
+    ASSERT_EQ (counter, 1);
+    EXPECT_TRUE (act.lock ()->action () == helics::action_message_def::action_t::cmd_ack);
     comm.disconnect ();
     std::this_thread::sleep_for (100ms);
 }
 
-BOOST_AUTO_TEST_CASE (ipcComm_transmit_through)
+TEST (IPCCore_tests, ipcComm_transmit_through)
 {
     std::atomic<int> counter{0};
     std::string brokerLoc = "brokerIPC";
@@ -110,23 +106,23 @@ BOOST_AUTO_TEST_CASE (ipcComm_transmit_through)
     // auto connected_fut = std::async(std::launch::async, [&comm] {return comm.connect(); });
 
     bool connected = comm2.connect ();
-    BOOST_REQUIRE (connected);
+    ASSERT_TRUE (connected);
     // connected = connected_fut.get();
     connected = comm.connect ();
-    BOOST_REQUIRE (connected);
+    ASSERT_TRUE (connected);
 
     comm.transmit (helics::parent_route_id, helics::CMD_ACK);
 
     std::this_thread::sleep_for (250ms);
-    BOOST_REQUIRE_EQUAL (counter2, 1);
-    BOOST_CHECK (act2.lock ()->action () == helics::action_message_def::action_t::cmd_ack);
+    ASSERT_EQ (counter2, 1);
+    EXPECT_TRUE (act2.lock ()->action () == helics::action_message_def::action_t::cmd_ack);
 
     comm.disconnect ();
     comm2.disconnect ();
     std::this_thread::sleep_for (100ms);
 }
 
-BOOST_AUTO_TEST_CASE (ipcComm_transmit_add_route)
+TEST (IPCCore_tests, ipcComm_transmit_add_route)
 {
     std::atomic<int> counter{0};
     std::string brokerLoc = "brokerIPC";
@@ -166,12 +162,12 @@ BOOST_AUTO_TEST_CASE (ipcComm_transmit_add_route)
     // auto connected_fut = std::async(std::launch::async, [&comm] {return comm.connect(); });
 
     bool connected = comm2.connect ();
-    BOOST_REQUIRE (connected);
+    ASSERT_TRUE (connected);
     // connected = connected_fut.get();
     connected = comm.connect ();
-    BOOST_REQUIRE (connected);
+    ASSERT_TRUE (connected);
     connected = comm3.connect ();
-    BOOST_REQUIRE (connected);
+    ASSERT_TRUE (connected);
     std::this_thread::sleep_for (100ms);
     comm.transmit (helics::parent_route_id, helics::CMD_ACK);
 
@@ -180,8 +176,8 @@ BOOST_AUTO_TEST_CASE (ipcComm_transmit_add_route)
     {
         std::this_thread::sleep_for (350ms);
     }
-    BOOST_REQUIRE_EQUAL (counter2, 1);
-    BOOST_CHECK (act2.lock ()->action () == helics::action_message_def::action_t::cmd_ack);
+    ASSERT_EQ (counter2, 1);
+    EXPECT_TRUE (act2.lock ()->action () == helics::action_message_def::action_t::cmd_ack);
 
     comm3.transmit (helics::parent_route_id, helics::CMD_ACK);
 
@@ -190,8 +186,8 @@ BOOST_AUTO_TEST_CASE (ipcComm_transmit_add_route)
     {
         std::this_thread::sleep_for (350ms);
     }
-    BOOST_REQUIRE_EQUAL (counter2, 2);
-    BOOST_CHECK (act2.lock ()->action () == helics::action_message_def::action_t::cmd_ack);
+    ASSERT_EQ (counter2, 2);
+    EXPECT_TRUE (act2.lock ()->action () == helics::action_message_def::action_t::cmd_ack);
 
     comm2.addRoute (helics::route_id (3), localLocB);
     std::this_thread::sleep_for (100ms);
@@ -207,8 +203,8 @@ BOOST_AUTO_TEST_CASE (ipcComm_transmit_add_route)
         std::cout << "ipc core extra sleep required\n";
         std::this_thread::sleep_for (350ms);
     }
-    BOOST_REQUIRE_EQUAL (counter3, 1);
-    BOOST_CHECK (act3.lock ()->action () == helics::action_message_def::action_t::cmd_ack);
+    ASSERT_EQ (counter3, 1);
+    EXPECT_TRUE (act3.lock ()->action () == helics::action_message_def::action_t::cmd_ack);
 
     comm2.addRoute (helics::route_id (4), localLoc);
     std::this_thread::sleep_for (200ms);
@@ -219,8 +215,8 @@ BOOST_AUTO_TEST_CASE (ipcComm_transmit_add_route)
     {
         std::this_thread::sleep_for (350ms);
     }
-    BOOST_REQUIRE_EQUAL (counter.load (), 1);
-    BOOST_CHECK (act.lock ()->action () == helics::action_message_def::action_t::cmd_ack);
+    ASSERT_EQ (counter.load (), 1);
+    EXPECT_TRUE (act.lock ()->action () == helics::action_message_def::action_t::cmd_ack);
 
     comm.disconnect ();
     comm2.disconnect ();
@@ -228,24 +224,24 @@ BOOST_AUTO_TEST_CASE (ipcComm_transmit_add_route)
     std::this_thread::sleep_for (100ms);
 }
 
-BOOST_AUTO_TEST_CASE (ipccore_initialization_test)
+TEST (IPCCore_tests, ipccore_initialization_test)
 {
-    std::string initializationString = "-f 1 --broker_address=testBroker --name=core1";
+    std::string initializationString = "--broker_address=testBroker --name=core1";
     auto core = helics::CoreFactory::create (helics::core_type::INTERPROCESS, initializationString);
 
-    BOOST_REQUIRE (core != nullptr);
-    BOOST_CHECK (core->isConfigured ());
+    ASSERT_TRUE (core != nullptr);
+    EXPECT_TRUE (core->isConfigured ());
 
     helics::ipc::OwnedQueue mq;
     bool mqConn = mq.connect ("testBroker", 1024, 1024);
-    BOOST_REQUIRE (mqConn);
+    ASSERT_TRUE (mqConn);
 
     bool crConn = core->connect ();
-    BOOST_REQUIRE (crConn);
+    ASSERT_TRUE (crConn);
 
     helics::ActionMessage rM = mq.getMessage ();
-    BOOST_CHECK_EQUAL (rM.name, "core1");
-    BOOST_CHECK (rM.action () == helics::action_message_def::action_t::cmd_reg_broker);
+    EXPECT_EQ (rM.name, "core1");
+    EXPECT_TRUE (rM.action () == helics::action_message_def::action_t::cmd_reg_broker);
     core->disconnect ();
     core = nullptr;
     boost::interprocess::message_queue::remove ("testbroker");
@@ -255,7 +251,7 @@ BOOST_AUTO_TEST_CASE (ipccore_initialization_test)
 /** test case checks default values and makes sure they all mesh together
 also tests the automatic port determination for cores
 */
-BOOST_AUTO_TEST_CASE (ipcCore_core_broker_default_test)
+TEST (IPCCore_tests, ipcCore_core_broker_default_test)
 {
     std::string initializationString = "-f 1";
 
@@ -263,9 +259,9 @@ BOOST_AUTO_TEST_CASE (ipcCore_core_broker_default_test)
 
     auto core = helics::CoreFactory::create (helics::core_type::IPC, initializationString);
     bool connected = broker->isConnected ();
-    BOOST_CHECK (connected);
+    EXPECT_TRUE (connected);
     connected = core->connect ();
-    BOOST_CHECK (connected);
+    EXPECT_TRUE (connected);
 
     core->disconnect ();
     broker->disconnect ();
@@ -274,5 +270,3 @@ BOOST_AUTO_TEST_CASE (ipcCore_core_broker_default_test)
     helics::CoreFactory::cleanUpCores (100ms);
     helics::BrokerFactory::cleanUpBrokers (100ms);
 }
-
-BOOST_AUTO_TEST_SUITE_END ()

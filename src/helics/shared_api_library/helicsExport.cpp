@@ -31,7 +31,7 @@ static constexpr const char *nullstrPtr = "";
 
 const std::string emptyStr;
 
-helics_error helicsErrorInitialize ()
+helics_error helicsErrorInitialize (void)
 {
     helics_error err;
     err.error_code = 0;
@@ -1085,7 +1085,7 @@ helics::CoreObject::~CoreObject ()
     coreptr = nullptr;
 }
 
-void helicsCloseLibrary ()
+void helicsCloseLibrary (void)
 {
     using namespace std::literals::chrono_literals;
     clearAllObjects ();
@@ -1293,7 +1293,7 @@ void helicsQueryFree (helics_query query)
     queryObj->valid = 0;
     delete queryObj;
 }
-void helicsCleanupLibrary ()
+void helicsCleanupLibrary (void)
 {
     helics::cleanupHelicsLibrary ();
     //  helics::LoggerManager::closeLogger();

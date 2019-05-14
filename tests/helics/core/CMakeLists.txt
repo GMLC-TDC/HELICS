@@ -5,11 +5,7 @@
 # SPDX-License-Identifier: BSD-3-Clause
 #
 
-# -----------------------------------------------------------------------------
-# Core tests using Boost
-# -----------------------------------------------------------------------------
-
-set(core_test_headers testFixtures.h)
+set(core_test_headers )
 
 set(
   core_test_sources
@@ -20,13 +16,15 @@ set(
   BrokerClassTests.cpp
   CoreFactory-tests.cpp 
   MessageTimerTests.cpp
-  TestCore-tests.cpp
-  testFixtures.cpp
   data-block-tests.cpp
   ForwardingTimeCoordinatorTests.cpp
   TimeCoordinatorTests.cpp
   networkInfoTests.cpp
 )
+
+if(ENABLE_TEST_CORE)
+  list(APPEND core_test_sources TestCore-tests.cpp)
+endif()
 
 if(ENABLE_ZMQ_CORE)
   list(APPEND core_test_sources ZeromqCore-tests.cpp ZeromqSSCore-tests.cpp)
@@ -49,7 +47,7 @@ if(ENABLE_MPI_CORE)
 endif()
 
 add_executable(core-tests ${core_test_sources} ${core_test_headers})
-target_link_libraries(core-tests helics-static helics_test_base)
+target_link_libraries(core-tests helics-static helics_google_test_base)
 
 target_include_directories(core-tests PRIVATE ${PROJECT_SOURCE_DIR}/src)
 target_compile_definitions(
@@ -57,7 +55,7 @@ target_compile_definitions(
 )
 set_target_properties(core-tests PROPERTIES FOLDER tests)
 
-add_test(NAME core-tests COMMAND core-tests --log_level=test_suite --report_level=short)
+add_test(NAME core-tests COMMAND core-tests)
 set_property(TEST core-tests PROPERTY LABELS Core Coverage Daily TSAN)
 
 # Tests for Continuous Integration builds
@@ -65,9 +63,7 @@ add_test(
   NAME core-ci-tests
   COMMAND
     core-tests
-    --run_test=@ci
-    --log_level=test_suite
-    --report_level=short
+    --gtest_filter=-*skip_ci*
 )
 set_property(TEST core-ci-tests PROPERTY LABELS Continuous)
 #set_property(TEST core-ci-tests PROPERTY LABELS DebugTest)

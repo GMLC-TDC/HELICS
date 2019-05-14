@@ -26,10 +26,10 @@ extern "C"
     ****************************************************/
 
     /** get a version string for HELICS */
-    HELICS_EXPORT const char *helicsGetVersion ();
+    HELICS_EXPORT const char *helicsGetVersion (void);
 
     /** return an initialized error object*/
-    HELICS_EXPORT helics_error helicsErrorInitialize ();
+    HELICS_EXPORT helics_error helicsErrorInitialize (void);
 
     /** clear an error object*/
     HELICS_EXPORT void helicsErrorClear (helics_error *err);
@@ -294,7 +294,7 @@ extern "C"
     /** create a federate info object for specifying federate information when constructing a federate
     @return a helics_federate_info object which is a reference to the created object
     */
-    HELICS_EXPORT helics_federate_info helicsCreateFederateInfo ();
+    HELICS_EXPORT helics_federate_info helicsCreateFederateInfo (void);
 
     /** create a federate info object from an existing one and clone the information
     @param fi a federateInfo object to duplicate
@@ -444,7 +444,7 @@ extern "C"
 
     /** call when done using the helics library,  this function will ensure the threads are closed properly if possible
     this should be the last call before exiting,  */
-    HELICS_EXPORT void helicsCloseLibrary ();
+    HELICS_EXPORT void helicsCloseLibrary (void);
 
     /* initialization, execution, and time requests */
     /** enter the initialization state of a federate
@@ -774,7 +774,7 @@ extern "C"
     /** function to do some housekeeping work
     @details this runs some cleanup routines and tries to close out any residual thread that haven't been shutdown
     yet*/
-    HELICS_EXPORT void helicsCleanupLibrary ();
+    HELICS_EXPORT void helicsCleanupLibrary (void);
 
 #ifdef __cplusplus
 } /* end of extern "C" { */
