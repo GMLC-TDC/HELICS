@@ -654,6 +654,23 @@ set(
 )
 mark_as_advanced(HELICS_CMAKECONFIG_INSTALL_DIR)
 
+set(HELICS_INSTALL_TARGETS helics_base helics_base_includes jsoncpp_lib helics-static)
+if(BUILD_SHARED_LIBS)
+    set(HELICS_INSTALL_TARGETS ${HELICS_INSTALL_TARGETS} helics-shared)
+endif()
+if(BUILD_C_SHARED_LIB)
+    set(HELICS_INSTALL_TARGETS ${HELICS_INSTALL_TARGETS} helicsSharedLib helicsCpp98)
+endif()
+if(BUILD_APPS)
+    set(HELICS_INSTALL_TARGETS ${HELICS_INSTALL_TARGETS} helics_apps)
+endif()
+file(GLOB HELICS_CMAKE_MODULES "config/cmake/*.cmake")
+file(COPY ${HELICS_CMAKE_MODULES} DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+export(TARGETS ${HELICS_INSTALL_TARGETS}
+    NAMESPACE HELICS::
+    FILE ${PROJECT_BINARY_DIR}/helics-targets.cmake
+)
+
 install(
     EXPORT helics-targets
     NAMESPACE HELICS::
