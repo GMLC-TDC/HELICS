@@ -38,10 +38,9 @@ if(BUILD_SHARED_LIBS)
   add_library(HELICS::helics-shared ALIAS helics-shared)
   target_link_libraries(helics-shared PRIVATE helics_base helics_base_includes jsoncpp_lib)
   target_include_directories(helics-shared
-    PUBLIC
-      $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>
     INTERFACE
       $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/src>
+      $<BUILD_INTERFACE:${AUTOBUILD_INSTALL_PATH}/include>
       $<INSTALL_INTERFACE:$<INSTALL_PREFIX>/include>
   )
 
