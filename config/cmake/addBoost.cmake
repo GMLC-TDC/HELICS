@@ -93,7 +93,7 @@ hide_variable(BOOST_TEST_PATH)
 
 if(NOT BOOST_REQUIRED_LIBRARIES)
     set(BOOST_REQUIRED_LIBRARIES)
-    if(BUILD_TESTING AND BUILD_HELICS_TESTS)
+    if(BUILD_TESTING AND BUILD_HELICS_BOOST_TESTS)
         message(STATUS "adding unit testing")
         list(APPEND BOOST_REQUIRED_LIBRARIES unit_test_framework)
     endif()

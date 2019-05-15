@@ -24,7 +24,7 @@ add_executable(helics_apps-tests ${helics_apps_test_sources})
 
 set_target_properties(helics_apps-tests PROPERTIES FOLDER tests)
 
-target_link_libraries(helics_apps-tests helics_apps helics_test_base)
+target_link_libraries(helics_apps-tests helics_apps helics_boost_test_base)
 
 target_include_directories(helics_apps-tests PRIVATE ${PROJECT_SOURCE_DIR}/src)
 
