@@ -25,9 +25,6 @@ add_subdirectory(performance_tests)
 
 
 # Tests for other CMake projects including and using HELICS
-export(TARGETS  NAMESPACE HELICS::
-         FILE ${PROJECT_BINARY_DIR}/helics-targets.cmake)
-
 add_test(find-package-tests ${CMAKE_CTEST_COMMAND} -C ${CMAKE_BUILD_TYPE}
                             --build-and-test "${CMAKE_CURRENT_SOURCE_DIR}/find_package_tests" "${CMAKE_CURRENT_BINARY_DIR}/find_package_tests"
                             --build-generator ${CMAKE_GENERATOR}
