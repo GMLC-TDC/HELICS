@@ -36,6 +36,7 @@ add_test(find-package-tests ${CMAKE_CTEST_COMMAND} -C ${CMAKE_BUILD_TYPE}
                             "-DBUILD_SHARED_LIBS=${BUILD_SHARED_LIBS}"
                             "-DBUILD_C_SHARED_LIB=${BUILD_C_SHARED_LIB}"
                             "-DBUILD_APPS=${BUILD_APPS}"
+                            "-DZeroMQ_INSTALL_PATH=${ZeroMQ_INSTALL_PATH}"
                             "-DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}"
                             "-DCMAKE_CXX_STANDARD=${CMAKE_CXX_STANDARD}"
 )
