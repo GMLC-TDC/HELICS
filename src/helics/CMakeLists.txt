@@ -1,7 +1,7 @@
 #
 # Copyright © 2017-2019, Battelle Memorial Institute; Lawrence Livermore National
-# Security, LLC; Alliance for Sustainable Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved. 
-# 
+# Security, LLC; Alliance for Sustainable Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
+#
 # SPDX-License-Identifier: BSD-3-Clause
 #
 
@@ -37,6 +37,14 @@ if(BUILD_SHARED_LIBS)
 
   add_library(HELICS::helics-shared ALIAS helics-shared)
   target_link_libraries(helics-shared PRIVATE helics_base helics_base_includes jsoncpp_lib)
+  target_include_directories(helics-shared
+    PUBLIC
+      $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>
+    INTERFACE
+      $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/src>
+      $<INSTALL_INTERFACE:$<INSTALL_PREFIX>/include>
+  )
+
 
   if(WIN32)
     set_target_properties(helics-shared PROPERTIES WINDOWS_EXPORT_ALL_SYMBOLS TRUE)
