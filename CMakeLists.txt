@@ -654,6 +654,9 @@ set(
 )
 mark_as_advanced(HELICS_CMAKECONFIG_INSTALL_DIR)
 
+# Copy required CMake module files to build tree for importing build tree with find_package
+file(COPY config/cmake/addMPI.cmake config/cmake/FindZeroMQ.cmake DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+
 # Export targets for importing build tree with find_package
 export(EXPORT helics-targets
     NAMESPACE HELICS::
@@ -728,7 +731,6 @@ install(
     FILES
         config/cmake/addMPI.cmake
         config/cmake/FindZeroMQ.cmake
-        config/cmake/extraMacros.cmake
     DESTINATION ${HELICS_CMAKECONFIG_INSTALL_DIR}
     COMPONENT libs
 )
