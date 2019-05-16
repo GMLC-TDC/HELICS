@@ -7,7 +7,7 @@
 cmake_minimum_required(VERSION 3.4)
 cmake_policy(VERSION 3.4)
 
-project(HELICS VERSION 2.0.0)
+project(HELICS VERSION 2.1.0)
 
 # -----------------------------------------------------------------------------
 # HELICS Version number

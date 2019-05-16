@@ -93,6 +93,7 @@ set(
   helicsVersion.hpp
   federate_id.hpp
   helics_definitions.hpp
+  helicsCLI11.hpp
 )
 
 set(
@@ -106,7 +107,6 @@ set(
 	CommsBroker_impl.hpp
 	TimeoutMonitor.h
 	CoreBroker.hpp
-	helicsCLI11.hpp
 	InterfaceInfo.hpp
 	ActionMessageDefintions.hpp
 	ActionMessage.hpp
