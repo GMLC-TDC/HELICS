@@ -14,16 +14,14 @@
 @PACKAGE_INIT@
 
 set(PN HELICS)
-set_and_check(${PN}_INCLUDE_DIR "${PACKAGE_PREFIX_DIR}/@CMAKE_INSTALL_INCLUDEDIR@")
+set(${PN}_INCLUDE_DIR "${PACKAGE_PREFIX_DIR}/@CMAKE_INSTALL_INCLUDEDIR@")
 
-set(C_SHARED_BUILT @BUILT_C_SHARED_LIB@)
-if (C_SHARED_BUILT )
+if (@BUILD_C_SHARED_LIB@)
 set(${PN}_C_SHARED_LIBRARY "${PACKAGE_PREFIX_DIR}/@CMAKE_INSTALL_BINDIR@/@helics_c_shared_file@")
 set(${PN}_C_SHARED_LIBRARY_DEBUG "${PACKAGE_PREFIX_DIR}/@CMAKE_INSTALL_BINDIR@/@helics_c_shared_file_debug@")
 endif()
 
-set(CXX_SHARED_BUILT @BUILD_CXX_SHARED_LIB@)
-if (CXX_SHARED_BUILT)
+if (@BUILD_SHARED_LIBS@)
 set(${PN}_CXX_SHARED_LIBRARY "${PACKAGE_PREFIX_DIR}/@CMAKE_INSTALL_BINDIR@/@helics_cxx_shared_file@")
 set(${PN}_CXX_SHARED_LIBRARY_DEBUG "${PACKAGE_PREFIX_DIR}/@CMAKE_INSTALL_BINDIR@/@helics_cxx_shared_file_debug@")
 endif()
@@ -47,36 +45,36 @@ find_program(HELICS_BROKER helics_broker
 	PATH ${PACKAGE_PREFIX_DIR}/@CMAKE_INSTALL_BINDIR@
 	NO_DEFAULT_PATH)
 	
-set(HELICS_HAVE_ZEROMQ @HELICS_HAVE_ZEROMQ@)
-set(HELICS_HAVE_MPI @HELICS_HAVE_MPI@)
-
 set(SAVED_PARENT_CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH})
-set(CMAKE_MODULE_PATH ${PACKAGE_PREFIX_DIR}/@HELICS_CMAKECONFIG_INSTALL_DIR@)
+set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_LIST_DIR})
 
 include(CMakeFindDependencyMacro)
-include(extraMacros)
 
-if (HELICS_HAVE_ZEROMQ)
+if (@ENABLE_ZMQ_CORE@)
 	if (NOT TARGET libzmq)
 		set(ZeroMQ_LIBRARY_ONLY ON)
 		if(NOT ZeroMQ_INSTALL_PATH)
 			if(ENV{ZeroMQ_INSTALL_PATH})
 				set(ZeroMQ_INSTALL_PATH $ENV{ZeroMQ_INSTALL_PATH})
 			else()
+                # Check if a copy of ZeroMQ was installed with HELICS
 				set(ZeroMQ_LIBRARY_PATH "${PACKAGE_PREFIX_DIR}/@CMAKE_INSTALL_LIBDIR@/")
+                find_package(ZeroMQ)
 			endif()
 		endif()
-		find_dependency(ZeroMQ)
+        # If ZeroMQ wasn't installed with this copy of HELICS, search for a system copy 
+        if (NOT ZeroMQ_FOUND AND NOT TARGET libzmq)
+            unset(ZeroMQ_LIBRARY_PATH)
+            find_dependency(ZeroMQ)
+        endif()
 	endif()
 endif()
 
-if (HELICS_HAVE_MPI)
+if (@ENABLE_MPI_CORE@)
 	if (NOT TARGET MPI::MPI_C)
 		include(addMPI)
 	endif()
 endif()
-
-#find_dependency(ZeroMQ)
 
 if (NOT TARGET Threads::Threads)
 	if (NOT WIN32)
@@ -88,18 +86,6 @@ if (NOT TARGET Threads::Threads)
 endif()
 
 include(${CMAKE_CURRENT_LIST_DIR}/helics-targets.cmake)
-
-if (TARGET HELICS::helicsSharedLib)
-    if (NOT TARGET HELICS::helicsCpp98)
-	   add_library(HELICS::helicsCpp98 INTERFACE IMPORTED)
-	   set_property(TARGET HELICS::helicsCpp98 PROPERTY INTERFACE_INCLUDE_DIRECTORIES "${PACKAGE_PREFIX_DIR}/include/cpp98")
-
-	   set_property(TARGET HELICS::helicsCpp98 PROPERTY INTERFACE_LINK_LIBRARIES HELICS::helicsSharedLib)
-    endif()
-	set_target_properties(HELICS::helicsSharedLib PROPERTIES
-		INTERFACE_INCLUDE_DIRECTORIES "${PACKAGE_PREFIX_DIR}/include/helics/shared_api_library"
-	)
-endif()
 
 check_required_components(${PN})
 
