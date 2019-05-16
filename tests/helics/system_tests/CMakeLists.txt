@@ -21,7 +21,7 @@ set(
 )
 
 add_executable(system-tests ${system_test_sources} ${system_test_headers})
-target_link_libraries(system-tests helics-static helics_test_base)
+target_link_libraries(system-tests helics-static helics_boost_test_base)
 
 set_target_properties(system-tests PROPERTIES FOLDER tests)
 
