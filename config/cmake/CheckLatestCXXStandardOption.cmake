@@ -58,7 +58,7 @@ else()
 endif ()
 
 endif()
-set(CMAKE_REQUIRED_FLAGS ${CXX_STANDARD_FLAG})
+#set(CMAKE_REQUIRED_FLAGS ${CXX_STANDARD_FLAG})
 
 # boost libraries don't compile under /std:c++latest flag 1.66 might solve this
 # issue
