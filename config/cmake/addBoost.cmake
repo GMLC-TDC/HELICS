@@ -112,7 +112,6 @@ find_package(
 )
 else()
 message(STATUS "Finding without components\n")
-set(Boost_DEBUG ON)
 find_package(Boost ${BOOST_MINIMUM_VERSION})
 endif()
 # Minimum version of Boost required for building test suite
