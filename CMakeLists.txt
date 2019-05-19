@@ -7,7 +7,7 @@
 cmake_minimum_required(VERSION 3.4)
 cmake_policy(VERSION 3.4)
 
-project(HELICS VERSION 2.0.0)
+project(HELICS VERSION 2.1.0)
 
 # -----------------------------------------------------------------------------
 # HELICS Version number
@@ -164,14 +164,14 @@ if("${CMAKE_SOURCE_DIR}" STREQUAL "${CMAKE_BINARY_DIR}")
 endif()
 
 include(compiler_flags)
-message(STATUS "setting version build options to \"${VERSION_OPTION}\"")
+message(STATUS "setting version build options to \"${CXX_STANDARD_FLAG}\"")
 if(VERSION_OPTION)
     if(MSVC)
-        target_compile_options(helics_base_includes INTERFACE ${VERSION_OPTION})
+        target_compile_options(helics_base_includes INTERFACE ${CXX_STANDARD_FLAG})
     else()
         target_compile_options(
             helics_base_includes
-            INTERFACE $<$<COMPILE_LANGUAGE:CXX>:${VERSION_OPTION}>
+            INTERFACE $<$<COMPILE_LANGUAGE:CXX>:${CXX_STANDARD_FLAG}>
         )
     endif(MSVC)
 endif(VERSION_OPTION)
