@@ -1,8 +1,7 @@
 /*
 Copyright © 2017-2019,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See the top-level NOTICE for additional details.
-All rights reserved.
-SPDX-License-Identifier: BSD-3-Clause
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
+the top-level NOTICE for additional details. All rights reserved. SPDX-License-Identifier: BSD-3-Clause
 */
 
 #include "helics/application_api/Publications.hpp"
@@ -153,7 +152,7 @@ BOOST_AUTO_TEST_CASE (test_uninteruptible_flag, *utf::label ("ci"))
     fed1res.get ();
     auto rvec = fed2res.get ();
     BOOST_CHECK_EQUAL (rvec.front (), 5.0);
-    BOOST_CHECK_EQUAL (rvec.size (), 20);
+    BOOST_CHECK_EQUAL (rvec.size (), 20u);
     BOOST_CHECK_EQUAL (rvec[1], 10.0);
     BOOST_CHECK_EQUAL (rvec.back (), 100.0);
     vFed1->finalize ();
@@ -200,7 +199,7 @@ BOOST_AUTO_TEST_CASE (test_uninteruptible_flag_option, *utf::label ("ci"))
     fed1res.get ();
     auto rvec = fed2res.get ();
     BOOST_CHECK_EQUAL (rvec.front (), 5.0);
-    BOOST_CHECK_EQUAL (rvec.size (), 20);
+    BOOST_CHECK_EQUAL (rvec.size (), 20u);
     BOOST_CHECK_EQUAL (rvec[1], 10.0);
     BOOST_CHECK_EQUAL (rvec.back (), 100.0);
     vFed1->finalize ();
