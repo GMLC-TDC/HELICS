@@ -13,7 +13,7 @@ SPDX-License-Identifier: BSD-3-Clause
 
 using namespace helics;
 
-TEST(ActionMessage_tests, action_test_to_string_conversion)
+TEST (ActionMessage_tests, action_test_to_string_conversion)
 {
     helics::ActionMessage m (CMD_IGNORE);
     /*
@@ -47,7 +47,7 @@ TEST(ActionMessage_tests, action_test_to_string_conversion)
     EXPECT_TRUE (m.actionTime == fr.actionTime);
 }
 
-TEST(ActionMessage_tests, action_test_to_string_conversion_info)
+TEST (ActionMessage_tests, action_test_to_string_conversion_info)
 {
     helics::ActionMessage m (CMD_REG_INPUT);
     /*
@@ -87,7 +87,7 @@ TEST(ActionMessage_tests, action_test_to_string_conversion_info)
     EXPECT_TRUE (m.getStringData () == fr.getStringData ());
 }
 
-TEST(ActionMessage_tests, action_test_to_string_conversion_info2)
+TEST (ActionMessage_tests, action_test_to_string_conversion_info2)
 {
     helics::ActionMessage m (CMD_TIME_REQUEST);
     /*
@@ -133,7 +133,7 @@ TEST(ActionMessage_tests, action_test_to_string_conversion_info2)
     EXPECT_TRUE (m.Tdemin == fr.Tdemin);
 }
 
-TEST(ActionMessage_tests, constructor_test)
+TEST (ActionMessage_tests, constructor_test)
 {
     // Default constructor
     helics::ActionMessage cmd;
@@ -157,7 +157,7 @@ TEST(ActionMessage_tests, constructor_test)
     EXPECT_TRUE (cmd2.action () == helics::CMD_INIT);
 }
 
-TEST(ActionMessage_tests, copy_constructor_test)
+TEST (ActionMessage_tests, copy_constructor_test)
 {
     helics::ActionMessage cmd (helics::CMD_INIT);
     cmd.source_id = global_federate_id{1};
@@ -191,7 +191,7 @@ TEST(ActionMessage_tests, copy_constructor_test)
     EXPECT_EQ (cmd_copy.getString (origSourceStringLoc), "original_source");
 }
 
-TEST(ActionMessage_tests, assignment_test)
+TEST (ActionMessage_tests, assignment_test)
 {
     helics::ActionMessage cmd (helics::CMD_INIT);
     cmd.source_id = global_federate_id (1);
@@ -230,7 +230,7 @@ TEST(ActionMessage_tests, assignment_test)
     EXPECT_EQ (cmd_assign.getString (origDestStringLoc), "original_dest");
 }
 
-TEST(ActionMessage_tests, comparison_test)
+TEST (ActionMessage_tests, comparison_test)
 {
     helics::ActionMessage cmd1 (helics::CMD_INIT);
     cmd1.actionTime = helics::Time::minVal ();
@@ -261,7 +261,7 @@ TEST(ActionMessage_tests, comparison_test)
     }
 }
 
-TEST(ActionMessage_tests, conversion_test)
+TEST (ActionMessage_tests, conversion_test)
 {
     helics::ActionMessage cmd (helics::CMD_SEND_MESSAGE);
     cmd.source_id = global_federate_id (1);
@@ -290,7 +290,7 @@ TEST(ActionMessage_tests, conversion_test)
     EXPECT_TRUE (cmd.getStringData () == cmd2.getStringData ());
 }
 
-TEST(ActionMessage_tests, conversion_test2)
+TEST (ActionMessage_tests, conversion_test2)
 {
     helics::ActionMessage cmd (helics::CMD_SEND_MESSAGE);
     cmd.source_id = global_federate_id{1};
@@ -319,7 +319,7 @@ TEST(ActionMessage_tests, conversion_test2)
     EXPECT_TRUE (cmd.getStringData () == cmd2.getStringData ());
 }
 
-TEST(ActionMessage_tests, message_message_conversion_test)
+TEST (ActionMessage_tests, message_message_conversion_test)
 {
     helics::ActionMessage cmd (helics::CMD_SEND_MESSAGE);
     cmd.source_id = global_federate_id{1};
@@ -353,7 +353,7 @@ TEST(ActionMessage_tests, message_message_conversion_test)
 }
 
 // check some error handling in the toByteArray function
-TEST(ActionMessage_tests, check_conversions)
+TEST (ActionMessage_tests, check_conversions)
 {
     helics::ActionMessage cmd (helics::CMD_PROTOCOL);
     cmd.messageID = 10;
@@ -368,7 +368,7 @@ TEST(ActionMessage_tests, check_conversions)
     auto testBuffer2 = std::make_unique<char[]> (cmdStr.size () >> 2u);  // make a too small buffer
 
     auto res = cmd.toByteArray (testBuffer1.get (), static_cast<int> (cmdStr.size () + 20));
-    EXPECT_EQ (res, cmdStr.size ());
+    EXPECT_EQ (res, static_cast<int> (cmdStr.size ()));
     // just check to make sure the same string was written
     EXPECT_EQ (cmdStr, std::string (testBuffer1.get (), res));
     // this should return -1
@@ -377,7 +377,7 @@ TEST(ActionMessage_tests, check_conversions)
 }
 
 // check some error handling in the toByteArray function
-TEST(ActionMessage_tests, check_packetization)
+TEST (ActionMessage_tests, check_packetization)
 {
     helics::ActionMessage cmd (helics::CMD_SEND_MESSAGE);
     cmd.source_id = global_federate_id (1);
@@ -396,7 +396,7 @@ TEST(ActionMessage_tests, check_packetization)
     EXPECT_GE (cmdStringNormal.size () + 6, cmdString.size ());
     helics::ActionMessage cmd2;
     auto res = cmd2.depacketize (cmdString.data (), static_cast<int> (cmdString.size ()));
-    EXPECT_EQ (res, cmdString.size ());
+    EXPECT_EQ (res, static_cast<int> (cmdString.size ()));
     EXPECT_TRUE (cmd.action () == cmd2.action ());
     EXPECT_EQ (cmd.actionTime, cmd2.actionTime);
     EXPECT_EQ (cmd.source_id, cmd2.source_id);
