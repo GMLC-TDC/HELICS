@@ -37,6 +37,12 @@ set(
 )
 include(extraMacros)
 include(CMakeDependentOption)
+
+if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
+	set(HELICS_CUR_PROJ ON)
+else()
+    set(HELICS_CUR_PROJ OFF)
+endif()
 # include(BuildType)
 # -----------------------------------------------------------------------------
 # set the install path to a local directory
@@ -71,9 +77,18 @@ show_variable(
 mark_as_advanced(AUTOBUILD_INSTALL_PATH)
 
 file(MAKE_DIRECTORY ${PROJECT_BINARY_DIR}/logs)
-
+if (HELICS_CUR_PROJ)
+if (DEFINED BUILD_TESTING)
+option(BUILD_HELICS_TESTS "Enable the test executables to be built" ${BUILD_TESTING})
+else()
 option(BUILD_HELICS_TESTS "Enable the test executables to be built" ON)
+endif()
+
 option(BUILD_HELICS_BOOST_TESTS "Enable the test executables built using boost unit tests" ON)
+option(BUILD_HELICS_EXAMPLES "Enable the example executables to be built" ON)
+
+else()
+endif()
 # enable testing
 if(BUILD_HELICS_TESTS)
     include(CTest)
@@ -81,7 +96,6 @@ endif()
 
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
-option(BUILD_HELICS_EXAMPLES "Enable the example executables to be built" ON)
 
 option(BUILD_PYTHON_INTERFACE "Build Python extension" OFF)
 option(
@@ -156,28 +170,32 @@ add_library(helics_base_includes INTERFACE)
 
 target_link_libraries(helics_base INTERFACE helics_base_includes)
 # Prohibit in-source build
-if("${CMAKE_SOURCE_DIR}" STREQUAL "${CMAKE_BINARY_DIR}")
+if("${PROJECT_SOURCE_DIR}" STREQUAL "${PROJECT_BINARY_DIR}")
     message(
         FATAL_ERROR
             "In-source build is not supported. Please, use an empty directory for building the project."
     )
 endif()
 
-include(compiler_flags)
-message(STATUS "setting version build options to \"${CXX_STANDARD_FLAG}\"")
-if(VERSION_OPTION)
-    if(MSVC)
-        target_compile_options(helics_base_includes INTERFACE ${CXX_STANDARD_FLAG})
-    else()
-        target_compile_options(
-            helics_base_includes
-            INTERFACE $<$<COMPILE_LANGUAGE:CXX>:${CXX_STANDARD_FLAG}>
-        )
-    endif(MSVC)
-endif(VERSION_OPTION)
+if (HELICS_CUR_PROJ)
+	include(compiler_flags)
+	message(STATUS "setting version build options to \"${CXX_STANDARD_FLAG}\"")
+	if(VERSION_OPTION)
+		if(MSVC)
+			target_compile_options(helics_base_includes INTERFACE ${CXX_STANDARD_FLAG})
+		else()
+			target_compile_options(
+				helics_base_includes
+				INTERFACE $<$<COMPILE_LANGUAGE:CXX>:${CXX_STANDARD_FLAG}>
+			)
+		endif(MSVC)
+	endif(VERSION_OPTION)
+
+endif()
 
  target_compile_options(helics_base_includes INTERFACE -DENABLE_BOOST_IOSTREAMS)
 
+ if (HELICS_CUR_PROJ)
 cmake_dependent_option(
     STATIC_STANDARD_LIB
     "Link against a static standard lib"
@@ -202,10 +220,11 @@ if(MSVC)
         ucm_set_embedded_debug(EXTERNAL)
     endif()
 endif(MSVC)
+endif (HELICS_CUR_PROJ)
 # -------------------------------------------------------------
 # add coverage target
 # -------------------------------------------------------------
-if(BUILD_HELICS_TESTS AND BUILD_TESTING)
+if(BUILD_HELICS_TESTS)
     cmake_dependent_option(
         TEST_CODE_COVERAGE
         "Build a target for testing code coverage"
@@ -262,11 +281,11 @@ if(GENERATE_DOXYGEN_DOC)
             "${PROJECT_BINARY_DIR}/docs"
         )
         configure_file(
-            ${CMAKE_CURRENT_SOURCE_DIR}/config/Doxyfile.in
-            ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile @ONLY
+            ${HELICS_CURRENT_SOURCE_DIR}/config/Doxyfile.in
+            ${HELICS_CURRENT_BINARY_DIR}/Doxyfile @ONLY
         )
         add_custom_target(
-            doc ${DOXYGEN_EXECUTABLE} ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile
+            doc ${DOXYGEN_EXECUTABLE} ${HELICS_CURRENT_BINARY_DIR}/Doxyfile
             WORKING_DIRECTORY ${DOXYGET_OUTPUT_DIR}
             COMMENT "Generating API documentation with Doxygen"
             VERBATIM
@@ -767,9 +786,9 @@ if(ENABLE_PACKAGE_BUILD)
         csharp
     )
     if(WIN32)
-        set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_SOURCE_DIR}\\\\LICENSE")
+        set(CPACK_RESOURCE_FILE_LICENSE "${HELICS_SOURCE_DIR}\\\\LICENSE")
     else(WIN32)
-        set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_SOURCE_DIR}/LICENSE")
+        set(CPACK_RESOURCE_FILE_LICENSE "${HELICS_SOURCE_DIR}/LICENSE")
     endif(WIN32)
 
     set(CPACK_COMPONENT_APPLICATIONS_DISPLAY_NAME "Application")
@@ -824,9 +843,9 @@ if(ENABLE_PACKAGE_BUILD)
     if(WIN32)
         set(
             CPACK_PACKAGE_ICON
-            "${CMAKE_SOURCE_DIR}\\\\docs\\\\img\\\\HELICS.ico"
+            "${HELICS_SOURCE_DIR}\\\\docs\\\\img\\\\HELICS.ico"
         )
-        set(CPACK_NSIS_MUI_ICON "${CMAKE_SOURCE_DIR}/docs/img/HELICS.ico")
+        set(CPACK_NSIS_MUI_ICON "${HELICS_SOURCE_DIR}/docs/img/HELICS.ico")
         set(CPACK_NSIS_INSTALL_ROOT "C:\\\\local")
         set(
             CPACK_NSIS_URL_INFO_ABOUT
@@ -850,17 +869,17 @@ if(ENABLE_PACKAGE_BUILD)
             "TDC YouTube channel"
         )
     else(WIN32)
-        set(CPACK_PACKAGE_ICON "${CMAKE_SOURCE_DIR}/docs/img/HELICS.ico")
+        set(CPACK_PACKAGE_ICON "${HELICS_SOURCE_DIR}/docs/img/HELICS.ico")
     endif(WIN32)
 
     if(APPLE)
         set(CPACK_BUNDLE_NAME "libhelics")
         configure_file(
-            "${PROJECT_SOURCE_DIR}/config/Info.plist.in"
+            "${HELICS_SOURCE_DIR}/config/Info.plist.in"
             "${CMAKE_CURRENT_BINARY_DIR}/Info.plist" @ONLY
         )
         set(CPACK_BUNDLE_PLIST "${CMAKE_CURRENT_BINARY_DIR}/Info.plist")
-        set(CPACK_BUNDLE_ICON "${PROJECT_SOURCE_DIR}/docs/img/HELICS.ico")
+        set(CPACK_BUNDLE_ICON "${HELICS_SOURCE_DIR}/docs/img/HELICS.ico")
     endif(APPLE)
 
     set(CPACK_SOURCE_IGNORE_FILES "/Build*/;/build*/;/.git/")
