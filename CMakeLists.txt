@@ -502,11 +502,13 @@ if(NOT WIN32)
     endif()
 endif()
 
+if (HELICS_ROOT_PROJ)
 option(
     BUILD_APP_LIBRARY
     "Build helics application library (a static library containing objects for broker, player, recorder, and helics_apps"
     ON
 )
+endif()
 
 if (HELICS_ROOT_PROJ)
 option(
