@@ -39,9 +39,9 @@ include(extraMacros)
 include(CMakeDependentOption)
 
 if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
-	set(HELICS_CUR_PROJ ON)
+	set(HELICS_ROOT_PROJ ON)
 else()
-    set(HELICS_CUR_PROJ OFF)
+    set(HELICS_ROOT_PROJ OFF)
 endif()
 # include(BuildType)
 # -----------------------------------------------------------------------------
@@ -77,7 +77,7 @@ show_variable(
 mark_as_advanced(AUTOBUILD_INSTALL_PATH)
 
 file(MAKE_DIRECTORY ${PROJECT_BINARY_DIR}/logs)
-if (HELICS_CUR_PROJ)
+if (HELICS_ROOT_PROJ)
 if (DEFINED BUILD_TESTING)
 option(BUILD_HELICS_TESTS "Enable the test executables to be built" ${BUILD_TESTING})
 else()
@@ -177,7 +177,7 @@ if("${PROJECT_SOURCE_DIR}" STREQUAL "${PROJECT_BINARY_DIR}")
     )
 endif()
 
-if (HELICS_CUR_PROJ)
+if (HELICS_ROOT_PROJ)
 	include(compiler_flags)
 	message(STATUS "setting version build options to \"${CXX_STANDARD_FLAG}\"")
 	if(VERSION_OPTION)
@@ -195,7 +195,7 @@ endif()
 
  target_compile_options(helics_base_includes INTERFACE -DENABLE_BOOST_IOSTREAMS)
 
- if (HELICS_CUR_PROJ)
+ if (HELICS_ROOT_PROJ)
 cmake_dependent_option(
     STATIC_STANDARD_LIB
     "Link against a static standard lib"
@@ -220,7 +220,7 @@ if(MSVC)
         ucm_set_embedded_debug(EXTERNAL)
     endif()
 endif(MSVC)
-endif (HELICS_CUR_PROJ)
+endif (HELICS_ROOT_PROJ)
 # -------------------------------------------------------------
 # add coverage target
 # -------------------------------------------------------------
@@ -469,11 +469,6 @@ if("${isSystemDir}" STREQUAL "-1")
     )
 endif()
 
-if(NOT Boost_USE_STATIC_LIBS)
-    list(APPEND CMAKE_INSTALL_RPATH ${Boost_LIBRARY_DIRS})
-    list(APPEND CMAKE_BUILD_RPATH ${Boost_LIBRARY_DIRS})
-endif()
-
 # add the local directory to the rpath
 list(APPEND CMAKE_INSTALL_RPATH "./")
 
@@ -497,11 +492,13 @@ if(NOT WIN32)
     endif()
 endif()
 
+if (HELICS_ROOT_PROJ)
 option(
     BUILD_APPS
     "Build helics applications to run various apps, including broker, player, recorder, and helics_apps"
     ON
 )
+endif()
 
 file(GLOB KEY_LIBRARY_FILES ${AUTOBUILD_INSTALL_PATH}/bin/*)
 if(ENABLE_ZMQ_CORE AND ZMQ_USE_STATIC_LIBRARY)
@@ -553,6 +550,7 @@ target_include_directories(
     $<TARGET_PROPERTY:jsoncpp_lib,INTERFACE_INCLUDE_DIRECTORIES>
 )
 
+set_target_properties(jsoncpp_lib PROPERTIES FOLDER Extern)
 # -----------------------------------------------------------------------------
 # CMAKE Subdirectories
 # -----------------------------------------------------------------------------
@@ -733,6 +731,11 @@ write_basic_package_version_file(
     VERSION ${HELICS_VERSION}
     COMPATIBILITY SameMajorVersion
 )
+
+if (NOT HELICS_ROOT_PROJ)
+	set_target_properties(helics_apps PROPERTIES FOLDER helics)
+	set_target_properties(application_api helics_common helics_core helics-static PROPERTIES FOLDER helics)
+endif()
 
 install(
     FILES
