@@ -251,7 +251,7 @@ BOOST_AUTO_TEST_CASE (test_uninteruptible_flag_two_way_comm, *utf::label ("ci"))
     fed1res.get ();
     auto rvec = fed2res.get ();
     BOOST_CHECK_EQUAL (rvec.front (), 5.0);
-    BOOST_CHECK_EQUAL (rvec.size (), 20);
+    BOOST_CHECK_EQUAL (rvec.size (), 20u);
     BOOST_CHECK_EQUAL (rvec[1], 10.0);
     BOOST_CHECK_EQUAL (rvec.back (), 100.0);
     vFed1->finalize ();

@@ -123,14 +123,14 @@ BOOST_AUTO_TEST_CASE (test_traits)
 
 BOOST_AUTO_TEST_CASE (test_minSize)
 {
-    BOOST_CHECK_EQUAL (helics::getMinSize<std::vector<double>> (), 9);
+    BOOST_CHECK_EQUAL (helics::getMinSize<std::vector<double>> (), 9u);
     BOOST_CHECK_EQUAL (helics::getMinSize<double> (), sizeof (double) + 1);
     BOOST_CHECK_EQUAL (helics::getMinSize<int> (), sizeof (int) + 1);
     BOOST_CHECK_EQUAL (helics::getMinSize<std::complex<double>> (), sizeof (std::complex<double>) + 1);
-    BOOST_CHECK_EQUAL (helics::getMinSize<std::string> (), 0);
-    BOOST_CHECK_EQUAL (helics::getMinSize<const char *> (), 0);
-    BOOST_CHECK_EQUAL (helics::getMinSize<std::set<double>> (), 9);
-    BOOST_CHECK_EQUAL (helics::getMinSize<helics::NamedPoint> (), 10);
+    BOOST_CHECK_EQUAL (helics::getMinSize<std::string> (), 0u);
+    BOOST_CHECK_EQUAL (helics::getMinSize<const char *> (), 0u);
+    BOOST_CHECK_EQUAL (helics::getMinSize<std::set<double>> (), 9u);
+    BOOST_CHECK_EQUAL (helics::getMinSize<helics::NamedPoint> (), 10u);
 }
 
 /** this one is a bit annoying to use the template so it gets its own case
