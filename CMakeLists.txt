@@ -498,7 +498,10 @@ option(
     "Build helics applications to run various apps, including broker, player, recorder, and helics_apps"
     ON
 )
+else()
+SET(BUILD_APPS OFF)
 endif()
+
 
 file(GLOB KEY_LIBRARY_FILES ${AUTOBUILD_INSTALL_PATH}/bin/*)
 if(ENABLE_ZMQ_CORE AND ZMQ_USE_STATIC_LIBRARY)
