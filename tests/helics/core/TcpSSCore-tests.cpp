@@ -45,18 +45,18 @@ TEST (TcpSSCore_tests, tcpSSComms_broker_test)
     auto server = helics::tcp::TcpServer::create (srv->getBaseContext (), TCP_BROKER_PORT);
     auto contextLoop = srv->startContextLoop ();
     std::vector<char> data (1024);
-    server->setDataCall ([&counter](helics::tcp::TcpConnection::pointer, const char *, size_t data_avail) {
+    server->setDataCall ([&counter] (helics::tcp::TcpConnection::pointer, const char *, size_t data_avail) {
         ++counter;
         return data_avail;
     });
     server->start ();
 
-    comm.setCallback ([&counter](helics::ActionMessage /*m*/) { ++counter; });
+    comm.setCallback ([&counter] (helics::ActionMessage /*m*/) { ++counter; });
     comm.setBrokerPort (TCP_BROKER_PORT);
     comm.setName ("tests");
     comm.setTimeout (1000ms);
     comm.setServerMode (false);
-    auto confut = std::async (std::launch::async, [&comm]() { return comm.connect (); });
+    auto confut = std::async (std::launch::async, [&comm] () { return comm.connect (); });
 
     std::this_thread::sleep_for (100ms);
     int cnt = 0;
@@ -92,7 +92,7 @@ TEST (TcpSSCore_tests, tcpSSComms_broker_test_transmit)
 
     std::vector<char> data (1024);
     server->setDataCall (
-      [&data, &counter, &len](helics::tcp::TcpConnection::pointer, const char *data_rec, size_t data_Size) {
+      [&data, &counter, &len] (helics::tcp::TcpConnection::pointer, const char *data_rec, size_t data_Size) {
           std::copy (data_rec, data_rec + data_Size, data.begin ());
           len = data_Size;
           ++counter;
@@ -102,7 +102,7 @@ TEST (TcpSSCore_tests, tcpSSComms_broker_test_transmit)
     auto res = server->start ();
     EXPECT_TRUE (res);
     std::this_thread::sleep_for (100ms);
-    comm.setCallback ([](helics::ActionMessage /*m*/) {});
+    comm.setCallback ([] (helics::ActionMessage /*m*/) {});
     comm.setBrokerPort (TCP_BROKER_PORT);
     comm.setName ("tests");
     comm.setServerMode (false);
@@ -143,9 +143,9 @@ TEST (TcpSSCore_tests, tcpSSComms_broker_test_transmit)
 TEST (TcpSSCore_tests, tcpSSComms_rx_test)
 {
     std::this_thread::sleep_for (400ms);
-    std::atomic<int> ServerCounter{0};
+    // std::atomic<int> ServerCounter{0};
     std::atomic<int> CommCounter{0};
-    std::atomic<size_t> len{0};
+    // std::atomic<size_t> len{0};
     helics::ActionMessage act;
     std::string host = "127.0.0.1";
     helics::tcp::TcpCommsSS comm;
@@ -153,7 +153,7 @@ TEST (TcpSSCore_tests, tcpSSComms_rx_test)
     std::mutex actguard;
     auto srv = AsioContextManager::getContextPointer ();
     auto contextLoop = srv->startContextLoop ();
-    comm.setCallback ([&CommCounter, &act, &actguard](helics::ActionMessage m) {
+    comm.setCallback ([&CommCounter, &act, &actguard] (helics::ActionMessage m) {
         ++CommCounter;
         std::lock_guard<std::mutex> lock (actguard);
         act = m;
@@ -209,11 +209,11 @@ TEST (TcpSSCore_tests, tcpSSComm_transmit_through)
     comm2.setPortNumber (TCP_BROKER_PORT);
     comm2.setServerMode (true);
 
-    comm.setCallback ([&counter, &act](helics::ActionMessage m) {
+    comm.setCallback ([&counter, &act] (helics::ActionMessage m) {
         ++counter;
         act = m;
     });
-    comm2.setCallback ([&counter2, &act2](helics::ActionMessage m) {
+    comm2.setCallback ([&counter2, &act2] (helics::ActionMessage m) {
         ++counter2;
         act2 = m;
     });
@@ -275,15 +275,15 @@ TEST (TcpSSCore_tests, tcpSSComm_transmit_add_route)
     guarded<helics::ActionMessage> act2;
     guarded<helics::ActionMessage> act3;
 
-    comm.setCallback ([&counter, &act](helics::ActionMessage m) {
+    comm.setCallback ([&counter, &act] (helics::ActionMessage m) {
         ++counter;
         act = m;
     });
-    comm2.setCallback ([&counter2, &act2](helics::ActionMessage m) {
+    comm2.setCallback ([&counter2, &act2] (helics::ActionMessage m) {
         ++counter2;
         act2 = m;
     });
-    comm3.setCallback ([&counter3, &act3](helics::ActionMessage m) {
+    comm3.setCallback ([&counter3, &act3] (helics::ActionMessage m) {
         ++counter3;
         act3 = m;
     });
@@ -352,7 +352,7 @@ TEST (TcpSSCore_tests, tcpSSCore_initialization_test)
     std::vector<char> data (1024);
     std::atomic<size_t> len{0};
     server->setDataCall (
-      [&data, &counter, &len](helics::tcp::TcpConnection::pointer, const char *data_rec, size_t data_Size) {
+      [&data, &counter, &len] (helics::tcp::TcpConnection::pointer, const char *data_rec, size_t data_Size) {
           std::copy (data_rec, data_rec + data_Size, data.begin () + len);
           len += data_Size;
           ++counter;
