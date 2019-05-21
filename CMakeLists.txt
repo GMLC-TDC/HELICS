@@ -300,7 +300,15 @@ endif(GENERATE_DOXYGEN_DOC)
 # Update git submodules
 # -------------------------------------------------------------
 include(updateGitSubmodules)
-
+if(NOT EXISTS "${PROJECT_SOURCE_DIR}/ThirdParty/fmtlib/CMakeLists.txt")
+if (HELICS_ROOT_PROJ)
+	submod_update_all()
+else()
+	submod_update(ThirdParty/fmtlib)
+	submod_update(ThirdParty/asio)
+	submod_update(ThirdParty/jsoncpp)
+endif()
+endif()
 # -------------------------------------------------------------
 # BOOST  find the boost libraries
 # -------------------------------------------------------------
@@ -613,7 +621,7 @@ endif()
 # -------------------------------------------------------------
 # Enable clang analysis and formatting tools
 # -------------------------------------------------------------
-
+if (HELICS_ROOT_PROJ)
 option(
     ENABLE_CLANG_TOOLS
     "if clang is found enable some custom targets for clang formatting and tidy"
@@ -629,6 +637,8 @@ if(INTERFACE_BUILD)
 endif()
 
 add_subdirectory(docs)
+
+endif(HELICS_ROOT_PROJ)
 
 install(TARGETS helics_base EXPORT helics-targets)
 install(TARGETS helics_base_includes EXPORT helics-targets)
