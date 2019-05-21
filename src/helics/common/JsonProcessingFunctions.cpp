@@ -7,6 +7,7 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include "JsonProcessingFunctions.hpp"
 #include <fstream>
+#include <sstream>
 
 bool hasJsonExtension (const std::string &jsonString)
 {
