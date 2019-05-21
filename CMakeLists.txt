@@ -508,6 +508,8 @@ option(
     "Build helics application library (a static library containing objects for broker, player, recorder, and helics_apps"
     ON
 )
+else()
+SET(BUILD_APPS OFF)
 endif()
 
 if (HELICS_ROOT_PROJ)
