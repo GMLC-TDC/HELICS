@@ -301,13 +301,15 @@ endif(GENERATE_DOXYGEN_DOC)
 # -------------------------------------------------------------
 include(updateGitSubmodules)
 if(NOT EXISTS "${PROJECT_SOURCE_DIR}/ThirdParty/fmtlib/CMakeLists.txt")
-if (HELICS_ROOT_PROJ)
-	submod_update_all()
-else()
 	submod_update(ThirdParty/fmtlib)
-	submod_update(ThirdParty/asio)
-	submod_update(ThirdParty/jsoncpp)
 endif()
+
+if(NOT EXISTS "${PROJECT_SOURCE_DIR}/ThirdParty/asio/asio/include/asio.hpp")
+	submod_update(ThirdParty/asio)
+endif()
+
+if(NOT EXISTS "${PROJECT_SOURCE_DIR}/ThirdParty/jsoncpp/CMakeLists.txt")
+	submod_update(ThirdParty/jsoncpp)
 endif()
 # -------------------------------------------------------------
 # BOOST  find the boost libraries
