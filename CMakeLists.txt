@@ -180,7 +180,7 @@ endif()
 if (HELICS_ROOT_PROJ)
 	include(compiler_flags)
 	message(STATUS "setting version build options to \"${CXX_STANDARD_FLAG}\"")
-	if(VERSION_OPTION)
+	if(CXX_STANDARD_FLAG)
 		if(MSVC)
 			target_compile_options(helics_base_includes INTERFACE ${CXX_STANDARD_FLAG})
 		else()
@@ -189,7 +189,7 @@ if (HELICS_ROOT_PROJ)
 				INTERFACE $<$<COMPILE_LANGUAGE:CXX>:${CXX_STANDARD_FLAG}>
 			)
 		endif(MSVC)
-	endif(VERSION_OPTION)
+	endif(CXX_STANDARD_FLAG)
 
 endif()
 
