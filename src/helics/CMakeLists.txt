@@ -88,7 +88,9 @@ if(BUILD_SHARED_LIBS)
 
 endif(BUILD_SHARED_LIBS)
 
-add_subdirectory(apps)
+if (BUILD_APP_LIBRARY)
+	add_subdirectory(apps)
+endif(BUILD_APP_LIBRARY)
 
 if(BUILD_C_SHARED_LIB OR INTERFACE_BUILD)
   add_subdirectory(shared_api_library)

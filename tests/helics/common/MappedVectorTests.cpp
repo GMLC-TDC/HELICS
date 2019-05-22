@@ -42,13 +42,13 @@ BOOST_AUTO_TEST_CASE (insertion_tests)
     BOOST_CHECK_EQUAL (V[2], 1.7);
 
     auto &V2 = Mvec[1];
-    BOOST_CHECK_EQUAL (V2.size (), 45);
+    BOOST_CHECK_EQUAL (V2.size (), 45u);
 
     auto V3 = Mvec.find ("el1");
-    BOOST_CHECK_EQUAL (V3->size (), 3);
+    BOOST_CHECK_EQUAL (V3->size (), 3u);
 
     auto V4 = Mvec.find ("a2");
-    BOOST_CHECK_EQUAL (V4->size (), 45);
+    BOOST_CHECK_EQUAL (V4->size (), 45u);
 }
 
 BOOST_AUTO_TEST_CASE (iterator_tests)
@@ -60,7 +60,7 @@ BOOST_AUTO_TEST_CASE (iterator_tests)
     Mvec.insert ("s3", 9.7);
     Mvec.insert ("s4", 11.4);
 
-    BOOST_CHECK_EQUAL (Mvec.size (), 4);
+    BOOST_CHECK_EQUAL (Mvec.size (), 4u);
 
     Mvec.transform ([](double val) { return val + 1; });
     BOOST_CHECK_EQUAL (Mvec[0], 3.2 + 1.0);

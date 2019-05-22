@@ -4,12 +4,14 @@
 # gives output on failed tests without having to set an environment variable.
 #
 #
+
+if(NOT EXISTS "${PROJECT_SOURCE_DIR}/ThirdParty/googletest/CMakeLists.txt")
+	submod_update(${HELICS_SOURCE_DIR}/ThirdParty/googletest)
+endif()
+
 set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
 set(BUILD_SHARED_LIBS OFF)
-# older version of google tests doesn't support MSYS so needs this flag to compile
-#if (MSYS)
-#	set(gtest_disable_pthreads ON CACHE BOOL "" FORCE)
-#endif()
+
 set(CMAKE_SUPPRESS_DEVELOPER_WARNINGS 1 CACHE BOOL "")
 add_subdirectory("${HELICS_SOURCE_DIR}/ThirdParty/googletest" "${HELICS_BINARY_DIR}/ThirdParty/googletest" EXCLUDE_FROM_ALL)
 

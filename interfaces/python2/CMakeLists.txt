@@ -47,6 +47,10 @@ else()
 endif()
 
 set_target_properties(_helics PROPERTIES FOLDER interfaces)
+if (MSVC)
+	target_compile_options(_helics PRIVATE "/wd4100")
+	target_compile_options(_helics PRIVATE "/wd4459")
+endif()
 
 install(TARGETS _helics DESTINATION python COMPONENT python)
 

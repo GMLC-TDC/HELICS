@@ -77,8 +77,8 @@ BOOST_AUTO_TEST_CASE (save_load_file1)
     mfed.finalize ();
     mfed2.finalize ();
     fut.get ();
-    BOOST_CHECK_EQUAL (rec1.messageCount (), 2);
-    BOOST_CHECK_EQUAL (rec1.pointCount (), 3);
+    BOOST_CHECK_EQUAL (rec1.messageCount (), 2u);
+    BOOST_CHECK_EQUAL (rec1.pointCount (), 3u);
 
     auto filename = ghc::filesystem::temp_directory_path () / "savefile.txt";
     rec1.saveFile (filename.string ());
@@ -145,8 +145,8 @@ BOOST_AUTO_TEST_CASE (save_load_file_binary)
     mfed.finalize ();
     mfed2.finalize ();
     fut.get ();
-    BOOST_CHECK_EQUAL (rec1.messageCount (), 2);
-    BOOST_CHECK_EQUAL (rec1.pointCount (), 3);
+    BOOST_CHECK_EQUAL (rec1.messageCount (), 2u);
+    BOOST_CHECK_EQUAL (rec1.pointCount (), 3u);
 
     auto filename = ghc::filesystem::temp_directory_path () / "savefile_binary.txt";
     rec1.saveFile (filename.string ());
@@ -171,10 +171,10 @@ BOOST_AUTO_TEST_CASE (check_created_files1, *boost::unit_test::depends_on ("comb
     play1.loadFile (filename.string ());
 
     play1.initialize ();
-    BOOST_CHECK_EQUAL (play1.pointCount (), 3);
-    BOOST_CHECK_EQUAL (play1.publicationCount (), 1);
-    BOOST_CHECK_EQUAL (play1.messageCount (), 2);
-    BOOST_CHECK_EQUAL (play1.endpointCount (), 2);
+    BOOST_CHECK_EQUAL (play1.pointCount (), 3u);
+    BOOST_CHECK_EQUAL (play1.publicationCount (), 1u);
+    BOOST_CHECK_EQUAL (play1.messageCount (), 2u);
+    BOOST_CHECK_EQUAL (play1.endpointCount (), 2u);
 
     play1.finalize ();
     ghc::filesystem::remove (filename);
@@ -192,10 +192,10 @@ BOOST_AUTO_TEST_CASE (check_created_files2, *boost::unit_test::depends_on ("comb
     play1.loadFile (filename.string ());
 
     play1.initialize ();
-    BOOST_CHECK_EQUAL (play1.pointCount (), 3);
-    BOOST_CHECK_EQUAL (play1.publicationCount (), 1);
-    BOOST_CHECK_EQUAL (play1.messageCount (), 2);
-    BOOST_CHECK_EQUAL (play1.endpointCount (), 2);
+    BOOST_CHECK_EQUAL (play1.pointCount (), 3u);
+    BOOST_CHECK_EQUAL (play1.publicationCount (), 1u);
+    BOOST_CHECK_EQUAL (play1.messageCount (), 2u);
+    BOOST_CHECK_EQUAL (play1.endpointCount (), 2u);
 
     play1.finalize ();
     ghc::filesystem::remove (filename);
@@ -215,10 +215,10 @@ BOOST_AUTO_TEST_CASE (check_created_files_binary1,
     play1.loadFile (filename.string ());
 
     play1.initialize ();
-    BOOST_CHECK_EQUAL (play1.pointCount (), 3);
-    BOOST_CHECK_EQUAL (play1.publicationCount (), 1);
-    BOOST_CHECK_EQUAL (play1.messageCount (), 2);
-    BOOST_CHECK_EQUAL (play1.endpointCount (), 2);
+    BOOST_CHECK_EQUAL (play1.pointCount (), 3u);
+    BOOST_CHECK_EQUAL (play1.publicationCount (), 1u);
+    BOOST_CHECK_EQUAL (play1.messageCount (), 2u);
+    BOOST_CHECK_EQUAL (play1.endpointCount (), 2u);
 
     auto &b1 = play1.getMessage (0);
     helics::data_block n5 (256);
@@ -253,11 +253,11 @@ BOOST_AUTO_TEST_CASE (check_created_files_binary2,
     play1.loadFile (filename.string ());
 
     play1.initialize ();
-    BOOST_CHECK_EQUAL (play1.pointCount (), 3);
-    BOOST_CHECK_EQUAL (play1.publicationCount (), 1);
-    BOOST_CHECK_EQUAL (play1.messageCount (), 2);
+    BOOST_CHECK_EQUAL (play1.pointCount (), 3u);
+    BOOST_CHECK_EQUAL (play1.publicationCount (), 1u);
+    BOOST_CHECK_EQUAL (play1.messageCount (), 2u);
 
-    BOOST_CHECK_EQUAL (play1.endpointCount (), 2);
+    BOOST_CHECK_EQUAL (play1.endpointCount (), 2u);
 
     auto &b1 = play1.getMessage (0);
     helics::data_block n5 (256);
@@ -316,12 +316,12 @@ BOOST_AUTO_TEST_CASE (check_combination_file_load)
             fed.getPublication (1).publish (1);
         }
     }
-    BOOST_CHECK_EQUAL (fed.pendingMessages (), 3);
+    BOOST_CHECK_EQUAL (fed.pendingMessages (), 3u);
     fed.finalize ();
     fut_play.get ();
     fut_rec.get ();
-    BOOST_CHECK_EQUAL (rec1.messageCount (), 2);
-    BOOST_CHECK_EQUAL (rec1.pointCount (), 2);
+    BOOST_CHECK_EQUAL (rec1.messageCount (), 2u);
+    BOOST_CHECK_EQUAL (rec1.pointCount (), 2u);
 }
 
 BOOST_AUTO_TEST_SUITE_END ()
