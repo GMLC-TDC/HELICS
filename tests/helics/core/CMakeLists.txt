@@ -67,16 +67,4 @@ add_test(
 )
 set_property(TEST core-ci-tests PROPERTY LABELS Continuous)
 #set_property(TEST core-ci-tests PROPERTY LABELS DebugTest)
-foreach(keyfile IN LISTS KEY_LIBRARY_FILES)
-  add_custom_command(
-    TARGET
-    core-tests
-    POST_BUILD # Adds a post-build event to core tests
-    COMMAND
-      ${CMAKE_COMMAND}
-      -E
-      copy_if_different # which executes "cmake - E copy_if_different..."
-      "${keyfile}" # <--this is in-file
-      "$<TARGET_FILE_DIR:core-tests>/"
-  ) # <--this is out- file path
-endforeach(keyfile)
+copy_key_files_to_target_location(core-tests)

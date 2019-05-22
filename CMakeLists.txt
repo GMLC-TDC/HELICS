@@ -37,6 +37,7 @@ set(
 )
 include(extraMacros)
 include(CMakeDependentOption)
+include(copy_key_files)
 
 if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
 	set(HELICS_ROOT_PROJ ON)
