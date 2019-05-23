@@ -13,7 +13,7 @@ project(HELICS VERSION 2.1.0)
 # HELICS Version number
 # -----------------------------------------------------------------------------
 set(HELICS_VERSION_BUILD)
-set(HELICS_DATE "03-10-19")
+set(HELICS_DATE "05-24-19")
 
 set(
     HELICS_VERSION_UNDERSCORE
@@ -68,16 +68,6 @@ if(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
     endif(WIN32)
 endif()
 
-show_variable(
-    AUTOBUILD_INSTALL_PATH
-    PATH
-    "location to install the autobuild libraries and Headers"
-    "${PROJECT_BINARY_DIR}/libs"
-)
-
-mark_as_advanced(AUTOBUILD_INSTALL_PATH)
-
-file(MAKE_DIRECTORY ${PROJECT_BINARY_DIR}/logs)
 if (HELICS_ROOT_PROJ)
 if (DEFINED BUILD_TESTING)
 option(BUILD_HELICS_TESTS "Enable the test executables to be built" ${BUILD_TESTING})
@@ -266,7 +256,7 @@ mark_as_advanced(TEST_CODE_COVERAGE)
 # Get some configuration for C++17 as that becomes available
 # -------------------------------------------------------------
 # message(STATUS ${CMAKE_CXX_FLAGS})
-set(CONFIGURE_TARGET_LOCATION ${AUTOBUILD_INSTALL_PATH}/include/helics/)
+set(CONFIGURE_TARGET_LOCATION ${HELICS_BINARY_DIR}/include/helics/)
 include(configGenerator)
 
 option(GENERATE_DOXYGEN_DOC "Generate Doxygen doc target" OFF)
@@ -397,7 +387,7 @@ if(ENABLE_ZMQ_CORE)
             set(ZeroMQ_DEPENDENCY libzmq)
         endif()
         # message(STATUS "zmq dep ${ZeroMQ_DEPENDENCY}")
-        target_link_libraries(helics_base INTERFACE ${ZeroMQ_DEPENDENCY})
+	    target_link_libraries(helics_base INTERFACE ${ZeroMQ_DEPENDENCY})
     else(ZeroMQ_FOUND)
         message(FATAL_ERROR "ZeroMQ not found")
     endif(ZeroMQ_FOUND)
@@ -410,7 +400,7 @@ target_include_directories(
     helics_base_includes
     INTERFACE
         $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/src>
-        $<BUILD_INTERFACE:${AUTOBUILD_INSTALL_PATH}/include>
+        $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}/include>
         $<INSTALL_INTERFACE:$<INSTALL_PREFIX>/include>
 )
 
@@ -444,10 +434,6 @@ set(CMAKE_SKIP_BUILD_RPATH FALSE)
 set(CMAKE_BUILD_WITH_INSTALL_RPATH FALSE)
 
 set(CMAKE_MACOSX_RPATH ON)
-set(
-    CMAKE_BUILD_RPATH
-    "./;${AUTOBUILD_INSTALL_PATH}/bin;${AUTOBUILD_INSTALL_PATH}/lib;${AUTOBUILD_INSTALL_PATH}/lib64"
-)
 
 # add the automatically determined parts of the RPATH which point to directories
 # outside the build tree to the install RPATH
@@ -484,7 +470,7 @@ endif()
 list(APPEND CMAKE_INSTALL_RPATH "./")
 
 if(NOT WIN32)
-    if(ENABLE_ZMQ_CORE)
+    if(ENABLE_ZMQ_CORE AND NOT ZMQ_USE_STATIC_LIBRARY)
         get_target_property(zmqlibfile libzmq IMPORTED_LOCATION)
         if(NOT zmqlibfile)
             get_target_property(zmqlibfile libzmq IMPORTED_LOCATION_RELEASE)
@@ -528,23 +514,6 @@ option(
 else()
 SET(BUILD_APP_EXECUTABLES OFF)
 endif()
-
-
-file(GLOB KEY_LIBRARY_FILES ${AUTOBUILD_INSTALL_PATH}/bin/*)
-if(ENABLE_ZMQ_CORE AND ZMQ_USE_STATIC_LIBRARY)
-    # remove the zmq libraries from the key files list if we are using static
-    # zeromq libraries
-    set(NEW_LIST)
-    foreach(keyfile IN LISTS KEY_LIBRARY_FILES)
-        if(keyfile MATCHES "zmq")
-
-        else()
-            list(APPEND NEW_LIST ${keyfile})
-        endif()
-    endforeach()
-    set(KEY_LIBRARY_FILES ${NEW_LIST})
-endif()
-# message(STATUS "key files ${KEY_LIBRARY_FILES}")
 
 option(ENABLE_LOGGING "enable normal, debug, and trace logging in HELICS" ON)
 
@@ -602,24 +571,6 @@ endif()
 if(BUILD_HELICS_EXAMPLES)
     add_subdirectory(examples)
 endif(BUILD_HELICS_EXAMPLES)
-
-install(
-    FILES ${KEY_LIBRARY_FILES}
-    DESTINATION ${CMAKE_INSTALL_BINDIR}
-    COMPONENT
-    RUNTIME
-)
-
-install(
-    DIRECTORY ${AUTOBUILD_INSTALL_PATH}/lib/
-    DESTINATION ${CMAKE_INSTALL_LIBDIR}/
-    OPTIONAL
-)
-install(
-    DIRECTORY ${AUTOBUILD_INSTALL_PATH}/lib64/
-    DESTINATION ${CMAKE_INSTALL_LIBDIR}/
-    OPTIONAL
-)
 
 if(ENABLE_ZMQ_CORE)
     if(WIN32 AND NOT MSYS)
@@ -720,15 +671,15 @@ install(
 # -----------------------------------------------------------------------------
 configure_file(
     "config/helics-config.h.in"
-    "${AUTOBUILD_INSTALL_PATH}/include/helics/helics-config.h"
+    "${HELICS_BINARY_DIR}/include/helics/helics-config.h"
 )
 install(
-    FILES ${AUTOBUILD_INSTALL_PATH}/include/helics/helics-config.h
+    FILES ${HELICS_BINARY_DIR}/include/helics/helics-config.h
     DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/helics
     COMPONENT headers
 )
 install(
-    FILES ${AUTOBUILD_INSTALL_PATH}/include/helics/compiler-config.h
+    FILES ${HELICS_BINARY_DIR}/include/helics/compiler-config.h
     DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/helics
     COMPONENT headers
 )

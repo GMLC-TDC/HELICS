@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2017-2019, Battelle Memorial Institute; Lawrence Livermore
+# Copyright (c) 2019, Battelle Memorial Institute; Lawrence Livermore
 # National Security, LLC; Alliance for Sustainable Energy, LLC.
 # See the top-level NOTICE for additional details. 
 #All rights reserved.
@@ -24,7 +24,7 @@ include(FetchContent)
 FetchContent_Declare(
   lzmq
   GIT_REPOSITORY https://github.com/zeromq/libzmq.git
-  GIT_TAG        v4.3.0
+  GIT_TAG        v4.3.1
 )
 
 FetchContent_GetProperties(lzmq)
@@ -32,20 +32,27 @@ string(TOLOWER "lzmq" lcName)
 if(NOT ${lcName}_POPULATED)
   # Fetch the content using previously declared details
   FetchContent_Populate(lzmq)
-
+  # this section to be removed at the next release of ZMQ for now we need to download the file in master as the one in the release doesn't work
+	file(REMOVE ${${lcName}_SOURCE_DIR}/builds/cmake/ZeroMQConfig.cmake.in)
+  file(DOWNLOAD https://raw.githubusercontent.com/zeromq/libzmq/master/builds/cmake/ZeroMQConfig.cmake.in ${${lcName}_SOURCE_DIR}/builds/cmake/ZeroMQConfig.cmake.in)
+  
+endif()
   # Set custom variables, policies, etc.
   # ...
 
   set(ZMQ_BUILD_TESTS OFF CACHE BOOL "" FORCE)
   set(ENABLE_CURVE OFF CACHE BOOL "" FORCE)
   set(ENABLE_DRAFTS OFF CACHE BOOL "" FORCE)
+  set(WITH_DOCS OFF CACHE BOOL "" FORCE)
+  set(ZMQ_LOCAL_BUILD ON CACHE BOOL "" FORCE)
   set(LIBZMQ_PEDANTIC OFF CACHE BOOL "" FORCE)
   set(WITH_PERF_TOOL OFF CACHE BOOL "" FORCE)
   set(BUILD_STATIC ${zmq_static_build} CACHE BOOL "" FORCE)
   set(BUILD_SHARED ${zmq_shared_build} CACHE BOOL "" FORCE)
-
+  set(ZEROMQ_CMAKECONFIG_INSTALL_DIR ${CMAKE_INSTALL_LIBDIR}/cmake/ZeroMQ CACHE BOOL "" FORCE)
   # Bring the populated content into the build
   add_subdirectory(${${lcName}_SOURCE_DIR} ${${lcName}_BINARY_DIR})
+  set(COMPILER_SUPPORTS_CXX11 ON)
   set(ZeroMQ_FOUND TRUE)
 
   set_target_properties(clang-format clang-format-check clang-format-diff PROPERTIES FOLDER "Extern/zmq_clang_format")
@@ -66,18 +73,24 @@ if(NOT ${lcName}_POPULATED)
 	endif()
     endif()
 
-  
-endif()
-else()
-include(buildlibZMQ)
-            build_libzmq()
-            find_package(
-                ZeroMQ
-                HINTS
-                ${ZeroMQ_INSTALL_PATH}
-                $ENV{ZeroMQ_INSTALL_PATH}
-                ${AUTOBUILD_INSTALL_PATH}
-                PATH_SUFFIXES
-                ${ZMQ_CMAKE_SUFFIXES}
-            )
-endif()
+# move a bunch of local variables and options to advanced
+  mark_as_advanced(LIBZMQ_PEDANTIC)
+  mark_as_advanced(LIBZMQ_WERROR)
+  mark_as_advanced(ZMQ_BUILD_TESTS)
+  mark_as_advanced(WITH_LIBSODIUM)
+  mark_as_advanced(WITH_MILITANT)
+  mark_as_advanced(WITH_OPENPGM)
+  mark_as_advanced(WITH_VMCI)
+  mark_as_advanced(WITH_PERF_TOOL)
+  mark_as_advanced(WITH_DOCS)
+  mark_as_advanced(ZEROMQ_CMAKECONFIG_INSTALL_DIR)
+  mark_as_advanced(POLLER)
+   mark_as_advanced(API_POLLER)
+   mark_as_advanced(ENABLE_CURVE)
+  mark_as_advanced(ENABLE_DRAFTS)
+  mark_as_advanced(ENABLE_ANALYSIS)
+  mark_as_advanced(ENABLE_ASAN)
+  mark_as_advanced(ENABLE_RADIX_TREE)
+  mark_as_advanced(ENABLE_EVENTFD)
+
+endif() 
