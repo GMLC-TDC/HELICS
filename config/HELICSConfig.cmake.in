@@ -68,7 +68,7 @@ if (@ENABLE_ZMQ_CORE@)
             find_dependency(ZeroMQ)
         endif()
 	else()
-		include(${PACKAGE_PREFIX_DIR}/@CMAKE_INSTALL_LIBDIR@/cmake/ZeroMQ/ZeroMQTargets.cmake)
+		include(../ZeroMQ/ZeroMQTargets.cmake)
 	endif()
 endif()
 

@@ -90,9 +90,13 @@ else()
 
     if(NOT ZeroMQ_FOUND OR NOT ZeroMQ_INCLUDE_DIR)
         # message(STATUS "initialZMQ not found")
-        if(ZMQ_SUBPROJECT)
-            include(addlibzmq)
-        endif()
+		set(ZeroMQ_FIND_QUIETLY ON)
+        find_package(ZeroMQ)
+        if(NOT ZeroMQ_FOUND OR NOT ZeroMQ_INCLUDE_DIR)
+           if(ZMQ_SUBPROJECT)
+              include(addlibzmq)
+           endif()
+		endif()
     endif()
 
 endif() # USE_SYSTEM_ZEROMQ_ONLY
