@@ -127,7 +127,7 @@ if [[ "$os_name" == "Linux" ]]; then
     if [[ ! -d "${boost_install_path}" ]]; then
         echo "*** build boost"
         local boost_sanitizer=""
-        if [[ "$RUN_TSAN" ]]; then
+        if [[ "$RUN_SANITIZER" == "tsan" ]]; then
             boost_sanitizer="BOOST_SANITIZER=thread"
         fi
         ${BOOST_SANITIZER} ${WAIT_COMMAND} ./scripts/install-dependency.sh boost ${boost_version} ${boost_install_path}
