@@ -115,7 +115,7 @@ jobs:
         - CI_BOOST_VERSION=1.61.0
         - ENABLE_CPACK=true
         - INSTALL_SYSTEM_LIBRARIES=true
-        - SKIP_TEST_RUN=true
+        - TEST_TYPE=Packaging
       after_script: ${TRAVIS_BUILD_DIR}/scripts/upload-ci-artifact.sh
 
     - <<: *linux_base
