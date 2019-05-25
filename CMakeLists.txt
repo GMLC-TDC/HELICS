@@ -760,7 +760,7 @@ if(ENABLE_PACKAGE_BUILD)
     set(CPACK_PACKAGE_INSTALL_REGISTRY_KEY "HELICS")
 
 	if (ZMQ_LOCAL_BUILD)
-		set(ZMQ_PACKAGES Development Runtime)
+		set(ZMQ_PACKAGES Development)
 	else()
 		set(ZMQ_PACKAGES )
 	endif()
@@ -769,7 +769,7 @@ if(ENABLE_PACKAGE_BUILD)
         applications
         headers
         libs
-        runtime
+        Runtime
         matlab
         python
         java
