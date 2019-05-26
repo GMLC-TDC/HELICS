@@ -77,6 +77,6 @@ set_property(
     Daily
 )
 
-  copy_key_files_to_target_location(Java_Helics_Api)
-  copy_shared_target(Java_Helics_Api)
+  copy_key_files_to_target_located_at(Java_Helics_Api ${CMAKE_CURRENT_BINARY_DIR})
+  copy_shared_target_at(Java_Helics_Api ${CMAKE_CURRENT_BINARY_DIR})
   
