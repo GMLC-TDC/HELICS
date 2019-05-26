@@ -33,8 +33,8 @@ if(NOT ${lcName}_POPULATED)
   # Fetch the content using previously declared details
   FetchContent_Populate(lzmq)
   # this section to be removed at the next release of ZMQ for now we need to download the file in master as the one in the release doesn't work
-	file(REMOVE ${${lcName}_SOURCE_DIR}/builds/cmake/ZeroMQConfig.cmake.in)
-  file(DOWNLOAD https://raw.githubusercontent.com/zeromq/libzmq/master/builds/cmake/ZeroMQConfig.cmake.in ${${lcName}_SOURCE_DIR}/builds/cmake/ZeroMQConfig.cmake.in)
+#	file(REMOVE ${${lcName}_SOURCE_DIR}/builds/cmake/ZeroMQConfig.cmake.in)
+#  file(DOWNLOAD https://raw.githubusercontent.com/zeromq/libzmq/master/builds/cmake/ZeroMQConfig.cmake.in ${${lcName}_SOURCE_DIR}/builds/cmake/ZeroMQConfig.cmake.in)
   
 endif()
   # Set custom variables, policies, etc.
@@ -93,5 +93,52 @@ endif()
   mark_as_advanced(ENABLE_ASAN)
   mark_as_advanced(ENABLE_RADIX_TREE)
   mark_as_advanced(ENABLE_EVENTFD)
+  
+if(ZMQ_USE_STATIC_LIBRARY)
+  set(zmq_target_output "libzmq-static")
+else()
+  set(zmq_target_output "libzmq")
+endif()
+
+
+get_target_property(ZMQ_PUBLIC_HEADER_TARGETS ${zmq_target_output} PUBLIC_HEADER)
+
+message(STATUS "ZMQ PUBLIC HEADERS: ${ZMQ_PUBLIC_HEADER_TARGETS}")
+if (ZMQ_PUBLIC_HEADER_TARGETS)
+
+set(NEW_ZMQ_PUBLIC_HEADERS)
+foreach( SOURCE_FILE ${ZMQ_PUBLIC_HEADER_TARGETS} )
+    list( APPEND NEW_ZMQ_PUBLIC_HEADERS ${${lcName}_SOURCE_DIR}/${SOURCE_FILE} )
+  ENDFOREACH()
+set_target_properties(${zmq_target_output} PROPERTIES PUBLIC_HEADER "${NEW_ZMQ_PUBLIC_HEADERS}")
+
+get_target_property(ZMQ_PUBLIC_HEADER_TARGETS2 ${zmq_target_output} PUBLIC_HEADER)
+
+message(STATUS "NEW ZMQ PUBLIC HEADERS: ${ZMQ_PUBLIC_HEADER_TARGETS2}")
+
+endif()
+
+install(TARGETS ${zmq_target_output}
+    EXPORT helics-targets
+    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+    PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+    COMPONENT libs)
+	
+install(
+    FILES $<TARGET_FILE:${zmq_target_output}>
+    DESTINATION ${CMAKE_INSTALL_BINDIR}
+    COMPONENT libs
+  )
+  
+  if(MSVC AND NOT EMBEDDED_DEBUG_INFO)
+  install(
+    FILES $<TARGET_PDB_FILE:${zmq_target_output}>
+    DESTINATION ${CMAKE_INSTALL_BINDIR}
+    OPTIONAL COMPONENT libs
+  )
+endif()
+
 
 endif() 

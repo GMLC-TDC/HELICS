@@ -40,7 +40,6 @@ if(BUILD_SHARED_LIBS)
   target_include_directories(helics-shared
     INTERFACE
       $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/src>
-      $<BUILD_INTERFACE:${AUTOBUILD_INSTALL_PATH}/include>
       $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/ThirdParty>
       $<INSTALL_INTERFACE:$<INSTALL_PREFIX>/include>
   )

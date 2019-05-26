@@ -759,11 +759,6 @@ if(ENABLE_PACKAGE_BUILD)
     set(CPACK_PACKAGE_VERSION_PATCH ${HELICS_VERSION_PATCH})
     set(CPACK_PACKAGE_INSTALL_REGISTRY_KEY "HELICS")
 
-	if (ZMQ_LOCAL_BUILD)
-		set(ZMQ_PACKAGES SDK)
-	else()
-		set(ZMQ_PACKAGES )
-	endif()
     set(
         CPACK_COMPONENTS_ALL
         applications
@@ -775,7 +770,6 @@ if(ENABLE_PACKAGE_BUILD)
         java
         octave
         csharp
-		${ZMQ_PACKAGES}
     )
     if(WIN32)
         set(CPACK_RESOURCE_FILE_LICENSE "${HELICS_SOURCE_DIR}\\\\LICENSE")
