@@ -32,6 +32,7 @@ add_subdirectory(apps)
 add_subdirectory(performance_tests)
 endif()
 
+
 # Tests for other CMake projects including and using HELICS
 add_test(find-package-tests ${CMAKE_CTEST_COMMAND} -C ${CMAKE_BUILD_TYPE}
                             --build-and-test "${CMAKE_CURRENT_SOURCE_DIR}/find_package_tests" "${CMAKE_CURRENT_BINARY_DIR}/find_package_tests"
@@ -46,4 +47,4 @@ add_test(find-package-tests ${CMAKE_CTEST_COMMAND} -C ${CMAKE_BUILD_TYPE}
                             "-DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}"
                             "-DCMAKE_CXX_STANDARD=${CMAKE_CXX_STANDARD}"
 )
-set_property(TEST find-package-tests PROPERTY LABELS Continuous Daily)
+set_property(TEST find-package-tests PROPERTY LABELS Packaging)
