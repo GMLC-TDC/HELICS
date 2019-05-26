@@ -32,10 +32,7 @@ string(TOLOWER "lzmq" lcName)
 if(NOT ${lcName}_POPULATED)
   # Fetch the content using previously declared details
   FetchContent_Populate(lzmq)
-  # this section to be removed at the next release of ZMQ for now we need to download the file in master as the one in the release doesn't work
-#	file(REMOVE ${${lcName}_SOURCE_DIR}/builds/cmake/ZeroMQConfig.cmake.in)
-#  file(DOWNLOAD https://raw.githubusercontent.com/zeromq/libzmq/master/builds/cmake/ZeroMQConfig.cmake.in ${${lcName}_SOURCE_DIR}/builds/cmake/ZeroMQConfig.cmake.in)
-  
+
 endif()
   # Set custom variables, policies, etc.
   # ...
@@ -132,13 +129,12 @@ install(
     COMPONENT libs
   )
   
-  if(MSVC AND NOT EMBEDDED_DEBUG_INFO)
+if(MSVC AND NOT EMBEDDED_DEBUG_INFO)
   install(
     FILES $<TARGET_PDB_FILE:${zmq_target_output}>
     DESTINATION ${CMAKE_INSTALL_BINDIR}
     OPTIONAL COMPONENT libs
   )
 endif()
-
 
 endif() 

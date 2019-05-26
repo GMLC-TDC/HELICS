@@ -99,6 +99,6 @@ install(
   DESTINATION java
   COMPONENT java OPTIONAL
 )
-install(FILES $<TARGET_FILE:helicsSharedLib> DESTINATION java COMPONENT java)
+
+install_key_files_with_comp(java)
 install(TARGETS JNIhelics DESTINATION java COMPONENT java)
-install(FILES ${KEY_LIBRARY_FILES} DESTINATION java COMPONENT java)

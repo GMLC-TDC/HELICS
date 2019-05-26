@@ -30,6 +30,7 @@ add_custom_command(
       "$<TARGET_FILE_DIR:${target}>/"
   ) # <--this is out- file path
 endif()
+
 endif(WIN32)
 endmacro()
 
@@ -45,4 +46,16 @@ macro(copy_shared_target target)
       "$<TARGET_FILE:helicsSharedLib>" # <--this is in- file
       "$<TARGET_FILE_DIR:${target}>/"
   ) # <--this is out- file path
+endmacro()
+
+macro(install_key_files_with_comp comp)
+install(FILES $<TARGET_FILE:helicsSharedLib> DESTINATION ${comp} COMPONENT ${comp})
+install(FILES ${KEY_LIBRARY_FILES} DESTINATION ${comp} COMPONENT ${comp})
+
+IF (WIN32)
+   if (TARGET libzmq)
+     install(FILES $<TARGET_FILE:libzmq> DESTINATION ${comp} COMPONENT ${comp})
+   endif()
+
+endif(WIN32)
 endmacro()
