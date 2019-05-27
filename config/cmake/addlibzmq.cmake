@@ -43,10 +43,10 @@ git_clone(
              PROJECT_NAME                    ${lcName}
              GIT_URL                         https://github.com/zeromq/libzmq.git
              GIT_TAG                         v4.3.1
-			 DIRECTORY                       deps_
+			 DIRECTORY                       ${PROJECT_BINARY_DIR}/_deps
        )
 	   
-set(${lcName}_BINARY_DIR ${PROJECT_BINARY_DIR}/deps_/${lcName}-build)
+set(${lcName}_BINARY_DIR ${PROJECT_BINARY_DIR}/_deps/${lcName}-build)
 
 endif()
   # Set custom variables, policies, etc.
