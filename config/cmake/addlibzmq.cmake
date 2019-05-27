@@ -134,6 +134,7 @@ message(STATUS "NEW ZMQ PUBLIC HEADERS: ${ZMQ_PUBLIC_HEADER_TARGETS2}")
 
 endif()
 
+if(NOT CMAKE_VERSION VERSION_LESS 3.13)
 install(TARGETS ${zmq_target_output}
     EXPORT helics-targets
     ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
@@ -142,6 +143,9 @@ install(TARGETS ${zmq_target_output}
     PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
     COMPONENT libs)
 	
+	#TODO will have to do something about this for older versions
+endif()
+
 install(
     FILES $<TARGET_FILE:${zmq_target_output}>
     DESTINATION ${CMAKE_INSTALL_BINDIR}
