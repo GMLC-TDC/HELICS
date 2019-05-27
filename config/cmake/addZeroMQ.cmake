@@ -35,11 +35,9 @@ mark_as_advanced(USE_SYSTEM_ZEROMQ_ONLY)
 mark_as_advanced(ZMQ_SUBPROJECT)
 mark_as_advanced(ZMQ_FORCE_SUBPROJECT)
 
-cmake_dependent_option(
+option(
     ZMQ_USE_STATIC_LIBRARY
     "use the ZMQ static library"
-    OFF
-    "NOT USE_SYSTEM_ZEROMQ_ONLY"
     OFF
 )
 
@@ -73,9 +71,9 @@ else()
             ${ZMQ_CMAKE_SUFFIXES}
         )
     else()
+	# add  QUIET back in later
         find_package(
             ZeroMQ
-            QUIET
             HINTS
             ${ZeroMQ_INSTALL_PATH}
             $ENV{ZeroMQ_INSTALL_PATH}
@@ -90,7 +88,7 @@ else()
 
     if(NOT ZeroMQ_FOUND OR NOT ZeroMQ_INCLUDE_DIR)
         # message(STATUS "initialZMQ not found")
-		set(ZeroMQ_FIND_QUIETLY ON)
+		set(ZeroMQ_FIND_QUIETLY OFF)
         find_package(ZeroMQ)
         if(NOT ZeroMQ_FOUND OR NOT ZeroMQ_INCLUDE_DIR)
            if(ZMQ_SUBPROJECT)
