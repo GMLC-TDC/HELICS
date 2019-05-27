@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 2.8.7)
 
-include(${PROJECT_SOURCE_DIR}/Config/cmake/Utils.cmake)
+include(${PROJECT_SOURCE_DIR}/config/cmake/Utils.cmake)
 include(CMakeParseArguments)
 
 find_package(Git)
