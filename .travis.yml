@@ -27,6 +27,7 @@ _basic_env:
         - g++-6
         - valgrind
         - lcov
+        - libzmq3-dev
 - &daily_osx
   if: type = cron
   os: osx
@@ -77,6 +78,8 @@ jobs:
             - ubuntu-toolchain-r-test
           packages:
             - g++-6
+            - libzmq3-dev
+			
       env:
         - MATRIX_EVAL="COMPILER=gcc && CC=gcc-6 && CXX=g++-6"
         - USE_SWIG=true
