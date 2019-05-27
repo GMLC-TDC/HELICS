@@ -19,13 +19,13 @@ if(ZMQ_USE_STATIC_LIBRARY)
         set(zmq_shared_build ON)
     endif()
 	
-string(TOLOWER "lzmq" lcName)
+string(TOLOWER "libzmq" lcName)
 
 if(NOT CMAKE_VERSION VERSION_LESS 3.11)
 include(FetchContent)
 
 FetchContent_Declare(
-  lzmq
+  libzmq
   GIT_REPOSITORY https://github.com/zeromq/libzmq.git
   GIT_TAG        v4.3.1
 )
@@ -43,7 +43,7 @@ git_clone(
              PROJECT_NAME                    ${lcName}
              GIT_URL                         https://github.com/zeromq/libzmq.git
              GIT_TAG                         v4.3.1
-			 DIRECTORY                       dependencies_
+			 DIRECTORY                       deps_
        )
 	   
 set(${lcName}_BINARY_DIR ${PROJECT_BINARY_DIR}/deps_/${lcName}-build)
