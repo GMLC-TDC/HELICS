@@ -38,6 +38,10 @@ if(NOT ${lcName}_POPULATED)
 
 endif()
 else() #cmake <3.11
+
+# create the directory first
+file(MAKE_DIRECTORY ${PROJECT_BINARY_DIR}/_deps)
+
 include(GitUtils)
 git_clone(
              PROJECT_NAME                    ${lcName}
