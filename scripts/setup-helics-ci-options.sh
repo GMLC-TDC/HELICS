@@ -8,9 +8,14 @@ shopt -s nocasematch
 OPTION_FLAGS_ARR=()
 OPTION_FLAGS_ARR+=("-DBUILD_C_SHARED_LIB=ON" "-DBUILD_SHARED_LIBS=ON" "-DEXAMPLES_WARNINGS_AS_ERROR=ON")
 
-#if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
-#    OPTION_FLAGS_ARR+=("-DZMQ_USE_STATIC_LIBRARY=ON")
-#fi
+# Options to control building zeromq
+if [[ "$ZMQ_SUBPROJECT" ]]; then
+    OPTION_FLAGS_ARR+=("-DZMQ_SUBPROJECT=ON")
+fi
+
+if [[ "$ZMQ_STATIC" ]]; then
+    OPTION_FLAGS_ARR+=("-DZMQ_USE_STATIC_LIBRARY=ON")
+fi
 
 # Options to control building swig interfaces
 if [[ "${DISABLE_INTERFACES}" != *"Java"* ]]; then
