@@ -71,9 +71,9 @@ else()
             ${ZMQ_CMAKE_SUFFIXES}
         )
     else()
-	# add  QUIET back in later
         find_package(
             ZeroMQ
+            QUIET
             HINTS
             ${ZeroMQ_INSTALL_PATH}
             $ENV{ZeroMQ_INSTALL_PATH}
@@ -88,7 +88,7 @@ else()
 
     if(NOT ZeroMQ_FOUND OR NOT ZeroMQ_INCLUDE_DIR)
         # message(STATUS "initialZMQ not found")
-		set(ZeroMQ_FIND_QUIETLY OFF)
+		set(ZeroMQ_FIND_QUIETLY ON)
         find_package(ZeroMQ)
         if(NOT ZeroMQ_FOUND OR NOT ZeroMQ_INCLUDE_DIR)
            if(ZMQ_SUBPROJECT)

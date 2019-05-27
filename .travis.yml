@@ -94,6 +94,7 @@ jobs:
           packages:
             - libstdc++-6-dev
             - clang-5.0
+			- libzmq3-dev
       env:
         - MATRIX_EVAL="COMPILER=clang && CC='clang-5.0' && CXX='clang++-5.0'"
         - CCACHE_CPP2=yes
