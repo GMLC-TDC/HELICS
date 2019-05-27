@@ -79,7 +79,6 @@ jobs:
           packages:
             - g++-6
             - libzmq3-dev
-			
       env:
         - MATRIX_EVAL="COMPILER=gcc && CC=gcc-6 && CXX=g++-6"
         - USE_SWIG=true
