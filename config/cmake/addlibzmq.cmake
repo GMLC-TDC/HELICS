@@ -66,6 +66,7 @@ endif()
   set(ENABLE_CPACK OFF CACHE BOOL "" FORCE)
   set(BUILD_STATIC ${zmq_static_build} CACHE BOOL "" FORCE)
   set(BUILD_SHARED ${zmq_shared_build} CACHE BOOL "" FORCE)
+  message(STATUS "zmq install lib dir ${CMAKE_INSTALL_LIBDIR}")
   set(ZEROMQ_CMAKECONFIG_INSTALL_DIR ${CMAKE_INSTALL_LIBDIR}/cmake/ZeroMQ CACHE BOOL "" FORCE)
   # Bring the populated content into the build
   add_subdirectory(${${lcName}_SOURCE_DIR} ${${lcName}_BINARY_DIR})
