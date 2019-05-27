@@ -30,11 +30,11 @@ FetchContent_Declare(
   GIT_TAG        v4.3.1
 )
 
-FetchContent_GetProperties(lzmq)
+FetchContent_GetProperties(libzmq)
 
 if(NOT ${lcName}_POPULATED)
   # Fetch the content using previously declared details
-  FetchContent_Populate(lzmq)
+  FetchContent_Populate(libzmq)
 
 endif()
 else() #cmake <3.11
