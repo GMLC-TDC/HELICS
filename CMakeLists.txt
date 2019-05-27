@@ -302,6 +302,9 @@ endif()
 if(NOT EXISTS "${PROJECT_SOURCE_DIR}/ThirdParty/jsoncpp/CMakeLists.txt")
 	submod_update(ThirdParty/jsoncpp)
 endif()
+
+include(GNUInstallDirs)
+
 # -------------------------------------------------------------
 # BOOST  find the boost libraries
 # -------------------------------------------------------------
@@ -410,8 +413,6 @@ target_include_directories(
         $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/ThirdParty>
         $<BUILD_INTERFACE:${Boost_INCLUDE_DIR}>
 )
-
-include(GNUInstallDirs)
 
 # -------------------------------------------------------------
 # Asio include directories
