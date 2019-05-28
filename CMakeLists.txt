@@ -597,7 +597,7 @@ endif(HELICS_ROOT_PROJ)
 
 install(TARGETS helics_base EXPORT helics-targets)
 install(TARGETS helics_base_includes EXPORT helics-targets)
-
+install(TARGETS compile_flags_target EXPORT helics-targets)
 set(
     helics_static_file
     "${CMAKE_STATIC_LIBRARY_PREFIX}helics-static${CMAKE_STATIC_LIBRARY_SUFFIX}"

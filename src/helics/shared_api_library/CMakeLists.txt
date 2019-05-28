@@ -51,6 +51,8 @@ set_target_properties(
     hidden
 )
 target_link_libraries(helicsSharedLib PRIVATE helics-static)
+target_link_libraries(helicsSharedLib PRIVATE compile_flags_target)
+
 if(UNIX OR MINGW)
   if(NOT APPLE)
     target_link_libraries(

@@ -45,6 +45,7 @@ if(BUILD_APP_LIBRARY)
   )
 
   target_link_libraries(helics_apps PUBLIC helics-static)
+  target_link_libraries(helics_apps PRIVATE compile_flags_target)
   target_include_directories(
     helics_apps SYSTEM
     PRIVATE $<TARGET_PROPERTY:fmt::fmt-header-only,INTERFACE_INCLUDE_DIRECTORIES>
@@ -58,7 +59,8 @@ if(BUILD_APP_LIBRARY)
 
   if (BUILD_APP_EXECUTABLES)
     add_executable(helics_player playerMain.cpp)
-    target_link_libraries(helics_player helics_apps)
+    target_link_libraries(helics_player PUBLIC helics_apps)
+	target_link_libraries(helics_player PRIVATE compile_flags_target)
     set_target_properties(helics_player PROPERTIES FOLDER apps)
     install(
       TARGETS helics_player
@@ -67,8 +69,9 @@ if(BUILD_APP_LIBRARY)
     )
 
     add_executable(helics_recorder recorderMain.cpp)
-    target_link_libraries(helics_recorder helics_apps)
+    target_link_libraries(helics_recorder PUBLIC helics_apps)
     set_target_properties(helics_recorder PROPERTIES FOLDER apps)
+	target_link_libraries(helics_recorder PRIVATE compile_flags_target)
     install(
       TARGETS helics_recorder
       DESTINATION ${CMAKE_INSTALL_BINDIR}
@@ -76,7 +79,8 @@ if(BUILD_APP_LIBRARY)
     )
 
     add_executable(helics_broker helics-broker.cpp)
-    target_link_libraries(helics_broker helics_apps)
+    target_link_libraries(helics_broker PUBLIC helics_apps)
+	target_link_libraries(helics_broker PRIVATE compile_flags_target)
     set_target_properties(helics_broker PROPERTIES FOLDER apps)
     set(
       HELICS_BROKER_LOC ${CMAKE_CURRENT_BINARY_DIR}
@@ -89,7 +93,8 @@ if(BUILD_APP_LIBRARY)
     )
 
     add_executable(helics_app appMain.cpp)
-    target_link_libraries(helics_app helics_apps)
+    target_link_libraries(helics_app PUBLIC helics_apps)
+	target_link_libraries(helics_app PRIVATE compile_flags_target)
     set_target_properties(helics_app PROPERTIES FOLDER apps)
     install(TARGETS helics_app DESTINATION ${CMAKE_INSTALL_BINDIR} COMPONENT applications)
 
@@ -125,6 +130,7 @@ add_executable(
   helics-config helicsConfigMain.cpp ${CMAKE_CURRENT_BINARY_DIR}/helicsConfigMain.h
 )
 
+target_link_libraries(helics-config PRIVATE compile_flags_target)
 target_include_directories(helics-config PRIVATE ${CMAKE_CURRENT_BINARY_DIR})
 set_target_properties(helics-config PROPERTIES FOLDER apps)
 

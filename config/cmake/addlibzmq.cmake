@@ -78,17 +78,12 @@ endif()
   if(ZMQ_USE_STATIC_LIBRARY)
   set_target_properties(libzmq-static
     PROPERTIES FOLDER "Extern")
-	if (MSVC)
-	  target_compile_options(libzmq-static PRIVATE "/w")
-	else()
+	if ( !MSVC)
 		target_compile_options(libzmq-static PRIVATE "-fPIC")
 	endif()
     else()
         set_target_properties(libzmq
     PROPERTIES FOLDER "Extern")
-	if (MSVC)
-	  target_compile_options(libzmq PRIVATE "/w")
-	endif()
     endif()
 
 # move a bunch of local variables and options to advanced
