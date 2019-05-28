@@ -153,6 +153,7 @@ jobs:
         - SKIP_TEST_RUN=true
         - USE_CMAKE_VERSION=3.11.4
         - ZMQ_SUBPROJECT=true
+        - ZMQ_FORCE_SUBPROJECT=true
 
     # ------------------------------------------------
     # Jobs for daily valgrind and code coverage tests
