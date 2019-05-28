@@ -104,7 +104,7 @@ jobs:
         - CXX_STANDARD=17
 
     - <<: *linux_base
-      name: "GCC 4.9 (No SWIG)"
+      name: "GCC 4.9 (No SWIG, ZMQ Subproject)"
       if: (branch = develop AND type IN (pull_request, cron)) OR (branch != develop)
       addons:
         apt:
@@ -112,6 +112,7 @@ jobs:
             - ubuntu-toolchain-r-test
           packages:
             - g++-4.9
+            - libzmq3-dev
       env:
         - MATRIX_EVAL="COMPILER=gcc && CC=gcc-4.9 && CXX=g++-4.9"
         - USE_SWIG=false
@@ -133,12 +134,25 @@ jobs:
             - llvm-toolchain-precise-3.6
           packages:
             - clang-3.6
+            - libzmq3-dev
       env:
         - MATRIX_EVAL="COMPILER=clang && CC='clang-3.6' && CXX='clang++-3.6'"
         - CCACHE_CPP2=yes
         - USE_SWIG=true
         - CI_BOOST_VERSION=1.58.0
         - SKIP_TEST_RUN=true
+
+   # -----------------------------------------------
+   # Daily ZMQ subproject build with new CMake
+   # -----------------------------------------------
+   - <<: *daily_linux
+     name: "GCC 6 (CMake 3.11.4, ZMQ Subproject)"
+     env:
+       - MATRIX_EVAL="COMPILER=gcc && CC=gcc-6 && CXX=g++-6"
+       - USE_SWIG=true
+       - SKIP_TEST_RUN=true
+       - USE_CMAKE_VERSION=3.11.4
+       - ZMQ_SUBPROJECT=true
 
    # ------------------------------------------------
    # Jobs for daily valgrind and code coverage tests

@@ -35,7 +35,10 @@ if [[ -z "$CI_BOOST_VERSION" ]]; then
 fi
 boost_install_path=${CI_DEPENDENCY_DIR}/boost
 
-cmake_version=3.4.3
+cmake_version=${USE_CMAKE_VERSION}
+if [[ -z "$USE_CMAKE_VERSION" ]]; then
+    cmake_version=3.4.3
+fi
 cmake_install_path=${CI_DEPENDENCY_DIR}/cmake
 
 if [[ "$USE_MPI" ]]; then
