@@ -311,6 +311,10 @@ endif()
 if(NOT EXISTS "${PROJECT_SOURCE_DIR}/ThirdParty/jsoncpp/CMakeLists.txt")
 	submod_update(ThirdParty/jsoncpp)
 endif()
+
+if(NOT EXISTS "${PROJECT_SOURCE_DIR}/ThirdParty/containers/containers/BlockingQueue.hpp")
+	submod_update(ThirdParty/containers)
+endif()
 # -------------------------------------------------------------
 # BOOST  find the boost libraries
 # -------------------------------------------------------------
