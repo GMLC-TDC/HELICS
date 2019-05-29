@@ -9,7 +9,6 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "../common/GuardedTypes.hpp"
 #include "../core/Core.hpp"
 #include "Inputs.hpp"
-//#include "containers/MappedVector.hpp"
 #include "Publications.hpp"
 #include "containers/DualMappedVector.hpp"
 
