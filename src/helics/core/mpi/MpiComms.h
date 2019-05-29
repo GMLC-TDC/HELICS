@@ -7,8 +7,8 @@ SPDX-License-Identifier: BSD-3-Clause
 */
 #pragma once
 
-#include "../../common/BlockingQueue.hpp"
 #include "../CommsInterface.hpp"
+#include "containers/BlockingQueue.hpp"
 #include "helics/helics-config.h"
 #include <atomic>
 #include <future>
