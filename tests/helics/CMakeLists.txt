@@ -17,9 +17,9 @@ target_link_libraries(helics_google_test_base INTERFACE gtest gtest_main gmock)
 target_link_libraries(helics_google_test_base INTERFACE helics_base_includes)
 
 add_subdirectory(core)
+add_subdirectory(common)
 
 if (BUILD_BOOST_TESTS)
-add_subdirectory(common)
 
 add_subdirectory(application_api)
 add_subdirectory(system_tests)
