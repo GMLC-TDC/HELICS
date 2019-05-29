@@ -186,10 +186,6 @@ endif(UNIX)
 # -------------------------------------------------------------
 # Check and set latest CXX Standard supported by compiler
 # -------------------------------------------------------------
-option(ENABLE_CXX_17 "set to ON to enable C++17 compilation features" OFF)
 include(CheckLatestCXXStandardOption)
-if(NOT VERSION_OPTION)
-    set(CMAKE_CXX_STANDARD 14)
-endif()
 
 mark_as_advanced(USE_BOOST_STATIC_LIBS)

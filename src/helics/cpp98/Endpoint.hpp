@@ -10,6 +10,8 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include "../shared_api_library/MessageFederate.h"
 #include "helicsExceptions.hpp"
+#include <vector>
+#include <string>
 
 namespace helicscpp
 {

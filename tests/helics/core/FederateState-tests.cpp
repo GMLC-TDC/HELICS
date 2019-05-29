@@ -41,12 +41,12 @@ TEST_F (federateStateTests, constructor_test)
     EXPECT_EQ (fs->getOptionFlag (helics::defs::flags::source_only), false);
 
     // Check other default state values
-    EXPECT_EQ (fs->getQueueSize (), 0);
-    EXPECT_EQ (fs->getEvents ().size (), 0);
+    EXPECT_EQ (fs->getQueueSize (), 0u);
+    EXPECT_EQ (fs->getEvents ().size (), 0u);
 
     // EXPECT_EQ(fs->message_queue.size(), 0);
     // EXPECT_EQ(fs->dependencies.size(), 0);
-    EXPECT_EQ (fs->getDependents ().size (), 0);
+    EXPECT_EQ (fs->getDependents ().size (), 0u);
     EXPECT_TRUE (fs->local_id == helics::local_federate_id{});
     EXPECT_TRUE (fs->global_id.load () == helics::global_federate_id{});
     EXPECT_EQ (fs->init_requested, false);

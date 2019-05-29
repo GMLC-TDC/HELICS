@@ -1,7 +1,7 @@
 #
 # Copyright © 2017-2019, Battelle Memorial Institute; Lawrence Livermore National
-# Security, LLC; Alliance for Sustainable Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved. 
-# 
+# Security, LLC; Alliance for Sustainable Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
+#
 # SPDX-License-Identifier: BSD-3-Clause
 #
 
@@ -37,6 +37,14 @@ if(BUILD_SHARED_LIBS)
 
   add_library(HELICS::helics-shared ALIAS helics-shared)
   target_link_libraries(helics-shared PRIVATE helics_base helics_base_includes jsoncpp_lib)
+  target_include_directories(helics-shared
+    INTERFACE
+      $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/src>
+      $<BUILD_INTERFACE:${AUTOBUILD_INSTALL_PATH}/include>
+      $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/ThirdParty>
+      $<INSTALL_INTERFACE:$<INSTALL_PREFIX>/include>
+  )
+
 
   if(WIN32)
     set_target_properties(helics-shared PROPERTIES WINDOWS_EXPORT_ALL_SYMBOLS TRUE)
@@ -80,7 +88,9 @@ if(BUILD_SHARED_LIBS)
 
 endif(BUILD_SHARED_LIBS)
 
-add_subdirectory(apps)
+if (BUILD_APP_LIBRARY)
+	add_subdirectory(apps)
+endif(BUILD_APP_LIBRARY)
 
 if(BUILD_C_SHARED_LIB OR INTERFACE_BUILD)
   add_subdirectory(shared_api_library)

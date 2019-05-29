@@ -108,7 +108,7 @@ TEST (TcpCore_tests, tcpComms_broker_test_transmit)
         }
         EXPECT_EQ (counter, 1);
 
-        EXPECT_GT (len, 32);
+        EXPECT_GT (len, 32u);
         helics::ActionMessage rM (data.data (), len);
         EXPECT_TRUE (rM.action () == helics::action_message_def::action_t::cmd_ignore);
     }
@@ -459,7 +459,7 @@ TEST (TcpCore_tests, tcpCore_initialization_test)
         }
         EXPECT_EQ (counter, 1);
 
-        EXPECT_GT (len, 32);
+        EXPECT_GT (len, 32u);
         helics::ActionMessage rM (data.data (), len);
 
         EXPECT_EQ (rM.name, "core1");

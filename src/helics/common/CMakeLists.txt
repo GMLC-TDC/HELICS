@@ -44,8 +44,8 @@ set(
   zmq_headers
   zmqContextManager.h
   zmqHelper.h
-  ${CMAKE_SOURCE_DIR}/ThirdParty/cppzmq/zmq.hpp
-  ${CMAKE_SOURCE_DIR}/ThirdParty/cppzmq/zmq_addon.hpp
+  ${HELICS_SOURCE_DIR}/ThirdParty/cppzmq/zmq.hpp
+  ${HELICS_SOURCE_DIR}/ThirdParty/cppzmq/zmq_addon.hpp
 )
 
 set(

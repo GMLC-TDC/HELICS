@@ -63,7 +63,7 @@ TEST (data_block_tests, data_block_constructor_tests)
     // build from a vector
     std::vector<char> cvector (23, 'd');
     data_block db7 (cvector);
-    EXPECT_EQ (db7.size (), 23);
+    EXPECT_EQ (db7.size (), 23u);
     EXPECT_EQ (db7[17], 'd');
 
     std::vector<double> dvector (10, 0.07);
@@ -92,8 +92,8 @@ TEST (data_block_tests, data_block_assignment_tests)
     data_block db5 (10, 'e');
     // test move constructor
     db5 = std::move (db4);
-    EXPECT_EQ (db5.size (), 400);
-    EXPECT_NE (db4.size (), 400);
+    EXPECT_EQ (db5.size (), 400u);
+    EXPECT_NE (db4.size (), 400u);
 }
 
 TEST (data_block_tests, data_block_range_for_ops)
@@ -133,6 +133,6 @@ TEST (data_block_tests, data_block_swap)
     data_block test2 (100, 45);
 
     std::swap (test1, test2);
-    EXPECT_EQ (test1.size (), 100);
-    EXPECT_EQ (test2.size (), 300);
+    EXPECT_EQ (test1.size (), 100u);
+    EXPECT_EQ (test2.size (), 300u);
 }

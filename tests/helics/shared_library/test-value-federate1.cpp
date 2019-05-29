@@ -829,7 +829,7 @@ BOOST_DATA_TEST_CASE (value_federate_single_transfer_publisher, bdata::make (cor
     // make sure the value is still what we expect
     CE (helicsInputGetString (subid, s, STRINGLEN, &len, &err));
     BOOST_CHECK_EQUAL (s, "string1");
-    BOOST_CHECK_EQUAL (len - 1, strlen ("string1"));
+    BOOST_CHECK_EQUAL (len - 1, static_cast<int> (strlen ("string1")));
 
     // advance time
     CE (gtime = helicsFederateRequestTime (vFed, 2.0, &err));

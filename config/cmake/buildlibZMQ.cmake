@@ -30,7 +30,7 @@ function(build_libzmq)
         set(LOCAL_BUILD_TYPE "Release")
     endif()
 
-    set(trigger_build_dir ${CMAKE_BINARY_DIR}/autobuild/force_libzmq)
+    set(trigger_build_dir ${PROJECT_BINARY_DIR}/autobuild/force_libzmq)
 
     include(escape_string)
 

@@ -1,11 +1,11 @@
 #
 # Copyright © 2017-2019, Battelle Memorial Institute; Lawrence Livermore National
-# Security, LLC; Alliance for Sustainable Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved. 
-# 
+# Security, LLC; Alliance for Sustainable Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
+#
 # SPDX-License-Identifier: BSD-3-Clause
 #
 
-if(BUILD_APPS)
+if(BUILD_APP_LIBRARY)
 
   set(
     helics_apps_public_headers
@@ -47,67 +47,68 @@ if(BUILD_APPS)
   target_link_libraries(helics_apps PUBLIC helics-static)
   target_include_directories(
     helics_apps SYSTEM
-    PRIVATE $<TARGET_PROPERTY:fmt-header-only,INTERFACE_INCLUDE_DIRECTORIES>
+    PRIVATE $<TARGET_PROPERTY:fmt::fmt-header-only,INTERFACE_INCLUDE_DIRECTORIES>
   )
   target_compile_definitions(
     helics_apps PRIVATE
-    $<TARGET_PROPERTY:fmt-header-only,INTERFACE_COMPILE_DEFINITIONS>
+    $<TARGET_PROPERTY:fmt::fmt-header-only,INTERFACE_COMPILE_DEFINITIONS>
   )
   # add and alias library to match the find_package
   add_library(HELICS::helics_apps ALIAS helics_apps)
 
-  add_executable(helics_player playerMain.cpp)
-  target_link_libraries(helics_player helics_apps)
-  set_target_properties(helics_player PROPERTIES FOLDER apps)
-  install(
-    TARGETS helics_player
-    DESTINATION ${CMAKE_INSTALL_BINDIR}
-    COMPONENT applications
-  )
+  if (BUILD_APP_EXECUTABLES)
+    add_executable(helics_player playerMain.cpp)
+    target_link_libraries(helics_player helics_apps)
+    set_target_properties(helics_player PROPERTIES FOLDER apps)
+    install(
+      TARGETS helics_player
+      DESTINATION ${CMAKE_INSTALL_BINDIR}
+      COMPONENT applications
+    )
 
-  add_executable(helics_recorder recorderMain.cpp)
-  target_link_libraries(helics_recorder helics_apps)
-  set_target_properties(helics_recorder PROPERTIES FOLDER apps)
-  install(
-    TARGETS helics_recorder
-    DESTINATION ${CMAKE_INSTALL_BINDIR}
-    COMPONENT applications
-  )
+    add_executable(helics_recorder recorderMain.cpp)
+    target_link_libraries(helics_recorder helics_apps)
+    set_target_properties(helics_recorder PROPERTIES FOLDER apps)
+    install(
+      TARGETS helics_recorder
+      DESTINATION ${CMAKE_INSTALL_BINDIR}
+      COMPONENT applications
+    )
 
-  add_executable(helics_broker helics-broker.cpp)
-  target_link_libraries(helics_broker helics_apps)
-  set_target_properties(helics_broker PROPERTIES FOLDER apps)
-  set(
-    HELICS_BROKER_LOC ${CMAKE_CURRENT_BINARY_DIR}
-    CACHE INTERNAL "build folder location of the broker"
-  )
-  install(
-    TARGETS helics_broker
-    DESTINATION ${CMAKE_INSTALL_BINDIR}
-    COMPONENT applications
-  )
+    add_executable(helics_broker helics-broker.cpp)
+    target_link_libraries(helics_broker helics_apps)
+    set_target_properties(helics_broker PROPERTIES FOLDER apps)
+    set(
+      HELICS_BROKER_LOC ${CMAKE_CURRENT_BINARY_DIR}
+      CACHE INTERNAL "build folder location of the broker"
+    )
+    install(
+      TARGETS helics_broker
+      DESTINATION ${CMAKE_INSTALL_BINDIR}
+      COMPONENT applications
+    )
 
-  add_executable(helics_app appMain.cpp)
-  target_link_libraries(helics_app helics_apps)
-  set_target_properties(helics_app PROPERTIES FOLDER apps)
-  install(TARGETS helics_app DESTINATION ${CMAKE_INSTALL_BINDIR} COMPONENT applications)
+    add_executable(helics_app appMain.cpp)
+    target_link_libraries(helics_app helics_apps)
+    set_target_properties(helics_app PROPERTIES FOLDER apps)
+    install(TARGETS helics_app DESTINATION ${CMAKE_INSTALL_BINDIR} COMPONENT applications)
 
-  if(WIN32)
-    foreach(keyfile IN LISTS KEY_LIBRARY_FILES)
-      add_custom_command(
-        TARGET
-        helics_app
-        POST_BUILD # Adds a post-build event to core tests
-        COMMAND
-          ${CMAKE_COMMAND}
-          -E
-          copy_if_different # which executes "cmake - E copy_if_different..."
-          "${keyfile}" # <--this is in-file
-          "$<TARGET_FILE_DIR:helics_app>/"
-      ) # <--this is out-file path
-    endforeach(keyfile)
-
-  endif()
+    if(WIN32)
+      foreach(keyfile IN LISTS KEY_LIBRARY_FILES)
+        add_custom_command(
+          TARGET
+          helics_app
+          POST_BUILD # Adds a post-build event to core tests
+          COMMAND
+            ${CMAKE_COMMAND}
+            -E
+            copy_if_different # which executes "cmake - E copy_if_different..."
+            "${keyfile}" # <--this is in-file
+            "$<TARGET_FILE_DIR:helics_app>/"
+        ) # <--this is out-file path
+      endforeach(keyfile)
+    endif(WIN32)
+  endif(BUILD_APP_EXECUTABLES)
 
   install(
     TARGETS helics_apps
@@ -127,10 +128,11 @@ if(BUILD_APPS)
     COMPONENT headers
   )
 
-endif() # if build any app
+endif (BUILD_APP_LIBRARY)
 
 # configure executable app
 
+IF (BUILD_APP_EXECUTABLES)
 configure_file(helicsConfigMain.h.in ${CMAKE_CURRENT_BINARY_DIR}/helicsConfigMain.h)
 add_executable(
   helics-config helicsConfigMain.cpp ${CMAKE_CURRENT_BINARY_DIR}/helicsConfigMain.h
@@ -145,3 +147,5 @@ install(
   TARGETS helics-config
   RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR} COMPONENT libs
 )
+
+endif(BUILD_APP_EXECUTABLES)

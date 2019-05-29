@@ -54,7 +54,7 @@ TEST (ZMQCore_tests, zmqComms_broker_test)
 
     repSocket.recv (&rxmsg);
 
-    EXPECT_GT (rxmsg.size (), 32);
+    EXPECT_GT (rxmsg.size (), 32u);
 
     helics::ActionMessage rM (static_cast<char *> (rxmsg.data ()), rxmsg.size ());
     EXPECT_TRUE (helics::isProtocolCommand (rM));
@@ -284,7 +284,7 @@ TEST (ZMQCore_tests, zmqComms_broker_test_transmit)
 
     pullSocket.recv (&rxmsg);
 
-    EXPECT_GT (rxmsg.size (), 32);
+    EXPECT_GT (rxmsg.size (), 32u);
     helics::ActionMessage rM (static_cast<char *> (rxmsg.data ()), rxmsg.size ());
     EXPECT_TRUE (rM.action () == helics::action_message_def::action_t::cmd_ignore);
     comm.disconnect ();
@@ -579,7 +579,7 @@ TEST (ZMQCore_tests, zmqCore_initialization_test)
 
     pullSocket.recv (&rxmsg);
 
-    EXPECT_GT (rxmsg.size (), 32);
+    EXPECT_GT (rxmsg.size (), 32u);
     helics::ActionMessage rM (static_cast<char *> (rxmsg.data ()), rxmsg.size ());
 
     EXPECT_EQ (rM.name, "core1");

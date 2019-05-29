@@ -93,6 +93,7 @@ set(
   helicsVersion.hpp
   federate_id.hpp
   helics_definitions.hpp
+  helicsCLI11.hpp
 )
 
 set(
@@ -106,7 +107,6 @@ set(
 	CommsBroker_impl.hpp
 	TimeoutMonitor.h
 	CoreBroker.hpp
-	helicsCLI11.hpp
 	InterfaceInfo.hpp
 	ActionMessageDefintions.hpp
 	ActionMessage.hpp
@@ -227,10 +227,10 @@ endif()
 
 target_include_directories(
   helics_core SYSTEM
-  PRIVATE $<TARGET_PROPERTY:fmt-header-only,INTERFACE_INCLUDE_DIRECTORIES>
+  PRIVATE $<TARGET_PROPERTY:fmt::fmt-header-only,INTERFACE_INCLUDE_DIRECTORIES>
 )
 target_compile_definitions(
-  helics_core PRIVATE $<TARGET_PROPERTY:fmt-header-only,INTERFACE_COMPILE_DEFINITIONS>
+  helics_core PRIVATE $<TARGET_PROPERTY:fmt::fmt-header-only,INTERFACE_COMPILE_DEFINITIONS>
 )
 
 if(ENABLE_MPI_CORE)

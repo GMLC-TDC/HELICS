@@ -78,18 +78,9 @@ if [[ "$RUN_CACHEGRIND" ]]; then
     TEST_FLAGS_ARR+=("--cachegrind")
 fi
 
-# Sanitizer tests
-if [[ "$RUN_ASAN" ]]; then
-    TEST_FLAGS_ARR+=("--asan")
-fi
-if [[ "$RUN_MSAN" ]]; then
-    TEST_FLAGS_ARR+=("--msan")
-fi
-if [[ "$RUN_TSAN" ]]; then
-    TEST_FLAGS_ARR+=("--tsan")
-fi
-if [[ "$RUN_UBSAN" ]]; then
-    TEST_FLAGS_ARR+=("--ubsan")
+# Sanitizer tests (supported: asan, msan, tsan, ubsan)
+if [[ "$RUN_SANITIZER" ]]; then
+    TEST_FLAGS_ARR+=("--${RUN_SANITIZER}")
 fi
 
 # Misc options
