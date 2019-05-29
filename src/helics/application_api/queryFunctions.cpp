@@ -10,8 +10,6 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "Federate.hpp"
 #include <thread>
 
-#include "json/json.h"
-
 #include <boost/algorithm/string.hpp>
 
 std::vector<std::string> vectorizeQueryResult (std::string &&queryres)
