@@ -65,7 +65,7 @@ ValueFederateManager::registerInput (const std::string &key, const std::string &
 {
     auto coreID = coreObject->registerInput (fedID, key, type, units);
     auto inpHandle = inputs.lock ();
-	decltype(inpHandle->insert) active;
+	decltype(inpHandle->insert(key, coreID, fed, coreID, key)) active;
     if (!key.empty ())
     {
         active = inpHandle->insert (key, coreID, fed, coreID, key);

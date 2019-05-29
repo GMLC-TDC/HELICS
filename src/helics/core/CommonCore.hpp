@@ -9,7 +9,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "ActionMessage.hpp"
 #include "BrokerBase.hpp"
 #include "Core.hpp"
-#include "containers/SimpleQueue.hpp"
+
 #include "helics-time.hpp"
 #include "helics/helics-config.h"
 
@@ -17,10 +17,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "../common/GuardedTypes.hpp"
 #include "../common/TriggerVariable.hpp"
 #include "HandleManager.hpp"
-#include "containers/AirLock.hpp"
-#include "containers/DualMappedPointerVector.hpp"
-#include "containers/DualMappedVector.hpp"
-#include "containers/MappedPointerVector.hpp"
+
 #include "helics_includes/any.hpp"
 #include <array>
 #include <atomic>
@@ -28,6 +25,13 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <set>
 #include <thread>
 #include <utility>
+
+#include "containers/AirLock.hpp"
+#include "containers/SimpleQueue.hpp"
+
+#include "containers/DualMappedPointerVector.hpp"
+#include "containers/MappedPointerVector.hpp"
+#include "containers/DualMappedVector.hpp"
 
 namespace helics
 {
@@ -53,6 +57,7 @@ class FedInfo
     const FederateState *operator-> () const { return fed; }
     operator bool () const { return (fed != nullptr); }
 };
+
 
 /** base class implementing a standard interaction strategy between federates
 @details the CommonCore is virtual class that manages local federates and handles most of the
