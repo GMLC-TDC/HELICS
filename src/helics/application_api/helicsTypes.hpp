@@ -120,15 +120,15 @@ class NamedPoint
     double value = std::numeric_limits<double>::quiet_NaN ();  //!< the data value for the named point
     NamedPoint () = default;
     NamedPoint (std::string valname, double valval) : name (std::move (valname)), value (valval) {}
-    bool operator== (const NamedPoint &opt) const
+    bool operator== (const NamedPoint &np) const
     {
-        return ((std::isnan (value)) && (std::isnan (opt.value))) ? (name == opt.name) :
-                                                                    ((value == opt.value) && (name == opt.name));
+        return ((std::isnan (value)) && (std::isnan (np.value))) ? (name == np.name) :
+                                                                    ((value == np.value) && (name == np.name));
     }
-    bool operator!= (const NamedPoint &opt) const { return !operator== (opt); }
-    bool operator< (const NamedPoint &opt) const
+    bool operator!= (const NamedPoint &np) const { return !operator== (np); }
+    bool operator< (const NamedPoint &np) const
     {
-        return (name == opt.name) ? (name < opt.name) : (value < opt.value);
+        return (name == np.name) ? (name <np.name) : (value < np.value);
     }
 };
 
