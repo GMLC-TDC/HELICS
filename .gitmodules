@@ -12,3 +12,7 @@
 	path = ThirdParty/googletest
 	url = ../../google/googletest.git
 	branch = master
+[submodule "ThirdParty/containers"]
+	path = ThirdParty/containers
+	url = https://github.com/GMLC-TDC/containers.git
+	branch = master

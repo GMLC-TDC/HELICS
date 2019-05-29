@@ -11,8 +11,8 @@ virtual base class for object that function like a broker includes common parame
 and some common methods used cores and brokers
 */
 
-#include "../common/BlockingPriorityQueue.hpp"
 #include "ActionMessage.hpp"
+#include "containers/BlockingPriorityQueue.hpp"
 #include "federate_id.hpp"
 #include <atomic>
 #include <memory>
@@ -50,7 +50,7 @@ class BrokerBase
       loggingObj;  //!< default logging object to use if the logging callback is not specified
     std::thread queueProcessingThread;  //!< thread for running the broker
     /** a logging function for logging or printing messages*/
-    std::function<void (int, const std::string &, const std::string &)> loggerFunction;
+    std::function<void(int, const std::string &, const std::string &)> loggerFunction;
 
     std::atomic<bool> haltOperations{false};  //!< flag indicating that no further message should be processed
   private:
@@ -62,7 +62,7 @@ class BrokerBase
   protected:
     std::string logFile;  //!< the file to log message to
     std::unique_ptr<ForwardingTimeCoordinator> timeCoord;  //!< object managing the time control
-    BlockingPriorityQueue<ActionMessage> actionQueue;  //!< primary routing queue
+    gmlc::containers::BlockingPriorityQueue<ActionMessage> actionQueue;  //!< primary routing queue
     /** enumeration of the possible core states*/
     enum broker_state_t : int16_t
     {
@@ -109,7 +109,7 @@ class BrokerBase
     std::string &message) the function takes a level indicating the logging level string with the source name and a
     string with the message
     */
-    void setLoggerFunction (std::function<void (int, const std::string &, const std::string &)> logFunction);
+    void setLoggerFunction (std::function<void(int, const std::string &, const std::string &)> logFunction);
 
     /** check if the main processing loop of a broker is running*/
     bool isRunning () const { return mainLoopIsRunning.load (); }

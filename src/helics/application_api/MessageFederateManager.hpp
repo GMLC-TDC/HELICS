@@ -6,11 +6,11 @@ SPDX-License-Identifier: BSD-3-Clause
 */
 #pragma once
 
-#include "../common/DualMappedVector.hpp"
 #include "../common/GuardedTypes.hpp"
-#include "../common/simpleQueue.hpp"
 #include "../core/Core.hpp"
 #include "Endpoints.hpp"
+#include "containers/DualMappedVector.hpp"
+#include "containers/SimpleQueue.hpp"
 #include "data_view.hpp"
 #include <cstdint>
 #include <deque>
@@ -130,10 +130,11 @@ class MessageFederateManager
     class EndpointData
     {
       public:
-        SimpleQueue<std::unique_ptr<Message>> messages;
+        gmlc::containers::SimpleQueue<std::unique_ptr<Message>> messages;
         std::function<void(Endpoint &, Time)> callback;
     };
-    shared_guarded<DualMappedVector<Endpoint, std::string, interface_handle, reference_stability::stable>>
+    shared_guarded<
+      gmlc::containers::DualMappedVector<Endpoint, std::string, interface_handle, reference_stability::stable>>
       local_endpoints;  //!< storage for the local endpoint information
     atomic_guarded<std::function<void(Endpoint &, Time)>> allCallback;
     Time CurrentTime = Time::minVal ();  //!< the current simulation time
