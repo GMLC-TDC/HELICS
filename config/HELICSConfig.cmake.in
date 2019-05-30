@@ -21,7 +21,7 @@ if(HELICS_PREFIX_DIR STREQUAL "/")
   set(HELICS_PREFIX_DIR "")
 endif()
 
-message(status 
+message(status "HELICS PREFIX DIR = ${HELICS_PREFIX_DIR} ||")
 
 
 set(PN HELICS)
