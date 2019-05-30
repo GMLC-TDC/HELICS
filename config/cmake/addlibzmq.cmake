@@ -145,6 +145,7 @@ install(FILES ${NEW_ZMQ_PUBLIC_HEADERS}
 endif()
 
 if(NOT CMAKE_VERSION VERSION_LESS 3.13)
+message(STATUS "installing ${zmq_target_output} as HELICS EXPORT")
 install(TARGETS ${zmq_target_output}
     EXPORT helics-targets
     ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
