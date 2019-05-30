@@ -568,8 +568,8 @@ if(BUILD_HELICS_EXAMPLES)
     add_subdirectory(examples)
 endif(BUILD_HELICS_EXAMPLES)
 
-if(ENABLE_ZMQ_CORE)
-    if(WIN32 AND NOT MSYS)
+if(ENABLE_ZMQ_CORE AND NOT ZMQ_USE_STATIC_LIBRARY)
+    if(WIN32)
         install(
             FILES $<TARGET_LINKER_FILE:libzmq>
             DESTINATION ${CMAKE_INSTALL_LIBDIR}
