@@ -746,6 +746,14 @@ option(
 )
 
 if(ENABLE_PACKAGE_BUILD)
+
+	if(CMAKE_VERSION VERSION_LESS 3.13)
+		if (ZMQ_SUBPROJECT OR ZMQ_FORCE_SUBPROJECT)
+			if (ENABLE_ZMQ_CORE)
+				message(FATAL_ERROR "CMAKE 3.13 or higher is required to package a subproject of ZeroMQ with HELICS")
+			endif()
+		endif()
+	endif()
     set(CPACK_PACKAGE_NAME "Helics")
     set(CPACK_PACKAGE_VENDOR "GMLC")
     set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "HELICS")

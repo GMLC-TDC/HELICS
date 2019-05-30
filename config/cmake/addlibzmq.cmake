@@ -134,10 +134,14 @@ foreach( SOURCE_FILE ${ZMQ_PUBLIC_HEADER_TARGETS} )
   ENDFOREACH()
 set_target_properties(${zmq_target_output} PROPERTIES PUBLIC_HEADER "${NEW_ZMQ_PUBLIC_HEADERS}")
 
-get_target_property(ZMQ_PUBLIC_HEADER_TARGETS2 ${zmq_target_output} PUBLIC_HEADER)
+#get_target_property(ZMQ_PUBLIC_HEADER_TARGETS2 ${zmq_target_output} PUBLIC_HEADER)
 
-message(STATUS "NEW ZMQ PUBLIC HEADERS: ${ZMQ_PUBLIC_HEADER_TARGETS2}")
+#message(STATUS "NEW ZMQ PUBLIC HEADERS: ${ZMQ_PUBLIC_HEADER_TARGETS2}")
 
+install(FILES ${NEW_ZMQ_PUBLIC_HEADERS} 
+    DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+    COMPONENT headers
+	)
 endif()
 
 if(NOT CMAKE_VERSION VERSION_LESS 3.13)
@@ -149,12 +153,17 @@ install(TARGETS ${zmq_target_output}
     PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
     COMPONENT libs)
 	
-	#TODO will have to do something about this for older versions
 endif()
 
 install(
     FILES $<TARGET_FILE:${zmq_target_output}>
     DESTINATION ${CMAKE_INSTALL_BINDIR}
+    COMPONENT libs
+  )
+  
+  install(
+    FILES $<TARGET_LINKER_FILE:${zmq_target_output}>
+    DESTINATION ${CMAKE_INSTALL_LIBDIR}
     COMPONENT libs
   )
   

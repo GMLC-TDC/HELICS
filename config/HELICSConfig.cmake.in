@@ -63,8 +63,6 @@ if (@ENABLE_ZMQ_CORE@)
             unset(ZeroMQ_LIBRARY_PATH)
             find_dependency(ZeroMQ)
         endif()
-	else()
-#	    include(${CMAKE_CURRENT_LIST_DIR}/local_zmq_targets.cmake)
 	endif()
 endif()
 
@@ -84,6 +82,12 @@ if (NOT TARGET Threads::Threads)
 endif()
 
 include(${CMAKE_CURRENT_LIST_DIR}/helics-targets.cmake)
+
+if (NOT TARGET libzmq AND NOT TARGET helics::libzmq)
+	if (EXISTS ${PACKAGE_PREFIX_DIR}/@CMAKE_INSTALL_LIBDIR@/cmake/ZeroMQ/ZeroMQConfig.cmake)
+		include(${PACKAGE_PREFIX_DIR}/@CMAKE_INSTALL_LIBDIR@/cmake/ZeroMQ/ZeroMQConfig.cmake)
+	endif()
+endif()
 
 check_required_components(${PN})
 
