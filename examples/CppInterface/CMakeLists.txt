@@ -36,5 +36,5 @@ if(BUILD_HELICS_TESTS AND NOT MSVC)
   set_property(TEST nonlings_example PROPERTY LABELS Continuous)
 endif()
 
-  copy_key_files_to_target_location(shared-library-tests)
- copy_shared_target(shared-library-tests)
+  copy_key_files_to_target_location(nonlings_fed1_cpp)
+ copy_shared_target(nonlings_fed1_cpp)
