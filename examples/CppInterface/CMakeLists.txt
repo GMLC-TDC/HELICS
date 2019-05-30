@@ -11,8 +11,8 @@ include_directories("${PROJECT_SOURCE_DIR}/src/helics/cpp98")
 add_executable(nonlings_fed1_cpp nonlings_fed1.cpp)
 add_executable(nonlings_fed2_cpp nonlings_fed2.cpp)
 
-target_link_libraries(nonlings_fed1_cpp helicsCpp98)
-target_link_libraries(nonlings_fed2_cpp helicsCpp98)
+target_link_libraries(nonlings_fed1_cpp PUBLIC helicsCpp98)
+target_link_libraries(nonlings_fed2_cpp PUBLIC helicsCpp98)
 target_link_libraries(nonlings_fed1_cpp PRIVATE compile_flags_target)
 target_link_libraries(nonlings_fed2_cpp PRIVATE compile_flags_target)
  
