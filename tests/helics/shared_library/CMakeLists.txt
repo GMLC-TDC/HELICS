@@ -120,9 +120,6 @@ add_test(
 set_property(TEST shared-library-ci-tests PROPERTY LABELS Continuous)
 set_property(TEST shared-library-ci-tests-cpp PROPERTY LABELS Continuous)
 
-if(WIN32)
-
   copy_key_files_to_target_location(shared-library-tests)
  copy_shared_target(shared-library-tests)
 
-endif(WIN32)
