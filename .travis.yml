@@ -104,7 +104,7 @@ jobs:
         - CXX_STANDARD=17
 
     - <<: *linux_base
-      name: "GCC 4.9 (No SWIG, ZMQ Subproject)"
+      name: "GCC 4.9 (No SWIG, Packaging)"
       if: (branch = develop AND type IN (pull_request, cron)) OR (branch != develop)
       addons:
         apt:
@@ -118,7 +118,6 @@ jobs:
         - USE_SWIG=false
         - CI_BOOST_VERSION=1.61.0
         - ENABLE_CPACK=true		
-        - ZMQ_SUBPROJECT=true
         - INSTALL_SYSTEM_LIBRARIES=true
         - TEST_TYPE=Packaging
       after_script: ${TRAVIS_BUILD_DIR}/scripts/upload-ci-artifact.sh
@@ -199,6 +198,8 @@ jobs:
         - RUN_SANITIZER=tsan
         - USE_MPI=mpich
         - JOB_OPTION_FLAGS="-C../scripts/tsan-cache.cmake"
+        - ZMQ_SUBPROJECT=true
+        - ZMQ_FORCE_SUBPROJECT=true
     # UBSAN build
     - <<: *daily_linux
       name: "Clang 5 Undefined Behavior Sanitizer"
@@ -218,6 +219,8 @@ jobs:
         - RUN_SANITIZER=ubsan
         - USE_MPI=mpich
         - JOB_OPTION_FLAGS="-C../scripts/ubsan-cache.cmake"
+        - ZMQ_SUBPROJECT=true
+        - ZMQ_FORCE_SUBPROJECT=true
       
     - stage: trigger dependent repositories
       if: branch == develop

@@ -303,6 +303,10 @@ if(NOT EXISTS "${PROJECT_SOURCE_DIR}/ThirdParty/jsoncpp/CMakeLists.txt")
 	submod_update(ThirdParty/jsoncpp)
 endif()
 
+if(NOT EXISTS "${PROJECT_SOURCE_DIR}/ThirdParty/containers/containers/BlockingQueue.hpp")
+	submod_update(ThirdParty/containers)
+endif()
+
 include(GNUInstallDirs)
 
 # -------------------------------------------------------------
@@ -405,6 +409,7 @@ target_include_directories(
         $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/src>
         $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}/include>
         $<INSTALL_INTERFACE:$<INSTALL_PREFIX>/include>
+		$<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/ThirdParty/containers>
 )
 
 target_include_directories(
@@ -563,8 +568,8 @@ if(BUILD_HELICS_EXAMPLES)
     add_subdirectory(examples)
 endif(BUILD_HELICS_EXAMPLES)
 
-if(ENABLE_ZMQ_CORE)
-    if(WIN32 AND NOT MSYS)
+if(ENABLE_ZMQ_CORE AND NOT ZMQ_USE_STATIC_LIBRARY)
+    if(WIN32)
         install(
             FILES $<TARGET_LINKER_FILE:libzmq>
             DESTINATION ${CMAKE_INSTALL_LIBDIR}
@@ -741,6 +746,14 @@ option(
 )
 
 if(ENABLE_PACKAGE_BUILD)
+
+	if(CMAKE_VERSION VERSION_LESS 3.13)
+		if (ZMQ_SUBPROJECT OR ZMQ_FORCE_SUBPROJECT)
+			if (ENABLE_ZMQ_CORE)
+				message(FATAL_ERROR "CMAKE 3.13 or higher is required to package a subproject of ZeroMQ with HELICS")
+			endif()
+		endif()
+	endif()
     set(CPACK_PACKAGE_NAME "Helics")
     set(CPACK_PACKAGE_VENDOR "GMLC")
     set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "HELICS")

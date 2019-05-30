@@ -36,6 +36,10 @@ if(NOT ${lcName}_POPULATED)
   # Fetch the content using previously declared details
   FetchContent_Populate(libzmq)
 
+  # this section to be removed at the next release of ZMQ for now we need to download the file in master as the one in the release doesn't work
+	file(RENAME ${${lcName}_SOURCE_DIR}/builds/cmake/ZeroMQConfig.cmake.in ${${lcName}_SOURCE_DIR}/builds/cmake/ZeroMQConfig.cmake.in.old)
+  file(DOWNLOAD https://raw.githubusercontent.com/zeromq/libzmq/master/builds/cmake/ZeroMQConfig.cmake.in ${${lcName}_SOURCE_DIR}/builds/cmake/ZeroMQConfig.cmake.in)
+  
 endif()
 else() #cmake <3.11
 
@@ -52,7 +56,13 @@ git_clone(
 	   
 set(${lcName}_BINARY_DIR ${PROJECT_BINARY_DIR}/_deps/${lcName}-build)
 
+if (NOT EXISTS ${${lcName}_SOURCE_DIR}/builds/cmake/ZeroMQConfig.cmake.in.old)
+	file(RENAME ${${lcName}_SOURCE_DIR}/builds/cmake/ZeroMQConfig.cmake.in ${${lcName}_SOURCE_DIR}/builds/cmake/ZeroMQConfig.cmake.in.old)
+  file(DOWNLOAD https://raw.githubusercontent.com/zeromq/libzmq/master/builds/cmake/ZeroMQConfig.cmake.in ${${lcName}_SOURCE_DIR}/builds/cmake/ZeroMQConfig.cmake.in)
 endif()
+
+endif()
+
   # Set custom variables, policies, etc.
   # ...
 
@@ -124,10 +134,14 @@ foreach( SOURCE_FILE ${ZMQ_PUBLIC_HEADER_TARGETS} )
   ENDFOREACH()
 set_target_properties(${zmq_target_output} PROPERTIES PUBLIC_HEADER "${NEW_ZMQ_PUBLIC_HEADERS}")
 
-get_target_property(ZMQ_PUBLIC_HEADER_TARGETS2 ${zmq_target_output} PUBLIC_HEADER)
+#get_target_property(ZMQ_PUBLIC_HEADER_TARGETS2 ${zmq_target_output} PUBLIC_HEADER)
 
-message(STATUS "NEW ZMQ PUBLIC HEADERS: ${ZMQ_PUBLIC_HEADER_TARGETS2}")
+#message(STATUS "NEW ZMQ PUBLIC HEADERS: ${ZMQ_PUBLIC_HEADER_TARGETS2}")
 
+install(FILES ${NEW_ZMQ_PUBLIC_HEADERS} 
+    DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+    COMPONENT headers
+	)
 endif()
 
 if(NOT CMAKE_VERSION VERSION_LESS 3.13)
@@ -139,12 +153,17 @@ install(TARGETS ${zmq_target_output}
     PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
     COMPONENT libs)
 	
-	#TODO will have to do something about this for older versions
 endif()
 
 install(
     FILES $<TARGET_FILE:${zmq_target_output}>
     DESTINATION ${CMAKE_INSTALL_BINDIR}
+    COMPONENT libs
+  )
+  
+  install(
+    FILES $<TARGET_LINKER_FILE:${zmq_target_output}>
+    DESTINATION ${CMAKE_INSTALL_LIBDIR}
     COMPONENT libs
   )
   

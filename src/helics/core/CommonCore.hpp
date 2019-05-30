@@ -6,21 +6,22 @@ SPDX-License-Identifier: BSD-3-Clause
 */
 #pragma once
 
-#include "../common/simpleQueue.hpp"
 #include "ActionMessage.hpp"
 #include "BrokerBase.hpp"
 #include "Core.hpp"
+
+#include "../common/DelayedObjects.hpp"
+#include "../common/GuardedTypes.hpp"
+#include "../common/TriggerVariable.hpp"
+#include "HandleManager.hpp"
+#include "containers/AirLock.hpp"
+#include "containers/DualMappedPointerVector.hpp"
+#include "containers/DualMappedVector.hpp"
+#include "containers/MappedPointerVector.hpp"
+#include "containers/SimpleQueue.hpp"
 #include "helics-time.hpp"
 #include "helics/helics-config.h"
 
-#include "../common/AirLock.hpp"
-#include "../common/DelayedObjects.hpp"
-#include "../common/DualMappedPointerVector.hpp"
-#include "../common/DualMappedVector.hpp"
-#include "../common/GuardedTypes.hpp"
-#include "../common/MappedPointerVector.hpp"
-#include "../common/TriggerVariable.hpp"
-#include "HandleManager.hpp"
 #include "helics_includes/any.hpp"
 #include <array>
 #include <atomic>
@@ -178,7 +179,7 @@ class CommonCore : public Core, public BrokerBase
     virtual void setLoggingLevel (int logLevel) override;
     virtual void setLoggingCallback (
       local_federate_id federateID,
-      std::function<void (int, const std::string &, const std::string &)> logFunction) override final;
+      std::function<void(int, const std::string &, const std::string &)> logFunction) override final;
 
     virtual std::string query (const std::string &target, const std::string &queryStr) override;
     virtual void setQueryCallback (local_federate_id federateID,
@@ -265,7 +266,7 @@ class CommonCore : public Core, public BrokerBase
     std::string prevIdentifier;  //!< storage for the case of requiring a renaming
     std::map<global_federate_id, route_id>
       routing_table;  //!< map for external routes  <global federate id, route id>
-    SimpleQueue<ActionMessage>
+    gmlc::containers::SimpleQueue<ActionMessage>
       delayTransmitQueue;  //!< FIFO queue for transmissions to the root that need to be delays for a certain time
     std::unordered_map<std::string, route_id>
       knownExternalEndpoints;  //!< external map for all known external endpoints with names and route
@@ -322,9 +323,9 @@ class CommonCore : public Core, public BrokerBase
     int32_t _global_federation_size = 0;  //!< total size of the federation
     std::atomic<int16_t> delayInitCounter{
       0};  //!< counter for the number of times the entry to initialization Mode was explicitly delayed
-    shared_guarded<MappedPointerVector<FederateState, std::string>>
+    shared_guarded<gmlc::containers::MappedPointerVector<FederateState, std::string>>
       federates;  //!< threadsafe local federate information list for external functions
-    DualMappedVector<FedInfo, std::string, global_federate_id>
+    gmlc::containers::DualMappedVector<FedInfo, std::string, global_federate_id>
       loopFederates;  // federate pointers stored for the core loop
     std::atomic<int32_t> messageCounter{54};  //!< counter for the number of messages that have been sent, nothing
                                               //!< magical about 54 just a number bigger than 1 to prevent
@@ -344,11 +345,14 @@ class CommonCore : public Core, public BrokerBase
 
     std::map<interface_handle, std::unique_ptr<FilterCoordinator>> filterCoord;  //!< map of all local filters
     // The interface_handle used is here is usually referencing an endpoint
-    DualMappedPointerVector<FilterInfo, std::string,
-                            global_handle> filters;  //!< storage for all the filters
+    gmlc::containers::DualMappedPointerVector<FilterInfo,
+                                              std::string,
+                                              global_handle>
+      filters;  //!< storage for all the filters
 
     std::atomic<uint16_t> nextAirLock{0};  //!< the index of the next airlock to use
-    std::array<AirLock<stx::any>, 4> dataAirlocks;  //!< airlocks for updating filter operators and other functions
+    std::array<gmlc::containers::AirLock<stx::any>, 4>
+      dataAirlocks;  //!< airlocks for updating filter operators and other functions
     TriggerVariable disconnection;  //!< controller for the disconnection process
   private:
     /** wait for the core to be registered with the broker*/
