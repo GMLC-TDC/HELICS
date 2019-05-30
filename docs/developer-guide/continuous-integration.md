@@ -20,9 +20,15 @@ Push tests run on all pushes to any branch in the main repo, there are 4 tests t
  - XCode 8.3 which is the oldest fully supported Xcode version
 
 ### Daily Builds on develop
- On the develop branch a few additional tests are run on a daily basis.  These will run an extended set of tests or things like valgrind or clang-sanitizers.  The previus tests are run with an extended set of tests and a few additional tests are run
+ On the develop branch a few additional tests are run on a daily basis.  These will run an extended set of tests or things like valgrind or clang-sanitizers.  The previous tests are run with an extended set of tests and a few additional tests are run
 
   - gcc 6.0 valgrind
   - gcc 6.0 Code Coverage
   - clang 5 undefined behavior
   - clang 5 thread sanitizer
+
+
+## Appveyor tests
+  - MSVC 2015 cmake 3.13,  python and java builds and tests, packaging tests for windows
+
+## Azure tests
