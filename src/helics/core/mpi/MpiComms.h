@@ -7,8 +7,8 @@ SPDX-License-Identifier: BSD-3-Clause
 */
 #pragma once
 
-#include "../../common/BlockingQueue.hpp"
 #include "../CommsInterface.hpp"
+#include "containers/BlockingQueue.hpp"
 #include "helics/helics-config.h"
 #include <atomic>
 #include <future>
@@ -40,9 +40,9 @@ class MpiComms final : public CommsInterface
     int processIncomingMessage (ActionMessage &cmd);
 
     /** queue for pending incoming messages*/
-    BlockingQueue<ActionMessage> rxMessageQueue;
+    gmlc::containers::BlockingQueue<ActionMessage> rxMessageQueue;
     /** queue for pending outgoing messages*/
-    BlockingQueue<std::pair<std::pair<int, int>, std::vector<char>>> txMessageQueue;
+    gmlc::containers::BlockingQueue<std::pair<std::pair<int, int>, std::vector<char>>> txMessageQueue;
 
     std::atomic<bool> hasBroker{false};
     virtual void closeReceiver () override;  //!< function to instruct the receiver loop to close
@@ -51,8 +51,8 @@ class MpiComms final : public CommsInterface
     void setBrokerAddress (const std::string &address);
 
     std::string getAddress () { return localTargetAddress; }
-    BlockingQueue<ActionMessage> &getRxMessageQueue () { return rxMessageQueue; }
-    BlockingQueue<std::pair<std::pair<int, int>, std::vector<char>>> &getTxMessageQueue ()
+    gmlc::containers::BlockingQueue<ActionMessage> &getRxMessageQueue () { return rxMessageQueue; }
+    gmlc::containers::BlockingQueue<std::pair<std::pair<int, int>, std::vector<char>>> &getTxMessageQueue ()
     {
         return txMessageQueue;
     }

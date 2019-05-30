@@ -14,19 +14,11 @@ set(common_test_headers)
 set(
   common_test_sources
   common-tests.cpp
-  MappedVectorTests.cpp
-  MappedPointerVectorTests.cpp
-  DualMappedVectorTests.cpp
-  DualMappedPointerVectorTests.cpp
-  BlockingQueueTests.cpp
-  PriorityBlockingQueueTests.cpp
-  SimpleQueueTests.cpp
-  AirLockTests.cpp
   TimeTests.cpp
 )
 
 add_executable(common-tests ${common_test_sources} ${common_test_headers})
-target_link_libraries(common-tests PRIVATE helics-static helics_boost_test_base)
+target_link_libraries(common-tests PRIVATE helics-static helics_google_test_base)
 set_target_properties(common-tests PROPERTIES FOLDER tests)
 
 add_test(
