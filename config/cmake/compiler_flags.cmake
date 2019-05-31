@@ -23,8 +23,9 @@ mark_as_advanced(ENABLE_ERROR_ON_WARNINGS)
 # Setup compiler options and configurations
 # -------------------------------------------------------------
 message(STATUS "setting up for ${CMAKE_CXX_COMPILER_ID}")
-
+if (NOT TARGET compile_flags_target)
 add_library(compile_flags_target INTERFACE)
+endif()
 
 if(UNIX)
 

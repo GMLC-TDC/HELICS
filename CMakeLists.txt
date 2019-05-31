@@ -168,6 +168,10 @@ if("${PROJECT_SOURCE_DIR}" STREQUAL "${PROJECT_BINARY_DIR}")
     )
 endif()
 
+if (NOT TARGET compile_flags_target)
+   add_library(compile_flags_target INTERFACE)
+endif()
+
 if (HELICS_ROOT_PROJ)
 	include(compiler_flags)
 	message(STATUS "setting version build options to \"${CXX_STANDARD_FLAG}\"")
