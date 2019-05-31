@@ -15,11 +15,29 @@ option(
 
 mark_as_advanced(USE_SYSTEM_ZEROMQ_ONLY)
 
+if (WIN32 AND NOT MSYS)
 cmake_dependent_option(
+                        ZMQ_SUBPROJECT
+                        "enable ZMQ to automatically download and include as a subproject" ON "NOT USE_SYSTEM_ZEROMQ_ONLY" OFF
+                    )
+		else()
+			cmake_dependent_option(
+                        ZMQ_SUBPROJECT
+                        "enable ZMQ to automatically download and include as a subproject" OFF "NOT USE_SYSTEM_ZEROMQ_ONLY" OFF
+                    )
+					endif()
+cmake_dependent_option(
+                        ZMQ_FORCE_SUBPROJECT
+                        "force ZMQ to automatically download and include as a subproject" OFF "NOT USE_SYSTEM_ZEROMQ_ONLY" OFF
+                    )
+
+mark_as_advanced(USE_SYSTEM_ZEROMQ_ONLY)
+mark_as_advanced(ZMQ_SUBPROJECT)
+mark_as_advanced(ZMQ_FORCE_SUBPROJECT)
+
+option(
     ZMQ_USE_STATIC_LIBRARY
     "use the ZMQ static library"
-    OFF
-    "NOT USE_SYSTEM_ZEROMQ_ONLY"
     OFF
 )
 
@@ -27,13 +45,15 @@ mark_as_advanced(ZMQ_USE_STATIC_LIBRARY)
 
 if(USE_SYSTEM_ZEROMQ_ONLY)
     find_package(ZeroMQ)
+elseif (ZMQ_FORCE_SUBPROJECT)
+    include(addlibzmq)
 else()
-
+	
     show_variable(
         ZeroMQ_INSTALL_PATH
         PATH
         "path to the zmq libraries"
-        "${AUTOBUILD_INSTALL_PATH}"
+        ""
     )
 
     mark_as_advanced(ZeroMQ_INSTALL_PATH)
@@ -47,7 +67,6 @@ else()
             HINTS
             ${ZeroMQ_INSTALL_PATH}
             $ENV{ZeroMQ_INSTALL_PATH}
-            ${AUTOBUILD_INSTALL_PATH}
             PATH_SUFFIXES
             ${ZMQ_CMAKE_SUFFIXES}
         )
@@ -58,7 +77,6 @@ else()
             HINTS
             ${ZeroMQ_INSTALL_PATH}
             $ENV{ZeroMQ_INSTALL_PATH}
-            ${AUTOBUILD_INSTALL_PATH}
             PATH_SUFFIXES
             ${ZMQ_CMAKE_SUFFIXES}
             NO_SYSTEM_ENVIRONMENT_PATH
@@ -70,48 +88,13 @@ else()
 
     if(NOT ZeroMQ_FOUND OR NOT ZeroMQ_INCLUDE_DIR)
         # message(STATUS "initialZMQ not found")
-        if(ZMQ_USE_STATIC_LIBRARY OR AUTOBUILD_ZMQ)
-            include(buildlibZMQ)
-            build_libzmq()
-            find_package(
-                ZeroMQ
-                HINTS
-                ${ZeroMQ_INSTALL_PATH}
-                $ENV{ZeroMQ_INSTALL_PATH}
-                ${AUTOBUILD_INSTALL_PATH}
-                PATH_SUFFIXES
-                ${ZMQ_CMAKE_SUFFIXES}
-            )
-        else()
-            set(ZeroMQ_FIND_QUIETLY ON)
-            find_package(ZeroMQ)
-            if(NOT ZeroMQ_FOUND OR NOT ZeroMQ_INCLUDE_DIR)
-                if(WIN32 AND NOT MSYS)
-                    option(
-                        AUTOBUILD_ZMQ
-                        "enable ZMQ to automatically download and build" ON
-                    )
-                else()
-                    option(
-                        AUTOBUILD_ZMQ
-                        "enable ZMQ to automatically download and build" OFF
-                    )
-                endif()
-                if(AUTOBUILD_ZMQ)
-                    include(buildlibZMQ)
-                    build_libzmq()
-                    find_package(
-                        ZeroMQ
-                        HINTS
-                        ${ZeroMQ_INSTALL_PATH}
-                        $ENV{ZeroMQ_INSTALL_PATH}
-                        ${AUTOBUILD_INSTALL_PATH}
-                        PATH_SUFFIXES
-                        ${ZMQ_CMAKE_SUFFIXES}
-                    )
-                endif(AUTOBUILD_ZMQ)
-            endif()
-        endif()
+		set(ZeroMQ_FIND_QUIETLY ON)
+        find_package(ZeroMQ)
+        if(NOT ZeroMQ_FOUND OR NOT ZeroMQ_INCLUDE_DIR)
+           if(ZMQ_SUBPROJECT)
+              include(addlibzmq)
+           endif()
+		endif()
     endif()
 
 endif() # USE_SYSTEM_ZEROMQ_ONLY

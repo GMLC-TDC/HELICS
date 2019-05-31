@@ -120,33 +120,6 @@ add_test(
 set_property(TEST shared-library-ci-tests PROPERTY LABELS Continuous)
 set_property(TEST shared-library-ci-tests-cpp PROPERTY LABELS Continuous)
 
-if(WIN32)
+  copy_key_files_to_target_location(shared-library-tests)
+ copy_shared_target(shared-library-tests)
 
-  foreach(keyfile IN LISTS KEY_LIBRARY_FILES)
-    add_custom_command(
-      TARGET
-      shared-library-tests
-      POST_BUILD # Adds a post-build event to api tests
-      COMMAND
-        ${CMAKE_COMMAND}
-        -E
-        copy_if_different # which executes "cmake - E copy_if_different..."
-        "${keyfile}" # <--this is in-file
-        "$<TARGET_FILE_DIR:shared-library-tests>/"
-    )
-    # <--this is out-file path
-  endforeach(keyfile)
-
-  add_custom_command(
-    TARGET
-    shared-library-tests
-    POST_BUILD # Adds a post-build event to api tests
-    COMMAND
-      ${CMAKE_COMMAND}
-      -E
-      copy_if_different # which executes "cmake - E copy_if_different..."
-      "$<TARGET_FILE:helicsSharedLib>" # <--this is in- file
-      "$<TARGET_FILE_DIR:shared-library-tests>/"
-  )
-  # <--this is out-file path
-endif(WIN32)

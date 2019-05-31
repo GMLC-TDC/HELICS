@@ -218,6 +218,11 @@ target_compile_options(
   PRIVATE $<TARGET_PROPERTY:helics_base_includes,INTERFACE_COMPILE_OPTIONS>
 )
 
+target_compile_options(
+  helics_core
+  PRIVATE $<TARGET_PROPERTY:compile_flags_target,INTERFACE_COMPILE_OPTIONS>
+)
+
 if (TARGET Boost::boost)
 target_include_directories(
   helics_core SYSTEM

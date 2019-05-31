@@ -51,6 +51,8 @@ set_target_properties(
     hidden
 )
 target_link_libraries(helicsSharedLib PRIVATE helics-static)
+target_link_libraries(helicsSharedLib PRIVATE compile_flags_target)
+
 if(UNIX OR MINGW)
   if(NOT APPLE)
     target_link_libraries(
@@ -80,7 +82,7 @@ if(${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION} VERSION_GREATER 3.6)
     FILES $<TARGET_FILE:helicsSharedLib>
     DESTINATION ${CMAKE_INSTALL_BINDIR}
     COMPONENT
-    runtime EXCLUDE_FROM_ALL
+    Runtime EXCLUDE_FROM_ALL
   )
 else()
   install(
@@ -92,7 +94,7 @@ else()
     FILES $<TARGET_FILE:helicsSharedLib>
     DESTINATION ${CMAKE_INSTALL_BINDIR}
     COMPONENT
-    runtime
+    Runtime
   )
 endif()
 

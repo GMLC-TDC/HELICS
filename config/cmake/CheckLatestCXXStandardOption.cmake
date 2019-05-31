@@ -9,7 +9,7 @@
 # LLNS Copyright End
 
 include(CheckCXXCompilerFlag)
-
+message(STATUS "CMAKE_CXX_STANDARD: --${CMAKE_CXX_STANDARD}")
 if (NOT CMAKE_CXX_STANDARD)
   set(CMAKE_CXX_STANDARD 14)
 endif()

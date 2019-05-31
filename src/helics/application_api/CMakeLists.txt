@@ -95,9 +95,15 @@ target_compile_options(
   PRIVATE $<TARGET_PROPERTY:helics_base_includes,INTERFACE_COMPILE_OPTIONS>
 )
 
+target_compile_options(
+  application_api
+  PRIVATE $<TARGET_PROPERTY:compile_flags_target,INTERFACE_COMPILE_OPTIONS>
+)
+
 if(MSYS AND USE_LIBCXX)
   target_compile_definitions(application_api PUBLIC "-DSTX_NO_STD_OPTIONAL=1")
 endif()
+
 
 install(
   FILES ${public_application_api_headers}
