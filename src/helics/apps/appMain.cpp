@@ -5,7 +5,7 @@ the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 
-#include "../common/logger.h"
+#include "../common/loggerCore.hpp"
 #include "../core/BrokerFactory.hpp"
 #include "../core/core-exceptions.hpp"
 #include "../core/helicsCLI11.hpp"

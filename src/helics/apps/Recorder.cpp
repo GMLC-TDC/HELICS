@@ -15,7 +15,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "../common/base64.h"
 #include "../common/fmt_format.h"
 #include "../common/fmt_ostream.h"
-#include "../common/logger.h"
+#include "../common/loggerCore.hpp"
 #include "../core/helicsCLI11.hpp"
 #include "PrecHelper.hpp"
 #include <algorithm>
