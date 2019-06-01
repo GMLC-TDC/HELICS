@@ -683,21 +683,16 @@ install(
     DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/helics
     COMPONENT headers
 )
+
 install(
     DIRECTORY ThirdParty/cereal
-    DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+    DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/helics/external/optional
     COMPONENT headers
 )
 
 install(
-    DIRECTORY ThirdParty/CLI11
-    DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
-    COMPONENT headers
-)
-
-install(
-    DIRECTORY ThirdParty/helics_includes
-    DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+    DIRECTORY ThirdParty/helics/external
+    DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/helics
     COMPONENT headers
 )
 
