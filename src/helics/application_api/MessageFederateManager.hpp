@@ -9,8 +9,8 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "../common/GuardedTypes.hpp"
 #include "../core/Core.hpp"
 #include "Endpoints.hpp"
-#include "containers/DualMappedVector.hpp"
-#include "containers/SimpleQueue.hpp"
+#include "gmlc/containers/DualMappedVector.hpp"
+#include "gmlc/containers/SimpleQueue.hpp"
 #include "data_view.hpp"
 #include <cstdint>
 #include <deque>

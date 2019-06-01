@@ -9,7 +9,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "EndpointInfo.hpp"
 #include "NamedInputInfo.hpp"
 #include "PublicationInfo.hpp"
-#include "containers/DualMappedPointerVector.hpp"
+#include "gmlc/containers/DualMappedPointerVector.hpp"
 #include <atomic>
 
 /** @file container for keeping the set of different interfaces information for a federate

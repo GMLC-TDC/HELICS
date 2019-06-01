@@ -6,7 +6,7 @@ SPDX-License-Identifier: BSD-3-Clause
 */
 
 #pragma once
-#include "containers/MapTraits.hpp"
+#include "gmlc/containers/MapTraits.hpp"
 #include <cstdint>
 #include <functional>
 #include <iosfwd>

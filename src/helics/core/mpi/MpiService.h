@@ -9,7 +9,7 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include "../ActionMessage.hpp"
 #include "MpiComms.h"
-#include "containers/BlockingQueue.hpp"
+#include "gmlc/containers/BlockingQueue.hpp"
 #include "helics/helics-config.h"
 #include <atomic>
 #include <functional>
