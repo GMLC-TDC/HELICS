@@ -8,6 +8,7 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include "../common/GuardedTypes.hpp"
 #include "../core/Core.hpp"
+#include "../core/federate_id_extra.hpp"
 #include "Endpoints.hpp"
 #include "gmlc/containers/DualMappedVector.hpp"
 #include "gmlc/containers/SimpleQueue.hpp"

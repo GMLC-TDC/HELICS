@@ -4,7 +4,7 @@ Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance
 additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
-#include "../common/logger.h"
+#include "../common/loggerCore.hpp"
 #include "../core/BrokerFactory.hpp"
 #include "../core/CoreFactory.hpp"
 #include "../helics.hpp"
