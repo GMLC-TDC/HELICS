@@ -15,6 +15,7 @@ set(
   TomlProcessingFunctions.hpp
   AsioContextManager.h
   logger.h
+  loggerCore.hpp
   stringOps.h
   GuardedTypes.hpp
   generic_string_ops.hpp
@@ -33,6 +34,7 @@ set(
   JsonProcessingFunctions.cpp
   TomlProcessingFunctions.cpp
   logger.cpp
+  loggerCore.cpp
   stringOps.cpp
   charMapper.cpp
   base64.cpp

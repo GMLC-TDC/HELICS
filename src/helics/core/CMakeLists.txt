@@ -119,6 +119,7 @@ set(
 	EndpointInfo.hpp
 	flagOperations.hpp
 	BasicHandleInfo.hpp
+	federate_id_extra.hpp
 	FilterInfo.hpp
 	FilterCoordinator.hpp
 	NetworkBrokerData.hpp
