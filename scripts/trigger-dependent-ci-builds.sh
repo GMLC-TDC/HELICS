@@ -54,6 +54,11 @@ body+='
 "reason": "individualCI"
 }'
 
+echo "----BUILD_PARAMS----"
+echo "${BUILD_PARAMS}"
+echo "----body----"
+echo "${body}"
+
 curl -s -X POST \
     -H "Content-Type: application/json" \
     -H "Accept: application/json" \
