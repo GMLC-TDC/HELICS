@@ -684,7 +684,11 @@ install(
     COMPONENT headers
 )
 
-# Install a copy of the cereal headers used for compiling and a CMake target to include them
+option(HELICS_INSTALL_CEREAL "Install a copy of the cereal headers used for compiling and a CMake target to include them" ${MSVC})
+
+mark_as_advanced(HELICS_INSTALL_CEREAL)
+
+if (HELICS_INSTALL_CEREAL)
 install(
     DIRECTORY ThirdParty/cereal
     DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/helics/external/optional
@@ -698,6 +702,7 @@ target_include_directories(cereal
         $<INSTALL_INTERFACE:$<INSTALL_PREFIX>/include/helics/external/optional>
 )
 install(TARGETS cereal EXPORT helics-targets COMPONENT cereal)
+endif()
 
 install(
     DIRECTORY ThirdParty/helics/external

@@ -124,7 +124,7 @@ find_program(HELICS_APP helics_app
 	)
 	
 find_program(HELICS_BROKER helics_broker 
-	PATHS ${PACKAGE_PREFIX_DIR}/@CMAKE_INSTALL_BINDIR@
+	PATHS c
 	${APP_CHECK_LOC}
 	${APP_CHECK_LOC2}
 	PATH_SUFFIXES Release @CMAKE_INSTALL_BINDIR@ Debug
