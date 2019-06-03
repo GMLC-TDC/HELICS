@@ -684,11 +684,20 @@ install(
     COMPONENT headers
 )
 
+# Install a copy of the cereal headers used for compiling and a CMake target to include them
 install(
     DIRECTORY ThirdParty/cereal
     DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/helics/external/optional
-    COMPONENT headers
+    COMPONENT cereal
 )
+add_library(cereal INTERFACE)
+add_library(HELICS::cereal ALIAS cereal)
+target_include_directories(cereal
+    INTERFACE
+        $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/ThirdParty>
+        $<INSTALL_INTERFACE:$<INSTALL_PREFIX>/include/helics/external/optional>
+)
+install(TARGETS cereal EXPORT helics-targets COMPONENT cereal)
 
 install(
     DIRECTORY ThirdParty/helics/external
@@ -733,7 +742,7 @@ install(
 
 install(
     FILES LICENSE NOTICE
-    DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+    DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/helics
     COMPONENT libs
 )
 # -------------------------------------------------------------
@@ -773,6 +782,7 @@ if(ENABLE_PACKAGE_BUILD)
         java
         octave
         csharp
+        cereal
     )
     if(WIN32)
         set(CPACK_RESOURCE_FILE_LICENSE "${HELICS_SOURCE_DIR}\\\\LICENSE")
@@ -804,7 +814,7 @@ if(ENABLE_PACKAGE_BUILD)
         "Headers for linking and compiling with HELICS"
     )
     set(CPACK_COMPONENT_RUNTIME_DESCRIPTION "Runtime libraries for HELICS")
-
+    set(CPACK_COMPONENT_CEREAL_DESCRIPTION "cereal C++11 serialization library [no support for other language interfaces]")
     set(
         CPACK_COMPONENT_GROUP_INTERFACES_DESCRIPTION
         "additional language interfaces for HELICS"
