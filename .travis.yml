@@ -223,7 +223,7 @@ jobs:
         - ZMQ_FORCE_SUBPROJECT=true
       
     - stage: trigger dependent repositories
-    if: branch IN (master, develop)
+      if: branch IN (master, develop)
       before_install: true
       install: true
       script: scripts/trigger-dependent-ci-builds.sh
