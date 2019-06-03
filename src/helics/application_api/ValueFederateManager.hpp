@@ -11,7 +11,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "../core/federate_id_extra.hpp"
 #include "Inputs.hpp"
 #include "Publications.hpp"
-#include "containers/DualMappedVector.hpp"
+#include "gmlc/containers/DualMappedVector.hpp"
 
 #include "data_view.hpp"
 #include "helicsTypes.hpp"

@@ -10,7 +10,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "../common/TripWire.hpp"
 #include "ActionMessage.hpp"
 #include "NetworkBrokerData.hpp"
-#include "containers/BlockingPriorityQueue.hpp"
+#include "gmlc/containers/BlockingPriorityQueue.hpp"
 #include <functional>
 #include <thread>
 
