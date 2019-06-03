@@ -59,6 +59,6 @@ curl -s -X POST \
     -H "Accept: application/json" \
     -H "Authorization: Basic ${HELICSBOT_AZURE_TOKEN}" \
     -d "$body" \
-    https://dev.azure.com/HELICS-test/helics-ns3/_apis/build/builds?api-version=4.1
+    https://dev.azure.com/HELICS-test/HELICS-Examples/_apis/build/builds?api-version=4.1
 
 
