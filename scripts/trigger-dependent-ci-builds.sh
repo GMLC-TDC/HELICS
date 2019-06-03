@@ -51,7 +51,8 @@ body='{
 '
 body+='"parameters": "{'${BUILD_PARAMS}'}",'
 body+='
-"reason": "individualCI"
+"reason": "individualCI",
+"sourceBranch": "refs/heads/HELICS_2_1"
 }'
 
 echo "----BUILD_PARAMS----"
