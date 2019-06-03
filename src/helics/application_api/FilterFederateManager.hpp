@@ -9,7 +9,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "../common/GuardedTypes.hpp"
 #include "../core/Core.hpp"
 #include "Filters.hpp"
-#include "containers/MappedVector.hpp"
+#include "gmlc/containers/MappedVector.hpp"
 #include <cstdint>
 #include <deque>
 #include <functional>

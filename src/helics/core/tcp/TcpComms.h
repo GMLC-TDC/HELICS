@@ -7,7 +7,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #pragma once
 
 #include "../NetworkCommsInterface.hpp"
-#include "containers/BlockingQueue.hpp"
+#include "gmlc/containers/BlockingQueue.hpp"
 #include <atomic>
 #include <set>
 #include <string>

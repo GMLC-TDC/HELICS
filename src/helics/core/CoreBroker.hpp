@@ -15,9 +15,9 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <unordered_map>
 
 #include "../common/DelayedObjects.hpp"
-#include "containers/AirLock.hpp"
-#include "containers/DualMappedVector.hpp"
-#include "containers/SimpleQueue.hpp"
+#include "gmlc/containers/AirLock.hpp"
+#include "gmlc/containers/DualMappedVector.hpp"
+#include "gmlc/containers/SimpleQueue.hpp"
 #include "helics/external/any.hpp"
 
 #include "../common/TriggerVariable.hpp"

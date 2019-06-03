@@ -13,7 +13,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "CoreFederateInfo.hpp"
 #include "InterfaceInfo.hpp"
 #include "TimeDependencies.hpp"
-#include "containers/BlockingQueue.hpp"
+#include "gmlc/containers/BlockingQueue.hpp"
 #include "core-data.hpp"
 #include "core-types.hpp"
 #include "helics-time.hpp"

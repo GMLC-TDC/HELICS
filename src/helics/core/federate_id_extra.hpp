@@ -6,7 +6,7 @@ SPDX-License-Identifier: BSD-3-Clause
 */
 
 #pragma once
-#include "containers/MapTraits.hpp"
+#include "gmlc/containers/MapTraits.hpp"
 #include "federate_id.hpp"
 
 /** override the is_easily_hashable type_trait of interface_handle for use in DualMappedVector and some other types

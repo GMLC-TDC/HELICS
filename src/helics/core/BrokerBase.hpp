@@ -12,7 +12,7 @@ and some common methods used cores and brokers
 */
 
 #include "ActionMessage.hpp"
-#include "containers/BlockingPriorityQueue.hpp"
+#include "gmlc/containers/BlockingPriorityQueue.hpp"
 #include "federate_id_extra.hpp"
 #include <atomic>
 #include <memory>

@@ -8,7 +8,7 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include "../../common/zmqContextManager.h"
 #include "../ActionMessage.hpp"
-#include "containers/extra/optional.hpp"
+#include "gmlc/containers/extra/optional.hpp"
 #include "cppzmq/zmq.hpp"
 #include <deque>
 #include <map>

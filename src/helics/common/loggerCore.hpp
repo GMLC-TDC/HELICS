@@ -19,7 +19,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #pragma once
 
 #include "TripWire.hpp"
-#include "containers/BlockingQueue.hpp"
+#include "gmlc/containers/BlockingQueue.hpp"
 #include <atomic>
 #include <fstream>
 #include <functional>
