@@ -10,6 +10,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "NamedInputInfo.hpp"
 #include "PublicationInfo.hpp"
 #include "containers/DualMappedPointerVector.hpp"
+#include "federate_id_extra.hpp"
 #include <atomic>
 
 /** @file container for keeping the set of different interfaces information for a federate

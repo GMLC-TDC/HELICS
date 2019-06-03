@@ -29,6 +29,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "JsonMapBuilder.hpp"
 #include "TimeDependencies.hpp"
 #include "UnknownHandleManager.hpp"
+#include "federate_id_extra.hpp"
 
 namespace helics
 {

@@ -11,7 +11,7 @@ Push tests run on all pushes to any branch in the main repo, there are 4 tests t
 
  - GCC 6 :  Test the GCC 6.0 compiler and the CI labeled Tests  BOOST 1.61, SWIG, MPI
  - Clang 5:  Test the clang compiler and run the CI labeled Tests, along with python and Java interface generation and Tests Using C++17
- - GCC 4.9: Test the oldest supported compiler in GCC,  Test the included interface files for Java and python, and test a packaging build.  The main tests are disabled,  BOOST 1.61
+ - GCC 4.9: Test the oldest supported compiler in GCC,  Test the included interface files(SWIG OFF) for Java and python, and test a packaging build.  The main tests are disabled,  BOOST 1.61
  - XCode 10.2  Test a recent Xcode compiler
 
 ### PR tests and develop branch Tests
@@ -23,7 +23,7 @@ Push tests run on all pushes to any branch in the main repo, there are 4 tests t
  On the develop branch a few additional tests are run on a daily basis.  These will run an extended set of tests or things like valgrind or clang-sanitizers.  The previous tests are run with an extended set of tests and a few additional tests are run
 
   - gcc 6.0 valgrind, interface disabled
-  - gcc 6.0 Code Coverage, MPI, interfaces disabled 
+  - gcc 6.0 Code Coverage, MPI, interfaces disabled
   - clang 5 undefined behavior sanitizer, interfaces disabled
   - clang 5 thread sanitizer, interfaces disabled
 
