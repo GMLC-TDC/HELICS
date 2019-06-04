@@ -24,6 +24,7 @@ Motivation: Energy systems and their associated information and communication te
 .. toctree::
    :maxdepth: 1
    :caption: Basics
+
    installation/index
    introduction/index
    user-guide/index
@@ -33,6 +34,7 @@ Motivation: Energy systems and their associated information and communication te
 .. toctree::
    :maxdepth: 1
    :caption: Reference
+
    configuration/index
    apps/index
 ```
@@ -41,6 +43,7 @@ Motivation: Energy systems and their associated information and communication te
 .. toctree::
    :maxdepth: 1
    :caption: API Docs
+
    c-api-reference/index
    doxygen/index
 ```
@@ -49,6 +52,7 @@ Motivation: Energy systems and their associated information and communication te
 .. toctree::
    :maxdepth: 1
    :caption: Contributing
+
    developer-guide/index
    ROADMAP
 ```
