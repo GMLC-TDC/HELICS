@@ -36,6 +36,7 @@ curl -s -X POST \
 
 
 # Trigger HELICS-Examples repository build
+BUILD_PARAMS='\"HELICS_COMMITISH\": \"'$(git rev-parse HEAD)'\"'
 if [[ "${TRAVIS_EVENT_TYPE}" == "push" ]]; then
     BUILD_PARAMS='\"HELICS_COMMITISH\": \"'${TRAVIS_COMMIT}'\"'
 elif [[ "${TRAVIS_EVENT_TYPE}" == "pull_request" && "${TRAVIS_PULL_REQUEST}" != "false" ]]; then
@@ -54,11 +55,6 @@ body+='
 "reason": "individualCI",
 "sourceBranch": "refs/heads/HELICS_2_1"
 }'
-
-echo "----BUILD_PARAMS----"
-echo "${BUILD_PARAMS}"
-echo "----body----"
-echo "${body}"
 
 curl -s -X POST \
     -H "Content-Type: application/json" \
