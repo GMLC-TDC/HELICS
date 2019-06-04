@@ -1,6 +1,6 @@
 //---------------------------------------------------------------------------------------
 //
-// ghc::filesystem - A C++17-like filesystem implementation for C++11/C++14
+// ghc::filesystem - A C++17-like filesystem implementation for C++11/C++147/C++17
 //
 //---------------------------------------------------------------------------------------
 //
@@ -142,6 +142,9 @@
 #include <stdexcept>
 #include <string>
 #include <system_error>
+#ifdef GHC_OS_WINDOWS
+#include <vector>
+#endif
 #endif  // GHC_EXPAND_IMPL
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -158,9 +161,18 @@
 // LWG #2937 enforces that fs::equivalent emits an error, if !fs::exists(p1)||!exists(p2)
 #define LWG_2937_BEHAVIOUR
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+// UTF8-Everywhere is the original behaviour of ghc::filesystem. With this define you can
+// enable the more standard conforming implementation option that uses wstring on Windows
+// as ghc::filesystem::string_type.
+// #define GHC_WIN_WSTRING_STRING_TYPE
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+// Rais errors/exceptions when invalid unicode codepoints or UTF-8 sequences are found,
+// instead of replacing them with the unicode replacement character (U+FFFD).
+// #define GHC_RAISE_UNICODE_ERRORS
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 // ghc::filesystem version in decimal (major * 10000 + minor * 100 + patch)
-#define GHC_FILESYSTEM_VERSION 10105L
+#define GHC_FILESYSTEM_VERSION 10200L
 
 namespace ghc {
 namespace filesystem {
@@ -179,11 +191,18 @@ public:
 class GHC_FS_API_CLASS path
 {
 public:
-    using value_type = std::string::value_type;
-    using string_type = std::basic_string<value_type>;
 #ifdef GHC_OS_WINDOWS
+#ifdef GHC_WIN_WSTRING_STRING_TYPE
+#define GHC_USE_WCHAR_T
+    using value_type = std::wstring::value_type;
+#else
+    using value_type = std::string::value_type;
+#endif
+    using string_type = std::basic_string<value_type>;
     static constexpr value_type preferred_separator = '\\';
 #else
+    using value_type = std::string::value_type;
+    using string_type = std::basic_string<value_type>;
     static constexpr value_type preferred_separator = '/';
 #endif
     // 30.10.10.1 enumeration format
@@ -213,11 +232,19 @@ public:
 
     template <typename T1, typename T2 = void>
     using path_type = typename std::enable_if<!std::is_same<path, T1>::value, path>::type;
+#ifdef GHC_USE_WCHAR_T
+    template <typename T>
+    using path_from_string = typename std::enable_if<_is_basic_string<T>::value || std::is_same<char const*, typename std::decay<T>::type>::value || std::is_same<char*, typename std::decay<T>::type>::value ||
+                                                         std::is_same<wchar_t const*, typename std::decay<T>::type>::value || std::is_same<wchar_t*, typename std::decay<T>::type>::value,
+                                                     path>::type;
+    template <typename T>
+    using path_type_EcharT = typename std::enable_if<std::is_same<T, char>::value || std::is_same<T, char16_t>::value || std::is_same<T, char32_t>::value, path>::type;
+#else
     template <typename T>
     using path_from_string = typename std::enable_if<_is_basic_string<T>::value || std::is_same<char const*, typename std::decay<T>::type>::value || std::is_same<char*, typename std::decay<T>::type>::value, path>::type;
     template <typename T>
     using path_type_EcharT = typename std::enable_if<std::is_same<T, char>::value || std::is_same<T, char16_t>::value || std::is_same<T, char32_t>::value || std::is_same<T, wchar_t>::value, path>::type;
-
+#endif
     // 30.10.8.4.1 constructors and destructor
     path() noexcept;
     path(const path& p);
@@ -263,7 +290,7 @@ public:
     path& operator+=(const value_type* x);
     path& operator+=(value_type x);
     template <class Source>
-    path_type<Source>& operator+=(const Source& x);
+    path_from_string<Source>& operator+=(const Source& x);
     template <class EcharT>
     path_type_EcharT<EcharT>& operator+=(EcharT x);
     template <class Source>
@@ -343,9 +370,11 @@ public:
     iterator end() const;
 
 private:
+    using impl_value_type = std::string::value_type;
+    using impl_string_type = std::basic_string<impl_value_type>;
     friend class directory_iterator;
     void append_name(const char* name);
-    static constexpr value_type generic_separator = '/';
+    static constexpr impl_value_type generic_separator = '/';
     template <typename InputIterator>
     class input_iterator_range
     {
@@ -369,9 +398,13 @@ private:
     };
     friend void swap(path& lhs, path& rhs) noexcept;
     friend size_t hash_value(const path& p) noexcept;
-    string_type _path;
+    static void postprocess_path_with_format(impl_string_type& p, format fmt);
+    impl_string_type _path;
 #ifdef GHC_OS_WINDOWS
+    impl_string_type native_impl() const;
     mutable string_type _native_cache;
+#else
+    const impl_string_type& native_impl() const;
 #endif
 };
 
@@ -426,7 +459,7 @@ public:
     using iterator_category = std::bidirectional_iterator_tag;
 
     iterator();
-    iterator(const string_type::const_iterator& first, const string_type::const_iterator& last, const string_type::const_iterator& pos);
+    iterator(const impl_string_type::const_iterator& first, const impl_string_type::const_iterator& last, const impl_string_type::const_iterator& pos);
     iterator& operator++();
     iterator operator++(int);
     iterator& operator--();
@@ -437,13 +470,13 @@ public:
     pointer operator->() const;
 
 private:
-    string_type::const_iterator increment(const std::string::const_iterator& pos) const;
-    string_type::const_iterator decrement(const std::string::const_iterator& pos) const;
+    impl_string_type::const_iterator increment(const std::string::const_iterator& pos) const;
+    impl_string_type::const_iterator decrement(const std::string::const_iterator& pos) const;
     void updateCurrent();
-    string_type::const_iterator _first;
-    string_type::const_iterator _last;
-    string_type::const_iterator _root;
-    string_type::const_iterator _iter;
+    impl_string_type::const_iterator _first;
+    impl_string_type::const_iterator _last;
+    impl_string_type::const_iterator _root;
+    impl_string_type::const_iterator _iter;
     path _current;
 };
 
@@ -621,11 +654,11 @@ private:
     filesystem::path _path;
     file_status _status;
     file_status _symlink_status;
-    uintmax_t _file_size;
+    uintmax_t _file_size = 0;
 #ifndef GHC_OS_WINDOWS
     uintmax_t _hard_link_count;
 #endif
-    time_t _last_write_time;
+    time_t _last_write_time = 0;
 };
 
 // 30.10.13 Class directory_iterator
@@ -678,7 +711,6 @@ public:
     }
     bool operator==(const directory_iterator& rhs) const;
     bool operator!=(const directory_iterator& rhs) const;
-    void swap(directory_iterator& rhs);
 
 private:
     friend class recursive_directory_iterator;
@@ -737,7 +769,6 @@ public:
     }
     bool operator==(const recursive_directory_iterator& rhs) const;
     bool operator!=(const recursive_directory_iterator& rhs) const;
-    void swap(recursive_directory_iterator& rhs);
 
 private:
     struct recursive_directory_iterator_impl
@@ -901,10 +932,10 @@ public:
     const basic_filebuf& operator=(const basic_filebuf&) = delete;
     basic_filebuf<charT, traits>* open(const path& p, std::ios_base::openmode mode)
     {
-#if defined(GHC_OS_WINDOWS) && defined(_MSC_VER)
+#if defined(GHC_OS_WINDOWS) && !defined(__GNUC__)
         return std::basic_filebuf<charT, traits>::open(p.wstring().c_str(), mode) ? this : 0;
 #else
-        return std::basic_filebuf<charT, traits>::open(p.c_str(), mode) ? this : 0;
+        return std::basic_filebuf<charT, traits>::open(p.string().c_str(), mode) ? this : 0;
 #endif
     }
 };
@@ -914,7 +945,7 @@ class basic_ifstream : public std::basic_ifstream<charT, traits>
 {
 public:
     basic_ifstream() {}
-#if defined(GHC_OS_WINDOWS) && defined(_MSC_VER)
+#if defined(GHC_OS_WINDOWS) && !defined(__GNUC__)
     explicit basic_ifstream(const path& p, std::ios_base::openmode mode = std::ios_base::in)
         : std::basic_ifstream<charT, traits>(p.wstring().c_str(), mode)
     {
@@ -922,10 +953,10 @@ public:
     void open(const path& p, std::ios_base::openmode mode = std::ios_base::in) { std::basic_ifstream<charT, traits>::open(p.wstring().c_str(), mode); }
 #else
     explicit basic_ifstream(const path& p, std::ios_base::openmode mode = std::ios_base::in)
-        : std::basic_ifstream<charT, traits>(p.c_str(), mode)
+        : std::basic_ifstream<charT, traits>(p.string().c_str(), mode)
     {
     }
-    void open(const path& p, std::ios_base::openmode mode = std::ios_base::in) { std::basic_ifstream<charT, traits>::open(p.c_str(), mode); }
+    void open(const path& p, std::ios_base::openmode mode = std::ios_base::in) { std::basic_ifstream<charT, traits>::open(p.string().c_str(), mode); }
 #endif
     basic_ifstream(const basic_ifstream&) = delete;
     const basic_ifstream& operator=(const basic_ifstream&) = delete;
@@ -937,7 +968,7 @@ class basic_ofstream : public std::basic_ofstream<charT, traits>
 {
 public:
     basic_ofstream() {}
-#if defined(GHC_OS_WINDOWS) && defined(_MSC_VER)
+#if defined(GHC_OS_WINDOWS) && !defined(__GNUC__)
     explicit basic_ofstream(const path& p, std::ios_base::openmode mode = std::ios_base::out)
         : std::basic_ofstream<charT, traits>(p.wstring().c_str(), mode)
     {
@@ -945,10 +976,10 @@ public:
     void open(const path& p, std::ios_base::openmode mode = std::ios_base::out) { std::basic_ofstream<charT, traits>::open(p.wstring().c_str(), mode); }
 #else
     explicit basic_ofstream(const path& p, std::ios_base::openmode mode = std::ios_base::out)
-        : std::basic_ofstream<charT, traits>(p.c_str(), mode)
+        : std::basic_ofstream<charT, traits>(p.string().c_str(), mode)
     {
     }
-    void open(const path& p, std::ios_base::openmode mode = std::ios_base::out) { std::basic_ofstream<charT, traits>::open(p.c_str(), mode); }
+    void open(const path& p, std::ios_base::openmode mode = std::ios_base::out) { std::basic_ofstream<charT, traits>::open(p.string().c_str(), mode); }
 #endif
     basic_ofstream(const basic_ofstream&) = delete;
     const basic_ofstream& operator=(const basic_ofstream&) = delete;
@@ -960,7 +991,7 @@ class basic_fstream : public std::basic_fstream<charT, traits>
 {
 public:
     basic_fstream() {}
-#if defined(GHC_OS_WINDOWS) && defined(_MSC_VER)
+#if defined(GHC_OS_WINDOWS) && !defined(__GNUC__)
     explicit basic_fstream(const path& p, std::ios_base::openmode mode = std::ios_base::in | std::ios_base::out)
         : std::basic_fstream<charT, traits>(p.wstring().c_str(), mode)
     {
@@ -968,10 +999,10 @@ public:
     void open(const path& p, std::ios_base::openmode mode = std::ios_base::in | std::ios_base::out) { std::basic_fstream<charT, traits>::open(p.wstring().c_str(), mode); }
 #else
     explicit basic_fstream(const path& p, std::ios_base::openmode mode = std::ios_base::in | std::ios_base::out)
-        : std::basic_fstream<charT, traits>(p.c_str(), mode)
+        : std::basic_fstream<charT, traits>(p.string().c_str(), mode)
     {
     }
-    void open(const path& p, std::ios_base::openmode mode = std::ios_base::in | std::ios_base::out) { std::basic_fstream<charT, traits>::open(p.c_str(), mode); }
+    void open(const path& p, std::ios_base::openmode mode = std::ios_base::in | std::ios_base::out) { std::basic_fstream<charT, traits>::open(p.string().c_str(), mode); }
 #endif
     basic_fstream(const basic_fstream&) = delete;
     const basic_fstream& operator=(const basic_fstream&) = delete;
@@ -1016,7 +1047,7 @@ private:
 //-------------------------------------------------------------------------------------------------
 
 namespace detail {
-GHC_FS_API void postprocess_path_with_format(path::string_type& p, path::format fmt);
+// GHC_FS_API void postprocess_path_with_format(path::impl_string_type& p, path::format fmt);
 enum utf8_states_t { S_STRT = 0, S_RJCT = 8 };
 GHC_FS_API void appendUTF8(std::string& str, uint32_t unicode);
 GHC_FS_API bool is_surrogate(uint32_t c);
@@ -1057,7 +1088,7 @@ GHC_INLINE std::error_code make_error_code(portable_error err)
             return std::error_code(ERROR_INVALID_PARAMETER, std::system_category());
         case portable_error::is_a_directory:
 #ifdef ERROR_DIRECTORY_NOT_SUPPORTED
-            return std::error_code(ERROR_DIRECTORY_NOT_SUPPORTED, std::system_category()); 
+            return std::error_code(ERROR_DIRECTORY_NOT_SUPPORTED, std::system_category());
 #else
             return std::error_code(ERROR_NOT_SUPPORTED, std::system_category());
 #endif
@@ -1176,11 +1207,18 @@ GHC_INLINE void appendUTF8(std::string& str, uint32_t unicode)
         str.push_back(static_cast<char>(((unicode & 0xfff) >> 6) + 128));
         str.push_back(static_cast<char>((unicode & 0x3f) + 128));
     }
-    else {
+    else if (unicode >= 0x10000 && unicode <= 0x10ffff) {
         str.push_back(static_cast<char>((unicode >> 18) + 240));
         str.push_back(static_cast<char>(((unicode & 0x3ffff) >> 12) + 128));
         str.push_back(static_cast<char>(((unicode & 0xfff) >> 6) + 128));
         str.push_back(static_cast<char>((unicode & 0x3f) + 128));
+    }
+    else {
+#ifdef GHC_RAISE_UNICODE_ERRORS
+        throw filesystem_error("Illegal code point for unicode character.", str, std::make_error_code(std::errc::illegal_byte_sequence));
+#else
+        appendUTF8(str, 0xfffd);
+#endif
     }
 }
 
@@ -1190,26 +1228,46 @@ GHC_INLINE void appendUTF8(std::string& str, uint32_t unicode)
 GHC_INLINE unsigned consumeUtf8Fragment(const unsigned state, const uint8_t fragment, uint32_t& codepoint)
 {
     static const uint32_t utf8_state_info[] = {
-        0x11111111u, 0x11111111u, 0x77777777u, 0x77777777u, 0x88888888u, 0x88888888u, 0x88888888u, 0x88888888u, 0x22222299u, 0x22222222u, 0x22222222u, 0x22222222u, 0x3333333au, 0x33433333u,
-        0x9995666bu, 0x99999999u, 0x88888880u, 0x22818108u, 0x88888881u, 0x88888882u, 0x88888884u, 0x88888887u, 0x88888886u, 0x82218108u, 0x82281108u, 0x88888888u, 0x88888883u, 0x88888885u,
+        // encoded states
+        0x11111111u, 0x11111111u, 0x77777777u, 0x77777777u, 0x88888888u, 0x88888888u, 0x88888888u, 0x88888888u, 0x22222299u, 0x22222222u, 0x22222222u, 0x22222222u, 0x3333333au, 0x33433333u, 0x9995666bu, 0x99999999u,
+        0x88888880u, 0x22818108u, 0x88888881u, 0x88888882u, 0x88888884u, 0x88888887u, 0x88888886u, 0x82218108u, 0x82281108u, 0x88888888u, 0x88888883u, 0x88888885u, 0u,          0u,          0u,          0u,
     };
     uint8_t category = fragment < 128 ? 0 : (utf8_state_info[(fragment >> 3) & 0xf] >> ((fragment & 7) << 2)) & 0xf;
     codepoint = (state ? (codepoint << 6) | (fragment & 0x3f) : (0xff >> category) & fragment);
     return state == S_RJCT ? static_cast<unsigned>(S_RJCT) : static_cast<unsigned>((utf8_state_info[category + 16] >> (state << 2)) & 0xf);
 }
+    
+GHC_INLINE bool validUtf8(const std::string& utf8String)
+{
+    std::string::const_iterator iter = utf8String.begin();
+    unsigned utf8_state = S_STRT;
+    std::uint32_t codepoint = 0;
+    while (iter < utf8String.end()) {
+        if ((utf8_state = consumeUtf8Fragment(utf8_state, (uint8_t)*iter++, codepoint)) == S_RJCT) {
+            return false;
+        }
+    }
+    if (utf8_state) {
+        return false;
+    }
+    return true;
+}
 
 }  // namespace detail
-
+    
 #endif
-
+    
 namespace detail {
 
-template <class StringType>
+template <class StringType, typename std::enable_if<(sizeof(typename StringType::value_type) == 1)>::type* = nullptr>
 inline StringType fromUtf8(const std::string& utf8String, const typename StringType::allocator_type& alloc = typename StringType::allocator_type())
 {
-    if (sizeof(typename StringType::value_type) == 1) {
-        return StringType(utf8String.begin(), utf8String.end());
-    }
+    return StringType(utf8String.begin(), utf8String.end(), alloc);
+}
+
+template <class StringType, typename std::enable_if<(sizeof(typename StringType::value_type) == 2)>::type* = nullptr>
+inline StringType fromUtf8(const std::string& utf8String, const typename StringType::allocator_type& alloc = typename StringType::allocator_type())
+{
     StringType result(alloc);
     result.reserve(utf8String.length());
     std::string::const_iterator iter = utf8String.begin();
@@ -1217,71 +1275,118 @@ inline StringType fromUtf8(const std::string& utf8String, const typename StringT
     std::uint32_t codepoint = 0;
     while (iter < utf8String.end()) {
         if ((utf8_state = consumeUtf8Fragment(utf8_state, (uint8_t)*iter++, codepoint)) == S_STRT) {
-            if (sizeof(typename StringType::value_type) == 4) {
-                result += codepoint;
+            if (codepoint <= 0xffff) {
+                result += (typename StringType::value_type)codepoint;
             }
             else {
-                if (codepoint <= 0xffff) {
-                    result += (typename StringType::value_type)codepoint;
-                }
-                else {
-                    codepoint -= 0x10000;
-                    result += (typename StringType::value_type)((codepoint >> 10) + 0xd800);
-                    result += (typename StringType::value_type)((codepoint & 0x3ff) + 0xdc00);
-                }
+                codepoint -= 0x10000;
+                result += (typename StringType::value_type)((codepoint >> 10) + 0xd800);
+                result += (typename StringType::value_type)((codepoint & 0x3ff) + 0xdc00);
             }
             codepoint = 0;
         }
         else if (utf8_state == S_RJCT) {
+#ifdef GHC_RAISE_UNICODE_ERRORS
+            throw filesystem_error("Illegal byte sequence for unicode character.", utf8String, std::make_error_code(std::errc::illegal_byte_sequence));
+#else
             result += (typename StringType::value_type)0xfffd;
             utf8_state = S_STRT;
             codepoint = 0;
+#endif
         }
     }
     if (utf8_state) {
+#ifdef GHC_RAISE_UNICODE_ERRORS
+        throw filesystem_error("Illegal byte sequence for unicode character.", utf8String, std::make_error_code(std::errc::illegal_byte_sequence));
+#else
         result += (typename StringType::value_type)0xfffd;
+#endif
     }
     return result;
 }
 
-template <typename charT, typename traits, typename Alloc>
-inline std::string toUtf8(const std::basic_string<charT, traits, Alloc>& unicodeString)
+template <class StringType, typename std::enable_if<(sizeof(typename StringType::value_type) == 4)>::type* = nullptr>
+inline StringType fromUtf8(const std::string& utf8String, const typename StringType::allocator_type& alloc = typename StringType::allocator_type())
 {
-    using StringType = std::basic_string<charT, traits, Alloc>;
-    if (sizeof(typename StringType::value_type) == 1) {
-        return std::string(unicodeString.begin(), unicodeString.end());
-    }
-    std::string result;
-    result.reserve(unicodeString.length());
-    if (sizeof(typename StringType::value_type) == 2) {
-        for (typename StringType::const_iterator iter = unicodeString.begin(); iter != unicodeString.end(); ++iter) {
-            char32_t c = *iter;
-            if (is_surrogate(c)) {
-                ++iter;
-                if (iter != unicodeString.end() && is_high_surrogate(c) && is_low_surrogate(*iter)) {
-                    appendUTF8(result, (char32_t(c) << 10) + *iter - 0x35fdc00);
-                }
-                else {
-                    appendUTF8(result, 0xfffd);
-                }
-            }
-            else {
-                appendUTF8(result, c);
-            }
+    StringType result(alloc);
+    result.reserve(utf8String.length());
+    std::string::const_iterator iter = utf8String.begin();
+    unsigned utf8_state = S_STRT;
+    std::uint32_t codepoint = 0;
+    while (iter < utf8String.end()) {
+        if ((utf8_state = consumeUtf8Fragment(utf8_state, (uint8_t)*iter++, codepoint)) == S_STRT) {
+            result += codepoint;
+            codepoint = 0;
+        }
+        else if (utf8_state == S_RJCT) {
+#ifdef GHC_RAISE_UNICODE_ERRORS
+            throw filesystem_error("Illegal byte sequence for unicode character.", utf8String, std::make_error_code(std::errc::illegal_byte_sequence));
+#else
+            result += (typename StringType::value_type)0xfffd;
+            utf8_state = S_STRT;
+            codepoint = 0;
+#endif
         }
     }
-    else {
-        for (char32_t c : unicodeString) {
+    if (utf8_state) {
+#ifdef GHC_RAISE_UNICODE_ERRORS
+        throw filesystem_error("Illegal byte sequence for unicode character.", utf8String, std::make_error_code(std::errc::illegal_byte_sequence));
+#else
+        result += (typename StringType::value_type)0xfffd;
+#endif
+    }
+    return result;
+}
+
+template <typename charT, typename traits, typename Alloc, typename std::enable_if<(sizeof(charT) == 1), int>::type size = 1>
+inline std::string toUtf8(const std::basic_string<charT, traits, Alloc>& unicodeString)
+{
+    return std::string(unicodeString.begin(), unicodeString.end());
+}
+
+template <typename charT, typename traits, typename Alloc, typename std::enable_if<(sizeof(charT) == 2), int>::type size = 2>
+inline std::string toUtf8(const std::basic_string<charT, traits, Alloc>& unicodeString)
+{
+    std::string result;
+    for (auto iter = unicodeString.begin(); iter != unicodeString.end(); ++iter) {
+        char32_t c = *iter;
+        if (is_surrogate(c)) {
+            ++iter;
+            if (iter != unicodeString.end() && is_high_surrogate(c) && is_low_surrogate(*iter)) {
+                appendUTF8(result, (char32_t(c) << 10) + *iter - 0x35fdc00);
+            }
+            else {
+#ifdef GHC_RAISE_UNICODE_ERRORS
+                throw filesystem_error("Illegal code point for unicode character.", result, std::make_error_code(std::errc::illegal_byte_sequence));
+#else
+                appendUTF8(result, 0xfffd);
+                if(iter == unicodeString.end()) {
+                    break;
+                }
+#endif
+            }
+        }
+        else {
             appendUTF8(result, c);
         }
     }
     return result;
 }
 
-template <typename SourceType>
-inline std::string toUtf8(const SourceType* unicodeString)
+template <typename charT, typename traits, typename Alloc, typename std::enable_if<(sizeof(charT) == 4), int>::type size = 4>
+inline std::string toUtf8(const std::basic_string<charT, traits, Alloc>& unicodeString)
 {
-    return toUtf8(std::basic_string<SourceType, std::char_traits<SourceType>>(unicodeString));
+    std::string result;
+    for (auto c : unicodeString) {
+        appendUTF8(result, c);
+    }
+    return result;
+}
+
+template <typename charT>
+inline std::string toUtf8(const charT* unicodeString)
+{
+    return toUtf8(std::basic_string<charT, std::char_traits<charT>>(unicodeString));
 }
 
 }  // namespace detail
@@ -1295,8 +1400,17 @@ GHC_INLINE bool startsWith(const std::string& what, const std::string& with)
     return with.length() <= what.length() && equal(with.begin(), with.end(), what.begin());
 }
 
-GHC_INLINE void postprocess_path_with_format(path::string_type& p, path::format fmt)
+}  // namespace detail
+
+GHC_INLINE void path::postprocess_path_with_format(path::impl_string_type& p, path::format fmt)
 {
+#ifdef GHC_RAISE_UNICODE_ERRORS
+    if(!detail::validUtf8(p)) {
+        path t;
+        t._path = p;
+        throw filesystem_error("Illegal byte sequence for unicode character.", t, std::make_error_code(std::errc::illegal_byte_sequence));
+    }
+#endif
     switch (fmt) {
 #ifndef GHC_OS_WINDOWS
         case path::auto_format:
@@ -1308,11 +1422,10 @@ GHC_INLINE void postprocess_path_with_format(path::string_type& p, path::format 
 #ifdef GHC_OS_WINDOWS
         case path::auto_format:
         case path::native_format:
-#endif
-            if (startsWith(p, std::string("\\\\?\\"))) {
+            if (detail::startsWith(p, std::string("\\\\?\\"))) {
                 // remove Windows long filename marker
                 p.erase(0, 4);
-                if (startsWith(p, std::string("UNC\\"))) {
+                if (detail::startsWith(p, std::string("UNC\\"))) {
                     p.erase(0, 2);
                     p[0] = '\\';
                 }
@@ -1323,6 +1436,7 @@ GHC_INLINE void postprocess_path_with_format(path::string_type& p, path::format 
                 }
             }
             break;
+#endif
     }
     if (p.length() > 2 && p[0] == '/' && p[1] == '/' && p[2] != '/') {
         std::string::iterator new_end = std::unique(p.begin() + 2, p.end(), [](path::value_type lhs, path::value_type rhs) { return lhs == rhs && lhs == '/'; });
@@ -1334,33 +1448,31 @@ GHC_INLINE void postprocess_path_with_format(path::string_type& p, path::format 
     }
 }
 
-}  // namespace detail
-
 #endif  // GHC_EXPAND_IMPL
 
 template <class Source, typename>
 inline path::path(const Source& source, format fmt)
-    : _path(source)
+    : _path(detail::toUtf8(source))
 {
-    detail::postprocess_path_with_format(_path, fmt);
+    postprocess_path_with_format(_path, fmt);
 }
 template <>
 inline path::path(const std::wstring& source, format fmt)
 {
     _path = detail::toUtf8(source);
-    detail::postprocess_path_with_format(_path, fmt);
+    postprocess_path_with_format(_path, fmt);
 }
 template <>
 inline path::path(const std::u16string& source, format fmt)
 {
     _path = detail::toUtf8(source);
-    detail::postprocess_path_with_format(_path, fmt);
+    postprocess_path_with_format(_path, fmt);
 }
 template <>
 inline path::path(const std::u32string& source, format fmt)
 {
     _path = detail::toUtf8(source);
-    detail::postprocess_path_with_format(_path, fmt);
+    postprocess_path_with_format(_path, fmt);
 }
 
 template <class Source, typename>
@@ -1388,15 +1500,15 @@ namespace detail {
 GHC_INLINE bool equals_simple_insensitive(const char* str1, const char* str2)
 {
 #ifdef GHC_OS_WINDOWS
-#  ifdef __GNUC__
+#ifdef __GNUC__
     while (::tolower((unsigned char)*str1) == ::tolower((unsigned char)*str2++)) {
         if (*str1++ == 0)
             return true;
     }
     return false;
-#  else
+#else
     return 0 == ::_stricmp(str1, str2);
-#  endif
+#endif
 #else
     return 0 == ::strcasecmp(str1, str2);
 #endif
@@ -1555,7 +1667,7 @@ GHC_INLINE path resolveSymlink(const path& p, std::error_code& ec)
                 UCHAR DataBuffer[1];
             } GenericReparseBuffer;
         } DUMMYUNIONNAME;
-    } REPARSE_DATA_BUFFER, *PREPARSE_DATA_BUFFER;
+    } REPARSE_DATA_BUFFER;
 #ifndef MAXIMUM_REPARSE_DATA_BUFFER_SIZE
 #define MAXIMUM_REPARSE_DATA_BUFFER_SIZE (16 * 1024)
 #endif
@@ -1567,18 +1679,17 @@ GHC_INLINE path resolveSymlink(const path& p, std::error_code& ec)
         return path();
     }
 
-    char buffer[MAXIMUM_REPARSE_DATA_BUFFER_SIZE] = {0};
-    REPARSE_DATA_BUFFER& reparseData = *(REPARSE_DATA_BUFFER*)buffer;
+    std::shared_ptr<REPARSE_DATA_BUFFER> reparseData((REPARSE_DATA_BUFFER*)std::calloc(1, MAXIMUM_REPARSE_DATA_BUFFER_SIZE), std::free);
     ULONG bufferUsed;
     path result;
-    if (DeviceIoControl(file.get(), FSCTL_GET_REPARSE_POINT, 0, 0, &reparseData, sizeof(buffer), &bufferUsed, 0)) {
-        if (IsReparseTagMicrosoft(reparseData.ReparseTag)) {
-            switch (reparseData.ReparseTag) {
+    if (DeviceIoControl(file.get(), FSCTL_GET_REPARSE_POINT, 0, 0, reparseData.get(), MAXIMUM_REPARSE_DATA_BUFFER_SIZE, &bufferUsed, 0)) {
+        if (IsReparseTagMicrosoft(reparseData->ReparseTag)) {
+            switch (reparseData->ReparseTag) {
                 case IO_REPARSE_TAG_SYMLINK:
-                    result = std::wstring(&reparseData.SymbolicLinkReparseBuffer.PathBuffer[reparseData.SymbolicLinkReparseBuffer.PrintNameOffset / sizeof(WCHAR)], reparseData.SymbolicLinkReparseBuffer.PrintNameLength / sizeof(WCHAR));
+                    result = std::wstring(&reparseData->SymbolicLinkReparseBuffer.PathBuffer[reparseData->SymbolicLinkReparseBuffer.PrintNameOffset / sizeof(WCHAR)], reparseData->SymbolicLinkReparseBuffer.PrintNameLength / sizeof(WCHAR));
                     break;
                 case IO_REPARSE_TAG_MOUNT_POINT:
-                    result = std::wstring(&reparseData.MountPointReparseBuffer.PathBuffer[reparseData.MountPointReparseBuffer.PrintNameOffset / sizeof(WCHAR)], reparseData.MountPointReparseBuffer.PrintNameLength / sizeof(WCHAR));
+                    result = std::wstring(&reparseData->MountPointReparseBuffer.PathBuffer[reparseData->MountPointReparseBuffer.PrintNameOffset / sizeof(WCHAR)], reparseData->MountPointReparseBuffer.PrintNameLength / sizeof(WCHAR));
                     break;
                 default:
                     break;
@@ -1839,9 +1950,13 @@ GHC_INLINE path::path(path&& p) noexcept
 }
 
 GHC_INLINE path::path(string_type&& source, format fmt)
+#ifdef GHC_USE_WCHAR_T
+    : _path(detail::toUtf8(source))
+#else
     : _path(std::move(source))
+#endif
 {
-    detail::postprocess_path_with_format(_path, fmt);
+    postprocess_path_with_format(_path, fmt);
 }
 
 #endif  // GHC_EXPAND_IMPL
@@ -1892,8 +2007,12 @@ GHC_INLINE path& path::operator=(path::string_type&& source)
 
 GHC_INLINE path& path::assign(path::string_type&& source)
 {
+#ifdef GHC_USE_WCHAR_T
+    _path = detail::toUtf8(source);
+#else
     _path = std::move(source);
-    detail::postprocess_path_with_format(_path, native_format);
+#endif
+    postprocess_path_with_format(_path, native_format);
     return *this;
 }
 
@@ -1909,7 +2028,7 @@ template <class Source>
 inline path& path::assign(const Source& source)
 {
     _path.assign(detail::toUtf8(source));
-    detail::postprocess_path_with_format(_path, native_format);
+    postprocess_path_with_format(_path, native_format);
     return *this;
 }
 
@@ -1924,7 +2043,7 @@ template <class InputIterator>
 inline path& path::assign(InputIterator first, InputIterator last)
 {
     _path.assign(first, last);
-    detail::postprocess_path_with_format(_path, native_format);
+    postprocess_path_with_format(_path, native_format);
     return *this;
 }
 
@@ -2042,7 +2161,11 @@ GHC_INLINE path& path::operator+=(value_type x)
     }
 #endif
     if (_path.empty() || _path.back() != generic_separator) {
+#ifdef GHC_USE_WCHAR_T
+        _path += detail::toUtf8(string_type(1, x));
+#else
         _path += x;
+#endif
     }
     return *this;
 }
@@ -2050,7 +2173,7 @@ GHC_INLINE path& path::operator+=(value_type x)
 #endif  // GHC_EXPAND_IMPL
 
 template <class Source>
-inline path::path_type<Source>& path::operator+=(const Source& x)
+inline path::path_from_string<Source>& path::operator+=(const Source& x)
 {
     return concat(x);
 }
@@ -2058,7 +2181,7 @@ inline path::path_type<Source>& path::operator+=(const Source& x)
 template <class EcharT>
 inline path::path_type_EcharT<EcharT>& path::operator+=(EcharT x)
 {
-    std::basic_string<EcharT> part(x);
+    std::basic_string<EcharT> part(1, x);
     concat(detail::toUtf8(part));
     return *this;
 }
@@ -2067,7 +2190,7 @@ template <class Source>
 inline path& path::concat(const Source& x)
 {
     path p(x);
-    detail::postprocess_path_with_format(p._path, native_format);
+    postprocess_path_with_format(p._path, native_format);
     _path += p._path;
     return *this;
 }
@@ -2075,7 +2198,7 @@ template <class InputIterator>
 inline path& path::concat(InputIterator first, InputIterator last)
 {
     _path.append(first, last);
-    detail::postprocess_path_with_format(_path, native_format);
+    postprocess_path_with_format(_path, native_format);
     return *this;
 }
 
@@ -2127,29 +2250,47 @@ GHC_INLINE void path::swap(path& rhs) noexcept
 
 //-----------------------------------------------------------------------------
 // 30.10.8.4.6, native format observers
-GHC_INLINE const path::string_type& path::native() const
-{
 #ifdef GHC_OS_WINDOWS
+GHC_INLINE path::impl_string_type path::native_impl() const
+{
+    impl_string_type result;
     if (is_absolute() && _path.length() > MAX_PATH - 10) {
         // expand long Windows filenames with marker
         if (has_root_name() && _path[0] == '/') {
-            _native_cache = "\\\\?\\UNC" + _path.substr(1);
+            result = "\\\\?\\UNC" + _path.substr(1);
         }
         else {
-            _native_cache = "\\\\?\\" + _path;
+            result = "\\\\?\\" + _path;
         }
     }
     else {
-        _native_cache = _path;
+        result = _path;
     }
     /*if (has_root_name() && root_name()._path[0] == '/') {
         return _path;
     }*/
-    for (auto& c : _native_cache) {
+    for (auto& c : result) {
         if (c == '/') {
             c = '\\';
         }
     }
+    return result;
+}
+#else
+GHC_INLINE const path::impl_string_type& path::native_impl() const
+{
+    return _path;
+}
+#endif
+
+GHC_INLINE const path::string_type& path::native() const
+{
+#ifdef GHC_OS_WINDOWS
+#ifdef GHC_USE_WCHAR_T
+    _native_cache = detail::fromUtf8<string_type>(native_impl());
+#else
+    _native_cache = native_impl();
+#endif
     return _native_cache;
 #else
     return _path;
@@ -2171,34 +2312,38 @@ GHC_INLINE path::operator path::string_type() const
 template <class EcharT, class traits, class Allocator>
 inline std::basic_string<EcharT, traits, Allocator> path::string(const Allocator& a) const
 {
-    return detail::fromUtf8<std::basic_string<EcharT, traits, Allocator>>(native(), a);
+    return detail::fromUtf8<std::basic_string<EcharT, traits, Allocator>>(native_impl(), a);
 }
 
 #ifdef GHC_EXPAND_IMPL
 
 GHC_INLINE std::string path::string() const
 {
-    return native();
+    return native_impl();
 }
 
 GHC_INLINE std::wstring path::wstring() const
 {
+#ifdef GHC_USE_WCHAR_T
+    return native();
+#else
     return detail::fromUtf8<std::wstring>(native());
+#endif
 }
 
 GHC_INLINE std::string path::u8string() const
 {
-    return native();
+    return native_impl();
 }
 
 GHC_INLINE std::u16string path::u16string() const
 {
-    return detail::fromUtf8<std::u16string>(native());
+    return detail::fromUtf8<std::u16string>(native_impl());
 }
 
 GHC_INLINE std::u32string path::u32string() const
 {
-    return detail::fromUtf8<std::u32string>(native());
+    return detail::fromUtf8<std::u32string>(native_impl());
 }
 
 #endif  // GHC_EXPAND_IMPL
@@ -2272,8 +2417,8 @@ GHC_INLINE path path::root_name() const
     }
 #endif
     if (_path.length() > 2 && _path[0] == '/' && _path[1] == '/' && _path[2] != '/' && std::isprint(_path[2])) {
-        string_type::size_type pos = _path.find_first_of("/\\", 3);
-        if (pos == string_type::npos) {
+        impl_string_type::size_type pos = _path.find_first_of("/\\", 3);
+        if (pos == impl_string_type::npos) {
             return path(_path);
         }
         else {
@@ -2335,10 +2480,10 @@ GHC_INLINE path path::filename() const
 
 GHC_INLINE path path::stem() const
 {
-    string_type fn = filename();
+    impl_string_type fn = filename().string();
     if (fn != "." && fn != "..") {
-        string_type::size_type n = fn.rfind(".");
-        if (n != string_type::npos && n != 0) {
+        impl_string_type::size_type n = fn.rfind(".");
+        if (n != impl_string_type::npos && n != 0) {
             return fn.substr(0, n);
         }
     }
@@ -2347,8 +2492,8 @@ GHC_INLINE path path::stem() const
 
 GHC_INLINE path path::extension() const
 {
-    string_type fn = filename();
-    string_type::size_type pos = fn.find_last_of('.');
+    impl_string_type fn = filename().string();
+    impl_string_type::size_type pos = fn.find_last_of('.');
     if (pos == std::string::npos || pos == 0) {
         return "";
     }
@@ -2492,7 +2637,7 @@ GHC_INLINE path path::lexically_proximate(const path& base) const
 // 30.10.8.5, iterators
 GHC_INLINE path::iterator::iterator() {}
 
-GHC_INLINE path::iterator::iterator(const path::string_type::const_iterator& first, const path::string_type::const_iterator& last, const path::string_type::const_iterator& pos)
+GHC_INLINE path::iterator::iterator(const path::impl_string_type::const_iterator& first, const path::impl_string_type::const_iterator& last, const path::impl_string_type::const_iterator& pos)
     : _first(first)
     , _last(last)
     , _iter(pos)
@@ -2505,22 +2650,24 @@ GHC_INLINE path::iterator::iterator(const path::string_type::const_iterator& fir
     }
     else
 #endif
+    {
         if (_first != _last && *_first == '/') {
-        if (_last - _first >= 2 && *(_first + 1) == '/' && !(_last - _first >= 3 && *(_first + 2) == '/')) {
-            _root = increment(_first);
+            if (_last - _first >= 2 && *(_first + 1) == '/' && !(_last - _first >= 3 && *(_first + 2) == '/')) {
+                _root = increment(_first);
+            }
+            else {
+                _root = _first;
+            }
         }
         else {
-            _root = _first;
+            _root = _last;
         }
-    }
-    else {
-        _root = _last;
     }
 }
 
-GHC_INLINE path::string_type::const_iterator path::iterator::increment(const path::string_type::const_iterator& pos) const
+GHC_INLINE path::impl_string_type::const_iterator path::iterator::increment(const path::impl_string_type::const_iterator& pos) const
 {
-    std::string::const_iterator i = pos;
+    path::impl_string_type::const_iterator i = pos;
     bool fromStart = i == _first;
     if (i != _last) {
         // we can only sit on a slash if it is a network name or a root
@@ -2551,9 +2698,9 @@ GHC_INLINE path::string_type::const_iterator path::iterator::increment(const pat
     return i;
 }
 
-GHC_INLINE path::string_type::const_iterator path::iterator::decrement(const path::string_type::const_iterator& pos) const
+GHC_INLINE path::impl_string_type::const_iterator path::iterator::decrement(const path::impl_string_type::const_iterator& pos) const
 {
-    std::string::const_iterator i = pos;
+    path::impl_string_type::const_iterator i = pos;
     if (i != _first) {
         --i;
         // if this is now the root slash or the trailing slash, we are done,
@@ -2561,12 +2708,12 @@ GHC_INLINE path::string_type::const_iterator path::iterator::decrement(const pat
         if (i != _root && (pos != _last || *i != '/')) {
 #ifdef GHC_OS_WINDOWS
             static const std::string seps = "/:";
-            i = std::find_first_of(std::reverse_iterator<std::string::const_iterator>(i), std::reverse_iterator<std::string::const_iterator>(_first), seps.begin(), seps.end()).base();
+            i = std::find_first_of(std::reverse_iterator<path::impl_string_type::const_iterator>(i), std::reverse_iterator<path::impl_string_type::const_iterator>(_first), seps.begin(), seps.end()).base();
             if (i > _first && *i == ':') {
                 i++;
             }
 #else
-            i = std::find(std::reverse_iterator<std::string::const_iterator>(i), std::reverse_iterator<std::string::const_iterator>(_first), '/').base();
+            i = std::find(std::reverse_iterator<path::impl_string_type::const_iterator>(i), std::reverse_iterator<path::impl_string_type::const_iterator>(_first), '/').base();
 #endif
             // Now we have to check if this is a network name
             if (i - _first == 2 && *_first == '/' && *(_first + 1) == '/') {
@@ -2621,7 +2768,7 @@ GHC_INLINE path::iterator& path::iterator::operator--()
 
 GHC_INLINE path::iterator path::iterator::operator--(int)
 {
-    path::iterator i{*this};
+    auto i = *this;
     --(*this);
     return i;
 }
@@ -3108,7 +3255,7 @@ GHC_INLINE bool copy_file(const path& from, const path& to, copy_options options
         ec = std::error_code(errno, std::system_category());
         return false;
     }
-    std::shared_ptr<void> guard_out(nullptr, [out](void*) { ::close(out); });
+    std::shared_ptr<void> guard_in(nullptr, [in](void*) { ::close(in); });
     int mode = O_CREAT | O_WRONLY | O_TRUNC;
     if (!overwrite) {
         mode |= O_EXCL;
@@ -3117,7 +3264,7 @@ GHC_INLINE bool copy_file(const path& from, const path& to, copy_options options
         ec = std::error_code(errno, std::system_category());
         return false;
     }
-    std::shared_ptr<void> guard_in(nullptr, [in](void*) { ::close(in); });
+    std::shared_ptr<void> guard_out(nullptr, [out](void*) { ::close(out); });
     ssize_t br, bw;
     while ((br = ::read(in, buffer.data(), buffer.size())) > 0) {
         int offset = 0;
@@ -3173,7 +3320,7 @@ GHC_INLINE bool create_directories(const path& p, std::error_code& ec) noexcept
 {
     path current;
     ec.clear();
-    for (const std::string& part : p) {
+    for (const path::string_type& part : p) {
         current /= part;
         if (current != p.root_name() && current != p.root_path()) {
             std::error_code tec;
@@ -3324,7 +3471,7 @@ GHC_INLINE path current_path(std::error_code& ec)
     ec.clear();
 #ifdef GHC_OS_WINDOWS
     DWORD pathlen = ::GetCurrentDirectoryW(0, 0);
-    std::unique_ptr<wchar_t[]> buffer(new wchar_t[pathlen + 1]);
+    std::unique_ptr<wchar_t[]> buffer(new wchar_t[size_t(pathlen) + 1]);
     if (::GetCurrentDirectoryW(pathlen, buffer.get()) == 0) {
         ec = std::error_code(::GetLastError(), std::system_category());
         return path();
@@ -3772,7 +3919,7 @@ GHC_INLINE void permissions(const path& p, perms prms, perm_options opts, std::e
         }
     }
 #ifdef GHC_OS_WINDOWS
-#  ifdef __GNUC__
+#ifdef __GNUC__
     auto oldAttr = GetFileAttributesW(p.wstring().c_str());
     if (oldAttr != INVALID_FILE_ATTRIBUTES) {
         DWORD newAttr = ((prms & perms::owner_write) == perms::owner_write) ? oldAttr & ~FILE_ATTRIBUTE_READONLY : oldAttr | FILE_ATTRIBUTE_READONLY;
@@ -3781,7 +3928,7 @@ GHC_INLINE void permissions(const path& p, perms prms, perm_options opts, std::e
         }
     }
     ec = std::error_code(::GetLastError(), std::system_category());
-#  else
+#else
     int mode = 0;
     if ((prms & perms::owner_read) == perms::owner_read) {
         mode |= _S_IREAD;
@@ -3792,7 +3939,7 @@ GHC_INLINE void permissions(const path& p, perms prms, perm_options opts, std::e
     if (::_wchmod(p.wstring().c_str(), mode) != 0) {
         ec = std::error_code(::GetLastError(), std::system_category());
     }
-#  endif
+#endif
 #else
     if ((opts & perm_options::nofollow) != perm_options::nofollow) {
         if (::chmod(p.c_str(), static_cast<mode_t>(prms)) != 0) {
@@ -4526,22 +4673,26 @@ public:
     impl(const path& p, directory_options options)
         : _base(p)
         , _options(options)
-        , _dirHandle(_base.empty() ? INVALID_HANDLE_VALUE : FindFirstFileW(detail::fromUtf8<std::wstring>((_base / "*").u8string()).c_str(), &_findData))
-        , _current(_dirHandle != INVALID_HANDLE_VALUE ? _base / std::wstring(_findData.cFileName) : filesystem::path())
+        , _findData{0}
+        , _dirHandle(INVALID_HANDLE_VALUE)
     {
-        if (_dirHandle == INVALID_HANDLE_VALUE && !p.empty()) {
-            auto error = ::GetLastError();
-            _base = filesystem::path();
-            if (error != ERROR_ACCESS_DENIED || (options & directory_options::skip_permission_denied) == directory_options::none) {
-                _ec = std::error_code(::GetLastError(), std::system_category());
-            }
-        }
-        else {
-            if (std::wstring(_findData.cFileName) == L"." || std::wstring(_findData.cFileName) == L"..") {
-                increment(_ec);
+        if (!_base.empty()) {
+            ZeroMemory(&_findData, sizeof(WIN32_FIND_DATAW));
+            if ((_dirHandle = FindFirstFileW(detail::fromUtf8<std::wstring>((_base / "*").u8string()).c_str(), &_findData)) != INVALID_HANDLE_VALUE) {
+                if (std::wstring(_findData.cFileName) == L"." || std::wstring(_findData.cFileName) == L"..") {
+                    increment(_ec);
+                }
+                else {
+                    _current = _base / std::wstring(_findData.cFileName);
+                    copyToDirEntry(_ec);
+                }
             }
             else {
-                copyToDirEntry(_ec);
+                auto error = ::GetLastError();
+                _base = filesystem::path();
+                if (error != ERROR_ACCESS_DENIED || (options & directory_options::skip_permission_denied) == directory_options::none) {
+                    _ec = std::error_code(::GetLastError(), std::system_category());
+                }
             }
         }
     }
@@ -4559,10 +4710,20 @@ public:
             do {
                 if (FindNextFileW(_dirHandle, &_findData)) {
                     _current = _base;
-                    _current.append_name(detail::toUtf8(_findData.cFileName).c_str());
+                    try {
+                        _current.append_name(detail::toUtf8(_findData.cFileName).c_str());
+                    }
+                    catch(filesystem_error& fe) {
+                        ec = fe.code();
+                        return;
+                    }
                     copyToDirEntry(ec);
                 }
                 else {
+                    auto err = ::GetLastError();
+                    if(err != ERROR_NO_MORE_FILES) {
+                        _ec = ec = std::error_code(err, std::system_category());
+                    }
                     FindClose(_dirHandle);
                     _dirHandle = INVALID_HANDLE_VALUE;
                     _current = filesystem::path();
@@ -4768,11 +4929,6 @@ GHC_INLINE bool directory_iterator::operator!=(const directory_iterator& rhs) co
     return _impl->_current != rhs._impl->_current;
 }
 
-GHC_INLINE void directory_iterator::swap(directory_iterator& rhs)
-{
-    std::swap(_impl, rhs._impl);
-}
-
 // 30.10.13.2 directory_iterator non-member functions
 
 GHC_INLINE directory_iterator begin(directory_iterator iter) noexcept
@@ -4936,11 +5092,6 @@ GHC_INLINE bool recursive_directory_iterator::operator==(const recursive_directo
 GHC_INLINE bool recursive_directory_iterator::operator!=(const recursive_directory_iterator& rhs) const
 {
     return _impl->_dir_iter_stack.top() != rhs._impl->_dir_iter_stack.top();
-}
-
-GHC_INLINE void recursive_directory_iterator::swap(recursive_directory_iterator& rhs)
-{
-    std::swap(_impl, rhs._impl);
 }
 
 // 30.10.14.2 directory_iterator non-member functions
