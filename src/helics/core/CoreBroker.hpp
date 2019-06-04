@@ -18,7 +18,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "gmlc/containers/AirLock.hpp"
 #include "gmlc/containers/DualMappedVector.hpp"
 #include "gmlc/containers/SimpleQueue.hpp"
-#include "helics_includes/any.hpp"
+#include "helics/external/any.hpp"
 
 #include "../common/TriggerVariable.hpp"
 #include "ActionMessage.hpp"

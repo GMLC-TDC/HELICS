@@ -16,10 +16,10 @@
 #include <future>
 #ifdef _MSC_VER
 #pragma warning(push, 0)
-#include <helics_includes/filesystem.hpp>
+#include "helics/external/filesystem.hpp"
 #pragma warning(pop)
 #else
-#include <helics_includes/filesystem.hpp>
+#include "helics/external/filesystem.hpp"
 #endif
 #include <streambuf>
 

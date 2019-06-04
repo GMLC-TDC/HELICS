@@ -683,21 +683,30 @@ install(
     DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/helics
     COMPONENT headers
 )
+
+option(HELICS_INSTALL_CEREAL "Install a copy of the cereal headers used for compiling and a CMake target to include them" ${MSVC})
+
+mark_as_advanced(HELICS_INSTALL_CEREAL)
+
+if (HELICS_INSTALL_CEREAL)
 install(
     DIRECTORY ThirdParty/cereal
-    DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
-    COMPONENT headers
+    DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/helics/external/optional
+    COMPONENT cereal
 )
+add_library(cereal INTERFACE)
+add_library(HELICS::cereal ALIAS cereal)
+target_include_directories(cereal
+    INTERFACE
+        $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/ThirdParty>
+        $<INSTALL_INTERFACE:$<INSTALL_PREFIX>/include/helics/external/optional>
+)
+install(TARGETS cereal EXPORT helics-targets COMPONENT cereal)
+endif()
 
 install(
-    DIRECTORY ThirdParty/CLI11
-    DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
-    COMPONENT headers
-)
-
-install(
-    DIRECTORY ThirdParty/helics_includes
-    DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+    DIRECTORY ThirdParty/helics/external
+    DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/helics
     COMPONENT headers
 )
 
@@ -738,7 +747,7 @@ install(
 
 install(
     FILES LICENSE NOTICE
-    DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+    DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/helics
     COMPONENT libs
 )
 # -------------------------------------------------------------
@@ -778,6 +787,7 @@ if(ENABLE_PACKAGE_BUILD)
         java
         octave
         csharp
+        cereal
     )
     if(WIN32)
         set(CPACK_RESOURCE_FILE_LICENSE "${HELICS_SOURCE_DIR}\\\\LICENSE")
@@ -809,7 +819,7 @@ if(ENABLE_PACKAGE_BUILD)
         "Headers for linking and compiling with HELICS"
     )
     set(CPACK_COMPONENT_RUNTIME_DESCRIPTION "Runtime libraries for HELICS")
-
+    set(CPACK_COMPONENT_CEREAL_DESCRIPTION "cereal C++11 serialization library [no support for other language interfaces]")
     set(
         CPACK_COMPONENT_GROUP_INTERFACES_DESCRIPTION
         "additional language interfaces for HELICS"

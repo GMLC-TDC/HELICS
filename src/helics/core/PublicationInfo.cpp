@@ -5,7 +5,7 @@ the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 #include "PublicationInfo.hpp"
-#include "helics_includes/string_view.hpp"
+#include "helics/external/string_view.hpp"
 namespace helics
 {
 bool PublicationInfo::CheckSetValue (const char *dataToCheck, uint64_t len)

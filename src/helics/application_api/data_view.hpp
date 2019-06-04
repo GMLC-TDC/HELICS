@@ -10,7 +10,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "../core/helics-time.hpp"
 #include "helics/helics-config.h"
 #include "helicsTypes.hpp"
-#include "helics_includes/string_view.hpp"
+#include "helics/external/string_view.hpp"
 #include <memory>
 
 namespace helics

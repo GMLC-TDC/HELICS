@@ -9,10 +9,10 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "ValueConverter.hpp"
 #include "helics/helics-config.h"
 #include "helicsTypes.hpp"
+#include "helics/external/variant.hpp"
 #include <cmath>
 #include <complex>
 #include <cstdint>
-#include <helics_includes/variant.hpp>
 #include <string>
 #include <vector>
 /** @file
