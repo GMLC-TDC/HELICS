@@ -492,7 +492,7 @@ target_include_directories(
         $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/src>
         $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}/include>
         $<INSTALL_INTERFACE:$<INSTALL_PREFIX>/${CMAKE_INSTALL_INCLUDE_DIR}>
-        $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/ThirdParty/containers>
+		$<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/ThirdParty/containers>
         $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/ThirdParty/concurrency>
         $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/ThirdParty/netif>
         $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/ThirdParty/utilities>
@@ -858,6 +858,21 @@ install(
     DESTINATION ${CMAKE_INSTALL_DOCDIR}
     COMPONENT libs
 )
+
+foreach(LIB ${HELICS_LIBRARIES})
+  set(PRIVATE_LIBS "${PRIVATE_LIBS} -l${LIB}")
+endforeach()
+
+set(prefix ${CMAKE_INSTALL_PREFIX})
+set(exec_prefix ${prefix}/${CMAKE_INSTALL_BINDIR})
+set(libdir ${prefix}/${CMAKE_INSTALL_LIBDIR})
+set(includedir ${prefix}/${CMAKE_INSTALL_INCLUDEDIR})
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/src/libhelics.pc.in ${CMAKE_CURRENT_BINARY_DIR}/libhelics.pc @ONLY)
+set(helics-pkgconfig ${CMAKE_CURRENT_BINARY_DIR}/libhelics.pc)
+
+if(UNIX)
+  install(FILES ${CMAKE_CURRENT_BINARY_DIR}/libhelics.pc DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig)
+endif()
 
 # -------------------------------------------------------------
 # CPack
