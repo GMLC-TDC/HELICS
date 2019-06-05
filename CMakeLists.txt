@@ -307,7 +307,7 @@ if(NOT EXISTS "${PROJECT_SOURCE_DIR}/ThirdParty/jsoncpp/CMakeLists.txt")
 	submod_update(ThirdParty/jsoncpp)
 endif()
 
-if(NOT EXISTS "${PROJECT_SOURCE_DIR}/ThirdParty/containers/containers/BlockingQueue.hpp")
+if(NOT EXISTS "${PROJECT_SOURCE_DIR}/ThirdParty/containers/gmlc/containers/BlockingQueue.hpp")
 	submod_update(ThirdParty/containers)
 endif()
 
@@ -543,13 +543,22 @@ include(addfmt)
 #  Create the target for jsoncpp
 # -----------------------------------------------------------
 include(addJsoncpp)
+
+if (JSONCPP_OBJLIB)
+target_include_directories(
+    helics_base_includes SYSTEM
+    INTERFACE
+    $<TARGET_PROPERTY:jsoncpp_headers,INTERFACE_INCLUDE_DIRECTORIES>
+)
+set_target_properties(jsoncppobj_lib PROPERTIES FOLDER Extern)
+else()
 target_include_directories(
     helics_base_includes SYSTEM
     INTERFACE
     $<TARGET_PROPERTY:jsoncpp_lib,INTERFACE_INCLUDE_DIRECTORIES>
 )
-
 set_target_properties(jsoncpp_lib PROPERTIES FOLDER Extern)
+endif()
 # -----------------------------------------------------------------------------
 # CMAKE Subdirectories
 # -----------------------------------------------------------------------------
