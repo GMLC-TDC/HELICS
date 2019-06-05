@@ -8,6 +8,9 @@ set(INSTALL_EXPORT EXPORT helics-targets CACHE INTERNAL "")
 
 set(JSONCPP_DISABLE_CCACHE ON CACHE INTERNAL "")
 
+option(JSONCPP_OBJLIB OFF "use jsoncpp objlib for linking object files instead of the normal target") 
+mark_as_advanced(JSONCPP_OBJLIB)
+
 if(NOT CMAKE_CXX_STANDARD)
     set(CMAKE_CXX_STANDARD 14) # Supported values are ``11``, ``14``, and ``17``.
 endif()
@@ -17,7 +20,7 @@ if (BUILD_SHARED_LIBS)
    set(BUILD_SHARED_LIBS OFF)
 endif()
 
-#these are intenal variables used in JSONCPP that we know to be true based on the requirements in HELICS for newer compilers than JSONCPP supports
+#these are internal variables used in JSONCPP that we know to be true based on the requirements in HELICS for newer compilers than JSONCPP supports
 set(HAVE_CLOCALE ON)
 set(HAVE_LOCALECONV ON)
 set(COMPILER_HAS_DEPRECATED ON)
