@@ -7,31 +7,24 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "gtest/gtest.h"
 
 #include "helics/core/MessageTimer.hpp"
-
+#include "libguarded/atomic_guarded.hpp"
 using namespace helics;
 
 TEST (messageTimer_tests, basic_test)
 {
-    std::mutex mlock;
-    ActionMessage M;
-    auto cback = [&](ActionMessage &&m) {
-        std::lock_guard<std::mutex> locker (mlock);
-        M = std::move (m);
-    };
+    libguarded::atomic_guarded<ActionMessage> M;
+    auto cback = [&](ActionMessage &&m) { M = std::move (m); };
     auto mtimer = std::make_shared<MessageTimer> (cback);
-    std::unique_lock<std::mutex> localLock (mlock);
+    std::this_thread::yield ();  // just get the loop started
     mtimer->addTimerFromNow (std::chrono::milliseconds (200), CMD_PROTOCOL);
-    EXPECT_TRUE (M.action () == CMD_IGNORE);
-    localLock.unlock ();
+    EXPECT_TRUE (M.load ().action () == CMD_IGNORE);
     std::this_thread::sleep_for (std::chrono::milliseconds (300));
-    localLock.lock ();
-    if (M.action () != CMD_PROTOCOL)
+    if (M.load ().action () != CMD_PROTOCOL)
     {
-        localLock.unlock ();
         std::this_thread::sleep_for (std::chrono::milliseconds (500));
-        localLock.lock ();
     }
-    EXPECT_TRUE (M.action () == CMD_PROTOCOL);
+    auto tm = M.load ();
+    EXPECT_TRUE (tm.action () == CMD_PROTOCOL) << tm;
 }
 
 TEST (messageTimer_tests_skip_ci, basic_test_update)
