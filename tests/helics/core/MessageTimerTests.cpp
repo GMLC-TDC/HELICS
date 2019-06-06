@@ -21,10 +21,19 @@ TEST (messageTimer_tests, basic_test)
     std::this_thread::sleep_for (std::chrono::milliseconds (300));
     if (M.load ().action () != CMD_PROTOCOL)
     {
-        std::this_thread::sleep_for (std::chrono::milliseconds (500));
+        std::this_thread::sleep_for (std::chrono::milliseconds (300));
+    }
+    if (M.load ().action () != CMD_PROTOCOL)
+    {
+        std::cout << "having to wait again";
+        std::this_thread::sleep_for (std::chrono::milliseconds (200));
     }
     auto tm = M.load ();
     EXPECT_TRUE (tm.action () == CMD_PROTOCOL) << tm;
+    if (tm.action () != CMD_PROTOCOL)
+    {
+        mtimer->cancelAll ();
+    }
 }
 
 TEST (messageTimer_tests_skip_ci, basic_test_update)
