@@ -130,9 +130,9 @@ To demonstrate how a to build a co-simulation, an example of a simple integrated
 
 This example has a very simple message topology (with only one message being sent by either federate at each time step) and uses only a single broker. Diagrams of the message and broker topology can be found below:
 
-![Ex. 1a message topology](../img/ex1a_message_topology.pdf)
+![Ex. 1a message topology](../img/Ex1a_Message_topology.png)
 
-![Ex. 1a broker topology](../img/ex1a_broker_topology.pdf)
+![Ex. 1a broker topology](../img/Ex1a_Broker_topology.png)
 
 * **Transmission system** - The transmission system model used is the IEEE-118 bus model. To a single bus in this model the GridLAB-D distribution system is attached. All other load buses in the model use a static load shape scaled proportionately so the peak of the load shape matches meet the model-defined load value. The generators are re-dispatched every fifteen minutes by running an optimal power flow (the so-called "ACOPF" which places constraints on the voltage at the nodes in the system) and every five minutes a powerflow is run the update the state of the system. To allow for the relatively modest size of the single distribution system attached to the transmission system, the distribution system load is amplified by a factor of fifteen before being applied to the transmission system.
 

@@ -26,11 +26,11 @@ public:
 
 3) class methods should be `camelCase`
 
-    > ``` {.sourceCode .cpp}
-    > Publication &registerGlobalPublication (const std::string &name, const std::string &type, const std::string &units = "");
-    >
-    > Exceptions:  functions that match standard library functions e.g. to_string()
-    > ```
+    ``` {.sourceCode .cpp}
+    Publication &registerGlobalPublication (const std::string &name, const std::string &type, const std::string &units = "");
+
+    Exceptions:  functions that match standard library functions e.g. to_string()
+    ```
 
 4) All fundamental types and enumerations should be underscore
    separated words in lower case. Fundamental types are those for which

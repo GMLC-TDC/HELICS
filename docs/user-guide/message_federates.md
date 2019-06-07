@@ -10,13 +10,13 @@ As previously discussed, message federates interact with the federation by defin
 
 In fact, as you'll see in [a later section](./filters.md), it is possible to create more realistic communication-system effects natively in HELICS (as well as use a full-blown communication simulator like [ns-3](https://www.nsnam.org) to do the same). This is relevant now, though, because it influences how the endpoints are created and, as a consequence, how the simulator handles messages. You could, for example, have a system with three federates communicating with each other: a remote voltage sensor, a voltage controller, and a voltage regulation actuator (we'll pretend for the case of this example that the last two are physically separated though they often aren't). In this case, you could imagine that the voltage sensor only sends messages to the voltage controller and the voltage controller only sends messages to the voltage regulation actuator. That is, those two paths between the three entities are distinct, have no interaction, and have unique properties (though they may not be modeled). Given this, referring to the figure below, the voltage sensor could have one endpoint ("Endpoint 1") to send the voltage signal, the voltage regulator could receive the measurement at one endpoint ("Endpoint 2") and send the control signal on another ("Endpoint 3"), and the voltage regulation actuator would receive the control signal on its own endpoint ("Endpoint 4").
 
-![voltage regulation message federates](../img/voltage_reg_message_federate.pdf)
+![voltage regulation message federates](../img/voltage_reg_message_federate.png)
 
 The federate code handling these messages can be relatively simple because the data coming in or going out of each endpoint is unique. The voltage controller always receives (and only receives) the voltage measurement at one endpoint and similarly only sends the control signal on another.
 
 Consider a counter-example: automated meter-reading (AMI) using a wireless network that connects all meters in a distribution system to a data-aggregator in the substation (where, presumably, the data travels over a dedicated wired connection to a control room). All meters will have a single endpoint over which they will send their data but what about the receiver? The co-simulation could be designed with the data-aggregator having a unique endpoint for each meter but this implies come kind of dedicated communication channel for each meter; this is not the case with wireless communication. Instead, it is probably better to create a single endpoint representing the wireless connection the data aggregator has with the AMI network. In this case, messages from any of the meters in the system will be flowing through the same endpoint and to differentiate the messages from each other, the federate will have to be written to examine the metadata with the message to determine its original source.
 
-![ami message federates](../img/ami_message_federate.pdf)
+![ami message federates](../img/ami_message_federate.png)
 
 ## Interactions Between Messages and Values
 Though it is not possible to have a HELICS message show up at a value interface, the converse is possible; message_federates can subscribe to HELICS values. Every time a value federate publishes a new value to the federation, if a message federate has subscribed to that message HELICS will generate a new HELICS message and send it directly to the destination endpoint. These messages are queued and not overwritten (unlike in HELICS values) which means when a message federate is synchronized it may have multiple messages from the same source to manage.
@@ -82,9 +82,9 @@ Keeping in mind that this a model for demonstration purposes (which is to say, d
 
 The message topology (including the endpoints) and the not very interesting broker topology are shown below.
 
-![Ex. 1b message topology](../img/ex1b_message_topology.pdf)
+![Ex. 1b message topology](../img/Ex1b_Message_topology.png)
 
-![Ex. 1b message topology](../img/ex1b_broker_topology.pdf)
+![Ex. 1b message topology](../img/Ex1b_Broker_topology.png)
 
 
 Taking these assumptions and specifications, it is not too difficult to write a simple charge controller as a Python script. And just by opening the [JSON configuration file](../../examples/user_guide_examples/Example_1b/EV_Controller/Control.json) we can learn important details about how the controller works.

@@ -18,13 +18,13 @@ The figure below is an example of a representation of the message topology of a 
   * As constructed, the source filter on Federate 2 has no impact on this co-simulation as there are no messages sent from that endpoint.
   * Individual filters can be targeted to act on multiple endpoints and act as both source and destination filters.
 
-![messages and filters example](../img/messages_and_filters_example.pdf)
+![messages and filters example](../img/messages_and_filters_example.png)
   
 ### Example 1c - EV charge controller with HELICS filters ###
 
 To demonstrate the effects of filters, let's take the same model we were working with in the [previous example](./message_federates.md), and add a filter to the controller. Specifically, let's assume a very, very poor communication system and add a 600 second delay to the control messages sent from the EV charge controller to each of the EVs.
 
-![Ex. 1c message topology](../img/ex1c_message_topology.pdf)
+![Ex. 1c message topology](../img/Ex1c_Message_topology.png)
 
 [The JSON configuration file](../../examples/user_guide_examples/Example_1c/EV_Controller/Control.json) adds a new `filter` section that implements the filtering:
 
@@ -76,7 +76,7 @@ HELICS filters are a simple, easy step to add a touch of realism to messages in 
 
 The wonderful thing about the software architecture of HELICS is that simulators that have been properly modified to allow HELICS integration will seamlessly slide into the role of filters without having to reconfigure the sending and receiving federates. The move from native HELICS filters to full-blown communication system models is invisible. This is achieved by allowing user-defined nodes in a communication system model to be designated the filter for a given endpoint. All HELICS messages coming from that endpoint enter the communication system federate at that node and message being sent to that endpoint exit the communication system federate at that node. Conceptually, the change looks something like the figure below:
 
-![filters federate example](../img/filter_federate_example.pdf)
+![filters federate example](../img/filter_federate_example.png)
 
 
 ### Example 1d - EV charge controller with an ns-3 model ###
