@@ -10,9 +10,9 @@ As a co-simulation is, in some sense, a simulation of simulations, there are two
 		
 		Given the fact that only two federates are being used (the minimum number to be a co-simulation, though HELICS itself works just fine with a single federate), only a single broker is required.
 
-![Transmission distribution co-simulation message topology](../img/ditl_message_topology.png)
+		![Transmission distribution co-simulation message topology](../img/ditl_message_topology.png)
 
-![Transmission distribution co-simulation broker topology](../img/ditl_broker_topology.png)
+		![Transmission distribution co-simulation broker topology](../img/ditl_broker_topology.png)
 
 2. **Configure the federates** - Every federate (instance of a simulator) will require configuration so that it correctly integrates with the federation. For simulators that already have HELICS support, the configuration takes the form of a JSON (or TOML) file; for simulators you might be integrating, the configuration can be done programmatically in code or via a JSON file as well. The essential information that HELICS configuration defines is:
   
