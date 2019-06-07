@@ -21,14 +21,14 @@ Filters
 Federation
 ----------
 
-![image](../img/federation.png)
+![Federate communication](../img/federation.png)
 
 Example with delay
 ------------------
 
-![image](../img/filter-delay.png)
+![Federate communication with a delay filter](../img/filter-delay.png)
 
 Example with communication system
 ---------------------------------
 
-![image](../img/filter-comm-system.png)
+![Federate communication with a communication simulator](../img/filter-comm-system.png)

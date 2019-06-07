@@ -55,7 +55,7 @@ helics_player player_file.txt --stop 5
 
 Players support both delimited text files and JSON files some examples can be found in
 
-[Player configuation Examples](https://github.com/GMLC-TDC/HELICS-src/tree/master/tests/helics/apps/test_files)
+[Player configuration examples](https://github.com/GMLC-TDC/HELICS-src/tree/master/tests/helics/apps/test_files)
 
 ## Config File Detail
 

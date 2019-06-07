@@ -49,9 +49,9 @@ Just for the purposes of illustration, let's suppose that a co-simulation federa
 * **Generator Controller** - This is an event-based simulator, updating the control commands to the Generator federate whenever new inputs are received from the Power System federate (subscriptions to the physical values it calculates). As such, it will always request `maxTime`, expecting to be granted times whenever the state of the Power System federate changes. The `timeDelta` will be set to 0.010 ms to replicate the time it takes to calculate and communicate the command signals to the Generator.
 * **Power System** - This federate is a classic power system dynamics simulator with a fixed time-step of 1 ms. The integrator of this simulator choose to realize this by setting the `uninterruptible` flag and hard-coding the time requests to advance at 1 ms intervals.
 
-Below is a PDF with a timing diagram showing how these federates interact during a co-simulation. The filled blocks show when each federate has been woken up and is active.
+Below is a timing diagram showing how these federates interact during a co-simulation. The filled blocks show when each federate has been woken up and is active.
 
-[Example timing diagram](../img/helics_timing_example.png)
+![Example timing diagram](../img/helics_timing_example.png)
 
 Items of notes:
 
