@@ -120,9 +120,9 @@ To demonstrate how a to build a co-simulation, an example of a simple integrated
   2. [GridLAB-D](https://github.com/gridlab-d/gridlab-d/tree/develop) - Enable HELICS, see instructions [here](http://gridlab-d.shoutwiki.com/wiki/Connection:helics_msg)
   3. [Python](https://www.anaconda.com/download/) - Anaconda installation, if you don't already have Python installed. You may need to also install the following Python packages (`conda install` ...)
 
-  	* matplotlib
-  	* time
-  	* logging
+          * matplotlib
+          * time
+          * logging
 
   4. [PyPower](https://pypi.org/project/PYPOWER/) - `pip install pypower`
   5. [helics_cli](https://github.com/GMLC-TDC/helics-runner) - `pip install git+git://github.com/GMLC-TDC/helics-runner.git@master`
