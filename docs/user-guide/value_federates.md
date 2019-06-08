@@ -1,4 +1,4 @@
-#Value Federates #
+# Value Federates #
 
 HELICS messages that are value-oriented are the most common type of messages. As mentioned in the [federate introduction](./federate.md), value messages are intended to be used to represent the physics of a system, linking federates at their mutual boundaries and allowing a larger and more complex system to be represented than would be the case if only one simulator was used.
 
