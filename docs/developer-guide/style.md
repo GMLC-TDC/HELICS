@@ -10,34 +10,34 @@ Naming Conventions
 
 1) All functions should be `camelCase`
 
-        ``` {.sourceCode .cpp}
+``` cpp
         publication_id_t registerGlobalPublication (const std::string &name, const std::string &type, const std::string &units = "");
-        ```
+```
 
 2) All classes should be `PascalCase` except those noted below(namely classes which are wrappers for fundamental types)
 
-        ``` {.sourceCode .cpp}
+``` cpp
         class ValueFederate : public virtual Federate
         {
         public:
             ValueFederate (const FederateInfo &fi);
         }
-        ```
+```
 
 3) class methods should be `camelCase`
 
-        ``` {.sourceCode .cpp}
+``` cpp
         Publication &registerGlobalPublication (const std::string &name, const std::string &type, const std::string &units = "");
 
         Exceptions:  functions that match standard library functions e.g. to_string()
-        ```
+```
 
 4) All fundamental types and enumerations should be underscore
    separated words in lower case. Fundamental types are those for which
    normal usage does not involve calling any methods or are simple
    aliases for other fundamental types
 
-        ``` {.sourceCode .cpp}
+``` cpp
         /* Type definitions */
         typedef enum {
             helics_ok,
@@ -55,46 +55,47 @@ Naming Conventions
         typedef void *helics_broker;
 
         typedef int helics_bool_t;
-        ```
+```
 
 5)  All C++ functions and types should be contained in the helics
     namespace with subnamespaces used as appropriate
 
-        ``` {.sourceCode .cpp}
+``` cpp
         namespace helics
         {
             ...
         } // namespace helics
-        ```
+```
 
 6)  C interface functions should begin with helicsXXXX
 
-        ``` {.sourceCode .c}
+``` cpp
         helics_bool helicsBrokerIsConnected (helics_broker broker);
-        ```
+```
 
 7)  C interface function should be of the format helics{Class}{Action}
     or helics{Action} if no class is appropriate
 
-        ``` {.sourceCode .c}
+``` cpp
         helics_bool helicsBrokerIsConnected (helics_broker broker);
 
         const char *helicsGetVersion ();
-        ```
+```
 
 8) All cmake commmands (those defined in cmake itself) should be lower case
-        ```
+
+``` cmake
         if as opposed to IF
         install vs INSTALL
-        ```
+```
 
 9)  Public interface functions should be documented consistent with Doxygen style comments
     non public ones should be documented as well with doxygen but we are a ways from that goal
 
-        ```
+``` cpp
         /** get an identifier for the core
             @param core the core to query
             @return a string with the identifier of the core
             */
             HELICS_EXPORT const char *helicsCoreGetIdentifier (helics_core core);
-        ```
+```
