@@ -43,6 +43,9 @@ option(
 
 mark_as_advanced(ZMQ_USE_STATIC_LIBRARY)
 
+#flag that zeromq headers are required
+set(ZeroMQ_REQUIRE_HEADERS ON)
+
 if(USE_SYSTEM_ZEROMQ_ONLY)
     find_package(ZeroMQ)
 elseif (ZMQ_FORCE_SUBPROJECT)
@@ -86,11 +89,11 @@ else()
         )
     endif()
 
-    if(NOT ZeroMQ_FOUND OR NOT ZeroMQ_INCLUDE_DIR)
+    if(NOT ZeroMQ_FOUND)
         # message(STATUS "initialZMQ not found")
 		set(ZeroMQ_FIND_QUIETLY ON)
         find_package(ZeroMQ)
-        if(NOT ZeroMQ_FOUND OR NOT ZeroMQ_INCLUDE_DIR)
+        if(NOT ZeroMQ_FOUND)
            if(ZMQ_SUBPROJECT)
               include(addlibzmq)
            endif()

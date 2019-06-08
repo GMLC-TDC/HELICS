@@ -10,23 +10,21 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "libguarded/atomic_guarded.hpp"
 using namespace helics;
 
+using namespace std::literals::chrono_literals;
+
 TEST (messageTimer_tests, basic_test)
 {
     libguarded::atomic_guarded<ActionMessage> M;
     auto cback = [&](ActionMessage &&m) { M = std::move (m); };
     auto mtimer = std::make_shared<MessageTimer> (cback);
     std::this_thread::yield ();  // just get the loop started
-    mtimer->addTimerFromNow (std::chrono::milliseconds (200), CMD_PROTOCOL);
+    auto index=mtimer->addTimerFromNow (200ms, CMD_PROTOCOL);
+	EXPECT_EQ(index, 0);
     EXPECT_TRUE (M.load ().action () == CMD_IGNORE);
-    std::this_thread::sleep_for (std::chrono::milliseconds (300));
+    std::this_thread::sleep_for (300ms);
     if (M.load ().action () != CMD_PROTOCOL)
     {
-        std::this_thread::sleep_for (std::chrono::milliseconds (300));
-    }
-    if (M.load ().action () != CMD_PROTOCOL)
-    {
-        std::cout << "having to wait again";
-        std::this_thread::sleep_for (std::chrono::milliseconds (200));
+        std::this_thread::sleep_for (300ms);
     }
     auto tm = M.load ();
     EXPECT_TRUE (tm.action () == CMD_PROTOCOL) << tm;
@@ -47,18 +45,18 @@ TEST (messageTimer_tests_skip_ci, basic_test_update)
     auto mtimer = std::make_shared<MessageTimer> (cback);
     std::unique_lock<std::mutex> localLock (mlock);
 
-    auto index = mtimer->addTimerFromNow (std::chrono::milliseconds (500), CMD_PROTOCOL);
+    auto index = mtimer->addTimerFromNow (500ms, CMD_PROTOCOL);
     EXPECT_TRUE (M.action () == CMD_IGNORE);
     localLock.unlock ();
-    std::this_thread::sleep_for (std::chrono::milliseconds (100));
+    std::this_thread::sleep_for (100ms);
 
-    auto res = mtimer->addTimeToTimer (index, std::chrono::milliseconds (300));
+    auto res = mtimer->addTimeToTimer (index, 300ms);
     EXPECT_TRUE (res);
-    std::this_thread::sleep_for (std::chrono::milliseconds (500));
+    std::this_thread::sleep_for (500ms);
     localLock.lock ();
     EXPECT_TRUE (M.action () == CMD_IGNORE);
     localLock.unlock ();
-    std::this_thread::sleep_for (std::chrono::milliseconds (300));
+    std::this_thread::sleep_for (300ms);
     localLock.lock ();
     EXPECT_TRUE (M.action () == CMD_PROTOCOL);
 }
@@ -69,19 +67,19 @@ TEST (messageTimer_tests_skip_ci, basic_test_multiple)
     auto cback = [&counter](helics::ActionMessage &&) { ++counter; };
     auto mtimer = std::make_shared<helics::MessageTimer> (cback);
 
-    mtimer->addTimerFromNow (std::chrono::milliseconds (200), helics::CMD_PROTOCOL);
-    mtimer->addTimerFromNow (std::chrono::milliseconds (400), helics::CMD_PROTOCOL);
-    mtimer->addTimerFromNow (std::chrono::milliseconds (600), helics::CMD_PROTOCOL);
-    mtimer->addTimerFromNow (std::chrono::milliseconds (800), helics::CMD_PROTOCOL);
-    std::this_thread::sleep_for (std::chrono::milliseconds (50));
+    mtimer->addTimerFromNow (200ms, helics::CMD_PROTOCOL);
+    mtimer->addTimerFromNow (400ms, helics::CMD_PROTOCOL);
+    mtimer->addTimerFromNow (600ms, helics::CMD_PROTOCOL);
+    mtimer->addTimerFromNow (800ms, helics::CMD_PROTOCOL);
+    std::this_thread::sleep_for (50ms);
     EXPECT_EQ (counter.load (), 0);
-    std::this_thread::sleep_for (std::chrono::milliseconds (200));
+    std::this_thread::sleep_for (200ms);
     EXPECT_EQ (counter.load (), 1);
-    std::this_thread::sleep_for (std::chrono::milliseconds (200));
+    std::this_thread::sleep_for (200ms);
     EXPECT_EQ (counter.load (), 2);
-    std::this_thread::sleep_for (std::chrono::milliseconds (200));
+    std::this_thread::sleep_for (200ms);
     EXPECT_EQ (counter.load (), 3);
-    std::this_thread::sleep_for (std::chrono::milliseconds (200));
+    std::this_thread::sleep_for (200ms);
     EXPECT_EQ (counter.load (), 4);
 }
 
@@ -92,19 +90,19 @@ TEST (messageTimer_tests_skip_ci, basic_test_multiple_alt)
     auto mtimer = std::make_shared<helics::MessageTimer> (cback);
 
     auto ctime = std::chrono::steady_clock::now ();
-    mtimer->addTimer (ctime + std::chrono::milliseconds (200), helics::CMD_PROTOCOL);
-    mtimer->addTimer (ctime + std::chrono::milliseconds (400), helics::CMD_PROTOCOL);
-    mtimer->addTimer (ctime + std::chrono::milliseconds (600), helics::CMD_PROTOCOL);
-    mtimer->addTimer (ctime + std::chrono::milliseconds (800), helics::CMD_PROTOCOL);
-    std::this_thread::sleep_until (ctime + std::chrono::milliseconds (100));
+    mtimer->addTimer (ctime + 200ms, helics::CMD_PROTOCOL);
+    mtimer->addTimer (ctime + 400ms, helics::CMD_PROTOCOL);
+    mtimer->addTimer (ctime + 600ms, helics::CMD_PROTOCOL);
+    mtimer->addTimer (ctime + 800ms, helics::CMD_PROTOCOL);
+    std::this_thread::sleep_until (ctime + 100ms);
     EXPECT_EQ (counter.load (), 0);
-    std::this_thread::sleep_until (ctime + std::chrono::milliseconds (300));
+    std::this_thread::sleep_until (ctime + 300ms);
     EXPECT_EQ (counter.load (), 1);
-    std::this_thread::sleep_until (ctime + std::chrono::milliseconds (500));
+    std::this_thread::sleep_until (ctime + 500ms);
     EXPECT_EQ (counter.load (), 2);
-    std::this_thread::sleep_until (ctime + std::chrono::milliseconds (700));
+    std::this_thread::sleep_until (ctime + 700ms);
     EXPECT_EQ (counter.load (), 3);
-    std::this_thread::sleep_until (ctime + std::chrono::milliseconds (900));
+    std::this_thread::sleep_until (ctime + 900ms);
     EXPECT_EQ (counter.load (), 4);
 }
 
@@ -114,20 +112,20 @@ TEST (messageTimer_tests_skip_ci, basic_test_multiple_cancel)
     auto cback = [&counter](helics::ActionMessage &&) { ++counter; };
     auto mtimer = std::make_shared<helics::MessageTimer> (cback);
 
-    mtimer->addTimerFromNow (std::chrono::milliseconds (200), helics::CMD_PROTOCOL);
-    mtimer->addTimerFromNow (std::chrono::milliseconds (400), helics::CMD_PROTOCOL);
-    mtimer->addTimerFromNow (std::chrono::milliseconds (600), helics::CMD_PROTOCOL);
-    mtimer->addTimerFromNow (std::chrono::milliseconds (800), helics::CMD_PROTOCOL);
-    std::this_thread::sleep_for (std::chrono::milliseconds (50));
+    mtimer->addTimerFromNow (200ms, helics::CMD_PROTOCOL);
+    mtimer->addTimerFromNow (400ms, helics::CMD_PROTOCOL);
+    mtimer->addTimerFromNow (600ms, helics::CMD_PROTOCOL);
+    mtimer->addTimerFromNow (800ms, helics::CMD_PROTOCOL);
+    std::this_thread::sleep_for (50ms);
     EXPECT_EQ (counter.load (), 0);
-    std::this_thread::sleep_for (std::chrono::milliseconds (200));
+    std::this_thread::sleep_for (200ms);
     EXPECT_EQ (counter.load (), 1);
-    std::this_thread::sleep_for (std::chrono::milliseconds (200));
+    std::this_thread::sleep_for (200ms);
     EXPECT_EQ (counter.load (), 2);
     mtimer->cancelAll ();
-    std::this_thread::sleep_for (std::chrono::milliseconds (200));
+    std::this_thread::sleep_for (200ms);
     EXPECT_EQ (counter.load (), 2);
-    std::this_thread::sleep_for (std::chrono::milliseconds (200));
+    std::this_thread::sleep_for (200ms);
     EXPECT_EQ (counter.load (), 2);
 }
 
@@ -137,21 +135,21 @@ TEST (messageTimer_tests_skip_ci, basic_test_multiple_change_time)
     auto cback = [&counter](helics::ActionMessage &&) { ++counter; };
     auto mtimer = std::make_shared<helics::MessageTimer> (cback);
 
-    mtimer->addTimerFromNow (std::chrono::milliseconds (200), helics::CMD_PROTOCOL);
-    auto t2 = mtimer->addTimerFromNow (std::chrono::milliseconds (400), helics::CMD_PROTOCOL);
-    auto t3 = mtimer->addTimerFromNow (std::chrono::milliseconds (600), helics::CMD_PROTOCOL);
-    mtimer->addTimerFromNow (std::chrono::milliseconds (800), helics::CMD_PROTOCOL);
-    std::this_thread::sleep_for (std::chrono::milliseconds (50));
+    mtimer->addTimerFromNow (200ms, helics::CMD_PROTOCOL);
+    auto t2 = mtimer->addTimerFromNow (400ms, helics::CMD_PROTOCOL);
+    auto t3 = mtimer->addTimerFromNow (600ms, helics::CMD_PROTOCOL);
+    mtimer->addTimerFromNow (800ms, helics::CMD_PROTOCOL);
+    std::this_thread::sleep_for (50ms);
     EXPECT_EQ (counter.load (), 0);
-    std::this_thread::sleep_for (std::chrono::milliseconds (200));
+    std::this_thread::sleep_for (200ms);
     EXPECT_EQ (counter.load (), 1);
-    mtimer->addTimeToTimer (t2, std::chrono::milliseconds (400));
-    mtimer->addTimeToTimer (t3, std::chrono::milliseconds (200));
-    std::this_thread::sleep_for (std::chrono::milliseconds (200));
+    mtimer->addTimeToTimer (t2, 400ms);
+    mtimer->addTimeToTimer (t3, 200ms);
+    std::this_thread::sleep_for (200ms);
     EXPECT_EQ (counter.load (), 1);
-    std::this_thread::sleep_for (std::chrono::milliseconds (200));
+    std::this_thread::sleep_for (200ms);
     EXPECT_EQ (counter.load (), 1);
-    std::this_thread::sleep_for (std::chrono::milliseconds (200));
+    std::this_thread::sleep_for (200ms);
     EXPECT_EQ (counter.load (), 4);
 }
 
@@ -161,22 +159,22 @@ TEST (messageTimer_tests_skip_ci, basic_test_multiple_change_time2)
     auto cback = [&counter](helics::ActionMessage &&) { ++counter; };
     auto mtimer = std::make_shared<helics::MessageTimer> (cback);
     auto ctime = std::chrono::steady_clock::now ();
-    mtimer->addTimerFromNow (std::chrono::milliseconds (200), helics::CMD_PROTOCOL);
-    auto t2 = mtimer->addTimerFromNow (std::chrono::milliseconds (400), helics::CMD_PROTOCOL);
-    auto t3 = mtimer->addTimerFromNow (std::chrono::milliseconds (600), helics::CMD_PROTOCOL);
-    auto t4 = mtimer->addTimerFromNow (std::chrono::milliseconds (800), helics::CMD_PROTOCOL);
-    std::this_thread::sleep_for (std::chrono::milliseconds (50));
+    mtimer->addTimerFromNow (200ms, helics::CMD_PROTOCOL);
+    auto t2 = mtimer->addTimerFromNow (400ms, helics::CMD_PROTOCOL);
+    auto t3 = mtimer->addTimerFromNow (600ms, helics::CMD_PROTOCOL);
+    auto t4 = mtimer->addTimerFromNow (800ms, helics::CMD_PROTOCOL);
+    std::this_thread::sleep_for (50ms);
     EXPECT_EQ (counter.load (), 0);
-    std::this_thread::sleep_for (std::chrono::milliseconds (200));
+    std::this_thread::sleep_for (200ms);
     EXPECT_EQ (counter.load (), 1);
-    mtimer->updateTimer (t2, ctime + std::chrono::milliseconds (800));
-    mtimer->updateTimer (t3, ctime + std::chrono::milliseconds (800));
-    std::this_thread::sleep_for (std::chrono::milliseconds (200));
+    mtimer->updateTimer (t2, ctime + 800ms);
+    mtimer->updateTimer (t3, ctime + 800ms);
+    std::this_thread::sleep_for (200ms);
     EXPECT_EQ (counter.load (), 1);
-    std::this_thread::sleep_for (std::chrono::milliseconds (200));
+    std::this_thread::sleep_for (200ms);
     mtimer->cancelTimer (t4);
     EXPECT_EQ (counter.load (), 1);
-    std::this_thread::sleep_for (std::chrono::milliseconds (200));
+    std::this_thread::sleep_for (200ms);
     EXPECT_EQ (counter.load (), 3);
 }
 
@@ -192,17 +190,17 @@ TEST (messageTimer_tests_skip_ci, basic_test_updatemessage)
     auto ctime = std::chrono::steady_clock::now ();
     std::unique_lock<std::mutex> localLock (mlock);
 
-    auto index = mtimer->addTimer (ctime + std::chrono::milliseconds (400), CMD_PROTOCOL);
+    auto index = mtimer->addTimer (ctime + 400ms, CMD_PROTOCOL);
     EXPECT_TRUE (M.action () == CMD_IGNORE);
     localLock.unlock ();
-    std::this_thread::sleep_for (std::chrono::milliseconds (100));
+    std::this_thread::sleep_for (100ms);
 
-    mtimer->updateTimer (index, ctime + std::chrono::milliseconds (700), CMD_BROKER_ACK);
-    std::this_thread::sleep_for (std::chrono::milliseconds (400));
+    mtimer->updateTimer (index, ctime + 700ms, CMD_BROKER_ACK);
+    std::this_thread::sleep_for (400ms);
     localLock.lock ();
     EXPECT_TRUE (M.action () == CMD_IGNORE);
     localLock.unlock ();
-    std::this_thread::sleep_for (std::chrono::milliseconds (300));
+    std::this_thread::sleep_for (300ms);
     localLock.lock ();
     EXPECT_TRUE (M.action () == CMD_BROKER_ACK);
 }
@@ -219,13 +217,13 @@ TEST (messageTimer_tests_skip_ci, basic_test_updatemessage2)
     auto ctime = std::chrono::steady_clock::now ();
     std::unique_lock<std::mutex> localLock (mlock);
 
-    auto index = mtimer->addTimer (ctime + std::chrono::milliseconds (400), CMD_PROTOCOL);
+    auto index = mtimer->addTimer (ctime + 400ms, CMD_PROTOCOL);
     EXPECT_TRUE (M.action () == CMD_IGNORE);
     localLock.unlock ();
-    std::this_thread::sleep_for (std::chrono::milliseconds (100));
+    std::this_thread::sleep_for (100ms);
 
     mtimer->updateMessage (index, CMD_BROKER_ACK);
-    std::this_thread::sleep_for (std::chrono::milliseconds (400));
+    std::this_thread::sleep_for (400ms);
     localLock.lock ();
     EXPECT_TRUE (M.action () == CMD_BROKER_ACK);
 }

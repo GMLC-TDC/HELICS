@@ -29,7 +29,7 @@ processTimerCallback (std::shared_ptr<MessageTimer> mtimer, int32_t index, const
         }
         catch (std::exception &e)
         {
-            std::cout << "exception caught from addActionMessage" << std::endl;
+            std::cout << "exception caught from sendMessage" << std::endl;
         }
     }
 }
@@ -49,11 +49,11 @@ int32_t MessageTimer::addTimer (time_type expirationTime, ActionMessage mess)
     auto timerCallback = [ptr = shared_from_this (), index](const std::error_code &ec) {
         processTimerCallback (ptr, index, ec);
     };
-
-    timer->async_wait (timerCallback);
+	buffers.push_back(std::move(mess));
+	expirationTimes.push_back(expirationTime);
     timers.push_back (std::move (timer));
-    buffers.push_back (std::move (mess));
-    expirationTimes.push_back (expirationTime);
+	timers.back()->async_wait(timerCallback);
+    
     return index;
 }
 
@@ -62,22 +62,24 @@ void MessageTimer::cancelTimer (int32_t index)
     std::lock_guard<std::mutex> lock (timerLock);
     if ((index >= 0) && (index < static_cast<int32_t> (timers.size ())))
     {
+		buffers[index].setAction(CMD_IGNORE);
         timers[index]->cancel ();
-        buffers[index].setAction (CMD_IGNORE);
+        
     }
 }
 
 void MessageTimer::cancelAll ()
 {
     std::lock_guard<std::mutex> lock (timerLock);
+	for (auto &buf : buffers)
+	{
+		buf.setAction(CMD_IGNORE);
+	}
     for (auto &tmr : timers)
     {
         tmr->cancel ();
     }
-    for (auto &buf : buffers)
-    {
-        buf.setAction (CMD_IGNORE);
-    }
+    
 }
 
 void MessageTimer::updateTimer (int32_t timerIndex, time_type expirationTime, ActionMessage mess)
