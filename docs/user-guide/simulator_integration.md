@@ -16,6 +16,9 @@ At some point, maybe from the very beginning of your time with HELICS co-simulat
       - MATLAB
       - Octave
       - C# (somewhat limited as of yet)
+      - Julia
+      - Nim
+
   3. **What is the simulators concept of time?** - Understanding how the simulator natively moves through time is essential when determining how time requests will need to be made. Does the simulator have a fixed time-step? Is it user-definable? Does the simulator have any concept of time or is it event-based?
   4. **What is the nature of the values it will send to and receive from the rest of the federation?** Depending on the nature of the simulator, this may or may not be specifically definable but a general understanding of how this simulator will be used in a co-simulation should be clear. As a stand-alone simulator, what are its inputs and outputs? What are its assumed or provided boundary conditions? What kinds of values will it be providing to the rest of the federation?
 
