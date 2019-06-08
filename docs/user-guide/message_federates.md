@@ -28,7 +28,8 @@ This feature offers the convenience of allowing a message federate to receive me
 Once the message topology considering endpoints has been determined, the definitions of these endpoints in the JSON file is straight-forward. Here's what it could look like for the voltage regulator example from above.
 
 ```
-...
+{
+	 ...
 	 "endpoints" : [
 		{
 			"name" : "voltage_sensor", 
@@ -41,19 +42,20 @@ Once the message topology considering endpoints has been determined, the definit
 			"global" : true, 
 			"info" : ""
 		},
-				{
+		{
 			"name" : "voltage_controller_2", 
 			"global" : true, 
 			"destination" : "voltage_actuator", 
 			"info" : ""
 		},
-		},
-				{
+		{
 			"name" : "voltage_actuator", 
 			"global" : true, 
 			"info" : ""
 		}
-...
+	 ...
+	 ]
+}
 ```
 * **`name`** - Analogous to `key` in value federates, this is the unique identifier of the endpoint in the federation and has the same interaction with `global` as the value federates do.
 * **`global`** - Just as in value federates, `global` allows for the identifier of the endpoint to be declared unique for the entire federation.
@@ -119,11 +121,13 @@ Taking these assumptions and specifications, it is not too difficult to write a 
 		"key": "IEEE_123_feeder_0/totalLoad",
 		"type": "complex",
 		"required": true
-	},  { 
+	}, 
+	{ 
 		"key": "IEEE_123_feeder_0/charge_EV6",
 		"type": "complex",
 		"required": true
-	},	{ 
+	},
+	{ 
 		"key": "IEEE_123_feeder_0/charge_EV5",
 		"type": "complex",
 		"required": true
