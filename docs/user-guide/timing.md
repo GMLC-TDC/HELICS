@@ -18,12 +18,13 @@ The same JSON configuration file used to set the publications, subscriptions, an
 
 ```
 { 
-"name":"generic_federate", 
-...
-"uninterruptible":false,
-"period":  1.0,
-"offset": 0.0,
-...
+  "name":"generic_federate", 
+  ...
+  "uninterruptible":false,
+  "period":  1.0,
+  "offset": 0.0,
+  ...
+}
 ```
 * **uninterruptible [false]** - Normally, a federate will be granted a time earlier than it requested when it receives a message from another federate; the presence of any message implies there could be an action the federate needs to take and may generate new messages of its own. There are times, though, when it is important that the federate only be granted a time (and begin simulating/executing again) that it has previously requested. For example, there could be some controller that should only operate at fixed intervals even if new data arrives earlier. In these cases, setting the `uninterruptible` flag to `true` will prevent premature time grants.
 
