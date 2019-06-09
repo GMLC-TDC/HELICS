@@ -29,7 +29,7 @@ There are a number of classes of HELICS users:
 
 ## Additional Resources ##
 * [HELICS API](../doxygen/index.html) - Doxygen of the current API. If you need to know the details of the APIs and function calls, this is the place.
-* [HELICS federate configuration](../developer-guide/index.html) - Details on how the federates can be configured
+* [HELICS federate configuration](../configuration/index.html) - Details on how the federates can be configured
 * [Installation](../installation/index.html) -  Instructions on how to install HELICS
 * [C API](../c-api-reference/index.html)
 * [Developer's Guide](../developer-guide/index.html) - Details on how the software is assembled and some of the underlying components.
