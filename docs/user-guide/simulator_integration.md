@@ -39,7 +39,7 @@ Though not technically a pat of integrating a simulator its important to remembe
 broker = h.helicsCreateBroker("zmq", "main_broker", "--federates 2")
 
 ```
-The [Doxygen on this function](https://helics.readthedocs.io/en/latest/doxygen/helics_8h.html#aeb64e4cbbfd666b121a2814a0baef4de) shows that the first argument defines the core, the second the name of the broker, and the third is an initialization string which in this case, only specifies the number of federates in the federation.
+The [Doxygen on this function](../doxygen/helics_8h.html#aeb64e4cbbfd666b121a2814a0baef4de) shows that the first argument defines the core, the second the name of the broker, and the third is an initialization string which in this case, only specifies the number of federates in the federation.
 
 
 
