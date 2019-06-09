@@ -26,7 +26,7 @@ To demonstrate the effects of filters, let's take the same model we were working
 
 ![Ex. 1c message topology](../img/Ex1c_Message_topology.png)
 
-[The JSON configuration file](../../examples/user_guide_examples/Example_1c/EV_Controller/Control.json) adds a new `filter` section that implements the filtering:
+[The JSON configuration file](https://github.com/GMLC-TDC/HELICS-src/tree/319de2b125fe5e36818f0434ac3d0a82ccc46534/examples/user_guide_examples/Example_1c/EV_Controller/Control.json) adds a new `filter` section that implements the filtering:
 
 ```
 ...
@@ -59,10 +59,10 @@ To demonstrate the effects of filters, let's take the same model we were working
 * **`name`** (optional) - Name of the endpoint filter
 * **`sourcetarget(s)`** - Name(s) of the endpoints to which this source filter will be applied
 * **`desttarget(s)`** - Name(s) of the endpoints to which this destination filter will be applied
-* **`operation`** - Defines the type of filtering operation that will be applied to messages. As of v2.0, the supported types are: `delay`, `timedelay`, `randomdelay`, `randomdrop`, `reroute`, `redirect`, `clone`, `cloning`, and `custom`. Further details on filter types can be found [here](https://github.com/GMLC-TDC/HELICS-src/blob/master/docs/configuration/Filters.md).
+* **`operation`** - Defines the type of filtering operation that will be applied to messages. As of v2.0, the supported types are: `delay`, `timedelay`, `randomdelay`, `randomdrop`, `reroute`, `redirect`, `clone`, `cloning`, and `custom`. Further details on filter types can be found [here](../configuration/Filters.md).
 * **`properties`** - Each filter type has specific parameters that define how it operates. In this case, one of those parameters is the amount each message will be delayed, in seconds.
 
-Let's run [this co-simulation](../../examples/user_guide_examples/Example_1c/) and capture the same data as last time for direct comparison: total substation load and EV charging behavior, both as a function of time.
+Let's run [this co-simulation](https://github.com/GMLC-TDC/HELICS-src/tree/319de2b125fe5e36818f0434ac3d0a82ccc46534/examples/user_guide_examples/Example_1c/) and capture the same data as last time for direct comparison: total substation load and EV charging behavior, both as a function of time.
 
 ![Ex. 1c total feeder load](../img/Ex1c_Feeder_consumption.png)
 
