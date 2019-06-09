@@ -1,6 +1,6 @@
 # Message Federates #
 
-As previously discussed in the [federate introduction](./federate.md), message federates are used to create HELICS messages that model information transfers (versus physical values) moving between federates. Measurement and control signals are typical applications for these types of federates.
+As previously discussed in the [federate introduction](./federates.md), message federates are used to create HELICS messages that model information transfers (versus physical values) moving between federates. Measurement and control signals are typical applications for these types of federates.
 
 Unlike HELICS values which are persistent (meaning they are continuously available throughout the co-simulation), HELICS messages are only readable once when collected from an endpoint. Once that collection is made the message only exists within the memory of the collecting message federate. If another message federate needs the information, a new message must be created and sent to the appropriate endpoint.  Filters can be created to clone messages as well if that behavior is desired.
 
@@ -89,7 +89,7 @@ The message topology (including the endpoints) and the not very interesting brok
 ![Ex. 1b message topology](../img/Ex1b_Broker_topology.png)
 
 
-Taking these assumptions and specifications, it is not too difficult to write a simple charge controller as a Python script. And just by opening the [JSON configuration file](../../examples/user_guide_examples/Example_1b/EV_Controller/Control.json) we can learn important details about how the controller works.
+Taking these assumptions and specifications, it is not too difficult to write a simple charge controller as a Python script. And just by opening the [JSON configuration file](https://github.com/GMLC-TDC/HELICS-src/tree/319de2b125fe5e36818f0434ac3d0a82ccc46534/examples/user_guide_examples/Example_1b/EV_Controller/Control.json) we can learn important details about how the controller works.
 
 
 ```
@@ -138,7 +138,7 @@ Taking these assumptions and specifications, it is not too difficult to write a 
 ```
 The first thing to note is the the EV controller has been written as a combination federate, having both endpoints for receiving/sending messages and subscriptions to HELICS values. The HELICS values that the controller has subscribed to give the controller access to both the total load of the feeder (`totalLoad`, presumably) as well as the charging power for each of the individual EVs being controlled (six in total).
 
-Looking at the [GridLAB-D JSON configuration file](../../examples/user_guide_examples/Example_1b/Distribution/IEEE_123_feeder_0.json) confirms this:
+Looking at the [GridLAB-D JSON configuration file](https://github.com/GMLC-TDC/HELICS-src/tree/319de2b125fe5e36818f0434ac3d0a82ccc46534/examples/user_guide_examples/Example_1b/Distribution/IEEE_123_feeder_0.json) confirms this:
 
 ```
 {
@@ -206,7 +206,7 @@ Looking at the [GridLAB-D JSON configuration file](../../examples/user_guide_exa
 GridLAB-D is publishing out the total load on the feeder as well as the individual EV charging loads. It also has endpoints set up for each of the EV chargers to receive messages from the controller. Based on the strings in the `info` field it appears that the received messages are used to define the EV charge power.
 
 
-Running [the example](../../examples/user_guide_examples/Example_1b/) and looking at the results, as the total load on the feeder exceeded the pre-defined maximum loading of the feeder (red line in the graph), the EV controller disconnected an additional EV load. Conversely, as the load dipped to the lower limit (green line), the controller reconnected the EV load. Looking at a graph of the EV charge power for each EV shows the timing of the EV charging for each load.
+Running [the example](https://github.com/GMLC-TDC/HELICS-src/tree/319de2b125fe5e36818f0434ac3d0a82ccc46534/examples/user_guide_examples/Example_1b/) and looking at the results, as the total load on the feeder exceeded the pre-defined maximum loading of the feeder (red line in the graph), the EV controller disconnected an additional EV load. Conversely, as the load dipped to the lower limit (green line), the controller reconnected the EV load. Looking at a graph of the EV charge power for each EV shows the timing of the EV charging for each load.
 
 ![Ex. 1b total feeder load](../img/Ex1b_Feeder_consumption.png)
 
