@@ -44,7 +44,8 @@ int32_t MessageTimer::addTimer (time_type expirationTime, ActionMessage mess)
     // these two calls need to be before the lock
     auto timer = std::make_shared<asio::steady_timer> (contextPtr->getBaseContext ());
     timer->expires_at (expirationTime);
-    std::lock_guard<std::mutex> lock (timerLock);
+    std::unique_lock<std::mutex> lock (timerLock);
+	
     auto index = static_cast<int32_t> (timers.size ());
     auto timerCallback = [ptr = shared_from_this (), index](const std::error_code &ec) {
         processTimerCallback (ptr, index, ec);
@@ -52,7 +53,15 @@ int32_t MessageTimer::addTimer (time_type expirationTime, ActionMessage mess)
 	buffers.push_back(std::move(mess));
 	expirationTimes.push_back(expirationTime);
     timers.push_back (std::move (timer));
-	timers.back()->async_wait(timerCallback);
+	if (expirationTime > std::chrono::steady_clock::now())
+	{
+		timers.back()->async_wait(timerCallback);
+	}
+	else
+	{
+		lock.unlock();
+		timerCallback(std::error_code{});
+	}
     
     return index;
 }

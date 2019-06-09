@@ -26,12 +26,32 @@ TEST (messageTimer_tests, basic_test)
     {
         std::this_thread::sleep_for (300ms);
     }
+	if (M.load().action() != CMD_PROTOCOL)
+	{
+		std::this_thread::sleep_for(300ms);
+	}
     auto tm = M.load ();
-    EXPECT_TRUE (tm.action () == CMD_PROTOCOL) << tm;
+    EXPECT_TRUE (tm.action () == CMD_PROTOCOL) << "current = "<<prettyPrintString(tm);
     if (tm.action () != CMD_PROTOCOL)
     {
         mtimer->cancelAll ();
     }
+}
+TEST(messageTimer_tests, shorttime_test)
+{
+	libguarded::atomic_guarded<ActionMessage> M;
+	auto cback = [&](ActionMessage &&m) { M = std::move(m); };
+	auto mtimer = std::make_shared<MessageTimer>(cback);
+	auto index = mtimer->addTimerFromNow(0ms, CMD_PROTOCOL);
+	EXPECT_EQ(index, 0);
+	
+	std::this_thread::sleep_for(5ms);
+	auto tm = M.load();
+	EXPECT_TRUE(tm.action() == CMD_PROTOCOL) << "current = " << prettyPrintString(tm);
+	if (tm.action() != CMD_PROTOCOL)
+	{
+		mtimer->cancelAll();
+	}
 }
 
 TEST (messageTimer_tests_skip_ci, basic_test_update)
