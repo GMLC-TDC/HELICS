@@ -18,19 +18,19 @@ Given the definitions of the entities above, there are several co-simulation arc
 
 ### Everyday Co-simulation ###
 The figure below shows the most common architecture for HELICS co-simulation. Each core has only one federate as an integrated executable, all executables reside on the same computer and are connected to the same broker. This architecture is particularly common for small federates and/or co-simulations under development.
-![HELICS Architecture 1](../img/helics_architecture_1.pdf)
+![HELICS Architecture 1](../img/helics_architecture_1.png)
 
 ### Multi-threading ###
 The architecture below shows a much less common scenario where more than one federate is associated with a single core. For most simulators that have already been integrated with HELICS this architecture would generally not be used. For simulators that are multi-threaded by nature, HELICS can be configured this way to facilitate message passing between threads. For a co-simulation that exists entirely within a single executable, this architecture will provide the highest performance. For example, of a large number of small controllers are written as a single, multi-threaded application (perhaps all the thermostats in an commercial building are being managed by a centralized controller), particularly where there is communication between the threads, using a single core inside a single multi-threaded application (with essentially one thread per federate) will provide the highest level of performance.
-![HELICS Architecture 2](../img/helics_architecture_2.pdf)
+![HELICS Architecture 2](../img/helics_architecture_2.png)
 
 ### Computationally Heavy Federates ###
 For co-simulations on limited hardware where a federate requires significant computational resources and high performance is important, it may be necessary to spread the federates out across a number of compute nodes to give each federate the resources it needs. All federates are still connected to a common broker and it would be required that the computers have a valid network connection so all federates can communicate with said broker. In this case, it may or may not be necessary to place the broker on its own compute node, based on the degree of competition for resources on its current compute node.
-![HELICS Architecture 3](../img/helics_architecture_3.pdf)
+![HELICS Architecture 3](../img/helics_architecture_3.png)
 
 ### Multi-Broker ###
 Alternatively, it would be possible to locate a broker on each computer and create a root broker on a third node. This kind of architecture could help if higher performance is needed and the federates on each computer primarily interact with each other and very little with the federates on the other computer. As compared to the previous architecture, adding the extra layer of brokers would keep local messages on the same compute node and reduce congestion on the root broker.
-![HELICS Architecture 4](../img/helics_architecture_4.pdf)
+![HELICS Architecture 4](../img/helics_architecture_4.png)
 
 
 

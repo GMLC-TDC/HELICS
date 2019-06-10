@@ -1,6 +1,6 @@
-#Value Federates #
+# Value Federates #
 
-HELICS messages that are value-oriented are the most common type of messages. As mentioned in the [federate introduction](./federate.md), value messages are intended to be used to represent the physics of a system, linking federates at their mutual boundaries and allowing a larger and more complex system to be represented than would be the case if only one simulator was used.
+HELICS messages that are value-oriented are the most common type of messages. As mentioned in the [federate introduction](./federates.md), value messages are intended to be used to represent the physics of a system, linking federates at their mutual boundaries and allowing a larger and more complex system to be represented than would be the case if only one simulator was used.
 
 ## Value Federate Message Types ##
 There are four interface types for value federates that allow the interactions between the federates (a large part of co-simulation/federation configuration) to be flexibly defined. The difference between the four types revolve around whether the interface is for sending or receiving HELICS messages and whether the sender/receiver is defined by the federate (technically, the core associated with the federate):
@@ -21,22 +21,23 @@ The message type used for a given federation configuration is often an expressio
 Though all four message types are supported, the remainder of this guide will focus on publications and subscriptions as they are conceptually easily understood and can be comprehensively configured through the individual federate configuration files.
 
 
-##Federate Configuration Options via JSON ##
+## Federate Configuration Options via JSON ##
 For any simulator that you didn't write for yourself, the most common way of configuring that simulator for use in a HELICS co-simulation will be through the use of an external JSON configuration file. TOML files are also supported but we will concentrate on JSON for this discussion. This file is read when a federate is being created and initialized and it will provide all the necessary information to incorporate that federate into the co-simulation.
 
 As the fundamental role of the co-simulation platform is to manage the synchronization and data exchange between the federates, you may or may not be surprised to learn that there are generic configuration options available to all HELICS federates that deal precisely with these. In this section, we'll focus on the options related to data exchange as pertaining to value federates, those options  and in [Timing section](./timing.md) we'll look at the timing parameters.
 
-Let's look at a generic JSON configuration file as an example with the more common parameters shown; the default values are shown in "[ ]". (Further parameters and explanations can be found in the [developer documentation](../configuration/Timing.md)
+Let's look at a generic JSON configuration file as an example with the more common parameters shown; the default values are shown in "[ ]". (Further parameters and explanations can be found in the [federate configuration](../configuration/Federate.md) guide.
 
 ### General Configuration Parameter ###
 Though contained here in this section on value federates, the options below are applicable to both value and message federates. As value federates are the more common type, we've put them here.
 
 ```
 {
-...
-"name":"generic_federate",
-"coreType": "zmq"
-...
+	...
+	"name":"generic_federate",
+	"coreType": "zmq"
+	...
+}
 ```
 * **`name`** - Every federate must have a unique name across the entire federation; this is functionally the address of the federate and is used to determine where HELICS messages are sent. An error will be generated if the federate name is not unique.
 * **`coreType` [zmq]** - There are a number of technologies or message buses that can be used to send HELICS messages among federates. Every HELICS enabled simulator has code in it that creates a core which connects to a HELICS broker using one of these messaging technologies. ZeroMQ (zmq) is the default core type and most commonly used but there are also cores that use TCP and UDP networking protocols directly (forgoing ZMQ's guarantee of delivery and reconnection functions), IPC (uses Boost's interprocess communication for fast in-memory message-passing but only works if all federates are running on the same physical computer), and MPI (for use on HPC clusters where MPI is installed).
@@ -46,12 +47,13 @@ Though contained here in this section on value federates, the options below are 
 
 ```
 {
-...
-"only_update_on_change":false, //indicator that the federate should only indicate updated values on change
-"only_transmit_on_change":false,  //indicator that the federate should only publish if the value changed
-"source_only":false,
-"observer":false,
-...
+	...
+	"only_update_on_change":false, //indicator that the federate should only indicate updated values on change
+	"only_transmit_on_change":false,  //indicator that the federate should only publish if the value changed
+	"source_only":false,
+	"observer":false,
+	...
+}
 ```
 * **`only_update_on_change` [false]** - In some cases a federate may have subscribed to a value that changes infrequently. If the publisher of that makes new publications regularly but the value itself has not changed, setting this flag on the receiving federate will prevent that federate from being sent the new, but unchanged value and having to reprocess it's received data when nothing has changed. Note that this flag will only prevent the old value from getting through if it is bit-for-bit identical to the old one.
 
@@ -64,7 +66,7 @@ Though contained here in this section on value federates, the options below are 
 
 ### Value Federate Interface Configuration ###
 ```
-...
+{
      "publications" : [
           {
                "key" : "IEEE_123_feeder_0/totalLoad",
@@ -95,7 +97,7 @@ Though contained here in this section on value federates, the options below are 
           ...
           }
      ]
- ...
+}
 ```
 
 * **`publications` and/or `subscriptions`** - These are lists of the values being sent to and from the given federate.
@@ -120,19 +122,19 @@ To demonstrate how a to build a co-simulation, an example of a simple integrated
   2. [GridLAB-D](https://github.com/gridlab-d/gridlab-d/tree/develop) - Enable HELICS, see instructions [here](http://gridlab-d.shoutwiki.com/wiki/Connection:helics_msg)
   3. [Python](https://www.anaconda.com/download/) - Anaconda installation, if you don't already have Python installed. You may need to also install the following Python packages (`conda install` ...)
 
-  	* matplotlib
-  	* time
-  	* logging
+          * matplotlib
+          * time
+          * logging
 
   4. [PyPower](https://pypi.org/project/PYPOWER/) - `pip install pypower`
-  5. [helics_cli](https://github.com/GMLC-TDC/helics-runner) - `pip install git+git://github.com/GMLC-TDC/helics-runner.git@master`
+  5. [helics_cli](https://github.com/GMLC-TDC/helics-cli) - `pip install git+git://github.com/GMLC-TDC/helics-cli.git@master`
 
 
 This example has a very simple message topology (with only one message being sent by either federate at each time step) and uses only a single broker. Diagrams of the message and broker topology can be found below:
 
-![Ex. 1a message topology](../img/ex1a_message_topology.pdf)
+![Ex. 1a message topology](../img/Ex1a_Message_topology.png)
 
-![Ex. 1a broker topology](../img/ex1a_broker_topology.pdf)
+![Ex. 1a broker topology](../img/Ex1a_Broker_topology.png)
 
 * **Transmission system** - The transmission system model used is the IEEE-118 bus model. To a single bus in this model the GridLAB-D distribution system is attached. All other load buses in the model use a static load shape scaled proportionately so the peak of the load shape matches meet the model-defined load value. The generators are re-dispatched every fifteen minutes by running an optimal power flow (the so-called "ACOPF" which places constraints on the voltage at the nodes in the system) and every five minutes a powerflow is run the update the state of the system. To allow for the relatively modest size of the single distribution system attached to the transmission system, the distribution system load is amplified by a factor of fifteen before being applied to the transmission system.
 
@@ -142,7 +144,7 @@ In this particular case, the Python script executing the transmission model also
 
 
 ### Running co-simulations via helics_cli ###
-To run this simulation, the HELICS team has also developed an application called `helics_cli` (command line interface) which, among other uses, creates a standardized means of launching co-simulations. The application can be downloaded from the [helics_cli repository](https://github.com/GMLC-TDC/helics-runner). Discussion of how to configure `helics_cli` for a given simulation is discussed in the [section on helics_cli](./helics_cli.md) but for all these examples, the configuration has already been done. In this case, that configuration is in the examples folder as "cosim_runner_1a.json" and looks like this:
+To run this simulation, the HELICS team has also developed an application called `helics_cli` (command line interface) which, among other uses, creates a standardized means of launching co-simulations. The application can be downloaded from the [helics_cli repository](https://github.com/GMLC-TDC/helics-cli). Discussion of how to configure `helics_cli` for a given simulation is discussed in the [section on helics_cli](./helics_cli.md) but for all these examples, the configuration has already been done. In this case, that configuration is in the examples folder as "cosim_runner_1a.json" and looks like this:
 
 ```
 {
