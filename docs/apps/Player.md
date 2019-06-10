@@ -91,7 +91,7 @@ time specifications are typically numerical with optional units
 if no units are specified the time defaults to units specified via `--time_units` or seconds if none were specified
 valid units are "s", "ms", "us", "min", "day", "hr", "ns", "ps" the default precision in HELICS is ns so time specified in ps is not guaranteed to be precise
 
-
+```eval_rst
 +--------------------+---------------------------+-----------------------+
 | identifier         | type                      | Example               |
 +====================+===========================+=======================+
@@ -107,6 +107,7 @@ valid units are "s", "ms", "us", "min", "day", "hr", "ns", "ps" the default prec
 +--------------------+---------------------------+-----------------------+
 | cv, complex_vector | vector of complex numbers | [23+2j, -23.1j, 1+3i] |
 +--------------------+---------------------------+-----------------------+
+```
 
 capitalization does not matter
 
