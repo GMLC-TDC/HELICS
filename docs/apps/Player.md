@@ -92,14 +92,21 @@ if no units are specified the time defaults to units specified via `--time_units
 valid units are "s", "ms", "us", "min", "day", "hr", "ns", "ps" the default precision in HELICS is ns so time specified in ps is not guaranteed to be precise
 
 
-| identifier       | type          | Example  |
-| ------------- |:-------------:| -----:|
-| d,f, double     | double | 45.1 |
-| s,string     | string      |  "this is a test" |
-| i, i64, int | integer      |    456 |
-| c, complex | complex      |    23+2j, -23.1j, 1+3i |
-| v, vector | vector of doubles     |    [23.1,34,17.2,-5.6] |
-| cv, complex_vector | vector of complex numbers    |  [23+2j, -23.1j, 1+3i] |
++--------------------+---------------------------+-----------------------+
+| identifier         | type                      | Example               |
++====================+===========================+=======================+
+| d,f, double        | double                    | 45.1                  |
++--------------------+---------------------------+-----------------------+
+| s,string           | string                    | "this is a test"      |
++--------------------+---------------------------+-----------------------+
+| i, i64, int        | integer                   | 456                   |
++--------------------+---------------------------+-----------------------+
+| c, complex         | complex                   | 23+2j, -23.1j, 1+3i   |
++--------------------+---------------------------+-----------------------+
+| v, vector          | vector of doubles         | [23.1,34,17.2,-5.6]   |
++--------------------+---------------------------+-----------------------+
+| cv, complex_vector | vector of complex numbers | [23+2j, -23.1j, 1+3i] |
++--------------------+---------------------------+-----------------------+
 
 capitalization does not matter
 
