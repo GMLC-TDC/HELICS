@@ -13,14 +13,23 @@ std::string query (const std::string &target, const std::string &queryStr)
 
 A target is specified, and can be one of the following.  A federate named one of the key words is valid for the federation, but cannot be queried using the name.
 
-| target | Description |
-| --- | --- |
-| `broker` | The first broker encountered in the hierarchy from the caller |
-| `root`, `federation`, `rootbroker` | The root broker of the federation |
-|`parent`| The parent of the caller|
-|`core`| The core of a federation, this is not a valid target if called from a broker|
-|`federate`| A query to the local federate or the first federate of a core|
-|``<object name>``| any named object in the federation can also be queried, brokers, cores, and federates|
+```eval_rst
++------------------------------------+---------------------------------------------------------------------------------------+
+| target                             | Description                                                                           |
++====================================+=======================================================================================+
+| `broker`                           | The first broker encountered in the hierarchy from the caller                         |
++------------------------------------+---------------------------------------------------------------------------------------+
+| `root`, `federation`, `rootbroker` | The root broker of the federation                                                     |
++------------------------------------+---------------------------------------------------------------------------------------+
+| `parent`                           | The parent of the caller                                                              |
++------------------------------------+---------------------------------------------------------------------------------------+
+| `core`                             | The core of a federation, this is not a valid target if called from a broker          |
++------------------------------------+---------------------------------------------------------------------------------------+
+| `federate`                         | A query to the local federate or the first federate of a core                         |
++------------------------------------+---------------------------------------------------------------------------------------+
+| ``<object name>``                  | any named object in the federation can also be queried, brokers, cores, and federates |
++------------------------------------+---------------------------------------------------------------------------------------+
+```
 
 ## Queries
 
@@ -35,58 +44,101 @@ Answers to queries can be
 ### Federate Queries
 The following queries are defined for federates.  Federates may specify a callback function which allows arbitrary user defined Queries.  The queries defined here are available inside of HELICS.
 
-| queryString | Description |
-| --- | --- |
-|`name`| the identifier of the federate [string]|
-|`exists`| Basic query if the federate exists in the Federation [T/F]|
-|`isinit`| If the federate has entered init mode [T/F]|
-|`state`| Current state of the federate as a string [string]|
-|`publications`| current publications of a federate [sv]|
-|`subscriptions`| current subscriptions of a federate [sv]|
-|`endpoints`| current endpoints of a federate [sv]|
-|`dependencies`| list of the objects this federate depends on [sv]|
-|`dependents`| list of dependent objects [sv]|
+```eval_rst
++-----------------+------------------------------------------------------------+
+| queryString     | Description                                                |
++=================+============================================================+
+| `name`          | the identifier of the federate [string]                    |
++-----------------+------------------------------------------------------------+
+| `exists`        | Basic query if the federate exists in the Federation [T/F] |
++-----------------+------------------------------------------------------------+
+| `isinit`        | If the federate has entered init mode [T/F]                |
++-----------------+------------------------------------------------------------+
+| `state`         | Current state of the federate as a string [string]         |
++-----------------+------------------------------------------------------------+
+| `publications`  | current publications of a federate [sv]                    |
++-----------------+------------------------------------------------------------+
+| `subscriptions` | current subscriptions of a federate [sv]                   |
++-----------------+------------------------------------------------------------+
+| `endpoints`     | current endpoints of a federate [sv]                       |
++-----------------+------------------------------------------------------------+
+| `dependencies`  | list of the objects this federate depends on [sv]          |
++-----------------+------------------------------------------------------------+
+| `dependents`    | list of dependent objects [sv]                             |
++-----------------+------------------------------------------------------------+
+```
 
 Other strings may be defined for specific federates.
 
 ### Core queries
 The following queries will be answered by a core.
 
-| queryString | Description |
-| --- | --- |
-|`name`| the identifier of the core [string]|
-|`address`| the network address of the core [string]|
-|`isinit`| If the core has entered init mode [T/F]|
-|`publications`| current publications defined in a core [sv]|
-|`endpoints`| current endpoints defined in a core [sv]|
-|`federates`| current federates defined in a core [sv]|
-|`dependenson`| list of the objects this core depends on [sv]|
-|`dependents`| list of dependent objects [sv]|
-|`dependencies`| structure containing dependency information [JSON]|
-|`federate_map`| a Hierarchical map of the federates contained in a core [JSON]|
-|`dependency_graph`| a representation of the dependencies in the core and its contained federates [JSON]|
+```eval_rst
++--------------------+-------------------------------------------------------------------------------------+
+| queryString        | Description                                                                         |
++====================+=====================================================================================+
+| `name`             | the identifier of the core [string]                                                 |
++--------------------+-------------------------------------------------------------------------------------+
+| `address`          | the network address of the core [string]                                            |
++--------------------+-------------------------------------------------------------------------------------+
+| `isinit`           | If the core has entered init mode [T/F]                                             |
++--------------------+-------------------------------------------------------------------------------------+
+| `publications`     | current publications defined in a core [sv]                                         |
++--------------------+-------------------------------------------------------------------------------------+
+| `endpoints`        | current endpoints defined in a core [sv]                                            |
++--------------------+-------------------------------------------------------------------------------------+
+| `federates`        | current federates defined in a core [sv]                                            |
++--------------------+-------------------------------------------------------------------------------------+
+| `dependenson`      | list of the objects this core depends on [sv]                                       |
++--------------------+-------------------------------------------------------------------------------------+
+| `dependents`       | list of dependent objects [sv]                                                      |
++--------------------+-------------------------------------------------------------------------------------+
+| `dependencies`     | structure containing dependency information [JSON]                                  |
++--------------------+-------------------------------------------------------------------------------------+
+| `federate_map`     | a Hierarchical map of the federates contained in a core [JSON]                      |
++--------------------+-------------------------------------------------------------------------------------+
+| `dependency_graph` | a representation of the dependencies in the core and its contained federates [JSON] |
++--------------------+-------------------------------------------------------------------------------------+
+```
 
 The last two are valid but are not usually queried directly, but instead the same query is used on a broker and this query in the core is used as a building block.
 
 ### Broker Queries
 
 The Following queries will be answered by a broker.
-| queryString | Description |
-| --- | --- |
-|`name`| the identifier of the broker [string]|
-|`address`| the network address of the broker [string]|
-|`isinit`| If the broker has entered init mode [T/F]|
-|`isconnected`| If the broker is connected to the network [T/F]|
-|`publications`| current publications known to a broker [sv]|
-|`endpoints`| current endpoints known to a broker [sv]|
-|`federates`| current federates under the brokers hierarchy [sv]|
-|`brokers`| current cores/brokers connected to a broker [sv]|
-|`dependson`| list of the objects this broker depends on [sv]|
-|`dependencies`| structure containing dependency information for the broker [JSON]|
-|`dependents`| list of dependent objects [sv]|
-|`counts`| a simple count of the number of brokers, federates, and handles [JSON]|
-|`federate_map`| a Hierarchical map of the federates contained in a broker [JSON]|
-|`dependency_graph`|a representation of the dependencies in the broker and all contained members [JSON]|
+```eval_rst
++--------------------+-------------------------------------------------------------------------------------+
+| queryString        | Description                                                                         |
++====================+=====================================================================================+
+| `name`             | the identifier of the broker [string]                                               |
++--------------------+-------------------------------------------------------------------------------------+
+| `address`          | the network address of the broker [string]                                          |
++--------------------+-------------------------------------------------------------------------------------+
+| `isinit`           | If the broker has entered init mode [T/F]                                           |
++--------------------+-------------------------------------------------------------------------------------+
+| `isconnected`      | If the broker is connected to the network [T/F]                                     |
++--------------------+-------------------------------------------------------------------------------------+
+| `publications`     | current publications known to a broker [sv]                                         |
++--------------------+-------------------------------------------------------------------------------------+
+| `endpoints`        | current endpoints known to a broker [sv]                                            |
++--------------------+-------------------------------------------------------------------------------------+
+| `federates`        | current federates under the brokers hierarchy [sv]                                  |
++--------------------+-------------------------------------------------------------------------------------+
+| `brokers`          | current cores/brokers connected to a broker [sv]                                    |
++--------------------+-------------------------------------------------------------------------------------+
+| `dependson`        | list of the objects this broker depends on [sv]                                     |
++--------------------+-------------------------------------------------------------------------------------+
+| `dependencies`     | structure containing dependency information for the broker [JSON]                   |
++--------------------+-------------------------------------------------------------------------------------+
+| `dependents`       | list of dependent objects [sv]                                                      |
++--------------------+-------------------------------------------------------------------------------------+
+| `counts`           | a simple count of the number of brokers, federates, and handles [JSON]              |
++--------------------+-------------------------------------------------------------------------------------+
+| `federate_map`     | a Hierarchical map of the federates contained in a broker [JSON]                    |
++--------------------+-------------------------------------------------------------------------------------+
+| `dependency_graph` | a representation of the dependencies in the broker and all contained members [JSON] |
++--------------------+-------------------------------------------------------------------------------------+
+```
 
 `federate_map` and `dependency_graph` when called from the root broker will generate a JSON string containing the entire structure of the federation.  This can take some time to assemble since all members must be queried.
 
