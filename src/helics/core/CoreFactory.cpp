@@ -218,6 +218,10 @@ std::shared_ptr<Core> create (core_type type, const std::string &configureString
 std::shared_ptr<Core> create (core_type type, const std::string &core_name, const std::string &configureString)
 {
     auto core = makeCore (type, core_name);
+    if (!core)
+    {
+        throw (helics::RegistrationFailure ("unable to create core"));
+    }
     core->configure (configureString);
     registerCore (core);
 

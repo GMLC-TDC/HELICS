@@ -19,7 +19,7 @@ using namespace helics::CoreFactory;
 
 TEST (TestCore_tests, testcore_initialization_test)
 {
-    auto broker = helics::BrokerFactory::create (helics::core_type::TEST, std::string ());
+    auto broker = helics::BrokerFactory::create (helics::core_type::TEST, std::string{});
     ASSERT_TRUE (broker);
     EXPECT_TRUE (broker->isConnected ());
     std::string configureString = std::string ("-f 4") + " --broker=" + broker->getIdentifier ();

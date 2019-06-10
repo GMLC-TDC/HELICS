@@ -164,13 +164,25 @@ find_library(
     PATHS /lib /usr/lib /usr/local/lib
 )
 
+if (ZeroMQ_REQUIRE_HEADERS)
+if(ZeroMQ_INCLUDE_DIR)
 if(
     (ZeroMQ_LIBRARY AND NOT ZeroMQ_LIBRARY-NOTFOUND)
     OR (ZeroMQ_STATIC_LIBRARY AND NOT ZeroMQ_STATIC_LIBRARY-NOTFOUND)
 )
     set(ZeroMQ_FOUND 1)
 endif()
+endif()
+else(ZeroMQ_REQUIRE_HEADERS)
+if(
+    (ZeroMQ_LIBRARY AND NOT ZeroMQ_LIBRARY-NOTFOUND)
+    OR (ZeroMQ_STATIC_LIBRARY AND NOT ZeroMQ_STATIC_LIBRARY-NOTFOUND)
+)
+    set(ZeroMQ_FOUND 1)
+endif()
+endif(ZeroMQ_REQUIRE_HEADERS)
 
+if (ZeroMQ_FOUND)
 # Create shared library target
 if(ZeroMQ_LIBRARY AND NOT ZeroMQ_LIBRARY-NOTFOUND)
     message(STATUS "Found ZeroMQ library: ${ZeroMQ_LIBRARY}")
@@ -222,9 +234,9 @@ if(ZeroMQ_STATIC_LIBRARY AND NOT ZeroMQ_STATIC_LIBRARY-NOTFOUND)
         )
     endif()
 endif()
+endif()
 
-# show the ZeroMQ_INCLUDE_DIR and ZeroMQ_LIBRARY variables only in the advanced
-# view
+# show the variables only in the advanced view
 mark_as_advanced(
     ZeroMQ_ROOT_DIR
     ZeroMQ_INCLUDE_DIR
