@@ -1,5 +1,4 @@
-# User Guide Introduction #
-
+# User Guide #
 
 Co-simulation is a powerful analysis technique that allows simulators of different domains to interact through the course of the simulation, typically by dynamically exchanging values that define boundary conditions for other simulators. HELICS is a co-simulation platform that has been designed to allow integration of these simulators across a variety of computation platforms and languages. HELICS has been designed with power system simulation in mind ([GridLAB-D](https://github.com/gridlab-d/gridlab-d), [GridDyn](https://github.com/LLNL/GridDyn), [MATPOWER](https://github.com/GMLC-TDC/MATPOWER-wrapper), [OpenDSS](https://sourceforge.net/projects/electricdss/), [PSLF](https://github.com/GMLC-TDC/PSLF-wrapper), [InterPSS](https://github.com/InterPSS-Project/ipss-common), [FESTIV](https://www.nrel.gov/grid/festiv-model.html)) but is general enough to support a wide variety of simulators and co-simulation tasks. Support for other domains is anticipated to increase over time.
 
@@ -23,6 +22,7 @@ There are a number of classes of HELICS users:
 * **Cores (forthcoming)** - Discussion of the different types of message-passing buses and their implementation as HELICS cores
 * **Broker Hierarchies (forthcoming)** - Advantages and disadvantages of implementing hierarchies of brokers and how that is accomplished in HELICS
 * **Reiteration (forthcoming)** - Discussion of why reiteration is used and how to successfully execute it in HELICS
+* **Queries** - How queries can be used to get information on HELICS brokers, federates, and cores
 * [**Integrating a New Simulator**](./simulator_integration.md) - General overview of the process by which a simulator is integrated with HELICS including usage of the common APIs
 * **Trouble-Shooting HELICS Co-Simulations (forthcoming)** - What to do when the co-simulations don't seem to be working correctly.
 * **Large Co-Simulations in HELICS (forthcoming)** - How to run HELICS co-simulations with a large (100+) number of federates
