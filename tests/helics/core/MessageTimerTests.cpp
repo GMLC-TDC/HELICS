@@ -15,7 +15,7 @@ using namespace std::literals::chrono_literals;
 TEST (messageTimer_tests, basic_test)
 {
     libguarded::atomic_guarded<ActionMessage> M;
-    auto cback = [&](ActionMessage &&m) { M = std::move (m); };
+    auto cback = [&M](ActionMessage &&m) { M = std::move (m); };
     auto mtimer = std::make_shared<MessageTimer> (cback);
     std::this_thread::yield ();  // just get the loop started
     auto index=mtimer->addTimerFromNow (200ms, CMD_PROTOCOL);
@@ -26,6 +26,11 @@ TEST (messageTimer_tests, basic_test)
     {
         std::this_thread::sleep_for (300ms);
     }
+	if (M.load().action() != CMD_PROTOCOL)
+	{
+		std::cout << "waiting Again" << std::endl;
+		std::this_thread::sleep_for(300ms);
+	}
 	if (M.load().action() != CMD_PROTOCOL)
 	{
 		std::this_thread::sleep_for(300ms);

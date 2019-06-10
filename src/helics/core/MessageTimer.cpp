@@ -11,11 +11,9 @@ SPDX-License-Identifier: BSD-3-Clause
 namespace helics
 {
 MessageTimer::MessageTimer (std::function<void(ActionMessage &&)> sFunction)
-    : sendFunction (std::move (sFunction)), contextPtr (AsioContextManager::getContextPointer ())
+    : sendFunction (std::move (sFunction)), contextPtr (AsioContextManager::getContextPointer ()),loopHandle(contextPtr->startContextLoop())
 {
-    //  std::cout << "getting loop handle for timer" << std::endl;
-    loopHandle = contextPtr->startContextLoop ();
-    // std::cout << "got loop handle for timer" << std::endl;
+
 }
 
 static void
@@ -29,7 +27,7 @@ processTimerCallback (std::shared_ptr<MessageTimer> mtimer, int32_t index, const
         }
         catch (std::exception &e)
         {
-            std::cout << "exception caught from sendMessage" << std::endl;
+            std::cerr << "exception caught from sendMessage" << std::endl;
         }
     }
 }
@@ -44,6 +42,7 @@ int32_t MessageTimer::addTimer (time_type expirationTime, ActionMessage mess)
     // these two calls need to be before the lock
     auto timer = std::make_shared<asio::steady_timer> (contextPtr->getBaseContext ());
     timer->expires_at (expirationTime);
+
     std::unique_lock<std::mutex> lock (timerLock);
 	
     auto index = static_cast<int32_t> (timers.size ());
@@ -96,12 +95,14 @@ void MessageTimer::updateTimer (int32_t timerIndex, time_type expirationTime, Ac
     std::lock_guard<std::mutex> lock (timerLock);
     if ((timerIndex >= 0) && (timerIndex < static_cast<int32_t> (timers.size ())))
     {
-        timers[timerIndex]->expires_at (expirationTime);
+		timers[timerIndex]->expires_at(expirationTime);
+		expirationTimes[timerIndex] = expirationTime;
+		buffers[timerIndex] = std::move(mess);
+        
         auto timerCallback = [ptr = shared_from_this (), timerIndex](const std::error_code &ec) {
             processTimerCallback (ptr, timerIndex, ec);
         };
-        expirationTimes[timerIndex] = expirationTime;
-        buffers[timerIndex] = std::move (mess);
+       
         timers[timerIndex]->async_wait (timerCallback);
     }
 }
@@ -160,8 +161,8 @@ void MessageTimer::sendMessage (int32_t timerIndex)
         {
             if (buffers[timerIndex].action () != CMD_IGNORE)
             {
-                auto buf = std::move (buffers[timerIndex]);
-                buffers[timerIndex].setAction (CMD_IGNORE);
+                ActionMessage buf = std::move (buffers[timerIndex]);
+                buffers[timerIndex].setAction (CMD_IGNORE); //clear out the action
                 lock.unlock ();  // don't keep a lock while calling a callback
                 sendFunction (std::move (buf));
             }
