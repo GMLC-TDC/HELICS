@@ -15,7 +15,7 @@ The main focus of this minor release is cleaning up the build system and extract
    - remove included fmt code and replace with submodule
    - remove jsoncpp code and replace with a submodule which generates a compiled library- this removed the need to continually regenerate the single header/file with customized namespaces, though if you are manually including helics the HELICS::jsoncpp needs to be added as a library.
    - extract several containers used in HELICS to a separate repository for better maintenance and possible reuse elsewhere.  Any reference to the containers library was removed from the Public API.
-   - All required references to boost were removed from the public API.  
+   - all required references to boost were removed from the public API.  
    - the logger headers were split into two sections.  The logger.h which includes the logger objects for use in federates was split from the loggerCore which is not publicly accessible.  
    - The command line arguments are error checked and the help prints all available options (thanks to CLI11)
    - the core tests and common tests now use google test instead of boost test.  More tests are expected to be migrated in the future.  
