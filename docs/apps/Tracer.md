@@ -82,6 +82,7 @@ if only a single column is specified it is assumed to be a subscription
 for two column rows the second is the identifier
 arguments with spaces should be enclosed in quotes
 
+```eval_rst
 +------------------------------+------------------------------------------------------------+
 | interface                    | description                                                |
 +==============================+============================================================+
@@ -97,6 +98,7 @@ arguments with spaces should be enclosed in quotes
 +------------------------------+------------------------------------------------------------+
 | clone                        | capture all message going from or to a particular endpoint |
 +------------------------------+------------------------------------------------------------+
+```
 
 for 3 column rows the first must be either clone or capture
 for clone the second can be either source or destination and the third the endpoint name
