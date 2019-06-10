@@ -97,14 +97,23 @@ if only a single column is specified it is assumed to be a subscription
 for two column rows the second is the identifier
 arguments with spaces should be enclosed in quotes
 
-| interface       | description         |
-| ------------- |:-------------:|
-| s, sub, subscription     | subscribe to a particular publication |
-| endpoint, ept, e     | generate an endpoint to capture all targeted packets    |
-| source, sourceclone,src | capture all messages coming from a particular endpoint     |
-| dest, destination, destclone | capture all message going to a particular endpoint     |
-| capture | capture all data coming from a particular federate     |
-|clone | capture all message going from or to a particular endpoint    |
+```eval_rst
++------------------------------+------------------------------------------------------------+
+| interface                    | description                                                |
++==============================+============================================================+
+| s, sub, subscription         | subscribe to a particular publication                      |
++------------------------------+------------------------------------------------------------+
+| endpoint, ept, e             | generate an endpoint to capture all targeted packets       |
++------------------------------+------------------------------------------------------------+
+| source, sourceclone,src      | capture all messages coming from a particular endpoint     |
++------------------------------+------------------------------------------------------------+
+| dest, destination, destclone | capture all message going to a particular endpoint         |
++------------------------------+------------------------------------------------------------+
+| capture                      | capture all data coming from a particular federate         |
++------------------------------+------------------------------------------------------------+
+| clone                        | capture all message going from or to a particular endpoint |
++------------------------------+------------------------------------------------------------+
+```
 
 for 3 column rows the first must be either clone or capture
 for clone the second can be either source or destination and the third the endpoint name
