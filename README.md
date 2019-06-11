@@ -69,7 +69,7 @@ A [Users guide](https://helics.readthedocs.io/en/latest/user-guide/index.html) f
 
 ## Documentation
 
-Our GitHub pages provides a set of [documentation](https://helics.readthedocs.io/en/latest/index.html) including a set of introductory [examples](https://helics.readthedocs.io/en/latest/introduction/index.html), a [developers guide](https://helics.readthedocs.io/en/latest/developer-guide/index.html), complete doxygen generated [API documentation](https://helics.readthedocs.io/en/latest/doxygen/annotated.html), and more.  A few more questions and answers are available on the [Wiki](https://github.com/GMLC-TDC/HELICS-src/wiki).
+Our ReadTheDocs site provides a set of [documentation](https://helics.readthedocs.io/en/latest/index.html) including a set of introductory [examples](https://helics.readthedocs.io/en/latest/introduction/index.html), a [developers guide](https://helics.readthedocs.io/en/latest/developer-guide/index.html), complete doxygen generated [API documentation](https://helics.readthedocs.io/en/latest/doxygen/annotated.html), and more.  A few more questions and answers are available on the [Wiki](https://github.com/GMLC-TDC/HELICS-src/wiki).
 
 Additionally, our initial requirements document can be found [here](docs/introduction/original_specification.md), which describes a number of our early design considerations.
 
