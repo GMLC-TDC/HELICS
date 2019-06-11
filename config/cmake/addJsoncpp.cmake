@@ -16,8 +16,13 @@ if(NOT CMAKE_CXX_STANDARD)
 endif()
 
 if (BUILD_SHARED_LIBS)
-   set(OLD_BUILD_SHARED_LIBS BUILD_SHARED_LIBS)
+   set(OLD_BUILD_SHARED_LIBS ${BUILD_SHARED_LIBS})
    set(BUILD_SHARED_LIBS OFF)
+endif()
+
+if (CMAKE_INSTALL_INCLUDEDIR)
+    set(OLD_CMAKE_INSTALL_INCLUDEDIR ${CMAKE_INSTALL_INCLUDEDIR})
+    set(CMAKE_INSTALL_INCLUDEDIR ${CMAKE_INSTALL_INCLUDEDIR}/helics/external/optional)
 endif()
 
 #these are internal variables used in JSONCPP that we know to be true based on the requirements in HELICS for newer compilers than JSONCPP supports
@@ -28,8 +33,12 @@ set(HAVE_STDINT_H ON)
 set(HAVE_DECIMAL_POINT ON)
 add_subdirectory("${HELICS_SOURCE_DIR}/ThirdParty/jsoncpp" "${PROJECT_BINARY_DIR}/ThirdParty/jsoncpp")
 
+if (OLD_CMAKE_INSTALL_INCLUDEDIR)
+    set(CMAKE_INSTALL_INCLUDEDIR ${OLD_CMAKE_INSTALL_INCLUDEDIR})
+endif()
+
 if (OLD_BUILD_SHARED_LIBS)
-   set(BUILD_SHARED_LIBS OLD_BUILD_SHARED_LIBS)
+   set(BUILD_SHARED_LIBS ${OLD_BUILD_SHARED_LIBS})
 endif()
 
 mark_as_advanced(
