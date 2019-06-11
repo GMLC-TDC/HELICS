@@ -59,7 +59,7 @@ fi
 
 # Compiler/language options
 if [[ "$CXX_STANDARD" ]]; then
-    OPTION_FLAGS+=("-DCMAKE_CXX_STANDARD=${CXX_STANDARD}")
+    OPTION_FLAGS_ARR+=("-DCMAKE_CXX_STANDARD=${CXX_STANDARD}")
 fi
 
 # Travis related options
