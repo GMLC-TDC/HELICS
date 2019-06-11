@@ -58,8 +58,8 @@ if [[ "$USE_MPI" ]]; then
 fi
 
 # Compiler/language options
-if [[ "$CXX_STANDARD" == "17" ]]; then
-    OPTION_FLAGS+=("-DCMAKE_CXX_STANDARD=17")
+if [[ "$CXX_STANDARD" ]]; then
+    OPTION_FLAGS+=("-DCMAKE_CXX_STANDARD=${CXX_STANDARD}")
 fi
 
 # Travis related options
