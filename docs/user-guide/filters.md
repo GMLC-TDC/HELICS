@@ -18,15 +18,15 @@ The figure below is an example of a representation of the message topology of a 
   * As constructed, the source filter on Federate 2 has no impact on this co-simulation as there are no messages sent from that endpoint.
   * Individual filters can be targeted to act on multiple endpoints and act as both source and destination filters.
 
-![messages and filters example](../img/messages_and_filters_example.pdf)
+![messages and filters example](../img/messages_and_filters_example.png)
   
 ### Example 1c - EV charge controller with HELICS filters ###
 
 To demonstrate the effects of filters, let's take the same model we were working with in the [previous example](./message_federates.md), and add a filter to the controller. Specifically, let's assume a very, very poor communication system and add a 600 second delay to the control messages sent from the EV charge controller to each of the EVs.
 
-![Ex. 1c message topology](../img/ex1c_message_topology.pdf)
+![Ex. 1c message topology](../img/Ex1c_Message_topology.png)
 
-[The JSON configuration file](../../examples/user_guide_examples/Example_1c/EV_Controller/Control.json) adds a new `filter` section that implements the filtering:
+[The JSON configuration file](https://github.com/GMLC-TDC/HELICS-src/tree/319de2b125fe5e36818f0434ac3d0a82ccc46534/examples/user_guide_examples/Example_1c/EV_Controller/Control.json) adds a new `filter` section that implements the filtering:
 
 ```
 ...
@@ -59,10 +59,10 @@ To demonstrate the effects of filters, let's take the same model we were working
 * **`name`** (optional) - Name of the endpoint filter
 * **`sourcetarget(s)`** - Name(s) of the endpoints to which this source filter will be applied
 * **`desttarget(s)`** - Name(s) of the endpoints to which this destination filter will be applied
-* **`operation`** - Defines the type of filtering operation that will be applied to messages. As of v2.0, the supported types are: `delay`, `timedelay`, `randomdelay`, `randomdrop`, `reroute`, `redirect`, `clone`, `cloning`, and `custom`. Further details on filter types can be found [here](https://github.com/GMLC-TDC/HELICS-src/blob/master/docs/configuration/Filters.md).
+* **`operation`** - Defines the type of filtering operation that will be applied to messages. As of v2.0, the supported types are: `delay`, `timedelay`, `randomdelay`, `randomdrop`, `reroute`, `redirect`, `clone`, `cloning`, and `custom`. Further details on filter types can be found [here](../configuration/Filters.md).
 * **`properties`** - Each filter type has specific parameters that define how it operates. In this case, one of those parameters is the amount each message will be delayed, in seconds.
 
-Let's run [this co-simulation](../../examples/user_guide_examples/Example_1c/) and capture the same data as last time for direct comparison: total substation load and EV charging behavior, both as a function of time.
+Let's run [this co-simulation](https://github.com/GMLC-TDC/HELICS-src/tree/319de2b125fe5e36818f0434ac3d0a82ccc46534/examples/user_guide_examples/Example_1c/) and capture the same data as last time for direct comparison: total substation load and EV charging behavior, both as a function of time.
 
 ![Ex. 1c total feeder load](../img/Ex1c_Feeder_consumption.png)
 
@@ -76,7 +76,7 @@ HELICS filters are a simple, easy step to add a touch of realism to messages in 
 
 The wonderful thing about the software architecture of HELICS is that simulators that have been properly modified to allow HELICS integration will seamlessly slide into the role of filters without having to reconfigure the sending and receiving federates. The move from native HELICS filters to full-blown communication system models is invisible. This is achieved by allowing user-defined nodes in a communication system model to be designated the filter for a given endpoint. All HELICS messages coming from that endpoint enter the communication system federate at that node and message being sent to that endpoint exit the communication system federate at that node. Conceptually, the change looks something like the figure below:
 
-![filters federate example](../img/filter_federate_example.pdf)
+![filters federate example](../img/filter_federate_example.png)
 
 
 ### Example 1d - EV charge controller with an ns-3 model ###

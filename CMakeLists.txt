@@ -755,8 +755,8 @@ install(
 )
 
 install(
-    FILES LICENSE NOTICE
-    DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/helics
+    FILES LICENSE NOTICE CHANGELOG.md README.md
+    DESTINATION ${CMAKE_INSTALL_DOCDIR}
     COMPONENT libs
 )
 # -------------------------------------------------------------

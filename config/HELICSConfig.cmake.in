@@ -14,22 +14,6 @@
 @PACKAGE_INIT@
 
 set(PN HELICS)
-set(${PN}_INCLUDE_DIR "${PACKAGE_PREFIX_DIR}/@CMAKE_INSTALL_INCLUDEDIR@")
-
-
-if (@BUILD_C_SHARED_LIB@)
-set(${PN}_C_SHARED_LIBRARY "${PACKAGE_PREFIX_DIR}/@CMAKE_INSTALL_BINDIR@/@helics_c_shared_file@")
-set(${PN}_C_SHARED_LIBRARY_DEBUG "${PACKAGE_PREFIX_DIR}/@CMAKE_INSTALL_BINDIR@/@helics_c_shared_file_debug@")
-endif()
-
-if (@BUILD_SHARED_LIBS@)
-set(${PN}_CXX_SHARED_LIBRARY "${PACKAGE_PREFIX_DIR}/@CMAKE_INSTALL_BINDIR@/@helics_cxx_shared_file@")
-set(${PN}_CXX_SHARED_LIBRARY_DEBUG "${PACKAGE_PREFIX_DIR}/@CMAKE_INSTALL_BINDIR@/@helics_cxx_shared_file_debug@")
-endif()
-
-set(${PN}_STATIC_LIBRARY "${PACKAGE_PREFIX_DIR}/@CMAKE_INSTALL_LIBDIR@/@helics_static_file@")
-set(${PN}_STATIC_LIBRARY_DEBUG "${PACKAGE_PREFIX_DIR}/@CMAKE_INSTALL_LIBDIR@/@helics_static_file_debug@")
-	
 set(SAVED_PARENT_CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH})
 set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_LIST_DIR})
 
@@ -84,6 +68,20 @@ endif()
 endif()
 
 check_required_components(${PN})
+
+get_target_property(${PN}_INCLUDE_DIRS HELICS::helics_base_includes INTERFACE_INCLUDE_DIRECTORIES)
+
+if (@BUILD_C_SHARED_LIB@)
+    get_target_property(${PN}_C_SHARED_LIBRARY HELICS::helicsSharedLib LOCATION)
+endif()
+
+if (@BUILD_SHARED_LIBS@)
+    get_target_property(${PN}_CXX_SHARED_LIBRARY HELICS::helics-shared LOCATION)
+endif()
+
+get_target_property(${PN}_STATIC_LIBRARY HELICS::helics-static LOCATION)
+message(STATUS "INCLUDE DIRS HELICS: ${HELICS_INCLUDE_DIRS}")
+message(STATUS "C_SHARED_LIBRARY: ${HELICS_C_SHARED_LIBRARY}")
 
 #load some variables with the locations the different executables
 if (@BUILD_APP_EXECUTABLES@)
