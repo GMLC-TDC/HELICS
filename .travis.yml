@@ -101,6 +101,7 @@ jobs:
         - MATRIX_EVAL="COMPILER=clang && CC='clang-5.0' && CXX='clang++-5.0'"
         - CCACHE_CPP2=yes
         - USE_SWIG=true
+        - USE_CMAKE_VERSION=3.14.5
         - CXX_STANDARD=17
 
     - <<: *linux_base
