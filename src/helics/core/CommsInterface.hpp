@@ -6,11 +6,11 @@ SPDX-License-Identifier: BSD-3-Clause
 */
 #pragma once
 
-#include "../common/BlockingPriorityQueue.hpp"
 #include "../common/TriggerVariable.hpp"
 #include "../common/TripWire.hpp"
 #include "ActionMessage.hpp"
 #include "NetworkBrokerData.hpp"
+#include "gmlc/containers/BlockingPriorityQueue.hpp"
 #include <functional>
 #include <thread>
 
@@ -137,7 +137,7 @@ class CommsInterface
     std::function<void(ActionMessage &&)> ActionCallback;  //!< the callback for what to do with a received message
     std::function<void(int level, const std::string &name, const std::string &message)>
       loggingCallback;  //!< callback for logging
-    BlockingPriorityQueue<std::pair<route_id, ActionMessage>>
+	gmlc::containers::BlockingPriorityQueue<std::pair<route_id, ActionMessage>>
       txQueue;  //!< set of messages waiting to be transmitted
     // closing the files or connection can take some time so there is a need for inter-thread communication to not
     // spit out warning messages if it is in the process of disconnecting

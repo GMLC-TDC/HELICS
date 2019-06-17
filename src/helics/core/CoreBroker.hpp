@@ -14,11 +14,11 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <thread>
 #include <unordered_map>
 
-#include "../common/AirLock.hpp"
 #include "../common/DelayedObjects.hpp"
-#include "../common/DualMappedVector.hpp"
-#include "../common/simpleQueue.hpp"
-#include "helics_includes/any.hpp"
+#include "gmlc/containers/AirLock.hpp"
+#include "gmlc/containers/DualMappedVector.hpp"
+#include "gmlc/containers/SimpleQueue.hpp"
+#include "helics/external/any.hpp"
 
 #include "../common/TriggerVariable.hpp"
 #include "ActionMessage.hpp"
@@ -29,6 +29,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "JsonMapBuilder.hpp"
 #include "TimeDependencies.hpp"
 #include "UnknownHandleManager.hpp"
+#include "federate_id_extra.hpp"
 
 namespace helics
 {
@@ -81,8 +82,9 @@ class CoreBroker : public Broker, public BrokerBase
     bool isRootc{false};
     bool connectionEstablished{false};  //!< the setup has been received by the core loop thread
     int routeCount = 1;  //!< counter for creating new routes;
-    DualMappedVector<BasicFedInfo, std::string, global_federate_id> _federates;  //!< container for all federates
-    DualMappedVector<BasicBrokerInfo, std::string, global_broker_id>
+    gmlc::containers::DualMappedVector<BasicFedInfo, std::string, global_federate_id>
+      _federates;  //!< container for all federates
+    gmlc::containers::DualMappedVector<BasicBrokerInfo, std::string, global_broker_id>
       _brokers;  //!< container for all the broker information
     std::string previous_local_broker_identifier;  //!< the previous identifier in case a rename is required
 
@@ -111,7 +113,8 @@ class CoreBroker : public Broker, public BrokerBase
     TriggerVariable disconnection;  //!< controller for the disconnection process
     std::unique_ptr<TimeoutMonitor> timeoutMon;  //!< class to handle timeouts and disconnection notices
     std::atomic<uint16_t> nextAirLock{0};  //!< the index of the next airlock to use
-    std::array<AirLock<stx::any>, 3> dataAirlocks;  //!< airlocks for updating filter operators and other functions
+    std::array<gmlc::containers::AirLock<stx::any>, 3>
+      dataAirlocks;  //!< airlocks for updating filter operators and other functions
   private:
     /** function that processes all the messages
     @param command -- the message to process
@@ -127,7 +130,7 @@ class CoreBroker : public Broker, public BrokerBase
     /** process configure commands for the broker*/
     void processBrokerConfigureCommands (ActionMessage &cmd);
 
-    SimpleQueue<ActionMessage>
+    gmlc::containers::SimpleQueue<ActionMessage>
       delayTransmitQueue;  //!< FIFO queue for transmissions to the root that need to be delayed for a certain time
     /* function to transmit the delayed messages*/
     void transmitDelayedMessages ();
@@ -141,7 +144,7 @@ class CoreBroker : public Broker, public BrokerBase
     /** transmit a message to the parent or root */
     void transmitToParent (ActionMessage &&cmd);
 
-    /** broacast a message to all immediate brokers*/
+    /** broadcast a message to all immediate brokers*/
     void broadcast (ActionMessage &cmd);
     /**/
     route_id fillMessageRouteInformation (ActionMessage &mess);
@@ -175,8 +178,6 @@ class CoreBroker : public Broker, public BrokerBase
     virtual bool isRoot () const override final { return _isRoot; };
 
     virtual bool isOpenToNewFederates () const override;
-    /** display the help for command line arguments on the broker*/
-    static void displayHelp ();
 
     virtual void setLoggingCallback (
       const std::function<void(int, const std::string &, const std::string &)> &logFunction) override final;
@@ -228,10 +229,12 @@ class CoreBroker : public Broker, public BrokerBase
     /** destructor*/
     virtual ~CoreBroker ();
     /** start up the broker with an initialization string containing commands and parameters*/
-    virtual void initialize (const std::string &initializationString) override final;
+    virtual void configure (const std::string &configureString) override final;
     /** initialize from command line arguments
      */
-    virtual void initializeFromArgs (int argc, const char *const *argv) override;
+    virtual void configureFromArgs (int argc, char *argv[]) override final;
+    /** initialize from command line arguments in a vector*/
+    virtual void configureFromVector (std::vector<std::string> args) override final;
 
     /** check if all the local federates are ready to be initialized
     @return true if everyone is ready, false otherwise
@@ -253,6 +256,9 @@ class CoreBroker : public Broker, public BrokerBase
 
     virtual void
     addDestinationFilterToEndpoint (const std::string &filter, const std::string &endpoint) override final;
+
+  protected:
+    virtual std::shared_ptr<helicsCLI11App> generateCLI () override;
 
   private:
     /** check if we can remove some dependencies*/

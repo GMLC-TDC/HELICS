@@ -3,7 +3,7 @@ Co-simulation is an analysis technique that allows simulators from different dom
 
 Co-simulation allows the coupling of existing models and simulators by breaking down these boundary condition barriers and calculating results that are more realistic and dynamic. In this case, while the atmospheric simulator is able to calculate the current weather using the latest values of surface reflectivity and humidity contributions from the vegetation, the vegetation simulator is able to use the latest values from the atmospheric simulator to determine the moisture content of the soil and the ambient temperature.
 
-![atmospheric](../img/atmospheric.png)
+![Atmospheric simulation](../img/atmospheric.png)
 
 It's easy to imagine this hypothetical model being extended with other simulators throughout the ecosphere, incorporating models describing the behavior of the ocean, wildlife, even human agriculture. Rather than trying to build a single simulator that models all of this functionality, co-simulation allows us to use existing simulators that have the longer-term investment and validation behind them; that experience is leveraged into building simulations of complex systems of systems.
 

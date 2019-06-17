@@ -7,30 +7,20 @@
 
 set(
   common_headers
-  AirLock.hpp
-  simpleQueue.hpp
-  BlockingQueue.hpp
-  BlockingPriorityQueue.hpp
   timeRepresentation.hpp
   delayedDestructor.hpp
   DelayedObjects.hpp
   searchableObjectHolder.hpp
-  argParser.h
   JsonProcessingFunctions.hpp
   TomlProcessingFunctions.hpp
-  stringToCmdLine.h
   AsioContextManager.h
   logger.h
+  loggerCore.hpp
   stringOps.h
-  MapTraits.hpp
   GuardedTypes.hpp
   generic_string_ops.hpp
   charMapper.h
   base64.h
-  MappedVector.hpp
-  DualMappedVector.hpp
-  MappedPointerVector.hpp
-  DualMappedPointerVector.hpp
   TriggerVariable.hpp
   TripWire.hpp
   fmt_format.h
@@ -40,25 +30,24 @@ set(
 
 set(
   common_sources
-  stringToCmdLine.cpp
   AsioContextManager.cpp
   JsonProcessingFunctions.cpp
   TomlProcessingFunctions.cpp
   logger.cpp
+  loggerCore.cpp
   stringOps.cpp
   charMapper.cpp
   base64.cpp
-  argParser.cpp
   TripWire.cpp
   TriggerVariable.cpp
 )
 
 set(
   zmq_headers
-  zmqContextManager.h 
+  zmqContextManager.h
   zmqHelper.h
-  ${CMAKE_SOURCE_DIR}/ThirdParty/cppzmq/zmq.hpp 
-  ${CMAKE_SOURCE_DIR}/ThirdParty/cppzmq/zmq_addon.hpp
+  ${HELICS_SOURCE_DIR}/ThirdParty/cppzmq/zmq.hpp
+  ${HELICS_SOURCE_DIR}/ThirdParty/cppzmq/zmq_addon.hpp
 )
 
 set(
@@ -74,21 +63,18 @@ set(
 set(
   helics_public_common
   timeRepresentation.hpp
-  argParser.h
   JsonProcessingFunctions.hpp
-  stringToCmdLine.h
   AsioContextManager.h
   logger.h
   stringOps.h
-  MapTraits.hpp
   GuardedTypes.hpp
   generic_string_ops.hpp
 )
 
-if(HELICS_HAVE_ZEROMQ)
+if(ENABLE_ZMQ_CORE)
   list(APPEND common_headers ${zmq_headers})
   list(APPEND common_sources ${zmq_sources})
-endif(HELICS_HAVE_ZEROMQ)
+endif(ENABLE_ZMQ_CORE)
 
 add_library(helics_common OBJECT ${common_sources} ${common_headers})
 set_target_properties(helics_common PROPERTIES LINKER_LANGUAGE CXX)
@@ -106,17 +92,30 @@ target_compile_definitions(
   $<TARGET_PROPERTY:helics_base_includes,INTERFACE_COMPILE_DEFINITIONS>
 )
 
+if (TARGET Boost::boost)
+target_include_directories(
+  helics_common SYSTEM
+  PRIVATE $<TARGET_PROPERTY:Boost::boost,INTERFACE_SYSTEM_INCLUDE_DIRECTORIES>
+)
+endif()
+
 target_compile_options(
   helics_common
   PRIVATE $<TARGET_PROPERTY:helics_base_includes,INTERFACE_COMPILE_OPTIONS>
 )
 
-if(HELICS_HAVE_ZEROMQ)
+target_compile_options(
+  helics_common
+  PRIVATE $<TARGET_PROPERTY:compile_flags_target,INTERFACE_COMPILE_OPTIONS>
+)
+
+
+if(ENABLE_ZMQ_CORE)
   target_include_directories(
     helics_common SYSTEM
     PRIVATE $<TARGET_PROPERTY:${ZeroMQ_DEPENDENCY},INTERFACE_INCLUDE_DIRECTORIES>
   )
-endif(HELICS_HAVE_ZEROMQ)
+endif(ENABLE_ZMQ_CORE)
 
 if(APPLE)
   target_compile_definitions(helics_common PUBLIC "-DSTX_NO_STD_ANY=1")

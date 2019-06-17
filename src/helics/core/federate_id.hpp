@@ -6,7 +6,6 @@ SPDX-License-Identifier: BSD-3-Clause
 */
 
 #pragma once
-#include "../common/MapTraits.hpp"
 #include <cstdint>
 #include <functional>
 #include <iosfwd>
@@ -323,43 +322,3 @@ struct hash<helics::global_handle>
 };
 
 }  // namespace std
-
-/** override the is_easily_hashable type_trait for use in DualMappedVector and some other types that may optionally
- * use std::map or std::unordered_map*/
-template <>
-struct is_easily_hashable<helics::global_federate_id>
-{
-    static constexpr bool value = true;
-};
-
-/** override the is_easily_hashable type_trait for use in DualMappedVector and some other types that may optionally
- * use std::map or std::unordered_map*/
-template <>
-struct is_easily_hashable<helics::local_federate_id>
-{
-    static constexpr bool value = true;
-};
-
-/** override the is_easily_hashable type_trait for use in DualMappedVector and some other types that may optionally
- * use std::map or std::unordered_map*/
-template <>
-struct is_easily_hashable<helics::global_broker_id>
-{
-    static constexpr bool value = true;
-};
-
-/** override the is_easily_hashable type_trait for use in DualMappedVector and some other types that may optionally
- * use std::map or std::unordered_map*/
-template <>
-struct is_easily_hashable<helics::route_id>
-{
-    static constexpr bool value = true;
-};
-
-/** override the is_easily_hashable type_trait for use in DualMappedVector and some other types that may optionally
- * use std::map or std::unordered_map*/
-template <>
-struct is_easily_hashable<helics::global_handle>
-{
-    static constexpr bool value = true;
-};

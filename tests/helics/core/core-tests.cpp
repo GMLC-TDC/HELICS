@@ -6,27 +6,33 @@ SPDX-License-Identifier: BSD-3-Clause
 */
 #include "helics/helics-config.h"
 
-#ifndef BOOST_STATIC
-#define BOOST_TEST_DYN_LINK
-#endif
+#include "gtest/gtest.h"
 
-#define BOOST_TEST_MODULE core_tests
-#define BOOST_TEST_DETECT_MEMORY_LEAK 0
+#ifdef ENABLE_ZMQ_CORE
+#include "cppzmq/zmq.hpp"
+#include "helics/common/zmqContextManager.h"
+#endif
 
 #include <helics/core/BrokerFactory.hpp>
 #include <helics/core/CoreFactory.hpp>
-#include <boost/test/unit_test.hpp>
 
-struct globalTestConfig
+struct globalTestConfig : public ::testing::Environment
 {
-    globalTestConfig () {}
-    ~globalTestConfig ()
+    virtual void TearDown () override
     {
+#ifdef ENABLE_ZMQ_CORE
+#ifdef __APPLE__
+        if (ZmqContextManager::setContextToLeakOnDelete ())
+        {
+            ZmqContextManager::getContext ().close ();
+        }
+#endif
+#endif
         helics::CoreFactory::cleanUpCores ();
         helics::BrokerFactory::cleanUpBrokers ();
     }
 };
 
+// register the global setup and teardown structure
+::testing::Environment *const foo_env = ::testing::AddGlobalTestEnvironment (new globalTestConfig);
 //____________________________________________________________________________//
-
-BOOST_GLOBAL_FIXTURE (globalTestConfig);

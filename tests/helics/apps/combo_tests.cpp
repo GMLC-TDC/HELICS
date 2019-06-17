@@ -5,8 +5,15 @@ the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 #include <boost/test/unit_test.hpp>
-#include <boost/filesystem.hpp>
 #include <boost/test/data/test_case.hpp>
+
+#ifdef _MSC_VER
+#pragma warning(push, 0)
+#include "helics/external/filesystem.hpp"
+#pragma warning(pop)
+#else
+#include "helics/external/filesystem.hpp"
+#endif
 
 #include <cstdio>
 
@@ -16,7 +23,6 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helics/application_api/Subscriptions.hpp"
 #include "helics/apps/Player.hpp"
 #include "helics/apps/Recorder.hpp"
-#include "helics/common/stringToCmdLine.h"
 #include "helics/core/BrokerFactory.hpp"
 #include <future>
 
@@ -71,18 +77,18 @@ BOOST_AUTO_TEST_CASE (save_load_file1)
     mfed.finalize ();
     mfed2.finalize ();
     fut.get ();
-    BOOST_CHECK_EQUAL (rec1.messageCount (), 2);
-    BOOST_CHECK_EQUAL (rec1.pointCount (), 3);
+    BOOST_CHECK_EQUAL (rec1.messageCount (), 2u);
+    BOOST_CHECK_EQUAL (rec1.pointCount (), 3u);
 
-    auto filename = boost::filesystem::temp_directory_path () / "savefile.txt";
+    auto filename = ghc::filesystem::temp_directory_path () / "savefile.txt";
     rec1.saveFile (filename.string ());
 
-    BOOST_CHECK (boost::filesystem::exists (filename));
+    BOOST_CHECK (ghc::filesystem::exists (filename));
 
-    auto filename2 = boost::filesystem::temp_directory_path () / "savefile.json";
+    auto filename2 = ghc::filesystem::temp_directory_path () / "savefile.json";
     rec1.saveFile (filename2.string ());
 
-    BOOST_CHECK (boost::filesystem::exists (filename2));
+    BOOST_CHECK (ghc::filesystem::exists (filename2));
 }
 
 BOOST_AUTO_TEST_CASE (save_load_file_binary)
@@ -139,18 +145,18 @@ BOOST_AUTO_TEST_CASE (save_load_file_binary)
     mfed.finalize ();
     mfed2.finalize ();
     fut.get ();
-    BOOST_CHECK_EQUAL (rec1.messageCount (), 2);
-    BOOST_CHECK_EQUAL (rec1.pointCount (), 3);
+    BOOST_CHECK_EQUAL (rec1.messageCount (), 2u);
+    BOOST_CHECK_EQUAL (rec1.pointCount (), 3u);
 
-    auto filename = boost::filesystem::temp_directory_path () / "savefile_binary.txt";
+    auto filename = ghc::filesystem::temp_directory_path () / "savefile_binary.txt";
     rec1.saveFile (filename.string ());
 
-    BOOST_CHECK (boost::filesystem::exists (filename));
+    BOOST_CHECK (ghc::filesystem::exists (filename));
 
-    auto filename2 = boost::filesystem::temp_directory_path () / "savefile_binary.json";
+    auto filename2 = ghc::filesystem::temp_directory_path () / "savefile_binary.json";
     rec1.saveFile (filename2.string ());
 
-    BOOST_CHECK (boost::filesystem::exists (filename2));
+    BOOST_CHECK (ghc::filesystem::exists (filename2));
 }
 
 BOOST_AUTO_TEST_CASE (check_created_files1, *boost::unit_test::depends_on ("combo_tests/save_load_file1"))
@@ -161,17 +167,17 @@ BOOST_AUTO_TEST_CASE (check_created_files1, *boost::unit_test::depends_on ("comb
     fi.setProperty (helics_property_time_period, 1.0);
 
     helics::apps::Player play1 ("play1", fi);
-    auto filename = boost::filesystem::temp_directory_path () / "savefile.txt";
+    auto filename = ghc::filesystem::temp_directory_path () / "savefile.txt";
     play1.loadFile (filename.string ());
 
     play1.initialize ();
-    BOOST_CHECK_EQUAL (play1.pointCount (), 3);
-    BOOST_CHECK_EQUAL (play1.publicationCount (), 1);
-    BOOST_CHECK_EQUAL (play1.messageCount (), 2);
-    BOOST_CHECK_EQUAL (play1.endpointCount (), 2);
+    BOOST_CHECK_EQUAL (play1.pointCount (), 3u);
+    BOOST_CHECK_EQUAL (play1.publicationCount (), 1u);
+    BOOST_CHECK_EQUAL (play1.messageCount (), 2u);
+    BOOST_CHECK_EQUAL (play1.endpointCount (), 2u);
 
     play1.finalize ();
-    boost::filesystem::remove (filename);
+    ghc::filesystem::remove (filename);
 }
 
 BOOST_AUTO_TEST_CASE (check_created_files2, *boost::unit_test::depends_on ("combo_tests/save_load_file1"))
@@ -182,17 +188,17 @@ BOOST_AUTO_TEST_CASE (check_created_files2, *boost::unit_test::depends_on ("comb
     fi.setProperty (helics_property_time_period, 1.0);
 
     helics::apps::Player play1 ("play1", fi);
-    auto filename = boost::filesystem::temp_directory_path () / "savefile.json";
+    auto filename = ghc::filesystem::temp_directory_path () / "savefile.json";
     play1.loadFile (filename.string ());
 
     play1.initialize ();
-    BOOST_CHECK_EQUAL (play1.pointCount (), 3);
-    BOOST_CHECK_EQUAL (play1.publicationCount (), 1);
-    BOOST_CHECK_EQUAL (play1.messageCount (), 2);
-    BOOST_CHECK_EQUAL (play1.endpointCount (), 2);
+    BOOST_CHECK_EQUAL (play1.pointCount (), 3u);
+    BOOST_CHECK_EQUAL (play1.publicationCount (), 1u);
+    BOOST_CHECK_EQUAL (play1.messageCount (), 2u);
+    BOOST_CHECK_EQUAL (play1.endpointCount (), 2u);
 
     play1.finalize ();
-    boost::filesystem::remove (filename);
+    ghc::filesystem::remove (filename);
 }
 
 BOOST_AUTO_TEST_CASE (check_created_files_binary1,
@@ -205,14 +211,14 @@ BOOST_AUTO_TEST_CASE (check_created_files_binary1,
     fi.setProperty (helics_property_time_period, 1.0);
 
     helics::apps::Player play1 ("play1", fi);
-    auto filename = boost::filesystem::temp_directory_path () / "savefile_binary.txt";
+    auto filename = ghc::filesystem::temp_directory_path () / "savefile_binary.txt";
     play1.loadFile (filename.string ());
 
     play1.initialize ();
-    BOOST_CHECK_EQUAL (play1.pointCount (), 3);
-    BOOST_CHECK_EQUAL (play1.publicationCount (), 1);
-    BOOST_CHECK_EQUAL (play1.messageCount (), 2);
-    BOOST_CHECK_EQUAL (play1.endpointCount (), 2);
+    BOOST_CHECK_EQUAL (play1.pointCount (), 3u);
+    BOOST_CHECK_EQUAL (play1.publicationCount (), 1u);
+    BOOST_CHECK_EQUAL (play1.messageCount (), 2u);
+    BOOST_CHECK_EQUAL (play1.endpointCount (), 2u);
 
     auto &b1 = play1.getMessage (0);
     helics::data_block n5 (256);
@@ -230,7 +236,7 @@ BOOST_AUTO_TEST_CASE (check_created_files_binary1,
     }
     BOOST_CHECK_EQUAL (b2.mess.data.to_string (), n6.to_string ());
     play1.finalize ();
-    boost::filesystem::remove (filename);
+    ghc::filesystem::remove (filename);
 }
 
 BOOST_AUTO_TEST_CASE (check_created_files_binary2,
@@ -243,15 +249,15 @@ BOOST_AUTO_TEST_CASE (check_created_files_binary2,
     fi.setProperty (helics_property_time_period, 1.0);
 
     helics::apps::Player play1 ("play1", fi);
-    auto filename = boost::filesystem::temp_directory_path () / "savefile_binary.json";
+    auto filename = ghc::filesystem::temp_directory_path () / "savefile_binary.json";
     play1.loadFile (filename.string ());
 
     play1.initialize ();
-    BOOST_CHECK_EQUAL (play1.pointCount (), 3);
-    BOOST_CHECK_EQUAL (play1.publicationCount (), 1);
-    BOOST_CHECK_EQUAL (play1.messageCount (), 2);
+    BOOST_CHECK_EQUAL (play1.pointCount (), 3u);
+    BOOST_CHECK_EQUAL (play1.publicationCount (), 1u);
+    BOOST_CHECK_EQUAL (play1.messageCount (), 2u);
 
-    BOOST_CHECK_EQUAL (play1.endpointCount (), 2);
+    BOOST_CHECK_EQUAL (play1.endpointCount (), 2u);
 
     auto &b1 = play1.getMessage (0);
     helics::data_block n5 (256);
@@ -270,7 +276,7 @@ BOOST_AUTO_TEST_CASE (check_created_files_binary2,
     BOOST_CHECK_EQUAL (b2.mess.data.to_string (), n6.to_string ());
 
     play1.finalize ();
-    boost::filesystem::remove (filename);
+    ghc::filesystem::remove (filename);
 }
 
 BOOST_AUTO_TEST_CASE (check_combination_file_load)
@@ -310,12 +316,12 @@ BOOST_AUTO_TEST_CASE (check_combination_file_load)
             fed.getPublication (1).publish (1);
         }
     }
-    BOOST_CHECK_EQUAL (fed.pendingMessages (), 3);
+    BOOST_CHECK_EQUAL (fed.pendingMessages (), 3u);
     fed.finalize ();
     fut_play.get ();
     fut_rec.get ();
-    BOOST_CHECK_EQUAL (rec1.messageCount (), 2);
-    BOOST_CHECK_EQUAL (rec1.pointCount (), 2);
+    BOOST_CHECK_EQUAL (rec1.messageCount (), 2u);
+    BOOST_CHECK_EQUAL (rec1.pointCount (), 2u);
 }
 
 BOOST_AUTO_TEST_SUITE_END ()

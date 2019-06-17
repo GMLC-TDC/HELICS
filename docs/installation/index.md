@@ -4,7 +4,7 @@ Installation
 The first step to using HELICS is to install it.
 You’ll need an internet connection to run the commands in this chapter, as we’ll be downloading HELICS from the internet.
 
-We’ll be showing number of commands as code snippets in the following presentation using a terminal, and those lines all start with `$`.
+We’ll be showing a number of commands as code snippets in the following presentation using a terminal, and those lines all start with `$`.
 You don’t need to type in the `$` character; they are there to indicate the start of each command.
 Lines that don’t start with `$` are typically showing the output of the previous command.
 
@@ -22,10 +22,10 @@ conda install -c conda-forge helics
 conda install -c gmlc-tdc helics
 ```
 
-### Using a installer for your operating system
+### Using an installer for your operating system
 
 Download pre-compiled libraries from the [releases page](https://github.com/GMLC-TDC/HELICS-Src/releases/latest) and add them to your path.
-The installers come with bindings for Python (3.6), MATLAB, Java extensions precompiled as part of the installation.
+The installers come with bindings for Python (3.6), MATLAB, and Java extensions precompiled as part of the installation.
 All you need to do is add the relevant folders to your User's PATH variables.
 
 On Windows, you can visit `Control Panel -> System -> Advanced System Settings -> Environment Variables` and edit your user environment variables to add the necessary Path, PYTHONPATH, JAVAPATH, MATLABPATH environment variables to the corresponding HELICS installed locations.
@@ -82,7 +82,7 @@ git checkout v1.0.1
 
 You will not need a full understanding of how `git` works for installing HELICS, but if you are interested you can find a good `git` resource in [this page](https://git-scm.com/book/en/v2).
 
-Secondly, HELICS-src is a modern CPP cross-platform software application.
+Secondly, HELICS-src is a modern C++ cross-platform software application.
 One challenge while maintaining the same codebase across multiple operating systems is that we have to ensure that everything installs correctly everywhere.
 The development team uses `CMake` to build HELICS.
 `CMake` is a cross-platform tool designed to build, test and package software.

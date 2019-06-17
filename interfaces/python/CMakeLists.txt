@@ -40,6 +40,8 @@ if(ENABLE_SWIG AND SWIG_EXECUTABLE)
   swig_link_libraries(helics helicsSharedLib)
   if (MSVC)
 	target_compile_options(_helics PRIVATE "/wd4100")
+  else(MSVC)
+   target_compile_options(_helics PRIVATE "-Wno-long-long")
   endif(MSVC)
   if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
     # https://groups.google.com/a/continuum.io/d/msg/anaconda/057P4uNWyCU/Iem6Ot jBCQAJ
@@ -56,32 +58,9 @@ if(ENABLE_SWIG AND SWIG_EXECUTABLE)
 
   install(TARGETS _helics DESTINATION python COMPONENT python)
 
-  foreach(keyfile IN LISTS KEY_LIBRARY_FILES)
-    add_custom_command(
-      TARGET
-      _helics
-      POST_BUILD # Adds a post-build event to api tests
-      COMMAND
-        ${CMAKE_COMMAND}
-        -E
-        copy_if_different # which executes "cmake - E copy_if_different..."
-        "${keyfile}" # <--this is in-file
-        "$<TARGET_FILE_DIR:_helics>/"
-    ) # <--this is out- file path
-  endforeach(keyfile)
-
-  add_custom_command(
-    TARGET
-    _helics
-    POST_BUILD # Adds a post-build event to api tests
-    COMMAND
-      ${CMAKE_COMMAND}
-      -E
-      copy_if_different # which executes "cmake - E copy_if_different..."
-      "$<TARGET_FILE:helicsSharedLib>" # <--this is in- file
-      "$<TARGET_FILE_DIR:_helics>/"
-  ) # <--this is out- file path
-
+  copy_key_files_to_target_location(_helics)
+  copy_shared_target(_helics)
+ 
 else()
   message("Building without swig")
 

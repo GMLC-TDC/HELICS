@@ -24,7 +24,7 @@ add_executable(helics_apps-tests ${helics_apps_test_sources})
 
 set_target_properties(helics_apps-tests PROPERTIES FOLDER tests)
 
-target_link_libraries(helics_apps-tests helics_apps helics_test_base)
+target_link_libraries(helics_apps-tests helics_apps helics_boost_test_base)
 
 target_include_directories(helics_apps-tests PRIVATE ${PROJECT_SOURCE_DIR}/src)
 
@@ -32,7 +32,7 @@ target_compile_definitions(
   helics_apps-tests PRIVATE -DTEST_DIR=\"${CMAKE_CURRENT_SOURCE_DIR}/test_files/\"
 )
 target_compile_definitions(
-  helics_apps-tests PRIVATE -DHELICS_BUILD_LOC=\"${CMAKE_BINARY_DIR}/src/helics/\"
+  helics_apps-tests PRIVATE -DHELICS_BUILD_LOC=\"${HELICS_BINARY_DIR}/src/helics/\"
 )
 target_compile_definitions(
   helics_apps-tests PRIVATE
@@ -53,19 +53,4 @@ add_test(
 )
 set_property(TEST helics_apps-ci-tests PROPERTY LABELS Continuous)
 
-if(WIN32)
-  foreach(keyfile IN LISTS KEY_LIBRARY_FILES)
-    add_custom_command(
-      TARGET
-      helics_apps-tests
-      POST_BUILD # Adds a post-build event to core tests
-      COMMAND
-        ${CMAKE_COMMAND}
-        -E
-        copy_if_different # which executes "cmake - E copy_if_different..."
-        "${keyfile}" # <--this is in-file
-        "$<TARGET_FILE_DIR:helics_apps-tests>/"
-    )
-    # <--this is out-file path
-  endforeach(keyfile)
-endif(WIN32)
+copy_key_files_to_target_location(helics_apps-tests)

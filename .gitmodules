@@ -8,3 +8,11 @@
 [submodule "ThirdParty/fmtlib"]
 	path = ThirdParty/fmtlib
 	url = https://github.com/fmtlib/fmt.git
+[submodule "ThirdParty/googletest"]
+	path = ThirdParty/googletest
+	url = ../../google/googletest.git
+	branch = master
+[submodule "ThirdParty/containers"]
+	path = ThirdParty/containers
+	url = https://github.com/GMLC-TDC/containers.git
+	branch = master

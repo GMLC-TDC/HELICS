@@ -5,7 +5,7 @@ import helics as h
 
 def AddBroker(core_type="zmq", number_of_federates=1):
 
-    initstring = "{} --name=mainbroker".format(number_of_federates)
+    initstring = "-f {} --name=mainbroker".format(number_of_federates)
 
     helicsversion = h.helicsGetVersion()
     print("HELICS version = {}".format(helicsversion))

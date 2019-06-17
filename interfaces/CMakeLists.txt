@@ -37,8 +37,8 @@ if(ENABLE_SWIG)
 endif()
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
-include_directories("${PROJECT_SOURCE_DIR}/src/helics/shared_api_library")
-include_directories("${PROJECT_BINARY_DIR}/src/helics/shared_api_library")
+include_directories("${HELICS_SOURCE_DIR}/src/helics/shared_api_library")
+include_directories("${HELICS_BINARY_DIR}/src/helics/shared_api_library")
 
 if(BUILD_PYTHON_INTERFACE)
   add_subdirectory(python)

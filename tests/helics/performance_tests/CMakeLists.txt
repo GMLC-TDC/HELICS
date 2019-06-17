@@ -16,7 +16,7 @@ ring_tests.cpp
 
 
 add_executable(perf-tests ${perf_sources})
-target_link_libraries(perf-tests helics-static helics_test_base)
+target_link_libraries(perf-tests helics-static helics_boost_test_base)
 
 set_target_properties (perf-tests PROPERTIES FOLDER tests)
 

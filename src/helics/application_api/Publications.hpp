@@ -280,7 +280,6 @@ class Publication
 
 /** create a pointer to a publication
 @tparam X is the type of the publication
-@tparam FedPtr a pointer a value Federate
 @param valueFed pointer to a valid federate
 @param key the identifier for the publication
 @param units optional units for the publication
@@ -308,7 +307,6 @@ make_publication (FedPtr &valueFed, const std::string &key, const std::string &u
 
 /** create a pointer to a publication
 @tparam X is the type of the publication
-@tparam FedPtr a pointer a value Federate
 @param locality either LOCAL or GLOBAL defining whether the federate name is prepended or not
 @param valueFed pointer to a valid federate
 @param key the identifier for the publication

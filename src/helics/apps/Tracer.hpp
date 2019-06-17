@@ -24,6 +24,11 @@ class Tracer : public App
   public:
     /** construct from a FederateInfo structure*/
     explicit Tracer (const std::string &name, FederateInfo &fi);
+    /** construct from command line arguments in a vector
+   @param args the command line arguments to pass in a reverse vector
+   */
+    explicit Tracer (std::vector<std::string> args);
+
     /** construct from command line arguments*/
     Tracer (int argc, char *argv[]);
 
@@ -61,7 +66,7 @@ class Tracer : public App
     /** set the callback for a message received through cloned interfaces
     @details the function signature will take the time in the Tracer a unique_ptr to the message
     */
-    void setClonedMessageCallback (std::function<void(Time, std::unique_ptr<Message>)> callback)
+    void setClonedMessageCallback (std::function<void (Time, std::unique_ptr<Message>)> callback)
     {
         clonedMessageCallback = std::move (callback);
     }
@@ -70,7 +75,7 @@ class Tracer : public App
     unique_ptr to the message
     */
     void
-    setEndpointMessageCallback (std::function<void(Time, const std::string &, std::unique_ptr<Message>)> callback)
+    setEndpointMessageCallback (std::function<void (Time, const std::string &, std::unique_ptr<Message>)> callback)
     {
         endpointMessageCallback = std::move (callback);
     }
@@ -78,7 +83,7 @@ class Tracer : public App
     @details the function signature will take the time in the Tracer, the publication key as a string, and the
     value as a string
     */
-    void setValueCallback (std::function<void(Time, const std::string &, const std::string &)> callback)
+    void setValueCallback (std::function<void (Time, const std::string &, const std::string &)> callback)
     {
         valueCallback = std::move (callback);
     }
@@ -88,9 +93,6 @@ class Tracer : public App
     void disableTextOutput () { printMessage = false; }
 
   private:
-    /** load arguments through a variable map created through command line arguments
-     */
-    int loadArguments (boost::program_options::variables_map &vm_map);
     /** load from a jsonString
     @param jsonString either a JSON filename or a string containing JSON
     */
@@ -103,9 +105,15 @@ class Tracer : public App
     void captureForCurrentTime (Time currentTime, int iteration = 0);
     void loadCaptureInterfaces ();
 
+    /** build the command line argument processing application*/
+    std::shared_ptr<helicsCLI11App> buildArgParserApp ();
+    /** process remaining command line arguments*/
+    void processArgs ();
+
   protected:
     bool printMessage = false;
     bool allow_iteration = false;  //!< flag to allow iteration of the federate for time requests
+    bool skiplog = false;  //!< skip the log function and print directly to cout
     std::unique_ptr<CloningFilter> cFilt;  //!< a pointer to a clone filter
 
     std::vector<Input> subscriptions;  //!< the actual subscription objects
@@ -116,9 +124,9 @@ class Tracer : public App
     std::unique_ptr<Endpoint> cloneEndpoint;  //!< the endpoint for cloned message delivery
     std::vector<std::string> captureInterfaces;  //!< storage for the interfaces to capture
 
-    std::function<void(Time, std::unique_ptr<Message>)> clonedMessageCallback;
-    std::function<void(Time, const std::string &, std::unique_ptr<Message>)> endpointMessageCallback;
-    std::function<void(Time, const std::string &, const std::string &)> valueCallback;
+    std::function<void (Time, std::unique_ptr<Message>)> clonedMessageCallback;
+    std::function<void (Time, const std::string &, std::unique_ptr<Message>)> endpointMessageCallback;
+    std::function<void (Time, const std::string &, const std::string &)> valueCallback;
 };
 
 }  // namespace apps

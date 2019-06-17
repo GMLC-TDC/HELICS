@@ -7,9 +7,9 @@ SPDX-License-Identifier: BSD-3-Clause
 */
 #pragma once
 
-#include "../../common/BlockingQueue.hpp"
 #include "../ActionMessage.hpp"
 #include "MpiComms.h"
+#include "gmlc/containers/BlockingQueue.hpp"
 #include "helics/helics-config.h"
 #include <atomic>
 #include <functional>
@@ -64,7 +64,7 @@ class MpiService
 
     std::mutex mpiDataLock;  //!< lock for the comms and send_requests
     std::vector<MpiComms *> comms;
-    BlockingQueue<std::pair<std::pair<int, int>, std::vector<char>>> txMessageQueue;
+    gmlc::containers::BlockingQueue<std::pair<std::pair<int, int>, std::vector<char>>> txMessageQueue;
 
     bool helics_initialized_mpi{false};
     std::atomic<int> comms_connected{0};

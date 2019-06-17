@@ -30,7 +30,7 @@ set(
 add_executable(
   application-api-tests ${application_api_test_sources} ${application_api_test_headers}
 )
-target_link_libraries(application-api-tests helics-static helics_test_base)
+target_link_libraries(application-api-tests helics-static helics_boost_test_base)
 
 set_target_properties(application-api-tests PROPERTIES FOLDER tests)
 
@@ -61,17 +61,4 @@ add_test(
 )
 set_property(TEST application-api-ci-tests PROPERTY LABELS Continuous)
 
-foreach(keyfile IN LISTS KEY_LIBRARY_FILES)
-  add_custom_command(
-    TARGET
-    application-api-tests
-    POST_BUILD # Adds a post-build event to api tests
-    COMMAND
-      ${CMAKE_COMMAND}
-      -E
-      copy_if_different # which executes "cmake - E copy_if_different..."
-      "${keyfile}" # <--this is in-file
-      "$<TARGET_FILE_DIR:application-api-tests>/"
-  )
-  # <--this is out-file path
-endforeach(keyfile)
+copy_key_files_to_target_location(application-api-tests)

@@ -31,7 +31,7 @@ class Broker
         }
     }
 
-    Broker (std::string type, std::string name, int argc, const char **argv)
+    Broker (std::string type, std::string name, int argc, char **argv)
     {
         broker = helicsCreateBrokerFromArgs (type.c_str (), name.c_str (), argc, argv, hThrowOnError ());
     }

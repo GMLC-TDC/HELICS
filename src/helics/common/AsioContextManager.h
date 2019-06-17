@@ -27,7 +27,11 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <string>
 #include <vector>
 
+// The choice for noexcept isn't set correctly in asio::io_context (including asio.hpp instead didn't help)
+// With Boost 1.58 this resulted in a compile error, apparently from the BOOST_NOEXCEPT define being empty
+#define ASIO_ERROR_CATEGORY_NOEXCEPT noexcept(true)
 #include <asio/io_context.hpp>
+#undef ASIO_ERROR_CATEGORY_NOEXCEPT
 
 /** class defining a (potential) singleton Asio io_context manager for all asio usage*/
 class AsioContextManager : public std::enable_shared_from_this<AsioContextManager>
@@ -38,8 +42,7 @@ class AsioContextManager : public std::enable_shared_from_this<AsioContextManage
     std::atomic<int> runCounter{0};  //!< counter for the number of times the runContextLoop has been called
     std::string name;  //!< context name
     std::unique_ptr<asio::io_context> ictx;  //!< pointer to the actual context
-    std::unique_ptr<asio::io_context::work>
-      nullwork;  //!< pointer to an object used to keep a context running
+    std::unique_ptr<asio::io_context::work> nullwork;  //!< pointer to an object used to keep a context running
     bool leakOnDelete = false;  //!< this is done to prevent some warning messages for use in DLL's
     std::atomic<bool> running{false};
     std::mutex runningLoopLock;  //!< lock protecting the nullwork object and the return future
@@ -115,15 +118,14 @@ class AsioContextManager : public std::enable_shared_from_this<AsioContextManage
     asio::io_context &getBaseContext () const { return *ictx; }
 
     /** run a single thread for the context manager to execute asynchronous contexts in
-    @details will run a single thread for the io_context,  it will not stop the thread until either the context 
+    @details will run a single thread for the io_context,  it will not stop the thread until either the context
     manager is closed or the haltContextLoop function is called and there is no more work
-    @param in the name of the context  This function can be called as a static function on a particularly named
-    context 
+    @param contextName the name of the context
     */
     static LoopHandle runContextLoop (const std::string &contextName = std::string{});
 
     /** run a single thread for the context manager to execute asynchronous contexts in
-    @details will run a single thread for the io_context,  it will not stop the thread until either the context 
+    @details will run a single thread for the io_context,  it will not stop the thread until either the context
     manager is closed or the haltContextLoop function is called and there is no more work
     */
     LoopHandle startContextLoop ();

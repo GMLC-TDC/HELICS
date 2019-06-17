@@ -6,8 +6,8 @@ SPDX-License-Identifier: BSD-3-Clause
 */
 #pragma once
 
-#include "../../common/BlockingQueue.hpp"
 #include "../NetworkCommsInterface.hpp"
+#include "gmlc/containers/BlockingQueue.hpp"
 #include <atomic>
 #include <set>
 #include <string>
@@ -15,8 +15,8 @@ SPDX-License-Identifier: BSD-3-Clause
 class AsioContextManager;
 namespace asio
 {
-    class io_context;
-} // namespace asio
+class io_context;
+}  // namespace asio
 
 namespace helics
 {
@@ -52,7 +52,7 @@ class TcpComms final : public NetworkCommsInterface
     return code for required action 0=NONE, -1 TERMINATE*/
     int processIncomingMessage (ActionMessage &&cmd);
     // promise and future for communicating port number from tx_thread to rx_thread
-    BlockingQueue<ActionMessage> rxMessageQueue;
+	gmlc::containers::BlockingQueue<ActionMessage> rxMessageQueue;
 
     void txReceive (const char *data, size_t bytes_received, const std::string &errorMessage);
 

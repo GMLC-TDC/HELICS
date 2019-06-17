@@ -21,7 +21,6 @@ class ZmqBroker final : public NetworkBroker<ZmqComms, interface_type::tcp, 1>
     explicit ZmqBroker (bool rootbroker = false) noexcept;
     /** construct from with a core name*/
     explicit ZmqBroker (const std::string &broker_name);
-    static void displayHelp (bool localOnly);
 
   private:
     virtual bool brokerConnect () override;
@@ -36,7 +35,6 @@ class ZmqBrokerSS final : public NetworkBroker<ZmqCommsSS, interface_type::tcp, 
     explicit ZmqBrokerSS (bool rootbroker = false) noexcept;
     /** construct from with a core name*/
     explicit ZmqBrokerSS (const std::string &broker_name);
-    static void displayHelp (bool localOnly);
 
   private:
     virtual bool brokerConnect () override;

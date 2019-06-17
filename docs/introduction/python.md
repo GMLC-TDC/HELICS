@@ -100,7 +100,7 @@ __Background:__ Running a HELICS federation (via low level commands) requires fi
 
 **Tips**
 
-Ensure that the install location is added to your `PATH`. If you've installed to the default installation, you may not need to do this.
+Ensure that the install location is added to your `PATH`. If you've installed to the default system location, you may not need to do this.
 To ensure that the Python extension works correctly, you may add the following to your `PYTHONPATH`. You can do so by pasting the following in your .bashrc file.
 
 ```bash

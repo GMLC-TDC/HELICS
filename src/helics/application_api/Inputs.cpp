@@ -64,57 +64,57 @@ void Input::handleCallback (Time time)
     case double_loc:
     {
         auto val = getValue<double> ();
-        mpark::get<std::function<void(const double &, Time)>> (value_callback) (val, time);
+        mpark::get<std::function<void (const double &, Time)>> (value_callback) (val, time);
     }
     break;
     case int_loc:
     {
         auto val = getValue<int64_t> ();
-        mpark::get<std::function<void(const int64_t &, Time)>> (value_callback) (val, time);
+        mpark::get<std::function<void (const int64_t &, Time)>> (value_callback) (val, time);
     }
     break;
     case string_loc:
     default:
     {
         auto val = getValue<std::string> ();
-        mpark::get<std::function<void(const std::string &, Time)>> (value_callback) (val, time);
+        mpark::get<std::function<void (const std::string &, Time)>> (value_callback) (val, time);
     }
     break;
     case complex_loc:
     {
         auto val = getValue<std::complex<double>> ();
-        mpark::get<std::function<void(const std::complex<double> &, Time)>> (value_callback) (val, time);
+        mpark::get<std::function<void (const std::complex<double> &, Time)>> (value_callback) (val, time);
     }
     break;
     case vector_loc:
     {
         auto val = getValue<std::vector<double>> ();
-        mpark::get<std::function<void(const std::vector<double> &, Time)>> (value_callback) (val, time);
+        mpark::get<std::function<void (const std::vector<double> &, Time)>> (value_callback) (val, time);
     }
     break;
     case complex_vector_loc:
     {
         auto val = getValue<std::vector<std::complex<double>>> ();
-        mpark::get<std::function<void(const std::vector<std::complex<double>> &, Time)>> (value_callback) (val,
-                                                                                                           time);
+        mpark::get<std::function<void (const std::vector<std::complex<double>> &, Time)>> (value_callback) (val,
+                                                                                                            time);
     }
     break;
     case named_point_loc:
     {
         auto val = getValue<NamedPoint> ();
-        mpark::get<std::function<void(const NamedPoint &, Time)>> (value_callback) (val, time);
+        mpark::get<std::function<void (const NamedPoint &, Time)>> (value_callback) (val, time);
     }
     break;
     case 7:  // bool loc
     {
         auto val = getValue<bool> ();
-        mpark::get<std::function<void(const bool &, Time)>> (value_callback) (val, time);
+        mpark::get<std::function<void (const bool &, Time)>> (value_callback) (val, time);
     }
     break;
     case 8:  // Time loc
     {
         auto val = getValue<Time> ();
-        mpark::get<std::function<void(const Time &, Time)>> (value_callback) (val, time);
+        mpark::get<std::function<void (const Time &, Time)>> (value_callback) (val, time);
     }
     break;
     }
@@ -135,7 +135,7 @@ bool Input::isUpdated ()
             {
                 type = getTypeFromString (fed->getInjectionType (*this));
             }
-            auto visitor = [&, this](auto &&arg) {
+            auto visitor = [&, this] (auto &&arg) {
                 std::remove_reference_t<decltype (arg)> newVal;
                 (void)arg;  // suppress VS2015 warning
                 valueExtract (dv, type, newVal);
@@ -294,6 +294,7 @@ int Input::getValue (double *data, int maxsize)
     auto V = getValueRef<std::vector<double>> ();
     int length = std::min (static_cast<int> (V.size ()), maxsize);
     std::copy (V.data (), V.data () + length, data);
+    hasUpdate = false;
     return length;
 }
 
@@ -311,6 +312,7 @@ int Input::getValue (char *str, int maxsize)
         str[length] = '\0';
         ++length;
     }
+    hasUpdate = false;
     return length;
 }
 

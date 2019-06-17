@@ -59,8 +59,9 @@ helics::Time loadTimeFromString (const std::string &timeString)
     return Time (val * toSecondMultiplier (timeUnitsFromString (units)));
 }
 
-helics::Time loadTimeFromString (const std::string &timeString, time_units defUnits)
+helics::Time loadTimeFromString (std::string timeString, time_units defUnits)
 {
+    stringOps::trimString (timeString);
     size_t pos;
     double val = std::stod (timeString, &pos);
     if (pos >= timeString.size ())

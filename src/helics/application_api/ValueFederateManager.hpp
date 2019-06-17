@@ -6,12 +6,13 @@ SPDX-License-Identifier: BSD-3-Clause
 */
 #pragma once
 
-#include "../common/DualMappedVector.hpp"
 #include "../common/GuardedTypes.hpp"
-#include "../common/MappedVector.hpp"
 #include "../core/Core.hpp"
+#include "../core/federate_id_extra.hpp"
 #include "Inputs.hpp"
 #include "Publications.hpp"
+#include "gmlc/containers/DualMappedVector.hpp"
+
 #include "data_view.hpp"
 #include "helicsTypes.hpp"
 #include <atomic>
@@ -187,8 +188,11 @@ class ValueFederateManager
     int getInputCount () const;
 
   private:
-    shared_guarded_m<DualMappedVector<Input, std::string, interface_handle, reference_stability::stable>> inputs;
-    shared_guarded_m<DualMappedVector<Publication, std::string, interface_handle, reference_stability::stable>>
+    shared_guarded_m<
+      gmlc::containers::DualMappedVector<Input, std::string, interface_handle, reference_stability::stable>>
+      inputs;
+    shared_guarded_m<
+      gmlc::containers::DualMappedVector<Publication, std::string, interface_handle, reference_stability::stable>>
       publications;
     Time CurrentTime = Time (-1.0);  //!< the current simulation time
     Core *coreObject;  //!< the pointer to the actual core

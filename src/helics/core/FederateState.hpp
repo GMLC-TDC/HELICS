@@ -6,8 +6,6 @@ SPDX-License-Identifier: BSD-3-Clause
 */
 #pragma once
 
-#include "../common/BlockingQueue.hpp"
-#include "../common/DualMappedPointerVector.hpp"
 #include "../common/GuardedTypes.hpp"
 #include "ActionMessage.hpp"
 #include "CommonCore.hpp"
@@ -15,6 +13,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "CoreFederateInfo.hpp"
 #include "InterfaceInfo.hpp"
 #include "TimeDependencies.hpp"
+#include "gmlc/containers/BlockingQueue.hpp"
 #include "core-data.hpp"
 #include "core-types.hpp"
 #include "helics-time.hpp"
@@ -92,7 +91,8 @@ class FederateState
     //   std::vector<ActionMessage> messLog;
   private:
     std::shared_ptr<MessageTimer> mTimer;  //!< message timer object for real time operations and timeouts
-    BlockingQueue<ActionMessage> queue;  //!< processing queue for messages incoming to a federate
+    gmlc::containers::BlockingQueue<ActionMessage>
+      queue;  //!< processing queue for messages incoming to a federate
     std::atomic<uint16_t> interfaceFlags{
       0};  //!< current defaults for operational flags of interfaces for this federate
     std::map<global_federate_id, std::deque<ActionMessage>>
@@ -281,7 +281,7 @@ class FederateState
     stx::optional<ActionMessage> processPostTerminationAction (const ActionMessage &action);
     /** log a message to the federate Logger
     @param level the logging level of the message
-    @param logMessageSource- the name of the object that sent the message
+    @param logMessageSource the name of the object that sent the message
     @param message the message to log
     */
     void logMessage (int level, const std::string &logMessageSource, const std::string &message) const;
