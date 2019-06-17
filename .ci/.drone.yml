@@ -5,6 +5,7 @@ platform:
   os: linux
   arch: arm
 
+failure: ignore
 steps:
 - name: uname
   image: alpine
