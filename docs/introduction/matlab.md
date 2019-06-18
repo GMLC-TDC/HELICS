@@ -17,7 +17,7 @@ After installing the mex file will be placed in the matlab folder of the install
 ## Build SWIG MATLAB source
 
 ```bash
-cd ~/GitRepos/GMLC-TDC/HELICS-src/swig/
+cd ~/GitRepos/GMLC-TDC/HELICS/swig/
 mkdir matlab
 swig -I../src/helics/shared_api_library -outdir ./matlab -matlab ./helicsMATLAB.i
 mv helics_wrap.cxx matlab/helicsMEX.cxx
@@ -26,7 +26,7 @@ mv helics_wrap.cxx matlab/helicsMEX.cxx
 ## Compile MATLAB extension
 
 ```bash
-cd ~/GitRepos/GMLC-TDC/HELICS-src/swig/
+cd ~/GitRepos/GMLC-TDC/HELICS/swig/
 mex -I../src/helics/shared_api_library ./matlab/helics_wrap.cxx -lhelicsSharedLib -L/path/to/helics_install/lib/helics/
 mv helicsMEX.* matlab/
 ```

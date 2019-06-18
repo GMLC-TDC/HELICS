@@ -2,11 +2,11 @@
 <img src="docs/img/HELICS_Logo.png" width="400">
 </p>
 
-[![](https://badges.gitter.im/GMLC-TDC/HELICS-src.png)](https://gitter.im/GMLC-TDC/HELICS-src)
+[![](https://badges.gitter.im/GMLC-TDC/HELICS.png)](https://gitter.im/GMLC-TDC/HELICS)
 [![](https://img.shields.io/badge/docs-ready-blue.svg)](https://helics.readthedocs.io/en/latest)
 [![](https://img.shields.io/conda/pn/gmlc-tdc/helics.svg)](https://anaconda.org/gmlc-tdc/helics/)
-[![Releases](https://img.shields.io/github/tag-date/GMLC-TDC/HELICS-src.svg)](https://github.com/GMLC-TDC/HELICS-src/releases)
-[![](https://img.shields.io/badge/License-BSD-blue.svg)](https://github.com/GMLC-TDC/HELICS-src/blob/master/LICENSE)
+[![Releases](https://img.shields.io/github/tag-date/GMLC-TDC/HELICS.svg)](https://github.com/GMLC-TDC/HELICS/releases)
+[![](https://img.shields.io/badge/License-BSD-blue.svg)](https://github.com/GMLC-TDC/HELICS/blob/master/LICENSE)
 ## Build Status
 <table>
   <tr>
@@ -16,23 +16,23 @@
   </tr>
   <tr>
   <td>Travis CI</td>
-  <td><a href="https://travis-ci.org/GMLC-TDC/HELICS-src"><img src="https://travis-ci.org/GMLC-TDC/HELICS-src.svg?branch=master" alt="Build Status" /></a></td>
-  <td><a href="https://travis-ci.org/GMLC-TDC/HELICS-src"><img src="https://travis-ci.org/GMLC-TDC/HELICS-src.svg?branch=develop" alt="Build Status" /></a></td>
+  <td><a href="https://travis-ci.org/GMLC-TDC/HELICS"><img src="https://travis-ci.org/GMLC-TDC/HELICS.svg?branch=master" alt="Build Status" /></a></td>
+  <td><a href="https://travis-ci.org/GMLC-TDC/HELICS"><img src="https://travis-ci.org/GMLC-TDC/HELICS.svg?branch=develop" alt="Build Status" /></a></td>
   </tr>
   <tr>
   <td>Appveyor</td>
-  <td><a href="https://ci.appveyor.com/project/nightlark/helics-src/branch/master"><img src="https://ci.appveyor.com/api/projects/status/afpa4mv0kgsjwvtn/branch/master?svg=true" alt="Build Status" /></a></td>
-  <td><a href="https://ci.appveyor.com/project/nightlark/helics-src/branch/develop"><img src="https://ci.appveyor.com/api/projects/status/afpa4mv0kgsjwvtn/branch/develop?svg=true" alt="Build Status" /></a></td>
+  <td><a href="https://ci.appveyor.com/project/nightlark/helics/branch/master"><img src="https://ci.appveyor.com/api/projects/status/afpa4mv0kgsjwvtn/branch/master?svg=true" alt="Build Status" /></a></td>
+  <td><a href="https://ci.appveyor.com/project/nightlark/helics/branch/develop"><img src="https://ci.appveyor.com/api/projects/status/afpa4mv0kgsjwvtn/branch/develop?svg=true" alt="Build Status" /></a></td>
   </tr>
   <tr>
   <td>Codacy</td>
-  <td><a href="https://www.codacy.com/app/phlptp/HELICS-src?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=GMLC-TDC/HELICS-src&amp;utm_campaign=Badge_Grade;branch=master"><img src="https://api.codacy.com/project/badge/Grade/83ba19b36b714c729ec3a3d18504505e?branch=master" alt="codacy" /></a></td>
-  <td><a href="https://www.codacy.com/app/phlptp/HELICS-src?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=GMLC-TDC/HELICS-src&amp;utm_campaign=Badge_Grade;branch=develop"><img src="https://api.codacy.com/project/badge/Grade/83ba19b36b714c729ec3a3d18504505e?branch=develop" alt="codacy" /></a></td>
+  <td><a href="https://www.codacy.com/app/phlptp/HELICS?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=GMLC-TDC/HELICS&amp;utm_campaign=Badge_Grade;branch=master"><img src="https://api.codacy.com/project/badge/Grade/83ba19b36b714c729ec3a3d18504505e?branch=master" alt="codacy" /></a></td>
+  <td><a href="https://www.codacy.com/app/phlptp/HELICS?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=GMLC-TDC/HELICS&amp;utm_campaign=Badge_Grade;branch=develop"><img src="https://api.codacy.com/project/badge/Grade/83ba19b36b714c729ec3a3d18504505e?branch=develop" alt="codacy" /></a></td>
   </tr>
   <tr>
   <td>Coverage</td>
-  <td><a href="https://codecov.io/gh/GMLC-TDC/HELICS-src"><img src="https://codecov.io/gh/GMLC-TDC/HELICS-src/branch/master/graph/badge.svg" alt="codecov" /></a></td>
-  <td><a href="https://codecov.io/gh/GMLC-TDC/HELICS-src/branch/develop"><img src="https://codecov.io/gh/GMLC-TDC/HELICS-src/branch/develop/graph/badge.svg" alt="codecov" /></a></td>
+  <td><a href="https://codecov.io/gh/GMLC-TDC/HELICS"><img src="https://codecov.io/gh/GMLC-TDC/HELICS/branch/master/graph/badge.svg" alt="codecov" /></a></td>
+  <td><a href="https://codecov.io/gh/GMLC-TDC/HELICS/branch/develop"><img src="https://codecov.io/gh/GMLC-TDC/HELICS/branch/develop/graph/badge.svg" alt="codecov" /></a></td>
   </tr>
 </table>
 
@@ -69,7 +69,7 @@ A [Users guide](https://helics.readthedocs.io/en/latest/user-guide/index.html) f
 
 ## Documentation
 
-Our ReadTheDocs site provides a set of [documentation](https://helics.readthedocs.io/en/latest/index.html) including a set of introductory [examples](https://helics.readthedocs.io/en/latest/introduction/index.html), a [developers guide](https://helics.readthedocs.io/en/latest/developer-guide/index.html), complete doxygen generated [API documentation](https://helics.readthedocs.io/en/latest/doxygen/annotated.html), and more.  A few more questions and answers are available on the [Wiki](https://github.com/GMLC-TDC/HELICS-src/wiki).
+Our ReadTheDocs site provides a set of [documentation](https://helics.readthedocs.io/en/latest/index.html) including a set of introductory [examples](https://helics.readthedocs.io/en/latest/introduction/index.html), a [developers guide](https://helics.readthedocs.io/en/latest/developer-guide/index.html), complete doxygen generated [API documentation](https://helics.readthedocs.io/en/latest/doxygen/annotated.html), and more.  A few more questions and answers are available on the [Wiki](https://github.com/GMLC-TDC/HELICS/wiki).
 
 Additionally, our initial requirements document can be found [here](docs/introduction/original_specification.md), which describes a number of our early design considerations.
 

@@ -8,8 +8,8 @@ The easiest way to generate the latest C files for the Python extension is to us
 For example, you can run the following on an OSX machine where you have `swig` installed.
 
 ```bash
-git clone https://github.com/GMLC-TDC/HELICS-src
-cd HELICS-src
+git clone https://github.com/GMLC-TDC/HELICS
+cd HELICS
 mkdir build-osx
 cmake -DBUILD_PYTHON_INTERFACE=ON -DPYTHON_INCLUDE_DIR=$(python3-config --prefix)/include/python3.6m/ -DCMAKE_INSTALL_PREFIX=/Users/$(whoami)/local/helics-develop/ .. && make -j 8 && make install
 cd swig/python

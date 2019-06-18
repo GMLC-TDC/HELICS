@@ -78,7 +78,7 @@ helics_recorder record_file.txt --stop 5
 
 Recorders support both delimited text files and json files some examples can be found in
 
-[Player configuration examples](https://github.com/GMLC-TDC/HELICS-src/tree/master/tests/helics/apps/test_files)
+[Player configuration examples](https://github.com/GMLC-TDC/HELICS/tree/master/tests/helics/apps/test_files)
 
 ## Config File Detail
 

@@ -12,7 +12,7 @@ pip install pytest
 Then run it by doing the following
 
 ```bash
-cd ~/GitRepos/HELICS-src/tests/
+cd ~/GitRepos/HELICS/tests/
 pytest -sv python_helics
 ```
 
