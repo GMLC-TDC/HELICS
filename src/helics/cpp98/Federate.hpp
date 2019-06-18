@@ -43,13 +43,13 @@ class FederateInfo
     }
 #ifdef HELICS_HAS_RVALUE_REFS
     /** move constructor for federateInfo*/
-    FederateInfo (FederateInfo &&fedInfo)
+    FederateInfo (FederateInfo &&fedInfo) HELICS_NOTHROW
     {
         fi = fedInfo.fi;
         fedInfo.fi = NULL;
     }
     /** move assignment for federateInfo*/
-    FederateInfo &operator= (FederateInfo &&fedInfo)
+    FederateInfo &operator= (FederateInfo &&fedInfo) HELICS_NOTHROW
     {
         helicsFederateInfoFree (fi);
         fi = fedInfo.fi;
@@ -118,12 +118,12 @@ class Federate
         return *this;
     }
 #ifdef HELICS_HAS_RVALUE_REFS
-    Federate (Federate &&fedObj) : exec_async_iterate (fedObj.exec_async_iterate)
+    Federate (Federate &&fedObj) HELICS_NOTHROW: exec_async_iterate (fedObj.exec_async_iterate)
     {
         fed = fedObj.fed;
         fedObj.fed = NULL;
     }
-    Federate &operator= (Federate &&fedObj)
+    Federate &operator= (Federate &&fedObj) HELICS_NOTHROW
     {
         exec_async_iterate = fedObj.exec_async_iterate;
         fed = fedObj.fed;

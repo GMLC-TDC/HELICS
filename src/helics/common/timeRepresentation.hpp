@@ -50,10 +50,10 @@ enum class time_units : int
 
 /** defining doubles for time Multipliers*/
 constexpr double timeCountForward[10]{1e12, 1e9,        1e6,          1e3,           1.0,
-                                      1.0,  1.0 / 60.0, 1.0 / 3600.0, 1.0 / 86400.0, 1.0 / (86400.0 * 7)};
+                                      1.0,  1.0 / 60.0, 1.0 / 3600.0, 1.0 / 86400.0, 1.0 / (86400.0 * 7.0)};
 
 /** defining doubles for time Multipliers*/
-constexpr double timeCountReverse[10]{1e-12, 1e-9, 1e-6, 1e-3, 1.0, 1.0, 60.0, 3600.0, 86400.0, 7 * 86400};
+constexpr double timeCountReverse[10]{1e-12, 1e-9, 1e-6, 1e-3, 1.0, 1.0, 60.0, 3600.0, 86400.0, 7.0 * 86400.0};
 
 inline constexpr double toSecondMultiplier (time_units units)
 {

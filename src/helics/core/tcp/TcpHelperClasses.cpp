@@ -346,13 +346,13 @@ bool TcpConnection::waitUntilConnected (std::chrono::milliseconds timeOut)
     return isConnected ();
 }
 
-TcpAcceptor::TcpAcceptor (asio::io_context &io_context, tcp::endpoint &ep) : acceptor_ (io_context), endpoint_ (ep)
+TcpAcceptor::TcpAcceptor (asio::io_context &io_context, tcp::endpoint &ep) : endpoint_ (ep), acceptor_ (io_context)
 {
     acceptor_.open (ep.protocol ());
 }
 
 TcpAcceptor::TcpAcceptor (asio::io_context &io_context, int port)
-    : acceptor_ (io_context, tcp::endpoint (tcp::v4 (), port)), endpoint_ (tcp::v4 (), port),
+    : endpoint_ (asio::ip::address_v4::any (), port), acceptor_ (io_context, endpoint_.protocol()),
       state (accepting_state_t::connected)
 {
 }
@@ -540,7 +540,8 @@ TcpServer::TcpServer (asio::io_context &io_context,
 {
     if ((address == "*") || (address == "tcp://*"))
     {
-        acceptors.push_back (TcpAcceptor::create (ioctx, portNum));
+        endpoints.emplace_back (asio::ip::address_v4::any (), portNum);
+        endpoints.emplace_back (asio::ip::address_v6::any (), portNum);
     }
     else if (address == "localhost")
     {

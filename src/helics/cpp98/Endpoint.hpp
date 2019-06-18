@@ -18,10 +18,10 @@ namespace helicscpp
 class Endpoint
 {
   public:
-    explicit Endpoint (helics_endpoint hep) : ep (hep) {}
-    Endpoint (){};
+    explicit Endpoint (helics_endpoint hep) HELICS_NOTHROW: ep (hep) {}
+    Endpoint () HELICS_NOTHROW:ep(NULL){};
 
-    Endpoint (const Endpoint &endpoint) : ep (endpoint.ep) {}
+    Endpoint (const Endpoint &endpoint) HELICS_NOTHROW: ep (endpoint.ep) {}
 
     Endpoint &operator= (const Endpoint &endpoint)
     {

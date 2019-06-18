@@ -69,21 +69,21 @@ class ValueFederate : public virtual Federate
         return *this;
     }
 #ifdef HELICS_HAS_RVALUE_REFS
-    ValueFederate (ValueFederate &&fedObj)
+    ValueFederate (ValueFederate &&fedObj) HELICS_NOTHROW
         : Federate (), ipts (std::move (fedObj.ipts)), pubs (std::move (fedObj.pubs))
     {
         Federate::operator= (std::move (fedObj));
-        if (fed == NULL)
+        if (fed == HELICS_NULL_POINTER)
         {
             throw (HelicsException (helics_error_registration_failure, "fed==NULL move constructor"));
         }
     }
-    ValueFederate &operator= (ValueFederate &&fedObj)
+    ValueFederate &operator= (ValueFederate &&fedObj) HELICS_NOTHROW
     {
         ipts = std::move (fedObj.ipts);
         pubs = std::move (fedObj.pubs);
         Federate::operator= (std::move (fedObj));
-        if (fed == NULL)
+        if (fed == HELICS_NULL_POINTER)
         {
             throw (HelicsException (helics_error_registration_failure, "fed==NULL move assignment"));
         }
@@ -91,7 +91,7 @@ class ValueFederate : public virtual Federate
     }
 #endif
     // Default constructor, not meant to be used
-    ValueFederate () {}
+    ValueFederate ()HELICS_NOTHROW {}
 
     /** Methods to register publications **/
     Publication

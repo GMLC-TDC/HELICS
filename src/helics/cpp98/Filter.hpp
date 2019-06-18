@@ -18,8 +18,8 @@ namespace helicscpp
 class Filter
 {
   public:
-    explicit Filter (helics_filter hfilt) : filt (hfilt) {}
-    Filter (){};
+    explicit Filter (helics_filter hfilt) HELICS_NOTHROW: filt (hfilt) {}
+    Filter ()HELICS_NOTHROW:filt(HELICS_NULL_POINTER){};
 
     Filter (const Filter &filter) : filt (filter.filt) {}
 
@@ -72,8 +72,8 @@ class Filter
 class CloningFilter : public Filter
 {
   public:
-    explicit CloningFilter (helics_filter hfilt) : Filter (hfilt) {}
-    CloningFilter (){};
+    explicit CloningFilter (helics_filter hfilt) HELICS_NOTHROW: Filter (hfilt) {}
+    CloningFilter () HELICS_NOTHROW{};
 
     CloningFilter (const CloningFilter &filter) : Filter (filter) {}
 

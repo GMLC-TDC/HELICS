@@ -65,6 +65,15 @@ class FederateInfo : public CoreFederateInfo
 
   private:
     std::unique_ptr<helicsCLI11App> makeCLIApp ();
+    /** load a federateInfo object from command line arguments outside the constructor
+  @param args a string containing the command line arguments
+  */
+    void loadInfoFromArgsIgnoreOutput (const std::string &args);
+    /** load a federateInfo object from command line arguments outside the constructor
+    @param argc the number of arguments
+    @param argv an array of char * pointers to the arguments
+    */
+    void loadInfoFromArgsIgnoreOutput (int argc, char *argv[]);
 };
 
 /** generate a FederateInfo object from a config file (JSON, TOML)
