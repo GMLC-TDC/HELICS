@@ -119,6 +119,9 @@ A list of optional component that are not included in HELICS but are optionally 
 
 [1] B. Palmintier, D. Krishnamurthy, P. Top, S. Smith, J. Daily, and J. Fuller, “Design of the HELICS High-Performance Transmission-Distribution-Communication-Market Co-Simulation Framework,” in *Proc. of the 2017 Workshop on Modeling and Simulation of Cyber-Physical Energy Systems*, Pittsburgh, PA, 2017. [pre-print](https://www.nrel.gov/docs/fy17osti/67928.pdf) [published](https://ieeexplore.ieee.org/document/8064542/)
 
+## Source Repo
+
+The HELICS source code is hosted on GitHub: https://github.com/GMLC-TDC/HELICS-src
 
 ## Release
 HELICS is distributed under the terms of the BSD-3 clause license. All new
