@@ -43,6 +43,7 @@ _basic_env:
 addons:
   homebrew:
     brewfile: .ci/Brewfile.travis
+    update: true
 
 jobs:
   # On weekdays, the backlog for waiting OS X builds is huge
