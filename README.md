@@ -121,7 +121,7 @@ A list of optional component that are not included in HELICS but are optionally 
 
 ## Source Repo
 
-The HELICS source code is hosted on GitHub: https://github.com/GMLC-TDC/HELICS-src
+The HELICS source code is hosted on GitHub: https://github.com/GMLC-TDC/HELICS
 
 ## Release
 HELICS is distributed under the terms of the BSD-3 clause license. All new
