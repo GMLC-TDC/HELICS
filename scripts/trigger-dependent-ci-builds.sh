@@ -3,21 +3,21 @@
 BUILD_MESSAGE="Test ${TRAVIS_REPO_SLUG} ${TRAVIS_COMMIT_RANGE}"
 
 # Trigger HELICS-FMI build
-body='{
-"request": {
-"message":"'
-body+="${BUILD_MESSAGE}"
-body+='",
-"branch":"master"
-}}'
+#body='{
+#"request": {
+#"message":"'
+#body+="${BUILD_MESSAGE}"
+#body+='",
+#"branch":"master"
+#}}'
 
-curl -s -X POST \
-    -H "Content-Type: application/json" \
-    -H "Accept: application/json" \
-    -H "Travis-API-Version: 3" \
-    -H "Authorization: token ${HELICSBOT_TRAVIS_ORG_TOKEN}" \
-    -d "$body" \
-    https://api.travis-ci.org/repo/GMLC-TDC%2FHELICS-FMI/requests
+#curl -s -X POST \
+#    -H "Content-Type: application/json" \
+#    -H "Accept: application/json" \
+#    -H "Travis-API-Version: 3" \
+#    -H "Authorization: token ${HELICSBOT_TRAVIS_ORG_TOKEN}" \
+#    -d "$body" \
+#    https://api.travis-ci.org/repo/GMLC-TDC%2FHELICS-FMI/requests
 
 # Takes 2 arguments, a Azure org/project slug and pipeline/build definition id
 trigger_azure_build () {
@@ -40,6 +40,11 @@ trigger_azure_build () {
          -H "Authorization: Basic ${HELICSBOT_AZURE_TOKEN}" \
          -d "$body" \
          https://dev.azure.com/${azure_slug}/_apis/build/builds?api-version=4.1
+    
+    echo "===Triggering Azure build==="
+    echo "Slug: $azure_slug"
+    echo "Definition ID: $def_id"
+    echo "Request body: $body"
 }
 
 ################################
