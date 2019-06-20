@@ -25,7 +25,7 @@ trigger_azure_build () {
     local def_id=$2
     local body='{
     "definition": {
-    "id": ${def_id}
+    "id": '${def_id}'
     },
     '
     body+='"parameters": "{'${BUILD_PARAMS}'}",'
