@@ -9,8 +9,8 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "../../common/fmt_format.h"
 #include "../ActionMessage.hpp"
 #include "../NetworkBrokerData.hpp"
-#include <memory>
 #include <asio/ip/udp.hpp>
+#include <memory>
 
 static const int DEFAULT_UDP_BROKER_PORT_NUMBER = 23901;
 
@@ -293,9 +293,28 @@ void UdpComms::queue_tx_function ()
             promisePort.set_value (PortNumber);
         }
     }
-    udp::resolver::query queryLocal (udpnet (interfaceNetwork), localTargetAddress, std::to_string (PortNumber));
+    udp::endpoint rxEndpoint;
+    if (localTargetAddress.empty () || localTargetAddress == "*" || localTargetAddress == "udp://*")
+    {
+        udp::resolver::query queryLocal (udpnet (interfaceNetwork), "127.0.0.1",
+                                         std::to_string (PortNumber));
+        auto result = resolver.resolve (queryLocal);
+        rxEndpoint = *result;
+    }
+    else
+    {
+        udp::resolver::query queryLocal (udpnet (interfaceNetwork), localTargetAddress,
+                                         std::to_string (PortNumber));
+        auto result = resolver.resolve (queryLocal, error);
+        if (error)
+        {
+            logError (std::string ("Unable to resolve:") + localTargetAddress);
+            setTxStatus (connection_status::error);
+            return;
+        }
+        rxEndpoint = *result;
+    }
 
-    udp::endpoint rxEndpoint = *resolver.resolve (queryLocal);
     setTxStatus (connection_status::connected);
 
     while (true)
@@ -468,12 +487,27 @@ void UdpComms::closeReceiver ()
             auto serv = AsioContextManager::getContextPointer ();
             if (serv)
             {
-                // try connecting with the receiver socket
-                udp::resolver resolver (serv->getBaseContext ());
-                udp::resolver::query queryLocal (udpnet (interfaceNetwork), localTargetAddress,
-                                                 std::to_string (PortNumber));
+                udp::endpoint rxEndpoint;
 
-                udp::endpoint rxEndpoint = *resolver.resolve (queryLocal);
+                if (localTargetAddress.empty () || localTargetAddress == "*" || localTargetAddress == "udp://*")
+                {
+                    // try connecting with the receiver socket
+                    udp::resolver resolver (serv->getBaseContext ());
+                    udp::resolver::query queryLocal (udpnet (interfaceNetwork),"127.0.0.1",
+                                                     std::to_string (PortNumber));
+                    rxEndpoint = *resolver.resolve (queryLocal);
+                }
+                else
+                {
+                    // try connecting with the receiver socket
+                    udp::resolver resolver (serv->getBaseContext ());
+                    udp::resolver::query queryLocal (udpnet (interfaceNetwork), localTargetAddress,
+                                                     std::to_string (PortNumber));
+                    rxEndpoint = *resolver.resolve (queryLocal);
+
+                }
+                
+                
 
                 udp::socket transmitter (serv->getBaseContext (), udp::endpoint (udpnet (interfaceNetwork), 0));
                 std::string cls ("close");
