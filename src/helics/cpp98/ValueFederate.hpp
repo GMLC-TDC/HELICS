@@ -73,20 +73,12 @@ class ValueFederate : public virtual Federate
         : Federate (), ipts (std::move (fedObj.ipts)), pubs (std::move (fedObj.pubs))
     {
         Federate::operator= (std::move (fedObj));
-        if (fed == HELICS_NULL_POINTER)
-        {
-            throw (HelicsException (helics_error_registration_failure, "fed==NULL move constructor"));
-        }
     }
     ValueFederate &operator= (ValueFederate &&fedObj) HELICS_NOTHROW
     {
         ipts = std::move (fedObj.ipts);
         pubs = std::move (fedObj.pubs);
         Federate::operator= (std::move (fedObj));
-        if (fed == HELICS_NULL_POINTER)
-        {
-            throw (HelicsException (helics_error_registration_failure, "fed==NULL move assignment"));
-        }
         return *this;
     }
 #endif

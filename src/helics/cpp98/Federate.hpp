@@ -46,14 +46,14 @@ class FederateInfo
     FederateInfo (FederateInfo &&fedInfo) HELICS_NOTHROW
     {
         fi = fedInfo.fi;
-        fedInfo.fi = NULL;
+        fedInfo.fi = HELICS_NULL_POINTER;
     }
     /** move assignment for federateInfo*/
     FederateInfo &operator= (FederateInfo &&fedInfo) HELICS_NOTHROW
     {
         helicsFederateInfoFree (fi);
         fi = fedInfo.fi;
-        fedInfo.fi = NULL;
+        fedInfo.fi = HELICS_NULL_POINTER;
         return *this;
     }
 #endif
@@ -64,7 +64,7 @@ class FederateInfo
 
     void setCoreInitString (const std::string &coreInit)
     {
-        helicsFederateInfoSetCoreInitString (fi, coreInit.c_str (), NULL);
+        helicsFederateInfoSetCoreInitString (fi, coreInit.c_str (), HELICS_NULL_POINTER);
     }
 
     void setCoreTypeFromString (const std::string &coretype)
@@ -72,18 +72,21 @@ class FederateInfo
         helicsFederateInfoSetCoreTypeFromString (fi, coretype.c_str (), hThrowOnError ());
     }
 
-    void setCoreType (int coretype) { helicsFederateInfoSetCoreType (fi, coretype, NULL); }
+    void setCoreType (int coretype) { helicsFederateInfoSetCoreType (fi, coretype, HELICS_NULL_POINTER); }
 
-    void setFlagOption (int flag, int value) { helicsFederateInfoSetFlagOption (fi, flag, value, NULL); }
+    void setFlagOption (int flag, int value)
+    {
+        helicsFederateInfoSetFlagOption (fi, flag, value, HELICS_NULL_POINTER);
+    }
 
     void setProperty (int timeProperty, helics_time timeValue)
     {
-        helicsFederateInfoSetTimeProperty (fi, timeProperty, timeValue, NULL);
+        helicsFederateInfoSetTimeProperty (fi, timeProperty, timeValue, HELICS_NULL_POINTER);
     }
 
     void setProperty (int integerProperty, int propertyValue)
     {
-        helicsFederateInfoSetIntegerProperty (fi, integerProperty, propertyValue, NULL);
+        helicsFederateInfoSetIntegerProperty (fi, integerProperty, propertyValue, HELICS_NULL_POINTER);
     }
 
     helics_federate_info getInfo () { return fi; }
@@ -105,7 +108,7 @@ class Federate
 {
   public:
     // Default constructor
-    Federate () : fed (NULL), exec_async_iterate (false){};
+    Federate () HELICS_NOTHROW: fed (NULL), exec_async_iterate (false){};
 
     Federate (const Federate &fedObj) : exec_async_iterate (fedObj.exec_async_iterate)
     {
@@ -121,19 +124,19 @@ class Federate
     Federate (Federate &&fedObj) HELICS_NOTHROW: exec_async_iterate (fedObj.exec_async_iterate)
     {
         fed = fedObj.fed;
-        fedObj.fed = NULL;
+        fedObj.fed = HELICS_NULL_POINTER;
     }
     Federate &operator= (Federate &&fedObj) HELICS_NOTHROW
     {
         exec_async_iterate = fedObj.exec_async_iterate;
         fed = fedObj.fed;
-        fedObj.fed = NULL;
+        fedObj.fed = HELICS_NULL_POINTER;
         return *this;
     }
 #endif
     virtual ~Federate ()
     {
-        if (fed != NULL)
+        if (fed != HELICS_NULL_POINTER)
         {
             helicsFederateFree (fed);
         }
@@ -177,7 +180,7 @@ class Federate
         return helicsFederateGetIntegerProperty (fed, intProperty, hThrowOnError ());
     }
 
-    helics_federate_state getState () const { return helicsFederateGetState (fed, NULL); }
+    helics_federate_state getState () const { return helicsFederateGetState (fed, HELICS_NULL_POINTER); }
 
     void enterInitializingMode () { helicsFederateEnterInitializingMode (fed, hThrowOnError ()); }
 
@@ -186,7 +189,7 @@ class Federate
     bool isAsyncOperationCompleted () const
     {
         // returns int, 1 = true, 0 = false
-        return helicsFederateIsAsyncOperationCompleted (fed, NULL) > 0;
+        return helicsFederateIsAsyncOperationCompleted (fed, HELICS_NULL_POINTER) > 0;
     }
 
     void enterInitializingModeComplete () { helicsFederateEnterInitializingModeComplete (fed, hThrowOnError ()); }

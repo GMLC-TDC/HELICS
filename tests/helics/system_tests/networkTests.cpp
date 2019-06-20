@@ -15,7 +15,7 @@ namespace utf = boost::unit_test;
 
 /** tests for some network options*/
 
-BOOST_FIXTURE_TEST_SUITE (network_tests, FederateTestFixture)
+BOOST_FIXTURE_TEST_SUITE (network_tests, FederateTestFixture, *utf::label ("ci"))
 
 /** test simple creation and destruction*/
 BOOST_AUTO_TEST_CASE (test_external_tcp)

@@ -21,7 +21,7 @@ class Core
 {
   public:
     /** Default constructor*/
-    Core () : core (NULL){};
+    Core () HELICS_NOTHROW: core (HELICS_NULL_POINTER){};
     /** construct with type, core name and initialization string */
     Core (const std::string &type, const std::string &name, const std::string &initString)
     {
@@ -47,15 +47,15 @@ class Core
         return *this;
     }
 #ifdef HELICS_HAS_RVALUE_REFS
-    Core (Core &&cr) noexcept
+    Core (Core &&cr) HELICS_NOTHROW
     {
         core = cr.core;
-        cr.core = NULL;
+        cr.core = HELICS_NULL_POINTER;
     }
-    Core &operator= (Core &&cr) noexcept
+    Core &operator= (Core &&cr) HELICS_NOTHROW
     {
         core = cr.core;
-        cr.core = NULL;
+        cr.core = HELICS_NULL_POINTER;
         return *this;
     }
 #endif

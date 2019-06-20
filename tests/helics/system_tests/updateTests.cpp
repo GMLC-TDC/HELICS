@@ -15,7 +15,7 @@ namespace utf = boost::unit_test;
 
 /** tests for the different flag options and considerations*/
 
-BOOST_FIXTURE_TEST_SUITE (update_tests, FederateTestFixture)
+BOOST_FIXTURE_TEST_SUITE (update_tests, FederateTestFixture, *utf::label ("ci"))
 
 /** test simple creation and destruction*/
 BOOST_AUTO_TEST_CASE (test_single_update)
