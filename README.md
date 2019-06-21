@@ -21,8 +21,8 @@
   </tr>
   <tr>
   <td>Appveyor</td>
-  <td><a href="https://ci.appveyor.com/project/nightlark/helics/branch/master"><img src="https://ci.appveyor.com/api/projects/status/afpa4mv0kgsjwvtn/branch/master?svg=true" alt="Build Status" /></a></td>
-  <td><a href="https://ci.appveyor.com/project/nightlark/helics/branch/develop"><img src="https://ci.appveyor.com/api/projects/status/afpa4mv0kgsjwvtn/branch/develop?svg=true" alt="Build Status" /></a></td>
+  <td><a href="https://ci.appveyor.com/project/HELICS/helics/branch/master"><img src="https://ci.appveyor.com/api/projects/status/9rnwrtelsa68k5lt/branch/master?svg=true" alt="Build Status" /></a></td>
+  <td><a href="https://ci.appveyor.com/project/HELICS/helics/branch/develop"><img src="https://ci.appveyor.com/api/projects/status/9rnwrtelsa68k5lt/branch/develop?svg=true" alt="Build Status" /></a></td>
   </tr>
   <tr>
   <td>Codacy</td>
