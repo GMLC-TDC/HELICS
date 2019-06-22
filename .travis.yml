@@ -43,6 +43,7 @@ _basic_env:
 addons:
   homebrew:
     brewfile: .ci/Brewfile.travis
+    update: true
 
 jobs:
   # On weekdays, the backlog for waiting OS X builds is huge
@@ -64,7 +65,7 @@ jobs:
     # XCode 8.3, OS X 10.12
     - <<: *osx_base
       name: "XCode 8.3, macOS 10.12"
-      if: (branch = develop AND type IN (pull_request, cron)) OR (branch = master AND type IN (push, pull_request))
+      if: (branch = develop AND type IN (cron)) OR (branch = master AND type IN (push, pull_request))
       env:
         - MATRIX_EVAL="COMPILER=clang && BUILD_TYPE=Release && TRAVIS_XCODE_VERSION=83"
         - HOMEBREW_NO_AUTO_UPDATE=1
@@ -101,6 +102,7 @@ jobs:
         - MATRIX_EVAL="COMPILER=clang && CC='clang-5.0' && CXX='clang++-5.0'"
         - CCACHE_CPP2=yes
         - USE_SWIG=true
+        - USE_CMAKE_VERSION=3.14.5
         - CXX_STANDARD=17
 
     - <<: *linux_base
