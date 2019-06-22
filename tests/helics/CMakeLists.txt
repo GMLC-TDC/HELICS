@@ -89,3 +89,22 @@ if(HELICS_ENABLE_SLOW_PACKAGING_TESTS)
     )
     set_property(TEST add-subdirectory-tests PROPERTY LABELS Packaging)
 endif()
+
+if (UNIX)  #this test won't do anything on windows since we don't generate the package config files on Windows
+if(NOT ${CMAKE_VERSION} VERSION_LESS "3.6.0") 
+    # Tests for other CMake projects using the package_config files
+    add_test(package-config-tests ${CMAKE_CTEST_COMMAND} -C ${CMAKE_BUILD_TYPE}
+                            --build-and-test "${CMAKE_CURRENT_SOURCE_DIR}/package_config_tests" "${CMAKE_CURRENT_BINARY_DIR}/package_config_tests"
+                            --build-generator "${CMAKE_GENERATOR}"
+                            --build-generator-platform "${CMAKE_GENERATOR_PLATFORM}"
+                            --build-options
+                            "-DHELICS_DIR=${PROJECT_BINARY_DIR}"
+                            "-DBUILD_SHARED_LIBS=${BUILD_SHARED_LIBS}"
+                            "-DBUILD_C_SHARED_LIB=${BUILD_C_SHARED_LIB}"
+                            "-DBUILD_APPS=${BUILD_APPS}"
+                            "-DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}"
+                            "-DCMAKE_CXX_STANDARD=${CMAKE_CXX_STANDARD}"
+)
+set_property(TEST package-config-tests PROPERTY LABELS Packaging)
+endif()
+endif()
