@@ -8,7 +8,13 @@ set(INSTALL_EXPORT EXPORT helics-targets CACHE INTERNAL "")
 
 set(JSONCPP_DISABLE_CCACHE ON CACHE INTERNAL "")
 
-option(JSONCPP_OBJLIB OFF "use jsoncpp objlib for linking object files instead of the normal target") 
+if (MSVC)
+  option(JSONCPP_OBJLIB OFF "use jsoncpp objlib for linking object files instead of the normal target") 
+else(MSVC)
+ # for Everything but MSVC turn this on to not conflict with system jsoncpp if any
+  option(JSONCPP_OBJLIB ON "use jsoncpp objlib for linking object files instead of the normal target") 
+endif(MSVC)
+
 mark_as_advanced(JSONCPP_OBJLIB)
 
 if(NOT CMAKE_CXX_STANDARD)

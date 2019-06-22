@@ -27,9 +27,9 @@ add_library(HELICS::helics-static ALIAS helics-static)
 
 if (JSONCPP_OBJLIB)
   target_sources(helics-static PRIVATE $<TARGET_OBJECTS:jsoncppobj_lib>)
- else()
+else()
   target_link_libraries(helics-static PUBLIC jsoncpp_lib)
- endif()
+endif()
 
 if(BUILD_SHARED_LIBS)
   add_library(
@@ -51,9 +51,9 @@ if(BUILD_SHARED_LIBS)
   )
 
   if (JSONCPP_OBJLIB)
-  target_sources(helics-static PRIVATE $<TARGET_OBJECTS:jsoncppobj_lib>)
+    target_sources(helics-static PRIVATE $<TARGET_OBJECTS:jsoncppobj_lib>)
   else()
-  target_link_libraries(helics-shared PRIVATE jsoncpp_lib)
+    target_link_libraries(helics-shared PRIVATE jsoncpp_lib)
   endif()
 
   if(WIN32)
