@@ -541,7 +541,7 @@ TcpServer::TcpServer (asio::io_context &io_context,
     if ((address == "*") || (address == "tcp://*"))
     {
         endpoints.emplace_back (asio::ip::address_v4::any (), portNum);
-        endpoints.emplace_back (asio::ip::address_v6::any (), portNum);
+  //      endpoints.emplace_back (asio::ip::address_v6::any (), portNum);
     }
     else if (address == "localhost")
     {
@@ -636,7 +636,7 @@ void TcpServer::initialConnect ()
         acceptors.push_back (std::move (acc));
     }
     bool anyConnect = false;
-    int connectedAcceptors = 0;
+    size_t connectedAcceptors = 0;
     int index = 0;
     for (auto &acc : acceptors)
     {
