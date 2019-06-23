@@ -7,7 +7,7 @@ pkgver=2.0.0
 pkgrel=1
 pkgdesc="A C++ library for co-simulation"
 arch=('any')
-url="https://github.com/GMLC-TDC/HELICS-src"
+url="https://github.com/GMLC-TDC/HELICS"
 license=('BSD')
 makedepends=("${MINGW_PACKAGE_PREFIX}-gcc"
              "${MINGW_PACKAGE_PREFIX}-cmake"
@@ -16,7 +16,7 @@ makedepends=("${MINGW_PACKAGE_PREFIX}-gcc"
 			 "${MINGW_PACKAGE_PREFIX}-swig"
              "${MINGW_PACKAGE_PREFIX}-python3")
 
-source=("${_realname}-${pkgver}.tar.gz"::"https://github.com/GMLC-TDC/HELICS-src/archive/v${pkgver}.tar.gz"
+source=("${_realname}-${pkgver}.tar.gz"::"https://github.com/GMLC-TDC/HELICS/archive/v${pkgver}.tar.gz"
         001-library-name.patch)
 #sha256sums=('c49deac9e0933bcb7044f08516861a2d560988540b23de2ac1ad443b219afdb6'
  #           'db74c4fb0e5b98a8365a99060166cfff36a7eda97f552cd838b8a7bb9799428a')

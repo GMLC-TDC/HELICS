@@ -9,7 +9,7 @@ if "%SPHINXBUILD%" == "" (
 )
 set SOURCEDIR=.
 set BUILDDIR=_build
-set SPHINXPROJ=HELICS-src
+set SPHINXPROJ=HELICS
 
 if "%1" == "" goto help
 

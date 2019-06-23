@@ -45,8 +45,8 @@ add -DCMAKE_CXX_FLAGS="-D_GLIBCXX_USE_C99 -D_GLIBCXX_USE_C99_MATH" to make it wo
 
 ```bash
 
-git clone https://github.com/GMLC-TDC/HELICS-src
-cd HELICS-src
+git clone https://github.com/GMLC-TDC/HELICS
+cd HELICS
 mkdir build
 cd build
 cmake ../

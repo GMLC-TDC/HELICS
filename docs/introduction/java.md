@@ -22,7 +22,7 @@ Run the following to compile all Java classes. You will first have to create a `
 ```bash
 javac com/java/helics/helics.java
 javac HelloWorld.java
-java -Djava.library.path="/Library/Java/Extensions:/Network/Library/Java/Extensions:/System/Library/Java/Extensions:/usr/lib/java:/path/to/GitRepos/HELICS-src/build-osx/swig/java/com/java/helics/:." HelloWorld
+java -Djava.library.path="/Library/Java/Extensions:/Network/Library/Java/Extensions:/System/Library/Java/Extensions:/usr/lib/java:/path/to/GitRepos/HELICS/build-osx/swig/java/com/java/helics/:." HelloWorld
 ```
 
 You should see the output that is similar to the following.

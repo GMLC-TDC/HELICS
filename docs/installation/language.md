@@ -94,8 +94,8 @@ $ make clean; make -j 4; make install
 To install HELICS with MATLAB support, you will need to add `BUILD_MATLAB_INTERFACE=ON`.
 
 ```
-git clone https://github.com/GMLC-TDC/HELICS-src
-cd HELICS-src
+git clone https://github.com/GMLC-TDC/HELICS
+cd HELICS
 mkdir build
 cd build
 cmake -DBUILD_MATLAB_INTERFACE=ON -DCMAKE_INSTALL_PREFIX=/Users/$(whoami)/local/helics-develop/ ..
@@ -158,7 +158,7 @@ To do that, you can follow the following instructions.
 Alternatively, you wish to build the MATLAB interface without using CMake, and you can do the following.
 
 ```bash
-cd ~/GitRepos/GMLC-TDC/HELICS-src/swig/
+cd ~/GitRepos/GMLC-TDC/HELICS/swig/
 mex -I../src/helics/shared_api_library ./matlab/helics_wrap.cxx -lhelicsSharedLib -L/path/to/helics_install/lib/helics/
 mv helicsMEX.* matlab/
 ```
@@ -170,8 +170,8 @@ The above instructions will have to be modified slightly to support Windows,  CM
 To install HELICS with Octave support, you will need to add `BUILD_OCTAVE_INTERFACE=ON`.
 
 ```
-git clone https://github.com/GMLC-TDC/HELICS-src
-cd HELICS-src
+git clone https://github.com/GMLC-TDC/HELICS
+cd HELICS
 mkdir build
 cd build
 cmake -DBUILD_OCTAVE_INTERFACE=ON -DCMAKE_INSTALL_PREFIX=/Users/$(whoami)/local/helics-develop/ ..

@@ -1,7 +1,7 @@
 ﻿#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 #
-# HELICS-src documentation build configuration file, created by
+# HELICS documentation build configuration file, created by
 # sphinx-quickstart on Wed Dec 13 12:07:08 2017.
 #
 # This file is execfile()d with the current directory set to its
@@ -107,7 +107,7 @@ source_suffix = ['.rst', '.md']
 master_doc = 'index'
 
 # General information about the project.
-project = 'HELICS-src'
+project = 'HELICS'
 copyright = 'Copyright © 2017-2019,\nBattelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.See the top-level NOTICE for additional details.\nAll rights reserved.\nSPDX-License-Identifier: BSD-3-Clause\n'
 author = 'Philip Top, Jeff Daily, Ryan Mast, Dheepak Krishnamurthy, Andrew Fisher, Himanshu Jain, Bryan Palmintier, Jason Fuller'
 
@@ -178,7 +178,7 @@ html_sidebars = {
 # -- Options for HTMLHelp output ------------------------------------------
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = 'HELICS-srcdoc'
+htmlhelp_basename = 'HELICSdoc'
 
 # -- Options for LaTeX output ---------------------------------------------
 
@@ -204,7 +204,7 @@ latex_elements = {
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-    (master_doc, 'HELICS-src.tex', 'HELICS-src Documentation',
+    (master_doc, 'HELICS.tex', 'HELICS Documentation',
      'Philip Top, Jeff Daily, Ryan Mast, Dheepak Krishnamurthy, Andrew Fisher, Himanshu Jain, Bryan Palmintier, Jason Fuller', 'manual'),
 ]
 
@@ -212,7 +212,7 @@ latex_documents = [
 
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
-man_pages = [(master_doc, 'helics-src', 'HELICS-src Documentation', [author], 1)]
+man_pages = [(master_doc, 'helics', 'HELICS Documentation', [author], 1)]
 
 # -- Options for Texinfo output -------------------------------------------
 
@@ -220,7 +220,7 @@ man_pages = [(master_doc, 'helics-src', 'HELICS-src Documentation', [author], 1)
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-    (master_doc, 'HELICS-src', 'HELICS-src Documentation', author, 'HELICS-src', 'One line description of project.', 'Miscellaneous'),
+    (master_doc, 'HELICS', 'HELICS Documentation', author, 'HELICS', 'One line description of project.', 'Miscellaneous'),
 ]
 
 def setup(app):

@@ -52,15 +52,15 @@ Getting and building from source:
    HELICS.
 
    ```bash
-   git clone https://github.com/GMLC-TDC/HELICS-src.git
+   git clone https://github.com/GMLC-TDC/HELICS.git
    ```
 
 3. Go to the checkedout HELICS project folder (the default folder
-   name is HELICS-src). Create a build folder and open the build
+   name is HELICS). Create a build folder and open the build
    folder. Alternatively, cmake-gui can be used.
 
    ```bash
-   cd HELICS-src
+   cd HELICS
    mkdir build
    cd build
    ```
@@ -97,7 +97,7 @@ Getting and building from source:
 
 ## Windows Installers
 
-Windows installers are available with the different [releases](https://github.com/GMLC-TDC/HELICS-src/releases).  The release includes installers for the Debug version and Release version. As well as a zip file of the install directory. The static libraries included with the installer will work with Visual Studio 2017.
+Windows installers are available with the different [releases](https://github.com/GMLC-TDC/HELICS/releases).  The release includes installers for the Debug version and Release version. As well as a zip file of the install directory. The static libraries included with the installer will work with Visual Studio 2017.
 
 ## Testing
 
@@ -187,9 +187,9 @@ $ export PATH=$PATH:/mingw64/bin
 ### Download HELICS Source Code ###
 Now that the MSYS2 environment has been setup and all prerequisite packages have been installed the source code can be compiled and installed. The HELICS source code can be cloned from GitHub by performing the following:
 ```bash
-$ git clone https://github.com/GMLC-TDC/HELICS-src.git
+$ git clone https://github.com/GMLC-TDC/HELICS.git
 ```
-git will clone the source code into a folder in the current working directory called HELICS-src. This path will be referred to by this guide as HELICS_ROOT_DIR.
+git will clone the source code into a folder in the current working directory called HELICS. This path will be referred to by this guide as HELICS_ROOT_DIR.
 
 ### Compiling HELICS From Source ###
 Change directories to HELICS_ROOT_DIR. Create a directory called helics-build. This can be accomplished by using the mkdir command. cd into this directory. Now type the following:
