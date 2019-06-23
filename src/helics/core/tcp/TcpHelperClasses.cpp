@@ -352,7 +352,7 @@ TcpAcceptor::TcpAcceptor (asio::io_context &io_context, tcp::endpoint &ep) : end
 }
 
 TcpAcceptor::TcpAcceptor (asio::io_context &io_context, int port)
-    : endpoint_ (asio::ip::address_v4::any (), port), acceptor_ (io_context, endpoint_.protocol()),
+    : endpoint_ (asio::ip::address_v4::any (), port), acceptor_ (io_context, endpoint_.protocol ()),
       state (accepting_state_t::connected)
 {
 }
@@ -635,14 +635,30 @@ void TcpServer::initialConnect ()
           [this](TcpAcceptor::pointer accPtr, TcpConnection::pointer conn) { handle_accept (accPtr, conn); });
         acceptors.push_back (std::move (acc));
     }
+    bool anyConnect = false;
+    int connectedAcceptors = 0;
+    int index = 0;
     for (auto &acc : acceptors)
     {
+        ++index;
         if (!acc->connect ())
         {
-            std::cout << "unable to connect acceptor" << std::endl;
-            halted = true;
-            break;
+            std::cout << "unable to connect acceptor " << index << " of " << acceptors.size () << std::endl;
+            continue;
         }
+        ++connectedAcceptors;
+        anyConnect = true;
+    }
+    if (!anyConnect)
+    {
+        halted = true;
+        std::cout << "halting server operation";
+        return;
+    }
+    if (connectedAcceptors < acceptors.size ())
+    {
+        std::cout << "partial connection on the server " << connectedAcceptors << " of " << acceptors.size ()
+                  << " were connected" << std::endl;
     }
 }
 

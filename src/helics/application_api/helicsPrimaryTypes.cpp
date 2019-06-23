@@ -965,7 +965,6 @@ void valueConvert (defV &val, data_type newType)
         valueExtract (val, V);
         val = V.getBaseTimeCode ();
         break;
-        break;
     }
     case data_type::helics_string:
     default:
