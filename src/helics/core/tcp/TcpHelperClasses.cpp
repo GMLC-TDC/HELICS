@@ -6,9 +6,9 @@ SPDX-License-Identifier: BSD-3-Clause
 */
 
 #include "TcpHelperClasses.h"
+#include <algorithm>
 #include <iostream>
 #include <thread>
-#include <algorithm>
 
 namespace helics
 {
@@ -41,8 +41,7 @@ void TcpConnection::startReceive ()
         }
         if (!triggerhalt)
         {
-            socket_.async_receive (asio::buffer (data.data () + residBufferSize,
-                                                        data.size () - residBufferSize),
+            socket_.async_receive (asio::buffer (data.data () + residBufferSize, data.size () - residBufferSize),
                                    [this](const std::error_code &error, size_t bytes_transferred) {
                                        handle_read (error, bytes_transferred);
                                    });
@@ -77,8 +76,7 @@ void TcpConnection::setDataCall (std::function<size_t (TcpConnection::pointer, c
         throw (std::runtime_error ("cannot set data callback after socket is started"));
     }
 }
-void TcpConnection::setErrorCall (
-  std::function<bool(TcpConnection::pointer, const std::error_code &)> errorFunc)
+void TcpConnection::setErrorCall (std::function<bool(TcpConnection::pointer, const std::error_code &)> errorFunc)
 {
     if (state.load () == connection_state_t::prestart)
     {
@@ -217,8 +215,7 @@ void TcpConnection::closeNoWait ()
         socket_.shutdown (tcp::socket::shutdown_both, ec);
         if (ec)
         {
-            if ((ec.value () != asio::error::not_connected) &&
-                (ec.value () != asio::error::connection_reset))
+            if ((ec.value () != asio::error::not_connected) && (ec.value () != asio::error::connection_reset))
             {
                 std::cerr << "error occurred sending shutdown::" << ec.message () << " " << ec.value ()
                           << std::endl;
@@ -275,8 +272,7 @@ TcpConnection::TcpConnection (asio::io_context &io_context,
     tcp::resolver resolver (io_context);
     tcp::resolver::query query (tcp::v4 (), connection, port);
     tcp::resolver::iterator endpoint_iterator = resolver.resolve (query);
-    socket_.async_connect (*endpoint_iterator,
-                           [this](const std::error_code &error) { connect_handler (error); });
+    socket_.async_connect (*endpoint_iterator, [this](const std::error_code &error) { connect_handler (error); });
 }
 
 void TcpConnection::connect_handler (const std::error_code &error)
@@ -350,8 +346,7 @@ bool TcpConnection::waitUntilConnected (std::chrono::milliseconds timeOut)
     return isConnected ();
 }
 
-TcpAcceptor::TcpAcceptor (asio::io_context &io_context, tcp::endpoint &ep)
-    : acceptor_ (io_context), endpoint_ (ep)
+TcpAcceptor::TcpAcceptor (asio::io_context &io_context, tcp::endpoint &ep) : acceptor_ (io_context), endpoint_ (ep)
 {
     acceptor_.open (ep.protocol ());
 }
@@ -444,10 +439,9 @@ bool TcpAcceptor::start (TcpConnection::pointer conn)
         auto &socket = conn->socket ();
         acceptor_.listen ();
         auto ptr = shared_from_this ();
-        acceptor_.async_accept (socket, [this, apointer = std::move (ptr),
-                                         connection = std::move (conn)](const std::error_code &error) {
-            handle_accept (apointer, connection, error);
-        });
+        acceptor_.async_accept (socket,
+                                [this, apointer = std::move (ptr), connection = std::move (conn)](
+                                  const std::error_code &error) { handle_accept (apointer, connection, error); });
         return true;
     }
 

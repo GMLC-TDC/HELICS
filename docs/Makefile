@@ -4,7 +4,7 @@
 # You can set these variables from the command line.
 SPHINXOPTS    =
 SPHINXBUILD   = python -msphinx
-SPHINXPROJ    = HELICS-src
+SPHINXPROJ    = HELICS
 SOURCEDIR     = .
 BUILDDIR      = _build
 BRANCH := $(shell git rev-parse --abbrev-ref HEAD)

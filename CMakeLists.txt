@@ -862,7 +862,7 @@ if(ENABLE_PACKAGE_BUILD)
         set(CPACK_NSIS_INSTALL_ROOT "C:\\\\local")
         set(
             CPACK_NSIS_URL_INFO_ABOUT
-            "https://www.github.com/GMLC-TDC/Helics-src"
+	    "https://www.github.com/GMLC-TDC/HELICS"
         )
         set(CPACK_NSIS_HELP_LINK "https://helics.readthedocs.io/en/latest")
         set(CPACK_NSIS_CONTACT "helicsteam@helics.org")
@@ -872,7 +872,7 @@ if(ENABLE_PACKAGE_BUILD)
         set(CPACK_NSIS_EXECUTABLES_DIRECTORY ${CMAKE_INSTALL_BINDIR})
         set(
             CPACK_NSIS_MENU_LINKS
-            "https://www.github.com/GMLC-TDC/Helics-src"
+	    "https://www.github.com/GMLC-TDC/HELICS"
             "HELICS Github"
             "https://helics.readthedocs.io/en/latest"
             "Helics Documentation"
