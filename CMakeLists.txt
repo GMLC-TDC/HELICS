@@ -548,14 +548,14 @@ if (JSONCPP_OBJLIB)
 target_include_directories(
     helics_base_includes SYSTEM
     INTERFACE
-    $<TARGET_PROPERTY:jsoncpp_headers,INTERFACE_INCLUDE_DIRECTORIES>
+    $<BUILD_INTERFACE:$<TARGET_PROPERTY:jsoncpp_headers,INTERFACE_INCLUDE_DIRECTORIES>>
 )
 set_target_properties(jsoncppobj_lib PROPERTIES FOLDER Extern)
 else()
 target_include_directories(
     helics_base_includes SYSTEM
     INTERFACE
-    $<TARGET_PROPERTY:jsoncpp_lib,INTERFACE_INCLUDE_DIRECTORIES>
+    $<BUILD_INTERFACE:$<TARGET_PROPERTY:jsoncpp_lib,INTERFACE_INCLUDE_DIRECTORIES>>
 )
 set_target_properties(jsoncpp_lib PROPERTIES FOLDER Extern)
 endif()
