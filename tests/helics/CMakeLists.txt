@@ -65,4 +65,4 @@ add_test(add-subdirectory-tests ${CMAKE_CTEST_COMMAND} -C ${CMAKE_BUILD_TYPE}
                             "-DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}"
                             "-DCMAKE_CXX_STANDARD=${CMAKE_CXX_STANDARD}"
 )
-set_property(TEST add-subdirectory-tests PROPERTY LABELS Continuous Daily)
+set_property(TEST add-subdirectory-tests PROPERTY LABELS Packaging)
