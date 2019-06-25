@@ -790,9 +790,9 @@ if(ENABLE_PACKAGE_BUILD)
         cereal
     )
     if(WIN32)
-        set(CPACK_RESOURCE_FILE_LICENSE "${PROJECT_SOURCE_DIR}\\\\LICENSE")
+        set(CPACK_RESOURCE_FILE_LICENSE "${HELICS_SOURCE_DIR}\\\\LICENSE")
     else(WIN32)
-        set(CPACK_RESOURCE_FILE_LICENSE "${PROJECT_SOURCE_DIR}/LICENSE")
+        set(CPACK_RESOURCE_FILE_LICENSE "${HELICS_SOURCE_DIR}/LICENSE")
     endif(WIN32)
 
     set(CPACK_COMPONENT_APPLICATIONS_DISPLAY_NAME "Application")
@@ -847,8 +847,9 @@ if(ENABLE_PACKAGE_BUILD)
     if(WIN32)
         set(
             CPACK_PACKAGE_ICON
-            "${PROJECT_SOURCE_DIR}\\\\docs\\\\img\\\\HELICS.ico"
+            "${HELICS_SOURCE_DIR}\\\\docs\\\\img\\\\HELICS.ico"
         )
+        set(CPACK_NSIS_MUI_ICON "${HELICS_SOURCE_DIR}/docs/img/HELICS.ico")
         set(CPACK_NSIS_INSTALL_ROOT "C:\\\\local")
         set(
             CPACK_NSIS_URL_INFO_ABOUT
@@ -872,7 +873,7 @@ if(ENABLE_PACKAGE_BUILD)
             "TDC YouTube channel"
         )
     else(WIN32)
-        set(CPACK_PACKAGE_ICON "${PROJECT_SOURCE_DIR}/docs/img/HELICS.ico")
+        set(CPACK_PACKAGE_ICON "${HELICS_SOURCE_DIR}/docs/img/HELICS.ico")
     endif(WIN32)
 
     if(APPLE)
