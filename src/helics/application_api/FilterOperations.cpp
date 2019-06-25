@@ -335,9 +335,9 @@ std::string newDestGeneration (const std::string &src, const std::string &dest, 
     }
     std::string newDest = formula;
     std::regex srcreg (R"(\$\{source\})");
-    std::regex_replace (newDest, srcreg, src);
+    newDest=std::regex_replace (newDest, srcreg, src);
     std::regex destreg (R"(\$\{dest\})");
-    std::regex_replace (newDest, destreg, dest);
+    newDest=std::regex_replace (newDest, destreg, dest);
     return newDest;
 }
 

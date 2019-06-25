@@ -230,7 +230,7 @@ std::pair<std::string, int> extractInterfaceandPort (const std::string &address)
 std::pair<std::string, std::string> extractInterfaceandPortString (const std::string &address)
 {
     auto lastColon = address.find_last_of (':');
-    return std::make_pair (address.substr (0, lastColon), address.substr (lastColon + 1));
+    return {address.substr (0, lastColon), address.substr (lastColon + 1)};
 }
 
 std::string stripProtocol (const std::string &networkAddress)

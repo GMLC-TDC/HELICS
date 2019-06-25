@@ -17,10 +17,10 @@ namespace helicscpp
 class Input
 {
   public:
-    explicit Input (helics_input hsub) : inp (hsub) {}
-    Input (){};
+    explicit Input (helics_input hsub) HELICS_NOTHROW: inp (hsub) {}
+    Input ()HELICS_NOTHROW:inp(HELICS_NULL_POINTER){};
 
-    Input (const Input &inputs) : inp (inputs.inp) {}
+    Input (const Input &inputs) HELICS_NOTHROW: inp (inputs.inp) {}
 
     Input &operator= (const Input &input)
     {
@@ -90,12 +90,12 @@ class Input
         int size = helicsInputGetStringSize (inp);
         std::string result;
 
-        result.resize (size + 1);
+        result.resize (static_cast<size_t>(size)+ 1);
         // this function results in a null terminated string
         helicsInputGetString (inp, &result[0], size + 1, &size, NULL);
-        if (!(result.empty ()) && (result[size - 1] == '\0'))
+        if (!(result.empty ()) && (result[static_cast<size_t> (size) - 1] == '\0'))
         {
-            result.resize (size - 1);
+            result.resize (static_cast<size_t> (size) - 1);
         }
         else
         {
@@ -108,7 +108,7 @@ class Input
     {
         int size = helicsInputGetStringSize (inp);
 
-        name.resize (size + 1);
+        name.resize (static_cast<size_t> (size) + 1);
         // this function results in a null terminated string
         helicsInputGetNamedPoint (inp, &name[0], size + 1, &size, val, NULL);
         name.resize (size);
