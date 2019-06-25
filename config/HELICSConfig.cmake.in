@@ -67,6 +67,10 @@ message(STATUS "checking for ${PACKAGE_PREFIX_DIR}/@CMAKE_INSTALL_LIBDIR@/cmake/
 endif()
 endif()
 
+if (NOT TARGET HELICS::jsoncpp_headers)
+	add_target(HELICS::jsoncpp_headers ALIAS HELICS::jsoncpp_lib)
+endif()
+
 check_required_components(${PN})
 
 get_target_property(${PN}_INCLUDE_DIRS HELICS::helics_base_includes INTERFACE_INCLUDE_DIRECTORIES)
