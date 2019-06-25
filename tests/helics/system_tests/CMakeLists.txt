@@ -17,6 +17,7 @@ set(
   heat-transfer-tests.cpp
   flagTests.cpp
   updateTests.cpp
+  networkTests.cpp
   ../application_api/testFixtures.cpp
   ../application_api/testFixtures.hpp
 )

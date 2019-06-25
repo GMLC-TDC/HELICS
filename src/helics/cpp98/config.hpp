@@ -24,10 +24,16 @@ SPDX-License-Identifier: BSD-3-Clause
 
 //  Detect whether the compiler supports C++11.
 #if __cplusplus > 199711L
-#define THROWS_EXCEPTION noexcept (false)
+#define HELICS_THROWS_EXCEPTION noexcept (false)
+#define HELICS_NOTHROW noexcept
+#define HELICS_NULL_POINTER nullptr
 #elif defined(_MSC_VER) && (_MSC_VER >= 1900)
-#define THROWS_EXCEPTION noexcept (false)
+#define HELICS_THROWS_EXCEPTION noexcept (false)
+#define HELICS_NOTHROW noexcept
+#define HELICS_NULL_POINTER nullptr
 #else
-#define THROWS_EXCEPTION throw (HelicsException)
+#define HELICS_THROWS_EXCEPTION throw (HelicsException)
+#define HELICS_NOTHROW throw ()
+#define HELICS_NULL_POINTER NULL
 #endif
 #endif

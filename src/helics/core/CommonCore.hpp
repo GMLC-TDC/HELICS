@@ -25,7 +25,6 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helics/external/any.hpp"
 #include <array>
 #include <atomic>
-#include <cstdint>
 #include <set>
 #include <thread>
 #include <utility>
@@ -48,11 +47,12 @@ class FedInfo
   public:
     FederateState *fed = nullptr;
     bool disconnected = false;
+
     constexpr FedInfo () = default;
-    constexpr FedInfo (FederateState *newfed) noexcept : fed (newfed){};
-    FederateState *operator-> () { return fed; }
-    const FederateState *operator-> () const { return fed; }
-    operator bool () const { return (fed != nullptr); }
+    constexpr explicit FedInfo (FederateState *newfed) noexcept : fed (newfed){};
+    FederateState *operator-> () noexcept { return fed; }
+    const FederateState *operator-> () const noexcept { return fed; }
+    operator bool () const noexcept { return (fed != nullptr); }
 };
 
 /** base class implementing a standard interaction strategy between federates

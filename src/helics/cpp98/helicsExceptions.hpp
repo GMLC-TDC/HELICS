@@ -36,7 +36,7 @@ class hThrowOnError
     hThrowOnError () : eObj (helicsErrorInitialize ()) {}
     /** throwing destructor
     @details if the error code object contains a non-zero error code the destructor will emit an exception */
-    ~hThrowOnError () THROWS_EXCEPTION
+    ~hThrowOnError () HELICS_THROWS_EXCEPTION
     {
         if (eObj.error_code != 0)
         {

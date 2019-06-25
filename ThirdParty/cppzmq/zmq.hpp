@@ -273,7 +273,7 @@ proxy_steerable(void *frontend, void *backend, void *capture, void *control)
 #endif
 
 #ifdef ZMQ_HAS_RVALUE_REFS
-    inline message_t(message_t &&rhs) : msg(rhs.msg)
+    inline message_t (message_t &&rhs) ZMQ_NOTHROW : msg (rhs.msg)
         {
             int rc = zmq_msg_init (&rhs.msg);
             if (rc != 0)

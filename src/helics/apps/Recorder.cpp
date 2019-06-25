@@ -531,10 +531,10 @@ void Recorder::runTo (Time runToTime)
     Time nextPrintTime = (nextPrintTimeStep > timeZero) ? nextPrintTimeStep : Time::maxVal ();
     try
     {
+        int iteration = 0;
         while (true)
         {
             helics::Time T;
-            int iteration = 0;
             if (allow_iteration)
             {
                 auto ItRes = fed->requestTimeIterative (runToTime, iteration_request::iterate_if_needed);

@@ -17,8 +17,8 @@ namespace helicscpp
 class Publication
 {
   public:
-    explicit Publication (helics_publication hpub) : pub (hpub) {}
-    Publication (){};
+    explicit Publication (helics_publication hpub) HELICS_NOTHROW: pub (hpub) {}
+    Publication ()HELICS_NOTHROW:pub(HELICS_NULL_POINTER){};
 
     Publication (const Publication &publication) : pub (publication.pub) {}
 

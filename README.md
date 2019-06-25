@@ -26,8 +26,8 @@
   </tr>
   <tr>
   <td>Codacy</td>
-  <td><a href="https://www.codacy.com/app/phlptp/HELICS?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=GMLC-TDC/HELICS&amp;utm_campaign=Badge_Grade;branch=master"><img src="https://api.codacy.com/project/badge/Grade/83ba19b36b714c729ec3a3d18504505e?branch=master" alt="codacy" /></a></td>
-  <td><a href="https://www.codacy.com/app/phlptp/HELICS?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=GMLC-TDC/HELICS&amp;utm_campaign=Badge_Grade;branch=develop"><img src="https://api.codacy.com/project/badge/Grade/83ba19b36b714c729ec3a3d18504505e?branch=develop" alt="codacy" /></a></td>
+  <td><a href="https://www.codacy.com/app/GMLC-TDC/HELICS?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=GMLC-TDC/HELICS&amp;utm_campaign=Badge_Grade;branch=master"><img src="https://api.codacy.com/project/badge/Grade/83ba19b36b714c729ec3a3d18504505e?branch=master" alt="codacy" /></a></td>
+  <td><a href="https://www.codacy.com/app/GMLC-TDC/HELICS?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=GMLC-TDC/HELICS&amp;utm_campaign=Badge_Grade;branch=develop"><img src="https://api.codacy.com/project/badge/Grade/83ba19b36b714c729ec3a3d18504505e?branch=develop" alt="codacy" /></a></td>
   </tr>
   <tr>
   <td>Coverage</td>

@@ -244,8 +244,8 @@ class TcpAcceptor : public std::enable_shared_from_this<TcpAcceptor>
     void handle_accept (TcpAcceptor::pointer ptr,
                         TcpConnection::pointer new_connection,
                         const std::error_code &error);
-    asio::ip::tcp::acceptor acceptor_;
     asio::ip::tcp::endpoint endpoint_;
+	asio::ip::tcp::acceptor acceptor_;
     std::function<void(TcpAcceptor::pointer, TcpConnection::pointer)> acceptCall;
     std::function<bool(TcpAcceptor::pointer, const std::error_code &)> errorCall;
     std::atomic<accepting_state_t> state{accepting_state_t::opened};

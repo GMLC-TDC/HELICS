@@ -353,17 +353,15 @@ void ZmqCommsSS::queue_tx_function ()
         route_id rid;
         ActionMessage cmd;
         int count = 0;
-        int tx_count = 0;
-        int rc = 1;
 
         // Handle Tx messages first
         auto tx_msg = txQueue.try_pop ();
-        rc = zmq::poll (poller, 0l);
+        int rc = zmq::poll (poller, 0l);
         if (!tx_msg || (rc <= 0))
         {
             std::this_thread::yield ();
         }
-        tx_count = 0;
+        int tx_count = 0;
         // Balance between tx and rx processing since both running on single thread
         while (tx_msg && (tx_count < TX_RX_MSG_COUNT))
         {
@@ -514,7 +512,7 @@ int ZmqCommsSS::processRxMessage (zmq::socket_t &brokerSocket,
 
         brokerConnection.recv (&msg2);
     }
-    std::string str2 (static_cast<char *> (msg2.data ()), msg2.size ());
+    // std::string str2 (static_cast<char *> (msg2.data ()), msg2.size ());
     status = processIncomingMessage (msg2, connection_info);
 
     return status;
