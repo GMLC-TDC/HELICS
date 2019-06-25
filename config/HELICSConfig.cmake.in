@@ -68,7 +68,7 @@ endif()
 endif()
 
 if (NOT TARGET HELICS::jsoncpp_headers)
-	add_target(HELICS::jsoncpp_headers ALIAS HELICS::jsoncpp_lib)
+	add_library(HELICS::jsoncpp_headers ALIAS HELICS::jsoncpp_lib)
 endif()
 
 check_required_components(${PN})
