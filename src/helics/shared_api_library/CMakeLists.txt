@@ -42,6 +42,11 @@ target_include_directories(
         $<INSTALL_INTERFACE:$<INSTALL_PREFIX>/include>
 )
 
+set_target_properties(helicsSharedLib PROPERTIES
+    VERSION ${HELICS_VERSION}
+    SOVERSION ${HELICS_VERSION_MAJOR}
+)
+
 set_target_properties(
   helicsSharedLib
   PROPERTIES

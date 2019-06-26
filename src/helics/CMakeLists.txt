@@ -44,6 +44,10 @@ if(BUILD_SHARED_LIBS)
       $<INSTALL_INTERFACE:$<INSTALL_PREFIX>/include>
   )
 
+  set_target_properties(helics-shared PROPERTIES
+    VERSION ${HELICS_VERSION}
+    SOVERSION ${HELICS_VERSION_MAJOR}
+  )
 
   if(WIN32)
     set_target_properties(helics-shared PROPERTIES WINDOWS_EXPORT_ALL_SYMBOLS TRUE)
