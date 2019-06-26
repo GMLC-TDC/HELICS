@@ -38,7 +38,7 @@ endif()
 
 install(
     FILES helics.i output.i
-    DESTINATION ${CMAKE_INSTALL_DATADIR/helics/swig}
+    DESTINATION ${CMAKE_INSTALL_DATADIR}/helics/swig
     COMPONENT swig-devel
 )
 
