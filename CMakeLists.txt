@@ -609,6 +609,14 @@ if(INTERFACE_BUILD)
     add_subdirectory(interfaces)
 endif()
 
+# add base swig interface files as install option, regardless of current interfaces built
+install(
+    FILES interfaces/helics.i interfaces/output.i
+    DESTINATION ${CMAKE_INSTALL_DATADIR}/helics/swig
+    COMPONENT swig-devel
+)
+
+
 add_subdirectory(docs)
 
 endif(HELICS_ROOT_PROJ)

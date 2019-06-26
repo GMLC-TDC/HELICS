@@ -1,7 +1,7 @@
 #
 # Copyright (c) 2017-2019, Battelle Memorial Institute; Lawrence Livermore
 # National Security, LLC; Alliance for Sustainable Energy, LLC.
-# See the top-level NOTICE for additional details. 
+# See the top-level NOTICE for additional details.
 # All rights reserved.
 #
 # SPDX-License-Identifier: BSD-3-Clause
@@ -35,12 +35,6 @@ if(ENABLE_SWIG)
   find_package(SWIG REQUIRED 3.0)
   include(${SWIG_USE_FILE})
 endif()
-
-install(
-    FILES helics.i output.i
-    DESTINATION ${CMAKE_INSTALL_DATADIR}/helics/swig
-    COMPONENT swig-devel
-)
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 include_directories("${HELICS_SOURCE_DIR}/src/helics/shared_api_library")
