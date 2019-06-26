@@ -53,6 +53,7 @@ option(
     ENABLE_SLOW_PACKAGING_TESTS
     "Enable the packaging tests that may take a long time to run" OFF
 )
+mark_as_advanced(ENABLE_SLOW_PACKAGING_TESTS)
 
 # Tests for adding HELICS as a subproject using add_subdirectory
 if (ENABLE_SLOW_PACKAGING_TESTS)
