@@ -36,6 +36,12 @@ if(ENABLE_SWIG)
   include(${SWIG_USE_FILE})
 endif()
 
+install(
+    FILES helics.i output.i
+    DESTINATION ${CMAKE_INSTALL_DATADIR/helics/swig}
+    COMPONENT swig-devel
+)
+
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 include_directories("${HELICS_SOURCE_DIR}/src/helics/shared_api_library")
 include_directories("${HELICS_BINARY_DIR}/src/helics/shared_api_library")
