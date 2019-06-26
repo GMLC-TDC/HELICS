@@ -1,8 +1,7 @@
 /*
 Copyright © 2017-2019,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See the top-level NOTICE for additional details.
-All rights reserved. 
-SPDX-License-Identifier: BSD-3-Clause
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
+the top-level NOTICE for additional details. All rights reserved. SPDX-License-Identifier: BSD-3-Clause
 */
 
 #include "../application_api/testFixtures.hpp"
@@ -32,7 +31,7 @@ BOOST_DATA_TEST_CASE (test_optional_pub, bdata::make (core_types_single), core_t
     ipt2.addTarget ("tom");
     ipt3.addTarget ("harry");
     std::atomic<int> warnings{0};
-    vFed1->setLoggingCallback ([&warnings](int level, const std::string &, const std::string &) {
+    vFed1->setLoggingCallback ([&warnings] (int level, const std::string &, const std::string &) {
         if (level == 1)
         {
             ++warnings;
@@ -57,7 +56,7 @@ BOOST_DATA_TEST_CASE (test_optional_sub, bdata::make (core_types_single), core_t
     pub1.addTarget ("harry");
     std::atomic<int> warnings{0};
 
-    vFed1->setLoggingCallback ([&warnings](int level, const std::string &, const std::string &) {
+    vFed1->setLoggingCallback ([&warnings] (int level, const std::string &, const std::string &) {
         if (level == 1)
         {
             ++warnings;
@@ -161,6 +160,56 @@ BOOST_AUTO_TEST_CASE (type_mismatch_error2)
     ipt1.setOption (helics::defs::options::strict_type_checking);
     ipt1.addTarget ("pub1");
     BOOST_CHECK_THROW (vFed1->enterExecutingMode (), helics::ConnectionFailure);
+    vFed1->finalize ();
+}
+
+BOOST_AUTO_TEST_CASE (only_update_on_change_fedlevel)
+{
+    SetupTest<helics::ValueFederate> ("test", 1, 1.0);
+    auto vFed1 = GetFederateAs<helics::ValueFederate> (0);
+    vFed1->setFlagOption (helics::defs::options::handle_only_update_on_change);
+
+    // register the publications
+    auto &ipt1 = vFed1->registerGlobalInput ("ipt1", "double", "V");
+
+    auto &pub1 = vFed1->registerGlobalPublication ("pub1", "double");
+    ipt1.addTarget ("pub1");
+
+    vFed1->enterExecutingMode ();
+    pub1.publish (45.7);
+    vFed1->requestTime (1.0);
+    BOOST_CHECK (ipt1.isUpdated ());
+    double val = ipt1.getValue<double> ();
+    BOOST_CHECK_EQUAL (val, 45.7);
+    BOOST_CHECK (!ipt1.isUpdated ());
+    pub1.publish (45.7);
+    vFed1->requestTime (2.0);
+    BOOST_CHECK (!ipt1.isUpdated ());
+    vFed1->finalize ();
+}
+
+BOOST_AUTO_TEST_CASE (only_transmit_on_change_fedlevel)
+{
+    SetupTest<helics::ValueFederate> ("test", 1, 1.0);
+    auto vFed1 = GetFederateAs<helics::ValueFederate> (0);
+    vFed1->setFlagOption (helics::defs::options::handle_only_transmit_on_change);
+
+    // register the publications
+    auto &ipt1 = vFed1->registerGlobalInput ("ipt1", "double", "V");
+
+    auto &pub1 = vFed1->registerGlobalPublication ("pub1", "double");
+    ipt1.addTarget ("pub1");
+
+    vFed1->enterExecutingMode ();
+    pub1.publish (45.7);
+    vFed1->requestTime (1.0);
+    BOOST_CHECK (ipt1.isUpdated ());
+    double val = ipt1.getValue<double> ();
+    BOOST_CHECK_EQUAL (val, 45.7);
+    BOOST_CHECK (!ipt1.isUpdated ());
+    pub1.publish (45.7);
+    vFed1->requestTime (2.0);
+    BOOST_CHECK (!ipt1.isUpdated ());
     vFed1->finalize ();
 }
 
