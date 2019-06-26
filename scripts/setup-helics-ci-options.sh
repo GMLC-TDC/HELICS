@@ -8,6 +8,9 @@ shopt -s nocasematch
 OPTION_FLAGS_ARR=()
 OPTION_FLAGS_ARR+=("-DBUILD_C_SHARED_LIB=ON" "-DBUILD_SHARED_LIBS=ON" "-DEXAMPLES_WARNINGS_AS_ERROR=ON")
 
+# Enable adding the slower packaging tests; will not run for CI builds unless they run ctest with the Packaging label
+OPTION_FLAGS_ARR+=("-DENABLE_SLOW_PACKAGING_TESTS=ON")
+
 # Options to control building zeromq
 if [[ "$ZMQ_SUBPROJECT" ]]; then
     OPTION_FLAGS_ARR+=("-DZMQ_SUBPROJECT=ON")

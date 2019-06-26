@@ -49,21 +49,27 @@ add_test(find-package-tests ${CMAKE_CTEST_COMMAND} -C ${CMAKE_BUILD_TYPE}
 )
 set_property(TEST find-package-tests PROPERTY LABELS Packaging PackagingFast)
 
-# Tests for adding HELICS as a subproject using add_subdirectory
-add_test(add-subdirectory-tests ${CMAKE_CTEST_COMMAND} -C ${CMAKE_BUILD_TYPE}
-                            --build-and-test "${CMAKE_CURRENT_SOURCE_DIR}/add_subdirectory_tests" "${CMAKE_CURRENT_BINARY_DIR}/add_subdirectory_tests"
-                            --build-generator "${CMAKE_GENERATOR}"
-                            --build-generator-platform "${CMAKE_GENERATOR_PLATFORM}"
-                            --build-options
-                            "-DBUILD_SHARED_LIBS=${BUILD_SHARED_LIBS}"
-                            "-DBUILD_C_SHARED_LIB=${BUILD_C_SHARED_LIB}"
-                            "-DBUILD_APPS=${BUILD_APPS}"
-                            "-DBUILD_HELICS_TESTS=OFF"
-                            "-DBUILD_HELICS_EXAMPLES=OFF"
-                            "-DZeroMQ_INSTALL_PATH=${ZeroMQ_INSTALL_PATH}"
-                            "-DBOOST_INSTALL_PATH=${BOOST_INSTALL_PATH}"
-                            "-DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}"
-                            "-DCMAKE_CXX_STANDARD=${CMAKE_CXX_STANDARD}"
+option(
+    ENABLE_SLOW_PACKAGING_TESTS
+    "Enable the packaging tests that may take a long time to run" OFF
 )
-set_property(TEST add-subdirectory-tests PROPERTY LABELS Packaging)
-set_property(TEST add-subdirectory-tests PROPERTY DISABLED True)
+
+# Tests for adding HELICS as a subproject using add_subdirectory
+if (ENABLE_SLOW_PACKAGING_TESTS)
+    add_test(add-subdirectory-tests ${CMAKE_CTEST_COMMAND} -C ${CMAKE_BUILD_TYPE}
+                                --build-and-test "${CMAKE_CURRENT_SOURCE_DIR}/add_subdirectory_tests" "${CMAKE_CURRENT_BINARY_DIR}/add_subdirectory_tests"
+                                --build-generator "${CMAKE_GENERATOR}"
+                                --build-generator-platform "${CMAKE_GENERATOR_PLATFORM}"
+                                --build-options
+                                "-DBUILD_SHARED_LIBS=${BUILD_SHARED_LIBS}"
+                                "-DBUILD_C_SHARED_LIB=${BUILD_C_SHARED_LIB}"
+                                "-DBUILD_APPS=${BUILD_APPS}"
+                                "-DBUILD_HELICS_TESTS=OFF"
+                                "-DBUILD_HELICS_EXAMPLES=OFF"
+                                "-DZeroMQ_INSTALL_PATH=${ZeroMQ_INSTALL_PATH}"
+                                "-DBOOST_INSTALL_PATH=${BOOST_INSTALL_PATH}"
+                                "-DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}"
+                                "-DCMAKE_CXX_STANDARD=${CMAKE_CXX_STANDARD}"
+    )
+    set_property(TEST add-subdirectory-tests PROPERTY LABELS Packaging)
+endif()
