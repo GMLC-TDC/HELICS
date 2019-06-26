@@ -804,6 +804,7 @@ if(ENABLE_PACKAGE_BUILD)
         java
         octave
         csharp
+	swig-devel
         cereal
     )
     if(WIN32)
@@ -837,6 +838,7 @@ if(ENABLE_PACKAGE_BUILD)
     )
     set(CPACK_COMPONENT_RUNTIME_DESCRIPTION "Runtime libraries for HELICS")
     set(CPACK_COMPONENT_CEREAL_DESCRIPTION "cereal C++11 serialization library [no support for other language interfaces]")
+    set(CPACK_COMPONENT_SWIG-DEVEL_DESCRIPTION "Basic swig interface files for HELICS for building 3rd party language interfaces")
     set(
         CPACK_COMPONENT_GROUP_INTERFACES_DESCRIPTION
         "additional language interfaces for HELICS"
