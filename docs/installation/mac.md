@@ -96,7 +96,7 @@ Building HELICS with python support
 Run the following:
 
 ```bash
-$ cmake -DBUILD_PYTHON_INTERFACE=ON -DCMAKE_INSTALL_PREFIX=/Users/$(whoami)/local/helics-2.0.0/ ..
+$ cmake -DBUILD_PYTHON_INTERFACE=ON -DCMAKE_INSTALL_PREFIX=/Users/$(whoami)/local/helics-2.1.0/ ..
 $ make -j8
 $ make install
 ```

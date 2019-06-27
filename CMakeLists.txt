@@ -1,4 +1,4 @@
-#
+﻿#
 # Copyright © 2017-2019, Battelle Memorial Institute; Lawrence Livermore National
 # Security, LLC; Alliance for Sustainable Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 # SPDX-License-Identifier: BSD-3-Clause
@@ -13,7 +13,7 @@ project(HELICS VERSION 2.1.0)
 # HELICS Version number
 # -----------------------------------------------------------------------------
 set(HELICS_VERSION_BUILD)
-set(HELICS_DATE "05-24-19")
+set(HELICS_DATE "06-27-19")
 
 set(
     HELICS_VERSION_UNDERSCORE
@@ -307,7 +307,7 @@ if(NOT EXISTS "${PROJECT_SOURCE_DIR}/ThirdParty/jsoncpp/CMakeLists.txt")
 	submod_update(ThirdParty/jsoncpp)
 endif()
 
-if(NOT EXISTS "${PROJECT_SOURCE_DIR}/ThirdParty/containers/containers/BlockingQueue.hpp")
+if(NOT EXISTS "${PROJECT_SOURCE_DIR}/ThirdParty/containers/gmlc/containers/BlockingQueue.hpp")
 	submod_update(ThirdParty/containers)
 endif()
 
@@ -543,13 +543,22 @@ include(addfmt)
 #  Create the target for jsoncpp
 # -----------------------------------------------------------
 include(addJsoncpp)
+
+if (JSONCPP_OBJLIB)
 target_include_directories(
     helics_base_includes SYSTEM
     INTERFACE
-    $<TARGET_PROPERTY:jsoncpp_lib,INTERFACE_INCLUDE_DIRECTORIES>
+    $<BUILD_INTERFACE:$<TARGET_PROPERTY:jsoncpp_headers,INTERFACE_INCLUDE_DIRECTORIES>>
 )
-
+set_target_properties(jsoncppobj_lib PROPERTIES FOLDER Extern)
+else()
+target_include_directories(
+    helics_base_includes SYSTEM
+    INTERFACE
+    $<BUILD_INTERFACE:$<TARGET_PROPERTY:jsoncpp_lib,INTERFACE_INCLUDE_DIRECTORIES>>
+)
 set_target_properties(jsoncpp_lib PROPERTIES FOLDER Extern)
+endif()
 # -----------------------------------------------------------------------------
 # CMAKE Subdirectories
 # -----------------------------------------------------------------------------
@@ -599,6 +608,14 @@ endif(ENABLE_CLANG_TOOLS)
 if(INTERFACE_BUILD)
     add_subdirectory(interfaces)
 endif()
+
+# add base swig interface files as install option, regardless of current interfaces built
+install(
+    FILES interfaces/helics.i interfaces/output.i
+    DESTINATION ${CMAKE_INSTALL_DATADIR}/helics/swig
+    COMPONENT swig
+)
+
 
 add_subdirectory(docs)
 
@@ -787,6 +804,7 @@ if(ENABLE_PACKAGE_BUILD)
         java
         octave
         csharp
+	swig
         cereal
     )
     if(WIN32)
@@ -820,6 +838,7 @@ if(ENABLE_PACKAGE_BUILD)
     )
     set(CPACK_COMPONENT_RUNTIME_DESCRIPTION "Runtime libraries for HELICS")
     set(CPACK_COMPONENT_CEREAL_DESCRIPTION "cereal C++11 serialization library [no support for other language interfaces]")
+    set(CPACK_COMPONENT_SWIG_DESCRIPTION "Basic swig interface files for HELICS for building 3rd party language interfaces")
     set(
         CPACK_COMPONENT_GROUP_INTERFACES_DESCRIPTION
         "additional language interfaces for HELICS"

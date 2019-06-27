@@ -5,32 +5,40 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 A note on future revisions.  
-  Everything within a major version number should be code compatible (With the exception of experimental interfaces).  The most notable example of an experimental interface is the support for multiple source inputs.  The API's to deal with this will change in future minor releases.    Everything within a single minor release should be network compatible with other federates on the same minor release number.  Compatibility across minor release numbers may be possible in some situations but we are not going to guarantee this as those components are subject to performance improvements and may need to be modified at some point.  patch releases will be limited to bug fixes and other improvements not impacting the public API or network compatibility.  Check [here](./docs/Public_API.md) for details of what is included and excluded from the public API and version stability.
+  Everything within a major version number should be code compatible (with the exception of experimental interfaces).  The most notable example of an experimental interface is the support for multiple source inputs.  The APIs to deal with this will change in future minor releases.  Everything within a single minor release should be network compatible with other federates on the same minor release number.  Compatibility across minor release numbers may be possible in some situations but we are not going to guarantee this as those components are subject to performance improvements and may need to be modified at some point.  Patch releases will be limited to bug fixes and other improvements not impacting the public API or network compatibility.  Check [here](./docs/Public_API.md) for details on what is included and excluded from the public API and version stability.
 
-## [2.1.0] - 2019-06-11
-The main focus of this minor release is cleaning up the build system and extracting required compiled libraries from the HELICS build process, no changes in the C api, and few additionals and deprecations in the C++ API related to command line arguments.  
+## [2.1.0] - 2019-06-27
+The main focus of this minor release is cleaning up the build system and extracting required compiled libraries from the HELICS build process, no changes in the C API, and a few additions and deprecations in the C++ API related to command line arguments.  
 ### Changed
    - remove use of boost::program options and replace usage with CLI11
    - remove boost::asio and replace with a submodule for ASIO
    - remove included fmt code and replace with submodule
-   - remove jsoncpp code and replace with a submodule which generates a compiled library- this removed the need to continually regenerate the single header/file with customized namespaces, though if you are manually including helics the HELICS::jsoncpp needs to be added as a library.
+   - remove JsonCpp code and replace with a submodule which generates a compiled library - this removed the need to continually regenerate the single header/file with customized namespaces, though if you are using the helics-static library built with a separate JsonCpp static library, the HELICS copy of the jsoncpp static library must be linked with manually (for build systems other than CMake such as waf, meson, premake, etc).  Also included is an option to incorporate JsonCpp as an object library within a single helics-static library (default on macOS/Linux), and create a target HELICS::jsoncpp_headers.
    - extract several containers used in HELICS to a separate repository for better maintenance and possible reuse elsewhere.  Any reference to the containers library was removed from the Public API.
    - all required references to boost were removed from the public API.  
    - the logger headers were split into two sections.  The logger.h which includes the logger objects for use in federates was split from the loggerCore which is not publicly accessible.  
    - The command line arguments are error checked and the help prints all available options (thanks to CLI11)
    - the core tests and common tests now use google test instead of boost test.  More tests are expected to be migrated in the future.  
+   - updates to the HELICSConfig.cmake file that gets installed to be more resilient to different directory structures. 
+   - use ZMQ as a subproject if needed instead of an autobuild and install it as a target if needed. The CMake option to enable this is ZMQ_LOCAL_BUILD, replacing AUTOBUILD_ZMQ.
+   - the cereal library is not installed by default except on visual studio, and there is a CMAKE option to install it `HELICS_INSTALL_CEREAL`
+   - some update to the noexcept policy on c++98 interface
 
 ### Fixed
-   - an issue with the isUpdated function not registering access( mainly an issue in the C and language interfaces) Issue #655
+   - an issue with the isUpdated function not registering access (mainly an issue in the C and language interfaces), Issue #655
+   - certain flags when used with certain brokers could cause errors, Issue #634
    - certain flags when used with certain brokers could cause errors Issue #634
+   - potential issue with only_update_on_change_flag when used at the federate level, along with some tests
 
 ### Added
    - the HELICS library can now operate as a subproject in a larger cmake project if needed
    - tcp cores have a --reuse-address flag to allow multiple brokers on the same port,  mostly useful for the test suite to prevent spurious failures due to the OS not releasing tcp ports in a timely manner.  
-   - several C++ api functions for using a vector of strings as command line arguments, in the federates and in the broker/core factory.
+   - several C++ api functions for using a vector of strings as command line arguments, in the federates and in the broker/core factory, this is related to the transition to CLI11
+   - tests for building HELICS with musl instead of glibc
+   - tests for building HELICS on ARM/ARM64
 
 ### Removed
-    - Tested support Xcode 6.4 and 7.3,  These probably still work but we are not testing them anymore.  
+   - tested support of XCode 6.4 and 7.3;  these probably still work but we are not testing them anymore.
 
 ## [2.0.0] - 2019-02-12
 
@@ -52,7 +60,7 @@ This is a major revision so this changelog will not capture all the changes that
   - a local info field for all the interfaces for user defined string data.  
   - many other small changes.
   - License file changed to match BSD-3-clause exactly(terms are the same but the file had some extra disclaimers in it, now it matches the standard BSD-3-clause license)
-  - tag source files with
+  - tag source files with appropriate licensing information
 
 ## [1.3.1] - 2018-09-23
 ### Changed
