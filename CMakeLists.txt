@@ -1,4 +1,4 @@
-#
+﻿#
 # Copyright © 2017-2019, Battelle Memorial Institute; Lawrence Livermore National
 # Security, LLC; Alliance for Sustainable Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 # SPDX-License-Identifier: BSD-3-Clause
@@ -609,6 +609,14 @@ if(INTERFACE_BUILD)
     add_subdirectory(interfaces)
 endif()
 
+# add base swig interface files as install option, regardless of current interfaces built
+install(
+    FILES interfaces/helics.i interfaces/output.i
+    DESTINATION ${CMAKE_INSTALL_DATADIR}/helics/swig
+    COMPONENT swig
+)
+
+
 add_subdirectory(docs)
 
 endif(HELICS_ROOT_PROJ)
@@ -796,6 +804,7 @@ if(ENABLE_PACKAGE_BUILD)
         java
         octave
         csharp
+	swig
         cereal
     )
     if(WIN32)
@@ -829,6 +838,7 @@ if(ENABLE_PACKAGE_BUILD)
     )
     set(CPACK_COMPONENT_RUNTIME_DESCRIPTION "Runtime libraries for HELICS")
     set(CPACK_COMPONENT_CEREAL_DESCRIPTION "cereal C++11 serialization library [no support for other language interfaces]")
+    set(CPACK_COMPONENT_SWIG_DESCRIPTION "Basic swig interface files for HELICS for building 3rd party language interfaces")
     set(
         CPACK_COMPONENT_GROUP_INTERFACES_DESCRIPTION
         "additional language interfaces for HELICS"
