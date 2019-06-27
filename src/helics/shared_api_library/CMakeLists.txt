@@ -72,32 +72,6 @@ install(
   LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
 )
 
-if(${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION} VERSION_GREATER 3.6)
-  install(
-    FILES $<TARGET_LINKER_FILE:helicsSharedLib>
-    DESTINATION ${CMAKE_INSTALL_LIBDIR}
-    COMPONENT libs EXCLUDE_FROM_ALL
-  )
-  install(
-    FILES $<TARGET_FILE:helicsSharedLib>
-    DESTINATION ${CMAKE_INSTALL_BINDIR}
-    COMPONENT
-    Runtime EXCLUDE_FROM_ALL
-  )
-else()
-  install(
-    FILES $<TARGET_LINKER_FILE:helicsSharedLib>
-    DESTINATION ${CMAKE_INSTALL_LIBDIR}
-    COMPONENT libs
-  )
-  install(
-    FILES $<TARGET_FILE:helicsSharedLib>
-    DESTINATION ${CMAKE_INSTALL_BINDIR}
-    COMPONENT
-    Runtime
-  )
-endif()
-
 install(
   FILES ${CMAKE_CURRENT_BINARY_DIR}/helics_export.h
   DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/helics/shared_api_library
