@@ -20,7 +20,7 @@ The main focus of this minor release is cleaning up the build system and extract
    - The command line arguments are error checked and the help prints all available options (thanks to CLI11)
    - the core tests and common tests now use google test instead of boost test.  More tests are expected to be migrated in the future.  
    - updates to the HELICSConfig.cmake file that gets installed to be more resilient to different directory structures. 
-   - Use ZMQ as a subproject if needed instead of an autobuild and install it as a target if needed.  
+   - use ZMQ as a subproject if needed instead of an autobuild and install it as a target if needed. The CMake option to enable this is ZMQ_LOCAL_BUILD, replacing AUTOBUILD_ZMQ.
    - the cereal library is not installed by default except on visual studio, and there is a CMAKE option to install it `HELICS_INSTALL_CEREAL`
    - some update to the noexcept policy on c++98 interface
 
@@ -34,9 +34,11 @@ The main focus of this minor release is cleaning up the build system and extract
    - the HELICS library can now operate as a subproject in a larger cmake project if needed
    - tcp cores have a --reuse-address flag to allow multiple brokers on the same port,  mostly useful for the test suite to prevent spurious failures due to the OS not releasing tcp ports in a timely manner.  
    - several C++ api functions for using a vector of strings as command line arguments, in the federates and in the broker/core factory, this is related to the transition to CLI11
+   - tests for building HELICS with musl instead of glibc
+   - tests for building HELICS on ARM/ARM64
 
 ### Removed
-    - tested support of XCode 6.4 and 7.3;  these probably still work but we are not testing them anymore.
+   - tested support of XCode 6.4 and 7.3;  these probably still work but we are not testing them anymore.
 
 ## [2.0.0] - 2019-02-12
 
