@@ -200,12 +200,10 @@ $ cmake-gui ../
 If this fails that is because mingw-w64-x86_64-qt5 was not installed. If you did install it the cmake gui window should pop up. click the Advanced check box next to the search bar. Then click Configure. A window will pop up asking you to specify the generator for this project. Select MSYS Makefiles from the dropdown menu. Then click the Specify native compilers check box and click next. Enter C:/msys64/mingw64/bin/gcc.exe for the C compiler and C:/msys64/mingw64/bin/g++.exe for the C++ compiler and click finish. Once the Configure process finished several variables will show up highlighted in red. Since this is the first time setup the Boost and ZeroMQ library. Below are the following cmake variables that need to be verified.
 
 * BUILD_CXX_SHARED_LIB should be checked as GridLAB-D dynamically links with the shared c++ library of HELICS
-* Boost_FILESYSTEM_LIBRARY_DEBUG/RELEASE C:/msys64/mingw64/bin/libboost_filesystem-mt.dll
 * Boost_INCLUDE_DIR C:/msys64/mingw64/include
 * Boost_LIBRARY_DIR_DEBUG/RELEASE C:/msys64/mingw64/bin
-* Boost_SYSTEM_LIBRARY_DEBUG/RELEASE C:/msys64/mingw64/bin/libboost_system-mt.dll
 * Boost_UNIT_TEST_FRAMEWORK_LIBRARY_DEBUG/RELEASE C:/msys64/mingw64/bin/libboost_unit_test_framework-mt.dll
-* CMAKE_CXX_FLAGS -std=gnu++14
+* CMAKE_CXX_FLAGS -std=c++14
 * CMAKE_INSTALL_PREFIX /usr/local or location of your choice
 * ZeroMQ_INCLUDE_DIR C:/msys64/mingw64/include
 * ZeroMQ_INSTALL_PATH C:/msys64/mingw64
