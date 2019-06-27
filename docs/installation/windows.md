@@ -67,8 +67,8 @@ Getting and building from source:
 
 4. Run cmake. It should automatically detect where MPI is installed
    if the system path variables are set up correctly, otherwise you
-   will have to set the cmake path manually. The AUTOBUILD_ZMQ is set to ON
-    so ZeroMQ will automatically be built unless the option is changed.
+   will have to set the cmake path manually. ZMQ_LOCAL_BUILD is set to ON
+   so ZeroMQ will automatically be built unless the option is changed.
 
    ```bash
    cmake ..
