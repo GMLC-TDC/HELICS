@@ -32,15 +32,15 @@ class Input
     double delta = -1.0;  //!< the minimum difference
     std::string actualName;  //!< the name of the federate
     // this needs to match the defV type
-    mpark::variant<std::function<void(const double &, Time)>,
-                   std::function<void(const int64_t &, Time)>,
-                   std::function<void(const std::string &, Time)>,
-                   std::function<void(const std::complex<double> &, Time)>,
-                   std::function<void(const std::vector<double> &, Time)>,
-                   std::function<void(const std::vector<std::complex<double>> &, Time)>,
-                   std::function<void(const NamedPoint &, Time)>,
-                   std::function<void(const bool &, Time)>,
-                   std::function<void(const Time &, Time)>>
+    mpark::variant<std::function<void (const double &, Time)>,
+                   std::function<void (const int64_t &, Time)>,
+                   std::function<void (const std::string &, Time)>,
+                   std::function<void (const std::complex<double> &, Time)>,
+                   std::function<void (const std::vector<double> &, Time)>,
+                   std::function<void (const std::vector<std::complex<double>> &, Time)>,
+                   std::function<void (const NamedPoint &, Time)>,
+                   std::function<void (const bool &, Time)>,
+                   std::function<void (const Time &, Time)>>
       value_callback;  //!< callback function for the federate
   public:
     Input () = default;
@@ -152,10 +152,10 @@ class Input
     @param callback a function with signature void( Time time)
     time is the time the value was updated  This callback is a notification callback and doesn't return the value
     */
-    void registerNotificationCallback (std::function<void(Time)> callback)
+    void registerNotificationCallback (std::function<void (Time)> callback)
     {
         fed->setInputNotificationCallback (*this,
-                                           [this, callback = std::move (callback)](const Input &, Time time) {
+                                           [this, callback = std::move (callback)] (const Input &, Time time) {
                                                if (isUpdated ())
                                                {
                                                    callback (time);
@@ -196,8 +196,23 @@ class Input
     /** get the current value of a flag for the handle*/
     bool getOption (int32_t option) const { return fed->getInterfaceOption (handle, option); }
     /** check if the value has been updated
-    @details if changeDetection is Enabled this function also loads the value into the buffer*/
+    @details if changeDetection is Enabled this function also loads the value into the buffer
+    @param assumeUpdate if set to true will assume there was a publication and not check it first, if set to
+    false[default] it will check the federate first
+    @return true if the value has been updated*/
+    bool checkUpdate (bool assumeUpdate = false);
+
+    /** check if the value has been updated including interpretation of the change detection
+     */
     bool isUpdated ();
+    /** check if the value has been updated,
+    @details the const version can in some circumstances return true even if the value would not be updated
+    the circumstances in which this is true are a minimum change has been set, checkUpdate has not been
+    call(meaning it is a standalone copy, not the one stored with the federate, and the value has been published
+    but would not trigger the change detection. If this is to be avoided use the non-const version or call
+    checkUpdate before calling this function.
+     */
+    bool isUpdated () const;
 
     /** register a callback for the update
     @details the callback is called in the just before the time request function returns
@@ -205,14 +220,14 @@ class Input
     val is the new value and time is the time the value was updated
     */
     template <class X>
-    void setInputNotificationCallback (std::function<void(const X &, Time)> callback)
+    void setInputNotificationCallback (std::function<void (const X &, Time)> callback)
     {
         static_assert (
           helicsType<X> () != data_type::helics_custom,
           "callback type must be a primary helics type one of \"double, int64_t, named_point, bool, Time "
           "std::vector<double>, std::vector<std::complex<double>>, std::complex<double>\"");
         value_callback = std::move (callback);
-        fed->setInputNotificationCallback (*this, [this](Input &, Time time) { handleCallback (time); });
+        fed->setInputNotificationCallback (*this, [this] (Input &, Time time) { handleCallback (time); });
     }
 
   private:
@@ -367,8 +382,8 @@ class InputT : public Input
 {
   public:
   private:
-    std::function<void(X, Time)> value_callback;  //!< callback function for the federate
-    std::function<double(const X &v1, const X &v2)>
+    std::function<void (X, Time)> value_callback;  //!< callback function for the federate
+    std::function<double (const X &v1, const X &v2)>
       changeDetectionOperator;  //!< callback function for change detection
     // determine if we can convert to a primary type
     using is_convertible_to_primary_type =
@@ -412,10 +427,10 @@ class InputT : public Input
     @param callback a function with signature void(X val, Time time)
     val is the new value and time is the time the value was updated
     */
-    void setInputNotificationCallback (std::function<void(X, Time)> callback)
+    void setInputNotificationCallback (std::function<void (X, Time)> callback)
     {
         value_callback = callback;
-        fed->setInputNotificationCallback (*this, [=](Input &, Time time) { handleCallback (time); });
+        fed->setInputNotificationCallback (*this, [=] (Input &, Time time) { handleCallback (time); });
     }
     /** set a default value
     @param val the value to set as the default

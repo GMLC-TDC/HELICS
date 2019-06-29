@@ -9,6 +9,7 @@ set(
   common_headers
   timeRepresentation.hpp
   JsonProcessingFunctions.hpp
+  JsonBuilder.hpp
   TomlProcessingFunctions.hpp
   AsioContextManager.h
   logger.h
@@ -27,6 +28,7 @@ set(
   common_sources
   AsioContextManager.cpp
   JsonProcessingFunctions.cpp
+  JsonBuilder.cpp
   TomlProcessingFunctions.cpp
   logger.cpp
   loggerCore.cpp

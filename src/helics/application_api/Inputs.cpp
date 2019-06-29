@@ -120,15 +120,11 @@ void Input::handleCallback (Time time)
     }
 }
 
-bool Input::isUpdated ()
+bool Input::checkUpdate (bool assumeUpdate)
 {
-    if (hasUpdate)
-    {
-        return true;
-    }
     if (changeDetectionEnabled)
     {
-        if (fed->isUpdated (*this))
+        if (assumeUpdate || fed->isUpdated (*this))
         {
             auto dv = fed->getValueRaw (*this);
             if (type == data_type::helics_unknown)
@@ -150,9 +146,27 @@ bool Input::isUpdated ()
     }
     else
     {
-        hasUpdate = fed->isUpdated (*this);
+        hasUpdate = (hasUpdate || assumeUpdate || fed->isUpdated (*this));
     }
     return hasUpdate;
+}
+
+bool Input::isUpdated ()
+{
+    if (hasUpdate)
+    {
+        return true;
+    }
+    return checkUpdate ();
+}
+
+bool Input::isUpdated () const
+{
+    if (hasUpdate)
+    {
+        return true;
+    }
+    return fed->isUpdated (*this);
 }
 
 size_t Input::getRawSize ()

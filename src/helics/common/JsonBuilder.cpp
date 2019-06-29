@@ -5,8 +5,8 @@ the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 
-#include "JsonMapBuilder.hpp"
-#include "../common/JsonProcessingFunctions.hpp"
+#include "JsonBuilder.hpp"
+#include "JsonProcessingFunctions.hpp"
 
 namespace helics
 {

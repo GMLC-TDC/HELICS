@@ -5,11 +5,11 @@ the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 #include "ValueFederateManager.hpp"
+#include "../common/JsonBuilder.hpp"
 #include "../core/core-exceptions.hpp"
 #include "../core/queryHelpers.hpp"
 #include "Inputs.hpp"
 #include "Publications.hpp"
-
 namespace helics
 {
 ValueFederateManager::ValueFederateManager (Core *coreOb, ValueFederate *vfed, local_federate_id id)
@@ -43,7 +43,7 @@ Publication &ValueFederateManager::registerPublication (const std::string &key,
     auto coreID = coreObject->registerPublication (fedID, key, type, units);
 
     auto pubHandle = publications.lock ();
-    decltype(pubHandle->insert(key, coreID, fed, coreID, key, type, units)) active;
+    decltype (pubHandle->insert (key, coreID, fed, coreID, key, type, units)) active;
     if (!key.empty ())
     {
         active = pubHandle->insert (key, coreID, fed, coreID, key, type, units);
@@ -65,7 +65,7 @@ ValueFederateManager::registerInput (const std::string &key, const std::string &
 {
     auto coreID = coreObject->registerInput (fedID, key, type, units);
     auto inpHandle = inputs.lock ();
-	decltype(inpHandle->insert(key, coreID, fed, coreID, key)) active;
+    decltype (inpHandle->insert (key, coreID, fed, coreID, key)) active;
     if (!key.empty ())
     {
         active = inpHandle->insert (key, coreID, fed, coreID, key);
@@ -246,23 +246,27 @@ void ValueFederateManager::updateTime (Time newTime, Time /*oldTime*/)
             iData->lastData = std::move (data);
             iData->lastUpdate = CurrentTime;
             iData->hasUpdate = true;
-            if (iData->callback)
+            bool updated = fid->checkUpdate (true);
+            if (updated)
             {
-                Input &inp = *fid;
+                if (iData->callback)
+                {
+                    Input &inp = *fid;
 
-                inpHandle.unlock ();  // need to free the lock
+                    inpHandle.unlock ();  // need to free the lock
 
-                // callbacks can do all sorts of things, best not to have it locked during the callback
-                iData->callback (inp, CurrentTime);
-                inpHandle = inputs.lock ();
-            }
-            else if (allCall)
-            {
-                Input &inp = *fid;
-                inpHandle.unlock ();  // need to free the lock
-                // callbacks can do all sorts of strange things, best not to have it locked during the callback
-                allCall (inp, CurrentTime);
-                inpHandle = inputs.lock ();
+                    // callbacks can do all sorts of things, best not to have it locked during the callback
+                    iData->callback (inp, CurrentTime);
+                    inpHandle = inputs.lock ();
+                }
+                else if (allCall)
+                {
+                    Input &inp = *fid;
+                    inpHandle.unlock ();  // need to free the lock
+                    // callbacks can do all sorts of strange things, best not to have it locked during the callback
+                    allCall (inp, CurrentTime);
+                    inpHandle = inputs.lock ();
+                }
             }
         }
     }
@@ -273,7 +277,7 @@ void ValueFederateManager::startupToInitializeStateTransition ()
     // get the actual publication types
     auto inpHandle = inputs.lock ();
     inpHandle->apply (
-      [this](auto &inp) { inp.type = getTypeFromString (coreObject->getInjectionType (inp.handle)); });
+      [this] (auto &inp) { inp.type = getTypeFromString (coreObject->getInjectionType (inp.handle)); });
 }
 
 void ValueFederateManager::initializeToExecuteStateTransition () { updateTime (0.0, 0.0); }
@@ -283,18 +287,47 @@ std::string ValueFederateManager::localQuery (const std::string &queryStr) const
     std::string ret;
     if (queryStr == "inputs")
     {
-        ret = generateStringVector_if (inputs.lock_shared (), [](const auto &info) { return info.actualName; },
-                                       [](const auto &info) { return (!info.actualName.empty ()); });
+        ret = generateStringVector_if (
+          inputs.lock_shared (), [] (const auto &info) { return info.actualName; },
+          [] (const auto &info) { return (!info.actualName.empty ()); });
     }
     else if (queryStr == "publications")
     {
-        ret =
-          generateStringVector_if (publications.lock_shared (), [](const auto &info) { return info.getName (); },
-                                   [](const auto &info) { return (!info.getName ().empty ()); });
+        ret = generateStringVector_if (
+          publications.lock_shared (), [] (const auto &info) { return info.getName (); },
+          [] (const auto &info) { return (!info.getName ().empty ()); });
     }
     else if (queryStr == "subscriptions")
     {
-        ret = generateStringVector (targetIDs, [](const auto &target) { return target.first; });
+        ret = generateStringVector (targetIDs, [] (const auto &target) { return target.first; });
+    }
+    else if (queryStr == "updated_input_indices")
+    {
+        ret = "[";
+        auto hand = inputs.lock ();
+        int ii = 0;
+        for (auto &inp : *hand)
+        {
+            if (inp.isUpdated ())
+            {
+                ret.append (std::to_string (ii));
+                ret.push_back (',');
+            }
+        }
+        ret.pop_back ();
+        ret.push_back (']');
+    }
+    else if (queryStr == "updated_input_names")
+    {
+        ret = generateStringVector_if (
+          inputs.lock_shared (), [] (const auto &inp) { return inp.getName (); },
+          [] (const auto &inp) { return (inp.isUpdated ()); });
+    }
+    else if (queryStr == "updates")
+    {
+    }
+    else if (queryStr == "values")
+    {
     }
     return ret;
 }
@@ -456,13 +489,13 @@ int ValueFederateManager::getPublicationCount () const
 /** get a count of the number inputs registered*/
 int ValueFederateManager::getInputCount () const { return static_cast<int> (inputs.lock_shared ()->size ()); }
 
-void ValueFederateManager::setInputNotificationCallback (std::function<void(Input &, Time)> callback)
+void ValueFederateManager::setInputNotificationCallback (std::function<void (Input &, Time)> callback)
 {
     allCallback.store (std::move (callback));
 }
 
 void ValueFederateManager::setInputNotificationCallback (const Input &inp,
-                                                         std::function<void(Input &, Time)> callback)
+                                                         std::function<void (Input &, Time)> callback)
 {
     auto data = reinterpret_cast<input_info *> (inp.dataReference);
     if (data != nullptr)
