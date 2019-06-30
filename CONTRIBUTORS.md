@@ -3,31 +3,31 @@ This file describes the contributors to the HELICS library and the software used
 If you would like to contribute to the HELICS project see [CONTRIBUTING](CONTRIBUTING.md)
 ## Individual contributors
 ### Pacific Northwest National Lab
- - Jeff Daily (Now AMD)
- - Andy Fisher*
- - Jason Fuller*
- - Shwetha Niddodi*
- - Monish Mukherjee*
- - Jacob Hansen*
- - Marc Eberlein*
+-   Jeff Daily (Now AMD)
+-   Andy Fisher*
+-   Jason Fuller*
+-   Shwetha Niddodi*
+-   Monish Mukherjee*
+-   Jacob Hansen*
+-   Marc Eberlein*
 
 ### Lawrence Livermore National Lab
- - Ryan Mast*
- - Steve Smith
- - Philip Top*
+-   Ryan Mast*
+-   Steve Smith
+-   Philip Top*
 
 ### National Renewable Energy Lab
- - Himanshu Jain*
- - Dheepak Krishnamurthy*
- - Bryan Palmintier*
- - Bryan Richardson**
+-   Himanshu Jain*
+-   Dheepak Krishnamurthy*
+-   Bryan Palmintier*
+-   Bryan Richardson**
 
 ### Argonne National Lab
- - Shrirang Abhyankar
- - Karthikeyan Balasubramaniam*
+-   Shrirang Abhyankar
+-   Karthikeyan Balasubramaniam*
 
- `*` currently active
- `**` subcontractor
+`*` currently active
+`**` subcontractor
 
 ## Used Libraries or Code
 
@@ -53,7 +53,7 @@ CLI11 is a command line parser and was used as a replacement for boost::program_
 GridDyn supports HELICS in experimental versions, and several components of GridDyn code were used in the development of HELICS, given they have several of the same authors.  
 
 ### [libGuarded](https://github.com/copperspice/libguarded)
-Several components of libGuarded are being used in the core and application libraries to better encapsulate the locks for threading. The library was modified to allow use of std::mutex and std::timed_mutex support for the shared_guarded class, and also modified to use handles. An atomic_guarded and a staged_guarded class were added for std::atomic like support for allocating classes. libGuarded is licensed under [BSD 2 clause](https://github.com/copperspice/libguarded/blob/master/LICENSE). The modified version being used in HELICS is available at https://github.com/phlptp/libguarded/tree/modified
+Several components of libGuarded are being used in the core and application libraries to better encapsulate the locks for threading. The library was modified to allow use of std::mutex and std::timed_mutex support for the shared_guarded class, and also modified to use handles. An atomic_guarded and a staged_guarded class were added for std::atomic like support for allocating classes. libGuarded is licensed under [BSD 2 clause](https://github.com/copperspice/libguarded/blob/master/LICENSE). The modified version being used in HELICS is available at [https://github.com/phlptp/libguarded/tree/modified]([https://github.com/phlptp/libguarded/tree/modified]).
 
 ### [fmt](http://fmtlib.net/latest/index.html)
 fmt replaces boost::format for internal logging and message printing. The library is included as a submodule.  HELICS uses the header only library for the time being. fmt is licensed under [BSD 2 clause](https://github.com/fmtlib/fmt/blob/master/LICENSE.rst) license.
@@ -81,9 +81,9 @@ A single-header standalone variant of the filesystem library is used to avoid co
 
 ### cmake scripts
 Several cmake scripts came from other sources and were either used or modified for use in HELICS.
- - Lars Bilke [CodeCoverage.cmake](https://github.com/bilke/cmake-modules/blob/master/CodeCoverage.cmake)
- - NATIONAL HEART, LUNG, AND BLOOD INSTITUTE  FindOctave.cmake
- - clang-format, clang-tidy scripts were created using tips from [Emmanuel Fleury](http://www.labri.fr/perso/fleury/posts/programming/using-clang-tidy-and-clang-format.html)
- - Viktor Kirilov, useful cmake macros [ucm](https://github.com/onqtam/ucm)  particularly for the set_runtime macro to use static runtime libraries
- - scripts for cloning get repositories are included from [tschuchortdev/cmake_git_clone](https://github.com/tschuchortdev/cmake_git_clone) used with [MIT](https://github.com/tschuchortdev/cmake_git_clone/blob/master/LICENSE.TXT) License
- - Some scripts for including google test were borrowed from [CLI11](https://github.com/CLIUtils/CLI11)
+-   Lars Bilke [CodeCoverage.cmake](https://github.com/bilke/cmake-modules/blob/master/CodeCoverage.cmake)
+-   NATIONAL HEART, LUNG, AND BLOOD INSTITUTE  FindOctave.cmake
+-   clang-format, clang-tidy scripts were created using tips from [Emmanuel Fleury](http://www.labri.fr/perso/fleury/posts/programming/using-clang-tidy-and-clang-format.html)
+-   Viktor Kirilov, useful cmake macros [ucm](https://github.com/onqtam/ucm)  particularly for the set_runtime macro to use static runtime libraries
+-   scripts for cloning get repositories are included from [tschuchortdev/cmake_git_clone](https://github.com/tschuchortdev/cmake_git_clone) used with [MIT](https://github.com/tschuchortdev/cmake_git_clone/blob/master/LICENSE.TXT) License
+-   Some scripts for including google test were borrowed from [CLI11](https://github.com/CLIUtils/CLI11)
