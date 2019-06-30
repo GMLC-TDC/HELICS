@@ -5,39 +5,52 @@ the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 #include "BrokerApp.hpp"
-#include "../common/argParser.h"
-#include "../common/stringToCmdLine.h"
 #include "../core/BrokerFactory.hpp"
 #include "../core/CoreBroker.hpp"
 #include "../core/core-exceptions.hpp"
-#include "../core/helicsVersion.hpp"
+#include "../core/helicsCLI11.hpp"
 #include <fstream>
 #include <iostream>
-
-static const helics::ArgDescriptors InfoArgs{
-  {"name,n", "name of the broker"},
-  {"coretype,t",
-   R"lit(type of the broker ("(zmq)", "ipc", "test", "mpi", "test", "tcp", "udp", "tcp_ss", "zmq_ss"))lit"}};
 
 namespace helics
 {
 namespace apps
 {
-BrokerApp::BrokerApp (int argc, char *argv[]) { loadFromArguments (argc, argv); }
-
-BrokerApp::BrokerApp (core_type ctype, int argc, char *argv[]) : type (ctype) { loadFromArguments (argc, argv); }
-
-BrokerApp::BrokerApp (const std::string &argString)
+BrokerApp::BrokerApp (core_type ctype, std::vector<std::string> args)
 {
-    StringToCmdLine cmdargs (argString);
-    loadFromArguments (cmdargs.getArgCount (), cmdargs.getArgV ());
+    auto app = generateParser ();
+    app->setDefaultCoreType (ctype);
+    if (app->helics_parse (std::move (args)) == helicsCLI11App::parse_return::ok)
+    {
+        processArgs (app);
+    }
 }
 
-BrokerApp::BrokerApp (core_type ctype, const std::string &argString) : type (ctype)
+BrokerApp::BrokerApp (std::vector<std::string> args) : BrokerApp (core_type::DEFAULT, std::move (args)) {}
+
+BrokerApp::BrokerApp (core_type ctype, int argc, char *argv[])
 {
-    StringToCmdLine cmdargs (argString);
-    loadFromArguments (cmdargs.getArgCount (), cmdargs.getArgV ());
+    auto app = generateParser ();
+    app->setDefaultCoreType (ctype);
+    if (app->helics_parse (argc, argv) == helicsCLI11App::parse_return::ok)
+    {
+        processArgs (app);
+    }
 }
+
+BrokerApp::BrokerApp (int argc, char *argv[]) : BrokerApp (core_type::DEFAULT, argc, argv) {}
+
+BrokerApp::BrokerApp (core_type ctype, const std::string &argString)
+{
+    auto app = generateParser ();
+    app->setDefaultCoreType (ctype);
+    if (app->helics_parse (argString) == helicsCLI11App::parse_return::ok)
+    {
+        processArgs (app);
+    }
+}
+
+BrokerApp::BrokerApp (const std::string &argString) : BrokerApp (core_type::DEFAULT, argString) {}
 
 BrokerApp::~BrokerApp ()
 {
@@ -51,39 +64,25 @@ BrokerApp::~BrokerApp ()
     helics::BrokerFactory::cleanUpBrokers (std::chrono::milliseconds (500));
 }
 
-void BrokerApp::loadFromArguments (int argc, char *argv[])
+std::unique_ptr<helicsCLI11App> BrokerApp::generateParser ()
 {
-    helics::variable_map vm;
-    auto exit_early = helics::argumentParser (argc, argv, vm, InfoArgs);
+    auto app = std::make_unique<helicsCLI11App> ("Broker application");
+    app->addTypeOption ();
+    app->add_option ("--name,-n", name, "name of the broker");
+    app->allow_extras ();
+    auto app_p = app.get ();
+    app->footer ([app_p] () {
+        auto coreType = helics::coreTypeFromString ((*app_p)["--core"]->as<std::string> ());
+        BrokerFactory::displayHelp (coreType);
+        return std::string ();
+    });
+    return app;
+}
 
-    if (exit_early != 0)
-    {
-        if (exit_early == helics::helpReturn)
-        {
-            helics::BrokerFactory::displayHelp ();
-        }
-        else if (exit_early == helics::versionReturn)
-        {
-            std::cout << helics::versionString << '\n';
-        }
-        return;
-    }
-
-    std::string name = (vm.count ("name") > 0) ? vm["name"].as<std::string> () : "";
-    if (vm.count ("coretype") > 0)
-    {
-        try
-        {
-            type = coreTypeFromString (vm["coretype"].as<std::string> ());
-        }
-        catch (std::invalid_argument &ie)
-        {
-            std::cerr << "Unable to generate broker from specified type: " << ie.what () << '\n';
-            throw;
-        }
-    }
-
-    broker = BrokerFactory::create (type, name, argc, argv);
+void BrokerApp::processArgs (std::unique_ptr<helicsCLI11App> &app)
+{
+    auto remArgs = app->remaining_for_passthrough ();
+    broker = BrokerFactory::create (app->getCoreType (), name, remArgs);
     if (!broker->isConnected ())
     {
         throw (ConnectionFailure ("Broker is unable to connect\n"));

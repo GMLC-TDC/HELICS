@@ -20,7 +20,7 @@ class Broker
 {
   public:
     /** Default constructor */
-    Broker () : broker (NULL){};
+    Broker () HELICS_NOTHROW: broker (HELICS_NULL_POINTER){};
 
     Broker (std::string type, std::string name, std::string initString)
     {
@@ -31,7 +31,7 @@ class Broker
         }
     }
 
-    Broker (std::string type, std::string name, int argc, const char **argv)
+    Broker (std::string type, std::string name, int argc, char **argv)
     {
         broker = helicsCreateBrokerFromArgs (type.c_str (), name.c_str (), argc, argv, hThrowOnError ());
     }
@@ -43,21 +43,21 @@ class Broker
         return *this;
     }
 #ifdef HELICS_HAS_RVALUE_REFS
-    Broker (Broker &&brk) noexcept
+    Broker (Broker &&brk) HELICS_NOTHROW
     {
         broker = brk.broker;
-        brk.broker = NULL;
+        brk.broker = HELICS_NULL_POINTER;
     }
-    Broker &operator= (Broker &&brk) noexcept
+    Broker &operator= (Broker &&brk) HELICS_NOTHROW
     {
         broker = brk.broker;
-        brk.broker = NULL;
+        brk.broker = HELICS_NULL_POINTER;
         return *this;
     }
 #endif
     virtual ~Broker ()
     {
-        if (broker != NULL)
+        if (broker != HELICS_NULL_POINTER)
         {
             helicsBrokerFree (broker);
         }

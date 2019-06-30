@@ -19,4 +19,4 @@ Terminology
 
 6)  Interface - a structure by which a federate can communicate with other federates.  Includes Endpoints, Publications, Filters, and Inputs
 
-![image](../img/terminology-structure.png)
+![Example federate hierarchy](../img/terminology-structure.png)

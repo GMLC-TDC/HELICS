@@ -9,7 +9,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "../ActionMessage.hpp"
 #include <algorithm>
 #include <cctype>
-#include <helics_includes/optional.hpp>
+#include "gmlc/containers/extra/optional.hpp"
 #include <iostream>
 #include <memory>
 #include <thread>

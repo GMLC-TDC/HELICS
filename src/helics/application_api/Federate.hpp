@@ -176,15 +176,17 @@ class Federate
     @return the granted time step in a structure containing a return time and an iteration_result*/
     iteration_time requestTimeIterative (Time nextInternalTimeStep, iteration_request iterate);
 
-    /** request a time advancement
+    /**  request a time advancement and return immediately for asynchronous function.
+    @details /ref requestTimeComplete should be called to finish the operation and get the result
     @param nextInternalTimeStep the next requested time step
     */
     void requestTimeAsync (Time nextInternalTimeStep);
 
-    /** request a time advancement
+    /** request a time advancement with iterative call and return for asynchronous function.
+    @details /ref requestTimeIterativeComplete should be called to finish the operation and get the result
     @param nextInternalTimeStep the next requested time step
     @param iterate a requested iteration level (none, require, optional)
-    @return the granted time step*/
+    */
     void requestTimeIterativeAsync (Time nextInternalTimeStep, iteration_request iterate);
 
     /** request a time advancement
@@ -239,7 +241,7 @@ class Federate
     A string indicating the source of the message and another string with the actual message
     */
     void
-    setLoggingCallback (const std::function<void(int, const std::string &, const std::string &)> &logFunction);
+    setLoggingCallback (const std::function<void (int, const std::string &, const std::string &)> &logFunction);
 
     /** make a query of the core
     @details this call is blocking until the value is returned which make take some time depending on the size of

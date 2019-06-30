@@ -1,20 +1,19 @@
-#
+﻿#
 # Copyright © 2017-2019, Battelle Memorial Institute; Lawrence Livermore National
 # Security, LLC; Alliance for Sustainable Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
-#
 # SPDX-License-Identifier: BSD-3-Clause
 #
 
 cmake_minimum_required(VERSION 3.4)
 cmake_policy(VERSION 3.4)
 
-project(HELICS VERSION 2.0.0)
+project(HELICS VERSION 2.1.0)
 
 # -----------------------------------------------------------------------------
 # HELICS Version number
 # -----------------------------------------------------------------------------
 set(HELICS_VERSION_BUILD)
-set(HELICS_DATE "03-10-19")
+set(HELICS_DATE "06-27-19")
 
 set(
     HELICS_VERSION_UNDERSCORE
@@ -38,6 +37,13 @@ set(
 )
 include(extraMacros)
 include(CMakeDependentOption)
+include(copy_key_files)
+
+if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
+	set(HELICS_ROOT_PROJ ON)
+else()
+    set(HELICS_ROOT_PROJ OFF)
+endif()
 # include(BuildType)
 # -----------------------------------------------------------------------------
 # set the install path to a local directory
@@ -62,26 +68,25 @@ if(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
     endif(WIN32)
 endif()
 
-show_variable(
-    AUTOBUILD_INSTALL_PATH
-    PATH
-    "location to install the autobuild libraries and Headers"
-    "${PROJECT_BINARY_DIR}/libs"
-)
-
-mark_as_advanced(AUTOBUILD_INSTALL_PATH)
-
-file(MAKE_DIRECTORY ${PROJECT_BINARY_DIR}/logs)
-
+if (HELICS_ROOT_PROJ)
+if (DEFINED BUILD_TESTING)
+option(BUILD_HELICS_TESTS "Enable the test executables to be built" ${BUILD_TESTING})
+else()
 option(BUILD_HELICS_TESTS "Enable the test executables to be built" ON)
+endif()
+
+option(BUILD_HELICS_BOOST_TESTS "Enable the test executables built using boost unit tests" ON)
+option(BUILD_HELICS_EXAMPLES "Enable the example executables to be built" ON)
+
+else()
+endif()
 # enable testing
 if(BUILD_HELICS_TESTS)
     include(CTest)
-endif(BUILD_HELICS_TESTS)
+endif()
 
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
-option(BUILD_HELICS_EXAMPLES "Enable the example executables to be built" ON)
 
 option(BUILD_PYTHON_INTERFACE "Build Python extension" OFF)
 option(
@@ -156,26 +161,36 @@ add_library(helics_base_includes INTERFACE)
 
 target_link_libraries(helics_base INTERFACE helics_base_includes)
 # Prohibit in-source build
-if("${CMAKE_SOURCE_DIR}" STREQUAL "${CMAKE_BINARY_DIR}")
+if("${PROJECT_SOURCE_DIR}" STREQUAL "${PROJECT_BINARY_DIR}")
     message(
         FATAL_ERROR
             "In-source build is not supported. Please, use an empty directory for building the project."
     )
 endif()
 
-include(compiler_flags)
-message(STATUS "setting version build options to \"${VERSION_OPTION}\"")
-if(VERSION_OPTION)
-    if(MSVC)
-        target_compile_options(helics_base_includes INTERFACE ${VERSION_OPTION})
-    else()
-        target_compile_options(
-            helics_base_includes
-            INTERFACE $<$<COMPILE_LANGUAGE:CXX>:${VERSION_OPTION}>
-        )
-    endif(MSVC)
-endif(VERSION_OPTION)
+if (NOT TARGET compile_flags_target)
+   add_library(compile_flags_target INTERFACE)
+endif()
 
+if (HELICS_ROOT_PROJ)
+	include(compiler_flags)
+	message(STATUS "setting version build options to \"${CXX_STANDARD_FLAG}\"")
+	if(CXX_STANDARD_FLAG)
+		if(MSVC)
+			target_compile_options(helics_base_includes INTERFACE ${CXX_STANDARD_FLAG})
+		else()
+			target_compile_options(
+				helics_base_includes
+				INTERFACE $<$<COMPILE_LANGUAGE:CXX>:${CXX_STANDARD_FLAG}>
+			)
+		endif(MSVC)
+	endif(CXX_STANDARD_FLAG)
+
+endif()
+
+ target_compile_options(helics_base_includes INTERFACE -DENABLE_BOOST_IOSTREAMS)
+
+ if (HELICS_ROOT_PROJ)
 cmake_dependent_option(
     STATIC_STANDARD_LIB
     "Link against a static standard lib"
@@ -200,6 +215,7 @@ if(MSVC)
         ucm_set_embedded_debug(EXTERNAL)
     endif()
 endif(MSVC)
+endif (HELICS_ROOT_PROJ)
 # -------------------------------------------------------------
 # add coverage target
 # -------------------------------------------------------------
@@ -237,14 +253,14 @@ if(BUILD_HELICS_TESTS)
             )
         endif()
     endif(TEST_CODE_COVERAGE)
-endif(BUILD_HELICS_TESTS)
+endif()
 mark_as_advanced(TEST_CODE_COVERAGE)
 
 # -------------------------------------------------------------
 # Get some configuration for C++17 as that becomes available
 # -------------------------------------------------------------
 # message(STATUS ${CMAKE_CXX_FLAGS})
-set(CONFIGURE_TARGET_LOCATION ${AUTOBUILD_INSTALL_PATH}/include/helics/)
+set(CONFIGURE_TARGET_LOCATION ${HELICS_BINARY_DIR}/include/helics/)
 include(configGenerator)
 
 option(GENERATE_DOXYGEN_DOC "Generate Doxygen doc target" OFF)
@@ -260,11 +276,11 @@ if(GENERATE_DOXYGEN_DOC)
             "${PROJECT_BINARY_DIR}/docs"
         )
         configure_file(
-            ${CMAKE_CURRENT_SOURCE_DIR}/config/Doxyfile.in
-            ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile @ONLY
+            ${HELICS_CURRENT_SOURCE_DIR}/config/Doxyfile.in
+            ${HELICS_CURRENT_BINARY_DIR}/Doxyfile @ONLY
         )
         add_custom_target(
-            doc ${DOXYGEN_EXECUTABLE} ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile
+            doc ${DOXYGEN_EXECUTABLE} ${HELICS_CURRENT_BINARY_DIR}/Doxyfile
             WORKING_DIRECTORY ${DOXYGET_OUTPUT_DIR}
             COMMENT "Generating API documentation with Doxygen"
             VERBATIM
@@ -276,31 +292,53 @@ endif(GENERATE_DOXYGEN_DOC)
 # add_definitions(-DWIN32_LEAN_AND_MEAN) endif()
 
 # -------------------------------------------------------------
+# Update git submodules
+# -------------------------------------------------------------
+include(updateGitSubmodules)
+if(NOT EXISTS "${PROJECT_SOURCE_DIR}/ThirdParty/fmtlib/CMakeLists.txt")
+	submod_update(ThirdParty/fmtlib)
+endif()
+
+if(NOT EXISTS "${PROJECT_SOURCE_DIR}/ThirdParty/asio/asio/include/asio.hpp")
+	submod_update(ThirdParty/asio)
+endif()
+
+if(NOT EXISTS "${PROJECT_SOURCE_DIR}/ThirdParty/jsoncpp/CMakeLists.txt")
+	submod_update(ThirdParty/jsoncpp)
+endif()
+
+if(NOT EXISTS "${PROJECT_SOURCE_DIR}/ThirdParty/containers/gmlc/containers/BlockingQueue.hpp")
+	submod_update(ThirdParty/containers)
+endif()
+
+include(GNUInstallDirs)
+
+# -------------------------------------------------------------
 # BOOST  find the boost libraries
 # -------------------------------------------------------------
-set(BOOST_REQUIRED_LIBRARIES program_options filesystem system)
-if(BUILD_TESTING)
-    list(APPEND BOOST_REQUIRED_LIBRARIES unit_test_framework)
-endif()
 include(addBoost)
 
-target_link_libraries(helics_base INTERFACE Boostlibs::core)
+
+option(ENABLE_MPI_CORE "Enable MPI networking library" OFF)
+option(ENABLE_ZMQ_CORE "Enable ZeroMQ networking library" ON)
+option(ENABLE_TCP_CORE "Enable TCP core types" ON)
+option(ENABLE_UDP_CORE "Enable UDP core types" ON)
+option(ENABLE_IPC_CORE "Enable Interprocess communication types" ON)
+option(ENABLE_TEST_CORE "Enable test inprocess core type" ON)
+mark_as_advanced(ENABLE_MPI_CORE ENABLE_ZMQ_CORE ENABLE_TCP_CORE ENABLE_UDP_CORE ENABLE_TEST_CORE ENABLE_IPC_CORE)
+
 # -------------------------------------------------------------
 # finding MPI
 # -------------------------------------------------------------
 
-option(ENABLE_MPI "Enable MPI networking library" OFF)
-if(ENABLE_MPI)
+if(ENABLE_MPI_CORE)
     include(addMPI)
     if(MPI_C_FOUND)
-        set(HELICS_HAVE_MPI TRUE)
         target_link_libraries(helics_base INTERFACE MPI::MPI_C)
     else()
-        message(SEND_ERROR "MPI not found")
+        message(FATAL_ERROR "MPI not found")
     endif(MPI_C_FOUND)
-else(ENABLE_MPI)
-    set(HELICS_HAVE_MPI FALSE)
-endif(ENABLE_MPI)
+endif(ENABLE_MPI_CORE)
 
 # -------------------------------------------------------------
 # add threading support
@@ -321,25 +359,14 @@ if(UNIX AND NOT APPLE)
 endif()
 
 # -------------------------------------------------------------
-# check for some things with TCP core and boost
+# add some additional libraries for MSYS
 # -------------------------------------------------------------
 if(MSYS)
-    if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
-        if(BOOST_VERSION_LEVEL GREATER 65)
-            set(DISABLE_TCP_CORE FALSE)
-            target_link_libraries(helics_base INTERFACE wsock32 ws2_32)
-            set(DISABLE_IPC_CORE TRUE)
-        else()
-            set(DISABLE_TCP_CORE TRUE)
-            message(STATUS, "disabling TCP core |${DISABLE_TCP_CORE}|")
-            target_link_libraries(helics_base INTERFACE ws2_32)
-            set(DISABLE_IPC_CORE FALSE)
-        endif()
-
-    else()
-        target_link_libraries(helics_base INTERFACE wsock32 ws2_32)
+    target_link_libraries(helics_base INTERFACE wsock32 ws2_32)
+	if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+        set(ENABLE_IPC_CORE FALSE)
+		target_compile_definitions(helics_base_includes INTERFACE -DDISABLE_BOOST_IOSTREAMS)
     endif()
-
 endif(MSYS)
 
 # -------------------------------------------------------------
@@ -354,15 +381,14 @@ if(BUILD_DEBUG_ONLY AND BUILD_RELEASE_ONLY)
     )
 endif()
 
-option(ENABLE_ZeroMQ "Enable ZeroMQ networking library" ON)
-mark_as_advanced(ENABLE_ZeroMQ)
+option(ENABLE_ZMQ_CORE "Enable ZeroMQ networking library" ON)
+mark_as_advanced(ENABLE_ZMQ_CORE)
 # If ZeroMQ library is enabled try to locate it and link against it
 
-if(ENABLE_ZeroMQ AND NOT DISABLE_ZMQ_CORE)
+if(ENABLE_ZMQ_CORE)
     include(addZeroMQ)
 
     if(ZeroMQ_FOUND)
-        set(HELICS_HAVE_ZEROMQ TRUE)
         if(ZMQ_USE_STATIC_LIBRARY)
             set(ZeroMQ_DEPENDENCY libzmq-static)
             target_compile_definitions(
@@ -372,15 +398,10 @@ if(ENABLE_ZeroMQ AND NOT DISABLE_ZMQ_CORE)
             set(ZeroMQ_DEPENDENCY libzmq)
         endif()
         # message(STATUS "zmq dep ${ZeroMQ_DEPENDENCY}")
-        target_link_libraries(helics_base INTERFACE ${ZeroMQ_DEPENDENCY})
+	    target_link_libraries(helics_base INTERFACE ${ZeroMQ_DEPENDENCY})
     else(ZeroMQ_FOUND)
-        set(HELICS_HAVE_ZEROMQ FALSE)
+        message(FATAL_ERROR "ZeroMQ not found")
     endif(ZeroMQ_FOUND)
-else(ENABLE_ZeroMQ)
-    set(HELICS_HAVE_ZEROMQ FALSE)
-    if(ENABLE_ZeroMQ)
-        message(SEND_ERROR "ZeroMQ not found")
-    endif()
 endif()
 
 # -------------------------------------------------------------
@@ -390,8 +411,9 @@ target_include_directories(
     helics_base_includes
     INTERFACE
         $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/src>
-        $<BUILD_INTERFACE:${AUTOBUILD_INSTALL_PATH}/include>
+        $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}/include>
         $<INSTALL_INTERFACE:$<INSTALL_PREFIX>/include>
+		$<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/ThirdParty/containers>
 )
 
 target_include_directories(
@@ -401,7 +423,15 @@ target_include_directories(
         $<BUILD_INTERFACE:${Boost_INCLUDE_DIR}>
 )
 
-include(GNUInstallDirs)
+# -------------------------------------------------------------
+# Asio include directories
+# -------------------------------------------------------------
+target_compile_definitions(helics_base_includes INTERFACE "-DASIO_STANDALONE")
+target_include_directories(
+    helics_base_includes SYSTEM
+    INTERFACE
+        $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/ThirdParty/asio/asio/include>
+)
 
 # -------------------------------------------------------------
 # setting the RPATH
@@ -414,10 +444,6 @@ set(CMAKE_SKIP_BUILD_RPATH FALSE)
 set(CMAKE_BUILD_WITH_INSTALL_RPATH FALSE)
 
 set(CMAKE_MACOSX_RPATH ON)
-set(
-    CMAKE_BUILD_RPATH
-    "./;${AUTOBUILD_INSTALL_PATH}/bin;${AUTOBUILD_INSTALL_PATH}/lib;${AUTOBUILD_INSTALL_PATH}/lib64"
-)
 
 # add the automatically determined parts of the RPATH which point to directories
 # outside the build tree to the install RPATH
@@ -450,16 +476,11 @@ if("${isSystemDir}" STREQUAL "-1")
     )
 endif()
 
-if(NOT Boost_USE_STATIC_LIBS)
-    list(APPEND CMAKE_INSTALL_RPATH ${Boost_LIBRARY_DIRS})
-    list(APPEND CMAKE_BUILD_RPATH ${Boost_LIBRARY_DIRS})
-endif()
-
 # add the local directory to the rpath
 list(APPEND CMAKE_INSTALL_RPATH "./")
 
 if(NOT WIN32)
-    if(HELICS_HAVE_ZEROMQ AND NOT ZMQ_USE_STATIC_LIBRARY)
+    if(ENABLE_ZMQ_CORE AND NOT ZMQ_USE_STATIC_LIBRARY)
         get_target_property(zmqlibfile libzmq IMPORTED_LOCATION)
         if(NOT zmqlibfile)
             get_target_property(zmqlibfile libzmq IMPORTED_LOCATION_RELEASE)
@@ -479,26 +500,20 @@ if(NOT WIN32)
 endif()
 
 option(
-    BUILD_APPS
-    "Build helics applications to run various apps, including broker, player, recorder, and helics_apps"
+    BUILD_APP_LIBRARY
+    "Build helics application library (a static library containing objects for broker, player, recorder, and helics_apps"
     ON
 )
 
-file(GLOB KEY_LIBRARY_FILES ${AUTOBUILD_INSTALL_PATH}/bin/*)
-if(ZMQ_USE_STATIC_LIBRARY)
-    # remove the zmq libraries from the key files list if we are using static
-    # zeromq libraries
-    set(NEW_LIST)
-    foreach(keyfile IN LISTS KEY_LIBRARY_FILES)
-        if(keyfile MATCHES "zmq")
-
-        else()
-            list(APPEND NEW_LIST ${keyfile})
-        endif()
-    endforeach()
-    set(KEY_LIBRARY_FILES ${NEW_LIST})
+if (HELICS_ROOT_PROJ)
+option(
+    BUILD_APP_EXECUTABLES
+    "Build helics applications to run various apps, including broker, player, recorder, and helics_apps"
+    ${BUILD_APP_LIBRARY}
+)
+else()
+SET(BUILD_APP_EXECUTABLES OFF)
 endif()
-# message(STATUS "key files ${KEY_LIBRARY_FILES}")
 
 option(ENABLE_LOGGING "enable normal, debug, and trace logging in HELICS" ON)
 
@@ -522,16 +537,28 @@ mark_as_advanced(ENABLE_DEBUG_LOGGING)
 # -----------------------------------------------------------------------------
 # create the fmt header only targets
 # -----------------------------------------------------------------------------
-set(FMT_ASSUME_CPP14_SUPPORT ON)
-set(FMT_SILENT ON)
-# get the FMT header only library
-add_subdirectory(ThirdParty/fmt EXCLUDE_FROM_ALL)
-hide_variable(FMT_DOC)
-hide_variable(FMT_INSTALL)
-hide_variable(FMT_PEDANTIC)
-hide_variable(FMT_TEST)
-hide_variable(FMT_WERROR)
+include(addfmt)
 
+# --------------------------------------------------------------
+#  Create the target for jsoncpp
+# -----------------------------------------------------------
+include(addJsoncpp)
+
+if (JSONCPP_OBJLIB)
+target_include_directories(
+    helics_base_includes SYSTEM
+    INTERFACE
+    $<BUILD_INTERFACE:$<TARGET_PROPERTY:jsoncpp_headers,INTERFACE_INCLUDE_DIRECTORIES>>
+)
+set_target_properties(jsoncppobj_lib PROPERTIES FOLDER Extern)
+else()
+target_include_directories(
+    helics_base_includes SYSTEM
+    INTERFACE
+    $<BUILD_INTERFACE:$<TARGET_PROPERTY:jsoncpp_lib,INTERFACE_INCLUDE_DIRECTORIES>>
+)
+set_target_properties(jsoncpp_lib PROPERTIES FOLDER Extern)
+endif()
 # -----------------------------------------------------------------------------
 # CMAKE Subdirectories
 # -----------------------------------------------------------------------------
@@ -539,10 +566,10 @@ hide_variable(FMT_WERROR)
 add_subdirectory(src)
 
 # -----------------------------------------------------------------------------
-# Setup CTEST environment
+# Build the tests
 # -----------------------------------------------------------------------------
 
-if(BUILD_HELICS_TESTS AND BUILD_TESTING AND NOT DISABLE_TEST_CORE)
+if(BUILD_HELICS_TESTS AND BUILD_TESTING AND ENABLE_TEST_CORE)
     mark_as_advanced(BUILD_TESTING)
     add_subdirectory(tests)
 endif()
@@ -554,26 +581,8 @@ if(BUILD_HELICS_EXAMPLES)
     add_subdirectory(examples)
 endif(BUILD_HELICS_EXAMPLES)
 
-install(
-    FILES ${KEY_LIBRARY_FILES}
-    DESTINATION ${CMAKE_INSTALL_BINDIR}
-    COMPONENT
-    RUNTIME
-)
-
-install(
-    DIRECTORY ${AUTOBUILD_INSTALL_PATH}/lib/
-    DESTINATION ${CMAKE_INSTALL_LIBDIR}/
-    OPTIONAL
-)
-install(
-    DIRECTORY ${AUTOBUILD_INSTALL_PATH}/lib64/
-    DESTINATION ${CMAKE_INSTALL_LIBDIR}/
-    OPTIONAL
-)
-
-if(HELICS_HAVE_ZEROMQ)
-    if(WIN32 AND NOT MSYS)
+if(ENABLE_ZMQ_CORE AND NOT ZMQ_USE_STATIC_LIBRARY)
+    if(WIN32)
         install(
             FILES $<TARGET_LINKER_FILE:libzmq>
             DESTINATION ${CMAKE_INSTALL_LIBDIR}
@@ -585,7 +594,7 @@ endif()
 # -------------------------------------------------------------
 # Enable clang analysis and formatting tools
 # -------------------------------------------------------------
-
+if (HELICS_ROOT_PROJ)
 option(
     ENABLE_CLANG_TOOLS
     "if clang is found enable some custom targets for clang formatting and tidy"
@@ -600,11 +609,21 @@ if(INTERFACE_BUILD)
     add_subdirectory(interfaces)
 endif()
 
+# add base swig interface files as install option, regardless of current interfaces built
+install(
+    FILES interfaces/helics.i interfaces/output.i
+    DESTINATION ${CMAKE_INSTALL_DATADIR}/helics/swig
+    COMPONENT swig
+)
+
+
 add_subdirectory(docs)
+
+endif(HELICS_ROOT_PROJ)
 
 install(TARGETS helics_base EXPORT helics-targets)
 install(TARGETS helics_base_includes EXPORT helics-targets)
-
+install(TARGETS compile_flags_target EXPORT helics-targets)
 set(
     helics_static_file
     "${CMAKE_STATIC_LIBRARY_PREFIX}helics-static${CMAKE_STATIC_LIBRARY_SUFFIX}"
@@ -648,6 +667,15 @@ set(
 )
 mark_as_advanced(HELICS_CMAKECONFIG_INSTALL_DIR)
 
+# Copy required CMake module files to build tree for importing build tree with find_package
+file(COPY config/cmake/addMPI.cmake config/cmake/FindZeroMQ.cmake DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+
+# Export targets for importing build tree with find_package
+export(EXPORT helics-targets
+    NAMESPACE HELICS::
+    FILE ${PROJECT_BINARY_DIR}/helics-targets.cmake
+)
+
 install(
     EXPORT helics-targets
     NAMESPACE HELICS::
@@ -660,27 +688,42 @@ install(
 # -----------------------------------------------------------------------------
 configure_file(
     "config/helics-config.h.in"
-    "${AUTOBUILD_INSTALL_PATH}/include/helics/helics-config.h"
+    "${HELICS_BINARY_DIR}/include/helics/helics-config.h"
 )
 install(
-    FILES ${AUTOBUILD_INSTALL_PATH}/include/helics/helics-config.h
+    FILES ${HELICS_BINARY_DIR}/include/helics/helics-config.h
     DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/helics
     COMPONENT headers
 )
 install(
-    FILES ${AUTOBUILD_INSTALL_PATH}/include/helics/compiler-config.h
+    FILES ${HELICS_BINARY_DIR}/include/helics/compiler-config.h
     DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/helics
-    COMPONENT headers
-)
-install(
-    DIRECTORY ThirdParty/cereal
-    DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
     COMPONENT headers
 )
 
+option(HELICS_INSTALL_CEREAL "Install a copy of the cereal headers used for compiling and a CMake target to include them" ${MSVC})
+
+mark_as_advanced(HELICS_INSTALL_CEREAL)
+
+if (HELICS_INSTALL_CEREAL)
 install(
-    DIRECTORY ThirdParty/helics_includes
-    DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+    DIRECTORY ThirdParty/cereal
+    DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/helics/external/optional
+    COMPONENT cereal
+)
+add_library(cereal INTERFACE)
+add_library(HELICS::cereal ALIAS cereal)
+target_include_directories(cereal
+    INTERFACE
+        $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/ThirdParty>
+        $<INSTALL_INTERFACE:$<INSTALL_PREFIX>/include/helics/external/optional>
+)
+install(TARGETS cereal EXPORT helics-targets COMPONENT cereal)
+endif()
+
+install(
+    DIRECTORY ThirdParty/helics/external
+    DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/helics
     COMPONENT headers
 )
 
@@ -698,6 +741,11 @@ write_basic_package_version_file(
     COMPATIBILITY SameMajorVersion
 )
 
+if (NOT HELICS_ROOT_PROJ)
+	set_target_properties(helics_apps PROPERTIES FOLDER helics)
+	set_target_properties(application_api helics_common helics_core helics-static PROPERTIES FOLDER helics)
+endif()
+
 install(
     FILES
         ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake
@@ -710,15 +758,13 @@ install(
     FILES
         config/cmake/addMPI.cmake
         config/cmake/FindZeroMQ.cmake
-        config/cmake/addBoost.cmake
-        config/cmake/extraMacros.cmake
     DESTINATION ${HELICS_CMAKECONFIG_INSTALL_DIR}
     COMPONENT libs
 )
 
 install(
-    FILES LICENSE NOTICE
-    DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+    FILES LICENSE NOTICE CHANGELOG.md README.md
+    DESTINATION ${CMAKE_INSTALL_DOCDIR}
     COMPONENT libs
 )
 # -------------------------------------------------------------
@@ -730,6 +776,14 @@ option(
 )
 
 if(ENABLE_PACKAGE_BUILD)
+
+	if(CMAKE_VERSION VERSION_LESS 3.13)
+		if (ZMQ_SUBPROJECT OR ZMQ_FORCE_SUBPROJECT)
+			if (ENABLE_ZMQ_CORE)
+				message(FATAL_ERROR "CMAKE 3.13 or higher is required to package a subproject of ZeroMQ with HELICS")
+			endif()
+		endif()
+	endif()
     set(CPACK_PACKAGE_NAME "Helics")
     set(CPACK_PACKAGE_VENDOR "GMLC")
     set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "HELICS")
@@ -744,17 +798,19 @@ if(ENABLE_PACKAGE_BUILD)
         applications
         headers
         libs
-        runtime
+        Runtime
         matlab
         python
         java
         octave
         csharp
+	swig
+        cereal
     )
     if(WIN32)
-        set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_SOURCE_DIR}\\\\LICENSE")
+        set(CPACK_RESOURCE_FILE_LICENSE "${HELICS_SOURCE_DIR}\\\\LICENSE")
     else(WIN32)
-        set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_SOURCE_DIR}/LICENSE")
+        set(CPACK_RESOURCE_FILE_LICENSE "${HELICS_SOURCE_DIR}/LICENSE")
     endif(WIN32)
 
     set(CPACK_COMPONENT_APPLICATIONS_DISPLAY_NAME "Application")
@@ -781,7 +837,8 @@ if(ENABLE_PACKAGE_BUILD)
         "Headers for linking and compiling with HELICS"
     )
     set(CPACK_COMPONENT_RUNTIME_DESCRIPTION "Runtime libraries for HELICS")
-
+    set(CPACK_COMPONENT_CEREAL_DESCRIPTION "cereal C++11 serialization library [no support for other language interfaces]")
+    set(CPACK_COMPONENT_SWIG_DESCRIPTION "Basic swig interface files for HELICS for building 3rd party language interfaces")
     set(
         CPACK_COMPONENT_GROUP_INTERFACES_DESCRIPTION
         "additional language interfaces for HELICS"
@@ -809,13 +866,13 @@ if(ENABLE_PACKAGE_BUILD)
     if(WIN32)
         set(
             CPACK_PACKAGE_ICON
-            "${CMAKE_SOURCE_DIR}\\\\docs\\\\img\\\\HELICS.ico"
+            "${HELICS_SOURCE_DIR}\\\\docs\\\\img\\\\HELICS.ico"
         )
-        set(CPACK_NSIS_MUI_ICON "${CMAKE_SOURCE_DIR}/docs/img/HELICS.ico")
+        set(CPACK_NSIS_MUI_ICON "${HELICS_SOURCE_DIR}/docs/img/HELICS.ico")
         set(CPACK_NSIS_INSTALL_ROOT "C:\\\\local")
         set(
             CPACK_NSIS_URL_INFO_ABOUT
-            "https://www.github.com/GMLC-TDC/Helics-src"
+	    "https://www.github.com/GMLC-TDC/HELICS"
         )
         set(CPACK_NSIS_HELP_LINK "https://helics.readthedocs.io/en/latest")
         set(CPACK_NSIS_CONTACT "helicsteam@helics.org")
@@ -825,7 +882,7 @@ if(ENABLE_PACKAGE_BUILD)
         set(CPACK_NSIS_EXECUTABLES_DIRECTORY ${CMAKE_INSTALL_BINDIR})
         set(
             CPACK_NSIS_MENU_LINKS
-            "https://www.github.com/GMLC-TDC/Helics-src"
+	    "https://www.github.com/GMLC-TDC/HELICS"
             "HELICS Github"
             "https://helics.readthedocs.io/en/latest"
             "Helics Documentation"
@@ -835,17 +892,17 @@ if(ENABLE_PACKAGE_BUILD)
             "TDC YouTube channel"
         )
     else(WIN32)
-        set(CPACK_PACKAGE_ICON "${CMAKE_SOURCE_DIR}/docs/img/HELICS.ico")
+        set(CPACK_PACKAGE_ICON "${HELICS_SOURCE_DIR}/docs/img/HELICS.ico")
     endif(WIN32)
 
     if(APPLE)
         set(CPACK_BUNDLE_NAME "libhelics")
         configure_file(
-            "${PROJECT_SOURCE_DIR}/config/Info.plist.in"
+            "${HELICS_SOURCE_DIR}/config/Info.plist.in"
             "${CMAKE_CURRENT_BINARY_DIR}/Info.plist" @ONLY
         )
         set(CPACK_BUNDLE_PLIST "${CMAKE_CURRENT_BINARY_DIR}/Info.plist")
-        set(CPACK_BUNDLE_ICON "${PROJECT_SOURCE_DIR}/docs/img/HELICS.ico")
+        set(CPACK_BUNDLE_ICON "${HELICS_SOURCE_DIR}/docs/img/HELICS.ico")
     endif(APPLE)
 
     set(CPACK_SOURCE_IGNORE_FILES "/Build*/;/build*/;/.git/")

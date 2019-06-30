@@ -1,7 +1,7 @@
 # Timing #
 The [section on federates](./federates.md) addressed the data-exchange responsibility of the co-simulation platform and this will address the timing and synchronization requirements. These two functions work hand-in-hand; for data-exchange between federates to be productive it must be delivered to each federate at the appropriate time. Co-simulation breaks down if federates are simulating different times (e.g. noon for one, 9am for another) and exchanging data as if they were operating at the same time; the system is no longer coherent.
 
-As discussed in the [section providing the overview of co-simulation operation](./helics_co_sim_sequence.md) the primary mechanism HELICS uses to regulate the time of the individual federates (and thus the federation as a whole), is an iterative process of a federate requesting a simulated time to which it can advance and being granted that time (or another) by the federate's associated HELICS core. For example, a power system simulator may be ready to simulate the next second of operation and once its HELICS core has determined it is appropriate, it will grant the power system simulator that time.
+As discussed in the [section providing the overview of co-simulation operation](./helics_co-sim_sequence.md) the primary mechanism HELICS uses to regulate the time of the individual federates (and thus the federation as a whole), is an iterative process of a federate requesting a simulated time to which it can advance and being granted that time (or another) by the federate's associated HELICS core. For example, a power system simulator may be ready to simulate the next second of operation and once its HELICS core has determined it is appropriate, it will grant the power system simulator that time.
 
 To be clear, it is the role of each federate to determine which time it should request and it is the job of those integrating the simulator with HELICS to determine how best to estimate that value. For simulators that have no internal mechanisms for changing state (e.g. a power system at steady-state whose loads are time-invariant), a time request for infinity is made. (Technically, the value is a constant called `maxTime` which equals 1e12 seconds.). Until an input value changes, these federates have nothing to do and request that they are not granted a time until the co-simulation reaches a conclusion.  If, instead of static load shapes that same simulator was using hourly load profiles, it would make more sense for the federate to make time requests in one-hour increments.
 
@@ -18,12 +18,13 @@ The same JSON configuration file used to set the publications, subscriptions, an
 
 ```
 { 
-"name":"generic_federate", 
-...
-"uninterruptible":false,
-"period":  1.0,
-"offset": 0.0,
-...
+  "name":"generic_federate", 
+  ...
+  "uninterruptible":false,
+  "period":  1.0,
+  "offset": 0.0,
+  ...
+}
 ```
 * **uninterruptible [false]** - Normally, a federate will be granted a time earlier than it requested when it receives a message from another federate; the presence of any message implies there could be an action the federate needs to take and may generate new messages of its own. There are times, though, when it is important that the federate only be granted a time (and begin simulating/executing again) that it has previously requested. For example, there could be some controller that should only operate at fixed intervals even if new data arrives earlier. In these cases, setting the `uninterruptible` flag to `true` will prevent premature time grants.
 
@@ -51,7 +52,7 @@ Just for the purposes of illustration, let's suppose that a co-simulation federa
 
 Below is a timing diagram showing how these federates interact during a co-simulation. The filled blocks show when each federate has been woken up and is active.
 
-![Example timing diagram](../img/helics_timing_example.pdf)
+![Example timing diagram](../img/helics_timing_example.png)
 
 Items of notes:
 

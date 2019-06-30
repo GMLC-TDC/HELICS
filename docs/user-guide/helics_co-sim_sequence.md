@@ -4,68 +4,68 @@ As a co-simulation is, in some sense, a simulation of simulations, there are two
 
 1. **Co-simulation design** - This isn't really a part of the co-simulation execution but is a step often overlooked. As a user, it will be up to you to understand the assumptions, modeling techniques, and dynamics of the simulators you are going to be tying together via HELICS. Using that knowledge you'll have to define the message topology (who is passing what information to whom) and the broker topology (which federates are connected to which brokers). The former is a matter of understanding the interactions of the system the simulators are trying to replicate and identifying the boundary conditions where they could exchange data. The later is somewhat optional (you can run a co-simulation with just a single broker) but offers an increase in performance if it is possible to identify groups of federates that interact often with each other but rarely with the rest of the federation. In such cases, assigning that group of federates their own broker will remove the congestion their messages cause with the federation as a whole.
  
-  Using our example of an integrated transmission and distribution powerflow, its easy to think of each distribution circuit acting as a load on the transmission system and the transmission system, since most (sometimes all) of the generation is directly attached to it, acting as the supplier of energy for the distribution systems. Our co-simulation design, then, defines that the transmission system will provide voltages to the distribution system (as a result of solving its powerflow) and the distribution system will provide load values to the transmission system after using the provided voltages as their substation voltage and solving their powerflow. 
-  
-  If you're familiar with transmission and distribution system simulation tools, you might have already realized that there is a bit of a mis-match in how those tools operate that creates a small problem in our design: typically transmission system solvers assuming a balanced (positive-sequence only) network while distribution systems are often more comprehensive and model all three phases and support imbalanced operation. This implies that the voltages being supplied to the distribution system will always be balanced and only the positive-sequence component of the distribution system load can be used by the transmission system. When defining the values that will be sent as messages between federates, it is important that these modeling differences be taken into account.
-  
-  Given the fact that only two federates are being used (the minimum number to be a co-simulation, though HELICS itself works just fine with a single federate), only a single broker is required.
+	Using our example of an integrated transmission and distribution powerflow, its easy to think of each distribution circuit acting as a load on the transmission system and the transmission system, since most (sometimes all) of the generation is directly attached to it, acting as the supplier of energy for the distribution systems. Our co-simulation design, then, defines that the transmission system will provide voltages to the distribution system (as a result of solving its powerflow) and the distribution system will provide load values to the transmission system after using the provided voltages as their substation voltage and solving their powerflow. 
+		
+	If you're familiar with transmission and distribution system simulation tools, you might have already realized that there is a bit of a mis-match in how those tools operate that creates a small problem in our design: typically transmission system solvers assuming a balanced (positive-sequence only) network while distribution systems are often more comprehensive and model all three phases and support imbalanced operation. This implies that the voltages being supplied to the distribution system will always be balanced and only the positive-sequence component of the distribution system load can be used by the transmission system. When defining the values that will be sent as messages between federates, it is important that these modeling differences be taken into account.
+		
+	Given the fact that only two federates are being used (the minimum number to be a co-simulation, though HELICS itself works just fine with a single federate), only a single broker is required.
 
-![message topology 1](../img/ditl_message_topology.png)
+	![Transmission distribution co-simulation message topology](../img/ditl_message_topology.png)
 
-![broker topology 1](../img/ditl_broker_topology.png)
+	![Transmission distribution co-simulation broker topology](../img/ditl_broker_topology.png)
 
 2. **Configure the federates** - Every federate (instance of a simulator) will require configuration so that it correctly integrates with the federation. For simulators that already have HELICS support, the configuration takes the form of a JSON (or TOML) file; for simulators you might be integrating, the configuration can be done programmatically in code or via a JSON file as well. The essential information that HELICS configuration defines is:
   
-  *Federate name* - The unique name this federate will be known as throughout the federation. It is essential this name is unique so that HELICS messages can route properly.
-  
-  *Core type* - The core manages interface between the federation and the federate; there are several messaging technologies supported by HELICS. All federates in the same federation must have the same core type(this requirement will be relaxed in the future).
-  
-  *Outputs and Inputs* - Output configuration contains a listing of messages, data types, and units being sent by this federate; input configuration does the same for values being received by the federate. If supported by the simulator these values can be mapped to internal variables of the simulator from the configuration file. This is discussed in a [later section](./value_federates.md) on value messages in HELICS.
-  
-  *Endpoints* - Endpoints are sending and receiving points for HELICS messages to and from message federates. They are declared and defined for each federate. Endpoints are further discussed in a [later section](./message_federates.md).
-  
-  *Time step size* - This value defines the resolution of the simulator to prevent HELICS from telling the simulator to run to a time that is has no concept of (e.g. trying to simulate the time of 1.5 seconds when the simulator has a resolution of one second). Configuration of the timing is further discussed in the a later [section on timing](./timing.md).
+	*Federate name* - The unique name this federate will be known as throughout the federation. It is essential this name is unique so that HELICS messages can route properly.
+		
+	*Core type* - The core manages interface between the federation and the federate; there are several messaging technologies supported by HELICS. All federates in the same federation must have the same core type(this requirement will be relaxed in the future).
+		
+	*Outputs and Inputs* - Output configuration contains a listing of messages, data types, and units being sent by this federate; input configuration does the same for values being received by the federate. If supported by the simulator these values can be mapped to internal variables of the simulator from the configuration file. This is discussed in a [later section](./value_federates.md) on value messages in HELICS.
+		
+	*Endpoints* - Endpoints are sending and receiving points for HELICS messages to and from message federates. They are declared and defined for each federate. Endpoints are further discussed in a [later section](./message_federates.md).
+		
+	*Time step size* - This value defines the resolution of the simulator to prevent HELICS from telling the simulator to run to a time that is has no concept of (e.g. trying to simulate the time of 1.5 seconds when the simulator has a resolution of one second). Configuration of the timing is further discussed in the a later [section on timing](./timing.md).
 
-  
-  Below is an example of how a very generic configuration for the transmission federate could look followed by one for the distribution federate.
-  
-  ```JSON
-  { 
-  	"name":"transmission_federate",
-  	"coreType":"ZMQ"
-  	"publications":[
-    {
-    	"key":"transmission_voltages", 
- 		"type":"double", 
- 		"unit":"V",  
-	}],
-	"subscriptions":[
-	{
-		"key":"distribution_federate/distribution_load", 
- 		"type":"double", 
- 		"required":true 
-	}],
-  }
-  ```
-  
-  ```JSON
-  { 
-  	"name":"distribution_federate",
-  	"coreType":"ZMQ"
-  	"publications":[
-    {
-    	"key":"distribution_loads", 
- 		"type":"double", 
- 		"unit":"W",  
-	}],
-	"subscriptions":[
-	{
-		"key":"transmission_federate/transmission_voltages", 
- 		"type":"double", 
- 		"required":true 
-	}],
-  }
-  ```
+		
+	Below is an example of how a very generic configuration for the transmission federate could look followed by one for the distribution federate.
+		
+	```JSON
+	{ 
+		"name":"transmission_federate",
+		"coreType":"ZMQ"
+		"publications":[
+		{
+			"key":"transmission_voltages", 
+			"type":"double", 
+			"unit":"V",  
+		}],
+		"subscriptions":[
+		{
+			"key":"distribution_federate/distribution_load", 
+			"type":"double", 
+			"required":true 
+		}],
+	}
+	```
+		
+	```JSON
+	{ 
+		"name":"distribution_federate",
+		"coreType":"ZMQ"
+		"publications":[
+		{
+			"key":"distribution_loads", 
+			"type":"double", 
+			"unit":"W",  
+		}],
+		"subscriptions":[
+		{
+			"key":"transmission_federate/transmission_voltages", 
+			"type":"double", 
+			"required":true 
+		}],
+	}
+	```
 
 3. **Launch co-simulation/Initialize federates** - This will create the federates as entities recognized by the broker, set-up the communication channels for their messages to be passed, pass some initial messages and execute some preliminary code as preparation for the beginning of the co-simulation proper. The later is particularly important if the various federates need to reach a self-consistent state as an initial condition of the system. 
 

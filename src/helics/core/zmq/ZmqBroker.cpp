@@ -31,8 +31,6 @@ bool ZmqBroker::brokerConnect ()
     return NetworkBroker::brokerConnect ();
 }
 
-void ZmqBroker::displayHelp (bool localOnly) { NetworkBroker::displayHelp (localOnly); }
-
 ZmqBrokerSS::ZmqBrokerSS (bool rootBroker) noexcept : NetworkBroker (rootBroker)
 {
     netInfo.server_mode = NetworkBrokerData::server_mode_options::server_active;
@@ -48,8 +46,6 @@ bool ZmqBrokerSS::brokerConnect ()
     ZmqContextManager::startContext ();
     return NetworkBroker::brokerConnect ();
 }
-
-void ZmqBrokerSS::displayHelp (bool localOnly) { NetworkBroker::displayHelp (localOnly); }
 
 }  // namespace zeromq
 }  // namespace helics

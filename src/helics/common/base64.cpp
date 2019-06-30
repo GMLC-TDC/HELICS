@@ -36,7 +36,7 @@ static inline bool is_base64 (unsigned char c) { return (b64Map[c] < 0xFF); }
 std::string base64_encode (unsigned char const *bytes_to_encode, int32_t in_len)
 {
     std::string ret;
-    ret.reserve ((in_len * 4) / 3 + 2);
+    ret.reserve ((static_cast<size_t>(in_len) * 4) / 3 + 2);
     int ii = 0;
     unsigned char char_array_3[3];
     unsigned char char_array_4[4];

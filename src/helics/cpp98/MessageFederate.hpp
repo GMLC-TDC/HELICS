@@ -29,7 +29,7 @@ class MessageFederate : public virtual Federate
     }
 
     // Default constructor, not meant to be used
-    MessageFederate () {}
+    MessageFederate () HELICS_NOTHROW {}
 
     /** Methods for registering endpoints **/
     Endpoint registerEndpoint (const std::string &name, const std::string &type = std::string ())

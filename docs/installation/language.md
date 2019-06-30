@@ -65,22 +65,22 @@ Out[2]: 'x.x.x (XX-XX-XX)'
 ## HELICS with GCC and Python3
 
 First you will need to build boost using gcc from source. Download
-[boost](http://www.boost.org/users/history/version_1_64_0.html) from the
+[boost](http://www.boost.org/users/history/version_1_70_0.html) from the
 boost.org website.
 
-Unzip the folder boost\_1\_64\_0 to any location, for example Downloads.
+Unzip the folder boost\_1\_70\_0 to any location, for example Downloads.
 
 ```bash
-$ cd ~/Downloads/boost_1_64_0
+$ cd ~/Downloads/boost_1_70_0
 $ ./bootstrap.sh --with-python=/Users/$USER/miniconda3/python3 --prefix=/usr/local/Cellar/gcc/7.2.0_1/bin/gcc-7
-$ ./bootstrap.sh --prefix=/ --prefix=/Users/$USER/local/boost-gcc-1.64
+$ ./bootstrap.sh --prefix=/ --prefix=/Users/$USER/local/boost-gcc-1.70
 $ ./b2
 $ ./b2 install
 $ # OR
 $ ./bjam cxxflags='-fPIC' cflags='-fPIC' -a link=static install # For static linking
 ```
 
-This will install boost in the `~/local/boost-gcc-1.64` folder
+This will install boost in the `~/local/boost-gcc-1.70` folder
 
 Next, you will need to build HELICS and tell it what the BOOST\_ROOT is.
 
@@ -94,8 +94,8 @@ $ make clean; make -j 4; make install
 To install HELICS with MATLAB support, you will need to add `BUILD_MATLAB_INTERFACE=ON`.
 
 ```
-git clone https://github.com/GMLC-TDC/HELICS-src
-cd HELICS-src
+git clone https://github.com/GMLC-TDC/HELICS
+cd HELICS
 mkdir build
 cd build
 cmake -DBUILD_MATLAB_INTERFACE=ON -DCMAKE_INSTALL_PREFIX=/Users/$(whoami)/local/helics-develop/ ..
@@ -158,7 +158,7 @@ To do that, you can follow the following instructions.
 Alternatively, you wish to build the MATLAB interface without using CMake, and you can do the following.
 
 ```bash
-cd ~/GitRepos/GMLC-TDC/HELICS-src/swig/
+cd ~/GitRepos/GMLC-TDC/HELICS/swig/
 mex -I../src/helics/shared_api_library ./matlab/helics_wrap.cxx -lhelicsSharedLib -L/path/to/helics_install/lib/helics/
 mv helicsMEX.* matlab/
 ```
@@ -170,8 +170,8 @@ The above instructions will have to be modified slightly to support Windows,  CM
 To install HELICS with Octave support, you will need to add `BUILD_OCTAVE_INTERFACE=ON`.
 
 ```
-git clone https://github.com/GMLC-TDC/HELICS-src
-cd HELICS-src
+git clone https://github.com/GMLC-TDC/HELICS
+cd HELICS
 mkdir build
 cd build
 cmake -DBUILD_OCTAVE_INTERFACE=ON -DCMAKE_INSTALL_PREFIX=/Users/$(whoami)/local/helics-develop/ ..
@@ -188,5 +188,5 @@ ans = x.x.x (XX-XX-XX)
 
 #### Notes
 At present the interface to octave is experimental,  the testing is limited and not all functions are likely to have a clean interface, this will improve over time.
-Octave 4.2 will require swig 3.0.12,  Octave 4.4 will require the develop branch of swig.  The Octave interface has built and run smoothly on Linux systems, and run through some limited trials.
+Octave 4.2 will require swig 3.0.12,  Octave 4.4 will require swig 4.0 or higher.  The Octave interface has built and run smoothly on Linux systems.
 On windows system the octave interface is not that reliable to build, while it has worked it hasn't been that smooth of process and has required some hacks to get it to work.  More work is likely needed.

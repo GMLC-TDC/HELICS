@@ -16,12 +16,14 @@ set(
   QueryTests.cpp
   heat-transfer-tests.cpp
   flagTests.cpp
+  updateTests.cpp
+  networkTests.cpp
   ../application_api/testFixtures.cpp
   ../application_api/testFixtures.hpp
 )
 
 add_executable(system-tests ${system_test_sources} ${system_test_headers})
-target_link_libraries(system-tests helics-static helics_test_base)
+target_link_libraries(system-tests helics-static helics_boost_test_base)
 
 set_target_properties(system-tests PROPERTIES FOLDER tests)
 
@@ -52,16 +54,4 @@ add_test(
 )
 set_property(TEST system-ci-tests PROPERTY LABELS Continuous Valgrind)
 
-foreach(keyfile IN LISTS KEY_LIBRARY_FILES)
-  add_custom_command(
-    TARGET
-    system-tests
-    POST_BUILD # Adds a post-build event to api tests
-    COMMAND
-      ${CMAKE_COMMAND}
-      -E
-      copy_if_different # which executes "cmake - E copy_if_different..."
-      "${keyfile}" # <--this is in-file
-      "$<TARGET_FILE_DIR:system-tests>/"
-  ) # <--this is out-file path
-endforeach(keyfile)
+copy_key_files_to_target_location(system-tests)

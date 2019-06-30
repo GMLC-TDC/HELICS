@@ -1,0 +1,18 @@
+[submodule "ThirdParty/asio"]
+	path = ThirdParty/asio
+	url = https://github.com/chriskohlhoff/asio
+[submodule "ThirdParty/jsoncpp"]
+	path = ThirdParty/jsoncpp
+	url = https://github.com/phlptp/jsoncpp.git
+	branch = fix_jsoncpp_shadow_warnings
+[submodule "ThirdParty/fmtlib"]
+	path = ThirdParty/fmtlib
+	url = https://github.com/fmtlib/fmt.git
+[submodule "ThirdParty/googletest"]
+	path = ThirdParty/googletest
+	url = ../../google/googletest.git
+	branch = master
+[submodule "ThirdParty/containers"]
+	path = ThirdParty/containers
+	url = https://github.com/GMLC-TDC/containers.git
+	branch = master

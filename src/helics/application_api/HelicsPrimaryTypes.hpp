@@ -9,10 +9,10 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "ValueConverter.hpp"
 #include "helics/helics-config.h"
 #include "helicsTypes.hpp"
+#include "helics/external/variant.hpp"
 #include <cmath>
 #include <complex>
 #include <cstdint>
-#include <helics_includes/variant.hpp>
 #include <string>
 #include <vector>
 /** @file
@@ -127,16 +127,7 @@ valueExtract (const defV &dv, X &val)
         break;
     case string_loc:  // string
     default:
-        if
-            IF_CONSTEXPR (std::is_integral<X>::value)
-            {
-                val = static_cast<X> (std::stoll (mpark::get<std::string> (dv)));
-            }
-        else
-        {
-            val = static_cast<X> (std::stod (mpark::get<std::string> (dv)));
-        }
-
+        val = static_cast<X> (getDoubleFromString (mpark::get<std::string> (dv)));
         break;
     case complex_loc:  // complex
         val = static_cast<X> (std::abs (mpark::get<std::complex<double>> (dv)));

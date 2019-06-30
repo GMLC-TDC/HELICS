@@ -5,13 +5,19 @@ the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 #include <boost/test/unit_test.hpp>
-#include <boost/filesystem.hpp>
 #include <boost/test/data/test_case.hpp>
+
+#ifdef _MSC_VER
+#pragma warning(push, 0)
+#include "helics/external/filesystem.hpp"
+#pragma warning(pop)
+#else
+#include "helics/external/filesystem.hpp"
+#endif
 
 #include "exeTestHelper.h"
 #include "helics/application_api/Publications.hpp"
 #include "helics/apps/Recorder.hpp"
-#include "helics/common/stringToCmdLine.h"
 #include "helics/core/BrokerFactory.hpp"
 #include <cstdio>
 #include <future>
@@ -47,7 +53,7 @@ BOOST_AUTO_TEST_CASE (simple_recorder_test)
     fut.get ();
     rec1.finalize ();
     auto cnt = rec1.pointCount ();
-    BOOST_CHECK_EQUAL (cnt, 2);
+    BOOST_CHECK_EQUAL (cnt, 2u);
 }
 
 BOOST_AUTO_TEST_CASE (simple_recorder_test2)
@@ -116,7 +122,7 @@ BOOST_AUTO_TEST_CASE (recorder_test_message)
 
     mfed.finalize ();
     fut.get ();
-    BOOST_CHECK_EQUAL (rec1.messageCount (), 2);
+    BOOST_CHECK_EQUAL (rec1.messageCount (), 2u);
 
     auto m = rec1.getMessage (0);
     BOOST_CHECK_EQUAL (m->data.to_string (), "this is a test message");
@@ -162,7 +168,7 @@ BOOST_DATA_TEST_CASE (simple_recorder_test_files, boost::unit_test::data::make (
     vfed.finalize ();
     fut.get ();
     rec1.finalize ();
-    BOOST_CHECK_EQUAL (rec1.pointCount (), 4);
+    BOOST_CHECK_EQUAL (rec1.pointCount (), 4u);
     auto v1 = rec1.getValue (0);
     BOOST_CHECK_EQUAL (v1.first, "pub1");
     BOOST_CHECK_EQUAL (v1.second, std::to_string (3.4));
@@ -223,8 +229,8 @@ BOOST_DATA_TEST_CASE (simple_recorder_test_message_files,
     cfed.finalize ();
     fut.get ();
     rec1.finalize ();
-    BOOST_CHECK_EQUAL (rec1.pointCount (), 4);
-    BOOST_CHECK_EQUAL (rec1.messageCount (), 2);
+    BOOST_CHECK_EQUAL (rec1.pointCount (), 4u);
+    BOOST_CHECK_EQUAL (rec1.messageCount (), 2u);
 
     auto v1 = rec1.getValue (0);
     BOOST_CHECK_EQUAL (v1.first, "pub1");
@@ -246,6 +252,7 @@ BOOST_DATA_TEST_CASE (simple_recorder_test_message_files,
     BOOST_CHECK_EQUAL (m->data.to_string (), "this is a test message2");
 }
 
+#ifdef ENABLE_IPC_CORE
 BOOST_DATA_TEST_CASE (simple_recorder_test_message_files_cmd,
                       boost::unit_test::data::make (simple_message_files),
                       file)
@@ -255,12 +262,18 @@ BOOST_DATA_TEST_CASE (simple_recorder_test_message_files_cmd,
     brk->connect ();
     std::string exampleFile = std::string (TEST_DIR) + file;
 
-    StringToCmdLine cmdArg ("--name=rec --broker=ipc_broker --coretype=ipc " + exampleFile);
+    std::vector<std::string> args{"", "--name=rec", "--broker=ipc_broker", "--coretype=ipc", exampleFile};
+    char *argv[5];
+    argv[0] = &(args[0][0]);
+    argv[1] = &(args[1][0]);
+    argv[2] = &(args[2][0]);
+    argv[3] = &(args[3][0]);
+    argv[4] = &(args[4][0]);
 
-    helics::apps::Recorder rec1 (cmdArg.getArgCount (), cmdArg.getArgV ());
+    helics::apps::Recorder rec1 (5, argv);
 
     helics::FederateInfo fi (helics::core_type::IPC);
-    fi.coreInitString = "1 --broker=ipc_broker";
+    fi.coreInitString = "-f 1 --broker=ipc_broker";
 
     helics::CombinationFederate cfed ("obj", fi);
     helics::Publication pub1 (helics::GLOBAL, &cfed, "pub1", helics::data_type::helics_double);
@@ -293,8 +306,8 @@ BOOST_DATA_TEST_CASE (simple_recorder_test_message_files_cmd,
     cfed.finalize ();
     fut.get ();
     rec1.finalize ();
-    BOOST_CHECK_EQUAL (rec1.pointCount (), 4);
-    BOOST_CHECK_EQUAL (rec1.messageCount (), 2);
+    BOOST_CHECK_EQUAL (rec1.pointCount (), 4u);
+    BOOST_CHECK_EQUAL (rec1.messageCount (), 2u);
 
     auto v1 = rec1.getValue (0);
     BOOST_CHECK_EQUAL (v1.first, "pub1");
@@ -316,6 +329,7 @@ BOOST_DATA_TEST_CASE (simple_recorder_test_message_files_cmd,
     BOOST_CHECK_EQUAL (m->data.to_string (), "this is a test message2");
     std::this_thread::sleep_for (std::chrono::milliseconds (500));
 }
+#endif
 
 BOOST_AUTO_TEST_CASE (recorder_test_destendpoint_clone)
 {
@@ -357,7 +371,7 @@ BOOST_AUTO_TEST_CASE (recorder_test_destendpoint_clone)
     mfed.finalize ();
     mfed2.finalize ();
     fut.get ();
-    BOOST_CHECK_GE (rec1.messageCount (), 2);
+    BOOST_CHECK_GE (rec1.messageCount (), 2u);
 
     auto m = rec1.getMessage (0);
     BOOST_CHECK_EQUAL (m->data.to_string (), "this is a test message");
@@ -403,7 +417,7 @@ BOOST_AUTO_TEST_CASE (recorder_test_srcendpoint_clone)
     mfed.finalize ();
     mfed2.finalize ();
     fut.get ();
-    BOOST_CHECK_GE (rec1.messageCount (), 2);
+    BOOST_CHECK_GE (rec1.messageCount (), 2u);
 
     auto m = rec1.getMessage (0);
     BOOST_CHECK_EQUAL (m->data.to_string (), "this is a test message");
@@ -449,7 +463,7 @@ BOOST_AUTO_TEST_CASE (recorder_test_endpoint_clone)
     mfed.finalize ();
     mfed2.finalize ();
     fut.get ();
-    BOOST_CHECK_EQUAL (rec1.messageCount (), 2);
+    BOOST_CHECK_EQUAL (rec1.messageCount (), 2u);
 
     auto m = rec1.getMessage (0);
     BOOST_CHECK_EQUAL (m->data.to_string (), "this is a test message");
@@ -498,7 +512,7 @@ BOOST_DATA_TEST_CASE (simple_clone_test_file, boost::unit_test::data::make (simp
     mfed.finalize ();
     mfed2.finalize ();
     fut.get ();
-    BOOST_CHECK_GE (rec1.messageCount (), 2);
+    BOOST_CHECK_GE (rec1.messageCount (), 2u);
 
     auto m = rec1.getMessage (0);
     BOOST_CHECK (m);
@@ -547,19 +561,19 @@ BOOST_AUTO_TEST_CASE (recorder_test_saveFile1)
     mfed.finalize ();
     mfed2.finalize ();
     fut.get ();
-    BOOST_CHECK_EQUAL (rec1.messageCount (), 2);
+    BOOST_CHECK_EQUAL (rec1.messageCount (), 2u);
 
-    auto filename = boost::filesystem::temp_directory_path () / "savefile.txt";
+    auto filename = ghc::filesystem::temp_directory_path () / "savefile.txt";
     rec1.saveFile (filename.string ());
 
-    BOOST_CHECK (boost::filesystem::exists (filename));
+    BOOST_CHECK (ghc::filesystem::exists (filename));
 
-    auto filename2 = boost::filesystem::temp_directory_path () / "savefile.json";
+    auto filename2 = ghc::filesystem::temp_directory_path () / "savefile.json";
     rec1.saveFile (filename2.string ());
 
-    BOOST_CHECK (boost::filesystem::exists (filename2));
-    boost::filesystem::remove (filename);
-    boost::filesystem::remove (filename2);
+    BOOST_CHECK (ghc::filesystem::exists (filename2));
+    ghc::filesystem::remove (filename);
+    ghc::filesystem::remove (filename2);
 }
 
 BOOST_AUTO_TEST_CASE (recorder_test_saveFile2)
@@ -592,17 +606,17 @@ BOOST_AUTO_TEST_CASE (recorder_test_saveFile2)
 
     auto m2 = rec1.getMessage (4);
     BOOST_CHECK (!m2);
-    auto filename = boost::filesystem::temp_directory_path () / "savefile.txt";
+    auto filename = ghc::filesystem::temp_directory_path () / "savefile.txt";
     rec1.saveFile (filename.string ());
 
-    BOOST_CHECK (boost::filesystem::exists (filename));
+    BOOST_CHECK (ghc::filesystem::exists (filename));
 
-    auto filename2 = boost::filesystem::temp_directory_path () / "savefile.json";
+    auto filename2 = ghc::filesystem::temp_directory_path () / "savefile.json";
     rec1.saveFile (filename2.string ());
 
-    BOOST_CHECK (boost::filesystem::exists (filename2));
-    boost::filesystem::remove (filename);
-    boost::filesystem::remove (filename2);
+    BOOST_CHECK (ghc::filesystem::exists (filename2));
+    ghc::filesystem::remove (filename);
+    ghc::filesystem::remove (filename2);
 }
 
 BOOST_AUTO_TEST_CASE (recorder_test_saveFile3)
@@ -651,31 +665,31 @@ BOOST_AUTO_TEST_CASE (recorder_test_saveFile3)
     mfed.finalize ();
     mfed2.finalize ();
     fut.get ();
-    BOOST_CHECK_EQUAL (rec1.messageCount (), 2);
-    BOOST_CHECK_EQUAL (rec1.pointCount (), 3);
+    BOOST_CHECK_EQUAL (rec1.messageCount (), 2u);
+    BOOST_CHECK_EQUAL (rec1.pointCount (), 3u);
 
-    auto filename = boost::filesystem::temp_directory_path () / "savefile.txt";
+    auto filename = ghc::filesystem::temp_directory_path () / "savefile.txt";
     rec1.saveFile (filename.string ());
 
-    BOOST_CHECK (boost::filesystem::exists (filename));
+    BOOST_CHECK (ghc::filesystem::exists (filename));
 
-    auto filename2 = boost::filesystem::temp_directory_path () / "savefile.json";
+    auto filename2 = ghc::filesystem::temp_directory_path () / "savefile.json";
     rec1.saveFile (filename2.string ());
 
-    BOOST_CHECK (boost::filesystem::exists (filename2));
-    boost::filesystem::remove (filename);
-    boost::filesystem::remove (filename2);
+    BOOST_CHECK (ghc::filesystem::exists (filename2));
+    ghc::filesystem::remove (filename);
+    ghc::filesystem::remove (filename2);
 }
 
 BOOST_AUTO_TEST_CASE (recorder_test_help)
 {
-    StringToCmdLine cmdArg ("--version --quiet");
-    helics::apps::Recorder rec1 (cmdArg.getArgCount (), cmdArg.getArgV ());
+    std::vector<std::string> args{"--quiet", "--version"};
+    helics::apps::Recorder rec1 (args);
 
     BOOST_CHECK (!rec1.isActive ());
 
-    StringToCmdLine cmdArg2 ("-? --quiet");
-    helics::apps::Recorder rec2 (cmdArg2.getArgCount (), cmdArg2.getArgV ());
+    args.emplace_back ("-?");
+    helics::apps::Recorder rec2 (args);
 
     BOOST_CHECK (!rec2.isActive ());
 }

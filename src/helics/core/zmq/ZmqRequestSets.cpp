@@ -6,7 +6,6 @@ SPDX-License-Identifier: BSD-3-Clause
 */
 
 #include "ZmqRequestSets.h"
-#include "helics_includes/optional.hpp"
 #include <algorithm>
 #include <iostream>
 

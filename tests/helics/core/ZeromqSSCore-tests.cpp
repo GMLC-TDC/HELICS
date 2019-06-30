@@ -5,12 +5,12 @@ the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 
+#include "cppzmq/zmq.hpp"
 #include "helics/application_api/Inputs.hpp"
 #include "helics/application_api/Publications.hpp"
 #include "helics/application_api/Subscriptions.hpp"
 #include "helics/application_api/ValueFederate.hpp"
 #include "helics/common/GuardedTypes.hpp"
-#include "helics/common/cppzmq/zmq.hpp"
 #include "helics/common/zmqContextManager.h"
 #include "helics/core/ActionMessage.hpp"
 #include "helics/core/BrokerFactory.hpp"
@@ -20,19 +20,13 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helics/core/zmq/ZmqBroker.h"
 #include "helics/core/zmq/ZmqCommsSS.h"
 #include "helics/core/zmq/ZmqCore.h"
-#include <boost/test/unit_test.hpp>
-#include <boost/test/data/monomorphic.hpp>
-#include <boost/test/data/test_case.hpp>
-#include <boost/test/floating_point_comparison.hpp>
 
-//#include "boost/process.hpp"
+#include "gtest/gtest.h"
+
 #include <future>
 #include <iostream>
 
-namespace utf = boost::unit_test;
 using namespace std::literals::chrono_literals;
-
-BOOST_AUTO_TEST_SUITE (ZMQSSCore_tests, *utf::label ("ci"))
 
 using helics::Core;
 
@@ -40,7 +34,7 @@ using helics::Core;
 
 const std::string host = "tcp://127.0.0.1";
 
-BOOST_AUTO_TEST_CASE (zmqSSComm_transmit)
+TEST (ZMQSSCore_tests, zmqSSComm_transmit)
 {
     std::this_thread::sleep_for (400ms);
     std::atomic<int> counter{0};
@@ -72,13 +66,13 @@ BOOST_AUTO_TEST_CASE (zmqSSComm_transmit)
     // need to launch the connection commands at the same time since they depend on each other in this case
     auto connected_fut = std::async (std::launch::async, [&comm] { return comm.connect (); });
     bool connected1 = comm2.connect ();
-    BOOST_REQUIRE (connected1);
+    ASSERT_TRUE (connected1);
     bool connected2 = connected_fut.get ();
     if (!connected2)
     {  // lets just try again if it is not connected
         connected2 = comm.connect ();
     }
-    BOOST_REQUIRE (connected2);
+    ASSERT_TRUE (connected2);
 
     comm.transmit (helics::parent_route_id, helics::CMD_ACK);
     std::this_thread::sleep_for (250ms);
@@ -86,18 +80,18 @@ BOOST_AUTO_TEST_CASE (zmqSSComm_transmit)
     {
         std::this_thread::sleep_for (500ms);
     }
-    BOOST_REQUIRE_EQUAL (counter2, 2);
-    BOOST_CHECK (act2.lock ()->action () == helics::action_message_def::action_t::cmd_ack);
+    ASSERT_EQ (counter2, 2);
+    EXPECT_TRUE (act2.lock ()->action () == helics::action_message_def::action_t::cmd_ack);
 
     comm2.disconnect ();
-    BOOST_CHECK (!comm2.isConnected ());
+    EXPECT_TRUE (!comm2.isConnected ());
     comm.disconnect ();
-    BOOST_CHECK (!comm.isConnected ());
+    EXPECT_TRUE (!comm.isConnected ());
 
     std::this_thread::sleep_for (100ms);
 }
 
-BOOST_AUTO_TEST_CASE (zmqSSComm_addroute)
+TEST (ZMQSSCore_tests, zmqSSComm_addroute)
 {
     std::this_thread::sleep_for (400ms);
     std::atomic<int> counter{0};
@@ -143,26 +137,26 @@ BOOST_AUTO_TEST_CASE (zmqSSComm_addroute)
     auto connected_fut = std::async (std::launch::async, [&comm] { return comm.connect (); });
     auto connected_fut2 = std::async (std::launch::async, [&comm2] { return comm2.connect (); });
     bool connected1 = comm3.connect ();
-    BOOST_REQUIRE (connected1);
+    ASSERT_TRUE (connected1);
     bool connected2 = connected_fut.get ();
     if (!connected2)
     {  // lets just try again if it is not connected
         connected2 = comm.connect ();
     }
-    BOOST_REQUIRE (connected2);
+    ASSERT_TRUE (connected2);
     connected2 = connected_fut2.get ();
     if (!connected2)
     {  // lets just try again if it is not connected
         connected2 = comm2.connect ();
     }
-    BOOST_REQUIRE (connected2);
+    ASSERT_TRUE (connected2);
     comm.transmit (helics::parent_route_id, helics::CMD_ACK);
     std::this_thread::sleep_for (250ms);
     if (counter3 != 3)
     {
         std::this_thread::sleep_for (500ms);
     }
-    BOOST_REQUIRE_EQUAL (counter3, 3);
+    ASSERT_EQ (counter3, 3);
     comm3.addRoute (helics::route_id (2), comm2.getAddress ());
     comm3.transmit (helics::route_id (2), helics::CMD_ACK);
     std::this_thread::sleep_for (250ms);
@@ -170,19 +164,19 @@ BOOST_AUTO_TEST_CASE (zmqSSComm_addroute)
     {
         std::this_thread::sleep_for (500ms);
     }
-    BOOST_REQUIRE_EQUAL (counter2, 1);
-    BOOST_CHECK (act2.lock ()->action () == helics::action_message_def::action_t::cmd_ack);
+    ASSERT_EQ (counter2, 1);
+    EXPECT_TRUE (act2.lock ()->action () == helics::action_message_def::action_t::cmd_ack);
 
     comm.disconnect ();
-    BOOST_CHECK (!comm.isConnected ());
+    EXPECT_TRUE (!comm.isConnected ());
     comm2.disconnect ();
-    BOOST_CHECK (!comm2.isConnected ());
+    EXPECT_TRUE (!comm2.isConnected ());
     comm3.disconnect ();
-    BOOST_CHECK (!comm3.isConnected ());
+    EXPECT_TRUE (!comm3.isConnected ());
     std::this_thread::sleep_for (100ms);
 }
 
-BOOST_AUTO_TEST_CASE (zmqSSCore_initialization_test)
+TEST (ZMQSSCore_tests, zmqSSCore_initialization_test)
 {
     std::atomic<int> counter{0};
     std::vector<helics::ActionMessage> msgs;
@@ -202,12 +196,12 @@ BOOST_AUTO_TEST_CASE (zmqSSCore_initialization_test)
     std::string initializationString = "-f 1 --name=core1";
     auto core = helics::CoreFactory::create (helics::core_type::ZMQ_SS, initializationString);
 
-    BOOST_REQUIRE (core);
-    BOOST_CHECK (core->isInitialized ());
+    ASSERT_TRUE (core);
+    EXPECT_TRUE (core->isConfigured ());
 
     std::this_thread::sleep_for (100ms);
     bool connected = core->connect ();
-    BOOST_CHECK (connected);
+    EXPECT_TRUE (connected);
 
     if (connected)
     {
@@ -221,15 +215,15 @@ BOOST_AUTO_TEST_CASE (zmqSSCore_initialization_test)
                 break;
             }
         }
-        BOOST_CHECK_GE (counter, 1);
+        EXPECT_GE (counter, 1);
         std::unique_lock<std::mutex> mLock (msgLock);
         if (!msgs.empty ())
         {
             auto rM = msgs.at (0);
             mLock.unlock ();
-            BOOST_CHECK_EQUAL (rM.name, "core1");
-            std::cout << "rM.name: " << rM.name << std::endl;
-            BOOST_CHECK (rM.action () == helics::action_message_def::action_t::cmd_protocol);
+            EXPECT_EQ (rM.name, "core1");
+            // std::cout << "rM.name: " << rM.name << std::endl;
+            EXPECT_TRUE (rM.action () == helics::action_message_def::action_t::cmd_protocol);
         }
         else
         {
@@ -245,15 +239,15 @@ BOOST_AUTO_TEST_CASE (zmqSSCore_initialization_test)
                 break;
             }
         }
-        BOOST_CHECK_GE (counter, 2);
+        EXPECT_GE (counter, 2);
         mLock.lock ();
         if (!msgs.empty ())
         {
             auto rM2 = msgs.at (1);
             mLock.unlock ();
-            BOOST_CHECK_EQUAL (rM2.name, "core1");
+            EXPECT_EQ (rM2.name, "core1");
             // std::cout << "rM.name: " << rM2.name << std::endl;
-            BOOST_CHECK (rM2.action () == helics::action_message_def::action_t::cmd_reg_broker);
+            EXPECT_TRUE (rM2.action () == helics::action_message_def::action_t::cmd_reg_broker);
         }
         else
         {
@@ -270,7 +264,7 @@ BOOST_AUTO_TEST_CASE (zmqSSCore_initialization_test)
 /** test case checks default values and makes sure they all mesh together
 also tests the automatic port determination for cores
 */
-BOOST_AUTO_TEST_CASE (zmqSSCore_core_broker_default_test)
+TEST (ZMQSSCore_tests, zmqSSCore_core_broker_default_test)
 {
     std::string initializationString = "-f 1";
 
@@ -278,15 +272,15 @@ BOOST_AUTO_TEST_CASE (zmqSSCore_core_broker_default_test)
 
     auto core = helics::CoreFactory::create (helics::core_type::ZMQ_SS, initializationString);
     bool connected = broker->isConnected ();
-    BOOST_CHECK (connected);
+    EXPECT_TRUE (connected);
     connected = core->connect ();
-    BOOST_CHECK (connected);
+    EXPECT_TRUE (connected);
 
     core->disconnect ();
 
-    BOOST_CHECK (!core->isConnected ());
+    EXPECT_TRUE (!core->isConnected ());
     broker->disconnect ();
-    BOOST_CHECK (!broker->isConnected ());
+    EXPECT_TRUE (!broker->isConnected ());
     helics::CoreFactory::cleanUpCores (200ms);
     helics::BrokerFactory::cleanUpBrokers (200ms);
 }
@@ -358,23 +352,23 @@ class FedTest
                 }
             }
         }
-        BOOST_REQUIRE_EQUAL (counter, 80);
+        ASSERT_EQ (counter, 80);
         vFed->finalize ();
     }
 };
 
-BOOST_AUTO_TEST_CASE (zmqSSMultiCoreInitialization_test)
+TEST (ZMQSSCore_tests, zmqSSMultiCoreInitialization_test)
 {
     int feds = 20;
-    auto broker =
-      helics::BrokerFactory::create (helics::core_type::ZMQ_SS, "ZMQ_SS_broker", std::to_string (feds));
+    auto broker = helics::BrokerFactory::create (helics::core_type::ZMQ_SS, "ZMQ_SS_broker",
+                                                 std::string ("-f ") + std::to_string (feds));
     std::vector<std::shared_ptr<helics::Core>> cores (feds);
     std::vector<FedTest> leafs (feds);
-    BOOST_TEST_CHECKPOINT ("created broker");
+    SCOPED_TRACE ("created broker");
     for (int ii = 0; ii < feds; ++ii)
     {
-        std::string initializationString = "-f 1 --name=core" + std::to_string (ii);
-        cores[ii] = helics::CoreFactory::create (helics::core_type::ZMQ_SS, initializationString);
+        std::string configureString = "-f 1 --name=core" + std::to_string (ii);
+        cores[ii] = helics::CoreFactory::create (helics::core_type::ZMQ_SS, configureString);
         cores[ii]->connect ();
         int s_index = ii + 1;
         if (ii == feds - 1)
@@ -383,14 +377,14 @@ BOOST_AUTO_TEST_CASE (zmqSSMultiCoreInitialization_test)
         }
         leafs[ii].initialize (cores[ii]->getIdentifier (), ii, s_index);
     }
-    BOOST_TEST_CHECKPOINT ("initialized");
+    SCOPED_TRACE ("initialized");
     std::this_thread::sleep_for (std::chrono::milliseconds (100));
     std::vector<std::thread> threads (feds);
     for (int ii = 0; ii < feds; ++ii)
     {
         threads[ii] = std::thread ([](FedTest &leaf) { leaf.run (); }, std::ref (leafs[ii]));
     }
-    BOOST_TEST_CHECKPOINT ("started threads");
+    SCOPED_TRACE ("started threads");
     std::this_thread::yield ();
     std::this_thread::sleep_for (std::chrono::milliseconds (100));
     std::this_thread::yield ();
@@ -402,5 +396,3 @@ BOOST_AUTO_TEST_CASE (zmqSSMultiCoreInitialization_test)
     broker->disconnect ();
     std::this_thread::sleep_for (std::chrono::milliseconds (200));
 }
-
-BOOST_AUTO_TEST_SUITE_END ()

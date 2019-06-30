@@ -4,8 +4,7 @@ Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance
 the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
-#include "testFixtures.h"
-#include <boost/test/unit_test.hpp>
+#include "gtest/gtest.h"
 
 #include <future>
 
@@ -16,47 +15,53 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helics/core/PublicationInfo.hpp"
 #include "helics/core/helics_definitions.hpp"
 
-namespace utf = boost::unit_test;
+#include <memory>
 
-BOOST_FIXTURE_TEST_SUITE (FederateState_tests, federateStateTestFixture, *utf::label ("ci"))
+struct federateStateTests : public ::testing::Test
+{
+    federateStateTests () : fs (std::make_unique<helics::FederateState> ("fed_name", helics::CoreFederateInfo ()))
+    {
+    }
+    std::unique_ptr<helics::FederateState> fs;
+};
 
-BOOST_AUTO_TEST_CASE (constructor_test)
+TEST_F (federateStateTests, constructor_test)
 {
     // Check setting of name, initial state, and info by the constructor
-    BOOST_CHECK_EQUAL (fs->getIdentifier (), "fed_name");
-    BOOST_CHECK_EQUAL (fs->getState (), helics::federate_state::HELICS_CREATED);
+    EXPECT_EQ (fs->getIdentifier (), "fed_name");
+    EXPECT_EQ (fs->getState (), helics::federate_state::HELICS_CREATED);
 
-    BOOST_CHECK_EQUAL (fs->getTimeProperty (helics::defs::properties::time_delta), helics::Time::epsilon ());
-    BOOST_CHECK_EQUAL (fs->getTimeProperty (helics::defs::properties::output_delay), helics::Time::zeroVal ());
-    BOOST_CHECK_EQUAL (fs->getTimeProperty (helics::defs::properties::input_delay), helics::Time::zeroVal ());
-    BOOST_CHECK_EQUAL (fs->getTimeProperty (helics_property_time_period), helics::Time::zeroVal ());
-    BOOST_CHECK_EQUAL (fs->getOptionFlag (helics::defs::flags::observer), false);
-    BOOST_CHECK_EQUAL (fs->getOptionFlag (helics::defs::flags::uninterruptible), false);
-    BOOST_CHECK_EQUAL (fs->getOptionFlag (helics::defs::flags::interruptible), true);
-    BOOST_CHECK_EQUAL (fs->getOptionFlag (helics::defs::flags::source_only), false);
+    EXPECT_EQ (fs->getTimeProperty (helics::defs::properties::time_delta), helics::Time::epsilon ());
+    EXPECT_EQ (fs->getTimeProperty (helics::defs::properties::output_delay), helics::Time::zeroVal ());
+    EXPECT_EQ (fs->getTimeProperty (helics::defs::properties::input_delay), helics::Time::zeroVal ());
+    EXPECT_EQ (fs->getTimeProperty (helics_property_time_period), helics::Time::zeroVal ());
+    EXPECT_EQ (fs->getOptionFlag (helics::defs::flags::observer), false);
+    EXPECT_EQ (fs->getOptionFlag (helics::defs::flags::uninterruptible), false);
+    EXPECT_EQ (fs->getOptionFlag (helics::defs::flags::interruptible), true);
+    EXPECT_EQ (fs->getOptionFlag (helics::defs::flags::source_only), false);
 
     // Check other default state values
-    BOOST_CHECK_EQUAL (fs->getQueueSize (), 0);
-    BOOST_CHECK_EQUAL (fs->getEvents ().size (), 0);
+    EXPECT_EQ (fs->getQueueSize (), 0u);
+    EXPECT_EQ (fs->getEvents ().size (), 0u);
 
-    // BOOST_CHECK_EQUAL(fs->message_queue.size(), 0);
-    // BOOST_CHECK_EQUAL(fs->dependencies.size(), 0);
-    BOOST_CHECK_EQUAL (fs->getDependents ().size (), 0);
-    BOOST_CHECK (fs->local_id == helics::local_federate_id{});
-    BOOST_CHECK (fs->global_id.load () == helics::global_federate_id{});
-    BOOST_CHECK_EQUAL (fs->init_requested, false);
+    // EXPECT_EQ(fs->message_queue.size(), 0);
+    // EXPECT_EQ(fs->dependencies.size(), 0);
+    EXPECT_EQ (fs->getDependents ().size (), 0u);
+    EXPECT_TRUE (fs->local_id == helics::local_federate_id{});
+    EXPECT_TRUE (fs->global_id.load () == helics::global_federate_id{});
+    EXPECT_EQ (fs->init_requested, false);
 
-    BOOST_CHECK_EQUAL (fs->getCurrentIteration (), 0);
-    BOOST_CHECK_EQUAL (fs->grantedTime (), helics::Time::minVal ());
-    // BOOST_CHECK_EQUAL(fs->time_requested, helics::Time::zeroVal());
-    // BOOST_CHECK_EQUAL(fs->time_next, helics::Time::zeroVal());
-    // BOOST_CHECK_EQUAL(fs->time_minDe, helics::Time::zeroVal());
-    // BOOST_CHECK_EQUAL(fs->time_minTe, helics::Time::zeroVal());
-    // BOOST_CHECK_EQUAL(fs->time_event, helics::Time::zeroVal());
-    BOOST_CHECK_EQUAL (fs->getIntegerProperty (helics::defs::properties::max_iterations), 50);
+    EXPECT_EQ (fs->getCurrentIteration (), 0);
+    EXPECT_EQ (fs->grantedTime (), helics::Time::minVal ());
+    // EXPECT_EQ(fs->time_requested, helics::Time::zeroVal());
+    // EXPECT_EQ(fs->time_next, helics::Time::zeroVal());
+    // EXPECT_EQ(fs->time_minDe, helics::Time::zeroVal());
+    // EXPECT_EQ(fs->time_minTe, helics::Time::zeroVal());
+    // EXPECT_EQ(fs->time_event, helics::Time::zeroVal());
+    EXPECT_EQ (fs->getIntegerProperty (helics::defs::properties::max_iterations), 50);
 }
 
-BOOST_AUTO_TEST_CASE (create_input_test)
+TEST_F (federateStateTests, create_input_test)
 {
     using namespace helics;
     fs->interfaces ().createInput (interface_handle (0), "first!", "type", "units");
@@ -68,34 +73,34 @@ BOOST_AUTO_TEST_CASE (create_input_test)
 
     // Check first subscription
     info = fs->interfaces ().getInput ("first!");
-    BOOST_CHECK_EQUAL (info->id.handle, interface_handle (0));
+    EXPECT_EQ (info->id.handle, interface_handle (0));
 
     info = fs->interfaces ().getInput (interface_handle (0));
-    BOOST_CHECK_EQUAL (info->key, "first!");
+    EXPECT_EQ (info->key, "first!");
 
     // Check second subscription
     info = fs->interfaces ().getInput ("second");
-    BOOST_CHECK_EQUAL (info->id.handle, interface_handle (1));
+    EXPECT_EQ (info->id.handle, interface_handle (1));
 
     info = fs->interfaces ().getInput (interface_handle (1));
-    BOOST_CHECK_EQUAL (info->key, "second");
+    EXPECT_EQ (info->key, "second");
 
     // Check the out of order subscription
     info = fs->interfaces ().getInput ("cut-in-line");
-    BOOST_CHECK_EQUAL (info->id.handle, interface_handle (2));
+    EXPECT_EQ (info->id.handle, interface_handle (2));
 
     info = fs->interfaces ().getInput (interface_handle (2));
-    BOOST_CHECK_EQUAL (info->key, "cut-in-line");
+    EXPECT_EQ (info->key, "cut-in-line");
 
     // Check the displaced (last) subscription
     info = fs->interfaces ().getInput ("last");
-    BOOST_CHECK_EQUAL (info->id.handle, interface_handle (3));
+    EXPECT_EQ (info->id.handle, interface_handle (3));
 
     info = fs->interfaces ().getInput (interface_handle (3));
-    BOOST_CHECK_EQUAL (info->key, "last");
+    EXPECT_EQ (info->key, "last");
 }
 
-BOOST_AUTO_TEST_CASE (create_publication_test)
+TEST_F (federateStateTests, create_publication_test)
 {
     fs->interfaces ().createPublication (helics::interface_handle (0), "first!", "type", "units");
     fs->interfaces ().createPublication (helics::interface_handle (1), "second", "type", "units");
@@ -106,34 +111,34 @@ BOOST_AUTO_TEST_CASE (create_publication_test)
 
     // Check first publication
     info = fs->interfaces ().getPublication ("first!");
-    BOOST_CHECK_EQUAL (info->id.handle, helics::interface_handle (0));
+    EXPECT_EQ (info->id.handle, helics::interface_handle (0));
 
     info = fs->interfaces ().getPublication (helics::interface_handle (0));
-    BOOST_CHECK_EQUAL (info->key, "first!");
+    EXPECT_EQ (info->key, "first!");
 
     // Check second publication
     info = fs->interfaces ().getPublication ("second");
-    BOOST_CHECK_EQUAL (info->id.handle, helics::interface_handle (1));
+    EXPECT_EQ (info->id.handle, helics::interface_handle (1));
 
     info = fs->interfaces ().getPublication (helics::interface_handle (1));
-    BOOST_CHECK_EQUAL (info->key, "second");
+    EXPECT_EQ (info->key, "second");
 
     // Check the out of order publication
     info = fs->interfaces ().getPublication ("cut-in-line");
-    BOOST_CHECK_EQUAL (info->id.handle, helics::interface_handle (2));
+    EXPECT_EQ (info->id.handle, helics::interface_handle (2));
 
     info = fs->interfaces ().getPublication (helics::interface_handle (2));
-    BOOST_CHECK_EQUAL (info->key, "cut-in-line");
+    EXPECT_EQ (info->key, "cut-in-line");
 
     // Check the displaced (last) publication
     info = fs->interfaces ().getPublication ("last");
-    BOOST_CHECK_EQUAL (info->id.handle, helics::interface_handle (3));
+    EXPECT_EQ (info->id.handle, helics::interface_handle (3));
 
     info = fs->interfaces ().getPublication (helics::interface_handle (3));
-    BOOST_CHECK_EQUAL (info->key, "last");
+    EXPECT_EQ (info->key, "last");
 }
 
-BOOST_AUTO_TEST_CASE (create_endpoint_test)
+TEST_F (federateStateTests, create_endpoint_test)
 {
     using namespace helics;
     fs->interfaces ().createEndpoint (interface_handle (0), "first!", "type");
@@ -145,34 +150,34 @@ BOOST_AUTO_TEST_CASE (create_endpoint_test)
 
     // Check first endpoint
     info = fs->interfaces ().getEndpoint ("first!");
-    BOOST_CHECK_EQUAL (info->id.handle, interface_handle (0));
+    EXPECT_EQ (info->id.handle, interface_handle (0));
 
     info = fs->interfaces ().getEndpoint (interface_handle (0));
-    BOOST_CHECK_EQUAL (info->key, "first!");
+    EXPECT_EQ (info->key, "first!");
 
     // Check second endpoint
     info = fs->interfaces ().getEndpoint ("second");
-    BOOST_CHECK_EQUAL (info->id.handle, interface_handle (1));
+    EXPECT_EQ (info->id.handle, interface_handle (1));
 
     info = fs->interfaces ().getEndpoint (interface_handle (1));
-    BOOST_CHECK_EQUAL (info->key, "second");
+    EXPECT_EQ (info->key, "second");
 
     // Check the out of order endpoint
     info = fs->interfaces ().getEndpoint ("cut-in-line");
-    BOOST_CHECK_EQUAL (info->id.handle, interface_handle (2));
+    EXPECT_EQ (info->id.handle, interface_handle (2));
 
     info = fs->interfaces ().getEndpoint (interface_handle (2));
-    BOOST_CHECK_EQUAL (info->key, "cut-in-line");
+    EXPECT_EQ (info->key, "cut-in-line");
 
     // Check the displaced (last) endpoint
     info = fs->interfaces ().getEndpoint ("last");
-    BOOST_CHECK_EQUAL (info->id.handle, interface_handle (3));
+    EXPECT_EQ (info->id.handle, interface_handle (3));
 
     info = fs->interfaces ().getEndpoint (interface_handle (3));
-    BOOST_CHECK_EQUAL (info->key, "last");
+    EXPECT_EQ (info->key, "last");
 }
 
-BOOST_AUTO_TEST_CASE (basic_processmessage_test)
+TEST_F (federateStateTests, basic_processmessage_test)
 {
     using namespace helics;
     ActionMessage cmd;
@@ -180,16 +185,16 @@ BOOST_AUTO_TEST_CASE (basic_processmessage_test)
     // Test returning when the initialization state is entered
     cmd.setAction (helics::CMD_INIT_GRANT);
     auto fs_process = std::async (std::launch::async, [&]() { return fs->enterInitializingMode (); });
-    BOOST_CHECK_EQUAL (fs->getState (), federate_state::HELICS_CREATED);
+    EXPECT_EQ (fs->getState (), federate_state::HELICS_CREATED);
     fs->addAction (cmd);
     fs_process.wait ();
-    BOOST_CHECK (fs_process.get () == iteration_result::next_step);
-    BOOST_CHECK_EQUAL (fs->getState (), federate_state::HELICS_INITIALIZING);
+    EXPECT_TRUE (fs_process.get () == iteration_result::next_step);
+    EXPECT_EQ (fs->getState (), federate_state::HELICS_INITIALIZING);
 
     // Test returning when the finished state is entered
     cmd.setAction (helics::CMD_STOP);
     fs->addAction (cmd);
-    BOOST_CHECK_EQUAL (fs->getState (), federate_state::HELICS_INITIALIZING);
+    EXPECT_EQ (fs->getState (), federate_state::HELICS_INITIALIZING);
     auto fs_process2 =
       std::async (std::launch::async, [&]() { return fs->enterExecutingMode (iteration_request::no_iterations); });
 
@@ -198,8 +203,8 @@ BOOST_AUTO_TEST_CASE (basic_processmessage_test)
     fs->global_id = helics::global_federate_id ();
     auto state = fs_process2.get ();
 
-    BOOST_CHECK (state == iteration_result::halted);
-    BOOST_CHECK_EQUAL (fs->getState (), federate_state::HELICS_FINISHED);
+    EXPECT_TRUE (state == iteration_result::halted);
+    EXPECT_EQ (fs->getState (), federate_state::HELICS_FINISHED);
 
     // Return to created state
     fs->reset ();
@@ -213,8 +218,8 @@ BOOST_AUTO_TEST_CASE (basic_processmessage_test)
     fs_process = std::async (std::launch::async, [&]() { return fs->waitSetup (); });
     fs->addAction (cmd);
     fs_process.wait ();
-    BOOST_CHECK (fs_process.get () == iteration_result::next_step);
-    BOOST_CHECK_EQUAL (fs->global_id.load (), fed22);
+    EXPECT_TRUE (fs_process.get () == iteration_result::next_step);
+    EXPECT_EQ (fs->global_id.load (), fed22);
 
     // Test CMD_FED_ACK message with an error
     cmd.setAction (helics::CMD_FED_ACK);
@@ -223,9 +228,9 @@ BOOST_AUTO_TEST_CASE (basic_processmessage_test)
     fs_process = std::async (std::launch::async, [&]() { return fs->waitSetup (); });
     fs->addAction (cmd);
     fs_process.wait ();
-    BOOST_CHECK (fs_process.get () == iteration_result::error);
-    BOOST_CHECK_EQUAL (fs->global_id.load (), fed22);
-    BOOST_CHECK_EQUAL (fs->getState (), federate_state::HELICS_ERROR);
+    EXPECT_TRUE (fs_process.get () == iteration_result::error);
+    EXPECT_EQ (fs->global_id.load (), fed22);
+    EXPECT_EQ (fs->getState (), federate_state::HELICS_ERROR);
 
     // Return to initializing state
     fs->reInit ();
@@ -235,7 +240,7 @@ BOOST_AUTO_TEST_CASE (basic_processmessage_test)
     fs_process2 =
       std::async (std::launch::async, [&]() { return fs->enterExecutingMode (iteration_request::no_iterations); });
     auto st = fs->getState ();
-    BOOST_CHECK ((st == federate_state::HELICS_INITIALIZING) || (st == federate_state::HELICS_EXECUTING));
+    EXPECT_TRUE ((st == federate_state::HELICS_INITIALIZING) || (st == federate_state::HELICS_EXECUTING));
     fs->addAction (cmd);
     auto res = fs_process2.get ();
     if (res != iteration_result::error)
@@ -244,8 +249,8 @@ BOOST_AUTO_TEST_CASE (basic_processmessage_test)
         res = ittime.state;
     }
 
-    BOOST_CHECK (res == iteration_result::error);
-    BOOST_CHECK_EQUAL (fs->getState (), federate_state::HELICS_ERROR);
+    EXPECT_TRUE (res == iteration_result::error);
+    EXPECT_EQ (fs->getState (), federate_state::HELICS_ERROR);
 
     fs->reset ();
 
@@ -266,12 +271,12 @@ BOOST_AUTO_TEST_CASE (basic_processmessage_test)
     */
 }
 
-BOOST_AUTO_TEST_CASE (pubsub_test)
+TEST_F (federateStateTests, pubsub_test)
 {
     // auto fs_process = std::async(std::launch::async, [&]() { return fs->processQueue(); });
 }
 
-BOOST_AUTO_TEST_CASE (message_test)
+TEST_F (federateStateTests, message_test)
 {
     // auto fs_process = std::async(std::launch::async, [&]() { return fs->processQueue(); });
 }
@@ -310,5 +315,3 @@ DependencyInfo(Core::local_federate_id id) :fedID(id) {};
 
     std::pair<Time, bool> requestTime(Time nextTime, bool iterationRequested);
 */
-
-BOOST_AUTO_TEST_SUITE_END ()

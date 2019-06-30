@@ -5,12 +5,12 @@ the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 #include "UdpComms.h"
-#include "../../common/AsioServiceManager.h"
+#include "../../common/AsioContextManager.h"
 #include "../../common/fmt_format.h"
 #include "../ActionMessage.hpp"
 #include "../NetworkBrokerData.hpp"
+#include <asio/ip/udp.hpp>
 #include <memory>
-#include <boost/asio/ip/udp.hpp>
 
 static const int DEFAULT_UDP_BROKER_PORT_NUMBER = 23901;
 
@@ -18,7 +18,7 @@ namespace helics
 {
 namespace udp
 {
-using boost::asio::ip::udp;
+using asio::ip::udp;
 UdpComms::UdpComms () : NetworkCommsInterface (interface_type::udp)
 {
     promisePort = std::promise<int> ();
@@ -60,8 +60,8 @@ void UdpComms::queue_rx_function ()
         setRxStatus (connection_status::error);
         return;
     }
-    auto ioserv = AsioServiceManager::getServicePointer ();
-    udp::socket socket (ioserv->getBaseService ());
+    auto ioctx = AsioContextManager::getContextPointer ();
+    udp::socket socket (ioctx->getBaseContext ());
     socket.open (udpnet (interfaceNetwork));
     std::chrono::milliseconds t_cnt{0};
     bool bindsuccess = false;
@@ -72,7 +72,7 @@ void UdpComms::queue_rx_function ()
             socket.bind (udp::endpoint (udpnet (interfaceNetwork), PortNumber));
             bindsuccess = true;
         }
-        catch (const boost::system::system_error &error)
+        catch (const std::system_error &error)
         {
             if ((autoPortNumber) && (hasBroker))
             {  // If we failed and we are on an automatically assigned port number,  just try a different port
@@ -85,7 +85,7 @@ void UdpComms::queue_rx_function ()
                         socket.bind (udp::endpoint (udpnet (interfaceNetwork), PortNumber));
                         bindsuccess = true;
                     }
-                    catch (const boost::system::system_error &)
+                    catch (const std::system_error &)
                     {
                         ++tries;
                         if (tries > 10)
@@ -126,12 +126,12 @@ void UdpComms::queue_rx_function ()
 
     std::vector<char> data (10192);
     udp::endpoint remote_endp;
-    boost::system::error_code error;
-    boost::system::error_code ignored_error;
+    std::error_code error;
+    std::error_code ignored_error;
     setRxStatus (connection_status::connected);
     while (true)
     {
-        auto len = socket.receive_from (boost::asio::buffer (data), remote_endp, 0, error);
+        auto len = socket.receive_from (asio::buffer (data), remote_endp, 0, error);
         if (error)
         {
             setRxStatus (connection_status::error);
@@ -166,7 +166,7 @@ void UdpComms::queue_rx_function ()
                 }
                 else if (reply.action () != CMD_IGNORE)
                 {
-                    socket.send_to (boost::asio::buffer (reply.to_string ()), remote_endp, 0, ignored_error);
+                    socket.send_to (asio::buffer (reply.to_string ()), remote_endp, 0, ignored_error);
                 }
             }
         }
@@ -183,17 +183,17 @@ CLOSE_RX_LOOP:
 void UdpComms::queue_tx_function ()
 {
     std::vector<char> buffer;
-    auto ioserv = AsioServiceManager::getServicePointer ();
-    udp::resolver resolver (ioserv->getBaseService ());
+    auto ioctx = AsioContextManager::getContextPointer ();
+    udp::resolver resolver (ioctx->getBaseContext ());
     bool closingRx = false;
-    udp::socket transmitSocket (ioserv->getBaseService ());
+    udp::socket transmitSocket (ioctx->getBaseContext ());
     transmitSocket.open (udpnet (interfaceNetwork));
     if (PortNumber >= 0)
     {
         promisePort.set_value (PortNumber);
     }
 
-    boost::system::error_code error;
+    std::error_code error;
     std::map<route_id, udp::endpoint> routes;  // for all the other possible routes
     udp::endpoint broker_endpoint;
 
@@ -218,7 +218,7 @@ void UdpComms::queue_tx_function ()
             {
                 ActionMessage m (CMD_PROTOCOL_PRIORITY);
                 m.messageID = REQUEST_PORTS;
-                transmitSocket.send_to (boost::asio::buffer (m.to_string ()), broker_endpoint, 0, error);
+                transmitSocket.send_to (asio::buffer (m.to_string ()), broker_endpoint, 0, error);
                 if (error)
                 {
                     logError (fmt::format ("error in initial send to broker {}", error.message ()));
@@ -257,7 +257,7 @@ void UdpComms::queue_tx_function ()
                         continue;
                     }
                 }
-                auto len = transmitSocket.receive_from (boost::asio::buffer (rx), brk);
+                auto len = transmitSocket.receive_from (asio::buffer (rx), brk);
                 m = ActionMessage (rx.data (), len);
                 if (isProtocolCommand (m))
                 {
@@ -293,9 +293,28 @@ void UdpComms::queue_tx_function ()
             promisePort.set_value (PortNumber);
         }
     }
-    udp::resolver::query queryLocal (udpnet (interfaceNetwork), localTargetAddress, std::to_string (PortNumber));
+    udp::endpoint rxEndpoint;
+    if (localTargetAddress.empty () || localTargetAddress == "*" || localTargetAddress == "udp://*")
+    {
+        udp::resolver::query queryLocal (udpnet (interfaceNetwork), "127.0.0.1",
+                                         std::to_string (PortNumber));
+        auto result = resolver.resolve (queryLocal);
+        rxEndpoint = *result;
+    }
+    else
+    {
+        udp::resolver::query queryLocal (udpnet (interfaceNetwork), localTargetAddress,
+                                         std::to_string (PortNumber));
+        auto result = resolver.resolve (queryLocal, error);
+        if (error)
+        {
+            logError (std::string ("Unable to resolve:") + localTargetAddress);
+            setTxStatus (connection_status::error);
+            return;
+        }
+        rxEndpoint = *result;
+    }
 
-    udp::endpoint rxEndpoint = *resolver.resolve (queryLocal);
     setTxStatus (connection_status::connected);
 
     while (true)
@@ -336,7 +355,7 @@ void UdpComms::queue_tx_function ()
                     processed = true;
                     break;
                 case CLOSE_RECEIVER:
-                    transmitSocket.send_to (boost::asio::buffer (cmd.to_string ()), rxEndpoint, 0, error);
+                    transmitSocket.send_to (asio::buffer (cmd.to_string ()), rxEndpoint, 0, error);
                     if (error)
                     {
                         logError (
@@ -359,7 +378,7 @@ void UdpComms::queue_tx_function ()
         {
             if (hasBroker)
             {
-                transmitSocket.send_to (boost::asio::buffer (cmd.to_string ()), broker_endpoint, 0, error);
+                transmitSocket.send_to (asio::buffer (cmd.to_string ()), broker_endpoint, 0, error);
                 if (error)
                 {
                     logWarning (fmt::format ("transmit failure sending to broker  {}", error.message ()));
@@ -374,7 +393,7 @@ void UdpComms::queue_tx_function ()
         }
         else if (rid == control_route)
         {  // send to rx thread loop
-            transmitSocket.send_to (boost::asio::buffer (cmd.to_string ()), rxEndpoint, 0, error);
+            transmitSocket.send_to (asio::buffer (cmd.to_string ()), rxEndpoint, 0, error);
             if (error)
             {
                 logWarning (
@@ -386,7 +405,7 @@ void UdpComms::queue_tx_function ()
             auto rt_find = routes.find (rid);
             if (rt_find != routes.end ())
             {
-                transmitSocket.send_to (boost::asio::buffer (cmd.to_string ()), rt_find->second, 0, error);
+                transmitSocket.send_to (asio::buffer (cmd.to_string ()), rt_find->second, 0, error);
                 if (error)
                 {
                     logWarning (
@@ -397,7 +416,7 @@ void UdpComms::queue_tx_function ()
             {
                 if (hasBroker)
                 {
-                    transmitSocket.send_to (boost::asio::buffer (cmd.to_string ()), broker_endpoint, 0, error);
+                    transmitSocket.send_to (asio::buffer (cmd.to_string ()), broker_endpoint, 0, error);
                     if (error)
                     {
                         logWarning (fmt::format ("transmit failure sending to broker  {}", error.message ()));
@@ -424,7 +443,7 @@ CLOSE_TX_LOOP:
             if (!(rxTrigger.wait_for (std::chrono::milliseconds (3000))))
             {
                 std::string cls ("close");
-                transmitSocket.send_to (boost::asio::buffer (cls), rxEndpoint, 0, error);
+                transmitSocket.send_to (asio::buffer (cls), rxEndpoint, 0, error);
                 if (error)
                 {
                     logWarning (
@@ -442,7 +461,7 @@ CLOSE_TX_LOOP:
         else
         {
             std::string cls ("close");
-            transmitSocket.send_to (boost::asio::buffer (cls), rxEndpoint, 0, error);
+            transmitSocket.send_to (asio::buffer (cls), rxEndpoint, 0, error);
             if (error)
             {
                 logWarning (fmt::format ("transmit failure sending close to receiver II:{}", error.message ()));
@@ -465,20 +484,35 @@ void UdpComms::closeReceiver ()
     {
         try
         {
-            auto serv = AsioServiceManager::getServicePointer ();
+            auto serv = AsioContextManager::getContextPointer ();
             if (serv)
             {
-                // try connecting with the receiver socket
-                udp::resolver resolver (serv->getBaseService ());
-                udp::resolver::query queryLocal (udpnet (interfaceNetwork), localTargetAddress,
-                                                 std::to_string (PortNumber));
+                udp::endpoint rxEndpoint;
 
-                udp::endpoint rxEndpoint = *resolver.resolve (queryLocal);
+                if (localTargetAddress.empty () || localTargetAddress == "*" || localTargetAddress == "udp://*")
+                {
+                    // try connecting with the receiver socket
+                    udp::resolver resolver (serv->getBaseContext ());
+                    udp::resolver::query queryLocal (udpnet (interfaceNetwork),"127.0.0.1",
+                                                     std::to_string (PortNumber));
+                    rxEndpoint = *resolver.resolve (queryLocal);
+                }
+                else
+                {
+                    // try connecting with the receiver socket
+                    udp::resolver resolver (serv->getBaseContext ());
+                    udp::resolver::query queryLocal (udpnet (interfaceNetwork), localTargetAddress,
+                                                     std::to_string (PortNumber));
+                    rxEndpoint = *resolver.resolve (queryLocal);
 
-                udp::socket transmitter (serv->getBaseService (), udp::endpoint (udpnet (interfaceNetwork), 0));
+                }
+                
+                
+
+                udp::socket transmitter (serv->getBaseContext (), udp::endpoint (udpnet (interfaceNetwork), 0));
                 std::string cls ("close");
-                boost::system::error_code error;
-                transmitter.send_to (boost::asio::buffer (cls), rxEndpoint, 0, error);
+                std::error_code error;
+                transmitter.send_to (asio::buffer (cls), rxEndpoint, 0, error);
                 if (error)
                 {
                     logWarning (fmt::format ("transmit failure on disconnect:{}", error.message ()));

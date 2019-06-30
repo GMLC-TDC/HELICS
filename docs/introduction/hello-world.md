@@ -35,7 +35,7 @@ Windows CMD:
 
 Next, make a new source file and call it `hello_world_sender.c`. Copy
 the contents from
-[hello\_world\_sender.c](https://github.com/GMLC-TDC/HELICS-Examples/blob/72c9d38e/c/hello_world/hello_world_receiver.c)
+[hello\_world\_sender.c](https://github.com/GMLC-TDC/HELICS-Examples/blob/72c9d38e/c/hello_world/hello_world_sender.c)
 and paste it into the file.
 
 Next, create a new source file and call it `hello_world_receiver.c`.

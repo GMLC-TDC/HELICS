@@ -4,7 +4,7 @@ Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance
 additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
-#include "../common/logger.h"
+#include "../common/loggerCore.hpp"
 #include "../core/BrokerFactory.hpp"
 #include "../core/CoreFactory.hpp"
 #include "../helics.hpp"
@@ -20,18 +20,18 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include "../core/helicsVersion.hpp"
 #include "helics/helics-config.h"
-#if HELICS_HAVE_ZEROMQ > 0
-#include "../common/cppzmq/zmq.hpp"
+#ifdef ENABLE_ZMQ_CORE
 #include "../common/zmqContextManager.h"
+#include "cppzmq/zmq.hpp"
 #endif
 
 const char *helicsGetVersion (void) { return helics::versionString; }
 
-static const char *nullstrPtr = "";
+static constexpr const char *nullstrPtr = "";
 
 const std::string emptyStr;
 
-helics_error helicsErrorInitialize ()
+helics_error helicsErrorInitialize (void)
 {
     helics_error err;
     err.error_code = 0;
@@ -207,7 +207,7 @@ void helicsFederateInfoFree (helics_federate_info fi)
     auto info = getFedInfo (fi, nullptr);
     if (info == nullptr)
     {
-        fprintf (stderr, "The helics_federate_info object is not valid");
+        fprintf (stderr, "The helics_federate_info object is not valid\n");
         return;
     }
     info->uniqueKey = 0;
@@ -225,7 +225,13 @@ void helicsFederateInfoLoadFromArgs (helics_federate_info fi, int argc, const ch
     }
     try
     {
-        hfi->loadInfoFromArgs (argc, argv);
+        std::vector<std::string> args;
+        args.reserve (static_cast<size_t>(argc) - 1);
+        for (int ii = argc - 1; ii > 0; --ii)
+        {
+            args.emplace_back (argv[ii]);
+        }
+        hfi->loadInfoFromArgs (args);
     }
     catch (...)
     {
@@ -566,13 +572,26 @@ helics_core helicsCreateCoreFromArgs (const char *type, const char *name, int ar
         return nullptr;
     }
     auto core = std::make_unique<helics::CoreObject> ();
+    try
+    {
+        core->valid = coreValidationIdentifier;
+        std::vector<std::string> args;
+        args.reserve (static_cast<size_t>(argc) - 1);
+        for (int ii = argc - 1; ii > 0; ii--)
+        {
+            args.emplace_back (argv[ii]);
+        }
+        core->coreptr = helics::CoreFactory::FindOrCreate (ct, AS_STRING (name), args);
+        auto retcore = reinterpret_cast<helics_core> (core.get ());
+        getMasterHolder ()->addCore (std::move (core));
 
-    core->valid = coreValidationIdentifier;
-    core->coreptr = helics::CoreFactory::FindOrCreate (ct, AS_STRING (name), argc, argv);
-    auto retcore = reinterpret_cast<helics_core> (core.get ());
-    getMasterHolder ()->addCore (std::move (core));
-
-    return retcore;
+        return retcore;
+    }
+    catch (...)
+    {
+        helicsErrorHandler (err);
+        return nullptr;
+    }
 }
 
 helics_core helicsCoreClone (helics_core core, helics_error *err)
@@ -685,7 +704,13 @@ helics_broker helicsCreateBrokerFromArgs (const char *type, const char *name, in
     broker->valid = brokerValidationIdentifier;
     try
     {
-        broker->brokerptr = helics::BrokerFactory::create (ct, (name != nullptr) ? std::string (name) : nullstr, argc, argv);
+        std::vector<std::string> args;
+        args.reserve (static_cast<size_t>(argc) - 1);
+        for (int ii = argc - 1; ii > 0; ii--)
+        {
+            args.emplace_back (argv[ii]);
+        }
+        broker->brokerptr = helics::BrokerFactory::create (ct, (name != nullptr) ? std::string (name) : nullstr, args);
         auto retbroker = reinterpret_cast<helics_broker> (broker.get ());
         getMasterHolder ()->addBroker (std::move (broker));
         return retbroker;
@@ -1060,14 +1085,14 @@ helics::CoreObject::~CoreObject ()
     coreptr = nullptr;
 }
 
-void helicsCloseLibrary ()
+void helicsCloseLibrary (void)
 {
     using namespace std::literals::chrono_literals;
     clearAllObjects ();
     auto ret = std::async (std::launch::async, []() { helics::CoreFactory::cleanUpCores (2000ms); });
     helics::BrokerFactory::cleanUpBrokers (2000ms);
     ret.get ();
-#if HELICS_HAVE_ZEROMQ > 0
+#ifdef ENABLE_ZMQ_CORE
     if (ZmqContextManager::setContextToLeakOnDelete ())
     {
         ZmqContextManager::getContext ().close ();
@@ -1268,7 +1293,7 @@ void helicsQueryFree (helics_query query)
     queryObj->valid = 0;
     delete queryObj;
 }
-void helicsCleanupLibrary ()
+void helicsCleanupLibrary (void)
 {
     helics::cleanupHelicsLibrary ();
     //  helics::LoggerManager::closeLogger();
@@ -1280,7 +1305,7 @@ MasterObjectHolder::MasterObjectHolder () noexcept {}
 
 MasterObjectHolder::~MasterObjectHolder ()
 {
-#if HELICS_HAVE_ZEROMQ > 0
+#ifdef ENABLE_ZMQ_CORE
     if (ZmqContextManager::setContextToLeakOnDelete ())
     {
         ZmqContextManager::getContext ().close ();

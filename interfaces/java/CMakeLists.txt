@@ -30,7 +30,10 @@ if(ENABLE_SWIG AND SWIG_EXECUTABLE)
   swig_link_libraries(JNIhelics ${JAVA_LIBRARIES})
 
   set_target_properties(JNIhelics PROPERTIES FOLDER interfaces)
-
+  #get rid of some annoying warnings coming from swig generated code
+  if (NOT MSVC)
+    target_compile_options(JNIhelics PRIVATE "-Wno-strict-aliasing")
+  endif()
 
 else()
   
@@ -82,34 +85,9 @@ add_custom_command(
   VERBATIM
 )
 
-if(WIN32)
-  foreach(keyfile IN LISTS KEY_LIBRARY_FILES)
-    add_custom_command(
-      TARGET
-      JNIhelics
-      POST_BUILD # Adds a post-build event to api tests
-      COMMAND
-        ${CMAKE_COMMAND}
-        -E
-        copy_if_different # which executes "cmake - E copy_if_different..."
-        "${keyfile}" # <--this is in-file
-        "$<TARGET_FILE_DIR:JNIhelics>/"
-    ) # <--this is out-file path
-  endforeach(keyfile)
+  copy_key_files_to_target_location(JNIhelics)
+  copy_shared_target(JNIhelics)
 
-  add_custom_command(
-    TARGET
-    JNIhelics
-    POST_BUILD # Adds a post-build event to api tests
-    COMMAND
-      ${CMAKE_COMMAND}
-      -E
-      copy_if_different # which executes "cmake - E copy_if_different..."
-      "$<TARGET_FILE:helicsSharedLib>" # <--this is in- file
-      "$<TARGET_FILE_DIR:JNIhelics>/"
-  ) # <--this is out- file path
-
-endif(WIN32)
 
 install(
   FILES ${CMAKE_CURRENT_BINARY_DIR}/buildjar/helics-${HELICS_VERSION}.jar
@@ -121,6 +99,6 @@ install(
   DESTINATION java
   COMPONENT java OPTIONAL
 )
-install(FILES $<TARGET_FILE:helicsSharedLib> DESTINATION java COMPONENT java)
+
+install_key_files_with_comp(java)
 install(TARGETS JNIhelics DESTINATION java COMPONENT java)
-install(FILES ${KEY_LIBRARY_FILES} DESTINATION java COMPONENT java)

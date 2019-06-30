@@ -13,7 +13,7 @@ file linking with version info and containing some convenience functions
 */
 namespace helics
 {
-/** @returns a string containing version information*/
+/** a string representation of the HELICS version*/
 constexpr auto versionString = HELICS_VERSION_STRING;
 
 /** get the Major version number*/

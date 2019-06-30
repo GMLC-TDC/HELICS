@@ -63,8 +63,8 @@ Getting and building from source:
 3. Run `make`.
 
 ```bash
-git clone https://github.com/GMLC-TDC/HELICS-src
-cd HELICS-src
+git clone https://github.com/GMLC-TDC/HELICS
+cd HELICS
 mkdir build
 cd build
 cmake ../
@@ -96,7 +96,7 @@ Building HELICS with python support
 Run the following:
 
 ```bash
-$ cmake -DBUILD_PYTHON_INTERFACE=ON -DCMAKE_INSTALL_PREFIX=/Users/$(whoami)/local/helics-2.0.0/ ..
+$ cmake -DBUILD_PYTHON_INTERFACE=ON -DCMAKE_INSTALL_PREFIX=/Users/$(whoami)/local/helics-2.1.0/ ..
 $ make -j8
 $ make install
 ```
@@ -189,8 +189,8 @@ Note: To check if `mex` is in the PATH, type `which mex` and see if it returns a
 </div>
 
 ```
-git clone https://github.com/GMLC-TDC/HELICS-src
-cd HELICS-src
+git clone https://github.com/GMLC-TDC/HELICS
+cd HELICS
 mkdir build-osx
 cd build-osx
 cmake -DBUILD_MATLAB_INTERFACE=ON -DCMAKE_INSTALL_PREFIX=/Users/$(whoami)/local/helics-develop/ ..
@@ -208,17 +208,17 @@ To do that, you can follow the following instructions.
 The below generates the MATLAB interface using SWIG.
 
 ```bash
-cd ~/GitRepos/GMLC-TDC/HELICS-src/interfaces/
+cd ~/GitRepos/GMLC-TDC/HELICS/interfaces/
 mkdir matlab
 swig -I../src/helics/shared_api_library -outdir ./matlab -matlab ./helics.i
 mv helics_wrap.cxx matlab/helicsMEX.cxx
 ```
 
-You can copy these files into the respective `HELICS-src/interfaces/matlab/` folder and run the cmake command above.
+You can copy these files into the respective `HELICS/interfaces/matlab/` folder and run the cmake command above.
 Alternatively, you wish to build the MATLAB interface without using CMake, and you can do the following.
 
 ```bash
-cd ~/GitRepos/GMLC-TDC/HELICS-src/interfaces/
+cd ~/GitRepos/GMLC-TDC/HELICS/interfaces/
 mex -I../src/helics/shared_api_library ./matlab/helics_wrap.cxx -lhelicsSharedLib -L/path/to/helics_install/lib/helics/
 mv helicsMEX.* matlab/
 ```

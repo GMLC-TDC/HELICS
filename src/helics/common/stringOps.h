@@ -188,6 +188,7 @@ the delimiter characters are allowed inside the brackets and the resulting vecto
 account
 @param line  the string to spit
 @param  delimiters a string containing the valid delimiter characters
+@param bracketChars a string of characters define what valid bracket characters are
 @param compression default off,  if set to delimiter_compression::on will merge multiple sequential delimiters
 together
 @return a vector of strings separated by the delimiters characters accounting for bracketing characters
@@ -199,14 +200,14 @@ stringVector splitlineBracket (const std::string &line,
 
 /** @brief extract a trailing number from a string return the number and the string without the number
 @param input the string to extract the information from
-@param[out]  the leading string with the numbers removed
-@param  the default number to return if no trailing number was found
+@param[out] output the leading string with the numbers removed
+@param defNum the default number to return if no trailing number was found
 @return the numerical value of the trailing number*/
 int trailingStringInt (const std::string &input, std::string &output, int defNum = -1);
 
 /** @brief extract a trailing number from a string
 @param input the string to extract the information from
-@param  the default number to return if no trailing number was found
+@param defNum the default number to return if no trailing number was found
 @return the numerical value of the trailing number*/
 int trailingStringInt (const std::string &input, int defNum = -1);
 
@@ -224,7 +225,7 @@ enum string_match_type_t
  function searches for any of the testStrings in the testStrings vector based on the matchType parameter and
 returns the index into the testStrings vector
 @param testStrings the vector of strings to search for
-@param iString the string library to search through
+@param iStrings the string library to search through
 @param matchType the matching type
 @return the index of the match or -1 if no match is found
 */
@@ -235,7 +236,7 @@ int findCloseStringMatch (const stringVector &testStrings,
 /** @brief remove a set of characters from a string
 @param source  the original string
 @param remchars the characters to remove
-@return  the string with the specified character removed
+@return  the string with the specified characters removed
 */
 std::string removeChars (const std::string &source, const std::string &remchars);
 
@@ -248,14 +249,14 @@ std::string removeChar (const std::string &source, char remchar);
 
 /** @brief remove quotes from a string
  only quotes around the edges are removed along with whitespace outside the quotes
-@param source  the original string
+@param str the original string
 @return  the string with quotes removed
 */
 std::string removeQuotes (const std::string &str);
 
 /** @brief outer brackets from a string
 Bracket characters include [({<
-@param source  the original string
+@param str  the original string
 @return  the string with brackets removed
 */
 std::string removeBrackets (const std::string &str);
@@ -263,7 +264,7 @@ std::string removeBrackets (const std::string &str);
 /** @brief replace a particular key character with a different string
 @param source  the original string
 @param key the character to replace
-@param  the string to replace the key with
+@param repStr the string to replace the key with
 @return  the string after the specified replacement
 */
 std::string characterReplace (const std::string &source, char key, const std::string &repStr);

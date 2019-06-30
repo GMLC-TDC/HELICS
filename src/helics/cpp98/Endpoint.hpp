@@ -10,16 +10,18 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include "../shared_api_library/MessageFederate.h"
 #include "helicsExceptions.hpp"
+#include <vector>
+#include <string>
 
 namespace helicscpp
 {
 class Endpoint
 {
   public:
-    explicit Endpoint (helics_endpoint hep) : ep (hep) {}
-    Endpoint (){};
+    explicit Endpoint (helics_endpoint hep) HELICS_NOTHROW: ep (hep) {}
+    Endpoint () HELICS_NOTHROW : ep (HELICS_NULL_POINTER){};
 
-    Endpoint (const Endpoint &endpoint) : ep (endpoint.ep) {}
+    Endpoint (const Endpoint &endpoint) HELICS_NOTHROW: ep (endpoint.ep) {}
 
     Endpoint &operator= (const Endpoint &endpoint)
     {
@@ -51,7 +53,7 @@ class Endpoint
     /** Methods for sending a message **/
     void sendMessage (const char *data, size_t len)
     {
-        helicsEndpointSendMessageRaw (ep, NULL, data, static_cast<int> (len), hThrowOnError ());
+        helicsEndpointSendMessageRaw (ep, HELICS_NULL_POINTER, data, static_cast<int> (len), hThrowOnError ());
     }
 
     /** Methods for sending a message **/
@@ -62,7 +64,7 @@ class Endpoint
 
     void sendMessage (const char *data, size_t len, helics_time time)
     {
-        helicsEndpointSendEventRaw (ep, NULL, data, static_cast<int> (len), time, hThrowOnError ());
+        helicsEndpointSendEventRaw (ep, HELICS_NULL_POINTER, data, static_cast<int> (len), time, hThrowOnError ());
     }
 
     void sendMessage (const std::string &dest, const char *data, size_t len, helics_time time)
@@ -72,7 +74,8 @@ class Endpoint
     /** Methods for sending a message **/
     void sendMessage (const std::string &data)
     {
-        helicsEndpointSendMessageRaw (ep, NULL, data.c_str (), static_cast<int> (data.size ()), hThrowOnError ());
+        helicsEndpointSendMessageRaw (ep, HELICS_NULL_POINTER, data.c_str (), static_cast<int> (data.size ()),
+                                      hThrowOnError ());
     }
 
     /** Methods for sending a message **/
@@ -84,7 +87,7 @@ class Endpoint
 
     void sendMessage (const std::string &data, helics_time time)
     {
-        helicsEndpointSendEventRaw (ep, NULL, data.c_str (), static_cast<int> (data.size ()), time,
+        helicsEndpointSendEventRaw (ep, HELICS_NULL_POINTER, data.c_str (), static_cast<int> (data.size ()), time,
                                     hThrowOnError ());
     }
 
@@ -97,7 +100,8 @@ class Endpoint
     /** Methods for sending a message **/
     void sendMessage (const std::vector<char> &data)
     {
-        helicsEndpointSendMessageRaw (ep, NULL, data.data (), static_cast<int> (data.size ()), hThrowOnError ());
+        helicsEndpointSendMessageRaw (ep, HELICS_NULL_POINTER, data.data (), static_cast<int> (data.size ()),
+                                      hThrowOnError ());
     }
 
     /** Methods for sending a message **/
@@ -109,7 +113,7 @@ class Endpoint
 
     void sendMessage (const std::vector<char> &data, helics_time time)
     {
-        helicsEndpointSendEventRaw (ep, NULL, data.data (), static_cast<int> (data.size ()), time,
+        helicsEndpointSendEventRaw (ep, HELICS_NULL_POINTER, data.data (), static_cast<int> (data.size ()), time,
                                     hThrowOnError ());
     }
 

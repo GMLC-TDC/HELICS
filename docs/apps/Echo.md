@@ -56,6 +56,6 @@ helics_app echo echo_file.txt --stop 5
 
 The Echo app supports JSON files some examples can be found in
 
-[Echo configuation Examples](https://github.com/GMLC-TDC/HELICS-src/tree/master/tests/helics/apps/test_files)
+[Echo configuration examples](https://github.com/GMLC-TDC/HELICS/tree/master/tests/helics/apps/test_files)
 
 the main property of the echo app is the delay time which messages are echoed.

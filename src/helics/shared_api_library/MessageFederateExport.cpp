@@ -425,7 +425,7 @@ helics_message helicsEndpointGetMessage (helics_endpoint endpoint)
 
     if (endObj->lastMessage)
     {
-        helics_message mess{};
+        helics_message mess;
         mess.data = endObj->lastMessage->data.data ();
         mess.dest = endObj->lastMessage->dest.c_str ();
         mess.length = endObj->lastMessage->data.size ();
@@ -452,7 +452,7 @@ helics_message helicsFederateGetMessage (helics_federate fed)
 
     if (fedObj->lastMessage)
     {
-        helics_message mess{};
+        helics_message mess;
         mess.data = fedObj->lastMessage->data.data ();
         mess.dest = fedObj->lastMessage->dest.c_str ();
         mess.length = fedObj->lastMessage->data.size ();

@@ -1,11 +1,11 @@
 HELICS documentation
 ====================
 
-[![](https://badges.gitter.im/GMLC-TDC/HELICS-src.png)](https://gitter.im/GMLC-TDC/HELICS-src)
+[![](https://badges.gitter.im/GMLC-TDC/HELICS.png)](https://gitter.im/GMLC-TDC/HELICS)
 [![](https://img.shields.io/badge/docs-ready-blue.svg)](https://helics.readthedocs.io/en/latest)
 [![](https://img.shields.io/conda/pn/gmlc-tdc/helics.svg)](https://anaconda.org/gmlc-tdc/helics/)
-[![](https://img.shields.io/github/tag-date/GMLC-TDC/HELICS-src.svg)](https://github.com/GMLC-TDC/HELICS-src/releases)
-[![](https://img.shields.io/badge/License-BSD-blue.svg)](https://github.com/GMLC-TDC/HELICS-src/blob/master/LICENSE)
+[![](https://img.shields.io/github/tag-date/GMLC-TDC/HELICS.svg)](https://github.com/GMLC-TDC/HELICS/releases)
+[![](https://img.shields.io/badge/License-BSD-blue.svg)](https://github.com/GMLC-TDC/HELICS/blob/master/LICENSE)
 
 This is the documentation for the Hierarchical Engine for Large-scale Infrastructure Co-Simulation (HELICS). HELICS is an
 open-source cyber-physical-energy co-simulation framework for energy systems, with a strong tie to the electric
@@ -18,24 +18,43 @@ Brief History: HELICS began as the core software development of the Grid Moderni
 
 Motivation: Energy systems and their associated information and communication technology systems are becoming increasingly intertwined. As a result, effectively designing, analyzing, and implementing modern energy systems increasingly relies on advanced modeling that simultaneously captures both the cyber and physical domains in combined simulations. It is designed to increase scalability and portability in modeling advanced features of highly integrated power system and cyber-physical energy systems.
 
-
-- [GitHub](https://github.com/GMLC-TDC/HELICS-src)
-- [Gitter](https://gitter.im/GMLC-TDC/HELICS-src)
-- [Documentation](https://helics.readthedocs.io/en/latest)
-- [User Guide](user-guide/index.html)
+- [Gitter](https://gitter.im/GMLC-TDC/HELICS)
 
 ```eval_rst
 .. toctree::
- :maxdepth: 1
+   :maxdepth: 1
+   :caption: Basics
 
- installation/index
- introduction/index
- configuration/index
- user-guide/index
- developer-guide/index
- apps/index
- c-api-reference/index
- ROADMAP
+   installation/index
+   introduction/index
+   user-guide/index
+```
+
+```eval_rst
+.. toctree::
+   :maxdepth: 1
+   :caption: Reference
+
+   configuration/index
+   apps/index
+```
+
+```eval_rst
+.. toctree::
+   :maxdepth: 1
+   :caption: API Docs
+
+   c-api-reference/index
+   doxygen/index
+```
+
+```eval_rst
+.. toctree::
+   :maxdepth: 1
+   :caption: Contributing
+
+   developer-guide/index
+   ROADMAP
 ```
 
 You can find [Doxygen documentation here](doxygen/index.html).

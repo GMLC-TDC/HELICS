@@ -68,7 +68,7 @@ BOOST_AUTO_TEST_CASE (federate_time_step_tests, *utf::label ("ci"))
 
 BOOST_AUTO_TEST_CASE (federate_broker_disconnect_test)
 {
-    auto brk = helics::BrokerFactory::create (helics::core_type::TEST, "b1", "1");
+    auto brk = helics::BrokerFactory::create (helics::core_type::TEST, "b1", "-f 1");
     brk->connect ();
     helics::FederateInfo fi (CORE_TYPE_TO_TEST);
 
@@ -98,6 +98,7 @@ BOOST_AUTO_TEST_CASE (federate_broker_disconnect_test)
     BOOST_CHECK (Fed->getCurrentMode () == helics::Federate::modes::finalize);
 }
 
+#ifdef ENABLE_ZMQ_CORE
 // TODO PT:: make this work for all test types
 BOOST_AUTO_TEST_CASE (federate_bad_broker_error_zmq)
 {
@@ -115,6 +116,8 @@ BOOST_AUTO_TEST_CASE (federate_timeout_error_zmq)
     BOOST_CHECK_THROW (std::make_shared<helics::Federate> ("test1", fi), helics::RegistrationFailure);
 }
 
+#endif
+
 BOOST_AUTO_TEST_CASE (federate_multiple_federates, *utf::label ("ci"))
 {
     helics::FederateInfo fi (CORE_TYPE_TO_TEST);
@@ -130,20 +133,20 @@ BOOST_AUTO_TEST_CASE (federate_multiple_federates, *utf::label ("ci"))
 
     BOOST_CHECK (Fed1->getID () != Fed2->getID ());
 
-    auto f1finish = std::async (std::launch::async, [&]() { Fed1->enterInitializingMode (); });
+    auto f1finish = std::async (std::launch::async, [&] () { Fed1->enterInitializingMode (); });
     Fed2->enterInitializingMode ();
 
     f1finish.wait ();
     BOOST_CHECK (Fed1->getCurrentMode () == helics::Federate::modes::initializing);
     BOOST_CHECK (Fed2->getCurrentMode () == helics::Federate::modes::initializing);
 
-    f1finish = std::async (std::launch::async, [&]() { Fed1->enterExecutingMode (); });
+    f1finish = std::async (std::launch::async, [&] () { Fed1->enterExecutingMode (); });
     Fed2->enterExecutingMode ();
     f1finish.wait ();
     BOOST_CHECK (Fed1->getCurrentMode () == helics::Federate::modes::executing);
     BOOST_CHECK (Fed2->getCurrentMode () == helics::Federate::modes::executing);
 
-    auto f1step = std::async (std::launch::async, [&]() { return Fed1->requestTime (1.0); });
+    auto f1step = std::async (std::launch::async, [&] () { return Fed1->requestTime (1.0); });
     auto f2step = Fed2->requestTime (1.0);
 
     auto f1stepVal = f1step.get ();
@@ -152,7 +155,7 @@ BOOST_AUTO_TEST_CASE (federate_multiple_federates, *utf::label ("ci"))
 
     BOOST_CHECK_EQUAL (Fed1->getCurrentTime (), 1.0);
 
-    f1step = std::async (std::launch::async, [&]() { return Fed1->requestTime (3.0); });
+    f1step = std::async (std::launch::async, [&] () { return Fed1->requestTime (3.0); });
     f2step = Fed2->requestTime (3.0);
 
     f1stepVal = f1step.get ();
@@ -179,20 +182,20 @@ BOOST_AUTO_TEST_CASE (federate_multiple_federates_multi_cores, *utf::label ("ci"
     BOOST_CHECK (Fed1->getCurrentMode () == helics::Federate::modes::startup);
     BOOST_CHECK (Fed2->getCurrentMode () == helics::Federate::modes::startup);
 
-    auto f1finish = std::async (std::launch::async, [&]() { Fed1->enterInitializingMode (); });
+    auto f1finish = std::async (std::launch::async, [&] () { Fed1->enterInitializingMode (); });
     Fed2->enterInitializingMode ();
 
     f1finish.wait ();
     BOOST_CHECK (Fed1->getCurrentMode () == helics::Federate::modes::initializing);
     BOOST_CHECK (Fed2->getCurrentMode () == helics::Federate::modes::initializing);
 
-    f1finish = std::async (std::launch::async, [&]() { Fed1->enterExecutingMode (); });
+    f1finish = std::async (std::launch::async, [&] () { Fed1->enterExecutingMode (); });
     Fed2->enterExecutingMode ();
     f1finish.wait ();
     BOOST_CHECK (Fed1->getCurrentMode () == helics::Federate::modes::executing);
     BOOST_CHECK (Fed2->getCurrentMode () == helics::Federate::modes::executing);
 
-    auto f1step = std::async (std::launch::async, [&]() { return Fed1->requestTime (1.0); });
+    auto f1step = std::async (std::launch::async, [&] () { return Fed1->requestTime (1.0); });
     auto f2step = Fed2->requestTime (1.0);
 
     auto f1stepVal = f1step.get ();
@@ -201,7 +204,7 @@ BOOST_AUTO_TEST_CASE (federate_multiple_federates_multi_cores, *utf::label ("ci"
 
     BOOST_CHECK_EQUAL (Fed1->getCurrentTime (), 1.0);
 
-    f1step = std::async (std::launch::async, [&]() { return Fed1->requestTime (3.0); });
+    f1step = std::async (std::launch::async, [&] () { return Fed1->requestTime (3.0); });
     f2step = Fed2->requestTime (3.0);
 
     f1stepVal = f1step.get ();
@@ -270,7 +273,7 @@ namespace bdata = boost::unit_test::data;
 
 BOOST_DATA_TEST_CASE (federate_global_file, bdata::make (simple_global_files), file_name)
 {
-    auto brk = helics::BrokerFactory::create (helics::core_type::TEST, "b1", "2");
+    auto brk = helics::BrokerFactory::create (helics::core_type::TEST, "b1", "-f 2");
     brk->connect ();
     auto testFile = std::string (TEST_DIR) + file_name;
     brk->makeConnections (testFile);
@@ -304,7 +307,7 @@ BOOST_DATA_TEST_CASE (federate_global_file, bdata::make (simple_global_files), f
 
 BOOST_DATA_TEST_CASE (federate_core_global_file, bdata::make (simple_global_files), file_name)
 {
-    auto brk = helics::BrokerFactory::create (helics::core_type::TEST, "b1", "2");
+    auto brk = helics::BrokerFactory::create (helics::core_type::TEST, "b1", "-f 2");
     brk->connect ();
 
     helics::FederateInfo fi (CORE_TYPE_TO_TEST);

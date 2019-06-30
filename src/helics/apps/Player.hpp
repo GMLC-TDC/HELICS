@@ -48,6 +48,10 @@ class Player : public App
   public:
     /** default constructor*/
     Player () = default;
+    /** construct from command line arguments in a vector
+   @param args the command line arguments to pass in a reverse vector
+   */
+    Player (std::vector<std::string> args);
     /** construct from command line arguments
     @param argc the number of arguments
     @param argv the strings in the input
@@ -184,7 +188,9 @@ class Player : public App
     const auto &getMessage (int index) const { return messages[index]; }
 
   private:
-    int loadArguments (boost::program_options::variables_map &vm_map);
+    std::unique_ptr<helicsCLI11App> generateParser ();
+    /** process remaining command line arguments*/
+    void processArgs ();
     /** load from a jsonString
     @param jsonString either a JSON filename or a string containing JSON
     */
