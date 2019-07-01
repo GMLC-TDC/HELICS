@@ -20,7 +20,7 @@ struct timing_tests : public FederateTestFixture, public ::testing::Test
 };
 
 /** just a check that in the simple case we do actually get the time back we requested*/
-TEST_F (timing_tests, simple_timing_test, *utf::label ("ci"))
+TEST_F (timing_tests, simple_timing_test)
 {
     SetupTest<helics::ValueFederate> ("test", 2);
     auto vFed1 = GetFederateAs<helics::ValueFederate> (0);
@@ -47,7 +47,7 @@ TEST_F (timing_tests, simple_timing_test, *utf::label ("ci"))
     vFed2->finalize ();
 }
 
-TEST_F (timing_tests, simple_timing_test2, *utf::label ("ci"))
+TEST_F (timing_tests, simple_timing_test2)
 {
     SetupTest<helics::ValueFederate> ("test", 2);
     auto vFed1 = GetFederateAs<helics::ValueFederate> (0);
@@ -78,7 +78,7 @@ TEST_F (timing_tests, simple_timing_test2, *utf::label ("ci"))
     vFed2->finalize ();
 }
 
-TEST_F (timing_tests, simple_timing_test_message, *utf::label ("ci"))
+TEST_F (timing_tests, simple_timing_test_message)
 {
     SetupTest<helics::MessageFederate> ("test", 2);
     auto vFed1 = GetFederateAs<helics::MessageFederate> (0);
@@ -112,7 +112,7 @@ TEST_F (timing_tests, simple_timing_test_message, *utf::label ("ci"))
       ->finalize ();  // this will also test finalizing while a time request is ongoing otherwise it will time out.
 }
 
-TEST_F (timing_tests, test_uninteruptible_flag, *utf::label ("ci"))
+TEST_F (timing_tests, test_uninteruptible_flag)
 {
     SetupTest<helics::ValueFederate> ("test", 2);
     auto vFed1 = GetFederateAs<helics::ValueFederate> (0);
@@ -159,7 +159,7 @@ TEST_F (timing_tests, test_uninteruptible_flag, *utf::label ("ci"))
       ->finalize ();  // this will also test finalizing while a time request is ongoing otherwise it will time out.
 }
 
-TEST_F (timing_tests, test_uninteruptible_flag_option, *utf::label ("ci"))
+TEST_F (timing_tests, test_uninteruptible_flag_option)
 {
     SetupTest<helics::ValueFederate> ("test", 2);
     auto vFed1 = GetFederateAs<helics::ValueFederate> (0);
@@ -206,7 +206,7 @@ TEST_F (timing_tests, test_uninteruptible_flag_option, *utf::label ("ci"))
       ->finalize ();  // this will also test finalizing while a time request is ongoing otherwise it will time out.
 }
 
-TEST_F (timing_tests, test_uninteruptible_flag_two_way_comm, *utf::label ("ci"))
+TEST_F (timing_tests, test_uninteruptible_flag_two_way_comm)
 {
     SetupTest<helics::ValueFederate> ("test", 2);
     auto vFed1 = GetFederateAs<helics::ValueFederate> (0);
@@ -258,7 +258,7 @@ TEST_F (timing_tests, test_uninteruptible_flag_two_way_comm, *utf::label ("ci"))
       ->finalize ();  // this will also test finalizing while a time request is ongoing otherwise it will time out.
 }
 
-TEST_F (timing_tests, timing_with_input_delay, *utf::label ("ci"))
+TEST_F (timing_tests, timing_with_input_delay)
 {
     SetupTest<helics::MessageFederate> ("test", 2);
     auto vFed1 = GetFederateAs<helics::MessageFederate> (0);
@@ -291,7 +291,7 @@ TEST_F (timing_tests, timing_with_input_delay, *utf::label ("ci"))
       ->finalize ();  // this will also test finalizing while a time request is ongoing otherwise it will time out.
 }
 
-TEST_F (timing_tests, timing_with_minDelta_change, *utf::label ("ci"))
+TEST_F (timing_tests, timing_with_minDelta_change)
 {
     SetupTest<helics::ValueFederate> ("test", 1, 1.0);
     auto vFed1 = GetFederateAs<helics::ValueFederate> (0);
@@ -313,7 +313,7 @@ TEST_F (timing_tests, timing_with_minDelta_change, *utf::label ("ci"))
     vFed1->finalize ();
 }
 
-TEST_F (timing_tests, timing_with_period_change, *utf::label ("ci"))
+TEST_F (timing_tests, timing_with_period_change)
 {
     SetupTest<helics::ValueFederate> ("test", 1);
     auto vFed1 = GetFederateAs<helics::ValueFederate> (0);
@@ -335,7 +335,7 @@ TEST_F (timing_tests, timing_with_period_change, *utf::label ("ci"))
     vFed1->finalize ();
 }
 
-TEST_F (timing_tests, sender_finalize_timing_result, *utf::label ("ci"))
+TEST_F (timing_tests, sender_finalize_timing_result)
 {
     SetupTest<helics::ValueFederate> ("test", 2);
     auto vFed1 = GetFederateAs<helics::ValueFederate> (0);
@@ -398,7 +398,7 @@ TEST_F (timing_tests, sender_finalize_timing_result, *utf::label ("ci"))
     vFed2->finalize ();
 }
 
-TEST_F (timing_tests, sender_finalize_timing_result2, *utf::label ("ci"))
+TEST_F (timing_tests, sender_finalize_timing_result2)
 {
     SetupTest<helics::ValueFederate> ("test", 2);
     auto vFed1 = GetFederateAs<helics::ValueFederate> (0);
@@ -466,7 +466,7 @@ TEST_F (timing_tests, sender_finalize_timing_result2, *utf::label ("ci"))
     vFed2->finalize ();
 }
 
-TEST_F (timing_tests, fast_sender_tests)
+TEST_F (timing_tests, fast_sender_tests)  // skip_ci
 {
     SetupTest<helics::ValueFederate> ("zmq_2", 2);
     auto vFed1 = GetFederateAs<helics::ValueFederate> (0);
@@ -500,7 +500,7 @@ TEST_F (timing_tests, fast_sender_tests)
     vFed2->finalize ();
 }
 
-TEST_F (timing_tests, dual_fast_sender_tests)
+TEST_F (timing_tests, dual_fast_sender_tests)  // skip_ci
 {
     SetupTest<helics::ValueFederate> ("zmq_2", 3);
     auto vFed1 = GetFederateAs<helics::ValueFederate> (0);
