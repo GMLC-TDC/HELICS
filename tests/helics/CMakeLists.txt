@@ -18,11 +18,12 @@ target_link_libraries(helics_google_test_base INTERFACE helics_base_includes com
 
 add_subdirectory(core)
 add_subdirectory(common)
+add_subdirectory(system_tests)
 
 if (BUILD_BOOST_TESTS)
 
 add_subdirectory(application_api)
-add_subdirectory(system_tests)
+
 if(BUILD_C_SHARED_LIB OR INTERFACE_BUILD)
     add_subdirectory(shared_library)
 endif()
