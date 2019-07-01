@@ -142,7 +142,7 @@ if __name__ == "__main__":
     bus_profiles = load_profiles[:,bus_profiles_index]
     time_opf=numpy.linspace(0, total_inteval, numpy.floor(total_inteval/acopf_interval)+1)
 
-###########################   Cosimulation Bus and Load Amplification Factor #########################################   
+###########################   Cosimulation Bus and Load Amplification Factor #########################################
 
     #Co-sim Bus  (inputs)
     Cosim_bus_number = 118

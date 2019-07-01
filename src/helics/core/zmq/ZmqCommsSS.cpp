@@ -501,14 +501,14 @@ int ZmqCommsSS::processRxMessage (zmq::socket_t &brokerSocket,
     if (serverMode)
     {
         brokerSocket.recv (&msg1);
-        std::string str (static_cast<char *> (msg1.data ()), msg1.size ());
+        // std::string str (static_cast<char *> (msg1.data ()), msg1.size ());
 
         brokerSocket.recv (&msg2);
     }
     else
     {
         brokerConnection.recv (&msg1);
-        std::string str (static_cast<char *> (msg1.data ()), msg1.size ());
+        // std::string str (static_cast<char *> (msg1.data ()), msg1.size ());
 
         brokerConnection.recv (&msg2);
     }

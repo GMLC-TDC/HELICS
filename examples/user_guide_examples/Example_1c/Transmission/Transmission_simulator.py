@@ -101,8 +101,6 @@ if __name__ == "__main__":
 ######################   Entereing Execution Mode  ##########################################################
     status = h.helicsFederateEnterInitializingMode(fed)
     status = h.helicsFederateEnterExecutingMode(fed)
-    
-
 
     #Pypower Processing (inputs)
     hours = 24
@@ -111,15 +109,15 @@ if __name__ == "__main__":
     pf_interval = 5*60 # in seconds (minimim_resolution)
     acopf_interval = 15*60 # in seconds (minimim_resolution)
     random.seed(0)
-    
+
     peak_demand = []
     ppc = []
     case_format = case118()
     peak_demand = case_format['bus'][:,2][:].copy()
     ppc = case_format.copy()
-      
-######################   creating fixed load profiles for each bus based on PF interval #############################       
-    
+
+######################   creating fixed load profiles for each bus based on PF interval #############################
+
     # load profiles (inputs)
     profiles = spio.loadmat('normalized_load_data_1min_ORIGINAL.mat',squeeze_me=True,struct_as_record=False)
     load_profiles_1min=profiles['my_data']
@@ -143,12 +141,12 @@ if __name__ == "__main__":
     #bus_profiles_index = numpy.random.random_integers(0,load_profiles.shape[1]-1,len(ppc['bus']))
     bus_profiles = load_profiles[:,bus_profiles_index]
     time_opf=numpy.linspace(0, total_inteval, numpy.floor(total_inteval/acopf_interval)+1)
-    
-###########################   Cosimulation Bus and Load Amplification Factor #########################################         
+
+###########################   Cosimulation Bus and Load Amplification Factor #########################################
 
     #Co-sim Bus  (inputs)
     Cosim_bus_number = 118
-    cosim_bus= Cosim_bus_number - 1   ## Do not chage this line 
+    cosim_bus= Cosim_bus_number - 1   ## Do not chage this line
     load_amplification_factor = 15
 
     #power_flow
@@ -160,10 +158,10 @@ if __name__ == "__main__":
     k=0
     votlage_cosim_bus = (ppc['bus'][cosim_bus,7]*ppc['bus'][cosim_bus,9])*1.043 
 
-#########################################   Starting Co-simulation  #################################################### 
+#########################################   Starting Co-simulation  ####################################################
 
     for t in range(0, total_inteval, pf_interval):
-        ############################   Publishing Voltage to GridLAB-D #######################################################      
+        ############################   Publishing Voltage to GridLAB-D #######################################################
             
         voltage_gld = complex(votlage_cosim_bus*1000)
         logger.info("Voltage value = {} kV".format(abs(voltage_gld)/1000))
@@ -179,11 +177,11 @@ if __name__ == "__main__":
         #############################   Subscribing to Feeder Load from to GridLAB-D ##############################################
 
         for i in range(0,subkeys_count):
-            sub = subid["m{}".format(i)]        
+            sub = subid["m{}".format(i)]
             rload, iload = h.helicsInputGetComplex(sub)
         logger.info("Python Federate grantedtime = {}".format(grantedtime))
         logger.info("Load value = {} kW".format(complex(rload, iload)/1000))
-        #print(votlage_plot,real_demand) 
+        #print(votlage_plot,real_demand)
         
         actual_demand=peak_demand*bus_profiles[x,:]
         ppc['bus'][:,2]=actual_demand
@@ -191,11 +189,11 @@ if __name__ == "__main__":
         ppc['bus'][cosim_bus,2]=rload*load_amplification_factor/1000000
         ppc['bus'][cosim_bus,3]=iload*load_amplification_factor/1000000
         ppopt = ppoption(PF_ALG=1)
-        
+
         print('PF TIme is {} and ACOPF time is {}'.format(time_pf[x], time_opf[k]))
-        
+
         ############################  Running OPF For optimal power flow intervals   ##############################
-        
+
         if (time_pf[x] == time_opf[k]):
             results_opf = runopf(ppc, ppopt)
             if (results_opf['success']):
@@ -207,9 +205,9 @@ if __name__ == "__main__":
                     LMP_solved = numpy.vstack((LMP_solved,results_opf['bus'][:,13]))
                     opf_time = time_opf[0:k+1]/3600
             k=k+1
-            
-        ################################  Running PF For optimal power flow intervals   ##############################  
-        
+
+        ################################  Running PF For optimal power flow intervals   ##############################
+
         solved_pf = runpf(ppc, ppopt)
         results_pf = solved_pf[0]
         ppc['bus'] = results_pf['bus']
@@ -228,9 +226,9 @@ if __name__ == "__main__":
                 
             votlage_cosim_bus=results_pf['bus'][cosim_bus,7]*results_pf['bus'][cosim_bus,9]    
             votlage_plot.append(votlage_cosim_bus)
-        
-        ######################### Plotting the Voltages and Load of the Co-SIM bus ##############################################   
-        
+
+        ######################### Plotting the Voltages and Load of the Co-SIM bus ##############################################
+
         if (x > 0) :
             ax1.clear()
             ax1.plot(pf_time,votlage_plot,'r--')
@@ -245,9 +243,9 @@ if __name__ == "__main__":
             plt.show(block=False)
             plt.pause(0.1)
         x=x+1
-        
+
     ##########################   Creating headers and Printing results to CSVs #####################################
-        
+
     head = str('Time(in Hours)')
     for i in range(voltages.shape[1]):
         head = head+','+('Bus'+str(i+1))
@@ -263,6 +261,3 @@ if __name__ == "__main__":
     logger.info("Destroying federate")
     destroy_federate(fed)
     logger.info("Done!")
-    
-    
-    
