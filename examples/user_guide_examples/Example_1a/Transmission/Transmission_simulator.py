@@ -5,7 +5,7 @@ Created on Thu Oct 11 10:08:26 2018
 @author: monish.mukherjee
 """
 import scipy.io as spio
-from pypower.api import case118, ppoption, runpf, runopf
+from pypower.api import case118, ppoption, runpf
 import math
 import numpy
 import copy
@@ -102,8 +102,6 @@ if __name__ == "__main__":
     status = h.helicsFederateEnterInitializingMode(fed)
     status = h.helicsFederateEnterExecutingMode(fed)
 
-
-
     #Pypower Processing (inputs)
     hours = 24
     total_inteval = int(60 * 60 * hours)
@@ -139,7 +137,7 @@ if __name__ == "__main__":
         else:
             profile_number=profile_number+1
     ###################   Asserting Profiles to buses    ############################
-     
+
     #bus_profiles_index = numpy.random.random_integers(0,load_profiles.shape[1]-1,len(ppc['bus']))
     bus_profiles = load_profiles[:,bus_profiles_index]
     time_opf=numpy.linspace(0, total_inteval, numpy.floor(total_inteval/acopf_interval)+1)
