@@ -112,7 +112,7 @@ if __name__ == "__main__":
             logger.info('Total Feeder Load is over the Feeder Upper Limit')
             logger.info('Warning ----> Feeder OverLimit --->  Turn off EV')
             
-            if (k < endpoint_count):   
+            if (k < endpoint_count):
                 end = endid["m{}".format(k)]
                 end_name = str(h.helicsEndpointGetName(end))
                 print(end_name)

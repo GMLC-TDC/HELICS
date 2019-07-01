@@ -77,7 +77,7 @@ if __name__ == "__main__":
     #fed = create_federate()
 
 #################################  Registering  federate from json  ########################################
-    
+
     fed = h.helicsCreateValueFederateFromConfig('Transmission_json.json')
     status = h.helicsFederateRegisterInterfaces(fed, 'Transmission_json.json')
     federate_name = h.helicsFederateGetName(fed)[-1]
@@ -85,7 +85,7 @@ if __name__ == "__main__":
     pubkeys_count = h.helicsFederateGetPublicationCount(fed)
     subkeys_count = h.helicsFederateGetInputCount(fed)
     print(subkeys_count)
-######################   Reference to Publications and Subscription form index  #############################   
+######################   Reference to Publications and Subscription form index  #############################
     pubid = {}
     subid = {}
     for i in range(0,pubkeys_count):
@@ -97,8 +97,8 @@ if __name__ == "__main__":
         status = h.helicsInputSetDefaultComplex(subid["m{}".format(i)], 0, 0)
         sub_key = h.helicsSubscriptionGetKey(subid["m{}".format(i)])
         print( 'Registered Subscription ---> {}'.format(sub_key))
-  
-######################   Entereing Execution Mode  ##########################################################    
+
+######################   Entereing Execution Mode  ##########################################################
     status = h.helicsFederateEnterInitializingMode(fed)
     status = h.helicsFederateEnterExecutingMode(fed)
     
@@ -127,9 +127,9 @@ if __name__ == "__main__":
     points = numpy.floor(numpy.linspace(0, len(load_profiles_1min)-1, resolution_load+1))
     time_pf = numpy.linspace(0, total_inteval, resolution_load+1)
     load_profiles = load_profiles_1min[points.astype(int),:]
-    
+
     ###################   Creating a fixed profile for buses    ##################
-    
+
     bus_profiles_index=[]
     profile_number=0
     for i in range(len(ppc['bus'])):
@@ -139,18 +139,18 @@ if __name__ == "__main__":
         else:
             profile_number=profile_number+1
     ###################   Asserting Profiles to buses    ############################
-     
+
     #bus_profiles_index = numpy.random.random_integers(0,load_profiles.shape[1]-1,len(ppc['bus']))
     bus_profiles = load_profiles[:,bus_profiles_index]
     time_opf=numpy.linspace(0, total_inteval, numpy.floor(total_inteval/acopf_interval)+1)
     
 ###########################   Cosimulation Bus and Load Amplification Factor #########################################         
-    
+
     #Co-sim Bus  (inputs)
     Cosim_bus_number = 118
     cosim_bus= Cosim_bus_number - 1   ## Do not chage this line 
     load_amplification_factor = 15
-    
+
     #power_flow
     fig=plt.figure()
     ax1=fig.add_subplot(2,1,1)
@@ -159,11 +159,10 @@ if __name__ == "__main__":
     x=0
     k=0
     votlage_cosim_bus = (ppc['bus'][cosim_bus,7]*ppc['bus'][cosim_bus,9])*1.043 
-    
+
 #########################################   Starting Co-simulation  #################################################### 
-   
+
     for t in range(0, total_inteval, pf_interval):
-    
         ############################   Publishing Voltage to GridLAB-D #######################################################      
             
         voltage_gld = complex(votlage_cosim_bus*1000)
@@ -172,13 +171,13 @@ if __name__ == "__main__":
             pub = pubid["m{}".format(i)]
             status = h.helicsPublicationPublishComplex(pub, voltage_gld.real, voltage_gld.imag)
         # status = h.helicsEndpointSendEventRaw(epid, "fixed_price", 10, t)
-                
+
         while grantedtime < t:
             grantedtime = h.helicsFederateRequestTime (fed, t)
         time.sleep(0.1)
-        
-        #############################   Subscribing to Feeder Load from to GridLAB-D ##############################################   
-        
+
+        #############################   Subscribing to Feeder Load from to GridLAB-D ##############################################
+
         for i in range(0,subkeys_count):
             sub = subid["m{}".format(i)]        
             rload, iload = h.helicsInputGetComplex(sub)
@@ -195,9 +194,9 @@ if __name__ == "__main__":
         
         print('PF TIme is {} and ACOPF time is {}'.format(time_pf[x], time_opf[k]))
         
-        ############################  Running OPF For optimal power flow intervals   ##############################  
+        ############################  Running OPF For optimal power flow intervals   ##############################
         
-        if (time_pf[x] == time_opf[k]):            
+        if (time_pf[x] == time_opf[k]):
             results_opf = runopf(ppc, ppopt)
             if (results_opf['success']):
                 ppc['bus'] = results_opf['bus']
@@ -220,7 +219,7 @@ if __name__ == "__main__":
             if (x == 0):
                 voltages = results_pf['bus'][:,7]
                 real_demand = results_pf['bus'][:,2]
-                distribuiton_load = [rload/1000000]             
+                distribuiton_load = [rload/1000000]
             else:
                 voltages = numpy.vstack((voltages,results_pf['bus'][:,7]))
                 real_demand = numpy.vstack((real_demand,results_pf['bus'][:,2]))
@@ -228,19 +227,19 @@ if __name__ == "__main__":
                 pf_time = time_pf[0:x+1]/3600
                 
             votlage_cosim_bus=results_pf['bus'][cosim_bus,7]*results_pf['bus'][cosim_bus,9]    
-            votlage_plot.append(votlage_cosim_bus)        
+            votlage_plot.append(votlage_cosim_bus)
         
         ######################### Plotting the Voltages and Load of the Co-SIM bus ##############################################   
         
         if (x > 0) :
             ax1.clear()
-            ax1.plot(pf_time,votlage_plot,'r--') 
+            ax1.plot(pf_time,votlage_plot,'r--')
             ax1.set_xlim([0,25])
             ax1.set_ylabel('Voltage [in kV]')
             ax1.set_xlabel('Time [in hours]')
             ax2.clear()
             ax2.plot(pf_time,real_demand[:,cosim_bus],'k')
-            ax2.set_xlim([0, 25])            
+            ax2.set_xlim([0, 25])
             ax2.set_ylabel('Load from distribution [in MW]')
             ax2.set_xlabel('Time [in hours]')
             plt.show(block=False)
