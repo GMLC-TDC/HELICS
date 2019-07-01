@@ -105,7 +105,7 @@ class iteration_tests_type : public ::testing::TestWithParam<const char *>, publ
 {
 };
 
-TEST_P (iteration_tests_type, execution_iteration_round_robin)
+TEST_P (iteration_tests_type, execution_iteration_round_robin_skip_ci)
 {
     SetupTest<helics::ValueFederate> (GetParam (), 3);
     auto vFed1 = GetFederateAs<helics::ValueFederate> (0).get ();

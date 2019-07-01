@@ -48,9 +48,7 @@ add_test(
   NAME system-ci-tests
   COMMAND
     system-tests
-    --run_test=@ci
-    --log_level=message
-    --report_level=short
+    --gtest_filter=-*skip_ci*
 )
 set_property(TEST system-ci-tests PROPERTY LABELS Continuous Valgrind)
 

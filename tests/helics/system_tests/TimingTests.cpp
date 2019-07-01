@@ -466,7 +466,7 @@ TEST_F (timing_tests, sender_finalize_timing_result2)
     vFed2->finalize ();
 }
 
-TEST_F (timing_tests, fast_sender_tests)  // skip_ci
+TEST_F (timing_tests, fast_sender_tests_skip_ci)  // skip_ci
 {
     SetupTest<helics::ValueFederate> ("zmq_2", 2);
     auto vFed1 = GetFederateAs<helics::ValueFederate> (0);
@@ -500,7 +500,7 @@ TEST_F (timing_tests, fast_sender_tests)  // skip_ci
     vFed2->finalize ();
 }
 
-TEST_F (timing_tests, dual_fast_sender_tests)  // skip_ci
+TEST_F (timing_tests, dual_fast_sender_tests_skip_ci)  // skip_ci
 {
     SetupTest<helics::ValueFederate> ("zmq_2", 3);
     auto vFed1 = GetFederateAs<helics::ValueFederate> (0);
