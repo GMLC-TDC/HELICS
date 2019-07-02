@@ -5,20 +5,18 @@ the top-level NOTICE for additional details. All rights reserved. SPDX-License-I
 */
 
 #include "../application_api/testFixtures.hpp"
+#include "gtest/gtest.h"
 #include "helics/ValueFederates.hpp"
 #include <future>
-#include <boost/test/unit_test.hpp>
-#include <boost/test/data/test_case.hpp>
-
-namespace bdata = boost::unit_test::data;
-namespace utf = boost::unit_test;
 
 /** tests for the different flag options and considerations*/
 
-BOOST_FIXTURE_TEST_SUITE (update_tests, FederateTestFixture, *utf::label ("ci"))
+struct update_tests : public FederateTestFixture, public ::testing::Test
+{
+};
 
 /** test simple creation and destruction*/
-BOOST_AUTO_TEST_CASE (test_single_update)
+TEST_F (update_tests, test_single_update)
 {
     using namespace helics;
     SetupTest<ValueFederate> ("test", 2);
@@ -43,21 +41,21 @@ BOOST_AUTO_TEST_CASE (test_single_update)
     double val;
     sub.getValue (val);
 
-    BOOST_CHECK_EQUAL (val, 3.1);
+    EXPECT_EQ (val, 3.1);
 
     auto f1time = std::async (std::launch::async, [&] () { return fedA->requestTime (1.0); });
     auto gtime = fedB->requestTime (1.0);
 
-    BOOST_CHECK_EQUAL (gtime, 1.0);
-    BOOST_CHECK_EQUAL (f1time.get (), 1.0);
-    BOOST_CHECK (sub.isUpdated ());
+    EXPECT_EQ (gtime, 1.0);
+    EXPECT_EQ (f1time.get (), 1.0);
+    EXPECT_TRUE (sub.isUpdated ());
     // get the value
     sub.getValue (val);
-    BOOST_CHECK (!sub.isUpdated ());
+    EXPECT_TRUE (!sub.isUpdated ());
     // make sure the string is what we expect
-    BOOST_CHECK_EQUAL (val, testValue);
+    EXPECT_EQ (val, testValue);
     sub.getValue (val);
-    BOOST_CHECK (!sub.isUpdated ());
+    EXPECT_TRUE (!sub.isUpdated ());
 
     fedA->finalizeAsync ();
     fedB->finalize ();
@@ -66,7 +64,7 @@ BOOST_AUTO_TEST_CASE (test_single_update)
 }
 
 /** test simple creation and destruction*/
-BOOST_AUTO_TEST_CASE (test_single_update_string)
+TEST_F (update_tests, test_single_update_string)
 {
     using namespace helics;
     SetupTest<ValueFederate> ("test", 2);
@@ -92,37 +90,37 @@ BOOST_AUTO_TEST_CASE (test_single_update_string)
     std::string val;
     sub.getValue (val);
 
-    BOOST_CHECK_EQUAL (val, "3.100000");
+    EXPECT_EQ (val, "3.100000");
 
     auto f1time = std::async (std::launch::async, [&] () { return fedA->requestTime (1.0); });
     auto gtime = fedB->requestTime (1.0);
 
-    BOOST_CHECK_EQUAL (gtime, 1.0);
-    BOOST_CHECK_EQUAL (f1time.get (), 1.0);
-    BOOST_CHECK (sub.isUpdated ());
+    EXPECT_EQ (gtime, 1.0);
+    EXPECT_EQ (f1time.get (), 1.0);
+    EXPECT_TRUE (sub.isUpdated ());
     // get the value
     sub.getValue (val);
-    BOOST_CHECK (!sub.isUpdated ());
+    EXPECT_TRUE (!sub.isUpdated ());
     // make sure the string is what we expect
-    BOOST_CHECK_EQUAL (val, "4.790000");
+    EXPECT_EQ (val, "4.790000");
     sub.getValue (val);
-    BOOST_CHECK (!sub.isUpdated ());
+    EXPECT_TRUE (!sub.isUpdated ());
     pub.publish (testValue2);
 
     f1time = std::async (std::launch::async, [&] () { return fedA->requestTime (2.0); });
     gtime = fedB->requestTime (2.0);
-    BOOST_CHECK_EQUAL (f1time.get (), 2.0);
-    BOOST_CHECK (sub.isUpdated ());
+    EXPECT_EQ (f1time.get (), 2.0);
+    EXPECT_TRUE (sub.isUpdated ());
     // get the value
     sub.getValue (val);
-    BOOST_CHECK (!sub.isUpdated ());
+    EXPECT_TRUE (!sub.isUpdated ());
     // make sure the string is what we expect
-    BOOST_CHECK_EQUAL (val, "9.340000");
+    EXPECT_EQ (val, "9.340000");
     sub.getValue (val);
-    BOOST_CHECK (!sub.isUpdated ());
+    EXPECT_TRUE (!sub.isUpdated ());
     double v2;
     sub.getValue (v2);
-    BOOST_CHECK (!sub.isUpdated ());
+    EXPECT_TRUE (!sub.isUpdated ());
 
     fedA->finalizeAsync ();
     fedB->finalize ();
@@ -131,7 +129,7 @@ BOOST_AUTO_TEST_CASE (test_single_update_string)
 }
 
 /** test simple creation and destruction*/
-BOOST_AUTO_TEST_CASE (test_single_update_vector)
+TEST_F (update_tests, test_single_update_vector)
 {
     using namespace helics;
     SetupTest<ValueFederate> ("test", 2);
@@ -157,37 +155,37 @@ BOOST_AUTO_TEST_CASE (test_single_update_vector)
     std::string val;
     sub.getValue (val);
 
-    BOOST_CHECK_EQUAL (val, "3.100000");
+    EXPECT_EQ (val, "3.100000");
 
     auto f1time = std::async (std::launch::async, [&] () { return fedA->requestTime (1.0); });
     auto gtime = fedB->requestTime (1.0);
 
-    BOOST_CHECK_EQUAL (gtime, 1.0);
-    BOOST_CHECK_EQUAL (f1time.get (), 1.0);
-    BOOST_CHECK (sub.isUpdated ());
+    EXPECT_EQ (gtime, 1.0);
+    EXPECT_EQ (f1time.get (), 1.0);
+    EXPECT_TRUE (sub.isUpdated ());
     // get the value
     sub.getValue (val);
-    BOOST_CHECK (!sub.isUpdated ());
+    EXPECT_TRUE (!sub.isUpdated ());
     // make sure the string is what we expect
-    BOOST_CHECK_EQUAL (val, "v1[4.790000]");
+    EXPECT_EQ (val, "v1[4.790000]");
     sub.getValue (val);
-    BOOST_CHECK (!sub.isUpdated ());
+    EXPECT_TRUE (!sub.isUpdated ());
     pub.publish (testValue2);
 
     f1time = std::async (std::launch::async, [&] () { return fedA->requestTime (2.0); });
     gtime = fedB->requestTime (2.0);
-    BOOST_CHECK_EQUAL (f1time.get (), 2.0);
-    BOOST_CHECK (sub.isUpdated ());
+    EXPECT_EQ (f1time.get (), 2.0);
+    EXPECT_TRUE (sub.isUpdated ());
     // get the value
     sub.getValue (val);
-    BOOST_CHECK (!sub.isUpdated ());
+    EXPECT_TRUE (!sub.isUpdated ());
     // make sure the string is what we expect
-    BOOST_CHECK_EQUAL (val, "v1[9.340000]");
+    EXPECT_EQ (val, "v1[9.340000]");
     sub.getValue (val);
-    BOOST_CHECK (!sub.isUpdated ());
+    EXPECT_TRUE (!sub.isUpdated ());
     double v2;
     sub.getValue (v2);
-    BOOST_CHECK (!sub.isUpdated ());
+    EXPECT_TRUE (!sub.isUpdated ());
 
     fedA->finalizeAsync ();
     fedB->finalize ();
@@ -196,7 +194,7 @@ BOOST_AUTO_TEST_CASE (test_single_update_vector)
 }
 
 /** test simple creation and destruction*/
-BOOST_AUTO_TEST_CASE (test_single_update_vector_char_ptr)
+TEST_F (update_tests, test_single_update_vector_char_ptr)
 {
     using namespace helics;
     SetupTest<ValueFederate> ("test", 2);
@@ -222,37 +220,37 @@ BOOST_AUTO_TEST_CASE (test_single_update_vector_char_ptr)
     std::array<char, 50> val;
     sub.getValue (val.data (), 50);
 
-    BOOST_CHECK_EQUAL (val.data (), "3.100000");
+    EXPECT_EQ (std::string (val.data ()), "3.100000");
 
     auto f1time = std::async (std::launch::async, [&] () { return fedA->requestTime (1.0); });
     auto gtime = fedB->requestTime (1.0);
 
-    BOOST_CHECK_EQUAL (gtime, 1.0);
-    BOOST_CHECK_EQUAL (f1time.get (), 1.0);
-    BOOST_CHECK (sub.isUpdated ());
+    EXPECT_EQ (gtime, 1.0);
+    EXPECT_EQ (f1time.get (), 1.0);
+    EXPECT_TRUE (sub.isUpdated ());
     // get the value
     sub.getValue (val.data (), 50);
-    BOOST_CHECK (!sub.isUpdated ());
+    EXPECT_TRUE (!sub.isUpdated ());
     // make sure the string is what we expect
-    BOOST_CHECK_EQUAL (val.data (), "v1[4.790000]");
+    EXPECT_EQ (std::string (val.data ()), "v1[4.790000]");
     sub.getValue (val.data (), 50);
-    BOOST_CHECK (!sub.isUpdated ());
+    EXPECT_TRUE (!sub.isUpdated ());
     pub.publish (testValue2);
 
     f1time = std::async (std::launch::async, [&] () { return fedA->requestTime (2.0); });
     gtime = fedB->requestTime (2.0);
-    BOOST_CHECK_EQUAL (f1time.get (), 2.0);
-    BOOST_CHECK (sub.isUpdated ());
+    EXPECT_EQ (f1time.get (), 2.0);
+    EXPECT_TRUE (sub.isUpdated ());
     // get the value
     sub.getValue (val.data (), 50);
-    BOOST_CHECK (!sub.isUpdated ());
+    EXPECT_TRUE (!sub.isUpdated ());
     // make sure the string is what we expect
-    BOOST_CHECK_EQUAL (val.data (), "v1[9.340000]");
+    EXPECT_EQ (std::string (val.data ()), "v1[9.340000]");
     sub.getValue (val.data (), 50);
-    BOOST_CHECK (!sub.isUpdated ());
+    EXPECT_TRUE (!sub.isUpdated ());
     double v2;
     sub.getValue (v2);
-    BOOST_CHECK (!sub.isUpdated ());
+    EXPECT_TRUE (!sub.isUpdated ());
 
     fedA->finalizeAsync ();
     fedB->finalize ();
@@ -261,7 +259,7 @@ BOOST_AUTO_TEST_CASE (test_single_update_vector_char_ptr)
 }
 
 /** test simple creation and destruction*/
-BOOST_AUTO_TEST_CASE (test_single_update_vector_ptr)
+TEST_F (update_tests, test_single_update_vector_ptr)
 {
     using namespace helics;
     SetupTest<ValueFederate> ("test", 2);
@@ -287,41 +285,40 @@ BOOST_AUTO_TEST_CASE (test_single_update_vector_ptr)
     std::vector<double> val (3, 0.0);
     sub.getValue (val.data (), 3);
 
-    BOOST_CHECK_EQUAL (val[0], 3.100000);
+    EXPECT_EQ (val[0], 3.100000);
 
     auto f1time = std::async (std::launch::async, [&] () { return fedA->requestTime (1.0); });
     auto gtime = fedB->requestTime (1.0);
 
-    BOOST_CHECK_EQUAL (gtime, 1.0);
-    BOOST_CHECK_EQUAL (f1time.get (), 1.0);
-    BOOST_CHECK (sub.isUpdated ());
+    EXPECT_EQ (gtime, 1.0);
+    EXPECT_EQ (f1time.get (), 1.0);
+    EXPECT_TRUE (sub.isUpdated ());
     // get the value
     sub.getValue (val.data (), 3);
-    BOOST_CHECK (!sub.isUpdated ());
+    EXPECT_TRUE (!sub.isUpdated ());
     // make sure the string is what we expect
-    BOOST_CHECK_EQUAL (val[0], 4.790000);
+    EXPECT_EQ (val[0], 4.790000);
     sub.getValue (val.data (), 3);
-    BOOST_CHECK (!sub.isUpdated ());
+    EXPECT_TRUE (!sub.isUpdated ());
     pub.publish (testValue2);
 
     f1time = std::async (std::launch::async, [&] () { return fedA->requestTime (2.0); });
     gtime = fedB->requestTime (2.0);
-    BOOST_CHECK_EQUAL (f1time.get (), 2.0);
-    BOOST_CHECK (sub.isUpdated ());
+    EXPECT_EQ (f1time.get (), 2.0);
+    EXPECT_TRUE (sub.isUpdated ());
     // get the value
     sub.getValue (val.data (), 3);
-    BOOST_CHECK (!sub.isUpdated ());
+    EXPECT_TRUE (!sub.isUpdated ());
     // make sure the string is what we expect
-    BOOST_CHECK_EQUAL (val[0], 9.340000);
+    EXPECT_EQ (val[0], 9.340000);
     sub.getValue (val.data (), 50);
-    BOOST_CHECK (!sub.isUpdated ());
+    EXPECT_TRUE (!sub.isUpdated ());
     double v2;
     sub.getValue (v2);
-    BOOST_CHECK (!sub.isUpdated ());
+    EXPECT_TRUE (!sub.isUpdated ());
 
     fedA->finalizeAsync ();
     fedB->finalize ();
     fedA->finalizeComplete ();
     helics::cleanupHelicsLibrary ();
 }
-BOOST_AUTO_TEST_SUITE_END ()

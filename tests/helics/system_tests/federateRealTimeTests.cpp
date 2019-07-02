@@ -1,13 +1,10 @@
 /*
 Copyright © 2017-2019,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See the top-level NOTICE for additional details.
-All rights reserved. 
-SPDX-License-Identifier: BSD-3-Clause
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
+the top-level NOTICE for additional details. All rights reserved. SPDX-License-Identifier: BSD-3-Clause
 */
 
-#include <boost/test/unit_test.hpp>
-#include <boost/test/data/test_case.hpp>
-#include <boost/test/floating_point_comparison.hpp>
+#include "gtest/gtest.h"
 
 #include <future>
 
@@ -23,10 +20,12 @@ SPDX-License-Identifier: BSD-3-Clause
 /** @file these test cases test out the real time mode for HELICS
  */
 
+struct federate_realtime_tests : public FederateTestFixture, public ::testing::Test
+{
+};
 #define CORE_TYPE_TO_TEST helics::core_type::TEST
-BOOST_FIXTURE_TEST_SUITE (federate_realtime_tests, FederateTestFixture)
 
-BOOST_AUTO_TEST_CASE (federate_delay_tests)
+TEST_F (federate_realtime_tests, federate_delay_tests_skip_ci)
 {
     auto broker = AddBroker ("test", 1);
     helics::FederateInfo fi (CORE_TYPE_TO_TEST);
@@ -50,7 +49,7 @@ BOOST_AUTO_TEST_CASE (federate_delay_tests)
         pubid.publish (static_cast<double> (reqTime));
         auto gtime = fed->requestTime (reqTime);
         auto ctime = std::chrono::steady_clock::now ();
-        BOOST_CHECK_EQUAL (gtime, reqTime);
+        EXPECT_EQ (gtime, reqTime);
         auto td = ctime - now;
         auto tdiff = helics::Time (td) - reqTime;
 
@@ -61,12 +60,12 @@ BOOST_AUTO_TEST_CASE (federate_delay_tests)
         }
         reqTime += 0.5;
     }
-    BOOST_CHECK_LT (outofTimeBounds, 3);
+    EXPECT_LT (outofTimeBounds, 3);
     fed->finalize ();
     broker->disconnect ();
 }
 
-BOOST_AUTO_TEST_CASE (federate_trigger_tests_adelay)
+TEST_F (federate_realtime_tests, federate_trigger_tests_adelay_skip_ci)
 {
     auto broker = AddBroker ("test", 1);
     helics::FederateInfo fi (CORE_TYPE_TO_TEST);
@@ -82,7 +81,7 @@ BOOST_AUTO_TEST_CASE (federate_trigger_tests_adelay)
     auto fed2 = std::make_shared<helics::ValueFederate> ("test2", fi);
     helics::Publication pubid (helics::GLOBAL, fed2, "pub1", helics::data_type::helics_double);
     std::atomic<int> warnCounter{0};
-    fed->setLoggingCallback ([&warnCounter](int logLevel, const std::string &, const std::string &) {
+    fed->setLoggingCallback ([&warnCounter] (int logLevel, const std::string &, const std::string &) {
         if (logLevel == 1)
         {
             ++warnCounter;
@@ -105,7 +104,7 @@ BOOST_AUTO_TEST_CASE (federate_trigger_tests_adelay)
         }
 
         auto gtime = fed->requestTime (reqTime);
-        BOOST_CHECK_EQUAL (gtime, reqTime);
+        EXPECT_EQ (gtime, reqTime);
 
         reqTime += 0.5;
         if (ii < 5)
@@ -113,13 +112,13 @@ BOOST_AUTO_TEST_CASE (federate_trigger_tests_adelay)
             fed2->requestTimeComplete ();
         }
     }
-    BOOST_CHECK_EQUAL (warnCounter, 8);
+    EXPECT_EQ (warnCounter, 8);
     fed2->finalize ();
     fed->finalize ();
     broker->disconnect ();
 }
 
-BOOST_AUTO_TEST_CASE (federate_trigger_tests)
+TEST_F (federate_realtime_tests, federate_trigger_tests_skip_ci)
 {
     auto broker = AddBroker ("test", 1);
     helics::FederateInfo fi (CORE_TYPE_TO_TEST);
@@ -155,10 +154,10 @@ BOOST_AUTO_TEST_CASE (federate_trigger_tests)
 
         auto gtime = fed->requestTime (reqTime);
         auto ctime = std::chrono::steady_clock::now ();
-        BOOST_CHECK_EQUAL (gtime, reqTime);
+        EXPECT_EQ (gtime, reqTime);
         auto td = ctime - now;
         auto tdiff = helics::Time (td) - reqTime;
-        BOOST_CHECK (tdiff >= -0.15);
+        EXPECT_TRUE (tdiff >= -0.15);
         if (tdiff < -0.15)
         {
             ++outofTimeBounds;
@@ -175,9 +174,8 @@ BOOST_AUTO_TEST_CASE (federate_trigger_tests)
             fed2->requestTimeComplete ();
         }
     }
-    BOOST_CHECK_LT (outofTimeBounds, 3);
+    EXPECT_LT (outofTimeBounds, 3);
     fed2->finalize ();
     fed->finalize ();
     broker->disconnect ();
 }
-BOOST_AUTO_TEST_SUITE_END ()

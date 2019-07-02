@@ -23,7 +23,7 @@ set(
 )
 
 add_executable(system-tests ${system_test_sources} ${system_test_headers})
-target_link_libraries(system-tests helics-static helics_boost_test_base)
+target_link_libraries(system-tests helics-static helics_google_test_base)
 
 set_target_properties(system-tests PROPERTIES FOLDER tests)
 
@@ -48,9 +48,7 @@ add_test(
   NAME system-ci-tests
   COMMAND
     system-tests
-    --run_test=@ci
-    --log_level=message
-    --report_level=short
+    --gtest_filter=-*skip_ci*
 )
 set_property(TEST system-ci-tests PROPERTY LABELS Continuous Valgrind)
 
