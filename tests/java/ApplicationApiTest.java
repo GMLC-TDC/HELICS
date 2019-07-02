@@ -5,7 +5,6 @@
 
 import com.java.helics.SWIGTYPE_p_void;
 import com.java.helics.helics;
-import com.java.helics.helics_status;
 
 public class ApplicationApiTest {
 
