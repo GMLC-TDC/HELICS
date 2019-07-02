@@ -11,10 +11,10 @@ public class ApplicationApiTest {
 
 	public static SWIGTYPE_p_void createValueFederate(final String fedName, final double timeDelta) {
 		SWIGTYPE_p_void fi = helics.helicsFederateInfoCreate();
-		helics_status rv = helics.helicsFederateInfoSetFederateName(fi,fedName);
-		rv = helics.helicsFederateInfoSetTimeDelta(fi, timeDelta);
-		rv = helics.helicsFederateInfoSetCoreTypeFromString(fi, "zmq");
-		rv = helics.helicsFederateInfoSetCoreInitString(fi, "1");
+		helics.helicsFederateInfoSetFederateName(fi,fedName);
+		helics.helicsFederateInfoSetTimeDelta(fi, timeDelta);
+		helics.helicsFederateInfoSetCoreTypeFromString(fi, "zmq");
+		helics.helicsFederateInfoSetCoreInitString(fi, "1");
 		SWIGTYPE_p_void valFed = helics.helicsCreateValueFederate(fi);
 		return valFed;
 	}
