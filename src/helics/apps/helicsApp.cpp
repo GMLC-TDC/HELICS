@@ -51,7 +51,7 @@ void App::processArgs (std::unique_ptr<helicsCLI11App> &app, const std::string &
 {
     remArgs = app->remaining_for_passthrough ();
     auto ret = app->last_return;
-    if (ret == helicsCLI11App::parse_return::help_return)
+    if (ret == helicsCLI11App::parse_output::help_return)
     {
         if (!app->quiet)
         {
@@ -60,7 +60,7 @@ void App::processArgs (std::unique_ptr<helicsCLI11App> &app, const std::string &
         }
         helpMode = true;
     }
-    if (ret != helicsCLI11App::parse_return::ok)
+    if (ret != helicsCLI11App::parse_output::ok)
     {
         deactivated = true;
         return;

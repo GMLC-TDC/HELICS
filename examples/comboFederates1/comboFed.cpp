@@ -37,12 +37,12 @@ int main (int argc, char *argv[])
     auto ret = app.helics_parse (argc, argv);
 
     helics::FederateInfo fi;
-    if (ret == helics::helicsCLI11App::parse_return::help_return)
+    if (ret == helics::helicsCLI11App::parse_output::help_return)
     {
         fi.loadInfoFromArgs ("--help");
         return 0;
     }
-    else if (ret != helics::helicsCLI11App::parse_return::ok)
+    else if (ret != helics::helicsCLI11App::parse_output::ok)
     {
         return -1;
     }
