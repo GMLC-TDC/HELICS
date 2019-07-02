@@ -10,7 +10,6 @@ import math
 import numpy
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
-from datetime import datetime
 import time
 import helics as h
 import random
@@ -88,8 +87,8 @@ if __name__ == "__main__":
     subid = {}
     for i in range(0,pubkeys_count):
         pubid["m{}".format(i)] = h.helicsFederateGetPublicationByIndex(fed, i)
-        type = h.helicsPublicationGetType(pubid["m{}".format(i)])
-        print(type)
+        pubtype = h.helicsPublicationGetType(pubid["m{}".format(i)])
+        print(pubtype)
     for i in range(0,subkeys_count):
         subid["m{}".format(i)] = h.helicsFederateGetInputByIndex(fed, i)
         status = h.helicsInputSetDefaultComplex(subid["m{}".format(i)], 0, 0)
@@ -222,7 +221,7 @@ if __name__ == "__main__":
                 real_demand = numpy.vstack((real_demand,results_pf['bus'][:,2]))
                 distribuiton_load.append(rload/1000000)
                 pf_time = time_pf[0:x+1]/3600
-                
+
             votlage_cosim_bus=results_pf['bus'][cosim_bus,7]*results_pf['bus'][cosim_bus,9]
             votlage_plot.append(votlage_cosim_bus)
 

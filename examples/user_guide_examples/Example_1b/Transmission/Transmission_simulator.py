@@ -72,7 +72,7 @@ if __name__ == "__main__":
     #fed = create_federate()
 
 #################################  Registering  federate from json  ########################################
-    
+
     fed = h.helicsCreateValueFederateFromConfig('Transmission_json.json')
     status = h.helicsFederateRegisterInterfaces(fed, 'Transmission_json.json')
     federate_name = h.helicsFederateGetName(fed)[-1]

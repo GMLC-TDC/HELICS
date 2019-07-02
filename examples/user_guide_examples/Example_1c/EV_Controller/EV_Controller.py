@@ -4,7 +4,7 @@ Created on Thu Oct 11 10:08:26 2018
 
 @author: monish.mukherjee
 """
-from pypower.api import case118, ppoption
+from pypower.api import case118
 import matplotlib.pyplot as plt
 #import matplotlib.animation as animation
 import time

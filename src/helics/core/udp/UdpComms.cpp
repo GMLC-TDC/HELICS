@@ -19,9 +19,8 @@ namespace helics
 namespace udp
 {
 using asio::ip::udp;
-UdpComms::UdpComms () : NetworkCommsInterface (interface_type::udp)
+UdpComms::UdpComms () : NetworkCommsInterface (interface_type::udp), promisePort (std::promise<int> ())
 {
-    promisePort = std::promise<int> ();
     futurePort = promisePort.get_future ();
 }
 
@@ -296,8 +295,7 @@ void UdpComms::queue_tx_function ()
     udp::endpoint rxEndpoint;
     if (localTargetAddress.empty () || localTargetAddress == "*" || localTargetAddress == "udp://*")
     {
-        udp::resolver::query queryLocal (udpnet (interfaceNetwork), "127.0.0.1",
-                                         std::to_string (PortNumber));
+        udp::resolver::query queryLocal (udpnet (interfaceNetwork), "127.0.0.1", std::to_string (PortNumber));
         auto result = resolver.resolve (queryLocal);
         rxEndpoint = *result;
     }
@@ -493,7 +491,7 @@ void UdpComms::closeReceiver ()
                 {
                     // try connecting with the receiver socket
                     udp::resolver resolver (serv->getBaseContext ());
-                    udp::resolver::query queryLocal (udpnet (interfaceNetwork),"127.0.0.1",
+                    udp::resolver::query queryLocal (udpnet (interfaceNetwork), "127.0.0.1",
                                                      std::to_string (PortNumber));
                     rxEndpoint = *resolver.resolve (queryLocal);
                 }
@@ -504,10 +502,7 @@ void UdpComms::closeReceiver ()
                     udp::resolver::query queryLocal (udpnet (interfaceNetwork), localTargetAddress,
                                                      std::to_string (PortNumber));
                     rxEndpoint = *resolver.resolve (queryLocal);
-
                 }
-                
-                
 
                 udp::socket transmitter (serv->getBaseContext (), udp::endpoint (udpnet (interfaceNetwork), 0));
                 std::string cls ("close");
