@@ -155,7 +155,6 @@ if __name__ == "__main__":
 
     for t in range(0, total_inteval, pf_interval):
         ############################   Publishing Voltage to GridLAB-D #######################################################
-            
         voltage_gld = complex(votlage_cosim_bus*1000)
         logger.info("Voltage value = {} kV".format(abs(voltage_gld)/1000))
         for i in range(0,pubkeys_count):
