@@ -8,15 +8,13 @@ import scipy.io as spio
 from pypower.api import case118, ppoption, runpf
 import math
 import numpy
-import copy
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
-from datetime import datetime, timedelta
+from datetime import datetime
 import time
 import helics as h
 import random
 import logging
-import json
 import sys
 import os
 
@@ -146,7 +144,7 @@ if __name__ == "__main__":
 
     #Co-sim Bus  (inputs)
     Cosim_bus_number = 118
-    cosim_bus= Cosim_bus_number - 1   ## Do not chage this line 
+    cosim_bus= Cosim_bus_number - 1   ## Do not chage this line
     load_amplification_factor = 15
 
     #power_flow
@@ -182,7 +180,7 @@ if __name__ == "__main__":
             rload, iload = h.helicsInputGetComplex(sub)
         logger.info("Python Federate grantedtime = {}".format(grantedtime))
         logger.info("Load value = {} kW".format(complex(rload, iload)/1000))
-        #print(votlage_plot,real_demand) 
+        #print(votlage_plot,real_demand)
 
         actual_demand=peak_demand*bus_profiles[x,:]
         ppc['bus'][:,2]=actual_demand

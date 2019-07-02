@@ -8,17 +8,12 @@ import scipy.io as spio
 from pypower.api import case118, ppoption, runpf, runopf
 import math
 import numpy
-import copy
 import matplotlib.pyplot as plt
-import matplotlib.animation as animation
 from datetime import datetime, timedelta
 import time
 import helics as h
 import random
 import logging
-import json
-import sys
-import os
 
 logger = logging.getLogger(__name__)
 logger.addHandler(logging.StreamHandler())
@@ -97,11 +92,10 @@ if __name__ == "__main__":
         status = h.helicsInputSetDefaultComplex(subid["m{}".format(i)], 0, 0)
         sub_key = h.helicsSubscriptionGetKey(subid["m{}".format(i)])
         print( 'Registered Subscription ---> {}'.format(sub_key))
-  
+
 ######################   Entereing Execution Mode  ##########################################################
     status = h.helicsFederateEnterInitializingMode(fed)
     status = h.helicsFederateEnterExecutingMode(fed)
-
 
     #Pypower Processing (inputs)
     hours = 24
@@ -157,12 +151,11 @@ if __name__ == "__main__":
     votlage_plot=[]
     x=0
     k=0
-    votlage_cosim_bus = (ppc['bus'][cosim_bus,7]*ppc['bus'][cosim_bus,9])*1.043 
+    votlage_cosim_bus = (ppc['bus'][cosim_bus,7]*ppc['bus'][cosim_bus,9])*1.043
 
 #########################################   Starting Co-simulation  ####################################################
 
     for t in range(0, total_inteval, pf_interval):
-
         ############################   Publishing Voltage to GridLAB-D #######################################################
 
         voltage_gld = complex(votlage_cosim_bus*1000)
@@ -179,11 +172,11 @@ if __name__ == "__main__":
         #############################   Subscribing to Feeder Load from to GridLAB-D ##############################################
 
         for i in range(0,subkeys_count):
-            sub = subid["m{}".format(i)]        
+            sub = subid["m{}".format(i)]
             rload, iload = h.helicsInputGetComplex(sub)
         logger.info("Python Federate grantedtime = {}".format(grantedtime))
         logger.info("Load value = {} kW".format(complex(rload, iload)/1000))
-        #print(votlage_plot,real_demand) 
+        #print(votlage_plot,real_demand)
 
         actual_demand=peak_demand*bus_profiles[x,:]
         ppc['bus'][:,2]=actual_demand
@@ -227,7 +220,7 @@ if __name__ == "__main__":
                 pf_time = time_pf[0:x+1]/3600
 
             votlage_cosim_bus=results_pf['bus'][cosim_bus,7]*results_pf['bus'][cosim_bus,9]
-            votlage_plot.append(votlage_cosim_bus)        
+            votlage_plot.append(votlage_cosim_bus)
 
         ######################### Plotting the Voltages and Load of the Co-SIM bus ##############################################
 
@@ -239,7 +232,7 @@ if __name__ == "__main__":
             ax1.set_xlabel('Time [in hours]')
             ax2.clear()
             ax2.plot(pf_time,real_demand[:,cosim_bus],'k')
-            ax2.set_xlim([0, 25])            
+            ax2.set_xlim([0, 25])
             ax2.set_ylabel('Load from distribution [in MW]')
             ax2.set_xlabel('Time [in hours]')
             plt.show(block=False)

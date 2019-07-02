@@ -4,7 +4,7 @@ Created on Thu Oct 11 10:08:26 2018
 
 @author: monish.mukherjee
 """
-from pypower.api import case118, ppoption, runpf
+from pypower.api import case118, ppoption
 import matplotlib.pyplot as plt
 #import matplotlib.animation as animation
 import time
@@ -36,7 +36,6 @@ if __name__ == "__main__":
 
 
 #################################  Registering  federate from json  ########################################
-    
     fed = h.helicsCreateCombinationFederateFromConfig('Control.json')
     federate_name = h.helicsFederateGetName(fed)
     print(federate_name)
@@ -66,7 +65,7 @@ if __name__ == "__main__":
     hours = 24
     total_inteval = int(60 * 60 * hours)
     grantedtime = -1
-    update_interval = 5*60 
+    update_interval = 5*60
     feeder_limit_upper = 4 * (1000*1000)
     feeder_limit_lower = 2.7 * (1000*1000)
     k = 0
@@ -82,7 +81,7 @@ if __name__ == "__main__":
         #############################   Subscribing to Feeder Load from to GridLAB-D ##############################################
         key =[]; Real_demand = []; Imag_demand = [];
         for i in range(0,subkeys_count):
-            sub = subid["m{}".format(i)]        
+            sub = subid["m{}".format(i)]
             rload, iload = h.helicsInputGetComplex(sub)
             sub_key = h.helicsSubscriptionGetKey(sub)
             print(sub_key)

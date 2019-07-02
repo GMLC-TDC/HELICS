@@ -8,17 +8,12 @@ import scipy.io as spio
 from pypower.api import case118, ppoption, runpf, runopf
 import math
 import numpy
-import copy
 import matplotlib.pyplot as plt
-import matplotlib.animation as animation
-from datetime import datetime, timedelta
+from datetime import datetime
 import time
 import helics as h
 import random
 import logging
-import json
-import sys
-import os
 
 logger = logging.getLogger(__name__)
 logger.addHandler(logging.StreamHandler())
@@ -70,7 +65,6 @@ def destroy_federate(fed):
     h.helicsFederateFree(fed)
     h.helicsCloseLibrary()
 
-
 if __name__ == "__main__":
 
     broker = create_broker()
@@ -90,8 +84,8 @@ if __name__ == "__main__":
     subid = {}
     for i in range(0,pubkeys_count):
         pubid["m{}".format(i)] = h.helicsFederateGetPublicationByIndex(fed, i)
-        type = h.helicsPublicationGetType(pubid["m{}".format(i)])
-        print(type)
+        pubtype = h.helicsPublicationGetType(pubid["m{}".format(i)])
+        print(pubtype)
     for i in range(0,subkeys_count):
         subid["m{}".format(i)] = h.helicsFederateGetInputByIndex(fed, i)
         status = h.helicsInputSetDefaultComplex(subid["m{}".format(i)], 0, 0)
@@ -156,7 +150,7 @@ if __name__ == "__main__":
     votlage_plot=[]
     x=0
     k=0
-    votlage_cosim_bus = (ppc['bus'][cosim_bus,7]*ppc['bus'][cosim_bus,9])*1.043 
+    votlage_cosim_bus = (ppc['bus'][cosim_bus,7]*ppc['bus'][cosim_bus,9])*1.043
 
 #########################################   Starting Co-simulation  ####################################################
 
@@ -223,8 +217,8 @@ if __name__ == "__main__":
                 real_demand = numpy.vstack((real_demand,results_pf['bus'][:,2]))
                 distribuiton_load.append(rload/1000000)
                 pf_time = time_pf[0:x+1]/3600
-                
-            votlage_cosim_bus=results_pf['bus'][cosim_bus,7]*results_pf['bus'][cosim_bus,9]    
+
+            votlage_cosim_bus=results_pf['bus'][cosim_bus,7]*results_pf['bus'][cosim_bus,9]
             votlage_plot.append(votlage_cosim_bus)
 
         ######################### Plotting the Voltages and Load of the Co-SIM bus ##############################################

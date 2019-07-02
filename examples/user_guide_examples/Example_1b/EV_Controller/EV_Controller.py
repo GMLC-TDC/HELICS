@@ -4,9 +4,8 @@ Created on Thu Oct 11 10:08:26 2018
 
 @author: monish.mukherjee
 """
-from pypower.api import case118, ppoption, runpf, runopf
+from pypower.api import case118, ppoption, runpf
 import matplotlib.pyplot as plt
-import matplotlib.animation as animation
 import time
 import helics as h
 import logging
@@ -19,7 +18,7 @@ logger.setLevel(logging.DEBUG)
 
 
 def destroy_federate(fed):
-    status = h.helicsFederateFinalize(fed)
+    h.helicsFederateFinalize(fed)
     h.helicsFederateFree(fed)
     h.helicsCloseLibrary()
 
@@ -85,7 +84,7 @@ if __name__ == "__main__":
                 Imag_feeder_load = iload
                 feeder_real_power.append(rload/1000)
                 feeder_imag_power.append(iload/1000)
-            else: 
+            else:
                 try:
                     data[sub_key].append(rload/1000)
                 except KeyError:
