@@ -9,7 +9,6 @@ from pypower.api import case118, ppoption, runpf, runopf
 import math
 import numpy
 import matplotlib.pyplot as plt
-from datetime import datetime
 import time
 import helics as h
 import random
@@ -176,7 +175,7 @@ if __name__ == "__main__":
         logger.info("Python Federate grantedtime = {}".format(grantedtime))
         logger.info("Load value = {} kW".format(complex(rload, iload)/1000))
         #print(votlage_plot,real_demand)
-        
+
         actual_demand=peak_demand*bus_profiles[x,:]
         ppc['bus'][:,2]=actual_demand
         ppc['bus'][:,3]=actual_demand*math.tan(math.acos(.85))

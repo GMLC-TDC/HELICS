@@ -79,7 +79,7 @@ class helicsCLI11App : public CLI::App
         }
         catch (const CLI::Error &ce)
         {
-            exit (ce);
+            CLI::App::exit (ce);
             last_output = parse_output::parse_error;
             return parse_output::parse_error;
         }

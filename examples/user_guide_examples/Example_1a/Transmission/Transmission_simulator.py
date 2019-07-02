@@ -106,7 +106,7 @@ if __name__ == "__main__":
     pf_interval = 5*60 # in seconds (minimim_resolution)
     acopf_interval = 15*60 # in seconds (minimim_resolution)
     random.seed(0)
-    
+
     peak_demand = []
     ppc = []
     case_format = case118()

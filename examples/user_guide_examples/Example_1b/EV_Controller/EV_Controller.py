@@ -4,7 +4,6 @@ Created on Thu Oct 11 10:08:26 2018
 
 @author: monish.mukherjee
 """
-from pypower.api import case118, ppoption, runpf
 import matplotlib.pyplot as plt
 import time
 import helics as h
