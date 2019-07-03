@@ -147,7 +147,7 @@ if __name__ == "__main__":
     fig=plt.figure()
     ax1=fig.add_subplot(2,1,1)
     ax2=fig.add_subplot(2,1,2)
-    votlage_plot=[]
+    voltage_plot=[]
     x=0
     k=0
     voltage_cosim_bus = (ppc['bus'][cosim_bus,7]*ppc['bus'][cosim_bus,9])*1.043
