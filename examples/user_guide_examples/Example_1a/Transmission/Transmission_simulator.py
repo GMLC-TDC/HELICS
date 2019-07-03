@@ -150,7 +150,7 @@ if __name__ == "__main__":
     votlage_plot=[]
     x=0
     k=0
-    votlage_cosim_bus = (ppc['bus'][cosim_bus,7]*ppc['bus'][cosim_bus,9])*1.043
+    voltage_cosim_bus = (ppc['bus'][cosim_bus,7]*ppc['bus'][cosim_bus,9])*1.043
 
 #########################################   Starting Co-simulation  ####################################################
 
@@ -158,7 +158,7 @@ if __name__ == "__main__":
 
         ############################   Publishing Voltage to GridLAB-D #######################################################
 
-        voltage_gld = complex(votlage_cosim_bus*1000)
+        voltage_gld = complex(voltage_cosim_bus*1000)
         logger.info("Voltage value = {} kV".format(abs(voltage_gld)/1000))
         for i in range(0,pubkeys_count):
             pub = pubid["m{}".format(i)]
@@ -176,7 +176,7 @@ if __name__ == "__main__":
             rload, iload = h.helicsInputGetComplex(sub)
         logger.info("Python Federate grantedtime = {}".format(grantedtime))
         logger.info("Load value = {} kW".format(complex(rload, iload)/1000))
-        #print(votlage_plot,real_demand)
+        #print(voltage_plot,real_demand)
 
         actual_demand=peak_demand*bus_profiles[x,:]
         ppc['bus'][:,2]=actual_demand
@@ -212,21 +212,21 @@ if __name__ == "__main__":
             if (x == 0):
                 voltages = results_pf['bus'][:,7]
                 real_demand = results_pf['bus'][:,2]
-                distribuiton_load = [rload/1000000]
+                distribution_load = [rload/1000000]
             else:
                 voltages = numpy.vstack((voltages,results_pf['bus'][:,7]))
                 real_demand = numpy.vstack((real_demand,results_pf['bus'][:,2]))
-                distribuiton_load.append(rload/1000000)
+                distribution_load.append(rload/1000000)
                 pf_time = time_pf[0:x+1]/3600
 
-            votlage_cosim_bus=results_pf['bus'][cosim_bus,7]*results_pf['bus'][cosim_bus,9]
-            votlage_plot.append(votlage_cosim_bus)
+            voltage_cosim_bus=results_pf['bus'][cosim_bus,7]*results_pf['bus'][cosim_bus,9]
+            voltage_plot.append(voltage_cosim_bus)
 
         ######################### Plotting the Voltages and Load of the Co-SIM bus ##############################################
 
         if (x > 0) :
             ax1.clear()
-            ax1.plot(pf_time,votlage_plot,'r--')
+            ax1.plot(pf_time,voltage_plot,'r--')
             ax1.set_xlim([0,25])
             ax1.set_ylabel('Voltage [in kV]')
             ax1.set_xlabel('Time [in hours]')
