@@ -153,7 +153,7 @@ class CommsInterface
     virtual void queue_rx_function () = 0;  //!< the functional loop for the receive queue
     virtual void queue_tx_function () = 0;  //!< the loop for transmitting data
     virtual void closeTransmitter ();  //!< function to instruct the transmitter loop to close
-    virtual void closeReceiver () = 0;  //!< function to instruct the receiver loop to close
+    virtual void closeReceiver ();  //!< function to instruct the receiver loop to close
     virtual void reconnectTransmitter ();  //!< function to reconnect the transmitter
     virtual void reconnectReceiver ();  //!< function to reconnect the receiver
   protected:

@@ -362,7 +362,9 @@ void ZmqCommsSS::queue_tx_function ()
     bool close_tx = false;
     int status = 0;
 
-    while (true)
+    bool haltLoop{false};
+    //  std::vector<ActionMessage> txlist;
+    while (!haltLoop)
     {
         route_id rid;
         ActionMessage cmd;
@@ -391,7 +393,8 @@ void ZmqCommsSS::queue_tx_function ()
 
                     if (close_tx)
                     {
-                        goto CLOSE_TX_LOOP;
+                        haltLoop = true;
+                        break;
                     }
                 }
             }
@@ -416,7 +419,8 @@ void ZmqCommsSS::queue_tx_function ()
                     status = processIncomingMessage (msg, connection_info);  //----------> ToCheck
                     if (status < 0)
                     {
-                        goto CLOSE_TX_LOOP;
+                        haltLoop = true;
+                        break;
                     }
                 }
                 else
@@ -479,13 +483,12 @@ void ZmqCommsSS::queue_tx_function ()
 
                 if (status < 0)
                 {
-                    goto CLOSE_TX_LOOP;
+                    haltLoop = true;
                 }
             }
             count++;
         }
     }
-CLOSE_TX_LOOP:
     routes.clear ();
     connection_info.clear ();
     if (serverMode)
@@ -532,14 +535,5 @@ int ZmqCommsSS::processRxMessage (zmq::socket_t &brokerSocket,
     return status;
 }
 
-void ZmqCommsSS::closeReceiver ()
-{
-    // Send close message to close Tx and Rx connection
-    ActionMessage cmd (CMD_PROTOCOL);
-    cmd.messageID = CLOSE_RECEIVER;
-    transmit (control_route, cmd);
-}
-
 }  // namespace zeromq
-// namespace zeromq
 }  // namespace helics

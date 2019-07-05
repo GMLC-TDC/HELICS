@@ -517,12 +517,5 @@ void TcpCommsSS::queue_tx_function ()
     }
 }
 
-void TcpCommsSS::closeReceiver ()
-{
-    ActionMessage cmd (CMD_PROTOCOL);
-    cmd.messageID = CLOSE_RECEIVER;
-    transmit (control_route, cmd);
-}
-
 }  // namespace tcp
 }  // namespace helics

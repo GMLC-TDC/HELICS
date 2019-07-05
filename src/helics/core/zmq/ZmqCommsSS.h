@@ -39,7 +39,6 @@ class ZmqCommsSS final : public NetworkCommsInterface
     virtual int getDefaultBrokerPort () const override;
     virtual void queue_rx_function () override;  //!< the functional loop for the receive queue
     virtual void queue_tx_function () override;  //!< the loop for transmitting data
-    virtual void closeReceiver () override;  //!< function to instruct the receiver loop to close
     /** process an incoming message
     return code for required action 0=NONE, -1 TERMINATE*/
     int processIncomingMessage (zmq::message_t &msg, std::map<std::string, std::string> &connection_info);
