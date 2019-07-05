@@ -281,7 +281,6 @@ bool ZmqCommsSS::processTxControlCmd (ActionMessage cmd,
         routes.erase (route_id (cmd.getExtraData ()));
         break;
     case CLOSE_RECEIVER:
-        setRxStatus (connection_status::terminated);
         close_tx = true;
         break;
     case DISCONNECT:
@@ -488,10 +487,6 @@ void ZmqCommsSS::queue_tx_function ()
 CLOSE_TX_LOOP:
     routes.clear ();
     connection_info.clear ();
-    if (getRxStatus () == connection_status::connected)
-    {
-        setRxStatus (connection_status::terminated);
-    }
     if (serverMode)
     {
         std::this_thread::sleep_for (std::chrono::milliseconds (50));
@@ -502,6 +497,10 @@ CLOSE_TX_LOOP:
         brokerConnection.close ();
     }
     setTxStatus (connection_status::terminated);
+    if (getRxStatus () == connection_status::connected)
+    {
+        setRxStatus (connection_status::terminated);
+    }
 }
 
 int ZmqCommsSS::processRxMessage (zmq::socket_t &brokerSocket,
