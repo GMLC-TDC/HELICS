@@ -93,7 +93,21 @@ void ZmqCommsSS::loadNetworkInfo (const NetworkBrokerData &netInfo)
 ZmqCommsSS::ZmqCommsSS () noexcept : NetworkCommsInterface (interface_type::ip) {}
 
 /** destructor*/
-ZmqCommsSS::~ZmqCommsSS () { disconnect (); }
+ZmqCommsSS::~ZmqCommsSS ()
+{
+    if (requestDisconnect.load () || disconnecting.load ())
+    {
+        auto status = getRxStatus ();
+        while (status != connection_status::terminated && status != connection_status::error)
+        {
+            std::this_thread::yield;
+        }
+    }
+    else
+    {
+        disconnect ();
+    }
+}
 
 int ZmqCommsSS::getDefaultBrokerPort () const { return DEFAULT_BROKER_PORT_NUMBER; }
 

@@ -27,8 +27,8 @@ class CommsInterface
     /** enumeration of whether the threading system should generate a single thread or multiple threads*/
     enum class thread_generation
     {
-        single,
-        dual
+        single,  // indicate that a single thread is used for transmitting and receiving
+        dual  // indicate that separate threads are used 1 for transmission and one for reception
     };
     /** default constructor*/
     CommsInterface () = default;
@@ -67,11 +67,11 @@ class CommsInterface
     void setName (const std::string &name);
     /** set the callback for processing the messages
      */
-    void setCallback (std::function<void(ActionMessage &&)> callback);
+    void setCallback (std::function<void (ActionMessage &&)> callback);
     /** set the callback for processing the messages
      */
     void setLoggingCallback (
-      std::function<void(int level, const std::string &name, const std::string &message)> callback);
+      std::function<void (int level, const std::string &name, const std::string &message)> callback);
     /** set the max message size and max Queue size
      */
     void setMessageSize (int maxMsgSize, int maxCount);
@@ -134,10 +134,11 @@ class CommsInterface
     int maxMessageSize = 16 * 1024;  //!< the maximum message size for the queues (if needed)
     int maxMessageCount = 512;  //!< the maximum number of message to buffer (if needed)
     std::atomic<bool> requestDisconnect{false};  //!< flag gets set when disconnect is called
-    std::function<void(ActionMessage &&)> ActionCallback;  //!< the callback for what to do with a received message
-    std::function<void(int level, const std::string &name, const std::string &message)>
+    std::function<void (ActionMessage &&)>
+      ActionCallback;  //!< the callback for what to do with a received message
+    std::function<void (int level, const std::string &name, const std::string &message)>
       loggingCallback;  //!< callback for logging
-	gmlc::containers::BlockingPriorityQueue<std::pair<route_id, ActionMessage>>
+    gmlc::containers::BlockingPriorityQueue<std::pair<route_id, ActionMessage>>
       txQueue;  //!< set of messages waiting to be transmitted
     // closing the files or connection can take some time so there is a need for inter-thread communication to not
     // spit out warning messages if it is in the process of disconnecting
