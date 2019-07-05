@@ -101,7 +101,25 @@ TEST_F (error_tests, duplicate_publication_names2)
 
     fed2->registerGlobalPublication ("testkey", "");
 
-    EXPECT_THROW (fed2->enterInitializingMode (), helics::RegistrationFailure);
+    bool gotException = false;
+    try
+    {
+        fed2->enterInitializingMode ();
+    }
+    catch (const helics::RegistrationFailure &)
+    {
+        gotException = true;
+    }
+
+    try
+    {
+        fed1->enterInitializingModeComplete ();
+    }
+    catch (const helics::RegistrationFailure &)
+    {
+        gotException = true;
+    }
+    EXPECT_TRUE (gotException);
     fed1->finalize ();
     fed2->finalize ();
     broker->disconnect ();
@@ -181,7 +199,25 @@ TEST_F (error_tests, duplicate_endpoint_names2)
     fed1->registerGlobalEndpoint ("testEpt");
     fed2->registerGlobalEndpoint ("testEpt");
 
-    EXPECT_THROW (fed2->enterInitializingMode (), helics::RegistrationFailure);
+    bool gotException = false;
+    try
+    {
+        fed2->enterInitializingMode ();
+    }
+    catch (const helics::RegistrationFailure &)
+    {
+        gotException = true;
+    }
+
+    try
+    {
+        fed1->enterInitializingModeComplete ();
+    }
+    catch (const helics::RegistrationFailure &)
+    {
+        gotException = true;
+    }
+    EXPECT_TRUE (gotException);
     fed1->finalize ();
     fed2->finalize ();
     broker->disconnect ();

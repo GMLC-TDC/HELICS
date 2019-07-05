@@ -90,7 +90,10 @@ void ZmqCommsSS::loadNetworkInfo (const NetworkBrokerData &netInfo)
     propertyUnLock ();
 }
 
-ZmqCommsSS::ZmqCommsSS () noexcept : NetworkCommsInterface (interface_type::ip) {}
+ZmqCommsSS::ZmqCommsSS () noexcept
+    : NetworkCommsInterface (interface_type::ip, CommsInterface::thread_generation::single)
+{
+}
 
 /** destructor*/
 ZmqCommsSS::~ZmqCommsSS ()
