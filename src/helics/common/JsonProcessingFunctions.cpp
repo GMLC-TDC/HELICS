@@ -104,8 +104,10 @@ std::string generateJsonString (const Json::Value &block)
     Json::StreamWriterBuilder builder;
     builder["commentStyle"] = "None";
     builder["indentation"] = "   ";  // or whatever you like
-    std::unique_ptr<decltype (*builder.newStreamWriter ())> writer (builder.newStreamWriter ());
+    auto writer = builder.newStreamWriter ();
     std::stringstream sstr;
     writer->write (block, &sstr);
-    return sstr.str ();
+    auto ret = sstr.str ();
+    delete writer;
+    return ret;
 }
