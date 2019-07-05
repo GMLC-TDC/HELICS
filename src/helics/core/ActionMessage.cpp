@@ -324,29 +324,39 @@ int ActionMessage::fromByteArray (const char *data, int buffer_size)
     }
     bool swap = (data[0] != littleEndian);
     data += sizeof (uint32_t);
-    messageAction = *reinterpret_cast<const action_message_def::action_t *> (data);
+    memcpy (&messageAction, data, sizeof (action_message_def::action_t));
+    // messageAction = *reinterpret_cast<const action_message_def::action_t *> (data);
     if (swap)
     {
         swap_bytes<4> (reinterpret_cast<std::uint8_t *> (&messageAction));
     }
     data += sizeof (action_message_def::action_t);
-    messageID = *reinterpret_cast<const int32_t *> (data);
+    // messageID = *reinterpret_cast<const int32_t *> (data);
+    memcpy (&messageID, data, sizeof (int32_t));
     data += sizeof (int32_t);
-    source_id = global_federate_id{*reinterpret_cast<const int32_t *> (data)};
+    // source_id = global_federate_id{*reinterpret_cast<const int32_t *> (data)};
+    memcpy (&source_id, data, sizeof (int32_t));
     data += sizeof (int32_t);
-    source_handle = interface_handle{*reinterpret_cast<const int32_t *> (data)};
+    // source_handle = interface_handle{*reinterpret_cast<const int32_t *> (data)};
+    memcpy (&source_handle, data, sizeof (int32_t));
     data += sizeof (int32_t);
-    dest_id = global_federate_id{*reinterpret_cast<const int32_t *> (data)};
+    // dest_id = global_federate_id{*reinterpret_cast<const int32_t *> (data)};
+    memcpy (&dest_id, data, sizeof (int32_t));
     data += sizeof (int32_t);
-    dest_handle = interface_handle{*reinterpret_cast<const int32_t *> (data)};
+    // dest_handle = interface_handle{*reinterpret_cast<const int32_t *> (data)};
+    memcpy (&dest_handle, data, sizeof (int32_t));
     data += sizeof (int32_t);
-    counter = *reinterpret_cast<const uint16_t *> (data);
+    // counter = *reinterpret_cast<const uint16_t *> (data);
+    memcpy (&counter, data, sizeof (uint16_t));
     data += sizeof (uint16_t);
-    flags = *reinterpret_cast<const uint16_t *> (data);
+    // flags = *reinterpret_cast<const uint16_t *> (data);
+    memcpy (&flags, data, sizeof (uint16_t));
     data += sizeof (uint16_t);
     sequenceID = *reinterpret_cast<const uint32_t *> (data);
     data += sizeof (uint32_t);
-    actionTime.setBaseTimeCode (*reinterpret_cast<const int64_t *> (data));
+    int64_t btc;
+    memcpy (&btc, data, sizeof (int64_t));
+    actionTime.setBaseTimeCode (btc);
     data += sizeof (int64_t);
 
     if (messageAction == CMD_TIME_REQUEST)
@@ -357,11 +367,14 @@ int ActionMessage::fromByteArray (const char *data, int buffer_size)
             messageAction = CMD_INVALID;
             return (0);
         }
-        Te.setBaseTimeCode (*reinterpret_cast<const int64_t *> (data));
+        memcpy (&btc, data, sizeof (int64_t));
+        Te.setBaseTimeCode (btc);
         data += sizeof (int64_t);
-        Tdemin.setBaseTimeCode (*reinterpret_cast<const int64_t *> (data));
+        memcpy (&btc, data, sizeof (int64_t));
+        Tdemin.setBaseTimeCode (btc);
         data += sizeof (int64_t);
-        Tso.setBaseTimeCode (*reinterpret_cast<const int64_t *> (data));
+        memcpy (&btc, data, sizeof (int64_t));
+        Tso.setBaseTimeCode (btc);
         data += sizeof (int64_t);
     }
     else
@@ -389,7 +402,8 @@ int ActionMessage::fromByteArray (const char *data, int buffer_size)
 
         for (int ii = 0; ii < stringCount; ++ii)
         {
-            auto ssize = *reinterpret_cast<const uint32_t *> (data);
+            uint32_t ssize;
+            memcpy (&ssize, data, sizeof (uint32_t));
             data += 4;
             if (swap)
             {
@@ -652,7 +666,7 @@ static constexpr size_t actEnd = sizeof (actionStrings) / sizeof (actionPair);
 const char *actionMessageType (action_message_def::action_t action)
 {
     auto pptr = static_cast<const actionPair *> (actionStrings);
-    auto res = std::find_if (pptr, pptr + actEnd, [action](const auto &pt) { return (pt.first == action); });
+    auto res = std::find_if (pptr, pptr + actEnd, [action] (const auto &pt) { return (pt.first == action); });
     if (res != pptr + actEnd)
     {
         return res->second;
@@ -674,7 +688,8 @@ static constexpr size_t errEnd = sizeof (errorStrings) / sizeof (errorPair);
 const char *commandErrorString (int errorcode)
 {
     auto pptr = static_cast<const errorPair *> (errorStrings);
-    auto res = std::find_if (pptr, pptr + errEnd, [errorcode](const auto &pt) { return (pt.first == errorcode); });
+    auto res =
+      std::find_if (pptr, pptr + errEnd, [errorcode] (const auto &pt) { return (pt.first == errorcode); });
     if (res != pptr + errEnd)
     {
         return res->second;
