@@ -100,7 +100,8 @@ ZmqCommsSS::~ZmqCommsSS ()
         auto status = getRxStatus ();
         while (status != connection_status::terminated && status != connection_status::error)
         {
-            std::this_thread::yield;
+            std::this_thread::yield ();
+            status = getRxStatus ();
         }
     }
     else
