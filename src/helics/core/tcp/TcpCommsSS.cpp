@@ -124,22 +124,6 @@ size_t TcpCommsSS::dataReceive (std::shared_ptr<TcpConnection> connection, const
     return used_total;
 }
 
-bool TcpCommsSS::commErrorHandler (std::shared_ptr<TcpConnection> /*connection*/, const std::error_code &error)
-{
-    if (getRxStatus () == connection_status::connected)
-    {
-        if ((error != asio::error::eof) && (error != asio::error::operation_aborted))
-        {
-            if (error != asio::error::connection_reset)
-            {
-                logError ("error message while connected " + error.message () + "code " +
-                          std::to_string (error.value ()));
-            }
-        }
-    }
-    return false;
-}
-
 void TcpCommsSS::queue_rx_function ()
 {
     // this function does nothing since everything is handled in the other thread
@@ -178,12 +162,12 @@ void TcpCommsSS::queue_tx_function ()
     TcpServer::pointer server;
     auto ioctx = AsioContextManager::getContextPointer ();
     auto contextLoop = ioctx->startContextLoop ();
-    auto dataCall = [this] (TcpConnection::pointer connection, const char *data, size_t datasize) {
+    auto dataCall = [this](TcpConnection::pointer connection, const char *data, size_t datasize) {
         return dataReceive (connection, data, datasize);
     };
-
-    auto errorCall = [this] (TcpConnection::pointer connection, const std::error_code &error) {
-        return commErrorHandler (connection, error);
+    CommsInterface *ci = this;
+    auto errorCall = [ci](TcpConnection::pointer connection, const std::error_code &error) {
+        return commErrorHandler (ci, connection, error);
     };
 
     if (serverMode)

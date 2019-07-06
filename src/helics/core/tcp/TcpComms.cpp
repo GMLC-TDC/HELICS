@@ -115,23 +115,6 @@ size_t TcpComms::dataReceive (std::shared_ptr<TcpConnection> connection, const c
     return used_total;
 }
 
-bool TcpComms::commErrorHandler (std::shared_ptr<TcpConnection> /*connection*/,
-                                 const std::error_code &error)
-{
-    if (getRxStatus () == connection_status::connected)
-    {
-        if ((error != asio::error::eof) && (error != asio::error::operation_aborted))
-        {
-            if (error != asio::error::connection_reset)
-            {
-                logError (std::string ("error message while connected ") + error.message () + " code " +
-                          std::to_string (error.value ()));
-            }
-        }
-    }
-    return false;
-}
-
 void TcpComms::queue_rx_function ()
 {
     while (PortNumber < 0)
@@ -190,8 +173,9 @@ void TcpComms::queue_rx_function ()
     server->setDataCall ([this](TcpConnection::pointer connection, const char *data, size_t datasize) {
         return dataReceive (connection, data, datasize);
     });
-    server->setErrorCall ([this](TcpConnection::pointer connection, const std::error_code &error) {
-        return commErrorHandler (connection, error);
+    CommsInterface *ci = this;
+    server->setErrorCall ([ci](TcpConnection::pointer connection, const std::error_code &error) {
+        return commErrorHandler (ci, connection, error);
     });
     server->start ();
     setRxStatus (connection_status::connected);
