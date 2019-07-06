@@ -16,3 +16,6 @@
 	path = ThirdParty/containers
 	url = https://github.com/GMLC-TDC/containers.git
 	branch = master
+[submodule "ThirdParty/concurrency"]
+	path = ThirdParty/concurrency
+	url = https://github.com/GMLC-TDC/concurrency.git

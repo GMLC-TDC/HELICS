@@ -10,10 +10,10 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "BrokerBase.hpp"
 #include "Core.hpp"
 
-#include "../common/DelayedObjects.hpp"
 #include "../common/GuardedTypes.hpp"
-#include "../common/TriggerVariable.hpp"
 #include "HandleManager.hpp"
+#include "gmlc/concurrency/DelayedObjects.hpp"
+#include "gmlc/concurrency/TriggerVariable.hpp"
 #include "gmlc/containers/AirLock.hpp"
 #include "gmlc/containers/DualMappedPointerVector.hpp"
 #include "gmlc/containers/DualMappedVector.hpp"
@@ -341,7 +341,7 @@ class CommonCore : public Core, public BrokerBase
     std::map<int32_t, std::vector<ActionMessage>>
       delayedTimingMessages;  //!< delayedTimingMessages from ongoing Filter actions
     std::atomic<int> queryCounter{1};  //!< counter for queries start at 1 so the default value isn't used
-    DelayedObjects<std::string> ActiveQueries;  //!< holder for active queries
+    gmlc::concurrency::DelayedObjects<std::string> ActiveQueries;  //!< holder for active queries
 
     std::map<interface_handle, std::unique_ptr<FilterCoordinator>> filterCoord;  //!< map of all local filters
     // The interface_handle used is here is usually referencing an endpoint
@@ -353,7 +353,7 @@ class CommonCore : public Core, public BrokerBase
     std::atomic<uint16_t> nextAirLock{0};  //!< the index of the next airlock to use
     std::array<gmlc::containers::AirLock<stx::any>, 4>
       dataAirlocks;  //!< airlocks for updating filter operators and other functions
-    TriggerVariable disconnection;  //!< controller for the disconnection process
+    gmlc::concurrency::TriggerVariable disconnection;  //!< controller for the disconnection process
   private:
     /** wait for the core to be registered with the broker*/
     bool waitCoreRegistration ();

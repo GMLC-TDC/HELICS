@@ -18,7 +18,7 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #pragma once
 
-#include "TripWire.hpp"
+#include "gmlc/concurrency/TripWire.hpp"
 #include "gmlc/containers/BlockingQueue.hpp"
 #include <atomic>
 #include <fstream>
@@ -39,7 +39,7 @@ class LoggingCore
     std::mutex functionLock;  //!< lock for updating the functions
     gmlc::containers::BlockingQueue<std::pair<int32_t, std::string>>
       loggingQueue;  //!< the actual queue containing the strings to log
-    tripwire::TripWireDetector tripDetector;
+    gmlc::concurrency::TripWireDetector tripDetector;
 
   public:
     /** default constructor*/

@@ -311,6 +311,10 @@ if(NOT EXISTS "${PROJECT_SOURCE_DIR}/ThirdParty/containers/gmlc/containers/Block
 	submod_update(ThirdParty/containers)
 endif()
 
+if(NOT EXISTS "${PROJECT_SOURCE_DIR}/ThirdParty/concurrency/gmlc/concurrency/TriggerVariable.hpp")
+	submod_update(ThirdParty/concurrency)
+endif()
+
 include(GNUInstallDirs)
 
 # -------------------------------------------------------------
@@ -414,6 +418,7 @@ target_include_directories(
         $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}/include>
         $<INSTALL_INTERFACE:$<INSTALL_PREFIX>/include>
 		$<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/ThirdParty/containers>
+		$<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/ThirdParty/concurrency>
 )
 
 target_include_directories(

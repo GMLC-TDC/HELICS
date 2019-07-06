@@ -8,9 +8,6 @@
 set(
   common_headers
   timeRepresentation.hpp
-  delayedDestructor.hpp
-  DelayedObjects.hpp
-  searchableObjectHolder.hpp
   JsonProcessingFunctions.hpp
   TomlProcessingFunctions.hpp
   AsioContextManager.h
@@ -21,8 +18,6 @@ set(
   generic_string_ops.hpp
   charMapper.h
   base64.h
-  TriggerVariable.hpp
-  TripWire.hpp
   fmt_format.h
   fmt_ostream.h
   addTargets.hpp
@@ -38,8 +33,6 @@ set(
   stringOps.cpp
   charMapper.cpp
   base64.cpp
-  TripWire.cpp
-  TriggerVariable.cpp
 )
 
 set(

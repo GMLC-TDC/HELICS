@@ -12,7 +12,7 @@ file defines some common filter operations
 
 #include "../common/GuardedTypes.hpp"
 #include "../core/Core.hpp"
-#include "libguarded/cow_guarded.hpp"
+#include "gmlc/libguarded/cow_guarded.hpp"
 #include <atomic>
 #include <set>
 
@@ -122,9 +122,9 @@ class FirewallFilterOperation : public FilterOperations
 {
   private:
     std::shared_ptr<FirewallOperator> op;  //!< the actual operator
-    libguarded::cow_guarded<std::vector<std::string>>
+    gmlc::libguarded::cow_guarded<std::vector<std::string>>
       allowed;  //!< the conditions on which the rerouting will occur
-    libguarded::cow_guarded<std::vector<std::string>> blocked;  //!< the conditions that block a message
+    gmlc::libguarded::cow_guarded<std::vector<std::string>> blocked;  //!< the conditions that block a message
   public:
     FirewallFilterOperation ();
     ~FirewallFilterOperation ();
