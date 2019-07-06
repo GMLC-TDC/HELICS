@@ -18,8 +18,8 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "mpi/MpiCore.h"
 #endif
 
-#include "gmlc/concurrency/delayedDestructor.hpp"
-#include "gmlc/concurrency/searchableObjectHolder.hpp"
+#include "gmlc/concurrency/DelayedDestructor.hpp"
+#include "gmlc/concurrency/SearchableObjectHolder.hpp"
 
 #ifdef ENABLE_TEST_CORE
 #include "test/TestCore.h"

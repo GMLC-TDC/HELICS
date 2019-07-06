@@ -10,9 +10,9 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "BrokerFactory.hpp"
 #include "core-exceptions.hpp"
 #include "core-types.hpp"
+#include "gmlc/concurrency/DelayedDestructor.hpp"
+#include "gmlc/concurrency/SearchableObjectHolder.hpp"
 #include "gmlc/concurrency/TripWire.hpp"
-#include "gmlc/concurrency/delayedDestructor.hpp"
-#include "gmlc/concurrency/searchableObjectHolder.hpp"
 #include "helics/helics-config.h"
 #ifdef ENABLE_ZMQ_CORE
 #include "zmq/ZmqBroker.h"
