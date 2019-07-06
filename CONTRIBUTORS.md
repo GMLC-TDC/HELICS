@@ -53,7 +53,7 @@ CLI11 is a command line parser and was used as a replacement for boost::program_
 GridDyn supports HELICS in experimental versions, and several components of GridDyn code were used in the development of HELICS, given they have several of the same authors.  
 
 ### [libGuarded](https://github.com/copperspice/libguarded)
-Several components of libGuarded are being used in the core and application libraries to better encapsulate the locks for threading. The library was modified to allow use of std::mutex and std::timed_mutex support for the shared_guarded class, and also modified to use handles. An atomic_guarded and a staged_guarded class were added for std::atomic like support for allocating classes. libGuarded is licensed under [BSD 2 clause](https://github.com/copperspice/libguarded/blob/master/LICENSE). The modified version being used in HELICS is available at [https://github.com/phlptp/libguarded/tree/modified]([https://github.com/phlptp/libguarded/tree/modified]).
+Several components of libGuarded are being used in the core and application libraries to better encapsulate the locks for threading. The library was modified to allow use of std::mutex and std::timed_mutex support for the shared_guarded class, and also modified to use handles. It is now included through the [gmlc/concurrency](https://github.com/GMLC-TDC/concurrency). libGuarded is licensed under [BSD 2 clause](https://github.com/copperspice/libguarded/blob/master/LICENSE).
 
 ### [fmt](http://fmtlib.net/latest/index.html)
 fmt replaces boost::format for internal logging and message printing. The library is included as a submodule.  HELICS uses the header only library for the time being. fmt is licensed under [BSD 2 clause](https://github.com/fmtlib/fmt/blob/master/LICENSE.rst) license.
@@ -61,8 +61,11 @@ fmt replaces boost::format for internal logging and message printing. The librar
 ### [Google Test](https://github.com/google/googletest)  
   A few of the tests are written to use the Google Test and mock frameworks. Google Test is included as a submodule. Google Test is released with a [BSD-3 clause](https://github.com/google/googletest/blob/master/LICENSE) license.
 
-### [containers](https://github.com/GMLC-TDC/containers)  
+### [gmlc/containers](https://github.com/GMLC-TDC/containers)  
 Several containers developed for HELICS and other applications were branched into a separate repository as a header only library. It is included in HELICS as a submodule and is released under a [BSD-3 clause](https://github.com/GMLC-TDC/containers/blob/master/LICENSE) license.
+
+### [gmlc/concurrency](https://github.com/GMLC-TDC/concurrency)  
+Several concurrency related structures and containers were developed for HELICS and other applications and were branched into a separate repository as a header only library and also includes the modified [libGuarded](https://github.com/copperspice/libguarded). It is included in HELICS as a submodule and is released under a [BSD-3 clause](https://github.com/GMLC-TDC/concurrency/blob/master/LICENSE) license.
 
 ### [cereal](https://github.com/USCiLab/cereal)
 The cereal library is used for serialization of messages sent around inside HELICS. cereal is included in the HELICS source and licensed under the [BSD-3 clause](https://github.com/USCiLab/cereal/blob/master/LICENSE) license.
