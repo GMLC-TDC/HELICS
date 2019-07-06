@@ -4,6 +4,8 @@ Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance
 the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
+#define ENABLE_TRIPWIRE
+
 #include "CoreFactory.hpp"
 #include "core-exceptions.hpp"
 #include "core-types.hpp"
@@ -38,6 +40,8 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helicsCLI11.hpp"
 #include <cassert>
 #include <cstring>
+
+DECLARE_TRIPLINE ()
 
 namespace helics
 {
