@@ -2833,11 +2833,16 @@ void CommonCore::registerInterface (ActionMessage &command)
 {
     if (command.dest_id == parent_broker_id)
     {
-        auto ifc = getHandleInfo (command.source_handle);
-        if (ifc != nullptr)
-        {
-            loopHandles.addHandleAtIndex (*ifc, command.source_handle.baseValue ());
-        }
+        auto handle = command.source_handle;
+        auto &lH = loopHandles;
+        handles.read ([handle, &lH](auto &hand) {
+            auto ifc = hand.getHandleInfo (handle.baseValue ());
+            if (ifc != nullptr)
+            {
+                lH.addHandleAtIndex (*ifc, handle.baseValue ());
+            }
+        });
+
         switch (command.action ())
         {
         case CMD_REG_INPUT:
