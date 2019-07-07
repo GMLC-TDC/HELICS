@@ -199,6 +199,8 @@ TEST_F (error_tests, duplicate_endpoint_names2)
     fed1->registerGlobalEndpoint ("testEpt");
     fed2->registerGlobalEndpoint ("testEpt");
 
+    fed1->enterInitializingModeAsync ();
+
     bool gotException = false;
     try
     {
@@ -305,7 +307,7 @@ TEST_P (network_error_tests, test_broker_recovery)
 {
     auto broker = AddBroker (GetParam (), "");
     ASSERT_TRUE (broker->isConnected ());
-    auto res = std::async (std::launch::async, [&broker] () {
+    auto res = std::async (std::launch::async, [&broker]() {
         std::this_thread::sleep_for (std::chrono::milliseconds (1400));
         broker->disconnect ();
     });
