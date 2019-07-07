@@ -7,12 +7,12 @@ SPDX-License-Identifier: BSD-3-Clause
 #pragma once
 
 #include "../../common/GuardedTypes.hpp"
-#include "../../common/TriggerVariable.hpp"
+#include "gmlc/concurrency/TriggerVariable.hpp"
+#include <asio/io_context.hpp>
+#include <asio/ip/tcp.hpp>
 #include <functional>
 #include <memory>
 #include <string>
-#include <asio/io_context.hpp>
-#include <asio/ip/tcp.hpp>
 
 /** @file
 various helper classes and functions for handling TCP connections
@@ -108,10 +108,10 @@ class TcpConnection : public std::enable_shared_from_this<TcpConnection>
    @param callback the callback function to execute when data has been received with signature
    void(TcpConnection::pointer, const char *buffer, size_t dataLength, const std::error_code &error)
     */
-    void async_receive (std::function<void(TcpConnection::pointer,
-                                           const char *buffer,
-                                           size_t dataLength,
-                                           const std::error_code &error)> callback)
+    void async_receive (
+      std::function<
+        void(TcpConnection::pointer, const char *buffer, size_t dataLength, const std::error_code &error)>
+        callback)
     {
         socket_.async_receive (asio::buffer (data, data.size ()),
                                [connection = shared_from_this (),
@@ -147,8 +147,7 @@ class TcpConnection : public std::enable_shared_from_this<TcpConnection>
     void handle_read (
       size_t message_size,
       const std::error_code &error,
-      std::function<void(TcpConnection::pointer, const char *, size_t, const std::error_code &error)>
-        callback)
+      std::function<void(TcpConnection::pointer, const char *, size_t, const std::error_code &error)> callback)
     {
         callback (shared_from_this (), data.data (), message_size, error);
     }
@@ -156,13 +155,13 @@ class TcpConnection : public std::enable_shared_from_this<TcpConnection>
 
     std::atomic<size_t> residBufferSize{0};
     asio::ip::tcp::socket socket_;
-    asio::io_context& context_;
+    asio::io_context &context_;
     std::vector<char> data;
     std::atomic<bool> triggerhalt{false};
     const bool connecting{false};
-    TriggerVariable receivingHalt;
+    gmlc::concurrency::TriggerVariable receivingHalt;
     std::atomic<bool> connectionError{false};
-    TriggerVariable connected;  //!< variable indicating connectivity
+    gmlc::concurrency::TriggerVariable connected;  //!< variable indicating connectivity
     std::function<size_t (TcpConnection::pointer, const char *, size_t)> dataCall;
     std::function<bool(TcpConnection::pointer, const std::error_code &)> errorCall;
     std::function<void(int level, const std::string &logMessage)> logFunction;
@@ -241,15 +240,14 @@ class TcpAcceptor : public std::enable_shared_from_this<TcpAcceptor>
     TcpAcceptor (asio::io_context &io_context, asio::ip::tcp::endpoint &ep);
     TcpAcceptor (asio::io_context &io_context, int port);
     /** function for handling the asynchronous return from a read request*/
-    void handle_accept (TcpAcceptor::pointer ptr,
-                        TcpConnection::pointer new_connection,
-                        const std::error_code &error);
+    void
+    handle_accept (TcpAcceptor::pointer ptr, TcpConnection::pointer new_connection, const std::error_code &error);
     asio::ip::tcp::endpoint endpoint_;
-	asio::ip::tcp::acceptor acceptor_;
+    asio::ip::tcp::acceptor acceptor_;
     std::function<void(TcpAcceptor::pointer, TcpConnection::pointer)> acceptCall;
     std::function<bool(TcpAcceptor::pointer, const std::error_code &)> errorCall;
     std::atomic<accepting_state_t> state{accepting_state_t::opened};
-    TriggerVariable accepting;
+    gmlc::concurrency::TriggerVariable accepting;
 };
 
 /** helper class for a server*/

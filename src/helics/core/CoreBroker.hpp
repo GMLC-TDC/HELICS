@@ -14,13 +14,12 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <thread>
 #include <unordered_map>
 
-#include "../common/DelayedObjects.hpp"
+#include "gmlc/concurrency/DelayedObjects.hpp"
 #include "gmlc/containers/AirLock.hpp"
 #include "gmlc/containers/DualMappedVector.hpp"
 #include "gmlc/containers/SimpleQueue.hpp"
 #include "helics/external/any.hpp"
 
-#include "../common/TriggerVariable.hpp"
 #include "ActionMessage.hpp"
 #include "BasicHandleInfo.hpp"
 #include "Broker.hpp"
@@ -30,6 +29,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "TimeDependencies.hpp"
 #include "UnknownHandleManager.hpp"
 #include "federate_id_extra.hpp"
+#include "gmlc/concurrency/TriggerVariable.hpp"
 
 namespace helics
 {
@@ -101,7 +101,7 @@ class CoreBroker : public Broker, public BrokerBase
     std::unordered_map<std::string, std::string> global_values;  //!< storage for global values
     std::mutex name_mutex_;  //!< mutex lock for name and identifier
     std::atomic<int> queryCounter{1};  // counter for active queries going to the local API
-    DelayedObjects<std::string> ActiveQueries;  //!< holder for
+    gmlc::concurrency::DelayedObjects<std::string> ActiveQueries;  //!< holder for
     JsonMapBuilder fedMap;  //!< builder for the federate_map
     std::vector<ActionMessage> fedMapRequestors;  //!< list of requesters for the active federate map
     JsonMapBuilder depMap;  //!< builder for the dependency graph
@@ -110,7 +110,7 @@ class CoreBroker : public Broker, public BrokerBase
     std::vector<ActionMessage> dataflowMapRequestors;  //!< list of requesters for the dependency graph
 
     std::vector<ActionMessage> earlyMessages;  //!< list of messages that came before connection
-    TriggerVariable disconnection;  //!< controller for the disconnection process
+    gmlc::concurrency::TriggerVariable disconnection;  //!< controller for the disconnection process
     std::unique_ptr<TimeoutMonitor> timeoutMon;  //!< class to handle timeouts and disconnection notices
     std::atomic<uint16_t> nextAirLock{0};  //!< the index of the next airlock to use
     std::array<gmlc::containers::AirLock<stx::any>, 3>

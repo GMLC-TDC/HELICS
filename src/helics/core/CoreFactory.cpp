@@ -4,6 +4,8 @@ Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance
 the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
+#define ENABLE_TRIPWIRE
+
 #include "CoreFactory.hpp"
 #include "core-exceptions.hpp"
 #include "core-types.hpp"
@@ -16,8 +18,8 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "mpi/MpiCore.h"
 #endif
 
-#include "../common/delayedDestructor.hpp"
-#include "../common/searchableObjectHolder.hpp"
+#include "gmlc/concurrency/DelayedDestructor.hpp"
+#include "gmlc/concurrency/SearchableObjectHolder.hpp"
 
 #ifdef ENABLE_TEST_CORE
 #include "test/TestCore.h"
@@ -38,6 +40,8 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helicsCLI11.hpp"
 #include <cassert>
 #include <cstring>
+
+DECLARE_TRIPLINE ()
 
 namespace helics
 {
@@ -361,13 +365,14 @@ can do the unregister operation and destroy itself meaning it is unable to join 
 what we do is delay the destruction until it is called in a different thread which allows the destructor to fire if
 need be
 without issue*/
-static DelayedDestructor<CommonCore>
+static gmlc::concurrency::DelayedDestructor<CommonCore>
   delayedDestroyer (destroyerCallFirst);  //!< the object handling the delayed destruction
 
-static SearchableObjectHolder<CommonCore> searchableObjects;  //!< the object managing the searchable objects
+static gmlc::concurrency::SearchableObjectHolder<CommonCore>
+  searchableObjects;  //!< the object managing the searchable objects
 
 // this will trip the line when it is destroyed at global destruction time
-static tripwire::TripWireTrigger tripTrigger;
+static gmlc::concurrency::TripWireTrigger tripTrigger;
 
 std::shared_ptr<Core> findCore (const std::string &name) { return searchableObjects.findObject (name); }
 

@@ -6,10 +6,10 @@ SPDX-License-Identifier: BSD-3-Clause
 */
 #pragma once
 
-#include "../common/TriggerVariable.hpp"
-#include "../common/TripWire.hpp"
 #include "ActionMessage.hpp"
 #include "NetworkBrokerData.hpp"
+#include "gmlc/concurrency/TriggerVariable.hpp"
+#include "gmlc/concurrency/TripWire.hpp"
 #include "gmlc/containers/BlockingPriorityQueue.hpp"
 #include <functional>
 #include <thread>
@@ -111,7 +111,7 @@ class CommsInterface
   private:
     std::atomic<connection_status> rx_status{connection_status::startup};  //!< the status of the receiver thread
   protected:
-    TriggerVariable rxTrigger;
+    gmlc::concurrency::TriggerVariable rxTrigger;
 
     std::string name;  //!< the name of the object
     std::string localTargetAddress;  //!< the base for the receive address
@@ -121,7 +121,7 @@ class CommsInterface
   private:
     std::atomic<connection_status> tx_status{
       connection_status::startup};  //!< the status of the transmitter thread
-    TriggerVariable txTrigger;
+    gmlc::concurrency::TriggerVariable txTrigger;
     std::atomic<bool> operating{false};  //!< the comms interface is in startup mode
     const bool singleThread{false};
 
@@ -165,7 +165,7 @@ class CommsInterface
     void propertyUnLock ();
 
   private:
-    tripwire::TripWireDetector tripDetector;  //!< try to detect if everything is shutting down
+    gmlc::concurrency::TripWireDetector tripDetector;  //!< try to detect if everything is shutting down
 };
 
 template <class X>

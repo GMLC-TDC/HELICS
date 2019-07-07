@@ -6,57 +6,57 @@ SPDX-License-Identifier: BSD-3-Clause
 */
 #include "gtest/gtest.h"
 
+#include "gmlc/libguarded/atomic_guarded.hpp"
 #include "helics/core/MessageTimer.hpp"
-#include "libguarded/atomic_guarded.hpp"
 using namespace helics;
 
 using namespace std::literals::chrono_literals;
 
 TEST (messageTimer_tests, basic_test)
 {
-    libguarded::atomic_guarded<ActionMessage> M;
+    gmlc::libguarded::atomic_guarded<ActionMessage> M;
     auto cback = [&M](ActionMessage &&m) { M = std::move (m); };
     auto mtimer = std::make_shared<MessageTimer> (cback);
     std::this_thread::yield ();  // just get the loop started
-    auto index=mtimer->addTimerFromNow (200ms, CMD_PROTOCOL);
-	EXPECT_EQ(index, 0);
+    auto index = mtimer->addTimerFromNow (200ms, CMD_PROTOCOL);
+    EXPECT_EQ (index, 0);
     EXPECT_TRUE (M.load ().action () == CMD_IGNORE);
     std::this_thread::sleep_for (300ms);
     if (M.load ().action () != CMD_PROTOCOL)
     {
         std::this_thread::sleep_for (300ms);
     }
-	if (M.load().action() != CMD_PROTOCOL)
-	{
-		std::cout << "waiting Again" << std::endl;
-		std::this_thread::sleep_for(300ms);
-	}
-	if (M.load().action() != CMD_PROTOCOL)
-	{
-		std::this_thread::sleep_for(300ms);
-	}
+    if (M.load ().action () != CMD_PROTOCOL)
+    {
+        std::cout << "waiting Again" << std::endl;
+        std::this_thread::sleep_for (300ms);
+    }
+    if (M.load ().action () != CMD_PROTOCOL)
+    {
+        std::this_thread::sleep_for (300ms);
+    }
     auto tm = M.load ();
-    EXPECT_TRUE (tm.action () == CMD_PROTOCOL) << "current = "<<prettyPrintString(tm);
+    EXPECT_TRUE (tm.action () == CMD_PROTOCOL) << "current = " << prettyPrintString (tm);
     if (tm.action () != CMD_PROTOCOL)
     {
         mtimer->cancelAll ();
     }
 }
-TEST(messageTimer_tests, shorttime_test)
+TEST (messageTimer_tests, shorttime_test)
 {
-	libguarded::atomic_guarded<ActionMessage> M;
-	auto cback = [&](ActionMessage &&m) { M = std::move(m); };
-	auto mtimer = std::make_shared<MessageTimer>(cback);
-	auto index = mtimer->addTimerFromNow(0ms, CMD_PROTOCOL);
-	EXPECT_EQ(index, 0);
-	
-	std::this_thread::sleep_for(5ms);
-	auto tm = M.load();
-	EXPECT_TRUE(tm.action() == CMD_PROTOCOL) << "current = " << prettyPrintString(tm);
-	if (tm.action() != CMD_PROTOCOL)
-	{
-		mtimer->cancelAll();
-	}
+    gmlc::libguarded::atomic_guarded<ActionMessage> M;
+    auto cback = [&](ActionMessage &&m) { M = std::move (m); };
+    auto mtimer = std::make_shared<MessageTimer> (cback);
+    auto index = mtimer->addTimerFromNow (0ms, CMD_PROTOCOL);
+    EXPECT_EQ (index, 0);
+
+    std::this_thread::sleep_for (5ms);
+    auto tm = M.load ();
+    EXPECT_TRUE (tm.action () == CMD_PROTOCOL) << "current = " << prettyPrintString (tm);
+    if (tm.action () != CMD_PROTOCOL)
+    {
+        mtimer->cancelAll ();
+    }
 }
 
 TEST (messageTimer_tests_skip_ci, basic_test_update)

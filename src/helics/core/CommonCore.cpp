@@ -28,10 +28,10 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <fstream>
 #include <functional>
 
-#include "../common/DelayedObjects.hpp"
 #include "../common/JsonProcessingFunctions.hpp"
 #include "../common/fmt_format.h"
 #include "fileConnections.hpp"
+#include "gmlc/concurrency/DelayedObjects.hpp"
 
 namespace helics
 {

@@ -5,9 +5,9 @@ additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 
-#include "../common/TripWire.hpp"
 #include "../core/core-exceptions.hpp"
 #include "../helics.hpp"
+#include "gmlc/concurrency/TripWire.hpp"
 #include "helics.h"
 #include "internal/api_objects.h"
 #include <iostream>

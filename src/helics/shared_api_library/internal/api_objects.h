@@ -8,9 +8,9 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include "../../application_api/helicsTypes.hpp"
 #include "../../common/GuardedTypes.hpp"
-#include "../../common/TripWire.hpp"
 #include "../../core/core-data.hpp"
 #include "../api-data.h"
+#include "gmlc/concurrency/TripWire.hpp"
 #include <deque>
 #include <memory>
 #include <mutex>
@@ -202,7 +202,7 @@ class MasterObjectHolder
     guarded<std::deque<std::unique_ptr<helics::BrokerObject>>> brokers;
     guarded<std::deque<std::unique_ptr<helics::CoreObject>>> cores;
     guarded<std::deque<std::unique_ptr<helics::FedObject>>> feds;
-    tripwire::TripWireDetector tripDetect;  //!< detector for library termination
+    gmlc::concurrency::TripWireDetector tripDetect;  //!< detector for library termination
     guarded<std::deque<std::string>> errorStrings;  //!< container for strings generated from error conditions
   public:
     MasterObjectHolder () noexcept;

@@ -14,10 +14,10 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "../common/fmt_format.h"
 #include "ForwardingTimeCoordinator.hpp"
 #include "flagOperations.hpp"
+#include "gmlc/libguarded/guarded.hpp"
 #include "loggingHelper.hpp"
 #include <asio/steady_timer.hpp>
 #include <iostream>
-#include <libguarded/guarded.hpp>
 #include <random>
 
 static constexpr auto chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
@@ -314,7 +314,7 @@ void BrokerBase::addActionMessage (ActionMessage &&m)
     }
 }
 
-using activeProtector = libguarded::guarded<std::pair<bool, bool>>;
+using activeProtector = gmlc::libguarded::guarded<std::pair<bool, bool>>;
 
 static void haltTimer (activeProtector &active, asio::steady_timer &tickTimer)
 {
