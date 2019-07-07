@@ -1,0 +1,99 @@
+language: cpp
+
+cache:
+  ccache: true
+  directories:
+    - dependencies
+    - build/libs
+
+before_cache:
+  - ${TRAVIS_BUILD_DIR}/scripts/cleanup-cmake.sh
+
+env:
+  global:
+    - MAKEFLAGS="-j 2"
+
+# Create aliases for some of shared build configuration
+_basic_env:
+- &linux_base
+  os: linux
+  compiler: gcc
+
+# Install macOS dependencies using Homebrew
+addons:
+  homebrew:
+    brewfile: .ci/Brewfile.travis
+    update: true
+
+jobs:
+  # On weekdays, the backlog for waiting OS X builds is huge
+  fast_finish: true
+  allow_failures:
+    - os: osx
+    - name: "Clang 5 Thread Sanitizer"
+    - script: scripts/trigger-dependent-ci-builds.sh
+
+  include:
+
+    # TSAN build
+    - <<: *linux_base
+      name: "Clang 5 Thread Sanitizer"
+      compiler: clang
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+            - llvm-toolchain-trusty-5.0
+          packages:
+            - libstdc++-6-dev
+            - clang-5.0
+      env:
+        - MATRIX_EVAL="COMPILER=clang && CC='clang-5.0' && CXX='clang++-5.0'"
+        - CCACHE_CPP2=yes
+        - CI_TEST_CONFIG="TSAN"
+        - DISABLE_INTERFACES="Python,Java"
+        - RUN_SANITIZER=tsan
+        - USE_MPI=mpich
+        - JOB_OPTION_FLAGS="-C../scripts/tsan-cache.cmake"
+        - ZMQ_SUBPROJECT=true
+        - ZMQ_FORCE_SUBPROJECT=true
+    
+branches:
+  except:
+    - gh-pages
+
+before_install:
+  - eval "${MATRIX_EVAL}"
+  - $CXX --version
+
+install:
+  - source scripts/install-ci-dependencies.sh
+  - source scripts/setup-helics-ci-options.sh
+  
+script:
+  - mkdir -p build && cd build
+  - cmake .. ${JOB_OPTION_FLAGS} ${HELICS_DEPENDENCY_FLAGS} ${HELICS_OPTION_FLAGS} -DCMAKE_C_COMPILER_LAUNCHER=ccache -DCMAKE_CXX_COMPILER_LAUNCHER=ccache
+  - make ${MAKEFLAGS}
+
+  # Setup counters for coverage
+  - if [[ "$BUILD_TYPE" == "Coverage" ]]; then pushd .. && scripts/lcov-helper.sh setup-counters && popd ; fi
+
+  - if [[ "TRAVIS_OS_NAME" == "osx" ]]; then python ../scripts/fix_install_names.py ; fi
+  - if [[ "TRAVIS_OS_NAME" == "osx" ]]; then make ${MAKEFLAGS} install ; fi
+
+  # Run CI tests
+  - export CTEST_OPTIONS="--output-on-failure"
+  - |
+    if [[ "$SKIP_TEST_RUN" != "true" ]]; then
+    travis_wait ../scripts/run-ci-tests.sh ${CI_TEST_FLAGS}
+    fi
+
+  # Gather coverage results
+  - if [[ "$BUILD_TYPE" == "Coverage" ]]; then pushd .. && scripts/lcov-helper.sh gather-coverage-info --gcov ${GCOV_TOOL} --codecov && popd ; fi
+
+  # Create an installer using CPack
+  - if [[ "$ENABLE_CPACK" ]]; then cpack -G STGZ -B $(pwd)/cpack-output ; fi
+
+notifications:
+    email: false
+

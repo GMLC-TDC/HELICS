@@ -55,24 +55,24 @@ TEST (ZMQSSCore_tests, zmqSSComm_transmit)
     comm2.setPortNumber (ZMQ_SS_BROKER_PORT);
     comm2.setServerMode (true);
 
-    comm.setCallback ([&counter, &act](helics::ActionMessage m) {
+    comm.setCallback ([&counter, &act] (helics::ActionMessage m) {
         ++counter;
         act = m;
     });
-    comm2.setCallback ([&counter2, &act2](helics::ActionMessage m) {
+    comm2.setCallback ([&counter2, &act2] (helics::ActionMessage m) {
         ++counter2;
         act2 = m;
     });
     // need to launch the connection commands at the same time since they depend on each other in this case
     auto connected_fut = std::async (std::launch::async, [&comm] { return comm.connect (); });
-    bool connected1 = comm2.connect ();
-    ASSERT_TRUE (connected1);
-    bool connected2 = connected_fut.get ();
-    if (!connected2)
-    {  // lets just try again if it is not connected
-        connected2 = comm.connect ();
-    }
+    bool connected2 = comm2.connect ();
     ASSERT_TRUE (connected2);
+    bool connected1 = connected_fut.get ();
+    if (!connected1)
+    {  // lets just try again if it is not connected
+        connected1 = comm.connect ();
+    }
+    ASSERT_TRUE (connected1);
 
     comm.transmit (helics::parent_route_id, helics::CMD_ACK);
     std::this_thread::sleep_for (250ms);
@@ -84,9 +84,9 @@ TEST (ZMQSSCore_tests, zmqSSComm_transmit)
     EXPECT_TRUE (act2.lock ()->action () == helics::action_message_def::action_t::cmd_ack);
 
     comm2.disconnect ();
-    EXPECT_TRUE (!comm2.isConnected ());
+    EXPECT_FALSE (comm2.isConnected ());
     comm.disconnect ();
-    EXPECT_TRUE (!comm.isConnected ());
+    EXPECT_FALSE (comm.isConnected ());
 
     std::this_thread::sleep_for (100ms);
 }
@@ -121,15 +121,15 @@ TEST (ZMQSSCore_tests, zmqSSComm_addroute)
     comm3.setPortNumber (ZMQ_SS_BROKER_PORT);
     comm3.setServerMode (true);
 
-    comm.setCallback ([&counter, &act](helics::ActionMessage m) {
+    comm.setCallback ([&counter, &act] (helics::ActionMessage m) {
         ++counter;
         act = m;
     });
-    comm2.setCallback ([&counter2, &act2](helics::ActionMessage m) {
+    comm2.setCallback ([&counter2, &act2] (helics::ActionMessage m) {
         ++counter2;
         act2 = m;
     });
-    comm3.setCallback ([&counter3, &act3](helics::ActionMessage m) {
+    comm3.setCallback ([&counter3, &act3] (helics::ActionMessage m) {
         ++counter3;
         act3 = m;
     });
@@ -186,7 +186,7 @@ TEST (ZMQSSCore_tests, zmqSSCore_initialization_test)
     comm.setName ("test_broker");
     comm.setPortNumber (ZMQ_SS_BROKER_PORT);
     comm.setServerMode (true);
-    comm.setCallback ([&counter, &msgs, &msgLock](helics::ActionMessage m) {
+    comm.setCallback ([&counter, &msgs, &msgLock] (helics::ActionMessage m) {
         ++counter;
         std::lock_guard<std::mutex> lock (msgLock);
         msgs.push_back (m);
@@ -382,7 +382,7 @@ TEST (ZMQSSCore_tests, zmqSSMultiCoreInitialization_test)
     std::vector<std::thread> threads (feds);
     for (int ii = 0; ii < feds; ++ii)
     {
-        threads[ii] = std::thread ([](FedTest &leaf) { leaf.run (); }, std::ref (leafs[ii]));
+        threads[ii] = std::thread ([] (FedTest &leaf) { leaf.run (); }, std::ref (leafs[ii]));
     }
     SCOPED_TRACE ("started threads");
     std::this_thread::yield ();

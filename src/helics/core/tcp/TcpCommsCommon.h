@@ -15,11 +15,13 @@ SPDX-License-Identifier: BSD-3-Clause
 class AsioContextManager;
 namespace asio
 {
-    class io_context;
-} // namespace asio
+class io_context;
+}  // namespace asio
 
 namespace helics
 {
+class CommsInterface;
+
 namespace tcp
 {
 /** establish a connection to a server by as associated timeout*/
@@ -28,5 +30,10 @@ TcpConnection::pointer makeConnection (asio::io_context &io_context,
                                        const std::string &port,
                                        size_t bufferSize,
                                        std::chrono::milliseconds timeOut);
+
+/** do some checking and logging about errors if the interface is connected*/
+bool commErrorHandler (CommsInterface *comm,
+                       std::shared_ptr<TcpConnection> connection,
+                       const std::error_code &error);
 }  // namespace tcp
 }  // namespace helics

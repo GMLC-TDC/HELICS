@@ -7,6 +7,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "TcpCommsCommon.h"
 #include "../../common/AsioContextManager.h"
 #include "../ActionMessage.hpp"
+#include "../CommsInterface.hpp"
 #include "../NetworkBrokerData.hpp"
 #include "TcpHelperClasses.h"
 #include <memory>
@@ -54,5 +55,24 @@ TcpConnection::pointer makeConnection (asio::io_context &io_context,
     }
     return connectionPtr;
 }
+
+bool commErrorHandler (CommsInterface *comm,
+                       std::shared_ptr<TcpConnection> /*connection*/,
+                       const std::error_code &error)
+{
+    if (comm->isConnected ())
+    {
+        if ((error != asio::error::eof) && (error != asio::error::operation_aborted))
+        {
+            if (error != asio::error::connection_reset)
+            {
+                comm->logError ("error message while connected " + error.message () + "code " +
+                                std::to_string (error.value ()));
+            }
+        }
+    }
+    return false;
+}
+
 }  // namespace tcp
 }  // namespace helics

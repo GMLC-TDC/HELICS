@@ -27,8 +27,8 @@ class CommsInterface
     /** enumeration of whether the threading system should generate a single thread or multiple threads*/
     enum class thread_generation
     {
-        single,
-        dual
+        single,  // indicate that a single thread is used for transmitting and receiving
+        dual  // indicate that separate threads are used 1 for transmission and one for reception
     };
     /** default constructor*/
     CommsInterface () = default;
@@ -88,7 +88,6 @@ class CommsInterface
     /** enable or disable the server mode for the comms*/
     void setServerMode (bool serverActive);
 
-  protected:
     /** generate a log message as a warning*/
     void logWarning (const std::string &message) const;
     /** generate a log message as an error*/
@@ -137,7 +136,7 @@ class CommsInterface
     std::function<void(ActionMessage &&)> ActionCallback;  //!< the callback for what to do with a received message
     std::function<void(int level, const std::string &name, const std::string &message)>
       loggingCallback;  //!< callback for logging
-	gmlc::containers::BlockingPriorityQueue<std::pair<route_id, ActionMessage>>
+    gmlc::containers::BlockingPriorityQueue<std::pair<route_id, ActionMessage>>
       txQueue;  //!< set of messages waiting to be transmitted
     // closing the files or connection can take some time so there is a need for inter-thread communication to not
     // spit out warning messages if it is in the process of disconnecting
@@ -152,7 +151,7 @@ class CommsInterface
     virtual void queue_rx_function () = 0;  //!< the functional loop for the receive queue
     virtual void queue_tx_function () = 0;  //!< the loop for transmitting data
     virtual void closeTransmitter ();  //!< function to instruct the transmitter loop to close
-    virtual void closeReceiver () = 0;  //!< function to instruct the receiver loop to close
+    virtual void closeReceiver ();  //!< function to instruct the receiver loop to close
     virtual void reconnectTransmitter ();  //!< function to reconnect the transmitter
     virtual void reconnectReceiver ();  //!< function to reconnect the receiver
   protected:
