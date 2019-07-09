@@ -94,7 +94,7 @@ void ValueFederateManager::addAlias (const Input &inp, const std::string &shortc
     {
         auto inpHandle = inputs.lock ();
         inpHandle->addSearchTerm (shortcutName, inp.handle);
-        targetIDs.emplace (shortcutName, inp.handle);
+        targetIDs.lock ()->emplace (shortcutName, inp.handle);
     }
     else
     {
@@ -118,14 +118,14 @@ void ValueFederateManager::addAlias (const Publication &pub, const std::string &
 void ValueFederateManager::addTarget (const Publication &pub, const std::string &target)
 {
     coreObject->addDestinationTarget (pub.handle, target);
-    targetIDs.emplace (target, pub.handle);
+    targetIDs.lock ()->emplace (target, pub.handle);
 }
 
 void ValueFederateManager::addTarget (const Input &inp, const std::string &target)
 {
     coreObject->addSourceTarget (inp.handle, target);
-    targetIDs.emplace (target, inp.handle);
-    inputTargets.emplace (inp.handle, target);
+    targetIDs.lock ()->emplace (target, inp.handle);
+    inputTargets.lock ()->emplace (inp.handle, target);
 }
 
 void ValueFederateManager::removeTarget (const Publication &pub, const std::string &target)
@@ -136,13 +136,14 @@ void ValueFederateManager::removeTarget (const Publication &pub, const std::stri
 
 void ValueFederateManager::removeTarget (const Input &inp, const std::string &target)
 {
-    auto rng = inputTargets.equal_range (inp.handle);
+    auto iTHandle = inputTargets.lock ();
+    auto rng = iTHandle->equal_range (inp.handle);
     for (auto el = rng.first; el != rng.second; ++el)
     {
         if (el->second == target)
         {
             coreObject->removeTarget (inp.handle, target);
-            inputTargets.erase (el);
+            iTHandle->erase (el);
             break;
         }
     }
@@ -299,7 +300,7 @@ std::string ValueFederateManager::localQuery (const std::string &queryStr) const
     }
     else if (queryStr == "subscriptions")
     {
-        ret = generateStringVector (targetIDs, [] (const auto &target) { return target.first; });
+        ret = generateStringVector (targetIDs.lock_shared (), [] (const auto &target) { return target.first; });
     }
     else if (queryStr == "updated_input_indices")
     {
@@ -311,23 +312,60 @@ std::string ValueFederateManager::localQuery (const std::string &queryStr) const
             if (inp.isUpdated ())
             {
                 ret.append (std::to_string (ii));
-                ret.push_back (',');
+                ret.push_back (';');
             }
+            ++ii;
         }
-        ret.pop_back ();
+        if (ret.back () == ';')
+        {
+            ret.pop_back ();
+        }
         ret.push_back (']');
     }
     else if (queryStr == "updated_input_names")
     {
         ret = generateStringVector_if (
-          inputs.lock_shared (), [] (const auto &inp) { return inp.getName (); },
+          inputs.lock_shared (), [] (const auto &inp) { return inp.getDisplayName (); },
           [] (const auto &inp) { return (inp.isUpdated ()); });
     }
     else if (queryStr == "updates")
     {
+        JsonBuilder JB;
+        for (auto &inp : inputs.lock_shared ())
+        {
+            if (inp.isUpdated ())
+            {
+                auto inpTemp = inp;
+                if (inpTemp.getHelicsType () == data_type::helics_double)
+                {
+                    JB.addElement (inp.getDisplayName (), inpTemp.getValue<double> ());
+                }
+                else
+                {
+                    JB.addElement (inp.getDisplayName (), inpTemp.getValue<std::string> ());
+                }
+            }
+        }
+        ret = JB.generate ();
     }
     else if (queryStr == "values")
     {
+        JsonBuilder JB;
+        for (auto &inp : inputs.lock_shared ())
+        {
+            auto inpTemp = inp;
+            inpTemp.checkUpdate (true);
+
+            if (inpTemp.getHelicsType () == data_type::helics_double)
+            {
+                JB.addElement (inp.getDisplayName (), inpTemp.getValue<double> ());
+            }
+            else
+            {
+                JB.addElement (inp.getDisplayName (), inpTemp.getValue<std::string> ());
+            }
+        }
+        ret = JB.generate ();
     }
     return ret;
 }
@@ -352,9 +390,9 @@ static const std::string emptyStr;
 
 const std::string &ValueFederateManager::getTarget (const Input &inp) const
 {
-    auto inpHandle = inputs.lock_shared ();
-    auto fnd = inputTargets.find (inp.handle);
-    if (fnd != inputTargets.end ())
+    auto inpHandle = inputTargets.lock_shared ();
+    auto fnd = inpHandle->find (inp.handle);
+    if (fnd != inpHandle->end ())
     {
         return fnd->second;
     }
@@ -408,7 +446,8 @@ Input &ValueFederateManager::getInput (int index)
 
 const Input &ValueFederateManager::getSubscription (const std::string &key) const
 {
-    auto res = targetIDs.equal_range (key);
+    auto TIDhandle = targetIDs.lock_shared ();
+    auto res = TIDhandle->equal_range (key);
     if (res.first != res.second)
     {
         auto inps = inputs.lock_shared ();
@@ -423,7 +462,8 @@ const Input &ValueFederateManager::getSubscription (const std::string &key) cons
 
 Input &ValueFederateManager::getSubscription (const std::string &key)
 {
-    auto res = targetIDs.equal_range (key);
+    auto TIDhandle = targetIDs.lock_shared ();
+    auto res = TIDhandle->equal_range (key);
     if (res.first != res.second)
     {
         auto inps = inputs.lock ();
@@ -488,6 +528,23 @@ int ValueFederateManager::getPublicationCount () const
 }
 /** get a count of the number inputs registered*/
 int ValueFederateManager::getInputCount () const { return static_cast<int> (inputs.lock_shared ()->size ()); }
+
+void ValueFederateManager::clearUpdates ()
+{
+    for (auto &inp : inputs.lock ())
+    {
+        inp.clearUpdate ();
+    }
+}
+
+void ValueFederateManager::clearUpdate (const Input &inp)
+{
+    auto iData = reinterpret_cast<input_info *> (inp.dataReference);
+    if (iData != nullptr)
+    {
+        iData->hasUpdate = false;
+    }
+}
 
 void ValueFederateManager::setInputNotificationCallback (std::function<void (Input &, Time)> callback)
 {

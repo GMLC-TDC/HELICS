@@ -157,7 +157,7 @@ static const std::string emptyStr;
 template <class Inp, class Obj>
 static void loadOptions (ValueFederate *fed, const Inp &data, Obj &objUpdate)
 {
-    addTargets (data, "flags", [&objUpdate](const std::string &target) {
+    addTargets (data, "flags", [&objUpdate] (const std::string &target) {
         if (target.front () != '-')
         {
             objUpdate.setOption (getOptionIndex (target), true);
@@ -177,8 +177,9 @@ static void loadOptions (ValueFederate *fed, const Inp &data, Obj &objUpdate)
     {
         objUpdate.setOption (defs::options::connection_required, required);
     }
-    callIfMember (data, "shortcut", [&objUpdate, fed](const std::string &val) { fed->addAlias (objUpdate, val); });
-    callIfMember (data, "alias", [&objUpdate, fed](const std::string &val) { fed->addAlias (objUpdate, val); });
+    callIfMember (data, "shortcut",
+                  [&objUpdate, fed] (const std::string &val) { fed->addAlias (objUpdate, val); });
+    callIfMember (data, "alias", [&objUpdate, fed] (const std::string &val) { fed->addAlias (objUpdate, val); });
 
     auto tol = getOrDefault (data, "tolerance", -1.0);
     if (tol > 0.0)
@@ -190,7 +191,7 @@ static void loadOptions (ValueFederate *fed, const Inp &data, Obj &objUpdate)
     {
         fed->setInfo (objUpdate.getHandle (), info);
     }
-    addTargets (data, "targets", [&objUpdate](const std::string &target) { objUpdate.addTarget (target); });
+    addTargets (data, "targets", [&objUpdate] (const std::string &target) { objUpdate.addTarget (target); });
 }
 
 void ValueFederate::registerValueInterfacesJson (const std::string &jsonString)
@@ -475,18 +476,21 @@ const Publication &ValueFederate::getPublication (const std::string &key, int in
     return vfManager->getPublication (key + '_' + std::to_string (index1) + '_' + std::to_string (index2));
 }
 
-void ValueFederate::setInputNotificationCallback (std::function<void(Input &, Time)> callback)
+void ValueFederate::setInputNotificationCallback (std::function<void (Input &, Time)> callback)
 {
     vfManager->setInputNotificationCallback (std::move (callback));
 }
 
-void ValueFederate::setInputNotificationCallback (Input &inp, std::function<void(Input &, Time)> callback)
+void ValueFederate::setInputNotificationCallback (Input &inp, std::function<void (Input &, Time)> callback)
 {
     vfManager->setInputNotificationCallback (inp, std::move (callback));
 }
 
-/** get a count of the number publications registered*/
 int ValueFederate::getPublicationCount () const { return vfManager->getPublicationCount (); }
-/** get a count of the number subscriptions registered*/
+
 int ValueFederate::getInputCount () const { return vfManager->getInputCount (); }
+
+void ValueFederate::clearUpdates () { vfManager->clearUpdates (); }
+
+void ValueFederate::clearUpdate (const Input &inp) { vfManager->clearUpdate (inp); }
 }  // namespace helics

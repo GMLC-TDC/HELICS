@@ -386,6 +386,12 @@ class ValueFederate : public virtual Federate  // using virtual inheritance to a
     Time getLastUpdateTime (const Input &inp) const;
 
     virtual void disconnect () override;
+    /** clear all the updates
+    @details after this call isUpdated on all the internal objects will return false*/
+    void clearUpdates ();
+    /** clear all the update for a specific federate
+    @details after this call isUpdated on the input will return false*/
+    void clearUpdate (const Input &inp);
 
   protected:
     virtual void updateTime (Time newTime, Time oldTime) override;
@@ -463,12 +469,12 @@ class ValueFederate : public virtual Federate  // using virtual inheritance to a
     @details there can only be one generic callback
     @param callback the function to call signature void(input_id_t, Time)
     */
-    void setInputNotificationCallback (std::function<void(Input &, Time)> callback);
+    void setInputNotificationCallback (std::function<void (Input &, Time)> callback);
     /** register a callback function to call when the specified subscription is updated
     @param inp an input to set the notification callback for
     @param callback the function to call
     */
-    void setInputNotificationCallback (Input &inp, std::function<void(Input &, Time)> callback);
+    void setInputNotificationCallback (Input &inp, std::function<void (Input &, Time)> callback);
 
     /** get a count of the number publications registered*/
     int getPublicationCount () const;

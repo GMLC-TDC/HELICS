@@ -168,6 +168,9 @@ class Input
     /** get the Name/Key for the input
     @details the name is the local name if given, key is the full key name*/
     const std::string &getKey () const { return fed->getInterfaceName (handle); }
+    /** get the display name for an input
+    @details the name is the given local name or if empty the name of the target*/
+    const std::string &getDisplayName () const { return (actualName.empty () ? getTarget () : actualName); }
 
     /** get the type of the data coming from the publication*/
     const std::string &getPublicationType () const
@@ -202,6 +205,8 @@ class Input
     @return true if the value has been updated*/
     bool checkUpdate (bool assumeUpdate = false);
 
+    /** clear the isUpdated flag*/
+    void clearUpdate ();
     /** check if the value has been updated including interpretation of the change detection
      */
     bool isUpdated ();
@@ -368,6 +373,8 @@ class Input
     /** close a input during an active simulation
     @details it is not necessary to call this function unless you are continuing the simulation after the close*/
     void close () { fed->closeInterface (handle); }
+    /** get the HELICS data type for the input*/
+    data_type getHelicsType () const { return type; }
 
   private:
     /** helper class for getting a character since that is a bit odd*/

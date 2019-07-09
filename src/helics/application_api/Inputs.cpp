@@ -169,6 +169,12 @@ bool Input::isUpdated () const
     return fed->isUpdated (*this);
 }
 
+void Input::clearUpdate ()
+{
+    hasUpdate = false;
+    fed->clearUpdate (*this);
+};
+
 size_t Input::getRawSize ()
 {
     isUpdated ();

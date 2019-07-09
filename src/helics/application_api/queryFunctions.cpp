@@ -8,9 +8,10 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "queryFunctions.hpp"
 
 #include "Federate.hpp"
+#include <algorithm>
 #include <thread>
 
-#include <boost/algorithm/string.hpp>
+#include "../common/stringOps.h"
 
 std::vector<std::string> vectorizeQueryResult (std::string &&queryres)
 {
@@ -20,8 +21,7 @@ std::vector<std::string> vectorizeQueryResult (std::string &&queryres)
     }
     if (queryres.front () == '[')
     {
-        std::vector<std::string> strs;
-        boost::split (strs, queryres, [] (char c) { return c == ';'; });
+        std::vector<std::string> strs = stringOps::splitline (queryres, ';');
         strs.front () = strs.front ().substr (1);  // get rid of the leading '['
         strs.back ().pop_back ();  // get rid of the trailing ']';
         return strs;
@@ -39,8 +39,7 @@ std::vector<std::string> vectorizeQueryResult (const std::string &queryres)
     }
     if (queryres.front () == '[')
     {
-        std::vector<std::string> strs;
-        boost::split (strs, queryres, [] (char c) { return c == ';'; });
+        std::vector<std::string> strs = stringOps::splitline (queryres, ';');
         strs.front () = strs.front ().substr (1);  // get rid of the leading '['
         strs.back ().pop_back ();  // get rid of the trailing ']';
         return strs;
@@ -48,6 +47,40 @@ std::vector<std::string> vectorizeQueryResult (const std::string &queryres)
     std::vector<std::string> res;
     res.push_back (queryres);
     return res;
+}
+
+std::vector<int> vectorizeIndexQuery (const std::string &queryres)
+{
+    std::vector<int> result;
+    if (queryres.empty ())
+    {
+        return result;
+    }
+
+    if (queryres.front () == '[')
+    {
+        auto strs = vectorizeQueryResult (queryres);
+        result.reserve (strs.size ());
+        for (auto &str : strs)
+        {
+            try
+            {
+                result.push_back (std::stoi (str));
+            }
+            catch (const std::invalid_argument &)
+            {
+                continue;
+            }
+        }
+    }
+    try
+    {
+        result.push_back (std::stoi (queryres));
+    }
+    catch (const std::invalid_argument &)
+    {
+    }
+    return result;
 }
 
 std::vector<std::string> vectorizeAndSortQueryResult (const std::string &queryres)

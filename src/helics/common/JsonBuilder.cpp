@@ -7,9 +7,14 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include "JsonBuilder.hpp"
 #include "JsonProcessingFunctions.hpp"
+#include "stringOps.h"
 
 namespace helics
 {
+JsonMapBuilder::JsonMapBuilder () noexcept {};
+
+JsonMapBuilder::~JsonMapBuilder () = default;
+
 Json::Value &JsonMapBuilder::getJValue ()
 {
     if (!jMap)
@@ -57,4 +62,61 @@ void JsonMapBuilder::reset ()
     missing_components.clear ();
 }
 
+JsonBuilder::JsonBuilder () noexcept {};
+
+JsonBuilder::~JsonBuilder () = default;
+/** add an element on a specific path*/
+void JsonBuilder::addElement (const std::string &path, const std::string &value)
+{
+    stringVector res = stringOps::splitline (path, "\\/:.", stringOps::delimiter_compression::on);
+    auto jv = &getJValue ();
+    size_t ii = 0;
+    for (ii = 0; ii < res.size () - 1; ++ii)
+    {
+        auto &sub = (*jv)[res[ii]];
+        if (sub.isNull ())
+        {
+            (*jv)[res[ii]] = Json::Value ();
+        }
+        jv = &(*jv)[res[ii]];
+    }
+    (*jv)[res.back ()] = value;
+}
+
+void JsonBuilder::addElement (const std::string &path, double value)
+{
+    stringVector res = stringOps::splitline (path, "\\/:.", stringOps::delimiter_compression::on);
+    auto jv = &getJValue ();
+    size_t ii = 0;
+    for (ii = 0; ii < res.size () - 1; ++ii)
+    {
+        auto &sub = (*jv)[res[ii]];
+        if (sub.isNull ())
+        {
+            (*jv)[res[ii]] = Json::Value ();
+        }
+        jv = &(*jv)[res[ii]];
+    }
+    (*jv)[res.back ()] = value;
+}
+
+Json::Value &JsonBuilder::getJValue ()
+{
+    if (!jMap)
+    {
+        jMap = std::make_unique<Json::Value> ();
+    }
+    return *jMap;
+}
+
+std::string JsonBuilder::generate ()
+{
+    if (jMap)
+    {
+        return generateJsonString (*jMap);
+    }
+    return "{}";
+}
+
+void JsonBuilder::reset () { jMap = nullptr; }
 }  // namespace helics

@@ -60,12 +60,31 @@ The following queries are defined for federates.  Federates may specify a callba
 +-------------------+------------------------------------------------------------+
 | ``subscriptions`` | current subscriptions of a federate [sv]                   |
 +-------------------+------------------------------------------------------------+
+| ``inputs``        | current inputs of a federate [sv]                          |
++-------------------+------------------------------------------------------------+
 | ``endpoints``     | current endpoints of a federate [sv]                       |
 +-------------------+------------------------------------------------------------+
 | ``dependencies``  | list of the objects this federate depends on [sv]          |
 +-------------------+------------------------------------------------------------+
 | ``dependents``    | list of dependent objects [sv]                             |
 +-------------------+------------------------------------------------------------+
+```
+
+### Local Federate Queries
+The following queries are defined for federates but can only be queried on the local federate.  Federates may specify a callback function which allows arbitrary user defined Queries.  The queries defined here are available inside of HELICS.
+
+```eval_rst
++---------------------------+------------------------------------------------------------+
+| queryString               | Description                                                |
++===========================+============================================================+
+| ``updated_input_indices`` | vector of number of the inputs that have been updated [sv] |
++---------------------------+------------------------------------------------------------+
+| ``updated_input_names``   | names or targets of inputs that have been updated [sv]     |
++---------------------------+------------------------------------------------------------+
+| ``updates``               | values of all currently updated inputs [JSON]              |
++---------------------------+------------------------------------------------------------+
+| ``values``                | current values of all inputs [JSON]                        |
++---------------------------+------------------------------------------------------------+
 ```
 
 Other strings may be defined for specific federates.
