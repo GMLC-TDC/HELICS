@@ -17,10 +17,10 @@ namespace helicscpp
 class Input
 {
   public:
-    explicit Input (helics_input hsub) HELICS_NOTHROW: inp (hsub) {}
-    Input ()HELICS_NOTHROW:inp(HELICS_NULL_POINTER){};
+    explicit Input (helics_input hsub) HELICS_NOTHROW : inp (hsub) {}
+    Input () HELICS_NOTHROW : inp (HELICS_NULL_POINTER){};
 
-    Input (const Input &inputs) HELICS_NOTHROW: inp (inputs.inp) {}
+    Input (const Input &inputs) HELICS_NOTHROW : inp (inputs.inp) {}
 
     Input &operator= (const Input &input)
     {
@@ -90,7 +90,7 @@ class Input
         int size = helicsInputGetStringSize (inp);
         std::string result;
 
-        result.resize (static_cast<size_t>(size)+ 1);
+        result.resize (static_cast<size_t> (size) + 1);
         // this function results in a null terminated string
         helicsInputGetString (inp, &result[0], size + 1, &size, NULL);
         if (!(result.empty ()) && (result[static_cast<size_t> (size) - 1] == '\0'))
@@ -150,6 +150,8 @@ class Input
     /** Get the last time a subscription was updated **/
     helics_time getLastUpdateTime () const { return helicsInputLastUpdateTime (inp); }
 
+    /** clear the updated flag*/
+    void clearUpdate () { helicsInputClearUpdate (inp); }
     // call helicsInputIsUpdated for each inp
 
     const char *getKey () const { return helicsInputGetKey (inp); }

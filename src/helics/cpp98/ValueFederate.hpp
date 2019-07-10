@@ -69,8 +69,9 @@ class ValueFederate : public virtual Federate
         return *this;
     }
 #ifdef HELICS_HAS_RVALUE_REFS
-    ValueFederate (ValueFederate &&fedObj) HELICS_NOTHROW
-        : Federate (), ipts (std::move (fedObj.ipts)), pubs (std::move (fedObj.pubs))
+    ValueFederate (ValueFederate &&fedObj) HELICS_NOTHROW : Federate (),
+                                                            ipts (std::move (fedObj.ipts)),
+                                                            pubs (std::move (fedObj.pubs))
     {
         Federate::operator= (std::move (fedObj));
     }
@@ -83,7 +84,7 @@ class ValueFederate : public virtual Federate
     }
 #endif
     // Default constructor, not meant to be used
-    ValueFederate ()HELICS_NOTHROW {}
+    ValueFederate () HELICS_NOTHROW {}
 
     /** Methods to register publications **/
     Publication
@@ -185,7 +186,10 @@ class ValueFederate : public virtual Federate
     // TODO: use c api to implement this method... callbacks too?
     /** Get a list of all subscriptions with updates since the last call **/
     std::vector<helics_input> queryUpdates () { return std::vector<helics_input> (); }
-    // call helicsInputIsUpdated for each sub
+
+    /** clear all the update flags from all federate inputs*/
+    void clearUpdates () { helicsFederateClearUpdates (fed); }
+
   private:
     // Utility function for converting numbers to string
     template <typename T>

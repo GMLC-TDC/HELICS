@@ -426,7 +426,7 @@ static void generateData (std::vector<std::pair<std::string, dvalue>> &vpairs,
     }
 }
 
-void ValueFederate::registerPublicationsFromJSON (const std::string &jsonString)
+void ValueFederate::registerFromPublicationJSON (const std::string &jsonString)
 {
     auto jv = loadJson (jsonString);
     if (jv.isNull ())

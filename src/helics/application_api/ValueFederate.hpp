@@ -328,7 +328,7 @@ class ValueFederate : public virtual Federate  // using virtual inheritance to a
     /** register a set of publications based on a publication JSON
     @param jsonString a json string containing the data to publish and establish publications from
     */
-    void registerPublicationsFromJSON (const std::string &jsonString);
+    void registerFromPublicationJSON (const std::string &jsonString);
 
     /** publish a set of values in json format
      @param jsonString a json string containing the data to publish

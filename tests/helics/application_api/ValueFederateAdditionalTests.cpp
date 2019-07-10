@@ -624,7 +624,7 @@ BOOST_AUTO_TEST_CASE (test_json_register_publish, *utf::label ("ci"))
     fi.coreInitString = "--autobroker";
     helics::ValueFederate vFed ("test2", fi);
 
-    vFed.registerPublicationsFromJSON (std::string (TEST_DIR) + "example_pub_input1.json");
+    vFed.registerFromPublicationJSON (std::string (TEST_DIR) + "example_pub_input1.json");
     auto &s1 = vFed.registerSubscription ("test2/pub1");
     auto &s2 = vFed.registerSubscription ("test2/pub2");
     auto &s3 = vFed.registerSubscription ("test2/group1/pubA");
