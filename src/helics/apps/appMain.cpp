@@ -105,5 +105,15 @@ int main (int argc, char *argv[])
     helics::LoggerManager::getLoggerCore ()->addMessage ("!!>flush");
 
     helics::cleanupHelicsLibrary ();
-    return (static_cast<int> (ret));
+
+    switch (ret)
+    {
+    case helics::helicsCLI11App::parse_return::help_return:
+    case helics::helicsCLI11App::parse_return::help_all_return:
+    case helics::helicsCLI11App::parse_return::version_return:
+    case helics::helicsCLI11App::parse_return::ok:
+        return 0;
+    default:
+        return static_cast<int> (ret);
+    }
 }
