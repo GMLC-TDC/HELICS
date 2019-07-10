@@ -106,6 +106,10 @@ if(BUILD_APP_LIBRARY)
 	add_test(NAME app_version_return COMMAND helics_app --version)
 	add_test(NAME app_help_return COMMAND helics_app --help)
     set_property(TEST app_version_return app_help_return PROPERTY LABELS Continuous)
+
+	add_test(NAME app_subcommand_version_return COMMAND helics_app player --version)
+	add_test(NAME app_subcommand_help_return COMMAND helics_app player --help)
+	set_property(TEST app_subcommand_version_return app_subcommand_help_return PROPERTY LABELS Continuous)
   endif(BUILD_APP_EXECUTABLES)
 
   install(
