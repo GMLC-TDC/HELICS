@@ -383,6 +383,107 @@ void ValueFederate::publish (Publication &pub, const std::string &str) { pub.pub
 
 void ValueFederate::publish (Publication &pub, double val) { pub.publish (val); }
 
+using dvalue = mpark::variant<double, std::string>;
+
+static void generateData (std::vector<std::pair<std::string, dvalue>> &vpairs,
+                          const std::string &prefix,
+                          char separator,
+                          Json::Value val)
+{
+    if (val.isObject ())
+    {
+        auto mn = val.getMemberNames ();
+        for (auto &name : mn)
+        {
+            auto so = val[name];
+            if (so.isObject ())
+            {
+                generateData (vpairs, prefix + name + separator, separator, so);
+            }
+            else
+            {
+                if (so.isDouble ())
+                {
+                    vpairs.emplace_back (prefix + name, so.asDouble ());
+                }
+                else
+                {
+                    vpairs.emplace_back (prefix + name, so.asString ());
+                }
+            }
+        }
+    }
+    else
+    {
+        if (val.isDouble ())
+        {
+            vpairs.emplace_back (prefix, val.asDouble ());
+        }
+        else
+        {
+            vpairs.emplace_back (prefix, val.asString ());
+        }
+    }
+}
+
+void ValueFederate::registerPublicationsFromJSON (const std::string &jsonString)
+{
+    auto jv = loadJson (jsonString);
+    if (jv.isNull ())
+    {
+        throw (helics::InvalidParameter ("unable to load file or string"));
+    }
+
+    std::vector<std::pair<std::string, dvalue>> vpairs;
+    generateData (vpairs, "", nameSegmentSeparator, jv);
+
+    for (auto &vp : vpairs)
+    {
+        try
+        {
+            if (vp.second.index () == 0)
+            {
+                registerPublication<double> (vp.first);
+            }
+            else
+            {
+                registerPublication<std::string> (vp.first);
+            }
+        }
+        catch (const helics::RegistrationFailure &)
+        {
+            continue;
+        }
+    }
+}
+
+void ValueFederate::publishJSON (const std::string &jsonString)
+{
+    auto jv = loadJson (jsonString);
+    if (jv.isNull ())
+    {
+        throw (helics::InvalidParameter ("unable to load file or string"));
+    }
+    std::vector<std::pair<std::string, dvalue>> vpairs;
+    generateData (vpairs, "", nameSegmentSeparator, jv);
+
+    for (auto &vp : vpairs)
+    {
+        auto &pub = getPublication (vp.first);
+        if (pub.isValid ())
+        {
+            if (vp.second.index () == 0)
+            {
+                pub.publish (mpark::get<double> (vp.second));
+            }
+            else
+            {
+                pub.publish (mpark::get<std::string> (vp.second));
+            }
+        }
+    }
+}
+
 bool ValueFederate::isUpdated (const Input &inp) const { return vfManager->hasUpdate (inp); }
 
 Time ValueFederate::getLastUpdateTime (const Input &inp) const { return vfManager->getLastUpdateTime (inp); }

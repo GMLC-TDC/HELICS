@@ -358,8 +358,8 @@ BOOST_DATA_TEST_CASE (test_vector_callback_lists, bdata::make (core_types_single
     helics::data_block db (547, ';');
     int ccnt = 0;
     // set subscriptions 1 and 2 to have callbacks
-    vFed1->setInputNotificationCallback (sub1, [&](helics::Input &, helics::Time) { ++ccnt; });
-    vFed1->setInputNotificationCallback (sub2, [&](helics::Input &, helics::Time) { ++ccnt; });
+    vFed1->setInputNotificationCallback (sub1, [&] (helics::Input &, helics::Time) { ++ccnt; });
+    vFed1->setInputNotificationCallback (sub2, [&] (helics::Input &, helics::Time) { ++ccnt; });
     vFed1->enterExecutingMode ();
     vFed1->publishRaw (pubid3, db);
     vFed1->requestTime (1.0);
@@ -575,6 +575,76 @@ BOOST_DATA_TEST_CASE (test_file_load, boost::unit_test::data::make (config_files
 
     BOOST_CHECK_EQUAL (vFed.query ("global", "global1"), "this is a global1 value");
     BOOST_CHECK_EQUAL (vFed.query ("global", "global2"), "this is another global value");
+    vFed.disconnect ();
+}
+
+BOOST_AUTO_TEST_CASE (test_json_publish, *utf::label ("ci"))
+{
+    helics::FederateInfo fi (helics::core_type::TEST);
+    fi.separator = '/';
+    fi.coreInitString = "--autobroker";
+    helics::ValueFederate vFed ("test2", fi);
+    vFed.registerGlobalPublication<double> ("pub1");
+    vFed.registerPublication<std::string> ("pub2");
+    vFed.registerPublication<double> ("group1/pubA");
+    vFed.registerPublication<std::string> ("group1/pubB");
+
+    auto &s1 = vFed.registerSubscription ("pub1");
+    auto &s2 = vFed.registerSubscription ("test2/pub2");
+    auto &s3 = vFed.registerSubscription ("test2/group1/pubA");
+    auto &s4 = vFed.registerSubscription ("test2/group1/pubB");
+    vFed.enterExecutingMode ();
+
+    vFed.publishJSON (std::string (TEST_DIR) + "example_pub_input1.json");
+    vFed.requestTime (1.0);
+    BOOST_CHECK_EQUAL (s1.getValue<double> (), 99.9);
+    BOOST_CHECK_EQUAL (s2.getValue<std::string> (), "things");
+    BOOST_CHECK_EQUAL (s3.getValue<double> (), 45.7);
+    BOOST_CHECK_EQUAL (s4.getValue<std::string> (), "count");
+
+    vFed.publishJSON (std::string (TEST_DIR) + "example_pub_input2.json");
+    vFed.requestTime (2.0);
+    BOOST_CHECK_EQUAL (s1.getValue<double> (), 88.2);
+    BOOST_CHECK_EQUAL (s2.getValue<std::string> (), "items");
+    BOOST_CHECK_EQUAL (s3.getValue<double> (), 15.0);
+    BOOST_CHECK_EQUAL (s4.getValue<std::string> (), "count2");
+
+    vFed.publishJSON ("{\"pub1\": 77.2}");
+
+    vFed.requestTime (3.0);
+    BOOST_CHECK_EQUAL (s1.getValue<double> (), 77.2);
+
+    vFed.disconnect ();
+}
+
+BOOST_AUTO_TEST_CASE (test_json_register_publish, *utf::label ("ci"))
+{
+    helics::FederateInfo fi (helics::core_type::TEST);
+    fi.separator = '/';
+    fi.coreInitString = "--autobroker";
+    helics::ValueFederate vFed ("test2", fi);
+
+    vFed.registerPublicationsFromJSON (std::string (TEST_DIR) + "example_pub_input1.json");
+    auto &s1 = vFed.registerSubscription ("test2/pub1");
+    auto &s2 = vFed.registerSubscription ("test2/pub2");
+    auto &s3 = vFed.registerSubscription ("test2/group1/pubA");
+    auto &s4 = vFed.registerSubscription ("test2/group1/pubB");
+    vFed.enterExecutingMode ();
+
+    vFed.publishJSON (std::string (TEST_DIR) + "example_pub_input1.json");
+    vFed.requestTime (1.0);
+    BOOST_CHECK_EQUAL (s1.getValue<double> (), 99.9);
+    BOOST_CHECK_EQUAL (s2.getValue<std::string> (), "things");
+    BOOST_CHECK_EQUAL (s3.getValue<double> (), 45.7);
+    BOOST_CHECK_EQUAL (s4.getValue<std::string> (), "count");
+
+    vFed.publishJSON (std::string (TEST_DIR) + "example_pub_input2.json");
+    vFed.requestTime (2.0);
+    BOOST_CHECK_EQUAL (s1.getValue<double> (), 88.2);
+    BOOST_CHECK_EQUAL (s2.getValue<std::string> (), "items");
+    BOOST_CHECK_EQUAL (s3.getValue<double> (), 15.0);
+    BOOST_CHECK_EQUAL (s4.getValue<std::string> (), "count2");
+
     vFed.disconnect ();
 }
 

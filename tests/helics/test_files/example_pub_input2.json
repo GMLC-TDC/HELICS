@@ -1,0 +1,9 @@
+{
+	"pub1": 88.2,
+	"group1": {
+		"pubA": 15,
+		"pubB": "count2"
+	},
+	"pub2": "items"
+	
+}
