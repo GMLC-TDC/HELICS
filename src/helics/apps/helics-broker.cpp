@@ -48,7 +48,15 @@ int main (int argc, char *argv[])
     auto res = cmdLine.helics_parse (argc, argv);
     if (res != helics::helicsCLI11App::parse_return::ok)
     {
-        return static_cast<int> (res);
+        switch (res)
+        {
+        case helics::helicsCLI11App::parse_return::help_return:
+        case helics::helicsCLI11App::parse_return::help_all_return:
+        case helics::helicsCLI11App::parse_return::version_return:
+            return 0;
+        default:
+            return static_cast<int> (res);
+        }
     }
     try
     {

@@ -91,6 +91,9 @@ if(BUILD_APP_LIBRARY)
       DESTINATION ${CMAKE_INSTALL_BINDIR}
       COMPONENT applications
     )
+	add_test(NAME broker_version_return COMMAND helics_broker --version)
+	add_test(NAME broker_help_return COMMAND helics_broker --help)
+	set_property(TEST broker_version_return broker_help_return PROPERTY LABELS Continuous)
 
     add_executable(helics_app appMain.cpp)
     target_link_libraries(helics_app PUBLIC helics_apps)
@@ -99,7 +102,10 @@ if(BUILD_APP_LIBRARY)
     install(TARGETS helics_app DESTINATION ${CMAKE_INSTALL_BINDIR} COMPONENT applications)
 
 	copy_key_files_to_target_location(helics_app)
-   
+
+	add_test(NAME app_version_return COMMAND helics_app --version)
+	add_test(NAME app_help_return COMMAND helics_app --help)
+    set_property(TEST app_version_return app_help_return PROPERTY LABELS Continuous)
   endif(BUILD_APP_EXECUTABLES)
 
   install(
