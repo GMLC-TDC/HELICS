@@ -141,6 +141,11 @@ class ValueFederate : public virtual Federate
         return registerGlobalPublication (indexed_name, type, units);
     }
 
+    void registerFromPublicationJSON (const std::string &json)
+    {
+        helicsFederateRegisterFromPublicationJSON (fed, json.c_str (), hThrowOnError ());
+    }
+
     Publication getPublication (const std::string &name)
     {
         return Publication (helicsFederateGetPublication (fed, name.c_str (), hThrowOnError ()));
@@ -189,6 +194,11 @@ class ValueFederate : public virtual Federate
 
     /** clear all the update flags from all federate inputs*/
     void clearUpdates () { helicsFederateClearUpdates (fed); }
+    /** publish data contained in a JSON file*/
+    void publishJSON (const std::string &json)
+    {
+        helicsFederatePublishJSON (fed, json.c_str (), hThrowOnError ());
+    }
 
   private:
     // Utility function for converting numbers to string

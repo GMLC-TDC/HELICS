@@ -197,6 +197,8 @@ extern "C"
     */
     HELICS_EXPORT void helicsFederateRegisterFromPublicationJSON (helics_federate fed, const char *json, helics_error *err);
 
+    /** publish data contained in a json file or string*/
+    HELICS_EXPORT void helicsFederatePublishJSON (helics_federate fed, const char *json, helics_error *err);
     /**
     * \defgroup publications Publication functions
     @details functions for publishing data of various kinds
