@@ -75,7 +75,7 @@ function(build_libzmq)
 ExternalProject_Add(libzmq
 	SOURCE_DIR ${PROJECT_BINARY_DIR}/Download/libzmq
     GIT_REPOSITORY  https://github.com/zeromq/libzmq.git
-	GIT_TAG v4.3.0
+	GIT_TAG v4.3.2
     DOWNLOAD_COMMAND " "
     UPDATE_COMMAND " "
 	BINARY_DIR ${PROJECT_BINARY_DIR}/ThirdParty/libzmq
