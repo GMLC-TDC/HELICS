@@ -13,7 +13,8 @@ This is a minor release that adds some JSON related input and output functions, 
 ## Changed
 -   move concurrency related structures to a standalone library
 -   System-tests is now based on google test instead of boost test
-=   the deserializer for ActionMessage now uses memcpy to avoid possible undefined behavior
+-   Shared_libary_cpp tests now based on google_test instead of boost test
+-   the deserializer for ActionMessage now uses memcpy to avoid possible undefined behavior
 -   The value of helics_time_maxtime has been changed for consistency with the C++ equivalent
 
 ### Fixed
@@ -26,6 +27,9 @@ This is a minor release that adds some JSON related input and output functions, 
 -   queries for getting all current inputs in JSON format.
 -   query for getting all updated inputs in JSON format
 -   publication function that accepts a JSON structure for multiple publications
+-   registration function that generates publications based on same JSON structure as the function that accepts JSON for group publication
+-   function on the inputs to clear the updates, is used from a query
+-   a const version of the isUpdated function call on inputs
 
 ### Removed
 -   libguarded and several concurrency related structures as they are now in a standalone repository that is included through submodules
