@@ -304,6 +304,46 @@ TEST_F (query_tests, test_update_values)
     helics::cleanupHelicsLibrary ();
 }
 
+TEST_F (query_tests, test_update_values_local)
+{
+    SetupTest<helics::ValueFederate> ("test", 1);
+    auto vFed1 = GetFederateAs<helics::ValueFederate> (0);
+    auto &p1 = vFed1->registerGlobalPublication<double> ("pub1");
+    auto &p2 = vFed1->registerPublication<double> ("pub2");
+    auto &p3 = vFed1->registerPublication<double> ("pub3");
+
+    vFed1->registerSubscription ("pub1");
+    vFed1->registerSubscription ("fed0/pub2");
+    vFed1->registerSubscription ("fed0/pub3");
+
+    vFed1->enterExecutingMode ();
+    p1.publish (45.7);
+    p2.publish (23.1);
+    p3.publish (19.4);
+    vFed1->requestTime (1.0);
+
+    auto qres = vFed1->query ("updates");
+    auto val = loadJsonStr (qres);
+
+    EXPECT_EQ (val["pub1"].asDouble (), 45.7);
+    EXPECT_EQ (val["fed0"]["pub2"].asDouble (), 23.1);
+    EXPECT_EQ (val["fed0"]["pub3"].asDouble (), 19.4);
+    vFed1->clearUpdates ();
+    qres = vFed1->query ("updates");
+    EXPECT_EQ (qres, "{}");
+    p1.publish (19.7);
+    p3.publish (15.1);
+    vFed1->requestTime (2.0);
+    qres = vFed1->query ("updates");
+    val = loadJsonStr (qres);
+
+    EXPECT_EQ (val["pub1"].asDouble (), 19.7);
+    EXPECT_TRUE (val["fed0"]["pub2"].isNull ());
+    EXPECT_EQ (val["fed0"]["pub3"].asDouble (), 15.1);
+    vFed1->finalize ();
+    helics::cleanupHelicsLibrary ();
+}
+
 TEST_F (query_tests, test_update_values_all)
 {
     SetupTest<helics::ValueFederate> ("test", 1);
