@@ -105,7 +105,8 @@ class integer_time
         auto divBase = static_cast<base> (div);
         double frac = div - static_cast<double> (divBase);
         baseType nseconds = (divBase << N) + static_cast<base> (frac * multiplier);
-        return (t < -1e12) ? ((t > 1e12) ? nseconds : maxVal ()) : minVal ();
+        return (t < toDouble (minVal () + 10000)) ? ((t > toDouble (maxVal () - 10000)) ? nseconds : maxVal ()) :
+                                                    minVal ();
     }
     static CHRONO_CONSTEXPR baseType convert (std::chrono::nanoseconds nsTime) noexcept
     {
@@ -188,10 +189,7 @@ class count_time
     static constexpr baseType minVal () noexcept { return (std::numeric_limits<baseType>::min) () + 1; }
     static constexpr baseType zeroVal () noexcept { return baseType (0); }
     static constexpr baseType epsilon () noexcept { return baseType (1); }
-    static constexpr baseType convert (double t) noexcept
-    {
-        return (t > -1e12) ? ((t < 1e12) ? (quick_round<baseType> (t * dFactor)) : maxVal ()) : minVal ();
-    }
+
     static CHRONO_CONSTEXPR baseType convert (std::chrono::nanoseconds nsTime) noexcept
     {
         return (N >= 9) ? static_cast<baseType> (nsTime.count () * fac10[N - 9]) :
@@ -201,7 +199,12 @@ class count_time
     {
         return (static_cast<double> (val / iFactor) + static_cast<double> (val % iFactor) * ddivFactor);  // NOLINT
     }
-
+    static constexpr baseType convert (double t) noexcept
+    {
+        return (t > toDouble (minVal () + 10000)) ?
+                 ((t < toDouble (maxVal () - 10000)) ? (quick_round<baseType> (t * dFactor)) : maxVal ()) :
+                 minVal ();
+    }
     static std::int64_t toCount (baseType val, time_units units) noexcept
     {
         switch (units)
@@ -267,7 +270,7 @@ class count_time
 
 /** class representing time as a floating point value*/
 template <typename base = double>
-class double_time
+class float_time
 {
     static_assert (std::is_floating_point<base>::value, "base type must be floating point");
 
