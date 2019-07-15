@@ -14,11 +14,13 @@ This is a minor release that adds some JSON related input and output functions, 
 -   move concurrency related structures to a standalone library
 -   System-tests is now based on google test instead of boost test
 =   the deserializer for ActionMessage now uses memcpy to avoid possible undefined behavior
+-   The value of helics_time_maxtime has been changed for consistency with the C++ equivalent
 
 ### Fixed
 -   a few possible race conditions found by thread-sanitizer
 -   cleared up a couple scenarios that were triggering occasional test failure in the system tests
 -   a small memory leak when a JSON stream builder was created and not destroyed properly
+-   an inconsistency between the helics_time_maxtime in the C shared library and the maxTime value used in C++, this could in some cases result in failing termination conditions
 
 ### Added
 -   queries for getting all current inputs in JSON format.
@@ -26,7 +28,7 @@ This is a minor release that adds some JSON related input and output functions, 
 -   publication function that accepts a JSON structure for multiple publications
 
 ### Removed
--   libguarded and several concurrency related structures as they are now in a standalone repository
+-   libguarded and several concurrency related structures as they are now in a standalone repository that is included through submodules
 
 
 ## \[2.1.0\] - 2019-06-27
