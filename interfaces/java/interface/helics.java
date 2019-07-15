@@ -529,6 +529,18 @@ public class helics {
     return (cPtr == 0) ? null : new SWIGTYPE_p_void(cPtr, false);
   }
 
+  public static void helicsFederateClearUpdates(SWIGTYPE_p_void fed) {
+    helicsJNI.helicsFederateClearUpdates(SWIGTYPE_p_void.getCPtr(fed));
+  }
+
+  public static void helicsFederateRegisterFromPublicationJSON(SWIGTYPE_p_void fed, String json) {
+    helicsJNI.helicsFederateRegisterFromPublicationJSON(SWIGTYPE_p_void.getCPtr(fed), json);
+  }
+
+  public static void helicsFederatePublishJSON(SWIGTYPE_p_void fed, String json) {
+    helicsJNI.helicsFederatePublishJSON(SWIGTYPE_p_void.getCPtr(fed), json);
+  }
+
   public static void helicsPublicationPublishRaw(SWIGTYPE_p_void pub, SWIGTYPE_p_void data, int inputDataLength) {
     helicsJNI.helicsPublicationPublishRaw(SWIGTYPE_p_void.getCPtr(pub), SWIGTYPE_p_void.getCPtr(data), inputDataLength);
   }
@@ -743,6 +755,10 @@ public class helics {
 
   public static double helicsInputLastUpdateTime(SWIGTYPE_p_void ipt) {
     return helicsJNI.helicsInputLastUpdateTime(SWIGTYPE_p_void.getCPtr(ipt));
+  }
+
+  public static void helicsInputClearUpdate(SWIGTYPE_p_void ipt) {
+    helicsJNI.helicsInputClearUpdate(SWIGTYPE_p_void.getCPtr(ipt));
   }
 
   public static int helicsFederateGetPublicationCount(SWIGTYPE_p_void fed) {

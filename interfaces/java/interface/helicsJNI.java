@@ -9,7 +9,6 @@
 package com.java.helics;
 
 public class helicsJNI {
-
   public final static native int helics_core_type_default_get();
   public final static native int helics_core_type_zmq_get();
   public final static native int helics_core_type_mpi_get();
@@ -244,6 +243,9 @@ public class helicsJNI {
   public final static native long helicsFederateGetInput(long jarg1, String jarg2);
   public final static native long helicsFederateGetInputByIndex(long jarg1, int jarg2);
   public final static native long helicsFederateGetSubscription(long jarg1, String jarg2);
+  public final static native void helicsFederateClearUpdates(long jarg1);
+  public final static native void helicsFederateRegisterFromPublicationJSON(long jarg1, String jarg2);
+  public final static native void helicsFederatePublishJSON(long jarg1, String jarg2);
   public final static native void helicsPublicationPublishRaw(long jarg1, long jarg2, int jarg3);
   public final static native void helicsPublicationPublishString(long jarg1, String jarg2);
   public final static native void helicsPublicationPublishInteger(long jarg1, long jarg2);
@@ -298,6 +300,7 @@ public class helicsJNI {
   public final static native void helicsPublicationSetOption(long jarg1, int jarg2, int jarg3);
   public final static native int helicsInputIsUpdated(long jarg1);
   public final static native double helicsInputLastUpdateTime(long jarg1);
+  public final static native void helicsInputClearUpdate(long jarg1);
   public final static native int helicsFederateGetPublicationCount(long jarg1);
   public final static native int helicsFederateGetInputCount(long jarg1);
   public final static native long helicsFederateRegisterEndpoint(long jarg1, String jarg2, String jarg3);

@@ -1348,6 +1348,18 @@ def helicsFederateGetSubscription(fed: 'helics_federate', key: 'char const *') -
     return _helics.helicsFederateGetSubscription(fed, key)
 helicsFederateGetSubscription = _helics.helicsFederateGetSubscription
 
+def helicsFederateClearUpdates(fed: 'helics_federate') -> "void":
+    return _helics.helicsFederateClearUpdates(fed)
+helicsFederateClearUpdates = _helics.helicsFederateClearUpdates
+
+def helicsFederateRegisterFromPublicationJSON(fed: 'helics_federate', json: 'char const *') -> "void":
+    return _helics.helicsFederateRegisterFromPublicationJSON(fed, json)
+helicsFederateRegisterFromPublicationJSON = _helics.helicsFederateRegisterFromPublicationJSON
+
+def helicsFederatePublishJSON(fed: 'helics_federate', json: 'char const *') -> "void":
+    return _helics.helicsFederatePublishJSON(fed, json)
+helicsFederatePublishJSON = _helics.helicsFederatePublishJSON
+
 def helicsPublicationPublishRaw(pub: 'helics_publication', data: 'void const *') -> "int":
     return _helics.helicsPublicationPublishRaw(pub, data)
 helicsPublicationPublishRaw = _helics.helicsPublicationPublishRaw
@@ -1590,6 +1602,10 @@ helicsInputIsUpdated = _helics.helicsInputIsUpdated
 def helicsInputLastUpdateTime(ipt: 'helics_input') -> "helics_time":
     return _helics.helicsInputLastUpdateTime(ipt)
 helicsInputLastUpdateTime = _helics.helicsInputLastUpdateTime
+
+def helicsInputClearUpdate(ipt: 'helics_input') -> "void":
+    return _helics.helicsInputClearUpdate(ipt)
+helicsInputClearUpdate = _helics.helicsInputClearUpdate
 
 def helicsFederateGetPublicationCount(fed: 'helics_federate') -> "int":
     return _helics.helicsFederateGetPublicationCount(fed)
