@@ -334,10 +334,10 @@ int ZmqComms::initializeBrokerConnections (zmq::socket_t &controlSocket)
         }
 
         hasBroker = true;
-        int cnt = 0;
         zmq::message_t msg;
         if (PortNumber < 0)
         {
+            int cnt = 0;
             while (PortNumber < 0)
             {
                 ActionMessage getPorts = generatePortRequest ((serverMode) ? 2 : 1);

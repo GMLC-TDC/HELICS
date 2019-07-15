@@ -17,6 +17,5 @@ exclude_paths:
   - interfaces/**/*
   - scripts/**/*
   - scripts/*
-  - src/helics/common/cppzmq/*
   - tests/csharp/*
 

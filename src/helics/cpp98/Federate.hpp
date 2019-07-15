@@ -26,7 +26,7 @@ class FederateInfo
   public:
     FederateInfo () { fi = helicsCreateFederateInfo (); }
 
-    FederateInfo (const std::string &coretype)
+    explicit FederateInfo (const std::string &coretype)
     {
         fi = helicsCreateFederateInfo ();
         helicsFederateInfoSetCoreTypeFromString (fi, coretype.c_str (), hThrowOnError ());

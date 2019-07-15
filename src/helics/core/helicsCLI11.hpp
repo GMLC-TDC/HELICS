@@ -29,26 +29,26 @@ class helicsCLI11App : public CLI::App
                                                                      "silence most print output");
     }
 
-    enum class parse_return : int
+    enum class parse_output : int
     {
         ok = 0,
-        help_return,
-        help_all_return,
-        version_return,
-        error_return,
+        help_call,
+        help_all_call,
+        version_call,
+        parse_error,
     };
     bool quiet{false};
-    parse_return last_return{parse_return::ok};
+    parse_output last_output{parse_output::ok};
 
     template <typename... Args>
-    parse_return helics_parse (Args &&... args)
+    parse_output helics_parse (Args &&... args)
     {
         try
         {
             parse (std::forward<Args> (args)...);
-            last_return = parse_return::ok;
+            last_output = parse_output::ok;
             remArgs = remaining_for_passthrough ();
-            return parse_return::ok;
+            return parse_output::ok;
         }
         catch (const CLI::CallForHelp &ch)
         {
@@ -56,8 +56,8 @@ class helicsCLI11App : public CLI::App
             {
                 exit (ch);
             }
-            last_return = parse_return::help_return;
-            return parse_return::help_return;
+            last_output = parse_output::help_call;
+            return parse_output::help_call;
         }
         catch (const CLI::CallForAllHelp &ca)
         {
@@ -65,8 +65,8 @@ class helicsCLI11App : public CLI::App
             {
                 exit (ca);
             }
-            last_return = parse_return::help_all_return;
-            return parse_return::help_all_return;
+            last_output = parse_output::help_all_call;
+            return parse_output::help_all_call;
         }
         catch (const CLI::Success &)
         {
@@ -74,14 +74,14 @@ class helicsCLI11App : public CLI::App
             {
                 std::cout << helics::versionString << '\n';
             }
-            last_return = parse_return::version_return;
-            return parse_return::version_return;
+            last_output = parse_output::version_call;
+            return parse_output::version_call;
         }
         catch (const CLI::Error &ce)
         {
-            exit (ce);
-            last_return = parse_return::error_return;
-            return parse_return::error_return;
+            CLI::App::exit (ce);
+            last_output = parse_output::parse_error;
+            return parse_output::parse_error;
         }
     }
     std::vector<std::string> &remainArgs () { return remArgs; }

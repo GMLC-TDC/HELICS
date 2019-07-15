@@ -59,7 +59,6 @@ def which(program):
     return None
 
 import subprocess
-import os
 
 read_the_docs_build = os.environ.get('READTHEDOCS', None) == 'True'
 

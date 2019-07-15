@@ -22,10 +22,8 @@ ActionMessage::ActionMessage (action_message_def::action_t startingAction)
 ActionMessage::ActionMessage (action_message_def::action_t startingAction,
                               global_federate_id sourceId,
                               global_federate_id destId)
-    : ActionMessage (startingAction)
+    : messageAction (startingAction), source_id (sourceId), dest_id (destId), name (payload)
 {
-    source_id = sourceId;
-    dest_id = destId;
 }
 
 ActionMessage::ActionMessage (ActionMessage &&act) noexcept
@@ -667,7 +665,7 @@ static constexpr size_t actEnd = sizeof (actionStrings) / sizeof (actionPair);
 const char *actionMessageType (action_message_def::action_t action)
 {
     auto pptr = static_cast<const actionPair *> (actionStrings);
-    auto res = std::find_if (pptr, pptr + actEnd, [action](const auto &pt) { return (pt.first == action); });
+    auto res = std::find_if (pptr, pptr + actEnd, [action] (const auto &pt) { return (pt.first == action); });
     if (res != pptr + actEnd)
     {
         return res->second;
@@ -689,7 +687,8 @@ static constexpr size_t errEnd = sizeof (errorStrings) / sizeof (errorPair);
 const char *commandErrorString (int errorcode)
 {
     auto pptr = static_cast<const errorPair *> (errorStrings);
-    auto res = std::find_if (pptr, pptr + errEnd, [errorcode](const auto &pt) { return (pt.first == errorcode); });
+    auto res =
+      std::find_if (pptr, pptr + errEnd, [errorcode] (const auto &pt) { return (pt.first == errorcode); });
     if (res != pptr + errEnd)
     {
         return res->second;
