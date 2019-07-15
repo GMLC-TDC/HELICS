@@ -50,9 +50,9 @@ int main (int argc, char *argv[])
     {
         switch (res)
         {
-        case helics::helicsCLI11App::parse_return::help_return:
-        case helics::helicsCLI11App::parse_return::help_all_return:
-        case helics::helicsCLI11App::parse_return::version_return:
+        case helics::helicsCLI11App::parse_output::help_call:
+        case helics::helicsCLI11App::parse_output::help_all_call:
+        case helics::helicsCLI11App::parse_output::version_call:
             return 0;
         default:
             return static_cast<int> (res);
