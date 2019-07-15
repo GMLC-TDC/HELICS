@@ -26,7 +26,7 @@ class FederateInfo
   public:
     FederateInfo () { fi = helicsCreateFederateInfo (); }
 
-    FederateInfo (const std::string &coretype)
+    explicit FederateInfo (const std::string &coretype)
     {
         fi = helicsCreateFederateInfo ();
         helicsFederateInfoSetCoreTypeFromString (fi, coretype.c_str (), hThrowOnError ());
@@ -108,7 +108,7 @@ class Federate
 {
   public:
     // Default constructor
-    Federate () HELICS_NOTHROW: fed (NULL), exec_async_iterate (false){};
+    Federate () HELICS_NOTHROW : fed (NULL), exec_async_iterate (false){};
 
     Federate (const Federate &fedObj) : exec_async_iterate (fedObj.exec_async_iterate)
     {
@@ -121,7 +121,7 @@ class Federate
         return *this;
     }
 #ifdef HELICS_HAS_RVALUE_REFS
-    Federate (Federate &&fedObj) HELICS_NOTHROW: exec_async_iterate (fedObj.exec_async_iterate)
+    Federate (Federate &&fedObj) HELICS_NOTHROW : exec_async_iterate (fedObj.exec_async_iterate)
     {
         fed = fedObj.fed;
         fedObj.fed = HELICS_NULL_POINTER;

@@ -521,18 +521,13 @@ int ZmqCommsSS::processRxMessage (zmq::socket_t &brokerSocket,
     if (serverMode)
     {
         brokerSocket.recv (&msg1);
-        std::string str (static_cast<char *> (msg1.data ()), msg1.size ());
-
         brokerSocket.recv (&msg2);
     }
     else
     {
         brokerConnection.recv (&msg1);
-        std::string str (static_cast<char *> (msg1.data ()), msg1.size ());
-
         brokerConnection.recv (&msg2);
     }
-    // std::string str2 (static_cast<char *> (msg2.data ()), msg2.size ());
     status = processIncomingMessage (msg2, connection_info);
 
     return status;
