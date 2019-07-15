@@ -78,6 +78,8 @@ endif()
 option(BUILD_HELICS_BOOST_TESTS "Enable the test executables built using boost unit tests" ON)
 option(BUILD_HELICS_EXAMPLES "Enable the example executables to be built" ON)
 
+mark_as_advanced(BUILD_HELICS_BOOST_TESTS)
+
 else()
 endif()
 # enable testing
