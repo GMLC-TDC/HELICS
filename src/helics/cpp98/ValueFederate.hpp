@@ -69,8 +69,9 @@ class ValueFederate : public virtual Federate
         return *this;
     }
 #ifdef HELICS_HAS_RVALUE_REFS
-    ValueFederate (ValueFederate &&fedObj) HELICS_NOTHROW
-        : Federate (), ipts (std::move (fedObj.ipts)), pubs (std::move (fedObj.pubs))
+    ValueFederate (ValueFederate &&fedObj) HELICS_NOTHROW : Federate (),
+                                                            ipts (std::move (fedObj.ipts)),
+                                                            pubs (std::move (fedObj.pubs))
     {
         Federate::operator= (std::move (fedObj));
     }
@@ -83,7 +84,7 @@ class ValueFederate : public virtual Federate
     }
 #endif
     // Default constructor, not meant to be used
-    ValueFederate ()HELICS_NOTHROW {}
+    ValueFederate () HELICS_NOTHROW {}
 
     /** Methods to register publications **/
     Publication
@@ -140,6 +141,11 @@ class ValueFederate : public virtual Federate
         return registerGlobalPublication (indexed_name, type, units);
     }
 
+    void registerFromPublicationJSON (const std::string &json)
+    {
+        helicsFederateRegisterFromPublicationJSON (fed, json.c_str (), hThrowOnError ());
+    }
+
     Publication getPublication (const std::string &name)
     {
         return Publication (helicsFederateGetPublication (fed, name.c_str (), hThrowOnError ()));
@@ -185,7 +191,15 @@ class ValueFederate : public virtual Federate
     // TODO: use c api to implement this method... callbacks too?
     /** Get a list of all subscriptions with updates since the last call **/
     std::vector<helics_input> queryUpdates () { return std::vector<helics_input> (); }
-    // call helicsInputIsUpdated for each sub
+
+    /** clear all the update flags from all federate inputs*/
+    void clearUpdates () { helicsFederateClearUpdates (fed); }
+    /** publish data contained in a JSON file*/
+    void publishJSON (const std::string &json)
+    {
+        helicsFederatePublishJSON (fed, json.c_str (), hThrowOnError ());
+    }
+
   private:
     // Utility function for converting numbers to string
     template <typename T>

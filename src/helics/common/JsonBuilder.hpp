@@ -24,7 +24,8 @@ class JsonMapBuilder
     std::map<int, std::string> missing_components;
 
   public:
-    JsonMapBuilder () = default;
+    JsonMapBuilder () noexcept;
+    ~JsonMapBuilder ();
     /** get the underlying json object*/
     Json::Value &getJValue ();
     /** check if the map has completed*/
@@ -40,6 +41,27 @@ class JsonMapBuilder
     /** generate a new location to fill in later
     @return the index value of the location for use in addComponent*/
     int generatePlaceHolder (const std::string &location);
+    /** generate the JSON value*/
+    std::string generate ();
+    /** reset the builder*/
+    void reset ();
+};
+
+/** class to help with the generation of JSON*/
+class JsonBuilder
+{
+  private:
+    std::unique_ptr<Json::Value> jMap;
+
+  public:
+    JsonBuilder () noexcept;
+    ~JsonBuilder ();
+    /** get the underlying json object*/
+    Json::Value &getJValue ();
+    /** add a string element on a specific path*/
+    void addElement (const std::string &path, const std::string &value);
+    /** add a double element on a specific path*/
+    void addElement (const std::string &path, double value);
     /** generate the JSON value*/
     std::string generate ();
     /** reset the builder*/

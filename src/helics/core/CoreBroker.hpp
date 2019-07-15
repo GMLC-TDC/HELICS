@@ -20,12 +20,12 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "gmlc/containers/SimpleQueue.hpp"
 #include "helics/external/any.hpp"
 
+#include "../common/JsonBuilder.hpp"
 #include "ActionMessage.hpp"
 #include "BasicHandleInfo.hpp"
 #include "Broker.hpp"
 #include "BrokerBase.hpp"
 #include "HandleManager.hpp"
-#include "JsonMapBuilder.hpp"
 #include "TimeDependencies.hpp"
 #include "UnknownHandleManager.hpp"
 #include "federate_id_extra.hpp"
@@ -180,7 +180,7 @@ class CoreBroker : public Broker, public BrokerBase
     virtual bool isOpenToNewFederates () const override;
 
     virtual void setLoggingCallback (
-      const std::function<void(int, const std::string &, const std::string &)> &logFunction) override final;
+      const std::function<void (int, const std::string &, const std::string &)> &logFunction) override final;
 
     virtual bool
     waitForDisconnect (std::chrono::milliseconds msToWait = std::chrono::milliseconds (0)) const override final;

@@ -147,3 +147,32 @@ TEST_F (vfed_tests, test_file_load)
     //	 helicscpp::ValueFederate vFed(std::string(TEST_DIR) + "/test_files/example_value_fed.json");
     vFed.finalize ();
 }
+
+TEST_F (vfed_tests, test_json_register_publish)
+{
+    SetupTest<helicscpp::ValueFederate> ("test", 1);
+    auto vFed = GetFederateAs<helicscpp::ValueFederate> (0);
+    vFed->setSeparator ('/');
+    vFed->registerFromPublicationJSON (std::string (TEST_DIR) + "example_pub_input1.json");
+    auto s1 = vFed->registerSubscription ("fed0/pub1");
+    auto s2 = vFed->registerSubscription ("fed0/pub2");
+    auto s3 = vFed->registerSubscription ("fed0/group1/pubA");
+    auto s4 = vFed->registerSubscription ("fed0/group1/pubB");
+    vFed->enterExecutingMode ();
+
+    vFed->publishJSON (std::string (TEST_DIR) + "example_pub_input1.json");
+    vFed->requestTime (1.0);
+    EXPECT_EQ (s1.getDouble (), 99.9);
+    EXPECT_EQ (s2.getString (), "things");
+    EXPECT_EQ (s3.getDouble (), 45.7);
+    EXPECT_EQ (s4.getString (), "count");
+
+    vFed->publishJSON (std::string (TEST_DIR) + "example_pub_input2.json");
+    vFed->requestTime (2.0);
+    EXPECT_EQ (s1.getDouble (), 88.2);
+    EXPECT_EQ (s2.getString (), "items");
+    EXPECT_EQ (s3.getDouble (), 15.0);
+    EXPECT_EQ (s4.getString (), "count2");
+
+    vFed->finalize ();
+}

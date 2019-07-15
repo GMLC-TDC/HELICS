@@ -32,7 +32,6 @@ set(
 	FilterCoordinator.cpp
 	UnknownHandleManager.cpp
 	MessageTimer.cpp
-	JsonMapBuilder.cpp
 	federate_id.cpp
 	TimeoutMonitor.cpp
 
@@ -127,7 +126,6 @@ set(
 	UnknownHandleManager.hpp
 	queryHelpers.hpp
 	MessageTimer.hpp
-	JsonMapBuilder.hpp
 	NetworkBroker.hpp
 	NetworkCore.hpp
 	NetworkBroker_impl.hpp

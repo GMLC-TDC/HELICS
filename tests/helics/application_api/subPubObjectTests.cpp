@@ -460,4 +460,56 @@ BOOST_AUTO_TEST_CASE (subscriptionDefaults_test, *utf::label ("ci"))
     vFed->finalize ();
 }
 
+BOOST_AUTO_TEST_CASE (input_test, *utf::label ("ci"))
+{
+    helics::FederateInfo fi (CORE_TYPE_TO_TEST);
+    fi.coreInitString = "--autobroker";
+
+    auto vFed = std::make_shared<helics::ValueFederate> ("test1", fi);
+
+    // register the publications
+    auto &subObj1 = vFed->registerSubscription ("pub1");
+    auto &subObj2 = vFed->registerSubscription ("pub2");
+    auto &p1 = vFed->registerGlobalPublication<double> ("pub1");
+    auto &p2 = vFed->registerGlobalPublication<double> ("pub2");
+
+    vFed->enterExecutingMode ();
+    p1.publish (10.0);
+    p2.publish (10.3);
+
+    vFed->requestTime (1.0);
+
+    BOOST_CHECK (subObj1.isUpdated ());
+    BOOST_CHECK (subObj2.isUpdated ());
+
+    auto val1 = subObj1.getValue<double> ();
+    auto val2 = subObj2.getValue<double> ();
+
+    BOOST_CHECK_EQUAL (val1, 10.0);
+    BOOST_CHECK_EQUAL (val2, 10.3);
+    auto I1 = subObj1;
+    auto I2 = subObj2;
+
+    val1 = subObj1.getValue<double> ();
+    val2 = subObj2.getValue<double> ();
+
+    BOOST_CHECK_EQUAL (val1, 10.0);
+    BOOST_CHECK_EQUAL (val2, 10.3);
+
+    BOOST_CHECK_EQUAL (I1.getValue<double> (), 10.0);
+    BOOST_CHECK_EQUAL (I2.getValue<double> (), 10.3);
+
+    // advance time
+    vFed->requestTime (2.0);
+
+    BOOST_CHECK (!subObj1.isUpdated ());
+    BOOST_CHECK (!subObj2.isUpdated ());
+    val1 = subObj1.getValue<double> ();
+    val2 = subObj2.getValue<double> ();
+
+    BOOST_CHECK_EQUAL (val1, 10.0);
+    BOOST_CHECK_EQUAL (val2, 10.3);
+    vFed->finalize ();
+}
+
 BOOST_AUTO_TEST_SUITE_END ()

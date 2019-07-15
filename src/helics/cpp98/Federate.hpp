@@ -60,8 +60,12 @@ class FederateInfo
 
     ~FederateInfo () { helicsFederateInfoFree (fi); }
 
-    void setCoreName (const std::string &corename) { helicsFederateInfoSetCoreName (fi, corename.c_str (), NULL); }
-
+    void setCoreName (const std::string &corename)
+    {
+        helicsFederateInfoSetCoreName (fi, corename.c_str (), HELICS_NULL_POINTER);
+    }
+    /// Set the separator character
+    void setSeparator (char sep) { helicsFederateInfoSetSeparator (fi, sep, HELICS_NULL_POINTER); }
     void setCoreInitString (const std::string &coreInit)
     {
         helicsFederateInfoSetCoreInitString (fi, coreInit.c_str (), HELICS_NULL_POINTER);
@@ -170,7 +174,8 @@ class Federate
     {
         return helicsFederateGetTimeProperty (fed, tProperty, hThrowOnError ());
     }
-
+    /// Set the separator character for the federate
+    void setSeparator (char sep) { helicsFederateSetSeparator (fed, sep, HELICS_NULL_POINTER); }
     void registerInterfaces (const std::string &configFile)
     {
         helicsFederateRegisterInterfaces (fed, configFile.c_str (), hThrowOnError ());

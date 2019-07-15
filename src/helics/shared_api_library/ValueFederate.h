@@ -188,6 +188,17 @@ extern "C"
     */
     HELICS_EXPORT helics_input helicsFederateGetSubscription (helics_federate fed, const char *key, helics_error *err);
 
+    /** clear all the update flags from a federates inputs
+     */
+    HELICS_EXPORT void helicsFederateClearUpdates (helics_federate fed);
+
+    /** register the publications via  JSON publication string
+    @details this would be the same JSON that would be used to publish data
+    */
+    HELICS_EXPORT void helicsFederateRegisterFromPublicationJSON (helics_federate fed, const char *json, helics_error *err);
+
+    /** publish data contained in a json file or string*/
+    HELICS_EXPORT void helicsFederatePublishJSON (helics_federate fed, const char *json, helics_error *err);
     /**
     * \defgroup publications Publication functions
     @details functions for publishing data of various kinds
@@ -575,6 +586,9 @@ extern "C"
     HELICS_EXPORT helics_bool helicsInputIsUpdated (helics_input ipt);
     /** get the last time a subscription was updated */
     HELICS_EXPORT helics_time helicsInputLastUpdateTime (helics_input ipt);
+    /** clear the updated flag from an input
+     */
+    HELICS_EXPORT void helicsInputClearUpdate (helics_input ipt);
     /** get the number of publications in a federate
     @return (-1) if fed was not a valid federate otherwise returns the number of publications*/
     HELICS_EXPORT int helicsFederateGetPublicationCount (helics_federate fed);
