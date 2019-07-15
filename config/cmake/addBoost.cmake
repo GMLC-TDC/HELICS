@@ -15,7 +15,11 @@ show_variable(
     "${BOOST_INSTALL_PATH}"
 )
 
+if (MSVC)
 option(USE_BOOST_STATIC_LIBS "Build using boost static Libraries" ON)
+else(MSVC)
+option(USE_BOOST_STATIC_LIBS "Build using boost static Libraries" OFF)
+endif(MSVC)
 
 mark_as_advanced(USE_BOOST_STATIC_LIBS)
 
