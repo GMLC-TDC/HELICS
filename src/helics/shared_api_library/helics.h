@@ -498,7 +498,7 @@ extern "C"
     HELICS_EXPORT void helicsFederateEnterExecutingModeComplete (helics_federate fed, helics_error *err);
 
     /** request an iterative time
-    @details this call allows for finer grain control of the iterative process then /ref helicsFederateRequestTime it takes a time and and
+    @details this call allows for finer grain control of the iterative process then /ref helicsFederateRequestTime it takes a time and
     iteration request and return a time and iteration status
     @param fed the federate to make the request of
     @param iterate the requested iteration mode
@@ -543,7 +543,7 @@ extern "C"
     @param fed the federate to make the request of
     @param requestTime the next requested time
     @param[in,out] err an error object that will contain an error code and string if any error occurred during the execution of the function
-    @return the time granted to the federate
+    @return the time granted to the federate, will return helics_time_maxtime if the simulation has terminated
     invalid*/
     HELICS_EXPORT helics_time helicsFederateRequestTime (helics_federate fed, helics_time requestTime, helics_error *err);
 
@@ -552,7 +552,7 @@ extern "C"
     time plus the minimum time step
     @param fed the federate to make the request of
     @param[in,out] err an error object that will contain an error code and string if any error occurred during the execution of the function
-    @return the time granted to the federate
+    @return the time granted to the federate, will return helics_time_maxtime if the simulation has terminated
     invalid*/
     HELICS_EXPORT helics_time helicsFederateRequestNextStep (helics_federate fed, helics_error *err);
 
@@ -564,7 +564,8 @@ extern "C"
     @param iterate the requested iteration mode
     @param[out] outIterate  the iteration specification of the result
     @param[in,out] err an error object that will contain an error code and string if any error occurred during the execution of the function
-    @return the granted time
+    @return the granted time, will return helics_time_maxtime if the simulation has terminated along with the appropriate iteration result
+    value
     */
     HELICS_EXPORT helics_time helicsFederateRequestTimeIterative (helics_federate fed,
                                                                   helics_time requestTime,
@@ -583,7 +584,7 @@ extern "C"
     /** complete an asynchronous requestTime call
     @param fed the federate to make the request of
     @param[in,out] err an error object that will contain an error code and string if any error occurred during the execution of the function
-    @return the time granted to the federate*/
+    @return the time granted to the federate, will return helics_time_maxtime if the simulation has terminated*/
     HELICS_EXPORT helics_time helicsFederateRequestTimeComplete (helics_federate fed, helics_error *err);
 
     /** request an iterative time through an asynchronous call
@@ -603,7 +604,7 @@ extern "C"
     @param fed the federate to make the request of
     @param[out] outIterate  the iteration specification of the result
     @param[in,out] err an error object that will contain an error code and string if any error occurred during the execution of the function
-    @return the granted time
+    @return the granted time, will return helics_time_maxtime if the simulation has terminated
     */
     HELICS_EXPORT helics_time helicsFederateRequestTimeIterativeComplete (helics_federate fed,
                                                                           helics_iteration_result *outIterate,

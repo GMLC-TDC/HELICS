@@ -219,4 +219,16 @@ BOOST_AUTO_TEST_CASE (timing_with_period_change)
     CE (helicsFederateFinalize (vFed, &err));
 }
 
+BOOST_AUTO_TEST_CASE (max_time_consistency)
+{
+    SetupTest (helicsCreateValueFederate, "test", 1);
+    auto vFed = GetFederateAt (0);
+    CE (helicsFederateEnterExecutingMode (vFed, &err));
+    helics_time gtime;
+    CE (gtime = helicsFederateRequestTime (vFed, helics_time_maxtime, &err));
+    BOOST_CHECK_GE (gtime, helics_time_maxtime);
+    CE (helicsFederateFinalize (vFed, &err));
+    CE (gtime = helicsFederateGetCurrentTime (vFed, &err));
+    BOOST_CHECK_GE (gtime, helics_time_maxtime);
+}
 BOOST_AUTO_TEST_SUITE_END ()

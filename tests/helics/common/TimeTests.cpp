@@ -11,6 +11,7 @@ SPDX-License-Identifier: BSD-3-Clause
  */
 
 #include "helics/core/helics-time.hpp"
+#include "helics/shared_api_library/api-data.h"
 
 using namespace helics;
 
@@ -194,4 +195,14 @@ TEST (time_tests, chrono_tests)
     EXPECT_EQ (b2.getBaseTimeCode (), tmns.count ());
 
     EXPECT_TRUE (b2.to_ns () == tmns);
+}
+
+TEST (time_tests, max_tests)
+{
+    auto tm = Time (helics_time_maxtime);
+    auto tmax = Time::maxVal ();
+    EXPECT_EQ (tm, tmax);
+    EXPECT_EQ (Time (-helics_time_maxtime), Time::minVal ());
+
+    EXPECT_GE (static_cast<double> (Time::maxVal ()), helics_time_maxtime);
 }
