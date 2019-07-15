@@ -105,6 +105,10 @@ class integer_time
         auto divBase = static_cast<base> (div);
         double frac = div - static_cast<double> (divBase);
         baseType nseconds = (divBase << N) + static_cast<base> (frac * multiplier);
+        // 10000 is to allow a little wiggle room in the conversion from double the absolute minimum it could be is
+        // 1024 to allow for
+        // conversion to double of maxVal then back to time,  those should be consistent,  supporting float would
+        // require a much bigger number
         return (t < toDouble (minVal () + 10000)) ? ((t > toDouble (maxVal () - 10000)) ? nseconds : maxVal ()) :
                                                     minVal ();
     }
@@ -201,6 +205,10 @@ class count_time
     }
     static constexpr baseType convert (double t) noexcept
     {
+        // 10000 is to allow a little wiggle room in the conversion from double the absolute minimum it could be is
+        // 1024 to allow for
+        // conversion to double of maxVal then back to time,  those should be consistent,  supporting float would
+        // require a much bigger number
         return (t > toDouble (minVal () + 10000)) ?
                  ((t < toDouble (maxVal () - 10000)) ? (quick_round<baseType> (t * dFactor)) : maxVal ()) :
                  minVal ();

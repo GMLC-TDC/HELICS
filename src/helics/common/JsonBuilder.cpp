@@ -11,7 +11,7 @@ SPDX-License-Identifier: BSD-3-Clause
 
 namespace helics
 {
-JsonMapBuilder::JsonMapBuilder () noexcept {};
+JsonMapBuilder::JsonMapBuilder () noexcept {}
 
 JsonMapBuilder::~JsonMapBuilder () = default;
 
@@ -62,7 +62,7 @@ void JsonMapBuilder::reset ()
     missing_components.clear ();
 }
 
-JsonBuilder::JsonBuilder () noexcept {};
+JsonBuilder::JsonBuilder () noexcept {}
 
 JsonBuilder::~JsonBuilder () = default;
 /** add an element on a specific path*/
