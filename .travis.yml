@@ -245,6 +245,7 @@ install:
 script:
   - mkdir -p build && cd build
   - cmake .. ${JOB_OPTION_FLAGS} ${HELICS_DEPENDENCY_FLAGS} ${HELICS_OPTION_FLAGS} -DCMAKE_C_COMPILER_LAUNCHER=ccache -DCMAKE_CXX_COMPILER_LAUNCHER=ccache
+  - cat CMakeCache.txt
   - make ${MAKEFLAGS}
 
   # Setup counters for coverage
