@@ -81,7 +81,6 @@ if(UNIX)
 		    endif()
 		endif()
     endif(ENABLE_EXTRA_COMPILER_WARNINGS)
-    option(USE_BOOST_STATIC_LIBS "Build using boost static Libraries" OFF)
     option(USE_LIBCXX "Use Libc++ vs as opposed to the default" OFF)
     mark_as_advanced(USE_LIBCXX)
 	#this is a global option on all parts
@@ -145,9 +144,7 @@ else(UNIX)
 		    endif()
 		endif()
         endif(ENABLE_EXTRA_COMPILER_WARNINGS)
-        option(USE_BOOST_STATIC_LIBS "Build using boost static Libraries" OFF)
     else(MINGW)
-        option(USE_BOOST_STATIC_LIBS "Build using boost static Libraries" ON)
         # -------------------------------------------------------------
         # Extra definitions for visual studio
         # -------------------------------------------------------------
@@ -185,5 +182,3 @@ endif(UNIX)
 # Check and set latest CXX Standard supported by compiler
 # -------------------------------------------------------------
 include(CheckLatestCXXStandardOption)
-
-mark_as_advanced(USE_BOOST_STATIC_LIBS)

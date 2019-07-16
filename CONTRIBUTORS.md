@@ -17,7 +17,7 @@ If you would like to contribute to the HELICS project see [CONTRIBUTING](CONTRIB
 -   Philip Top*
 
 ### National Renewable Energy Lab
--   Himanshu Jain*
+-   Himanshu Jain
 -   Dheepak Krishnamurthy*
 -   Bryan Palmintier*
 -   Bryan Richardson**
@@ -41,7 +41,7 @@ If you would like to contribute to the HELICS project see [CONTRIBUTING](CONTRIB
   The header only bindings for the ZeroMQ library are used to interact with the ZeroMQ library. The header files are modified to include some string operations and are included in the HELICS source. cppzmq is licensed under the [MIT](https://github.com/zeromq/cppzmq/blob/master/LICENSE) license.
 
 ### [JsonCpp](https://github.com/open-source-parsers/jsoncpp)
-  JsonCpp is used for parsing json files. It is included as a submodule from a slightly modified fork to add support for object libraries and to clean up some warning issues. JsonCpp is licensed under public domain or MIT in case public domain is not recognized [LICENSE](https://github.com/open-source-parsers/jsoncpp/blob/master/LICENSE).
+  JsonCpp is used for parsing json files. It is included as a submodule from a slightly modified [fork](https://github.com/phlptp/jsoncpp.git) to add support for object libraries and to clean up some warning issues. JsonCpp is licensed under public domain or MIT in case public domain is not recognized [LICENSE](https://github.com/open-source-parsers/jsoncpp/blob/master/LICENSE).
 
 ### [CLI11](https://github.com/CLIUtils/CLI11)
 CLI11 is a command line parser and was used as a replacement for boost::program_options. Some modifications used in HELICS were committed to the CLI11 library and others are in the process of doing so. The modified single header library is included in the HELICS source code. The project was created by Henry Schreiner. CLI11 is available under a [3-Clause BSD](https://github.com/CLIUtils/CLI11/blob/master/LICENSE) license.

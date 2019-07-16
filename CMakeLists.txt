@@ -7,13 +7,13 @@
 cmake_minimum_required(VERSION 3.4)
 cmake_policy(VERSION 3.4)
 
-project(HELICS VERSION 2.1.0)
+project(HELICS VERSION 2.1.1)
 
 # -----------------------------------------------------------------------------
 # HELICS Version number
 # -----------------------------------------------------------------------------
 set(HELICS_VERSION_BUILD)
-set(HELICS_DATE "06-27-19")
+set(HELICS_DATE "07-16-19")
 
 set(
     HELICS_VERSION_UNDERSCORE
@@ -77,6 +77,8 @@ endif()
 
 option(BUILD_HELICS_BOOST_TESTS "Enable the test executables built using boost unit tests" ON)
 option(BUILD_HELICS_EXAMPLES "Enable the example executables to be built" ON)
+
+mark_as_advanced(BUILD_HELICS_BOOST_TESTS)
 
 else()
 endif()

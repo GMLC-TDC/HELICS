@@ -22,7 +22,7 @@ The public API includes the following
   * queryFunctions.hpp
   * FederateInfo.hpp
   * Inputs.hpp
-  * Exceptions:  Any function dealing with Inputs with data from multiple sources is subject to change,  the vector subscriptions, and inputs is subject to change
+  * Exceptions:  Any function dealing with Inputs with data from multiple sources is subject to change,  the vector subscriptions, and inputs is subject to change.  The functionality related to PublishJSON is considered experimental and may change in the future.  The queries to retrieve JSON may update the format in the future.  
 
 * Core library headers
   * Core.hpp
