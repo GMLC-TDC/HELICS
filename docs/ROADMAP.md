@@ -12,7 +12,7 @@ This document contains tentative plans for changes and improvements of note in u
 ### Features and Improvements
 
 -   Network reliability related improvements
--   some additional logging capabilities
+-   Some additional logging capabilities
 -   Multi-broker to allow multiple communication cores to be connected in the same federation
 -   Broker-server for continuously generating brokers
 -   A key string for discriminating federates to specific broker
