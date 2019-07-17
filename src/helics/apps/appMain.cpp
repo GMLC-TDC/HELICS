@@ -23,7 +23,7 @@ int main (int argc, char *argv[])
     helics::helicsCLI11App app ("simple execution for all the different HELICS apps", "helics_app");
     app.ignore_case ()->prefix_command ();
     app.add_subcommand ("player", "Helics Player App")
-      ->callback ([&app]() {
+      ->callback ([&app] () {
           helics::apps::Player player (app.remaining_for_passthrough (true));
           std::cout << "player subcommand\n";
           if (player.isActive ())
@@ -37,7 +37,7 @@ int main (int argc, char *argv[])
       });
 
     app.add_subcommand ("recorder", "Helics Recorder App")
-      ->callback ([&app]() {
+      ->callback ([&app] () {
           helics::apps::Recorder recorder (app.remaining_for_passthrough (true));
           std::cout << "recorder subcommand\n";
           if (recorder.isActive ())
@@ -50,7 +50,7 @@ int main (int argc, char *argv[])
           return std::string{};
       });
     app.add_subcommand ("echo", "Helics Echo App")
-      ->callback ([&app]() {
+      ->callback ([&app] () {
           std::cout << "echo subcommand\n";
           helics::apps::Echo echo (app.remaining_for_passthrough (true));
           if (echo.isActive ())
@@ -64,7 +64,7 @@ int main (int argc, char *argv[])
       });
 
     app.add_subcommand ("source", "Helics Source App")
-      ->callback ([&app]() {
+      ->callback ([&app] () {
           std::cout << "source subcommand\n";
           helics::apps::Source source (app.remaining_for_passthrough (true));
           if (source.isActive ())
@@ -78,7 +78,7 @@ int main (int argc, char *argv[])
       });
 
     app.add_subcommand ("tracer", "Helics Tracer App")
-      ->callback ([&app]() {
+      ->callback ([&app] () {
           std::cout << "tracer subcommand\n";
           helics::apps::Tracer tracer (app.remaining_for_passthrough (true));
           if (tracer.isActive ())
@@ -92,7 +92,7 @@ int main (int argc, char *argv[])
       });
 
     app.add_subcommand ("broker", "Helics Broker App")
-      ->callback ([&app]() {
+      ->callback ([&app] () {
           std::cout << "broker subcommand\n";
           helics::apps::BrokerApp broker (app.remaining_for_passthrough (true));
       })
@@ -105,5 +105,15 @@ int main (int argc, char *argv[])
     helics::LoggerManager::getLoggerCore ()->addMessage ("!!>flush");
 
     helics::cleanupHelicsLibrary ();
-    return (static_cast<int> (ret));
+
+    switch (ret)
+    {
+    case helics::helicsCLI11App::parse_output::help_call:
+    case helics::helicsCLI11App::parse_output::help_all_call:
+    case helics::helicsCLI11App::parse_output::version_call:
+    case helics::helicsCLI11App::parse_output::ok:
+        return 0;
+    default:
+        return static_cast<int> (ret);
+    }
 }

@@ -50,8 +50,8 @@ App::App (const std::string &defaultAppName, int argc, char *argv[])
 void App::processArgs (std::unique_ptr<helicsCLI11App> &app, const std::string &defaultAppName)
 {
     remArgs = app->remaining_for_passthrough ();
-    auto ret = app->last_return;
-    if (ret == helicsCLI11App::parse_return::help_return)
+    auto ret = app->last_output;
+    if (ret == helicsCLI11App::parse_output::help_call)
     {
         if (!app->quiet)
         {
@@ -60,7 +60,7 @@ void App::processArgs (std::unique_ptr<helicsCLI11App> &app, const std::string &
         }
         helpMode = true;
     }
-    if (ret != helicsCLI11App::parse_return::ok)
+    if (ret != helicsCLI11App::parse_output::ok)
     {
         deactivated = true;
         return;

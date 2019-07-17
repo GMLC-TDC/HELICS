@@ -23,14 +23,13 @@ SPDX-License-Identifier: BSD-3-Clause
 
 namespace helics
 {
-Logger::Logger ()
+Logger::Logger () : logCore (LoggerManager::getLoggerCore ())
 {
-    logCore = LoggerManager::getLoggerCore ();
-    coreIndex = logCore->addFileProcessor ([this](std::string &&message) { logFunction (std::move (message)); });
+    coreIndex = logCore->addFileProcessor ([this] (std::string &&message) { logFunction (std::move (message)); });
 }
 Logger::Logger (std::shared_ptr<LoggingCore> core) : logCore (std::move (core))
 {
-    coreIndex = logCore->addFileProcessor ([this](std::string &&message) { logFunction (std::move (message)); });
+    coreIndex = logCore->addFileProcessor ([this] (std::string &&message) { logFunction (std::move (message)); });
 }
 
 Logger::~Logger () { logCore->haltOperations (coreIndex); }

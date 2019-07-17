@@ -26,7 +26,7 @@ class FederateInfo
   public:
     FederateInfo () { fi = helicsCreateFederateInfo (); }
 
-    FederateInfo (const std::string &coretype)
+    explicit FederateInfo (const std::string &coretype)
     {
         fi = helicsCreateFederateInfo ();
         helicsFederateInfoSetCoreTypeFromString (fi, coretype.c_str (), hThrowOnError ());
@@ -60,8 +60,12 @@ class FederateInfo
 
     ~FederateInfo () { helicsFederateInfoFree (fi); }
 
-    void setCoreName (const std::string &corename) { helicsFederateInfoSetCoreName (fi, corename.c_str (), NULL); }
-
+    void setCoreName (const std::string &corename)
+    {
+        helicsFederateInfoSetCoreName (fi, corename.c_str (), HELICS_NULL_POINTER);
+    }
+    /// Set the separator character
+    void setSeparator (char sep) { helicsFederateInfoSetSeparator (fi, sep, HELICS_NULL_POINTER); }
     void setCoreInitString (const std::string &coreInit)
     {
         helicsFederateInfoSetCoreInitString (fi, coreInit.c_str (), HELICS_NULL_POINTER);
@@ -108,7 +112,7 @@ class Federate
 {
   public:
     // Default constructor
-    Federate () HELICS_NOTHROW: fed (NULL), exec_async_iterate (false){};
+    Federate () HELICS_NOTHROW : fed (NULL), exec_async_iterate (false){};
 
     Federate (const Federate &fedObj) : exec_async_iterate (fedObj.exec_async_iterate)
     {
@@ -121,7 +125,7 @@ class Federate
         return *this;
     }
 #ifdef HELICS_HAS_RVALUE_REFS
-    Federate (Federate &&fedObj) HELICS_NOTHROW: exec_async_iterate (fedObj.exec_async_iterate)
+    Federate (Federate &&fedObj) HELICS_NOTHROW : exec_async_iterate (fedObj.exec_async_iterate)
     {
         fed = fedObj.fed;
         fedObj.fed = HELICS_NULL_POINTER;
@@ -170,7 +174,8 @@ class Federate
     {
         return helicsFederateGetTimeProperty (fed, tProperty, hThrowOnError ());
     }
-
+    /// Set the separator character for the federate
+    void setSeparator (char sep) { helicsFederateSetSeparator (fed, sep, HELICS_NULL_POINTER); }
     void registerInterfaces (const std::string &configFile)
     {
         helicsFederateRegisterInterfaces (fed, configFile.c_str (), hThrowOnError ());

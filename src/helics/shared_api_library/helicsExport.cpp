@@ -226,7 +226,7 @@ void helicsFederateInfoLoadFromArgs (helics_federate_info fi, int argc, const ch
     try
     {
         std::vector<std::string> args;
-        args.reserve (static_cast<size_t>(argc) - 1);
+        args.reserve (static_cast<size_t> (argc) - 1);
         for (int ii = argc - 1; ii > 0; --ii)
         {
             args.emplace_back (argv[ii]);
@@ -576,7 +576,7 @@ helics_core helicsCreateCoreFromArgs (const char *type, const char *name, int ar
     {
         core->valid = coreValidationIdentifier;
         std::vector<std::string> args;
-        args.reserve (static_cast<size_t>(argc) - 1);
+        args.reserve (static_cast<size_t> (argc) - 1);
         for (int ii = argc - 1; ii > 0; ii--)
         {
             args.emplace_back (argv[ii]);
@@ -705,7 +705,7 @@ helics_broker helicsCreateBrokerFromArgs (const char *type, const char *name, in
     try
     {
         std::vector<std::string> args;
-        args.reserve (static_cast<size_t>(argc) - 1);
+        args.reserve (static_cast<size_t> (argc) - 1);
         for (int ii = argc - 1; ii > 0; ii--)
         {
             args.emplace_back (argv[ii]);
@@ -1463,11 +1463,11 @@ const char *MasterObjectHolder::addErrorString (std::string newError)
 std::shared_ptr<MasterObjectHolder> getMasterHolder ()
 {
     static auto instance = std::make_shared<MasterObjectHolder> ();
-    static tripwire::TripWireTrigger tripTriggerholder;
+    static gmlc::concurrency::TripWireTrigger tripTriggerholder;
     return instance;
 }
 
-tripwire::TripWireTrigger tripTrigger;
+gmlc::concurrency::TripWireTrigger tripTrigger;
 
 void clearAllObjects ()
 {

@@ -18,11 +18,14 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <mutex>
 #include <stdexcept>
 
+namespace gmlc
+{
 namespace libguarded
 {
 template <class T, class M>
 class shared_guarded;
 }  // namespace libguarded
+}  // namespace gmlc
 
 /**
  * HELICS Application API
@@ -66,7 +69,7 @@ class Federate
     std::shared_ptr<Core> coreObject;  //!< reference to the core simulation API
     Time currentTime = Time::minVal ();  //!< the current simulation time
   private:
-    std::unique_ptr<libguarded::shared_guarded<AsyncFedCallInfo, std::mutex>>
+    std::unique_ptr<gmlc::libguarded::shared_guarded<AsyncFedCallInfo, std::mutex>>
       asyncCallInfo;  //!< pointer to a class defining the async call information
     std::unique_ptr<FilterFederateManager> fManager;  //!< class for managing filter operations
     std::string name;  //!< the name of the federate
@@ -241,7 +244,7 @@ class Federate
     A string indicating the source of the message and another string with the actual message
     */
     void
-    setLoggingCallback (const std::function<void (int, const std::string &, const std::string &)> &logFunction);
+    setLoggingCallback (const std::function<void(int, const std::string &, const std::string &)> &logFunction);
 
     /** make a query of the core
     @details this call is blocking until the value is returned which make take some time depending on the size of

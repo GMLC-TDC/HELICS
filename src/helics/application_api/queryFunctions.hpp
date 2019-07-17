@@ -27,6 +27,11 @@ std::vector<std::string> vectorizeQueryResult (std::string &&queryres);
  */
 std::vector<std::string> vectorizeQueryResult (const std::string &queryres);
 
+/** function takes a query result and vectorizes it if the query is a vector result of integer indices, if not the
+ * results are an empty vector
+ */
+std::vector<int> vectorizeIndexQuery (const std::string &queryres);
+
 /** function takes a query result, vectorizes and sorts it if the query is a vector result, if not the results go
  * into the first element of the vector
  */

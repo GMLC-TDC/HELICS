@@ -1,16 +1,13 @@
 /*
 Copyright © 2017-2019,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See the top-level NOTICE for additional details.
-All rights reserved.
-SPDX-License-Identifier: BSD-3-Clause
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
+the top-level NOTICE for additional details. All rights reserved. SPDX-License-Identifier: BSD-3-Clause
 */
 
 #include "../application_api/testFixtures.hpp"
+#include "gtest/gtest.h"
 #include "helics/core/core-exceptions.hpp"
 #include <complex>
-#include <boost/test/unit_test.hpp>
-#include <boost/test/data/test_case.hpp>
-#include <boost/test/floating_point_comparison.hpp>
 
 /** these test cases test out the value converters
  */
@@ -18,24 +15,24 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helics/application_api.hpp"
 #include <future>
 
-namespace utf = boost::unit_test;
-namespace bdata = boost::unit_test::data;
-
-BOOST_FIXTURE_TEST_SUITE (error_tests, FederateTestFixture)
 #define CORE_TYPE_TO_TEST helics::core_type::TEST
 
-BOOST_AUTO_TEST_CASE (duplicate_federate_names)
+struct error_tests : public FederateTestFixture, public ::testing::Test
+{
+};
+
+TEST_F (error_tests, duplicate_federate_names)
 {
     helics::FederateInfo fi (CORE_TYPE_TO_TEST);
     fi.coreInitString = "-f 1 --autobroker";
 
     auto Fed = std::make_shared<helics::Federate> ("test1", fi);
 
-    BOOST_CHECK_THROW (std::make_shared<helics::Federate> ("test1", fi), helics::RegistrationFailure);
+    EXPECT_THROW (std::make_shared<helics::Federate> ("test1", fi), helics::RegistrationFailure);
     Fed->finalize ();
 }
 
-BOOST_AUTO_TEST_CASE (duplicate_federate_names2)
+TEST_F (error_tests, duplicate_federate_names2)
 {
     auto broker = AddBroker ("test", 2);
     AddFederates<helics::ValueFederate> ("test", 1, broker, 1.0, "fed");
@@ -45,12 +42,12 @@ BOOST_AUTO_TEST_CASE (duplicate_federate_names2)
     auto fed2 = GetFederateAs<helics::ValueFederate> (1);
     helics::FederateInfo fi;
     // get the core pointer from fed2 and using the name of fed1 should be an error
-    BOOST_CHECK_THROW (helics::ValueFederate fed3 (fed1->getName (), fed2->getCorePointer (), fi),
-                       helics::RegistrationFailure);
+    EXPECT_THROW (helics::ValueFederate fed3 (fed1->getName (), fed2->getCorePointer (), fi),
+                  helics::RegistrationFailure);
     broker->disconnect ();
 }
 
-BOOST_AUTO_TEST_CASE (already_init_broker)
+TEST_F (error_tests, already_init_broker)
 {
     auto broker = AddBroker ("test", 1);
     AddFederates<helics::ValueFederate> ("test", 1, broker, 1.0, "fed");
@@ -59,11 +56,11 @@ BOOST_AUTO_TEST_CASE (already_init_broker)
     fed1->enterInitializingMode ();
     helics::FederateInfo fi (helics::core_type::TEST);
     fi.coreInitString = std::string ("--timeout=1s --broker=") + broker->getIdentifier ();
-    BOOST_CHECK_THROW (helics::ValueFederate fed3 ("fed222", fi), helics::RegistrationFailure);
+    EXPECT_THROW (helics::ValueFederate fed3 ("fed222", fi), helics::RegistrationFailure);
     broker->disconnect ();
 }
 
-BOOST_AUTO_TEST_CASE (already_init_core)
+TEST_F (error_tests, already_init_core)
 {
     auto broker = AddBroker ("test", 1);
     AddFederates<helics::ValueFederate> ("test", 1, broker, 1.0, "fed");
@@ -71,12 +68,12 @@ BOOST_AUTO_TEST_CASE (already_init_core)
     auto fed1 = GetFederateAs<helics::ValueFederate> (0);
     fed1->enterExecutingMode ();
     // get the core pointer from fed2 and using the name of fed1 should be an error
-    BOOST_CHECK_THROW (helics::ValueFederate fed2 ("fed2", fed1->getCorePointer (), helics::FederateInfo ()),
-                       helics::RegistrationFailure);
+    EXPECT_THROW (helics::ValueFederate fed2 ("fed2", fed1->getCorePointer (), helics::FederateInfo ()),
+                  helics::RegistrationFailure);
     broker->disconnect ();
 }
 
-BOOST_AUTO_TEST_CASE (duplicate_publication_names)
+TEST_F (error_tests, duplicate_publication_names)
 {
     auto broker = AddBroker ("test", 1);
     AddFederates<helics::ValueFederate> ("test", 2, broker, 1.0, "fed");
@@ -84,13 +81,13 @@ BOOST_AUTO_TEST_CASE (duplicate_publication_names)
     auto fed2 = GetFederateAs<helics::ValueFederate> (1);
 
     fed1->registerGlobalPublication ("testkey", "");
-    BOOST_CHECK_THROW (fed2->registerGlobalPublication ("testkey", ""), helics::RegistrationFailure);
+    EXPECT_THROW (fed2->registerGlobalPublication ("testkey", ""), helics::RegistrationFailure);
     fed1->finalize ();
     fed2->finalize ();
     broker->disconnect ();
 }
 
-BOOST_AUTO_TEST_CASE (duplicate_publication_names2)
+TEST_F (error_tests, duplicate_publication_names2)
 {
     auto broker = AddBroker ("test", 2);
     AddFederates<helics::ValueFederate> ("test", 1, broker, 1.0, "fed");
@@ -104,13 +101,31 @@ BOOST_AUTO_TEST_CASE (duplicate_publication_names2)
 
     fed2->registerGlobalPublication ("testkey", "");
 
-    BOOST_CHECK_THROW (fed2->enterInitializingMode (), helics::RegistrationFailure);
+    bool gotException = false;
+    try
+    {
+        fed2->enterInitializingMode ();
+    }
+    catch (const helics::RegistrationFailure &)
+    {
+        gotException = true;
+    }
+
+    try
+    {
+        fed1->enterInitializingModeComplete ();
+    }
+    catch (const helics::RegistrationFailure &)
+    {
+        gotException = true;
+    }
+    EXPECT_TRUE (gotException);
     fed1->finalize ();
     fed2->finalize ();
     broker->disconnect ();
 }
 
-BOOST_AUTO_TEST_CASE (duplicate_publication_names3)
+TEST_F (error_tests, duplicate_publication_names3)
 {
     auto broker = AddBroker ("test", 1);
     AddFederates<helics::ValueFederate> ("test", 1, broker, 1.0, "fed");
@@ -119,12 +134,12 @@ BOOST_AUTO_TEST_CASE (duplicate_publication_names3)
 
     fed1->registerPublication ("testkey", "");
 
-    BOOST_CHECK_THROW (fed1->registerPublication ("testkey", ""), helics::RegistrationFailure);
+    EXPECT_THROW (fed1->registerPublication ("testkey", ""), helics::RegistrationFailure);
     fed1->finalize ();
     broker->disconnect ();
 }
 
-BOOST_AUTO_TEST_CASE (duplicate_publication_names4)
+TEST_F (error_tests, duplicate_publication_names4)
 {
     auto broker = AddBroker ("test", 1);
     AddFederates<helics::ValueFederate> ("test", 1, broker, 1.0, "fed");
@@ -143,22 +158,22 @@ BOOST_AUTO_TEST_CASE (duplicate_publication_names4)
     fed1->publish (pubid, 45.7);
     fed1->requestTime (1.0);
     auto res = sub.getValue<double> ();
-    BOOST_CHECK_EQUAL (res, 45.7);
+    EXPECT_EQ (res, 45.7);
     pub.publish (99.2);
 
     fed1->requestTime (2.0);
     res = sub.getValue<double> ();
-    BOOST_CHECK_EQUAL (res, 99.2);
+    EXPECT_EQ (res, 99.2);
     pub2.publish (103.8);
 
     fed1->requestTime (3.0);
     res = sub.getValue<double> ();
-    BOOST_CHECK_EQUAL (res, 103.8);
+    EXPECT_EQ (res, 103.8);
     fed1->finalize ();
     broker->disconnect ();
 }
 
-BOOST_AUTO_TEST_CASE (duplicate_endpoint_names)
+TEST_F (error_tests, duplicate_endpoint_names)
 {
     auto broker = AddBroker ("test", 1);
     AddFederates<helics::MessageFederate> ("test", 2, broker, 1.0, "fed");
@@ -166,13 +181,13 @@ BOOST_AUTO_TEST_CASE (duplicate_endpoint_names)
     auto fed2 = GetFederateAs<helics::MessageFederate> (1);
 
     fed1->registerGlobalEndpoint ("testEpt");
-    BOOST_CHECK_THROW (fed2->registerGlobalEndpoint ("testEpt"), helics::RegistrationFailure);
+    EXPECT_THROW (fed2->registerGlobalEndpoint ("testEpt"), helics::RegistrationFailure);
     fed1->finalize ();
     fed2->finalize ();
     broker->disconnect ();
 }
 
-BOOST_AUTO_TEST_CASE (duplicate_endpoint_names2)
+TEST_F (error_tests, duplicate_endpoint_names2)
 {
     auto broker = AddBroker ("test", 2);
     AddFederates<helics::MessageFederate> ("test", 1, broker, 1.0, "fed");
@@ -184,13 +199,33 @@ BOOST_AUTO_TEST_CASE (duplicate_endpoint_names2)
     fed1->registerGlobalEndpoint ("testEpt");
     fed2->registerGlobalEndpoint ("testEpt");
 
-    BOOST_CHECK_THROW (fed2->enterInitializingMode (), helics::RegistrationFailure);
+    fed1->enterInitializingModeAsync ();
+
+    bool gotException = false;
+    try
+    {
+        fed2->enterInitializingMode ();
+    }
+    catch (const helics::RegistrationFailure &)
+    {
+        gotException = true;
+    }
+
+    try
+    {
+        fed1->enterInitializingModeComplete ();
+    }
+    catch (const helics::RegistrationFailure &)
+    {
+        gotException = true;
+    }
+    EXPECT_TRUE (gotException);
     fed1->finalize ();
     fed2->finalize ();
     broker->disconnect ();
 }
 
-BOOST_AUTO_TEST_CASE (missing_required_pub)
+TEST_F (error_tests, missing_required_pub)
 {
     auto broker = AddBroker ("test", 2);
 
@@ -205,13 +240,13 @@ BOOST_AUTO_TEST_CASE (missing_required_pub)
     i2.setOption (helics::defs::options::connection_required, true);
 
     fed1->enterInitializingModeAsync ();
-    BOOST_CHECK_THROW (fed2->enterInitializingMode (), helics::ConnectionFailure);
+    EXPECT_THROW (fed2->enterInitializingMode (), helics::ConnectionFailure);
     fed1->finalize ();
     fed2->finalize ();
     broker->disconnect ();
 }
 
-BOOST_AUTO_TEST_CASE (missing_required_pub_with_default)
+TEST_F (error_tests, missing_required_pub_with_default)
 {
     auto broker = AddBroker ("test", 2);
 
@@ -226,51 +261,61 @@ BOOST_AUTO_TEST_CASE (missing_required_pub_with_default)
     fed2->registerSubscription ("abcd", "");
 
     fed1->enterInitializingModeAsync ();
-    BOOST_CHECK_THROW (fed2->enterInitializingMode (), helics::ConnectionFailure);
+    EXPECT_THROW (fed2->enterInitializingMode (), helics::ConnectionFailure);
     // this is definitely not how you would normally do this,
     // we are calling finalize while an async call is active, this should result in finalize throwing since it was
     // a global connection failure
-    BOOST_CHECK_THROW (fed1->finalize (), helics::ConnectionFailure);
+    EXPECT_THROW (fed1->finalize (), helics::ConnectionFailure);
     fed2->finalize ();
     broker->disconnect ();
 }
 
-/** test simple creation and destruction*/
-BOOST_DATA_TEST_CASE (test_duplicate_broker_name, bdata::make (core_types_simple), core_type)
+class error_tests_type : public ::testing::TestWithParam<const char *>, public FederateTestFixture
 {
-    auto broker = AddBroker (core_type, "--name=brk1");
-    BOOST_CHECK (broker->isConnected ());
-    BOOST_CHECK_THROW (AddBroker (core_type, "--name=brk1 --timeout=500"), helics::RegistrationFailure);
+};
+
+/** test simple creation and destruction*/
+TEST_P (error_tests_type, test_duplicate_broker_name)
+{
+    auto broker = AddBroker (GetParam (), "--name=brk1");
+    EXPECT_TRUE (broker->isConnected ());
+    EXPECT_THROW (AddBroker (GetParam (), "--name=brk1 --timeout=500"), helics::RegistrationFailure);
     broker->disconnect ();
     helics::cleanupHelicsLibrary ();
 }
 
+INSTANTIATE_TEST_SUITE_P (error_tests, error_tests_type, ::testing::ValuesIn (core_types_simple));
+
 constexpr const char *networkCores[] = {"zmq", "udp"};
 
-/** test simple creation and destruction*/
-BOOST_DATA_TEST_CASE (test_duplicate_default_brokers, bdata::make (networkCores), core_type)
+class network_error_tests : public ::testing::TestWithParam<const char *>, public FederateTestFixture
 {
-    auto broker = AddBroker (core_type, "");
-    auto broker2 = AddBroker (core_type, "--timeout=500");
-    BOOST_CHECK (!broker2->isConnected ());
+};
+
+/** test simple creation and destruction*/
+TEST_P (network_error_tests, test_duplicate_default_brokers)
+{
+    auto broker = AddBroker (GetParam (), "");
+    auto broker2 = AddBroker (GetParam (), "--timeout=500");
+    EXPECT_TRUE (!broker2->isConnected ());
     broker->disconnect ();
     helics::cleanupHelicsLibrary ();
 }
 
 /** test broker recovery*/
-BOOST_DATA_TEST_CASE (test_broker_recovery, bdata::make (networkCores), core_type)
+TEST_P (network_error_tests, test_broker_recovery)
 {
-    auto broker = AddBroker (core_type, "");
-    BOOST_REQUIRE (broker->isConnected ());
+    auto broker = AddBroker (GetParam (), "");
+    ASSERT_TRUE (broker->isConnected ());
     auto res = std::async (std::launch::async, [&broker]() {
         std::this_thread::sleep_for (std::chrono::milliseconds (1400));
         broker->disconnect ();
     });
-    auto broker2 = AddBroker (core_type, " --timeout=2500");
-    BOOST_CHECK (!broker->isConnected ());
-    BOOST_CHECK (broker2->isConnected ());
+    auto broker2 = AddBroker (GetParam (), " --timeout=2500");
+    EXPECT_TRUE (!broker->isConnected ());
+    EXPECT_TRUE (broker2->isConnected ());
     broker2->disconnect ();
     helics::cleanupHelicsLibrary ();
 }
 
-BOOST_AUTO_TEST_SUITE_END ()
+INSTANTIATE_TEST_SUITE_P (error_tests, network_error_tests, ::testing::ValuesIn (networkCores));

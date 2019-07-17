@@ -422,7 +422,7 @@ bool CommsInterface::reconnect ()
             (tx_status.load () == connection_status::connected));
 }
 
-void CommsInterface::setCallback (std::function<void(ActionMessage &&)> callback)
+void CommsInterface::setCallback (std::function<void (ActionMessage &&)> callback)
 {
     if (propertyLock ())
     {
@@ -432,7 +432,7 @@ void CommsInterface::setCallback (std::function<void(ActionMessage &&)> callback
 }
 
 void CommsInterface::setLoggingCallback (
-  std::function<void(int level, const std::string &name, const std::string &message)> callback)
+  std::function<void (int level, const std::string &name, const std::string &message)> callback)
 {
     loggingCallback = std::move (callback);
 }
@@ -525,6 +525,13 @@ void CommsInterface::closeTransmitter ()
     ActionMessage rt (CMD_PROTOCOL);
     rt.messageID = DISCONNECT;
     transmit (control_route, rt);
+}
+
+void CommsInterface::closeReceiver ()
+{
+    ActionMessage cmd (CMD_PROTOCOL);
+    cmd.messageID = CLOSE_RECEIVER;
+    transmit (control_route, cmd);
 }
 
 void CommsInterface::reconnectTransmitter ()

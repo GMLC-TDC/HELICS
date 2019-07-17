@@ -69,6 +69,6 @@ trigger_azure_build "HELICS-test/HELICS-Examples" 2
 # Trigger helics-ns3 module build
 #################################
 # Only trigger for commits/PRs to master
-if [[ "$TRAVIS_BRANCH" == "master" ]]; then
+if [[ "$TRAVIS_BRANCH" == "master" || "$TRAVIS_PULL_REQUEST_BRANCH" == "master" ]]; then
     trigger_azure_build "HELICS-test/helics-ns3" 1
 fi

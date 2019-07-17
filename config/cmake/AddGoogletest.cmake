@@ -6,14 +6,14 @@
 #
 
 if(NOT EXISTS "${PROJECT_SOURCE_DIR}/ThirdParty/googletest/CMakeLists.txt")
-	submod_update(${HELICS_SOURCE_DIR}/ThirdParty/googletest)
+	submod_update(${PROJECT_SOURCE_DIR}/ThirdParty/googletest)
 endif()
 
 set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
 set(BUILD_SHARED_LIBS OFF)
 
 set(CMAKE_SUPPRESS_DEVELOPER_WARNINGS 1 CACHE BOOL "")
-add_subdirectory("${HELICS_SOURCE_DIR}/ThirdParty/googletest" "${HELICS_BINARY_DIR}/ThirdParty/googletest" EXCLUDE_FROM_ALL)
+add_subdirectory("${PROJECT_SOURCE_DIR}/ThirdParty/googletest" "${PROJECT_BINARY_DIR}/ThirdParty/googletest" EXCLUDE_FROM_ALL)
 
 if (NOT MSVC)
 #target_Compile_options(gtest PRIVATE "-Wno-undef")

@@ -5,21 +5,23 @@ the top-level NOTICE for additional details. All rights reserved. SPDX-License-I
 */
 
 #include "../application_api/testFixtures.hpp"
+#include "gtest/gtest.h"
 #include "helics/ValueFederates.hpp"
-#include <boost/test/unit_test.hpp>
-#include <boost/test/data/test_case.hpp>
-
-namespace bdata = boost::unit_test::data;
-namespace utf = boost::unit_test;
 
 /** tests for the different flag options and considerations*/
 
-BOOST_FIXTURE_TEST_SUITE (flag_tests, FederateTestFixture)
+struct flag_tests : public FederateTestFixture, public ::testing::Test
+{
+};
+
+class flag_type_tests : public ::testing::TestWithParam<const char *>, public FederateTestFixture
+{
+};
 
 /** test simple creation and destruction*/
-BOOST_DATA_TEST_CASE (test_optional_pub, bdata::make (core_types_single), core_type)
+TEST_P (flag_type_tests, optional_pub)
 {
-    SetupTest<helics::ValueFederate> (core_type, 1, 1.0);
+    SetupTest<helics::ValueFederate> (GetParam (), 1, 1.0);
     auto vFed1 = GetFederateAs<helics::ValueFederate> (0);
     // register the publications
     auto &ipt1 = vFed1->registerInput<double> ("ipt1");
@@ -39,13 +41,13 @@ BOOST_DATA_TEST_CASE (test_optional_pub, bdata::make (core_types_single), core_t
     });
 
     vFed1->enterExecutingMode ();
-    BOOST_CHECK_EQUAL (warnings.load (), 2);
+    EXPECT_EQ (warnings.load (), 2);
     vFed1->finalize ();
 }
 
-BOOST_DATA_TEST_CASE (test_optional_sub, bdata::make (core_types_single), core_type)
+TEST_P (flag_type_tests, optional_sub)
 {
-    SetupTest<helics::ValueFederate> (core_type, 1, 1.0);
+    SetupTest<helics::ValueFederate> (GetParam (), 1, 1.0);
     auto vFed1 = GetFederateAs<helics::ValueFederate> (0);
     // register the publications
     auto &pub1 = vFed1->registerPublication<double> ("pub1");
@@ -64,13 +66,15 @@ BOOST_DATA_TEST_CASE (test_optional_sub, bdata::make (core_types_single), core_t
     });
 
     vFed1->enterExecutingMode ();
-    BOOST_CHECK_EQUAL (warnings.load (), 1);
-    BOOST_CHECK (pub1.getOption (helics::defs::options::connection_optional));
+    EXPECT_EQ (warnings.load (), 1);
+    EXPECT_TRUE (pub1.getOption (helics::defs::options::connection_optional));
 
     vFed1->finalize ();
 }
 
-BOOST_AUTO_TEST_CASE (single_connection_test)
+INSTANTIATE_TEST_SUITE_P (flag_tests, flag_type_tests, ::testing::ValuesIn (core_types_single));
+
+TEST_F (flag_tests, single_connection_test)
 {
     SetupTest<helics::ValueFederate> ("test", 1, 1.0);
     auto vFed1 = GetFederateAs<helics::ValueFederate> (0);
@@ -83,12 +87,12 @@ BOOST_AUTO_TEST_CASE (single_connection_test)
     pub1.addTarget ("ipt1");
     pub2.addTarget ("ipt1");
 
-    BOOST_CHECK_THROW (vFed1->enterExecutingMode (), helics::ConnectionFailure);
+    EXPECT_THROW (vFed1->enterExecutingMode (), helics::ConnectionFailure);
 
     vFed1->finalize ();
 }
 
-BOOST_AUTO_TEST_CASE (single_connection_test_pub)
+TEST_F (flag_tests, single_connection_test_pub)
 {
     SetupTest<helics::ValueFederate> ("test", 1, 1.0);
     auto vFed1 = GetFederateAs<helics::ValueFederate> (0);
@@ -101,12 +105,12 @@ BOOST_AUTO_TEST_CASE (single_connection_test_pub)
     ipt1.addTarget ("pub1");
     ipt2.addTarget ("pub1");
 
-    BOOST_CHECK_THROW (vFed1->enterExecutingMode (), helics::ConnectionFailure);
+    EXPECT_THROW (vFed1->enterExecutingMode (), helics::ConnectionFailure);
 
     vFed1->finalize ();
 }
 
-BOOST_AUTO_TEST_CASE (type_match_check)
+TEST_F (flag_tests, type_match_check)
 {
     SetupTest<helics::ValueFederate> ("test", 1, 1.0);
     auto vFed1 = GetFederateAs<helics::ValueFederate> (0);
@@ -117,11 +121,11 @@ BOOST_AUTO_TEST_CASE (type_match_check)
     ipt1.setOption (helics::defs::options::strict_type_checking);
     ipt1.addTarget ("pub1");
     vFed1->enterExecutingMode ();
-    BOOST_CHECK (ipt1.getOption (helics::defs::options::strict_type_checking));
+    EXPECT_TRUE (ipt1.getOption (helics::defs::options::strict_type_checking));
     vFed1->finalize ();
 }
 
-BOOST_AUTO_TEST_CASE (type_mismatch_error)
+TEST_F (flag_tests, type_mismatch_error)
 {
     SetupTest<helics::ValueFederate> ("test", 1, 1.0);
     auto vFed1 = GetFederateAs<helics::ValueFederate> (0);
@@ -131,11 +135,11 @@ BOOST_AUTO_TEST_CASE (type_mismatch_error)
     vFed1->registerGlobalPublication<std::vector<double>> ("pub1");
     ipt1.setOption (helics::defs::options::strict_type_checking);
     ipt1.addTarget ("pub1");
-    BOOST_CHECK_THROW (vFed1->enterExecutingMode (), helics::ConnectionFailure);
+    EXPECT_THROW (vFed1->enterExecutingMode (), helics::ConnectionFailure);
     vFed1->finalize ();
 }
 
-BOOST_AUTO_TEST_CASE (type_mismatch_error_fed_level)
+TEST_F (flag_tests, type_mismatch_error_fed_level)
 {
     SetupTest<helics::ValueFederate> ("test", 1, 1.0);
     auto vFed1 = GetFederateAs<helics::ValueFederate> (0);
@@ -145,11 +149,11 @@ BOOST_AUTO_TEST_CASE (type_mismatch_error_fed_level)
 
     vFed1->registerGlobalPublication<std::vector<double>> ("pub1");
     ipt1.addTarget ("pub1");
-    BOOST_CHECK_THROW (vFed1->enterExecutingMode (), helics::ConnectionFailure);
+    EXPECT_THROW (vFed1->enterExecutingMode (), helics::ConnectionFailure);
     vFed1->finalize ();
 }
 
-BOOST_AUTO_TEST_CASE (type_mismatch_error2)
+TEST_F (flag_tests, type_mismatch_error2)
 {
     SetupTest<helics::ValueFederate> ("test", 1, 1.0);
     auto vFed1 = GetFederateAs<helics::ValueFederate> (0);
@@ -159,11 +163,11 @@ BOOST_AUTO_TEST_CASE (type_mismatch_error2)
     vFed1->registerGlobalPublication ("pub1", "other");
     ipt1.setOption (helics::defs::options::strict_type_checking);
     ipt1.addTarget ("pub1");
-    BOOST_CHECK_THROW (vFed1->enterExecutingMode (), helics::ConnectionFailure);
+    EXPECT_THROW (vFed1->enterExecutingMode (), helics::ConnectionFailure);
     vFed1->finalize ();
 }
 
-BOOST_AUTO_TEST_CASE (only_update_on_change_fedlevel)
+TEST_F (flag_tests, only_update_on_change_fedlevel)
 {
     SetupTest<helics::ValueFederate> ("test", 1, 1.0);
     auto vFed1 = GetFederateAs<helics::ValueFederate> (0);
@@ -178,17 +182,17 @@ BOOST_AUTO_TEST_CASE (only_update_on_change_fedlevel)
     vFed1->enterExecutingMode ();
     pub1.publish (45.7);
     vFed1->requestTime (1.0);
-    BOOST_CHECK (ipt1.isUpdated ());
+    EXPECT_TRUE (ipt1.isUpdated ());
     double val = ipt1.getValue<double> ();
-    BOOST_CHECK_EQUAL (val, 45.7);
-    BOOST_CHECK (!ipt1.isUpdated ());
+    EXPECT_EQ (val, 45.7);
+    EXPECT_TRUE (!ipt1.isUpdated ());
     pub1.publish (45.7);
     vFed1->requestTime (2.0);
-    BOOST_CHECK (!ipt1.isUpdated ());
+    EXPECT_TRUE (!ipt1.isUpdated ());
     vFed1->finalize ();
 }
 
-BOOST_AUTO_TEST_CASE (only_transmit_on_change_fedlevel)
+TEST_F (flag_tests, only_transmit_on_change_fedlevel)
 {
     SetupTest<helics::ValueFederate> ("test", 1, 1.0);
     auto vFed1 = GetFederateAs<helics::ValueFederate> (0);
@@ -203,14 +207,12 @@ BOOST_AUTO_TEST_CASE (only_transmit_on_change_fedlevel)
     vFed1->enterExecutingMode ();
     pub1.publish (45.7);
     vFed1->requestTime (1.0);
-    BOOST_CHECK (ipt1.isUpdated ());
+    EXPECT_TRUE (ipt1.isUpdated ());
     double val = ipt1.getValue<double> ();
-    BOOST_CHECK_EQUAL (val, 45.7);
-    BOOST_CHECK (!ipt1.isUpdated ());
+    EXPECT_EQ (val, 45.7);
+    EXPECT_TRUE (!ipt1.isUpdated ());
     pub1.publish (45.7);
     vFed1->requestTime (2.0);
-    BOOST_CHECK (!ipt1.isUpdated ());
+    EXPECT_TRUE (!ipt1.isUpdated ());
     vFed1->finalize ();
 }
-
-BOOST_AUTO_TEST_SUITE_END ()

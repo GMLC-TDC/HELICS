@@ -33,22 +33,30 @@ int main (int argc, char *argv[])
           "term", "helics_broker term <broker args...> will start a broker and open a terminal control window "
                   "for the broker run help in a terminal for more commands\n")
         ->prefix_command ();
-    term->callback ([&runterminal]() { runterminal = true; });
+    term->callback ([&runterminal] () { runterminal = true; });
     cmdLine.add_flag ("--autorestart", autorestart,
                       "helics_broker autorestart <broker args ...> will start a continually regenerating broker "
                       "there is a 3 second countdown on broker completion to halt the program via ctrl-C\n");
     cmdLine
       .footer ("helics_broker <broker args ..> starts a broker with the given args and waits for it to "
                "complete\n")
-      ->footer ([]() {
+      ->footer ([] () {
           helics::apps::BrokerApp ("-?");
           return std::string{};
       });
     cmdLine.allow_extras ();
     auto res = cmdLine.helics_parse (argc, argv);
-    if (res != helics::helicsCLI11App::parse_return::ok)
+    if (res != helics::helicsCLI11App::parse_output::ok)
     {
-        return static_cast<int> (res);
+        switch (res)
+        {
+        case helics::helicsCLI11App::parse_output::help_call:
+        case helics::helicsCLI11App::parse_output::help_all_call:
+        case helics::helicsCLI11App::parse_output::version_call:
+            return 0;
+        default:
+            return static_cast<int> (res);
+        }
     }
     try
     {
@@ -105,7 +113,7 @@ void terminalFunction (std::vector<std::string> args)
 {
     std::cout << "starting broker\n";
     auto broker = std::make_unique<helics::apps::BrokerApp> (args);
-    auto closeBroker = [&broker]() {
+    auto closeBroker = [&broker] () {
         if (!broker)
         {
             std::cout << "Broker has terminated\n";
@@ -122,7 +130,7 @@ void terminalFunction (std::vector<std::string> args)
         }
     };
 
-    auto restartBroker = [&broker, &args](std::vector<std::string> broker_args, bool force) {
+    auto restartBroker = [&broker, &args] (std::vector<std::string> broker_args, bool force) {
         if (!broker_args.empty ())
         {
             args = broker_args;
@@ -154,7 +162,7 @@ void terminalFunction (std::vector<std::string> args)
         }
     };
 
-    auto status = [&broker](bool addAddress) {
+    auto status = [&broker] (bool addAddress) {
         if (!broker)
         {
             std::cout << "Broker is not available\n";
@@ -188,11 +196,11 @@ void terminalFunction (std::vector<std::string> args)
     termProg.ignore_case ();
     termProg.add_flag ("-q,--quit,--exit", cmdcont, "close the terminal and wait for the broker to exit");
     termProg.add_subcommand ("quit", "close the terminal and  wait for the broker to exit")
-      ->callback ([&cmdcont]() { cmdcont = false; });
+      ->callback ([&cmdcont] () { cmdcont = false; });
     termProg.add_subcommand ("terminate", "terminate the broker")->callback (closeBroker);
 
     termProg.add_subcommand ("terminate!", "forceably terminate the broker and exit")
-      ->callback ([closeBroker, &cmdcont]() {
+      ->callback ([closeBroker, &cmdcont] () {
           cmdcont = false;
           closeBroker ();
       });
@@ -200,26 +208,26 @@ void terminalFunction (std::vector<std::string> args)
     auto restart =
       termProg.add_subcommand ("restart", "restart the broker if it is not currently executing")->allow_extras ();
     restart->callback (
-      [restartBroker, &restart]() { restartBroker (restart->remaining_for_passthrough (), false); });
+      [restartBroker, &restart] () { restartBroker (restart->remaining_for_passthrough (), false); });
 
     auto frestart =
       termProg.add_subcommand ("restart!", "forceably terminate the broker and restart it")->allow_extras ();
     frestart->callback (
-      [restartBroker, &restart]() { restartBroker (restart->remaining_for_passthrough (), true); });
+      [restartBroker, &restart] () { restartBroker (restart->remaining_for_passthrough (), true); });
 
-    termProg.add_subcommand ("status", "generate the current status of the broker")->callback ([&status]() {
+    termProg.add_subcommand ("status", "generate the current status of the broker")->callback ([&status] () {
         status (false);
     });
-    termProg.add_subcommand ("info", "get the current broker status and connection info")->callback ([&status]() {
+    termProg.add_subcommand ("info", "get the current broker status and connection info")->callback ([&status] () {
         status (true);
     });
-    termProg.add_subcommand ("help", "display the help")->callback ([&termProg]() {
+    termProg.add_subcommand ("help", "display the help")->callback ([&termProg] () {
         termProg.helics_parse ("-?");
     });
     std::string target;
     std::string query;
 
-    auto queryCall = [&broker, &target, &query]() {
+    auto queryCall = [&broker, &target, &query] () {
         if (!broker)
         {
             std::cout << "Broker is not available\n";
@@ -247,7 +255,7 @@ void terminalFunction (std::vector<std::string> args)
     qgroup1->add_option ("target", target, "the name of object to target");
     auto qgroup2 = querySub->add_option_group ("queryGroup");
     qgroup2->add_option ("query", query, "the query to make")->required ();
-    querySub->preparse_callback ([qgroup1, &target](size_t argcount) {
+    querySub->preparse_callback ([qgroup1, &target] (size_t argcount) {
         if (argcount < 2)
         {
             target.clear ();

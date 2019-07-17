@@ -104,7 +104,7 @@ BOOST_DATA_TEST_CASE (message_federate_send_receive_callback, bdata::make (core_
 
     helics::interface_handle rxend;
     helics::Time timeRx;
-    auto mend = [&](const helics::Endpoint &ept, helics::Time rtime) {
+    auto mend = [&] (const helics::Endpoint &ept, helics::Time rtime) {
         rxend = ept.getHandle ();
         timeRx = rtime;
     };
@@ -152,7 +152,7 @@ BOOST_DATA_TEST_CASE (message_federate_send_receive_callback_obj, bdata::make (c
 
     helics::interface_handle rxend;
     helics::Time timeRx;
-    auto mend = [&](const helics::Endpoint &ept, helics::Time rtime) {
+    auto mend = [&] (const helics::Endpoint &ept, helics::Time rtime) {
         rxend = ept.getHandle ();
         timeRx = rtime;
     };
@@ -198,7 +198,7 @@ BOOST_DATA_TEST_CASE (message_federate_send_receive_callback_obj2, bdata::make (
 
     helics::interface_handle rxend;
     helics::Time timeRx;
-    auto mend = [&](const helics::Endpoint &ept, helics::Time rtime) {
+    auto mend = [&] (const helics::Endpoint &ept, helics::Time rtime) {
         rxend = ept.getHandle ();
         timeRx = rtime;
     };
@@ -246,13 +246,13 @@ BOOST_DATA_TEST_CASE (message_federate_send_receive_2fed_multisend_callback,
     auto &epid2 = mFed2->registerGlobalEndpoint ("ep2", "random");
     std::atomic<int> e1cnt{0};
     std::atomic<int> e2cnt{0};
-    mFed1->setMessageNotificationCallback (epid, [&](const helics::Endpoint &, helics::Time) { ++e1cnt; });
-    mFed2->setMessageNotificationCallback (epid2, [&](const helics::Endpoint &, helics::Time) { ++e2cnt; });
+    mFed1->setMessageNotificationCallback (epid, [&] (const helics::Endpoint &, helics::Time) { ++e1cnt; });
+    mFed2->setMessageNotificationCallback (epid2, [&] (const helics::Endpoint &, helics::Time) { ++e2cnt; });
     // mFed1->getCorePointer()->setLoggingLevel(0, 5);
     mFed1->setProperty (helics_property_time_delta, 1.0);
     mFed2->setProperty (helics_property_time_delta, 1.0);
 
-    auto f1finish = std::async (std::launch::async, [&]() { mFed1->enterExecutingMode (); });
+    auto f1finish = std::async (std::launch::async, [&] () { mFed1->enterExecutingMode (); });
     mFed2->enterExecutingMode ();
     f1finish.wait ();
 
@@ -268,7 +268,7 @@ BOOST_DATA_TEST_CASE (message_federate_send_receive_2fed_multisend_callback,
     mFed1->sendMessage (epid, "ep2", data3);
     mFed1->sendMessage (epid, "ep2", data4);
     // move the time to 1.0
-    auto f1time = std::async (std::launch::async, [&]() { return mFed1->requestTime (1.0); });
+    auto f1time = std::async (std::launch::async, [&] () { return mFed1->requestTime (1.0); });
     auto gtime = mFed2->requestTime (1.0);
 
     BOOST_CHECK_EQUAL (gtime, 1.0);
@@ -326,12 +326,12 @@ class PingPongFed
     std::string name;  //!< the name of the federate
     helics::core_type coreType;
     std::vector<std::pair<helics::Time, std::string>> triggers;
-    helics::Endpoint *ep;
-    int index = 0;
+    helics::Endpoint *ep{nullptr};
+    int index{0};
 
   public:
-    int pings = 0;  //!< the number of pings received
-    int pongs = 0;  //!< the number of pongs received
+    int pings{0};  //!< the number of pings received
+    int pongs{0};  //!< the number of pongs received
   public:
     PingPongFed (const std::string &fname, helics::Time tDelta, helics::core_type ctype)
         : delta (tDelta), name (fname), coreType (ctype)
@@ -454,9 +454,9 @@ BOOST_DATA_TEST_CASE (threefedPingPong, bdata::make (core_types), core_type)
     p3.addTrigger (3.0, "fedB/port");
     p3.addTrigger (4.0, "fedA/port");
 
-    auto t1 = std::thread ([&p1]() { p1.run (6.0); });
-    auto t2 = std::thread ([&p2]() { p2.run (6.0); });
-    auto t3 = std::thread ([&p3]() { p3.run (6.0); });
+    auto t1 = std::thread ([&p1] () { p1.run (6.0); });
+    auto t2 = std::thread ([&p2] () { p2.run (6.0); });
+    auto t3 = std::thread ([&p3] () { p3.run (6.0); });
 
     t1.join ();
     t2.join ();

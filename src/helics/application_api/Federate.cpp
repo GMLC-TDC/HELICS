@@ -1026,7 +1026,6 @@ const Filter &Federate::getFilter (int index) const { return fManager->getFilter
 int Federate::filterCount () const { return fManager->getFilterCount (); }
 
 std::string Federate::localQuery (const std::string & /*queryStr*/) const { return std::string{}; }
-
 std::string Federate::query (const std::string &queryStr)
 {
     std::string res;
@@ -1078,7 +1077,7 @@ std::string Federate::query (const std::string &target, const std::string &query
         }
         else
         {
-            return "#invalid";
+            res = "#invalid";
         }
     }
     return res;

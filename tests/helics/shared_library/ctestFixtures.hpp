@@ -21,7 +21,7 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #define HELICS_SIZE_MAX 512
 
-typedef helics_federate (*FedCreator) (char const *, helics_federate_info, helics_error *err);
+typedef helics_federate (*FedCreator) (char const *, helics_federate_info, helics_error *);
 
 struct FederateTestFixture
 {

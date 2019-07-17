@@ -8,10 +8,8 @@
 set(
   common_headers
   timeRepresentation.hpp
-  delayedDestructor.hpp
-  DelayedObjects.hpp
-  searchableObjectHolder.hpp
   JsonProcessingFunctions.hpp
+  JsonBuilder.hpp
   TomlProcessingFunctions.hpp
   AsioContextManager.h
   logger.h
@@ -21,8 +19,6 @@ set(
   generic_string_ops.hpp
   charMapper.h
   base64.h
-  TriggerVariable.hpp
-  TripWire.hpp
   fmt_format.h
   fmt_ostream.h
   addTargets.hpp
@@ -32,14 +28,13 @@ set(
   common_sources
   AsioContextManager.cpp
   JsonProcessingFunctions.cpp
+  JsonBuilder.cpp
   TomlProcessingFunctions.cpp
   logger.cpp
   loggerCore.cpp
   stringOps.cpp
   charMapper.cpp
   base64.cpp
-  TripWire.cpp
-  TriggerVariable.cpp
 )
 
 set(

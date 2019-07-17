@@ -202,7 +202,6 @@ BOOST_DATA_TEST_CASE (message_federate_send_receive_2fed_multisend, bdata::make 
     BOOST_CHECK (mFed2State == helics_state_execution);
 
     std::string data (500, 'a');
-    std::string data2 (400, 'b');
 
     helicsEndpointSetDefaultDestination (epid, "ep2", &err);
 

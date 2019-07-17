@@ -53,7 +53,7 @@ target_link_libraries(
 target_link_libraries(
   shared-library-tests-cpp
   helicsSharedLib
-  helics_boost_test_base
+  helics_google_test_base
 )
 
 add_dependencies(shared-library-tests helicsSharedLib)

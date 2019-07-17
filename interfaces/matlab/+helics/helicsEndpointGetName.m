@@ -14,5 +14,5 @@ function varargout = helicsEndpointGetName(varargin)
     %-------
     %a status variable
     %
-  [varargout{1:nargout}] = helicsMEX(219, varargin{:});
+  [varargout{1:nargout}] = helicsMEX(223, varargin{:});
 end

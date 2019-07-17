@@ -4,12 +4,15 @@ Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance
 the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
+
+#define ENABLE_TRIPWIRE
+
 #include "BrokerFactory.hpp"
-#include "../common/TripWire.hpp"
-#include "../common/delayedDestructor.hpp"
-#include "../common/searchableObjectHolder.hpp"
 #include "core-exceptions.hpp"
 #include "core-types.hpp"
+#include "gmlc/concurrency/DelayedDestructor.hpp"
+#include "gmlc/concurrency/SearchableObjectHolder.hpp"
+#include "gmlc/concurrency/TripWire.hpp"
 #include "helics/helics-config.h"
 #ifdef ENABLE_ZMQ_CORE
 #include "zmq/ZmqBroker.h"
@@ -256,13 +259,14 @@ can do the unregister operation and destroy itself meaning it is unable to join 
 what we do is delay the destruction until it is called in a different thread which allows the destructor to fire if
 need be without issue*/
 
-static DelayedDestructor<CoreBroker>
+static gmlc::concurrency::DelayedDestructor<CoreBroker>
   delayedDestroyer (destroyerCallFirst);  //!< the object handling the delayed destruction
 
-static SearchableObjectHolder<CoreBroker> searchableObjects;  //!< the object managing the searchable objects
+static gmlc::concurrency::SearchableObjectHolder<CoreBroker>
+  searchableObjects;  //!< the object managing the searchable objects
 
 // this will trip the line when it is destroyed at global destruction time
-static tripwire::TripWireTrigger tripTrigger;
+static gmlc::concurrency::TripWireTrigger tripTrigger;
 
 std::shared_ptr<Broker> findBroker (const std::string &brokerName)
 {

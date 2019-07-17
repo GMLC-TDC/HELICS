@@ -56,7 +56,7 @@ target_compile_definitions(
 set_target_properties(core-tests PROPERTIES FOLDER tests)
 
 add_test(NAME core-tests COMMAND core-tests)
-set_property(TEST core-tests PROPERTY LABELS Core Coverage Daily TSAN)
+set_property(TEST core-tests PROPERTY LABELS Core Coverage Daily)
 
 # Tests for Continuous Integration builds
 add_test(

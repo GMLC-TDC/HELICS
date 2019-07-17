@@ -7,13 +7,13 @@
 cmake_minimum_required(VERSION 3.4)
 cmake_policy(VERSION 3.4)
 
-project(HELICS VERSION 2.1.0)
+project(HELICS VERSION 2.1.1)
 
 # -----------------------------------------------------------------------------
 # HELICS Version number
 # -----------------------------------------------------------------------------
 set(HELICS_VERSION_BUILD)
-set(HELICS_DATE "06-27-19")
+set(HELICS_DATE "07-16-19")
 
 set(
     HELICS_VERSION_UNDERSCORE
@@ -77,6 +77,8 @@ endif()
 
 option(BUILD_HELICS_BOOST_TESTS "Enable the test executables built using boost unit tests" ON)
 option(BUILD_HELICS_EXAMPLES "Enable the example executables to be built" ON)
+
+mark_as_advanced(BUILD_HELICS_BOOST_TESTS)
 
 else()
 endif()
@@ -311,6 +313,10 @@ if(NOT EXISTS "${PROJECT_SOURCE_DIR}/ThirdParty/containers/gmlc/containers/Block
 	submod_update(ThirdParty/containers)
 endif()
 
+if(NOT EXISTS "${PROJECT_SOURCE_DIR}/ThirdParty/concurrency/gmlc/concurrency/TriggerVariable.hpp")
+	submod_update(ThirdParty/concurrency)
+endif()
+
 include(GNUInstallDirs)
 
 # -------------------------------------------------------------
@@ -413,7 +419,8 @@ target_include_directories(
         $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/src>
         $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}/include>
         $<INSTALL_INTERFACE:$<INSTALL_PREFIX>/include>
-		$<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/ThirdParty/containers>
+        $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/ThirdParty/containers>
+        $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/ThirdParty/concurrency>
 )
 
 target_include_directories(

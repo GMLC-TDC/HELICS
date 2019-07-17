@@ -51,7 +51,7 @@ class Player : public App
     /** construct from command line arguments in a vector
    @param args the command line arguments to pass in a reverse vector
    */
-    Player (std::vector<std::string> args);
+    explicit Player (std::vector<std::string> args);
     /** construct from command line arguments
     @param argc the number of arguments
     @param argv the strings in the input

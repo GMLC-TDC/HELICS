@@ -7,8 +7,41 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 A note on future revisions.  
   Everything within a major version number should be code compatible (with the exception of experimental interfaces).  The most notable example of an experimental interface is the support for multiple source inputs.  The APIs to deal with this will change in future minor releases.  Everything within a single minor release should be network compatible with other federates on the same minor release number.  Compatibility across minor release numbers may be possible in some situations but we are not going to guarantee this as those components are subject to performance improvements and may need to be modified at some point.  Patch releases will be limited to bug fixes and other improvements not impacting the public API or network compatibility.  Check [here](./docs/Public_API.md) for details on what is included and excluded from the public API and version stability.
 
+## \[2.1.1\] - 2019-07-15
+Minor release which fixes a few bugs and add some JSON related input and queries
+
+## Changed
+-   moved concurrency related structures to a standalone library
+-   System-tests is now based on google test instead of boost test
+-   Shared_libary_cpp tests now based on google_test instead of boost test
+-   the deserializer for `ActionMessage` now uses `memcpy` to avoid possible undefined behavior
+-   The value of `helics_time_maxtime` has been changed for consistency with the C++ equivalent
+-   The return type of the helicsCLI11App is now named `parse_output` instead of `parse_return`
+-   fmt and googletest were updated to latest version
+
+### Fixed
+-   a few possible race conditions found by thread-sanitizer
+-   cleared up a couple scenarios that were triggering occasional test failure in the system tests
+-   `helics_broker` and `helics_app` were returning non-zero return values when `--version` or `--help` were used, they now return 0 in those cases
+-   a small memory leak when a JSON stream builder was created and not destroyed properly
+-   an inconsistency between the `helics_time_maxtime` in the C shared library and the maxTime value used in C++, this could in some cases result in failing termination conditions
+
+### Added
+-   queries for getting all current inputs in JSON format.
+-   query for getting all updated inputs in JSON format
+-   publication function that accepts a JSON structure for multiple publications
+-   registration function that generates publications based on same JSON structure as the function that accepts JSON for group publication
+-   function on the inputs to clear the updates, is used from a query
+-   a const version of the `isUpdated` function call on inputs
+-   Shared OBJECT (SO) versions to the shared libraries
+
+### Removed
+-   libguarded and several concurrency related structures as they are now in a standalone repository that is included through submodules
+
+
 ## \[2.1.0\] - 2019-06-27
 The main focus of this minor release is cleaning up the build system and extracting required compiled libraries from the HELICS build process, no changes in the C API, and a few additions and deprecations in the C++ API related to command line arguments.  
+
 ### Changed
 -   remove use of boost::program options and replace usage with CLI11
 -   remove boost::asio and replace with a submodule for ASIO

@@ -14,10 +14,10 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "../common/fmt_format.h"
 #include "ForwardingTimeCoordinator.hpp"
 #include "flagOperations.hpp"
+#include "gmlc/libguarded/guarded.hpp"
 #include "loggingHelper.hpp"
 #include <asio/steady_timer.hpp>
 #include <iostream>
-#include <libguarded/guarded.hpp>
 #include <random>
 
 static constexpr auto chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
@@ -159,7 +159,7 @@ int BrokerBase::parseArgs (int argc, char *argv[])
     auto sApp = generateCLI ();
     app->add_subcommand (sApp);
     auto res = app->helics_parse (argc, argv);
-    if (res != helicsCLI11App::parse_return::ok)
+    if (res != helicsCLI11App::parse_output::ok)
     {
         return -1;
     }
@@ -172,7 +172,7 @@ int BrokerBase::parseArgs (std::vector<std::string> args)
     auto sApp = generateCLI ();
     app->add_subcommand (sApp);
     auto res = app->helics_parse (std::move (args));
-    if (res != helicsCLI11App::parse_return::ok)
+    if (res != helicsCLI11App::parse_output::ok)
     {
         return -1;
     }
@@ -185,7 +185,7 @@ int BrokerBase::parseArgs (const std::string &initializationString)
     auto sApp = generateCLI ();
     app->add_subcommand (sApp);
     auto res = app->helics_parse (initializationString);
-    if (res != helicsCLI11App::parse_return::ok)
+    if (res != helicsCLI11App::parse_output::ok)
     {
         return -1;
     }
@@ -314,7 +314,7 @@ void BrokerBase::addActionMessage (ActionMessage &&m)
     }
 }
 
-using activeProtector = libguarded::guarded<std::pair<bool, bool>>;
+using activeProtector = gmlc::libguarded::guarded<std::pair<bool, bool>>;
 
 static void haltTimer (activeProtector &active, asio::steady_timer &tickTimer)
 {

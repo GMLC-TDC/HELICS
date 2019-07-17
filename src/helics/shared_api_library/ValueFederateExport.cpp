@@ -371,6 +371,48 @@ helicsFederateRegisterGlobalInput (helics_federate fed, const char *key, helics_
     return nullptr;
 }
 
+void helicsFederateRegisterFromPublicationJSON (helics_federate fed, const char *json, helics_error *err)
+{
+    if (json == nullptr)
+    {  // this isn't an error, just doesn't do anything
+        return;
+    }
+    auto fedObj = getValueFedSharedPtr (fed, err);
+    if (!fedObj)
+    {
+        return;
+    }
+    try
+    {
+        fedObj->registerFromPublicationJSON (json);
+    }
+    catch (...)
+    {
+        helicsErrorHandler (err);
+    }
+}
+
+void helicsFederatePublishJSON (helics_federate fed, const char *json, helics_error *err)
+{
+    if (json == nullptr)
+    {  // this isn't an error just doesn't do anything
+        return;
+    }
+    auto fedObj = getValueFedSharedPtr (fed, err);
+    if (!fedObj)
+    {
+        return;
+    }
+    try
+    {
+        fedObj->publishJSON (json);
+    }
+    catch (...)
+    {
+        helicsErrorHandler (err);
+    }
+}
+
 static constexpr char invalidPubName[] = "the specified publication name is a not a valid publication name";
 static constexpr char invalidPubIndex[] = "the specified publication index is not valid";
 
@@ -541,6 +583,22 @@ helics_input helicsFederateGetSubscription (helics_federate fed, const char *key
     {
         helicsErrorHandler (err);
         return nullptr;
+    }
+}
+
+void helicsFederateClearUpdates (helics_federate fed)
+{
+    auto fedObj = getValueFedSharedPtr (fed, nullptr);
+    if (!fedObj)
+    {
+        return;
+    }
+    try
+    {
+        fedObj->clearUpdates ();
+    }
+    catch (...)
+    {
     }
 }
 
@@ -737,7 +795,7 @@ void helicsPublicationAddTarget (helics_publication pub, const char *target, hel
     {
         return;
     }
-    CHECK_NULL_STRING (target, void());
+    CHECK_NULL_STRING (target, void ());
 
     pubObj->pubPtr->addTarget (target);
 }
@@ -749,7 +807,7 @@ void helicsInputAddTarget (helics_input ipt, const char *target, helics_error *e
     {
         return;
     }
-    CHECK_NULL_STRING (target, void());
+    CHECK_NULL_STRING (target, void ());
     inpObj->inputPtr->addTarget (target);
 }
 
@@ -1589,6 +1647,22 @@ helics_time helicsInputLastUpdateTime (helics_input inp)
     catch (...)
     {
         return helics_time_invalid;
+    }
+}
+
+void helicsInputClearUpdate (helics_input inp)
+{
+    auto inpObj = verifyInput (inp, nullptr);
+    if (inpObj == nullptr)
+    {
+        return;
+    }
+    try
+    {
+        inpObj->inputPtr->clearUpdate ();
+    }
+    catch (...)
+    {
     }
 }
 

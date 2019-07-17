@@ -90,10 +90,28 @@ void ZmqCommsSS::loadNetworkInfo (const NetworkBrokerData &netInfo)
     propertyUnLock ();
 }
 
-ZmqCommsSS::ZmqCommsSS () noexcept : NetworkCommsInterface (interface_type::ip) {}
+ZmqCommsSS::ZmqCommsSS () noexcept
+    : NetworkCommsInterface (interface_type::ip, CommsInterface::thread_generation::single)
+{
+}
 
 /** destructor*/
-ZmqCommsSS::~ZmqCommsSS () { disconnect (); }
+ZmqCommsSS::~ZmqCommsSS ()
+{
+    if (requestDisconnect.load () || disconnecting.load ())
+    {
+        auto status = getRxStatus ();
+        while (status != connection_status::terminated && status != connection_status::error)
+        {
+            std::this_thread::yield ();
+            status = getRxStatus ();
+        }
+    }
+    else
+    {
+        disconnect ();
+    }
+}
 
 int ZmqCommsSS::getDefaultBrokerPort () const { return DEFAULT_BROKER_PORT_NUMBER; }
 
@@ -267,7 +285,6 @@ bool ZmqCommsSS::processTxControlCmd (ActionMessage cmd,
         routes.erase (route_id (cmd.getExtraData ()));
         break;
     case CLOSE_RECEIVER:
-        setRxStatus (connection_status::terminated);
         close_tx = true;
         break;
     case DISCONNECT:
@@ -348,7 +365,9 @@ void ZmqCommsSS::queue_tx_function ()
     bool close_tx = false;
     int status = 0;
 
-    while (true)
+    bool haltLoop{false};
+    //  std::vector<ActionMessage> txlist;
+    while (!haltLoop)
     {
         route_id rid;
         ActionMessage cmd;
@@ -377,7 +396,8 @@ void ZmqCommsSS::queue_tx_function ()
 
                     if (close_tx)
                     {
-                        goto CLOSE_TX_LOOP;
+                        haltLoop = true;
+                        break;
                     }
                 }
             }
@@ -402,7 +422,8 @@ void ZmqCommsSS::queue_tx_function ()
                     status = processIncomingMessage (msg, connection_info);  //----------> ToCheck
                     if (status < 0)
                     {
-                        goto CLOSE_TX_LOOP;
+                        haltLoop = true;
+                        break;
                     }
                 }
                 else
@@ -465,19 +486,14 @@ void ZmqCommsSS::queue_tx_function ()
 
                 if (status < 0)
                 {
-                    goto CLOSE_TX_LOOP;
+                    haltLoop = true;
                 }
             }
             count++;
         }
     }
-CLOSE_TX_LOOP:
     routes.clear ();
     connection_info.clear ();
-    if (getRxStatus () == connection_status::connected)
-    {
-        setRxStatus (connection_status::terminated);
-    }
     if (serverMode)
     {
         std::this_thread::sleep_for (std::chrono::milliseconds (50));
@@ -488,6 +504,10 @@ CLOSE_TX_LOOP:
         brokerConnection.close ();
     }
     setTxStatus (connection_status::terminated);
+    if (getRxStatus () == connection_status::connected)
+    {
+        setRxStatus (connection_status::terminated);
+    }
 }
 
 int ZmqCommsSS::processRxMessage (zmq::socket_t &brokerSocket,
@@ -501,31 +521,17 @@ int ZmqCommsSS::processRxMessage (zmq::socket_t &brokerSocket,
     if (serverMode)
     {
         brokerSocket.recv (&msg1);
-        std::string str (static_cast<char *> (msg1.data ()), msg1.size ());
-
         brokerSocket.recv (&msg2);
     }
     else
     {
         brokerConnection.recv (&msg1);
-        std::string str (static_cast<char *> (msg1.data ()), msg1.size ());
-
         brokerConnection.recv (&msg2);
     }
-    // std::string str2 (static_cast<char *> (msg2.data ()), msg2.size ());
     status = processIncomingMessage (msg2, connection_info);
 
     return status;
 }
 
-void ZmqCommsSS::closeReceiver ()
-{
-    // Send close message to close Tx and Rx connection
-    ActionMessage cmd (CMD_PROTOCOL);
-    cmd.messageID = CLOSE_RECEIVER;
-    transmit (control_route, cmd);
-}
-
 }  // namespace zeromq
-// namespace zeromq
 }  // namespace helics

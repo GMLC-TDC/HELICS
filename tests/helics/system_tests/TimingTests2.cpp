@@ -5,8 +5,7 @@ the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 
-#include <boost/test/unit_test.hpp>
-#include <boost/test/floating_point_comparison.hpp>
+#include "gtest/gtest.h"
 
 #include <complex>
 
@@ -15,11 +14,13 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "../application_api/testFixtures.hpp"
 #include "helics/helics.hpp"
 #include <future>
-BOOST_FIXTURE_TEST_SUITE (timing_tests2, FederateTestFixture)
 
+struct timing_tests2 : public FederateTestFixture, public ::testing::Test
+{
+};
 /** just a check that in the simple case we do actually get the time back we requested*/
 
-BOOST_AUTO_TEST_CASE (small_time_test)
+TEST_F (timing_tests2, small_time_test)
 {
     SetupTest<helics::ValueFederate> ("test", 2);
     auto vFed1 = GetFederateAs<helics::ValueFederate> (0);
@@ -37,7 +38,7 @@ BOOST_AUTO_TEST_CASE (small_time_test)
     vFed1->enterExecutingModeAsync ();
     vFed2->enterExecutingMode ();
     vFed1->enterExecutingModeComplete ();
-    auto echoRun = [&]() {
+    auto echoRun = [&] () {
         helics::Time grantedTime = helics::timeZero;
         helics::Time stopTime (100, time_units::ns);
         while (grantedTime < stopTime)
@@ -71,15 +72,15 @@ BOOST_AUTO_TEST_CASE (small_time_test)
         }
         else
         {
-            BOOST_CHECK (grantedTime == requestedTime - helics::Time (9, time_units::ns));
+            EXPECT_TRUE (grantedTime == requestedTime - helics::Time (9, time_units::ns));
             // printf("grantedTime=%e\n", static_cast<double>(grantedTime));
             if (sub2_a.isUpdated ())
             {
-                BOOST_CHECK_EQUAL (sub2_a.getValue<double> (), 10.3);
+                EXPECT_EQ (sub2_a.getValue<double> (), 10.3);
             }
             if (sub2_b.isUpdated ())
             {
-                BOOST_CHECK_EQUAL (sub2_b.getValue<double> (), 11.2);
+                EXPECT_EQ (sub2_b.getValue<double> (), 11.2);
             }
         }
     }
@@ -89,7 +90,7 @@ BOOST_AUTO_TEST_CASE (small_time_test)
 }
 
 /** this test requires a major change to the timing subsystem
-BOOST_AUTO_TEST_CASE(ring_test3)
+TEST_F(timing_tests2,ring_test3)
 {
     SetupTest<helics::ValueFederate>("test_2", 3);
     auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
@@ -114,58 +115,57 @@ BOOST_AUTO_TEST_CASE(ring_test3)
     vFed3->requestTimeAsync(50.0);
 
     auto newTime = vFed2->requestTimeComplete();
-    BOOST_CHECK_EQUAL(newTime, 1e-9);
-    BOOST_CHECK(sub2.isUpdated());
+    EXPECT_EQ(newTime, 1e-9);
+    EXPECT_TRUE(sub2.isUpdated());
     double val = sub2.getValue<double>();
     pub2->publish(val);
     vFed2->requestTimeAsync(50.0);
     newTime = vFed3->requestTimeComplete();
-    BOOST_CHECK_EQUAL(newTime, 1e-9);
-    BOOST_CHECK(sub3.isUpdated());
+    EXPECT_EQ(newTime, 1e-9);
+    EXPECT_TRUE(sub3.isUpdated());
     val = sub3.getValue<double>();
     pub3->publish(val);
     vFed3->requestTimeAsync(50.0);
     newTime = vFed1->requestTimeComplete();
-    BOOST_CHECK_EQUAL(newTime, 1e-9);
-    BOOST_CHECK(sub1.isUpdated());
+    EXPECT_EQ(newTime, 1e-9);
+    EXPECT_TRUE(sub1.isUpdated());
     val = sub1.getValue<double>();
     pub1->publish(val);
     vFed1->requestTimeAsync(50.0);
     // round 2 for time
     newTime = vFed2->requestTimeComplete();
-    BOOST_CHECK_EQUAL(newTime, 2e-9);
-    BOOST_CHECK(sub2.isUpdated());
+    EXPECT_EQ(newTime, 2e-9);
+    EXPECT_TRUE(sub2.isUpdated());
     val = sub2.getValue<double>();
     pub2->publish(val);
     vFed2->requestTimeAsync(50.0);
     newTime = vFed3->requestTimeComplete();
-    BOOST_CHECK_EQUAL(newTime, 2e-9);
-    BOOST_CHECK(sub3.isUpdated());
+    EXPECT_EQ(newTime, 2e-9);
+    EXPECT_TRUE(sub3.isUpdated());
     val = sub3.getValue<double>();
     pub3->publish(val);
     vFed3->requestTimeAsync(50.0);
     newTime = vFed1->requestTimeComplete();
-    BOOST_CHECK_EQUAL(newTime, 2e-9);
-    BOOST_CHECK(sub1.isUpdated());
+    EXPECT_EQ(newTime, 2e-9);
+    EXPECT_TRUE(sub1.isUpdated());
     val = sub1.getValue<double>();
     pub1->publish(val);
     vFed1->requestTimeAsync(50.0);
     // round 3
     newTime = vFed2->requestTimeComplete();
-    BOOST_CHECK_EQUAL(newTime, 3e-9);
-    BOOST_CHECK(sub2.isUpdated());
+    EXPECT_EQ(newTime, 3e-9);
+    EXPECT_TRUE(sub2.isUpdated());
     val = sub2.getValue<double>();
     vFed2->finalize();
     newTime = vFed3->requestTimeComplete();
-    BOOST_CHECK_EQUAL(newTime, 50.0);
-    BOOST_CHECK(!sub3.isUpdated());
+    EXPECT_EQ(newTime, 50.0);
+    EXPECT_TRUE(!sub3.isUpdated());
     val = sub3.getValue<double>();
     vFed3->finalize();
     newTime = vFed1->requestTimeComplete();
-    BOOST_CHECK_EQUAL(newTime, 50.0);
-    BOOST_CHECK(!sub1.isUpdated());
+    EXPECT_EQ(newTime, 50.0);
+    EXPECT_TRUE(!sub1.isUpdated());
     vFed1->finalize();
 }
 
 */
-BOOST_AUTO_TEST_SUITE_END ()

@@ -14,8 +14,8 @@ SPDX-License-Identifier: BSD-3-Clause
 class AsioContextManager;
 namespace asio
 {
-    class io_context;
-} // namespace asio
+class io_context;
+}  // namespace asio
 
 namespace helics
 {
@@ -47,7 +47,6 @@ class TcpCommsSS final : public NetworkCommsInterface
     virtual void queue_rx_function () override;  //!< the functional loop for the receive queue
     virtual void queue_tx_function () override;  //!< the loop for transmitting data
 
-    virtual void closeReceiver () override;  //!< function to instruct the receiver loop to close
     /** process an incoming message
     return code for required action 0=NONE, -1 TERMINATE*/
     int processIncomingMessage (ActionMessage &&cmd);
@@ -59,8 +58,6 @@ class TcpCommsSS final : public NetworkCommsInterface
     @return a the number of bytes used by the function
     */
     size_t dataReceive (std::shared_ptr<TcpConnection> connection, const char *data, size_t bytes_received);
-
-    bool commErrorHandler (std::shared_ptr<TcpConnection> connection, const std::error_code &error);
     //  bool errorHandle()
 };
 

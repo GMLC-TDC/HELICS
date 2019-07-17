@@ -5,7 +5,6 @@ the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 #include "testFixtures.hpp"
-#include <boost/test/unit_test.hpp>
 
 #include "helics/core/BrokerFactory.hpp"
 #include "helics/core/CoreFactory.hpp"
