@@ -43,6 +43,7 @@ class BrokerBase
     Time timeout{30.0};  //!< timeout to wait to establish a broker connection before giving up
     Time networkTimeout{-1.0};  //!< timeout to establish a socket connection before giving up
     std::string identifier;  //!< an identifier for the broker
+    std::string brokerKey;  //!< a key that all joining federates must have to connect if empty no key is required
     // address is mutable since during initial phases it may not be fixed so to maintain a consistent public
     // interface for extracting it this variable may need to be updated in a constant function
     mutable std::string address;  //!< network location of the broker
