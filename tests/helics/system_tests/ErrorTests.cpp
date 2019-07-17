@@ -60,6 +60,16 @@ TEST_F (error_tests, already_init_broker)
     broker->disconnect ();
 }
 
+TEST_F (error_tests, mismatch_broker_key)
+{
+    auto broker = AddBroker ("test", 1);
+    
+    helics::FederateInfo fi (helics::core_type::TEST);
+    fi.coreInitString = std::string ("--timeout=1s --key=tkey --broker=") + broker->getIdentifier ();
+    EXPECT_THROW (helics::ValueFederate fed3 ("fed222", fi), helics::RegistrationFailure);
+    broker->disconnect();
+}
+
 TEST_F (error_tests, already_init_core)
 {
     auto broker = AddBroker ("test", 1);
