@@ -672,12 +672,15 @@ const char *actionMessageType (action_message_def::action_t action)
     }
     return static_cast<const char *> (unknownStr);
 }
-// set of strings to translate error codes to something sensible
-static constexpr std::pair<int, const char *> errorStrings[] = {{-2, "connection error"},
-                                                                {-5, "lost connection with server"},
-                                                                {5, "already in initialization mode"},
-                                                                {6, "duplicate federate name detected"},
-                                                                {7, "duplicate broker name detected"}};
+
+
+                            // set of strings to translate error codes to something sensible
+  static constexpr std::pair<int, const char *> errorStrings[] = {{connection_error_code, "connection error"},
+  {lost_server_connection_code, "lost connection with server"},
+    {already_init_error_code, "already in initialization mode"},
+      {duplicate_federate_name_error_code,"duplicate federate name detected"},
+    {duplicate_broker_name_error_code, "duplicate broker name detected"},
+    {mismatch_broker_key_error_code, "Broker key does not match"}};
 
 using errorPair = std::pair<int, const char *>;
 static constexpr size_t errEnd = sizeof (errorStrings) / sizeof (errorPair);

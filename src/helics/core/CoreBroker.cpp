@@ -126,6 +126,21 @@ uint16_t CoreBroker::getNextAirlockIndex ()
     return index;
 }
 
+bool CoreBroker::verifyBrokerKey (ActionMessage &mess) const
+{
+    if (mess.getStringData ().size () > 1)
+    {
+        return verifyBrokerKey (mess.getString (1));
+    }
+    else
+    {
+        return brokerKey.empty ();
+    }
+}
+/** verify the broker key contained in a string
+@return false if the keys do not match*/
+bool CoreBroker::verifyBrokerKey (const std::string &key) const { return key == brokerKey; }
+
 void CoreBroker::makeConnections (const std::string &file)
 {
     if (hasTomlExtension (file))
@@ -357,6 +372,33 @@ void CoreBroker::processPriorityCommand (ActionMessage &&command)
             }
             return;
         }
+        if (!verifyBrokerKey (command))
+        {
+            route_id newroute;
+            bool route_created = false;
+            if ((!command.source_id.isValid ()) || (command.source_id == parent_broker_id))
+            {
+                newroute = route_id{routeCount++};
+                addRoute (newroute, command.getString (targetStringLoc));
+                route_created = true;
+            }
+            else
+            {
+                newroute = getRoute (command.source_id);
+            }
+            ActionMessage badKey (CMD_BROKER_ACK);
+            setActionFlag (badKey, error_flag);
+            badKey.source_id = global_broker_id_local;
+            badKey.messageID = mismatch_broker_key_error_code;
+            badKey.name = command.name;
+            badKey.setString (0, "broker key does not match");
+            transmit (newroute, badKey);
+            if (route_created)
+            {
+                removeRoute (newroute);
+            }
+            return;
+        }
         auto inserted = _brokers.insert (command.name, nullptr, command.name);
         if (!inserted)
         {
@@ -375,7 +417,7 @@ void CoreBroker::processPriorityCommand (ActionMessage &&command)
             ActionMessage badName (CMD_BROKER_ACK);
             setActionFlag (badName, error_flag);
             badName.source_id = global_broker_id_local;
-            badName.messageID = 7;
+            badName.messageID = duplicate_broker_name_error_code;
             badName.name = command.name;
             transmit (newroute, badName);
             if (route_created)
@@ -1687,7 +1729,7 @@ bool CoreBroker::connect ()
                     else
                     {
                         m.setStringData (getAddress ());
-					}
+                    }
                     transmit (parent_route_id, m);
                 }
                 LOG_CONNECTIONS (parent_broker_id, getIdentifier (),
