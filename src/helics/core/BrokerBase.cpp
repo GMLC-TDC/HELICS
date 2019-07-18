@@ -254,6 +254,13 @@ bool BrokerBase::sendToLogger (global_federate_id federateID,
 
 void BrokerBase::generateNewIdentifier () { identifier = genId (0); }
 
+void BrokerBase::setErrorState (int eCode, const std::string &estring)
+{
+    lastErrorString = estring;
+    errorCode = eCode;
+    brokerState.store (broker_state_t::errored);
+}
+
 void BrokerBase::setLoggerFunction (std::function<void(int, const std::string &, const std::string &)> logFunction)
 {
     loggerFunction = std::move (logFunction);

@@ -665,7 +665,7 @@ static constexpr size_t actEnd = sizeof (actionStrings) / sizeof (actionPair);
 const char *actionMessageType (action_message_def::action_t action)
 {
     auto pptr = static_cast<const actionPair *> (actionStrings);
-    auto res = std::find_if (pptr, pptr + actEnd, [action] (const auto &pt) { return (pt.first == action); });
+    auto res = std::find_if (pptr, pptr + actEnd, [action](const auto &pt) { return (pt.first == action); });
     if (res != pptr + actEnd)
     {
         return res->second;
@@ -673,14 +673,14 @@ const char *actionMessageType (action_message_def::action_t action)
     return static_cast<const char *> (unknownStr);
 }
 
-
-                            // set of strings to translate error codes to something sensible
-  static constexpr std::pair<int, const char *> errorStrings[] = {{connection_error_code, "connection error"},
+// set of strings to translate error codes to something sensible
+static constexpr std::pair<int, const char *> errorStrings[] = {
+  {connection_error_code, "connection error"},
   {lost_server_connection_code, "lost connection with server"},
-    {already_init_error_code, "already in initialization mode"},
-      {duplicate_federate_name_error_code,"duplicate federate name detected"},
-    {duplicate_broker_name_error_code, "duplicate broker name detected"},
-    {mismatch_broker_key_error_code, "Broker key does not match"}};
+  {already_init_error_code, "already in initialization mode"},
+  {duplicate_federate_name_error_code, "duplicate federate name detected"},
+  {duplicate_broker_name_error_code, "duplicate broker name detected"},
+  {mismatch_broker_key_error_code, "Broker key does not match"}};
 
 using errorPair = std::pair<int, const char *>;
 static constexpr size_t errEnd = sizeof (errorStrings) / sizeof (errorPair);
@@ -690,13 +690,25 @@ static constexpr size_t errEnd = sizeof (errorStrings) / sizeof (errorPair);
 const char *commandErrorString (int errorcode)
 {
     auto pptr = static_cast<const errorPair *> (errorStrings);
-    auto res =
-      std::find_if (pptr, pptr + errEnd, [errorcode] (const auto &pt) { return (pt.first == errorcode); });
+    auto res = std::find_if (pptr, pptr + errEnd, [errorcode](const auto &pt) { return (pt.first == errorcode); });
     if (res != pptr + errEnd)
     {
         return res->second;
     }
     return static_cast<const char *> (unknownStr);
+}
+
+std::string errorMessageString (const ActionMessage &command)
+{
+    if (checkActionFlag (command, error_flag))
+    {
+        auto &estring = command.getString (0);
+        if (estring.empty ())
+        {
+            return commandErrorString (command.messageID);
+        }
+        return estring;
+    }
 }
 
 std::string prettyPrintString (const ActionMessage &command)

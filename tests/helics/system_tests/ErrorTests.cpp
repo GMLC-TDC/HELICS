@@ -63,11 +63,46 @@ TEST_F (error_tests, already_init_broker)
 TEST_F (error_tests, mismatch_broker_key)
 {
     auto broker = AddBroker ("test", 1);
-    
+
     helics::FederateInfo fi (helics::core_type::TEST);
     fi.coreInitString = std::string ("--timeout=1s --key=tkey --broker=") + broker->getIdentifier ();
     EXPECT_THROW (helics::ValueFederate fed3 ("fed222", fi), helics::RegistrationFailure);
-    broker->disconnect();
+    broker->disconnect ();
+    auto core = helics::CoreFactory::findJoinableCoreOfType (helics::core_type::TEST);
+    if (core)
+    {
+        core->disconnect ();
+    }
+    helics::cleanupHelicsLibrary ();
+}
+
+TEST_F (error_tests, mismatch_broker_key2)
+{
+    auto broker = AddBroker ("test", "-f 1 --key=tkey2");
+
+    helics::FederateInfo fi (helics::core_type::TEST);
+    fi.coreInitString = std::string ("--timeout=1s --key=tkey --broker=") + broker->getIdentifier ();
+    EXPECT_THROW (helics::ValueFederate fed3 ("fed222", fi), helics::RegistrationFailure);
+    broker->disconnect ();
+    auto core = helics::CoreFactory::findJoinableCoreOfType (helics::core_type::TEST);
+    if (core)
+    {
+        core->disconnect ();
+    }
+    helics::cleanupHelicsLibrary ();
+}
+
+TEST_F (error_tests, mismatch_broker_key_success)
+{
+    auto broker = AddBroker ("test", "--key=tkey");
+
+    helics::FederateInfo fi (helics::core_type::TEST);
+    fi.coreInitString = std::string ("--timeout=1s --key=tkey --broker=") + broker->getIdentifier ();
+    helics::ValueFederate fed3 ("fed2b", fi);
+    fed3.enterExecutingMode ();
+    fed3.finalize ();
+    broker->waitForDisconnect ();
+    helics::cleanupHelicsLibrary ();
 }
 
 TEST_F (error_tests, already_init_core)

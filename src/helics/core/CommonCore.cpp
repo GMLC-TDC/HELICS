@@ -110,7 +110,7 @@ bool CommonCore::connect ()
                 {
                     m.setStringData (getAddress (), brokerKey);
                 }
-                
+
                 setActionFlag (m, core_flag);
                 transmit (parent_route_id, m);
                 brokerState = broker_state_t::connected;
@@ -491,8 +491,15 @@ local_federate_id CommonCore::registerFederate (const std::string &name, const C
 {
     if (!waitCoreRegistration ())
     {
-        throw (
-          RegistrationFailure ("core is unable to register and has timed out, federate cannot be registered"));
+        if (brokerState == errored)
+        {
+            throw (RegistrationFailure (lastErrorString));
+        }
+        else
+        {
+            throw (
+              RegistrationFailure ("core is unable to register and has timed out, federate cannot be registered"));
+        }
     }
     if (brokerState >= operating)
     {
@@ -2191,17 +2198,28 @@ void CommonCore::processPriorityCommand (ActionMessage &&command)
     case CMD_REG_BROKER:
         // These really shouldn't happen here probably means something went wrong in setup but we can handle it
         // forward the connection request to the higher level
-        LOG_WARNING (parent_broker_id, identifier,
-                     "Core received reg broker message, likely improper federation setup\n");
-        transmit (parent_route_id, command);
+        if (command.name == identifier)
+        {
+            LOG_ERROR (global_broker_id_local, identifier,
+                       "received locally sent registration message, broker loop, please set the broker address to "
+                       "a valid broker");
+        }
+        else
+        {
+            LOG_WARNING (parent_broker_id, identifier,
+                         "Core received reg broker message, likely improper federation setup\n");
+            transmit (parent_route_id, command);
+        }
         break;
     case CMD_BROKER_ACK:
         if (command.payload == identifier)
         {
             if (checkActionFlag (command, error_flag))
             {
-                LOG_ERROR (parent_broker_id, identifier, "broker responded with error\n");
-                // TODO:generate error messages in response to all the delayed messages
+                auto estring = std::string ("broker responded with error: ") + errorMessageString (command);
+                setErrorState (command.messageID, estring);
+                errorRespondDelayedMessages (estring);
+                LOG_ERROR (parent_broker_id, identifier, estring);
                 break;
             }
             global_id = global_broker_id (command.dest_id);
@@ -2321,6 +2339,20 @@ void CommonCore::transmitDelayedMessages ()
             msg->source_id = global_broker_id_local;
         }
         routeMessage (*msg);
+        msg = delayTransmitQueue.pop ();
+    }
+}
+
+void CommonCore::errorRespondDelayedMessages (const std::string &estring)
+{
+    auto msg = delayTransmitQueue.pop ();
+    while (msg)
+    {
+        if (msg->source_id == parent_broker_id)
+        {
+            msg->source_id = global_broker_id_local;
+        }
+
         msg = delayTransmitQueue.pop ();
     }
 }
