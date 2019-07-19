@@ -6,11 +6,23 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 A note on future revisions.  
   Everything within a major version number should be code compatible (with the exception of experimental interfaces).  The most notable example of an experimental interface is the support for multiple source inputs.  The APIs to deal with this will change in future minor releases.  Everything within a single minor release should be network compatible with other federates on the same minor release number.  Compatibility across minor release numbers may be possible in some situations but we are not going to guarantee this as those components are subject to performance improvements and may need to be modified at some point.  Patch releases will be limited to bug fixes and other improvements not impacting the public API or network compatibility.  Check [here](./docs/Public_API.md) for details on what is included and excluded from the public API and version stability.
+##\[2.2.0\] ~ 2019-08-02
+Minor release with some updates to the networking portion of HELICS
+
+### Changed
+
+### Fixed
+-   A error response to a core registration will immediately generate an error on federates waiting for registration instead of waiting for a timeout
+
+### Added
+-   The ability specify a broker key for brokers and cores to limit linking to those cores with the appropriate key
+
+### Removed
 
 ## \[2.1.1\] - 2019-07-15
 Minor release which fixes a few bugs and add some JSON related input and queries
 
-## Changed
+### Changed
 -   moved concurrency related structures to a standalone library
 -   System-tests is now based on google test instead of boost test
 -   Shared_libary_cpp tests now based on google_test instead of boost test

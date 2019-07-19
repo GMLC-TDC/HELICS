@@ -128,7 +128,7 @@ void ActionMessage::setString (int index, const std::string &str)
     {
         if (index >= static_cast<int> (stringData.size ()))
         {
-            stringData.resize (index + 1);
+            stringData.resize (static_cast<size_t>(index) + 1);
         }
         stringData[index] = str;
     }
@@ -250,7 +250,7 @@ std::string ActionMessage::packetize () const
 void ActionMessage::packetize (std::string &data) const
 {
     auto sz = serializedByteCount ();
-    data.resize (sz + 4);
+    data.resize (static_cast<size_t>(sz) + 4);
     toByteArray (&(data[4]), sz);
 
     data[0] = LEADING_CHAR;
@@ -709,6 +709,7 @@ std::string errorMessageString (const ActionMessage &command)
         }
         return estring;
     }
+    return std::string{};
 }
 
 std::string prettyPrintString (const ActionMessage &command)

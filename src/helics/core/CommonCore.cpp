@@ -493,13 +493,13 @@ local_federate_id CommonCore::registerFederate (const std::string &name, const C
     {
         if (brokerState == errored)
         {
-            throw (RegistrationFailure (lastErrorString));
+            if (!lastErrorString.empty ())
+            {
+                throw (RegistrationFailure (lastErrorString));
+            }
         }
-        else
-        {
-            throw (
-              RegistrationFailure ("core is unable to register and has timed out, federate cannot be registered"));
-        }
+        throw (
+          RegistrationFailure ("core is unable to register and has timed out, federate cannot be registered"));
     }
     if (brokerState >= operating)
     {
@@ -1652,10 +1652,7 @@ void CommonCore::deliverMessage (ActionMessage &message)
                         {
                             if (FiltI->filterOp != nullptr)
                             {
-                                if (FiltI->cloning)
-                                {
-                                    FiltI->filterOp->process (createMessageFromCommand (message));
-                                }
+                                FiltI->filterOp->process (createMessageFromCommand (message));
                             }
                         }
                     }
@@ -2348,11 +2345,11 @@ void CommonCore::errorRespondDelayedMessages (const std::string &estring)
     auto msg = delayTransmitQueue.pop ();
     while (msg)
     {
-        if (msg->source_id == parent_broker_id)
-        {
-            msg->source_id = global_broker_id_local;
+        if ((*msg).action () == CMD_QUERY || (*msg).action () == CMD_BROKER_QUERY)
+        {//deal with in flight queries that will block unless a response is given
+            ActiveQueries.setDelayedValue ((*msg).messageID, std::string("#error:")+estring);
         }
-
+		//else other message which might get into here shouldn't need any action, just drop them
         msg = delayTransmitQueue.pop ();
     }
 }
@@ -2381,7 +2378,7 @@ void CommonCore::transmitDelayedMessages (global_federate_id source)
             routeMessage (*msg);
         }
         else
-        {
+        {  // these messages were delayed for a different purpose and will be dealt with in a different way
             buffer.push_back (std::move (*msg));
         }
         msg = delayTransmitQueue.pop ();
@@ -3789,7 +3786,7 @@ bool CommonCore::waitCoreRegistration ()
         std::this_thread::sleep_for (std::chrono::milliseconds (100));
         brkid = global_id.load ();
         ++sleepcnt;
-        if (Time (sleepcnt * 100, time_units::ms) > timeout)
+        if (Time (static_cast<int64_t>(sleepcnt) * 100, time_units::ms) > timeout)
         {
             return false;
         }
