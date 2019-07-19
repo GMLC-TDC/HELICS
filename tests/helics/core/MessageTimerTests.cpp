@@ -14,6 +14,9 @@ using namespace std::literals::chrono_literals;
 
 TEST (messageTimer_tests, basic_test)
 {
+    auto contextPtr = AsioContextManager::getContextPointer ();
+    auto loopHandle = contextPtr->startContextLoop ();
+    EXPECT_TRUE (contextPtr->isRunning ());
     gmlc::libguarded::atomic_guarded<ActionMessage> M;
     auto cback = [&M](ActionMessage &&m) { M = std::move (m); };
     auto mtimer = std::make_shared<MessageTimer> (cback);

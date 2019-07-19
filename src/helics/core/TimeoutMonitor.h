@@ -17,12 +17,14 @@ class ActionMessage;
 class TimeoutMonitor
 {
   public:
+    /** tick function for a core,  executes one tick*/
     void tick (CommonCore *core);
     void tick (CoreBroker *brk);
+    /** get a ping reply*/
     void pingReply (const ActionMessage &m);
-
+    /**  set the overall timeout for the monitor*/
     void setTimeout (std::chrono::milliseconds to) { timeout = to; }
-
+    /** reset the monitor to initial conditions*/
     void reset ()
     {
         waitingForPingReply = false;

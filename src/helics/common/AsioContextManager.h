@@ -129,7 +129,8 @@ class AsioContextManager : public std::enable_shared_from_this<AsioContextManage
     manager is closed or the haltContextLoop function is called and there is no more work
     */
     LoopHandle startContextLoop ();
-
+    /** check if the contextLoopo is running*/
+    bool isRunning () const { return running.load (); }
   private:
     /** halt the context loop thread if the counter==0
     @details decrements the loop request counter and if it is 0 then will halt the

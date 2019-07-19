@@ -74,6 +74,30 @@ void serialize (Archive &archive, NamedPoint &m)
     archive (m.name, m.value);
 }
 
+namespace detail
+{
+struct membuf : std::streambuf
+{
+    membuf (const char *buf, size_t size)
+    {
+        char *cbuf (const_cast<char *> (buf));
+        this->setg (cbuf, cbuf, cbuf + size);
+    }
+};
+struct imemstream : virtual membuf, std::istream
+{
+    imemstream (const char *buf, size_t size)
+        : membuf (buf, size), std::istream (static_cast<std::streambuf *> (this))
+    {
+    }
+};
+
+struct ostreambuf : public std::streambuf
+{
+    ostreambuf (char *buf, size_t size) { this->setg (buf, buf, buf + size); }
+};
+}  // namespace detail
+
 #if defined ENABLE_BOOST_IOSTREAMS && !defined DISABLE_BOOST_IOSTREAMS
 template <class X>
 void ValueConverter<X>::convert (const X &val, data_block &store)
@@ -82,6 +106,7 @@ void ValueConverter<X>::convert (const X &val, data_block &store)
     data.reserve (sizeof (store) + 1);
     boost::iostreams::back_insert_device<std::string> inserter (data);
     boost::iostreams::stream<boost::iostreams::back_insert_device<std::string>> s (inserter);
+   // detail::ostreambuf (&(data[0]),sizeof(store)
     archiver oa (s);
 
     oa (val);
@@ -161,8 +186,8 @@ struct is_iterable<T,
                    typename std::enable_if_t<
                      std::is_same<decltype (std::begin (T ()) != std::end (T ()),  // begin/end and operator != and
                                                                                    // has default constructor
-                                            void (),
-                                            void (*std::begin (T ())),  // dereference operator
+                                            void(),
+                                            void(*std::begin (T ())),  // dereference operator
                                             std::true_type{}),
                                   std::true_type>::value>>
 {
@@ -223,8 +248,9 @@ void ValueConverter<X>::interpret (const data_view &block, X &val)
     {
         throw std::invalid_argument ("invalid data size");
     }
-    boost::iostreams::basic_array_source<char> device (block.data (), block.size ());
-    boost::iostreams::stream<boost::iostreams::basic_array_source<char>> s (device);
+    detail::imemstream s (block.data (), block.size ());
+    // boost::iostreams::basic_array_source<char> device (block.data (), block.size ());
+    // boost::iostreams::stream<boost::iostreams::basic_array_source<char>> s (device);
     retriever ia (s);
     try
     {
