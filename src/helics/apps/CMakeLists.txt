@@ -134,7 +134,8 @@ endif (BUILD_APP_LIBRARY)
 
 # configure executable app
 
-IF (BUILD_APP_EXECUTABLES)
+if (NOT CYGWIN)
+if (BUILD_APP_EXECUTABLES)
 configure_file(helicsConfigMain.h.in ${CMAKE_CURRENT_BINARY_DIR}/helicsConfigMain.h)
 add_executable(
   helics-config helicsConfigMain.cpp ${CMAKE_CURRENT_BINARY_DIR}/helicsConfigMain.h
@@ -152,3 +153,5 @@ install(
 )
 
 endif(BUILD_APP_EXECUTABLES)
+
+endif(NOT CYGWIN)
