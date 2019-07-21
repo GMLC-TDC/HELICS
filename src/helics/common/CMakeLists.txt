@@ -14,11 +14,8 @@ set(
   AsioContextManager.h
   logger.h
   loggerCore.hpp
-  stringOps.h
   GuardedTypes.hpp
   generic_string_ops.hpp
-  charMapper.h
-  base64.h
   fmt_format.h
   fmt_ostream.h
   addTargets.hpp
@@ -32,9 +29,6 @@ set(
   TomlProcessingFunctions.cpp
   logger.cpp
   loggerCore.cpp
-  stringOps.cpp
-  charMapper.cpp
-  base64.cpp
 )
 
 set(

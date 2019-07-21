@@ -14,8 +14,8 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include "../common/JsonProcessingFunctions.hpp"
 
-#include "../common/stringOps.h"
 #include "../core/helicsVersion.hpp"
+#include "gmlc/utilities/stringOps.h"
 // static const std::regex creg
 // (R"raw((-?\d+(\.\d+)?|\.\d+)[\s,]*([^\s]*)(\s+[cCdDvVsSiIfF]?\s+|\s+)([^\s]*))raw");
 
@@ -135,7 +135,7 @@ void App::loadFile (const std::string &filename)
 
 void App::loadTextFile (const std::string &textFile)
 {
-    using namespace stringOps;
+    using namespace gmlc::utilities::stringOps;
     std::ifstream infile (textFile);
     std::string str;
 

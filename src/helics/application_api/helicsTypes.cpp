@@ -6,14 +6,16 @@ SPDX-License-Identifier: BSD-3-Clause
 */
 
 #include "helicsTypes.hpp"
-#include "../common/stringOps.h"
 #include "ValueConverter.hpp"
+#include "gmlc/utilities/stringOps.h"
 #include <algorithm>
 #include <numeric>
 #include <regex>
 #include <unordered_map>
 #include <boost/core/demangle.hpp>
 #include <boost/lexical_cast.hpp>
+
+using namespace gmlc::utilities;
 
 namespace helics
 {

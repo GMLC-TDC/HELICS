@@ -317,6 +317,10 @@ if(NOT EXISTS "${PROJECT_SOURCE_DIR}/ThirdParty/concurrency/gmlc/concurrency/Tri
 	submod_update(ThirdParty/concurrency)
 endif()
 
+if(NOT EXISTS "${PROJECT_SOURCE_DIR}/ThirdParty/utilities/gmlc/utilities/stringOps.h")
+	submod_update(ThirdParty/utilities)
+endif()
+
 include(GNUInstallDirs)
 
 # -------------------------------------------------------------
@@ -421,6 +425,7 @@ target_include_directories(
         $<INSTALL_INTERFACE:$<INSTALL_PREFIX>/include>
         $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/ThirdParty/containers>
         $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/ThirdParty/concurrency>
+		$<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/ThirdParty/utilities>
 )
 
 target_include_directories(
@@ -566,6 +571,14 @@ target_include_directories(
 )
 set_target_properties(jsoncpp_lib PROPERTIES FOLDER Extern)
 endif()
+
+# -----------------------------------------------------------------------------
+# create utilities target
+# -----------------------------------------------------------------------------
+set(UTILITIES_LIBRARY_TYPE OBJECT)
+add_subdirectory(ThirdParty/utilities)
+set_target_properties(gmlc_utilities PROPERTIES FOLDER Extern)
+
 # -----------------------------------------------------------------------------
 # CMAKE Subdirectories
 # -----------------------------------------------------------------------------
