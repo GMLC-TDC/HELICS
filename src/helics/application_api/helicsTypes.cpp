@@ -7,13 +7,12 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include "helicsTypes.hpp"
 #include "ValueConverter.hpp"
-#include "gmlc/utilities/stringOps.h"
+#include "gmlc/utilities/stringConversion.h"
 #include <algorithm>
 #include <numeric>
 #include <regex>
 #include <unordered_map>
 #include <boost/core/demangle.hpp>
-#include <boost/lexical_cast.hpp>
 
 using namespace gmlc::utilities;
 
@@ -207,9 +206,9 @@ std::complex<double> helicsGetComplex (const std::string &val)
     {
         if (m.size () == 9)
         {
-            re = boost::lexical_cast<double> (m[1]);
+            re = numConv<double> (m[1]);
 
-            im = boost::lexical_cast<double> (m[6]);
+            im = numConv<double> (m[6]);
 
             if (*m[5].first == '-')
             {
@@ -222,18 +221,18 @@ std::complex<double> helicsGetComplex (const std::string &val)
             {
                 auto strval = val.substr (0, val.size () - 1);
                 stringOps::trimString (strval);
-                im = boost::lexical_cast<double> (strval);
+                im = numConv<double> (strval);
                 re = 0.0;
             }
             else
             {
                 auto strval = val;
                 stringOps::trimString (strval);
-                re = boost::lexical_cast<double> (strval);
+                re = numConv<double> (strval);
             }
         }
     }
-    catch (const boost::bad_lexical_cast &)
+    catch (const std::invalid_argument &)
     {
         re = -1e49;
     }
@@ -385,7 +384,7 @@ NamedPoint helicsGetNamedPoint (const std::string &val)
     point.name = stringOps::removeQuotes (str1);
     auto vstr = val.substr (locsep + 1, locend - locsep - 1);
     stringOps::trimString (vstr);
-    point.value = boost::lexical_cast<double> (vstr);
+    point.value = numConv<double> (vstr);
     return point;
 }
 
@@ -475,17 +474,12 @@ void helicsGetVector (const std::string &val, std::vector<double> &data)
         for (decltype (sz) ii = 0; ii < sz; ++ii)
         {
             auto nc = val.find_first_of (";,]", fb + 1);
-            try
-            {
-                std::string vstr = val.substr (fb + 1, nc - fb - 1);
-                stringOps::trimString (vstr);
-                auto V = boost::lexical_cast<double> (vstr);
-                data.push_back (V);
-            }
-            catch (const boost::bad_lexical_cast &)
-            {
-                data.push_back (-1e49);
-            }
+
+            std::string vstr = val.substr (fb + 1, nc - fb - 1);
+            stringOps::trimString (vstr);
+            auto V = numeric_conversion<double> (vstr, -1e49);
+            data.push_back (V);
+
             fb = nc;
         }
     }
@@ -543,11 +537,11 @@ void helicsGetComplexVector (const std::string &val, std::vector<std::complex<do
                 stringOps::trimString (vstr1);
                 std::string vstr2 = val.substr (nc + 1, nc2 - nc - 1);
                 stringOps::trimString (vstr2);
-                auto V1 = boost::lexical_cast<double> (vstr1);
-                auto V2 = boost::lexical_cast<double> (vstr2);
+                auto V1 = numConv<double> (vstr1);
+                auto V2 = numConv<double> (vstr2);
                 data.emplace_back (V1, V2);
             }
-            catch (const boost::bad_lexical_cast &)
+            catch (const std::invalid_argument &)
             {
                 data.emplace_back (-1e49);
             }

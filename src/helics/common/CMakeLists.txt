@@ -7,7 +7,6 @@
 
 set(
   common_headers
-  timeRepresentation.hpp
   JsonProcessingFunctions.hpp
   JsonBuilder.hpp
   TomlProcessingFunctions.hpp
