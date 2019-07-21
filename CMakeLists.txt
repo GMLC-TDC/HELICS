@@ -578,6 +578,8 @@ endif()
 set(UTILITIES_LIBRARY_TYPE OBJECT)
 add_subdirectory(ThirdParty/utilities)
 set_target_properties(gmlc_utilities PROPERTIES FOLDER Extern)
+message(STATUS "Boost include=${Boost_INCLUDE_DIRS})
+target_include_directories(gmlc_utilities SYSTEM PRIVATE ${Boost_INCLUDE_DIRS})
 
 # -----------------------------------------------------------------------------
 # CMAKE Subdirectories
