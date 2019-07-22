@@ -426,8 +426,10 @@ target_include_directories(
         $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/ThirdParty/containers>
         $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/ThirdParty/concurrency>
 		$<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/ThirdParty/utilities>
-)
+		$<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/ThirdParty/utilities/gmlc/utilities>
 
+)
+# the utilities/gmlc is to account for some 
 target_include_directories(
     helics_base_includes SYSTEM
     INTERFACE
