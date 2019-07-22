@@ -17,6 +17,7 @@ if(BUILD_APP_LIBRARY)
     helicsApp.hpp
     BrokerApp.hpp
 	MultiBroker.hpp
+	Clone.hpp
   )
 
   set(helics_apps_private_headers PrecHelper.hpp SignalGenerators.hpp)
@@ -33,6 +34,7 @@ if(BUILD_APP_LIBRARY)
     helicsApp.cpp
     BrokerApp.cpp
 	MultiBroker.cpp
+	Clone.cpp
   )
 
   add_library(

@@ -10,6 +10,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "../core/core-exceptions.hpp"
 #include "../core/helicsCLI11.hpp"
 #include "BrokerApp.hpp"
+#include "Clone.hpp"
 #include "Echo.hpp"
 #include "Player.hpp"
 #include "Recorder.hpp"
@@ -47,6 +48,19 @@ int main (int argc, char *argv[])
       })
       ->footer ([] {
           helics::apps::Recorder rec ({"-?"});
+          return std::string{};
+      });
+    app.add_subcommand ("clone", "Helics Clone App")
+      ->callback ([&app] () {
+          helics::apps::Clone cloner (app.remaining_for_passthrough (true));
+          std::cout << "clone subcommand\n";
+          if (cloner.isActive ())
+          {
+              cloner.run ();
+          }
+      })
+      ->footer ([] {
+          helics::apps::Clone rec ({"-?"});
           return std::string{};
       });
     app.add_subcommand ("echo", "Helics Echo App")
