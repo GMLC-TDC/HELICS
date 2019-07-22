@@ -286,7 +286,7 @@ install(
 )
 
 install(
-  FILES ${PROJECT_SRC_DIR}/ThirdParty/utilities/gmlc/utilities/TimeRepresentation.hpp
+  FILES ${PROJECT_SRC_DIR}/ThirdParty/utilities/gmlc/utilities/timeRepresentation.hpp
   DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/helics/gmlc/utilities/
   COMPONENT headers
 )
