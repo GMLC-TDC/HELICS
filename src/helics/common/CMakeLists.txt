@@ -14,7 +14,6 @@ set(
   logger.h
   loggerCore.hpp
   GuardedTypes.hpp
-  generic_string_ops.hpp
   fmt_format.h
   fmt_ostream.h
   addTargets.hpp
@@ -50,13 +49,10 @@ set(
 # headers that are part of the public interface
 set(
   helics_public_common
-  timeRepresentation.hpp
   JsonProcessingFunctions.hpp
   AsioContextManager.h
   logger.h
-  stringOps.h
   GuardedTypes.hpp
-  generic_string_ops.hpp
 )
 
 if(ENABLE_ZMQ_CORE)
