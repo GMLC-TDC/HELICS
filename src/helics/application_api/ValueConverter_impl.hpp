@@ -28,12 +28,6 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <utility>
 //#include <cereal/archives/binary.hpp>
 #include <cereal/types/string.hpp>
-#if defined ENABLE_BOOST_IOSTREAMS && !defined DISABLE_BOOST_IOSTREAMS
-#include <boost/iostreams/device/back_inserter.hpp>
-#include <boost/iostreams/stream.hpp>
-#else
-#include <sstream>
-#endif
 
 using archiver = cereal::PortableBinaryOutputArchive;
 
@@ -193,15 +187,9 @@ struct ostreambuf : public std::streambuf
 };
 }  // namespace detail
 
-#if defined ENABLE_BOOST_IOSTREAMS && !defined DISABLE_BOOST_IOSTREAMS
 template <class X>
 void ValueConverter<X>::convert (const X &val, data_block &store)
 {
-    // std::string data;
-    // data.reserve (sizeof (store) + 1);
-    // boost::iostreams::back_insert_device<std::string> inserter (data);
-    // boost::iostreams::stream<boost::iostreams::back_insert_device<std::string>> s (inserter);
-    // detail::ostreambuf (&(data[0]),sizeof(store)
     detail::ostringbufstream s;
     archiver oa (s);
 
@@ -215,11 +203,6 @@ void ValueConverter<X>::convert (const X &val, data_block &store)
 template <class X>
 void ValueConverter<X>::convert (const X *vals, size_t size, data_block &store)
 {
-    // std::string data;
-    // data.reserve (sizeof (store) + 1);
-    // boost::iostreams::back_insert_device<std::string> inserter (data);
-    // boost::iostreams::stream<boost::iostreams::back_insert_device<std::string>> s (inserter);
-
     detail::ostringbufstream s;
     archiver oa (s);
     oa (cereal::make_size_tag (size));  // number of elements
@@ -232,33 +215,7 @@ void ValueConverter<X>::convert (const X *vals, size_t size, data_block &store)
     // store = std::move (data);
     store = s.extractString ();
 }
-#else
-template <class X>
-void ValueConverter<X>::convert (const X &val, data_block &store)
-{
-    std::ostringstream sst;
-    archiver oa (sst);
-    oa (val);
-    // don't forget to flush the stream to finish writing into the buffer
-    sst.flush ();
-    store = sst.str ();
-}
 
-template <class X>
-void ValueConverter<X>::convert (const X *vals, size_t size, data_block &store)
-{
-    std::ostringstream sst;
-    archiver oa (sst);
-    oa (cereal::make_size_tag (size));  // number of elements
-    for (size_t ii = 0; ii < size; ++ii)
-    {
-        oa (vals[ii]);
-    }
-    // don't forget to flush the stream to finish writing into the buffer
-    sst.flush ();
-    store = sst.str ();
-}
-#endif
 /** template trait for figuring out if something is a vector of objects*/
 template <typename T, typename _ = void>
 struct is_vector
@@ -285,8 +242,8 @@ struct is_iterable<T,
                    typename std::enable_if_t<
                      std::is_same<decltype (std::begin (T ()) != std::end (T ()),  // begin/end and operator != and
                                                                                    // has default constructor
-                                            void(),
-                                            void(*std::begin (T ())),  // dereference operator
+                                            void (),
+                                            void (*std::begin (T ())),  // dereference operator
                                             std::true_type{}),
                                   std::true_type>::value>>
 {
@@ -339,7 +296,6 @@ data_block ValueConverter<X>::convert (const X &val)
     return dv;
 }
 
-#if defined ENABLE_BOOST_IOSTREAMS && !defined DISABLE_BOOST_IOSTREAMS
 template <class X>
 void ValueConverter<X>::interpret (const data_view &block, X &val)
 {
@@ -348,8 +304,6 @@ void ValueConverter<X>::interpret (const data_view &block, X &val)
         throw std::invalid_argument ("invalid data size");
     }
     detail::imemstream s (block.data (), block.size ());
-    // boost::iostreams::basic_array_source<char> device (block.data (), block.size ());
-    // boost::iostreams::stream<boost::iostreams::basic_array_source<char>> s (device);
     retriever ia (s);
     try
     {
@@ -360,28 +314,7 @@ void ValueConverter<X>::interpret (const data_view &block, X &val)
         throw std::invalid_argument (ce.what ());
     }
 }
-#else
-template <class X>
-void ValueConverter<X>::interpret (const data_view &block, X &val)
-{
-    if (block.size () < getMinSize<X> ())
-    {
-        throw std::invalid_argument ("invalid data size");
-    }
-    std::istringstream sst;
-    sst.str (block.string ());
 
-    retriever ia (sst);
-    try
-    {
-        ia (val);
-    }
-    catch (const cereal::Exception &ce)
-    {
-        throw std::invalid_argument (ce.what ());
-    }
-}
-#endif
 template <class X>
 X ValueConverter<X>::interpret (const data_view &block)
 {
