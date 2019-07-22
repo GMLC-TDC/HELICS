@@ -13,6 +13,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "data_view.hpp"
 #include "helicsTypes.hpp"
 #include <algorithm>
+#include <array>
 #include <cassert>
 #include <cereal/archives/portable_binary.hpp>
 #include <cereal/cereal.hpp>
@@ -76,20 +77,114 @@ void serialize (Archive &archive, NamedPoint &m)
 
 namespace detail
 {
-struct membuf : std::streambuf
+// templates for this derived from http://www.voidcn.com/article/p-vjnlygmc-gy.html
+class membuf : public std::streambuf
 {
-    membuf (const char *buf, size_t size)
+  public:
+    membuf (const char *buf, size_t size) : begin_ (buf), end_ (buf + size), current_ (buf) {}
+
+  private:
+    int_type underflow ()
     {
-        char *cbuf (const_cast<char *> (buf));
-        this->setg (cbuf, cbuf, cbuf + size);
+        if (current_ == end_)
+            return traits_type::eof ();
+
+        return traits_type::to_int_type (*current_);
     }
+    int_type uflow ()
+    {
+        if (current_ == end_)
+            return traits_type::eof ();
+
+        return traits_type::to_int_type (*current_++);
+    }
+    int_type pbackfail (int_type ch)
+    {
+        if (current_ == begin_ || (ch != traits_type::eof () && ch != current_[-1]))
+            return traits_type::eof ();
+
+        return traits_type::to_int_type (*--current_);
+    }
+    std::streamsize showmanyc () { return end_ - current_; }
+
+    // copy ctor and assignment not implemented;
+    // copying not allowed
+    membuf (const membuf &) = delete;
+    membuf &operator= (const membuf &) = delete;
+
+  private:
+    const char *const begin_;
+    const char *const end_;
+    const char *current_;
 };
+
 struct imemstream : virtual membuf, std::istream
 {
     imemstream (const char *buf, size_t size)
         : membuf (buf, size), std::istream (static_cast<std::streambuf *> (this))
     {
     }
+};
+
+/** class to create a stream directly to a string that can be extracted*/
+class ostringbuf : public std::streambuf
+{
+  public:
+    ostringbuf ()
+    {
+        char *base = abuf_.data ();
+        setp (base, base + 63);  // one less than the buffer size
+    }
+    /** reserve a size of the buffer*/
+    void reserve (size_t size) { sbuf_.reserve (size); }
+    /** extract the string in the buffer and reset the string buffer*/
+    std::string extractString ()
+    {
+        std::string retString (std::move (sbuf_));
+        sbuf_.clear ();
+        return retString;
+    }
+
+  protected:
+    void move_to_string_and_flush ()
+    {
+        sbuf_.append (pbase (), pptr ());
+        std::ptrdiff_t n = pptr () - pbase ();
+        pbump (-n);
+    }
+
+  private:
+    int_type overflow (int_type ch)
+    {
+        if (ch != traits_type::eof ())
+        {
+            *pptr () = ch;
+            pbump (1);  // always safe due to buffer at 1 space reserved
+            move_to_string_and_flush ();
+            return ch;
+        }
+
+        return traits_type::eof ();
+    }
+    int sync ()
+    {
+        move_to_string_and_flush ();
+        return 0;
+    }
+
+    // copy ctor and assignment not implemented;
+    // copying not allowed
+    ostringbuf (const ostringbuf &) = delete;
+    ostringbuf &operator= (const ostringbuf &) = delete;
+
+  private:
+    std::array<char, 64> abuf_;
+    std::string sbuf_;
+};
+
+struct ostringbufstream : virtual ostringbuf, std::ostream
+{
+    ostringbufstream () : std::ostream (static_cast<std::streambuf *> (this)) {}
 };
 
 struct ostreambuf : public std::streambuf
@@ -102,27 +197,30 @@ struct ostreambuf : public std::streambuf
 template <class X>
 void ValueConverter<X>::convert (const X &val, data_block &store)
 {
-    std::string data;
-    data.reserve (sizeof (store) + 1);
-    boost::iostreams::back_insert_device<std::string> inserter (data);
-    boost::iostreams::stream<boost::iostreams::back_insert_device<std::string>> s (inserter);
-   // detail::ostreambuf (&(data[0]),sizeof(store)
+    // std::string data;
+    // data.reserve (sizeof (store) + 1);
+    // boost::iostreams::back_insert_device<std::string> inserter (data);
+    // boost::iostreams::stream<boost::iostreams::back_insert_device<std::string>> s (inserter);
+    // detail::ostreambuf (&(data[0]),sizeof(store)
+    detail::ostringbufstream s;
     archiver oa (s);
 
     oa (val);
 
     // don't forget to flush the stream to finish writing into the buffer
     s.flush ();
-    store = std::move (data);
+    store = s.extractString ();
 }
 
 template <class X>
 void ValueConverter<X>::convert (const X *vals, size_t size, data_block &store)
 {
-    std::string data;
-    data.reserve (sizeof (store) + 1);
-    boost::iostreams::back_insert_device<std::string> inserter (data);
-    boost::iostreams::stream<boost::iostreams::back_insert_device<std::string>> s (inserter);
+    // std::string data;
+    // data.reserve (sizeof (store) + 1);
+    // boost::iostreams::back_insert_device<std::string> inserter (data);
+    // boost::iostreams::stream<boost::iostreams::back_insert_device<std::string>> s (inserter);
+
+    detail::ostringbufstream s;
     archiver oa (s);
     oa (cereal::make_size_tag (size));  // number of elements
     for (size_t ii = 0; ii < size; ++ii)
@@ -131,7 +229,8 @@ void ValueConverter<X>::convert (const X *vals, size_t size, data_block &store)
     }
     // don't forget to flush the stream to finish writing into the buffer
     s.flush ();
-    store = std::move (data);
+    // store = std::move (data);
+    store = s.extractString ();
 }
 #else
 template <class X>
