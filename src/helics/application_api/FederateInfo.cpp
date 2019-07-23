@@ -226,7 +226,7 @@ std::unique_ptr<helicsCLI11App> FederateInfo::makeCLIApp ()
     app->add_option ("--corename", coreName, "the name of the core to create or find")->ignore_underscore ();
     app->addTypeOption ();
     app->add_option ("--coreinitstring,-i,--coreinit", coreInitString, "The initialization arguments for the core")
-      ->transform ([](std::string arg) {
+      ->transform ([] (std::string arg) {
           arg.insert (arg.begin (), ' ');
           return arg;
       })
@@ -238,86 +238,90 @@ std::unique_ptr<helicsCLI11App> FederateInfo::makeCLIApp ()
       ->check (CLI::PositiveNumber);
 
     app
-      ->add_option_function<int> ("--port",
-                                  [this](int port) {
-                                      if (brokerPort > 0)
-                                          localport = std::to_string (port);
-                                      else
-                                          brokerPort = port;
-                                  },
-                                  "Specify the port number to use")
+      ->add_option_function<int> (
+        "--port",
+        [this] (int port) {
+            if (brokerPort > 0)
+                localport = std::to_string (port);
+            else
+                brokerPort = port;
+        },
+        "Specify the port number to use")
       ->check (CLI::PositiveNumber);
     app->add_option ("--localport", localport, "Port number to use for connections to this federate")
       ->ignore_underscore ();
     app->add_flag ("--autobroker", autobroker, "tell the core to automatically generate a broker if needed");
+    app->add_option ("--key,--broker_key", key,
+                     "specify a key to use to match a broker should match the broker key");
+    app->add_option_function<Time> (
+      "--offset", [this] (Time val) { setProperty (helics_property_time_offset, val); },
+      "the offset of the time steps (default in ms)");
+    app->add_option_function<Time> (
+      "--period", [this] (Time val) { setProperty (helics_property_time_period, val); },
+      "the execution cycle of the federate (default in ms)");
+    app
+      ->add_option_function<Time> (
+        "--timedelta", [this] (Time val) { setProperty (helics_property_time_delta, val); },
+        "The minimum time between time grants for a Federate (default in ms)")
+      ->ignore_underscore ();
+    app
+      ->add_option_function<Time> (
+        "--rtlag", [this] (Time val) { setProperty (helics_property_time_rt_lag, val); },
+        "the amount of the time the federate is allowed to lag realtime before "
+        "corrective action is taken (default in ms)")
+      ->ignore_underscore ();
+    app
+      ->add_option_function<Time> (
+        "--rtlead", [this] (Time val) { setProperty (helics_property_time_rt_lead, val); },
+        "the amount of the time the federate is allowed to lead realtime before "
+        "corrective action is taken (default in ms)")
+      ->ignore_underscore ();
+    app
+      ->add_option_function<Time> (
+        "--rttolerance", [this] (Time val) { setProperty (helics_property_time_rt_tolerance, val); },
+        "the time tolerance of the real time mode (default in ms)")
+      ->ignore_underscore ();
 
-    app->add_option_function<Time> ("--offset",
-                                    [this](Time val) { setProperty (helics_property_time_offset, val); },
-                                    "the offset of the time steps (default in ms)");
-    app->add_option_function<Time> ("--period",
-                                    [this](Time val) { setProperty (helics_property_time_period, val); },
-                                    "the execution cycle of the federate (default in ms)");
     app
-      ->add_option_function<Time> ("--timedelta",
-                                   [this](Time val) { setProperty (helics_property_time_delta, val); },
-                                   "The minimum time between time grants for a Federate (default in ms)")
+      ->add_option_function<Time> (
+        "--inputdelay", [this] (Time val) { setProperty (helics_property_time_input_delay, val); },
+        "the input delay on incoming communication of the federate (default in ms)")
       ->ignore_underscore ();
     app
-      ->add_option_function<Time> ("--rtlag", [this](Time val) { setProperty (helics_property_time_rt_lag, val); },
-                                   "the amount of the time the federate is allowed to lag realtime before "
-                                   "corrective action is taken (default in ms)")
+      ->add_option_function<Time> (
+        "--outputdelay", [this] (Time val) { setProperty (helics_property_time_output_delay, val); },
+        "the output delay for outgoing communication of the federate (default in ms)")
       ->ignore_underscore ();
     app
-      ->add_option_function<Time> ("--rtlead",
-                                   [this](Time val) { setProperty (helics_property_time_rt_lead, val); },
-                                   "the amount of the time the federate is allowed to lead realtime before "
-                                   "corrective action is taken (default in ms)")
-      ->ignore_underscore ();
-    app
-      ->add_option_function<Time> ("--rttolerance",
-                                   [this](Time val) { setProperty (helics_property_time_rt_tolerance, val); },
-                                   "the time tolerance of the real time mode (default in ms)")
-      ->ignore_underscore ();
-
-    app
-      ->add_option_function<Time> ("--inputdelay",
-                                   [this](Time val) { setProperty (helics_property_time_input_delay, val); },
-                                   "the input delay on incoming communication of the federate (default in ms)")
-      ->ignore_underscore ();
-    app
-      ->add_option_function<Time> ("--outputdelay",
-                                   [this](Time val) { setProperty (helics_property_time_output_delay, val); },
-                                   "the output delay for outgoing communication of the federate (default in ms)")
-      ->ignore_underscore ();
-    app
-      ->add_option_function<int> ("--maxiterations",
-                                  [this](int val) { setProperty (helics_property_int_max_iterations, val); },
-                                  "the maximum number of iterations a federate is allowed to take")
+      ->add_option_function<int> (
+        "--maxiterations", [this] (int val) { setProperty (helics_property_int_max_iterations, val); },
+        "the maximum number of iterations a federate is allowed to take")
       ->ignore_underscore ()
       ->check (CLI::PositiveNumber);
     app
-      ->add_option_function<int> ("--loglevel,--log-level",
-                                  [this](int val) { setProperty (helics_property_time_output_delay, val); },
-                                  "the logging level of a federate")
+      ->add_option_function<int> (
+        "--loglevel,--log-level", [this] (int val) { setProperty (helics_property_time_output_delay, val); },
+        "the logging level of a federate")
       ->ignore_underscore ()
       ->transform (CLI::CheckedTransformer (&log_level_map, CLI::ignore_case, CLI::ignore_underscore));
 
     app
-      ->add_option ("--separator",
-                    [this](CLI::results_t res) {
-                        separator = res[0][0];
-                        if (res[0].size () != 1)
-                            return false;
-                        return true;
-                    },
-                    "separator character for local federates")
+      ->add_option (
+        "--separator",
+        [this] (CLI::results_t res) {
+            separator = res[0][0];
+            if (res[0].size () != 1)
+                return false;
+            return true;
+        },
+        "separator character for local federates")
       ->default_str (std::string (1, separator))
       ->type_size (1)
       ->type_name ("CHAR");
     app->add_option ("--flags,-f,--flag", "named flag for the federate")
       ->type_size (-1)
       ->delimiter (',')
-      ->each ([this](const std::string &flag) { loadFlags (*this, flag); });
+      ->each ([this] (const std::string &flag) { loadFlags (*this, flag); });
     app->allow_extras ();
     return app;
 }
@@ -395,15 +399,15 @@ FederateInfo loadFederateInfoJson (const std::string &jsonString)
         throw (helics::InvalidParameter (ia.what ()));
     }
 
-    std::function<void(const std::string &, bool)> flagCall = [&fi](const std::string &fname, bool arg) {
+    std::function<void (const std::string &, bool)> flagCall = [&fi] (const std::string &fname, bool arg) {
         fi.setFlagOption (propStringsTranslations.at (fname), arg);
     };
 
-    std::function<void(const std::string &, Time)> timeCall = [&fi](const std::string &fname, Time arg) {
+    std::function<void (const std::string &, Time)> timeCall = [&fi] (const std::string &fname, Time arg) {
         fi.setProperty (propStringsTranslations.at (fname), arg);
     };
 
-    std::function<void(const std::string &, int)> intCall = [&fi](const std::string &fname, int arg) {
+    std::function<void (const std::string &, int)> intCall = [&fi] (const std::string &fname, int arg) {
         fi.setProperty (propStringsTranslations.at (fname), arg);
     };
 
@@ -427,6 +431,7 @@ FederateInfo loadFederateInfoJson (const std::string &jsonString)
     }
 
     replaceIfMember (doc, "broker", fi.broker);
+    replaceIfMember (doc, "key", fi.key);
     fi.brokerPort = getOrDefault (doc, "brokerport", int64_t (fi.brokerPort));
     replaceIfMember (doc, "localport", fi.localport);
     replaceIfMember (doc, "autobroker", fi.autobroker);
@@ -524,15 +529,15 @@ FederateInfo loadFederateInfoToml (const std::string &tomlString)
     {
         throw (helics::InvalidParameter (ia.what ()));
     }
-    std::function<void(const std::string &, bool)> flagCall = [&fi](const std::string &fname, bool arg) {
+    std::function<void (const std::string &, bool)> flagCall = [&fi] (const std::string &fname, bool arg) {
         fi.setFlagOption (propStringsTranslations.at (fname), arg);
     };
 
-    std::function<void(const std::string &, Time)> timeCall = [&fi](const std::string &fname, Time arg) {
+    std::function<void (const std::string &, Time)> timeCall = [&fi] (const std::string &fname, Time arg) {
         fi.setProperty (propStringsTranslations.at (fname), arg);
     };
 
-    std::function<void(const std::string &, int)> intCall = [&fi](const std::string &fname, int arg) {
+    std::function<void (const std::string &, int)> intCall = [&fi] (const std::string &fname, int arg) {
         fi.setProperty (propStringsTranslations.at (fname), arg);
     };
 
@@ -556,6 +561,7 @@ FederateInfo loadFederateInfoToml (const std::string &tomlString)
     }
     replaceIfMember (doc, "autobroker", fi.autobroker);
     replaceIfMember (doc, "broker", fi.broker);
+    replaceIfMember (doc, "key", fi.key);
     fi.brokerPort = getOrDefault (doc, "brokerport", fi.brokerPort);
     replaceIfMember (doc, "localport", fi.localport);
     if (isMember (doc, "port"))
@@ -662,6 +668,12 @@ std::string generateFullCoreInitString (const FederateInfo &fi)
     if (fi.autobroker)
     {
         res.append (" --autobroker");
+    }
+
+    if (!fi.key.empty ())
+    {
+        res += " --key=";
+        res.append (fi.key);
     }
     return res;
 }

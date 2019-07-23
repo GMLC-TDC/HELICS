@@ -25,6 +25,8 @@ namespace helics
 {
 using namespace std::string_literals;
 
+constexpr char universalKey[] = "**";
+
 CoreBroker::~CoreBroker ()
 {
     std::lock_guard<std::mutex> lock (name_mutex_);
@@ -84,7 +86,7 @@ const BasicBrokerInfo *CoreBroker::getBrokerById (global_broker_id brokerid) con
 }
 
 void CoreBroker::setLoggingCallback (
-  const std::function<void(int, const std::string &, const std::string &)> &logFunction)
+  const std::function<void (int, const std::string &, const std::string &)> &logFunction)
 {
     ActionMessage loggerUpdate (CMD_BROKER_CONFIGURE);
     loggerUpdate.messageID = UPDATE_LOGGING_CALLBACK;
@@ -139,7 +141,10 @@ bool CoreBroker::verifyBrokerKey (ActionMessage &mess) const
 }
 /** verify the broker key contained in a string
 @return false if the keys do not match*/
-bool CoreBroker::verifyBrokerKey (const std::string &key) const { return key == brokerKey; }
+bool CoreBroker::verifyBrokerKey (const std::string &key) const
+{
+    return (key == brokerKey || brokerKey == universalKey);
+}
 
 void CoreBroker::makeConnections (const std::string &file)
 {
@@ -654,14 +659,13 @@ std::string CoreBroker::generateFederationSummary () const
             break;
         }
     }
-    std::string output =
-      fmt::format ("Federation Summary> \n\t{} federates [min {}]\n\t{}/{} brokers/cores [min {}]\n\t{} "
-                   "publications\n\t{} inputs\n\t{} endpoints\n\t{} filters\n<<<<<<<<<",
-                   _federates.size (), minFederateCount,
-                   std::count_if (_brokers.begin (), _brokers.end (),
-                                  [](auto &brk) { return brk._core == false; }),
-                   std::count_if (_brokers.begin (), _brokers.end (), [](auto &brk) { return brk._core == true; }),
-                   minBrokerCount, pubs, ipts, epts, filt);
+    std::string output = fmt::format (
+      "Federation Summary> \n\t{} federates [min {}]\n\t{}/{} brokers/cores [min {}]\n\t{} "
+      "publications\n\t{} inputs\n\t{} endpoints\n\t{} filters\n<<<<<<<<<",
+      _federates.size (), minFederateCount,
+      std::count_if (_brokers.begin (), _brokers.end (), [] (auto &brk) { return brk._core == false; }),
+      std::count_if (_brokers.begin (), _brokers.end (), [] (auto &brk) { return brk._core == true; }),
+      minBrokerCount, pubs, ipts, epts, filt);
     return output;
 }
 
@@ -809,6 +813,10 @@ void CoreBroker::processCommand (ActionMessage &&command)
     }
     break;
     case CMD_INIT_GRANT:
+        if (brokerKey == universalKey)
+        {
+            LOG_SUMMARY (global_broker_id_local, getIdentifier (), " Broker started with universal key");
+        }
         brokerState = broker_state_t::operating;
         for (auto &brk : _brokers)
         {
@@ -1209,7 +1217,7 @@ void CoreBroker::processBrokerConfigureCommands (ActionMessage &cmd)
             auto op = dataAirlocks[cmd.counter].try_unload ();
             if (op)
             {
-                auto M = stx::any_cast<std::function<void(int, const std::string &, const std::string &)>> (
+                auto M = stx::any_cast<std::function<void (int, const std::string &, const std::string &)>> (
                   std::move (*op));
                 setLoggerFunction (std::move (M));
             }
@@ -1687,7 +1695,8 @@ std::shared_ptr<helicsCLI11App> CoreBroker::generateCLI ()
 {
     auto app = std::make_shared<helicsCLI11App> ("Option for Broker");
     app->remove_helics_specifics ();
-    app->add_flag_callback ("--root", [this]() { setAsRoot (); }, "specify whether the broker is a root");
+    app->add_flag_callback (
+      "--root", [this] () { setAsRoot (); }, "specify whether the broker is a root");
     return app;
 }
 
@@ -1722,7 +1731,7 @@ bool CoreBroker::connect ()
                     m.source_id = global_federate_id{};
                     m.name = getIdentifier ();
 
-                    if (!brokerKey.empty ())
+                    if (!brokerKey.empty () && brokerKey != universalKey)
                     {
                         m.setStringData (getAddress (), brokerKey);
                     }
@@ -1915,6 +1924,10 @@ void CoreBroker::broadcast (ActionMessage &cmd)
 
 void CoreBroker::executeInitializationOperations ()
 {
+    if (brokerKey == universalKey)
+    {
+        LOG_SUMMARY (global_broker_id_local, getIdentifier (), " Broker started with universal key");
+    }
     checkDependencies ();
 
     if (unknownHandles.hasUnknowns ())
@@ -1927,7 +1940,7 @@ void CoreBroker::executeInitializationOperations ()
                 eMiss.source_id = global_broker_id_local;
                 eMiss.messageID = defs::errors::connection_failure;
                 unknownHandles.processRequiredUnknowns (
-                  [this, &eMiss](const std::string &target, char type, global_handle handle) {
+                  [this, &eMiss] (const std::string &target, char type, global_handle handle) {
                       switch (type)
                       {
                       case 'p':
@@ -1962,7 +1975,7 @@ void CoreBroker::executeInitializationOperations ()
             wMiss.source_id = global_broker_id_local;
             wMiss.messageID = defs::errors::connection_failure;
             unknownHandles.processNonOptionalUnknowns (
-              [this, &wMiss](const std::string &target, char type, global_handle handle) {
+              [this, &wMiss] (const std::string &target, char type, global_handle handle) {
                   switch (type)
                   {
                   case 'p':
@@ -2422,33 +2435,35 @@ std::string CoreBroker::generateQueryAnswer (const std::string &request)
     }
     if (request == "federates")
     {
-        return generateStringVector (_federates, [](auto &fed) { return fed.name; });
+        return generateStringVector (_federates, [] (auto &fed) { return fed.name; });
     }
     if (request == "brokers")
     {
-        return generateStringVector (_brokers, [](auto &brk) { return brk.name; });
+        return generateStringVector (_brokers, [] (auto &brk) { return brk.name; });
     }
     if (request == "inputs")
     {
-        return generateStringVector_if (handles, [](auto &handle) { return handle.key; },
-                                        [](auto &handle) { return (handle.handleType == handle_type::input); });
+        return generateStringVector_if (
+          handles, [] (auto &handle) { return handle.key; },
+          [] (auto &handle) { return (handle.handleType == handle_type::input); });
     }
     if (request == "publications")
     {
-        return generateStringVector_if (handles, [](auto &handle) { return handle.key; },
-                                        [](auto &handle) {
-                                            return (handle.handleType == handle_type::publication);
-                                        });
+        return generateStringVector_if (
+          handles, [] (auto &handle) { return handle.key; },
+          [] (auto &handle) { return (handle.handleType == handle_type::publication); });
     }
     if (request == "filters")
     {
-        return generateStringVector_if (handles, [](auto &handle) { return handle.key; },
-                                        [](auto &handle) { return (handle.handleType == handle_type::filter); });
+        return generateStringVector_if (
+          handles, [] (auto &handle) { return handle.key; },
+          [] (auto &handle) { return (handle.handleType == handle_type::filter); });
     }
     if (request == "endpoints")
     {
-        return generateStringVector_if (handles, [](auto &handle) { return handle.key; },
-                                        [](auto &handle) { return (handle.handleType == handle_type::endpoint); });
+        return generateStringVector_if (
+          handles, [] (auto &handle) { return handle.key; },
+          [] (auto &handle) { return (handle.handleType == handle_type::endpoint); });
     }
     if (request == "federate_map")
     {
@@ -2487,12 +2502,12 @@ std::string CoreBroker::generateQueryAnswer (const std::string &request)
     if (request == "dependson")
     {
         return generateStringVector (timeCoord->getDependencies (),
-                                     [](const auto &dep) { return std::to_string (dep.baseValue ()); });
+                                     [] (const auto &dep) { return std::to_string (dep.baseValue ()); });
     }
     if (request == "dependents")
     {
         return generateStringVector (timeCoord->getDependents (),
-                                     [](const auto &dep) { return std::to_string (dep.baseValue ()); });
+                                     [] (const auto &dep) { return std::to_string (dep.baseValue ()); });
     }
     if (request == "dependencies")
     {
@@ -2712,7 +2727,7 @@ void CoreBroker::processQuery (const ActionMessage &m)
         }
         else if (m.payload == "list")
         {
-            queryResp.payload = generateStringVector (global_values, [](const auto &gv) { return gv.first; });
+            queryResp.payload = generateStringVector (global_values, [] (const auto &gv) { return gv.first; });
         }
         else if (m.payload == "all")
         {
@@ -2970,13 +2985,13 @@ bool CoreBroker::allInitReady () const
     }
 
     return std::all_of (_brokers.begin (), _brokers.end (),
-                        [](const auto &brk) { return ((brk._nonLocal) || (brk._initRequested)); });
+                        [] (const auto &brk) { return ((brk._nonLocal) || (brk._initRequested)); });
 }
 
 bool CoreBroker::allDisconnected () const
 {
     return std::all_of (_brokers.begin (), _brokers.end (),
-                        [](const auto &brk) { return ((brk._nonLocal) || (brk.isDisconnected)); });
+                        [] (const auto &brk) { return ((brk._nonLocal) || (brk.isDisconnected)); });
 }
 
 }  // namespace helics

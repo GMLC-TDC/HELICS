@@ -105,6 +105,19 @@ TEST_F (error_tests, mismatch_broker_key_success)
     helics::cleanupHelicsLibrary ();
 }
 
+TEST_F (error_tests, mismatch_broker_key_success_universal_key)
+{
+    auto broker = AddBroker ("test", "--key=**");
+
+    helics::FederateInfo fi (helics::core_type::TEST);
+    fi.coreInitString = std::string ("--timeout=1s --key=tkey --broker=") + broker->getIdentifier ();
+    helics::ValueFederate fed3 ("fed2b", fi);
+    fed3.enterExecutingMode ();
+    fed3.finalize ();
+    broker->waitForDisconnect ();
+    helics::cleanupHelicsLibrary ();
+}
+
 TEST_F (error_tests, already_init_core)
 {
     auto broker = AddBroker ("test", 1);
@@ -352,7 +365,7 @@ TEST_P (network_error_tests, test_broker_recovery)
 {
     auto broker = AddBroker (GetParam (), "");
     ASSERT_TRUE (broker->isConnected ());
-    auto res = std::async (std::launch::async, [&broker]() {
+    auto res = std::async (std::launch::async, [&broker] () {
         std::this_thread::sleep_for (std::chrono::milliseconds (1400));
         broker->disconnect ();
     });
