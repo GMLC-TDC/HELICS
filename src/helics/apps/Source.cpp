@@ -16,11 +16,11 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include "../common/JsonProcessingFunctions.hpp"
 
-#include "../common/stringOps.h"
 #include "../core/core-exceptions.hpp"
 #include "../core/helicsCLI11.hpp"
 #include "../core/helicsVersion.hpp"
 #include "SignalGenerators.hpp"
+#include "gmlc/utilities/stringOps.h"
 
 namespace helics
 {

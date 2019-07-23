@@ -19,3 +19,6 @@
 [submodule "ThirdParty/concurrency"]
 	path = ThirdParty/concurrency
 	url = https://github.com/GMLC-TDC/concurrency.git
+[submodule "ThirdParty/utilities"]
+	path = ThirdParty/utilities
+	url = https://github.com/GMLC-TDC/utilities.git

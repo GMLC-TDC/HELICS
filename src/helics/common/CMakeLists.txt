@@ -7,18 +7,13 @@
 
 set(
   common_headers
-  timeRepresentation.hpp
   JsonProcessingFunctions.hpp
   JsonBuilder.hpp
   TomlProcessingFunctions.hpp
   AsioContextManager.h
   logger.h
   loggerCore.hpp
-  stringOps.h
   GuardedTypes.hpp
-  generic_string_ops.hpp
-  charMapper.h
-  base64.h
   fmt_format.h
   fmt_ostream.h
   addTargets.hpp
@@ -32,9 +27,6 @@ set(
   TomlProcessingFunctions.cpp
   logger.cpp
   loggerCore.cpp
-  stringOps.cpp
-  charMapper.cpp
-  base64.cpp
 )
 
 set(
@@ -57,13 +49,10 @@ set(
 # headers that are part of the public interface
 set(
   helics_public_common
-  timeRepresentation.hpp
   JsonProcessingFunctions.hpp
   AsioContextManager.h
   logger.h
-  stringOps.h
   GuardedTypes.hpp
-  generic_string_ops.hpp
 )
 
 if(ENABLE_ZMQ_CORE)

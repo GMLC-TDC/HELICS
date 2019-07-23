@@ -11,7 +11,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <algorithm>
 #include <thread>
 
-#include "../common/stringOps.h"
+#include "gmlc/utilities/stringOps.h"
 
 std::vector<std::string> vectorizeQueryResult (std::string &&queryres)
 {
@@ -21,7 +21,7 @@ std::vector<std::string> vectorizeQueryResult (std::string &&queryres)
     }
     if (queryres.front () == '[')
     {
-        std::vector<std::string> strs = stringOps::splitline (queryres, ';');
+        std::vector<std::string> strs = gmlc::utilities::stringOps::splitline (queryres, ';');
         strs.front () = strs.front ().substr (1);  // get rid of the leading '['
         strs.back ().pop_back ();  // get rid of the trailing ']';
         return strs;
@@ -39,7 +39,7 @@ std::vector<std::string> vectorizeQueryResult (const std::string &queryres)
     }
     if (queryres.front () == '[')
     {
-        std::vector<std::string> strs = stringOps::splitline (queryres, ';');
+        std::vector<std::string> strs = gmlc::utilities::stringOps::splitline (queryres, ';');
         strs.front () = strs.front ().substr (1);  // get rid of the leading '['
         strs.back ().pop_back ();  // get rid of the trailing ']';
         return strs;

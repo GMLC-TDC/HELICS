@@ -15,8 +15,8 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <iostream>
 #include <set>
 
-#include "../common/stringOps.h"
 #include "../core/helicsCLI11.hpp"
+#include "gmlc/utilities/stringOps.h"
 
 namespace helics
 {
@@ -144,7 +144,7 @@ static const std::map<std::string, int> log_level_map{{"none", helics_log_level_
 
 static void loadFlags (FederateInfo &fi, const std::string &flags)
 {
-    auto sflgs = stringOps::splitline (flags);
+    auto sflgs = gmlc::utilities::stringOps::splitline (flags);
     for (auto &flg : sflgs)
     {
         if (flg == "autobroker")
@@ -179,7 +179,7 @@ int getPropertyIndex (std::string val)
     {
         return fnd->second;
     }
-    makeLowerCase (val);
+    gmlc::utilities::makeLowerCase (val);
     fnd = propStringsTranslations.find (val);
     if (fnd != propStringsTranslations.end ())
     {
@@ -201,7 +201,7 @@ int getOptionIndex (std::string val)
     {
         return fnd->second;
     }
-    makeLowerCase (val);
+    gmlc::utilities::makeLowerCase (val);
     fnd = optionStringsTranslations.find (val);
     if (fnd != optionStringsTranslations.end ())
     {
