@@ -167,11 +167,19 @@ void Clone::generateInterfaces ()
         auto pubs = vectorizeQueryResult (fed->query (captureFederate, "publications"));
         for (auto &pub : pubs)
         {
+            if (pub.empty ())
+            {
+                continue;
+            }
             addSubscription (pub);
         }
         auto epts = vectorizeQueryResult (fed->query (captureFederate, "endpoints"));
         for (auto &ept : epts)
         {
+            if (ept.empty ())
+            {
+                continue;
+            }
             addSourceEndpointClone (ept);
         }
         cloneSubscriptionsNames = vectorizeQueryResult (fed->query (captureFederate, "subscriptions"));
