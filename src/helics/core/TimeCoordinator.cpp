@@ -267,14 +267,6 @@ std::string TimeCoordinator::generateConfig () const
     {
         s << ",\n\"intput_delay\":" << static_cast<double> (info.inputDelay);
     }
-    if (info.rtLag > timeZero)
-    {
-        s << ",\n\"rt_lag\":" << static_cast<double> (info.rtLag);
-    }
-    if (info.rtLead > timeZero)
-    {
-        s << ",\n\"rt_lead\":" << static_cast<double> (info.rtLead);
-    }
     return s.str ();
 }
 bool TimeCoordinator::hasActiveTimeDependencies () const { return dependencies.hasActiveTimeDependencies (); }

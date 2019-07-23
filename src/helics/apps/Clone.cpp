@@ -9,15 +9,15 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include "../application_api/Filters.hpp"
 #include "../application_api/queryFunctions.hpp"
-#include "../common/stringOps.h"
+#include "gmlc/utilities/stringOps.h"
 
 #include "../common/JsonProcessingFunctions.hpp"
-#include "../common/base64.h"
 #include "../common/fmt_format.h"
 #include "../common/fmt_ostream.h"
 #include "../common/loggerCore.hpp"
 #include "../core/helicsCLI11.hpp"
 #include "PrecHelper.hpp"
+#include "gmlc/utilities/base64.h"
 #include <algorithm>
 #include <fstream>
 #include <iostream>
@@ -82,7 +82,18 @@ catch (...)
 
 void Clone::saveFile (const std::string &filename)
 {
-    Json::Value doc;
+    Json::Value doc = loadJsonStr (fedConfig);
+    doc["global"] = true;
+    if (!cloneSubscriptionsNames.empty ())
+    {
+        doc["subscriptions"] = Json::Value (Json::arrayValue);
+        for (auto &sub : cloneSubscriptionsNames)
+        {
+            Json::Value subsc;
+            subsc["key"] = sub;
+            doc["subscriptions"].append (subsc);
+        }
+    }
     if (!points.empty ())
     {
         doc["points"] = Json::Value (Json::arrayValue);
@@ -183,6 +194,7 @@ void Clone::generateInterfaces ()
             addSourceEndpointClone (ept);
         }
         cloneSubscriptionsNames = vectorizeQueryResult (fed->query (captureFederate, "subscriptions"));
+        fedConfig = fed->query (captureFederate, "config");
     }
 }
 
@@ -252,8 +264,8 @@ void Clone::captureForCurrentTime (Time currentTime, int iteration)
 std::string Clone::encode (const std::string &str2encode)
 {
     return std::string ("b64[") +
-           utilities::base64_encode (reinterpret_cast<const unsigned char *> (str2encode.c_str ()),
-                                     static_cast<int> (str2encode.size ())) +
+           gmlc::utilities::base64_encode (reinterpret_cast<const unsigned char *> (str2encode.c_str ()),
+                                           static_cast<int> (str2encode.size ())) +
            ']';
 }
 

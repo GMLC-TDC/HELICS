@@ -32,8 +32,8 @@ class tcoptions
     Time outputDelay = timeZero;
     Time offset = timeZero;
     Time period = timeZero;
-    Time rtLag = timeZero;
-    Time rtLead = timeZero;
+    // Time rtLag = timeZero;
+    // Time rtLead = timeZero;
     // bool observer = false;
     // bool realtime = false;
     // bool source_only = false;

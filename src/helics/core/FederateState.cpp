@@ -15,6 +15,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <algorithm>
 #include <chrono>
 #include <mutex>
+#include <sstream>
 #include <thread>
 
 #include "MessageTimer.hpp"
@@ -178,6 +179,28 @@ bool FederateState::checkAndSetValue (interface_handle pub_id, const char *data,
     auto pub = interfaceInformation.getPublication (pub_id);
     auto res = pub->CheckSetValue (data, len);
     return res;
+}
+
+std::string FederateState::generateConfig () const
+{
+    static const std::string truestr{"true"};
+    static const std::string falsestr{"false"};
+
+    std::stringstream s;
+    s << "\"only_transmit_on_change\":" << ((only_transmit_on_change) ? truestr : falsestr);
+    s << ",\n\"realtime\":" << ((realtime) ? truestr : falsestr);
+    s << ",\n\"observer\":" << ((observer) ? truestr : falsestr);
+    s << ",\n\"source_only\":" << ((source_only) ? truestr : falsestr);
+    s << ",\n\"strict_input_type_checking\":" << ((source_only) ? truestr : falsestr);
+    if (rt_lag > timeZero)
+    {
+        s << ",\n\"rt_lag\":" << static_cast<double> (rt_lag);
+    }
+    if (rt_lead > timeZero)
+    {
+        s << ",\n\"rt_lead\":" << static_cast<double> (rt_lead);
+    }
+    return s.str ();
 }
 
 uint64_t FederateState::getQueueSize (interface_handle handle_) const
@@ -1727,7 +1750,11 @@ std::string FederateState::processQuery (const std::string &query) const
     }
     if (query == "config")
     {
-        auto str = timeCoord->generateConfig ();
+        std::ostringstream s;
+        s << "{\n" << timeCoord->generateConfig ();
+        s << ",\n" << generateConfig ();
+        s << "}";
+        return s.str ();
     }
     if (query == "dependents")
     {

@@ -133,6 +133,7 @@ class Clone : public App
     std::map<std::string, int> eptNames;  //!< translate endpoint name to index
     std::vector<ValueStats> vStat;  //!< storage for statistics capture
     std::string captureFederate;  //!< storage for the name of the federate to clone
+    std::string fedConfig;  //!< storage for the federateConfiguration
     std::string mapfile;  //!< file name for the on-line file updater
     std::string outFileName{"out.txt"};  //!< the final output file
 };
