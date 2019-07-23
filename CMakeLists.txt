@@ -429,7 +429,8 @@ target_include_directories(
 		$<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/ThirdParty/utilities/gmlc/utilities>
 
 )
-# the utilities/gmlc is to account for some 
+# the utilities/gmlc is to account for the transfer of the header to a known location on install
+
 target_include_directories(
     helics_base_includes SYSTEM
     INTERFACE
@@ -582,6 +583,16 @@ add_subdirectory(ThirdParty/utilities)
 set_target_properties(gmlc_utilities PROPERTIES FOLDER Extern)
 message(STATUS "Boost include=${Boost_INCLUDE_DIRS}")
 target_include_directories(gmlc_utilities SYSTEM PRIVATE ${Boost_INCLUDE_DIRS})
+
+file(GLOB UTILITIES_HEADERS_INSTALL_H ${PROJECT_SOURCE_DIR}/ThirdParty/utilities/gmlc/utilities/*.h)
+file(GLOB UTILITIES_HEADERS_INSTALL_HPP ${PROJECT_SOURCE_DIR}/ThirdParty/utilities/gmlc/utilities/*.hpp)
+
+install(
+  FILES ${UTILITIES_HEADERS_INSTALL_H} ${UTILITIES_HEADERS_INSTALL_HPP}
+  ${PROJECT_SOURCE_DIR}/ThirdParty/utilities/LICENSE
+  DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/helics/utilities/
+  COMPONENT headers
+)
 
 # -----------------------------------------------------------------------------
 # CMAKE Subdirectories

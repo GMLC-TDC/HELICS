@@ -284,9 +284,3 @@ install(
   DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/helics
   COMPONENT headers
 )
-
-install(
-  FILES ${PROJECT_SOURCE_DIR}/ThirdParty/utilities/gmlc/utilities/timeRepresentation.hpp
-  DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/helics/utilities/
-  COMPONENT headers
-)
