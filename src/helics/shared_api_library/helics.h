@@ -350,10 +350,18 @@ extern "C"
     /** set the name or connection information for a broker
     @details this is only used if the core is automatically created, the broker information will be transferred to the core for connection
     @param fi the federate info object to alter
-    @param broker a string which defined the connection information for a broker either a name or an address
+    @param broker a string which defines the connection information for a broker either a name or an address
    @param[in,out] err an error object that will contain an error code and string if any error occurred during the execution of the function
     */
     HELICS_EXPORT void helicsFederateInfoSetBroker (helics_federate_info fi, const char *broker, helics_error *err);
+
+    /** set the key for a broker connection
+    @details this is only used if the core is automatically created, the broker information will be transferred to the core for connection
+    @param fi the federate info object to alter
+    @param brokerkey a string containing a key for the broker to connect
+    @param[in,out] err an error object that will contain an error code and string if any error occurred during the execution of the function
+    */
+    HELICS_EXPORT void helicsFederateInfoSetBrokerKey (helics_federate_info fi, const char *brokerkey, helics_error *err);
 
     /** set the port to use for the broker
     @details this is only used if the core is automatically created, the broker information will be transferred to the core for connection

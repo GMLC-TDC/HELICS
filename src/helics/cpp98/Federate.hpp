@@ -78,6 +78,16 @@ class FederateInfo
 
     void setCoreType (int coretype) { helicsFederateInfoSetCoreType (fi, coretype, HELICS_NULL_POINTER); }
 
+    void setBroker (const std::string &broker)
+    {
+        helicsFederateInfoSetBroker (fi, broker.c_str (), HELICS_NULL_POINTER);
+    }
+
+    void setBrokerKey (const std::string &brokerkey)
+    {
+        helicsFederateInfoSetBrokerKey (fi, brokerkey.c_str (), HELICS_NULL_POINTER);
+    }
+
     void setFlagOption (int flag, int value)
     {
         helicsFederateInfoSetFlagOption (fi, flag, value, HELICS_NULL_POINTER);

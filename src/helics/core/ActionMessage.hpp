@@ -319,4 +319,11 @@ std::ostream &operator<< (std::ostream &os, const ActionMessage &command);
 @param newMessage the message to append
 @return the integer location of the message in the stringData section*/
 int appendMessage (ActionMessage &m, const ActionMessage &newMessage);
+
+/** generate a string reprenting an error from an ActionMessage
+@param command the command to generate the error string for
+@return a string describing the error, if the string is not an error the string is empty
+*/
+std::string errorMessageString (const ActionMessage &command);
+
 }  // namespace helics

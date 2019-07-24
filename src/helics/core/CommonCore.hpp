@@ -274,7 +274,8 @@ class CommonCore : public Core, public BrokerBase
     std::unique_ptr<TimeoutMonitor> timeoutMon;  //!< class to handle timeouts and disconnection notices
     /** actually transmit messages that were delayed until the core was actually registered*/
     void transmitDelayedMessages ();
-
+    /** respond to delayed message with an error*/
+    void errorRespondDelayedMessages (const std::string &estring);
     /** actually transmit messages that were delayed for a particular source
     @param source the identifier for the message to transmit
     */

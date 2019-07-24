@@ -41,7 +41,7 @@ class BasicFedInfo
     global_federate_id global_id;  //!< the identification code for the federate
     route_id route;  //!< the routing information for data to be sent to the federate
     global_broker_id parent;  //!< the id of the parent broker/core
-    bool isDisconnected = false;
+    bool isDisconnected = false; //!< flag indicating the federate is disconnected
     explicit BasicFedInfo (const std::string &fedname) : name (fedname){};
 };
 
@@ -153,6 +153,12 @@ class CoreBroker : public Broker, public BrokerBase
     void executeInitializationOperations ();
     /** get an index for an airlock, function is threadsafe*/
     uint16_t getNextAirlockIndex ();
+    /** verify the broker key contained in a message
+	@return false if the keys do not match*/
+	bool verifyBrokerKey (ActionMessage &mess) const;
+    /** verify the broker key contained in a string
+    @return false if the keys do not match*/
+    bool verifyBrokerKey (const std::string &key) const;
 
   public:
     /** connect the core to its broker
