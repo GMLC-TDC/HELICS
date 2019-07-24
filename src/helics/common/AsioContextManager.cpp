@@ -36,7 +36,7 @@ std::shared_ptr<AsioContextManager> AsioContextManager::getContextPointer (const
 {
     std::shared_ptr<AsioContextManager> contextPtr;
     std::lock_guard<std::mutex> ctxlock (contextLock);  // just to ensure that nothing funny happens if you try
-                                                          // to get a context while it is being constructed
+                                                        // to get a context while it is being constructed
     auto fnd = contexts.find (contextName);
     if (fnd != contexts.end ())
     {
@@ -53,7 +53,7 @@ std::shared_ptr<AsioContextManager> AsioContextManager::getContextPointer (const
 std::shared_ptr<AsioContextManager> AsioContextManager::getExistingContextPointer (const std::string &contextName)
 {
     std::lock_guard<std::mutex> ctxlock (contextLock);  // just to ensure that nothing funny happens if you try
-                                                          // to get a context while it is being constructed
+                                                        // to get a context while it is being constructed
     auto fnd = contexts.find (contextName);
     if (fnd != contexts.end ())
     {
@@ -88,7 +88,7 @@ void AsioContextManager::closeContext (const std::string &contextName)
         auto ptr = fnd->second;
         contexts.erase (fnd);
         ctxlock.unlock ();
-        if (ptr->running)
+        if (ptr->isRunning ())
         {
             std::lock_guard<std::mutex> nullLock (ptr->runningLoopLock);
             ptr->nullwork.reset ();
@@ -111,7 +111,7 @@ AsioContextManager::~AsioContextManager ()
 {
     //  std::cout << "deleting context manager\n";
 
-    if (running)
+    if (isRunning ())
     {
         try
         {
@@ -156,11 +156,11 @@ AsioContextManager::LoopHandle AsioContextManager::startContextLoop ()
 {
     ++runCounter;  // atomic
 
-    bool exp = false;
-    if (running.compare_exchange_strong (exp, true))
+    loop_mode exp = loop_mode::stopped;
+    if (running.compare_exchange_strong (exp, loop_mode::starting))
     {
         auto ptr = shared_from_this ();
-        std::packaged_task<void()> contextTask ([ptr = std::move (ptr)]() { contextProcessingLoop (ptr); });
+        std::packaged_task<void ()> contextTask ([ptr = std::move (ptr)] () { contextProcessingLoop (ptr); });
         //   std::cout << "run Context loop " << runCounter << "\n";
         std::unique_lock<std::mutex> nullLock (runningLoopLock);
 
@@ -182,12 +182,12 @@ AsioContextManager::LoopHandle AsioContextManager::startContextLoop ()
                 loopRet.get ();
             }
             nullLock.unlock ();
-            exp = false;
-            if (running.compare_exchange_strong (exp, true))
+            exp = loop_mode::stopped;
+            if (running.compare_exchange_strong (exp, loop_mode::starting))
             {
                 auto ptr = shared_from_this ();
-                std::packaged_task<void()> contextTask (
-                  [ptr = std::move (ptr)]() { contextProcessingLoop (ptr); });
+                std::packaged_task<void ()> contextTask (
+                  [ptr = std::move (ptr)] () { contextProcessingLoop (ptr); });
                 nullLock.lock ();
                 nullwork = std::make_unique<asio::io_context::work> (getBaseContext ());
                 loopRet = contextTask.get_future ();
@@ -202,7 +202,7 @@ AsioContextManager::LoopHandle AsioContextManager::startContextLoop ()
 
 void AsioContextManager::haltContextLoop ()
 {
-    if (running.load ())
+    if (isRunning ())
     {
         // std::cout << "context loop halted "<<ptr->runCounter<<"\n";
         if (--runCounter <= 0)
@@ -251,6 +251,7 @@ void contextProcessingLoop (std::shared_ptr<AsioContextManager> ptr)
         auto clk = std::chrono::steady_clock::now ();
         try
         {
+            ptr->running.store (AsioContextManager::loop_mode::running);
             ptr->ictx->run ();
         }
         catch (const std::system_error &se)
@@ -272,5 +273,5 @@ void contextProcessingLoop (std::shared_ptr<AsioContextManager> ptr)
     }
 
     //   std::cout << "context loop stopped\n";
-    ptr->running.store (false);
+    ptr->running.store (AsioContextManager::loop_mode::stopped);
 }
