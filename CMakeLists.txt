@@ -82,6 +82,18 @@ mark_as_advanced(BUILD_HELICS_BOOST_TESTS)
 
 else()
 endif()
+
+option(HELICS_WITH_CMAKE_PACKAGE "Generate and install cmake package files" ${HELICS_ROOT_PROJ})
+mark_as_advanced(HELICS_WITH_CMAKE_PACKAGE)
+
+
+# Install instructions for this target
+if(HELICS_WITH_CMAKE_PACKAGE)
+    set(HELICS_EXPORT_COMMAND EXPORT helics-targets)
+else(HELICS_WITH_CMAKE_PACKAGE)
+    set(HELICS_EXPORT_COMMAND)
+endif(HELICS_WITH_CMAKE_PACKAGE)
+
 # enable testing
 if(BUILD_HELICS_TESTS)
     include(CTest)
@@ -656,9 +668,9 @@ add_subdirectory(docs)
 
 endif(HELICS_ROOT_PROJ)
 
-install(TARGETS helics_base EXPORT helics-targets)
-install(TARGETS helics_base_includes EXPORT helics-targets)
-install(TARGETS compile_flags_target EXPORT helics-targets)
+install(TARGETS helics_base ${HELICS_EXPORT_COMMAND})
+install(TARGETS helics_base_includes ${HELICS_EXPORT_COMMAND})
+install(TARGETS compile_flags_target ${HELICS_EXPORT_COMMAND})
 set(
     helics_static_file
     "${CMAKE_STATIC_LIBRARY_PREFIX}helics-static${CMAKE_STATIC_LIBRARY_SUFFIX}"
@@ -695,15 +707,19 @@ else()
     set(helics_c_shared_file_debug)
 endif()
 
+
+
+# Copy required CMake module files to build tree for importing build tree with find_package
+file(COPY config/cmake/addMPI.cmake config/cmake/FindZeroMQ.cmake DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+
+if (HELICS_WITH_CMAKE_PACKAGE)
+
 set(
     HELICS_CMAKECONFIG_INSTALL_DIR
     "${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}"
     CACHE STRING "install path for HELICSConfig.cmake"
 )
 mark_as_advanced(HELICS_CMAKECONFIG_INSTALL_DIR)
-
-# Copy required CMake module files to build tree for importing build tree with find_package
-file(COPY config/cmake/addMPI.cmake config/cmake/FindZeroMQ.cmake DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 
 # Export targets for importing build tree with find_package
 export(EXPORT helics-targets
@@ -717,7 +733,7 @@ install(
     DESTINATION ${HELICS_CMAKECONFIG_INSTALL_DIR}
     COMPONENT libs
 )
-
+endif()
 # -----------------------------------------------------------------------------
 # Setup configure.h file for accessing configure options
 # -----------------------------------------------------------------------------
@@ -753,7 +769,7 @@ target_include_directories(cereal
         $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/ThirdParty>
         $<INSTALL_INTERFACE:$<INSTALL_PREFIX>/include/helics/external/optional>
 )
-install(TARGETS cereal EXPORT helics-targets COMPONENT cereal)
+install(TARGETS cereal ${HELICS_EXPORT_COMMAND} COMPONENT cereal)
 endif()
 
 install(

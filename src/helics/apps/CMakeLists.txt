@@ -114,7 +114,7 @@ if(BUILD_APP_LIBRARY)
 
   install(
     TARGETS helics_apps
-    EXPORT helics-targets
+    ${HELICS_EXPORT_COMMAND}
     DESTINATION ${CMAKE_INSTALL_LIBDIR}
     COMPONENT libs
   )

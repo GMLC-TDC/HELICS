@@ -58,7 +58,7 @@ if(BUILD_SHARED_LIBS)
   )
 
   if (JSONCPP_OBJLIB)
-    target_sources(helics-static PRIVATE $<TARGET_OBJECTS:jsoncppobj_lib>)
+    target_sources(helics-shared PRIVATE $<TARGET_OBJECTS:jsoncppobj_lib>)
   else()
     target_link_libraries(helics-shared PRIVATE jsoncpp_lib)
   endif()
@@ -78,7 +78,7 @@ install(
 
 install(
   TARGETS helics-static
-  EXPORT helics-targets
+  ${HELICS_EXPORT_COMMAND}
   DESTINATION ${CMAKE_INSTALL_LIBDIR}
   COMPONENT libs
 )
@@ -86,7 +86,7 @@ install(
 if(BUILD_SHARED_LIBS)
   install(
     TARGETS helics-shared
-    EXPORT helics-targets
+    ${HELICS_EXPORT_COMMAND}
     RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
     ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
