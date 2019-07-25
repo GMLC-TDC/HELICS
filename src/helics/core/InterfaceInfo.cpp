@@ -7,6 +7,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "InterfaceInfo.hpp"
 #include "../common/fmt_format.h"
 #include "helics_definitions.hpp"
+#include <sstream>
 
 namespace helics
 {
@@ -312,4 +313,92 @@ std::vector<std::pair<int, std::string>> InterfaceInfo::checkInterfacesForIssues
     return issues;
 }
 
+std::string InterfaceInfo::generateInferfaceConfig () const
+{
+    std::ostringstream s;
+
+    auto ihandle = inputs.lock_shared ();
+    if (!ihandle->size () > 0)
+    {
+        s << "inputs:[";
+        bool first = true;
+        for (auto &ipt : ihandle)
+        {
+            if (!ipt->key.empty ())
+            {
+                if (!first)
+                {
+                    s << ',';
+                }
+                first = false;
+                s << "{\n \"key\":\"" << ipt->key << "\"";
+                if (!ipt->type.empty ())
+                {
+                    s << ",\n \"type\":\"" << ipt->type << "\"";
+                }
+                if (!ipt->units.empty ())
+                {
+                    s << ",\n \"units\":\"" << ipt->units << "\"";
+                }
+                s << "\n}";
+            }
+        }
+        s << "],";
+    }
+    ihandle.unlock ();
+    auto phandle = publications.lock ();
+    if (!phandle->size () > 0)
+    {
+        s << "\npublications:[";
+        bool first = true;
+        for (auto &pub : phandle)
+        {
+            if (!first)
+            {
+                s << ',';
+            }
+            first = false;
+
+            s << "],";
+            s << "{\n \"key\":\"" << pub->key << "\"";
+            if (!pub->type.empty ())
+            {
+                s << ",\n \"type\":\"" << pub->type << "\"";
+            }
+            if (!pub->units.empty ())
+            {
+                s << ",\n \"units\":\"" << pub->units << "\"";
+            }
+            s << "\n}";
+        }
+        s << "],";
+    }
+    phandle.unlock ();
+
+    auto ehandle = endpoints.lock_shared ();
+    if (!ehandle->size () > 0)
+    {
+        s << "\nendpoints:[";
+        bool first = true;
+        for (auto &ept : ehandle)
+        {
+            if (!first)
+            {
+                s << ',';
+            }
+            first = false;
+
+            s << "{\n \"key\":\"" << ept->key << "\"";
+            if (!ept->type.empty ())
+            {
+                s << ",\n \"type\":\"" << ept->type << "\"";
+            }
+            s << "\n}";
+        }
+        s << "\n],";
+    }
+    phandle.unlock ();
+    s << "\"extra\":\"configuration\"";
+    return s.str ();
+}
 }  // namespace helics

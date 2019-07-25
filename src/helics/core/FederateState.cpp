@@ -1743,16 +1743,30 @@ std::string FederateState::processQuery (const std::string &query) const
     {
         return generateStringVector (interfaceInformation.getEndpoints (), [] (auto &ept) { return ept->key; });
     }
+    if (query == "interfaces")
+    {
+        return "{" + interfaceInformation.generateInferfaceConfig ();
+        +"}";
+    }
     if (query == "dependencies")
     {
         return generateStringVector (timeCoord->getDependencies (),
                                      [] (auto &dep) { return std::to_string (dep.baseValue ()); });
+    }
+    if (query == "timeconfig")
+    {
+        std::ostringstream s;
+        s << "{\n" << timeCoord->generateConfig ();
+        s << ",\n" << generateConfig ();
+        s << "}";
+        return s.str ();
     }
     if (query == "config")
     {
         std::ostringstream s;
         s << "{\n" << timeCoord->generateConfig ();
         s << ",\n" << generateConfig ();
+        s << ",\n" << interfaceInformation.generateInferfaceConfig ();
         s << "}";
         return s.str ();
     }
