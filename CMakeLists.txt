@@ -598,11 +598,18 @@ target_include_directories(gmlc_utilities SYSTEM PRIVATE ${Boost_INCLUDE_DIRS})
 
 file(GLOB UTILITIES_HEADERS_INSTALL_H ${PROJECT_SOURCE_DIR}/ThirdParty/utilities/gmlc/utilities/*.h)
 file(GLOB UTILITIES_HEADERS_INSTALL_HPP ${PROJECT_SOURCE_DIR}/ThirdParty/utilities/gmlc/utilities/*.hpp)
+file(GLOB UTILITIES_HEADERS_INSTALL_EXTRA ${PROJECT_SOURCE_DIR}/ThirdParty/utilities/gmlc/utilities/extra/*.hpp)
 
 install(
   FILES ${UTILITIES_HEADERS_INSTALL_H} ${UTILITIES_HEADERS_INSTALL_HPP}
   ${PROJECT_SOURCE_DIR}/ThirdParty/utilities/LICENSE
   DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/helics/utilities/
+  COMPONENT headers
+)
+
+install(
+  FILES ${UTILITIES_HEADERS_INSTALL_EXTRA}
+  DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/helics/utilities/extra
   COMPONENT headers
 )
 

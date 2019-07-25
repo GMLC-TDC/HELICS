@@ -167,7 +167,7 @@ Out[2]: 'x.x.x (XX-XX-XX)'
 This section will layout the setting up of MSYS2 to compile and install HELICS. This guide will describe all the packages and install instructions for a 64bit build.
 
 ### Setting up MSYS2 ###
-MSYS2 provides a Linux like terminal environment on your Windows system. MSYS2 can be installed from [here](https://www.msys2.org/). Once MSYS2 has been installed start up msys2.exe. Follow first time updates as described on the MSYS2 website. After MSYS2 has been successfully updated Some packages need to be installed in order to configure and build HELICS. The following packages need to be installed:
+MSYS2 provides a Linux like terminal environment on your Windows system. MSYS2 can be installed from [here](https://www.msys2.org/). Once MSYS2 has been installed start up msys2. The recommended way is to start up the MSYS2 MinGW 64-bit from the Windows start menu.  The following commands assume you are in this command unless otherwise noted.  MinGW 32bit could be used but you will need to substitute `i686` versions for the `x86_64` libraries.   Follow first time updates as described on the [MSYS2 website](https://www.msys2.org/). After MSYS2 has been successfully updated, some additional packages need to be installed in order to configure and build HELICS. The following packages need to be installed:
 - base-devel
 - mingw-w64-x86_64-toolchain
 - git
@@ -178,9 +178,9 @@ MSYS2 provides a Linux like terminal environment on your Windows system. MSYS2 c
 
 All packages can be installed by typing the following:
 ```bash
-$ pacman -S --needed base-devel mingw-w64_x86_64-toolchain mingw-w64-x86_64-cmake mingw-w64-x86_64-boost mingw-w64-x86_64-qt5
+$ pacman -Sy base-devel mingw-w64-x86_64-toolchain git mingw-w64-x86_64-cmake mingw-w64-x86_64-boost mingw-w64-x86_64-qt5 mingw-w64-x86_64-zeromq
 ```
-After all this has been done /mingw64/bin must be in the PATH environment variable. If it isn't then it must be added. Please note that this is only necessary if you are compiling in MSYS2 shell. If you are compiling in the MSYS2 MINGW-64bit shell then /ming64/bin will be automatically added to the PATH environment variable.
+For base-devel and mingw-w64-x86_64-toolchain you may have to hit enter for installing all packages that are part of the group package. The qt5 package is quite large, if you are only using it once it might be faster to use ccmake which is a text based interface to cmake. After all the packages have been installed has been done /mingw64/bin must be in the PATH environment variable. If it isn't then it must be added. Please note that this is only necessary if you are compiling in MSYS2 shell. If you are compiling in the MSYS2 MINGW-64bit shell then /mingw64/bin will be automatically added to the PATH environment variable.
 ```bash
 $ export PATH=$PATH:/mingw64/bin
 ```
@@ -197,27 +197,32 @@ Change directories to HELICS_ROOT_DIR. Create a directory called helics-build. T
 ```bash
 $ cmake-gui ../
 ```
-If this fails that is because mingw-w64-x86_64-qt5 was not installed. If you did install it the cmake gui window should pop up. click the Advanced check box next to the search bar. Then click Configure. A window will pop up asking you to specify the generator for this project. Select MSYS Makefiles from the dropdown menu. Then click the Specify native compilers check box and click next. Enter C:/msys64/mingw64/bin/gcc.exe for the C compiler and C:/msys64/mingw64/bin/g++.exe for the C++ compiler and click finish. Once the Configure process finished several variables will show up highlighted in red. Since this is the first time setup the Boost and ZeroMQ library. Below are the following cmake variables that need to be verified.
+If this fails that is because mingw-w64-x86_64-qt5 was not installed. If you did install it the cmake gui window should pop up. click the Advanced check box next to the search bar. Then click Configure. A window will pop up asking you to specify the generator for this project. Select "MSYS Makefiles" from the dropdown menu.  The native compilers can be used and will most likely default to gcc.  The compilers can also be specified manually. Select Finish;  once the configure process completes finished several variables will show up highlighted in red. Since this is the first time setup the Boost and ZeroMQ library. Below are the following cmake variables that could to be verified.
 
-* BUILD_CXX_SHARED_LIB should be checked as GridLAB-D dynamically links with the shared c++ library of HELICS
+* BUILD_SHARED_LIBS should be checked if you are using HELICS with GridLAB-D, GridLAB-D dynamically links with the shared c++ library of HELICS, the default is off so you would need to change it
+
+For others the advanced checkbox can be selected to see some other variables
+
 * Boost_INCLUDE_DIR C:/msys64/mingw64/include
 * Boost_LIBRARY_DIR_DEBUG/RELEASE C:/msys64/mingw64/bin
-* Boost_UNIT_TEST_FRAMEWORK_LIBRARY_DEBUG/RELEASE C:/msys64/mingw64/bin/libboost_unit_test_framework-mt.dll
-* CMAKE_CXX_FLAGS -std=c++14
+* Boost_UNIT_TEST_FRAMEWORK_LIBRARY_DEBUG/RELEASE C:/msys64/mingw64/bin/libboost_unit_test_framework-mt.dll.a
 * CMAKE_INSTALL_PREFIX /usr/local or location of your choice
 * ZeroMQ_INCLUDE_DIR C:/msys64/mingw64/include
 * ZeroMQ_INSTALL_PATH C:/msys64/mingw64
-* ZeroMQ_LIBRARY C:/msys64/mingw64/bin/libzmq.dll
+* ZeroMQ_LIBRARY C:/msys64/mingw64/bin/libzmq.dll.a
 * ZeroMQ_ROOT_DIR C:/msys64/mingw64
 
-Once these cmake variables have been correctly verified click Configure. Once that is complete click Generate then once that is complete the CMake GUI can be closed.
+Once these cmake variables have been correctly verified click Configure if anything was changed. Once that is complete click Generate then once that is complete the CMake-gui can be closed.
 
-Back in the MSYS2 command window type:
+Back in the MSYS2 command window\[ make sure you are in the build directory\] type:
 ```bash
 $ make -j x
 ```
-where x is the number of threads you can give the make process to speed up the build. Then once that is complete type:
+where x is the number of threads you can give the make process to speed up the build. Then once that is complete type:  `make -j` will just use the number of cores you have available
 ```bash
 $ make install
 ```
-unless you changed the value of CMAKE_INSTALL_PREFIX everything the default install location /usr/local/helics_2_1_0. This install path will be referred to as HELICS_INSTALL for the next section.
+unless you changed the value of CMAKE_INSTALL_PREFIX everything the default install location /usr/local/helics_2_1_0. This install path will be referred to as HELICS_INSTALL for the sections related to GridLab-D
+
+### Compiling with clang
+
