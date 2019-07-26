@@ -222,7 +222,8 @@ where x is the number of threads you can give the make process to speed up the b
 ```bash
 $ make install
 ```
-unless you changed the value of CMAKE_INSTALL_PREFIX everything the default install location /usr/local/helics_2_1_0. This install path will be referred to as HELICS_INSTALL for the sections related to GridLab-D
+unless you changed the value of CMAKE_INSTALL_PREFIX everything the default install location /usr/local/helics_2_1_0. This install path will be referred to as HELICS_INSTALL for the sections related to GridLab-D. 
+If you want to build Gridlab-d on Windows with HELICS see [Building with HELICS](http://gridlab-d.shoutwiki.com/wiki/Building_GridLAB-D_on_Windows_with_MSYS2#Building_with_the_HELICS_Library).  Please use branch feature/1179 to build with HELICS 2.1 or later instead of the branch listed.  
 
 ### Compiling with clang
-
+Clang does not work to compile on MSYS2 at this time.  It has in the past but there are various issues with the clang standard library on MSYS yet so this will be updated if the situation changes.  

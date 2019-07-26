@@ -806,6 +806,8 @@ if (NOT HELICS_ROOT_PROJ)
 	set_target_properties(application_api helics_common helics_core helics-static PROPERTIES FOLDER helics)
 endif()
 
+if (HELICS_WITH_CMAKE_PACKAGE)
+
 install(
     FILES
         ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake
@@ -821,6 +823,7 @@ install(
     DESTINATION ${HELICS_CMAKECONFIG_INSTALL_DIR}
     COMPONENT libs
 )
+endif()
 
 install(
     FILES LICENSE NOTICE CHANGELOG.md README.md
