@@ -32,8 +32,7 @@ set(HELICS_VERSION_STRING "${HELICS_VERSION} (${HELICS_DATE})")
 # set the module path and include some common macros
 # -----------------------------------------------------------------------------
 set(
-    CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH}
-    "${PROJECT_SOURCE_DIR}/config/cmake/"
+    CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/config/cmake/" ${CMAKE_MODULE_PATH}  
 )
 include(extraMacros)
 include(CMakeDependentOption)
