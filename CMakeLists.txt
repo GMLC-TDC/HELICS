@@ -784,20 +784,22 @@ install(
     DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/helics
     COMPONENT headers
 )
+if (HELICS_WITH_CMAKE_PACKAGE)
 
-include(CMakePackageConfigHelpers)
+   include(CMakePackageConfigHelpers)
 
-configure_package_config_file(
-    config/${PROJECT_NAME}Config.cmake.in
-    "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake"
-    INSTALL_DESTINATION
-    ${HELICS_CMAKECONFIG_INSTALL_DIR}
-)
-write_basic_package_version_file(
-    ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake
-    VERSION ${HELICS_VERSION}
-    COMPATIBILITY SameMajorVersion
-)
+   configure_package_config_file(
+       config/${PROJECT_NAME}Config.cmake.in
+       "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake"
+       INSTALL_DESTINATION
+       ${HELICS_CMAKECONFIG_INSTALL_DIR}
+   )
+   write_basic_package_version_file(
+       ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake
+       VERSION ${HELICS_VERSION}
+       COMPATIBILITY SameMajorVersion
+   )
+endif()
 
 if (NOT HELICS_ROOT_PROJ)
 	set_target_properties(helics_apps PROPERTIES FOLDER helics)
