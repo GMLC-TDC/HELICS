@@ -797,11 +797,18 @@ install(
     COMPONENT libs
 )
 
+# combine 3rd party license files for install package
+include(combineLicenses)
+combineLicenses(THIRDPARTY_LICENSES
+	Test ${PROJECT_SOURCE_DIR}/README.md
+)
+
 install(
     FILES LICENSE NOTICE CHANGELOG.md README.md
     DESTINATION ${CMAKE_INSTALL_DOCDIR}
     COMPONENT libs
 )
+
 # -------------------------------------------------------------
 # CPack
 # -------------------------------------------------------------
