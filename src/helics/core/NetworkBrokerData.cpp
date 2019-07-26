@@ -8,6 +8,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "NetworkBrokerData.hpp"
 #include "BrokerFactory.hpp"
 #include "helicsCLI11.hpp"
+#include "gmlc/netif/NetIF.hpp"
 
 #include "../common/AsioContextManager.h"
 #include <asio/ip/host_name.hpp>
@@ -335,7 +336,35 @@ std::string getLocalExternalAddressV4 ()
     asio::ip::tcp::resolver::iterator it = resolver.resolve (query);
     asio::ip::tcp::endpoint endpoint = *it;
 
-    return endpoint.address ().to_string ();
+    auto resolved_address = endpoint.address ().to_string ();
+    auto interface_addresses = gmlc::netif::getInterfaceAddressesV4 ();
+
+    // Return the resolved address if no interface addresses were found
+    if (interface_addresses.empty ())
+    {
+        return resolved_address;
+    }
+
+    // Use the resolved address if it matches one of the interface addresses
+    for (auto addr : interface_addresses)
+    {
+        if (addr == resolved_address)
+        {
+            return resolved_address;
+        }
+    }
+
+    // Pick an interface that isn't an IPv4 loopback address, 127.0.0.1
+    for (auto addr : interface_addresses)
+    {
+        if (addr != "127.0.0.1")
+        {
+            return addr;
+        }
+    }
+
+    // Very likely that any address returned at this won't be a working external address
+    return resolved_address;
 }
 
 std::string getLocalExternalAddressV4 (const std::string &server)
@@ -357,24 +386,36 @@ std::string getLocalExternalAddressV4 (const std::string &server)
 
     auto sstring = (it_server == end) ? server : servep.address ().to_string ();
 
-    asio::ip::tcp::resolver::query query (asio::ip::tcp::v4 (), asio::ip::host_name (), "");
-    asio::ip::tcp::resolver::iterator it = resolver.resolve (query);
-    asio::ip::tcp::endpoint endpoint = *it;
-    int cnt = 0;
-    std::string def = endpoint.address ().to_string ();
-    cnt = matchcount (sstring.begin (), sstring.end (), def.begin (), def.end ());
-    ++it;
-    while (it != end)
+    auto interface_addresses = gmlc::netif::getInterfaceAddressesV4 ();
+
+    // Fall-back to resolver addresses if no network interfaces were found
+    if (interface_addresses.empty ())
     {
-        asio::ip::tcp::endpoint ept = *it;
-        std::string ndef = ept.address ().to_string ();
+        asio::ip::tcp::resolver::query query (asio::ip::tcp::v4 (), asio::ip::host_name (), "");
+        asio::ip::tcp::resolver::iterator it = resolver.resolve (query);
+        asio::ip::tcp::endpoint endpoint = *it;
+        if (it == end)
+        {
+            return std::string ();
+        }
+        while (it != end)
+        {
+            asio::ip::tcp::endpoint ept = *it;
+            interface_addresses.push_back (ept.address ().to_string ());
+            ++it;
+        }
+    }
+    int cnt = 0;
+    std::string def = interface_addresses[0];
+    cnt = matchcount (sstring.begin (), sstring.end (), def.begin (), def.end ());
+    for (auto ndef : interface_addresses)
+    {
         auto mcnt = matchcount (sstring.begin (), sstring.end (), ndef.begin (), ndef.end ());
         if ((mcnt > cnt) && (mcnt >= 7))
         {
             def = ndef;
             cnt = mcnt;
         }
-        ++it;
     }
     return def;
 }
@@ -388,7 +429,32 @@ std::string getLocalExternalAddressV6 ()
     asio::ip::tcp::resolver::iterator it = resolver.resolve (query);
     asio::ip::tcp::endpoint endpoint = *it;
 
-    return endpoint.address ().to_string ();
+    auto resolved_address = endpoint.address ().to_string ();
+    auto interface_addresses = gmlc::netif::getInterfaceAddressesV6 ();
+
+    // Return the resolved address if no interface addresses were found
+    if (interface_addresses.empty ())
+    {
+        return resolved_address;
+    }
+
+    // Use the resolved address if it matches one of the interface addresses
+    for (auto addr : interface_addresses)
+    {
+        if (addr == resolved_address)
+        {
+            return resolved_address;
+        }
+    }
+
+    // Pick an interface that isn't an IPv6 loopback address
+    for (auto addr : interface_addresses)
+    {
+        return addr;
+    }
+
+    // Very likely that any address returned at this won't be a working external address
+    return resolved_address;
 }
 
 std::string getLocalExternalAddressV6 (const std::string &server)
@@ -403,30 +469,36 @@ std::string getLocalExternalAddressV6 (const std::string &server)
     asio::ip::tcp::resolver::iterator end;
 
     auto sstring = (it_server == end) ? server : servep.address ().to_string ();
+    auto interface_addresses = gmlc::netif::getInterfaceAddressesV4 ();
 
-    asio::ip::tcp::resolver::query query (asio::ip::tcp::v6 (), asio::ip::host_name (), "");
-    asio::ip::tcp::resolver::iterator it = resolver.resolve (query);
-    asio::ip::tcp::endpoint endpoint = *it;
-
-    if (it == end)
+    // Fall-back to resolver addresses if no network interfaces were found
+    if (interface_addresses.empty ())
     {
-        return std::string ();
+        asio::ip::tcp::resolver::query query (asio::ip::tcp::v6 (), asio::ip::host_name (), "");
+        asio::ip::tcp::resolver::iterator it = resolver.resolve (query);
+        asio::ip::tcp::endpoint endpoint = *it;
+        if (it == end)
+        {
+            return std::string ();
+        }
+        while (it != end)
+        {
+            asio::ip::tcp::endpoint ept = *it;
+            interface_addresses.push_back (ept.address ().to_string ());
+            ++it;
+        }
     }
     int cnt = 0;
-    std::string def = endpoint.address ().to_string ();
+    std::string def = interface_addresses[0];
     cnt = matchcount (sstring.begin (), sstring.end (), def.begin (), def.end ());
-    ++it;
-    while (it != end)
+    for (auto ndef : interface_addresses)
     {
-        asio::ip::tcp::endpoint ept = *it;
-        std::string ndef = ept.address ().to_string ();
         auto mcnt = matchcount (sstring.begin (), sstring.end (), ndef.begin (), ndef.end ());
-        if ((mcnt > cnt) && (mcnt >= 9))
+        if ((mcnt > cnt) && (mcnt >= 7))
         {
             def = ndef;
             cnt = mcnt;
         }
-        ++it;
     }
     return def;
 }

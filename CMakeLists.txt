@@ -425,6 +425,7 @@ target_include_directories(
         $<INSTALL_INTERFACE:$<INSTALL_PREFIX>/include>
         $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/ThirdParty/containers>
         $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/ThirdParty/concurrency>
+        $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/ThirdParty/netif>
 		$<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/ThirdParty/utilities>
 		$<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/ThirdParty/utilities/gmlc/utilities>
 
