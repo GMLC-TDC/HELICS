@@ -800,7 +800,16 @@ install(
 # combine 3rd party license files for install package
 include(combineLicenses)
 combineLicenses(${PROJECT_BINARY_DIR}/THIRDPARTY_LICENSES
-	Test ${PROJECT_SOURCE_DIR}/README.md
+	"asio" "${PROJECT_SOURCE_DIR}/ThirdParty/asio/asio/LICENSE_1_0.txt"
+	"cereal" "${PROJECT_SOURCE_DIR}/ThirdParty/cereal/LICENSE"
+	"GMLC Concurrency" "${PROJECT_SOURCE_DIR}/ThirdParty/concurrency/LICENSE"
+	"GMLC Containers" "${PROJECT_SOURCE_DIR}/ThirdParty/containers/LICENSE"
+	"cppzmq" "${PROJECT_SOURCE_DIR}/ThirdParty/cppzmq/LICENSE"
+	"{fmt}" "${PROJECT_SOURCE_DIR}/ThirdParty/fmtlib/LICENSE.rst"
+	"Google Test" "${PROJECT_SOURCE_DIR}/ThirdParty/googletest/LICENSE"
+	"JsonCpp" "${PROJECT_SOURCE_DIR}/ThirdParty/jsoncpp/LICENSE"
+	"tinytoml" "${PROJECT_SOURCE_DIR}/ThirdParty/toml/LICENSE"
+	"GMLC Utilities" "${PROJECT_SOURCE_DIR}/ThirdParty/utilities/LICENSE"
 )
 
 install(
