@@ -19,7 +19,6 @@ add_library(
   $<TARGET_OBJECTS:application_api>
   $<TARGET_OBJECTS:helics_core>
   $<TARGET_OBJECTS:helics_common>
-  $<TARGET_OBJECTS:gmlc_utilities>
 )
 
 target_link_libraries(helics-static PUBLIC helics_base helics_base_includes)
@@ -32,6 +31,12 @@ else()
   target_link_libraries(helics-static PUBLIC jsoncpp_lib)
 endif()
 
+if (UTILITIES_OBJLIB)
+  target_sources(helics-static PRIVATE $<TARGET_OBJECTS:gmlc_utilities>)
+else()
+  target_link_libraries(helics-static PUBLIC HELICS::utilities)
+endif()
+
 if(BUILD_SHARED_LIBS)
   add_library(
     helics-shared
@@ -40,7 +45,6 @@ if(BUILD_SHARED_LIBS)
     $<TARGET_OBJECTS:application_api>
     $<TARGET_OBJECTS:helics_core>
     $<TARGET_OBJECTS:helics_common>
-	$<TARGET_OBJECTS:gmlc_utilities>
   )
 
   add_library(HELICS::helics-shared ALIAS helics-shared)
@@ -61,6 +65,12 @@ if(BUILD_SHARED_LIBS)
     target_sources(helics-shared PRIVATE $<TARGET_OBJECTS:jsoncppobj_lib>)
   else()
     target_link_libraries(helics-shared PRIVATE jsoncpp_lib)
+  endif()
+
+  if (UTILITIES_OBJLIB)
+	target_sources(helics-static PRIVATE $<TARGET_OBJECTS:gmlc_utilities>)
+  else()
+	target_link_libraries(helics-static PUBLIC HELICS::utilities)
   endif()
 
   if(WIN32)
