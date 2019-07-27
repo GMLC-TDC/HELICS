@@ -7,8 +7,8 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include "NetworkBrokerData.hpp"
 #include "BrokerFactory.hpp"
-#include "helicsCLI11.hpp"
 #include "gmlc/netif/NetIF.hpp"
+#include "helicsCLI11.hpp"
 
 #include "../common/AsioContextManager.h"
 #include <asio/ip/host_name.hpp>
@@ -354,16 +354,16 @@ std::string getLocalExternalAddressV4 ()
         }
     }
 
-    // Pick an interface that isn't an IPv4 loopback address, 127.0.0.1
+    // Pick an interface that isn't an IPv4 loopback address, 127.0.0.1/8
     for (auto addr : interface_addresses)
     {
-        if (addr != "127.0.0.1")
+        if (addr.rfind ("127.", 0) != 0)
         {
             return addr;
         }
     }
 
-    // Very likely that any address returned at this won't be a working external address
+    // Very likely that any address returned at this point won't be a working external address
     return resolved_address;
 }
 
@@ -450,10 +450,13 @@ std::string getLocalExternalAddressV6 ()
     // Pick an interface that isn't an IPv6 loopback address
     for (auto addr : interface_addresses)
     {
-        return addr;
+        if (addr != "::1")
+		{
+            return addr;
+		}
     }
 
-    // Very likely that any address returned at this won't be a working external address
+    // Very likely that any address returned at this point won't be a working external address
     return resolved_address;
 }
 
@@ -469,7 +472,7 @@ std::string getLocalExternalAddressV6 (const std::string &server)
     asio::ip::tcp::resolver::iterator end;
 
     auto sstring = (it_server == end) ? server : servep.address ().to_string ();
-    auto interface_addresses = gmlc::netif::getInterfaceAddressesV4 ();
+    auto interface_addresses = gmlc::netif::getInterfaceAddressesV6 ();
 
     // Fall-back to resolver addresses if no network interfaces were found
     if (interface_addresses.empty ())
