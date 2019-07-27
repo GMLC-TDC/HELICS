@@ -1,6 +1,6 @@
 
 #so units cpp exports to the correct target export
-set(UNITS_INSTALL_EXPORT EXPORT helics-targets CACHE INTERNAL "")
+set(UNITS_INSTALL_EXPORT ${HELICS_EXPORT_COMMAND} CACHE INTERNAL "")
 
 if (MSVC)
   option(HELICS_UNITS_OBJLIB OFF "use the units objlib for linking object files instead of the normal target") 
@@ -32,4 +32,5 @@ if (OLD_CMAKE_INSTALL_INCLUDEDIR)
 endif()
 
 set_target_properties(unitslib PROPERTIES FOLDER Extern)
+add_library(HELICS::unitslib ALIAS unitslib)
 
