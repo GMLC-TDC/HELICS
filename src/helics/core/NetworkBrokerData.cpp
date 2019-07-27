@@ -355,12 +355,27 @@ std::string getLocalExternalAddressV4 ()
     }
 
     // Pick an interface that isn't an IPv4 loopback address, 127.0.0.1/8
+    // or an IPv4 link-local address, 169.254.0.0/16
+    std::string link_local_addr;
     for (auto addr : interface_addresses)
     {
         if (addr.rfind ("127.", 0) != 0)
         {
-            return addr;
+            if (addr.rfind ("169.254.", 0) != 0)
+            {
+                return addr;
+            }
+            else if (link_local_addr.empty ())
+            {
+                link_local_addr = addr;
+            }
         }
+    }
+
+    // Return a link-local address since no alternatives were found
+    if (!link_local_addr.empty ())
+    {
+        return link_local_addr;
     }
 
     // Very likely that any address returned at this point won't be a working external address
@@ -447,13 +462,28 @@ std::string getLocalExternalAddressV6 ()
         }
     }
 
-    // Pick an interface that isn't an IPv6 loopback address
+    // Pick an interface that isn't the IPv6 loopback address, ::1/128
+	// or an IPv6 link-local address, fe80::/16
+    std::string link_local_addr;
     for (auto addr : interface_addresses)
     {
         if (addr != "::1")
-		{
-            return addr;
-		}
+        {
+            if (addr.rfind ("fe80:", 0) != 0)
+            {
+                return addr;
+            }
+            else if (link_local_addr.empty ())
+            {
+                link_local_addr = addr;
+            }
+        }
+    }
+
+	// No other choices, so return a link local address if one was found
+    if (!link_local_addr.empty ())
+    {
+        return link_local_addr;
     }
 
     // Very likely that any address returned at this point won't be a working external address
