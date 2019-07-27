@@ -799,12 +799,12 @@ install(
 
 # combine 3rd party license files for install package
 include(combineLicenses)
-combineLicenses(THIRDPARTY_LICENSES
+combineLicenses(${PROJECT_BINARY_DIR}/THIRDPARTY_LICENSES
 	Test ${PROJECT_SOURCE_DIR}/README.md
 )
 
 install(
-    FILES LICENSE NOTICE CHANGELOG.md README.md
+    FILES LICENSE NOTICE CHANGELOG.md README.md ${PROJECT_BINARY_DIR}/THIRDPARTY_LICENSES
     DESTINATION ${CMAKE_INSTALL_DOCDIR}
     COMPONENT libs
 )

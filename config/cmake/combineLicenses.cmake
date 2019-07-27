@@ -1,5 +1,3 @@
-
-
 # takes a list of names and license file paths and combines the contents into a single file
 function(combineLicenses OUT_FILE)
 	set(COMBINE_TMP "Third-Party Licenses")
