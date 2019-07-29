@@ -144,6 +144,21 @@ jobs:
         - CI_BOOST_VERSION=1.58.0
         - SKIP_TEST_RUN=true
 
+    - os: windows
+      install:
+        - pacman || echo "pacman does not exist"; true
+        - cmake || echo "cmake does not exist"; true
+        - mingw64-make || echo "mingw64-make does not exist"; true
+        - mingw32-make || echo "mingw32-make does not exist"; true
+        - msys || echo "msys does not exist"; true
+        - msys2 || echo "msys2 does not exist"; true
+        - choco install boost-msvc-12
+        - source scripts/setup-helics-ci-options.sh
+      script:
+        - mkdir -p build && cd build
+        - cmake .. -G "MinGW Makefiles" ${JOB_OPTION_FLAGS} ${HELICS_DEPENDENCY_FLAGS} ${HELICS_OPTION_FLAGS}
+        - mingw64-make ${MAKEFLAGS}
+
     # -----------------------------------------------
     # Daily ZMQ subproject build with new CMake
     # -----------------------------------------------
