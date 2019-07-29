@@ -44,6 +44,7 @@ if(BUILD_SHARED_LIBS)
     $<TARGET_OBJECTS:application_api>
     $<TARGET_OBJECTS:helics_core>
     $<TARGET_OBJECTS:helics_common>
+	$<$<BOOL:GMLC_UTILITIES_OBJECT_LIB>:$<TARGET_OBJECTS:gmlc_utilities_obj>>
   )
 
   add_library(HELICS::helics-shared ALIAS helics-shared)
@@ -66,9 +67,7 @@ if(BUILD_SHARED_LIBS)
     target_link_libraries(helics-shared PRIVATE jsoncpp_lib)
   endif()
 
-  if (GMLC_UTILITIES_OBJECT_LIB)
-	target_sources(helics-shared PRIVATE $<TARGET_OBJECTS:gmlc_utilities_obj>)
-  else()
+  if (NOT GMLC_UTILITIES_OBJECT_LIB)
 	target_link_libraries(helics-shared PUBLIC HELICS::utilities)
   endif()
 
