@@ -84,5 +84,4 @@ install(
   DESTINATION octave
   COMPONENT octave
 )
-install(FILES $<TARGET_FILE:helicsSharedLib> DESTINATION octave COMPONENT octave)
-install(FILES ${KEY_LIBRARY_FILES} DESTINATION octave COMPONENT octave)
+install_key_files_with_comp(octave)
