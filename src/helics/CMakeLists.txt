@@ -68,9 +68,9 @@ if(BUILD_SHARED_LIBS)
   endif()
 
   if (UTILITIES_OBJLIB)
-	target_sources(helics-static PRIVATE $<TARGET_OBJECTS:gmlc_utilities>)
+	target_sources(helics-shared PRIVATE $<TARGET_OBJECTS:gmlc_utilities>)
   else()
-	target_link_libraries(helics-static PUBLIC HELICS::utilities)
+	target_link_libraries(helics-shared PUBLIC HELICS::utilities)
   endif()
 
   if(WIN32)

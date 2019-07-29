@@ -599,7 +599,7 @@ endif()
 # create utilities target
 # -----------------------------------------------------------------------------
 
-option(UTILITIES_OBJLIB ON "use the utilities library as an object library instead of a static library") 
+option(UTILITIES_OBJLIB "use the utilities library as an object library instead of a static library" ON) 
 mark_as_advanced(UTILITIES_OBJLIB)
 if (UTILITIES_OBJLIB)
 	set(UTILITIES_LIBRARY_TYPE OBJECT)
