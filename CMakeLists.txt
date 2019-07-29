@@ -600,7 +600,7 @@ endif()
 # -----------------------------------------------------------------------------
 
 set(GMLC_UTILITIES_OBJECT_LIB ON CACHE INTERNAL "")
-
+set(GMLC_UTILITIES_STATIC_LIB OFF CACHE INTERNAL "")
 if (NOT GMLC_UTILITIES_OBJECT_LIB)
 	set(UTILITIES_LIBRARY_EXPORT_COMMAND ${HELICS_EXPORT_COMMAND} CACHE INTERNAL "")
 endif()
