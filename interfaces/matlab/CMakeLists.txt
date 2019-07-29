@@ -156,14 +156,14 @@ install(
   DESTINATION matlab
   COMPONENT matlab
 )
-install(FILES $<TARGET_FILE:helicsSharedLib> DESTINATION matlab COMPONENT matlab)
+
 install(
   FILES ${CMAKE_CURRENT_BINARY_DIR}/helicsMEX.cpp
   DESTINATION matlab
   COMPONENT matlab
 )
 install(FILES $<TARGET_LINKER_FILE:helicsSharedLib> DESTINATION matlab COMPONENT matlab)
-install(FILES ${KEY_LIBRARY_FILES} DESTINATION matlab COMPONENT matlab)
+install_key_files_with_comp(matlab)
 install(FILES ${HSHARED_LIB_SOURCES} DESTINATION matlab/headers COMPONENT matlab)
 
 install(

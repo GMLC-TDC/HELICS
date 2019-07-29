@@ -31,6 +31,12 @@ else()
   target_link_libraries(helics-static PUBLIC jsoncpp_lib)
 endif()
 
+if (UTILITIES_OBJLIB)
+  target_sources(helics-static PRIVATE $<TARGET_OBJECTS:gmlc_utilities>)
+else()
+  target_link_libraries(helics-static PUBLIC HELICS::utilities)
+endif()
+
 if(BUILD_SHARED_LIBS)
   add_library(
     helics-shared
@@ -59,6 +65,12 @@ if(BUILD_SHARED_LIBS)
     target_sources(helics-shared PRIVATE $<TARGET_OBJECTS:jsoncppobj_lib>)
   else()
     target_link_libraries(helics-shared PRIVATE jsoncpp_lib)
+  endif()
+
+  if (UTILITIES_OBJLIB)
+	target_sources(helics-shared PRIVATE $<TARGET_OBJECTS:gmlc_utilities>)
+  else()
+	target_link_libraries(helics-shared PUBLIC HELICS::utilities)
   endif()
 
   if(WIN32)

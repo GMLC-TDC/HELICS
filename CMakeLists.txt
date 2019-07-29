@@ -31,18 +31,27 @@ set(HELICS_VERSION_STRING "${HELICS_VERSION} (${HELICS_DATE})")
 # -----------------------------------------------------------------------------
 # set the module path and include some common macros
 # -----------------------------------------------------------------------------
-set(
-    CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/config/cmake/" ${CMAKE_MODULE_PATH}  
-)
-include(extraMacros)
-include(CMakeDependentOption)
-include(copy_key_files)
+
 
 if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
 	set(HELICS_ROOT_PROJ ON)
 else()
     set(HELICS_ROOT_PROJ OFF)
 endif()
+
+if (HELICS_ROOT_PROJ)
+set(CMAKE_MODULE_PATH
+     ${CMAKE_MODULE_PATH} "${PROJECT_SOURCE_DIR}/config/cmake/"
+)
+else()
+	set(ORIGINAL_MODULE_PATH ${CMAKE_MODULE_PATH})
+	set(CMAKE_MODULE_PATH
+    "${PROJECT_SOURCE_DIR}/config/cmake/" ${CMAKE_MODULE_PATH}
+)
+endif()
+include(extraMacros)
+include(CMakeDependentOption)
+include(copy_key_files)
 # include(BuildType)
 # -----------------------------------------------------------------------------
 # set the install path to a local directory
@@ -589,11 +598,33 @@ endif()
 # -----------------------------------------------------------------------------
 # create utilities target
 # -----------------------------------------------------------------------------
-set(UTILITIES_LIBRARY_TYPE OBJECT)
+
+option(UTILITIES_OBJLIB "use the utilities library as an object library instead of a static library" ON) 
+mark_as_advanced(UTILITIES_OBJLIB)
+if (UTILITIES_OBJLIB)
+	set(UTILITIES_LIBRARY_TYPE OBJECT CACHE INTERNAL "")
+else()
+	set(UTILITIES_LIBRARY_TYPE STATIC CACHE INTERNAL "")
+	set(UTILITIES_LIBRARY_EXPORT_COMMAND ${HELICS_EXPORT_COMMAND} CACHE INTERNAL "")
+endif()
+
 add_subdirectory(ThirdParty/utilities)
 set_target_properties(gmlc_utilities PROPERTIES FOLDER Extern)
+if (UTILITIES_OBJLIB)
+   if (NOT HELICS_ROOT_PROJ)
+   add_library(HELICS::utilities INTERFACE IMPORTED )
+	set_target_properties(HELICS::utilities PROPERTIES
+       INTERFACE_INCLUDE_DIRECTORIES $<BUILD_INTERFACE:ThirdParty/utilities/gmlc>
+    )
+	set_target_properties(HELICS::utilities PROPERTIES
+       INTERFACE_LINK_LIBRARIES "HELICS::helics-static"
+    )
+   endif()
+else()
+   add_library(HELICS::utilities ALIAS gmlc_utilities)
+endif()
 message(STATUS "Boost include=${Boost_INCLUDE_DIRS}")
-target_include_directories(gmlc_utilities SYSTEM PRIVATE ${Boost_INCLUDE_DIRS})
+target_include_directories(gmlc_utilities SYSTEM PRIVATE $<BUILD_INTERFACE:${Boost_INCLUDE_DIRS}>)
 
 file(GLOB UTILITIES_HEADERS_INSTALL_H ${PROJECT_SOURCE_DIR}/ThirdParty/utilities/gmlc/utilities/*.h)
 file(GLOB UTILITIES_HEADERS_INSTALL_HPP ${PROJECT_SOURCE_DIR}/ThirdParty/utilities/gmlc/utilities/*.hpp)
@@ -788,15 +819,15 @@ if (HELICS_WITH_CMAKE_PACKAGE)
    include(CMakePackageConfigHelpers)
 
    configure_package_config_file(
-       config/${PROJECT_NAME}Config.cmake.in
-       "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake"
-       INSTALL_DESTINATION
-       ${HELICS_CMAKECONFIG_INSTALL_DIR}
+    config/${PROJECT_NAME}Config.cmake.in
+    "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake"
+    INSTALL_DESTINATION
+    ${HELICS_CMAKECONFIG_INSTALL_DIR}
    )
    write_basic_package_version_file(
-       ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake
-       VERSION ${HELICS_VERSION}
-       COMPATIBILITY SameMajorVersion
+    ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake
+    VERSION ${HELICS_VERSION}
+    COMPATIBILITY SameMajorVersion
    )
 endif()
 
@@ -971,3 +1002,8 @@ if(ENABLE_PACKAGE_BUILD)
     # THIS LINE MUST BE LAST
     include(CPack)
 endif(ENABLE_PACKAGE_BUILD)
+
+if (NOT HELICS_ROOT_PROJ)
+	#restore the original module path
+	set(CMAKE_MODULE_PATH ${ORIGINAL_MODULE_PATH})
+endif()

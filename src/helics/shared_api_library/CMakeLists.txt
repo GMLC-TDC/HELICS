@@ -78,30 +78,23 @@ install(
 )
 
 if(${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION} VERSION_GREATER 3.6)
-  install(
-    FILES $<TARGET_LINKER_FILE:helicsSharedLib>
-    DESTINATION ${CMAKE_INSTALL_LIBDIR}
-    COMPONENT libs EXCLUDE_FROM_ALL
-  )
-  install(
-    FILES $<TARGET_FILE:helicsSharedLib>
-    DESTINATION ${CMAKE_INSTALL_BINDIR}
-    COMPONENT
-    Runtime EXCLUDE_FROM_ALL
-  )
+	set(HELICS_EXCLUSION_COMMAND EXCLUDE_FROM_ALL)
 else()
-  install(
+	set(HELICS_EXCLUSION_COMMAND )
+endif()
+
+ install(
     FILES $<TARGET_LINKER_FILE:helicsSharedLib>
     DESTINATION ${CMAKE_INSTALL_LIBDIR}
-    COMPONENT libs
+    COMPONENT libs ${HELICS_EXCLUSION_COMMAND}
   )
   install(
     FILES $<TARGET_FILE:helicsSharedLib>
     DESTINATION ${CMAKE_INSTALL_BINDIR}
     COMPONENT
-    Runtime
+    Runtime ${HELICS_EXCLUSION_COMMAND}
   )
-endif()
+
 
 install(
   FILES ${CMAKE_CURRENT_BINARY_DIR}/helics_export.h

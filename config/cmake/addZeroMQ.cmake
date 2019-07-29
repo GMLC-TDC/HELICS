@@ -102,3 +102,9 @@ else()
 
 endif() # USE_SYSTEM_ZEROMQ_ONLY
 hide_variable(ZeroMQ_DIR)
+
+if (WIN32)
+if (TARGET libzmq)
+     install(FILES $<TARGET_FILE:libzmq> DESTINATION ${CMAKE_INSTALL_BINDIR} COMPONENT Runtime)
+   endif()
+endif()
