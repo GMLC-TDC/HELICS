@@ -19,7 +19,6 @@ add_library(
   $<TARGET_OBJECTS:application_api>
   $<TARGET_OBJECTS:helics_core>
   $<TARGET_OBJECTS:helics_common>
-  $<TARGET_OBJECTS:gmlc_utilities>
 )
 
 target_link_libraries(helics-static PUBLIC helics_base helics_base_includes)
@@ -40,7 +39,6 @@ if(BUILD_SHARED_LIBS)
     $<TARGET_OBJECTS:application_api>
     $<TARGET_OBJECTS:helics_core>
     $<TARGET_OBJECTS:helics_common>
-	$<TARGET_OBJECTS:gmlc_utilities>
   )
 
   add_library(HELICS::helics-shared ALIAS helics-shared)
