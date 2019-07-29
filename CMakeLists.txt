@@ -599,20 +599,20 @@ endif()
 # create utilities target
 # -----------------------------------------------------------------------------
 
-option(UTILITIES_OBJLIB "use the utilities library as an object library instead of a static library" ON) 
-mark_as_advanced(UTILITIES_OBJLIB)
-if (UTILITIES_OBJLIB)
-	set(UTILITIES_LIBRARY_TYPE OBJECT CACHE INTERNAL "")
-else()
-	set(UTILITIES_LIBRARY_TYPE STATIC CACHE INTERNAL "")
+set(GMLC_UTILITIES_OBJECT_LIB ON CACHE INTERNAL "")
+
+if (NOT GMLC_UTILITIES_OBJECT_LIB)
 	set(UTILITIES_LIBRARY_EXPORT_COMMAND ${HELICS_EXPORT_COMMAND} CACHE INTERNAL "")
 endif()
 
 add_subdirectory(ThirdParty/utilities)
-set_target_properties(gmlc_utilities PROPERTIES FOLDER Extern)
-if (UTILITIES_OBJLIB)
+
+mark_as_advanced(GMLC_UTILITIES_OBJECT_LIB)
+mark_as_advanced(GMLC_UTILITIES_STATIC_LIB)
+
+if (GMLC_UTILITIES_OBJECT_LIB)
    if (NOT HELICS_ROOT_PROJ)
-   add_library(HELICS::utilities INTERFACE IMPORTED )
+	add_library(HELICS::utilities INTERFACE IMPORTED )
 	set_target_properties(HELICS::utilities PROPERTIES
        INTERFACE_INCLUDE_DIRECTORIES $<BUILD_INTERFACE:ThirdParty/utilities/gmlc>
     )
@@ -620,11 +620,17 @@ if (UTILITIES_OBJLIB)
        INTERFACE_LINK_LIBRARIES "HELICS::helics-static"
     )
    endif()
+   set_target_properties(gmlc_utilities_obj PROPERTIES FOLDER Extern)
+   message(STATUS "Boost include=${Boost_INCLUDE_DIRS}")
+	target_include_directories(gmlc_utilities_obj SYSTEM PRIVATE $<BUILD_INTERFACE:${Boost_INCLUDE_DIRS}>)
+
 else()
    add_library(HELICS::utilities ALIAS gmlc_utilities)
-endif()
-message(STATUS "Boost include=${Boost_INCLUDE_DIRS}")
+   set_target_properties(gmlc_utilities PROPERTIES FOLDER Extern)
+   message(STATUS "Boost include=${Boost_INCLUDE_DIRS}")
 target_include_directories(gmlc_utilities SYSTEM PRIVATE $<BUILD_INTERFACE:${Boost_INCLUDE_DIRS}>)
+
+endif()
 
 file(GLOB UTILITIES_HEADERS_INSTALL_H ${PROJECT_SOURCE_DIR}/ThirdParty/utilities/gmlc/utilities/*.h)
 file(GLOB UTILITIES_HEADERS_INSTALL_HPP ${PROJECT_SOURCE_DIR}/ThirdParty/utilities/gmlc/utilities/*.hpp)
