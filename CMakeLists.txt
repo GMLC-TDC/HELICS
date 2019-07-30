@@ -600,7 +600,7 @@ set_target_properties(jsoncpp_lib PROPERTIES FOLDER Extern)
 endif()
 
 # --------------------------------------------------------------
-#  Create the target for jsoncpp
+#  Create the target for unitslib
 # -----------------------------------------------------------
 include(addUnits)
 

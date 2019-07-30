@@ -20,6 +20,7 @@ add_library(
   $<TARGET_OBJECTS:helics_core>
   $<TARGET_OBJECTS:helics_common>
   $<$<BOOL:GMLC_UTILITIES_OBJECT_LIB>:$<TARGET_OBJECTS:gmlc_utilities_obj>>
+  $<$<BOOL:HELICS_UNITS_OBJLIB>:$<TARGET_OBJECTS:units::units>>
 )
 
 target_link_libraries(helics-static PUBLIC helics_base helics_base_includes)
@@ -36,9 +37,7 @@ if (NOT GMLC_UTILITIES_OBJECT_LIB)
   target_link_libraries(helics-static PUBLIC HELICS::utilities)
 endif()
 
-if (HELICS_UNITS_OBJLIB)
-  target_sources(helics-static PRIVATE $<TARGET_OBJECTS:units::units>)
-else()
+if (NOT HELICS_UNITS_OBJLIB)
   target_link_libraries(helics-static PUBLIC units::units)
 endif()
 
@@ -51,6 +50,7 @@ if(BUILD_SHARED_LIBS)
     $<TARGET_OBJECTS:helics_core>
     $<TARGET_OBJECTS:helics_common>
 	$<$<BOOL:GMLC_UTILITIES_OBJECT_LIB>:$<TARGET_OBJECTS:gmlc_utilities_obj>>
+	$<$<BOOL:HELICS_UNITS_OBJLIB>:$<TARGET_OBJECTS:units::units>>
   )
 
   add_library(HELICS::helics-shared ALIAS helics-shared)
@@ -77,9 +77,7 @@ if(BUILD_SHARED_LIBS)
 	target_link_libraries(helics-shared PUBLIC HELICS::utilities)
   endif()
 
-if (HELICS_UNITS_OBJLIB)
-  target_sources(helics-shared PRIVATE $<TARGET_OBJECTS:units::units>)
-else()
+if (NOT HELICS_UNITS_OBJLIB)
   target_link_libraries(helics-shared PUBLIC units::units)
 endif()
   if(WIN32)
