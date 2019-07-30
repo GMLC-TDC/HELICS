@@ -409,6 +409,9 @@ int ZmqComms::initializeBrokerConnections (zmq::socket_t &controlSocket)
                         setTxStatus (connection_status::error);
                         return (-4);
                     }
+                    if (rxcmd.messageID == NEW_BROKER_INFORMATION)
+                    {
+                    }
                 }
 
                 ++cnt;
@@ -493,6 +496,8 @@ void ZmqComms::queue_tx_function ()
                 {
                 case RECONNECT_TRANSMITTER:
                     setTxStatus (connection_status::connected);
+                    break;
+                case NEW_BROKER_INFORMATION:
                     break;
                 case NEW_ROUTE:
                 {
