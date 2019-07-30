@@ -73,7 +73,9 @@ class Federate
       asyncCallInfo;  //!< pointer to a class defining the async call information
     std::unique_ptr<FilterFederateManager> fManager;  //!< class for managing filter operations
     std::string name;  //!< the name of the federate
-  public:
+    std::function<void(int, const std::string &, const std::string &)> loggerFunction; //!< Logging function
+
+public:
     /**constructor taking a federate information structure
     @param fedname the name of the federate can be empty to use a name from the federateInfo
     @param fi  a federate information structure
@@ -500,6 +502,27 @@ class Federate
     @param handle the interface handle to get the extraction units for
     @return a const ref to  std::string containing the units */
     const std::string &getInterfaceUnits (interface_handle handle) const { return getExtractionUnits (handle); }
+
+    /** log a message to the federate Logger
+   @param level the logging level of the message
+   @param logMessageSource- the name of the object that sent the message
+   @param message the message to log
+   */
+    virtual void logMessage (int level, const std::string &logMessageSource, const std::string &message) const;
+
+    /** log a simplified message to the federate Logger
+    @param message the message to log
+    */
+    virtual void logMessage (const std::string &message) const;
+
+    /** set the logging function
+    @details function must have signature void(int level, const std::string &sourceName, const std::string
+    &message)
+    */
+    virtual void setLogger (std::function<void(int, const std::string &, const std::string &)> logFunction)
+    {
+        loggerFunction = std::move (logFunction);
+    }
 
   private:
     /** register filter interfaces defined in  file or string

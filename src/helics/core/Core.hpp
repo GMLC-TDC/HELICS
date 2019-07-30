@@ -672,6 +672,14 @@ class Core
      * @return a string containing the Info data stored in an interface
      */
     virtual const std::string &getInterfaceInfo (interface_handle handle) const = 0;
+
+    /** send a Message to the logging system
+@return true if the message was actually logged
+*/
+    virtual bool sendToLogger (global_federate_id federateID,
+                               int logLevel,
+                               const std::string &name,
+                               const std::string &message) const = 0;
 };
 
 }  // namespace helics

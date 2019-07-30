@@ -150,9 +150,9 @@ class BrokerBase
     */
     virtual void processPriorityCommand (ActionMessage &&command) = 0;
 
-    /** send a Message to the logging system
-    @return true if the message was actually logged
-    */
+//    /** send a Message to the logging system
+//    @return true if the message was actually logged
+//    */
     virtual bool sendToLogger (global_federate_id federateID,
                                int logLevel,
                                const std::string &name,
