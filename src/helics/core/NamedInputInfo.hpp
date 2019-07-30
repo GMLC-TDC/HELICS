@@ -107,4 +107,6 @@ class NamedInputInfo
 };
 
 bool checkTypeMatch (const std::string &type1, const std::string &type2, bool strict_match);
+
+bool checkUnitMatch (const std::string &unit1, const std::string &unit2, bool strict_match);
 }  // namespace helics

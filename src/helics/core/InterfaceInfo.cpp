@@ -284,6 +284,13 @@ std::vector<std::pair<int, std::string>> InterfaceInfo::checkInterfacesForIssues
                   fmt::format ("Input {} source has mismatched types {} is not compatible with {}", ipt->key,
                                ipt->type, source.first));
             }
+            if (!checkUnitMatch (ipt->units, source.second, false))
+            {
+                issues.emplace_back (
+                  helics::defs::errors::connection_failure,
+                  fmt::format ("Input {} source has incompatible unit {} is not convertible to {}", ipt->key,
+                               source.second, ipt->units));
+            }
         }
     }
     ihandle.unlock ();

@@ -19,8 +19,8 @@ add_library(
   $<TARGET_OBJECTS:application_api>
   $<TARGET_OBJECTS:helics_core>
   $<TARGET_OBJECTS:helics_common>
-  $<$<BOOL:GMLC_UTILITIES_OBJECT_LIB>:$<TARGET_OBJECTS:gmlc_utilities_obj>>
-  $<$<BOOL:HELICS_UNITS_OBJLIB>:$<TARGET_OBJECTS:units::units>>
+  $<$<BOOL:${GMLC_UTILITIES_OBJECT_LIB}>:$<TARGET_OBJECTS:gmlc_utilities_obj>>
+  $<$<BOOL:${HELICS_UNITS_OBJLIB}>:$<TARGET_OBJECTS:units-object>>
 )
 
 target_link_libraries(helics-static PUBLIC helics_base helics_base_includes)
@@ -49,8 +49,8 @@ if(BUILD_SHARED_LIBS)
     $<TARGET_OBJECTS:application_api>
     $<TARGET_OBJECTS:helics_core>
     $<TARGET_OBJECTS:helics_common>
-	$<$<BOOL:GMLC_UTILITIES_OBJECT_LIB>:$<TARGET_OBJECTS:gmlc_utilities_obj>>
-	$<$<BOOL:HELICS_UNITS_OBJLIB>:$<TARGET_OBJECTS:units::units>>
+	$<$<BOOL:${GMLC_UTILITIES_OBJECT_LIB}>:$<TARGET_OBJECTS:gmlc_utilities_obj>>
+	$<$<BOOL:${HELICS_UNITS_OBJLIB}>:$<TARGET_OBJECTS:units-object>>
   )
 
   add_library(HELICS::helics-shared ALIAS helics-shared)
