@@ -10,6 +10,11 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "HelicsPrimaryTypes.hpp"
 #include "ValueFederate.hpp"
 
+namespace units
+{
+class precise_unit;
+}
+
 namespace helics
 {
 /** define a publication object in the C++98 interface*/
@@ -31,6 +36,7 @@ class Publication
     mutable defV prevValue;  //!< the previous value of the publication
     std::string pubKey;  //!< the name of the publication
     std::string pubUnits;  //!< the defined units of the publication
+    std::shared_ptr<units::precise_unit> pubUnitType;  //!< a unit representation of the publication unit Type;
   public:
     Publication () = default;
     /** constructor for a publication used by the valueFederateManager
@@ -220,13 +226,10 @@ class Publication
     @param val the value to publish
     @param units  the units association with the publication
     */
-    template <class X>
-    void publish (const X &val, const std::string &units)
-    {
-        // TODO:: figure out units
-        (void)(units);
-        publish (val);
-    }
+
+    void publish (double val, const std::string &units);
+    void publish (double val, const units::precise_unit &units);
+
     /** publish integral values */
     template <class X>
     std::enable_if_t<(std::is_integral<X>::value && !std::is_same<remove_cv_ref<X>, char>::value), void>
