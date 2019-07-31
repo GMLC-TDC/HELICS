@@ -498,6 +498,12 @@ void ZmqComms::queue_tx_function ()
                     setTxStatus (connection_status::connected);
                     break;
                 case NEW_BROKER_INFORMATION:
+                    brokerPushSocket.close ();
+                    brokerPushSocket = zmq::socket_t (ctx->getContext (), ZMQ_PUSH);
+                    brokerPushSocket.setsockopt (ZMQ_LINGER, 200);
+                    brokerTargetAddress = cmd.payload;
+                    brokerPort = cmd.getExtraData ();
+                    brokerPushSocket.connect (makePortAddress (brokerTargetAddress, brokerPort));
                     break;
                 case NEW_ROUTE:
                 {

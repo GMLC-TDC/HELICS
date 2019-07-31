@@ -18,7 +18,6 @@ namespace helics
 {
 enum class interface_networks : char;
 
-constexpr route_id control_route (-1);
 /** implementation of a generic communications interface
  */
 class CommsInterface
@@ -67,11 +66,11 @@ class CommsInterface
     void setName (const std::string &name);
     /** set the callback for processing the messages
      */
-    void setCallback (std::function<void(ActionMessage &&)> callback);
+    void setCallback (std::function<void (ActionMessage &&)> callback);
     /** set the callback for processing the messages
      */
     void setLoggingCallback (
-      std::function<void(int level, const std::string &name, const std::string &message)> callback);
+      std::function<void (int level, const std::string &name, const std::string &message)> callback);
     /** set the max message size and max Queue size
      */
     void setMessageSize (int maxMsgSize, int maxCount);
@@ -133,8 +132,9 @@ class CommsInterface
     int maxMessageSize = 16 * 1024;  //!< the maximum message size for the queues (if needed)
     int maxMessageCount = 512;  //!< the maximum number of message to buffer (if needed)
     std::atomic<bool> requestDisconnect{false};  //!< flag gets set when disconnect is called
-    std::function<void(ActionMessage &&)> ActionCallback;  //!< the callback for what to do with a received message
-    std::function<void(int level, const std::string &name, const std::string &message)>
+    std::function<void (ActionMessage &&)>
+      ActionCallback;  //!< the callback for what to do with a received message
+    std::function<void (int level, const std::string &name, const std::string &message)>
       loggingCallback;  //!< callback for logging
     gmlc::containers::BlockingPriorityQueue<std::pair<route_id, ActionMessage>>
       txQueue;  //!< set of messages waiting to be transmitted
