@@ -31,6 +31,12 @@ namespace gmlc
 {
 namespace netif
 {
+  #if defined(_WIN32)
+    typedef IF_ADDRS PIP_ADAPTER_ADDRESSES
+  #else
+    typedef IF_ADDRS struct ifaddrs*
+  #endif
+
   inline std::string addressToString(struct sockaddr *addr)
   {
     int family = addr->sa_family;
@@ -50,8 +56,7 @@ namespace netif
     return std::string(addr_str);
   }
 	
-  template <class A>
-  inline void freeAddresses(A addrs)
+  inline void freeAddresses(IF_ADDRS addrs)
   {
     #if defined(_WIN32)
       HeapFree(GetProcessHeap(),0,addrs);
@@ -60,8 +65,7 @@ namespace netif
     #endif
   }
 
-  template <class A>
-  inline auto getAddresses(int family, A* addrs)
+  inline auto getAddresses(int family, IF_ADDRS* addrs)
   {
     #if defined(_WIN32)
       // Windows API: https://docs.microsoft.com/en-us/windows/win32/api/iphlpapi/nf-iphlpapi-getadaptersaddresses
@@ -76,7 +80,7 @@ namespace netif
 
         rv = GetAdaptersAddresses(family, GAA_FLAG_INCLUDE_PREFIX, NULL, *addrs, &bufLen);
         if (rv == ERROR_BUFFER_OVERFLOW) {
-          freeAddresses<decltype(*addrs)>(*addrs);
+          freeAddresses(*addrs);
           *addrs = NULL;
           bufLen = bufLen*2; // Double buffer length for the next attempt
         } else {
@@ -94,8 +98,7 @@ namespace netif
     #endif
   }
 
-  template <class A>
-  inline auto getSockAddr(A addr)
+  inline auto getSockAddr(IF_ADDRS addr)
   {
     #if defined(_WIN32)
       return addr->Address.lpSockaddr;
@@ -104,8 +107,7 @@ namespace netif
     #endif
   }
 	
-  template <class A>
-  inline A getNextAddress(int family, A addrs)
+  inline IF_ADDRS getNextAddress(int family, IF_ADDRS addrs)
   {
     #if defined(_WIN32)
       return addrs->Next;
@@ -113,7 +115,7 @@ namespace netif
     auto next = addrs->ifa_next;
     while (next != NULL) {
       // Skip entries with a null sockaddr
-      auto next_sockaddr = getSockAddr<decltype(next)>(next);
+      auto next_sockaddr = getSockAddr(next);
       if (next_sockaddr == NULL) {
         next = next->ifa_next;
 	continue;
@@ -141,36 +143,32 @@ namespace netif
   {
     std::vector<std::string> result_list;
 	  
-#if defined(_WIN32)
-    PIP_ADAPTER_ADDRESSES allAddrs = NULL;
-#else
-    struct ifaddrs *allAddrs;
-#endif
+    IF_ADDRS allAddrs = NULL;
 	 
-    getAddresses<decltype(allAddrs)>(family, &allAddrs);
+    getAddresses(family, &allAddrs);
 
 #if defined(_WIN32)
-    PIP_ADAPTER_ADDRESSES winAddrs = allAddrs;
+    IF_ADDRS winAddrs = allAddrs;
     while (winAddrs) {
       auto addrs = winAddrs->FirstUnicastAddress;
 #else
     auto addrs = allAddrs;
 #endif
 	    
-    for (auto a = addrs; a != NULL; a = getNextAddress<decltype(a)>(family, a)) {
-      std::string ipAddr = addressToString(getSockAddr<decltype(a)>(a));
+    for (auto a = addrs; a != NULL; a = getNextAddress(family, a)) {
+      std::string ipAddr = addressToString(getSockAddr(a));
       if (!ipAddr.empty()) {
         result_list.push_back(ipAddr);
       }
     }
 
 #if defined(_WIN32)
-      winAddrs = getNextAddress<decltype(winAddrs)>(family, winAddrs);
+      winAddrs = getNextAddress(family, winAddrs);
     }
 #endif
 
     if (allAddrs) {
-      freeAddresses<decltype(allAddrs)>(allAddrs);
+      freeAddresses(allAddrs);
     }
     return result_list;
   }
