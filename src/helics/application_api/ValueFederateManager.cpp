@@ -65,14 +65,14 @@ ValueFederateManager::registerInput (const std::string &key, const std::string &
 {
     auto coreID = coreObject->registerInput (fedID, key, type, units);
     auto inpHandle = inputs.lock ();
-    decltype (inpHandle->insert (key, coreID, fed, coreID, key)) active;
+    decltype (inpHandle->insert (key, coreID, fed, coreID, key, units)) active;
     if (!key.empty ())
     {
-        active = inpHandle->insert (key, coreID, fed, coreID, key);
+        active = inpHandle->insert (key, coreID, fed, coreID, key, units);
     }
     else
     {
-        active = inpHandle->insert (nullptr, coreID, fed, coreID, key);
+        active = inpHandle->insert (nullptr, coreID, fed, coreID, key, units);
     }
     if (active)
     {
@@ -278,7 +278,7 @@ void ValueFederateManager::startupToInitializeStateTransition ()
     // get the actual publication types
     auto inpHandle = inputs.lock ();
     inpHandle->apply (
-      [this] (auto &inp) { inp.type = getTypeFromString (coreObject->getInjectionType (inp.handle)); });
+      [this](auto &inp) { inp.type = getTypeFromString (coreObject->getInjectionType (inp.handle)); });
 }
 
 void ValueFederateManager::initializeToExecuteStateTransition () { updateTime (0.0, 0.0); }
@@ -288,19 +288,18 @@ std::string ValueFederateManager::localQuery (const std::string &queryStr) const
     std::string ret;
     if (queryStr == "inputs")
     {
-        ret = generateStringVector_if (
-          inputs.lock_shared (), [] (const auto &info) { return info.actualName; },
-          [] (const auto &info) { return (!info.actualName.empty ()); });
+        ret = generateStringVector_if (inputs.lock_shared (), [](const auto &info) { return info.actualName; },
+                                       [](const auto &info) { return (!info.actualName.empty ()); });
     }
     else if (queryStr == "publications")
     {
-        ret = generateStringVector_if (
-          publications.lock_shared (), [] (const auto &info) { return info.getName (); },
-          [] (const auto &info) { return (!info.getName ().empty ()); });
+        ret =
+          generateStringVector_if (publications.lock_shared (), [](const auto &info) { return info.getName (); },
+                                   [](const auto &info) { return (!info.getName ().empty ()); });
     }
     else if (queryStr == "subscriptions")
     {
-        ret = generateStringVector (targetIDs.lock_shared (), [] (const auto &target) { return target.first; });
+        ret = generateStringVector (targetIDs.lock_shared (), [](const auto &target) { return target.first; });
     }
     else if (queryStr == "updated_input_indices")
     {
@@ -324,9 +323,9 @@ std::string ValueFederateManager::localQuery (const std::string &queryStr) const
     }
     else if (queryStr == "updated_input_names")
     {
-        ret = generateStringVector_if (
-          inputs.lock_shared (), [] (const auto &inp) { return inp.getDisplayName (); },
-          [] (const auto &inp) { return (inp.isUpdated ()); });
+        ret =
+          generateStringVector_if (inputs.lock_shared (), [](const auto &inp) { return inp.getDisplayName (); },
+                                   [](const auto &inp) { return (inp.isUpdated ()); });
     }
     else if (queryStr == "updates")
     {
@@ -546,13 +545,13 @@ void ValueFederateManager::clearUpdate (const Input &inp)
     }
 }
 
-void ValueFederateManager::setInputNotificationCallback (std::function<void (Input &, Time)> callback)
+void ValueFederateManager::setInputNotificationCallback (std::function<void(Input &, Time)> callback)
 {
     allCallback.store (std::move (callback));
 }
 
 void ValueFederateManager::setInputNotificationCallback (const Input &inp,
-                                                         std::function<void (Input &, Time)> callback)
+                                                         std::function<void(Input &, Time)> callback)
 {
     auto data = reinterpret_cast<input_info *> (inp.dataReference);
     if (data != nullptr)

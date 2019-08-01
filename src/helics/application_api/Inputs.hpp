@@ -35,6 +35,9 @@ class Input
     bool disableAssign = false;  //!< disable assignment for the object
     size_t customTypeHash = 0;  //!< a hash code for the custom type
     defV lastValue;  //!< the last value updated
+    std::shared_ptr<units::precise_unit> outputUnits;
+    std::shared_ptr<units::precise_unit> inputUnits;
+
     double delta = -1.0;  //!< the minimum difference
     std::string actualName;  //!< the name of the Input
     // this needs to match the defV type
@@ -49,12 +52,13 @@ class Input
                    std::function<void(const Time &, Time)>>
       value_callback;  //!< callback function for the federate
   public:
+    /** Default constructor*/
     Input () = default;
-
-    Input (ValueFederate *valueFed, interface_handle id, const std::string &actName)
-        : fed (valueFed), handle (id), actualName (actName)
-    {
-    }
+    /** construct from a federate and handle, mainly used by the valueFederateManager*/
+    Input (ValueFederate *valueFed,
+           interface_handle id,
+           const std::string &actName,
+           const std::string unitsOut = std::string{});
 
     Input (ValueFederate *valueFed,
            const std::string &key,
@@ -383,8 +387,12 @@ class Input
     data_type getHelicsType () const { return type; }
 
   private:
+    /** load some information about the data source such as type and units*/
+    void loadSourceInformation ();
     /** helper class for getting a character since that is a bit odd*/
     char getValueChar ();
+    /** helper function to do the extraction and any necessary conversions for doubles*/
+    double doubleExtract (const data_view &dv);
     friend class ValueFederateManager;
 };
 
@@ -467,10 +475,18 @@ void Input::getValue_impl (std::integral_constant<int, primaryType> /*V*/, X &ou
         auto dv = fed->getValueRaw (*this);
         if (type == data_type::helics_unknown)
         {
-            type = getTypeFromString (fed->getInjectionType (*this));
+            loadSourceInformation ();
         }
 
-        valueExtract (dv, type, out);
+        if (type == helics::data_type::helics_double)
+        {
+            defV val = doubleExtract (dv);
+            valueExtract (val, out);
+        }
+        else
+        {
+            valueExtract (dv, type, out);
+        }
         if (changeDetectionEnabled)
         {
             if (changeDetected (lastValue, out, delta))
@@ -523,13 +539,21 @@ const X &Input::getValueRef ()
         auto dv = fed->getValueRaw (*this);
         if (type == data_type::helics_unknown)
         {
-            type = getTypeFromString (fed->getInjectionType (*this));
+            loadSourceInformation ();
         }
 
         if (changeDetectionEnabled)
         {
             X out;
-            valueExtract (dv, type, out);
+            if (type == helics::data_type::helics_double)
+            {
+                defV val = doubleExtract (dv);
+                valueExtract (val, out);
+            }
+            else
+            {
+                valueExtract (dv, type, out);
+            }
             if (changeDetected (lastValue, out, delta))
             {
                 lastValue = make_valid (std::move (out));

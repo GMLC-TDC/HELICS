@@ -1206,11 +1206,7 @@ message_processing_result FederateState::processActionMessage (ActionMessage &cm
         auto subI = interfaceInformation.getInput (cmd.dest_handle);
         if (subI != nullptr)
         {
-            subI->addSource (cmd.getSource (), cmd.getString (0), cmd.getString (1));
-            if (subI->inputType.empty ())
-            {
-                subI->inputType = cmd.getString (typeStringLoc);
-            }
+            subI->addSource (cmd.getSource (), cmd.getString (typeStringLoc), cmd.getString (unitStringLoc));
             addDependency (cmd.source_id);
         }
     }

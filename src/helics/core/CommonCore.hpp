@@ -121,7 +121,8 @@ class CommonCore : public Core, public BrokerBase
     virtual void removeTarget (interface_handle handle, const std::string &targetToRemove) override final;
     virtual void addDestinationTarget (interface_handle handle, const std::string &dest) override final;
     virtual void addSourceTarget (interface_handle handle, const std::string &name) override final;
-    virtual const std::string &getUnits (interface_handle handle) const override final;
+    virtual const std::string &getInjectionUnits (interface_handle handle) const override final;
+    virtual const std::string &getExtractionUnits (interface_handle handle) const override final;
     virtual const std::string &getInjectionType (interface_handle handle) const override final;
     virtual const std::string &getExtractionType (interface_handle handle) const override final;
     virtual void setValue (interface_handle handle, const char *data, uint64_t len) override final;
@@ -179,7 +180,7 @@ class CommonCore : public Core, public BrokerBase
     virtual void setLoggingLevel (int logLevel) override;
     virtual void setLoggingCallback (
       local_federate_id federateID,
-      std::function<void (int, const std::string &, const std::string &)> logFunction) override final;
+      std::function<void(int, const std::string &, const std::string &)> logFunction) override final;
 
     virtual std::string query (const std::string &target, const std::string &queryStr) override;
     virtual void setQueryCallback (local_federate_id federateID,

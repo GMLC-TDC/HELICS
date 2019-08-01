@@ -49,6 +49,7 @@ class NamedInputInfo
     const std::string key;  //!< the identifier for the input
     const std::string type;  //! the nominal type of data for the input
     std::string inputType;  //!< the type of data that its first matching input uses
+    std::string inputUnits;  //!< the units of the data that its first matching input uses
     const std::string units;  //!< the units of the controlInput
     bool required = false;  //!< flag indicating that the subscription requires a matching publication
     bool optional = false;  //!< flag indicating that any targets are optional
