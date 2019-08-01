@@ -113,6 +113,46 @@ BOOST_DATA_TEST_CASE (message_federate_send_receive, bdata::make (core_types_sim
     BOOST_CHECK (mFed1State == helics_federate_state::helics_state_finalize);
 }
 
+BOOST_DATA_TEST_CASE (message_federate_send_receive_mobj, bdata::make (core_types_simple), core_type)
+{
+    SetupTest (helicsCreateMessageFederate, core_type, 1);
+    auto mFed1 = GetFederateAt (0);
+
+    auto epid = helicsFederateRegisterEndpoint (mFed1, "ep1", NULL, &err);
+    auto epid2 = helicsFederateRegisterGlobalEndpoint (mFed1, "ep2", "random", &err);
+    BOOST_CHECK_EQUAL (err.error_code, helics_ok);
+    CE (helicsFederateSetTimeProperty (mFed1, helics_property_time_delta, 1.0, &err));
+
+    CE (helicsFederateEnterExecutingMode (mFed1, &err));
+
+    CE (helics_federate_state mFed1State = helicsFederateGetState (mFed1, &err));
+    BOOST_CHECK (mFed1State == helics_state_execution);
+    std::string data (500, 'a');
+
+    CE (helicsEndpointSendEventRaw (epid, "ep2", data.c_str (), 500, 0.0, &err));
+    helics_time time;
+    CE (time = helicsFederateRequestTime (mFed1, 1.0, &err));
+    BOOST_CHECK_EQUAL (time, 1.0);
+
+    auto res = helicsFederateHasMessage (mFed1);
+    BOOST_CHECK (res);
+    res = helicsEndpointHasMessage (epid);
+    BOOST_CHECK (res == false);
+    res = helicsEndpointHasMessage (epid2);
+    BOOST_CHECK (res);
+
+    auto M = helicsEndpointGetMessageObject (epid2);
+    // BOOST_REQUIRE (M);
+    BOOST_REQUIRE_EQUAL (helicsMessageGetRawDataSize (M), 500);
+
+    char *rdata = static_cast<char *> (helicsMessageGetRawDataPointer (M));
+    BOOST_CHECK_EQUAL (rdata[245], 'a');
+    CE (helicsFederateFinalize (mFed1, &err));
+
+    CE (mFed1State = helicsFederateGetState (mFed1, &err));
+    BOOST_CHECK (mFed1State == helics_federate_state::helics_state_finalize);
+}
+
 BOOST_DATA_TEST_CASE (message_federate_send_receive_2fed, bdata::make (core_types), core_type)
 {
     // extraBrokerArgs = "--loglevel=4";

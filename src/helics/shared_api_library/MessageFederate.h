@@ -231,7 +231,8 @@ extern "C"
     HELICS_EXPORT const char *helicsMessageGetOriginalDestination (helics_message_object message);
     HELICS_EXPORT helics_time helicsMessageGetTime (helics_message_object message);
     HELICS_EXPORT const char *helicsMessageGetString (helics_message_object message);
-
+    HELICS_EXPORT int helicsMessageGetMessageID (helics_message_object message);
+    HELICS_EXPORT uint16_t helicsMessageGetFlags (helics_message_object message);
     HELICS_EXPORT int helicsMessageGetRawDataSize (helics_message_object message);
 
     /** get the raw data for a message object
@@ -243,6 +244,24 @@ extern "C"
     */
     HELICS_EXPORT void helicsMessageGetRawData (helics_message_object message, void *data, int maxlen, int *actualSize, helics_error *err);
 
+    /** get a pointer to the raw data of a message
+    @param message a message object to get the data for
+
+    */
+    HELICS_EXPORT void *helicsMessageGetRawDataPointer (helics_message_object message);
+
+    HELICS_EXPORT helics_bool helicsMessageIsValid (helics_message_object message);
+    HELICS_EXPORT void helicsMessageSetSource (helics_message_object message, const char *src, helics_error *err);
+    HELICS_EXPORT void helicsMessageSetDestination (helics_message_object message, const char *dest, helics_error *err);
+    HELICS_EXPORT void helicsMessageSetOriginalSource (helics_message_object message, const char *src, helics_error *err);
+    HELICS_EXPORT void helicsMessageSetOriginalDestination (helics_message_object message, const char *dest, helics_error *err);
+    HELICS_EXPORT void helicsMessageSetTime (helics_message_object message, helics_time time, helics_error *err);
+    HELICS_EXPORT void helicsMessageAllocatePayload (helics_message_object message, int newSize, helics_error *err);
+    HELICS_EXPORT void helicsMessageSetMessageID (helics_message_object message, int32_t messageID, helics_error *err);
+    HELICS_EXPORT void helicsMessageSetFlags (helics_message_object message, uint16_t flags, helics_error *err);
+    HELICS_EXPORT void helicsMessageSetMessage (helics_message_object message, const char *str, helics_error *err);
+    HELICS_EXPORT void
+    helicsMessageSetMessageData (helics_message_object message, const void *data, int inputDataLength, helics_error *err);
 #ifdef __cplusplus
 } /* end of extern "C" { */
 #endif
