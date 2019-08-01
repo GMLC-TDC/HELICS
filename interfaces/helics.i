@@ -26,7 +26,7 @@
 %ignore helicsErrorClear;
 %ignore helics_error;
 %ignore helicsMessageGetRawDataPointer;
-%ignore helicsMessageAllocatePayload;
+%ignore helicsMessageResize;
 
 %include "../helics_enums.h"
 %include "api-data.h"

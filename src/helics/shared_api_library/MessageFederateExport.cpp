@@ -948,7 +948,7 @@ void helicsMessageSetTime (helics_message_object message, helics_time time, heli
     mess->time = time;
 }
 
-void helicsMessageAllocatePayload (helics_message_object message, int newSize, helics_error *err)
+void helicsMessageResize (helics_message_object message, int newSize, helics_error *err)
 {
     if (message == nullptr)
     {
@@ -961,6 +961,21 @@ void helicsMessageAllocatePayload (helics_message_object message, int newSize, h
     }
     helics::Message *mess = reinterpret_cast<helics::Message *> (message);
     mess->data.resize (newSize);
+}
+
+void helicsMessageReserve (helics_message_object message, int reservedSize, helics_error *err)
+{
+    if (message == nullptr)
+    {
+        if (err != nullptr)
+        {
+            err->error_code = helics_error_invalid_argument;
+            err->message = invalidMessageObject;
+        }
+        return;
+    }
+    helics::Message *mess = reinterpret_cast<helics::Message *> (message);
+    mess->data.reserve (reservedSize);
 }
 
 void helicsMessageSetMessageID (helics_message_object message, int32_t messageID, helics_error *err)
@@ -993,7 +1008,7 @@ void helicsMessageSetFlags (helics_message_object message, uint16_t flags, helic
     mess->flags = flags;
 }
 
-void helicsMessageSetMessage (helics_message_object message, const char *str, helics_error *err)
+void helicsMessageSetString (helics_message_object message, const char *str, helics_error *err)
 {
     if (message == nullptr)
     {
@@ -1008,7 +1023,7 @@ void helicsMessageSetMessage (helics_message_object message, const char *str, he
     mess->data = AS_STRING (str);
 }
 
-void helicsMessageSetMessageData (helics_message_object message, const void *data, int inputDataLength, helics_error *err)
+void helicsMessageSetData (helics_message_object message, const void *data, int inputDataLength, helics_error *err)
 {
     if (message == nullptr)
     {
@@ -1021,4 +1036,19 @@ void helicsMessageSetMessageData (helics_message_object message, const void *dat
     }
     helics::Message *mess = reinterpret_cast<helics::Message *> (message);
     mess->data.assign (static_cast<const char *> (data), inputDataLength);
+}
+
+void helicsMessageAppendData (helics_message_object message, const void *data, int inputDataLength, helics_error *err)
+{
+    if (message == nullptr)
+    {
+        if (err != nullptr)
+        {
+            err->error_code = helics_error_invalid_argument;
+            err->message = invalidMessageObject;
+        }
+        return;
+    }
+    helics::Message *mess = reinterpret_cast<helics::Message *> (message);
+    mess->data.append (static_cast<const char *> (data), inputDataLength);
 }
