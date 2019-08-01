@@ -112,6 +112,12 @@ extern "C"
     @param[in,out] err a pointer to an error object for catching errors
     */
     HELICS_EXPORT void helicsEndpointSendMessage (helics_endpoint endpoint, helics_message *message, helics_error *err);
+    /** send a message object from a specific endpoint
+    @param endpoint the endpoint to send the data from
+    @param message the actual message to send
+    @param[in,out] err a pointer to an error object for catching errors
+    */
+    HELICS_EXPORT void helicsEndpointSendMessageObject (helics_endpoint endpoint, helics_message_object message, helics_error *err);
 
     /** subscribe an endpoint to a publication
     @param endpoint the endpoint to use
@@ -144,6 +150,11 @@ extern "C"
     @return a message object*/
     HELICS_EXPORT helics_message helicsEndpointGetMessage (helics_endpoint endpoint);
 
+    /** receive a packet from a particular endpoint
+    @param[in] endpoint the identifier for the endpoint
+    @return a message object*/
+    HELICS_EXPORT helics_message_object helicsEndpointGetMessageObject (helics_endpoint endpoint);
+
     /** receive a communication message for any endpoint in the federate
     @details the return order will be in order of endpoint creation then order of arrival
     all messages for the first endpoint, then all for the second, and so on
@@ -151,6 +162,30 @@ extern "C"
     @return a unique_ptr to a Message object containing the message data*/
     HELICS_EXPORT helics_message helicsFederateGetMessage (helics_federate fed);
 
+    /** receive a communication message for any endpoint in the federate
+    @details the return order will be in order of endpoint creation then order of arrival
+    all messages for the first endpoint, then all for the second, and so on
+    within a single endpoint the messages are ordered by time, then source_id, then order of arrival
+    @return a helics_message_object which references the data in the message*/
+    HELICS_EXPORT helics_message_object helicsFederateGetMessageObject (helics_federate fed);
+
+    /** create a new empty message object
+    @return a helics_message_object containing the message data*/
+    HELICS_EXPORT helics_message_object helicsFederateCreateMessageObject (helics_federate fed, helics_error *err);
+    /** clear all message from a federate
+    @details this clears messages retrieved through helicsFederateGetMessage or helicsFederateGetMessageObject
+    @param endpoint  the endpoint object to operate on
+    */
+    HELICS_EXPORT void helicsFederateClearMessages (helics_federate fed);
+    /** clear all message from an endpoint
+    @param endpoint  the endpoint object to operate on
+    */
+    HELICS_EXPORT void helicsEndpointClearMessages (helics_endpoint endpoint);
+
+    /** get the last retrieved message from a federate*/
+    HELICS_EXPORT helics_message_object helicsFederateGetLastMessage (helics_federate fed);
+    /** get the last retrieved message from an endpoint*/
+    HELICS_EXPORT helics_message_object helicsEndpointGetLastMessage (helics_endpoint endpoint);
     /** get the type specified for an endpoint
     @param endpoint  the endpoint object in question
     @return the defined type of the endpoint
@@ -189,6 +224,24 @@ extern "C"
     @param option integer code for the option to set /ref helics_handle_options
     */
     HELICS_EXPORT helics_bool helicsEndpointGetOption (helics_endpoint end, int option);
+
+    HELICS_EXPORT const char *helicsMessageGetSource (helics_message_object message);
+    HELICS_EXPORT const char *helicsMessageGetDestination (helics_message_object message);
+    HELICS_EXPORT const char *helicsMessageGetOriginalSource (helics_message_object message);
+    HELICS_EXPORT const char *helicsMessageGetOriginalDestination (helics_message_object message);
+    HELICS_EXPORT helics_time helicsMessageGetTime (helics_message_object message);
+    HELICS_EXPORT const char *helicsMessageGetString (helics_message_object message);
+
+    HELICS_EXPORT int helicsMessageGetRawDataSize (helics_message_object message);
+
+    /** get the raw data for a message object
+    @param message a message object to get the data for
+    @param[out] data the memory location of the data
+    @param maxlen the maximum size of information that data can hold
+    @param[out] actualSize  the actual length of data copied to data
+    @param[in,out] err a pointer to an error object for catching errors
+    */
+    HELICS_EXPORT void helicsMessageGetRawData (helics_message_object message, void *data, int maxlen, int *actualSize, helics_error *err);
 
 #ifdef __cplusplus
 } /* end of extern "C" { */

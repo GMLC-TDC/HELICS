@@ -81,7 +81,7 @@ class FedObject
     int index = -2;
     int valid = 0;
     std::shared_ptr<Federate> fedptr;
-    std::unique_ptr<Message> lastMessage;
+    std::vector<std::unique_ptr<Message>> messages;
     std::vector<std::unique_ptr<InputObject>> inputs;
     std::vector<std::unique_ptr<PublicationObject>> pubs;
     std::vector<std::unique_ptr<EndpointObject>> epts;
@@ -116,7 +116,7 @@ class EndpointObject
   public:
     Endpoint *endPtr = nullptr;
     std::shared_ptr<MessageFederate> fedptr;
-    std::unique_ptr<Message> lastMessage;
+    std::vector<std::unique_ptr<Message>> messages;
     int valid = 0;
 };
 

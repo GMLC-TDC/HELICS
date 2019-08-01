@@ -180,7 +180,7 @@ void helicsEndpointSetDefaultDestination (helics_endpoint endpoint, const char *
     {
         return;
     }
-    CHECK_NULL_STRING (dest, void());
+    CHECK_NULL_STRING (dest, void ());
     try
     {
         endObj->endPtr->setDefaultDestination (dest);
@@ -347,7 +347,7 @@ void helicsEndpointSubscribe (helics_endpoint endpoint, const char *key, helics_
     {
         return;
     }
-    CHECK_NULL_STRING (key, void());
+    CHECK_NULL_STRING (key, void ());
     try
     {
         endObj->endPtr->subscribe (key);
@@ -421,21 +421,41 @@ helics_message helicsEndpointGetMessage (helics_endpoint endpoint)
         return emptyMessage ();
     }
 
-    endObj->lastMessage = endObj->endPtr->getMessage ();
+    auto message = endObj->endPtr->getMessage ();
 
-    if (endObj->lastMessage)
+    if (message)
     {
         helics_message mess;
-        mess.data = endObj->lastMessage->data.data ();
-        mess.dest = endObj->lastMessage->dest.c_str ();
-        mess.length = endObj->lastMessage->data.size ();
-        mess.original_source = endObj->lastMessage->original_source.c_str ();
-        mess.source = endObj->lastMessage->source.c_str ();
-        mess.original_dest = endObj->lastMessage->original_dest.c_str ();
-        mess.time = static_cast<helics_time> (endObj->lastMessage->time);
+        mess.data = message->data.data ();
+        mess.dest = message->dest.c_str ();
+        mess.length = message->data.size ();
+        mess.original_source = message->original_source.c_str ();
+        mess.source = message->source.c_str ();
+        mess.original_dest = message->original_dest.c_str ();
+        mess.time = static_cast<helics_time> (message->time);
+        endObj->messages.push_back (std::move (message));
         return mess;
     }
     return emptyMessage ();
+}
+
+helics_message_object helicsEndpointGetMessageObject (helics_endpoint endpoint)
+{
+    auto endObj = verifyEndpoint (endpoint, nullptr);
+    if (endObj == nullptr)
+    {
+        return nullptr;
+    }
+
+    auto message = endObj->endPtr->getMessage ();
+
+    if (message)
+    {
+        helics_message_object mess = message.get ();
+        endObj->messages.push_back (std::move (message));
+        return mess;
+    }
+    return nullptr;
 }
 
 helics_message helicsFederateGetMessage (helics_federate fed)
@@ -448,21 +468,109 @@ helics_message helicsFederateGetMessage (helics_federate fed)
 
     auto fedObj = helics::getFedObject (fed, nullptr);
 
-    fedObj->lastMessage = mFed->getMessage ();
+    auto message = mFed->getMessage ();
 
-    if (fedObj->lastMessage)
+    if (message)
     {
         helics_message mess;
-        mess.data = fedObj->lastMessage->data.data ();
-        mess.dest = fedObj->lastMessage->dest.c_str ();
-        mess.length = fedObj->lastMessage->data.size ();
-        mess.original_source = fedObj->lastMessage->original_source.c_str ();
-        mess.original_dest = fedObj->lastMessage->original_dest.c_str ();
-        mess.source = fedObj->lastMessage->source.c_str ();
-        mess.time = static_cast<helics_time> (fedObj->lastMessage->time);
+        mess.data = message->data.data ();
+        mess.dest = message->dest.c_str ();
+        mess.length = message->data.size ();
+        mess.original_source = message->original_source.c_str ();
+        mess.source = message->source.c_str ();
+        mess.original_dest = message->original_dest.c_str ();
+        mess.time = static_cast<helics_time> (message->time);
+        fedObj->messages.push_back (std::move (message));
         return mess;
     }
     return emptyMessage ();
+}
+
+helics_message_object helicsFederateGetMessageObject (helics_federate fed)
+{
+    auto mFed = getMessageFed (fed, nullptr);
+    if (mFed == nullptr)
+    {
+        return nullptr;
+    }
+
+    auto fedObj = helics::getFedObject (fed, nullptr);
+
+    auto message = mFed->getMessage ();
+
+    if (message)
+    {
+        helics_message_object mess = message.get ();
+        fedObj->messages.push_back (std::move (message));
+        return mess;
+    }
+    return nullptr;
+}
+
+helics_message_object helicsFederateCreateMessageObject (helics_federate fed, helics_error *err)
+{
+    auto fedObj = helics::getFedObject (fed, err);
+    if (fedObj == nullptr)
+    {
+        return nullptr;
+    }
+    auto messptr = std::make_unique<helics::Message> ();
+    helics_message_object mess = messptr.get ();
+    fedObj->messages.push_back (std::move (messptr));
+    return mess;
+}
+
+void helicsFederateClearMessages (helics_federate fed)
+{
+    auto fedObj = helics::getFedObject (fed, nullptr);
+    if (fedObj == nullptr)
+    {
+        return;
+    }
+    fedObj->messages.clear ();
+}
+
+/** clear all message from an endpoint
+@param endpoint  the endpoint object to operate on
+*/
+void helicsEndpointClearMessages (helics_endpoint endpoint)
+{
+    auto endObj = verifyEndpoint (endpoint, nullptr);
+    if (endObj == nullptr)
+    {
+        return;
+    }
+    endObj->messages.clear ();
+}
+
+helics_message_object helicsFederateGetLastMessage (helics_federate fed)
+{
+    auto fedObj = helics::getFedObject (fed, nullptr);
+    if (fedObj == nullptr)
+    {
+        return nullptr;
+    }
+    if (!fedObj->messages.empty ())
+    {
+        helics_message_object mess = fedObj->messages.back ().get ();
+        return mess;
+    }
+    return nullptr;
+}
+
+helics_message_object helicsEndpointGetLastMessage (helics_endpoint endpoint)
+{
+    auto endObj = verifyEndpoint (endpoint, nullptr);
+    if (endObj == nullptr)
+    {
+        return nullptr;
+    }
+    if (!endObj->messages.empty ())
+    {
+        helics_message_object mess = endObj->messages.back ().get ();
+        return mess;
+    }
+    return nullptr;
 }
 
 bool checkOutArgString (const char *outputString, int maxlen, helics_error *err)
@@ -596,4 +704,105 @@ void helicsEndpointSetOption (helics_endpoint end, int option, helics_bool value
     {
         helicsErrorHandler (err);
     }
+}
+
+const char *helicsMessageGetSource (helics_message_object message)
+{
+    if (message == nullptr)
+    {
+        return nullcstr;
+    }
+    helics::Message *mess = reinterpret_cast<helics::Message *> (message);
+    return mess->source.c_str ();
+}
+
+const char *helicsMessageGetDestination (helics_message_object message)
+{
+    if (message == nullptr)
+    {
+        return nullcstr;
+    }
+    helics::Message *mess = reinterpret_cast<helics::Message *> (message);
+    return mess->dest.c_str ();
+}
+
+const char *helicsMessageGetOriginalSource (helics_message_object message)
+{
+    if (message == nullptr)
+    {
+        return nullcstr;
+    }
+    helics::Message *mess = reinterpret_cast<helics::Message *> (message);
+    return mess->original_source.c_str ();
+}
+
+const char *helicsMessageGetOriginalDestination (helics_message_object message)
+{
+    if (message == nullptr)
+    {
+        return nullcstr;
+    }
+    helics::Message *mess = reinterpret_cast<helics::Message *> (message);
+    return mess->original_dest.c_str ();
+}
+
+helics_time helicsMessageGetTime (helics_message_object message)
+{
+    if (message == nullptr)
+    {
+        return helics_time_invalid;
+    }
+    helics::Message *mess = reinterpret_cast<helics::Message *> (message);
+    return static_cast<double> (mess->time);
+}
+
+const char *helicsMessageGetString (helics_message_object message)
+{
+    if (message == nullptr)
+    {
+        return nullcstr;
+    }
+    helics::Message *mess = reinterpret_cast<helics::Message *> (message);
+    return mess->data.data ();
+}
+
+int helicsMessageGetRawDataSize (helics_message_object message)
+{
+    if (message == nullptr)
+    {
+        return 0;
+    }
+    helics::Message *mess = reinterpret_cast<helics::Message *> (message);
+    return static_cast<int> (mess->data.size ());
+}
+
+void helicsMessageGetRawData (helics_message_object message, void *data, int maxlen, int *actualSize, helics_error *err)
+{
+    static constexpr char invalidMessageObject[] = "The message object was not valid";
+    static constexpr char invalidInsufficient[] = "the given storage was not sufficient to store the message";
+    if (message == nullptr)
+    {
+        *actualSize = 0;
+        if (err != nullptr)
+        {
+            err->error_code = helics_error_invalid_argument;
+            err->message = invalidMessageObject;
+        }
+        return;
+    }
+    helics::Message *mess = reinterpret_cast<helics::Message *> (message);
+    if (mess->data.size () > maxlen)
+    {
+        *actualSize = 0;
+        if (err != nullptr)
+        {
+            err->error_code = helics_error_insufficient_space;
+            err->message = invalidInsufficient;
+        }
+        return;
+    }
+
+    memcpy (data, mess->data.data (), mess->data.size ());
+    *actualSize = static_cast<int> (mess->data.size ());
+    return;
 }
