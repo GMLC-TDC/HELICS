@@ -788,7 +788,7 @@ int32_t helicsMessageGetMessageID (helics_message_object message)
 {
     if (message == nullptr)
     {
-        return helics_time_invalid;
+        return 0;
     }
     helics::Message *mess = reinterpret_cast<helics::Message *> (message);
     return mess->messageID;
@@ -798,7 +798,7 @@ uint16_t helicsMessageGetFlags (helics_message_object message)
 {
     if (message == nullptr)
     {
-        return helics_time_invalid;
+        return 0;
     }
     helics::Message *mess = reinterpret_cast<helics::Message *> (message);
     return mess->flags;
@@ -840,7 +840,7 @@ void helicsMessageGetRawData (helics_message_object message, void *data, int max
         return;
     }
     helics::Message *mess = reinterpret_cast<helics::Message *> (message);
-    if (mess->data.size () > maxMessagelen)
+    if (static_cast<int> (mess->data.size ()) > maxMessagelen)
     {
         *actualSize = 0;
         if (err != nullptr)
