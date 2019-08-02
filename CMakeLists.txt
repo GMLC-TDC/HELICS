@@ -880,6 +880,7 @@ set(LICENSE_LIST
 	"GMLC Containers" "${PROJECT_SOURCE_DIR}/ThirdParty/containers/LICENSE"
 	"cppzmq" "${PROJECT_SOURCE_DIR}/ThirdParty/cppzmq/LICENSE"
 	"fmt" "${PROJECT_SOURCE_DIR}/ThirdParty/fmtlib/LICENSE.rst"
+	"units" "${PROJECT_SOURCE_DIR}/ThirdParty/units/LICENSE"
 	"Google Test" "${PROJECT_SOURCE_DIR}/ThirdParty/googletest/LICENSE"
 	"JsonCpp" "${PROJECT_SOURCE_DIR}/ThirdParty/jsoncpp/LICENSE"
 	"tinytoml" "${PROJECT_SOURCE_DIR}/ThirdParty/toml/LICENSE"

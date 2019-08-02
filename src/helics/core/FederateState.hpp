@@ -66,6 +66,7 @@ class FederateState
     bool source_only{false};  //!< flag indicating the federate is a source_only
     bool ignore_time_mismatch_warnings{false};  //!< flag indicating that time mismatches should be ignored
     bool strict_input_type_checking{false};  //!< flag indicating that inputs should have strict type checking
+    bool ignore_unit_mismatch{false};  //!< flag to ignore mismatching units
     InterfaceInfo interfaceInformation;  //!< the container for the interface information objects
 
   public:

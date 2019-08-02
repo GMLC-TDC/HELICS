@@ -128,6 +128,9 @@ bool InterfaceInfo::setInputProperty (interface_handle id, int option, bool valu
     case defs::options::strict_type_checking:
         ipt->strict_type_matching = value;
         break;
+    case defs::options::ignore_unit_mismatch:
+        ipt->ignore_unit_mismatch = value;
+        break;
     default:
         return false;
         break;
@@ -281,14 +284,14 @@ std::vector<std::pair<int, std::string>> InterfaceInfo::checkInterfacesForIssues
             {
                 issues.emplace_back (
                   helics::defs::errors::connection_failure,
-                  fmt::format ("Input {} source has mismatched types {} is not compatible with {}", ipt->key,
+                  fmt::format ("Input \"{}\" source has mismatched types: {} is not compatible with {}", ipt->key,
                                ipt->type, source.first));
             }
-            if (!checkUnitMatch (ipt->units, source.second, false))
+            if ((!ipt->ignore_unit_mismatch) && (!checkUnitMatch (ipt->units, source.second, false)))
             {
                 issues.emplace_back (
                   helics::defs::errors::connection_failure,
-                  fmt::format ("Input {} source has incompatible unit {} is not convertible to {}", ipt->key,
+                  fmt::format ("Input \"{}\" source has incompatible unit: {} is not convertible to {}", ipt->key,
                                source.second, ipt->units));
             }
         }

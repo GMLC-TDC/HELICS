@@ -196,6 +196,8 @@ extern "C"
         helics_handle_option_buffer_data = 411,
         /** specify that the types should be checked strictly for pub/sub and filters*/
         helics_handle_option_strict_type_checking = 414,
+        /** specify that the mismatching units should be ignored*/
+        helics_handle_option_ignore_unit_mismatch = 447,
         /** specify that an interface will only transmit on change(only applicable to publications)*/
         helics_handle_option_only_transmit_on_change = 6,
         /** specify that an interface will only update if the value has actually changed*/

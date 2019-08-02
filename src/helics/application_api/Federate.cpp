@@ -375,27 +375,35 @@ iteration_result Federate::enterExecutingModeComplete ()
         throw (InvalidFunctionCall ("cannot call finalize function without first calling async function"));
     }
     auto asyncInfo = asyncCallInfo->lock ();
-    auto res = asyncInfo->execFuture.get ();
-    switch (res)
+    try
     {
-    case iteration_result::next_step:
-        currentMode = modes::executing;
-        currentTime = timeZero;
-        initializeToExecuteStateTransition ();
-        break;
-    case iteration_result::iterating:
-        currentMode = modes::initializing;
-        updateTime (getCurrentTime (), getCurrentTime ());
-        break;
-    case iteration_result::error:
-        currentMode = modes::error;
-        break;
-    case iteration_result::halted:
-        currentMode = modes::finalize;
-        break;
-    }
+        auto res = asyncInfo->execFuture.get ();
+        switch (res)
+        {
+        case iteration_result::next_step:
+            currentMode = modes::executing;
+            currentTime = timeZero;
+            initializeToExecuteStateTransition ();
+            break;
+        case iteration_result::iterating:
+            currentMode = modes::initializing;
+            updateTime (getCurrentTime (), getCurrentTime ());
+            break;
+        case iteration_result::error:
+            currentMode = modes::error;
+            break;
+        case iteration_result::halted:
+            currentMode = modes::finalize;
+            break;
+        }
 
-    return res;
+        return res;
+    }
+    catch (const std::exception &)
+    {
+        currentMode = modes::error;
+        throw;
+    }
 }
 
 void Federate::setProperty (int32_t option, double timeValue)

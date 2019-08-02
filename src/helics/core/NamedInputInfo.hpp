@@ -58,6 +58,7 @@ class NamedInputInfo
     bool not_interruptible = false;  //!< indicator that this handle should not be used for interrupting
     bool strict_type_matching = false;  //!< indicator that the handle need to have strict type matching
     bool single_source = false;  //!< allow only a single source to connect
+    bool ignore_unit_mismatch = false;  //!< ignore unit mismatches
     std::vector<dataRecord> current_data;  //!< the most recent published data
     std::vector<global_handle> input_sources;  //!< the sources of the input signals
     std::vector<Time> deactivated;

@@ -70,6 +70,9 @@ Several concurrency related structures and containers were developed for HELICS 
 ### [gmlc/utilities](https://github.com/GMLC-TDC/utilities)  
 Several generic operations and utilities from HELICS and GridDyn are encapsuled in a separate repository, mostly dealing with String Operations but including a few other features as well.  It is included in HELICS as a submodule and is released under a [BSD-3 clause](https://github.com/GMLC-TDC/utilities/blob/master/LICENSE) license.
 
+### [LLNL/units](https://github.com/LLNL/units)  
+A library that provides runtime unit values, instead of individual unit types, for the purposes of working with units of measurement at run time possibly from user input.  It is included in HELICS as a submodule and is released under a [BSD-3 clause](https://github.com/LLNL/units/blob/master/LICENSE) license.
+
 ### [cereal](https://github.com/USCiLab/cereal)
 The cereal library is used for serialization of messages sent around inside HELICS. cereal is included in the HELICS source and licensed under the [BSD-3 clause](https://github.com/USCiLab/cereal/blob/master/LICENSE) license.
 
