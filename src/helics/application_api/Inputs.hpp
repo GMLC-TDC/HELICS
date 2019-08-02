@@ -192,7 +192,9 @@ class Input
     /** get the type of the input*/
     const std::string &getType () const { return fed->getExtractionType (*this); }
     /** get the units associated with a input*/
-    const std::string &getUnits () const { return fed->getInterfaceUnits (*this); }
+    const std::string &getUnits () const { return fed->getExtractionUnits (*this); }
+    /** get the units associated with a input*/
+    const std::string &getInjectionUnits () const { return fed->getInjectionUnits (*this); }
     /** get an associated target*/
     const std::string &getTarget () const { return fed->getTarget (*this); }
     /** subscribe to a named publication*/

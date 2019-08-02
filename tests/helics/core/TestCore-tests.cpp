@@ -64,12 +64,12 @@ TEST (TestCore_tests, testcore_pubsub_value_test)
     auto sub1 = core->registerInput (id, "", "type", "units");
     core->addSourceTarget (sub1, "sim1_pub");
     EXPECT_EQ (core->getExtractionType (sub1), "type");
-    EXPECT_EQ (core->getUnits (sub1), "units");
+    EXPECT_EQ (core->getExtractionUnits (sub1), "units");
 
     auto pub1 = core->registerPublication (id, "sim1_pub", "type", "units");
     EXPECT_TRUE (core->getPublication (id, "sim1_pub") == pub1);
     EXPECT_EQ (core->getExtractionType (pub1), "type");
-    EXPECT_EQ (core->getUnits (pub1), "units");
+    EXPECT_EQ (core->getExtractionUnits (pub1), "units");
 
     core->enterInitializingMode (id);
 
