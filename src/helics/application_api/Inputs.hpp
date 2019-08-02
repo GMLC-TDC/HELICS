@@ -392,7 +392,7 @@ class Input
     /** helper class for getting a character since that is a bit odd*/
     char getValueChar ();
     /** helper function to do the extraction and any necessary conversions for doubles*/
-    double doubleExtract (const data_view &dv);
+    double doubleExtract (const data_view &dv) const;
     friend class ValueFederateManager;
 };
 

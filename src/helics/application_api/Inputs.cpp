@@ -296,7 +296,7 @@ void Input::loadSourceInformation ()
     }
 }
 
-double Input::doubleExtract (const data_view &dv)
+double Input::doubleExtract (const data_view &dv) const
 {
     auto V = ValueConverter<double>::interpret (dv);
     if ((inputUnits) && (outputUnits))
