@@ -6,6 +6,7 @@ SPDX-License-Identifier: BSD-3-Clause
 */
 
 #include "../core/core-exceptions.hpp"
+#include "../core/flagOperations.hpp"
 #include "../helics.hpp"
 #include "MessageFederate.h"
 #include "helics.h"
@@ -794,14 +795,18 @@ int32_t helicsMessageGetMessageID (helics_message_object message)
     return mess->messageID;
 }
 
-uint16_t helicsMessageGetFlags (helics_message_object message)
+helics_bool helicsMessageCheckFlag (helics_message_object message, int flag)
 {
     if (message == nullptr)
     {
-        return 0;
+        return helics_false;
+    }
+    if (flag > 15 || flag < 0)
+    {
+        return helics_false;
     }
     helics::Message *mess = reinterpret_cast<helics::Message *> (message);
-    return mess->flags;
+    return (checkActionFlag (*mess, flag) ? helics_true : helics_false);
 }
 
 const char *helicsMessageGetString (helics_message_object message)
@@ -993,7 +998,17 @@ void helicsMessageSetMessageID (helics_message_object message, int32_t messageID
     mess->messageID = messageID;
 }
 
-void helicsMessageSetFlags (helics_message_object message, uint16_t flags, helics_error *err)
+void helicsMessageClearFlags (helics_message_object message)
+{
+    if (message == nullptr)
+    {
+        return;
+    }
+    helics::Message *mess = reinterpret_cast<helics::Message *> (message);
+    mess->flags = 0;
+}
+
+void helicsMessageSetFlagOption (helics_message_object message, int flag, helics_bool flagValue, helics_error *err)
 {
     if (message == nullptr)
     {
@@ -1004,8 +1019,24 @@ void helicsMessageSetFlags (helics_message_object message, uint16_t flags, helic
         }
         return;
     }
+    if (flag > 15 || flag < 0)
+    {
+        if (err != nullptr)
+        {
+            err->error_code = helics_error_invalid_argument;
+            err->message = getMasterHolder ()->addErrorString ("flag variable is out of bounds must be in [0,15]");
+        }
+        return;
+    }
     helics::Message *mess = reinterpret_cast<helics::Message *> (message);
-    mess->flags = flags;
+    if (flagValue == helics_true)
+    {
+        setActionFlag (*mess, flag);
+    }
+    else
+    {
+        clearActionFlag (*mess, flag);
+    }
 }
 
 void helicsMessageSetString (helics_message_object message, const char *str, helics_error *err)

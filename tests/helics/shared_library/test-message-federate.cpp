@@ -197,6 +197,11 @@ BOOST_AUTO_TEST_CASE (message_object_tests)
 
     CE (mFed1State = helicsFederateGetState (mFed1, &err));
     BOOST_CHECK (mFed1State == helics_federate_state::helics_state_finalize);
+
+    helicsMessageSetFlagOption (M, 7, helics_true, &err);
+    BOOST_CHECK (helicsMessageCheckFlag (M, 7) == helics_true);
+    helicsMessageClearFlags (M);
+    BOOST_CHECK (helicsMessageCheckFlag (M, 7) == helics_false);
 }
 
 BOOST_DATA_TEST_CASE (message_federate_send_receive_2fed, bdata::make (core_types), core_type)

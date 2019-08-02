@@ -230,15 +230,51 @@ extern "C"
     @details functions for working with helics message envelopes
     * @{
     */
-
+    /** get the source endpoint of a message
+    @param message the message object in question
+    @return a string with the source endpoint
+    */
     HELICS_EXPORT const char *helicsMessageGetSource (helics_message_object message);
+    /** get the destination endpoint of a message
+    @param message the message object in question
+    @return a string with the destination endpoint
+    */
     HELICS_EXPORT const char *helicsMessageGetDestination (helics_message_object message);
+    /** get the original source endpoint of a message, the source may have modified by filters or other actions
+    @param message the message object in question
+    @return a string with the source of a message
+    */
     HELICS_EXPORT const char *helicsMessageGetOriginalSource (helics_message_object message);
+    /** get the original destination endpoint of a message, the destination may have been modified by filters or other actions
+    @param message the message object in question
+    @return a string with the original destination of a message
+    */
     HELICS_EXPORT const char *helicsMessageGetOriginalDestination (helics_message_object message);
+    /** get the helics time associated with a message
+    @param message the message object in question
+    @return the time associated with a message
+    */
     HELICS_EXPORT helics_time helicsMessageGetTime (helics_message_object message);
+    /** get the payload of a message as a string
+    @param message the message object in question
+    @return a string representing the payload of a message
+    */
     HELICS_EXPORT const char *helicsMessageGetString (helics_message_object message);
+    /** get the messageID of a message
+    @param message the message object in question
+    @return the messageID
+    */
     HELICS_EXPORT int helicsMessageGetMessageID (helics_message_object message);
-    HELICS_EXPORT uint16_t helicsMessageGetFlags (helics_message_object message);
+    /** check if a flag is set on a message
+    @param message the message object in question
+    @param flag the flag to check should be between [0,15]
+    @return the flags associated with a message
+    */
+    HELICS_EXPORT helics_bool helicsMessageCheckFlag (helics_message_object message, int flag);
+    /** get the size of the data payload in bytes
+    @param message the message object in question
+    @return the size of the data payload
+    */
     HELICS_EXPORT int helicsMessageGetRawDataSize (helics_message_object message);
 
     /** get the raw data for a message object
@@ -252,22 +288,82 @@ extern "C"
 
     /** get a pointer to the raw data of a message
     @param message a message object to get the data for
-
+    @return a pointer to the raw data in memory
     */
     HELICS_EXPORT void *helicsMessageGetRawDataPointer (helics_message_object message);
-
+    /** a check if the message contains a valid payload
+    @param message the message object in question
+    @return true if the message contains a payload
+    */
     HELICS_EXPORT helics_bool helicsMessageIsValid (helics_message_object message);
+    /** set the source of a message
+    @param message the message object in question
+    @param src a string containing the source
+    @param[in,out] err an error object to fill out in case of an error*/
     HELICS_EXPORT void helicsMessageSetSource (helics_message_object message, const char *src, helics_error *err);
+    /** set the destination of a message
+    @param message the message object in question
+    @param dest a string containing the new destination
+    @param[in,out] err an error object to fill out in case of an error*/
     HELICS_EXPORT void helicsMessageSetDestination (helics_message_object message, const char *dest, helics_error *err);
+    /** set the original source of a message
+    @param message the message object in question
+    @param src a string containing the new original source
+    @param[in,out] err an error object to fill out in case of an error*/
     HELICS_EXPORT void helicsMessageSetOriginalSource (helics_message_object message, const char *src, helics_error *err);
+    /** set the original destination of a message
+    @param message the message object in question
+    @param dest a string containing the new original source
+    @param[in,out] err an error object to fill out in case of an error*/
     HELICS_EXPORT void helicsMessageSetOriginalDestination (helics_message_object message, const char *dest, helics_error *err);
+    /** set the delivery time for a message
+    @param message the message object in question
+    @param time the time the message should be delivered
+    @param[in,out] err an error object to fill out in case of an error*/
     HELICS_EXPORT void helicsMessageSetTime (helics_message_object message, helics_time time, helics_error *err);
+    /** resize the data buffer for a message
+    @details the message data buffer will be resized there is no guarantees on what is in the buffer in newly allocated space
+    if the allocated space is not sufficient new allocations will occur
+    @param message the message object in question
+    @param newSize the new size in bytes of the buffer
+    @param[in,out] err an error object to fill out in case of an error*/
     HELICS_EXPORT void helicsMessageResize (helics_message_object message, int newSize, helics_error *err);
+    /** reserve space in a buffer but don't actually resize
+    @details the message data buffer will be reserved but not resized
+    @param message the message object in question
+    @param newSize the new size in bytes of the buffer
+    @param[in,out] err an error object to fill out in case of an error*/
     HELICS_EXPORT void helicsMessageReserve (helics_message_object message, int reserveSize, helics_error *err);
+    /** set the message ID for the message
+    @details normally this is not needed and the core of HELICS will adjust as needed
+    @param message the message object in question
+    @param messageID a new message ID
+    @param[in,out] err an error object to fill out in case of an error*/
     HELICS_EXPORT void helicsMessageSetMessageID (helics_message_object message, int32_t messageID, helics_error *err);
-    HELICS_EXPORT void helicsMessageSetFlags (helics_message_object message, uint16_t flags, helics_error *err);
+    /** clear the flags of a message
+    @param message the message object in question*/
+    HELICS_EXPORT void helicsMessageClearFlags (helics_message_object message);
+    /** set a flag on a message
+    @param message the message object in question
+    @param flag an index of a flag to set on the message
+    @param[in,out] err an error object to fill out in case of an error*/
+    HELICS_EXPORT void helicsMessageSetFlagOption (helics_message_object message, int flag, helics_bool flagValue, helics_error *err);
+    /** set the data payload of a message as a string
+    @param message the message object in question
+    @param str a string containing the message data
+    @param[in,out] err an error object to fill out in case of an error*/
     HELICS_EXPORT void helicsMessageSetString (helics_message_object message, const char *str, helics_error *err);
+    /** set the data payload of a message as raw data
+    @param message the message object in question
+    @param data a string containing the message data
+    @param inputDataLength  the length of the data to input
+    @param[in,out] err an error object to fill out in case of an error*/
     HELICS_EXPORT void helicsMessageSetData (helics_message_object message, const void *data, int inputDataLength, helics_error *err);
+    /** append data to the payload
+    @param message the message object in question
+    @param data a string containing the message data to append
+    @param inputDataLength  the length of the data to input
+    @param[in,out] err an error object to fill out in case of an error*/
     HELICS_EXPORT void helicsMessageAppendData (helics_message_object message, const void *data, int inputDataLength, helics_error *err);
 
     /**@}*/
