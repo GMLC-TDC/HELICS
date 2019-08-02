@@ -870,11 +870,34 @@ install(
 )
 endif()
 
+# combine 3rd party license files for install package
+include(combineLicenses)
+set(LICENSE_LIST
+	"asio" "${PROJECT_SOURCE_DIR}/ThirdParty/asio/asio/LICENSE_1_0.txt"
+	"cereal" "${PROJECT_SOURCE_DIR}/ThirdParty/cereal/LICENSE"
+	"GMLC Concurrency" "${PROJECT_SOURCE_DIR}/ThirdParty/concurrency/LICENSE"
+	"libGuarded" "${PROJECT_SOURCE_DIR}/ThirdParty/concurrency/gmlc/libguarded/LICENSE"
+	"GMLC Containers" "${PROJECT_SOURCE_DIR}/ThirdParty/containers/LICENSE"
+	"cppzmq" "${PROJECT_SOURCE_DIR}/ThirdParty/cppzmq/LICENSE"
+	"fmt" "${PROJECT_SOURCE_DIR}/ThirdParty/fmtlib/LICENSE.rst"
+	"Google Test" "${PROJECT_SOURCE_DIR}/ThirdParty/googletest/LICENSE"
+	"JsonCpp" "${PROJECT_SOURCE_DIR}/ThirdParty/jsoncpp/LICENSE"
+	"tinytoml" "${PROJECT_SOURCE_DIR}/ThirdParty/toml/LICENSE"
+	"GMLC Utilities" "${PROJECT_SOURCE_DIR}/ThirdParty/utilities/LICENSE"
+)
+
+if (EXISTS ${PROJECT_BINARY_DIR}/_deps/libzmq-src)
+	list(APPEND LICENSE_LIST "ZeroMQ" "${PROJECT_BINARY_DIR}/_deps/libzmq-src/COPYING")
+endif()
+
+combineLicenses(${PROJECT_BINARY_DIR}/THIRDPARTY_LICENSES ${LICENSE_LIST})
+
 install(
-    FILES LICENSE NOTICE CHANGELOG.md README.md
+    FILES LICENSE NOTICE CHANGELOG.md README.md ${PROJECT_BINARY_DIR}/THIRDPARTY_LICENSES
     DESTINATION ${CMAKE_INSTALL_DOCDIR}
     COMPONENT libs
 )
+
 # -------------------------------------------------------------
 # CPack
 # -------------------------------------------------------------
