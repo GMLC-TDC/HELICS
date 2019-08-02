@@ -150,7 +150,7 @@ bool Input::checkUpdate (bool assumeUpdate)
                 (void)arg;  // suppress VS2015 warning
                 if (type == helics::data_type::helics_double)
                 {
-                    defV val = doubleExtract (dv);
+                    defV val = doubleExtractAndConvert (dv, inputUnits, outputUnits);
                     valueExtract (val, newVal);
                 }
                 else
@@ -296,7 +296,9 @@ void Input::loadSourceInformation ()
     }
 }
 
-double Input::doubleExtract (const data_view &dv) const
+double doubleExtractAndConvert (const data_view &dv,
+                                const std::shared_ptr<units::precise_unit> &inputUnits,
+                                const std::shared_ptr<units::precise_unit> &outputUnits)
 {
     auto V = ValueConverter<double>::interpret (dv);
     if ((inputUnits) && (outputUnits))
@@ -338,7 +340,7 @@ char Input::getValueChar ()
             int64_t out;
             if (type == helics::data_type::helics_double)
             {
-                out = static_cast<int64_t> (doubleExtract (dv));
+                out = static_cast<int64_t> (doubleExtractAndConvert (dv, inputUnits, outputUnits));
             }
             else
             {

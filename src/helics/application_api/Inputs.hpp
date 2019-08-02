@@ -392,9 +392,13 @@ class Input
     /** helper class for getting a character since that is a bit odd*/
     char getValueChar ();
     /** helper function to do the extraction and any necessary conversions for doubles*/
-    double doubleExtract (const data_view &dv) const;
     friend class ValueFederateManager;
 };
+
+/** convert a dataview to a double and do a unit conversion if appropriate*/
+double doubleExtractAndConvert (const data_view &dv,
+                                const std::shared_ptr<units::precise_unit> &inputUnits,
+                                const std::shared_ptr<units::precise_unit> &outputUnits);
 
 /** class to handle an input and extract a specific type
 @tparam X the class of the value associated with a input*/
@@ -480,7 +484,7 @@ void Input::getValue_impl (std::integral_constant<int, primaryType> /*V*/, X &ou
 
         if (type == helics::data_type::helics_double)
         {
-            defV val = doubleExtract (dv);
+            defV val = doubleExtractAndConvert (dv, inputUnits, outputUnits);
             valueExtract (val, out);
         }
         else
@@ -547,7 +551,7 @@ const X &Input::getValueRef ()
             X out;
             if (type == helics::data_type::helics_double)
             {
-                defV val = doubleExtract (dv);
+                defV val = doubleExtractAndConvert (dv, inputUnits, outputUnits);
                 valueExtract (val, out);
             }
             else
