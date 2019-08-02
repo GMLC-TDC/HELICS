@@ -58,7 +58,7 @@ class Input
     Input (ValueFederate *valueFed,
            interface_handle id,
            const std::string &actName,
-           const std::string unitsOut = std::string{});
+           const std::string &unitsOut = std::string{});
 
     Input (ValueFederate *valueFed,
            const std::string &key,
