@@ -19,7 +19,7 @@ add_library(
   $<TARGET_OBJECTS:application_api>
   $<TARGET_OBJECTS:helics_core>
   $<TARGET_OBJECTS:helics_common>
-  $<TARGET_OBJECTS:gmlc_utilities>
+  $<$<BOOL:GMLC_UTILITIES_OBJECT_LIB>:$<TARGET_OBJECTS:gmlc_utilities_obj>>
 )
 
 target_link_libraries(helics-static PUBLIC helics_base helics_base_includes)
@@ -32,6 +32,10 @@ else()
   target_link_libraries(helics-static PUBLIC jsoncpp_lib)
 endif()
 
+if (NOT GMLC_UTILITIES_OBJECT_LIB)
+  target_link_libraries(helics-static PUBLIC HELICS::utilities)
+endif()
+
 if(BUILD_SHARED_LIBS)
   add_library(
     helics-shared
@@ -40,7 +44,7 @@ if(BUILD_SHARED_LIBS)
     $<TARGET_OBJECTS:application_api>
     $<TARGET_OBJECTS:helics_core>
     $<TARGET_OBJECTS:helics_common>
-	$<TARGET_OBJECTS:gmlc_utilities>
+	$<$<BOOL:GMLC_UTILITIES_OBJECT_LIB>:$<TARGET_OBJECTS:gmlc_utilities_obj>>
   )
 
   add_library(HELICS::helics-shared ALIAS helics-shared)
@@ -58,9 +62,13 @@ if(BUILD_SHARED_LIBS)
   )
 
   if (JSONCPP_OBJLIB)
-    target_sources(helics-static PRIVATE $<TARGET_OBJECTS:jsoncppobj_lib>)
+    target_sources(helics-shared PRIVATE $<TARGET_OBJECTS:jsoncppobj_lib>)
   else()
     target_link_libraries(helics-shared PRIVATE jsoncpp_lib)
+  endif()
+
+  if (NOT GMLC_UTILITIES_OBJECT_LIB)
+	target_link_libraries(helics-shared PUBLIC HELICS::utilities)
   endif()
 
   if(WIN32)
@@ -78,7 +86,7 @@ install(
 
 install(
   TARGETS helics-static
-  EXPORT helics-targets
+  ${HELICS_EXPORT_COMMAND}
   DESTINATION ${CMAKE_INSTALL_LIBDIR}
   COMPONENT libs
 )
@@ -86,7 +94,7 @@ install(
 if(BUILD_SHARED_LIBS)
   install(
     TARGETS helics-shared
-    EXPORT helics-targets
+    ${HELICS_EXPORT_COMMAND}
     RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
     ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}

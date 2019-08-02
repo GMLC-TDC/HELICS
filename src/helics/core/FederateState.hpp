@@ -13,9 +13,9 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "CoreFederateInfo.hpp"
 #include "InterfaceInfo.hpp"
 #include "TimeDependencies.hpp"
-#include "gmlc/containers/BlockingQueue.hpp"
 #include "core-data.hpp"
 #include "core-types.hpp"
+#include "gmlc/containers/BlockingQueue.hpp"
 #include "helics-time.hpp"
 #include "helics/helics-config.h"
 #include <atomic>
@@ -278,7 +278,7 @@ class FederateState
     /** move a message to the queue*/
     void addAction (ActionMessage &&action);
     /** sometime a message comes in after a federate has terminated and may require a response*/
-    stx::optional<ActionMessage> processPostTerminationAction (const ActionMessage &action);
+    opt<ActionMessage> processPostTerminationAction (const ActionMessage &action);
     /** log a message to the federate Logger
     @param level the logging level of the message
     @param logMessageSource the name of the object that sent the message

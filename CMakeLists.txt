@@ -7,13 +7,13 @@
 cmake_minimum_required(VERSION 3.4)
 cmake_policy(VERSION 3.4)
 
-project(HELICS VERSION 2.1.1)
+project(HELICS VERSION 2.2.0)
 
 # -----------------------------------------------------------------------------
 # HELICS Version number
 # -----------------------------------------------------------------------------
 set(HELICS_VERSION_BUILD)
-set(HELICS_DATE "07-16-19")
+set(HELICS_DATE "07-26-19")
 
 set(
     HELICS_VERSION_UNDERSCORE
@@ -31,19 +31,27 @@ set(HELICS_VERSION_STRING "${HELICS_VERSION} (${HELICS_DATE})")
 # -----------------------------------------------------------------------------
 # set the module path and include some common macros
 # -----------------------------------------------------------------------------
-set(
-    CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH}
-    "${PROJECT_SOURCE_DIR}/config/cmake/"
-)
-include(extraMacros)
-include(CMakeDependentOption)
-include(copy_key_files)
+
 
 if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
 	set(HELICS_ROOT_PROJ ON)
 else()
     set(HELICS_ROOT_PROJ OFF)
 endif()
+
+if (HELICS_ROOT_PROJ)
+set(CMAKE_MODULE_PATH
+     ${CMAKE_MODULE_PATH} "${PROJECT_SOURCE_DIR}/config/cmake/"
+)
+else()
+	set(ORIGINAL_MODULE_PATH ${CMAKE_MODULE_PATH})
+	set(CMAKE_MODULE_PATH
+    "${PROJECT_SOURCE_DIR}/config/cmake/" ${CMAKE_MODULE_PATH}
+)
+endif()
+include(extraMacros)
+include(CMakeDependentOption)
+include(copy_key_files)
 # include(BuildType)
 # -----------------------------------------------------------------------------
 # set the install path to a local directory
@@ -82,6 +90,18 @@ mark_as_advanced(BUILD_HELICS_BOOST_TESTS)
 
 else()
 endif()
+
+option(HELICS_WITH_CMAKE_PACKAGE "Generate and install cmake package files" ${HELICS_ROOT_PROJ})
+mark_as_advanced(HELICS_WITH_CMAKE_PACKAGE)
+
+
+# Install instructions for this target
+if(HELICS_WITH_CMAKE_PACKAGE)
+    set(HELICS_EXPORT_COMMAND EXPORT helics-targets)
+else(HELICS_WITH_CMAKE_PACKAGE)
+    set(HELICS_EXPORT_COMMAND)
+endif(HELICS_WITH_CMAKE_PACKAGE)
+
 # enable testing
 if(BUILD_HELICS_TESTS)
     include(CTest)
@@ -578,19 +598,54 @@ endif()
 # -----------------------------------------------------------------------------
 # create utilities target
 # -----------------------------------------------------------------------------
-set(UTILITIES_LIBRARY_TYPE OBJECT)
+
+set(GMLC_UTILITIES_OBJECT_LIB ON CACHE INTERNAL "")
+set(GMLC_UTILITIES_STATIC_LIB OFF CACHE INTERNAL "")
+if (NOT GMLC_UTILITIES_OBJECT_LIB)
+	set(UTILITIES_LIBRARY_EXPORT_COMMAND ${HELICS_EXPORT_COMMAND} CACHE INTERNAL "")
+endif()
+
 add_subdirectory(ThirdParty/utilities)
-set_target_properties(gmlc_utilities PROPERTIES FOLDER Extern)
-message(STATUS "Boost include=${Boost_INCLUDE_DIRS}")
-target_include_directories(gmlc_utilities SYSTEM PRIVATE ${Boost_INCLUDE_DIRS})
+
+mark_as_advanced(GMLC_UTILITIES_OBJECT_LIB)
+mark_as_advanced(GMLC_UTILITIES_STATIC_LIB)
+
+if (GMLC_UTILITIES_OBJECT_LIB)
+   if (NOT HELICS_ROOT_PROJ)
+	add_library(HELICS::utilities INTERFACE IMPORTED )
+	set_target_properties(HELICS::utilities PROPERTIES
+       INTERFACE_INCLUDE_DIRECTORIES $<BUILD_INTERFACE:ThirdParty/utilities/gmlc>
+    )
+	set_target_properties(HELICS::utilities PROPERTIES
+       INTERFACE_LINK_LIBRARIES "HELICS::helics-static"
+    )
+   endif()
+   set_target_properties(gmlc_utilities_obj PROPERTIES FOLDER Extern)
+   message(STATUS "Boost include=${Boost_INCLUDE_DIRS}")
+	target_include_directories(gmlc_utilities_obj SYSTEM PRIVATE $<BUILD_INTERFACE:${Boost_INCLUDE_DIRS}>)
+
+else()
+   add_library(HELICS::utilities ALIAS gmlc_utilities)
+   set_target_properties(gmlc_utilities PROPERTIES FOLDER Extern)
+   message(STATUS "Boost include=${Boost_INCLUDE_DIRS}")
+target_include_directories(gmlc_utilities SYSTEM PRIVATE $<BUILD_INTERFACE:${Boost_INCLUDE_DIRS}>)
+
+endif()
 
 file(GLOB UTILITIES_HEADERS_INSTALL_H ${PROJECT_SOURCE_DIR}/ThirdParty/utilities/gmlc/utilities/*.h)
 file(GLOB UTILITIES_HEADERS_INSTALL_HPP ${PROJECT_SOURCE_DIR}/ThirdParty/utilities/gmlc/utilities/*.hpp)
+file(GLOB UTILITIES_HEADERS_INSTALL_EXTRA ${PROJECT_SOURCE_DIR}/ThirdParty/utilities/gmlc/utilities/extra/*.hpp)
 
 install(
   FILES ${UTILITIES_HEADERS_INSTALL_H} ${UTILITIES_HEADERS_INSTALL_HPP}
   ${PROJECT_SOURCE_DIR}/ThirdParty/utilities/LICENSE
   DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/helics/utilities/
+  COMPONENT headers
+)
+
+install(
+  FILES ${UTILITIES_HEADERS_INSTALL_EXTRA}
+  DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/helics/utilities/extra
   COMPONENT headers
 )
 
@@ -656,9 +711,9 @@ add_subdirectory(docs)
 
 endif(HELICS_ROOT_PROJ)
 
-install(TARGETS helics_base EXPORT helics-targets)
-install(TARGETS helics_base_includes EXPORT helics-targets)
-install(TARGETS compile_flags_target EXPORT helics-targets)
+install(TARGETS helics_base ${HELICS_EXPORT_COMMAND})
+install(TARGETS helics_base_includes ${HELICS_EXPORT_COMMAND})
+install(TARGETS compile_flags_target ${HELICS_EXPORT_COMMAND})
 set(
     helics_static_file
     "${CMAKE_STATIC_LIBRARY_PREFIX}helics-static${CMAKE_STATIC_LIBRARY_SUFFIX}"
@@ -695,15 +750,19 @@ else()
     set(helics_c_shared_file_debug)
 endif()
 
+
+
+# Copy required CMake module files to build tree for importing build tree with find_package
+file(COPY config/cmake/addMPI.cmake config/cmake/FindZeroMQ.cmake DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+
+if (HELICS_WITH_CMAKE_PACKAGE)
+
 set(
     HELICS_CMAKECONFIG_INSTALL_DIR
     "${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}"
     CACHE STRING "install path for HELICSConfig.cmake"
 )
 mark_as_advanced(HELICS_CMAKECONFIG_INSTALL_DIR)
-
-# Copy required CMake module files to build tree for importing build tree with find_package
-file(COPY config/cmake/addMPI.cmake config/cmake/FindZeroMQ.cmake DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 
 # Export targets for importing build tree with find_package
 export(EXPORT helics-targets
@@ -717,7 +776,7 @@ install(
     DESTINATION ${HELICS_CMAKECONFIG_INSTALL_DIR}
     COMPONENT libs
 )
-
+endif()
 # -----------------------------------------------------------------------------
 # Setup configure.h file for accessing configure options
 # -----------------------------------------------------------------------------
@@ -753,7 +812,7 @@ target_include_directories(cereal
         $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/ThirdParty>
         $<INSTALL_INTERFACE:$<INSTALL_PREFIX>/include/helics/external/optional>
 )
-install(TARGETS cereal EXPORT helics-targets COMPONENT cereal)
+install(TARGETS cereal ${HELICS_EXPORT_COMMAND} COMPONENT cereal)
 endif()
 
 install(
@@ -761,25 +820,29 @@ install(
     DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/helics
     COMPONENT headers
 )
+if (HELICS_WITH_CMAKE_PACKAGE)
 
-include(CMakePackageConfigHelpers)
+   include(CMakePackageConfigHelpers)
 
-configure_package_config_file(
+   configure_package_config_file(
     config/${PROJECT_NAME}Config.cmake.in
     "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake"
     INSTALL_DESTINATION
     ${HELICS_CMAKECONFIG_INSTALL_DIR}
-)
-write_basic_package_version_file(
+   )
+   write_basic_package_version_file(
     ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake
     VERSION ${HELICS_VERSION}
     COMPATIBILITY SameMajorVersion
-)
+   )
+endif()
 
 if (NOT HELICS_ROOT_PROJ)
 	set_target_properties(helics_apps PROPERTIES FOLDER helics)
 	set_target_properties(application_api helics_common helics_core helics-static PROPERTIES FOLDER helics)
 endif()
+
+if (HELICS_WITH_CMAKE_PACKAGE)
 
 install(
     FILES
@@ -796,6 +859,7 @@ install(
     DESTINATION ${HELICS_CMAKECONFIG_INSTALL_DIR}
     COMPONENT libs
 )
+endif()
 
 # combine 3rd party license files for install package
 include(combineLicenses)
@@ -967,3 +1031,8 @@ if(ENABLE_PACKAGE_BUILD)
     # THIS LINE MUST BE LAST
     include(CPack)
 endif(ENABLE_PACKAGE_BUILD)
+
+if (NOT HELICS_ROOT_PROJ)
+	#restore the original module path
+	set(CMAKE_MODULE_PATH ${ORIGINAL_MODULE_PATH})
+endif()

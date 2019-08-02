@@ -58,5 +58,4 @@ install(TARGETS _helics DESTINATION python COMPONENT python)
   copy_shared_target(_helics)
 
 install(FILES ${CMAKE_CURRENT_BINARY_DIR}/helics.py DESTINATION python COMPONENT python)
-install(FILES $<TARGET_FILE:helicsSharedLib> DESTINATION python COMPONENT python)
-install(FILES ${KEY_LIBRARY_FILES} DESTINATION python COMPONENT python)
+install_key_files_with_comp(python)

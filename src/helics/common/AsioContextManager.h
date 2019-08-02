@@ -29,6 +29,10 @@ SPDX-License-Identifier: BSD-3-Clause
 
 // The choice for noexcept isn't set correctly in asio::io_context (including asio.hpp instead didn't help)
 // With Boost 1.58 this resulted in a compile error, apparently from the BOOST_NOEXCEPT define being empty
+#ifdef ASIO_ERROR_CATEGORY_NOEXCEPT
+#undef ASIO_ERROR_CATEGORY_NOEXCEPT
+#endif
+
 #define ASIO_ERROR_CATEGORY_NOEXCEPT noexcept (true)
 #include <asio/io_context.hpp>
 #undef ASIO_ERROR_CATEGORY_NOEXCEPT
