@@ -73,8 +73,10 @@ make
 make install
 ```
 
-Testing
--------
+If you want to install in a custom location, you can add the the following argument: `-DCMAKE_INSTALL_PREFIX=/path/to/folder/`
+
+Testing HELICS
+--------------
 
 A quick test is to double check the versions of the HELICS player and
 recorder:
@@ -107,6 +109,9 @@ Add the following to your `~/.bashrc` file.
 export PYTHONPATH=/Users/$(whoami)/local/helics-X.X.X/python:$PYTHONPATH
 ```
 
+Testing HELICS with python support
+----------------------------------
+
 If you open a interactive Python session and import helics, you should be able to get the version of `helics` and an output that is similar to the following.
 
 ```bash
@@ -121,6 +126,106 @@ In [2]: helics.helicsGetVersion()
 Out[2]: 'x.x.x (XX-XX-XX)'
 
 ```
+
+Building HELICS with MATLAB support
+-----------------------------------
+
+To install HELICS with MATLAB support, you will need to add `-DBUILD_MATLAB_INTERFACE=ON`.
+
+The important thing to note is that the MATLAB binaries are in the PATH.
+Specifically, `mex` must be available in the PATH.
+
+<div class="admonition note">
+
+Note: To check if `mex` is in the PATH, type `which mex` and see if it returns a PATH to the `mex` compiler
+
+</div>
+
+```
+git clone https://github.com/GMLC-TDC/HELICS
+cd HELICS
+mkdir build-osx
+cd build-osx
+cmake -DBUILD_MATLAB_INTERFACE=ON -DCMAKE_INSTALL_PREFIX=/Users/$(whoami)/local/helics-develop/ ..
+make -j8
+make install
+```
+
+Testing HELICS with MATLAB support
+----------------------------------
+
+To run the MATLAB HELICS extension, one would have to load the `helicsSharedLib` in the MATLAB file.
+This is run by the `helicsStartup` function in the generated MATLAB files.
+You can test this by opening MATLAB from the terminal or using the icon.
+
+```
+/Applications/MATLAB_R2017b.app/bin/matlab -nodesktop -nosplash -nojvm
+```
+
+and running 
+
+```matlab
+>> helicsStartup
+```
+
+<div class="admonition note">
+
+Note: See https://github.com/GMLC-TDC/HELICS/issues/763 if your installation doesn't point the dylib to the correct location.
+
+</div>
+
+
+You can run the following in two separate windows to test an example from the following repository:
+
+```
+git clone https://github.com/GMLC-TDC/HELICS-examples
+```
+
+Run the following in one MATLAB instance
+
+```bash
+matlab -nodesktop -nosplash
+cd ~/GitRepos/GMLC-TDC/HELICS-examples/matlab
+pireceiver
+```
+
+Run the following in a separate MATLAB instance.
+
+```bash
+matlab -nodesktop -nosplash
+cd ~/GitRepos/GMLC-TDC/HELICS-examples/matlab
+pisender
+```
+
+Building HELICS MATLAB support manually
+--------------------------------------------
+
+If you have changed the C-interface and want to regenerate the SWIG MATLAB bindings, you will need to use a custom version of SWIG to build the MATLAB interface.
+To do that, you can follow the following instructions.
+
+- Install [SWIG with MATLAB](https://github.com/jaeandersson/swig/)
+- `./configure --prefix=/Users/$USER/local/swig_install; make; make install;`
+- Ensure that SWIG and MATLAB are in the PATH
+
+The below generates the MATLAB interface using SWIG.
+
+```bash
+cd ~/GitRepos/GMLC-TDC/HELICS/interfaces/
+mkdir matlab
+swig -I../src/helics/shared_api_library -outdir ./matlab -matlab ./helics.i
+mv helics_wrap.cxx matlab/helicsMEX.cxx
+```
+
+You can copy these files into the respective `HELICS/interfaces/matlab/` folder and run the cmake command above.
+Alternatively, you wish to build the MATLAB interface without using CMake, and you can do the following.
+
+```bash
+cd ~/GitRepos/GMLC-TDC/HELICS/interfaces/
+mex -I../src/helics/shared_api_library ./matlab/helics_wrap.cxx -lhelicsSharedLib -L/path/to/helics_install/lib/helics/
+mv helicsMEX.* matlab/
+```
+
+You will need HELICS installed correctly before the above can be run successfully.
 
 Building HELICS using gcc and python
 ------------------------------------
@@ -171,73 +276,4 @@ Next, you will need to build HELICS and tell it what the `BOOST_ROOT` is.
 ```bash
 $ cmake -DCMAKE_INSTALL_PREFIX="/Users/$USER/local/helics-gcc-X.X.X/" -DBOOST_ROOT="/Users/$USER/local/boost-gcc-1.69.0" -DBUILD_PYTHON_INTERFACE=ON -DCMAKE_C_COMPILER=/usr/local/Cellar/gcc/8.2.0/bin/gcc-8 -DCMAKE_CXX_COMPILER=/usr/local/Cellar/gcc/8.2.0/bin/g++-8 ../
 $ make clean; make -j 4; make install
-```
-
-
-Building HELICS with MATLAB support
------------------------------------
-
-To install HELICS with MATLAB support, you will need to add `BUILD_MATLAB_INTERFACE=ON`.
-
-The important thing to note is that the MATLAB binaries are in the PATH.
-Specifically, `mex` must be available in the PATH.
-
-<div class="admonition note">
-
-Note: To check if `mex` is in the PATH, type `which mex` and see if it returns a PATH to the `mex` compiler
-
-</div>
-
-```
-git clone https://github.com/GMLC-TDC/HELICS
-cd HELICS
-mkdir build-osx
-cd build-osx
-cmake -DBUILD_MATLAB_INTERFACE=ON -DCMAKE_INSTALL_PREFIX=/Users/$(whoami)/local/helics-develop/ ..
-make -j8
-make install
-```
-
-If you have changed the C-interface, and want to regenerate the SWIG MATLAB bindings, you will need to use a custom version of SWIG to build the MATLAB interface.
-To do that, you can follow the following instructions.
-
-- Install [SWIG with MATLAB](https://github.com/jaeandersson/swig/)
-- `./configure --prefix=/Users/$USER/local/swig_install; make; make install;`
-- Ensure that SWIG and MATLAB are in the PATH
-
-The below generates the MATLAB interface using SWIG.
-
-```bash
-cd ~/GitRepos/GMLC-TDC/HELICS/interfaces/
-mkdir matlab
-swig -I../src/helics/shared_api_library -outdir ./matlab -matlab ./helics.i
-mv helics_wrap.cxx matlab/helicsMEX.cxx
-```
-
-You can copy these files into the respective `HELICS/interfaces/matlab/` folder and run the cmake command above.
-Alternatively, you wish to build the MATLAB interface without using CMake, and you can do the following.
-
-```bash
-cd ~/GitRepos/GMLC-TDC/HELICS/interfaces/
-mex -I../src/helics/shared_api_library ./matlab/helics_wrap.cxx -lhelicsSharedLib -L/path/to/helics_install/lib/helics/
-mv helicsMEX.* matlab/
-```
-
-## Test HELICS MATLAB extension
-
-To run the MATLAB HELICS extension, one would have to load the `helicsSharedLib` in the MATLAB file.
-You can modify the first line of the files listed below to point them to your current `helicsSharedLib` install.
-
-Run the following in two separate windows.
-
-```bash
-matlab -nodesktop -nosplash
-cd ~/GitRepos/GMLC-TDC/HELICS-examples/matlab
-pireceiver
-```
-
-```bash
-matlab -nodesktop -nosplash
-cd ~/GitRepos/GMLC-TDC/HELICS-examples/matlab
-pisender
 ```
