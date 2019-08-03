@@ -60,18 +60,28 @@ Getting and building from source:
 1. Use `git clone` to to check out a copy of HELICS.
 2. Create a build folder. Run cmake and give it the path that HELICS
    was checked out into.
-3. Run `make`.
 
 ```bash
 git clone https://github.com/GMLC-TDC/HELICS
 cd HELICS
 mkdir build
 cd build
-cmake ../
-ccmake . # optional, to change install path or other configuration settings
-make
-make install
 ```
+
+## Compile and Install
+
+There are a number of different options and approaches at this point depending on your needs, in particular with respect to programming language support:
+
+### Basic Install (without language bindings)
+
+1. Run `make`.
+
+   ```bash
+   cmake ../
+   ccmake . # optional, to change install path or other configuration settings
+   make
+   make install
+   ```
 
 If you want to install in a custom location, you can add the the following argument: `-DCMAKE_INSTALL_PREFIX=/path/to/folder/`
 
