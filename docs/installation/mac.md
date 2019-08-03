@@ -104,7 +104,13 @@ Specifically, `mex` must be available in the PATH.
 
 <div class="admonition note">
 
-Note: To check if `mex` is in the PATH, type `which mex` and see if it returns a PATH to the `mex` compiler
+Note: To check if `mex` is in the PATH, type `which mex` and see if it returns a PATH to the `mex` compiler.
+
+If it does not, you should install MATLAB and add the path to all the MATLAB binaries to your PATH.
+
+```
+export PATH="/Applications/MATLAB_R2017b.app/bin/:$PATH"
+```
 
 </div>
 
