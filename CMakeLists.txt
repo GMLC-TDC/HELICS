@@ -109,50 +109,15 @@ endif()
 
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
-
-option(BUILD_PYTHON_INTERFACE "Build Python extension" OFF)
 option(
-    BUILD_PYTHON2_INTERFACE
-    "Build Python2.7 extension(Requires swig and will not build if \"PYTHON_INTERFACE\" is active)"
-    OFF
+    DISABLE_C_SHARED_LIB OFF
+    "turn off building of the C shared interface"
 )
-option(BUILD_MATLAB_INTERFACE "Build Matlab Extension" OFF)
-option(BUILD_OCTAVE_INTERFACE "Build Octave extension" OFF)
-option(BUILD_JAVA_INTERFACE "Build Java extension" OFF)
+mark_as_advanced(DISABLE_C_SHARED_LIB)
 
-if(${CMAKE_VERSION} VERSION_GREATER 3.8)
-    # cmake projects are only available for csharp from 3.8 onward
-    option(BUILD_CSHARP_INTERFACE "Build C# extension" OFF)
-endif()
-
-if(
-    BUILD_PYTHON_INTERFACE
-    OR BUILD_PYTHON2_INTERFACE
-    OR BUILD_MATLAB_INTERFACE
-    OR BUILD_JAVA_INTERFACE
-    OR BUILD_CSHARP_INTERFACE
-    OR BUILD_OCTAVE_INTERFACE
-)
-    set(INTERFACE_BUILD ON)
-else()
-    set(INTERFACE_BUILD OFF)
-endif()
-
-cmake_dependent_option(
-    BUILD_C_SHARED_LIB
-    "Build the Shared Libraries with a C interface"
-    ON
-    "NOT INTERFACE_BUILD"
-    ON
-)
-option(
-    ENABLE_SWIG
-    "enable the use of the swig executable to generate interface code and use repository code instead"
-    ON
-)
 option(BUILD_SHARED_LIBS "install shared libraries for the CXX interface" OFF)
 
-if(INTERFACE_BUILD OR BUILD_C_SHARED_LIB OR BUILD_SHARED_LIBS)
+if(NOT DISABLE_C_SHARED_LIB OR BUILD_SHARED_LIBS)
     set(BUILD_HELICS_SHARED_LIBS ON)
 endif()
 
@@ -695,9 +660,8 @@ if(ENABLE_CLANG_TOOLS)
     include(clang-cxx-dev-tools)
 endif(ENABLE_CLANG_TOOLS)
 
-if(INTERFACE_BUILD)
-    add_subdirectory(interfaces)
-endif()
+add_subdirectory(interfaces)
+
 
 # add base swig interface files as install option, regardless of current interfaces built
 install(
@@ -926,7 +890,7 @@ if(ENABLE_PACKAGE_BUILD)
         java
         octave
         csharp
-	swig
+		swig
         cereal
     )
     if(WIN32)

@@ -31,8 +31,8 @@ fi
 if [[ "${DISABLE_INTERFACES}" != *"Python"* ]]; then
     OPTION_FLAGS_ARR+=("-DBUILD_PYTHON_INTERFACE=ON" "-DPYTHON_LIBRARY=${PYTHON_LIB_PATH}" "-DPYTHON_INCLUDE_DIR=${PYTHON_INCLUDE_PATH}")
 fi
-if [[ "$USE_SWIG" == 'false' ]]; then
-    OPTION_FLAGS_ARR+=("-DENABLE_SWIG=OFF")
+if [[ "$USE_SWIG" == 'true' ]]; then
+    OPTION_FLAGS_ARR+=("-DENABLE_SWIG=ON")
 fi
 
 # Options related to the CMake build type
