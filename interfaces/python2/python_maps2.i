@@ -201,6 +201,49 @@ PyModule_AddObject(m, "HelicsException", pHelicsException);
   $result = SWIG_Python_AppendOutput($result, o2);
 }
 
+
+
+// typemap for raw data output function
+%typemap(in, numinputs=0) (void *data, int maxDatalen, int *actualSize) {
+  $3=&($2);
+}
+
+%typemap(freearg) (void *data, int maxDatalen, int *actualSize) {
+   if ($1) free($1);
+}
+
+// Set argument to NULL before any conversion occurs
+%typemap(check)(void *data, int maxDatalen, int *actualSize) {
+    $2=helicsInputGetValueSize(arg1)+2;
+    $1 =  malloc($2);
+}
+
+%typemap(argout) (void *data, int maxDatalen, int *actualSize) {
+  PyObject *o2=PyBytes_FromStringAndSize($1,*$3);
+  $result = SWIG_Python_AppendOutput($result, o2);
+}
+
+
+// typemap for raw message data output
+%typemap(in, numinputs=0) (void *data, int maxMessagelen, int *actualSize) {
+  $3=&($2);
+}
+
+%typemap(freearg) (void *data, int maxMessagelen, int *actualSize) {
+   if ($1) free($1);
+}
+
+// Set argument to NULL before any conversion occurs
+%typemap(check)(void *data, int maxMessagelen, int *actualSize) {
+    $2=helicsMessageGetRawDataSize(arg1)+2;
+    $1 =  malloc($2);
+}
+
+%typemap(argout) (void *data, int maxMessagelen, int *actualSize) {
+  PyObject *o2=PyBytes_FromStringAndSize($1,*$3);
+  $result = SWIG_Python_AppendOutput($result, o2);
+}
+
 %apply (char *STRING, size_t LENGTH) { (const void *data, int inputDataLength) };
 
 %apply (char *outputString, int maxStringLen, int *actualLength) {(void *data, int maxDatalen, int *actualSize)};
