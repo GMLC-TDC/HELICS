@@ -4,7 +4,7 @@ Installation
 The first step to using HELICS is to install it.
 You’ll need an internet connection to run the commands in this chapter, as we’ll be downloading HELICS from the internet.
 
-We’ll be showing a number of commands as code snippets in the following presentation using a terminal, and those lines all start with `$`.
+We’ll be showing a number of commands as code snippets in the following presentation using a terminal, and those lines may start with `$`.
 You don’t need to type in the `$` character; they are there to indicate the start of each command.
 Lines that don’t start with `$` are typically showing the output of the previous command.
 
@@ -17,8 +17,6 @@ OR
 Use conda to install helics:
 
 ```bash
-conda install -c conda-forge helics
-# OR
 conda install -c gmlc-tdc helics
 ```
 
