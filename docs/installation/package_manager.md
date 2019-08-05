@@ -1,5 +1,17 @@
 # Package Manager
 
+## Install using conda (Windows, MacOS, Linux)
+
+**Recommended**
+
+Install [Anaconda](https://www.anaconda.com/download/) or [Miniconda](https://conda.io/en/latest/miniconda.html). It is a Python distribution but also provides a cross platform package manager called `conda`.
+
+You can then use `conda` to install HELICS.
+
+```bash
+conda install -c gmlc-tdc helics
+```
+
 ## Install using brew (MacOS)
 
 Install [brew](https://brew.sh/). It is a package manager for MacOS.
@@ -31,16 +43,3 @@ That is to say, you cannot build using Python3 and run using Python2.
 Additionally, if required, you can add `--HEAD` to install from the
 latest `develop` branch.
 
-## Install using conda (Windows, MacOS, Linux)
-
-Install [Anaconda](https://www.anaconda.com/download/) or [Miniconda](https://conda.io/en/latest/miniconda.html). It is a Python distribution but also provides a cross platform package manager called `conda`.
-
-```bash
-conda install -c conda-forge helics
-```
-
-OR
-
-```bash
-conda install -c kdheepak helics
-```
