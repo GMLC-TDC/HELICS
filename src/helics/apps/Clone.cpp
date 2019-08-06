@@ -72,12 +72,17 @@ Clone::Clone (const std::string &appName, const std::string &jsonString) : App (
 }
 
 Clone::~Clone ()
-try
 {
-    saveFile (outFileName);
-}
-catch (...)
-{
+    try
+    {
+        if (!outFileName.empty ())
+        {
+            saveFile (outFileName);
+        }
+    }
+    catch (...)
+    {
+    }
 }
 
 void Clone::saveFile (const std::string &filename)
@@ -193,7 +198,7 @@ void Clone::generateInterfaces ()
             }
             addSourceEndpointClone (ept);
         }
-        cloneSubscriptionsNames = vectorizeQueryResult (fed->query (captureFederate, "subscriptions"));
+        cloneSubscriptionsNames = vectorizeQueryResult (queryFederateSubscriptions (fed.get (), captureFederate));
         fedConfig = fed->query (captureFederate, "config");
     }
 }

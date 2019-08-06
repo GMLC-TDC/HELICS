@@ -242,7 +242,7 @@ void terminalFunction (std::vector<std::string> args)
         {
             res = (*broker)->query (target, query);
         }
-        auto qvec = vectorizeQueryResult (std::move (res));
+        auto qvec = helics::vectorizeQueryResult (std::move (res));
         std::cout << "results: ";
         for (const auto &vres : qvec)
         {

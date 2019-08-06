@@ -37,7 +37,7 @@ BOOST_AUTO_TEST_CASE (simple_clone_test_pub)
 
     helics::ValueFederate vfed ("block1", fi);
     helics::Publication pub1 (helics::GLOBAL, &vfed, "pub1", helics::data_type::helics_double);
-    auto fut = std::async (std::launch::async, [&c1] () { c1.runTo (4); });
+    auto fut = std::async (std::launch::async, [&c1]() { c1.runTo (4); });
     vfed.enterExecutingMode ();
     auto retTime = vfed.requestTime (1);
     BOOST_CHECK_EQUAL (retTime, 1.0);
@@ -55,6 +55,41 @@ BOOST_AUTO_TEST_CASE (simple_clone_test_pub)
     c1.finalize ();
     auto cnt = c1.pointCount ();
     BOOST_CHECK_EQUAL (cnt, 2u);
+}
+
+BOOST_AUTO_TEST_CASE (simple_clone_test_pub2)
+{
+    helics::FederateInfo fi (helics::core_type::TEST);
+    fi.coreName = "rcore1";
+    fi.coreInitString = "-f 2 --autobroker";
+    helics::apps::Clone c1 ("c1", fi);
+    c1.setFederateToClone ("block1");
+
+    helics::ValueFederate vfed ("block1", fi);
+    helics::Publication pub1 (helics::GLOBAL, &vfed, "pub1", helics::data_type::helics_double);
+
+    auto &pub2=vfed.registerPublication ("pub2", "double", "m");
+
+    auto fut =
+      std::async (std::launch::async, [&c1]() { c1.runTo (4); });
+    vfed.enterExecutingMode ();
+    auto retTime = vfed.requestTime (1);
+    BOOST_CHECK_EQUAL (retTime, 1.0);
+    pub1.publish (3.4);
+
+    retTime = vfed.requestTime (2.0);
+    BOOST_CHECK_EQUAL (retTime, 2.0);
+    pub1.publish (4.7);
+    pub2.publish (3.3);
+    retTime = vfed.requestTime (5);
+    BOOST_CHECK_EQUAL (retTime, 5.0);
+
+    vfed.finalize ();
+    fut.get ();
+    c1.finalize ();
+    auto cnt = c1.pointCount ();
+    BOOST_CHECK_EQUAL (cnt, 3u);
+	
 }
 
 /*

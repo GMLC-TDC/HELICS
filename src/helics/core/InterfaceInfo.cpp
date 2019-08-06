@@ -318,9 +318,9 @@ std::string InterfaceInfo::generateInferfaceConfig () const
     std::ostringstream s;
 
     auto ihandle = inputs.lock_shared ();
-    if (!ihandle->size () > 0)
+    if (ihandle->size () > 0)
     {
-        s << "inputs:[";
+        s << "\"inputs\":[";
         bool first = true;
         for (auto &ipt : ihandle)
         {
@@ -347,9 +347,9 @@ std::string InterfaceInfo::generateInferfaceConfig () const
     }
     ihandle.unlock ();
     auto phandle = publications.lock ();
-    if (!phandle->size () > 0)
+    if (phandle->size () > 0)
     {
-        s << "\npublications:[";
+        s << "\n\"publications\":[";
         bool first = true;
         for (auto &pub : phandle)
         {
@@ -358,8 +358,6 @@ std::string InterfaceInfo::generateInferfaceConfig () const
                 s << ',';
             }
             first = false;
-
-            s << "],";
             s << "{\n \"key\":\"" << pub->key << "\"";
             if (!pub->type.empty ())
             {
@@ -376,9 +374,9 @@ std::string InterfaceInfo::generateInferfaceConfig () const
     phandle.unlock ();
 
     auto ehandle = endpoints.lock_shared ();
-    if (!ehandle->size () > 0)
+    if (ehandle->size () > 0)
     {
-        s << "\nendpoints:[";
+        s << "\n\"endpoints\":[";
         bool first = true;
         for (auto &ept : ehandle)
         {
@@ -398,7 +396,7 @@ std::string InterfaceInfo::generateInferfaceConfig () const
         s << "\n],";
     }
     phandle.unlock ();
-    s << "\"extra\":\"configuration\"";
+    s << "\n\"extra\":\"configuration\"";
     return s.str ();
 }
 }  // namespace helics
