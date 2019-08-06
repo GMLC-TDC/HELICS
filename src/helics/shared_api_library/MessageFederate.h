@@ -156,25 +156,27 @@ extern "C"
     HELICS_EXPORT helics_message_object helicsEndpointGetMessageObject (helics_endpoint endpoint);
 
     /** receive a communication message for any endpoint in the federate
-    @details the return order will be in order of endpoint creation then order of arrival
-    all messages for the first endpoint, then all for the second, and so on
+    @details the return order will be in order of endpoint creation.
+    So all messages that are available for the first endpoint, then all for the second, and so on
     within a single endpoint the messages are ordered by time, then source_id, then order of arrival
     @return a unique_ptr to a Message object containing the message data*/
     HELICS_EXPORT helics_message helicsFederateGetMessage (helics_federate fed);
 
     /** receive a communication message for any endpoint in the federate
-    @details the return order will be in order of endpoint creation then order of arrival
-    all messages for the first endpoint, then all for the second, and so on
+     @details the return order will be in order of endpoint creation.
+    So all messages that are available for the first endpoint, then all for the second, and so on
     within a single endpoint the messages are ordered by time, then source_id, then order of arrival
     @return a helics_message_object which references the data in the message*/
     HELICS_EXPORT helics_message_object helicsFederateGetMessageObject (helics_federate fed);
 
     /** create a new empty message object
+	@details, the message is empty and isValid will return false since there is no data associated with the message yet. 
     @return a helics_message_object containing the message data*/
     HELICS_EXPORT helics_message_object helicsFederateCreateMessageObject (helics_federate fed, helics_error *err);
-    /** clear all message from a federate
+    
+	/** clear all stored messages from a federate
     @details this clears messages retrieved through helicsFederateGetMessage or helicsFederateGetMessageObject
-    @param endpoint  the endpoint object to operate on
+    @param fed the federate to clear the message for
     */
     HELICS_EXPORT void helicsFederateClearMessages (helics_federate fed);
     /** clear all message from an endpoint
@@ -182,10 +184,6 @@ extern "C"
     */
     HELICS_EXPORT void helicsEndpointClearMessages (helics_endpoint endpoint);
 
-    /** get the last retrieved message from a federate*/
-    HELICS_EXPORT helics_message_object helicsFederateGetLastMessage (helics_federate fed);
-    /** get the last retrieved message from an endpoint*/
-    HELICS_EXPORT helics_message_object helicsEndpointGetLastMessage (helics_endpoint endpoint);
     /** get the type specified for an endpoint
     @param endpoint  the endpoint object in question
     @return the defined type of the endpoint
@@ -207,7 +205,8 @@ extern "C"
     @param end the filter to query
     @return a string with the info field string*/
     HELICS_EXPORT const char *helicsEndpointGetInfo (helics_endpoint end);
-    /** set the data in the info field for an filter
+    
+	/** set the data in the info field for an filter
     @param end the endpoint to query
     @param info the string to set
     @param[in,out] err an error object to fill out in case of an error*/
@@ -288,7 +287,7 @@ extern "C"
 
     /** get a pointer to the raw data of a message
     @param message a message object to get the data for
-    @return a pointer to the raw data in memory
+    @return a pointer to the raw data in memory, the pointer may be NULL if the message is not a valid message
     */
     HELICS_EXPORT void *helicsMessageGetRawDataPointer (helics_message_object message);
     /** a check if the message contains a valid payload

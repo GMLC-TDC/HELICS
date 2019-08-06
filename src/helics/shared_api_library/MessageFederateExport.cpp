@@ -181,7 +181,7 @@ void helicsEndpointSetDefaultDestination (helics_endpoint endpoint, const char *
     {
         return;
     }
-    CHECK_NULL_STRING (dest, void ());
+    CHECK_NULL_STRING (dest, void());
     try
     {
         endObj->endPtr->setDefaultDestination (dest);
@@ -376,7 +376,7 @@ void helicsEndpointSubscribe (helics_endpoint endpoint, const char *key, helics_
     {
         return;
     }
-    CHECK_NULL_STRING (key, void ());
+    CHECK_NULL_STRING (key, void());
     try
     {
         endObj->endPtr->subscribe (key);
@@ -572,6 +572,7 @@ void helicsEndpointClearMessages (helics_endpoint endpoint)
     endObj->messages.clear ();
 }
 
+/* this function has been removed but may be added back in the future
 helics_message_object helicsFederateGetLastMessage (helics_federate fed)
 {
     auto fedObj = helics::getFedObject (fed, nullptr);
@@ -601,6 +602,7 @@ helics_message_object helicsEndpointGetLastMessage (helics_endpoint endpoint)
     }
     return nullptr;
 }
+*/
 
 bool checkOutArgString (const char *outputString, int maxlen, helics_error *err)
 {
