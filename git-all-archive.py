@@ -99,7 +99,7 @@ def SendFile(FILENAME, CLONE, RELEASE, TOKEN, CLIENTID, CLIENTSECRET):
             if asset.name == FILENAME:
                 asset.update_asset(FILENAME)
     except BaseException as e:
-        print("Error, check if file already exist in repository")
+        print("Error, check if file already exist in this directory")
         sys.exit(1)
 
 
