@@ -117,7 +117,7 @@ if (BUILD_APP_LIBRARY)
 	add_subdirectory(apps)
 endif(BUILD_APP_LIBRARY)
 
-if(BUILD_C_SHARED_LIB OR INTERFACE_BUILD)
+if(NOT DISABLE_C_SHARED_LIB)
   add_subdirectory(shared_api_library)
   add_subdirectory(cpp98)
   install(
