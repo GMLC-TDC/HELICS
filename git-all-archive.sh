@@ -22,7 +22,7 @@ where:
     -k  github Personal access token (read/write permission)
     -i  github client id (github OAuth [optional])
     -s  github client secret (github OAut [optional])
-    
+
     URL: https://github.com/GMLC-TDC/HELICS/releases"
 
 while getopts ':ht:r:l:k:i:s:' option; do
@@ -89,7 +89,7 @@ mv repo-output.tar.gz $OUTPUT_FILE
 
 cmd="python git-all-archive.py --repo $repo --release $release --version $tag"
 if [ "${GITHUB_TOKEN}a" != "a" ]; then
-    cmd="${cmd} --token $GITHUB_TOKEN" 
+    cmd="${cmd} --token $GITHUB_TOKEN"
 fi
 if [[ "${CLIENT_ID}a" != "a" ]]; then
     cmd="${cmd} --client_id $CLIENT_ID"
