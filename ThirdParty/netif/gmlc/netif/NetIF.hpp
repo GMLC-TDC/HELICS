@@ -32,9 +32,15 @@ namespace gmlc
 namespace netif
 {
   #if defined(_WIN32)
-    typedef IF_ADDRS PIP_ADAPTER_ADDRESSES
+    using IF_ADDRS = PIP_ADAPTER_ADDRESSES;
   #else
-    typedef IF_ADDRS struct ifaddrs*
+    using IF_ADDRS = struct ifaddrs*;
+  #endif
+
+  #if defined(_WIN32)
+    using IF_ADDRS_UNICAST = PIP_ADAPTER_UNICAST_ADDRESS;
+  #else
+    using IF_ADDRS_UNICAST = struct ifaddrs *;
   #endif
 
   inline std::string addressToString(struct sockaddr *addr)
@@ -98,7 +104,7 @@ namespace netif
     #endif
   }
 
-  inline auto getSockAddr(IF_ADDRS addr)
+  inline auto getSockAddr(IF_ADDRS_UNICAST addr)
   {
     #if defined(_WIN32)
       return addr->Address.lpSockaddr;
@@ -107,7 +113,7 @@ namespace netif
     #endif
   }
 	
-  inline IF_ADDRS getNextAddress(int family, IF_ADDRS addrs)
+  inline IF_ADDRS_UNICAST getNextAddress(int family, IF_ADDRS_UNICAST addrs)
   {
     #if defined(_WIN32)
       return addrs->Next;
@@ -148,7 +154,7 @@ namespace netif
     getAddresses(family, &allAddrs);
 
 #if defined(_WIN32)
-    IF_ADDRS winAddrs = allAddrs;
+    auto winAddrs = allAddrs;
     while (winAddrs) {
       auto addrs = winAddrs->FirstUnicastAddress;
 #else
@@ -163,7 +169,7 @@ namespace netif
     }
 
 #if defined(_WIN32)
-      winAddrs = getNextAddress(family, winAddrs);
+      winAddrs = winAddrs->Next;
     }
 #endif
 
