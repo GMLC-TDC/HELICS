@@ -43,6 +43,11 @@ namespace netif
     using IF_ADDRS_UNICAST = struct ifaddrs *;
   #endif
 
+  /**
+   * a helper function to convert the IP address in a sockaddr struct to text
+   * @param addr a pointer to a sockaddr struct
+   * @return an IP address in text form, or an empty string if conversion to text failed
+   */
   inline std::string addressToString(struct sockaddr *addr)
   {
     int family = addr->sa_family;
@@ -61,7 +66,11 @@ namespace netif
     inet_ntop(family, src_addr, addr_str, INET6_ADDRSTRLEN);
     return std::string(addr_str);
   }
-	
+
+  /**
+   * a helper function to free the memory allocated to store a set of interface addresses
+   * @param addrs a pointer to the allocated address structure (type depends on OS)
+   */
   inline void freeAddresses(IF_ADDRS addrs)
   {
     #if defined(_WIN32)
@@ -71,6 +80,12 @@ namespace netif
     #endif
   }
 
+  /**
+   * a helper function to get a list of all interface adapters using OS system calls. the returned pointer from addrs must be freed with a call to freeAddresses.
+   * @param family type of adapter addresses to get on Windows; one of AF_INET (IPv4), AF_INET6 (IPv6), or AF_UNSPEC (both)
+   * @param[out] addrs pointer to a pointer to be filled in with the address of the allocated address structure; must be freed when done by calling freeAddresses
+   * @return 0 on success, or -1 if an error occurred
+   */
   inline auto getAddresses(int family, IF_ADDRS* addrs)
   {
     #if defined(_WIN32)
@@ -104,6 +119,11 @@ namespace netif
     #endif
   }
 
+  /**
+   * a helper function to get the underlying socket address structure based on OS
+   * @param addr a pointer to an address structure for an (unicast) interface/adapter
+   * @return a socket address structure containing the IP address information for an interface
+   */
   inline auto getSockAddr(IF_ADDRS_UNICAST addr)
   {
     #if defined(_WIN32)
@@ -113,6 +133,12 @@ namespace netif
     #endif
   }
 	
+  /**
+   * a helper function to get the next interface/adapter address based on OS
+   * @param family specify the type of address desired on non-Windows systems; one of AF_INET (IPv4), AF_INET6 (IPv6), or AF_UNSPEC (both)
+   * @param addrs a pointer to an addresses structure for an interface/adapter list
+   * @return the next interface/adapter in the addresses list (that matches the family given for non-Windows systems), or nullptr if there is no next address
+   */
   inline IF_ADDRS_UNICAST getNextAddress(int family, IF_ADDRS_UNICAST addrs)
   {
     #if defined(_WIN32)
@@ -144,7 +170,12 @@ namespace netif
     return nullptr;
     #endif
   }
-	  
+	 
+  /**
+   * get all addresses associated with network interfaces on the system of the address family given.
+   * @param family the type of IP address to return; one of AF_INET (IPv4), AF_INET6 (IPv6), or AF_UNSPEC (both)
+   * @return a list of addresses as text
+   */
   std::vector<std::string> getInterfaceAddresses(int family)
   {
     std::vector<std::string> result_list;
@@ -179,16 +210,28 @@ namespace netif
     return result_list;
   }
 
+  /**
+   * returns a list of all IPv4 addresses associated with network interfaces on the system.
+   * @return a list of IPv4 addresses as text
+   */
   std::vector<std::string> getInterfaceAddressesV4()
   {
     return getInterfaceAddresses(AF_INET);
   }
-	
+
+  /**
+   * returns a list of all IPv6 addresses associated with network interfaces on the system.
+   * @return a list of IPv6 addresses as text
+   */
   std::vector<std::string> getInterfaceAddressesV6()
   {
     return getInterfaceAddresses(AF_INET6);
   }
 
+  /**
+   * returns a list of all IPv4 and IPv6 addresses associated with network interfaces on the system.
+   * @return a list of IPv4 and IPv6 addresses as text
+   */
   std::vector<std::string> getInterfaceAddressesAll()
   {
     return getInterfaceAddresses(AF_UNSPEC);
