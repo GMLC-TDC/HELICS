@@ -75,7 +75,7 @@ Clone::~Clone ()
 {
     try
     {
-        if (!outFileName.empty ())
+        if (!fileSaved && !outFileName.empty ())
         {
             saveFile (outFileName);
         }
@@ -87,12 +87,22 @@ Clone::~Clone ()
 
 void Clone::saveFile (const std::string &filename)
 {
-    Json::Value doc = loadJsonStr (fedConfig);
-    doc["global"] = true;
-    if (!cloneSubscriptionsNames.empty ())
+    if (filename.empty ())
     {
+        if (!outFileName.empty ())
+        {
+            saveFile (outFileName);
+        }
+        return;
+    }
+    Json::Value doc = loadJsonStr (fedConfig);
+    doc["defaultglobal"] = true;
+    if (!cloneSubscriptionNames.empty ())
+    {
+        doc["optional"] = true;
+
         doc["subscriptions"] = Json::Value (Json::arrayValue);
-        for (auto &sub : cloneSubscriptionsNames)
+        for (auto &sub : cloneSubscriptionNames)
         {
             Json::Value subsc;
             subsc["key"] = sub;
@@ -156,17 +166,14 @@ void Clone::saveFile (const std::string &filename)
 
     std::ofstream o (filename);
     o << doc << std::endl;
+    fileSaved = true;
 }
 
 void Clone::initialize ()
 {
     generateInterfaces ();
 
-    vStat.resize (subids.size ());
-    for (auto &val : subkeys)
-    {
-        vStat[val.second].key = val.first;
-    }
+    pubPointCount.resize (subids.size (), 0);
 
     fed->enterInitializingMode ();
     captureForCurrentTime (-1.0);
@@ -198,7 +205,12 @@ void Clone::generateInterfaces ()
             }
             addSourceEndpointClone (ept);
         }
-        cloneSubscriptionsNames = vectorizeQueryResult (queryFederateSubscriptions (fed.get (), captureFederate));
+        cloneSubscriptionNames = vectorizeQueryResult (queryFederateSubscriptions (fed.get (), captureFederate));
+        // get rid of any empty strings that may have come to be
+        cloneSubscriptionNames.erase (std::remove (cloneSubscriptionNames.begin (), cloneSubscriptionNames.end (),
+                                                   std::string{}),
+                                      cloneSubscriptionNames.end ());
+
         fedConfig = fed->query (captureFederate, "config");
     }
 }
@@ -246,13 +258,11 @@ void Clone::captureForCurrentTime (Time currentTime, int iteration)
                 }
                 logger->addMessage (std::move (valstr));
             }
-            if (vStat[ii].cnt == 0)
+            if (pubPointCount[ii] == 0)
             {
                 points.back ().first = true;
             }
-            ++vStat[ii].cnt;
-            vStat[ii].lastVal = val;
-            vStat[ii].time = -1.0;
+            ++pubPointCount[ii];
         }
     }
 
@@ -278,19 +288,7 @@ std::string Clone::encode (const std::string &str2encode)
 void Clone::runTo (Time runToTime)
 {
     initialize ();
-    if (!mapfile.empty ())
-    {
-        std::ofstream out (mapfile);
-        for (auto &stat : vStat)
-        {
-            //    out << stat.key << "\t" << stat.cnt << '\t' << static_cast<double> (stat.time) << '\t' <<
-            //    stat.lastVal
-            //        << '\n';
-            fmt::print (out, "{}\t{}\t{}\t{}\n", stat.key, stat.cnt, static_cast<double> (stat.time),
-                        stat.lastVal);
-        }
-        out.flush ();
-    }
+
     Time nextPrintTime = (nextPrintTimeStep > timeZero) ? nextPrintTimeStep : Time::maxVal ();
     try
     {
@@ -314,16 +312,7 @@ void Clone::runTo (Time runToTime)
                 T = fed->requestTime (runToTime);
                 captureForCurrentTime (T);
             }
-            if (!mapfile.empty ())
-            {
-                std::ofstream out (mapfile);
-                for (auto &stat : vStat)
-                {
-                    fmt::print (out, "{}\t{}\t{}\t{}\n", stat.key, stat.cnt, static_cast<double> (stat.time),
-                                stat.lastVal);
-                }
-                out.flush ();
-            }
+
             if (T >= runToTime)
             {
                 break;

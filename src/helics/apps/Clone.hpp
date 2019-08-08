@@ -56,7 +56,7 @@ class Clone : public App
     /** run the Cloner until the specified time*/
     virtual void runTo (Time runToTime) override;
     /** save the data to a file*/
-    void saveFile (const std::string &filename);
+    void saveFile (const std::string &filename = std::string{});
     /** get the number of captured points*/
     auto pointCount () const { return points.size (); }
     /** get the number of captured messages*/
@@ -76,7 +76,8 @@ class Clone : public App
     @param federateName the name of the federate to clone
     */
     void setFederateToClone (const std::string &federateName);
-
+    /** set the name of the output file 
+	@param fileName  the name of the file, can be "" if no file should be auto saved/
   private:
     /** add a subscription to capture*/
     void addSubscription (const std::string &key);
@@ -108,34 +109,24 @@ class Clone : public App
         ValueCapture (helics::Time t1, int id1, const std::string &val) : time (t1), index (id1), value (val){};
     };
 
-    /** helper class for displaying statistics*/
-    class ValueStats
-    {
-      public:
-        helics::Time time = helics::Time::minVal ();
-        std::string lastVal;
-        std::string key;
-        int cnt = 0;
-    };
-
     bool allow_iteration = false;  //!< trigger to allow Iteration
     bool verbose = false;  //!< print all captured values to the screen
+    bool fileSaved = false;  //!< true if the file has been saved already
     Time nextPrintTimeStep = helics::timeZero;  //!< the time advancement period for printing markers
     std::unique_ptr<CloningFilter> cFilt;  //!< a pointer to a clone filter
     std::vector<ValueCapture> points;  //!< lists of points that were captured
     std::vector<Input> subscriptions;  //!< the actual subscription objects
-    std::vector<std::string> cloneSubscriptionsNames;  //!< string of the subscriptions of the cloned federate
+    std::vector<std::string> cloneSubscriptionNames;  //!< string of the subscriptions of the cloned federate
     std::unique_ptr<Endpoint> cloneEndpoint;  //!< the endpoint for cloned message delivery
     std::vector<std::unique_ptr<Message>> messages;  //!< list of messages
     std::map<helics::interface_handle, int> subids;  //!< map of the subscription ids
     std::map<std::string, int> subkeys;  //!< translate subscription names to an index
     std::map<helics::interface_handle, int> eptids;  // translate subscription id to index
     std::map<std::string, int> eptNames;  //!< translate endpoint name to index
-    std::vector<ValueStats> vStat;  //!< storage for statistics capture
     std::string captureFederate;  //!< storage for the name of the federate to clone
     std::string fedConfig;  //!< storage for the federateConfiguration
-    std::string mapfile;  //!< file name for the on-line file updater
-    std::string outFileName{"out.txt"};  //!< the final output file
+    std::string outFileName{"clone.json"};  //!< the final output file
+    std::vector<int> pubPointCount;  //!< a	vector containing the counts of each publication
 };
 
 }  // namespace apps
