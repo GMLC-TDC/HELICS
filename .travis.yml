@@ -158,6 +158,7 @@ jobs:
         - scripts/install-dependency.sh boost 1.66.0 ${TRAVIS_BUILD_DIR}/dependencies/boost
       script:
         - mkdir -p build && cd build
+        - ls /c/ProgramData/chocolatey/lib/mingw/tools/install/mingw64/bin
         - ls ${TRAVIS_BUILD_DIR}/dependencies/boost
         - ls ${TRAVIS_BUILD_DIR}/dependencies/boost/include
         - cmake .. -G "MinGW Makefiles" -DBUILD_HELICS_TESTS=OFF -DBOOST_INSTALL_PATH=${TRAVIS_BUILD_DIR}/dependencies/boost ${JOB_OPTION_FLAGS} ${HELICS_DEPENDENCY_FLAGS} ${HELICS_OPTION_FLAGS} -DCMAKE_SH="CMAKE_SH-NOTFOUND"
