@@ -154,13 +154,13 @@ jobs:
         - msys || echo "msys does not exist"; true
         - msys2 || echo "msys2 does not exist"; true
         - source scripts/setup-helics-ci-options.sh
-        - scripts/install-dependency.sh boost 1.69.0 ${TRAVIS_BUILD_DIR}/dependencies/boost
+        - scripts/install-dependency.sh boost 1.66.0 ${TRAVIS_BUILD_DIR}/dependencies/boost
       script:
         - mkdir -p build && cd build
         - ls ${TRAVIS_BUILD_DIR}/dependencies/boost
         - ls ${TRAVIS_BUILD_DIR}/dependencies/boost/include
         - cmake .. -G "MinGW Makefiles" -DBUILD_HELICS_TESTS=OFF -DBOOST_INSTALL_PATH=${TRAVIS_BUILD_DIR}/dependencies/boost ${JOB_OPTION_FLAGS} ${HELICS_DEPENDENCY_FLAGS} ${HELICS_OPTION_FLAGS} -DCMAKE_SH="CMAKE_SH-NOTFOUND"
-        - mingw64-make ${MAKEFLAGS}
+        - cmake . --build
 
     # -----------------------------------------------
     # Daily ZMQ subproject build with new CMake
