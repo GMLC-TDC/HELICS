@@ -24,4 +24,4 @@
 	url = https://github.com/GMLC-TDC/utilities.git
 [submodule "ThirdParty/units"]
 	path = ThirdParty/units
-	url = ../../LLNL/units.git
+	url = https://github.com/LLNL/units.git

@@ -16,7 +16,7 @@ Minor release with some updates to the networking portion of HELICS
 
 ### Added
 -   The ability specify a broker key for brokers and cores to limit linking to those cores with the appropriate key
--   A units library into HELICS,  mismatched units are checked and units published as a double with units on the publication and subscription are converted internally
+-   A units library into HELICS,  mismatched units are checked and units published as a double with units on the publication and subscription converted internally
 
 ### Removed
 

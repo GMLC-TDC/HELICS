@@ -5,7 +5,6 @@ set(UNITS_LIBRARY_EXPORT_COMMAND ${HELICS_EXPORT_COMMAND} CACHE INTERNAL "")
 if (MSVC)
   option(HELICS_UNITS_OBJLIB OFF "use the units objlib for linking object files instead of the normal target") 
 else(MSVC)
- # for Everything but MSVC turn this on to not conflict with system jsoncpp if any
   option(HELICS_UNITS_OBJLIB ON "use the units objlib for linking object files instead of the normal target") 
 endif(MSVC)
 
