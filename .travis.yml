@@ -153,11 +153,11 @@ jobs:
         - mingw32-make || echo "mingw32-make does not exist"; true
         - msys || echo "msys does not exist"; true
         - msys2 || echo "msys2 does not exist"; true
-        - choco install boost-msvc-12
         - source scripts/setup-helics-ci-options.sh
+        - scripts/install-dependency.sh boost 1.69.0 dependencies/boost
       script:
         - mkdir -p build && cd build
-        - cmake .. -G "MinGW Makefiles" ${JOB_OPTION_FLAGS} ${HELICS_DEPENDENCY_FLAGS} ${HELICS_OPTION_FLAGS} -DCMAKE_SH="CMAKE_SH-NOTFOUND"
+        - cmake .. -G "MinGW Makefiles" -DBOOST_INSTALL_PATH=../dependencies/boost ${JOB_OPTION_FLAGS} ${HELICS_DEPENDENCY_FLAGS} ${HELICS_OPTION_FLAGS} -DCMAKE_SH="CMAKE_SH-NOTFOUND"
         - mingw64-make ${MAKEFLAGS}
 
     # -----------------------------------------------
