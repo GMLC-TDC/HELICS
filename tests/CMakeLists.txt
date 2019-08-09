@@ -4,6 +4,7 @@
 # SPDX-License-Identifier: BSD-3-Clause
 #
 
+if (NOT CYGWIN)
 if (BUILD_HELICS_BOOST_TESTS)
 if(BOOST_VERSION_LEVEL GREATER 60)
   set(BUILD_BOOST_TESTS ON)
@@ -17,7 +18,13 @@ endif()
 else()
 set(BUILD_BOOST_TESTS OFF)
 endif()
+if (BUILD_HELICS_BOOST_TESTS)
+#cygwin has trouble detecting boost test version
+set(BUILD_BOOST_TESTS ON)
+endif()
+else()
 
+endif()
 add_subdirectory(helics)
 
 if(BUILD_PYTHON_INTERFACE)
