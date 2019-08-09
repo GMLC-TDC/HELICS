@@ -13,10 +13,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "gmlc/utilities/stringOps.h"
 #include <iostream>
 #include <thread>
-#ifdef ENABLE_ZMQ_CORE
-#include "../common/zmqContextManager.h"
-#include "cppzmq/zmq.hpp"
-#endif
+
 /** function to run the online terminal program*/
 void terminalFunction (std::vector<std::string> args);
 
@@ -96,14 +93,6 @@ int main (int argc, char *argv[])
         ret = -4;
     }
 
-#ifdef ENABLE_ZMQ_CORE
-#ifdef __APPLE__
-    if (ZmqContextManager::setContextToLeakOnDelete ())
-    {
-        ZmqContextManager::getContext ().close ();
-    }
-#endif
-#endif
     helics::cleanupHelicsLibrary ();
     return ret;
 }

@@ -45,7 +45,7 @@ class ZmqContextManager
     static zmq::context_t &getContext (const std::string &contextName = std::string{});
     /** start a ZMQ context if it hasn't been started already*/
     static void startContext (const std::string &contextName = std::string{});
-    /** close a ZMQ context if it exists already regardless of leakOnDelete Status*/
+    /** close a ZMQ context if it exists*/
     static void closeContext (const std::string &contextName = std::string{});
     /** tell the context to free the pointer and leak the memory on delete
     @details You may ask why, well in windows systems when operating in a DLL if this context is closed after
