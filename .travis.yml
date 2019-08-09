@@ -146,7 +146,7 @@ jobs:
 
     - os: windows
       install:
-        - choco install msys2
+        - echo $PATH
         - pacman || echo "pacman does not exist"; true
         - cmake || echo "cmake does not exist"; true
         - mingw64-make || echo "mingw64-make does not exist"; true
@@ -157,7 +157,7 @@ jobs:
         - source scripts/setup-helics-ci-options.sh
       script:
         - mkdir -p build && cd build
-        - cmake .. -G "MSYS Makefiles" ${JOB_OPTION_FLAGS} ${HELICS_DEPENDENCY_FLAGS} ${HELICS_OPTION_FLAGS}
+        - cmake .. -G "MinGW Makefiles" ${JOB_OPTION_FLAGS} ${HELICS_DEPENDENCY_FLAGS} ${HELICS_OPTION_FLAGS} -DCMAKE_SH="CMAKE_SH-NOTFOUND"
         - mingw64-make ${MAKEFLAGS}
 
     # -----------------------------------------------
