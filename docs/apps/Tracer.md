@@ -1,5 +1,4 @@
-Tracer
-=======
+# Tracer
 
 The Tracer application is one of the HELICS apps available with the library
 Its purpose is to provide a easy way to display data from a federation
@@ -7,8 +6,8 @@ It acts as a federate that can "capture" values or messages from specific public
 or direct endpoints or cloned endpoints which exist elsewhere and either trigger callbacks or display it to a screen
 The main use is a simple visual indicator and a monitoring app
 
-Command line arguments
-----------
+## Command line arguments
+
 ```
 allowed options:
 
@@ -102,7 +101,7 @@ arguments with spaces should be enclosed in quotes
 
 for 3 column rows the first must be either clone or capture
 for clone the second can be either source or destination and the third the endpoint name
-[for capture it can be either "endpoints" or "subscriptions"]
+\[for capture it can be either "endpoints" or "subscriptions"\]
 
 ### JSON configuration
 Tracers can also be specified via JSON files
