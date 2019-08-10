@@ -8,6 +8,7 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include <memory>
 #include <string>
+#include <vector>
 
 namespace helics
 {
@@ -122,11 +123,19 @@ void insertProtocol (std::string &networkAddress, interface_type interfaceT);
 
 /** check if a specified address is v6 or v4
 @return true if the address is a v6 address
-*/
+ */
 bool isipv6 (const std::string &address);
 
-/** get the external ipv4 address of the current computer
+/** create a combined address list with choices in a rough order of priority based on if they appear in both lists, followed by the high priority addresses, and low priority addresses last
+
+@param high addresses that should be considered before low addresses
+@param low addresses that should be considered last
+@return a vector of strings of ip addresses ordered in roughly the priority they should be used
  */
+std::vector<std::string> prioritizeExternalAddresses (std::vector<std::string> high, std::vector<std::string> low);
+
+/** get the external ipv4 address of the current computer
+*/
 std::string getLocalExternalAddressV4 ();
 
 /** get the external ipv4 Ethernet address of the current computer that best matches the listed server*/
