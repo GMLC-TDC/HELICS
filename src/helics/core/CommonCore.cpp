@@ -919,7 +919,36 @@ const std::string &CommonCore::getHandleName (interface_handle handle) const
     return emptyStr;
 }
 
-const std::string &CommonCore::getUnits (interface_handle handle) const
+const std::string &CommonCore::getInjectionUnits (interface_handle handle) const
+{
+    auto handleInfo = getHandleInfo (handle);
+    if (handleInfo != nullptr)
+    {
+        switch (handleInfo->handleType)
+        {
+        case handle_type::input:
+        {
+            auto fed = getFederateAt (handleInfo->local_fed_id);
+            auto inpInfo = fed->interfaces ().getInput (handle);
+            if (inpInfo != nullptr)
+            {
+                if (!inpInfo->inputUnits.empty ())
+                {
+                    return inpInfo->inputUnits;
+                }
+            }
+            break;
+        }
+        case handle_type::publication:
+            return handleInfo->units;
+        default:
+            return emptyStr;
+        }
+    }
+    return emptyStr;
+}
+
+const std::string &CommonCore::getExtractionUnits (interface_handle handle) const
 {
     auto handleInfo = getHandleInfo (handle);
     if (handleInfo != nullptr)

@@ -306,6 +306,10 @@ if(NOT EXISTS "${PROJECT_SOURCE_DIR}/ThirdParty/utilities/gmlc/utilities/stringO
 	submod_update(ThirdParty/utilities)
 endif()
 
+if(NOT EXISTS "${PROJECT_SOURCE_DIR}/ThirdParty/units/units/units.hpp")
+	submod_update(ThirdParty/units)
+endif()
+
 include(GNUInstallDirs)
 
 # -------------------------------------------------------------
@@ -559,6 +563,11 @@ target_include_directories(
 )
 set_target_properties(jsoncpp_lib PROPERTIES FOLDER Extern)
 endif()
+
+# --------------------------------------------------------------
+#  Create the target for unitslib
+# -----------------------------------------------------------
+include(addUnits)
 
 # -----------------------------------------------------------------------------
 # create utilities target
@@ -835,6 +844,7 @@ set(LICENSE_LIST
 	"GMLC Containers" "${PROJECT_SOURCE_DIR}/ThirdParty/containers/LICENSE"
 	"cppzmq" "${PROJECT_SOURCE_DIR}/ThirdParty/cppzmq/LICENSE"
 	"fmt" "${PROJECT_SOURCE_DIR}/ThirdParty/fmtlib/LICENSE.rst"
+	"units" "${PROJECT_SOURCE_DIR}/ThirdParty/units/LICENSE"
 	"Google Test" "${PROJECT_SOURCE_DIR}/ThirdParty/googletest/LICENSE"
 	"JsonCpp" "${PROJECT_SOURCE_DIR}/ThirdParty/jsoncpp/LICENSE"
 	"tinytoml" "${PROJECT_SOURCE_DIR}/ThirdParty/toml/LICENSE"

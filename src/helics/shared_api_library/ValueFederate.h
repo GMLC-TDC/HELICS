@@ -532,6 +532,17 @@ extern "C"
     @return a void enumeration, helics_ok if everything worked*/
     HELICS_EXPORT const char *helicsInputGetUnits (helics_input ipt);
 
+    /** get the units of the publication that an input is linked to
+    @param ipt the input to query
+    @return a void enumeration, helics_ok if everything worked*/
+    HELICS_EXPORT const char *helicsInputGetInjectionUnits (helics_input ipt);
+
+    /** get the units of an input
+    @details:  the same as helicsInputGetUnits
+    @param ipt the input to query
+    @return a void enumeration, helics_ok if everything worked*/
+    HELICS_EXPORT const char *helicsInputGetExtractionUnits (helics_input ipt);
+
     /** get the units of a publication
     @param pub the publication to query
     @return a void enumeration, helics_ok if everything worked*/

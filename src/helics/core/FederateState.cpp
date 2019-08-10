@@ -298,6 +298,10 @@ void FederateState::createInterface (handle_type htype,
         {
             interfaceInformation.setInputProperty (handle, defs::options::strict_type_checking, true);
         }
+        if (ignore_unit_mismatch)
+        {
+            interfaceInformation.setInputProperty (handle, defs::options::ignore_unit_mismatch, true);
+        }
         if (checkActionFlag (getInterfaceFlags (), required_flag))
         {
             interfaceInformation.setInputProperty (handle, defs::options::connection_required, true);
@@ -1206,11 +1210,7 @@ message_processing_result FederateState::processActionMessage (ActionMessage &cm
         auto subI = interfaceInformation.getInput (cmd.dest_handle);
         if (subI != nullptr)
         {
-            subI->addSource (cmd.getSource (), cmd.getString (0), cmd.getString (1));
-            if (subI->inputType.empty ())
-            {
-                subI->inputType = cmd.getString (typeStringLoc);
-            }
+            subI->addSource (cmd.getSource (), cmd.getString (typeStringLoc), cmd.getString (unitStringLoc));
             addDependency (cmd.source_id);
         }
     }
@@ -1469,6 +1469,9 @@ void FederateState::setOptionFlag (int optionFlag, bool value)
     case defs::flags::strict_input_type_checking:
         strict_input_type_checking = value;
         break;
+    case defs::flags::ignore_input_unit_mismatch:
+        ignore_unit_mismatch = value;
+        break;
     case defs::flags::realtime:
         if (value)
         {
@@ -1570,6 +1573,8 @@ bool FederateState::getOptionFlag (int optionFlag) const
         return ((interfaceFlags.load () & make_flags (optional_flag)) != 0);
     case defs::flags::strict_input_type_checking:
         return strict_input_type_checking;
+    case defs::flags::ignore_input_unit_mismatch:
+        return ignore_unit_mismatch;
     default:
         return timeCoord->getOptionFlag (optionFlag);
     }

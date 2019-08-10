@@ -11,6 +11,12 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helicsTypes.hpp"
 #include <algorithm>
 #include <array>
+
+namespace units
+{
+class precise_unit;
+}
+
 namespace helics
 {
 /** base class for a input object*/
@@ -29,37 +35,41 @@ class Input
     bool disableAssign = false;  //!< disable assignment for the object
     size_t customTypeHash = 0;  //!< a hash code for the custom type
     defV lastValue;  //!< the last value updated
+    std::shared_ptr<units::precise_unit> outputUnits;
+    std::shared_ptr<units::precise_unit> inputUnits;
+
     double delta = -1.0;  //!< the minimum difference
-    std::string actualName;  //!< the name of the federate
+    std::string actualName;  //!< the name of the Input
     // this needs to match the defV type
-    mpark::variant<std::function<void (const double &, Time)>,
-                   std::function<void (const int64_t &, Time)>,
-                   std::function<void (const std::string &, Time)>,
-                   std::function<void (const std::complex<double> &, Time)>,
-                   std::function<void (const std::vector<double> &, Time)>,
-                   std::function<void (const std::vector<std::complex<double>> &, Time)>,
-                   std::function<void (const NamedPoint &, Time)>,
-                   std::function<void (const bool &, Time)>,
-                   std::function<void (const Time &, Time)>>
+    mpark::variant<std::function<void(const double &, Time)>,
+                   std::function<void(const int64_t &, Time)>,
+                   std::function<void(const std::string &, Time)>,
+                   std::function<void(const std::complex<double> &, Time)>,
+                   std::function<void(const std::vector<double> &, Time)>,
+                   std::function<void(const std::vector<std::complex<double>> &, Time)>,
+                   std::function<void(const NamedPoint &, Time)>,
+                   std::function<void(const bool &, Time)>,
+                   std::function<void(const Time &, Time)>>
       value_callback;  //!< callback function for the federate
   public:
+    /** Default constructor*/
     Input () = default;
-
-    Input (ValueFederate *valueFed, interface_handle id, const std::string &actName)
-        : fed (valueFed), handle (id), actualName (actName)
-    {
-    }
+    /** construct from a federate and handle, mainly used by the valueFederateManager*/
+    Input (ValueFederate *valueFed,
+           interface_handle id,
+           const std::string &actName,
+           const std::string &unitsOut = std::string{});
 
     Input (ValueFederate *valueFed,
            const std::string &key,
            const std::string &defaultType = "def",
-           const std::string &units = std::string ());
+           const std::string &units = std::string{});
 
     template <class FedPtr>
     Input (FedPtr &valueFed,
            const std::string &key,
            const std::string &defaultType = "def",
-           const std::string &units = std::string ())
+           const std::string &units = std::string{})
         : Input (std::addressof (*valueFed), key, defaultType, units)
     {
         static_assert (std::is_base_of<ValueFederate, std::remove_reference_t<decltype (*valueFed)>>::value,
@@ -70,14 +80,14 @@ class Input
            ValueFederate *valueFed,
            const std::string &name,
            const std::string &defaultType = "def",
-           const std::string &units = std::string ());
+           const std::string &units = std::string{});
 
     template <class FedPtr>
     Input (interface_visibility locality,
            FedPtr &valueFed,
            const std::string &name,
            const std::string &defaultType = "def",
-           const std::string &units = std::string ())
+           const std::string &units = std::string{})
         : Input (locality, std::addressof (*valueFed), name, defaultType, units)
     {
         static_assert (std::is_base_of<ValueFederate, std::remove_reference_t<decltype (*valueFed)>>::value,
@@ -87,7 +97,7 @@ class Input
     Input (ValueFederate *valueFed,
            const std::string &name,
            data_type defType,
-           const std::string &units = std::string ())
+           const std::string &units = std::string{})
         : Input (valueFed, name, typeNameStringRef (defType), units)
     {
     }
@@ -101,7 +111,7 @@ class Input
     Input (interface_visibility locality,
            ValueFederate *valueFed,
            const std::string &name,
-           const std::string &units = std::string ())
+           const std::string &units = std::string{})
         : Input (locality, valueFed, name, "def", units)
     {
     }
@@ -110,7 +120,7 @@ class Input
     Input (interface_visibility locality,
            FedPtr &valueFed,
            const std::string &key,
-           const std::string &units = std::string ())
+           const std::string &units = std::string{})
         : Input (locality, valueFed, key, "def", units)
     {
     }
@@ -119,7 +129,7 @@ class Input
            ValueFederate *valueFed,
            const std::string &name,
            data_type defType,
-           const std::string &units = std::string ())
+           const std::string &units = std::string{})
         : Input (locality, valueFed, name, typeNameStringRef (defType), units)
     {
     }
@@ -129,7 +139,7 @@ class Input
            FedPtr &valueFed,
            const std::string &name,
            data_type defType,
-           const std::string &units = std::string ())
+           const std::string &units = std::string{})
         : Input (locality, valueFed, name, typeNameStringRef (defType), units)
     {
     }
@@ -152,10 +162,10 @@ class Input
     @param callback a function with signature void( Time time)
     time is the time the value was updated  This callback is a notification callback and doesn't return the value
     */
-    void registerNotificationCallback (std::function<void (Time)> callback)
+    void registerNotificationCallback (std::function<void(Time)> callback)
     {
         fed->setInputNotificationCallback (*this,
-                                           [this, callback = std::move (callback)] (const Input &, Time time) {
+                                           [this, callback = std::move (callback)](const Input &, Time time) {
                                                if (isUpdated ())
                                                {
                                                    callback (time);
@@ -182,7 +192,9 @@ class Input
     /** get the type of the input*/
     const std::string &getType () const { return fed->getExtractionType (*this); }
     /** get the units associated with a input*/
-    const std::string &getUnits () const { return fed->getInterfaceUnits (*this); }
+    const std::string &getUnits () const { return fed->getExtractionUnits (*this); }
+    /** get the units associated with a input*/
+    const std::string &getInjectionUnits () const { return fed->getInjectionUnits (*this); }
     /** get an associated target*/
     const std::string &getTarget () const { return fed->getTarget (*this); }
     /** subscribe to a named publication*/
@@ -225,14 +237,14 @@ class Input
     val is the new value and time is the time the value was updated
     */
     template <class X>
-    void setInputNotificationCallback (std::function<void (const X &, Time)> callback)
+    void setInputNotificationCallback (std::function<void(const X &, Time)> callback)
     {
         static_assert (
           helicsType<X> () != data_type::helics_custom,
           "callback type must be a primary helics type one of \"double, int64_t, named_point, bool, Time "
           "std::vector<double>, std::vector<std::complex<double>>, std::complex<double>\"");
         value_callback = std::move (callback);
-        fed->setInputNotificationCallback (*this, [this] (Input &, Time time) { handleCallback (time); });
+        fed->setInputNotificationCallback (*this, [this](Input &, Time time) { handleCallback (time); });
     }
 
   private:
@@ -377,10 +389,18 @@ class Input
     data_type getHelicsType () const { return type; }
 
   private:
+    /** load some information about the data source such as type and units*/
+    void loadSourceInformation ();
     /** helper class for getting a character since that is a bit odd*/
     char getValueChar ();
+    /** helper function to do the extraction and any necessary conversions for doubles*/
     friend class ValueFederateManager;
 };
+
+/** convert a dataview to a double and do a unit conversion if appropriate*/
+double doubleExtractAndConvert (const data_view &dv,
+                                const std::shared_ptr<units::precise_unit> &inputUnits,
+                                const std::shared_ptr<units::precise_unit> &outputUnits);
 
 /** class to handle an input and extract a specific type
 @tparam X the class of the value associated with a input*/
@@ -389,8 +409,8 @@ class InputT : public Input
 {
   public:
   private:
-    std::function<void (X, Time)> value_callback;  //!< callback function for the federate
-    std::function<double (const X &v1, const X &v2)>
+    std::function<void(X, Time)> value_callback;  //!< callback function for the federate
+    std::function<double(const X &v1, const X &v2)>
       changeDetectionOperator;  //!< callback function for change detection
     // determine if we can convert to a primary type
     using is_convertible_to_primary_type =
@@ -434,10 +454,10 @@ class InputT : public Input
     @param callback a function with signature void(X val, Time time)
     val is the new value and time is the time the value was updated
     */
-    void setInputNotificationCallback (std::function<void (X, Time)> callback)
+    void setInputNotificationCallback (std::function<void(X, Time)> callback)
     {
         value_callback = callback;
-        fed->setInputNotificationCallback (*this, [=] (Input &, Time time) { handleCallback (time); });
+        fed->setInputNotificationCallback (*this, [=](Input &, Time time) { handleCallback (time); });
     }
     /** set a default value
     @param val the value to set as the default
@@ -461,10 +481,18 @@ void Input::getValue_impl (std::integral_constant<int, primaryType> /*V*/, X &ou
         auto dv = fed->getValueRaw (*this);
         if (type == data_type::helics_unknown)
         {
-            type = getTypeFromString (fed->getInjectionType (*this));
+            loadSourceInformation ();
         }
 
-        valueExtract (dv, type, out);
+        if (type == helics::data_type::helics_double)
+        {
+            defV val = doubleExtractAndConvert (dv, inputUnits, outputUnits);
+            valueExtract (val, out);
+        }
+        else
+        {
+            valueExtract (dv, type, out);
+        }
         if (changeDetectionEnabled)
         {
             if (changeDetected (lastValue, out, delta))
@@ -517,13 +545,21 @@ const X &Input::getValueRef ()
         auto dv = fed->getValueRaw (*this);
         if (type == data_type::helics_unknown)
         {
-            type = getTypeFromString (fed->getInjectionType (*this));
+            loadSourceInformation ();
         }
 
         if (changeDetectionEnabled)
         {
             X out;
-            valueExtract (dv, type, out);
+            if (type == helics::data_type::helics_double)
+            {
+                defV val = doubleExtractAndConvert (dv, inputUnits, outputUnits);
+                valueExtract (val, out);
+            }
+            else
+            {
+                valueExtract (dv, type, out);
+            }
             if (changeDetected (lastValue, out, delta))
             {
                 lastValue = make_valid (std::move (out));

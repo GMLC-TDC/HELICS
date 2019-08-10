@@ -15,6 +15,7 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include "helics/application_api/Publications.hpp"
 #include "helics/application_api/Subscriptions.hpp"
+#include "units/units/units.hpp"
 #include <future>
 
 namespace utf = boost::unit_test;
@@ -509,6 +510,64 @@ BOOST_AUTO_TEST_CASE (input_test, *utf::label ("ci"))
 
     BOOST_CHECK_EQUAL (val1, 10.0);
     BOOST_CHECK_EQUAL (val2, 10.3);
+    vFed->finalize ();
+}
+
+BOOST_AUTO_TEST_CASE (input_unit_test, *utf::label ("ci"))
+{
+    helics::FederateInfo fi (CORE_TYPE_TO_TEST);
+    fi.coreInitString = "--autobroker";
+
+    auto vFed = std::make_shared<helics::ValueFederate> ("test1", fi);
+
+    // register the publications
+    auto &subObj1 = vFed->registerSubscription ("pub1", "km");
+    auto &subObj2 = vFed->registerSubscription ("pub2", "cm");
+    auto &subObj3 = vFed->registerSubscription ("pub1");
+    auto &p1 = vFed->registerGlobalPublication<double> ("pub1", "m");
+    auto &p2 = vFed->registerGlobalPublication<double> ("pub2", "in");
+
+    vFed->enterExecutingMode ();
+    p1.publish (100.0);
+    p2.publish (4.0 / 2.54);
+
+    vFed->requestTime (1.0);
+
+    BOOST_CHECK (subObj1.isUpdated ());
+    BOOST_CHECK (subObj2.isUpdated ());
+
+    auto val1 = subObj1.getValue<double> ();
+    auto val2 = subObj2.getValue<double> ();
+    auto val3 = subObj3.getValue<double> ();
+
+    BOOST_CHECK_CLOSE (val1, 0.1, 0.0001);
+    BOOST_CHECK_CLOSE (val2, 4.0, 0.01);
+    BOOST_CHECK_EQUAL (val3, 100.0);
+    p1.publish (2.0, "km");
+    p2.publish (43.8, "cm");
+
+    vFed->requestTime (2.0);
+
+    val1 = subObj1.getValue<double> ();
+    val2 = subObj2.getValue<double> ();
+    val3 = subObj3.getValue<double> ();
+
+    BOOST_CHECK_CLOSE (val1, 2.0, 0.0001);
+    BOOST_CHECK_CLOSE (val2, 43.8, 0.01);
+    BOOST_CHECK_CLOSE (val3, 2000.0, 0.0001);
+
+    p1.publish (40000.0, units::precise::mm);
+    p2.publish (2.3, units::precise::mile);
+
+    vFed->requestTime (3.0);
+
+    val1 = subObj1.getValue<double> ();
+    val2 = subObj2.getValue<double> ();
+    val3 = subObj3.getValue<double> ();
+
+    BOOST_CHECK_CLOSE (val1, 0.04, 0.0001);
+    BOOST_CHECK_CLOSE (val2, units::convert (2.3, units::precise::mile, units::precise::cm), 0.01);
+    BOOST_CHECK_CLOSE (val3, 40.0, 0.0001);
     vFed->finalize ();
 }
 
