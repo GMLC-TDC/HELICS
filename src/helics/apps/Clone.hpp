@@ -76,8 +76,10 @@ class Clone : public App
     @param federateName the name of the federate to clone
     */
     void setFederateToClone (const std::string &federateName);
-    /** set the name of the output file 
-	@param fileName  the name of the file, can be "" if no file should be auto saved/
+    /** set the name of the output file
+    @param fileName  the name of the file, can be "" if no file should be auto saved*/
+    void setOutputFile (std::string fileName) { outFileName = std::move (fileName); }
+
   private:
     /** add a subscription to capture*/
     void addSubscription (const std::string &key);
