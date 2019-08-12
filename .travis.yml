@@ -161,7 +161,11 @@ jobs:
         - ls /c/ProgramData/chocolatey/lib/mingw/tools/install/mingw64/bin
         - ls ${TRAVIS_BUILD_DIR}/dependencies/boost
         - ls ${TRAVIS_BUILD_DIR}/dependencies/boost/include
-        - powershell -command "cmake .. -G 'MinGW Makefiles' -DBUILD_HELICS_TESTS=OFF -DBOOST_INSTALL_PATH=${TRAVIS_BUILD_DIR}/dependencies/boost ${JOB_OPTION_FLAGS} ${HELICS_DEPENDENCY_FLAGS} ${HELICS_OPTION_FLAGS}"
+        - powershell -command echo ${TRAVIS_BUILD_DIR}
+        - powershell -command echo '$env:PATH'
+        - powershell -command echo '$env:TRAVIS_BUILD_DIR'
+        - powershell -command cmake --version
+        - powershell -command cmake .. -G "MinGW Makefiles" -DBUILD_HELICS_TESTS=OFF -DBOOST_INSTALL_PATH=${TRAVIS_BUILD_DIR}/dependencies/boost ${JOB_OPTION_FLAGS} ${HELICS_DEPENDENCY_FLAGS} ${HELICS_OPTION_FLAGS}
         - cat "/c/Users/travis/build/GMLC-TDC/HELICS/build/CMakeFiles/CMakeError.log"
         - powershell -command cmake . --build
 
