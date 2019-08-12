@@ -153,7 +153,8 @@ def main():
             TOPATH = "."
         except:
             print("> Current directory does not contain \".git\"")
-            print
+            print("> Are you in \"git\" repository?")
+            print("")
             parser.print_help(sys.stderr)
             sys.exit(1)
 
