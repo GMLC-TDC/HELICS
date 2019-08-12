@@ -146,6 +146,7 @@ jobs:
 
     - os: windows
       install:
+        - choco install msys2
         - echo $PATH
         - export PATH="/c/ProgramData/chocolatey/lib/mingw/tools/install/mingw64/bin:$PATH"
         - pacman || echo "pacman does not exist"; true
