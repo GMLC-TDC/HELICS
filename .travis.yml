@@ -148,7 +148,6 @@ jobs:
       install:
         - echo $PATH
         - export PATH="/c/ProgramData/chocolatey/lib/mingw/tools/install/mingw64/bin:$PATH"
-        - powershell || echo "powershell does not exist"; true
         - pacman || echo "pacman does not exist"; true
         - cmake || echo "cmake does not exist"; true
         - mingw64-make || echo "mingw64-make does not exist"; true
