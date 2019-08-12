@@ -146,9 +146,9 @@ jobs:
 
     - os: windows
       install:
-        - choco install msys2
         - echo $PATH
         - export PATH="/c/ProgramData/chocolatey/lib/mingw/tools/install/mingw64/bin:$PATH"
+        - powershell || echo "powershell does not exist"; true
         - pacman || echo "pacman does not exist"; true
         - cmake || echo "cmake does not exist"; true
         - mingw64-make || echo "mingw64-make does not exist"; true
@@ -162,9 +162,9 @@ jobs:
         - ls /c/ProgramData/chocolatey/lib/mingw/tools/install/mingw64/bin
         - ls ${TRAVIS_BUILD_DIR}/dependencies/boost
         - ls ${TRAVIS_BUILD_DIR}/dependencies/boost/include
-        - cmake .. -G "MinGW Makefiles" -DBUILD_HELICS_TESTS=OFF -DBOOST_INSTALL_PATH=${TRAVIS_BUILD_DIR}/dependencies/boost ${JOB_OPTION_FLAGS} ${HELICS_DEPENDENCY_FLAGS} ${HELICS_OPTION_FLAGS} -DCMAKE_SH="CMAKE_SH-NOTFOUND"
+        - powershell -command "cmake .. -G 'MinGW Makefiles' -DBUILD_HELICS_TESTS=OFF -DBOOST_INSTALL_PATH=${TRAVIS_BUILD_DIR}/dependencies/boost ${JOB_OPTION_FLAGS} ${HELICS_DEPENDENCY_FLAGS} ${HELICS_OPTION_FLAGS}"
         - cat "/c/Users/travis/build/GMLC-TDC/HELICS/build/CMakeFiles/CMakeError.log"
-        - cmake . --build
+        - powershell -command cmake . --build
 
     # -----------------------------------------------
     # Daily ZMQ subproject build with new CMake
