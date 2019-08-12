@@ -165,7 +165,7 @@ jobs:
         - powershell -command echo '$env:PATH'
         - powershell -command echo '$env:TRAVIS_BUILD_DIR'
         - powershell -command cmake --version
-        - powershell -command cmake .. -G "MinGW Makefiles" -DBUILD_HELICS_TESTS=OFF -DBOOST_INSTALL_PATH=${TRAVIS_BUILD_DIR}/dependencies/boost ${JOB_OPTION_FLAGS} ${HELICS_DEPENDENCY_FLAGS} ${HELICS_OPTION_FLAGS}
+        - powershell -command cmake .. -G "MinGW Makefiles" -DBUILD_HELICS_TESTS=OFF -DBOOST_INSTALL_PATH='$env:TRAVIS_BUILD_DIR'/dependencies/boost '$env:JOB_OPTION_FLAGS' '$env:HELICS_DEPENDENCY_FLAGS' '$env:HELICS_OPTION_FLAGS'
         - cat "/c/Users/travis/build/GMLC-TDC/HELICS/build/CMakeFiles/CMakeError.log"
         - powershell -command cmake . --build
 
