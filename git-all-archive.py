@@ -217,7 +217,7 @@ def main():
     if TOKEN is not None:
         SendFile(FILENAME, CLONE, RELEASE, TOKEN, CLIENTID, CLIENTSECRET)
     else:
-        print(FILENAME + "has been created in repository")
+        print(FILENAME + " has been created in repository")
         print("without a GitHub Toekn, you will need to upload it manually.")
 
     print("> Done.")
