@@ -18,11 +18,13 @@ import glob
 import tarfile
 from urllib.parse import urlparse
 from subprocess import Popen, PIPE
-
+from git import Repo
 
 ####
 # Run a shell command
 ####
+
+
 def runcmd(cmd):
     archiveargs = shlex.split(cmd)
     p = Popen(archiveargs, stdout=PIPE, stderr=PIPE)
@@ -32,6 +34,8 @@ def runcmd(cmd):
 ###
 # Send file to github.com
 ###
+
+
 def SendFile(FILENAME, CLONE, RELEASE, TOKEN, CLIENTID, CLIENTSECRET):
     REPO = urlparse(CLONE).path
     REPO = REPO.split(".")[0]
@@ -52,9 +56,9 @@ def SendFile(FILENAME, CLONE, RELEASE, TOKEN, CLIENTID, CLIENTSECRET):
 
     # Open Github organization/user
     gh = github.Github(api_preview=True,
-                    login_or_token=TOKEN,
-                    client_id=CLIENTID,
-                    client_secret=CLIENTSECRET)
+                       login_or_token=TOKEN,
+                       client_id=CLIENTID,
+                       client_secret=CLIENTSECRET)
 
     # find Repository
     try:
@@ -114,17 +118,13 @@ def main():
     parser.add_argument('--clone', action='store', dest="CLONE",
                         help="clone a github repository [https://github.com/GMLC-TDC/HELICS.git]")
     parser.add_argument("--to_path", action='store', dest="TOPATH", help="clone into a directory [helics_tar_generate")
-    parser.add_argument('--releasename', action='store', dest="RELEASE", help="github release/tag to upload if different than version")
+    parser.add_argument('--releasename', action='store', dest="RELEASE",
+                        help="github release/tag to upload if different than version")
     parser.add_argument('--prefix', action='store', dest="PREFIX", help="filename prefix [HELICS]")
     parser.add_argument('--tag', action='store', dest="HELICSTAG", help="github release/tag [v2.1.1]")
     parser.add_argument('--token', action='store', dest="TOKEN", help="github Personal Access Token")
     parser.add_argument('--client_id', action='store', dest="CLIENTID", help="github Client ID Oauth Apps")
     parser.add_argument('--client_secret', action='store', dest="CLIENTSECRET", help="github Client Secret Oauth Apps")
-
-
-    if len(sys.argv) == 1:
-        parser.print_help(sys.stderr)
-        sys.exit(1)
 
     args = parser.parse_args()
 
@@ -137,11 +137,10 @@ def main():
     CLONE = args.CLONE
     TOPATH = args.TOPATH
     FILENAME = ""
-
     # Clone repository into ./HELICS by default
     #
     if CLONE is not None:
-        from git import Repo
+
         if TOPATH is None:
             TOPATH = "./HELICS"
             if os.path.exists(TOPATH):
@@ -149,7 +148,14 @@ def main():
         Repo.clone_from(CLONE, TOPATH)
         repo = Repo(TOPATH)
     else:
-        repo = Repo(".")
+        try:
+            repo = Repo(os.getcwd())
+            TOPATH = "."
+        except:
+            print("> Current directory does not contain \".git\"")
+            print
+            parser.print_help(sys.stderr)
+            sys.exit(1)
 
     if PREFIX is None:
         PREFIX = "HELICS"
@@ -169,7 +175,7 @@ def main():
     if RELEASE is None:
         RELEASE = HELICSTAG.name
 
-    if not (isinstance(HELICSTAG,git.refs.tag.TagReference) or isinstance(HELICSTAG, git.refs.head.Head)):
+    if not (isinstance(HELICSTAG, git.refs.tag.TagReference) or isinstance(HELICSTAG, git.refs.head.Head)):
         print("Could not find tag " + HELICSTAG + " in repository")
         sys.exit(1)
 
@@ -181,7 +187,7 @@ def main():
     cmd = "git archive --verbose --prefix \"repo/\" --format \"tar\" --output \"" + currentdir + "/" + PREFIX +\
         "-output.tar\" \"master\""
     stdoutdata, stderrdata = runcmd(cmd)
-    print("> checkout tag "+ HELICSTAG.name)
+    print("> checkout tag " + HELICSTAG.name)
     cmd = "git checkout " + HELICSTAG.name
     stdoutdata, stderrdata = runcmd(cmd)
     print("> checking out all submodules")
@@ -221,5 +227,7 @@ def main():
         print("without a GitHub Toekn, you will need to upload it manually.")
 
     print("> Done.")
+
+
 if __name__ == "__main__":
     main()
