@@ -171,7 +171,7 @@ jobs:
         - powershell -command echo PWD='$PWD'
         - powershell -command gcc --version
         - powershell -command g++ --version
-        - powershell -command cmake /G "MinGW Makefiles" /D BUILD_HELICS_TESTS=OFF /D BOOST_INSTALL_PATH='$env:TRAVIS_BUILD_DIR'/dependencies/boost -DCMAKE_C_COMPILER=gcc -DCMAKE_CXX_COMPILER=g++ ..
+        - powershell -command cmake /G "MinGW Makefiles" /D BUILD_HELICS_TESTS=OFF /D BOOST_INSTALL_PATH='$env:TRAVIS_BUILD_DIR'/dependencies/boost /D CMAKE_C_COMPILER=gcc /D CMAKE_CXX_COMPILER=g++ ..
         #- powershell -command cmake -G "MinGW Makefiles" -DBUILD_HELICS_TESTS=OFF -DBOOST_INSTALL_PATH='$env:TRAVIS_BUILD_DIR'/dependencies/boost '$env:JOB_OPTION_FLAGS' '$env:HELICS_DEPENDENCY_FLAGS' '$env:HELICS_OPTION_FLAGS' ..
         - cat "/c/Users/travis/build/GMLC-TDC/HELICS/build/CMakeFiles/CMakeError.log"
         - powershell -command cmake . --build
