@@ -208,6 +208,67 @@ BOOST_DATA_TEST_CASE (message_filter_function, bdata::make (core_types), core_ty
     BOOST_CHECK (state == helics_state_finalize);
 }
 
+BOOST_DATA_TEST_CASE (message_filter_function_mObj, bdata::make (core_types_simple), core_type)
+{
+    auto broker = AddBroker (core_type, 2);
+    AddFederates (helicsCreateMessageFederate, core_type, 1, broker, 1.0, "filter");
+    AddFederates (helicsCreateMessageFederate, core_type, 1, broker, 1.0, "message");
+
+    auto fFed = GetFederateAt (0);
+    auto mFed = GetFederateAt (1);
+
+    CE (helicsFederateSetFlagOption (mFed, helics_flag_ignore_time_mismatch_warnings, helics_true, &err));
+    auto p1 = helicsFederateRegisterGlobalEndpoint (mFed, "port1", nullptr, &err);
+    auto p2 = helicsFederateRegisterGlobalEndpoint (mFed, "port2", "", &err);
+    BOOST_CHECK_EQUAL (err.error_code, helics_ok);
+
+    auto f1 = helicsFederateRegisterFilter (fFed, helics_filter_type_delay, "filter1", &err);
+    BOOST_CHECK_EQUAL (err.error_code, helics_ok);
+    CE (helicsFilterAddSourceTarget (f1, "port1", &err));
+    BOOST_CHECK (f1 != NULL);
+    CE (helicsFilterSet (f1, "delay", 2.5, &err));
+
+    CE (helicsFederateEnterExecutingModeAsync (fFed, &err));
+    CE (helicsFederateEnterExecutingMode (mFed, &err));
+    CE (helicsFederateEnterExecutingModeComplete (fFed, &err));
+
+    CE (helics_federate_state state = helicsFederateGetState (fFed, &err));
+    BOOST_CHECK (state == helics_state_execution);
+    std::string data (500, 'a');
+    CE (helicsEndpointSendMessageRaw (p1, "port2", data.c_str (), static_cast<int> (data.size ()), &err));
+
+    CE (helicsFederateRequestTimeAsync (mFed, 1.0, &err));
+    CE (helicsFederateRequestTime (fFed, 1.0, &err));
+    CE (helicsFederateRequestTimeComplete (mFed, &err));
+
+    auto res = helicsFederateHasMessage (mFed);
+    BOOST_CHECK (!res);
+
+    CE (helicsFederateRequestTimeAsync (mFed, 2.0, &err));
+    CE (helicsFederateRequestTime (fFed, 2.0, &err));
+    CE (helicsFederateRequestTimeComplete (mFed, &err));
+    BOOST_REQUIRE (!helicsEndpointHasMessage (p2));
+
+    CE (helicsFederateRequestTimeAsync (fFed, 3.0, &err));
+    CE (helicsFederateRequestTime (mFed, 3.0, &err));
+
+    BOOST_REQUIRE (helicsEndpointHasMessage (p2));
+
+    auto m2 = helicsEndpointGetMessageObject (p2);
+    BOOST_CHECK_EQUAL (helicsMessageGetSource (m2), "port1");
+    BOOST_CHECK_EQUAL (helicsMessageGetOriginalSource (m2), "port1");
+    BOOST_CHECK_EQUAL (helicsMessageGetDestination (m2), "port2");
+    BOOST_CHECK_EQUAL (helicsMessageGetRawDataSize (m2), static_cast<int64_t> (data.size ()));
+    BOOST_CHECK_EQUAL (helicsMessageGetTime (m2), 2.5);
+
+    CE (helicsFederateRequestTime (mFed, 3.0, &err));
+    CE (helicsFederateRequestTimeComplete (fFed, &err));
+    CE (helicsFederateFinalizeAsync (mFed, &err));
+    CE (helicsFederateFinalize (fFed, &err));
+    CE (helicsFederateFinalizeComplete (mFed, &err));
+    CE (state = helicsFederateGetState (fFed, &err));
+    BOOST_CHECK (state == helics_state_finalize);
+}
 /** test a filter operator
 The filter operator delays the message by 2.5 seconds meaning it should arrive by 3 sec into the simulation
 */

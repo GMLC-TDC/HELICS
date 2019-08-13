@@ -173,6 +173,10 @@ class Federate
   @return the granted time step*/
     Time requestNextStep () { return requestTime (timeZero); }
 
+    /** request a time advancement by a certain amount
+    @return the granted time step*/
+    Time requestTimeAdvance (Time timeDelta) { return requestTime (currentTime + timeDelta); }
+
     /** request a time advancement
     @param nextInternalTimeStep the next requested time step
     @param iterate a requested iteration mode
@@ -244,7 +248,7 @@ class Federate
     A string indicating the source of the message and another string with the actual message
     */
     void
-    setLoggingCallback (const std::function<void(int, const std::string &, const std::string &)> &logFunction);
+    setLoggingCallback (const std::function<void (int, const std::string &, const std::string &)> &logFunction);
 
     /** make a query of the core
     @details this call is blocking until the value is returned which make take some time depending on the size of
