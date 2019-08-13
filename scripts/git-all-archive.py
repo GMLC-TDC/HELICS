@@ -6,7 +6,6 @@
 # the top-level NOTICE for additional details. All rights reserved.
 # SPDX-License-Identifier: BSD-3-Clause
 
-import pdb
 import os
 import sys
 import github
@@ -19,6 +18,7 @@ import tarfile
 from urllib.parse import urlparse
 from subprocess import Popen, PIPE
 from git import Repo
+from argparse import RawTextHelpFormatter
 
 ####
 # Run a shell command
@@ -48,11 +48,6 @@ def SendFile(FILENAME, CLONE, RELEASE, TOKEN, CLIENTID, CLIENTSECRET):
         sys.exit(1)
     else:
         print("> sending " + FILENAME + "....")
-
-    # gh=github.Github(api_preview=True,
-    #                  login_or_token="6f5e483731a40f1a6d88770d2b9530c589c0d830",
-    #                  client_id= "062b872f7e0245054676",
-    #                  client_secret="c802fceef3da13b3ab95c96a96b8f929d706f47c")
 
     # Open Github organization/user
     gh = github.Github(api_preview=True,
@@ -113,8 +108,22 @@ def SendFile(FILENAME, CLONE, RELEASE, TOKEN, CLIENTID, CLIENTSECRET):
 def main():
 
     # Setup arguments
-    DESCRIPTION = "Store an extraneous binary file code in the github release page. "
-    parser = argparse.ArgumentParser(description=DESCRIPTION)
+    DESCRIPTION = """
+    Store an extraneous binary file code in the github release page.
+
+    Example:
+        . to clone a repository found in current directory
+           > git-all-archive.py   [will archive the curent tag found in current repository]\n
+        . To clone HELICS repository for version v2.1.1
+           > git-all-archive.py --clone https://github.com/GMLC-TDC/HELICS.git --tag v2.1.1\n
+        . To upload the binary file to a release you can used <GIT_TOKEN> created in your repository setup.
+           >  git-all-archive.py --clone https://github.com/dnadeau4/HELICS-src.git  --tag v2.1.1  --token <GIT_TOKEN> --releasename v0.0.0archive\n
+        . You can also use <GIT CLIENTID> and <GIT_CLIENTSECRET> if you need to make many upload.
+           - <GIT_TOKEN> is limited to 60 request per hour.
+           - Using GIT_CLIENTID and GIT_CLIENTSECRET you can increase up to 5000 upload/requests per hour.
+
+    """
+    parser = argparse.ArgumentParser(description=DESCRIPTION, formatter_class=RawTextHelpFormatter)
     parser.add_argument('--clone', action='store', dest="CLONE",
                         help="clone a github repository [https://github.com/GMLC-TDC/HELICS.git]")
     parser.add_argument("--to_path", action='store', dest="TOPATH", help="clone into a directory [helics_tar_generate")
@@ -148,10 +157,13 @@ def main():
         Repo.clone_from(CLONE, TOPATH)
         repo = Repo(TOPATH)
     else:
-        try:
-            repo = Repo(os.getcwd())
+        if(os.path.exists("./.git")):
+            repo = Repo(".")
             TOPATH = "."
-        except:
+        elif (os.path.exists("../.git")):
+            repo = Repo("..")
+            TOPATH = ".."
+        else:
             print("> Current directory does not contain \".git\"")
             print("> Are you in \"git\" repository?")
             print("")
@@ -163,13 +175,19 @@ def main():
 
     # Checkout tag or use master
     #
-    if HELICSTAG is None:
-        HELICSTAG = repo.active_branch
-    else:
-        for ref in repo.references:
-            if ref.name == HELICSTAG:
-                repo.head.reference = ref
-                HELICSTAG = ref
+    try:
+        if HELICSTAG is None:
+            HELICSTAG = repo.active_branch
+        else:
+            for ref in repo.references:
+                if ref.name == HELICSTAG:
+                    repo.head.reference = ref
+                    HELICSTAG = ref
+    except:
+        print("> Cannot find " + HELICSTAG)
+        print("")
+        parser.print_help(sys.stderr)
+        sys.exit(1)
 
     # You can push the tarbal in any release tag
     # By deafult use the HELICSTAG
@@ -225,8 +243,10 @@ def main():
         SendFile(FILENAME, CLONE, RELEASE, TOKEN, CLIENTID, CLIENTSECRET)
     else:
         print(FILENAME + " has been created in repository")
-        print("without a GitHub Toekn, you will need to upload it manually.")
+        print("without a GitHub Token, you will need to upload it manually.")
 
+    if CLONE:
+        shutil.move(FILENAME, "..")
     print("> Done.")
 
 
