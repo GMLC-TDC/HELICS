@@ -161,12 +161,16 @@ jobs:
         - ls /c/ProgramData/chocolatey/lib/mingw/tools/install/mingw64/bin
         - ls ${TRAVIS_BUILD_DIR}/dependencies/boost
         - ls ${TRAVIS_BUILD_DIR}/dependencies/boost/include
+        - export CC=gcc
+        - export CXX=g++
         - powershell -command echo ${TRAVIS_BUILD_DIR}
         - powershell -command echo PATH='$env:PATH'
         - powershell -command echo TRAVIS_BUILD_DIR='$env:TRAVIS_BUILD_DIR'
         - powershell -command echo JOB_OPTION_FLAGS='$env:JOB_OPTION_FLAGS'
         - powershell -command echo HELICS_DEPENDENCY_FLAGS='$env:HELICS_DEPENDENCY_FLAGS'
         - powershell -command echo HELICS_OPTION_FLAGS='$env:HELICS_OPTION_FLAGS'
+        - powershell -command echo CC='$env:CC'
+        - powershell -command echo CXX='$env:CXX'
         - powershell -command cmake --version
         - powershell -command echo PWD='$PWD'
         - powershell -command gcc --version
