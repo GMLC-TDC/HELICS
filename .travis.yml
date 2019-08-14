@@ -157,8 +157,7 @@ jobs:
         - msys2 || echo "msys2 does not exist"; true
         - source scripts/setup-helics-ci-options.sh
         - choco install boost-msvc-12
-        - echo ChocolateyPackageFolder=$ChocolateyPackageFolder
-        - ls $ChocolateyPackageFolder
+        - ls /c/local
         #- scripts/install-dependency.sh boost 1.66.0 ${TRAVIS_BUILD_DIR}/dependencies/boost
       script:
         - mkdir -p build && cd build
