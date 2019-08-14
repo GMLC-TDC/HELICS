@@ -145,6 +145,8 @@ jobs:
         - SKIP_TEST_RUN=true
 
     - os: windows
+      name: "MinGW"
+      if: (branch = develop AND type IN (cron)) OR (branch = master AND type IN (push, pull_request))
       env:
         - DISABLE_INTERFACES="Python,Java"
       install:
