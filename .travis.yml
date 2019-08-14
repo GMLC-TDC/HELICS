@@ -149,7 +149,7 @@ jobs:
         - DISABLE_INTERFACES="Python,Java"
       install:
         - echo $PATH
-        - export PATH="C:\ProgramData\chocolatey\lib\mingw\tools\install\mingw64\bin;C:\program files\git\usr\lib\ccache;C:\tools\ruby25\bin;C:\Windows\system32;C:\Windows;C:\Windows\System32\Wbem;C:\Windows\System32\WindowsPowerShell\v1.0;C:\Windows\System32\OpenSSH;C:\ProgramData\GooGet;C:\Program Files\Google\Compute Engine\metadata_scripts;C:\Program Files (x86)\Google\Cloud SDK\google-cloud-sdk\bin;C:\Program Files\Google\Compute Engine\sysprep;C:\Program Files\Docker;C:\ProgramData\chocolatey\bin;C:\Program Files\CMake\bin;C:\Program Files\Git\cmd;C:\Program Files\LLVM\bin;C:\Program Files\dotnet;C:\Users\travis\AppData\Local\Microsoft\WindowsApps"
+        - export PATH="/c/ProgramData/chocolatey/lib/mingw/tools/install/mingw64/bin;/C/program\ files/git/usr/lib/ccache;/c/tools/ruby25/bin;/c/Windows/system32;/c/Windows;/c/Windows/System32/Wbem;/c/Windows/System32/WindowsPowerShell/v1.0;/c/Windows/System32/OpenSSH;/c/ProgramData/GooGet;/c/Program\ Files/Google/Compute\ Engine/metadata_scripts;/c/Program/ Files/ (x86)\Google\Cloud SDK\google-cloud-sdk\bin;/c/Program/ Files\Google\Compute/ Engine\sysprep;/c/Program Files/Docker;/c/ProgramData/chocolatey/bin;/c/Program\ Files/CMake/bin;/c/Program\ Files/Git/cmd;/c/Program\ Files/LLVM/bin;/c/Program\ Files/dotnet;/c/Users/travis/AppData/Local/Microsoft/WindowsApps"
         - pacman || echo "pacman does not exist"; true
         - cmake || echo "cmake does not exist"; true
         - mingw64-make || echo "mingw64-make does not exist"; true
