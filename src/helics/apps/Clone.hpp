@@ -7,6 +7,7 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #pragma once
 #include "../application_api/Endpoints.hpp"
+#include "../application_api/Publications.hpp"
 #include "../application_api/Subscriptions.hpp"
 #include "helicsApp.hpp"
 #include <map>
@@ -20,54 +21,42 @@ class CloningFilter;
 namespace apps
 {
 /** class designed to capture data points from a set of subscriptions or endpoints*/
-class Recorder : public App
+class Clone : public App
 {
   public:
     /** construct from a FederateInfo structure
     @param name the name of the Recorder, can be left empty for the default or to pull from the federateInfo object
     @param fi  a federate information structure
     */
-    Recorder (const std::string &name, FederateInfo &fi);
+    Clone (const std::string &name, FederateInfo &fi);
     /** construct from command line arguments in a vector
    @param args the command line arguments to pass in a reverse vector
    */
-    explicit Recorder (std::vector<std::string> args);
+    explicit Clone (std::vector<std::string> args);
     /** construct from command line arguments*/
-    Recorder (int argc, char *argv[]);
+    Clone (int argc, char *argv[]);
 
     /**constructor taking a federate information structure and using the given core
     @param name the name of the Recorder, can be left empty for the default or to pull from the federateInfo object
     @param core a pointer to core object which the federate can join
     @param fi  a federate information structure
     */
-    Recorder (const std::string &name, const std::shared_ptr<Core> &core, const FederateInfo &fi);
+    Clone (const std::string &name, const std::shared_ptr<Core> &core, const FederateInfo &fi);
     /**constructor taking a file with the required information
     @param name the name of the app
     @param file a file defining the federate information in JSon or text
     */
-    Recorder (const std::string &name, const std::string &file);
+    Clone (const std::string &name, const std::string &file);
     /** move construction*/
-    Recorder (Recorder &&other_recorder) = default;
+    Clone (Clone &&other_recorder) = default;
     /** move assignment*/
-    Recorder &operator= (Recorder &&record) = default;
+    Clone &operator= (Clone &&record) = default;
     /** destructor*/
-    ~Recorder ();
-    /** run the Player until the specified time*/
+    ~Clone ();
+    /** run the Cloner until the specified time*/
     virtual void runTo (Time runToTime) override;
-    /** add a subscription to capture*/
-    void addSubscription (const std::string &key);
-    /** add an endpoint*/
-    void addEndpoint (const std::string &endpoint);
-    /** copy all messages that come from a specified endpoint*/
-    void addSourceEndpointClone (const std::string &sourceEndpoint);
-    /** copy all messages that are going to a specific endpoint*/
-    void addDestEndpointClone (const std::string &destEndpoint);
-    /** add a capture interface
-    @param captureDesc describes a federate to capture all the interfaces for
-    */
-    void addCapture (const std::string &captureDesc);
     /** save the data to a file*/
-    void saveFile (const std::string &filename);
+    void saveFile (const std::string &filename = std::string{});
     /** get the number of captured points*/
     auto pointCount () const { return points.size (); }
     /** get the number of captured messages*/
@@ -83,22 +72,24 @@ class Recorder : public App
     */
     std::unique_ptr<Message> getMessage (int index) const;
 
-  private:
-    /** load from a jsonString
-    @param jsonString either a JSON filename or a string containing JSON
+    /** set the name of the federate to Clone
+    @param federateName the name of the federate to clone
     */
-    virtual void loadJsonFile (const std::string &jsonString) override;
-    /** load a text file*/
-    virtual void loadTextFile (const std::string &textFile) override;
-    /** helper function to write the date to a JSON file*/
-    void writeJsonFile (const std::string &filename);
-    /** helper function to write the date to a text file*/
-    void writeTextFile (const std::string &filename);
+    void setFederateToClone (const std::string &federateName);
+    /** set the name of the output file
+    @param fileName  the name of the file, can be "" if no file should be auto saved*/
+    void setOutputFile (std::string fileName) { outFileName = std::move (fileName); }
+
+  private:
+    /** add a subscription to capture*/
+    void addSubscription (const std::string &key);
+
+    /** copy all messages that come from a specified endpoint*/
+    void addSourceEndpointClone (const std::string &sourceEndpoint);
 
     virtual void initialize () override;
     void generateInterfaces ();
     void captureForCurrentTime (Time currentTime, int iteration = 0);
-    void loadCaptureInterfaces ();
     /** encode the string in base64 if needed otherwise just return the string*/
     std::string encode (const std::string &str2encode);
     /** build the command line argument processing application*/
@@ -120,33 +111,24 @@ class Recorder : public App
         ValueCapture (helics::Time t1, int id1, const std::string &val) : time (t1), index (id1), value (val){};
     };
 
-    /** helper class for displaying statistics*/
-    class ValueStats
-    {
-      public:
-        helics::Time time = helics::Time::minVal ();
-        std::string lastVal;
-        std::string key;
-        int cnt = 0;
-    };
-
     bool allow_iteration = false;  //!< trigger to allow Iteration
     bool verbose = false;  //!< print all captured values to the screen
+    bool fileSaved = false;  //!< true if the file has been saved already
     Time nextPrintTimeStep = helics::timeZero;  //!< the time advancement period for printing markers
     std::unique_ptr<CloningFilter> cFilt;  //!< a pointer to a clone filter
     std::vector<ValueCapture> points;  //!< lists of points that were captured
     std::vector<Input> subscriptions;  //!< the actual subscription objects
-    std::vector<Endpoint> endpoints;  //!< the actual endpoint objects
+    std::vector<std::string> cloneSubscriptionNames;  //!< string of the subscriptions of the cloned federate
     std::unique_ptr<Endpoint> cloneEndpoint;  //!< the endpoint for cloned message delivery
     std::vector<std::unique_ptr<Message>> messages;  //!< list of messages
     std::map<helics::interface_handle, int> subids;  //!< map of the subscription ids
     std::map<std::string, int> subkeys;  //!< translate subscription names to an index
     std::map<helics::interface_handle, int> eptids;  // translate subscription id to index
     std::map<std::string, int> eptNames;  //!< translate endpoint name to index
-    std::vector<ValueStats> vStat;  //!< storage for statistics capture
-    std::vector<std::string> captureInterfaces;  //!< storage for the interfaces to capture
-    std::string mapfile;  //!< file name for the on-line file updater
-    std::string outFileName{"out.txt"};  //!< the final output file
+    std::string captureFederate;  //!< storage for the name of the federate to clone
+    std::string fedConfig;  //!< storage for the federateConfiguration
+    std::string outFileName{"clone.json"};  //!< the final output file
+    std::vector<int> pubPointCount;  //!< a	vector containing the counts of each publication
 };
 
 }  // namespace apps

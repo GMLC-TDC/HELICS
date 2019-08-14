@@ -17,6 +17,7 @@ set(
   EchoTests.cpp
   TracerTests.cpp
   SourceTests.cpp
+  CloneTests.cpp
   exeTestHelper.h
 )
 

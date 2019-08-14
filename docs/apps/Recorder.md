@@ -1,13 +1,12 @@
-Recorder
-=======
+# Recorder
 
 The Recorder application is one of the HELICS apps available with the library
 Its purpose is to provide a easy way to capture data from a federation
 It acts as a federate that can "capture" values or messages from specific publications
 or direct endpoints or cloned endpoints which exist elsewhere
 
-Command line arguments
-----------
+## Command line arguments
+
 ```
 allowed options:
 
@@ -80,7 +79,7 @@ Recorders support both delimited text files and json files some examples can be 
 
 [Player configuration examples](https://github.com/GMLC-TDC/HELICS/tree/master/tests/helics/apps/test_files)
 
-## Config File Detail
+## config file detail
 
 ### subscriptions
 a simple example of a recorder file specifying some subscriptions
@@ -117,7 +116,7 @@ arguments with spaces should be enclosed in quotes
 
 for 3 column rows the first must be either clone or capture
 for clone the second can be either source or destination and the third the endpoint name
-[for capture it can be either "endpoints" or "subscriptions"] NOTE:not fully working yet for capture
+\[for capture it can be either "endpoints" or "subscriptions"\] NOTE:not fully working yet for capture
 
 ### JSON configuration
 recorders can also be specified via JSON files
@@ -156,6 +155,6 @@ and file elements can be used to load up additional files
 Recorders capture files in a format the Player can read see [Player](Player)
 the `--verbose` option will also print the values to the screen.
 
-## Map file output
+### Map file output
 the recorder can generate a live file that can be used in process to see the progress of the Federation
 This is occasionally useful, though for many uses the [Tracer](Tracer) will be more useful when it is completed

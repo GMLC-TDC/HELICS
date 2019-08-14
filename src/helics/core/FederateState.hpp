@@ -105,7 +105,7 @@ class FederateState
     std::atomic_flag processing = ATOMIC_FLAG_INIT;  //!< the federate is processing
   private:
     /** a logging function for logging or printing messages*/
-    std::function<void(int, const std::string &, const std::string &)> loggerFunction;
+    std::function<void (int, const std::string &, const std::string &)> loggerFunction;
     std::function<std::string (const std::string &)> queryCallback;  //!< a callback for additional queries
     /** find the next Value Event*/
     Time nextValueTime () const;
@@ -119,6 +119,8 @@ class FederateState
     bool messageShouldBeDelayed (const ActionMessage &cmd) const;
     /** add a federate to the delayed list*/
     void addFederateToDelay (global_federate_id id);
+    /** generate a component of json config string*/
+    std::string generateConfig () const;
 
   public:
     /** reset the federate to created state*/
@@ -291,7 +293,7 @@ class FederateState
     @details function must have signature void(int level, const std::string &sourceName, const std::string
     &message)
     */
-    void setLogger (std::function<void(int, const std::string &, const std::string &)> logFunction)
+    void setLogger (std::function<void (int, const std::string &, const std::string &)> logFunction)
     {
         loggerFunction = std::move (logFunction);
     }

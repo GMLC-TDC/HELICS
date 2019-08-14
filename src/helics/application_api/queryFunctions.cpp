@@ -13,6 +13,8 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include "gmlc/utilities/stringOps.h"
 
+namespace helics
+{
 std::vector<std::string> vectorizeQueryResult (std::string &&queryres)
 {
     if (queryres.empty ())
@@ -136,3 +138,15 @@ bool waitForFed (helics::Federate *fed, const std::string &fedName, std::chrono:
     }
     return true;
 }
+
+std::string queryFederateSubscriptions (helics::Federate *fed, const std::string &fedName)
+{
+    auto res = fed->query (fedName, "subscriptions");
+    if (res.size () > 2 && res!="#invalid")
+    {
+        res=fed->query ("gid_to_name", res);
+    }
+    return res;
+}
+
+}  // namespace helics

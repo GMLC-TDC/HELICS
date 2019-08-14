@@ -16,7 +16,7 @@ functions for dealing with query results*/
 namespace helics
 {
 class Federate;
-}  // namespace helics
+
 
 /** function takes a query result and vectorizes it if the query is a vector result, if not the results go into the
  * first element of the vector
@@ -63,3 +63,12 @@ bool waitForInit (helics::Federate *fed,
 bool waitForFed (helics::Federate *fed,
                  const std::string &fedName,
                  std::chrono::milliseconds timeout = std::chrono::milliseconds (10000));
+
+/** helper function to get a list of all the publications a federate subscribes to
+@param fed  a pointer to the federate
+@param fedName the name of the federate we are querying
+@return a string vector of the names of the publication that are subscribed to
+*/
+std::string queryFederateSubscriptions (helics::Federate *fed, const std::string &FedName);
+
+}  // namespace helics
