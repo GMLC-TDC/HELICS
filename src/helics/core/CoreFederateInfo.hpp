@@ -20,7 +20,7 @@ class CoreFederateInfo
     std::vector<std::pair<int, bool>> flagProps;  //!< container for the binary flag options
 
   public:
-    /** double overload to time and needs to be there since a literal double will convert to int more easily than
+    /** double overload for timeprops needs to be there since a literal double will convert to int more easily than
     to Time*/
     void setProperty (int propId, double propVal) { timeProps.emplace_back (propId, propVal); }
     void setProperty (int propId, int propVal) { intProps.emplace_back (propId, propVal); }

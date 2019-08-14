@@ -328,6 +328,32 @@ TEST_F (error_tests, missing_required_pub_with_default)
     broker->disconnect ();
 }
 
+TEST_F (error_tests, mismatched_units)
+{
+    auto broker = AddBroker ("test", 2);
+
+    AddFederates<helics::ValueFederate> ("test", 3, broker, 1.0, "fed");
+
+    auto fed1 = GetFederateAs<helics::ValueFederate> (0);
+    auto fed2 = GetFederateAs<helics::ValueFederate> (1);
+    auto fed3 = GetFederateAs<helics::ValueFederate> (2);
+
+    fed1->registerGlobalPublication ("t1", "double", "V");
+    fed2->registerSubscription ("t1", "m");
+    auto &sub = fed3->registerSubscription ("t1", "m");
+    sub.setOption (helics::defs::options::ignore_unit_mismatch);
+    fed1->enterExecutingModeAsync ();
+    fed2->enterExecutingModeAsync ();
+    EXPECT_NO_THROW (fed3->enterExecutingMode ());
+    fed1->enterExecutingModeComplete ();
+    EXPECT_THROW (fed2->enterExecutingModeComplete (), helics::ConnectionFailure);
+
+    fed1->finalize ();
+    fed2->finalize ();
+    fed3->finalize ();
+    broker->disconnect ();
+}
+
 class error_tests_type : public ::testing::TestWithParam<const char *>, public FederateTestFixture
 {
 };
@@ -365,7 +391,7 @@ TEST_P (network_error_tests, test_broker_recovery)
 {
     auto broker = AddBroker (GetParam (), "");
     ASSERT_TRUE (broker->isConnected ());
-    auto res = std::async (std::launch::async, [&broker] () {
+    auto res = std::async (std::launch::async, [&broker]() {
         std::this_thread::sleep_for (std::chrono::milliseconds (1400));
         broker->disconnect ();
     });

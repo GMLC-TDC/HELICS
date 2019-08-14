@@ -360,7 +360,22 @@ class Core
     /**
      * Returns units for specified handle.
      */
-    virtual const std::string &getUnits (interface_handle handle) const = 0;
+    virtual const std::string &getExtractionUnits (interface_handle handle) const = 0;
+    /** get the injection units for an interface,  this is the type for data coming into an interface
+   @details for publications this is the units associated with the transmitted data,  for inputs this is the units
+   of the transmitting publication
+   @param handle the interface handle to get the injection type for
+   @return a const ref to  std::string  */
+    virtual const std::string &getInjectionUnits (interface_handle handle) const = 0;
+
+    /**
+     * Returns units for specified handle.
+     */
+    [[deprecated ("please use getExtractionUnits instead")]] const std::string &
+    getUnits (interface_handle handle) const
+    {
+        return getExtractionUnits (handle);
+    }
     /** get the injection type for an interface,  this is the type for data coming into an interface
     @details for filters this is the input type, for publications this is type used to transmit data, for endpoints
     this is the specified type and for inputs this is the type of the transmitting publication
@@ -613,7 +628,7 @@ class Core
     */
     virtual void
     setLoggingCallback (local_federate_id federateID,
-                        std::function<void (int, const std::string &, const std::string &)> logFunction) = 0;
+                        std::function<void(int, const std::string &, const std::string &)> logFunction) = 0;
 
     /** set the core logging level*/
     virtual void setLoggingLevel (int logLevel) = 0;

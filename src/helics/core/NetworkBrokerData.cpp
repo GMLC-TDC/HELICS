@@ -7,12 +7,14 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include "NetworkBrokerData.hpp"
 #include "BrokerFactory.hpp"
+#include "gmlc/netif/NetIF.hpp"
 #include "helicsCLI11.hpp"
 
 #include "../common/AsioContextManager.h"
 #include <asio/ip/host_name.hpp>
 #include <asio/ip/tcp.hpp>
 
+#include <algorithm>
 #include <iostream>
 
 using namespace std::string_literals;
@@ -315,6 +317,43 @@ bool isipv6 (const std::string &address)
     return false;
 }
 
+std::vector<std::string> prioritizeExternalAddresses(std::vector<std::string> high, std::vector<std::string> low)
+{
+	std::vector<std::string> result;
+
+    // Top choice: addresses that both lists contain (resolver + OS)
+    for (auto r_addr : low)
+    {
+        if (std::find (high.begin (), high.end (), r_addr) !=
+            high.end ())
+        {
+            result.push_back (r_addr);
+        }
+    }
+    // Second choice: high-priority addresses found by the OS (likely link-local addresses or loop-back)
+    for (auto i_addr : high)
+    {
+        // add the address if it isn't already in the list
+        if (std::find (result.begin (), result.end (), i_addr) ==
+            result.end ())
+        {
+            result.push_back (i_addr);
+        }
+    }
+    // Last choice: low-priority addresses returned by the resolver (OS doesn't know about them so may be invalid)
+    for (auto r_addr : low)
+    {
+        // add the address if it isn't already in the list
+        if (std::find (low.begin (), low.end (), r_addr) ==
+            low.end ())
+        {
+            result.push_back (r_addr);
+        }
+    }
+
+	return result;
+}
+
 template <class InputIt1, class InputIt2>
 auto matchcount (InputIt1 first1, InputIt1 last1, InputIt2 first2, InputIt2 last2)
 {
@@ -335,7 +374,50 @@ std::string getLocalExternalAddressV4 ()
     asio::ip::tcp::resolver::iterator it = resolver.resolve (query);
     asio::ip::tcp::endpoint endpoint = *it;
 
-    return endpoint.address ().to_string ();
+    auto resolved_address = endpoint.address ().to_string ();
+    auto interface_addresses = gmlc::netif::getInterfaceAddressesV4 ();
+
+    // Return the resolved address if no interface addresses were found
+    if (interface_addresses.empty ())
+    {
+        return resolved_address;
+    }
+
+    // Use the resolved address if it matches one of the interface addresses
+    for (auto addr : interface_addresses)
+    {
+        if (addr == resolved_address)
+        {
+            return resolved_address;
+        }
+    }
+
+    // Pick an interface that isn't an IPv4 loopback address, 127.0.0.1/8
+    // or an IPv4 link-local address, 169.254.0.0/16
+    std::string link_local_addr;
+    for (auto addr : interface_addresses)
+    {
+        if (addr.rfind ("127.", 0) != 0)
+        {
+            if (addr.rfind ("169.254.", 0) != 0)
+            {
+                return addr;
+            }
+            else if (link_local_addr.empty ())
+            {
+                link_local_addr = addr;
+            }
+        }
+    }
+
+    // Return a link-local address since no alternatives were found
+    if (!link_local_addr.empty ())
+    {
+        return link_local_addr;
+    }
+
+    // Very likely that any address returned at this point won't be a working external address
+    return resolved_address;
 }
 
 std::string getLocalExternalAddressV4 (const std::string &server)
@@ -357,24 +439,33 @@ std::string getLocalExternalAddressV4 (const std::string &server)
 
     auto sstring = (it_server == end) ? server : servep.address ().to_string ();
 
+    auto interface_addresses = gmlc::netif::getInterfaceAddressesV4 ();
+
     asio::ip::tcp::resolver::query query (asio::ip::tcp::v4 (), asio::ip::host_name (), "");
     asio::ip::tcp::resolver::iterator it = resolver.resolve (query);
     asio::ip::tcp::endpoint endpoint = *it;
-    int cnt = 0;
-    std::string def = endpoint.address ().to_string ();
-    cnt = matchcount (sstring.begin (), sstring.end (), def.begin (), def.end ());
-    ++it;
+
+    std::vector<std::string> resolved_addresses;
     while (it != end)
     {
         asio::ip::tcp::endpoint ept = *it;
-        std::string ndef = ept.address ().to_string ();
+        resolved_addresses.push_back (ept.address ().to_string ());
+        ++it;
+    }
+
+    auto candidate_addresses = prioritizeExternalAddresses (interface_addresses, resolved_addresses);
+
+    int cnt = 0;
+    std::string def = candidate_addresses[0];
+    cnt = matchcount (sstring.begin (), sstring.end (), def.begin (), def.end ());
+    for (auto ndef : candidate_addresses)
+    {
         auto mcnt = matchcount (sstring.begin (), sstring.end (), ndef.begin (), ndef.end ());
         if ((mcnt > cnt) && (mcnt >= 7))
         {
             def = ndef;
             cnt = mcnt;
         }
-        ++it;
     }
     return def;
 }
@@ -388,7 +479,50 @@ std::string getLocalExternalAddressV6 ()
     asio::ip::tcp::resolver::iterator it = resolver.resolve (query);
     asio::ip::tcp::endpoint endpoint = *it;
 
-    return endpoint.address ().to_string ();
+    auto resolved_address = endpoint.address ().to_string ();
+    auto interface_addresses = gmlc::netif::getInterfaceAddressesV6 ();
+
+    // Return the resolved address if no interface addresses were found
+    if (interface_addresses.empty ())
+    {
+        return resolved_address;
+    }
+
+    // Use the resolved address if it matches one of the interface addresses
+    for (auto addr : interface_addresses)
+    {
+        if (addr == resolved_address)
+        {
+            return resolved_address;
+        }
+    }
+
+    // Pick an interface that isn't the IPv6 loopback address, ::1/128
+    // or an IPv6 link-local address, fe80::/16
+    std::string link_local_addr;
+    for (auto addr : interface_addresses)
+    {
+        if (addr != "::1")
+        {
+            if (addr.rfind ("fe80:", 0) != 0)
+            {
+                return addr;
+            }
+            else if (link_local_addr.empty ())
+            {
+                link_local_addr = addr;
+            }
+        }
+    }
+
+    // No other choices, so return a link local address if one was found
+    if (!link_local_addr.empty ())
+    {
+        return link_local_addr;
+    }
+
+    // Very likely that any address returned at this point won't be a working external address
+    return resolved_address;
 }
 
 std::string getLocalExternalAddressV6 (const std::string &server)
@@ -403,30 +537,33 @@ std::string getLocalExternalAddressV6 (const std::string &server)
     asio::ip::tcp::resolver::iterator end;
 
     auto sstring = (it_server == end) ? server : servep.address ().to_string ();
+    auto interface_addresses = gmlc::netif::getInterfaceAddressesV6 ();
 
     asio::ip::tcp::resolver::query query (asio::ip::tcp::v6 (), asio::ip::host_name (), "");
     asio::ip::tcp::resolver::iterator it = resolver.resolve (query);
     asio::ip::tcp::endpoint endpoint = *it;
 
-    if (it == end)
-    {
-        return std::string ();
-    }
-    int cnt = 0;
-    std::string def = endpoint.address ().to_string ();
-    cnt = matchcount (sstring.begin (), sstring.end (), def.begin (), def.end ());
-    ++it;
+    std::vector<std::string> resolved_addresses;
     while (it != end)
     {
         asio::ip::tcp::endpoint ept = *it;
-        std::string ndef = ept.address ().to_string ();
+        resolved_addresses.push_back (ept.address ().to_string ());
+        ++it;
+    }
+
+    auto candidate_addresses = prioritizeExternalAddresses (interface_addresses, resolved_addresses);
+
+    int cnt = 0;
+    std::string def = candidate_addresses[0];
+    cnt = matchcount (sstring.begin (), sstring.end (), def.begin (), def.end ());
+    for (auto ndef : candidate_addresses)
+    {
         auto mcnt = matchcount (sstring.begin (), sstring.end (), ndef.begin (), ndef.end ());
-        if ((mcnt > cnt) && (mcnt >= 9))
+        if ((mcnt > cnt) && (mcnt >= 7))
         {
             def = ndef;
             cnt = mcnt;
         }
-        ++it;
     }
     return def;
 }

@@ -9,8 +9,8 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "EndpointInfo.hpp"
 #include "NamedInputInfo.hpp"
 #include "PublicationInfo.hpp"
-#include "gmlc/containers/DualMappedPointerVector.hpp"
 #include "federate_id_extra.hpp"
+#include "gmlc/containers/DualMappedPointerVector.hpp"
 #include <atomic>
 
 /** @file container for keeping the set of different interfaces information for a federate
@@ -71,6 +71,8 @@ class InterfaceInfo
 
     /** check the interfaces for specific issues*/
     std::vector<std::pair<int, std::string>> checkInterfacesForIssues ();
+    /** generate a configuration script for the interfaces*/
+    std::string generateInferfaceConfig () const;
 
   private:
     std::atomic<global_federate_id> global_id;

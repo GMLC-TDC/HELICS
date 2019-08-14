@@ -40,7 +40,7 @@ TEST_P (query_type_tests, publication_queries)
     auto core = vFed1->getCorePointer ();
     auto res = core->query ("fed0", "publications");
     EXPECT_EQ (res, "[pub1;fed0/pub2]");
-    auto rvec = vectorizeQueryResult (res);
+    auto rvec = helics::vectorizeQueryResult (res);
 
     ASSERT_EQ (rvec.size (), 2u);
     EXPECT_EQ (rvec[0], "pub1");
@@ -95,7 +95,7 @@ TEST_P (query_type_tests, publication_fed_queries)
 
     auto res = vFed1->query ("federation", "publications");
 
-    auto rvec = vectorizeAndSortQueryResult (res);
+    auto rvec = helics::vectorizeAndSortQueryResult (res);
 
     ASSERT_EQ (rvec.size (), 3u);
     EXPECT_EQ (rvec[0], "fed0/pub1");
@@ -381,5 +381,28 @@ TEST_F (query_tests, test_update_values_all)
     EXPECT_EQ (val["pub2"].asDouble (), 23.1);
     EXPECT_EQ (val["pub3"].asDouble (), 15.1);
     vFed1->finalize ();
+    helics::cleanupHelicsLibrary ();
+}
+
+TEST_F (query_tests, test_query_subscriptions)
+{
+    SetupTest<helics::ValueFederate> ("zmq2", 2);
+    auto vFed1 = GetFederateAs<helics::ValueFederate> (0);
+    auto vFed2 = GetFederateAs<helics::ValueFederate> (1);
+    vFed1->registerGlobalPublication<double> ("pub1");
+    vFed1->registerGlobalPublication<double> ("pub2");
+    vFed1->registerGlobalPublication<double> ("pub3");
+
+    vFed2->registerSubscription ("pub1");
+    vFed2->registerSubscription ("pub2");
+    vFed2->registerSubscription ("pub3");
+    vFed1->enterInitializingModeAsync ();
+    vFed2->enterInitializingMode ();
+    vFed1->enterInitializingModeComplete ();
+
+    auto subs = helics::queryFederateSubscriptions (vFed1.get (), "fed1");
+    EXPECT_EQ (subs, "[pub1;pub2;pub3]");
+    vFed1->finalize ();
+    vFed2->finalize ();
     helics::cleanupHelicsLibrary ();
 }

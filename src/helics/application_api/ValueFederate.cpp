@@ -157,7 +157,7 @@ static const std::string emptyStr;
 template <class Inp, class Obj>
 static void loadOptions (ValueFederate *fed, const Inp &data, Obj &objUpdate)
 {
-    addTargets (data, "flags", [&objUpdate] (const std::string &target) {
+    addTargets (data, "flags", [&objUpdate](const std::string &target) {
         if (target.front () != '-')
         {
             objUpdate.setOption (getOptionIndex (target), true);
@@ -177,9 +177,8 @@ static void loadOptions (ValueFederate *fed, const Inp &data, Obj &objUpdate)
     {
         objUpdate.setOption (defs::options::connection_required, required);
     }
-    callIfMember (data, "shortcut",
-                  [&objUpdate, fed] (const std::string &val) { fed->addAlias (objUpdate, val); });
-    callIfMember (data, "alias", [&objUpdate, fed] (const std::string &val) { fed->addAlias (objUpdate, val); });
+    callIfMember (data, "shortcut", [&objUpdate, fed](const std::string &val) { fed->addAlias (objUpdate, val); });
+    callIfMember (data, "alias", [&objUpdate, fed](const std::string &val) { fed->addAlias (objUpdate, val); });
 
     auto tol = getOrDefault (data, "tolerance", -1.0);
     if (tol > 0.0)
@@ -191,14 +190,15 @@ static void loadOptions (ValueFederate *fed, const Inp &data, Obj &objUpdate)
     {
         fed->setInfo (objUpdate.getHandle (), info);
     }
-    addTargets (data, "targets", [&objUpdate] (const std::string &target) { objUpdate.addTarget (target); });
+    addTargets (data, "targets", [&objUpdate](const std::string &target) { objUpdate.addTarget (target); });
 }
 
 void ValueFederate::registerValueInterfacesJson (const std::string &jsonString)
 {
     auto doc = loadJson (jsonString);
-
-    if (doc.isMember ("publications"))
+    bool defaultGlobal = false;
+    replaceIfMember (doc, "defaultglobal",defaultGlobal);
+	if (doc.isMember ("publications"))
     {
         auto pubs = doc["publications"];
         for (const auto &pub : pubs)
@@ -212,7 +212,7 @@ void ValueFederate::registerValueInterfacesJson (const std::string &jsonString)
             }
             auto type = getOrDefault (pub, "type", emptyStr);
             auto units = getOrDefault (pub, "units", emptyStr);
-            bool global = getOrDefault (pub, "global", false);
+            bool global = getOrDefault (pub, "global", defaultGlobal);
             if (global)
             {
                 pubAct = &registerGlobalPublication (key, type, units);
@@ -255,9 +255,9 @@ void ValueFederate::registerValueInterfacesJson (const std::string &jsonString)
             {
                 continue;
             }
-            auto type = getOrDefault (ipt, "type", std::string ());
-            auto units = getOrDefault (ipt, "units", std::string ());
-            bool global = getOrDefault (ipt, "global", false);
+            auto type = getOrDefault (ipt, "type", emptyStr);
+            auto units = getOrDefault (ipt, "units", emptyStr);
+            bool global = getOrDefault (ipt, "global", defaultGlobal);
             if (global)
             {
                 inp = &registerGlobalInput (key, type, units);
@@ -282,7 +282,8 @@ void ValueFederate::registerValueInterfacesToml (const std::string &tomlString)
     {
         throw (helics::InvalidParameter (ia.what ()));
     }
-
+    bool defaultGlobal = false;
+    replaceIfMember (doc, "defaultglobal", defaultGlobal);
     auto pubs = doc.find ("publications");
     if (pubs != nullptr)
     {
@@ -298,7 +299,7 @@ void ValueFederate::registerValueInterfacesToml (const std::string &tomlString)
             }
             auto type = getOrDefault (pub, "type", emptyStr);
             auto units = getOrDefault (pub, "units", emptyStr);
-            bool global = getOrDefault (pub, "global", false);
+            bool global = getOrDefault (pub, "global", defaultGlobal);
             Publication *pubObj = nullptr;
             if (global)
             {
@@ -345,9 +346,9 @@ void ValueFederate::registerValueInterfacesToml (const std::string &tomlString)
             {
                 continue;
             }
-            auto type = getOrDefault (ipt, "type", std::string ());
-            auto units = getOrDefault (ipt, "units", std::string ());
-            bool global = getOrDefault (ipt, "global", false);
+            auto type = getOrDefault (ipt, "type", emptyStr);
+            auto units = getOrDefault (ipt, "units", emptyStr);
+            bool global = getOrDefault (ipt, "global", defaultGlobal);
             if (global)
             {
                 id = &registerGlobalInput (key, type, units);
@@ -577,12 +578,12 @@ const Publication &ValueFederate::getPublication (const std::string &key, int in
     return vfManager->getPublication (key + '_' + std::to_string (index1) + '_' + std::to_string (index2));
 }
 
-void ValueFederate::setInputNotificationCallback (std::function<void (Input &, Time)> callback)
+void ValueFederate::setInputNotificationCallback (std::function<void(Input &, Time)> callback)
 {
     vfManager->setInputNotificationCallback (std::move (callback));
 }
 
-void ValueFederate::setInputNotificationCallback (Input &inp, std::function<void (Input &, Time)> callback)
+void ValueFederate::setInputNotificationCallback (Input &inp, std::function<void(Input &, Time)> callback)
 {
     vfManager->setInputNotificationCallback (inp, std::move (callback));
 }

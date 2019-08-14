@@ -324,7 +324,7 @@ route_id CommonCore::getRoute (global_federate_id global_fedid) const
 bool CommonCore::isConfigured () const { return (brokerState >= configured); }
 
 bool CommonCore::isOpenToNewFederates () const { return ((brokerState != created) && (brokerState < operating)); }
-void CommonCore::error (local_federate_id federateID, int errorCode)
+void CommonCore::error (local_federate_id federateID, int errorID)
 {
     auto fed = getFederateAt (federateID);
     if (fed == nullptr)
@@ -333,7 +333,7 @@ void CommonCore::error (local_federate_id federateID, int errorCode)
     }
     ActionMessage m (CMD_ERROR);
     m.source_id = fed->global_id.load ();
-    m.messageID = errorCode;
+    m.messageID = errorID;
     addActionMessage (m);
     fed->addAction (m);
     iteration_result ret = iteration_result::next_step;
@@ -919,7 +919,36 @@ const std::string &CommonCore::getHandleName (interface_handle handle) const
     return emptyStr;
 }
 
-const std::string &CommonCore::getUnits (interface_handle handle) const
+const std::string &CommonCore::getInjectionUnits (interface_handle handle) const
+{
+    auto handleInfo = getHandleInfo (handle);
+    if (handleInfo != nullptr)
+    {
+        switch (handleInfo->handleType)
+        {
+        case handle_type::input:
+        {
+            auto fed = getFederateAt (handleInfo->local_fed_id);
+            auto inpInfo = fed->interfaces ().getInput (handle);
+            if (inpInfo != nullptr)
+            {
+                if (!inpInfo->inputUnits.empty ())
+                {
+                    return inpInfo->inputUnits;
+                }
+            }
+            break;
+        }
+        case handle_type::publication:
+            return handleInfo->units;
+        default:
+            return emptyStr;
+        }
+    }
+    return emptyStr;
+}
+
+const std::string &CommonCore::getExtractionUnits (interface_handle handle) const
 {
     auto handleInfo = getHandleInfo (handle);
     if (handleInfo != nullptr)
@@ -1957,17 +1986,15 @@ std::string CommonCore::coreQuery (const std::string &queryStr) const
     }
     if (queryStr == "publications")
     {
-        return generateStringVector_if (loopHandles, [](const auto &handle) { return handle.key; },
-                                        [](const auto &handle) {
-                                            return (handle.handleType == handle_type::publication);
-                                        });
+        return generateStringVector_if (
+          loopHandles, [](const auto &handle) { return handle.key; },
+          [](const auto &handle) { return (handle.handleType == handle_type::publication); });
     }
     if (queryStr == "endpoints")
     {
-        return generateStringVector_if (loopHandles, [](const auto &handle) { return handle.key; },
-                                        [](const auto &handle) {
-                                            return (handle.handleType == handle_type::endpoint);
-                                        });
+        return generateStringVector_if (
+          loopHandles, [](const auto &handle) { return handle.key; },
+          [](const auto &handle) { return (handle.handleType == handle_type::endpoint); });
     }
     if (queryStr == "dependson")
     {
@@ -2346,10 +2373,10 @@ void CommonCore::errorRespondDelayedMessages (const std::string &estring)
     while (msg)
     {
         if ((*msg).action () == CMD_QUERY || (*msg).action () == CMD_BROKER_QUERY)
-        {//deal with in flight queries that will block unless a response is given
-            ActiveQueries.setDelayedValue ((*msg).messageID, std::string("#error:")+estring);
+        {  // deal with in flight queries that will block unless a response is given
+            ActiveQueries.setDelayedValue ((*msg).messageID, std::string ("#error:") + estring);
         }
-		//else other message which might get into here shouldn't need any action, just drop them
+        // else other message which might get into here shouldn't need any action, just drop them
         msg = delayTransmitQueue.pop ();
     }
 }
@@ -3786,7 +3813,7 @@ bool CommonCore::waitCoreRegistration ()
         std::this_thread::sleep_for (std::chrono::milliseconds (100));
         brkid = global_id.load ();
         ++sleepcnt;
-        if (Time (static_cast<int64_t>(sleepcnt) * 100, time_units::ms) > timeout)
+        if (Time (static_cast<int64_t> (sleepcnt) * 100, time_units::ms) > timeout)
         {
             return false;
         }
@@ -3884,7 +3911,11 @@ void CommonCore::routeMessage (ActionMessage &cmd, global_federate_id dest)
             }
             else
             {
-                fed->processPostTerminationAction (cmd);
+                auto rep = fed->processPostTerminationAction (cmd);
+                if (rep)
+                {
+                    routeMessage (*rep);
+                }
             }
         }
     }
@@ -3917,7 +3948,11 @@ void CommonCore::routeMessage (const ActionMessage &cmd)
             }
             else
             {
-                fed->processPostTerminationAction (cmd);
+                auto rep = fed->processPostTerminationAction (cmd);
+                if (rep)
+                {
+                    routeMessage (*rep);
+                }
             }
         }
     }
@@ -3954,7 +3989,11 @@ void CommonCore::routeMessage (ActionMessage &&cmd, global_federate_id dest)
             }
             else
             {
-                fed->processPostTerminationAction (cmd);
+                auto rep = fed->processPostTerminationAction (cmd);
+                if (rep)
+                {
+                    routeMessage (*rep);
+                }
             }
         }
     }
@@ -3987,7 +4026,11 @@ void CommonCore::routeMessage (ActionMessage &&cmd)
             }
             else
             {
-                fed->processPostTerminationAction (cmd);
+                auto rep = fed->processPostTerminationAction (cmd);
+                if (rep)
+                {
+                    routeMessage (*rep);
+                }
             }
         }
     }

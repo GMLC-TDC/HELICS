@@ -65,6 +65,8 @@ class HandleManager
     const BasicHandleInfo *getHandleInfo (interface_handle handle) const;
     /** find a handle from both the federate and local id*/
     BasicHandleInfo *findHandle (global_handle id);
+    /** find a const handle from both the federate and local id*/
+    const BasicHandleInfo *findHandle (global_handle id) const;
 
     void setHandleOption (interface_handle handle, int option, bool val);
 

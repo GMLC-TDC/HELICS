@@ -5,7 +5,7 @@ the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 #include "NamedInputInfo.hpp"
-
+#include "units/units/units.hpp"
 #include <algorithm>
 #include <set>
 
@@ -52,8 +52,7 @@ std::shared_ptr<const data_block> NamedInputInfo::getData ()
     return nullptr;
 }
 
-static auto recordComparison = [] (const NamedInputInfo::dataRecord &rec1,
-                                   const NamedInputInfo::dataRecord &rec2) {
+static auto recordComparison = [](const NamedInputInfo::dataRecord &rec1, const NamedInputInfo::dataRecord &rec2) {
     return (rec1.time < rec2.time) ? true : ((rec1.time == rec2.time) ? (rec1.iteration < rec2.iteration) : false);
 };
 
@@ -95,6 +94,11 @@ void NamedInputInfo::addData (global_handle source_id,
 
 void NamedInputInfo::addSource (global_handle newSource, const std::string &stype, const std::string &sunits)
 {
+    if (input_sources.empty ())
+    {
+        inputType = stype;
+        inputUnits = sunits;
+    }
     input_sources.push_back (newSource);
     source_types.emplace_back (stype, sunits);
     data_queues.resize (input_sources.size ());
@@ -115,6 +119,7 @@ void NamedInputInfo::removeSource (global_handle sourceToRemove, Time minTime)
             }
             deactivated[ii] = minTime;
         }
+        // there could be duplicate sources so we need to do the full loop
     }
 }
 
@@ -310,6 +315,36 @@ bool checkTypeMatch (const std::string &type1, const std::string &type2, bool st
         return ((convertible_set.find (type2) != convertible_set.end ()));
     }
     return (type2 == "raw");
+}
+
+bool checkUnitMatch (const std::string &unit1, const std::string &unit2, bool strict_match)
+{
+    if ((unit1.empty ()) || (unit1 == unit2) || (unit1 == "def") || (unit1 == "any"))
+    {
+        return true;
+    }
+
+    if ((unit2.empty ()) || (unit2 == "def") || (unit2 == "any"))
+    {
+        return true;
+    }
+    auto u1 = units::unit_from_string (unit1);
+    auto u2 = units::unit_from_string (unit2);
+
+    if (!units::is_valid (u1) || !units::is_valid (u2))
+    {
+        return false;
+    }
+    if (strict_match)
+    {
+        double conv = units::quick_convert (u1, u2);
+        return (!std::isnan (conv));
+    }
+    else
+    {
+        double conv = units::convert (u1, u2);
+        return (!std::isnan (conv));
+    }
 }
 
 }  // namespace helics

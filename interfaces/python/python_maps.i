@@ -56,6 +56,11 @@ static void throwHelicsPythonException(helics_error *err) {
     strcat(str, err->message);
     PyErr_SetString(pHelicsException, str);
 	break;
+  case   helics_error_insufficient_space:
+    strcat(str, "helics:insufficient_space - ");
+    strcat(str, err->message);
+    PyErr_SetString(pHelicsException, str);
+	break;
   case   helics_error_other:
   case   helics_error_external_type:
   default:
@@ -255,6 +260,27 @@ PyModule_AddObject(m, "HelicsException", pHelicsException);
 }
 
 %typemap(argout) (void *data, int maxDatalen, int *actualSize) {
+  PyObject *o2=PyBytes_FromStringAndSize($1,*$3);
+  $result = SWIG_Python_AppendOutput($result, o2);
+}
+
+
+// typemap for raw message data output
+%typemap(in, numinputs=0) (void *data, int maxMessagelen, int *actualSize) {
+  $3=&($2);
+}
+
+%typemap(freearg) (void *data, int maxMessagelen, int *actualSize) {
+   if ($1) free($1);
+}
+
+// Set argument to NULL before any conversion occurs
+%typemap(check)(void *data, int maxMessagelen, int *actualSize) {
+    $2=helicsMessageGetRawDataSize(arg1)+2;
+    $1 =  malloc($2);
+}
+
+%typemap(argout) (void *data, int maxMessagelen, int *actualSize) {
   PyObject *o2=PyBytes_FromStringAndSize($1,*$3);
   $result = SWIG_Python_AppendOutput($result, o2);
 }

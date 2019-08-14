@@ -644,6 +644,25 @@ helics_time helicsFederateRequestTime (helics_federate fed, helics_time requestT
     }
 }
 
+helics_time helicsFederateRequestTimeAdvance (helics_federate fed, helics_time timeDelta, helics_error *err)
+{
+    auto fedObj = getFed (fed, err);
+    if (fedObj == nullptr)
+    {
+        return helics_time_invalid;
+    }
+    try
+    {
+        auto timeret = fedObj->requestTimeAdvance (timeDelta);
+        return (timeret < helics::Time::maxVal ()) ? static_cast<double> (timeret) : helics_time_maxtime;
+    }
+    catch (...)
+    {
+        helicsErrorHandler (err);
+        return helics_time_invalid;
+    }
+}
+
 helics_time helicsFederateRequestNextStep (helics_federate fed, helics_error *err)
 {
     auto fedObj = getFed (fed, err);

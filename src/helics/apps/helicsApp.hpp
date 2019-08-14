@@ -92,7 +92,8 @@ class App
 
     /** check if the Player is ready to run*/
     bool isActive () const { return !deactivated; }
-
+    /** get a const reference to the federate*/
+    const CombinationFederate &accessUnderlyingFederate () const { return *fed; }
   protected:
     /** load from a jsonString
     @param jsonString either a JSON filename or a string containing JSON
@@ -110,6 +111,7 @@ class App
     void loadConfigOptions (const Json::Value &element);
     /** generate the command line parser*/
     std::unique_ptr<helicsCLI11App> generateParser ();
+    /** process the command line arguments */
     void processArgs (std::unique_ptr<helicsCLI11App> &app, const std::string &defaultAppName);
 
   protected:

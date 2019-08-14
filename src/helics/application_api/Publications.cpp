@@ -7,6 +7,7 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include "Publications.hpp"
 #include "../core/core-exceptions.hpp"
+#include "units/units/units.hpp"
 
 namespace helics
 {
@@ -18,6 +19,14 @@ Publication::Publication (ValueFederate *valueFed,
     : fed (valueFed), handle (id), pubKey (key), pubUnits (units)
 {
     pubType = getTypeFromString (type);
+    if (!units.empty ())
+    {
+        pubUnitType = std::make_shared<units::precise_unit> (units::unit_from_string (pubUnits));
+        if (!units::is_valid (*pubUnitType))
+        {
+            pubUnitType.reset ();
+        }
+    }
 }
 
 Publication::Publication (ValueFederate *valueFed,
@@ -349,6 +358,34 @@ void Publication::publish (const char *name, double val)
     {
         auto db = typeConvert (pubType, name, val);
         fed->publishRaw (*this, db);
+    }
+}
+
+void Publication::publish (double val, const std::string &units)
+{
+    if (units == pubUnits)
+    {
+        publish (val);
+    }
+    auto punit = units::unit_from_string (units);
+    if (units::is_valid (punit))
+    {
+        publish (val, punit);
+    }
+    else
+    {
+        throw (InvalidConversion{});
+    }
+}
+void Publication::publish (double val, const units::precise_unit &units)
+{
+    if (pubUnitType)
+    {
+        publish (units::convert (val, units, *pubUnitType));
+    }
+    else
+    {
+        publish (val);
     }
 }
 

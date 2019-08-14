@@ -173,6 +173,10 @@ class Federate
   @return the granted time step*/
     Time requestNextStep () { return requestTime (timeZero); }
 
+    /** request a time advancement by a certain amount
+    @return the granted time step*/
+    Time requestTimeAdvance (Time timeDelta) { return requestTime (currentTime + timeDelta); }
+
     /** request a time advancement
     @param nextInternalTimeStep the next requested time step
     @param iterate a requested iteration mode
@@ -244,7 +248,7 @@ class Federate
     A string indicating the source of the message and another string with the actual message
     */
     void
-    setLoggingCallback (const std::function<void(int, const std::string &, const std::string &)> &logFunction);
+    setLoggingCallback (const std::function<void (int, const std::string &, const std::string &)> &logFunction);
 
     /** make a query of the core
     @details this call is blocking until the value is returned which make take some time depending on the size of
@@ -471,17 +475,31 @@ class Federate
     @return a const ref to  std::string  */
     const std::string &getInjectionType (interface_handle handle) const;
 
-    /** get the extraction type for an interface,  this is the type for data coming into an interface
+    /** get the extraction type for an interface,  this is the type for data coming out of interface
     @details for filters this is the output type, for publications this is the specified type, for endpoints this
     is the specified type and for inputs this is the specified type
     @param handle the interface handle to get the injection type for
     @return a const ref to  std::string  */
     const std::string &getExtractionType (interface_handle handle) const;
 
-    /** get the units associated with an interface
+    /** get the injection units for an interface,  this is the units associated with data coming into an interface
+  @details for inputs this is the input type, for publications this is the units used to transmit data, and for
+  inputs this is the units of the transmitting publication
+  @param handle the interface handle to get the injection units for
+  @return a const ref to  std::string  */
+    const std::string &getInjectionUnits (interface_handle handle) const;
+
+    /** get the extraction type for an interface,  this is the units associated with data coming out of an
+    interface
+    @details for publications this is the specified units, for inputs this is the specified type
     @param handle the interface handle to get the injection type for
+    @return a const ref to  std::string  */
+    const std::string &getExtractionUnits (interface_handle handle) const;
+    /** get the units associated with an interface
+    @details this function will is identical to getExtractionUnits
+    @param handle the interface handle to get the extraction units for
     @return a const ref to  std::string containing the units */
-    const std::string &getInterfaceUnits (interface_handle handle) const;
+    const std::string &getInterfaceUnits (interface_handle handle) const { return getExtractionUnits (handle); }
 
   private:
     /** register filter interfaces defined in  file or string
