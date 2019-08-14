@@ -149,6 +149,7 @@ jobs:
         - DISABLE_INTERFACES="Python,Java"
       install:
         - echo $PATH
+        - set PATH=%PATH:C:\program files\git\usr\bin;=%
         - export PATH="/c/ProgramData/chocolatey/lib/mingw/tools/install/mingw64/bin:$PATH"
         - pacman || echo "pacman does not exist"; true
         - cmake || echo "cmake does not exist"; true
