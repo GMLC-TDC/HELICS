@@ -102,13 +102,11 @@ bool CommonCore::connect ()
                 ActionMessage m (CMD_REG_BROKER);
                 m.source_id = global_federate_id{};
                 m.name = getIdentifier ();
-                if (brokerKey.empty ())
+                m.setStringData (getAddress ());
+
+                if (!brokerKey.empty ())
                 {
-                    m.setStringData (getAddress (), brokerKey);
-                }
-                else
-                {
-                    m.setStringData (getAddress (), brokerKey);
+                    m.setString (1, brokerKey);
                 }
 
                 setActionFlag (m, core_flag);
@@ -1987,14 +1985,14 @@ std::string CommonCore::coreQuery (const std::string &queryStr) const
     if (queryStr == "publications")
     {
         return generateStringVector_if (
-          loopHandles, [](const auto &handle) { return handle.key; },
-          [](const auto &handle) { return (handle.handleType == handle_type::publication); });
+          loopHandles, [] (const auto &handle) { return handle.key; },
+          [] (const auto &handle) { return (handle.handleType == handle_type::publication); });
     }
     if (queryStr == "endpoints")
     {
         return generateStringVector_if (
-          loopHandles, [](const auto &handle) { return handle.key; },
-          [](const auto &handle) { return (handle.handleType == handle_type::endpoint); });
+          loopHandles, [] (const auto &handle) { return handle.key; },
+          [] (const auto &handle) { return (handle.handleType == handle_type::endpoint); });
     }
     if (queryStr == "dependson")
     {

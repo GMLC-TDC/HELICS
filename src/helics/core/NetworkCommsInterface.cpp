@@ -248,6 +248,7 @@ ActionMessage NetworkCommsInterface::generatePortRequest (int cnt) const
     req.messageID = REQUEST_PORTS;
     req.payload = stripProtocol (localTargetAddress);
     req.counter = cnt;
+    req.setStringData (brokerName, brokerInitString);
     return req;
 }
 
