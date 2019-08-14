@@ -145,26 +145,42 @@ jobs:
         - SKIP_TEST_RUN=true
 
     - os: windows
+      env:
+        - DISABLE_INTERFACES="Python,Java"
       install:
         - echo $PATH
-        - export PATH="/c/ProgramData/chocolatey/lib/mingw/tools/install/mingw64/bin:$PATH"
-        - pacman || echo "pacman does not exist"; true
+        - export SHELL=cmd
         - cmake || echo "cmake does not exist"; true
         - mingw64-make || echo "mingw64-make does not exist"; true
         - mingw32-make || echo "mingw32-make does not exist"; true
         - msys || echo "msys does not exist"; true
         - msys2 || echo "msys2 does not exist"; true
         - source scripts/setup-helics-ci-options.sh
-        - scripts/install-dependency.sh boost 1.66.0 ${TRAVIS_BUILD_DIR}/dependencies/boost
+        #- scripts/install-dependency.sh boost 1.66.0 ${TRAVIS_BUILD_DIR}/dependencies/boost
         - mv \"C:/Program Files/Git/usr/bin/sh.exe\" \"C:/Program Files/Git/usr/bin/sh2.exe\" 
       script:
         - mkdir -p build && cd build
         - ls /c/ProgramData/chocolatey/lib/mingw/tools/install/mingw64/bin
         - ls ${TRAVIS_BUILD_DIR}/dependencies/boost
         - ls ${TRAVIS_BUILD_DIR}/dependencies/boost/include
-        - cmake .. -G "MinGW Makefiles" -DBUILD_HELICS_TESTS=OFF -DBOOST_INSTALL_PATH=${TRAVIS_BUILD_DIR}/dependencies/boost ${JOB_OPTION_FLAGS} ${HELICS_DEPENDENCY_FLAGS} ${HELICS_OPTION_FLAGS} -DCMAKE_SH="CMAKE_SH-NOTFOUND"
+        - export CC=gcc
+        - export CXX=g++
+        - powershell -command echo ${TRAVIS_BUILD_DIR}
+        - powershell -command echo PATH='$env:PATH'
+        - powershell -command echo TRAVIS_BUILD_DIR='$env:TRAVIS_BUILD_DIR'
+        - powershell -command echo JOB_OPTION_FLAGS='$env:JOB_OPTION_FLAGS'
+        - powershell -command echo HELICS_DEPENDENCY_FLAGS='$env:HELICS_DEPENDENCY_FLAGS'
+        - powershell -command echo HELICS_OPTION_FLAGS='$env:HELICS_OPTION_FLAGS'
+        - powershell -command echo CC='$env:CC'
+        - powershell -command echo CXX='$env:CXX'
+        - powershell -command cmake --version
+        - powershell -command echo PWD='$PWD'
+        - powershell -command gcc --version
+        - powershell -command g++ --version
+        #- powershell -command cmake /G "MinGW Makefiles" /D BUILD_HELICS_TESTS=OFF /D BOOST_INSTALL_PATH='$env:TRAVIS_BUILD_DIR'/dependencies/boost /D CMAKE_C_COMPILER=C:\ProgramData\chocolatey\lib\mingw\tools\install\mingw64\bin\gcc.exe /D CMAKE_CXX_COMPILER=C:\ProgramData\chocolatey\lib\mingw\tools\install\mingw64\bin\g++.exe ..
+        - powershell -command cmake -G \"MinGW Makefiles\" -DBUILD_HELICS_TESTS=OFF -DBOOST_INSTALL_PATH='$env:TRAVIS_BUILD_DIR'/dependencies/boost '$env:JOB_OPTION_FLAGS' '$env:HELICS_DEPENDENCY_FLAGS' '$env:HELICS_OPTION_FLAGS' -DCMAKE_C_COMPILER=C:\ProgramData\chocolatey\lib\mingw\tools\install\mingw64\bin\gcc.exe -DCMAKE_CXX_COMPILER=C:\ProgramData\chocolatey\lib\mingw\tools\install\mingw64\bin\g++.exe ..
         - cat "/c/Users/travis/build/GMLC-TDC/HELICS/build/CMakeFiles/CMakeError.log"
-        - cmake . --build
+        - powershell -command cmake . --build
 
     # -----------------------------------------------
     # Daily ZMQ subproject build with new CMake
