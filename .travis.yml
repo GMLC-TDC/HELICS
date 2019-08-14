@@ -160,6 +160,7 @@ jobs:
         - export CXX=g++
         - powershell -command cmake -G \"MinGW Makefiles\" -DBUILD_HELICS_BOOST_TESTS=OFF -DCMAKE_SH=CMAKE_SH-NOTFOUND -DBOOST_INSTALL_PATH=C:/local/boost_1_58_0 '$env:JOB_OPTION_FLAGS' '$env:HELICS_DEPENDENCY_FLAGS' '$env:HELICS_OPTION_FLAGS' -DCMAKE_C_COMPILER=C:/ProgramData/chocolatey/lib/mingw/tools/install/mingw64/bin/gcc.exe -DCMAKE_CXX_COMPILER=C:/ProgramData/chocolatey/lib/mingw/tools/install/mingw64/bin/g++.exe ..
         - powershell -command cmake --build . --parallel
+        - powershell -command ctest -R core-ci-tests
 
     # -----------------------------------------------
     # Daily ZMQ subproject build with new CMake
