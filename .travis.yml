@@ -146,7 +146,7 @@ jobs:
 
     - os: windows
       name: "MinGW"
-      if: (branch = develop AND type IN (cron)) OR (branch = master AND type IN (push, pull_request)) OR (branch =~ /(mingw)/)
+      if: (branch = develop AND type IN (cron)) OR (branch = master AND type IN (push, pull_request)) OR (branch =~ /(mingw)/) OR (commit_message =~ /(mingw)/)
       env:
         - DISABLE_INTERFACES="Python,Java"
       install:
