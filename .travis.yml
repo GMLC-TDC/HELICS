@@ -156,6 +156,7 @@ jobs:
         - msys2 || echo "msys2 does not exist"; true
         - source scripts/setup-helics-ci-options.sh
         - scripts/install-dependency.sh boost 1.66.0 ${TRAVIS_BUILD_DIR}/dependencies/boost
+        - mv \"C:/Program Files/Git/usr/bin/sh.exe\" \"C:/Program Files/Git/usr/bin/sh2.exe\" 
       script:
         - mkdir -p build && cd build
         - ls /c/ProgramData/chocolatey/lib/mingw/tools/install/mingw64/bin
