@@ -145,6 +145,8 @@ jobs:
         - SKIP_TEST_RUN=true
 
     - os: windows
+      env:
+        - DISABLE_INTERFACES="Python,Java"
       install:
         - echo $PATH
         - export PATH="/c/ProgramData/chocolatey/lib/mingw/tools/install/mingw64/bin:$PATH"
