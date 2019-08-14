@@ -157,7 +157,6 @@ jobs:
         - msys2 || echo "msys2 does not exist"; true
         - source scripts/setup-helics-ci-options.sh
         #- scripts/install-dependency.sh boost 1.66.0 ${TRAVIS_BUILD_DIR}/dependencies/boost
-        - mv \"C:/Program Files/Git/usr/bin/sh.exe\" \"C:/Program Files/Git/usr/bin/sh2.exe\" 
       script:
         - mkdir -p build && cd build
         - ls /c/ProgramData/chocolatey/lib/mingw/tools/install/mingw64/bin
@@ -178,7 +177,7 @@ jobs:
         - powershell -command gcc --version
         - powershell -command g++ --version
         #- powershell -command cmake /G "MinGW Makefiles" /D BUILD_HELICS_TESTS=OFF /D BOOST_INSTALL_PATH='$env:TRAVIS_BUILD_DIR'/dependencies/boost /D CMAKE_C_COMPILER=C:\ProgramData\chocolatey\lib\mingw\tools\install\mingw64\bin\gcc.exe /D CMAKE_CXX_COMPILER=C:\ProgramData\chocolatey\lib\mingw\tools\install\mingw64\bin\g++.exe ..
-        - powershell -command cmake -G \"MinGW Makefiles\" -DBUILD_HELICS_TESTS=OFF -DBOOST_INSTALL_PATH='$env:TRAVIS_BUILD_DIR'/dependencies/boost '$env:JOB_OPTION_FLAGS' '$env:HELICS_DEPENDENCY_FLAGS' '$env:HELICS_OPTION_FLAGS' -DCMAKE_C_COMPILER=C:\ProgramData\chocolatey\lib\mingw\tools\install\mingw64\bin\gcc.exe -DCMAKE_CXX_COMPILER=C:\ProgramData\chocolatey\lib\mingw\tools\install\mingw64\bin\g++.exe ..
+        - powershell -command cmake -G \"MinGW Makefiles\" -DBUILD_HELICS_TESTS=OFF -DCMAKE_SH=CMAKE_SH-NOTFOUND -DBOOST_INSTALL_PATH='$env:TRAVIS_BUILD_DIR'/dependencies/boost '$env:JOB_OPTION_FLAGS' '$env:HELICS_DEPENDENCY_FLAGS' '$env:HELICS_OPTION_FLAGS' -DCMAKE_C_COMPILER=C:\ProgramData\chocolatey\lib\mingw\tools\install\mingw64\bin\gcc.exe -DCMAKE_CXX_COMPILER=C:\ProgramData\chocolatey\lib\mingw\tools\install\mingw64\bin\g++.exe ..
         - cat "/c/Users/travis/build/GMLC-TDC/HELICS/build/CMakeFiles/CMakeError.log"
         - powershell -command cmake . --build
 
