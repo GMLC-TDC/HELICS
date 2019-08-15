@@ -21,5 +21,5 @@ function varargout = helicsFederateRegisterSubscription(varargin)
     %-------
     %an object containing the subscription
     %
-  [varargout{1:nargout}] = helicsMEX(133, varargin{:});
+  [varargout{1:nargout}] = helicsMEX(135, varargin{:});
 end

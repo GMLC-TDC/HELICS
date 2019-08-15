@@ -83,7 +83,7 @@ else()
 option(BUILD_HELICS_TESTS "Enable the test executables to be built" ON)
 endif()
 
-option(BUILD_HELICS_BOOST_TESTS "Enable the test executables built using boost unit tests" ON)
+option(BUILD_HELICS_BOOST_TESTS "Enable the test executables built using boost unit and system tests" ON)
 option(BUILD_HELICS_EXAMPLES "Enable the example executables to be built" ON)
 
 mark_as_advanced(BUILD_HELICS_BOOST_TESTS)
@@ -361,7 +361,7 @@ endif()
 # add some additional libraries for MSYS
 # -------------------------------------------------------------
 if(MSYS)
-    target_link_libraries(helics_base INTERFACE wsock32 ws2_32)
+    target_link_libraries(helics_base INTERFACE wsock32 ws2_32 Iphlpapi)
 	if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
         set(ENABLE_IPC_CORE FALSE)
 		target_compile_definitions(helics_base_includes INTERFACE -DDISABLE_BOOST_IOSTREAMS)

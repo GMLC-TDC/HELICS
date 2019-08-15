@@ -317,15 +317,14 @@ bool isipv6 (const std::string &address)
     return false;
 }
 
-std::vector<std::string> prioritizeExternalAddresses(std::vector<std::string> high, std::vector<std::string> low)
+std::vector<std::string> prioritizeExternalAddresses (std::vector<std::string> high, std::vector<std::string> low)
 {
-	std::vector<std::string> result;
+    std::vector<std::string> result;
 
     // Top choice: addresses that both lists contain (resolver + OS)
     for (auto r_addr : low)
     {
-        if (std::find (high.begin (), high.end (), r_addr) !=
-            high.end ())
+        if (std::find (high.begin (), high.end (), r_addr) != high.end ())
         {
             result.push_back (r_addr);
         }
@@ -334,8 +333,7 @@ std::vector<std::string> prioritizeExternalAddresses(std::vector<std::string> hi
     for (auto i_addr : high)
     {
         // add the address if it isn't already in the list
-        if (std::find (result.begin (), result.end (), i_addr) ==
-            result.end ())
+        if (std::find (result.begin (), result.end (), i_addr) == result.end ())
         {
             result.push_back (i_addr);
         }
@@ -344,14 +342,13 @@ std::vector<std::string> prioritizeExternalAddresses(std::vector<std::string> hi
     for (auto r_addr : low)
     {
         // add the address if it isn't already in the list
-        if (std::find (low.begin (), low.end (), r_addr) ==
-            low.end ())
+        if (std::find (low.begin (), low.end (), r_addr) == low.end ())
         {
             result.push_back (r_addr);
         }
     }
 
-	return result;
+    return result;
 }
 
 template <class InputIt1, class InputIt2>
@@ -443,7 +440,7 @@ std::string getLocalExternalAddressV4 (const std::string &server)
 
     asio::ip::tcp::resolver::query query (asio::ip::tcp::v4 (), asio::ip::host_name (), "");
     asio::ip::tcp::resolver::iterator it = resolver.resolve (query);
-    asio::ip::tcp::endpoint endpoint = *it;
+    // asio::ip::tcp::endpoint endpoint = *it;
 
     std::vector<std::string> resolved_addresses;
     while (it != end)
@@ -541,7 +538,7 @@ std::string getLocalExternalAddressV6 (const std::string &server)
 
     asio::ip::tcp::resolver::query query (asio::ip::tcp::v6 (), asio::ip::host_name (), "");
     asio::ip::tcp::resolver::iterator it = resolver.resolve (query);
-    asio::ip::tcp::endpoint endpoint = *it;
+    // asio::ip::tcp::endpoint endpoint = *it;
 
     std::vector<std::string> resolved_addresses;
     while (it != end)

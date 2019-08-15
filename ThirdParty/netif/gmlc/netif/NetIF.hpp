@@ -19,9 +19,10 @@ All rights reserved. SPDX-License-Identifier: BSD-3-Clause
 #include <WS2tcpip.h>
 #include <iphlpapi.h>
 #include <winsock2.h>
-
+#ifdef _MSC_VER
 #pragma comment(lib, "IPHLPAPI.lib")
 #pragma comment(lib, "Ws2_32.lib")
+#endif
 #else
 #include <arpa/inet.h>
 #include <ifaddrs.h>
