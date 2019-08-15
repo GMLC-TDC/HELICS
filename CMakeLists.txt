@@ -65,6 +65,13 @@ if(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
                 CACHE PATH "default install path"
                 FORCE
             )
+		elif (CYGWIN)
+			set(
+                CMAKE_INSTALL_PREFIX
+                "/usr/local/helics_${HELICS_VERSION_UNDERSCORE}/"
+                CACHE PATH "default install path"
+                FORCE
+            )
         else(MSYS)
             set(
                 CMAKE_INSTALL_PREFIX
@@ -76,6 +83,10 @@ if(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
     endif(WIN32)
 endif()
 
+if (MSYS OR CYGWIN OR UNIX OR APPLE)
+	set(UNIX_LIKE TRUE)
+endif()
+
 if (HELICS_ROOT_PROJ)
 if (DEFINED BUILD_TESTING)
 option(BUILD_HELICS_TESTS "Enable the test executables to be built" ${BUILD_TESTING})
@@ -83,7 +94,12 @@ else()
 option(BUILD_HELICS_TESTS "Enable the test executables to be built" ON)
 endif()
 
+if (MINGW AND NOT UNIX_LIKE)
+option(BUILD_HELICS_BOOST_TESTS "Enable the test executables built using boost unit tests" OFF)
+else()
 option(BUILD_HELICS_BOOST_TESTS "Enable the test executables built using boost unit tests" ON)
+endif()
+
 option(BUILD_HELICS_EXAMPLES "Enable the example executables to be built" ON)
 
 mark_as_advanced(BUILD_HELICS_BOOST_TESTS)
@@ -344,7 +360,7 @@ endif(ENABLE_MPI_CORE)
 # -------------------------------------------------------------
 if(NOT WIN32)
     set(THREADS_PREFER_PTHREAD_FLAG ON)
-elseif(MSYS)
+elseif(MSYS OR CYGWIN)
     set(THREADS_PREFER_PTHREAD_FLAG ON)
 else()
     set(CMAKE_USE_WIN32_THREADS_INIT ON)
@@ -358,15 +374,23 @@ if(UNIX AND NOT APPLE)
 endif()
 
 # -------------------------------------------------------------
-# add some additional libraries for MSYS
+# add some additional libraries for MINGW and MSYS
 # -------------------------------------------------------------
-if(MSYS)
+if(MSYS OR CYGWIN)
     target_link_libraries(helics_base INTERFACE wsock32 ws2_32)
 	if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
         set(ENABLE_IPC_CORE FALSE)
 		target_compile_definitions(helics_base_includes INTERFACE -DDISABLE_BOOST_IOSTREAMS)
     endif()
-endif(MSYS)
+endif()
+
+if(MINGW AND NOT UNIX_LIKE)
+    target_link_libraries(helics_base INTERFACE wsock32 ws2_32)
+endif()
+
+if (CYGWIN)
+	target_compile_definitions(helics_base_includes INTERFACE -D_XOPEN_SOURCE=500 -D__USE_W32_SOCKETS -D_WIN32_WINNT=0x0601)
+endif(CYGWIN)
 
 # -------------------------------------------------------------
 # Enable ZeroMQ
