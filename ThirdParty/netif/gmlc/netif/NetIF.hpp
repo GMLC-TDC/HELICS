@@ -53,10 +53,10 @@ inline std::string addressToString (struct sockaddr *addr, int sa_len)
 {
     #if defined(__MINGW32__)
     char addr_str[NI_MAXHOST];
-	if (getnameinfo(addr, sa_len, addr_str, NI_MAXHOST, 0, 0, NI_NUMERICHOST) != 0)
-	{
-	    return std::string();
-	}
+    if (getnameinfo(addr, sa_len, addr_str, NI_MAXHOST, 0, 0, NI_NUMERICHOST) != 0)
+    {
+        return std::string();
+    }
     #else
     (void)sa_len;
     int family = addr->sa_family;
@@ -228,7 +228,7 @@ std::vector<std::string> getInterfaceAddresses (int family)
 
 #if defined(_WIN32)
     WSADATA wsaData;
-	WSAStartup(0x202, &wsaData);
+    WSAStartup(0x202, &wsaData);
     auto winAddrs = allAddrs;
     while (winAddrs)
     {
