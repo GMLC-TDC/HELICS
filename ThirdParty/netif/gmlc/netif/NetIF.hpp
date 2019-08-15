@@ -47,10 +47,19 @@ using IF_ADDRS_UNICAST = struct ifaddrs *;
 /**
  * a helper function to convert the IP address in a sockaddr struct to text
  * @param addr a pointer to a sockaddr struct
+ * @param sa_len the length of the sockaddr (primarily for systems that don't support inet_ntop)
  * @return an IP address in text form, or an empty string if conversion to text failed
  */
-inline std::string addressToString (struct sockaddr *addr)
+inline std::string addressToString (struct sockaddr *addr, int sa_len)
 {
+    #if defined(__MINGW32__)
+    char addr_str[NI_MAXHOST];
+    if (getnameinfo(addr, sa_len, addr_str, NI_MAXHOST, 0, 0, NI_NUMERICHOST) != 0)
+    {
+        return std::string();
+    }
+    #else
+    (void)sa_len;
     int family = addr->sa_family;
     char addr_str[INET6_ADDRSTRLEN];
     void *src_addr = nullptr;
@@ -66,7 +75,9 @@ inline std::string addressToString (struct sockaddr *addr)
         return std::string ();
     }
     inet_ntop (family, src_addr, addr_str, INET6_ADDRSTRLEN);
-    return std::string (addr_str);
+    #endif
+    
+    return std::string(addr_str);
 }
 
 /**
@@ -145,6 +156,20 @@ inline auto getSockAddr (IF_ADDRS_UNICAST addr)
 }
 
 /**
+ * a helper function to get the underlying socket address length on systems where it is needed
+ * @param addr a pointer to an address structure for an (unicast) interface/adapter
+ * @return the socket address length
+ */
+inline int getSockAddrLen (IF_ADDRS_UNICAST addr)
+{
+#if defined(_WIN32)
+    return addr->Address.iSockaddrLength;
+#else
+    return sizeof(*addr->ifa_addr);
+#endif
+}
+                            
+/**
  * a helper function to get the next interface/adapter address based on OS
  * @param family specify the type of address desired on non-Windows systems; one of AF_INET (IPv4), AF_INET6
  * (IPv6), or AF_UNSPEC (both)
@@ -203,6 +228,8 @@ std::vector<std::string> getInterfaceAddresses (int family)
     getAddresses (family, &allAddrs);
 
 #if defined(_WIN32)
+    WSADATA wsaData;
+    WSAStartup(0x202, &wsaData);
     auto winAddrs = allAddrs;
     while (winAddrs)
     {
@@ -213,7 +240,7 @@ std::vector<std::string> getInterfaceAddresses (int family)
 
         for (auto a = addrs; a != NULL; a = getNextAddress (family, a))
         {
-            std::string ipAddr = addressToString (getSockAddr (a));
+            std::string ipAddr = addressToString (getSockAddr (a), getSockAddrLen(a));
             if (!ipAddr.empty ())
             {
                 result_list.push_back (ipAddr);
@@ -223,6 +250,7 @@ std::vector<std::string> getInterfaceAddresses (int family)
 #if defined(_WIN32)
         winAddrs = winAddrs->Next;
     }
+    WSACleanup();
 #endif
 
     if (allAddrs)

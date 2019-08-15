@@ -3,23 +3,22 @@
 
 ## Requirements
 
-- Microsoft Visual C++ 2015 or newer (MS Build Tools also works)
-- CMake 3.4 or newer(cmake should be newer than the Visual Studio and Boost version you are using)
-- git
-- Boost 1.58 or newer
-- ZeroMQ 4.2.0 or newer (if ZeroMQ support is needed)
-- MS-MPI v8 or newer (if MPI support is needed)
+-   Microsoft Visual C++ 2015 or newer (MS Build Tools also works)
+-   CMake 3.4 or newer(cmake should be newer than the Visual Studio and Boost version you are using)
+-   git
+-   Boost 1.58 or newer
+-   MS-MPI v8 or newer (if MPI support is needed)
 
-## Setup
+## Setup for Visual Studio
 
 *Note*: Keep in mind that your cmake version should be newer than the boost version. If you have an older cmake, you may want an older boost version. Alternatively, you can choose to upgrade your version of cmake.
 
 To set up your environment:
 
-1. Install Microsoft Visual C++ 2015 or newer
+1. Install Microsoft Visual C++ 2015 or newer (2017 or later is recommended)[MSVC](https://visualstudio.microsoft.com/)
 2. Install
-   [Boost](https://www.boost.org/doc/libs/1_69_0/more/getting_started/windows.html)
-    [Windows downloads](https://dl.bintray.com/boostorg/release/1.69.0/binaries/)
+   [Boost](https://www.boost.org/doc/libs/1_70_0/more/getting_started/windows.html)
+    [Windows downloads](https://dl.bintray.com/boostorg/release/1.70.0/binaries/)
    1.61 or later recommended (core library should build with 1.58,
    but tests will not). For CMake to detect it automatically either
    extract Boost to the root of your drive, or set the `BOOST_INSTALL_PATH`
@@ -28,12 +27,11 @@ To set up your environment:
    Building with Visual Studio 2017 will require boost 1.65.1 or newer and cmake 3.9
     or newer.  Use 14.0 versions for Visual Studio 2015, 14.1 files for Visual studio 2017.  Visual studio 2019 will require cmake 3.14 or later.  
     Boost 1.70 with cmake 3.14 is the current recommended configuration.
-3. *Optional* Install [ZeroMQ](http://zeromq.org/build:_start) if you
-   need ZeroMQ support and don't need a copy in a global system location.
-   We recommend skipping this step and running cmake with the
-   `ZMQ_LOCAL_BUILD=ON` option to automatically set up a project-only
-   copy of ZeroMQ later on. The ZeroMQ Windows installer is **very**
-   outdated and will not work with new versions of Visual Studio.  The cmake from ZeroMQ on windows is also function and can be used to store ZMQ in another location that will need to be specified for HELICS.
+3. *Optional* Only if you need a global Install of ZeroMQ [ZeroMQ](http://zeromq.org/build:_start).
+   We **highly recommend skipping** this step and running cmake with the
+   `ZMQ_LOCAL_BUILD=ON` option enabled(which is default on windows) to automatically set up a project-only
+   copy of ZeroMQ. The ZeroMQ Windows installer is **very**
+   outdated and will not work with new versions of Visual Studio.  The cmake from ZeroMQ on windows is also functional and can be used to store ZMQ in another location that will need to be specified for HELICS.
 4. *Optional* Install
    [MS-MPI](https://msdn.microsoft.com/en-us/library/bb524831(v=vs.85).aspx)
    if you need MPI support.
@@ -227,3 +225,20 @@ If you want to build Gridlab-d on Windows with HELICS see [Building with HELICS]
 
 ### Compiling with clang
 Clang does not work to compile on MSYS2 at this time.  It has in the past but there are various issues with the clang standard library on MSYS yet so this will be updated if the situation changes.  
+
+## Building with mingw
+Helics can also be built with the standalone MinGW
+
+- We assume you have MinGW installed or know how to install it.
+- [Boost](https://www.boost.org/doc/libs/1_70_0/more/getting_started/windows.html); you can use the [Windows installer](https://dl.bintray.com/boostorg/release/1.70.0/binaries/) for Boost installed in the default location, but if you want the BUILD_HELICS_BOOST_TESTS to be built you will need to build Boost with MinGW, if you are doing testing on windows we recommend MSVC or MSYS2.  The tests using google test will work fine.
+- Run CMake to configure and generate build files, using "MinGW Makefiles" as the generator,
+- Run mingw32-make -j  to build
+
+## Building with cygwin
+
+Cygwin is another unix like environment on Windows.  It has some peculiarities.
+HELICS will only build on the 32 bit version due to incompatibilities with ASIO and the 64 bit build.  But it does build on the 32 bit versions.
+Also the helics-config utility does not get built due to an incompatibility with the filesystem header.  
+
+- required packages include cmake, libboost-devel, make, gcc, g++, libzmq(if using zmq)
+- use the unix makefiles generator
