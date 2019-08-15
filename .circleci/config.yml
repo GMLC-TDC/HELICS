@@ -1,0 +1,42 @@
+version: 2
+
+aliases:
+
+  - &setup_helics
+    name: setup_helics
+    environment:
+    command: |
+      mkdir -p build
+      cmake .. -DBUILD_OCTAVE_INTERFACE=ON -DBUILD_SHARED_LIBS=ON
+      make install
+
+  - &run_octave_tests
+    name: run_octave_tests
+    command: |
+       cd ${OCTAVETEST}
+       octave -W -V -f runTestsCIRCLECI.m
+       RESULT=$?
+       echo "*** Octave test result: "${RESULT}
+       exit $RESULT
+
+jobs:
+  helicsoctave:
+    docker:
+      - image: helics/octave:latest
+    environment:
+      OCTAVETEST: "/root/develop/HELICS/tests/octave"
+    steps:
+      - checkout
+      - setup_remote_docker: 
+         docker_layer_caching: true   # Save time when caching
+      - run: *setup_helics
+      - run: *run_octave_tests
+
+workflows:
+  version: 2
+  helics_test:
+    jobs:
+      - heclisoctave
+#           requires:
+#              - previous_test_passed
+
