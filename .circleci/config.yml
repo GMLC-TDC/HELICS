@@ -35,7 +35,7 @@ workflows:
   version: 2
   helics_test:
     jobs:
-      - heclisoctave
+      - helicsoctave
 #           requires:
 #              - previous_test_passed
 
