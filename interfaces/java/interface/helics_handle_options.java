@@ -15,6 +15,7 @@ public final class helics_handle_options {
   public final static helics_handle_options helics_handle_option_multiple_connections_allowed = new helics_handle_options("helics_handle_option_multiple_connections_allowed", helicsJNI.helics_handle_option_multiple_connections_allowed_get());
   public final static helics_handle_options helics_handle_option_buffer_data = new helics_handle_options("helics_handle_option_buffer_data", helicsJNI.helics_handle_option_buffer_data_get());
   public final static helics_handle_options helics_handle_option_strict_type_checking = new helics_handle_options("helics_handle_option_strict_type_checking", helicsJNI.helics_handle_option_strict_type_checking_get());
+  public final static helics_handle_options helics_handle_option_ignore_unit_mismatch = new helics_handle_options("helics_handle_option_ignore_unit_mismatch", helicsJNI.helics_handle_option_ignore_unit_mismatch_get());
   public final static helics_handle_options helics_handle_option_only_transmit_on_change = new helics_handle_options("helics_handle_option_only_transmit_on_change", helicsJNI.helics_handle_option_only_transmit_on_change_get());
   public final static helics_handle_options helics_handle_option_only_update_on_change = new helics_handle_options("helics_handle_option_only_update_on_change", helicsJNI.helics_handle_option_only_update_on_change_get());
   public final static helics_handle_options helics_handle_option_ignore_interrupts = new helics_handle_options("helics_handle_option_ignore_interrupts", helicsJNI.helics_handle_option_ignore_interrupts_get());
@@ -53,7 +54,7 @@ public final class helics_handle_options {
     swigNext = this.swigValue+1;
   }
 
-  private static helics_handle_options[] swigValues = { helics_handle_option_connection_required, helics_handle_option_connection_optional, helics_handle_option_single_connection_only, helics_handle_option_multiple_connections_allowed, helics_handle_option_buffer_data, helics_handle_option_strict_type_checking, helics_handle_option_only_transmit_on_change, helics_handle_option_only_update_on_change, helics_handle_option_ignore_interrupts };
+  private static helics_handle_options[] swigValues = { helics_handle_option_connection_required, helics_handle_option_connection_optional, helics_handle_option_single_connection_only, helics_handle_option_multiple_connections_allowed, helics_handle_option_buffer_data, helics_handle_option_strict_type_checking, helics_handle_option_ignore_unit_mismatch, helics_handle_option_only_transmit_on_change, helics_handle_option_only_update_on_change, helics_handle_option_ignore_interrupts };
   private static int swigNext = 0;
   private final int swigValue;
   private final String swigName;
