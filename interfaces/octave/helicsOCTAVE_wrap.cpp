@@ -2303,20 +2303,27 @@ SWIGRUNTIME void SWIG_Octave_SetModule(void *clientdata, swig_module_info *point
 /* -------- TYPES TABLE (BEGIN) -------- */
 
 #define SWIGTYPE_p_char swig_types[0]
-#define SWIGTYPE_p_data_t swig_types[1]
-#define SWIGTYPE_p_double swig_types[2]
-#define SWIGTYPE_p_federate_state swig_types[3]
-#define SWIGTYPE_p_helics_filter_type_t swig_types[4]
-#define SWIGTYPE_p_helics_iteration_request swig_types[5]
-#define SWIGTYPE_p_helics_iteration_status swig_types[6]
-#define SWIGTYPE_p_helics_status swig_types[7]
-#define SWIGTYPE_p_int swig_types[8]
-#define SWIGTYPE_p_int64_t swig_types[9]
-#define SWIGTYPE_p_message_t swig_types[10]
-#define SWIGTYPE_p_p_char swig_types[11]
-#define SWIGTYPE_p_void swig_types[12]
-static swig_type_info *swig_types[14];
-static swig_module_info swig_module = {swig_types, 13, 0, 0, 0, 0};
+#define SWIGTYPE_p_double swig_types[1]
+#define SWIGTYPE_p_helics_core_type swig_types[2]
+#define SWIGTYPE_p_helics_data_type swig_types[3]
+#define SWIGTYPE_p_helics_error swig_types[4]
+#define SWIGTYPE_p_helics_error_types swig_types[5]
+#define SWIGTYPE_p_helics_federate_flags swig_types[6]
+#define SWIGTYPE_p_helics_federate_state swig_types[7]
+#define SWIGTYPE_p_helics_filter_type swig_types[8]
+#define SWIGTYPE_p_helics_handle_options swig_types[9]
+#define SWIGTYPE_p_helics_iteration_request swig_types[10]
+#define SWIGTYPE_p_helics_iteration_result swig_types[11]
+#define SWIGTYPE_p_helics_log_levels swig_types[12]
+#define SWIGTYPE_p_helics_message swig_types[13]
+#define SWIGTYPE_p_helics_properties swig_types[14]
+#define SWIGTYPE_p_int swig_types[15]
+#define SWIGTYPE_p_int16_t swig_types[16]
+#define SWIGTYPE_p_int32_t swig_types[17]
+#define SWIGTYPE_p_p_char swig_types[18]
+#define SWIGTYPE_p_void swig_types[19]
+static swig_type_info *swig_types[21];
+static swig_module_info swig_module = {swig_types, 20, 0, 0, 0, 0};
 #define SWIG_TypeQuery(name) SWIG_TypeQueryModule(&swig_module, &swig_module, name)
 #define SWIG_MangledTypeQuery(name) SWIG_MangledTypeQueryModule(&swig_module, &swig_module, name)
 
@@ -2335,7 +2342,49 @@ static swig_module_info swig_module = {swig_types, 13, 0, 0, 0, 0};
 
 
 #include "api-data.h"
-#include "helics.h"
+#include "CMatrix.h"
+#include "ov-complex.h"
+
+/* throw a helics error */
+static octave_value Helics_ErrorType(helics_error *err) {
+switch (err->error_code)
+  {
+  case helics_error_registration_failure:
+	return "helics:registration_failure";
+  case   helics_error_connection_failure:
+    return "helics:connection_failure";
+  case   helics_error_invalid_object:
+    return "helics:invalid_object";
+  case   helics_error_invalid_argument:
+    return "helics:invalid_argument";
+  case   helics_error_discard:
+    return "helics:discard";
+  case helics_error_system_failure:
+	return "helics:system_failure";
+  case   helics_error_invalid_state_transition:
+    return "helics:invalid_state_transition";
+  case   helics_error_invalid_function_call:
+    return "helics:invalid_function_call";
+  case   helics_error_execution_failure:
+	return "helics:execution_failure";
+  case   helics_error_insufficient_space:
+	return "helics:insufficient_space";
+  case   helics_error_other:
+  case   helics_error_external_type:
+  default:
+    return "helics:error";
+  }
+}
+static octave_value throwHelicsOctaveError(helics_error *err) {
+ octave_value type(Helics_ErrorType(err));
+  std::string r(err->message);
+  r += " (" + type.string_value() + ")";
+  error(r.c_str());
+  return octave_value(r);
+}
+
+
+
 #include "ValueFederate.h"
 #include "MessageFederate.h"
 #include "MessageFilters.h"
@@ -2357,6 +2406,18 @@ SWIG_From_int  (int value)
   SWIGINTERNINLINE octave_value SWIG_From_double    (double value)
     {    
       return octave_value(value);
+    }
+
+
+  SWIGINTERN int SWIG_AsVal_double (const octave_value& ov, double* val)
+    {
+      if (!ov.is_scalar_type())
+	return SWIG_TypeError;
+      if (ov.is_complex_scalar())
+	return SWIG_TypeError;
+      if (val)
+	*val = ov.double_value();
+      return SWIG_OK;
     }
 
 
@@ -2460,18 +2521,6 @@ SWIG_FromCharPtr(const char *cptr)
 #endif
 
 
-  SWIGINTERN int SWIG_AsVal_double (const octave_value& ov, double* val)
-    {
-      if (!ov.is_scalar_type())
-	return SWIG_TypeError;
-      if (ov.is_complex_scalar())
-	return SWIG_TypeError;
-      if (val)
-	*val = ov.double_value();
-      return SWIG_OK;
-    }
-
-
   SWIGINTERN int SWIG_AsVal_long (const octave_value& ov, long* val)
     {
       if (!ov.is_scalar_type())
@@ -2504,1007 +2553,57 @@ SWIG_AsVal_int (octave_value obj, int *val)
   return res;
 }
 
-static const char* _wrap_helicsCreateBroker_texinfo = "-*- texinfo -*-\n\
-create a broker object\n\
-\n\
-Parameters\n\
-----------\n\
-* `type` :\n\
-    the type of the broker to create\n\
-* `name` :\n\
-    the name of the broker , may be a nullptr or empty string to have a name\n\
-    automatically assigned\n\
-* `initString` :\n\
-    an initialization string to send to the core-the format is similar to\n\
-    command line arguments typical options include a broker address\n\
-    --broker=\"XSSAF\" if this is a subbroker or the number of federates or the\n\
-    address\n\
-\n\
-Returns\n\
--------\n\
-a helics_core object\n\
-";
-static const char* _wrap_helicsFederateGetState_texinfo = "-*- texinfo -*-\n\
-get the current state of a federate\n\
-\n\
-Parameters\n\
-----------\n\
-* `fed` :\n\
-    the fed to query\n\
-* `state` :\n\
-    the resulting state if helics_status return helics_ok\n\
-";
-static const char* _wrap_helicsSubscriptionSetDefaultString_texinfo = "-*- texinfo -*-\n\
-";
-static const char* _wrap_helicsSubscriptionGetString_texinfo = "-*- texinfo -*-\n\
-";
-static const char* _wrap_helicsPublicationPublishString_texinfo = "-*- texinfo -*-\n\
-";
-static const char* _wrap_helicsFederateInfoSetCoreInitString_texinfo = "-*- texinfo -*-\n\
-set the initialization string for the core usually in the form of command line\n\
-arguments\n\
-\n\
-Parameters\n\
-----------\n\
-* `fi` :\n\
-    the federate info object to alter\n\
-* `coreInit` :\n\
-    a string with the core initialization strings\n\
-\n\
-Returns\n\
--------\n\
-a helics_status enumeration helics_ok on success helicsInvalidReference if fi is\n\
-not a valid reference\n\
-";
-static const char* _wrap_helicsCloseLibrary_texinfo = "-*- texinfo -*-\n\
-call when done using the helics library, this function will ensure the threads\n\
-are closed properly if possible this should be the last call before exiting,\n\
-";
-static const char* _wrap_new_message_t_texinfo = "-*- texinfo -*-\n\
-Message_t mapped to a c compatible structure\n\
-\n\
-C++ includes: api-data.h\n\
-";
-static const char* _wrap_helicsCreateValueFederate_texinfo = "-*- texinfo -*-\n\
-create a value federate from a federate info object\n\
-\n\
-helics_federate objects can be used in all functions that take a helics_federate\n\
-or helics_federate object as an argument\n\
-\n\
-Parameters\n\
-----------\n\
-* `fi` :\n\
-    the federate info object that contains details on the federate\n\
-\n\
-Returns\n\
--------\n\
-an opaque value federate object\n\
-";
-static const char* _wrap_helicsCreateMessageFederate_texinfo = "-*- texinfo -*-\n\
-create a message federate from a federate info object\n\
-\n\
-helics_message_federate objects can be used in all functions that take a\n\
-helics_message_federate or helics_federate object as an argument\n\
-\n\
-Parameters\n\
-----------\n\
-* `fi` :\n\
-    the federate info object that contains details on the federate\n\
-\n\
-Returns\n\
--------\n\
-an opaque message federate object\n\
-";
-static const char* _wrap_helicsCreateCombinationFederate_texinfo = "-*- texinfo -*-\n\
-create a combination federate from a federate info object\n\
-\n\
-combination federates are both value federates and message federates, objects\n\
-can be used in all functions that take a helics_federate,\n\
-helics_message_federate or helics_federate object as an argument\n\
-\n\
-Parameters\n\
-----------\n\
-* `fi` :\n\
-    the federate info object that contains details on the federate\n\
-\n\
-Returns\n\
--------\n\
-an opaque value federate object nullptr if the object creation failed\n\
-";
-static const char* _wrap_helicsFederateEnterInitializationMode_texinfo = "-*- texinfo -*-\n\
-enter the initialization state of a federate\n\
-\n\
-the initialization state allows initial values to be set and received if the\n\
-iteration is requested on entry to the execution state This is a blocking call\n\
-and will block until the core allows it to proceed\n\
-";
-static const char* _wrap_helicsFederateEnterExecutionMode_texinfo = "-*- texinfo -*-\n\
-request that the federate enter the Execution mode\n\
-\n\
-this call is blocking until granted entry by the core object for an asynchronous\n\
-alternative call /ref helicsFederateEnterExecutionModeAsync\n\
-\n\
-Parameters\n\
-----------\n\
-* `fed` :\n\
-    a federate to change modes\n\
-\n\
-Returns\n\
--------\n\
-a helics_status enumeration helics_error if something went wrong\n\
-helicsInvalidReference if fed is invalid\n\
-";
-static const char* _wrap_helicsFederateRegisterGlobalEndpoint_texinfo = "-*- texinfo -*-\n\
-";
-static const char* _wrap_helicsFederateRegisterEndpoint_texinfo = "-*- texinfo -*-\n\
-";
-static const char* _wrap_helicsFilterAddDeliveryEndpoint_texinfo = "-*- texinfo -*-\n\
-";
-static const char* _wrap_helicsFilterRemoveDeliveryEndpoint_texinfo = "-*- texinfo -*-\n\
-";
-static const char* _wrap_helicsBrokerGetAddress_texinfo = "-*- texinfo -*-\n\
-get the network address associated with a broker\n\
-\n\
-Parameters\n\
-----------\n\
-* `broker` :\n\
-    the broker to query\n\
-* `identifier` :\n\
-    storage space to place the identifier string\n\
-* `maxlen` :\n\
-    the maximum space available in identifier\n\
-\n\
-Returns\n\
--------\n\
-a helics_status enumeration indicating any error condition\n\
-";
-static const char* _wrap_helicsFederateRegisterGlobalTypePublication_texinfo = "-*- texinfo -*-\n\
-";
-static const char* _wrap_helicsFederateRegisterGlobalPublication_texinfo = "-*- texinfo -*-\n\
-";
-static const char* _wrap_helicsFederateRegisterTypePublication_texinfo = "-*- texinfo -*-\n\
-";
-static const char* _wrap_helicsFederateRegisterPublication_texinfo = "-*- texinfo -*-\n\
-";
-static const char* _wrap_helicsFederateRegisterDestinationFilter_texinfo = "-*- texinfo -*-\n\
-";
-static const char* _wrap_helicsCoreRegisterDestinationFilter_texinfo = "-*- texinfo -*-\n\
-";
-static const char* _wrap_helicsEndpointSubscribe_texinfo = "-*- texinfo -*-\n\
-subscribe an endpoint to a publication\n\
-\n\
-Parameters\n\
-----------\n\
-* `endpoint` :\n\
-    the endpoint to use\n\
-* `key` :\n\
-    the name of the publication\n\
-* `type` :\n\
-    the type of the publication that is expected (nullptr or \"\" for DON\'T\n\
-    CARE)\n\
-";
-static const char* _wrap_helicsFederateFree_texinfo = "-*- texinfo -*-\n\
-release the memory associated withe a federate\n\
-";
-static const char* _wrap_helicsPublicationGetUnits_texinfo = "-*- texinfo -*-\n\
-";
-static const char* _wrap_helicsSubscriptionGetUnits_texinfo = "-*- texinfo -*-\n\
-";
-static const char* _wrap_helicsFederateEnterExecutionModeIterativeComplete_texinfo = "-*- texinfo -*-\n\
-";
-static const char* _wrap_helicsFederateInfoSetFederateName_texinfo = "-*- texinfo -*-\n\
-set the federate name in the Federate Info structure\n\
-\n\
-Parameters\n\
-----------\n\
-* `fi` :\n\
-    the federate info object to alter\n\
-* `name` :\n\
-    the new identifier for the federate\n\
-\n\
-Returns\n\
--------\n\
-a helics_status enumeration helics_ok on success\n\
-";
-static const char* _wrap_new_data_t_texinfo = "-*- texinfo -*-\n\
-Data to be communicated.\n\
-\n\
-Core operates on opaque byte buffers.\n\
-\n\
-C++ includes: api-data.h\n\
-";
-static const char* _wrap_helicsFederateInfoCreate_texinfo = "-*- texinfo -*-\n\
-create a federate info object for specifying federate information when\n\
-constructing a federate\n\
-\n\
-Returns\n\
--------\n\
-a helics_federate_info_t object which is a reference to the created object\n\
-";
-static const char* _wrap_helicsIsCoreTypeAvailable_texinfo = "-*- texinfo -*-\n\
-Returns true if core/broker type specified is available in current compilation.\n\
-";
-static const char* _wrap_helicsCoreDisconnect_texinfo = "-*- texinfo -*-\n\
-get an identifier for the core\n\
-\n\
-Parameters\n\
-----------\n\
-* `core` :\n\
-    the core to query\n\
-* `identifier` :\n\
-    storage space to place the identifier string\n\
-* `maxlen` :\n\
-    the maximum space available in identifier\n\
-\n\
-Returns\n\
--------\n\
-a helics_status enumeration indicating any error condition\n\
-";
-static const char* _wrap_helicsBrokerDisconnect_texinfo = "-*- texinfo -*-\n\
-get the network address associated with a broker\n\
-\n\
-Parameters\n\
-----------\n\
-* `broker` :\n\
-    the broker to query\n\
-* `identifier` :\n\
-    storage space to place the identifier string\n\
-* `maxlen` :\n\
-    the maximum space available in identifier\n\
-\n\
-Returns\n\
--------\n\
-a helics_status enumeration indicating any error condition\n\
-";
-static const char* _wrap_helicsFederateInfoSetCoreTypeFromString_texinfo = "-*- texinfo -*-\n\
-set the core type from a string\n\
-\n\
-Parameters\n\
-----------\n\
-* `fi` :\n\
-    the federate info object to alter\n\
-* `coretype` :\n\
-    a string naming a core type\n\
-\n\
-Returns\n\
--------\n\
-a helics_status enumeration helics_ok on success helicsInvalidReference if fi is\n\
-not a valid reference helics_discard if the string is not recognized\n\
-";
-static const char* _wrap_helicsFederateSetFlag_texinfo = "-*- texinfo -*-\n\
-set a flag for the federate\n\
-\n\
-Parameters\n\
-----------\n\
-* `fed` :\n\
-    the federate to alter a flag for\n\
-* `flag` :\n\
-    the flag to change\n\
-* `flagValue` :\n\
-    the new value of the flag 0 for false !=0 for true\n\
-";
-static const char* _wrap_helicsFederateInfoSetFlag_texinfo = "-*- texinfo -*-\n\
-";
-static const char* _wrap_helicsFederateSetPeriod_texinfo = "-*- texinfo -*-\n\
-set the period and offset of the federate\n\
-\n\
-the federate will on grant time on N*period+offset interval\n\
-\n\
-Parameters\n\
-----------\n\
-* `period` :\n\
-    the length of time between each subsequent grants\n\
-* `offset` :\n\
-    the shift of the period from 0 offset must be < period\n\
-";
-static const char* _wrap_helicsFederateInfoSetPeriod_texinfo = "-*- texinfo -*-\n\
-";
-static const char* _wrap_helicsEndpointGetType_texinfo = "-*- texinfo -*-\n\
-get the type specified for an endpoint\n\
-\n\
-Parameters\n\
-----------\n\
-* `endpoint` :\n\
-    the endpoint object in question\n\
-* `str` :\n\
-    the location where the string is stored\n\
-* `maxlen` :\n\
-    the maximum string length that can be stored in str\n\
-\n\
-Returns\n\
--------\n\
-a status variable\n\
-";
-static const char* _wrap_helicsPublicationGetType_texinfo = "-*- texinfo -*-\n\
-";
-static const char* _wrap_helicsSubscriptionGetType_texinfo = "-*- texinfo -*-\n\
-";
-static const char* _wrap_helicsCoreIsConnected_texinfo = "-*- texinfo -*-\n\
-check if a core is connected a connected core implies is attached to federate or\n\
-federates could be attached to it return 0 if not connected , something else if\n\
-it is connected\n\
-";
-static const char* _wrap_helicsBrokerIsConnected_texinfo = "-*- texinfo -*-\n\
-check if a broker is connected a connected broker implies is attached to cores\n\
-or cores could reach out to communicate return 0 if not connected , something\n\
-else if it is connected\n\
-";
-static const char* _wrap_helicsFederateRegisterCloningFilter_texinfo = "-*- texinfo -*-\n\
-";
-static const char* _wrap_helicsFederateRegisterSourceFilter_texinfo = "-*- texinfo -*-\n\
-create a source Filter on the specified federate\n\
-\n\
-filters can be created through a federate or a core , linking through a federate\n\
-allows a few extra features of name matching to function on the federate\n\
-interface but otherwise equivalent behavior\n\
-\n\
-Parameters\n\
-----------\n\
-* `fed` :\n\
-    the fed to register through\n\
-* `name` :\n\
-    the name of the filter (can be nullptr)\n\
-* `inputType` :\n\
-    the input type of the filter, used for ordering (can be nullptr)\n\
-* `outputType` :\n\
-    the output type of the filter, used for ordering (can be nullptr)\n\
-\n\
-Returns\n\
--------\n\
-a helics_source_filter object\n\
-";
-static const char* _wrap_helicsCoreRegisterSourceFilter_texinfo = "-*- texinfo -*-\n\
-";
-static const char* _wrap_helicsCoreRegisterCloningFilter_texinfo = "-*- texinfo -*-\n\
-";
-static const char* _wrap_helicsFederateInfoSetMaxIterations_texinfo = "-*- texinfo -*-\n\
-";
-static const char* _wrap_helicsCoreFree_texinfo = "-*- texinfo -*-\n\
-release the memory associated with a core\n\
-";
-static const char* _wrap_helicsSubscriptionSetDefaultInteger_texinfo = "-*- texinfo -*-\n\
-";
-static const char* _wrap_helicsSubscriptionGetInteger_texinfo = "-*- texinfo -*-\n\
-";
-static const char* _wrap_helicsPublicationPublishInteger_texinfo = "-*- texinfo -*-\n\
-";
-static const char* _wrap_helicsPublicationGetKey_texinfo = "-*- texinfo -*-\n\
-";
-static const char* _wrap_helicsSubscriptionGetKey_texinfo = "-*- texinfo -*-\n\
-";
-static const char* _wrap_helicsFederateInfoSetCoreName_texinfo = "-*- texinfo -*-\n\
-set the name of the core to link to for a federate\n\
-\n\
-Parameters\n\
-----------\n\
-* `fi` :\n\
-    the federate info object to alter\n\
-* `corename` :\n\
-    the identifier for a core to link to\n\
-\n\
-Returns\n\
--------\n\
-a helics_status enumeration helics_ok on success helicsInvalidReference if fi is\n\
-not a valid reference\n\
-";
-static const char* _wrap_helicsFederateSetInputDelay_texinfo = "-*- texinfo -*-\n\
-set the impact Window time\n\
-\n\
-the impact window is the time window around the time request in which other\n\
-federates cannot affect the federate\n\
-\n\
-Parameters\n\
-----------\n\
-* `lookAhead` :\n\
-    the look ahead time\n\
-";
-static const char* _wrap_helicsFederateSetOutputDelay_texinfo = "-*- texinfo -*-\n\
-set the look ahead time\n\
-\n\
-the look ahead is the propagation time for messages/event to propagate from the\n\
-Federate the federate\n\
-\n\
-Parameters\n\
-----------\n\
-* `lookAhead` :\n\
-    the look ahead time\n\
-";
-static const char* _wrap_helicsFederateInfoSetOutputDelay_texinfo = "-*- texinfo -*-\n\
-";
-static const char* _wrap_helicsFederateInfoSetInputDelay_texinfo = "-*- texinfo -*-\n\
-";
-static const char* _wrap_helicsFederateInfoFree_texinfo = "-*- texinfo -*-\n\
-delete the memory associated with a federate info object\n\
-";
-static const char* _wrap_helicsFederateRegisterOptionalTypeSubscription_texinfo = "-*- texinfo -*-\n\
-create a subscription of a specific known type that is specifically stated to be\n\
-optional\n\
-\n\
-the subscription becomes part of the federate and is destroyed when the federate\n\
-is freed so there are no separate free functions for subscriptions and\n\
-publications optional implies that there may or may not be matching publication\n\
-elsewhere in the federation\n\
-\n\
-Parameters\n\
-----------\n\
-* `fed` :\n\
-    the federate object in which to create a subscription\n\
-* `key` :\n\
-    the identifier matching a publication to get a subscription for\n\
-* `type` :\n\
-    a known type identifier HELICS_STRING_TYPE, HELICS_INT_TYPE,\n\
-    HELICS_DOUBLE_TYPE, HELICS_COMPLEX_TYPE, HELICS_VECTOR_TYPE, HELICS_RAW_TYPE\n\
-* `units` :\n\
-    a string listing the units of the subscription maybe NULL\n\
-\n\
-Returns\n\
--------\n\
-an object containing the subscription\n\
-";
-static const char* _wrap_helicsCreateBrokerFromArgs_texinfo = "-*- texinfo -*-\n\
-create a core object by passing command line arguments\n\
-\n\
-Parameters\n\
-----------\n\
-* `type` :\n\
-    the type of the core to create\n\
-* `name` :\n\
-    the name of the core , may be a nullptr or empty string to have a name\n\
-    automatically assigned\n\
-* `argc` :\n\
-    the number of arguments\n\
-* `argv` :\n\
-    the string values from a command line\n\
-\n\
-Returns\n\
--------\n\
-a helics_core object\n\
-";
-static const char* _wrap_helicsCreateCoreFromArgs_texinfo = "-*- texinfo -*-\n\
-create a core object by passing command line arguments\n\
-\n\
-Parameters\n\
-----------\n\
-* `type` :\n\
-    the type of the core to create\n\
-* `name` :\n\
-    the name of the core , may be a nullptr or empty string to have a name\n\
-    automatically assigned\n\
-* `argc` :\n\
-    the number of arguments\n\
-* `argv` :\n\
-    the string values from a command line\n\
-\n\
-Returns\n\
--------\n\
-a helics_core object\n\
-";
-static const char* _wrap_helicsFederateInfoLoadFromArgs_texinfo = "-*- texinfo -*-\n\
-load a federate info from command line arguments\n\
-\n\
-Parameters\n\
-----------\n\
-* `fi` :\n\
-    a federateInfo object\n\
-* `argc` :\n\
-    the number of command line arguments\n\
-* `argv` :\n\
-    an array of strings from the command line\n\
-\n\
-Returns\n\
--------\n\
-a helics_status enumeration indicating success or any potential errors\n\
-";
-static const char* _wrap_helicsFederateGetCoreObject_texinfo = "-*- texinfo -*-\n\
-get the core object associated with a federate\n\
-\n\
-Parameters\n\
-----------\n\
-* `fed` :\n\
-    a federate object\n\
-\n\
-Returns\n\
--------\n\
-a core object, nullptr if invalid\n\
-";
-static const char* _wrap_helicsFederateEnterExecutionModeIterativeAsync_texinfo = "-*- texinfo -*-\n\
-";
-static const char* _wrap_helicsFederateRegisterOptionalSubscription_texinfo = "-*- texinfo -*-\n\
-create a subscription that is specifically stated to be optional\n\
-\n\
-the subscription becomes part of the federate and is destroyed when the federate\n\
-is freed so there are no separate free functions for subscriptions and\n\
-publications\n\
-\n\
-optional implies that there may or may not be matching publication elsewhere in\n\
-the federation\n\
-\n\
-Parameters\n\
-----------\n\
-* `fed` :\n\
-    the federate object in which to create a subscription\n\
-* `key` :\n\
-    the identifier matching a publication to get a subscription for\n\
-* `type` :\n\
-    a string describing the expected type of the publication may be NULL\n\
-* `units` :\n\
-    a string listing the units of the subscription maybe NULL\n\
-\n\
-Returns\n\
--------\n\
-an object containing the subscription\n\
-";
-static const char* _wrap_helicsFederateRegisterTypeSubscription_texinfo = "-*- texinfo -*-\n\
-create a subscription of a specific known type\n\
-\n\
-the subscription becomes part of the federate and is destroyed when the federate\n\
-is freed so there are no separate free functions for subscriptions and\n\
-publications\n\
-\n\
-Parameters\n\
-----------\n\
-* `fed` :\n\
-    the federate object in which to create a subscription\n\
-* `key` :\n\
-    the identifier matching a publication to get a subscription for\n\
-* `type` :\n\
-    a known type identifier HELICS_STRING_TYPE, HELICS_INT_TYPE,\n\
-    HELICS_DOUBLE_TYPE, HELICS_COMPLEX_TYPE, HELICS_VECTOR_TYPE, HELICS_RAW_TYPE\n\
-* `units` :\n\
-    a string listing the units of the subscription maybe NULL\n\
-\n\
-Returns\n\
--------\n\
-an object containing the subscription\n\
-";
-static const char* _wrap_helicsFederateRegisterSubscription_texinfo = "-*- texinfo -*-\n\
-create a subscription\n\
-\n\
-the subscription becomes part of the federate and is destroyed when the federate\n\
-is freed so there are no separate free functions for subscriptions and\n\
-publications\n\
-\n\
-Parameters\n\
-----------\n\
-* `fed` :\n\
-    the federate object in which to create a subscription must have been create\n\
-    with helicsCreateValueFederate or helicsCreateCombinationFederate\n\
-* `key` :\n\
-    the identifier matching a publication to get a subscription for\n\
-* `type` :\n\
-    a string describing the expected type of the publication may be NULL\n\
-* `units` :\n\
-    a string listing the units of the subscription maybe NULL\n\
-\n\
-Returns\n\
--------\n\
-an object containing the subscription\n\
-";
-static const char* _wrap_helicsSubscriptionSetDefaultVector_texinfo = "-*- texinfo -*-\n\
-";
-static const char* _wrap_helicsSubscriptionGetVector_texinfo = "-*- texinfo -*-\n\
-get a vector from a subscription\n\
-\n\
-Parameters\n\
-----------\n\
-* `sub` :\n\
-    the subscription to get the result for\n\
-* `data` :\n\
-    the location to store the data\n\
-* `maxlen` :\n\
-    the maximum size of the vector\n\
-* `actualSize` :\n\
-    pointer to variable to store the actual size\n\
-";
-static const char* _wrap_helicsPublicationPublishVector_texinfo = "-*- texinfo -*-\n\
-";
-static const char* _wrap_helicsQueryExecute_texinfo = "-*- texinfo -*-\n\
-Execute a query\n\
-\n\
-the call will block until the query finishes which may require communication or\n\
-other delays\n\
-\n\
-Parameters\n\
-----------\n\
-* `query` :\n\
-    the query object to use in the query\n\
-* `fed` :\n\
-    a federate to send the query through\n\
-\n\
-Returns\n\
--------\n\
-a pointer to a string. the string will remain valid until the query is freed or\n\
-executed again the return will be nullptr if fed or query is an invalid object\n\
-";
-static const char* _wrap_helicsFederateFinalize_texinfo = "-*- texinfo -*-\n\
-finalize the federate this halts all communication in the federate and\n\
-disconnects it from the core\n\
-";
-static const char* _wrap_helicsQueryExecuteComplete_texinfo = "-*- texinfo -*-\n\
-complete the return from a query called with /ref helicsExecuteQueryAsync\n\
-\n\
-the function will block until the query completes /ref isQueryComplete can be\n\
-called to determine if a query has completed or not\n\
-\n\
-Parameters\n\
-----------\n\
-* `query` :\n\
-    the query object to\n\
-\n\
-Returns\n\
--------\n\
-a pointer to a string. the string will remain valid until the query is freed or\n\
-executed again the return will be nullptr if query is an invalid object\n\
-";
-static const char* _wrap_helicsFederateRequestTimeIterativeComplete_texinfo = "-*- texinfo -*-\n\
-";
-static const char* _wrap_helicsFederateRequestTimeComplete_texinfo = "-*- texinfo -*-\n\
-";
-static const char* _wrap_helicsFederateEnterExecutionModeComplete_texinfo = "-*- texinfo -*-\n\
-complete the call to /ref EnterExecutionModeAsync\n\
-\n\
-Parameters\n\
-----------\n\
-* `fed` :\n\
-    the federate object to complete the call\n\
-";
-static const char* _wrap_helicsCreateValueFederateFromJson_texinfo = "-*- texinfo -*-\n\
-create a value federate from a JSON file or JSON string\n\
-\n\
-helics_federate objects can be used in all functions that take a helics_federate\n\
-or helics_federate object as an argument\n\
-\n\
-Parameters\n\
-----------\n\
-* `JSON` :\n\
-    a JSON file or a JSON string that contains setup and configuration\n\
-    information\n\
-\n\
-Returns\n\
--------\n\
-an opaque value federate object\n\
-";
-static const char* _wrap_helicsCreateMessageFederateFromJson_texinfo = "-*- texinfo -*-\n\
-create a message federate from a JSON file or JSON string\n\
-\n\
-helics_message_federate objects can be used in all functions that take a\n\
-helics_message_federate or helics_federate object as an argument\n\
-\n\
-Parameters\n\
-----------\n\
-* `JSON` :\n\
-    a JSON file or a JSON string that contains setup and configuration\n\
-    information\n\
-\n\
-Returns\n\
--------\n\
-an opaque message federate object\n\
-";
-static const char* _wrap_helicsCreateCombinationFederateFromJson_texinfo = "-*- texinfo -*-\n\
-create a combination federate from a JSON file or JSON string\n\
-\n\
-combination federates are both value federates and message federates, objects\n\
-can be used in all functions that take a helics_federate,\n\
-helics_message_federate or helics_federate object as an argument\n\
-\n\
-Parameters\n\
-----------\n\
-* `JSON` :\n\
-    a JSON file or a JSON string that contains setup and configuration\n\
-    information\n\
-\n\
-Returns\n\
--------\n\
-an opaque combination federate object\n\
-";
-static const char* _wrap_helicsFederateSetLoggingLevel_texinfo = "-*- texinfo -*-\n\
-set the logging level for the federate @ details debug and trace only do\n\
-anything if they were enabled in the compilation\n\
-\n\
-Parameters\n\
-----------\n\
-* `loggingLevel` :\n\
-    (-1: none, 0: error_only, 1: warnings, 2: normal, 3: debug, 4: trace)\n\
-";
-static const char* _wrap_helicsFederateInfoSetLoggingLevel_texinfo = "-*- texinfo -*-\n\
-";
-static const char* _wrap_helicsEndpointSendMessageRaw_texinfo = "-*- texinfo -*-\n\
-";
-static const char* _wrap_helicsFilterGetTarget_texinfo = "-*- texinfo -*-\n\
-get the target of the filter\n\
-";
-static const char* _wrap_helicsFilterAddDestinationTarget_texinfo = "-*- texinfo -*-\n\
-";
-static const char* _wrap_helicsFilterRemoveDestinationTarget_texinfo = "-*- texinfo -*-\n\
-";
-static const char* _wrap_helicsFederateInfoSetTimeOffset_texinfo = "-*- texinfo -*-\n\
-";
-static const char* _wrap_helicsFederateRequestTimeIterative_texinfo = "-*- texinfo -*-\n\
-request an iterative time\n\
-\n\
-this call allows for finer grain control of the iterative process then /ref\n\
-helicsFederateRequestTime it takes a time and and iteration request and return a\n\
-time and iteration status\n\
-\n\
-Parameters\n\
-----------\n\
-* `fed` :\n\
-    the federate to make the request of\n\
-* `requestTime` :\n\
-    the next desired time\n\
-* `iterate` :\n\
-    the requested iteration mode\n\
-* `timeOut` :\n\
-    the granted time\n\
-* `outIterate` :\n\
-    the iteration specification of the result\n\
-\n\
-Returns\n\
--------\n\
-a helics_status object with a return code of the result\n\
-";
-static const char* _wrap_helicsFederateEnterExecutionModeIterative_texinfo = "-*- texinfo -*-\n\
-";
-static const char* _wrap_helicsSubscriptionLastUpdateTime_texinfo = "-*- texinfo -*-\n\
-";
-static const char* _wrap_helicsFederateEnterInitializationModeComplete_texinfo = "-*- texinfo -*-\n\
-finalize the entry to initialize mode that was initiated with\n\
-";
-static const char* _wrap_helicsEndpointSetDefaultDestination_texinfo = "-*- texinfo -*-\n\
-";
-static const char* _wrap_helicsSubscriptionSetDefaultComplex_texinfo = "-*- texinfo -*-\n\
-";
-static const char* _wrap_helicsSubscriptionGetComplex_texinfo = "-*- texinfo -*-\n\
-";
-static const char* _wrap_helicsPublicationPublishComplex_texinfo = "-*- texinfo -*-\n\
-";
-static const char* _wrap_helicsEndpointSendEventRaw_texinfo = "-*- texinfo -*-\n\
-";
-static const char* _wrap_helicsSubscriptionSetDefaultDouble_texinfo = "-*- texinfo -*-\n\
-";
-static const char* _wrap_helicsSubscriptionGetDouble_texinfo = "-*- texinfo -*-\n\
-";
-static const char* _wrap_helicsPublicationPublishDouble_texinfo = "-*- texinfo -*-\n\
-";
-static const char* _wrap_helicsSubscriptionGetValueSize_texinfo = "-*- texinfo -*-\n\
-";
-static const char* _wrap_helicsFederateGetMessage_texinfo = "-*- texinfo -*-\n\
-receive a communication message for any endpoint in the federate\n\
-\n\
-the return order will be in order of endpoint creation then order of arrival all\n\
-messages for the first endpoint, then all for the second, and so on\n\
-\n\
-Returns\n\
--------\n\
-a unique_ptr to a Message object containing the message data\n\
-";
-static const char* _wrap_helicsEndpointGetMessage_texinfo = "-*- texinfo -*-\n\
-receive a packet from a particular endpoint\n\
-\n\
-Parameters\n\
-----------\n\
-* `endpoint` :\n\
-    the identifier for the endpoint\n\
-\n\
-Returns\n\
--------\n\
-a message object\n\
-";
-static const char* _wrap_helicsEndpointHasMessage_texinfo = "-*- texinfo -*-\n\
-";
-static const char* _wrap_helicsFederateHasMessage_texinfo = "-*- texinfo -*-\n\
-check if the federate has any outstanding messages\n\
-";
-static const char* _wrap_helicsEndpointSendMessage_texinfo = "-*- texinfo -*-\n\
-";
-static const char* _wrap_helicsFilterAddSourceTarget_texinfo = "-*- texinfo -*-\n\
-";
-static const char* _wrap_helicsFilterRemoveSourceTarget_texinfo = "-*- texinfo -*-\n\
-";
-static const char* _wrap_helicsEndpointGetName_texinfo = "-*- texinfo -*-\n\
-get the name of an endpoint\n\
-\n\
-Parameters\n\
-----------\n\
-* `endpoint` :\n\
-    the endpoint object in question\n\
-* `str` :\n\
-    the location where the string is stored\n\
-* `maxlen` :\n\
-    the maximum string length that can be stored in str\n\
-\n\
-Returns\n\
--------\n\
-a status variable\n\
-";
-static const char* _wrap_helicsFederateGetName_texinfo = "-*- texinfo -*-\n\
-get the name of the federate\n\
-\n\
-Parameters\n\
-----------\n\
-* `fed` :\n\
-    the federate object to query\n\
-* `str` :\n\
-    memory buffer to store the result\n\
-* `maxlen` :\n\
-    the maximum size of the buffer\n\
-\n\
-Returns\n\
--------\n\
-helics_status object indicating success or error\n\
-";
-static const char* _wrap_helicsEndpointReceiveCount_texinfo = "-*- texinfo -*-\n\
-Returns the number of pending receives for all endpoints of particular federate.\n\
-";
-static const char* _wrap_helicsFederateReceiveCount_texinfo = "-*- texinfo -*-\n\
-Returns the number of pending receives for the specified destination endpoint.\n\
-";
-static const char* _wrap_helicsFilterGetName_texinfo = "-*- texinfo -*-\n\
-get the name of the filter\n\
-";
-static const char* _wrap_helicsBrokerFree_texinfo = "-*- texinfo -*-\n\
-release the memory associated with a broker\n\
-";
-static const char* _wrap_helicsCoreGetIdentifier_texinfo = "-*- texinfo -*-\n\
-get an identifier for the core\n\
-\n\
-Parameters\n\
-----------\n\
-* `core` :\n\
-    the core to query\n\
-* `identifier` :\n\
-    storage space to place the identifier string\n\
-* `maxlen` :\n\
-    the maximum space available in identifier\n\
-\n\
-Returns\n\
--------\n\
-a helics_status enumeration indicating any error condition\n\
-";
-static const char* _wrap_helicsBrokerGetIdentifier_texinfo = "-*- texinfo -*-\n\
-get an identifier for the broker\n\
-\n\
-Parameters\n\
-----------\n\
-* `broker` :\n\
-    the broker to query\n\
-* `identifier` :\n\
-    storage space to place the identifier string\n\
-* `maxlen` :\n\
-    the maximum space available in identifier\n\
-\n\
-Returns\n\
--------\n\
-a helics_status enumeration indicating any error condition\n\
-";
-static const char* _wrap_helicsGetVersion_texinfo = "-*- texinfo -*-\n\
-";
-static const char* _wrap_helicsFederateRequestTimeAsync_texinfo = "-*- texinfo -*-\n\
-";
-static const char* _wrap_helicsCreateCore_texinfo = "-*- texinfo -*-\n\
-create a core object\n\
-\n\
-Parameters\n\
-----------\n\
-* `type` :\n\
-    the type of the core to create\n\
-* `name` :\n\
-    the name of the core , may be a nullptr or empty string to have a name\n\
-    automatically assigned\n\
-* `initString` :\n\
-    an initialization string to send to the core-the format is similar to\n\
-    command line arguments typical options include a broker address\n\
-    --broker=\"XSSAF\" or the number of federates or the address\n\
-\n\
-Returns\n\
--------\n\
-a helics_core object\n\
-";
-static const char* _wrap_helicsFederateSetTimeDelta_texinfo = "-*- texinfo -*-\n\
-set the minimum time delta for the federate\n\
-\n\
-Parameters\n\
-----------\n\
-* `tdelta` :\n\
-    the minimum time delta to return from a time request function\n\
-";
-static const char* _wrap_helicsFederateInfoSetTimeDelta_texinfo = "-*- texinfo -*-\n\
-";
-static const char* _wrap_helicsFederateGetCurrentTime_texinfo = "-*- texinfo -*-\n\
-get the current time of the federate\n\
-\n\
-Parameters\n\
-----------\n\
-* `fed` :\n\
-    the federate object to query\n\
-* `time` :\n\
-    storage location for the time variable\n\
-\n\
-Returns\n\
--------\n\
-helics_status object indicating success or error\n\
-";
-static const char* _wrap_helicsQueryIsCompleted_texinfo = "-*- texinfo -*-\n\
-check if an asynchronously executed query has completed\n\
-\n\
-Returns\n\
--------\n\
-will return helics_true if an async query has complete or a regular query call\n\
-was made with a result and false if an async query has not completed or is\n\
-invalid\n\
-";
-static const char* _wrap_helicsFederateIsAsyncOperationCompleted_texinfo = "-*- texinfo -*-\n\
-check if the current Asynchronous operation has completed\n\
-\n\
-Parameters\n\
-----------\n\
-* `fed` :\n\
-    the federate to operate on\n\
-\n\
-Returns\n\
--------\n\
-0 if not completed, 1 if completed\n\
-";
-static const char* _wrap_helicsFederateInfoSetCoreType_texinfo = "-*- texinfo -*-\n\
-";
-static const char* _wrap_helicsQueryExecuteAsync_texinfo = "-*- texinfo -*-\n\
-Execute a query in a non-blocking call\n\
-\n\
-Parameters\n\
-----------\n\
-* `query` :\n\
-    the query object to use in the query\n\
-* `fed` :\n\
-    a federate to send the query through\n\
-\n\
-Returns\n\
--------\n\
-a helics status enumeration with the result of the query specification\n\
-";
-static const char* _wrap_helicsFederateRequestTimeIterativeAsync_texinfo = "-*- texinfo -*-\n\
-";
-static const char* _wrap_helicsFederateEnterInitializationModeAsync_texinfo = "-*- texinfo -*-\n\
-non blocking alternative to  the function\n\
-helicsFederateEnterInitializationModeFinalize must be called to finish the\n\
-operation\n\
-";
-static const char* _wrap_helicsFederateEnterExecutionModeAsync_texinfo = "-*- texinfo -*-\n\
-request that the federate enter the Execution mode\n\
-\n\
-this call is non-blocking and will return immediately call /ref\n\
-helicsFederateEnterExecutionModeComplete to finish the call sequence /ref\n\
-";
-static const char* _wrap_helicsSubscriptionIsUpdated_texinfo = "-*- texinfo -*-\n\
-";
-static const char* _wrap_helicsFederateRequestTime_texinfo = "-*- texinfo -*-\n\
-request the next time for federate execution\n\
-\n\
-Parameters\n\
-----------\n\
-* `fed` :\n\
-    the federate to make the request of\n\
-* `requestTime` :\n\
-    the next requested time\n\
-* `timeOut` :\n\
-    the time granted to the federate\n\
-\n\
-Returns\n\
--------\n\
-a helics_status if the return value is equal to helics_ok the timeOut will\n\
-contain the new granted time, otherwise timeOut is invalid\n\
-";
-static const char* _wrap_helicsCreateQuery_texinfo = "-*- texinfo -*-\n\
-create a query object\n\
-\n\
-a query object consists of a target and query string\n\
-";
-static const char* _wrap_helicsQueryFree_texinfo = "-*- texinfo -*-\n\
-free the memory associated with a query object\n\
-";
-static const char* _wrap_helicsSubscriptionGetVectorSize_texinfo = "-*- texinfo -*-\n\
-";
-static const char* _wrap_helicsFilterSet_texinfo = "-*- texinfo -*-\n\
-";
+
+SWIGINTERN int
+SWIG_AsCharArray(octave_value obj, char *val, size_t size)
+{ 
+  char* cptr = 0; size_t csize = 0; int alloc = SWIG_OLDOBJ;
+  int res = SWIG_AsCharPtrAndSize(obj, &cptr, &csize, &alloc);
+  if (SWIG_IsOK(res)) {
+    /* special case of single char conversion when we don't need space for NUL */
+    if (size == 1 && csize == 2 && cptr && !cptr[1]) --csize;
+    if (csize <= size) {
+      if (val) {
+	if (csize) memcpy(val, cptr, csize*sizeof(char));
+	if (csize < size) memset(val + csize, 0, (size - csize)*sizeof(char));
+      }
+      if (alloc == SWIG_NEWOBJ) {
+	delete[] cptr;
+	res = SWIG_DelNewMask(res);
+      }      
+      return res;
+    }
+    if (alloc == SWIG_NEWOBJ) delete[] cptr;
+  }
+  return SWIG_TypeError;
+}
+
+
+SWIGINTERN int
+SWIG_AsVal_char (octave_value obj, char *val)
+{    
+  int res = SWIG_AsCharArray(obj, val, 1);
+  if (!SWIG_IsOK(res)) {
+    long v;
+    res = SWIG_AddCast(SWIG_AsVal_long (obj, &v));
+    if (SWIG_IsOK(res)) {
+      if ((CHAR_MIN <= v) && (v <= CHAR_MAX)) {
+	if (val) *val = static_cast< char >(v);
+      } else {
+	res = SWIG_OverflowError;
+      }
+    }
+  }
+  return res;
+}
+
+
+SWIGINTERNINLINE octave_value
+SWIG_From_char  (char c) 
+{ 
+  return SWIG_FromCharPtrAndSize(&c,1);
+}
+
 
 SWIG_DEFUN( helics_time_zero_set, _wrap_helics_time_zero_set, std::string() ) {
   if (!SWIG_check_num_args("helics_time_zero_set",args.length(),1,1,0)) return octave_value_list();
@@ -3532,6 +2631,36 @@ SWIG_DEFUN( helics_time_epsilon_get, _wrap_helics_time_epsilon_get, std::string(
   octave_value obj;
   
   obj = SWIG_From_double(static_cast< double >(helics_time_epsilon));
+  return obj;
+}
+
+
+SWIG_DEFUN( helics_time_invalid_set, _wrap_helics_time_invalid_set, std::string() ) {
+  if (!SWIG_check_num_args("helics_time_invalid_set",args.length(),1,1,0)) return octave_value_list();
+  
+  return octave_set_immutable(args,nargout);
+}
+
+
+SWIG_DEFUN( helics_time_invalid_get, _wrap_helics_time_invalid_get, std::string() ) {
+  octave_value obj;
+  
+  obj = SWIG_From_double(static_cast< double >(helics_time_invalid));
+  return obj;
+}
+
+
+SWIG_DEFUN( helics_time_maxtime_set, _wrap_helics_time_maxtime_set, std::string() ) {
+  if (!SWIG_check_num_args("helics_time_maxtime_set",args.length(),1,1,0)) return octave_value_list();
+  
+  return octave_set_immutable(args,nargout);
+}
+
+
+SWIG_DEFUN( helics_time_maxtime_get, _wrap_helics_time_maxtime_get, std::string() ) {
+  octave_value obj;
+  
+  obj = SWIG_From_double(static_cast< double >(helics_time_maxtime));
   return obj;
 }
 
@@ -3566,188 +2695,9 @@ SWIG_DEFUN( helics_false_get, _wrap_helics_false_get, std::string() ) {
 }
 
 
-SWIG_DEFUN( data_t_data_set, _wrap_data_t_data_set, std::string() ) {
-  data_t *arg1 = (data_t *) 0 ;
-  char *arg2 = (char *) 0 ;
-  void *argp1 = 0 ;
-  int res1 = 0 ;
-  int res2 ;
-  char *buf2 = 0 ;
-  int alloc2 = 0 ;
-  octave_value_list _out;
-  octave_value_list *_outp=&_out;
-  octave_value _outv;
-  
-  if (!SWIG_check_num_args("data_t_data_set",args.length(),2,2,0)) {
-    SWIG_fail;
-  }
-  res1 = SWIG_ConvertPtr(args(0), &argp1,SWIGTYPE_p_data_t, 0 |  0 );
-  if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "data_t_data_set" "', argument " "1"" of type '" "data_t *""'"); 
-  }
-  arg1 = reinterpret_cast< data_t * >(argp1);
-  res2 = SWIG_AsCharPtrAndSize(args(1), &buf2, NULL, &alloc2);
-  if (!SWIG_IsOK(res2)) {
-    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "data_t_data_set" "', argument " "2"" of type '" "char *""'");
-  }
-  arg2 = reinterpret_cast< char * >(buf2);
-  if (arg1->data) delete[] arg1->data;
-  if (arg2) {
-    size_t size = strlen(reinterpret_cast< const char * >(arg2)) + 1;
-    arg1->data = (char *)reinterpret_cast< char* >(memcpy(new char[size], reinterpret_cast< const char * >(arg2), sizeof(char)*(size)));
-  } else {
-    arg1->data = 0;
-  }
-  _outv = octave_value();
-  if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
-  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
-  return _out;
-fail:
-  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
-  return octave_value_list();
-}
-
-
-SWIG_DEFUN( data_t_data_get, _wrap_data_t_data_get, std::string() ) {
-  data_t *arg1 = (data_t *) 0 ;
-  void *argp1 = 0 ;
-  int res1 = 0 ;
-  octave_value_list _out;
-  octave_value_list *_outp=&_out;
-  octave_value _outv;
-  char *result = 0 ;
-  
-  if (!SWIG_check_num_args("data_t_data_get",args.length(),1,1,0)) {
-    SWIG_fail;
-  }
-  res1 = SWIG_ConvertPtr(args(0), &argp1,SWIGTYPE_p_data_t, 0 |  0 );
-  if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "data_t_data_get" "', argument " "1"" of type '" "data_t *""'"); 
-  }
-  arg1 = reinterpret_cast< data_t * >(argp1);
-  result = (char *) ((arg1)->data);
-  _outv = SWIG_FromCharPtr((const char *)result);
-  if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
-  return _out;
-fail:
-  return octave_value_list();
-}
-
-
-SWIG_DEFUN( data_t_length_set, _wrap_data_t_length_set, std::string() ) {
-  data_t *arg1 = (data_t *) 0 ;
-  int64_t arg2 ;
-  void *argp1 = 0 ;
-  int res1 = 0 ;
-  long long val2 ;
-  int ecode2 = 0 ;
-  octave_value_list _out;
-  octave_value_list *_outp=&_out;
-  octave_value _outv;
-  
-  if (!SWIG_check_num_args("data_t_length_set",args.length(),2,2,0)) {
-    SWIG_fail;
-  }
-  res1 = SWIG_ConvertPtr(args(0), &argp1,SWIGTYPE_p_data_t, 0 |  0 );
-  if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "data_t_length_set" "', argument " "1"" of type '" "data_t *""'"); 
-  }
-  arg1 = reinterpret_cast< data_t * >(argp1);
-  ecode2 = SWIG_AsVal_long_SS_long(args(1), &val2);
-  if (!SWIG_IsOK(ecode2)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "data_t_length_set" "', argument " "2"" of type '" "int64_t""'");
-  } 
-  arg2 = static_cast< int64_t >(val2);
-  if (arg1) (arg1)->length = arg2;
-  _outv = octave_value();
-  if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
-  return _out;
-fail:
-  return octave_value_list();
-}
-
-
-SWIG_DEFUN( data_t_length_get, _wrap_data_t_length_get, std::string() ) {
-  data_t *arg1 = (data_t *) 0 ;
-  void *argp1 = 0 ;
-  int res1 = 0 ;
-  octave_value_list _out;
-  octave_value_list *_outp=&_out;
-  octave_value _outv;
-  int64_t result;
-  
-  if (!SWIG_check_num_args("data_t_length_get",args.length(),1,1,0)) {
-    SWIG_fail;
-  }
-  res1 = SWIG_ConvertPtr(args(0), &argp1,SWIGTYPE_p_data_t, 0 |  0 );
-  if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "data_t_length_get" "', argument " "1"" of type '" "data_t *""'"); 
-  }
-  arg1 = reinterpret_cast< data_t * >(argp1);
-  result =  ((arg1)->length);
-  _outv = SWIG_From_long_SS_long(static_cast< long long >(result));
-  if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
-  return _out;
-fail:
-  return octave_value_list();
-}
-
-
-SWIG_DEFUN( new_data_t, _wrap_new_data_t, _wrap_new_data_t_texinfo ) {
-  octave_value_list _out;
-  octave_value_list *_outp=&_out;
-  octave_value _outv;
-  data_t *result = 0 ;
-  
-  if (!SWIG_check_num_args("new_data_t",args.length(),0,0,0)) {
-    SWIG_fail;
-  }
-  result = (data_t *)new data_t();
-  _outv = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_data_t, 1 |  0 );
-  if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
-  return _out;
-fail:
-  return octave_value_list();
-}
-
-
-SWIG_DEFUN( delete_data_t, _wrap_delete_data_t, std::string() ) {
-  data_t *arg1 = (data_t *) 0 ;
-  void *argp1 = 0 ;
-  int res1 = 0 ;
-  octave_value_list _out;
-  octave_value_list *_outp=&_out;
-  octave_value _outv;
-  
-  if (!SWIG_check_num_args("delete_data_t",args.length(),1,1,0)) {
-    SWIG_fail;
-  }
-  res1 = SWIG_ConvertPtr(args(0), &argp1,SWIGTYPE_p_data_t, SWIG_POINTER_DISOWN |  0 );
-  if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "delete_data_t" "', argument " "1"" of type '" "data_t *""'"); 
-  }
-  arg1 = reinterpret_cast< data_t * >(argp1);
-  delete arg1;
-  _outv = octave_value();
-  if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
-  return _out;
-fail:
-  return octave_value_list();
-}
-
-
-static swig_octave_member swig_data_t_members[] = {
-{"data",0,_wrap_data_t_data_get,_wrap_data_t_data_set,0,0},
-{"length",0,_wrap_data_t_length_get,_wrap_data_t_length_set,0,0},
-{0,0,0,0,0,0}
-};
-static const char *swig_data_t_base_names[] = {0};
-static const swig_type_info *swig_data_t_base[] = {0};
-static swig_octave_class _wrap_class_data_t = {"data_t", &SWIGTYPE_p_data_t,0,_wrap_new_data_t,0,_wrap_delete_data_t,swig_data_t_members,swig_data_t_base_names,swig_data_t_base };
-
-SWIG_DEFUN( message_t_time_set, _wrap_message_t_time_set, std::string() ) {
-  message_t *arg1 = (message_t *) 0 ;
-  helics_time_t arg2 ;
+SWIG_DEFUN( helics_message_time_set, _wrap_helics_message_time_set, std::string() ) {
+  helics_message *arg1 = (helics_message *) 0 ;
+  helics_time arg2 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
   double val2 ;
@@ -3756,19 +2706,19 @@ SWIG_DEFUN( message_t_time_set, _wrap_message_t_time_set, std::string() ) {
   octave_value_list *_outp=&_out;
   octave_value _outv;
   
-  if (!SWIG_check_num_args("message_t_time_set",args.length(),2,2,0)) {
+  if (!SWIG_check_num_args("helics_message_time_set",args.length(),2,2,0)) {
     SWIG_fail;
   }
-  res1 = SWIG_ConvertPtr(args(0), &argp1,SWIGTYPE_p_message_t, 0 |  0 );
+  res1 = SWIG_ConvertPtr(args(0), &argp1,SWIGTYPE_p_helics_message, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "message_t_time_set" "', argument " "1"" of type '" "message_t *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helics_message_time_set" "', argument " "1"" of type '" "helics_message *""'"); 
   }
-  arg1 = reinterpret_cast< message_t * >(argp1);
+  arg1 = reinterpret_cast< helics_message * >(argp1);
   ecode2 = SWIG_AsVal_double(args(1), &val2);
   if (!SWIG_IsOK(ecode2)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "message_t_time_set" "', argument " "2"" of type '" "helics_time_t""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "helics_message_time_set" "', argument " "2"" of type '" "helics_time""'");
   } 
-  arg2 = static_cast< helics_time_t >(val2);
+  arg2 = static_cast< helics_time >(val2);
   if (arg1) (arg1)->time = arg2;
   _outv = octave_value();
   if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
@@ -3778,24 +2728,24 @@ fail:
 }
 
 
-SWIG_DEFUN( message_t_time_get, _wrap_message_t_time_get, std::string() ) {
-  message_t *arg1 = (message_t *) 0 ;
+SWIG_DEFUN( helics_message_time_get, _wrap_helics_message_time_get, std::string() ) {
+  helics_message *arg1 = (helics_message *) 0 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
   octave_value_list _out;
   octave_value_list *_outp=&_out;
   octave_value _outv;
-  helics_time_t result;
+  helics_time result;
   
-  if (!SWIG_check_num_args("message_t_time_get",args.length(),1,1,0)) {
+  if (!SWIG_check_num_args("helics_message_time_get",args.length(),1,1,0)) {
     SWIG_fail;
   }
-  res1 = SWIG_ConvertPtr(args(0), &argp1,SWIGTYPE_p_message_t, 0 |  0 );
+  res1 = SWIG_ConvertPtr(args(0), &argp1,SWIGTYPE_p_helics_message, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "message_t_time_get" "', argument " "1"" of type '" "message_t *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helics_message_time_get" "', argument " "1"" of type '" "helics_message *""'"); 
   }
-  arg1 = reinterpret_cast< message_t * >(argp1);
-  result = (helics_time_t) ((arg1)->time);
+  arg1 = reinterpret_cast< helics_message * >(argp1);
+  result = (helics_time) ((arg1)->time);
   _outv = SWIG_From_double(static_cast< double >(result));
   if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
   return _out;
@@ -3804,8 +2754,8 @@ fail:
 }
 
 
-SWIG_DEFUN( message_t_data_set, _wrap_message_t_data_set, std::string() ) {
-  message_t *arg1 = (message_t *) 0 ;
+SWIG_DEFUN( helics_message_data_set, _wrap_helics_message_data_set, std::string() ) {
+  helics_message *arg1 = (helics_message *) 0 ;
   char *arg2 = (char *) 0 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
@@ -3816,17 +2766,17 @@ SWIG_DEFUN( message_t_data_set, _wrap_message_t_data_set, std::string() ) {
   octave_value_list *_outp=&_out;
   octave_value _outv;
   
-  if (!SWIG_check_num_args("message_t_data_set",args.length(),2,2,0)) {
+  if (!SWIG_check_num_args("helics_message_data_set",args.length(),2,2,0)) {
     SWIG_fail;
   }
-  res1 = SWIG_ConvertPtr(args(0), &argp1,SWIGTYPE_p_message_t, 0 |  0 );
+  res1 = SWIG_ConvertPtr(args(0), &argp1,SWIGTYPE_p_helics_message, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "message_t_data_set" "', argument " "1"" of type '" "message_t *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helics_message_data_set" "', argument " "1"" of type '" "helics_message *""'"); 
   }
-  arg1 = reinterpret_cast< message_t * >(argp1);
+  arg1 = reinterpret_cast< helics_message * >(argp1);
   res2 = SWIG_AsCharPtrAndSize(args(1), &buf2, NULL, &alloc2);
   if (!SWIG_IsOK(res2)) {
-    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "message_t_data_set" "', argument " "2"" of type '" "char const *""'");
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helics_message_data_set" "', argument " "2"" of type '" "char const *""'");
   }
   arg2 = reinterpret_cast< char * >(buf2);
   if (arg2) {
@@ -3845,8 +2795,8 @@ fail:
 }
 
 
-SWIG_DEFUN( message_t_data_get, _wrap_message_t_data_get, std::string() ) {
-  message_t *arg1 = (message_t *) 0 ;
+SWIG_DEFUN( helics_message_data_get, _wrap_helics_message_data_get, std::string() ) {
+  helics_message *arg1 = (helics_message *) 0 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
   octave_value_list _out;
@@ -3854,14 +2804,14 @@ SWIG_DEFUN( message_t_data_get, _wrap_message_t_data_get, std::string() ) {
   octave_value _outv;
   char *result = 0 ;
   
-  if (!SWIG_check_num_args("message_t_data_get",args.length(),1,1,0)) {
+  if (!SWIG_check_num_args("helics_message_data_get",args.length(),1,1,0)) {
     SWIG_fail;
   }
-  res1 = SWIG_ConvertPtr(args(0), &argp1,SWIGTYPE_p_message_t, 0 |  0 );
+  res1 = SWIG_ConvertPtr(args(0), &argp1,SWIGTYPE_p_helics_message, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "message_t_data_get" "', argument " "1"" of type '" "message_t *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helics_message_data_get" "', argument " "1"" of type '" "helics_message *""'"); 
   }
-  arg1 = reinterpret_cast< message_t * >(argp1);
+  arg1 = reinterpret_cast< helics_message * >(argp1);
   result = (char *) ((arg1)->data);
   _outv = SWIG_FromCharPtr((const char *)result);
   if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
@@ -3871,8 +2821,8 @@ fail:
 }
 
 
-SWIG_DEFUN( message_t_length_set, _wrap_message_t_length_set, std::string() ) {
-  message_t *arg1 = (message_t *) 0 ;
+SWIG_DEFUN( helics_message_length_set, _wrap_helics_message_length_set, std::string() ) {
+  helics_message *arg1 = (helics_message *) 0 ;
   int64_t arg2 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
@@ -3882,17 +2832,17 @@ SWIG_DEFUN( message_t_length_set, _wrap_message_t_length_set, std::string() ) {
   octave_value_list *_outp=&_out;
   octave_value _outv;
   
-  if (!SWIG_check_num_args("message_t_length_set",args.length(),2,2,0)) {
+  if (!SWIG_check_num_args("helics_message_length_set",args.length(),2,2,0)) {
     SWIG_fail;
   }
-  res1 = SWIG_ConvertPtr(args(0), &argp1,SWIGTYPE_p_message_t, 0 |  0 );
+  res1 = SWIG_ConvertPtr(args(0), &argp1,SWIGTYPE_p_helics_message, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "message_t_length_set" "', argument " "1"" of type '" "message_t *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helics_message_length_set" "', argument " "1"" of type '" "helics_message *""'"); 
   }
-  arg1 = reinterpret_cast< message_t * >(argp1);
+  arg1 = reinterpret_cast< helics_message * >(argp1);
   ecode2 = SWIG_AsVal_long_SS_long(args(1), &val2);
   if (!SWIG_IsOK(ecode2)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "message_t_length_set" "', argument " "2"" of type '" "int64_t""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "helics_message_length_set" "', argument " "2"" of type '" "int64_t""'");
   } 
   arg2 = static_cast< int64_t >(val2);
   if (arg1) (arg1)->length = arg2;
@@ -3904,8 +2854,8 @@ fail:
 }
 
 
-SWIG_DEFUN( message_t_length_get, _wrap_message_t_length_get, std::string() ) {
-  message_t *arg1 = (message_t *) 0 ;
+SWIG_DEFUN( helics_message_length_get, _wrap_helics_message_length_get, std::string() ) {
+  helics_message *arg1 = (helics_message *) 0 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
   octave_value_list _out;
@@ -3913,14 +2863,14 @@ SWIG_DEFUN( message_t_length_get, _wrap_message_t_length_get, std::string() ) {
   octave_value _outv;
   int64_t result;
   
-  if (!SWIG_check_num_args("message_t_length_get",args.length(),1,1,0)) {
+  if (!SWIG_check_num_args("helics_message_length_get",args.length(),1,1,0)) {
     SWIG_fail;
   }
-  res1 = SWIG_ConvertPtr(args(0), &argp1,SWIGTYPE_p_message_t, 0 |  0 );
+  res1 = SWIG_ConvertPtr(args(0), &argp1,SWIGTYPE_p_helics_message, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "message_t_length_get" "', argument " "1"" of type '" "message_t *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helics_message_length_get" "', argument " "1"" of type '" "helics_message *""'"); 
   }
-  arg1 = reinterpret_cast< message_t * >(argp1);
+  arg1 = reinterpret_cast< helics_message * >(argp1);
   result =  ((arg1)->length);
   _outv = SWIG_From_long_SS_long(static_cast< long long >(result));
   if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
@@ -3930,8 +2880,138 @@ fail:
 }
 
 
-SWIG_DEFUN( message_t_original_source_set, _wrap_message_t_original_source_set, std::string() ) {
-  message_t *arg1 = (message_t *) 0 ;
+SWIG_DEFUN( helics_message_messageID_set, _wrap_helics_message_messageID_set, std::string() ) {
+  helics_message *arg1 = (helics_message *) 0 ;
+  int32_t arg2 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  void *argp2 ;
+  int res2 = 0 ;
+  octave_value_list _out;
+  octave_value_list *_outp=&_out;
+  octave_value _outv;
+  
+  if (!SWIG_check_num_args("helics_message_messageID_set",args.length(),2,2,0)) {
+    SWIG_fail;
+  }
+  res1 = SWIG_ConvertPtr(args(0), &argp1,SWIGTYPE_p_helics_message, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helics_message_messageID_set" "', argument " "1"" of type '" "helics_message *""'"); 
+  }
+  arg1 = reinterpret_cast< helics_message * >(argp1);
+  {
+    res2 = SWIG_ConvertPtr(args(1), &argp2, SWIGTYPE_p_int32_t,  0 );
+    if (!SWIG_IsOK(res2)) {
+      SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helics_message_messageID_set" "', argument " "2"" of type '" "int32_t""'"); 
+    }  
+    if (!argp2) {
+      SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "helics_message_messageID_set" "', argument " "2"" of type '" "int32_t""'");
+    } else {
+      arg2 = *(reinterpret_cast< int32_t * >(argp2));
+    }
+  }
+  if (arg1) (arg1)->messageID = arg2;
+  _outv = octave_value();
+  if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
+  return _out;
+fail:
+  return octave_value_list();
+}
+
+
+SWIG_DEFUN( helics_message_messageID_get, _wrap_helics_message_messageID_get, std::string() ) {
+  helics_message *arg1 = (helics_message *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  octave_value_list _out;
+  octave_value_list *_outp=&_out;
+  octave_value _outv;
+  int32_t result;
+  
+  if (!SWIG_check_num_args("helics_message_messageID_get",args.length(),1,1,0)) {
+    SWIG_fail;
+  }
+  res1 = SWIG_ConvertPtr(args(0), &argp1,SWIGTYPE_p_helics_message, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helics_message_messageID_get" "', argument " "1"" of type '" "helics_message *""'"); 
+  }
+  arg1 = reinterpret_cast< helics_message * >(argp1);
+  result =  ((arg1)->messageID);
+  _outv = SWIG_NewPointerObj((new int32_t(static_cast< const int32_t& >(result))), SWIGTYPE_p_int32_t, SWIG_POINTER_OWN |  0 );
+  if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
+  return _out;
+fail:
+  return octave_value_list();
+}
+
+
+SWIG_DEFUN( helics_message_flags_set, _wrap_helics_message_flags_set, std::string() ) {
+  helics_message *arg1 = (helics_message *) 0 ;
+  int16_t arg2 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  void *argp2 ;
+  int res2 = 0 ;
+  octave_value_list _out;
+  octave_value_list *_outp=&_out;
+  octave_value _outv;
+  
+  if (!SWIG_check_num_args("helics_message_flags_set",args.length(),2,2,0)) {
+    SWIG_fail;
+  }
+  res1 = SWIG_ConvertPtr(args(0), &argp1,SWIGTYPE_p_helics_message, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helics_message_flags_set" "', argument " "1"" of type '" "helics_message *""'"); 
+  }
+  arg1 = reinterpret_cast< helics_message * >(argp1);
+  {
+    res2 = SWIG_ConvertPtr(args(1), &argp2, SWIGTYPE_p_int16_t,  0 );
+    if (!SWIG_IsOK(res2)) {
+      SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helics_message_flags_set" "', argument " "2"" of type '" "int16_t""'"); 
+    }  
+    if (!argp2) {
+      SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "helics_message_flags_set" "', argument " "2"" of type '" "int16_t""'");
+    } else {
+      arg2 = *(reinterpret_cast< int16_t * >(argp2));
+    }
+  }
+  if (arg1) (arg1)->flags = arg2;
+  _outv = octave_value();
+  if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
+  return _out;
+fail:
+  return octave_value_list();
+}
+
+
+SWIG_DEFUN( helics_message_flags_get, _wrap_helics_message_flags_get, std::string() ) {
+  helics_message *arg1 = (helics_message *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  octave_value_list _out;
+  octave_value_list *_outp=&_out;
+  octave_value _outv;
+  int16_t result;
+  
+  if (!SWIG_check_num_args("helics_message_flags_get",args.length(),1,1,0)) {
+    SWIG_fail;
+  }
+  res1 = SWIG_ConvertPtr(args(0), &argp1,SWIGTYPE_p_helics_message, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helics_message_flags_get" "', argument " "1"" of type '" "helics_message *""'"); 
+  }
+  arg1 = reinterpret_cast< helics_message * >(argp1);
+  result =  ((arg1)->flags);
+  _outv = SWIG_NewPointerObj((new int16_t(static_cast< const int16_t& >(result))), SWIGTYPE_p_int16_t, SWIG_POINTER_OWN |  0 );
+  if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
+  return _out;
+fail:
+  return octave_value_list();
+}
+
+
+SWIG_DEFUN( helics_message_original_source_set, _wrap_helics_message_original_source_set, std::string() ) {
+  helics_message *arg1 = (helics_message *) 0 ;
   char *arg2 = (char *) 0 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
@@ -3942,17 +3022,17 @@ SWIG_DEFUN( message_t_original_source_set, _wrap_message_t_original_source_set, 
   octave_value_list *_outp=&_out;
   octave_value _outv;
   
-  if (!SWIG_check_num_args("message_t_original_source_set",args.length(),2,2,0)) {
+  if (!SWIG_check_num_args("helics_message_original_source_set",args.length(),2,2,0)) {
     SWIG_fail;
   }
-  res1 = SWIG_ConvertPtr(args(0), &argp1,SWIGTYPE_p_message_t, 0 |  0 );
+  res1 = SWIG_ConvertPtr(args(0), &argp1,SWIGTYPE_p_helics_message, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "message_t_original_source_set" "', argument " "1"" of type '" "message_t *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helics_message_original_source_set" "', argument " "1"" of type '" "helics_message *""'"); 
   }
-  arg1 = reinterpret_cast< message_t * >(argp1);
+  arg1 = reinterpret_cast< helics_message * >(argp1);
   res2 = SWIG_AsCharPtrAndSize(args(1), &buf2, NULL, &alloc2);
   if (!SWIG_IsOK(res2)) {
-    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "message_t_original_source_set" "', argument " "2"" of type '" "char const *""'");
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helics_message_original_source_set" "', argument " "2"" of type '" "char const *""'");
   }
   arg2 = reinterpret_cast< char * >(buf2);
   if (arg2) {
@@ -3971,8 +3051,8 @@ fail:
 }
 
 
-SWIG_DEFUN( message_t_original_source_get, _wrap_message_t_original_source_get, std::string() ) {
-  message_t *arg1 = (message_t *) 0 ;
+SWIG_DEFUN( helics_message_original_source_get, _wrap_helics_message_original_source_get, std::string() ) {
+  helics_message *arg1 = (helics_message *) 0 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
   octave_value_list _out;
@@ -3980,14 +3060,14 @@ SWIG_DEFUN( message_t_original_source_get, _wrap_message_t_original_source_get, 
   octave_value _outv;
   char *result = 0 ;
   
-  if (!SWIG_check_num_args("message_t_original_source_get",args.length(),1,1,0)) {
+  if (!SWIG_check_num_args("helics_message_original_source_get",args.length(),1,1,0)) {
     SWIG_fail;
   }
-  res1 = SWIG_ConvertPtr(args(0), &argp1,SWIGTYPE_p_message_t, 0 |  0 );
+  res1 = SWIG_ConvertPtr(args(0), &argp1,SWIGTYPE_p_helics_message, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "message_t_original_source_get" "', argument " "1"" of type '" "message_t *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helics_message_original_source_get" "', argument " "1"" of type '" "helics_message *""'"); 
   }
-  arg1 = reinterpret_cast< message_t * >(argp1);
+  arg1 = reinterpret_cast< helics_message * >(argp1);
   result = (char *) ((arg1)->original_source);
   _outv = SWIG_FromCharPtr((const char *)result);
   if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
@@ -3997,8 +3077,8 @@ fail:
 }
 
 
-SWIG_DEFUN( message_t_source_set, _wrap_message_t_source_set, std::string() ) {
-  message_t *arg1 = (message_t *) 0 ;
+SWIG_DEFUN( helics_message_source_set, _wrap_helics_message_source_set, std::string() ) {
+  helics_message *arg1 = (helics_message *) 0 ;
   char *arg2 = (char *) 0 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
@@ -4009,17 +3089,17 @@ SWIG_DEFUN( message_t_source_set, _wrap_message_t_source_set, std::string() ) {
   octave_value_list *_outp=&_out;
   octave_value _outv;
   
-  if (!SWIG_check_num_args("message_t_source_set",args.length(),2,2,0)) {
+  if (!SWIG_check_num_args("helics_message_source_set",args.length(),2,2,0)) {
     SWIG_fail;
   }
-  res1 = SWIG_ConvertPtr(args(0), &argp1,SWIGTYPE_p_message_t, 0 |  0 );
+  res1 = SWIG_ConvertPtr(args(0), &argp1,SWIGTYPE_p_helics_message, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "message_t_source_set" "', argument " "1"" of type '" "message_t *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helics_message_source_set" "', argument " "1"" of type '" "helics_message *""'"); 
   }
-  arg1 = reinterpret_cast< message_t * >(argp1);
+  arg1 = reinterpret_cast< helics_message * >(argp1);
   res2 = SWIG_AsCharPtrAndSize(args(1), &buf2, NULL, &alloc2);
   if (!SWIG_IsOK(res2)) {
-    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "message_t_source_set" "', argument " "2"" of type '" "char const *""'");
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helics_message_source_set" "', argument " "2"" of type '" "char const *""'");
   }
   arg2 = reinterpret_cast< char * >(buf2);
   if (arg2) {
@@ -4038,8 +3118,8 @@ fail:
 }
 
 
-SWIG_DEFUN( message_t_source_get, _wrap_message_t_source_get, std::string() ) {
-  message_t *arg1 = (message_t *) 0 ;
+SWIG_DEFUN( helics_message_source_get, _wrap_helics_message_source_get, std::string() ) {
+  helics_message *arg1 = (helics_message *) 0 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
   octave_value_list _out;
@@ -4047,14 +3127,14 @@ SWIG_DEFUN( message_t_source_get, _wrap_message_t_source_get, std::string() ) {
   octave_value _outv;
   char *result = 0 ;
   
-  if (!SWIG_check_num_args("message_t_source_get",args.length(),1,1,0)) {
+  if (!SWIG_check_num_args("helics_message_source_get",args.length(),1,1,0)) {
     SWIG_fail;
   }
-  res1 = SWIG_ConvertPtr(args(0), &argp1,SWIGTYPE_p_message_t, 0 |  0 );
+  res1 = SWIG_ConvertPtr(args(0), &argp1,SWIGTYPE_p_helics_message, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "message_t_source_get" "', argument " "1"" of type '" "message_t *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helics_message_source_get" "', argument " "1"" of type '" "helics_message *""'"); 
   }
-  arg1 = reinterpret_cast< message_t * >(argp1);
+  arg1 = reinterpret_cast< helics_message * >(argp1);
   result = (char *) ((arg1)->source);
   _outv = SWIG_FromCharPtr((const char *)result);
   if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
@@ -4064,8 +3144,8 @@ fail:
 }
 
 
-SWIG_DEFUN( message_t_dest_set, _wrap_message_t_dest_set, std::string() ) {
-  message_t *arg1 = (message_t *) 0 ;
+SWIG_DEFUN( helics_message_dest_set, _wrap_helics_message_dest_set, std::string() ) {
+  helics_message *arg1 = (helics_message *) 0 ;
   char *arg2 = (char *) 0 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
@@ -4076,17 +3156,17 @@ SWIG_DEFUN( message_t_dest_set, _wrap_message_t_dest_set, std::string() ) {
   octave_value_list *_outp=&_out;
   octave_value _outv;
   
-  if (!SWIG_check_num_args("message_t_dest_set",args.length(),2,2,0)) {
+  if (!SWIG_check_num_args("helics_message_dest_set",args.length(),2,2,0)) {
     SWIG_fail;
   }
-  res1 = SWIG_ConvertPtr(args(0), &argp1,SWIGTYPE_p_message_t, 0 |  0 );
+  res1 = SWIG_ConvertPtr(args(0), &argp1,SWIGTYPE_p_helics_message, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "message_t_dest_set" "', argument " "1"" of type '" "message_t *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helics_message_dest_set" "', argument " "1"" of type '" "helics_message *""'"); 
   }
-  arg1 = reinterpret_cast< message_t * >(argp1);
+  arg1 = reinterpret_cast< helics_message * >(argp1);
   res2 = SWIG_AsCharPtrAndSize(args(1), &buf2, NULL, &alloc2);
   if (!SWIG_IsOK(res2)) {
-    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "message_t_dest_set" "', argument " "2"" of type '" "char const *""'");
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helics_message_dest_set" "', argument " "2"" of type '" "char const *""'");
   }
   arg2 = reinterpret_cast< char * >(buf2);
   if (arg2) {
@@ -4105,8 +3185,8 @@ fail:
 }
 
 
-SWIG_DEFUN( message_t_dest_get, _wrap_message_t_dest_get, std::string() ) {
-  message_t *arg1 = (message_t *) 0 ;
+SWIG_DEFUN( helics_message_dest_get, _wrap_helics_message_dest_get, std::string() ) {
+  helics_message *arg1 = (helics_message *) 0 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
   octave_value_list _out;
@@ -4114,14 +3194,14 @@ SWIG_DEFUN( message_t_dest_get, _wrap_message_t_dest_get, std::string() ) {
   octave_value _outv;
   char *result = 0 ;
   
-  if (!SWIG_check_num_args("message_t_dest_get",args.length(),1,1,0)) {
+  if (!SWIG_check_num_args("helics_message_dest_get",args.length(),1,1,0)) {
     SWIG_fail;
   }
-  res1 = SWIG_ConvertPtr(args(0), &argp1,SWIGTYPE_p_message_t, 0 |  0 );
+  res1 = SWIG_ConvertPtr(args(0), &argp1,SWIGTYPE_p_helics_message, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "message_t_dest_get" "', argument " "1"" of type '" "message_t *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helics_message_dest_get" "', argument " "1"" of type '" "helics_message *""'"); 
   }
-  arg1 = reinterpret_cast< message_t * >(argp1);
+  arg1 = reinterpret_cast< helics_message * >(argp1);
   result = (char *) ((arg1)->dest);
   _outv = SWIG_FromCharPtr((const char *)result);
   if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
@@ -4131,8 +3211,8 @@ fail:
 }
 
 
-SWIG_DEFUN( message_t_original_dest_set, _wrap_message_t_original_dest_set, std::string() ) {
-  message_t *arg1 = (message_t *) 0 ;
+SWIG_DEFUN( helics_message_original_dest_set, _wrap_helics_message_original_dest_set, std::string() ) {
+  helics_message *arg1 = (helics_message *) 0 ;
   char *arg2 = (char *) 0 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
@@ -4143,17 +3223,17 @@ SWIG_DEFUN( message_t_original_dest_set, _wrap_message_t_original_dest_set, std:
   octave_value_list *_outp=&_out;
   octave_value _outv;
   
-  if (!SWIG_check_num_args("message_t_original_dest_set",args.length(),2,2,0)) {
+  if (!SWIG_check_num_args("helics_message_original_dest_set",args.length(),2,2,0)) {
     SWIG_fail;
   }
-  res1 = SWIG_ConvertPtr(args(0), &argp1,SWIGTYPE_p_message_t, 0 |  0 );
+  res1 = SWIG_ConvertPtr(args(0), &argp1,SWIGTYPE_p_helics_message, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "message_t_original_dest_set" "', argument " "1"" of type '" "message_t *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helics_message_original_dest_set" "', argument " "1"" of type '" "helics_message *""'"); 
   }
-  arg1 = reinterpret_cast< message_t * >(argp1);
+  arg1 = reinterpret_cast< helics_message * >(argp1);
   res2 = SWIG_AsCharPtrAndSize(args(1), &buf2, NULL, &alloc2);
   if (!SWIG_IsOK(res2)) {
-    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "message_t_original_dest_set" "', argument " "2"" of type '" "char const *""'");
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helics_message_original_dest_set" "', argument " "2"" of type '" "char const *""'");
   }
   arg2 = reinterpret_cast< char * >(buf2);
   if (arg2) {
@@ -4172,8 +3252,8 @@ fail:
 }
 
 
-SWIG_DEFUN( message_t_original_dest_get, _wrap_message_t_original_dest_get, std::string() ) {
-  message_t *arg1 = (message_t *) 0 ;
+SWIG_DEFUN( helics_message_original_dest_get, _wrap_helics_message_original_dest_get, std::string() ) {
+  helics_message *arg1 = (helics_message *) 0 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
   octave_value_list _out;
@@ -4181,14 +3261,14 @@ SWIG_DEFUN( message_t_original_dest_get, _wrap_message_t_original_dest_get, std:
   octave_value _outv;
   char *result = 0 ;
   
-  if (!SWIG_check_num_args("message_t_original_dest_get",args.length(),1,1,0)) {
+  if (!SWIG_check_num_args("helics_message_original_dest_get",args.length(),1,1,0)) {
     SWIG_fail;
   }
-  res1 = SWIG_ConvertPtr(args(0), &argp1,SWIGTYPE_p_message_t, 0 |  0 );
+  res1 = SWIG_ConvertPtr(args(0), &argp1,SWIGTYPE_p_helics_message, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "message_t_original_dest_get" "', argument " "1"" of type '" "message_t *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helics_message_original_dest_get" "', argument " "1"" of type '" "helics_message *""'"); 
   }
-  arg1 = reinterpret_cast< message_t * >(argp1);
+  arg1 = reinterpret_cast< helics_message * >(argp1);
   result = (char *) ((arg1)->original_dest);
   _outv = SWIG_FromCharPtr((const char *)result);
   if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
@@ -4198,17 +3278,17 @@ fail:
 }
 
 
-SWIG_DEFUN( new_message_t, _wrap_new_message_t, _wrap_new_message_t_texinfo ) {
+SWIG_DEFUN( new_helics_message, _wrap_new_helics_message, std::string() ) {
   octave_value_list _out;
   octave_value_list *_outp=&_out;
   octave_value _outv;
-  message_t *result = 0 ;
+  helics_message *result = 0 ;
   
-  if (!SWIG_check_num_args("new_message_t",args.length(),0,0,0)) {
+  if (!SWIG_check_num_args("new_helics_message",args.length(),0,0,0)) {
     SWIG_fail;
   }
-  result = (message_t *)new message_t();
-  _outv = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_message_t, 1 |  0 );
+  result = (helics_message *)new helics_message();
+  _outv = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_helics_message, 1 |  0 );
   if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
   return _out;
 fail:
@@ -4216,22 +3296,22 @@ fail:
 }
 
 
-SWIG_DEFUN( delete_message_t, _wrap_delete_message_t, std::string() ) {
-  message_t *arg1 = (message_t *) 0 ;
+SWIG_DEFUN( delete_helics_message, _wrap_delete_helics_message, std::string() ) {
+  helics_message *arg1 = (helics_message *) 0 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
   octave_value_list _out;
   octave_value_list *_outp=&_out;
   octave_value _outv;
   
-  if (!SWIG_check_num_args("delete_message_t",args.length(),1,1,0)) {
+  if (!SWIG_check_num_args("delete_helics_message",args.length(),1,1,0)) {
     SWIG_fail;
   }
-  res1 = SWIG_ConvertPtr(args(0), &argp1,SWIGTYPE_p_message_t, SWIG_POINTER_DISOWN |  0 );
+  res1 = SWIG_ConvertPtr(args(0), &argp1,SWIGTYPE_p_helics_message, SWIG_POINTER_DISOWN |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "delete_message_t" "', argument " "1"" of type '" "message_t *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "delete_helics_message" "', argument " "1"" of type '" "helics_message *""'"); 
   }
-  arg1 = reinterpret_cast< message_t * >(argp1);
+  arg1 = reinterpret_cast< helics_message * >(argp1);
   delete arg1;
   _outv = octave_value();
   if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
@@ -4241,21 +3321,23 @@ fail:
 }
 
 
-static swig_octave_member swig_message_t_members[] = {
-{"time",0,_wrap_message_t_time_get,_wrap_message_t_time_set,0,0},
-{"data",0,_wrap_message_t_data_get,_wrap_message_t_data_set,0,0},
-{"length",0,_wrap_message_t_length_get,_wrap_message_t_length_set,0,0},
-{"original_source",0,_wrap_message_t_original_source_get,_wrap_message_t_original_source_set,0,0},
-{"source",0,_wrap_message_t_source_get,_wrap_message_t_source_set,0,0},
-{"dest",0,_wrap_message_t_dest_get,_wrap_message_t_dest_set,0,0},
-{"original_dest",0,_wrap_message_t_original_dest_get,_wrap_message_t_original_dest_set,0,0},
+static swig_octave_member swig_helics_message_members[] = {
+{"time",0,_wrap_helics_message_time_get,_wrap_helics_message_time_set,0,0},
+{"data",0,_wrap_helics_message_data_get,_wrap_helics_message_data_set,0,0},
+{"length",0,_wrap_helics_message_length_get,_wrap_helics_message_length_set,0,0},
+{"messageID",0,_wrap_helics_message_messageID_get,_wrap_helics_message_messageID_set,0,0},
+{"flags",0,_wrap_helics_message_flags_get,_wrap_helics_message_flags_set,0,0},
+{"original_source",0,_wrap_helics_message_original_source_get,_wrap_helics_message_original_source_set,0,0},
+{"source",0,_wrap_helics_message_source_get,_wrap_helics_message_source_set,0,0},
+{"dest",0,_wrap_helics_message_dest_get,_wrap_helics_message_dest_set,0,0},
+{"original_dest",0,_wrap_helics_message_original_dest_get,_wrap_helics_message_original_dest_set,0,0},
 {0,0,0,0,0,0}
 };
-static const char *swig_message_t_base_names[] = {0};
-static const swig_type_info *swig_message_t_base[] = {0};
-static swig_octave_class _wrap_class_message_t = {"message_t", &SWIGTYPE_p_message_t,0,_wrap_new_message_t,0,_wrap_delete_message_t,swig_message_t_members,swig_message_t_base_names,swig_message_t_base };
+static const char *swig_helics_message_base_names[] = {0};
+static const swig_type_info *swig_helics_message_base[] = {0};
+static swig_octave_class _wrap_class_helics_message = {"helics_message", &SWIGTYPE_p_helics_message,0,_wrap_new_helics_message,0,_wrap_delete_helics_message,swig_helics_message_members,swig_helics_message_base_names,swig_helics_message_base };
 
-SWIG_DEFUN( helicsGetVersion, _wrap_helicsGetVersion, _wrap_helicsGetVersion_texinfo ) {
+SWIG_DEFUN( helicsGetVersion, _wrap_helicsGetVersion, std::string() ) {
   octave_value_list _out;
   octave_value_list *_outp=&_out;
   octave_value _outv;
@@ -4273,7 +3355,7 @@ fail:
 }
 
 
-SWIG_DEFUN( helicsIsCoreTypeAvailable, _wrap_helicsIsCoreTypeAvailable, _wrap_helicsIsCoreTypeAvailable_texinfo ) {
+SWIG_DEFUN( helicsIsCoreTypeAvailable, _wrap_helicsIsCoreTypeAvailable, std::string() ) {
   char *arg1 = (char *) 0 ;
   int res1 ;
   char *buf1 = 0 ;
@@ -4281,7 +3363,7 @@ SWIG_DEFUN( helicsIsCoreTypeAvailable, _wrap_helicsIsCoreTypeAvailable, _wrap_he
   octave_value_list _out;
   octave_value_list *_outp=&_out;
   octave_value _outv;
-  helics_bool_t result;
+  helics_bool result;
   
   if (!SWIG_check_num_args("helicsIsCoreTypeAvailable",args.length(),1,1,0)) {
     SWIG_fail;
@@ -4291,7 +3373,7 @@ SWIG_DEFUN( helicsIsCoreTypeAvailable, _wrap_helicsIsCoreTypeAvailable, _wrap_he
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsIsCoreTypeAvailable" "', argument " "1"" of type '" "char const *""'");
   }
   arg1 = reinterpret_cast< char * >(buf1);
-  result = (helics_bool_t)helicsIsCoreTypeAvailable((char const *)arg1);
+  result = (helics_bool)helicsIsCoreTypeAvailable((char const *)arg1);
   _outv = SWIG_From_int(static_cast< int >(result));
   if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
   if (alloc1 == SWIG_NEWOBJ) delete[] buf1;
@@ -4302,10 +3384,11 @@ fail:
 }
 
 
-SWIG_DEFUN( helicsCreateCore, _wrap_helicsCreateCore, _wrap_helicsCreateCore_texinfo ) {
+SWIG_DEFUN( helicsCreateCore, _wrap_helicsCreateCore, std::string() ) {
   char *arg1 = (char *) 0 ;
   char *arg2 = (char *) 0 ;
   char *arg3 = (char *) 0 ;
+  helics_error *arg4 = (helics_error *) 0 ;
   int res1 ;
   char *buf1 = 0 ;
   int alloc1 = 0 ;
@@ -4315,11 +3398,16 @@ SWIG_DEFUN( helicsCreateCore, _wrap_helicsCreateCore, _wrap_helicsCreateCore_tex
   int res3 ;
   char *buf3 = 0 ;
   int alloc3 = 0 ;
+  helics_error etemp4 ;
   octave_value_list _out;
   octave_value_list *_outp=&_out;
   octave_value _outv;
   helics_core result;
   
+  {
+    etemp4=helicsErrorInitialize();
+    arg4=&etemp4;
+  }
   if (!SWIG_check_num_args("helicsCreateCore",args.length(),3,3,0)) {
     SWIG_fail;
   }
@@ -4338,42 +3426,56 @@ SWIG_DEFUN( helicsCreateCore, _wrap_helicsCreateCore, _wrap_helicsCreateCore_tex
     SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "helicsCreateCore" "', argument " "3"" of type '" "char const *""'");
   }
   arg3 = reinterpret_cast< char * >(buf3);
-  result = (helics_core)helicsCreateCore((char const *)arg1,(char const *)arg2,(char const *)arg3);
+  result = (helics_core)helicsCreateCore((char const *)arg1,(char const *)arg2,(char const *)arg3,arg4);
   _outv = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_void, 0 |  0 );
   if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
   if (alloc1 == SWIG_NEWOBJ) delete[] buf1;
   if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
   if (alloc3 == SWIG_NEWOBJ) delete[] buf3;
+  {
+    if (arg4->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg4);
+    }
+  }
   return _out;
 fail:
   if (alloc1 == SWIG_NEWOBJ) delete[] buf1;
   if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
   if (alloc3 == SWIG_NEWOBJ) delete[] buf3;
+  {
+    if (arg4->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg4);
+    }
+  }
   return octave_value_list();
 }
 
 
-SWIG_DEFUN( helicsCreateCoreFromArgs, _wrap_helicsCreateCoreFromArgs, _wrap_helicsCreateCoreFromArgs_texinfo ) {
+SWIG_DEFUN( helicsCreateCoreFromArgs, _wrap_helicsCreateCoreFromArgs, std::string() ) {
   char *arg1 = (char *) 0 ;
   char *arg2 = (char *) 0 ;
   int arg3 ;
   char **arg4 = (char **) 0 ;
+  helics_error *arg5 = (helics_error *) 0 ;
   int res1 ;
   char *buf1 = 0 ;
   int alloc1 = 0 ;
   int res2 ;
   char *buf2 = 0 ;
   int alloc2 = 0 ;
-  int val3 ;
-  int ecode3 = 0 ;
-  void *argp4 = 0 ;
-  int res4 = 0 ;
+  helics_error etemp5 ;
   octave_value_list _out;
   octave_value_list *_outp=&_out;
   octave_value _outv;
   helics_core result;
   
-  if (!SWIG_check_num_args("helicsCreateCoreFromArgs",args.length(),4,4,0)) {
+  {
+    etemp5=helicsErrorInitialize();
+    arg5=&etemp5;
+  }
+  if (!SWIG_check_num_args("helicsCreateCoreFromArgs",args.length(),3,3,0)) {
     SWIG_fail;
   }
   res1 = SWIG_AsCharPtrAndSize(args(0), &buf1, NULL, &alloc1);
@@ -4386,37 +3488,84 @@ SWIG_DEFUN( helicsCreateCoreFromArgs, _wrap_helicsCreateCoreFromArgs, _wrap_heli
     SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsCreateCoreFromArgs" "', argument " "2"" of type '" "char const *""'");
   }
   arg2 = reinterpret_cast< char * >(buf2);
-  ecode3 = SWIG_AsVal_int(args(2), &val3);
-  if (!SWIG_IsOK(ecode3)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "helicsCreateCoreFromArgs" "', argument " "3"" of type '" "int""'");
-  } 
-  arg3 = static_cast< int >(val3);
-  res4 = SWIG_ConvertPtr(args(3), &argp4,SWIGTYPE_p_p_char, 0 |  0 );
-  if (!SWIG_IsOK(res4)) {
-    SWIG_exception_fail(SWIG_ArgError(res4), "in method '" "helicsCreateCoreFromArgs" "', argument " "4"" of type '" "char const *const *""'"); 
+  {
+    /* Check if is a list */
+    if (args(2).is_cellstr()) {
+      Cell cellargs=octave_value_extract<Cell>(args(2));
+      arg4 = (char **) malloc((cellargs.numel()+1)*sizeof(char *));
+      for (int ii=0;ii<cellargs.numel();++ii)
+      {
+        octave_value arg=cellargs(ii);
+        int alloc;
+        SWIG_AsCharPtrAndSize(arg, &arg4[ii+1], NULL, &alloc);
+      }
+      
+    } 
+    else if (args(2).is_string())
+    {
+      int retval=0;
+      char *buffer=NULL;
+      int allocation=0;
+      arg3=2;
+      arg4 = (char **) malloc(2*sizeof(char *));
+      retval = SWIG_AsCharPtrAndSize(args(2), &buffer, NULL, &allocation);
+      if (!SWIG_IsOK(retval)) {
+        SWIG_exception_fail(SWIG_ArgError(retval), "conversion to string failed");
+      }
+      arg4[0]=buffer;
+      arg4[1]=buffer;
+    }
+    else
+    {
+      SWIG_exception_fail(SWIG_ArgError(3), "argument must be a cell array or string");
+      return octave_value_list();
+    }
   }
-  arg4 = reinterpret_cast< char ** >(argp4);
-  result = (helics_core)helicsCreateCoreFromArgs((char const *)arg1,(char const *)arg2,arg3,(char const *const *)arg4);
+  result = (helics_core)helicsCreateCoreFromArgs((char const *)arg1,(char const *)arg2,arg3,(char const *const *)arg4,arg5);
   _outv = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_void, 0 |  0 );
   if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
   if (alloc1 == SWIG_NEWOBJ) delete[] buf1;
   if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  {
+    free((char **) arg4);
+  }
+  {
+    if (arg5->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg5);
+    }
+  }
   return _out;
 fail:
   if (alloc1 == SWIG_NEWOBJ) delete[] buf1;
   if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  {
+    free((char **) arg4);
+  }
+  {
+    if (arg5->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg5);
+    }
+  }
   return octave_value_list();
 }
 
 
 SWIG_DEFUN( helicsCoreClone, _wrap_helicsCoreClone, std::string() ) {
   helics_core arg1 = (helics_core) 0 ;
+  helics_error *arg2 = (helics_error *) 0 ;
   int res1 ;
+  helics_error etemp2 ;
   octave_value_list _out;
   octave_value_list *_outp=&_out;
   octave_value _outv;
   helics_core result;
   
+  {
+    etemp2=helicsErrorInitialize();
+    arg2=&etemp2;
+  }
   if (!SWIG_check_num_args("helicsCoreClone",args.length(),1,1,0)) {
     SWIG_fail;
   }
@@ -4424,8 +3573,44 @@ SWIG_DEFUN( helicsCoreClone, _wrap_helicsCoreClone, std::string() ) {
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsCoreClone" "', argument " "1"" of type '" "helics_core""'"); 
   }
-  result = (helics_core)helicsCoreClone(arg1);
+  result = (helics_core)helicsCoreClone(arg1,arg2);
   _outv = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_void, 0 |  0 );
+  if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
+  {
+    if (arg2->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg2);
+    }
+  }
+  return _out;
+fail:
+  {
+    if (arg2->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg2);
+    }
+  }
+  return octave_value_list();
+}
+
+
+SWIG_DEFUN( helicsCoreIsValid, _wrap_helicsCoreIsValid, std::string() ) {
+  helics_core arg1 = (helics_core) 0 ;
+  int res1 ;
+  octave_value_list _out;
+  octave_value_list *_outp=&_out;
+  octave_value _outv;
+  helics_bool result;
+  
+  if (!SWIG_check_num_args("helicsCoreIsValid",args.length(),1,1,0)) {
+    SWIG_fail;
+  }
+  res1 = SWIG_ConvertPtr(args(0),SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsCoreIsValid" "', argument " "1"" of type '" "helics_core""'"); 
+  }
+  result = (helics_bool)helicsCoreIsValid(arg1);
+  _outv = SWIG_From_int(static_cast< int >(result));
   if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
   return _out;
 fail:
@@ -4433,10 +3618,11 @@ fail:
 }
 
 
-SWIG_DEFUN( helicsCreateBroker, _wrap_helicsCreateBroker, _wrap_helicsCreateBroker_texinfo ) {
+SWIG_DEFUN( helicsCreateBroker, _wrap_helicsCreateBroker, std::string() ) {
   char *arg1 = (char *) 0 ;
   char *arg2 = (char *) 0 ;
   char *arg3 = (char *) 0 ;
+  helics_error *arg4 = (helics_error *) 0 ;
   int res1 ;
   char *buf1 = 0 ;
   int alloc1 = 0 ;
@@ -4446,11 +3632,16 @@ SWIG_DEFUN( helicsCreateBroker, _wrap_helicsCreateBroker, _wrap_helicsCreateBrok
   int res3 ;
   char *buf3 = 0 ;
   int alloc3 = 0 ;
+  helics_error etemp4 ;
   octave_value_list _out;
   octave_value_list *_outp=&_out;
   octave_value _outv;
   helics_broker result;
   
+  {
+    etemp4=helicsErrorInitialize();
+    arg4=&etemp4;
+  }
   if (!SWIG_check_num_args("helicsCreateBroker",args.length(),3,3,0)) {
     SWIG_fail;
   }
@@ -4469,42 +3660,56 @@ SWIG_DEFUN( helicsCreateBroker, _wrap_helicsCreateBroker, _wrap_helicsCreateBrok
     SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "helicsCreateBroker" "', argument " "3"" of type '" "char const *""'");
   }
   arg3 = reinterpret_cast< char * >(buf3);
-  result = (helics_broker)helicsCreateBroker((char const *)arg1,(char const *)arg2,(char const *)arg3);
+  result = (helics_broker)helicsCreateBroker((char const *)arg1,(char const *)arg2,(char const *)arg3,arg4);
   _outv = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_void, 0 |  0 );
   if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
   if (alloc1 == SWIG_NEWOBJ) delete[] buf1;
   if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
   if (alloc3 == SWIG_NEWOBJ) delete[] buf3;
+  {
+    if (arg4->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg4);
+    }
+  }
   return _out;
 fail:
   if (alloc1 == SWIG_NEWOBJ) delete[] buf1;
   if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
   if (alloc3 == SWIG_NEWOBJ) delete[] buf3;
+  {
+    if (arg4->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg4);
+    }
+  }
   return octave_value_list();
 }
 
 
-SWIG_DEFUN( helicsCreateBrokerFromArgs, _wrap_helicsCreateBrokerFromArgs, _wrap_helicsCreateBrokerFromArgs_texinfo ) {
+SWIG_DEFUN( helicsCreateBrokerFromArgs, _wrap_helicsCreateBrokerFromArgs, std::string() ) {
   char *arg1 = (char *) 0 ;
   char *arg2 = (char *) 0 ;
   int arg3 ;
   char **arg4 = (char **) 0 ;
+  helics_error *arg5 = (helics_error *) 0 ;
   int res1 ;
   char *buf1 = 0 ;
   int alloc1 = 0 ;
   int res2 ;
   char *buf2 = 0 ;
   int alloc2 = 0 ;
-  int val3 ;
-  int ecode3 = 0 ;
-  void *argp4 = 0 ;
-  int res4 = 0 ;
+  helics_error etemp5 ;
   octave_value_list _out;
   octave_value_list *_outp=&_out;
   octave_value _outv;
   helics_broker result;
   
-  if (!SWIG_check_num_args("helicsCreateBrokerFromArgs",args.length(),4,4,0)) {
+  {
+    etemp5=helicsErrorInitialize();
+    arg5=&etemp5;
+  }
+  if (!SWIG_check_num_args("helicsCreateBrokerFromArgs",args.length(),3,3,0)) {
     SWIG_fail;
   }
   res1 = SWIG_AsCharPtrAndSize(args(0), &buf1, NULL, &alloc1);
@@ -4517,37 +3722,84 @@ SWIG_DEFUN( helicsCreateBrokerFromArgs, _wrap_helicsCreateBrokerFromArgs, _wrap_
     SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsCreateBrokerFromArgs" "', argument " "2"" of type '" "char const *""'");
   }
   arg2 = reinterpret_cast< char * >(buf2);
-  ecode3 = SWIG_AsVal_int(args(2), &val3);
-  if (!SWIG_IsOK(ecode3)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "helicsCreateBrokerFromArgs" "', argument " "3"" of type '" "int""'");
-  } 
-  arg3 = static_cast< int >(val3);
-  res4 = SWIG_ConvertPtr(args(3), &argp4,SWIGTYPE_p_p_char, 0 |  0 );
-  if (!SWIG_IsOK(res4)) {
-    SWIG_exception_fail(SWIG_ArgError(res4), "in method '" "helicsCreateBrokerFromArgs" "', argument " "4"" of type '" "char const *const *""'"); 
+  {
+    /* Check if is a list */
+    if (args(2).is_cellstr()) {
+      Cell cellargs=octave_value_extract<Cell>(args(2));
+      arg4 = (char **) malloc((cellargs.numel()+1)*sizeof(char *));
+      for (int ii=0;ii<cellargs.numel();++ii)
+      {
+        octave_value arg=cellargs(ii);
+        int alloc;
+        SWIG_AsCharPtrAndSize(arg, &arg4[ii+1], NULL, &alloc);
+      }
+      
+    } 
+    else if (args(2).is_string())
+    {
+      int retval=0;
+      char *buffer=NULL;
+      int allocation=0;
+      arg3=2;
+      arg4 = (char **) malloc(2*sizeof(char *));
+      retval = SWIG_AsCharPtrAndSize(args(2), &buffer, NULL, &allocation);
+      if (!SWIG_IsOK(retval)) {
+        SWIG_exception_fail(SWIG_ArgError(retval), "conversion to string failed");
+      }
+      arg4[0]=buffer;
+      arg4[1]=buffer;
+    }
+    else
+    {
+      SWIG_exception_fail(SWIG_ArgError(3), "argument must be a cell array or string");
+      return octave_value_list();
+    }
   }
-  arg4 = reinterpret_cast< char ** >(argp4);
-  result = (helics_broker)helicsCreateBrokerFromArgs((char const *)arg1,(char const *)arg2,arg3,(char const *const *)arg4);
+  result = (helics_broker)helicsCreateBrokerFromArgs((char const *)arg1,(char const *)arg2,arg3,(char const *const *)arg4,arg5);
   _outv = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_void, 0 |  0 );
   if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
   if (alloc1 == SWIG_NEWOBJ) delete[] buf1;
   if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  {
+    free((char **) arg4);
+  }
+  {
+    if (arg5->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg5);
+    }
+  }
   return _out;
 fail:
   if (alloc1 == SWIG_NEWOBJ) delete[] buf1;
   if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  {
+    free((char **) arg4);
+  }
+  {
+    if (arg5->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg5);
+    }
+  }
   return octave_value_list();
 }
 
 
 SWIG_DEFUN( helicsBrokerClone, _wrap_helicsBrokerClone, std::string() ) {
   helics_broker arg1 = (helics_broker) 0 ;
+  helics_error *arg2 = (helics_error *) 0 ;
   int res1 ;
+  helics_error etemp2 ;
   octave_value_list _out;
   octave_value_list *_outp=&_out;
   octave_value _outv;
   helics_broker result;
   
+  {
+    etemp2=helicsErrorInitialize();
+    arg2=&etemp2;
+  }
   if (!SWIG_check_num_args("helicsBrokerClone",args.length(),1,1,0)) {
     SWIG_fail;
   }
@@ -4555,8 +3807,44 @@ SWIG_DEFUN( helicsBrokerClone, _wrap_helicsBrokerClone, std::string() ) {
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsBrokerClone" "', argument " "1"" of type '" "helics_broker""'"); 
   }
-  result = (helics_broker)helicsBrokerClone(arg1);
+  result = (helics_broker)helicsBrokerClone(arg1,arg2);
   _outv = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_void, 0 |  0 );
+  if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
+  {
+    if (arg2->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg2);
+    }
+  }
+  return _out;
+fail:
+  {
+    if (arg2->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg2);
+    }
+  }
+  return octave_value_list();
+}
+
+
+SWIG_DEFUN( helicsBrokerIsValid, _wrap_helicsBrokerIsValid, std::string() ) {
+  helics_broker arg1 = (helics_broker) 0 ;
+  int res1 ;
+  octave_value_list _out;
+  octave_value_list *_outp=&_out;
+  octave_value _outv;
+  helics_bool result;
+  
+  if (!SWIG_check_num_args("helicsBrokerIsValid",args.length(),1,1,0)) {
+    SWIG_fail;
+  }
+  res1 = SWIG_ConvertPtr(args(0),SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsBrokerIsValid" "', argument " "1"" of type '" "helics_broker""'"); 
+  }
+  result = (helics_bool)helicsBrokerIsValid(arg1);
+  _outv = SWIG_From_int(static_cast< int >(result));
   if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
   return _out;
 fail:
@@ -4564,13 +3852,13 @@ fail:
 }
 
 
-SWIG_DEFUN( helicsBrokerIsConnected, _wrap_helicsBrokerIsConnected, _wrap_helicsBrokerIsConnected_texinfo ) {
+SWIG_DEFUN( helicsBrokerIsConnected, _wrap_helicsBrokerIsConnected, std::string() ) {
   helics_broker arg1 = (helics_broker) 0 ;
   int res1 ;
   octave_value_list _out;
   octave_value_list *_outp=&_out;
   octave_value _outv;
-  int result;
+  helics_bool result;
   
   if (!SWIG_check_num_args("helicsBrokerIsConnected",args.length(),1,1,0)) {
     SWIG_fail;
@@ -4579,7 +3867,7 @@ SWIG_DEFUN( helicsBrokerIsConnected, _wrap_helicsBrokerIsConnected, _wrap_helics
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsBrokerIsConnected" "', argument " "1"" of type '" "helics_broker""'"); 
   }
-  result = (int)helicsBrokerIsConnected(arg1);
+  result = (helics_bool)helicsBrokerIsConnected(arg1);
   _outv = SWIG_From_int(static_cast< int >(result));
   if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
   return _out;
@@ -4588,13 +3876,252 @@ fail:
 }
 
 
-SWIG_DEFUN( helicsCoreIsConnected, _wrap_helicsCoreIsConnected, _wrap_helicsCoreIsConnected_texinfo ) {
+SWIG_DEFUN( helicsBrokerDataLink, _wrap_helicsBrokerDataLink, std::string() ) {
+  helics_broker arg1 = (helics_broker) 0 ;
+  char *arg2 = (char *) 0 ;
+  char *arg3 = (char *) 0 ;
+  helics_error *arg4 = (helics_error *) 0 ;
+  int res1 ;
+  int res2 ;
+  char *buf2 = 0 ;
+  int alloc2 = 0 ;
+  int res3 ;
+  char *buf3 = 0 ;
+  int alloc3 = 0 ;
+  helics_error etemp4 ;
+  octave_value_list _out;
+  octave_value_list *_outp=&_out;
+  octave_value _outv;
+  
+  {
+    etemp4=helicsErrorInitialize();
+    arg4=&etemp4;
+  }
+  if (!SWIG_check_num_args("helicsBrokerDataLink",args.length(),3,3,0)) {
+    SWIG_fail;
+  }
+  res1 = SWIG_ConvertPtr(args(0),SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsBrokerDataLink" "', argument " "1"" of type '" "helics_broker""'"); 
+  }
+  res2 = SWIG_AsCharPtrAndSize(args(1), &buf2, NULL, &alloc2);
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsBrokerDataLink" "', argument " "2"" of type '" "char const *""'");
+  }
+  arg2 = reinterpret_cast< char * >(buf2);
+  res3 = SWIG_AsCharPtrAndSize(args(2), &buf3, NULL, &alloc3);
+  if (!SWIG_IsOK(res3)) {
+    SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "helicsBrokerDataLink" "', argument " "3"" of type '" "char const *""'");
+  }
+  arg3 = reinterpret_cast< char * >(buf3);
+  helicsBrokerDataLink(arg1,(char const *)arg2,(char const *)arg3,arg4);
+  _outv = octave_value();
+  if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
+  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  if (alloc3 == SWIG_NEWOBJ) delete[] buf3;
+  {
+    if (arg4->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg4);
+    }
+  }
+  return _out;
+fail:
+  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  if (alloc3 == SWIG_NEWOBJ) delete[] buf3;
+  {
+    if (arg4->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg4);
+    }
+  }
+  return octave_value_list();
+}
+
+
+SWIG_DEFUN( helicsBrokerAddSourceFilterToEndpoint, _wrap_helicsBrokerAddSourceFilterToEndpoint, std::string() ) {
+  helics_broker arg1 = (helics_broker) 0 ;
+  char *arg2 = (char *) 0 ;
+  char *arg3 = (char *) 0 ;
+  helics_error *arg4 = (helics_error *) 0 ;
+  int res1 ;
+  int res2 ;
+  char *buf2 = 0 ;
+  int alloc2 = 0 ;
+  int res3 ;
+  char *buf3 = 0 ;
+  int alloc3 = 0 ;
+  helics_error etemp4 ;
+  octave_value_list _out;
+  octave_value_list *_outp=&_out;
+  octave_value _outv;
+  
+  {
+    etemp4=helicsErrorInitialize();
+    arg4=&etemp4;
+  }
+  if (!SWIG_check_num_args("helicsBrokerAddSourceFilterToEndpoint",args.length(),3,3,0)) {
+    SWIG_fail;
+  }
+  res1 = SWIG_ConvertPtr(args(0),SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsBrokerAddSourceFilterToEndpoint" "', argument " "1"" of type '" "helics_broker""'"); 
+  }
+  res2 = SWIG_AsCharPtrAndSize(args(1), &buf2, NULL, &alloc2);
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsBrokerAddSourceFilterToEndpoint" "', argument " "2"" of type '" "char const *""'");
+  }
+  arg2 = reinterpret_cast< char * >(buf2);
+  res3 = SWIG_AsCharPtrAndSize(args(2), &buf3, NULL, &alloc3);
+  if (!SWIG_IsOK(res3)) {
+    SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "helicsBrokerAddSourceFilterToEndpoint" "', argument " "3"" of type '" "char const *""'");
+  }
+  arg3 = reinterpret_cast< char * >(buf3);
+  helicsBrokerAddSourceFilterToEndpoint(arg1,(char const *)arg2,(char const *)arg3,arg4);
+  _outv = octave_value();
+  if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
+  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  if (alloc3 == SWIG_NEWOBJ) delete[] buf3;
+  {
+    if (arg4->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg4);
+    }
+  }
+  return _out;
+fail:
+  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  if (alloc3 == SWIG_NEWOBJ) delete[] buf3;
+  {
+    if (arg4->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg4);
+    }
+  }
+  return octave_value_list();
+}
+
+
+SWIG_DEFUN( helicsBrokerAddDestinationFilterToEndpoint, _wrap_helicsBrokerAddDestinationFilterToEndpoint, std::string() ) {
+  helics_broker arg1 = (helics_broker) 0 ;
+  char *arg2 = (char *) 0 ;
+  char *arg3 = (char *) 0 ;
+  helics_error *arg4 = (helics_error *) 0 ;
+  int res1 ;
+  int res2 ;
+  char *buf2 = 0 ;
+  int alloc2 = 0 ;
+  int res3 ;
+  char *buf3 = 0 ;
+  int alloc3 = 0 ;
+  helics_error etemp4 ;
+  octave_value_list _out;
+  octave_value_list *_outp=&_out;
+  octave_value _outv;
+  
+  {
+    etemp4=helicsErrorInitialize();
+    arg4=&etemp4;
+  }
+  if (!SWIG_check_num_args("helicsBrokerAddDestinationFilterToEndpoint",args.length(),3,3,0)) {
+    SWIG_fail;
+  }
+  res1 = SWIG_ConvertPtr(args(0),SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsBrokerAddDestinationFilterToEndpoint" "', argument " "1"" of type '" "helics_broker""'"); 
+  }
+  res2 = SWIG_AsCharPtrAndSize(args(1), &buf2, NULL, &alloc2);
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsBrokerAddDestinationFilterToEndpoint" "', argument " "2"" of type '" "char const *""'");
+  }
+  arg2 = reinterpret_cast< char * >(buf2);
+  res3 = SWIG_AsCharPtrAndSize(args(2), &buf3, NULL, &alloc3);
+  if (!SWIG_IsOK(res3)) {
+    SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "helicsBrokerAddDestinationFilterToEndpoint" "', argument " "3"" of type '" "char const *""'");
+  }
+  arg3 = reinterpret_cast< char * >(buf3);
+  helicsBrokerAddDestinationFilterToEndpoint(arg1,(char const *)arg2,(char const *)arg3,arg4);
+  _outv = octave_value();
+  if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
+  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  if (alloc3 == SWIG_NEWOBJ) delete[] buf3;
+  {
+    if (arg4->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg4);
+    }
+  }
+  return _out;
+fail:
+  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  if (alloc3 == SWIG_NEWOBJ) delete[] buf3;
+  {
+    if (arg4->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg4);
+    }
+  }
+  return octave_value_list();
+}
+
+
+SWIG_DEFUN( helicsBrokerWaitForDisconnect, _wrap_helicsBrokerWaitForDisconnect, std::string() ) {
+  helics_broker arg1 = (helics_broker) 0 ;
+  int arg2 ;
+  helics_error *arg3 = (helics_error *) 0 ;
+  int res1 ;
+  int val2 ;
+  int ecode2 = 0 ;
+  helics_error etemp3 ;
+  octave_value_list _out;
+  octave_value_list *_outp=&_out;
+  octave_value _outv;
+  helics_bool result;
+  
+  {
+    etemp3=helicsErrorInitialize();
+    arg3=&etemp3;
+  }
+  if (!SWIG_check_num_args("helicsBrokerWaitForDisconnect",args.length(),2,2,0)) {
+    SWIG_fail;
+  }
+  res1 = SWIG_ConvertPtr(args(0),SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsBrokerWaitForDisconnect" "', argument " "1"" of type '" "helics_broker""'"); 
+  }
+  ecode2 = SWIG_AsVal_int(args(1), &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "helicsBrokerWaitForDisconnect" "', argument " "2"" of type '" "int""'");
+  } 
+  arg2 = static_cast< int >(val2);
+  result = (helics_bool)helicsBrokerWaitForDisconnect(arg1,arg2,arg3);
+  _outv = SWIG_From_int(static_cast< int >(result));
+  if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg3);
+    }
+  }
+  return _out;
+fail:
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg3);
+    }
+  }
+  return octave_value_list();
+}
+
+
+SWIG_DEFUN( helicsCoreIsConnected, _wrap_helicsCoreIsConnected, std::string() ) {
   helics_core arg1 = (helics_core) 0 ;
   int res1 ;
   octave_value_list _out;
   octave_value_list *_outp=&_out;
   octave_value _outv;
-  int result;
+  helics_bool result;
   
   if (!SWIG_check_num_args("helicsCoreIsConnected",args.length(),1,1,0)) {
     SWIG_fail;
@@ -4603,7 +4130,7 @@ SWIG_DEFUN( helicsCoreIsConnected, _wrap_helicsCoreIsConnected, _wrap_helicsCore
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsCoreIsConnected" "', argument " "1"" of type '" "helics_core""'"); 
   }
-  result = (int)helicsCoreIsConnected(arg1);
+  result = (helics_bool)helicsCoreIsConnected(arg1);
   _outv = SWIG_From_int(static_cast< int >(result));
   if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
   return _out;
@@ -4612,143 +4139,280 @@ fail:
 }
 
 
-SWIG_DEFUN( helicsBrokerGetIdentifier, _wrap_helicsBrokerGetIdentifier, _wrap_helicsBrokerGetIdentifier_texinfo ) {
-  helics_broker arg1 = (helics_broker) 0 ;
+SWIG_DEFUN( helicsCoreDataLink, _wrap_helicsCoreDataLink, std::string() ) {
+  helics_core arg1 = (helics_core) 0 ;
   char *arg2 = (char *) 0 ;
-  int arg3 ;
+  char *arg3 = (char *) 0 ;
+  helics_error *arg4 = (helics_error *) 0 ;
   int res1 ;
   int res2 ;
   char *buf2 = 0 ;
   int alloc2 = 0 ;
-  int val3 ;
-  int ecode3 = 0 ;
+  int res3 ;
+  char *buf3 = 0 ;
+  int alloc3 = 0 ;
+  helics_error etemp4 ;
   octave_value_list _out;
   octave_value_list *_outp=&_out;
   octave_value _outv;
-  helics_status result;
   
-  if (!SWIG_check_num_args("helicsBrokerGetIdentifier",args.length(),3,3,0)) {
+  {
+    etemp4=helicsErrorInitialize();
+    arg4=&etemp4;
+  }
+  if (!SWIG_check_num_args("helicsCoreDataLink",args.length(),3,3,0)) {
+    SWIG_fail;
+  }
+  res1 = SWIG_ConvertPtr(args(0),SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsCoreDataLink" "', argument " "1"" of type '" "helics_core""'"); 
+  }
+  res2 = SWIG_AsCharPtrAndSize(args(1), &buf2, NULL, &alloc2);
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsCoreDataLink" "', argument " "2"" of type '" "char const *""'");
+  }
+  arg2 = reinterpret_cast< char * >(buf2);
+  res3 = SWIG_AsCharPtrAndSize(args(2), &buf3, NULL, &alloc3);
+  if (!SWIG_IsOK(res3)) {
+    SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "helicsCoreDataLink" "', argument " "3"" of type '" "char const *""'");
+  }
+  arg3 = reinterpret_cast< char * >(buf3);
+  helicsCoreDataLink(arg1,(char const *)arg2,(char const *)arg3,arg4);
+  _outv = octave_value();
+  if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
+  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  if (alloc3 == SWIG_NEWOBJ) delete[] buf3;
+  {
+    if (arg4->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg4);
+    }
+  }
+  return _out;
+fail:
+  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  if (alloc3 == SWIG_NEWOBJ) delete[] buf3;
+  {
+    if (arg4->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg4);
+    }
+  }
+  return octave_value_list();
+}
+
+
+SWIG_DEFUN( helicsCoreAddSourceFilterToEndpoint, _wrap_helicsCoreAddSourceFilterToEndpoint, std::string() ) {
+  helics_core arg1 = (helics_core) 0 ;
+  char *arg2 = (char *) 0 ;
+  char *arg3 = (char *) 0 ;
+  helics_error *arg4 = (helics_error *) 0 ;
+  int res1 ;
+  int res2 ;
+  char *buf2 = 0 ;
+  int alloc2 = 0 ;
+  int res3 ;
+  char *buf3 = 0 ;
+  int alloc3 = 0 ;
+  helics_error etemp4 ;
+  octave_value_list _out;
+  octave_value_list *_outp=&_out;
+  octave_value _outv;
+  
+  {
+    etemp4=helicsErrorInitialize();
+    arg4=&etemp4;
+  }
+  if (!SWIG_check_num_args("helicsCoreAddSourceFilterToEndpoint",args.length(),3,3,0)) {
+    SWIG_fail;
+  }
+  res1 = SWIG_ConvertPtr(args(0),SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsCoreAddSourceFilterToEndpoint" "', argument " "1"" of type '" "helics_core""'"); 
+  }
+  res2 = SWIG_AsCharPtrAndSize(args(1), &buf2, NULL, &alloc2);
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsCoreAddSourceFilterToEndpoint" "', argument " "2"" of type '" "char const *""'");
+  }
+  arg2 = reinterpret_cast< char * >(buf2);
+  res3 = SWIG_AsCharPtrAndSize(args(2), &buf3, NULL, &alloc3);
+  if (!SWIG_IsOK(res3)) {
+    SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "helicsCoreAddSourceFilterToEndpoint" "', argument " "3"" of type '" "char const *""'");
+  }
+  arg3 = reinterpret_cast< char * >(buf3);
+  helicsCoreAddSourceFilterToEndpoint(arg1,(char const *)arg2,(char const *)arg3,arg4);
+  _outv = octave_value();
+  if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
+  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  if (alloc3 == SWIG_NEWOBJ) delete[] buf3;
+  {
+    if (arg4->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg4);
+    }
+  }
+  return _out;
+fail:
+  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  if (alloc3 == SWIG_NEWOBJ) delete[] buf3;
+  {
+    if (arg4->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg4);
+    }
+  }
+  return octave_value_list();
+}
+
+
+SWIG_DEFUN( helicsCoreAddDestinationFilterToEndpoint, _wrap_helicsCoreAddDestinationFilterToEndpoint, std::string() ) {
+  helics_core arg1 = (helics_core) 0 ;
+  char *arg2 = (char *) 0 ;
+  char *arg3 = (char *) 0 ;
+  helics_error *arg4 = (helics_error *) 0 ;
+  int res1 ;
+  int res2 ;
+  char *buf2 = 0 ;
+  int alloc2 = 0 ;
+  int res3 ;
+  char *buf3 = 0 ;
+  int alloc3 = 0 ;
+  helics_error etemp4 ;
+  octave_value_list _out;
+  octave_value_list *_outp=&_out;
+  octave_value _outv;
+  
+  {
+    etemp4=helicsErrorInitialize();
+    arg4=&etemp4;
+  }
+  if (!SWIG_check_num_args("helicsCoreAddDestinationFilterToEndpoint",args.length(),3,3,0)) {
+    SWIG_fail;
+  }
+  res1 = SWIG_ConvertPtr(args(0),SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsCoreAddDestinationFilterToEndpoint" "', argument " "1"" of type '" "helics_core""'"); 
+  }
+  res2 = SWIG_AsCharPtrAndSize(args(1), &buf2, NULL, &alloc2);
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsCoreAddDestinationFilterToEndpoint" "', argument " "2"" of type '" "char const *""'");
+  }
+  arg2 = reinterpret_cast< char * >(buf2);
+  res3 = SWIG_AsCharPtrAndSize(args(2), &buf3, NULL, &alloc3);
+  if (!SWIG_IsOK(res3)) {
+    SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "helicsCoreAddDestinationFilterToEndpoint" "', argument " "3"" of type '" "char const *""'");
+  }
+  arg3 = reinterpret_cast< char * >(buf3);
+  helicsCoreAddDestinationFilterToEndpoint(arg1,(char const *)arg2,(char const *)arg3,arg4);
+  _outv = octave_value();
+  if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
+  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  if (alloc3 == SWIG_NEWOBJ) delete[] buf3;
+  {
+    if (arg4->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg4);
+    }
+  }
+  return _out;
+fail:
+  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  if (alloc3 == SWIG_NEWOBJ) delete[] buf3;
+  {
+    if (arg4->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg4);
+    }
+  }
+  return octave_value_list();
+}
+
+
+SWIG_DEFUN( helicsBrokerGetIdentifier, _wrap_helicsBrokerGetIdentifier, std::string() ) {
+  helics_broker arg1 = (helics_broker) 0 ;
+  int res1 ;
+  octave_value_list _out;
+  octave_value_list *_outp=&_out;
+  octave_value _outv;
+  char *result = 0 ;
+  
+  if (!SWIG_check_num_args("helicsBrokerGetIdentifier",args.length(),1,1,0)) {
     SWIG_fail;
   }
   res1 = SWIG_ConvertPtr(args(0),SWIG_as_voidptrptr(&arg1), 0, 0);
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsBrokerGetIdentifier" "', argument " "1"" of type '" "helics_broker""'"); 
   }
-  res2 = SWIG_AsCharPtrAndSize(args(1), &buf2, NULL, &alloc2);
-  if (!SWIG_IsOK(res2)) {
-    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsBrokerGetIdentifier" "', argument " "2"" of type '" "char *""'");
-  }
-  arg2 = reinterpret_cast< char * >(buf2);
-  ecode3 = SWIG_AsVal_int(args(2), &val3);
-  if (!SWIG_IsOK(ecode3)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "helicsBrokerGetIdentifier" "', argument " "3"" of type '" "int""'");
-  } 
-  arg3 = static_cast< int >(val3);
-  result = (helics_status)helicsBrokerGetIdentifier(arg1,arg2,arg3);
-  _outv = SWIG_From_int(static_cast< int >(result));
+  result = (char *)helicsBrokerGetIdentifier(arg1);
+  _outv = SWIG_FromCharPtr((const char *)result);
   if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
-  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
   return _out;
 fail:
-  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
   return octave_value_list();
 }
 
 
-SWIG_DEFUN( helicsCoreGetIdentifier, _wrap_helicsCoreGetIdentifier, _wrap_helicsCoreGetIdentifier_texinfo ) {
+SWIG_DEFUN( helicsCoreGetIdentifier, _wrap_helicsCoreGetIdentifier, std::string() ) {
   helics_core arg1 = (helics_core) 0 ;
-  char *arg2 = (char *) 0 ;
-  int arg3 ;
   int res1 ;
-  int res2 ;
-  char *buf2 = 0 ;
-  int alloc2 = 0 ;
-  int val3 ;
-  int ecode3 = 0 ;
   octave_value_list _out;
   octave_value_list *_outp=&_out;
   octave_value _outv;
-  helics_status result;
+  char *result = 0 ;
   
-  if (!SWIG_check_num_args("helicsCoreGetIdentifier",args.length(),3,3,0)) {
+  if (!SWIG_check_num_args("helicsCoreGetIdentifier",args.length(),1,1,0)) {
     SWIG_fail;
   }
   res1 = SWIG_ConvertPtr(args(0),SWIG_as_voidptrptr(&arg1), 0, 0);
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsCoreGetIdentifier" "', argument " "1"" of type '" "helics_core""'"); 
   }
-  res2 = SWIG_AsCharPtrAndSize(args(1), &buf2, NULL, &alloc2);
-  if (!SWIG_IsOK(res2)) {
-    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsCoreGetIdentifier" "', argument " "2"" of type '" "char *""'");
-  }
-  arg2 = reinterpret_cast< char * >(buf2);
-  ecode3 = SWIG_AsVal_int(args(2), &val3);
-  if (!SWIG_IsOK(ecode3)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "helicsCoreGetIdentifier" "', argument " "3"" of type '" "int""'");
-  } 
-  arg3 = static_cast< int >(val3);
-  result = (helics_status)helicsCoreGetIdentifier(arg1,arg2,arg3);
-  _outv = SWIG_From_int(static_cast< int >(result));
+  result = (char *)helicsCoreGetIdentifier(arg1);
+  _outv = SWIG_FromCharPtr((const char *)result);
   if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
-  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
   return _out;
 fail:
-  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
   return octave_value_list();
 }
 
 
-SWIG_DEFUN( helicsBrokerGetAddress, _wrap_helicsBrokerGetAddress, _wrap_helicsBrokerGetAddress_texinfo ) {
+SWIG_DEFUN( helicsBrokerGetAddress, _wrap_helicsBrokerGetAddress, std::string() ) {
   helics_broker arg1 = (helics_broker) 0 ;
-  char *arg2 = (char *) 0 ;
-  int arg3 ;
   int res1 ;
-  int res2 ;
-  char *buf2 = 0 ;
-  int alloc2 = 0 ;
-  int val3 ;
-  int ecode3 = 0 ;
   octave_value_list _out;
   octave_value_list *_outp=&_out;
   octave_value _outv;
-  helics_status result;
+  char *result = 0 ;
   
-  if (!SWIG_check_num_args("helicsBrokerGetAddress",args.length(),3,3,0)) {
+  if (!SWIG_check_num_args("helicsBrokerGetAddress",args.length(),1,1,0)) {
     SWIG_fail;
   }
   res1 = SWIG_ConvertPtr(args(0),SWIG_as_voidptrptr(&arg1), 0, 0);
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsBrokerGetAddress" "', argument " "1"" of type '" "helics_broker""'"); 
   }
-  res2 = SWIG_AsCharPtrAndSize(args(1), &buf2, NULL, &alloc2);
-  if (!SWIG_IsOK(res2)) {
-    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsBrokerGetAddress" "', argument " "2"" of type '" "char *""'");
-  }
-  arg2 = reinterpret_cast< char * >(buf2);
-  ecode3 = SWIG_AsVal_int(args(2), &val3);
-  if (!SWIG_IsOK(ecode3)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "helicsBrokerGetAddress" "', argument " "3"" of type '" "int""'");
-  } 
-  arg3 = static_cast< int >(val3);
-  result = (helics_status)helicsBrokerGetAddress(arg1,arg2,arg3);
-  _outv = SWIG_From_int(static_cast< int >(result));
+  result = (char *)helicsBrokerGetAddress(arg1);
+  _outv = SWIG_FromCharPtr((const char *)result);
   if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
-  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
   return _out;
 fail:
-  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
   return octave_value_list();
 }
 
 
 SWIG_DEFUN( helicsCoreSetReadyToInit, _wrap_helicsCoreSetReadyToInit, std::string() ) {
   helics_core arg1 = (helics_core) 0 ;
+  helics_error *arg2 = (helics_error *) 0 ;
   int res1 ;
+  helics_error etemp2 ;
   octave_value_list _out;
   octave_value_list *_outp=&_out;
   octave_value _outv;
-  helics_status result;
   
+  {
+    etemp2=helicsErrorInitialize();
+    arg2=&etemp2;
+  }
   if (!SWIG_check_num_args("helicsCoreSetReadyToInit",args.length(),1,1,0)) {
     SWIG_fail;
   }
@@ -4756,23 +4420,40 @@ SWIG_DEFUN( helicsCoreSetReadyToInit, _wrap_helicsCoreSetReadyToInit, std::strin
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsCoreSetReadyToInit" "', argument " "1"" of type '" "helics_core""'"); 
   }
-  result = (helics_status)helicsCoreSetReadyToInit(arg1);
-  _outv = SWIG_From_int(static_cast< int >(result));
+  helicsCoreSetReadyToInit(arg1,arg2);
+  _outv = octave_value();
   if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
+  {
+    if (arg2->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg2);
+    }
+  }
   return _out;
 fail:
+  {
+    if (arg2->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg2);
+    }
+  }
   return octave_value_list();
 }
 
 
-SWIG_DEFUN( helicsCoreDisconnect, _wrap_helicsCoreDisconnect, _wrap_helicsCoreDisconnect_texinfo ) {
+SWIG_DEFUN( helicsCoreDisconnect, _wrap_helicsCoreDisconnect, std::string() ) {
   helics_core arg1 = (helics_core) 0 ;
+  helics_error *arg2 = (helics_error *) 0 ;
   int res1 ;
+  helics_error etemp2 ;
   octave_value_list _out;
   octave_value_list *_outp=&_out;
   octave_value _outv;
-  helics_status result;
   
+  {
+    etemp2=helicsErrorInitialize();
+    arg2=&etemp2;
+  }
   if (!SWIG_check_num_args("helicsCoreDisconnect",args.length(),1,1,0)) {
     SWIG_fail;
   }
@@ -4780,25 +4461,43 @@ SWIG_DEFUN( helicsCoreDisconnect, _wrap_helicsCoreDisconnect, _wrap_helicsCoreDi
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsCoreDisconnect" "', argument " "1"" of type '" "helics_core""'"); 
   }
-  result = (helics_status)helicsCoreDisconnect(arg1);
-  _outv = SWIG_From_int(static_cast< int >(result));
+  helicsCoreDisconnect(arg1,arg2);
+  _outv = octave_value();
   if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
+  {
+    if (arg2->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg2);
+    }
+  }
   return _out;
 fail:
+  {
+    if (arg2->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg2);
+    }
+  }
   return octave_value_list();
 }
 
 
 SWIG_DEFUN( helicsGetFederateByName, _wrap_helicsGetFederateByName, std::string() ) {
   char *arg1 = (char *) 0 ;
+  helics_error *arg2 = (helics_error *) 0 ;
   int res1 ;
   char *buf1 = 0 ;
   int alloc1 = 0 ;
+  helics_error etemp2 ;
   octave_value_list _out;
   octave_value_list *_outp=&_out;
   octave_value _outv;
   helics_federate result;
   
+  {
+    etemp2=helicsErrorInitialize();
+    arg2=&etemp2;
+  }
   if (!SWIG_check_num_args("helicsGetFederateByName",args.length(),1,1,0)) {
     SWIG_fail;
   }
@@ -4807,25 +4506,42 @@ SWIG_DEFUN( helicsGetFederateByName, _wrap_helicsGetFederateByName, std::string(
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsGetFederateByName" "', argument " "1"" of type '" "char const *""'");
   }
   arg1 = reinterpret_cast< char * >(buf1);
-  result = (helics_federate)helicsGetFederateByName((char const *)arg1);
+  result = (helics_federate)helicsGetFederateByName((char const *)arg1,arg2);
   _outv = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_void, 0 |  0 );
   if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
   if (alloc1 == SWIG_NEWOBJ) delete[] buf1;
+  {
+    if (arg2->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg2);
+    }
+  }
   return _out;
 fail:
   if (alloc1 == SWIG_NEWOBJ) delete[] buf1;
+  {
+    if (arg2->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg2);
+    }
+  }
   return octave_value_list();
 }
 
 
-SWIG_DEFUN( helicsBrokerDisconnect, _wrap_helicsBrokerDisconnect, _wrap_helicsBrokerDisconnect_texinfo ) {
+SWIG_DEFUN( helicsBrokerDisconnect, _wrap_helicsBrokerDisconnect, std::string() ) {
   helics_broker arg1 = (helics_broker) 0 ;
+  helics_error *arg2 = (helics_error *) 0 ;
   int res1 ;
+  helics_error etemp2 ;
   octave_value_list _out;
   octave_value_list *_outp=&_out;
   octave_value _outv;
-  helics_status result;
   
+  {
+    etemp2=helicsErrorInitialize();
+    arg2=&etemp2;
+  }
   if (!SWIG_check_num_args("helicsBrokerDisconnect",args.length(),1,1,0)) {
     SWIG_fail;
   }
@@ -4833,8 +4549,43 @@ SWIG_DEFUN( helicsBrokerDisconnect, _wrap_helicsBrokerDisconnect, _wrap_helicsBr
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsBrokerDisconnect" "', argument " "1"" of type '" "helics_broker""'"); 
   }
-  result = (helics_status)helicsBrokerDisconnect(arg1);
-  _outv = SWIG_From_int(static_cast< int >(result));
+  helicsBrokerDisconnect(arg1,arg2);
+  _outv = octave_value();
+  if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
+  {
+    if (arg2->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg2);
+    }
+  }
+  return _out;
+fail:
+  {
+    if (arg2->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg2);
+    }
+  }
+  return octave_value_list();
+}
+
+
+SWIG_DEFUN( helicsFederateDestroy, _wrap_helicsFederateDestroy, std::string() ) {
+  helics_federate arg1 = (helics_federate) 0 ;
+  int res1 ;
+  octave_value_list _out;
+  octave_value_list *_outp=&_out;
+  octave_value _outv;
+  
+  if (!SWIG_check_num_args("helicsFederateDestroy",args.length(),1,1,0)) {
+    SWIG_fail;
+  }
+  res1 = SWIG_ConvertPtr(args(0),SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateDestroy" "', argument " "1"" of type '" "helics_federate""'"); 
+  }
+  helicsFederateDestroy(arg1);
+  _outv = octave_value();
   if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
   return _out;
 fail:
@@ -4842,7 +4593,53 @@ fail:
 }
 
 
-SWIG_DEFUN( helicsCoreFree, _wrap_helicsCoreFree, _wrap_helicsCoreFree_texinfo ) {
+SWIG_DEFUN( helicsBrokerDestroy, _wrap_helicsBrokerDestroy, std::string() ) {
+  helics_broker arg1 = (helics_broker) 0 ;
+  int res1 ;
+  octave_value_list _out;
+  octave_value_list *_outp=&_out;
+  octave_value _outv;
+  
+  if (!SWIG_check_num_args("helicsBrokerDestroy",args.length(),1,1,0)) {
+    SWIG_fail;
+  }
+  res1 = SWIG_ConvertPtr(args(0),SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsBrokerDestroy" "', argument " "1"" of type '" "helics_broker""'"); 
+  }
+  helicsBrokerDestroy(arg1);
+  _outv = octave_value();
+  if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
+  return _out;
+fail:
+  return octave_value_list();
+}
+
+
+SWIG_DEFUN( helicsCoreDestroy, _wrap_helicsCoreDestroy, std::string() ) {
+  helics_core arg1 = (helics_core) 0 ;
+  int res1 ;
+  octave_value_list _out;
+  octave_value_list *_outp=&_out;
+  octave_value _outv;
+  
+  if (!SWIG_check_num_args("helicsCoreDestroy",args.length(),1,1,0)) {
+    SWIG_fail;
+  }
+  res1 = SWIG_ConvertPtr(args(0),SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsCoreDestroy" "', argument " "1"" of type '" "helics_core""'"); 
+  }
+  helicsCoreDestroy(arg1);
+  _outv = octave_value();
+  if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
+  return _out;
+fail:
+  return octave_value_list();
+}
+
+
+SWIG_DEFUN( helicsCoreFree, _wrap_helicsCoreFree, std::string() ) {
   helics_core arg1 = (helics_core) 0 ;
   int res1 ;
   octave_value_list _out;
@@ -4865,7 +4662,7 @@ fail:
 }
 
 
-SWIG_DEFUN( helicsBrokerFree, _wrap_helicsBrokerFree, _wrap_helicsBrokerFree_texinfo ) {
+SWIG_DEFUN( helicsBrokerFree, _wrap_helicsBrokerFree, std::string() ) {
   helics_broker arg1 = (helics_broker) 0 ;
   int res1 ;
   octave_value_list _out;
@@ -4888,173 +4685,320 @@ fail:
 }
 
 
-SWIG_DEFUN( helicsCreateValueFederate, _wrap_helicsCreateValueFederate, _wrap_helicsCreateValueFederate_texinfo ) {
-  helics_federate_info_t arg1 = (helics_federate_info_t) (helics_federate_info_t)0 ;
-  int res1 ;
-  octave_value_list _out;
-  octave_value_list *_outp=&_out;
-  octave_value _outv;
-  helics_federate result;
-  
-  if (!SWIG_check_num_args("helicsCreateValueFederate",args.length(),1,1,0)) {
-    SWIG_fail;
-  }
-  res1 = SWIG_ConvertPtr(args(0),SWIG_as_voidptrptr(&arg1), 0, 0);
-  if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsCreateValueFederate" "', argument " "1"" of type '" "helics_federate_info_t const""'"); 
-  }
-  result = (helics_federate)helicsCreateValueFederate(arg1);
-  _outv = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_void, 0 |  0 );
-  if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
-  return _out;
-fail:
-  return octave_value_list();
-}
-
-
-SWIG_DEFUN( helicsCreateValueFederateFromJson, _wrap_helicsCreateValueFederateFromJson, _wrap_helicsCreateValueFederateFromJson_texinfo ) {
+SWIG_DEFUN( helicsCreateValueFederate, _wrap_helicsCreateValueFederate, std::string() ) {
   char *arg1 = (char *) 0 ;
+  helics_federate_info arg2 = (helics_federate_info) 0 ;
+  helics_error *arg3 = (helics_error *) 0 ;
   int res1 ;
   char *buf1 = 0 ;
   int alloc1 = 0 ;
+  int res2 ;
+  helics_error etemp3 ;
   octave_value_list _out;
   octave_value_list *_outp=&_out;
   octave_value _outv;
   helics_federate result;
   
-  if (!SWIG_check_num_args("helicsCreateValueFederateFromJson",args.length(),1,1,0)) {
+  {
+    etemp3=helicsErrorInitialize();
+    arg3=&etemp3;
+  }
+  if (!SWIG_check_num_args("helicsCreateValueFederate",args.length(),2,2,0)) {
     SWIG_fail;
   }
   res1 = SWIG_AsCharPtrAndSize(args(0), &buf1, NULL, &alloc1);
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsCreateValueFederateFromJson" "', argument " "1"" of type '" "char const *""'");
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsCreateValueFederate" "', argument " "1"" of type '" "char const *""'");
   }
   arg1 = reinterpret_cast< char * >(buf1);
-  result = (helics_federate)helicsCreateValueFederateFromJson((char const *)arg1);
+  res2 = SWIG_ConvertPtr(args(1),SWIG_as_voidptrptr(&arg2), 0, 0);
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsCreateValueFederate" "', argument " "2"" of type '" "helics_federate_info""'"); 
+  }
+  result = (helics_federate)helicsCreateValueFederate((char const *)arg1,arg2,arg3);
   _outv = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_void, 0 |  0 );
   if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
   if (alloc1 == SWIG_NEWOBJ) delete[] buf1;
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg3);
+    }
+  }
   return _out;
 fail:
   if (alloc1 == SWIG_NEWOBJ) delete[] buf1;
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg3);
+    }
+  }
   return octave_value_list();
 }
 
 
-SWIG_DEFUN( helicsCreateMessageFederate, _wrap_helicsCreateMessageFederate, _wrap_helicsCreateMessageFederate_texinfo ) {
-  helics_federate_info_t arg1 = (helics_federate_info_t) (helics_federate_info_t)0 ;
-  int res1 ;
-  octave_value_list _out;
-  octave_value_list *_outp=&_out;
-  octave_value _outv;
-  helics_federate result;
-  
-  if (!SWIG_check_num_args("helicsCreateMessageFederate",args.length(),1,1,0)) {
-    SWIG_fail;
-  }
-  res1 = SWIG_ConvertPtr(args(0),SWIG_as_voidptrptr(&arg1), 0, 0);
-  if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsCreateMessageFederate" "', argument " "1"" of type '" "helics_federate_info_t const""'"); 
-  }
-  result = (helics_federate)helicsCreateMessageFederate(arg1);
-  _outv = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_void, 0 |  0 );
-  if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
-  return _out;
-fail:
-  return octave_value_list();
-}
-
-
-SWIG_DEFUN( helicsCreateMessageFederateFromJson, _wrap_helicsCreateMessageFederateFromJson, _wrap_helicsCreateMessageFederateFromJson_texinfo ) {
+SWIG_DEFUN( helicsCreateValueFederateFromConfig, _wrap_helicsCreateValueFederateFromConfig, std::string() ) {
   char *arg1 = (char *) 0 ;
+  helics_error *arg2 = (helics_error *) 0 ;
   int res1 ;
   char *buf1 = 0 ;
   int alloc1 = 0 ;
+  helics_error etemp2 ;
   octave_value_list _out;
   octave_value_list *_outp=&_out;
   octave_value _outv;
   helics_federate result;
   
-  if (!SWIG_check_num_args("helicsCreateMessageFederateFromJson",args.length(),1,1,0)) {
+  {
+    etemp2=helicsErrorInitialize();
+    arg2=&etemp2;
+  }
+  if (!SWIG_check_num_args("helicsCreateValueFederateFromConfig",args.length(),1,1,0)) {
     SWIG_fail;
   }
   res1 = SWIG_AsCharPtrAndSize(args(0), &buf1, NULL, &alloc1);
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsCreateMessageFederateFromJson" "', argument " "1"" of type '" "char const *""'");
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsCreateValueFederateFromConfig" "', argument " "1"" of type '" "char const *""'");
   }
   arg1 = reinterpret_cast< char * >(buf1);
-  result = (helics_federate)helicsCreateMessageFederateFromJson((char const *)arg1);
+  result = (helics_federate)helicsCreateValueFederateFromConfig((char const *)arg1,arg2);
   _outv = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_void, 0 |  0 );
   if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
   if (alloc1 == SWIG_NEWOBJ) delete[] buf1;
+  {
+    if (arg2->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg2);
+    }
+  }
   return _out;
 fail:
   if (alloc1 == SWIG_NEWOBJ) delete[] buf1;
+  {
+    if (arg2->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg2);
+    }
+  }
   return octave_value_list();
 }
 
 
-SWIG_DEFUN( helicsCreateCombinationFederate, _wrap_helicsCreateCombinationFederate, _wrap_helicsCreateCombinationFederate_texinfo ) {
-  helics_federate_info_t arg1 = (helics_federate_info_t) (helics_federate_info_t)0 ;
-  int res1 ;
-  octave_value_list _out;
-  octave_value_list *_outp=&_out;
-  octave_value _outv;
-  helics_federate result;
-  
-  if (!SWIG_check_num_args("helicsCreateCombinationFederate",args.length(),1,1,0)) {
-    SWIG_fail;
-  }
-  res1 = SWIG_ConvertPtr(args(0),SWIG_as_voidptrptr(&arg1), 0, 0);
-  if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsCreateCombinationFederate" "', argument " "1"" of type '" "helics_federate_info_t const""'"); 
-  }
-  result = (helics_federate)helicsCreateCombinationFederate(arg1);
-  _outv = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_void, 0 |  0 );
-  if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
-  return _out;
-fail:
-  return octave_value_list();
-}
-
-
-SWIG_DEFUN( helicsCreateCombinationFederateFromJson, _wrap_helicsCreateCombinationFederateFromJson, _wrap_helicsCreateCombinationFederateFromJson_texinfo ) {
+SWIG_DEFUN( helicsCreateMessageFederate, _wrap_helicsCreateMessageFederate, std::string() ) {
   char *arg1 = (char *) 0 ;
+  helics_federate_info arg2 = (helics_federate_info) 0 ;
+  helics_error *arg3 = (helics_error *) 0 ;
   int res1 ;
   char *buf1 = 0 ;
   int alloc1 = 0 ;
+  int res2 ;
+  helics_error etemp3 ;
   octave_value_list _out;
   octave_value_list *_outp=&_out;
   octave_value _outv;
   helics_federate result;
   
-  if (!SWIG_check_num_args("helicsCreateCombinationFederateFromJson",args.length(),1,1,0)) {
+  {
+    etemp3=helicsErrorInitialize();
+    arg3=&etemp3;
+  }
+  if (!SWIG_check_num_args("helicsCreateMessageFederate",args.length(),2,2,0)) {
     SWIG_fail;
   }
   res1 = SWIG_AsCharPtrAndSize(args(0), &buf1, NULL, &alloc1);
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsCreateCombinationFederateFromJson" "', argument " "1"" of type '" "char const *""'");
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsCreateMessageFederate" "', argument " "1"" of type '" "char const *""'");
   }
   arg1 = reinterpret_cast< char * >(buf1);
-  result = (helics_federate)helicsCreateCombinationFederateFromJson((char const *)arg1);
+  res2 = SWIG_ConvertPtr(args(1),SWIG_as_voidptrptr(&arg2), 0, 0);
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsCreateMessageFederate" "', argument " "2"" of type '" "helics_federate_info""'"); 
+  }
+  result = (helics_federate)helicsCreateMessageFederate((char const *)arg1,arg2,arg3);
   _outv = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_void, 0 |  0 );
   if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
   if (alloc1 == SWIG_NEWOBJ) delete[] buf1;
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg3);
+    }
+  }
   return _out;
 fail:
   if (alloc1 == SWIG_NEWOBJ) delete[] buf1;
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg3);
+    }
+  }
+  return octave_value_list();
+}
+
+
+SWIG_DEFUN( helicsCreateMessageFederateFromConfig, _wrap_helicsCreateMessageFederateFromConfig, std::string() ) {
+  char *arg1 = (char *) 0 ;
+  helics_error *arg2 = (helics_error *) 0 ;
+  int res1 ;
+  char *buf1 = 0 ;
+  int alloc1 = 0 ;
+  helics_error etemp2 ;
+  octave_value_list _out;
+  octave_value_list *_outp=&_out;
+  octave_value _outv;
+  helics_federate result;
+  
+  {
+    etemp2=helicsErrorInitialize();
+    arg2=&etemp2;
+  }
+  if (!SWIG_check_num_args("helicsCreateMessageFederateFromConfig",args.length(),1,1,0)) {
+    SWIG_fail;
+  }
+  res1 = SWIG_AsCharPtrAndSize(args(0), &buf1, NULL, &alloc1);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsCreateMessageFederateFromConfig" "', argument " "1"" of type '" "char const *""'");
+  }
+  arg1 = reinterpret_cast< char * >(buf1);
+  result = (helics_federate)helicsCreateMessageFederateFromConfig((char const *)arg1,arg2);
+  _outv = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_void, 0 |  0 );
+  if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
+  if (alloc1 == SWIG_NEWOBJ) delete[] buf1;
+  {
+    if (arg2->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg2);
+    }
+  }
+  return _out;
+fail:
+  if (alloc1 == SWIG_NEWOBJ) delete[] buf1;
+  {
+    if (arg2->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg2);
+    }
+  }
+  return octave_value_list();
+}
+
+
+SWIG_DEFUN( helicsCreateCombinationFederate, _wrap_helicsCreateCombinationFederate, std::string() ) {
+  char *arg1 = (char *) 0 ;
+  helics_federate_info arg2 = (helics_federate_info) 0 ;
+  helics_error *arg3 = (helics_error *) 0 ;
+  int res1 ;
+  char *buf1 = 0 ;
+  int alloc1 = 0 ;
+  int res2 ;
+  helics_error etemp3 ;
+  octave_value_list _out;
+  octave_value_list *_outp=&_out;
+  octave_value _outv;
+  helics_federate result;
+  
+  {
+    etemp3=helicsErrorInitialize();
+    arg3=&etemp3;
+  }
+  if (!SWIG_check_num_args("helicsCreateCombinationFederate",args.length(),2,2,0)) {
+    SWIG_fail;
+  }
+  res1 = SWIG_AsCharPtrAndSize(args(0), &buf1, NULL, &alloc1);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsCreateCombinationFederate" "', argument " "1"" of type '" "char const *""'");
+  }
+  arg1 = reinterpret_cast< char * >(buf1);
+  res2 = SWIG_ConvertPtr(args(1),SWIG_as_voidptrptr(&arg2), 0, 0);
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsCreateCombinationFederate" "', argument " "2"" of type '" "helics_federate_info""'"); 
+  }
+  result = (helics_federate)helicsCreateCombinationFederate((char const *)arg1,arg2,arg3);
+  _outv = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_void, 0 |  0 );
+  if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
+  if (alloc1 == SWIG_NEWOBJ) delete[] buf1;
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg3);
+    }
+  }
+  return _out;
+fail:
+  if (alloc1 == SWIG_NEWOBJ) delete[] buf1;
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg3);
+    }
+  }
+  return octave_value_list();
+}
+
+
+SWIG_DEFUN( helicsCreateCombinationFederateFromConfig, _wrap_helicsCreateCombinationFederateFromConfig, std::string() ) {
+  char *arg1 = (char *) 0 ;
+  helics_error *arg2 = (helics_error *) 0 ;
+  int res1 ;
+  char *buf1 = 0 ;
+  int alloc1 = 0 ;
+  helics_error etemp2 ;
+  octave_value_list _out;
+  octave_value_list *_outp=&_out;
+  octave_value _outv;
+  helics_federate result;
+  
+  {
+    etemp2=helicsErrorInitialize();
+    arg2=&etemp2;
+  }
+  if (!SWIG_check_num_args("helicsCreateCombinationFederateFromConfig",args.length(),1,1,0)) {
+    SWIG_fail;
+  }
+  res1 = SWIG_AsCharPtrAndSize(args(0), &buf1, NULL, &alloc1);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsCreateCombinationFederateFromConfig" "', argument " "1"" of type '" "char const *""'");
+  }
+  arg1 = reinterpret_cast< char * >(buf1);
+  result = (helics_federate)helicsCreateCombinationFederateFromConfig((char const *)arg1,arg2);
+  _outv = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_void, 0 |  0 );
+  if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
+  if (alloc1 == SWIG_NEWOBJ) delete[] buf1;
+  {
+    if (arg2->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg2);
+    }
+  }
+  return _out;
+fail:
+  if (alloc1 == SWIG_NEWOBJ) delete[] buf1;
+  {
+    if (arg2->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg2);
+    }
+  }
   return octave_value_list();
 }
 
 
 SWIG_DEFUN( helicsFederateClone, _wrap_helicsFederateClone, std::string() ) {
   helics_federate arg1 = (helics_federate) 0 ;
+  helics_error *arg2 = (helics_error *) 0 ;
   int res1 ;
+  helics_error etemp2 ;
   octave_value_list _out;
   octave_value_list *_outp=&_out;
   octave_value _outv;
   helics_federate result;
   
+  {
+    etemp2=helicsErrorInitialize();
+    arg2=&etemp2;
+  }
   if (!SWIG_check_num_args("helicsFederateClone",args.length(),1,1,0)) {
     SWIG_fail;
   }
@@ -5062,25 +5006,37 @@ SWIG_DEFUN( helicsFederateClone, _wrap_helicsFederateClone, std::string() ) {
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateClone" "', argument " "1"" of type '" "helics_federate""'"); 
   }
-  result = (helics_federate)helicsFederateClone(arg1);
+  result = (helics_federate)helicsFederateClone(arg1,arg2);
   _outv = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_void, 0 |  0 );
   if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
+  {
+    if (arg2->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg2);
+    }
+  }
   return _out;
 fail:
+  {
+    if (arg2->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg2);
+    }
+  }
   return octave_value_list();
 }
 
 
-SWIG_DEFUN( helicsFederateInfoCreate, _wrap_helicsFederateInfoCreate, _wrap_helicsFederateInfoCreate_texinfo ) {
+SWIG_DEFUN( helicsCreateFederateInfo, _wrap_helicsCreateFederateInfo, std::string() ) {
   octave_value_list _out;
   octave_value_list *_outp=&_out;
   octave_value _outv;
-  helics_federate_info_t result;
+  helics_federate_info result;
   
-  if (!SWIG_check_num_args("helicsFederateInfoCreate",args.length(),0,0,0)) {
+  if (!SWIG_check_num_args("helicsCreateFederateInfo",args.length(),0,0,0)) {
     SWIG_fail;
   }
-  result = (helics_federate_info_t)helicsFederateInfoCreate();
+  result = (helics_federate_info)helicsCreateFederateInfo();
   _outv = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_void, 0 |  0 );
   if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
   return _out;
@@ -5089,48 +5045,132 @@ fail:
 }
 
 
-SWIG_DEFUN( helicsFederateInfoLoadFromArgs, _wrap_helicsFederateInfoLoadFromArgs, _wrap_helicsFederateInfoLoadFromArgs_texinfo ) {
-  helics_federate_info_t arg1 = (helics_federate_info_t) 0 ;
-  int arg2 ;
-  char **arg3 = (char **) 0 ;
+SWIG_DEFUN( helicsFederateInfoClone, _wrap_helicsFederateInfoClone, std::string() ) {
+  helics_federate_info arg1 = (helics_federate_info) 0 ;
+  helics_error *arg2 = (helics_error *) 0 ;
   int res1 ;
-  int val2 ;
-  int ecode2 = 0 ;
-  void *argp3 = 0 ;
-  int res3 = 0 ;
+  helics_error etemp2 ;
   octave_value_list _out;
   octave_value_list *_outp=&_out;
   octave_value _outv;
-  helics_status result;
+  helics_federate_info result;
   
-  if (!SWIG_check_num_args("helicsFederateInfoLoadFromArgs",args.length(),3,3,0)) {
+  {
+    etemp2=helicsErrorInitialize();
+    arg2=&etemp2;
+  }
+  if (!SWIG_check_num_args("helicsFederateInfoClone",args.length(),1,1,0)) {
     SWIG_fail;
   }
   res1 = SWIG_ConvertPtr(args(0),SWIG_as_voidptrptr(&arg1), 0, 0);
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateInfoLoadFromArgs" "', argument " "1"" of type '" "helics_federate_info_t""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateInfoClone" "', argument " "1"" of type '" "helics_federate_info""'"); 
   }
-  ecode2 = SWIG_AsVal_int(args(1), &val2);
-  if (!SWIG_IsOK(ecode2)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "helicsFederateInfoLoadFromArgs" "', argument " "2"" of type '" "int""'");
-  } 
-  arg2 = static_cast< int >(val2);
-  res3 = SWIG_ConvertPtr(args(2), &argp3,SWIGTYPE_p_p_char, 0 |  0 );
-  if (!SWIG_IsOK(res3)) {
-    SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "helicsFederateInfoLoadFromArgs" "', argument " "3"" of type '" "char const *const *""'"); 
-  }
-  arg3 = reinterpret_cast< char ** >(argp3);
-  result = (helics_status)helicsFederateInfoLoadFromArgs(arg1,arg2,(char const *const *)arg3);
-  _outv = SWIG_From_int(static_cast< int >(result));
+  result = (helics_federate_info)helicsFederateInfoClone(arg1,arg2);
+  _outv = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_void, 0 |  0 );
   if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
+  {
+    if (arg2->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg2);
+    }
+  }
   return _out;
 fail:
+  {
+    if (arg2->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg2);
+    }
+  }
   return octave_value_list();
 }
 
 
-SWIG_DEFUN( helicsFederateInfoFree, _wrap_helicsFederateInfoFree, _wrap_helicsFederateInfoFree_texinfo ) {
-  helics_federate_info_t arg1 = (helics_federate_info_t) 0 ;
+SWIG_DEFUN( helicsFederateInfoLoadFromArgs, _wrap_helicsFederateInfoLoadFromArgs, std::string() ) {
+  helics_federate_info arg1 = (helics_federate_info) 0 ;
+  int arg2 ;
+  char **arg3 = (char **) 0 ;
+  helics_error *arg4 = (helics_error *) 0 ;
+  int res1 ;
+  helics_error etemp4 ;
+  octave_value_list _out;
+  octave_value_list *_outp=&_out;
+  octave_value _outv;
+  
+  {
+    etemp4=helicsErrorInitialize();
+    arg4=&etemp4;
+  }
+  if (!SWIG_check_num_args("helicsFederateInfoLoadFromArgs",args.length(),2,2,0)) {
+    SWIG_fail;
+  }
+  res1 = SWIG_ConvertPtr(args(0),SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateInfoLoadFromArgs" "', argument " "1"" of type '" "helics_federate_info""'"); 
+  }
+  {
+    /* Check if is a list */
+    if (args(1).is_cellstr()) {
+      Cell cellargs=octave_value_extract<Cell>(args(1));
+      arg3 = (char **) malloc((cellargs.numel()+1)*sizeof(char *));
+      for (int ii=0;ii<cellargs.numel();++ii)
+      {
+        octave_value arg=cellargs(ii);
+        int alloc;
+        SWIG_AsCharPtrAndSize(arg, &arg3[ii+1], NULL, &alloc);
+      }
+      
+    } 
+    else if (args(1).is_string())
+    {
+      int retval=0;
+      char *buffer=NULL;
+      int allocation=0;
+      arg2=2;
+      arg3 = (char **) malloc(2*sizeof(char *));
+      retval = SWIG_AsCharPtrAndSize(args(1), &buffer, NULL, &allocation);
+      if (!SWIG_IsOK(retval)) {
+        SWIG_exception_fail(SWIG_ArgError(retval), "conversion to string failed");
+      }
+      arg3[0]=buffer;
+      arg3[1]=buffer;
+    }
+    else
+    {
+      SWIG_exception_fail(SWIG_ArgError(3), "argument must be a cell array or string");
+      return octave_value_list();
+    }
+  }
+  helicsFederateInfoLoadFromArgs(arg1,arg2,(char const *const *)arg3,arg4);
+  _outv = octave_value();
+  if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
+  {
+    free((char **) arg3);
+  }
+  {
+    if (arg4->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg4);
+    }
+  }
+  return _out;
+fail:
+  {
+    free((char **) arg3);
+  }
+  {
+    if (arg4->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg4);
+    }
+  }
+  return octave_value_list();
+}
+
+
+SWIG_DEFUN( helicsFederateInfoFree, _wrap_helicsFederateInfoFree, std::string() ) {
+  helics_federate_info arg1 = (helics_federate_info) 0 ;
   int res1 ;
   octave_value_list _out;
   octave_value_list *_outp=&_out;
@@ -5141,7 +5181,7 @@ SWIG_DEFUN( helicsFederateInfoFree, _wrap_helicsFederateInfoFree, _wrap_helicsFe
   }
   res1 = SWIG_ConvertPtr(args(0),SWIG_as_voidptrptr(&arg1), 0, 0);
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateInfoFree" "', argument " "1"" of type '" "helics_federate_info_t""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateInfoFree" "', argument " "1"" of type '" "helics_federate_info""'"); 
   }
   helicsFederateInfoFree(arg1);
   _outv = octave_value();
@@ -5152,450 +5192,783 @@ fail:
 }
 
 
-SWIG_DEFUN( helicsFederateInfoSetFederateName, _wrap_helicsFederateInfoSetFederateName, _wrap_helicsFederateInfoSetFederateName_texinfo ) {
-  helics_federate_info_t arg1 = (helics_federate_info_t) 0 ;
-  char *arg2 = (char *) 0 ;
+SWIG_DEFUN( helicsFederateIsValid, _wrap_helicsFederateIsValid, std::string() ) {
+  helics_federate arg1 = (helics_federate) 0 ;
   int res1 ;
-  int res2 ;
-  char *buf2 = 0 ;
-  int alloc2 = 0 ;
   octave_value_list _out;
   octave_value_list *_outp=&_out;
   octave_value _outv;
-  helics_status result;
+  helics_bool result;
   
-  if (!SWIG_check_num_args("helicsFederateInfoSetFederateName",args.length(),2,2,0)) {
+  if (!SWIG_check_num_args("helicsFederateIsValid",args.length(),1,1,0)) {
     SWIG_fail;
   }
   res1 = SWIG_ConvertPtr(args(0),SWIG_as_voidptrptr(&arg1), 0, 0);
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateInfoSetFederateName" "', argument " "1"" of type '" "helics_federate_info_t""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateIsValid" "', argument " "1"" of type '" "helics_federate""'"); 
   }
-  res2 = SWIG_AsCharPtrAndSize(args(1), &buf2, NULL, &alloc2);
-  if (!SWIG_IsOK(res2)) {
-    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsFederateInfoSetFederateName" "', argument " "2"" of type '" "char const *""'");
-  }
-  arg2 = reinterpret_cast< char * >(buf2);
-  result = (helics_status)helicsFederateInfoSetFederateName(arg1,(char const *)arg2);
+  result = (helics_bool)helicsFederateIsValid(arg1);
   _outv = SWIG_From_int(static_cast< int >(result));
   if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
-  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
   return _out;
 fail:
-  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
   return octave_value_list();
 }
 
 
-SWIG_DEFUN( helicsFederateInfoSetCoreName, _wrap_helicsFederateInfoSetCoreName, _wrap_helicsFederateInfoSetCoreName_texinfo ) {
-  helics_federate_info_t arg1 = (helics_federate_info_t) 0 ;
+SWIG_DEFUN( helicsFederateInfoSetCoreName, _wrap_helicsFederateInfoSetCoreName, std::string() ) {
+  helics_federate_info arg1 = (helics_federate_info) 0 ;
   char *arg2 = (char *) 0 ;
+  helics_error *arg3 = (helics_error *) 0 ;
   int res1 ;
   int res2 ;
   char *buf2 = 0 ;
   int alloc2 = 0 ;
+  helics_error etemp3 ;
   octave_value_list _out;
   octave_value_list *_outp=&_out;
   octave_value _outv;
-  helics_status result;
   
+  {
+    etemp3=helicsErrorInitialize();
+    arg3=&etemp3;
+  }
   if (!SWIG_check_num_args("helicsFederateInfoSetCoreName",args.length(),2,2,0)) {
     SWIG_fail;
   }
   res1 = SWIG_ConvertPtr(args(0),SWIG_as_voidptrptr(&arg1), 0, 0);
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateInfoSetCoreName" "', argument " "1"" of type '" "helics_federate_info_t""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateInfoSetCoreName" "', argument " "1"" of type '" "helics_federate_info""'"); 
   }
   res2 = SWIG_AsCharPtrAndSize(args(1), &buf2, NULL, &alloc2);
   if (!SWIG_IsOK(res2)) {
     SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsFederateInfoSetCoreName" "', argument " "2"" of type '" "char const *""'");
   }
   arg2 = reinterpret_cast< char * >(buf2);
-  result = (helics_status)helicsFederateInfoSetCoreName(arg1,(char const *)arg2);
-  _outv = SWIG_From_int(static_cast< int >(result));
+  helicsFederateInfoSetCoreName(arg1,(char const *)arg2,arg3);
+  _outv = octave_value();
   if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
   if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg3);
+    }
+  }
   return _out;
 fail:
   if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg3);
+    }
+  }
   return octave_value_list();
 }
 
 
-SWIG_DEFUN( helicsFederateInfoSetCoreInitString, _wrap_helicsFederateInfoSetCoreInitString, _wrap_helicsFederateInfoSetCoreInitString_texinfo ) {
-  helics_federate_info_t arg1 = (helics_federate_info_t) 0 ;
+SWIG_DEFUN( helicsFederateInfoSetCoreInitString, _wrap_helicsFederateInfoSetCoreInitString, std::string() ) {
+  helics_federate_info arg1 = (helics_federate_info) 0 ;
   char *arg2 = (char *) 0 ;
+  helics_error *arg3 = (helics_error *) 0 ;
   int res1 ;
   int res2 ;
   char *buf2 = 0 ;
   int alloc2 = 0 ;
+  helics_error etemp3 ;
   octave_value_list _out;
   octave_value_list *_outp=&_out;
   octave_value _outv;
-  helics_status result;
   
+  {
+    etemp3=helicsErrorInitialize();
+    arg3=&etemp3;
+  }
   if (!SWIG_check_num_args("helicsFederateInfoSetCoreInitString",args.length(),2,2,0)) {
     SWIG_fail;
   }
   res1 = SWIG_ConvertPtr(args(0),SWIG_as_voidptrptr(&arg1), 0, 0);
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateInfoSetCoreInitString" "', argument " "1"" of type '" "helics_federate_info_t""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateInfoSetCoreInitString" "', argument " "1"" of type '" "helics_federate_info""'"); 
   }
   res2 = SWIG_AsCharPtrAndSize(args(1), &buf2, NULL, &alloc2);
   if (!SWIG_IsOK(res2)) {
     SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsFederateInfoSetCoreInitString" "', argument " "2"" of type '" "char const *""'");
   }
   arg2 = reinterpret_cast< char * >(buf2);
-  result = (helics_status)helicsFederateInfoSetCoreInitString(arg1,(char const *)arg2);
-  _outv = SWIG_From_int(static_cast< int >(result));
+  helicsFederateInfoSetCoreInitString(arg1,(char const *)arg2,arg3);
+  _outv = octave_value();
   if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
   if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg3);
+    }
+  }
   return _out;
 fail:
   if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg3);
+    }
+  }
   return octave_value_list();
 }
 
 
-SWIG_DEFUN( helicsFederateInfoSetCoreTypeFromString, _wrap_helicsFederateInfoSetCoreTypeFromString, _wrap_helicsFederateInfoSetCoreTypeFromString_texinfo ) {
-  helics_federate_info_t arg1 = (helics_federate_info_t) 0 ;
-  char *arg2 = (char *) 0 ;
-  int res1 ;
-  int res2 ;
-  char *buf2 = 0 ;
-  int alloc2 = 0 ;
-  octave_value_list _out;
-  octave_value_list *_outp=&_out;
-  octave_value _outv;
-  helics_status result;
-  
-  if (!SWIG_check_num_args("helicsFederateInfoSetCoreTypeFromString",args.length(),2,2,0)) {
-    SWIG_fail;
-  }
-  res1 = SWIG_ConvertPtr(args(0),SWIG_as_voidptrptr(&arg1), 0, 0);
-  if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateInfoSetCoreTypeFromString" "', argument " "1"" of type '" "helics_federate_info_t""'"); 
-  }
-  res2 = SWIG_AsCharPtrAndSize(args(1), &buf2, NULL, &alloc2);
-  if (!SWIG_IsOK(res2)) {
-    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsFederateInfoSetCoreTypeFromString" "', argument " "2"" of type '" "char const *""'");
-  }
-  arg2 = reinterpret_cast< char * >(buf2);
-  result = (helics_status)helicsFederateInfoSetCoreTypeFromString(arg1,(char const *)arg2);
-  _outv = SWIG_From_int(static_cast< int >(result));
-  if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
-  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
-  return _out;
-fail:
-  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
-  return octave_value_list();
-}
-
-
-SWIG_DEFUN( helicsFederateInfoSetCoreType, _wrap_helicsFederateInfoSetCoreType, _wrap_helicsFederateInfoSetCoreType_texinfo ) {
-  helics_federate_info_t arg1 = (helics_federate_info_t) 0 ;
+SWIG_DEFUN( helicsFederateInfoSetCoreType, _wrap_helicsFederateInfoSetCoreType, std::string() ) {
+  helics_federate_info arg1 = (helics_federate_info) 0 ;
   int arg2 ;
+  helics_error *arg3 = (helics_error *) 0 ;
   int res1 ;
   int val2 ;
   int ecode2 = 0 ;
+  helics_error etemp3 ;
   octave_value_list _out;
   octave_value_list *_outp=&_out;
   octave_value _outv;
-  helics_status result;
   
+  {
+    etemp3=helicsErrorInitialize();
+    arg3=&etemp3;
+  }
   if (!SWIG_check_num_args("helicsFederateInfoSetCoreType",args.length(),2,2,0)) {
     SWIG_fail;
   }
   res1 = SWIG_ConvertPtr(args(0),SWIG_as_voidptrptr(&arg1), 0, 0);
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateInfoSetCoreType" "', argument " "1"" of type '" "helics_federate_info_t""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateInfoSetCoreType" "', argument " "1"" of type '" "helics_federate_info""'"); 
   }
   ecode2 = SWIG_AsVal_int(args(1), &val2);
   if (!SWIG_IsOK(ecode2)) {
     SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "helicsFederateInfoSetCoreType" "', argument " "2"" of type '" "int""'");
   } 
   arg2 = static_cast< int >(val2);
-  result = (helics_status)helicsFederateInfoSetCoreType(arg1,arg2);
-  _outv = SWIG_From_int(static_cast< int >(result));
+  helicsFederateInfoSetCoreType(arg1,arg2,arg3);
+  _outv = octave_value();
   if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg3);
+    }
+  }
   return _out;
 fail:
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg3);
+    }
+  }
   return octave_value_list();
 }
 
 
-SWIG_DEFUN( helicsFederateInfoSetFlag, _wrap_helicsFederateInfoSetFlag, _wrap_helicsFederateInfoSetFlag_texinfo ) {
-  helics_federate_info_t arg1 = (helics_federate_info_t) 0 ;
+SWIG_DEFUN( helicsFederateInfoSetCoreTypeFromString, _wrap_helicsFederateInfoSetCoreTypeFromString, std::string() ) {
+  helics_federate_info arg1 = (helics_federate_info) 0 ;
+  char *arg2 = (char *) 0 ;
+  helics_error *arg3 = (helics_error *) 0 ;
+  int res1 ;
+  int res2 ;
+  char *buf2 = 0 ;
+  int alloc2 = 0 ;
+  helics_error etemp3 ;
+  octave_value_list _out;
+  octave_value_list *_outp=&_out;
+  octave_value _outv;
+  
+  {
+    etemp3=helicsErrorInitialize();
+    arg3=&etemp3;
+  }
+  if (!SWIG_check_num_args("helicsFederateInfoSetCoreTypeFromString",args.length(),2,2,0)) {
+    SWIG_fail;
+  }
+  res1 = SWIG_ConvertPtr(args(0),SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateInfoSetCoreTypeFromString" "', argument " "1"" of type '" "helics_federate_info""'"); 
+  }
+  res2 = SWIG_AsCharPtrAndSize(args(1), &buf2, NULL, &alloc2);
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsFederateInfoSetCoreTypeFromString" "', argument " "2"" of type '" "char const *""'");
+  }
+  arg2 = reinterpret_cast< char * >(buf2);
+  helicsFederateInfoSetCoreTypeFromString(arg1,(char const *)arg2,arg3);
+  _outv = octave_value();
+  if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
+  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg3);
+    }
+  }
+  return _out;
+fail:
+  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg3);
+    }
+  }
+  return octave_value_list();
+}
+
+
+SWIG_DEFUN( helicsFederateInfoSetBroker, _wrap_helicsFederateInfoSetBroker, std::string() ) {
+  helics_federate_info arg1 = (helics_federate_info) 0 ;
+  char *arg2 = (char *) 0 ;
+  helics_error *arg3 = (helics_error *) 0 ;
+  int res1 ;
+  int res2 ;
+  char *buf2 = 0 ;
+  int alloc2 = 0 ;
+  helics_error etemp3 ;
+  octave_value_list _out;
+  octave_value_list *_outp=&_out;
+  octave_value _outv;
+  
+  {
+    etemp3=helicsErrorInitialize();
+    arg3=&etemp3;
+  }
+  if (!SWIG_check_num_args("helicsFederateInfoSetBroker",args.length(),2,2,0)) {
+    SWIG_fail;
+  }
+  res1 = SWIG_ConvertPtr(args(0),SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateInfoSetBroker" "', argument " "1"" of type '" "helics_federate_info""'"); 
+  }
+  res2 = SWIG_AsCharPtrAndSize(args(1), &buf2, NULL, &alloc2);
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsFederateInfoSetBroker" "', argument " "2"" of type '" "char const *""'");
+  }
+  arg2 = reinterpret_cast< char * >(buf2);
+  helicsFederateInfoSetBroker(arg1,(char const *)arg2,arg3);
+  _outv = octave_value();
+  if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
+  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg3);
+    }
+  }
+  return _out;
+fail:
+  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg3);
+    }
+  }
+  return octave_value_list();
+}
+
+
+SWIG_DEFUN( helicsFederateInfoSetBrokerKey, _wrap_helicsFederateInfoSetBrokerKey, std::string() ) {
+  helics_federate_info arg1 = (helics_federate_info) 0 ;
+  char *arg2 = (char *) 0 ;
+  helics_error *arg3 = (helics_error *) 0 ;
+  int res1 ;
+  int res2 ;
+  char *buf2 = 0 ;
+  int alloc2 = 0 ;
+  helics_error etemp3 ;
+  octave_value_list _out;
+  octave_value_list *_outp=&_out;
+  octave_value _outv;
+  
+  {
+    etemp3=helicsErrorInitialize();
+    arg3=&etemp3;
+  }
+  if (!SWIG_check_num_args("helicsFederateInfoSetBrokerKey",args.length(),2,2,0)) {
+    SWIG_fail;
+  }
+  res1 = SWIG_ConvertPtr(args(0),SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateInfoSetBrokerKey" "', argument " "1"" of type '" "helics_federate_info""'"); 
+  }
+  res2 = SWIG_AsCharPtrAndSize(args(1), &buf2, NULL, &alloc2);
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsFederateInfoSetBrokerKey" "', argument " "2"" of type '" "char const *""'");
+  }
+  arg2 = reinterpret_cast< char * >(buf2);
+  helicsFederateInfoSetBrokerKey(arg1,(char const *)arg2,arg3);
+  _outv = octave_value();
+  if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
+  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg3);
+    }
+  }
+  return _out;
+fail:
+  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg3);
+    }
+  }
+  return octave_value_list();
+}
+
+
+SWIG_DEFUN( helicsFederateInfoSetBrokerPort, _wrap_helicsFederateInfoSetBrokerPort, std::string() ) {
+  helics_federate_info arg1 = (helics_federate_info) 0 ;
   int arg2 ;
-  helics_bool_t arg3 ;
+  helics_error *arg3 = (helics_error *) 0 ;
+  int res1 ;
+  int val2 ;
+  int ecode2 = 0 ;
+  helics_error etemp3 ;
+  octave_value_list _out;
+  octave_value_list *_outp=&_out;
+  octave_value _outv;
+  
+  {
+    etemp3=helicsErrorInitialize();
+    arg3=&etemp3;
+  }
+  if (!SWIG_check_num_args("helicsFederateInfoSetBrokerPort",args.length(),2,2,0)) {
+    SWIG_fail;
+  }
+  res1 = SWIG_ConvertPtr(args(0),SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateInfoSetBrokerPort" "', argument " "1"" of type '" "helics_federate_info""'"); 
+  }
+  ecode2 = SWIG_AsVal_int(args(1), &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "helicsFederateInfoSetBrokerPort" "', argument " "2"" of type '" "int""'");
+  } 
+  arg2 = static_cast< int >(val2);
+  helicsFederateInfoSetBrokerPort(arg1,arg2,arg3);
+  _outv = octave_value();
+  if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg3);
+    }
+  }
+  return _out;
+fail:
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg3);
+    }
+  }
+  return octave_value_list();
+}
+
+
+SWIG_DEFUN( helicsFederateInfoSetLocalPort, _wrap_helicsFederateInfoSetLocalPort, std::string() ) {
+  helics_federate_info arg1 = (helics_federate_info) 0 ;
+  char *arg2 = (char *) 0 ;
+  helics_error *arg3 = (helics_error *) 0 ;
+  int res1 ;
+  int res2 ;
+  char *buf2 = 0 ;
+  int alloc2 = 0 ;
+  helics_error etemp3 ;
+  octave_value_list _out;
+  octave_value_list *_outp=&_out;
+  octave_value _outv;
+  
+  {
+    etemp3=helicsErrorInitialize();
+    arg3=&etemp3;
+  }
+  if (!SWIG_check_num_args("helicsFederateInfoSetLocalPort",args.length(),2,2,0)) {
+    SWIG_fail;
+  }
+  res1 = SWIG_ConvertPtr(args(0),SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateInfoSetLocalPort" "', argument " "1"" of type '" "helics_federate_info""'"); 
+  }
+  res2 = SWIG_AsCharPtrAndSize(args(1), &buf2, NULL, &alloc2);
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsFederateInfoSetLocalPort" "', argument " "2"" of type '" "char const *""'");
+  }
+  arg2 = reinterpret_cast< char * >(buf2);
+  helicsFederateInfoSetLocalPort(arg1,(char const *)arg2,arg3);
+  _outv = octave_value();
+  if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
+  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg3);
+    }
+  }
+  return _out;
+fail:
+  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg3);
+    }
+  }
+  return octave_value_list();
+}
+
+
+SWIG_DEFUN( helicsGetPropertyIndex, _wrap_helicsGetPropertyIndex, std::string() ) {
+  char *arg1 = (char *) 0 ;
+  int res1 ;
+  char *buf1 = 0 ;
+  int alloc1 = 0 ;
+  octave_value_list _out;
+  octave_value_list *_outp=&_out;
+  octave_value _outv;
+  int result;
+  
+  if (!SWIG_check_num_args("helicsGetPropertyIndex",args.length(),1,1,0)) {
+    SWIG_fail;
+  }
+  res1 = SWIG_AsCharPtrAndSize(args(0), &buf1, NULL, &alloc1);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsGetPropertyIndex" "', argument " "1"" of type '" "char const *""'");
+  }
+  arg1 = reinterpret_cast< char * >(buf1);
+  result = (int)helicsGetPropertyIndex((char const *)arg1);
+  _outv = SWIG_From_int(static_cast< int >(result));
+  if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
+  if (alloc1 == SWIG_NEWOBJ) delete[] buf1;
+  return _out;
+fail:
+  if (alloc1 == SWIG_NEWOBJ) delete[] buf1;
+  return octave_value_list();
+}
+
+
+SWIG_DEFUN( helicsGetOptionIndex, _wrap_helicsGetOptionIndex, std::string() ) {
+  char *arg1 = (char *) 0 ;
+  int res1 ;
+  char *buf1 = 0 ;
+  int alloc1 = 0 ;
+  octave_value_list _out;
+  octave_value_list *_outp=&_out;
+  octave_value _outv;
+  int result;
+  
+  if (!SWIG_check_num_args("helicsGetOptionIndex",args.length(),1,1,0)) {
+    SWIG_fail;
+  }
+  res1 = SWIG_AsCharPtrAndSize(args(0), &buf1, NULL, &alloc1);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsGetOptionIndex" "', argument " "1"" of type '" "char const *""'");
+  }
+  arg1 = reinterpret_cast< char * >(buf1);
+  result = (int)helicsGetOptionIndex((char const *)arg1);
+  _outv = SWIG_From_int(static_cast< int >(result));
+  if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
+  if (alloc1 == SWIG_NEWOBJ) delete[] buf1;
+  return _out;
+fail:
+  if (alloc1 == SWIG_NEWOBJ) delete[] buf1;
+  return octave_value_list();
+}
+
+
+SWIG_DEFUN( helicsFederateInfoSetFlagOption, _wrap_helicsFederateInfoSetFlagOption, std::string() ) {
+  helics_federate_info arg1 = (helics_federate_info) 0 ;
+  int arg2 ;
+  helics_bool arg3 ;
+  helics_error *arg4 = (helics_error *) 0 ;
   int res1 ;
   int val2 ;
   int ecode2 = 0 ;
   int val3 ;
   int ecode3 = 0 ;
+  helics_error etemp4 ;
   octave_value_list _out;
   octave_value_list *_outp=&_out;
   octave_value _outv;
-  helics_status result;
   
-  if (!SWIG_check_num_args("helicsFederateInfoSetFlag",args.length(),3,3,0)) {
+  {
+    etemp4=helicsErrorInitialize();
+    arg4=&etemp4;
+  }
+  if (!SWIG_check_num_args("helicsFederateInfoSetFlagOption",args.length(),3,3,0)) {
     SWIG_fail;
   }
   res1 = SWIG_ConvertPtr(args(0),SWIG_as_voidptrptr(&arg1), 0, 0);
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateInfoSetFlag" "', argument " "1"" of type '" "helics_federate_info_t""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateInfoSetFlagOption" "', argument " "1"" of type '" "helics_federate_info""'"); 
   }
   ecode2 = SWIG_AsVal_int(args(1), &val2);
   if (!SWIG_IsOK(ecode2)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "helicsFederateInfoSetFlag" "', argument " "2"" of type '" "int""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "helicsFederateInfoSetFlagOption" "', argument " "2"" of type '" "int""'");
   } 
   arg2 = static_cast< int >(val2);
   ecode3 = SWIG_AsVal_int(args(2), &val3);
   if (!SWIG_IsOK(ecode3)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "helicsFederateInfoSetFlag" "', argument " "3"" of type '" "helics_bool_t""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "helicsFederateInfoSetFlagOption" "', argument " "3"" of type '" "helics_bool""'");
   } 
-  arg3 = static_cast< helics_bool_t >(val3);
-  result = (helics_status)helicsFederateInfoSetFlag(arg1,arg2,arg3);
-  _outv = SWIG_From_int(static_cast< int >(result));
+  arg3 = static_cast< helics_bool >(val3);
+  helicsFederateInfoSetFlagOption(arg1,arg2,arg3,arg4);
+  _outv = octave_value();
   if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
+  {
+    if (arg4->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg4);
+    }
+  }
   return _out;
 fail:
+  {
+    if (arg4->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg4);
+    }
+  }
   return octave_value_list();
 }
 
 
-SWIG_DEFUN( helicsFederateInfoSetOutputDelay, _wrap_helicsFederateInfoSetOutputDelay, _wrap_helicsFederateInfoSetOutputDelay_texinfo ) {
-  helics_federate_info_t arg1 = (helics_federate_info_t) 0 ;
-  helics_time_t arg2 ;
+SWIG_DEFUN( helicsFederateInfoSetSeparator, _wrap_helicsFederateInfoSetSeparator, std::string() ) {
+  helics_federate_info arg1 = (helics_federate_info) 0 ;
+  char arg2 ;
+  helics_error *arg3 = (helics_error *) 0 ;
   int res1 ;
-  double val2 ;
+  char val2 ;
   int ecode2 = 0 ;
+  helics_error etemp3 ;
   octave_value_list _out;
   octave_value_list *_outp=&_out;
   octave_value _outv;
-  helics_status result;
   
-  if (!SWIG_check_num_args("helicsFederateInfoSetOutputDelay",args.length(),2,2,0)) {
+  {
+    etemp3=helicsErrorInitialize();
+    arg3=&etemp3;
+  }
+  if (!SWIG_check_num_args("helicsFederateInfoSetSeparator",args.length(),2,2,0)) {
     SWIG_fail;
   }
   res1 = SWIG_ConvertPtr(args(0),SWIG_as_voidptrptr(&arg1), 0, 0);
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateInfoSetOutputDelay" "', argument " "1"" of type '" "helics_federate_info_t""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateInfoSetSeparator" "', argument " "1"" of type '" "helics_federate_info""'"); 
   }
-  ecode2 = SWIG_AsVal_double(args(1), &val2);
+  ecode2 = SWIG_AsVal_char(args(1), &val2);
   if (!SWIG_IsOK(ecode2)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "helicsFederateInfoSetOutputDelay" "', argument " "2"" of type '" "helics_time_t""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "helicsFederateInfoSetSeparator" "', argument " "2"" of type '" "char""'");
   } 
-  arg2 = static_cast< helics_time_t >(val2);
-  result = (helics_status)helicsFederateInfoSetOutputDelay(arg1,arg2);
-  _outv = SWIG_From_int(static_cast< int >(result));
+  arg2 = static_cast< char >(val2);
+  helicsFederateInfoSetSeparator(arg1,arg2,arg3);
+  _outv = octave_value();
   if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg3);
+    }
+  }
   return _out;
 fail:
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg3);
+    }
+  }
   return octave_value_list();
 }
 
 
-SWIG_DEFUN( helicsFederateInfoSetTimeDelta, _wrap_helicsFederateInfoSetTimeDelta, _wrap_helicsFederateInfoSetTimeDelta_texinfo ) {
-  helics_federate_info_t arg1 = (helics_federate_info_t) 0 ;
-  helics_time_t arg2 ;
-  int res1 ;
-  double val2 ;
-  int ecode2 = 0 ;
-  octave_value_list _out;
-  octave_value_list *_outp=&_out;
-  octave_value _outv;
-  helics_status result;
-  
-  if (!SWIG_check_num_args("helicsFederateInfoSetTimeDelta",args.length(),2,2,0)) {
-    SWIG_fail;
-  }
-  res1 = SWIG_ConvertPtr(args(0),SWIG_as_voidptrptr(&arg1), 0, 0);
-  if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateInfoSetTimeDelta" "', argument " "1"" of type '" "helics_federate_info_t""'"); 
-  }
-  ecode2 = SWIG_AsVal_double(args(1), &val2);
-  if (!SWIG_IsOK(ecode2)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "helicsFederateInfoSetTimeDelta" "', argument " "2"" of type '" "helics_time_t""'");
-  } 
-  arg2 = static_cast< helics_time_t >(val2);
-  result = (helics_status)helicsFederateInfoSetTimeDelta(arg1,arg2);
-  _outv = SWIG_From_int(static_cast< int >(result));
-  if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
-  return _out;
-fail:
-  return octave_value_list();
-}
-
-
-SWIG_DEFUN( helicsFederateInfoSetInputDelay, _wrap_helicsFederateInfoSetInputDelay, _wrap_helicsFederateInfoSetInputDelay_texinfo ) {
-  helics_federate_info_t arg1 = (helics_federate_info_t) 0 ;
-  helics_time_t arg2 ;
-  int res1 ;
-  double val2 ;
-  int ecode2 = 0 ;
-  octave_value_list _out;
-  octave_value_list *_outp=&_out;
-  octave_value _outv;
-  helics_status result;
-  
-  if (!SWIG_check_num_args("helicsFederateInfoSetInputDelay",args.length(),2,2,0)) {
-    SWIG_fail;
-  }
-  res1 = SWIG_ConvertPtr(args(0),SWIG_as_voidptrptr(&arg1), 0, 0);
-  if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateInfoSetInputDelay" "', argument " "1"" of type '" "helics_federate_info_t""'"); 
-  }
-  ecode2 = SWIG_AsVal_double(args(1), &val2);
-  if (!SWIG_IsOK(ecode2)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "helicsFederateInfoSetInputDelay" "', argument " "2"" of type '" "helics_time_t""'");
-  } 
-  arg2 = static_cast< helics_time_t >(val2);
-  result = (helics_status)helicsFederateInfoSetInputDelay(arg1,arg2);
-  _outv = SWIG_From_int(static_cast< int >(result));
-  if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
-  return _out;
-fail:
-  return octave_value_list();
-}
-
-
-SWIG_DEFUN( helicsFederateInfoSetTimeOffset, _wrap_helicsFederateInfoSetTimeOffset, _wrap_helicsFederateInfoSetTimeOffset_texinfo ) {
-  helics_federate_info_t arg1 = (helics_federate_info_t) 0 ;
-  helics_time_t arg2 ;
-  int res1 ;
-  double val2 ;
-  int ecode2 = 0 ;
-  octave_value_list _out;
-  octave_value_list *_outp=&_out;
-  octave_value _outv;
-  helics_status result;
-  
-  if (!SWIG_check_num_args("helicsFederateInfoSetTimeOffset",args.length(),2,2,0)) {
-    SWIG_fail;
-  }
-  res1 = SWIG_ConvertPtr(args(0),SWIG_as_voidptrptr(&arg1), 0, 0);
-  if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateInfoSetTimeOffset" "', argument " "1"" of type '" "helics_federate_info_t""'"); 
-  }
-  ecode2 = SWIG_AsVal_double(args(1), &val2);
-  if (!SWIG_IsOK(ecode2)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "helicsFederateInfoSetTimeOffset" "', argument " "2"" of type '" "helics_time_t""'");
-  } 
-  arg2 = static_cast< helics_time_t >(val2);
-  result = (helics_status)helicsFederateInfoSetTimeOffset(arg1,arg2);
-  _outv = SWIG_From_int(static_cast< int >(result));
-  if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
-  return _out;
-fail:
-  return octave_value_list();
-}
-
-
-SWIG_DEFUN( helicsFederateInfoSetPeriod, _wrap_helicsFederateInfoSetPeriod, _wrap_helicsFederateInfoSetPeriod_texinfo ) {
-  helics_federate_info_t arg1 = (helics_federate_info_t) 0 ;
-  helics_time_t arg2 ;
-  int res1 ;
-  double val2 ;
-  int ecode2 = 0 ;
-  octave_value_list _out;
-  octave_value_list *_outp=&_out;
-  octave_value _outv;
-  helics_status result;
-  
-  if (!SWIG_check_num_args("helicsFederateInfoSetPeriod",args.length(),2,2,0)) {
-    SWIG_fail;
-  }
-  res1 = SWIG_ConvertPtr(args(0),SWIG_as_voidptrptr(&arg1), 0, 0);
-  if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateInfoSetPeriod" "', argument " "1"" of type '" "helics_federate_info_t""'"); 
-  }
-  ecode2 = SWIG_AsVal_double(args(1), &val2);
-  if (!SWIG_IsOK(ecode2)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "helicsFederateInfoSetPeriod" "', argument " "2"" of type '" "helics_time_t""'");
-  } 
-  arg2 = static_cast< helics_time_t >(val2);
-  result = (helics_status)helicsFederateInfoSetPeriod(arg1,arg2);
-  _outv = SWIG_From_int(static_cast< int >(result));
-  if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
-  return _out;
-fail:
-  return octave_value_list();
-}
-
-
-SWIG_DEFUN( helicsFederateInfoSetMaxIterations, _wrap_helicsFederateInfoSetMaxIterations, _wrap_helicsFederateInfoSetMaxIterations_texinfo ) {
-  helics_federate_info_t arg1 = (helics_federate_info_t) 0 ;
+SWIG_DEFUN( helicsFederateInfoSetTimeProperty, _wrap_helicsFederateInfoSetTimeProperty, std::string() ) {
+  helics_federate_info arg1 = (helics_federate_info) 0 ;
   int arg2 ;
+  helics_time arg3 ;
+  helics_error *arg4 = (helics_error *) 0 ;
   int res1 ;
   int val2 ;
   int ecode2 = 0 ;
+  double val3 ;
+  int ecode3 = 0 ;
+  helics_error etemp4 ;
   octave_value_list _out;
   octave_value_list *_outp=&_out;
   octave_value _outv;
-  helics_status result;
   
-  if (!SWIG_check_num_args("helicsFederateInfoSetMaxIterations",args.length(),2,2,0)) {
+  {
+    etemp4=helicsErrorInitialize();
+    arg4=&etemp4;
+  }
+  if (!SWIG_check_num_args("helicsFederateInfoSetTimeProperty",args.length(),3,3,0)) {
     SWIG_fail;
   }
   res1 = SWIG_ConvertPtr(args(0),SWIG_as_voidptrptr(&arg1), 0, 0);
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateInfoSetMaxIterations" "', argument " "1"" of type '" "helics_federate_info_t""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateInfoSetTimeProperty" "', argument " "1"" of type '" "helics_federate_info""'"); 
   }
   ecode2 = SWIG_AsVal_int(args(1), &val2);
   if (!SWIG_IsOK(ecode2)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "helicsFederateInfoSetMaxIterations" "', argument " "2"" of type '" "int""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "helicsFederateInfoSetTimeProperty" "', argument " "2"" of type '" "int""'");
   } 
   arg2 = static_cast< int >(val2);
-  result = (helics_status)helicsFederateInfoSetMaxIterations(arg1,arg2);
-  _outv = SWIG_From_int(static_cast< int >(result));
+  ecode3 = SWIG_AsVal_double(args(2), &val3);
+  if (!SWIG_IsOK(ecode3)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "helicsFederateInfoSetTimeProperty" "', argument " "3"" of type '" "helics_time""'");
+  } 
+  arg3 = static_cast< helics_time >(val3);
+  helicsFederateInfoSetTimeProperty(arg1,arg2,arg3,arg4);
+  _outv = octave_value();
   if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
+  {
+    if (arg4->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg4);
+    }
+  }
   return _out;
 fail:
+  {
+    if (arg4->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg4);
+    }
+  }
   return octave_value_list();
 }
 
 
-SWIG_DEFUN( helicsFederateInfoSetLoggingLevel, _wrap_helicsFederateInfoSetLoggingLevel, _wrap_helicsFederateInfoSetLoggingLevel_texinfo ) {
-  helics_federate_info_t arg1 = (helics_federate_info_t) 0 ;
+SWIG_DEFUN( helicsFederateInfoSetIntegerProperty, _wrap_helicsFederateInfoSetIntegerProperty, std::string() ) {
+  helics_federate_info arg1 = (helics_federate_info) 0 ;
   int arg2 ;
+  int arg3 ;
+  helics_error *arg4 = (helics_error *) 0 ;
   int res1 ;
   int val2 ;
   int ecode2 = 0 ;
+  int val3 ;
+  int ecode3 = 0 ;
+  helics_error etemp4 ;
   octave_value_list _out;
   octave_value_list *_outp=&_out;
   octave_value _outv;
-  helics_status result;
   
-  if (!SWIG_check_num_args("helicsFederateInfoSetLoggingLevel",args.length(),2,2,0)) {
+  {
+    etemp4=helicsErrorInitialize();
+    arg4=&etemp4;
+  }
+  if (!SWIG_check_num_args("helicsFederateInfoSetIntegerProperty",args.length(),3,3,0)) {
     SWIG_fail;
   }
   res1 = SWIG_ConvertPtr(args(0),SWIG_as_voidptrptr(&arg1), 0, 0);
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateInfoSetLoggingLevel" "', argument " "1"" of type '" "helics_federate_info_t""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateInfoSetIntegerProperty" "', argument " "1"" of type '" "helics_federate_info""'"); 
   }
   ecode2 = SWIG_AsVal_int(args(1), &val2);
   if (!SWIG_IsOK(ecode2)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "helicsFederateInfoSetLoggingLevel" "', argument " "2"" of type '" "int""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "helicsFederateInfoSetIntegerProperty" "', argument " "2"" of type '" "int""'");
   } 
   arg2 = static_cast< int >(val2);
-  result = (helics_status)helicsFederateInfoSetLoggingLevel(arg1,arg2);
-  _outv = SWIG_From_int(static_cast< int >(result));
+  ecode3 = SWIG_AsVal_int(args(2), &val3);
+  if (!SWIG_IsOK(ecode3)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "helicsFederateInfoSetIntegerProperty" "', argument " "3"" of type '" "int""'");
+  } 
+  arg3 = static_cast< int >(val3);
+  helicsFederateInfoSetIntegerProperty(arg1,arg2,arg3,arg4);
+  _outv = octave_value();
   if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
+  {
+    if (arg4->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg4);
+    }
+  }
   return _out;
 fail:
+  {
+    if (arg4->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg4);
+    }
+  }
   return octave_value_list();
 }
 
 
-SWIG_DEFUN( helicsFederateFinalize, _wrap_helicsFederateFinalize, _wrap_helicsFederateFinalize_texinfo ) {
+SWIG_DEFUN( helicsFederateRegisterInterfaces, _wrap_helicsFederateRegisterInterfaces, std::string() ) {
   helics_federate arg1 = (helics_federate) 0 ;
+  char *arg2 = (char *) 0 ;
+  helics_error *arg3 = (helics_error *) 0 ;
   int res1 ;
+  int res2 ;
+  char *buf2 = 0 ;
+  int alloc2 = 0 ;
+  helics_error etemp3 ;
   octave_value_list _out;
   octave_value_list *_outp=&_out;
   octave_value _outv;
-  helics_status result;
   
+  {
+    etemp3=helicsErrorInitialize();
+    arg3=&etemp3;
+  }
+  if (!SWIG_check_num_args("helicsFederateRegisterInterfaces",args.length(),2,2,0)) {
+    SWIG_fail;
+  }
+  res1 = SWIG_ConvertPtr(args(0),SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateRegisterInterfaces" "', argument " "1"" of type '" "helics_federate""'"); 
+  }
+  res2 = SWIG_AsCharPtrAndSize(args(1), &buf2, NULL, &alloc2);
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsFederateRegisterInterfaces" "', argument " "2"" of type '" "char const *""'");
+  }
+  arg2 = reinterpret_cast< char * >(buf2);
+  helicsFederateRegisterInterfaces(arg1,(char const *)arg2,arg3);
+  _outv = octave_value();
+  if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
+  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg3);
+    }
+  }
+  return _out;
+fail:
+  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg3);
+    }
+  }
+  return octave_value_list();
+}
+
+
+SWIG_DEFUN( helicsFederateFinalize, _wrap_helicsFederateFinalize, std::string() ) {
+  helics_federate arg1 = (helics_federate) 0 ;
+  helics_error *arg2 = (helics_error *) 0 ;
+  int res1 ;
+  helics_error etemp2 ;
+  octave_value_list _out;
+  octave_value_list *_outp=&_out;
+  octave_value _outv;
+  
+  {
+    etemp2=helicsErrorInitialize();
+    arg2=&etemp2;
+  }
   if (!SWIG_check_num_args("helicsFederateFinalize",args.length(),1,1,0)) {
     SWIG_fail;
   }
@@ -5603,16 +5976,110 @@ SWIG_DEFUN( helicsFederateFinalize, _wrap_helicsFederateFinalize, _wrap_helicsFe
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateFinalize" "', argument " "1"" of type '" "helics_federate""'"); 
   }
-  result = (helics_status)helicsFederateFinalize(arg1);
-  _outv = SWIG_From_int(static_cast< int >(result));
+  helicsFederateFinalize(arg1,arg2);
+  _outv = octave_value();
   if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
+  {
+    if (arg2->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg2);
+    }
+  }
   return _out;
 fail:
+  {
+    if (arg2->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg2);
+    }
+  }
   return octave_value_list();
 }
 
 
-SWIG_DEFUN( helicsFederateFree, _wrap_helicsFederateFree, _wrap_helicsFederateFree_texinfo ) {
+SWIG_DEFUN( helicsFederateFinalizeAsync, _wrap_helicsFederateFinalizeAsync, std::string() ) {
+  helics_federate arg1 = (helics_federate) 0 ;
+  helics_error *arg2 = (helics_error *) 0 ;
+  int res1 ;
+  helics_error etemp2 ;
+  octave_value_list _out;
+  octave_value_list *_outp=&_out;
+  octave_value _outv;
+  
+  {
+    etemp2=helicsErrorInitialize();
+    arg2=&etemp2;
+  }
+  if (!SWIG_check_num_args("helicsFederateFinalizeAsync",args.length(),1,1,0)) {
+    SWIG_fail;
+  }
+  res1 = SWIG_ConvertPtr(args(0),SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateFinalizeAsync" "', argument " "1"" of type '" "helics_federate""'"); 
+  }
+  helicsFederateFinalizeAsync(arg1,arg2);
+  _outv = octave_value();
+  if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
+  {
+    if (arg2->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg2);
+    }
+  }
+  return _out;
+fail:
+  {
+    if (arg2->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg2);
+    }
+  }
+  return octave_value_list();
+}
+
+
+SWIG_DEFUN( helicsFederateFinalizeComplete, _wrap_helicsFederateFinalizeComplete, std::string() ) {
+  helics_federate arg1 = (helics_federate) 0 ;
+  helics_error *arg2 = (helics_error *) 0 ;
+  int res1 ;
+  helics_error etemp2 ;
+  octave_value_list _out;
+  octave_value_list *_outp=&_out;
+  octave_value _outv;
+  
+  {
+    etemp2=helicsErrorInitialize();
+    arg2=&etemp2;
+  }
+  if (!SWIG_check_num_args("helicsFederateFinalizeComplete",args.length(),1,1,0)) {
+    SWIG_fail;
+  }
+  res1 = SWIG_ConvertPtr(args(0),SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateFinalizeComplete" "', argument " "1"" of type '" "helics_federate""'"); 
+  }
+  helicsFederateFinalizeComplete(arg1,arg2);
+  _outv = octave_value();
+  if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
+  {
+    if (arg2->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg2);
+    }
+  }
+  return _out;
+fail:
+  {
+    if (arg2->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg2);
+    }
+  }
+  return octave_value_list();
+}
+
+
+SWIG_DEFUN( helicsFederateFree, _wrap_helicsFederateFree, std::string() ) {
   helics_federate arg1 = (helics_federate) 0 ;
   int res1 ;
   octave_value_list _out;
@@ -5635,7 +6102,7 @@ fail:
 }
 
 
-SWIG_DEFUN( helicsCloseLibrary, _wrap_helicsCloseLibrary, _wrap_helicsCloseLibrary_texinfo ) {
+SWIG_DEFUN( helicsCloseLibrary, _wrap_helicsCloseLibrary, std::string() ) {
   octave_value_list _out;
   octave_value_list *_outp=&_out;
   octave_value _outv;
@@ -5652,62 +6119,102 @@ fail:
 }
 
 
-SWIG_DEFUN( helicsFederateEnterInitializationMode, _wrap_helicsFederateEnterInitializationMode, _wrap_helicsFederateEnterInitializationMode_texinfo ) {
+SWIG_DEFUN( helicsFederateEnterInitializingMode, _wrap_helicsFederateEnterInitializingMode, std::string() ) {
   helics_federate arg1 = (helics_federate) 0 ;
+  helics_error *arg2 = (helics_error *) 0 ;
   int res1 ;
+  helics_error etemp2 ;
   octave_value_list _out;
   octave_value_list *_outp=&_out;
   octave_value _outv;
-  helics_status result;
   
-  if (!SWIG_check_num_args("helicsFederateEnterInitializationMode",args.length(),1,1,0)) {
+  {
+    etemp2=helicsErrorInitialize();
+    arg2=&etemp2;
+  }
+  if (!SWIG_check_num_args("helicsFederateEnterInitializingMode",args.length(),1,1,0)) {
     SWIG_fail;
   }
   res1 = SWIG_ConvertPtr(args(0),SWIG_as_voidptrptr(&arg1), 0, 0);
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateEnterInitializationMode" "', argument " "1"" of type '" "helics_federate""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateEnterInitializingMode" "', argument " "1"" of type '" "helics_federate""'"); 
   }
-  result = (helics_status)helicsFederateEnterInitializationMode(arg1);
-  _outv = SWIG_From_int(static_cast< int >(result));
+  helicsFederateEnterInitializingMode(arg1,arg2);
+  _outv = octave_value();
   if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
+  {
+    if (arg2->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg2);
+    }
+  }
   return _out;
 fail:
+  {
+    if (arg2->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg2);
+    }
+  }
   return octave_value_list();
 }
 
 
-SWIG_DEFUN( helicsFederateEnterInitializationModeAsync, _wrap_helicsFederateEnterInitializationModeAsync, _wrap_helicsFederateEnterInitializationModeAsync_texinfo ) {
+SWIG_DEFUN( helicsFederateEnterInitializingModeAsync, _wrap_helicsFederateEnterInitializingModeAsync, std::string() ) {
   helics_federate arg1 = (helics_federate) 0 ;
+  helics_error *arg2 = (helics_error *) 0 ;
   int res1 ;
+  helics_error etemp2 ;
   octave_value_list _out;
   octave_value_list *_outp=&_out;
   octave_value _outv;
-  helics_status result;
   
-  if (!SWIG_check_num_args("helicsFederateEnterInitializationModeAsync",args.length(),1,1,0)) {
+  {
+    etemp2=helicsErrorInitialize();
+    arg2=&etemp2;
+  }
+  if (!SWIG_check_num_args("helicsFederateEnterInitializingModeAsync",args.length(),1,1,0)) {
     SWIG_fail;
   }
   res1 = SWIG_ConvertPtr(args(0),SWIG_as_voidptrptr(&arg1), 0, 0);
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateEnterInitializationModeAsync" "', argument " "1"" of type '" "helics_federate""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateEnterInitializingModeAsync" "', argument " "1"" of type '" "helics_federate""'"); 
   }
-  result = (helics_status)helicsFederateEnterInitializationModeAsync(arg1);
-  _outv = SWIG_From_int(static_cast< int >(result));
+  helicsFederateEnterInitializingModeAsync(arg1,arg2);
+  _outv = octave_value();
   if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
+  {
+    if (arg2->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg2);
+    }
+  }
   return _out;
 fail:
+  {
+    if (arg2->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg2);
+    }
+  }
   return octave_value_list();
 }
 
 
-SWIG_DEFUN( helicsFederateIsAsyncOperationCompleted, _wrap_helicsFederateIsAsyncOperationCompleted, _wrap_helicsFederateIsAsyncOperationCompleted_texinfo ) {
+SWIG_DEFUN( helicsFederateIsAsyncOperationCompleted, _wrap_helicsFederateIsAsyncOperationCompleted, std::string() ) {
   helics_federate arg1 = (helics_federate) 0 ;
+  helics_error *arg2 = (helics_error *) 0 ;
   int res1 ;
+  helics_error etemp2 ;
   octave_value_list _out;
   octave_value_list *_outp=&_out;
   octave_value _outv;
-  helics_bool_t result;
+  helics_bool result;
   
+  {
+    etemp2=helicsErrorInitialize();
+    arg2=&etemp2;
+  }
   if (!SWIG_check_num_args("helicsFederateIsAsyncOperationCompleted",args.length(),1,1,0)) {
     SWIG_fail;
   }
@@ -5715,231 +6222,346 @@ SWIG_DEFUN( helicsFederateIsAsyncOperationCompleted, _wrap_helicsFederateIsAsync
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateIsAsyncOperationCompleted" "', argument " "1"" of type '" "helics_federate""'"); 
   }
-  result = (helics_bool_t)helicsFederateIsAsyncOperationCompleted(arg1);
+  result = (helics_bool)helicsFederateIsAsyncOperationCompleted(arg1,arg2);
   _outv = SWIG_From_int(static_cast< int >(result));
   if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
+  {
+    if (arg2->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg2);
+    }
+  }
   return _out;
 fail:
+  {
+    if (arg2->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg2);
+    }
+  }
   return octave_value_list();
 }
 
 
-SWIG_DEFUN( helicsFederateEnterInitializationModeComplete, _wrap_helicsFederateEnterInitializationModeComplete, _wrap_helicsFederateEnterInitializationModeComplete_texinfo ) {
+SWIG_DEFUN( helicsFederateEnterInitializingModeComplete, _wrap_helicsFederateEnterInitializingModeComplete, std::string() ) {
   helics_federate arg1 = (helics_federate) 0 ;
+  helics_error *arg2 = (helics_error *) 0 ;
   int res1 ;
+  helics_error etemp2 ;
   octave_value_list _out;
   octave_value_list *_outp=&_out;
   octave_value _outv;
-  helics_status result;
   
-  if (!SWIG_check_num_args("helicsFederateEnterInitializationModeComplete",args.length(),1,1,0)) {
+  {
+    etemp2=helicsErrorInitialize();
+    arg2=&etemp2;
+  }
+  if (!SWIG_check_num_args("helicsFederateEnterInitializingModeComplete",args.length(),1,1,0)) {
     SWIG_fail;
   }
   res1 = SWIG_ConvertPtr(args(0),SWIG_as_voidptrptr(&arg1), 0, 0);
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateEnterInitializationModeComplete" "', argument " "1"" of type '" "helics_federate""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateEnterInitializingModeComplete" "', argument " "1"" of type '" "helics_federate""'"); 
   }
-  result = (helics_status)helicsFederateEnterInitializationModeComplete(arg1);
-  _outv = SWIG_From_int(static_cast< int >(result));
+  helicsFederateEnterInitializingModeComplete(arg1,arg2);
+  _outv = octave_value();
   if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
+  {
+    if (arg2->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg2);
+    }
+  }
   return _out;
 fail:
+  {
+    if (arg2->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg2);
+    }
+  }
   return octave_value_list();
 }
 
 
-SWIG_DEFUN( helicsFederateEnterExecutionMode, _wrap_helicsFederateEnterExecutionMode, _wrap_helicsFederateEnterExecutionMode_texinfo ) {
+SWIG_DEFUN( helicsFederateEnterExecutingMode, _wrap_helicsFederateEnterExecutingMode, std::string() ) {
   helics_federate arg1 = (helics_federate) 0 ;
+  helics_error *arg2 = (helics_error *) 0 ;
   int res1 ;
+  helics_error etemp2 ;
   octave_value_list _out;
   octave_value_list *_outp=&_out;
   octave_value _outv;
-  helics_status result;
   
-  if (!SWIG_check_num_args("helicsFederateEnterExecutionMode",args.length(),1,1,0)) {
+  {
+    etemp2=helicsErrorInitialize();
+    arg2=&etemp2;
+  }
+  if (!SWIG_check_num_args("helicsFederateEnterExecutingMode",args.length(),1,1,0)) {
     SWIG_fail;
   }
   res1 = SWIG_ConvertPtr(args(0),SWIG_as_voidptrptr(&arg1), 0, 0);
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateEnterExecutionMode" "', argument " "1"" of type '" "helics_federate""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateEnterExecutingMode" "', argument " "1"" of type '" "helics_federate""'"); 
   }
-  result = (helics_status)helicsFederateEnterExecutionMode(arg1);
-  _outv = SWIG_From_int(static_cast< int >(result));
+  helicsFederateEnterExecutingMode(arg1,arg2);
+  _outv = octave_value();
   if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
+  {
+    if (arg2->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg2);
+    }
+  }
   return _out;
 fail:
+  {
+    if (arg2->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg2);
+    }
+  }
   return octave_value_list();
 }
 
 
-SWIG_DEFUN( helicsFederateEnterExecutionModeAsync, _wrap_helicsFederateEnterExecutionModeAsync, _wrap_helicsFederateEnterExecutionModeAsync_texinfo ) {
+SWIG_DEFUN( helicsFederateEnterExecutingModeAsync, _wrap_helicsFederateEnterExecutingModeAsync, std::string() ) {
   helics_federate arg1 = (helics_federate) 0 ;
+  helics_error *arg2 = (helics_error *) 0 ;
   int res1 ;
+  helics_error etemp2 ;
   octave_value_list _out;
   octave_value_list *_outp=&_out;
   octave_value _outv;
-  helics_status result;
   
-  if (!SWIG_check_num_args("helicsFederateEnterExecutionModeAsync",args.length(),1,1,0)) {
+  {
+    etemp2=helicsErrorInitialize();
+    arg2=&etemp2;
+  }
+  if (!SWIG_check_num_args("helicsFederateEnterExecutingModeAsync",args.length(),1,1,0)) {
     SWIG_fail;
   }
   res1 = SWIG_ConvertPtr(args(0),SWIG_as_voidptrptr(&arg1), 0, 0);
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateEnterExecutionModeAsync" "', argument " "1"" of type '" "helics_federate""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateEnterExecutingModeAsync" "', argument " "1"" of type '" "helics_federate""'"); 
   }
-  result = (helics_status)helicsFederateEnterExecutionModeAsync(arg1);
-  _outv = SWIG_From_int(static_cast< int >(result));
+  helicsFederateEnterExecutingModeAsync(arg1,arg2);
+  _outv = octave_value();
   if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
+  {
+    if (arg2->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg2);
+    }
+  }
   return _out;
 fail:
+  {
+    if (arg2->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg2);
+    }
+  }
   return octave_value_list();
 }
 
 
-SWIG_DEFUN( helicsFederateEnterExecutionModeComplete, _wrap_helicsFederateEnterExecutionModeComplete, _wrap_helicsFederateEnterExecutionModeComplete_texinfo ) {
+SWIG_DEFUN( helicsFederateEnterExecutingModeComplete, _wrap_helicsFederateEnterExecutingModeComplete, std::string() ) {
   helics_federate arg1 = (helics_federate) 0 ;
+  helics_error *arg2 = (helics_error *) 0 ;
   int res1 ;
+  helics_error etemp2 ;
   octave_value_list _out;
   octave_value_list *_outp=&_out;
   octave_value _outv;
-  helics_status result;
   
-  if (!SWIG_check_num_args("helicsFederateEnterExecutionModeComplete",args.length(),1,1,0)) {
+  {
+    etemp2=helicsErrorInitialize();
+    arg2=&etemp2;
+  }
+  if (!SWIG_check_num_args("helicsFederateEnterExecutingModeComplete",args.length(),1,1,0)) {
     SWIG_fail;
   }
   res1 = SWIG_ConvertPtr(args(0),SWIG_as_voidptrptr(&arg1), 0, 0);
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateEnterExecutionModeComplete" "', argument " "1"" of type '" "helics_federate""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateEnterExecutingModeComplete" "', argument " "1"" of type '" "helics_federate""'"); 
   }
-  result = (helics_status)helicsFederateEnterExecutionModeComplete(arg1);
-  _outv = SWIG_From_int(static_cast< int >(result));
+  helicsFederateEnterExecutingModeComplete(arg1,arg2);
+  _outv = octave_value();
   if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
+  {
+    if (arg2->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg2);
+    }
+  }
   return _out;
 fail:
+  {
+    if (arg2->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg2);
+    }
+  }
   return octave_value_list();
 }
 
 
-SWIG_DEFUN( helicsFederateEnterExecutionModeIterative, _wrap_helicsFederateEnterExecutionModeIterative, _wrap_helicsFederateEnterExecutionModeIterative_texinfo ) {
+SWIG_DEFUN( helicsFederateEnterExecutingModeIterative, _wrap_helicsFederateEnterExecutingModeIterative, std::string() ) {
   helics_federate arg1 = (helics_federate) 0 ;
   helics_iteration_request arg2 ;
-  helics_iteration_status *arg3 = (helics_iteration_status *) 0 ;
+  helics_error *arg3 = (helics_error *) 0 ;
   int res1 ;
   int val2 ;
   int ecode2 = 0 ;
-  helics_iteration_status temp3 ;
-  int res3 = SWIG_TMPOBJ ;
+  helics_error etemp3 ;
   octave_value_list _out;
   octave_value_list *_outp=&_out;
   octave_value _outv;
-  helics_status result;
+  helics_iteration_result result;
   
-  arg3 = &temp3;
-  if (!SWIG_check_num_args("helicsFederateEnterExecutionModeIterative",args.length(),2,2,0)) {
+  {
+    etemp3=helicsErrorInitialize();
+    arg3=&etemp3;
+  }
+  if (!SWIG_check_num_args("helicsFederateEnterExecutingModeIterative",args.length(),2,2,0)) {
     SWIG_fail;
   }
   res1 = SWIG_ConvertPtr(args(0),SWIG_as_voidptrptr(&arg1), 0, 0);
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateEnterExecutionModeIterative" "', argument " "1"" of type '" "helics_federate""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateEnterExecutingModeIterative" "', argument " "1"" of type '" "helics_federate""'"); 
   }
   ecode2 = SWIG_AsVal_int(args(1), &val2);
   if (!SWIG_IsOK(ecode2)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "helicsFederateEnterExecutionModeIterative" "', argument " "2"" of type '" "helics_iteration_request""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "helicsFederateEnterExecutingModeIterative" "', argument " "2"" of type '" "helics_iteration_request""'");
   } 
   arg2 = static_cast< helics_iteration_request >(val2);
-  result = (helics_status)helicsFederateEnterExecutionModeIterative(arg1,arg2,arg3);
+  result = (helics_iteration_result)helicsFederateEnterExecutingModeIterative(arg1,arg2,arg3);
   _outv = SWIG_From_int(static_cast< int >(result));
   if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
-  if (SWIG_IsTmpObj(res3)) {
-    _outp = SWIG_Octave_AppendOutput(_outp, SWIG_From_int((*arg3)));
-  } else {
-    int new_flags = SWIG_IsNewObj(res3) ? (SWIG_POINTER_OWN |  0 ) :  0 ;
-    _outp = SWIG_Octave_AppendOutput(_outp, SWIG_NewPointerObj((void*)(arg3), SWIGTYPE_p_helics_iteration_status, new_flags));
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg3);
+    }
   }
   return _out;
 fail:
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg3);
+    }
+  }
   return octave_value_list();
 }
 
 
-SWIG_DEFUN( helicsFederateEnterExecutionModeIterativeAsync, _wrap_helicsFederateEnterExecutionModeIterativeAsync, _wrap_helicsFederateEnterExecutionModeIterativeAsync_texinfo ) {
+SWIG_DEFUN( helicsFederateEnterExecutingModeIterativeAsync, _wrap_helicsFederateEnterExecutingModeIterativeAsync, std::string() ) {
   helics_federate arg1 = (helics_federate) 0 ;
   helics_iteration_request arg2 ;
+  helics_error *arg3 = (helics_error *) 0 ;
   int res1 ;
   int val2 ;
   int ecode2 = 0 ;
+  helics_error etemp3 ;
   octave_value_list _out;
   octave_value_list *_outp=&_out;
   octave_value _outv;
-  helics_status result;
   
-  if (!SWIG_check_num_args("helicsFederateEnterExecutionModeIterativeAsync",args.length(),2,2,0)) {
+  {
+    etemp3=helicsErrorInitialize();
+    arg3=&etemp3;
+  }
+  if (!SWIG_check_num_args("helicsFederateEnterExecutingModeIterativeAsync",args.length(),2,2,0)) {
     SWIG_fail;
   }
   res1 = SWIG_ConvertPtr(args(0),SWIG_as_voidptrptr(&arg1), 0, 0);
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateEnterExecutionModeIterativeAsync" "', argument " "1"" of type '" "helics_federate""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateEnterExecutingModeIterativeAsync" "', argument " "1"" of type '" "helics_federate""'"); 
   }
   ecode2 = SWIG_AsVal_int(args(1), &val2);
   if (!SWIG_IsOK(ecode2)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "helicsFederateEnterExecutionModeIterativeAsync" "', argument " "2"" of type '" "helics_iteration_request""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "helicsFederateEnterExecutingModeIterativeAsync" "', argument " "2"" of type '" "helics_iteration_request""'");
   } 
   arg2 = static_cast< helics_iteration_request >(val2);
-  result = (helics_status)helicsFederateEnterExecutionModeIterativeAsync(arg1,arg2);
-  _outv = SWIG_From_int(static_cast< int >(result));
+  helicsFederateEnterExecutingModeIterativeAsync(arg1,arg2,arg3);
+  _outv = octave_value();
   if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg3);
+    }
+  }
   return _out;
 fail:
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg3);
+    }
+  }
   return octave_value_list();
 }
 
 
-SWIG_DEFUN( helicsFederateEnterExecutionModeIterativeComplete, _wrap_helicsFederateEnterExecutionModeIterativeComplete, _wrap_helicsFederateEnterExecutionModeIterativeComplete_texinfo ) {
+SWIG_DEFUN( helicsFederateEnterExecutingModeIterativeComplete, _wrap_helicsFederateEnterExecutingModeIterativeComplete, std::string() ) {
   helics_federate arg1 = (helics_federate) 0 ;
-  helics_iteration_status *arg2 = (helics_iteration_status *) 0 ;
+  helics_error *arg2 = (helics_error *) 0 ;
   int res1 ;
-  helics_iteration_status temp2 ;
-  int res2 = SWIG_TMPOBJ ;
+  helics_error etemp2 ;
   octave_value_list _out;
   octave_value_list *_outp=&_out;
   octave_value _outv;
-  helics_status result;
+  helics_iteration_result result;
   
-  arg2 = &temp2;
-  if (!SWIG_check_num_args("helicsFederateEnterExecutionModeIterativeComplete",args.length(),1,1,0)) {
+  {
+    etemp2=helicsErrorInitialize();
+    arg2=&etemp2;
+  }
+  if (!SWIG_check_num_args("helicsFederateEnterExecutingModeIterativeComplete",args.length(),1,1,0)) {
     SWIG_fail;
   }
   res1 = SWIG_ConvertPtr(args(0),SWIG_as_voidptrptr(&arg1), 0, 0);
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateEnterExecutionModeIterativeComplete" "', argument " "1"" of type '" "helics_federate""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateEnterExecutingModeIterativeComplete" "', argument " "1"" of type '" "helics_federate""'"); 
   }
-  result = (helics_status)helicsFederateEnterExecutionModeIterativeComplete(arg1,arg2);
+  result = (helics_iteration_result)helicsFederateEnterExecutingModeIterativeComplete(arg1,arg2);
   _outv = SWIG_From_int(static_cast< int >(result));
   if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
-  if (SWIG_IsTmpObj(res2)) {
-    _outp = SWIG_Octave_AppendOutput(_outp, SWIG_From_int((*arg2)));
-  } else {
-    int new_flags = SWIG_IsNewObj(res2) ? (SWIG_POINTER_OWN |  0 ) :  0 ;
-    _outp = SWIG_Octave_AppendOutput(_outp, SWIG_NewPointerObj((void*)(arg2), SWIGTYPE_p_helics_iteration_status, new_flags));
+  {
+    if (arg2->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg2);
+    }
   }
   return _out;
 fail:
+  {
+    if (arg2->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg2);
+    }
+  }
   return octave_value_list();
 }
 
 
-SWIG_DEFUN( helicsFederateGetState, _wrap_helicsFederateGetState, _wrap_helicsFederateGetState_texinfo ) {
+SWIG_DEFUN( helicsFederateGetState, _wrap_helicsFederateGetState, std::string() ) {
   helics_federate arg1 = (helics_federate) 0 ;
-  federate_state *arg2 = (federate_state *) 0 ;
+  helics_error *arg2 = (helics_error *) 0 ;
   int res1 ;
-  federate_state temp2 ;
-  int res2 = SWIG_TMPOBJ ;
+  helics_error etemp2 ;
   octave_value_list _out;
   octave_value_list *_outp=&_out;
   octave_value _outv;
-  helics_status result;
+  helics_federate_state result;
   
-  arg2 = &temp2;
+  {
+    etemp2=helicsErrorInitialize();
+    arg2=&etemp2;
+  }
   if (!SWIG_check_num_args("helicsFederateGetState",args.length(),1,1,0)) {
     SWIG_fail;
   }
@@ -5947,29 +6569,41 @@ SWIG_DEFUN( helicsFederateGetState, _wrap_helicsFederateGetState, _wrap_helicsFe
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateGetState" "', argument " "1"" of type '" "helics_federate""'"); 
   }
-  result = (helics_status)helicsFederateGetState(arg1,arg2);
+  result = (helics_federate_state)helicsFederateGetState(arg1,arg2);
   _outv = SWIG_From_int(static_cast< int >(result));
   if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
-  if (SWIG_IsTmpObj(res2)) {
-    _outp = SWIG_Octave_AppendOutput(_outp, SWIG_From_int((*arg2)));
-  } else {
-    int new_flags = SWIG_IsNewObj(res2) ? (SWIG_POINTER_OWN |  0 ) :  0 ;
-    _outp = SWIG_Octave_AppendOutput(_outp, SWIG_NewPointerObj((void*)(arg2), SWIGTYPE_p_federate_state, new_flags));
+  {
+    if (arg2->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg2);
+    }
   }
   return _out;
 fail:
+  {
+    if (arg2->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg2);
+    }
+  }
   return octave_value_list();
 }
 
 
-SWIG_DEFUN( helicsFederateGetCoreObject, _wrap_helicsFederateGetCoreObject, _wrap_helicsFederateGetCoreObject_texinfo ) {
+SWIG_DEFUN( helicsFederateGetCoreObject, _wrap_helicsFederateGetCoreObject, std::string() ) {
   helics_federate arg1 = (helics_federate) 0 ;
+  helics_error *arg2 = (helics_error *) 0 ;
   int res1 ;
+  helics_error etemp2 ;
   octave_value_list _out;
   octave_value_list *_outp=&_out;
   octave_value _outv;
   helics_core result;
   
+  {
+    etemp2=helicsErrorInitialize();
+    arg2=&etemp2;
+  }
   if (!SWIG_check_num_args("helicsFederateGetCoreObject",args.length(),1,1,0)) {
     SWIG_fail;
   }
@@ -5977,30 +6611,44 @@ SWIG_DEFUN( helicsFederateGetCoreObject, _wrap_helicsFederateGetCoreObject, _wra
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateGetCoreObject" "', argument " "1"" of type '" "helics_federate""'"); 
   }
-  result = (helics_core)helicsFederateGetCoreObject(arg1);
+  result = (helics_core)helicsFederateGetCoreObject(arg1,arg2);
   _outv = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_void, 0 |  0 );
   if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
+  {
+    if (arg2->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg2);
+    }
+  }
   return _out;
 fail:
+  {
+    if (arg2->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg2);
+    }
+  }
   return octave_value_list();
 }
 
 
-SWIG_DEFUN( helicsFederateRequestTime, _wrap_helicsFederateRequestTime, _wrap_helicsFederateRequestTime_texinfo ) {
+SWIG_DEFUN( helicsFederateRequestTime, _wrap_helicsFederateRequestTime, std::string() ) {
   helics_federate arg1 = (helics_federate) 0 ;
-  helics_time_t arg2 ;
-  helics_time_t *arg3 = (helics_time_t *) 0 ;
+  helics_time arg2 ;
+  helics_error *arg3 = (helics_error *) 0 ;
   int res1 ;
   double val2 ;
   int ecode2 = 0 ;
-  helics_time_t temp3 ;
-  int res3 = SWIG_TMPOBJ ;
+  helics_error etemp3 ;
   octave_value_list _out;
   octave_value_list *_outp=&_out;
   octave_value _outv;
-  helics_status result;
+  helics_time result;
   
-  arg3 = &temp3;
+  {
+    etemp3=helicsErrorInitialize();
+    arg3=&etemp3;
+  }
   if (!SWIG_check_num_args("helicsFederateRequestTime",args.length(),2,2,0)) {
     SWIG_fail;
   }
@@ -6010,46 +6658,146 @@ SWIG_DEFUN( helicsFederateRequestTime, _wrap_helicsFederateRequestTime, _wrap_he
   }
   ecode2 = SWIG_AsVal_double(args(1), &val2);
   if (!SWIG_IsOK(ecode2)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "helicsFederateRequestTime" "', argument " "2"" of type '" "helics_time_t""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "helicsFederateRequestTime" "', argument " "2"" of type '" "helics_time""'");
   } 
-  arg2 = static_cast< helics_time_t >(val2);
-  result = (helics_status)helicsFederateRequestTime(arg1,arg2,arg3);
-  _outv = SWIG_From_int(static_cast< int >(result));
+  arg2 = static_cast< helics_time >(val2);
+  result = (helics_time)helicsFederateRequestTime(arg1,arg2,arg3);
+  _outv = SWIG_From_double(static_cast< double >(result));
   if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
-  if (SWIG_IsTmpObj(res3)) {
-    _outp = SWIG_Octave_AppendOutput(_outp, SWIG_From_double((*arg3)));
-  } else {
-    int new_flags = SWIG_IsNewObj(res3) ? (SWIG_POINTER_OWN |  0 ) :  0 ;
-    _outp = SWIG_Octave_AppendOutput(_outp, SWIG_NewPointerObj((void*)(arg3), SWIGTYPE_p_double, new_flags));
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg3);
+    }
   }
   return _out;
 fail:
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg3);
+    }
+  }
   return octave_value_list();
 }
 
 
-SWIG_DEFUN( helicsFederateRequestTimeIterative, _wrap_helicsFederateRequestTimeIterative, _wrap_helicsFederateRequestTimeIterative_texinfo ) {
+SWIG_DEFUN( helicsFederateRequestTimeAdvance, _wrap_helicsFederateRequestTimeAdvance, std::string() ) {
   helics_federate arg1 = (helics_federate) 0 ;
-  helics_time_t arg2 ;
+  helics_time arg2 ;
+  helics_error *arg3 = (helics_error *) 0 ;
+  int res1 ;
+  double val2 ;
+  int ecode2 = 0 ;
+  helics_error etemp3 ;
+  octave_value_list _out;
+  octave_value_list *_outp=&_out;
+  octave_value _outv;
+  helics_time result;
+  
+  {
+    etemp3=helicsErrorInitialize();
+    arg3=&etemp3;
+  }
+  if (!SWIG_check_num_args("helicsFederateRequestTimeAdvance",args.length(),2,2,0)) {
+    SWIG_fail;
+  }
+  res1 = SWIG_ConvertPtr(args(0),SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateRequestTimeAdvance" "', argument " "1"" of type '" "helics_federate""'"); 
+  }
+  ecode2 = SWIG_AsVal_double(args(1), &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "helicsFederateRequestTimeAdvance" "', argument " "2"" of type '" "helics_time""'");
+  } 
+  arg2 = static_cast< helics_time >(val2);
+  result = (helics_time)helicsFederateRequestTimeAdvance(arg1,arg2,arg3);
+  _outv = SWIG_From_double(static_cast< double >(result));
+  if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg3);
+    }
+  }
+  return _out;
+fail:
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg3);
+    }
+  }
+  return octave_value_list();
+}
+
+
+SWIG_DEFUN( helicsFederateRequestNextStep, _wrap_helicsFederateRequestNextStep, std::string() ) {
+  helics_federate arg1 = (helics_federate) 0 ;
+  helics_error *arg2 = (helics_error *) 0 ;
+  int res1 ;
+  helics_error etemp2 ;
+  octave_value_list _out;
+  octave_value_list *_outp=&_out;
+  octave_value _outv;
+  helics_time result;
+  
+  {
+    etemp2=helicsErrorInitialize();
+    arg2=&etemp2;
+  }
+  if (!SWIG_check_num_args("helicsFederateRequestNextStep",args.length(),1,1,0)) {
+    SWIG_fail;
+  }
+  res1 = SWIG_ConvertPtr(args(0),SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateRequestNextStep" "', argument " "1"" of type '" "helics_federate""'"); 
+  }
+  result = (helics_time)helicsFederateRequestNextStep(arg1,arg2);
+  _outv = SWIG_From_double(static_cast< double >(result));
+  if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
+  {
+    if (arg2->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg2);
+    }
+  }
+  return _out;
+fail:
+  {
+    if (arg2->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg2);
+    }
+  }
+  return octave_value_list();
+}
+
+
+SWIG_DEFUN( helicsFederateRequestTimeIterative, _wrap_helicsFederateRequestTimeIterative, std::string() ) {
+  helics_federate arg1 = (helics_federate) 0 ;
+  helics_time arg2 ;
   helics_iteration_request arg3 ;
-  helics_time_t *arg4 = (helics_time_t *) 0 ;
-  helics_iteration_status *arg5 = (helics_iteration_status *) 0 ;
+  helics_iteration_result *arg4 = (helics_iteration_result *) 0 ;
+  helics_error *arg5 = (helics_error *) 0 ;
   int res1 ;
   double val2 ;
   int ecode2 = 0 ;
   int val3 ;
   int ecode3 = 0 ;
-  helics_time_t temp4 ;
+  helics_iteration_result temp4 ;
   int res4 = SWIG_TMPOBJ ;
-  helics_iteration_status temp5 ;
-  int res5 = SWIG_TMPOBJ ;
+  helics_error etemp5 ;
   octave_value_list _out;
   octave_value_list *_outp=&_out;
   octave_value _outv;
-  helics_status result;
+  helics_time result;
   
   arg4 = &temp4;
-  arg5 = &temp5;
+  {
+    etemp5=helicsErrorInitialize();
+    arg5=&etemp5;
+  }
   if (!SWIG_check_num_args("helicsFederateRequestTimeIterative",args.length(),3,3,0)) {
     SWIG_fail;
   }
@@ -6059,46 +6807,57 @@ SWIG_DEFUN( helicsFederateRequestTimeIterative, _wrap_helicsFederateRequestTimeI
   }
   ecode2 = SWIG_AsVal_double(args(1), &val2);
   if (!SWIG_IsOK(ecode2)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "helicsFederateRequestTimeIterative" "', argument " "2"" of type '" "helics_time_t""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "helicsFederateRequestTimeIterative" "', argument " "2"" of type '" "helics_time""'");
   } 
-  arg2 = static_cast< helics_time_t >(val2);
+  arg2 = static_cast< helics_time >(val2);
   ecode3 = SWIG_AsVal_int(args(2), &val3);
   if (!SWIG_IsOK(ecode3)) {
     SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "helicsFederateRequestTimeIterative" "', argument " "3"" of type '" "helics_iteration_request""'");
   } 
   arg3 = static_cast< helics_iteration_request >(val3);
-  result = (helics_status)helicsFederateRequestTimeIterative(arg1,arg2,arg3,arg4,arg5);
-  _outv = SWIG_From_int(static_cast< int >(result));
+  result = (helics_time)helicsFederateRequestTimeIterative(arg1,arg2,arg3,arg4,arg5);
+  _outv = SWIG_From_double(static_cast< double >(result));
   if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
   if (SWIG_IsTmpObj(res4)) {
-    _outp = SWIG_Octave_AppendOutput(_outp, SWIG_From_double((*arg4)));
+    _outp = SWIG_Octave_AppendOutput(_outp, SWIG_From_int((*arg4)));
   } else {
     int new_flags = SWIG_IsNewObj(res4) ? (SWIG_POINTER_OWN |  0 ) :  0 ;
-    _outp = SWIG_Octave_AppendOutput(_outp, SWIG_NewPointerObj((void*)(arg4), SWIGTYPE_p_double, new_flags));
+    _outp = SWIG_Octave_AppendOutput(_outp, SWIG_NewPointerObj((void*)(arg4), SWIGTYPE_p_helics_iteration_result, new_flags));
   }
-  if (SWIG_IsTmpObj(res5)) {
-    _outp = SWIG_Octave_AppendOutput(_outp, SWIG_From_int((*arg5)));
-  } else {
-    int new_flags = SWIG_IsNewObj(res5) ? (SWIG_POINTER_OWN |  0 ) :  0 ;
-    _outp = SWIG_Octave_AppendOutput(_outp, SWIG_NewPointerObj((void*)(arg5), SWIGTYPE_p_helics_iteration_status, new_flags));
+  {
+    if (arg5->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg5);
+    }
   }
   return _out;
 fail:
+  {
+    if (arg5->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg5);
+    }
+  }
   return octave_value_list();
 }
 
 
-SWIG_DEFUN( helicsFederateRequestTimeAsync, _wrap_helicsFederateRequestTimeAsync, _wrap_helicsFederateRequestTimeAsync_texinfo ) {
+SWIG_DEFUN( helicsFederateRequestTimeAsync, _wrap_helicsFederateRequestTimeAsync, std::string() ) {
   helics_federate arg1 = (helics_federate) 0 ;
-  helics_time_t arg2 ;
+  helics_time arg2 ;
+  helics_error *arg3 = (helics_error *) 0 ;
   int res1 ;
   double val2 ;
   int ecode2 = 0 ;
+  helics_error etemp3 ;
   octave_value_list _out;
   octave_value_list *_outp=&_out;
   octave_value _outv;
-  helics_status result;
   
+  {
+    etemp3=helicsErrorInitialize();
+    arg3=&etemp3;
+  }
   if (!SWIG_check_num_args("helicsFederateRequestTimeAsync",args.length(),2,2,0)) {
     SWIG_fail;
   }
@@ -6108,30 +6867,44 @@ SWIG_DEFUN( helicsFederateRequestTimeAsync, _wrap_helicsFederateRequestTimeAsync
   }
   ecode2 = SWIG_AsVal_double(args(1), &val2);
   if (!SWIG_IsOK(ecode2)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "helicsFederateRequestTimeAsync" "', argument " "2"" of type '" "helics_time_t""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "helicsFederateRequestTimeAsync" "', argument " "2"" of type '" "helics_time""'");
   } 
-  arg2 = static_cast< helics_time_t >(val2);
-  result = (helics_status)helicsFederateRequestTimeAsync(arg1,arg2);
-  _outv = SWIG_From_int(static_cast< int >(result));
+  arg2 = static_cast< helics_time >(val2);
+  helicsFederateRequestTimeAsync(arg1,arg2,arg3);
+  _outv = octave_value();
   if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg3);
+    }
+  }
   return _out;
 fail:
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg3);
+    }
+  }
   return octave_value_list();
 }
 
 
-SWIG_DEFUN( helicsFederateRequestTimeComplete, _wrap_helicsFederateRequestTimeComplete, _wrap_helicsFederateRequestTimeComplete_texinfo ) {
+SWIG_DEFUN( helicsFederateRequestTimeComplete, _wrap_helicsFederateRequestTimeComplete, std::string() ) {
   helics_federate arg1 = (helics_federate) 0 ;
-  helics_time_t *arg2 = (helics_time_t *) 0 ;
+  helics_error *arg2 = (helics_error *) 0 ;
   int res1 ;
-  helics_time_t temp2 ;
-  int res2 = SWIG_TMPOBJ ;
+  helics_error etemp2 ;
   octave_value_list _out;
   octave_value_list *_outp=&_out;
   octave_value _outv;
-  helics_status result;
+  helics_time result;
   
-  arg2 = &temp2;
+  {
+    etemp2=helicsErrorInitialize();
+    arg2=&etemp2;
+  }
   if (!SWIG_check_num_args("helicsFederateRequestTimeComplete",args.length(),1,1,0)) {
     SWIG_fail;
   }
@@ -6139,35 +6912,46 @@ SWIG_DEFUN( helicsFederateRequestTimeComplete, _wrap_helicsFederateRequestTimeCo
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateRequestTimeComplete" "', argument " "1"" of type '" "helics_federate""'"); 
   }
-  result = (helics_status)helicsFederateRequestTimeComplete(arg1,arg2);
-  _outv = SWIG_From_int(static_cast< int >(result));
+  result = (helics_time)helicsFederateRequestTimeComplete(arg1,arg2);
+  _outv = SWIG_From_double(static_cast< double >(result));
   if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
-  if (SWIG_IsTmpObj(res2)) {
-    _outp = SWIG_Octave_AppendOutput(_outp, SWIG_From_double((*arg2)));
-  } else {
-    int new_flags = SWIG_IsNewObj(res2) ? (SWIG_POINTER_OWN |  0 ) :  0 ;
-    _outp = SWIG_Octave_AppendOutput(_outp, SWIG_NewPointerObj((void*)(arg2), SWIGTYPE_p_double, new_flags));
+  {
+    if (arg2->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg2);
+    }
   }
   return _out;
 fail:
+  {
+    if (arg2->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg2);
+    }
+  }
   return octave_value_list();
 }
 
 
-SWIG_DEFUN( helicsFederateRequestTimeIterativeAsync, _wrap_helicsFederateRequestTimeIterativeAsync, _wrap_helicsFederateRequestTimeIterativeAsync_texinfo ) {
+SWIG_DEFUN( helicsFederateRequestTimeIterativeAsync, _wrap_helicsFederateRequestTimeIterativeAsync, std::string() ) {
   helics_federate arg1 = (helics_federate) 0 ;
-  helics_time_t arg2 ;
+  helics_time arg2 ;
   helics_iteration_request arg3 ;
+  helics_error *arg4 = (helics_error *) 0 ;
   int res1 ;
   double val2 ;
   int ecode2 = 0 ;
   int val3 ;
   int ecode3 = 0 ;
+  helics_error etemp4 ;
   octave_value_list _out;
   octave_value_list *_outp=&_out;
   octave_value _outv;
-  helics_status result;
   
+  {
+    etemp4=helicsErrorInitialize();
+    arg4=&etemp4;
+  }
   if (!SWIG_check_num_args("helicsFederateRequestTimeIterativeAsync",args.length(),3,3,0)) {
     SWIG_fail;
   }
@@ -6177,39 +6961,53 @@ SWIG_DEFUN( helicsFederateRequestTimeIterativeAsync, _wrap_helicsFederateRequest
   }
   ecode2 = SWIG_AsVal_double(args(1), &val2);
   if (!SWIG_IsOK(ecode2)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "helicsFederateRequestTimeIterativeAsync" "', argument " "2"" of type '" "helics_time_t""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "helicsFederateRequestTimeIterativeAsync" "', argument " "2"" of type '" "helics_time""'");
   } 
-  arg2 = static_cast< helics_time_t >(val2);
+  arg2 = static_cast< helics_time >(val2);
   ecode3 = SWIG_AsVal_int(args(2), &val3);
   if (!SWIG_IsOK(ecode3)) {
     SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "helicsFederateRequestTimeIterativeAsync" "', argument " "3"" of type '" "helics_iteration_request""'");
   } 
   arg3 = static_cast< helics_iteration_request >(val3);
-  result = (helics_status)helicsFederateRequestTimeIterativeAsync(arg1,arg2,arg3);
-  _outv = SWIG_From_int(static_cast< int >(result));
+  helicsFederateRequestTimeIterativeAsync(arg1,arg2,arg3,arg4);
+  _outv = octave_value();
   if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
+  {
+    if (arg4->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg4);
+    }
+  }
   return _out;
 fail:
+  {
+    if (arg4->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg4);
+    }
+  }
   return octave_value_list();
 }
 
 
-SWIG_DEFUN( helicsFederateRequestTimeIterativeComplete, _wrap_helicsFederateRequestTimeIterativeComplete, _wrap_helicsFederateRequestTimeIterativeComplete_texinfo ) {
+SWIG_DEFUN( helicsFederateRequestTimeIterativeComplete, _wrap_helicsFederateRequestTimeIterativeComplete, std::string() ) {
   helics_federate arg1 = (helics_federate) 0 ;
-  helics_time_t *arg2 = (helics_time_t *) 0 ;
-  helics_iteration_status *arg3 = (helics_iteration_status *) 0 ;
+  helics_iteration_result *arg2 = (helics_iteration_result *) 0 ;
+  helics_error *arg3 = (helics_error *) 0 ;
   int res1 ;
-  helics_time_t temp2 ;
+  helics_iteration_result temp2 ;
   int res2 = SWIG_TMPOBJ ;
-  helics_iteration_status temp3 ;
-  int res3 = SWIG_TMPOBJ ;
+  helics_error etemp3 ;
   octave_value_list _out;
   octave_value_list *_outp=&_out;
   octave_value _outv;
-  helics_status result;
+  helics_time result;
   
   arg2 = &temp2;
-  arg3 = &temp3;
+  {
+    etemp3=helicsErrorInitialize();
+    arg3=&etemp3;
+  }
   if (!SWIG_check_num_args("helicsFederateRequestTimeIterativeComplete",args.length(),1,1,0)) {
     SWIG_fail;
   }
@@ -6217,95 +7015,50 @@ SWIG_DEFUN( helicsFederateRequestTimeIterativeComplete, _wrap_helicsFederateRequ
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateRequestTimeIterativeComplete" "', argument " "1"" of type '" "helics_federate""'"); 
   }
-  result = (helics_status)helicsFederateRequestTimeIterativeComplete(arg1,arg2,arg3);
-  _outv = SWIG_From_int(static_cast< int >(result));
+  result = (helics_time)helicsFederateRequestTimeIterativeComplete(arg1,arg2,arg3);
+  _outv = SWIG_From_double(static_cast< double >(result));
   if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
   if (SWIG_IsTmpObj(res2)) {
-    _outp = SWIG_Octave_AppendOutput(_outp, SWIG_From_double((*arg2)));
+    _outp = SWIG_Octave_AppendOutput(_outp, SWIG_From_int((*arg2)));
   } else {
     int new_flags = SWIG_IsNewObj(res2) ? (SWIG_POINTER_OWN |  0 ) :  0 ;
-    _outp = SWIG_Octave_AppendOutput(_outp, SWIG_NewPointerObj((void*)(arg2), SWIGTYPE_p_double, new_flags));
+    _outp = SWIG_Octave_AppendOutput(_outp, SWIG_NewPointerObj((void*)(arg2), SWIGTYPE_p_helics_iteration_result, new_flags));
   }
-  if (SWIG_IsTmpObj(res3)) {
-    _outp = SWIG_Octave_AppendOutput(_outp, SWIG_From_int((*arg3)));
-  } else {
-    int new_flags = SWIG_IsNewObj(res3) ? (SWIG_POINTER_OWN |  0 ) :  0 ;
-    _outp = SWIG_Octave_AppendOutput(_outp, SWIG_NewPointerObj((void*)(arg3), SWIGTYPE_p_helics_iteration_status, new_flags));
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg3);
+    }
   }
   return _out;
 fail:
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg3);
+    }
+  }
   return octave_value_list();
 }
 
 
-SWIG_DEFUN( helicsFederateGetName, _wrap_helicsFederateGetName, _wrap_helicsFederateGetName_texinfo ) {
+SWIG_DEFUN( helicsFederateGetName, _wrap_helicsFederateGetName, std::string() ) {
   helics_federate arg1 = (helics_federate) 0 ;
-  char *arg2 = (char *) 0 ;
-  int arg3 ;
   int res1 ;
-  int res2 ;
-  char *buf2 = 0 ;
-  int alloc2 = 0 ;
-  int val3 ;
-  int ecode3 = 0 ;
   octave_value_list _out;
   octave_value_list *_outp=&_out;
   octave_value _outv;
-  helics_status result;
+  char *result = 0 ;
   
-  if (!SWIG_check_num_args("helicsFederateGetName",args.length(),3,3,0)) {
+  if (!SWIG_check_num_args("helicsFederateGetName",args.length(),1,1,0)) {
     SWIG_fail;
   }
   res1 = SWIG_ConvertPtr(args(0),SWIG_as_voidptrptr(&arg1), 0, 0);
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateGetName" "', argument " "1"" of type '" "helics_federate""'"); 
   }
-  res2 = SWIG_AsCharPtrAndSize(args(1), &buf2, NULL, &alloc2);
-  if (!SWIG_IsOK(res2)) {
-    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsFederateGetName" "', argument " "2"" of type '" "char *""'");
-  }
-  arg2 = reinterpret_cast< char * >(buf2);
-  ecode3 = SWIG_AsVal_int(args(2), &val3);
-  if (!SWIG_IsOK(ecode3)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "helicsFederateGetName" "', argument " "3"" of type '" "int""'");
-  } 
-  arg3 = static_cast< int >(val3);
-  result = (helics_status)helicsFederateGetName(arg1,arg2,arg3);
-  _outv = SWIG_From_int(static_cast< int >(result));
-  if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
-  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
-  return _out;
-fail:
-  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
-  return octave_value_list();
-}
-
-
-SWIG_DEFUN( helicsFederateSetTimeDelta, _wrap_helicsFederateSetTimeDelta, _wrap_helicsFederateSetTimeDelta_texinfo ) {
-  helics_federate arg1 = (helics_federate) 0 ;
-  helics_time_t arg2 ;
-  int res1 ;
-  double val2 ;
-  int ecode2 = 0 ;
-  octave_value_list _out;
-  octave_value_list *_outp=&_out;
-  octave_value _outv;
-  helics_status result;
-  
-  if (!SWIG_check_num_args("helicsFederateSetTimeDelta",args.length(),2,2,0)) {
-    SWIG_fail;
-  }
-  res1 = SWIG_ConvertPtr(args(0),SWIG_as_voidptrptr(&arg1), 0, 0);
-  if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateSetTimeDelta" "', argument " "1"" of type '" "helics_federate""'"); 
-  }
-  ecode2 = SWIG_AsVal_double(args(1), &val2);
-  if (!SWIG_IsOK(ecode2)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "helicsFederateSetTimeDelta" "', argument " "2"" of type '" "helics_time_t""'");
-  } 
-  arg2 = static_cast< helics_time_t >(val2);
-  result = (helics_status)helicsFederateSetTimeDelta(arg1,arg2);
-  _outv = SWIG_From_int(static_cast< int >(result));
+  result = (char *)helicsFederateGetName(arg1);
+  _outv = SWIG_FromCharPtr((const char *)result);
   if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
   return _out;
 fail:
@@ -6313,226 +7066,390 @@ fail:
 }
 
 
-SWIG_DEFUN( helicsFederateSetOutputDelay, _wrap_helicsFederateSetOutputDelay, _wrap_helicsFederateSetOutputDelay_texinfo ) {
+SWIG_DEFUN( helicsFederateSetTimeProperty, _wrap_helicsFederateSetTimeProperty, std::string() ) {
   helics_federate arg1 = (helics_federate) 0 ;
-  helics_time_t arg2 ;
+  int arg2 ;
+  helics_time arg3 ;
+  helics_error *arg4 = (helics_error *) 0 ;
   int res1 ;
-  double val2 ;
-  int ecode2 = 0 ;
-  octave_value_list _out;
-  octave_value_list *_outp=&_out;
-  octave_value _outv;
-  helics_status result;
-  
-  if (!SWIG_check_num_args("helicsFederateSetOutputDelay",args.length(),2,2,0)) {
-    SWIG_fail;
-  }
-  res1 = SWIG_ConvertPtr(args(0),SWIG_as_voidptrptr(&arg1), 0, 0);
-  if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateSetOutputDelay" "', argument " "1"" of type '" "helics_federate""'"); 
-  }
-  ecode2 = SWIG_AsVal_double(args(1), &val2);
-  if (!SWIG_IsOK(ecode2)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "helicsFederateSetOutputDelay" "', argument " "2"" of type '" "helics_time_t""'");
-  } 
-  arg2 = static_cast< helics_time_t >(val2);
-  result = (helics_status)helicsFederateSetOutputDelay(arg1,arg2);
-  _outv = SWIG_From_int(static_cast< int >(result));
-  if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
-  return _out;
-fail:
-  return octave_value_list();
-}
-
-
-SWIG_DEFUN( helicsFederateSetInputDelay, _wrap_helicsFederateSetInputDelay, _wrap_helicsFederateSetInputDelay_texinfo ) {
-  helics_federate arg1 = (helics_federate) 0 ;
-  helics_time_t arg2 ;
-  int res1 ;
-  double val2 ;
-  int ecode2 = 0 ;
-  octave_value_list _out;
-  octave_value_list *_outp=&_out;
-  octave_value _outv;
-  helics_status result;
-  
-  if (!SWIG_check_num_args("helicsFederateSetInputDelay",args.length(),2,2,0)) {
-    SWIG_fail;
-  }
-  res1 = SWIG_ConvertPtr(args(0),SWIG_as_voidptrptr(&arg1), 0, 0);
-  if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateSetInputDelay" "', argument " "1"" of type '" "helics_federate""'"); 
-  }
-  ecode2 = SWIG_AsVal_double(args(1), &val2);
-  if (!SWIG_IsOK(ecode2)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "helicsFederateSetInputDelay" "', argument " "2"" of type '" "helics_time_t""'");
-  } 
-  arg2 = static_cast< helics_time_t >(val2);
-  result = (helics_status)helicsFederateSetInputDelay(arg1,arg2);
-  _outv = SWIG_From_int(static_cast< int >(result));
-  if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
-  return _out;
-fail:
-  return octave_value_list();
-}
-
-
-SWIG_DEFUN( helicsFederateSetPeriod, _wrap_helicsFederateSetPeriod, _wrap_helicsFederateSetPeriod_texinfo ) {
-  helics_federate arg1 = (helics_federate) 0 ;
-  helics_time_t arg2 ;
-  helics_time_t arg3 ;
-  int res1 ;
-  double val2 ;
+  int val2 ;
   int ecode2 = 0 ;
   double val3 ;
   int ecode3 = 0 ;
+  helics_error etemp4 ;
   octave_value_list _out;
   octave_value_list *_outp=&_out;
   octave_value _outv;
-  helics_status result;
   
-  if (!SWIG_check_num_args("helicsFederateSetPeriod",args.length(),3,3,0)) {
+  {
+    etemp4=helicsErrorInitialize();
+    arg4=&etemp4;
+  }
+  if (!SWIG_check_num_args("helicsFederateSetTimeProperty",args.length(),3,3,0)) {
     SWIG_fail;
   }
   res1 = SWIG_ConvertPtr(args(0),SWIG_as_voidptrptr(&arg1), 0, 0);
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateSetPeriod" "', argument " "1"" of type '" "helics_federate""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateSetTimeProperty" "', argument " "1"" of type '" "helics_federate""'"); 
   }
-  ecode2 = SWIG_AsVal_double(args(1), &val2);
+  ecode2 = SWIG_AsVal_int(args(1), &val2);
   if (!SWIG_IsOK(ecode2)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "helicsFederateSetPeriod" "', argument " "2"" of type '" "helics_time_t""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "helicsFederateSetTimeProperty" "', argument " "2"" of type '" "int""'");
   } 
-  arg2 = static_cast< helics_time_t >(val2);
+  arg2 = static_cast< int >(val2);
   ecode3 = SWIG_AsVal_double(args(2), &val3);
   if (!SWIG_IsOK(ecode3)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "helicsFederateSetPeriod" "', argument " "3"" of type '" "helics_time_t""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "helicsFederateSetTimeProperty" "', argument " "3"" of type '" "helics_time""'");
   } 
-  arg3 = static_cast< helics_time_t >(val3);
-  result = (helics_status)helicsFederateSetPeriod(arg1,arg2,arg3);
-  _outv = SWIG_From_int(static_cast< int >(result));
+  arg3 = static_cast< helics_time >(val3);
+  helicsFederateSetTimeProperty(arg1,arg2,arg3,arg4);
+  _outv = octave_value();
   if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
+  {
+    if (arg4->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg4);
+    }
+  }
   return _out;
 fail:
+  {
+    if (arg4->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg4);
+    }
+  }
   return octave_value_list();
 }
 
 
-SWIG_DEFUN( helicsFederateSetFlag, _wrap_helicsFederateSetFlag, _wrap_helicsFederateSetFlag_texinfo ) {
+SWIG_DEFUN( helicsFederateSetFlagOption, _wrap_helicsFederateSetFlagOption, std::string() ) {
   helics_federate arg1 = (helics_federate) 0 ;
   int arg2 ;
-  helics_bool_t arg3 ;
+  helics_bool arg3 ;
+  helics_error *arg4 = (helics_error *) 0 ;
   int res1 ;
   int val2 ;
   int ecode2 = 0 ;
   int val3 ;
   int ecode3 = 0 ;
+  helics_error etemp4 ;
   octave_value_list _out;
   octave_value_list *_outp=&_out;
   octave_value _outv;
-  helics_status result;
   
-  if (!SWIG_check_num_args("helicsFederateSetFlag",args.length(),3,3,0)) {
+  {
+    etemp4=helicsErrorInitialize();
+    arg4=&etemp4;
+  }
+  if (!SWIG_check_num_args("helicsFederateSetFlagOption",args.length(),3,3,0)) {
     SWIG_fail;
   }
   res1 = SWIG_ConvertPtr(args(0),SWIG_as_voidptrptr(&arg1), 0, 0);
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateSetFlag" "', argument " "1"" of type '" "helics_federate""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateSetFlagOption" "', argument " "1"" of type '" "helics_federate""'"); 
   }
   ecode2 = SWIG_AsVal_int(args(1), &val2);
   if (!SWIG_IsOK(ecode2)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "helicsFederateSetFlag" "', argument " "2"" of type '" "int""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "helicsFederateSetFlagOption" "', argument " "2"" of type '" "int""'");
   } 
   arg2 = static_cast< int >(val2);
   ecode3 = SWIG_AsVal_int(args(2), &val3);
   if (!SWIG_IsOK(ecode3)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "helicsFederateSetFlag" "', argument " "3"" of type '" "helics_bool_t""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "helicsFederateSetFlagOption" "', argument " "3"" of type '" "helics_bool""'");
   } 
-  arg3 = static_cast< helics_bool_t >(val3);
-  result = (helics_status)helicsFederateSetFlag(arg1,arg2,arg3);
-  _outv = SWIG_From_int(static_cast< int >(result));
+  arg3 = static_cast< helics_bool >(val3);
+  helicsFederateSetFlagOption(arg1,arg2,arg3,arg4);
+  _outv = octave_value();
   if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
+  {
+    if (arg4->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg4);
+    }
+  }
   return _out;
 fail:
+  {
+    if (arg4->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg4);
+    }
+  }
   return octave_value_list();
 }
 
 
-SWIG_DEFUN( helicsFederateSetLoggingLevel, _wrap_helicsFederateSetLoggingLevel, _wrap_helicsFederateSetLoggingLevel_texinfo ) {
+SWIG_DEFUN( helicsFederateSetSeparator, _wrap_helicsFederateSetSeparator, std::string() ) {
   helics_federate arg1 = (helics_federate) 0 ;
-  int arg2 ;
+  char arg2 ;
+  helics_error *arg3 = (helics_error *) 0 ;
   int res1 ;
-  int val2 ;
+  char val2 ;
   int ecode2 = 0 ;
+  helics_error etemp3 ;
   octave_value_list _out;
   octave_value_list *_outp=&_out;
   octave_value _outv;
-  helics_status result;
   
-  if (!SWIG_check_num_args("helicsFederateSetLoggingLevel",args.length(),2,2,0)) {
+  {
+    etemp3=helicsErrorInitialize();
+    arg3=&etemp3;
+  }
+  if (!SWIG_check_num_args("helicsFederateSetSeparator",args.length(),2,2,0)) {
     SWIG_fail;
   }
   res1 = SWIG_ConvertPtr(args(0),SWIG_as_voidptrptr(&arg1), 0, 0);
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateSetLoggingLevel" "', argument " "1"" of type '" "helics_federate""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateSetSeparator" "', argument " "1"" of type '" "helics_federate""'"); 
   }
-  ecode2 = SWIG_AsVal_int(args(1), &val2);
+  ecode2 = SWIG_AsVal_char(args(1), &val2);
   if (!SWIG_IsOK(ecode2)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "helicsFederateSetLoggingLevel" "', argument " "2"" of type '" "int""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "helicsFederateSetSeparator" "', argument " "2"" of type '" "char""'");
   } 
-  arg2 = static_cast< int >(val2);
-  result = (helics_status)helicsFederateSetLoggingLevel(arg1,arg2);
-  _outv = SWIG_From_int(static_cast< int >(result));
+  arg2 = static_cast< char >(val2);
+  helicsFederateSetSeparator(arg1,arg2,arg3);
+  _outv = octave_value();
   if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg3);
+    }
+  }
   return _out;
 fail:
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg3);
+    }
+  }
   return octave_value_list();
 }
 
 
-SWIG_DEFUN( helicsFederateSetMaxIterations, _wrap_helicsFederateSetMaxIterations, std::string() ) {
-  helics_federate_info_t arg1 = (helics_federate_info_t) 0 ;
+SWIG_DEFUN( helicsFederateSetIntegerProperty, _wrap_helicsFederateSetIntegerProperty, std::string() ) {
+  helics_federate arg1 = (helics_federate) 0 ;
   int arg2 ;
+  int arg3 ;
+  helics_error *arg4 = (helics_error *) 0 ;
   int res1 ;
   int val2 ;
   int ecode2 = 0 ;
+  int val3 ;
+  int ecode3 = 0 ;
+  helics_error etemp4 ;
   octave_value_list _out;
   octave_value_list *_outp=&_out;
   octave_value _outv;
-  helics_status result;
   
-  if (!SWIG_check_num_args("helicsFederateSetMaxIterations",args.length(),2,2,0)) {
+  {
+    etemp4=helicsErrorInitialize();
+    arg4=&etemp4;
+  }
+  if (!SWIG_check_num_args("helicsFederateSetIntegerProperty",args.length(),3,3,0)) {
     SWIG_fail;
   }
   res1 = SWIG_ConvertPtr(args(0),SWIG_as_voidptrptr(&arg1), 0, 0);
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateSetMaxIterations" "', argument " "1"" of type '" "helics_federate_info_t""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateSetIntegerProperty" "', argument " "1"" of type '" "helics_federate""'"); 
   }
   ecode2 = SWIG_AsVal_int(args(1), &val2);
   if (!SWIG_IsOK(ecode2)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "helicsFederateSetMaxIterations" "', argument " "2"" of type '" "int""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "helicsFederateSetIntegerProperty" "', argument " "2"" of type '" "int""'");
   } 
   arg2 = static_cast< int >(val2);
-  result = (helics_status)helicsFederateSetMaxIterations(arg1,arg2);
-  _outv = SWIG_From_int(static_cast< int >(result));
+  ecode3 = SWIG_AsVal_int(args(2), &val3);
+  if (!SWIG_IsOK(ecode3)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "helicsFederateSetIntegerProperty" "', argument " "3"" of type '" "int""'");
+  } 
+  arg3 = static_cast< int >(val3);
+  helicsFederateSetIntegerProperty(arg1,arg2,arg3,arg4);
+  _outv = octave_value();
   if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
+  {
+    if (arg4->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg4);
+    }
+  }
   return _out;
 fail:
+  {
+    if (arg4->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg4);
+    }
+  }
   return octave_value_list();
 }
 
 
-SWIG_DEFUN( helicsFederateGetCurrentTime, _wrap_helicsFederateGetCurrentTime, _wrap_helicsFederateGetCurrentTime_texinfo ) {
+SWIG_DEFUN( helicsFederateGetTimeProperty, _wrap_helicsFederateGetTimeProperty, std::string() ) {
   helics_federate arg1 = (helics_federate) 0 ;
-  helics_time_t *arg2 = (helics_time_t *) 0 ;
+  int arg2 ;
+  helics_error *arg3 = (helics_error *) 0 ;
   int res1 ;
-  helics_time_t temp2 ;
-  int res2 = SWIG_TMPOBJ ;
+  int val2 ;
+  int ecode2 = 0 ;
+  helics_error etemp3 ;
   octave_value_list _out;
   octave_value_list *_outp=&_out;
   octave_value _outv;
-  helics_status result;
+  helics_time result;
   
-  arg2 = &temp2;
+  {
+    etemp3=helicsErrorInitialize();
+    arg3=&etemp3;
+  }
+  if (!SWIG_check_num_args("helicsFederateGetTimeProperty",args.length(),2,2,0)) {
+    SWIG_fail;
+  }
+  res1 = SWIG_ConvertPtr(args(0),SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateGetTimeProperty" "', argument " "1"" of type '" "helics_federate""'"); 
+  }
+  ecode2 = SWIG_AsVal_int(args(1), &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "helicsFederateGetTimeProperty" "', argument " "2"" of type '" "int""'");
+  } 
+  arg2 = static_cast< int >(val2);
+  result = (helics_time)helicsFederateGetTimeProperty(arg1,arg2,arg3);
+  _outv = SWIG_From_double(static_cast< double >(result));
+  if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg3);
+    }
+  }
+  return _out;
+fail:
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg3);
+    }
+  }
+  return octave_value_list();
+}
+
+
+SWIG_DEFUN( helicsFederateGetFlagOption, _wrap_helicsFederateGetFlagOption, std::string() ) {
+  helics_federate arg1 = (helics_federate) 0 ;
+  int arg2 ;
+  helics_error *arg3 = (helics_error *) 0 ;
+  int res1 ;
+  int val2 ;
+  int ecode2 = 0 ;
+  helics_error etemp3 ;
+  octave_value_list _out;
+  octave_value_list *_outp=&_out;
+  octave_value _outv;
+  helics_bool result;
+  
+  {
+    etemp3=helicsErrorInitialize();
+    arg3=&etemp3;
+  }
+  if (!SWIG_check_num_args("helicsFederateGetFlagOption",args.length(),2,2,0)) {
+    SWIG_fail;
+  }
+  res1 = SWIG_ConvertPtr(args(0),SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateGetFlagOption" "', argument " "1"" of type '" "helics_federate""'"); 
+  }
+  ecode2 = SWIG_AsVal_int(args(1), &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "helicsFederateGetFlagOption" "', argument " "2"" of type '" "int""'");
+  } 
+  arg2 = static_cast< int >(val2);
+  result = (helics_bool)helicsFederateGetFlagOption(arg1,arg2,arg3);
+  _outv = SWIG_From_int(static_cast< int >(result));
+  if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg3);
+    }
+  }
+  return _out;
+fail:
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg3);
+    }
+  }
+  return octave_value_list();
+}
+
+
+SWIG_DEFUN( helicsFederateGetIntegerProperty, _wrap_helicsFederateGetIntegerProperty, std::string() ) {
+  helics_federate arg1 = (helics_federate) 0 ;
+  int arg2 ;
+  helics_error *arg3 = (helics_error *) 0 ;
+  int res1 ;
+  int val2 ;
+  int ecode2 = 0 ;
+  helics_error etemp3 ;
+  octave_value_list _out;
+  octave_value_list *_outp=&_out;
+  octave_value _outv;
+  int result;
+  
+  {
+    etemp3=helicsErrorInitialize();
+    arg3=&etemp3;
+  }
+  if (!SWIG_check_num_args("helicsFederateGetIntegerProperty",args.length(),2,2,0)) {
+    SWIG_fail;
+  }
+  res1 = SWIG_ConvertPtr(args(0),SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateGetIntegerProperty" "', argument " "1"" of type '" "helics_federate""'"); 
+  }
+  ecode2 = SWIG_AsVal_int(args(1), &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "helicsFederateGetIntegerProperty" "', argument " "2"" of type '" "int""'");
+  } 
+  arg2 = static_cast< int >(val2);
+  result = (int)helicsFederateGetIntegerProperty(arg1,arg2,arg3);
+  _outv = SWIG_From_int(static_cast< int >(result));
+  if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg3);
+    }
+  }
+  return _out;
+fail:
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg3);
+    }
+  }
+  return octave_value_list();
+}
+
+
+SWIG_DEFUN( helicsFederateGetCurrentTime, _wrap_helicsFederateGetCurrentTime, std::string() ) {
+  helics_federate arg1 = (helics_federate) 0 ;
+  helics_error *arg2 = (helics_error *) 0 ;
+  int res1 ;
+  helics_error etemp2 ;
+  octave_value_list _out;
+  octave_value_list *_outp=&_out;
+  octave_value _outv;
+  helics_time result;
+  
+  {
+    etemp2=helicsErrorInitialize();
+    arg2=&etemp2;
+  }
   if (!SWIG_check_num_args("helicsFederateGetCurrentTime",args.length(),1,1,0)) {
     SWIG_fail;
   }
@@ -6540,22 +7457,217 @@ SWIG_DEFUN( helicsFederateGetCurrentTime, _wrap_helicsFederateGetCurrentTime, _w
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateGetCurrentTime" "', argument " "1"" of type '" "helics_federate""'"); 
   }
-  result = (helics_status)helicsFederateGetCurrentTime(arg1,arg2);
-  _outv = SWIG_From_int(static_cast< int >(result));
+  result = (helics_time)helicsFederateGetCurrentTime(arg1,arg2);
+  _outv = SWIG_From_double(static_cast< double >(result));
   if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
-  if (SWIG_IsTmpObj(res2)) {
-    _outp = SWIG_Octave_AppendOutput(_outp, SWIG_From_double((*arg2)));
-  } else {
-    int new_flags = SWIG_IsNewObj(res2) ? (SWIG_POINTER_OWN |  0 ) :  0 ;
-    _outp = SWIG_Octave_AppendOutput(_outp, SWIG_NewPointerObj((void*)(arg2), SWIGTYPE_p_double, new_flags));
+  {
+    if (arg2->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg2);
+    }
   }
   return _out;
 fail:
+  {
+    if (arg2->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg2);
+    }
+  }
   return octave_value_list();
 }
 
 
-SWIG_DEFUN( helicsCreateQuery, _wrap_helicsCreateQuery, _wrap_helicsCreateQuery_texinfo ) {
+SWIG_DEFUN( helicsFederateSetGlobal, _wrap_helicsFederateSetGlobal, std::string() ) {
+  helics_federate arg1 = (helics_federate) 0 ;
+  char *arg2 = (char *) 0 ;
+  char *arg3 = (char *) 0 ;
+  helics_error *arg4 = (helics_error *) 0 ;
+  int res1 ;
+  int res2 ;
+  char *buf2 = 0 ;
+  int alloc2 = 0 ;
+  int res3 ;
+  char *buf3 = 0 ;
+  int alloc3 = 0 ;
+  helics_error etemp4 ;
+  octave_value_list _out;
+  octave_value_list *_outp=&_out;
+  octave_value _outv;
+  
+  {
+    etemp4=helicsErrorInitialize();
+    arg4=&etemp4;
+  }
+  if (!SWIG_check_num_args("helicsFederateSetGlobal",args.length(),3,3,0)) {
+    SWIG_fail;
+  }
+  res1 = SWIG_ConvertPtr(args(0),SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateSetGlobal" "', argument " "1"" of type '" "helics_federate""'"); 
+  }
+  res2 = SWIG_AsCharPtrAndSize(args(1), &buf2, NULL, &alloc2);
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsFederateSetGlobal" "', argument " "2"" of type '" "char const *""'");
+  }
+  arg2 = reinterpret_cast< char * >(buf2);
+  res3 = SWIG_AsCharPtrAndSize(args(2), &buf3, NULL, &alloc3);
+  if (!SWIG_IsOK(res3)) {
+    SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "helicsFederateSetGlobal" "', argument " "3"" of type '" "char const *""'");
+  }
+  arg3 = reinterpret_cast< char * >(buf3);
+  helicsFederateSetGlobal(arg1,(char const *)arg2,(char const *)arg3,arg4);
+  _outv = octave_value();
+  if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
+  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  if (alloc3 == SWIG_NEWOBJ) delete[] buf3;
+  {
+    if (arg4->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg4);
+    }
+  }
+  return _out;
+fail:
+  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  if (alloc3 == SWIG_NEWOBJ) delete[] buf3;
+  {
+    if (arg4->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg4);
+    }
+  }
+  return octave_value_list();
+}
+
+
+SWIG_DEFUN( helicsCoreSetGlobal, _wrap_helicsCoreSetGlobal, std::string() ) {
+  helics_core arg1 = (helics_core) 0 ;
+  char *arg2 = (char *) 0 ;
+  char *arg3 = (char *) 0 ;
+  helics_error *arg4 = (helics_error *) 0 ;
+  int res1 ;
+  int res2 ;
+  char *buf2 = 0 ;
+  int alloc2 = 0 ;
+  int res3 ;
+  char *buf3 = 0 ;
+  int alloc3 = 0 ;
+  helics_error etemp4 ;
+  octave_value_list _out;
+  octave_value_list *_outp=&_out;
+  octave_value _outv;
+  
+  {
+    etemp4=helicsErrorInitialize();
+    arg4=&etemp4;
+  }
+  if (!SWIG_check_num_args("helicsCoreSetGlobal",args.length(),3,3,0)) {
+    SWIG_fail;
+  }
+  res1 = SWIG_ConvertPtr(args(0),SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsCoreSetGlobal" "', argument " "1"" of type '" "helics_core""'"); 
+  }
+  res2 = SWIG_AsCharPtrAndSize(args(1), &buf2, NULL, &alloc2);
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsCoreSetGlobal" "', argument " "2"" of type '" "char const *""'");
+  }
+  arg2 = reinterpret_cast< char * >(buf2);
+  res3 = SWIG_AsCharPtrAndSize(args(2), &buf3, NULL, &alloc3);
+  if (!SWIG_IsOK(res3)) {
+    SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "helicsCoreSetGlobal" "', argument " "3"" of type '" "char const *""'");
+  }
+  arg3 = reinterpret_cast< char * >(buf3);
+  helicsCoreSetGlobal(arg1,(char const *)arg2,(char const *)arg3,arg4);
+  _outv = octave_value();
+  if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
+  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  if (alloc3 == SWIG_NEWOBJ) delete[] buf3;
+  {
+    if (arg4->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg4);
+    }
+  }
+  return _out;
+fail:
+  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  if (alloc3 == SWIG_NEWOBJ) delete[] buf3;
+  {
+    if (arg4->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg4);
+    }
+  }
+  return octave_value_list();
+}
+
+
+SWIG_DEFUN( helicsBrokerSetGlobal, _wrap_helicsBrokerSetGlobal, std::string() ) {
+  helics_broker arg1 = (helics_broker) 0 ;
+  char *arg2 = (char *) 0 ;
+  char *arg3 = (char *) 0 ;
+  helics_error *arg4 = (helics_error *) 0 ;
+  int res1 ;
+  int res2 ;
+  char *buf2 = 0 ;
+  int alloc2 = 0 ;
+  int res3 ;
+  char *buf3 = 0 ;
+  int alloc3 = 0 ;
+  helics_error etemp4 ;
+  octave_value_list _out;
+  octave_value_list *_outp=&_out;
+  octave_value _outv;
+  
+  {
+    etemp4=helicsErrorInitialize();
+    arg4=&etemp4;
+  }
+  if (!SWIG_check_num_args("helicsBrokerSetGlobal",args.length(),3,3,0)) {
+    SWIG_fail;
+  }
+  res1 = SWIG_ConvertPtr(args(0),SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsBrokerSetGlobal" "', argument " "1"" of type '" "helics_broker""'"); 
+  }
+  res2 = SWIG_AsCharPtrAndSize(args(1), &buf2, NULL, &alloc2);
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsBrokerSetGlobal" "', argument " "2"" of type '" "char const *""'");
+  }
+  arg2 = reinterpret_cast< char * >(buf2);
+  res3 = SWIG_AsCharPtrAndSize(args(2), &buf3, NULL, &alloc3);
+  if (!SWIG_IsOK(res3)) {
+    SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "helicsBrokerSetGlobal" "', argument " "3"" of type '" "char const *""'");
+  }
+  arg3 = reinterpret_cast< char * >(buf3);
+  helicsBrokerSetGlobal(arg1,(char const *)arg2,(char const *)arg3,arg4);
+  _outv = octave_value();
+  if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
+  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  if (alloc3 == SWIG_NEWOBJ) delete[] buf3;
+  {
+    if (arg4->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg4);
+    }
+  }
+  return _out;
+fail:
+  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  if (alloc3 == SWIG_NEWOBJ) delete[] buf3;
+  {
+    if (arg4->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg4);
+    }
+  }
+  return octave_value_list();
+}
+
+
+SWIG_DEFUN( helicsCreateQuery, _wrap_helicsCreateQuery, std::string() ) {
   char *arg1 = (char *) 0 ;
   char *arg2 = (char *) 0 ;
   int res1 ;
@@ -6595,16 +7707,22 @@ fail:
 }
 
 
-SWIG_DEFUN( helicsQueryExecute, _wrap_helicsQueryExecute, _wrap_helicsQueryExecute_texinfo ) {
+SWIG_DEFUN( helicsQueryExecute, _wrap_helicsQueryExecute, std::string() ) {
   helics_query arg1 = (helics_query) 0 ;
   helics_federate arg2 = (helics_federate) 0 ;
+  helics_error *arg3 = (helics_error *) 0 ;
   int res1 ;
   int res2 ;
+  helics_error etemp3 ;
   octave_value_list _out;
   octave_value_list *_outp=&_out;
   octave_value _outv;
   char *result = 0 ;
   
+  {
+    etemp3=helicsErrorInitialize();
+    arg3=&etemp3;
+  }
   if (!SWIG_check_num_args("helicsQueryExecute",args.length(),2,2,0)) {
     SWIG_fail;
   }
@@ -6616,25 +7734,138 @@ SWIG_DEFUN( helicsQueryExecute, _wrap_helicsQueryExecute, _wrap_helicsQueryExecu
   if (!SWIG_IsOK(res2)) {
     SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsQueryExecute" "', argument " "2"" of type '" "helics_federate""'"); 
   }
-  result = (char *)helicsQueryExecute(arg1,arg2);
+  result = (char *)helicsQueryExecute(arg1,arg2,arg3);
   _outv = SWIG_FromCharPtr((const char *)result);
   if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg3);
+    }
+  }
   return _out;
 fail:
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg3);
+    }
+  }
   return octave_value_list();
 }
 
 
-SWIG_DEFUN( helicsQueryExecuteAsync, _wrap_helicsQueryExecuteAsync, _wrap_helicsQueryExecuteAsync_texinfo ) {
+SWIG_DEFUN( helicsQueryCoreExecute, _wrap_helicsQueryCoreExecute, std::string() ) {
   helics_query arg1 = (helics_query) 0 ;
-  helics_federate arg2 = (helics_federate) 0 ;
+  helics_core arg2 = (helics_core) 0 ;
+  helics_error *arg3 = (helics_error *) 0 ;
   int res1 ;
   int res2 ;
+  helics_error etemp3 ;
   octave_value_list _out;
   octave_value_list *_outp=&_out;
   octave_value _outv;
-  helics_status result;
+  char *result = 0 ;
   
+  {
+    etemp3=helicsErrorInitialize();
+    arg3=&etemp3;
+  }
+  if (!SWIG_check_num_args("helicsQueryCoreExecute",args.length(),2,2,0)) {
+    SWIG_fail;
+  }
+  res1 = SWIG_ConvertPtr(args(0),SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsQueryCoreExecute" "', argument " "1"" of type '" "helics_query""'"); 
+  }
+  res2 = SWIG_ConvertPtr(args(1),SWIG_as_voidptrptr(&arg2), 0, 0);
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsQueryCoreExecute" "', argument " "2"" of type '" "helics_core""'"); 
+  }
+  result = (char *)helicsQueryCoreExecute(arg1,arg2,arg3);
+  _outv = SWIG_FromCharPtr((const char *)result);
+  if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg3);
+    }
+  }
+  return _out;
+fail:
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg3);
+    }
+  }
+  return octave_value_list();
+}
+
+
+SWIG_DEFUN( helicsQueryBrokerExecute, _wrap_helicsQueryBrokerExecute, std::string() ) {
+  helics_query arg1 = (helics_query) 0 ;
+  helics_broker arg2 = (helics_broker) 0 ;
+  helics_error *arg3 = (helics_error *) 0 ;
+  int res1 ;
+  int res2 ;
+  helics_error etemp3 ;
+  octave_value_list _out;
+  octave_value_list *_outp=&_out;
+  octave_value _outv;
+  char *result = 0 ;
+  
+  {
+    etemp3=helicsErrorInitialize();
+    arg3=&etemp3;
+  }
+  if (!SWIG_check_num_args("helicsQueryBrokerExecute",args.length(),2,2,0)) {
+    SWIG_fail;
+  }
+  res1 = SWIG_ConvertPtr(args(0),SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsQueryBrokerExecute" "', argument " "1"" of type '" "helics_query""'"); 
+  }
+  res2 = SWIG_ConvertPtr(args(1),SWIG_as_voidptrptr(&arg2), 0, 0);
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsQueryBrokerExecute" "', argument " "2"" of type '" "helics_broker""'"); 
+  }
+  result = (char *)helicsQueryBrokerExecute(arg1,arg2,arg3);
+  _outv = SWIG_FromCharPtr((const char *)result);
+  if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg3);
+    }
+  }
+  return _out;
+fail:
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg3);
+    }
+  }
+  return octave_value_list();
+}
+
+
+SWIG_DEFUN( helicsQueryExecuteAsync, _wrap_helicsQueryExecuteAsync, std::string() ) {
+  helics_query arg1 = (helics_query) 0 ;
+  helics_federate arg2 = (helics_federate) 0 ;
+  helics_error *arg3 = (helics_error *) 0 ;
+  int res1 ;
+  int res2 ;
+  helics_error etemp3 ;
+  octave_value_list _out;
+  octave_value_list *_outp=&_out;
+  octave_value _outv;
+  
+  {
+    etemp3=helicsErrorInitialize();
+    arg3=&etemp3;
+  }
   if (!SWIG_check_num_args("helicsQueryExecuteAsync",args.length(),2,2,0)) {
     SWIG_fail;
   }
@@ -6646,23 +7877,41 @@ SWIG_DEFUN( helicsQueryExecuteAsync, _wrap_helicsQueryExecuteAsync, _wrap_helics
   if (!SWIG_IsOK(res2)) {
     SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsQueryExecuteAsync" "', argument " "2"" of type '" "helics_federate""'"); 
   }
-  result = (helics_status)helicsQueryExecuteAsync(arg1,arg2);
-  _outv = SWIG_From_int(static_cast< int >(result));
+  helicsQueryExecuteAsync(arg1,arg2,arg3);
+  _outv = octave_value();
   if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg3);
+    }
+  }
   return _out;
 fail:
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg3);
+    }
+  }
   return octave_value_list();
 }
 
 
-SWIG_DEFUN( helicsQueryExecuteComplete, _wrap_helicsQueryExecuteComplete, _wrap_helicsQueryExecuteComplete_texinfo ) {
+SWIG_DEFUN( helicsQueryExecuteComplete, _wrap_helicsQueryExecuteComplete, std::string() ) {
   helics_query arg1 = (helics_query) 0 ;
+  helics_error *arg2 = (helics_error *) 0 ;
   int res1 ;
+  helics_error etemp2 ;
   octave_value_list _out;
   octave_value_list *_outp=&_out;
   octave_value _outv;
   char *result = 0 ;
   
+  {
+    etemp2=helicsErrorInitialize();
+    arg2=&etemp2;
+  }
   if (!SWIG_check_num_args("helicsQueryExecuteComplete",args.length(),1,1,0)) {
     SWIG_fail;
   }
@@ -6670,22 +7919,34 @@ SWIG_DEFUN( helicsQueryExecuteComplete, _wrap_helicsQueryExecuteComplete, _wrap_
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsQueryExecuteComplete" "', argument " "1"" of type '" "helics_query""'"); 
   }
-  result = (char *)helicsQueryExecuteComplete(arg1);
+  result = (char *)helicsQueryExecuteComplete(arg1,arg2);
   _outv = SWIG_FromCharPtr((const char *)result);
   if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
+  {
+    if (arg2->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg2);
+    }
+  }
   return _out;
 fail:
+  {
+    if (arg2->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg2);
+    }
+  }
   return octave_value_list();
 }
 
 
-SWIG_DEFUN( helicsQueryIsCompleted, _wrap_helicsQueryIsCompleted, _wrap_helicsQueryIsCompleted_texinfo ) {
+SWIG_DEFUN( helicsQueryIsCompleted, _wrap_helicsQueryIsCompleted, std::string() ) {
   helics_query arg1 = (helics_query) 0 ;
   int res1 ;
   octave_value_list _out;
   octave_value_list *_outp=&_out;
   octave_value _outv;
-  helics_bool_t result;
+  helics_bool result;
   
   if (!SWIG_check_num_args("helicsQueryIsCompleted",args.length(),1,1,0)) {
     SWIG_fail;
@@ -6694,7 +7955,7 @@ SWIG_DEFUN( helicsQueryIsCompleted, _wrap_helicsQueryIsCompleted, _wrap_helicsQu
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsQueryIsCompleted" "', argument " "1"" of type '" "helics_query""'"); 
   }
-  result = (helics_bool_t)helicsQueryIsCompleted(arg1);
+  result = (helics_bool)helicsQueryIsCompleted(arg1);
   _outv = SWIG_From_int(static_cast< int >(result));
   if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
   return _out;
@@ -6703,7 +7964,7 @@ fail:
 }
 
 
-SWIG_DEFUN( helicsQueryFree, _wrap_helicsQueryFree, _wrap_helicsQueryFree_texinfo ) {
+SWIG_DEFUN( helicsQueryFree, _wrap_helicsQueryFree, std::string() ) {
   helics_query arg1 = (helics_query) 0 ;
   int res1 ;
   octave_value_list _out;
@@ -6726,15 +7987,15 @@ fail:
 }
 
 
-SWIG_DEFUN( helicsCleanupHelicsLibrary, _wrap_helicsCleanupHelicsLibrary, std::string() ) {
+SWIG_DEFUN( helicsCleanupLibrary, _wrap_helicsCleanupLibrary, std::string() ) {
   octave_value_list _out;
   octave_value_list *_outp=&_out;
   octave_value _outv;
   
-  if (!SWIG_check_num_args("helicsCleanupHelicsLibrary",args.length(),0,0,0)) {
+  if (!SWIG_check_num_args("helicsCleanupLibrary",args.length(),0,0,0)) {
     SWIG_fail;
   }
-  helicsCleanupHelicsLibrary();
+  helicsCleanupLibrary();
   _outv = octave_value();
   if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
   return _out;
@@ -6743,11 +8004,11 @@ fail:
 }
 
 
-SWIG_DEFUN( helicsFederateRegisterSubscription, _wrap_helicsFederateRegisterSubscription, _wrap_helicsFederateRegisterSubscription_texinfo ) {
+SWIG_DEFUN( helicsFederateRegisterSubscription, _wrap_helicsFederateRegisterSubscription, std::string() ) {
   helics_federate arg1 = (helics_federate) 0 ;
   char *arg2 = (char *) 0 ;
   char *arg3 = (char *) 0 ;
-  char *arg4 = (char *) 0 ;
+  helics_error *arg4 = (helics_error *) 0 ;
   int res1 ;
   int res2 ;
   char *buf2 = 0 ;
@@ -6755,15 +8016,17 @@ SWIG_DEFUN( helicsFederateRegisterSubscription, _wrap_helicsFederateRegisterSubs
   int res3 ;
   char *buf3 = 0 ;
   int alloc3 = 0 ;
-  int res4 ;
-  char *buf4 = 0 ;
-  int alloc4 = 0 ;
+  helics_error etemp4 ;
   octave_value_list _out;
   octave_value_list *_outp=&_out;
   octave_value _outv;
-  helics_subscription result;
+  helics_input result;
   
-  if (!SWIG_check_num_args("helicsFederateRegisterSubscription",args.length(),4,4,0)) {
+  {
+    etemp4=helicsErrorInitialize();
+    arg4=&etemp4;
+  }
+  if (!SWIG_check_num_args("helicsFederateRegisterSubscription",args.length(),3,3,0)) {
     SWIG_fail;
   }
   res1 = SWIG_ConvertPtr(args(0),SWIG_as_voidptrptr(&arg1), 0, 0);
@@ -6780,31 +8043,37 @@ SWIG_DEFUN( helicsFederateRegisterSubscription, _wrap_helicsFederateRegisterSubs
     SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "helicsFederateRegisterSubscription" "', argument " "3"" of type '" "char const *""'");
   }
   arg3 = reinterpret_cast< char * >(buf3);
-  res4 = SWIG_AsCharPtrAndSize(args(3), &buf4, NULL, &alloc4);
-  if (!SWIG_IsOK(res4)) {
-    SWIG_exception_fail(SWIG_ArgError(res4), "in method '" "helicsFederateRegisterSubscription" "', argument " "4"" of type '" "char const *""'");
-  }
-  arg4 = reinterpret_cast< char * >(buf4);
-  result = (helics_subscription)helicsFederateRegisterSubscription(arg1,(char const *)arg2,(char const *)arg3,(char const *)arg4);
+  result = (helics_input)helicsFederateRegisterSubscription(arg1,(char const *)arg2,(char const *)arg3,arg4);
   _outv = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_void, 0 |  0 );
   if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
   if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
   if (alloc3 == SWIG_NEWOBJ) delete[] buf3;
-  if (alloc4 == SWIG_NEWOBJ) delete[] buf4;
+  {
+    if (arg4->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg4);
+    }
+  }
   return _out;
 fail:
   if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
   if (alloc3 == SWIG_NEWOBJ) delete[] buf3;
-  if (alloc4 == SWIG_NEWOBJ) delete[] buf4;
+  {
+    if (arg4->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg4);
+    }
+  }
   return octave_value_list();
 }
 
 
-SWIG_DEFUN( helicsFederateRegisterTypeSubscription, _wrap_helicsFederateRegisterTypeSubscription, _wrap_helicsFederateRegisterTypeSubscription_texinfo ) {
+SWIG_DEFUN( helicsFederateRegisterPublication, _wrap_helicsFederateRegisterPublication, std::string() ) {
   helics_federate arg1 = (helics_federate) 0 ;
   char *arg2 = (char *) 0 ;
-  int arg3 ;
+  helics_data_type arg3 ;
   char *arg4 = (char *) 0 ;
+  helics_error *arg5 = (helics_error *) 0 ;
   int res1 ;
   int res2 ;
   char *buf2 = 0 ;
@@ -6814,177 +8083,16 @@ SWIG_DEFUN( helicsFederateRegisterTypeSubscription, _wrap_helicsFederateRegister
   int res4 ;
   char *buf4 = 0 ;
   int alloc4 = 0 ;
-  octave_value_list _out;
-  octave_value_list *_outp=&_out;
-  octave_value _outv;
-  helics_subscription result;
-  
-  if (!SWIG_check_num_args("helicsFederateRegisterTypeSubscription",args.length(),4,4,0)) {
-    SWIG_fail;
-  }
-  res1 = SWIG_ConvertPtr(args(0),SWIG_as_voidptrptr(&arg1), 0, 0);
-  if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateRegisterTypeSubscription" "', argument " "1"" of type '" "helics_federate""'"); 
-  }
-  res2 = SWIG_AsCharPtrAndSize(args(1), &buf2, NULL, &alloc2);
-  if (!SWIG_IsOK(res2)) {
-    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsFederateRegisterTypeSubscription" "', argument " "2"" of type '" "char const *""'");
-  }
-  arg2 = reinterpret_cast< char * >(buf2);
-  ecode3 = SWIG_AsVal_int(args(2), &val3);
-  if (!SWIG_IsOK(ecode3)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "helicsFederateRegisterTypeSubscription" "', argument " "3"" of type '" "int""'");
-  } 
-  arg3 = static_cast< int >(val3);
-  res4 = SWIG_AsCharPtrAndSize(args(3), &buf4, NULL, &alloc4);
-  if (!SWIG_IsOK(res4)) {
-    SWIG_exception_fail(SWIG_ArgError(res4), "in method '" "helicsFederateRegisterTypeSubscription" "', argument " "4"" of type '" "char const *""'");
-  }
-  arg4 = reinterpret_cast< char * >(buf4);
-  result = (helics_subscription)helicsFederateRegisterTypeSubscription(arg1,(char const *)arg2,arg3,(char const *)arg4);
-  _outv = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_void, 0 |  0 );
-  if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
-  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
-  if (alloc4 == SWIG_NEWOBJ) delete[] buf4;
-  return _out;
-fail:
-  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
-  if (alloc4 == SWIG_NEWOBJ) delete[] buf4;
-  return octave_value_list();
-}
-
-
-SWIG_DEFUN( helicsFederateRegisterOptionalSubscription, _wrap_helicsFederateRegisterOptionalSubscription, _wrap_helicsFederateRegisterOptionalSubscription_texinfo ) {
-  helics_federate arg1 = (helics_federate) 0 ;
-  char *arg2 = (char *) 0 ;
-  char *arg3 = (char *) 0 ;
-  char *arg4 = (char *) 0 ;
-  int res1 ;
-  int res2 ;
-  char *buf2 = 0 ;
-  int alloc2 = 0 ;
-  int res3 ;
-  char *buf3 = 0 ;
-  int alloc3 = 0 ;
-  int res4 ;
-  char *buf4 = 0 ;
-  int alloc4 = 0 ;
-  octave_value_list _out;
-  octave_value_list *_outp=&_out;
-  octave_value _outv;
-  helics_subscription result;
-  
-  if (!SWIG_check_num_args("helicsFederateRegisterOptionalSubscription",args.length(),4,4,0)) {
-    SWIG_fail;
-  }
-  res1 = SWIG_ConvertPtr(args(0),SWIG_as_voidptrptr(&arg1), 0, 0);
-  if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateRegisterOptionalSubscription" "', argument " "1"" of type '" "helics_federate""'"); 
-  }
-  res2 = SWIG_AsCharPtrAndSize(args(1), &buf2, NULL, &alloc2);
-  if (!SWIG_IsOK(res2)) {
-    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsFederateRegisterOptionalSubscription" "', argument " "2"" of type '" "char const *""'");
-  }
-  arg2 = reinterpret_cast< char * >(buf2);
-  res3 = SWIG_AsCharPtrAndSize(args(2), &buf3, NULL, &alloc3);
-  if (!SWIG_IsOK(res3)) {
-    SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "helicsFederateRegisterOptionalSubscription" "', argument " "3"" of type '" "char const *""'");
-  }
-  arg3 = reinterpret_cast< char * >(buf3);
-  res4 = SWIG_AsCharPtrAndSize(args(3), &buf4, NULL, &alloc4);
-  if (!SWIG_IsOK(res4)) {
-    SWIG_exception_fail(SWIG_ArgError(res4), "in method '" "helicsFederateRegisterOptionalSubscription" "', argument " "4"" of type '" "char const *""'");
-  }
-  arg4 = reinterpret_cast< char * >(buf4);
-  result = (helics_subscription)helicsFederateRegisterOptionalSubscription(arg1,(char const *)arg2,(char const *)arg3,(char const *)arg4);
-  _outv = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_void, 0 |  0 );
-  if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
-  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
-  if (alloc3 == SWIG_NEWOBJ) delete[] buf3;
-  if (alloc4 == SWIG_NEWOBJ) delete[] buf4;
-  return _out;
-fail:
-  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
-  if (alloc3 == SWIG_NEWOBJ) delete[] buf3;
-  if (alloc4 == SWIG_NEWOBJ) delete[] buf4;
-  return octave_value_list();
-}
-
-
-SWIG_DEFUN( helicsFederateRegisterOptionalTypeSubscription, _wrap_helicsFederateRegisterOptionalTypeSubscription, _wrap_helicsFederateRegisterOptionalTypeSubscription_texinfo ) {
-  helics_federate arg1 = (helics_federate) 0 ;
-  char *arg2 = (char *) 0 ;
-  int arg3 ;
-  char *arg4 = (char *) 0 ;
-  int res1 ;
-  int res2 ;
-  char *buf2 = 0 ;
-  int alloc2 = 0 ;
-  int val3 ;
-  int ecode3 = 0 ;
-  int res4 ;
-  char *buf4 = 0 ;
-  int alloc4 = 0 ;
-  octave_value_list _out;
-  octave_value_list *_outp=&_out;
-  octave_value _outv;
-  helics_subscription result;
-  
-  if (!SWIG_check_num_args("helicsFederateRegisterOptionalTypeSubscription",args.length(),4,4,0)) {
-    SWIG_fail;
-  }
-  res1 = SWIG_ConvertPtr(args(0),SWIG_as_voidptrptr(&arg1), 0, 0);
-  if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateRegisterOptionalTypeSubscription" "', argument " "1"" of type '" "helics_federate""'"); 
-  }
-  res2 = SWIG_AsCharPtrAndSize(args(1), &buf2, NULL, &alloc2);
-  if (!SWIG_IsOK(res2)) {
-    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsFederateRegisterOptionalTypeSubscription" "', argument " "2"" of type '" "char const *""'");
-  }
-  arg2 = reinterpret_cast< char * >(buf2);
-  ecode3 = SWIG_AsVal_int(args(2), &val3);
-  if (!SWIG_IsOK(ecode3)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "helicsFederateRegisterOptionalTypeSubscription" "', argument " "3"" of type '" "int""'");
-  } 
-  arg3 = static_cast< int >(val3);
-  res4 = SWIG_AsCharPtrAndSize(args(3), &buf4, NULL, &alloc4);
-  if (!SWIG_IsOK(res4)) {
-    SWIG_exception_fail(SWIG_ArgError(res4), "in method '" "helicsFederateRegisterOptionalTypeSubscription" "', argument " "4"" of type '" "char const *""'");
-  }
-  arg4 = reinterpret_cast< char * >(buf4);
-  result = (helics_subscription)helicsFederateRegisterOptionalTypeSubscription(arg1,(char const *)arg2,arg3,(char const *)arg4);
-  _outv = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_void, 0 |  0 );
-  if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
-  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
-  if (alloc4 == SWIG_NEWOBJ) delete[] buf4;
-  return _out;
-fail:
-  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
-  if (alloc4 == SWIG_NEWOBJ) delete[] buf4;
-  return octave_value_list();
-}
-
-
-SWIG_DEFUN( helicsFederateRegisterPublication, _wrap_helicsFederateRegisterPublication, _wrap_helicsFederateRegisterPublication_texinfo ) {
-  helics_federate arg1 = (helics_federate) 0 ;
-  char *arg2 = (char *) 0 ;
-  char *arg3 = (char *) 0 ;
-  char *arg4 = (char *) 0 ;
-  int res1 ;
-  int res2 ;
-  char *buf2 = 0 ;
-  int alloc2 = 0 ;
-  int res3 ;
-  char *buf3 = 0 ;
-  int alloc3 = 0 ;
-  int res4 ;
-  char *buf4 = 0 ;
-  int alloc4 = 0 ;
+  helics_error etemp5 ;
   octave_value_list _out;
   octave_value_list *_outp=&_out;
   octave_value _outv;
   helics_publication result;
   
+  {
+    etemp5=helicsErrorInitialize();
+    arg5=&etemp5;
+  }
   if (!SWIG_check_num_args("helicsFederateRegisterPublication",args.length(),4,4,0)) {
     SWIG_fail;
   }
@@ -6997,50 +8105,67 @@ SWIG_DEFUN( helicsFederateRegisterPublication, _wrap_helicsFederateRegisterPubli
     SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsFederateRegisterPublication" "', argument " "2"" of type '" "char const *""'");
   }
   arg2 = reinterpret_cast< char * >(buf2);
-  res3 = SWIG_AsCharPtrAndSize(args(2), &buf3, NULL, &alloc3);
-  if (!SWIG_IsOK(res3)) {
-    SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "helicsFederateRegisterPublication" "', argument " "3"" of type '" "char const *""'");
-  }
-  arg3 = reinterpret_cast< char * >(buf3);
+  ecode3 = SWIG_AsVal_int(args(2), &val3);
+  if (!SWIG_IsOK(ecode3)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "helicsFederateRegisterPublication" "', argument " "3"" of type '" "helics_data_type""'");
+  } 
+  arg3 = static_cast< helics_data_type >(val3);
   res4 = SWIG_AsCharPtrAndSize(args(3), &buf4, NULL, &alloc4);
   if (!SWIG_IsOK(res4)) {
     SWIG_exception_fail(SWIG_ArgError(res4), "in method '" "helicsFederateRegisterPublication" "', argument " "4"" of type '" "char const *""'");
   }
   arg4 = reinterpret_cast< char * >(buf4);
-  result = (helics_publication)helicsFederateRegisterPublication(arg1,(char const *)arg2,(char const *)arg3,(char const *)arg4);
+  result = (helics_publication)helicsFederateRegisterPublication(arg1,(char const *)arg2,arg3,(char const *)arg4,arg5);
   _outv = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_void, 0 |  0 );
   if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
   if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
-  if (alloc3 == SWIG_NEWOBJ) delete[] buf3;
   if (alloc4 == SWIG_NEWOBJ) delete[] buf4;
+  {
+    if (arg5->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg5);
+    }
+  }
   return _out;
 fail:
   if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
-  if (alloc3 == SWIG_NEWOBJ) delete[] buf3;
   if (alloc4 == SWIG_NEWOBJ) delete[] buf4;
+  {
+    if (arg5->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg5);
+    }
+  }
   return octave_value_list();
 }
 
 
-SWIG_DEFUN( helicsFederateRegisterTypePublication, _wrap_helicsFederateRegisterTypePublication, _wrap_helicsFederateRegisterTypePublication_texinfo ) {
+SWIG_DEFUN( helicsFederateRegisterTypePublication, _wrap_helicsFederateRegisterTypePublication, std::string() ) {
   helics_federate arg1 = (helics_federate) 0 ;
   char *arg2 = (char *) 0 ;
-  int arg3 ;
+  char *arg3 = (char *) 0 ;
   char *arg4 = (char *) 0 ;
+  helics_error *arg5 = (helics_error *) 0 ;
   int res1 ;
   int res2 ;
   char *buf2 = 0 ;
   int alloc2 = 0 ;
-  int val3 ;
-  int ecode3 = 0 ;
+  int res3 ;
+  char *buf3 = 0 ;
+  int alloc3 = 0 ;
   int res4 ;
   char *buf4 = 0 ;
   int alloc4 = 0 ;
+  helics_error etemp5 ;
   octave_value_list _out;
   octave_value_list *_outp=&_out;
   octave_value _outv;
   helics_publication result;
   
+  {
+    etemp5=helicsErrorInitialize();
+    arg5=&etemp5;
+  }
   if (!SWIG_check_num_args("helicsFederateRegisterTypePublication",args.length(),4,4,0)) {
     SWIG_fail;
   }
@@ -7053,49 +8178,68 @@ SWIG_DEFUN( helicsFederateRegisterTypePublication, _wrap_helicsFederateRegisterT
     SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsFederateRegisterTypePublication" "', argument " "2"" of type '" "char const *""'");
   }
   arg2 = reinterpret_cast< char * >(buf2);
-  ecode3 = SWIG_AsVal_int(args(2), &val3);
-  if (!SWIG_IsOK(ecode3)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "helicsFederateRegisterTypePublication" "', argument " "3"" of type '" "int""'");
-  } 
-  arg3 = static_cast< int >(val3);
+  res3 = SWIG_AsCharPtrAndSize(args(2), &buf3, NULL, &alloc3);
+  if (!SWIG_IsOK(res3)) {
+    SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "helicsFederateRegisterTypePublication" "', argument " "3"" of type '" "char const *""'");
+  }
+  arg3 = reinterpret_cast< char * >(buf3);
   res4 = SWIG_AsCharPtrAndSize(args(3), &buf4, NULL, &alloc4);
   if (!SWIG_IsOK(res4)) {
     SWIG_exception_fail(SWIG_ArgError(res4), "in method '" "helicsFederateRegisterTypePublication" "', argument " "4"" of type '" "char const *""'");
   }
   arg4 = reinterpret_cast< char * >(buf4);
-  result = (helics_publication)helicsFederateRegisterTypePublication(arg1,(char const *)arg2,arg3,(char const *)arg4);
+  result = (helics_publication)helicsFederateRegisterTypePublication(arg1,(char const *)arg2,(char const *)arg3,(char const *)arg4,arg5);
   _outv = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_void, 0 |  0 );
   if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
   if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  if (alloc3 == SWIG_NEWOBJ) delete[] buf3;
   if (alloc4 == SWIG_NEWOBJ) delete[] buf4;
+  {
+    if (arg5->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg5);
+    }
+  }
   return _out;
 fail:
   if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  if (alloc3 == SWIG_NEWOBJ) delete[] buf3;
   if (alloc4 == SWIG_NEWOBJ) delete[] buf4;
+  {
+    if (arg5->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg5);
+    }
+  }
   return octave_value_list();
 }
 
 
-SWIG_DEFUN( helicsFederateRegisterGlobalPublication, _wrap_helicsFederateRegisterGlobalPublication, _wrap_helicsFederateRegisterGlobalPublication_texinfo ) {
+SWIG_DEFUN( helicsFederateRegisterGlobalPublication, _wrap_helicsFederateRegisterGlobalPublication, std::string() ) {
   helics_federate arg1 = (helics_federate) 0 ;
   char *arg2 = (char *) 0 ;
-  char *arg3 = (char *) 0 ;
+  helics_data_type arg3 ;
   char *arg4 = (char *) 0 ;
+  helics_error *arg5 = (helics_error *) 0 ;
   int res1 ;
   int res2 ;
   char *buf2 = 0 ;
   int alloc2 = 0 ;
-  int res3 ;
-  char *buf3 = 0 ;
-  int alloc3 = 0 ;
+  int val3 ;
+  int ecode3 = 0 ;
   int res4 ;
   char *buf4 = 0 ;
   int alloc4 = 0 ;
+  helics_error etemp5 ;
   octave_value_list _out;
   octave_value_list *_outp=&_out;
   octave_value _outv;
   helics_publication result;
   
+  {
+    etemp5=helicsErrorInitialize();
+    arg5=&etemp5;
+  }
   if (!SWIG_check_num_args("helicsFederateRegisterGlobalPublication",args.length(),4,4,0)) {
     SWIG_fail;
   }
@@ -7108,50 +8252,67 @@ SWIG_DEFUN( helicsFederateRegisterGlobalPublication, _wrap_helicsFederateRegiste
     SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsFederateRegisterGlobalPublication" "', argument " "2"" of type '" "char const *""'");
   }
   arg2 = reinterpret_cast< char * >(buf2);
-  res3 = SWIG_AsCharPtrAndSize(args(2), &buf3, NULL, &alloc3);
-  if (!SWIG_IsOK(res3)) {
-    SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "helicsFederateRegisterGlobalPublication" "', argument " "3"" of type '" "char const *""'");
-  }
-  arg3 = reinterpret_cast< char * >(buf3);
+  ecode3 = SWIG_AsVal_int(args(2), &val3);
+  if (!SWIG_IsOK(ecode3)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "helicsFederateRegisterGlobalPublication" "', argument " "3"" of type '" "helics_data_type""'");
+  } 
+  arg3 = static_cast< helics_data_type >(val3);
   res4 = SWIG_AsCharPtrAndSize(args(3), &buf4, NULL, &alloc4);
   if (!SWIG_IsOK(res4)) {
     SWIG_exception_fail(SWIG_ArgError(res4), "in method '" "helicsFederateRegisterGlobalPublication" "', argument " "4"" of type '" "char const *""'");
   }
   arg4 = reinterpret_cast< char * >(buf4);
-  result = (helics_publication)helicsFederateRegisterGlobalPublication(arg1,(char const *)arg2,(char const *)arg3,(char const *)arg4);
+  result = (helics_publication)helicsFederateRegisterGlobalPublication(arg1,(char const *)arg2,arg3,(char const *)arg4,arg5);
   _outv = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_void, 0 |  0 );
   if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
   if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
-  if (alloc3 == SWIG_NEWOBJ) delete[] buf3;
   if (alloc4 == SWIG_NEWOBJ) delete[] buf4;
+  {
+    if (arg5->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg5);
+    }
+  }
   return _out;
 fail:
   if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
-  if (alloc3 == SWIG_NEWOBJ) delete[] buf3;
   if (alloc4 == SWIG_NEWOBJ) delete[] buf4;
+  {
+    if (arg5->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg5);
+    }
+  }
   return octave_value_list();
 }
 
 
-SWIG_DEFUN( helicsFederateRegisterGlobalTypePublication, _wrap_helicsFederateRegisterGlobalTypePublication, _wrap_helicsFederateRegisterGlobalTypePublication_texinfo ) {
+SWIG_DEFUN( helicsFederateRegisterGlobalTypePublication, _wrap_helicsFederateRegisterGlobalTypePublication, std::string() ) {
   helics_federate arg1 = (helics_federate) 0 ;
   char *arg2 = (char *) 0 ;
-  int arg3 ;
+  char *arg3 = (char *) 0 ;
   char *arg4 = (char *) 0 ;
+  helics_error *arg5 = (helics_error *) 0 ;
   int res1 ;
   int res2 ;
   char *buf2 = 0 ;
   int alloc2 = 0 ;
-  int val3 ;
-  int ecode3 = 0 ;
+  int res3 ;
+  char *buf3 = 0 ;
+  int alloc3 = 0 ;
   int res4 ;
   char *buf4 = 0 ;
   int alloc4 = 0 ;
+  helics_error etemp5 ;
   octave_value_list _out;
   octave_value_list *_outp=&_out;
   octave_value _outv;
   helics_publication result;
   
+  {
+    etemp5=helicsErrorInitialize();
+    arg5=&etemp5;
+  }
   if (!SWIG_check_num_args("helicsFederateRegisterGlobalTypePublication",args.length(),4,4,0)) {
     SWIG_fail;
   }
@@ -7164,25 +8325,719 @@ SWIG_DEFUN( helicsFederateRegisterGlobalTypePublication, _wrap_helicsFederateReg
     SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsFederateRegisterGlobalTypePublication" "', argument " "2"" of type '" "char const *""'");
   }
   arg2 = reinterpret_cast< char * >(buf2);
-  ecode3 = SWIG_AsVal_int(args(2), &val3);
-  if (!SWIG_IsOK(ecode3)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "helicsFederateRegisterGlobalTypePublication" "', argument " "3"" of type '" "int""'");
-  } 
-  arg3 = static_cast< int >(val3);
+  res3 = SWIG_AsCharPtrAndSize(args(2), &buf3, NULL, &alloc3);
+  if (!SWIG_IsOK(res3)) {
+    SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "helicsFederateRegisterGlobalTypePublication" "', argument " "3"" of type '" "char const *""'");
+  }
+  arg3 = reinterpret_cast< char * >(buf3);
   res4 = SWIG_AsCharPtrAndSize(args(3), &buf4, NULL, &alloc4);
   if (!SWIG_IsOK(res4)) {
     SWIG_exception_fail(SWIG_ArgError(res4), "in method '" "helicsFederateRegisterGlobalTypePublication" "', argument " "4"" of type '" "char const *""'");
   }
   arg4 = reinterpret_cast< char * >(buf4);
-  result = (helics_publication)helicsFederateRegisterGlobalTypePublication(arg1,(char const *)arg2,arg3,(char const *)arg4);
+  result = (helics_publication)helicsFederateRegisterGlobalTypePublication(arg1,(char const *)arg2,(char const *)arg3,(char const *)arg4,arg5);
+  _outv = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_void, 0 |  0 );
+  if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
+  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  if (alloc3 == SWIG_NEWOBJ) delete[] buf3;
+  if (alloc4 == SWIG_NEWOBJ) delete[] buf4;
+  {
+    if (arg5->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg5);
+    }
+  }
+  return _out;
+fail:
+  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  if (alloc3 == SWIG_NEWOBJ) delete[] buf3;
+  if (alloc4 == SWIG_NEWOBJ) delete[] buf4;
+  {
+    if (arg5->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg5);
+    }
+  }
+  return octave_value_list();
+}
+
+
+SWIG_DEFUN( helicsFederateRegisterInput, _wrap_helicsFederateRegisterInput, std::string() ) {
+  helics_federate arg1 = (helics_federate) 0 ;
+  char *arg2 = (char *) 0 ;
+  helics_data_type arg3 ;
+  char *arg4 = (char *) 0 ;
+  helics_error *arg5 = (helics_error *) 0 ;
+  int res1 ;
+  int res2 ;
+  char *buf2 = 0 ;
+  int alloc2 = 0 ;
+  int val3 ;
+  int ecode3 = 0 ;
+  int res4 ;
+  char *buf4 = 0 ;
+  int alloc4 = 0 ;
+  helics_error etemp5 ;
+  octave_value_list _out;
+  octave_value_list *_outp=&_out;
+  octave_value _outv;
+  helics_input result;
+  
+  {
+    etemp5=helicsErrorInitialize();
+    arg5=&etemp5;
+  }
+  if (!SWIG_check_num_args("helicsFederateRegisterInput",args.length(),4,4,0)) {
+    SWIG_fail;
+  }
+  res1 = SWIG_ConvertPtr(args(0),SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateRegisterInput" "', argument " "1"" of type '" "helics_federate""'"); 
+  }
+  res2 = SWIG_AsCharPtrAndSize(args(1), &buf2, NULL, &alloc2);
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsFederateRegisterInput" "', argument " "2"" of type '" "char const *""'");
+  }
+  arg2 = reinterpret_cast< char * >(buf2);
+  ecode3 = SWIG_AsVal_int(args(2), &val3);
+  if (!SWIG_IsOK(ecode3)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "helicsFederateRegisterInput" "', argument " "3"" of type '" "helics_data_type""'");
+  } 
+  arg3 = static_cast< helics_data_type >(val3);
+  res4 = SWIG_AsCharPtrAndSize(args(3), &buf4, NULL, &alloc4);
+  if (!SWIG_IsOK(res4)) {
+    SWIG_exception_fail(SWIG_ArgError(res4), "in method '" "helicsFederateRegisterInput" "', argument " "4"" of type '" "char const *""'");
+  }
+  arg4 = reinterpret_cast< char * >(buf4);
+  result = (helics_input)helicsFederateRegisterInput(arg1,(char const *)arg2,arg3,(char const *)arg4,arg5);
   _outv = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_void, 0 |  0 );
   if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
   if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
   if (alloc4 == SWIG_NEWOBJ) delete[] buf4;
+  {
+    if (arg5->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg5);
+    }
+  }
   return _out;
 fail:
   if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
   if (alloc4 == SWIG_NEWOBJ) delete[] buf4;
+  {
+    if (arg5->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg5);
+    }
+  }
+  return octave_value_list();
+}
+
+
+SWIG_DEFUN( helicsFederateRegisterTypeInput, _wrap_helicsFederateRegisterTypeInput, std::string() ) {
+  helics_federate arg1 = (helics_federate) 0 ;
+  char *arg2 = (char *) 0 ;
+  char *arg3 = (char *) 0 ;
+  char *arg4 = (char *) 0 ;
+  helics_error *arg5 = (helics_error *) 0 ;
+  int res1 ;
+  int res2 ;
+  char *buf2 = 0 ;
+  int alloc2 = 0 ;
+  int res3 ;
+  char *buf3 = 0 ;
+  int alloc3 = 0 ;
+  int res4 ;
+  char *buf4 = 0 ;
+  int alloc4 = 0 ;
+  helics_error etemp5 ;
+  octave_value_list _out;
+  octave_value_list *_outp=&_out;
+  octave_value _outv;
+  helics_input result;
+  
+  {
+    etemp5=helicsErrorInitialize();
+    arg5=&etemp5;
+  }
+  if (!SWIG_check_num_args("helicsFederateRegisterTypeInput",args.length(),4,4,0)) {
+    SWIG_fail;
+  }
+  res1 = SWIG_ConvertPtr(args(0),SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateRegisterTypeInput" "', argument " "1"" of type '" "helics_federate""'"); 
+  }
+  res2 = SWIG_AsCharPtrAndSize(args(1), &buf2, NULL, &alloc2);
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsFederateRegisterTypeInput" "', argument " "2"" of type '" "char const *""'");
+  }
+  arg2 = reinterpret_cast< char * >(buf2);
+  res3 = SWIG_AsCharPtrAndSize(args(2), &buf3, NULL, &alloc3);
+  if (!SWIG_IsOK(res3)) {
+    SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "helicsFederateRegisterTypeInput" "', argument " "3"" of type '" "char const *""'");
+  }
+  arg3 = reinterpret_cast< char * >(buf3);
+  res4 = SWIG_AsCharPtrAndSize(args(3), &buf4, NULL, &alloc4);
+  if (!SWIG_IsOK(res4)) {
+    SWIG_exception_fail(SWIG_ArgError(res4), "in method '" "helicsFederateRegisterTypeInput" "', argument " "4"" of type '" "char const *""'");
+  }
+  arg4 = reinterpret_cast< char * >(buf4);
+  result = (helics_input)helicsFederateRegisterTypeInput(arg1,(char const *)arg2,(char const *)arg3,(char const *)arg4,arg5);
+  _outv = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_void, 0 |  0 );
+  if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
+  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  if (alloc3 == SWIG_NEWOBJ) delete[] buf3;
+  if (alloc4 == SWIG_NEWOBJ) delete[] buf4;
+  {
+    if (arg5->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg5);
+    }
+  }
+  return _out;
+fail:
+  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  if (alloc3 == SWIG_NEWOBJ) delete[] buf3;
+  if (alloc4 == SWIG_NEWOBJ) delete[] buf4;
+  {
+    if (arg5->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg5);
+    }
+  }
+  return octave_value_list();
+}
+
+
+SWIG_DEFUN( helicsFederateRegisterGlobalInput, _wrap_helicsFederateRegisterGlobalInput, std::string() ) {
+  helics_federate arg1 = (helics_federate) 0 ;
+  char *arg2 = (char *) 0 ;
+  helics_data_type arg3 ;
+  char *arg4 = (char *) 0 ;
+  helics_error *arg5 = (helics_error *) 0 ;
+  int res1 ;
+  int res2 ;
+  char *buf2 = 0 ;
+  int alloc2 = 0 ;
+  int val3 ;
+  int ecode3 = 0 ;
+  int res4 ;
+  char *buf4 = 0 ;
+  int alloc4 = 0 ;
+  helics_error etemp5 ;
+  octave_value_list _out;
+  octave_value_list *_outp=&_out;
+  octave_value _outv;
+  helics_publication result;
+  
+  {
+    etemp5=helicsErrorInitialize();
+    arg5=&etemp5;
+  }
+  if (!SWIG_check_num_args("helicsFederateRegisterGlobalInput",args.length(),4,4,0)) {
+    SWIG_fail;
+  }
+  res1 = SWIG_ConvertPtr(args(0),SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateRegisterGlobalInput" "', argument " "1"" of type '" "helics_federate""'"); 
+  }
+  res2 = SWIG_AsCharPtrAndSize(args(1), &buf2, NULL, &alloc2);
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsFederateRegisterGlobalInput" "', argument " "2"" of type '" "char const *""'");
+  }
+  arg2 = reinterpret_cast< char * >(buf2);
+  ecode3 = SWIG_AsVal_int(args(2), &val3);
+  if (!SWIG_IsOK(ecode3)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "helicsFederateRegisterGlobalInput" "', argument " "3"" of type '" "helics_data_type""'");
+  } 
+  arg3 = static_cast< helics_data_type >(val3);
+  res4 = SWIG_AsCharPtrAndSize(args(3), &buf4, NULL, &alloc4);
+  if (!SWIG_IsOK(res4)) {
+    SWIG_exception_fail(SWIG_ArgError(res4), "in method '" "helicsFederateRegisterGlobalInput" "', argument " "4"" of type '" "char const *""'");
+  }
+  arg4 = reinterpret_cast< char * >(buf4);
+  result = (helics_publication)helicsFederateRegisterGlobalInput(arg1,(char const *)arg2,arg3,(char const *)arg4,arg5);
+  _outv = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_void, 0 |  0 );
+  if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
+  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  if (alloc4 == SWIG_NEWOBJ) delete[] buf4;
+  {
+    if (arg5->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg5);
+    }
+  }
+  return _out;
+fail:
+  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  if (alloc4 == SWIG_NEWOBJ) delete[] buf4;
+  {
+    if (arg5->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg5);
+    }
+  }
+  return octave_value_list();
+}
+
+
+SWIG_DEFUN( helicsFederateRegisterGlobalTypeInput, _wrap_helicsFederateRegisterGlobalTypeInput, std::string() ) {
+  helics_federate arg1 = (helics_federate) 0 ;
+  char *arg2 = (char *) 0 ;
+  char *arg3 = (char *) 0 ;
+  char *arg4 = (char *) 0 ;
+  helics_error *arg5 = (helics_error *) 0 ;
+  int res1 ;
+  int res2 ;
+  char *buf2 = 0 ;
+  int alloc2 = 0 ;
+  int res3 ;
+  char *buf3 = 0 ;
+  int alloc3 = 0 ;
+  int res4 ;
+  char *buf4 = 0 ;
+  int alloc4 = 0 ;
+  helics_error etemp5 ;
+  octave_value_list _out;
+  octave_value_list *_outp=&_out;
+  octave_value _outv;
+  helics_publication result;
+  
+  {
+    etemp5=helicsErrorInitialize();
+    arg5=&etemp5;
+  }
+  if (!SWIG_check_num_args("helicsFederateRegisterGlobalTypeInput",args.length(),4,4,0)) {
+    SWIG_fail;
+  }
+  res1 = SWIG_ConvertPtr(args(0),SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateRegisterGlobalTypeInput" "', argument " "1"" of type '" "helics_federate""'"); 
+  }
+  res2 = SWIG_AsCharPtrAndSize(args(1), &buf2, NULL, &alloc2);
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsFederateRegisterGlobalTypeInput" "', argument " "2"" of type '" "char const *""'");
+  }
+  arg2 = reinterpret_cast< char * >(buf2);
+  res3 = SWIG_AsCharPtrAndSize(args(2), &buf3, NULL, &alloc3);
+  if (!SWIG_IsOK(res3)) {
+    SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "helicsFederateRegisterGlobalTypeInput" "', argument " "3"" of type '" "char const *""'");
+  }
+  arg3 = reinterpret_cast< char * >(buf3);
+  res4 = SWIG_AsCharPtrAndSize(args(3), &buf4, NULL, &alloc4);
+  if (!SWIG_IsOK(res4)) {
+    SWIG_exception_fail(SWIG_ArgError(res4), "in method '" "helicsFederateRegisterGlobalTypeInput" "', argument " "4"" of type '" "char const *""'");
+  }
+  arg4 = reinterpret_cast< char * >(buf4);
+  result = (helics_publication)helicsFederateRegisterGlobalTypeInput(arg1,(char const *)arg2,(char const *)arg3,(char const *)arg4,arg5);
+  _outv = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_void, 0 |  0 );
+  if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
+  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  if (alloc3 == SWIG_NEWOBJ) delete[] buf3;
+  if (alloc4 == SWIG_NEWOBJ) delete[] buf4;
+  {
+    if (arg5->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg5);
+    }
+  }
+  return _out;
+fail:
+  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  if (alloc3 == SWIG_NEWOBJ) delete[] buf3;
+  if (alloc4 == SWIG_NEWOBJ) delete[] buf4;
+  {
+    if (arg5->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg5);
+    }
+  }
+  return octave_value_list();
+}
+
+
+SWIG_DEFUN( helicsFederateGetPublication, _wrap_helicsFederateGetPublication, std::string() ) {
+  helics_federate arg1 = (helics_federate) 0 ;
+  char *arg2 = (char *) 0 ;
+  helics_error *arg3 = (helics_error *) 0 ;
+  int res1 ;
+  int res2 ;
+  char *buf2 = 0 ;
+  int alloc2 = 0 ;
+  helics_error etemp3 ;
+  octave_value_list _out;
+  octave_value_list *_outp=&_out;
+  octave_value _outv;
+  helics_publication result;
+  
+  {
+    etemp3=helicsErrorInitialize();
+    arg3=&etemp3;
+  }
+  if (!SWIG_check_num_args("helicsFederateGetPublication",args.length(),2,2,0)) {
+    SWIG_fail;
+  }
+  res1 = SWIG_ConvertPtr(args(0),SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateGetPublication" "', argument " "1"" of type '" "helics_federate""'"); 
+  }
+  res2 = SWIG_AsCharPtrAndSize(args(1), &buf2, NULL, &alloc2);
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsFederateGetPublication" "', argument " "2"" of type '" "char const *""'");
+  }
+  arg2 = reinterpret_cast< char * >(buf2);
+  result = (helics_publication)helicsFederateGetPublication(arg1,(char const *)arg2,arg3);
+  _outv = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_void, 0 |  0 );
+  if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
+  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg3);
+    }
+  }
+  return _out;
+fail:
+  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg3);
+    }
+  }
+  return octave_value_list();
+}
+
+
+SWIG_DEFUN( helicsFederateGetPublicationByIndex, _wrap_helicsFederateGetPublicationByIndex, std::string() ) {
+  helics_federate arg1 = (helics_federate) 0 ;
+  int arg2 ;
+  helics_error *arg3 = (helics_error *) 0 ;
+  int res1 ;
+  int val2 ;
+  int ecode2 = 0 ;
+  helics_error etemp3 ;
+  octave_value_list _out;
+  octave_value_list *_outp=&_out;
+  octave_value _outv;
+  helics_publication result;
+  
+  {
+    etemp3=helicsErrorInitialize();
+    arg3=&etemp3;
+  }
+  if (!SWIG_check_num_args("helicsFederateGetPublicationByIndex",args.length(),2,2,0)) {
+    SWIG_fail;
+  }
+  res1 = SWIG_ConvertPtr(args(0),SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateGetPublicationByIndex" "', argument " "1"" of type '" "helics_federate""'"); 
+  }
+  ecode2 = SWIG_AsVal_int(args(1), &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "helicsFederateGetPublicationByIndex" "', argument " "2"" of type '" "int""'");
+  } 
+  arg2 = static_cast< int >(val2);
+  result = (helics_publication)helicsFederateGetPublicationByIndex(arg1,arg2,arg3);
+  _outv = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_void, 0 |  0 );
+  if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg3);
+    }
+  }
+  return _out;
+fail:
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg3);
+    }
+  }
+  return octave_value_list();
+}
+
+
+SWIG_DEFUN( helicsFederateGetInput, _wrap_helicsFederateGetInput, std::string() ) {
+  helics_federate arg1 = (helics_federate) 0 ;
+  char *arg2 = (char *) 0 ;
+  helics_error *arg3 = (helics_error *) 0 ;
+  int res1 ;
+  int res2 ;
+  char *buf2 = 0 ;
+  int alloc2 = 0 ;
+  helics_error etemp3 ;
+  octave_value_list _out;
+  octave_value_list *_outp=&_out;
+  octave_value _outv;
+  helics_input result;
+  
+  {
+    etemp3=helicsErrorInitialize();
+    arg3=&etemp3;
+  }
+  if (!SWIG_check_num_args("helicsFederateGetInput",args.length(),2,2,0)) {
+    SWIG_fail;
+  }
+  res1 = SWIG_ConvertPtr(args(0),SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateGetInput" "', argument " "1"" of type '" "helics_federate""'"); 
+  }
+  res2 = SWIG_AsCharPtrAndSize(args(1), &buf2, NULL, &alloc2);
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsFederateGetInput" "', argument " "2"" of type '" "char const *""'");
+  }
+  arg2 = reinterpret_cast< char * >(buf2);
+  result = (helics_input)helicsFederateGetInput(arg1,(char const *)arg2,arg3);
+  _outv = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_void, 0 |  0 );
+  if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
+  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg3);
+    }
+  }
+  return _out;
+fail:
+  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg3);
+    }
+  }
+  return octave_value_list();
+}
+
+
+SWIG_DEFUN( helicsFederateGetInputByIndex, _wrap_helicsFederateGetInputByIndex, std::string() ) {
+  helics_federate arg1 = (helics_federate) 0 ;
+  int arg2 ;
+  helics_error *arg3 = (helics_error *) 0 ;
+  int res1 ;
+  int val2 ;
+  int ecode2 = 0 ;
+  helics_error etemp3 ;
+  octave_value_list _out;
+  octave_value_list *_outp=&_out;
+  octave_value _outv;
+  helics_input result;
+  
+  {
+    etemp3=helicsErrorInitialize();
+    arg3=&etemp3;
+  }
+  if (!SWIG_check_num_args("helicsFederateGetInputByIndex",args.length(),2,2,0)) {
+    SWIG_fail;
+  }
+  res1 = SWIG_ConvertPtr(args(0),SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateGetInputByIndex" "', argument " "1"" of type '" "helics_federate""'"); 
+  }
+  ecode2 = SWIG_AsVal_int(args(1), &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "helicsFederateGetInputByIndex" "', argument " "2"" of type '" "int""'");
+  } 
+  arg2 = static_cast< int >(val2);
+  result = (helics_input)helicsFederateGetInputByIndex(arg1,arg2,arg3);
+  _outv = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_void, 0 |  0 );
+  if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg3);
+    }
+  }
+  return _out;
+fail:
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg3);
+    }
+  }
+  return octave_value_list();
+}
+
+
+SWIG_DEFUN( helicsFederateGetSubscription, _wrap_helicsFederateGetSubscription, std::string() ) {
+  helics_federate arg1 = (helics_federate) 0 ;
+  char *arg2 = (char *) 0 ;
+  helics_error *arg3 = (helics_error *) 0 ;
+  int res1 ;
+  int res2 ;
+  char *buf2 = 0 ;
+  int alloc2 = 0 ;
+  helics_error etemp3 ;
+  octave_value_list _out;
+  octave_value_list *_outp=&_out;
+  octave_value _outv;
+  helics_input result;
+  
+  {
+    etemp3=helicsErrorInitialize();
+    arg3=&etemp3;
+  }
+  if (!SWIG_check_num_args("helicsFederateGetSubscription",args.length(),2,2,0)) {
+    SWIG_fail;
+  }
+  res1 = SWIG_ConvertPtr(args(0),SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateGetSubscription" "', argument " "1"" of type '" "helics_federate""'"); 
+  }
+  res2 = SWIG_AsCharPtrAndSize(args(1), &buf2, NULL, &alloc2);
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsFederateGetSubscription" "', argument " "2"" of type '" "char const *""'");
+  }
+  arg2 = reinterpret_cast< char * >(buf2);
+  result = (helics_input)helicsFederateGetSubscription(arg1,(char const *)arg2,arg3);
+  _outv = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_void, 0 |  0 );
+  if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
+  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg3);
+    }
+  }
+  return _out;
+fail:
+  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg3);
+    }
+  }
+  return octave_value_list();
+}
+
+
+SWIG_DEFUN( helicsFederateClearUpdates, _wrap_helicsFederateClearUpdates, std::string() ) {
+  helics_federate arg1 = (helics_federate) 0 ;
+  int res1 ;
+  octave_value_list _out;
+  octave_value_list *_outp=&_out;
+  octave_value _outv;
+  
+  if (!SWIG_check_num_args("helicsFederateClearUpdates",args.length(),1,1,0)) {
+    SWIG_fail;
+  }
+  res1 = SWIG_ConvertPtr(args(0),SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateClearUpdates" "', argument " "1"" of type '" "helics_federate""'"); 
+  }
+  helicsFederateClearUpdates(arg1);
+  _outv = octave_value();
+  if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
+  return _out;
+fail:
+  return octave_value_list();
+}
+
+
+SWIG_DEFUN( helicsFederateRegisterFromPublicationJSON, _wrap_helicsFederateRegisterFromPublicationJSON, std::string() ) {
+  helics_federate arg1 = (helics_federate) 0 ;
+  char *arg2 = (char *) 0 ;
+  helics_error *arg3 = (helics_error *) 0 ;
+  int res1 ;
+  int res2 ;
+  char *buf2 = 0 ;
+  int alloc2 = 0 ;
+  helics_error etemp3 ;
+  octave_value_list _out;
+  octave_value_list *_outp=&_out;
+  octave_value _outv;
+  
+  {
+    etemp3=helicsErrorInitialize();
+    arg3=&etemp3;
+  }
+  if (!SWIG_check_num_args("helicsFederateRegisterFromPublicationJSON",args.length(),2,2,0)) {
+    SWIG_fail;
+  }
+  res1 = SWIG_ConvertPtr(args(0),SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateRegisterFromPublicationJSON" "', argument " "1"" of type '" "helics_federate""'"); 
+  }
+  res2 = SWIG_AsCharPtrAndSize(args(1), &buf2, NULL, &alloc2);
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsFederateRegisterFromPublicationJSON" "', argument " "2"" of type '" "char const *""'");
+  }
+  arg2 = reinterpret_cast< char * >(buf2);
+  helicsFederateRegisterFromPublicationJSON(arg1,(char const *)arg2,arg3);
+  _outv = octave_value();
+  if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
+  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg3);
+    }
+  }
+  return _out;
+fail:
+  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg3);
+    }
+  }
+  return octave_value_list();
+}
+
+
+SWIG_DEFUN( helicsFederatePublishJSON, _wrap_helicsFederatePublishJSON, std::string() ) {
+  helics_federate arg1 = (helics_federate) 0 ;
+  char *arg2 = (char *) 0 ;
+  helics_error *arg3 = (helics_error *) 0 ;
+  int res1 ;
+  int res2 ;
+  char *buf2 = 0 ;
+  int alloc2 = 0 ;
+  helics_error etemp3 ;
+  octave_value_list _out;
+  octave_value_list *_outp=&_out;
+  octave_value _outv;
+  
+  {
+    etemp3=helicsErrorInitialize();
+    arg3=&etemp3;
+  }
+  if (!SWIG_check_num_args("helicsFederatePublishJSON",args.length(),2,2,0)) {
+    SWIG_fail;
+  }
+  res1 = SWIG_ConvertPtr(args(0),SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederatePublishJSON" "', argument " "1"" of type '" "helics_federate""'"); 
+  }
+  res2 = SWIG_AsCharPtrAndSize(args(1), &buf2, NULL, &alloc2);
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsFederatePublishJSON" "', argument " "2"" of type '" "char const *""'");
+  }
+  arg2 = reinterpret_cast< char * >(buf2);
+  helicsFederatePublishJSON(arg1,(char const *)arg2,arg3);
+  _outv = octave_value();
+  if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
+  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg3);
+    }
+  }
+  return _out;
+fail:
+  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg3);
+    }
+  }
   return octave_value_list();
 }
 
@@ -7191,52 +9046,74 @@ SWIG_DEFUN( helicsPublicationPublishRaw, _wrap_helicsPublicationPublishRaw, std:
   helics_publication arg1 = (helics_publication) 0 ;
   void *arg2 = (void *) 0 ;
   int arg3 ;
+  helics_error *arg4 = (helics_error *) 0 ;
   int res1 ;
   int res2 ;
-  int val3 ;
-  int ecode3 = 0 ;
+  char *buf2 = 0 ;
+  size_t size2 = 0 ;
+  int alloc2 = 0 ;
+  helics_error etemp4 ;
   octave_value_list _out;
   octave_value_list *_outp=&_out;
   octave_value _outv;
-  helics_status result;
   
-  if (!SWIG_check_num_args("helicsPublicationPublishRaw",args.length(),3,3,0)) {
+  {
+    etemp4=helicsErrorInitialize();
+    arg4=&etemp4;
+  }
+  if (!SWIG_check_num_args("helicsPublicationPublishRaw",args.length(),2,2,0)) {
     SWIG_fail;
   }
   res1 = SWIG_ConvertPtr(args(0),SWIG_as_voidptrptr(&arg1), 0, 0);
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsPublicationPublishRaw" "', argument " "1"" of type '" "helics_publication""'"); 
   }
-  res2 = SWIG_ConvertPtr(args(1),SWIG_as_voidptrptr(&arg2), 0, 0);
+  res2 = SWIG_AsCharPtrAndSize(args(1), &buf2, &size2, &alloc2);
   if (!SWIG_IsOK(res2)) {
-    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsPublicationPublishRaw" "', argument " "2"" of type '" "void const *""'"); 
-  }
-  ecode3 = SWIG_AsVal_int(args(2), &val3);
-  if (!SWIG_IsOK(ecode3)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "helicsPublicationPublishRaw" "', argument " "3"" of type '" "int""'");
-  } 
-  arg3 = static_cast< int >(val3);
-  result = (helics_status)helicsPublicationPublishRaw(arg1,(void const *)arg2,arg3);
-  _outv = SWIG_From_int(static_cast< int >(result));
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsPublicationPublishRaw" "', argument " "2"" of type '" "void const *""'");
+  }  
+  arg2 = reinterpret_cast< void * >(buf2);
+  arg3 = static_cast< int >(size2 - 1);
+  helicsPublicationPublishRaw(arg1,(void const *)arg2,arg3,arg4);
+  _outv = octave_value();
   if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
+  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  {
+    if (arg4->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg4);
+    }
+  }
   return _out;
 fail:
+  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  {
+    if (arg4->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg4);
+    }
+  }
   return octave_value_list();
 }
 
 
-SWIG_DEFUN( helicsPublicationPublishString, _wrap_helicsPublicationPublishString, _wrap_helicsPublicationPublishString_texinfo ) {
+SWIG_DEFUN( helicsPublicationPublishString, _wrap_helicsPublicationPublishString, std::string() ) {
   helics_publication arg1 = (helics_publication) 0 ;
   char *arg2 = (char *) 0 ;
+  helics_error *arg3 = (helics_error *) 0 ;
   int res1 ;
   int res2 ;
   char *buf2 = 0 ;
   int alloc2 = 0 ;
+  helics_error etemp3 ;
   octave_value_list _out;
   octave_value_list *_outp=&_out;
   octave_value _outv;
-  helics_status result;
   
+  {
+    etemp3=helicsErrorInitialize();
+    arg3=&etemp3;
+  }
   if (!SWIG_check_num_args("helicsPublicationPublishString",args.length(),2,2,0)) {
     SWIG_fail;
   }
@@ -7249,28 +9126,45 @@ SWIG_DEFUN( helicsPublicationPublishString, _wrap_helicsPublicationPublishString
     SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsPublicationPublishString" "', argument " "2"" of type '" "char const *""'");
   }
   arg2 = reinterpret_cast< char * >(buf2);
-  result = (helics_status)helicsPublicationPublishString(arg1,(char const *)arg2);
-  _outv = SWIG_From_int(static_cast< int >(result));
+  helicsPublicationPublishString(arg1,(char const *)arg2,arg3);
+  _outv = octave_value();
   if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
   if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg3);
+    }
+  }
   return _out;
 fail:
   if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg3);
+    }
+  }
   return octave_value_list();
 }
 
 
-SWIG_DEFUN( helicsPublicationPublishInteger, _wrap_helicsPublicationPublishInteger, _wrap_helicsPublicationPublishInteger_texinfo ) {
+SWIG_DEFUN( helicsPublicationPublishInteger, _wrap_helicsPublicationPublishInteger, std::string() ) {
   helics_publication arg1 = (helics_publication) 0 ;
   int64_t arg2 ;
+  helics_error *arg3 = (helics_error *) 0 ;
   int res1 ;
   long long val2 ;
   int ecode2 = 0 ;
+  helics_error etemp3 ;
   octave_value_list _out;
   octave_value_list *_outp=&_out;
   octave_value _outv;
-  helics_status result;
   
+  {
+    etemp3=helicsErrorInitialize();
+    arg3=&etemp3;
+  }
   if (!SWIG_check_num_args("helicsPublicationPublishInteger",args.length(),2,2,0)) {
     SWIG_fail;
   }
@@ -7283,26 +9177,92 @@ SWIG_DEFUN( helicsPublicationPublishInteger, _wrap_helicsPublicationPublishInteg
     SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "helicsPublicationPublishInteger" "', argument " "2"" of type '" "int64_t""'");
   } 
   arg2 = static_cast< int64_t >(val2);
-  result = (helics_status)helicsPublicationPublishInteger(arg1,arg2);
-  _outv = SWIG_From_int(static_cast< int >(result));
+  helicsPublicationPublishInteger(arg1,arg2,arg3);
+  _outv = octave_value();
   if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg3);
+    }
+  }
   return _out;
 fail:
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg3);
+    }
+  }
   return octave_value_list();
 }
 
 
-SWIG_DEFUN( helicsPublicationPublishDouble, _wrap_helicsPublicationPublishDouble, _wrap_helicsPublicationPublishDouble_texinfo ) {
+SWIG_DEFUN( helicsPublicationPublishBoolean, _wrap_helicsPublicationPublishBoolean, std::string() ) {
   helics_publication arg1 = (helics_publication) 0 ;
-  double arg2 ;
+  helics_bool arg2 ;
+  helics_error *arg3 = (helics_error *) 0 ;
   int res1 ;
-  double val2 ;
+  int val2 ;
   int ecode2 = 0 ;
+  helics_error etemp3 ;
   octave_value_list _out;
   octave_value_list *_outp=&_out;
   octave_value _outv;
-  helics_status result;
   
+  {
+    etemp3=helicsErrorInitialize();
+    arg3=&etemp3;
+  }
+  if (!SWIG_check_num_args("helicsPublicationPublishBoolean",args.length(),2,2,0)) {
+    SWIG_fail;
+  }
+  res1 = SWIG_ConvertPtr(args(0),SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsPublicationPublishBoolean" "', argument " "1"" of type '" "helics_publication""'"); 
+  }
+  ecode2 = SWIG_AsVal_int(args(1), &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "helicsPublicationPublishBoolean" "', argument " "2"" of type '" "helics_bool""'");
+  } 
+  arg2 = static_cast< helics_bool >(val2);
+  helicsPublicationPublishBoolean(arg1,arg2,arg3);
+  _outv = octave_value();
+  if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg3);
+    }
+  }
+  return _out;
+fail:
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg3);
+    }
+  }
+  return octave_value_list();
+}
+
+
+SWIG_DEFUN( helicsPublicationPublishDouble, _wrap_helicsPublicationPublishDouble, std::string() ) {
+  helics_publication arg1 = (helics_publication) 0 ;
+  double arg2 ;
+  helics_error *arg3 = (helics_error *) 0 ;
+  int res1 ;
+  double val2 ;
+  int ecode2 = 0 ;
+  helics_error etemp3 ;
+  octave_value_list _out;
+  octave_value_list *_outp=&_out;
+  octave_value _outv;
+  
+  {
+    etemp3=helicsErrorInitialize();
+    arg3=&etemp3;
+  }
   if (!SWIG_check_num_args("helicsPublicationPublishDouble",args.length(),2,2,0)) {
     SWIG_fail;
   }
@@ -7315,70 +9275,201 @@ SWIG_DEFUN( helicsPublicationPublishDouble, _wrap_helicsPublicationPublishDouble
     SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "helicsPublicationPublishDouble" "', argument " "2"" of type '" "double""'");
   } 
   arg2 = static_cast< double >(val2);
-  result = (helics_status)helicsPublicationPublishDouble(arg1,arg2);
-  _outv = SWIG_From_int(static_cast< int >(result));
+  helicsPublicationPublishDouble(arg1,arg2,arg3);
+  _outv = octave_value();
   if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg3);
+    }
+  }
   return _out;
 fail:
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg3);
+    }
+  }
   return octave_value_list();
 }
 
 
-SWIG_DEFUN( helicsPublicationPublishComplex, _wrap_helicsPublicationPublishComplex, _wrap_helicsPublicationPublishComplex_texinfo ) {
+SWIG_DEFUN( helicsPublicationPublishTime, _wrap_helicsPublicationPublishTime, std::string() ) {
   helics_publication arg1 = (helics_publication) 0 ;
-  double arg2 ;
-  double arg3 ;
+  helics_time arg2 ;
+  helics_error *arg3 = (helics_error *) 0 ;
   int res1 ;
   double val2 ;
   int ecode2 = 0 ;
-  double val3 ;
-  int ecode3 = 0 ;
+  helics_error etemp3 ;
   octave_value_list _out;
   octave_value_list *_outp=&_out;
   octave_value _outv;
-  helics_status result;
   
-  if (!SWIG_check_num_args("helicsPublicationPublishComplex",args.length(),3,3,0)) {
+  {
+    etemp3=helicsErrorInitialize();
+    arg3=&etemp3;
+  }
+  if (!SWIG_check_num_args("helicsPublicationPublishTime",args.length(),2,2,0)) {
+    SWIG_fail;
+  }
+  res1 = SWIG_ConvertPtr(args(0),SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsPublicationPublishTime" "', argument " "1"" of type '" "helics_publication""'"); 
+  }
+  ecode2 = SWIG_AsVal_double(args(1), &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "helicsPublicationPublishTime" "', argument " "2"" of type '" "helics_time""'");
+  } 
+  arg2 = static_cast< helics_time >(val2);
+  helicsPublicationPublishTime(arg1,arg2,arg3);
+  _outv = octave_value();
+  if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg3);
+    }
+  }
+  return _out;
+fail:
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg3);
+    }
+  }
+  return octave_value_list();
+}
+
+
+SWIG_DEFUN( helicsPublicationPublishChar, _wrap_helicsPublicationPublishChar, std::string() ) {
+  helics_publication arg1 = (helics_publication) 0 ;
+  char arg2 ;
+  helics_error *arg3 = (helics_error *) 0 ;
+  int res1 ;
+  char val2 ;
+  int ecode2 = 0 ;
+  helics_error etemp3 ;
+  octave_value_list _out;
+  octave_value_list *_outp=&_out;
+  octave_value _outv;
+  
+  {
+    etemp3=helicsErrorInitialize();
+    arg3=&etemp3;
+  }
+  if (!SWIG_check_num_args("helicsPublicationPublishChar",args.length(),2,2,0)) {
+    SWIG_fail;
+  }
+  res1 = SWIG_ConvertPtr(args(0),SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsPublicationPublishChar" "', argument " "1"" of type '" "helics_publication""'"); 
+  }
+  ecode2 = SWIG_AsVal_char(args(1), &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "helicsPublicationPublishChar" "', argument " "2"" of type '" "char""'");
+  } 
+  arg2 = static_cast< char >(val2);
+  helicsPublicationPublishChar(arg1,arg2,arg3);
+  _outv = octave_value();
+  if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg3);
+    }
+  }
+  return _out;
+fail:
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg3);
+    }
+  }
+  return octave_value_list();
+}
+
+
+SWIG_DEFUN( helicsPublicationPublishComplex, _wrap_helicsPublicationPublishComplex, std::string() ) {
+  helics_publication arg1 = (helics_publication) 0 ;
+  double arg2 ;
+  double arg3 ;
+  helics_error *arg4 = (helics_error *) 0 ;
+  int res1 ;
+  helics_error etemp4 ;
+  octave_value_list _out;
+  octave_value_list *_outp=&_out;
+  octave_value _outv;
+  
+  {
+    etemp4=helicsErrorInitialize();
+    arg4=&etemp4;
+  }
+  if (!SWIG_check_num_args("helicsPublicationPublishComplex",args.length(),2,2,0)) {
     SWIG_fail;
   }
   res1 = SWIG_ConvertPtr(args(0),SWIG_as_voidptrptr(&arg1), 0, 0);
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsPublicationPublishComplex" "', argument " "1"" of type '" "helics_publication""'"); 
   }
-  ecode2 = SWIG_AsVal_double(args(1), &val2);
-  if (!SWIG_IsOK(ecode2)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "helicsPublicationPublishComplex" "', argument " "2"" of type '" "double""'");
-  } 
-  arg2 = static_cast< double >(val2);
-  ecode3 = SWIG_AsVal_double(args(2), &val3);
-  if (!SWIG_IsOK(ecode3)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "helicsPublicationPublishComplex" "', argument " "3"" of type '" "double""'");
-  } 
-  arg3 = static_cast< double >(val3);
-  result = (helics_status)helicsPublicationPublishComplex(arg1,arg2,arg3);
-  _outv = SWIG_From_int(static_cast< int >(result));
+  {
+    if(args(1).is_complex_scalar())
+    {
+      Complex arg=args(1).complex_value();
+      arg2=arg.real();
+      arg3=arg.imag();
+    }  
+    else if (args(1).is_float_type())
+    {
+      arg3=0.0;
+      arg2=args(1).double_value();
+    }
+    else
+    {
+      arg2=0.0;
+      arg3 = 0.0;
+    }
+  }
+  helicsPublicationPublishComplex(arg1,arg2,arg3,arg4);
+  _outv = octave_value();
   if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
+  {
+    if (arg4->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg4);
+    }
+  }
   return _out;
 fail:
+  {
+    if (arg4->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg4);
+    }
+  }
   return octave_value_list();
 }
 
 
-SWIG_DEFUN( helicsPublicationPublishVector, _wrap_helicsPublicationPublishVector, _wrap_helicsPublicationPublishVector_texinfo ) {
+SWIG_DEFUN( helicsPublicationPublishVector, _wrap_helicsPublicationPublishVector, std::string() ) {
   helics_publication arg1 = (helics_publication) 0 ;
   double *arg2 = (double *) 0 ;
   int arg3 ;
+  helics_error *arg4 = (helics_error *) 0 ;
   int res1 ;
-  double temp2 ;
-  int res2 = SWIG_TMPOBJ ;
-  int val3 ;
-  int ecode3 = 0 ;
+  helics_error etemp4 ;
   octave_value_list _out;
   octave_value_list *_outp=&_out;
   octave_value _outv;
-  helics_status result;
   
-  arg2 = &temp2;
+  {
+    etemp4=helicsErrorInitialize();
+    arg4=&etemp4;
+  }
   if (!SWIG_check_num_args("helicsPublicationPublishVector",args.length(),2,2,0)) {
     SWIG_fail;
   }
@@ -7386,136 +9477,266 @@ SWIG_DEFUN( helicsPublicationPublishVector, _wrap_helicsPublicationPublishVector
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsPublicationPublishVector" "', argument " "1"" of type '" "helics_publication""'"); 
   }
-  ecode3 = SWIG_AsVal_int(args(1), &val3);
-  if (!SWIG_IsOK(ecode3)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "helicsPublicationPublishVector" "', argument " "3"" of type '" "int""'");
-  } 
-  arg3 = static_cast< int >(val3);
-  result = (helics_status)helicsPublicationPublishVector(arg1,(double const *)arg2,arg3);
-  _outv = SWIG_From_int(static_cast< int >(result));
+  {
+    if (!args(1).is_real_matrix()) {
+      SWIG_exception_fail(SWIG_ArgError(3), "argument must be a double array");
+      return octave_value_list();
+    }
+    arg3=static_cast<int>(args(1).numel());
+    arg2=reinterpret_cast<double *>(args(1).mex_get_data());
+  }
+  helicsPublicationPublishVector(arg1,(double const *)arg2,arg3,arg4);
+  _outv = octave_value();
   if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
-  if (SWIG_IsTmpObj(res2)) {
-    _outp = SWIG_Octave_AppendOutput(_outp, SWIG_From_double((*arg2)));
-  } else {
-    int new_flags = SWIG_IsNewObj(res2) ? (SWIG_POINTER_OWN |  0 ) :  0 ;
-    _outp = SWIG_Octave_AppendOutput(_outp, SWIG_NewPointerObj((void*)(arg2), SWIGTYPE_p_double, new_flags));
+  {
+    
+  }
+  {
+    if (arg4->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg4);
+    }
   }
   return _out;
 fail:
+  {
+    if (arg4->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg4);
+    }
+  }
   return octave_value_list();
 }
 
 
-SWIG_DEFUN( helicsSubscriptionGetValueSize, _wrap_helicsSubscriptionGetValueSize, _wrap_helicsSubscriptionGetValueSize_texinfo ) {
-  helics_subscription arg1 = (helics_subscription) 0 ;
-  int res1 ;
-  octave_value_list _out;
-  octave_value_list *_outp=&_out;
-  octave_value _outv;
-  int result;
-  
-  if (!SWIG_check_num_args("helicsSubscriptionGetValueSize",args.length(),1,1,0)) {
-    SWIG_fail;
-  }
-  res1 = SWIG_ConvertPtr(args(0),SWIG_as_voidptrptr(&arg1), 0, 0);
-  if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsSubscriptionGetValueSize" "', argument " "1"" of type '" "helics_subscription""'"); 
-  }
-  result = (int)helicsSubscriptionGetValueSize(arg1);
-  _outv = SWIG_From_int(static_cast< int >(result));
-  if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
-  return _out;
-fail:
-  return octave_value_list();
-}
-
-
-SWIG_DEFUN( helicsSubscriptionGetRawValue, _wrap_helicsSubscriptionGetRawValue, std::string() ) {
-  helics_subscription arg1 = (helics_subscription) 0 ;
-  void *arg2 = (void *) 0 ;
-  int arg3 ;
-  int *arg4 = (int *) 0 ;
-  int res1 ;
-  int res2 ;
-  int val3 ;
-  int ecode3 = 0 ;
-  int temp4 ;
-  int res4 = SWIG_TMPOBJ ;
-  octave_value_list _out;
-  octave_value_list *_outp=&_out;
-  octave_value _outv;
-  helics_status result;
-  
-  arg4 = &temp4;
-  if (!SWIG_check_num_args("helicsSubscriptionGetRawValue",args.length(),3,3,0)) {
-    SWIG_fail;
-  }
-  res1 = SWIG_ConvertPtr(args(0),SWIG_as_voidptrptr(&arg1), 0, 0);
-  if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsSubscriptionGetRawValue" "', argument " "1"" of type '" "helics_subscription""'"); 
-  }
-  res2 = SWIG_ConvertPtr(args(1),SWIG_as_voidptrptr(&arg2), 0, 0);
-  if (!SWIG_IsOK(res2)) {
-    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsSubscriptionGetRawValue" "', argument " "2"" of type '" "void *""'"); 
-  }
-  ecode3 = SWIG_AsVal_int(args(2), &val3);
-  if (!SWIG_IsOK(ecode3)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "helicsSubscriptionGetRawValue" "', argument " "3"" of type '" "int""'");
-  } 
-  arg3 = static_cast< int >(val3);
-  result = (helics_status)helicsSubscriptionGetRawValue(arg1,arg2,arg3,arg4);
-  _outv = SWIG_From_int(static_cast< int >(result));
-  if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
-  if (SWIG_IsTmpObj(res4)) {
-    _outp = SWIG_Octave_AppendOutput(_outp, SWIG_From_int((*arg4)));
-  } else {
-    int new_flags = SWIG_IsNewObj(res4) ? (SWIG_POINTER_OWN |  0 ) :  0 ;
-    _outp = SWIG_Octave_AppendOutput(_outp, SWIG_NewPointerObj((void*)(arg4), SWIGTYPE_p_int, new_flags));
-  }
-  return _out;
-fail:
-  return octave_value_list();
-}
-
-
-SWIG_DEFUN( helicsSubscriptionGetString, _wrap_helicsSubscriptionGetString, _wrap_helicsSubscriptionGetString_texinfo ) {
-  helics_subscription arg1 = (helics_subscription) 0 ;
+SWIG_DEFUN( helicsPublicationPublishNamedPoint, _wrap_helicsPublicationPublishNamedPoint, std::string() ) {
+  helics_publication arg1 = (helics_publication) 0 ;
   char *arg2 = (char *) 0 ;
-  int arg3 ;
-  int *arg4 = (int *) 0 ;
+  double arg3 ;
+  helics_error *arg4 = (helics_error *) 0 ;
   int res1 ;
   int res2 ;
   char *buf2 = 0 ;
   int alloc2 = 0 ;
-  int val3 ;
+  double val3 ;
   int ecode3 = 0 ;
-  int temp4 ;
-  int res4 = SWIG_TMPOBJ ;
+  helics_error etemp4 ;
   octave_value_list _out;
   octave_value_list *_outp=&_out;
   octave_value _outv;
-  helics_status result;
   
-  arg4 = &temp4;
-  if (!SWIG_check_num_args("helicsSubscriptionGetString",args.length(),3,3,0)) {
+  {
+    etemp4=helicsErrorInitialize();
+    arg4=&etemp4;
+  }
+  if (!SWIG_check_num_args("helicsPublicationPublishNamedPoint",args.length(),3,3,0)) {
     SWIG_fail;
   }
   res1 = SWIG_ConvertPtr(args(0),SWIG_as_voidptrptr(&arg1), 0, 0);
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsSubscriptionGetString" "', argument " "1"" of type '" "helics_subscription""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsPublicationPublishNamedPoint" "', argument " "1"" of type '" "helics_publication""'"); 
   }
   res2 = SWIG_AsCharPtrAndSize(args(1), &buf2, NULL, &alloc2);
   if (!SWIG_IsOK(res2)) {
-    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsSubscriptionGetString" "', argument " "2"" of type '" "char *""'");
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsPublicationPublishNamedPoint" "', argument " "2"" of type '" "char const *""'");
   }
   arg2 = reinterpret_cast< char * >(buf2);
+  ecode3 = SWIG_AsVal_double(args(2), &val3);
+  if (!SWIG_IsOK(ecode3)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "helicsPublicationPublishNamedPoint" "', argument " "3"" of type '" "double""'");
+  } 
+  arg3 = static_cast< double >(val3);
+  helicsPublicationPublishNamedPoint(arg1,(char const *)arg2,arg3,arg4);
+  _outv = octave_value();
+  if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
+  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  {
+    if (arg4->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg4);
+    }
+  }
+  return _out;
+fail:
+  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  {
+    if (arg4->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg4);
+    }
+  }
+  return octave_value_list();
+}
+
+
+SWIG_DEFUN( helicsPublicationAddTarget, _wrap_helicsPublicationAddTarget, std::string() ) {
+  helics_publication arg1 = (helics_publication) 0 ;
+  char *arg2 = (char *) 0 ;
+  helics_error *arg3 = (helics_error *) 0 ;
+  int res1 ;
+  int res2 ;
+  char *buf2 = 0 ;
+  int alloc2 = 0 ;
+  helics_error etemp3 ;
+  octave_value_list _out;
+  octave_value_list *_outp=&_out;
+  octave_value _outv;
+  
+  {
+    etemp3=helicsErrorInitialize();
+    arg3=&etemp3;
+  }
+  if (!SWIG_check_num_args("helicsPublicationAddTarget",args.length(),2,2,0)) {
+    SWIG_fail;
+  }
+  res1 = SWIG_ConvertPtr(args(0),SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsPublicationAddTarget" "', argument " "1"" of type '" "helics_publication""'"); 
+  }
+  res2 = SWIG_AsCharPtrAndSize(args(1), &buf2, NULL, &alloc2);
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsPublicationAddTarget" "', argument " "2"" of type '" "char const *""'");
+  }
+  arg2 = reinterpret_cast< char * >(buf2);
+  helicsPublicationAddTarget(arg1,(char const *)arg2,arg3);
+  _outv = octave_value();
+  if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
+  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg3);
+    }
+  }
+  return _out;
+fail:
+  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg3);
+    }
+  }
+  return octave_value_list();
+}
+
+
+SWIG_DEFUN( helicsInputAddTarget, _wrap_helicsInputAddTarget, std::string() ) {
+  helics_input arg1 = (helics_input) 0 ;
+  char *arg2 = (char *) 0 ;
+  helics_error *arg3 = (helics_error *) 0 ;
+  int res1 ;
+  int res2 ;
+  char *buf2 = 0 ;
+  int alloc2 = 0 ;
+  helics_error etemp3 ;
+  octave_value_list _out;
+  octave_value_list *_outp=&_out;
+  octave_value _outv;
+  
+  {
+    etemp3=helicsErrorInitialize();
+    arg3=&etemp3;
+  }
+  if (!SWIG_check_num_args("helicsInputAddTarget",args.length(),2,2,0)) {
+    SWIG_fail;
+  }
+  res1 = SWIG_ConvertPtr(args(0),SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsInputAddTarget" "', argument " "1"" of type '" "helics_input""'"); 
+  }
+  res2 = SWIG_AsCharPtrAndSize(args(1), &buf2, NULL, &alloc2);
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsInputAddTarget" "', argument " "2"" of type '" "char const *""'");
+  }
+  arg2 = reinterpret_cast< char * >(buf2);
+  helicsInputAddTarget(arg1,(char const *)arg2,arg3);
+  _outv = octave_value();
+  if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
+  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg3);
+    }
+  }
+  return _out;
+fail:
+  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg3);
+    }
+  }
+  return octave_value_list();
+}
+
+
+SWIG_DEFUN( helicsInputGetRawValueSize, _wrap_helicsInputGetRawValueSize, std::string() ) {
+  helics_input arg1 = (helics_input) 0 ;
+  int res1 ;
+  octave_value_list _out;
+  octave_value_list *_outp=&_out;
+  octave_value _outv;
+  int result;
+  
+  if (!SWIG_check_num_args("helicsInputGetRawValueSize",args.length(),1,1,0)) {
+    SWIG_fail;
+  }
+  res1 = SWIG_ConvertPtr(args(0),SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsInputGetRawValueSize" "', argument " "1"" of type '" "helics_input""'"); 
+  }
+  result = (int)helicsInputGetRawValueSize(arg1);
+  _outv = SWIG_From_int(static_cast< int >(result));
+  if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
+  return _out;
+fail:
+  return octave_value_list();
+}
+
+
+SWIG_DEFUN( helicsInputGetRawValue, _wrap_helicsInputGetRawValue, std::string() ) {
+  helics_input arg1 = (helics_input) 0 ;
+  void *arg2 = (void *) 0 ;
+  int arg3 ;
+  int *arg4 = (int *) 0 ;
+  helics_error *arg5 = (helics_error *) 0 ;
+  int res1 ;
+  int res2 ;
+  int val3 ;
+  int ecode3 = 0 ;
+  int temp4 ;
+  int res4 = SWIG_TMPOBJ ;
+  helics_error etemp5 ;
+  octave_value_list _out;
+  octave_value_list *_outp=&_out;
+  octave_value _outv;
+  
+  arg4 = &temp4;
+  {
+    etemp5=helicsErrorInitialize();
+    arg5=&etemp5;
+  }
+  if (!SWIG_check_num_args("helicsInputGetRawValue",args.length(),3,3,0)) {
+    SWIG_fail;
+  }
+  res1 = SWIG_ConvertPtr(args(0),SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsInputGetRawValue" "', argument " "1"" of type '" "helics_input""'"); 
+  }
+  res2 = SWIG_ConvertPtr(args(1),SWIG_as_voidptrptr(&arg2), 0, 0);
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsInputGetRawValue" "', argument " "2"" of type '" "void *""'"); 
+  }
   ecode3 = SWIG_AsVal_int(args(2), &val3);
   if (!SWIG_IsOK(ecode3)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "helicsSubscriptionGetString" "', argument " "3"" of type '" "int""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "helicsInputGetRawValue" "', argument " "3"" of type '" "int""'");
   } 
   arg3 = static_cast< int >(val3);
-  result = (helics_status)helicsSubscriptionGetString(arg1,arg2,arg3,arg4);
-  _outv = SWIG_From_int(static_cast< int >(result));
+  helicsInputGetRawValue(arg1,arg2,arg3,arg4,arg5);
+  _outv = octave_value();
   if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
   if (SWIG_IsTmpObj(res4)) {
     _outp = SWIG_Octave_AppendOutput(_outp, SWIG_From_int((*arg4)));
@@ -7523,142 +9744,40 @@ SWIG_DEFUN( helicsSubscriptionGetString, _wrap_helicsSubscriptionGetString, _wra
     int new_flags = SWIG_IsNewObj(res4) ? (SWIG_POINTER_OWN |  0 ) :  0 ;
     _outp = SWIG_Octave_AppendOutput(_outp, SWIG_NewPointerObj((void*)(arg4), SWIGTYPE_p_int, new_flags));
   }
-  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  {
+    if (arg5->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg5);
+    }
+  }
   return _out;
 fail:
-  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  {
+    if (arg5->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg5);
+    }
+  }
   return octave_value_list();
 }
 
 
-SWIG_DEFUN( helicsSubscriptionGetInteger, _wrap_helicsSubscriptionGetInteger, _wrap_helicsSubscriptionGetInteger_texinfo ) {
-  helics_subscription arg1 = (helics_subscription) 0 ;
-  int64_t *arg2 = (int64_t *) 0 ;
-  int res1 ;
-  int64_t temp2 ;
-  int res2 = SWIG_TMPOBJ ;
-  octave_value_list _out;
-  octave_value_list *_outp=&_out;
-  octave_value _outv;
-  helics_status result;
-  
-  arg2 = &temp2;
-  if (!SWIG_check_num_args("helicsSubscriptionGetInteger",args.length(),1,1,0)) {
-    SWIG_fail;
-  }
-  res1 = SWIG_ConvertPtr(args(0),SWIG_as_voidptrptr(&arg1), 0, 0);
-  if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsSubscriptionGetInteger" "', argument " "1"" of type '" "helics_subscription""'"); 
-  }
-  result = (helics_status)helicsSubscriptionGetInteger(arg1,arg2);
-  _outv = SWIG_From_int(static_cast< int >(result));
-  if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
-  if (SWIG_IsTmpObj(res2)) {
-    _outp = SWIG_Octave_AppendOutput(_outp, SWIG_From_long_SS_long((*arg2)));
-  } else {
-    int new_flags = SWIG_IsNewObj(res2) ? (SWIG_POINTER_OWN |  0 ) :  0 ;
-    _outp = SWIG_Octave_AppendOutput(_outp, SWIG_NewPointerObj((void*)(arg2), SWIGTYPE_p_int64_t, new_flags));
-  }
-  return _out;
-fail:
-  return octave_value_list();
-}
-
-
-SWIG_DEFUN( helicsSubscriptionGetDouble, _wrap_helicsSubscriptionGetDouble, _wrap_helicsSubscriptionGetDouble_texinfo ) {
-  helics_subscription arg1 = (helics_subscription) 0 ;
-  double *arg2 = (double *) 0 ;
-  int res1 ;
-  double temp2 ;
-  int res2 = SWIG_TMPOBJ ;
-  octave_value_list _out;
-  octave_value_list *_outp=&_out;
-  octave_value _outv;
-  helics_status result;
-  
-  arg2 = &temp2;
-  if (!SWIG_check_num_args("helicsSubscriptionGetDouble",args.length(),1,1,0)) {
-    SWIG_fail;
-  }
-  res1 = SWIG_ConvertPtr(args(0),SWIG_as_voidptrptr(&arg1), 0, 0);
-  if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsSubscriptionGetDouble" "', argument " "1"" of type '" "helics_subscription""'"); 
-  }
-  result = (helics_status)helicsSubscriptionGetDouble(arg1,arg2);
-  _outv = SWIG_From_int(static_cast< int >(result));
-  if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
-  if (SWIG_IsTmpObj(res2)) {
-    _outp = SWIG_Octave_AppendOutput(_outp, SWIG_From_double((*arg2)));
-  } else {
-    int new_flags = SWIG_IsNewObj(res2) ? (SWIG_POINTER_OWN |  0 ) :  0 ;
-    _outp = SWIG_Octave_AppendOutput(_outp, SWIG_NewPointerObj((void*)(arg2), SWIGTYPE_p_double, new_flags));
-  }
-  return _out;
-fail:
-  return octave_value_list();
-}
-
-
-SWIG_DEFUN( helicsSubscriptionGetComplex, _wrap_helicsSubscriptionGetComplex, _wrap_helicsSubscriptionGetComplex_texinfo ) {
-  helics_subscription arg1 = (helics_subscription) 0 ;
-  double *arg2 = (double *) 0 ;
-  double *arg3 = (double *) 0 ;
-  int res1 ;
-  double temp2 ;
-  int res2 = SWIG_TMPOBJ ;
-  double temp3 ;
-  int res3 = SWIG_TMPOBJ ;
-  octave_value_list _out;
-  octave_value_list *_outp=&_out;
-  octave_value _outv;
-  helics_status result;
-  
-  arg2 = &temp2;
-  arg3 = &temp3;
-  if (!SWIG_check_num_args("helicsSubscriptionGetComplex",args.length(),1,1,0)) {
-    SWIG_fail;
-  }
-  res1 = SWIG_ConvertPtr(args(0),SWIG_as_voidptrptr(&arg1), 0, 0);
-  if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsSubscriptionGetComplex" "', argument " "1"" of type '" "helics_subscription""'"); 
-  }
-  result = (helics_status)helicsSubscriptionGetComplex(arg1,arg2,arg3);
-  _outv = SWIG_From_int(static_cast< int >(result));
-  if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
-  if (SWIG_IsTmpObj(res2)) {
-    _outp = SWIG_Octave_AppendOutput(_outp, SWIG_From_double((*arg2)));
-  } else {
-    int new_flags = SWIG_IsNewObj(res2) ? (SWIG_POINTER_OWN |  0 ) :  0 ;
-    _outp = SWIG_Octave_AppendOutput(_outp, SWIG_NewPointerObj((void*)(arg2), SWIGTYPE_p_double, new_flags));
-  }
-  if (SWIG_IsTmpObj(res3)) {
-    _outp = SWIG_Octave_AppendOutput(_outp, SWIG_From_double((*arg3)));
-  } else {
-    int new_flags = SWIG_IsNewObj(res3) ? (SWIG_POINTER_OWN |  0 ) :  0 ;
-    _outp = SWIG_Octave_AppendOutput(_outp, SWIG_NewPointerObj((void*)(arg3), SWIGTYPE_p_double, new_flags));
-  }
-  return _out;
-fail:
-  return octave_value_list();
-}
-
-
-SWIG_DEFUN( helicsSubscriptionGetVectorSize, _wrap_helicsSubscriptionGetVectorSize, _wrap_helicsSubscriptionGetVectorSize_texinfo ) {
-  helics_subscription arg1 = (helics_subscription) 0 ;
+SWIG_DEFUN( helicsInputGetStringSize, _wrap_helicsInputGetStringSize, std::string() ) {
+  helics_input arg1 = (helics_input) 0 ;
   int res1 ;
   octave_value_list _out;
   octave_value_list *_outp=&_out;
   octave_value _outv;
   int result;
   
-  if (!SWIG_check_num_args("helicsSubscriptionGetVectorSize",args.length(),1,1,0)) {
+  if (!SWIG_check_num_args("helicsInputGetStringSize",args.length(),1,1,0)) {
     SWIG_fail;
   }
   res1 = SWIG_ConvertPtr(args(0),SWIG_as_voidptrptr(&arg1), 0, 0);
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsSubscriptionGetVectorSize" "', argument " "1"" of type '" "helics_subscription""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsInputGetStringSize" "', argument " "1"" of type '" "helics_input""'"); 
   }
-  result = (int)helicsSubscriptionGetVectorSize(arg1);
+  result = (int)helicsInputGetStringSize(arg1);
   _outv = SWIG_From_int(static_cast< int >(result));
   if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
   return _out;
@@ -7667,549 +9786,1528 @@ fail:
 }
 
 
-SWIG_DEFUN( helicsSubscriptionGetVector, _wrap_helicsSubscriptionGetVector, _wrap_helicsSubscriptionGetVector_texinfo ) {
-  helics_subscription arg1 = (helics_subscription) 0 ;
+SWIG_DEFUN( helicsInputGetString, _wrap_helicsInputGetString, std::string() ) {
+  helics_input arg1 = (helics_input) 0 ;
+  char *arg2 = (char *) 0 ;
+  int arg3 ;
+  int *arg4 = (int *) 0 ;
+  helics_error *arg5 = (helics_error *) 0 ;
+  int res1 ;
+  helics_error etemp5 ;
+  octave_value_list _out;
+  octave_value_list *_outp=&_out;
+  octave_value _outv;
+  
+  {
+    arg4=&(arg3);
+  }
+  {
+    etemp5=helicsErrorInitialize();
+    arg5=&etemp5;
+  }
+  if (!SWIG_check_num_args("helicsInputGetString",args.length(),1,1,0)) {
+    SWIG_fail;
+  }
+  res1 = SWIG_ConvertPtr(args(0),SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsInputGetString" "', argument " "1"" of type '" "helics_input""'"); 
+  }
+  {
+    arg3=helicsInputGetStringSize(arg1)+2;
+    arg2 = (char *) malloc(arg3);
+  }
+  helicsInputGetString(arg1,arg2,arg3,arg4,arg5);
+  _outv = octave_value();
+  if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
+  {
+    _outv = SWIG_FromCharPtrAndSize(arg2,*arg4-1);
+    if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
+  }
+  {
+    if (arg2) free(arg2);
+  }
+  {
+    if (arg5->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg5);
+    }
+  }
+  return _out;
+fail:
+  {
+    if (arg2) free(arg2);
+  }
+  {
+    if (arg5->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg5);
+    }
+  }
+  return octave_value_list();
+}
+
+
+SWIG_DEFUN( helicsInputGetInteger, _wrap_helicsInputGetInteger, std::string() ) {
+  helics_input arg1 = (helics_input) 0 ;
+  helics_error *arg2 = (helics_error *) 0 ;
+  int res1 ;
+  helics_error etemp2 ;
+  octave_value_list _out;
+  octave_value_list *_outp=&_out;
+  octave_value _outv;
+  int64_t result;
+  
+  {
+    etemp2=helicsErrorInitialize();
+    arg2=&etemp2;
+  }
+  if (!SWIG_check_num_args("helicsInputGetInteger",args.length(),1,1,0)) {
+    SWIG_fail;
+  }
+  res1 = SWIG_ConvertPtr(args(0),SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsInputGetInteger" "', argument " "1"" of type '" "helics_input""'"); 
+  }
+  result = helicsInputGetInteger(arg1,arg2);
+  _outv = SWIG_From_long_SS_long(static_cast< long long >(result));
+  if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
+  {
+    if (arg2->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg2);
+    }
+  }
+  return _out;
+fail:
+  {
+    if (arg2->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg2);
+    }
+  }
+  return octave_value_list();
+}
+
+
+SWIG_DEFUN( helicsInputGetBoolean, _wrap_helicsInputGetBoolean, std::string() ) {
+  helics_input arg1 = (helics_input) 0 ;
+  helics_error *arg2 = (helics_error *) 0 ;
+  int res1 ;
+  helics_error etemp2 ;
+  octave_value_list _out;
+  octave_value_list *_outp=&_out;
+  octave_value _outv;
+  helics_bool result;
+  
+  {
+    etemp2=helicsErrorInitialize();
+    arg2=&etemp2;
+  }
+  if (!SWIG_check_num_args("helicsInputGetBoolean",args.length(),1,1,0)) {
+    SWIG_fail;
+  }
+  res1 = SWIG_ConvertPtr(args(0),SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsInputGetBoolean" "', argument " "1"" of type '" "helics_input""'"); 
+  }
+  result = (helics_bool)helicsInputGetBoolean(arg1,arg2);
+  _outv = SWIG_From_int(static_cast< int >(result));
+  if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
+  {
+    if (arg2->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg2);
+    }
+  }
+  return _out;
+fail:
+  {
+    if (arg2->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg2);
+    }
+  }
+  return octave_value_list();
+}
+
+
+SWIG_DEFUN( helicsInputGetDouble, _wrap_helicsInputGetDouble, std::string() ) {
+  helics_input arg1 = (helics_input) 0 ;
+  helics_error *arg2 = (helics_error *) 0 ;
+  int res1 ;
+  helics_error etemp2 ;
+  octave_value_list _out;
+  octave_value_list *_outp=&_out;
+  octave_value _outv;
+  double result;
+  
+  {
+    etemp2=helicsErrorInitialize();
+    arg2=&etemp2;
+  }
+  if (!SWIG_check_num_args("helicsInputGetDouble",args.length(),1,1,0)) {
+    SWIG_fail;
+  }
+  res1 = SWIG_ConvertPtr(args(0),SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsInputGetDouble" "', argument " "1"" of type '" "helics_input""'"); 
+  }
+  result = (double)helicsInputGetDouble(arg1,arg2);
+  _outv = SWIG_From_double(static_cast< double >(result));
+  if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
+  {
+    if (arg2->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg2);
+    }
+  }
+  return _out;
+fail:
+  {
+    if (arg2->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg2);
+    }
+  }
+  return octave_value_list();
+}
+
+
+SWIG_DEFUN( helicsInputGetTime, _wrap_helicsInputGetTime, std::string() ) {
+  helics_input arg1 = (helics_input) 0 ;
+  helics_error *arg2 = (helics_error *) 0 ;
+  int res1 ;
+  helics_error etemp2 ;
+  octave_value_list _out;
+  octave_value_list *_outp=&_out;
+  octave_value _outv;
+  helics_time result;
+  
+  {
+    etemp2=helicsErrorInitialize();
+    arg2=&etemp2;
+  }
+  if (!SWIG_check_num_args("helicsInputGetTime",args.length(),1,1,0)) {
+    SWIG_fail;
+  }
+  res1 = SWIG_ConvertPtr(args(0),SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsInputGetTime" "', argument " "1"" of type '" "helics_input""'"); 
+  }
+  result = (helics_time)helicsInputGetTime(arg1,arg2);
+  _outv = SWIG_From_double(static_cast< double >(result));
+  if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
+  {
+    if (arg2->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg2);
+    }
+  }
+  return _out;
+fail:
+  {
+    if (arg2->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg2);
+    }
+  }
+  return octave_value_list();
+}
+
+
+SWIG_DEFUN( helicsInputGetChar, _wrap_helicsInputGetChar, std::string() ) {
+  helics_input arg1 = (helics_input) 0 ;
+  helics_error *arg2 = (helics_error *) 0 ;
+  int res1 ;
+  helics_error etemp2 ;
+  octave_value_list _out;
+  octave_value_list *_outp=&_out;
+  octave_value _outv;
+  char result;
+  
+  {
+    etemp2=helicsErrorInitialize();
+    arg2=&etemp2;
+  }
+  if (!SWIG_check_num_args("helicsInputGetChar",args.length(),1,1,0)) {
+    SWIG_fail;
+  }
+  res1 = SWIG_ConvertPtr(args(0),SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsInputGetChar" "', argument " "1"" of type '" "helics_input""'"); 
+  }
+  result = (char)helicsInputGetChar(arg1,arg2);
+  _outv = SWIG_From_char(static_cast< char >(result));
+  if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
+  {
+    if (arg2->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg2);
+    }
+  }
+  return _out;
+fail:
+  {
+    if (arg2->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg2);
+    }
+  }
+  return octave_value_list();
+}
+
+
+SWIG_DEFUN( helicsInputGetComplex, _wrap_helicsInputGetComplex, std::string() ) {
+  helics_input arg1 = (helics_input) 0 ;
+  double *arg2 = (double *) 0 ;
+  double *arg3 = (double *) 0 ;
+  helics_error *arg4 = (helics_error *) 0 ;
+  int res1 ;
+  double vals2[2] ;
+  helics_error etemp4 ;
+  octave_value_list _out;
+  octave_value_list *_outp=&_out;
+  octave_value _outv;
+  
+  {
+    arg2=&(vals2[0]);
+    arg3=&(vals2[1]);
+  }
+  {
+    etemp4=helicsErrorInitialize();
+    arg4=&etemp4;
+  }
+  if (!SWIG_check_num_args("helicsInputGetComplex",args.length(),1,1,0)) {
+    SWIG_fail;
+  }
+  res1 = SWIG_ConvertPtr(args(0),SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsInputGetComplex" "', argument " "1"" of type '" "helics_input""'"); 
+  }
+  helicsInputGetComplex(arg1,arg2,arg3,arg4);
+  _outv = octave_value();
+  if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
+  {
+    Complex c(*arg2,*arg3);
+    //octave_complex cv(c);
+    octave_value v(c);
+    _outp = SWIG_Octave_AppendOutput(_outp, v);
+  }
+  {
+    if (arg4->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg4);
+    }
+  }
+  return _out;
+fail:
+  {
+    if (arg4->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg4);
+    }
+  }
+  return octave_value_list();
+}
+
+
+SWIG_DEFUN( helicsInputGetVectorSize, _wrap_helicsInputGetVectorSize, std::string() ) {
+  helics_input arg1 = (helics_input) 0 ;
+  int res1 ;
+  octave_value_list _out;
+  octave_value_list *_outp=&_out;
+  octave_value _outv;
+  int result;
+  
+  if (!SWIG_check_num_args("helicsInputGetVectorSize",args.length(),1,1,0)) {
+    SWIG_fail;
+  }
+  res1 = SWIG_ConvertPtr(args(0),SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsInputGetVectorSize" "', argument " "1"" of type '" "helics_input""'"); 
+  }
+  result = (int)helicsInputGetVectorSize(arg1);
+  _outv = SWIG_From_int(static_cast< int >(result));
+  if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
+  return _out;
+fail:
+  return octave_value_list();
+}
+
+
+SWIG_DEFUN( helicsInputGetVector, _wrap_helicsInputGetVector, std::string() ) {
+  helics_input arg1 = (helics_input) 0 ;
   double *arg2 ;
   int arg3 ;
   int *arg4 = (int *) 0 ;
+  helics_error *arg5 = (helics_error *) 0 ;
   int res1 ;
-  void *argp2 = 0 ;
-  int res2 = 0 ;
-  int val3 ;
-  int ecode3 = 0 ;
-  int temp4 ;
-  int res4 = SWIG_TMPOBJ ;
+  helics_error etemp5 ;
   octave_value_list _out;
   octave_value_list *_outp=&_out;
   octave_value _outv;
-  helics_status result;
   
-  arg4 = &temp4;
-  if (!SWIG_check_num_args("helicsSubscriptionGetVector",args.length(),3,3,0)) {
+  {
+    arg2=(double *)(NULL);
+  }
+  {
+    arg4=&(arg3);
+  }
+  {
+    etemp5=helicsErrorInitialize();
+    arg5=&etemp5;
+  }
+  if (!SWIG_check_num_args("helicsInputGetVector",args.length(),1,1,0)) {
     SWIG_fail;
   }
   res1 = SWIG_ConvertPtr(args(0),SWIG_as_voidptrptr(&arg1), 0, 0);
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsSubscriptionGetVector" "', argument " "1"" of type '" "helics_subscription""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsInputGetVector" "', argument " "1"" of type '" "helics_input""'"); 
   }
-  res2 = SWIG_ConvertPtr(args(1), &argp2,SWIGTYPE_p_double, 0 |  0 );
-  if (!SWIG_IsOK(res2)) {
-    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsSubscriptionGetVector" "', argument " "2"" of type '" "double []""'"); 
-  } 
-  arg2 = reinterpret_cast< double * >(argp2);
-  ecode3 = SWIG_AsVal_int(args(2), &val3);
-  if (!SWIG_IsOK(ecode3)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "helicsSubscriptionGetVector" "', argument " "3"" of type '" "int""'");
-  } 
-  arg3 = static_cast< int >(val3);
-  result = (helics_status)helicsSubscriptionGetVector(arg1,arg2,arg3,arg4);
-  _outv = SWIG_From_int(static_cast< int >(result));
+  {
+    arg3=helicsInputGetVectorSize(arg1);
+    arg2=(double *)malloc(sizeof(double)*arg3);
+  }
+  helicsInputGetVector(arg1,arg2,arg3,arg4,arg5);
+  _outv = octave_value();
   if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
-  if (SWIG_IsTmpObj(res4)) {
-    _outp = SWIG_Octave_AppendOutput(_outp, SWIG_From_int((*arg4)));
-  } else {
-    int new_flags = SWIG_IsNewObj(res4) ? (SWIG_POINTER_OWN |  0 ) :  0 ;
-    _outp = SWIG_Octave_AppendOutput(_outp, SWIG_NewPointerObj((void*)(arg4), SWIGTYPE_p_int, new_flags));
+  {
+    Matrix a(*arg4,1);
+    double *dat=a.fortran_vec();
+    for (int ii=0;ii<*arg4;++ii)
+    {
+      dat[ii]=arg2[ii];
+    }
+    
+    _outp = SWIG_Octave_AppendOutput(_outp, a);
+  }
+  {
+    if (arg2) free(arg2);
+  }
+  {
+    if (arg5->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg5);
+    }
   }
   return _out;
 fail:
+  {
+    if (arg2) free(arg2);
+  }
+  {
+    if (arg5->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg5);
+    }
+  }
   return octave_value_list();
 }
 
 
-SWIG_DEFUN( helicsSubscriptionSetDefaultRaw, _wrap_helicsSubscriptionSetDefaultRaw, std::string() ) {
-  helics_subscription arg1 = (helics_subscription) 0 ;
+SWIG_DEFUN( helicsInputGetNamedPoint, _wrap_helicsInputGetNamedPoint, std::string() ) {
+  helics_input arg1 = (helics_input) 0 ;
+  char *arg2 = (char *) 0 ;
+  int arg3 ;
+  int *arg4 = (int *) 0 ;
+  double *arg5 = (double *) 0 ;
+  helics_error *arg6 = (helics_error *) 0 ;
+  int res1 ;
+  double temp5 ;
+  int res5 = SWIG_TMPOBJ ;
+  helics_error etemp6 ;
+  octave_value_list _out;
+  octave_value_list *_outp=&_out;
+  octave_value _outv;
+  
+  {
+    arg4=&(arg3);
+  }
+  arg5 = &temp5;
+  {
+    etemp6=helicsErrorInitialize();
+    arg6=&etemp6;
+  }
+  if (!SWIG_check_num_args("helicsInputGetNamedPoint",args.length(),1,1,0)) {
+    SWIG_fail;
+  }
+  res1 = SWIG_ConvertPtr(args(0),SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsInputGetNamedPoint" "', argument " "1"" of type '" "helics_input""'"); 
+  }
+  {
+    arg3=helicsInputGetStringSize(arg1)+2;
+    arg2 = (char *) malloc(arg3);
+  }
+  helicsInputGetNamedPoint(arg1,arg2,arg3,arg4,arg5,arg6);
+  _outv = octave_value();
+  if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
+  {
+    _outv = SWIG_FromCharPtrAndSize(arg2,*arg4-1);
+    if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
+  }
+  if (SWIG_IsTmpObj(res5)) {
+    _outp = SWIG_Octave_AppendOutput(_outp, SWIG_From_double((*arg5)));
+  } else {
+    int new_flags = SWIG_IsNewObj(res5) ? (SWIG_POINTER_OWN |  0 ) :  0 ;
+    _outp = SWIG_Octave_AppendOutput(_outp, SWIG_NewPointerObj((void*)(arg5), SWIGTYPE_p_double, new_flags));
+  }
+  {
+    if (arg2) free(arg2);
+  }
+  {
+    if (arg6->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg6);
+    }
+  }
+  return _out;
+fail:
+  {
+    if (arg2) free(arg2);
+  }
+  {
+    if (arg6->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg6);
+    }
+  }
+  return octave_value_list();
+}
+
+
+SWIG_DEFUN( helicsInputSetDefaultRaw, _wrap_helicsInputSetDefaultRaw, std::string() ) {
+  helics_input arg1 = (helics_input) 0 ;
   void *arg2 = (void *) 0 ;
   int arg3 ;
+  helics_error *arg4 = (helics_error *) 0 ;
   int res1 ;
   int res2 ;
-  int val3 ;
-  int ecode3 = 0 ;
+  char *buf2 = 0 ;
+  size_t size2 = 0 ;
+  int alloc2 = 0 ;
+  helics_error etemp4 ;
   octave_value_list _out;
   octave_value_list *_outp=&_out;
   octave_value _outv;
-  helics_status result;
   
-  if (!SWIG_check_num_args("helicsSubscriptionSetDefaultRaw",args.length(),3,3,0)) {
+  {
+    etemp4=helicsErrorInitialize();
+    arg4=&etemp4;
+  }
+  if (!SWIG_check_num_args("helicsInputSetDefaultRaw",args.length(),2,2,0)) {
     SWIG_fail;
   }
   res1 = SWIG_ConvertPtr(args(0),SWIG_as_voidptrptr(&arg1), 0, 0);
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsSubscriptionSetDefaultRaw" "', argument " "1"" of type '" "helics_subscription""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsInputSetDefaultRaw" "', argument " "1"" of type '" "helics_input""'"); 
   }
-  res2 = SWIG_ConvertPtr(args(1),SWIG_as_voidptrptr(&arg2), 0, 0);
+  res2 = SWIG_AsCharPtrAndSize(args(1), &buf2, &size2, &alloc2);
   if (!SWIG_IsOK(res2)) {
-    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsSubscriptionSetDefaultRaw" "', argument " "2"" of type '" "void const *""'"); 
-  }
-  ecode3 = SWIG_AsVal_int(args(2), &val3);
-  if (!SWIG_IsOK(ecode3)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "helicsSubscriptionSetDefaultRaw" "', argument " "3"" of type '" "int""'");
-  } 
-  arg3 = static_cast< int >(val3);
-  result = (helics_status)helicsSubscriptionSetDefaultRaw(arg1,(void const *)arg2,arg3);
-  _outv = SWIG_From_int(static_cast< int >(result));
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsInputSetDefaultRaw" "', argument " "2"" of type '" "void const *""'");
+  }  
+  arg2 = reinterpret_cast< void * >(buf2);
+  arg3 = static_cast< int >(size2 - 1);
+  helicsInputSetDefaultRaw(arg1,(void const *)arg2,arg3,arg4);
+  _outv = octave_value();
   if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
+  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  {
+    if (arg4->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg4);
+    }
+  }
   return _out;
 fail:
+  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  {
+    if (arg4->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg4);
+    }
+  }
   return octave_value_list();
 }
 
 
-SWIG_DEFUN( helicsSubscriptionSetDefaultString, _wrap_helicsSubscriptionSetDefaultString, _wrap_helicsSubscriptionSetDefaultString_texinfo ) {
-  helics_subscription arg1 = (helics_subscription) 0 ;
+SWIG_DEFUN( helicsInputSetDefaultString, _wrap_helicsInputSetDefaultString, std::string() ) {
+  helics_input arg1 = (helics_input) 0 ;
   char *arg2 = (char *) 0 ;
+  helics_error *arg3 = (helics_error *) 0 ;
   int res1 ;
   int res2 ;
   char *buf2 = 0 ;
   int alloc2 = 0 ;
+  helics_error etemp3 ;
   octave_value_list _out;
   octave_value_list *_outp=&_out;
   octave_value _outv;
-  helics_status result;
   
-  if (!SWIG_check_num_args("helicsSubscriptionSetDefaultString",args.length(),2,2,0)) {
+  {
+    etemp3=helicsErrorInitialize();
+    arg3=&etemp3;
+  }
+  if (!SWIG_check_num_args("helicsInputSetDefaultString",args.length(),2,2,0)) {
     SWIG_fail;
   }
   res1 = SWIG_ConvertPtr(args(0),SWIG_as_voidptrptr(&arg1), 0, 0);
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsSubscriptionSetDefaultString" "', argument " "1"" of type '" "helics_subscription""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsInputSetDefaultString" "', argument " "1"" of type '" "helics_input""'"); 
   }
   res2 = SWIG_AsCharPtrAndSize(args(1), &buf2, NULL, &alloc2);
   if (!SWIG_IsOK(res2)) {
-    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsSubscriptionSetDefaultString" "', argument " "2"" of type '" "char const *""'");
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsInputSetDefaultString" "', argument " "2"" of type '" "char const *""'");
   }
   arg2 = reinterpret_cast< char * >(buf2);
-  result = (helics_status)helicsSubscriptionSetDefaultString(arg1,(char const *)arg2);
-  _outv = SWIG_From_int(static_cast< int >(result));
+  helicsInputSetDefaultString(arg1,(char const *)arg2,arg3);
+  _outv = octave_value();
   if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
   if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg3);
+    }
+  }
   return _out;
 fail:
   if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg3);
+    }
+  }
   return octave_value_list();
 }
 
 
-SWIG_DEFUN( helicsSubscriptionSetDefaultInteger, _wrap_helicsSubscriptionSetDefaultInteger, _wrap_helicsSubscriptionSetDefaultInteger_texinfo ) {
-  helics_subscription arg1 = (helics_subscription) 0 ;
+SWIG_DEFUN( helicsInputSetDefaultInteger, _wrap_helicsInputSetDefaultInteger, std::string() ) {
+  helics_input arg1 = (helics_input) 0 ;
   int64_t arg2 ;
+  helics_error *arg3 = (helics_error *) 0 ;
   int res1 ;
   long long val2 ;
   int ecode2 = 0 ;
+  helics_error etemp3 ;
   octave_value_list _out;
   octave_value_list *_outp=&_out;
   octave_value _outv;
-  helics_status result;
   
-  if (!SWIG_check_num_args("helicsSubscriptionSetDefaultInteger",args.length(),2,2,0)) {
+  {
+    etemp3=helicsErrorInitialize();
+    arg3=&etemp3;
+  }
+  if (!SWIG_check_num_args("helicsInputSetDefaultInteger",args.length(),2,2,0)) {
     SWIG_fail;
   }
   res1 = SWIG_ConvertPtr(args(0),SWIG_as_voidptrptr(&arg1), 0, 0);
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsSubscriptionSetDefaultInteger" "', argument " "1"" of type '" "helics_subscription""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsInputSetDefaultInteger" "', argument " "1"" of type '" "helics_input""'"); 
   }
   ecode2 = SWIG_AsVal_long_SS_long(args(1), &val2);
   if (!SWIG_IsOK(ecode2)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "helicsSubscriptionSetDefaultInteger" "', argument " "2"" of type '" "int64_t""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "helicsInputSetDefaultInteger" "', argument " "2"" of type '" "int64_t""'");
   } 
   arg2 = static_cast< int64_t >(val2);
-  result = (helics_status)helicsSubscriptionSetDefaultInteger(arg1,arg2);
-  _outv = SWIG_From_int(static_cast< int >(result));
+  helicsInputSetDefaultInteger(arg1,arg2,arg3);
+  _outv = octave_value();
   if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg3);
+    }
+  }
   return _out;
 fail:
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg3);
+    }
+  }
   return octave_value_list();
 }
 
 
-SWIG_DEFUN( helicsSubscriptionSetDefaultDouble, _wrap_helicsSubscriptionSetDefaultDouble, _wrap_helicsSubscriptionSetDefaultDouble_texinfo ) {
-  helics_subscription arg1 = (helics_subscription) 0 ;
-  double arg2 ;
+SWIG_DEFUN( helicsInputSetDefaultBoolean, _wrap_helicsInputSetDefaultBoolean, std::string() ) {
+  helics_input arg1 = (helics_input) 0 ;
+  helics_bool arg2 ;
+  helics_error *arg3 = (helics_error *) 0 ;
   int res1 ;
-  double val2 ;
+  int val2 ;
   int ecode2 = 0 ;
+  helics_error etemp3 ;
   octave_value_list _out;
   octave_value_list *_outp=&_out;
   octave_value _outv;
-  helics_status result;
   
-  if (!SWIG_check_num_args("helicsSubscriptionSetDefaultDouble",args.length(),2,2,0)) {
+  {
+    etemp3=helicsErrorInitialize();
+    arg3=&etemp3;
+  }
+  if (!SWIG_check_num_args("helicsInputSetDefaultBoolean",args.length(),2,2,0)) {
     SWIG_fail;
   }
   res1 = SWIG_ConvertPtr(args(0),SWIG_as_voidptrptr(&arg1), 0, 0);
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsSubscriptionSetDefaultDouble" "', argument " "1"" of type '" "helics_subscription""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsInputSetDefaultBoolean" "', argument " "1"" of type '" "helics_input""'"); 
   }
-  ecode2 = SWIG_AsVal_double(args(1), &val2);
+  ecode2 = SWIG_AsVal_int(args(1), &val2);
   if (!SWIG_IsOK(ecode2)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "helicsSubscriptionSetDefaultDouble" "', argument " "2"" of type '" "double""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "helicsInputSetDefaultBoolean" "', argument " "2"" of type '" "helics_bool""'");
   } 
-  arg2 = static_cast< double >(val2);
-  result = (helics_status)helicsSubscriptionSetDefaultDouble(arg1,arg2);
-  _outv = SWIG_From_int(static_cast< int >(result));
+  arg2 = static_cast< helics_bool >(val2);
+  helicsInputSetDefaultBoolean(arg1,arg2,arg3);
+  _outv = octave_value();
   if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg3);
+    }
+  }
   return _out;
 fail:
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg3);
+    }
+  }
   return octave_value_list();
 }
 
 
-SWIG_DEFUN( helicsSubscriptionSetDefaultComplex, _wrap_helicsSubscriptionSetDefaultComplex, _wrap_helicsSubscriptionSetDefaultComplex_texinfo ) {
-  helics_subscription arg1 = (helics_subscription) 0 ;
+SWIG_DEFUN( helicsInputSetDefaultTime, _wrap_helicsInputSetDefaultTime, std::string() ) {
+  helics_input arg1 = (helics_input) 0 ;
+  helics_time arg2 ;
+  helics_error *arg3 = (helics_error *) 0 ;
+  int res1 ;
+  double val2 ;
+  int ecode2 = 0 ;
+  helics_error etemp3 ;
+  octave_value_list _out;
+  octave_value_list *_outp=&_out;
+  octave_value _outv;
+  
+  {
+    etemp3=helicsErrorInitialize();
+    arg3=&etemp3;
+  }
+  if (!SWIG_check_num_args("helicsInputSetDefaultTime",args.length(),2,2,0)) {
+    SWIG_fail;
+  }
+  res1 = SWIG_ConvertPtr(args(0),SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsInputSetDefaultTime" "', argument " "1"" of type '" "helics_input""'"); 
+  }
+  ecode2 = SWIG_AsVal_double(args(1), &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "helicsInputSetDefaultTime" "', argument " "2"" of type '" "helics_time""'");
+  } 
+  arg2 = static_cast< helics_time >(val2);
+  helicsInputSetDefaultTime(arg1,arg2,arg3);
+  _outv = octave_value();
+  if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg3);
+    }
+  }
+  return _out;
+fail:
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg3);
+    }
+  }
+  return octave_value_list();
+}
+
+
+SWIG_DEFUN( helicsInputSetDefaultChar, _wrap_helicsInputSetDefaultChar, std::string() ) {
+  helics_input arg1 = (helics_input) 0 ;
+  char arg2 ;
+  helics_error *arg3 = (helics_error *) 0 ;
+  int res1 ;
+  char val2 ;
+  int ecode2 = 0 ;
+  helics_error etemp3 ;
+  octave_value_list _out;
+  octave_value_list *_outp=&_out;
+  octave_value _outv;
+  
+  {
+    etemp3=helicsErrorInitialize();
+    arg3=&etemp3;
+  }
+  if (!SWIG_check_num_args("helicsInputSetDefaultChar",args.length(),2,2,0)) {
+    SWIG_fail;
+  }
+  res1 = SWIG_ConvertPtr(args(0),SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsInputSetDefaultChar" "', argument " "1"" of type '" "helics_input""'"); 
+  }
+  ecode2 = SWIG_AsVal_char(args(1), &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "helicsInputSetDefaultChar" "', argument " "2"" of type '" "char""'");
+  } 
+  arg2 = static_cast< char >(val2);
+  helicsInputSetDefaultChar(arg1,arg2,arg3);
+  _outv = octave_value();
+  if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg3);
+    }
+  }
+  return _out;
+fail:
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg3);
+    }
+  }
+  return octave_value_list();
+}
+
+
+SWIG_DEFUN( helicsInputSetDefaultDouble, _wrap_helicsInputSetDefaultDouble, std::string() ) {
+  helics_input arg1 = (helics_input) 0 ;
+  double arg2 ;
+  helics_error *arg3 = (helics_error *) 0 ;
+  int res1 ;
+  double val2 ;
+  int ecode2 = 0 ;
+  helics_error etemp3 ;
+  octave_value_list _out;
+  octave_value_list *_outp=&_out;
+  octave_value _outv;
+  
+  {
+    etemp3=helicsErrorInitialize();
+    arg3=&etemp3;
+  }
+  if (!SWIG_check_num_args("helicsInputSetDefaultDouble",args.length(),2,2,0)) {
+    SWIG_fail;
+  }
+  res1 = SWIG_ConvertPtr(args(0),SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsInputSetDefaultDouble" "', argument " "1"" of type '" "helics_input""'"); 
+  }
+  ecode2 = SWIG_AsVal_double(args(1), &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "helicsInputSetDefaultDouble" "', argument " "2"" of type '" "double""'");
+  } 
+  arg2 = static_cast< double >(val2);
+  helicsInputSetDefaultDouble(arg1,arg2,arg3);
+  _outv = octave_value();
+  if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg3);
+    }
+  }
+  return _out;
+fail:
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg3);
+    }
+  }
+  return octave_value_list();
+}
+
+
+SWIG_DEFUN( helicsInputSetDefaultComplex, _wrap_helicsInputSetDefaultComplex, std::string() ) {
+  helics_input arg1 = (helics_input) 0 ;
   double arg2 ;
   double arg3 ;
+  helics_error *arg4 = (helics_error *) 0 ;
   int res1 ;
-  double val2 ;
-  int ecode2 = 0 ;
-  double val3 ;
-  int ecode3 = 0 ;
+  helics_error etemp4 ;
   octave_value_list _out;
   octave_value_list *_outp=&_out;
   octave_value _outv;
-  helics_status result;
   
-  if (!SWIG_check_num_args("helicsSubscriptionSetDefaultComplex",args.length(),3,3,0)) {
+  {
+    etemp4=helicsErrorInitialize();
+    arg4=&etemp4;
+  }
+  if (!SWIG_check_num_args("helicsInputSetDefaultComplex",args.length(),2,2,0)) {
     SWIG_fail;
   }
   res1 = SWIG_ConvertPtr(args(0),SWIG_as_voidptrptr(&arg1), 0, 0);
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsSubscriptionSetDefaultComplex" "', argument " "1"" of type '" "helics_subscription""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsInputSetDefaultComplex" "', argument " "1"" of type '" "helics_input""'"); 
   }
-  ecode2 = SWIG_AsVal_double(args(1), &val2);
-  if (!SWIG_IsOK(ecode2)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "helicsSubscriptionSetDefaultComplex" "', argument " "2"" of type '" "double""'");
-  } 
-  arg2 = static_cast< double >(val2);
-  ecode3 = SWIG_AsVal_double(args(2), &val3);
-  if (!SWIG_IsOK(ecode3)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "helicsSubscriptionSetDefaultComplex" "', argument " "3"" of type '" "double""'");
-  } 
-  arg3 = static_cast< double >(val3);
-  result = (helics_status)helicsSubscriptionSetDefaultComplex(arg1,arg2,arg3);
-  _outv = SWIG_From_int(static_cast< int >(result));
+  {
+    if(args(1).is_complex_scalar())
+    {
+      Complex arg=args(1).complex_value();
+      arg2=arg.real();
+      arg3=arg.imag();
+    }  
+    else if (args(1).is_float_type())
+    {
+      arg3=0.0;
+      arg2=args(1).double_value();
+    }
+    else
+    {
+      arg2=0.0;
+      arg3 = 0.0;
+    }
+  }
+  helicsInputSetDefaultComplex(arg1,arg2,arg3,arg4);
+  _outv = octave_value();
   if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
+  {
+    if (arg4->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg4);
+    }
+  }
   return _out;
 fail:
+  {
+    if (arg4->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg4);
+    }
+  }
   return octave_value_list();
 }
 
 
-SWIG_DEFUN( helicsSubscriptionSetDefaultVector, _wrap_helicsSubscriptionSetDefaultVector, _wrap_helicsSubscriptionSetDefaultVector_texinfo ) {
-  helics_subscription arg1 = (helics_subscription) 0 ;
+SWIG_DEFUN( helicsInputSetDefaultVector, _wrap_helicsInputSetDefaultVector, std::string() ) {
+  helics_input arg1 = (helics_input) 0 ;
   double *arg2 = (double *) 0 ;
   int arg3 ;
+  helics_error *arg4 = (helics_error *) 0 ;
   int res1 ;
-  double temp2 ;
-  int res2 = SWIG_TMPOBJ ;
-  int val3 ;
-  int ecode3 = 0 ;
+  helics_error etemp4 ;
   octave_value_list _out;
   octave_value_list *_outp=&_out;
   octave_value _outv;
-  helics_status result;
   
-  arg2 = &temp2;
-  if (!SWIG_check_num_args("helicsSubscriptionSetDefaultVector",args.length(),2,2,0)) {
+  {
+    etemp4=helicsErrorInitialize();
+    arg4=&etemp4;
+  }
+  if (!SWIG_check_num_args("helicsInputSetDefaultVector",args.length(),2,2,0)) {
     SWIG_fail;
   }
   res1 = SWIG_ConvertPtr(args(0),SWIG_as_voidptrptr(&arg1), 0, 0);
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsSubscriptionSetDefaultVector" "', argument " "1"" of type '" "helics_subscription""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsInputSetDefaultVector" "', argument " "1"" of type '" "helics_input""'"); 
   }
-  ecode3 = SWIG_AsVal_int(args(1), &val3);
-  if (!SWIG_IsOK(ecode3)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "helicsSubscriptionSetDefaultVector" "', argument " "3"" of type '" "int""'");
-  } 
-  arg3 = static_cast< int >(val3);
-  result = (helics_status)helicsSubscriptionSetDefaultVector(arg1,(double const *)arg2,arg3);
-  _outv = SWIG_From_int(static_cast< int >(result));
+  {
+    if (!args(1).is_real_matrix()) {
+      SWIG_exception_fail(SWIG_ArgError(3), "argument must be a double array");
+      return octave_value_list();
+    }
+    arg3=static_cast<int>(args(1).numel());
+    arg2=reinterpret_cast<double *>(args(1).mex_get_data());
+  }
+  helicsInputSetDefaultVector(arg1,(double const *)arg2,arg3,arg4);
+  _outv = octave_value();
   if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
-  if (SWIG_IsTmpObj(res2)) {
-    _outp = SWIG_Octave_AppendOutput(_outp, SWIG_From_double((*arg2)));
-  } else {
-    int new_flags = SWIG_IsNewObj(res2) ? (SWIG_POINTER_OWN |  0 ) :  0 ;
-    _outp = SWIG_Octave_AppendOutput(_outp, SWIG_NewPointerObj((void*)(arg2), SWIGTYPE_p_double, new_flags));
+  {
+    
+  }
+  {
+    if (arg4->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg4);
+    }
   }
   return _out;
 fail:
+  {
+    if (arg4->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg4);
+    }
+  }
   return octave_value_list();
 }
 
 
-SWIG_DEFUN( helicsSubscriptionGetType, _wrap_helicsSubscriptionGetType, _wrap_helicsSubscriptionGetType_texinfo ) {
-  helics_subscription arg1 = (helics_subscription) 0 ;
+SWIG_DEFUN( helicsInputSetDefaultNamedPoint, _wrap_helicsInputSetDefaultNamedPoint, std::string() ) {
+  helics_input arg1 = (helics_input) 0 ;
   char *arg2 = (char *) 0 ;
-  int arg3 ;
+  double arg3 ;
+  helics_error *arg4 = (helics_error *) 0 ;
   int res1 ;
   int res2 ;
   char *buf2 = 0 ;
   int alloc2 = 0 ;
-  int val3 ;
+  double val3 ;
   int ecode3 = 0 ;
+  helics_error etemp4 ;
   octave_value_list _out;
   octave_value_list *_outp=&_out;
   octave_value _outv;
-  helics_status result;
   
-  if (!SWIG_check_num_args("helicsSubscriptionGetType",args.length(),3,3,0)) {
+  {
+    etemp4=helicsErrorInitialize();
+    arg4=&etemp4;
+  }
+  if (!SWIG_check_num_args("helicsInputSetDefaultNamedPoint",args.length(),3,3,0)) {
     SWIG_fail;
   }
   res1 = SWIG_ConvertPtr(args(0),SWIG_as_voidptrptr(&arg1), 0, 0);
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsSubscriptionGetType" "', argument " "1"" of type '" "helics_subscription""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsInputSetDefaultNamedPoint" "', argument " "1"" of type '" "helics_input""'"); 
   }
   res2 = SWIG_AsCharPtrAndSize(args(1), &buf2, NULL, &alloc2);
   if (!SWIG_IsOK(res2)) {
-    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsSubscriptionGetType" "', argument " "2"" of type '" "char *""'");
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsInputSetDefaultNamedPoint" "', argument " "2"" of type '" "char const *""'");
   }
   arg2 = reinterpret_cast< char * >(buf2);
-  ecode3 = SWIG_AsVal_int(args(2), &val3);
+  ecode3 = SWIG_AsVal_double(args(2), &val3);
   if (!SWIG_IsOK(ecode3)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "helicsSubscriptionGetType" "', argument " "3"" of type '" "int""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "helicsInputSetDefaultNamedPoint" "', argument " "3"" of type '" "double""'");
   } 
-  arg3 = static_cast< int >(val3);
-  result = (helics_status)helicsSubscriptionGetType(arg1,arg2,arg3);
-  _outv = SWIG_From_int(static_cast< int >(result));
+  arg3 = static_cast< double >(val3);
+  helicsInputSetDefaultNamedPoint(arg1,(char const *)arg2,arg3,arg4);
+  _outv = octave_value();
   if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
   if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  {
+    if (arg4->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg4);
+    }
+  }
   return _out;
 fail:
   if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  {
+    if (arg4->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg4);
+    }
+  }
   return octave_value_list();
 }
 
 
-SWIG_DEFUN( helicsPublicationGetType, _wrap_helicsPublicationGetType, _wrap_helicsPublicationGetType_texinfo ) {
-  helics_publication arg1 = (helics_publication) 0 ;
-  char *arg2 = (char *) 0 ;
-  int arg3 ;
+SWIG_DEFUN( helicsInputGetType, _wrap_helicsInputGetType, std::string() ) {
+  helics_input arg1 = (helics_input) 0 ;
   int res1 ;
-  int res2 ;
-  char *buf2 = 0 ;
-  int alloc2 = 0 ;
-  int val3 ;
-  int ecode3 = 0 ;
   octave_value_list _out;
   octave_value_list *_outp=&_out;
   octave_value _outv;
-  helics_status result;
+  char *result = 0 ;
   
-  if (!SWIG_check_num_args("helicsPublicationGetType",args.length(),3,3,0)) {
+  if (!SWIG_check_num_args("helicsInputGetType",args.length(),1,1,0)) {
+    SWIG_fail;
+  }
+  res1 = SWIG_ConvertPtr(args(0),SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsInputGetType" "', argument " "1"" of type '" "helics_input""'"); 
+  }
+  result = (char *)helicsInputGetType(arg1);
+  _outv = SWIG_FromCharPtr((const char *)result);
+  if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
+  return _out;
+fail:
+  return octave_value_list();
+}
+
+
+SWIG_DEFUN( helicsInputGetPublicationType, _wrap_helicsInputGetPublicationType, std::string() ) {
+  helics_input arg1 = (helics_input) 0 ;
+  int res1 ;
+  octave_value_list _out;
+  octave_value_list *_outp=&_out;
+  octave_value _outv;
+  char *result = 0 ;
+  
+  if (!SWIG_check_num_args("helicsInputGetPublicationType",args.length(),1,1,0)) {
+    SWIG_fail;
+  }
+  res1 = SWIG_ConvertPtr(args(0),SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsInputGetPublicationType" "', argument " "1"" of type '" "helics_input""'"); 
+  }
+  result = (char *)helicsInputGetPublicationType(arg1);
+  _outv = SWIG_FromCharPtr((const char *)result);
+  if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
+  return _out;
+fail:
+  return octave_value_list();
+}
+
+
+SWIG_DEFUN( helicsPublicationGetType, _wrap_helicsPublicationGetType, std::string() ) {
+  helics_publication arg1 = (helics_publication) 0 ;
+  int res1 ;
+  octave_value_list _out;
+  octave_value_list *_outp=&_out;
+  octave_value _outv;
+  char *result = 0 ;
+  
+  if (!SWIG_check_num_args("helicsPublicationGetType",args.length(),1,1,0)) {
     SWIG_fail;
   }
   res1 = SWIG_ConvertPtr(args(0),SWIG_as_voidptrptr(&arg1), 0, 0);
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsPublicationGetType" "', argument " "1"" of type '" "helics_publication""'"); 
   }
-  res2 = SWIG_AsCharPtrAndSize(args(1), &buf2, NULL, &alloc2);
-  if (!SWIG_IsOK(res2)) {
-    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsPublicationGetType" "', argument " "2"" of type '" "char *""'");
-  }
-  arg2 = reinterpret_cast< char * >(buf2);
-  ecode3 = SWIG_AsVal_int(args(2), &val3);
-  if (!SWIG_IsOK(ecode3)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "helicsPublicationGetType" "', argument " "3"" of type '" "int""'");
-  } 
-  arg3 = static_cast< int >(val3);
-  result = (helics_status)helicsPublicationGetType(arg1,arg2,arg3);
-  _outv = SWIG_From_int(static_cast< int >(result));
+  result = (char *)helicsPublicationGetType(arg1);
+  _outv = SWIG_FromCharPtr((const char *)result);
   if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
-  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
   return _out;
 fail:
-  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
   return octave_value_list();
 }
 
 
-SWIG_DEFUN( helicsSubscriptionGetKey, _wrap_helicsSubscriptionGetKey, _wrap_helicsSubscriptionGetKey_texinfo ) {
-  helics_subscription arg1 = (helics_subscription) 0 ;
-  char *arg2 = (char *) 0 ;
-  int arg3 ;
+SWIG_DEFUN( helicsInputGetKey, _wrap_helicsInputGetKey, std::string() ) {
+  helics_input arg1 = (helics_input) 0 ;
   int res1 ;
-  int res2 ;
-  char *buf2 = 0 ;
-  int alloc2 = 0 ;
-  int val3 ;
-  int ecode3 = 0 ;
   octave_value_list _out;
   octave_value_list *_outp=&_out;
   octave_value _outv;
-  helics_status result;
+  char *result = 0 ;
   
-  if (!SWIG_check_num_args("helicsSubscriptionGetKey",args.length(),3,3,0)) {
+  if (!SWIG_check_num_args("helicsInputGetKey",args.length(),1,1,0)) {
     SWIG_fail;
   }
   res1 = SWIG_ConvertPtr(args(0),SWIG_as_voidptrptr(&arg1), 0, 0);
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsSubscriptionGetKey" "', argument " "1"" of type '" "helics_subscription""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsInputGetKey" "', argument " "1"" of type '" "helics_input""'"); 
   }
-  res2 = SWIG_AsCharPtrAndSize(args(1), &buf2, NULL, &alloc2);
-  if (!SWIG_IsOK(res2)) {
-    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsSubscriptionGetKey" "', argument " "2"" of type '" "char *""'");
-  }
-  arg2 = reinterpret_cast< char * >(buf2);
-  ecode3 = SWIG_AsVal_int(args(2), &val3);
-  if (!SWIG_IsOK(ecode3)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "helicsSubscriptionGetKey" "', argument " "3"" of type '" "int""'");
-  } 
-  arg3 = static_cast< int >(val3);
-  result = (helics_status)helicsSubscriptionGetKey(arg1,arg2,arg3);
-  _outv = SWIG_From_int(static_cast< int >(result));
+  result = (char *)helicsInputGetKey(arg1);
+  _outv = SWIG_FromCharPtr((const char *)result);
   if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
-  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
   return _out;
 fail:
-  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
   return octave_value_list();
 }
 
 
-SWIG_DEFUN( helicsPublicationGetKey, _wrap_helicsPublicationGetKey, _wrap_helicsPublicationGetKey_texinfo ) {
-  helics_publication arg1 = (helics_publication) 0 ;
-  char *arg2 = (char *) 0 ;
-  int arg3 ;
+SWIG_DEFUN( helicsSubscriptionGetKey, _wrap_helicsSubscriptionGetKey, std::string() ) {
+  helics_input arg1 = (helics_input) 0 ;
   int res1 ;
-  int res2 ;
-  char *buf2 = 0 ;
-  int alloc2 = 0 ;
-  int val3 ;
-  int ecode3 = 0 ;
   octave_value_list _out;
   octave_value_list *_outp=&_out;
   octave_value _outv;
-  helics_status result;
+  char *result = 0 ;
   
-  if (!SWIG_check_num_args("helicsPublicationGetKey",args.length(),3,3,0)) {
+  if (!SWIG_check_num_args("helicsSubscriptionGetKey",args.length(),1,1,0)) {
+    SWIG_fail;
+  }
+  res1 = SWIG_ConvertPtr(args(0),SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsSubscriptionGetKey" "', argument " "1"" of type '" "helics_input""'"); 
+  }
+  result = (char *)helicsSubscriptionGetKey(arg1);
+  _outv = SWIG_FromCharPtr((const char *)result);
+  if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
+  return _out;
+fail:
+  return octave_value_list();
+}
+
+
+SWIG_DEFUN( helicsPublicationGetKey, _wrap_helicsPublicationGetKey, std::string() ) {
+  helics_publication arg1 = (helics_publication) 0 ;
+  int res1 ;
+  octave_value_list _out;
+  octave_value_list *_outp=&_out;
+  octave_value _outv;
+  char *result = 0 ;
+  
+  if (!SWIG_check_num_args("helicsPublicationGetKey",args.length(),1,1,0)) {
     SWIG_fail;
   }
   res1 = SWIG_ConvertPtr(args(0),SWIG_as_voidptrptr(&arg1), 0, 0);
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsPublicationGetKey" "', argument " "1"" of type '" "helics_publication""'"); 
   }
-  res2 = SWIG_AsCharPtrAndSize(args(1), &buf2, NULL, &alloc2);
-  if (!SWIG_IsOK(res2)) {
-    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsPublicationGetKey" "', argument " "2"" of type '" "char *""'");
-  }
-  arg2 = reinterpret_cast< char * >(buf2);
-  ecode3 = SWIG_AsVal_int(args(2), &val3);
-  if (!SWIG_IsOK(ecode3)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "helicsPublicationGetKey" "', argument " "3"" of type '" "int""'");
-  } 
-  arg3 = static_cast< int >(val3);
-  result = (helics_status)helicsPublicationGetKey(arg1,arg2,arg3);
-  _outv = SWIG_From_int(static_cast< int >(result));
+  result = (char *)helicsPublicationGetKey(arg1);
+  _outv = SWIG_FromCharPtr((const char *)result);
   if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
-  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
   return _out;
 fail:
-  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
   return octave_value_list();
 }
 
 
-SWIG_DEFUN( helicsSubscriptionGetUnits, _wrap_helicsSubscriptionGetUnits, _wrap_helicsSubscriptionGetUnits_texinfo ) {
-  helics_subscription arg1 = (helics_subscription) 0 ;
-  char *arg2 = (char *) 0 ;
-  int arg3 ;
+SWIG_DEFUN( helicsInputGetUnits, _wrap_helicsInputGetUnits, std::string() ) {
+  helics_input arg1 = (helics_input) 0 ;
   int res1 ;
-  int res2 ;
-  char *buf2 = 0 ;
-  int alloc2 = 0 ;
-  int val3 ;
-  int ecode3 = 0 ;
   octave_value_list _out;
   octave_value_list *_outp=&_out;
   octave_value _outv;
-  helics_status result;
+  char *result = 0 ;
   
-  if (!SWIG_check_num_args("helicsSubscriptionGetUnits",args.length(),3,3,0)) {
+  if (!SWIG_check_num_args("helicsInputGetUnits",args.length(),1,1,0)) {
     SWIG_fail;
   }
   res1 = SWIG_ConvertPtr(args(0),SWIG_as_voidptrptr(&arg1), 0, 0);
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsSubscriptionGetUnits" "', argument " "1"" of type '" "helics_subscription""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsInputGetUnits" "', argument " "1"" of type '" "helics_input""'"); 
   }
-  res2 = SWIG_AsCharPtrAndSize(args(1), &buf2, NULL, &alloc2);
-  if (!SWIG_IsOK(res2)) {
-    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsSubscriptionGetUnits" "', argument " "2"" of type '" "char *""'");
-  }
-  arg2 = reinterpret_cast< char * >(buf2);
-  ecode3 = SWIG_AsVal_int(args(2), &val3);
-  if (!SWIG_IsOK(ecode3)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "helicsSubscriptionGetUnits" "', argument " "3"" of type '" "int""'");
-  } 
-  arg3 = static_cast< int >(val3);
-  result = (helics_status)helicsSubscriptionGetUnits(arg1,arg2,arg3);
-  _outv = SWIG_From_int(static_cast< int >(result));
+  result = (char *)helicsInputGetUnits(arg1);
+  _outv = SWIG_FromCharPtr((const char *)result);
   if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
-  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
   return _out;
 fail:
-  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
   return octave_value_list();
 }
 
 
-SWIG_DEFUN( helicsPublicationGetUnits, _wrap_helicsPublicationGetUnits, _wrap_helicsPublicationGetUnits_texinfo ) {
-  helics_publication arg1 = (helics_publication) 0 ;
-  char *arg2 = (char *) 0 ;
-  int arg3 ;
+SWIG_DEFUN( helicsInputGetInjectionUnits, _wrap_helicsInputGetInjectionUnits, std::string() ) {
+  helics_input arg1 = (helics_input) 0 ;
   int res1 ;
-  int res2 ;
-  char *buf2 = 0 ;
-  int alloc2 = 0 ;
-  int val3 ;
-  int ecode3 = 0 ;
   octave_value_list _out;
   octave_value_list *_outp=&_out;
   octave_value _outv;
-  helics_status result;
+  char *result = 0 ;
   
-  if (!SWIG_check_num_args("helicsPublicationGetUnits",args.length(),3,3,0)) {
+  if (!SWIG_check_num_args("helicsInputGetInjectionUnits",args.length(),1,1,0)) {
+    SWIG_fail;
+  }
+  res1 = SWIG_ConvertPtr(args(0),SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsInputGetInjectionUnits" "', argument " "1"" of type '" "helics_input""'"); 
+  }
+  result = (char *)helicsInputGetInjectionUnits(arg1);
+  _outv = SWIG_FromCharPtr((const char *)result);
+  if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
+  return _out;
+fail:
+  return octave_value_list();
+}
+
+
+SWIG_DEFUN( helicsInputGetExtractionUnits, _wrap_helicsInputGetExtractionUnits, std::string() ) {
+  helics_input arg1 = (helics_input) 0 ;
+  int res1 ;
+  octave_value_list _out;
+  octave_value_list *_outp=&_out;
+  octave_value _outv;
+  char *result = 0 ;
+  
+  if (!SWIG_check_num_args("helicsInputGetExtractionUnits",args.length(),1,1,0)) {
+    SWIG_fail;
+  }
+  res1 = SWIG_ConvertPtr(args(0),SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsInputGetExtractionUnits" "', argument " "1"" of type '" "helics_input""'"); 
+  }
+  result = (char *)helicsInputGetExtractionUnits(arg1);
+  _outv = SWIG_FromCharPtr((const char *)result);
+  if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
+  return _out;
+fail:
+  return octave_value_list();
+}
+
+
+SWIG_DEFUN( helicsPublicationGetUnits, _wrap_helicsPublicationGetUnits, std::string() ) {
+  helics_publication arg1 = (helics_publication) 0 ;
+  int res1 ;
+  octave_value_list _out;
+  octave_value_list *_outp=&_out;
+  octave_value _outv;
+  char *result = 0 ;
+  
+  if (!SWIG_check_num_args("helicsPublicationGetUnits",args.length(),1,1,0)) {
     SWIG_fail;
   }
   res1 = SWIG_ConvertPtr(args(0),SWIG_as_voidptrptr(&arg1), 0, 0);
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsPublicationGetUnits" "', argument " "1"" of type '" "helics_publication""'"); 
   }
+  result = (char *)helicsPublicationGetUnits(arg1);
+  _outv = SWIG_FromCharPtr((const char *)result);
+  if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
+  return _out;
+fail:
+  return octave_value_list();
+}
+
+
+SWIG_DEFUN( helicsInputGetInfo, _wrap_helicsInputGetInfo, std::string() ) {
+  helics_input arg1 = (helics_input) 0 ;
+  int res1 ;
+  octave_value_list _out;
+  octave_value_list *_outp=&_out;
+  octave_value _outv;
+  char *result = 0 ;
+  
+  if (!SWIG_check_num_args("helicsInputGetInfo",args.length(),1,1,0)) {
+    SWIG_fail;
+  }
+  res1 = SWIG_ConvertPtr(args(0),SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsInputGetInfo" "', argument " "1"" of type '" "helics_input""'"); 
+  }
+  result = (char *)helicsInputGetInfo(arg1);
+  _outv = SWIG_FromCharPtr((const char *)result);
+  if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
+  return _out;
+fail:
+  return octave_value_list();
+}
+
+
+SWIG_DEFUN( helicsInputSetInfo, _wrap_helicsInputSetInfo, std::string() ) {
+  helics_input arg1 = (helics_input) 0 ;
+  char *arg2 = (char *) 0 ;
+  helics_error *arg3 = (helics_error *) 0 ;
+  int res1 ;
+  int res2 ;
+  char *buf2 = 0 ;
+  int alloc2 = 0 ;
+  helics_error etemp3 ;
+  octave_value_list _out;
+  octave_value_list *_outp=&_out;
+  octave_value _outv;
+  
+  {
+    etemp3=helicsErrorInitialize();
+    arg3=&etemp3;
+  }
+  if (!SWIG_check_num_args("helicsInputSetInfo",args.length(),2,2,0)) {
+    SWIG_fail;
+  }
+  res1 = SWIG_ConvertPtr(args(0),SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsInputSetInfo" "', argument " "1"" of type '" "helics_input""'"); 
+  }
   res2 = SWIG_AsCharPtrAndSize(args(1), &buf2, NULL, &alloc2);
   if (!SWIG_IsOK(res2)) {
-    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsPublicationGetUnits" "', argument " "2"" of type '" "char *""'");
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsInputSetInfo" "', argument " "2"" of type '" "char const *""'");
   }
   arg2 = reinterpret_cast< char * >(buf2);
+  helicsInputSetInfo(arg1,(char const *)arg2,arg3);
+  _outv = octave_value();
+  if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
+  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg3);
+    }
+  }
+  return _out;
+fail:
+  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg3);
+    }
+  }
+  return octave_value_list();
+}
+
+
+SWIG_DEFUN( helicsPublicationGetInfo, _wrap_helicsPublicationGetInfo, std::string() ) {
+  helics_publication arg1 = (helics_publication) 0 ;
+  int res1 ;
+  octave_value_list _out;
+  octave_value_list *_outp=&_out;
+  octave_value _outv;
+  char *result = 0 ;
+  
+  if (!SWIG_check_num_args("helicsPublicationGetInfo",args.length(),1,1,0)) {
+    SWIG_fail;
+  }
+  res1 = SWIG_ConvertPtr(args(0),SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsPublicationGetInfo" "', argument " "1"" of type '" "helics_publication""'"); 
+  }
+  result = (char *)helicsPublicationGetInfo(arg1);
+  _outv = SWIG_FromCharPtr((const char *)result);
+  if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
+  return _out;
+fail:
+  return octave_value_list();
+}
+
+
+SWIG_DEFUN( helicsPublicationSetInfo, _wrap_helicsPublicationSetInfo, std::string() ) {
+  helics_publication arg1 = (helics_publication) 0 ;
+  char *arg2 = (char *) 0 ;
+  helics_error *arg3 = (helics_error *) 0 ;
+  int res1 ;
+  int res2 ;
+  char *buf2 = 0 ;
+  int alloc2 = 0 ;
+  helics_error etemp3 ;
+  octave_value_list _out;
+  octave_value_list *_outp=&_out;
+  octave_value _outv;
+  
+  {
+    etemp3=helicsErrorInitialize();
+    arg3=&etemp3;
+  }
+  if (!SWIG_check_num_args("helicsPublicationSetInfo",args.length(),2,2,0)) {
+    SWIG_fail;
+  }
+  res1 = SWIG_ConvertPtr(args(0),SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsPublicationSetInfo" "', argument " "1"" of type '" "helics_publication""'"); 
+  }
+  res2 = SWIG_AsCharPtrAndSize(args(1), &buf2, NULL, &alloc2);
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsPublicationSetInfo" "', argument " "2"" of type '" "char const *""'");
+  }
+  arg2 = reinterpret_cast< char * >(buf2);
+  helicsPublicationSetInfo(arg1,(char const *)arg2,arg3);
+  _outv = octave_value();
+  if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
+  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg3);
+    }
+  }
+  return _out;
+fail:
+  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg3);
+    }
+  }
+  return octave_value_list();
+}
+
+
+SWIG_DEFUN( helicsInputGetOption, _wrap_helicsInputGetOption, std::string() ) {
+  helics_input arg1 = (helics_input) 0 ;
+  int arg2 ;
+  int res1 ;
+  int val2 ;
+  int ecode2 = 0 ;
+  octave_value_list _out;
+  octave_value_list *_outp=&_out;
+  octave_value _outv;
+  helics_bool result;
+  
+  if (!SWIG_check_num_args("helicsInputGetOption",args.length(),2,2,0)) {
+    SWIG_fail;
+  }
+  res1 = SWIG_ConvertPtr(args(0),SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsInputGetOption" "', argument " "1"" of type '" "helics_input""'"); 
+  }
+  ecode2 = SWIG_AsVal_int(args(1), &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "helicsInputGetOption" "', argument " "2"" of type '" "int""'");
+  } 
+  arg2 = static_cast< int >(val2);
+  result = (helics_bool)helicsInputGetOption(arg1,arg2);
+  _outv = SWIG_From_int(static_cast< int >(result));
+  if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
+  return _out;
+fail:
+  return octave_value_list();
+}
+
+
+SWIG_DEFUN( helicsInputSetOption, _wrap_helicsInputSetOption, std::string() ) {
+  helics_input arg1 = (helics_input) 0 ;
+  int arg2 ;
+  helics_bool arg3 ;
+  helics_error *arg4 = (helics_error *) 0 ;
+  int res1 ;
+  int val2 ;
+  int ecode2 = 0 ;
+  int val3 ;
+  int ecode3 = 0 ;
+  helics_error etemp4 ;
+  octave_value_list _out;
+  octave_value_list *_outp=&_out;
+  octave_value _outv;
+  
+  {
+    etemp4=helicsErrorInitialize();
+    arg4=&etemp4;
+  }
+  if (!SWIG_check_num_args("helicsInputSetOption",args.length(),3,3,0)) {
+    SWIG_fail;
+  }
+  res1 = SWIG_ConvertPtr(args(0),SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsInputSetOption" "', argument " "1"" of type '" "helics_input""'"); 
+  }
+  ecode2 = SWIG_AsVal_int(args(1), &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "helicsInputSetOption" "', argument " "2"" of type '" "int""'");
+  } 
+  arg2 = static_cast< int >(val2);
   ecode3 = SWIG_AsVal_int(args(2), &val3);
   if (!SWIG_IsOK(ecode3)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "helicsPublicationGetUnits" "', argument " "3"" of type '" "int""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "helicsInputSetOption" "', argument " "3"" of type '" "helics_bool""'");
   } 
-  arg3 = static_cast< int >(val3);
-  result = (helics_status)helicsPublicationGetUnits(arg1,arg2,arg3);
-  _outv = SWIG_From_int(static_cast< int >(result));
+  arg3 = static_cast< helics_bool >(val3);
+  helicsInputSetOption(arg1,arg2,arg3,arg4);
+  _outv = octave_value();
   if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
-  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  {
+    if (arg4->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg4);
+    }
+  }
   return _out;
 fail:
-  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  {
+    if (arg4->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg4);
+    }
+  }
   return octave_value_list();
 }
 
 
-SWIG_DEFUN( helicsSubscriptionIsUpdated, _wrap_helicsSubscriptionIsUpdated, _wrap_helicsSubscriptionIsUpdated_texinfo ) {
-  helics_subscription arg1 = (helics_subscription) 0 ;
+SWIG_DEFUN( helicsPublicationGetOption, _wrap_helicsPublicationGetOption, std::string() ) {
+  helics_publication arg1 = (helics_publication) 0 ;
+  int arg2 ;
   int res1 ;
+  int val2 ;
+  int ecode2 = 0 ;
   octave_value_list _out;
   octave_value_list *_outp=&_out;
   octave_value _outv;
-  helics_bool_t result;
+  helics_bool result;
   
-  if (!SWIG_check_num_args("helicsSubscriptionIsUpdated",args.length(),1,1,0)) {
+  if (!SWIG_check_num_args("helicsPublicationGetOption",args.length(),2,2,0)) {
     SWIG_fail;
   }
   res1 = SWIG_ConvertPtr(args(0),SWIG_as_voidptrptr(&arg1), 0, 0);
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsSubscriptionIsUpdated" "', argument " "1"" of type '" "helics_subscription""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsPublicationGetOption" "', argument " "1"" of type '" "helics_publication""'"); 
   }
-  result = (helics_bool_t)helicsSubscriptionIsUpdated(arg1);
+  ecode2 = SWIG_AsVal_int(args(1), &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "helicsPublicationGetOption" "', argument " "2"" of type '" "int""'");
+  } 
+  arg2 = static_cast< int >(val2);
+  result = (helics_bool)helicsPublicationGetOption(arg1,arg2);
   _outv = SWIG_From_int(static_cast< int >(result));
   if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
   return _out;
@@ -8218,23 +11316,127 @@ fail:
 }
 
 
-SWIG_DEFUN( helicsSubscriptionLastUpdateTime, _wrap_helicsSubscriptionLastUpdateTime, _wrap_helicsSubscriptionLastUpdateTime_texinfo ) {
-  helics_subscription arg1 = (helics_subscription) 0 ;
+SWIG_DEFUN( helicsPublicationSetOption, _wrap_helicsPublicationSetOption, std::string() ) {
+  helics_publication arg1 = (helics_publication) 0 ;
+  int arg2 ;
+  helics_bool arg3 ;
+  helics_error *arg4 = (helics_error *) 0 ;
   int res1 ;
+  int val2 ;
+  int ecode2 = 0 ;
+  int val3 ;
+  int ecode3 = 0 ;
+  helics_error etemp4 ;
   octave_value_list _out;
   octave_value_list *_outp=&_out;
   octave_value _outv;
-  helics_time_t result;
   
-  if (!SWIG_check_num_args("helicsSubscriptionLastUpdateTime",args.length(),1,1,0)) {
+  {
+    etemp4=helicsErrorInitialize();
+    arg4=&etemp4;
+  }
+  if (!SWIG_check_num_args("helicsPublicationSetOption",args.length(),3,3,0)) {
     SWIG_fail;
   }
   res1 = SWIG_ConvertPtr(args(0),SWIG_as_voidptrptr(&arg1), 0, 0);
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsSubscriptionLastUpdateTime" "', argument " "1"" of type '" "helics_subscription""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsPublicationSetOption" "', argument " "1"" of type '" "helics_publication""'"); 
   }
-  result = (helics_time_t)helicsSubscriptionLastUpdateTime(arg1);
+  ecode2 = SWIG_AsVal_int(args(1), &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "helicsPublicationSetOption" "', argument " "2"" of type '" "int""'");
+  } 
+  arg2 = static_cast< int >(val2);
+  ecode3 = SWIG_AsVal_int(args(2), &val3);
+  if (!SWIG_IsOK(ecode3)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "helicsPublicationSetOption" "', argument " "3"" of type '" "helics_bool""'");
+  } 
+  arg3 = static_cast< helics_bool >(val3);
+  helicsPublicationSetOption(arg1,arg2,arg3,arg4);
+  _outv = octave_value();
+  if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
+  {
+    if (arg4->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg4);
+    }
+  }
+  return _out;
+fail:
+  {
+    if (arg4->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg4);
+    }
+  }
+  return octave_value_list();
+}
+
+
+SWIG_DEFUN( helicsInputIsUpdated, _wrap_helicsInputIsUpdated, std::string() ) {
+  helics_input arg1 = (helics_input) 0 ;
+  int res1 ;
+  octave_value_list _out;
+  octave_value_list *_outp=&_out;
+  octave_value _outv;
+  helics_bool result;
+  
+  if (!SWIG_check_num_args("helicsInputIsUpdated",args.length(),1,1,0)) {
+    SWIG_fail;
+  }
+  res1 = SWIG_ConvertPtr(args(0),SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsInputIsUpdated" "', argument " "1"" of type '" "helics_input""'"); 
+  }
+  result = (helics_bool)helicsInputIsUpdated(arg1);
+  _outv = SWIG_From_int(static_cast< int >(result));
+  if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
+  return _out;
+fail:
+  return octave_value_list();
+}
+
+
+SWIG_DEFUN( helicsInputLastUpdateTime, _wrap_helicsInputLastUpdateTime, std::string() ) {
+  helics_input arg1 = (helics_input) 0 ;
+  int res1 ;
+  octave_value_list _out;
+  octave_value_list *_outp=&_out;
+  octave_value _outv;
+  helics_time result;
+  
+  if (!SWIG_check_num_args("helicsInputLastUpdateTime",args.length(),1,1,0)) {
+    SWIG_fail;
+  }
+  res1 = SWIG_ConvertPtr(args(0),SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsInputLastUpdateTime" "', argument " "1"" of type '" "helics_input""'"); 
+  }
+  result = (helics_time)helicsInputLastUpdateTime(arg1);
   _outv = SWIG_From_double(static_cast< double >(result));
+  if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
+  return _out;
+fail:
+  return octave_value_list();
+}
+
+
+SWIG_DEFUN( helicsInputClearUpdate, _wrap_helicsInputClearUpdate, std::string() ) {
+  helics_input arg1 = (helics_input) 0 ;
+  int res1 ;
+  octave_value_list _out;
+  octave_value_list *_outp=&_out;
+  octave_value _outv;
+  
+  if (!SWIG_check_num_args("helicsInputClearUpdate",args.length(),1,1,0)) {
+    SWIG_fail;
+  }
+  res1 = SWIG_ConvertPtr(args(0),SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsInputClearUpdate" "', argument " "1"" of type '" "helics_input""'"); 
+  }
+  helicsInputClearUpdate(arg1);
+  _outv = octave_value();
   if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
   return _out;
 fail:
@@ -8266,7 +11468,7 @@ fail:
 }
 
 
-SWIG_DEFUN( helicsFederateGetSubscriptionCount, _wrap_helicsFederateGetSubscriptionCount, std::string() ) {
+SWIG_DEFUN( helicsFederateGetInputCount, _wrap_helicsFederateGetInputCount, std::string() ) {
   helics_federate arg1 = (helics_federate) 0 ;
   int res1 ;
   octave_value_list _out;
@@ -8274,14 +11476,14 @@ SWIG_DEFUN( helicsFederateGetSubscriptionCount, _wrap_helicsFederateGetSubscript
   octave_value _outv;
   int result;
   
-  if (!SWIG_check_num_args("helicsFederateGetSubscriptionCount",args.length(),1,1,0)) {
+  if (!SWIG_check_num_args("helicsFederateGetInputCount",args.length(),1,1,0)) {
     SWIG_fail;
   }
   res1 = SWIG_ConvertPtr(args(0),SWIG_as_voidptrptr(&arg1), 0, 0);
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateGetSubscriptionCount" "', argument " "1"" of type '" "helics_federate""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateGetInputCount" "', argument " "1"" of type '" "helics_federate""'"); 
   }
-  result = (int)helicsFederateGetSubscriptionCount(arg1);
+  result = (int)helicsFederateGetInputCount(arg1);
   _outv = SWIG_From_int(static_cast< int >(result));
   if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
   return _out;
@@ -8290,10 +11492,11 @@ fail:
 }
 
 
-SWIG_DEFUN( helicsFederateRegisterEndpoint, _wrap_helicsFederateRegisterEndpoint, _wrap_helicsFederateRegisterEndpoint_texinfo ) {
+SWIG_DEFUN( helicsFederateRegisterEndpoint, _wrap_helicsFederateRegisterEndpoint, std::string() ) {
   helics_federate arg1 = (helics_federate) 0 ;
   char *arg2 = (char *) 0 ;
   char *arg3 = (char *) 0 ;
+  helics_error *arg4 = (helics_error *) 0 ;
   int res1 ;
   int res2 ;
   char *buf2 = 0 ;
@@ -8301,11 +11504,16 @@ SWIG_DEFUN( helicsFederateRegisterEndpoint, _wrap_helicsFederateRegisterEndpoint
   int res3 ;
   char *buf3 = 0 ;
   int alloc3 = 0 ;
+  helics_error etemp4 ;
   octave_value_list _out;
   octave_value_list *_outp=&_out;
   octave_value _outv;
   helics_endpoint result;
   
+  {
+    etemp4=helicsErrorInitialize();
+    arg4=&etemp4;
+  }
   if (!SWIG_check_num_args("helicsFederateRegisterEndpoint",args.length(),3,3,0)) {
     SWIG_fail;
   }
@@ -8323,23 +11531,36 @@ SWIG_DEFUN( helicsFederateRegisterEndpoint, _wrap_helicsFederateRegisterEndpoint
     SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "helicsFederateRegisterEndpoint" "', argument " "3"" of type '" "char const *""'");
   }
   arg3 = reinterpret_cast< char * >(buf3);
-  result = (helics_endpoint)helicsFederateRegisterEndpoint(arg1,(char const *)arg2,(char const *)arg3);
+  result = (helics_endpoint)helicsFederateRegisterEndpoint(arg1,(char const *)arg2,(char const *)arg3,arg4);
   _outv = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_void, 0 |  0 );
   if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
   if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
   if (alloc3 == SWIG_NEWOBJ) delete[] buf3;
+  {
+    if (arg4->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg4);
+    }
+  }
   return _out;
 fail:
   if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
   if (alloc3 == SWIG_NEWOBJ) delete[] buf3;
+  {
+    if (arg4->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg4);
+    }
+  }
   return octave_value_list();
 }
 
 
-SWIG_DEFUN( helicsFederateRegisterGlobalEndpoint, _wrap_helicsFederateRegisterGlobalEndpoint, _wrap_helicsFederateRegisterGlobalEndpoint_texinfo ) {
+SWIG_DEFUN( helicsFederateRegisterGlobalEndpoint, _wrap_helicsFederateRegisterGlobalEndpoint, std::string() ) {
   helics_federate arg1 = (helics_federate) 0 ;
   char *arg2 = (char *) 0 ;
   char *arg3 = (char *) 0 ;
+  helics_error *arg4 = (helics_error *) 0 ;
   int res1 ;
   int res2 ;
   char *buf2 = 0 ;
@@ -8347,11 +11568,16 @@ SWIG_DEFUN( helicsFederateRegisterGlobalEndpoint, _wrap_helicsFederateRegisterGl
   int res3 ;
   char *buf3 = 0 ;
   int alloc3 = 0 ;
+  helics_error etemp4 ;
   octave_value_list _out;
   octave_value_list *_outp=&_out;
   octave_value _outv;
   helics_endpoint result;
   
+  {
+    etemp4=helicsErrorInitialize();
+    arg4=&etemp4;
+  }
   if (!SWIG_check_num_args("helicsFederateRegisterGlobalEndpoint",args.length(),3,3,0)) {
     SWIG_fail;
   }
@@ -8369,31 +11595,151 @@ SWIG_DEFUN( helicsFederateRegisterGlobalEndpoint, _wrap_helicsFederateRegisterGl
     SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "helicsFederateRegisterGlobalEndpoint" "', argument " "3"" of type '" "char const *""'");
   }
   arg3 = reinterpret_cast< char * >(buf3);
-  result = (helics_endpoint)helicsFederateRegisterGlobalEndpoint(arg1,(char const *)arg2,(char const *)arg3);
+  result = (helics_endpoint)helicsFederateRegisterGlobalEndpoint(arg1,(char const *)arg2,(char const *)arg3,arg4);
   _outv = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_void, 0 |  0 );
   if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
   if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
   if (alloc3 == SWIG_NEWOBJ) delete[] buf3;
+  {
+    if (arg4->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg4);
+    }
+  }
   return _out;
 fail:
   if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
   if (alloc3 == SWIG_NEWOBJ) delete[] buf3;
+  {
+    if (arg4->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg4);
+    }
+  }
   return octave_value_list();
 }
 
 
-SWIG_DEFUN( helicsEndpointSetDefaultDestination, _wrap_helicsEndpointSetDefaultDestination, _wrap_helicsEndpointSetDefaultDestination_texinfo ) {
-  helics_endpoint arg1 = (helics_endpoint) 0 ;
+SWIG_DEFUN( helicsFederateGetEndpoint, _wrap_helicsFederateGetEndpoint, std::string() ) {
+  helics_federate arg1 = (helics_federate) 0 ;
   char *arg2 = (char *) 0 ;
+  helics_error *arg3 = (helics_error *) 0 ;
   int res1 ;
   int res2 ;
   char *buf2 = 0 ;
   int alloc2 = 0 ;
+  helics_error etemp3 ;
   octave_value_list _out;
   octave_value_list *_outp=&_out;
   octave_value _outv;
-  helics_status result;
+  helics_endpoint result;
   
+  {
+    etemp3=helicsErrorInitialize();
+    arg3=&etemp3;
+  }
+  if (!SWIG_check_num_args("helicsFederateGetEndpoint",args.length(),2,2,0)) {
+    SWIG_fail;
+  }
+  res1 = SWIG_ConvertPtr(args(0),SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateGetEndpoint" "', argument " "1"" of type '" "helics_federate""'"); 
+  }
+  res2 = SWIG_AsCharPtrAndSize(args(1), &buf2, NULL, &alloc2);
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsFederateGetEndpoint" "', argument " "2"" of type '" "char const *""'");
+  }
+  arg2 = reinterpret_cast< char * >(buf2);
+  result = (helics_endpoint)helicsFederateGetEndpoint(arg1,(char const *)arg2,arg3);
+  _outv = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_void, 0 |  0 );
+  if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
+  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg3);
+    }
+  }
+  return _out;
+fail:
+  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg3);
+    }
+  }
+  return octave_value_list();
+}
+
+
+SWIG_DEFUN( helicsFederateGetEndpointByIndex, _wrap_helicsFederateGetEndpointByIndex, std::string() ) {
+  helics_federate arg1 = (helics_federate) 0 ;
+  int arg2 ;
+  helics_error *arg3 = (helics_error *) 0 ;
+  int res1 ;
+  int val2 ;
+  int ecode2 = 0 ;
+  helics_error etemp3 ;
+  octave_value_list _out;
+  octave_value_list *_outp=&_out;
+  octave_value _outv;
+  helics_endpoint result;
+  
+  {
+    etemp3=helicsErrorInitialize();
+    arg3=&etemp3;
+  }
+  if (!SWIG_check_num_args("helicsFederateGetEndpointByIndex",args.length(),2,2,0)) {
+    SWIG_fail;
+  }
+  res1 = SWIG_ConvertPtr(args(0),SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateGetEndpointByIndex" "', argument " "1"" of type '" "helics_federate""'"); 
+  }
+  ecode2 = SWIG_AsVal_int(args(1), &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "helicsFederateGetEndpointByIndex" "', argument " "2"" of type '" "int""'");
+  } 
+  arg2 = static_cast< int >(val2);
+  result = (helics_endpoint)helicsFederateGetEndpointByIndex(arg1,arg2,arg3);
+  _outv = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_void, 0 |  0 );
+  if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg3);
+    }
+  }
+  return _out;
+fail:
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg3);
+    }
+  }
+  return octave_value_list();
+}
+
+
+SWIG_DEFUN( helicsEndpointSetDefaultDestination, _wrap_helicsEndpointSetDefaultDestination, std::string() ) {
+  helics_endpoint arg1 = (helics_endpoint) 0 ;
+  char *arg2 = (char *) 0 ;
+  helics_error *arg3 = (helics_error *) 0 ;
+  int res1 ;
+  int res2 ;
+  char *buf2 = 0 ;
+  int alloc2 = 0 ;
+  helics_error etemp3 ;
+  octave_value_list _out;
+  octave_value_list *_outp=&_out;
+  octave_value _outv;
+  
+  {
+    etemp3=helicsErrorInitialize();
+    arg3=&etemp3;
+  }
   if (!SWIG_check_num_args("helicsEndpointSetDefaultDestination",args.length(),2,2,0)) {
     SWIG_fail;
   }
@@ -8406,35 +11752,77 @@ SWIG_DEFUN( helicsEndpointSetDefaultDestination, _wrap_helicsEndpointSetDefaultD
     SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsEndpointSetDefaultDestination" "', argument " "2"" of type '" "char const *""'");
   }
   arg2 = reinterpret_cast< char * >(buf2);
-  result = (helics_status)helicsEndpointSetDefaultDestination(arg1,(char const *)arg2);
-  _outv = SWIG_From_int(static_cast< int >(result));
+  helicsEndpointSetDefaultDestination(arg1,(char const *)arg2,arg3);
+  _outv = octave_value();
   if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
   if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg3);
+    }
+  }
   return _out;
 fail:
   if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg3);
+    }
+  }
   return octave_value_list();
 }
 
 
-SWIG_DEFUN( helicsEndpointSendMessageRaw, _wrap_helicsEndpointSendMessageRaw, _wrap_helicsEndpointSendMessageRaw_texinfo ) {
+SWIG_DEFUN( helicsEndpointGetDefaultDestination, _wrap_helicsEndpointGetDefaultDestination, std::string() ) {
+  helics_endpoint arg1 = (helics_endpoint) 0 ;
+  int res1 ;
+  octave_value_list _out;
+  octave_value_list *_outp=&_out;
+  octave_value _outv;
+  char *result = 0 ;
+  
+  if (!SWIG_check_num_args("helicsEndpointGetDefaultDestination",args.length(),1,1,0)) {
+    SWIG_fail;
+  }
+  res1 = SWIG_ConvertPtr(args(0),SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsEndpointGetDefaultDestination" "', argument " "1"" of type '" "helics_endpoint""'"); 
+  }
+  result = (char *)helicsEndpointGetDefaultDestination(arg1);
+  _outv = SWIG_FromCharPtr((const char *)result);
+  if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
+  return _out;
+fail:
+  return octave_value_list();
+}
+
+
+SWIG_DEFUN( helicsEndpointSendMessageRaw, _wrap_helicsEndpointSendMessageRaw, std::string() ) {
   helics_endpoint arg1 = (helics_endpoint) 0 ;
   char *arg2 = (char *) 0 ;
   void *arg3 = (void *) 0 ;
   int arg4 ;
+  helics_error *arg5 = (helics_error *) 0 ;
   int res1 ;
   int res2 ;
   char *buf2 = 0 ;
   int alloc2 = 0 ;
   int res3 ;
-  int val4 ;
-  int ecode4 = 0 ;
+  char *buf3 = 0 ;
+  size_t size3 = 0 ;
+  int alloc3 = 0 ;
+  helics_error etemp5 ;
   octave_value_list _out;
   octave_value_list *_outp=&_out;
   octave_value _outv;
-  helics_status result;
   
-  if (!SWIG_check_num_args("helicsEndpointSendMessageRaw",args.length(),4,4,0)) {
+  {
+    etemp5=helicsErrorInitialize();
+    arg5=&etemp5;
+  }
+  if (!SWIG_check_num_args("helicsEndpointSendMessageRaw",args.length(),3,3,0)) {
     SWIG_fail;
   }
   res1 = SWIG_ConvertPtr(args(0),SWIG_as_voidptrptr(&arg1), 0, 0);
@@ -8446,47 +11834,64 @@ SWIG_DEFUN( helicsEndpointSendMessageRaw, _wrap_helicsEndpointSendMessageRaw, _w
     SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsEndpointSendMessageRaw" "', argument " "2"" of type '" "char const *""'");
   }
   arg2 = reinterpret_cast< char * >(buf2);
-  res3 = SWIG_ConvertPtr(args(2),SWIG_as_voidptrptr(&arg3), 0, 0);
+  res3 = SWIG_AsCharPtrAndSize(args(2), &buf3, &size3, &alloc3);
   if (!SWIG_IsOK(res3)) {
-    SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "helicsEndpointSendMessageRaw" "', argument " "3"" of type '" "void const *""'"); 
-  }
-  ecode4 = SWIG_AsVal_int(args(3), &val4);
-  if (!SWIG_IsOK(ecode4)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode4), "in method '" "helicsEndpointSendMessageRaw" "', argument " "4"" of type '" "int""'");
-  } 
-  arg4 = static_cast< int >(val4);
-  result = (helics_status)helicsEndpointSendMessageRaw(arg1,(char const *)arg2,(void const *)arg3,arg4);
-  _outv = SWIG_From_int(static_cast< int >(result));
+    SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "helicsEndpointSendMessageRaw" "', argument " "3"" of type '" "void const *""'");
+  }  
+  arg3 = reinterpret_cast< void * >(buf3);
+  arg4 = static_cast< int >(size3 - 1);
+  helicsEndpointSendMessageRaw(arg1,(char const *)arg2,(void const *)arg3,arg4,arg5);
+  _outv = octave_value();
   if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
   if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  if (alloc3 == SWIG_NEWOBJ) delete[] buf3;
+  {
+    if (arg5->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg5);
+    }
+  }
   return _out;
 fail:
   if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  if (alloc3 == SWIG_NEWOBJ) delete[] buf3;
+  {
+    if (arg5->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg5);
+    }
+  }
   return octave_value_list();
 }
 
 
-SWIG_DEFUN( helicsEndpointSendEventRaw, _wrap_helicsEndpointSendEventRaw, _wrap_helicsEndpointSendEventRaw_texinfo ) {
+SWIG_DEFUN( helicsEndpointSendEventRaw, _wrap_helicsEndpointSendEventRaw, std::string() ) {
   helics_endpoint arg1 = (helics_endpoint) 0 ;
   char *arg2 = (char *) 0 ;
   void *arg3 = (void *) 0 ;
   int arg4 ;
-  helics_time_t arg5 ;
+  helics_time arg5 ;
+  helics_error *arg6 = (helics_error *) 0 ;
   int res1 ;
   int res2 ;
   char *buf2 = 0 ;
   int alloc2 = 0 ;
   int res3 ;
-  int val4 ;
-  int ecode4 = 0 ;
+  char *buf3 = 0 ;
+  size_t size3 = 0 ;
+  int alloc3 = 0 ;
   double val5 ;
   int ecode5 = 0 ;
+  helics_error etemp6 ;
   octave_value_list _out;
   octave_value_list *_outp=&_out;
   octave_value _outv;
-  helics_status result;
   
-  if (!SWIG_check_num_args("helicsEndpointSendEventRaw",args.length(),5,5,0)) {
+  {
+    etemp6=helicsErrorInitialize();
+    arg6=&etemp6;
+  }
+  if (!SWIG_check_num_args("helicsEndpointSendEventRaw",args.length(),4,4,0)) {
     SWIG_fail;
   }
   res1 = SWIG_ConvertPtr(args(0),SWIG_as_voidptrptr(&arg1), 0, 0);
@@ -8498,42 +11903,58 @@ SWIG_DEFUN( helicsEndpointSendEventRaw, _wrap_helicsEndpointSendEventRaw, _wrap_
     SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsEndpointSendEventRaw" "', argument " "2"" of type '" "char const *""'");
   }
   arg2 = reinterpret_cast< char * >(buf2);
-  res3 = SWIG_ConvertPtr(args(2),SWIG_as_voidptrptr(&arg3), 0, 0);
+  res3 = SWIG_AsCharPtrAndSize(args(2), &buf3, &size3, &alloc3);
   if (!SWIG_IsOK(res3)) {
-    SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "helicsEndpointSendEventRaw" "', argument " "3"" of type '" "void const *""'"); 
-  }
-  ecode4 = SWIG_AsVal_int(args(3), &val4);
-  if (!SWIG_IsOK(ecode4)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode4), "in method '" "helicsEndpointSendEventRaw" "', argument " "4"" of type '" "int""'");
-  } 
-  arg4 = static_cast< int >(val4);
-  ecode5 = SWIG_AsVal_double(args(4), &val5);
+    SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "helicsEndpointSendEventRaw" "', argument " "3"" of type '" "void const *""'");
+  }  
+  arg3 = reinterpret_cast< void * >(buf3);
+  arg4 = static_cast< int >(size3 - 1);
+  ecode5 = SWIG_AsVal_double(args(3), &val5);
   if (!SWIG_IsOK(ecode5)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode5), "in method '" "helicsEndpointSendEventRaw" "', argument " "5"" of type '" "helics_time_t""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode5), "in method '" "helicsEndpointSendEventRaw" "', argument " "5"" of type '" "helics_time""'");
   } 
-  arg5 = static_cast< helics_time_t >(val5);
-  result = (helics_status)helicsEndpointSendEventRaw(arg1,(char const *)arg2,(void const *)arg3,arg4,arg5);
-  _outv = SWIG_From_int(static_cast< int >(result));
+  arg5 = static_cast< helics_time >(val5);
+  helicsEndpointSendEventRaw(arg1,(char const *)arg2,(void const *)arg3,arg4,arg5,arg6);
+  _outv = octave_value();
   if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
   if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  if (alloc3 == SWIG_NEWOBJ) delete[] buf3;
+  {
+    if (arg6->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg6);
+    }
+  }
   return _out;
 fail:
   if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  if (alloc3 == SWIG_NEWOBJ) delete[] buf3;
+  {
+    if (arg6->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg6);
+    }
+  }
   return octave_value_list();
 }
 
 
-SWIG_DEFUN( helicsEndpointSendMessage, _wrap_helicsEndpointSendMessage, _wrap_helicsEndpointSendMessage_texinfo ) {
+SWIG_DEFUN( helicsEndpointSendMessage, _wrap_helicsEndpointSendMessage, std::string() ) {
   helics_endpoint arg1 = (helics_endpoint) 0 ;
-  message_t *arg2 = (message_t *) 0 ;
+  helics_message *arg2 = (helics_message *) 0 ;
+  helics_error *arg3 = (helics_error *) 0 ;
   int res1 ;
   void *argp2 = 0 ;
   int res2 = 0 ;
+  helics_error etemp3 ;
   octave_value_list _out;
   octave_value_list *_outp=&_out;
   octave_value _outv;
-  helics_status result;
   
+  {
+    etemp3=helicsErrorInitialize();
+    arg3=&etemp3;
+  }
   if (!SWIG_check_num_args("helicsEndpointSendMessage",args.length(),2,2,0)) {
     SWIG_fail;
   }
@@ -8541,37 +11962,97 @@ SWIG_DEFUN( helicsEndpointSendMessage, _wrap_helicsEndpointSendMessage, _wrap_he
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsEndpointSendMessage" "', argument " "1"" of type '" "helics_endpoint""'"); 
   }
-  res2 = SWIG_ConvertPtr(args(1), &argp2,SWIGTYPE_p_message_t, 0 |  0 );
+  res2 = SWIG_ConvertPtr(args(1), &argp2,SWIGTYPE_p_helics_message, 0 |  0 );
   if (!SWIG_IsOK(res2)) {
-    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsEndpointSendMessage" "', argument " "2"" of type '" "message_t *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsEndpointSendMessage" "', argument " "2"" of type '" "helics_message *""'"); 
   }
-  arg2 = reinterpret_cast< message_t * >(argp2);
-  result = (helics_status)helicsEndpointSendMessage(arg1,arg2);
-  _outv = SWIG_From_int(static_cast< int >(result));
+  arg2 = reinterpret_cast< helics_message * >(argp2);
+  helicsEndpointSendMessage(arg1,arg2,arg3);
+  _outv = octave_value();
   if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg3);
+    }
+  }
   return _out;
 fail:
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg3);
+    }
+  }
   return octave_value_list();
 }
 
 
-SWIG_DEFUN( helicsEndpointSubscribe, _wrap_helicsEndpointSubscribe, _wrap_helicsEndpointSubscribe_texinfo ) {
+SWIG_DEFUN( helicsEndpointSendMessageObject, _wrap_helicsEndpointSendMessageObject, std::string() ) {
+  helics_endpoint arg1 = (helics_endpoint) 0 ;
+  helics_message_object arg2 = (helics_message_object) 0 ;
+  helics_error *arg3 = (helics_error *) 0 ;
+  int res1 ;
+  int res2 ;
+  helics_error etemp3 ;
+  octave_value_list _out;
+  octave_value_list *_outp=&_out;
+  octave_value _outv;
+  
+  {
+    etemp3=helicsErrorInitialize();
+    arg3=&etemp3;
+  }
+  if (!SWIG_check_num_args("helicsEndpointSendMessageObject",args.length(),2,2,0)) {
+    SWIG_fail;
+  }
+  res1 = SWIG_ConvertPtr(args(0),SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsEndpointSendMessageObject" "', argument " "1"" of type '" "helics_endpoint""'"); 
+  }
+  res2 = SWIG_ConvertPtr(args(1),SWIG_as_voidptrptr(&arg2), 0, 0);
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsEndpointSendMessageObject" "', argument " "2"" of type '" "helics_message_object""'"); 
+  }
+  helicsEndpointSendMessageObject(arg1,arg2,arg3);
+  _outv = octave_value();
+  if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg3);
+    }
+  }
+  return _out;
+fail:
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg3);
+    }
+  }
+  return octave_value_list();
+}
+
+
+SWIG_DEFUN( helicsEndpointSubscribe, _wrap_helicsEndpointSubscribe, std::string() ) {
   helics_endpoint arg1 = (helics_endpoint) 0 ;
   char *arg2 = (char *) 0 ;
-  char *arg3 = (char *) 0 ;
+  helics_error *arg3 = (helics_error *) 0 ;
   int res1 ;
   int res2 ;
   char *buf2 = 0 ;
   int alloc2 = 0 ;
-  int res3 ;
-  char *buf3 = 0 ;
-  int alloc3 = 0 ;
+  helics_error etemp3 ;
   octave_value_list _out;
   octave_value_list *_outp=&_out;
   octave_value _outv;
-  helics_status result;
   
-  if (!SWIG_check_num_args("helicsEndpointSubscribe",args.length(),3,3,0)) {
+  {
+    etemp3=helicsErrorInitialize();
+    arg3=&etemp3;
+  }
+  if (!SWIG_check_num_args("helicsEndpointSubscribe",args.length(),2,2,0)) {
     SWIG_fail;
   }
   res1 = SWIG_ConvertPtr(args(0),SWIG_as_voidptrptr(&arg1), 0, 0);
@@ -8583,31 +12064,36 @@ SWIG_DEFUN( helicsEndpointSubscribe, _wrap_helicsEndpointSubscribe, _wrap_helics
     SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsEndpointSubscribe" "', argument " "2"" of type '" "char const *""'");
   }
   arg2 = reinterpret_cast< char * >(buf2);
-  res3 = SWIG_AsCharPtrAndSize(args(2), &buf3, NULL, &alloc3);
-  if (!SWIG_IsOK(res3)) {
-    SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "helicsEndpointSubscribe" "', argument " "3"" of type '" "char const *""'");
-  }
-  arg3 = reinterpret_cast< char * >(buf3);
-  result = (helics_status)helicsEndpointSubscribe(arg1,(char const *)arg2,(char const *)arg3);
-  _outv = SWIG_From_int(static_cast< int >(result));
+  helicsEndpointSubscribe(arg1,(char const *)arg2,arg3);
+  _outv = octave_value();
   if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
   if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
-  if (alloc3 == SWIG_NEWOBJ) delete[] buf3;
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg3);
+    }
+  }
   return _out;
 fail:
   if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
-  if (alloc3 == SWIG_NEWOBJ) delete[] buf3;
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg3);
+    }
+  }
   return octave_value_list();
 }
 
 
-SWIG_DEFUN( helicsFederateHasMessage, _wrap_helicsFederateHasMessage, _wrap_helicsFederateHasMessage_texinfo ) {
+SWIG_DEFUN( helicsFederateHasMessage, _wrap_helicsFederateHasMessage, std::string() ) {
   helics_federate arg1 = (helics_federate) 0 ;
   int res1 ;
   octave_value_list _out;
   octave_value_list *_outp=&_out;
   octave_value _outv;
-  helics_bool_t result;
+  helics_bool result;
   
   if (!SWIG_check_num_args("helicsFederateHasMessage",args.length(),1,1,0)) {
     SWIG_fail;
@@ -8616,7 +12102,7 @@ SWIG_DEFUN( helicsFederateHasMessage, _wrap_helicsFederateHasMessage, _wrap_heli
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateHasMessage" "', argument " "1"" of type '" "helics_federate""'"); 
   }
-  result = (helics_bool_t)helicsFederateHasMessage(arg1);
+  result = (helics_bool)helicsFederateHasMessage(arg1);
   _outv = SWIG_From_int(static_cast< int >(result));
   if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
   return _out;
@@ -8625,13 +12111,13 @@ fail:
 }
 
 
-SWIG_DEFUN( helicsEndpointHasMessage, _wrap_helicsEndpointHasMessage, _wrap_helicsEndpointHasMessage_texinfo ) {
+SWIG_DEFUN( helicsEndpointHasMessage, _wrap_helicsEndpointHasMessage, std::string() ) {
   helics_endpoint arg1 = (helics_endpoint) 0 ;
   int res1 ;
   octave_value_list _out;
   octave_value_list *_outp=&_out;
   octave_value _outv;
-  helics_bool_t result;
+  helics_bool result;
   
   if (!SWIG_check_num_args("helicsEndpointHasMessage",args.length(),1,1,0)) {
     SWIG_fail;
@@ -8640,7 +12126,7 @@ SWIG_DEFUN( helicsEndpointHasMessage, _wrap_helicsEndpointHasMessage, _wrap_heli
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsEndpointHasMessage" "', argument " "1"" of type '" "helics_endpoint""'"); 
   }
-  result = (helics_bool_t)helicsEndpointHasMessage(arg1);
+  result = (helics_bool)helicsEndpointHasMessage(arg1);
   _outv = SWIG_From_int(static_cast< int >(result));
   if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
   return _out;
@@ -8649,7 +12135,7 @@ fail:
 }
 
 
-SWIG_DEFUN( helicsFederateReceiveCount, _wrap_helicsFederateReceiveCount, _wrap_helicsFederateReceiveCount_texinfo ) {
+SWIG_DEFUN( helicsFederatePendingMessages, _wrap_helicsFederatePendingMessages, std::string() ) {
   helics_federate arg1 = (helics_federate) 0 ;
   int res1 ;
   octave_value_list _out;
@@ -8657,14 +12143,14 @@ SWIG_DEFUN( helicsFederateReceiveCount, _wrap_helicsFederateReceiveCount, _wrap_
   octave_value _outv;
   int result;
   
-  if (!SWIG_check_num_args("helicsFederateReceiveCount",args.length(),1,1,0)) {
+  if (!SWIG_check_num_args("helicsFederatePendingMessages",args.length(),1,1,0)) {
     SWIG_fail;
   }
   res1 = SWIG_ConvertPtr(args(0),SWIG_as_voidptrptr(&arg1), 0, 0);
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateReceiveCount" "', argument " "1"" of type '" "helics_federate""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederatePendingMessages" "', argument " "1"" of type '" "helics_federate""'"); 
   }
-  result = (int)helicsFederateReceiveCount(arg1);
+  result = (int)helicsFederatePendingMessages(arg1);
   _outv = SWIG_From_int(static_cast< int >(result));
   if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
   return _out;
@@ -8673,7 +12159,7 @@ fail:
 }
 
 
-SWIG_DEFUN( helicsEndpointReceiveCount, _wrap_helicsEndpointReceiveCount, _wrap_helicsEndpointReceiveCount_texinfo ) {
+SWIG_DEFUN( helicsEndpointPendingMessages, _wrap_helicsEndpointPendingMessages, std::string() ) {
   helics_endpoint arg1 = (helics_endpoint) 0 ;
   int res1 ;
   octave_value_list _out;
@@ -8681,14 +12167,14 @@ SWIG_DEFUN( helicsEndpointReceiveCount, _wrap_helicsEndpointReceiveCount, _wrap_
   octave_value _outv;
   int result;
   
-  if (!SWIG_check_num_args("helicsEndpointReceiveCount",args.length(),1,1,0)) {
+  if (!SWIG_check_num_args("helicsEndpointPendingMessages",args.length(),1,1,0)) {
     SWIG_fail;
   }
   res1 = SWIG_ConvertPtr(args(0),SWIG_as_voidptrptr(&arg1), 0, 0);
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsEndpointReceiveCount" "', argument " "1"" of type '" "helics_endpoint""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsEndpointPendingMessages" "', argument " "1"" of type '" "helics_endpoint""'"); 
   }
-  result = (int)helicsEndpointReceiveCount(arg1);
+  result = (int)helicsEndpointPendingMessages(arg1);
   _outv = SWIG_From_int(static_cast< int >(result));
   if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
   return _out;
@@ -8697,13 +12183,13 @@ fail:
 }
 
 
-SWIG_DEFUN( helicsEndpointGetMessage, _wrap_helicsEndpointGetMessage, _wrap_helicsEndpointGetMessage_texinfo ) {
+SWIG_DEFUN( helicsEndpointGetMessage, _wrap_helicsEndpointGetMessage, std::string() ) {
   helics_endpoint arg1 = (helics_endpoint) 0 ;
   int res1 ;
   octave_value_list _out;
   octave_value_list *_outp=&_out;
   octave_value _outv;
-  message_t result;
+  helics_message result;
   
   if (!SWIG_check_num_args("helicsEndpointGetMessage",args.length(),1,1,0)) {
     SWIG_fail;
@@ -8713,7 +12199,7 @@ SWIG_DEFUN( helicsEndpointGetMessage, _wrap_helicsEndpointGetMessage, _wrap_heli
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsEndpointGetMessage" "', argument " "1"" of type '" "helics_endpoint""'"); 
   }
   result = helicsEndpointGetMessage(arg1);
-  _outv = SWIG_NewPointerObj((new message_t(static_cast< const message_t& >(result))), SWIGTYPE_p_message_t, SWIG_POINTER_OWN |  0 );
+  _outv = SWIG_NewPointerObj((new helics_message(static_cast< const helics_message& >(result))), SWIGTYPE_p_helics_message, SWIG_POINTER_OWN |  0 );
   if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
   return _out;
 fail:
@@ -8721,13 +12207,37 @@ fail:
 }
 
 
-SWIG_DEFUN( helicsFederateGetMessage, _wrap_helicsFederateGetMessage, _wrap_helicsFederateGetMessage_texinfo ) {
+SWIG_DEFUN( helicsEndpointGetMessageObject, _wrap_helicsEndpointGetMessageObject, std::string() ) {
+  helics_endpoint arg1 = (helics_endpoint) 0 ;
+  int res1 ;
+  octave_value_list _out;
+  octave_value_list *_outp=&_out;
+  octave_value _outv;
+  helics_message_object result;
+  
+  if (!SWIG_check_num_args("helicsEndpointGetMessageObject",args.length(),1,1,0)) {
+    SWIG_fail;
+  }
+  res1 = SWIG_ConvertPtr(args(0),SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsEndpointGetMessageObject" "', argument " "1"" of type '" "helics_endpoint""'"); 
+  }
+  result = (helics_message_object)helicsEndpointGetMessageObject(arg1);
+  _outv = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_void, 0 |  0 );
+  if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
+  return _out;
+fail:
+  return octave_value_list();
+}
+
+
+SWIG_DEFUN( helicsFederateGetMessage, _wrap_helicsFederateGetMessage, std::string() ) {
   helics_federate arg1 = (helics_federate) 0 ;
   int res1 ;
   octave_value_list _out;
   octave_value_list *_outp=&_out;
   octave_value _outv;
-  message_t result;
+  helics_message result;
   
   if (!SWIG_check_num_args("helicsFederateGetMessage",args.length(),1,1,0)) {
     SWIG_fail;
@@ -8737,7 +12247,7 @@ SWIG_DEFUN( helicsFederateGetMessage, _wrap_helicsFederateGetMessage, _wrap_heli
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateGetMessage" "', argument " "1"" of type '" "helics_federate""'"); 
   }
   result = helicsFederateGetMessage(arg1);
-  _outv = SWIG_NewPointerObj((new message_t(static_cast< const message_t& >(result))), SWIGTYPE_p_message_t, SWIG_POINTER_OWN |  0 );
+  _outv = SWIG_NewPointerObj((new helics_message(static_cast< const helics_message& >(result))), SWIGTYPE_p_helics_message, SWIG_POINTER_OWN |  0 );
   if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
   return _out;
 fail:
@@ -8745,88 +12255,162 @@ fail:
 }
 
 
-SWIG_DEFUN( helicsEndpointGetType, _wrap_helicsEndpointGetType, _wrap_helicsEndpointGetType_texinfo ) {
-  helics_endpoint arg1 = (helics_endpoint) 0 ;
-  char *arg2 = (char *) 0 ;
-  int arg3 ;
+SWIG_DEFUN( helicsFederateGetMessageObject, _wrap_helicsFederateGetMessageObject, std::string() ) {
+  helics_federate arg1 = (helics_federate) 0 ;
   int res1 ;
-  int res2 ;
-  char *buf2 = 0 ;
-  int alloc2 = 0 ;
-  int val3 ;
-  int ecode3 = 0 ;
   octave_value_list _out;
   octave_value_list *_outp=&_out;
   octave_value _outv;
-  helics_status result;
+  helics_message_object result;
   
-  if (!SWIG_check_num_args("helicsEndpointGetType",args.length(),3,3,0)) {
+  if (!SWIG_check_num_args("helicsFederateGetMessageObject",args.length(),1,1,0)) {
+    SWIG_fail;
+  }
+  res1 = SWIG_ConvertPtr(args(0),SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateGetMessageObject" "', argument " "1"" of type '" "helics_federate""'"); 
+  }
+  result = (helics_message_object)helicsFederateGetMessageObject(arg1);
+  _outv = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_void, 0 |  0 );
+  if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
+  return _out;
+fail:
+  return octave_value_list();
+}
+
+
+SWIG_DEFUN( helicsFederateCreateMessageObject, _wrap_helicsFederateCreateMessageObject, std::string() ) {
+  helics_federate arg1 = (helics_federate) 0 ;
+  helics_error *arg2 = (helics_error *) 0 ;
+  int res1 ;
+  helics_error etemp2 ;
+  octave_value_list _out;
+  octave_value_list *_outp=&_out;
+  octave_value _outv;
+  helics_message_object result;
+  
+  {
+    etemp2=helicsErrorInitialize();
+    arg2=&etemp2;
+  }
+  if (!SWIG_check_num_args("helicsFederateCreateMessageObject",args.length(),1,1,0)) {
+    SWIG_fail;
+  }
+  res1 = SWIG_ConvertPtr(args(0),SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateCreateMessageObject" "', argument " "1"" of type '" "helics_federate""'"); 
+  }
+  result = (helics_message_object)helicsFederateCreateMessageObject(arg1,arg2);
+  _outv = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_void, 0 |  0 );
+  if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
+  {
+    if (arg2->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg2);
+    }
+  }
+  return _out;
+fail:
+  {
+    if (arg2->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg2);
+    }
+  }
+  return octave_value_list();
+}
+
+
+SWIG_DEFUN( helicsFederateClearMessages, _wrap_helicsFederateClearMessages, std::string() ) {
+  helics_federate arg1 = (helics_federate) 0 ;
+  int res1 ;
+  octave_value_list _out;
+  octave_value_list *_outp=&_out;
+  octave_value _outv;
+  
+  if (!SWIG_check_num_args("helicsFederateClearMessages",args.length(),1,1,0)) {
+    SWIG_fail;
+  }
+  res1 = SWIG_ConvertPtr(args(0),SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateClearMessages" "', argument " "1"" of type '" "helics_federate""'"); 
+  }
+  helicsFederateClearMessages(arg1);
+  _outv = octave_value();
+  if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
+  return _out;
+fail:
+  return octave_value_list();
+}
+
+
+SWIG_DEFUN( helicsEndpointClearMessages, _wrap_helicsEndpointClearMessages, std::string() ) {
+  helics_endpoint arg1 = (helics_endpoint) 0 ;
+  int res1 ;
+  octave_value_list _out;
+  octave_value_list *_outp=&_out;
+  octave_value _outv;
+  
+  if (!SWIG_check_num_args("helicsEndpointClearMessages",args.length(),1,1,0)) {
+    SWIG_fail;
+  }
+  res1 = SWIG_ConvertPtr(args(0),SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsEndpointClearMessages" "', argument " "1"" of type '" "helics_endpoint""'"); 
+  }
+  helicsEndpointClearMessages(arg1);
+  _outv = octave_value();
+  if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
+  return _out;
+fail:
+  return octave_value_list();
+}
+
+
+SWIG_DEFUN( helicsEndpointGetType, _wrap_helicsEndpointGetType, std::string() ) {
+  helics_endpoint arg1 = (helics_endpoint) 0 ;
+  int res1 ;
+  octave_value_list _out;
+  octave_value_list *_outp=&_out;
+  octave_value _outv;
+  char *result = 0 ;
+  
+  if (!SWIG_check_num_args("helicsEndpointGetType",args.length(),1,1,0)) {
     SWIG_fail;
   }
   res1 = SWIG_ConvertPtr(args(0),SWIG_as_voidptrptr(&arg1), 0, 0);
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsEndpointGetType" "', argument " "1"" of type '" "helics_endpoint""'"); 
   }
-  res2 = SWIG_AsCharPtrAndSize(args(1), &buf2, NULL, &alloc2);
-  if (!SWIG_IsOK(res2)) {
-    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsEndpointGetType" "', argument " "2"" of type '" "char *""'");
-  }
-  arg2 = reinterpret_cast< char * >(buf2);
-  ecode3 = SWIG_AsVal_int(args(2), &val3);
-  if (!SWIG_IsOK(ecode3)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "helicsEndpointGetType" "', argument " "3"" of type '" "int""'");
-  } 
-  arg3 = static_cast< int >(val3);
-  result = (helics_status)helicsEndpointGetType(arg1,arg2,arg3);
-  _outv = SWIG_From_int(static_cast< int >(result));
+  result = (char *)helicsEndpointGetType(arg1);
+  _outv = SWIG_FromCharPtr((const char *)result);
   if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
-  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
   return _out;
 fail:
-  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
   return octave_value_list();
 }
 
 
-SWIG_DEFUN( helicsEndpointGetName, _wrap_helicsEndpointGetName, _wrap_helicsEndpointGetName_texinfo ) {
+SWIG_DEFUN( helicsEndpointGetName, _wrap_helicsEndpointGetName, std::string() ) {
   helics_endpoint arg1 = (helics_endpoint) 0 ;
-  char *arg2 = (char *) 0 ;
-  int arg3 ;
   int res1 ;
-  int res2 ;
-  char *buf2 = 0 ;
-  int alloc2 = 0 ;
-  int val3 ;
-  int ecode3 = 0 ;
   octave_value_list _out;
   octave_value_list *_outp=&_out;
   octave_value _outv;
-  helics_status result;
+  char *result = 0 ;
   
-  if (!SWIG_check_num_args("helicsEndpointGetName",args.length(),3,3,0)) {
+  if (!SWIG_check_num_args("helicsEndpointGetName",args.length(),1,1,0)) {
     SWIG_fail;
   }
   res1 = SWIG_ConvertPtr(args(0),SWIG_as_voidptrptr(&arg1), 0, 0);
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsEndpointGetName" "', argument " "1"" of type '" "helics_endpoint""'"); 
   }
-  res2 = SWIG_AsCharPtrAndSize(args(1), &buf2, NULL, &alloc2);
-  if (!SWIG_IsOK(res2)) {
-    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsEndpointGetName" "', argument " "2"" of type '" "char *""'");
-  }
-  arg2 = reinterpret_cast< char * >(buf2);
-  ecode3 = SWIG_AsVal_int(args(2), &val3);
-  if (!SWIG_IsOK(ecode3)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "helicsEndpointGetName" "', argument " "3"" of type '" "int""'");
-  } 
-  arg3 = static_cast< int >(val3);
-  result = (helics_status)helicsEndpointGetName(arg1,arg2,arg3);
-  _outv = SWIG_From_int(static_cast< int >(result));
+  result = (char *)helicsEndpointGetName(arg1);
+  _outv = SWIG_FromCharPtr((const char *)result);
   if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
-  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
   return _out;
 fail:
-  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
   return octave_value_list();
 }
 
@@ -8855,126 +12439,1227 @@ fail:
 }
 
 
-SWIG_DEFUN( helicsFederateRegisterSourceFilter, _wrap_helicsFederateRegisterSourceFilter, _wrap_helicsFederateRegisterSourceFilter_texinfo ) {
-  helics_federate arg1 = (helics_federate) 0 ;
-  helics_filter_type_t arg2 ;
-  char *arg3 = (char *) 0 ;
-  char *arg4 = (char *) 0 ;
+SWIG_DEFUN( helicsEndpointGetInfo, _wrap_helicsEndpointGetInfo, std::string() ) {
+  helics_endpoint arg1 = (helics_endpoint) 0 ;
   int res1 ;
-  int val2 ;
-  int ecode2 = 0 ;
-  int res3 ;
-  char *buf3 = 0 ;
-  int alloc3 = 0 ;
-  int res4 ;
-  char *buf4 = 0 ;
-  int alloc4 = 0 ;
   octave_value_list _out;
   octave_value_list *_outp=&_out;
   octave_value _outv;
-  helics_filter result;
+  char *result = 0 ;
   
-  if (!SWIG_check_num_args("helicsFederateRegisterSourceFilter",args.length(),4,4,0)) {
+  if (!SWIG_check_num_args("helicsEndpointGetInfo",args.length(),1,1,0)) {
     SWIG_fail;
   }
   res1 = SWIG_ConvertPtr(args(0),SWIG_as_voidptrptr(&arg1), 0, 0);
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateRegisterSourceFilter" "', argument " "1"" of type '" "helics_federate""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsEndpointGetInfo" "', argument " "1"" of type '" "helics_endpoint""'"); 
   }
-  ecode2 = SWIG_AsVal_int(args(1), &val2);
-  if (!SWIG_IsOK(ecode2)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "helicsFederateRegisterSourceFilter" "', argument " "2"" of type '" "helics_filter_type_t""'");
-  } 
-  arg2 = static_cast< helics_filter_type_t >(val2);
-  res3 = SWIG_AsCharPtrAndSize(args(2), &buf3, NULL, &alloc3);
-  if (!SWIG_IsOK(res3)) {
-    SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "helicsFederateRegisterSourceFilter" "', argument " "3"" of type '" "char const *""'");
-  }
-  arg3 = reinterpret_cast< char * >(buf3);
-  res4 = SWIG_AsCharPtrAndSize(args(3), &buf4, NULL, &alloc4);
-  if (!SWIG_IsOK(res4)) {
-    SWIG_exception_fail(SWIG_ArgError(res4), "in method '" "helicsFederateRegisterSourceFilter" "', argument " "4"" of type '" "char const *""'");
-  }
-  arg4 = reinterpret_cast< char * >(buf4);
-  result = (helics_filter)helicsFederateRegisterSourceFilter(arg1,arg2,(char const *)arg3,(char const *)arg4);
-  _outv = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_void, 0 |  0 );
+  result = (char *)helicsEndpointGetInfo(arg1);
+  _outv = SWIG_FromCharPtr((const char *)result);
   if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
-  if (alloc3 == SWIG_NEWOBJ) delete[] buf3;
-  if (alloc4 == SWIG_NEWOBJ) delete[] buf4;
   return _out;
 fail:
-  if (alloc3 == SWIG_NEWOBJ) delete[] buf3;
-  if (alloc4 == SWIG_NEWOBJ) delete[] buf4;
   return octave_value_list();
 }
 
 
-SWIG_DEFUN( helicsFederateRegisterDestinationFilter, _wrap_helicsFederateRegisterDestinationFilter, _wrap_helicsFederateRegisterDestinationFilter_texinfo ) {
-  helics_federate arg1 = (helics_federate) 0 ;
-  helics_filter_type_t arg2 ;
-  char *arg3 = (char *) 0 ;
-  char *arg4 = (char *) 0 ;
-  int res1 ;
-  int val2 ;
-  int ecode2 = 0 ;
-  int res3 ;
-  char *buf3 = 0 ;
-  int alloc3 = 0 ;
-  int res4 ;
-  char *buf4 = 0 ;
-  int alloc4 = 0 ;
-  octave_value_list _out;
-  octave_value_list *_outp=&_out;
-  octave_value _outv;
-  helics_filter result;
-  
-  if (!SWIG_check_num_args("helicsFederateRegisterDestinationFilter",args.length(),4,4,0)) {
-    SWIG_fail;
-  }
-  res1 = SWIG_ConvertPtr(args(0),SWIG_as_voidptrptr(&arg1), 0, 0);
-  if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateRegisterDestinationFilter" "', argument " "1"" of type '" "helics_federate""'"); 
-  }
-  ecode2 = SWIG_AsVal_int(args(1), &val2);
-  if (!SWIG_IsOK(ecode2)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "helicsFederateRegisterDestinationFilter" "', argument " "2"" of type '" "helics_filter_type_t""'");
-  } 
-  arg2 = static_cast< helics_filter_type_t >(val2);
-  res3 = SWIG_AsCharPtrAndSize(args(2), &buf3, NULL, &alloc3);
-  if (!SWIG_IsOK(res3)) {
-    SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "helicsFederateRegisterDestinationFilter" "', argument " "3"" of type '" "char const *""'");
-  }
-  arg3 = reinterpret_cast< char * >(buf3);
-  res4 = SWIG_AsCharPtrAndSize(args(3), &buf4, NULL, &alloc4);
-  if (!SWIG_IsOK(res4)) {
-    SWIG_exception_fail(SWIG_ArgError(res4), "in method '" "helicsFederateRegisterDestinationFilter" "', argument " "4"" of type '" "char const *""'");
-  }
-  arg4 = reinterpret_cast< char * >(buf4);
-  result = (helics_filter)helicsFederateRegisterDestinationFilter(arg1,arg2,(char const *)arg3,(char const *)arg4);
-  _outv = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_void, 0 |  0 );
-  if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
-  if (alloc3 == SWIG_NEWOBJ) delete[] buf3;
-  if (alloc4 == SWIG_NEWOBJ) delete[] buf4;
-  return _out;
-fail:
-  if (alloc3 == SWIG_NEWOBJ) delete[] buf3;
-  if (alloc4 == SWIG_NEWOBJ) delete[] buf4;
-  return octave_value_list();
-}
-
-
-SWIG_DEFUN( helicsFederateRegisterCloningFilter, _wrap_helicsFederateRegisterCloningFilter, _wrap_helicsFederateRegisterCloningFilter_texinfo ) {
-  helics_federate arg1 = (helics_federate) 0 ;
+SWIG_DEFUN( helicsEndpointSetInfo, _wrap_helicsEndpointSetInfo, std::string() ) {
+  helics_endpoint arg1 = (helics_endpoint) 0 ;
   char *arg2 = (char *) 0 ;
+  helics_error *arg3 = (helics_error *) 0 ;
   int res1 ;
   int res2 ;
   char *buf2 = 0 ;
   int alloc2 = 0 ;
+  helics_error etemp3 ;
+  octave_value_list _out;
+  octave_value_list *_outp=&_out;
+  octave_value _outv;
+  
+  {
+    etemp3=helicsErrorInitialize();
+    arg3=&etemp3;
+  }
+  if (!SWIG_check_num_args("helicsEndpointSetInfo",args.length(),2,2,0)) {
+    SWIG_fail;
+  }
+  res1 = SWIG_ConvertPtr(args(0),SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsEndpointSetInfo" "', argument " "1"" of type '" "helics_endpoint""'"); 
+  }
+  res2 = SWIG_AsCharPtrAndSize(args(1), &buf2, NULL, &alloc2);
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsEndpointSetInfo" "', argument " "2"" of type '" "char const *""'");
+  }
+  arg2 = reinterpret_cast< char * >(buf2);
+  helicsEndpointSetInfo(arg1,(char const *)arg2,arg3);
+  _outv = octave_value();
+  if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
+  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg3);
+    }
+  }
+  return _out;
+fail:
+  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg3);
+    }
+  }
+  return octave_value_list();
+}
+
+
+SWIG_DEFUN( helicsEndpointSetOption, _wrap_helicsEndpointSetOption, std::string() ) {
+  helics_endpoint arg1 = (helics_endpoint) 0 ;
+  int arg2 ;
+  helics_bool arg3 ;
+  helics_error *arg4 = (helics_error *) 0 ;
+  int res1 ;
+  int val2 ;
+  int ecode2 = 0 ;
+  int val3 ;
+  int ecode3 = 0 ;
+  helics_error etemp4 ;
+  octave_value_list _out;
+  octave_value_list *_outp=&_out;
+  octave_value _outv;
+  
+  {
+    etemp4=helicsErrorInitialize();
+    arg4=&etemp4;
+  }
+  if (!SWIG_check_num_args("helicsEndpointSetOption",args.length(),3,3,0)) {
+    SWIG_fail;
+  }
+  res1 = SWIG_ConvertPtr(args(0),SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsEndpointSetOption" "', argument " "1"" of type '" "helics_endpoint""'"); 
+  }
+  ecode2 = SWIG_AsVal_int(args(1), &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "helicsEndpointSetOption" "', argument " "2"" of type '" "int""'");
+  } 
+  arg2 = static_cast< int >(val2);
+  ecode3 = SWIG_AsVal_int(args(2), &val3);
+  if (!SWIG_IsOK(ecode3)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "helicsEndpointSetOption" "', argument " "3"" of type '" "helics_bool""'");
+  } 
+  arg3 = static_cast< helics_bool >(val3);
+  helicsEndpointSetOption(arg1,arg2,arg3,arg4);
+  _outv = octave_value();
+  if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
+  {
+    if (arg4->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg4);
+    }
+  }
+  return _out;
+fail:
+  {
+    if (arg4->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg4);
+    }
+  }
+  return octave_value_list();
+}
+
+
+SWIG_DEFUN( helicsEndpointGetOption, _wrap_helicsEndpointGetOption, std::string() ) {
+  helics_endpoint arg1 = (helics_endpoint) 0 ;
+  int arg2 ;
+  int res1 ;
+  int val2 ;
+  int ecode2 = 0 ;
+  octave_value_list _out;
+  octave_value_list *_outp=&_out;
+  octave_value _outv;
+  helics_bool result;
+  
+  if (!SWIG_check_num_args("helicsEndpointGetOption",args.length(),2,2,0)) {
+    SWIG_fail;
+  }
+  res1 = SWIG_ConvertPtr(args(0),SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsEndpointGetOption" "', argument " "1"" of type '" "helics_endpoint""'"); 
+  }
+  ecode2 = SWIG_AsVal_int(args(1), &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "helicsEndpointGetOption" "', argument " "2"" of type '" "int""'");
+  } 
+  arg2 = static_cast< int >(val2);
+  result = (helics_bool)helicsEndpointGetOption(arg1,arg2);
+  _outv = SWIG_From_int(static_cast< int >(result));
+  if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
+  return _out;
+fail:
+  return octave_value_list();
+}
+
+
+SWIG_DEFUN( helicsMessageGetSource, _wrap_helicsMessageGetSource, std::string() ) {
+  helics_message_object arg1 = (helics_message_object) 0 ;
+  int res1 ;
+  octave_value_list _out;
+  octave_value_list *_outp=&_out;
+  octave_value _outv;
+  char *result = 0 ;
+  
+  if (!SWIG_check_num_args("helicsMessageGetSource",args.length(),1,1,0)) {
+    SWIG_fail;
+  }
+  res1 = SWIG_ConvertPtr(args(0),SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsMessageGetSource" "', argument " "1"" of type '" "helics_message_object""'"); 
+  }
+  result = (char *)helicsMessageGetSource(arg1);
+  _outv = SWIG_FromCharPtr((const char *)result);
+  if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
+  return _out;
+fail:
+  return octave_value_list();
+}
+
+
+SWIG_DEFUN( helicsMessageGetDestination, _wrap_helicsMessageGetDestination, std::string() ) {
+  helics_message_object arg1 = (helics_message_object) 0 ;
+  int res1 ;
+  octave_value_list _out;
+  octave_value_list *_outp=&_out;
+  octave_value _outv;
+  char *result = 0 ;
+  
+  if (!SWIG_check_num_args("helicsMessageGetDestination",args.length(),1,1,0)) {
+    SWIG_fail;
+  }
+  res1 = SWIG_ConvertPtr(args(0),SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsMessageGetDestination" "', argument " "1"" of type '" "helics_message_object""'"); 
+  }
+  result = (char *)helicsMessageGetDestination(arg1);
+  _outv = SWIG_FromCharPtr((const char *)result);
+  if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
+  return _out;
+fail:
+  return octave_value_list();
+}
+
+
+SWIG_DEFUN( helicsMessageGetOriginalSource, _wrap_helicsMessageGetOriginalSource, std::string() ) {
+  helics_message_object arg1 = (helics_message_object) 0 ;
+  int res1 ;
+  octave_value_list _out;
+  octave_value_list *_outp=&_out;
+  octave_value _outv;
+  char *result = 0 ;
+  
+  if (!SWIG_check_num_args("helicsMessageGetOriginalSource",args.length(),1,1,0)) {
+    SWIG_fail;
+  }
+  res1 = SWIG_ConvertPtr(args(0),SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsMessageGetOriginalSource" "', argument " "1"" of type '" "helics_message_object""'"); 
+  }
+  result = (char *)helicsMessageGetOriginalSource(arg1);
+  _outv = SWIG_FromCharPtr((const char *)result);
+  if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
+  return _out;
+fail:
+  return octave_value_list();
+}
+
+
+SWIG_DEFUN( helicsMessageGetOriginalDestination, _wrap_helicsMessageGetOriginalDestination, std::string() ) {
+  helics_message_object arg1 = (helics_message_object) 0 ;
+  int res1 ;
+  octave_value_list _out;
+  octave_value_list *_outp=&_out;
+  octave_value _outv;
+  char *result = 0 ;
+  
+  if (!SWIG_check_num_args("helicsMessageGetOriginalDestination",args.length(),1,1,0)) {
+    SWIG_fail;
+  }
+  res1 = SWIG_ConvertPtr(args(0),SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsMessageGetOriginalDestination" "', argument " "1"" of type '" "helics_message_object""'"); 
+  }
+  result = (char *)helicsMessageGetOriginalDestination(arg1);
+  _outv = SWIG_FromCharPtr((const char *)result);
+  if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
+  return _out;
+fail:
+  return octave_value_list();
+}
+
+
+SWIG_DEFUN( helicsMessageGetTime, _wrap_helicsMessageGetTime, std::string() ) {
+  helics_message_object arg1 = (helics_message_object) 0 ;
+  int res1 ;
+  octave_value_list _out;
+  octave_value_list *_outp=&_out;
+  octave_value _outv;
+  helics_time result;
+  
+  if (!SWIG_check_num_args("helicsMessageGetTime",args.length(),1,1,0)) {
+    SWIG_fail;
+  }
+  res1 = SWIG_ConvertPtr(args(0),SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsMessageGetTime" "', argument " "1"" of type '" "helics_message_object""'"); 
+  }
+  result = (helics_time)helicsMessageGetTime(arg1);
+  _outv = SWIG_From_double(static_cast< double >(result));
+  if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
+  return _out;
+fail:
+  return octave_value_list();
+}
+
+
+SWIG_DEFUN( helicsMessageGetString, _wrap_helicsMessageGetString, std::string() ) {
+  helics_message_object arg1 = (helics_message_object) 0 ;
+  int res1 ;
+  octave_value_list _out;
+  octave_value_list *_outp=&_out;
+  octave_value _outv;
+  char *result = 0 ;
+  
+  if (!SWIG_check_num_args("helicsMessageGetString",args.length(),1,1,0)) {
+    SWIG_fail;
+  }
+  res1 = SWIG_ConvertPtr(args(0),SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsMessageGetString" "', argument " "1"" of type '" "helics_message_object""'"); 
+  }
+  result = (char *)helicsMessageGetString(arg1);
+  _outv = SWIG_FromCharPtr((const char *)result);
+  if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
+  return _out;
+fail:
+  return octave_value_list();
+}
+
+
+SWIG_DEFUN( helicsMessageGetMessageID, _wrap_helicsMessageGetMessageID, std::string() ) {
+  helics_message_object arg1 = (helics_message_object) 0 ;
+  int res1 ;
+  octave_value_list _out;
+  octave_value_list *_outp=&_out;
+  octave_value _outv;
+  int result;
+  
+  if (!SWIG_check_num_args("helicsMessageGetMessageID",args.length(),1,1,0)) {
+    SWIG_fail;
+  }
+  res1 = SWIG_ConvertPtr(args(0),SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsMessageGetMessageID" "', argument " "1"" of type '" "helics_message_object""'"); 
+  }
+  result = (int)helicsMessageGetMessageID(arg1);
+  _outv = SWIG_From_int(static_cast< int >(result));
+  if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
+  return _out;
+fail:
+  return octave_value_list();
+}
+
+
+SWIG_DEFUN( helicsMessageCheckFlag, _wrap_helicsMessageCheckFlag, std::string() ) {
+  helics_message_object arg1 = (helics_message_object) 0 ;
+  int arg2 ;
+  int res1 ;
+  int val2 ;
+  int ecode2 = 0 ;
+  octave_value_list _out;
+  octave_value_list *_outp=&_out;
+  octave_value _outv;
+  helics_bool result;
+  
+  if (!SWIG_check_num_args("helicsMessageCheckFlag",args.length(),2,2,0)) {
+    SWIG_fail;
+  }
+  res1 = SWIG_ConvertPtr(args(0),SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsMessageCheckFlag" "', argument " "1"" of type '" "helics_message_object""'"); 
+  }
+  ecode2 = SWIG_AsVal_int(args(1), &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "helicsMessageCheckFlag" "', argument " "2"" of type '" "int""'");
+  } 
+  arg2 = static_cast< int >(val2);
+  result = (helics_bool)helicsMessageCheckFlag(arg1,arg2);
+  _outv = SWIG_From_int(static_cast< int >(result));
+  if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
+  return _out;
+fail:
+  return octave_value_list();
+}
+
+
+SWIG_DEFUN( helicsMessageGetRawDataSize, _wrap_helicsMessageGetRawDataSize, std::string() ) {
+  helics_message_object arg1 = (helics_message_object) 0 ;
+  int res1 ;
+  octave_value_list _out;
+  octave_value_list *_outp=&_out;
+  octave_value _outv;
+  int result;
+  
+  if (!SWIG_check_num_args("helicsMessageGetRawDataSize",args.length(),1,1,0)) {
+    SWIG_fail;
+  }
+  res1 = SWIG_ConvertPtr(args(0),SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsMessageGetRawDataSize" "', argument " "1"" of type '" "helics_message_object""'"); 
+  }
+  result = (int)helicsMessageGetRawDataSize(arg1);
+  _outv = SWIG_From_int(static_cast< int >(result));
+  if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
+  return _out;
+fail:
+  return octave_value_list();
+}
+
+
+SWIG_DEFUN( helicsMessageGetRawData, _wrap_helicsMessageGetRawData, std::string() ) {
+  helics_message_object arg1 = (helics_message_object) 0 ;
+  void *arg2 = (void *) 0 ;
+  int arg3 ;
+  int *arg4 = (int *) 0 ;
+  helics_error *arg5 = (helics_error *) 0 ;
+  int res1 ;
+  int res2 ;
+  int val3 ;
+  int ecode3 = 0 ;
+  int temp4 ;
+  int res4 = SWIG_TMPOBJ ;
+  helics_error etemp5 ;
+  octave_value_list _out;
+  octave_value_list *_outp=&_out;
+  octave_value _outv;
+  
+  arg4 = &temp4;
+  {
+    etemp5=helicsErrorInitialize();
+    arg5=&etemp5;
+  }
+  if (!SWIG_check_num_args("helicsMessageGetRawData",args.length(),3,3,0)) {
+    SWIG_fail;
+  }
+  res1 = SWIG_ConvertPtr(args(0),SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsMessageGetRawData" "', argument " "1"" of type '" "helics_message_object""'"); 
+  }
+  res2 = SWIG_ConvertPtr(args(1),SWIG_as_voidptrptr(&arg2), 0, 0);
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsMessageGetRawData" "', argument " "2"" of type '" "void *""'"); 
+  }
+  ecode3 = SWIG_AsVal_int(args(2), &val3);
+  if (!SWIG_IsOK(ecode3)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "helicsMessageGetRawData" "', argument " "3"" of type '" "int""'");
+  } 
+  arg3 = static_cast< int >(val3);
+  helicsMessageGetRawData(arg1,arg2,arg3,arg4,arg5);
+  _outv = octave_value();
+  if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
+  if (SWIG_IsTmpObj(res4)) {
+    _outp = SWIG_Octave_AppendOutput(_outp, SWIG_From_int((*arg4)));
+  } else {
+    int new_flags = SWIG_IsNewObj(res4) ? (SWIG_POINTER_OWN |  0 ) :  0 ;
+    _outp = SWIG_Octave_AppendOutput(_outp, SWIG_NewPointerObj((void*)(arg4), SWIGTYPE_p_int, new_flags));
+  }
+  {
+    if (arg5->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg5);
+    }
+  }
+  return _out;
+fail:
+  {
+    if (arg5->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg5);
+    }
+  }
+  return octave_value_list();
+}
+
+
+SWIG_DEFUN( helicsMessageIsValid, _wrap_helicsMessageIsValid, std::string() ) {
+  helics_message_object arg1 = (helics_message_object) 0 ;
+  int res1 ;
+  octave_value_list _out;
+  octave_value_list *_outp=&_out;
+  octave_value _outv;
+  helics_bool result;
+  
+  if (!SWIG_check_num_args("helicsMessageIsValid",args.length(),1,1,0)) {
+    SWIG_fail;
+  }
+  res1 = SWIG_ConvertPtr(args(0),SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsMessageIsValid" "', argument " "1"" of type '" "helics_message_object""'"); 
+  }
+  result = (helics_bool)helicsMessageIsValid(arg1);
+  _outv = SWIG_From_int(static_cast< int >(result));
+  if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
+  return _out;
+fail:
+  return octave_value_list();
+}
+
+
+SWIG_DEFUN( helicsMessageSetSource, _wrap_helicsMessageSetSource, std::string() ) {
+  helics_message_object arg1 = (helics_message_object) 0 ;
+  char *arg2 = (char *) 0 ;
+  helics_error *arg3 = (helics_error *) 0 ;
+  int res1 ;
+  int res2 ;
+  char *buf2 = 0 ;
+  int alloc2 = 0 ;
+  helics_error etemp3 ;
+  octave_value_list _out;
+  octave_value_list *_outp=&_out;
+  octave_value _outv;
+  
+  {
+    etemp3=helicsErrorInitialize();
+    arg3=&etemp3;
+  }
+  if (!SWIG_check_num_args("helicsMessageSetSource",args.length(),2,2,0)) {
+    SWIG_fail;
+  }
+  res1 = SWIG_ConvertPtr(args(0),SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsMessageSetSource" "', argument " "1"" of type '" "helics_message_object""'"); 
+  }
+  res2 = SWIG_AsCharPtrAndSize(args(1), &buf2, NULL, &alloc2);
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsMessageSetSource" "', argument " "2"" of type '" "char const *""'");
+  }
+  arg2 = reinterpret_cast< char * >(buf2);
+  helicsMessageSetSource(arg1,(char const *)arg2,arg3);
+  _outv = octave_value();
+  if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
+  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg3);
+    }
+  }
+  return _out;
+fail:
+  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg3);
+    }
+  }
+  return octave_value_list();
+}
+
+
+SWIG_DEFUN( helicsMessageSetDestination, _wrap_helicsMessageSetDestination, std::string() ) {
+  helics_message_object arg1 = (helics_message_object) 0 ;
+  char *arg2 = (char *) 0 ;
+  helics_error *arg3 = (helics_error *) 0 ;
+  int res1 ;
+  int res2 ;
+  char *buf2 = 0 ;
+  int alloc2 = 0 ;
+  helics_error etemp3 ;
+  octave_value_list _out;
+  octave_value_list *_outp=&_out;
+  octave_value _outv;
+  
+  {
+    etemp3=helicsErrorInitialize();
+    arg3=&etemp3;
+  }
+  if (!SWIG_check_num_args("helicsMessageSetDestination",args.length(),2,2,0)) {
+    SWIG_fail;
+  }
+  res1 = SWIG_ConvertPtr(args(0),SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsMessageSetDestination" "', argument " "1"" of type '" "helics_message_object""'"); 
+  }
+  res2 = SWIG_AsCharPtrAndSize(args(1), &buf2, NULL, &alloc2);
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsMessageSetDestination" "', argument " "2"" of type '" "char const *""'");
+  }
+  arg2 = reinterpret_cast< char * >(buf2);
+  helicsMessageSetDestination(arg1,(char const *)arg2,arg3);
+  _outv = octave_value();
+  if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
+  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg3);
+    }
+  }
+  return _out;
+fail:
+  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg3);
+    }
+  }
+  return octave_value_list();
+}
+
+
+SWIG_DEFUN( helicsMessageSetOriginalSource, _wrap_helicsMessageSetOriginalSource, std::string() ) {
+  helics_message_object arg1 = (helics_message_object) 0 ;
+  char *arg2 = (char *) 0 ;
+  helics_error *arg3 = (helics_error *) 0 ;
+  int res1 ;
+  int res2 ;
+  char *buf2 = 0 ;
+  int alloc2 = 0 ;
+  helics_error etemp3 ;
+  octave_value_list _out;
+  octave_value_list *_outp=&_out;
+  octave_value _outv;
+  
+  {
+    etemp3=helicsErrorInitialize();
+    arg3=&etemp3;
+  }
+  if (!SWIG_check_num_args("helicsMessageSetOriginalSource",args.length(),2,2,0)) {
+    SWIG_fail;
+  }
+  res1 = SWIG_ConvertPtr(args(0),SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsMessageSetOriginalSource" "', argument " "1"" of type '" "helics_message_object""'"); 
+  }
+  res2 = SWIG_AsCharPtrAndSize(args(1), &buf2, NULL, &alloc2);
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsMessageSetOriginalSource" "', argument " "2"" of type '" "char const *""'");
+  }
+  arg2 = reinterpret_cast< char * >(buf2);
+  helicsMessageSetOriginalSource(arg1,(char const *)arg2,arg3);
+  _outv = octave_value();
+  if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
+  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg3);
+    }
+  }
+  return _out;
+fail:
+  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg3);
+    }
+  }
+  return octave_value_list();
+}
+
+
+SWIG_DEFUN( helicsMessageSetOriginalDestination, _wrap_helicsMessageSetOriginalDestination, std::string() ) {
+  helics_message_object arg1 = (helics_message_object) 0 ;
+  char *arg2 = (char *) 0 ;
+  helics_error *arg3 = (helics_error *) 0 ;
+  int res1 ;
+  int res2 ;
+  char *buf2 = 0 ;
+  int alloc2 = 0 ;
+  helics_error etemp3 ;
+  octave_value_list _out;
+  octave_value_list *_outp=&_out;
+  octave_value _outv;
+  
+  {
+    etemp3=helicsErrorInitialize();
+    arg3=&etemp3;
+  }
+  if (!SWIG_check_num_args("helicsMessageSetOriginalDestination",args.length(),2,2,0)) {
+    SWIG_fail;
+  }
+  res1 = SWIG_ConvertPtr(args(0),SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsMessageSetOriginalDestination" "', argument " "1"" of type '" "helics_message_object""'"); 
+  }
+  res2 = SWIG_AsCharPtrAndSize(args(1), &buf2, NULL, &alloc2);
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsMessageSetOriginalDestination" "', argument " "2"" of type '" "char const *""'");
+  }
+  arg2 = reinterpret_cast< char * >(buf2);
+  helicsMessageSetOriginalDestination(arg1,(char const *)arg2,arg3);
+  _outv = octave_value();
+  if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
+  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg3);
+    }
+  }
+  return _out;
+fail:
+  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg3);
+    }
+  }
+  return octave_value_list();
+}
+
+
+SWIG_DEFUN( helicsMessageSetTime, _wrap_helicsMessageSetTime, std::string() ) {
+  helics_message_object arg1 = (helics_message_object) 0 ;
+  helics_time arg2 ;
+  helics_error *arg3 = (helics_error *) 0 ;
+  int res1 ;
+  double val2 ;
+  int ecode2 = 0 ;
+  helics_error etemp3 ;
+  octave_value_list _out;
+  octave_value_list *_outp=&_out;
+  octave_value _outv;
+  
+  {
+    etemp3=helicsErrorInitialize();
+    arg3=&etemp3;
+  }
+  if (!SWIG_check_num_args("helicsMessageSetTime",args.length(),2,2,0)) {
+    SWIG_fail;
+  }
+  res1 = SWIG_ConvertPtr(args(0),SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsMessageSetTime" "', argument " "1"" of type '" "helics_message_object""'"); 
+  }
+  ecode2 = SWIG_AsVal_double(args(1), &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "helicsMessageSetTime" "', argument " "2"" of type '" "helics_time""'");
+  } 
+  arg2 = static_cast< helics_time >(val2);
+  helicsMessageSetTime(arg1,arg2,arg3);
+  _outv = octave_value();
+  if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg3);
+    }
+  }
+  return _out;
+fail:
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg3);
+    }
+  }
+  return octave_value_list();
+}
+
+
+SWIG_DEFUN( helicsMessageReserve, _wrap_helicsMessageReserve, std::string() ) {
+  helics_message_object arg1 = (helics_message_object) 0 ;
+  int arg2 ;
+  helics_error *arg3 = (helics_error *) 0 ;
+  int res1 ;
+  int val2 ;
+  int ecode2 = 0 ;
+  helics_error etemp3 ;
+  octave_value_list _out;
+  octave_value_list *_outp=&_out;
+  octave_value _outv;
+  
+  {
+    etemp3=helicsErrorInitialize();
+    arg3=&etemp3;
+  }
+  if (!SWIG_check_num_args("helicsMessageReserve",args.length(),2,2,0)) {
+    SWIG_fail;
+  }
+  res1 = SWIG_ConvertPtr(args(0),SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsMessageReserve" "', argument " "1"" of type '" "helics_message_object""'"); 
+  }
+  ecode2 = SWIG_AsVal_int(args(1), &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "helicsMessageReserve" "', argument " "2"" of type '" "int""'");
+  } 
+  arg2 = static_cast< int >(val2);
+  helicsMessageReserve(arg1,arg2,arg3);
+  _outv = octave_value();
+  if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg3);
+    }
+  }
+  return _out;
+fail:
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg3);
+    }
+  }
+  return octave_value_list();
+}
+
+
+SWIG_DEFUN( helicsMessageSetMessageID, _wrap_helicsMessageSetMessageID, std::string() ) {
+  helics_message_object arg1 = (helics_message_object) 0 ;
+  int32_t arg2 ;
+  helics_error *arg3 = (helics_error *) 0 ;
+  int res1 ;
+  void *argp2 ;
+  int res2 = 0 ;
+  helics_error etemp3 ;
+  octave_value_list _out;
+  octave_value_list *_outp=&_out;
+  octave_value _outv;
+  
+  {
+    etemp3=helicsErrorInitialize();
+    arg3=&etemp3;
+  }
+  if (!SWIG_check_num_args("helicsMessageSetMessageID",args.length(),2,2,0)) {
+    SWIG_fail;
+  }
+  res1 = SWIG_ConvertPtr(args(0),SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsMessageSetMessageID" "', argument " "1"" of type '" "helics_message_object""'"); 
+  }
+  {
+    res2 = SWIG_ConvertPtr(args(1), &argp2, SWIGTYPE_p_int32_t,  0 );
+    if (!SWIG_IsOK(res2)) {
+      SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsMessageSetMessageID" "', argument " "2"" of type '" "int32_t""'"); 
+    }  
+    if (!argp2) {
+      SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "helicsMessageSetMessageID" "', argument " "2"" of type '" "int32_t""'");
+    } else {
+      arg2 = *(reinterpret_cast< int32_t * >(argp2));
+    }
+  }
+  helicsMessageSetMessageID(arg1,arg2,arg3);
+  _outv = octave_value();
+  if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg3);
+    }
+  }
+  return _out;
+fail:
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg3);
+    }
+  }
+  return octave_value_list();
+}
+
+
+SWIG_DEFUN( helicsMessageClearFlags, _wrap_helicsMessageClearFlags, std::string() ) {
+  helics_message_object arg1 = (helics_message_object) 0 ;
+  int res1 ;
+  octave_value_list _out;
+  octave_value_list *_outp=&_out;
+  octave_value _outv;
+  
+  if (!SWIG_check_num_args("helicsMessageClearFlags",args.length(),1,1,0)) {
+    SWIG_fail;
+  }
+  res1 = SWIG_ConvertPtr(args(0),SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsMessageClearFlags" "', argument " "1"" of type '" "helics_message_object""'"); 
+  }
+  helicsMessageClearFlags(arg1);
+  _outv = octave_value();
+  if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
+  return _out;
+fail:
+  return octave_value_list();
+}
+
+
+SWIG_DEFUN( helicsMessageSetFlagOption, _wrap_helicsMessageSetFlagOption, std::string() ) {
+  helics_message_object arg1 = (helics_message_object) 0 ;
+  int arg2 ;
+  helics_bool arg3 ;
+  helics_error *arg4 = (helics_error *) 0 ;
+  int res1 ;
+  int val2 ;
+  int ecode2 = 0 ;
+  int val3 ;
+  int ecode3 = 0 ;
+  helics_error etemp4 ;
+  octave_value_list _out;
+  octave_value_list *_outp=&_out;
+  octave_value _outv;
+  
+  {
+    etemp4=helicsErrorInitialize();
+    arg4=&etemp4;
+  }
+  if (!SWIG_check_num_args("helicsMessageSetFlagOption",args.length(),3,3,0)) {
+    SWIG_fail;
+  }
+  res1 = SWIG_ConvertPtr(args(0),SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsMessageSetFlagOption" "', argument " "1"" of type '" "helics_message_object""'"); 
+  }
+  ecode2 = SWIG_AsVal_int(args(1), &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "helicsMessageSetFlagOption" "', argument " "2"" of type '" "int""'");
+  } 
+  arg2 = static_cast< int >(val2);
+  ecode3 = SWIG_AsVal_int(args(2), &val3);
+  if (!SWIG_IsOK(ecode3)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "helicsMessageSetFlagOption" "', argument " "3"" of type '" "helics_bool""'");
+  } 
+  arg3 = static_cast< helics_bool >(val3);
+  helicsMessageSetFlagOption(arg1,arg2,arg3,arg4);
+  _outv = octave_value();
+  if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
+  {
+    if (arg4->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg4);
+    }
+  }
+  return _out;
+fail:
+  {
+    if (arg4->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg4);
+    }
+  }
+  return octave_value_list();
+}
+
+
+SWIG_DEFUN( helicsMessageSetString, _wrap_helicsMessageSetString, std::string() ) {
+  helics_message_object arg1 = (helics_message_object) 0 ;
+  char *arg2 = (char *) 0 ;
+  helics_error *arg3 = (helics_error *) 0 ;
+  int res1 ;
+  int res2 ;
+  char *buf2 = 0 ;
+  int alloc2 = 0 ;
+  helics_error etemp3 ;
+  octave_value_list _out;
+  octave_value_list *_outp=&_out;
+  octave_value _outv;
+  
+  {
+    etemp3=helicsErrorInitialize();
+    arg3=&etemp3;
+  }
+  if (!SWIG_check_num_args("helicsMessageSetString",args.length(),2,2,0)) {
+    SWIG_fail;
+  }
+  res1 = SWIG_ConvertPtr(args(0),SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsMessageSetString" "', argument " "1"" of type '" "helics_message_object""'"); 
+  }
+  res2 = SWIG_AsCharPtrAndSize(args(1), &buf2, NULL, &alloc2);
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsMessageSetString" "', argument " "2"" of type '" "char const *""'");
+  }
+  arg2 = reinterpret_cast< char * >(buf2);
+  helicsMessageSetString(arg1,(char const *)arg2,arg3);
+  _outv = octave_value();
+  if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
+  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg3);
+    }
+  }
+  return _out;
+fail:
+  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg3);
+    }
+  }
+  return octave_value_list();
+}
+
+
+SWIG_DEFUN( helicsMessageSetData, _wrap_helicsMessageSetData, std::string() ) {
+  helics_message_object arg1 = (helics_message_object) 0 ;
+  void *arg2 = (void *) 0 ;
+  int arg3 ;
+  helics_error *arg4 = (helics_error *) 0 ;
+  int res1 ;
+  int res2 ;
+  char *buf2 = 0 ;
+  size_t size2 = 0 ;
+  int alloc2 = 0 ;
+  helics_error etemp4 ;
+  octave_value_list _out;
+  octave_value_list *_outp=&_out;
+  octave_value _outv;
+  
+  {
+    etemp4=helicsErrorInitialize();
+    arg4=&etemp4;
+  }
+  if (!SWIG_check_num_args("helicsMessageSetData",args.length(),2,2,0)) {
+    SWIG_fail;
+  }
+  res1 = SWIG_ConvertPtr(args(0),SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsMessageSetData" "', argument " "1"" of type '" "helics_message_object""'"); 
+  }
+  res2 = SWIG_AsCharPtrAndSize(args(1), &buf2, &size2, &alloc2);
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsMessageSetData" "', argument " "2"" of type '" "void const *""'");
+  }  
+  arg2 = reinterpret_cast< void * >(buf2);
+  arg3 = static_cast< int >(size2 - 1);
+  helicsMessageSetData(arg1,(void const *)arg2,arg3,arg4);
+  _outv = octave_value();
+  if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
+  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  {
+    if (arg4->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg4);
+    }
+  }
+  return _out;
+fail:
+  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  {
+    if (arg4->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg4);
+    }
+  }
+  return octave_value_list();
+}
+
+
+SWIG_DEFUN( helicsMessageAppendData, _wrap_helicsMessageAppendData, std::string() ) {
+  helics_message_object arg1 = (helics_message_object) 0 ;
+  void *arg2 = (void *) 0 ;
+  int arg3 ;
+  helics_error *arg4 = (helics_error *) 0 ;
+  int res1 ;
+  int res2 ;
+  char *buf2 = 0 ;
+  size_t size2 = 0 ;
+  int alloc2 = 0 ;
+  helics_error etemp4 ;
+  octave_value_list _out;
+  octave_value_list *_outp=&_out;
+  octave_value _outv;
+  
+  {
+    etemp4=helicsErrorInitialize();
+    arg4=&etemp4;
+  }
+  if (!SWIG_check_num_args("helicsMessageAppendData",args.length(),2,2,0)) {
+    SWIG_fail;
+  }
+  res1 = SWIG_ConvertPtr(args(0),SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsMessageAppendData" "', argument " "1"" of type '" "helics_message_object""'"); 
+  }
+  res2 = SWIG_AsCharPtrAndSize(args(1), &buf2, &size2, &alloc2);
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsMessageAppendData" "', argument " "2"" of type '" "void const *""'");
+  }  
+  arg2 = reinterpret_cast< void * >(buf2);
+  arg3 = static_cast< int >(size2 - 1);
+  helicsMessageAppendData(arg1,(void const *)arg2,arg3,arg4);
+  _outv = octave_value();
+  if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
+  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  {
+    if (arg4->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg4);
+    }
+  }
+  return _out;
+fail:
+  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  {
+    if (arg4->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg4);
+    }
+  }
+  return octave_value_list();
+}
+
+
+SWIG_DEFUN( helicsFederateRegisterFilter, _wrap_helicsFederateRegisterFilter, std::string() ) {
+  helics_federate arg1 = (helics_federate) 0 ;
+  helics_filter_type arg2 ;
+  char *arg3 = (char *) 0 ;
+  helics_error *arg4 = (helics_error *) 0 ;
+  int res1 ;
+  int val2 ;
+  int ecode2 = 0 ;
+  int res3 ;
+  char *buf3 = 0 ;
+  int alloc3 = 0 ;
+  helics_error etemp4 ;
   octave_value_list _out;
   octave_value_list *_outp=&_out;
   octave_value _outv;
   helics_filter result;
   
+  {
+    etemp4=helicsErrorInitialize();
+    arg4=&etemp4;
+  }
+  if (!SWIG_check_num_args("helicsFederateRegisterFilter",args.length(),3,3,0)) {
+    SWIG_fail;
+  }
+  res1 = SWIG_ConvertPtr(args(0),SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateRegisterFilter" "', argument " "1"" of type '" "helics_federate""'"); 
+  }
+  ecode2 = SWIG_AsVal_int(args(1), &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "helicsFederateRegisterFilter" "', argument " "2"" of type '" "helics_filter_type""'");
+  } 
+  arg2 = static_cast< helics_filter_type >(val2);
+  res3 = SWIG_AsCharPtrAndSize(args(2), &buf3, NULL, &alloc3);
+  if (!SWIG_IsOK(res3)) {
+    SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "helicsFederateRegisterFilter" "', argument " "3"" of type '" "char const *""'");
+  }
+  arg3 = reinterpret_cast< char * >(buf3);
+  result = (helics_filter)helicsFederateRegisterFilter(arg1,arg2,(char const *)arg3,arg4);
+  _outv = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_void, 0 |  0 );
+  if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
+  if (alloc3 == SWIG_NEWOBJ) delete[] buf3;
+  {
+    if (arg4->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg4);
+    }
+  }
+  return _out;
+fail:
+  if (alloc3 == SWIG_NEWOBJ) delete[] buf3;
+  {
+    if (arg4->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg4);
+    }
+  }
+  return octave_value_list();
+}
+
+
+SWIG_DEFUN( helicsFederateRegisterGlobalFilter, _wrap_helicsFederateRegisterGlobalFilter, std::string() ) {
+  helics_federate arg1 = (helics_federate) 0 ;
+  helics_filter_type arg2 ;
+  char *arg3 = (char *) 0 ;
+  helics_error *arg4 = (helics_error *) 0 ;
+  int res1 ;
+  int val2 ;
+  int ecode2 = 0 ;
+  int res3 ;
+  char *buf3 = 0 ;
+  int alloc3 = 0 ;
+  helics_error etemp4 ;
+  octave_value_list _out;
+  octave_value_list *_outp=&_out;
+  octave_value _outv;
+  helics_filter result;
+  
+  {
+    etemp4=helicsErrorInitialize();
+    arg4=&etemp4;
+  }
+  if (!SWIG_check_num_args("helicsFederateRegisterGlobalFilter",args.length(),3,3,0)) {
+    SWIG_fail;
+  }
+  res1 = SWIG_ConvertPtr(args(0),SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateRegisterGlobalFilter" "', argument " "1"" of type '" "helics_federate""'"); 
+  }
+  ecode2 = SWIG_AsVal_int(args(1), &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "helicsFederateRegisterGlobalFilter" "', argument " "2"" of type '" "helics_filter_type""'");
+  } 
+  arg2 = static_cast< helics_filter_type >(val2);
+  res3 = SWIG_AsCharPtrAndSize(args(2), &buf3, NULL, &alloc3);
+  if (!SWIG_IsOK(res3)) {
+    SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "helicsFederateRegisterGlobalFilter" "', argument " "3"" of type '" "char const *""'");
+  }
+  arg3 = reinterpret_cast< char * >(buf3);
+  result = (helics_filter)helicsFederateRegisterGlobalFilter(arg1,arg2,(char const *)arg3,arg4);
+  _outv = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_void, 0 |  0 );
+  if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
+  if (alloc3 == SWIG_NEWOBJ) delete[] buf3;
+  {
+    if (arg4->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg4);
+    }
+  }
+  return _out;
+fail:
+  if (alloc3 == SWIG_NEWOBJ) delete[] buf3;
+  {
+    if (arg4->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg4);
+    }
+  }
+  return octave_value_list();
+}
+
+
+SWIG_DEFUN( helicsFederateRegisterCloningFilter, _wrap_helicsFederateRegisterCloningFilter, std::string() ) {
+  helics_federate arg1 = (helics_federate) 0 ;
+  char *arg2 = (char *) 0 ;
+  helics_error *arg3 = (helics_error *) 0 ;
+  int res1 ;
+  int res2 ;
+  char *buf2 = 0 ;
+  int alloc2 = 0 ;
+  helics_error etemp3 ;
+  octave_value_list _out;
+  octave_value_list *_outp=&_out;
+  octave_value _outv;
+  helics_filter result;
+  
+  {
+    etemp3=helicsErrorInitialize();
+    arg3=&etemp3;
+  }
   if (!SWIG_check_num_args("helicsFederateRegisterCloningFilter",args.length(),2,2,0)) {
     SWIG_fail;
   }
@@ -8987,137 +13672,161 @@ SWIG_DEFUN( helicsFederateRegisterCloningFilter, _wrap_helicsFederateRegisterClo
     SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsFederateRegisterCloningFilter" "', argument " "2"" of type '" "char const *""'");
   }
   arg2 = reinterpret_cast< char * >(buf2);
-  result = (helics_filter)helicsFederateRegisterCloningFilter(arg1,(char const *)arg2);
+  result = (helics_filter)helicsFederateRegisterCloningFilter(arg1,(char const *)arg2,arg3);
   _outv = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_void, 0 |  0 );
   if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
   if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg3);
+    }
+  }
   return _out;
 fail:
   if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg3);
+    }
+  }
   return octave_value_list();
 }
 
 
-SWIG_DEFUN( helicsCoreRegisterSourceFilter, _wrap_helicsCoreRegisterSourceFilter, _wrap_helicsCoreRegisterSourceFilter_texinfo ) {
-  helics_core arg1 = (helics_core) 0 ;
-  helics_filter_type_t arg2 ;
-  char *arg3 = (char *) 0 ;
-  char *arg4 = (char *) 0 ;
-  int res1 ;
-  int val2 ;
-  int ecode2 = 0 ;
-  int res3 ;
-  char *buf3 = 0 ;
-  int alloc3 = 0 ;
-  int res4 ;
-  char *buf4 = 0 ;
-  int alloc4 = 0 ;
-  octave_value_list _out;
-  octave_value_list *_outp=&_out;
-  octave_value _outv;
-  helics_filter result;
-  
-  if (!SWIG_check_num_args("helicsCoreRegisterSourceFilter",args.length(),4,4,0)) {
-    SWIG_fail;
-  }
-  res1 = SWIG_ConvertPtr(args(0),SWIG_as_voidptrptr(&arg1), 0, 0);
-  if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsCoreRegisterSourceFilter" "', argument " "1"" of type '" "helics_core""'"); 
-  }
-  ecode2 = SWIG_AsVal_int(args(1), &val2);
-  if (!SWIG_IsOK(ecode2)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "helicsCoreRegisterSourceFilter" "', argument " "2"" of type '" "helics_filter_type_t""'");
-  } 
-  arg2 = static_cast< helics_filter_type_t >(val2);
-  res3 = SWIG_AsCharPtrAndSize(args(2), &buf3, NULL, &alloc3);
-  if (!SWIG_IsOK(res3)) {
-    SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "helicsCoreRegisterSourceFilter" "', argument " "3"" of type '" "char const *""'");
-  }
-  arg3 = reinterpret_cast< char * >(buf3);
-  res4 = SWIG_AsCharPtrAndSize(args(3), &buf4, NULL, &alloc4);
-  if (!SWIG_IsOK(res4)) {
-    SWIG_exception_fail(SWIG_ArgError(res4), "in method '" "helicsCoreRegisterSourceFilter" "', argument " "4"" of type '" "char const *""'");
-  }
-  arg4 = reinterpret_cast< char * >(buf4);
-  result = (helics_filter)helicsCoreRegisterSourceFilter(arg1,arg2,(char const *)arg3,(char const *)arg4);
-  _outv = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_void, 0 |  0 );
-  if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
-  if (alloc3 == SWIG_NEWOBJ) delete[] buf3;
-  if (alloc4 == SWIG_NEWOBJ) delete[] buf4;
-  return _out;
-fail:
-  if (alloc3 == SWIG_NEWOBJ) delete[] buf3;
-  if (alloc4 == SWIG_NEWOBJ) delete[] buf4;
-  return octave_value_list();
-}
-
-
-SWIG_DEFUN( helicsCoreRegisterDestinationFilter, _wrap_helicsCoreRegisterDestinationFilter, _wrap_helicsCoreRegisterDestinationFilter_texinfo ) {
-  helics_core arg1 = (helics_core) 0 ;
-  helics_filter_type_t arg2 ;
-  char *arg3 = (char *) 0 ;
-  char *arg4 = (char *) 0 ;
-  int res1 ;
-  int val2 ;
-  int ecode2 = 0 ;
-  int res3 ;
-  char *buf3 = 0 ;
-  int alloc3 = 0 ;
-  int res4 ;
-  char *buf4 = 0 ;
-  int alloc4 = 0 ;
-  octave_value_list _out;
-  octave_value_list *_outp=&_out;
-  octave_value _outv;
-  helics_filter result;
-  
-  if (!SWIG_check_num_args("helicsCoreRegisterDestinationFilter",args.length(),4,4,0)) {
-    SWIG_fail;
-  }
-  res1 = SWIG_ConvertPtr(args(0),SWIG_as_voidptrptr(&arg1), 0, 0);
-  if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsCoreRegisterDestinationFilter" "', argument " "1"" of type '" "helics_core""'"); 
-  }
-  ecode2 = SWIG_AsVal_int(args(1), &val2);
-  if (!SWIG_IsOK(ecode2)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "helicsCoreRegisterDestinationFilter" "', argument " "2"" of type '" "helics_filter_type_t""'");
-  } 
-  arg2 = static_cast< helics_filter_type_t >(val2);
-  res3 = SWIG_AsCharPtrAndSize(args(2), &buf3, NULL, &alloc3);
-  if (!SWIG_IsOK(res3)) {
-    SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "helicsCoreRegisterDestinationFilter" "', argument " "3"" of type '" "char const *""'");
-  }
-  arg3 = reinterpret_cast< char * >(buf3);
-  res4 = SWIG_AsCharPtrAndSize(args(3), &buf4, NULL, &alloc4);
-  if (!SWIG_IsOK(res4)) {
-    SWIG_exception_fail(SWIG_ArgError(res4), "in method '" "helicsCoreRegisterDestinationFilter" "', argument " "4"" of type '" "char const *""'");
-  }
-  arg4 = reinterpret_cast< char * >(buf4);
-  result = (helics_filter)helicsCoreRegisterDestinationFilter(arg1,arg2,(char const *)arg3,(char const *)arg4);
-  _outv = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_void, 0 |  0 );
-  if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
-  if (alloc3 == SWIG_NEWOBJ) delete[] buf3;
-  if (alloc4 == SWIG_NEWOBJ) delete[] buf4;
-  return _out;
-fail:
-  if (alloc3 == SWIG_NEWOBJ) delete[] buf3;
-  if (alloc4 == SWIG_NEWOBJ) delete[] buf4;
-  return octave_value_list();
-}
-
-
-SWIG_DEFUN( helicsCoreRegisterCloningFilter, _wrap_helicsCoreRegisterCloningFilter, _wrap_helicsCoreRegisterCloningFilter_texinfo ) {
-  helics_core arg1 = (helics_core) 0 ;
+SWIG_DEFUN( helicsFederateRegisterGlobalCloningFilter, _wrap_helicsFederateRegisterGlobalCloningFilter, std::string() ) {
+  helics_federate arg1 = (helics_federate) 0 ;
   char *arg2 = (char *) 0 ;
+  helics_error *arg3 = (helics_error *) 0 ;
   int res1 ;
   int res2 ;
   char *buf2 = 0 ;
   int alloc2 = 0 ;
+  helics_error etemp3 ;
   octave_value_list _out;
   octave_value_list *_outp=&_out;
   octave_value _outv;
   helics_filter result;
   
+  {
+    etemp3=helicsErrorInitialize();
+    arg3=&etemp3;
+  }
+  if (!SWIG_check_num_args("helicsFederateRegisterGlobalCloningFilter",args.length(),2,2,0)) {
+    SWIG_fail;
+  }
+  res1 = SWIG_ConvertPtr(args(0),SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateRegisterGlobalCloningFilter" "', argument " "1"" of type '" "helics_federate""'"); 
+  }
+  res2 = SWIG_AsCharPtrAndSize(args(1), &buf2, NULL, &alloc2);
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsFederateRegisterGlobalCloningFilter" "', argument " "2"" of type '" "char const *""'");
+  }
+  arg2 = reinterpret_cast< char * >(buf2);
+  result = (helics_filter)helicsFederateRegisterGlobalCloningFilter(arg1,(char const *)arg2,arg3);
+  _outv = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_void, 0 |  0 );
+  if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
+  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg3);
+    }
+  }
+  return _out;
+fail:
+  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg3);
+    }
+  }
+  return octave_value_list();
+}
+
+
+SWIG_DEFUN( helicsCoreRegisterFilter, _wrap_helicsCoreRegisterFilter, std::string() ) {
+  helics_core arg1 = (helics_core) 0 ;
+  helics_filter_type arg2 ;
+  char *arg3 = (char *) 0 ;
+  helics_error *arg4 = (helics_error *) 0 ;
+  int res1 ;
+  int val2 ;
+  int ecode2 = 0 ;
+  int res3 ;
+  char *buf3 = 0 ;
+  int alloc3 = 0 ;
+  helics_error etemp4 ;
+  octave_value_list _out;
+  octave_value_list *_outp=&_out;
+  octave_value _outv;
+  helics_filter result;
+  
+  {
+    etemp4=helicsErrorInitialize();
+    arg4=&etemp4;
+  }
+  if (!SWIG_check_num_args("helicsCoreRegisterFilter",args.length(),3,3,0)) {
+    SWIG_fail;
+  }
+  res1 = SWIG_ConvertPtr(args(0),SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsCoreRegisterFilter" "', argument " "1"" of type '" "helics_core""'"); 
+  }
+  ecode2 = SWIG_AsVal_int(args(1), &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "helicsCoreRegisterFilter" "', argument " "2"" of type '" "helics_filter_type""'");
+  } 
+  arg2 = static_cast< helics_filter_type >(val2);
+  res3 = SWIG_AsCharPtrAndSize(args(2), &buf3, NULL, &alloc3);
+  if (!SWIG_IsOK(res3)) {
+    SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "helicsCoreRegisterFilter" "', argument " "3"" of type '" "char const *""'");
+  }
+  arg3 = reinterpret_cast< char * >(buf3);
+  result = (helics_filter)helicsCoreRegisterFilter(arg1,arg2,(char const *)arg3,arg4);
+  _outv = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_void, 0 |  0 );
+  if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
+  if (alloc3 == SWIG_NEWOBJ) delete[] buf3;
+  {
+    if (arg4->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg4);
+    }
+  }
+  return _out;
+fail:
+  if (alloc3 == SWIG_NEWOBJ) delete[] buf3;
+  {
+    if (arg4->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg4);
+    }
+  }
+  return octave_value_list();
+}
+
+
+SWIG_DEFUN( helicsCoreRegisterCloningFilter, _wrap_helicsCoreRegisterCloningFilter, std::string() ) {
+  helics_core arg1 = (helics_core) 0 ;
+  char *arg2 = (char *) 0 ;
+  helics_error *arg3 = (helics_error *) 0 ;
+  int res1 ;
+  int res2 ;
+  char *buf2 = 0 ;
+  int alloc2 = 0 ;
+  helics_error etemp3 ;
+  octave_value_list _out;
+  octave_value_list *_outp=&_out;
+  octave_value _outv;
+  helics_filter result;
+  
+  {
+    etemp3=helicsErrorInitialize();
+    arg3=&etemp3;
+  }
   if (!SWIG_check_num_args("helicsCoreRegisterCloningFilter",args.length(),2,2,0)) {
     SWIG_fail;
   }
@@ -9130,118 +13839,200 @@ SWIG_DEFUN( helicsCoreRegisterCloningFilter, _wrap_helicsCoreRegisterCloningFilt
     SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsCoreRegisterCloningFilter" "', argument " "2"" of type '" "char const *""'");
   }
   arg2 = reinterpret_cast< char * >(buf2);
-  result = (helics_filter)helicsCoreRegisterCloningFilter(arg1,(char const *)arg2);
+  result = (helics_filter)helicsCoreRegisterCloningFilter(arg1,(char const *)arg2,arg3);
   _outv = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_void, 0 |  0 );
   if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
   if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg3);
+    }
+  }
   return _out;
 fail:
   if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg3);
+    }
+  }
   return octave_value_list();
 }
 
 
-SWIG_DEFUN( helicsFilterGetTarget, _wrap_helicsFilterGetTarget, _wrap_helicsFilterGetTarget_texinfo ) {
-  helics_filter arg1 = (helics_filter) 0 ;
-  char *arg2 = (char *) 0 ;
-  int arg3 ;
+SWIG_DEFUN( helicsFederateGetFilterCount, _wrap_helicsFederateGetFilterCount, std::string() ) {
+  helics_federate arg1 = (helics_federate) 0 ;
   int res1 ;
-  int res2 ;
-  char *buf2 = 0 ;
-  int alloc2 = 0 ;
-  int val3 ;
-  int ecode3 = 0 ;
   octave_value_list _out;
   octave_value_list *_outp=&_out;
   octave_value _outv;
-  helics_status result;
+  int result;
   
-  if (!SWIG_check_num_args("helicsFilterGetTarget",args.length(),3,3,0)) {
+  if (!SWIG_check_num_args("helicsFederateGetFilterCount",args.length(),1,1,0)) {
     SWIG_fail;
   }
   res1 = SWIG_ConvertPtr(args(0),SWIG_as_voidptrptr(&arg1), 0, 0);
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFilterGetTarget" "', argument " "1"" of type '" "helics_filter""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateGetFilterCount" "', argument " "1"" of type '" "helics_federate""'"); 
   }
-  res2 = SWIG_AsCharPtrAndSize(args(1), &buf2, NULL, &alloc2);
-  if (!SWIG_IsOK(res2)) {
-    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsFilterGetTarget" "', argument " "2"" of type '" "char *""'");
-  }
-  arg2 = reinterpret_cast< char * >(buf2);
-  ecode3 = SWIG_AsVal_int(args(2), &val3);
-  if (!SWIG_IsOK(ecode3)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "helicsFilterGetTarget" "', argument " "3"" of type '" "int""'");
-  } 
-  arg3 = static_cast< int >(val3);
-  result = (helics_status)helicsFilterGetTarget(arg1,arg2,arg3);
+  result = (int)helicsFederateGetFilterCount(arg1);
   _outv = SWIG_From_int(static_cast< int >(result));
   if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
-  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
   return _out;
 fail:
-  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
   return octave_value_list();
 }
 
 
-SWIG_DEFUN( helicsFilterGetName, _wrap_helicsFilterGetName, _wrap_helicsFilterGetName_texinfo ) {
-  helics_filter arg1 = (helics_filter) 0 ;
+SWIG_DEFUN( helicsFederateGetFilter, _wrap_helicsFederateGetFilter, std::string() ) {
+  helics_federate arg1 = (helics_federate) 0 ;
   char *arg2 = (char *) 0 ;
-  int arg3 ;
+  helics_error *arg3 = (helics_error *) 0 ;
   int res1 ;
   int res2 ;
   char *buf2 = 0 ;
   int alloc2 = 0 ;
-  int val3 ;
-  int ecode3 = 0 ;
+  helics_error etemp3 ;
   octave_value_list _out;
   octave_value_list *_outp=&_out;
   octave_value _outv;
-  helics_status result;
+  helics_filter result;
   
-  if (!SWIG_check_num_args("helicsFilterGetName",args.length(),3,3,0)) {
+  {
+    etemp3=helicsErrorInitialize();
+    arg3=&etemp3;
+  }
+  if (!SWIG_check_num_args("helicsFederateGetFilter",args.length(),2,2,0)) {
+    SWIG_fail;
+  }
+  res1 = SWIG_ConvertPtr(args(0),SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateGetFilter" "', argument " "1"" of type '" "helics_federate""'"); 
+  }
+  res2 = SWIG_AsCharPtrAndSize(args(1), &buf2, NULL, &alloc2);
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsFederateGetFilter" "', argument " "2"" of type '" "char const *""'");
+  }
+  arg2 = reinterpret_cast< char * >(buf2);
+  result = (helics_filter)helicsFederateGetFilter(arg1,(char const *)arg2,arg3);
+  _outv = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_void, 0 |  0 );
+  if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
+  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg3);
+    }
+  }
+  return _out;
+fail:
+  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg3);
+    }
+  }
+  return octave_value_list();
+}
+
+
+SWIG_DEFUN( helicsFederateGetFilterByIndex, _wrap_helicsFederateGetFilterByIndex, std::string() ) {
+  helics_federate arg1 = (helics_federate) 0 ;
+  int arg2 ;
+  helics_error *arg3 = (helics_error *) 0 ;
+  int res1 ;
+  int val2 ;
+  int ecode2 = 0 ;
+  helics_error etemp3 ;
+  octave_value_list _out;
+  octave_value_list *_outp=&_out;
+  octave_value _outv;
+  helics_filter result;
+  
+  {
+    etemp3=helicsErrorInitialize();
+    arg3=&etemp3;
+  }
+  if (!SWIG_check_num_args("helicsFederateGetFilterByIndex",args.length(),2,2,0)) {
+    SWIG_fail;
+  }
+  res1 = SWIG_ConvertPtr(args(0),SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateGetFilterByIndex" "', argument " "1"" of type '" "helics_federate""'"); 
+  }
+  ecode2 = SWIG_AsVal_int(args(1), &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "helicsFederateGetFilterByIndex" "', argument " "2"" of type '" "int""'");
+  } 
+  arg2 = static_cast< int >(val2);
+  result = (helics_filter)helicsFederateGetFilterByIndex(arg1,arg2,arg3);
+  _outv = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_void, 0 |  0 );
+  if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg3);
+    }
+  }
+  return _out;
+fail:
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg3);
+    }
+  }
+  return octave_value_list();
+}
+
+
+SWIG_DEFUN( helicsFilterGetName, _wrap_helicsFilterGetName, std::string() ) {
+  helics_filter arg1 = (helics_filter) 0 ;
+  int res1 ;
+  octave_value_list _out;
+  octave_value_list *_outp=&_out;
+  octave_value _outv;
+  char *result = 0 ;
+  
+  if (!SWIG_check_num_args("helicsFilterGetName",args.length(),1,1,0)) {
     SWIG_fail;
   }
   res1 = SWIG_ConvertPtr(args(0),SWIG_as_voidptrptr(&arg1), 0, 0);
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFilterGetName" "', argument " "1"" of type '" "helics_filter""'"); 
   }
-  res2 = SWIG_AsCharPtrAndSize(args(1), &buf2, NULL, &alloc2);
-  if (!SWIG_IsOK(res2)) {
-    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsFilterGetName" "', argument " "2"" of type '" "char *""'");
-  }
-  arg2 = reinterpret_cast< char * >(buf2);
-  ecode3 = SWIG_AsVal_int(args(2), &val3);
-  if (!SWIG_IsOK(ecode3)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "helicsFilterGetName" "', argument " "3"" of type '" "int""'");
-  } 
-  arg3 = static_cast< int >(val3);
-  result = (helics_status)helicsFilterGetName(arg1,arg2,arg3);
-  _outv = SWIG_From_int(static_cast< int >(result));
+  result = (char *)helicsFilterGetName(arg1);
+  _outv = SWIG_FromCharPtr((const char *)result);
   if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
-  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
   return _out;
 fail:
-  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
   return octave_value_list();
 }
 
 
-SWIG_DEFUN( helicsFilterSet, _wrap_helicsFilterSet, _wrap_helicsFilterSet_texinfo ) {
+SWIG_DEFUN( helicsFilterSet, _wrap_helicsFilterSet, std::string() ) {
   helics_filter arg1 = (helics_filter) 0 ;
   char *arg2 = (char *) 0 ;
   double arg3 ;
+  helics_error *arg4 = (helics_error *) 0 ;
   int res1 ;
   int res2 ;
   char *buf2 = 0 ;
   int alloc2 = 0 ;
   double val3 ;
   int ecode3 = 0 ;
+  helics_error etemp4 ;
   octave_value_list _out;
   octave_value_list *_outp=&_out;
   octave_value _outv;
-  helics_status result;
   
+  {
+    etemp4=helicsErrorInitialize();
+    arg4=&etemp4;
+  }
   if (!SWIG_check_num_args("helicsFilterSet",args.length(),3,3,0)) {
     SWIG_fail;
   }
@@ -9259,13 +14050,25 @@ SWIG_DEFUN( helicsFilterSet, _wrap_helicsFilterSet, _wrap_helicsFilterSet_texinf
     SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "helicsFilterSet" "', argument " "3"" of type '" "double""'");
   } 
   arg3 = static_cast< double >(val3);
-  result = (helics_status)helicsFilterSet(arg1,(char const *)arg2,arg3);
-  _outv = SWIG_From_int(static_cast< int >(result));
+  helicsFilterSet(arg1,(char const *)arg2,arg3,arg4);
+  _outv = octave_value();
   if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
   if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  {
+    if (arg4->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg4);
+    }
+  }
   return _out;
 fail:
   if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  {
+    if (arg4->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg4);
+    }
+  }
   return octave_value_list();
 }
 
@@ -9274,6 +14077,7 @@ SWIG_DEFUN( helicsFilterSetString, _wrap_helicsFilterSetString, std::string() ) 
   helics_filter arg1 = (helics_filter) 0 ;
   char *arg2 = (char *) 0 ;
   char *arg3 = (char *) 0 ;
+  helics_error *arg4 = (helics_error *) 0 ;
   int res1 ;
   int res2 ;
   char *buf2 = 0 ;
@@ -9281,11 +14085,15 @@ SWIG_DEFUN( helicsFilterSetString, _wrap_helicsFilterSetString, std::string() ) 
   int res3 ;
   char *buf3 = 0 ;
   int alloc3 = 0 ;
+  helics_error etemp4 ;
   octave_value_list _out;
   octave_value_list *_outp=&_out;
   octave_value _outv;
-  helics_status result;
   
+  {
+    etemp4=helicsErrorInitialize();
+    arg4=&etemp4;
+  }
   if (!SWIG_check_num_args("helicsFilterSetString",args.length(),3,3,0)) {
     SWIG_fail;
   }
@@ -9303,31 +14111,48 @@ SWIG_DEFUN( helicsFilterSetString, _wrap_helicsFilterSetString, std::string() ) 
     SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "helicsFilterSetString" "', argument " "3"" of type '" "char const *""'");
   }
   arg3 = reinterpret_cast< char * >(buf3);
-  result = (helics_status)helicsFilterSetString(arg1,(char const *)arg2,(char const *)arg3);
-  _outv = SWIG_From_int(static_cast< int >(result));
+  helicsFilterSetString(arg1,(char const *)arg2,(char const *)arg3,arg4);
+  _outv = octave_value();
   if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
   if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
   if (alloc3 == SWIG_NEWOBJ) delete[] buf3;
+  {
+    if (arg4->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg4);
+    }
+  }
   return _out;
 fail:
   if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
   if (alloc3 == SWIG_NEWOBJ) delete[] buf3;
+  {
+    if (arg4->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg4);
+    }
+  }
   return octave_value_list();
 }
 
 
-SWIG_DEFUN( helicsFilterAddDestinationTarget, _wrap_helicsFilterAddDestinationTarget, _wrap_helicsFilterAddDestinationTarget_texinfo ) {
+SWIG_DEFUN( helicsFilterAddDestinationTarget, _wrap_helicsFilterAddDestinationTarget, std::string() ) {
   helics_filter arg1 = (helics_filter) 0 ;
   char *arg2 = (char *) 0 ;
+  helics_error *arg3 = (helics_error *) 0 ;
   int res1 ;
   int res2 ;
   char *buf2 = 0 ;
   int alloc2 = 0 ;
+  helics_error etemp3 ;
   octave_value_list _out;
   octave_value_list *_outp=&_out;
   octave_value _outv;
-  helics_status result;
   
+  {
+    etemp3=helicsErrorInitialize();
+    arg3=&etemp3;
+  }
   if (!SWIG_check_num_args("helicsFilterAddDestinationTarget",args.length(),2,2,0)) {
     SWIG_fail;
   }
@@ -9340,29 +14165,46 @@ SWIG_DEFUN( helicsFilterAddDestinationTarget, _wrap_helicsFilterAddDestinationTa
     SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsFilterAddDestinationTarget" "', argument " "2"" of type '" "char const *""'");
   }
   arg2 = reinterpret_cast< char * >(buf2);
-  result = (helics_status)helicsFilterAddDestinationTarget(arg1,(char const *)arg2);
-  _outv = SWIG_From_int(static_cast< int >(result));
+  helicsFilterAddDestinationTarget(arg1,(char const *)arg2,arg3);
+  _outv = octave_value();
   if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
   if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg3);
+    }
+  }
   return _out;
 fail:
   if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg3);
+    }
+  }
   return octave_value_list();
 }
 
 
-SWIG_DEFUN( helicsFilterAddSourceTarget, _wrap_helicsFilterAddSourceTarget, _wrap_helicsFilterAddSourceTarget_texinfo ) {
+SWIG_DEFUN( helicsFilterAddSourceTarget, _wrap_helicsFilterAddSourceTarget, std::string() ) {
   helics_filter arg1 = (helics_filter) 0 ;
   char *arg2 = (char *) 0 ;
+  helics_error *arg3 = (helics_error *) 0 ;
   int res1 ;
   int res2 ;
   char *buf2 = 0 ;
   int alloc2 = 0 ;
+  helics_error etemp3 ;
   octave_value_list _out;
   octave_value_list *_outp=&_out;
   octave_value _outv;
-  helics_status result;
   
+  {
+    etemp3=helicsErrorInitialize();
+    arg3=&etemp3;
+  }
   if (!SWIG_check_num_args("helicsFilterAddSourceTarget",args.length(),2,2,0)) {
     SWIG_fail;
   }
@@ -9375,29 +14217,46 @@ SWIG_DEFUN( helicsFilterAddSourceTarget, _wrap_helicsFilterAddSourceTarget, _wra
     SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsFilterAddSourceTarget" "', argument " "2"" of type '" "char const *""'");
   }
   arg2 = reinterpret_cast< char * >(buf2);
-  result = (helics_status)helicsFilterAddSourceTarget(arg1,(char const *)arg2);
-  _outv = SWIG_From_int(static_cast< int >(result));
+  helicsFilterAddSourceTarget(arg1,(char const *)arg2,arg3);
+  _outv = octave_value();
   if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
   if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg3);
+    }
+  }
   return _out;
 fail:
   if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg3);
+    }
+  }
   return octave_value_list();
 }
 
 
-SWIG_DEFUN( helicsFilterAddDeliveryEndpoint, _wrap_helicsFilterAddDeliveryEndpoint, _wrap_helicsFilterAddDeliveryEndpoint_texinfo ) {
+SWIG_DEFUN( helicsFilterAddDeliveryEndpoint, _wrap_helicsFilterAddDeliveryEndpoint, std::string() ) {
   helics_filter arg1 = (helics_filter) 0 ;
   char *arg2 = (char *) 0 ;
+  helics_error *arg3 = (helics_error *) 0 ;
   int res1 ;
   int res2 ;
   char *buf2 = 0 ;
   int alloc2 = 0 ;
+  helics_error etemp3 ;
   octave_value_list _out;
   octave_value_list *_outp=&_out;
   octave_value _outv;
-  helics_status result;
   
+  {
+    etemp3=helicsErrorInitialize();
+    arg3=&etemp3;
+  }
   if (!SWIG_check_num_args("helicsFilterAddDeliveryEndpoint",args.length(),2,2,0)) {
     SWIG_fail;
   }
@@ -9410,99 +14269,98 @@ SWIG_DEFUN( helicsFilterAddDeliveryEndpoint, _wrap_helicsFilterAddDeliveryEndpoi
     SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsFilterAddDeliveryEndpoint" "', argument " "2"" of type '" "char const *""'");
   }
   arg2 = reinterpret_cast< char * >(buf2);
-  result = (helics_status)helicsFilterAddDeliveryEndpoint(arg1,(char const *)arg2);
-  _outv = SWIG_From_int(static_cast< int >(result));
+  helicsFilterAddDeliveryEndpoint(arg1,(char const *)arg2,arg3);
+  _outv = octave_value();
   if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
   if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg3);
+    }
+  }
   return _out;
 fail:
   if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg3);
+    }
+  }
   return octave_value_list();
 }
 
 
-SWIG_DEFUN( helicsFilterRemoveDestinationTarget, _wrap_helicsFilterRemoveDestinationTarget, _wrap_helicsFilterRemoveDestinationTarget_texinfo ) {
+SWIG_DEFUN( helicsFilterRemoveTarget, _wrap_helicsFilterRemoveTarget, std::string() ) {
   helics_filter arg1 = (helics_filter) 0 ;
   char *arg2 = (char *) 0 ;
+  helics_error *arg3 = (helics_error *) 0 ;
   int res1 ;
   int res2 ;
   char *buf2 = 0 ;
   int alloc2 = 0 ;
+  helics_error etemp3 ;
   octave_value_list _out;
   octave_value_list *_outp=&_out;
   octave_value _outv;
-  helics_status result;
   
-  if (!SWIG_check_num_args("helicsFilterRemoveDestinationTarget",args.length(),2,2,0)) {
+  {
+    etemp3=helicsErrorInitialize();
+    arg3=&etemp3;
+  }
+  if (!SWIG_check_num_args("helicsFilterRemoveTarget",args.length(),2,2,0)) {
     SWIG_fail;
   }
   res1 = SWIG_ConvertPtr(args(0),SWIG_as_voidptrptr(&arg1), 0, 0);
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFilterRemoveDestinationTarget" "', argument " "1"" of type '" "helics_filter""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFilterRemoveTarget" "', argument " "1"" of type '" "helics_filter""'"); 
   }
   res2 = SWIG_AsCharPtrAndSize(args(1), &buf2, NULL, &alloc2);
   if (!SWIG_IsOK(res2)) {
-    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsFilterRemoveDestinationTarget" "', argument " "2"" of type '" "char const *""'");
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsFilterRemoveTarget" "', argument " "2"" of type '" "char const *""'");
   }
   arg2 = reinterpret_cast< char * >(buf2);
-  result = (helics_status)helicsFilterRemoveDestinationTarget(arg1,(char const *)arg2);
-  _outv = SWIG_From_int(static_cast< int >(result));
+  helicsFilterRemoveTarget(arg1,(char const *)arg2,arg3);
+  _outv = octave_value();
   if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
   if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg3);
+    }
+  }
   return _out;
 fail:
   if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg3);
+    }
+  }
   return octave_value_list();
 }
 
 
-SWIG_DEFUN( helicsFilterRemoveSourceTarget, _wrap_helicsFilterRemoveSourceTarget, _wrap_helicsFilterRemoveSourceTarget_texinfo ) {
+SWIG_DEFUN( helicsFilterRemoveDeliveryEndpoint, _wrap_helicsFilterRemoveDeliveryEndpoint, std::string() ) {
   helics_filter arg1 = (helics_filter) 0 ;
   char *arg2 = (char *) 0 ;
+  helics_error *arg3 = (helics_error *) 0 ;
   int res1 ;
   int res2 ;
   char *buf2 = 0 ;
   int alloc2 = 0 ;
+  helics_error etemp3 ;
   octave_value_list _out;
   octave_value_list *_outp=&_out;
   octave_value _outv;
-  helics_status result;
   
-  if (!SWIG_check_num_args("helicsFilterRemoveSourceTarget",args.length(),2,2,0)) {
-    SWIG_fail;
+  {
+    etemp3=helicsErrorInitialize();
+    arg3=&etemp3;
   }
-  res1 = SWIG_ConvertPtr(args(0),SWIG_as_voidptrptr(&arg1), 0, 0);
-  if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFilterRemoveSourceTarget" "', argument " "1"" of type '" "helics_filter""'"); 
-  }
-  res2 = SWIG_AsCharPtrAndSize(args(1), &buf2, NULL, &alloc2);
-  if (!SWIG_IsOK(res2)) {
-    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsFilterRemoveSourceTarget" "', argument " "2"" of type '" "char const *""'");
-  }
-  arg2 = reinterpret_cast< char * >(buf2);
-  result = (helics_status)helicsFilterRemoveSourceTarget(arg1,(char const *)arg2);
-  _outv = SWIG_From_int(static_cast< int >(result));
-  if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
-  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
-  return _out;
-fail:
-  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
-  return octave_value_list();
-}
-
-
-SWIG_DEFUN( helicsFilterRemoveDeliveryEndpoint, _wrap_helicsFilterRemoveDeliveryEndpoint, _wrap_helicsFilterRemoveDeliveryEndpoint_texinfo ) {
-  helics_filter arg1 = (helics_filter) 0 ;
-  char *arg2 = (char *) 0 ;
-  int res1 ;
-  int res2 ;
-  char *buf2 = 0 ;
-  int alloc2 = 0 ;
-  octave_value_list _out;
-  octave_value_list *_outp=&_out;
-  octave_value _outv;
-  helics_status result;
-  
   if (!SWIG_check_num_args("helicsFilterRemoveDeliveryEndpoint",args.length(),2,2,0)) {
     SWIG_fail;
   }
@@ -9515,13 +14373,190 @@ SWIG_DEFUN( helicsFilterRemoveDeliveryEndpoint, _wrap_helicsFilterRemoveDelivery
     SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsFilterRemoveDeliveryEndpoint" "', argument " "2"" of type '" "char const *""'");
   }
   arg2 = reinterpret_cast< char * >(buf2);
-  result = (helics_status)helicsFilterRemoveDeliveryEndpoint(arg1,(char const *)arg2);
-  _outv = SWIG_From_int(static_cast< int >(result));
+  helicsFilterRemoveDeliveryEndpoint(arg1,(char const *)arg2,arg3);
+  _outv = octave_value();
   if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
   if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg3);
+    }
+  }
   return _out;
 fail:
   if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg3);
+    }
+  }
+  return octave_value_list();
+}
+
+
+SWIG_DEFUN( helicsFilterGetInfo, _wrap_helicsFilterGetInfo, std::string() ) {
+  helics_filter arg1 = (helics_filter) 0 ;
+  int res1 ;
+  octave_value_list _out;
+  octave_value_list *_outp=&_out;
+  octave_value _outv;
+  char *result = 0 ;
+  
+  if (!SWIG_check_num_args("helicsFilterGetInfo",args.length(),1,1,0)) {
+    SWIG_fail;
+  }
+  res1 = SWIG_ConvertPtr(args(0),SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFilterGetInfo" "', argument " "1"" of type '" "helics_filter""'"); 
+  }
+  result = (char *)helicsFilterGetInfo(arg1);
+  _outv = SWIG_FromCharPtr((const char *)result);
+  if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
+  return _out;
+fail:
+  return octave_value_list();
+}
+
+
+SWIG_DEFUN( helicsFilterSetInfo, _wrap_helicsFilterSetInfo, std::string() ) {
+  helics_filter arg1 = (helics_filter) 0 ;
+  char *arg2 = (char *) 0 ;
+  helics_error *arg3 = (helics_error *) 0 ;
+  int res1 ;
+  int res2 ;
+  char *buf2 = 0 ;
+  int alloc2 = 0 ;
+  helics_error etemp3 ;
+  octave_value_list _out;
+  octave_value_list *_outp=&_out;
+  octave_value _outv;
+  
+  {
+    etemp3=helicsErrorInitialize();
+    arg3=&etemp3;
+  }
+  if (!SWIG_check_num_args("helicsFilterSetInfo",args.length(),2,2,0)) {
+    SWIG_fail;
+  }
+  res1 = SWIG_ConvertPtr(args(0),SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFilterSetInfo" "', argument " "1"" of type '" "helics_filter""'"); 
+  }
+  res2 = SWIG_AsCharPtrAndSize(args(1), &buf2, NULL, &alloc2);
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsFilterSetInfo" "', argument " "2"" of type '" "char const *""'");
+  }
+  arg2 = reinterpret_cast< char * >(buf2);
+  helicsFilterSetInfo(arg1,(char const *)arg2,arg3);
+  _outv = octave_value();
+  if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
+  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg3);
+    }
+  }
+  return _out;
+fail:
+  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg3);
+    }
+  }
+  return octave_value_list();
+}
+
+
+SWIG_DEFUN( helicsFilterSetOption, _wrap_helicsFilterSetOption, std::string() ) {
+  helics_filter arg1 = (helics_filter) 0 ;
+  int arg2 ;
+  helics_bool arg3 ;
+  helics_error *arg4 = (helics_error *) 0 ;
+  int res1 ;
+  int val2 ;
+  int ecode2 = 0 ;
+  int val3 ;
+  int ecode3 = 0 ;
+  helics_error etemp4 ;
+  octave_value_list _out;
+  octave_value_list *_outp=&_out;
+  octave_value _outv;
+  
+  {
+    etemp4=helicsErrorInitialize();
+    arg4=&etemp4;
+  }
+  if (!SWIG_check_num_args("helicsFilterSetOption",args.length(),3,3,0)) {
+    SWIG_fail;
+  }
+  res1 = SWIG_ConvertPtr(args(0),SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFilterSetOption" "', argument " "1"" of type '" "helics_filter""'"); 
+  }
+  ecode2 = SWIG_AsVal_int(args(1), &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "helicsFilterSetOption" "', argument " "2"" of type '" "int""'");
+  } 
+  arg2 = static_cast< int >(val2);
+  ecode3 = SWIG_AsVal_int(args(2), &val3);
+  if (!SWIG_IsOK(ecode3)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "helicsFilterSetOption" "', argument " "3"" of type '" "helics_bool""'");
+  } 
+  arg3 = static_cast< helics_bool >(val3);
+  helicsFilterSetOption(arg1,arg2,arg3,arg4);
+  _outv = octave_value();
+  if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
+  {
+    if (arg4->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg4);
+    }
+  }
+  return _out;
+fail:
+  {
+    if (arg4->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg4);
+    }
+  }
+  return octave_value_list();
+}
+
+
+SWIG_DEFUN( helicsFilterGetOption, _wrap_helicsFilterGetOption, std::string() ) {
+  helics_filter arg1 = (helics_filter) 0 ;
+  int arg2 ;
+  int res1 ;
+  int val2 ;
+  int ecode2 = 0 ;
+  octave_value_list _out;
+  octave_value_list *_outp=&_out;
+  octave_value _outv;
+  helics_bool result;
+  
+  if (!SWIG_check_num_args("helicsFilterGetOption",args.length(),2,2,0)) {
+    SWIG_fail;
+  }
+  res1 = SWIG_ConvertPtr(args(0),SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFilterGetOption" "', argument " "1"" of type '" "helics_filter""'"); 
+  }
+  ecode2 = SWIG_AsVal_int(args(1), &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "helicsFilterGetOption" "', argument " "2"" of type '" "int""'");
+  } 
+  arg2 = static_cast< int >(val2);
+  result = (helics_bool)helicsFilterGetOption(arg1,arg2);
+  _outv = SWIG_From_int(static_cast< int >(result));
+  if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
+  return _out;
+fail:
   return octave_value_list();
 }
 
@@ -9530,240 +14565,371 @@ fail:
 static const struct swig_octave_member swig_globals[] = {
 {"helics_time_zero",0,_wrap_helics_time_zero_get,_wrap_helics_time_zero_set,2,0},
 {"helics_time_epsilon",0,_wrap_helics_time_epsilon_get,_wrap_helics_time_epsilon_set,2,0},
+{"helics_time_invalid",0,_wrap_helics_time_invalid_get,_wrap_helics_time_invalid_set,2,0},
+{"helics_time_maxtime",0,_wrap_helics_time_maxtime_get,_wrap_helics_time_maxtime_set,2,0},
 {"helics_true",0,_wrap_helics_true_get,_wrap_helics_true_set,2,0},
 {"helics_false",0,_wrap_helics_false_get,_wrap_helics_false_set,2,0},
-{"data_t_data_set",_wrap_data_t_data_set,0,0,2,0},
-{"data_t_data_get",_wrap_data_t_data_get,0,0,2,0},
-{"data_t_length_set",_wrap_data_t_length_set,0,0,2,0},
-{"data_t_length_get",_wrap_data_t_length_get,0,0,2,0},
-{"new_data_t",_wrap_new_data_t,0,0,2,_wrap_new_data_t_texinfo},
-{"delete_data_t",_wrap_delete_data_t,0,0,2,0},
-{"message_t_time_set",_wrap_message_t_time_set,0,0,2,0},
-{"message_t_time_get",_wrap_message_t_time_get,0,0,2,0},
-{"message_t_data_set",_wrap_message_t_data_set,0,0,2,0},
-{"message_t_data_get",_wrap_message_t_data_get,0,0,2,0},
-{"message_t_length_set",_wrap_message_t_length_set,0,0,2,0},
-{"message_t_length_get",_wrap_message_t_length_get,0,0,2,0},
-{"message_t_original_source_set",_wrap_message_t_original_source_set,0,0,2,0},
-{"message_t_original_source_get",_wrap_message_t_original_source_get,0,0,2,0},
-{"message_t_source_set",_wrap_message_t_source_set,0,0,2,0},
-{"message_t_source_get",_wrap_message_t_source_get,0,0,2,0},
-{"message_t_dest_set",_wrap_message_t_dest_set,0,0,2,0},
-{"message_t_dest_get",_wrap_message_t_dest_get,0,0,2,0},
-{"message_t_original_dest_set",_wrap_message_t_original_dest_set,0,0,2,0},
-{"message_t_original_dest_get",_wrap_message_t_original_dest_get,0,0,2,0},
-{"new_message_t",_wrap_new_message_t,0,0,2,_wrap_new_message_t_texinfo},
-{"delete_message_t",_wrap_delete_message_t,0,0,2,0},
-{"helicsGetVersion",_wrap_helicsGetVersion,0,0,2,_wrap_helicsGetVersion_texinfo},
-{"helicsIsCoreTypeAvailable",_wrap_helicsIsCoreTypeAvailable,0,0,2,_wrap_helicsIsCoreTypeAvailable_texinfo},
-{"helicsCreateCore",_wrap_helicsCreateCore,0,0,2,_wrap_helicsCreateCore_texinfo},
-{"helicsCreateCoreFromArgs",_wrap_helicsCreateCoreFromArgs,0,0,2,_wrap_helicsCreateCoreFromArgs_texinfo},
+{"helics_message_time_set",_wrap_helics_message_time_set,0,0,2,0},
+{"helics_message_time_get",_wrap_helics_message_time_get,0,0,2,0},
+{"helics_message_data_set",_wrap_helics_message_data_set,0,0,2,0},
+{"helics_message_data_get",_wrap_helics_message_data_get,0,0,2,0},
+{"helics_message_length_set",_wrap_helics_message_length_set,0,0,2,0},
+{"helics_message_length_get",_wrap_helics_message_length_get,0,0,2,0},
+{"helics_message_messageID_set",_wrap_helics_message_messageID_set,0,0,2,0},
+{"helics_message_messageID_get",_wrap_helics_message_messageID_get,0,0,2,0},
+{"helics_message_flags_set",_wrap_helics_message_flags_set,0,0,2,0},
+{"helics_message_flags_get",_wrap_helics_message_flags_get,0,0,2,0},
+{"helics_message_original_source_set",_wrap_helics_message_original_source_set,0,0,2,0},
+{"helics_message_original_source_get",_wrap_helics_message_original_source_get,0,0,2,0},
+{"helics_message_source_set",_wrap_helics_message_source_set,0,0,2,0},
+{"helics_message_source_get",_wrap_helics_message_source_get,0,0,2,0},
+{"helics_message_dest_set",_wrap_helics_message_dest_set,0,0,2,0},
+{"helics_message_dest_get",_wrap_helics_message_dest_get,0,0,2,0},
+{"helics_message_original_dest_set",_wrap_helics_message_original_dest_set,0,0,2,0},
+{"helics_message_original_dest_get",_wrap_helics_message_original_dest_get,0,0,2,0},
+{"new_helics_message",_wrap_new_helics_message,0,0,2,0},
+{"delete_helics_message",_wrap_delete_helics_message,0,0,2,0},
+{"helicsGetVersion",_wrap_helicsGetVersion,0,0,2,0},
+{"helicsIsCoreTypeAvailable",_wrap_helicsIsCoreTypeAvailable,0,0,2,0},
+{"helicsCreateCore",_wrap_helicsCreateCore,0,0,2,0},
+{"helicsCreateCoreFromArgs",_wrap_helicsCreateCoreFromArgs,0,0,2,0},
 {"helicsCoreClone",_wrap_helicsCoreClone,0,0,2,0},
-{"helicsCreateBroker",_wrap_helicsCreateBroker,0,0,2,_wrap_helicsCreateBroker_texinfo},
-{"helicsCreateBrokerFromArgs",_wrap_helicsCreateBrokerFromArgs,0,0,2,_wrap_helicsCreateBrokerFromArgs_texinfo},
+{"helicsCoreIsValid",_wrap_helicsCoreIsValid,0,0,2,0},
+{"helicsCreateBroker",_wrap_helicsCreateBroker,0,0,2,0},
+{"helicsCreateBrokerFromArgs",_wrap_helicsCreateBrokerFromArgs,0,0,2,0},
 {"helicsBrokerClone",_wrap_helicsBrokerClone,0,0,2,0},
-{"helicsBrokerIsConnected",_wrap_helicsBrokerIsConnected,0,0,2,_wrap_helicsBrokerIsConnected_texinfo},
-{"helicsCoreIsConnected",_wrap_helicsCoreIsConnected,0,0,2,_wrap_helicsCoreIsConnected_texinfo},
-{"helicsBrokerGetIdentifier",_wrap_helicsBrokerGetIdentifier,0,0,2,_wrap_helicsBrokerGetIdentifier_texinfo},
-{"helicsCoreGetIdentifier",_wrap_helicsCoreGetIdentifier,0,0,2,_wrap_helicsCoreGetIdentifier_texinfo},
-{"helicsBrokerGetAddress",_wrap_helicsBrokerGetAddress,0,0,2,_wrap_helicsBrokerGetAddress_texinfo},
+{"helicsBrokerIsValid",_wrap_helicsBrokerIsValid,0,0,2,0},
+{"helicsBrokerIsConnected",_wrap_helicsBrokerIsConnected,0,0,2,0},
+{"helicsBrokerDataLink",_wrap_helicsBrokerDataLink,0,0,2,0},
+{"helicsBrokerAddSourceFilterToEndpoint",_wrap_helicsBrokerAddSourceFilterToEndpoint,0,0,2,0},
+{"helicsBrokerAddDestinationFilterToEndpoint",_wrap_helicsBrokerAddDestinationFilterToEndpoint,0,0,2,0},
+{"helicsBrokerWaitForDisconnect",_wrap_helicsBrokerWaitForDisconnect,0,0,2,0},
+{"helicsCoreIsConnected",_wrap_helicsCoreIsConnected,0,0,2,0},
+{"helicsCoreDataLink",_wrap_helicsCoreDataLink,0,0,2,0},
+{"helicsCoreAddSourceFilterToEndpoint",_wrap_helicsCoreAddSourceFilterToEndpoint,0,0,2,0},
+{"helicsCoreAddDestinationFilterToEndpoint",_wrap_helicsCoreAddDestinationFilterToEndpoint,0,0,2,0},
+{"helicsBrokerGetIdentifier",_wrap_helicsBrokerGetIdentifier,0,0,2,0},
+{"helicsCoreGetIdentifier",_wrap_helicsCoreGetIdentifier,0,0,2,0},
+{"helicsBrokerGetAddress",_wrap_helicsBrokerGetAddress,0,0,2,0},
 {"helicsCoreSetReadyToInit",_wrap_helicsCoreSetReadyToInit,0,0,2,0},
-{"helicsCoreDisconnect",_wrap_helicsCoreDisconnect,0,0,2,_wrap_helicsCoreDisconnect_texinfo},
+{"helicsCoreDisconnect",_wrap_helicsCoreDisconnect,0,0,2,0},
 {"helicsGetFederateByName",_wrap_helicsGetFederateByName,0,0,2,0},
-{"helicsBrokerDisconnect",_wrap_helicsBrokerDisconnect,0,0,2,_wrap_helicsBrokerDisconnect_texinfo},
-{"helicsCoreFree",_wrap_helicsCoreFree,0,0,2,_wrap_helicsCoreFree_texinfo},
-{"helicsBrokerFree",_wrap_helicsBrokerFree,0,0,2,_wrap_helicsBrokerFree_texinfo},
-{"helicsCreateValueFederate",_wrap_helicsCreateValueFederate,0,0,2,_wrap_helicsCreateValueFederate_texinfo},
-{"helicsCreateValueFederateFromJson",_wrap_helicsCreateValueFederateFromJson,0,0,2,_wrap_helicsCreateValueFederateFromJson_texinfo},
-{"helicsCreateMessageFederate",_wrap_helicsCreateMessageFederate,0,0,2,_wrap_helicsCreateMessageFederate_texinfo},
-{"helicsCreateMessageFederateFromJson",_wrap_helicsCreateMessageFederateFromJson,0,0,2,_wrap_helicsCreateMessageFederateFromJson_texinfo},
-{"helicsCreateCombinationFederate",_wrap_helicsCreateCombinationFederate,0,0,2,_wrap_helicsCreateCombinationFederate_texinfo},
-{"helicsCreateCombinationFederateFromJson",_wrap_helicsCreateCombinationFederateFromJson,0,0,2,_wrap_helicsCreateCombinationFederateFromJson_texinfo},
+{"helicsBrokerDisconnect",_wrap_helicsBrokerDisconnect,0,0,2,0},
+{"helicsFederateDestroy",_wrap_helicsFederateDestroy,0,0,2,0},
+{"helicsBrokerDestroy",_wrap_helicsBrokerDestroy,0,0,2,0},
+{"helicsCoreDestroy",_wrap_helicsCoreDestroy,0,0,2,0},
+{"helicsCoreFree",_wrap_helicsCoreFree,0,0,2,0},
+{"helicsBrokerFree",_wrap_helicsBrokerFree,0,0,2,0},
+{"helicsCreateValueFederate",_wrap_helicsCreateValueFederate,0,0,2,0},
+{"helicsCreateValueFederateFromConfig",_wrap_helicsCreateValueFederateFromConfig,0,0,2,0},
+{"helicsCreateMessageFederate",_wrap_helicsCreateMessageFederate,0,0,2,0},
+{"helicsCreateMessageFederateFromConfig",_wrap_helicsCreateMessageFederateFromConfig,0,0,2,0},
+{"helicsCreateCombinationFederate",_wrap_helicsCreateCombinationFederate,0,0,2,0},
+{"helicsCreateCombinationFederateFromConfig",_wrap_helicsCreateCombinationFederateFromConfig,0,0,2,0},
 {"helicsFederateClone",_wrap_helicsFederateClone,0,0,2,0},
-{"helicsFederateInfoCreate",_wrap_helicsFederateInfoCreate,0,0,2,_wrap_helicsFederateInfoCreate_texinfo},
-{"helicsFederateInfoLoadFromArgs",_wrap_helicsFederateInfoLoadFromArgs,0,0,2,_wrap_helicsFederateInfoLoadFromArgs_texinfo},
-{"helicsFederateInfoFree",_wrap_helicsFederateInfoFree,0,0,2,_wrap_helicsFederateInfoFree_texinfo},
-{"helicsFederateInfoSetFederateName",_wrap_helicsFederateInfoSetFederateName,0,0,2,_wrap_helicsFederateInfoSetFederateName_texinfo},
-{"helicsFederateInfoSetCoreName",_wrap_helicsFederateInfoSetCoreName,0,0,2,_wrap_helicsFederateInfoSetCoreName_texinfo},
-{"helicsFederateInfoSetCoreInitString",_wrap_helicsFederateInfoSetCoreInitString,0,0,2,_wrap_helicsFederateInfoSetCoreInitString_texinfo},
-{"helicsFederateInfoSetCoreTypeFromString",_wrap_helicsFederateInfoSetCoreTypeFromString,0,0,2,_wrap_helicsFederateInfoSetCoreTypeFromString_texinfo},
-{"helicsFederateInfoSetCoreType",_wrap_helicsFederateInfoSetCoreType,0,0,2,_wrap_helicsFederateInfoSetCoreType_texinfo},
-{"helicsFederateInfoSetFlag",_wrap_helicsFederateInfoSetFlag,0,0,2,_wrap_helicsFederateInfoSetFlag_texinfo},
-{"helicsFederateInfoSetOutputDelay",_wrap_helicsFederateInfoSetOutputDelay,0,0,2,_wrap_helicsFederateInfoSetOutputDelay_texinfo},
-{"helicsFederateInfoSetTimeDelta",_wrap_helicsFederateInfoSetTimeDelta,0,0,2,_wrap_helicsFederateInfoSetTimeDelta_texinfo},
-{"helicsFederateInfoSetInputDelay",_wrap_helicsFederateInfoSetInputDelay,0,0,2,_wrap_helicsFederateInfoSetInputDelay_texinfo},
-{"helicsFederateInfoSetTimeOffset",_wrap_helicsFederateInfoSetTimeOffset,0,0,2,_wrap_helicsFederateInfoSetTimeOffset_texinfo},
-{"helicsFederateInfoSetPeriod",_wrap_helicsFederateInfoSetPeriod,0,0,2,_wrap_helicsFederateInfoSetPeriod_texinfo},
-{"helicsFederateInfoSetMaxIterations",_wrap_helicsFederateInfoSetMaxIterations,0,0,2,_wrap_helicsFederateInfoSetMaxIterations_texinfo},
-{"helicsFederateInfoSetLoggingLevel",_wrap_helicsFederateInfoSetLoggingLevel,0,0,2,_wrap_helicsFederateInfoSetLoggingLevel_texinfo},
-{"helicsFederateFinalize",_wrap_helicsFederateFinalize,0,0,2,_wrap_helicsFederateFinalize_texinfo},
-{"helicsFederateFree",_wrap_helicsFederateFree,0,0,2,_wrap_helicsFederateFree_texinfo},
-{"helicsCloseLibrary",_wrap_helicsCloseLibrary,0,0,2,_wrap_helicsCloseLibrary_texinfo},
-{"helicsFederateEnterInitializationMode",_wrap_helicsFederateEnterInitializationMode,0,0,2,_wrap_helicsFederateEnterInitializationMode_texinfo},
-{"helicsFederateEnterInitializationModeAsync",_wrap_helicsFederateEnterInitializationModeAsync,0,0,2,_wrap_helicsFederateEnterInitializationModeAsync_texinfo},
-{"helicsFederateIsAsyncOperationCompleted",_wrap_helicsFederateIsAsyncOperationCompleted,0,0,2,_wrap_helicsFederateIsAsyncOperationCompleted_texinfo},
-{"helicsFederateEnterInitializationModeComplete",_wrap_helicsFederateEnterInitializationModeComplete,0,0,2,_wrap_helicsFederateEnterInitializationModeComplete_texinfo},
-{"helicsFederateEnterExecutionMode",_wrap_helicsFederateEnterExecutionMode,0,0,2,_wrap_helicsFederateEnterExecutionMode_texinfo},
-{"helicsFederateEnterExecutionModeAsync",_wrap_helicsFederateEnterExecutionModeAsync,0,0,2,_wrap_helicsFederateEnterExecutionModeAsync_texinfo},
-{"helicsFederateEnterExecutionModeComplete",_wrap_helicsFederateEnterExecutionModeComplete,0,0,2,_wrap_helicsFederateEnterExecutionModeComplete_texinfo},
-{"helicsFederateEnterExecutionModeIterative",_wrap_helicsFederateEnterExecutionModeIterative,0,0,2,_wrap_helicsFederateEnterExecutionModeIterative_texinfo},
-{"helicsFederateEnterExecutionModeIterativeAsync",_wrap_helicsFederateEnterExecutionModeIterativeAsync,0,0,2,_wrap_helicsFederateEnterExecutionModeIterativeAsync_texinfo},
-{"helicsFederateEnterExecutionModeIterativeComplete",_wrap_helicsFederateEnterExecutionModeIterativeComplete,0,0,2,_wrap_helicsFederateEnterExecutionModeIterativeComplete_texinfo},
-{"helicsFederateGetState",_wrap_helicsFederateGetState,0,0,2,_wrap_helicsFederateGetState_texinfo},
-{"helicsFederateGetCoreObject",_wrap_helicsFederateGetCoreObject,0,0,2,_wrap_helicsFederateGetCoreObject_texinfo},
-{"helicsFederateRequestTime",_wrap_helicsFederateRequestTime,0,0,2,_wrap_helicsFederateRequestTime_texinfo},
-{"helicsFederateRequestTimeIterative",_wrap_helicsFederateRequestTimeIterative,0,0,2,_wrap_helicsFederateRequestTimeIterative_texinfo},
-{"helicsFederateRequestTimeAsync",_wrap_helicsFederateRequestTimeAsync,0,0,2,_wrap_helicsFederateRequestTimeAsync_texinfo},
-{"helicsFederateRequestTimeComplete",_wrap_helicsFederateRequestTimeComplete,0,0,2,_wrap_helicsFederateRequestTimeComplete_texinfo},
-{"helicsFederateRequestTimeIterativeAsync",_wrap_helicsFederateRequestTimeIterativeAsync,0,0,2,_wrap_helicsFederateRequestTimeIterativeAsync_texinfo},
-{"helicsFederateRequestTimeIterativeComplete",_wrap_helicsFederateRequestTimeIterativeComplete,0,0,2,_wrap_helicsFederateRequestTimeIterativeComplete_texinfo},
-{"helicsFederateGetName",_wrap_helicsFederateGetName,0,0,2,_wrap_helicsFederateGetName_texinfo},
-{"helicsFederateSetTimeDelta",_wrap_helicsFederateSetTimeDelta,0,0,2,_wrap_helicsFederateSetTimeDelta_texinfo},
-{"helicsFederateSetOutputDelay",_wrap_helicsFederateSetOutputDelay,0,0,2,_wrap_helicsFederateSetOutputDelay_texinfo},
-{"helicsFederateSetInputDelay",_wrap_helicsFederateSetInputDelay,0,0,2,_wrap_helicsFederateSetInputDelay_texinfo},
-{"helicsFederateSetPeriod",_wrap_helicsFederateSetPeriod,0,0,2,_wrap_helicsFederateSetPeriod_texinfo},
-{"helicsFederateSetFlag",_wrap_helicsFederateSetFlag,0,0,2,_wrap_helicsFederateSetFlag_texinfo},
-{"helicsFederateSetLoggingLevel",_wrap_helicsFederateSetLoggingLevel,0,0,2,_wrap_helicsFederateSetLoggingLevel_texinfo},
-{"helicsFederateSetMaxIterations",_wrap_helicsFederateSetMaxIterations,0,0,2,0},
-{"helicsFederateGetCurrentTime",_wrap_helicsFederateGetCurrentTime,0,0,2,_wrap_helicsFederateGetCurrentTime_texinfo},
-{"helicsCreateQuery",_wrap_helicsCreateQuery,0,0,2,_wrap_helicsCreateQuery_texinfo},
-{"helicsQueryExecute",_wrap_helicsQueryExecute,0,0,2,_wrap_helicsQueryExecute_texinfo},
-{"helicsQueryExecuteAsync",_wrap_helicsQueryExecuteAsync,0,0,2,_wrap_helicsQueryExecuteAsync_texinfo},
-{"helicsQueryExecuteComplete",_wrap_helicsQueryExecuteComplete,0,0,2,_wrap_helicsQueryExecuteComplete_texinfo},
-{"helicsQueryIsCompleted",_wrap_helicsQueryIsCompleted,0,0,2,_wrap_helicsQueryIsCompleted_texinfo},
-{"helicsQueryFree",_wrap_helicsQueryFree,0,0,2,_wrap_helicsQueryFree_texinfo},
-{"helicsCleanupHelicsLibrary",_wrap_helicsCleanupHelicsLibrary,0,0,2,0},
-{"helicsFederateRegisterSubscription",_wrap_helicsFederateRegisterSubscription,0,0,2,_wrap_helicsFederateRegisterSubscription_texinfo},
-{"helicsFederateRegisterTypeSubscription",_wrap_helicsFederateRegisterTypeSubscription,0,0,2,_wrap_helicsFederateRegisterTypeSubscription_texinfo},
-{"helicsFederateRegisterOptionalSubscription",_wrap_helicsFederateRegisterOptionalSubscription,0,0,2,_wrap_helicsFederateRegisterOptionalSubscription_texinfo},
-{"helicsFederateRegisterOptionalTypeSubscription",_wrap_helicsFederateRegisterOptionalTypeSubscription,0,0,2,_wrap_helicsFederateRegisterOptionalTypeSubscription_texinfo},
-{"helicsFederateRegisterPublication",_wrap_helicsFederateRegisterPublication,0,0,2,_wrap_helicsFederateRegisterPublication_texinfo},
-{"helicsFederateRegisterTypePublication",_wrap_helicsFederateRegisterTypePublication,0,0,2,_wrap_helicsFederateRegisterTypePublication_texinfo},
-{"helicsFederateRegisterGlobalPublication",_wrap_helicsFederateRegisterGlobalPublication,0,0,2,_wrap_helicsFederateRegisterGlobalPublication_texinfo},
-{"helicsFederateRegisterGlobalTypePublication",_wrap_helicsFederateRegisterGlobalTypePublication,0,0,2,_wrap_helicsFederateRegisterGlobalTypePublication_texinfo},
+{"helicsCreateFederateInfo",_wrap_helicsCreateFederateInfo,0,0,2,0},
+{"helicsFederateInfoClone",_wrap_helicsFederateInfoClone,0,0,2,0},
+{"helicsFederateInfoLoadFromArgs",_wrap_helicsFederateInfoLoadFromArgs,0,0,2,0},
+{"helicsFederateInfoFree",_wrap_helicsFederateInfoFree,0,0,2,0},
+{"helicsFederateIsValid",_wrap_helicsFederateIsValid,0,0,2,0},
+{"helicsFederateInfoSetCoreName",_wrap_helicsFederateInfoSetCoreName,0,0,2,0},
+{"helicsFederateInfoSetCoreInitString",_wrap_helicsFederateInfoSetCoreInitString,0,0,2,0},
+{"helicsFederateInfoSetCoreType",_wrap_helicsFederateInfoSetCoreType,0,0,2,0},
+{"helicsFederateInfoSetCoreTypeFromString",_wrap_helicsFederateInfoSetCoreTypeFromString,0,0,2,0},
+{"helicsFederateInfoSetBroker",_wrap_helicsFederateInfoSetBroker,0,0,2,0},
+{"helicsFederateInfoSetBrokerKey",_wrap_helicsFederateInfoSetBrokerKey,0,0,2,0},
+{"helicsFederateInfoSetBrokerPort",_wrap_helicsFederateInfoSetBrokerPort,0,0,2,0},
+{"helicsFederateInfoSetLocalPort",_wrap_helicsFederateInfoSetLocalPort,0,0,2,0},
+{"helicsGetPropertyIndex",_wrap_helicsGetPropertyIndex,0,0,2,0},
+{"helicsGetOptionIndex",_wrap_helicsGetOptionIndex,0,0,2,0},
+{"helicsFederateInfoSetFlagOption",_wrap_helicsFederateInfoSetFlagOption,0,0,2,0},
+{"helicsFederateInfoSetSeparator",_wrap_helicsFederateInfoSetSeparator,0,0,2,0},
+{"helicsFederateInfoSetTimeProperty",_wrap_helicsFederateInfoSetTimeProperty,0,0,2,0},
+{"helicsFederateInfoSetIntegerProperty",_wrap_helicsFederateInfoSetIntegerProperty,0,0,2,0},
+{"helicsFederateRegisterInterfaces",_wrap_helicsFederateRegisterInterfaces,0,0,2,0},
+{"helicsFederateFinalize",_wrap_helicsFederateFinalize,0,0,2,0},
+{"helicsFederateFinalizeAsync",_wrap_helicsFederateFinalizeAsync,0,0,2,0},
+{"helicsFederateFinalizeComplete",_wrap_helicsFederateFinalizeComplete,0,0,2,0},
+{"helicsFederateFree",_wrap_helicsFederateFree,0,0,2,0},
+{"helicsCloseLibrary",_wrap_helicsCloseLibrary,0,0,2,0},
+{"helicsFederateEnterInitializingMode",_wrap_helicsFederateEnterInitializingMode,0,0,2,0},
+{"helicsFederateEnterInitializingModeAsync",_wrap_helicsFederateEnterInitializingModeAsync,0,0,2,0},
+{"helicsFederateIsAsyncOperationCompleted",_wrap_helicsFederateIsAsyncOperationCompleted,0,0,2,0},
+{"helicsFederateEnterInitializingModeComplete",_wrap_helicsFederateEnterInitializingModeComplete,0,0,2,0},
+{"helicsFederateEnterExecutingMode",_wrap_helicsFederateEnterExecutingMode,0,0,2,0},
+{"helicsFederateEnterExecutingModeAsync",_wrap_helicsFederateEnterExecutingModeAsync,0,0,2,0},
+{"helicsFederateEnterExecutingModeComplete",_wrap_helicsFederateEnterExecutingModeComplete,0,0,2,0},
+{"helicsFederateEnterExecutingModeIterative",_wrap_helicsFederateEnterExecutingModeIterative,0,0,2,0},
+{"helicsFederateEnterExecutingModeIterativeAsync",_wrap_helicsFederateEnterExecutingModeIterativeAsync,0,0,2,0},
+{"helicsFederateEnterExecutingModeIterativeComplete",_wrap_helicsFederateEnterExecutingModeIterativeComplete,0,0,2,0},
+{"helicsFederateGetState",_wrap_helicsFederateGetState,0,0,2,0},
+{"helicsFederateGetCoreObject",_wrap_helicsFederateGetCoreObject,0,0,2,0},
+{"helicsFederateRequestTime",_wrap_helicsFederateRequestTime,0,0,2,0},
+{"helicsFederateRequestTimeAdvance",_wrap_helicsFederateRequestTimeAdvance,0,0,2,0},
+{"helicsFederateRequestNextStep",_wrap_helicsFederateRequestNextStep,0,0,2,0},
+{"helicsFederateRequestTimeIterative",_wrap_helicsFederateRequestTimeIterative,0,0,2,0},
+{"helicsFederateRequestTimeAsync",_wrap_helicsFederateRequestTimeAsync,0,0,2,0},
+{"helicsFederateRequestTimeComplete",_wrap_helicsFederateRequestTimeComplete,0,0,2,0},
+{"helicsFederateRequestTimeIterativeAsync",_wrap_helicsFederateRequestTimeIterativeAsync,0,0,2,0},
+{"helicsFederateRequestTimeIterativeComplete",_wrap_helicsFederateRequestTimeIterativeComplete,0,0,2,0},
+{"helicsFederateGetName",_wrap_helicsFederateGetName,0,0,2,0},
+{"helicsFederateSetTimeProperty",_wrap_helicsFederateSetTimeProperty,0,0,2,0},
+{"helicsFederateSetFlagOption",_wrap_helicsFederateSetFlagOption,0,0,2,0},
+{"helicsFederateSetSeparator",_wrap_helicsFederateSetSeparator,0,0,2,0},
+{"helicsFederateSetIntegerProperty",_wrap_helicsFederateSetIntegerProperty,0,0,2,0},
+{"helicsFederateGetTimeProperty",_wrap_helicsFederateGetTimeProperty,0,0,2,0},
+{"helicsFederateGetFlagOption",_wrap_helicsFederateGetFlagOption,0,0,2,0},
+{"helicsFederateGetIntegerProperty",_wrap_helicsFederateGetIntegerProperty,0,0,2,0},
+{"helicsFederateGetCurrentTime",_wrap_helicsFederateGetCurrentTime,0,0,2,0},
+{"helicsFederateSetGlobal",_wrap_helicsFederateSetGlobal,0,0,2,0},
+{"helicsCoreSetGlobal",_wrap_helicsCoreSetGlobal,0,0,2,0},
+{"helicsBrokerSetGlobal",_wrap_helicsBrokerSetGlobal,0,0,2,0},
+{"helicsCreateQuery",_wrap_helicsCreateQuery,0,0,2,0},
+{"helicsQueryExecute",_wrap_helicsQueryExecute,0,0,2,0},
+{"helicsQueryCoreExecute",_wrap_helicsQueryCoreExecute,0,0,2,0},
+{"helicsQueryBrokerExecute",_wrap_helicsQueryBrokerExecute,0,0,2,0},
+{"helicsQueryExecuteAsync",_wrap_helicsQueryExecuteAsync,0,0,2,0},
+{"helicsQueryExecuteComplete",_wrap_helicsQueryExecuteComplete,0,0,2,0},
+{"helicsQueryIsCompleted",_wrap_helicsQueryIsCompleted,0,0,2,0},
+{"helicsQueryFree",_wrap_helicsQueryFree,0,0,2,0},
+{"helicsCleanupLibrary",_wrap_helicsCleanupLibrary,0,0,2,0},
+{"helicsFederateRegisterSubscription",_wrap_helicsFederateRegisterSubscription,0,0,2,0},
+{"helicsFederateRegisterPublication",_wrap_helicsFederateRegisterPublication,0,0,2,0},
+{"helicsFederateRegisterTypePublication",_wrap_helicsFederateRegisterTypePublication,0,0,2,0},
+{"helicsFederateRegisterGlobalPublication",_wrap_helicsFederateRegisterGlobalPublication,0,0,2,0},
+{"helicsFederateRegisterGlobalTypePublication",_wrap_helicsFederateRegisterGlobalTypePublication,0,0,2,0},
+{"helicsFederateRegisterInput",_wrap_helicsFederateRegisterInput,0,0,2,0},
+{"helicsFederateRegisterTypeInput",_wrap_helicsFederateRegisterTypeInput,0,0,2,0},
+{"helicsFederateRegisterGlobalInput",_wrap_helicsFederateRegisterGlobalInput,0,0,2,0},
+{"helicsFederateRegisterGlobalTypeInput",_wrap_helicsFederateRegisterGlobalTypeInput,0,0,2,0},
+{"helicsFederateGetPublication",_wrap_helicsFederateGetPublication,0,0,2,0},
+{"helicsFederateGetPublicationByIndex",_wrap_helicsFederateGetPublicationByIndex,0,0,2,0},
+{"helicsFederateGetInput",_wrap_helicsFederateGetInput,0,0,2,0},
+{"helicsFederateGetInputByIndex",_wrap_helicsFederateGetInputByIndex,0,0,2,0},
+{"helicsFederateGetSubscription",_wrap_helicsFederateGetSubscription,0,0,2,0},
+{"helicsFederateClearUpdates",_wrap_helicsFederateClearUpdates,0,0,2,0},
+{"helicsFederateRegisterFromPublicationJSON",_wrap_helicsFederateRegisterFromPublicationJSON,0,0,2,0},
+{"helicsFederatePublishJSON",_wrap_helicsFederatePublishJSON,0,0,2,0},
 {"helicsPublicationPublishRaw",_wrap_helicsPublicationPublishRaw,0,0,2,0},
-{"helicsPublicationPublishString",_wrap_helicsPublicationPublishString,0,0,2,_wrap_helicsPublicationPublishString_texinfo},
-{"helicsPublicationPublishInteger",_wrap_helicsPublicationPublishInteger,0,0,2,_wrap_helicsPublicationPublishInteger_texinfo},
-{"helicsPublicationPublishDouble",_wrap_helicsPublicationPublishDouble,0,0,2,_wrap_helicsPublicationPublishDouble_texinfo},
-{"helicsPublicationPublishComplex",_wrap_helicsPublicationPublishComplex,0,0,2,_wrap_helicsPublicationPublishComplex_texinfo},
-{"helicsPublicationPublishVector",_wrap_helicsPublicationPublishVector,0,0,2,_wrap_helicsPublicationPublishVector_texinfo},
-{"helicsSubscriptionGetValueSize",_wrap_helicsSubscriptionGetValueSize,0,0,2,_wrap_helicsSubscriptionGetValueSize_texinfo},
-{"helicsSubscriptionGetRawValue",_wrap_helicsSubscriptionGetRawValue,0,0,2,0},
-{"helicsSubscriptionGetString",_wrap_helicsSubscriptionGetString,0,0,2,_wrap_helicsSubscriptionGetString_texinfo},
-{"helicsSubscriptionGetInteger",_wrap_helicsSubscriptionGetInteger,0,0,2,_wrap_helicsSubscriptionGetInteger_texinfo},
-{"helicsSubscriptionGetDouble",_wrap_helicsSubscriptionGetDouble,0,0,2,_wrap_helicsSubscriptionGetDouble_texinfo},
-{"helicsSubscriptionGetComplex",_wrap_helicsSubscriptionGetComplex,0,0,2,_wrap_helicsSubscriptionGetComplex_texinfo},
-{"helicsSubscriptionGetVectorSize",_wrap_helicsSubscriptionGetVectorSize,0,0,2,_wrap_helicsSubscriptionGetVectorSize_texinfo},
-{"helicsSubscriptionGetVector",_wrap_helicsSubscriptionGetVector,0,0,2,_wrap_helicsSubscriptionGetVector_texinfo},
-{"helicsSubscriptionSetDefaultRaw",_wrap_helicsSubscriptionSetDefaultRaw,0,0,2,0},
-{"helicsSubscriptionSetDefaultString",_wrap_helicsSubscriptionSetDefaultString,0,0,2,_wrap_helicsSubscriptionSetDefaultString_texinfo},
-{"helicsSubscriptionSetDefaultInteger",_wrap_helicsSubscriptionSetDefaultInteger,0,0,2,_wrap_helicsSubscriptionSetDefaultInteger_texinfo},
-{"helicsSubscriptionSetDefaultDouble",_wrap_helicsSubscriptionSetDefaultDouble,0,0,2,_wrap_helicsSubscriptionSetDefaultDouble_texinfo},
-{"helicsSubscriptionSetDefaultComplex",_wrap_helicsSubscriptionSetDefaultComplex,0,0,2,_wrap_helicsSubscriptionSetDefaultComplex_texinfo},
-{"helicsSubscriptionSetDefaultVector",_wrap_helicsSubscriptionSetDefaultVector,0,0,2,_wrap_helicsSubscriptionSetDefaultVector_texinfo},
-{"helicsSubscriptionGetType",_wrap_helicsSubscriptionGetType,0,0,2,_wrap_helicsSubscriptionGetType_texinfo},
-{"helicsPublicationGetType",_wrap_helicsPublicationGetType,0,0,2,_wrap_helicsPublicationGetType_texinfo},
-{"helicsSubscriptionGetKey",_wrap_helicsSubscriptionGetKey,0,0,2,_wrap_helicsSubscriptionGetKey_texinfo},
-{"helicsPublicationGetKey",_wrap_helicsPublicationGetKey,0,0,2,_wrap_helicsPublicationGetKey_texinfo},
-{"helicsSubscriptionGetUnits",_wrap_helicsSubscriptionGetUnits,0,0,2,_wrap_helicsSubscriptionGetUnits_texinfo},
-{"helicsPublicationGetUnits",_wrap_helicsPublicationGetUnits,0,0,2,_wrap_helicsPublicationGetUnits_texinfo},
-{"helicsSubscriptionIsUpdated",_wrap_helicsSubscriptionIsUpdated,0,0,2,_wrap_helicsSubscriptionIsUpdated_texinfo},
-{"helicsSubscriptionLastUpdateTime",_wrap_helicsSubscriptionLastUpdateTime,0,0,2,_wrap_helicsSubscriptionLastUpdateTime_texinfo},
+{"helicsPublicationPublishString",_wrap_helicsPublicationPublishString,0,0,2,0},
+{"helicsPublicationPublishInteger",_wrap_helicsPublicationPublishInteger,0,0,2,0},
+{"helicsPublicationPublishBoolean",_wrap_helicsPublicationPublishBoolean,0,0,2,0},
+{"helicsPublicationPublishDouble",_wrap_helicsPublicationPublishDouble,0,0,2,0},
+{"helicsPublicationPublishTime",_wrap_helicsPublicationPublishTime,0,0,2,0},
+{"helicsPublicationPublishChar",_wrap_helicsPublicationPublishChar,0,0,2,0},
+{"helicsPublicationPublishComplex",_wrap_helicsPublicationPublishComplex,0,0,2,0},
+{"helicsPublicationPublishVector",_wrap_helicsPublicationPublishVector,0,0,2,0},
+{"helicsPublicationPublishNamedPoint",_wrap_helicsPublicationPublishNamedPoint,0,0,2,0},
+{"helicsPublicationAddTarget",_wrap_helicsPublicationAddTarget,0,0,2,0},
+{"helicsInputAddTarget",_wrap_helicsInputAddTarget,0,0,2,0},
+{"helicsInputGetRawValueSize",_wrap_helicsInputGetRawValueSize,0,0,2,0},
+{"helicsInputGetRawValue",_wrap_helicsInputGetRawValue,0,0,2,0},
+{"helicsInputGetStringSize",_wrap_helicsInputGetStringSize,0,0,2,0},
+{"helicsInputGetString",_wrap_helicsInputGetString,0,0,2,0},
+{"helicsInputGetInteger",_wrap_helicsInputGetInteger,0,0,2,0},
+{"helicsInputGetBoolean",_wrap_helicsInputGetBoolean,0,0,2,0},
+{"helicsInputGetDouble",_wrap_helicsInputGetDouble,0,0,2,0},
+{"helicsInputGetTime",_wrap_helicsInputGetTime,0,0,2,0},
+{"helicsInputGetChar",_wrap_helicsInputGetChar,0,0,2,0},
+{"helicsInputGetComplex",_wrap_helicsInputGetComplex,0,0,2,0},
+{"helicsInputGetVectorSize",_wrap_helicsInputGetVectorSize,0,0,2,0},
+{"helicsInputGetVector",_wrap_helicsInputGetVector,0,0,2,0},
+{"helicsInputGetNamedPoint",_wrap_helicsInputGetNamedPoint,0,0,2,0},
+{"helicsInputSetDefaultRaw",_wrap_helicsInputSetDefaultRaw,0,0,2,0},
+{"helicsInputSetDefaultString",_wrap_helicsInputSetDefaultString,0,0,2,0},
+{"helicsInputSetDefaultInteger",_wrap_helicsInputSetDefaultInteger,0,0,2,0},
+{"helicsInputSetDefaultBoolean",_wrap_helicsInputSetDefaultBoolean,0,0,2,0},
+{"helicsInputSetDefaultTime",_wrap_helicsInputSetDefaultTime,0,0,2,0},
+{"helicsInputSetDefaultChar",_wrap_helicsInputSetDefaultChar,0,0,2,0},
+{"helicsInputSetDefaultDouble",_wrap_helicsInputSetDefaultDouble,0,0,2,0},
+{"helicsInputSetDefaultComplex",_wrap_helicsInputSetDefaultComplex,0,0,2,0},
+{"helicsInputSetDefaultVector",_wrap_helicsInputSetDefaultVector,0,0,2,0},
+{"helicsInputSetDefaultNamedPoint",_wrap_helicsInputSetDefaultNamedPoint,0,0,2,0},
+{"helicsInputGetType",_wrap_helicsInputGetType,0,0,2,0},
+{"helicsInputGetPublicationType",_wrap_helicsInputGetPublicationType,0,0,2,0},
+{"helicsPublicationGetType",_wrap_helicsPublicationGetType,0,0,2,0},
+{"helicsInputGetKey",_wrap_helicsInputGetKey,0,0,2,0},
+{"helicsSubscriptionGetKey",_wrap_helicsSubscriptionGetKey,0,0,2,0},
+{"helicsPublicationGetKey",_wrap_helicsPublicationGetKey,0,0,2,0},
+{"helicsInputGetUnits",_wrap_helicsInputGetUnits,0,0,2,0},
+{"helicsInputGetInjectionUnits",_wrap_helicsInputGetInjectionUnits,0,0,2,0},
+{"helicsInputGetExtractionUnits",_wrap_helicsInputGetExtractionUnits,0,0,2,0},
+{"helicsPublicationGetUnits",_wrap_helicsPublicationGetUnits,0,0,2,0},
+{"helicsInputGetInfo",_wrap_helicsInputGetInfo,0,0,2,0},
+{"helicsInputSetInfo",_wrap_helicsInputSetInfo,0,0,2,0},
+{"helicsPublicationGetInfo",_wrap_helicsPublicationGetInfo,0,0,2,0},
+{"helicsPublicationSetInfo",_wrap_helicsPublicationSetInfo,0,0,2,0},
+{"helicsInputGetOption",_wrap_helicsInputGetOption,0,0,2,0},
+{"helicsInputSetOption",_wrap_helicsInputSetOption,0,0,2,0},
+{"helicsPublicationGetOption",_wrap_helicsPublicationGetOption,0,0,2,0},
+{"helicsPublicationSetOption",_wrap_helicsPublicationSetOption,0,0,2,0},
+{"helicsInputIsUpdated",_wrap_helicsInputIsUpdated,0,0,2,0},
+{"helicsInputLastUpdateTime",_wrap_helicsInputLastUpdateTime,0,0,2,0},
+{"helicsInputClearUpdate",_wrap_helicsInputClearUpdate,0,0,2,0},
 {"helicsFederateGetPublicationCount",_wrap_helicsFederateGetPublicationCount,0,0,2,0},
-{"helicsFederateGetSubscriptionCount",_wrap_helicsFederateGetSubscriptionCount,0,0,2,0},
-{"helicsFederateRegisterEndpoint",_wrap_helicsFederateRegisterEndpoint,0,0,2,_wrap_helicsFederateRegisterEndpoint_texinfo},
-{"helicsFederateRegisterGlobalEndpoint",_wrap_helicsFederateRegisterGlobalEndpoint,0,0,2,_wrap_helicsFederateRegisterGlobalEndpoint_texinfo},
-{"helicsEndpointSetDefaultDestination",_wrap_helicsEndpointSetDefaultDestination,0,0,2,_wrap_helicsEndpointSetDefaultDestination_texinfo},
-{"helicsEndpointSendMessageRaw",_wrap_helicsEndpointSendMessageRaw,0,0,2,_wrap_helicsEndpointSendMessageRaw_texinfo},
-{"helicsEndpointSendEventRaw",_wrap_helicsEndpointSendEventRaw,0,0,2,_wrap_helicsEndpointSendEventRaw_texinfo},
-{"helicsEndpointSendMessage",_wrap_helicsEndpointSendMessage,0,0,2,_wrap_helicsEndpointSendMessage_texinfo},
-{"helicsEndpointSubscribe",_wrap_helicsEndpointSubscribe,0,0,2,_wrap_helicsEndpointSubscribe_texinfo},
-{"helicsFederateHasMessage",_wrap_helicsFederateHasMessage,0,0,2,_wrap_helicsFederateHasMessage_texinfo},
-{"helicsEndpointHasMessage",_wrap_helicsEndpointHasMessage,0,0,2,_wrap_helicsEndpointHasMessage_texinfo},
-{"helicsFederateReceiveCount",_wrap_helicsFederateReceiveCount,0,0,2,_wrap_helicsFederateReceiveCount_texinfo},
-{"helicsEndpointReceiveCount",_wrap_helicsEndpointReceiveCount,0,0,2,_wrap_helicsEndpointReceiveCount_texinfo},
-{"helicsEndpointGetMessage",_wrap_helicsEndpointGetMessage,0,0,2,_wrap_helicsEndpointGetMessage_texinfo},
-{"helicsFederateGetMessage",_wrap_helicsFederateGetMessage,0,0,2,_wrap_helicsFederateGetMessage_texinfo},
-{"helicsEndpointGetType",_wrap_helicsEndpointGetType,0,0,2,_wrap_helicsEndpointGetType_texinfo},
-{"helicsEndpointGetName",_wrap_helicsEndpointGetName,0,0,2,_wrap_helicsEndpointGetName_texinfo},
+{"helicsFederateGetInputCount",_wrap_helicsFederateGetInputCount,0,0,2,0},
+{"helicsFederateRegisterEndpoint",_wrap_helicsFederateRegisterEndpoint,0,0,2,0},
+{"helicsFederateRegisterGlobalEndpoint",_wrap_helicsFederateRegisterGlobalEndpoint,0,0,2,0},
+{"helicsFederateGetEndpoint",_wrap_helicsFederateGetEndpoint,0,0,2,0},
+{"helicsFederateGetEndpointByIndex",_wrap_helicsFederateGetEndpointByIndex,0,0,2,0},
+{"helicsEndpointSetDefaultDestination",_wrap_helicsEndpointSetDefaultDestination,0,0,2,0},
+{"helicsEndpointGetDefaultDestination",_wrap_helicsEndpointGetDefaultDestination,0,0,2,0},
+{"helicsEndpointSendMessageRaw",_wrap_helicsEndpointSendMessageRaw,0,0,2,0},
+{"helicsEndpointSendEventRaw",_wrap_helicsEndpointSendEventRaw,0,0,2,0},
+{"helicsEndpointSendMessage",_wrap_helicsEndpointSendMessage,0,0,2,0},
+{"helicsEndpointSendMessageObject",_wrap_helicsEndpointSendMessageObject,0,0,2,0},
+{"helicsEndpointSubscribe",_wrap_helicsEndpointSubscribe,0,0,2,0},
+{"helicsFederateHasMessage",_wrap_helicsFederateHasMessage,0,0,2,0},
+{"helicsEndpointHasMessage",_wrap_helicsEndpointHasMessage,0,0,2,0},
+{"helicsFederatePendingMessages",_wrap_helicsFederatePendingMessages,0,0,2,0},
+{"helicsEndpointPendingMessages",_wrap_helicsEndpointPendingMessages,0,0,2,0},
+{"helicsEndpointGetMessage",_wrap_helicsEndpointGetMessage,0,0,2,0},
+{"helicsEndpointGetMessageObject",_wrap_helicsEndpointGetMessageObject,0,0,2,0},
+{"helicsFederateGetMessage",_wrap_helicsFederateGetMessage,0,0,2,0},
+{"helicsFederateGetMessageObject",_wrap_helicsFederateGetMessageObject,0,0,2,0},
+{"helicsFederateCreateMessageObject",_wrap_helicsFederateCreateMessageObject,0,0,2,0},
+{"helicsFederateClearMessages",_wrap_helicsFederateClearMessages,0,0,2,0},
+{"helicsEndpointClearMessages",_wrap_helicsEndpointClearMessages,0,0,2,0},
+{"helicsEndpointGetType",_wrap_helicsEndpointGetType,0,0,2,0},
+{"helicsEndpointGetName",_wrap_helicsEndpointGetName,0,0,2,0},
 {"helicsFederateGetEndpointCount",_wrap_helicsFederateGetEndpointCount,0,0,2,0},
-{"helicsFederateRegisterSourceFilter",_wrap_helicsFederateRegisterSourceFilter,0,0,2,_wrap_helicsFederateRegisterSourceFilter_texinfo},
-{"helicsFederateRegisterDestinationFilter",_wrap_helicsFederateRegisterDestinationFilter,0,0,2,_wrap_helicsFederateRegisterDestinationFilter_texinfo},
-{"helicsFederateRegisterCloningFilter",_wrap_helicsFederateRegisterCloningFilter,0,0,2,_wrap_helicsFederateRegisterCloningFilter_texinfo},
-{"helicsCoreRegisterSourceFilter",_wrap_helicsCoreRegisterSourceFilter,0,0,2,_wrap_helicsCoreRegisterSourceFilter_texinfo},
-{"helicsCoreRegisterDestinationFilter",_wrap_helicsCoreRegisterDestinationFilter,0,0,2,_wrap_helicsCoreRegisterDestinationFilter_texinfo},
-{"helicsCoreRegisterCloningFilter",_wrap_helicsCoreRegisterCloningFilter,0,0,2,_wrap_helicsCoreRegisterCloningFilter_texinfo},
-{"helicsFilterGetTarget",_wrap_helicsFilterGetTarget,0,0,2,_wrap_helicsFilterGetTarget_texinfo},
-{"helicsFilterGetName",_wrap_helicsFilterGetName,0,0,2,_wrap_helicsFilterGetName_texinfo},
-{"helicsFilterSet",_wrap_helicsFilterSet,0,0,2,_wrap_helicsFilterSet_texinfo},
+{"helicsEndpointGetInfo",_wrap_helicsEndpointGetInfo,0,0,2,0},
+{"helicsEndpointSetInfo",_wrap_helicsEndpointSetInfo,0,0,2,0},
+{"helicsEndpointSetOption",_wrap_helicsEndpointSetOption,0,0,2,0},
+{"helicsEndpointGetOption",_wrap_helicsEndpointGetOption,0,0,2,0},
+{"helicsMessageGetSource",_wrap_helicsMessageGetSource,0,0,2,0},
+{"helicsMessageGetDestination",_wrap_helicsMessageGetDestination,0,0,2,0},
+{"helicsMessageGetOriginalSource",_wrap_helicsMessageGetOriginalSource,0,0,2,0},
+{"helicsMessageGetOriginalDestination",_wrap_helicsMessageGetOriginalDestination,0,0,2,0},
+{"helicsMessageGetTime",_wrap_helicsMessageGetTime,0,0,2,0},
+{"helicsMessageGetString",_wrap_helicsMessageGetString,0,0,2,0},
+{"helicsMessageGetMessageID",_wrap_helicsMessageGetMessageID,0,0,2,0},
+{"helicsMessageCheckFlag",_wrap_helicsMessageCheckFlag,0,0,2,0},
+{"helicsMessageGetRawDataSize",_wrap_helicsMessageGetRawDataSize,0,0,2,0},
+{"helicsMessageGetRawData",_wrap_helicsMessageGetRawData,0,0,2,0},
+{"helicsMessageIsValid",_wrap_helicsMessageIsValid,0,0,2,0},
+{"helicsMessageSetSource",_wrap_helicsMessageSetSource,0,0,2,0},
+{"helicsMessageSetDestination",_wrap_helicsMessageSetDestination,0,0,2,0},
+{"helicsMessageSetOriginalSource",_wrap_helicsMessageSetOriginalSource,0,0,2,0},
+{"helicsMessageSetOriginalDestination",_wrap_helicsMessageSetOriginalDestination,0,0,2,0},
+{"helicsMessageSetTime",_wrap_helicsMessageSetTime,0,0,2,0},
+{"helicsMessageReserve",_wrap_helicsMessageReserve,0,0,2,0},
+{"helicsMessageSetMessageID",_wrap_helicsMessageSetMessageID,0,0,2,0},
+{"helicsMessageClearFlags",_wrap_helicsMessageClearFlags,0,0,2,0},
+{"helicsMessageSetFlagOption",_wrap_helicsMessageSetFlagOption,0,0,2,0},
+{"helicsMessageSetString",_wrap_helicsMessageSetString,0,0,2,0},
+{"helicsMessageSetData",_wrap_helicsMessageSetData,0,0,2,0},
+{"helicsMessageAppendData",_wrap_helicsMessageAppendData,0,0,2,0},
+{"helicsFederateRegisterFilter",_wrap_helicsFederateRegisterFilter,0,0,2,0},
+{"helicsFederateRegisterGlobalFilter",_wrap_helicsFederateRegisterGlobalFilter,0,0,2,0},
+{"helicsFederateRegisterCloningFilter",_wrap_helicsFederateRegisterCloningFilter,0,0,2,0},
+{"helicsFederateRegisterGlobalCloningFilter",_wrap_helicsFederateRegisterGlobalCloningFilter,0,0,2,0},
+{"helicsCoreRegisterFilter",_wrap_helicsCoreRegisterFilter,0,0,2,0},
+{"helicsCoreRegisterCloningFilter",_wrap_helicsCoreRegisterCloningFilter,0,0,2,0},
+{"helicsFederateGetFilterCount",_wrap_helicsFederateGetFilterCount,0,0,2,0},
+{"helicsFederateGetFilter",_wrap_helicsFederateGetFilter,0,0,2,0},
+{"helicsFederateGetFilterByIndex",_wrap_helicsFederateGetFilterByIndex,0,0,2,0},
+{"helicsFilterGetName",_wrap_helicsFilterGetName,0,0,2,0},
+{"helicsFilterSet",_wrap_helicsFilterSet,0,0,2,0},
 {"helicsFilterSetString",_wrap_helicsFilterSetString,0,0,2,0},
-{"helicsFilterAddDestinationTarget",_wrap_helicsFilterAddDestinationTarget,0,0,2,_wrap_helicsFilterAddDestinationTarget_texinfo},
-{"helicsFilterAddSourceTarget",_wrap_helicsFilterAddSourceTarget,0,0,2,_wrap_helicsFilterAddSourceTarget_texinfo},
-{"helicsFilterAddDeliveryEndpoint",_wrap_helicsFilterAddDeliveryEndpoint,0,0,2,_wrap_helicsFilterAddDeliveryEndpoint_texinfo},
-{"helicsFilterRemoveDestinationTarget",_wrap_helicsFilterRemoveDestinationTarget,0,0,2,_wrap_helicsFilterRemoveDestinationTarget_texinfo},
-{"helicsFilterRemoveSourceTarget",_wrap_helicsFilterRemoveSourceTarget,0,0,2,_wrap_helicsFilterRemoveSourceTarget_texinfo},
-{"helicsFilterRemoveDeliveryEndpoint",_wrap_helicsFilterRemoveDeliveryEndpoint,0,0,2,_wrap_helicsFilterRemoveDeliveryEndpoint_texinfo},
+{"helicsFilterAddDestinationTarget",_wrap_helicsFilterAddDestinationTarget,0,0,2,0},
+{"helicsFilterAddSourceTarget",_wrap_helicsFilterAddSourceTarget,0,0,2,0},
+{"helicsFilterAddDeliveryEndpoint",_wrap_helicsFilterAddDeliveryEndpoint,0,0,2,0},
+{"helicsFilterRemoveTarget",_wrap_helicsFilterRemoveTarget,0,0,2,0},
+{"helicsFilterRemoveDeliveryEndpoint",_wrap_helicsFilterRemoveDeliveryEndpoint,0,0,2,0},
+{"helicsFilterGetInfo",_wrap_helicsFilterGetInfo,0,0,2,0},
+{"helicsFilterSetInfo",_wrap_helicsFilterSetInfo,0,0,2,0},
+{"helicsFilterSetOption",_wrap_helicsFilterSetOption,0,0,2,0},
+{"helicsFilterGetOption",_wrap_helicsFilterGetOption,0,0,2,0},
 {0,0,0,0,0,0}
 };
 
 /* -------- TYPE CONVERSION AND EQUIVALENCE RULES (BEGIN) -------- */
 
 static swig_type_info _swigt__p_char = {"_p_char", "char *", 0, 0, (void*)0, 0};
-static swig_type_info _swigt__p_data_t = {"_p_data_t", "data_t *", 0, 0, (void*)&_wrap_class_data_t, 0};
-static swig_type_info _swigt__p_double = {"_p_double", "helics_time_t *|double *", 0, 0, (void*)0, 0};
-static swig_type_info _swigt__p_federate_state = {"_p_federate_state", "enum federate_state *|federate_state *", 0, 0, (void*)0, 0};
-static swig_type_info _swigt__p_helics_filter_type_t = {"_p_helics_filter_type_t", "enum helics_filter_type_t *|helics_filter_type_t *", 0, 0, (void*)0, 0};
+static swig_type_info _swigt__p_double = {"_p_double", "helics_time *|double *", 0, 0, (void*)0, 0};
+static swig_type_info _swigt__p_helics_core_type = {"_p_helics_core_type", "enum helics_core_type *|helics_core_type *", 0, 0, (void*)0, 0};
+static swig_type_info _swigt__p_helics_data_type = {"_p_helics_data_type", "enum helics_data_type *|helics_data_type *", 0, 0, (void*)0, 0};
+static swig_type_info _swigt__p_helics_error = {"_p_helics_error", "helics_error *", 0, 0, (void*)0, 0};
+static swig_type_info _swigt__p_helics_error_types = {"_p_helics_error_types", "enum helics_error_types *|helics_error_types *", 0, 0, (void*)0, 0};
+static swig_type_info _swigt__p_helics_federate_flags = {"_p_helics_federate_flags", "enum helics_federate_flags *|helics_federate_flags *", 0, 0, (void*)0, 0};
+static swig_type_info _swigt__p_helics_federate_state = {"_p_helics_federate_state", "enum helics_federate_state *|helics_federate_state *", 0, 0, (void*)0, 0};
+static swig_type_info _swigt__p_helics_filter_type = {"_p_helics_filter_type", "enum helics_filter_type *|helics_filter_type *", 0, 0, (void*)0, 0};
+static swig_type_info _swigt__p_helics_handle_options = {"_p_helics_handle_options", "enum helics_handle_options *|helics_handle_options *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_helics_iteration_request = {"_p_helics_iteration_request", "enum helics_iteration_request *|helics_iteration_request *", 0, 0, (void*)0, 0};
-static swig_type_info _swigt__p_helics_iteration_status = {"_p_helics_iteration_status", "enum helics_iteration_status *|helics_iteration_status *", 0, 0, (void*)0, 0};
-static swig_type_info _swigt__p_helics_status = {"_p_helics_status", "enum helics_status *|helics_status *", 0, 0, (void*)0, 0};
-static swig_type_info _swigt__p_int = {"_p_int", "helics_bool_t *|int *", 0, 0, (void*)0, 0};
-static swig_type_info _swigt__p_int64_t = {"_p_int64_t", "int64_t *", 0, 0, (void*)0, 0};
-static swig_type_info _swigt__p_message_t = {"_p_message_t", "message_t *", 0, 0, (void*)&_wrap_class_message_t, 0};
+static swig_type_info _swigt__p_helics_iteration_result = {"_p_helics_iteration_result", "enum helics_iteration_result *|helics_iteration_result *", 0, 0, (void*)0, 0};
+static swig_type_info _swigt__p_helics_log_levels = {"_p_helics_log_levels", "enum helics_log_levels *|helics_log_levels *", 0, 0, (void*)0, 0};
+static swig_type_info _swigt__p_helics_message = {"_p_helics_message", "helics_message *", 0, 0, (void*)&_wrap_class_helics_message, 0};
+static swig_type_info _swigt__p_helics_properties = {"_p_helics_properties", "enum helics_properties *|helics_properties *", 0, 0, (void*)0, 0};
+static swig_type_info _swigt__p_int = {"_p_int", "helics_bool *|int *", 0, 0, (void*)0, 0};
+static swig_type_info _swigt__p_int16_t = {"_p_int16_t", "int16_t *", 0, 0, (void*)0, 0};
+static swig_type_info _swigt__p_int32_t = {"_p_int32_t", "int32_t *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_p_char = {"_p_p_char", "char **", 0, 0, (void*)0, 0};
-static swig_type_info _swigt__p_void = {"_p_void", "helics_publication|helics_core|helics_broker|helics_query|helics_filter|helics_subscription|helics_federate|helics_federate_info_t|helics_endpoint|void *", 0, 0, (void*)0, 0};
+static swig_type_info _swigt__p_void = {"_p_void", "helics_publication|helics_core|helics_broker|helics_query|helics_filter|helics_federate_info|helics_message_object|helics_federate|helics_endpoint|void *|helics_input", 0, 0, (void*)0, 0};
 
 static swig_type_info *swig_type_initial[] = {
   &_swigt__p_char,
-  &_swigt__p_data_t,
   &_swigt__p_double,
-  &_swigt__p_federate_state,
-  &_swigt__p_helics_filter_type_t,
+  &_swigt__p_helics_core_type,
+  &_swigt__p_helics_data_type,
+  &_swigt__p_helics_error,
+  &_swigt__p_helics_error_types,
+  &_swigt__p_helics_federate_flags,
+  &_swigt__p_helics_federate_state,
+  &_swigt__p_helics_filter_type,
+  &_swigt__p_helics_handle_options,
   &_swigt__p_helics_iteration_request,
-  &_swigt__p_helics_iteration_status,
-  &_swigt__p_helics_status,
+  &_swigt__p_helics_iteration_result,
+  &_swigt__p_helics_log_levels,
+  &_swigt__p_helics_message,
+  &_swigt__p_helics_properties,
   &_swigt__p_int,
-  &_swigt__p_int64_t,
-  &_swigt__p_message_t,
+  &_swigt__p_int16_t,
+  &_swigt__p_int32_t,
   &_swigt__p_p_char,
   &_swigt__p_void,
 };
 
 static swig_cast_info _swigc__p_char[] = {  {&_swigt__p_char, 0, 0, 0},{0, 0, 0, 0}};
-static swig_cast_info _swigc__p_data_t[] = {  {&_swigt__p_data_t, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_double[] = {  {&_swigt__p_double, 0, 0, 0},{0, 0, 0, 0}};
-static swig_cast_info _swigc__p_federate_state[] = {  {&_swigt__p_federate_state, 0, 0, 0},{0, 0, 0, 0}};
-static swig_cast_info _swigc__p_helics_filter_type_t[] = {  {&_swigt__p_helics_filter_type_t, 0, 0, 0},{0, 0, 0, 0}};
+static swig_cast_info _swigc__p_helics_core_type[] = {  {&_swigt__p_helics_core_type, 0, 0, 0},{0, 0, 0, 0}};
+static swig_cast_info _swigc__p_helics_data_type[] = {  {&_swigt__p_helics_data_type, 0, 0, 0},{0, 0, 0, 0}};
+static swig_cast_info _swigc__p_helics_error[] = {  {&_swigt__p_helics_error, 0, 0, 0},{0, 0, 0, 0}};
+static swig_cast_info _swigc__p_helics_error_types[] = {  {&_swigt__p_helics_error_types, 0, 0, 0},{0, 0, 0, 0}};
+static swig_cast_info _swigc__p_helics_federate_flags[] = {  {&_swigt__p_helics_federate_flags, 0, 0, 0},{0, 0, 0, 0}};
+static swig_cast_info _swigc__p_helics_federate_state[] = {  {&_swigt__p_helics_federate_state, 0, 0, 0},{0, 0, 0, 0}};
+static swig_cast_info _swigc__p_helics_filter_type[] = {  {&_swigt__p_helics_filter_type, 0, 0, 0},{0, 0, 0, 0}};
+static swig_cast_info _swigc__p_helics_handle_options[] = {  {&_swigt__p_helics_handle_options, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_helics_iteration_request[] = {  {&_swigt__p_helics_iteration_request, 0, 0, 0},{0, 0, 0, 0}};
-static swig_cast_info _swigc__p_helics_iteration_status[] = {  {&_swigt__p_helics_iteration_status, 0, 0, 0},{0, 0, 0, 0}};
-static swig_cast_info _swigc__p_helics_status[] = {  {&_swigt__p_helics_status, 0, 0, 0},{0, 0, 0, 0}};
+static swig_cast_info _swigc__p_helics_iteration_result[] = {  {&_swigt__p_helics_iteration_result, 0, 0, 0},{0, 0, 0, 0}};
+static swig_cast_info _swigc__p_helics_log_levels[] = {  {&_swigt__p_helics_log_levels, 0, 0, 0},{0, 0, 0, 0}};
+static swig_cast_info _swigc__p_helics_message[] = {  {&_swigt__p_helics_message, 0, 0, 0},{0, 0, 0, 0}};
+static swig_cast_info _swigc__p_helics_properties[] = {  {&_swigt__p_helics_properties, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_int[] = {  {&_swigt__p_int, 0, 0, 0},{0, 0, 0, 0}};
-static swig_cast_info _swigc__p_int64_t[] = {  {&_swigt__p_int64_t, 0, 0, 0},{0, 0, 0, 0}};
-static swig_cast_info _swigc__p_message_t[] = {  {&_swigt__p_message_t, 0, 0, 0},{0, 0, 0, 0}};
+static swig_cast_info _swigc__p_int16_t[] = {  {&_swigt__p_int16_t, 0, 0, 0},{0, 0, 0, 0}};
+static swig_cast_info _swigc__p_int32_t[] = {  {&_swigt__p_int32_t, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_p_char[] = {  {&_swigt__p_p_char, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_void[] = {  {&_swigt__p_void, 0, 0, 0},{0, 0, 0, 0}};
 
 static swig_cast_info *swig_cast_initial[] = {
   _swigc__p_char,
-  _swigc__p_data_t,
   _swigc__p_double,
-  _swigc__p_federate_state,
-  _swigc__p_helics_filter_type_t,
+  _swigc__p_helics_core_type,
+  _swigc__p_helics_data_type,
+  _swigc__p_helics_error,
+  _swigc__p_helics_error_types,
+  _swigc__p_helics_federate_flags,
+  _swigc__p_helics_federate_state,
+  _swigc__p_helics_filter_type,
+  _swigc__p_helics_handle_options,
   _swigc__p_helics_iteration_request,
-  _swigc__p_helics_iteration_status,
-  _swigc__p_helics_status,
+  _swigc__p_helics_iteration_result,
+  _swigc__p_helics_log_levels,
+  _swigc__p_helics_message,
+  _swigc__p_helics_properties,
   _swigc__p_int,
-  _swigc__p_int64_t,
-  _swigc__p_message_t,
+  _swigc__p_int16_t,
+  _swigc__p_int32_t,
   _swigc__p_p_char,
   _swigc__p_void,
 };
@@ -10341,51 +15507,110 @@ DEFUN_DLD( SWIG_name, args, nargout, SWIG_name_usage ) {
 
 static bool SWIG_init_user(octave_swig_type* module_ns)
 {
+  SWIG_Octave_SetConstant(module_ns,"helics_core_type_default",SWIG_From_int(static_cast< int >(helics_core_type_default)));
+  SWIG_Octave_SetConstant(module_ns,"helics_core_type_zmq",SWIG_From_int(static_cast< int >(helics_core_type_zmq)));
+  SWIG_Octave_SetConstant(module_ns,"helics_core_type_mpi",SWIG_From_int(static_cast< int >(helics_core_type_mpi)));
+  SWIG_Octave_SetConstant(module_ns,"helics_core_type_test",SWIG_From_int(static_cast< int >(helics_core_type_test)));
+  SWIG_Octave_SetConstant(module_ns,"helics_core_type_interprocess",SWIG_From_int(static_cast< int >(helics_core_type_interprocess)));
+  SWIG_Octave_SetConstant(module_ns,"helics_core_type_ipc",SWIG_From_int(static_cast< int >(helics_core_type_ipc)));
+  SWIG_Octave_SetConstant(module_ns,"helics_core_type_tcp",SWIG_From_int(static_cast< int >(helics_core_type_tcp)));
+  SWIG_Octave_SetConstant(module_ns,"helics_core_type_udp",SWIG_From_int(static_cast< int >(helics_core_type_udp)));
+  SWIG_Octave_SetConstant(module_ns,"helics_core_type_zmq_test",SWIG_From_int(static_cast< int >(helics_core_type_zmq_test)));
+  SWIG_Octave_SetConstant(module_ns,"helics_core_type_nng",SWIG_From_int(static_cast< int >(helics_core_type_nng)));
+  SWIG_Octave_SetConstant(module_ns,"helics_core_type_tcp_ss",SWIG_From_int(static_cast< int >(helics_core_type_tcp_ss)));
+  SWIG_Octave_SetConstant(module_ns,"helics_core_type_http",SWIG_From_int(static_cast< int >(helics_core_type_http)));
+  SWIG_Octave_SetConstant(module_ns,"helics_data_type_string",SWIG_From_int(static_cast< int >(helics_data_type_string)));
+  SWIG_Octave_SetConstant(module_ns,"helics_data_type_double",SWIG_From_int(static_cast< int >(helics_data_type_double)));
+  SWIG_Octave_SetConstant(module_ns,"helics_data_type_int",SWIG_From_int(static_cast< int >(helics_data_type_int)));
+  SWIG_Octave_SetConstant(module_ns,"helics_data_type_complex",SWIG_From_int(static_cast< int >(helics_data_type_complex)));
+  SWIG_Octave_SetConstant(module_ns,"helics_data_type_vector",SWIG_From_int(static_cast< int >(helics_data_type_vector)));
+  SWIG_Octave_SetConstant(module_ns,"helics_data_type_complex_vector",SWIG_From_int(static_cast< int >(helics_data_type_complex_vector)));
+  SWIG_Octave_SetConstant(module_ns,"helics_data_type_named_point",SWIG_From_int(static_cast< int >(helics_data_type_named_point)));
+  SWIG_Octave_SetConstant(module_ns,"helics_data_type_boolean",SWIG_From_int(static_cast< int >(helics_data_type_boolean)));
+  SWIG_Octave_SetConstant(module_ns,"helics_data_type_time",SWIG_From_int(static_cast< int >(helics_data_type_time)));
+  SWIG_Octave_SetConstant(module_ns,"helics_data_type_raw",SWIG_From_int(static_cast< int >(helics_data_type_raw)));
+  SWIG_Octave_SetConstant(module_ns,"helics_data_type_any",SWIG_From_int(static_cast< int >(helics_data_type_any)));
+  SWIG_Octave_SetConstant(module_ns,"helics_flag_observer",SWIG_From_int(static_cast< int >(helics_flag_observer)));
+  SWIG_Octave_SetConstant(module_ns,"helics_flag_uninterruptible",SWIG_From_int(static_cast< int >(helics_flag_uninterruptible)));
+  SWIG_Octave_SetConstant(module_ns,"helics_flag_interruptible",SWIG_From_int(static_cast< int >(helics_flag_interruptible)));
+  SWIG_Octave_SetConstant(module_ns,"helics_flag_source_only",SWIG_From_int(static_cast< int >(helics_flag_source_only)));
+  SWIG_Octave_SetConstant(module_ns,"helics_flag_only_transmit_on_change",SWIG_From_int(static_cast< int >(helics_flag_only_transmit_on_change)));
+  SWIG_Octave_SetConstant(module_ns,"helics_flag_only_update_on_change",SWIG_From_int(static_cast< int >(helics_flag_only_update_on_change)));
+  SWIG_Octave_SetConstant(module_ns,"helics_flag_wait_for_current_time_update",SWIG_From_int(static_cast< int >(helics_flag_wait_for_current_time_update)));
+  SWIG_Octave_SetConstant(module_ns,"helics_flag_rollback",SWIG_From_int(static_cast< int >(helics_flag_rollback)));
+  SWIG_Octave_SetConstant(module_ns,"helics_flag_forward_compute",SWIG_From_int(static_cast< int >(helics_flag_forward_compute)));
+  SWIG_Octave_SetConstant(module_ns,"helics_flag_realtime",SWIG_From_int(static_cast< int >(helics_flag_realtime)));
+  SWIG_Octave_SetConstant(module_ns,"helics_flag_single_thread_federate",SWIG_From_int(static_cast< int >(helics_flag_single_thread_federate)));
+  SWIG_Octave_SetConstant(module_ns,"helics_flag_delay_init_entry",SWIG_From_int(static_cast< int >(helics_flag_delay_init_entry)));
+  SWIG_Octave_SetConstant(module_ns,"helics_flag_enable_init_entry",SWIG_From_int(static_cast< int >(helics_flag_enable_init_entry)));
+  SWIG_Octave_SetConstant(module_ns,"helics_flag_ignore_time_mismatch_warnings",SWIG_From_int(static_cast< int >(helics_flag_ignore_time_mismatch_warnings)));
+  SWIG_Octave_SetConstant(module_ns,"helics_log_level_no_print",SWIG_From_int(static_cast< int >(helics_log_level_no_print)));
+  SWIG_Octave_SetConstant(module_ns,"helics_log_level_error",SWIG_From_int(static_cast< int >(helics_log_level_error)));
+  SWIG_Octave_SetConstant(module_ns,"helics_log_level_warning",SWIG_From_int(static_cast< int >(helics_log_level_warning)));
+  SWIG_Octave_SetConstant(module_ns,"helics_log_level_summary",SWIG_From_int(static_cast< int >(helics_log_level_summary)));
+  SWIG_Octave_SetConstant(module_ns,"helics_log_level_connections",SWIG_From_int(static_cast< int >(helics_log_level_connections)));
+  SWIG_Octave_SetConstant(module_ns,"helics_log_level_interfaces",SWIG_From_int(static_cast< int >(helics_log_level_interfaces)));
+  SWIG_Octave_SetConstant(module_ns,"helics_log_level_timing",SWIG_From_int(static_cast< int >(helics_log_level_timing)));
+  SWIG_Octave_SetConstant(module_ns,"helics_log_level_data",SWIG_From_int(static_cast< int >(helics_log_level_data)));
+  SWIG_Octave_SetConstant(module_ns,"helics_log_level_trace",SWIG_From_int(static_cast< int >(helics_log_level_trace)));
   SWIG_Octave_SetConstant(module_ns,"helics_ok",SWIG_From_int(static_cast< int >(helics_ok)));
-  SWIG_Octave_SetConstant(module_ns,"helics_invalid_object",SWIG_From_int(static_cast< int >(helics_invalid_object)));
-  SWIG_Octave_SetConstant(module_ns,"helics_invalid_argument",SWIG_From_int(static_cast< int >(helics_invalid_argument)));
-  SWIG_Octave_SetConstant(module_ns,"helics_discard",SWIG_From_int(static_cast< int >(helics_discard)));
-  SWIG_Octave_SetConstant(module_ns,"helics_terminated",SWIG_From_int(static_cast< int >(helics_terminated)));
+  SWIG_Octave_SetConstant(module_ns,"helics_error_registration_failure",SWIG_From_int(static_cast< int >(helics_error_registration_failure)));
+  SWIG_Octave_SetConstant(module_ns,"helics_error_connection_failure",SWIG_From_int(static_cast< int >(helics_error_connection_failure)));
+  SWIG_Octave_SetConstant(module_ns,"helics_error_invalid_object",SWIG_From_int(static_cast< int >(helics_error_invalid_object)));
+  SWIG_Octave_SetConstant(module_ns,"helics_error_invalid_argument",SWIG_From_int(static_cast< int >(helics_error_invalid_argument)));
+  SWIG_Octave_SetConstant(module_ns,"helics_error_discard",SWIG_From_int(static_cast< int >(helics_error_discard)));
+  SWIG_Octave_SetConstant(module_ns,"helics_error_system_failure",SWIG_From_int(static_cast< int >(helics_error_system_failure)));
   SWIG_Octave_SetConstant(module_ns,"helics_warning",SWIG_From_int(static_cast< int >(helics_warning)));
-  SWIG_Octave_SetConstant(module_ns,"helics_invalid_state_transition",SWIG_From_int(static_cast< int >(helics_invalid_state_transition)));
-  SWIG_Octave_SetConstant(module_ns,"helics_invalid_function_call",SWIG_From_int(static_cast< int >(helics_invalid_function_call)));
-  SWIG_Octave_SetConstant(module_ns,"helics_error",SWIG_From_int(static_cast< int >(helics_error)));
-  SWIG_Octave_SetConstant(module_ns,"no_iteration",SWIG_From_int(static_cast< int >(no_iteration)));
-  SWIG_Octave_SetConstant(module_ns,"force_iteration",SWIG_From_int(static_cast< int >(force_iteration)));
-  SWIG_Octave_SetConstant(module_ns,"iterate_if_needed",SWIG_From_int(static_cast< int >(iterate_if_needed)));
-  SWIG_Octave_SetConstant(module_ns,"next_step",SWIG_From_int(static_cast< int >(next_step)));
-  SWIG_Octave_SetConstant(module_ns,"iteration_error",SWIG_From_int(static_cast< int >(iteration_error)));
-  SWIG_Octave_SetConstant(module_ns,"iteration_halted",SWIG_From_int(static_cast< int >(iteration_halted)));
-  SWIG_Octave_SetConstant(module_ns,"iterating",SWIG_From_int(static_cast< int >(iterating)));
-  SWIG_Octave_SetConstant(module_ns,"helics_startup_state",SWIG_From_int(static_cast< int >(helics_startup_state)));
-  SWIG_Octave_SetConstant(module_ns,"helics_initialization_state",SWIG_From_int(static_cast< int >(helics_initialization_state)));
-  SWIG_Octave_SetConstant(module_ns,"helics_execution_state",SWIG_From_int(static_cast< int >(helics_execution_state)));
-  SWIG_Octave_SetConstant(module_ns,"helics_finalize_state",SWIG_From_int(static_cast< int >(helics_finalize_state)));
-  SWIG_Octave_SetConstant(module_ns,"helics_error_state",SWIG_From_int(static_cast< int >(helics_error_state)));
-  SWIG_Octave_SetConstant(module_ns,"helics_pending_init_state",SWIG_From_int(static_cast< int >(helics_pending_init_state)));
-  SWIG_Octave_SetConstant(module_ns,"helics_pending_exec_state",SWIG_From_int(static_cast< int >(helics_pending_exec_state)));
-  SWIG_Octave_SetConstant(module_ns,"helics_pending_time_state",SWIG_From_int(static_cast< int >(helics_pending_time_state)));
-  SWIG_Octave_SetConstant(module_ns,"helics_pending_iterative_time_state",SWIG_From_int(static_cast< int >(helics_pending_iterative_time_state)));
-  SWIG_Octave_SetConstant(module_ns,"helics_custom_filter",SWIG_From_int(static_cast< int >(helics_custom_filter)));
-  SWIG_Octave_SetConstant(module_ns,"helics_delay_filter",SWIG_From_int(static_cast< int >(helics_delay_filter)));
-  SWIG_Octave_SetConstant(module_ns,"helics_randomDelay_filter",SWIG_From_int(static_cast< int >(helics_randomDelay_filter)));
-  SWIG_Octave_SetConstant(module_ns,"helics_randomDrop_filter",SWIG_From_int(static_cast< int >(helics_randomDrop_filter)));
-  SWIG_Octave_SetConstant(module_ns,"helics_reroute_filter",SWIG_From_int(static_cast< int >(helics_reroute_filter)));
-  SWIG_Octave_SetConstant(module_ns,"helics_clone_filter",SWIG_From_int(static_cast< int >(helics_clone_filter)));
-  SWIG_Octave_SetConstant(module_ns,"HELICS_CORE_TYPE_DEFAULT",SWIG_From_int(static_cast< int >(0)));
-  SWIG_Octave_SetConstant(module_ns,"HELICS_CORE_TYPE_ZMQ",SWIG_From_int(static_cast< int >(1)));
-  SWIG_Octave_SetConstant(module_ns,"HELICS_CORE_TYPE_MPI",SWIG_From_int(static_cast< int >(2)));
-  SWIG_Octave_SetConstant(module_ns,"HELICS_CORE_TYPE_TEST",SWIG_From_int(static_cast< int >(3)));
-  SWIG_Octave_SetConstant(module_ns,"HELICS_CORE_TYPE_INTERPROCESS",SWIG_From_int(static_cast< int >(4)));
-  SWIG_Octave_SetConstant(module_ns,"HELICS_CORE_TYPE_IPC",SWIG_From_int(static_cast< int >(5)));
-  SWIG_Octave_SetConstant(module_ns,"HELICS_CORE_TYPE_TCP",SWIG_From_int(static_cast< int >(6)));
-  SWIG_Octave_SetConstant(module_ns,"HELICS_CORE_TYPE_UDP",SWIG_From_int(static_cast< int >(7)));
-  SWIG_Octave_SetConstant(module_ns,"HELICS_DATA_TYPE_STRING",SWIG_From_int(static_cast< int >(0)));
-  SWIG_Octave_SetConstant(module_ns,"HELICS_DATA_TYPE_DOUBLE",SWIG_From_int(static_cast< int >(1)));
-  SWIG_Octave_SetConstant(module_ns,"HELICS_DATA_TYPE_INT",SWIG_From_int(static_cast< int >(2)));
-  SWIG_Octave_SetConstant(module_ns,"HELICS_DATA_TYPE_COMPLEX",SWIG_From_int(static_cast< int >(3)));
-  SWIG_Octave_SetConstant(module_ns,"HELICS_DATA_TYPE_VECTOR",SWIG_From_int(static_cast< int >(4)));
-  SWIG_Octave_SetConstant(module_ns,"HELICS_DATA_TYPE_RAW",SWIG_From_int(static_cast< int >(25)));
+  SWIG_Octave_SetConstant(module_ns,"helics_error_invalid_state_transition",SWIG_From_int(static_cast< int >(helics_error_invalid_state_transition)));
+  SWIG_Octave_SetConstant(module_ns,"helics_error_invalid_function_call",SWIG_From_int(static_cast< int >(helics_error_invalid_function_call)));
+  SWIG_Octave_SetConstant(module_ns,"helics_error_execution_failure",SWIG_From_int(static_cast< int >(helics_error_execution_failure)));
+  SWIG_Octave_SetConstant(module_ns,"helics_error_insufficient_space",SWIG_From_int(static_cast< int >(helics_error_insufficient_space)));
+  SWIG_Octave_SetConstant(module_ns,"helics_error_other",SWIG_From_int(static_cast< int >(helics_error_other)));
+  SWIG_Octave_SetConstant(module_ns,"helics_error_external_type",SWIG_From_int(static_cast< int >(helics_error_external_type)));
+  SWIG_Octave_SetConstant(module_ns,"helics_property_time_delta",SWIG_From_int(static_cast< int >(helics_property_time_delta)));
+  SWIG_Octave_SetConstant(module_ns,"helics_property_time_period",SWIG_From_int(static_cast< int >(helics_property_time_period)));
+  SWIG_Octave_SetConstant(module_ns,"helics_property_time_offset",SWIG_From_int(static_cast< int >(helics_property_time_offset)));
+  SWIG_Octave_SetConstant(module_ns,"helics_property_time_rt_lag",SWIG_From_int(static_cast< int >(helics_property_time_rt_lag)));
+  SWIG_Octave_SetConstant(module_ns,"helics_property_time_rt_lead",SWIG_From_int(static_cast< int >(helics_property_time_rt_lead)));
+  SWIG_Octave_SetConstant(module_ns,"helics_property_time_rt_tolerance",SWIG_From_int(static_cast< int >(helics_property_time_rt_tolerance)));
+  SWIG_Octave_SetConstant(module_ns,"helics_property_time_input_delay",SWIG_From_int(static_cast< int >(helics_property_time_input_delay)));
+  SWIG_Octave_SetConstant(module_ns,"helics_property_time_output_delay",SWIG_From_int(static_cast< int >(helics_property_time_output_delay)));
+  SWIG_Octave_SetConstant(module_ns,"helics_property_int_max_iterations",SWIG_From_int(static_cast< int >(helics_property_int_max_iterations)));
+  SWIG_Octave_SetConstant(module_ns,"helics_property_int_log_level",SWIG_From_int(static_cast< int >(helics_property_int_log_level)));
+  SWIG_Octave_SetConstant(module_ns,"helics_handle_option_connection_required",SWIG_From_int(static_cast< int >(helics_handle_option_connection_required)));
+  SWIG_Octave_SetConstant(module_ns,"helics_handle_option_connection_optional",SWIG_From_int(static_cast< int >(helics_handle_option_connection_optional)));
+  SWIG_Octave_SetConstant(module_ns,"helics_handle_option_single_connection_only",SWIG_From_int(static_cast< int >(helics_handle_option_single_connection_only)));
+  SWIG_Octave_SetConstant(module_ns,"helics_handle_option_multiple_connections_allowed",SWIG_From_int(static_cast< int >(helics_handle_option_multiple_connections_allowed)));
+  SWIG_Octave_SetConstant(module_ns,"helics_handle_option_buffer_data",SWIG_From_int(static_cast< int >(helics_handle_option_buffer_data)));
+  SWIG_Octave_SetConstant(module_ns,"helics_handle_option_strict_type_checking",SWIG_From_int(static_cast< int >(helics_handle_option_strict_type_checking)));
+  SWIG_Octave_SetConstant(module_ns,"helics_handle_option_ignore_unit_mismatch",SWIG_From_int(static_cast< int >(helics_handle_option_ignore_unit_mismatch)));
+  SWIG_Octave_SetConstant(module_ns,"helics_handle_option_only_transmit_on_change",SWIG_From_int(static_cast< int >(helics_handle_option_only_transmit_on_change)));
+  SWIG_Octave_SetConstant(module_ns,"helics_handle_option_only_update_on_change",SWIG_From_int(static_cast< int >(helics_handle_option_only_update_on_change)));
+  SWIG_Octave_SetConstant(module_ns,"helics_handle_option_ignore_interrupts",SWIG_From_int(static_cast< int >(helics_handle_option_ignore_interrupts)));
+  SWIG_Octave_SetConstant(module_ns,"helics_filter_type_custom",SWIG_From_int(static_cast< int >(helics_filter_type_custom)));
+  SWIG_Octave_SetConstant(module_ns,"helics_filter_type_delay",SWIG_From_int(static_cast< int >(helics_filter_type_delay)));
+  SWIG_Octave_SetConstant(module_ns,"helics_filter_type_random_delay",SWIG_From_int(static_cast< int >(helics_filter_type_random_delay)));
+  SWIG_Octave_SetConstant(module_ns,"helics_filter_type_random_drop",SWIG_From_int(static_cast< int >(helics_filter_type_random_drop)));
+  SWIG_Octave_SetConstant(module_ns,"helics_filter_type_reroute",SWIG_From_int(static_cast< int >(helics_filter_type_reroute)));
+  SWIG_Octave_SetConstant(module_ns,"helics_filter_type_clone",SWIG_From_int(static_cast< int >(helics_filter_type_clone)));
+  SWIG_Octave_SetConstant(module_ns,"helics_filter_type_firewall",SWIG_From_int(static_cast< int >(helics_filter_type_firewall)));
+  SWIG_Octave_SetConstant(module_ns,"helics_iteration_request_no_iteration",SWIG_From_int(static_cast< int >(helics_iteration_request_no_iteration)));
+  SWIG_Octave_SetConstant(module_ns,"helics_iteration_request_force_iteration",SWIG_From_int(static_cast< int >(helics_iteration_request_force_iteration)));
+  SWIG_Octave_SetConstant(module_ns,"helics_iteration_request_iterate_if_needed",SWIG_From_int(static_cast< int >(helics_iteration_request_iterate_if_needed)));
+  SWIG_Octave_SetConstant(module_ns,"helics_iteration_result_next_step",SWIG_From_int(static_cast< int >(helics_iteration_result_next_step)));
+  SWIG_Octave_SetConstant(module_ns,"helics_iteration_result_error",SWIG_From_int(static_cast< int >(helics_iteration_result_error)));
+  SWIG_Octave_SetConstant(module_ns,"helics_iteration_result_halted",SWIG_From_int(static_cast< int >(helics_iteration_result_halted)));
+  SWIG_Octave_SetConstant(module_ns,"helics_iteration_result_iterating",SWIG_From_int(static_cast< int >(helics_iteration_result_iterating)));
+  SWIG_Octave_SetConstant(module_ns,"helics_state_startup",SWIG_From_int(static_cast< int >(helics_state_startup)));
+  SWIG_Octave_SetConstant(module_ns,"helics_state_initialization",SWIG_From_int(static_cast< int >(helics_state_initialization)));
+  SWIG_Octave_SetConstant(module_ns,"helics_state_execution",SWIG_From_int(static_cast< int >(helics_state_execution)));
+  SWIG_Octave_SetConstant(module_ns,"helics_state_finalize",SWIG_From_int(static_cast< int >(helics_state_finalize)));
+  SWIG_Octave_SetConstant(module_ns,"helics_state_error",SWIG_From_int(static_cast< int >(helics_state_error)));
+  SWIG_Octave_SetConstant(module_ns,"helics_state_pending_init",SWIG_From_int(static_cast< int >(helics_state_pending_init)));
+  SWIG_Octave_SetConstant(module_ns,"helics_state_pending_exec",SWIG_From_int(static_cast< int >(helics_state_pending_exec)));
+  SWIG_Octave_SetConstant(module_ns,"helics_state_pending_time",SWIG_From_int(static_cast< int >(helics_state_pending_time)));
+  SWIG_Octave_SetConstant(module_ns,"helics_state_pending_iterative_time",SWIG_From_int(static_cast< int >(helics_state_pending_iterative_time)));
+  SWIG_Octave_SetConstant(module_ns,"helics_state_pending_finalize",SWIG_From_int(static_cast< int >(helics_state_pending_finalize)));
   return true;
 }
 
