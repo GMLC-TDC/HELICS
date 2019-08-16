@@ -14,7 +14,8 @@ aliases:
     name: run_octave_tests
     command: |
        cd ${OCTAVETEST}
-       octave -W -V -f runTestsCIRCLECI.m
+       # this return the write error code in RESULT
+       octave -W -V --eval "source('runTestsCIRCLECI.m');"
        RESULT=$?
        echo "*** Octave test result: "${RESULT}
        exit $RESULT
