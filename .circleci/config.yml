@@ -24,7 +24,7 @@ jobs:
     docker:
       - image: helics/octave:latest
     environment:
-      OCTAVETEST: "/root/project/HELICS/tests/octave"
+      OCTAVETEST: "/root/project/tests/octave"
     steps:
       - checkout
       - setup_remote_docker: 
