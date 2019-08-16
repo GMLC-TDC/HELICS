@@ -19,6 +19,7 @@ from urllib.parse import urlparse
 from subprocess import Popen, PIPE
 from git import Repo
 from argparse import RawTextHelpFormatter
+import tempfile
 
 ####
 # Run a shell command
@@ -201,40 +202,28 @@ def main():
     # Archive repository and submodules
     #
     os.chdir(TOPATH)  # change directory to clone repository
-    currentdir = os.getcwd()
-    print("> archiving main repository")
-    cmd = "git archive --verbose --prefix \"repo/\" --format \"tar\" --output \"" + currentdir + "/" + PREFIX +\
-        "-output.tar\" \"master\""
-    stdoutdata, stderrdata = runcmd(cmd)
-    print("> checkout tag " + HELICSTAG.name)
-    cmd = "git checkout " + HELICSTAG.name
-    stdoutdata, stderrdata = runcmd(cmd)
-    print("> checking out all submodules")
-    cmd = "git submodule update --init"
-    stdoutdata, stderrdata = runcmd(cmd)
-    print("> archiving all submodules")
-    cmd = 'git submodule foreach --recursive \'git archive --verbose --prefix=repo/$path/ --format tar master --output ' +\
-        currentdir + '/repo-output-sub-$sha1.tar\''
+    print(os.getcwd())
+    cmd = "scripts/git-archive.sh " + "-d . " + " -p " + PREFIX + " -n " + HELICSTAG.name
+    print(cmd)
     stdoutdata, stderrdata = runcmd(cmd)
 
     # Delete pre-existing work
     #
-    if os.path.exists("/tmp/repo"):
-        shutil.rmtree("/tmp/repo")
+    TMPDIR = tempfile.mkdtemp()
 
     print("> creating final file.")
     # Extract all archive tar into /tmp/repo
     filelist = glob.glob("*tar")
     for file in filelist:
         tar = tarfile.open(file)
-        tar.extractall(path="/tmp")
+        tar.extractall(path=TMPDIR)
         tar.close()
 
     # Create final File  "ex: HELICS-v2.1.1.tar.gz"
     NAME = PREFIX + "-" + HELICSTAG.name
     FILENAME = NAME + ".tar.gz"
     tar = tarfile.open(name=FILENAME, mode="w:gz")
-    tar.add("/tmp/repo", arcname=NAME)
+    tar.add(TMPDIR+"/repo", arcname=NAME)
     tar.close()
 
     # If a github token has been passed try to upload on github.
@@ -247,6 +236,16 @@ def main():
 
     if CLONE:
         shutil.move(FILENAME, "..")
+
+    print(TMPDIR)
+    fileList = glob.glob('*.tar')
+    # Iterate over the list of filepaths & remove each file.
+    for filePath in fileList:
+        try:
+            os.remove(filePath)
+        except:
+            print("Error while deleting file : ", filePath)
+
     print("> Done.")
 
 
