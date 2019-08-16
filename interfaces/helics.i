@@ -1,4 +1,3 @@
-%include output.i
 %include "typemaps.i"
 #define HELICS_EXPORT
 #define HELICS_DEPRECATED
