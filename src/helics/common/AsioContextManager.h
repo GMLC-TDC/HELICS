@@ -29,7 +29,11 @@ SPDX-License-Identifier: BSD-3-Clause
 
 // The choice for noexcept isn't set correctly in asio::io_context (including asio.hpp instead didn't help)
 // With Boost 1.58 this resulted in a compile error, apparently from the BOOST_NOEXCEPT define being empty
-#define ASIO_ERROR_CATEGORY_NOEXCEPT noexcept(true)
+#ifdef ASIO_ERROR_CATEGORY_NOEXCEPT
+#undef ASIO_ERROR_CATEGORY_NOEXCEPT
+#endif
+
+#define ASIO_ERROR_CATEGORY_NOEXCEPT noexcept (true)
 #include <asio/io_context.hpp>
 #undef ASIO_ERROR_CATEGORY_NOEXCEPT
 
@@ -37,6 +41,12 @@ SPDX-License-Identifier: BSD-3-Clause
 class AsioContextManager : public std::enable_shared_from_this<AsioContextManager>
 {
   private:
+    enum class loop_mode : int
+    {
+        stopped = 0,
+        starting = 1,
+        running = 2
+    };
     static std::map<std::string, std::shared_ptr<AsioContextManager>>
       contexts;  //!< container for pointers to all the available contexts
     std::atomic<int> runCounter{0};  //!< counter for the number of times the runContextLoop has been called
@@ -44,7 +54,7 @@ class AsioContextManager : public std::enable_shared_from_this<AsioContextManage
     std::unique_ptr<asio::io_context> ictx;  //!< pointer to the actual context
     std::unique_ptr<asio::io_context::work> nullwork;  //!< pointer to an object used to keep a context running
     bool leakOnDelete = false;  //!< this is done to prevent some warning messages for use in DLL's
-    std::atomic<bool> running{false};
+    std::atomic<loop_mode> running{loop_mode::stopped};  //!< flag indicating the loop is running
     std::mutex runningLoopLock;  //!< lock protecting the nullwork object and the return future
     std::atomic<bool> terminateLoop{false};  //!< flag indicating that the loop should terminate
     std::future<void> loopRet;
@@ -129,6 +139,8 @@ class AsioContextManager : public std::enable_shared_from_this<AsioContextManage
     manager is closed or the haltContextLoop function is called and there is no more work
     */
     LoopHandle startContextLoop ();
+    /** check if the contextLoopo is running*/
+    bool isRunning () const { return (running.load () != loop_mode::stopped); }
 
   private:
     /** halt the context loop thread if the counter==0

@@ -25,6 +25,7 @@ class FederateInfo : public CoreFederateInfo
     std::string coreName;  //!< the name of the core
     std::string coreInitString;  //!< an initialization string for the core API object
     std::string broker;  //!< connection information for the broker
+	std::string key;  //!< key for the broker
     std::string
       localport;  //!< string for defining the local port to use usually a number but other strings are possible
 

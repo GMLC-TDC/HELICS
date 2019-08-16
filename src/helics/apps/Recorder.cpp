@@ -9,15 +9,15 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include "../application_api/Filters.hpp"
 #include "../application_api/queryFunctions.hpp"
-#include "../common/stringOps.h"
+#include "gmlc/utilities/stringOps.h"
 
 #include "../common/JsonProcessingFunctions.hpp"
-#include "../common/base64.h"
 #include "../common/fmt_format.h"
 #include "../common/fmt_ostream.h"
 #include "../common/loggerCore.hpp"
 #include "../core/helicsCLI11.hpp"
 #include "PrecHelper.hpp"
+#include "gmlc/utilities/base64.h"
 #include <algorithm>
 #include <fstream>
 #include <iostream>
@@ -166,7 +166,7 @@ void Recorder::loadJsonFile (const std::string &jsonString)
 
 void Recorder::loadTextFile (const std::string &textFile)
 {
-    using namespace stringOps;
+    using namespace gmlc::utilities::stringOps;
 
     std::ifstream infile (textFile);
     std::string str;
@@ -506,8 +506,8 @@ void Recorder::captureForCurrentTime (Time currentTime, int iteration)
 std::string Recorder::encode (const std::string &str2encode)
 {
     return std::string ("b64[") +
-           utilities::base64_encode (reinterpret_cast<const unsigned char *> (str2encode.c_str ()),
-                                     static_cast<int> (str2encode.size ())) +
+           gmlc::utilities::base64_encode (reinterpret_cast<const unsigned char *> (str2encode.c_str ()),
+                                           static_cast<int> (str2encode.size ())) +
            ']';
 }
 
@@ -662,6 +662,8 @@ void Recorder::saveFile (const std::string &filename)
 
 std::shared_ptr<helicsCLI11App> Recorder::buildArgParserApp ()
 {
+    using namespace gmlc::utilities;
+
     auto app = std::make_shared<helicsCLI11App> ("Command line options for the Recorder App");
     app->add_flag ("--allow_iteration", allow_iteration, "allow iteration on values")->ignore_underscore ();
     app->add_option ("--marker", nextPrintTimeStep,

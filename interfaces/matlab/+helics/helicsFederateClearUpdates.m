@@ -1,3 +1,3 @@
 function varargout = helicsFederateClearUpdates(varargin)
-  [varargout{1:nargout}] = helicsMEX(147, varargin{:});
+  [varargout{1:nargout}] = helicsMEX(149, varargin{:});
 end

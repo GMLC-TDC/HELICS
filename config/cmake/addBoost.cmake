@@ -15,11 +15,11 @@ show_variable(
     "${BOOST_INSTALL_PATH}"
 )
 
-if (MSVC)
+if(WIN32 AND NOT MSYS)
 option(USE_BOOST_STATIC_LIBS "Build using boost static Libraries" ON)
-else(MSVC)
+else()
 option(USE_BOOST_STATIC_LIBS "Build using boost static Libraries" OFF)
-endif(MSVC)
+endif()
 
 mark_as_advanced(USE_BOOST_STATIC_LIBS)
 
@@ -28,7 +28,7 @@ if(USE_BOOST_STATIC_LIBS)
     set(BOOST_STATIC ON)
 endif()
 
-if(MSVC)
+if(WIN32 AND NOT UNIX_LIKE)
 
     set(
         boost_versions
@@ -81,7 +81,7 @@ if(MSVC)
     if(BOOST_TEST_PATH)
         set(BOOST_ROOT ${BOOST_TEST_PATH})
     endif(BOOST_TEST_PATH)
-else(MSVC)
+else()
     if(NOT BOOST_ROOT)
         if(BOOST_INSTALL_PATH)
             set(BOOST_ROOT "${BOOST_INSTALL_PATH}")
@@ -91,13 +91,13 @@ else(MSVC)
             set(BOOST_ROOT "$ENV{BOOST_ROOT}")
         endif()
     endif()
-endif(MSVC)
+endif()
 
 hide_variable(BOOST_TEST_PATH)
 
 if(NOT BOOST_REQUIRED_LIBRARIES)
     set(BOOST_REQUIRED_LIBRARIES)
-    if(BUILD_TESTING AND BUILD_HELICS_BOOST_TESTS)
+    if(BUILD_TESTING AND BUILD_HELICS_TESTS AND BUILD_HELICS_BOOST_TESTS)
         message(STATUS "adding unit testing")
         list(APPEND BOOST_REQUIRED_LIBRARIES unit_test_framework)
     endif()
@@ -162,11 +162,19 @@ endforeach(loop_var)
 #
 
 if(${Boost_USE_STATIC_LIBS})
-    add_library(Boostlibs::core STATIC IMPORTED)
-    add_library(Boostlibs::test STATIC IMPORTED)
+	if (NOT TARGET Boostlibs::core)
+		add_library(Boostlibs::core STATIC IMPORTED)
+	endif()
+	if (NOT TARGET Boostlibs::test)
+		add_library(Boostlibs::test STATIC IMPORTED)
+	endif()
 else()
-    add_library(Boostlibs::core UNKNOWN IMPORTED)
-    add_library(Boostlibs::test UNKNOWN IMPORTED)
+	if (NOT TARGET Boostlibs::core)
+		add_library(Boostlibs::core UNKNOWN IMPORTED)
+	endif()
+	if (NOT TARGET Boostlibs::test)
+		add_library(Boostlibs::test UNKNOWN IMPORTED)
+	endif()
     # if(MINGW) set_property(TARGET Boostlibs::core PROPERTY
     # INTERFACE_COMPILE_DEFINTIONS BOOST_USE_WINDOWS_H) endif()
 endif()

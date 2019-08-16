@@ -39,6 +39,8 @@ extern "C"
     typedef void *helics_federate_info;
     /** opaque object representing a query*/
     typedef void *helics_query;
+    /** opaque object representing a message*/
+    typedef void *helics_message_object;
 
     /** time definition used in the C interface to helics*/
     typedef double helics_time;
@@ -98,6 +100,7 @@ extern "C"
 
     /**
      *  Message_t mapped to a c compatible structure
+     * @details this will be deprecated in HELICS 2.3 and removed in HELICS 3.0
      */
     typedef struct helics_message
     {

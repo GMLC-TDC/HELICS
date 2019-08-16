@@ -50,6 +50,14 @@ class InvalidParameter : public HelicsException
         : HelicsException (std::move (message)){};
 };
 
+/** exception when a requested conversion is unable to be performed*/
+class InvalidConversion : public HelicsException
+{
+  public:
+    explicit InvalidConversion (std::string message = "unable to perform the requested conversion")
+        : HelicsException (std::move (message)){};
+};
+
 /** exception thrown when a function call was made at an inappropriate time*/
 class InvalidFunctionCall : public HelicsException
 {

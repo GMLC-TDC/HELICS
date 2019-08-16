@@ -286,6 +286,7 @@ enum class action_t : int32_t
 #define NEW_ROUTE 233
 #define REMOVE_ROUTE 244
 #define CONNECTION_INFORMATION 299
+#define NEW_BROKER_INFORMATION 333
 #define DISCONNECT 2523
 #define DISCONNECT_ERROR 2623
 
@@ -309,6 +310,17 @@ enum class action_t : int32_t
 @return a pointer to string with the name
 */
 const char *actionMessageType (action_message_def::action_t action);
+
+enum cmd_error_codes : int
+{
+    connection_error_code=-2,
+    lost_server_connection_code=-5,
+    already_init_error_code=5,
+   duplicate_federate_name_error_code=6,
+    duplicate_broker_name_error_code=7,
+    mismatch_broker_key_error_code=9,
+};
+
 /** return a string associated with a particular error code
 @param[in,out] errorcode The error to get the string for
 @return a pointer to string with the name

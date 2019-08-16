@@ -350,10 +350,18 @@ extern "C"
     /** set the name or connection information for a broker
     @details this is only used if the core is automatically created, the broker information will be transferred to the core for connection
     @param fi the federate info object to alter
-    @param broker a string which defined the connection information for a broker either a name or an address
+    @param broker a string which defines the connection information for a broker either a name or an address
    @param[in,out] err an error object that will contain an error code and string if any error occurred during the execution of the function
     */
     HELICS_EXPORT void helicsFederateInfoSetBroker (helics_federate_info fi, const char *broker, helics_error *err);
+
+    /** set the key for a broker connection
+    @details this is only used if the core is automatically created, the broker information will be transferred to the core for connection
+    @param fi the federate info object to alter
+    @param brokerkey a string containing a key for the broker to connect
+    @param[in,out] err an error object that will contain an error code and string if any error occurred during the execution of the function
+    */
+    HELICS_EXPORT void helicsFederateInfoSetBrokerKey (helics_federate_info fi, const char *brokerkey, helics_error *err);
 
     /** set the port to use for the broker
     @details this is only used if the core is automatically created, the broker information will be transferred to the core for connection
@@ -546,6 +554,14 @@ extern "C"
     @return the time granted to the federate, will return helics_time_maxtime if the simulation has terminated
     invalid*/
     HELICS_EXPORT helics_time helicsFederateRequestTime (helics_federate fed, helics_time requestTime, helics_error *err);
+
+    /** request the next time for federate execution
+    @param fed the federate to make the request of
+    @param requestTime the next requested time
+    @param[in,out] err an error object that will contain an error code and string if any error occurred during the execution of the function
+    @return the time granted to the federate, will return helics_time_maxtime if the simulation has terminated
+    invalid*/
+    HELICS_EXPORT helics_time helicsFederateRequestTimeAdvance (helics_federate fed, helics_time timeDelta, helics_error *err);
 
     /** request the next time step for federate execution
     @details feds should have setup the period or minDelta for this to work well but it will request the next time step which is the current

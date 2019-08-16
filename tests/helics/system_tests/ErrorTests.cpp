@@ -60,6 +60,64 @@ TEST_F (error_tests, already_init_broker)
     broker->disconnect ();
 }
 
+TEST_F (error_tests, mismatch_broker_key)
+{
+    auto broker = AddBroker ("test", 1);
+
+    helics::FederateInfo fi (helics::core_type::TEST);
+    fi.coreInitString = std::string ("--timeout=1s --key=tkey --broker=") + broker->getIdentifier ();
+    EXPECT_THROW (helics::ValueFederate fed3 ("fed222", fi), helics::RegistrationFailure);
+    broker->disconnect ();
+    auto core = helics::CoreFactory::findJoinableCoreOfType (helics::core_type::TEST);
+    if (core)
+    {
+        core->disconnect ();
+    }
+    helics::cleanupHelicsLibrary ();
+}
+
+TEST_F (error_tests, mismatch_broker_key2)
+{
+    auto broker = AddBroker ("test", "-f 1 --key=tkey2");
+
+    helics::FederateInfo fi (helics::core_type::TEST);
+    fi.coreInitString = std::string ("--timeout=1s --key=tkey --broker=") + broker->getIdentifier ();
+    EXPECT_THROW (helics::ValueFederate fed3 ("fed222", fi), helics::RegistrationFailure);
+    broker->disconnect ();
+    auto core = helics::CoreFactory::findJoinableCoreOfType (helics::core_type::TEST);
+    if (core)
+    {
+        core->disconnect ();
+    }
+    helics::cleanupHelicsLibrary ();
+}
+
+TEST_F (error_tests, mismatch_broker_key_success)
+{
+    auto broker = AddBroker ("test", "--key=tkey");
+
+    helics::FederateInfo fi (helics::core_type::TEST);
+    fi.coreInitString = std::string ("--timeout=1s --key=tkey --broker=") + broker->getIdentifier ();
+    helics::ValueFederate fed3 ("fed2b", fi);
+    fed3.enterExecutingMode ();
+    fed3.finalize ();
+    broker->waitForDisconnect ();
+    helics::cleanupHelicsLibrary ();
+}
+
+TEST_F (error_tests, mismatch_broker_key_success_universal_key)
+{
+    auto broker = AddBroker ("test", "--key=**");
+
+    helics::FederateInfo fi (helics::core_type::TEST);
+    fi.coreInitString = std::string ("--timeout=1s --key=tkey --broker=") + broker->getIdentifier ();
+    helics::ValueFederate fed3 ("fed2b", fi);
+    fed3.enterExecutingMode ();
+    fed3.finalize ();
+    broker->waitForDisconnect ();
+    helics::cleanupHelicsLibrary ();
+}
+
 TEST_F (error_tests, already_init_core)
 {
     auto broker = AddBroker ("test", 1);
@@ -267,6 +325,32 @@ TEST_F (error_tests, missing_required_pub_with_default)
     // a global connection failure
     EXPECT_THROW (fed1->finalize (), helics::ConnectionFailure);
     fed2->finalize ();
+    broker->disconnect ();
+}
+
+TEST_F (error_tests, mismatched_units)
+{
+    auto broker = AddBroker ("test", 2);
+
+    AddFederates<helics::ValueFederate> ("test", 3, broker, 1.0, "fed");
+
+    auto fed1 = GetFederateAs<helics::ValueFederate> (0);
+    auto fed2 = GetFederateAs<helics::ValueFederate> (1);
+    auto fed3 = GetFederateAs<helics::ValueFederate> (2);
+
+    fed1->registerGlobalPublication ("t1", "double", "V");
+    fed2->registerSubscription ("t1", "m");
+    auto &sub = fed3->registerSubscription ("t1", "m");
+    sub.setOption (helics::defs::options::ignore_unit_mismatch);
+    fed1->enterExecutingModeAsync ();
+    fed2->enterExecutingModeAsync ();
+    EXPECT_NO_THROW (fed3->enterExecutingMode ());
+    fed1->enterExecutingModeComplete ();
+    EXPECT_THROW (fed2->enterExecutingModeComplete (), helics::ConnectionFailure);
+
+    fed1->finalize ();
+    fed2->finalize ();
+    fed3->finalize ();
     broker->disconnect ();
 }
 

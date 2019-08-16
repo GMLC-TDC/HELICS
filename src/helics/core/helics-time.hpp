@@ -6,7 +6,7 @@ SPDX-License-Identifier: BSD-3-Clause
 */
 #pragma once
 
-#include "../common/timeRepresentation.hpp"
+#include "../utilities/timeRepresentation.hpp"
 #include "core-types.hpp"
 #include "helics/helics-config.h"
 #include <cstdint>

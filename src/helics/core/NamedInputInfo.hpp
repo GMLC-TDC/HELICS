@@ -49,6 +49,7 @@ class NamedInputInfo
     const std::string key;  //!< the identifier for the input
     const std::string type;  //! the nominal type of data for the input
     std::string inputType;  //!< the type of data that its first matching input uses
+    std::string inputUnits;  //!< the units of the data that its first matching input uses
     const std::string units;  //!< the units of the controlInput
     bool required = false;  //!< flag indicating that the subscription requires a matching publication
     bool optional = false;  //!< flag indicating that any targets are optional
@@ -57,6 +58,7 @@ class NamedInputInfo
     bool not_interruptible = false;  //!< indicator that this handle should not be used for interrupting
     bool strict_type_matching = false;  //!< indicator that the handle need to have strict type matching
     bool single_source = false;  //!< allow only a single source to connect
+    bool ignore_unit_mismatch = false;  //!< ignore unit mismatches
     std::vector<dataRecord> current_data;  //!< the most recent published data
     std::vector<global_handle> input_sources;  //!< the sources of the input signals
     std::vector<Time> deactivated;
@@ -107,4 +109,6 @@ class NamedInputInfo
 };
 
 bool checkTypeMatch (const std::string &type1, const std::string &type2, bool strict_match);
+
+bool checkUnitMatch (const std::string &unit1, const std::string &unit2, bool strict_match);
 }  // namespace helics

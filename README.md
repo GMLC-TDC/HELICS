@@ -49,7 +49,7 @@ Welcome to the repository for the Hierarchical Engine for Large-scale Infrastruc
 
 ### Windows
 
-Each [release](https://github.com/GMLC-TDC/HELICS/releases/latest) generally comes with a Windows installer and a zip file.  The current version is the release with Visual Studio 2017 x64 and includes the binaries for matlab, python and Java.  For building with Debug support it is generally recommended to build from Source or use HELICS as a subproject.  We hope to automate this in the future to be able to automatically generate other installers with different visual studio versions
+Each [release](https://github.com/GMLC-TDC/HELICS/releases/latest) generally comes with a Windows installer and a zip file.  The current version is the release with Visual Studio 2017 x64 and includes the binaries for Matlab, python and Java.  For building with Debug support it is generally recommended to build from Source or use HELICS as a subproject.  We hope to automate this in the future to be able to automatically generate other installers with different visual studio versions
 
 ### Conda
 
@@ -60,7 +60,7 @@ Some support to Conda is provided see [conda install](https://helics.readthedocs
 On MacOS there is a [brew package](https://helics.readthedocs.io/en/latest/installation/package_manager.html#install-using-brew-macos) for HELICS supported in a separate [repository](https://github.com/GMLC-TDC/homebrew-helics).  
 
 
-## Build From Source Instructions
+## Build from Source Instructions
 
 [Windows](https://helics.readthedocs.io/en/latest/installation/windows.html)
 

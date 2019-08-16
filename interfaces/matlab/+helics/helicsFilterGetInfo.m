@@ -1,3 +1,3 @@
 function varargout = helicsFilterGetInfo(varargin)
-  [varargout{1:nargout}] = helicsMEX(246, varargin{:});
+  [varargout{1:nargout}] = helicsMEX(279, varargin{:});
 end

@@ -15,8 +15,8 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <iostream>
 #include <set>
 
-#include "../common/stringOps.h"
 #include "../core/helicsCLI11.hpp"
+#include "gmlc/utilities/stringOps.h"
 
 namespace helics
 {
@@ -60,6 +60,7 @@ static const std::map<std::string, int> propStringsTranslations{
   {"ignore_time_mismatch", helics_flag_ignore_time_mismatch_warnings},
   {"delayed_update", helics_flag_wait_for_current_time_update},
   {"strict_input_type_checking", helics_handle_option_strict_type_checking},
+  {"ignore_unit_mismatch", helics_handle_option_ignore_unit_mismatch},
   {"buffer_data", helics_handle_option_buffer_data},
   {"required", helics_handle_option_connection_required},
   {"optional", helics_handle_option_connection_optional},
@@ -84,6 +85,7 @@ static const std::set<std::string> validFlagOptions{"interruptible",
                                                     "delayed_update",
                                                     "wait_for_current_time",
                                                     "strict_input_type_checking",
+                                                    "ignore_unit_mismatch",
                                                     "buffer_data",
                                                     "required",
                                                     "optional"};
@@ -117,6 +119,8 @@ static const std::map<std::string, int> optionStringsTranslations{
   {"onlytransmitonchange", helics_handle_option_only_transmit_on_change},
   {"only_update_on_change", helics_handle_option_only_update_on_change},
   {"onlyupdateonchange", helics_handle_option_only_update_on_change},
+  {"ignore_unit_mismatch", helics_handle_option_ignore_unit_mismatch},
+  {"ignore_units", helics_handle_option_ignore_unit_mismatch},
   {"strict_type_checking", helics_handle_option_strict_type_checking},
   {"strict_type_matching", helics_handle_option_strict_type_checking},
   {"strict_input_type_checking", helics_handle_option_strict_type_checking},
@@ -144,7 +148,7 @@ static const std::map<std::string, int> log_level_map{{"none", helics_log_level_
 
 static void loadFlags (FederateInfo &fi, const std::string &flags)
 {
-    auto sflgs = stringOps::splitline (flags);
+    auto sflgs = gmlc::utilities::stringOps::splitline (flags);
     for (auto &flg : sflgs)
     {
         if (flg == "autobroker")
@@ -179,7 +183,7 @@ int getPropertyIndex (std::string val)
     {
         return fnd->second;
     }
-    makeLowerCase (val);
+    gmlc::utilities::makeLowerCase (val);
     fnd = propStringsTranslations.find (val);
     if (fnd != propStringsTranslations.end ())
     {
@@ -201,7 +205,7 @@ int getOptionIndex (std::string val)
     {
         return fnd->second;
     }
-    makeLowerCase (val);
+    gmlc::utilities::makeLowerCase (val);
     fnd = optionStringsTranslations.find (val);
     if (fnd != optionStringsTranslations.end ())
     {
@@ -250,7 +254,8 @@ std::unique_ptr<helicsCLI11App> FederateInfo::makeCLIApp ()
     app->add_option ("--localport", localport, "Port number to use for connections to this federate")
       ->ignore_underscore ();
     app->add_flag ("--autobroker", autobroker, "tell the core to automatically generate a broker if needed");
-
+    app->add_option ("--key,--broker_key", key,
+                     "specify a key to use to match a broker should match the broker key");
     app->add_option_function<Time> ("--offset",
                                     [this](Time val) { setProperty (helics_property_time_offset, val); },
                                     "the offset of the time steps (default in ms)");
@@ -427,6 +432,7 @@ FederateInfo loadFederateInfoJson (const std::string &jsonString)
     }
 
     replaceIfMember (doc, "broker", fi.broker);
+    replaceIfMember (doc, "key", fi.key);
     fi.brokerPort = getOrDefault (doc, "brokerport", int64_t (fi.brokerPort));
     replaceIfMember (doc, "localport", fi.localport);
     replaceIfMember (doc, "autobroker", fi.autobroker);
@@ -556,6 +562,7 @@ FederateInfo loadFederateInfoToml (const std::string &tomlString)
     }
     replaceIfMember (doc, "autobroker", fi.autobroker);
     replaceIfMember (doc, "broker", fi.broker);
+    replaceIfMember (doc, "key", fi.key);
     fi.brokerPort = getOrDefault (doc, "brokerport", fi.brokerPort);
     replaceIfMember (doc, "localport", fi.localport);
     if (isMember (doc, "port"))
@@ -662,6 +669,12 @@ std::string generateFullCoreInitString (const FederateInfo &fi)
     if (fi.autobroker)
     {
         res.append (" --autobroker");
+    }
+
+    if (!fi.key.empty ())
+    {
+        res += " --key=";
+        res.append (fi.key);
     }
     return res;
 }

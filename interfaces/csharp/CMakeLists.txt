@@ -43,7 +43,8 @@ set_target_properties(CShelics PROPERTIES DEBUG_POSTFIX "")
 copy_key_files_to_target_location(CShelics)
   copy_shared_target(CShelics)
 
+install_key_files_with_comp(csharp)
 
-install(FILES $<TARGET_FILE:helicsSharedLib> DESTINATION csharp COMPONENT csharp)
 install(TARGETS CShelics DESTINATION csharp COMPONENT csharp)
-install(FILES ${KEY_LIBRARY_FILES} DESTINATION csharp COMPONENT csharp)
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/helics.cs DESTINATION csharp COMPONENT csharp)
+
