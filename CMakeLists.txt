@@ -377,7 +377,7 @@ endif()
 # add some additional libraries for MINGW and MSYS
 # -------------------------------------------------------------
 if(MSYS OR CYGWIN)
-    target_link_libraries(helics_base INTERFACE wsock32 ws2_32)
+    target_link_libraries(helics_base INTERFACE wsock32 ws2_32 Iphlpapi)
 	if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
         set(ENABLE_IPC_CORE FALSE)
 		target_compile_definitions(helics_base_includes INTERFACE -DDISABLE_BOOST_IOSTREAMS)

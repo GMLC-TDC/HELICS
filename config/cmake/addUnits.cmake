@@ -41,4 +41,4 @@ else()
 	add_library(HELICS::units ALIAS units-static)
 endif()
 
-
+HIDE_VARIABLE(BUILD_UNITS_FUZZ_TARGETS)

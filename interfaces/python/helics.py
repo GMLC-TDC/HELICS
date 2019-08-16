@@ -152,6 +152,7 @@ helics_warning = _helics.helics_warning
 helics_error_invalid_state_transition = _helics.helics_error_invalid_state_transition
 helics_error_invalid_function_call = _helics.helics_error_invalid_function_call
 helics_error_execution_failure = _helics.helics_error_execution_failure
+helics_error_insufficient_space = _helics.helics_error_insufficient_space
 helics_error_other = _helics.helics_error_other
 helics_error_external_type = _helics.helics_error_external_type
 helics_property_time_delta = _helics.helics_property_time_delta
@@ -170,6 +171,7 @@ helics_handle_option_single_connection_only = _helics.helics_handle_option_singl
 helics_handle_option_multiple_connections_allowed = _helics.helics_handle_option_multiple_connections_allowed
 helics_handle_option_buffer_data = _helics.helics_handle_option_buffer_data
 helics_handle_option_strict_type_checking = _helics.helics_handle_option_strict_type_checking
+helics_handle_option_ignore_unit_mismatch = _helics.helics_handle_option_ignore_unit_mismatch
 helics_handle_option_only_transmit_on_change = _helics.helics_handle_option_only_transmit_on_change
 helics_handle_option_only_update_on_change = _helics.helics_handle_option_only_update_on_change
 helics_handle_option_ignore_interrupts = _helics.helics_handle_option_ignore_interrupts
@@ -814,6 +816,10 @@ def helicsFederateInfoSetBroker(fi: 'helics_federate_info', broker: 'char const 
     return _helics.helicsFederateInfoSetBroker(fi, broker)
 helicsFederateInfoSetBroker = _helics.helicsFederateInfoSetBroker
 
+def helicsFederateInfoSetBrokerKey(fi: 'helics_federate_info', brokerkey: 'char const *') -> "void":
+    return _helics.helicsFederateInfoSetBrokerKey(fi, brokerkey)
+helicsFederateInfoSetBrokerKey = _helics.helicsFederateInfoSetBrokerKey
+
 def helicsFederateInfoSetBrokerPort(fi: 'helics_federate_info', brokerPort: 'int') -> "void":
     return _helics.helicsFederateInfoSetBrokerPort(fi, brokerPort)
 helicsFederateInfoSetBrokerPort = _helics.helicsFederateInfoSetBrokerPort
@@ -997,6 +1003,10 @@ def helicsFederateRequestTime(fed: 'helics_federate', requestTime: 'helics_time'
 
     """
     return _helics.helicsFederateRequestTime(fed, requestTime)
+
+def helicsFederateRequestTimeAdvance(fed: 'helics_federate', timeDelta: 'helics_time') -> "helics_time":
+    return _helics.helicsFederateRequestTimeAdvance(fed, timeDelta)
+helicsFederateRequestTimeAdvance = _helics.helicsFederateRequestTimeAdvance
 
 def helicsFederateRequestNextStep(fed: 'helics_federate') -> "helics_time":
     return _helics.helicsFederateRequestNextStep(fed)
@@ -1556,6 +1566,14 @@ def helicsInputGetUnits(ipt: 'helics_input') -> "char const *":
     return _helics.helicsInputGetUnits(ipt)
 helicsInputGetUnits = _helics.helicsInputGetUnits
 
+def helicsInputGetInjectionUnits(ipt: 'helics_input') -> "char const *":
+    return _helics.helicsInputGetInjectionUnits(ipt)
+helicsInputGetInjectionUnits = _helics.helicsInputGetInjectionUnits
+
+def helicsInputGetExtractionUnits(ipt: 'helics_input') -> "char const *":
+    return _helics.helicsInputGetExtractionUnits(ipt)
+helicsInputGetExtractionUnits = _helics.helicsInputGetExtractionUnits
+
 def helicsPublicationGetUnits(pub: 'helics_publication') -> "char const *":
     """
 
@@ -1669,6 +1687,10 @@ def helicsEndpointSendMessage(endpoint: 'helics_endpoint', message: 'helics_mess
     """
     return _helics.helicsEndpointSendMessage(endpoint, message)
 
+def helicsEndpointSendMessageObject(endpoint: 'helics_endpoint', message: 'helics_message_object') -> "void":
+    return _helics.helicsEndpointSendMessageObject(endpoint, message)
+helicsEndpointSendMessageObject = _helics.helicsEndpointSendMessageObject
+
 def helicsEndpointSubscribe(endpoint: 'helics_endpoint', key: 'char const *') -> "void":
     """
 
@@ -1730,6 +1752,10 @@ def helicsEndpointGetMessage(endpoint: 'helics_endpoint') -> "helics_message":
     """
     return _helics.helicsEndpointGetMessage(endpoint)
 
+def helicsEndpointGetMessageObject(endpoint: 'helics_endpoint') -> "helics_message_object":
+    return _helics.helicsEndpointGetMessageObject(endpoint)
+helicsEndpointGetMessageObject = _helics.helicsEndpointGetMessageObject
+
 def helicsFederateGetMessage(fed: 'helics_federate') -> "helics_message":
     """
 
@@ -1745,6 +1771,22 @@ def helicsFederateGetMessage(fed: 'helics_federate') -> "helics_message":
 
     """
     return _helics.helicsFederateGetMessage(fed)
+
+def helicsFederateGetMessageObject(fed: 'helics_federate') -> "helics_message_object":
+    return _helics.helicsFederateGetMessageObject(fed)
+helicsFederateGetMessageObject = _helics.helicsFederateGetMessageObject
+
+def helicsFederateCreateMessageObject(fed: 'helics_federate') -> "helics_message_object":
+    return _helics.helicsFederateCreateMessageObject(fed)
+helicsFederateCreateMessageObject = _helics.helicsFederateCreateMessageObject
+
+def helicsFederateClearMessages(fed: 'helics_federate') -> "void":
+    return _helics.helicsFederateClearMessages(fed)
+helicsFederateClearMessages = _helics.helicsFederateClearMessages
+
+def helicsEndpointClearMessages(endpoint: 'helics_endpoint') -> "void":
+    return _helics.helicsEndpointClearMessages(endpoint)
+helicsEndpointClearMessages = _helics.helicsEndpointClearMessages
 
 def helicsEndpointGetType(endpoint: 'helics_endpoint') -> "char const *":
     """
@@ -1809,6 +1851,98 @@ helicsEndpointSetOption = _helics.helicsEndpointSetOption
 def helicsEndpointGetOption(end: 'helics_endpoint', option: 'int') -> "helics_bool":
     return _helics.helicsEndpointGetOption(end, option)
 helicsEndpointGetOption = _helics.helicsEndpointGetOption
+
+def helicsMessageGetSource(message: 'helics_message_object') -> "char const *":
+    return _helics.helicsMessageGetSource(message)
+helicsMessageGetSource = _helics.helicsMessageGetSource
+
+def helicsMessageGetDestination(message: 'helics_message_object') -> "char const *":
+    return _helics.helicsMessageGetDestination(message)
+helicsMessageGetDestination = _helics.helicsMessageGetDestination
+
+def helicsMessageGetOriginalSource(message: 'helics_message_object') -> "char const *":
+    return _helics.helicsMessageGetOriginalSource(message)
+helicsMessageGetOriginalSource = _helics.helicsMessageGetOriginalSource
+
+def helicsMessageGetOriginalDestination(message: 'helics_message_object') -> "char const *":
+    return _helics.helicsMessageGetOriginalDestination(message)
+helicsMessageGetOriginalDestination = _helics.helicsMessageGetOriginalDestination
+
+def helicsMessageGetTime(message: 'helics_message_object') -> "helics_time":
+    return _helics.helicsMessageGetTime(message)
+helicsMessageGetTime = _helics.helicsMessageGetTime
+
+def helicsMessageGetString(message: 'helics_message_object') -> "char const *":
+    return _helics.helicsMessageGetString(message)
+helicsMessageGetString = _helics.helicsMessageGetString
+
+def helicsMessageGetMessageID(message: 'helics_message_object') -> "int":
+    return _helics.helicsMessageGetMessageID(message)
+helicsMessageGetMessageID = _helics.helicsMessageGetMessageID
+
+def helicsMessageCheckFlag(message: 'helics_message_object', flag: 'int') -> "helics_bool":
+    return _helics.helicsMessageCheckFlag(message, flag)
+helicsMessageCheckFlag = _helics.helicsMessageCheckFlag
+
+def helicsMessageGetRawDataSize(message: 'helics_message_object') -> "int":
+    return _helics.helicsMessageGetRawDataSize(message)
+helicsMessageGetRawDataSize = _helics.helicsMessageGetRawDataSize
+
+def helicsMessageGetRawData(message: 'helics_message_object', data: 'void *', maxlen: 'int') -> "int *":
+    return _helics.helicsMessageGetRawData(message, data, maxlen)
+helicsMessageGetRawData = _helics.helicsMessageGetRawData
+
+def helicsMessageIsValid(message: 'helics_message_object') -> "helics_bool":
+    return _helics.helicsMessageIsValid(message)
+helicsMessageIsValid = _helics.helicsMessageIsValid
+
+def helicsMessageSetSource(message: 'helics_message_object', src: 'char const *') -> "void":
+    return _helics.helicsMessageSetSource(message, src)
+helicsMessageSetSource = _helics.helicsMessageSetSource
+
+def helicsMessageSetDestination(message: 'helics_message_object', dest: 'char const *') -> "void":
+    return _helics.helicsMessageSetDestination(message, dest)
+helicsMessageSetDestination = _helics.helicsMessageSetDestination
+
+def helicsMessageSetOriginalSource(message: 'helics_message_object', src: 'char const *') -> "void":
+    return _helics.helicsMessageSetOriginalSource(message, src)
+helicsMessageSetOriginalSource = _helics.helicsMessageSetOriginalSource
+
+def helicsMessageSetOriginalDestination(message: 'helics_message_object', dest: 'char const *') -> "void":
+    return _helics.helicsMessageSetOriginalDestination(message, dest)
+helicsMessageSetOriginalDestination = _helics.helicsMessageSetOriginalDestination
+
+def helicsMessageSetTime(message: 'helics_message_object', time: 'helics_time') -> "void":
+    return _helics.helicsMessageSetTime(message, time)
+helicsMessageSetTime = _helics.helicsMessageSetTime
+
+def helicsMessageReserve(message: 'helics_message_object', reserveSize: 'int') -> "void":
+    return _helics.helicsMessageReserve(message, reserveSize)
+helicsMessageReserve = _helics.helicsMessageReserve
+
+def helicsMessageSetMessageID(message: 'helics_message_object', messageID: 'int32_t') -> "void":
+    return _helics.helicsMessageSetMessageID(message, messageID)
+helicsMessageSetMessageID = _helics.helicsMessageSetMessageID
+
+def helicsMessageClearFlags(message: 'helics_message_object') -> "void":
+    return _helics.helicsMessageClearFlags(message)
+helicsMessageClearFlags = _helics.helicsMessageClearFlags
+
+def helicsMessageSetFlagOption(message: 'helics_message_object', flag: 'int', flagValue: 'helics_bool') -> "void":
+    return _helics.helicsMessageSetFlagOption(message, flag, flagValue)
+helicsMessageSetFlagOption = _helics.helicsMessageSetFlagOption
+
+def helicsMessageSetString(message: 'helics_message_object', str: 'char const *') -> "void":
+    return _helics.helicsMessageSetString(message, str)
+helicsMessageSetString = _helics.helicsMessageSetString
+
+def helicsMessageSetData(message: 'helics_message_object', data: 'void const *') -> "int":
+    return _helics.helicsMessageSetData(message, data)
+helicsMessageSetData = _helics.helicsMessageSetData
+
+def helicsMessageAppendData(message: 'helics_message_object', data: 'void const *') -> "int":
+    return _helics.helicsMessageAppendData(message, data)
+helicsMessageAppendData = _helics.helicsMessageAppendData
 
 def helicsFederateRegisterFilter(fed: 'helics_federate', type: 'helics_filter_type', name: 'char const *') -> "helics_filter":
     return _helics.helicsFederateRegisterFilter(fed, type, name)
