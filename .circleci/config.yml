@@ -6,8 +6,9 @@ aliases:
     environment:
     command: |
       mkdir -p build
+      cd build
       cmake .. -DBUILD_OCTAVE_INTERFACE=ON -DBUILD_SHARED_LIBS=ON
-      make install
+      make -j 4 install
 
   - &run_octave_tests
     name: run_octave_tests
@@ -23,7 +24,7 @@ jobs:
     docker:
       - image: helics/octave:latest
     environment:
-      OCTAVETEST: "/root/develop/HELICS/tests/octave"
+      OCTAVETEST: "/root/project/HELICS/tests/octave"
     steps:
       - checkout
       - setup_remote_docker: 
