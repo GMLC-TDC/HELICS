@@ -7,10 +7,13 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #pragma once
 #include "../core/Broker.hpp"
+#include <memory>
+#include <thread>
 
 namespace helics
 {
 class ActionMessage;
+class helicsCLI11App;
 
 /** helper class defining some common functionality for brokers and cores that use different
 communication methods*/
@@ -31,8 +34,24 @@ class BrokerServer
     explicit BrokerServer (const std::string &argString);
     /** destructor*/
     ~BrokerServer ();
+    /** start the broker servers*/
+    void startServers ();
 
   private:
+    /** generate an argument processing app*/
+    std::unique_ptr<helicsCLI11App> generateArgProcessing ();
+    /** start the servers*/
+    void startZMQserver ();
+
+  private:
+    bool zmq_server{false};
+    bool zmq_ss_server{false};
+    bool tcp_server{false};
+    bool udp_server{false};
+    bool mpi_server{false};
+    std::string configFile_;
+    std::vector<std::thread> serverloops;
+
   public:
 };
 }  // namespace helics

@@ -7,63 +7,49 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include "BrokerServer.hpp"
 
+#include "../common/JsonProcessingFunctions.hpp"
+#include "../common/zmqContextManager.h"
+#include "../core/ActionMessage.hpp"
 #include "../core/NetworkBrokerData.hpp"
 #include "../core/helicsCLI11.hpp"
-
-using namespace std::string_literals;
+#include "cppzmq/zmq.hpp"
 
 namespace helics
 {
-BrokerServer::BrokerServer () noexcept { loadComms (); }
+BrokerServer::BrokerServer () noexcept : zmq_server{true} {}
 
-BrokerServer::BrokerServer (int /*argc*/, char * /*argv*/[]) { loadComms (); }
-
-BrokerServer::BrokerServer (const std::string & /*configFile*/) { loadComms (); }
-
-void BrokerServer::loadComms ()
+BrokerServer::BrokerServer (int argc, char *argv[])
 {
-    masterComm = generateComms ("def");
-    masterComm->setCallback ([this] (ActionMessage &&M) { BrokerBase::addActionMessage (std::move (M)); });
+    auto app = generateArgProcessing ();
+    app->parse (argc, argv);
 }
 
-BrokerServer::~BrokerServer ()
-{
-    BrokerBase::haltOperations = true;
-    int exp = 2;
-    while (!disconnectionStage.compare_exchange_weak (exp, 3))
-    {
-        if (exp == 0)
-        {
-            commDisconnect ();
-            exp = 1;
-        }
-        else
-        {
-            std::this_thread::sleep_for (std::chrono::milliseconds (50));
-        }
-    }
-    masterComm = nullptr;  // need to ensure the comms are deleted before the callbacks become invalid
-    BrokerBase::joinAllThreads ();
-}
+BrokerServer::BrokerServer (const std::string &configFile) : configFile_ (configFile) {}
 
-void BrokerServer::brokerDisconnect () { commDisconnect (); }
+BrokerServer::~BrokerServer () {}
 
-void BrokerServer::commDisconnect ()
+void BrokerServer::startServers ()
 {
-    int exp = 0;
-    if (disconnectionStage.compare_exchange_strong (exp, 1))
+    if (zmq_server)
     {
-        masterComm->disconnect ();
-        disconnectionStage = 2;
+        startZMQserver ();
     }
 }
 
-bool BrokerServer::tryReconnect () { return masterComm->reconnect (); }
+std::unique_ptr<helicsCLI11App> BrokerServer::generateArgProcessing ()
+{
+    auto app = std::make_unique<helicsCLI11App> (
+      "The Broker server is a helics broker coordinator that can generate brokers on request", "broker_server");
 
-void BrokerServer::transmit (route_id rid, const ActionMessage &cmd) { masterComm->transmit (rid, cmd); }
+    app->add_flag ("--zmq,-z", zmq_server, "start a broker-server for the zmq comms in helics");
+    app->add_flag ("--zmqss", zmq_ss_server, "start a broker-server for the zmq single socket comms in helics");
+    app->add_flag ("--tcp,-t", tcp_server, "start a broker-server for the tcp comms in helics");
+    app->add_flag ("--udp,-u", udp_server, "start a broker-server for the udp comms in helics");
+    app->add_flag ("--mpi", mpi_server, "start a broker-server for the mpi comms in helics");
 
-void BrokerServer::transmit (route_id rid, ActionMessage &&cmd) { masterComm->transmit (rid, std::move (cmd)); }
+    app->add_option ("--config,--config-file", configFile_, "load a config file for the broker server");
+    return app;
+}
 
-void BrokerServer::addRoute (route_id rid, const std::string &routeInfo) { masterComm->addRoute (rid, routeInfo); }
-
+void BrokerServer::startZMQserver () {}
 }  // namespace helics
