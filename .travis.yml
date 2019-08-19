@@ -159,7 +159,7 @@ jobs:
         - mkdir -p build && cd build
         - export CC=gcc
         - export CXX=g++
-        - cmake -G \"MinGW Makefiles\" -DBUILD_HELICS_BOOST_TESTS=OFF -DCMAKE_SH=CMAKE_SH-NOTFOUND -DBOOST_INSTALL_PATH=C:/local/boost_1_58_0 '$env:JOB_OPTION_FLAGS' '$env:HELICS_DEPENDENCY_FLAGS' '$env:HELICS_OPTION_FLAGS' -DCMAKE_C_COMPILER=C:/ProgramData/chocolatey/lib/mingw/tools/install/mingw64/bin/gcc.exe -DCMAKE_CXX_COMPILER=C:/ProgramData/chocolatey/lib/mingw/tools/install/mingw64/bin/g++.exe ..
+        - cmake -G "MinGW Makefiles" -DBUILD_HELICS_BOOST_TESTS=OFF -DCMAKE_SH=CMAKE_SH-NOTFOUND -DBOOST_INSTALL_PATH=/c/local/boost_1_58_0 '$env:JOB_OPTION_FLAGS' '$env:HELICS_DEPENDENCY_FLAGS' '$env:HELICS_OPTION_FLAGS' -DCMAKE_C_COMPILER=/c/ProgramData/chocolatey/lib/mingw/tools/install/mingw64/bin/gcc.exe -DCMAKE_CXX_COMPILER=/c/ProgramData/chocolatey/lib/mingw/tools/install/mingw64/bin/g++.exe ..
         - cmake --build . --parallel 2
         - ctest -R core-ci-tests
 
