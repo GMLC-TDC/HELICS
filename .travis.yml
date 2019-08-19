@@ -158,6 +158,10 @@ jobs:
         - export SHELL=cmd
         - source scripts/setup-helics-ci-options.sh
         - choco install boost-msvc-12
+      before_script:
+        - JOB_FLAG_ARR=()
+        - JOB_FLAG_ARR+=("-G" "MinGW Makefiles" "-DBUILD_HELICS_BOOST_TESTS=OFF" "-DCMAKE_SH=CMAKE_SH-NOTFOUND")
+        - export JOB_OPTION_FLAGS=${JOB_FLAG_ARR[@]}
       
     # -----------------------------------------------
     # Daily ZMQ subproject build with new CMake
