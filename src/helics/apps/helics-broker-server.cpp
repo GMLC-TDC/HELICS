@@ -13,10 +13,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "gmlc/utilities/stringOps.h"
 #include <iostream>
 #include <thread>
-#ifdef ENABLE_ZMQ_CORE
-#include "../common/zmqContextManager.h"
-#include "cppzmq/zmq.hpp"
-#endif
+
 /** function to run the online terminal program*/
 void terminalFunction (std::vector<std::string> args);
 

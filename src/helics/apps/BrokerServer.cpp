@@ -12,7 +12,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "../core/ActionMessage.hpp"
 #include "../core/NetworkBrokerData.hpp"
 #include "../core/helicsCLI11.hpp"
-#include "cppzmq/zmq.hpp"
+#include "../core/zmq/ZmqCommsCommon.h"
 
 namespace helics
 {
@@ -51,5 +51,21 @@ std::unique_ptr<helicsCLI11App> BrokerServer::generateArgProcessing ()
     return app;
 }
 
-void BrokerServer::startZMQserver () {}
+void BrokerServer::startZMQserver ()
+{
+    auto ctx = ZmqContextManager::getContextPointer ();
+    zmq::socket_t repSocket (ctx->getContext (), ZMQ_REP);
+    repSocket.setsockopt (ZMQ_LINGER, 500);
+    auto bindsuccess = hzmq::bindzmqSocket (repSocket, localTargetAddress, PortNumber + 1, connectionTimeout);
+    if (!bindsuccess)
+    {
+        pullSocket.close ();
+        repSocket.close ();
+        disconnecting = true;
+        logError (std::string ("Unable to bind zmq reply socket giving up ") +
+                  makePortAddress (localTargetAddress, PortNumber + 1));
+        setRxStatus (connection_status::error);
+        return;
+    }
+}
 }  // namespace helics

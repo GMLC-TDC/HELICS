@@ -11,6 +11,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "../../common/zmqSocketDescriptor.h"
 #include "../ActionMessage.hpp"
 #include "../NetworkBrokerData.hpp"
+#include "ZmqCommsCommon.h"
 #include "ZmqRequestSets.h"
 //#include <csignal>
 #include <memory>
@@ -18,38 +19,6 @@ SPDX-License-Identifier: BSD-3-Clause
 static const int DEFAULT_BROKER_PORT_NUMBER = 23404;
 
 using namespace std::chrono;
-/** bind a zmq socket, with a timeout and timeout period*/
-static bool bindzmqSocket (zmq::socket_t &socket,
-                           const std::string &address,
-                           int port,
-                           milliseconds timeout,
-                           milliseconds period = milliseconds (200))
-{
-    bool bindsuccess = false;
-    milliseconds tcount{0};
-    while (!bindsuccess)
-    {
-        try
-        {
-            socket.bind (helics::makePortAddress (address, port));
-            bindsuccess = true;
-        }
-        catch (const zmq::error_t &)
-        {
-            if (tcount == milliseconds (0))
-            {
-                // std::cerr << "zmq binding error on socket sleeping then will try again \n";
-            }
-            if (tcount > timeout)
-            {
-                break;
-            }
-            std::this_thread::sleep_for (period);
-            tcount += period;
-        }
-    }
-    return bindsuccess;
-}
 
 namespace helics
 {
@@ -216,7 +185,7 @@ void ZmqComms::queue_rx_function ()
     }
     if (serverMode)
     {
-        auto bindsuccess = bindzmqSocket (repSocket, localTargetAddress, PortNumber + 1, connectionTimeout);
+        auto bindsuccess = hzmq::bindzmqSocket (repSocket, localTargetAddress, PortNumber + 1, connectionTimeout);
         if (!bindsuccess)
         {
             pullSocket.close ();
@@ -229,7 +198,7 @@ void ZmqComms::queue_rx_function ()
         }
     }
 
-    auto bindsuccess = bindzmqSocket (pullSocket, localTargetAddress, PortNumber, connectionTimeout);
+    auto bindsuccess = hzmq::bindzmqSocket (pullSocket, localTargetAddress, PortNumber, connectionTimeout);
 
     if (!bindsuccess)
     {
