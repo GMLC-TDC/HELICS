@@ -12,7 +12,7 @@ before_cache:
 
 env:
   global:
-    - MAKEFLAGS="-j 2"
+    - MAX_BUILD_PARALLEL=2
 
 # Create aliases for some of shared build configuration
 _basic_env:
@@ -160,7 +160,7 @@ jobs:
         - export CC=gcc
         - export CXX=g++
         - cmake -G "MinGW Makefiles" -DBUILD_HELICS_BOOST_TESTS=OFF -DCMAKE_SH=CMAKE_SH-NOTFOUND -DBOOST_INSTALL_PATH=/c/local/boost_1_58_0 '$env:JOB_OPTION_FLAGS' '$env:HELICS_DEPENDENCY_FLAGS' '$env:HELICS_OPTION_FLAGS' -DCMAKE_C_COMPILER=/c/ProgramData/chocolatey/lib/mingw/tools/install/mingw64/bin/gcc.exe -DCMAKE_CXX_COMPILER=/c/ProgramData/chocolatey/lib/mingw/tools/install/mingw64/bin/g++.exe ..
-        - cmake --build . --parallel 2
+        - cmake --build . --parallel ${MAX_BUILD_PARALLEL}
         - ctest -R core-ci-tests
 
     # -----------------------------------------------
@@ -265,7 +265,7 @@ install:
 script:
   - mkdir -p build && cd build
   - cmake .. ${JOB_OPTION_FLAGS} ${HELICS_DEPENDENCY_FLAGS} ${HELICS_OPTION_FLAGS} -DCMAKE_C_COMPILER_LAUNCHER=ccache -DCMAKE_CXX_COMPILER_LAUNCHER=ccache
-  - make ${MAKEFLAGS}
+  - cmake --build . --parallel ${MAX_BUILD_PARALLEL}
 
   # Setup counters for coverage
   - if [[ "$BUILD_TYPE" == "Coverage" ]]; then pushd .. && scripts/lcov-helper.sh setup-counters && popd ; fi
