@@ -13,6 +13,7 @@ before_cache:
 env:
   global:
     - MAKEFLAGS="-j 2"
+    - CMAKE_GENERATOR="Unix Makefiles"
 
 # Create aliases for some of shared build configuration
 _basic_env:
@@ -151,17 +152,14 @@ jobs:
         - DISABLE_INTERFACES="Python,Java"
         - SKIP_TEST_RUN=true
         - CORE_CI_TEST=true
-        - JOB_OPTION_FLAGS='-G "MinGW Makefiles" -DBUILD_HELICS_BOOST_TESTS=OFF -DCMAKE_SH=CMAKE_SH-NOTFOUND'
+        - JOB_OPTION_FLAGS='-DBUILD_HELICS_BOOST_TESTS=OFF -DCMAKE_SH=CMAKE_SH-NOTFOUND'
+        - CMAKE_GENERATOR="MinGW Makefiles"
         - HELICS_DEPENDENCY_FLAGS="-DBOOST_INSTALL_PATH=/c/local/boost_1_58_0 -DCMAKE_C_COMPILER=/c/ProgramData/chocolatey/lib/mingw/tools/install/mingw64/bin/gcc.exe -DCMAKE_CXX_COMPILER=/c/ProgramData/chocolatey/lib/mingw/tools/install/mingw64/bin/g++.exe"
       install:
         - echo $PATH
         - export SHELL=cmd
         - source scripts/setup-helics-ci-options.sh
         - choco install boost-msvc-12
-      before_script:
-        - JOB_FLAG_ARR=()
-        - JOB_FLAG_ARR+=("-G" "MinGW Makefiles" "-DBUILD_HELICS_BOOST_TESTS=OFF" "-DCMAKE_SH=CMAKE_SH-NOTFOUND")
-        - export JOB_OPTION_FLAGS=${JOB_FLAG_ARR[@]}
       
     # -----------------------------------------------
     # Daily ZMQ subproject build with new CMake
@@ -265,7 +263,7 @@ install:
   
 script:
   - mkdir -p build && cd build
-  - cmake ${JOB_OPTION_FLAGS} ${HELICS_DEPENDENCY_FLAGS} ${HELICS_OPTION_FLAGS} ${CMAKE_COMPILER_LAUNCHER} ..
+  - cmake -G "${CMAKE_GENERATOR}" ${JOB_OPTION_FLAGS} ${HELICS_DEPENDENCY_FLAGS} ${HELICS_OPTION_FLAGS} ${CMAKE_COMPILER_LAUNCHER} ..
   - cmake --build . -- ${MAKEFLAGS}
 
   # Setup counters for coverage
