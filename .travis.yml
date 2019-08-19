@@ -151,7 +151,7 @@ jobs:
         - DISABLE_INTERFACES="Python,Java"
         - SKIP_TEST_RUN=true
         - CORE_CI_TEST=true
-        - JOB_OPTION_FLAGS="-G \"MinGW Makefiles\" -DBUILD_HELICS_BOOST_TESTS=OFF -DCMAKE_SH=CMAKE_SH-NOTFOUND"
+        - JOB_OPTION_FLAGS='-G "MinGW Makefiles" -DBUILD_HELICS_BOOST_TESTS=OFF -DCMAKE_SH=CMAKE_SH-NOTFOUND'
         - HELICS_DEPENDENCY_FLAGS="-DBOOST_INSTALL_PATH=/c/local/boost_1_58_0 -DCMAKE_C_COMPILER=/c/ProgramData/chocolatey/lib/mingw/tools/install/mingw64/bin/gcc.exe -DCMAKE_CXX_COMPILER=/c/ProgramData/chocolatey/lib/mingw/tools/install/mingw64/bin/g++.exe"
       install:
         - echo $PATH
