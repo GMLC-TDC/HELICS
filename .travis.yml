@@ -12,7 +12,7 @@ before_cache:
 
 env:
   global:
-    - MAX_BUILD_PARALLEL=2
+    - MAKEFLAGS="-j 2"
 
 # Create aliases for some of shared build configuration
 _basic_env:
@@ -262,7 +262,7 @@ install:
 script:
   - mkdir -p build && cd build
   - cmake ${JOB_OPTION_FLAGS} ${HELICS_DEPENDENCY_FLAGS} ${HELICS_OPTION_FLAGS} ${CMAKE_COMPILER_LAUNCHER} ..
-  - cmake --build . --parallel ${MAX_BUILD_PARALLEL}
+  - cmake --build . -- ${MAKEFLAGS}
 
   # Setup counters for coverage
   - if [[ "$BUILD_TYPE" == "Coverage" ]]; then pushd .. && scripts/lcov-helper.sh setup-counters && popd ; fi
