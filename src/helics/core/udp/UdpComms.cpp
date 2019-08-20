@@ -9,10 +9,9 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "../../common/fmt_format.h"
 #include "../ActionMessage.hpp"
 #include "../NetworkBrokerData.hpp"
+#include "../networkDefaults.hpp"
 #include <asio/ip/udp.hpp>
 #include <memory>
-
-static const int DEFAULT_UDP_BROKER_PORT_NUMBER = 23901;
 
 namespace helics
 {

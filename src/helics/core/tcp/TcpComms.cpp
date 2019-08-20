@@ -8,11 +8,10 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "../../common/AsioContextManager.h"
 #include "../ActionMessage.hpp"
 #include "../NetworkBrokerData.hpp"
+#include "../networkDefaults.hpp"
 #include "TcpCommsCommon.h"
 #include "TcpHelperClasses.h"
 #include <memory>
-
-static constexpr int DEFAULT_TCP_BROKER_PORT_NUMBER = 24160;
 
 namespace helics
 {
@@ -170,11 +169,11 @@ void TcpComms::queue_rx_function ()
         }
     }
     auto contextLoop = ioctx->startContextLoop ();
-    server->setDataCall ([this](TcpConnection::pointer connection, const char *data, size_t datasize) {
+    server->setDataCall ([this] (TcpConnection::pointer connection, const char *data, size_t datasize) {
         return dataReceive (connection, data, datasize);
     });
     CommsInterface *ci = this;
-    server->setErrorCall ([ci](TcpConnection::pointer connection, const std::error_code &error) {
+    server->setErrorCall ([ci] (TcpConnection::pointer connection, const std::error_code &error) {
         return commErrorHandler (ci, connection, error);
     });
     server->start ();
@@ -228,7 +227,7 @@ bool TcpComms::establishBrokerConnection (std::shared_ptr<AsioContextManager> &i
                                           std::shared_ptr<TcpConnection> &brokerConnection)
 {
     // lambda function that does the proper termination
-    auto terminate = [&, this](connection_status status) -> bool {
+    auto terminate = [&, this] (connection_status status) -> bool {
         if (brokerConnection)
         {
             brokerConnection->close ();
@@ -282,7 +281,7 @@ bool TcpComms::establishBrokerConnection (std::shared_ptr<AsioContextManager> &i
             std::vector<char> rx (512);
             tcp::endpoint brk;
             brokerConnection->async_receive (rx.data (), 128,
-                                             [this, &rx](const std::error_code &error, size_t bytes) {
+                                             [this, &rx] (const std::error_code &error, size_t bytes) {
                                                  if (!error)
                                                  {
                                                      txReceive (rx.data (), bytes, std::string ());

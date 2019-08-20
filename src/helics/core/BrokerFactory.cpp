@@ -248,7 +248,7 @@ std::shared_ptr<Broker> create (core_type type, const std::string &broker_name, 
 
 /** lambda function to join cores before the destruction happens to avoid potential problematic calls in the
  * loops*/
-static auto destroyerCallFirst = [](auto &broker) {
+static auto destroyerCallFirst = [] (auto &broker) {
     broker->processDisconnect (
       true);  // use true here as it is possible the searchableObjectHolder is deleted already
     broker->joinAllThreads ();
@@ -325,8 +325,10 @@ static bool isJoinableBrokerOfType (core_type type, const std::shared_ptr<Broker
 
 std::shared_ptr<Broker> findJoinableBrokerOfType (core_type type)
 {
-    return searchableObjects.findObject ([type](auto &ptr) { return isJoinableBrokerOfType (type, ptr); });
+    return searchableObjects.findObject ([type] (auto &ptr) { return isJoinableBrokerOfType (type, ptr); });
 }
+
+std::vector<std::shared_ptr<Broker>> getAllBrokers () { return {}; }
 
 bool registerBroker (const std::shared_ptr<Broker> &broker)
 {
@@ -362,7 +364,7 @@ void unregisterBroker (const std::string &name)
 {
     if (!searchableObjects.removeObject (name))
     {
-        searchableObjects.removeObject ([&name](auto &obj) { return (obj->getIdentifier () == name); });
+        searchableObjects.removeObject ([&name] (auto &obj) { return (obj->getIdentifier () == name); });
     }
 }
 

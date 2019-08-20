@@ -132,6 +132,7 @@ set(
 	NetworkBroker_impl.hpp
 	NetworkCore_impl.hpp
 	fileConnections.hpp
+	networkDefaults.hpp
 	../helics_enums.h
 )
 

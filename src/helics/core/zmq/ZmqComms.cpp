@@ -11,12 +11,11 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "../../common/zmqSocketDescriptor.h"
 #include "../ActionMessage.hpp"
 #include "../NetworkBrokerData.hpp"
+#include "../networkDefaults.hpp"
 #include "ZmqCommsCommon.h"
 #include "ZmqRequestSets.h"
 //#include <csignal>
 #include <memory>
-
-static const int DEFAULT_BROKER_PORT_NUMBER = 23404;
 
 using namespace std::chrono;
 
@@ -63,7 +62,7 @@ ZmqComms::ZmqComms () noexcept : NetworkCommsInterface (interface_type::ip) {}
 /** destructor*/
 ZmqComms::~ZmqComms () { disconnect (); }
 
-int ZmqComms::getDefaultBrokerPort () const { return DEFAULT_BROKER_PORT_NUMBER; }
+int ZmqComms::getDefaultBrokerPort () const { return DEFAULT_ZMQ_BROKER_PORT_NUMBER; }
 
 int ZmqComms::processIncomingMessage (zmq::message_t &msg)
 {
@@ -282,7 +281,7 @@ int ZmqComms::initializeBrokerConnections (zmq::socket_t &controlSocket)
         auto ctx = ZmqContextManager::getContextPointer ();
         if (brokerPort < 0)
         {
-            brokerPort = DEFAULT_BROKER_PORT_NUMBER;
+            brokerPort = DEFAULT_ZMQ_BROKER_PORT_NUMBER;
         }
 
         zmq::socket_t brokerReq (ctx->getContext (), ZMQ_REQ);
@@ -397,7 +396,7 @@ int ZmqComms::initializeBrokerConnections (zmq::socket_t &controlSocket)
     {
         if ((PortNumber < 0))
         {
-            PortNumber = DEFAULT_BROKER_PORT_NUMBER;
+            PortNumber = DEFAULT_ZMQ_BROKER_PORT_NUMBER;
             ActionMessage setPorts (CMD_PROTOCOL);
             setPorts.messageID = PORT_DEFINITIONS;
             setPorts.setExtraData (PortNumber);

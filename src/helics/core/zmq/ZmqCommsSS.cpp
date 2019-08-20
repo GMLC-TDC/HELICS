@@ -10,13 +10,13 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "../../common/zmqSocketDescriptor.h"
 #include "../ActionMessage.hpp"
 #include "../NetworkBrokerData.hpp"
+#include "../networkDefaults.hpp"
 #include "ZmqCommsCommon.h"
 #include "ZmqRequestSets.h"
 //#include <csignal>
 #include <iostream>
 #include <memory>
 
-static const int DEFAULT_BROKER_PORT_NUMBER = 23414;  // Todo define a different port number
 static const int TX_RX_MSG_COUNT = 20;
 
 using namespace std::chrono;
@@ -82,7 +82,7 @@ ZmqCommsSS::~ZmqCommsSS ()
     }
 }
 
-int ZmqCommsSS::getDefaultBrokerPort () const { return DEFAULT_BROKER_PORT_NUMBER; }
+int ZmqCommsSS::getDefaultBrokerPort () const { return DEFAULT_ZMQSS_BROKER_PORT_NUMBER; }
 
 int ZmqCommsSS::processIncomingMessage (zmq::message_t &msg, std::map<std::string, std::string> &connection_info)
 {
@@ -281,7 +281,7 @@ void ZmqCommsSS::queue_tx_function ()
 
     if (brokerPort < 0)
     {
-        brokerPort = DEFAULT_BROKER_PORT_NUMBER;
+        brokerPort = DEFAULT_ZMQSS_BROKER_PORT_NUMBER;
     }
 
     zmq::socket_t brokerSocket (ctx->getContext (), ZMQ_ROUTER);

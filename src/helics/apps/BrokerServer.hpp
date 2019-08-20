@@ -7,14 +7,22 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #pragma once
 #include "../core/Broker.hpp"
+#include <atomic>
 #include <memory>
 #include <thread>
+
+namespace Json
+{
+class Value;
+}
 
 namespace helics
 {
 class ActionMessage;
 class helicsCLI11App;
 
+namespace apps
+{
 /** helper class defining some common functionality for brokers and cores that use different
 communication methods*/
 class BrokerServer
@@ -28,6 +36,10 @@ class BrokerServer
     @param argv the strings in the input
     */
     BrokerServer (int argc, char *argv[]);
+    /** construct from command line arguments contained in a vector
+    @param args the number of arguments
+    */
+    BrokerServer (std::vector<std::string> args);
     /** construct from command line arguments parsed as a single string
     @param argString a merged string with all the arguments
     */
@@ -36,12 +48,20 @@ class BrokerServer
     ~BrokerServer ();
     /** start the broker servers*/
     void startServers ();
+    /** check if there are any active Brokers running*/
+    bool hasActiveBrokers () const;
+    /** force terminate all running brokers*/
+    void forceTerminate ();
+    /** close the broker server from creating new brokers*/
+    void closeServers ();
 
   private:
     /** generate an argument processing app*/
     std::unique_ptr<helicsCLI11App> generateArgProcessing ();
-    /** start the servers*/
+    /** start the ZMQ servers*/
     void startZMQserver ();
+    /** close the ZMQ servers*/
+    void closeZMQserver ();
 
   private:
     bool zmq_server{false};
@@ -49,9 +69,12 @@ class BrokerServer
     bool tcp_server{false};
     bool udp_server{false};
     bool mpi_server{false};
+    std::atomic<bool> exitall{false};
     std::string configFile_;
-    std::vector<std::thread> serverloops;
+    std::vector<std::thread> serverloops_;
+    std::unique_ptr<Json::Value> config_;
 
   public:
 };
+}  // namespace apps
 }  // namespace helics
