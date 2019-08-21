@@ -26,17 +26,17 @@ aliases:
        SUMRESULT=0
        # Run core-test
        /root/project/build/tests/helics/core/core-tests
-       RESULT = $?
+       RESULT=$?
        SUMRESULT=$(( SUMRESULT + RESULT ))
        echo "*** Helics core-test result: "${RESULT}
        # Run common-tests
        /root/project/build/tests/helics/common/common-tests
-       RESULT = $?
+       RESULT=$?
        SUMRESULT=$(( SUMRESULT + RESULT ))
        echo "*** Helics common-tests result: "${RESULT}
        # Run system-tests
        /root/project/build/tests/helics/system_tests/system-tests
-       RESULT = $?
+       RESULT=$?
        SUMRESULT=$(( SUMRESULT + RESULT ))
        echo "*** Helics system-tests result: "${RESULT}
        # Return 0 or a positive integer for failure
