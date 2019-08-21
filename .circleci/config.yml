@@ -7,7 +7,7 @@ aliases:
     command: |
       mkdir -p build
       cd build
-      cmake .. ${CMAKE_FLAGS}
+      eval cmake .. ${CMAKE_FLAGS}
       make -j 4 install
 
   - &run_octave_tests
