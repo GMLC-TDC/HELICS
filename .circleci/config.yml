@@ -25,7 +25,7 @@ aliases:
     command: |
        SUMRESULT=0
        # Run core-test
-       /root/project/build/tests/helics/core/core-test
+       /root/project/build/tests/helics/core/core-tests
        RESULT = $?
        SUMRESULT=$(( SUMRESULT + RESULT ))
        echo "*** Helics core-test result: "${RESULT}
@@ -75,6 +75,15 @@ workflows:
     jobs:
       - helicsoctave
       - helicsMSan
-#           requires:
-#              - previous_test_passed
+  nightly:
+    triggers:
+      - schedule:
+          cron: "25 * * * *"
+          filters:
+            branches:
+              only:
+                - dockerMSan
+    jobs:
+      - helicsoctave
+      - helicsMSan
 
