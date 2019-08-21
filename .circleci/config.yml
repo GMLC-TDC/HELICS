@@ -78,11 +78,11 @@ workflows:
   nightly:
     triggers:
       - schedule:
-          cron: "25 * * * *"
+          cron: "0 0 * * *"
           filters:
             branches:
               only:
-                - dockerMSan
+                - develop
     jobs:
       - helicsoctave
       - helicsMSan
