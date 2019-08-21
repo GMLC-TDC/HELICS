@@ -263,7 +263,9 @@ install:
   
 script:
   - mkdir -p build && cd build
+  - echo "cmake -G \"${CMAKE_GENERATOR}\" ${JOB_OPTION_FLAGS} ${HELICS_DEPENDENCY_FLAGS} ${HELICS_OPTION_FLAGS} ${CMAKE_COMPILER_LAUNCHER} .."
   - cmake -G "${CMAKE_GENERATOR}" ${JOB_OPTION_FLAGS} ${HELICS_DEPENDENCY_FLAGS} ${HELICS_OPTION_FLAGS} ${CMAKE_COMPILER_LAUNCHER} ..
+  - echo "cmake --build . -- ${MAKEFLAGS}"
   - cmake --build . -- ${MAKEFLAGS}
 
   # Setup counters for coverage
@@ -276,7 +278,8 @@ script:
   - export CTEST_OPTIONS="--output-on-failure"
   - |
     if [[ "$SKIP_TEST_RUN" != "true" ]]; then
-    travis_wait ../scripts/run-ci-tests.sh ${CI_TEST_FLAGS}
+      echo "travis_wait ../scripts/run-ci-tests.sh ${CI_TEST_FLAGS}"
+      travis_wait ../scripts/run-ci-tests.sh ${CI_TEST_FLAGS}
     else
       if [[ "$CORE_CI_TEST" == "true" ]]; then
       travis_wait ctest -R core-ci-tests
