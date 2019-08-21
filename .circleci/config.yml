@@ -7,7 +7,7 @@ aliases:
     command: |
       mkdir -p build
       cd build
-      cmake .. -DBUILD_OCTAVE_INTERFACE=ON -DBUILD_SHARED_LIBS=ON
+      cmake .. ${CMAKE_FLAGS}
       make -j 4 install
 
   - &run_octave_tests
@@ -20,18 +20,54 @@ aliases:
        echo "*** Octave test result: "${RESULT}
        exit $RESULT
 
+  - &run_helics_tests
+    name: run_helics_tests
+    command: |
+       SUMRESULT=0
+       # Run core-test
+       /root/project/build/tests/helics/core/core-test
+       RESULT = $?
+       SUMRESULT=$(( SUMRESULT + RESULT ))
+       echo "*** Helics core-test result: "${RESULT}
+       # Run common-tests
+       /root/project/build/tests/helics/common/common-tests
+       RESULT = $?
+       SUMRESULT=$(( SUMRESULT + RESULT ))
+       echo "*** Helics common-tests result: "${RESULT}
+       # Run system-tests
+       /root/project/build/tests/helics/system_tests/system-tests
+       RESULT = $?
+       SUMRESULT=$(( SUMRESULT + RESULT ))
+       echo "*** Helics system-tests result: "${RESULT}
+       # Return 0 or a positive integer for failure
+       exit $SUMRESULT
+
 jobs:
   helicsoctave:
     docker:
       - image: helics/octave:latest
     environment:
       OCTAVETEST: "/root/project/tests/octave"
+      CMAKE_FLAGS: "-DBUILD_OCTAVE_INTERFACE=ON -DBUILD_SHARED_LIBS=ON"
     steps:
       - checkout
       - setup_remote_docker: 
          docker_layer_caching: true   # Save time when caching
       - run: *setup_helics
       - run: *run_octave_tests
+  helicsMSan:
+    docker:
+      - image: helics/MSan:latest
+    environment:
+      MSAN_CFLAGS: "-fsanitize=memory -stdlib=libc++ -L/root/develop/libcxx_msan/lib -lc++abi -I/root/develop/libcxx_msan/include -I/root/develop/libcxx_msan/include/c++/v1 -Wno-unused-command-line-argument -fno-omit-frame-pointer -g -O1 -Wl,-rpath=/root/develop/libcxx_msan/lib"
+      CMAKE_FLAGS: "-DBUILD_SHARED_LIBS=ON -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_FLAGS=\"$MSAN_CFLAGS\"  -DBUILD_HELICS_BOOST_TESTS=OFF -DZMQ_SUBPROJECT=ON  -DZMQ_FORCE_SUBPROJECT=ON"
+
+    steps:
+      - checkout
+      - setup_remote_docker: 
+         docker_layer_caching: true   # Save time when caching
+      - run: *setup_helics
+      - run: *run_helics_tests
 
 workflows:
   version: 2
