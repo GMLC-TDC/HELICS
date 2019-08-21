@@ -55,6 +55,7 @@ jobs:
          docker_layer_caching: true   # Save time when caching
       - run: *setup_helics
       - run: *run_octave_tests
+
   helicsMSan:
     docker:
       - image: helics/MSan:latest
@@ -74,6 +75,7 @@ workflows:
   helics_test:
     jobs:
       - helicsoctave
+      - helicsMSan
 #           requires:
 #              - previous_test_passed
 
