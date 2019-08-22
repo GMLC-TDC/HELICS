@@ -144,6 +144,7 @@ jobs:
         - USE_SWIG=true
         - CI_BOOST_VERSION=1.58.0
         - SKIP_TEST_RUN=true
+        - JOB_OPTION_FLAGS="-DBUILD_HELICS_BOOST_TESTS=OFF"
 
     - os: windows
       name: "MinGW"
