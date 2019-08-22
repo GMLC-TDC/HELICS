@@ -215,6 +215,15 @@ void TcpComms::txReceive (const char *data, size_t bytes_received, const std::st
             {
                 txQueue.emplace (control_route, m);
             }
+            else if (m.messageID == NEW_BROKER_INFORMATION)
+            {
+                txQueue.emplace (control_route, m);
+            }
+            else if (m.messageID == DELAY)
+            {
+                std::this_thread::sleep_for (std::chrono::seconds (2));
+                txQueue.emplace (control_route, m);
+            }
         }
     }
     else
@@ -269,6 +278,7 @@ bool TcpComms::establishBrokerConnection (std::shared_ptr<AsioContextManager> &i
         {
             ActionMessage m (CMD_PROTOCOL_PRIORITY);
             m.messageID = REQUEST_PORTS;
+            m.setStringData (brokerName, brokerInitString);
             try
             {
                 brokerConnection->send (m.packetize ());
@@ -310,6 +320,9 @@ bool TcpComms::establishBrokerConnection (std::shared_ptr<AsioContextManager> &i
                         if (mess->second.messageID == DISCONNECT)
                         {
                             return terminate (connection_status::terminated);
+                        }
+                        if (mess->second.messageID == DELAY)
+                        {
                         }
                         rxMessageQueue.push (mess->second);
                     }

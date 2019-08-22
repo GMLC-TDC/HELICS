@@ -70,6 +70,7 @@ class BrokerServer
     bool udp_server{false};
     bool mpi_server{false};
     std::atomic<bool> exitall{false};
+
     std::string configFile_;
     std::vector<std::thread> serverloops_;
     std::unique_ptr<Json::Value> config_;

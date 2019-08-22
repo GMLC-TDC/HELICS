@@ -216,6 +216,7 @@ void UdpComms::queue_tx_function ()
             {
                 ActionMessage m (CMD_PROTOCOL_PRIORITY);
                 m.messageID = REQUEST_PORTS;
+                m.setStringData (brokerName, brokerInitString);
                 transmitSocket.send_to (asio::buffer (m.to_string ()), broker_endpoint, 0, error);
                 if (error)
                 {

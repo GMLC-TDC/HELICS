@@ -46,6 +46,8 @@ class NetworkCommsInterface : public CommsInterface
     void setBrokerPort (int brokerPortNumber);
     /** set the local port number to use for incoming connections*/
     void setPortNumber (int localPortNumber);
+    /** get the local port number to use for incoming connections*/
+    int getPortNumber () const { return PortNumber.load (); }
     /** set the automatic port numbering starting port*/
     void setAutomaticPortStartPort (int startingPort);
     /** set a flag on the communication system*/
