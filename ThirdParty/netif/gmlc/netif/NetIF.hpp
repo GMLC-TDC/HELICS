@@ -46,7 +46,7 @@ using IF_ADDRS_UNICAST = struct ifaddrs *;
 
 #ifdef __GNUC__
 #pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wno-strict-aliasing"
+#pragma GCC diagnostic ignored "-Wstrict-aliasing"
 #endif
 
 /**
