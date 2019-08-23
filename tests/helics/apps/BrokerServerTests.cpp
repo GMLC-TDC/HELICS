@@ -85,11 +85,11 @@ BOOST_AUTO_TEST_CASE (execution_tests_duplicate)
     brks.startServers ();
 
     FederateInfo fi (core_type::ZMQ);
-    fi.coreName = "c1";
+    fi.coreName = "c1b";
 
     auto fed1 = ValueFederate ("fed1", fi);
     auto &pub1 = fed1.registerGlobalPublication ("key1", "double");
-    fi.coreName = "c2";
+    fi.coreName = "c2b";
     std::this_thread::sleep_for (std::chrono::milliseconds (200));
     auto fed2 = ValueFederate ("fed2", fi);
     auto &sub2 = fed2.registerSubscription ("key1");
@@ -98,11 +98,11 @@ BOOST_AUTO_TEST_CASE (execution_tests_duplicate)
     BOOST_CHECK_NO_THROW (fed2.enterExecutingMode ());
     fed1.enterExecutingModeComplete ();
 
-    fi.coreName = "c3";
+    fi.coreName = "c3b";
     // this would test two ZMQ co-sim executing simultaneously
     auto fed3 = ValueFederate ("fed3", fi);
     auto &pub3 = fed3.registerGlobalPublication ("key1", "double");
-    fi.coreName = "c4";
+    fi.coreName = "c4b";
     std::this_thread::sleep_for (std::chrono::milliseconds (200));
     auto fed4 = ValueFederate ("fed4", fi);
     auto &sub4 = fed4.registerSubscription ("key1");

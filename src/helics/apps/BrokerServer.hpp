@@ -39,7 +39,7 @@ class BrokerServer
     /** construct from command line arguments contained in a vector
     @param args the number of arguments
     */
-    BrokerServer (std::vector<std::string> args);
+    explicit BrokerServer (std::vector<std::string> args);
     /** construct from command line arguments parsed as a single string
     @param argString a merged string with all the arguments
     */
