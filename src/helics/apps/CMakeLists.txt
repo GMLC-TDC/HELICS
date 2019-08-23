@@ -90,11 +90,7 @@ if(BUILD_APP_LIBRARY)
       HELICS_BROKER_LOC ${CMAKE_CURRENT_BINARY_DIR}
       CACHE INTERNAL "build folder location of the broker"
     )
-    install(
-      TARGETS helics_broker
-      DESTINATION ${CMAKE_INSTALL_BINDIR}
-      COMPONENT applications
-    )
+    
 	add_test(NAME broker_version_return COMMAND helics_broker --version)
 	add_test(NAME broker_help_return COMMAND helics_broker --help)
 	set_property(TEST broker_version_return broker_help_return PROPERTY LABELS Continuous)
@@ -109,7 +105,7 @@ if(BUILD_APP_LIBRARY)
       CACHE INTERNAL "build folder location of the broker server"
     )
     install(
-      TARGETS helics_broker
+      TARGETS helics_broker broker_server
       DESTINATION ${CMAKE_INSTALL_BINDIR}
       COMPONENT applications
     )
