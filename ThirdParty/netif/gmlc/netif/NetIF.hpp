@@ -44,6 +44,11 @@ using IF_ADDRS_UNICAST = PIP_ADAPTER_UNICAST_ADDRESS;
 using IF_ADDRS_UNICAST = struct ifaddrs *;
 #endif
 
+#ifdef __GNUC__
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wno-strict-aliasing"
+#endif
+
 /**
  * a helper function to convert the IP address in a sockaddr struct to text
  * @param addr a pointer to a sockaddr struct
@@ -79,6 +84,10 @@ inline std::string addressToString (struct sockaddr *addr, int sa_len)
 
     return std::string (addr_str);
 }
+
+#ifdef __GNUC__
+#pragma GCC diagnostic pop
+#endif
 
 /**
  * a helper function to free the memory allocated to store a set of interface addresses
