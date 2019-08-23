@@ -16,6 +16,8 @@ SPDX-License-Identifier: BSD-3-Clause
 #endif
 
 #include "exeTestHelper.h"
+#include "helics/application_api/Subscriptions.hpp"
+#include "helics/application_api/ValueFederate.hpp"
 #include "helics/apps/BrokerServer.hpp"
 #include "helics/core/BrokerFactory.hpp"
 #include "helics/core/Core.hpp"
@@ -25,13 +27,19 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <future>
 
 namespace utf = boost::unit_test;
+using namespace helics;
 
 BOOST_AUTO_TEST_SUITE (broker_server_tests, *utf::label ("ci"))
 
 BOOST_AUTO_TEST_CASE (startup_tests)
 {
-    helics::apps::BrokerServer brks (std::vector<std::string>{"--zmq"});
+    apps::BrokerServer brks (std::vector<std::string>{"--zmq"});
     bool active = brks.hasActiveBrokers ();
+    if (active)
+    {
+        std::this_thread::sleep_for (std::chrono::milliseconds (300));
+        active = brks.hasActiveBrokers ();
+    }
     BOOST_CHECK (!active);
     brks.startServers ();
 
@@ -52,6 +60,30 @@ BOOST_AUTO_TEST_CASE (startup_tests)
 
     BOOST_CHECK (cr->waitForDisconnect (std::chrono::milliseconds (1000)));
     BOOST_CHECK (cr2->waitForDisconnect (std::chrono::milliseconds (1000)));
+    cr->disconnect ();
+    cr2->disconnect ();
+}
+
+BOOST_AUTO_TEST_CASE (execution_tests)
+{
+    apps::BrokerServer brks (std::vector<std::string>{"--zmq"});
+    brks.startServers ();
+
+    FederateInfo fi (core_type::ZMQ);
+    fi.coreName = "c1";
+
+    auto fed1 = ValueFederate ("fed1", fi);
+    fed1.registerGlobalPublication ("key1", "double");
+    fi.coreName = "c2";
+    auto fed2 = ValueFederate ("fed2", fi);
+    auto &sub = fed2.registerSubscription ("key1");
+    sub.setOption (helics_handle_option_connection_required);
+    fed1.enterExecutingModeAsync ();
+    BOOST_CHECK_NO_THROW (fed2.enterExecutingMode ());
+    fed1.enterExecutingModeComplete ();
+
+    fed1.finalize ();
+    fed2.finalize ();
 }
 
 BOOST_AUTO_TEST_SUITE_END ()
