@@ -82,9 +82,10 @@ int main (int argc, char *argv[])
 /** function to control a user terminal for the broker*/
 void terminalFunction (std::vector<std::string> args)
 {
-    std::cout << "starting broker server\n";
     auto brokerServer = std::make_unique<helics::apps::BrokerServer> (args);
-
+    std::cout << "starting broker server\n";
+    brokerServer->startServers ();
+    std::cout << "servers started\n";
     auto closeBrokerServer = [&brokerServer] () {
         if (!brokerServer)
         {
@@ -163,20 +164,21 @@ void terminalFunction (std::vector<std::string> args)
             std::cout << "Broker (" << id << ") is not connected \n";
         }
     };
+    */
     bool cmdcont = true;
     helics::helicsCLI11App termProg ("helics broker command line terminal");
     termProg.ignore_case ();
     termProg.add_flag ("-q,--quit,--exit", cmdcont, "close the terminal and wait for the broker to exit");
     termProg.add_subcommand ("quit", "close the terminal and  wait for the broker to exit")
       ->callback ([&cmdcont] () { cmdcont = false; });
-    termProg.add_subcommand ("terminate", "terminate the broker")->callback (closeBroker);
+    termProg.add_subcommand ("terminate", "terminate the broker server")->callback (closeBrokerServer);
 
     termProg.add_subcommand ("terminate!", "forceably terminate the broker and exit")
-      ->callback ([closeBroker, &cmdcont] () {
+      ->callback ([closeBrokerServer, &cmdcont] () {
           cmdcont = false;
-          closeBroker ();
+          closeBrokerServer ();
       });
-
+    /*
     auto restart =
       termProg.add_subcommand ("restart", "restart the broker if it is not currently executing")->allow_extras ();
     restart->callback (
@@ -193,9 +195,11 @@ void terminalFunction (std::vector<std::string> args)
     termProg.add_subcommand ("info", "get the current broker status and connection info")->callback ([&status] () {
         status (true);
     });
+    */
     termProg.add_subcommand ("help", "display the help")->callback ([&termProg] () {
         termProg.helics_parse ("-?");
     });
+    /*
     std::string target;
     std::string query;
 
@@ -235,12 +239,12 @@ void terminalFunction (std::vector<std::string> args)
         }
     });
     querySub->callback (queryCall);
+    */
     while (cmdcont)
     {
         std::string cmdin;
-        std::cout << "\nhelics>>";
+        std::cout << "\nhelics-broker-server>>";
         std::getline (std::cin, cmdin);
         termProg.helics_parse (cmdin);
     }
-    */
 }

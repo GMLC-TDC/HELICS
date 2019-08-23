@@ -7,24 +7,14 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <boost/test/unit_test.hpp>
 #include <boost/test/data/test_case.hpp>
 
-#ifdef _MSC_VER
-#pragma warning(push, 0)
-#include "helics/external/filesystem.hpp"
-#pragma warning(pop)
-#else
-#include "helics/external/filesystem.hpp"
-#endif
-
 #include "exeTestHelper.h"
-#include "helics/application_api/Subscriptions.hpp"
-#include "helics/application_api/ValueFederate.hpp"
+
+#include "helics/helics.hpp"
+
 #include "helics/apps/BrokerServer.hpp"
-#include "helics/core/BrokerFactory.hpp"
 #include "helics/core/Core.hpp"
-#include "helics/core/CoreFactory.hpp"
 
 #include <cstdio>
-#include <future>
 
 namespace utf = boost::unit_test;
 using namespace helics;
@@ -62,6 +52,7 @@ BOOST_AUTO_TEST_CASE (startup_tests)
     BOOST_CHECK (cr2->waitForDisconnect (std::chrono::milliseconds (1000)));
     cr->disconnect ();
     cr2->disconnect ();
+    cleanupHelicsLibrary ();
 }
 
 BOOST_AUTO_TEST_CASE (execution_tests)
@@ -75,6 +66,7 @@ BOOST_AUTO_TEST_CASE (execution_tests)
     auto fed1 = ValueFederate ("fed1", fi);
     fed1.registerGlobalPublication ("key1", "double");
     fi.coreName = "c2";
+    std::this_thread::sleep_for (std::chrono::milliseconds (200));
     auto fed2 = ValueFederate ("fed2", fi);
     auto &sub = fed2.registerSubscription ("key1");
     sub.setOption (helics_handle_option_connection_required);
@@ -84,6 +76,59 @@ BOOST_AUTO_TEST_CASE (execution_tests)
 
     fed1.finalize ();
     fed2.finalize ();
+    cleanupHelicsLibrary ();
+}
+
+BOOST_AUTO_TEST_CASE (execution_tests_duplicate)
+{
+    apps::BrokerServer brks (std::vector<std::string>{"--zmq"});
+    brks.startServers ();
+
+    FederateInfo fi (core_type::ZMQ);
+    fi.coreName = "c1";
+
+    auto fed1 = ValueFederate ("fed1", fi);
+    auto &pub1 = fed1.registerGlobalPublication ("key1", "double");
+    fi.coreName = "c2";
+    std::this_thread::sleep_for (std::chrono::milliseconds (200));
+    auto fed2 = ValueFederate ("fed2", fi);
+    auto &sub2 = fed2.registerSubscription ("key1");
+    sub2.setOption (helics_handle_option_connection_required);
+    fed1.enterExecutingModeAsync ();
+    BOOST_CHECK_NO_THROW (fed2.enterExecutingMode ());
+    fed1.enterExecutingModeComplete ();
+
+    fi.coreName = "c3";
+    // this would test two ZMQ co-sim executing simultaneously
+    auto fed3 = ValueFederate ("fed3", fi);
+    auto &pub3 = fed3.registerGlobalPublication ("key1", "double");
+    fi.coreName = "c4";
+    std::this_thread::sleep_for (std::chrono::milliseconds (200));
+    auto fed4 = ValueFederate ("fed4", fi);
+    auto &sub4 = fed4.registerSubscription ("key1");
+    sub4.setOption (helics_handle_option_connection_required);
+    fed3.enterExecutingModeAsync ();
+    BOOST_CHECK_NO_THROW (fed4.enterExecutingMode ());
+    fed3.enterExecutingModeComplete ();
+
+    pub1.publish (27.5);
+    pub3.publish (30.6);
+
+    fed3.requestTimeAsync (1.0);
+    fed4.requestTime (1.0);
+    fed3.requestTimeComplete ();
+
+    fed1.requestTimeAsync (1.0);
+    fed2.requestTime (1.0);
+    fed1.requestTimeComplete ();
+
+    BOOST_CHECK_EQUAL (sub2.getValue<double> (), 27.5);
+    BOOST_CHECK_EQUAL (sub4.getValue<double> (), 30.6);
+    fed1.finalize ();
+    fed2.finalize ();
+    fed3.finalize ();
+    fed4.finalize ();
+    cleanupHelicsLibrary ();
 }
 
 BOOST_AUTO_TEST_SUITE_END ()
