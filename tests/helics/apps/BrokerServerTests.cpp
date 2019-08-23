@@ -39,9 +39,19 @@ BOOST_AUTO_TEST_CASE (startup_tests)
     BOOST_CHECK (cr->isConfigured ());
     cr->connect ();
     BOOST_CHECK (cr->isConnected ());
+
+    auto cr2 = helics::CoreFactory::create (helics::core_type::ZMQ, "--brokername=fred2");
+    BOOST_CHECK (cr2->isConfigured ());
+    cr2->connect ();
+    BOOST_CHECK (cr2->isConnected ());
+
+    auto objs = helics::BrokerFactory::getAllBrokers ();
+    BOOST_CHECK_EQUAL (objs.size (), 2u);
+
     brks.forceTerminate ();
 
-    cr->waitForDisconnect (std::chrono::milliseconds (1000));
+    BOOST_CHECK (cr->waitForDisconnect (std::chrono::milliseconds (1000)));
+    BOOST_CHECK (cr2->waitForDisconnect (std::chrono::milliseconds (1000)));
 }
 
 BOOST_AUTO_TEST_SUITE_END ()
