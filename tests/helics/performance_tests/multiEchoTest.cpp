@@ -7,7 +7,7 @@ the top-level NOTICE for additional details. All rights reserved. See LICENSE fi
 #include <boost/test/unit_test.hpp>
 #include <boost/test/data/monomorphic.hpp>
 #include <boost/test/data/test_case.hpp>
-#include <boost/test/floating_point_comparison.hpp>
+#include <boost/test/tools/floating_point_comparison.hpp>
 
 #include "helics/application_api/Inputs.hpp"
 #include "helics/application_api/Publications.hpp"
@@ -164,7 +164,7 @@ BOOST_DATA_TEST_CASE (echo_test_single_core, bdata::make (fedCount), feds)
         leafs[ii].initialize ("mcore", ii);
     }
 
-    std::vector<std::thread> threads (feds + 1);
+    std::vector<std::thread> threads (static_cast<size_t>(feds) + 1);
     for (int ii = 0; ii < feds; ++ii)
     {
         threads[ii] = std::thread ([](EchoLeaf &leaf) { leaf.run (); }, std::ref (leafs[ii]));
@@ -203,7 +203,7 @@ BOOST_DATA_TEST_CASE (echo_test_multicores, bdata::make (fedCountB), feds)
         leafs[ii].initialize (cores[ii]->getIdentifier (), ii);
     }
 
-    std::vector<std::thread> threads (feds + 1);
+    std::vector<std::thread> threads (static_cast<size_t>(feds) + 1);
     for (int ii = 0; ii < feds; ++ii)
     {
         threads[ii] = std::thread ([](EchoLeaf &leaf) { leaf.run (); }, std::ref (leafs[ii]));

@@ -13,7 +13,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <helics/core/Broker.hpp>
 #include <boost/test/unit_test.hpp>
 #include <boost/test/data/test_case.hpp>
-#include <boost/test/floating_point_comparison.hpp>
+#include <boost/test/tools/floating_point_comparison.hpp>
 
 #include <future>
 /** these test cases test out the message federates

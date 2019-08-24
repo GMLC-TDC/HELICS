@@ -239,7 +239,10 @@ std::vector<std::string> getInterfaceAddresses (int family)
 
 #if defined(_WIN32)
     WSADATA wsaData;
-    WSAStartup (0x202, &wsaData);
+    if (WSAStartup (0x202, &wsaData) != 0)
+    {
+        return result_list;
+    }
     auto winAddrs = allAddrs;
     while (winAddrs)
     {
