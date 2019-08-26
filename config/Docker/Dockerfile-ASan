@@ -14,7 +14,7 @@ RUN (cd llvm/projects && svn co http://llvm.org/svn/llvm-project/libcxxabi/trunk
 
 RUN  mkdir libcxx_asan && cd libcxx_asan &&  cmake ../llvm -DCMAKE_BUILD_TYPE=Release -DLLVM_USE_SANITIZER=Address -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++
 RUN cd libcxx_asan && make cxx -j12
-ENV MSAN_CFLAGS="-fsanitize=address-stdlib=libc++ -L/root/develop/libcxx_asan/lib -lc++abi -I/root/develop/libcxx_asan/include -I/root/develop/libcxx_asan/include/c++/v1 -Wno-unused-command-line-argument -fno-omit-frame-pointer -g -O1 -Wl,-rpath=/root/develop/libcxx_asan/lib"
+ENV ASAN_CFLAGS="-fsanitize=undefined,address -stdlib=libc++ -L/root/develop/libcxx_asan/lib -lc++abi -I/root/develop/libcxx_asan/include -I/root/develop/libcxx_asan/include/c++/v1 -Wno-unused-command-line-argument -fno-omit-frame-pointer -g -O1 -Wl,-rpath=/root/develop/libcxx_asan/lib"
 
 RUN rm -rf llvm
 # Create script to build helics
@@ -23,7 +23,7 @@ RUN printf "#!/bin/bash \
 \ncd HELICS \
 \nmkdir build \
 \ncd build \
-\ncmake .. -DBUILD_SHARED_LIBS=ON -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_FLAGS=\"${MSAN_CFLAGS}\"  -DBUILD_HELICS_BOOST_TESTS=OFF -DZMQ_SUBPROJECT=ON  -DZMQ_FORCE_SUBPROJECT=ON \
+\ncmake .. -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_FLAGS=\"${ASAN_CFLAGS}\"  -DBUILD_HELICS_BOOST_TESTS=OFF -DZMQ_SUBPROJECT=ON  -DZMQ_FORCE_SUBPROJECT=ON \
 \ncd /root/develop/HELICS/build \
 \nmake -j 12  \
 \n/root/develop/HELICS/build/tests/helics/core/core-tests \

@@ -14,7 +14,7 @@ RUN (cd llvm/projects && svn co http://llvm.org/svn/llvm-project/libcxxabi/trunk
 
 RUN  mkdir libcxx_tsan && cd libcxx_tsan &&  cmake ../llvm -DCMAKE_BUILD_TYPE=Release -DLLVM_USE_SANITIZER=Thread -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++
 RUN cd libcxx_tsan && make cxx -j12
-ENV MSAN_CFLAGS="-fsanitize=thread -stdlib=libc++ -L/root/develop/libcxx_tsan/lib -lc++abi -I/root/develop/libcxx_tsan/include -I/root/develop/libcxx_tsan/include/c++/v1 -Wno-unused-command-line-argument -g -O1 -Wl,-rpath=/root/develop/libcxx_tsan/lib"
+ENV TSAN_CFLAGS="-fsanitize=thread -stdlib=libc++ -L/root/develop/libcxx_tsan/lib -lc++abi -I/root/develop/libcxx_tsan/include -I/root/develop/libcxx_tsan/include/c++/v1 -Wno-unused-command-line-argument -g -O1 -Wl,-rpath=/root/develop/libcxx_tsan/lib"
 
 RUN rm -rf llvm
 
@@ -24,7 +24,7 @@ RUN printf "#!/bin/bash \
 \ncd HELICS \
 \nmkdir build \
 \ncd build \
-\ncmake .. -DBUILD_SHARED_LIBS=ON -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_FLAGS=\"${MSAN_CFLAGS}\"  -DBUILD_HELICS_BOOST_TESTS=OFF -DZMQ_SUBPROJECT=ON  -DZMQ_FORCE_SUBPROJECT=ON \
+\ncmake .. -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_FLAGS=\"${TSAN_CFLAGS}\"  -DBUILD_HELICS_BOOST_TESTS=OFF -DZMQ_SUBPROJECT=ON  -DZMQ_FORCE_SUBPROJECT=ON \
 \ncd /root/develop/HELICS/build \
 \nmake -j 12  \
 \n/root/develop/HELICS/build/tests/helics/core/core-tests \
