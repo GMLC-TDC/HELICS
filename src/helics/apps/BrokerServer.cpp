@@ -206,6 +206,7 @@ static void assignPort (portData &pd, int pnumber, std::shared_ptr<Broker> &brk)
 
 void BrokerServer::startZMQserver ()
 {
+    std::cerr << "starting zmq broker server\n";
 #ifdef ENABLE_ZMQ_CORE
     std::string ext_interface = "tcp://*";
     int port = DEFAULT_ZMQ_BROKER_PORT_NUMBER + 1;
@@ -303,6 +304,8 @@ void BrokerServer::startZMQserver ()
         }
     }
     repSocket.close ();
+    std::cerr << "exiting zmq broker server\n";
+
 #endif
 }
 
