@@ -62,7 +62,7 @@ BOOST_AUTO_TEST_CASE (execution_tests)
 
     FederateInfo fi (core_type::ZMQ);
     fi.coreName = "c1";
-
+    fi.coreInitString = "--brokerinit=\"-f 2\"";
     auto fed1 = ValueFederate ("fed1", fi);
     fed1.registerGlobalPublication ("key1", "double");
     fi.coreName = "c2";
