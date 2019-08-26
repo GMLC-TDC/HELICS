@@ -341,10 +341,26 @@ int ZmqComms::initializeBrokerConnections (zmq::socket_t &controlSocket)
                             setTxStatus (connection_status::error);
                             break;
                         }
-                        else
+                        // try to reestablish the connection
+                        brokerReq.close ();
+                        brokerReq = zmq::socket_t (ctx->getContext (), ZMQ_REQ);
+                        brokerReq.setsockopt (ZMQ_LINGER, 50);
+                        try
                         {
-                            continue;
+                            brokerReq.connect (makePortAddress (brokerTargetAddress, brokerPort + 1));
                         }
+                        catch (zmq::error_t &ze)
+                        {
+                            logError (std::string ("unable to connect with broker at ") +
+                                      makePortAddress (brokerTargetAddress, brokerPort + 1) + ":(" + name + ")" +
+                                      ze.what ());
+                            setTxStatus (connection_status::error);
+                            ActionMessage M (CMD_PROTOCOL);
+                            M.messageID = DISCONNECT_ERROR;
+                            controlSocket.send (M.to_string ());
+                            return (-1);
+                        }
+                        break;
                     }
                 }
 
@@ -379,6 +395,7 @@ int ZmqComms::initializeBrokerConnections (zmq::socket_t &controlSocket)
                     }
                     if (rxcmd.messageID == NEW_BROKER_INFORMATION)
                     {
+                        logWarning ("got new broker information");
                         brokerReq.disconnect (makePortAddress (brokerTargetAddress, brokerPort + 1));
                         auto brkprt = extractInterfaceandPort (rxcmd.getString (0));
                         brokerPort = brkprt.second;
