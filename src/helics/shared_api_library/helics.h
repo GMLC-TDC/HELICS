@@ -332,6 +332,13 @@ extern "C"
     */
     HELICS_EXPORT void helicsFederateInfoSetCoreInitString (helics_federate_info fi, const char *coreInit, helics_error *err);
 
+    /** set the initialization string for the core usually in the form of command line arguments
+    @param fi the federate info object to alter
+    @param coreInit a string with the core initialization strings
+    @param[in,out] err an error object that will contain an error code and string if any error occurred during the execution of the function
+    */
+    HELICS_EXPORT void helicsFederateInfoSetBrokerInitString (helics_federate_info fi, const char *brokerInit, helics_error *err);
+
     /** set the core type by integer code
     @details valid values available by definitions in api-data.h
     @param fi the federate info object to alter
