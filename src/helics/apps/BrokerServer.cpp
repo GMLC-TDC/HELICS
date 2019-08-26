@@ -259,6 +259,7 @@ void BrokerServer::startZMQserver ()
                 }
             }
             ActionMessage rxcmd (static_cast<char *> (msg.data ()), msg.size ());
+            std::cout << "received data length " << msg.size () << std::endl;
             switch (rxcmd.action ())
             {
             case CMD_PROTOCOL:
@@ -292,6 +293,7 @@ void BrokerServer::startZMQserver ()
                 }
                 break;
             default:
+                std::cout << "received unknown message " << msg.size ();
                 break;
             }
         }
