@@ -12,9 +12,9 @@ RUN svn co http://llvm.org/svn/llvm-project/llvm/trunk llvm
 RUN (cd llvm/projects && svn co http://llvm.org/svn/llvm-project/libcxx/trunk libcxx)
 RUN (cd llvm/projects && svn co http://llvm.org/svn/llvm-project/libcxxabi/trunk libcxxabi)
 
-RUN  mkdir libcxx_msan && cd libcxx_msan &&  cmake ../llvm -DCMAKE_BUILD_TYPE=Release -DLLVM_USE_SANITIZER=Memory -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++
-RUN cd libcxx_msan && make cxx -j12
-ENV MSAN_CFLAGS="-fsanitize=memory -stdlib=libc++ -L/root/develop/libcxx_msan/lib -lc++abi -I/root/develop/libcxx_msan/include -I/root/develop/libcxx_msan/include/c++/v1 -Wno-unused-command-line-argument -fno-omit-frame-pointer -g -O1 -Wl,-rpath=/root/develop/libcxx_msan/lib"
+RUN  mkdir libcxx_asan && cd libcxx_asan &&  cmake ../llvm -DCMAKE_BUILD_TYPE=Release -DLLVM_USE_SANITIZER=Address -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++
+RUN cd libcxx_asan && make cxx -j12
+ENV MSAN_CFLAGS="-fsanitize=address-stdlib=libc++ -L/root/develop/libcxx_asan/lib -lc++abi -I/root/develop/libcxx_asan/include -I/root/develop/libcxx_asan/include/c++/v1 -Wno-unused-command-line-argument -fno-omit-frame-pointer -g -O1 -Wl,-rpath=/root/develop/libcxx_asan/lib"
 
 RUN rm -rf llvm
 # Create script to build helics
