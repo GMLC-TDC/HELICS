@@ -312,6 +312,7 @@ int ZmqComms::initializeBrokerConnections (zmq::socket_t &controlSocket)
             {
                 ActionMessage getPorts = generatePortRequest ((serverMode) ? 2 : 1);
                 auto str = getPorts.to_string ();
+
                 brokerReq.send (str);
                 poller.socket = static_cast<void *> (brokerReq);
                 poller.events = ZMQ_POLLIN;
@@ -335,6 +336,8 @@ int ZmqComms::initializeBrokerConnections (zmq::socket_t &controlSocket)
                         if (cnt2 == 1)
                         {
                             logWarning ("zmq broker connection timed out, trying again (2)");
+                            logWarning (std::string ("sending message to ") +
+                                        makePortAddress (brokerTargetAddress, brokerPort + 1));
                         }
                         else if (cnt2 > maxRetries)
                         {
@@ -349,6 +352,7 @@ int ZmqComms::initializeBrokerConnections (zmq::socket_t &controlSocket)
                         try
                         {
                             brokerReq.connect (makePortAddress (brokerTargetAddress, brokerPort + 1));
+                            poller.socket = static_cast<void *> (brokerReq);
                         }
                         catch (zmq::error_t &ze)
                         {
