@@ -61,10 +61,11 @@ std::pair<double, int> runInitIterations (helics::ValueFederate *vfed, int index
     high_target += "/pub";
     auto &sub_low = vfed->registerSubscription (low_target);
     auto &sub_high = vfed->registerSubscription (high_target);
-    sub_low.setDefault (static_cast<double> (2 * index));
-    sub_high.setDefault (static_cast<double> (2 * index + 1));
+    double index2 = 2.0 * static_cast<double> (index);
+    sub_low.setDefault (index2);
+    sub_high.setDefault (index2+1.0);
     vfed->enterInitializingMode ();
-    auto cval = static_cast<double> (2 * index) + 0.5;
+    auto cval = index2 + 0.5;
 
     auto itres = iteration_result::iterating;
     int itcount = 0;

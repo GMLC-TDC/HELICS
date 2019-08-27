@@ -32,6 +32,7 @@ if(WIN32 AND NOT UNIX_LIKE)
 
     set(
         boost_versions
+		boost_1_71_0
 		boost_1_70_0
         boost_1_69_0
         boost_1_68_0
@@ -43,6 +44,7 @@ if(WIN32 AND NOT UNIX_LIKE)
         boost_1_63_0
         boost_1_62_0
         boost_1_61_0
+		boost_1_58_0
     )
 
     set(
@@ -52,6 +54,8 @@ if(WIN32 AND NOT UNIX_LIKE)
         C:/local
         C:/local/boost
         C:/Libraries
+		"C:/Program Files/boost"
+		C:/ProgramData/chocolatey/lib
         D:
         D:/boost
         D:/local
@@ -61,8 +65,8 @@ if(WIN32 AND NOT UNIX_LIKE)
     # create an empty list
     list(APPEND boost_paths "")
     mark_as_advanced(BOOST_INSTALL_PATH)
-    foreach(dir ${poss_prefixes})
-        foreach(boostver ${boost_versions})
+	foreach(boostver ${boost_versions})
+		foreach(dir ${poss_prefixes})
             if(IS_DIRECTORY ${dir}/${boostver})
                 if(EXISTS ${dir}/${boostver}/boost/version.hpp)
                     list(APPEND boost_paths ${dir}/${boostver})

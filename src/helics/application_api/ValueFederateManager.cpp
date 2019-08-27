@@ -277,7 +277,7 @@ void ValueFederateManager::startupToInitializeStateTransition ()
 {
     // get the actual publication types
     auto inpHandle = inputs.lock ();
-    inpHandle->apply ([this](auto &inp) { inp.loadSourceInformation (); });
+    inpHandle->apply ([](auto &inp) { inp.loadSourceInformation (); });
 }
 
 void ValueFederateManager::initializeToExecuteStateTransition () { updateTime (0.0, 0.0); }

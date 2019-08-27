@@ -113,7 +113,7 @@ void BrokerServer::closeServers ()
         closeZMQserver ();
     }
 #endif
-    exitall.store (false);
+    exitall.store (true);
 
     for (auto &t : serverloops_)
     {

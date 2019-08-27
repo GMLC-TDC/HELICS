@@ -1126,12 +1126,7 @@ void helicsCloseLibrary (void)
     auto ret = std::async (std::launch::async, [] () { helics::CoreFactory::cleanUpCores (2000ms); });
     helics::BrokerFactory::cleanUpBrokers (2000ms);
     ret.get ();
-#ifdef ENABLE_ZMQ_CORE
-    if (ZmqContextManager::setContextToLeakOnDelete ())
-    {
-        ZmqContextManager::getContext ().close ();
-    }
-#endif
+
     helics::LoggerManager::closeLogger ();
     // helics::cleanupHelicsLibrary();
 }

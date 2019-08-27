@@ -50,17 +50,17 @@ Echo::Echo (const std::string &name, const std::shared_ptr<Core> &core, const Fe
 {
 }
 
-Echo::Echo (const std::string &name, const std::string &jsonString) : App (name, jsonString)
+Echo::Echo (const std::string &name, const std::string &jsonString): App (name, jsonString)
 {
     Echo::loadJsonFile (jsonString);
 }
 
-Echo::Echo (Echo &&other_echo)
+Echo::Echo (Echo &&other_echo) noexcept
     : App (std::move (other_echo)), endpoints (std::move (other_echo.endpoints)), delayTime (other_echo.delayTime)
 {
 }
 
-Echo &Echo::operator= (Echo &&other_echo)
+Echo &Echo::operator= (Echo &&other_echo) noexcept
 {
     endpoints = std::move (other_echo.endpoints);
     std::lock_guard<std::mutex> lock (delayTimeLock);
