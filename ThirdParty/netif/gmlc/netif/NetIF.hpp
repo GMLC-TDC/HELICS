@@ -44,6 +44,11 @@ using IF_ADDRS_UNICAST = PIP_ADAPTER_UNICAST_ADDRESS;
 using IF_ADDRS_UNICAST = struct ifaddrs *;
 #endif
 
+#ifdef __GNUC__
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wstrict-aliasing"
+#endif
+
 /**
  * a helper function to convert the IP address in a sockaddr struct to text
  * @param addr a pointer to a sockaddr struct
@@ -52,13 +57,13 @@ using IF_ADDRS_UNICAST = struct ifaddrs *;
  */
 inline std::string addressToString (struct sockaddr *addr, int sa_len)
 {
-    #if defined(__MINGW32__)
+#if defined(__MINGW32__)
     char addr_str[NI_MAXHOST];
-    if (getnameinfo(addr, sa_len, addr_str, NI_MAXHOST, 0, 0, NI_NUMERICHOST) != 0)
+    if (getnameinfo (addr, sa_len, addr_str, NI_MAXHOST, 0, 0, NI_NUMERICHOST) != 0)
     {
-        return std::string();
+        return std::string ();
     }
-    #else
+#else
     (void)sa_len;
     int family = addr->sa_family;
     char addr_str[INET6_ADDRSTRLEN];
@@ -66,19 +71,23 @@ inline std::string addressToString (struct sockaddr *addr, int sa_len)
     switch (family)
     {
     case AF_INET:
-        src_addr = &((struct sockaddr_in *)addr)->sin_addr;
+        src_addr = &(reinterpret_cast<struct sockaddr_in *> (addr)->sin_addr);
         break;
     case AF_INET6:
-        src_addr = &((struct sockaddr_in6 *)addr)->sin6_addr;
+        src_addr = &(reinterpret_cast<struct sockaddr_in6 *> (addr)->sin6_addr);
         break;
     default:  // Invalid address type for conversion to text
         return std::string ();
     }
     inet_ntop (family, src_addr, addr_str, INET6_ADDRSTRLEN);
-    #endif
-    
-    return std::string(addr_str);
+#endif
+
+    return std::string (addr_str);
 }
+
+#ifdef __GNUC__
+#pragma GCC diagnostic pop
+#endif
 
 /**
  * a helper function to free the memory allocated to store a set of interface addresses
@@ -137,6 +146,7 @@ inline auto getAddresses (int family, IF_ADDRS *addrs)
     }
     return 0;
 #else
+    (void)family;
     return getifaddrs (addrs);
 #endif
 }
@@ -165,10 +175,10 @@ inline int getSockAddrLen (IF_ADDRS_UNICAST addr)
 #if defined(_WIN32)
     return addr->Address.iSockaddrLength;
 #else
-    return sizeof(*addr->ifa_addr);
+    return sizeof (*addr->ifa_addr);
 #endif
 }
-                            
+
 /**
  * a helper function to get the next interface/adapter address based on OS
  * @param family specify the type of address desired on non-Windows systems; one of AF_INET (IPv4), AF_INET6
@@ -229,7 +239,10 @@ std::vector<std::string> getInterfaceAddresses (int family)
 
 #if defined(_WIN32)
     WSADATA wsaData;
-    WSAStartup(0x202, &wsaData);
+    if (WSAStartup (0x202, &wsaData) != 0)
+    {
+        return result_list;
+    }
     auto winAddrs = allAddrs;
     while (winAddrs)
     {
@@ -240,7 +253,7 @@ std::vector<std::string> getInterfaceAddresses (int family)
 
         for (auto a = addrs; a != NULL; a = getNextAddress (family, a))
         {
-            std::string ipAddr = addressToString (getSockAddr (a), getSockAddrLen(a));
+            std::string ipAddr = addressToString (getSockAddr (a), getSockAddrLen (a));
             if (!ipAddr.empty ())
             {
                 result_list.push_back (ipAddr);
@@ -250,7 +263,7 @@ std::vector<std::string> getInterfaceAddresses (int family)
 #if defined(_WIN32)
         winAddrs = winAddrs->Next;
     }
-    WSACleanup();
+    WSACleanup ();
 #endif
 
     if (allAddrs)

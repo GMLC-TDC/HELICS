@@ -33,7 +33,7 @@ jobs:
       - image: helics/octave:latest
     environment:
       OCTAVETEST: "/root/project/tests/octave"
-      CMAKE_FLAGS: "-DBUILD_OCTAVE_INTERFACE=ON "
+      CMAKE_FLAGS: "-DBUILD_OCTAVE_INTERFACE=ON"
     steps:
       - checkout
       - setup_remote_docker: 
