@@ -26,7 +26,7 @@ RUN printf "#!/bin/bash \
 \ncd build \
 \ncmake .. -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_FLAGS=\"${TSAN_CFLAGS}\"  -DBUILD_HELICS_BOOST_TESTS=OFF -DZMQ_SUBPROJECT=ON  -DZMQ_FORCE_SUBPROJECT=ON \
 \ncd /root/develop/HELICS/build \
-\nmake -j 12  \
+\nmake -j  \
 \n/root/develop/HELICS/build/tests/helics/core/core-tests \
 \n/root/develop/HELICS/build/tests/helics/common/common-tests \
 \n/root/develop/HELICS/build/tests/helics/system_tests/system-tests \
