@@ -12,7 +12,7 @@ A note on future revisions.
 Minor release with some updates to the networking portion of HELICS and some API additions.
 
 ### Changed
--   submodule updates for filesystem, libfmt, and google test 
+-   Submodule updates for filesystem, libfmt, and google test 
 -   A utilities lib containing many string processing and small functions is now used instead of directly including it.  
 
 ### Fixed
@@ -22,13 +22,13 @@ Minor release with some updates to the networking portion of HELICS and some API
 -   Some changes to the network interface selection process that cause issues on certain platforms.  
 
 ### Added
--   The ability specify a broker key for brokers and cores to limit linking to those cores with the appropriate key
+-   The ability to specify a broker key for brokers and cores to limit linking to those cores with the appropriate key
 -   A units library into HELICS,  mismatched units are checked and units published as a double with units on the publication and subscription converted internally
 -   A new API for messages in the C interface.  The old interface has difficulties when working with binary data in the message structure.  So a message object API was created with appropriate methods to access the data.  The previous message API will be deprecated in release 2.3 and removed in 3.0.  
 -  A clone app for cloning an existing federate including all publications and subscriptions and all data that is being sent out.  It is accessible through the helics_app clone subcommand
 -  CI tests using docker for clang memory sanitizer and the octave interface.
--  scripts for generating a single zip file with all the code including submodules.  This will be generated for each new release.  
--  A broker server that generate multiple brokers on a single system and handle the port allocation intelligently. (only ZMQ currently supported, this is not backwards compatible, though regular 2.2 brokers should work with 2.1 federates if needed.
+-  Scripts for generating a single zip file with all the code including submodules.  This will be generated for each new release.  
+-  A broker server that generate multiple brokers on a single system and handles the port allocation intelligently. (Only ZMQ currently supported, this is not backwards compatible, though regular 2.2 brokers should work with 2.1 federates if needed.)
 
 ### Removed
 -   ENABLE_SWIG option in cmake as always ON.  This option will only appear for interfaces that have existing build files.  For swig generated interfaces that do not have prebuilt files (octave, python2, and C#) this option will no longer appear as swig is required.  
