@@ -40,6 +40,6 @@ helics_app clone fed1 -o fed1.json -stop 10
 
 
 ### output
-The Clone captures output and configuration in a JSON format the Player can read see [Player](Player).
+The Clone app captures output and configuration in a JSON format the [Player](Player) can read.
 All publications of a federate are created as global with the name of the original federate, so a player could be named something
 else if desired and not impact the transmission.  

@@ -347,7 +347,7 @@ void Player::loadTextFile (const std::string &filename)
                 }
                 if (pIndex > 0)
                 {
-                    points[pIndex].pubName = points[pIndex - 1].pubName;
+                    points[pIndex].pubName = points[static_cast<size_t>(pIndex) - 1].pubName;
                 }
                 else
                 {
@@ -378,7 +378,7 @@ void Player::loadTextFile (const std::string &filename)
                 }
                 if ((blk[1].empty ()) && (pIndex > 0))
                 {
-                    points[pIndex].pubName = points[pIndex - 1].pubName;
+                    points[pIndex].pubName = points[static_cast<size_t>(pIndex) - 1].pubName;
                 }
                 else
                 {
@@ -409,7 +409,7 @@ void Player::loadTextFile (const std::string &filename)
                 }
                 if ((blk[1].empty ()) && (pIndex > 0))
                 {
-                    points[pIndex].pubName = points[pIndex - 1].pubName;
+                    points[pIndex].pubName = points[static_cast<size_t>(pIndex) - 1].pubName;
                 }
                 else
                 {

@@ -296,7 +296,7 @@ void CoreBroker::processPriorityCommand (ActionMessage &&command)
             _federates.back ().global_id = global_federate_id (
               static_cast<global_federate_id::base_type> (_federates.size ()) - 1 + global_federate_id_shift);
             _federates.addSearchTermForIndex (_federates.back ().global_id,
-                                              _federates.back ().global_id.baseValue () -
+                                              static_cast<size_t>(_federates.back ().global_id.baseValue ()) -
                                                 global_federate_id_shift);
             auto route_id = _federates.back ().route;
             auto global_fedid = _federates.back ().global_id;

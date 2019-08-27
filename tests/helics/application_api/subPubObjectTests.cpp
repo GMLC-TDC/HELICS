@@ -6,12 +6,11 @@ SPDX-License-Identifier: BSD-3-Clause
 */
 
 #include <boost/test/unit_test.hpp>
-#include <boost/test/floating_point_comparison.hpp>
+#include <boost/test/tools/floating_point_comparison.hpp>
 
 #include <complex>
 /** these test cases test out the value converters
  */
-#include <boost/test/floating_point_comparison.hpp>
 
 #include "helics/application_api/Publications.hpp"
 #include "helics/application_api/Subscriptions.hpp"

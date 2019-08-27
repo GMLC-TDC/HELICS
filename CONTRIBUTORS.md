@@ -15,12 +15,14 @@ If you would like to contribute to the HELICS project see [CONTRIBUTING](CONTRIB
 -   Ryan Mast*
 -   Steve Smith
 -   Philip Top*
+-   Denis Nadeau*
 
 ### National Renewable Energy Lab
 -   Himanshu Jain
 -   Dheepak Krishnamurthy*
 -   Bryan Palmintier*
 -   Bryan Richardson**
+-   Matt Irish
 
 ### Argonne National Lab
 -   Shrirang Abhyankar
