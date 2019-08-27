@@ -20,25 +20,47 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "../core/zmq/ZmqCommsCommon.h"
 #endif
 
+#include <random>
+
+static std::string random_string (std::string::size_type length)
+{
+    static constexpr auto chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+
+    thread_local static std::mt19937 rg{std::random_device{}()};
+    thread_local static std::uniform_int_distribution<std::string::size_type> pick (0, 61);
+
+    std::string s;
+
+    s.reserve (length);
+
+    while (length--)
+        s.push_back (chars[pick (rg)]);
+
+    return s;
+}
+
 namespace helics
 {
 namespace apps
 {
-BrokerServer::BrokerServer () noexcept : zmq_server{true} {}
+BrokerServer::BrokerServer () noexcept : zmq_server{true}, server_name_{random_string (5)} {}
 
-BrokerServer::BrokerServer (int argc, char *argv[])
+BrokerServer::BrokerServer (int argc, char *argv[]) : server_name_{random_string (5)}
 {
     auto app = generateArgProcessing ();
     app->parse (argc, argv);
 }
 
-BrokerServer::BrokerServer (std::vector<std::string> args)
+BrokerServer::BrokerServer (std::vector<std::string> args) : server_name_{random_string (5)}
 {
     auto app = generateArgProcessing ();
     app->parse (args);
 }
 
-BrokerServer::BrokerServer (const std::string &configFile) : configFile_ (configFile) {}
+BrokerServer::BrokerServer (const std::string &configFile)
+    : server_name_{random_string (5)}, configFile_ (configFile)
+{
+}
 
 BrokerServer::~BrokerServer () { closeServers (); }
 
@@ -252,62 +274,64 @@ void BrokerServer::startZMQserver ()
             zmq::message_t msg;
             repSocket.recv (&msg);
             auto sz = msg.size ();
-            if (sz == 12)
+            if (sz < 25)
             {
-                if (std::string (static_cast<char *> (msg.data ()), msg.size ()) == "close_server")
+                if (std::string (static_cast<char *> (msg.data ()), msg.size ()) ==
+                    std::string ("close_server:") + server_name_)
                 {
-                    std::cerr << "received close server message"<<std::endl;
+                    std::cerr << "received close server message" << std::endl;
                     repSocket.send (msg);
                     break;
                 }
-            }
-            if (sz == 5)
-            {
-                if (std::string (static_cast<char *> (msg.data ()), msg.size ()) == "close")
+                else
                 {
-                    std::cerr << "received close message (ignoring)" << std::endl;
+                    std::cerr << "received unrecognized message (ignoring)"
+                              << std::string (static_cast<char *> (msg.data ()), msg.size ()) << std::endl;
+                    repSocket.send ("ignored");
+                    continue;
+                }
+            }
+            else
+            {
+                ActionMessage rxcmd (static_cast<char *> (msg.data ()), msg.size ());
+                std::cout << "received data length " << msg.size () << std::endl;
+                switch (rxcmd.action ())
+                {
+                case CMD_PROTOCOL:
+                case CMD_PROTOCOL_PRIORITY:
+                case CMD_PROTOCOL_BIG:
+                    switch (rxcmd.messageID)
+                    {
+                    case REQUEST_PORTS:
+                    {
+                        auto pt = getOpenPort (pdata);
+                        if (pt > 0)
+                        {
+                            auto nbrk = findBroker (rxcmd, core_type::ZMQ, pt);
+                            if (nbrk.second)
+                            {
+                                assignPort (pdata, pt, nbrk.first);
+                            }
+                            auto mess = generateReply (rxcmd, nbrk.first);
+                            auto str = mess.to_string ();
+                            repSocket.send (str.data (), str.size ());
+                        }
+                        else
+                        {
+                            ActionMessage rep (CMD_PROTOCOL);
+                            rep.messageID = DELAY;
+                            auto str = rep.to_string ();
+                            repSocket.send (str.data (), str.size ());
+                        }
+                    }
+                    break;
+                    }
+                    break;
+                default:
+                    std::cout << "received unknown message " << msg.size () << std::endl;
                     repSocket.send ("ignored");
                     break;
                 }
-            }
-            ActionMessage rxcmd (static_cast<char *> (msg.data ()), msg.size ());
-            std::cout << "received data length " << msg.size () << std::endl;
-            switch (rxcmd.action ())
-            {
-            case CMD_PROTOCOL:
-            case CMD_PROTOCOL_PRIORITY:
-            case CMD_PROTOCOL_BIG:
-                switch (rxcmd.messageID)
-                {
-                case REQUEST_PORTS:
-                {
-                    auto pt = getOpenPort (pdata);
-                    if (pt > 0)
-                    {
-                        auto nbrk = findBroker (rxcmd, core_type::ZMQ, pt);
-                        if (nbrk.second)
-                        {
-                            assignPort (pdata, pt, nbrk.first);
-                        }
-                        auto mess = generateReply (rxcmd, nbrk.first);
-                        auto str = mess.to_string ();
-                        repSocket.send (str.data (), str.size ());
-                    }
-                    else
-                    {
-                        ActionMessage rep (CMD_PROTOCOL);
-                        rep.messageID = DELAY;
-                        auto str = rep.to_string ();
-                        repSocket.send (str.data (), str.size ());
-                    }
-                }
-                break;
-                }
-                break;
-            default:
-                std::cout << "received unknown message " << msg.size () << std::endl;
-                repSocket.send ("ignored");
-                break;
             }
         }
         if (exitall.load ())
@@ -339,7 +363,7 @@ void BrokerServer::closeZMQserver ()
     try
     {
         reqSocket.connect (helics::makePortAddress (ext_interface, port));
-        reqSocket.send ("close_server");
+        reqSocket.send (std::string ("close_server:") + server_name_);
         reqSocket.close ();
     }
     catch (const zmq::error_t &)
