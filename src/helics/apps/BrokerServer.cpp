@@ -252,12 +252,21 @@ void BrokerServer::startZMQserver ()
             zmq::message_t msg;
             repSocket.recv (&msg);
             auto sz = msg.size ();
+            if (sz == 12)
+            {
+                if (std::string (static_cast<char *> (msg.data ()), msg.size ()) == "close_server")
+                {
+                    std::cerr << "received close server message"<<std::endl;
+                    repSocket.send (msg);
+                    break;
+                }
+            }
             if (sz == 5)
             {
                 if (std::string (static_cast<char *> (msg.data ()), msg.size ()) == "close")
                 {
-                    std::cerr << "received close message"<<std::endl;
-                    repSocket.send (msg);
+                    std::cerr << "received close message (ignoring)" << std::endl;
+                    repSocket.send ("ignored");
                     break;
                 }
             }
@@ -297,6 +306,7 @@ void BrokerServer::startZMQserver ()
                 break;
             default:
                 std::cout << "received unknown message " << msg.size () << std::endl;
+                repSocket.send ("ignored");
                 break;
             }
         }
@@ -329,7 +339,7 @@ void BrokerServer::closeZMQserver ()
     try
     {
         reqSocket.connect (helics::makePortAddress (ext_interface, port));
-        reqSocket.send ("close");
+        reqSocket.send ("close_server");
         reqSocket.close ();
     }
     catch (const zmq::error_t &)
