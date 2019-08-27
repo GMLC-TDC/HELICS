@@ -819,8 +819,8 @@ BOOST_DATA_TEST_CASE (value_federate_dual_transfer_remove_target, bdata::make (c
     // and this is an asynchronous operation so there is no guarantees the remove will stop the next broadcast
     // but it should do it within the next timestep so we have an extra loop here
     f1time = std::async (std::launch::async, [&] () {
-        return vFed1->requestTime (3.0);
-        vFed1->requestTime (4.0);
+        vFed1->requestTime (3.0);
+        return vFed1->requestTime (4.0);
     });
     gtime = vFed2->requestTime (3.0);
     gtime = vFed2->requestTime (4.0);

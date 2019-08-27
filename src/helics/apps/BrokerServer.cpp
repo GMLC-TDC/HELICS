@@ -58,7 +58,7 @@ BrokerServer::BrokerServer (std::vector<std::string> args) : server_name_{random
 }
 
 BrokerServer::BrokerServer (const std::string &configFile)
-    : server_name_{random_string (5)}, configFile_ (configFile)
+    : configFile_ (configFile), server_name_{random_string (5)}
 {
 }
 
