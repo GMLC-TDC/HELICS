@@ -13,7 +13,7 @@ RUN (cd llvm/projects && svn co http://llvm.org/svn/llvm-project/libcxx/trunk li
 RUN (cd llvm/projects && svn co http://llvm.org/svn/llvm-project/libcxxabi/trunk libcxxabi)
 
 RUN  mkdir libcxx_tsan && cd libcxx_tsan &&  cmake ../llvm -DCMAKE_BUILD_TYPE=Release -DLLVM_USE_SANITIZER=Thread -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++
-RUN cd libcxx_tsan && make cxx -j12
+RUN cd libcxx_tsan && make cxx -j
 ENV TSAN_CFLAGS="-fsanitize=thread -stdlib=libc++ -L/root/develop/libcxx_tsan/lib -lc++abi -I/root/develop/libcxx_tsan/include -I/root/develop/libcxx_tsan/include/c++/v1 -Wno-unused-command-line-argument -g -O1 -Wl,-rpath=/root/develop/libcxx_tsan/lib"
 
 RUN rm -rf llvm

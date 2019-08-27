@@ -10,7 +10,7 @@ WORKDIR /root/develop
 
 RUN git clone https://github.com/GMLC-TDC/HELICS.git
 RUN cd HELICS && mkdir build  && cd build && cmake .. -DBUILD_HELICS_TESTS=OFF
-RUN cd HELICS && cd build && make -j 12 install
+RUN cd HELICS && cd build && make -j install
 # Create script to build helics
 
 RUN rm -rf /var/lib/apt/lists/*
