@@ -76,6 +76,7 @@ BOOST_AUTO_TEST_CASE (execution_tests)
 
     fed1.finalize ();
     fed2.finalize ();
+    brks.forceTerminate ();
     cleanupHelicsLibrary ();
 }
 
@@ -128,6 +129,7 @@ BOOST_AUTO_TEST_CASE (execution_tests_duplicate)
     fed2.finalize ();
     fed3.finalize ();
     fed4.finalize ();
+    brks.forceTerminate ();
     cleanupHelicsLibrary ();
 }
 
