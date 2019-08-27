@@ -47,11 +47,20 @@ BOOST_AUTO_TEST_CASE (startup_tests)
     BOOST_CHECK_EQUAL (objs.size (), 2u);
 
     brks.forceTerminate ();
-
-    BOOST_CHECK (cr->waitForDisconnect (std::chrono::milliseconds (1000)));
-    BOOST_CHECK (cr2->waitForDisconnect (std::chrono::milliseconds (1000)));
     cr->disconnect ();
     cr2->disconnect ();
+    auto crdisconnect = cr->waitForDisconnect (std::chrono::milliseconds (1000));
+    auto cr2disconnect = cr2->waitForDisconnect (std::chrono::milliseconds (1000));
+    if (!crdisconnect)
+    {
+        crdisconnect = cr->waitForDisconnect (std::chrono::milliseconds (1000));
+    }
+    if (!cr2)
+    {
+        cr2disconnect = cr2->waitForDisconnect (std::chrono::milliseconds (1000));
+    }
+    BOOST_CHECK (crdisconnect);
+    BOOST_CHECK (cr2disconnect);
     cleanupHelicsLibrary ();
 }
 

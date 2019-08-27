@@ -282,7 +282,7 @@ void helicsFederateInfoSetBrokerInitString (helics_federate_info fi, const char 
     }
     try
     {
-        hfi->coreInitString = AS_STRING (brokerinit);
+        hfi->brokerInitString = AS_STRING (brokerinit);
     }
     catch (...)
     {

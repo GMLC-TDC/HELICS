@@ -327,14 +327,14 @@ extern "C"
 
     /** set the initialization string for the core usually in the form of command line arguments
     @param fi the federate info object to alter
-    @param coreInit a string with the core initialization strings
+    @param coreInit a string containing command line arguments to be passed to the core
     @param[in,out] err an error object that will contain an error code and string if any error occurred during the execution of the function
     */
     HELICS_EXPORT void helicsFederateInfoSetCoreInitString (helics_federate_info fi, const char *coreInit, helics_error *err);
 
-    /** set the initialization string for the core usually in the form of command line arguments
+    /** set the initialization string that a core will pass to a generated broker usually in the form of command line arguments
     @param fi the federate info object to alter
-    @param coreInit a string with the core initialization strings
+    @param brokerInit a string with command line arguments for a generated broker
     @param[in,out] err an error object that will contain an error code and string if any error occurred during the execution of the function
     */
     HELICS_EXPORT void helicsFederateInfoSetBrokerInitString (helics_federate_info fi, const char *brokerInit, helics_error *err);

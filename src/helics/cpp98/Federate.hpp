@@ -70,10 +70,10 @@ class FederateInfo
     {
         helicsFederateInfoSetCoreInitString (fi, coreInit.c_str (), HELICS_NULL_POINTER);
     }
-    /// Set a string for the broker initialization
-    void setBrokerInitString (const std::string &coreInit)
+    /// Set a string for the broker initialization in command line argument format
+    void setBrokerInitString (const std::string &brokerInit)
     {
-        helicsFederateInfoSetCoreInitString (fi, coreInit.c_str (), HELICS_NULL_POINTER);
+        helicsFederateInfoSetBrokerInitString (fi, brokerInit.c_str (), HELICS_NULL_POINTER);
     }
 
     void setCoreTypeFromString (const std::string &coretype)
