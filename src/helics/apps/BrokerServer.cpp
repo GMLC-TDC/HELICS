@@ -85,6 +85,7 @@ void BrokerServer::forceTerminate ()
 
 void BrokerServer::closeServers ()
 {
+    std::cerr << "closing servers\n";
 #ifdef ENABLE_ZMQ_CORE
     if (zmq_server)
     {
@@ -243,7 +244,7 @@ void BrokerServer::startZMQserver ()
         rc = zmq::poll (&poller, 1, std::chrono::milliseconds (5000));
         if (rc < 0)
         {
-            std::cout << "ZMQ broker connection error (2)\n";
+            std::cerr << "ZMQ broker connection error (2)" << std::endl;
             break;
         }
         if (rc > 0)
@@ -255,6 +256,7 @@ void BrokerServer::startZMQserver ()
             {
                 if (std::string (static_cast<char *> (msg.data ()), msg.size ()) == "close")
                 {
+                    std::cerr << "received close message"<<std::endl;
                     repSocket.send (msg);
                     break;
                 }
@@ -294,17 +296,18 @@ void BrokerServer::startZMQserver ()
                 }
                 break;
             default:
-                std::cout << "received unknown message " << msg.size ();
+                std::cout << "received unknown message " << msg.size () << std::endl;
                 break;
             }
         }
         if (exitall.load ())
         {
+            std::cerr << "exit all active" << std::endl;
             break;
         }
     }
     repSocket.close ();
-    std::cerr << "exiting zmq broker server\n";
+    std::cerr << "exiting zmq broker server" << std::endl;
 
 #endif
 }
