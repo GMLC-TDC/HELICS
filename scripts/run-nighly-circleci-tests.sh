@@ -2,7 +2,7 @@
 tests=(
     /root/project/build/tests/helics/core/core-tests
     /root/project/build/tests/helics/common/common-tests
-    /root/project/build/tests/helics/system_tests/system-tests
+    "/root/project/build/tests/helics/system_tests/system-tests --gtest_filter=-*realtime*"
 )
 SUMRESULT=0
 for test in "${tests[@]}"; do
