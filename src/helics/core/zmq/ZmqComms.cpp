@@ -402,7 +402,7 @@ int ZmqComms::initializeBrokerConnections (zmq::socket_t &controlSocket)
                         }
                         if (rxcmd.messageID == NEW_BROKER_INFORMATION)
                         {
-                            logWarning ("got new broker information");
+                            logMessage ("got new broker information");
                             brokerReq.disconnect (makePortAddress (brokerTargetAddress, brokerPort + 1));
                             auto brkprt = extractInterfaceandPort (rxcmd.getString (0));
                             brokerPort = brkprt.second;

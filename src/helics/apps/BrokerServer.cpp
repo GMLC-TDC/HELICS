@@ -107,7 +107,6 @@ void BrokerServer::forceTerminate ()
 
 void BrokerServer::closeServers ()
 {
-    std::cerr << "closing servers\n";
 #ifdef ENABLE_ZMQ_CORE
     if (zmq_server)
     {
@@ -279,14 +278,14 @@ void BrokerServer::startZMQserver ()
                 if (std::string (static_cast<char *> (msg.data ()), msg.size ()) ==
                     std::string ("close_server:") + server_name_)
                 {
-                    std::cerr << "received close server message" << std::endl;
+                    //      std::cerr << "received close server message" << std::endl;
                     repSocket.send (msg);
                     break;
                 }
                 else
                 {
-                    std::cerr << "received unrecognized message (ignoring)"
-                              << std::string (static_cast<char *> (msg.data ()), msg.size ()) << std::endl;
+                    //    std::cerr << "received unrecognized message (ignoring)"
+                    //              << std::string (static_cast<char *> (msg.data ()), msg.size ()) << std::endl;
                     repSocket.send ("ignored");
                     continue;
                 }
@@ -294,7 +293,7 @@ void BrokerServer::startZMQserver ()
             else
             {
                 ActionMessage rxcmd (static_cast<char *> (msg.data ()), msg.size ());
-                std::cout << "received data length " << msg.size () << std::endl;
+                //   std::cout << "received data length " << msg.size () << std::endl;
                 switch (rxcmd.action ())
                 {
                 case CMD_PROTOCOL:
@@ -336,7 +335,7 @@ void BrokerServer::startZMQserver ()
         }
         if (exitall.load ())
         {
-            std::cerr << "exit all active" << std::endl;
+            //    std::cerr << "exit all active" << std::endl;
             break;
         }
     }
