@@ -109,16 +109,13 @@ if(BUILD_SHARED_LIBS)
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
   )
 
-  install(
-    FILES $<TARGET_LINKER_FILE:helics-shared>
-    DESTINATION ${CMAKE_INSTALL_LIBDIR}
-    COMPONENT libs
-  )
-  install(
-    FILES $<TARGET_FILE:helics-shared>
-    DESTINATION ${CMAKE_INSTALL_BINDIR}
-    COMPONENT libs
-  )
+  if(WIN32)
+    install(
+      FILES $<TARGET_FILE:helics-shared>
+      DESTINATION ${CMAKE_INSTALL_BINDIR}
+      COMPONENT Runtime
+    )
+  endif()
 
 endif(BUILD_SHARED_LIBS)
 
