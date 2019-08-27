@@ -1808,6 +1808,10 @@ bool CommonCore::sendToLogger (global_federate_id federateID,
 {
     if (!BrokerBase::sendToLogger (federateID, logLevel, name, message))
     {
+        /*
+         * FIXME: the block of logic below should be returning a federate rather than a nullptr when an external
+         * logging call is made, but is not doing so.
+         */
         auto fed = federateID.isFederate () ?
                      getFederateAt (static_cast<local_federate_id> (federateID.baseValue ())) :
                      getFederateAt (local_federate_id (federateID.localIndex ()));
