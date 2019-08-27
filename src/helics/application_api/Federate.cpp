@@ -9,7 +9,6 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "../core/CoreFactory.hpp"
 #include "../core/core-exceptions.hpp"
 #include "../core/helics_definitions.hpp"
-#include "../core/CommonCore.hpp"
 #include "Filters.hpp"
 
 #include "../common/GuardedTypes.hpp"
@@ -84,7 +83,7 @@ Federate::Federate (const std::string &fedName, const FederateInfo &fi) : name (
     currentTime = coreObject->getCurrentTime (fedID);
     asyncCallInfo = std::make_unique<shared_guarded_m<AsyncFedCallInfo>> ();
     fManager = std::make_unique<FilterFederateManager> (coreObject.get (), this, fedID);
-    setLogger ([this](int /*level*/, const std::string &ident, const std::string &message) {
+    setLoggingCallback([this](int /*level*/, const std::string &ident, const std::string &message) {
         coreObject->sendToLogger (parent_broker_id, -2, ident, message);
     });
 }
@@ -1316,18 +1315,7 @@ std::string const &Federate::getInfo (interface_handle handle)
 }
 
 void Federate::logMessage(int level, const std::string &logMessageSource, const std::string &message) const {
-// FIXME: couldn't get fmt::format to work. Something strange about the include.
-//            loggerFunction (level,
-//                            (logMessageSource.empty ()) ?
-//                            fmt::format ("{} ({})", name, fedID.globalIndex()) :
-//                            logMessageSource,
-//                            message);
-
-    loggerFunction(level,
-                   (logMessageSource.empty()) ?
-                   name + " (" + std::to_string(fedID.globalIndex()) + ")" :
-                   logMessageSource,
-                   message);
+    coreObject->logMessage(fedID, level, message);
 }
 
     void Federate::logMessage(const std::string &message) const {

@@ -73,7 +73,6 @@ class Federate
       asyncCallInfo;  //!< pointer to a class defining the async call information
     std::unique_ptr<FilterFederateManager> fManager;  //!< class for managing filter operations
     std::string name;  //!< the name of the federate
-    std::function<void(int, const std::string &, const std::string &)> loggerFunction; //!< Logging function
 
 public:
     /**constructor taking a federate information structure
@@ -514,16 +513,6 @@ public:
     @param message the message to log
     */
     virtual void logMessage (const std::string &message) const;
-
-    /** set the logging function
-    @details function must have signature void(int level, const std::string &sourceName, const std::string
-    &message)
-    */
-    virtual void setLogger (std::function<void(int, const std::string &, const std::string &)> logFunction)
-    {
-        loggerFunction = std::move (logFunction);
-    }
-
   private:
     /** register filter interfaces defined in  file or string
   @details call is only valid in startup mode
