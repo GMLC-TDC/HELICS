@@ -3014,16 +3014,16 @@ static swig_module_info swig_module = {swig_types, 21, 0, 0, 0, 0};
 #endif
 
 /*-----------------------------------------------
-              @(target):= _helics.so
+              @(target):= _helicsd.so
   ------------------------------------------------*/
 #if PY_VERSION_HEX >= 0x03000000
-#  define SWIG_init    PyInit__helics
+#  define SWIG_init    PyInit__helicsd
 
 #else
-#  define SWIG_init    init_helics
+#  define SWIG_init    init_helicsd
 
 #endif
-#define SWIG_name    "_helics"
+#define SWIG_name    "_helicsd"
 
 #define SWIGVERSION 0x030012 
 #define SWIG_VERSION SWIGVERSION
@@ -6165,6 +6165,57 @@ SWIGINTERN PyObject *_wrap_helicsFederateInfoSetCoreInitString(PyObject *SWIGUNU
   }
   arg2 = (char *)(buf2);
   helicsFederateInfoSetCoreInitString(arg1,(char const *)arg2,arg3);
+  resultobj = SWIG_Py_Void();
+  if (alloc2 == SWIG_NEWOBJ) free((char*)buf2);
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsPythonException(arg3);
+      return NULL;
+    }
+  }
+  return resultobj;
+fail:
+  if (alloc2 == SWIG_NEWOBJ) free((char*)buf2);
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsPythonException(arg3);
+      return NULL;
+    }
+  }
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_helicsFederateInfoSetBrokerInitString(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  helics_federate_info arg1 = (helics_federate_info) 0 ;
+  char *arg2 = (char *) 0 ;
+  helics_error *arg3 = (helics_error *) 0 ;
+  int res1 ;
+  int res2 ;
+  char *buf2 = 0 ;
+  int alloc2 = 0 ;
+  helics_error etemp3 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  
+  {
+    etemp3=helicsErrorInitialize();
+    arg3=&etemp3;
+  }
+  if (!PyArg_ParseTuple(args,(char *)"OO:helicsFederateInfoSetBrokerInitString",&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0,SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateInfoSetBrokerInitString" "', argument " "1"" of type '" "helics_federate_info""'"); 
+  }
+  res2 = SWIG_AsCharPtrAndSize(obj1, &buf2, NULL, &alloc2);
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsFederateInfoSetBrokerInitString" "', argument " "2"" of type '" "char const *""'");
+  }
+  arg2 = (char *)(buf2);
+  helicsFederateInfoSetBrokerInitString(arg1,(char const *)arg2,arg3);
   resultobj = SWIG_Py_Void();
   if (alloc2 == SWIG_NEWOBJ) free((char*)buf2);
   {
@@ -15289,390 +15340,54 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"new_helics_message", _wrap_new_helics_message, METH_VARARGS, NULL},
 	 { (char *)"delete_helics_message", _wrap_delete_helics_message, METH_VARARGS, NULL},
 	 { (char *)"helics_message_swigregister", helics_message_swigregister, METH_VARARGS, NULL},
-	 { (char *)"helicsGetVersion", _wrap_helicsGetVersion, METH_VARARGS, (char *)"\n"
-		"\n"
-		"\n"
-		""},
-	 { (char *)"helicsIsCoreTypeAvailable", _wrap_helicsIsCoreTypeAvailable, METH_VARARGS, (char *)"\n"
-		"\n"
-		"\n"
-		"Returns true if core/broker type specified is available in current compilation.\n"
-		"\n"
-		""},
-	 { (char *)"helicsCreateCore", _wrap_helicsCreateCore, METH_VARARGS, (char *)"\n"
-		"\n"
-		"\n"
-		"create a core object\n"
-		"\n"
-		"Parameters\n"
-		"----------\n"
-		"* `type` :\n"
-		"    the type of the core to create\n"
-		"* `name` :\n"
-		"    the name of the core , may be a nullptr or empty string to have a name\n"
-		"    automatically assigned\n"
-		"* `initString` :\n"
-		"    an initialization string to send to the core-the format is similar to\n"
-		"    command line arguments typical options include a broker address\n"
-		"    --broker=\"XSSAF\" or the number of federates or the address\n"
-		"\n"
-		"Returns\n"
-		"-------\n"
-		"a helics_core object\n"
-		"\n"
-		""},
-	 { (char *)"helicsCreateCoreFromArgs", _wrap_helicsCreateCoreFromArgs, METH_VARARGS, (char *)"\n"
-		"\n"
-		"\n"
-		"create a core object by passing command line arguments\n"
-		"\n"
-		"Parameters\n"
-		"----------\n"
-		"* `type` :\n"
-		"    the type of the core to create\n"
-		"* `name` :\n"
-		"    the name of the core , may be a nullptr or empty string to have a name\n"
-		"    automatically assigned\n"
-		"* `argc` :\n"
-		"    the number of arguments\n"
-		"* `argv` :\n"
-		"    the string values from a command line\n"
-		"\n"
-		"Returns\n"
-		"-------\n"
-		"a helics_core object\n"
-		"\n"
-		""},
+	 { (char *)"helicsGetVersion", _wrap_helicsGetVersion, METH_VARARGS, NULL},
+	 { (char *)"helicsIsCoreTypeAvailable", _wrap_helicsIsCoreTypeAvailable, METH_VARARGS, NULL},
+	 { (char *)"helicsCreateCore", _wrap_helicsCreateCore, METH_VARARGS, NULL},
+	 { (char *)"helicsCreateCoreFromArgs", _wrap_helicsCreateCoreFromArgs, METH_VARARGS, NULL},
 	 { (char *)"helicsCoreClone", _wrap_helicsCoreClone, METH_VARARGS, NULL},
 	 { (char *)"helicsCoreIsValid", _wrap_helicsCoreIsValid, METH_VARARGS, NULL},
-	 { (char *)"helicsCreateBroker", _wrap_helicsCreateBroker, METH_VARARGS, (char *)"\n"
-		"\n"
-		"\n"
-		"create a broker object\n"
-		"\n"
-		"Parameters\n"
-		"----------\n"
-		"* `type` :\n"
-		"    the type of the broker to create\n"
-		"* `name` :\n"
-		"    the name of the broker , may be a nullptr or empty string to have a name\n"
-		"    automatically assigned\n"
-		"* `initString` :\n"
-		"    an initialization string to send to the core-the format is similar to\n"
-		"    command line arguments typical options include a broker address\n"
-		"    --broker=\"XSSAF\" if this is a subbroker or the number of federates or the\n"
-		"    address\n"
-		"\n"
-		"Returns\n"
-		"-------\n"
-		"a helics_core object\n"
-		"\n"
-		""},
-	 { (char *)"helicsCreateBrokerFromArgs", _wrap_helicsCreateBrokerFromArgs, METH_VARARGS, (char *)"\n"
-		"\n"
-		"\n"
-		"create a core object by passing command line arguments\n"
-		"\n"
-		"Parameters\n"
-		"----------\n"
-		"* `type` :\n"
-		"    the type of the core to create\n"
-		"* `name` :\n"
-		"    the name of the core , may be a nullptr or empty string to have a name\n"
-		"    automatically assigned\n"
-		"* `argc` :\n"
-		"    the number of arguments\n"
-		"* `argv` :\n"
-		"    the string values from a command line\n"
-		"\n"
-		"Returns\n"
-		"-------\n"
-		"a helics_core object\n"
-		"\n"
-		""},
+	 { (char *)"helicsCreateBroker", _wrap_helicsCreateBroker, METH_VARARGS, NULL},
+	 { (char *)"helicsCreateBrokerFromArgs", _wrap_helicsCreateBrokerFromArgs, METH_VARARGS, NULL},
 	 { (char *)"helicsBrokerClone", _wrap_helicsBrokerClone, METH_VARARGS, NULL},
 	 { (char *)"helicsBrokerIsValid", _wrap_helicsBrokerIsValid, METH_VARARGS, NULL},
-	 { (char *)"helicsBrokerIsConnected", _wrap_helicsBrokerIsConnected, METH_VARARGS, (char *)"\n"
-		"\n"
-		"\n"
-		"check if a broker is connected a connected broker implies is attached to cores\n"
-		"or cores could reach out to communicate return 0 if not connected , something\n"
-		"else if it is connected\n"
-		"\n"
-		""},
+	 { (char *)"helicsBrokerIsConnected", _wrap_helicsBrokerIsConnected, METH_VARARGS, NULL},
 	 { (char *)"helicsBrokerDataLink", _wrap_helicsBrokerDataLink, METH_VARARGS, NULL},
 	 { (char *)"helicsBrokerAddSourceFilterToEndpoint", _wrap_helicsBrokerAddSourceFilterToEndpoint, METH_VARARGS, NULL},
 	 { (char *)"helicsBrokerAddDestinationFilterToEndpoint", _wrap_helicsBrokerAddDestinationFilterToEndpoint, METH_VARARGS, NULL},
 	 { (char *)"helicsBrokerWaitForDisconnect", _wrap_helicsBrokerWaitForDisconnect, METH_VARARGS, NULL},
-	 { (char *)"helicsCoreIsConnected", _wrap_helicsCoreIsConnected, METH_VARARGS, (char *)"\n"
-		"\n"
-		"\n"
-		"check if a core is connected a connected core implies is attached to federate or\n"
-		"federates could be attached to it return 0 if not connected , something else if\n"
-		"it is connected\n"
-		"\n"
-		""},
+	 { (char *)"helicsCoreIsConnected", _wrap_helicsCoreIsConnected, METH_VARARGS, NULL},
 	 { (char *)"helicsCoreDataLink", _wrap_helicsCoreDataLink, METH_VARARGS, NULL},
 	 { (char *)"helicsCoreAddSourceFilterToEndpoint", _wrap_helicsCoreAddSourceFilterToEndpoint, METH_VARARGS, NULL},
 	 { (char *)"helicsCoreAddDestinationFilterToEndpoint", _wrap_helicsCoreAddDestinationFilterToEndpoint, METH_VARARGS, NULL},
-	 { (char *)"helicsBrokerGetIdentifier", _wrap_helicsBrokerGetIdentifier, METH_VARARGS, (char *)"\n"
-		"\n"
-		"\n"
-		"get an identifier for the broker\n"
-		"\n"
-		"Parameters\n"
-		"----------\n"
-		"* `broker` :\n"
-		"    the broker to query\n"
-		"* `identifier` :\n"
-		"    storage space to place the identifier string\n"
-		"* `maxlen` :\n"
-		"    the maximum space available in identifier\n"
-		"\n"
-		"Returns\n"
-		"-------\n"
-		"a helics_status enumeration indicating any error condition\n"
-		"\n"
-		""},
-	 { (char *)"helicsCoreGetIdentifier", _wrap_helicsCoreGetIdentifier, METH_VARARGS, (char *)"\n"
-		"\n"
-		"\n"
-		"get an identifier for the core\n"
-		"\n"
-		"Parameters\n"
-		"----------\n"
-		"* `core` :\n"
-		"    the core to query\n"
-		"* `identifier` :\n"
-		"    storage space to place the identifier string\n"
-		"* `maxlen` :\n"
-		"    the maximum space available in identifier\n"
-		"\n"
-		"Returns\n"
-		"-------\n"
-		"a helics_status enumeration indicating any error condition\n"
-		"\n"
-		""},
-	 { (char *)"helicsBrokerGetAddress", _wrap_helicsBrokerGetAddress, METH_VARARGS, (char *)"\n"
-		"\n"
-		"\n"
-		"get the network address associated with a broker\n"
-		"\n"
-		"Parameters\n"
-		"----------\n"
-		"* `broker` :\n"
-		"    the broker to query\n"
-		"* `identifier` :\n"
-		"    storage space to place the identifier string\n"
-		"* `maxlen` :\n"
-		"    the maximum space available in identifier\n"
-		"\n"
-		"Returns\n"
-		"-------\n"
-		"a helics_status enumeration indicating any error condition\n"
-		"\n"
-		""},
+	 { (char *)"helicsBrokerGetIdentifier", _wrap_helicsBrokerGetIdentifier, METH_VARARGS, NULL},
+	 { (char *)"helicsCoreGetIdentifier", _wrap_helicsCoreGetIdentifier, METH_VARARGS, NULL},
+	 { (char *)"helicsBrokerGetAddress", _wrap_helicsBrokerGetAddress, METH_VARARGS, NULL},
 	 { (char *)"helicsCoreSetReadyToInit", _wrap_helicsCoreSetReadyToInit, METH_VARARGS, NULL},
-	 { (char *)"helicsCoreDisconnect", _wrap_helicsCoreDisconnect, METH_VARARGS, (char *)"\n"
-		"\n"
-		"\n"
-		"get an identifier for the core\n"
-		"\n"
-		"Parameters\n"
-		"----------\n"
-		"* `core` :\n"
-		"    the core to query\n"
-		"* `identifier` :\n"
-		"    storage space to place the identifier string\n"
-		"* `maxlen` :\n"
-		"    the maximum space available in identifier\n"
-		"\n"
-		"Returns\n"
-		"-------\n"
-		"a helics_status enumeration indicating any error condition\n"
-		"\n"
-		""},
+	 { (char *)"helicsCoreDisconnect", _wrap_helicsCoreDisconnect, METH_VARARGS, NULL},
 	 { (char *)"helicsGetFederateByName", _wrap_helicsGetFederateByName, METH_VARARGS, NULL},
-	 { (char *)"helicsBrokerDisconnect", _wrap_helicsBrokerDisconnect, METH_VARARGS, (char *)"\n"
-		"\n"
-		"\n"
-		"get the network address associated with a broker\n"
-		"\n"
-		"Parameters\n"
-		"----------\n"
-		"* `broker` :\n"
-		"    the broker to query\n"
-		"* `identifier` :\n"
-		"    storage space to place the identifier string\n"
-		"* `maxlen` :\n"
-		"    the maximum space available in identifier\n"
-		"\n"
-		"Returns\n"
-		"-------\n"
-		"a helics_status enumeration indicating any error condition\n"
-		"\n"
-		""},
+	 { (char *)"helicsBrokerDisconnect", _wrap_helicsBrokerDisconnect, METH_VARARGS, NULL},
 	 { (char *)"helicsFederateDestroy", _wrap_helicsFederateDestroy, METH_VARARGS, NULL},
 	 { (char *)"helicsBrokerDestroy", _wrap_helicsBrokerDestroy, METH_VARARGS, NULL},
 	 { (char *)"helicsCoreDestroy", _wrap_helicsCoreDestroy, METH_VARARGS, NULL},
-	 { (char *)"helicsCoreFree", _wrap_helicsCoreFree, METH_VARARGS, (char *)"\n"
-		"\n"
-		"\n"
-		"release the memory associated with a core\n"
-		"\n"
-		""},
-	 { (char *)"helicsBrokerFree", _wrap_helicsBrokerFree, METH_VARARGS, (char *)"\n"
-		"\n"
-		"\n"
-		"release the memory associated with a broker\n"
-		"\n"
-		""},
-	 { (char *)"helicsCreateValueFederate", _wrap_helicsCreateValueFederate, METH_VARARGS, (char *)"\n"
-		"\n"
-		"\n"
-		"create a value federate from a federate info object\n"
-		"\n"
-		"helics_federate objects can be used in all functions that take a helics_federate\n"
-		"or helics_federate object as an argument\n"
-		"\n"
-		"Parameters\n"
-		"----------\n"
-		"* `fi` :\n"
-		"    the federate info object that contains details on the federate\n"
-		"\n"
-		"Returns\n"
-		"-------\n"
-		"an opaque value federate object\n"
-		"\n"
-		""},
+	 { (char *)"helicsCoreFree", _wrap_helicsCoreFree, METH_VARARGS, NULL},
+	 { (char *)"helicsBrokerFree", _wrap_helicsBrokerFree, METH_VARARGS, NULL},
+	 { (char *)"helicsCreateValueFederate", _wrap_helicsCreateValueFederate, METH_VARARGS, NULL},
 	 { (char *)"helicsCreateValueFederateFromConfig", _wrap_helicsCreateValueFederateFromConfig, METH_VARARGS, NULL},
-	 { (char *)"helicsCreateMessageFederate", _wrap_helicsCreateMessageFederate, METH_VARARGS, (char *)"\n"
-		"\n"
-		"\n"
-		"create a message federate from a federate info object\n"
-		"\n"
-		"helics_message_federate objects can be used in all functions that take a\n"
-		"helics_message_federate or helics_federate object as an argument\n"
-		"\n"
-		"Parameters\n"
-		"----------\n"
-		"* `fi` :\n"
-		"    the federate info object that contains details on the federate\n"
-		"\n"
-		"Returns\n"
-		"-------\n"
-		"an opaque message federate object\n"
-		"\n"
-		""},
+	 { (char *)"helicsCreateMessageFederate", _wrap_helicsCreateMessageFederate, METH_VARARGS, NULL},
 	 { (char *)"helicsCreateMessageFederateFromConfig", _wrap_helicsCreateMessageFederateFromConfig, METH_VARARGS, NULL},
-	 { (char *)"helicsCreateCombinationFederate", _wrap_helicsCreateCombinationFederate, METH_VARARGS, (char *)"\n"
-		"\n"
-		"\n"
-		"create a combination federate from a federate info object\n"
-		"\n"
-		"combination federates are both value federates and message federates, objects\n"
-		"can be used in all functions that take a helics_federate,\n"
-		"helics_message_federate or helics_federate object as an argument\n"
-		"\n"
-		"Parameters\n"
-		"----------\n"
-		"* `fi` :\n"
-		"    the federate info object that contains details on the federate\n"
-		"\n"
-		"Returns\n"
-		"-------\n"
-		"an opaque value federate object nullptr if the object creation failed\n"
-		"\n"
-		""},
+	 { (char *)"helicsCreateCombinationFederate", _wrap_helicsCreateCombinationFederate, METH_VARARGS, NULL},
 	 { (char *)"helicsCreateCombinationFederateFromConfig", _wrap_helicsCreateCombinationFederateFromConfig, METH_VARARGS, NULL},
 	 { (char *)"helicsFederateClone", _wrap_helicsFederateClone, METH_VARARGS, NULL},
 	 { (char *)"helicsCreateFederateInfo", _wrap_helicsCreateFederateInfo, METH_VARARGS, NULL},
 	 { (char *)"helicsFederateInfoClone", _wrap_helicsFederateInfoClone, METH_VARARGS, NULL},
-	 { (char *)"helicsFederateInfoLoadFromArgs", _wrap_helicsFederateInfoLoadFromArgs, METH_VARARGS, (char *)"\n"
-		"\n"
-		"\n"
-		"load a federate info from command line arguments\n"
-		"\n"
-		"Parameters\n"
-		"----------\n"
-		"* `fi` :\n"
-		"    a federateInfo object\n"
-		"* `argc` :\n"
-		"    the number of command line arguments\n"
-		"* `argv` :\n"
-		"    an array of strings from the command line\n"
-		"\n"
-		"Returns\n"
-		"-------\n"
-		"a helics_status enumeration indicating success or any potential errors\n"
-		"\n"
-		""},
-	 { (char *)"helicsFederateInfoFree", _wrap_helicsFederateInfoFree, METH_VARARGS, (char *)"\n"
-		"\n"
-		"\n"
-		"delete the memory associated with a federate info object\n"
-		"\n"
-		""},
+	 { (char *)"helicsFederateInfoLoadFromArgs", _wrap_helicsFederateInfoLoadFromArgs, METH_VARARGS, NULL},
+	 { (char *)"helicsFederateInfoFree", _wrap_helicsFederateInfoFree, METH_VARARGS, NULL},
 	 { (char *)"helicsFederateIsValid", _wrap_helicsFederateIsValid, METH_VARARGS, NULL},
-	 { (char *)"helicsFederateInfoSetCoreName", _wrap_helicsFederateInfoSetCoreName, METH_VARARGS, (char *)"\n"
-		"\n"
-		"\n"
-		"set the name of the core to link to for a federate\n"
-		"\n"
-		"Parameters\n"
-		"----------\n"
-		"* `fi` :\n"
-		"    the federate info object to alter\n"
-		"* `corename` :\n"
-		"    the identifier for a core to link to\n"
-		"\n"
-		"Returns\n"
-		"-------\n"
-		"a helics_status enumeration helics_ok on success helicsInvalidReference if fi is\n"
-		"not a valid reference\n"
-		"\n"
-		""},
-	 { (char *)"helicsFederateInfoSetCoreInitString", _wrap_helicsFederateInfoSetCoreInitString, METH_VARARGS, (char *)"\n"
-		"\n"
-		"\n"
-		"set the initialization string for the core usually in the form of command line\n"
-		"arguments\n"
-		"\n"
-		"Parameters\n"
-		"----------\n"
-		"* `fi` :\n"
-		"    the federate info object to alter\n"
-		"* `coreInit` :\n"
-		"    a string with the core initialization strings\n"
-		"\n"
-		"Returns\n"
-		"-------\n"
-		"a helics_status enumeration helics_ok on success helicsInvalidReference if fi is\n"
-		"not a valid reference\n"
-		"\n"
-		""},
-	 { (char *)"helicsFederateInfoSetCoreType", _wrap_helicsFederateInfoSetCoreType, METH_VARARGS, (char *)"\n"
-		"\n"
-		"\n"
-		""},
-	 { (char *)"helicsFederateInfoSetCoreTypeFromString", _wrap_helicsFederateInfoSetCoreTypeFromString, METH_VARARGS, (char *)"\n"
-		"\n"
-		"\n"
-		"set the core type from a string\n"
-		"\n"
-		"Parameters\n"
-		"----------\n"
-		"* `fi` :\n"
-		"    the federate info object to alter\n"
-		"* `coretype` :\n"
-		"    a string naming a core type\n"
-		"\n"
-		"Returns\n"
-		"-------\n"
-		"a helics_status enumeration helics_ok on success helicsInvalidReference if fi is\n"
-		"not a valid reference helics_discard if the string is not recognized\n"
-		"\n"
-		""},
+	 { (char *)"helicsFederateInfoSetCoreName", _wrap_helicsFederateInfoSetCoreName, METH_VARARGS, NULL},
+	 { (char *)"helicsFederateInfoSetCoreInitString", _wrap_helicsFederateInfoSetCoreInitString, METH_VARARGS, NULL},
+	 { (char *)"helicsFederateInfoSetBrokerInitString", _wrap_helicsFederateInfoSetBrokerInitString, METH_VARARGS, NULL},
+	 { (char *)"helicsFederateInfoSetCoreType", _wrap_helicsFederateInfoSetCoreType, METH_VARARGS, NULL},
+	 { (char *)"helicsFederateInfoSetCoreTypeFromString", _wrap_helicsFederateInfoSetCoreTypeFromString, METH_VARARGS, NULL},
 	 { (char *)"helicsFederateInfoSetBroker", _wrap_helicsFederateInfoSetBroker, METH_VARARGS, NULL},
 	 { (char *)"helicsFederateInfoSetBrokerKey", _wrap_helicsFederateInfoSetBrokerKey, METH_VARARGS, NULL},
 	 { (char *)"helicsFederateInfoSetBrokerPort", _wrap_helicsFederateInfoSetBrokerPort, METH_VARARGS, NULL},
@@ -15684,45 +15399,14 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"helicsFederateInfoSetTimeProperty", _wrap_helicsFederateInfoSetTimeProperty, METH_VARARGS, NULL},
 	 { (char *)"helicsFederateInfoSetIntegerProperty", _wrap_helicsFederateInfoSetIntegerProperty, METH_VARARGS, NULL},
 	 { (char *)"helicsFederateRegisterInterfaces", _wrap_helicsFederateRegisterInterfaces, METH_VARARGS, NULL},
-	 { (char *)"helicsFederateFinalize", _wrap_helicsFederateFinalize, METH_VARARGS, (char *)"\n"
-		"\n"
-		"\n"
-		"finalize the federate this halts all communication in the federate and\n"
-		"disconnects it from the core\n"
-		"\n"
-		""},
+	 { (char *)"helicsFederateFinalize", _wrap_helicsFederateFinalize, METH_VARARGS, NULL},
 	 { (char *)"helicsFederateFinalizeAsync", _wrap_helicsFederateFinalizeAsync, METH_VARARGS, NULL},
 	 { (char *)"helicsFederateFinalizeComplete", _wrap_helicsFederateFinalizeComplete, METH_VARARGS, NULL},
-	 { (char *)"helicsFederateFree", _wrap_helicsFederateFree, METH_VARARGS, (char *)"\n"
-		"\n"
-		"\n"
-		"release the memory associated withe a federate\n"
-		"\n"
-		""},
-	 { (char *)"helicsCloseLibrary", _wrap_helicsCloseLibrary, METH_VARARGS, (char *)"\n"
-		"\n"
-		"\n"
-		"call when done using the helics library, this function will ensure the threads\n"
-		"are closed properly if possible this should be the last call before exiting,\n"
-		"\n"
-		""},
+	 { (char *)"helicsFederateFree", _wrap_helicsFederateFree, METH_VARARGS, NULL},
+	 { (char *)"helicsCloseLibrary", _wrap_helicsCloseLibrary, METH_VARARGS, NULL},
 	 { (char *)"helicsFederateEnterInitializingMode", _wrap_helicsFederateEnterInitializingMode, METH_VARARGS, NULL},
 	 { (char *)"helicsFederateEnterInitializingModeAsync", _wrap_helicsFederateEnterInitializingModeAsync, METH_VARARGS, NULL},
-	 { (char *)"helicsFederateIsAsyncOperationCompleted", _wrap_helicsFederateIsAsyncOperationCompleted, METH_VARARGS, (char *)"\n"
-		"\n"
-		"\n"
-		"check if the current Asynchronous operation has completed\n"
-		"\n"
-		"Parameters\n"
-		"----------\n"
-		"* `fed` :\n"
-		"    the federate to operate on\n"
-		"\n"
-		"Returns\n"
-		"-------\n"
-		"0 if not completed, 1 if completed\n"
-		"\n"
-		""},
+	 { (char *)"helicsFederateIsAsyncOperationCompleted", _wrap_helicsFederateIsAsyncOperationCompleted, METH_VARARGS, NULL},
 	 { (char *)"helicsFederateEnterInitializingModeComplete", _wrap_helicsFederateEnterInitializingModeComplete, METH_VARARGS, NULL},
 	 { (char *)"helicsFederateEnterExecutingMode", _wrap_helicsFederateEnterExecutingMode, METH_VARARGS, NULL},
 	 { (char *)"helicsFederateEnterExecutingModeAsync", _wrap_helicsFederateEnterExecutingModeAsync, METH_VARARGS, NULL},
@@ -15730,118 +15414,17 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"helicsFederateEnterExecutingModeIterative", _wrap_helicsFederateEnterExecutingModeIterative, METH_VARARGS, NULL},
 	 { (char *)"helicsFederateEnterExecutingModeIterativeAsync", _wrap_helicsFederateEnterExecutingModeIterativeAsync, METH_VARARGS, NULL},
 	 { (char *)"helicsFederateEnterExecutingModeIterativeComplete", _wrap_helicsFederateEnterExecutingModeIterativeComplete, METH_VARARGS, NULL},
-	 { (char *)"helicsFederateGetState", _wrap_helicsFederateGetState, METH_VARARGS, (char *)"\n"
-		"\n"
-		"\n"
-		"get the current state of a federate\n"
-		"\n"
-		"Parameters\n"
-		"----------\n"
-		"* `fed` :\n"
-		"    the fed to query\n"
-		"* `state` :\n"
-		"    the resulting state if helics_status return helics_ok\n"
-		"\n"
-		""},
-	 { (char *)"helicsFederateGetCoreObject", _wrap_helicsFederateGetCoreObject, METH_VARARGS, (char *)"\n"
-		"\n"
-		"\n"
-		"get the core object associated with a federate\n"
-		"\n"
-		"Parameters\n"
-		"----------\n"
-		"* `fed` :\n"
-		"    a federate object\n"
-		"\n"
-		"Returns\n"
-		"-------\n"
-		"a core object, nullptr if invalid\n"
-		"\n"
-		""},
-	 { (char *)"helicsFederateRequestTime", _wrap_helicsFederateRequestTime, METH_VARARGS, (char *)"\n"
-		"\n"
-		"\n"
-		"request the next time for federate execution\n"
-		"\n"
-		"Parameters\n"
-		"----------\n"
-		"* `fed` :\n"
-		"    the federate to make the request of\n"
-		"* `requestTime` :\n"
-		"    the next requested time\n"
-		"* `timeOut` :\n"
-		"    the time granted to the federate\n"
-		"\n"
-		"Returns\n"
-		"-------\n"
-		"a helics_status if the return value is equal to helics_ok the timeOut will\n"
-		"contain the new granted time, otherwise timeOut is invalid\n"
-		"\n"
-		""},
+	 { (char *)"helicsFederateGetState", _wrap_helicsFederateGetState, METH_VARARGS, NULL},
+	 { (char *)"helicsFederateGetCoreObject", _wrap_helicsFederateGetCoreObject, METH_VARARGS, NULL},
+	 { (char *)"helicsFederateRequestTime", _wrap_helicsFederateRequestTime, METH_VARARGS, NULL},
 	 { (char *)"helicsFederateRequestTimeAdvance", _wrap_helicsFederateRequestTimeAdvance, METH_VARARGS, NULL},
 	 { (char *)"helicsFederateRequestNextStep", _wrap_helicsFederateRequestNextStep, METH_VARARGS, NULL},
-	 { (char *)"helicsFederateRequestTimeIterative", _wrap_helicsFederateRequestTimeIterative, METH_VARARGS, (char *)"\n"
-		"\n"
-		"\n"
-		"request an iterative time\n"
-		"\n"
-		"this call allows for finer grain control of the iterative process then /ref\n"
-		"helicsFederateRequestTime it takes a time and and iteration request and return a\n"
-		"time and iteration status\n"
-		"\n"
-		"Parameters\n"
-		"----------\n"
-		"* `fed` :\n"
-		"    the federate to make the request of\n"
-		"* `requestTime` :\n"
-		"    the next desired time\n"
-		"* `iterate` :\n"
-		"    the requested iteration mode\n"
-		"* `timeOut` :\n"
-		"    the granted time\n"
-		"* `outIterate` :\n"
-		"    the iteration specification of the result\n"
-		"\n"
-		"Returns\n"
-		"-------\n"
-		"a helics_status object with a return code of the result\n"
-		"\n"
-		""},
-	 { (char *)"helicsFederateRequestTimeAsync", _wrap_helicsFederateRequestTimeAsync, METH_VARARGS, (char *)"\n"
-		"\n"
-		"\n"
-		""},
-	 { (char *)"helicsFederateRequestTimeComplete", _wrap_helicsFederateRequestTimeComplete, METH_VARARGS, (char *)"\n"
-		"\n"
-		"\n"
-		""},
-	 { (char *)"helicsFederateRequestTimeIterativeAsync", _wrap_helicsFederateRequestTimeIterativeAsync, METH_VARARGS, (char *)"\n"
-		"\n"
-		"\n"
-		""},
-	 { (char *)"helicsFederateRequestTimeIterativeComplete", _wrap_helicsFederateRequestTimeIterativeComplete, METH_VARARGS, (char *)"\n"
-		"\n"
-		"\n"
-		""},
-	 { (char *)"helicsFederateGetName", _wrap_helicsFederateGetName, METH_VARARGS, (char *)"\n"
-		"\n"
-		"\n"
-		"get the name of the federate\n"
-		"\n"
-		"Parameters\n"
-		"----------\n"
-		"* `fed` :\n"
-		"    the federate object to query\n"
-		"* `str` :\n"
-		"    memory buffer to store the result\n"
-		"* `maxlen` :\n"
-		"    the maximum size of the buffer\n"
-		"\n"
-		"Returns\n"
-		"-------\n"
-		"helics_status object indicating success or error\n"
-		"\n"
-		""},
+	 { (char *)"helicsFederateRequestTimeIterative", _wrap_helicsFederateRequestTimeIterative, METH_VARARGS, NULL},
+	 { (char *)"helicsFederateRequestTimeAsync", _wrap_helicsFederateRequestTimeAsync, METH_VARARGS, NULL},
+	 { (char *)"helicsFederateRequestTimeComplete", _wrap_helicsFederateRequestTimeComplete, METH_VARARGS, NULL},
+	 { (char *)"helicsFederateRequestTimeIterativeAsync", _wrap_helicsFederateRequestTimeIterativeAsync, METH_VARARGS, NULL},
+	 { (char *)"helicsFederateRequestTimeIterativeComplete", _wrap_helicsFederateRequestTimeIterativeComplete, METH_VARARGS, NULL},
+	 { (char *)"helicsFederateGetName", _wrap_helicsFederateGetName, METH_VARARGS, NULL},
 	 { (char *)"helicsFederateSetTimeProperty", _wrap_helicsFederateSetTimeProperty, METH_VARARGS, NULL},
 	 { (char *)"helicsFederateSetFlagOption", _wrap_helicsFederateSetFlagOption, METH_VARARGS, NULL},
 	 { (char *)"helicsFederateSetSeparator", _wrap_helicsFederateSetSeparator, METH_VARARGS, NULL},
@@ -15849,154 +15432,24 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"helicsFederateGetTimeProperty", _wrap_helicsFederateGetTimeProperty, METH_VARARGS, NULL},
 	 { (char *)"helicsFederateGetFlagOption", _wrap_helicsFederateGetFlagOption, METH_VARARGS, NULL},
 	 { (char *)"helicsFederateGetIntegerProperty", _wrap_helicsFederateGetIntegerProperty, METH_VARARGS, NULL},
-	 { (char *)"helicsFederateGetCurrentTime", _wrap_helicsFederateGetCurrentTime, METH_VARARGS, (char *)"\n"
-		"\n"
-		"\n"
-		"get the current time of the federate\n"
-		"\n"
-		"Parameters\n"
-		"----------\n"
-		"* `fed` :\n"
-		"    the federate object to query\n"
-		"* `time` :\n"
-		"    storage location for the time variable\n"
-		"\n"
-		"Returns\n"
-		"-------\n"
-		"helics_status object indicating success or error\n"
-		"\n"
-		""},
+	 { (char *)"helicsFederateGetCurrentTime", _wrap_helicsFederateGetCurrentTime, METH_VARARGS, NULL},
 	 { (char *)"helicsFederateSetGlobal", _wrap_helicsFederateSetGlobal, METH_VARARGS, NULL},
 	 { (char *)"helicsCoreSetGlobal", _wrap_helicsCoreSetGlobal, METH_VARARGS, NULL},
 	 { (char *)"helicsBrokerSetGlobal", _wrap_helicsBrokerSetGlobal, METH_VARARGS, NULL},
-	 { (char *)"helicsCreateQuery", _wrap_helicsCreateQuery, METH_VARARGS, (char *)"\n"
-		"\n"
-		"\n"
-		"create a query object\n"
-		"\n"
-		"a query object consists of a target and query string\n"
-		"\n"
-		""},
-	 { (char *)"helicsQueryExecute", _wrap_helicsQueryExecute, METH_VARARGS, (char *)"\n"
-		"\n"
-		"\n"
-		"Execute a query\n"
-		"\n"
-		"the call will block until the query finishes which may require communication or\n"
-		"other delays\n"
-		"\n"
-		"Parameters\n"
-		"----------\n"
-		"* `query` :\n"
-		"    the query object to use in the query\n"
-		"* `fed` :\n"
-		"    a federate to send the query through\n"
-		"\n"
-		"Returns\n"
-		"-------\n"
-		"a pointer to a string. the string will remain valid until the query is freed or\n"
-		"executed again the return will be nullptr if fed or query is an invalid object\n"
-		"\n"
-		""},
+	 { (char *)"helicsCreateQuery", _wrap_helicsCreateQuery, METH_VARARGS, NULL},
+	 { (char *)"helicsQueryExecute", _wrap_helicsQueryExecute, METH_VARARGS, NULL},
 	 { (char *)"helicsQueryCoreExecute", _wrap_helicsQueryCoreExecute, METH_VARARGS, NULL},
 	 { (char *)"helicsQueryBrokerExecute", _wrap_helicsQueryBrokerExecute, METH_VARARGS, NULL},
-	 { (char *)"helicsQueryExecuteAsync", _wrap_helicsQueryExecuteAsync, METH_VARARGS, (char *)"\n"
-		"\n"
-		"\n"
-		"Execute a query in a non-blocking call\n"
-		"\n"
-		"Parameters\n"
-		"----------\n"
-		"* `query` :\n"
-		"    the query object to use in the query\n"
-		"* `fed` :\n"
-		"    a federate to send the query through\n"
-		"\n"
-		"Returns\n"
-		"-------\n"
-		"a helics status enumeration with the result of the query specification\n"
-		"\n"
-		""},
-	 { (char *)"helicsQueryExecuteComplete", _wrap_helicsQueryExecuteComplete, METH_VARARGS, (char *)"\n"
-		"\n"
-		"\n"
-		"complete the return from a query called with /ref helicsExecuteQueryAsync\n"
-		"\n"
-		"the function will block until the query completes /ref isQueryComplete can be\n"
-		"called to determine if a query has completed or not\n"
-		"\n"
-		"Parameters\n"
-		"----------\n"
-		"* `query` :\n"
-		"    the query object to\n"
-		"\n"
-		"Returns\n"
-		"-------\n"
-		"a pointer to a string. the string will remain valid until the query is freed or\n"
-		"executed again the return will be nullptr if query is an invalid object\n"
-		"\n"
-		""},
-	 { (char *)"helicsQueryIsCompleted", _wrap_helicsQueryIsCompleted, METH_VARARGS, (char *)"\n"
-		"\n"
-		"\n"
-		"check if an asynchronously executed query has completed\n"
-		"\n"
-		"Returns\n"
-		"-------\n"
-		"will return helics_true if an async query has complete or a regular query call\n"
-		"was made with a result and false if an async query has not completed or is\n"
-		"invalid\n"
-		"\n"
-		""},
-	 { (char *)"helicsQueryFree", _wrap_helicsQueryFree, METH_VARARGS, (char *)"\n"
-		"\n"
-		"\n"
-		"free the memory associated with a query object\n"
-		"\n"
-		""},
+	 { (char *)"helicsQueryExecuteAsync", _wrap_helicsQueryExecuteAsync, METH_VARARGS, NULL},
+	 { (char *)"helicsQueryExecuteComplete", _wrap_helicsQueryExecuteComplete, METH_VARARGS, NULL},
+	 { (char *)"helicsQueryIsCompleted", _wrap_helicsQueryIsCompleted, METH_VARARGS, NULL},
+	 { (char *)"helicsQueryFree", _wrap_helicsQueryFree, METH_VARARGS, NULL},
 	 { (char *)"helicsCleanupLibrary", _wrap_helicsCleanupLibrary, METH_VARARGS, NULL},
-	 { (char *)"helicsFederateRegisterSubscription", _wrap_helicsFederateRegisterSubscription, METH_VARARGS, (char *)"\n"
-		"\n"
-		"\n"
-		"create a subscription\n"
-		"\n"
-		"the subscription becomes part of the federate and is destroyed when the federate\n"
-		"is freed so there are no separate free functions for subscriptions and\n"
-		"publications\n"
-		"\n"
-		"Parameters\n"
-		"----------\n"
-		"* `fed` :\n"
-		"    the federate object in which to create a subscription must have been create\n"
-		"    with helicsCreateValueFederate or helicsCreateCombinationFederate\n"
-		"* `key` :\n"
-		"    the identifier matching a publication to get a subscription for\n"
-		"* `type` :\n"
-		"    a string describing the expected type of the publication may be NULL\n"
-		"* `units` :\n"
-		"    a string listing the units of the subscription maybe NULL\n"
-		"\n"
-		"Returns\n"
-		"-------\n"
-		"an object containing the subscription\n"
-		"\n"
-		""},
-	 { (char *)"helicsFederateRegisterPublication", _wrap_helicsFederateRegisterPublication, METH_VARARGS, (char *)"\n"
-		"\n"
-		"\n"
-		""},
-	 { (char *)"helicsFederateRegisterTypePublication", _wrap_helicsFederateRegisterTypePublication, METH_VARARGS, (char *)"\n"
-		"\n"
-		"\n"
-		""},
-	 { (char *)"helicsFederateRegisterGlobalPublication", _wrap_helicsFederateRegisterGlobalPublication, METH_VARARGS, (char *)"\n"
-		"\n"
-		"\n"
-		""},
-	 { (char *)"helicsFederateRegisterGlobalTypePublication", _wrap_helicsFederateRegisterGlobalTypePublication, METH_VARARGS, (char *)"\n"
-		"\n"
-		"\n"
-		""},
+	 { (char *)"helicsFederateRegisterSubscription", _wrap_helicsFederateRegisterSubscription, METH_VARARGS, NULL},
+	 { (char *)"helicsFederateRegisterPublication", _wrap_helicsFederateRegisterPublication, METH_VARARGS, NULL},
+	 { (char *)"helicsFederateRegisterTypePublication", _wrap_helicsFederateRegisterTypePublication, METH_VARARGS, NULL},
+	 { (char *)"helicsFederateRegisterGlobalPublication", _wrap_helicsFederateRegisterGlobalPublication, METH_VARARGS, NULL},
+	 { (char *)"helicsFederateRegisterGlobalTypePublication", _wrap_helicsFederateRegisterGlobalTypePublication, METH_VARARGS, NULL},
 	 { (char *)"helicsFederateRegisterInput", _wrap_helicsFederateRegisterInput, METH_VARARGS, NULL},
 	 { (char *)"helicsFederateRegisterTypeInput", _wrap_helicsFederateRegisterTypeInput, METH_VARARGS, NULL},
 	 { (char *)"helicsFederateRegisterGlobalInput", _wrap_helicsFederateRegisterGlobalInput, METH_VARARGS, NULL},
@@ -16010,29 +15463,14 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"helicsFederateRegisterFromPublicationJSON", _wrap_helicsFederateRegisterFromPublicationJSON, METH_VARARGS, NULL},
 	 { (char *)"helicsFederatePublishJSON", _wrap_helicsFederatePublishJSON, METH_VARARGS, NULL},
 	 { (char *)"helicsPublicationPublishRaw", _wrap_helicsPublicationPublishRaw, METH_VARARGS, NULL},
-	 { (char *)"helicsPublicationPublishString", _wrap_helicsPublicationPublishString, METH_VARARGS, (char *)"\n"
-		"\n"
-		"\n"
-		""},
-	 { (char *)"helicsPublicationPublishInteger", _wrap_helicsPublicationPublishInteger, METH_VARARGS, (char *)"\n"
-		"\n"
-		"\n"
-		""},
+	 { (char *)"helicsPublicationPublishString", _wrap_helicsPublicationPublishString, METH_VARARGS, NULL},
+	 { (char *)"helicsPublicationPublishInteger", _wrap_helicsPublicationPublishInteger, METH_VARARGS, NULL},
 	 { (char *)"helicsPublicationPublishBoolean", _wrap_helicsPublicationPublishBoolean, METH_VARARGS, NULL},
-	 { (char *)"helicsPublicationPublishDouble", _wrap_helicsPublicationPublishDouble, METH_VARARGS, (char *)"\n"
-		"\n"
-		"\n"
-		""},
+	 { (char *)"helicsPublicationPublishDouble", _wrap_helicsPublicationPublishDouble, METH_VARARGS, NULL},
 	 { (char *)"helicsPublicationPublishTime", _wrap_helicsPublicationPublishTime, METH_VARARGS, NULL},
 	 { (char *)"helicsPublicationPublishChar", _wrap_helicsPublicationPublishChar, METH_VARARGS, NULL},
-	 { (char *)"helicsPublicationPublishComplex", _wrap_helicsPublicationPublishComplex, METH_VARARGS, (char *)"\n"
-		"\n"
-		"\n"
-		""},
-	 { (char *)"helicsPublicationPublishVector", _wrap_helicsPublicationPublishVector, METH_VARARGS, (char *)"\n"
-		"\n"
-		"\n"
-		""},
+	 { (char *)"helicsPublicationPublishComplex", _wrap_helicsPublicationPublishComplex, METH_VARARGS, NULL},
+	 { (char *)"helicsPublicationPublishVector", _wrap_helicsPublicationPublishVector, METH_VARARGS, NULL},
 	 { (char *)"helicsPublicationPublishNamedPoint", _wrap_helicsPublicationPublishNamedPoint, METH_VARARGS, NULL},
 	 { (char *)"helicsPublicationAddTarget", _wrap_helicsPublicationAddTarget, METH_VARARGS, NULL},
 	 { (char *)"helicsInputAddTarget", _wrap_helicsInputAddTarget, METH_VARARGS, NULL},
@@ -16062,26 +15500,14 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"helicsInputSetDefaultNamedPoint", _wrap_helicsInputSetDefaultNamedPoint, METH_VARARGS, NULL},
 	 { (char *)"helicsInputGetType", _wrap_helicsInputGetType, METH_VARARGS, NULL},
 	 { (char *)"helicsInputGetPublicationType", _wrap_helicsInputGetPublicationType, METH_VARARGS, NULL},
-	 { (char *)"helicsPublicationGetType", _wrap_helicsPublicationGetType, METH_VARARGS, (char *)"\n"
-		"\n"
-		"\n"
-		""},
+	 { (char *)"helicsPublicationGetType", _wrap_helicsPublicationGetType, METH_VARARGS, NULL},
 	 { (char *)"helicsInputGetKey", _wrap_helicsInputGetKey, METH_VARARGS, NULL},
-	 { (char *)"helicsSubscriptionGetKey", _wrap_helicsSubscriptionGetKey, METH_VARARGS, (char *)"\n"
-		"\n"
-		"\n"
-		""},
-	 { (char *)"helicsPublicationGetKey", _wrap_helicsPublicationGetKey, METH_VARARGS, (char *)"\n"
-		"\n"
-		"\n"
-		""},
+	 { (char *)"helicsSubscriptionGetKey", _wrap_helicsSubscriptionGetKey, METH_VARARGS, NULL},
+	 { (char *)"helicsPublicationGetKey", _wrap_helicsPublicationGetKey, METH_VARARGS, NULL},
 	 { (char *)"helicsInputGetUnits", _wrap_helicsInputGetUnits, METH_VARARGS, NULL},
 	 { (char *)"helicsInputGetInjectionUnits", _wrap_helicsInputGetInjectionUnits, METH_VARARGS, NULL},
 	 { (char *)"helicsInputGetExtractionUnits", _wrap_helicsInputGetExtractionUnits, METH_VARARGS, NULL},
-	 { (char *)"helicsPublicationGetUnits", _wrap_helicsPublicationGetUnits, METH_VARARGS, (char *)"\n"
-		"\n"
-		"\n"
-		""},
+	 { (char *)"helicsPublicationGetUnits", _wrap_helicsPublicationGetUnits, METH_VARARGS, NULL},
 	 { (char *)"helicsInputGetInfo", _wrap_helicsInputGetInfo, METH_VARARGS, NULL},
 	 { (char *)"helicsInputSetInfo", _wrap_helicsInputSetInfo, METH_VARARGS, NULL},
 	 { (char *)"helicsPublicationGetInfo", _wrap_helicsPublicationGetInfo, METH_VARARGS, NULL},
@@ -16095,133 +15521,30 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"helicsInputClearUpdate", _wrap_helicsInputClearUpdate, METH_VARARGS, NULL},
 	 { (char *)"helicsFederateGetPublicationCount", _wrap_helicsFederateGetPublicationCount, METH_VARARGS, NULL},
 	 { (char *)"helicsFederateGetInputCount", _wrap_helicsFederateGetInputCount, METH_VARARGS, NULL},
-	 { (char *)"helicsFederateRegisterEndpoint", _wrap_helicsFederateRegisterEndpoint, METH_VARARGS, (char *)"\n"
-		"\n"
-		"\n"
-		""},
-	 { (char *)"helicsFederateRegisterGlobalEndpoint", _wrap_helicsFederateRegisterGlobalEndpoint, METH_VARARGS, (char *)"\n"
-		"\n"
-		"\n"
-		""},
+	 { (char *)"helicsFederateRegisterEndpoint", _wrap_helicsFederateRegisterEndpoint, METH_VARARGS, NULL},
+	 { (char *)"helicsFederateRegisterGlobalEndpoint", _wrap_helicsFederateRegisterGlobalEndpoint, METH_VARARGS, NULL},
 	 { (char *)"helicsFederateGetEndpoint", _wrap_helicsFederateGetEndpoint, METH_VARARGS, NULL},
 	 { (char *)"helicsFederateGetEndpointByIndex", _wrap_helicsFederateGetEndpointByIndex, METH_VARARGS, NULL},
-	 { (char *)"helicsEndpointSetDefaultDestination", _wrap_helicsEndpointSetDefaultDestination, METH_VARARGS, (char *)"\n"
-		"\n"
-		"\n"
-		""},
+	 { (char *)"helicsEndpointSetDefaultDestination", _wrap_helicsEndpointSetDefaultDestination, METH_VARARGS, NULL},
 	 { (char *)"helicsEndpointGetDefaultDestination", _wrap_helicsEndpointGetDefaultDestination, METH_VARARGS, NULL},
-	 { (char *)"helicsEndpointSendMessageRaw", _wrap_helicsEndpointSendMessageRaw, METH_VARARGS, (char *)"\n"
-		"\n"
-		"\n"
-		""},
-	 { (char *)"helicsEndpointSendEventRaw", _wrap_helicsEndpointSendEventRaw, METH_VARARGS, (char *)"\n"
-		"\n"
-		"\n"
-		""},
-	 { (char *)"helicsEndpointSendMessage", _wrap_helicsEndpointSendMessage, METH_VARARGS, (char *)"\n"
-		"\n"
-		"\n"
-		""},
+	 { (char *)"helicsEndpointSendMessageRaw", _wrap_helicsEndpointSendMessageRaw, METH_VARARGS, NULL},
+	 { (char *)"helicsEndpointSendEventRaw", _wrap_helicsEndpointSendEventRaw, METH_VARARGS, NULL},
+	 { (char *)"helicsEndpointSendMessage", _wrap_helicsEndpointSendMessage, METH_VARARGS, NULL},
 	 { (char *)"helicsEndpointSendMessageObject", _wrap_helicsEndpointSendMessageObject, METH_VARARGS, NULL},
-	 { (char *)"helicsEndpointSubscribe", _wrap_helicsEndpointSubscribe, METH_VARARGS, (char *)"\n"
-		"\n"
-		"\n"
-		"subscribe an endpoint to a publication\n"
-		"\n"
-		"Parameters\n"
-		"----------\n"
-		"* `endpoint` :\n"
-		"    the endpoint to use\n"
-		"* `key` :\n"
-		"    the name of the publication\n"
-		"* `type` :\n"
-		"    the type of the publication that is expected (nullptr or \"\" for DON'T\n"
-		"    CARE)\n"
-		"\n"
-		""},
-	 { (char *)"helicsFederateHasMessage", _wrap_helicsFederateHasMessage, METH_VARARGS, (char *)"\n"
-		"\n"
-		"\n"
-		"check if the federate has any outstanding messages\n"
-		"\n"
-		""},
-	 { (char *)"helicsEndpointHasMessage", _wrap_helicsEndpointHasMessage, METH_VARARGS, (char *)"\n"
-		"\n"
-		"\n"
-		""},
+	 { (char *)"helicsEndpointSubscribe", _wrap_helicsEndpointSubscribe, METH_VARARGS, NULL},
+	 { (char *)"helicsFederateHasMessage", _wrap_helicsFederateHasMessage, METH_VARARGS, NULL},
+	 { (char *)"helicsEndpointHasMessage", _wrap_helicsEndpointHasMessage, METH_VARARGS, NULL},
 	 { (char *)"helicsFederatePendingMessages", _wrap_helicsFederatePendingMessages, METH_VARARGS, NULL},
 	 { (char *)"helicsEndpointPendingMessages", _wrap_helicsEndpointPendingMessages, METH_VARARGS, NULL},
-	 { (char *)"helicsEndpointGetMessage", _wrap_helicsEndpointGetMessage, METH_VARARGS, (char *)"\n"
-		"\n"
-		"\n"
-		"receive a packet from a particular endpoint\n"
-		"\n"
-		"Parameters\n"
-		"----------\n"
-		"* `endpoint` :\n"
-		"    the identifier for the endpoint\n"
-		"\n"
-		"Returns\n"
-		"-------\n"
-		"a message object\n"
-		"\n"
-		""},
+	 { (char *)"helicsEndpointGetMessage", _wrap_helicsEndpointGetMessage, METH_VARARGS, NULL},
 	 { (char *)"helicsEndpointGetMessageObject", _wrap_helicsEndpointGetMessageObject, METH_VARARGS, NULL},
-	 { (char *)"helicsFederateGetMessage", _wrap_helicsFederateGetMessage, METH_VARARGS, (char *)"\n"
-		"\n"
-		"\n"
-		"receive a communication message for any endpoint in the federate\n"
-		"\n"
-		"the return order will be in order of endpoint creation then order of arrival all\n"
-		"messages for the first endpoint, then all for the second, and so on\n"
-		"\n"
-		"Returns\n"
-		"-------\n"
-		"a unique_ptr to a Message object containing the message data\n"
-		"\n"
-		""},
+	 { (char *)"helicsFederateGetMessage", _wrap_helicsFederateGetMessage, METH_VARARGS, NULL},
 	 { (char *)"helicsFederateGetMessageObject", _wrap_helicsFederateGetMessageObject, METH_VARARGS, NULL},
 	 { (char *)"helicsFederateCreateMessageObject", _wrap_helicsFederateCreateMessageObject, METH_VARARGS, NULL},
 	 { (char *)"helicsFederateClearMessages", _wrap_helicsFederateClearMessages, METH_VARARGS, NULL},
 	 { (char *)"helicsEndpointClearMessages", _wrap_helicsEndpointClearMessages, METH_VARARGS, NULL},
-	 { (char *)"helicsEndpointGetType", _wrap_helicsEndpointGetType, METH_VARARGS, (char *)"\n"
-		"\n"
-		"\n"
-		"get the type specified for an endpoint\n"
-		"\n"
-		"Parameters\n"
-		"----------\n"
-		"* `endpoint` :\n"
-		"    the endpoint object in question\n"
-		"* `str` :\n"
-		"    the location where the string is stored\n"
-		"* `maxlen` :\n"
-		"    the maximum string length that can be stored in str\n"
-		"\n"
-		"Returns\n"
-		"-------\n"
-		"a status variable\n"
-		"\n"
-		""},
-	 { (char *)"helicsEndpointGetName", _wrap_helicsEndpointGetName, METH_VARARGS, (char *)"\n"
-		"\n"
-		"\n"
-		"get the name of an endpoint\n"
-		"\n"
-		"Parameters\n"
-		"----------\n"
-		"* `endpoint` :\n"
-		"    the endpoint object in question\n"
-		"* `str` :\n"
-		"    the location where the string is stored\n"
-		"* `maxlen` :\n"
-		"    the maximum string length that can be stored in str\n"
-		"\n"
-		"Returns\n"
-		"-------\n"
-		"a status variable\n"
-		"\n"
-		""},
+	 { (char *)"helicsEndpointGetType", _wrap_helicsEndpointGetType, METH_VARARGS, NULL},
+	 { (char *)"helicsEndpointGetName", _wrap_helicsEndpointGetName, METH_VARARGS, NULL},
 	 { (char *)"helicsFederateGetEndpointCount", _wrap_helicsFederateGetEndpointCount, METH_VARARGS, NULL},
 	 { (char *)"helicsEndpointGetInfo", _wrap_helicsEndpointGetInfo, METH_VARARGS, NULL},
 	 { (char *)"helicsEndpointSetInfo", _wrap_helicsEndpointSetInfo, METH_VARARGS, NULL},
@@ -16252,47 +15575,21 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"helicsMessageAppendData", _wrap_helicsMessageAppendData, METH_VARARGS, NULL},
 	 { (char *)"helicsFederateRegisterFilter", _wrap_helicsFederateRegisterFilter, METH_VARARGS, NULL},
 	 { (char *)"helicsFederateRegisterGlobalFilter", _wrap_helicsFederateRegisterGlobalFilter, METH_VARARGS, NULL},
-	 { (char *)"helicsFederateRegisterCloningFilter", _wrap_helicsFederateRegisterCloningFilter, METH_VARARGS, (char *)"\n"
-		"\n"
-		"\n"
-		""},
+	 { (char *)"helicsFederateRegisterCloningFilter", _wrap_helicsFederateRegisterCloningFilter, METH_VARARGS, NULL},
 	 { (char *)"helicsFederateRegisterGlobalCloningFilter", _wrap_helicsFederateRegisterGlobalCloningFilter, METH_VARARGS, NULL},
 	 { (char *)"helicsCoreRegisterFilter", _wrap_helicsCoreRegisterFilter, METH_VARARGS, NULL},
-	 { (char *)"helicsCoreRegisterCloningFilter", _wrap_helicsCoreRegisterCloningFilter, METH_VARARGS, (char *)"\n"
-		"\n"
-		"\n"
-		""},
+	 { (char *)"helicsCoreRegisterCloningFilter", _wrap_helicsCoreRegisterCloningFilter, METH_VARARGS, NULL},
 	 { (char *)"helicsFederateGetFilterCount", _wrap_helicsFederateGetFilterCount, METH_VARARGS, NULL},
 	 { (char *)"helicsFederateGetFilter", _wrap_helicsFederateGetFilter, METH_VARARGS, NULL},
 	 { (char *)"helicsFederateGetFilterByIndex", _wrap_helicsFederateGetFilterByIndex, METH_VARARGS, NULL},
-	 { (char *)"helicsFilterGetName", _wrap_helicsFilterGetName, METH_VARARGS, (char *)"\n"
-		"\n"
-		"\n"
-		"get the name of the filter\n"
-		"\n"
-		""},
-	 { (char *)"helicsFilterSet", _wrap_helicsFilterSet, METH_VARARGS, (char *)"\n"
-		"\n"
-		"\n"
-		""},
+	 { (char *)"helicsFilterGetName", _wrap_helicsFilterGetName, METH_VARARGS, NULL},
+	 { (char *)"helicsFilterSet", _wrap_helicsFilterSet, METH_VARARGS, NULL},
 	 { (char *)"helicsFilterSetString", _wrap_helicsFilterSetString, METH_VARARGS, NULL},
-	 { (char *)"helicsFilterAddDestinationTarget", _wrap_helicsFilterAddDestinationTarget, METH_VARARGS, (char *)"\n"
-		"\n"
-		"\n"
-		""},
-	 { (char *)"helicsFilterAddSourceTarget", _wrap_helicsFilterAddSourceTarget, METH_VARARGS, (char *)"\n"
-		"\n"
-		"\n"
-		""},
-	 { (char *)"helicsFilterAddDeliveryEndpoint", _wrap_helicsFilterAddDeliveryEndpoint, METH_VARARGS, (char *)"\n"
-		"\n"
-		"\n"
-		""},
+	 { (char *)"helicsFilterAddDestinationTarget", _wrap_helicsFilterAddDestinationTarget, METH_VARARGS, NULL},
+	 { (char *)"helicsFilterAddSourceTarget", _wrap_helicsFilterAddSourceTarget, METH_VARARGS, NULL},
+	 { (char *)"helicsFilterAddDeliveryEndpoint", _wrap_helicsFilterAddDeliveryEndpoint, METH_VARARGS, NULL},
 	 { (char *)"helicsFilterRemoveTarget", _wrap_helicsFilterRemoveTarget, METH_VARARGS, NULL},
-	 { (char *)"helicsFilterRemoveDeliveryEndpoint", _wrap_helicsFilterRemoveDeliveryEndpoint, METH_VARARGS, (char *)"\n"
-		"\n"
-		"\n"
-		""},
+	 { (char *)"helicsFilterRemoveDeliveryEndpoint", _wrap_helicsFilterRemoveDeliveryEndpoint, METH_VARARGS, NULL},
 	 { (char *)"helicsFilterGetInfo", _wrap_helicsFilterGetInfo, METH_VARARGS, NULL},
 	 { (char *)"helicsFilterSetInfo", _wrap_helicsFilterSetInfo, METH_VARARGS, NULL},
 	 { (char *)"helicsFilterSetOption", _wrap_helicsFilterSetOption, METH_VARARGS, NULL},

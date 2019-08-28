@@ -229,6 +229,10 @@ public class helics {
     helicsJNI.helicsFederateInfoSetCoreInitString(SWIGTYPE_p_void.getCPtr(fi), coreInit);
   }
 
+  public static void helicsFederateInfoSetBrokerInitString(SWIGTYPE_p_void fi, String brokerInit) {
+    helicsJNI.helicsFederateInfoSetBrokerInitString(SWIGTYPE_p_void.getCPtr(fi), brokerInit);
+  }
+
   public static void helicsFederateInfoSetCoreType(SWIGTYPE_p_void fi, int coretype) {
     helicsJNI.helicsFederateInfoSetCoreType(SWIGTYPE_p_void.getCPtr(fi), coretype);
   }
