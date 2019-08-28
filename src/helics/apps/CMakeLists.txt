@@ -96,16 +96,16 @@ if(BUILD_APP_LIBRARY)
 	set_property(TEST broker_version_return broker_help_return PROPERTY LABELS Continuous)
 
 
-	add_executable(broker_server helics-broker-server.cpp)
-    target_link_libraries(broker_server PUBLIC helics_apps)
-	target_link_libraries(broker_server PRIVATE compile_flags_target)
-    set_target_properties(broker_server PROPERTIES FOLDER apps)
+	add_executable(helics_broker_server helics-broker-server.cpp)
+    target_link_libraries(helics_broker_server PUBLIC helics_apps)
+	target_link_libraries(helics_broker_server PRIVATE compile_flags_target)
+    set_target_properties(helics_broker_server PROPERTIES FOLDER apps)
     set(
       HELICS_BROKER_SERVER_LOC ${CMAKE_CURRENT_BINARY_DIR}
       CACHE INTERNAL "build folder location of the broker server"
     )
     install(
-      TARGETS helics_broker broker_server
+      TARGETS helics_broker helics_broker_server
       DESTINATION ${CMAKE_INSTALL_BINDIR}
       COMPONENT applications
     )
