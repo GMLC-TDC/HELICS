@@ -1,3 +1,3 @@
 function varargout = helicsFederateSetFlagOption(varargin)
-  [varargout{1:nargout}] = helicsMEX(116, varargin{:});
+  [varargout{1:nargout}] = helicsMEX(117, varargin{:});
 end

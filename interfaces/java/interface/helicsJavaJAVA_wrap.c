@@ -2974,6 +2974,36 @@ SWIGEXPORT void JNICALL Java_com_java_helics_helicsJNI_helicsFederateInfoSetCore
 }
 
 
+SWIGEXPORT void JNICALL Java_com_java_helics_helicsJNI_helicsFederateInfoSetBrokerInitString(JNIEnv *jenv, jclass jcls, jlong jarg1, jstring jarg2) {
+  helics_federate_info arg1 = (helics_federate_info) 0 ;
+  char *arg2 = (char *) 0 ;
+  helics_error *arg3 = (helics_error *) 0 ;
+  helics_error etemp3 ;
+  
+  (void)jenv;
+  (void)jcls;
+  {
+    etemp3=helicsErrorInitialize();
+    arg3=&etemp3;
+  }
+  arg1 = *(helics_federate_info *)&jarg1; 
+  arg2 = 0;
+  if (jarg2) {
+    arg2 = (char *)(*jenv)->GetStringUTFChars(jenv, jarg2, 0);
+    if (!arg2) return ;
+  }
+  helicsFederateInfoSetBrokerInitString(arg1,(char const *)arg2,arg3);
+  if (arg2) (*jenv)->ReleaseStringUTFChars(jenv, jarg2, (const char *)arg2);
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      jclass clazz = (*jenv)->FindClass(jenv, "java/lang/Exception");
+      (*jenv)->ThrowNew(jenv, clazz, arg3->message);
+    }
+  }
+}
+
+
 SWIGEXPORT void JNICALL Java_com_java_helics_helicsJNI_helicsFederateInfoSetCoreType(JNIEnv *jenv, jclass jcls, jlong jarg1, jint jarg2) {
   helics_federate_info arg1 = (helics_federate_info) 0 ;
   int arg2 ;

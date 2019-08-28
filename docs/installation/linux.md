@@ -38,8 +38,10 @@ Getting and building from source:
 3. Run "make".
 
 #### Notes for Ubuntu
+
 Building with GCC 4.9 and 5.X on Ubuntu requires some additional flags due to the way Ubuntu builds those compilers
-add -DCMAKE_CXX_FLAGS="-D_GLIBCXX_USE_C99 -D_GLIBCXX_USE_C99_MATH" to make it work.  If you built the compilers from source this may not be required
+add ``-DCMAKE_CXX_FLAGS="-D_GLIBCXX_USE_C99 -D_GLIBCXX_USE_C99_MATH"`` to make it work.
+If you built the compilers from source this may not be required.
 
 ```bash
 
@@ -51,6 +53,21 @@ cmake ../
 ccmake . # optional, to change install path or other configuration settings
 make
 make install
+```
+
+Testing
+-------
+
+A quick test is to double check the versions of the HELICS player and recorder:
+
+```bash
+cd /path/to/helics_install/bin
+
+$ helics_player --version
+x.x.x (XX-XX-XX)
+
+$ helics_recorder --version
+x.x.x (XX-XX-XX)
 ```
 
 Building HELICS with python support
@@ -72,6 +89,9 @@ export PYTHONPATH=~/.local/helics-X.X.X/python:$PYTHONPATH
 export PATH=~/.local/bin:$PATH
 ```
 
+Testing HELICS with python support
+----------------------------------
+
 If you open a interactive Python session and import helics, you should be able to get the version of `helics` and an output that is similar to the following.
 
 ```bash
@@ -87,18 +107,3 @@ Out[2]: 'x.x.x (XX-XX-XX)'
 
 ```
 
-
-Testing
--------
-
-A quick test is to double check the versions of the HELICS player and recorder:
-
-```bash
-cd /path/to/helics_install/bin
-
-$ helics_player --version
-x.x.x (XX-XX-XX)
-
-$ helics_recorder --version
-x.x.x (XX-XX-XX)
-```
