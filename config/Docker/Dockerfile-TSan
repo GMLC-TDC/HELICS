@@ -1,5 +1,8 @@
 FROM ubuntu:18.04 as builder
 
+# Sets the number of threads for make to use
+ARG MAKE_PARALLEL
+
 RUN apt update && apt install -y \
   libboost-dev \
   libboost-test-dev \
@@ -13,7 +16,7 @@ RUN (cd llvm/projects && svn co http://llvm.org/svn/llvm-project/libcxx/trunk li
 RUN (cd llvm/projects && svn co http://llvm.org/svn/llvm-project/libcxxabi/trunk libcxxabi)
 
 RUN  mkdir libcxx_tsan && cd libcxx_tsan &&  cmake ../llvm -DCMAKE_BUILD_TYPE=Release -DLLVM_USE_SANITIZER=Thread -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++
-RUN cd libcxx_tsan && make cxx -j
+RUN cd libcxx_tsan && make cxx -j${MAKE_PARALLEL:-2}
 ENV TSAN_CFLAGS="-fsanitize=thread -stdlib=libc++ -L/root/develop/libcxx_tsan/lib -lc++abi -I/root/develop/libcxx_tsan/include -I/root/develop/libcxx_tsan/include/c++/v1 -Wno-unused-command-line-argument -g -O1 -Wl,-rpath=/root/develop/libcxx_tsan/lib"
 
 RUN rm -rf llvm
@@ -26,7 +29,7 @@ RUN printf "#!/bin/bash \
 \ncd build \
 \ncmake .. -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_FLAGS=\"${TSAN_CFLAGS}\"  -DBUILD_HELICS_BOOST_TESTS=OFF -DZMQ_SUBPROJECT=ON  -DZMQ_FORCE_SUBPROJECT=ON \
 \ncd /root/develop/HELICS/build \
-\nmake -j  \
+\nmake -j${MAKE_PARALLEL:-2} \
 \n/root/develop/HELICS/build/tests/helics/core/core-tests \
 \n/root/develop/HELICS/build/tests/helics/common/common-tests \
 \n/root/develop/HELICS/build/tests/helics/system_tests/system-tests \
