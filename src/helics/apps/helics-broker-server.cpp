@@ -186,12 +186,12 @@ void terminalFunction (std::vector<std::string> args)
     bool cmdcont = true;
     helics::helicsCLI11App termProg ("helics broker server command line terminal");
     termProg.ignore_case ();
-    termProg.add_flag ("-q,--quit,--exit", cmdcont, "stop the broker servers close the terminal and wait for the brokers to exit");
+    termProg.add_flag ("-q,--quit,--exit", cmdcont, "stop the broker servers, close the terminal and wait for the brokers to exit");
     termProg.add_subcommand ("quit", "close the terminal and  wait for the brokers to exit")
       ->callback ([&cmdcont]() { cmdcont = false; });
     termProg.add_subcommand ("terminate", "terminate the broker servers")->callback (closeBrokerServer);
 
-    termProg.add_subcommand ("terminate!", "forceably terminate the broker servers, shutdown all brokers and exit")
+    termProg.add_subcommand ("terminate!", "forcibly terminate the broker servers, shutdown all brokers and exit")
       ->callback ([closeBrokerServer, &cmdcont]() {
           cmdcont = false;
           closeBrokerServer ();
