@@ -48,13 +48,13 @@ BrokerServer::BrokerServer () noexcept : zmq_server{true}, server_name_{random_s
 BrokerServer::BrokerServer (int argc, char *argv[]) : server_name_{random_string (5)}
 {
     auto app = generateArgProcessing ();
-    app->parse (argc, argv);
+    app->helics_parse (argc, argv);
 }
 
 BrokerServer::BrokerServer (std::vector<std::string> args) : server_name_{random_string (5)}
 {
     auto app = generateArgProcessing ();
-    app->parse (args);
+    app->helics_parse (args);
 }
 
 BrokerServer::BrokerServer (const std::string &configFile)

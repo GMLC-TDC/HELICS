@@ -174,6 +174,7 @@ public class helicsJNI {
   public final static native int helicsFederateIsValid(long jarg1);
   public final static native void helicsFederateInfoSetCoreName(long jarg1, String jarg2);
   public final static native void helicsFederateInfoSetCoreInitString(long jarg1, String jarg2);
+  public final static native void helicsFederateInfoSetBrokerInitString(long jarg1, String jarg2);
   public final static native void helicsFederateInfoSetCoreType(long jarg1, int jarg2);
   public final static native void helicsFederateInfoSetCoreTypeFromString(long jarg1, String jarg2);
   public final static native void helicsFederateInfoSetBroker(long jarg1, String jarg2);

@@ -18,11 +18,12 @@ TEST (messageTimer_tests, basic_test)
     auto loopHandle = contextPtr->startContextLoop ();
     if (!contextPtr->isRunning ())
     {
-        std::this_thread::sleep_for (1000ms);
+        std::this_thread::sleep_for (600ms);
     }
+    auto loopHandle2 = contextPtr->startContextLoop ();
     if (!contextPtr->isRunning ())
     {
-        std::this_thread::sleep_for (1000ms);
+        std::this_thread::sleep_for (600ms);
     }
     // if this fails there is a separate error path that this doesn't account for
     EXPECT_TRUE (contextPtr->isRunning ());

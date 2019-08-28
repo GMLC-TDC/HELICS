@@ -9,14 +9,19 @@ Docker version 19.03.1
 Getting a docker from the hub
 ------------------------------
 
-To search a docker from any reposository you can use this command
+To search a docker from any repository you can use this command
 
 ```bash
 docker search helics
 ```
 |NAME               |     DESCRIPTION             |
 |:-----------------:|:---------------------------:|
-|helics/octave      |     container for testing th|
+|helics/octave|container for testing octave|
+|helics/clang-asan|container for running clang address sanitizer|
+|helics/clang-tsan|container for running clang thread sanitizer|
+|helics/clang-msan|container for running clang memory sanitizer|
+|helics/helics|container with installed HELICS executables|
+
 
 ```bash
 docker pull helics/octave
@@ -134,6 +139,3 @@ Reference
 All docker command can be found here:
 
   [https://docs.docker.com/engine/reference/commandline/cli/](https://docs.docker.com/engine/reference/commandline/cli/)
-
-
-

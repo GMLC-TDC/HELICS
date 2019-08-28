@@ -5320,6 +5320,58 @@ fail:
 }
 
 
+SWIG_DEFUN( helicsFederateInfoSetBrokerInitString, _wrap_helicsFederateInfoSetBrokerInitString, std::string() ) {
+  helics_federate_info arg1 = (helics_federate_info) 0 ;
+  char *arg2 = (char *) 0 ;
+  helics_error *arg3 = (helics_error *) 0 ;
+  int res1 ;
+  int res2 ;
+  char *buf2 = 0 ;
+  int alloc2 = 0 ;
+  helics_error etemp3 ;
+  octave_value_list _out;
+  octave_value_list *_outp=&_out;
+  octave_value _outv;
+  
+  {
+    etemp3=helicsErrorInitialize();
+    arg3=&etemp3;
+  }
+  if (!SWIG_check_num_args("helicsFederateInfoSetBrokerInitString",args.length(),2,2,0)) {
+    SWIG_fail;
+  }
+  res1 = SWIG_ConvertPtr(args(0),SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateInfoSetBrokerInitString" "', argument " "1"" of type '" "helics_federate_info""'"); 
+  }
+  res2 = SWIG_AsCharPtrAndSize(args(1), &buf2, NULL, &alloc2);
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsFederateInfoSetBrokerInitString" "', argument " "2"" of type '" "char const *""'");
+  }
+  arg2 = reinterpret_cast< char * >(buf2);
+  helicsFederateInfoSetBrokerInitString(arg1,(char const *)arg2,arg3);
+  _outv = octave_value();
+  if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
+  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg3);
+    }
+  }
+  return _out;
+fail:
+  if (alloc2 == SWIG_NEWOBJ) delete[] buf2;
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsOctaveError(arg3);
+    }
+  }
+  return octave_value_list();
+}
+
+
 SWIG_DEFUN( helicsFederateInfoSetCoreType, _wrap_helicsFederateInfoSetCoreType, std::string() ) {
   helics_federate_info arg1 = (helics_federate_info) 0 ;
   int arg2 ;
@@ -14634,6 +14686,7 @@ static const struct swig_octave_member swig_globals[] = {
 {"helicsFederateIsValid",_wrap_helicsFederateIsValid,0,0,2,0},
 {"helicsFederateInfoSetCoreName",_wrap_helicsFederateInfoSetCoreName,0,0,2,0},
 {"helicsFederateInfoSetCoreInitString",_wrap_helicsFederateInfoSetCoreInitString,0,0,2,0},
+{"helicsFederateInfoSetBrokerInitString",_wrap_helicsFederateInfoSetBrokerInitString,0,0,2,0},
 {"helicsFederateInfoSetCoreType",_wrap_helicsFederateInfoSetCoreType,0,0,2,0},
 {"helicsFederateInfoSetCoreTypeFromString",_wrap_helicsFederateInfoSetCoreTypeFromString,0,0,2,0},
 {"helicsFederateInfoSetBroker",_wrap_helicsFederateInfoSetBroker,0,0,2,0},

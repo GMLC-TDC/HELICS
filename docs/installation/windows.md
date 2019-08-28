@@ -1,6 +1,5 @@
 # Windows Installation
 
-
 ## Requirements
 
 -   Microsoft Visual C++ 2015 or newer (MS Build Tools also works)
@@ -161,11 +160,14 @@ Out[2]: 'x.x.x (XX-XX-XX)'
 ![](../img/windows-python-success.png)
 
 ## Building HELICS From Source on Windows with MSYS2 ##
+
 ### Overview ###
+
 This section will layout the setting up of MSYS2 to compile and install HELICS. This guide will describe all the packages and install instructions for a 64bit build.
 
 ### Setting up MSYS2 ###
-MSYS2 provides a Linux like terminal environment on your Windows system. MSYS2 can be installed from [here](https://www.msys2.org/). Once MSYS2 has been installed start up msys2. The recommended way is to start up the MSYS2 MinGW 64-bit from the Windows start menu.  The following commands assume you are in this command unless otherwise noted.  MinGW 32bit could be used but you will need to substitute `i686` versions for the `x86_64` libraries.   Follow first time updates as described on the [MSYS2 website](https://www.msys2.org/). After MSYS2 has been successfully updated, some additional packages need to be installed in order to configure and build HELICS. The following packages need to be installed:
+
+MSYS2 provides a Linux like terminal environment on your Windows system. MSYS2 can be installed from [here](https://www.msys2.org/). Once MSYS2 has been installed start up msys2.exe. Follow first time updates as described on the MSYS2 website. After MSYS2 has been successfully updated Some packages need to be installed in order to configure and build HELICS. The following packages need to be installed:
 - base-devel
 - mingw-w64-x86_64-toolchain
 - git
@@ -184,6 +186,7 @@ $ export PATH=$PATH:/mingw64/bin
 ```
 
 ### Download HELICS Source Code ###
+
 Now that the MSYS2 environment has been setup and all prerequisite packages have been installed the source code can be compiled and installed. The HELICS source code can be cloned from GitHub by performing the following:
 ```bash
 $ git clone https://github.com/GMLC-TDC/HELICS.git
@@ -191,6 +194,7 @@ $ git clone https://github.com/GMLC-TDC/HELICS.git
 git will clone the source code into a folder in the current working directory called HELICS. This path will be referred to by this guide as HELICS_ROOT_DIR.
 
 ### Compiling HELICS From Source ###
+
 Change directories to HELICS_ROOT_DIR. Create a directory called helics-build. This can be accomplished by using the mkdir command. cd into this directory. Now type the following:
 ```bash
 $ cmake-gui ../
