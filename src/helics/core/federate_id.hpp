@@ -239,6 +239,7 @@ class route_id
 };
 
 constexpr route_id parent_route_id (0);
+constexpr route_id control_route (-1);
 
 /** stream operator for a route_id
  */

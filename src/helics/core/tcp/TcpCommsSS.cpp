@@ -8,11 +8,11 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "../../common/AsioContextManager.h"
 #include "../ActionMessage.hpp"
 #include "../NetworkBrokerData.hpp"
+#include "../networkDefaults.hpp"
+
 #include "TcpCommsCommon.h"
 #include "TcpHelperClasses.h"
 #include <memory>
-
-static constexpr int DEFAULT_TCPSS_PORT = 33133;
 
 namespace helics
 {
@@ -162,11 +162,11 @@ void TcpCommsSS::queue_tx_function ()
     TcpServer::pointer server;
     auto ioctx = AsioContextManager::getContextPointer ();
     auto contextLoop = ioctx->startContextLoop ();
-    auto dataCall = [this](TcpConnection::pointer connection, const char *data, size_t datasize) {
+    auto dataCall = [this] (TcpConnection::pointer connection, const char *data, size_t datasize) {
         return dataReceive (connection, data, datasize);
     };
     CommsInterface *ci = this;
-    auto errorCall = [ci](TcpConnection::pointer connection, const std::error_code &error) {
+    auto errorCall = [ci] (TcpConnection::pointer connection, const std::error_code &error) {
         return commErrorHandler (ci, connection, error);
     };
 

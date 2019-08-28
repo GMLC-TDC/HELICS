@@ -18,6 +18,7 @@ if(BUILD_APP_LIBRARY)
     BrokerApp.hpp
 	MultiBroker.hpp
 	Clone.hpp
+	BrokerServer.hpp
   )
 
   set(helics_apps_private_headers PrecHelper.hpp SignalGenerators.hpp)
@@ -35,6 +36,7 @@ if(BUILD_APP_LIBRARY)
     BrokerApp.cpp
 	MultiBroker.cpp
 	Clone.cpp
+	BrokerServer.cpp
   )
 
   add_library(
@@ -88,15 +90,26 @@ if(BUILD_APP_LIBRARY)
       HELICS_BROKER_LOC ${CMAKE_CURRENT_BINARY_DIR}
       CACHE INTERNAL "build folder location of the broker"
     )
-    install(
-      TARGETS helics_broker
-      DESTINATION ${CMAKE_INSTALL_BINDIR}
-      COMPONENT applications
-    )
+    
 	add_test(NAME broker_version_return COMMAND helics_broker --version)
 	add_test(NAME broker_help_return COMMAND helics_broker --help)
 	set_property(TEST broker_version_return broker_help_return PROPERTY LABELS Continuous)
 
+
+	add_executable(broker_server helics-broker-server.cpp)
+    target_link_libraries(broker_server PUBLIC helics_apps)
+	target_link_libraries(broker_server PRIVATE compile_flags_target)
+    set_target_properties(broker_server PROPERTIES FOLDER apps)
+    set(
+      HELICS_BROKER_SERVER_LOC ${CMAKE_CURRENT_BINARY_DIR}
+      CACHE INTERNAL "build folder location of the broker server"
+    )
+    install(
+      TARGETS helics_broker broker_server
+      DESTINATION ${CMAKE_INSTALL_BINDIR}
+      COMPONENT applications
+    )
+	
     add_executable(helics_app appMain.cpp)
     target_link_libraries(helics_app PUBLIC helics_apps)
 	target_link_libraries(helics_app PRIVATE compile_flags_target)

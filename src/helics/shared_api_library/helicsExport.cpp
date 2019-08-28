@@ -248,7 +248,7 @@ void helicsFederateInfoSetCoreName (helics_federate_info fi, const char *corenam
     }
     try
     {
-        hfi->coreName = (corename != nullptr) ? std::string (corename) : nullstr;
+        hfi->coreName = AS_STRING (corename);
     }
     catch (...)
     {
@@ -265,7 +265,24 @@ void helicsFederateInfoSetCoreInitString (helics_federate_info fi, const char *c
     }
     try
     {
-        hfi->coreInitString = (coreinit != nullptr) ? std::string (coreinit) : nullstr;
+        hfi->coreInitString = AS_STRING (coreinit);
+    }
+    catch (...)
+    {
+        return helicsErrorHandler (err);
+    }
+}
+
+void helicsFederateInfoSetBrokerInitString (helics_federate_info fi, const char *brokerinit, helics_error *err)
+{
+    auto hfi = getFedInfo (fi, err);
+    if (hfi == nullptr)
+    {
+        return;
+    }
+    try
+    {
+        hfi->brokerInitString = AS_STRING (brokerinit);
     }
     catch (...)
     {

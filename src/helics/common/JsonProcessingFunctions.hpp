@@ -121,3 +121,11 @@ inline void replaceIfMember (const Json::Value &element, const std::string &key,
         bval = element[key].asBool ();
     }
 }
+
+inline void replaceIfMember (const Json::Value &element, const std::string &key, int &sval)
+{
+    if (element.isMember (key))
+    {
+        sval = element[key].asInt ();
+    }
+}

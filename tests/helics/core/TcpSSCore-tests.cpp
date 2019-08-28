@@ -13,6 +13,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helics/core/Core.hpp"
 #include "helics/core/CoreFactory.hpp"
 #include "helics/core/core-types.hpp"
+#include "helics/core/networkDefaults.hpp"
 #include "helics/core/tcp/TcpBroker.h"
 #include "helics/core/tcp/TcpCommsSS.h"
 #include "helics/core/tcp/TcpCore.h"
@@ -27,7 +28,6 @@ using namespace std::literals::chrono_literals;
 using asio::ip::tcp;
 using helics::Core;
 
-#define TCP_BROKER_PORT 33133
 #define TCP_BROKER_PORT_STRING "33133"
 
 #define TCP_BROKER_PORT_ALT 33134
@@ -42,7 +42,7 @@ TEST (TcpSSCore_tests, tcpSSComms_broker_test)
 
     auto srv = AsioContextManager::getContextPointer ();
 
-    auto server = helics::tcp::TcpServer::create (srv->getBaseContext (), TCP_BROKER_PORT);
+    auto server = helics::tcp::TcpServer::create (srv->getBaseContext (), DEFAULT_TCPSS_PORT);
     auto contextLoop = srv->startContextLoop ();
     std::vector<char> data (1024);
     server->setDataCall ([&counter] (helics::tcp::TcpConnection::pointer, const char *, size_t data_avail) {
@@ -52,7 +52,7 @@ TEST (TcpSSCore_tests, tcpSSComms_broker_test)
     server->start ();
 
     comm.setCallback ([&counter] (helics::ActionMessage /*m*/) { ++counter; });
-    comm.setBrokerPort (TCP_BROKER_PORT);
+    comm.setBrokerPort (DEFAULT_TCPSS_PORT);
     comm.setName ("tests");
     comm.setTimeout (1000ms);
     comm.setServerMode (false);
@@ -88,7 +88,7 @@ TEST (TcpSSCore_tests, tcpSSComms_broker_test_transmit)
     auto srv = AsioContextManager::getContextPointer ();
     auto contextLoop = srv->startContextLoop ();
 
-    auto server = helics::tcp::TcpServer::create (srv->getBaseContext (), host, TCP_BROKER_PORT);
+    auto server = helics::tcp::TcpServer::create (srv->getBaseContext (), host, DEFAULT_TCPSS_PORT);
 
     std::vector<char> data (1024);
     server->setDataCall (
@@ -103,7 +103,7 @@ TEST (TcpSSCore_tests, tcpSSComms_broker_test_transmit)
     EXPECT_TRUE (res);
     std::this_thread::sleep_for (100ms);
     comm.setCallback ([] (helics::ActionMessage /*m*/) {});
-    comm.setBrokerPort (TCP_BROKER_PORT);
+    comm.setBrokerPort (DEFAULT_TCPSS_PORT);
     comm.setName ("tests");
     comm.setServerMode (false);
     bool connected = comm.connect ();
@@ -158,7 +158,7 @@ TEST (TcpSSCore_tests, tcpSSComms_rx_test)
         std::lock_guard<std::mutex> lock (actguard);
         act = m;
     });
-    comm.setBrokerPort (TCP_BROKER_PORT);
+    comm.setBrokerPort (DEFAULT_TCPSS_PORT);
     comm.setName ("tests");
     comm.setServerMode (true);
 
@@ -202,11 +202,11 @@ TEST (TcpSSCore_tests, tcpSSComm_transmit_through)
     // comm2 is the broker
     comm2.loadTargetInfo (host, std::string ());
 
-    comm.setBrokerPort (TCP_BROKER_PORT);
+    comm.setBrokerPort (DEFAULT_TCPSS_PORT);
     comm.setName ("tests");
     comm.setServerMode (false);
     comm2.setName ("test2");
-    comm2.setPortNumber (TCP_BROKER_PORT);
+    comm2.setPortNumber (DEFAULT_TCPSS_PORT);
     comm2.setServerMode (true);
 
     comm.setCallback ([&counter, &act] (helics::ActionMessage m) {
@@ -260,16 +260,16 @@ TEST (TcpSSCore_tests, tcpSSComm_transmit_add_route)
     comm2.loadTargetInfo (host, std::string ());
     comm3.loadTargetInfo (host, host);
 
-    comm.setBrokerPort (TCP_BROKER_PORT);
+    comm.setBrokerPort (DEFAULT_TCPSS_PORT);
     comm.setName ("tests");
     comm.setServerMode (false);
     comm2.setName ("broker");
     comm2.setServerMode (true);
     comm3.setName ("test3");
     comm3.setServerMode (false);
-    comm3.setBrokerPort (TCP_BROKER_PORT);
+    comm3.setBrokerPort (DEFAULT_TCPSS_PORT);
 
-    comm2.setPortNumber (TCP_BROKER_PORT);
+    comm2.setPortNumber (DEFAULT_TCPSS_PORT);
 
     guarded<helics::ActionMessage> act;
     guarded<helics::ActionMessage> act2;
@@ -348,7 +348,7 @@ TEST (TcpSSCore_tests, tcpSSCore_initialization_test)
     auto srv = AsioContextManager::getContextPointer ();
     auto contextLoop = srv->startContextLoop ();
 
-    auto server = helics::tcp::TcpServer::create (srv->getBaseContext (), "localhost", TCP_BROKER_PORT);
+    auto server = helics::tcp::TcpServer::create (srv->getBaseContext (), "localhost", DEFAULT_TCPSS_PORT);
     std::vector<char> data (1024);
     std::atomic<size_t> len{0};
     server->setDataCall (

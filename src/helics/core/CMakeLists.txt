@@ -64,6 +64,7 @@ set(
 	zmq/ZmqComms.cpp
 	zmq/ZmqCommsSS.cpp
 	zmq/ZmqRequestSets.cpp
+	zmq/ZmqCommsCommon.cpp
 )
 
 set(UDP_SOURCE_FILES udp/UdpCore.cpp udp/UdpBroker.cpp udp/UdpComms.cpp)
@@ -131,6 +132,7 @@ set(
 	NetworkBroker_impl.hpp
 	NetworkCore_impl.hpp
 	fileConnections.hpp
+	networkDefaults.hpp
 	../helics_enums.h
 )
 
@@ -141,7 +143,7 @@ set(IPC_HEADER_FILES ipc/IpcCore.h ipc/IpcBroker.h ipc/IpcComms.h ipc/IpcQueueHe
 #ipc/IpcBlockingPriorityQueueImpl.hpp
 )
 
-set(ZMQ_HEADER_FILES zmq/ZmqCore.h zmq/ZmqBroker.h zmq/ZmqComms.h zmq/ZmqCommsSS.h zmq/ZmqRequestSets.h)
+set(ZMQ_HEADER_FILES zmq/ZmqCore.h zmq/ZmqBroker.h zmq/ZmqComms.h zmq/ZmqCommsSS.h zmq/ZmqRequestSets.h zmq/ZmqCommsCommon.h)
 
 set(MPI_HEADER_FILES mpi/MpiCore.h mpi/MpiBroker.h mpi/MpiComms.h mpi/MpiService.h)
 

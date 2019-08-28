@@ -30,14 +30,14 @@ BOOST_AUTO_TEST_SUITE (clone_tests, *utf::label ("ci"))
 BOOST_AUTO_TEST_CASE (simple_clone_test_pub)
 {
     helics::FederateInfo fi (helics::core_type::TEST);
-    fi.coreName = "rcore1";
+    fi.coreName = "clone_core1";
     fi.coreInitString = "-f 2 --autobroker";
     helics::apps::Clone c1 ("c1", fi);
     c1.setFederateToClone ("block1");
 
     helics::ValueFederate vfed ("block1", fi);
     helics::Publication pub1 (helics::GLOBAL, &vfed, "pub1", helics::data_type::helics_double);
-    auto fut = std::async (std::launch::async, [&c1]() { c1.runTo (4); });
+    auto fut = std::async (std::launch::async, [&c1] () { c1.runTo (4); });
     vfed.enterExecutingMode ();
     auto retTime = vfed.requestTime (1);
     BOOST_CHECK_EQUAL (retTime, 1.0);
@@ -60,7 +60,7 @@ BOOST_AUTO_TEST_CASE (simple_clone_test_pub)
 BOOST_AUTO_TEST_CASE (simple_clone_test_pub2)
 {
     helics::FederateInfo fi (helics::core_type::TEST);
-    fi.coreName = "rcore1";
+    fi.coreName = "clone_core2";
     fi.coreInitString = "-f 2 --autobroker";
     helics::apps::Clone c1 ("c1", fi);
 
@@ -71,7 +71,7 @@ BOOST_AUTO_TEST_CASE (simple_clone_test_pub2)
 
     auto &pub2 = vfed.registerPublication ("pub2", "double", "m");
 
-    auto fut = std::async (std::launch::async, [&c1]() { c1.runTo (4); });
+    auto fut = std::async (std::launch::async, [&c1] () { c1.runTo (4); });
     vfed.enterExecutingMode ();
     auto retTime = vfed.requestTime (1);
     BOOST_CHECK_EQUAL (retTime, 1.0);
@@ -100,7 +100,7 @@ BOOST_AUTO_TEST_CASE (simple_clone_test_pub2_file,
                       *boost::unit_test::depends_on ("clone_tests/simple_clone_test_pub2"))
 {
     auto fi = helics::loadFederateInfo ("pubtest2.json");
-    fi.coreName = "rcore4";
+    fi.coreName = "clone_core3";
     fi.coreInitString = "--autobroker";
     fi.coreType = helics::core_type::TEST;
     helics::apps::Player c1 ("c1", fi);
@@ -117,7 +117,7 @@ BOOST_AUTO_TEST_CASE (simple_clone_test_pub2_file,
 BOOST_AUTO_TEST_CASE (simple_clone_test_message)
 {
     helics::FederateInfo fi (helics::core_type::TEST);
-    fi.coreName = "rcore3";
+    fi.coreName = "clone_core4";
     fi.setProperty (helics_property_time_period, 1.0);
     fi.coreInitString = "-f 2 --autobroker";
     helics::apps::Clone c1 ("c1", fi);
@@ -128,7 +128,7 @@ BOOST_AUTO_TEST_CASE (simple_clone_test_message)
     auto &ept2 = mfed.registerGlobalEndpoint ("ept3");
     mfed.registerEndpoint ("e3");
 
-    auto fut = std::async (std::launch::async, [&c1]() { c1.runTo (4); });
+    auto fut = std::async (std::launch::async, [&c1] () { c1.runTo (4); });
     mfed.enterExecutingMode ();
     auto retTime = mfed.requestTime (1);
     BOOST_CHECK_EQUAL (retTime, 1.0);
@@ -153,7 +153,7 @@ BOOST_AUTO_TEST_CASE (simple_clone_test_message_file,
                       *boost::unit_test::depends_on ("clone_tests/simple_clone_test_message"))
 {
     auto fi = helics::loadFederateInfo ("eptsave.json");
-    fi.coreName = "rcore4";
+    fi.coreName = "clone_core5";
     fi.coreInitString = "--autobroker";
     fi.coreType = helics::core_type::TEST;
     helics::apps::Player c1 ("c1", fi);
@@ -170,7 +170,7 @@ BOOST_AUTO_TEST_CASE (simple_clone_test_message_file,
 BOOST_AUTO_TEST_CASE (simple_clone_test_combo)
 {
     helics::FederateInfo fi (helics::core_type::TEST);
-    fi.coreName = "rcore_c";
+    fi.coreName = "clone_core6";
     fi.setProperty (helics_property_time_period, 1.0);
     fi.coreInitString = "-f 2 --autobroker";
     helics::apps::Clone c1 ("c1", fi);
@@ -185,7 +185,7 @@ BOOST_AUTO_TEST_CASE (simple_clone_test_combo)
 
     auto &pub2 = mfed.registerPublication ("pub2", "double", "m");
 
-    auto fut = std::async (std::launch::async, [&c1]() { c1.runTo (4); });
+    auto fut = std::async (std::launch::async, [&c1] () { c1.runTo (4); });
     mfed.enterExecutingMode ();
     auto retTime = mfed.requestTime (1);
     BOOST_CHECK_EQUAL (retTime, 1.0);
@@ -215,7 +215,7 @@ BOOST_AUTO_TEST_CASE (simple_clone_test_combo_file,
                       *boost::unit_test::depends_on ("clone_tests/simple_clone_test_combo"))
 {
     auto fi = helics::loadFederateInfo ("combsave.json");
-    fi.coreName = "rcore_c2";
+    fi.coreName = "clone_core7";
     fi.coreInitString = "--autobroker";
     fi.coreType = helics::core_type::TEST;
     helics::apps::Player c1 ("c1", fi);
@@ -234,7 +234,7 @@ BOOST_AUTO_TEST_CASE (simple_clone_test_combo_file,
 BOOST_AUTO_TEST_CASE (simple_clone_test_sub)
 {
     helics::FederateInfo fi (helics::core_type::TEST);
-    fi.coreName = "rcore1";
+    fi.coreName = "clone_core8";
     fi.coreInitString = "-f 3 --autobroker";
     helics::apps::Clone c1 ("c1", fi);
 
@@ -254,7 +254,7 @@ BOOST_AUTO_TEST_CASE (simple_clone_test_sub)
 
     vfed.registerSubscription ("block2/pub");
 
-    auto fut = std::async (std::launch::async, [&c1]() { c1.runTo (4); });
+    auto fut = std::async (std::launch::async, [&c1] () { c1.runTo (4); });
     vfed2.enterExecutingModeAsync ();
     vfed.enterExecutingMode ();
     vfed2.enterExecutingModeComplete ();
@@ -287,7 +287,7 @@ BOOST_AUTO_TEST_CASE (simple_clone_test_sub_file,
                       *boost::unit_test::depends_on ("clone_tests/simple_clone_test_sub"))
 {
     auto fi = helics::loadFederateInfo ("subtest.json");
-    fi.coreName = "rcore5";
+    fi.coreName = "clone_core9";
     fi.coreInitString = "--autobroker";
     fi.coreType = helics::core_type::TEST;
     helics::apps::Player c1 ("c1", fi);
