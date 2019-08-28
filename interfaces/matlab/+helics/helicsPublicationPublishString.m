@@ -1,4 +1,3 @@
 function varargout = helicsPublicationPublishString(varargin)
-    %
-  [varargout{1:nargout}] = helicsMEX(153, varargin{:});
+  [varargout{1:nargout}] = helicsMEX(154, varargin{:});
 end
