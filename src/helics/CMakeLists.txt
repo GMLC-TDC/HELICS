@@ -122,7 +122,7 @@ if(BUILD_SHARED_LIBS)
     )
   else()
     install(
-      TARGETS helicsSharedLib
+      TARGETS helics-shared
       DESTINATION ${CMAKE_INSTALL_LIBDIR}
       COMPONENT Runtime
     )
