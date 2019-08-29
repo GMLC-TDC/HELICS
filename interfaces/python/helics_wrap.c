@@ -3014,16 +3014,16 @@ static swig_module_info swig_module = {swig_types, 21, 0, 0, 0, 0};
 #endif
 
 /*-----------------------------------------------
-              @(target):= _helicsd.so
+              @(target):= _helics.so
   ------------------------------------------------*/
 #if PY_VERSION_HEX >= 0x03000000
-#  define SWIG_init    PyInit__helicsd
+#  define SWIG_init    PyInit__helics
 
 #else
-#  define SWIG_init    init_helicsd
+#  define SWIG_init    init_helics
 
 #endif
-#define SWIG_name    "_helicsd"
+#define SWIG_name    "_helics"
 
 #define SWIGVERSION 0x030012 
 #define SWIG_VERSION SWIGVERSION

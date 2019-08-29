@@ -22,7 +22,6 @@ int main (int argc, char *argv[])
 {
     int ret = 0;
     bool runterminal = false;
-    std::chrono::milliseconds duration (30 * 60 * 1000);
 
     helics::helicsCLI11App cmdLine ("helics broker server command line");
     auto term = cmdLine
@@ -31,13 +30,17 @@ int main (int argc, char *argv[])
                                            "for the broker server, run help in a terminal for more commands\n")
                   ->prefix_command ();
     term->callback ([&runterminal]() { runterminal = true; });
-    helics::Time opTime;
-    cmdLine.add_option ("--duration", opTime, "specify the length of time the server should run before closing the server and waiting for generated brokers to complete")
+    helics::Time opTime (30.0, time_units::minutes);
+    cmdLine
+      .add_option ("--duration", opTime,
+                   "specify the length of time the server should run before closing the server and waiting for "
+                   "generated brokers to complete")
       ->default_str ("30 minutes");
     cmdLine
-      .footer ("helics_broker_server starts the broker servers with the given args and waits for a given duration to close the servers and wait until all generated brokers have finished\n")
+      .footer ("helics_broker_server starts the broker servers with the given args and waits for a given duration "
+               "to close the servers and wait until all generated brokers have finished\n")
       ->footer ([]() {
-          helics::apps::BrokerServer brk(std::vector<std::string>{"-?"});
+          helics::apps::BrokerServer brk (std::vector<std::string>{"-?"});
           (void)brk;
           return std::string{};
       });
@@ -72,13 +75,13 @@ int main (int argc, char *argv[])
             std::this_thread::sleep_for (opTime.to_ms ());
             brokerServer->closeServers ();
 
-			//once we have closed the servers now wait for the active brokers to finish
+            // once we have closed the servers now wait for the active brokers to finish
             auto brokers = helics::BrokerFactory::getAllBrokers ();
             for (auto &broker : brokers)
             {
                 broker->waitForDisconnect ();
                 broker.reset ();
-			}
+            }
             brokers.clear ();
         }
     }
@@ -118,6 +121,15 @@ void terminalFunction (std::vector<std::string> args)
         if (!brokerServer->hasActiveBrokers ())
         {
             std::cout << "Broker servers have terminated\n";
+        }
+    };
+    auto lsbrokers = []() {
+        auto brks = helics::BrokerFactory::getAllBrokers ();
+        int ii = 1;
+        for (auto &brk : brks)
+        {
+            std::cout <<ii<<": "<<brk->getIdentifier() << " Connected:" << brk->isConnected ()
+                      << " open:" << brk->isOpenToNewFederates () << '\n';
         }
     };
     /*
@@ -186,9 +198,12 @@ void terminalFunction (std::vector<std::string> args)
     bool cmdcont = true;
     helics::helicsCLI11App termProg ("helics broker server command line terminal");
     termProg.ignore_case ();
-    termProg.add_flag ("-q,--quit,--exit", cmdcont, "stop the broker servers, close the terminal and wait for the brokers to exit");
+    termProg.add_flag ("-q,--quit,--exit", cmdcont,
+                       "stop the broker servers, close the terminal and wait for the brokers to exit");
     termProg.add_subcommand ("quit", "close the terminal and  wait for the brokers to exit")
       ->callback ([&cmdcont]() { cmdcont = false; });
+    termProg.add_subcommand ("ls", "list all brokers")
+      ->callback (lsbrokers);
     termProg.add_subcommand ("terminate", "terminate the broker servers")->callback (closeBrokerServer);
 
     termProg.add_subcommand ("terminate!", "forcibly terminate the broker servers, shutdown all brokers and exit")
