@@ -2226,6 +2226,7 @@ void CommonCore::processPriorityCommand (ActionMessage &&command)
         resend.messageID = static_cast<int32_t> (CMD_REG_BROKER);
         addActionMessage (resend);
     }
+    break;
     case CMD_REG_BROKER:
         // These really shouldn't happen here probably means something went wrong in setup but we can handle it
         // forward the connection request to the higher level

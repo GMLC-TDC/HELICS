@@ -283,7 +283,7 @@ script:
       travis_wait ../scripts/run-ci-tests.sh ${CI_TEST_FLAGS}
     else
       if [[ "$CORE_CI_TEST" == "true" ]]; then
-      travis_wait ctest -R core-ci-tests
+      travis_wait ctest -R core-ci-tests --timeout 120 --output-on-failure
       fi
     fi
 
