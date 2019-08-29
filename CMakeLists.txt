@@ -870,11 +870,14 @@ set(LICENSE_LIST
 	"cppzmq" "${PROJECT_SOURCE_DIR}/ThirdParty/cppzmq/LICENSE"
 	"fmt" "${PROJECT_SOURCE_DIR}/ThirdParty/fmtlib/LICENSE.rst"
 	"units" "${PROJECT_SOURCE_DIR}/ThirdParty/units/LICENSE"
-	"Google Test" "${PROJECT_SOURCE_DIR}/ThirdParty/googletest/LICENSE"
 	"JsonCpp" "${PROJECT_SOURCE_DIR}/ThirdParty/jsoncpp/LICENSE"
 	"tinytoml" "${PROJECT_SOURCE_DIR}/ThirdParty/toml/LICENSE"
 	"GMLC Utilities" "${PROJECT_SOURCE_DIR}/ThirdParty/utilities/LICENSE"
 )
+
+if(BUILD_HELICS_TESTS)
+	list(APPEND LICENSE_LIST "Google Test" "${PROJECT_SOURCE_DIR}/ThirdParty/googletest/LICENSE"
+endif()
 
 if (EXISTS ${PROJECT_BINARY_DIR}/_deps/libzmq-src)
 	list(APPEND LICENSE_LIST "ZeroMQ" "${PROJECT_BINARY_DIR}/_deps/libzmq-src/COPYING")
