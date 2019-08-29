@@ -35,6 +35,11 @@ Build a new docker image
 docker build -t clang-test -f config/Docker/Dockerfile-MSan .
 ```
 
+The HELICS and sanitizer docker images will accept a MAKE_PARALLEL build argument that can be used to set how many threads make uses. On machines with low memory such as those used by CI services, setting this too high can result in out of memory compiler errors.
+
+```bash
+docker build -t clang-test -f config/Docker/Dockerfile-MSan --build-arg MAKE_PARALLEL=12 .
+```
 
 Working with dockerhub
 ----------------------
