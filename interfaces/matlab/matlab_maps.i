@@ -34,6 +34,9 @@ static void throwHelicsMatlabError(helics_error *err) {
   case   helics_error_execution_failure:
   mexErrMsgIdAndTxt( "helics:execution_failure", err->message);
 	break;
+  case   helics_error_insufficient_space:
+    mexErrMsgIdAndTxt( "helics:insufficient_space", err->message);
+	break;
   case   helics_error_other:
   case   helics_error_external_type:
   default:
@@ -254,5 +257,24 @@ static void throwHelicsMatlabError(helics_error *err) {
 }
 
 %typemap(argout) (void *data, int maxDatalen, int *actualSize) {
+ if (--resc>=0) *resv++ = SWIG_FromCharPtrAndSize($1,*$3);
+}
+
+// typemap for raw message data functions
+%typemap(in, numinputs=0) (void *data, int maxMessagelen, int *actualSize) {
+  $3=&($2);
+}
+
+%typemap(freearg) (void *data, int maxMessagelen, int *actualSize) {
+   if ($1) free($1);
+}
+
+// Set argument to NULL before any conversion occurs
+%typemap(check)(void *data, int maxMessagelen, int *actualSize) {
+    $2=helicsMessageGetRawDataSize(arg1)+2;
+    $1 =  malloc($2);
+}
+
+%typemap(argout) (void *data, int maxMessagelen, int *actualSize) {
  if (--resc>=0) *resv++ = SWIG_FromCharPtrAndSize($1,*$3);
 }

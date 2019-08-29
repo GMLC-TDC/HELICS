@@ -19,29 +19,6 @@ class CloningFilter;
 
 namespace apps
 {
-/** helper class for capturing data points*/
-class ValueCapture
-{
-  public:
-    helics::Time time;
-    int index = -1;
-    int16_t iteration = 0;
-    bool first = false;
-    std::string value;
-    ValueCapture () = default;
-    ValueCapture (helics::Time t1, int id1, const std::string &val) : time (t1), index (id1), value (val){};
-};
-
-/** helper class for displaying statistics*/
-class ValueStats
-{
-  public:
-    helics::Time time = helics::Time::minVal ();
-    std::string lastVal;
-    std::string key;
-    int cnt = 0;
-};
-
 /** class designed to capture data points from a set of subscriptions or endpoints*/
 class Recorder : public App
 {
@@ -130,6 +107,29 @@ class Recorder : public App
     void processArgs ();
 
   protected:
+    /** helper class for capturing data points*/
+    class ValueCapture
+    {
+      public:
+        helics::Time time;
+        int index = -1;
+        int16_t iteration = 0;
+        bool first = false;
+        std::string value;
+        ValueCapture () = default;
+        ValueCapture (helics::Time t1, int id1, const std::string &val) : time (t1), index (id1), value (val){};
+    };
+
+    /** helper class for displaying statistics*/
+    class ValueStats
+    {
+      public:
+        helics::Time time = helics::Time::minVal ();
+        std::string lastVal;
+        std::string key;
+        int cnt = 0;
+    };
+
     bool allow_iteration = false;  //!< trigger to allow Iteration
     bool verbose = false;  //!< print all captured values to the screen
     Time nextPrintTimeStep = helics::timeZero;  //!< the time advancement period for printing markers

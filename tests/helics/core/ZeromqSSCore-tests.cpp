@@ -17,6 +17,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helics/core/Core.hpp"
 #include "helics/core/CoreFactory.hpp"
 #include "helics/core/core-types.hpp"
+#include "helics/core/networkDefaults.hpp"
 #include "helics/core/zmq/ZmqBroker.h"
 #include "helics/core/zmq/ZmqCommsSS.h"
 #include "helics/core/zmq/ZmqCore.h"
@@ -29,8 +30,6 @@ SPDX-License-Identifier: BSD-3-Clause
 using namespace std::literals::chrono_literals;
 
 using helics::Core;
-
-#define ZMQ_SS_BROKER_PORT 23414
 
 const std::string host = "tcp://127.0.0.1";
 
@@ -48,11 +47,11 @@ TEST (ZMQSSCore_tests, zmqSSComm_transmit)
     // comm2 is the broker
     comm2.loadTargetInfo (host, std::string ());
 
-    comm.setBrokerPort (ZMQ_SS_BROKER_PORT);
+    comm.setBrokerPort (DEFAULT_ZMQSS_BROKER_PORT_NUMBER);
     comm.setName ("test_comms");
     comm.setServerMode (false);
     comm2.setName ("test_broker");
-    comm2.setPortNumber (ZMQ_SS_BROKER_PORT);
+    comm2.setPortNumber (DEFAULT_ZMQSS_BROKER_PORT_NUMBER);
     comm2.setServerMode (true);
 
     comm.setCallback ([&counter, &act] (helics::ActionMessage m) {
@@ -109,16 +108,16 @@ TEST (ZMQSSCore_tests, zmqSSComm_addroute)
     // comm3 is the broker
     comm3.loadTargetInfo (host, std::string ());
 
-    comm.setBrokerPort (ZMQ_SS_BROKER_PORT);
+    comm.setBrokerPort (DEFAULT_ZMQSS_BROKER_PORT_NUMBER);
     comm.setName ("test1");
     comm.setServerMode (false);
 
-    comm2.setBrokerPort (ZMQ_SS_BROKER_PORT);
+    comm2.setBrokerPort (DEFAULT_ZMQSS_BROKER_PORT_NUMBER);
     comm2.setName ("test2");
     comm2.setServerMode (false);
 
     comm3.setName ("test_broker");
-    comm3.setPortNumber (ZMQ_SS_BROKER_PORT);
+    comm3.setPortNumber (DEFAULT_ZMQSS_BROKER_PORT_NUMBER);
     comm3.setServerMode (true);
 
     comm.setCallback ([&counter, &act] (helics::ActionMessage m) {
@@ -184,7 +183,7 @@ TEST (ZMQSSCore_tests, zmqSSCore_initialization_test)
     std::mutex msgLock;
     comm.loadTargetInfo (host, std::string ());
     comm.setName ("test_broker");
-    comm.setPortNumber (ZMQ_SS_BROKER_PORT);
+    comm.setPortNumber (DEFAULT_ZMQSS_BROKER_PORT_NUMBER);
     comm.setServerMode (true);
     comm.setCallback ([&counter, &msgs, &msgLock] (helics::ActionMessage m) {
         ++counter;
@@ -193,7 +192,7 @@ TEST (ZMQSSCore_tests, zmqSSCore_initialization_test)
     });
     comm.connect ();
 
-    std::string initializationString = "-f 1 --name=core1";
+    std::string initializationString = "--name=core1";
     auto core = helics::CoreFactory::create (helics::core_type::ZMQ_SS, initializationString);
 
     ASSERT_TRUE (core);

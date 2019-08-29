@@ -13,7 +13,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <future>
 #include <boost/test/unit_test.hpp>
 #include <boost/test/data/test_case.hpp>
-#include <boost/test/floating_point_comparison.hpp>
+#include <boost/test/tools/floating_point_comparison.hpp>
 /** these test cases test out the value converters
  */
 
@@ -103,7 +103,7 @@ BOOST_AUTO_TEST_CASE (federate_broker_disconnect_test)
 BOOST_AUTO_TEST_CASE (federate_bad_broker_error_zmq)
 {
     helics::FederateInfo fi (helics::core_type::ZMQ);
-    fi.coreInitString = "--broker=b1 --tick=200 --timeout=800";
+    fi.coreInitString = "--broker=b1 --tick=200 --timeout=800 --networktimeout=400";
 
     BOOST_CHECK_THROW (std::make_shared<helics::Federate> ("test1", fi), helics::RegistrationFailure);
 }
@@ -111,7 +111,7 @@ BOOST_AUTO_TEST_CASE (federate_bad_broker_error_zmq)
 BOOST_AUTO_TEST_CASE (federate_timeout_error_zmq)
 {
     helics::FederateInfo fi (helics::core_type::ZMQ);
-    fi.coreInitString = "--tick=200 --timeout=800";
+    fi.coreInitString = "--tick=200 --timeout=800 --networktimeout=400";
 
     BOOST_CHECK_THROW (std::make_shared<helics::Federate> ("test1", fi), helics::RegistrationFailure);
 }
@@ -172,7 +172,7 @@ BOOST_AUTO_TEST_CASE (federate_multiple_federates_multi_cores, *utf::label ("ci"
 {
     helics::FederateInfo fi (CORE_TYPE_TO_TEST);
     fi.coreName = "core_mc1";
-    fi.coreInitString = "--autobroker --broker=brk1 --brokerinit=2";
+    fi.coreInitString = "--autobroker --broker=brk1";
 
     auto Fed1 = std::make_shared<helics::Federate> ("fed1", fi);
     fi.coreName = "core_mc2";
@@ -307,7 +307,7 @@ BOOST_DATA_TEST_CASE (federate_global_file, bdata::make (simple_global_files), f
 
 BOOST_DATA_TEST_CASE (federate_core_global_file, bdata::make (simple_global_files), file_name)
 {
-    auto brk = helics::BrokerFactory::create (helics::core_type::TEST, "b1", "-f 2");
+    auto brk = helics::BrokerFactory::create (helics::core_type::TEST, "b1", "-f2");
     brk->connect ();
 
     helics::FederateInfo fi (CORE_TYPE_TO_TEST);

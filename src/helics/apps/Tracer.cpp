@@ -9,9 +9,9 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "../application_api/Subscriptions.hpp"
 #include "../application_api/ValueFederate.hpp"
 #include "../application_api/queryFunctions.hpp"
-#include "../common/stringOps.h"
 #include "../core/helicsCLI11.hpp"
 #include "../core/helicsVersion.hpp"
+#include "gmlc/utilities/stringOps.h"
 #include <algorithm>
 #include <iostream>
 #include <map>
@@ -156,7 +156,7 @@ void Tracer::loadJsonFile (const std::string &jsonString)
 
 void Tracer::loadTextFile (const std::string &textFile)
 {
-    using namespace stringOps;
+    using namespace gmlc::utilities::stringOps;
     App::loadTextFile (textFile);
     std::ifstream infile (textFile);
     std::string str;
@@ -506,6 +506,8 @@ void Tracer::addCapture (const std::string &captureDesc) { captureInterfaces.pus
 
 std::shared_ptr<helicsCLI11App> Tracer::buildArgParserApp ()
 {
+    using namespace gmlc::utilities;
+
     auto app = std::make_shared<helicsCLI11App> ("Command line options for the Tracer App");
     app->add_flag ("--allow_iteration", allow_iteration, "allow iteration on values")->ignore_underscore ();
     app->add_flag ("--print", printMessage, "print messages to the screen");
@@ -513,7 +515,7 @@ std::shared_ptr<helicsCLI11App> Tracer::buildArgParserApp ()
     auto clone_group =
       app->add_option_group ("cloning", "Options related to endpoint cloning operations and specifications");
     clone_group->add_option ("--clone", "existing endpoints to clone all packets to and from")
-      ->each ([this] (const std::string &clone) {
+      ->each ([this](const std::string &clone) {
           addDestEndpointClone (clone);
           addSourceEndpointClone (clone);
       })
@@ -524,7 +526,7 @@ std::shared_ptr<helicsCLI11App> Tracer::buildArgParserApp ()
       ->add_option (
         "--sourceclone",
         "existing endpoints to capture generated packets from, this argument may be specified multiple time")
-      ->each ([this] (const std::string &clone) { addSourceEndpointClone (clone); })
+      ->each ([this](const std::string &clone) { addSourceEndpointClone (clone); })
       ->delimiter (',')
       ->ignore_underscore ()
       ->type_size (-1);
@@ -532,7 +534,7 @@ std::shared_ptr<helicsCLI11App> Tracer::buildArgParserApp ()
     clone_group
       ->add_option ("--destclone", "existing endpoints to capture all packets with the specified endpoint as a "
                                    "destination, this argument may be specified multiple time")
-      ->each ([this] (const std::string &clone) { addSourceEndpointClone (clone); })
+      ->each ([this](const std::string &clone) { addSourceEndpointClone (clone); })
       ->delimiter (',')
       ->ignore_underscore ()
       ->type_size (-1);
@@ -543,7 +545,7 @@ std::shared_ptr<helicsCLI11App> Tracer::buildArgParserApp ()
     capture_group
       ->add_option ("--tag,--publication,--pub",
                     "tags(publications) to record, this argument may be specified any number of times")
-      ->each ([this] (const std::string &tag) {
+      ->each ([this](const std::string &tag) {
           auto taglist = stringOps::splitlineQuotes (tag);
           for (const auto &tagname : taglist)
           {
@@ -553,7 +555,7 @@ std::shared_ptr<helicsCLI11App> Tracer::buildArgParserApp ()
       ->type_size (-1);
 
     capture_group->add_option ("--endpoints", "endpoints to capture, this argument may be specified multiple time")
-      ->each ([this] (const std::string &ept) {
+      ->each ([this](const std::string &ept) {
           auto eptlist = stringOps::splitlineQuotes (ept);
           for (const auto &eptname : eptlist)
           {
@@ -565,7 +567,7 @@ std::shared_ptr<helicsCLI11App> Tracer::buildArgParserApp ()
     capture_group
       ->add_option ("--capture", "capture all the publications of a particular federate capture=\"fed1;fed2\"  "
                                  "supports multiple arguments or a comma separated list")
-      ->each ([this] (const std::string &capt) {
+      ->each ([this](const std::string &capt) {
           auto captFeds = stringOps::splitlineQuotes (capt);
           for (auto &captFed : captFeds)
           {

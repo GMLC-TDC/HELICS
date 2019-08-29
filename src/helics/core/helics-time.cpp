@@ -6,7 +6,7 @@ SPDX-License-Identifier: BSD-3-Clause
 */
 
 #include "helics-time.hpp"
-#include "../common/stringOps.h"
+#include "gmlc/utilities/stringOps.h"
 #include <map>
 
 namespace helics
@@ -31,6 +31,7 @@ const std::map<std::string, time_units> time_unitstrings{
   {"week", time_units::week},
   {"wk", time_units::week}};
 
+using namespace gmlc::utilities;
 time_units timeUnitsFromString (const std::string &unitString)
 {
     auto fnd = time_unitstrings.find (unitString);

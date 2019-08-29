@@ -6,15 +6,15 @@ SPDX-License-Identifier: BSD-3-Clause
 */
 #include <boost/test/unit_test.hpp>
 #include <boost/test/data/test_case.hpp>
-#include <boost/test/floating_point_comparison.hpp>
+#include <boost/test/tools/floating_point_comparison.hpp>
 
 #include <cstdio>
 
 #include "exeTestHelper.h"
 #include "gmlc/libguarded/guarded.hpp"
+#include "gmlc/utilities/stringOps.h"
 #include "helics/application_api/Publications.hpp"
 #include "helics/apps/Tracer.hpp"
-#include "helics/common/stringOps.h"
 #include "helics/core/BrokerFactory.hpp"
 #include <algorithm>
 #include <future>

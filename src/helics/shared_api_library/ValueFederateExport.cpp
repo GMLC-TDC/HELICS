@@ -795,7 +795,7 @@ void helicsPublicationAddTarget (helics_publication pub, const char *target, hel
     {
         return;
     }
-    CHECK_NULL_STRING (target, void ());
+    CHECK_NULL_STRING (target, void());
 
     pubObj->pubPtr->addTarget (target);
 }
@@ -807,7 +807,7 @@ void helicsInputAddTarget (helics_input ipt, const char *target, helics_error *e
     {
         return;
     }
-    CHECK_NULL_STRING (target, void ());
+    CHECK_NULL_STRING (target, void());
     inpObj->inputPtr->addTarget (target);
 }
 
@@ -1447,9 +1447,27 @@ const char *helicsPublicationGetKey (helics_publication pub)
     }
 }
 
-const char *helicsInputGetUnits (helics_input inp)
+const char *helicsInputGetInjectionUnits (helics_input ipt)
 {
-    auto inpObj = verifyInput (inp, nullptr);
+    auto inpObj = verifyInput (ipt, nullptr);
+    if (inpObj == nullptr)
+    {
+        return emptyStr.c_str ();
+    }
+    try
+    {
+        const std::string &units = inpObj->inputPtr->getInjectionUnits ();
+        return units.c_str ();
+    }
+    catch (...)
+    {
+        return emptyStr.c_str ();
+    }
+}
+
+const char *helicsInputGetExtractionUnits (helics_input ipt)
+{
+    auto inpObj = verifyInput (ipt, nullptr);
     if (inpObj == nullptr)
     {
         return emptyStr.c_str ();
@@ -1464,6 +1482,8 @@ const char *helicsInputGetUnits (helics_input inp)
         return emptyStr.c_str ();
     }
 }
+
+const char *helicsInputGetUnits (helics_input inp) { return helicsInputGetExtractionUnits (inp); }
 
 const char *helicsPublicationGetUnits (helics_publication pub)
 {

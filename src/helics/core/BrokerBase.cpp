@@ -117,6 +117,8 @@ std::shared_ptr<helicsCLI11App> BrokerBase::generateBaseCLI ()
       ->capture_default_str ();
     hApp->add_option ("--minbrokers,--minbroker,--minbrokercount", minBrokerCount,
                       "the minimum number of cores/brokers that need to be connected (ignored in cores)");
+    hApp->add_option ("--key,--broker_key", brokerKey,
+                      "specify a key to use for all connections to/from a broker");
     auto logging_group = hApp->add_option_group ("logging", "Options related to file and message logging");
     logging_group->option_defaults ()->ignore_underscore ();
     logging_group->add_flag ("--force_logging_flush", forceLoggingFlush, "flush the log after every message");
@@ -251,6 +253,13 @@ bool BrokerBase::sendToLogger (global_federate_id federateID,
 }
 
 void BrokerBase::generateNewIdentifier () { identifier = genId (0); }
+
+void BrokerBase::setErrorState (int eCode, const std::string &estring)
+{
+    lastErrorString = estring;
+    errorCode = eCode;
+    brokerState.store (broker_state_t::errored);
+}
 
 void BrokerBase::setLoggerFunction (std::function<void(int, const std::string &, const std::string &)> logFunction)
 {

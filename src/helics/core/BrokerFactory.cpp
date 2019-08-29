@@ -248,10 +248,14 @@ std::shared_ptr<Broker> create (core_type type, const std::string &broker_name, 
 
 /** lambda function to join cores before the destruction happens to avoid potential problematic calls in the
  * loops*/
-static auto destroyerCallFirst = [](auto &broker) {
-    broker->processDisconnect (
-      true);  // use true here as it is possible the searchableObjectHolder is deleted already
-    broker->joinAllThreads ();
+static auto destroyerCallFirst = [] (auto &broker) {
+    auto tbroker = std::dynamic_pointer_cast<CoreBroker> (broker);
+    if (tbroker)
+    {
+        tbroker->processDisconnect (
+          true);  // use true here as it is possible the searchableObjectHolder is deleted already
+        tbroker->joinAllThreads ();
+    }
 };
 /** so the problem this is addressing is that unregister can potentially cause a destructor to fire
 that destructor can delete a thread variable, unfortunately it is possible that a thread stored in this variable
@@ -259,10 +263,10 @@ can do the unregister operation and destroy itself meaning it is unable to join 
 what we do is delay the destruction until it is called in a different thread which allows the destructor to fire if
 need be without issue*/
 
-static gmlc::concurrency::DelayedDestructor<CoreBroker>
+static gmlc::concurrency::DelayedDestructor<Broker>
   delayedDestroyer (destroyerCallFirst);  //!< the object handling the delayed destruction
 
-static gmlc::concurrency::SearchableObjectHolder<CoreBroker>
+static gmlc::concurrency::SearchableObjectHolder<Broker>
   searchableObjects;  //!< the object managing the searchable objects
 
 // this will trip the line when it is destroyed at global destruction time
@@ -325,26 +329,29 @@ static bool isJoinableBrokerOfType (core_type type, const std::shared_ptr<Broker
 
 std::shared_ptr<Broker> findJoinableBrokerOfType (core_type type)
 {
-    return searchableObjects.findObject ([type](auto &ptr) { return isJoinableBrokerOfType (type, ptr); });
+    return searchableObjects.findObject ([type] (auto &ptr) { return isJoinableBrokerOfType (type, ptr); });
 }
+
+std::vector<std::shared_ptr<Broker>> getAllBrokers () { return searchableObjects.getObjects (); }
+
+bool brokersActive () { return !searchableObjects.empty (); }
 
 bool registerBroker (const std::shared_ptr<Broker> &broker)
 {
     bool registered = false;
-    auto tbroker = std::dynamic_pointer_cast<CoreBroker> (broker);
-    if (tbroker)
+    if (broker)
     {
-        registered = searchableObjects.addObject (tbroker->getIdentifier (), tbroker);
+        registered = searchableObjects.addObject (broker->getIdentifier (), broker);
     }
     cleanUpBrokers ();
-    if ((!registered) && (tbroker))
+    if ((!registered) && (broker))
     {
         std::this_thread::sleep_for (std::chrono::milliseconds (200));
-        registered = searchableObjects.addObject (tbroker->getIdentifier (), tbroker);
+        registered = searchableObjects.addObject (broker->getIdentifier (), broker);
     }
     if (registered)
     {
-        delayedDestroyer.addObjectsToBeDestroyed (tbroker);
+        delayedDestroyer.addObjectsToBeDestroyed (broker);
     }
 
     return registered;
@@ -362,7 +369,7 @@ void unregisterBroker (const std::string &name)
 {
     if (!searchableObjects.removeObject (name))
     {
-        searchableObjects.removeObject ([&name](auto &obj) { return (obj->getIdentifier () == name); });
+        searchableObjects.removeObject ([&name] (auto &obj) { return (obj->getIdentifier () == name); });
     }
 }
 

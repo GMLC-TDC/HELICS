@@ -172,7 +172,7 @@
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 // ghc::filesystem version in decimal (major * 10000 + minor * 100 + patch)
-#define GHC_FILESYSTEM_VERSION 10202L
+#define GHC_FILESYSTEM_VERSION 10204L
 
 namespace ghc {
 namespace filesystem {
@@ -705,9 +705,9 @@ public:
     // other members as required by 27.2.3, input iterators
     proxy operator++(int)
     {
-        proxy proxy{**this};
+        proxy p{**this};
         ++*this;
-        return proxy;
+        return p;
     }
     bool operator==(const directory_iterator& rhs) const;
     bool operator!=(const directory_iterator& rhs) const;
@@ -1756,7 +1756,7 @@ GHC_INLINE uintmax_t hard_links_from_INFO<BY_HANDLE_FILE_INFORMATION>(const BY_H
 }
 
 template <typename INFO>
-GHC_INLINE file_status status_from_INFO(const path& p, const INFO* info, std::error_code& ec, uintmax_t* sz = nullptr, time_t* lwt = nullptr) noexcept
+GHC_INLINE file_status status_from_INFO(const path& p, const INFO* info, std::error_code&, uintmax_t* sz = nullptr, time_t* lwt = nullptr) noexcept
 {
     file_type ft = file_type::unknown;
     if ((info->dwFileAttributes & FILE_ATTRIBUTE_REPARSE_POINT)) {
@@ -3169,7 +3169,7 @@ GHC_INLINE void copy(const path& from, const path& to, copy_options options, std
                 copy_file(from, to / from.filename(), options, ec);
             }
             else {
-                copy_file(from, to, ec);
+                copy_file(from, to, options, ec);
             }
         }
     }
@@ -4176,9 +4176,9 @@ GHC_INLINE space_info space(const path& p, std::error_code& ec) noexcept
 {
     ec.clear();
 #ifdef GHC_OS_WINDOWS
-    ULARGE_INTEGER freeBytesAvailableToCaller = {0};
-    ULARGE_INTEGER totalNumberOfBytes = {0};
-    ULARGE_INTEGER totalNumberOfFreeBytes = {0};
+    ULARGE_INTEGER freeBytesAvailableToCaller = {0, 0};
+    ULARGE_INTEGER totalNumberOfBytes = {0, 0};
+    ULARGE_INTEGER totalNumberOfFreeBytes = {0, 0};
     if (!GetDiskFreeSpaceExW(detail::fromUtf8<std::wstring>(p.u8string()).c_str(), &freeBytesAvailableToCaller, &totalNumberOfBytes, &totalNumberOfFreeBytes)) {
         ec = std::error_code(::GetLastError(), std::system_category());
         return {static_cast<uintmax_t>(-1), static_cast<uintmax_t>(-1), static_cast<uintmax_t>(-1)};
@@ -4681,7 +4681,6 @@ public:
     impl(const path& p, directory_options options)
         : _base(p)
         , _options(options)
-        , _findData{0}
         , _dirHandle(INVALID_HANDLE_VALUE)
     {
         if (!_base.empty()) {

@@ -1,6 +1,6 @@
 clone_depth: 1
 
-version: 2.1.1.{build}
+version: 2.2.0.{build}
 
 image: Visual Studio 2015
 
@@ -22,7 +22,7 @@ before_build:
   - IF NOT EXIST C:\ProgramData\chocolatey\bin\swig.exe choco install swig --yes --limit-output #> $null
   - mkdir build
   - cd build
-  - cmake .. -G "Visual Studio 14 2015 Win64" -DBOOST_INSTALL_PATH=C:/libraries/boost_1_63_0 -DENABLE_PACKAGE_BUILD=ON -DBUILD_RELEASE_ONLY=ON -DBUILD_C_SHARED_LIB=ON -DBUILD_SHARED_LIBS=ON -DBUILD_JAVA_INTERFACE=ON
+  - cmake .. -G "Visual Studio 14 2015 Win64" -DBOOST_INSTALL_PATH=C:/libraries/boost_1_63_0 -DENABLE_PACKAGE_BUILD=ON -DENABLE_SWIG=ON -DBUILD_SHARED_LIBS=ON -DBUILD_JAVA_INTERFACE=ON
   - cd ..
 
 build:

@@ -248,7 +248,7 @@ void helicsFederateInfoSetCoreName (helics_federate_info fi, const char *corenam
     }
     try
     {
-        hfi->coreName = (corename != nullptr) ? std::string (corename) : nullstr;
+        hfi->coreName = AS_STRING (corename);
     }
     catch (...)
     {
@@ -265,7 +265,24 @@ void helicsFederateInfoSetCoreInitString (helics_federate_info fi, const char *c
     }
     try
     {
-        hfi->coreInitString = (coreinit != nullptr) ? std::string (coreinit) : nullstr;
+        hfi->coreInitString = AS_STRING (coreinit);
+    }
+    catch (...)
+    {
+        return helicsErrorHandler (err);
+    }
+}
+
+void helicsFederateInfoSetBrokerInitString (helics_federate_info fi, const char *brokerinit, helics_error *err)
+{
+    auto hfi = getFedInfo (fi, err);
+    if (hfi == nullptr)
+    {
+        return;
+    }
+    try
+    {
+        hfi->brokerInitString = AS_STRING (brokerinit);
     }
     catch (...)
     {
@@ -317,6 +334,23 @@ void helicsFederateInfoSetBroker (helics_federate_info fi, const char *broker, h
     try
     {
         hfi->broker = AS_STRING (broker);
+    }
+    catch (...)
+    {
+        return helicsErrorHandler (err);
+    }
+}
+
+void helicsFederateInfoSetBrokerKey (helics_federate_info fi, const char *brokerkey, helics_error *err)
+{
+    auto hfi = getFedInfo (fi, err);
+    if (hfi == nullptr)
+    {
+        return;
+    }
+    try
+    {
+        hfi->key = AS_STRING (brokerkey);
     }
     catch (...)
     {
@@ -1089,15 +1123,10 @@ void helicsCloseLibrary (void)
 {
     using namespace std::literals::chrono_literals;
     clearAllObjects ();
-    auto ret = std::async (std::launch::async, []() { helics::CoreFactory::cleanUpCores (2000ms); });
+    auto ret = std::async (std::launch::async, [] () { helics::CoreFactory::cleanUpCores (2000ms); });
     helics::BrokerFactory::cleanUpBrokers (2000ms);
     ret.get ();
-#ifdef ENABLE_ZMQ_CORE
-    if (ZmqContextManager::setContextToLeakOnDelete ())
-    {
-        ZmqContextManager::getContext ().close ();
-    }
-#endif
+
     helics::LoggerManager::closeLogger ();
     // helics::cleanupHelicsLibrary();
 }
@@ -1287,7 +1316,7 @@ void helicsQueryFree (helics_query query)
     auto queryObj = getQueryObj (query, nullptr);
     if (queryObj == nullptr)
     {
-        fprintf (stderr, "invalid query object");
+        fprintf (stderr, "invalid query object\n");
         return;
     }
     queryObj->valid = 0;
@@ -1367,7 +1396,7 @@ void MasterObjectHolder::clearBroker (int index)
         (*broker)[index] = nullptr;
         if (broker->size () > 10)
         {
-            if (std::none_of (broker->begin (), broker->end (), [](const auto &brk) { return static_cast<bool> (brk); }))
+            if (std::none_of (broker->begin (), broker->end (), [] (const auto &brk) { return static_cast<bool> (brk); }))
             {
                 broker->clear ();
             }
@@ -1384,7 +1413,7 @@ void MasterObjectHolder::clearCore (int index)
         (*core)[index] = nullptr;
         if (core->size () > 10)
         {
-            if (std::none_of (core->begin (), core->end (), [](const auto &cr) { return static_cast<bool> (cr); }))
+            if (std::none_of (core->begin (), core->end (), [] (const auto &cr) { return static_cast<bool> (cr); }))
             {
                 core->clear ();
             }
@@ -1401,7 +1430,7 @@ void MasterObjectHolder::clearFed (int index)
         (*fed)[index] = nullptr;
         if (fed->size () > 10)
         {
-            if (std::none_of (fed->begin (), fed->end (), [](const auto &fd) { return static_cast<bool> (fd); }))
+            if (std::none_of (fed->begin (), fed->end (), [] (const auto &fd) { return static_cast<bool> (fd); }))
             {
                 fed->clear ();
             }

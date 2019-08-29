@@ -110,7 +110,7 @@ class Wall
 
   private:
     std::unique_ptr<helics::ValueFederate> vFed;
-    helics::Publication *pub;
+    helics::Publication *pub=nullptr;
     int index = 0;
     bool initialized = false;
 
@@ -247,13 +247,13 @@ TEST (heat_transfer_tests, linear_tests)
     observer obs ("temp", blockCount);
     obs.initialize ("wallcore");
 
-    std::vector<std::thread> threads (blockCount + 2);
+    std::vector<std::thread> threads (static_cast<size_t>(blockCount) + 2);
     for (int ii = 0; ii < blockCount; ++ii)
     {
         threads[ii] = std::thread ([] (HeatUnitBlock &blk) { blk.run (); }, std::ref (block[ii]));
     }
     threads[blockCount] = std::thread ([&] () { obs.run (); });
-    threads[blockCount + 1] = std::thread ([&] () { w.run (); });
+    threads[static_cast<size_t>(blockCount) + 1] = std::thread ([&] () { w.run (); });
     for (auto &thrd : threads)
     {
         thrd.join ();

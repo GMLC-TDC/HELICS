@@ -6,17 +6,14 @@ SPDX-License-Identifier: BSD-3-Clause
 */
 #include "../application_api/Federate.hpp"
 #include "../application_api/queryFunctions.hpp"
-#include "../common/stringOps.h"
 #include "../core/Broker.hpp"
 #include "../core/core-exceptions.hpp"
 #include "../core/helicsCLI11.hpp"
 #include "BrokerApp.hpp"
+#include "gmlc/utilities/stringOps.h"
 #include <iostream>
 #include <thread>
-#ifdef ENABLE_ZMQ_CORE
-#include "../common/zmqContextManager.h"
-#include "cppzmq/zmq.hpp"
-#endif
+
 /** function to run the online terminal program*/
 void terminalFunction (std::vector<std::string> args);
 
@@ -41,7 +38,7 @@ int main (int argc, char *argv[])
       .footer ("helics_broker <broker args ..> starts a broker with the given args and waits for it to "
                "complete\n")
       ->footer ([] () {
-          helics::apps::BrokerApp ("-?");
+          helics::apps::BrokerApp{"-?"};
           return std::string{};
       });
     cmdLine.allow_extras ();
@@ -70,7 +67,7 @@ int main (int argc, char *argv[])
             {
                 // I am purposely making an object that creates and destroys itself on the same line because this
                 // will run until termination so will take a while
-                helics::apps::BrokerApp (cmdLine.remaining_for_passthrough ());
+                helics::apps::BrokerApp{cmdLine.remaining_for_passthrough (true)};
                 std::cout << "broker restart in 3 seconds" << std::endl;
                 std::this_thread::sleep_for (std::chrono::seconds (1));
                 std::cout << "broker restart in 2 seconds" << std::endl;
@@ -96,14 +93,6 @@ int main (int argc, char *argv[])
         ret = -4;
     }
 
-#ifdef ENABLE_ZMQ_CORE
-#ifdef __APPLE__
-    if (ZmqContextManager::setContextToLeakOnDelete ())
-    {
-        ZmqContextManager::getContext ().close ();
-    }
-#endif
-#endif
     helics::cleanupHelicsLibrary ();
     return ret;
 }
@@ -242,7 +231,7 @@ void terminalFunction (std::vector<std::string> args)
         {
             res = (*broker)->query (target, query);
         }
-        auto qvec = vectorizeQueryResult (std::move (res));
+        auto qvec = helics::vectorizeQueryResult (std::move (res));
         std::cout << "results: ";
         for (const auto &vres : qvec)
         {

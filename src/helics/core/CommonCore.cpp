@@ -103,6 +103,12 @@ bool CommonCore::connect ()
                 m.source_id = global_federate_id{};
                 m.name = getIdentifier ();
                 m.setStringData (getAddress ());
+
+                if (!brokerKey.empty ())
+                {
+                    m.setString (1, brokerKey);
+                }
+
                 setActionFlag (m, core_flag);
                 transmit (parent_route_id, m);
                 brokerState = broker_state_t::connected;
@@ -316,7 +322,7 @@ route_id CommonCore::getRoute (global_federate_id global_fedid) const
 bool CommonCore::isConfigured () const { return (brokerState >= configured); }
 
 bool CommonCore::isOpenToNewFederates () const { return ((brokerState != created) && (brokerState < operating)); }
-void CommonCore::error (local_federate_id federateID, int errorCode)
+void CommonCore::error (local_federate_id federateID, int errorID)
 {
     auto fed = getFederateAt (federateID);
     if (fed == nullptr)
@@ -325,7 +331,7 @@ void CommonCore::error (local_federate_id federateID, int errorCode)
     }
     ActionMessage m (CMD_ERROR);
     m.source_id = fed->global_id.load ();
-    m.messageID = errorCode;
+    m.messageID = errorID;
     addActionMessage (m);
     fed->addAction (m);
     iteration_result ret = iteration_result::next_step;
@@ -483,6 +489,13 @@ local_federate_id CommonCore::registerFederate (const std::string &name, const C
 {
     if (!waitCoreRegistration ())
     {
+        if (brokerState == errored)
+        {
+            if (!lastErrorString.empty ())
+            {
+                throw (RegistrationFailure (lastErrorString));
+            }
+        }
         throw (
           RegistrationFailure ("core is unable to register and has timed out, federate cannot be registered"));
     }
@@ -904,7 +917,36 @@ const std::string &CommonCore::getHandleName (interface_handle handle) const
     return emptyStr;
 }
 
-const std::string &CommonCore::getUnits (interface_handle handle) const
+const std::string &CommonCore::getInjectionUnits (interface_handle handle) const
+{
+    auto handleInfo = getHandleInfo (handle);
+    if (handleInfo != nullptr)
+    {
+        switch (handleInfo->handleType)
+        {
+        case handle_type::input:
+        {
+            auto fed = getFederateAt (handleInfo->local_fed_id);
+            auto inpInfo = fed->interfaces ().getInput (handle);
+            if (inpInfo != nullptr)
+            {
+                if (!inpInfo->inputUnits.empty ())
+                {
+                    return inpInfo->inputUnits;
+                }
+            }
+            break;
+        }
+        case handle_type::publication:
+            return handleInfo->units;
+        default:
+            return emptyStr;
+        }
+    }
+    return emptyStr;
+}
+
+const std::string &CommonCore::getExtractionUnits (interface_handle handle) const
 {
     auto handleInfo = getHandleInfo (handle);
     if (handleInfo != nullptr)
@@ -1637,10 +1679,7 @@ void CommonCore::deliverMessage (ActionMessage &message)
                         {
                             if (FiltI->filterOp != nullptr)
                             {
-                                if (FiltI->cloning)
-                                {
-                                    FiltI->filterOp->process (createMessageFromCommand (message));
-                                }
+                                FiltI->filterOp->process (createMessageFromCommand (message));
                             }
                         }
                     }
@@ -2178,20 +2217,41 @@ void CommonCore::processPriorityCommand (ActionMessage &&command)
             delayTransmitQueue.push (std::move (command));
         }
         break;
+    case CMD_BROKER_LOCATION:
+    {
+        command.setAction (CMD_PROTOCOL);
+        command.messageID = NEW_BROKER_INFORMATION;
+        transmit (control_route, std::move (command));
+        ActionMessage resend (CMD_RESEND);
+        resend.messageID = static_cast<int32_t> (CMD_REG_BROKER);
+        addActionMessage (resend);
+    }
+    break;
     case CMD_REG_BROKER:
         // These really shouldn't happen here probably means something went wrong in setup but we can handle it
         // forward the connection request to the higher level
-        LOG_WARNING (parent_broker_id, identifier,
-                     "Core received reg broker message, likely improper federation setup\n");
-        transmit (parent_route_id, command);
+        if (command.name == identifier)
+        {
+            LOG_ERROR (global_broker_id_local, identifier,
+                       "received locally sent registration message, broker loop, please set the broker address to "
+                       "a valid broker");
+        }
+        else
+        {
+            LOG_WARNING (parent_broker_id, identifier,
+                         "Core received reg broker message, likely improper federation setup\n");
+            transmit (parent_route_id, command);
+        }
         break;
     case CMD_BROKER_ACK:
         if (command.payload == identifier)
         {
             if (checkActionFlag (command, error_flag))
             {
-                LOG_ERROR (parent_broker_id, identifier, "broker responded with error\n");
-                // TODO:generate error messages in response to all the delayed messages
+                auto estring = std::string ("broker responded with error: ") + errorMessageString (command);
+                setErrorState (command.messageID, estring);
+                errorRespondDelayedMessages (estring);
+                LOG_ERROR (parent_broker_id, identifier, estring);
                 break;
             }
             global_id = global_broker_id (command.dest_id);
@@ -2315,6 +2375,20 @@ void CommonCore::transmitDelayedMessages ()
     }
 }
 
+void CommonCore::errorRespondDelayedMessages (const std::string &estring)
+{
+    auto msg = delayTransmitQueue.pop ();
+    while (msg)
+    {
+        if ((*msg).action () == CMD_QUERY || (*msg).action () == CMD_BROKER_QUERY)
+        {  // deal with in flight queries that will block unless a response is given
+            ActiveQueries.setDelayedValue ((*msg).messageID, std::string ("#error:") + estring);
+        }
+        // else other message which might get into here shouldn't need any action, just drop them
+        msg = delayTransmitQueue.pop ();
+    }
+}
+
 void CommonCore::sendErrorToFederates (int error_code)
 {
     ActionMessage errorCom (CMD_ERROR);
@@ -2339,7 +2413,7 @@ void CommonCore::transmitDelayedMessages (global_federate_id source)
             routeMessage (*msg);
         }
         else
-        {
+        {  // these messages were delayed for a different purpose and will be dealt with in a different way
             buffer.push_back (std::move (*msg));
         }
         msg = delayTransmitQueue.pop ();
@@ -2833,7 +2907,7 @@ void CommonCore::registerInterface (ActionMessage &command)
     {
         auto handle = command.source_handle;
         auto &lH = loopHandles;
-        handles.read ([handle, &lH](auto &hand) {
+        handles.read ([handle, &lH] (auto &hand) {
             auto ifc = hand.getHandleInfo (handle.baseValue ());
             if (ifc != nullptr)
             {
@@ -3747,7 +3821,7 @@ bool CommonCore::waitCoreRegistration ()
         std::this_thread::sleep_for (std::chrono::milliseconds (100));
         brkid = global_id.load ();
         ++sleepcnt;
-        if (Time (sleepcnt * 100, time_units::ms) > timeout)
+        if (Time (static_cast<int64_t> (sleepcnt) * 100, time_units::ms) > timeout)
         {
             return false;
         }
@@ -3845,7 +3919,11 @@ void CommonCore::routeMessage (ActionMessage &cmd, global_federate_id dest)
             }
             else
             {
-                fed->processPostTerminationAction (cmd);
+                auto rep = fed->processPostTerminationAction (cmd);
+                if (rep)
+                {
+                    routeMessage (*rep);
+                }
             }
         }
     }
@@ -3878,7 +3956,11 @@ void CommonCore::routeMessage (const ActionMessage &cmd)
             }
             else
             {
-                fed->processPostTerminationAction (cmd);
+                auto rep = fed->processPostTerminationAction (cmd);
+                if (rep)
+                {
+                    routeMessage (*rep);
+                }
             }
         }
     }
@@ -3915,7 +3997,11 @@ void CommonCore::routeMessage (ActionMessage &&cmd, global_federate_id dest)
             }
             else
             {
-                fed->processPostTerminationAction (cmd);
+                auto rep = fed->processPostTerminationAction (cmd);
+                if (rep)
+                {
+                    routeMessage (*rep);
+                }
             }
         }
     }
@@ -3948,7 +4034,11 @@ void CommonCore::routeMessage (ActionMessage &&cmd)
             }
             else
             {
-                fed->processPostTerminationAction (cmd);
+                auto rep = fed->processPostTerminationAction (cmd);
+                if (rep)
+                {
+                    routeMessage (*rep);
+                }
             }
         }
     }

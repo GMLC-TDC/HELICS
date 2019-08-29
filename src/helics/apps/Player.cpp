@@ -18,9 +18,9 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include "../common/JsonProcessingFunctions.hpp"
 
-#include "../common/base64.h"
-#include "../common/stringOps.h"
 #include "../core/helicsVersion.hpp"
+#include "gmlc/utilities/base64.h"
+#include "gmlc/utilities/stringOps.h"
 
 /** test if a string has a base64 wrapper*/
 static int hasB64Wrapper (const std::string &str);
@@ -80,32 +80,30 @@ std::unique_ptr<helicsCLI11App> Player::generateParser ()
     app->add_option ("--marker", nextPrintTimeStep,
                      "print a statement indicating time advancement every <arg> period during the simulation");
     app
-      ->add_option (
-        "--datatype",
-        [this] (CLI::results_t res) {
-            defType = helics::getTypeFromString (res[0]);
-            return (defType != helics::data_type::helics_custom);
-        },
-        "type of the publication data type to use", false)
+      ->add_option ("--datatype",
+                    [this](CLI::results_t res) {
+                        defType = helics::getTypeFromString (res[0]);
+                        return (defType != helics::data_type::helics_custom);
+                    },
+                    "type of the publication data type to use", false)
       ->take_last ()
       ->ignore_underscore ();
 
     app
-      ->add_option (
-        "--time_units",
-        [this] (CLI::results_t res) {
-            try
-            {
-                units = timeUnitsFromString (res[0]);
-                timeMultiplier = toSecondMultiplier (units);
-                return true;
-            }
-            catch (...)
-            {
-                return false;
-            }
-        },
-        "the default units on the timestamps used in file based input", false)
+      ->add_option ("--time_units",
+                    [this](CLI::results_t res) {
+                        try
+                        {
+                            units = timeUnitsFromString (res[0]);
+                            timeMultiplier = toSecondMultiplier (units);
+                            return true;
+                        }
+                        catch (...)
+                        {
+                            return false;
+                        }
+                    },
+                    "the default units on the timestamps used in file based input", false)
       ->take_last ()
       ->ignore_underscore ();
 
@@ -176,7 +174,7 @@ helics::Time Player::extractTime (const std::string &str, int lineNumber) const
 void Player::loadTextFile (const std::string &filename)
 {
     App::loadTextFile (filename);
-    using namespace stringOps;
+    using namespace gmlc::utilities::stringOps;
     std::ifstream infile (filename);
     std::string str;
 
@@ -349,7 +347,7 @@ void Player::loadTextFile (const std::string &filename)
                 }
                 if (pIndex > 0)
                 {
-                    points[pIndex].pubName = points[pIndex - 1].pubName;
+                    points[pIndex].pubName = points[static_cast<size_t>(pIndex) - 1].pubName;
                 }
                 else
                 {
@@ -380,7 +378,7 @@ void Player::loadTextFile (const std::string &filename)
                 }
                 if ((blk[1].empty ()) && (pIndex > 0))
                 {
-                    points[pIndex].pubName = points[pIndex - 1].pubName;
+                    points[pIndex].pubName = points[static_cast<size_t>(pIndex) - 1].pubName;
                 }
                 else
                 {
@@ -411,7 +409,7 @@ void Player::loadTextFile (const std::string &filename)
                 }
                 if ((blk[1].empty ()) && (pIndex > 0))
                 {
-                    points[pIndex].pubName = points[pIndex - 1].pubName;
+                    points[pIndex].pubName = points[static_cast<size_t>(pIndex) - 1].pubName;
                 }
                 else
                 {
@@ -624,7 +622,7 @@ void Player::loadJsonFile (const std::string &jsonString)
                         auto offset = hasB64Wrapper (str);
                         if (offset == 0)
                         {
-                            messages.back ().mess.data = utilities::base64_decode_to_string (str);
+                            messages.back ().mess.data = gmlc::utilities::base64_decode_to_string (str);
                             continue;
                         }
                     }
@@ -641,7 +639,7 @@ void Player::loadJsonFile (const std::string &jsonString)
                         auto offset = hasB64Wrapper (str);
                         if (offset == 0)  // directly encoded no wrapper
                         {
-                            messages.back ().mess.data = utilities::base64_decode_to_string (str);
+                            messages.back ().mess.data = gmlc::utilities::base64_decode_to_string (str);
                             continue;
                         }
                     }
@@ -958,12 +956,12 @@ static std::string decode (std::string &&stringToDecode)
         }
 
         stringToDecode.pop_back ();
-        return utilities::base64_decode_to_string (stringToDecode, offset);
+        return gmlc::utilities::base64_decode_to_string (stringToDecode, offset);
     }
 
     if ((stringToDecode.front () == '"') || (stringToDecode.front () == '\''))
     {
-        return stringOps::removeQuotes (stringToDecode);
+        return gmlc::utilities::stringOps::removeQuotes (stringToDecode);
     }
     // move is required since you are returning the rvalue and we want to move from the rvalue input
     return std::move (stringToDecode);

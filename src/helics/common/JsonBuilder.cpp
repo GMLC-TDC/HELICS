@@ -7,10 +7,12 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include "JsonBuilder.hpp"
 #include "JsonProcessingFunctions.hpp"
-#include "stringOps.h"
+#include "gmlc/utilities/stringOps.h"
 
 namespace helics
 {
+using stringVector = gmlc::utilities::stringVector;
+
 JsonMapBuilder::JsonMapBuilder () noexcept {}
 
 JsonMapBuilder::~JsonMapBuilder () = default;
@@ -68,7 +70,8 @@ JsonBuilder::~JsonBuilder () = default;
 /** add an element on a specific path*/
 void JsonBuilder::addElement (const std::string &path, const std::string &value)
 {
-    stringVector res = stringOps::splitline (path, "\\/:.", stringOps::delimiter_compression::on);
+    stringVector res =
+      gmlc::utilities::stringOps::splitline (path, "\\/:.", gmlc::utilities::stringOps::delimiter_compression::on);
     auto jv = &getJValue ();
     size_t ii = 0;
     for (ii = 0; ii < res.size () - 1; ++ii)
@@ -85,7 +88,8 @@ void JsonBuilder::addElement (const std::string &path, const std::string &value)
 
 void JsonBuilder::addElement (const std::string &path, double value)
 {
-    stringVector res = stringOps::splitline (path, "\\/:.", stringOps::delimiter_compression::on);
+    stringVector res =
+      gmlc::utilities::stringOps::splitline (path, "\\/:.", gmlc::utilities::stringOps::delimiter_compression::on);
     auto jv = &getJValue ();
     size_t ii = 0;
     for (ii = 0; ii < res.size () - 1; ++ii)

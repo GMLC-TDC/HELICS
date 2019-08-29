@@ -152,6 +152,7 @@ helics_warning = _helics.helics_warning
 helics_error_invalid_state_transition = _helics.helics_error_invalid_state_transition
 helics_error_invalid_function_call = _helics.helics_error_invalid_function_call
 helics_error_execution_failure = _helics.helics_error_execution_failure
+helics_error_insufficient_space = _helics.helics_error_insufficient_space
 helics_error_other = _helics.helics_error_other
 helics_error_external_type = _helics.helics_error_external_type
 helics_property_time_delta = _helics.helics_property_time_delta
@@ -170,6 +171,7 @@ helics_handle_option_single_connection_only = _helics.helics_handle_option_singl
 helics_handle_option_multiple_connections_allowed = _helics.helics_handle_option_multiple_connections_allowed
 helics_handle_option_buffer_data = _helics.helics_handle_option_buffer_data
 helics_handle_option_strict_type_checking = _helics.helics_handle_option_strict_type_checking
+helics_handle_option_ignore_unit_mismatch = _helics.helics_handle_option_ignore_unit_mismatch
 helics_handle_option_only_transmit_on_change = _helics.helics_handle_option_only_transmit_on_change
 helics_handle_option_only_update_on_change = _helics.helics_handle_option_only_update_on_change
 helics_handle_option_ignore_interrupts = _helics.helics_handle_option_ignore_interrupts
@@ -286,70 +288,20 @@ helics_message_swigregister(helics_message)
 
 
 def helicsGetVersion() -> "char const *":
-    """
-
-
-    """
     return _helics.helicsGetVersion()
+helicsGetVersion = _helics.helicsGetVersion
 
 def helicsIsCoreTypeAvailable(type: 'char const *') -> "helics_bool":
-    """
-
-
-    Returns true if core/broker type specified is available in current compilation.
-
-    """
     return _helics.helicsIsCoreTypeAvailable(type)
+helicsIsCoreTypeAvailable = _helics.helicsIsCoreTypeAvailable
 
 def helicsCreateCore(type: 'char const *', name: 'char const *', initString: 'char const *') -> "helics_core":
-    """
-
-
-    create a core object
-
-    Parameters
-    ----------
-    * `type` :
-        the type of the core to create
-    * `name` :
-        the name of the core , may be a nullptr or empty string to have a name
-        automatically assigned
-    * `initString` :
-        an initialization string to send to the core-the format is similar to
-        command line arguments typical options include a broker address
-        --broker="XSSAF" or the number of federates or the address
-
-    Returns
-    -------
-    a helics_core object
-
-    """
     return _helics.helicsCreateCore(type, name, initString)
+helicsCreateCore = _helics.helicsCreateCore
 
 def helicsCreateCoreFromArgs(type: 'char const *', name: 'char const *', argc: 'int') -> "helics_core":
-    """
-
-
-    create a core object by passing command line arguments
-
-    Parameters
-    ----------
-    * `type` :
-        the type of the core to create
-    * `name` :
-        the name of the core , may be a nullptr or empty string to have a name
-        automatically assigned
-    * `argc` :
-        the number of arguments
-    * `argv` :
-        the string values from a command line
-
-    Returns
-    -------
-    a helics_core object
-
-    """
     return _helics.helicsCreateCoreFromArgs(type, name, argc)
+helicsCreateCoreFromArgs = _helics.helicsCreateCoreFromArgs
 
 def helicsCoreClone(core: 'helics_core') -> "helics_core":
     return _helics.helicsCoreClone(core)
@@ -360,55 +312,12 @@ def helicsCoreIsValid(core: 'helics_core') -> "helics_bool":
 helicsCoreIsValid = _helics.helicsCoreIsValid
 
 def helicsCreateBroker(type: 'char const *', name: 'char const *', initString: 'char const *') -> "helics_broker":
-    """
-
-
-    create a broker object
-
-    Parameters
-    ----------
-    * `type` :
-        the type of the broker to create
-    * `name` :
-        the name of the broker , may be a nullptr or empty string to have a name
-        automatically assigned
-    * `initString` :
-        an initialization string to send to the core-the format is similar to
-        command line arguments typical options include a broker address
-        --broker="XSSAF" if this is a subbroker or the number of federates or the
-        address
-
-    Returns
-    -------
-    a helics_core object
-
-    """
     return _helics.helicsCreateBroker(type, name, initString)
+helicsCreateBroker = _helics.helicsCreateBroker
 
 def helicsCreateBrokerFromArgs(type: 'char const *', name: 'char const *', argc: 'int') -> "helics_broker":
-    """
-
-
-    create a core object by passing command line arguments
-
-    Parameters
-    ----------
-    * `type` :
-        the type of the core to create
-    * `name` :
-        the name of the core , may be a nullptr or empty string to have a name
-        automatically assigned
-    * `argc` :
-        the number of arguments
-    * `argv` :
-        the string values from a command line
-
-    Returns
-    -------
-    a helics_core object
-
-    """
     return _helics.helicsCreateBrokerFromArgs(type, name, argc)
+helicsCreateBrokerFromArgs = _helics.helicsCreateBrokerFromArgs
 
 def helicsBrokerClone(broker: 'helics_broker') -> "helics_broker":
     return _helics.helicsBrokerClone(broker)
@@ -419,15 +328,8 @@ def helicsBrokerIsValid(broker: 'helics_broker') -> "helics_bool":
 helicsBrokerIsValid = _helics.helicsBrokerIsValid
 
 def helicsBrokerIsConnected(broker: 'helics_broker') -> "helics_bool":
-    """
-
-
-    check if a broker is connected a connected broker implies is attached to cores
-    or cores could reach out to communicate return 0 if not connected , something
-    else if it is connected
-
-    """
     return _helics.helicsBrokerIsConnected(broker)
+helicsBrokerIsConnected = _helics.helicsBrokerIsConnected
 
 def helicsBrokerDataLink(broker: 'helics_broker', source: 'char const *', target: 'char const *') -> "void":
     return _helics.helicsBrokerDataLink(broker, source, target)
@@ -446,15 +348,8 @@ def helicsBrokerWaitForDisconnect(broker: 'helics_broker', msToWait: 'int') -> "
 helicsBrokerWaitForDisconnect = _helics.helicsBrokerWaitForDisconnect
 
 def helicsCoreIsConnected(core: 'helics_core') -> "helics_bool":
-    """
-
-
-    check if a core is connected a connected core implies is attached to federate or
-    federates could be attached to it return 0 if not connected , something else if
-    it is connected
-
-    """
     return _helics.helicsCoreIsConnected(core)
+helicsCoreIsConnected = _helics.helicsCoreIsConnected
 
 def helicsCoreDataLink(core: 'helics_core', source: 'char const *', target: 'char const *') -> "void":
     return _helics.helicsCoreDataLink(core, source, target)
@@ -469,122 +364,32 @@ def helicsCoreAddDestinationFilterToEndpoint(core: 'helics_core', filter: 'char 
 helicsCoreAddDestinationFilterToEndpoint = _helics.helicsCoreAddDestinationFilterToEndpoint
 
 def helicsBrokerGetIdentifier(broker: 'helics_broker') -> "char const *":
-    """
-
-
-    get an identifier for the broker
-
-    Parameters
-    ----------
-    * `broker` :
-        the broker to query
-    * `identifier` :
-        storage space to place the identifier string
-    * `maxlen` :
-        the maximum space available in identifier
-
-    Returns
-    -------
-    a helics_status enumeration indicating any error condition
-
-    """
     return _helics.helicsBrokerGetIdentifier(broker)
+helicsBrokerGetIdentifier = _helics.helicsBrokerGetIdentifier
 
 def helicsCoreGetIdentifier(core: 'helics_core') -> "char const *":
-    """
-
-
-    get an identifier for the core
-
-    Parameters
-    ----------
-    * `core` :
-        the core to query
-    * `identifier` :
-        storage space to place the identifier string
-    * `maxlen` :
-        the maximum space available in identifier
-
-    Returns
-    -------
-    a helics_status enumeration indicating any error condition
-
-    """
     return _helics.helicsCoreGetIdentifier(core)
+helicsCoreGetIdentifier = _helics.helicsCoreGetIdentifier
 
 def helicsBrokerGetAddress(broker: 'helics_broker') -> "char const *":
-    """
-
-
-    get the network address associated with a broker
-
-    Parameters
-    ----------
-    * `broker` :
-        the broker to query
-    * `identifier` :
-        storage space to place the identifier string
-    * `maxlen` :
-        the maximum space available in identifier
-
-    Returns
-    -------
-    a helics_status enumeration indicating any error condition
-
-    """
     return _helics.helicsBrokerGetAddress(broker)
+helicsBrokerGetAddress = _helics.helicsBrokerGetAddress
 
 def helicsCoreSetReadyToInit(core: 'helics_core') -> "void":
     return _helics.helicsCoreSetReadyToInit(core)
 helicsCoreSetReadyToInit = _helics.helicsCoreSetReadyToInit
 
 def helicsCoreDisconnect(core: 'helics_core') -> "void":
-    """
-
-
-    get an identifier for the core
-
-    Parameters
-    ----------
-    * `core` :
-        the core to query
-    * `identifier` :
-        storage space to place the identifier string
-    * `maxlen` :
-        the maximum space available in identifier
-
-    Returns
-    -------
-    a helics_status enumeration indicating any error condition
-
-    """
     return _helics.helicsCoreDisconnect(core)
+helicsCoreDisconnect = _helics.helicsCoreDisconnect
 
 def helicsGetFederateByName(fedName: 'char const *') -> "helics_federate":
     return _helics.helicsGetFederateByName(fedName)
 helicsGetFederateByName = _helics.helicsGetFederateByName
 
 def helicsBrokerDisconnect(broker: 'helics_broker') -> "void":
-    """
-
-
-    get the network address associated with a broker
-
-    Parameters
-    ----------
-    * `broker` :
-        the broker to query
-    * `identifier` :
-        storage space to place the identifier string
-    * `maxlen` :
-        the maximum space available in identifier
-
-    Returns
-    -------
-    a helics_status enumeration indicating any error condition
-
-    """
     return _helics.helicsBrokerDisconnect(broker)
+helicsBrokerDisconnect = _helics.helicsBrokerDisconnect
 
 def helicsFederateDestroy(fed: 'helics_federate') -> "void":
     return _helics.helicsFederateDestroy(fed)
@@ -599,94 +404,32 @@ def helicsCoreDestroy(core: 'helics_core') -> "void":
 helicsCoreDestroy = _helics.helicsCoreDestroy
 
 def helicsCoreFree(core: 'helics_core') -> "void":
-    """
-
-
-    release the memory associated with a core
-
-    """
     return _helics.helicsCoreFree(core)
+helicsCoreFree = _helics.helicsCoreFree
 
 def helicsBrokerFree(broker: 'helics_broker') -> "void":
-    """
-
-
-    release the memory associated with a broker
-
-    """
     return _helics.helicsBrokerFree(broker)
+helicsBrokerFree = _helics.helicsBrokerFree
 
 def helicsCreateValueFederate(fedName: 'char const *', fi: 'helics_federate_info') -> "helics_federate":
-    """
-
-
-    create a value federate from a federate info object
-
-    helics_federate objects can be used in all functions that take a helics_federate
-    or helics_federate object as an argument
-
-    Parameters
-    ----------
-    * `fi` :
-        the federate info object that contains details on the federate
-
-    Returns
-    -------
-    an opaque value federate object
-
-    """
     return _helics.helicsCreateValueFederate(fedName, fi)
+helicsCreateValueFederate = _helics.helicsCreateValueFederate
 
 def helicsCreateValueFederateFromConfig(configFile: 'char const *') -> "helics_federate":
     return _helics.helicsCreateValueFederateFromConfig(configFile)
 helicsCreateValueFederateFromConfig = _helics.helicsCreateValueFederateFromConfig
 
 def helicsCreateMessageFederate(fedName: 'char const *', fi: 'helics_federate_info') -> "helics_federate":
-    """
-
-
-    create a message federate from a federate info object
-
-    helics_message_federate objects can be used in all functions that take a
-    helics_message_federate or helics_federate object as an argument
-
-    Parameters
-    ----------
-    * `fi` :
-        the federate info object that contains details on the federate
-
-    Returns
-    -------
-    an opaque message federate object
-
-    """
     return _helics.helicsCreateMessageFederate(fedName, fi)
+helicsCreateMessageFederate = _helics.helicsCreateMessageFederate
 
 def helicsCreateMessageFederateFromConfig(configFile: 'char const *') -> "helics_federate":
     return _helics.helicsCreateMessageFederateFromConfig(configFile)
 helicsCreateMessageFederateFromConfig = _helics.helicsCreateMessageFederateFromConfig
 
 def helicsCreateCombinationFederate(fedName: 'char const *', fi: 'helics_federate_info') -> "helics_federate":
-    """
-
-
-    create a combination federate from a federate info object
-
-    combination federates are both value federates and message federates, objects
-    can be used in all functions that take a helics_federate,
-    helics_message_federate or helics_federate object as an argument
-
-    Parameters
-    ----------
-    * `fi` :
-        the federate info object that contains details on the federate
-
-    Returns
-    -------
-    an opaque value federate object nullptr if the object creation failed
-
-    """
     return _helics.helicsCreateCombinationFederate(fedName, fi)
+helicsCreateCombinationFederate = _helics.helicsCreateCombinationFederate
 
 def helicsCreateCombinationFederateFromConfig(configFile: 'char const *') -> "helics_federate":
     return _helics.helicsCreateCombinationFederateFromConfig(configFile)
@@ -705,114 +448,44 @@ def helicsFederateInfoClone(fi: 'helics_federate_info') -> "helics_federate_info
 helicsFederateInfoClone = _helics.helicsFederateInfoClone
 
 def helicsFederateInfoLoadFromArgs(fi: 'helics_federate_info', argc: 'int') -> "void":
-    """
-
-
-    load a federate info from command line arguments
-
-    Parameters
-    ----------
-    * `fi` :
-        a federateInfo object
-    * `argc` :
-        the number of command line arguments
-    * `argv` :
-        an array of strings from the command line
-
-    Returns
-    -------
-    a helics_status enumeration indicating success or any potential errors
-
-    """
     return _helics.helicsFederateInfoLoadFromArgs(fi, argc)
+helicsFederateInfoLoadFromArgs = _helics.helicsFederateInfoLoadFromArgs
 
 def helicsFederateInfoFree(fi: 'helics_federate_info') -> "void":
-    """
-
-
-    delete the memory associated with a federate info object
-
-    """
     return _helics.helicsFederateInfoFree(fi)
+helicsFederateInfoFree = _helics.helicsFederateInfoFree
 
 def helicsFederateIsValid(fed: 'helics_federate') -> "helics_bool":
     return _helics.helicsFederateIsValid(fed)
 helicsFederateIsValid = _helics.helicsFederateIsValid
 
 def helicsFederateInfoSetCoreName(fi: 'helics_federate_info', corename: 'char const *') -> "void":
-    """
-
-
-    set the name of the core to link to for a federate
-
-    Parameters
-    ----------
-    * `fi` :
-        the federate info object to alter
-    * `corename` :
-        the identifier for a core to link to
-
-    Returns
-    -------
-    a helics_status enumeration helics_ok on success helicsInvalidReference if fi is
-    not a valid reference
-
-    """
     return _helics.helicsFederateInfoSetCoreName(fi, corename)
+helicsFederateInfoSetCoreName = _helics.helicsFederateInfoSetCoreName
 
 def helicsFederateInfoSetCoreInitString(fi: 'helics_federate_info', coreInit: 'char const *') -> "void":
-    """
-
-
-    set the initialization string for the core usually in the form of command line
-    arguments
-
-    Parameters
-    ----------
-    * `fi` :
-        the federate info object to alter
-    * `coreInit` :
-        a string with the core initialization strings
-
-    Returns
-    -------
-    a helics_status enumeration helics_ok on success helicsInvalidReference if fi is
-    not a valid reference
-
-    """
     return _helics.helicsFederateInfoSetCoreInitString(fi, coreInit)
+helicsFederateInfoSetCoreInitString = _helics.helicsFederateInfoSetCoreInitString
+
+def helicsFederateInfoSetBrokerInitString(fi: 'helics_federate_info', brokerInit: 'char const *') -> "void":
+    return _helics.helicsFederateInfoSetBrokerInitString(fi, brokerInit)
+helicsFederateInfoSetBrokerInitString = _helics.helicsFederateInfoSetBrokerInitString
 
 def helicsFederateInfoSetCoreType(fi: 'helics_federate_info', coretype: 'int') -> "void":
-    """
-
-
-    """
     return _helics.helicsFederateInfoSetCoreType(fi, coretype)
+helicsFederateInfoSetCoreType = _helics.helicsFederateInfoSetCoreType
 
 def helicsFederateInfoSetCoreTypeFromString(fi: 'helics_federate_info', coretype: 'char const *') -> "void":
-    """
-
-
-    set the core type from a string
-
-    Parameters
-    ----------
-    * `fi` :
-        the federate info object to alter
-    * `coretype` :
-        a string naming a core type
-
-    Returns
-    -------
-    a helics_status enumeration helics_ok on success helicsInvalidReference if fi is
-    not a valid reference helics_discard if the string is not recognized
-
-    """
     return _helics.helicsFederateInfoSetCoreTypeFromString(fi, coretype)
+helicsFederateInfoSetCoreTypeFromString = _helics.helicsFederateInfoSetCoreTypeFromString
 
 def helicsFederateInfoSetBroker(fi: 'helics_federate_info', broker: 'char const *') -> "void":
     return _helics.helicsFederateInfoSetBroker(fi, broker)
 helicsFederateInfoSetBroker = _helics.helicsFederateInfoSetBroker
+
+def helicsFederateInfoSetBrokerKey(fi: 'helics_federate_info', brokerkey: 'char const *') -> "void":
+    return _helics.helicsFederateInfoSetBrokerKey(fi, brokerkey)
+helicsFederateInfoSetBrokerKey = _helics.helicsFederateInfoSetBrokerKey
 
 def helicsFederateInfoSetBrokerPort(fi: 'helics_federate_info', brokerPort: 'int') -> "void":
     return _helics.helicsFederateInfoSetBrokerPort(fi, brokerPort)
@@ -851,14 +524,8 @@ def helicsFederateRegisterInterfaces(fed: 'helics_federate', file: 'char const *
 helicsFederateRegisterInterfaces = _helics.helicsFederateRegisterInterfaces
 
 def helicsFederateFinalize(fed: 'helics_federate') -> "void":
-    """
-
-
-    finalize the federate this halts all communication in the federate and
-    disconnects it from the core
-
-    """
     return _helics.helicsFederateFinalize(fed)
+helicsFederateFinalize = _helics.helicsFederateFinalize
 
 def helicsFederateFinalizeAsync(fed: 'helics_federate') -> "void":
     return _helics.helicsFederateFinalizeAsync(fed)
@@ -869,23 +536,12 @@ def helicsFederateFinalizeComplete(fed: 'helics_federate') -> "void":
 helicsFederateFinalizeComplete = _helics.helicsFederateFinalizeComplete
 
 def helicsFederateFree(fed: 'helics_federate') -> "void":
-    """
-
-
-    release the memory associated withe a federate
-
-    """
     return _helics.helicsFederateFree(fed)
+helicsFederateFree = _helics.helicsFederateFree
 
 def helicsCloseLibrary() -> "void":
-    """
-
-
-    call when done using the helics library, this function will ensure the threads
-    are closed properly if possible this should be the last call before exiting,
-
-    """
     return _helics.helicsCloseLibrary()
+helicsCloseLibrary = _helics.helicsCloseLibrary
 
 def helicsFederateEnterInitializingMode(fed: 'helics_federate') -> "void":
     return _helics.helicsFederateEnterInitializingMode(fed)
@@ -896,22 +552,8 @@ def helicsFederateEnterInitializingModeAsync(fed: 'helics_federate') -> "void":
 helicsFederateEnterInitializingModeAsync = _helics.helicsFederateEnterInitializingModeAsync
 
 def helicsFederateIsAsyncOperationCompleted(fed: 'helics_federate') -> "helics_bool":
-    """
-
-
-    check if the current Asynchronous operation has completed
-
-    Parameters
-    ----------
-    * `fed` :
-        the federate to operate on
-
-    Returns
-    -------
-    0 if not completed, 1 if completed
-
-    """
     return _helics.helicsFederateIsAsyncOperationCompleted(fed)
+helicsFederateIsAsyncOperationCompleted = _helics.helicsFederateIsAsyncOperationCompleted
 
 def helicsFederateEnterInitializingModeComplete(fed: 'helics_federate') -> "void":
     return _helics.helicsFederateEnterInitializingModeComplete(fed)
@@ -942,145 +584,48 @@ def helicsFederateEnterExecutingModeIterativeComplete(fed: 'helics_federate') ->
 helicsFederateEnterExecutingModeIterativeComplete = _helics.helicsFederateEnterExecutingModeIterativeComplete
 
 def helicsFederateGetState(fed: 'helics_federate') -> "helics_federate_state":
-    """
-
-
-    get the current state of a federate
-
-    Parameters
-    ----------
-    * `fed` :
-        the fed to query
-    * `state` :
-        the resulting state if helics_status return helics_ok
-
-    """
     return _helics.helicsFederateGetState(fed)
+helicsFederateGetState = _helics.helicsFederateGetState
 
 def helicsFederateGetCoreObject(fed: 'helics_federate') -> "helics_core":
-    """
-
-
-    get the core object associated with a federate
-
-    Parameters
-    ----------
-    * `fed` :
-        a federate object
-
-    Returns
-    -------
-    a core object, nullptr if invalid
-
-    """
     return _helics.helicsFederateGetCoreObject(fed)
+helicsFederateGetCoreObject = _helics.helicsFederateGetCoreObject
 
 def helicsFederateRequestTime(fed: 'helics_federate', requestTime: 'helics_time') -> "helics_time":
-    """
-
-
-    request the next time for federate execution
-
-    Parameters
-    ----------
-    * `fed` :
-        the federate to make the request of
-    * `requestTime` :
-        the next requested time
-    * `timeOut` :
-        the time granted to the federate
-
-    Returns
-    -------
-    a helics_status if the return value is equal to helics_ok the timeOut will
-    contain the new granted time, otherwise timeOut is invalid
-
-    """
     return _helics.helicsFederateRequestTime(fed, requestTime)
+helicsFederateRequestTime = _helics.helicsFederateRequestTime
+
+def helicsFederateRequestTimeAdvance(fed: 'helics_federate', timeDelta: 'helics_time') -> "helics_time":
+    return _helics.helicsFederateRequestTimeAdvance(fed, timeDelta)
+helicsFederateRequestTimeAdvance = _helics.helicsFederateRequestTimeAdvance
 
 def helicsFederateRequestNextStep(fed: 'helics_federate') -> "helics_time":
     return _helics.helicsFederateRequestNextStep(fed)
 helicsFederateRequestNextStep = _helics.helicsFederateRequestNextStep
 
 def helicsFederateRequestTimeIterative(fed: 'helics_federate', requestTime: 'helics_time', iterate: 'helics_iteration_request') -> "helics_iteration_result *":
-    """
-
-
-    request an iterative time
-
-    this call allows for finer grain control of the iterative process then /ref
-    helicsFederateRequestTime it takes a time and and iteration request and return a
-    time and iteration status
-
-    Parameters
-    ----------
-    * `fed` :
-        the federate to make the request of
-    * `requestTime` :
-        the next desired time
-    * `iterate` :
-        the requested iteration mode
-    * `timeOut` :
-        the granted time
-    * `outIterate` :
-        the iteration specification of the result
-
-    Returns
-    -------
-    a helics_status object with a return code of the result
-
-    """
     return _helics.helicsFederateRequestTimeIterative(fed, requestTime, iterate)
+helicsFederateRequestTimeIterative = _helics.helicsFederateRequestTimeIterative
 
 def helicsFederateRequestTimeAsync(fed: 'helics_federate', requestTime: 'helics_time') -> "void":
-    """
-
-
-    """
     return _helics.helicsFederateRequestTimeAsync(fed, requestTime)
+helicsFederateRequestTimeAsync = _helics.helicsFederateRequestTimeAsync
 
 def helicsFederateRequestTimeComplete(fed: 'helics_federate') -> "helics_time":
-    """
-
-
-    """
     return _helics.helicsFederateRequestTimeComplete(fed)
+helicsFederateRequestTimeComplete = _helics.helicsFederateRequestTimeComplete
 
 def helicsFederateRequestTimeIterativeAsync(fed: 'helics_federate', requestTime: 'helics_time', iterate: 'helics_iteration_request') -> "void":
-    """
-
-
-    """
     return _helics.helicsFederateRequestTimeIterativeAsync(fed, requestTime, iterate)
+helicsFederateRequestTimeIterativeAsync = _helics.helicsFederateRequestTimeIterativeAsync
 
 def helicsFederateRequestTimeIterativeComplete(fed: 'helics_federate') -> "helics_iteration_result *":
-    """
-
-
-    """
     return _helics.helicsFederateRequestTimeIterativeComplete(fed)
+helicsFederateRequestTimeIterativeComplete = _helics.helicsFederateRequestTimeIterativeComplete
 
 def helicsFederateGetName(fed: 'helics_federate') -> "char const *":
-    """
-
-
-    get the name of the federate
-
-    Parameters
-    ----------
-    * `fed` :
-        the federate object to query
-    * `str` :
-        memory buffer to store the result
-    * `maxlen` :
-        the maximum size of the buffer
-
-    Returns
-    -------
-    helics_status object indicating success or error
-
-    """
     return _helics.helicsFederateGetName(fed)
+helicsFederateGetName = _helics.helicsFederateGetName
 
 def helicsFederateSetTimeProperty(fed: 'helics_federate', timeProperty: 'int', time: 'helics_time') -> "void":
     return _helics.helicsFederateSetTimeProperty(fed, timeProperty, time)
@@ -1111,24 +656,8 @@ def helicsFederateGetIntegerProperty(fed: 'helics_federate', intProperty: 'int')
 helicsFederateGetIntegerProperty = _helics.helicsFederateGetIntegerProperty
 
 def helicsFederateGetCurrentTime(fed: 'helics_federate') -> "helics_time":
-    """
-
-
-    get the current time of the federate
-
-    Parameters
-    ----------
-    * `fed` :
-        the federate object to query
-    * `time` :
-        storage location for the time variable
-
-    Returns
-    -------
-    helics_status object indicating success or error
-
-    """
     return _helics.helicsFederateGetCurrentTime(fed)
+helicsFederateGetCurrentTime = _helics.helicsFederateGetCurrentTime
 
 def helicsFederateSetGlobal(fed: 'helics_federate', valueName: 'char const *', value: 'char const *') -> "void":
     return _helics.helicsFederateSetGlobal(fed, valueName, value)
@@ -1143,39 +672,12 @@ def helicsBrokerSetGlobal(broker: 'helics_broker', valueName: 'char const *', va
 helicsBrokerSetGlobal = _helics.helicsBrokerSetGlobal
 
 def helicsCreateQuery(target: 'char const *', query: 'char const *') -> "helics_query":
-    """
-
-
-    create a query object
-
-    a query object consists of a target and query string
-
-    """
     return _helics.helicsCreateQuery(target, query)
+helicsCreateQuery = _helics.helicsCreateQuery
 
 def helicsQueryExecute(query: 'helics_query', fed: 'helics_federate') -> "char const *":
-    """
-
-
-    Execute a query
-
-    the call will block until the query finishes which may require communication or
-    other delays
-
-    Parameters
-    ----------
-    * `query` :
-        the query object to use in the query
-    * `fed` :
-        a federate to send the query through
-
-    Returns
-    -------
-    a pointer to a string. the string will remain valid until the query is freed or
-    executed again the return will be nullptr if fed or query is an invalid object
-
-    """
     return _helics.helicsQueryExecute(query, fed)
+helicsQueryExecute = _helics.helicsQueryExecute
 
 def helicsQueryCoreExecute(query: 'helics_query', core: 'helics_core') -> "char const *":
     return _helics.helicsQueryCoreExecute(query, core)
@@ -1186,131 +688,44 @@ def helicsQueryBrokerExecute(query: 'helics_query', broker: 'helics_broker') -> 
 helicsQueryBrokerExecute = _helics.helicsQueryBrokerExecute
 
 def helicsQueryExecuteAsync(query: 'helics_query', fed: 'helics_federate') -> "void":
-    """
-
-
-    Execute a query in a non-blocking call
-
-    Parameters
-    ----------
-    * `query` :
-        the query object to use in the query
-    * `fed` :
-        a federate to send the query through
-
-    Returns
-    -------
-    a helics status enumeration with the result of the query specification
-
-    """
     return _helics.helicsQueryExecuteAsync(query, fed)
+helicsQueryExecuteAsync = _helics.helicsQueryExecuteAsync
 
 def helicsQueryExecuteComplete(query: 'helics_query') -> "char const *":
-    """
-
-
-    complete the return from a query called with /ref helicsExecuteQueryAsync
-
-    the function will block until the query completes /ref isQueryComplete can be
-    called to determine if a query has completed or not
-
-    Parameters
-    ----------
-    * `query` :
-        the query object to
-
-    Returns
-    -------
-    a pointer to a string. the string will remain valid until the query is freed or
-    executed again the return will be nullptr if query is an invalid object
-
-    """
     return _helics.helicsQueryExecuteComplete(query)
+helicsQueryExecuteComplete = _helics.helicsQueryExecuteComplete
 
 def helicsQueryIsCompleted(query: 'helics_query') -> "helics_bool":
-    """
-
-
-    check if an asynchronously executed query has completed
-
-    Returns
-    -------
-    will return helics_true if an async query has complete or a regular query call
-    was made with a result and false if an async query has not completed or is
-    invalid
-
-    """
     return _helics.helicsQueryIsCompleted(query)
+helicsQueryIsCompleted = _helics.helicsQueryIsCompleted
 
 def helicsQueryFree(query: 'helics_query') -> "void":
-    """
-
-
-    free the memory associated with a query object
-
-    """
     return _helics.helicsQueryFree(query)
+helicsQueryFree = _helics.helicsQueryFree
 
 def helicsCleanupLibrary() -> "void":
     return _helics.helicsCleanupLibrary()
 helicsCleanupLibrary = _helics.helicsCleanupLibrary
 
 def helicsFederateRegisterSubscription(fed: 'helics_federate', key: 'char const *', units: 'char const *') -> "helics_input":
-    """
-
-
-    create a subscription
-
-    the subscription becomes part of the federate and is destroyed when the federate
-    is freed so there are no separate free functions for subscriptions and
-    publications
-
-    Parameters
-    ----------
-    * `fed` :
-        the federate object in which to create a subscription must have been create
-        with helicsCreateValueFederate or helicsCreateCombinationFederate
-    * `key` :
-        the identifier matching a publication to get a subscription for
-    * `type` :
-        a string describing the expected type of the publication may be NULL
-    * `units` :
-        a string listing the units of the subscription maybe NULL
-
-    Returns
-    -------
-    an object containing the subscription
-
-    """
     return _helics.helicsFederateRegisterSubscription(fed, key, units)
+helicsFederateRegisterSubscription = _helics.helicsFederateRegisterSubscription
 
 def helicsFederateRegisterPublication(fed: 'helics_federate', key: 'char const *', type: 'helics_data_type', units: 'char const *') -> "helics_publication":
-    """
-
-
-    """
     return _helics.helicsFederateRegisterPublication(fed, key, type, units)
+helicsFederateRegisterPublication = _helics.helicsFederateRegisterPublication
 
 def helicsFederateRegisterTypePublication(fed: 'helics_federate', key: 'char const *', type: 'char const *', units: 'char const *') -> "helics_publication":
-    """
-
-
-    """
     return _helics.helicsFederateRegisterTypePublication(fed, key, type, units)
+helicsFederateRegisterTypePublication = _helics.helicsFederateRegisterTypePublication
 
 def helicsFederateRegisterGlobalPublication(fed: 'helics_federate', key: 'char const *', type: 'helics_data_type', units: 'char const *') -> "helics_publication":
-    """
-
-
-    """
     return _helics.helicsFederateRegisterGlobalPublication(fed, key, type, units)
+helicsFederateRegisterGlobalPublication = _helics.helicsFederateRegisterGlobalPublication
 
 def helicsFederateRegisterGlobalTypePublication(fed: 'helics_federate', key: 'char const *', type: 'char const *', units: 'char const *') -> "helics_publication":
-    """
-
-
-    """
     return _helics.helicsFederateRegisterGlobalTypePublication(fed, key, type, units)
+helicsFederateRegisterGlobalTypePublication = _helics.helicsFederateRegisterGlobalTypePublication
 
 def helicsFederateRegisterInput(fed: 'helics_federate', key: 'char const *', type: 'helics_data_type', units: 'char const *') -> "helics_input":
     return _helics.helicsFederateRegisterInput(fed, key, type, units)
@@ -1365,29 +780,20 @@ def helicsPublicationPublishRaw(pub: 'helics_publication', data: 'void const *')
 helicsPublicationPublishRaw = _helics.helicsPublicationPublishRaw
 
 def helicsPublicationPublishString(pub: 'helics_publication', str: 'char const *') -> "void":
-    """
-
-
-    """
     return _helics.helicsPublicationPublishString(pub, str)
+helicsPublicationPublishString = _helics.helicsPublicationPublishString
 
 def helicsPublicationPublishInteger(pub: 'helics_publication', val: 'int64_t') -> "void":
-    """
-
-
-    """
     return _helics.helicsPublicationPublishInteger(pub, val)
+helicsPublicationPublishInteger = _helics.helicsPublicationPublishInteger
 
 def helicsPublicationPublishBoolean(pub: 'helics_publication', val: 'helics_bool') -> "void":
     return _helics.helicsPublicationPublishBoolean(pub, val)
 helicsPublicationPublishBoolean = _helics.helicsPublicationPublishBoolean
 
 def helicsPublicationPublishDouble(pub: 'helics_publication', val: 'double') -> "void":
-    """
-
-
-    """
     return _helics.helicsPublicationPublishDouble(pub, val)
+helicsPublicationPublishDouble = _helics.helicsPublicationPublishDouble
 
 def helicsPublicationPublishTime(pub: 'helics_publication', val: 'helics_time') -> "void":
     return _helics.helicsPublicationPublishTime(pub, val)
@@ -1398,18 +804,12 @@ def helicsPublicationPublishChar(pub: 'helics_publication', val: 'char') -> "voi
 helicsPublicationPublishChar = _helics.helicsPublicationPublishChar
 
 def helicsPublicationPublishComplex(pub: 'helics_publication', real: 'double', imag: 'double') -> "void":
-    """
-
-
-    """
     return _helics.helicsPublicationPublishComplex(pub, real, imag)
+helicsPublicationPublishComplex = _helics.helicsPublicationPublishComplex
 
 def helicsPublicationPublishVector(pub: 'helics_publication', vectorInput: 'double const *') -> "int":
-    """
-
-
-    """
     return _helics.helicsPublicationPublishVector(pub, vectorInput)
+helicsPublicationPublishVector = _helics.helicsPublicationPublishVector
 
 def helicsPublicationPublishNamedPoint(pub: 'helics_publication', str: 'char const *', val: 'double') -> "void":
     return _helics.helicsPublicationPublishNamedPoint(pub, str, val)
@@ -1528,40 +928,36 @@ def helicsInputGetPublicationType(ipt: 'helics_input') -> "char const *":
 helicsInputGetPublicationType = _helics.helicsInputGetPublicationType
 
 def helicsPublicationGetType(pub: 'helics_publication') -> "char const *":
-    """
-
-
-    """
     return _helics.helicsPublicationGetType(pub)
+helicsPublicationGetType = _helics.helicsPublicationGetType
 
 def helicsInputGetKey(ipt: 'helics_input') -> "char const *":
     return _helics.helicsInputGetKey(ipt)
 helicsInputGetKey = _helics.helicsInputGetKey
 
 def helicsSubscriptionGetKey(ipt: 'helics_input') -> "char const *":
-    """
-
-
-    """
     return _helics.helicsSubscriptionGetKey(ipt)
+helicsSubscriptionGetKey = _helics.helicsSubscriptionGetKey
 
 def helicsPublicationGetKey(pub: 'helics_publication') -> "char const *":
-    """
-
-
-    """
     return _helics.helicsPublicationGetKey(pub)
+helicsPublicationGetKey = _helics.helicsPublicationGetKey
 
 def helicsInputGetUnits(ipt: 'helics_input') -> "char const *":
     return _helics.helicsInputGetUnits(ipt)
 helicsInputGetUnits = _helics.helicsInputGetUnits
 
+def helicsInputGetInjectionUnits(ipt: 'helics_input') -> "char const *":
+    return _helics.helicsInputGetInjectionUnits(ipt)
+helicsInputGetInjectionUnits = _helics.helicsInputGetInjectionUnits
+
+def helicsInputGetExtractionUnits(ipt: 'helics_input') -> "char const *":
+    return _helics.helicsInputGetExtractionUnits(ipt)
+helicsInputGetExtractionUnits = _helics.helicsInputGetExtractionUnits
+
 def helicsPublicationGetUnits(pub: 'helics_publication') -> "char const *":
-    """
-
-
-    """
     return _helics.helicsPublicationGetUnits(pub)
+helicsPublicationGetUnits = _helics.helicsPublicationGetUnits
 
 def helicsInputGetInfo(inp: 'helics_input') -> "char const *":
     return _helics.helicsInputGetInfo(inp)
@@ -1616,18 +1012,12 @@ def helicsFederateGetInputCount(fed: 'helics_federate') -> "int":
 helicsFederateGetInputCount = _helics.helicsFederateGetInputCount
 
 def helicsFederateRegisterEndpoint(fed: 'helics_federate', name: 'char const *', type: 'char const *') -> "helics_endpoint":
-    """
-
-
-    """
     return _helics.helicsFederateRegisterEndpoint(fed, name, type)
+helicsFederateRegisterEndpoint = _helics.helicsFederateRegisterEndpoint
 
 def helicsFederateRegisterGlobalEndpoint(fed: 'helics_federate', name: 'char const *', type: 'char const *') -> "helics_endpoint":
-    """
-
-
-    """
     return _helics.helicsFederateRegisterGlobalEndpoint(fed, name, type)
+helicsFederateRegisterGlobalEndpoint = _helics.helicsFederateRegisterGlobalEndpoint
 
 def helicsFederateGetEndpoint(fed: 'helics_federate', name: 'char const *') -> "helics_endpoint":
     return _helics.helicsFederateGetEndpoint(fed, name)
@@ -1638,71 +1028,40 @@ def helicsFederateGetEndpointByIndex(fed: 'helics_federate', index: 'int') -> "h
 helicsFederateGetEndpointByIndex = _helics.helicsFederateGetEndpointByIndex
 
 def helicsEndpointSetDefaultDestination(endpoint: 'helics_endpoint', dest: 'char const *') -> "void":
-    """
-
-
-    """
     return _helics.helicsEndpointSetDefaultDestination(endpoint, dest)
+helicsEndpointSetDefaultDestination = _helics.helicsEndpointSetDefaultDestination
 
 def helicsEndpointGetDefaultDestination(endpoint: 'helics_endpoint') -> "char const *":
     return _helics.helicsEndpointGetDefaultDestination(endpoint)
 helicsEndpointGetDefaultDestination = _helics.helicsEndpointGetDefaultDestination
 
 def helicsEndpointSendMessageRaw(endpoint: 'helics_endpoint', dest: 'char const *', data: 'void const *') -> "int":
-    """
-
-
-    """
     return _helics.helicsEndpointSendMessageRaw(endpoint, dest, data)
+helicsEndpointSendMessageRaw = _helics.helicsEndpointSendMessageRaw
 
 def helicsEndpointSendEventRaw(endpoint: 'helics_endpoint', dest: 'char const *', data: 'void const *', time: 'helics_time') -> "int":
-    """
-
-
-    """
     return _helics.helicsEndpointSendEventRaw(endpoint, dest, data, time)
+helicsEndpointSendEventRaw = _helics.helicsEndpointSendEventRaw
 
 def helicsEndpointSendMessage(endpoint: 'helics_endpoint', message: 'helics_message') -> "void":
-    """
-
-
-    """
     return _helics.helicsEndpointSendMessage(endpoint, message)
+helicsEndpointSendMessage = _helics.helicsEndpointSendMessage
+
+def helicsEndpointSendMessageObject(endpoint: 'helics_endpoint', message: 'helics_message_object') -> "void":
+    return _helics.helicsEndpointSendMessageObject(endpoint, message)
+helicsEndpointSendMessageObject = _helics.helicsEndpointSendMessageObject
 
 def helicsEndpointSubscribe(endpoint: 'helics_endpoint', key: 'char const *') -> "void":
-    """
-
-
-    subscribe an endpoint to a publication
-
-    Parameters
-    ----------
-    * `endpoint` :
-        the endpoint to use
-    * `key` :
-        the name of the publication
-    * `type` :
-        the type of the publication that is expected (nullptr or "" for DON'T
-        CARE)
-
-    """
     return _helics.helicsEndpointSubscribe(endpoint, key)
+helicsEndpointSubscribe = _helics.helicsEndpointSubscribe
 
 def helicsFederateHasMessage(fed: 'helics_federate') -> "helics_bool":
-    """
-
-
-    check if the federate has any outstanding messages
-
-    """
     return _helics.helicsFederateHasMessage(fed)
+helicsFederateHasMessage = _helics.helicsFederateHasMessage
 
 def helicsEndpointHasMessage(endpoint: 'helics_endpoint') -> "helics_bool":
-    """
-
-
-    """
     return _helics.helicsEndpointHasMessage(endpoint)
+helicsEndpointHasMessage = _helics.helicsEndpointHasMessage
 
 def helicsFederatePendingMessages(fed: 'helics_federate') -> "int":
     return _helics.helicsFederatePendingMessages(fed)
@@ -1713,82 +1072,40 @@ def helicsEndpointPendingMessages(endpoint: 'helics_endpoint') -> "int":
 helicsEndpointPendingMessages = _helics.helicsEndpointPendingMessages
 
 def helicsEndpointGetMessage(endpoint: 'helics_endpoint') -> "helics_message":
-    """
-
-
-    receive a packet from a particular endpoint
-
-    Parameters
-    ----------
-    * `endpoint` :
-        the identifier for the endpoint
-
-    Returns
-    -------
-    a message object
-
-    """
     return _helics.helicsEndpointGetMessage(endpoint)
+helicsEndpointGetMessage = _helics.helicsEndpointGetMessage
+
+def helicsEndpointGetMessageObject(endpoint: 'helics_endpoint') -> "helics_message_object":
+    return _helics.helicsEndpointGetMessageObject(endpoint)
+helicsEndpointGetMessageObject = _helics.helicsEndpointGetMessageObject
 
 def helicsFederateGetMessage(fed: 'helics_federate') -> "helics_message":
-    """
-
-
-    receive a communication message for any endpoint in the federate
-
-    the return order will be in order of endpoint creation then order of arrival all
-    messages for the first endpoint, then all for the second, and so on
-
-    Returns
-    -------
-    a unique_ptr to a Message object containing the message data
-
-    """
     return _helics.helicsFederateGetMessage(fed)
+helicsFederateGetMessage = _helics.helicsFederateGetMessage
+
+def helicsFederateGetMessageObject(fed: 'helics_federate') -> "helics_message_object":
+    return _helics.helicsFederateGetMessageObject(fed)
+helicsFederateGetMessageObject = _helics.helicsFederateGetMessageObject
+
+def helicsFederateCreateMessageObject(fed: 'helics_federate') -> "helics_message_object":
+    return _helics.helicsFederateCreateMessageObject(fed)
+helicsFederateCreateMessageObject = _helics.helicsFederateCreateMessageObject
+
+def helicsFederateClearMessages(fed: 'helics_federate') -> "void":
+    return _helics.helicsFederateClearMessages(fed)
+helicsFederateClearMessages = _helics.helicsFederateClearMessages
+
+def helicsEndpointClearMessages(endpoint: 'helics_endpoint') -> "void":
+    return _helics.helicsEndpointClearMessages(endpoint)
+helicsEndpointClearMessages = _helics.helicsEndpointClearMessages
 
 def helicsEndpointGetType(endpoint: 'helics_endpoint') -> "char const *":
-    """
-
-
-    get the type specified for an endpoint
-
-    Parameters
-    ----------
-    * `endpoint` :
-        the endpoint object in question
-    * `str` :
-        the location where the string is stored
-    * `maxlen` :
-        the maximum string length that can be stored in str
-
-    Returns
-    -------
-    a status variable
-
-    """
     return _helics.helicsEndpointGetType(endpoint)
+helicsEndpointGetType = _helics.helicsEndpointGetType
 
 def helicsEndpointGetName(endpoint: 'helics_endpoint') -> "char const *":
-    """
-
-
-    get the name of an endpoint
-
-    Parameters
-    ----------
-    * `endpoint` :
-        the endpoint object in question
-    * `str` :
-        the location where the string is stored
-    * `maxlen` :
-        the maximum string length that can be stored in str
-
-    Returns
-    -------
-    a status variable
-
-    """
     return _helics.helicsEndpointGetName(endpoint)
+helicsEndpointGetName = _helics.helicsEndpointGetName
 
 def helicsFederateGetEndpointCount(fed: 'helics_federate') -> "int":
     return _helics.helicsFederateGetEndpointCount(fed)
@@ -1810,6 +1127,98 @@ def helicsEndpointGetOption(end: 'helics_endpoint', option: 'int') -> "helics_bo
     return _helics.helicsEndpointGetOption(end, option)
 helicsEndpointGetOption = _helics.helicsEndpointGetOption
 
+def helicsMessageGetSource(message: 'helics_message_object') -> "char const *":
+    return _helics.helicsMessageGetSource(message)
+helicsMessageGetSource = _helics.helicsMessageGetSource
+
+def helicsMessageGetDestination(message: 'helics_message_object') -> "char const *":
+    return _helics.helicsMessageGetDestination(message)
+helicsMessageGetDestination = _helics.helicsMessageGetDestination
+
+def helicsMessageGetOriginalSource(message: 'helics_message_object') -> "char const *":
+    return _helics.helicsMessageGetOriginalSource(message)
+helicsMessageGetOriginalSource = _helics.helicsMessageGetOriginalSource
+
+def helicsMessageGetOriginalDestination(message: 'helics_message_object') -> "char const *":
+    return _helics.helicsMessageGetOriginalDestination(message)
+helicsMessageGetOriginalDestination = _helics.helicsMessageGetOriginalDestination
+
+def helicsMessageGetTime(message: 'helics_message_object') -> "helics_time":
+    return _helics.helicsMessageGetTime(message)
+helicsMessageGetTime = _helics.helicsMessageGetTime
+
+def helicsMessageGetString(message: 'helics_message_object') -> "char const *":
+    return _helics.helicsMessageGetString(message)
+helicsMessageGetString = _helics.helicsMessageGetString
+
+def helicsMessageGetMessageID(message: 'helics_message_object') -> "int":
+    return _helics.helicsMessageGetMessageID(message)
+helicsMessageGetMessageID = _helics.helicsMessageGetMessageID
+
+def helicsMessageCheckFlag(message: 'helics_message_object', flag: 'int') -> "helics_bool":
+    return _helics.helicsMessageCheckFlag(message, flag)
+helicsMessageCheckFlag = _helics.helicsMessageCheckFlag
+
+def helicsMessageGetRawDataSize(message: 'helics_message_object') -> "int":
+    return _helics.helicsMessageGetRawDataSize(message)
+helicsMessageGetRawDataSize = _helics.helicsMessageGetRawDataSize
+
+def helicsMessageGetRawData(message: 'helics_message_object', data: 'void *', maxlen: 'int') -> "int *":
+    return _helics.helicsMessageGetRawData(message, data, maxlen)
+helicsMessageGetRawData = _helics.helicsMessageGetRawData
+
+def helicsMessageIsValid(message: 'helics_message_object') -> "helics_bool":
+    return _helics.helicsMessageIsValid(message)
+helicsMessageIsValid = _helics.helicsMessageIsValid
+
+def helicsMessageSetSource(message: 'helics_message_object', src: 'char const *') -> "void":
+    return _helics.helicsMessageSetSource(message, src)
+helicsMessageSetSource = _helics.helicsMessageSetSource
+
+def helicsMessageSetDestination(message: 'helics_message_object', dest: 'char const *') -> "void":
+    return _helics.helicsMessageSetDestination(message, dest)
+helicsMessageSetDestination = _helics.helicsMessageSetDestination
+
+def helicsMessageSetOriginalSource(message: 'helics_message_object', src: 'char const *') -> "void":
+    return _helics.helicsMessageSetOriginalSource(message, src)
+helicsMessageSetOriginalSource = _helics.helicsMessageSetOriginalSource
+
+def helicsMessageSetOriginalDestination(message: 'helics_message_object', dest: 'char const *') -> "void":
+    return _helics.helicsMessageSetOriginalDestination(message, dest)
+helicsMessageSetOriginalDestination = _helics.helicsMessageSetOriginalDestination
+
+def helicsMessageSetTime(message: 'helics_message_object', time: 'helics_time') -> "void":
+    return _helics.helicsMessageSetTime(message, time)
+helicsMessageSetTime = _helics.helicsMessageSetTime
+
+def helicsMessageReserve(message: 'helics_message_object', reserveSize: 'int') -> "void":
+    return _helics.helicsMessageReserve(message, reserveSize)
+helicsMessageReserve = _helics.helicsMessageReserve
+
+def helicsMessageSetMessageID(message: 'helics_message_object', messageID: 'int32_t') -> "void":
+    return _helics.helicsMessageSetMessageID(message, messageID)
+helicsMessageSetMessageID = _helics.helicsMessageSetMessageID
+
+def helicsMessageClearFlags(message: 'helics_message_object') -> "void":
+    return _helics.helicsMessageClearFlags(message)
+helicsMessageClearFlags = _helics.helicsMessageClearFlags
+
+def helicsMessageSetFlagOption(message: 'helics_message_object', flag: 'int', flagValue: 'helics_bool') -> "void":
+    return _helics.helicsMessageSetFlagOption(message, flag, flagValue)
+helicsMessageSetFlagOption = _helics.helicsMessageSetFlagOption
+
+def helicsMessageSetString(message: 'helics_message_object', str: 'char const *') -> "void":
+    return _helics.helicsMessageSetString(message, str)
+helicsMessageSetString = _helics.helicsMessageSetString
+
+def helicsMessageSetData(message: 'helics_message_object', data: 'void const *') -> "int":
+    return _helics.helicsMessageSetData(message, data)
+helicsMessageSetData = _helics.helicsMessageSetData
+
+def helicsMessageAppendData(message: 'helics_message_object', data: 'void const *') -> "int":
+    return _helics.helicsMessageAppendData(message, data)
+helicsMessageAppendData = _helics.helicsMessageAppendData
+
 def helicsFederateRegisterFilter(fed: 'helics_federate', type: 'helics_filter_type', name: 'char const *') -> "helics_filter":
     return _helics.helicsFederateRegisterFilter(fed, type, name)
 helicsFederateRegisterFilter = _helics.helicsFederateRegisterFilter
@@ -1819,11 +1228,8 @@ def helicsFederateRegisterGlobalFilter(fed: 'helics_federate', type: 'helics_fil
 helicsFederateRegisterGlobalFilter = _helics.helicsFederateRegisterGlobalFilter
 
 def helicsFederateRegisterCloningFilter(fed: 'helics_federate', deliveryEndpoint: 'char const *') -> "helics_filter":
-    """
-
-
-    """
     return _helics.helicsFederateRegisterCloningFilter(fed, deliveryEndpoint)
+helicsFederateRegisterCloningFilter = _helics.helicsFederateRegisterCloningFilter
 
 def helicsFederateRegisterGlobalCloningFilter(fed: 'helics_federate', deliveryEndpoint: 'char const *') -> "helics_filter":
     return _helics.helicsFederateRegisterGlobalCloningFilter(fed, deliveryEndpoint)
@@ -1834,11 +1240,8 @@ def helicsCoreRegisterFilter(core: 'helics_core', type: 'helics_filter_type', na
 helicsCoreRegisterFilter = _helics.helicsCoreRegisterFilter
 
 def helicsCoreRegisterCloningFilter(core: 'helics_core', deliveryEndpoint: 'char const *') -> "helics_filter":
-    """
-
-
-    """
     return _helics.helicsCoreRegisterCloningFilter(core, deliveryEndpoint)
+helicsCoreRegisterCloningFilter = _helics.helicsCoreRegisterCloningFilter
 
 def helicsFederateGetFilterCount(fed: 'helics_federate') -> "int":
     return _helics.helicsFederateGetFilterCount(fed)
@@ -1853,56 +1256,36 @@ def helicsFederateGetFilterByIndex(fed: 'helics_federate', index: 'int') -> "hel
 helicsFederateGetFilterByIndex = _helics.helicsFederateGetFilterByIndex
 
 def helicsFilterGetName(filt: 'helics_filter') -> "char const *":
-    """
-
-
-    get the name of the filter
-
-    """
     return _helics.helicsFilterGetName(filt)
+helicsFilterGetName = _helics.helicsFilterGetName
 
 def helicsFilterSet(filt: 'helics_filter', prop: 'char const *', val: 'double') -> "void":
-    """
-
-
-    """
     return _helics.helicsFilterSet(filt, prop, val)
+helicsFilterSet = _helics.helicsFilterSet
 
 def helicsFilterSetString(filt: 'helics_filter', prop: 'char const *', val: 'char const *') -> "void":
     return _helics.helicsFilterSetString(filt, prop, val)
 helicsFilterSetString = _helics.helicsFilterSetString
 
 def helicsFilterAddDestinationTarget(filt: 'helics_filter', dest: 'char const *') -> "void":
-    """
-
-
-    """
     return _helics.helicsFilterAddDestinationTarget(filt, dest)
+helicsFilterAddDestinationTarget = _helics.helicsFilterAddDestinationTarget
 
 def helicsFilterAddSourceTarget(filt: 'helics_filter', source: 'char const *') -> "void":
-    """
-
-
-    """
     return _helics.helicsFilterAddSourceTarget(filt, source)
+helicsFilterAddSourceTarget = _helics.helicsFilterAddSourceTarget
 
 def helicsFilterAddDeliveryEndpoint(filt: 'helics_filter', deliveryEndpoint: 'char const *') -> "void":
-    """
-
-
-    """
     return _helics.helicsFilterAddDeliveryEndpoint(filt, deliveryEndpoint)
+helicsFilterAddDeliveryEndpoint = _helics.helicsFilterAddDeliveryEndpoint
 
 def helicsFilterRemoveTarget(filt: 'helics_filter', target: 'char const *') -> "void":
     return _helics.helicsFilterRemoveTarget(filt, target)
 helicsFilterRemoveTarget = _helics.helicsFilterRemoveTarget
 
 def helicsFilterRemoveDeliveryEndpoint(filt: 'helics_filter', deliveryEndpoint: 'char const *') -> "void":
-    """
-
-
-    """
     return _helics.helicsFilterRemoveDeliveryEndpoint(filt, deliveryEndpoint)
+helicsFilterRemoveDeliveryEndpoint = _helics.helicsFilterRemoveDeliveryEndpoint
 
 def helicsFilterGetInfo(filt: 'helics_filter') -> "char const *":
     return _helics.helicsFilterGetInfo(filt)

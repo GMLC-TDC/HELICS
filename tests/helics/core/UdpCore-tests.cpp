@@ -38,10 +38,10 @@ TEST (UdpCore_tests, udpComms_broker_test)
 
     udp::socket rxSocket (AsioContextManager::getContext (), udp::endpoint (udp::v4 (), 23901));
 
-    comm.setCallback ([&counter](helics::ActionMessage /*m*/) { ++counter; });
+    comm.setCallback ([&counter] (helics::ActionMessage /*m*/) { ++counter; });
     comm.setBrokerPort (UDP_BROKER_PORT);
     comm.setName ("tests");
-    auto confut = std::async (std::launch::async, [&comm]() { return comm.connect (); });
+    auto confut = std::async (std::launch::async, [&comm] () { return comm.connect (); });
 
     std::vector<char> data (1024);
 
@@ -76,7 +76,7 @@ TEST (UdpCore_tests, udpComms_broker_test_transmit)
     udp::socket rxSocket (AsioContextManager::getContext (), udp::endpoint (udp::v4 (), 23901));
 
     EXPECT_TRUE (rxSocket.is_open ());
-    comm.setCallback ([&counter](helics::ActionMessage /*m*/) { ++counter; });
+    comm.setCallback ([&counter] (helics::ActionMessage /*m*/) { ++counter; });
     comm.setBrokerPort (UDP_BROKER_PORT);
     comm.setPortNumber (UDP_SECONDARY_PORT);
     comm.setName ("tests");
@@ -113,7 +113,7 @@ TEST (UdpCore_tests, udpComms_rx_test)
     udp::socket rxSocket (AsioContextManager::getContext (), udp::endpoint (udp::v4 (), 23901));
 
     EXPECT_TRUE (rxSocket.is_open ());
-    comm.setCallback ([&counter, &act](helics::ActionMessage m) {
+    comm.setCallback ([&counter, &act] (helics::ActionMessage m) {
         ++counter;
         act = m;
     });
@@ -162,11 +162,11 @@ TEST (UdpCore_tests, udpComm_transmit_through)
     comm2.setPortNumber (UDP_BROKER_PORT);
     comm.setPortNumber (UDP_SECONDARY_PORT);
 
-    comm.setCallback ([&counter, &act](helics::ActionMessage m) {
+    comm.setCallback ([&counter, &act] (helics::ActionMessage m) {
         ++counter;
         act = m;
     });
-    comm2.setCallback ([&counter2, &act2](helics::ActionMessage m) {
+    comm2.setCallback ([&counter2, &act2] (helics::ActionMessage m) {
         ++counter2;
         act2 = m;
     });
@@ -221,15 +221,15 @@ TEST (UdpCore_tests, udpComm_transmit_add_route)
     guarded<helics::ActionMessage> act2;
     guarded<helics::ActionMessage> act3;
 
-    comm.setCallback ([&counter, &act](helics::ActionMessage &&m) {
+    comm.setCallback ([&counter, &act] (helics::ActionMessage &&m) {
         ++counter;
         act = std::move (m);
     });
-    comm2.setCallback ([&counter2, &act2](helics::ActionMessage &&m) {
+    comm2.setCallback ([&counter2, &act2] (helics::ActionMessage &&m) {
         ++counter2;
         act2 = std::move (m);
     });
-    comm3.setCallback ([&counter3, &act3](helics::ActionMessage &&m) {
+    comm3.setCallback ([&counter3, &act3] (helics::ActionMessage &&m) {
         ++counter3;
         act3 = std::move (m);
     });
@@ -338,7 +338,7 @@ TEST (UdpCore_tests, udpCore_core_broker_default_test)
 
     auto ccore = static_cast<helics::udp::UdpCore *> (core.get ());
     // this will test the automatic port allocation
-    EXPECT_EQ (ccore->getAddress (), "localhost:23961");
+    EXPECT_EQ (ccore->getAddress (), "localhost:23921");
     core->disconnect ();
     broker->disconnect ();
     core = nullptr;

@@ -229,6 +229,10 @@ public class helics {
     helicsJNI.helicsFederateInfoSetCoreInitString(SWIGTYPE_p_void.getCPtr(fi), coreInit);
   }
 
+  public static void helicsFederateInfoSetBrokerInitString(SWIGTYPE_p_void fi, String brokerInit) {
+    helicsJNI.helicsFederateInfoSetBrokerInitString(SWIGTYPE_p_void.getCPtr(fi), brokerInit);
+  }
+
   public static void helicsFederateInfoSetCoreType(SWIGTYPE_p_void fi, int coretype) {
     helicsJNI.helicsFederateInfoSetCoreType(SWIGTYPE_p_void.getCPtr(fi), coretype);
   }
@@ -239,6 +243,10 @@ public class helics {
 
   public static void helicsFederateInfoSetBroker(SWIGTYPE_p_void fi, String broker) {
     helicsJNI.helicsFederateInfoSetBroker(SWIGTYPE_p_void.getCPtr(fi), broker);
+  }
+
+  public static void helicsFederateInfoSetBrokerKey(SWIGTYPE_p_void fi, String brokerkey) {
+    helicsJNI.helicsFederateInfoSetBrokerKey(SWIGTYPE_p_void.getCPtr(fi), brokerkey);
   }
 
   public static void helicsFederateInfoSetBrokerPort(SWIGTYPE_p_void fi, int brokerPort) {
@@ -348,6 +356,10 @@ public class helics {
 
   public static double helicsFederateRequestTime(SWIGTYPE_p_void fed, double requestTime) {
     return helicsJNI.helicsFederateRequestTime(SWIGTYPE_p_void.getCPtr(fed), requestTime);
+  }
+
+  public static double helicsFederateRequestTimeAdvance(SWIGTYPE_p_void fed, double timeDelta) {
+    return helicsJNI.helicsFederateRequestTimeAdvance(SWIGTYPE_p_void.getCPtr(fed), timeDelta);
   }
 
   public static double helicsFederateRequestNextStep(SWIGTYPE_p_void fed) {
@@ -713,6 +725,14 @@ public class helics {
     return helicsJNI.helicsInputGetUnits(SWIGTYPE_p_void.getCPtr(ipt));
   }
 
+  public static String helicsInputGetInjectionUnits(SWIGTYPE_p_void ipt) {
+    return helicsJNI.helicsInputGetInjectionUnits(SWIGTYPE_p_void.getCPtr(ipt));
+  }
+
+  public static String helicsInputGetExtractionUnits(SWIGTYPE_p_void ipt) {
+    return helicsJNI.helicsInputGetExtractionUnits(SWIGTYPE_p_void.getCPtr(ipt));
+  }
+
   public static String helicsPublicationGetUnits(SWIGTYPE_p_void pub) {
     return helicsJNI.helicsPublicationGetUnits(SWIGTYPE_p_void.getCPtr(pub));
   }
@@ -809,6 +829,10 @@ public class helics {
     helicsJNI.helicsEndpointSendMessage(SWIGTYPE_p_void.getCPtr(endpoint), helics_message.getCPtr(message), message);
   }
 
+  public static void helicsEndpointSendMessageObject(SWIGTYPE_p_void endpoint, SWIGTYPE_p_void message) {
+    helicsJNI.helicsEndpointSendMessageObject(SWIGTYPE_p_void.getCPtr(endpoint), SWIGTYPE_p_void.getCPtr(message));
+  }
+
   public static void helicsEndpointSubscribe(SWIGTYPE_p_void endpoint, String key) {
     helicsJNI.helicsEndpointSubscribe(SWIGTYPE_p_void.getCPtr(endpoint), key);
   }
@@ -833,8 +857,31 @@ public class helics {
     return new helics_message(helicsJNI.helicsEndpointGetMessage(SWIGTYPE_p_void.getCPtr(endpoint)), true);
   }
 
+  public static SWIGTYPE_p_void helicsEndpointGetMessageObject(SWIGTYPE_p_void endpoint) {
+    long cPtr = helicsJNI.helicsEndpointGetMessageObject(SWIGTYPE_p_void.getCPtr(endpoint));
+    return (cPtr == 0) ? null : new SWIGTYPE_p_void(cPtr, false);
+  }
+
   public static helics_message helicsFederateGetMessage(SWIGTYPE_p_void fed) {
     return new helics_message(helicsJNI.helicsFederateGetMessage(SWIGTYPE_p_void.getCPtr(fed)), true);
+  }
+
+  public static SWIGTYPE_p_void helicsFederateGetMessageObject(SWIGTYPE_p_void fed) {
+    long cPtr = helicsJNI.helicsFederateGetMessageObject(SWIGTYPE_p_void.getCPtr(fed));
+    return (cPtr == 0) ? null : new SWIGTYPE_p_void(cPtr, false);
+  }
+
+  public static SWIGTYPE_p_void helicsFederateCreateMessageObject(SWIGTYPE_p_void fed) {
+    long cPtr = helicsJNI.helicsFederateCreateMessageObject(SWIGTYPE_p_void.getCPtr(fed));
+    return (cPtr == 0) ? null : new SWIGTYPE_p_void(cPtr, false);
+  }
+
+  public static void helicsFederateClearMessages(SWIGTYPE_p_void fed) {
+    helicsJNI.helicsFederateClearMessages(SWIGTYPE_p_void.getCPtr(fed));
+  }
+
+  public static void helicsEndpointClearMessages(SWIGTYPE_p_void endpoint) {
+    helicsJNI.helicsEndpointClearMessages(SWIGTYPE_p_void.getCPtr(endpoint));
   }
 
   public static String helicsEndpointGetType(SWIGTYPE_p_void endpoint) {
@@ -863,6 +910,98 @@ public class helics {
 
   public static int helicsEndpointGetOption(SWIGTYPE_p_void end, int option) {
     return helicsJNI.helicsEndpointGetOption(SWIGTYPE_p_void.getCPtr(end), option);
+  }
+
+  public static String helicsMessageGetSource(SWIGTYPE_p_void message) {
+    return helicsJNI.helicsMessageGetSource(SWIGTYPE_p_void.getCPtr(message));
+  }
+
+  public static String helicsMessageGetDestination(SWIGTYPE_p_void message) {
+    return helicsJNI.helicsMessageGetDestination(SWIGTYPE_p_void.getCPtr(message));
+  }
+
+  public static String helicsMessageGetOriginalSource(SWIGTYPE_p_void message) {
+    return helicsJNI.helicsMessageGetOriginalSource(SWIGTYPE_p_void.getCPtr(message));
+  }
+
+  public static String helicsMessageGetOriginalDestination(SWIGTYPE_p_void message) {
+    return helicsJNI.helicsMessageGetOriginalDestination(SWIGTYPE_p_void.getCPtr(message));
+  }
+
+  public static double helicsMessageGetTime(SWIGTYPE_p_void message) {
+    return helicsJNI.helicsMessageGetTime(SWIGTYPE_p_void.getCPtr(message));
+  }
+
+  public static String helicsMessageGetString(SWIGTYPE_p_void message) {
+    return helicsJNI.helicsMessageGetString(SWIGTYPE_p_void.getCPtr(message));
+  }
+
+  public static int helicsMessageGetMessageID(SWIGTYPE_p_void message) {
+    return helicsJNI.helicsMessageGetMessageID(SWIGTYPE_p_void.getCPtr(message));
+  }
+
+  public static int helicsMessageCheckFlag(SWIGTYPE_p_void message, int flag) {
+    return helicsJNI.helicsMessageCheckFlag(SWIGTYPE_p_void.getCPtr(message), flag);
+  }
+
+  public static int helicsMessageGetRawDataSize(SWIGTYPE_p_void message) {
+    return helicsJNI.helicsMessageGetRawDataSize(SWIGTYPE_p_void.getCPtr(message));
+  }
+
+  public static void helicsMessageGetRawData(SWIGTYPE_p_void message, SWIGTYPE_p_void data, int maxlen, int[] actualSize) {
+    helicsJNI.helicsMessageGetRawData(SWIGTYPE_p_void.getCPtr(message), SWIGTYPE_p_void.getCPtr(data), maxlen, actualSize);
+  }
+
+  public static int helicsMessageIsValid(SWIGTYPE_p_void message) {
+    return helicsJNI.helicsMessageIsValid(SWIGTYPE_p_void.getCPtr(message));
+  }
+
+  public static void helicsMessageSetSource(SWIGTYPE_p_void message, String src) {
+    helicsJNI.helicsMessageSetSource(SWIGTYPE_p_void.getCPtr(message), src);
+  }
+
+  public static void helicsMessageSetDestination(SWIGTYPE_p_void message, String dest) {
+    helicsJNI.helicsMessageSetDestination(SWIGTYPE_p_void.getCPtr(message), dest);
+  }
+
+  public static void helicsMessageSetOriginalSource(SWIGTYPE_p_void message, String src) {
+    helicsJNI.helicsMessageSetOriginalSource(SWIGTYPE_p_void.getCPtr(message), src);
+  }
+
+  public static void helicsMessageSetOriginalDestination(SWIGTYPE_p_void message, String dest) {
+    helicsJNI.helicsMessageSetOriginalDestination(SWIGTYPE_p_void.getCPtr(message), dest);
+  }
+
+  public static void helicsMessageSetTime(SWIGTYPE_p_void message, double time) {
+    helicsJNI.helicsMessageSetTime(SWIGTYPE_p_void.getCPtr(message), time);
+  }
+
+  public static void helicsMessageReserve(SWIGTYPE_p_void message, int reserveSize) {
+    helicsJNI.helicsMessageReserve(SWIGTYPE_p_void.getCPtr(message), reserveSize);
+  }
+
+  public static void helicsMessageSetMessageID(SWIGTYPE_p_void message, SWIGTYPE_p_int32_t messageID) {
+    helicsJNI.helicsMessageSetMessageID(SWIGTYPE_p_void.getCPtr(message), SWIGTYPE_p_int32_t.getCPtr(messageID));
+  }
+
+  public static void helicsMessageClearFlags(SWIGTYPE_p_void message) {
+    helicsJNI.helicsMessageClearFlags(SWIGTYPE_p_void.getCPtr(message));
+  }
+
+  public static void helicsMessageSetFlagOption(SWIGTYPE_p_void message, int flag, int flagValue) {
+    helicsJNI.helicsMessageSetFlagOption(SWIGTYPE_p_void.getCPtr(message), flag, flagValue);
+  }
+
+  public static void helicsMessageSetString(SWIGTYPE_p_void message, String str) {
+    helicsJNI.helicsMessageSetString(SWIGTYPE_p_void.getCPtr(message), str);
+  }
+
+  public static void helicsMessageSetData(SWIGTYPE_p_void message, SWIGTYPE_p_void data, int inputDataLength) {
+    helicsJNI.helicsMessageSetData(SWIGTYPE_p_void.getCPtr(message), SWIGTYPE_p_void.getCPtr(data), inputDataLength);
+  }
+
+  public static void helicsMessageAppendData(SWIGTYPE_p_void message, SWIGTYPE_p_void data, int inputDataLength) {
+    helicsJNI.helicsMessageAppendData(SWIGTYPE_p_void.getCPtr(message), SWIGTYPE_p_void.getCPtr(data), inputDataLength);
   }
 
   public static SWIGTYPE_p_void helicsFederateRegisterFilter(SWIGTYPE_p_void fed, helics_filter_type type, String name) {

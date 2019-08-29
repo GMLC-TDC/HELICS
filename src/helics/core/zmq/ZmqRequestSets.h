@@ -22,7 +22,7 @@ namespace zeromq
 class WaitingResponse
 {
   public:
-    int route;  //!< the route identifier for the socket
+    int route=0;  //!< the route identifier for the socket
     std::uint16_t loops = 0;  //!< the number of loops
     bool waiting = false;  //!< whether the response is waiting
     ActionMessage txmsg;  //!< the most recently sent message

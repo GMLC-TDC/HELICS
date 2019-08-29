@@ -7,10 +7,37 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 A note on future revisions.  
   Everything within a major version number should be code compatible (with the exception of experimental interfaces).  The most notable example of an experimental interface is the support for multiple source inputs.  The APIs to deal with this will change in future minor releases.  Everything within a single minor release should be network compatible with other federates on the same minor release number.  Compatibility across minor release numbers may be possible in some situations but we are not going to guarantee this as those components are subject to performance improvements and may need to be modified at some point.  Patch releases will be limited to bug fixes and other improvements not impacting the public API or network compatibility.  Check [here](./docs/Public_API.md) for details on what is included and excluded from the public API and version stability.
 
+
+## \[2.2.0\] ~ 2019-08-26
+Minor release with some updates to the networking portion of HELICS and some API additions.
+
+### Changed
+-   Submodule updates for filesystem, libfmt, and google test 
+-   A utilities lib containing many string processing and small functions is now used instead of directly including it.  
+
+### Fixed
+-   A error response to a core registration will immediately generate an error on federates waiting for registration instead of waiting for a timeout
+-   HELICS can now compile with standalone mingw and cygwin 32 bit on Windows. ASIO is not compatible with Cygwin 64 bit so no support for that is expected in the near future.  Tests in travis exercise the MinGW build.  
+-   Some issues with the ZMQ core generating an error on close due to incorrect builds of ZMQ in some installations.  
+-   Some changes to the network interface selection process that cause issues on certain platforms.  
+
+### Added
+-   The ability to specify a broker key for brokers and cores to limit linking to those cores with the appropriate key
+-   A units library into HELICS,  mismatched units are checked and units published as a double with units on the publication and subscription converted internally
+-   A new API for messages in the C interface.  The old interface has difficulties when working with binary data in the message structure.  So a message object API was created with appropriate methods to access the data.  The previous message API will be deprecated in release 2.3 and removed in 3.0.  
+-  A clone app for cloning an existing federate including all publications and subscriptions and all data that is being sent out.  It is accessible through the helics_app clone subcommand
+-  CI tests using docker for clang memory sanitizer and the octave interface.
+-  Scripts for generating a single zip file with all the code including submodules.  This will be generated for each new release.  
+-  A broker server that generate multiple brokers on a single system and handles the port allocation intelligently. (Only ZMQ currently supported, this is not backwards compatible, though regular 2.2 brokers should work with 2.1 federates if needed.)
+- A Docker image containing the HELICS apps (available on Docker Hub for tagged releases and the latest develop branch at https://hub.docker.com/r/helics/helics)
+
+### Removed
+-   ENABLE_SWIG option in cmake as always ON.  This option will only appear for interfaces that have existing build files.  For swig generated interfaces that do not have prebuilt files (octave, python2, and C#) this option will no longer appear as swig is required.  
+
 ## \[2.1.1\] - 2019-07-15
 Minor release which fixes a few bugs and add some JSON related input and queries
 
-## Changed
+### Changed
 -   moved concurrency related structures to a standalone library
 -   System-tests is now based on google test instead of boost test
 -   Shared_libary_cpp tests now based on google_test instead of boost test

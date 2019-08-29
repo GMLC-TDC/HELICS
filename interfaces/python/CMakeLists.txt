@@ -99,6 +99,8 @@ else()
     string(STRIP ${pymodule_includes} pymodule_includes)
     string(REPLACE " " ";" pymodule_includes "${pymodule_includes}")
     target_compile_options(helicsPYTHON PUBLIC ${pymodule_includes})
+	copy_key_files_to_target_location(helicsPYTHON PUBLIC)
+    copy_shared_target(helicsPYTHON PUBLIC)
   endif()
 
   # Set the output library name to _helics
@@ -121,5 +123,4 @@ else()
 endif()
 
 install(FILES ${CMAKE_CURRENT_BINARY_DIR}/helics.py DESTINATION python COMPONENT python)
-install(FILES $<TARGET_FILE:helicsSharedLib> DESTINATION python COMPONENT python)
-install(FILES ${KEY_LIBRARY_FILES} DESTINATION python COMPONENT python)
+install_key_files_with_comp(python)

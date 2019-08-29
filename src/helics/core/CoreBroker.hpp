@@ -41,7 +41,7 @@ class BasicFedInfo
     global_federate_id global_id;  //!< the identification code for the federate
     route_id route;  //!< the routing information for data to be sent to the federate
     global_broker_id parent;  //!< the id of the parent broker/core
-    bool isDisconnected = false;
+    bool isDisconnected = false;  //!< flag indicating the federate is disconnected
     explicit BasicFedInfo (const std::string &fedname) : name (fedname){};
 };
 
@@ -153,6 +153,12 @@ class CoreBroker : public Broker, public BrokerBase
     void executeInitializationOperations ();
     /** get an index for an airlock, function is threadsafe*/
     uint16_t getNextAirlockIndex ();
+    /** verify the broker key contained in a message
+    @return false if the keys do not match*/
+    bool verifyBrokerKey (ActionMessage &mess) const;
+    /** verify the broker key contained in a string
+    @return false if the keys do not match*/
+    bool verifyBrokerKey (const std::string &key) const;
 
   public:
     /** connect the core to its broker
@@ -180,7 +186,7 @@ class CoreBroker : public Broker, public BrokerBase
     virtual bool isOpenToNewFederates () const override;
 
     virtual void setLoggingCallback (
-      const std::function<void (int, const std::string &, const std::string &)> &logFunction) override final;
+      const std::function<void(int, const std::string &, const std::string &)> &logFunction) override final;
 
     virtual bool
     waitForDisconnect (std::chrono::milliseconds msToWait = std::chrono::milliseconds (0)) const override final;
@@ -285,6 +291,8 @@ class CoreBroker : public Broker, public BrokerBase
     void processLocalQuery (const ActionMessage &m);
     /** generate an actual response string to a query*/
     std::string generateQueryAnswer (const std::string &request);
+    /** generate a list of names of interfaces from a list of global_ids in a string*/
+    std::string getNameList (std::string gidString) const;
     /** locate the route to take to a particular federate*/
     route_id getRoute (global_federate_id fedid) const;
     /** locate the route to take to a particular federate*/

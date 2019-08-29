@@ -13,7 +13,7 @@ namespace helics
 MessageTimer::MessageTimer (std::function<void(ActionMessage &&)> sFunction)
     : sendFunction (std::move (sFunction)), contextPtr (AsioContextManager::getContextPointer ()),loopHandle(contextPtr->startContextLoop())
 {
-
+	
 }
 
 static void

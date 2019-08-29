@@ -74,6 +74,20 @@ if (NOT TARGET HELICS::jsoncpp_headers)
     )
 endif()
 
+if (NOT TARGET HELICS::utilities)
+	add_library(HELICS::utilities INTERFACE IMPORTED )
+	set_target_properties(HELICS::utilities PROPERTIES
+       INTERFACE_INCLUDE_DIRECTORIES ${CMAKE_CURRENT_LIST_DIR}/../../../@CMAKE_INSTALL_INCLUDEDIR@/helics/
+    )
+	set_target_properties(HELICS::utilities PROPERTIES
+       INTERFACE_LINK_LIBRARIES "HELICS::helics-static"
+    )
+else()
+set_target_properties(HELICS::utilities PROPERTIES
+       INTERFACE_INCLUDE_DIRECTORIES ${CMAKE_CURRENT_LIST_DIR}/../../../@CMAKE_INSTALL_INCLUDEDIR@/helics/
+    )
+endif()
+
 check_required_components(${PN})
 
 get_target_property(${PN}_INCLUDE_DIRS HELICS::helics_base_includes INTERFACE_INCLUDE_DIRECTORIES)
