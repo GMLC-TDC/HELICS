@@ -876,7 +876,7 @@ set(LICENSE_LIST
 )
 
 if(BUILD_HELICS_TESTS)
-	list(APPEND LICENSE_LIST "Google Test" "${PROJECT_SOURCE_DIR}/ThirdParty/googletest/LICENSE"
+	list(APPEND LICENSE_LIST "Google Test" "${PROJECT_SOURCE_DIR}/ThirdParty/googletest/LICENSE")
 endif()
 
 if (EXISTS ${PROJECT_BINARY_DIR}/_deps/libzmq-src)
