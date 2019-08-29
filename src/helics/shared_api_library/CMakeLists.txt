@@ -83,7 +83,8 @@ else()
 	set(HELICS_EXCLUSION_COMMAND )
 endif()
 
- install(
+if(WIN32)
+  install(
     FILES $<TARGET_LINKER_FILE:helicsSharedLib>
     DESTINATION ${CMAKE_INSTALL_LIBDIR}
     COMPONENT libs ${HELICS_EXCLUSION_COMMAND}
@@ -94,6 +95,14 @@ endif()
     COMPONENT
     Runtime ${HELICS_EXCLUSION_COMMAND}
   )
+else()
+  install(
+    TARGETS helicsSharedLib
+    DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    COMPONENT
+    Runtime ${HELICS_EXCLUSION_COMMAND}
+  )
+endif()
 
 
 install(
