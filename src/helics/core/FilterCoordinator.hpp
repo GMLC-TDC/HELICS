@@ -6,7 +6,7 @@ SPDX-License-Identifier: BSD-3-Clause
 */
 #pragma once
 
-#include "Core.hpp"
+#include "global_federate_id.hpp"
 
 #include <vector>
 namespace helics

@@ -5,12 +5,16 @@ the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 #pragma once
+#include "helics/helics-config.h"
 
 #include "../core/helics-time.hpp"
-#include "helics/helics-config.h"
+
 #include "helicsTypes.hpp"
 
 #include "../helics_enums.h"
+
+#include "../core/federate_id.hpp"
+
 #include "FederateInfo.hpp"
 #include <atomic>
 #include <functional>
@@ -74,7 +78,7 @@ class Federate
     std::unique_ptr<FilterFederateManager> fManager;  //!< class for managing filter operations
     std::string name;  //!< the name of the federate
 
-public:
+  public:
     /**constructor taking a federate information structure
     @param fedname the name of the federate can be empty to use a name from the federateInfo
     @param fi  a federate information structure
@@ -249,7 +253,7 @@ public:
     A string indicating the source of the message and another string with the actual message
     */
     void
-    setLoggingCallback (const std::function<void (int, const std::string &, const std::string &)> &logFunction);
+    setLoggingCallback (const std::function<void(int, const std::string &, const std::string &)> &logFunction);
 
     /** make a query of the core
     @details this call is blocking until the value is returned which make take some time depending on the size of
@@ -504,15 +508,15 @@ public:
 
     /** log a message to the federate Logger
    @param level the logging level of the message
-   @param logMessageSource- the name of the object that sent the message
    @param message the message to log
    */
-    virtual void logMessage (int level, const std::string &logMessageSource, const std::string &message) const;
+    virtual void logMessage (int level, const std::string &message) const;
 
     /** log a simplified message to the federate Logger
     @param message the message to log
     */
-    virtual void logMessage (const std::string &message) const;
+    virtual void logMessage (const std::string &message) const { logMessage (-2, message); }
+
   private:
     /** register filter interfaces defined in  file or string
   @details call is only valid in startup mode

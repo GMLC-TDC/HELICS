@@ -83,9 +83,6 @@ Federate::Federate (const std::string &fedName, const FederateInfo &fi) : name (
     currentTime = coreObject->getCurrentTime (fedID);
     asyncCallInfo = std::make_unique<shared_guarded_m<AsyncFedCallInfo>> ();
     fManager = std::make_unique<FilterFederateManager> (coreObject.get (), this, fedID);
-    setLoggingCallback([this](int /*level*/, const std::string &ident, const std::string &message) {
-        coreObject->sendToLogger (parent_broker_id, -2, ident, message);
-    });
 }
 
 Federate::Federate (const std::string &fedName, const std::shared_ptr<Core> &core, const FederateInfo &fi)
@@ -1314,12 +1311,9 @@ std::string const &Federate::getInfo (interface_handle handle)
     return (coreObject) ? coreObject->getInterfaceInfo (handle) : emptyStr;
 }
 
-void Federate::logMessage(int level, const std::string &logMessageSource, const std::string &message) const {
-    coreObject->logMessage(fedID, level, message);
+void Federate::logMessage (int level, const std::string &message) const
+{
+    coreObject->logMessage (fedID, level, message);
 }
-
-    void Federate::logMessage(const std::string &message) const {
-        logMessage(-2, "", message);
-    }
 
 }  // namespace helics
