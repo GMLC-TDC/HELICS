@@ -5,7 +5,7 @@ ARG MAKE_PARALLEL
 
 WORKDIR /root/develop
 ADD . /root/develop/HELICS
-RUN echo "====Printing ENV====" && printenv && echo "====ls HELICS src====" && ls /root/develop/HELICS && echo "====ls /====" && ls / && echo "====ls /mnt====" && ls /mnt && echo "====ls ~====" && ls ~
+RUN echo "====Printing ENV====" && printenv && echo "====ls HELICS src====" && ls /root/develop/HELICS && echo "====ls====" && ls && echo "====ls develop====" && ls develop && echo "====ls ~====" && ls ~
 
 RUN apt update && apt install -y \
   libboost-dev \
