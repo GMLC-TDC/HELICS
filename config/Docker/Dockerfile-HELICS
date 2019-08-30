@@ -10,7 +10,7 @@ ENV DOCKER_REPO=
 ENV DOCKERFILE_PATH= 
 
 WORKDIR /root/develop
-ADD . /root/develop/HELICS
+COPY . /root/develop/HELICS
 RUN echo "====Printing ENV====" && printenv && echo "====ls HELICS src====" && ls /root/develop/HELICS && echo "====ls====" && ls && echo "====ls /root/develop/HELICS====" && ls /root/develop/HELICS && echo "====ls ~====" && ls ~
 
 RUN apt update && apt install -y \
