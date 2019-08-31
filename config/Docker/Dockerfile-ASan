@@ -5,9 +5,8 @@ ARG MAKE_PARALLEL
 
 RUN apt update && apt install -y \
   libboost-dev \
-  libboost-test-dev \
   python3-dev \
-  build-essential clang cmake git wget subversion vim
+  build-essential clang cmake git wget subversion vim && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /root/develop
 
@@ -17,8 +16,16 @@ RUN (cd llvm/projects && svn co http://llvm.org/svn/llvm-project/libcxxabi/trunk
 
 RUN  mkdir libcxx_asan && cd libcxx_asan &&  cmake ../llvm -DCMAKE_BUILD_TYPE=Release -DLLVM_USE_SANITIZER=Address -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++
 RUN cd libcxx_asan && make cxx -j${MAKE_PARALLEL:-2}
+
+FROM ubuntu:18.04
+
+COPY --from=builder /root/develop/libcxx /root/develop/libcxx
 ENV ASAN_CFLAGS="-fsanitize=undefined,address -stdlib=libc++ -L/root/develop/libcxx_asan/lib -lc++abi -I/root/develop/libcxx_asan/include -I/root/develop/libcxx_asan/include/c++/v1 -Wno-unused-command-line-argument -fno-omit-frame-pointer -g -O1 -Wl,-rpath=/root/develop/libcxx_asan/lib"
 
+RUN apt update && apt install -y \
+  libboost-dev \
+  clang cmake make git vim && rm -rf /var/lib/apt/lists/*
+  
 RUN rm -rf llvm
 # Create script to build helics
 RUN printf "#!/bin/bash \
@@ -35,12 +42,12 @@ RUN printf "#!/bin/bash \
 \n" > /root/develop/buildhelics.sh
 RUN chmod 775 /root/develop/buildhelics.sh
 
+RUN ln -s /usr/bin/llvm-symbolizer-6.0 /usr/bin/llvm-symbolizer
 
-
-ENV PYTHONPATH /usr/local/python
+#ENV PYTHONPATH /usr/local/python
 
 # Python must be installed after the PYTHONPATH is set above for it to
 # recognize and import libhelicsSharedLib.so.
-RUN apt install -y --no-install-recommends python3-dev \
-  && rm -rf /var/lib/apt/lists/*
+#RUN apt install -y --no-install-recommends python3-dev \
+#  && rm -rf /var/lib/apt/lists/*
 
