@@ -24,6 +24,9 @@ set(
 add_library(helicsCpp98 INTERFACE)
 target_link_libraries(helicsCpp98 INTERFACE helicsSharedLib)
 add_library(HELICS::helicsCpp98 ALIAS helicsCpp98)
+target_include_directories(helicsCpp98 INTERFACE $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/src/helics>
+        $<INSTALL_INTERFACE:$<INSTALL_PREFIX>/include>)
+
 
 # this is purely so the files show up nicely in an IDE, other ides might use it as well
 # but that can be added when/if the need arises
