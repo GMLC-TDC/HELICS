@@ -1,11 +1,13 @@
 /*
 Copyright © 2017-2019,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
-All rights reserved. See LICENSE file and DISCLAIMER for more details.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
+the top-level NOTICE for additional details. All rights reserved.
+SPDX-License-Identifier: BSD-3-Clause
 */
 #include "TcpCommsCommon.h"
-#include "../../common/AsioServiceManager.h"
+#include "../../common/AsioContextManager.h"
 #include "../ActionMessage.hpp"
+#include "../CommsInterface.hpp"
 #include "../NetworkBrokerData.hpp"
 #include "TcpHelperClasses.h"
 #include <memory>
@@ -14,7 +16,7 @@ namespace helics
 {
 namespace tcp
 {
-TcpConnection::pointer makeConnection (boost::asio::io_service &io_service,
+TcpConnection::pointer makeConnection (asio::io_context &io_context,
                                        const std::string &connection,
                                        const std::string &port,
                                        size_t bufferSize,
@@ -25,7 +27,7 @@ TcpConnection::pointer makeConnection (boost::asio::io_service &io_service,
     auto tick = steady_clock::now ();
     milliseconds timeRemaining (timeOut);
     milliseconds timeRemPrev (timeOut);
-    TcpConnection::pointer connectionPtr = TcpConnection::create (io_service, connection, port, bufferSize);
+    TcpConnection::pointer connectionPtr = TcpConnection::create (io_context, connection, port, bufferSize);
     int trycnt = 1;
     while (!connectionPtr->waitUntilConnected (timeRemaining))
     {
@@ -49,9 +51,28 @@ TcpConnection::pointer makeConnection (boost::asio::io_service &io_service,
 
         // lets try to connect again
         ++trycnt;
-        connectionPtr = TcpConnection::create (io_service, connection, port, bufferSize);
+        connectionPtr = TcpConnection::create (io_context, connection, port, bufferSize);
     }
     return connectionPtr;
 }
+
+bool commErrorHandler (CommsInterface *comm,
+                       std::shared_ptr<TcpConnection> /*connection*/,
+                       const std::error_code &error)
+{
+    if (comm->isConnected ())
+    {
+        if ((error != asio::error::eof) && (error != asio::error::operation_aborted))
+        {
+            if (error != asio::error::connection_reset)
+            {
+                comm->logError ("error message while connected " + error.message () + "code " +
+                                std::to_string (error.value ()));
+            }
+        }
+    }
+    return false;
+}
+
 }  // namespace tcp
 }  // namespace helics

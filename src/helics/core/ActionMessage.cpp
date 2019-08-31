@@ -1,7 +1,8 @@
 /*
 Copyright © 2017-2019,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
-All rights reserved. See LICENSE file and DISCLAIMER for more details.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
+the top-level NOTICE for additional details. All rights reserved.
+SPDX-License-Identifier: BSD-3-Clause
 */
 #include "ActionMessage.hpp"
 #include "../common/fmt_format.h"
@@ -21,10 +22,8 @@ ActionMessage::ActionMessage (action_message_def::action_t startingAction)
 ActionMessage::ActionMessage (action_message_def::action_t startingAction,
                               global_federate_id sourceId,
                               global_federate_id destId)
-    : ActionMessage (startingAction)
+    : messageAction (startingAction), source_id (sourceId), dest_id (destId), name (payload)
 {
-    source_id = sourceId;
-    dest_id = destId;
 }
 
 ActionMessage::ActionMessage (ActionMessage &&act) noexcept
@@ -129,7 +128,7 @@ void ActionMessage::setString (int index, const std::string &str)
     {
         if (index >= static_cast<int> (stringData.size ()))
         {
-            stringData.resize (index + 1);
+            stringData.resize (static_cast<size_t>(index) + 1);
         }
         stringData[index] = str;
     }
@@ -251,7 +250,7 @@ std::string ActionMessage::packetize () const
 void ActionMessage::packetize (std::string &data) const
 {
     auto sz = serializedByteCount ();
-    data.resize (sz + 4);
+    data.resize (static_cast<size_t>(sz) + 4);
     toByteArray (&(data[4]), sz);
 
     data[0] = LEADING_CHAR;
@@ -323,29 +322,40 @@ int ActionMessage::fromByteArray (const char *data, int buffer_size)
     }
     bool swap = (data[0] != littleEndian);
     data += sizeof (uint32_t);
-    messageAction = *reinterpret_cast<const action_message_def::action_t *> (data);
+    memcpy (&messageAction, data, sizeof (action_message_def::action_t));
+    // messageAction = *reinterpret_cast<const action_message_def::action_t *> (data);
     if (swap)
     {
         swap_bytes<4> (reinterpret_cast<std::uint8_t *> (&messageAction));
     }
     data += sizeof (action_message_def::action_t);
-    messageID = *reinterpret_cast<const int32_t *> (data);
+    // messageID = *reinterpret_cast<const int32_t *> (data);
+    memcpy (&messageID, data, sizeof (int32_t));
     data += sizeof (int32_t);
-    source_id = global_federate_id{*reinterpret_cast<const int32_t *> (data)};
+    // source_id = global_federate_id{*reinterpret_cast<const int32_t *> (data)};
+    memcpy (&source_id, data, sizeof (int32_t));
     data += sizeof (int32_t);
-    source_handle = interface_handle{*reinterpret_cast<const int32_t *> (data)};
+    // source_handle = interface_handle{*reinterpret_cast<const int32_t *> (data)};
+    memcpy (&source_handle, data, sizeof (int32_t));
     data += sizeof (int32_t);
-    dest_id = global_federate_id{*reinterpret_cast<const int32_t *> (data)};
+    // dest_id = global_federate_id{*reinterpret_cast<const int32_t *> (data)};
+    memcpy (&dest_id, data, sizeof (int32_t));
     data += sizeof (int32_t);
-    dest_handle = interface_handle{*reinterpret_cast<const int32_t *> (data)};
+    // dest_handle = interface_handle{*reinterpret_cast<const int32_t *> (data)};
+    memcpy (&dest_handle, data, sizeof (int32_t));
     data += sizeof (int32_t);
-    counter = *reinterpret_cast<const uint16_t *> (data);
+    // counter = *reinterpret_cast<const uint16_t *> (data);
+    memcpy (&counter, data, sizeof (uint16_t));
     data += sizeof (uint16_t);
-    flags = *reinterpret_cast<const uint16_t *> (data);
+    // flags = *reinterpret_cast<const uint16_t *> (data);
+    memcpy (&flags, data, sizeof (uint16_t));
     data += sizeof (uint16_t);
-    sequenceID = *reinterpret_cast<const uint32_t *> (data);
+    // sequenceID = *reinterpret_cast<const uint32_t *> (data);
+    memcpy (&sequenceID, data, sizeof (uint32_t));
     data += sizeof (uint32_t);
-    actionTime.setBaseTimeCode (*reinterpret_cast<const int64_t *> (data));
+    int64_t btc;
+    memcpy (&btc, data, sizeof (int64_t));
+    actionTime.setBaseTimeCode (btc);
     data += sizeof (int64_t);
 
     if (messageAction == CMD_TIME_REQUEST)
@@ -356,11 +366,14 @@ int ActionMessage::fromByteArray (const char *data, int buffer_size)
             messageAction = CMD_INVALID;
             return (0);
         }
-        Te.setBaseTimeCode (*reinterpret_cast<const int64_t *> (data));
+        memcpy (&btc, data, sizeof (int64_t));
+        Te.setBaseTimeCode (btc);
         data += sizeof (int64_t);
-        Tdemin.setBaseTimeCode (*reinterpret_cast<const int64_t *> (data));
+        memcpy (&btc, data, sizeof (int64_t));
+        Tdemin.setBaseTimeCode (btc);
         data += sizeof (int64_t);
-        Tso.setBaseTimeCode (*reinterpret_cast<const int64_t *> (data));
+        memcpy (&btc, data, sizeof (int64_t));
+        Tso.setBaseTimeCode (btc);
         data += sizeof (int64_t);
     }
     else
@@ -388,7 +401,8 @@ int ActionMessage::fromByteArray (const char *data, int buffer_size)
 
         for (int ii = 0; ii < stringCount; ++ii)
         {
-            auto ssize = *reinterpret_cast<const uint32_t *> (data);
+            uint32_t ssize;
+            memcpy (&ssize, data, sizeof (uint32_t));
             data += 4;
             if (swap)
             {
@@ -658,12 +672,15 @@ const char *actionMessageType (action_message_def::action_t action)
     }
     return static_cast<const char *> (unknownStr);
 }
+
 // set of strings to translate error codes to something sensible
-static constexpr std::pair<int, const char *> errorStrings[] = {{-2, "connection error"},
-                                                                {-5, "lost connection with server"},
-                                                                {5, "already in initialization mode"},
-                                                                {6, "duplicate federate name detected"},
-                                                                {7, "duplicate broker name detected"}};
+static constexpr std::pair<int, const char *> errorStrings[] = {
+  {connection_error_code, "connection error"},
+  {lost_server_connection_code, "lost connection with server"},
+  {already_init_error_code, "already in initialization mode"},
+  {duplicate_federate_name_error_code, "duplicate federate name detected"},
+  {duplicate_broker_name_error_code, "duplicate broker name detected"},
+  {mismatch_broker_key_error_code, "Broker key does not match"}};
 
 using errorPair = std::pair<int, const char *>;
 static constexpr size_t errEnd = sizeof (errorStrings) / sizeof (errorPair);
@@ -679,6 +696,20 @@ const char *commandErrorString (int errorcode)
         return res->second;
     }
     return static_cast<const char *> (unknownStr);
+}
+
+std::string errorMessageString (const ActionMessage &command)
+{
+    if (checkActionFlag (command, error_flag))
+    {
+        auto &estring = command.getString (0);
+        if (estring.empty ())
+        {
+            return commandErrorString (command.messageID);
+        }
+        return estring;
+    }
+    return std::string{};
 }
 
 std::string prettyPrintString (const ActionMessage &command)

@@ -1,7 +1,8 @@
 /*
 Copyright © 2017-2019,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
-All rights reserved. See LICENSE file and DISCLAIMER for more details.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
+the top-level NOTICE for additional details. All rights reserved.
+SPDX-License-Identifier: BSD-3-Clause
 */
 
 #pragma once
@@ -18,29 +19,6 @@ class CloningFilter;
 
 namespace apps
 {
-/** helper class for capturing data points*/
-class ValueCapture
-{
-  public:
-    helics::Time time;
-    int index = -1;
-    int16_t iteration = 0;
-    bool first = false;
-    std::string value;
-    ValueCapture () = default;
-    ValueCapture (helics::Time t1, int id1, const std::string &val) : time (t1), index (id1), value (val){};
-};
-
-/** helper class for displaying statistics*/
-class ValueStats
-{
-  public:
-    helics::Time time = helics::Time::minVal ();
-    std::string lastVal;
-    std::string key;
-    int cnt = 0;
-};
-
 /** class designed to capture data points from a set of subscriptions or endpoints*/
 class Recorder : public App
 {
@@ -49,7 +27,11 @@ class Recorder : public App
     @param name the name of the Recorder, can be left empty for the default or to pull from the federateInfo object
     @param fi  a federate information structure
     */
-    explicit Recorder (const std::string &name, FederateInfo &fi);
+    Recorder (const std::string &name, FederateInfo &fi);
+    /** construct from command line arguments in a vector
+   @param args the command line arguments to pass in a reverse vector
+   */
+    explicit Recorder (std::vector<std::string> args);
     /** construct from command line arguments*/
     Recorder (int argc, char *argv[]);
 
@@ -102,9 +84,6 @@ class Recorder : public App
     std::unique_ptr<Message> getMessage (int index) const;
 
   private:
-    /** load arguments through a variable map created through command line arguments
-     */
-    int loadArguments (boost::program_options::variables_map &vm_map);
     /** load from a jsonString
     @param jsonString either a JSON filename or a string containing JSON
     */
@@ -122,8 +101,35 @@ class Recorder : public App
     void loadCaptureInterfaces ();
     /** encode the string in base64 if needed otherwise just return the string*/
     std::string encode (const std::string &str2encode);
+    /** build the command line argument processing application*/
+    std::shared_ptr<helicsCLI11App> buildArgParserApp ();
+    /** process remaining command line arguments*/
+    void processArgs ();
 
   protected:
+    /** helper class for capturing data points*/
+    class ValueCapture
+    {
+      public:
+        helics::Time time;
+        int index = -1;
+        int16_t iteration = 0;
+        bool first = false;
+        std::string value;
+        ValueCapture () = default;
+        ValueCapture (helics::Time t1, int id1, const std::string &val) : time (t1), index (id1), value (val){};
+    };
+
+    /** helper class for displaying statistics*/
+    class ValueStats
+    {
+      public:
+        helics::Time time = helics::Time::minVal ();
+        std::string lastVal;
+        std::string key;
+        int cnt = 0;
+    };
+
     bool allow_iteration = false;  //!< trigger to allow Iteration
     bool verbose = false;  //!< print all captured values to the screen
     Time nextPrintTimeStep = helics::timeZero;  //!< the time advancement period for printing markers
@@ -140,7 +146,7 @@ class Recorder : public App
     std::vector<ValueStats> vStat;  //!< storage for statistics capture
     std::vector<std::string> captureInterfaces;  //!< storage for the interfaces to capture
     std::string mapfile;  //!< file name for the on-line file updater
-    std::string outFileName;  //!< the final output file
+    std::string outFileName{"out.txt"};  //!< the final output file
 };
 
 }  // namespace apps

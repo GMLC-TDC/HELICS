@@ -1,7 +1,8 @@
 /*
 Copyright © 2017-2019,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
-All rights reserved. See LICENSE file and DISCLAIMER for more details.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
+the top-level NOTICE for additional details. All rights reserved.
+SPDX-License-Identifier: BSD-3-Clause
 */
 #include "ctestFixtures.hpp"
 #include "helics/shared_api_library/internal/api_objects.h"
@@ -109,7 +110,7 @@ FederateTestFixture::~FederateTestFixture ()
 
 helics_broker FederateTestFixture::AddBroker (const std::string &core_type_name, int count)
 {
-    return AddBroker (core_type_name, std::to_string (count));
+    return AddBroker (core_type_name, std::string ("-f") + std::to_string (count));
 }
 
 helics_broker
@@ -124,9 +125,7 @@ FederateTestFixture::AddBroker (const std::string &core_type_name, const std::st
     {
         broker = StartBrokerImp (core_type_name, initialization_string + " " + extraBrokerArgs);
     }
-    BOOST_CHECK (nullptr != broker);
-    auto BrokerObj = reinterpret_cast<helics::BrokerObject *> (broker);
-    BOOST_CHECK (BrokerObj->valid == brokerValidationIdentifier);
+    BOOST_CHECK (helicsBrokerIsValid (broker) == helics_true);
     brokers.push_back (broker);
     return broker;
 }

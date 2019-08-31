@@ -1,36 +1,40 @@
 /*
 Copyright © 2017-2019,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
-All rights reserved. See LICENSE file and DISCLAIMER for more details.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
+the top-level NOTICE for additional details. All rights reserved.
+SPDX-License-Identifier: BSD-3-Clause
 */
+
+#define ENABLE_TRIPWIRE
+
 #include "BrokerFactory.hpp"
-#include "../common/TripWire.hpp"
-#include "../common/delayedDestructor.hpp"
-#include "../common/searchableObjectHolder.hpp"
 #include "core-exceptions.hpp"
 #include "core-types.hpp"
+#include "gmlc/concurrency/DelayedDestructor.hpp"
+#include "gmlc/concurrency/SearchableObjectHolder.hpp"
+#include "gmlc/concurrency/TripWire.hpp"
 #include "helics/helics-config.h"
-#if HELICS_HAVE_ZEROMQ
+#ifdef ENABLE_ZMQ_CORE
 #include "zmq/ZmqBroker.h"
 #endif
 
-#if HELICS_HAVE_MPI
+#ifdef ENABLE_MPI_CORE
 #include "mpi/MpiBroker.h"
 #endif
 
-#ifndef DISABLE_TEST_CORE
+#ifdef ENABLE_TEST_CORE
 #include "test/TestBroker.h"
 #endif
 
-#ifndef DISABLE_IPC_CORE
+#ifdef ENABLE_IPC_CORE
 #include "ipc/IpcBroker.h"
 #endif
 
-#ifndef DISABLE_UDP_CORE
+#ifdef ENABLE_UDP_CORE
 #include "udp/UdpBroker.h"
 #endif
 
-#ifndef DISABLE_TCP_CORE
+#ifdef ENABLE_TCP_CORE
 #include "tcp/TcpBroker.h"
 #endif
 
@@ -38,19 +42,24 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 
 namespace helics
 {
+const std::string emptyString;
 std::shared_ptr<Broker> makeBroker (core_type type, const std::string &name)
 {
     std::shared_ptr<Broker> broker;
 
     if (type == core_type::DEFAULT)
     {
-#if HELICS_HAVE_ZEROMQ
+#ifdef ENABLE_ZMQ_CORE
         type = core_type::ZMQ;
 #else
-#ifndef DISABLE_TCP_CORE
+#ifdef ENABLE_TCP_CORE
         type = core_type::TCP;
 #else
+#ifdef ENABLE_MPI_CORE
+        type = core_type::MPI;
+#else
         type = core_type::UDP;
+#endif
 #endif
 #endif
     }
@@ -58,7 +67,7 @@ std::shared_ptr<Broker> makeBroker (core_type type, const std::string &name)
     switch (type)
     {
     case core_type::ZMQ:
-#if HELICS_HAVE_ZEROMQ
+#ifdef ENABLE_ZMQ_CORE
         if (name.empty ())
         {
             broker = std::make_shared<zeromq::ZmqBroker> ();
@@ -73,7 +82,7 @@ std::shared_ptr<Broker> makeBroker (core_type type, const std::string &name)
 #endif
         break;
     case core_type::ZMQ_SS:
-#if HELICS_HAVE_ZEROMQ
+#ifdef ENABLE_ZMQ_CORE
         if (name.empty ())
         {
             broker = std::make_shared<zeromq::ZmqBrokerSS> ();
@@ -87,7 +96,7 @@ std::shared_ptr<Broker> makeBroker (core_type type, const std::string &name)
 #endif
         break;
     case core_type::MPI:
-#if HELICS_HAVE_MPI
+#ifdef ENABLE_MPI_CORE
         if (name.empty ())
         {
             broker = std::make_shared<mpi::MpiBroker> ();
@@ -101,7 +110,7 @@ std::shared_ptr<Broker> makeBroker (core_type type, const std::string &name)
 #endif
         break;
     case core_type::TEST:
-#ifndef DISABLE_TEST_CORE
+#ifdef ENABLE_TEST_CORE
         if (name.empty ())
         {
             broker = std::make_shared<testcore::TestBroker> ();
@@ -116,7 +125,7 @@ std::shared_ptr<Broker> makeBroker (core_type type, const std::string &name)
 #endif
     case core_type::INTERPROCESS:
     case core_type::IPC:
-#ifndef DISABLE_IPC_CORE
+#ifdef ENABLE_IPC_CORE
         if (name.empty ())
         {
             broker = std::make_shared<ipc::IpcBroker> ();
@@ -130,7 +139,7 @@ std::shared_ptr<Broker> makeBroker (core_type type, const std::string &name)
         throw (HelicsException ("ipc broker type is not available"));
 #endif
     case core_type::UDP:
-#ifndef DISABLE_UDP_CORE
+#ifdef ENABLE_UDP_CORE
         if (name.empty ())
         {
             broker = std::make_shared<udp::UdpBroker> ();
@@ -144,7 +153,7 @@ std::shared_ptr<Broker> makeBroker (core_type type, const std::string &name)
         throw (HelicsException ("udp broker type is not available"));
 #endif
     case core_type::TCP:
-#ifndef DISABLE_TCP_CORE
+#ifdef ENABLE_TCP_CORE
         if (name.empty ())
         {
             broker = std::make_shared<tcp::TcpBroker> ();
@@ -158,7 +167,7 @@ std::shared_ptr<Broker> makeBroker (core_type type, const std::string &name)
 #endif
         break;
     case core_type::TCP_SS:
-#ifndef DISABLE_TCP_CORE
+#ifdef ENABLE_TCP_CORE
         if (name.empty ())
         {
             broker = std::make_shared<tcp::TcpBrokerSS> ();
@@ -179,24 +188,19 @@ std::shared_ptr<Broker> makeBroker (core_type type, const std::string &name)
 
 namespace BrokerFactory
 {
-std::shared_ptr<Broker> create (core_type type, const std::string &initializationString)
+std::shared_ptr<Broker> create (core_type type, const std::string &configureString)
 {
-    auto broker = makeBroker (type, std::string ());
-    broker->initialize (initializationString);
-    bool reg = registerBroker (broker);
-    if (!reg)
-    {
-        throw (helics::RegistrationFailure ("unable to register broker"));
-    }
-    broker->connect ();
-    return broker;
+    return create (type, emptyString, configureString);
 }
 
-std::shared_ptr<Broker>
-create (core_type type, const std::string &broker_name, const std::string &initializationString)
+std::shared_ptr<Broker> create (core_type type, const std::string &broker_name, const std::string &configureString)
 {
     auto broker = makeBroker (type, broker_name);
-    broker->initialize (initializationString);
+    if (!broker)
+    {
+        throw (helics::RegistrationFailure ("unable to create broker"));
+    }
+    broker->configure (configureString);
     bool reg = registerBroker (broker);
     if (!reg)
     {
@@ -206,23 +210,33 @@ create (core_type type, const std::string &broker_name, const std::string &initi
     return broker;
 }
 
-std::shared_ptr<Broker> create (core_type type, int argc, const char *const *argv)
+std::shared_ptr<Broker> create (core_type type, int argc, char *argv[])
 {
-    auto broker = makeBroker (type, "");
-    broker->initializeFromArgs (argc, argv);
-    bool reg = registerBroker (broker);
-    if (!reg)
-    {
-        throw (helics::RegistrationFailure ("unable to register broker"));
-    }
-    broker->connect ();
-    return broker;
+    return create (type, emptyString, argc, argv);
 }
 
-std::shared_ptr<Broker> create (core_type type, const std::string &broker_name, int argc, const char *const *argv)
+std::shared_ptr<Broker> create (core_type type, const std::string &broker_name, int argc, char *argv[])
 {
     auto broker = makeBroker (type, broker_name);
-    broker->initializeFromArgs (argc, argv);
+    broker->configureFromArgs (argc, argv);
+    bool reg = registerBroker (broker);
+    if (!reg)
+    {
+        throw (helics::RegistrationFailure ("unable to register broker"));
+    }
+    broker->connect ();
+    return broker;
+}
+
+std::shared_ptr<Broker> create (core_type type, std::vector<std::string> args)
+{
+    return create (type, emptyString, std::move (args));
+}
+
+std::shared_ptr<Broker> create (core_type type, const std::string &broker_name, std::vector<std::string> args)
+{
+    auto broker = makeBroker (type, broker_name);
+    broker->configureFromVector (std::move (args));
     bool reg = registerBroker (broker);
     if (!reg)
     {
@@ -234,10 +248,14 @@ std::shared_ptr<Broker> create (core_type type, const std::string &broker_name, 
 
 /** lambda function to join cores before the destruction happens to avoid potential problematic calls in the
  * loops*/
-static auto destroyerCallFirst = [](auto &broker) {
-    broker->processDisconnect (
-      true);  // use true here as it is possible the searchableObjectHolder is deleted already
-    broker->joinAllThreads ();
+static auto destroyerCallFirst = [] (auto &broker) {
+    auto tbroker = std::dynamic_pointer_cast<CoreBroker> (broker);
+    if (tbroker)
+    {
+        tbroker->processDisconnect (
+          true);  // use true here as it is possible the searchableObjectHolder is deleted already
+        tbroker->joinAllThreads ();
+    }
 };
 /** so the problem this is addressing is that unregister can potentially cause a destructor to fire
 that destructor can delete a thread variable, unfortunately it is possible that a thread stored in this variable
@@ -245,13 +263,14 @@ can do the unregister operation and destroy itself meaning it is unable to join 
 what we do is delay the destruction until it is called in a different thread which allows the destructor to fire if
 need be without issue*/
 
-static DelayedDestructor<CoreBroker>
+static gmlc::concurrency::DelayedDestructor<Broker>
   delayedDestroyer (destroyerCallFirst);  //!< the object handling the delayed destruction
 
-static SearchableObjectHolder<CoreBroker> searchableObjects;  //!< the object managing the searchable objects
+static gmlc::concurrency::SearchableObjectHolder<Broker>
+  searchableObjects;  //!< the object managing the searchable objects
 
 // this will trip the line when it is destroyed at global destruction time
-static tripwire::TripWireTrigger tripTrigger;
+static gmlc::concurrency::TripWireTrigger tripTrigger;
 
 std::shared_ptr<Broker> findBroker (const std::string &brokerName)
 {
@@ -265,38 +284,38 @@ static bool isJoinableBrokerOfType (core_type type, const std::shared_ptr<Broker
         switch (type)
         {
         case core_type::ZMQ:
-#if HELICS_HAVE_ZEROMQ
+#ifdef ENABLE_ZMQ_CORE
             return (dynamic_cast<zeromq::ZmqBroker *> (ptr.get ()) != nullptr);
 #else
             break;
 #endif
         case core_type::MPI:
-#if HELICS_HAVE_MPI
+#ifdef ENABLE_MPI_CORE
             return (dynamic_cast<mpi::MpiBroker *> (ptr.get ()) != nullptr);
 #else
             break;
 #endif
         case core_type::TEST:
-#ifndef DISABLE_TEST_CORE
+#ifdef ENABLE_TEST_CORE
             return (dynamic_cast<testcore::TestBroker *> (ptr.get ()) != nullptr);
 #else
             return false;
 #endif
         case core_type::INTERPROCESS:
         case core_type::IPC:
-#ifndef DISABLE_IPC_CORE
+#ifdef ENABLE_IPC_CORE
             return (dynamic_cast<ipc::IpcBroker *> (ptr.get ()) != nullptr);
 #else
             return false;
 #endif
         case core_type::UDP:
-#ifndef DISABLE_UDP_CORE
+#ifdef ENABLE_UDP_CORE
             return (dynamic_cast<udp::UdpBroker *> (ptr.get ()) != nullptr);
 #else
             return false;
 #endif
         case core_type::TCP:
-#ifndef DISABLE_TCP_CORE
+#ifdef ENABLE_TCP_CORE
             return (dynamic_cast<tcp::TcpBroker *> (ptr.get ()) != nullptr);
 #else
             return false;
@@ -310,26 +329,29 @@ static bool isJoinableBrokerOfType (core_type type, const std::shared_ptr<Broker
 
 std::shared_ptr<Broker> findJoinableBrokerOfType (core_type type)
 {
-    return searchableObjects.findObject ([type](auto &ptr) { return isJoinableBrokerOfType (type, ptr); });
+    return searchableObjects.findObject ([type] (auto &ptr) { return isJoinableBrokerOfType (type, ptr); });
 }
+
+std::vector<std::shared_ptr<Broker>> getAllBrokers () { return searchableObjects.getObjects (); }
+
+bool brokersActive () { return !searchableObjects.empty (); }
 
 bool registerBroker (const std::shared_ptr<Broker> &broker)
 {
     bool registered = false;
-    auto tbroker = std::dynamic_pointer_cast<CoreBroker> (broker);
-    if (tbroker)
+    if (broker)
     {
-        registered = searchableObjects.addObject (tbroker->getIdentifier (), tbroker);
+        registered = searchableObjects.addObject (broker->getIdentifier (), broker);
     }
     cleanUpBrokers ();
-    if ((!registered)&&(tbroker))
+    if ((!registered) && (broker))
     {
         std::this_thread::sleep_for (std::chrono::milliseconds (200));
-        registered = searchableObjects.addObject (tbroker->getIdentifier (), tbroker);
+        registered = searchableObjects.addObject (broker->getIdentifier (), broker);
     }
     if (registered)
     {
-        delayedDestroyer.addObjectsToBeDestroyed (tbroker);
+        delayedDestroyer.addObjectsToBeDestroyed (broker);
     }
 
     return registered;
@@ -347,68 +369,29 @@ void unregisterBroker (const std::string &name)
 {
     if (!searchableObjects.removeObject (name))
     {
-        searchableObjects.removeObject ([&name](auto &obj) { return (obj->getIdentifier () == name); });
+        searchableObjects.removeObject ([&name] (auto &obj) { return (obj->getIdentifier () == name); });
     }
 }
 
+static const std::string helpStr{"--help"};
+
 void displayHelp (core_type type)
 {
-    switch (type)
+    if (type == core_type::DEFAULT || type == core_type::UNRECOGNIZED)
     {
-    case core_type::ZMQ:
-#if HELICS_HAVE_ZEROMQ
-        zeromq::ZmqBroker::displayHelp (true);
+        std::cout << "All core types have similar options\n";
+        auto brk = makeBroker (core_type::DEFAULT, emptyString);
+        brk->configure (helpStr);
+#ifdef ENABLE_TCP_CORE
+        brk = makeBroker (core_type::TCP_SS, emptyString);
+        brk->configure (helpStr);
 #endif
-        break;
-    case core_type::MPI:
-#if HELICS_HAVE_MPI
-        mpi::MpiBroker::displayHelp (true);
-#endif
-        break;
-    case core_type::TEST:
-#ifndef DISABLE_TEST_CORE
-        testcore::TestBroker::displayHelp (true);
-#endif
-        break;
-    case core_type::INTERPROCESS:
-    case core_type::IPC:
-#ifndef DISABLE_IPC_CORE
-        ipc::IpcBroker::displayHelp (true);
-#endif
-        break;
-    case core_type::TCP:
-#ifndef DISABLE_TCP_CORE
-        tcp::TcpBroker::displayHelp (true);
-#endif
-        break;
-    case core_type::UDP:
-#ifndef DISABLE_UDP_CORE
-        udp::UdpBroker::displayHelp (true);
-#endif
-        break;
-    default:
-#if HELICS_HAVE_ZEROMQ
-        zeromq::ZmqBroker::displayHelp (true);
-#endif
-#if HELICS_HAVE_MPI
-        mpi::MpiBroker::displayHelp (true);
-#endif
-#ifndef DISABLE_IPC_CORE
-        ipc::IpcBroker::displayHelp (true);
-#endif
-#ifndef DISABLE_TEST_CORE
-        testcore::TestBroker::displayHelp (true);
-#endif
-#ifndef DISABLE_TCP_CORE
-        tcp::TcpBroker::displayHelp (true);
-#endif
-#ifndef DISABLE_UDP_CORE
-        udp::UdpBroker::displayHelp (true);
-#endif
-        break;
     }
-
-    CoreBroker::displayHelp ();
+    else
+    {
+        auto brk = makeBroker (type, emptyString);
+        brk->configure (helpStr);
+    }
 }
 
 }  // namespace BrokerFactory

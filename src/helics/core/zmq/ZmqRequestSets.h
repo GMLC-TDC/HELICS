@@ -1,14 +1,15 @@
 /*
 Copyright © 2017-2019,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
-All rights reserved. See LICENSE file and DISCLAIMER for more details.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
+the top-level NOTICE for additional details. All rights reserved.
+SPDX-License-Identifier: BSD-3-Clause
 */
 #pragma once
 
-#include "../../common/cppzmq/zmq.hpp"
 #include "../../common/zmqContextManager.h"
 #include "../ActionMessage.hpp"
-#include "helics_includes/optional.hpp"
+#include "gmlc/containers/extra/optional.hpp"
+#include "cppzmq/zmq.hpp"
 #include <deque>
 #include <map>
 #include <string>
@@ -21,7 +22,7 @@ namespace zeromq
 class WaitingResponse
 {
   public:
-    int route;  //!< the route identifier for the socket
+    int route=0;  //!< the route identifier for the socket
     std::uint16_t loops = 0;  //!< the number of loops
     bool waiting = false;  //!< whether the response is waiting
     ActionMessage txmsg;  //!< the most recently sent message

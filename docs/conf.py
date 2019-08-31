@@ -1,7 +1,7 @@
-#!/usr/bin/env python3
+﻿#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 #
-# HELICS-src documentation build configuration file, created by
+# HELICS documentation build configuration file, created by
 # sphinx-quickstart on Wed Dec 13 12:07:08 2017.
 #
 # This file is execfile()d with the current directory set to its
@@ -32,7 +32,6 @@
 # ones.
 import os
 import sphinx_rtd_theme
-from sphinxcontrib.pandoc_markdown import MarkdownParser
 
 current_directory = os.path.dirname(os.path.realpath(__file__))
 
@@ -59,19 +58,31 @@ def which(program):
 
     return None
 
-if which("pandoc") is None:
-    import warnings
-    warnings.warn("`pandoc` not found in PATH. Please consider installing Pandoc or consult the developer documentation")
-    from recommonmark.parser import CommonMarkParser as MarkdownParser
+import subprocess
 
+read_the_docs_build = os.environ.get('READTHEDOCS', None) == 'True'
+
+if read_the_docs_build:
+    dir_name = os.path.realpath(os.path.dirname(__file__))
+    subprocess.call("cd {dir_name} && make rtddoxygen".format(dir_name=dir_name), shell=True)
+    html_extra_path = [os.path.abspath(os.path.join(dir_name, "../rtd-doxygen"))]
 
 extensions = [
+    'sphinx.ext.autodoc',
+    'sphinx.ext.doctest',
+    'sphinx.ext.intersphinx',
+    'sphinx.ext.coverage',
     'sphinx.ext.mathjax',
+    'sphinx.ext.viewcode',
     'sphinx.ext.githubpages',
+    'sphinx.ext.napoleon',
     'nbsphinx',
     'IPython.sphinxext.ipython_console_highlighting',
     'breathe',
 ]
+
+from recommonmark.parser import CommonMarkParser
+from recommonmark.transform import AutoStructify
 
 breathe_projects = {
     "helics": os.path.abspath(os.path.join(current_directory, "./../build-doxygen/docs/xml")),
@@ -85,17 +96,18 @@ templates_path = ['_templates']
 # The suffix(es) of source filenames.
 # You can specify multiple suffix as a list of string:
 #
-source_suffix = ['.rst', '.md']
-# source_suffix = '.rst'
 
-source_parsers = {'.md': MarkdownParser}
+source_parsers = {
+    '.md': CommonMarkParser,
+}
+source_suffix = ['.rst', '.md']
 
 # The master toctree document.
 master_doc = 'index'
 
 # General information about the project.
-project = 'HELICS-src'
-copyright = 'Copyright © 2017-2018,\nBattelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC\nAll rights reserved. See LICENSE file and DISCLAIMER for more details.'
+project = 'HELICS'
+copyright = 'Copyright © 2017-2019,\nBattelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.See the top-level NOTICE for additional details.\nAll rights reserved.\nSPDX-License-Identifier: BSD-3-Clause\n'
 author = 'Philip Top, Jeff Daily, Ryan Mast, Dheepak Krishnamurthy, Andrew Fisher, Himanshu Jain, Bryan Palmintier, Jason Fuller'
 
 # The version info for the project you're documenting, acts as replacement for
@@ -165,7 +177,7 @@ html_sidebars = {
 # -- Options for HTMLHelp output ------------------------------------------
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = 'HELICS-srcdoc'
+htmlhelp_basename = 'HELICSdoc'
 
 # -- Options for LaTeX output ---------------------------------------------
 
@@ -191,7 +203,7 @@ latex_elements = {
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-    (master_doc, 'HELICS-src.tex', 'HELICS-src Documentation',
+    (master_doc, 'HELICS.tex', 'HELICS Documentation',
      'Philip Top, Jeff Daily, Ryan Mast, Dheepak Krishnamurthy, Andrew Fisher, Himanshu Jain, Bryan Palmintier, Jason Fuller', 'manual'),
 ]
 
@@ -199,7 +211,7 @@ latex_documents = [
 
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
-man_pages = [(master_doc, 'helics-src', 'HELICS-src Documentation', [author], 1)]
+man_pages = [(master_doc, 'helics', 'HELICS Documentation', [author], 1)]
 
 # -- Options for Texinfo output -------------------------------------------
 
@@ -207,9 +219,14 @@ man_pages = [(master_doc, 'helics-src', 'HELICS-src Documentation', [author], 1)
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-    (master_doc, 'HELICS-src', 'HELICS-src Documentation', author, 'HELICS-src', 'One line description of project.', 'Miscellaneous'),
+    (master_doc, 'HELICS', 'HELICS Documentation', author, 'HELICS', 'One line description of project.', 'Miscellaneous'),
 ]
-
 
 def setup(app):
     app.add_stylesheet('css/custom.css')  # may also be an URL
+    app.add_config_value('recommonmark_config', {
+            'enable_eval_rst': True,
+            }, True)
+    app.add_transform(AutoStructify)
+
+

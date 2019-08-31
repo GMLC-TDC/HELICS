@@ -1,7 +1,8 @@
 /*
 Copyright © 2017-2019,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
-All rights reserved. See LICENSE file and DISCLAIMER for more details.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
+the top-level NOTICE for additional details. All rights reserved.
+SPDX-License-Identifier: BSD-3-Clause
 */
 #include "NetworkCommsInterface.hpp"
 #include "../common/fmt_format.h"
@@ -119,6 +120,7 @@ void NetworkCommsInterface::loadNetworkInfo (const NetworkBrokerData &netInfo)
             localTargetAddress = generateMatchingInterfaceAddress (brokerTargetAddress, interfaceNetwork);
         }
     }
+
     if (netInfo.portStart > 0)
     {
         openPorts.setStartingPortNumber (netInfo.portStart);
@@ -145,7 +147,9 @@ int NetworkCommsInterface::findOpenPort (int count, const std::string &host)
 {
     if (openPorts.getDefaultStartingPort () < 0)
     {
-        auto start = (hasBroker) ? getDefaultBrokerPort () + 100 : getDefaultBrokerPort () + 60;
+        auto dport = PortNumber - getDefaultBrokerPort ();
+        auto start =
+          (dport < 10 * count) ? getDefaultBrokerPort () + 10 * count * (dport + 1) : PortNumber + 5 * count;
         openPorts.setStartingPortNumber (start);
     }
     return openPorts.findOpenPort (count, host);
@@ -247,6 +251,7 @@ ActionMessage NetworkCommsInterface::generatePortRequest (int cnt) const
     req.messageID = REQUEST_PORTS;
     req.payload = stripProtocol (localTargetAddress);
     req.counter = cnt;
+    req.setStringData (brokerName, brokerInitString);
     return req;
 }
 

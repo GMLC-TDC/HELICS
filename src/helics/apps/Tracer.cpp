@@ -1,32 +1,30 @@
 /*
 Copyright © 2017-2019,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
-All rights reserved. See LICENSE file and DISCLAIMER for more details.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
+the top-level NOTICE for additional details. All rights reserved.
+SPDX-License-Identifier: BSD-3-Clause
 */
 
 #include "../application_api/Filters.hpp"
 #include "../application_api/Subscriptions.hpp"
 #include "../application_api/ValueFederate.hpp"
 #include "../application_api/queryFunctions.hpp"
-#include "../common/argParser.h"
-#include "../common/stringOps.h"
+#include "../core/helicsCLI11.hpp"
 #include "../core/helicsVersion.hpp"
+#include "gmlc/utilities/stringOps.h"
 #include <algorithm>
 #include <iostream>
 #include <map>
 #include <memory>
 #include <regex>
 #include <stdexcept>
-#include <boost/filesystem.hpp>
 
 #include "../common/JsonProcessingFunctions.hpp"
 #include "../common/fmt_format.h"
-#include "../common/logger.h"
+#include "../common/loggerCore.hpp"
 #include "PrecHelper.hpp"
 #include "Tracer.hpp"
 #include <thread>
-
-namespace filesystem = boost::filesystem;
 
 namespace helics
 {
@@ -37,42 +35,28 @@ Tracer::Tracer (const std::string &appName, FederateInfo &fi) : App (appName, fi
     fed->setFlagOption (helics_flag_observer);
 }
 
-static const ArgDescriptors InfoArgs{
-  {"tags", ArgDescriptor::arg_type_t::vector_string,
-   "tags to record, this argument may be specified any number of times"},
-  {"endpoints", ArgDescriptor::arg_type_t::vector_string,
-   "endpoints to capture, this argument may be specified multiple time"},
-  {"sourceclone", ArgDescriptor::arg_type_t::vector_string,
-   "existing endpoints to capture generated packets from, this argument may be specified multiple time"},
-  {"destclone", ArgDescriptor::arg_type_t::vector_string,
-   "existing endpoints to capture all packets with the specified endpoint as a destination, this argument may be "
-   "specified multiple time"},
-  {"clone", ArgDescriptor::arg_type_t::vector_string, "existing endpoints to clone all packets to and from"},
-  {"allow_iteration", ArgDescriptor::arg_type_t::flag_type, "allow iteration on values"},
-  {"capture", ArgDescriptor::arg_type_t::vector_string,
-   "capture all the publications and endpoints of a particular federate capture=\"fed1;fed2\"  supports multiple "
-   "arguments or a comma separated list"},
-};
+Tracer::Tracer (std::vector<std::string> args) : App ("tracer", std::move (args)) { processArgs (); }
 
-Tracer::Tracer (int argc, char *argv[]) : App ("tracer", argc, argv)
+Tracer::Tracer (int argc, char *argv[]) : App ("tracer", argc, argv) { processArgs (); }
+
+void Tracer::processArgs ()
 {
-    variable_map vm_map;
+    auto app = buildArgParserApp ();
     if (!deactivated)
     {
         fed->setFlagOption (helics_flag_observer);
-        argumentParser (argc, argv, vm_map, InfoArgs);
-        loadArguments (vm_map);
+        app->parse (remArgs);
         if (!masterFileName.empty ())
         {
             loadFile (masterFileName);
         }
     }
-    else
+    else if (helpMode)
     {
-        argumentParser (argc, argv, vm_map, InfoArgs);
+        app->remove_helics_specifics ();
+        std::cout << app->help ();
     }
 }
-
 Tracer::Tracer (const std::string &appName, const std::shared_ptr<Core> &core, const FederateInfo &fi)
     : App (appName, core, fi)
 {
@@ -172,7 +156,7 @@ void Tracer::loadJsonFile (const std::string &jsonString)
 
 void Tracer::loadTextFile (const std::string &textFile)
 {
-    using namespace stringOps;
+    using namespace gmlc::utilities::stringOps;
     App::loadTextFile (textFile);
     std::ifstream infile (textFile);
     std::string str;
@@ -332,7 +316,14 @@ void Tracer::captureForCurrentTime (Time currentTime, int iteration)
                           fmt::format ("[{}]value {}=block[{}]", currentTime, sub.getTarget (), val.size ());
                     }
                 }
-                logger->addMessage (std::move (valstr));
+                if (skiplog)
+                {
+                    std::cout << valstr << '\n';
+                }
+                else
+                {
+                    logger->addMessage (std::move (valstr));
+                }
             }
             if (valueCallback)
             {
@@ -359,7 +350,14 @@ void Tracer::captureForCurrentTime (Time currentTime, int iteration)
                     messstr = fmt::format ("[{}]message from {} to {}:: size {}", currentTime, mess->source,
                                            mess->dest, mess->data.size ());
                 }
-                logger->addMessage (std::move (messstr));
+                if (skiplog)
+                {
+                    std::cout << messstr << '\n';
+                }
+                else
+                {
+                    logger->addMessage (std::move (messstr));
+                }
             }
             if (endpointMessageCallback)
             {
@@ -387,7 +385,14 @@ void Tracer::captureForCurrentTime (Time currentTime, int iteration)
                     messstr = fmt::format ("[{}]message from %s to %s:: size %d", currentTime, mess->source,
                                            mess->original_dest, mess->data.size ());
                 }
-                logger->addMessage (std::move (messstr));
+                if (skiplog)
+                {
+                    std::cout << messstr << '\n';
+                }
+                else
+                {
+                    logger->addMessage (std::move (messstr));
+                }
             }
             if (clonedMessageCallback)
             {
@@ -416,10 +421,11 @@ void Tracer::runTo (Time runToTime)
     Time nextPrintTime = 10.0;
     try
     {
+        int iteration = 0;
         while (true)
         {
             helics::Time T;
-            int iteration = 0;
+
             if (allow_iteration)
             {
                 auto ItRes = fed->requestTimeIterative (runToTime, iteration_request::iterate_if_needed);
@@ -498,81 +504,81 @@ void Tracer::addDestEndpointClone (const std::string &destEndpoint)
 
 void Tracer::addCapture (const std::string &captureDesc) { captureInterfaces.push_back (captureDesc); }
 
-int Tracer::loadArguments (boost::program_options::variables_map &vm_map)
+std::shared_ptr<helicsCLI11App> Tracer::buildArgParserApp ()
 {
-    if (vm_map.count ("input") == 0)
-    {
-        return -1;
-    }
+    using namespace gmlc::utilities;
 
-    if (!filesystem::exists (vm_map["input"].as<std::string> ()))
-    {
-        std::cerr << vm_map["input"].as<std::string> () << "is not a valid input file \n";
-        return -3;
-    }
-    loadFile (vm_map["input"].as<std::string> ());
+    auto app = std::make_shared<helicsCLI11App> ("Command line options for the Tracer App");
+    app->add_flag ("--allow_iteration", allow_iteration, "allow iteration on values")->ignore_underscore ();
+    app->add_flag ("--print", printMessage, "print messages to the screen");
+    app->add_flag ("--skiplog", skiplog, "print messages to the screen through cout");
+    auto clone_group =
+      app->add_option_group ("cloning", "Options related to endpoint cloning operations and specifications");
+    clone_group->add_option ("--clone", "existing endpoints to clone all packets to and from")
+      ->each ([this](const std::string &clone) {
+          addDestEndpointClone (clone);
+          addSourceEndpointClone (clone);
+      })
+      ->delimiter (',')
+      ->type_size (-1);
 
-    // get the extra tags from the arguments
-    if (vm_map.count ("tags") > 0)
-    {
-        auto argTags = vm_map["tags"].as<std::vector<std::string>> ();
-        for (const auto &tag : argTags)
-        {
-            auto taglist = stringOps::splitlineQuotes (tag);
-            for (const auto &tagname : taglist)
-            {
-                subkeys.emplace (stringOps::removeQuotes (tagname), -1);
-            }
-        }
-    }
+    clone_group
+      ->add_option (
+        "--sourceclone",
+        "existing endpoints to capture generated packets from, this argument may be specified multiple time")
+      ->each ([this](const std::string &clone) { addSourceEndpointClone (clone); })
+      ->delimiter (',')
+      ->ignore_underscore ()
+      ->type_size (-1);
 
-    // capture the all the publications from a particular federate
-    if (vm_map.count ("capture") > 0)
-    {
-        auto captures = vm_map["capture"].as<std::vector<std::string>> ();
-        for (const auto &capt : captures)
-        {
-            auto captFeds = stringOps::splitlineQuotes (capt);
-            for (auto &captFed : captFeds)
-            {
-                auto actCapt = stringOps::removeQuotes (captFed);
-                captureInterfaces.push_back (actCapt);
-            }
-        }
-    }
+    clone_group
+      ->add_option ("--destclone", "existing endpoints to capture all packets with the specified endpoint as a "
+                                   "destination, this argument may be specified multiple time")
+      ->each ([this](const std::string &clone) { addSourceEndpointClone (clone); })
+      ->delimiter (',')
+      ->ignore_underscore ()
+      ->type_size (-1);
 
-    if (vm_map.count ("clone") > 0)
-    {
-        auto clones = vm_map["clone"].as<std::vector<std::string>> ();
-        for (const auto &clone : clones)
-        {
-            addDestEndpointClone (clone);
-            addSourceEndpointClone (clone);
-        }
-    }
+    auto capture_group =
+      app->add_option_group ("capture_group",
+                             "Options related to capturing publications, endpoints, or federates");
+    capture_group
+      ->add_option ("--tag,--publication,--pub",
+                    "tags(publications) to record, this argument may be specified any number of times")
+      ->each ([this](const std::string &tag) {
+          auto taglist = stringOps::splitlineQuotes (tag);
+          for (const auto &tagname : taglist)
+          {
+              subkeys.emplace (stringOps::removeQuotes (tagname), -1);
+          }
+      })
+      ->type_size (-1);
 
-    if (vm_map.count ("sourceclone") > 0)
-    {
-        auto clones = vm_map["sourceclone"].as<std::vector<std::string>> ();
-        for (const auto &clone : clones)
-        {
-            addSourceEndpointClone (clone);
-        }
-    }
+    capture_group->add_option ("--endpoints", "endpoints to capture, this argument may be specified multiple time")
+      ->each ([this](const std::string &ept) {
+          auto eptlist = stringOps::splitlineQuotes (ept);
+          for (const auto &eptname : eptlist)
+          {
+              eptNames.emplace (stringOps::removeQuotes (eptname), -1);
+          }
+      })
+      ->type_size (-1);
 
-    if (vm_map.count ("destclone") > 0)
-    {
-        auto clones = vm_map["destclone"].as<std::vector<std::string>> ();
-        for (const auto &clone : clones)
-        {
-            addDestEndpointClone (clone);
-        }
-    }
-    if (vm_map.count ("allow_iteration") > 0)
-    {
-        allow_iteration = true;
-    }
-    return 0;
+    capture_group
+      ->add_option ("--capture", "capture all the publications of a particular federate capture=\"fed1;fed2\"  "
+                                 "supports multiple arguments or a comma separated list")
+      ->each ([this](const std::string &capt) {
+          auto captFeds = stringOps::splitlineQuotes (capt);
+          for (auto &captFed : captFeds)
+          {
+              auto actCapt = stringOps::removeQuotes (captFed);
+              captureInterfaces.push_back (actCapt);
+          }
+      })
+      ->type_size (-1);
+
+    return app;
 }
+
 }  // namespace apps
 }  // namespace helics

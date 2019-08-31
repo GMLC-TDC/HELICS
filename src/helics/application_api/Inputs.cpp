@@ -1,14 +1,32 @@
 /*
 Copyright © 2017-2019,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
-All rights reserved. See LICENSE file and DISCLAIMER for more details.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
+the top-level NOTICE for additional details. All rights reserved.
+SPDX-License-Identifier: BSD-3-Clause
 */
 
 #include "Inputs.hpp"
 #include "../core/core-exceptions.hpp"
+#include "units/units/units.hpp"
 
 namespace helics
 {
+Input::Input (ValueFederate *valueFed,
+              interface_handle id,
+              const std::string &actName,
+              const std::string &unitsOut)
+    : fed (valueFed), handle (id), actualName (actName)
+{
+    if (!unitsOut.empty ())
+    {
+        outputUnits = std::make_shared<units::precise_unit> (units::unit_from_string (unitsOut));
+        if (!units::is_valid (*outputUnits))
+        {
+            outputUnits.reset ();
+        }
+    }
+}
+
 Input::Input (ValueFederate *valueFed,
               const std::string &key,
               const std::string &defaultType,
@@ -119,25 +137,30 @@ void Input::handleCallback (Time time)
     }
 }
 
-bool Input::isUpdated ()
+bool Input::checkUpdate (bool assumeUpdate)
 {
-    if (hasUpdate)
-    {
-        return true;
-    }
     if (changeDetectionEnabled)
     {
-        if (fed->isUpdated (*this))
+        if (assumeUpdate || fed->isUpdated (*this))
         {
             auto dv = fed->getValueRaw (*this);
             if (type == data_type::helics_unknown)
             {
-                type = getTypeFromString (fed->getInjectionType (*this));
+                loadSourceInformation ();
             }
             auto visitor = [&, this](auto &&arg) {
                 std::remove_reference_t<decltype (arg)> newVal;
                 (void)arg;  // suppress VS2015 warning
-                valueExtract (dv, type, newVal);
+                if (type == helics::data_type::helics_double)
+                {
+                    defV val = doubleExtractAndConvert (dv, inputUnits, outputUnits);
+                    valueExtract (val, newVal);
+                }
+                else
+                {
+                    valueExtract (dv, type, newVal);
+                }
+
                 if (changeDetected (lastValue, newVal, delta))
                 {
                     lastValue = newVal;
@@ -149,9 +172,33 @@ bool Input::isUpdated ()
     }
     else
     {
-        hasUpdate = fed->isUpdated (*this);
+        hasUpdate = (hasUpdate || assumeUpdate || fed->isUpdated (*this));
     }
     return hasUpdate;
+}
+
+bool Input::isUpdated ()
+{
+    if (hasUpdate)
+    {
+        return true;
+    }
+    return checkUpdate ();
+}
+
+bool Input::isUpdated () const
+{
+    if (hasUpdate)
+    {
+        return true;
+    }
+    return fed->isUpdated (*this);
+}
+
+void Input::clearUpdate ()
+{
+    hasUpdate = false;
+    fed->clearUpdate (*this);
 }
 
 size_t Input::getRawSize ()
@@ -238,6 +285,32 @@ size_t Input::getVectorSize ()
     return out.size ();
 }
 
+void Input::loadSourceInformation ()
+{
+    type = getTypeFromString (fed->getInjectionType (*this));
+    auto &iunits = fed->getInjectionUnits (*this);
+    if (!iunits.empty ())
+    {
+        inputUnits = std::make_shared<units::precise_unit> (units::unit_from_string (iunits));
+        if (!units::is_valid (*inputUnits))
+        {
+            inputUnits.reset ();
+        }
+    }
+}
+
+double doubleExtractAndConvert (const data_view &dv,
+                                const std::shared_ptr<units::precise_unit> &inputUnits,
+                                const std::shared_ptr<units::precise_unit> &outputUnits)
+{
+    auto V = ValueConverter<double>::interpret (dv);
+    if ((inputUnits) && (outputUnits))
+    {
+        V = units::convert (V, *inputUnits, *outputUnits);
+    }
+    return V;
+}
+
 char Input::getValueChar ()
 {
     if (fed->isUpdated (*this) || (hasUpdate && !changeDetectionEnabled))
@@ -268,7 +341,14 @@ char Input::getValueChar ()
         else
         {
             int64_t out;
-            valueExtract (dv, type, out);
+            if (type == helics::data_type::helics_double)
+            {
+                out = static_cast<int64_t> (doubleExtractAndConvert (dv, inputUnits, outputUnits));
+            }
+            else
+            {
+                valueExtract (dv, type, out);
+            }
             if (changeDetectionEnabled)
             {
                 if (changeDetected (lastValue, out, delta))
@@ -293,6 +373,7 @@ int Input::getValue (double *data, int maxsize)
     auto V = getValueRef<std::vector<double>> ();
     int length = std::min (static_cast<int> (V.size ()), maxsize);
     std::copy (V.data (), V.data () + length, data);
+    hasUpdate = false;
     return length;
 }
 
@@ -310,6 +391,7 @@ int Input::getValue (char *str, int maxsize)
         str[length] = '\0';
         ++length;
     }
+    hasUpdate = false;
     return length;
 }
 

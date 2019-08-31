@@ -1,7 +1,8 @@
 /*
 Copyright © 2017-2019,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
-All rights reserved. See LICENSE file and DISCLAIMER for more details.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
+the top-level NOTICE for additional details. All rights reserved.
+SPDX-License-Identifier: BSD-3-Clause
 */
 #pragma once
 
@@ -10,24 +11,12 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include <future>
 #include <set>
 
-#if (BOOST_VERSION_LEVEL >= 66)
-namespace boost
-{
+class AsioContextManager;
 namespace asio
 {
-class io_context;
-using io_service = io_context;
-}  // namespace asio
-}  // namespace boost
-#else
-namespace boost
-{
-namespace asio
-{
-class io_service;
-}  // namespace asio
-}  // namespace boost
-#endif
+    class io_context;
+} // namespace asio
+
 namespace helics
 {
 namespace udp

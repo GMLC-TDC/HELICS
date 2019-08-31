@@ -1,7 +1,8 @@
 /*
 Copyright © 2017-2019,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
-All rights reserved. See LICENSE file and DISCLAIMER for more details.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
+the top-level NOTICE for additional details. All rights reserved.
+SPDX-License-Identifier: BSD-3-Clause
 */
 #pragma once
 
@@ -10,6 +11,12 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include "helicsTypes.hpp"
 #include <algorithm>
 #include <array>
+
+namespace units
+{
+class precise_unit;
+}
+
 namespace helics
 {
 /** base class for a input object*/
@@ -28,8 +35,11 @@ class Input
     bool disableAssign = false;  //!< disable assignment for the object
     size_t customTypeHash = 0;  //!< a hash code for the custom type
     defV lastValue;  //!< the last value updated
+    std::shared_ptr<units::precise_unit> outputUnits;
+    std::shared_ptr<units::precise_unit> inputUnits;
+
     double delta = -1.0;  //!< the minimum difference
-    std::string actualName;  //!< the name of the federate
+    std::string actualName;  //!< the name of the Input
     // this needs to match the defV type
     mpark::variant<std::function<void(const double &, Time)>,
                    std::function<void(const int64_t &, Time)>,
@@ -42,23 +52,24 @@ class Input
                    std::function<void(const Time &, Time)>>
       value_callback;  //!< callback function for the federate
   public:
+    /** Default constructor*/
     Input () = default;
-
-    Input (ValueFederate *valueFed, interface_handle id, const std::string &actName)
-        : fed (valueFed), handle (id), actualName (actName)
-    {
-    }
+    /** construct from a federate and handle, mainly used by the valueFederateManager*/
+    Input (ValueFederate *valueFed,
+           interface_handle id,
+           const std::string &actName,
+           const std::string &unitsOut = std::string{});
 
     Input (ValueFederate *valueFed,
            const std::string &key,
            const std::string &defaultType = "def",
-           const std::string &units = std::string ());
+           const std::string &units = std::string{});
 
     template <class FedPtr>
     Input (FedPtr &valueFed,
            const std::string &key,
            const std::string &defaultType = "def",
-           const std::string &units = std::string ())
+           const std::string &units = std::string{})
         : Input (std::addressof (*valueFed), key, defaultType, units)
     {
         static_assert (std::is_base_of<ValueFederate, std::remove_reference_t<decltype (*valueFed)>>::value,
@@ -69,14 +80,14 @@ class Input
            ValueFederate *valueFed,
            const std::string &name,
            const std::string &defaultType = "def",
-           const std::string &units = std::string ());
+           const std::string &units = std::string{});
 
     template <class FedPtr>
     Input (interface_visibility locality,
            FedPtr &valueFed,
            const std::string &name,
            const std::string &defaultType = "def",
-           const std::string &units = std::string ())
+           const std::string &units = std::string{})
         : Input (locality, std::addressof (*valueFed), name, defaultType, units)
     {
         static_assert (std::is_base_of<ValueFederate, std::remove_reference_t<decltype (*valueFed)>>::value,
@@ -86,7 +97,7 @@ class Input
     Input (ValueFederate *valueFed,
            const std::string &name,
            data_type defType,
-           const std::string &units = std::string ())
+           const std::string &units = std::string{})
         : Input (valueFed, name, typeNameStringRef (defType), units)
     {
     }
@@ -100,7 +111,7 @@ class Input
     Input (interface_visibility locality,
            ValueFederate *valueFed,
            const std::string &name,
-           const std::string &units = std::string ())
+           const std::string &units = std::string{})
         : Input (locality, valueFed, name, "def", units)
     {
     }
@@ -109,7 +120,7 @@ class Input
     Input (interface_visibility locality,
            FedPtr &valueFed,
            const std::string &key,
-           const std::string &units = std::string ())
+           const std::string &units = std::string{})
         : Input (locality, valueFed, key, "def", units)
     {
     }
@@ -118,7 +129,7 @@ class Input
            ValueFederate *valueFed,
            const std::string &name,
            data_type defType,
-           const std::string &units = std::string ())
+           const std::string &units = std::string{})
         : Input (locality, valueFed, name, typeNameStringRef (defType), units)
     {
     }
@@ -128,7 +139,7 @@ class Input
            FedPtr &valueFed,
            const std::string &name,
            data_type defType,
-           const std::string &units = std::string ())
+           const std::string &units = std::string{})
         : Input (locality, valueFed, name, typeNameStringRef (defType), units)
     {
     }
@@ -167,6 +178,9 @@ class Input
     /** get the Name/Key for the input
     @details the name is the local name if given, key is the full key name*/
     const std::string &getKey () const { return fed->getInterfaceName (handle); }
+    /** get the display name for an input
+    @details the name is the given local name or if empty the name of the target*/
+    const std::string &getDisplayName () const { return (actualName.empty () ? getTarget () : actualName); }
 
     /** get the type of the data coming from the publication*/
     const std::string &getPublicationType () const
@@ -178,7 +192,9 @@ class Input
     /** get the type of the input*/
     const std::string &getType () const { return fed->getExtractionType (*this); }
     /** get the units associated with a input*/
-    const std::string &getUnits () const { return fed->getInterfaceUnits (*this); }
+    const std::string &getUnits () const { return fed->getExtractionUnits (*this); }
+    /** get the units associated with a input*/
+    const std::string &getInjectionUnits () const { return fed->getInjectionUnits (*this); }
     /** get an associated target*/
     const std::string &getTarget () const { return fed->getTarget (*this); }
     /** subscribe to a named publication*/
@@ -195,8 +211,25 @@ class Input
     /** get the current value of a flag for the handle*/
     bool getOption (int32_t option) const { return fed->getInterfaceOption (handle, option); }
     /** check if the value has been updated
-    @details if changeDetection is Enabled this function also loads the value into the buffer*/
+    @details if changeDetection is Enabled this function also loads the value into the buffer
+    @param assumeUpdate if set to true will assume there was a publication and not check it first, if set to
+    false[default] it will check the federate first
+    @return true if the value has been updated*/
+    bool checkUpdate (bool assumeUpdate = false);
+
+    /** clear the isUpdated flag*/
+    void clearUpdate ();
+    /** check if the value has been updated including interpretation of the change detection
+     */
     bool isUpdated ();
+    /** check if the value has been updated,
+    @details the const version can in some circumstances return true even if the value would not be updated
+    the circumstances in which this is true are a minimum change has been set, checkUpdate has not been
+    call(meaning it is a standalone copy, not the one stored with the federate, and the value has been published
+    but would not trigger the change detection. If this is to be avoided use the non-const version or call
+    checkUpdate before calling this function.
+     */
+    bool isUpdated () const;
 
     /** register a callback for the update
     @details the callback is called in the just before the time request function returns
@@ -352,12 +385,22 @@ class Input
     /** close a input during an active simulation
     @details it is not necessary to call this function unless you are continuing the simulation after the close*/
     void close () { fed->closeInterface (handle); }
+    /** get the HELICS data type for the input*/
+    data_type getHelicsType () const { return type; }
 
   private:
+    /** load some information about the data source such as type and units*/
+    void loadSourceInformation ();
     /** helper class for getting a character since that is a bit odd*/
     char getValueChar ();
+    /** helper function to do the extraction and any necessary conversions for doubles*/
     friend class ValueFederateManager;
 };
+
+/** convert a dataview to a double and do a unit conversion if appropriate*/
+double doubleExtractAndConvert (const data_view &dv,
+                                const std::shared_ptr<units::precise_unit> &inputUnits,
+                                const std::shared_ptr<units::precise_unit> &outputUnits);
 
 /** class to handle an input and extract a specific type
 @tparam X the class of the value associated with a input*/
@@ -438,10 +481,18 @@ void Input::getValue_impl (std::integral_constant<int, primaryType> /*V*/, X &ou
         auto dv = fed->getValueRaw (*this);
         if (type == data_type::helics_unknown)
         {
-            type = getTypeFromString (fed->getInjectionType (*this));
+            loadSourceInformation ();
         }
 
-        valueExtract (dv, type, out);
+        if (type == helics::data_type::helics_double)
+        {
+            defV val = doubleExtractAndConvert (dv, inputUnits, outputUnits);
+            valueExtract (val, out);
+        }
+        else
+        {
+            valueExtract (dv, type, out);
+        }
         if (changeDetectionEnabled)
         {
             if (changeDetected (lastValue, out, delta))
@@ -494,13 +545,21 @@ const X &Input::getValueRef ()
         auto dv = fed->getValueRaw (*this);
         if (type == data_type::helics_unknown)
         {
-            type = getTypeFromString (fed->getInjectionType (*this));
+            loadSourceInformation ();
         }
 
         if (changeDetectionEnabled)
         {
             X out;
-            valueExtract (dv, type, out);
+            if (type == helics::data_type::helics_double)
+            {
+                defV val = doubleExtractAndConvert (dv, inputUnits, outputUnits);
+                valueExtract (val, out);
+            }
+            else
+            {
+                valueExtract (dv, type, out);
+            }
             if (changeDetected (lastValue, out, delta))
             {
                 lastValue = make_valid (std::move (out));

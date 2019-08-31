@@ -1,15 +1,16 @@
 /*
 Copyright © 2017-2019,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
-All rights reserved. See LICENSE file and DISCLAIMER for more details.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
+the top-level NOTICE for additional details. All rights reserved.
+SPDX-License-Identifier: BSD-3-Clause
 */
 #pragma once
 
-#include "../common/BlockingPriorityQueue.hpp"
-#include "../common/TriggerVariable.hpp"
-#include "../common/TripWire.hpp"
 #include "ActionMessage.hpp"
 #include "NetworkBrokerData.hpp"
+#include "gmlc/concurrency/TriggerVariable.hpp"
+#include "gmlc/concurrency/TripWire.hpp"
+#include "gmlc/containers/BlockingPriorityQueue.hpp"
 #include <functional>
 #include <thread>
 
@@ -17,7 +18,6 @@ namespace helics
 {
 enum class interface_networks : char;
 
-constexpr route_id control_route (-1);
 /** implementation of a generic communications interface
  */
 class CommsInterface
@@ -26,8 +26,8 @@ class CommsInterface
     /** enumeration of whether the threading system should generate a single thread or multiple threads*/
     enum class thread_generation
     {
-        single,
-        dual
+        single,  // indicate that a single thread is used for transmitting and receiving
+        dual  // indicate that separate threads are used 1 for transmission and one for reception
     };
     /** default constructor*/
     CommsInterface () = default;
@@ -66,11 +66,11 @@ class CommsInterface
     void setName (const std::string &name);
     /** set the callback for processing the messages
      */
-    void setCallback (std::function<void(ActionMessage &&)> callback);
+    void setCallback (std::function<void (ActionMessage &&)> callback);
     /** set the callback for processing the messages
      */
     void setLoggingCallback (
-      std::function<void(int level, const std::string &name, const std::string &message)> callback);
+      std::function<void (int level, const std::string &name, const std::string &message)> callback);
     /** set the max message size and max Queue size
      */
     void setMessageSize (int maxMsgSize, int maxCount);
@@ -87,7 +87,6 @@ class CommsInterface
     /** enable or disable the server mode for the comms*/
     void setServerMode (bool serverActive);
 
-  protected:
     /** generate a log message as a warning*/
     void logWarning (const std::string &message) const;
     /** generate a log message as an error*/
@@ -111,7 +110,7 @@ class CommsInterface
   private:
     std::atomic<connection_status> rx_status{connection_status::startup};  //!< the status of the receiver thread
   protected:
-    TriggerVariable rxTrigger;
+    gmlc::concurrency::TriggerVariable rxTrigger;
 
     std::string name;  //!< the name of the object
     std::string localTargetAddress;  //!< the base for the receive address
@@ -121,7 +120,7 @@ class CommsInterface
   private:
     std::atomic<connection_status> tx_status{
       connection_status::startup};  //!< the status of the transmitter thread
-    TriggerVariable txTrigger;
+    gmlc::concurrency::TriggerVariable txTrigger;
     std::atomic<bool> operating{false};  //!< the comms interface is in startup mode
     const bool singleThread{false};
 
@@ -133,10 +132,11 @@ class CommsInterface
     int maxMessageSize = 16 * 1024;  //!< the maximum message size for the queues (if needed)
     int maxMessageCount = 512;  //!< the maximum number of message to buffer (if needed)
     std::atomic<bool> requestDisconnect{false};  //!< flag gets set when disconnect is called
-    std::function<void(ActionMessage &&)> ActionCallback;  //!< the callback for what to do with a received message
-    std::function<void(int level, const std::string &name, const std::string &message)>
+    std::function<void (ActionMessage &&)>
+      ActionCallback;  //!< the callback for what to do with a received message
+    std::function<void (int level, const std::string &name, const std::string &message)>
       loggingCallback;  //!< callback for logging
-    BlockingPriorityQueue<std::pair<route_id, ActionMessage>>
+    gmlc::containers::BlockingPriorityQueue<std::pair<route_id, ActionMessage>>
       txQueue;  //!< set of messages waiting to be transmitted
     // closing the files or connection can take some time so there is a need for inter-thread communication to not
     // spit out warning messages if it is in the process of disconnecting
@@ -151,7 +151,7 @@ class CommsInterface
     virtual void queue_rx_function () = 0;  //!< the functional loop for the receive queue
     virtual void queue_tx_function () = 0;  //!< the loop for transmitting data
     virtual void closeTransmitter ();  //!< function to instruct the transmitter loop to close
-    virtual void closeReceiver () = 0;  //!< function to instruct the receiver loop to close
+    virtual void closeReceiver ();  //!< function to instruct the receiver loop to close
     virtual void reconnectTransmitter ();  //!< function to reconnect the transmitter
     virtual void reconnectReceiver ();  //!< function to reconnect the receiver
   protected:
@@ -165,7 +165,7 @@ class CommsInterface
     void propertyUnLock ();
 
   private:
-    tripwire::TripWireDetector tripDetector;  //!< try to detect if everything is shutting down
+    gmlc::concurrency::TripWireDetector tripDetector;  //!< try to detect if everything is shutting down
 };
 
 template <class X>

@@ -1,7 +1,8 @@
 /*
 Copyright © 2017-2019,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
-All rights reserved. See LICENSE file and DISCLAIMER for more details.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See the top-level NOTICE for
+additional details. All rights reserved.
+SPDX-License-Identifier: BSD-3-Clause
 */
 
 #ifndef HELICS_API_DATA_H_
@@ -38,14 +39,16 @@ extern "C"
     typedef void *helics_federate_info;
     /** opaque object representing a query*/
     typedef void *helics_query;
+    /** opaque object representing a message*/
+    typedef void *helics_message_object;
 
     /** time definition used in the C interface to helics*/
     typedef double helics_time;
     const helics_time helics_time_zero = 0.0; /*!< definition of time zero-the beginning of simulation*/
     const helics_time helics_time_epsilon = 1.0e-9; /*!< definition of the minimum time resolution*/
     const helics_time helics_time_invalid = -1.785e39; /*!< definition of an invalid time that has no meaning*/
-    const helics_time helics_time_maxtime =
-      1e53; /*!< definition of time signifying the federate has terminated or to run until the end of the simulation*/
+    const helics_time helics_time_maxtime = 9223372036.854774;
+    /*!< definition of time signifying the federate has terminated or to run until the end of the simulation*/
 
     /** defining a boolean type for use in the helics interface*/
     typedef int helics_bool;
@@ -97,6 +100,7 @@ extern "C"
 
     /**
      *  Message_t mapped to a c compatible structure
+     * @details this will be deprecated in HELICS 2.3 and removed in HELICS 3.0
      */
     typedef struct helics_message
     {

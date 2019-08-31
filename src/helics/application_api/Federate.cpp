@@ -1,7 +1,8 @@
 /*
 Copyright © 2017-2019,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
-All rights reserved. See LICENSE file and DISCLAIMER for more details.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
+the top-level NOTICE for additional details. All rights reserved.
+SPDX-License-Identifier: BSD-3-Clause
 */
 #include "Federate.hpp"
 #include "../core/BrokerFactory.hpp"
@@ -374,27 +375,35 @@ iteration_result Federate::enterExecutingModeComplete ()
         throw (InvalidFunctionCall ("cannot call finalize function without first calling async function"));
     }
     auto asyncInfo = asyncCallInfo->lock ();
-    auto res = asyncInfo->execFuture.get ();
-    switch (res)
+    try
     {
-    case iteration_result::next_step:
-        currentMode = modes::executing;
-        currentTime = timeZero;
-        initializeToExecuteStateTransition ();
-        break;
-    case iteration_result::iterating:
-        currentMode = modes::initializing;
-        updateTime (getCurrentTime (), getCurrentTime ());
-        break;
-    case iteration_result::error:
-        currentMode = modes::error;
-        break;
-    case iteration_result::halted:
-        currentMode = modes::finalize;
-        break;
-    }
+        auto res = asyncInfo->execFuture.get ();
+        switch (res)
+        {
+        case iteration_result::next_step:
+            currentMode = modes::executing;
+            currentTime = timeZero;
+            initializeToExecuteStateTransition ();
+            break;
+        case iteration_result::iterating:
+            currentMode = modes::initializing;
+            updateTime (getCurrentTime (), getCurrentTime ());
+            break;
+        case iteration_result::error:
+            currentMode = modes::error;
+            break;
+        case iteration_result::halted:
+            currentMode = modes::finalize;
+            break;
+        }
 
-    return res;
+        return res;
+    }
+    catch (const std::exception &)
+    {
+        currentMode = modes::error;
+        throw;
+    }
 }
 
 void Federate::setProperty (int32_t option, double timeValue)
@@ -1025,7 +1034,6 @@ const Filter &Federate::getFilter (int index) const { return fManager->getFilter
 int Federate::filterCount () const { return fManager->getFilterCount (); }
 
 std::string Federate::localQuery (const std::string & /*queryStr*/) const { return std::string{}; }
-
 std::string Federate::query (const std::string &queryStr)
 {
     std::string res;
@@ -1077,7 +1085,7 @@ std::string Federate::query (const std::string &target, const std::string &query
         }
         else
         {
-            return "#invalid";
+            res = "#invalid";
         }
     }
     return res;
@@ -1213,29 +1221,32 @@ const std::string &Federate::getExtractionType (interface_handle handle) const
     return (coreObject) ? (coreObject->getExtractionType (handle)) : emptyStr;
 }
 
-const std::string &Federate::getInterfaceUnits (interface_handle handle) const
+const std::string &Federate::getInjectionUnits (interface_handle handle) const
 {
-    return (coreObject) ? (coreObject->getUnits (handle)) : emptyStr;
+    return (coreObject) ? (coreObject->getInjectionUnits (handle)) : emptyStr;
+}
+
+const std::string &Federate::getExtractionUnits (interface_handle handle) const
+{
+    return (coreObject) ? (coreObject->getExtractionUnits (handle)) : emptyStr;
 }
 
 const Filter &Federate::getFilter (const std::string &filterName) const
 {
-    auto &filt = fManager->getFilter (filterName);
+    const Filter &filt = fManager->getFilter (filterName);
     if (!filt.isValid ())
     {
-        auto &filt2 = fManager->getFilter (getName () + nameSegmentSeparator + filterName);
-        return filt2;
+        return fManager->getFilter (getName () + nameSegmentSeparator + filterName);
     }
     return filt;
 }
 
 Filter &Federate::getFilter (const std::string &filterName)
 {
-    auto &filt = fManager->getFilter (filterName);
+    Filter &filt = fManager->getFilter (filterName);
     if (!filt.isValid ())
     {
-        auto &filt2 = fManager->getFilter (getName () + nameSegmentSeparator + filterName);
-        return filt2;
+        return fManager->getFilter (getName () + nameSegmentSeparator + filterName);
     }
     return filt;
 }

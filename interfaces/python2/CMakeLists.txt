@@ -1,7 +1,10 @@
 #
-# Copyright © 2017-2019, Battelle Memorial Institute; Lawrence Livermore National
-# Security, LLC; Alliance for Sustainable Energy, LLC All rights reserved. See LICENSE
-# file and DISCLAIMER for more details.
+# Copyright (c) 2017-2019, Battelle Memorial Institute; Lawrence Livermore
+# National Security, LLC; Alliance for Sustainable Energy, LLC.
+# See the top-level NOTICE for additional details. 
+# All rights reserved.
+#
+# SPDX-License-Identifier: BSD-3-Clause
 #
 
 if(NOT ENABLE_SWIG OR NOT SWIG_EXECUTABLE)
@@ -44,23 +47,15 @@ else()
 endif()
 
 set_target_properties(_helics PROPERTIES FOLDER interfaces)
+if (MSVC)
+	target_compile_options(_helics PRIVATE "/wd4100")
+	target_compile_options(_helics PRIVATE "/wd4459")
+endif()
 
 install(TARGETS _helics DESTINATION python COMPONENT python)
 
-foreach(keyfile IN LISTS KEY_LIBRARY_FILES)
-  add_custom_command(
-    TARGET
-    _helics
-    POST_BUILD # Adds a post-build event to api tests
-    COMMAND
-      ${CMAKE_COMMAND}
-      -E
-      copy_if_different # which executes "cmake - E copy_if_different..."
-      "${keyfile}" # <--this is in-file
-      "$<TARGET_FILE_DIR:_helics>/"
-  ) # <--this is out- file path
-endforeach(keyfile)
+  copy_key_files_to_target_location(_helics)
+  copy_shared_target(_helics)
 
 install(FILES ${CMAKE_CURRENT_BINARY_DIR}/helics.py DESTINATION python COMPONENT python)
-install(FILES $<TARGET_FILE:helicsSharedLib> DESTINATION python COMPONENT python)
-install(FILES ${KEY_LIBRARY_FILES} DESTINATION python COMPONENT python)
+install_key_files_with_comp(python)

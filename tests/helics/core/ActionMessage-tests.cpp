@@ -1,22 +1,19 @@
 /*
 Copyright © 2017-2019,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
-All rights reserved. See LICENSE file and DISCLAIMER for more details.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
+the top-level NOTICE for additional details. All rights reserved.
+SPDX-License-Identifier: BSD-3-Clause
 */
-#include <boost/test/unit_test.hpp>
+#include "gtest/gtest.h"
 
 #include "helics/core/ActionMessage.hpp"
 #include "helics/core/flagOperations.hpp"
 #include <cstdio>
 #include <set>
 
-namespace utf = boost::unit_test;
-
-BOOST_AUTO_TEST_SUITE (ActionMessage_tests, *utf::label ("ci"))
-
 using namespace helics;
 
-BOOST_AUTO_TEST_CASE (action_test_to_string_conversion)
+TEST (ActionMessage_tests, action_test_to_string_conversion)
 {
     helics::ActionMessage m (CMD_IGNORE);
     /*
@@ -41,16 +38,16 @@ BOOST_AUTO_TEST_CASE (action_test_to_string_conversion)
 
     ActionMessage fr;
     fr.from_string (data);
-    BOOST_CHECK (m.action () == fr.action ());
-    BOOST_CHECK_EQUAL (m.payload, fr.payload);
-    BOOST_CHECK_EQUAL (m.source_handle, fr.source_handle);
-    BOOST_CHECK_EQUAL (m.source_id, fr.source_id);
-    BOOST_CHECK_EQUAL (m.dest_handle, fr.dest_handle);
-    BOOST_CHECK_EQUAL (m.dest_id, fr.dest_id);
-    BOOST_CHECK (m.actionTime == fr.actionTime);
+    EXPECT_TRUE (m.action () == fr.action ());
+    EXPECT_EQ (m.payload, fr.payload);
+    EXPECT_EQ (m.source_handle, fr.source_handle);
+    EXPECT_EQ (m.source_id, fr.source_id);
+    EXPECT_EQ (m.dest_handle, fr.dest_handle);
+    EXPECT_EQ (m.dest_id, fr.dest_id);
+    EXPECT_TRUE (m.actionTime == fr.actionTime);
 }
 
-BOOST_AUTO_TEST_CASE (action_test_to_string_conversion_info)
+TEST (ActionMessage_tests, action_test_to_string_conversion_info)
 {
     helics::ActionMessage m (CMD_REG_INPUT);
     /*
@@ -79,18 +76,18 @@ BOOST_AUTO_TEST_CASE (action_test_to_string_conversion_info)
 
     ActionMessage fr;
     fr.from_string (data);
-    BOOST_CHECK (m.action () == fr.action ());
-    BOOST_CHECK_EQUAL (m.payload, fr.payload);
-    BOOST_CHECK_EQUAL (m.source_handle, fr.source_handle);
-    BOOST_CHECK_EQUAL (m.source_id, fr.source_id);
-    BOOST_CHECK_EQUAL (m.dest_handle, fr.dest_handle);
-    BOOST_CHECK_EQUAL (m.dest_id, fr.dest_id);
-    BOOST_CHECK (m.actionTime == fr.actionTime);
+    EXPECT_TRUE (m.action () == fr.action ());
+    EXPECT_EQ (m.payload, fr.payload);
+    EXPECT_EQ (m.source_handle, fr.source_handle);
+    EXPECT_EQ (m.source_id, fr.source_id);
+    EXPECT_EQ (m.dest_handle, fr.dest_handle);
+    EXPECT_EQ (m.dest_id, fr.dest_id);
+    EXPECT_TRUE (m.actionTime == fr.actionTime);
 
-    BOOST_CHECK (m.getStringData () == fr.getStringData ());
+    EXPECT_TRUE (m.getStringData () == fr.getStringData ());
 }
 
-BOOST_AUTO_TEST_CASE (action_test_to_string_conversion_info2)
+TEST (ActionMessage_tests, action_test_to_string_conversion_info2)
 {
     helics::ActionMessage m (CMD_TIME_REQUEST);
     /*
@@ -122,45 +119,45 @@ BOOST_AUTO_TEST_CASE (action_test_to_string_conversion_info2)
 
     ActionMessage fr;
     fr.from_string (data);
-    BOOST_CHECK (m.action () == fr.action ());
-    BOOST_CHECK_EQUAL (m.payload, fr.payload);
-    BOOST_CHECK_EQUAL (m.source_handle, fr.source_handle);
-    BOOST_CHECK_EQUAL (m.source_id, fr.source_id);
-    BOOST_CHECK_EQUAL (m.dest_handle, fr.dest_handle);
-    BOOST_CHECK_EQUAL (m.dest_id, fr.dest_id);
-    BOOST_CHECK (m.actionTime == fr.actionTime);
+    EXPECT_TRUE (m.action () == fr.action ());
+    EXPECT_EQ (m.payload, fr.payload);
+    EXPECT_EQ (m.source_handle, fr.source_handle);
+    EXPECT_EQ (m.source_id, fr.source_id);
+    EXPECT_EQ (m.dest_handle, fr.dest_handle);
+    EXPECT_EQ (m.dest_id, fr.dest_id);
+    EXPECT_TRUE (m.actionTime == fr.actionTime);
 
-    BOOST_CHECK (m.getStringData () == fr.getStringData ());
-    BOOST_CHECK (m.Tso == fr.Tso);
-    BOOST_CHECK (m.Te == fr.Te);
-    BOOST_CHECK (m.Tdemin == fr.Tdemin);
+    EXPECT_TRUE (m.getStringData () == fr.getStringData ());
+    EXPECT_TRUE (m.Tso == fr.Tso);
+    EXPECT_TRUE (m.Te == fr.Te);
+    EXPECT_TRUE (m.Tdemin == fr.Tdemin);
 }
 
-BOOST_AUTO_TEST_CASE (constructor_test)
+TEST (ActionMessage_tests, constructor_test)
 {
     // Default constructor
     helics::ActionMessage cmd;
-    BOOST_CHECK (cmd.action () == helics::CMD_IGNORE);
-    BOOST_CHECK_EQUAL (cmd.source_id, parent_broker_id);
-    BOOST_CHECK (!cmd.source_handle.isValid ());
-    BOOST_CHECK_EQUAL (cmd.dest_id, parent_broker_id);
-    BOOST_CHECK (!cmd.dest_handle.isValid ());
-    BOOST_CHECK_EQUAL (cmd.counter, 0);
-    BOOST_CHECK_EQUAL (cmd.flags, 0);
-    BOOST_CHECK_EQUAL (cmd.actionTime, helics::Time::zeroVal ());
-    BOOST_CHECK (cmd.payload.empty ());
+    EXPECT_TRUE (cmd.action () == helics::CMD_IGNORE);
+    EXPECT_EQ (cmd.source_id, parent_broker_id);
+    EXPECT_TRUE (!cmd.source_handle.isValid ());
+    EXPECT_EQ (cmd.dest_id, parent_broker_id);
+    EXPECT_TRUE (!cmd.dest_handle.isValid ());
+    EXPECT_EQ (cmd.counter, 0);
+    EXPECT_EQ (cmd.flags, 0);
+    EXPECT_EQ (cmd.actionTime, helics::Time::zeroVal ());
+    EXPECT_TRUE (cmd.payload.empty ());
 
     // Additional info defaults
-    BOOST_CHECK_EQUAL (cmd.Te, helics::timeZero);
-    BOOST_CHECK_EQUAL (cmd.Tdemin, helics::timeZero);
-    BOOST_CHECK (cmd.getStringData ().empty ());
+    EXPECT_EQ (cmd.Te, helics::timeZero);
+    EXPECT_EQ (cmd.Tdemin, helics::timeZero);
+    EXPECT_TRUE (cmd.getStringData ().empty ());
 
     // Action constructor
     helics::ActionMessage cmd2 (helics::CMD_INIT);
-    BOOST_CHECK (cmd2.action () == helics::CMD_INIT);
+    EXPECT_TRUE (cmd2.action () == helics::CMD_INIT);
 }
 
-BOOST_AUTO_TEST_CASE (copy_constructor_test)
+TEST (ActionMessage_tests, copy_constructor_test)
 {
     helics::ActionMessage cmd (helics::CMD_INIT);
     cmd.source_id = global_federate_id{1};
@@ -177,24 +174,24 @@ BOOST_AUTO_TEST_CASE (copy_constructor_test)
 
     // Check operator= override
     helics::ActionMessage cmd_copy (cmd);
-    BOOST_CHECK (cmd_copy.action () == helics::CMD_INIT);
-    BOOST_CHECK_EQUAL (cmd_copy.source_id.baseValue (), 1);
-    BOOST_CHECK_EQUAL (cmd_copy.source_handle.baseValue (), 2);
-    BOOST_CHECK_EQUAL (cmd_copy.dest_id.baseValue (), 3);
-    BOOST_CHECK_EQUAL (cmd_copy.dest_handle.baseValue (), 4);
-    BOOST_CHECK_EQUAL (cmd_copy.flags, 0x1a2F);
-    BOOST_CHECK_EQUAL (cmd_copy.actionTime, helics::Time::maxVal ());
-    BOOST_CHECK_EQUAL (cmd_copy.payload, "hello world");
-    BOOST_CHECK_EQUAL (cmd_copy.name, "hello world");  // aliased to payload
+    EXPECT_TRUE (cmd_copy.action () == helics::CMD_INIT);
+    EXPECT_EQ (cmd_copy.source_id.baseValue (), 1);
+    EXPECT_EQ (cmd_copy.source_handle.baseValue (), 2);
+    EXPECT_EQ (cmd_copy.dest_id.baseValue (), 3);
+    EXPECT_EQ (cmd_copy.dest_handle.baseValue (), 4);
+    EXPECT_EQ (cmd_copy.flags, 0x1a2F);
+    EXPECT_EQ (cmd_copy.actionTime, helics::Time::maxVal ());
+    EXPECT_EQ (cmd_copy.payload, "hello world");
+    EXPECT_EQ (cmd_copy.name, "hello world");  // aliased to payload
 
-    BOOST_CHECK_EQUAL (cmd_copy.Te, helics::Time::maxVal ());
-    BOOST_CHECK_EQUAL (cmd_copy.Tdemin, helics::Time::minVal ());
-    BOOST_CHECK_EQUAL (cmd_copy.getString (sourceStringLoc), "source");
-    BOOST_CHECK_EQUAL (cmd_copy.getString (targetStringLoc), "target");
-    BOOST_CHECK_EQUAL (cmd_copy.getString (origSourceStringLoc), "original_source");
+    EXPECT_EQ (cmd_copy.Te, helics::Time::maxVal ());
+    EXPECT_EQ (cmd_copy.Tdemin, helics::Time::minVal ());
+    EXPECT_EQ (cmd_copy.getString (sourceStringLoc), "source");
+    EXPECT_EQ (cmd_copy.getString (targetStringLoc), "target");
+    EXPECT_EQ (cmd_copy.getString (origSourceStringLoc), "original_source");
 }
 
-BOOST_AUTO_TEST_CASE (assignment_test)
+TEST (ActionMessage_tests, assignment_test)
 {
     helics::ActionMessage cmd (helics::CMD_INIT);
     cmd.source_id = global_federate_id (1);
@@ -213,27 +210,27 @@ BOOST_AUTO_TEST_CASE (assignment_test)
 
     // Check operator= override
     helics::ActionMessage cmd_assign = cmd;
-    BOOST_CHECK (cmd_assign.action () == helics::CMD_INIT);
-    BOOST_CHECK_EQUAL (cmd_assign.source_id.baseValue (), 1);
-    BOOST_CHECK_EQUAL (cmd_assign.source_handle.baseValue (), 2);
-    BOOST_CHECK_EQUAL (cmd_assign.dest_id.baseValue (), 3);
-    BOOST_CHECK_EQUAL (cmd_assign.dest_handle.baseValue (), 4);
-    BOOST_CHECK (checkActionFlag (cmd_assign, iteration_requested_flag));
-    BOOST_CHECK (checkActionFlag (cmd_assign, required_flag));
-    BOOST_CHECK (checkActionFlag (cmd_assign, error_flag));
-    BOOST_CHECK_EQUAL (cmd_assign.actionTime, helics::Time::maxVal ());
-    BOOST_CHECK_EQUAL (cmd_assign.payload, "hello world");
-    BOOST_CHECK_EQUAL (cmd_assign.name, "hello world");  // aliased to payload
+    EXPECT_TRUE (cmd_assign.action () == helics::CMD_INIT);
+    EXPECT_EQ (cmd_assign.source_id.baseValue (), 1);
+    EXPECT_EQ (cmd_assign.source_handle.baseValue (), 2);
+    EXPECT_EQ (cmd_assign.dest_id.baseValue (), 3);
+    EXPECT_EQ (cmd_assign.dest_handle.baseValue (), 4);
+    EXPECT_TRUE (checkActionFlag (cmd_assign, iteration_requested_flag));
+    EXPECT_TRUE (checkActionFlag (cmd_assign, required_flag));
+    EXPECT_TRUE (checkActionFlag (cmd_assign, error_flag));
+    EXPECT_EQ (cmd_assign.actionTime, helics::Time::maxVal ());
+    EXPECT_EQ (cmd_assign.payload, "hello world");
+    EXPECT_EQ (cmd_assign.name, "hello world");  // aliased to payload
 
-    BOOST_CHECK_EQUAL (cmd_assign.Te, helics::Time::maxVal ());
-    BOOST_CHECK_EQUAL (cmd_assign.Tdemin, helics::Time::minVal ());
-    BOOST_CHECK_EQUAL (cmd_assign.getString (sourceStringLoc), "source");
-    BOOST_CHECK_EQUAL (cmd_assign.getString (targetStringLoc), "target");
-    BOOST_CHECK_EQUAL (cmd_assign.getString (origSourceStringLoc), "original_source");
-    BOOST_CHECK_EQUAL (cmd_assign.getString (origDestStringLoc), "original_dest");
+    EXPECT_EQ (cmd_assign.Te, helics::Time::maxVal ());
+    EXPECT_EQ (cmd_assign.Tdemin, helics::Time::minVal ());
+    EXPECT_EQ (cmd_assign.getString (sourceStringLoc), "source");
+    EXPECT_EQ (cmd_assign.getString (targetStringLoc), "target");
+    EXPECT_EQ (cmd_assign.getString (origSourceStringLoc), "original_source");
+    EXPECT_EQ (cmd_assign.getString (origDestStringLoc), "original_dest");
 }
 
-BOOST_AUTO_TEST_CASE (comparison_test)
+TEST (ActionMessage_tests, comparison_test)
 {
     helics::ActionMessage cmd1 (helics::CMD_INIT);
     cmd1.actionTime = helics::Time::minVal ();
@@ -246,10 +243,10 @@ BOOST_AUTO_TEST_CASE (comparison_test)
 
     // Check less than comparison (not implemented yet)
 
-    BOOST_CHECK (cmd1 < cmd2);
-    BOOST_CHECK (cmd2 < cmd3);
-    BOOST_CHECK (cmd1 < cmd3);
-    BOOST_CHECK (!(cmd1 < cmd1));
+    EXPECT_TRUE (cmd1 < cmd2);
+    EXPECT_TRUE (cmd2 < cmd3);
+    EXPECT_TRUE (cmd1 < cmd3);
+    EXPECT_TRUE (!(cmd1 < cmd1));
 
     // Insert messages into a set, check for correct ordering when scanned
     std::set<helics::ActionMessage> q;
@@ -259,12 +256,12 @@ BOOST_AUTO_TEST_CASE (comparison_test)
     helics::Time ctime = helics::Time::minVal ();
     for (const auto &cmd : q)
     {
-        BOOST_CHECK (cmd.actionTime >= ctime);
+        EXPECT_TRUE (cmd.actionTime >= ctime);
         ctime = cmd.actionTime;
     }
 }
 
-BOOST_AUTO_TEST_CASE (conversion_test)
+TEST (ActionMessage_tests, conversion_test)
 {
     helics::ActionMessage cmd (helics::CMD_SEND_MESSAGE);
     cmd.source_id = global_federate_id (1);
@@ -282,18 +279,18 @@ BOOST_AUTO_TEST_CASE (conversion_test)
     auto cmdString = cmd.to_string ();
 
     helics::ActionMessage cmd2 (cmdString);
-    BOOST_CHECK (cmd.action () == cmd2.action ());
-    BOOST_CHECK_EQUAL (cmd.actionTime, cmd2.actionTime);
-    BOOST_CHECK_EQUAL (cmd.source_id, cmd2.source_id);
-    BOOST_CHECK_EQUAL (cmd.dest_id, cmd2.dest_id);
-    BOOST_CHECK_EQUAL (cmd.source_handle, cmd2.source_handle);
-    BOOST_CHECK_EQUAL (cmd.dest_handle, cmd2.dest_handle);
-    BOOST_CHECK_EQUAL (cmd.payload, cmd2.payload);
-    BOOST_CHECK_EQUAL (cmd.flags, cmd2.flags);
-    BOOST_CHECK (cmd.getStringData () == cmd2.getStringData ());
+    EXPECT_TRUE (cmd.action () == cmd2.action ());
+    EXPECT_EQ (cmd.actionTime, cmd2.actionTime);
+    EXPECT_EQ (cmd.source_id, cmd2.source_id);
+    EXPECT_EQ (cmd.dest_id, cmd2.dest_id);
+    EXPECT_EQ (cmd.source_handle, cmd2.source_handle);
+    EXPECT_EQ (cmd.dest_handle, cmd2.dest_handle);
+    EXPECT_EQ (cmd.payload, cmd2.payload);
+    EXPECT_EQ (cmd.flags, cmd2.flags);
+    EXPECT_TRUE (cmd.getStringData () == cmd2.getStringData ());
 }
 
-BOOST_AUTO_TEST_CASE (conversion_test2)
+TEST (ActionMessage_tests, conversion_test2)
 {
     helics::ActionMessage cmd (helics::CMD_SEND_MESSAGE);
     cmd.source_id = global_federate_id{1};
@@ -311,18 +308,18 @@ BOOST_AUTO_TEST_CASE (conversion_test2)
     auto cmdString = cmd.to_string ();
 
     helics::ActionMessage cmd2 (cmdString);
-    BOOST_CHECK (cmd.action () == cmd2.action ());
-    BOOST_CHECK_EQUAL (cmd.actionTime, cmd2.actionTime);
-    BOOST_CHECK_EQUAL (cmd.source_id, cmd2.source_id);
-    BOOST_CHECK_EQUAL (cmd.dest_id, cmd2.dest_id);
-    BOOST_CHECK_EQUAL (cmd.source_handle, cmd2.source_handle);
-    BOOST_CHECK_EQUAL (cmd.dest_handle, cmd2.dest_handle);
-    BOOST_CHECK_EQUAL (cmd.payload, cmd2.payload);
-    BOOST_CHECK_EQUAL (cmd.flags, cmd2.flags);
-    BOOST_CHECK (cmd.getStringData () == cmd2.getStringData ());
+    EXPECT_TRUE (cmd.action () == cmd2.action ());
+    EXPECT_EQ (cmd.actionTime, cmd2.actionTime);
+    EXPECT_EQ (cmd.source_id, cmd2.source_id);
+    EXPECT_EQ (cmd.dest_id, cmd2.dest_id);
+    EXPECT_EQ (cmd.source_handle, cmd2.source_handle);
+    EXPECT_EQ (cmd.dest_handle, cmd2.dest_handle);
+    EXPECT_EQ (cmd.payload, cmd2.payload);
+    EXPECT_EQ (cmd.flags, cmd2.flags);
+    EXPECT_TRUE (cmd.getStringData () == cmd2.getStringData ());
 }
 
-BOOST_AUTO_TEST_CASE (message_message_conversion_test)
+TEST (ActionMessage_tests, message_message_conversion_test)
 {
     helics::ActionMessage cmd (helics::CMD_SEND_MESSAGE);
     cmd.source_id = global_federate_id{1};
@@ -339,24 +336,24 @@ BOOST_AUTO_TEST_CASE (message_message_conversion_test)
 
     auto msg = helics::createMessageFromCommand (cmd);
 
-    BOOST_CHECK_EQUAL (cmd.actionTime, msg->time);
-    BOOST_CHECK_EQUAL (cmd.getString (sourceStringLoc), msg->source);
-    BOOST_CHECK_EQUAL (cmd.getString (origSourceStringLoc), msg->original_source);
-    BOOST_CHECK_EQUAL (cmd.getString (targetStringLoc), msg->dest);
-    BOOST_CHECK_EQUAL (cmd.payload, msg->data.to_string ());
+    EXPECT_EQ (cmd.actionTime, msg->time);
+    EXPECT_EQ (cmd.getString (sourceStringLoc), msg->source);
+    EXPECT_EQ (cmd.getString (origSourceStringLoc), msg->original_source);
+    EXPECT_EQ (cmd.getString (targetStringLoc), msg->dest);
+    EXPECT_EQ (cmd.payload, msg->data.to_string ());
 
     ActionMessage cmd2;
     cmd2.moveInfo (std::move (msg));
-    BOOST_CHECK (cmd.action () == CMD_SEND_MESSAGE);
-    BOOST_CHECK_EQUAL (cmd.actionTime, cmd2.actionTime);
-    BOOST_CHECK_EQUAL (cmd.getString (0), cmd2.getString (0));
-    BOOST_CHECK_EQUAL (cmd.getString (1), cmd2.getString (1));
-    BOOST_CHECK_EQUAL (cmd.getString (2), cmd2.getString (2));
-    BOOST_CHECK_EQUAL (cmd.payload, cmd.payload);
+    EXPECT_TRUE (cmd.action () == CMD_SEND_MESSAGE);
+    EXPECT_EQ (cmd.actionTime, cmd2.actionTime);
+    EXPECT_EQ (cmd.getString (0), cmd2.getString (0));
+    EXPECT_EQ (cmd.getString (1), cmd2.getString (1));
+    EXPECT_EQ (cmd.getString (2), cmd2.getString (2));
+    EXPECT_EQ (cmd.payload, cmd.payload);
 }
 
 // check some error handling in the toByteArray function
-BOOST_AUTO_TEST_CASE (check_conversions)
+TEST (ActionMessage_tests, check_conversions)
 {
     helics::ActionMessage cmd (helics::CMD_PROTOCOL);
     cmd.messageID = 10;
@@ -364,23 +361,23 @@ BOOST_AUTO_TEST_CASE (check_conversions)
 
     auto cmdStr = cmd.to_string ();
     auto cmdVec = cmd.to_vector ();
-    BOOST_CHECK_EQUAL (cmdStr.size (), cmdVec.size ());
-    BOOST_CHECK_EQUAL (cmdStr, std::string (cmdVec.data (), cmdVec.size ()));
+    EXPECT_EQ (cmdStr.size (), cmdVec.size ());
+    EXPECT_EQ (cmdStr, std::string (cmdVec.data (), cmdVec.size ()));
 
     auto testBuffer1 = std::make_unique<char[]> (cmdStr.size () + 20);
     auto testBuffer2 = std::make_unique<char[]> (cmdStr.size () >> 2u);  // make a too small buffer
 
     auto res = cmd.toByteArray (testBuffer1.get (), static_cast<int> (cmdStr.size () + 20));
-    BOOST_CHECK_EQUAL (res, cmdStr.size ());
+    EXPECT_EQ (res, static_cast<int> (cmdStr.size ()));
     // just check to make sure the same string was written
-    BOOST_CHECK_EQUAL (cmdStr, std::string (testBuffer1.get (), res));
+    EXPECT_EQ (cmdStr, std::string (testBuffer1.get (), res));
     // this should return -1
     res = cmd.toByteArray (testBuffer2.get (), static_cast<int> (cmdStr.size () >> 2u));
-    BOOST_CHECK_EQUAL (res, -1);
+    EXPECT_EQ (res, -1);
 }
 
 // check some error handling in the toByteArray function
-BOOST_AUTO_TEST_CASE (check_packetization)
+TEST (ActionMessage_tests, check_packetization)
 {
     helics::ActionMessage cmd (helics::CMD_SEND_MESSAGE);
     cmd.source_id = global_federate_id (1);
@@ -396,19 +393,17 @@ BOOST_AUTO_TEST_CASE (check_packetization)
     cmd.setStringData ("target", "source as a very long string test .........", "original_source");
     auto cmdStringNormal = cmd.to_string ();
     auto cmdString = cmd.packetize ();
-    BOOST_CHECK_GE (cmdStringNormal.size () + 6, cmdString.size ());
+    EXPECT_GE (cmdStringNormal.size () + 6, cmdString.size ());
     helics::ActionMessage cmd2;
     auto res = cmd2.depacketize (cmdString.data (), static_cast<int> (cmdString.size ()));
-    BOOST_CHECK_EQUAL (res, cmdString.size ());
-    BOOST_CHECK (cmd.action () == cmd2.action ());
-    BOOST_CHECK_EQUAL (cmd.actionTime, cmd2.actionTime);
-    BOOST_CHECK_EQUAL (cmd.source_id, cmd2.source_id);
-    BOOST_CHECK_EQUAL (cmd.dest_id, cmd2.dest_id);
-    BOOST_CHECK_EQUAL (cmd.source_handle, cmd2.source_handle);
-    BOOST_CHECK_EQUAL (cmd.dest_handle, cmd2.dest_handle);
-    BOOST_CHECK_EQUAL (cmd.payload, cmd2.payload);
-    BOOST_CHECK_EQUAL (cmd.flags, cmd2.flags);
-    BOOST_CHECK (cmd.getStringData () == cmd2.getStringData ());
+    EXPECT_EQ (res, static_cast<int> (cmdString.size ()));
+    EXPECT_TRUE (cmd.action () == cmd2.action ());
+    EXPECT_EQ (cmd.actionTime, cmd2.actionTime);
+    EXPECT_EQ (cmd.source_id, cmd2.source_id);
+    EXPECT_EQ (cmd.dest_id, cmd2.dest_id);
+    EXPECT_EQ (cmd.source_handle, cmd2.source_handle);
+    EXPECT_EQ (cmd.dest_handle, cmd2.dest_handle);
+    EXPECT_EQ (cmd.payload, cmd2.payload);
+    EXPECT_EQ (cmd.flags, cmd2.flags);
+    EXPECT_TRUE (cmd.getStringData () == cmd2.getStringData ());
 }
-
-BOOST_AUTO_TEST_SUITE_END ()

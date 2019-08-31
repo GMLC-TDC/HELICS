@@ -1,15 +1,16 @@
 /*
 Copyright © 2017-2019,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
-All rights reserved. See LICENSE file and DISCLAIMER for more details.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See the top-level NOTICE for
+additional details. All rights reserved.
+SPDX-License-Identifier: BSD-3-Clause
 */
 #pragma once
 
 #include "../../application_api/helicsTypes.hpp"
 #include "../../common/GuardedTypes.hpp"
-#include "../../common/TripWire.hpp"
 #include "../../core/core-data.hpp"
 #include "../api-data.h"
+#include "gmlc/concurrency/TripWire.hpp"
 #include <deque>
 #include <memory>
 #include <mutex>
@@ -80,7 +81,7 @@ class FedObject
     int index = -2;
     int valid = 0;
     std::shared_ptr<Federate> fedptr;
-    std::unique_ptr<Message> lastMessage;
+    std::vector<std::unique_ptr<Message>> messages;
     std::vector<std::unique_ptr<InputObject>> inputs;
     std::vector<std::unique_ptr<PublicationObject>> pubs;
     std::vector<std::unique_ptr<EndpointObject>> epts;
@@ -115,7 +116,7 @@ class EndpointObject
   public:
     Endpoint *endPtr = nullptr;
     std::shared_ptr<MessageFederate> fedptr;
-    std::unique_ptr<Message> lastMessage;
+    std::vector<std::unique_ptr<Message>> messages;
     int valid = 0;
 };
 
@@ -201,7 +202,7 @@ class MasterObjectHolder
     guarded<std::deque<std::unique_ptr<helics::BrokerObject>>> brokers;
     guarded<std::deque<std::unique_ptr<helics::CoreObject>>> cores;
     guarded<std::deque<std::unique_ptr<helics::FedObject>>> feds;
-    tripwire::TripWireDetector tripDetect;  //!< detector for library termination
+    gmlc::concurrency::TripWireDetector tripDetect;  //!< detector for library termination
     guarded<std::deque<std::string>> errorStrings;  //!< container for strings generated from error conditions
   public:
     MasterObjectHolder () noexcept;

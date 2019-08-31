@@ -1,16 +1,16 @@
 /*
 Copyright © 2017-2019,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
-All rights reserved. See LICENSE file and DISCLAIMER for more details.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
+the top-level NOTICE for additional details. All rights reserved.
+SPDX-License-Identifier: BSD-3-Clause
 */
 #pragma once
 
-#include "../common/AsioServiceManager.h"
+#include "../common/AsioContextManager.h"
 #include "ActionMessage.hpp"
-#include <boost/asio/steady_timer.hpp>
+#include <asio/steady_timer.hpp>
 #include <memory>
 #include <mutex>
-
 
 namespace helics
 {
@@ -48,11 +48,11 @@ class MessageTimer : public std::enable_shared_from_this<MessageTimer>
 
   private:
     std::mutex timerLock;  //!< lock protecting the timer buffers
-    std::vector<std::shared_ptr<boost::asio::steady_timer>> timers;
-    const std::function<void(ActionMessage &&)> sendFunction;  //!< the callback to use when sending a message
     std::vector<ActionMessage> buffers;
     std::vector<time_type> expirationTimes;
-    std::shared_ptr<AsioServiceManager> servicePtr;  //!< service manager to for handling real time operations
-    decltype (servicePtr->startServiceLoop ()) loopHandle;  //!< loop controller for async real time operations
+    const std::function<void(ActionMessage &&)> sendFunction;  //!< the callback to use when sending a message
+    std::vector<std::shared_ptr<asio::steady_timer>> timers;
+    std::shared_ptr<AsioContextManager> contextPtr;  //!< context manager to for handling real time operations
+    decltype (contextPtr->startContextLoop ()) loopHandle;  //!< loop controller for async real time operations
 };
 }  // namespace helics

@@ -1,7 +1,8 @@
 /*
 Copyright © 2017-2019,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
-All rights reserved. See LICENSE file and DISCLAIMER for more details.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
+the top-level NOTICE for additional details. All rights reserved.
+SPDX-License-Identifier: BSD-3-Clause
 */
 #include <boost/test/unit_test.hpp>
 #include <boost/test/data/test_case.hpp>
@@ -11,7 +12,6 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include "exeTestHelper.h"
 #include "helics/application_api/Subscriptions.hpp"
 #include "helics/apps/Player.hpp"
-#include "helics/common/stringToCmdLine.h"
 #include "helics/core/BrokerFactory.hpp"
 #include <future>
 
@@ -249,7 +249,7 @@ BOOST_AUTO_TEST_CASE (simple_player_mlinecomment)
     helics::apps::Player play1 ("player1", fi);
     play1.loadFile (std::string (TEST_DIR) + "/example_comments.player");
 
-    BOOST_CHECK_EQUAL (play1.pointCount (), 7);
+    BOOST_CHECK_EQUAL (play1.pointCount (), 7u);
     helics::ValueFederate vfed ("block1", fi);
     auto &sub1 = vfed.registerSubscription ("pub1");
     auto &sub2 = vfed.registerSubscription ("pub2");
@@ -283,9 +283,10 @@ BOOST_AUTO_TEST_CASE (simple_player_mlinecomment)
     BOOST_CHECK_EQUAL (retTime, 5.0);
     vfed.finalize ();
     fut.get ();
-    BOOST_CHECK_EQUAL (play1.publicationCount (), 2);
+    BOOST_CHECK_EQUAL (play1.publicationCount (), 2u);
 }
 
+#ifdef ENABLE_IPC_CORE
 BOOST_DATA_TEST_CASE (simple_player_test_files_cmdline, boost::unit_test::data::make (simple_files), file)
 {
     std::this_thread::sleep_for (std::chrono::milliseconds (300));
@@ -293,9 +294,15 @@ BOOST_DATA_TEST_CASE (simple_player_test_files_cmdline, boost::unit_test::data::
     brk->connect ();
     std::string exampleFile = std::string (TEST_DIR) + file;
 
-    StringToCmdLine cmdArg ("--name=player --broker=ipc_broker --coretype=ipc " + exampleFile);
+    std::vector<std::string> args{"", "--name=player", "--broker=ipc_broker", "--coretype=ipc", exampleFile};
+    char *argv[5];
+    argv[0] = &(args[0][0]);
+    argv[1] = &(args[1][0]);
+    argv[2] = &(args[2][0]);
+    argv[3] = &(args[3][0]);
+    argv[4] = &(args[4][0]);
 
-    helics::apps::Player play1 (cmdArg.getArgCount (), cmdArg.getArgV ());
+    helics::apps::Player play1 (5, argv);
 
     helics::FederateInfo fi (helics::core_type::IPC);
     fi.coreInitString = "--broker=ipc_broker";
@@ -336,7 +343,9 @@ BOOST_DATA_TEST_CASE (simple_player_test_files_cmdline, boost::unit_test::data::
     brk = nullptr;
     std::this_thread::sleep_for (std::chrono::milliseconds (300));
 }
+#endif
 
+#ifdef ENABLE_ZMQ_CORE
 #ifndef DISABLE_SYSTEM_CALL_TESTS
 BOOST_DATA_TEST_CASE (simple_player_test_files_ext, boost::unit_test::data::make (simple_files), file)
 {
@@ -392,6 +401,7 @@ BOOST_DATA_TEST_CASE (simple_player_test_files_ext, boost::unit_test::data::make
     // out = 0;
     std::this_thread::sleep_for (std::chrono::milliseconds (300));
 }
+#endif
 #endif
 
 BOOST_AUTO_TEST_CASE (simple_player_testjson)
@@ -627,13 +637,13 @@ BOOST_DATA_TEST_CASE (simple_message_player_test_files, boost::unit_test::data::
 
 BOOST_AUTO_TEST_CASE (player_test_help)
 {
-    StringToCmdLine cmdArg ("--version --quiet");
-    helics::apps::Player play1 (cmdArg.getArgCount (), cmdArg.getArgV ());
+    std::vector<std::string> args{"--quiet", "--version"};
+    helics::apps::Player play1 (args);
 
     BOOST_CHECK (!play1.isActive ());
 
-    StringToCmdLine cmdArg2 ("-? --quiet");
-    helics::apps::Player play2 (cmdArg2.getArgCount (), cmdArg2.getArgV ());
+    args.emplace_back ("-?");
+    helics::apps::Player play2 (args);
 
     BOOST_CHECK (!play2.isActive ());
 }

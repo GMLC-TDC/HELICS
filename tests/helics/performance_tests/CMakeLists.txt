@@ -1,7 +1,10 @@
 ##############################################################################
 # Copyright © 2017-2019,
-# Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
-#All rights reserved. See LICENSE file and DISCLAIMER for more details.
+# Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See the top-level NOTICE for additional details.
+#All rights reserved. 
+# 
+# SPDX-License-Identifier: BSD-3-Clause
+#
 ##############################################################################
 
 
@@ -13,7 +16,7 @@ ring_tests.cpp
 
 
 add_executable(perf-tests ${perf_sources})
-target_link_libraries(perf-tests helics-static helics_test_base)
+target_link_libraries(perf-tests helics-static helics_boost_test_base)
 
 set_target_properties (perf-tests PROPERTIES FOLDER tests)
 

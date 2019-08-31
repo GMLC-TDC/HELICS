@@ -1,7 +1,8 @@
 /*
 Copyright © 2017-2019,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
-All rights reserved. See LICENSE file and DISCLAIMER for more details.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
+the top-level NOTICE for additional details. All rights reserved.
+SPDX-License-Identifier: BSD-3-Clause
 */
 #pragma once
 
@@ -10,8 +11,8 @@ file defines some common filter operations
 */
 
 #include "../common/GuardedTypes.hpp"
-#include "libguarded/cow_guarded.hpp"
 #include "../core/Core.hpp"
+#include "gmlc/libguarded/cow_guarded.hpp"
 #include <atomic>
 #include <set>
 
@@ -121,8 +122,9 @@ class FirewallFilterOperation : public FilterOperations
 {
   private:
     std::shared_ptr<FirewallOperator> op;  //!< the actual operator
-    libguarded::cow_guarded<std::vector<std::string>> allowed;  //!< the conditions on which the rerouting will occur
-    libguarded::cow_guarded<std::vector<std::string>> blocked;  //!< the conditions that block a message
+    gmlc::libguarded::cow_guarded<std::vector<std::string>>
+      allowed;  //!< the conditions on which the rerouting will occur
+    gmlc::libguarded::cow_guarded<std::vector<std::string>> blocked;  //!< the conditions that block a message
   public:
     FirewallFilterOperation ();
     ~FirewallFilterOperation ();

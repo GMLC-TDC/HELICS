@@ -1,7 +1,8 @@
 /*
 Copyright © 2017-2019,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
-All rights reserved. See LICENSE file and DISCLAIMER for more details.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
+the top-level NOTICE for additional details. All rights reserved.
+SPDX-License-Identifier: BSD-3-Clause
 */
 #pragma once
 
@@ -34,6 +35,7 @@ enum class action_t : int32_t
     cmd_broker_query = -37,  //!< send a query to a core
     cmd_query_reply = -cmd_info_basis - 38,  //!< response to a query
     cmd_reg_broker = -cmd_info_basis - 40,  //!< for a broker to connect with a higher level broker
+    cmd_broker_location = cmd_info_basis - 57,  //!< command to define a new broker location
     cmd_broker_setup = -1,  //!< command to load the setup information for a broker
     cmd_ignore = 0,  //!< null command
     cmd_tick = 1,  //!< command for a timer tick
@@ -172,6 +174,7 @@ enum class action_t : int32_t
 #define CMD_PING action_message_def::action_t::cmd_ping
 #define CMD_PING_REPLY action_message_def::action_t::cmd_ping_reply
 #define CMD_BROKER_SETUP action_message_def::action_t::cmd_broker_setup
+#define CMD_BROKER_LOCATION action_message_def::action_t::cmd_broker_location
 
 #define CMD_INIT action_message_def::action_t::cmd_init
 #define CMD_INIT_NOT_READY action_message_def::action_t::cmd_init_not_ready
@@ -285,8 +288,10 @@ enum class action_t : int32_t
 #define NEW_ROUTE 233
 #define REMOVE_ROUTE 244
 #define CONNECTION_INFORMATION 299
+#define NEW_BROKER_INFORMATION 333
 #define DISCONNECT 2523
 #define DISCONNECT_ERROR 2623
+#define DELAY 3795
 
 #define NAME_NOT_FOUND 2726
 #define RECONNECT_TRANSMITTER 1997
@@ -308,6 +313,17 @@ enum class action_t : int32_t
 @return a pointer to string with the name
 */
 const char *actionMessageType (action_message_def::action_t action);
+
+enum cmd_error_codes : int
+{
+    connection_error_code = -2,
+    lost_server_connection_code = -5,
+    already_init_error_code = 5,
+    duplicate_federate_name_error_code = 6,
+    duplicate_broker_name_error_code = 7,
+    mismatch_broker_key_error_code = 9,
+};
+
 /** return a string associated with a particular error code
 @param[in,out] errorcode The error to get the string for
 @return a pointer to string with the name

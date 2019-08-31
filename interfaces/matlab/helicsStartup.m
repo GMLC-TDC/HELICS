@@ -1,5 +1,5 @@
 function success = helicsStartup(helicsLibPath)
-% HELICSSTARTUP configures MATLAB for HELICS use 
+% HELICSSTARTUP configures MATLAB for HELICS use
 
 if nargin < 1
     %If not specified use our location, which should have required lib once
@@ -16,10 +16,14 @@ libraryName = '';
 
 %TODO: vectorize (make MATLAB-esque)
 for i=1:numel(listing)
-    if endsWith(listing(i).name, '.h')
+    [~, ~, ext]=fileparts(listing(i).name);
+    if isequal(ext, '.h')
         continue;
     end
-    if endsWith(listing(i).name, '.lib')
+    if isequal(ext, '.lib')
+        continue;
+    end
+     if isequal(ext, '.a')
         continue;
     end
     libraryName = listing(i).name;
@@ -31,10 +35,14 @@ if isempty(libraryName)
     listing = dir(fullfile(directory, '*helicsSharedLibd.*'));
     
     for i=1:numel(listing)
-        if endsWith(listing(i).name, '.h')
+        [~, ~, ext]=fileparts(listing(i).name);
+        if isequal(ext, '.h')
             continue;
         end
-        if endsWith(listing(i).name, '.lib')
+        if isequal(ext, '.lib')
+            continue;
+        end
+        if isequal(ext, '.a')
             continue;
         end
         libraryName = listing(i).name;
@@ -43,7 +51,10 @@ if isempty(libraryName)
 end
 
 if (~isempty(libraryName))
-    loadlibrary(GetFullPath(fullfile(helicsLibPath, libraryName)));
+    [~,name]=fileparts(libraryName);
+    if ~libisloaded(name)
+        loadlibrary(GetFullPath(fullfile(helicsLibPath, libraryName)));
+    end
 else
     disp('Unable to find library for HELICS')
 end

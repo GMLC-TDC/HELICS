@@ -1,7 +1,8 @@
 /*
 Copyright © 2017-2019,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
-All rights reserved. See LICENSE file and DISCLAIMER for more details.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
+the top-level NOTICE for additional details. All rights reserved.
+SPDX-License-Identifier: BSD-3-Clause
 */
 #include "FederateState.hpp"
 
@@ -14,6 +15,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include <algorithm>
 #include <chrono>
 #include <mutex>
+#include <sstream>
 #include <thread>
 
 #include "MessageTimer.hpp"
@@ -179,6 +181,28 @@ bool FederateState::checkAndSetValue (interface_handle pub_id, const char *data,
     return res;
 }
 
+std::string FederateState::generateConfig () const
+{
+    static const std::string truestr{"true"};
+    static const std::string falsestr{"false"};
+
+    std::stringstream s;
+    s << "\"only_transmit_on_change\":" << ((only_transmit_on_change) ? truestr : falsestr);
+    s << ",\n\"realtime\":" << ((realtime) ? truestr : falsestr);
+    s << ",\n\"observer\":" << ((observer) ? truestr : falsestr);
+    s << ",\n\"source_only\":" << ((source_only) ? truestr : falsestr);
+    s << ",\n\"strict_input_type_checking\":" << ((source_only) ? truestr : falsestr);
+    if (rt_lag > timeZero)
+    {
+        s << ",\n\"rt_lag\":" << static_cast<double> (rt_lag);
+    }
+    if (rt_lead > timeZero)
+    {
+        s << ",\n\"rt_lead\":" << static_cast<double> (rt_lead);
+    }
+    return s.str ();
+}
+
 uint64_t FederateState::getQueueSize (interface_handle handle_) const
 {
     auto epI = interfaceInformation.getEndpoint (handle_);
@@ -296,6 +320,10 @@ void FederateState::createInterface (handle_type htype,
         if (strict_input_type_checking)
         {
             interfaceInformation.setInputProperty (handle, defs::options::strict_type_checking, true);
+        }
+        if (ignore_unit_mismatch)
+        {
+            interfaceInformation.setInputProperty (handle, defs::options::ignore_unit_mismatch, true);
         }
         if (checkActionFlag (getInterfaceFlags (), required_flag))
         {
@@ -1205,11 +1233,7 @@ message_processing_result FederateState::processActionMessage (ActionMessage &cm
         auto subI = interfaceInformation.getInput (cmd.dest_handle);
         if (subI != nullptr)
         {
-            subI->addSource (cmd.getSource (), cmd.getString (0), cmd.getString (1));
-            if (subI->inputType.empty ())
-            {
-                subI->inputType = cmd.getString (typeStringLoc);
-            }
+            subI->addSource (cmd.getSource (), cmd.getString (typeStringLoc), cmd.getString (unitStringLoc));
             addDependency (cmd.source_id);
         }
     }
@@ -1363,17 +1387,15 @@ void FederateState::setInterfaceProperty (const ActionMessage &cmd)
                                                       checkActionFlag (cmd, indicator_flag));
         if (!used)
         {
-            auto ipt = interfaceInformation.getInput(cmd.dest_handle);
+            auto ipt = interfaceInformation.getInput (cmd.dest_handle);
             if (ipt != nullptr)
             {
-                LOG_WARNING(fmt::format("property {} not used on input {}", cmd.messageID,
-                    ipt->key));
+                LOG_WARNING (fmt::format ("property {} not used on input {}", cmd.messageID, ipt->key));
             }
             else
             {
-                LOG_WARNING(fmt::format("property {} not used on due to unknown input", cmd.messageID));
+                LOG_WARNING (fmt::format ("property {} not used on due to unknown input", cmd.messageID));
             }
-           
         }
         break;
     case 'p':
@@ -1381,15 +1403,14 @@ void FederateState::setInterfaceProperty (const ActionMessage &cmd)
                                                             checkActionFlag (cmd, indicator_flag));
         if (!used)
         {
-            auto pub = interfaceInformation.getPublication(cmd.dest_handle);
+            auto pub = interfaceInformation.getPublication (cmd.dest_handle);
             if (pub != nullptr)
             {
-                LOG_WARNING(fmt::format("property {} not used on Publication {}", cmd.messageID,
-                    pub->key));
+                LOG_WARNING (fmt::format ("property {} not used on Publication {}", cmd.messageID, pub->key));
             }
             else
             {
-                LOG_WARNING(fmt::format("property {} not used on due to unknown Publication", cmd.messageID));
+                LOG_WARNING (fmt::format ("property {} not used on due to unknown Publication", cmd.messageID));
             }
         }
         break;
@@ -1398,15 +1419,14 @@ void FederateState::setInterfaceProperty (const ActionMessage &cmd)
                                                       checkActionFlag (cmd, indicator_flag));
         if (!used)
         {
-            auto ept = interfaceInformation.getEndpoint(cmd.dest_handle);
+            auto ept = interfaceInformation.getEndpoint (cmd.dest_handle);
             if (ept != nullptr)
             {
-                LOG_WARNING(fmt::format("property {} not used on Endpoint {}", cmd.messageID,
-                    ept->key));
+                LOG_WARNING (fmt::format ("property {} not used on Endpoint {}", cmd.messageID, ept->key));
             }
             else
             {
-                LOG_WARNING(fmt::format("property {} not used on due to unknown Endpoint", cmd.messageID));
+                LOG_WARNING (fmt::format ("property {} not used on due to unknown Endpoint", cmd.messageID));
             }
         }
         break;
@@ -1471,6 +1491,9 @@ void FederateState::setOptionFlag (int optionFlag, bool value)
         break;
     case defs::flags::strict_input_type_checking:
         strict_input_type_checking = value;
+        break;
+    case defs::flags::ignore_input_unit_mismatch:
+        ignore_unit_mismatch = value;
         break;
     case defs::flags::realtime:
         if (value)
@@ -1573,6 +1596,8 @@ bool FederateState::getOptionFlag (int optionFlag) const
         return ((interfaceFlags.load () & make_flags (optional_flag)) != 0);
     case defs::flags::strict_input_type_checking:
         return strict_input_type_checking;
+    case defs::flags::ignore_input_unit_mismatch:
+        return ignore_unit_mismatch;
     default:
         return timeCoord->getOptionFlag (optionFlag);
     }
@@ -1723,10 +1748,51 @@ std::string FederateState::processQuery (const std::string &query) const
     {
         return generateStringVector (interfaceInformation.getEndpoints (), [](auto &ept) { return ept->key; });
     }
+    if (query == "interfaces")
+    {
+        return "{" + interfaceInformation.generateInferfaceConfig () + "}";
+    }
+    if (query == "subscriptions")
+    {
+        std::ostringstream s;
+        s << "[";
+        auto ipts = interfaceInformation.getInputs ();
+        for (auto &ipt : ipts)
+        {
+            for (auto &isrc : ipt->input_sources)
+            {
+                s << isrc.fed_id << ':' << isrc.handle << ';';
+            }
+        }
+        auto str = s.str ();
+        if (str.back() == ';')
+        {
+            str.pop_back ();
+        }
+        str.push_back (']');
+        return str;
+    }
     if (query == "dependencies")
     {
         return generateStringVector (timeCoord->getDependencies (),
                                      [](auto &dep) { return std::to_string (dep.baseValue ()); });
+    }
+    if (query == "timeconfig")
+    {
+        std::ostringstream s;
+        s << "{\n" << timeCoord->generateConfig ();
+        s << ",\n" << generateConfig ();
+        s << "}";
+        return s.str ();
+    }
+    if (query == "config")
+    {
+        std::ostringstream s;
+        s << "{\n" << timeCoord->generateConfig ();
+        s << ",\n" << generateConfig ();
+        s << ",\n" << interfaceInformation.generateInferfaceConfig ();
+        s << "}";
+        return s.str ();
     }
     if (query == "dependents")
     {

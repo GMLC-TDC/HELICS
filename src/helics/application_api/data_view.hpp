@@ -1,7 +1,8 @@
 /*
 Copyright © 2017-2019,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
-All rights reserved. See LICENSE file and DISCLAIMER for more details.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
+the top-level NOTICE for additional details. All rights reserved.
+SPDX-License-Identifier: BSD-3-Clause
 */
 #pragma once
 
@@ -9,7 +10,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include "../core/helics-time.hpp"
 #include "helics/helics-config.h"
 #include "helicsTypes.hpp"
-#include "helics_includes/string_view.hpp"
+#include "helics/external/string_view.hpp"
 #include <memory>
 
 namespace helics

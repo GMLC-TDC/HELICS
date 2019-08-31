@@ -1,14 +1,44 @@
 #
-# Copyright © 2017-2019, Battelle Memorial Institute; Lawrence Livermore National
-# Security, LLC; Alliance for Sustainable Energy, LLC All rights reserved. See LICENSE
-# file and DISCLAIMER for more details.
+# Copyright (c) 2017-2019, Battelle Memorial Institute; Lawrence Livermore
+# National Security, LLC; Alliance for Sustainable Energy, LLC.
+# See the top-level NOTICE for additional details.
+# All rights reserved.
 #
+# SPDX-License-Identifier: BSD-3-Clause
+#
+if (NOT DISABLE_C_SHARED_INTERFACE)
 
-if(ENABLE_SWIG)
+option(BUILD_PYTHON_INTERFACE "Build Python extension" OFF)
+option(
+    BUILD_PYTHON2_INTERFACE
+    "Build Python2.7 extension(Requires swig and will not build if \"PYTHON_INTERFACE\" is active)"
+    OFF
+)
+option(BUILD_MATLAB_INTERFACE "Build Matlab Extension" OFF)
+option(BUILD_OCTAVE_INTERFACE "Build Octave extension" OFF)
+option(BUILD_JAVA_INTERFACE "Build Java extension" OFF)
+
+if(${CMAKE_VERSION} VERSION_GREATER 3.8)
+    # cmake projects are only available for csharp from 3.8 onward
+    option(BUILD_CSHARP_INTERFACE "Build C# extension" OFF)
+endif()
+
+
+IF(BUILD_CSHARP_INTERFACE OR BUILD_OCTAVE_INTERFACE OR BUILD_PYTHON2_INTERFACE)
+set(SWIG_REQUIRED ON)
+else()
+set(SWIG_REQUIRED OFF)
+if (BUILD_PYTHON_INTERFACE OR BUILD_MATLAB_INTERFACE OR BUILD_JAVA_INTERFACE)
+option(ENABLE_SWIG OFF "use swig to generate the interface files")
+endif()
+endif()
+
+if(ENABLE_SWIG OR SWIG_REQUIRED)
   if(WIN32 AND NOT MSYS)
     if(NOT CMAKE_PROGRAM_PATH)
       set(
         CMAKE_PROGRAM_PATH
+	"C:/local/swigwin-4.0.0"
         "C:/local/swigwin-3.0.12"
         "C:/local/swigwin-3.0.11"
         "C:/local/swigwin-3.0.10"
@@ -17,6 +47,7 @@ if(ENABLE_SWIG)
       set(
         CMAKE_PROGRAM_PATH
         "${CMAKE_PROGRAM_PATH}"
+	"C:/local/swigwin-4.0.0"
         "C:/local/swigwin-3.0.12"
         "C:/local/swigwin-3.0.11"
         "C:/local/swigwin-3.0.10"
@@ -34,8 +65,8 @@ if(ENABLE_SWIG)
 endif()
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
-include_directories("${PROJECT_SOURCE_DIR}/src/helics/shared_api_library")
-include_directories("${PROJECT_BINARY_DIR}/src/helics/shared_api_library")
+include_directories("${HELICS_SOURCE_DIR}/src/helics/shared_api_library")
+include_directories("${HELICS_BINARY_DIR}/src/helics/shared_api_library")
 
 if(BUILD_PYTHON_INTERFACE)
   add_subdirectory(python)
@@ -63,3 +94,5 @@ endif()
 if(BUILD_CSHARP_INTERFACE)
    add_subdirectory(csharp)
 endif()
+
+endif()  # disable c shared interface

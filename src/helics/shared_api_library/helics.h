@@ -1,7 +1,8 @@
 /*
 Copyright © 2017-2019,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
-All rights reserved. See LICENSE file and DISCLAIMER for more details.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See the top-level NOTICE for
+additional details. All rights reserved.
+SPDX-License-Identifier: BSD-3-Clause
 */
 
 #ifndef HELICS_APISHARED_FUNCTIONS_H_
@@ -25,10 +26,10 @@ extern "C"
     ****************************************************/
 
     /** get a version string for HELICS */
-    HELICS_EXPORT const char *helicsGetVersion ();
+    HELICS_EXPORT const char *helicsGetVersion (void);
 
     /** return an initialized error object*/
-    HELICS_EXPORT helics_error helicsErrorInitialize ();
+    HELICS_EXPORT helics_error helicsErrorInitialize (void);
 
     /** clear an error object*/
     HELICS_EXPORT void helicsErrorClear (helics_error *err);
@@ -195,7 +196,6 @@ extern "C"
 
     /** get an identifier for the core
     @param core the core to query
-    @return a void enumeration indicating any error condition
     @param[in,out] err an error object that will contain an error code and string if any error occurred during the execution of the function
     */
     HELICS_EXPORT void helicsCoreDisconnect (helics_core core, helics_error *err);
@@ -294,7 +294,7 @@ extern "C"
     /** create a federate info object for specifying federate information when constructing a federate
     @return a helics_federate_info object which is a reference to the created object
     */
-    HELICS_EXPORT helics_federate_info helicsCreateFederateInfo ();
+    HELICS_EXPORT helics_federate_info helicsCreateFederateInfo (void);
 
     /** create a federate info object from an existing one and clone the information
     @param fi a federateInfo object to duplicate
@@ -327,10 +327,17 @@ extern "C"
 
     /** set the initialization string for the core usually in the form of command line arguments
     @param fi the federate info object to alter
-    @param coreInit a string with the core initialization strings
+    @param coreInit a string containing command line arguments to be passed to the core
     @param[in,out] err an error object that will contain an error code and string if any error occurred during the execution of the function
     */
     HELICS_EXPORT void helicsFederateInfoSetCoreInitString (helics_federate_info fi, const char *coreInit, helics_error *err);
+
+    /** set the initialization string that a core will pass to a generated broker usually in the form of command line arguments
+    @param fi the federate info object to alter
+    @param brokerInit a string with command line arguments for a generated broker
+    @param[in,out] err an error object that will contain an error code and string if any error occurred during the execution of the function
+    */
+    HELICS_EXPORT void helicsFederateInfoSetBrokerInitString (helics_federate_info fi, const char *brokerInit, helics_error *err);
 
     /** set the core type by integer code
     @details valid values available by definitions in api-data.h
@@ -350,10 +357,18 @@ extern "C"
     /** set the name or connection information for a broker
     @details this is only used if the core is automatically created, the broker information will be transferred to the core for connection
     @param fi the federate info object to alter
-    @param broker a string which defined the connection information for a broker either a name or an address
+    @param broker a string which defines the connection information for a broker either a name or an address
    @param[in,out] err an error object that will contain an error code and string if any error occurred during the execution of the function
     */
     HELICS_EXPORT void helicsFederateInfoSetBroker (helics_federate_info fi, const char *broker, helics_error *err);
+
+    /** set the key for a broker connection
+    @details this is only used if the core is automatically created, the broker information will be transferred to the core for connection
+    @param fi the federate info object to alter
+    @param brokerkey a string containing a key for the broker to connect
+    @param[in,out] err an error object that will contain an error code and string if any error occurred during the execution of the function
+    */
+    HELICS_EXPORT void helicsFederateInfoSetBrokerKey (helics_federate_info fi, const char *brokerkey, helics_error *err);
 
     /** set the port to use for the broker
     @details this is only used if the core is automatically created, the broker information will be transferred to the core for connection
@@ -444,7 +459,7 @@ extern "C"
 
     /** call when done using the helics library,  this function will ensure the threads are closed properly if possible
     this should be the last call before exiting,  */
-    HELICS_EXPORT void helicsCloseLibrary ();
+    HELICS_EXPORT void helicsCloseLibrary (void);
 
     /* initialization, execution, and time requests */
     /** enter the initialization state of a federate
@@ -498,7 +513,7 @@ extern "C"
     HELICS_EXPORT void helicsFederateEnterExecutingModeComplete (helics_federate fed, helics_error *err);
 
     /** request an iterative time
-    @details this call allows for finer grain control of the iterative process then /ref helicsFederateRequestTime it takes a time and and
+    @details this call allows for finer grain control of the iterative process then /ref helicsFederateRequestTime it takes a time and
     iteration request and return a time and iteration status
     @param fed the federate to make the request of
     @param iterate the requested iteration mode
@@ -543,16 +558,24 @@ extern "C"
     @param fed the federate to make the request of
     @param requestTime the next requested time
     @param[in,out] err an error object that will contain an error code and string if any error occurred during the execution of the function
-    @return the time granted to the federate
+    @return the time granted to the federate, will return helics_time_maxtime if the simulation has terminated
     invalid*/
     HELICS_EXPORT helics_time helicsFederateRequestTime (helics_federate fed, helics_time requestTime, helics_error *err);
+
+    /** request the next time for federate execution
+    @param fed the federate to make the request of
+    @param requestTime the next requested time
+    @param[in,out] err an error object that will contain an error code and string if any error occurred during the execution of the function
+    @return the time granted to the federate, will return helics_time_maxtime if the simulation has terminated
+    invalid*/
+    HELICS_EXPORT helics_time helicsFederateRequestTimeAdvance (helics_federate fed, helics_time timeDelta, helics_error *err);
 
     /** request the next time step for federate execution
     @details feds should have setup the period or minDelta for this to work well but it will request the next time step which is the current
     time plus the minimum time step
     @param fed the federate to make the request of
     @param[in,out] err an error object that will contain an error code and string if any error occurred during the execution of the function
-    @return the time granted to the federate
+    @return the time granted to the federate, will return helics_time_maxtime if the simulation has terminated
     invalid*/
     HELICS_EXPORT helics_time helicsFederateRequestNextStep (helics_federate fed, helics_error *err);
 
@@ -564,7 +587,8 @@ extern "C"
     @param iterate the requested iteration mode
     @param[out] outIterate  the iteration specification of the result
     @param[in,out] err an error object that will contain an error code and string if any error occurred during the execution of the function
-    @return the granted time
+    @return the granted time, will return helics_time_maxtime if the simulation has terminated along with the appropriate iteration result
+    value
     */
     HELICS_EXPORT helics_time helicsFederateRequestTimeIterative (helics_federate fed,
                                                                   helics_time requestTime,
@@ -583,7 +607,7 @@ extern "C"
     /** complete an asynchronous requestTime call
     @param fed the federate to make the request of
     @param[in,out] err an error object that will contain an error code and string if any error occurred during the execution of the function
-    @return the time granted to the federate*/
+    @return the time granted to the federate, will return helics_time_maxtime if the simulation has terminated*/
     HELICS_EXPORT helics_time helicsFederateRequestTimeComplete (helics_federate fed, helics_error *err);
 
     /** request an iterative time through an asynchronous call
@@ -593,7 +617,6 @@ extern "C"
     @param requestTime the next desired time
     @param iterate the requested iteration mode
     @param[in,out] err an error object that will contain an error code and string if any error occurred during the execution of the function
-    @return a void object with a return code of the result
     */
     HELICS_EXPORT void helicsFederateRequestTimeIterativeAsync (helics_federate fed,
                                                                 helics_time requestTime,
@@ -604,7 +627,7 @@ extern "C"
     @param fed the federate to make the request of
     @param[out] outIterate  the iteration specification of the result
     @param[in,out] err an error object that will contain an error code and string if any error occurred during the execution of the function
-    @return the granted time
+    @return the granted time, will return helics_time_maxtime if the simulation has terminated
     */
     HELICS_EXPORT helics_time helicsFederateRequestTimeIterativeComplete (helics_federate fed,
                                                                           helics_iteration_result *outIterate,
@@ -748,7 +771,6 @@ extern "C"
     @param query the query object to use in the query
     @param fed a federate to send the query through
     @param[in,out] err an error object that will contain an error code and string if any error occurred during the execution of the function
-    @return a helics status enumeration with the result of the query specification
     */
     HELICS_EXPORT void helicsQueryExecuteAsync (helics_query query, helics_federate fed, helics_error *err);
 
@@ -776,7 +798,7 @@ extern "C"
     /** function to do some housekeeping work
     @details this runs some cleanup routines and tries to close out any residual thread that haven't been shutdown
     yet*/
-    HELICS_EXPORT void helicsCleanupLibrary ();
+    HELICS_EXPORT void helicsCleanupLibrary (void);
 
 #ifdef __cplusplus
 } /* end of extern "C" { */

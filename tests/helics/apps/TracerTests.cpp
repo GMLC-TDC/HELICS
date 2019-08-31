@@ -1,24 +1,24 @@
 /*
 Copyright © 2017-2019,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
-All rights reserved. See LICENSE file and DISCLAIMER for more details.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
+the top-level NOTICE for additional details. All rights reserved.
+SPDX-License-Identifier: BSD-3-Clause
 */
 #include <boost/test/unit_test.hpp>
-#include <boost/filesystem.hpp>
 #include <boost/test/data/test_case.hpp>
-#include <boost/test/floating_point_comparison.hpp>
+#include <boost/test/tools/floating_point_comparison.hpp>
 
 #include <cstdio>
 
-#include "../ThirdParty/libguarded/guarded.hpp"
 #include "exeTestHelper.h"
+#include "gmlc/libguarded/guarded.hpp"
+#include "gmlc/utilities/stringOps.h"
 #include "helics/application_api/Publications.hpp"
 #include "helics/apps/Tracer.hpp"
-#include "helics/common/stringOps.h"
-#include "helics/common/stringToCmdLine.h"
 #include "helics/core/BrokerFactory.hpp"
 #include <algorithm>
 #include <future>
+#include <iostream>
 
 namespace utf = boost::unit_test;
 using namespace std::literals::chrono_literals;
@@ -74,7 +74,7 @@ BOOST_AUTO_TEST_CASE (simple_tracer_test)
 
 BOOST_AUTO_TEST_CASE (tracer_test_message)
 {
-    libguarded::guarded<std::unique_ptr<helics::Message>> mguard;
+    gmlc::libguarded::guarded<std::unique_ptr<helics::Message>> mguard;
     std::atomic<double> lastTime{0.0};
     helics::FederateInfo fi (helics::core_type::TEST);
     fi.coreName = "tcore-tracer";
@@ -195,7 +195,7 @@ BOOST_DATA_TEST_CASE (simple_tracer_test_message_files, boost::unit_test::data::
     helics::FederateInfo fi (helics::core_type::TEST);
     fi.coreName = std::string ("tcore1b") + file;
     fi.coreName.push_back (indx++);
-    fi.coreInitString = " - f 2 --autobroker";
+    fi.coreInitString = " -f 2 --autobroker";
     helics::apps::Tracer trace1 ("trace1", fi);
 
     trace1.loadFile (std::string (TEST_DIR) + file);
@@ -243,6 +243,7 @@ BOOST_DATA_TEST_CASE (simple_tracer_test_message_files, boost::unit_test::data::
     trace1.finalize ();
 }
 
+#ifdef ENABLE_IPC_CORE
 BOOST_DATA_TEST_CASE (simple_tracer_test_message_files_cmd,
                       boost::unit_test::data::make (simple_message_files),
                       file)
@@ -251,10 +252,15 @@ BOOST_DATA_TEST_CASE (simple_tracer_test_message_files_cmd,
     auto brk = helics::BrokerFactory::create (helics::core_type::IPC, "ipc_broker", "-f 2");
     brk->connect ();
     std::string exampleFile = std::string (TEST_DIR) + file;
+    std::vector<std::string> args{"", "--name=rec", "--coretype=ipc", exampleFile};
 
-    StringToCmdLine cmdArg ("--name=rec --coretype=ipc " + exampleFile);
+    char *argv[4];
+    argv[0] = &(args[0][0]);
+    argv[1] = &(args[1][0]);
+    argv[2] = &(args[2][0]);
+    argv[3] = &(args[3][0]);
 
-    helics::apps::Tracer trace1 (cmdArg.getArgCount (), cmdArg.getArgV ());
+    helics::apps::Tracer trace1 (4, argv);
     std::atomic<int> counter{0};
     auto cb = [&counter](helics::Time, const std::string &, const std::string &) { ++counter; };
     trace1.setValueCallback (cb);
@@ -297,10 +303,11 @@ BOOST_DATA_TEST_CASE (simple_tracer_test_message_files_cmd,
     trace1.finalize ();
     std::this_thread::sleep_for (300ms);
 }
+#endif
 
 BOOST_AUTO_TEST_CASE (tracer_test_destendpoint_clone)
 {
-    libguarded::guarded<std::unique_ptr<helics::Message>> mguard;
+    gmlc::libguarded::guarded<std::unique_ptr<helics::Message>> mguard;
     std::atomic<double> lastTime{0.0};
     helics::FederateInfo fi (helics::core_type::TEST);
     fi.coreName = "tcore-dep";
@@ -381,7 +388,7 @@ BOOST_AUTO_TEST_CASE (tracer_test_destendpoint_clone)
 
 BOOST_AUTO_TEST_CASE (tracer_test_srcendpoint_clone)
 {
-    libguarded::guarded<std::unique_ptr<helics::Message>> mguard;
+    gmlc::libguarded::guarded<std::unique_ptr<helics::Message>> mguard;
     std::atomic<double> lastTime{0.0};
     helics::FederateInfo fi (helics::core_type::TEST);
     fi.coreName = "tcoresrc";
@@ -454,7 +461,7 @@ BOOST_AUTO_TEST_CASE (tracer_test_srcendpoint_clone)
 
 BOOST_AUTO_TEST_CASE (tracer_test_endpoint_clone)
 {
-    libguarded::guarded<std::unique_ptr<helics::Message>> mguard;
+    gmlc::libguarded::guarded<std::unique_ptr<helics::Message>> mguard;
     std::atomic<double> lastTime{0.0};
     helics::FederateInfo fi (helics::core_type::TEST);
     fi.coreName = "tcore-ep";
@@ -534,7 +541,7 @@ static constexpr const char *simple_clone_test_files[] = {"clone_example1.txt", 
 BOOST_DATA_TEST_CASE (simple_clone_test_file, boost::unit_test::data::make (simple_clone_test_files), file)
 {
     static char indx = 'a';
-    libguarded::guarded<std::unique_ptr<helics::Message>> mguard;
+    gmlc::libguarded::guarded<std::unique_ptr<helics::Message>> mguard;
     std::atomic<double> lastTime{0.0};
     helics::FederateInfo fi (helics::core_type::TEST);
     fi.coreName = std::string ("tcore4") + file;
@@ -603,22 +610,22 @@ BOOST_DATA_TEST_CASE (simple_clone_test_file, boost::unit_test::data::make (simp
     }
 }
 
+#ifdef ENABLE_ZMQ_TESTS
 #ifndef DISABLE_SYSTEM_CALL_TESTS
 BOOST_DATA_TEST_CASE (simple_tracer_test_message_files_exe,
                       boost::unit_test::data::make (simple_message_files),
                       file)
 {
     std::this_thread::sleep_for (300ms);
-    auto brk = helics::BrokerFactory::create (helics::core_type::IPC, "ipc_broker", "-f 2");
+    auto brk = helics::BrokerFactory::create (helics::core_type::ZMQ, "z_broker", "-f 2");
     brk->connect ();
     std::string exampleFile = std::string (TEST_DIR) + file;
 
-    std::string cmdArg ("--name=tracer --coretype=ipc --stop=5 " + exampleFile);
+    std::string cmdArg ("--name=tracer --coretype=zmq --stop=5s --print --skiplog " + exampleFile);
     exeTestRunner tracerExe (HELICS_INSTALL_LOC, HELICS_BUILD_LOC "apps/", "helics_app");
     BOOST_REQUIRE (tracerExe.isActive ());
     auto out = tracerExe.runCaptureOutputAsync (std::string ("tracer " + cmdArg));
-
-    helics::FederateInfo fi (helics::core_type::IPC);
+    helics::FederateInfo fi (helics::core_type::ZMQ);
     fi.coreInitString = "";
 
     helics::CombinationFederate cfed ("obj", fi);
@@ -674,5 +681,5 @@ BOOST_DATA_TEST_CASE (simple_tracer_test_message_files_exe,
 }
 
 #endif
-
+#endif
 BOOST_AUTO_TEST_SUITE_END ()

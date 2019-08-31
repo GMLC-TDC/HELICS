@@ -1,7 +1,8 @@
 /*
 Copyright © 2017-2019,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
-All rights reserved. See LICENSE file and DISCLAIMER for more details.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See the top-level NOTICE for
+additional details. All rights reserved.
+SPDX-License-Identifier: BSD-3-Clause
 */
 
 /** @file
@@ -187,6 +188,17 @@ extern "C"
     */
     HELICS_EXPORT helics_input helicsFederateGetSubscription (helics_federate fed, const char *key, helics_error *err);
 
+    /** clear all the update flags from a federates inputs
+     */
+    HELICS_EXPORT void helicsFederateClearUpdates (helics_federate fed);
+
+    /** register the publications via  JSON publication string
+    @details this would be the same JSON that would be used to publish data
+    */
+    HELICS_EXPORT void helicsFederateRegisterFromPublicationJSON (helics_federate fed, const char *json, helics_error *err);
+
+    /** publish data contained in a json file or string*/
+    HELICS_EXPORT void helicsFederatePublishJSON (helics_federate fed, const char *json, helics_error *err);
     /**
     * \defgroup publications Publication functions
     @details functions for publishing data of various kinds
@@ -475,7 +487,6 @@ extern "C"
     @param str a pointer to a string representing the name
     @param val a double value for the value of the named point
     @param[in,out] err an error object that will contain an error code and string if any error occurred during the execution of the function
-    @return helics_ok if everything was OK
     */
     HELICS_EXPORT void helicsInputSetDefaultNamedPoint (helics_input ipt, const char *str, double val, helics_error *err);
 
@@ -520,6 +531,17 @@ extern "C"
     @param ipt the input to query
     @return a void enumeration, helics_ok if everything worked*/
     HELICS_EXPORT const char *helicsInputGetUnits (helics_input ipt);
+
+    /** get the units of the publication that an input is linked to
+    @param ipt the input to query
+    @return a void enumeration, helics_ok if everything worked*/
+    HELICS_EXPORT const char *helicsInputGetInjectionUnits (helics_input ipt);
+
+    /** get the units of an input
+    @details:  the same as helicsInputGetUnits
+    @param ipt the input to query
+    @return a void enumeration, helics_ok if everything worked*/
+    HELICS_EXPORT const char *helicsInputGetExtractionUnits (helics_input ipt);
 
     /** get the units of a publication
     @param pub the publication to query
@@ -575,6 +597,9 @@ extern "C"
     HELICS_EXPORT helics_bool helicsInputIsUpdated (helics_input ipt);
     /** get the last time a subscription was updated */
     HELICS_EXPORT helics_time helicsInputLastUpdateTime (helics_input ipt);
+    /** clear the updated flag from an input
+     */
+    HELICS_EXPORT void helicsInputClearUpdate (helics_input ipt);
     /** get the number of publications in a federate
     @return (-1) if fed was not a valid federate otherwise returns the number of publications*/
     HELICS_EXPORT int helicsFederateGetPublicationCount (helics_federate fed);

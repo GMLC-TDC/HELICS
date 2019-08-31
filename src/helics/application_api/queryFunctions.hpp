@@ -1,7 +1,8 @@
 /*
 Copyright © 2017-2019,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
-All rights reserved. See LICENSE file and DISCLAIMER for more details.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
+the top-level NOTICE for additional details. All rights reserved.
+SPDX-License-Identifier: BSD-3-Clause
 */
 #pragma once
 /** @file
@@ -15,7 +16,7 @@ functions for dealing with query results*/
 namespace helics
 {
 class Federate;
-}  // namespace helics
+
 
 /** function takes a query result and vectorizes it if the query is a vector result, if not the results go into the
  * first element of the vector
@@ -25,6 +26,11 @@ std::vector<std::string> vectorizeQueryResult (std::string &&queryres);
  * first element of the vector
  */
 std::vector<std::string> vectorizeQueryResult (const std::string &queryres);
+
+/** function takes a query result and vectorizes it if the query is a vector result of integer indices, if not the
+ * results are an empty vector
+ */
+std::vector<int> vectorizeIndexQuery (const std::string &queryres);
 
 /** function takes a query result, vectorizes and sorts it if the query is a vector result, if not the results go
  * into the first element of the vector
@@ -57,3 +63,12 @@ bool waitForInit (helics::Federate *fed,
 bool waitForFed (helics::Federate *fed,
                  const std::string &fedName,
                  std::chrono::milliseconds timeout = std::chrono::milliseconds (10000));
+
+/** helper function to get a list of all the publications a federate subscribes to
+@param fed  a pointer to the federate
+@param fedName the name of the federate we are querying
+@return a string vector of the names of the publication that are subscribed to
+*/
+std::string queryFederateSubscriptions (helics::Federate *fed, const std::string &FedName);
+
+}  // namespace helics

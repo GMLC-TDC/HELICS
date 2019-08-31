@@ -1,17 +1,18 @@
 /*
 Copyright © 2017-2019,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
-All rights reserved. See LICENSE file and DISCLAIMER for more details.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
+the top-level NOTICE for additional details. All rights reserved.
+SPDX-License-Identifier: BSD-3-Clause
 */
 #pragma once
 
 #include "ValueConverter.hpp"
 #include "helics/helics-config.h"
 #include "helicsTypes.hpp"
+#include "helics/external/variant.hpp"
 #include <cmath>
 #include <complex>
 #include <cstdint>
-#include <helics_includes/variant.hpp>
 #include <string>
 #include <vector>
 /** @file
@@ -126,16 +127,7 @@ valueExtract (const defV &dv, X &val)
         break;
     case string_loc:  // string
     default:
-        if
-            IF_CONSTEXPR (std::is_integral<X>::value)
-            {
-                val = static_cast<X> (std::stoll (mpark::get<std::string> (dv)));
-            }
-        else
-        {
-            val = static_cast<X> (std::stod (mpark::get<std::string> (dv)));
-        }
-
+        val = static_cast<X> (getDoubleFromString (mpark::get<std::string> (dv)));
         break;
     case complex_loc:  // complex
         val = static_cast<X> (std::abs (mpark::get<std::complex<double>> (dv)));

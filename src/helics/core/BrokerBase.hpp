@@ -1,7 +1,8 @@
 /*
 Copyright © 2017-2019,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
-All rights reserved. See LICENSE file and DISCLAIMER for more details.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
+the top-level NOTICE for additional details. All rights reserved.
+SPDX-License-Identifier: BSD-3-Clause
 */
 #pragma once
 /**
@@ -10,17 +11,19 @@ virtual base class for object that function like a broker includes common parame
 and some common methods used cores and brokers
 */
 
-#include "../common/BlockingPriorityQueue.hpp"
 #include "ActionMessage.hpp"
-#include "federate_id.hpp"
+#include "gmlc/containers/BlockingPriorityQueue.hpp"
+#include "federate_id_extra.hpp"
 #include <atomic>
 #include <memory>
 #include <string>
 #include <thread>
+
 namespace helics
 {
 class Logger;
 class ForwardingTimeCoordinator;
+class helicsCLI11App;
 /** base class for broker like objects
  */
 class BrokerBase
@@ -30,17 +33,17 @@ class BrokerBase
       parent_broker_id};  //!< the unique identifier for the broker(core or broker)
     global_broker_id global_broker_id_local;  //!< meant to be the same as global_id but not atomically protected
     global_broker_id higher_broker_id{0};  //!< the id code of the broker 1 level about this broker
-    std::atomic<int32_t> maxLogLevel{1};  //!< the logging level to use levels >=this will be logged
+    std::atomic<int32_t> maxLogLevel{1};  //!< the logging level to use levels >=this will be ignored
     int32_t consoleLogLevel = 1;  //!< the logging level for console display
     int32_t fileLogLevel = 1;  //!< the logging level for logging to a file
     int32_t minFederateCount = 1;  //!< the minimum number of federates that must connect before entering init mode
     int32_t minBrokerCount = 0;  //!< the minimum number of brokers that must connect before entering init mode
     int32_t maxIterationCount = 10000;  //!< the maximum number of iterative loops that are allowed
-    int32_t tickTimer = 5000;  //!< counter for the length of a keep alive tick in milliseconds
-    int32_t timeout =
-      30000;  //!< timeout to wait to establish a broker connection before giving up in milliseconds
-    int32_t networkTimeout = -1;  //!< timeout to establish a socket connection before giving up
+    Time tickTimer{5.0};  //!< the length of each heartbeat tick
+    Time timeout{30.0};  //!< timeout to wait to establish a broker connection before giving up
+    Time networkTimeout{-1.0};  //!< timeout to establish a socket connection before giving up
     std::string identifier;  //!< an identifier for the broker
+    std::string brokerKey;  //!< a key that all joining federates must have to connect if empty no key is required
     // address is mutable since during initial phases it may not be fixed so to maintain a consistent public
     // interface for extracting it this variable may need to be updated in a constant function
     mutable std::string address;  //!< network location of the broker
@@ -54,17 +57,19 @@ class BrokerBase
   private:
     std::atomic<bool> mainLoopIsRunning{false};  //!< flag indicating that the main processing loop is running
     bool dumplog = false;  //!< flag indicating the broker should capture a dump log
+    bool forceLoggingFlush = false;  //!< force the log to flush after every message
     bool queueDisabled = false;  //!< flag indicating that the message queue should not be used and all functions
-                                 //!< called directly instaed of distinct thread
+                                 //!< called directly instead of distinct thread
   protected:
-    std::string logFile;  //< the file to log message to
+    std::string logFile;  //!< the file to log message to
     std::unique_ptr<ForwardingTimeCoordinator> timeCoord;  //!< object managing the time control
-    BlockingPriorityQueue<ActionMessage> actionQueue;  //!< primary routing queue
+    gmlc::containers::BlockingPriorityQueue<ActionMessage> actionQueue;  //!< primary routing queue
     /** enumeration of the possible core states*/
     enum broker_state_t : int16_t
     {
-        created = -5,  //!< the broker has been created
-        initialized = -4,  //!< the broker itself has been initialized and is ready to connect
+        created = -6,  //!< the broker has been created
+        configuring = -5,  //!< the broker is in the processing of configuring
+        configured = -4,  //!< the broker itself has been configured and is ready to connect
         connecting = -3,  //!< the connection process has started
         connected = -2,  //!< the connection process has completed
         initializing = -1,  //!< the enter initialization process has started
@@ -81,20 +86,21 @@ class BrokerBase
     bool enteredExecutionMode = false;  //!< flag indicating that the broker has entered execution mode
     bool waitingForBrokerPingReply = false;  //!< flag indicating we are waiting for a ping reply
     bool hasFilters = false;  //!< flag indicating filters come through the broker
-
+    std::string lastErrorString; //!< storage for last error string
+	std::atomic<int> errorCode{0};  //!< storage for last error code
+	
   public:
-    /** display help messages for the broker*/
-    static void displayHelp ();
     explicit BrokerBase (bool DisableQueue = false) noexcept;
     explicit BrokerBase (const std::string &broker_name, bool DisableQueue = false);
 
     virtual ~BrokerBase ();
 
-    /** initialize the core manager with command line arguments
-    @param argc the number of arguments
-    @param argv char pointers to the arguments
-    */
-    virtual void initializeFromCmdArgs (int argc, const char *const *argv);
+    int parseArgs (int argc, char *argv[]);
+    int parseArgs (std::vector<std::string> args);
+    int parseArgs (const std::string &configureString);
+    /** configure the base of all brokers and cores
+     */
+    virtual void configureBase ();
 
     /** add an action Message to the process queue*/
     void addActionMessage (const ActionMessage &m);
@@ -122,8 +128,11 @@ class BrokerBase
     /** start main broker loop*/
     void queueProcessingLoop ();
     /** helper function for doing some preprocessing on a command
-    @return (-1) if the command is a termination command*/
+    @return (CMD_IGNORE) if the command is a termination command*/
     action_message_def::action_t commandProcessor (ActionMessage &command);
+
+    /** Generate the base CLI processor*/
+    std::shared_ptr<helicsCLI11App> generateBaseCLI ();
 
   protected:
     /** process a disconnect signal*/
@@ -138,7 +147,6 @@ class BrokerBase
     @details called when processing a priority command.  The priority command has a response message which gets
     sent this mainly deals with some of the registration functions
     @param command the command to process
-    @return a action message response to the priority command
     */
     virtual void processPriorityCommand (ActionMessage &&command) = 0;
 
@@ -154,6 +162,10 @@ class BrokerBase
     void generateNewIdentifier ();
     /** generate the local address information*/
     virtual std::string generateLocalAddressString () const = 0;
+    /** generate a CLI11 Application for subprocesses for processing of command line arguments*/
+    virtual std::shared_ptr<helicsCLI11App> generateCLI ();
+    /** set the broker error state and error string*/
+	void setErrorState (int eCode, const std::string &estring);
 
   public:
     /** close all the threads*/

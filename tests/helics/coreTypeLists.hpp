@@ -1,13 +1,14 @@
 /*
 Copyright © 2017-2019,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
-All rights reserved. See LICENSE file and DISCLAIMER for more details.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
+the top-level NOTICE for additional details. All rights reserved.
+SPDX-License-Identifier: BSD-3-Clause
 */
 #pragma once
 
 #include "helics/helics-config.h"
 
-#ifdef HELICS_HAVE_ZEROMQ
+#ifdef ENABLE_ZMQ_CORE
 #define ZMQTEST "zmq",
 #define ZMQTEST2 "zmq_2",
 #define ZMQTEST3 "zmq_3",
@@ -25,7 +26,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #define ZMQSSTEST2
 #endif
 
-#ifndef DISABLE_TCP_CORE
+#ifdef ENABLE_TCP_CORE
 #define TCPTEST "tcp",
 #define TCPTEST2 "tcp_2",
 #define TCPTEST3 "tcp_3",
@@ -43,7 +44,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #define TCPSSTEST2
 #endif
 
-#ifndef DISABLE_IPC_CORE
+#ifdef ENABLE_IPC_CORE
 #define IPCTEST "ipc",
 #define IPCTEST2 "ipc_2",
 
@@ -52,7 +53,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #define IPCTEST2
 #endif
 
-#ifndef DISABLE_UDP_CORE
+#ifdef ENABLE_UDP_CORE
 #define UDPTEST "udp",
 #define UDPTEST2 "udp_2",
 #define UDPTEST3 "udp_3",
@@ -65,8 +66,9 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #define UDPTEST4
 
 #endif
-
+#ifdef ENABLE_ZMQ_CORE
 constexpr const char *ztypes[] = {ZMQTEST ZMQSSTEST ZMQTEST2 ZMQTEST3 ZMQSSTEST2 ZMQTEST4};
+#endif
 
 constexpr const char *core_types[] = {"test", ZMQTEST3 IPCTEST2 TCPTEST "test_2",
                                       ZMQTEST UDPTEST TCPSSTEST ZMQSSTEST "test_3"};

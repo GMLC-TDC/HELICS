@@ -1,7 +1,8 @@
 #
 # Copyright © 2017-2019, Battelle Memorial Institute; Lawrence Livermore National
-# Security, LLC; Alliance for Sustainable Energy, LLC All rights reserved. See LICENSE
-# file and DISCLAIMER for more details.
+# Security, LLC; Alliance for Sustainable Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved. 
+# 
+# SPDX-License-Identifier: BSD-3-Clause
 #
 
 set(
@@ -47,14 +48,12 @@ add_executable(
 target_link_libraries(
   shared-library-tests
   helicsSharedLib
-  ${Boost_LIBRARIES_core}
-  helics_test_base
+  helics_boost_test_base
 )
 target_link_libraries(
   shared-library-tests-cpp
   helicsSharedLib
-  ${Boost_LIBRARIES_core}
-  helics_test_base
+  helics_google_test_base
 )
 
 add_dependencies(shared-library-tests helicsSharedLib)
@@ -121,33 +120,6 @@ add_test(
 set_property(TEST shared-library-ci-tests PROPERTY LABELS Continuous)
 set_property(TEST shared-library-ci-tests-cpp PROPERTY LABELS Continuous)
 
-if(WIN32)
+  copy_key_files_to_target_location(shared-library-tests)
+ copy_shared_target(shared-library-tests)
 
-  foreach(keyfile IN LISTS KEY_LIBRARY_FILES)
-    add_custom_command(
-      TARGET
-      shared-library-tests
-      POST_BUILD # Adds a post-build event to api tests
-      COMMAND
-        ${CMAKE_COMMAND}
-        -E
-        copy_if_different # which executes "cmake - E copy_if_different..."
-        "${keyfile}" # <--this is in-file
-        "$<TARGET_FILE_DIR:shared-library-tests>/"
-    )
-    # <--this is out-file path
-  endforeach(keyfile)
-
-  add_custom_command(
-    TARGET
-    shared-library-tests
-    POST_BUILD # Adds a post-build event to api tests
-    COMMAND
-      ${CMAKE_COMMAND}
-      -E
-      copy_if_different # which executes "cmake - E copy_if_different..."
-      "$<TARGET_FILE:helicsSharedLib>" # <--this is in- file
-      "$<TARGET_FILE_DIR:shared-library-tests>/"
-  )
-  # <--this is out-file path
-endif(WIN32)

@@ -1,7 +1,8 @@
 /*
 Copyright © 2017-2019,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
-All rights reserved. See LICENSE file and DISCLAIMER for more details.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
+the top-level NOTICE for additional details. All rights reserved.
+SPDX-License-Identifier: BSD-3-Clause
 */
 #ifndef HELICS_CPP98_INPUT_HPP_
 #define HELICS_CPP98_INPUT_HPP_
@@ -16,10 +17,10 @@ namespace helicscpp
 class Input
 {
   public:
-    explicit Input (helics_input hsub) : inp (hsub) {}
-    Input (){};
+    explicit Input (helics_input hsub) HELICS_NOTHROW : inp (hsub) {}
+    Input () HELICS_NOTHROW : inp (HELICS_NULL_POINTER){};
 
-    Input (const Input &inputs) : inp (inputs.inp) {}
+    Input (const Input &inputs) HELICS_NOTHROW : inp (inputs.inp) {}
 
     Input &operator= (const Input &input)
     {
@@ -89,12 +90,12 @@ class Input
         int size = helicsInputGetStringSize (inp);
         std::string result;
 
-        result.resize (size + 1);
+        result.resize (static_cast<size_t> (size) + 1);
         // this function results in a null terminated string
         helicsInputGetString (inp, &result[0], size + 1, &size, NULL);
-        if (!(result.empty ()) && (result[size - 1] == '\0'))
+        if (!(result.empty ()) && (result[static_cast<size_t> (size) - 1] == '\0'))
         {
-            result.resize (size - 1);
+            result.resize (static_cast<size_t> (size) - 1);
         }
         else
         {
@@ -107,7 +108,7 @@ class Input
     {
         int size = helicsInputGetStringSize (inp);
 
-        name.resize (size + 1);
+        name.resize (static_cast<size_t> (size) + 1);
         // this function results in a null terminated string
         helicsInputGetNamedPoint (inp, &name[0], size + 1, &size, val, NULL);
         name.resize (size);
@@ -149,6 +150,8 @@ class Input
     /** Get the last time a subscription was updated **/
     helics_time getLastUpdateTime () const { return helicsInputLastUpdateTime (inp); }
 
+    /** clear the updated flag*/
+    void clearUpdate () { helicsInputClearUpdate (inp); }
     // call helicsInputIsUpdated for each inp
 
     const char *getKey () const { return helicsInputGetKey (inp); }

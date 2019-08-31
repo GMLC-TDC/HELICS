@@ -1,4 +1,3 @@
 function varargout = helicsSubscriptionGetKey(varargin)
-    %
-  [varargout{1:nargout}] = helicsMEX(186, varargin{:});
+  [varargout{1:nargout}] = helicsMEX(192, varargin{:});
 end

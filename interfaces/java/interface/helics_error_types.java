@@ -20,8 +20,9 @@ public final class helics_error_types {
   public final static helics_error_types helics_error_invalid_state_transition = new helics_error_types("helics_error_invalid_state_transition", helicsJNI.helics_error_invalid_state_transition_get());
   public final static helics_error_types helics_error_invalid_function_call = new helics_error_types("helics_error_invalid_function_call", helicsJNI.helics_error_invalid_function_call_get());
   public final static helics_error_types helics_error_execution_failure = new helics_error_types("helics_error_execution_failure", helicsJNI.helics_error_execution_failure_get());
+  public final static helics_error_types helics_error_insufficient_space = new helics_error_types("helics_error_insufficient_space", helicsJNI.helics_error_insufficient_space_get());
   public final static helics_error_types helics_error_other = new helics_error_types("helics_error_other", helicsJNI.helics_error_other_get());
-  public final static helics_error_types other_error_type = new helics_error_types("other_error_type", helicsJNI.other_error_type_get());
+  public final static helics_error_types helics_error_external_type = new helics_error_types("helics_error_external_type", helicsJNI.helics_error_external_type_get());
 
   public final int swigValue() {
     return swigValue;
@@ -57,7 +58,7 @@ public final class helics_error_types {
     swigNext = this.swigValue+1;
   }
 
-  private static helics_error_types[] swigValues = { helics_ok, helics_error_registration_failure, helics_error_connection_failure, helics_error_invalid_object, helics_error_invalid_argument, helics_error_discard, helics_error_system_failure, helics_warning, helics_error_invalid_state_transition, helics_error_invalid_function_call, helics_error_execution_failure, helics_error_other, other_error_type };
+  private static helics_error_types[] swigValues = { helics_ok, helics_error_registration_failure, helics_error_connection_failure, helics_error_invalid_object, helics_error_invalid_argument, helics_error_discard, helics_error_system_failure, helics_warning, helics_error_invalid_state_transition, helics_error_invalid_function_call, helics_error_execution_failure, helics_error_insufficient_space, helics_error_other, helics_error_external_type };
   private static int swigNext = 0;
   private final int swigValue;
   private final String swigName;

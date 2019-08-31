@@ -1,7 +1,8 @@
 /*
 Copyright © 2017-2019,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
-All rights reserved. See LICENSE file and DISCLAIMER for more details.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
+the top-level NOTICE for additional details. All rights reserved.
+SPDX-License-Identifier: BSD-3-Clause
 */
 #pragma once
 #include <stdexcept>
@@ -46,6 +47,14 @@ class InvalidParameter : public HelicsException
 {
   public:
     explicit InvalidParameter (std::string message = "invalid parameter")
+        : HelicsException (std::move (message)){};
+};
+
+/** exception when a requested conversion is unable to be performed*/
+class InvalidConversion : public HelicsException
+{
+  public:
+    explicit InvalidConversion (std::string message = "unable to perform the requested conversion")
         : HelicsException (std::move (message)){};
 };
 

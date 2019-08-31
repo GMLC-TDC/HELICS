@@ -1,7 +1,8 @@
 /*
 Copyright © 2017-2019,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
-All rights reserved. See LICENSE file and DISCLAIMER for more details.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
+the top-level NOTICE for additional details. All rights reserved.
+SPDX-License-Identifier: BSD-3-Clause
 */
 #ifndef HELICS_CPP98_BROKER_HPP_
 #define HELICS_CPP98_BROKER_HPP_
@@ -19,7 +20,7 @@ class Broker
 {
   public:
     /** Default constructor */
-    Broker () : broker (NULL){};
+    Broker () HELICS_NOTHROW: broker (HELICS_NULL_POINTER){};
 
     Broker (std::string type, std::string name, std::string initString)
     {
@@ -30,7 +31,7 @@ class Broker
         }
     }
 
-    Broker (std::string type, std::string name, int argc, const char **argv)
+    Broker (std::string type, std::string name, int argc, char **argv)
     {
         broker = helicsCreateBrokerFromArgs (type.c_str (), name.c_str (), argc, argv, hThrowOnError ());
     }
@@ -42,21 +43,21 @@ class Broker
         return *this;
     }
 #ifdef HELICS_HAS_RVALUE_REFS
-    Broker (Broker &&brk) noexcept
+    Broker (Broker &&brk) HELICS_NOTHROW
     {
         broker = brk.broker;
-        brk.broker = NULL;
+        brk.broker = HELICS_NULL_POINTER;
     }
-    Broker &operator= (Broker &&brk) noexcept
+    Broker &operator= (Broker &&brk) HELICS_NOTHROW
     {
         broker = brk.broker;
-        brk.broker = NULL;
+        brk.broker = HELICS_NULL_POINTER;
         return *this;
     }
 #endif
     virtual ~Broker ()
     {
-        if (broker != NULL)
+        if (broker != HELICS_NULL_POINTER)
         {
             helicsBrokerFree (broker);
         }

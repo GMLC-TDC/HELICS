@@ -1,7 +1,9 @@
 /*
 Copyright © 2017-2019,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
-All rights reserved. See LICENSE file and DISCLAIMER for more details.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.
+See the top-level NOTICE for additional details.
+All rights reserved.
+SPDX-License-Identifier: BSD-3-Clause
 */
 
 #include "MpiService.h"
@@ -220,6 +222,7 @@ void MpiService::sendAndReceiveMessages ()
     // Using fixed size chunks for sending messages would allow posting blocks of irecv requests
     // If we know that a message will get received, a blocking MPI_Wait_any could be used for send requests
     // Also, a method of doing time synchronization using MPI reductions should be added
+    std::list<std::pair<MPI_Request, std::vector<char>>> send_requests;
     std::unique_lock<std::mutex> mpilock (mpiDataLock);
     for (unsigned int i = 0; i < comms.size (); i++)
     {

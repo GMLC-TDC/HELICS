@@ -77,31 +77,6 @@ set_property(
     Daily
 )
 
-if(WIN32)
-  foreach(keyfile IN LISTS KEY_LIBRARY_FILES)
-    add_custom_command(
-      TARGET
-      Java_Helics_Api
-      POST_BUILD # Adds a post-build event to api tests
-      COMMAND
-        ${CMAKE_COMMAND}
-        -E
-        copy_if_different # which executes "cmake - E copy_if_different..."
-        "${keyfile}" # <--this is in-file
-        "${CMAKE_CURRENT_BINARY_DIR}/"
-    ) # <--this is out- file path
-  endforeach(keyfile)
-
-  add_custom_command(
-    TARGET
-    Java_Helics_Api
-    POST_BUILD # Adds a post-build event to api tests
-    COMMAND
-      ${CMAKE_COMMAND}
-      -E
-      copy_if_different # which executes "cmake - E copy_if_different..."
-      "$<TARGET_FILE:helicsSharedLib>" # <--this is in- file
-      "${CMAKE_CURRENT_BINARY_DIR}/"
-  ) # <--this is out- file path
-
-endif(WIN32)
+  copy_key_files_to_target_located_at(Java_Helics_Api ${CMAKE_CURRENT_BINARY_DIR})
+  copy_shared_target_at(Java_Helics_Api ${CMAKE_CURRENT_BINARY_DIR})
+  

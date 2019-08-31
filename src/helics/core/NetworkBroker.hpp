@@ -1,36 +1,33 @@
 /*
 Copyright © 2017-2019,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
-All rights reserved. See LICENSE file and DISCLAIMER for more details.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
+the top-level NOTICE for additional details. All rights reserved.
+SPDX-License-Identifier: BSD-3-Clause
 */
 #pragma once
 
 #include "CommsBroker.hpp"
-#include "NetworkBrokerData.hpp"
-#include "CommsBroker.hpp"
 #include "CoreBroker.hpp"
+#include "NetworkBrokerData.hpp"
 
 namespace helics
 {
-template <class COMMS, interface_type baseline,int tcode=0>
-class NetworkBroker :public CommsBroker<COMMS, CoreBroker>
+template <class COMMS, interface_type baseline, int tcode = 0>
+class NetworkBroker : public CommsBroker<COMMS, CoreBroker>
 {
-public:
+  public:
     /** default constructor*/
-    explicit NetworkBroker(bool rootBroker = false) noexcept;
-    explicit NetworkBroker(const std::string &broker_name);
+    explicit NetworkBroker (bool rootBroker = false) noexcept;
+    explicit NetworkBroker (const std::string &broker_name);
 
-    void initializeFromArgs(int argc, const char *const *argv) override;
+  public:
+    virtual std::string generateLocalAddressString () const override;
 
-public:
-    virtual std::string generateLocalAddressString() const override;
-    static void displayHelp(bool local_only = false);
-
-protected:
-    virtual bool brokerConnect() override;
+  protected:
+    virtual std::shared_ptr<helicsCLI11App> generateCLI () override;
+    virtual bool brokerConnect () override;
     mutable std::mutex dataMutex;  //!< mutex protecting the configuration information
-    NetworkBrokerData netInfo{
-        baseline };  //!< structure containing the networking information
+    NetworkBrokerData netInfo{baseline};  //!< structure containing the networking information
 };
 
-} //namespace helics
+}  // namespace helics

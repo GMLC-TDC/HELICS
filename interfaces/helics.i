@@ -1,4 +1,3 @@
-%include output.i
 %include "typemaps.i"
 #define HELICS_EXPORT
 #define HELICS_DEPRECATED
@@ -25,6 +24,8 @@
 %ignore helicsErrorInitialize;
 %ignore helicsErrorClear;
 %ignore helics_error;
+%ignore helicsMessageGetRawDataPointer;
+%ignore helicsMessageResize;
 
 %include "../helics_enums.h"
 %include "api-data.h"

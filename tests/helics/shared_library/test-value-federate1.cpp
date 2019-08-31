@@ -1,7 +1,8 @@
 /*
 Copyright © 2017-2019,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
-All rights reserved. See LICENSE file and DISCLAIMER for more details.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
+the top-level NOTICE for additional details. All rights reserved.
+SPDX-License-Identifier: BSD-3-Clause
 */
 
 #include <boost/test/unit_test.hpp>
@@ -828,7 +829,7 @@ BOOST_DATA_TEST_CASE (value_federate_single_transfer_publisher, bdata::make (cor
     // make sure the value is still what we expect
     CE (helicsInputGetString (subid, s, STRINGLEN, &len, &err));
     BOOST_CHECK_EQUAL (s, "string1");
-    BOOST_CHECK_EQUAL (len - 1, strlen ("string1"));
+    BOOST_CHECK_EQUAL (len - 1, static_cast<int> (strlen ("string1")));
 
     // advance time
     CE (gtime = helicsFederateRequestTime (vFed, 2.0, &err));

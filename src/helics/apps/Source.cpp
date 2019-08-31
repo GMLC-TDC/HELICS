@@ -1,7 +1,8 @@
 /*
 Copyright © 2017-2019,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
-All rights reserved. See LICENSE file and DISCLAIMER for more details.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
+the top-level NOTICE for additional details. All rights reserved.
+SPDX-License-Identifier: BSD-3-Clause
 */
 #include "Source.hpp"
 #include "PrecHelper.hpp"
@@ -13,14 +14,13 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include <set>
 #include <stdexcept>
 
-#include "../common/argParser.h"
-
 #include "../common/JsonProcessingFunctions.hpp"
 
-#include "../common/stringOps.h"
 #include "../core/core-exceptions.hpp"
+#include "../core/helicsCLI11.hpp"
 #include "../core/helicsVersion.hpp"
 #include "SignalGenerators.hpp"
+#include "gmlc/utilities/stringOps.h"
 
 namespace helics
 {
@@ -31,27 +31,30 @@ void SignalGenerator::set (const std::string & /*parameter*/, double /*val*/) {}
 void SignalGenerator::setString (const std::string & /*parameter*/, const std::string & /*val*/) {}
 
 using namespace std::string_literals;
-static const ArgDescriptors InfoArgs{{"default_period", "the default period publications"}};
 
-Source::Source (int argc, char *argv[]) : App ("source", argc, argv)
+Source::Source (int argc, char *argv[]) : App ("source", argc, argv) { processArgs (); }
+
+Source::Source (std::vector<std::string> args) : App ("source", std::move (args)) { processArgs (); }
+
+void Source::processArgs ()
 {
-    variable_map vm_map;
+    helicsCLI11App app ("Options specific to the Source App");
+    app.add_option ("--default_period", defaultPeriod, "the default period publications");
     if (!deactivated)
     {
         fed->setFlagOption (helics_flag_source_only);
-        argumentParser (argc, argv, vm_map, InfoArgs, "input"s);
-        loadArguments (vm_map);
+        app.parse (remArgs);
         if (!masterFileName.empty ())
         {
             loadFile (masterFileName);
         }
     }
-    else
+    else if (helpMode)
     {
-        argumentParser (argc, argv, vm_map, InfoArgs);
+        app.remove_helics_specifics ();
+        std::cout << app.help ();
     }
 }
-
 Source::Source (const std::string &appName, const FederateInfo &fi) : App (appName, fi)
 {
     fed->setFlagOption (helics_flag_source_only);
@@ -457,16 +460,6 @@ Time Source::runSourceLoop (Time currentTime)
         }
     }
     return minTime;
-}
-int Source::loadArguments (boost::program_options::variables_map &vm_map)
-{
-    //   std::cout << "read file " << points.size () << " points for " << tags.size () << " tags \n";
-
-    if (vm_map.count ("default_period") == 0)
-    {
-        defaultPeriod = loadTimeFromString (vm_map["default_period"].as<std::string> ());
-    }
-    return 0;
 }
 
 }  // namespace apps

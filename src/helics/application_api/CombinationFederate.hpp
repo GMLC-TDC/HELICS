@@ -1,7 +1,8 @@
 /*
 Copyright © 2017-2019,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
-All rights reserved. See LICENSE file and DISCLAIMER for more details.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
+the top-level NOTICE for additional details. All rights reserved.
+SPDX-License-Identifier: BSD-3-Clause
 */
 #pragma once
 
@@ -18,12 +19,12 @@ class CombinationFederate : public ValueFederate, public MessageFederate
     /** default constructor*/
     CombinationFederate ();
     /**constructor taking a federate information structure and using the default core
-    @param name the name of the federate, may be left empty to use a default or one found in fi
+    @param fedName the name of the federate, may be left empty to use a default or one found in fi
     @param fi  a federate information structure
     */
     explicit CombinationFederate (const std::string &fedName, const FederateInfo &fi);
     /**constructor taking a federate information structure and using the given core
-    @param name the name of the federate, may be left empty to use a default or one found in fi
+    @param fedName the name of the federate, may be left empty to use a default or one found in fi
     @param core a pointer to core object which the federate can join
     @param fi  a federate information structure
     */

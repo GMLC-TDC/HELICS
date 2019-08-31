@@ -1,41 +1,47 @@
 /*
 Copyright © 2017-2019,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
-All rights reserved. See LICENSE file and DISCLAIMER for more details.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
+the top-level NOTICE for additional details. All rights reserved.
+SPDX-License-Identifier: BSD-3-Clause
 */
+#define ENABLE_TRIPWIRE
+
 #include "CoreFactory.hpp"
 #include "core-exceptions.hpp"
 #include "core-types.hpp"
 #include "helics/helics-config.h"
-#if HELICS_HAVE_ZEROMQ
+#ifdef ENABLE_ZMQ_CORE
 #include "zmq/ZmqCore.h"
 #endif
 
-#if HELICS_HAVE_MPI
+#ifdef ENABLE_MPI_CORE
 #include "mpi/MpiCore.h"
 #endif
 
-#include "../common/delayedDestructor.hpp"
-#include "../common/searchableObjectHolder.hpp"
+#include "gmlc/concurrency/DelayedDestructor.hpp"
+#include "gmlc/concurrency/SearchableObjectHolder.hpp"
 
-#ifndef DISABLE_TEST_CORE
+#ifdef ENABLE_TEST_CORE
 #include "test/TestCore.h"
 #endif
 
-#ifndef DISABLE_IPC_CORE
+#ifdef ENABLE_IPC_CORE
 #include "ipc/IpcCore.h"
 #endif
 
-#ifndef DISABLE_UDP_CORE
+#ifdef ENABLE_UDP_CORE
 #include "udp/UdpCore.h"
 #endif
 
-#ifndef DISABLE_TCP_CORE
+#ifdef ENABLE_TCP_CORE
 #include "tcp/TcpCore.h"
 #endif
 
+#include "helicsCLI11.hpp"
 #include <cassert>
 #include <cstring>
+
+DECLARE_TRIPLINE ()
 
 namespace helics
 {
@@ -44,41 +50,37 @@ std::shared_ptr<Core> makeCore (core_type type, const std::string &name)
     std::shared_ptr<Core> core;
     if (type == core_type::DEFAULT)
     {
-#if HELICS_HAVE_ZEROMQ
+#ifdef ENABLE_ZMQ_CORE
         type = core_type::ZMQ;
 #else
-#ifndef DISABLE_TCP_CORE
+#ifdef ENABLE_TCP_CORE
         type = core_type::TCP;
 #else
-#ifndef DISABLE_UDP_CORE
+#ifdef ENABLE_UDP_CORE
         type = core_type::UDP;
 #else
-#ifdef HELICS_HAVE_MPI
+#ifdef ENABLE_MPI_CORE
         type = core_type::MPI;
 #else
-#ifndef DISABLE_UDP_CORE
-        type = core_type::UDP;
-#else
-#ifndef DISABLE_IPC_CORE
+#ifdef ENABLE_IPC_CORE
         type = core_type::IPC;
 #else
-#ifndef DISABLE_TEST_CORE
+#ifdef ENABLE_TEST_CORE
         type = core_type::TEST;
 #else
         type = core_type::UNRECOGNIZED;
-#endif  // DISABLE_TEST_CORE
-#endif  // DISABLE_IPC_CORE
-#endif  // DISABLE_UDP_CORE
-#endif  // HELICS_HAVE_MPI
-#endif  // DISABLE_UDP_CORE
-#endif  // DISABLE_TCP_CORE
-#endif  // HELICS_HAVE_ZEROMQ
+#endif  // ENABLE_TEST_CORE
+#endif  // ENABLE_IPC_CORE
+#endif  // ENABLE_MPI_CORE
+#endif  // ENABLE_UDP_CORE
+#endif  // ENABLE_TCP_CORE
+#endif  // ENABLE_ZMQ_CORE
     }
 
     switch (type)
     {
     case core_type::ZMQ:
-#if HELICS_HAVE_ZEROMQ
+#ifdef ENABLE_ZMQ_CORE
         if (name.empty ())
         {
             core = std::make_shared<zeromq::ZmqCore> ();
@@ -93,7 +95,7 @@ std::shared_ptr<Core> makeCore (core_type type, const std::string &name)
 #endif
         break;
     case core_type::ZMQ_SS:
-#if HELICS_HAVE_ZEROMQ
+#ifdef ENABLE_ZMQ_CORE
         if (name.empty ())
         {
             core = std::make_shared<zeromq::ZmqCoreSS> ();
@@ -108,7 +110,7 @@ std::shared_ptr<Core> makeCore (core_type type, const std::string &name)
 #endif
         break;
     case core_type::MPI:
-#if HELICS_HAVE_MPI
+#ifdef ENABLE_MPI_CORE
         if (name.empty ())
         {
             core = std::make_shared<mpi::MpiCore> ();
@@ -122,7 +124,7 @@ std::shared_ptr<Core> makeCore (core_type type, const std::string &name)
 #endif
         break;
     case core_type::TEST:
-#ifndef DISABLE_TEST_CORE
+#ifdef ENABLE_TEST_CORE
         if (name.empty ())
         {
             core = std::make_shared<testcore::TestCore> ();
@@ -137,7 +139,7 @@ std::shared_ptr<Core> makeCore (core_type type, const std::string &name)
 #endif
     case core_type::INTERPROCESS:
     case core_type::IPC:
-#ifndef DISABLE_IPC_CORE
+#ifdef ENABLE_IPC_CORE
         if (name.empty ())
         {
             core = std::make_shared<ipc::IpcCore> ();
@@ -151,7 +153,7 @@ std::shared_ptr<Core> makeCore (core_type type, const std::string &name)
         throw (HelicsException ("IPC core is not available"));
 #endif
     case core_type::UDP:
-#ifndef DISABLE_UDP_CORE
+#ifdef ENABLE_UDP_CORE
         if (name.empty ())
         {
             core = std::make_shared<udp::UdpCore> ();
@@ -165,7 +167,7 @@ std::shared_ptr<Core> makeCore (core_type type, const std::string &name)
         throw (HelicsException ("UDP core is not available"));
 #endif
     case core_type::TCP:
-#ifndef DISABLE_TCP_CORE
+#ifdef ENABLE_TCP_CORE
         if (name.empty ())
         {
             core = std::make_shared<tcp::TcpCore> ();
@@ -179,7 +181,7 @@ std::shared_ptr<Core> makeCore (core_type type, const std::string &name)
 #endif
         break;
     case core_type::TCP_SS:
-#ifndef DISABLE_TCP_CORE
+#ifdef ENABLE_TCP_CORE
         if (name.empty ())
         {
             core = std::make_shared<tcp::TcpCoreSS> ();
@@ -200,64 +202,87 @@ std::shared_ptr<Core> makeCore (core_type type, const std::string &name)
 
 namespace CoreFactory
 {
-std::shared_ptr<Core> create (core_type type, const std::string &initializationString)
-{
-    auto core = makeCore (type, std::string ());
-    core->initialize (initializationString);
-    registerCore (core);
+static const std::string emptyString;
 
-    return core;
+std::shared_ptr<Core> create (const std::string &initializationString)
+{
+    helicsCLI11App tparser;
+    tparser.remove_helics_specifics ();
+    tparser.addTypeOption ();
+    tparser.allow_extras ();
+    tparser.parse (initializationString);
+    return create (tparser.getCoreType (), emptyString, tparser.remaining_for_passthrough ());
 }
 
-std::shared_ptr<Core> create (core_type type, const std::string &core_name, std::string &initializationString)
+std::shared_ptr<Core> create (core_type type, const std::string &configureString)
+{
+    return create (type, emptyString, configureString);
+}
+
+std::shared_ptr<Core> create (core_type type, const std::string &core_name, const std::string &configureString)
 {
     auto core = makeCore (type, core_name);
-    core->initialize (initializationString);
-    registerCore (core);
-
-    return core;
-}
-
-std::shared_ptr<Core> create (int argc, const char *const *argv)
-{
-    core_type type = core_type::DEFAULT;
-    for (int ii = 1; ii < argc; ++ii)
+    if (!core)
     {
-        if (strncmp ("coretype", argv[ii], 8) == 0)
-        {
-            if (strlen (argv[ii]) > 9)
-            {
-                type = coreTypeFromString (&(argv[ii][9]));
-            }
-            else
-            {
-                type = coreTypeFromString (argv[ii + 1]);
-            }
-            break;
-        }
+        throw (helics::RegistrationFailure ("unable to create core"));
     }
-    return create (type, argc, argv);
-}
-
-std::shared_ptr<Core> create (core_type type, int argc, const char *const *argv)
-{
-    auto core = makeCore (type, "");
-    core->initializeFromArgs (argc, argv);
+    core->configure (configureString);
     registerCore (core);
+
     return core;
 }
 
-std::shared_ptr<Core> create (core_type type, const std::string &core_name, int argc, const char *const *argv)
+std::shared_ptr<Core> create (std::vector<std::string> args)
+{
+    helicsCLI11App tparser;
+    tparser.remove_helics_specifics ();
+    tparser.addTypeOption ();
+
+    tparser.allow_extras ();
+    tparser.parse (std::move (args));
+    return create (tparser.getCoreType (), emptyString, tparser.remaining_for_passthrough ());
+}
+
+std::shared_ptr<Core> create (core_type type, std::vector<std::string> args)
+{
+    return create (type, emptyString, std::move (args));
+}
+
+std::shared_ptr<Core> create (core_type type, const std::string &core_name, std::vector<std::string> args)
 {
     auto core = makeCore (type, core_name);
-    core->initializeFromArgs (argc, argv);
+    core->configureFromVector (std::move (args));
     registerCore (core);
 
     return core;
 }
 
-std::shared_ptr<Core>
-FindOrCreate (core_type type, const std::string &core_name, const std::string &initializationString)
+std::shared_ptr<Core> create (int argc, char *argv[])
+{
+    helicsCLI11App tparser;
+    tparser.remove_helics_specifics ();
+    tparser.addTypeOption ();
+
+    tparser.allow_extras ();
+    tparser.parse (argc, argv);
+    return create (tparser.getCoreType (), tparser.remaining_for_passthrough ());
+}
+
+std::shared_ptr<Core> create (core_type type, int argc, char *argv[])
+{
+    return create (type, emptyString, argc, argv);
+}
+
+std::shared_ptr<Core> create (core_type type, const std::string &core_name, int argc, char *argv[])
+{
+    auto core = makeCore (type, core_name);
+    core->configureFromArgs (argc, argv);
+    registerCore (core);
+
+    return core;
+}
+
+std::shared_ptr<Core> FindOrCreate (core_type type, const std::string &core_name, std::vector<std::string> args)
 {
     std::shared_ptr<Core> core = findCore (core_name);
     if (core)
@@ -265,7 +290,7 @@ FindOrCreate (core_type type, const std::string &core_name, const std::string &i
         return core;
     }
     core = makeCore (type, core_name);
-    core->initialize (initializationString);
+    core->configureFromVector (std::move (args));
 
     bool success = registerCore (core);
     if (!success)
@@ -281,7 +306,30 @@ FindOrCreate (core_type type, const std::string &core_name, const std::string &i
 }
 
 std::shared_ptr<Core>
-FindOrCreate (core_type type, const std::string &core_name, int argc, const char *const *argv)
+FindOrCreate (core_type type, const std::string &core_name, const std::string &configureString)
+{
+    std::shared_ptr<Core> core = findCore (core_name);
+    if (core)
+    {
+        return core;
+    }
+    core = makeCore (type, core_name);
+    core->configure (configureString);
+
+    bool success = registerCore (core);
+    if (!success)
+    {
+        core = findCore (core_name);
+        if (core)
+        {
+            return core;
+        }
+    }
+
+    return core;
+}
+
+std::shared_ptr<Core> FindOrCreate (core_type type, const std::string &core_name, int argc, char *argv[])
 {
     std::shared_ptr<Core> core = findCore (core_name);
     if (core)
@@ -290,7 +338,7 @@ FindOrCreate (core_type type, const std::string &core_name, int argc, const char
     }
     core = makeCore (type, core_name);
 
-    core->initializeFromArgs (argc, argv);
+    core->configureFromArgs (argc, argv);
     bool success = registerCore (core);
     if (!success)
     {
@@ -317,13 +365,14 @@ can do the unregister operation and destroy itself meaning it is unable to join 
 what we do is delay the destruction until it is called in a different thread which allows the destructor to fire if
 need be
 without issue*/
-static DelayedDestructor<CommonCore>
+static gmlc::concurrency::DelayedDestructor<CommonCore>
   delayedDestroyer (destroyerCallFirst);  //!< the object handling the delayed destruction
 
-static SearchableObjectHolder<CommonCore> searchableObjects;  //!< the object managing the searchable objects
+static gmlc::concurrency::SearchableObjectHolder<CommonCore>
+  searchableObjects;  //!< the object managing the searchable objects
 
 // this will trip the line when it is destroyed at global destruction time
-static tripwire::TripWireTrigger tripTrigger;
+static gmlc::concurrency::TripWireTrigger tripTrigger;
 
 std::shared_ptr<Core> findCore (const std::string &name) { return searchableObjects.findObject (name); }
 
@@ -334,44 +383,44 @@ static bool isJoinableCoreOfType (core_type type, const std::shared_ptr<CommonCo
         switch (type)
         {
         case core_type::ZMQ:
-#if HELICS_HAVE_ZEROMQ
+#ifdef ENABLE_ZMQ_CORE
             return (dynamic_cast<zeromq::ZmqCore *> (ptr.get ()) != nullptr);
 #else
             break;
 #endif
         case core_type::MPI:
-#if HELICS_HAVE_MPI
+#ifdef ENABLE_MPI_CORE
             return (dynamic_cast<mpi::MpiCore *> (ptr.get ()) != nullptr);
 #else
             break;
 #endif
         case core_type::TEST:
-#ifndef DISABLE_TEST_CORE
+#ifdef ENABLE_TEST_CORE
             return (dynamic_cast<testcore::TestCore *> (ptr.get ()) != nullptr);
 #else
             break;
 #endif
         case core_type::INTERPROCESS:
         case core_type::IPC:
-#ifndef DISABLE_IPC_CORE
+#ifdef ENABLE_IPC_CORE
             return (dynamic_cast<ipc::IpcCore *> (ptr.get ()) != nullptr);
 #else
             break;
 #endif
         case core_type::UDP:
-#ifndef DISABLE_UDP_CORE
+#ifdef ENABLE_UDP_CORE
             return (dynamic_cast<udp::UdpCore *> (ptr.get ()) != nullptr);
 #else
             break;
 #endif
         case core_type::TCP:
-#ifndef DISABLE_TCP_CORE
+#ifdef ENABLE_TCP_CORE
             return (dynamic_cast<tcp::TcpCore *> (ptr.get ()) != nullptr);
 #else
             break;
 #endif
         case core_type::TCP_SS:
-#ifndef DISABLE_TCP_CORE
+#ifdef ENABLE_TCP_CORE
             return (dynamic_cast<tcp::TcpCoreSS *> (ptr.get ()) != nullptr);
 #else
             break;

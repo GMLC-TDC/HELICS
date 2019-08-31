@@ -1,11 +1,13 @@
 /*
 Copyright © 2017-2019,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
-All rights reserved. See LICENSE file and DISCLAIMER for more details.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
+the top-level NOTICE for additional details. All rights reserved.
+SPDX-License-Identifier: BSD-3-Clause
 */
 #include "InterfaceInfo.hpp"
 #include "../common/fmt_format.h"
 #include "helics_definitions.hpp"
+#include <sstream>
 
 namespace helics
 {
@@ -126,6 +128,9 @@ bool InterfaceInfo::setInputProperty (interface_handle id, int option, bool valu
         break;
     case defs::options::strict_type_checking:
         ipt->strict_type_matching = value;
+        break;
+    case defs::options::ignore_unit_mismatch:
+        ipt->ignore_unit_mismatch = value;
         break;
     default:
         return false;
@@ -280,8 +285,15 @@ std::vector<std::pair<int, std::string>> InterfaceInfo::checkInterfacesForIssues
             {
                 issues.emplace_back (
                   helics::defs::errors::connection_failure,
-                  fmt::format ("Input {} source has mismatched types {} is not compatible with {}", ipt->key,
+                  fmt::format ("Input \"{}\" source has mismatched types: {} is not compatible with {}", ipt->key,
                                ipt->type, source.first));
+            }
+            if ((!ipt->ignore_unit_mismatch) && (!checkUnitMatch (ipt->units, source.second, false)))
+            {
+                issues.emplace_back (
+                  helics::defs::errors::connection_failure,
+                  fmt::format ("Input \"{}\" source has incompatible unit: {} is not convertible to {}", ipt->key,
+                               source.second, ipt->units));
             }
         }
     }
@@ -311,4 +323,90 @@ std::vector<std::pair<int, std::string>> InterfaceInfo::checkInterfacesForIssues
     return issues;
 }
 
+std::string InterfaceInfo::generateInferfaceConfig () const
+{
+    std::ostringstream s;
+
+    auto ihandle = inputs.lock_shared ();
+    if (ihandle->size () > 0)
+    {
+        s << "\"inputs\":[";
+        bool first = true;
+        for (auto &ipt : ihandle)
+        {
+            if (!ipt->key.empty ())
+            {
+                if (!first)
+                {
+                    s << ',';
+                }
+                first = false;
+                s << "{\n \"key\":\"" << ipt->key << "\"";
+                if (!ipt->type.empty ())
+                {
+                    s << ",\n \"type\":\"" << ipt->type << "\"";
+                }
+                if (!ipt->units.empty ())
+                {
+                    s << ",\n \"units\":\"" << ipt->units << "\"";
+                }
+                s << "\n}";
+            }
+        }
+        s << "],";
+    }
+    ihandle.unlock ();
+    auto phandle = publications.lock ();
+    if (phandle->size () > 0)
+    {
+        s << "\n\"publications\":[";
+        bool first = true;
+        for (auto &pub : phandle)
+        {
+            if (!first)
+            {
+                s << ',';
+            }
+            first = false;
+            s << "{\n \"key\":\"" << pub->key << "\"";
+            if (!pub->type.empty ())
+            {
+                s << ",\n \"type\":\"" << pub->type << "\"";
+            }
+            if (!pub->units.empty ())
+            {
+                s << ",\n \"units\":\"" << pub->units << "\"";
+            }
+            s << "\n}";
+        }
+        s << "],";
+    }
+    phandle.unlock ();
+
+    auto ehandle = endpoints.lock_shared ();
+    if (ehandle->size () > 0)
+    {
+        s << "\n\"endpoints\":[";
+        bool first = true;
+        for (auto &ept : ehandle)
+        {
+            if (!first)
+            {
+                s << ',';
+            }
+            first = false;
+
+            s << "{\n \"key\":\"" << ept->key << "\"";
+            if (!ept->type.empty ())
+            {
+                s << ",\n \"type\":\"" << ept->type << "\"";
+            }
+            s << "\n}";
+        }
+        s << "\n],";
+    }
+    phandle.unlock ();
+    s << "\n\"extra\":\"configuration\"";
+    return s.str ();
+}
 }  // namespace helics

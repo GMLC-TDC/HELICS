@@ -1,7 +1,8 @@
 /*
 Copyright © 2017-2019,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
-All rights reserved. See LICENSE file and DISCLAIMER for more details.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
+the top-level NOTICE for additional details. All rights reserved.
+SPDX-License-Identifier: BSD-3-Clause
 */
 
 #pragma once
@@ -38,7 +39,6 @@ class ZmqCommsSS final : public NetworkCommsInterface
     virtual int getDefaultBrokerPort () const override;
     virtual void queue_rx_function () override;  //!< the functional loop for the receive queue
     virtual void queue_tx_function () override;  //!< the loop for transmitting data
-    virtual void closeReceiver () override;  //!< function to instruct the receiver loop to close
     /** process an incoming message
     return code for required action 0=NONE, -1 TERMINATE*/
     int processIncomingMessage (zmq::message_t &msg, std::map<std::string, std::string> &connection_info);

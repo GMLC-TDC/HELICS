@@ -1,20 +1,12 @@
 /*
 Copyright © 2017-2019,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
-All rights reserved. See LICENSE file and DISCLAIMER for more details.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
+the top-level NOTICE for additional details. All rights reserved.
+SPDX-License-Identifier: BSD-3-Clause
 */
 #include "PrecHelper.hpp"
 
-#ifdef __GNUC__
-#pragma GCC diagnostic push
-//#pragma GCC diagnostic warning "-w"
-#include <boost/algorithm/string/split.hpp>
-#include <boost/algorithm/string/trim.hpp>
-#pragma GCC diagnostic pop
-#else
-#include <boost/algorithm/string/split.hpp>
-#include <boost/algorithm/string/trim.hpp>
-#endif
+#include "gmlc/utilities/stringOps.h"
 
 #include <algorithm>
 
@@ -24,10 +16,8 @@ using namespace helics;
 
 data_type getType (const std::string &typeString)
 {
-    auto tstr = typeString;
+    auto tstr = gmlc::utilities::stringOps::trim(typeString);
     // trim the string
-    tstr.erase (tstr.find_last_not_of (" \t\n\0") + 1);
-    tstr.erase (0, tstr.find_first_not_of (" \t\n\0"));
     if (tstr.empty ())
     {
         return data_type::helics_custom;
@@ -61,7 +51,7 @@ data_type getType (const std::string &typeString)
         }
     }
 
-    std::transform (tstr.begin (), tstr.end (), tstr.begin (), ::tolower);
+    gmlc::utilities::makeLowerCase (tstr);
 
     return getTypeFromString (tstr);
 }

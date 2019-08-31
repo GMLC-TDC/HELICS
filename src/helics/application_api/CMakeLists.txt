@@ -1,7 +1,8 @@
 #
 # Copyright © 2017-2019, Battelle Memorial Institute; Lawrence Livermore National
-# Security, LLC; Alliance for Sustainable Energy, LLC All rights reserved. See LICENSE
-# file and DISCLAIMER for more details.
+# Security, LLC; Alliance for Sustainable Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved. 
+# 
+# SPDX-License-Identifier: BSD-3-Clause
 #
 set(
   public_application_api_headers
@@ -78,6 +79,13 @@ target_include_directories(
   application_api SYSTEM
   PRIVATE $<TARGET_PROPERTY:helics_base_includes,INTERFACE_SYSTEM_INCLUDE_DIRECTORIES>
 )
+if (TARGET Boost::boost)
+target_include_directories(
+  application_api SYSTEM
+  PRIVATE $<TARGET_PROPERTY:Boost::boost,INTERFACE_SYSTEM_INCLUDE_DIRECTORIES>
+)
+endif()
+
 target_compile_definitions(
   application_api PRIVATE
   $<TARGET_PROPERTY:helics_base_includes,INTERFACE_COMPILE_DEFINITIONS>
@@ -87,9 +95,15 @@ target_compile_options(
   PRIVATE $<TARGET_PROPERTY:helics_base_includes,INTERFACE_COMPILE_OPTIONS>
 )
 
+target_compile_options(
+  application_api
+  PRIVATE $<TARGET_PROPERTY:compile_flags_target,INTERFACE_COMPILE_OPTIONS>
+)
+
 if(MSYS AND USE_LIBCXX)
   target_compile_definitions(application_api PUBLIC "-DSTX_NO_STD_OPTIONAL=1")
 endif()
+
 
 install(
   FILES ${public_application_api_headers}

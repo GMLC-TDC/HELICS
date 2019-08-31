@@ -1,5 +1,4 @@
-Tracer
-=======
+# Tracer
 
 The Tracer application is one of the HELICS apps available with the library
 Its purpose is to provide a easy way to display data from a federation
@@ -7,8 +6,8 @@ It acts as a federate that can "capture" values or messages from specific public
 or direct endpoints or cloned endpoints which exist elsewhere and either trigger callbacks or display it to a screen
 The main use is a simple visual indicator and a monitoring app
 
-Command line arguments
-----------
+## Command line arguments
+
 ```
 allowed options:
 
@@ -54,16 +53,16 @@ federate configuration
 ```
 also permissible are all arguments allowed for federates and any specific broker specified:
 
-[Command line reference](cmdArgs.md)
+[Command line reference](cmdArgs.html)
 
 the tracer executable also takes an untagged argument of a file name for example
 ```
 helics_app tracer tracer_file.txt --stop 5
 ```
 
-Tracers support both delimited text files and JSON files some examples can be found in, they are otherwise the same as options for recorders.  
+Tracers support both delimited text files and JSON files some examples can be found in, they are otherwise the same as options for recorders.
 
-[Tracer configuration Examples](https://github.com/GMLC-TDC/HELICS-src/tree/master/tests/helics/apps/test_files)
+[Tracer configuration examples](https://github.com/GMLC-TDC/HELICS/tree/master/tests/helics/apps/test_files)
 
 ## Config File Detail
 
@@ -82,18 +81,27 @@ if only a single column is specified it is assumed to be a subscription
 for two column rows the second is the identifier
 arguments with spaces should be enclosed in quotes
 
-| interface       | description         |
-| ------------- |:-------------:|
-| s, sub, subscription     | subscribe to a particular publication |
-| endpoint, ept, e     | generate an endpoint to capture all targeted packets    |
-| source, sourceclone,src | capture all messages coming from a particular endpoint     |
-| dest, destination, destclone | capture all message going to a particular endpoint     |
-| capture | capture all data coming from a particular federate     |
-|clone | capture all message going from or to a particular endpoint    |
+```eval_rst
++------------------------------+------------------------------------------------------------+
+| interface                    | description                                                |
++==============================+============================================================+
+| s, sub, subscription         | subscribe to a particular publication                      |
++------------------------------+------------------------------------------------------------+
+| endpoint, ept, e             | generate an endpoint to capture all targeted packets       |
++------------------------------+------------------------------------------------------------+
+| source, sourceclone,src      | capture all messages coming from a particular endpoint     |
++------------------------------+------------------------------------------------------------+
+| dest, destination, destclone | capture all message going to a particular endpoint         |
++------------------------------+------------------------------------------------------------+
+| capture                      | capture all data coming from a particular federate         |
++------------------------------+------------------------------------------------------------+
+| clone                        | capture all message going from or to a particular endpoint |
++------------------------------+------------------------------------------------------------+
+```
 
 for 3 column rows the first must be either clone or capture
 for clone the second can be either source or destination and the third the endpoint name
-[for capture it can be either "endpoints" or "subscriptions"]
+\[for capture it can be either "endpoints" or "subscriptions"\]
 
 ### JSON configuration
 Tracers can also be specified via JSON files

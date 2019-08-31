@@ -1,11 +1,12 @@
 /*
 Copyright © 2017-2019,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
-All rights reserved. See LICENSE file and DISCLAIMER for more details.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
+the top-level NOTICE for additional details. All rights reserved.
+SPDX-License-Identifier: BSD-3-Clause
 */
 
 #include "Player.hpp"
-#include "../common/argParser.h"
+#include "../core/helicsCLI11.hpp"
 #include "PrecHelper.hpp"
 #include <algorithm>
 #include <fstream>
@@ -14,15 +15,12 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include <memory>
 #include <set>
 #include <stdexcept>
-#include <boost/filesystem.hpp>
 
 #include "../common/JsonProcessingFunctions.hpp"
 
-#include "../common/base64.h"
-#include "../common/stringOps.h"
 #include "../core/helicsVersion.hpp"
-
-namespace filesystem = boost::filesystem;
+#include "gmlc/utilities/base64.h"
+#include "gmlc/utilities/stringOps.h"
 
 /** test if a string has a base64 wrapper*/
 static int hasB64Wrapper (const std::string &str);
@@ -52,28 +50,64 @@ static inline bool vComp (const ValueSetter &v1, const ValueSetter &v2)
 }
 static inline bool mComp (const MessageHolder &m1, const MessageHolder &m2) { return (m1.sendTime < m2.sendTime); }
 
-static const ArgDescriptors InfoArgs{
-  {"datatype", "type of the publication data type to use"},
-  {"marker", "print a statement indicating time advancement every <arg> period during the simulation"},
-  {"time_units", "the default units on the timestamps used in file based input"}};
+Player::Player (std::vector<std::string> args) : App ("player", std::move (args)) { processArgs (); }
 
-Player::Player (int argc, char *argv[]) : App ("player", argc, argv)
+Player::Player (int argc, char *argv[]) : App ("player", argc, argv) { processArgs (); }
+
+void Player::processArgs ()
 {
-    variable_map vm_map;
+    auto app = generateParser ();
+
     if (!deactivated)
     {
         fed->setFlagOption (helics_flag_source_only);
-        argumentParser (argc, argv, vm_map, InfoArgs);
-        loadArguments (vm_map);
+        app->helics_parse (remArgs);
         if (!masterFileName.empty ())
         {
             loadFile (masterFileName);
         }
     }
-    else
+    else if (helpMode)
     {
-        argumentParser (argc, argv, vm_map, InfoArgs);
+        app->remove_helics_specifics ();
+        std::cout << app->help ();
     }
+}
+
+std::unique_ptr<helicsCLI11App> Player::generateParser ()
+{
+    auto app = std::make_unique<helicsCLI11App> ("Command line options for the Player App");
+    app->add_option ("--marker", nextPrintTimeStep,
+                     "print a statement indicating time advancement every <arg> period during the simulation");
+    app
+      ->add_option ("--datatype",
+                    [this](CLI::results_t res) {
+                        defType = helics::getTypeFromString (res[0]);
+                        return (defType != helics::data_type::helics_custom);
+                    },
+                    "type of the publication data type to use", false)
+      ->take_last ()
+      ->ignore_underscore ();
+
+    app
+      ->add_option ("--time_units",
+                    [this](CLI::results_t res) {
+                        try
+                        {
+                            units = timeUnitsFromString (res[0]);
+                            timeMultiplier = toSecondMultiplier (units);
+                            return true;
+                        }
+                        catch (...)
+                        {
+                            return false;
+                        }
+                    },
+                    "the default units on the timestamps used in file based input", false)
+      ->take_last ()
+      ->ignore_underscore ();
+
+    return app;
 }
 
 Player::Player (const std::string &appName, const FederateInfo &fi) : App (appName, fi)
@@ -140,7 +174,7 @@ helics::Time Player::extractTime (const std::string &str, int lineNumber) const
 void Player::loadTextFile (const std::string &filename)
 {
     App::loadTextFile (filename);
-    using namespace stringOps;
+    using namespace gmlc::utilities::stringOps;
     std::ifstream infile (filename);
     std::string str;
 
@@ -313,7 +347,7 @@ void Player::loadTextFile (const std::string &filename)
                 }
                 if (pIndex > 0)
                 {
-                    points[pIndex].pubName = points[pIndex - 1].pubName;
+                    points[pIndex].pubName = points[static_cast<size_t>(pIndex) - 1].pubName;
                 }
                 else
                 {
@@ -344,7 +378,7 @@ void Player::loadTextFile (const std::string &filename)
                 }
                 if ((blk[1].empty ()) && (pIndex > 0))
                 {
-                    points[pIndex].pubName = points[pIndex - 1].pubName;
+                    points[pIndex].pubName = points[static_cast<size_t>(pIndex) - 1].pubName;
                 }
                 else
                 {
@@ -375,7 +409,7 @@ void Player::loadTextFile (const std::string &filename)
                 }
                 if ((blk[1].empty ()) && (pIndex > 0))
                 {
-                    points[pIndex].pubName = points[pIndex - 1].pubName;
+                    points[pIndex].pubName = points[static_cast<size_t>(pIndex) - 1].pubName;
                 }
                 else
                 {
@@ -588,7 +622,7 @@ void Player::loadJsonFile (const std::string &jsonString)
                         auto offset = hasB64Wrapper (str);
                         if (offset == 0)
                         {
-                            messages.back ().mess.data = utilities::base64_decode_to_string (str);
+                            messages.back ().mess.data = gmlc::utilities::base64_decode_to_string (str);
                             continue;
                         }
                     }
@@ -605,7 +639,7 @@ void Player::loadJsonFile (const std::string &jsonString)
                         auto offset = hasB64Wrapper (str);
                         if (offset == 0)  // directly encoded no wrapper
                         {
-                            messages.back ().mess.data = utilities::base64_decode_to_string (str);
+                            messages.back ().mess.data = gmlc::utilities::base64_decode_to_string (str);
                             continue;
                         }
                     }
@@ -876,38 +910,6 @@ void Player::addEndpoint (const std::string &endpointName, const std::string &en
     eptids[endpointName] = static_cast<int> (endpoints.size ()) - 1;
 }
 
-int Player::loadArguments (boost::program_options::variables_map &vm_map)
-{
-    App::loadArguments (vm_map);
-    if (vm_map.count ("datatype") > 0)
-    {
-        defType = helics::getTypeFromString (vm_map["datatype"].as<std::string> ());
-        if (defType == helics::data_type::helics_custom)
-        {
-            std::cerr << vm_map["datatype"].as<std::string> () << " is not recognized as a valid type \n";
-            return -3;
-        }
-    }
-    if (vm_map.count ("time_units") > 0)
-    {
-        try
-        {
-            units = timeUnitsFromString (vm_map["time_units"].as<std::string> ());
-            timeMultiplier = toSecondMultiplier (units);
-        }
-        catch (...)
-        {
-            std::cerr << vm_map["time_units"].as<std::string> ()
-                      << " is not recognized as a valid unit of time \n";
-        }
-    }
-    if (vm_map.count ("marker") > 0)
-    {
-        nextPrintTimeStep = loadTimeFromString (vm_map["marker"].as<std::string> ());
-    }
-    return 0;
-}
-
 }  // namespace apps
 }  // namespace helics
 
@@ -954,12 +956,12 @@ static std::string decode (std::string &&stringToDecode)
         }
 
         stringToDecode.pop_back ();
-        return utilities::base64_decode_to_string (stringToDecode, offset);
+        return gmlc::utilities::base64_decode_to_string (stringToDecode, offset);
     }
 
     if ((stringToDecode.front () == '"') || (stringToDecode.front () == '\''))
     {
-        return stringOps::removeQuotes (stringToDecode);
+        return gmlc::utilities::stringOps::removeQuotes (stringToDecode);
     }
     // move is required since you are returning the rvalue and we want to move from the rvalue input
     return std::move (stringToDecode);

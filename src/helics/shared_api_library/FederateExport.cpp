@@ -1,12 +1,13 @@
 /*
 Copyright © 2017-2019,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
-All rights reserved. See LICENSE file and DISCLAIMER for more details.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See the top-level NOTICE for
+additional details. All rights reserved.
+SPDX-License-Identifier: BSD-3-Clause
 */
 
-#include "../common/TripWire.hpp"
 #include "../core/core-exceptions.hpp"
 #include "../helics.hpp"
+#include "gmlc/concurrency/TripWire.hpp"
 #include "helics.h"
 #include "internal/api_objects.h"
 #include <iostream>
@@ -633,7 +634,27 @@ helics_time helicsFederateRequestTime (helics_federate fed, helics_time requestT
     }
     try
     {
-        return static_cast<double> (fedObj->requestTime (requestTime));
+        auto timeret = fedObj->requestTime (requestTime);
+        return (timeret < helics::Time::maxVal ()) ? static_cast<double> (timeret) : helics_time_maxtime;
+    }
+    catch (...)
+    {
+        helicsErrorHandler (err);
+        return helics_time_invalid;
+    }
+}
+
+helics_time helicsFederateRequestTimeAdvance (helics_federate fed, helics_time timeDelta, helics_error *err)
+{
+    auto fedObj = getFed (fed, err);
+    if (fedObj == nullptr)
+    {
+        return helics_time_invalid;
+    }
+    try
+    {
+        auto timeret = fedObj->requestTimeAdvance (timeDelta);
+        return (timeret < helics::Time::maxVal ()) ? static_cast<double> (timeret) : helics_time_maxtime;
     }
     catch (...)
     {
@@ -651,7 +672,8 @@ helics_time helicsFederateRequestNextStep (helics_federate fed, helics_error *er
     }
     try
     {
-        return static_cast<helics_time> (fedObj->requestNextStep ());
+        auto timeret = fedObj->requestNextStep ();
+        return (timeret < helics::Time::maxVal ()) ? static_cast<double> (timeret) : helics_time_maxtime;
     }
     catch (...)
     {
@@ -682,7 +704,7 @@ helics_time helicsFederateRequestTimeIterative (helics_federate fed,
         {
             *outIterate = getIterationStatus (val.state);
         }
-        return static_cast<double> (val.grantedTime);
+        return (val.grantedTime < helics::Time::maxVal ()) ? static_cast<double> (val.grantedTime) : helics_time_maxtime;
     }
     catch (...)
     {
@@ -712,6 +734,25 @@ void helicsFederateRequestTimeAsync (helics_federate fed, helics_time requestTim
     }
 }
 
+helics_time helicsFederateRequestTimeComplete (helics_federate fed, helics_error *err)
+{
+    auto fedObj = getFed (fed, err);
+    if (fedObj == nullptr)
+    {
+        return helics_time_invalid;
+    }
+    try
+    {
+        auto timeret = fedObj->requestTimeComplete ();
+        return (timeret < helics::Time::maxVal ()) ? static_cast<double> (timeret) : helics_time_maxtime;
+    }
+    catch (...)
+    {
+        helicsErrorHandler (err);
+        return helics_time_invalid;
+    }
+}
+
 void helicsFederateRequestTimeIterativeAsync (helics_federate fed,
                                               helics_time requestTime,
                                               helics_iteration_request iterate,
@@ -732,7 +773,7 @@ void helicsFederateRequestTimeIterativeAsync (helics_federate fed,
     }
 }
 
-helics_time helicsFederateRequestTimeComplete (helics_federate fed, helics_error *err)
+helics_time helicsFederateRequestTimeIterativeComplete (helics_federate fed, helics_iteration_result *outIteration, helics_error *err)
 {
     auto fedObj = getFed (fed, err);
     if (fedObj == nullptr)
@@ -741,7 +782,12 @@ helics_time helicsFederateRequestTimeComplete (helics_federate fed, helics_error
     }
     try
     {
-        return static_cast<double> (fedObj->requestTimeComplete ());
+        auto val = fedObj->requestTimeIterativeComplete ();
+        if (outIteration != nullptr)
+        {
+            *outIteration = getIterationStatus (val.state);
+        }
+        return (val.grantedTime < helics::Time::maxVal ()) ? static_cast<double> (val.grantedTime) : helics_time_maxtime;
     }
     catch (...)
     {
@@ -853,7 +899,8 @@ helics_time helicsFederateGetTimeProperty (helics_federate fed, int timeProperty
     try
     {
         auto T = fedObj->getTimeProperty (timeProperty);
-        return static_cast<double> (T);
+
+        return (T < helics::Time::maxVal ()) ? static_cast<double> (T) : helics_time_maxtime;
     }
     catch (...)
     {
@@ -925,30 +972,8 @@ helics_time helicsFederateGetCurrentTime (helics_federate fed, helics_error *err
     }
     try
     {
-        return static_cast<double> (fedObj->getCurrentTime ());
-    }
-    catch (...)
-    {
-        helicsErrorHandler (err);
-        return helics_time_invalid;
-    }
-}
-
-helics_time helicsFederateRequestTimeIterativeComplete (helics_federate fed, helics_iteration_result *outIteration, helics_error *err)
-{
-    auto fedObj = getFed (fed, err);
-    if (fedObj == nullptr)
-    {
-        return helics_time_invalid;
-    }
-    try
-    {
-        auto val = fedObj->requestTimeIterativeComplete ();
-        if (outIteration != nullptr)
-        {
-            *outIteration = getIterationStatus (val.state);
-        }
-        return static_cast<double> (val.grantedTime);
+        auto T = fedObj->getCurrentTime ();
+        return (T < helics::Time::maxVal ()) ? static_cast<double> (T) : helics_time_maxtime;
     }
     catch (...)
     {

@@ -1,6 +1,6 @@
-shallow_clone: true
+clone_depth: 1
 
-version: 2.0.0.{build}
+version: 2.2.0.{build}
 
 image: Visual Studio 2015
 
@@ -15,12 +15,14 @@ cache:
   - C:\ProgramData\chocolatey\lib -> appveyor.yml
 
 install:
+  - cd %APPVEYOR_BUILD_FOLDER%
+  - git submodule update --init --recursive
 
 before_build:
   - IF NOT EXIST C:\ProgramData\chocolatey\bin\swig.exe choco install swig --yes --limit-output #> $null
   - mkdir build
   - cd build
-  - cmake .. -G "Visual Studio 14 2015 Win64" -DAUTOBUILD_ZMQ=ON -DBOOST_INSTALL_PATH=C:/libraries/boost_1_63_0 -DENABLE_PACKAGE_BUILD=ON -DBUILD_RELEASE_ONLY=ON -DBUILD_C_SHARED_LIB=ON -DBUILD_SHARED_LIBS=ON -DBUILD_JAVA_INTERFACE=ON
+  - cmake .. -G "Visual Studio 14 2015 Win64" -DBOOST_INSTALL_PATH=C:/libraries/boost_1_63_0 -DENABLE_PACKAGE_BUILD=ON -DENABLE_SWIG=ON -DBUILD_SHARED_LIBS=ON -DBUILD_JAVA_INTERFACE=ON
   - cd ..
 
 build:
@@ -35,7 +37,7 @@ after_build:
 
 test_script:
   - cd build
-  - ctest --output-on-failure --timeout 480 -C Release -L Continuous
+  - ctest --output-on-failure --timeout 480 -C Release -L "Continuous|PackagingFast"
   - cd ..
 
 artifacts:

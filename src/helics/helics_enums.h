@@ -1,7 +1,8 @@
 /*
 Copyright © 2017-2019,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
-All rights reserved. See LICENSE file and DISCLAIMER for more details.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
+the top-level NOTICE for additional details. All rights reserved.
+SPDX-License-Identifier: BSD-3-Clause
 */
 
 /*defines left in this code as it is used in the shared library*/
@@ -149,8 +150,9 @@ extern "C"
         helics_error_invalid_function_call =
           (-10), /*!< the call made was invalid in the present state of the calling object*/
         helics_error_execution_failure = (-14), /*!< the function execution has failed*/
+        helics_error_insufficient_space = (-18), /*!< insufficient space is available to store requested data*/
         helics_error_other = -101, /*!< the function produced a helics error of some other type */
-        other_error_type = -203 /*!< a non helics error was produced*/
+        helics_error_external_type = -203 /*!< an unknown non-helics error was produced*/
     } helics_error_types;
 
     /** enumeration of properties that apply to federates*/
@@ -195,6 +197,8 @@ extern "C"
         helics_handle_option_buffer_data = 411,
         /** specify that the types should be checked strictly for pub/sub and filters*/
         helics_handle_option_strict_type_checking = 414,
+        /** specify that the mismatching units should be ignored*/
+        helics_handle_option_ignore_unit_mismatch = 447,
         /** specify that an interface will only transmit on change(only applicable to publications)*/
         helics_handle_option_only_transmit_on_change = 6,
         /** specify that an interface will only update if the value has actually changed*/

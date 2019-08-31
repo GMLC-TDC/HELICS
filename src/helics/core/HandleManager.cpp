@@ -1,7 +1,8 @@
 /*
 Copyright © 2017-2019,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
-All rights reserved. See LICENSE file and DISCLAIMER for more details.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
+the top-level NOTICE for additional details. All rights reserved.
+SPDX-License-Identifier: BSD-3-Clause
 */
 #include "HandleManager.hpp"
 #include "ActionMessage.hpp"
@@ -92,7 +93,7 @@ void HandleManager::addHandleAtIndex (const BasicHandleInfo &otherHandle, int32_
     }
     else if (index > 0)
     {
-        handles.resize (index + 1);
+        handles.resize (static_cast<size_t>(index) + 1);
         // use placement new to reconstruct new object
         new (&handles[index]) BasicHandleInfo (otherHandle);
         addSearchFields (handles[index], index);
@@ -149,6 +150,16 @@ BasicHandleInfo *HandleManager::findHandle (global_handle fed_id)
     return nullptr;
 }
 
+const BasicHandleInfo *HandleManager::findHandle (global_handle fed_id) const
+{
+    auto key = static_cast<uint64_t> (fed_id);
+    auto fnd = unique_ids.find (key);
+    if (fnd != unique_ids.end ())
+    {
+        return &handles[fnd->second];
+    }
+    return nullptr;
+}
 void HandleManager::setHandleOption (interface_handle handle, int option, bool val)
 {
     auto index = handle.baseValue ();

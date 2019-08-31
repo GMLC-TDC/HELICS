@@ -1,7 +1,8 @@
 /*
 Copyright © 2017-2019,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
-All rights reserved. See LICENSE file and DISCLAIMER for more details.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
+the top-level NOTICE for additional details. All rights reserved.
+SPDX-License-Identifier: BSD-3-Clause
 */
 #pragma once
 
@@ -318,4 +319,11 @@ std::ostream &operator<< (std::ostream &os, const ActionMessage &command);
 @param newMessage the message to append
 @return the integer location of the message in the stringData section*/
 int appendMessage (ActionMessage &m, const ActionMessage &newMessage);
+
+/** generate a string reprenting an error from an ActionMessage
+@param command the command to generate the error string for
+@return a string describing the error, if the string is not an error the string is empty
+*/
+std::string errorMessageString (const ActionMessage &command);
+
 }  // namespace helics

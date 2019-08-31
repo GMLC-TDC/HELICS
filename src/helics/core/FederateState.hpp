@@ -1,12 +1,11 @@
 /*
 Copyright © 2017-2019,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
-All rights reserved. See LICENSE file and DISCLAIMER for more details.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
+the top-level NOTICE for additional details. All rights reserved.
+SPDX-License-Identifier: BSD-3-Clause
 */
 #pragma once
 
-#include "../common/BlockingQueue.hpp"
-#include "../common/DualMappedPointerVector.hpp"
 #include "../common/GuardedTypes.hpp"
 #include "ActionMessage.hpp"
 #include "CommonCore.hpp"
@@ -16,6 +15,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include "TimeDependencies.hpp"
 #include "core-data.hpp"
 #include "core-types.hpp"
+#include "gmlc/containers/BlockingQueue.hpp"
 #include "helics-time.hpp"
 #include "helics/helics-config.h"
 #include <atomic>
@@ -66,6 +66,7 @@ class FederateState
     bool source_only{false};  //!< flag indicating the federate is a source_only
     bool ignore_time_mismatch_warnings{false};  //!< flag indicating that time mismatches should be ignored
     bool strict_input_type_checking{false};  //!< flag indicating that inputs should have strict type checking
+    bool ignore_unit_mismatch{false};  //!< flag to ignore mismatching units
     InterfaceInfo interfaceInformation;  //!< the container for the interface information objects
 
   public:
@@ -91,7 +92,8 @@ class FederateState
     //   std::vector<ActionMessage> messLog;
   private:
     std::shared_ptr<MessageTimer> mTimer;  //!< message timer object for real time operations and timeouts
-    BlockingQueue<ActionMessage> queue;  //!< processing queue for messages incoming to a federate
+    gmlc::containers::BlockingQueue<ActionMessage>
+      queue;  //!< processing queue for messages incoming to a federate
     std::atomic<uint16_t> interfaceFlags{
       0};  //!< current defaults for operational flags of interfaces for this federate
     std::map<global_federate_id, std::deque<ActionMessage>>
@@ -103,7 +105,7 @@ class FederateState
     std::atomic_flag processing = ATOMIC_FLAG_INIT;  //!< the federate is processing
   private:
     /** a logging function for logging or printing messages*/
-    std::function<void(int, const std::string &, const std::string &)> loggerFunction;
+    std::function<void (int, const std::string &, const std::string &)> loggerFunction;
     std::function<std::string (const std::string &)> queryCallback;  //!< a callback for additional queries
     /** find the next Value Event*/
     Time nextValueTime () const;
@@ -117,6 +119,8 @@ class FederateState
     bool messageShouldBeDelayed (const ActionMessage &cmd) const;
     /** add a federate to the delayed list*/
     void addFederateToDelay (global_federate_id id);
+    /** generate a component of json config string*/
+    std::string generateConfig () const;
 
   public:
     /** reset the federate to created state*/
@@ -277,10 +281,10 @@ class FederateState
     /** move a message to the queue*/
     void addAction (ActionMessage &&action);
     /** sometime a message comes in after a federate has terminated and may require a response*/
-    stx::optional<ActionMessage> processPostTerminationAction (const ActionMessage &action);
+    opt<ActionMessage> processPostTerminationAction (const ActionMessage &action);
     /** log a message to the federate Logger
     @param level the logging level of the message
-    @param logMessageSource- the name of the object that sent the message
+    @param logMessageSource the name of the object that sent the message
     @param message the message to log
     */
     void logMessage (int level, const std::string &logMessageSource, const std::string &message) const;
@@ -289,7 +293,7 @@ class FederateState
     @details function must have signature void(int level, const std::string &sourceName, const std::string
     &message)
     */
-    void setLogger (std::function<void(int, const std::string &, const std::string &)> logFunction)
+    void setLogger (std::function<void (int, const std::string &, const std::string &)> logFunction)
     {
         loggerFunction = std::move (logFunction);
     }

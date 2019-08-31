@@ -1,7 +1,8 @@
 /*
 Copyright © 2017-2019,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
-All rights reserved. See LICENSE file and DISCLAIMER for more details.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
+the top-level NOTICE for additional details. All rights reserved.
+SPDX-License-Identifier: BSD-3-Clause
 */
 #pragma once
 
@@ -45,6 +46,8 @@ class NetworkCommsInterface : public CommsInterface
     void setBrokerPort (int brokerPortNumber);
     /** set the local port number to use for incoming connections*/
     void setPortNumber (int localPortNumber);
+    /** get the local port number to use for incoming connections*/
+    int getPortNumber () const { return PortNumber.load (); }
     /** set the automatic port numbering starting port*/
     void setAutomaticPortStartPort (int startingPort);
     /** set a flag on the communication system*/

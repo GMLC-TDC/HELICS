@@ -1,7 +1,8 @@
 /*
 Copyright © 2017-2019,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
-All rights reserved. See LICENSE file and DISCLAIMER for more details.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See the top-level NOTICE for
+additional details. All rights reserved.
+SPDX-License-Identifier: BSD-3-Clause
 */
 #include "../core/core-exceptions.hpp"
 #include "../helics.hpp"
@@ -370,6 +371,48 @@ helicsFederateRegisterGlobalInput (helics_federate fed, const char *key, helics_
     return nullptr;
 }
 
+void helicsFederateRegisterFromPublicationJSON (helics_federate fed, const char *json, helics_error *err)
+{
+    if (json == nullptr)
+    {  // this isn't an error, just doesn't do anything
+        return;
+    }
+    auto fedObj = getValueFedSharedPtr (fed, err);
+    if (!fedObj)
+    {
+        return;
+    }
+    try
+    {
+        fedObj->registerFromPublicationJSON (json);
+    }
+    catch (...)
+    {
+        helicsErrorHandler (err);
+    }
+}
+
+void helicsFederatePublishJSON (helics_federate fed, const char *json, helics_error *err)
+{
+    if (json == nullptr)
+    {  // this isn't an error just doesn't do anything
+        return;
+    }
+    auto fedObj = getValueFedSharedPtr (fed, err);
+    if (!fedObj)
+    {
+        return;
+    }
+    try
+    {
+        fedObj->publishJSON (json);
+    }
+    catch (...)
+    {
+        helicsErrorHandler (err);
+    }
+}
+
 static constexpr char invalidPubName[] = "the specified publication name is a not a valid publication name";
 static constexpr char invalidPubIndex[] = "the specified publication index is not valid";
 
@@ -540,6 +583,22 @@ helics_input helicsFederateGetSubscription (helics_federate fed, const char *key
     {
         helicsErrorHandler (err);
         return nullptr;
+    }
+}
+
+void helicsFederateClearUpdates (helics_federate fed)
+{
+    auto fedObj = getValueFedSharedPtr (fed, nullptr);
+    if (!fedObj)
+    {
+        return;
+    }
+    try
+    {
+        fedObj->clearUpdates ();
+    }
+    catch (...)
+    {
     }
 }
 
@@ -1388,9 +1447,27 @@ const char *helicsPublicationGetKey (helics_publication pub)
     }
 }
 
-const char *helicsInputGetUnits (helics_input inp)
+const char *helicsInputGetInjectionUnits (helics_input ipt)
 {
-    auto inpObj = verifyInput (inp, nullptr);
+    auto inpObj = verifyInput (ipt, nullptr);
+    if (inpObj == nullptr)
+    {
+        return emptyStr.c_str ();
+    }
+    try
+    {
+        const std::string &units = inpObj->inputPtr->getInjectionUnits ();
+        return units.c_str ();
+    }
+    catch (...)
+    {
+        return emptyStr.c_str ();
+    }
+}
+
+const char *helicsInputGetExtractionUnits (helics_input ipt)
+{
+    auto inpObj = verifyInput (ipt, nullptr);
     if (inpObj == nullptr)
     {
         return emptyStr.c_str ();
@@ -1405,6 +1482,8 @@ const char *helicsInputGetUnits (helics_input inp)
         return emptyStr.c_str ();
     }
 }
+
+const char *helicsInputGetUnits (helics_input inp) { return helicsInputGetExtractionUnits (inp); }
 
 const char *helicsPublicationGetUnits (helics_publication pub)
 {
@@ -1588,6 +1667,22 @@ helics_time helicsInputLastUpdateTime (helics_input inp)
     catch (...)
     {
         return helics_time_invalid;
+    }
+}
+
+void helicsInputClearUpdate (helics_input inp)
+{
+    auto inpObj = verifyInput (inp, nullptr);
+    if (inpObj == nullptr)
+    {
+        return;
+    }
+    try
+    {
+        inpObj->inputPtr->clearUpdate ();
+    }
+    catch (...)
+    {
     }
 }
 

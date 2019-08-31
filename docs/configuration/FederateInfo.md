@@ -22,27 +22,36 @@ Command line arguments that are passed to the core when starting it.  Some examp
 Specify which type of core to use. See [core types](./CoreTypes) for more details
 
 They can be generated from a string using the
+
 ```
 core_type coreTypeFromString (std::string type) noexcept
 ```
+
 function call.  The function
+
 ```
 bool isCoreTypeAvailable (core_type type) noexcept;
 ```
-Will check if the specified core type is available in the current build of the library on a specific platform.  
+
+will check if the specified core type is available in the current build of the library on a specific platform.
 
 **broker [string]**
-specify the broker to connect to,  can be an ipaddress, or a name of the broker depending on the core type and federation configuration.  
 
-**localport [string]**  
-The local ip port to use for incoming connections.  This is usually a number but depending on the system some ports can be named.  
+specify the broker to connect to,  can be an ipaddress, or a name of the broker depending on the core type and federation configuration.
+
+**localport [string]**
+
+The local ip port to use for incoming connections.  This is usually a number but depending on the system some ports can be named.
 
 **properties [bool]**
-Federate info structures accept properties  as either Time values, integers, or flag values (bool).  These are entered through the `setProperty` calls or the `setFlagOption` call. The function calls take a propertyID and a value  From a description of the available options see [Timing](./Timing) and  [helics_enums](https://gmlc-tdc.github.io/HELICS-src/doxygen/helics__enums_8h.html) and [helics_definitions](https://gmlc-tdc.github.io/HELICS-src/doxygen/helics__definitions_8hpp.html)
+
+Federate info structures accept properties  as either Time values, integers, or flag values (bool).  These are entered through the `setProperty` calls or the `setFlagOption` call.
+The function calls take a propertyID and a value.
+For a description of the available options see [Timing](./Timing) and  [helics_enums](../doxygen/helics__enums_8h.html) and [helics_definitions](../doxygen/helics__definitions_8hpp.html)
 
 ## Timing control variables
 
-see [timing](./Timing) for more details.
+see [timing](./Timing.html) for more details.
 
 **timeDelta[time]**
 

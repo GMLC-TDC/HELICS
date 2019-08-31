@@ -3,9 +3,7 @@ Copyright © 2017-2018,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
-#pragma once
-
-#include "helics_includes/optional.hpp"
+#include "gmlc/containers/optionalDefinition.hpp"
 #include <algorithm>
 #include <atomic>
 #include <condition_variable>
@@ -298,46 +296,45 @@ class BlockingPriorityQueue
             val = try_pop ();
         }
         // move the value out of the optional
-        actval = std::move(*val);
+        actval = std::move (*val);
         return actval;
     }
 
-
     /** blocking call to wait on an object from the stack with timeout*/
-    stx::optional<T> pop(std::chrono::milliseconds timeout)
+    stx::optional<T> pop (std::chrono::milliseconds timeout)
     {
-        auto val = try_pop();
+        auto val = try_pop ();
         while (!val)
         {
-            std::unique_lock<std::mutex> pullLock(m_pullLock);  // get the lock then wait
-            if (!priorityQueue.empty())
+            std::unique_lock<std::mutex> pullLock (m_pullLock);  // get the lock then wait
+            if (!priorityQueue.empty ())
             {
-                val = std::move(priorityQueue.front());
-                priorityQueue.pop();
+                val = std::move (priorityQueue.front ());
+                priorityQueue.pop ();
                 break;
             }
-            if (!pullElements.empty())  // make sure we are actually empty;
+            if (!pullElements.empty ())  // make sure we are actually empty;
             {
-                val = std::move(pullElements.back());
-                pullElements.pop_back();
+                val = std::move (pullElements.back ());
+                pullElements.pop_back ();
                 break;
             }
-            auto res=condition.wait_for(pullLock, timeout);  // now wait
+            auto res = condition.wait_for (pullLock, timeout);  // now wait
 
-            if (!priorityQueue.empty())
+            if (!priorityQueue.empty ())
             {
-                val = std::move(priorityQueue.front());
-                priorityQueue.pop();
+                val = std::move (priorityQueue.front ());
+                priorityQueue.pop ();
                 break;
             }
-            if (!pullElements.empty())  // check for spurious wake-ups
+            if (!pullElements.empty ())  // check for spurious wake-ups
             {
-                val = std::move(pullElements.back());
-                pullElements.pop_back();
+                val = std::move (pullElements.back ());
+                pullElements.pop_back ();
                 break;
             }
-            pullLock.unlock();
-            val = try_pop();
+            pullLock.unlock ();
+            val = try_pop ();
             if (res == std::cv_status::timeout)
             {
                 break;

@@ -7,7 +7,22 @@ shopt -s nocasematch
 # Setup the flags for configuring HELICS with CMake
 OPTION_FLAGS_ARR=()
 OPTION_FLAGS_ARR+=("-DBUILD_C_SHARED_LIB=ON" "-DBUILD_SHARED_LIBS=ON" "-DEXAMPLES_WARNINGS_AS_ERROR=ON")
-OPTION_FLAGS_ARR+=("-DZMQ_USE_STATIC_LIBRARY=ON -DUSE_BOOST_STATIC_LIBS=ON")
+
+# Enable adding the slower packaging tests; will not run for CI builds unless they run ctest with the Packaging label
+OPTION_FLAGS_ARR+=("-DENABLE_SLOW_PACKAGING_TESTS=ON")
+
+# Options to control building zeromq
+if [[ "$ZMQ_SUBPROJECT" ]]; then
+    OPTION_FLAGS_ARR+=("-DZMQ_SUBPROJECT=ON")
+fi
+
+if [[ "$ZMQ_FORCE_SUBPROJECT" ]]; then
+    OPTION_FLAGS_ARR+=("-DZMQ_FORCE_SUBPROJECT=ON")
+fi
+
+if [[ "$ZMQ_STATIC" ]]; then
+    OPTION_FLAGS_ARR+=("-DZMQ_USE_STATIC_LIBRARY=ON")
+fi
 
 # Options to control building swig interfaces
 if [[ "${DISABLE_INTERFACES}" != *"Java"* ]]; then
@@ -16,8 +31,8 @@ fi
 if [[ "${DISABLE_INTERFACES}" != *"Python"* ]]; then
     OPTION_FLAGS_ARR+=("-DBUILD_PYTHON_INTERFACE=ON" "-DPYTHON_LIBRARY=${PYTHON_LIB_PATH}" "-DPYTHON_INCLUDE_DIR=${PYTHON_INCLUDE_PATH}")
 fi
-if [[ "$USE_SWIG" == 'false' ]]; then
-    OPTION_FLAGS_ARR+=("-DENABLE_SWIG=OFF")
+if [[ "$USE_SWIG" == 'true' ]]; then
+    OPTION_FLAGS_ARR+=("-DENABLE_SWIG=ON")
 fi
 
 # Options related to the CMake build type
@@ -26,6 +41,8 @@ if [[ "$BUILD_TYPE" ]]; then
     if [[ "$BUILD_TYPE" == "Coverage" ]]; then
         OPTION_FLAGS_ARR+=("-DTEST_CODE_COVERAGE=ON")
     fi
+else
+    OPTION_FLAGS_ARR+=("-DCMAKE_BUILD_TYPE=Release")
 fi
 
 # CPack/Install options
@@ -38,14 +55,14 @@ fi
 
 # MPI options
 if [[ "$USE_MPI" ]]; then
-    OPTION_FLAGS_ARR+=("-DENABLE_MPI=ON")
+    OPTION_FLAGS_ARR+=("-DENABLE_MPI_CORE=ON")
     CC=${CI_DEPENDENCY_DIR}/mpi/bin/mpicc
     CXX=${CI_DEPENDENCY_DIR}/mpi/bin/mpic++
 fi
 
 # Compiler/language options
-if [[ "$CXX_STANDARD" == 17 ]]; then
-    OPTION_FLAGS+=("-DENABLE_CXX_17=ON")
+if [[ "$CXX_STANDARD" ]]; then
+    OPTION_FLAGS_ARR+=("-DCMAKE_CXX_STANDARD=${CXX_STANDARD}")
 fi
 
 # Travis related options
@@ -53,6 +70,11 @@ if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
     OPTION_FLAGS_ARR+=("-DDISABLE_SYSTEM_CALL_TESTS=ON")
 fi
 export HELICS_OPTION_FLAGS=${OPTION_FLAGS_ARR[@]}
+
+# Set any HELICS flags for finding dependencies
+if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
+    export HELICS_DEPENDENCY_FLAGS+="-DBOOST_INSTALL_PATH=${CI_DEPENDENCY_DIR}/boost"
+fi
 
 # Setup the flags for controlling test execution
 TEST_FLAGS_ARR=("$TEST_TYPE")
@@ -68,18 +90,9 @@ if [[ "$RUN_CACHEGRIND" ]]; then
     TEST_FLAGS_ARR+=("--cachegrind")
 fi
 
-# Sanitizer tests
-if [[ "$RUN_ASAN" ]]; then
-    TEST_FLAGS_ARR+=("--asan")
-fi
-if [[ "$RUN_MSAN" ]]; then
-    TEST_FLAGS_ARR+=("--msan")
-fi
-if [[ "$RUN_TSAN" ]]; then
-    TEST_FLAGS_ARR+=("--tsan")
-fi
-if [[ "$RUN_UBSAN" ]]; then
-    TEST_FLAGS_ARR+=("--ubsan")
+# Sanitizer tests (supported: asan, msan, tsan, ubsan)
+if [[ "$RUN_SANITIZER" ]]; then
+    TEST_FLAGS_ARR+=("--${RUN_SANITIZER}")
 fi
 
 # Misc options

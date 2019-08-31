@@ -1,7 +1,8 @@
 #
 # Copyright © 2017-2019, Battelle Memorial Institute; Lawrence Livermore National
-# Security, LLC; Alliance for Sustainable Energy, LLC All rights reserved. See LICENSE
-# file and DISCLAIMER for more details.
+# Security, LLC; Alliance for Sustainable Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
+#
+# SPDX-License-Identifier: BSD-3-Clause
 #
 set(
   SRC_FILES
@@ -31,7 +32,6 @@ set(
 	FilterCoordinator.cpp
 	UnknownHandleManager.cpp
 	MessageTimer.cpp
-	JsonMapBuilder.cpp
 	federate_id.cpp
 	TimeoutMonitor.cpp
 
@@ -64,6 +64,7 @@ set(
 	zmq/ZmqComms.cpp
 	zmq/ZmqCommsSS.cpp
 	zmq/ZmqRequestSets.cpp
+	zmq/ZmqCommsCommon.cpp
 )
 
 set(UDP_SOURCE_FILES udp/UdpCore.cpp udp/UdpBroker.cpp udp/UdpComms.cpp)
@@ -92,6 +93,7 @@ set(
   helicsVersion.hpp
   federate_id.hpp
   helics_definitions.hpp
+  helicsCLI11.hpp
 )
 
 set(
@@ -117,6 +119,7 @@ set(
 	EndpointInfo.hpp
 	flagOperations.hpp
 	BasicHandleInfo.hpp
+	federate_id_extra.hpp
 	FilterInfo.hpp
 	FilterCoordinator.hpp
 	NetworkBrokerData.hpp
@@ -124,12 +127,12 @@ set(
 	UnknownHandleManager.hpp
 	queryHelpers.hpp
 	MessageTimer.hpp
-	JsonMapBuilder.hpp
 	NetworkBroker.hpp
 	NetworkCore.hpp
 	NetworkBroker_impl.hpp
 	NetworkCore_impl.hpp
 	fileConnections.hpp
+	networkDefaults.hpp
 	../helics_enums.h
 )
 
@@ -140,7 +143,7 @@ ipc/IpcBlockingPriorityQueue.hpp
 ipc/IpcBlockingPriorityQueueImpl.hpp
 )
 
-set(ZMQ_HEADER_FILES zmq/ZmqCore.h zmq/ZmqBroker.h zmq/ZmqComms.h zmq/ZmqCommsSS.h zmq/ZmqRequestSets.h)
+set(ZMQ_HEADER_FILES zmq/ZmqCore.h zmq/ZmqBroker.h zmq/ZmqComms.h zmq/ZmqCommsSS.h zmq/ZmqRequestSets.h zmq/ZmqCommsCommon.h)
 
 set(MPI_HEADER_FILES mpi/MpiCore.h mpi/MpiBroker.h mpi/MpiComms.h mpi/MpiService.h)
 
@@ -156,7 +159,7 @@ set(
 	tcp/TcpCommsCommon.h
 )
 
-if(NOT DISABLE_TEST_CORE)
+if(ENABLE_TEST_CORE)
 list(
   APPEND
     SRC_FILES
@@ -169,30 +172,30 @@ list(
 )
 endif()
 
-if(NOT DISABLE_UDP_CORE)
+if(ENABLE_UDP_CORE)
   list(APPEND SRC_FILES ${UDP_SOURCE_FILES})
   list(APPEND INCLUDE_FILES ${UDP_HEADER_FILES})
 endif()
 
-if(NOT DISABLE_IPC_CORE)
+if(ENABLE_IPC_CORE)
   list(APPEND SRC_FILES ${IPC_SOURCE_FILES})
   list(APPEND INCLUDE_FILES ${IPC_HEADER_FILES})
 endif()
 
-if(NOT DISABLE_TCP_CORE)
+if(ENABLE_TCP_CORE)
   list(APPEND SRC_FILES ${TCP_SOURCE_FILES})
   list(APPEND INCLUDE_FILES ${TCP_HEADER_FILES})
 endif()
 
-if(HELICS_HAVE_ZEROMQ)
+if(ENABLE_ZMQ_CORE)
    list(APPEND SRC_FILES ${ZMQ_SOURCE_FILES})
    list(APPEND INCLUDE_FILES ${ZMQ_HEADER_FILES})
-endif(HELICS_HAVE_ZEROMQ)
+endif(ENABLE_ZMQ_CORE)
 
-if(HELICS_HAVE_MPI)
+if(ENABLE_MPI_CORE)
    list(APPEND SRC_FILES ${MPI_SOURCE_FILES})
    list(APPEND INCLUDE_FILES ${MPI_HEADER_FILES})
-endif(HELICS_HAVE_MPI)
+endif(ENABLE_MPI_CORE)
 
 add_library(helics_core OBJECT ${SRC_FILES} ${INCLUDE_FILES} ${PUBLIC_INCLUDE_FILES})
 
@@ -216,45 +219,61 @@ target_compile_options(
   PRIVATE $<TARGET_PROPERTY:helics_base_includes,INTERFACE_COMPILE_OPTIONS>
 )
 
+target_compile_options(
+  helics_core
+  PRIVATE $<TARGET_PROPERTY:compile_flags_target,INTERFACE_COMPILE_OPTIONS>
+)
+
+if (TARGET Boost::boost)
 target_include_directories(
   helics_core SYSTEM
-  PRIVATE $<TARGET_PROPERTY:fmt-header-only,INTERFACE_INCLUDE_DIRECTORIES>
+  PRIVATE $<TARGET_PROPERTY:Boost::boost,INTERFACE_SYSTEM_INCLUDE_DIRECTORIES>
 )
-target_compile_definitions(
-  helics_core PRIVATE $<TARGET_PROPERTY:fmt-header-only,INTERFACE_COMPILE_DEFINITIONS>
-)
-
-if(NOT ENABLE_CXX_17)
-	target_compile_definitions(helics_core PUBLIC "-DSTX_NO_STD_ANY=1")
 endif()
 
-if(HELICS_HAVE_MPI)
-	source_group("mpi" FILES ${MPI_SOURCE_FILES} ${MPI_HEADER_FILES})
-endif(HELICS_HAVE_MPI)
+target_include_directories(
+  helics_core SYSTEM
+  PRIVATE $<TARGET_PROPERTY:fmt::fmt-header-only,INTERFACE_INCLUDE_DIRECTORIES>
+)
+target_compile_definitions(
+  helics_core PRIVATE $<TARGET_PROPERTY:fmt::fmt-header-only,INTERFACE_COMPILE_DEFINITIONS>
+)
 
-if(HELICS_HAVE_ZEROMQ)
+if(ENABLE_MPI_CORE)
+	source_group("mpi" FILES ${MPI_SOURCE_FILES} ${MPI_HEADER_FILES})
+endif(ENABLE_MPI_CORE)
+
+if(ENABLE_ZMQ_CORE)
   target_include_directories(
     helics_core SYSTEM
     PRIVATE $<TARGET_PROPERTY:${ZeroMQ_DEPENDENCY},INTERFACE_INCLUDE_DIRECTORIES>
   )
 	source_group("zmq" FILES ${ZMQ_SOURCE_FILES} ${ZMQ_HEADER_FILES})
-endif(HELICS_HAVE_ZEROMQ)
+endif(ENABLE_ZMQ_CORE)
 
+if(ENABLE_UDP_CORE)
 source_group("udp" FILES ${UDP_SOURCE_FILES} ${UDP_HEADER_FILES})
-source_group("ipc" FILES ${IPC_SOURCE_FILES} ${IPC_HEADER_FILES})
-source_group("test" FILES ${TESTCORE_SOURCE_FILES} ${TESTCORE_HEADER_FILES})
+endif()
 
-if(NOT DISABLE_TCP_CORE)
+if (ENABLE_IPC_CORE)
+source_group("ipc" FILES ${IPC_SOURCE_FILES} ${IPC_HEADER_FILES})
+endif()
+
+if (ENABLE_TEST_CORE)
+source_group("test" FILES ${TESTCORE_SOURCE_FILES} ${TESTCORE_HEADER_FILES})
+endif()
+
+if(ENABLE_TCP_CORE)
    source_group("tcp" FILES ${TCP_SOURCE_FILES} ${TCP_HEADER_FILES})
 endif()
 
-if(HELICS_HAVE_MPI)
+if(ENABLE_MPI_CORE)
   target_include_directories(
     helics_core
     PRIVATE
       "${MPI_C_INCLUDE_DIR}" "${MPI_C_HEADER_DIR}" "${MPI_C_ADDITIONAL_INCLUDE_DIRS}"
   )
-endif(HELICS_HAVE_MPI)
+endif(ENABLE_MPI_CORE)
 
 install(
   FILES ${PUBLIC_INCLUDE_FILES}

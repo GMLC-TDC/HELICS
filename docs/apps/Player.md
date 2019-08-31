@@ -53,7 +53,7 @@ configuration:
 ```
 also permissible are all arguments allowed for federates and any specific broker specified:
 
-[Command line reference](cmdArgs.md)
+[Command line reference](cmdArgs.html)
 
 the player executable also takes an untagged argument of a file name for example
 ```
@@ -62,7 +62,7 @@ helics_player player_file.txt --stop 5
 
 Players support both delimited text files and JSON files some examples can be found in
 
-[Player configuation Examples](https://github.com/GMLC-TDC/HELICS-src/tree/master/tests/helics/apps/test_files)
+[Player configuration examples](https://github.com/GMLC-TDC/HELICS/tree/master/tests/helics/apps/test_files)
 
 ## Config File Detail
 
@@ -91,15 +91,23 @@ time specifications are typically numerical with optional units
 if no units are specified the time defaults to units specified via `--time_units` or seconds if none were specified
 valid units are "s", "ms", "us", "min", "day", "hr", "ns", "ps" the default precision in HELICS is ns so time specified in ps is not guaranteed to be precise
 
-
-| identifier       | type          | Example  |
-| ------------- |:-------------:| -----:|
-| d,f, double     | double | 45.1 |
-| s,string     | string      |  "this is a test" |
-| i, i64, int | integer      |    456 |
-| c, complex | complex      |    23+2j, -23.1j, 1+3i |
-| v, vector | vector of doubles     |    [23.1,34,17.2,-5.6] |
-| cv, complex_vector | vector of complex numbers    |  [23+2j, -23.1j, 1+3i] |
+```eval_rst
++--------------------+---------------------------+-----------------------+
+| identifier         | type                      | Example               |
++====================+===========================+=======================+
+| d,f, double        | double                    | 45.1                  |
++--------------------+---------------------------+-----------------------+
+| s,string           | string                    | "this is a test"      |
++--------------------+---------------------------+-----------------------+
+| i, i64, int        | integer                   | 456                   |
++--------------------+---------------------------+-----------------------+
+| c, complex         | complex                   | 23+2j, -23.1j, 1+3i   |
++--------------------+---------------------------+-----------------------+
+| v, vector          | vector of doubles         | [23.1,34,17.2,-5.6]   |
++--------------------+---------------------------+-----------------------+
+| cv, complex_vector | vector of complex numbers | [23+2j, -23.1j, 1+3i] |
++--------------------+---------------------------+-----------------------+
+```
 
 capitalization does not matter
 

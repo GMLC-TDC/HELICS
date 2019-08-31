@@ -1,10 +1,12 @@
 /*
 Copyright © 2017-2019,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
-All rights reserved. See LICENSE file and DISCLAIMER for more details.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.
+See the top-level NOTICE for additional details.
+All rights reserved.
+SPDX-License-Identifier: BSD-3-Clause
 */
 #include "MpiComms.h"
-//#include "../../common/AsioServiceManager.h"
+#include "../../common/fmt_format.h"
 #include "../ActionMessage.hpp"
 #include "MpiService.h"
 #include <iostream>
@@ -20,7 +22,7 @@ MpiComms::MpiComms ()
 {
     auto &mpi_service = MpiService::getInstance ();
     localTargetAddress = mpi_service.addMpiComms (this);
-    std::cout << "MpiComms() - commAddress = " << localTargetAddress << std::endl;
+    logMessage (fmt::format ("MpiComms() - commAddress = {}", localTargetAddress));
 }
 
 /** destructor*/
@@ -55,7 +57,7 @@ void MpiComms::queue_rx_function ()
 {
     BOOST_SCOPE_EXIT_ALL (this)
     {
-        logMessage (std::string ("Shutdown RX Loop for ") + localTargetAddress);
+        logMessage (fmt::format ("Shutdown RX Loop for {}", localTargetAddress));
         shutdown = true;
         setRxStatus (connection_status::terminated);
     };
@@ -139,7 +141,7 @@ void MpiComms::queue_tx_function ()
                 }
                 break;
                 case REMOVE_ROUTE:
-                    routes.erase (route_id (cmd.getExtraData ()));
+                    routes.erase (route_id{cmd.getExtraData ()});
                     processed = true;
                     break;
                 case DISCONNECT:
@@ -189,8 +191,8 @@ void MpiComms::queue_tx_function ()
                 {
                     if (!isDisconnectCommand (cmd))
                     {
-                        logWarning (std::string ("unknown route and no broker, dropping message ") +
-                                    prettyPrintString (cmd));
+                        logWarning (fmt::format ("unknown route and no broker, dropping message {}",
+                                                 prettyPrintString (cmd)));
                     }
                 }
             }

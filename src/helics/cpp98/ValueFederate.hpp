@@ -1,7 +1,8 @@
 /*
 Copyright © 2017-2019,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
-All rights reserved. See LICENSE file and DISCLAIMER for more details.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
+the top-level NOTICE for additional details. All rights reserved.
+SPDX-License-Identifier: BSD-3-Clause
 */
 #ifndef HELICS_CPP98_VALUE_FEDERATE_HPP_
 #define HELICS_CPP98_VALUE_FEDERATE_HPP_
@@ -68,29 +69,22 @@ class ValueFederate : public virtual Federate
         return *this;
     }
 #ifdef HELICS_HAS_RVALUE_REFS
-    ValueFederate (ValueFederate &&fedObj)
-        : Federate (), ipts (std::move (fedObj.ipts)), pubs (std::move (fedObj.pubs))
+    ValueFederate (ValueFederate &&fedObj) HELICS_NOTHROW : Federate (),
+                                                            ipts (std::move (fedObj.ipts)),
+                                                            pubs (std::move (fedObj.pubs))
     {
         Federate::operator= (std::move (fedObj));
-        if (fed == NULL)
-        {
-            throw (HelicsException (helics_error_registration_failure, "fed==NULL move constructor"));
-        }
     }
-    ValueFederate &operator= (ValueFederate &&fedObj)
+    ValueFederate &operator= (ValueFederate &&fedObj) HELICS_NOTHROW
     {
         ipts = std::move (fedObj.ipts);
         pubs = std::move (fedObj.pubs);
         Federate::operator= (std::move (fedObj));
-        if (fed == NULL)
-        {
-            throw (HelicsException (helics_error_registration_failure, "fed==NULL move assignment"));
-        }
         return *this;
     }
 #endif
     // Default constructor, not meant to be used
-    ValueFederate () {}
+    ValueFederate () HELICS_NOTHROW {}
 
     /** Methods to register publications **/
     Publication
@@ -147,6 +141,11 @@ class ValueFederate : public virtual Federate
         return registerGlobalPublication (indexed_name, type, units);
     }
 
+    void registerFromPublicationJSON (const std::string &json)
+    {
+        helicsFederateRegisterFromPublicationJSON (fed, json.c_str (), hThrowOnError ());
+    }
+
     Publication getPublication (const std::string &name)
     {
         return Publication (helicsFederateGetPublication (fed, name.c_str (), hThrowOnError ()));
@@ -192,7 +191,15 @@ class ValueFederate : public virtual Federate
     // TODO: use c api to implement this method... callbacks too?
     /** Get a list of all subscriptions with updates since the last call **/
     std::vector<helics_input> queryUpdates () { return std::vector<helics_input> (); }
-    // call helicsInputIsUpdated for each sub
+
+    /** clear all the update flags from all federate inputs*/
+    void clearUpdates () { helicsFederateClearUpdates (fed); }
+    /** publish data contained in a JSON file*/
+    void publishJSON (const std::string &json)
+    {
+        helicsFederatePublishJSON (fed, json.c_str (), hThrowOnError ());
+    }
+
   private:
     // Utility function for converting numbers to string
     template <typename T>

@@ -16,10 +16,6 @@ Included with HELICS are a number of apps that provide useful utilities and test
   Echo
   Tracer
   Broker
+  BrokerServer
+  Clone
 ```
-
-<!--
-TODO: Add following to TOC above
-Source
-Broker
--->

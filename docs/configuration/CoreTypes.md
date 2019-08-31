@@ -1,11 +1,11 @@
 # Core Types
 
 There are several different core/broker types available in HELICS
-These can be used in different circumstances depending on the platorm and system desires
+These can be used in different circumstances depending on the platform and system desires
 
 ### Test
 
-The Test core functions in a single process, and works through interthread communications.
+The Test core functions in a single process, and works through inter-thread communications.
 Its primary purpose is to test communication patterns and algorithms.  However, in situations
 where all federates can be run in a single process it is probably the fastest and easiest to setup, and it is fully operational.
 
@@ -18,7 +18,7 @@ multi tiered brokers.
 ### ZMQ
 
 The ZMQ is the primary core to use for multi-machine systems.  It uses the
-[ZMQ](zeromq.com) mechanisms.  Internally it makes use of the REQ/REP mechanics for priority
+[ZMQ](https://zeromq.org) mechanisms.  Internally it makes use of the REQ/REP mechanics for priority
 communications and PUSH/PULL for non-priority communication messages.
 
 ### ZMQ_SS
@@ -28,12 +28,12 @@ The ZMQ_SS core was developed to minimize the number of sockets in use to suppor
 ### UDP
 
 UDP communications sends IP messages.  UDP communication is not guaranteed or ordered,  but may be faster in cases with highly reliable networking
-Its primary use is for performance testing.  The UDP core uses boost::asio for networking
+Its primary use is for performance testing.  The UDP core uses asio for networking
 
 ### TCP
 
 TCP communications is an alternative to ZMQ on platforms where ZMQ is not available,  performance comparisons have not been done, so it is unclear as to the relative performance differences
-between TCP, UDP, and ZMQ.  It uses the boost::asio library for networking
+between TCP, UDP, and ZMQ.  It uses the asio library for networking
 
 ### TCP_SS
 

@@ -1,0 +1,104 @@
+version: 2
+aliases:
+
+  - &setup_helics
+    name: setup_helics
+    environment:
+    command: |
+      mkdir -p build
+      cd build
+      eval cmake .. ${CMAKE_FLAGS}
+      make -j 4 install
+
+  - &run_octave_tests
+    name: run_octave_tests
+    command: |
+       cd ${OCTAVETEST}
+       # this return the write error code in RESULT
+       octave -W -V --eval "source('runTestsCIRCLECI.m');"
+       RESULT=$?
+       echo "*** Octave test result: "${RESULT}
+       exit $RESULT
+
+  - &run_helics_tests
+    name: run_helics_tests
+    command: |
+       /root/project/scripts/run-nighly-circleci-tests.sh
+       RESULT=$?
+       exit $RESULT
+
+jobs:
+  helicsoctave:
+    docker:
+      - image: helics/octave:latest
+    environment:
+      OCTAVETEST: "/root/project/tests/octave"
+      CMAKE_FLAGS: "-DBUILD_OCTAVE_INTERFACE=ON"
+    steps:
+      - checkout
+      - setup_remote_docker: 
+         docker_layer_caching: true   # Save time when caching
+      - run: *setup_helics
+      - run: *run_octave_tests
+
+  helicsTSan:
+    docker:
+      - image: helics/clang-tsan:latest
+    environment:
+      CMAKE_FLAGS: '-DCMAKE_CXX_COMPILER=clang++ -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_FLAGS="-fsanitize=thread -stdlib=libc++ -L/root/develop/libcxx_tsan/lib -lc++abi -I/root/develop/libcxx_tsan/include -I/root/develop/libcxx_tsan/include/c++/v1 -Wno-unused-command-line-argument -g -O1 -Wl,-rpath=/root/develop/libcxx_tsan/lib"  -DBUILD_HELICS_BOOST_TESTS=OFF -DZMQ_SUBPROJECT=ON  -DZMQ_FORCE_SUBPROJECT=ON'
+
+    steps:
+      - checkout
+      - setup_remote_docker: 
+         docker_layer_caching: true   # Save time when caching
+      - run: *setup_helics
+      - run: *run_helics_tests
+
+  helicsASan:
+    docker:
+      - image: helics/clang-asan:latest
+    environment:
+      CMAKE_FLAGS: '-DCMAKE_CXX_COMPILER=clang++ -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_FLAGS="-fsanitize=undefined,address -stdlib=libc++ -L/root/develop/libcxx_asan/lib -lc++abi -I/root/develop/libcxx_asan/include -I/root/develop/libcxx_asan/include/c++/v1 -Wno-unused-command-line-argument -fno-omit-frame-pointer -g -O1 -Wl,-rpath=/root/develop/libcxx_asan/lib"  -DBUILD_HELICS_BOOST_TESTS=OFF -DZMQ_SUBPROJECT=ON  -DZMQ_FORCE_SUBPROJECT=ON'
+
+    steps:
+      - checkout
+      - setup_remote_docker: 
+         docker_layer_caching: true   # Save time when caching
+      - run: *setup_helics
+      - run: *run_helics_tests
+
+  helicsMSan:
+    docker:
+      - image: helics/clang-msan:latest
+    environment:
+      CMAKE_FLAGS: '-DCMAKE_CXX_COMPILER=clang++ -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_FLAGS="-fsanitize=memory -stdlib=libc++ -L/root/develop/libcxx_msan/lib -lc++abi -I/root/develop/libcxx_msan/include -I/root/develop/libcxx_msan/include/c++/v1 -Wno-unused-command-line-argument -fno-omit-frame-pointer -g -O1 -Wl,-rpath=/root/develop/libcxx_msan/lib"  -DBUILD_HELICS_BOOST_TESTS=OFF -DZMQ_SUBPROJECT=ON  -DZMQ_FORCE_SUBPROJECT=ON'
+
+    steps:
+      - checkout
+      - setup_remote_docker: 
+         docker_layer_caching: true   # Save time when caching
+      - run: *setup_helics
+      - run: *run_helics_tests
+
+workflows:
+  version: 2
+  helics_test:
+    jobs:
+      - helicsoctave
+      - helicsMSan
+      - helicsASan
+      - helicsTSan
+  nightly:
+    triggers:
+      - schedule:
+          cron: "0 0 * * *"
+          filters:
+            branches:
+              only:
+                - develop
+    jobs:
+      - helicsoctave
+      - helicsMSan
+      - helicsASan
+      - helicsTSan
+

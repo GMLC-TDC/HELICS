@@ -1,7 +1,8 @@
 /*
 Copyright © 2017-2019,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
-All rights reserved. See LICENSE file and DISCLAIMER for more details.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
+the top-level NOTICE for additional details. All rights reserved.
+SPDX-License-Identifier: BSD-3-Clause
 */
 #ifndef HELICS_CPP98_CORE_HPP_
 #define HELICS_CPP98_CORE_HPP_
@@ -20,14 +21,14 @@ class Core
 {
   public:
     /** Default constructor*/
-    Core () : core (NULL){};
+    Core () HELICS_NOTHROW: core (HELICS_NULL_POINTER){};
     /** construct with type, core name and initialization string */
     Core (const std::string &type, const std::string &name, const std::string &initString)
     {
         core = helicsCreateCore (type.c_str (), name.c_str (), initString.c_str (), hThrowOnError ());
     }
     /** construct with type, core name and command line arguments */
-    Core (const std::string &type, const std::string &name, int argc, const char **argv)
+    Core (const std::string &type, const std::string &name, int argc, char **argv)
     {
         core = helicsCreateCoreFromArgs (type.c_str (), name.c_str (), argc, argv, hThrowOnError ());
     }
@@ -46,15 +47,15 @@ class Core
         return *this;
     }
 #ifdef HELICS_HAS_RVALUE_REFS
-    Core (Core &&cr) noexcept
+    Core (Core &&cr) HELICS_NOTHROW
     {
         core = cr.core;
-        cr.core = NULL;
+        cr.core = HELICS_NULL_POINTER;
     }
-    Core &operator= (Core &&cr) noexcept
+    Core &operator= (Core &&cr) HELICS_NOTHROW
     {
         core = cr.core;
-        cr.core = NULL;
+        cr.core = HELICS_NULL_POINTER;
         return *this;
     }
 #endif

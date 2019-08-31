@@ -1,11 +1,12 @@
 /*
 Copyright © 2017-2019,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
-All rights reserved. See LICENSE file and DISCLAIMER for more details.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
+the top-level NOTICE for additional details. All rights reserved.
+SPDX-License-Identifier: BSD-3-Clause
 */
 
 #include "helics-time.hpp"
-#include "../common/stringOps.h"
+#include "gmlc/utilities/stringOps.h"
 #include <map>
 
 namespace helics
@@ -30,6 +31,7 @@ const std::map<std::string, time_units> time_unitstrings{
   {"week", time_units::week},
   {"wk", time_units::week}};
 
+using namespace gmlc::utilities;
 time_units timeUnitsFromString (const std::string &unitString)
 {
     auto fnd = time_unitstrings.find (unitString);
@@ -58,8 +60,9 @@ helics::Time loadTimeFromString (const std::string &timeString)
     return Time (val * toSecondMultiplier (timeUnitsFromString (units)));
 }
 
-helics::Time loadTimeFromString (const std::string &timeString, time_units defUnits)
+helics::Time loadTimeFromString (std::string timeString, time_units defUnits)
 {
+    stringOps::trimString (timeString);
     size_t pos;
     double val = std::stod (timeString, &pos);
     if (pos >= timeString.size ())
@@ -69,4 +72,4 @@ helics::Time loadTimeFromString (const std::string &timeString, time_units defUn
     std::string units = stringOps::trim (timeString.substr (pos));
     return Time (val * toSecondMultiplier (timeUnitsFromString (units)));
 }
-} //namespace helics
+}  // namespace helics

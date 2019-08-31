@@ -1,262 +1,136 @@
 /*
 Copyright © 2017-2019,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
-All rights reserved. See LICENSE file and DISCLAIMER for more details.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
+the top-level NOTICE for additional details. All rights reserved.
+SPDX-License-Identifier: BSD-3-Clause
 */
 
 #include "NetworkBrokerData.hpp"
-#include "../common/argParser.h"
 #include "BrokerFactory.hpp"
+#include "gmlc/netif/NetIF.hpp"
+#include "helicsCLI11.hpp"
 
-#include "../common/AsioServiceManager.h"
-#include <boost/asio/ip/host_name.hpp>
-#include <boost/asio/ip/tcp.hpp>
+#include "../common/AsioContextManager.h"
+#include <asio/ip/host_name.hpp>
+#include <asio/ip/tcp.hpp>
 
+#include <algorithm>
 #include <iostream>
 
 using namespace std::string_literals;
 
 namespace helics
 {
-static const ArgDescriptors extraArgs{
-  {"interface"s, "the local interface to use for the receive ports"s},
-  {"local_interface"s, "the local interface to use for the receive ports"s},
-  {"broker,b"s,
-   "identifier for the broker, this is either the name or network address use --broker_address or --brokername to explicitly set the network address or name the search for the broker is first by name"s},
-  {"broker_address"s, "location of the broker i.e network address"s},
-  {"network_retries"s, ArgDescriptor::arg_type_t::int_type, "the maximum number of network retries"s},
-  {"brokername"s, "the name of the broker"s},
-  {"brokerinit"s, "the initialization string for the broker"s},
-  {"max_size"s, ArgDescriptor::arg_type_t::int_type, "maximum message buffer size (16*1024)"s},
-  {"max_count"s, ArgDescriptor::arg_type_t::int_type, "max queue size for the message (256)"s},
-  {"local"s, ArgDescriptor::arg_type_t::flag_type, "use local interface(default)"s},
-  {"ipv4"s, ArgDescriptor::arg_type_t::flag_type, "use external ipv4 addresses"s},
-  {"ipv6"s, ArgDescriptor::arg_type_t::flag_type, "use external ipv6 addresses"s},
-  {"server"s, ArgDescriptor::arg_type_t::flag_type, "specify that the network connection should be a server"s},
-  {"os_port"s, ArgDescriptor::arg_type_t::flag_type,
-   "specify that the ports should be allocated by the host operating system"s},
-  {"autobroker"s, ArgDescriptor::arg_type_t::flag_type,
-   "allow a broker to be automatically created if one is not available"s},
-  {"client"s, ArgDescriptor::arg_type_t::flag_type, "specify that the network connection should be a client"s},
-  {"reuse_address"s, ArgDescriptor::arg_type_t::flag_type, "allow the server to reuse a bound address"s},
-  {"external"s, ArgDescriptor::arg_type_t::flag_type, "use all external interfaces"s},
-  {"brokerport"s, ArgDescriptor::arg_type_t::int_type, "port number for the broker priority port"s},
-  {"localport"s, "port number for the local receive port"s},
-  {"port"s, ArgDescriptor::arg_type_t::int_type, "port number for the broker's port"s},
-  {"portstart"s, ArgDescriptor::arg_type_t::int_type, "starting port for automatic port definitions"s}};
-
-void NetworkBrokerData::displayHelp ()
+std::shared_ptr<helicsCLI11App> NetworkBrokerData::commandLineParser (const std::string &localAddress)
 {
-    const char *const argV[] = {"", "--help"};
-    variable_map vm;
-    argumentParser (2, argV, vm, extraArgs);
-}
+    auto nbparser = std::make_shared<helicsCLI11App> (
+      "Network connection information \n(arguments allow '_' characters in the names and ignore them)");
+    nbparser->option_defaults ()->ignore_underscore ();
+    nbparser
+      ->add_flag ("--local{0},--ipv4{4},--ipv6{6},--all{10},--external{10}", interfaceNetwork,
+                  "specify external interface to use, default is --local")
+      ->disable_flag_override ();
+    nbparser->add_option_function<std::string> ("--brokeraddress",
+                                                [this, localAddress](const std::string &addr) {
+                                                    auto brkprt = extractInterfaceandPort (addr);
+                                                    brokerAddress = brkprt.first;
+                                                    brokerPort = brkprt.second;
+                                                    checkAndUpdateBrokerAddress (localAddress);
+                                                },
+                                                "location of the broker i.e network address");
+    nbparser->add_flag ("--reuse_address", reuse_address,
+                        "allow the server to reuse a bound address, mostly useful for tcp cores");
+    nbparser->add_option_function<std::string> (
+      "--broker",
+      [this, localAddress](std::string addr) {
+          auto brkr = BrokerFactory::findBroker (addr);
+          if (brkr)
+          {
+              addr = brkr->getAddress ();
+          }
+          if (brokerAddress.empty ())
+          {
+              auto brkprt = extractInterfaceandPort (addr);
+              brokerAddress = brkprt.first;
+              brokerPort = brkprt.second;
+              checkAndUpdateBrokerAddress (localAddress);
+          }
+          else
+          {
+              brokerName = addr;
+          }
+      },
+      "identifier for the broker, this is either the name or network address use --broker_address or --brokername "
+      "to explicitly set the network address or name the search for the broker is first by name");
+    nbparser->add_option ("--brokername", brokerName, "the name of the broker");
+    nbparser->add_option ("--maxsize", maxMessageSize, "The message buffer size")
+      ->capture_default_str ()
+      ->check (CLI::PositiveNumber);
+    nbparser->add_option ("--maxcount", maxMessageCount, "The maximum number of message to have in a queue")
+      ->capture_default_str ()
+      ->check (CLI::PositiveNumber);
+    nbparser->add_option ("--networkretries", maxRetries, "the maximum number of network retries")
+      ->capture_default_str ();
+    nbparser->add_flag ("--osport,--use_os_port", use_os_port,
+                        "specify that the ports should be allocated by the host operating system");
+    nbparser->add_flag ("--autobroker", autobroker,
+                        "allow a broker to be automatically created if one is not available");
+    nbparser->add_option ("--brokerinit", brokerInitString, "the initialization string for the broker");
+    nbparser
+      ->add_flag_function ("--client{0},--server{1}",
+                           [this](int64_t val) {
+                               switch (server_mode)
+                               {
+                               case server_mode_options::unspecified:
+                               case server_mode_options::server_default_active:
+                               case server_mode_options::server_default_deactivated:
+                                   server_mode = (val > 0) ? server_mode_options::server_active :
+                                                             server_mode_options::server_deactivated;
+                                   break;
+                               default:
+                                   break;
+                               }
+                           },
+                           "specify that the network connection should be a server or client")
+      ->disable_flag_override ();
+    nbparser->add_option_function<std::string> ("--interface,--localinterface",
+                                                [this](const std::string &addr) {
+                                                    auto localprt = extractInterfaceandPort (addr);
+                                                    localInterface = localprt.first;
+                                                    // this may get overridden later
+                                                    portNumber = localprt.second;
+                                                },
+                                                "the local interface to use for the receive ports");
+    nbparser->add_option ("--port,-p", portNumber, "port number to use")
+      ->transform (CLI::Transformer ({{"auto", "-1"}}, CLI::ignore_case));
+    nbparser->add_option ("--brokerport", brokerPort, "The port number to use to connect with the broker");
+    nbparser
+      ->add_option_function<int> ("--localport",
+                                  [this](int port) {
+                                      if (port == -999)
+                                      {
+                                          use_os_port = true;
+                                      }
+                                      else
+                                      {
+                                          portNumber = port;
+                                      }
+                                  },
+                                  "port number for the local receive port")
+      ->transform (CLI::Transformer ({{"auto", "-1"}, {"os", "-999"}}, CLI::ignore_case));
+    nbparser->add_option ("--portstart", portStart, "starting port for automatic port definitions");
 
-void NetworkBrokerData::initializeFromArgs (int argc, const char *const *argv, const std::string &localAddress)
-{
-    variable_map vm;
-    argumentParser (argc, argv, vm, extraArgs);
-    if (vm.count ("local") > 0)
-    {
-        interfaceNetwork = interface_networks::local;
-    }
-    else if (vm.count ("ipv4") > 0)
-    {
-        interfaceNetwork = interface_networks::ipv4;
-    }
-    else if (vm.count ("ipv6") > 0)
-    {
-        interfaceNetwork = interface_networks::ipv6;
-    }
-    else if (vm.count ("external") > 0)
-    {
-        interfaceNetwork = interface_networks::all;
-    }
-    if (vm.count ("broker_address") > 0)
-    {
-        auto addr = vm["broker_address"].as<std::string> ();
-        auto sc = addr.find_first_of (';', 1);
-        if (sc == std::string::npos)
+    nbparser->add_callback ([this]() {
+        if ((!brokerAddress.empty ()) && (brokerPort == -1))
         {
-            auto brkprt = extractInterfaceandPort (addr);
-            brokerAddress = brkprt.first;
-            brokerPort = brkprt.second;
-        }
-        else
-        {
-            auto brkprt = extractInterfaceandPort (addr.substr (0, sc));
-            brokerAddress = brkprt.first;
-            brokerPort = brkprt.second;
-            brkprt = extractInterfaceandPort (addr.substr (sc + 1));
-            if (brkprt.first != brokerAddress)
+            if ((localInterface.empty ()) && (portNumber != -1))
             {
-                std::cerr << "it is not recommended to specify multiple addresses from different servers"
-                          << std::endl;
+                std::swap (brokerPort, portNumber);
             }
         }
-        checkAndUpdateBrokerAddress (localAddress);
-    }
+    });
 
-    if (vm.count ("reuse_address") > 0)
-    {
-        reuse_address = true;
-    }
-    if (vm.count ("broker") > 0)
-    {
-        auto addr = vm["broker"].as<std::string> ();
-        auto brkr = BrokerFactory::findBroker (addr);
-        if (brkr)
-        {
-            addr = brkr->getAddress ();
-        }
-        if (brokerAddress.empty ())
-        {
-            auto sc = addr.find_first_of (';', 1);
-            if (sc == std::string::npos)
-            {
-                auto brkprt = extractInterfaceandPort (addr);
-                brokerAddress = brkprt.first;
-                brokerPort = brkprt.second;
-            }
-            else
-            {
-                auto brkprt = extractInterfaceandPort (addr.substr (0, sc));
-                brokerAddress = brkprt.first;
-                brokerPort = brkprt.second;
-                brkprt = extractInterfaceandPort (addr.substr (sc + 1));
-                if (brkprt.first != brokerAddress)
-                {
-                    std::cerr << "it is not recommended to specify multiple addresses from different servers"
-                              << std::endl;
-                }
-            }
-            checkAndUpdateBrokerAddress (localAddress);
-        }
-        else
-        {
-            brokerName = addr;
-        }
-    }
-    if (vm.count ("brokername") > 0)
-    {
-        brokerName = vm["brokername"].as<std::string> ();
-    }
-    if (vm.count ("max_size") > 0)
-    {
-        auto bsize = vm["max_size"].as<int> ();
-        if (bsize > 0)
-        {
-            maxMessageSize = bsize;
-        }
-    }
-    if (vm.count ("max_count") > 0)
-    {
-        auto msize = vm["max_count"].as<int> ();
-        if (msize > 0)
-        {
-            maxMessageSize = msize;
-        }
-    }
-    if (vm.count ("network_retries") > 0)
-    {
-        maxRetries = vm["network_retries"].as<int> ();
-    }
-    if (vm.count ("os_port") > 0)
-    {
-        use_os_port = true;
-    }
-    if (vm.count ("autobroker") > 0)
-    {
-        autobroker = true;
-    }
-    if (vm.count ("brokerinit") > 0)
-    {
-        brokerInitString = vm["brokerinit"].as<std::string> ();
-    }
-    if (vm.count ("server") > 0)
-    {
-        switch (server_mode)
-        {
-        case server_mode_options::unspecified:
-        case server_mode_options::server_default_active:
-        case server_mode_options::server_default_deactivated:
-            server_mode = server_mode_options::server_active;
-            break;
-        default:
-            break;
-        }
-    }
-    if (vm.count ("client") > 0)
-    {
-        switch (server_mode)
-        {
-        case server_mode_options::unspecified:
-        case server_mode_options::server_default_active:
-        case server_mode_options::server_default_deactivated:
-            server_mode = server_mode_options::server_deactivated;
-            break;
-        default:
-            break;
-        }
-    }
-    if (vm.count ("interface") > 0)
-    {
-        auto localprt = extractInterfaceandPort (vm["interface"].as<std::string> ());
-        localInterface = localprt.first;
-        // this may get overridden later
-        portNumber = localprt.second;
-    }
-    if (vm.count ("local_interface") > 0)
-    {
-        auto localprt = extractInterfaceandPort (vm["local_interface"].as<std::string> ());
-        localInterface = localprt.first;
-        // this may get overridden later
-        portNumber = localprt.second;
-    }
-    if (vm.count ("port") > 0)
-    {  // there is some ambiguity of what port could mean this is dealt with later
-        portNumber = vm["port"].as<int> ();
-    }
-    if (vm.count ("brokerport") > 0)
-    {
-        brokerPort = vm["brokerport"].as<int> ();
-    }
-    if (vm.count ("localport") > 0)
-    {
-        auto pstring = vm["localport"].as<std::string> ();
-        if (pstring == "os")
-        {
-            use_os_port = true;
-        }
-        else if (pstring == "auto")
-        {
-            portNumber = -1;
-        }
-        else
-        {
-            try
-            {
-                portNumber = std::stoi (pstring);
-            }
-            catch (...)
-            {
-                std::cerr << "failed to convert " << pstring << " to a valid port number";
-            }
-        }
-    }
-    if (vm.count ("portstart") > 0)
-    {
-        portStart = vm["portstart"].as<int> ();
-    }
-
-    // check for port ambiguity
-    if ((!brokerAddress.empty ()) && (brokerPort == -1))
-    {
-        if ((localInterface.empty ()) && (portNumber != -1))
-        {
-            std::swap (brokerPort, portNumber);
-        }
-    }
+    return nbparser;
 }
 
 void NetworkBrokerData::checkAndUpdateBrokerAddress (const std::string &localAddress)
@@ -358,7 +232,7 @@ std::pair<std::string, int> extractInterfaceandPort (const std::string &address)
 std::pair<std::string, std::string> extractInterfaceandPortString (const std::string &address)
 {
     auto lastColon = address.find_last_of (':');
-    return std::make_pair (address.substr (0, lastColon), address.substr (lastColon + 1));
+    return {address.substr (0, lastColon), address.substr (lastColon + 1)};
 }
 
 std::string stripProtocol (const std::string &networkAddress)
@@ -443,6 +317,40 @@ bool isipv6 (const std::string &address)
     return false;
 }
 
+std::vector<std::string> prioritizeExternalAddresses (std::vector<std::string> high, std::vector<std::string> low)
+{
+    std::vector<std::string> result;
+
+    // Top choice: addresses that both lists contain (resolver + OS)
+    for (auto r_addr : low)
+    {
+        if (std::find (high.begin (), high.end (), r_addr) != high.end ())
+        {
+            result.push_back (r_addr);
+        }
+    }
+    // Second choice: high-priority addresses found by the OS (likely link-local addresses or loop-back)
+    for (auto i_addr : high)
+    {
+        // add the address if it isn't already in the list
+        if (std::find (result.begin (), result.end (), i_addr) == result.end ())
+        {
+            result.push_back (i_addr);
+        }
+    }
+    // Last choice: low-priority addresses returned by the resolver (OS doesn't know about them so may be invalid)
+    for (auto r_addr : low)
+    {
+        // add the address if it isn't already in the list
+        if (std::find (low.begin (), low.end (), r_addr) == low.end ())
+        {
+            result.push_back (r_addr);
+        }
+    }
+
+    return result;
+}
+
 template <class InputIt1, class InputIt2>
 auto matchcount (InputIt1 first1, InputIt1 last1, InputIt2 first2, InputIt2 last2)
 {
@@ -456,105 +364,203 @@ auto matchcount (InputIt1 first1, InputIt1 last1, InputIt2 first2, InputIt2 last
 
 std::string getLocalExternalAddressV4 ()
 {
-    auto srv = AsioServiceManager::getServicePointer ();
+    auto srv = AsioContextManager::getContextPointer ();
 
-    boost::asio::ip::tcp::resolver resolver (srv->getBaseService ());
-    boost::asio::ip::tcp::resolver::query query (boost::asio::ip::tcp::v4 (), boost::asio::ip::host_name (), "");
-    boost::asio::ip::tcp::resolver::iterator it = resolver.resolve (query);
-    boost::asio::ip::tcp::endpoint endpoint = *it;
+    asio::ip::tcp::resolver resolver (srv->getBaseContext ());
+    asio::ip::tcp::resolver::query query (asio::ip::tcp::v4 (), asio::ip::host_name (), "");
+    asio::ip::tcp::resolver::iterator it = resolver.resolve (query);
+    asio::ip::tcp::endpoint endpoint = *it;
 
-    return endpoint.address ().to_string ();
+    auto resolved_address = endpoint.address ().to_string ();
+    auto interface_addresses = gmlc::netif::getInterfaceAddressesV4 ();
+
+    // Return the resolved address if no interface addresses were found
+    if (interface_addresses.empty ())
+    {
+        return resolved_address;
+    }
+
+    // Use the resolved address if it matches one of the interface addresses
+    for (auto addr : interface_addresses)
+    {
+        if (addr == resolved_address)
+        {
+            return resolved_address;
+        }
+    }
+
+    // Pick an interface that isn't an IPv4 loopback address, 127.0.0.1/8
+    // or an IPv4 link-local address, 169.254.0.0/16
+    std::string link_local_addr;
+    for (auto addr : interface_addresses)
+    {
+        if (addr.rfind ("127.", 0) != 0)
+        {
+            if (addr.rfind ("169.254.", 0) != 0)
+            {
+                return addr;
+            }
+            else if (link_local_addr.empty ())
+            {
+                link_local_addr = addr;
+            }
+        }
+    }
+
+    // Return a link-local address since no alternatives were found
+    if (!link_local_addr.empty ())
+    {
+        return link_local_addr;
+    }
+
+    // Very likely that any address returned at this point won't be a working external address
+    return resolved_address;
 }
 
 std::string getLocalExternalAddressV4 (const std::string &server)
 {
-    auto srv = AsioServiceManager::getServicePointer ();
+    auto srv = AsioContextManager::getContextPointer ();
 
-    boost::asio::ip::tcp::resolver resolver (srv->getBaseService ());
+    asio::ip::tcp::resolver resolver (srv->getBaseContext ());
 
-    boost::asio::ip::tcp::resolver::query query_server (boost::asio::ip::tcp::v4 (), server, "");
-    boost::system::error_code ec;
-    boost::asio::ip::tcp::resolver::iterator it_server = resolver.resolve (query_server, ec);
+    asio::ip::tcp::resolver::query query_server (asio::ip::tcp::v4 (), server, "");
+    std::error_code ec;
+    asio::ip::tcp::resolver::iterator it_server = resolver.resolve (query_server, ec);
     if (ec)
     {
         return getLocalExternalAddressV4 ();
     }
-    boost::asio::ip::tcp::endpoint servep = *it_server;
+    asio::ip::tcp::endpoint servep = *it_server;
 
-    boost::asio::ip::tcp::resolver::iterator end;
+    asio::ip::tcp::resolver::iterator end;
 
     auto sstring = (it_server == end) ? server : servep.address ().to_string ();
 
-    boost::asio::ip::tcp::resolver::query query (boost::asio::ip::tcp::v4 (), boost::asio::ip::host_name (), "");
-    boost::asio::ip::tcp::resolver::iterator it = resolver.resolve (query);
-    boost::asio::ip::tcp::endpoint endpoint = *it;
-    int cnt = 0;
-    std::string def = endpoint.address ().to_string ();
-    cnt = matchcount (sstring.begin (), sstring.end (), def.begin (), def.end ());
-    ++it;
+    auto interface_addresses = gmlc::netif::getInterfaceAddressesV4 ();
+
+    asio::ip::tcp::resolver::query query (asio::ip::tcp::v4 (), asio::ip::host_name (), "");
+    asio::ip::tcp::resolver::iterator it = resolver.resolve (query);
+    // asio::ip::tcp::endpoint endpoint = *it;
+
+    std::vector<std::string> resolved_addresses;
     while (it != end)
     {
-        boost::asio::ip::tcp::endpoint ept = *it;
-        std::string ndef = ept.address ().to_string ();
+        asio::ip::tcp::endpoint ept = *it;
+        resolved_addresses.push_back (ept.address ().to_string ());
+        ++it;
+    }
+
+    auto candidate_addresses = prioritizeExternalAddresses (interface_addresses, resolved_addresses);
+
+    int cnt = 0;
+    std::string def = candidate_addresses[0];
+    cnt = matchcount (sstring.begin (), sstring.end (), def.begin (), def.end ());
+    for (auto ndef : candidate_addresses)
+    {
         auto mcnt = matchcount (sstring.begin (), sstring.end (), ndef.begin (), ndef.end ());
         if ((mcnt > cnt) && (mcnt >= 7))
         {
             def = ndef;
             cnt = mcnt;
         }
-        ++it;
     }
     return def;
 }
 
 std::string getLocalExternalAddressV6 ()
 {
-    auto srv = AsioServiceManager::getServicePointer ();
+    auto srv = AsioContextManager::getContextPointer ();
 
-    boost::asio::ip::tcp::resolver resolver (srv->getBaseService ());
-    boost::asio::ip::tcp::resolver::query query (boost::asio::ip::tcp::v6 (), boost::asio::ip::host_name (), "");
-    boost::asio::ip::tcp::resolver::iterator it = resolver.resolve (query);
-    boost::asio::ip::tcp::endpoint endpoint = *it;
+    asio::ip::tcp::resolver resolver (srv->getBaseContext ());
+    asio::ip::tcp::resolver::query query (asio::ip::tcp::v6 (), asio::ip::host_name (), "");
+    asio::ip::tcp::resolver::iterator it = resolver.resolve (query);
+    asio::ip::tcp::endpoint endpoint = *it;
 
-    return endpoint.address ().to_string ();
+    auto resolved_address = endpoint.address ().to_string ();
+    auto interface_addresses = gmlc::netif::getInterfaceAddressesV6 ();
+
+    // Return the resolved address if no interface addresses were found
+    if (interface_addresses.empty ())
+    {
+        return resolved_address;
+    }
+
+    // Use the resolved address if it matches one of the interface addresses
+    for (auto addr : interface_addresses)
+    {
+        if (addr == resolved_address)
+        {
+            return resolved_address;
+        }
+    }
+
+    // Pick an interface that isn't the IPv6 loopback address, ::1/128
+    // or an IPv6 link-local address, fe80::/16
+    std::string link_local_addr;
+    for (auto addr : interface_addresses)
+    {
+        if (addr != "::1")
+        {
+            if (addr.rfind ("fe80:", 0) != 0)
+            {
+                return addr;
+            }
+            else if (link_local_addr.empty ())
+            {
+                link_local_addr = addr;
+            }
+        }
+    }
+
+    // No other choices, so return a link local address if one was found
+    if (!link_local_addr.empty ())
+    {
+        return link_local_addr;
+    }
+
+    // Very likely that any address returned at this point won't be a working external address
+    return resolved_address;
 }
 
 std::string getLocalExternalAddressV6 (const std::string &server)
 {
-    auto srv = AsioServiceManager::getServicePointer ();
+    auto srv = AsioContextManager::getContextPointer ();
 
-    boost::asio::ip::tcp::resolver resolver (srv->getBaseService ());
+    asio::ip::tcp::resolver resolver (srv->getBaseContext ());
 
-    boost::asio::ip::tcp::resolver::query query_server (boost::asio::ip::tcp::v6 (), server, "");
-    boost::asio::ip::tcp::resolver::iterator it_server = resolver.resolve (query_server);
-    boost::asio::ip::tcp::endpoint servep = *it_server;
-    boost::asio::ip::tcp::resolver::iterator end;
+    asio::ip::tcp::resolver::query query_server (asio::ip::tcp::v6 (), server, "");
+    asio::ip::tcp::resolver::iterator it_server = resolver.resolve (query_server);
+    asio::ip::tcp::endpoint servep = *it_server;
+    asio::ip::tcp::resolver::iterator end;
 
     auto sstring = (it_server == end) ? server : servep.address ().to_string ();
+    auto interface_addresses = gmlc::netif::getInterfaceAddressesV6 ();
 
-    boost::asio::ip::tcp::resolver::query query (boost::asio::ip::tcp::v6 (), boost::asio::ip::host_name (), "");
-    boost::asio::ip::tcp::resolver::iterator it = resolver.resolve (query);
-    boost::asio::ip::tcp::endpoint endpoint = *it;
+    asio::ip::tcp::resolver::query query (asio::ip::tcp::v6 (), asio::ip::host_name (), "");
+    asio::ip::tcp::resolver::iterator it = resolver.resolve (query);
+    // asio::ip::tcp::endpoint endpoint = *it;
 
-    if (it == end)
-    {
-        return std::string ();
-    }
-    int cnt = 0;
-    std::string def = endpoint.address ().to_string ();
-    cnt = matchcount (sstring.begin (), sstring.end (), def.begin (), def.end ());
-    ++it;
+    std::vector<std::string> resolved_addresses;
     while (it != end)
     {
-        boost::asio::ip::tcp::endpoint ept = *it;
-        std::string ndef = ept.address ().to_string ();
+        asio::ip::tcp::endpoint ept = *it;
+        resolved_addresses.push_back (ept.address ().to_string ());
+        ++it;
+    }
+
+    auto candidate_addresses = prioritizeExternalAddresses (interface_addresses, resolved_addresses);
+
+    int cnt = 0;
+    std::string def = candidate_addresses[0];
+    cnt = matchcount (sstring.begin (), sstring.end (), def.begin (), def.end ());
+    for (auto ndef : candidate_addresses)
+    {
         auto mcnt = matchcount (sstring.begin (), sstring.end (), ndef.begin (), ndef.end ());
-        if ((mcnt > cnt) && (mcnt >= 9))
+        if ((mcnt > cnt) && (mcnt >= 7))
         {
             def = ndef;
             cnt = mcnt;
         }
-        ++it;
     }
     return def;
 }

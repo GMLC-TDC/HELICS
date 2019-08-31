@@ -206,110 +206,110 @@ C++ includes: argParser.h
 %feature("docstring") helics::ArgDescriptor::ArgDescriptor "
 ";
 
-// File: classAsioServiceManager.xml
+// File: classAsioContextManager.xml
 
 
-%feature("docstring") AsioServiceManager "
+%feature("docstring") AsioContextManager "
 
-class defining a (potential) singleton Asio Io_service manager for all
-boost::asio usage
+class defining a (potential) singleton Asio io_context manager for all
+asio usage
 
-C++ includes: AsioServiceManager.h
+C++ includes: AsioContextManager.h
 ";
 
-%feature("docstring") AsioServiceManager::getServicePointer "
+%feature("docstring") AsioContextManager::getContextPointer "
 
-return a pointer to a service manager
+return a pointer to a context manager
 
-the function will search for an existing service manager for the name if it
+the function will search for an existing context manager for the name if it
 doesn't find one it will create a new one
 
 Parameters
 ----------
-* `serviceName` :
-    the name of the service to find or create
+* `contextName` :
+    the name of the context to find or create
 ";
 
-%feature("docstring") AsioServiceManager::getExistingServicePointer "
+%feature("docstring") AsioContextManager::getExistingContextPointer "
 
-return a pointer to a service manager
+return a pointer to a context manager
 
-the function will search for an existing service manager for the name if it
+the function will search for an existing context manager for the name if it
 doesn't find one it will return nullptr
 
 Parameters
 ----------
-* `serviceName` :
-    the name of the service to find
+* `contextName` :
+    the name of the context to find
 ";
 
-%feature("docstring") AsioServiceManager::getService "
+%feature("docstring") AsioContextManager::getContext "
 
-get the boost io_service associated with the service manager
+get the asio io_context associated with the context manager
 ";
 
-%feature("docstring") AsioServiceManager::getExistingService "
+%feature("docstring") AsioContextManager::getExistingContext "
 
-get the boost io_service associated with the service manager but only if the
-service exists if it doesn't this will throw and invalid_argument exception
+get the asio io_context associated with the context manager but only if the
+context exists if it doesn't this will throw and invalid_argument exception
 ";
 
-%feature("docstring") AsioServiceManager::closeService "
+%feature("docstring") AsioContextManager::closeContext "
 ";
 
-%feature("docstring") AsioServiceManager::setServiceToLeakOnDelete "
+%feature("docstring") AsioContextManager::setContextToLeakOnDelete "
 
-tell the service to free the pointer and leak the memory on delete
+tell the context to free the pointer and leak the memory on delete
 
 You may ask why, well in windows systems when operating in a DLL if this context
 is closed after certain other operations that happen when the DLL is unlinked
 bad things can happen, and since in nearly all cases this happens at Shutdown
-leaking really doesn't matter that much and if you don't the service could
+leaking really doesn't matter that much and if you don't the context could
 terminate before some other parts of the program which cause all sorts of odd
 errors and issues
 ";
 
-%feature("docstring") AsioServiceManager::runServiceLoop "
+%feature("docstring") AsioContextManager::runContextLoop "
 
-run a single thread for the service manager to execute asynchronous services in
+run a single thread for the context manager to execute asynchronous contexts in
 
-will run a single thread for the io_service, it will not stop the thread until
-either the service manager is closed or the haltServiceLoop function is called
+will run a single thread for the io_context, it will not stop the thread until
+either the context manager is closed or the haltContextLoop function is called
 and there is no more work
 
 Parameters
 ----------
 * `in` :
-    the name of the service
+    the name of the context 
 ";
 
-%feature("docstring") AsioServiceManager::haltServiceLoop "
+%feature("docstring") AsioContextManager::haltContextLoop "
 
-halt the service loop thread if the counter==0
+halt the context loop thread if the counter==0
 
-decrements the loop request counter and if it is 0 then will halt the service
+decrements the loop request counter and if it is 0 then will halt the context 
 loop
 
 Parameters
 ----------
 * `in` :
-    the name of the service
+    the name of the context
 ";
 
-%feature("docstring") AsioServiceManager::~AsioServiceManager "
+%feature("docstring") AsioContextManager::~AsioContextManager "
 ";
 
-%feature("docstring") AsioServiceManager::getName "
+%feature("docstring") AsioContextManager::getName "
 
-get the name of the current service manager
+get the name of the current context manager
 ";
 
-%feature("docstring") AsioServiceManager::getBaseService "
+%feature("docstring") AsioContextManager::getBaseContext "
 
-get the underlying boost::io_service reference
+get the underlying asio::io_context reference
 ";
 
-%feature("docstring") AsioServiceManager::serviceRunLoop "
+%feature("docstring") AsioContextManager::contextRunLoop "
 ";
 
 // File: classhelics_1_1AsyncFedCallInfo.xml
@@ -9009,7 +9009,7 @@ send raw data
 
 Exceptions
 ----------
-* `boost::system::system_error` :
+* `asio::system_error` :
     on failure
 ";
 
@@ -9019,7 +9019,7 @@ send a string
 
 Exceptions
 ----------
-* `boost::system::system_error` :
+* `asio::system_error` :
     on failure
 ";
 
@@ -9029,7 +9029,7 @@ do a blocking receive on the socket
 
 Exceptions
 ----------
-* `boost::system::system_error` :
+* `asio::system_error` :
     on failure
 
 Returns
@@ -9049,7 +9049,7 @@ Parameters
     the length of the data
 * `callback` :
     a callback function of the form void handler( const
-    boost::system::error_code& error, // Result of operation. std::size_t
+    asio::error_code& error, // Result of operation. std::size_t
     bytes_transferred // Number of bytes received. );
 ";
 
@@ -9065,7 +9065,7 @@ Parameters
     the length of the data
 * `callback` :
     a callback function of the form void handler( const
-    boost::system::error_code& error, // Result of operation. std::size_t
+    asio::error_code& error, // Result of operation. std::size_t
     bytes_transferred // Number of bytes received. );
 ";
 
@@ -9081,7 +9081,7 @@ Parameters
     the length of the data
 * `callback` :
     a callback function of the form void handler( const
-    boost::system::error_code& error, // Result of operation. std::size_t
+    asio::error_code& error, // Result of operation. std::size_t
     bytes_transferred // Number of bytes received. );
 ";
 
@@ -9142,7 +9142,7 @@ send raw data
 
 Exceptions
 ----------
-* `boost::system::system_error` :
+* `asio::system_error` :
     on failure
 ";
 
@@ -9152,7 +9152,7 @@ send a string
 
 Exceptions
 ----------
-* `boost::system::system_error` :
+* `asio::system_error` :
     on failure
 ";
 
@@ -11658,8 +11658,6 @@ C++ includes: zmqSocketDescriptor.h
 
 // File: namespaceboost.xml
 
-// File: namespaceboost_1_1asio.xml
-
 // File: namespaceboost_1_1program__options.xml
 
 // File: namespaceboost_1_1system.xml
@@ -12849,14 +12847,14 @@ map that all containing characters that come in pairs to the appropriate match
 
 // File: argParser_8h.xml
 
-// File: AsioServiceManager_8cpp.xml
+// File: AsioContextManager_8cpp.xml
 
-%feature("docstring") serviceRunLoop "
+%feature("docstring") contextRunLoop "
 ";
 
-// File: AsioServiceManager_8h.xml
+// File: AsioContextManager_8h.xml
 
-%feature("docstring") serviceRunLoop "
+%feature("docstring") contextRunLoop "
 ";
 
 // File: AsyncFedCallInfo_8hpp.xml

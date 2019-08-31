@@ -1,13 +1,13 @@
 /*
 Copyright © 2017-2019,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
-All rights reserved. See LICENSE file and DISCLAIMER for more details.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
+the top-level NOTICE for additional details. All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
 
 #include <boost/test/unit_test.hpp>
 #include <boost/test/data/monomorphic.hpp>
 #include <boost/test/data/test_case.hpp>
-#include <boost/test/floating_point_comparison.hpp>
+#include <boost/test/tools/floating_point_comparison.hpp>
 
 #include "helics/application_api/Publications.hpp"
 #include "helics/application_api/Subscriptions.hpp"
@@ -145,7 +145,7 @@ BOOST_DATA_TEST_CASE (ring_test_multicores, bdata::make (fedCountB), feds)
         links[ii].initialize (cores[ii]->getIdentifier (), ii, feds);
     }
 
-    std::vector<std::thread> threads (feds + 1);
+    std::vector<std::thread> threads (static_cast<size_t>(feds) + 1);
     for (int ii = 0; ii < feds; ++ii)
     {
         threads[ii] = std::thread ([](RingTransmit &link) { link.run (); }, std::ref (links[ii]));

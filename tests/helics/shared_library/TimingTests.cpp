@@ -1,7 +1,8 @@
 /*
 Copyright © 2017-2019,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
-All rights reserved. See LICENSE file and DISCLAIMER for more details.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
+the top-level NOTICE for additional details. All rights reserved.
+SPDX-License-Identifier: BSD-3-Clause
 */
 
 #include <boost/test/unit_test.hpp>
@@ -218,4 +219,16 @@ BOOST_AUTO_TEST_CASE (timing_with_period_change)
     CE (helicsFederateFinalize (vFed, &err));
 }
 
+BOOST_AUTO_TEST_CASE (max_time_consistency)
+{
+    SetupTest (helicsCreateValueFederate, "test", 1);
+    auto vFed = GetFederateAt (0);
+    CE (helicsFederateEnterExecutingMode (vFed, &err));
+    helics_time gtime;
+    CE (gtime = helicsFederateRequestTime (vFed, helics_time_maxtime, &err));
+    BOOST_CHECK_GE (gtime, helics_time_maxtime);
+    CE (helicsFederateFinalize (vFed, &err));
+    CE (gtime = helicsFederateGetCurrentTime (vFed, &err));
+    BOOST_CHECK_GE (gtime, helics_time_maxtime);
+}
 BOOST_AUTO_TEST_SUITE_END ()

@@ -1,69 +1,65 @@
 /*
 Copyright © 2017-2019,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
-All rights reserved. See LICENSE file and DISCLAIMER for more details.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
+the top-level NOTICE for additional details. All rights reserved.
+SPDX-License-Identifier: BSD-3-Clause
 */
 #include "../application_api/Federate.hpp"
 #include "../application_api/queryFunctions.hpp"
-#include "../common/stringOps.h"
 #include "../core/Broker.hpp"
 #include "../core/core-exceptions.hpp"
+#include "../core/helicsCLI11.hpp"
 #include "BrokerApp.hpp"
+#include "gmlc/utilities/stringOps.h"
 #include <iostream>
 #include <thread>
-#include <boost/algorithm/string.hpp>
-#if HELICS_HAVE_ZEROMQ > 0
-#include "../common/cppzmq/zmq.hpp"
-#include "../common/zmqContextManager.h"
-#endif
+
 /** function to run the online terminal program*/
-void terminalFunction (int argc, char *argv[]);
+void terminalFunction (std::vector<std::string> args);
 
 int main (int argc, char *argv[])
 {
     int ret = 0;
     bool runterminal = false;
     bool autorestart = false;
-    auto firstarg = std::string (argv[1]);
-    if (boost::iequals (firstarg, "term"))
-    {  // if this is true run a user terminal
-        // now redo the arguments remove the second argument which is term command
 
-        runterminal = true;
-    }
-    else if (boost::iequals (firstarg, "autorestart"))
+    helics::helicsCLI11App cmdLine ("helics broker command line");
+    auto term =
+      cmdLine
+        .add_subcommand (
+          "term", "helics_broker term <broker args...> will start a broker and open a terminal control window "
+                  "for the broker run help in a terminal for more commands\n")
+        ->prefix_command ();
+    term->callback ([&runterminal] () { runterminal = true; });
+    cmdLine.add_flag ("--autorestart", autorestart,
+                      "helics_broker autorestart <broker args ...> will start a continually regenerating broker "
+                      "there is a 3 second countdown on broker completion to halt the program via ctrl-C\n");
+    cmdLine
+      .footer ("helics_broker <broker args ..> starts a broker with the given args and waits for it to "
+               "complete\n")
+      ->footer ([] () {
+          helics::apps::BrokerApp{"-?"};
+          return std::string{};
+      });
+    cmdLine.allow_extras ();
+    auto res = cmdLine.helics_parse (argc, argv);
+    if (res != helics::helicsCLI11App::parse_output::ok)
     {
-        autorestart = true;
-    }
-    else if ((boost::iequals (firstarg, "help")) || (firstarg == "-?") || (firstarg == "-h") ||
-             (firstarg == "--help"))
-    {
-        std::cout << "helics_broker term <broker args...> will start a broker and open a terminal control window "
-                     "for the broker run help in a terminal for more commands\n";
-        std::cout << "helics_broker autorestart <broker args ...> will start a continually regenerating broker "
-                     "there is a 3 second countdown on broker completion to halt the program via ctrl-C\n";
-        std::cout << "helics_broker <broker args ..> just starts a broker with the given args and waits for it to "
-                     "complete\n";
-        if (boost::iequals (firstarg, "help"))
+        switch (res)
         {
-            return ret;
+        case helics::helicsCLI11App::parse_output::help_call:
+        case helics::helicsCLI11App::parse_output::help_all_call:
+        case helics::helicsCLI11App::parse_output::version_call:
+            return 0;
+        default:
+            return static_cast<int> (res);
         }
     }
-    // shift the arguments
-    if ((runterminal) || (autorestart))
-    {
-        argc -= 1;
-        for (int ii = 2; ii <= argc; ++ii)
-        {
-            argv[ii - 1] = argv[ii];
-        }
-    }
-
     try
     {
         if (runterminal)
         {
-            terminalFunction (argc, argv);
+            terminalFunction (cmdLine.remaining_for_passthrough ());
         }
         else if (autorestart)
         {
@@ -71,7 +67,7 @@ int main (int argc, char *argv[])
             {
                 // I am purposely making an object that creates and destroys itself on the same line because this
                 // will run until termination so will take a while
-                helics::apps::BrokerApp (argc, argv);
+                helics::apps::BrokerApp{cmdLine.remaining_for_passthrough (true)};
                 std::cout << "broker restart in 3 seconds" << std::endl;
                 std::this_thread::sleep_for (std::chrono::seconds (1));
                 std::cout << "broker restart in 2 seconds" << std::endl;
@@ -83,7 +79,7 @@ int main (int argc, char *argv[])
         }
         else
         {
-            helics::apps::BrokerApp broker (argc, argv);
+            helics::apps::BrokerApp broker (cmdLine.remaining_for_passthrough ());
         }
     }
     catch (const std::invalid_argument &ia)
@@ -97,189 +93,170 @@ int main (int argc, char *argv[])
         ret = -4;
     }
 
-#if HELICS_HAVE_ZEROMQ > 0
-#ifdef __APPLE__
-    if (ZmqContextManager::setContextToLeakOnDelete ())
-    {
-        ZmqContextManager::getContext ().close ();
-    }
-#endif
-#endif
     helics::cleanupHelicsLibrary ();
     return ret;
 }
 
 /** function to control a user terminal for the broker*/
-void terminalFunction (int argc, char *argv[])
+void terminalFunction (std::vector<std::string> args)
 {
     std::cout << "starting broker\n";
-    auto broker = std::make_unique<helics::apps::BrokerApp> (argc, argv);
-    bool cmdcont = true;
-    while (cmdcont)
-    {
-        std::string cmdin;
-        std::cout << "helics>>";
-        std::getline (std::cin, cmdin);
-        auto cmdVec = stringOps::splitlineQuotes (cmdin, " ", stringOps::default_quote_chars,
-                                                  stringOps::delimiter_compression::on);
-        auto cmd1 = convertToLowerCase (cmdVec[0]);
-        stringOps::trimString (cmd1);
-        if ((cmd1 == "quit") || (cmd1 == "q"))
+    auto broker = std::make_unique<helics::apps::BrokerApp> (args);
+    auto closeBroker = [&broker] () {
+        if (!broker)
         {
-            cmdcont = false;
+            std::cout << "Broker has terminated\n";
+            return;
         }
-        else if (cmd1 == "terminate")
+        broker->forceTerminate ();
+        while (broker->isActive ())
         {
-            if (!broker)
-            {
-                std::cout << "Broker has terminated\n";
-                continue;
-            }
-            broker->forceTerminate ();
-            while (broker->isActive ())
-            {
-                std::this_thread::sleep_for (std::chrono::milliseconds (100));
-            }
-            if (!broker->isActive ())
-            {
-                std::cout << "Broker has terminated\n";
-            }
+            std::this_thread::sleep_for (std::chrono::milliseconds (100));
         }
-        else if (cmd1 == "terminate*")
+        if (!broker->isActive ())
         {
-            if (!broker)
-            {
-                std::cout << "Broker has terminated\n";
-                continue;
-            }
-            broker->forceTerminate ();
-            while (broker->isActive ())
-            {
-                std::this_thread::sleep_for (std::chrono::milliseconds (100));
-            }
-            if (!broker->isActive ())
-            {
-                std::cout << "Broker has terminated\n";
-            }
-            cmdcont = false;
+            std::cout << "Broker has terminated\n";
         }
-        else if ((cmd1 == "help") || (cmd1 == "?"))
+    };
+
+    auto restartBroker = [&broker, &args] (std::vector<std::string> broker_args, bool force) {
+        if (!broker_args.empty ())
         {
-            std::cout << "`quit` -> close the terminal application and wait for broker to finish\n";
-            std::cout << "`terminate` -> force the broker to stop\n";
-            std::cout << "`terminate*` -> force the broker to stop and exit the terminal application\n";
-            std::cout << "`help`,`?` -> this help display\n";
-            std::cout << "`restart` -> restart a completed broker\n";
-            std::cout << "`status` -> will display the current status of the broker\n";
-            std::cout << "`info` -> will display info about the broker\n";
-            std::cout << "`force restart` -> will force terminate a broker and restart it\n";
-            std::cout << "`query` <queryString> -> will query a broker for <queryString>\n";
-            std::cout << "`query` <queryTarget> <queryString> -> will query <queryTarget> for <queryString>\n";
+            args = broker_args;
         }
-        else if (cmd1 == "restart")
+        if (!broker)
         {
-            if (!broker)
+            broker = std::make_unique<helics::apps::BrokerApp> (args);
+            std::cout << "broker has started\n";
+        }
+        else if (broker->isActive ())
+        {
+            if (force)
             {
-                broker = std::make_unique<helics::apps::BrokerApp> (argc, argv);
-                std::cout << "broker has started\n";
+                broker->forceTerminate ();
+                broker = nullptr;
+                broker = std::make_unique<helics::apps::BrokerApp> (args);
+                std::cout << "broker was forceably terminated and restarted\n";
             }
-            else if (broker->isActive ())
+            else
             {
                 std::cout << "broker is currently running unable to restart\n";
             }
-            else
-            {
-                broker = nullptr;
-                broker = std::make_unique<helics::apps::BrokerApp> (argc, argv);
-                std::cout << "broker has restarted\n";
-            }
         }
-        else if (cmd1 == "force")
+        else
         {
-            if (!broker)
-            {
-                broker = std::make_unique<helics::apps::BrokerApp> (argc, argv);
-            }
-            else if ((cmdVec.size () >= 2) && (cmdVec[1] == "restart"))
-            {
-                if (broker->isActive ())
-                {
-                    broker->forceTerminate ();
-                    broker = nullptr;
-                    broker = std::make_unique<helics::apps::BrokerApp> (argc, argv);
-                }
-                else
-                {
-                    broker = nullptr;
-                    broker = std::make_unique<helics::apps::BrokerApp> (argc, argv);
-                }
-            }
+            broker = nullptr;
+            broker = std::make_unique<helics::apps::BrokerApp> (args);
+            std::cout << "broker has restarted\n";
         }
-        else if (cmd1 == "status")
+    };
+
+    auto status = [&broker] (bool addAddress) {
+        if (!broker)
         {
-            if (!broker)
-            {
-                std::cout << "Broker is not available\n";
-                continue;
-            }
-            auto accepting = (*broker)->isOpenToNewFederates ();
-            auto connected = (*broker)->isConnected ();
-            auto id = (*broker)->getIdentifier ();
-            if (connected)
-            {
-                auto cts = (*broker)->query ("broker", "counts");
-                std::cout << "Broker (" << id << ") is connected and " << ((accepting) ? "is" : "is not")
-                          << "accepting new federates\n"
-                          << cts << '\n';
-            }
-            else
-            {
-                std::cout << "Broker (" << id << ") is not connected \n";
-            }
+            std::cout << "Broker is not available\n";
+            return;
         }
-        else if (cmd1 == "info")
+        auto accepting = (*broker)->isOpenToNewFederates ();
+        auto connected = (*broker)->isConnected ();
+        auto id = (*broker)->getIdentifier ();
+        if (connected)
         {
-            if (!broker)
-            {
-                std::cout << "Broker is not available\n";
-                continue;
-            }
-            auto accepting = (*broker)->isOpenToNewFederates ();
-            auto connected = (*broker)->isConnected ();
-            auto id = (*broker)->getIdentifier ();
-            if (connected)
+            std::cout << "Broker (" << id << ") is connected and " << ((accepting) ? "is" : "is not")
+                      << "accepting new federates\n";
+            if (addAddress)
             {
                 auto address = (*broker)->getAddress ();
-                std::cout << "Broker (" << id << ") is connected and " << ((accepting) ? "is" : "is not")
-                          << " accepting new federates\naddress=" << address << '\n';
+                std::cout << address << '\n';
             }
             else
             {
-                std::cout << "Broker (" << id << ") is not connected \n";
+                auto cts = (*broker)->query ("broker", "counts");
+                std::cout << cts << '\n';
             }
         }
-        else if (cmd1 == "query")
+        else
         {
-            if (!broker)
-            {
-                std::cout << "Broker is not available\n";
-                continue;
-            }
-            std::string res;
-            if (cmdVec.size () == 2)
-            {
-                res = (*broker)->query ("broker", cmdVec[1]);
-            }
-            else if (cmdVec.size () >= 3)
-            {
-                res = (*broker)->query (cmdVec[1], cmdVec[2]);
-            }
-            auto qvec = vectorizeQueryResult (std::move (res));
-            std::cout << "results: ";
-            for (const auto &vres : qvec)
-            {
-                std::cout << vres << '\n';
-            }
+            std::cout << "Broker (" << id << ") is not connected \n";
         }
+    };
+    bool cmdcont = true;
+    helics::helicsCLI11App termProg ("helics broker command line terminal");
+    termProg.ignore_case ();
+    termProg.add_flag ("-q,--quit,--exit", cmdcont, "close the terminal and wait for the broker to exit");
+    termProg.add_subcommand ("quit", "close the terminal and  wait for the broker to exit")
+      ->callback ([&cmdcont] () { cmdcont = false; });
+    termProg.add_subcommand ("terminate", "terminate the broker")->callback (closeBroker);
+
+    termProg.add_subcommand ("terminate!", "forceably terminate the broker and exit")
+      ->callback ([closeBroker, &cmdcont] () {
+          cmdcont = false;
+          closeBroker ();
+      });
+
+    auto restart =
+      termProg.add_subcommand ("restart", "restart the broker if it is not currently executing")->allow_extras ();
+    restart->callback (
+      [restartBroker, &restart] () { restartBroker (restart->remaining_for_passthrough (), false); });
+
+    auto frestart =
+      termProg.add_subcommand ("restart!", "forceably terminate the broker and restart it")->allow_extras ();
+    frestart->callback (
+      [restartBroker, &restart] () { restartBroker (restart->remaining_for_passthrough (), true); });
+
+    termProg.add_subcommand ("status", "generate the current status of the broker")->callback ([&status] () {
+        status (false);
+    });
+    termProg.add_subcommand ("info", "get the current broker status and connection info")->callback ([&status] () {
+        status (true);
+    });
+    termProg.add_subcommand ("help", "display the help")->callback ([&termProg] () {
+        termProg.helics_parse ("-?");
+    });
+    std::string target;
+    std::string query;
+
+    auto queryCall = [&broker, &target, &query] () {
+        if (!broker)
+        {
+            std::cout << "Broker is not available\n";
+            return;
+        }
+        std::string res;
+        if (target.empty ())
+        {
+            res = (*broker)->query ("broker", query);
+        }
+        else
+        {
+            res = (*broker)->query (target, query);
+        }
+        auto qvec = helics::vectorizeQueryResult (std::move (res));
+        std::cout << "results: ";
+        for (const auto &vres : qvec)
+        {
+            std::cout << vres << '\n';
+        }
+    };
+    auto querySub = termProg.add_subcommand (
+      "query", "make a query of some target >>query <target> <query> or query <query> to query the broker");
+    auto qgroup1 = querySub->add_option_group ("targetGroup")->enabled_by_default ();
+    qgroup1->add_option ("target", target, "the name of object to target");
+    auto qgroup2 = querySub->add_option_group ("queryGroup");
+    qgroup2->add_option ("query", query, "the query to make")->required ();
+    querySub->preparse_callback ([qgroup1, &target] (size_t argcount) {
+        if (argcount < 2)
+        {
+            target.clear ();
+            qgroup1->disabled ();
+        }
+    });
+    querySub->callback (queryCall);
+    while (cmdcont)
+    {
+        std::string cmdin;
+        std::cout << "\nhelics>>";
+        std::getline (std::cin, cmdin);
+        termProg.helics_parse (cmdin);
     }
 }

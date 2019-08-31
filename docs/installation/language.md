@@ -5,7 +5,7 @@
 Run the following:
 
 ```bash
-$ cmake -DBUILD_PYTHON_INTERFACE=ON -DPYTHON_INCLUDE_DIR=$(python3-config --prefix)/include/python3.6m/ -DPYTHON_LIBRARY=$(python3-config --prefix)/lib/python3.6m/libpython3.6m.dylib -DCMAKE_INSTALL_PREFIX=/Users/$(whoami)/local/helics-1.0.0/ ..
+$ cmake -DBUILD_PYTHON_INTERFACE=ON -DCMAKE_INSTALL_PREFIX=/Users/$(whoami)/local/helics-x.x.x/ ..
 $ make -j8
 $ make install
 ```
@@ -13,7 +13,7 @@ $ make install
 Add the following to your `~/.bashrc` file.
 
 ```bash
-export PYTHONPATH=/Users/$(whoami)/local/helics-1.0.0/python:$PYTHONPATH
+export PYTHONPATH=/Users/$(whoami)/local/helics-x.x.x/python:$PYTHONPATH
 ```
 
 If you open a interactive Python session and import helics, you should be able to get the version of `helics` and an output that is similar to the following.
@@ -36,7 +36,7 @@ Out[2]: 'x.x.x (XX-XX-XX)'
 Run the following:
 
 ```bash
-$ cmake -DBUILD_PYTHON2_INTERFACE=ON -DPYTHON_INCLUDE_DIR=$(python2-config --prefix)/include/python2.7/ -DPYTHON_LIBRARY=$(python2-config --prefix)/lib/python2.7/libpython2.7.dylib -DCMAKE_INSTALL_PREFIX=/Users/$(whoami)/local/helics-1.0.0/ ..
+$ cmake -DBUILD_PYTHON2_INTERFACE=ON -DPYTHON_INCLUDE_DIR=$(python2-config --prefix)/include/python2.7/ -DPYTHON_LIBRARY=$(python2-config --prefix)/lib/python2.7/libpython2.7.dylib -DCMAKE_INSTALL_PREFIX=/Users/$(whoami)/local/helics-x.x.x/ ..
 $ make -j8
 $ make install
 ```
@@ -44,7 +44,7 @@ $ make install
 Add the following to your `~/.bashrc` file.
 
 ```bash
-export PYTHONPATH=/Users/$(whoami)/local/helics-1.0.0/python:$PYTHONPATH
+export PYTHONPATH=/Users/$(whoami)/local/helics-x.x.x/python:$PYTHONPATH
 ```
 
 If you open a interactive Python session and import helics, you should be able to get the version of `helics` and an output that is similar to the following.
@@ -65,27 +65,27 @@ Out[2]: 'x.x.x (XX-XX-XX)'
 ## HELICS with GCC and Python3
 
 First you will need to build boost using gcc from source. Download
-[boost](http://www.boost.org/users/history/version_1_64_0.html) from the
+[boost](http://www.boost.org/users/history/version_1_70_0.html) from the
 boost.org website.
 
-Unzip the folder boost\_1\_64\_0 to any location, for example Downloads.
+Unzip the folder boost\_1\_70\_0 to any location, for example Downloads.
 
 ```bash
-$ cd ~/Downloads/boost_1_64_0
+$ cd ~/Downloads/boost_1_70_0
 $ ./bootstrap.sh --with-python=/Users/$USER/miniconda3/python3 --prefix=/usr/local/Cellar/gcc/7.2.0_1/bin/gcc-7
-$ ./bootstrap.sh --prefix=/ --prefix=/Users/$USER/local/boost-gcc-1.64
+$ ./bootstrap.sh --prefix=/ --prefix=/Users/$USER/local/boost-gcc-1.70
 $ ./b2
 $ ./b2 install
 $ # OR
 $ ./bjam cxxflags='-fPIC' cflags='-fPIC' -a link=static install # For static linking
 ```
 
-This will install boost in the `~/local/boost-gcc-1.64` folder
+This will install boost in the `~/local/boost-gcc-1.70` folder
 
 Next, you will need to build HELICS and tell it what the BOOST\_ROOT is.
 
 ```bash
-$ cmake -DCMAKE_INSTALL_PREFIX="/Users/$USER/local/helics-gcc-1.0.0/" -DBOOST_ROOT="/Users/$USER/local/boost-gcc-1.64" -DBUILD_PYTHON_INTERFACE=ON -DPYTHON_LIBRARY=$(python3-config --prefix)/lib/libpython3.6m.dylib -DPYTHON_INCLUDE_DIR=$(python3-config --prefix)/include/python3.6m -DCMAKE_C_COMPILER=/usr/local/Cellar/gcc/7.2.0_1/bin/gcc-7 -DCMAKE_CXX_COMPILER=/usr/local/Cellar/gcc/7.2.0_1/bin/g++-7 ../
+$ cmake -DCMAKE_INSTALL_PREFIX="/Users/$USER/local/helics-gcc-x.x.x/" -DBOOST_ROOT="/Users/$USER/local/boost-gcc-1.64" -DBUILD_PYTHON_INTERFACE=ON -DPYTHON_LIBRARY=$(python3-config --prefix)/lib/libpython3.6m.dylib -DPYTHON_INCLUDE_DIR=$(python3-config --prefix)/include/python3.6m -DCMAKE_C_COMPILER=/usr/local/Cellar/gcc/7.2.0_1/bin/gcc-7 -DCMAKE_CXX_COMPILER=/usr/local/Cellar/gcc/7.2.0_1/bin/g++-7 ../
 $ make clean; make -j 4; make install
 ```
 
@@ -94,8 +94,8 @@ $ make clean; make -j 4; make install
 To install HELICS with MATLAB support, you will need to add `BUILD_MATLAB_INTERFACE=ON`.
 
 ```
-git clone https://github.com/GMLC-TDC/HELICS-src
-cd HELICS-src
+git clone https://github.com/GMLC-TDC/HELICS
+cd HELICS
 mkdir build
 cd build
 cmake -DBUILD_MATLAB_INTERFACE=ON -DCMAKE_INSTALL_PREFIX=/Users/$(whoami)/local/helics-develop/ ..
@@ -105,7 +105,7 @@ make install
 
 On windows using visual studio the command line cmake would look like
 ```
-cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX="C:\local\helics-develop" -DDISABLE_SWIG -DBUILD_MATLAB_INTERFACE=ON -G "Visual Studio 15 2017 Win64" ..
+cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX="C:\local\helics-develop" -DENABLE_SWIG=OFF -DBUILD_MATLAB_INTERFACE=ON -G "Visual Studio 15 2017 Win64" ..
 
 cmake --build . --config Release --target INSTALL
 ```
@@ -116,7 +116,7 @@ For this operation to succeed MATLAB must be available and mex must be setup to 
 ```
 and follow the prompted instructions.
 
-Reconstructing the files requires a specific version of SWIG with MATLAB support. If swig is not used then adding `-DDISABLE_SWIG=ON` to the cmake command will bypass swig and use the included interface files directly.  If any modifications to the C library were made then swig must be used to regenerate the files appropriately, otherwise the existing files can be used.  The CMAKE scripts will detect if the swig is the appropriate version and act accordingly.
+Reconstructing the files requires a specific version of SWIG with MATLAB support. If swig is not used then adding `-DENABLE_SWIG=OFF` to the cmake command will bypass swig and use the included interface files directly.  If any modifications to the C library were made then swig must be used to regenerate the files appropriately, otherwise the existing files can be used.  The CMAKE scripts will detect if the swig is the appropriate version and act accordingly.
 
 Add the install directory path to the MATLAB files to your PATH. This can be the system path, or the MATLAB path through the addpath command or the graphical equivalent
 ```
@@ -158,7 +158,7 @@ To do that, you can follow the following instructions.
 Alternatively, you wish to build the MATLAB interface without using CMake, and you can do the following.
 
 ```bash
-cd ~/GitRepos/GMLC-TDC/HELICS-src/swig/
+cd ~/GitRepos/GMLC-TDC/HELICS/swig/
 mex -I../src/helics/shared_api_library ./matlab/helics_wrap.cxx -lhelicsSharedLib -L/path/to/helics_install/lib/helics/
 mv helicsMEX.* matlab/
 ```
@@ -170,8 +170,8 @@ The above instructions will have to be modified slightly to support Windows,  CM
 To install HELICS with Octave support, you will need to add `BUILD_OCTAVE_INTERFACE=ON`.
 
 ```
-git clone https://github.com/GMLC-TDC/HELICS-src
-cd HELICS-src
+git clone https://github.com/GMLC-TDC/HELICS
+cd HELICS
 mkdir build
 cd build
 cmake -DBUILD_OCTAVE_INTERFACE=ON -DCMAKE_INSTALL_PREFIX=/Users/$(whoami)/local/helics-develop/ ..
@@ -188,5 +188,5 @@ ans = x.x.x (XX-XX-XX)
 
 #### Notes
 At present the interface to octave is experimental,  the testing is limited and not all functions are likely to have a clean interface, this will improve over time.
-Octave 4.2 will require swig 3.0.12,  Octave 4.4 will require the develop branch of swig.  The Octave interface has built and run smoothly on Linux systems, and run through some limited trials.
+Octave 4.2 will require swig 3.0.12,  Octave 4.4 will require swig 4.0 or higher.  The Octave interface has built and run smoothly on Linux systems.
 On windows system the octave interface is not that reliable to build, while it has worked it hasn't been that smooth of process and has required some hacks to get it to work.  More work is likely needed.

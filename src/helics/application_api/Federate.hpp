@@ -1,7 +1,8 @@
 /*
 Copyright © 2017-2019,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
-All rights reserved. See LICENSE file and DISCLAIMER for more details.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
+the top-level NOTICE for additional details. All rights reserved.
+SPDX-License-Identifier: BSD-3-Clause
 */
 #pragma once
 
@@ -17,11 +18,14 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include <mutex>
 #include <stdexcept>
 
+namespace gmlc
+{
 namespace libguarded
 {
 template <class T, class M>
 class shared_guarded;
 }  // namespace libguarded
+}  // namespace gmlc
 
 /**
  * HELICS Application API
@@ -65,7 +69,7 @@ class Federate
     std::shared_ptr<Core> coreObject;  //!< reference to the core simulation API
     Time currentTime = Time::minVal ();  //!< the current simulation time
   private:
-    std::unique_ptr<libguarded::shared_guarded<AsyncFedCallInfo, std::mutex>>
+    std::unique_ptr<gmlc::libguarded::shared_guarded<AsyncFedCallInfo, std::mutex>>
       asyncCallInfo;  //!< pointer to a class defining the async call information
     std::unique_ptr<FilterFederateManager> fManager;  //!< class for managing filter operations
     std::string name;  //!< the name of the federate
@@ -169,21 +173,27 @@ class Federate
   @return the granted time step*/
     Time requestNextStep () { return requestTime (timeZero); }
 
+    /** request a time advancement by a certain amount
+    @return the granted time step*/
+    Time requestTimeAdvance (Time timeDelta) { return requestTime (currentTime + timeDelta); }
+
     /** request a time advancement
     @param nextInternalTimeStep the next requested time step
     @param iterate a requested iteration mode
     @return the granted time step in a structure containing a return time and an iteration_result*/
     iteration_time requestTimeIterative (Time nextInternalTimeStep, iteration_request iterate);
 
-    /** request a time advancement
+    /**  request a time advancement and return immediately for asynchronous function.
+    @details /ref requestTimeComplete should be called to finish the operation and get the result
     @param nextInternalTimeStep the next requested time step
     */
     void requestTimeAsync (Time nextInternalTimeStep);
 
-    /** request a time advancement
+    /** request a time advancement with iterative call and return for asynchronous function.
+    @details /ref requestTimeIterativeComplete should be called to finish the operation and get the result
     @param nextInternalTimeStep the next requested time step
     @param iterate a requested iteration level (none, require, optional)
-    @return the granted time step*/
+    */
     void requestTimeIterativeAsync (Time nextInternalTimeStep, iteration_request iterate);
 
     /** request a time advancement
@@ -238,7 +248,7 @@ class Federate
     A string indicating the source of the message and another string with the actual message
     */
     void
-    setLoggingCallback (const std::function<void(int, const std::string &, const std::string &)> &logFunction);
+    setLoggingCallback (const std::function<void (int, const std::string &, const std::string &)> &logFunction);
 
     /** make a query of the core
     @details this call is blocking until the value is returned which make take some time depending on the size of
@@ -465,17 +475,31 @@ class Federate
     @return a const ref to  std::string  */
     const std::string &getInjectionType (interface_handle handle) const;
 
-    /** get the extraction type for an interface,  this is the type for data coming into an interface
+    /** get the extraction type for an interface,  this is the type for data coming out of interface
     @details for filters this is the output type, for publications this is the specified type, for endpoints this
     is the specified type and for inputs this is the specified type
     @param handle the interface handle to get the injection type for
     @return a const ref to  std::string  */
     const std::string &getExtractionType (interface_handle handle) const;
 
-    /** get the units associated with an interface
+    /** get the injection units for an interface,  this is the units associated with data coming into an interface
+  @details for inputs this is the input type, for publications this is the units used to transmit data, and for
+  inputs this is the units of the transmitting publication
+  @param handle the interface handle to get the injection units for
+  @return a const ref to  std::string  */
+    const std::string &getInjectionUnits (interface_handle handle) const;
+
+    /** get the extraction type for an interface,  this is the units associated with data coming out of an
+    interface
+    @details for publications this is the specified units, for inputs this is the specified type
     @param handle the interface handle to get the injection type for
+    @return a const ref to  std::string  */
+    const std::string &getExtractionUnits (interface_handle handle) const;
+    /** get the units associated with an interface
+    @details this function will is identical to getExtractionUnits
+    @param handle the interface handle to get the extraction units for
     @return a const ref to  std::string containing the units */
-    const std::string &getInterfaceUnits (interface_handle handle) const;
+    const std::string &getInterfaceUnits (interface_handle handle) const { return getExtractionUnits (handle); }
 
   private:
     /** register filter interfaces defined in  file or string

@@ -1,7 +1,8 @@
 /*
 Copyright © 2017-2019,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
-All rights reserved. See LICENSE file and DISCLAIMER for more details.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
+the top-level NOTICE for additional details. All rights reserved.
+SPDX-License-Identifier: BSD-3-Clause
 */
 #pragma once
 
@@ -45,25 +46,54 @@ class Core
     /**
      * Simulator control.
      */
-
     /**
-     * Initialize the core.
+     * Configure the core.
+     *
+     * Should be invoked a single time to configure the co-simulation core for operation
+     *
+     */
+    [[deprecated ("please use configure instead")]] void initialize (const std::string &configureString)
+    {
+        configure (configureString);
+    }
+    /**Configure the core from command line arguments.
+     *
+     * Should be invoked a single time to initialize the co-simulation core for operation
+     *
+     */
+    [[deprecated ("please use configureFromArgs instead")]] void initializeFromArgs (int argc, char *argv[])
+    {
+        configureFromArgs (argc, argv);
+    }
+    /**
+     * Configure the core from a configuration string
      *
      * Should be invoked a single time to initialize the co-simulation core.
      *
      */
-    virtual void initialize (const std::string &initializationString) = 0;
+    virtual void configure (const std::string &configureString) = 0;
     /**
-     * Initialize the core from command line arguments.
+     * Configure the core from command line arguments.
      *
-     * Should be invoked a single time to initialize the co-simulation core.
+     * Should be invoked a single time to configure the co-simulation core for operation
      *
      */
-    virtual void initializeFromArgs (int argc, const char *const *argv) = 0;
+    virtual void configureFromArgs (int argc, char *argv[]) = 0;
     /**
-     * Returns true if the core has been initialized.
+     * Configure the core from command line arguments contained in a vector in reverse order
+     *
+     * Should be invoked a single time to configure the co-simulation core for operations
+     *
      */
-    virtual bool isInitialized () const = 0;
+    virtual void configureFromVector (std::vector<std::string> args) = 0;
+    /**
+     * Returns true if the core has been configured.
+     */
+    virtual bool isConfigured () const = 0;
+    /**
+     * Returns true if the core has been configured.
+     */
+    [[deprecated ("please use isConfigured instead")]] bool isInitialized () const { return isConfigured (); }
     /**
     * connect the core to a broker if needed
     @return true if the connection was successful
@@ -217,8 +247,8 @@ class Core
      * Non-reiterative federates may not invoke this method.
      *@param federateID the identifier for the federate to process
      * @param next the requested time
-     * @param localConverged has the local federate converged
-     @return an iteration_time object with two field grantedTime and a enumeration indicating the state of the
+     * @param iterate the requested iteration mode /ref iteration_request
+     @return an /ref iteration_time object with two field grantedTime and a enumeration indicating the state of the
      iteration
      */
     virtual iteration_time
@@ -254,7 +284,7 @@ class Core
     */
     virtual int16_t getIntegerProperty (local_federate_id federateID, int32_t property) const = 0;
     /** get the most recent granted Time
-    @param federateID, the id of the federate to get the time
+    @param federateID the identifier of the federate to get the time
     @return the most recent granted time or the startup time
     */
     virtual Time getCurrentTime (local_federate_id federateID) const = 0;
@@ -263,7 +293,7 @@ class Core
     Set a flag in a a federate
     * @param federateID  the identifier for the federate
     * @param flag an index code for the flag to set
-    @param flagValue the value to set the flag to
+    * @param flagValue the value to set the flag to
     */
     virtual void setFlagOption (local_federate_id federateID, int32_t flag, bool flagValue) = 0;
 
@@ -271,7 +301,7 @@ class Core
     Set a flag in a a federate
     * @param federateID  the identifier for the federate
     * @param flag an index code for the flag to set
-    @param flagValue the value to set the flag to
+    * @return the value of the flag
     */
     virtual bool getFlagOption (local_federate_id federateID, int32_t flag) const = 0;
     /**
@@ -303,7 +333,7 @@ class Core
      * Register a control input for the specified federate.
      *
      * May only be invoked in the initialize state.
-     * @param federateID
+     * @param federateID the indentifier for the federate to register an input interface on
      * @param key the name of the control input
      * @param type a string describing the type of the federate
      * @param units a string naming the units of the federate
@@ -330,7 +360,22 @@ class Core
     /**
      * Returns units for specified handle.
      */
-    virtual const std::string &getUnits (interface_handle handle) const = 0;
+    virtual const std::string &getExtractionUnits (interface_handle handle) const = 0;
+    /** get the injection units for an interface,  this is the type for data coming into an interface
+   @details for publications this is the units associated with the transmitted data,  for inputs this is the units
+   of the transmitting publication
+   @param handle the interface handle to get the injection type for
+   @return a const ref to  std::string  */
+    virtual const std::string &getInjectionUnits (interface_handle handle) const = 0;
+
+    /**
+     * Returns units for specified handle.
+     */
+    [[deprecated ("please use getExtractionUnits instead")]] const std::string &
+    getUnits (interface_handle handle) const
+    {
+        return getExtractionUnits (handle);
+    }
     /** get the injection type for an interface,  this is the type for data coming into an interface
     @details for filters this is the input type, for publications this is type used to transmit data, for endpoints
     this is the specified type and for inputs this is the type of the transmitting publication
@@ -448,7 +493,7 @@ class Core
     linkage to a particular publication, for filters it add a source endpoint to filter
     @param handle the identifier of the interface
     @param name the name of the filter or its target
-    @return a handle to identify the filter*/
+    */
     virtual void addSourceTarget (interface_handle handle, const std::string &name) = 0;
 
     /** get a destination filter Handle from its name or target(this may not be unique so it will only find the
@@ -564,7 +609,7 @@ class Core
     /** send a log message to the Core for logging
     @param federateID the federate that is sending the log message
     @param logLevel  an integer for the log level (0- error, 1- warning, 2-status, 3-debug)
-    @param messageToLog
+    @param messageToLog the string to send to a logger
     */
     virtual void logMessage (local_federate_id federateID, int logLevel, const std::string &messageToLog) = 0;
 
@@ -616,15 +661,15 @@ class Core
     virtual void setQueryCallback (local_federate_id federateID,
                                    std::function<std::string (const std::string &)> queryFunction) = 0;
     /**
-     * TODO: tags
-     * @param handle
-     * @param info
+     * setter for the interface information
+     * @param handle the identifiers for the interface to set the info data on
+     * @param info a string containing the info data
      */
     virtual void setInterfaceInfo (interface_handle handle, std::string info) = 0;
     /**
-     *  TODO: tags
-     * @param handle
-     * @return
+     * gett for the interface information
+     * @param handle the identifiers for the interface to query
+     * @return a string containing the Info data stored in an interface
      */
     virtual const std::string &getInterfaceInfo (interface_handle handle) const = 0;
 };

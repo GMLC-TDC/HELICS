@@ -1,7 +1,8 @@
 /*
  Copyright © 2017-2019,
- Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
- All rights reserved. See LICENSE file and DISCLAIMER for more details.
+ Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
+the top-level NOTICE for additional details. All rights reserved.
+SPDX-License-Identifier: BSD-3-Clause
  */
 #include "ZmqCommsSS.h"
 #include "../../common/zmqContextManager.h"
@@ -9,47 +10,16 @@
 #include "../../common/zmqSocketDescriptor.h"
 #include "../ActionMessage.hpp"
 #include "../NetworkBrokerData.hpp"
+#include "../networkDefaults.hpp"
+#include "ZmqCommsCommon.h"
 #include "ZmqRequestSets.h"
 //#include <csignal>
 #include <iostream>
 #include <memory>
 
-static const int DEFAULT_BROKER_PORT_NUMBER = 23414;  // Todo define a different port number
 static const int TX_RX_MSG_COUNT = 20;
 
 using namespace std::chrono;
-/** bind a zmq socket, with a timeout and timeout period*/
-static bool bindzmqSocket (zmq::socket_t &socket,
-                           const std::string &address,
-                           int port,
-                           milliseconds timeout,
-                           milliseconds period = milliseconds (200))
-{
-    bool bindsuccess = false;
-    milliseconds tcount{0};
-    while (!bindsuccess)
-    {
-        try
-        {
-            socket.bind (helics::makePortAddress (address, port));
-            bindsuccess = true;
-        }
-        catch (const zmq::error_t &)
-        {
-            if (tcount == milliseconds (0))
-            {
-                std::cerr << "zmq binding error on socket sleeping then will try again \n";
-            }
-            if (tcount > timeout)
-            {
-                break;
-            }
-            std::this_thread::sleep_for (period);
-            tcount += period;
-        }
-    }
-    return bindsuccess;
-}
 
 namespace helics
 {
@@ -89,12 +59,30 @@ void ZmqCommsSS::loadNetworkInfo (const NetworkBrokerData &netInfo)
     propertyUnLock ();
 }
 
-ZmqCommsSS::ZmqCommsSS () noexcept : NetworkCommsInterface (interface_type::ip) {}
+ZmqCommsSS::ZmqCommsSS () noexcept
+    : NetworkCommsInterface (interface_type::ip, CommsInterface::thread_generation::single)
+{
+}
 
 /** destructor*/
-ZmqCommsSS::~ZmqCommsSS () { disconnect (); }
+ZmqCommsSS::~ZmqCommsSS ()
+{
+    if (requestDisconnect.load () || disconnecting.load ())
+    {
+        auto status = getRxStatus ();
+        while (status != connection_status::terminated && status != connection_status::error)
+        {
+            std::this_thread::yield ();
+            status = getRxStatus ();
+        }
+    }
+    else
+    {
+        disconnect ();
+    }
+}
 
-int ZmqCommsSS::getDefaultBrokerPort () const { return DEFAULT_BROKER_PORT_NUMBER; }
+int ZmqCommsSS::getDefaultBrokerPort () const { return DEFAULT_ZMQSS_BROKER_PORT_NUMBER; }
 
 int ZmqCommsSS::processIncomingMessage (zmq::message_t &msg, std::map<std::string, std::string> &connection_info)
 {
@@ -188,7 +176,7 @@ int ZmqCommsSS::initializeBrokerConnections (zmq::socket_t &brokerSocket, zmq::s
     if (serverMode)
     {
         brokerSocket.setsockopt (ZMQ_LINGER, 500);
-        auto bindsuccess = bindzmqSocket (brokerSocket, localTargetAddress, brokerPort, connectionTimeout);
+        auto bindsuccess = hzmq::bindzmqSocket (brokerSocket, localTargetAddress, brokerPort, connectionTimeout);
         if (!bindsuccess)
         {
             brokerSocket.close ();
@@ -266,7 +254,6 @@ bool ZmqCommsSS::processTxControlCmd (ActionMessage cmd,
         routes.erase (route_id (cmd.getExtraData ()));
         break;
     case CLOSE_RECEIVER:
-        setRxStatus (connection_status::terminated);
         close_tx = true;
         break;
     case DISCONNECT:
@@ -294,7 +281,7 @@ void ZmqCommsSS::queue_tx_function ()
 
     if (brokerPort < 0)
     {
-        brokerPort = DEFAULT_BROKER_PORT_NUMBER;
+        brokerPort = DEFAULT_ZMQSS_BROKER_PORT_NUMBER;
     }
 
     zmq::socket_t brokerSocket (ctx->getContext (), ZMQ_ROUTER);
@@ -347,22 +334,22 @@ void ZmqCommsSS::queue_tx_function ()
     bool close_tx = false;
     int status = 0;
 
-    while (true)
+    bool haltLoop{false};
+    //  std::vector<ActionMessage> txlist;
+    while (!haltLoop)
     {
         route_id rid;
         ActionMessage cmd;
         int count = 0;
-        int tx_count = 0;
-        int rc = 1;
 
         // Handle Tx messages first
         auto tx_msg = txQueue.try_pop ();
-        rc = zmq::poll (poller, 0l);
+        int rc = zmq::poll (poller, 0l);
         if (!tx_msg || (rc <= 0))
         {
             std::this_thread::yield ();
         }
-        tx_count = 0;
+        int tx_count = 0;
         // Balance between tx and rx processing since both running on single thread
         while (tx_msg && (tx_count < TX_RX_MSG_COUNT))
         {
@@ -378,7 +365,8 @@ void ZmqCommsSS::queue_tx_function ()
 
                     if (close_tx)
                     {
-                        goto CLOSE_TX_LOOP;
+                        haltLoop = true;
+                        break;
                     }
                 }
             }
@@ -403,7 +391,8 @@ void ZmqCommsSS::queue_tx_function ()
                     status = processIncomingMessage (msg, connection_info);  //----------> ToCheck
                     if (status < 0)
                     {
-                        goto CLOSE_TX_LOOP;
+                        haltLoop = true;
+                        break;
                     }
                 }
                 else
@@ -466,19 +455,14 @@ void ZmqCommsSS::queue_tx_function ()
 
                 if (status < 0)
                 {
-                    goto CLOSE_TX_LOOP;
+                    haltLoop = true;
                 }
             }
             count++;
         }
     }
-CLOSE_TX_LOOP:
     routes.clear ();
     connection_info.clear ();
-    if (getRxStatus () == connection_status::connected)
-    {
-        setRxStatus (connection_status::terminated);
-    }
     if (serverMode)
     {
         std::this_thread::sleep_for (std::chrono::milliseconds (50));
@@ -489,6 +473,10 @@ CLOSE_TX_LOOP:
         brokerConnection.close ();
     }
     setTxStatus (connection_status::terminated);
+    if (getRxStatus () == connection_status::connected)
+    {
+        setRxStatus (connection_status::terminated);
+    }
 }
 
 int ZmqCommsSS::processRxMessage (zmq::socket_t &brokerSocket,
@@ -502,31 +490,17 @@ int ZmqCommsSS::processRxMessage (zmq::socket_t &brokerSocket,
     if (serverMode)
     {
         brokerSocket.recv (&msg1);
-        std::string str (static_cast<char *> (msg1.data ()), msg1.size ());
-
         brokerSocket.recv (&msg2);
     }
     else
     {
         brokerConnection.recv (&msg1);
-        std::string str (static_cast<char *> (msg1.data ()), msg1.size ());
-
         brokerConnection.recv (&msg2);
     }
-    std::string str2 (static_cast<char *> (msg2.data ()), msg2.size ());
     status = processIncomingMessage (msg2, connection_info);
 
     return status;
 }
 
-void ZmqCommsSS::closeReceiver ()
-{
-    // Send close message to close Tx and Rx connection
-    ActionMessage cmd (CMD_PROTOCOL);
-    cmd.messageID = CLOSE_RECEIVER;
-    transmit (control_route, cmd);
-}
-
 }  // namespace zeromq
-// namespace zeromq
 }  // namespace helics

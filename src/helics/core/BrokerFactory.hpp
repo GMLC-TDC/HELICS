@@ -1,7 +1,8 @@
 /*
 Copyright © 2017-2019,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
-All rights reserved. See LICENSE file and DISCLAIMER for more details.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
+the top-level NOTICE for additional details. All rights reserved.
+SPDX-License-Identifier: BSD-3-Clause
 */
 #pragma once
 
@@ -24,12 +25,18 @@ namespace BrokerFactory
  * Invokes initialize() on the instantiated Core object.
  */
 std::shared_ptr<Broker> create (core_type type, const std::string &initializationString);
-
-std::shared_ptr<Broker> create (core_type type, int argc, const char *const *argv);
+/** Create a broker from command line arguments*/
+std::shared_ptr<Broker> create (core_type type, int argc, char *argv[]);
+/** Create a broker from command line arguments in a vector*/
+std::shared_ptr<Broker> create (core_type type, std::vector<std::string> args);
 
 std::shared_ptr<Broker>
 create (core_type type, const std::string &broker_name, const std::string &initializationString);
-std::shared_ptr<Broker> create (core_type type, const std::string &broker_name, int argc, const char *const *argv);
+
+std::shared_ptr<Broker> create (core_type type, const std::string &broker_name, int argc, char *argv[]);
+
+/** Create a broker from command line arguments in a vector*/
+std::shared_ptr<Broker> create (core_type type, const std::string &broker_name, std::vector<std::string> args);
 
 /** locate a coreBroker by name
 @param brokerName the name of the broker
@@ -38,6 +45,12 @@ std::shared_ptr<Broker> findBroker (const std::string &brokerName);
 
 /** try to find a joinable broker of a specific type*/
 std::shared_ptr<Broker> findJoinableBrokerOfType (core_type type);
+
+/** get all available brokers*/
+std::vector<std::shared_ptr<Broker>> getAllBrokers ();
+
+/** check if there are any active Brokers*/
+bool brokersActive ();
 
 /** register a coreBroker so it can be found by others
 @details also cleans up any leftover brokers that were previously unregistered this can be controlled by calling

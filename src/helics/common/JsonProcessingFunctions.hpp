@@ -1,7 +1,8 @@
 /*
 Copyright © 2017-2019,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
-All rights reserved. See LICENSE file and DISCLAIMER for more details.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
+the top-level NOTICE for additional details. All rights reserved.
+SPDX-License-Identifier: BSD-3-Clause
 */
 #pragma once
 
@@ -10,7 +11,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 using the jsoncpp library
 */
 
-#include "json/jsoncpp.h"
+#include "json/json.h"
 #include <functional>
 
 #include "../core/helics-time.hpp"
@@ -20,47 +21,46 @@ bool hasJsonExtension (const std::string &jsonString);
 /** load a JSON string or filename that points to a JSON file and return a
 JSON::Value to the root object
 */
-helics::Json::Value loadJson (const std::string &jsonString);
+Json::Value loadJson (const std::string &jsonString);
 
 /** load a JSON object in a string
  */
-helics::Json::Value loadJsonStr (const std::string &jsonString);
+Json::Value loadJsonStr (const std::string &jsonString);
 
 /** read a time from a JSON value element*/
-helics::Time loadJsonTime (const helics::Json::Value &timeElement, time_units defaultUnits = time_units::sec);
+helics::Time loadJsonTime (const Json::Value &timeElement, time_units defaultUnits = time_units::sec);
 
 /** get a name or key from the element*/
-std::string getKey (const helics::Json::Value &element);
+std::string getKey (const Json::Value &element);
 
 /** generate a Json String*/
-std::string generateJsonString (const helics::Json::Value &block);
+std::string generateJsonString (const Json::Value &block);
 
-inline std::string
-getOrDefault (const helics::Json::Value &element, const std::string &key, const std::string &defVal)
+inline std::string getOrDefault (const Json::Value &element, const std::string &key, const std::string &defVal)
 {
     return (element.isMember (key)) ?
              ((element[key].isString ()) ? element[key].asString () : generateJsonString (element[key])) :
              defVal;
 }
 
-inline double getOrDefault (const helics::Json::Value &element, const std::string &key, double defVal)
+inline double getOrDefault (const Json::Value &element, const std::string &key, double defVal)
 {
     return (element.isMember (key)) ? element[key].asDouble () : defVal;
 }
 
-inline bool getOrDefault (const helics::Json::Value &element, const std::string &key, bool defVal)
+inline bool getOrDefault (const Json::Value &element, const std::string &key, bool defVal)
 {
     return (element.isMember (key)) ? element[key].asBool () : defVal;
 }
 
-inline int64_t getOrDefault (const helics::Json::Value &element, const std::string &key, int64_t defVal)
+inline int64_t getOrDefault (const Json::Value &element, const std::string &key, int64_t defVal)
 {
     return (element.isMember (key)) ? element[key].asInt64 () : defVal;
 }
 
-inline void callIfMember (const helics::Json::Value &element,
+inline void callIfMember (const Json::Value &element,
                           const std::string &key,
-                          const std::function<void(const std::string &, helics::Time)> &call)
+                          const std::function<void (const std::string &, helics::Time)> &call)
 {
     if (element.isMember (key))
     {
@@ -68,9 +68,9 @@ inline void callIfMember (const helics::Json::Value &element,
     }
 }
 
-inline void callIfMember (const helics::Json::Value &element,
+inline void callIfMember (const Json::Value &element,
                           const std::string &key,
-                          const std::function<void(const std::string &, bool)> &call)
+                          const std::function<void (const std::string &, bool)> &call)
 {
     if (element.isMember (key))
     {
@@ -78,9 +78,9 @@ inline void callIfMember (const helics::Json::Value &element,
     }
 }
 
-inline void callIfMember (const helics::Json::Value &element,
+inline void callIfMember (const Json::Value &element,
                           const std::string &key,
-                          const std::function<void(const std::string &, int)> &call)
+                          const std::function<void (const std::string &, int)> &call)
 {
     if (element.isMember (key))
     {
@@ -88,9 +88,9 @@ inline void callIfMember (const helics::Json::Value &element,
     }
 }
 
-inline void callIfMember (const helics::Json::Value &element,
+inline void callIfMember (const Json::Value &element,
                           const std::string &key,
-                          const std::function<void(const std::string &)> &call)
+                          const std::function<void (const std::string &)> &call)
 {
     if (element.isMember (key))
     {
@@ -98,7 +98,7 @@ inline void callIfMember (const helics::Json::Value &element,
     }
 }
 
-inline void replaceIfMember (const helics::Json::Value &element, const std::string &key, helics::Time &timeVal)
+inline void replaceIfMember (const Json::Value &element, const std::string &key, helics::Time &timeVal)
 {
     if (element.isMember (key))
     {
@@ -106,7 +106,7 @@ inline void replaceIfMember (const helics::Json::Value &element, const std::stri
     }
 }
 
-inline void replaceIfMember (const helics::Json::Value &element, const std::string &key, std::string &sval)
+inline void replaceIfMember (const Json::Value &element, const std::string &key, std::string &sval)
 {
     if (element.isMember (key))
     {
@@ -114,10 +114,18 @@ inline void replaceIfMember (const helics::Json::Value &element, const std::stri
     }
 }
 
-inline void replaceIfMember (const helics::Json::Value &element, const std::string &key, bool &bval)
+inline void replaceIfMember (const Json::Value &element, const std::string &key, bool &bval)
 {
     if (element.isMember (key))
     {
         bval = element[key].asBool ();
+    }
+}
+
+inline void replaceIfMember (const Json::Value &element, const std::string &key, int &sval)
+{
+    if (element.isMember (key))
+    {
+        sval = element[key].asInt ();
     }
 }

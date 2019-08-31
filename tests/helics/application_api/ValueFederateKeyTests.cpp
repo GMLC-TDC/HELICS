@@ -1,12 +1,13 @@
 /*
 Copyright © 2017-2019,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
-All rights reserved. See LICENSE file and DISCLAIMER for more details.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
+the top-level NOTICE for additional details. All rights reserved.
+SPDX-License-Identifier: BSD-3-Clause
 */
 
 #include <boost/test/unit_test.hpp>
 #include <boost/test/data/test_case.hpp>
-#include <boost/test/floating_point_comparison.hpp>
+#include <boost/test/tools/floating_point_comparison.hpp>
 
 #include <future>
 
@@ -128,12 +129,12 @@ static bool dual_transfer_test (std::shared_ptr<helics::ValueFederate> &vFed1,
 
     bool correct = true;
 
-    auto f1finish = std::async (std::launch::async, [&]() { vFed1->enterExecutingMode (); });
+    auto f1finish = std::async (std::launch::async, [&] () { vFed1->enterExecutingMode (); });
     vFed2->enterExecutingMode ();
     f1finish.wait ();
     // publish string1 at time=0.0;
     vFed1->publish (pubid, "string1");
-    auto f1time = std::async (std::launch::async, [&]() { return vFed1->requestTime (1.0); });
+    auto f1time = std::async (std::launch::async, [&] () { return vFed1->requestTime (1.0); });
     auto gtime = vFed2->requestTime (1.0);
 
     BOOST_CHECK_EQUAL (gtime, 1.0);
@@ -166,7 +167,7 @@ static bool dual_transfer_test (std::shared_ptr<helics::ValueFederate> &vFed1,
         correct = false;
     }
     // advance time
-    f1time = std::async (std::launch::async, [&]() { return vFed1->requestTime (2.0); });
+    f1time = std::async (std::launch::async, [&] () { return vFed1->requestTime (2.0); });
     gtime = vFed2->requestTime (2.0);
 
     BOOST_CHECK_EQUAL (gtime, 2.0);
@@ -566,7 +567,7 @@ BOOST_DATA_TEST_CASE (test_all_callback, bdata::make (core_types_single), core_t
     helics::data_block db (547, ';');
     helics::interface_handle lastId;
     helics::Time lastTime;
-    vFed1->setInputNotificationCallback ([&](const helics::Input &subid, helics::Time callTime) {
+    vFed1->setInputNotificationCallback ([&] (const helics::Input &subid, helics::Time callTime) {
         lastTime = callTime;
         lastId = subid.getHandle ();
     });
@@ -597,7 +598,7 @@ BOOST_DATA_TEST_CASE (test_all_callback, bdata::make (core_types_single), core_t
     BOOST_CHECK_EQUAL (lastTime, 3.0);
 
     int ccnt = 0;
-    vFed1->setInputNotificationCallback ([&](const helics::Input &, helics::Time) { ++ccnt; });
+    vFed1->setInputNotificationCallback ([&] (const helics::Input &, helics::Time) { ++ccnt; });
 
     vFed1->publishRaw (pubid3, db);
     vFed1->publish (pubid2, 4);
@@ -717,12 +718,12 @@ BOOST_DATA_TEST_CASE (value_federate_dual_transfer_close, bdata::make (core_type
     vFed1->setProperty (helics_property_time_delta, 1.0);
     vFed2->setProperty (helics_property_time_delta, 1.0);
 
-    auto f1finish = std::async (std::launch::async, [&]() { vFed1->enterExecutingMode (); });
+    auto f1finish = std::async (std::launch::async, [&] () { vFed1->enterExecutingMode (); });
     vFed2->enterExecutingMode ();
     f1finish.wait ();
     // publish string1 at time=0.0;
     vFed1->publish (pubid, "string1");
-    auto f1time = std::async (std::launch::async, [&]() { return vFed1->requestTime (1.0); });
+    auto f1time = std::async (std::launch::async, [&] () { return vFed1->requestTime (1.0); });
     auto gtime = vFed2->requestTime (1.0);
 
     BOOST_CHECK_EQUAL (gtime, 1.0);
@@ -740,7 +741,7 @@ BOOST_DATA_TEST_CASE (value_federate_dual_transfer_close, bdata::make (core_type
     BOOST_CHECK_EQUAL (s, "string1");
     // advance time
     vFed1->closeInterface (pubid.getHandle ());
-    f1time = std::async (std::launch::async, [&]() { return vFed1->requestTime (2.0); });
+    f1time = std::async (std::launch::async, [&] () { return vFed1->requestTime (2.0); });
     gtime = vFed2->requestTime (2.0);
 
     BOOST_CHECK_EQUAL (gtime, 2.0);
@@ -756,7 +757,7 @@ BOOST_DATA_TEST_CASE (value_federate_dual_transfer_close, bdata::make (core_type
     // make sure the value is still what we expect
 
     // advance time
-    f1time = std::async (std::launch::async, [&]() { return vFed1->requestTime (3.0); });
+    f1time = std::async (std::launch::async, [&] () { return vFed1->requestTime (3.0); });
     gtime = vFed2->requestTime (3.0);
     s = vFed2->getString (subid);
     // make sure we didn't get the last publish
@@ -778,12 +779,12 @@ BOOST_DATA_TEST_CASE (value_federate_dual_transfer_remove_target, bdata::make (c
     vFed1->setProperty (helics_property_time_delta, 1.0);
     vFed2->setProperty (helics_property_time_delta, 1.0);
 
-    auto f1finish = std::async (std::launch::async, [&]() { vFed1->enterExecutingMode (); });
+    auto f1finish = std::async (std::launch::async, [&] () { vFed1->enterExecutingMode (); });
     vFed2->enterExecutingMode ();
     f1finish.wait ();
     // publish string1 at time=0.0;
     vFed1->publish (pubid, "string1");
-    auto f1time = std::async (std::launch::async, [&]() { return vFed1->requestTime (1.0); });
+    auto f1time = std::async (std::launch::async, [&] () { return vFed1->requestTime (1.0); });
     auto gtime = vFed2->requestTime (1.0);
 
     BOOST_CHECK_EQUAL (gtime, 1.0);
@@ -801,7 +802,7 @@ BOOST_DATA_TEST_CASE (value_federate_dual_transfer_remove_target, bdata::make (c
     BOOST_CHECK_EQUAL (s, "string1");
     // advance time
     subid.removeTarget ("pub1");
-    f1time = std::async (std::launch::async, [&]() { return vFed1->requestTime (2.0); });
+    f1time = std::async (std::launch::async, [&] () { return vFed1->requestTime (2.0); });
     gtime = vFed2->requestTime (2.0);
 
     BOOST_CHECK_EQUAL (gtime, 2.0);
@@ -817,18 +818,21 @@ BOOST_DATA_TEST_CASE (value_federate_dual_transfer_remove_target, bdata::make (c
     // occasion
     // and this is an asynchronous operation so there is no guarantees the remove will stop the next broadcast
     // but it should do it within the next timestep so we have an extra loop here
-    f1time = std::async (std::launch::async, [&]() { return vFed1->requestTime (3.0); });
+    f1time = std::async (std::launch::async, [&] () {
+        vFed1->requestTime (3.0);
+        return vFed1->requestTime (4.0);
+    });
     gtime = vFed2->requestTime (3.0);
-
-    BOOST_CHECK_EQUAL (gtime, 3.0);
+    gtime = vFed2->requestTime (4.0);
+    BOOST_CHECK_EQUAL (gtime, 4.0);
     gtime = f1time.get ();
-    BOOST_CHECK_EQUAL (gtime, 3.0);
+    BOOST_CHECK_EQUAL (gtime, 4.0);
     vFed1->publish (pubid, "string3");
     // make sure the value is still what we expect
 
     // advance time
-    f1time = std::async (std::launch::async, [&]() { return vFed1->requestTime (4.0); });
-    gtime = vFed2->requestTime (4.0);
+    f1time = std::async (std::launch::async, [&] () { return vFed1->requestTime (5.0); });
+    gtime = vFed2->requestTime (5.0);
     s = vFed2->getString (subid);
     // make sure we didn't get the last publish
     BOOST_CHECK_EQUAL (s, "string2");
@@ -850,12 +854,12 @@ BOOST_DATA_TEST_CASE (value_federate_dual_transfer_remove_target_input, bdata::m
     vFed1->setProperty (helics_property_time_delta, 1.0);
     vFed2->setProperty (helics_property_time_delta, 1.0);
 
-    auto f1finish = std::async (std::launch::async, [&]() { vFed1->enterExecutingMode (); });
+    auto f1finish = std::async (std::launch::async, [&] () { vFed1->enterExecutingMode (); });
     vFed2->enterExecutingMode ();
     f1finish.wait ();
     // publish string1 at time=0.0;
     vFed1->publish (pubid, "string1");
-    auto f1time = std::async (std::launch::async, [&]() { return vFed1->requestTime (1.0); });
+    auto f1time = std::async (std::launch::async, [&] () { return vFed1->requestTime (1.0); });
     auto gtime = vFed2->requestTime (1.0);
 
     BOOST_CHECK_EQUAL (gtime, 1.0);
@@ -873,7 +877,7 @@ BOOST_DATA_TEST_CASE (value_federate_dual_transfer_remove_target_input, bdata::m
     BOOST_CHECK_EQUAL (s, "string1");
     // advance time
     pubid.removeTarget ("sub1");
-    f1time = std::async (std::launch::async, [&]() { return vFed1->requestTime (2.0); });
+    f1time = std::async (std::launch::async, [&] () { return vFed1->requestTime (2.0); });
     gtime = vFed2->requestTime (2.0);
 
     BOOST_CHECK_EQUAL (gtime, 2.0);
@@ -889,7 +893,7 @@ BOOST_DATA_TEST_CASE (value_federate_dual_transfer_remove_target_input, bdata::m
     // make sure the value is still what we expect
 
     // advance time
-    f1time = std::async (std::launch::async, [&]() { return vFed1->requestTime (3.0); });
+    f1time = std::async (std::launch::async, [&] () { return vFed1->requestTime (3.0); });
     gtime = vFed2->requestTime (3.0);
     s = vFed2->getString (subid);
     // make sure we didn't get the last publish

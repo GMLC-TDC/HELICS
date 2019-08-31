@@ -1,7 +1,8 @@
 /*
 Copyright © 2017-2019,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
-All rights reserved. See LICENSE file and DISCLAIMER for more details.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
+the top-level NOTICE for additional details. All rights reserved.
+SPDX-License-Identifier: BSD-3-Clause
 */
 
 #include "ZmqBroker.h"
@@ -30,8 +31,6 @@ bool ZmqBroker::brokerConnect ()
     return NetworkBroker::brokerConnect ();
 }
 
-void ZmqBroker::displayHelp (bool localOnly) { NetworkBroker::displayHelp (localOnly); }
-
 ZmqBrokerSS::ZmqBrokerSS (bool rootBroker) noexcept : NetworkBroker (rootBroker)
 {
     netInfo.server_mode = NetworkBrokerData::server_mode_options::server_active;
@@ -47,8 +46,6 @@ bool ZmqBrokerSS::brokerConnect ()
     ZmqContextManager::startContext ();
     return NetworkBroker::brokerConnect ();
 }
-
-void ZmqBrokerSS::displayHelp (bool localOnly) { NetworkBroker::displayHelp (localOnly); }
 
 }  // namespace zeromq
 }  // namespace helics

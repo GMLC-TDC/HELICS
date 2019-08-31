@@ -1,13 +1,12 @@
-Recorder
-=======
+# Recorder
 
 The Recorder application is one of the HELICS apps available with the library
 Its purpose is to provide a easy way to capture data from a federation
 It acts as a federate that can "capture" values or messages from specific publications
 or direct endpoints or cloned endpoints which exist elsewhere
 
-Command line arguments
-----------
+## Command line arguments
+
 ```
 allowed options:
 
@@ -69,7 +68,7 @@ configuration:
 ```
 also permissible are all arguments allowed for federates and any specific broker specified:
 
-[Command line reference](cmdArgs.md)
+[Command line reference](cmdArgs.html)
 
 the player executable also takes an untagged argument of a file name for example
 ```
@@ -78,9 +77,9 @@ helics_recorder record_file.txt --stop 5
 
 Recorders support both delimited text files and json files some examples can be found in
 
-[Player configuation Examples](https://github.com/GMLC-TDC/HELICS-src/tree/master/tests/helics/apps/test_files)
+[Player configuration examples](https://github.com/GMLC-TDC/HELICS/tree/master/tests/helics/apps/test_files)
 
-## Config File Detail
+## config file detail
 
 ### subscriptions
 a simple example of a recorder file specifying some subscriptions
@@ -97,18 +96,27 @@ if only a single column is specified it is assumed to be a subscription
 for two column rows the second is the identifier
 arguments with spaces should be enclosed in quotes
 
-| interface       | description         |
-| ------------- |:-------------:|
-| s, sub, subscription     | subscribe to a particular publication |
-| endpoint, ept, e     | generate an endpoint to capture all targeted packets    |
-| source, sourceclone,src | capture all messages coming from a particular endpoint     |
-| dest, destination, destclone | capture all message going to a particular endpoint     |
-| capture | capture all data coming from a particular federate     |
-|clone | capture all message going from or to a particular endpoint    |
+```eval_rst
++------------------------------+------------------------------------------------------------+
+| interface                    | description                                                |
++==============================+============================================================+
+| s, sub, subscription         | subscribe to a particular publication                      |
++------------------------------+------------------------------------------------------------+
+| endpoint, ept, e             | generate an endpoint to capture all targeted packets       |
++------------------------------+------------------------------------------------------------+
+| source, sourceclone,src      | capture all messages coming from a particular endpoint     |
++------------------------------+------------------------------------------------------------+
+| dest, destination, destclone | capture all message going to a particular endpoint         |
++------------------------------+------------------------------------------------------------+
+| capture                      | capture all data coming from a particular federate         |
++------------------------------+------------------------------------------------------------+
+| clone                        | capture all message going from or to a particular endpoint |
++------------------------------+------------------------------------------------------------+
+```
 
 for 3 column rows the first must be either clone or capture
 for clone the second can be either source or destination and the third the endpoint name
-[for capture it can be either "endpoints" or "subscriptions"] NOTE:not fully working yet for capture
+\[for capture it can be either "endpoints" or "subscriptions"\] NOTE:not fully working yet for capture
 
 ### JSON configuration
 recorders can also be specified via JSON files
@@ -147,6 +155,6 @@ and file elements can be used to load up additional files
 Recorders capture files in a format the Player can read see [Player](Player)
 the `--verbose` option will also print the values to the screen.
 
-## Map file output
+### Map file output
 the recorder can generate a live file that can be used in process to see the progress of the Federation
 This is occasionally useful, though for many uses the [Tracer](Tracer) will be more useful when it is completed

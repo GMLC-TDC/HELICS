@@ -1,14 +1,16 @@
 /*
 Copyright © 2017-2019,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
-All rights reserved. See LICENSE file and DISCLAIMER for more details.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
+the top-level NOTICE for additional details. All rights reserved.
+SPDX-License-Identifier: BSD-3-Clause
 */
 #pragma once
-#include "../common/DualMappedPointerVector.hpp"
 #include "../common/GuardedTypes.hpp"
 #include "EndpointInfo.hpp"
 #include "NamedInputInfo.hpp"
 #include "PublicationInfo.hpp"
+#include "federate_id_extra.hpp"
+#include "gmlc/containers/DualMappedPointerVector.hpp"
 #include <atomic>
 
 /** @file container for keeping the set of different interfaces information for a federate
@@ -69,16 +71,18 @@ class InterfaceInfo
 
     /** check the interfaces for specific issues*/
     std::vector<std::pair<int, std::string>> checkInterfacesForIssues ();
+    /** generate a configuration script for the interfaces*/
+    std::string generateInferfaceConfig () const;
 
   private:
     std::atomic<global_federate_id> global_id;
     bool only_update_on_change{
       false};  //!< flag indicating that subscriptions values should only be updated on change
-    shared_guarded<DualMappedPointerVector<PublicationInfo, std::string, interface_handle>>
+    shared_guarded<gmlc::containers::DualMappedPointerVector<PublicationInfo, std::string, interface_handle>>
       publications;  //!< storage for all the publications
-    shared_guarded<DualMappedPointerVector<EndpointInfo, std::string, interface_handle>>
+    shared_guarded<gmlc::containers::DualMappedPointerVector<EndpointInfo, std::string, interface_handle>>
       endpoints;  //!< storage for all the endpoints
-    shared_guarded<DualMappedPointerVector<NamedInputInfo, std::string, interface_handle>>
+    shared_guarded<gmlc::containers::DualMappedPointerVector<NamedInputInfo, std::string, interface_handle>>
       inputs;  //!< storage for all the endpoints
 };
 }  // namespace helics

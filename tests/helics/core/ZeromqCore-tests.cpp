@@ -1,13 +1,14 @@
 /*
 Copyright © 2017-2019,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
-All rights reserved. See LICENSE file and DISCLAIMER for more details.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
+the top-level NOTICE for additional details. All rights reserved.
+SPDX-License-Identifier: BSD-3-Clause
 */
 
-#include <boost/test/unit_test.hpp>
+#include "gtest/gtest.h"
 
+#include "cppzmq/zmq.hpp"
 #include "helics/common/GuardedTypes.hpp"
-#include "helics/common/cppzmq/zmq.hpp"
 #include "helics/common/zmqContextManager.h"
 #include "helics/core/ActionMessage.hpp"
 #include "helics/core/BrokerFactory.hpp"
@@ -18,14 +19,11 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include "helics/core/zmq/ZmqComms.h"
 #include "helics/core/zmq/ZmqCore.h"
 #include "helics/core/zmq/ZmqRequestSets.h"
-//#include "boost/process.hpp"
+
 #include <future>
 #include <iostream>
 
-namespace utf = boost::unit_test;
 using namespace std::literals::chrono_literals;
-
-BOOST_AUTO_TEST_SUITE (ZMQCore_tests, *utf::label ("ci"))
 
 using helics::Core;
 const std::string defServer ("tcp://127.0.0.1:23406");
@@ -35,7 +33,7 @@ const std::string defRoute1 ("tcp://127.0.0.1:23405");
 
 const std::string defRoute2 ("tcp://127.0.0.1:23407");
 
-BOOST_AUTO_TEST_CASE (zmqComms_broker_test)
+TEST (ZMQCore_tests, zmqComms_broker_test)
 {
     std::atomic<int> counter{0};
 
@@ -56,19 +54,19 @@ BOOST_AUTO_TEST_CASE (zmqComms_broker_test)
 
     repSocket.recv (&rxmsg);
 
-    BOOST_CHECK_GT (rxmsg.size (), 32);
+    EXPECT_GT (rxmsg.size (), 32u);
 
     helics::ActionMessage rM (static_cast<char *> (rxmsg.data ()), rxmsg.size ());
-    BOOST_CHECK (helics::isProtocolCommand (rM));
+    EXPECT_TRUE (helics::isProtocolCommand (rM));
     rM.messageID = DISCONNECT;
     repSocket.send (rM.to_string ());
     auto connected = confut.get ();
-    BOOST_CHECK (!connected);
+    EXPECT_TRUE (!connected);
     repSocket.close ();
 }
 
 /** test the request set class with various scenarios*/
-BOOST_AUTO_TEST_CASE (zmqRequestSet_test1)
+TEST (ZMQCore_tests, zmqRequestSet_test1)
 {
     // sleep to clear any residual from the previous test
     std::this_thread::sleep_for (500ms);
@@ -90,41 +88,41 @@ BOOST_AUTO_TEST_CASE (zmqRequestSet_test1)
     M.messageID = 1;
 
     reqset.transmit (1, M);
-    BOOST_CHECK (reqset.waiting ());
+    EXPECT_TRUE (reqset.waiting ());
 
     zmq::message_t msg;
     repSocket1.recv (&msg);
 
     repSocket1.send (msg);
     // should still be waiting
-    BOOST_CHECK (reqset.waiting ());
+    EXPECT_TRUE (reqset.waiting ());
     auto msgCnt = reqset.checkForMessages (100ms);
 
-    BOOST_CHECK (!reqset.waiting ());
-    BOOST_CHECK_EQUAL (msgCnt, 1);
+    EXPECT_TRUE (!reqset.waiting ());
+    EXPECT_EQ (msgCnt, 1);
 
     auto M2 = reqset.getMessage ();
 
-    BOOST_CHECK (M2->action () == helics::CMD_IGNORE);
+    EXPECT_TRUE (M2->action () == helics::CMD_IGNORE);
 
     // send two messages
     reqset.transmit (2, M);
     reqset.transmit (2, M);
-    BOOST_CHECK (reqset.waiting ());
+    EXPECT_TRUE (reqset.waiting ());
 
     repSocket2.recv (&msg);
 
     repSocket2.send (msg);
     msgCnt = reqset.checkForMessages (100ms);
 
-    BOOST_CHECK (reqset.waiting ());
+    EXPECT_TRUE (reqset.waiting ());
     repSocket2.recv (&msg);
 
     repSocket2.send (msg);
     reqset.checkForMessages (100ms);
-    BOOST_CHECK (!reqset.waiting ());
+    EXPECT_TRUE (!reqset.waiting ());
 
-    BOOST_CHECK (reqset.hasMessages ());
+    EXPECT_TRUE (reqset.hasMessages ());
     repSocket1.close ();
     repSocket2.close ();
     repSocket3.close ();
@@ -133,7 +131,7 @@ BOOST_AUTO_TEST_CASE (zmqRequestSet_test1)
 }
 
 /** test the request set class with various scenarios*/
-BOOST_AUTO_TEST_CASE (zmqRequestSet_test2)
+TEST (ZMQCore_tests, zmqRequestSet_test2)
 {
     // sleep to clear any residual from the previous test
     std::this_thread::sleep_for (500ms);
@@ -184,7 +182,7 @@ BOOST_AUTO_TEST_CASE (zmqRequestSet_test2)
     {
         reqset.checkForMessages (50ms);
     }
-    BOOST_REQUIRE (!reqset.waiting ());
+    ASSERT_TRUE (!reqset.waiting ());
     std::this_thread::yield ();
     reqset.transmit (1, M);
     reqset.transmit (2, M);
@@ -232,7 +230,7 @@ BOOST_AUTO_TEST_CASE (zmqRequestSet_test2)
             }
         }
     }
-    BOOST_CHECK_EQUAL (res, 6);
+    EXPECT_EQ (res, 6);
     repSocket1.close ();
     repSocket2.close ();
     repSocket3.close ();
@@ -240,7 +238,7 @@ BOOST_AUTO_TEST_CASE (zmqRequestSet_test2)
     std::this_thread::sleep_for (200ms);
 }
 
-BOOST_AUTO_TEST_CASE (zmqComms_broker_test_transmit)
+TEST (ZMQCore_tests, zmqComms_broker_test_transmit)
 {
     // sleep to clear any residual from the previous test
     std::this_thread::sleep_for (500ms);
@@ -258,7 +256,7 @@ BOOST_AUTO_TEST_CASE (zmqComms_broker_test_transmit)
     {
         std::cerr << "error repbind (broker test transmit) " << ze.what () << std::endl;
         std::this_thread::sleep_for (200ms);
-        BOOST_FAIL ("Unable to bind Socket");
+        GTEST_FAIL () << "Unable to bind Socket";
     }
     repSocket.setsockopt (ZMQ_LINGER, 100);
     zmq::socket_t pullSocket (ctx->getContext (), ZMQ_PULL);
@@ -271,7 +269,7 @@ BOOST_AUTO_TEST_CASE (zmqComms_broker_test_transmit)
         std::cerr << "error pullbind (broker test transmit)" << ze.what () << std::endl;
         repSocket.close ();
         std::this_thread::sleep_for (200ms);
-        BOOST_FAIL ("Unable to bind Socket");
+        GTEST_FAIL () << "Unable to bind Socket";
     }
 
     pullSocket.setsockopt (ZMQ_LINGER, 100);
@@ -280,22 +278,22 @@ BOOST_AUTO_TEST_CASE (zmqComms_broker_test_transmit)
     comm.setPortNumber (23407);
     comm.setName ("tests");
     bool connected = comm.connect ();
-    BOOST_REQUIRE (connected);
+    ASSERT_TRUE (connected);
     comm.transmit (helics::parent_route_id, helics::CMD_IGNORE);
     zmq::message_t rxmsg;
 
     pullSocket.recv (&rxmsg);
 
-    BOOST_CHECK_GT (rxmsg.size (), 32);
+    EXPECT_GT (rxmsg.size (), 32u);
     helics::ActionMessage rM (static_cast<char *> (rxmsg.data ()), rxmsg.size ());
-    BOOST_CHECK (rM.action () == helics::action_message_def::action_t::cmd_ignore);
+    EXPECT_TRUE (rM.action () == helics::action_message_def::action_t::cmd_ignore);
     comm.disconnect ();
     repSocket.close ();
     pullSocket.close ();
     std::this_thread::sleep_for (200ms);
 }
 
-BOOST_AUTO_TEST_CASE (zmqComms_rx_test)
+TEST (ZMQCore_tests, zmqComms_rx_test)
 {
     // sleep to clear any residual from the previous test
     std::this_thread::sleep_for (400ms);
@@ -314,7 +312,7 @@ BOOST_AUTO_TEST_CASE (zmqComms_rx_test)
     {
         std::cerr << "error repbind (zmqComms_rx_test) " << ze.what () << std::endl;
         std::this_thread::sleep_for (200ms);
-        BOOST_FAIL ("Unable to bind Socket");
+        GTEST_FAIL () << "Unable to bind Socket";
     }
     repSocket.setsockopt (ZMQ_LINGER, 100);
     zmq::socket_t pullSocket (ctx->getContext (), ZMQ_PULL);
@@ -327,7 +325,7 @@ BOOST_AUTO_TEST_CASE (zmqComms_rx_test)
         std::cerr << "error pullbind (zmqComms_rx_test)" << ze.what () << std::endl;
         repSocket.close ();
         std::this_thread::sleep_for (200ms);
-        BOOST_FAIL ("Unable to bind Socket");
+        GTEST_FAIL () << "Unable to bind Socket";
     }
     pullSocket.setsockopt (ZMQ_LINGER, 100);
     comm.setBrokerPort (23405);
@@ -339,7 +337,7 @@ BOOST_AUTO_TEST_CASE (zmqComms_rx_test)
     });
 
     bool connected = comm.connect ();
-    BOOST_CHECK (connected);
+    EXPECT_TRUE (connected);
 
     zmq::socket_t pushSocket (ctx->getContext (), ZMQ_PUSH);
     pushSocket.connect ("tcp://127.0.0.1:23407");
@@ -349,11 +347,11 @@ BOOST_AUTO_TEST_CASE (zmqComms_rx_test)
     try
     {
         auto cnt = pushSocket.send (buffer, ZMQ_DONTWAIT);
-        BOOST_CHECK_EQUAL (cnt, buffer.size ());
+        EXPECT_EQ (cnt, buffer.size ());
     }
     catch (const zmq::error_t &ze)
     {
-        BOOST_CHECK_MESSAGE (false, "Message failed to send");
+        GTEST_FAIL () << "Message failed to send";
     }
 
     std::this_thread::sleep_for (200ms);
@@ -361,15 +359,15 @@ BOOST_AUTO_TEST_CASE (zmqComms_rx_test)
     {
         std::this_thread::sleep_for (200ms);
     }
-    BOOST_CHECK_EQUAL (counter, 1);
-    BOOST_CHECK (act.lock ()->action () == helics::action_message_def::action_t::cmd_ack);
+    EXPECT_EQ (counter, 1);
+    EXPECT_TRUE (act.lock ()->action () == helics::action_message_def::action_t::cmd_ack);
     comm.disconnect ();
     repSocket.close ();
     pullSocket.close ();
     std::this_thread::sleep_for (200ms);
 }
 
-BOOST_AUTO_TEST_CASE (zmqComm_transmit_through)
+TEST (ZMQCore_tests, zmqComm_transmit_through)
 {
     // sleep to clear any residual from the previous test
     std::this_thread::sleep_for (300ms);
@@ -398,9 +396,9 @@ BOOST_AUTO_TEST_CASE (zmqComm_transmit_through)
     });
 
     bool connected = comm2.connect ();
-    BOOST_CHECK (connected);
+    EXPECT_TRUE (connected);
     connected = comm.connect ();
-    BOOST_CHECK (connected);
+    EXPECT_TRUE (connected);
 
     comm.transmit (helics::parent_route_id, helics::CMD_ACK);
 
@@ -409,10 +407,10 @@ BOOST_AUTO_TEST_CASE (zmqComm_transmit_through)
     {
         std::this_thread::sleep_for (500ms);
     }
-    BOOST_CHECK_EQUAL (counter2, 1);
+    EXPECT_EQ (counter2, 1);
     if (counter2 == 1)
     {
-        BOOST_CHECK (act2.lock ()->action () == helics::action_message_def::action_t::cmd_ack);
+        EXPECT_TRUE (act2.lock ()->action () == helics::action_message_def::action_t::cmd_ack);
     }
 
     comm.disconnect ();
@@ -420,7 +418,7 @@ BOOST_AUTO_TEST_CASE (zmqComm_transmit_through)
     std::this_thread::sleep_for (200ms);
 }
 
-BOOST_AUTO_TEST_CASE (zmqComm_transmit_add_route)
+TEST (ZMQCore_tests, zmqComm_transmit_add_route)
 {
     // sleep to clear any residual from the previous test
     std::this_thread::sleep_for (300ms);
@@ -461,12 +459,12 @@ BOOST_AUTO_TEST_CASE (zmqComm_transmit_add_route)
     });
 
     bool connected = comm2.connect ();
-    BOOST_REQUIRE (connected);
+    ASSERT_TRUE (connected);
     connected = comm.connect ();
     // connected = comm.connect ();
-    BOOST_REQUIRE (connected);
+    ASSERT_TRUE (connected);
     connected = comm3.connect ();
-    BOOST_REQUIRE (connected);
+    ASSERT_TRUE (connected);
 
     comm.transmit (helics::parent_route_id, helics::CMD_ACK);
 
@@ -483,8 +481,8 @@ BOOST_AUTO_TEST_CASE (zmqComm_transmit_add_route)
     {
         std::this_thread::sleep_for (std::chrono::milliseconds (200));
     }
-    BOOST_REQUIRE_EQUAL (counter2, 1);
-    BOOST_CHECK (act2.lock ()->action () == helics::action_message_def::action_t::cmd_ack);
+    ASSERT_EQ (counter2, 1);
+    EXPECT_TRUE (act2.lock ()->action () == helics::action_message_def::action_t::cmd_ack);
 
     comm3.transmit (helics::parent_route_id, helics::CMD_ACK);
 
@@ -497,8 +495,8 @@ BOOST_AUTO_TEST_CASE (zmqComm_transmit_add_route)
     {
         std::this_thread::sleep_for (200ms);
     }
-    BOOST_REQUIRE_EQUAL (counter2, 2);
-    BOOST_CHECK (act2.lock ()->action () == helics::action_message_def::action_t::cmd_ack);
+    ASSERT_EQ (counter2, 2);
+    EXPECT_TRUE (act2.lock ()->action () == helics::action_message_def::action_t::cmd_ack);
 
     comm2.addRoute (helics::route_id (3), comm3.getAddress ());
 
@@ -516,8 +514,8 @@ BOOST_AUTO_TEST_CASE (zmqComm_transmit_add_route)
         }
     }
 
-    BOOST_REQUIRE_EQUAL (counter3, 1);
-    BOOST_CHECK (act3.lock ()->action () == helics::action_message_def::action_t::cmd_ack);
+    ASSERT_EQ (counter3, 1);
+    EXPECT_TRUE (act3.lock ()->action () == helics::action_message_def::action_t::cmd_ack);
 
     comm2.addRoute (helics::route_id (4), comm.getAddress ());
 
@@ -529,8 +527,8 @@ BOOST_AUTO_TEST_CASE (zmqComm_transmit_add_route)
         std::this_thread::sleep_for (200ms);
     }
 
-    BOOST_REQUIRE_EQUAL (counter, 1);
-    BOOST_CHECK (act.lock ()->action () == helics::action_message_def::action_t::cmd_ack);
+    ASSERT_EQ (counter, 1);
+    EXPECT_TRUE (act.lock ()->action () == helics::action_message_def::action_t::cmd_ack);
 
     comm.disconnect ();
     comm2.disconnect ();
@@ -538,7 +536,7 @@ BOOST_AUTO_TEST_CASE (zmqComm_transmit_add_route)
     std::this_thread::sleep_for (200ms);
 }
 
-BOOST_AUTO_TEST_CASE (zmqCore_initialization_test)
+TEST (ZMQCore_tests, zmqCore_initialization_test)
 {
     // sleep to clear any residual from the previous test
     std::this_thread::sleep_for (400ms);
@@ -546,8 +544,8 @@ BOOST_AUTO_TEST_CASE (zmqCore_initialization_test)
       "-f 1 --brokerport=23405 --port=23410 --local_interface=tcp://127.0.0.1 --name=core1";
     auto core = helics::CoreFactory::create (helics::core_type::ZMQ, initializationString);
 
-    BOOST_REQUIRE (core != nullptr);
-    BOOST_CHECK (core->isInitialized ());
+    ASSERT_TRUE (core != nullptr);
+    EXPECT_TRUE (core->isConfigured ());
     auto ctx = ZmqContextManager::getContextPointer ();
     zmq::socket_t repSocket (ctx->getContext (), ZMQ_REP);
     try
@@ -558,7 +556,7 @@ BOOST_AUTO_TEST_CASE (zmqCore_initialization_test)
     {
         std::cerr << "error repbind (zmqCore_initialization_test) " << ze.what () << std::endl;
         std::this_thread::sleep_for (200ms);
-        BOOST_FAIL ("Unable to bind Socket");
+        GTEST_FAIL () << "Unable to bind Socket";
     }
     repSocket.setsockopt (ZMQ_LINGER, 100);
     zmq::socket_t pullSocket (ctx->getContext (), ZMQ_PULL);
@@ -571,21 +569,21 @@ BOOST_AUTO_TEST_CASE (zmqCore_initialization_test)
         std::cerr << "error pullbind (zmqCore_initialization_test)" << ze.what () << std::endl;
         repSocket.close ();
         std::this_thread::sleep_for (200ms);
-        BOOST_FAIL ("Unable to bind Socket");
+        GTEST_FAIL () << "Unable to bind Socket";
     }
     pullSocket.setsockopt (ZMQ_LINGER, 100);
     bool connected = core->connect ();
-    BOOST_REQUIRE (connected);
+    ASSERT_TRUE (connected);
 
     zmq::message_t rxmsg;
 
     pullSocket.recv (&rxmsg);
 
-    BOOST_CHECK_GT (rxmsg.size (), 32);
+    EXPECT_GT (rxmsg.size (), 32u);
     helics::ActionMessage rM (static_cast<char *> (rxmsg.data ()), rxmsg.size ());
 
-    BOOST_CHECK_EQUAL (rM.name, "core1");
-    BOOST_CHECK (rM.action () == helics::action_message_def::action_t::cmd_reg_broker);
+    EXPECT_EQ (rM.name, "core1");
+    EXPECT_TRUE (rM.action () == helics::action_message_def::action_t::cmd_reg_broker);
 
     repSocket.close ();
     pullSocket.close ();
@@ -598,7 +596,7 @@ BOOST_AUTO_TEST_CASE (zmqCore_initialization_test)
 /** test case checks default values and makes sure they all mesh together
 also tests the automatic port determination for cores
 */
-BOOST_AUTO_TEST_CASE (zmqCore_core_broker_default_test)
+TEST (ZMQCore_tests, zmqCore_core_broker_default_test)
 {
     // sleep to clear any residual from the previous test
     std::this_thread::sleep_for (400ms);
@@ -608,17 +606,15 @@ BOOST_AUTO_TEST_CASE (zmqCore_core_broker_default_test)
 
     auto core = helics::CoreFactory::create (helics::core_type::ZMQ, initializationString);
     bool connected = broker->isConnected ();
-    BOOST_CHECK (connected);
+    EXPECT_TRUE (connected);
     connected = core->connect ();
-    BOOST_CHECK (connected);
+    EXPECT_TRUE (connected);
 
     core->disconnect ();
 
-    BOOST_CHECK (!core->isConnected ());
+    EXPECT_TRUE (!core->isConnected ());
     broker->disconnect ();
-    BOOST_CHECK (!broker->isConnected ());
+    EXPECT_TRUE (!broker->isConnected ());
     helics::CoreFactory::cleanUpCores (200ms);
     helics::BrokerFactory::cleanUpBrokers (200ms);
 }
-
-BOOST_AUTO_TEST_SUITE_END ()

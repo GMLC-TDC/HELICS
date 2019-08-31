@@ -1,0 +1,61 @@
+This material was prepared as an account of work sponsored by an agency of the United States Government. Neither the United States Government nor the United States Department of Energy, nor any copyright owner listed below, nor any of their employees, nor any jurisdiction or organization that has cooperated in the development of these materials, makes any warranty, express or implied, or assumes any legal liability or responsibility for the accuracy, completeness, or usefulness or any information, apparatus, product, software, or process disclosed, or represents that its use would not infringe privately owned rights.
+Reference herein to any specific commercial product, process, or service by trade name, trademark, manufacturer, or otherwise does not necessarily constitute or imply its endorsement, recommendation, or favoring by the United States Government or any agency thereof, or copyright owner. The views and opinions of authors expressed herein do not necessarily state or reflect those of the United States Government or any agency thereof.
+Copyright Owners:
+Battelle Memorial Institute;
+Lawrence Livermore National Security, LLC;
+Alliance for Sustainable Energy, LLC
+
+
+Open Source Disclaimer:
+This material was prepared as an account of work sponsored by an agency of the United States Government.  Neither the United States Government nor the United States Department of Energy, nor Battelle, nor any of their employees, nor any jurisdiction or organization that has cooperated in the development of these materials, makes any warranty, express or implied, or assumes any legal liability or responsibility for the accuracy, completeness, or usefulness or any information, apparatus, product, software, or process disclosed, or represents that its use would not infringe privately owned rights.
+Reference herein to any specific commercial product, process, or service by trade name, trademark, manufacturer, or otherwise does not necessarily constitute or imply its endorsement, recommendation, or favoring by the United States Government or any agency thereof, or Battelle Memorial Institute. The views and opinions of authors expressed herein do not necessarily state or reflect those of the United States Government or any agency thereof.
+
+PACIFIC NORTHWEST NATIONAL LABORATORY operated by BATTELLE for the UNITED STATES DEPARTMENT OF ENERGY under Contract DE-AC05-76RL01830
+
+Attribution:
+This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
+
+GU Acknowledgement:
+These data were produced by BATTELLE under Contract No. DE AC05-76RL01830 with the U.S. Department of Energy (DOE).  For a five-year period from October 31, 2014, the U.S. Government is granted for itself and others acting on its behalf a nonexclusive, paid-up, irrevocable worldwide license in this data to reproduce, prepare derivative works, and perform publicly and display publicly, by or on behalf of the U.S. Government.  There is provision for the possible extension of the term of this license.  Subsequent to that period or any extension granted, the U.S. Government is granted for itself and others acting on its behalf a nonexclusive, paid-up, irrevocable worldwide license in this data to reproduce, prepare derivative works, distribute copies to the public, perform publicly and display publicly, and to permit others to do so.  The specific term of the license can be identified by inquiry made to BATTELLE or DOE.  Neither the United States nor DOE, nor any of their employees, makes any warranty, express or implied, or assumes any legal liability or responsibility for the accuracy, completeness, or usefulness of any data, apparatus, product, or process disclosed, or represents that its use would not infringe privately owned rights.
+
+Disclaimer:
+This Agreement is entered into by BATTELLE in its private capacity.  It is understood and agreed that the U.S. Government is not a party to this Agreement and in no manner whatsoever shall be liable for nor assume any responsibility or obligation for any claim, cost or damages arising out of or resulting from this Agreement or the subject matter licensed.
+
+LICENSEE recognizes that the Licensed Software is provided by BATTELLE on an as-is basis.  Nothing in this Agreement shall be deemed to be a representation or warranty by BATTELLE, or the U.S. Government, of the accuracy, safety or usefulness for any purpose, of the Licensed Software at any time made available by BATTELLE.  Neither the U.S. Government nor BATTELLE nor any affiliated company of BATTELLE shall have any liability whatsoever to LICENSEE or any other person for or on account of any injury, loss, or damage, of any kind or nature sustained by, or any damage assessed or asserted against, or any other liability incurred by or imposed upon LICENSEE or any other person, arising out of or in connection with or resulting from (i) the production, use or sale of the Licensed Software or any apparatus or product, or process; (ii) the use of any technical information, techniques, or practices disclosed by BATTELLE; or (iii) any advertising or other promotional activities with respect to any of the foregoing, and LICENSEE shall hold the U.S. Government, BATTELLE, and any affiliated company of BATTELLE, harmless in the event the U.S. Government, BATTELLE, or any affiliated company of BATTELLE, is held liable.  In the event BATTELLE is determined to be liable to LICENSEE for any reason arising out of this Agreement, despite the above limitation, the maximum extent of BATTELLE's liability shall be the license fee.
+
+BATTELLE represents that it has the right to grant all of the rights granted herein, except as to such rights as the Government of the United States of America may have or may assert.
+
+Enduser Terms:
+This Agreement is entered into by BATTELLE in its private capacity.  It is understood and agreed that the U.S. Government is not a party to this Agreement and in no manner whatsoever shall be liable for nor assume any responsibility or obligation for any claim, cost or damages arising out of or resulting from this Agreement or the subject matter licensed.
+
+LICENSEE recognizes that the Licensed Software is provided by BATTELLE on an as-is basis.  Nothing in this Agreement shall be deemed to be a representation or warranty by BATTELLE, or the U.S. Government, of the accuracy, safety or usefulness for any purpose, of the Licensed Software at any time made available by BATTELLE.  Neither the U.S. Government nor BATTELLE nor any affiliated company of BATTELLE shall have any liability whatsoever to LICENSEE or any other person for or on account of any injury, loss, or damage, of any kind or nature sustained by, or any damage assessed or asserted against, or any other liability incurred by or imposed upon LICENSEE or any other person, arising out of or in connection with or resulting from (i) the production, use or sale of the Licensed Software or any apparatus or product, or process; (ii) the use of any technical information, techniques, or practices disclosed by BATTELLE; or (iii) any advertising or other promotional activities with respect to any of the foregoing, and LICENSEE shall hold the U.S. Government, BATTELLE, and any affiliated company of BATTELLE, harmless in the event the U.S. Government, BATTELLE, or any affiliated company of BATTELLE, is held liable.  In the event BATTELLE is determined to be liable to LICENSEE for any reason arising out of this Agreement, despite the above limitation, the maximum extent of BATTELLE's liability shall be the license fee.
+
+BATTELLE represents that it has the right to grant all of the rights granted herein, except as to such rights as the Government of the United States of America may have or may assert.
+
+LLNL NOTICE
+
+portions of the code written by LLNL with release number
+LLNL-CODE-739319
+OCEC-17-164
+
+Portions of this work were produced under the auspices of the U.S. Department of
+Energy by Lawrence Livermore National Laboratory under Contract
+DE-AC52-07NA27344.
+
+This work was prepared as an account of work sponsored by an agency of
+the United States Government. Neither the United States Government nor
+Lawrence Livermore National Security, LLC, nor any of their employees
+makes any warranty, expressed or implied, or assumes any legal liability
+or responsibility for the accuracy, completeness, or usefulness of any
+information, apparatus, product, or process disclosed, or represents that
+its use would not infringe privately owned rights.
+
+Reference herein to any specific commercial product, process, or service
+by trade name, trademark, manufacturer, or otherwise does not necessarily
+constitute or imply its endorsement, recommendation, or favoring by the
+United States Government or Lawrence Livermore National Security, LLC.
+
+The views and opinions of authors expressed herein do not necessarily
+state or reflect those of the United States Government or Lawrence
+Livermore National Security, LLC, and shall not be used for advertising
+or product endorsement purposes.

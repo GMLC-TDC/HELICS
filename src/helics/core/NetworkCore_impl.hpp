@@ -1,16 +1,18 @@
 /*
 Copyright © 2017-2019,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
-All rights reserved. See LICENSE file and DISCLAIMER for more details.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
+the top-level NOTICE for additional details. All rights reserved.
+SPDX-License-Identifier: BSD-3-Clause
 */
 #pragma once
 
 #include "NetworkCore.hpp"
+#include "helicsCLI11.hpp"
 
 namespace helics
 {
-constexpr const char *defBrokerInterface[] = {"127.0.0.1", "127.0.0.1", "tcp://127.0.0.1", "_ipc_broker",""};
-constexpr const char *defLocalInterface[] = {"127.0.0.1", "127.0.0.1", "tcp://127.0.0.1", "",""};
+constexpr const char *defBrokerInterface[] = {"127.0.0.1", "127.0.0.1", "tcp://127.0.0.1", "_ipc_broker", ""};
+constexpr const char *defLocalInterface[] = {"127.0.0.1", "127.0.0.1", "tcp://127.0.0.1", "", ""};
 
 template <class COMMS, interface_type baseline>
 NetworkCore<COMMS, baseline>::NetworkCore () noexcept
@@ -26,17 +28,12 @@ NetworkCore<COMMS, baseline>::NetworkCore (const std::string &core_name)
 }
 
 template <class COMMS, interface_type baseline>
-void NetworkCore<COMMS, baseline>::initializeFromArgs (int argc, const char *const *argv)
+std::shared_ptr<helicsCLI11App> NetworkCore<COMMS, baseline>::generateCLI ()
 {
-    if (BrokerBase::brokerState == BrokerBase::created)
-    {
-        std::lock_guard<std::mutex> lock (dataMutex);
-        if (BrokerBase::brokerState == BrokerBase::created)
-        {
-            netInfo.initializeFromArgs (argc, argv, defLocalInterface[static_cast<int> (baseline)]);
-            CommonCore::initializeFromArgs (argc, argv);
-        }
-    }
+    auto app = CommonCore::generateCLI ();
+    CLI::App_p netApp = netInfo.commandLineParser (defLocalInterface[static_cast<int> (baseline)]);
+    app->add_subcommand (netApp);
+    return app;
 }
 
 template <class COMMS, interface_type baseline>
@@ -49,7 +46,7 @@ bool NetworkCore<COMMS, baseline>::brokerConnect ()
     }
     CommsBroker<COMMS, CommonCore>::comms->setName (CommonCore::getIdentifier ());
     CommsBroker<COMMS, CommonCore>::comms->loadNetworkInfo (netInfo);
-    CommsBroker<COMMS, CommonCore>::comms->setTimeout (std::chrono::milliseconds (BrokerBase::networkTimeout));
+    CommsBroker<COMMS, CommonCore>::comms->setTimeout (BrokerBase::networkTimeout.to_ms ());
     // comms->setMessageSize(maxMessageSize, maxMessageCount);
     auto res = CommsBroker<COMMS, CommonCore>::comms->connect ();
     if (res)
@@ -97,7 +94,7 @@ std::string NetworkCore<COMMS, baseline>::generateLocalAddressString () const
             }
             else
             {
-                add = CommonCore::getIdentifier();
+                add = CommonCore::getIdentifier ();
             }
             break;
         }

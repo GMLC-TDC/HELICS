@@ -1,7 +1,8 @@
 /*
 Copyright © 2017-2019,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
-All rights reserved. See LICENSE file and DISCLAIMER for more details.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
+the top-level NOTICE for additional details. All rights reserved.
+SPDX-License-Identifier: BSD-3-Clause
 */
 #include "ValueFederate.hpp"
 #include "../common/JsonProcessingFunctions.hpp"
@@ -195,8 +196,9 @@ static void loadOptions (ValueFederate *fed, const Inp &data, Obj &objUpdate)
 void ValueFederate::registerValueInterfacesJson (const std::string &jsonString)
 {
     auto doc = loadJson (jsonString);
-
-    if (doc.isMember ("publications"))
+    bool defaultGlobal = false;
+    replaceIfMember (doc, "defaultglobal",defaultGlobal);
+	if (doc.isMember ("publications"))
     {
         auto pubs = doc["publications"];
         for (const auto &pub : pubs)
@@ -210,7 +212,7 @@ void ValueFederate::registerValueInterfacesJson (const std::string &jsonString)
             }
             auto type = getOrDefault (pub, "type", emptyStr);
             auto units = getOrDefault (pub, "units", emptyStr);
-            bool global = getOrDefault (pub, "global", false);
+            bool global = getOrDefault (pub, "global", defaultGlobal);
             if (global)
             {
                 pubAct = &registerGlobalPublication (key, type, units);
@@ -253,9 +255,9 @@ void ValueFederate::registerValueInterfacesJson (const std::string &jsonString)
             {
                 continue;
             }
-            auto type = getOrDefault (ipt, "type", std::string ());
-            auto units = getOrDefault (ipt, "units", std::string ());
-            bool global = getOrDefault (ipt, "global", false);
+            auto type = getOrDefault (ipt, "type", emptyStr);
+            auto units = getOrDefault (ipt, "units", emptyStr);
+            bool global = getOrDefault (ipt, "global", defaultGlobal);
             if (global)
             {
                 inp = &registerGlobalInput (key, type, units);
@@ -280,7 +282,8 @@ void ValueFederate::registerValueInterfacesToml (const std::string &tomlString)
     {
         throw (helics::InvalidParameter (ia.what ()));
     }
-
+    bool defaultGlobal = false;
+    replaceIfMember (doc, "defaultglobal", defaultGlobal);
     auto pubs = doc.find ("publications");
     if (pubs != nullptr)
     {
@@ -296,7 +299,7 @@ void ValueFederate::registerValueInterfacesToml (const std::string &tomlString)
             }
             auto type = getOrDefault (pub, "type", emptyStr);
             auto units = getOrDefault (pub, "units", emptyStr);
-            bool global = getOrDefault (pub, "global", false);
+            bool global = getOrDefault (pub, "global", defaultGlobal);
             Publication *pubObj = nullptr;
             if (global)
             {
@@ -343,9 +346,9 @@ void ValueFederate::registerValueInterfacesToml (const std::string &tomlString)
             {
                 continue;
             }
-            auto type = getOrDefault (ipt, "type", std::string ());
-            auto units = getOrDefault (ipt, "units", std::string ());
-            bool global = getOrDefault (ipt, "global", false);
+            auto type = getOrDefault (ipt, "type", emptyStr);
+            auto units = getOrDefault (ipt, "units", emptyStr);
+            bool global = getOrDefault (ipt, "global", defaultGlobal);
             if (global)
             {
                 id = &registerGlobalInput (key, type, units);
@@ -380,6 +383,107 @@ void ValueFederate::publishRaw (const Publication &pub, data_view block)
 void ValueFederate::publish (Publication &pub, const std::string &str) { pub.publish (str); }
 
 void ValueFederate::publish (Publication &pub, double val) { pub.publish (val); }
+
+using dvalue = mpark::variant<double, std::string>;
+
+static void generateData (std::vector<std::pair<std::string, dvalue>> &vpairs,
+                          const std::string &prefix,
+                          char separator,
+                          Json::Value val)
+{
+    if (val.isObject ())
+    {
+        auto mn = val.getMemberNames ();
+        for (auto &name : mn)
+        {
+            auto so = val[name];
+            if (so.isObject ())
+            {
+                generateData (vpairs, prefix + name + separator, separator, so);
+            }
+            else
+            {
+                if (so.isDouble ())
+                {
+                    vpairs.emplace_back (prefix + name, so.asDouble ());
+                }
+                else
+                {
+                    vpairs.emplace_back (prefix + name, so.asString ());
+                }
+            }
+        }
+    }
+    else
+    {
+        if (val.isDouble ())
+        {
+            vpairs.emplace_back (prefix, val.asDouble ());
+        }
+        else
+        {
+            vpairs.emplace_back (prefix, val.asString ());
+        }
+    }
+}
+
+void ValueFederate::registerFromPublicationJSON (const std::string &jsonString)
+{
+    auto jv = loadJson (jsonString);
+    if (jv.isNull ())
+    {
+        throw (helics::InvalidParameter ("unable to load file or string"));
+    }
+
+    std::vector<std::pair<std::string, dvalue>> vpairs;
+    generateData (vpairs, "", nameSegmentSeparator, jv);
+
+    for (auto &vp : vpairs)
+    {
+        try
+        {
+            if (vp.second.index () == 0)
+            {
+                registerPublication<double> (vp.first);
+            }
+            else
+            {
+                registerPublication<std::string> (vp.first);
+            }
+        }
+        catch (const helics::RegistrationFailure &)
+        {
+            continue;
+        }
+    }
+}
+
+void ValueFederate::publishJSON (const std::string &jsonString)
+{
+    auto jv = loadJson (jsonString);
+    if (jv.isNull ())
+    {
+        throw (helics::InvalidParameter ("unable to load file or string"));
+    }
+    std::vector<std::pair<std::string, dvalue>> vpairs;
+    generateData (vpairs, "", nameSegmentSeparator, jv);
+
+    for (auto &vp : vpairs)
+    {
+        auto &pub = getPublication (vp.first);
+        if (pub.isValid ())
+        {
+            if (vp.second.index () == 0)
+            {
+                pub.publish (mpark::get<double> (vp.second));
+            }
+            else
+            {
+                pub.publish (mpark::get<std::string> (vp.second));
+            }
+        }
+    }
+}
 
 bool ValueFederate::isUpdated (const Input &inp) const { return vfManager->hasUpdate (inp); }
 
@@ -484,8 +588,11 @@ void ValueFederate::setInputNotificationCallback (Input &inp, std::function<void
     vfManager->setInputNotificationCallback (inp, std::move (callback));
 }
 
-/** get a count of the number publications registered*/
 int ValueFederate::getPublicationCount () const { return vfManager->getPublicationCount (); }
-/** get a count of the number subscriptions registered*/
+
 int ValueFederate::getInputCount () const { return vfManager->getInputCount (); }
+
+void ValueFederate::clearUpdates () { vfManager->clearUpdates (); }
+
+void ValueFederate::clearUpdate (const Input &inp) { vfManager->clearUpdate (inp); }
 }  // namespace helics

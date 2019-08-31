@@ -1,7 +1,8 @@
 #
 # Copyright © 2017-2019, Battelle Memorial Institute; Lawrence Livermore National
-# Security, LLC; Alliance for Sustainable Energy, LLC All rights reserved. See LICENSE
-# file and DISCLAIMER for more details.
+# Security, LLC; Alliance for Sustainable Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved. 
+# 
+# SPDX-License-Identifier: BSD-3-Clause
 #
 
 set(
@@ -15,12 +16,14 @@ set(
   QueryTests.cpp
   heat-transfer-tests.cpp
   flagTests.cpp
+  updateTests.cpp
+  networkTests.cpp
   ../application_api/testFixtures.cpp
   ../application_api/testFixtures.hpp
 )
 
 add_executable(system-tests ${system_test_sources} ${system_test_headers})
-target_link_libraries(system-tests helics-static helics_test_base)
+target_link_libraries(system-tests helics-static helics_google_test_base)
 
 set_target_properties(system-tests PROPERTIES FOLDER tests)
 
@@ -38,29 +41,15 @@ add_test(
   NAME system-tests
   COMMAND system-tests --log_level=message --report_level=short
 )
-set_property(TEST system-tests PROPERTY LABELS System Coverage Daily)
+set_property(TEST system-tests PROPERTY LABELS System Coverage Daily TSAN)
 
 # Tests for Continuous Integration builds
 add_test(
   NAME system-ci-tests
   COMMAND
     system-tests
-    --run_test=@ci
-    --log_level=message
-    --report_level=short
+    --gtest_filter=-*skip_ci*
 )
 set_property(TEST system-ci-tests PROPERTY LABELS Continuous Valgrind)
 
-foreach(keyfile IN LISTS KEY_LIBRARY_FILES)
-  add_custom_command(
-    TARGET
-    system-tests
-    POST_BUILD # Adds a post-build event to api tests
-    COMMAND
-      ${CMAKE_COMMAND}
-      -E
-      copy_if_different # which executes "cmake - E copy_if_different..."
-      "${keyfile}" # <--this is in-file
-      "$<TARGET_FILE_DIR:system-tests>/"
-  ) # <--this is out-file path
-endforeach(keyfile)
+copy_key_files_to_target_location(system-tests)

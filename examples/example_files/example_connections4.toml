@@ -1,0 +1,4 @@
+#example toml connection file connections can be an array of two element string arrays  ["publication", "input"]
+connections=[
+{publication="pub1",targets=["inp1"]}
+]

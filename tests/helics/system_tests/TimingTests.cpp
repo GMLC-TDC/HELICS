@@ -1,27 +1,26 @@
 /*
 Copyright © 2017-2019,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
-All rights reserved. See LICENSE file and DISCLAIMER for more details.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
+the top-level NOTICE for additional details. All rights reserved. SPDX-License-Identifier: BSD-3-Clause
 */
 
+#include "gtest/gtest.h"
 #include "helics/application_api/Publications.hpp"
 #include "helics/application_api/Subscriptions.hpp"
 #include <complex>
 #include <future>
-#include <boost/test/unit_test.hpp>
-#include <boost/test/floating_point_comparison.hpp>
 
 /** these test cases test out the value converters
  */
 #include "../application_api/testFixtures.hpp"
 #include "helics/helics.hpp"
 
-namespace utf = boost::unit_test;
-
-BOOST_FIXTURE_TEST_SUITE (timing_tests, FederateTestFixture)
+struct timing_tests : public FederateTestFixture, public ::testing::Test
+{
+};
 
 /** just a check that in the simple case we do actually get the time back we requested*/
-BOOST_AUTO_TEST_CASE (simple_timing_test, *utf::label ("ci"))
+TEST_F (timing_tests, simple_timing_test)
 {
     SetupTest<helics::ValueFederate> ("test", 2);
     auto vFed1 = GetFederateAs<helics::ValueFederate> (0);
@@ -37,18 +36,18 @@ BOOST_AUTO_TEST_CASE (simple_timing_test, *utf::label ("ci"))
     vFed1->enterExecutingModeComplete ();
     pub->publish (0.27);
     auto res = vFed1->requestTime (2.0);
-    BOOST_CHECK_EQUAL (res, 2.0);
+    EXPECT_EQ (res, 2.0);
 
     res = vFed2->requestTime (2.0);
-    BOOST_CHECK_EQUAL (res, 0.5);  // the result should show up at the next available time point
+    EXPECT_EQ (res, 0.5);  // the result should show up at the next available time point
     res = vFed2->requestTime (2.0);
-    BOOST_CHECK_EQUAL (res, 2.0);
+    EXPECT_EQ (res, 2.0);
 
     vFed1->finalize ();
     vFed2->finalize ();
 }
 
-BOOST_AUTO_TEST_CASE (simple_timing_test2, *utf::label ("ci"))
+TEST_F (timing_tests, simple_timing_test2)
 {
     SetupTest<helics::ValueFederate> ("test", 2);
     auto vFed1 = GetFederateAs<helics::ValueFederate> (0);
@@ -66,20 +65,20 @@ BOOST_AUTO_TEST_CASE (simple_timing_test2, *utf::label ("ci"))
 
     auto res = vFed1->requestTime (0.32);
     // check that the request is only granted at the appropriate period
-    BOOST_CHECK_EQUAL (res, 0.5);
+    EXPECT_EQ (res, 0.5);
     pub->publish (0.27);
     res = vFed1->requestTime (1.85);
-    BOOST_CHECK_EQUAL (res, 2.0);
+    EXPECT_EQ (res, 2.0);
     res = vFed2->requestTime (1.79);
-    BOOST_CHECK_EQUAL (res, 0.5);  // the result should show up at the next available time point
+    EXPECT_EQ (res, 0.5);  // the result should show up at the next available time point
     res = vFed2->requestTime (2.0);
-    BOOST_CHECK_EQUAL (res, 2.0);
+    EXPECT_EQ (res, 2.0);
 
     vFed1->finalize ();
     vFed2->finalize ();
 }
 
-BOOST_AUTO_TEST_CASE (simple_timing_test_message, *utf::label ("ci"))
+TEST_F (timing_tests, simple_timing_test_message)
 {
     SetupTest<helics::MessageFederate> ("test", 2);
     auto vFed1 = GetFederateAs<helics::MessageFederate> (0);
@@ -97,23 +96,23 @@ BOOST_AUTO_TEST_CASE (simple_timing_test_message, *utf::label ("ci"))
     vFed2->requestTimeAsync (3.5);
     auto res = vFed1->requestTime (0.32);
     // check that the request is only granted at the appropriate period
-    BOOST_CHECK_EQUAL (res, 0.6);
+    EXPECT_EQ (res, 0.6);
     ept1.send ("e2", "test1");
     vFed1->requestTimeAsync (1.85);
     res = vFed2->requestTimeComplete ();
-    BOOST_CHECK_EQUAL (res, 0.9);  // the message should show up at the next available time point
+    EXPECT_EQ (res, 0.9);  // the message should show up at the next available time point
     vFed2->requestTimeAsync (2.0);
     res = vFed2->requestTimeComplete ();
-    BOOST_CHECK_EQUAL (res, 2.25);  // the message should show up at the next available time point
+    EXPECT_EQ (res, 2.25);  // the message should show up at the next available time point
     vFed2->requestTimeAsync (3.0);
     res = vFed1->requestTimeComplete ();
-    BOOST_CHECK_EQUAL (res, 2.4);
+    EXPECT_EQ (res, 2.4);
     vFed1->finalize ();
     vFed2
       ->finalize ();  // this will also test finalizing while a time request is ongoing otherwise it will time out.
 }
 
-BOOST_AUTO_TEST_CASE (test_uninteruptible_flag, *utf::label ("ci"))
+TEST_F (timing_tests, test_uninteruptible_flag)
 {
     SetupTest<helics::ValueFederate> ("test", 2);
     auto vFed1 = GetFederateAs<helics::ValueFederate> (0);
@@ -126,7 +125,7 @@ BOOST_AUTO_TEST_CASE (test_uninteruptible_flag, *utf::label ("ci"))
     auto pub = helics::make_publication<double> (helics::GLOBAL, vFed1.get (), "pub1");
     vFed2->registerSubscription ("pub1");
 
-    auto rfed1 = [&]() {
+    auto rfed1 = [&] () {
         vFed1->enterExecutingMode ();
         for (double ii = 1.0; ii <= 100.0; ii += 1.0)
         {
@@ -135,7 +134,7 @@ BOOST_AUTO_TEST_CASE (test_uninteruptible_flag, *utf::label ("ci"))
         }
     };
 
-    auto rfed2 = [&]() {
+    auto rfed2 = [&] () {
         vFed2->enterExecutingMode ();
         std::vector<helics::Time> res;
         for (double ii = 5.0; ii <= 100.0; ii += 5.0)
@@ -151,16 +150,16 @@ BOOST_AUTO_TEST_CASE (test_uninteruptible_flag, *utf::label ("ci"))
 
     fed1res.get ();
     auto rvec = fed2res.get ();
-    BOOST_CHECK_EQUAL (rvec.front (), 5.0);
-    BOOST_CHECK_EQUAL (rvec.size (), 20);
-    BOOST_CHECK_EQUAL (rvec[1], 10.0);
-    BOOST_CHECK_EQUAL (rvec.back (), 100.0);
+    EXPECT_EQ (rvec.front (), 5.0);
+    EXPECT_EQ (rvec.size (), 20u);
+    EXPECT_EQ (rvec[1], 10.0);
+    EXPECT_EQ (rvec.back (), 100.0);
     vFed1->finalize ();
     vFed2
       ->finalize ();  // this will also test finalizing while a time request is ongoing otherwise it will time out.
 }
 
-BOOST_AUTO_TEST_CASE (test_uninteruptible_flag_option, *utf::label ("ci"))
+TEST_F (timing_tests, test_uninteruptible_flag_option)
 {
     SetupTest<helics::ValueFederate> ("test", 2);
     auto vFed1 = GetFederateAs<helics::ValueFederate> (0);
@@ -173,7 +172,7 @@ BOOST_AUTO_TEST_CASE (test_uninteruptible_flag_option, *utf::label ("ci"))
     auto &IP2 = vFed2->registerSubscription ("pub1");
     // test with the handle option vs the federate option
     IP2.setOption (helics::defs::options::ignore_interrupts);
-    auto rfed1 = [&]() {
+    auto rfed1 = [&] () {
         vFed1->enterExecutingMode ();
         for (double ii = 1.0; ii <= 100.0; ii += 1.0)
         {
@@ -182,7 +181,7 @@ BOOST_AUTO_TEST_CASE (test_uninteruptible_flag_option, *utf::label ("ci"))
         }
     };
 
-    auto rfed2 = [&]() {
+    auto rfed2 = [&] () {
         vFed2->enterExecutingMode ();
         std::vector<helics::Time> res;
         for (double ii = 5.0; ii <= 100.0; ii += 5.0)
@@ -198,16 +197,16 @@ BOOST_AUTO_TEST_CASE (test_uninteruptible_flag_option, *utf::label ("ci"))
 
     fed1res.get ();
     auto rvec = fed2res.get ();
-    BOOST_CHECK_EQUAL (rvec.front (), 5.0);
-    BOOST_CHECK_EQUAL (rvec.size (), 20);
-    BOOST_CHECK_EQUAL (rvec[1], 10.0);
-    BOOST_CHECK_EQUAL (rvec.back (), 100.0);
+    EXPECT_EQ (rvec.front (), 5.0);
+    EXPECT_EQ (rvec.size (), 20u);
+    EXPECT_EQ (rvec[1], 10.0);
+    EXPECT_EQ (rvec.back (), 100.0);
     vFed1->finalize ();
     vFed2
       ->finalize ();  // this will also test finalizing while a time request is ongoing otherwise it will time out.
 }
 
-BOOST_AUTO_TEST_CASE (test_uninteruptible_flag_two_way_comm, *utf::label ("ci"))
+TEST_F (timing_tests, test_uninteruptible_flag_two_way_comm)
 {
     SetupTest<helics::ValueFederate> ("test", 2);
     auto vFed1 = GetFederateAs<helics::ValueFederate> (0);
@@ -224,7 +223,7 @@ BOOST_AUTO_TEST_CASE (test_uninteruptible_flag_two_way_comm, *utf::label ("ci"))
     vFed1->registerSubscription ("pub2");
     vFed2->registerSubscription ("pub1");
 
-    auto rfed1 = [&]() {
+    auto rfed1 = [&] () {
         vFed1->enterExecutingMode ();
         for (double ii = 1.0; ii <= 100.0; ii += 1.0)
         {
@@ -233,7 +232,7 @@ BOOST_AUTO_TEST_CASE (test_uninteruptible_flag_two_way_comm, *utf::label ("ci"))
         }
     };
 
-    auto rfed2 = [&]() {
+    auto rfed2 = [&] () {
         vFed2->enterExecutingMode ();
         std::vector<helics::Time> res;
         for (double ii = 5.0; ii <= 100.0; ii += 5.0)
@@ -250,16 +249,16 @@ BOOST_AUTO_TEST_CASE (test_uninteruptible_flag_two_way_comm, *utf::label ("ci"))
 
     fed1res.get ();
     auto rvec = fed2res.get ();
-    BOOST_CHECK_EQUAL (rvec.front (), 5.0);
-    BOOST_CHECK_EQUAL (rvec.size (), 20);
-    BOOST_CHECK_EQUAL (rvec[1], 10.0);
-    BOOST_CHECK_EQUAL (rvec.back (), 100.0);
+    EXPECT_EQ (rvec.front (), 5.0);
+    EXPECT_EQ (rvec.size (), 20u);
+    EXPECT_EQ (rvec[1], 10.0);
+    EXPECT_EQ (rvec.back (), 100.0);
     vFed1->finalize ();
     vFed2
       ->finalize ();  // this will also test finalizing while a time request is ongoing otherwise it will time out.
 }
 
-BOOST_AUTO_TEST_CASE (timing_with_input_delay, *utf::label ("ci"))
+TEST_F (timing_tests, timing_with_input_delay)
 {
     SetupTest<helics::MessageFederate> ("test", 2);
     auto vFed1 = GetFederateAs<helics::MessageFederate> (0);
@@ -277,23 +276,22 @@ BOOST_AUTO_TEST_CASE (timing_with_input_delay, *utf::label ("ci"))
     vFed2->requestTimeAsync (2.0);
     auto res = vFed1->requestTime (1.0);
     // check that the request is only granted at the appropriate period
-    BOOST_CHECK_EQUAL (res, 1.0);
+    EXPECT_EQ (res, 1.0);
     ept1.send ("e2", "test1");
     vFed1->requestTimeAsync (1.9);
     res = vFed2->requestTimeComplete ();
-    BOOST_CHECK_EQUAL (
-      res, 1.1);  // the message should show up at the next available time point after the impact window
+    EXPECT_EQ (res, 1.1);  // the message should show up at the next available time point after the impact window
     vFed2->requestTimeAsync (2.0);
     res = vFed1->requestTimeComplete ();
-    BOOST_CHECK_EQUAL (res, 1.9);
+    EXPECT_EQ (res, 1.9);
     res = vFed2->requestTimeComplete ();
-    BOOST_CHECK_EQUAL (res, 2.0);
+    EXPECT_EQ (res, 2.0);
     vFed1->finalize ();
     vFed2
       ->finalize ();  // this will also test finalizing while a time request is ongoing otherwise it will time out.
 }
 
-BOOST_AUTO_TEST_CASE (timing_with_minDelta_change, *utf::label ("ci"))
+TEST_F (timing_tests, timing_with_minDelta_change)
 {
     SetupTest<helics::ValueFederate> ("test", 1, 1.0);
     auto vFed1 = GetFederateAs<helics::ValueFederate> (0);
@@ -303,19 +301,19 @@ BOOST_AUTO_TEST_CASE (timing_with_minDelta_change, *utf::label ("ci"))
     auto res = vFed1->requestTime (1.0);
     // check that the request is only granted at the appropriate period
 
-    BOOST_CHECK_EQUAL (res, 1.0);
+    EXPECT_EQ (res, 1.0);
 
     // purposely requesting 1.0 to test min delta
     res = vFed1->requestTime (1.0);
-    BOOST_CHECK_EQUAL (res, 2.0);
+    EXPECT_EQ (res, 2.0);
 
     vFed1->setProperty (helics_property_time_delta, 0.1);
     res = vFed1->requestTime (res);
-    BOOST_CHECK_EQUAL (res, 2.1);
+    EXPECT_EQ (res, 2.1);
     vFed1->finalize ();
 }
 
-BOOST_AUTO_TEST_CASE (timing_with_period_change, *utf::label ("ci"))
+TEST_F (timing_tests, timing_with_period_change)
 {
     SetupTest<helics::ValueFederate> ("test", 1);
     auto vFed1 = GetFederateAs<helics::ValueFederate> (0);
@@ -325,19 +323,19 @@ BOOST_AUTO_TEST_CASE (timing_with_period_change, *utf::label ("ci"))
     auto res = vFed1->requestTime (1.0);
     // check that the request is only granted at the appropriate period
 
-    BOOST_CHECK_EQUAL (res, 1.0);
+    EXPECT_EQ (res, 1.0);
 
     // purposely requesting 1.0 to test min delta
     res = vFed1->requestTime (1.0);
-    BOOST_CHECK_EQUAL (res, 2.0);
+    EXPECT_EQ (res, 2.0);
 
     vFed1->setProperty (helics_property_time_period, 0.1);
     res = vFed1->requestTime (res);
-    BOOST_CHECK_EQUAL (res, 2.1);
+    EXPECT_EQ (res, 2.1);
     vFed1->finalize ();
 }
 
-BOOST_AUTO_TEST_CASE (sender_finalize_timing_result, *utf::label ("ci"))
+TEST_F (timing_tests, sender_finalize_timing_result)
 {
     SetupTest<helics::ValueFederate> ("test", 2);
     auto vFed1 = GetFederateAs<helics::ValueFederate> (0);
@@ -350,57 +348,57 @@ BOOST_AUTO_TEST_CASE (sender_finalize_timing_result, *utf::label ("ci"))
     vFed2->enterExecutingMode ();
     vFed1->enterExecutingModeComplete ();
     auto granted1 = vFed1->requestTime (1.0);
-    BOOST_CHECK_EQUAL (granted1, 1.0);
+    EXPECT_EQ (granted1, 1.0);
     sender.publish (1.0);
 
     granted1 = vFed1->requestTime (2.0);
-    BOOST_CHECK_EQUAL (granted1, 2.0);
+    EXPECT_EQ (granted1, 2.0);
     // now check that the receiver got the data at time 1.0
     auto granted2 = vFed2->requestTime (400.0);  // request a big time
-    BOOST_CHECK_EQUAL (granted2, 1.0);
-    BOOST_CHECK (receiver.isUpdated ());
-    BOOST_CHECK_EQUAL (receiver.getValue<double> (), 1.0);
+    EXPECT_EQ (granted2, 1.0);
+    EXPECT_TRUE (receiver.isUpdated ());
+    EXPECT_EQ (receiver.getValue<double> (), 1.0);
 
     // now do 2 publish cycles in a row
     sender.publish (2.0);
     granted1 = vFed1->requestTime (3.0);
-    BOOST_CHECK_EQUAL (granted1, 3.0);
+    EXPECT_EQ (granted1, 3.0);
 
     sender.publish (3.0);
     granted1 = vFed1->requestTime (4.0);
-    BOOST_CHECK_EQUAL (granted1, 4.0);
+    EXPECT_EQ (granted1, 4.0);
     sender.publish (4.0);
 
     // check the grant at time 2.0
     granted2 = vFed2->requestTime (400.0);  // request a big time
-    BOOST_CHECK_EQUAL (granted2, 2.0);
-    BOOST_CHECK (receiver.isUpdated ());
-    BOOST_CHECK_EQUAL (receiver.getValue<double> (), 2.0);
+    EXPECT_EQ (granted2, 2.0);
+    EXPECT_TRUE (receiver.isUpdated ());
+    EXPECT_EQ (receiver.getValue<double> (), 2.0);
 
     granted1 = vFed1->requestTime (6.0);
-    BOOST_CHECK_EQUAL (granted1, 6.0);
+    EXPECT_EQ (granted1, 6.0);
     sender.publish (6.0);
 
     vFed1->finalize ();
     // check the grant at time 2.0
     granted2 = vFed2->requestTime (400.0);  // request a big time
-    BOOST_CHECK_EQUAL (granted2, 3.0);
-    BOOST_CHECK (receiver.isUpdated ());
-    BOOST_CHECK_EQUAL (receiver.getValue<double> (), 3.0);
+    EXPECT_EQ (granted2, 3.0);
+    EXPECT_TRUE (receiver.isUpdated ());
+    EXPECT_EQ (receiver.getValue<double> (), 3.0);
     // check the grant at time 2.0
     granted2 = vFed2->requestTime (400.0);  // request a big time
-    BOOST_CHECK_EQUAL (granted2, 4.0);
-    BOOST_CHECK (receiver.isUpdated ());
-    BOOST_CHECK_EQUAL (receiver.getValue<double> (), 4.0);
+    EXPECT_EQ (granted2, 4.0);
+    EXPECT_TRUE (receiver.isUpdated ());
+    EXPECT_EQ (receiver.getValue<double> (), 4.0);
     // check the grant at time 2.0
     granted2 = vFed2->requestTime (400.0);  // request a big time
-    BOOST_CHECK_EQUAL (granted2, 6.0);
-    BOOST_CHECK (receiver.isUpdated ());
-    BOOST_CHECK_EQUAL (receiver.getValue<double> (), 6.0);
+    EXPECT_EQ (granted2, 6.0);
+    EXPECT_TRUE (receiver.isUpdated ());
+    EXPECT_EQ (receiver.getValue<double> (), 6.0);
     vFed2->finalize ();
 }
 
-BOOST_AUTO_TEST_CASE (sender_finalize_timing_result2, *utf::label ("ci"))
+TEST_F (timing_tests, sender_finalize_timing_result2)
 {
     SetupTest<helics::ValueFederate> ("test", 2);
     auto vFed1 = GetFederateAs<helics::ValueFederate> (0);
@@ -413,62 +411,62 @@ BOOST_AUTO_TEST_CASE (sender_finalize_timing_result2, *utf::label ("ci"))
     vFed2->enterExecutingMode ();
     vFed1->enterExecutingModeComplete ();
     auto granted1 = vFed1->requestTime (1.0);
-    BOOST_CHECK_EQUAL (granted1, 1.0);
+    EXPECT_EQ (granted1, 1.0);
     sender.publish (1.0);
 
     granted1 = vFed1->requestTime (2.0);
-    BOOST_CHECK_EQUAL (granted1, 2.0);
+    EXPECT_EQ (granted1, 2.0);
     // now check that the receiver got the data at time 1.0
     auto granted2 = vFed2->requestTime (400.0);  // request a big time
-    BOOST_CHECK_EQUAL (granted2, 1.0);
-    BOOST_CHECK (receiver.isUpdated ());
-    BOOST_CHECK_EQUAL (receiver.getValue<double> (), 1.0);
+    EXPECT_EQ (granted2, 1.0);
+    EXPECT_TRUE (receiver.isUpdated ());
+    EXPECT_EQ (receiver.getValue<double> (), 1.0);
 
     // now do 2 publish cycles in a row
     sender.publish (2.0);
     granted1 = vFed1->requestTime (3.0);
-    BOOST_CHECK_EQUAL (granted1, 3.0);
+    EXPECT_EQ (granted1, 3.0);
 
     sender.publish (3.0);
     granted1 = vFed1->requestTime (4.0);
-    BOOST_CHECK_EQUAL (granted1, 4.0);
+    EXPECT_EQ (granted1, 4.0);
     sender.publish (4.0);
 
     // check the grant at time 2.0
     granted2 = vFed2->requestTime (400.0);  // request a big time
-    BOOST_CHECK_EQUAL (granted2, 2.0);
-    BOOST_CHECK (receiver.isUpdated ());
-    BOOST_CHECK_EQUAL (receiver.getValue<double> (), 2.0);
+    EXPECT_EQ (granted2, 2.0);
+    EXPECT_TRUE (receiver.isUpdated ());
+    EXPECT_EQ (receiver.getValue<double> (), 2.0);
 
     granted1 = vFed1->requestTime (6.0);
-    BOOST_CHECK_EQUAL (granted1, 6.0);
+    EXPECT_EQ (granted1, 6.0);
     sender.publish (6.0);
 
     vFed1->finalize ();
     // check the grant at time 2.0
     granted2 = vFed2->requestTime (400.0);  // request a big time
-    BOOST_CHECK_EQUAL (granted2, 3.0);
-    BOOST_CHECK (receiver.isUpdated ());
-    BOOST_CHECK_EQUAL (receiver.getValue<double> (), 3.0);
+    EXPECT_EQ (granted2, 3.0);
+    EXPECT_TRUE (receiver.isUpdated ());
+    EXPECT_EQ (receiver.getValue<double> (), 3.0);
     // check the grant at time 2.0
     granted2 = vFed2->requestTime (400.0);  // request a big time
-    BOOST_CHECK_EQUAL (granted2, 4.0);
-    BOOST_CHECK (receiver.isUpdated ());
-    BOOST_CHECK_EQUAL (receiver.getValue<double> (), 4.0);
+    EXPECT_EQ (granted2, 4.0);
+    EXPECT_TRUE (receiver.isUpdated ());
+    EXPECT_EQ (receiver.getValue<double> (), 4.0);
     // check the grant at time 2.0
     granted2 = vFed2->requestTime (5.0);  // request time of 5
-    BOOST_CHECK_EQUAL (granted2, 5.0);
-    BOOST_CHECK (!receiver.isUpdated ());  // should not have an update
-    BOOST_CHECK_EQUAL (receiver.getValue<double> (), 4.0);  // the get value should be the previous value
+    EXPECT_EQ (granted2, 5.0);
+    EXPECT_TRUE (!receiver.isUpdated ());  // should not have an update
+    EXPECT_EQ (receiver.getValue<double> (), 4.0);  // the get value should be the previous value
 
     granted2 = vFed2->requestTime (400.0);  // request a big time
-    BOOST_CHECK_EQUAL (granted2, 6.0);
-    BOOST_CHECK (receiver.isUpdated ());
-    BOOST_CHECK_EQUAL (receiver.getValue<double> (), 6.0);
+    EXPECT_EQ (granted2, 6.0);
+    EXPECT_TRUE (receiver.isUpdated ());
+    EXPECT_EQ (receiver.getValue<double> (), 6.0);
     vFed2->finalize ();
 }
 
-BOOST_AUTO_TEST_CASE (fast_sender_tests)
+TEST_F (timing_tests, fast_sender_tests_skip_ci)  // skip_ci
 {
     SetupTest<helics::ValueFederate> ("zmq_2", 2);
     auto vFed1 = GetFederateAs<helics::ValueFederate> (0);
@@ -496,13 +494,13 @@ BOOST_AUTO_TEST_CASE (fast_sender_tests)
         if (receiver.isUpdated ())
         {
             double val = receiver.getValue<double> ();
-            BOOST_CHECK_EQUAL (val, static_cast<double> (currentTime));
+            EXPECT_EQ (val, static_cast<double> (currentTime));
         }
     }
     vFed2->finalize ();
 }
 
-BOOST_AUTO_TEST_CASE (dual_fast_sender_tests)
+TEST_F (timing_tests, dual_fast_sender_tests_skip_ci)  // skip_ci
 {
     SetupTest<helics::ValueFederate> ("zmq_2", 3);
     auto vFed1 = GetFederateAs<helics::ValueFederate> (0);
@@ -543,14 +541,13 @@ BOOST_AUTO_TEST_CASE (dual_fast_sender_tests)
         if (receiver1.isUpdated ())
         {
             double val = receiver1.getValue<double> ();
-            BOOST_CHECK_EQUAL (val, static_cast<double> (currentTime));
+            EXPECT_EQ (val, static_cast<double> (currentTime));
         }
         if (receiver2.isUpdated ())
         {
             double val = receiver2.getValue<double> ();
-            BOOST_CHECK_EQUAL (val, static_cast<double> (currentTime));
+            EXPECT_EQ (val, static_cast<double> (currentTime));
         }
     }
     vFed2->finalize ();
 }
-BOOST_AUTO_TEST_SUITE_END ()

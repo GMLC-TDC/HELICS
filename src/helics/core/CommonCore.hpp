@@ -1,29 +1,30 @@
 /*
 Copyright © 2017-2019,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
-All rights reserved. See LICENSE file and DISCLAIMER for more details.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
+the top-level NOTICE for additional details. All rights reserved.
+SPDX-License-Identifier: BSD-3-Clause
 */
 #pragma once
 
-#include "../common/simpleQueue.hpp"
 #include "ActionMessage.hpp"
 #include "BrokerBase.hpp"
 #include "Core.hpp"
+
+#include "../common/GuardedTypes.hpp"
+#include "HandleManager.hpp"
+#include "gmlc/concurrency/DelayedObjects.hpp"
+#include "gmlc/concurrency/TriggerVariable.hpp"
+#include "gmlc/containers/AirLock.hpp"
+#include "gmlc/containers/DualMappedPointerVector.hpp"
+#include "gmlc/containers/DualMappedVector.hpp"
+#include "gmlc/containers/MappedPointerVector.hpp"
+#include "gmlc/containers/SimpleQueue.hpp"
 #include "helics-time.hpp"
 #include "helics/helics-config.h"
 
-#include "../common/AirLock.hpp"
-#include "../common/DelayedObjects.hpp"
-#include "../common/DualMappedPointerVector.hpp"
-#include "../common/DualMappedVector.hpp"
-#include "../common/GuardedTypes.hpp"
-#include "../common/MappedPointerVector.hpp"
-#include "../common/TriggerVariable.hpp"
-#include "HandleManager.hpp"
-#include "helics_includes/any.hpp"
+#include "helics/external/any.hpp"
 #include <array>
 #include <atomic>
-#include <cstdint>
 #include <set>
 #include <thread>
 #include <utility>
@@ -46,11 +47,12 @@ class FedInfo
   public:
     FederateState *fed = nullptr;
     bool disconnected = false;
+
     constexpr FedInfo () = default;
-    constexpr FedInfo (FederateState *newfed) noexcept : fed (newfed){};
-    FederateState *operator-> () { return fed; }
-    const FederateState *operator-> () const { return fed; }
-    operator bool () const { return (fed != nullptr); }
+    constexpr explicit FedInfo (FederateState *newfed) noexcept : fed (newfed){};
+    FederateState *operator-> () noexcept { return fed; }
+    const FederateState *operator-> () const noexcept { return fed; }
+    operator bool () const noexcept { return (fed != nullptr); }
 };
 
 /** base class implementing a standard interaction strategy between federates
@@ -68,15 +70,12 @@ class CommonCore : public Core, public BrokerBase
     explicit CommonCore (const std::string &core_name);
     /** virtual destructor*/
     virtual ~CommonCore () override;
-    virtual void initialize (const std::string &initializationString) override final;
-    /** initialize the core manager with command line arguments
-    @param argc the number of arguments
-    @param argv char pointers to the arguments
-    */
-    virtual void initializeFromArgs (int argc, const char *const *argv) override;
-    virtual bool isInitialized () const override final;
+    virtual void configure (const std::string &configureString) override final;
+    virtual void configureFromArgs (int argc, char *argv[]) override final;
+    virtual void configureFromVector (std::vector<std::string> args) override final;
+    virtual bool isConfigured () const override final;
     virtual bool isOpenToNewFederates () const override final;
-    virtual void error (local_federate_id federateID, int errorCode = -1) override final;
+    virtual void error (local_federate_id federateID, int errorID = -1) override final;
     virtual void finalize (local_federate_id federateID) override final;
     virtual void enterInitializingMode (local_federate_id federateID) override final;
     virtual void setCoreReadyToInit () override final;
@@ -122,7 +121,8 @@ class CommonCore : public Core, public BrokerBase
     virtual void removeTarget (interface_handle handle, const std::string &targetToRemove) override final;
     virtual void addDestinationTarget (interface_handle handle, const std::string &dest) override final;
     virtual void addSourceTarget (interface_handle handle, const std::string &name) override final;
-    virtual const std::string &getUnits (interface_handle handle) const override final;
+    virtual const std::string &getInjectionUnits (interface_handle handle) const override final;
+    virtual const std::string &getExtractionUnits (interface_handle handle) const override final;
     virtual const std::string &getInjectionType (interface_handle handle) const override final;
     virtual const std::string &getExtractionType (interface_handle handle) const override final;
     virtual void setValue (interface_handle handle, const char *data, uint64_t len) override final;
@@ -180,7 +180,7 @@ class CommonCore : public Core, public BrokerBase
     virtual void setLoggingLevel (int logLevel) override;
     virtual void setLoggingCallback (
       local_federate_id federateID,
-      std::function<void(int, const std::string &, const std::string &)> logFunction) override final;
+      std::function<void (int, const std::string &, const std::string &)> logFunction) override final;
 
     virtual std::string query (const std::string &target, const std::string &queryStr) override;
     virtual void setQueryCallback (local_federate_id federateID,
@@ -259,14 +259,15 @@ class CommonCore : public Core, public BrokerBase
     /** get the federate Information from the federateID*/
     FederateState *getFederateCore (const std::string &federateName);
     /** get the federate Information from a handle
-    @param id a handle identifier as generated by the one of the functions*/
+    @param handle an identifier as generated by the one of the functions
+    @return the federateState pointer object*/
     FederateState *getHandleFederateCore (interface_handle handle);
 
   private:
     std::string prevIdentifier;  //!< storage for the case of requiring a renaming
     std::map<global_federate_id, route_id>
       routing_table;  //!< map for external routes  <global federate id, route id>
-    SimpleQueue<ActionMessage>
+    gmlc::containers::SimpleQueue<ActionMessage>
       delayTransmitQueue;  //!< FIFO queue for transmissions to the root that need to be delays for a certain time
     std::unordered_map<std::string, route_id>
       knownExternalEndpoints;  //!< external map for all known external endpoints with names and route
@@ -274,7 +275,8 @@ class CommonCore : public Core, public BrokerBase
     std::unique_ptr<TimeoutMonitor> timeoutMon;  //!< class to handle timeouts and disconnection notices
     /** actually transmit messages that were delayed until the core was actually registered*/
     void transmitDelayedMessages ();
-
+    /** respond to delayed message with an error*/
+    void errorRespondDelayedMessages (const std::string &estring);
     /** actually transmit messages that were delayed for a particular source
     @param source the identifier for the message to transmit
     */
@@ -323,9 +325,9 @@ class CommonCore : public Core, public BrokerBase
     int32_t _global_federation_size = 0;  //!< total size of the federation
     std::atomic<int16_t> delayInitCounter{
       0};  //!< counter for the number of times the entry to initialization Mode was explicitly delayed
-    shared_guarded<MappedPointerVector<FederateState, std::string>>
+    shared_guarded<gmlc::containers::MappedPointerVector<FederateState, std::string>>
       federates;  //!< threadsafe local federate information list for external functions
-    DualMappedVector<FedInfo, std::string, global_federate_id>
+    gmlc::containers::DualMappedVector<FedInfo, std::string, global_federate_id>
       loopFederates;  // federate pointers stored for the core loop
     std::atomic<int32_t> messageCounter{54};  //!< counter for the number of messages that have been sent, nothing
                                               //!< magical about 54 just a number bigger than 1 to prevent
@@ -341,16 +343,19 @@ class CommonCore : public Core, public BrokerBase
     std::map<int32_t, std::vector<ActionMessage>>
       delayedTimingMessages;  //!< delayedTimingMessages from ongoing Filter actions
     std::atomic<int> queryCounter{1};  //!< counter for queries start at 1 so the default value isn't used
-    DelayedObjects<std::string> ActiveQueries;  //!< holder for active queries
+    gmlc::concurrency::DelayedObjects<std::string> ActiveQueries;  //!< holder for active queries
 
     std::map<interface_handle, std::unique_ptr<FilterCoordinator>> filterCoord;  //!< map of all local filters
     // The interface_handle used is here is usually referencing an endpoint
-    DualMappedPointerVector<FilterInfo, std::string,
-                            global_handle> filters;  //!< storage for all the filters
+    gmlc::containers::DualMappedPointerVector<FilterInfo,
+                                              std::string,
+                                              global_handle>
+      filters;  //!< storage for all the filters
 
     std::atomic<uint16_t> nextAirLock{0};  //!< the index of the next airlock to use
-    std::array<AirLock<stx::any>, 4> dataAirlocks;  //!< airlocks for updating filter operators and other functions
-    TriggerVariable disconnection;  //!< controller for the disconnection process
+    std::array<gmlc::containers::AirLock<stx::any>, 4>
+      dataAirlocks;  //!< airlocks for updating filter operators and other functions
+    gmlc::concurrency::TriggerVariable disconnection;  //!< controller for the disconnection process
   private:
     /** wait for the core to be registered with the broker*/
     bool waitCoreRegistration ();
@@ -401,8 +406,8 @@ class CommonCore : public Core, public BrokerBase
     */
     void organizeFilterOperations ();
 
-    /** generate a query response of a federate if possible
-    @param federateID the identifier for the federate to query
+    /** generate a query response for a federate if possible
+    @param fed a pointer to the federateState object to query
     @param queryStr  the string containing the actual query
     */
     std::string federateQuery (const FederateState *fed, const std::string &queryStr) const;

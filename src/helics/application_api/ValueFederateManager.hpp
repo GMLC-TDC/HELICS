@@ -1,16 +1,18 @@
 /*
 Copyright © 2017-2019,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
-All rights reserved. See LICENSE file and DISCLAIMER for more details.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
+the top-level NOTICE for additional details. All rights reserved.
+SPDX-License-Identifier: BSD-3-Clause
 */
 #pragma once
 
-#include "../common/DualMappedVector.hpp"
 #include "../common/GuardedTypes.hpp"
-#include "../common/MappedVector.hpp"
 #include "../core/Core.hpp"
+#include "../core/federate_id_extra.hpp"
 #include "Inputs.hpp"
 #include "Publications.hpp"
+#include "gmlc/containers/DualMappedVector.hpp"
+
 #include "data_view.hpp"
 #include "helicsTypes.hpp"
 #include <atomic>
@@ -47,7 +49,7 @@ struct input_info
     interface_handle coreID;  //!< Handle from the core
     input_id_t id;  //!< the id used as the identifier
 
-    std::function<void(Input &, Time)> callback;  //!< callback to trigger on update
+    std::function<void (Input &, Time)> callback;  //!< callback to trigger on update
     bool hasUpdate = false;  //!< indicator that there was an update
     input_info (const std::string &n_name, const std::string &n_type, const std::string &n_units)
         : name (n_name), type (n_type), units (n_units){};
@@ -170,12 +172,12 @@ class ValueFederateManager
     @details there can only be one generic callback
     @param callback the function to call
     */
-    void setInputNotificationCallback (std::function<void(Input &, Time)> callback);
+    void setInputNotificationCallback (std::function<void (Input &, Time)> callback);
     /** register a callback function to call when the specified subscription is updated
     @param inp  the id to register the callback for
     @param callback the function to call
     */
-    void setInputNotificationCallback (const Input &inp, std::function<void(Input &, Time)> callback);
+    void setInputNotificationCallback (const Input &inp, std::function<void (Input &, Time)> callback);
 
     /** disconnect from the coreObject*/
     void disconnect ();
@@ -184,20 +186,32 @@ class ValueFederateManager
     int getPublicationCount () const;
     /** get a count of the number subscriptions registered*/
     int getInputCount () const;
+    /** clear all the updates
+    @details after this call isUpdated on all the internal objects will return false*/
+    void clearUpdates ();
+    /** clear an input value as updated without actually retrieving it
+    @param inp the identifier for the subscription
+    */
+    void clearUpdate (const Input &inp);
 
   private:
-    shared_guarded_m<DualMappedVector<Input, std::string, interface_handle, reference_stability::stable>> inputs;
-    shared_guarded_m<DualMappedVector<Publication, std::string, interface_handle, reference_stability::stable>>
+    shared_guarded_m<
+      gmlc::containers::DualMappedVector<Input, std::string, interface_handle, reference_stability::stable>>
+      inputs;
+    shared_guarded_m<
+      gmlc::containers::DualMappedVector<Publication, std::string, interface_handle, reference_stability::stable>>
       publications;
     Time CurrentTime = Time (-1.0);  //!< the current simulation time
     Core *coreObject;  //!< the pointer to the actual core
     ValueFederate *fed;  //!< pointer back to the value Federate for creation of the Publication/Inputs
     local_federate_id fedID;  //!< the federation ID from the core API
-    atomic_guarded<std::function<void(Input &, Time)>> allCallback;  //!< the global callback function
+    atomic_guarded<std::function<void (Input &, Time)>> allCallback;  //!< the global callback function
     shared_guarded<std::vector<std::unique_ptr<input_info>>>
       inputData;  //!< the storage for the message queues and other unique Endpoint information
-    std::multimap<std::string, interface_handle> targetIDs;  //!< container for the target identifications
-    std::multimap<interface_handle, std::string> inputTargets;  //!< container for the specified input targets
+    shared_guarded<std::multimap<std::string, interface_handle>>
+      targetIDs;  //!< container for the target identifications
+    shared_guarded<std::multimap<interface_handle, std::string>>
+      inputTargets;  //!< container for the specified input targets
   private:
     void getUpdateFromCore (interface_handle handle);
 };

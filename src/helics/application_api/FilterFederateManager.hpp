@@ -1,14 +1,15 @@
 /*
 Copyright © 2017-2019,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
-All rights reserved. See LICENSE file and DISCLAIMER for more details.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
+the top-level NOTICE for additional details. All rights reserved.
+SPDX-License-Identifier: BSD-3-Clause
 */
 #pragma once
 
 #include "../common/GuardedTypes.hpp"
-#include "../common/MappedVector.hpp"
 #include "../core/Core.hpp"
 #include "Filters.hpp"
+#include "gmlc/containers/MappedVector.hpp"
 #include <cstdint>
 #include <deque>
 #include <functional>
@@ -79,7 +80,7 @@ class FilterFederateManager
 
   private:
     Core *coreObject = nullptr;
-    shared_guarded<MappedVector<std::unique_ptr<Filter>, std::string>> filters;
+    shared_guarded<gmlc::containers::MappedVector<std::unique_ptr<Filter>, std::string>> filters;
     Federate *fed = nullptr;  //!< pointer back to the message Federate
     const local_federate_id fedID;  //!< storage for the federate ID
 };

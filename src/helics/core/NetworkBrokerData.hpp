@@ -1,21 +1,24 @@
 /*
 Copyright © 2017-2019,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
-All rights reserved. See LICENSE file and DISCLAIMER for more details.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
+the top-level NOTICE for additional details. All rights reserved.
+SPDX-License-Identifier: BSD-3-Clause
 */
 #pragma once
 
+#include <memory>
 #include <string>
+#include <vector>
 
 namespace helics
 {
 /** define the network access*/
 enum class interface_networks : char
 {
-    local,  //!< just open local ports
-    ipv4,  //!< use external ipv4 ports
-    ipv6,  //!< use external ipv6 ports
-    all,  //!< use all external ports
+    local = 0,  //!< just open local ports
+    ipv4 = 4,  //!< use external ipv4 ports
+    ipv6 = 6,  //!< use external ipv6 ports
+    all = 10,  //!< use all external ports
 };
 
 /** define keys for particular interfaces*/
@@ -27,6 +30,8 @@ enum class interface_type : char
     ipc = 3,  //!< using ipc locations
     inproc = 4,  //!< using inproc sockets for communications
 };
+
+class helicsCLI11App;
 
 /** helper class designed to contain the common elements between networking brokers and cores
  */
@@ -62,15 +67,11 @@ class NetworkBrokerData
     NetworkBrokerData () = default;
     /** constructor from the allowed type*/
     explicit NetworkBrokerData (interface_type type) : allowedType (type){};
-    /** initialize the properties from input arguments
-    @param argc the number of arguments
-    @param argv the strings as they may have come from the command line
-    @param localAddress a predefined string containing the desired local only address
+
+    /** generate a command line argument parser for the network broker data
+     @param localAddress a predefined string containing the desired local only address
     */
-    void initializeFromArgs (int argc, const char *const *argv, const std::string &localAddress);
-    /** display the help line for the network information
-     */
-    static void displayHelp ();
+    std::shared_ptr<helicsCLI11App> commandLineParser (const std::string &localAddress);
     /** set the desired interface type
      */
     void setInterfaceType (interface_type type) { allowedType = type; }
@@ -122,11 +123,19 @@ void insertProtocol (std::string &networkAddress, interface_type interfaceT);
 
 /** check if a specified address is v6 or v4
 @return true if the address is a v6 address
-*/
+ */
 bool isipv6 (const std::string &address);
 
-/** get the external ipv4 address of the current computer
+/** create a combined address list with choices in a rough order of priority based on if they appear in both lists, followed by the high priority addresses, and low priority addresses last
+
+@param high addresses that should be considered before low addresses
+@param low addresses that should be considered last
+@return a vector of strings of ip addresses ordered in roughly the priority they should be used
  */
+std::vector<std::string> prioritizeExternalAddresses (std::vector<std::string> high, std::vector<std::string> low);
+
+/** get the external ipv4 address of the current computer
+*/
 std::string getLocalExternalAddressV4 ();
 
 /** get the external ipv4 Ethernet address of the current computer that best matches the listed server*/

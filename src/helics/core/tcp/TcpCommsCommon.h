@@ -1,7 +1,8 @@
 /*
 Copyright © 2017-2019,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
-All rights reserved. See LICENSE file and DISCLAIMER for more details.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
+the top-level NOTICE for additional details. All rights reserved.
+SPDX-License-Identifier: BSD-3-Clause
 */
 #pragma once
 
@@ -11,15 +12,28 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 #include "TcpHelperClasses.h"
 #include <chrono>
 
-#include "../../common/AsioServiceManagerFwd.hpp"
+class AsioContextManager;
+namespace asio
+{
+class io_context;
+}  // namespace asio
+
 namespace helics
 {
-	namespace tcp
-	{
-    /** establish a connection to a server by as associated timeout*/
-    TcpConnection::pointer makeConnection (boost::asio::io_service &io_service,
-                                           const std::string &connection,
-                                           const std::string &port,
-                                           size_t bufferSize, std::chrono::milliseconds timeOut);
-	}
-}
+class CommsInterface;
+
+namespace tcp
+{
+/** establish a connection to a server by as associated timeout*/
+TcpConnection::pointer makeConnection (asio::io_context &io_context,
+                                       const std::string &connection,
+                                       const std::string &port,
+                                       size_t bufferSize,
+                                       std::chrono::milliseconds timeOut);
+
+/** do some checking and logging about errors if the interface is connected*/
+bool commErrorHandler (CommsInterface *comm,
+                       std::shared_ptr<TcpConnection> connection,
+                       const std::error_code &error);
+}  // namespace tcp
+}  // namespace helics

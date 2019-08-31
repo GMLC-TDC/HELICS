@@ -1,17 +1,17 @@
 /*
 Copyright © 2017-2019,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
-All rights reserved. See LICENSE file and DISCLAIMER for more details.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
+the top-level NOTICE for additional details. All rights reserved.
+SPDX-License-Identifier: BSD-3-Clause
 */
 #pragma once
 
 #include "../common/GuardedTypes.hpp"
 #include "ActionMessage.hpp"
-#include "CoreFederateInfo.hpp"
 #include "TimeDependencies.hpp"
 #include <atomic>
-#include <functional>
 #include <deque>
+#include <functional>
 
 namespace helics
 {
@@ -32,8 +32,8 @@ class tcoptions
     Time outputDelay = timeZero;
     Time offset = timeZero;
     Time period = timeZero;
-    Time rtLag = timeZero;
-    Time rtLead = timeZero;
+    // Time rtLag = timeZero;
+    // Time rtLead = timeZero;
     // bool observer = false;
     // bool realtime = false;
     // bool source_only = false;
@@ -69,7 +69,7 @@ class TimeCoordinator
     std::vector<global_federate_id> dependents;  //!< federates which temporally depend on this federate
     std::deque<std::pair<Time, int32_t>> timeBlocks;  //!< blocks for a particular timeblocking link
     tcoptions info;  //!< basic time control information
-    std::function<void(const ActionMessage &)> sendMessageFunction;  //!< callback used to send the messages
+    std::function<void (const ActionMessage &)> sendMessageFunction;  //!< callback used to send the messages
 
   public:
     global_federate_id source_id = global_federate_id (
@@ -85,7 +85,7 @@ class TimeCoordinator
     /** default constructor*/
     TimeCoordinator ();
     /** construct from a federate info and message send function*/
-    explicit TimeCoordinator (std::function<void(const ActionMessage &)> sendMessageFunction_);
+    explicit TimeCoordinator (std::function<void (const ActionMessage &)> sendMessageFunction_);
 
     /** set a timeProperty for a the coordinator*/
     void setProperty (int timeProperty, Time propertyVal);
@@ -100,7 +100,7 @@ class TimeCoordinator
     /** get an option flag value*/
     int getIntegerProperty (int intProperty) const;
     /** set the callback function used for the sending messages*/
-    void setMessageSender (std::function<void(const ActionMessage &)> sendMessageFunction_);
+    void setMessageSender (std::function<void (const ActionMessage &)> sendMessageFunction_);
 
     /** get the current granted time*/
     Time getGrantedTime () const { return time_granted; }
@@ -197,5 +197,7 @@ class TimeCoordinator
     std::string printTimeStatus () const;
     /** return true if there are active dependencies*/
     bool hasActiveTimeDependencies () const;
+    /** generate a configuration string(JSON)*/
+    std::string generateConfig () const;
 };
 }  // namespace helics

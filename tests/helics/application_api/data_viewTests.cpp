@@ -1,10 +1,11 @@
 /*
 Copyright © 2017-2019,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
-All rights reserved. See LICENSE file and DISCLAIMER for more details.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
+the top-level NOTICE for additional details. All rights reserved.
+SPDX-License-Identifier: BSD-3-Clause
 */
 #include <boost/test/unit_test.hpp>
-#include <boost/test/floating_point_comparison.hpp>
+#include <boost/test/tools/floating_point_comparison.hpp>
 
 /** these test cases test data_block and data_view objects
  */
@@ -13,7 +14,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 
 namespace utf = boost::unit_test;
 
-BOOST_AUTO_TEST_SUITE (data_view_tests, *utf::label("ci"))
+BOOST_AUTO_TEST_SUITE (data_view_tests, *utf::label ("ci"))
 
 using namespace helics;
 
@@ -64,7 +65,7 @@ BOOST_AUTO_TEST_CASE (data_view_assignment_tests)
 
     data_view dv1 (db);
     const char *str = "this is a test string";
-    BOOST_CHECK_EQUAL (dv1.size (), 3);
+    BOOST_CHECK_EQUAL (dv1.size (), 3u);
     dv1 = str;
     BOOST_CHECK_EQUAL (dv1.size (), strlen (str));
 
@@ -76,7 +77,7 @@ BOOST_AUTO_TEST_CASE (data_view_assignment_tests)
     data_view dv5;
     // test move constructor
     dv5 = std::move (dv4);
-    BOOST_CHECK_EQUAL (dv5.size (), 400);
+    BOOST_CHECK_EQUAL (dv5.size (), 400u);
 }
 
 BOOST_AUTO_TEST_CASE (data_view_range_for_ops)
@@ -100,11 +101,11 @@ BOOST_AUTO_TEST_CASE (data_view_swap)
     data_view v1 (test1);
     data_block test2 (100, 45);
     data_view v2 (test2);
-    BOOST_CHECK_EQUAL (v1.size (), 300);
-    BOOST_CHECK_EQUAL (v2.size (), 100);
+    BOOST_CHECK_EQUAL (v1.size (), 300u);
+    BOOST_CHECK_EQUAL (v2.size (), 100u);
     std::swap (v1, v2);
-    BOOST_CHECK_EQUAL (v1.size (), 100);
-    BOOST_CHECK_EQUAL (v2.size (), 300);
+    BOOST_CHECK_EQUAL (v1.size (), 100u);
+    BOOST_CHECK_EQUAL (v2.size (), 300u);
 }
 
 /** test the swap function*/

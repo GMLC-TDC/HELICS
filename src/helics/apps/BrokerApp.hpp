@@ -1,7 +1,8 @@
 /*
 Copyright © 2017-2019,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
-All rights reserved. See LICENSE file and DISCLAIMER for more details.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
+the top-level NOTICE for additional details. All rights reserved.
+SPDX-License-Identifier: BSD-3-Clause
 */
 #pragma once
 
@@ -9,10 +10,12 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 
 #include <memory>
 #include <string>
+#include <vector>
 
 namespace helics
 {
 class Broker;
+class helicsCLI11App;
 
 namespace apps
 {
@@ -24,6 +27,15 @@ class BrokerApp
   public:
     /** default constructor*/
     BrokerApp () = default;
+    /** construct from command line arguments in a vector
+ @param args the command line arguments to pass in a reverse vector
+ */
+    explicit BrokerApp (std::vector<std::string> args);
+    /** construct from command line arguments in a vector
+     @param ctype the type of broker to create
+@param args the command line arguments to pass in a reverse vector
+*/
+    BrokerApp (core_type ctype, std::vector<std::string> args);
     /** construct from command line arguments
     @param argc the number of arguments
     @param argv the strings in the input
@@ -60,9 +72,10 @@ class BrokerApp
     auto *operator-> () const { return broker.operator-> (); }
 
   private:
-    void loadFromArguments (int argc, char *argv[]);
-    core_type type = core_type::ZMQ;
+    void processArgs (std::unique_ptr<helicsCLI11App> &app);
+    std::unique_ptr<helicsCLI11App> generateParser ();
     std::shared_ptr<Broker> broker;  //!< the actual endpoint objects
+    std::string name;  //!< the name of the broker
 };
 }  // namespace apps
 }  // namespace helics

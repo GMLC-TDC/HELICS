@@ -1,7 +1,8 @@
 /*
 Copyright © 2017-2019,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
-All rights reserved. See LICENSE file and DISCLAIMER for more details.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
+the top-level NOTICE for additional details. All rights reserved.
+SPDX-License-Identifier: BSD-3-Clause
 */
 #include "MessageFederate.hpp"
 #include "../common/JsonProcessingFunctions.hpp"
@@ -158,14 +159,15 @@ static void loadOptions (MessageFederate *fed, const Inp &data, Endpoint &ept)
 void MessageFederate::registerMessageInterfacesJson (const std::string &jsonString)
 {
     auto doc = loadJson (jsonString);
-
+    bool defaultGlobal = false;
+    replaceIfMember (doc, "defaultglobal", defaultGlobal);
     if (doc.isMember ("endpoints"))
     {
         for (const auto &ept : doc["endpoints"])
         {
             auto eptName = getKey (ept);
             auto type = getOrDefault (ept, "type", emptyStr);
-            bool global = getOrDefault (ept, "global", false);
+            bool global = getOrDefault (ept, "global", defaultGlobal);
             Endpoint &epObj = (global) ? registerGlobalEndpoint (eptName, type) : registerEndpoint (eptName, type);
 
             loadOptions (this, ept, epObj);
@@ -184,7 +186,8 @@ void MessageFederate::registerMessageInterfacesToml (const std::string &tomlStri
     {
         throw (helics::InvalidParameter (ia.what ()));
     }
-
+    bool defaultGlobal = false;
+    replaceIfMember (doc, "defaultglobal", defaultGlobal);
     auto epts = doc.find ("endpoints");
     if (epts != nullptr)
     {
@@ -193,7 +196,7 @@ void MessageFederate::registerMessageInterfacesToml (const std::string &tomlStri
         {
             auto key = getKey (ept);
             auto type = getOrDefault (ept, "type", emptyStr);
-            bool global = getOrDefault (ept, "global", false);
+            bool global = getOrDefault (ept, "global", defaultGlobal);
             Endpoint &epObj = (global) ? registerGlobalEndpoint (key, type) : registerEndpoint (key, type);
 
             loadOptions (this, ept, epObj);

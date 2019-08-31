@@ -1,0 +1,16 @@
+/** @mainpage  HELICS
+@image html HELICS_Logo.png width=5cm
+HELICS (Hierarchical Engine for Large-Scale infrastructure Co-Simulation) is a co-simulation platform
+
+\section intro Introduction
+Welcome to the repository for the Hierarchical Engine for Large-scale Infrastructure Co-Simulation (HELICS). HELICS provides a general-purpose, modular, highly-scalable co-simulation framework that runs cross-platform (Linux, Windows, and Mac OSX). It provides users a high-performance way to have multiple individual simulation model "federates" from various domains interact during execution to create a larger co-simulation "federation" able to capture rich interactions. Written in modern C++ (C++ 2014), HELICS provides includes a rich set of APIs for other languages including Python, C, Java, and MATLAB, and has native support within a growing number of energy simulation tools.
+
+Brief History: HELICS began as the core software development of the Grid Modernization Laboratory Consortium (GMLC) project on integrated Transmission-Distribution-Communication simulation (TDC, GMLC project 1.4.15) supported by the U.S. Department of Energy's Offices of Electricity Delivery and Energy Reliability (OE) and Energy Efficiency and Renewable Energy (EERE). As such, it's first use cases center around modern electric power system, though it can be used for co-simulation in other domains. HELICS's layered, high-performance, co-simulation framework builds on the collective experience of multiple national labs.
+
+Motivation: Energy systems and their associated information and communication technology systems are becoming increasingly intertwined. As a result, effectively designing, analyzing, and implementing modern energy systems increasingly relies on advanced modeling that simultaneously captures both the cyber and physical domains in combined simulations. It is designed to increase scalability and portability in modeling advanced features of highly integrated power system and cyber-physical energy systems.
+
+\section related Informational Pages
+- <a href="https://github.com/GMLC-TDC/HELICS/blob/master/README.md">Github Readme</a>
+- <a href="https://github.com/GMLC-TDC/HELICS/blob/master/LICENSE">LICENSE</a>
+- <a href="https://github.com/GMLC-TDC/HELICS/blob/master/NOTICE">NOTICE</a>
+ */

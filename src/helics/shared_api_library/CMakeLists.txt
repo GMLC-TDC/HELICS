@@ -1,7 +1,8 @@
 #
 # Copyright © 2017-2019, Battelle Memorial Institute; Lawrence Livermore National
-# Security, LLC; Alliance for Sustainable Energy, LLC All rights reserved. See LICENSE
-# file and DISCLAIMER for more details.
+# Security, LLC; Alliance for Sustainable Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
+#
+# SPDX-License-Identifier: BSD-3-Clause
 #
 
 set(
@@ -34,7 +35,16 @@ generate_export_header(helicsSharedLib BASE_NAME helics)
 
 target_include_directories(
   helicsSharedLib
-  PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>
+  PUBLIC
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>
+  INTERFACE
+        $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/src>
+        $<INSTALL_INTERFACE:$<INSTALL_PREFIX>/include>
+)
+
+set_target_properties(helicsSharedLib PROPERTIES
+    VERSION ${HELICS_VERSION}
+    SOVERSION ${HELICS_VERSION_MAJOR}
 )
 
 set_target_properties(
@@ -46,6 +56,8 @@ set_target_properties(
     hidden
 )
 target_link_libraries(helicsSharedLib PRIVATE helics-static)
+target_link_libraries(helicsSharedLib PRIVATE compile_flags_target)
+
 if(UNIX OR MINGW)
   if(NOT APPLE)
     target_link_libraries(
@@ -59,37 +71,39 @@ set_target_properties(helicsSharedLib PROPERTIES FOLDER interfaces)
 
 install(
   TARGETS helicsSharedLib
-  EXPORT helics-targets
+  ${HELICS_EXPORT_COMMAND}
   RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
   ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
   LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
 )
 
 if(${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION} VERSION_GREATER 3.6)
+	set(HELICS_EXCLUSION_COMMAND EXCLUDE_FROM_ALL)
+else()
+	set(HELICS_EXCLUSION_COMMAND )
+endif()
+
+if(WIN32)
   install(
     FILES $<TARGET_LINKER_FILE:helicsSharedLib>
     DESTINATION ${CMAKE_INSTALL_LIBDIR}
-    COMPONENT libs EXCLUDE_FROM_ALL
+    COMPONENT libs ${HELICS_EXCLUSION_COMMAND}
   )
   install(
     FILES $<TARGET_FILE:helicsSharedLib>
     DESTINATION ${CMAKE_INSTALL_BINDIR}
     COMPONENT
-    runtime EXCLUDE_FROM_ALL
+    Runtime ${HELICS_EXCLUSION_COMMAND}
   )
 else()
   install(
-    FILES $<TARGET_LINKER_FILE:helicsSharedLib>
+    TARGETS helicsSharedLib
     DESTINATION ${CMAKE_INSTALL_LIBDIR}
-    COMPONENT libs
-  )
-  install(
-    FILES $<TARGET_FILE:helicsSharedLib>
-    DESTINATION ${CMAKE_INSTALL_BINDIR}
     COMPONENT
-    runtime
+    Runtime ${HELICS_EXCLUSION_COMMAND}
   )
 endif()
+
 
 install(
   FILES ${CMAKE_CURRENT_BINARY_DIR}/helics_export.h

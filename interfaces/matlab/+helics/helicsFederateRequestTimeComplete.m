@@ -1,4 +1,3 @@
 function varargout = helicsFederateRequestTimeComplete(varargin)
-    %
-  [varargout{1:nargout}] = helicsMEX(109, varargin{:});
+  [varargout{1:nargout}] = helicsMEX(112, varargin{:});
 end

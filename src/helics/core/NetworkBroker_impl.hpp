@@ -1,17 +1,19 @@
 /*
 Copyright � 2017-2019,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
-All rights reserved. See LICENSE file and DISCLAIMER for more details.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
+the top-level NOTICE for additional details. All rights reserved.
+SPDX-License-Identifier: BSD-3-Clause
 */
 #pragma once
 
 #include "../core/core-types.hpp"
 #include "NetworkBroker.hpp"
+#include "helicsCLI11.hpp"
 #include <iostream>
 
 namespace helics
 {
-constexpr const char *tstr[] = {"default", "ZeroMQ", "MPI",   "TEST",   "IPC",      "interprocess",
+constexpr const char *tstr[] = {"default", "ZeroMQ", "MPI",   "TEST",   "IPC",    "interprocess",
                                 "TCP",     "UDP",    "undef", "nng",    "ZMQ_SS", "TCPSS",
                                 "undef",   "undef",  "http",  "unknown"};
 
@@ -34,41 +36,25 @@ NetworkBroker<COMMS, baseline, tcode>::NetworkBroker (const std::string &broker_
 }
 
 template <class COMMS, interface_type baseline, int tcode>
-void NetworkBroker<COMMS, baseline, tcode>::displayHelp (bool local_only)
+std::shared_ptr<helicsCLI11App> NetworkBroker<COMMS, baseline, tcode>::generateCLI ()
 {
-    std::cout << " Help for " << tcodeStr (tcode) << " Broker: \n";
-    NetworkBrokerData::displayHelp ();
-    if (!local_only)
-    {
-        CoreBroker::displayHelp ();
-    }
-}
-
-template <class COMMS, interface_type baseline, int tcode>
-void NetworkBroker<COMMS, baseline, tcode>::initializeFromArgs (int argc, const char *const *argv)
-{
-    if (BrokerBase::brokerState == BrokerBase::created)
-    {
-        std::lock_guard<std::mutex> lock (dataMutex);
-        if (BrokerBase::brokerState == BrokerBase::created)
-        {
-            netInfo.initializeFromArgs (argc, argv, defInterface[static_cast<int> (baseline)]);
-            CoreBroker::initializeFromArgs (argc, argv);
-        }
-    }
+    auto app = CoreBroker::generateCLI ();
+    CLI::App_p netApp = netInfo.commandLineParser (defInterface[static_cast<int> (baseline)]);
+    app->add_subcommand (netApp);
+    return app;
 }
 
 template <class COMMS, interface_type baseline, int tcode>
 bool NetworkBroker<COMMS, baseline, tcode>::brokerConnect ()
 {
     std::lock_guard<std::mutex> lock (dataMutex);
-    if ((netInfo.brokerName.empty ())&&(netInfo.brokerAddress.empty ()))
+    if ((netInfo.brokerName.empty ()) && (netInfo.brokerAddress.empty ()))
     {
         CoreBroker::setAsRoot ();
     }
     CommsBroker<COMMS, CoreBroker>::comms->setName (CoreBroker::getIdentifier ());
     CommsBroker<COMMS, CoreBroker>::comms->loadNetworkInfo (netInfo);
-    CommsBroker<COMMS, CoreBroker>::comms->setTimeout (std::chrono::milliseconds (BrokerBase::networkTimeout));
+    CommsBroker<COMMS, CoreBroker>::comms->setTimeout (BrokerBase::networkTimeout.to_ms ());
 
     auto res = CommsBroker<COMMS, CoreBroker>::comms->connect ();
     if (res)
@@ -97,12 +83,16 @@ std::string NetworkBroker<COMMS, baseline, tcode>::generateLocalAddressString ()
         case interface_type::tcp:
         case interface_type::ip:
         case interface_type::udp:
-          if (!netInfo.localInterface.empty () && (netInfo.localInterface.back () == '*')) {
-              add = makePortAddress (netInfo.localInterface.substr (0, netInfo.localInterface.size () - 1),
-                                     netInfo.portNumber);
-          } else {
-              add = makePortAddress (netInfo.localInterface, netInfo.portNumber);
-          } break;
+            if (!netInfo.localInterface.empty () && (netInfo.localInterface.back () == '*'))
+            {
+                add = makePortAddress (netInfo.localInterface.substr (0, netInfo.localInterface.size () - 1),
+                                       netInfo.portNumber);
+            }
+            else
+            {
+                add = makePortAddress (netInfo.localInterface, netInfo.portNumber);
+            }
+            break;
         case interface_type::inproc:
         case interface_type::ipc:
         default:
@@ -112,7 +102,7 @@ std::string NetworkBroker<COMMS, baseline, tcode>::generateLocalAddressString ()
             }
             else
             {
-                add = CoreBroker::getIdentifier();
+                add = CoreBroker::getIdentifier ();
             }
             break;
         }

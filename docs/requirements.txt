@@ -1,0 +1,9 @@
+sphinx==1.7.0
+sphinx_rtd_theme==0.3.1
+sphinxcontrib-pandoc-markdown==1.6.8
+ipython==6.5.0
+ipykernel==4.9.0
+nbsphinx==0.3.3
+breathe==4.11.1
+pypandoc==1.4
+recommonmark==0.5.0

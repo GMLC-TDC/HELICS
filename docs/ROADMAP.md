@@ -1,33 +1,33 @@
+
 # RoadMap
-This document contains tentative plans for changes and improvements of note in upcoming versions of the HELICS library.  All dates are approximate and subject to change.  see the [projects](https://github.com/GMLC-TDC/HELICS-src/projects) for additional details
+
+This document contains tentative plans for changes and improvements of note in upcoming versions of the HELICS library.  All dates are approximate and subject to change. See the [projects](https://github.com/GMLC-TDC/HELICS/projects) for additional details
 
 
+## \[2.3\] ~ 2019-10-15
 
-## [2.1] ~ 2019-03-21
-- see [HELICS 2.X](https://github.com/GMLC-TDC/HELICS-src/projects/10) for up to date information
-- all features here are tentative and subject to change
-### Features
- - additional package manager integration
- - Julia interface
- - a major update to the timing system to allow improved testing and timing consistency in large cyclic dependencies
- - remove use of boost::program_options in favor of CLI11
- - performance Improvements
- - multi-broker to allow multiple comms to be connected
- - logging API for user log message
- - allow dynamic publications
+-   See [HELICS 2.3](https://github.com/GMLC-TDC/HELICS/projects/15) for up to date information
+-   All features and dates here are tentative and subject to change
 
-### Improvements
- - Additional performance and scalability testing and improvements
-
-### Notes
-- drop testing support for Xcode 6.4 builds
-
-## [2.2] ~ 2019-06-21
- - see [HELICS 2.X](https://github.com/GMLC-TDC/HELICS-src/projects/10) for up to date information
- - all features here are tentative and subject to change
 ### Features and Improvements
-  - additional package manager integration
-  - remove use of boost::asio in favor of asio standalone to complete removal of boost compiled libraries from the core HELICS library and simplify support
-  - single thread CORE_TYPES
-  - single federate cores using boost::fibers (will require boost 1.66 or greater)
-  - dynamic federations
+
+-   Network reliability related improvements
+-   Some additional logging capabilities
+-   Multi-broker to allow multiple communication cores to be connected in the same federation
+-   Broker-server continued development and support for tcp/udp cores
+-   Additional package manager integration
+-   Performance improvements
+-   Additional unit tests and more porting to google tests
+-   Separate out networking library
+
+## \[2.4\] ~ Winter 2019-2020
+-   Single thread cores
+-   Debugging tools
+-   SSL capable core
+-   split core library between comms layer components and actual core api
+-   plugin architecture for user defined cores
+
+## \[3.0\] ~ Late Spring 2020
+-   Upgrade minimum compilers and build systems. Currently planned targets are gcc 7.0, clang 6.0, MSVC 2017 15.5, CMake 3.10.2.   This is a setup which should be supported on Ubuntu 18.04 repositories.  Minimum Boost version will also be updated though Boost is becoming less critical for the HELICS core so may not be that important. This will not be released until Ubuntu 20.04 LTS is out and RHEL 8.0 has been out for a year.   
+-   Control interface
+-   Dynamic Federation support

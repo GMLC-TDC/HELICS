@@ -1,10 +1,10 @@
 /*
 Copyright © 2017-2019,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
+the top-level NOTICE for additional details.
 */
 
 #include <boost/test/unit_test.hpp>
-#include <boost/filesystem.hpp>
 #include <boost/test/data/test_case.hpp>
 #include <boost/test/floating_point_comparison.hpp>
 
@@ -149,5 +149,91 @@ BOOST_AUTO_TEST_CASE (test_file_load)
     //	 BOOST_CHECK_EQUAL(vFed.getSubscriptionCount(), 2);
     //	 BOOST_CHECK_EQUAL(vFed.getPublicationCount(), 2);
     helicsFederateFree (vFed);
+}
+
+BOOST_AUTO_TEST_CASE (test_json_publish, *utf::label ("ci"))
+{
+    SetupTest (helicsCreateValueFederate, "test", 1);
+    auto vFed1 = GetFederateAt (0);
+    BOOST_REQUIRE (vFed1 != nullptr);
+    helicsFederateSetSeparator (vFed1, '/', nullptr);
+
+    helicsFederateRegisterGlobalPublication (vFed1, "pub1", helics_data_type_double, "", nullptr);
+    helicsFederateRegisterPublication (vFed1, "pub2", helics_data_type_string, "", nullptr);
+    helicsFederateRegisterPublication (vFed1, "group1/pubA", helics_data_type_double, "", nullptr);
+    helicsFederateRegisterPublication (vFed1, "group1/pubB", helics_data_type_string, "", nullptr);
+
+    auto s1 = helicsFederateRegisterSubscription (vFed1, "pub1", nullptr, nullptr);
+    auto s2 = helicsFederateRegisterSubscription (vFed1, "fed0/pub2", nullptr, nullptr);
+    auto s3 = helicsFederateRegisterSubscription (vFed1, "fed0/group1/pubA", nullptr, nullptr);
+    auto s4 = helicsFederateRegisterSubscription (vFed1, "fed0/group1/pubB", nullptr, nullptr);
+    helicsFederateEnterExecutingMode (vFed1, nullptr);
+    helicsFederatePublishJSON (vFed1, (std::string (TEST_DIR) + "example_pub_input1.json").c_str (), nullptr);
+    helicsFederateRequestTime (vFed1, 1.0, nullptr);
+    BOOST_CHECK_EQUAL (helicsInputGetDouble (s1, nullptr), 99.9);
+    char buffer[50];
+    int actLen = 0;
+    helicsInputGetString (s2, buffer, 50, &actLen, nullptr);
+    BOOST_CHECK_EQUAL (buffer, "things");
+    BOOST_CHECK_EQUAL (helicsInputGetDouble (s3, nullptr), 45.7);
+    helicsInputGetString (s4, buffer, 50, &actLen, nullptr);
+    BOOST_CHECK_EQUAL (buffer, "count");
+
+    helicsFederatePublishJSON (vFed1, (std::string (TEST_DIR) + "example_pub_input2.json").c_str (), nullptr);
+    helicsFederateRequestTime (vFed1, 2.0, nullptr);
+    BOOST_CHECK_EQUAL (helicsInputGetDouble (s1, nullptr), 88.2);
+
+    helicsInputGetString (s2, buffer, 50, &actLen, nullptr);
+    BOOST_CHECK_EQUAL (buffer, "items");
+    BOOST_CHECK_EQUAL (helicsInputGetDouble (s3, nullptr), 15.0);
+    helicsInputGetString (s4, buffer, 50, &actLen, nullptr);
+    BOOST_CHECK_EQUAL (buffer, "count2");
+
+    helicsFederatePublishJSON (vFed1, "{\"pub1\": 77.2}", nullptr);
+
+    helicsFederateRequestTime (vFed1, 3.0, nullptr);
+    BOOST_CHECK_EQUAL (helicsInputGetDouble (s1, nullptr), 77.2);
+
+    CE (helicsFederateFinalize (vFed1, &err));
+}
+
+BOOST_AUTO_TEST_CASE (test_json_register_publish, *utf::label ("ci"))
+{
+    SetupTest (helicsCreateValueFederate, "test", 1);
+    auto vFed1 = GetFederateAt (0);
+    BOOST_REQUIRE (vFed1 != nullptr);
+    helicsFederateSetSeparator (vFed1, '/', nullptr);
+
+    CE (helicsFederateRegisterFromPublicationJSON (vFed1,
+                                                   (std::string (TEST_DIR) + "example_pub_input1.json").c_str (),
+                                                   &err));
+
+    auto s1 = helicsFederateRegisterSubscription (vFed1, "fed0/pub1", nullptr, nullptr);
+    auto s2 = helicsFederateRegisterSubscription (vFed1, "fed0/pub2", nullptr, nullptr);
+    auto s3 = helicsFederateRegisterSubscription (vFed1, "fed0/group1/pubA", nullptr, nullptr);
+    auto s4 = helicsFederateRegisterSubscription (vFed1, "fed0/group1/pubB", nullptr, nullptr);
+    helicsFederateEnterExecutingMode (vFed1, nullptr);
+    helicsFederatePublishJSON (vFed1, (std::string (TEST_DIR) + "example_pub_input1.json").c_str (), nullptr);
+    helicsFederateRequestTime (vFed1, 1.0, nullptr);
+    BOOST_CHECK_EQUAL (helicsInputGetDouble (s1, nullptr), 99.9);
+    char buffer[50];
+    int actLen = 0;
+    helicsInputGetString (s2, buffer, 50, &actLen, nullptr);
+    BOOST_CHECK_EQUAL (buffer, "things");
+    BOOST_CHECK_EQUAL (helicsInputGetDouble (s3, nullptr), 45.7);
+    helicsInputGetString (s4, buffer, 50, &actLen, nullptr);
+    BOOST_CHECK_EQUAL (buffer, "count");
+
+    helicsFederatePublishJSON (vFed1, (std::string (TEST_DIR) + "example_pub_input2.json").c_str (), nullptr);
+    helicsFederateRequestTime (vFed1, 2.0, nullptr);
+    BOOST_CHECK_EQUAL (helicsInputGetDouble (s1, nullptr), 88.2);
+
+    helicsInputGetString (s2, buffer, 50, &actLen, nullptr);
+    BOOST_CHECK_EQUAL (buffer, "items");
+    BOOST_CHECK_EQUAL (helicsInputGetDouble (s3, nullptr), 15.0);
+    helicsInputGetString (s4, buffer, 50, &actLen, nullptr);
+    BOOST_CHECK_EQUAL (buffer, "count2");
+
+    CE (helicsFederateFinalize (vFed1, &err));
 }
 BOOST_AUTO_TEST_SUITE_END ()

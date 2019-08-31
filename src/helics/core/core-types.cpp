@@ -1,7 +1,8 @@
 /*
 Copyright © 2017-2019,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
-All rights reserved. See LICENSE file and DISCLAIMER for more details.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
+the top-level NOTICE for additional details. All rights reserved.
+SPDX-License-Identifier: BSD-3-Clause
 */
 #include "core-types.hpp"
 #include "core-exceptions.hpp"
@@ -149,25 +150,37 @@ core_type coreTypeFromString (std::string type) noexcept
     return core_type::UNRECOGNIZED;
 }
 
-#ifdef DISABLE_TCP_CORE
+#ifndef ENABLE_ZMQ_CORE
+#define ZMQ_AVAILABILITY false
+#else
+#define ZMQ_AVAILABILITY true
+#endif
+
+#ifndef ENABLE_MPI_CORE
+#define MPI_AVAILABILITY false
+#else
+#define MPI_AVAILABILITY true
+#endif
+
+#ifndef ENABLE_TCP_CORE
 #define TCP_AVAILABILITY false
 #else
 #define TCP_AVAILABILITY true
 #endif
 
-#ifdef DISABLE_UDP_CORE
+#ifndef ENABLE_UDP_CORE
 #define UDP_AVAILABILITY false
 #else
 #define UDP_AVAILABILITY true
 #endif
 
-#ifdef DISABLE_IPC_CORE
+#ifndef ENABLE_IPC_CORE
 #define IPC_AVAILABILITY false
 #else
 #define IPC_AVAILABILITY true
 #endif
 
-#ifdef DISABLE_TEST_CORE
+#ifndef ENABLE_TEST_CORE
 #define TEST_AVAILABILITY false
 #else
 #define TEST_AVAILABILITY true
@@ -180,17 +193,11 @@ bool isCoreTypeAvailable (core_type type) noexcept
     switch (type)
     {
     case core_type::ZMQ:
-#if HELICS_HAVE_ZEROMQ
-        available = true;
-#endif
-        break;
     case core_type::ZMQ_SS:
-#if HELICS_HAVE_ZEROMQ
-        available = false;
-#endif
+        available = ZMQ_AVAILABILITY;
         break;
     case core_type::MPI:
-        available = (HELICS_HAVE_MPI != 0);
+        available = MPI_AVAILABILITY;
         break;
     case core_type::TEST:
         available = TEST_AVAILABILITY;

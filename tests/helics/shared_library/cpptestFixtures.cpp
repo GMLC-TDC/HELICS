@@ -3,14 +3,14 @@ Copyright (C) 2017-2019, Battelle Memorial Institute
 All rights reserved.
 
 This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial
-Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC; and the
-Lawrence Livermore National Laboratory, operated by Lawrence Livermore National Security, LLC.
+Institute; the National Renewable Energy Laboratory, operated by the Alliance for Sustainable Energy, LLC.  See the
+top-level NOTICE for additional details. and the Lawrence Livermore National Laboratory, operated by Lawrence
+Livermore National Security, LLC.
 
 */
-#include "../src/helics/cpp98/Broker.hpp"
 #include "cpptestFixtures.hpp"
+#include "../src/helics/cpp98/Broker.hpp"
 #include <cctype>
-#include <boost/test/unit_test.hpp>
 
 static bool hasIndexCode (const std::string &type_name)
 {
@@ -26,14 +26,14 @@ static bool hasIndexCode (const std::string &type_name)
 
 static auto StartBrokerImp (const std::string &core_type_name, std::string initialization_string)
 {
-    if (core_type_name.compare(0, 3, "tcp") == 0)
+    if (core_type_name.compare (0, 3, "tcp") == 0)
     {
         initialization_string += " --reuse_address";
     }
     else if (core_type_name.compare (0, 3, "ipc") == 0)
     {
-		//this is to use the name instead of the "_ipc_broker" as the queue name
-		//since we are linking it directly anyway
+        // this is to use the name instead of the "_ipc_broker" as the queue name
+        // since we are linking it directly anyway
         initialization_string += " --client";
     }
     if (hasIndexCode (core_type_name))
@@ -70,28 +70,28 @@ FederateTestFixture_cpp::~FederateTestFixture_cpp ()
     federates.clear ();
     for (auto &broker : brokers)
     {
-        if (ctype.compare(0, 3, "tcp") == 0)
+        if (ctype.compare (0, 3, "tcp") == 0)
         {
-            broker->waitForDisconnect(2000);
+            broker->waitForDisconnect (2000);
         }
         else
         {
-            broker->waitForDisconnect(200);
+            broker->waitForDisconnect (200);
         }
 
-        if (broker->isConnected())
+        if (broker->isConnected ())
         {
-
-        broker->disconnect ();
-    }
+            broker->disconnect ();
+        }
     }
     brokers.clear ();
     helicsCleanupLibrary ();
 }
 
-std::shared_ptr<helicscpp::Broker> FederateTestFixture_cpp::AddBroker (const std::string &core_type_name, int count)
+std::shared_ptr<helicscpp::Broker>
+FederateTestFixture_cpp::AddBroker (const std::string &core_type_name, int count)
 {
-    return AddBroker (core_type_name, std::to_string (count));
+    return AddBroker (core_type_name, std::string ("-f") + std::to_string (count));
 }
 
 std::shared_ptr<helicscpp::Broker>
@@ -108,7 +108,7 @@ FederateTestFixture_cpp::AddBroker (const std::string &core_type_name, const std
     }
     if (broker)
     {
-        brokers.push_back(broker);
+        brokers.push_back (broker);
     }
     return broker;
 }

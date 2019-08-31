@@ -41,7 +41,7 @@ the contents from
 [pisender.py](https://github.com/GMLC-TDC/HELICS-Examples/blob/master/python/pi-exchange/pisender.py)
 and paste it into the file.
 
-Next, create a new source file and call it `hello_world_receiver.c`.
+Next, create a new source file and call it `pireceiver.py`.
 Copy the contents from
 [pireceiver.py](https://github.com/GMLC-TDC/HELICS-Examples/blob/master/python/pi-exchange/pireceiver.py)
 and paste it into the file.
@@ -100,7 +100,7 @@ __Background:__ Running a HELICS federation (via low level commands) requires fi
 
 **Tips**
 
-Ensure that the install location is added to your `PATH`. If you've installed to the default installation, you may not need to do this.
+Ensure that the install location is added to your `PATH`. If you've installed to the default system location, you may not need to do this.
 To ensure that the Python extension works correctly, you may add the following to your `PYTHONPATH`. You can do so by pasting the following in your .bashrc file.
 
 ```bash

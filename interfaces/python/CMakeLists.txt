@@ -1,7 +1,10 @@
 #
-# Copyright © 2017-2019, Battelle Memorial Institute; Lawrence Livermore National
-# Security, LLC; Alliance for Sustainable Energy, LLC All rights reserved. See LICENSE
-# file and DISCLAIMER for more details.
+# Copyright (c) 2017-2019, Battelle Memorial Institute; Lawrence Livermore
+# National Security, LLC; Alliance for Sustainable Energy, LLC.
+# See the top-level NOTICE for additional details. 
+# All rights reserved.
+#
+# SPDX-License-Identifier: BSD-3-Clause
 #
 
 if(BUILD_PYTHON_INTERFACE)
@@ -37,6 +40,8 @@ if(ENABLE_SWIG AND SWIG_EXECUTABLE)
   swig_link_libraries(helics helicsSharedLib)
   if (MSVC)
 	target_compile_options(_helics PRIVATE "/wd4100")
+  else(MSVC)
+   target_compile_options(_helics PRIVATE "-Wno-long-long")
   endif(MSVC)
   if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
     # https://groups.google.com/a/continuum.io/d/msg/anaconda/057P4uNWyCU/Iem6Ot jBCQAJ
@@ -53,32 +58,9 @@ if(ENABLE_SWIG AND SWIG_EXECUTABLE)
 
   install(TARGETS _helics DESTINATION python COMPONENT python)
 
-  foreach(keyfile IN LISTS KEY_LIBRARY_FILES)
-    add_custom_command(
-      TARGET
-      _helics
-      POST_BUILD # Adds a post-build event to api tests
-      COMMAND
-        ${CMAKE_COMMAND}
-        -E
-        copy_if_different # which executes "cmake - E copy_if_different..."
-        "${keyfile}" # <--this is in-file
-        "$<TARGET_FILE_DIR:_helics>/"
-    ) # <--this is out- file path
-  endforeach(keyfile)
-
-  add_custom_command(
-    TARGET
-    _helics
-    POST_BUILD # Adds a post-build event to api tests
-    COMMAND
-      ${CMAKE_COMMAND}
-      -E
-      copy_if_different # which executes "cmake - E copy_if_different..."
-      "$<TARGET_FILE:helicsSharedLib>" # <--this is in- file
-      "$<TARGET_FILE_DIR:_helics>/"
-  ) # <--this is out- file path
-
+  copy_key_files_to_target_location(_helics)
+  copy_shared_target(_helics)
+ 
 else()
   message("Building without swig")
 
@@ -117,6 +99,8 @@ else()
     string(STRIP ${pymodule_includes} pymodule_includes)
     string(REPLACE " " ";" pymodule_includes "${pymodule_includes}")
     target_compile_options(helicsPYTHON PUBLIC ${pymodule_includes})
+	copy_key_files_to_target_location(helicsPYTHON PUBLIC)
+    copy_shared_target(helicsPYTHON PUBLIC)
   endif()
 
   # Set the output library name to _helics
@@ -125,6 +109,8 @@ else()
                  OUTPUT_NAME "helics"
   )
   target_link_libraries(helicsPYTHON PUBLIC helicsSharedLib)
+
+  install(TARGETS helicsPYTHON DESTINATION python COMPONENT python)
 
   configure_file(
     ${CMAKE_CURRENT_SOURCE_DIR}/setup.py.in ${CMAKE_CURRENT_BINARY_DIR}/setup.py
@@ -137,5 +123,4 @@ else()
 endif()
 
 install(FILES ${CMAKE_CURRENT_BINARY_DIR}/helics.py DESTINATION python COMPONENT python)
-install(FILES $<TARGET_FILE:helicsSharedLib> DESTINATION python COMPONENT python)
-install(FILES ${KEY_LIBRARY_FILES} DESTINATION python COMPONENT python)
+install_key_files_with_comp(python)

@@ -1,7 +1,8 @@
 /*
 Copyright © 2017-2019,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
-All rights reserved. See LICENSE file and DISCLAIMER for more details.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
+the top-level NOTICE for additional details. All rights reserved.
+SPDX-License-Identifier: BSD-3-Clause
 */
 #ifndef HELICS_CPP98_PUBLICATION_HPP_
 #define HELICS_CPP98_PUBLICATION_HPP_
@@ -16,8 +17,8 @@ namespace helicscpp
 class Publication
 {
   public:
-    explicit Publication (helics_publication hpub) : pub (hpub) {}
-    Publication (){};
+    explicit Publication (helics_publication hpub) HELICS_NOTHROW: pub (hpub) {}
+    Publication ()HELICS_NOTHROW:pub(HELICS_NULL_POINTER){};
 
     Publication (const Publication &publication) : pub (publication.pub) {}
 

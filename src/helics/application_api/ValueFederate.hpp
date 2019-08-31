@@ -1,7 +1,8 @@
 /*
 Copyright © 2017-2019,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
-All rights reserved. See LICENSE file and DISCLAIMER for more details.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
+the top-level NOTICE for additional details. All rights reserved.
+SPDX-License-Identifier: BSD-3-Clause
 */
 #pragma once
 
@@ -324,6 +325,16 @@ class ValueFederate : public virtual Federate  // using virtual inheritance to a
  */
     void publish (Publication &pub, double val);
 
+    /** register a set of publications based on a publication JSON
+    @param jsonString a json string containing the data to publish and establish publications from
+    */
+    void registerFromPublicationJSON (const std::string &jsonString);
+
+    /** publish a set of values in json format
+     @param jsonString a json string containing the data to publish
+     */
+    void publishJSON (const std::string &jsonString);
+
     /** add a destination target to a publication
     @param pub the publication object to add a target to
     @param target the name of the input to send the data to
@@ -385,6 +396,12 @@ class ValueFederate : public virtual Federate  // using virtual inheritance to a
     Time getLastUpdateTime (const Input &inp) const;
 
     virtual void disconnect () override;
+    /** clear all the updates
+    @details after this call isUpdated on all the internal objects will return false*/
+    void clearUpdates ();
+    /** clear all the update for a specific federate
+    @details after this call isUpdated on the input will return false*/
+    void clearUpdate (const Input &inp);
 
   protected:
     virtual void updateTime (Time newTime, Time oldTime) override;
@@ -462,12 +479,12 @@ class ValueFederate : public virtual Federate  // using virtual inheritance to a
     @details there can only be one generic callback
     @param callback the function to call signature void(input_id_t, Time)
     */
-    void setInputNotificationCallback (std::function<void(Input &, Time)> callback);
+    void setInputNotificationCallback (std::function<void (Input &, Time)> callback);
     /** register a callback function to call when the specified subscription is updated
     @param inp an input to set the notification callback for
     @param callback the function to call
     */
-    void setInputNotificationCallback (Input &inp, std::function<void(Input &, Time)> callback);
+    void setInputNotificationCallback (Input &inp, std::function<void (Input &, Time)> callback);
 
     /** get a count of the number publications registered*/
     int getPublicationCount () const;

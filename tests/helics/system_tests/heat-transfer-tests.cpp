@@ -1,10 +1,11 @@
 /*
 Copyright © 2017-2019,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
-All rights reserved. See LICENSE file and DISCLAIMER for more details.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.
+See the top-level NOTICE for additional details.
+All rights reserved.
+SPDX-License-Identifier: BSD-3-Clause
 */
-#include <boost/test/unit_test.hpp>
-#include <boost/test/floating_point_comparison.hpp>
+#include "gtest/gtest.h"
 
 #include "helics/application_api/Subscriptions.hpp"
 #include "helics/application_api/ValueFederate.hpp"
@@ -109,7 +110,7 @@ class Wall
 
   private:
     std::unique_ptr<helics::ValueFederate> vFed;
-    helics::Publication *pub;
+    helics::Publication *pub=nullptr;
     int index = 0;
     bool initialized = false;
 
@@ -231,11 +232,7 @@ class observer
     }
 };
 
-namespace utf = boost::unit_test;
-
-BOOST_AUTO_TEST_SUITE (heat_transfer_tests)
-
-BOOST_AUTO_TEST_CASE (linear_tests)
+TEST (heat_transfer_tests, linear_tests)
 {
     auto wcore = helics::CoreFactory::FindOrCreate (helics::core_type::TEST, "wallcore", "-f 22 --autobroker");
     Wall w;
@@ -250,18 +247,16 @@ BOOST_AUTO_TEST_CASE (linear_tests)
     observer obs ("temp", blockCount);
     obs.initialize ("wallcore");
 
-    std::vector<std::thread> threads (blockCount + 2);
+    std::vector<std::thread> threads (static_cast<size_t>(blockCount) + 2);
     for (int ii = 0; ii < blockCount; ++ii)
     {
-        threads[ii] = std::thread ([](HeatUnitBlock &blk) { blk.run (); }, std::ref (block[ii]));
+        threads[ii] = std::thread ([] (HeatUnitBlock &blk) { blk.run (); }, std::ref (block[ii]));
     }
-    threads[blockCount] = std::thread ([&]() { obs.run (); });
-    threads[blockCount + 1] = std::thread ([&]() { w.run (); });
+    threads[blockCount] = std::thread ([&] () { obs.run (); });
+    threads[static_cast<size_t>(blockCount) + 1] = std::thread ([&] () { w.run (); });
     for (auto &thrd : threads)
     {
         thrd.join ();
     }
     obs.saveFile ("tempData.csv");
 }
-
-BOOST_AUTO_TEST_SUITE_END ()

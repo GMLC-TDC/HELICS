@@ -1,14 +1,15 @@
 /*
 Copyright © 2017-2019,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
-All rights reserved. See LICENSE file and DISCLAIMER for more details.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
+the top-level NOTICE for additional details. All rights reserved.
+SPDX-License-Identifier: BSD-3-Clause
 */
 #include "ValueFederateManager.hpp"
+#include "../common/JsonBuilder.hpp"
 #include "../core/core-exceptions.hpp"
 #include "../core/queryHelpers.hpp"
 #include "Inputs.hpp"
 #include "Publications.hpp"
-
 namespace helics
 {
 ValueFederateManager::ValueFederateManager (Core *coreOb, ValueFederate *vfed, local_federate_id id)
@@ -42,7 +43,7 @@ Publication &ValueFederateManager::registerPublication (const std::string &key,
     auto coreID = coreObject->registerPublication (fedID, key, type, units);
 
     auto pubHandle = publications.lock ();
-    stx::optional<size_t> active;
+    decltype (pubHandle->insert (key, coreID, fed, coreID, key, type, units)) active;
     if (!key.empty ())
     {
         active = pubHandle->insert (key, coreID, fed, coreID, key, type, units);
@@ -64,14 +65,14 @@ ValueFederateManager::registerInput (const std::string &key, const std::string &
 {
     auto coreID = coreObject->registerInput (fedID, key, type, units);
     auto inpHandle = inputs.lock ();
-    stx::optional<size_t> active;
+    decltype (inpHandle->insert (key, coreID, fed, coreID, key, units)) active;
     if (!key.empty ())
     {
-        active = inpHandle->insert (key, coreID, fed, coreID, key);
+        active = inpHandle->insert (key, coreID, fed, coreID, key, units);
     }
     else
     {
-        active = inpHandle->insert (nullptr, coreID, fed, coreID, key);
+        active = inpHandle->insert (nullptr, coreID, fed, coreID, key, units);
     }
     if (active)
     {
@@ -93,7 +94,7 @@ void ValueFederateManager::addAlias (const Input &inp, const std::string &shortc
     {
         auto inpHandle = inputs.lock ();
         inpHandle->addSearchTerm (shortcutName, inp.handle);
-        targetIDs.emplace (shortcutName, inp.handle);
+        targetIDs.lock ()->emplace (shortcutName, inp.handle);
     }
     else
     {
@@ -117,14 +118,14 @@ void ValueFederateManager::addAlias (const Publication &pub, const std::string &
 void ValueFederateManager::addTarget (const Publication &pub, const std::string &target)
 {
     coreObject->addDestinationTarget (pub.handle, target);
-    targetIDs.emplace (target, pub.handle);
+    targetIDs.lock ()->emplace (target, pub.handle);
 }
 
 void ValueFederateManager::addTarget (const Input &inp, const std::string &target)
 {
     coreObject->addSourceTarget (inp.handle, target);
-    targetIDs.emplace (target, inp.handle);
-    inputTargets.emplace (inp.handle, target);
+    targetIDs.lock ()->emplace (target, inp.handle);
+    inputTargets.lock ()->emplace (inp.handle, target);
 }
 
 void ValueFederateManager::removeTarget (const Publication &pub, const std::string &target)
@@ -135,13 +136,14 @@ void ValueFederateManager::removeTarget (const Publication &pub, const std::stri
 
 void ValueFederateManager::removeTarget (const Input &inp, const std::string &target)
 {
-    auto rng = inputTargets.equal_range (inp.handle);
+    auto iTHandle = inputTargets.lock ();
+    auto rng = iTHandle->equal_range (inp.handle);
     for (auto el = rng.first; el != rng.second; ++el)
     {
         if (el->second == target)
         {
             coreObject->removeTarget (inp.handle, target);
-            inputTargets.erase (el);
+            iTHandle->erase (el);
             break;
         }
     }
@@ -245,23 +247,27 @@ void ValueFederateManager::updateTime (Time newTime, Time /*oldTime*/)
             iData->lastData = std::move (data);
             iData->lastUpdate = CurrentTime;
             iData->hasUpdate = true;
-            if (iData->callback)
+            bool updated = fid->checkUpdate (true);
+            if (updated)
             {
-                Input &inp = *fid;
+                if (iData->callback)
+                {
+                    Input &inp = *fid;
 
-                inpHandle.unlock ();  // need to free the lock
+                    inpHandle.unlock ();  // need to free the lock
 
-                // callbacks can do all sorts of things, best not to have it locked during the callback
-                iData->callback (inp, CurrentTime);
-                inpHandle = inputs.lock ();
-            }
-            else if (allCall)
-            {
-                Input &inp = *fid;
-                inpHandle.unlock ();  // need to free the lock
-                // callbacks can do all sorts of strange things, best not to have it locked during the callback
-                allCall (inp, CurrentTime);
-                inpHandle = inputs.lock ();
+                    // callbacks can do all sorts of things, best not to have it locked during the callback
+                    iData->callback (inp, CurrentTime);
+                    inpHandle = inputs.lock ();
+                }
+                else if (allCall)
+                {
+                    Input &inp = *fid;
+                    inpHandle.unlock ();  // need to free the lock
+                    // callbacks can do all sorts of strange things, best not to have it locked during the callback
+                    allCall (inp, CurrentTime);
+                    inpHandle = inputs.lock ();
+                }
             }
         }
     }
@@ -271,8 +277,7 @@ void ValueFederateManager::startupToInitializeStateTransition ()
 {
     // get the actual publication types
     auto inpHandle = inputs.lock ();
-    inpHandle->apply (
-      [this](auto &inp) { inp.type = getTypeFromString (coreObject->getInjectionType (inp.handle)); });
+    inpHandle->apply ([](auto &inp) { inp.loadSourceInformation (); });
 }
 
 void ValueFederateManager::initializeToExecuteStateTransition () { updateTime (0.0, 0.0); }
@@ -293,7 +298,72 @@ std::string ValueFederateManager::localQuery (const std::string &queryStr) const
     }
     else if (queryStr == "subscriptions")
     {
-        ret = generateStringVector (targetIDs, [](const auto &target) { return target.first; });
+        ret = generateStringVector (targetIDs.lock_shared (), [](const auto &target) { return target.first; });
+    }
+    else if (queryStr == "updated_input_indices")
+    {
+        ret = "[";
+        auto hand = inputs.lock ();
+        int ii = 0;
+        for (auto &inp : *hand)
+        {
+            if (inp.isUpdated ())
+            {
+                ret.append (std::to_string (ii));
+                ret.push_back (';');
+            }
+            ++ii;
+        }
+        if (ret.back () == ';')
+        {
+            ret.pop_back ();
+        }
+        ret.push_back (']');
+    }
+    else if (queryStr == "updated_input_names")
+    {
+        ret =
+          generateStringVector_if (inputs.lock_shared (), [](const auto &inp) { return inp.getDisplayName (); },
+                                   [](const auto &inp) { return (inp.isUpdated ()); });
+    }
+    else if (queryStr == "updates")
+    {
+        JsonBuilder JB;
+        for (auto &inp : inputs.lock_shared ())
+        {
+            if (inp.isUpdated ())
+            {
+                auto inpTemp = inp;
+                if (inpTemp.getHelicsType () == data_type::helics_double)
+                {
+                    JB.addElement (inp.getDisplayName (), inpTemp.getValue<double> ());
+                }
+                else
+                {
+                    JB.addElement (inp.getDisplayName (), inpTemp.getValue<std::string> ());
+                }
+            }
+        }
+        ret = JB.generate ();
+    }
+    else if (queryStr == "values")
+    {
+        JsonBuilder JB;
+        for (auto &inp : inputs.lock_shared ())
+        {
+            auto inpTemp = inp;
+            inpTemp.checkUpdate (true);
+
+            if (inpTemp.getHelicsType () == data_type::helics_double)
+            {
+                JB.addElement (inp.getDisplayName (), inpTemp.getValue<double> ());
+            }
+            else
+            {
+                JB.addElement (inp.getDisplayName (), inpTemp.getValue<std::string> ());
+            }
+        }
+        ret = JB.generate ();
     }
     return ret;
 }
@@ -318,9 +388,9 @@ static const std::string emptyStr;
 
 const std::string &ValueFederateManager::getTarget (const Input &inp) const
 {
-    auto inpHandle = inputs.lock_shared ();
-    auto fnd = inputTargets.find (inp.handle);
-    if (fnd != inputTargets.end ())
+    auto inpHandle = inputTargets.lock_shared ();
+    auto fnd = inpHandle->find (inp.handle);
+    if (fnd != inpHandle->end ())
     {
         return fnd->second;
     }
@@ -374,7 +444,8 @@ Input &ValueFederateManager::getInput (int index)
 
 const Input &ValueFederateManager::getSubscription (const std::string &key) const
 {
-    auto res = targetIDs.equal_range (key);
+    auto TIDhandle = targetIDs.lock_shared ();
+    auto res = TIDhandle->equal_range (key);
     if (res.first != res.second)
     {
         auto inps = inputs.lock_shared ();
@@ -389,7 +460,8 @@ const Input &ValueFederateManager::getSubscription (const std::string &key) cons
 
 Input &ValueFederateManager::getSubscription (const std::string &key)
 {
-    auto res = targetIDs.equal_range (key);
+    auto TIDhandle = targetIDs.lock_shared ();
+    auto res = TIDhandle->equal_range (key);
     if (res.first != res.second)
     {
         auto inps = inputs.lock ();
@@ -454,6 +526,23 @@ int ValueFederateManager::getPublicationCount () const
 }
 /** get a count of the number inputs registered*/
 int ValueFederateManager::getInputCount () const { return static_cast<int> (inputs.lock_shared ()->size ()); }
+
+void ValueFederateManager::clearUpdates ()
+{
+    for (auto &inp : inputs.lock ())
+    {
+        inp.clearUpdate ();
+    }
+}
+
+void ValueFederateManager::clearUpdate (const Input &inp)
+{
+    auto iData = reinterpret_cast<input_info *> (inp.dataReference);
+    if (iData != nullptr)
+    {
+        iData->hasUpdate = false;
+    }
+}
 
 void ValueFederateManager::setInputNotificationCallback (std::function<void(Input &, Time)> callback)
 {

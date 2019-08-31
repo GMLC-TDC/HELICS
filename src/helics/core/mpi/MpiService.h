@@ -1,14 +1,15 @@
 /*
-
 Copyright © 2017-2019,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
-All rights reserved. See LICENSE file and DISCLAIMER for more details.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.
+See the top-level NOTICE for additional details.
+All rights reserved.
+SPDX-License-Identifier: BSD-3-Clause
 */
 #pragma once
 
-#include "../../common/BlockingQueue.hpp"
 #include "../ActionMessage.hpp"
 #include "MpiComms.h"
+#include "gmlc/containers/BlockingQueue.hpp"
 #include "helics/helics-config.h"
 #include <atomic>
 #include <functional>
@@ -63,8 +64,7 @@ class MpiService
 
     std::mutex mpiDataLock;  //!< lock for the comms and send_requests
     std::vector<MpiComms *> comms;
-    std::list<std::pair<MPI_Request, std::vector<char>>> send_requests;
-    BlockingQueue<std::pair<std::pair<int, int>, std::vector<char>>> txMessageQueue;
+    gmlc::containers::BlockingQueue<std::pair<std::pair<int, int>, std::vector<char>>> txMessageQueue;
 
     bool helics_initialized_mpi{false};
     std::atomic<int> comms_connected{0};

@@ -1,9 +1,10 @@
 /*
 Copyright © 2017-2019,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
-All rights reserved. See LICENSE file and DISCLAIMER for more details.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See the top-level NOTICE for
+additional details. All rights reserved.
+SPDX-License-Identifier: BSD-3-Clause
 */
-#include "../common/logger.h"
+#include "../common/loggerCore.hpp"
 #include "../core/BrokerFactory.hpp"
 #include "../core/CoreFactory.hpp"
 #include "../helics.hpp"
@@ -19,18 +20,18 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 
 #include "../core/helicsVersion.hpp"
 #include "helics/helics-config.h"
-#if HELICS_HAVE_ZEROMQ > 0
-#include "../common/cppzmq/zmq.hpp"
+#ifdef ENABLE_ZMQ_CORE
 #include "../common/zmqContextManager.h"
+#include "cppzmq/zmq.hpp"
 #endif
 
 const char *helicsGetVersion (void) { return helics::versionString; }
 
-static const char *nullstrPtr = "";
+static constexpr const char *nullstrPtr = "";
 
 const std::string emptyStr;
 
-helics_error helicsErrorInitialize ()
+helics_error helicsErrorInitialize (void)
 {
     helics_error err;
     err.error_code = 0;
@@ -144,7 +145,7 @@ void helicsErrorHandler (helics_error *err) noexcept
             }
             else
             {
-                err->error_code = other_error_type;
+                err->error_code = helics_error_external_type;
                 err->message = unknown_err_string;
             }
         }
@@ -185,18 +186,18 @@ void helicsErrorHandler (helics_error *err) noexcept
         }
         catch (const std::exception &exc)
         {
-            err->error_code = other_error_type;
+            err->error_code = helics_error_external_type;
             err->message = getMasterHolder ()->addErrorString (exc.what ());
         }
         catch (...)
         {
-            err->error_code = other_error_type;
+            err->error_code = helics_error_external_type;
             err->message = unknown_err_string;
         }
     }
     catch (...)
     {
-        err->error_code = other_error_type;
+        err->error_code = helics_error_external_type;
         err->message = unknown_err_string;
     }
 }
@@ -206,7 +207,7 @@ void helicsFederateInfoFree (helics_federate_info fi)
     auto info = getFedInfo (fi, nullptr);
     if (info == nullptr)
     {
-        fprintf (stderr, "The helics_federate_info object is not valid");
+        fprintf (stderr, "The helics_federate_info object is not valid\n");
         return;
     }
     info->uniqueKey = 0;
@@ -224,7 +225,13 @@ void helicsFederateInfoLoadFromArgs (helics_federate_info fi, int argc, const ch
     }
     try
     {
-        hfi->loadInfoFromArgs (argc, argv);
+        std::vector<std::string> args;
+        args.reserve (static_cast<size_t> (argc) - 1);
+        for (int ii = argc - 1; ii > 0; --ii)
+        {
+            args.emplace_back (argv[ii]);
+        }
+        hfi->loadInfoFromArgs (args);
     }
     catch (...)
     {
@@ -241,7 +248,7 @@ void helicsFederateInfoSetCoreName (helics_federate_info fi, const char *corenam
     }
     try
     {
-        hfi->coreName = (corename != nullptr) ? std::string (corename) : nullstr;
+        hfi->coreName = AS_STRING (corename);
     }
     catch (...)
     {
@@ -258,7 +265,24 @@ void helicsFederateInfoSetCoreInitString (helics_federate_info fi, const char *c
     }
     try
     {
-        hfi->coreInitString = (coreinit != nullptr) ? std::string (coreinit) : nullstr;
+        hfi->coreInitString = AS_STRING (coreinit);
+    }
+    catch (...)
+    {
+        return helicsErrorHandler (err);
+    }
+}
+
+void helicsFederateInfoSetBrokerInitString (helics_federate_info fi, const char *brokerinit, helics_error *err)
+{
+    auto hfi = getFedInfo (fi, err);
+    if (hfi == nullptr)
+    {
+        return;
+    }
+    try
+    {
+        hfi->brokerInitString = AS_STRING (brokerinit);
     }
     catch (...)
     {
@@ -310,6 +334,23 @@ void helicsFederateInfoSetBroker (helics_federate_info fi, const char *broker, h
     try
     {
         hfi->broker = AS_STRING (broker);
+    }
+    catch (...)
+    {
+        return helicsErrorHandler (err);
+    }
+}
+
+void helicsFederateInfoSetBrokerKey (helics_federate_info fi, const char *brokerkey, helics_error *err)
+{
+    auto hfi = getFedInfo (fi, err);
+    if (hfi == nullptr)
+    {
+        return;
+    }
+    try
+    {
+        hfi->key = AS_STRING (brokerkey);
     }
     catch (...)
     {
@@ -565,13 +606,26 @@ helics_core helicsCreateCoreFromArgs (const char *type, const char *name, int ar
         return nullptr;
     }
     auto core = std::make_unique<helics::CoreObject> ();
+    try
+    {
+        core->valid = coreValidationIdentifier;
+        std::vector<std::string> args;
+        args.reserve (static_cast<size_t> (argc) - 1);
+        for (int ii = argc - 1; ii > 0; ii--)
+        {
+            args.emplace_back (argv[ii]);
+        }
+        core->coreptr = helics::CoreFactory::FindOrCreate (ct, AS_STRING (name), args);
+        auto retcore = reinterpret_cast<helics_core> (core.get ());
+        getMasterHolder ()->addCore (std::move (core));
 
-    core->valid = coreValidationIdentifier;
-    core->coreptr = helics::CoreFactory::FindOrCreate (ct, AS_STRING (name), argc, argv);
-    auto retcore = reinterpret_cast<helics_core> (core.get ());
-    getMasterHolder ()->addCore (std::move (core));
-
-    return retcore;
+        return retcore;
+    }
+    catch (...)
+    {
+        helicsErrorHandler (err);
+        return nullptr;
+    }
 }
 
 helics_core helicsCoreClone (helics_core core, helics_error *err)
@@ -684,7 +738,13 @@ helics_broker helicsCreateBrokerFromArgs (const char *type, const char *name, in
     broker->valid = brokerValidationIdentifier;
     try
     {
-        broker->brokerptr = helics::BrokerFactory::create (ct, (name != nullptr) ? std::string (name) : nullstr, argc, argv);
+        std::vector<std::string> args;
+        args.reserve (static_cast<size_t> (argc) - 1);
+        for (int ii = argc - 1; ii > 0; ii--)
+        {
+            args.emplace_back (argv[ii]);
+        }
+        broker->brokerptr = helics::BrokerFactory::create (ct, (name != nullptr) ? std::string (name) : nullstr, args);
         auto retbroker = reinterpret_cast<helics_broker> (broker.get ());
         getMasterHolder ()->addBroker (std::move (broker));
         return retbroker;
@@ -1059,19 +1119,14 @@ helics::CoreObject::~CoreObject ()
     coreptr = nullptr;
 }
 
-void helicsCloseLibrary ()
+void helicsCloseLibrary (void)
 {
     using namespace std::literals::chrono_literals;
     clearAllObjects ();
-    auto ret = std::async (std::launch::async, []() { helics::CoreFactory::cleanUpCores (2000ms); });
+    auto ret = std::async (std::launch::async, [] () { helics::CoreFactory::cleanUpCores (2000ms); });
     helics::BrokerFactory::cleanUpBrokers (2000ms);
     ret.get ();
-#if HELICS_HAVE_ZEROMQ > 0
-    if (ZmqContextManager::setContextToLeakOnDelete ())
-    {
-        ZmqContextManager::getContext ().close ();
-    }
-#endif
+
     helics::LoggerManager::closeLogger ();
     // helics::cleanupHelicsLibrary();
 }
@@ -1261,13 +1316,13 @@ void helicsQueryFree (helics_query query)
     auto queryObj = getQueryObj (query, nullptr);
     if (queryObj == nullptr)
     {
-        fprintf (stderr, "invalid query object");
+        fprintf (stderr, "invalid query object\n");
         return;
     }
     queryObj->valid = 0;
     delete queryObj;
 }
-void helicsCleanupLibrary ()
+void helicsCleanupLibrary (void)
 {
     helics::cleanupHelicsLibrary ();
     //  helics::LoggerManager::closeLogger();
@@ -1279,7 +1334,7 @@ MasterObjectHolder::MasterObjectHolder () noexcept {}
 
 MasterObjectHolder::~MasterObjectHolder ()
 {
-#if HELICS_HAVE_ZEROMQ > 0
+#ifdef ENABLE_ZMQ_CORE
     if (ZmqContextManager::setContextToLeakOnDelete ())
     {
         ZmqContextManager::getContext ().close ();
@@ -1341,7 +1396,7 @@ void MasterObjectHolder::clearBroker (int index)
         (*broker)[index] = nullptr;
         if (broker->size () > 10)
         {
-            if (std::none_of (broker->begin (), broker->end (), [](const auto &brk) { return static_cast<bool> (brk); }))
+            if (std::none_of (broker->begin (), broker->end (), [] (const auto &brk) { return static_cast<bool> (brk); }))
             {
                 broker->clear ();
             }
@@ -1358,7 +1413,7 @@ void MasterObjectHolder::clearCore (int index)
         (*core)[index] = nullptr;
         if (core->size () > 10)
         {
-            if (std::none_of (core->begin (), core->end (), [](const auto &cr) { return static_cast<bool> (cr); }))
+            if (std::none_of (core->begin (), core->end (), [] (const auto &cr) { return static_cast<bool> (cr); }))
             {
                 core->clear ();
             }
@@ -1375,7 +1430,7 @@ void MasterObjectHolder::clearFed (int index)
         (*fed)[index] = nullptr;
         if (fed->size () > 10)
         {
-            if (std::none_of (fed->begin (), fed->end (), [](const auto &fd) { return static_cast<bool> (fd); }))
+            if (std::none_of (fed->begin (), fed->end (), [] (const auto &fd) { return static_cast<bool> (fd); }))
             {
                 fed->clear ();
             }
@@ -1437,11 +1492,11 @@ const char *MasterObjectHolder::addErrorString (std::string newError)
 std::shared_ptr<MasterObjectHolder> getMasterHolder ()
 {
     static auto instance = std::make_shared<MasterObjectHolder> ();
-    static tripwire::TripWireTrigger tripTriggerholder;
+    static gmlc::concurrency::TripWireTrigger tripTriggerholder;
     return instance;
 }
 
-tripwire::TripWireTrigger tripTrigger;
+gmlc::concurrency::TripWireTrigger tripTrigger;
 
 void clearAllObjects ()
 {

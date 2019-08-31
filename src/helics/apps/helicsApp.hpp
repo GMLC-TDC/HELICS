@@ -1,26 +1,25 @@
 /*
 Copyright © 2017-2019,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
-All rights reserved. See LICENSE file and DISCLAIMER for more details.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
+the top-level NOTICE for additional details. All rights reserved.
+SPDX-License-Identifier: BSD-3-Clause
 */
 #pragma once
 
 #include "../application_api/CombinationFederate.hpp"
-#include "json/json-forwards.h"
-namespace boost
-{
-namespace program_options
-{
-class variables_map;
-}  // namespace program_options
-}  // namespace boost
+#include "json/forwards.h"
 
-namespace helics
+namespace CLI
 {
+class App;
+}  // namespace CLI
 namespace Json
 {
 class Value;
 }  // namespace Json
+
+namespace helics
+{
 namespace apps
 {
 /** class defining a basic helics App
@@ -32,6 +31,11 @@ class App
   public:
     /** default constructor*/
     App () = default;
+    /** construct from command line arguments in a vector
+   @param defaultAppName the name to use if not specified in one of the arguments
+   @param args the command line arguments to pass in a reverse vector
+   */
+    App (const std::string &defaultAppName, std::vector<std::string> args);
     /** construct from command line arguments
     @param defaultAppName the name to use if not specified in one of the arguments
     @param argc the number of arguments
@@ -88,9 +92,9 @@ class App
 
     /** check if the Player is ready to run*/
     bool isActive () const { return !deactivated; }
-
+    /** get a const reference to the federate*/
+    const CombinationFederate &accessUnderlyingFederate () const { return *fed; }
   protected:
-    int loadArguments (boost::program_options::variables_map &vm_map);
     /** load from a jsonString
     @param jsonString either a JSON filename or a string containing JSON
     */
@@ -105,15 +109,21 @@ class App
 
   private:
     void loadConfigOptions (const Json::Value &element);
+    /** generate the command line parser*/
+    std::unique_ptr<helicsCLI11App> generateParser ();
+    /** process the command line arguments */
+    void processArgs (std::unique_ptr<helicsCLI11App> &app, const std::string &defaultAppName);
 
   protected:
     std::shared_ptr<CombinationFederate> fed;  //!< the federate created for the Player
     Time stopTime = Time::maxVal ();  //!< the time the Player should stop
     std::string masterFileName;  //!< the name of the master file used to do the construction
-    bool useLocal = false;
-    bool fileLoaded = false;
-    bool deactivated = false;
-    bool quietMode = false;
+    bool useLocal{false};
+    bool fileLoaded{false};
+    bool deactivated{false};
+    bool quietMode{false};
+    bool helpMode{false};
+    std::vector<std::string> remArgs;
 };
 }  // namespace apps
 }  // namespace helics

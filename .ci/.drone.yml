@@ -1,0 +1,67 @@
+kind: pipeline
+name: arm
+
+platform:
+  os: linux
+  arch: arm
+
+steps:
+- name: uname
+  image: alpine
+  commands:
+  - uname -a
+
+- name: submodules
+  image: docker:git
+  commands:
+  # for updating submodules to latest upstream, add --remote
+  - git submodule update --init --recursive
+
+- name: build
+  image: alpine
+  failure: ignore
+  commands:
+  - apk update
+  - apk add --no-cache build-base git bash cmake ninja boost-dev zeromq-dev swig
+  - gcc --version || echo "gcc not installed"
+  - clang --version || echo "clang not installed"
+  - cmake --version
+  - git --version
+  - mkdir build && cd build
+  - cmake -GNinja ..
+  - cmake --build .
+  - ctest -L Continuous --output-on-failure
+
+---
+kind: pipeline
+name: arm64
+
+platform:
+  os: linux
+  arch: arm64
+
+steps:
+- name: uname
+  image: alpine
+  commands:
+  - uname -a
+
+- name: submodules
+  image: docker:git
+  commands:
+  # for updating submodules to latest upstream, add --remote
+  - git submodule update --init --recursive
+
+- name: build
+  image: alpine
+  commands:
+  - apk update
+  - apk add --no-cache build-base git bash cmake ninja boost-dev zeromq-dev swig
+  - gcc --version || echo "gcc not installed"
+  - clang --version || echo "clang not installed"
+  - cmake --version
+  - git --version
+  - mkdir build && cd build
+  - cmake -GNinja ..
+  - cmake --build .
+  - ctest -L Continuous --output-on-failure

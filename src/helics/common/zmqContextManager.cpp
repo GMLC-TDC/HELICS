@@ -1,7 +1,8 @@
 /*
 Copyright © 2017-2019,
-Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
-All rights reserved. See LICENSE file and DISCLAIMER for more details.
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
+the top-level NOTICE for additional details. All rights reserved.
+SPDX-License-Identifier: BSD-3-Clause
 */
 /*
  * LLNS Copyright Start
@@ -83,6 +84,17 @@ bool ZmqContextManager::setContextToLeakOnDelete (const std::string &contextName
     }
     return false;
 }
+
+bool ZmqContextManager::setContextToNotLeakOnDelete (const std::string &contextName)
+{
+    std::lock_guard<std::mutex> conlock (contextLock);
+    auto fnd = contexts.find (contextName);
+    if (fnd != contexts.end ())
+    {
+        fnd->second->leakOnDelete = false;
+    }
+    return false;
+}
 ZmqContextManager::~ZmqContextManager ()
 {
     // std::cout << "destroying context in " << std::this_thread::get_id() << std::endl;
@@ -92,10 +104,6 @@ ZmqContextManager::~ZmqContextManager ()
         // yes I am purposefully leaking this PHILIP TOP
         auto val = zcontext.release ();
         (void)(val);
-    }
-    else
-    {
-        std::this_thread::sleep_for (std::chrono::milliseconds (200));
     }
 }
 
