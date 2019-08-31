@@ -4,7 +4,6 @@ FROM ubuntu:18.04 as builder
 ARG MAKE_PARALLEL
 
 RUN apt update && apt install -y \
-  libboost-dev \
   python3-dev \
   build-essential clang cmake git wget subversion vim && rm -rf /var/lib/apt/lists/*
 
@@ -17,15 +16,18 @@ RUN (cd llvm/projects && svn co http://llvm.org/svn/llvm-project/libcxxabi/trunk
 RUN  mkdir libcxx_asan && cd libcxx_asan &&  cmake ../llvm -DCMAKE_BUILD_TYPE=Release -DLLVM_USE_SANITIZER=Address -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++
 RUN cd libcxx_asan && make cxx -j${MAKE_PARALLEL:-2}
 
+COPY /root/develop/libcxx_asan/include /root/develop/libcxx/include
+COPY /root/develop/libcxx_asan/lib /root/develop/libcxx/include
+
 FROM ubuntu:18.04
 
 COPY --from=builder /root/develop/libcxx /root/develop/libcxx
-ENV ASAN_CFLAGS="-fsanitize=undefined,address -stdlib=libc++ -L/root/develop/libcxx_asan/lib -lc++abi -I/root/develop/libcxx_asan/include -I/root/develop/libcxx_asan/include/c++/v1 -Wno-unused-command-line-argument -fno-omit-frame-pointer -g -O1 -Wl,-rpath=/root/develop/libcxx_asan/lib"
+ENV ASAN_CFLAGS="-fsanitize=undefined,address -stdlib=libc++ -L/root/develop/libcxx/lib -lc++abi -I/root/develop/libcxx/include -I/root/develop/libcxx/include/c++/v1 -Wno-unused-command-line-argument -fno-omit-frame-pointer -g -O1 -Wl,-rpath=/root/develop/libcxx/lib"
 
 RUN apt update && apt install -y \
   libboost-dev \
-  clang cmake make git vim && rm -rf /var/lib/apt/lists/*
-  
+  clang cmake make git && rm -rf /var/lib/apt/lists/*
+
 RUN rm -rf llvm
 # Create script to build helics
 RUN printf "#!/bin/bash \
@@ -50,4 +52,3 @@ RUN ln -s /usr/bin/llvm-symbolizer-6.0 /usr/bin/llvm-symbolizer
 # recognize and import libhelicsSharedLib.so.
 #RUN apt install -y --no-install-recommends python3-dev \
 #  && rm -rf /var/lib/apt/lists/*
-
