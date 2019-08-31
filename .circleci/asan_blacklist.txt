@@ -1,2 +1,1 @@
 src:*/libzmq/*
-src:*/zmqContextManager.cpp
