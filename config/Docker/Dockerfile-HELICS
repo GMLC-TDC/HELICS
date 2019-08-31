@@ -3,32 +3,21 @@ FROM ubuntu:18.04 as builder
 # Sets the number of threads for make to use
 ARG MAKE_PARALLEL
 
-ENV SOURCE_BRANCH=
-ENV DOCKER_TAG=
-ENV SOURCE_COMMIT=
-ENV DOCKER_REPO=
-ENV DOCKERFILE_PATH= 
-
-WORKDIR /root/develop
-COPY . /root/develop/HELICS
-RUN echo "====Printing ENV====" && printenv && echo "====ls HELICS src====" && ls /root/develop/HELICS && echo "====ls====" && ls && echo "====ls /root/develop/HELICS====" && ls /root/develop/HELICS && echo "====ls ~====" && ls ~
-
-RUN apt update && apt install -y \
+RUN apt-get update && apt-get install -y \
   libboost-dev \
   libzmq5-dev \ 
   g++ \
   cmake git
 
-#RUN git clone --recursive https://github.com/GMLC-TDC/HELICS.git
-RUN cd HELICS && mkdir build  && cd build && cmake -DBUILD_HELICS_TESTS=OFF -DENABLE_IPC_CORE=OFF -DBUILD_HELICS_EXAMPLES=OFF -DBUILD_C_SHARED_LIB=OFF \
+# Copies the current directory from the host
+COPY . /root/HELICS
+WORKDIR /root/HELICS
+
+RUN mkdir build  && cd build && cmake -DBUILD_HELICS_TESTS=OFF -DENABLE_IPC_CORE=OFF -DBUILD_HELICS_EXAMPLES=OFF -DBUILD_C_SHARED_LIB=OFF \
   -DCMAKE_BUILD_TYPE=Release -DBUILD_RELEASE_ONLY=ON -DCMAKE_INSTALL_PREFIX=/root/develop/helics-install ..
-RUN cd HELICS && cd build && make -j${MAKE_PARALLEL:-2} install
-# Create script to build helics
+RUN cd build && make -j${MAKE_PARALLEL:-2} install
 
-RUN rm -rf /var/lib/apt/lists/* && rm -rf HELICS
-
-
-# Final image with HELICS apps
+# Create final image with the HELICS apps
 FROM ubuntu:18.04
 COPY --from=builder /root/develop/helics-install /usr
 RUN apt-get update && apt-get install -y libzmq5 && apt-get clean
