@@ -5,9 +5,6 @@
 # SPDX-License-Identifier: BSD-3-Clause
 #
 
-include_directories("${PROJECT_SOURCE_DIR}/src/helics")
-include_directories("${PROJECT_SOURCE_DIR}/src/helics/cpp98")
-
 add_executable(nonlings_fed1_cpp nonlings_fed1.cpp)
 add_executable(nonlings_fed2_cpp nonlings_fed2.cpp)
 
