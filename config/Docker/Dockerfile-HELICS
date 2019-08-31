@@ -1,8 +1,5 @@
 FROM ubuntu:18.04 as builder
 
-# Sets the number of threads for make to use
-ARG MAKE_PARALLEL
-
 RUN apt-get update && apt-get install -y \
   libboost-dev \
   libzmq5-dev \ 
@@ -12,6 +9,9 @@ RUN apt-get update && apt-get install -y \
 # Copies the current directory from the host
 COPY . /root/HELICS
 WORKDIR /root/HELICS
+
+# Sets the number of threads for make to use
+ARG MAKE_PARALLEL
 
 RUN mkdir build  && cd build && cmake -DBUILD_HELICS_TESTS=OFF -DENABLE_IPC_CORE=OFF -DBUILD_HELICS_EXAMPLES=OFF -DBUILD_C_SHARED_LIB=OFF \
   -DCMAKE_BUILD_TYPE=Release -DBUILD_RELEASE_ONLY=ON -DCMAKE_INSTALL_PREFIX=/root/develop/helics-install ..
