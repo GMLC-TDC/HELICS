@@ -15,8 +15,6 @@ set(
   common_test_sources
   common-tests.cpp
   TimeTests.cpp
-  CircularBufferTests.cpp
-  StackQueueTests.cpp
 )
 
 add_executable(common-tests ${common_test_sources} ${common_test_headers})
