@@ -19,5 +19,5 @@ RUN cd build && make -j${MAKE_PARALLEL:-2} install
 
 # Create final image with the HELICS apps
 FROM ubuntu:18.04
-COPY --from=builder /root/develop/helics-install /usr
 RUN apt-get update && apt-get install -y libzmq5 && apt-get clean
+COPY --from=builder /root/develop/helics-install /usr
