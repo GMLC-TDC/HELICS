@@ -633,6 +633,9 @@ class Core
     /** set the core logging level*/
     virtual void setLoggingLevel (int logLevel) = 0;
 
+    /** set the core logging file*/
+    virtual void setLogFile (const std::string &lfile) = 0;
+
     /** set a federation global value
     @details this overwrites any previous value for this name
     @param valueName the name of the global to set

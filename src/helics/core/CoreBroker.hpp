@@ -253,6 +253,7 @@ class CoreBroker : public Broker, public BrokerBase
     virtual const std::string &getIdentifier () const override final { return identifier; }
     virtual const std::string &getAddress () const override final;
     virtual void setLoggingLevel (int logLevel) override final;
+    virtual void setLogFile (const std::string &lfile) override final;
     virtual std::string query (const std::string &target, const std::string &queryStr) override final;
     virtual void setGlobal (const std::string &valueName, const std::string &value) override final;
     virtual void makeConnections (const std::string &file) override final;

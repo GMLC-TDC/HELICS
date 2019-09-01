@@ -124,6 +124,7 @@ class BrokerBase
     */
     void setLogLevels (int32_t consoleLevel, int32_t fileLevel);
 
+
   private:
     /** start main broker loop*/
     void queueProcessingLoop ();
@@ -166,6 +167,8 @@ class BrokerBase
     virtual std::shared_ptr<helicsCLI11App> generateCLI ();
     /** set the broker error state and error string*/
     void setErrorState (int eCode, const std::string &estring);
+    /** set the logging file if using the default logger*/
+	void setLoggingFile (const std::string &lfile);
 
   public:
     /** close all the threads*/

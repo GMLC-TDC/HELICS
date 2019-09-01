@@ -93,7 +93,9 @@ enum properties : int
     input_delay = helics_property_time_input_delay,
     output_delay = helics_property_time_output_delay,
     max_iterations = helics_property_int_max_iterations,
-    log_level = helics_property_int_log_level
+    log_level = helics_property_int_log_level,
+    file_log_level = helics_property_int_file_log_level,
+    console_log_level = helics_property_int_console_log_level
 };
 
 /** options for handles */

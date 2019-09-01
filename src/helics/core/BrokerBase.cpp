@@ -249,8 +249,25 @@ void BrokerBase::setErrorState (int eCode, const std::string &estring)
     brokerState.store (broker_state_t::errored);
 }
 
-void BrokerBase::setLoggerFunction (
-  std::function<void (int, const std::string &, const std::string &)> logFunction)
+void BrokerBase::setLoggingFile (const std::string &lfile)
+{
+    if (loggingObj)
+    {
+        if (loggingObj->isRunning ())
+        {
+            loggingObj->haltLogging ();
+            logFile = lfile;
+            loggingObj->openFile (logFile);
+            loggingObj->startLogging ();
+        }
+    }
+    else
+    {
+        logFile = lfile;
+    }
+}
+
+void BrokerBase::setLoggerFunction (std::function<void(int, const std::string &, const std::string &)> logFunction)
 {
     loggerFunction = std::move (logFunction);
     if (loggerFunction)

@@ -75,6 +75,9 @@ class Broker
     virtual void setLoggingCallback (
       const std::function<void (int, const std::string &, const std::string &)> &logFunction) = 0;
 
+    /** set the broker logging file*/
+    virtual void setLogFile (const std::string &lfile) = 0;
+
     /** waits in the current thread until the broker is disconnected
     @param msToWait  the timeout to wait for disconnect
     @return true if the disconnect was successful false if it timed out

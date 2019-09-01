@@ -296,7 +296,7 @@ void CoreBroker::processPriorityCommand (ActionMessage &&command)
             _federates.back ().global_id = global_federate_id (
               static_cast<global_federate_id::base_type> (_federates.size ()) - 1 + global_federate_id_shift);
             _federates.addSearchTermForIndex (_federates.back ().global_id,
-                                              static_cast<size_t>(_federates.back ().global_id.baseValue ()) -
+                                              static_cast<size_t> (_federates.back ().global_id.baseValue ()) -
                                                 global_federate_id_shift);
             auto route_id = _federates.back ().route;
             auto global_fedid = _federates.back ().global_id;
@@ -1697,8 +1697,7 @@ std::shared_ptr<helicsCLI11App> CoreBroker::generateCLI ()
 {
     auto app = std::make_shared<helicsCLI11App> ("Option for Broker");
     app->remove_helics_specifics ();
-    app->add_flag_callback (
-      "--root", [this]() { setAsRoot (); }, "specify whether the broker is a root");
+    app->add_flag_callback ("--root", [this]() { setAsRoot (); }, "specify whether the broker is a root");
     return app;
 }
 
@@ -2326,6 +2325,8 @@ void CoreBroker::setLoggingLevel (int logLevel)
     addActionMessage (cmd);
 }
 
+void CoreBroker::setLogFile (const std::string &lfile) { setLoggingFile (lfile); }
+
 // public query function
 std::string CoreBroker::query (const std::string &target, const std::string &queryStr)
 {
@@ -2445,27 +2446,25 @@ std::string CoreBroker::generateQueryAnswer (const std::string &request)
     }
     if (request == "inputs")
     {
-        return generateStringVector_if (
-          handles, [](auto &handle) { return handle.key; },
-          [](auto &handle) { return (handle.handleType == handle_type::input); });
+        return generateStringVector_if (handles, [](auto &handle) { return handle.key; },
+                                        [](auto &handle) { return (handle.handleType == handle_type::input); });
     }
     if (request == "publications")
     {
-        return generateStringVector_if (
-          handles, [](auto &handle) { return handle.key; },
-          [](auto &handle) { return (handle.handleType == handle_type::publication); });
+        return generateStringVector_if (handles, [](auto &handle) { return handle.key; },
+                                        [](auto &handle) {
+                                            return (handle.handleType == handle_type::publication);
+                                        });
     }
     if (request == "filters")
     {
-        return generateStringVector_if (
-          handles, [](auto &handle) { return handle.key; },
-          [](auto &handle) { return (handle.handleType == handle_type::filter); });
+        return generateStringVector_if (handles, [](auto &handle) { return handle.key; },
+                                        [](auto &handle) { return (handle.handleType == handle_type::filter); });
     }
     if (request == "endpoints")
     {
-        return generateStringVector_if (
-          handles, [](auto &handle) { return handle.key; },
-          [](auto &handle) { return (handle.handleType == handle_type::endpoint); });
+        return generateStringVector_if (handles, [](auto &handle) { return handle.key; },
+                                        [](auto &handle) { return (handle.handleType == handle_type::endpoint); });
     }
     if (request == "federate_map")
     {
@@ -2557,8 +2556,8 @@ std::string CoreBroker::getNameList (std::string gidString) const
         {
             gidString.append (info->key);
             gidString.push_back (';');
-		}
-       
+        }
+
         index += 2;
     }
     if (gidString.back () == ';')
