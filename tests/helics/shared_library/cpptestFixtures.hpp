@@ -36,7 +36,7 @@ struct FederateTestFixture_cpp
             broker->disconnect ();
             broker = nullptr;
             helicsCleanupLibrary ();
-            broker = AddBroker (core_type_name, count);
+            broker = AddBroker (core_type_name, count); 
             if (!broker->isConnected ())
             {
                 throw (std::runtime_error ("Unable to connect rootbroker"));
@@ -46,7 +46,7 @@ struct FederateTestFixture_cpp
     }
 
     template <class FedType>
-    std::vector<std::shared_ptr<helicscpp::Federate>> AddFederates (std::string core_type_name,
+    void AddFederates (std::string core_type_name,
                                                                     int count,
                                                                     helicscpp::Broker &broker,
                                                                     helics_time time_delta = helics_time_zero,
@@ -75,7 +75,6 @@ struct FederateTestFixture_cpp
 
         fi.setCoreTypeFromString (core_type_name);
         fi.setProperty (helics_property_time_delta, time_delta);
-        std::vector<std::shared_ptr<helicscpp::Federate>> federates_added;
         switch (setup)
         {
         case 1:
@@ -91,7 +90,6 @@ struct FederateTestFixture_cpp
                 auto name = name_prefix + std::to_string (ii + offset);
                 auto fed = std::make_shared<FedType> (name, fi);
                 federates[ii + offset] = fed;
-                federates_added.push_back (fed);
             }
         }
         break;
@@ -108,7 +106,6 @@ struct FederateTestFixture_cpp
                 auto name = name_prefix + std::to_string (ii + offset);
                 auto fed = std::make_shared<FedType> (name, fi);
                 federates[ii + offset] = fed;
-                federates_added.push_back (fed);
             }
         }
         break;
@@ -137,8 +134,6 @@ struct FederateTestFixture_cpp
         }
         break;
         }
-
-        return federates_added;
     }
 
     template <class FedType>

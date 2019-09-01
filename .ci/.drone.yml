@@ -19,7 +19,6 @@ steps:
 
 - name: build
   image: alpine
-  failure: ignore
   commands:
   - apk update
   - apk add --no-cache build-base git bash cmake ninja boost-dev zeromq-dev swig
