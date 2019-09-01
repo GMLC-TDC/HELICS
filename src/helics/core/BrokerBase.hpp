@@ -12,8 +12,8 @@ and some common methods used cores and brokers
 */
 
 #include "ActionMessage.hpp"
-#include "gmlc/containers/BlockingPriorityQueue.hpp"
 #include "federate_id_extra.hpp"
+#include "gmlc/containers/BlockingPriorityQueue.hpp"
 #include <atomic>
 #include <memory>
 #include <string>
@@ -86,9 +86,9 @@ class BrokerBase
     bool enteredExecutionMode = false;  //!< flag indicating that the broker has entered execution mode
     bool waitingForBrokerPingReply = false;  //!< flag indicating we are waiting for a ping reply
     bool hasFilters = false;  //!< flag indicating filters come through the broker
-    std::string lastErrorString; //!< storage for last error string
-	std::atomic<int> errorCode{0};  //!< storage for last error code
-	
+    std::string lastErrorString;  //!< storage for last error string
+    std::atomic<int> errorCode{0};  //!< storage for last error code
+
   public:
     explicit BrokerBase (bool DisableQueue = false) noexcept;
     explicit BrokerBase (const std::string &broker_name, bool DisableQueue = false);
@@ -97,7 +97,7 @@ class BrokerBase
 
     int parseArgs (int argc, char *argv[]);
     int parseArgs (std::vector<std::string> args);
-    int parseArgs (const std::string &configureString);
+    int parseArgs (const std::string &initializationString);
     /** configure the base of all brokers and cores
      */
     virtual void configureBase ();
@@ -165,7 +165,7 @@ class BrokerBase
     /** generate a CLI11 Application for subprocesses for processing of command line arguments*/
     virtual std::shared_ptr<helicsCLI11App> generateCLI ();
     /** set the broker error state and error string*/
-	void setErrorState (int eCode, const std::string &estring);
+    void setErrorState (int eCode, const std::string &estring);
 
   public:
     /** close all the threads*/

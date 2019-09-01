@@ -29,6 +29,9 @@ namespace helics
 {
 class LoggingCore;
 
+constexpr int always_log = -100000;  //!< level that will always log
+constexpr int log_everything = 100;  //!< level that will log everything
+
 /** class implementing a thread safe Logger
 @details the Logger uses a queuing mechanism and condition variable to store messages to a queue and print/display
 them in a single thread allowing for asynchronous logging
@@ -41,8 +44,8 @@ class Logger
     std::ofstream outFile;  //!< the stream to write the log messages
     std::shared_ptr<LoggingCore> logCore;  //!< pointer to the core operation
     int coreIndex = -1;  //!< index into the core
-    std::atomic<int> consoleLevel{100};  //!< level below which we need to print to the console
-    std::atomic<int> fileLevel{100};  //!< level below which we need to print to a file
+    std::atomic<int> consoleLevel{log_everything};  //!< level below which we need to print to the console
+    std::atomic<int> fileLevel{log_everything};  //!< level below which we need to print to a file
   public:
     /** default constructor*/
     Logger ();
@@ -69,7 +72,7 @@ class Logger
     /** message to log without regard for levels*
     @param logMessage the message to log
     */
-    void log (std::string logMessage) { log (-100000, std::move (logMessage)); }
+    void log (std::string logMessage) { log (always_log, std::move (logMessage)); }
     /** flush the log queue*/
     void flush ();
     /** check if the Logger is running*/
@@ -90,8 +93,8 @@ class LoggerNoThread
   private:
     std::ofstream outFile;  //!< the file stream to write the log messages to
   public:
-    int consoleLevel = 100;  //!< level below which we need to print to the console
-    int fileLevel = 100;  //!< level below which we need to print to a file
+    int consoleLevel = log_everything;  //!< level below which we need to print to the console
+    int fileLevel = log_everything;  //!< level below which we need to print to a file
   public:
     /** default constructor*/
     LoggerNoThread ();
@@ -116,7 +119,7 @@ class LoggerNoThread
     /** message to log without regard for levels*
     @param logMessage the message to log
     */
-    void log (const std::string &logMessage) { log (-100000, logMessage); }
+    void log (const std::string &logMessage) { log (always_log, logMessage); }
     /** check if the logging thread is running*/
     bool isRunning () const;
     /** flush the log queue*/

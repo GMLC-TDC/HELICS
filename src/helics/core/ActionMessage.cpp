@@ -128,7 +128,7 @@ void ActionMessage::setString (int index, const std::string &str)
     {
         if (index >= static_cast<int> (stringData.size ()))
         {
-            stringData.resize (static_cast<size_t>(index) + 1);
+            stringData.resize (static_cast<size_t> (index) + 1);
         }
         stringData[index] = str;
     }
@@ -161,9 +161,9 @@ int ActionMessage::toByteArray (char *data, int buffer_size) const
     // put the main string size in the first 4 bytes;
     auto ssize = static_cast<uint32_t> (payload.size ()) & 0x00FFFFFFu;
     *data = littleEndian;
-    data[1] = static_cast<uint8_t> (ssize >> 16u);
-    data[2] = static_cast<uint8_t> ((ssize >> 8u) & 0xFFu);
-    data[3] = static_cast<uint8_t> (ssize & 0xFFu);
+    data[1] = static_cast<uint8_t> (ssize >> 16U);
+    data[2] = static_cast<uint8_t> ((ssize >> 8U) & 0xFFU);
+    data[3] = static_cast<uint8_t> (ssize & 0xFFU);
     data += sizeof (uint32_t);  // 4
     *reinterpret_cast<action_message_def::action_t *> (data) = messageAction;
     data += sizeof (action_message_def::action_t);
@@ -250,14 +250,14 @@ std::string ActionMessage::packetize () const
 void ActionMessage::packetize (std::string &data) const
 {
     auto sz = serializedByteCount ();
-    data.resize (static_cast<size_t>(sz) + 4);
+    data.resize (static_cast<size_t> (sz) + 4);
     toByteArray (&(data[4]), sz);
 
     data[0] = LEADING_CHAR;
     // now generate a length header
     auto dsz = static_cast<uint32_t> (data.size ());
-    data[1] = static_cast<char> (((dsz >> 16u) & 0xFFu));
-    data[2] = static_cast<char> (((dsz >> 8u) & 0xFFu));
+    data[1] = static_cast<char> (((dsz >> 16U) & 0xFFU));
+    data[2] = static_cast<char> (((dsz >> 8U) & 0xFFU));
     data[3] = static_cast<char> (dsz & 0xFFu);
     data.push_back (TAIL_CHAR1);
     data.push_back (TAIL_CHAR2);

@@ -157,11 +157,11 @@ class ActionMessage
 
     int serializedByteCount () const
     {
-        int size = 45;
+        int size = 45;  // 45 is the base size of the message
         size += static_cast<int> (payload.size ());
         if (messageAction == CMD_TIME_REQUEST)
         {
-            size += 24;
+            size += static_cast<int> (3 * sizeof (int64_t));
         }
         if (!stringData.empty ())
         {

@@ -17,11 +17,13 @@ namespace helics
 {
 namespace hzmq
 {
-/** bind a zmq socket, with a timeout and timeout period*/
+static const auto defaultPeriod{std::chrono::milliseconds (200)};
+
+      /** bind a zmq socket, with a timeout and timeout period*/
 bool bindzmqSocket (zmq::socket_t &socket,
                     const std::string &address,
                     int port,
                     std::chrono::milliseconds timeout,
-                    std::chrono::milliseconds period = std::chrono::milliseconds (200));
+                    std::chrono::milliseconds period = defaultPeriod);
 }  // namespace hzmq
 }  // namespace helics
