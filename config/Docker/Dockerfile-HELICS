@@ -8,13 +8,13 @@ RUN apt-get update && apt-get install -y \
 
 # Copies the current directory from the host
 COPY . /root/HELICS
-WORKDIR /root/HELICS
+WORKDIR /root
 
 # Sets the number of threads for make to use
 ARG MAKE_PARALLEL
 
 RUN mkdir build  && cd build && cmake -DBUILD_HELICS_TESTS=OFF -DENABLE_IPC_CORE=OFF -DBUILD_HELICS_EXAMPLES=OFF -DBUILD_C_SHARED_LIB=OFF \
-  -DCMAKE_BUILD_TYPE=Release -DBUILD_RELEASE_ONLY=ON -DCMAKE_INSTALL_PREFIX=/root/develop/helics-install ..
+  -DCMAKE_BUILD_TYPE=Release -DBUILD_RELEASE_ONLY=ON -DCMAKE_INSTALL_PREFIX=/root/develop/helics-install /root/HELICS
 RUN cd build && make -j${MAKE_PARALLEL:-2} install
 
 # Create final image with the HELICS apps
