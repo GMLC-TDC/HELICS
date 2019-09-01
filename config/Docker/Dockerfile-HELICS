@@ -13,6 +13,13 @@ WORKDIR /root
 # Sets the number of threads for make to use
 ARG MAKE_PARALLEL
 
+# Set ENABLE_GITHUB to true if you have only downloaded this Dockerfile without the rest of the HELICS source code repository
+# For users, it is recommended to just pull an already built Docker image from Docker Hub (building can take up to 30 minutes)
+ARG ENABLE_GITHUB=false
+ARG GIT_BRANCH=develop
+
+RUN if [[ "$ENABLE_GITHUB" == "true" ]]; then rm -rf HELICS && git clone --depth 1 --recurse-submodules --branch $GIT_BRANCH https://github.com/GMLC-TDC/HELICS; fi
+
 RUN mkdir build  && cd build && cmake -DBUILD_HELICS_TESTS=OFF -DENABLE_IPC_CORE=OFF -DBUILD_HELICS_EXAMPLES=OFF -DBUILD_C_SHARED_LIB=OFF \
   -DCMAKE_BUILD_TYPE=Release -DBUILD_RELEASE_ONLY=ON -DCMAKE_INSTALL_PREFIX=/root/develop/helics-install /root/HELICS
 RUN cd build && make -j${MAKE_PARALLEL:-2} install
