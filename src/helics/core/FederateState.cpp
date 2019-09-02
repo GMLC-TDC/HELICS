@@ -900,6 +900,19 @@ message_processing_result FederateState::processActionMessage (ActionMessage &cm
     case CMD_IGNORE:
     default:
         break;
+    case CMD_LOG:
+    {
+        if (cmd.getStringData ().empty ())
+        {
+            logMessage (cmd.messageID, emptyStr, cmd.payload);
+        }
+        else
+        {
+            logMessage (cmd.messageID, cmd.getStringData ()[0], cmd.payload);
+        }
+    }
+
+    break;
     case CMD_TIME_BLOCK:
     case CMD_TIME_UNBLOCK:
     {
@@ -1461,6 +1474,8 @@ void FederateState::setProperty (int intProperty, int propertyVal)
     switch (intProperty)
     {
     case defs::properties::log_level:
+    case defs::properties::file_log_level:
+    case defs::properties::console_log_level:
         logLevel = propertyVal;
         break;
     case defs::properties::rt_lag:
@@ -1625,6 +1640,8 @@ int FederateState::getIntegerProperty (int intProperty) const
     switch (intProperty)
     {
     case defs::properties::log_level:
+    case defs::properties::file_log_level:
+    case defs::properties::console_log_level:
         return logLevel;
     default:
         return timeCoord->getIntegerProperty (intProperty);
@@ -1765,7 +1782,7 @@ std::string FederateState::processQuery (const std::string &query) const
             }
         }
         auto str = s.str ();
-        if (str.back() == ';')
+        if (str.back () == ';')
         {
             str.pop_back ();
         }

@@ -25,11 +25,11 @@ namespace helics
 {
 Logger::Logger () : logCore (LoggerManager::getLoggerCore ())
 {
-    coreIndex = logCore->addFileProcessor ([this] (std::string &&message) { logFunction (std::move (message)); });
+    coreIndex = logCore->addFileProcessor ([this](std::string &&message) { logFunction (std::move (message)); });
 }
 Logger::Logger (std::shared_ptr<LoggingCore> core) : logCore (std::move (core))
 {
-    coreIndex = logCore->addFileProcessor ([this] (std::string &&message) { logFunction (std::move (message)); });
+    coreIndex = logCore->addFileProcessor ([this](std::string &&message) { logFunction (std::move (message)); });
 }
 
 Logger::~Logger () { logCore->haltOperations (coreIndex); }
@@ -41,6 +41,17 @@ void Logger::openFile (const std::string &file)
         outFile.close ();
     }
     outFile.open (file.c_str ());
+    hasFile.store (outFile.is_open ());
+}
+
+void Logger::closeFile ()
+{
+    std::lock_guard<std::mutex> fLock (fileLock);
+    if (outFile.is_open ())
+    {
+        outFile.close ();
+    }
+    hasFile.store (false);
 }
 
 void Logger::startLogging (int cLevel, int fLevel)
@@ -80,24 +91,27 @@ bool Logger::isRunning () const { return (!halted); }
 
 void Logger::logFunction (std::string &&message)
 {
-    std::lock_guard<std::mutex> fLock (fileLock);
-    if (message.size () > 3)
+    if (hasFile.load ())
     {
-        if (message.compare (0, 3, "!!>") == 0)
+        std::lock_guard<std::mutex> fLock (fileLock);
+        if (message.size () > 3)
         {
-            if (message.compare (3, 5, "flush") == 0)
+            if (message.compare (0, 3, "!!>") == 0)
             {
-                if (outFile.is_open ())
+                if (message.compare (3, 5, "flush") == 0)
                 {
-                    outFile.flush ();
+                    if (outFile.is_open ())
+                    {
+                        outFile.flush ();
+                    }
                 }
             }
         }
-    }
 
-    if (outFile.is_open ())
-    {
-        outFile << message << '\n';
+        if (outFile.is_open ())
+        {
+            outFile << message << '\n';
+        }
     }
 }
 
@@ -106,6 +120,9 @@ LoggerNoThread::LoggerNoThread () = default;
 LoggerNoThread::LoggerNoThread (const std::shared_ptr<LoggingCore> & /*core*/) {}
 
 void LoggerNoThread::openFile (const std::string &file) { outFile.open (file.c_str ()); }
+
+void LoggerNoThread::closeFile () { outFile.close (); }
+
 void LoggerNoThread::startLogging (int cLevel, int fLevel)
 {
     consoleLevel = cLevel;

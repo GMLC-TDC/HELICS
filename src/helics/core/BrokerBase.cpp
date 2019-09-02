@@ -48,6 +48,11 @@ BrokerBase::BrokerBase (const std::string &broker_name, bool DisableQueue)
 
 BrokerBase::~BrokerBase ()
 {
+    if (loggingObj)
+    {
+        loggingObj->closeFile ();
+        loggingObj->haltLogging ();
+    }
     if (!queueDisabled)
     {
         try

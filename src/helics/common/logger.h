@@ -41,6 +41,7 @@ class Logger
   private:
     std::atomic<bool> halted{true};  //!< indicator that the Logger was halted
     std::mutex fileLock;  //!< mutex to protect the file itself
+    std::atomic<bool> hasFile{false};  //!< flag indicating the logger has a file
     std::ofstream outFile;  //!< the stream to write the log messages
     std::shared_ptr<LoggingCore> logCore;  //!< pointer to the core operation
     int coreIndex = -1;  //!< index into the core
@@ -56,13 +57,16 @@ class Logger
     /** open a file to write the log messages
     @param file the name of the file to write messages to*/
     void openFile (const std::string &file);
+    /** close the file for logging
+    @param file the name of the file to write messages to*/
+    void closeFile ();
     /** function to start the logging thread
     @param cLevel the console print level
     @param fLevel the file print level  messages coming in below these levels will be printed*/
     void startLogging (int cLevel, int fLevel);
     /** overload of @see startLogging with unspecified logging levels*/
     void startLogging () { startLogging (consoleLevel, fileLevel); }
-    /** stop logging for a time messages received while halted are ignored*/
+    /** stop logging for a time, messages received while halted are ignored*/
     void haltLogging ();
     /** log a message at a particular level
     @param level the level of the message
@@ -103,6 +107,8 @@ class LoggerNoThread
     /** open a file to write the log messages
     @param file the name of the file to write messages to*/
     void openFile (const std::string &file);
+    /** close the file for logging*/
+    void closeFile ();
     /** function to start the logging thread
     @param cLevel the console print level
     @param fLevel the file print level  messages coming in below these levels will be printed*/

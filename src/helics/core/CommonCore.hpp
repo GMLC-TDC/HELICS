@@ -36,7 +36,6 @@ class FederateState;
 
 class BasicHandleInfo;
 class FilterCoordinator;
-class Logger;
 class FilterInfo;
 class TimeoutMonitor;
 enum class handle_type : char;
@@ -250,10 +249,6 @@ class CommonCore : public Core, public BrokerBase
     bool allDisconnected () const;
     /** check if all federates have said good-bye*/
     bool allFedDisconnected () const;
-    virtual bool sendToLogger (global_federate_id federateID,
-                               int logLevel,
-                               const std::string &name,
-                               const std::string &message) const override;
 
   private:
     /** get the federate Information from the federateID*/

@@ -527,7 +527,7 @@ local_federate_id CommonCore::registerFederate (const std::string &name, const C
     // auto ptr = fed.get();
     // if we are using the Logger, log all messages coming from the federates so they can control the level*/
     fed->setLogger ([this](int /*level*/, const std::string &ident, const std::string &message) {
-        sendToLogger (parent_broker_id, -2, ident, message);
+        sendToLogger (parent_broker_id, log_level::error - 2, ident, message);
     });
 
     fed->local_id = local_id;
@@ -1782,46 +1782,26 @@ uint64_t CommonCore::receiveCountAny (local_federate_id federateID)
 
 void CommonCore::logMessage (local_federate_id federateID, int logLevel, const std::string &messageToLog)
 {
+    global_federate_id gid;
     if (federateID == local_core_id)
     {
-        sendToLogger (parent_broker_id, logLevel, getIdentifier (), messageToLog);
-        return;
+        gid = global_id.load ();
     }
-    auto fed = getFederateAt (federateID);
-    if (fed == nullptr)
+    else
     {
-        throw (InvalidIdentifier ("FederateID is not valid (logMessage)"));
+        auto fed = getFederateAt (federateID);
+        if (fed == nullptr)
+        {
+            throw (InvalidIdentifier ("FederateID is not valid (logMessage)"));
+        }
+        gid = fed->global_id;
     }
     ActionMessage m (CMD_LOG);
-
-    m.source_id = fed->global_id.load ();
+    m.source_id = gid;
+    m.dest_id = gid;
     m.messageID = logLevel;
     m.payload = messageToLog;
     actionQueue.push (m);
-    sendToLogger (fed->global_id.load (), logLevel, fed->getIdentifier (), messageToLog);
-}
-
-bool CommonCore::sendToLogger (global_federate_id federateID,
-                               int logLevel,
-                               const std::string &name,
-                               const std::string &message) const
-{
-    if (!BrokerBase::sendToLogger (federateID, logLevel, name, message))
-    {
-        /*
-         * FIXME: the block of logic below should be returning a federate rather than a nullptr when an external
-         * logging call is made, but is not doing so.
-         */
-        auto fed = federateID.isFederate () ?
-                     getFederateAt (static_cast<local_federate_id> (federateID.baseValue ())) :
-                     getFederateAt (local_federate_id (federateID.localIndex ()));
-        if (fed == nullptr)
-        {
-            return false;
-        }
-        fed->logMessage (logLevel, name, message);
-    }
-    return true;
 }
 
 void CommonCore::setLoggingLevel (int logLevel)

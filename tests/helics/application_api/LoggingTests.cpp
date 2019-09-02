@@ -61,6 +61,7 @@ BOOST_AUTO_TEST_CASE (file_logging)
     BOOST_CHECK (ghc::filesystem::exists ("logfile.txt"));
     cr->waitForDisconnect ();
     cr.reset ();
+    helics::cleanupHelicsLibrary ();
     std::error_code ec;
     bool res = ghc::filesystem::remove ("logfile.txt", ec);
     int ii = 0;
@@ -74,7 +75,36 @@ BOOST_AUTO_TEST_CASE (file_logging)
             break;
         }
     }
-    BOOST_CHECK (!res);
+    BOOST_CHECK (res);
 }
 
+BOOST_AUTO_TEST_CASE (check_log_message)
+{
+    helics::FederateInfo fi (CORE_TYPE_TO_TEST);
+    fi.coreInitString = "--autobroker";
+    fi.setProperty (helics::defs::log_level, 5);
+
+    auto Fed = std::make_shared<helics::Federate> ("test1", fi);
+
+    gmlc::libguarded::guarded<std::vector<std::pair<int, std::string>>> mlog;
+    Fed->setLoggingCallback ([&mlog](int level, const std::string &, const std::string &message) {
+        mlog.lock ()->emplace_back (level, message);
+    });
+
+    Fed->enterExecutingMode ();
+    Fed->logMessage ("test MEXAGE");
+    Fed->requestNextStep ();
+    Fed->finalize ();
+
+    auto llock = mlog.lock ();
+    bool found = false;
+    for (auto &m : llock)
+    {
+        if (m.second.find ("MEXAGE") != std::string::npos)
+        {
+            found = true;
+        }
+    }
+    BOOST_CHECK (found);
+}
 BOOST_AUTO_TEST_SUITE_END ()
