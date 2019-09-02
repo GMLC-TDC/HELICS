@@ -185,7 +185,7 @@ int ActionMessage::toByteArray (char *data, int buffer_size) const
     data += sizeof (int32_t);  // 32
     auto bt = actionTime.getBaseTimeCode ();
     std::memcpy (data, &(bt), sizeof (int64_t));
-    data += sizeof (int64_t);
+    data += sizeof (int64_t);  // 40
 
     if (messageAction == CMD_TIME_REQUEST)
     {
@@ -225,6 +225,32 @@ int ActionMessage::toByteArray (char *data, int buffer_size) const
     }
     auto actSize = static_cast<int> (data - dataStart);
     return actSize;
+}
+
+int ActionMessage::serializedByteCount () const
+{
+    // base size= 7 header fields(7*4 bytes)+flags(2 bytes)+counter(2 bytes)+time(8 bytes)+payload size(4
+    // bytes)+1byte for number of strings=45
+    static constexpr int base_size =
+      static_cast<int> (8 * sizeof (uint32_t) + 2 * sizeof (uint16_t) + sizeof (int64_t) + 1);
+
+    int size{base_size};
+    size += static_cast<int> (payload.size ());
+    // for time request add an additional 3*8 bytes
+    if (messageAction == CMD_TIME_REQUEST)
+    {
+        size += static_cast<int> (3 * sizeof (int64_t));
+    }
+    // add additional string data
+    if (!stringData.empty ())
+    {
+        for (auto &str : stringData)
+        {
+            // 4(to store the length)+length of the string
+            size += static_cast<int> (str.size ()) + 4;
+        }
+    }
+    return size;
 }
 
 std::string ActionMessage::to_string () const
