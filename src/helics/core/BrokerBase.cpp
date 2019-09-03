@@ -15,32 +15,20 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "ForwardingTimeCoordinator.hpp"
 #include "flagOperations.hpp"
 #include "gmlc/libguarded/guarded.hpp"
+#include "gmlc/utilities/stringOps.h"
 #include "loggingHelper.hpp"
 #include <asio/steady_timer.hpp>
 #include <iostream>
-#include <random>
 
-static constexpr auto chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
-
-static inline std::string genId (size_t seed)
+static inline std::string genId ()
 {
-    std::string nm = std::string (24, '-');
-    if (seed == 0)
-    {
-        seed = std::chrono::high_resolution_clock::now ().time_since_epoch ().count ();
-        seed += std::hash<std::thread::id>{}(std::this_thread::get_id ());
-    }
-    std::mt19937 rng (
-      static_cast<unsigned int> (seed));  // random-number engine used (Mersenne-Twister in this case)
-    std::uniform_int_distribution<int> uni (0, 61);  // guaranteed unbiased
+    std::string nm = gmlc::utilities::randomString (24);
 
-    for (int ii = 1; ii < 24; ii++)
-    {
-        if ((ii != 6) && (ii != 12) && (ii != 18))
-        {
-            nm[ii] = chars[uni (rng)];
-        }
-    }
+    nm[0] = '-';
+    nm[6] = '-';
+    nm[12] = '-';
+    nm[18] = '-';
+
 #ifdef _WIN32
     std::string pid_str = std::to_string (GetCurrentProcessId ()) + nm;
 #else
@@ -125,7 +113,7 @@ std::shared_ptr<helicsCLI11App> BrokerBase::generateBaseCLI ()
     logging_group->add_option ("--logfile", logFile, "the file to log the messages to")->ignore_underscore ();
     logging_group
       ->add_option_function<int> (
-        "--loglevel,--log-level", [this](int val) { setLogLevel (val); },
+        "--loglevel,--log-level", [this] (int val) { setLogLevel (val); },
         "the level which to log the higher this is set to the more gets logs(-1) for no logging")
       ->transform (CLI::CheckedTransformer (&log_level_map, CLI::ignore_case, CLI::ignore_underscore));
 
@@ -205,12 +193,12 @@ void BrokerBase::configureBase ()
     {
         if (identifier.empty ())
         {
-            identifier = genId (reinterpret_cast<size_t> (this));
+            identifier = genId ();
         }
     }
 
     timeCoord = std::make_unique<ForwardingTimeCoordinator> ();
-    timeCoord->setMessageSender ([this](const ActionMessage &msg) { addActionMessage (msg); });
+    timeCoord->setMessageSender ([this] (const ActionMessage &msg) { addActionMessage (msg); });
 
     loggingObj = std::make_unique<Logger> ();
     if (!logFile.empty ())
@@ -252,7 +240,7 @@ bool BrokerBase::sendToLogger (global_federate_id federateID,
     return false;
 }
 
-void BrokerBase::generateNewIdentifier () { identifier = genId (0); }
+void BrokerBase::generateNewIdentifier () { identifier = genId (); }
 
 void BrokerBase::setErrorState (int eCode, const std::string &estring)
 {
@@ -261,7 +249,8 @@ void BrokerBase::setErrorState (int eCode, const std::string &estring)
     brokerState.store (broker_state_t::errored);
 }
 
-void BrokerBase::setLoggerFunction (std::function<void(int, const std::string &, const std::string &)> logFunction)
+void BrokerBase::setLoggerFunction (
+  std::function<void (int, const std::string &, const std::string &)> logFunction)
 {
     loggerFunction = std::move (logFunction);
     if (loggerFunction)
@@ -391,7 +380,7 @@ void BrokerBase::queueProcessingLoop ()
     asio::steady_timer ticktimer (serv->getBaseContext ());
     activeProtector active (true, false);
 
-    auto timerCallback = [this, &active](const std::error_code &ec) { timerTickHandler (this, active, ec); };
+    auto timerCallback = [this, &active] (const std::error_code &ec) { timerTickHandler (this, active, ec); };
     if (tickTimer > timeZero)
     {
         if (tickTimer < Time (0.5))
@@ -404,7 +393,7 @@ void BrokerBase::queueProcessingLoop ()
     }
     global_broker_id_local = global_id.load ();
     int messagesSinceLastTick = 0;
-    auto logDump = [&, this]() {
+    auto logDump = [&, this] () {
         if (dumplog)
         {
             for (auto &act : dumpMessages)
