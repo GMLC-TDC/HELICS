@@ -184,20 +184,20 @@ int ActionMessage::toByteArray (char *data, int buffer_size) const
     *reinterpret_cast<int32_t *> (data) = sequenceID;
     data += sizeof (int32_t);  // 32
     auto bt = actionTime.getBaseTimeCode ();
-    std::memcpy (data, &(bt), sizeof (int64_t));
-    data += sizeof (int64_t);  // 40
+    std::memcpy (data, &(bt), sizeof (Time::baseType));
+    data += sizeof (Time::baseType);  // 40
 
     if (messageAction == CMD_TIME_REQUEST)
     {
         bt = Te.getBaseTimeCode ();
-        std::memcpy (data, &(bt), sizeof (int64_t));
-        data += sizeof (int64_t);
+        std::memcpy (data, &(bt), sizeof (Time::baseType));
+        data += sizeof (Time::baseType);
         bt = Tdemin.getBaseTimeCode ();
-        std::memcpy (data, &(bt), sizeof (int64_t));
-        data += sizeof (int64_t);
+        std::memcpy (data, &(bt), sizeof (Time::baseType));
+        data += sizeof (Time::baseType);
         bt = Tso.getBaseTimeCode ();
-        std::memcpy (data, &(bt), sizeof (int64_t));
-        data += sizeof (int64_t);
+        std::memcpy (data, &(bt), sizeof (Time::baseType));
+        data += sizeof (Time::baseType);
     }
     if (ssize > 0)
     {
@@ -227,19 +227,19 @@ int ActionMessage::toByteArray (char *data, int buffer_size) const
     return actSize;
 }
 
+// action_message_base_size= 7 header fields(7*4 bytes)+flags(2 bytes)+counter(2 bytes)+time(8 bytes)+payload
+// size(4 bytes)+1 byte for number of strings=45
+static constexpr int action_message_base_size = static_cast<int> (
+  7 * sizeof (uint32_t) + 2 * sizeof (uint16_t) + sizeof (sizeof (Time::baseType)) + sizeof (int32_t) + 1);
+
 int ActionMessage::serializedByteCount () const
 {
-    // base size= 7 header fields(7*4 bytes)+flags(2 bytes)+counter(2 bytes)+time(8 bytes)+payload size(4
-    // bytes)+1byte for number of strings=45
-    static constexpr int base_size =
-      static_cast<int> (8 * sizeof (uint32_t) + 2 * sizeof (uint16_t) + sizeof (int64_t) + 1);
-
-    int size{base_size};
+    int size{action_message_base_size};
     size += static_cast<int> (payload.size ());
     // for time request add an additional 3*8 bytes
     if (messageAction == CMD_TIME_REQUEST)
     {
-        size += static_cast<int> (3 * sizeof (int64_t));
+        size += static_cast<int> (3 * sizeof (sizeof (Time::baseType)));
     }
     // add additional string data
     if (!stringData.empty ())
@@ -247,7 +247,7 @@ int ActionMessage::serializedByteCount () const
         for (auto &str : stringData)
         {
             // 4(to store the length)+length of the string
-            size += static_cast<int> (str.size ()) + 4;
+            size += static_cast<int> (sizeof (uint32_t) + str.size ());
         }
     }
     return size;
@@ -276,7 +276,7 @@ std::string ActionMessage::packetize () const
 void ActionMessage::packetize (std::string &data) const
 {
     auto sz = serializedByteCount ();
-    data.resize (static_cast<size_t> (sz) + 4);
+    data.resize (sizeof (uint32_t) + static_cast<size_t> (sz));
     toByteArray (&(data[4]), sz);
 
     data[0] = LEADING_CHAR;
@@ -323,7 +323,7 @@ inline void swap_bytes (std::uint8_t *data)
 
 int ActionMessage::fromByteArray (const char *data, int buffer_size)
 {
-    int tsize = 45;
+    int tsize{action_message_base_size};
     static const uint8_t littleEndian = isLittleEndian ();
     if (buffer_size < tsize)
     {
@@ -352,7 +352,7 @@ int ActionMessage::fromByteArray (const char *data, int buffer_size)
     // messageAction = *reinterpret_cast<const action_message_def::action_t *> (data);
     if (swap)
     {
-        swap_bytes<4> (reinterpret_cast<std::uint8_t *> (&messageAction));
+        swap_bytes<sizeof (action_message_def::action_t)> (reinterpret_cast<std::uint8_t *> (&messageAction));
     }
     data += sizeof (action_message_def::action_t);
     // messageID = *reinterpret_cast<const int32_t *> (data);
@@ -379,28 +379,28 @@ int ActionMessage::fromByteArray (const char *data, int buffer_size)
     // sequenceID = *reinterpret_cast<const uint32_t *> (data);
     memcpy (&sequenceID, data, sizeof (uint32_t));
     data += sizeof (uint32_t);
-    int64_t btc;
-    memcpy (&btc, data, sizeof (int64_t));
+    Time::baseType btc;
+    memcpy (&btc, data, sizeof (Time::baseType));
     actionTime.setBaseTimeCode (btc);
-    data += sizeof (int64_t);
+    data += sizeof (Time::baseType);
 
     if (messageAction == CMD_TIME_REQUEST)
     {
-        tsize += 24;
+        tsize += static_cast<int> (3 * sizeof (Time::baseType));
         if (buffer_size < tsize)
         {
             messageAction = CMD_INVALID;
             return (0);
         }
-        memcpy (&btc, data, sizeof (int64_t));
+        memcpy (&btc, data, sizeof (Time::baseType));
         Te.setBaseTimeCode (btc);
-        data += sizeof (int64_t);
-        memcpy (&btc, data, sizeof (int64_t));
+        data += sizeof (Time::baseType);
+        memcpy (&btc, data, sizeof (Time::baseType));
         Tdemin.setBaseTimeCode (btc);
-        data += sizeof (int64_t);
-        memcpy (&btc, data, sizeof (int64_t));
+        data += sizeof (Time::baseType);
+        memcpy (&btc, data, sizeof (Time::baseType));
         Tso.setBaseTimeCode (btc);
-        data += sizeof (int64_t);
+        data += sizeof (Time::baseType);
     }
     else
     {
@@ -429,7 +429,7 @@ int ActionMessage::fromByteArray (const char *data, int buffer_size)
         {
             uint32_t ssize;
             memcpy (&ssize, data, sizeof (uint32_t));
-            data += 4;
+            data += sizeof (uint32_t);
             if (swap)
             {
                 swap_bytes<4> (reinterpret_cast<std::uint8_t *> (&ssize));
@@ -459,18 +459,18 @@ int ActionMessage::fromByteArray (const char *data, int buffer_size)
         swap_bytes<2> (reinterpret_cast<std::uint8_t *> (&counter));
         swap_bytes<2> (reinterpret_cast<std::uint8_t *> (&flags));
         auto timecode = actionTime.getBaseTimeCode ();
-        swap_bytes<8> (reinterpret_cast<std::uint8_t *> (&timecode));
+        swap_bytes<sizeof (Time::baseType)> (reinterpret_cast<std::uint8_t *> (&timecode));
         actionTime.setBaseTimeCode (timecode);
         if (messageAction == CMD_TIME_REQUEST)
         {
             timecode = Te.getBaseTimeCode ();
-            swap_bytes<8> (reinterpret_cast<std::uint8_t *> (&timecode));
+            swap_bytes<sizeof (Time::baseType)> (reinterpret_cast<std::uint8_t *> (&timecode));
             Te.setBaseTimeCode (timecode);
             timecode = Tdemin.getBaseTimeCode ();
-            swap_bytes<8> (reinterpret_cast<std::uint8_t *> (&timecode));
+            swap_bytes<sizeof (Time::baseType)> (reinterpret_cast<std::uint8_t *> (&timecode));
             Tdemin.setBaseTimeCode (timecode);
             timecode = Tso.getBaseTimeCode ();
-            swap_bytes<8> (reinterpret_cast<std::uint8_t *> (&timecode));
+            swap_bytes<sizeof (Time::baseType)> (reinterpret_cast<std::uint8_t *> (&timecode));
             Tso.setBaseTimeCode (timecode);
         }
     }
@@ -691,7 +691,7 @@ static constexpr size_t actEnd = sizeof (actionStrings) / sizeof (actionPair);
 const char *actionMessageType (action_message_def::action_t action)
 {
     auto pptr = static_cast<const actionPair *> (actionStrings);
-    auto res = std::find_if (pptr, pptr + actEnd, [action](const auto &pt) { return (pt.first == action); });
+    auto res = std::find_if (pptr, pptr + actEnd, [action] (const auto &pt) { return (pt.first == action); });
     if (res != pptr + actEnd)
     {
         return res->second;
@@ -716,7 +716,8 @@ static constexpr size_t errEnd = sizeof (errorStrings) / sizeof (errorPair);
 const char *commandErrorString (int errorcode)
 {
     auto pptr = static_cast<const errorPair *> (errorStrings);
-    auto res = std::find_if (pptr, pptr + errEnd, [errorcode](const auto &pt) { return (pt.first == errorcode); });
+    auto res =
+      std::find_if (pptr, pptr + errEnd, [errorcode] (const auto &pt) { return (pt.first == errorcode); });
     if (res != pptr + errEnd)
     {
         return res->second;
