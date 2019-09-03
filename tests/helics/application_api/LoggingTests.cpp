@@ -19,7 +19,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <boost/test/data/test_case.hpp>
 #include <boost/test/tools/floating_point_comparison.hpp>
 
-/** these test cases test out the value converters
+/** these test cases test out user-directed logging functionality
  */
 
 #define CORE_TYPE_TO_TEST helics::core_type::TEST
@@ -107,4 +107,77 @@ BOOST_AUTO_TEST_CASE (check_log_message)
     }
     BOOST_CHECK (found);
 }
+
+BOOST_AUTO_TEST_CASE (check_log_message_levels)
+{
+    helics::FederateInfo fi (CORE_TYPE_TO_TEST);
+    fi.coreInitString = "--autobroker";
+    fi.setProperty (helics::defs::log_level, 5);
+
+    auto Fed = std::make_shared<helics::Federate> ("test1", fi);
+
+    gmlc::libguarded::guarded<std::vector<std::pair<int, std::string>>> mlog;
+    Fed->setLoggingCallback ([&mlog](int level, const std::string &, const std::string &message) {
+      mlog.lock ()->emplace_back (level, message);
+    });
+
+    Fed->enterExecutingMode ();
+    Fed->logMessage (3, "test MEXAGE1");
+    Fed->logMessage (8, "test MEXAGE2");
+    Fed->requestNextStep ();
+    Fed->finalize ();
+
+    auto llock = mlog.lock ();
+    bool found_low = false;
+    bool found_high = false;
+    for (auto &m : llock)
+    {
+        if (m.second.find ("MEXAGE1") != std::string::npos)
+        {
+            found_low = true;
+        }
+        if (m.second.find ("MEXAGE2") != std::string::npos)
+        {
+            found_high = true;
+        }
+    }
+    BOOST_CHECK (found_low && !found_high);
+}
+
+BOOST_AUTO_TEST_CASE (check_log_message_levels_high)
+{
+    helics::FederateInfo fi (CORE_TYPE_TO_TEST);
+    fi.coreInitString = "--autobroker";
+    fi.setProperty (helics::defs::log_level, 9);
+
+    auto Fed = std::make_shared<helics::Federate> ("test1", fi);
+
+    gmlc::libguarded::guarded<std::vector<std::pair<int, std::string>>> mlog;
+    Fed->setLoggingCallback ([&mlog](int level, const std::string &, const std::string &message) {
+      mlog.lock ()->emplace_back (level, message);
+    });
+
+    Fed->enterExecutingMode ();
+    Fed->logMessage (3, "test MEXAGE1");
+    Fed->logMessage (8, "test MEXAGE2");
+    Fed->requestNextStep ();
+    Fed->finalize ();
+
+    auto llock = mlog.lock ();
+    bool found_low = false;
+    bool found_high = false;
+    for (auto &m : llock)
+    {
+        if (m.second.find ("MEXAGE1") != std::string::npos)
+        {
+            found_low = true;
+        }
+        if (m.second.find ("MEXAGE2") != std::string::npos)
+        {
+            found_high = true;
+        }
+    }
+    BOOST_CHECK (found_low && found_high);
+}
+
 BOOST_AUTO_TEST_SUITE_END ()
