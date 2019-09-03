@@ -229,8 +229,8 @@ int ActionMessage::toByteArray (char *data, int buffer_size) const
 
 // action_message_base_size= 7 header fields(7*4 bytes)+flags(2 bytes)+counter(2 bytes)+time(8 bytes)+payload
 // size(4 bytes)+1 byte for number of strings=45
-static constexpr int action_message_base_size = static_cast<int> (
-  7 * sizeof (uint32_t) + 2 * sizeof (uint16_t) + sizeof (sizeof (Time::baseType)) + sizeof (int32_t) + 1);
+static constexpr int action_message_base_size = static_cast<int> (7 * sizeof (uint32_t) + 2 * sizeof (uint16_t) +
+                                                                  sizeof (Time::baseType) + sizeof (int32_t) + 1);
 
 int ActionMessage::serializedByteCount () const
 {
@@ -239,7 +239,7 @@ int ActionMessage::serializedByteCount () const
     // for time request add an additional 3*8 bytes
     if (messageAction == CMD_TIME_REQUEST)
     {
-        size += static_cast<int> (3 * sizeof (sizeof (Time::baseType)));
+        size += static_cast<int> (3 * sizeof (Time::baseType));
     }
     // add additional string data
     if (!stringData.empty ())
