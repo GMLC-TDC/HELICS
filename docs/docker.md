@@ -35,10 +35,16 @@ Build a new docker image
 docker build -t clang-test -f config/Docker/Dockerfile-MSan .
 ```
 
-The HELICS and sanitizer docker images will accept a MAKE_PARALLEL build argument that can be used to set how many threads make uses. On machines with low memory such as those used by CI services, setting this too high can result in out of memory compiler errors.
+The HELICS and sanitizer Dockerfiles will accept a MAKE_PARALLEL build argument that can be used to set how many threads make uses. On machines with low memory such as those used by CI services, setting this too high can result in out of memory compiler errors.
 
 ```bash
 docker build -t clang-test -f config/Docker/Dockerfile-MSan --build-arg MAKE_PARALLEL=12 .
+```
+
+In addition to this, the HELICS Dockerfile for the HELICS apps currently accepts an ENABLE_GITHUB argument (defaults to false) that when set to true will replace the copied current source directory with a copy of the HELICS source code checked out from GitHub. Due Docker not allowing conditional copy commands, it is recommended to run the docker build from a relatively empty working directory. It will also take a GIT_BRANCH argument (defaults to develop) that can be used to control which GitHub branch or tagged version gets checked out.
+
+```bash
+docker build -t helics-apps-test -f config/Docker/Dockerfile-HELICS --build-arg ENABLE_GITHUB=true --build-arg GIT_BRANCH=v2.2.0 .
 ```
 
 Working with dockerhub
