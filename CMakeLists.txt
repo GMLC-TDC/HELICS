@@ -87,6 +87,12 @@ if (MSYS OR CYGWIN OR UNIX OR APPLE)
 	set(UNIX_LIKE TRUE)
 endif()
 
+#  allow BOOST library inclusion to be turned off completely to be turned off completely
+option(DISABLE_BOOST OFF "disable all references to the Boost C++ libraries")
+
+mark_as_advanced(DISABLE_BOOST)
+
+
 if (HELICS_ROOT_PROJ)
 if (DEFINED BUILD_TESTING)
 option(BUILD_HELICS_TESTS "Enable the test executables to be built" ${BUILD_TESTING})
@@ -94,15 +100,20 @@ else()
 option(BUILD_HELICS_TESTS "Enable the test executables to be built" ON)
 endif()
 
-if (MINGW AND NOT UNIX_LIKE)
-option(BUILD_HELICS_BOOST_TESTS "Enable the test executables built using boost unit tests" OFF)
+if (NOT DISABLE_BOOST)
+	if (MINGW AND NOT UNIX_LIKE)
+		option(BUILD_HELICS_BOOST_TESTS "Enable the test executables built using boost unit tests" OFF)
+	else()
+		option(BUILD_HELICS_BOOST_TESTS "Enable the test executables built using boost unit tests" ON)
+	endif()
+	mark_as_advanced(BUILD_HELICS_BOOST_TESTS)
 else()
-option(BUILD_HELICS_BOOST_TESTS "Enable the test executables built using boost unit tests" ON)
+	set(BUILD_HELICS_BOOST_TESTS OFF)
 endif()
 
 option(BUILD_HELICS_EXAMPLES "Enable the example executables to be built" ON)
 
-mark_as_advanced(BUILD_HELICS_BOOST_TESTS)
+
 
 else()
 endif()
@@ -130,6 +141,8 @@ option(
     "turn off building of the C shared interface"
 )
 mark_as_advanced(DISABLE_C_SHARED_LIB)
+
+
 
 option(BUILD_SHARED_LIBS "install shared libraries for the CXX interface" OFF)
 
@@ -190,8 +203,6 @@ if (HELICS_ROOT_PROJ)
 	endif(CXX_STANDARD_FLAG)
 
 endif()
-
- target_compile_options(helics_base_includes INTERFACE -DENABLE_BOOST_IOSTREAMS)
 
  if (HELICS_ROOT_PROJ)
 cmake_dependent_option(
@@ -291,9 +302,6 @@ if(GENERATE_DOXYGEN_DOC)
     endif(DOXYGEN_FOUND)
 endif(GENERATE_DOXYGEN_DOC)
 
-# if(MINGW) add_definitions(-DBOOST_USE_WINDOWS_H)
-# add_definitions(-DWIN32_LEAN_AND_MEAN) endif()
-
 # -------------------------------------------------------------
 # Update git submodules
 # -------------------------------------------------------------
@@ -331,14 +339,17 @@ include(GNUInstallDirs)
 # -------------------------------------------------------------
 # BOOST  find the boost libraries
 # -------------------------------------------------------------
-include(addBoost)
+
+if (NOT DISABLE_BOOST)
+	include(addBoost)
+endif()
 
 
 option(ENABLE_MPI_CORE "Enable MPI networking library" OFF)
 option(ENABLE_ZMQ_CORE "Enable ZeroMQ networking library" ON)
 option(ENABLE_TCP_CORE "Enable TCP core types" ON)
 option(ENABLE_UDP_CORE "Enable UDP core types" ON)
-option(ENABLE_IPC_CORE "Enable Interprocess communication types" ON)
+cmake_dependent_option(ENABLE_IPC_CORE "Enable Interprocess communication types" ON "NOT DISABLE_BOOST" OFF)
 option(ENABLE_TEST_CORE "Enable test inprocess core type" ON)
 mark_as_advanced(ENABLE_MPI_CORE ENABLE_ZMQ_CORE ENABLE_TCP_CORE ENABLE_UDP_CORE ENABLE_TEST_CORE ENABLE_IPC_CORE)
 
@@ -380,7 +391,6 @@ if(MSYS OR CYGWIN)
     target_link_libraries(helics_base INTERFACE wsock32 ws2_32 Iphlpapi)
 	if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
         set(ENABLE_IPC_CORE FALSE)
-		target_compile_definitions(helics_base_includes INTERFACE -DDISABLE_BOOST_IOSTREAMS)
     endif()
 endif()
 
@@ -449,8 +459,15 @@ target_include_directories(
     helics_base_includes SYSTEM
     INTERFACE
         $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/ThirdParty>
+)
+
+if (NOT DISABLE_BOOST)
+target_include_directories(
+    helics_base_includes SYSTEM
+    INTERFACE
         $<BUILD_INTERFACE:${Boost_INCLUDE_DIR}>
 )
+endif()
 
 # -------------------------------------------------------------
 # Asio include directories
@@ -620,14 +637,18 @@ if (GMLC_UTILITIES_OBJECT_LIB)
     )
    endif()
    set_target_properties(gmlc_utilities_obj PROPERTIES FOLDER Extern)
-   message(STATUS "Boost include=${Boost_INCLUDE_DIRS}")
-	target_include_directories(gmlc_utilities_obj SYSTEM PRIVATE $<BUILD_INTERFACE:${Boost_INCLUDE_DIRS}>)
+   if (NOT DISABLE_BOOST)
+		message(STATUS "Boost include=${Boost_INCLUDE_DIRS}")
+		target_include_directories(gmlc_utilities_obj SYSTEM PRIVATE $<BUILD_INTERFACE:${Boost_INCLUDE_DIRS}>)
+	endif()
 
 else()
    add_library(HELICS::utilities ALIAS gmlc_utilities)
    set_target_properties(gmlc_utilities PROPERTIES FOLDER Extern)
-   message(STATUS "Boost include=${Boost_INCLUDE_DIRS}")
-target_include_directories(gmlc_utilities SYSTEM PRIVATE $<BUILD_INTERFACE:${Boost_INCLUDE_DIRS}>)
+   if (NOT DISABLE_BOOST)
+		message(STATUS "Boost include=${Boost_INCLUDE_DIRS}")
+		target_include_directories(gmlc_utilities SYSTEM PRIVATE $<BUILD_INTERFACE:${Boost_INCLUDE_DIRS}>)
+	endif()
 
 endif()
 
