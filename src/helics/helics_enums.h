@@ -182,7 +182,7 @@ extern "C"
         /** integer property controlling the log level for file logging in a federate see \ref helics_log_levels*/
         helics_property_int_file_log_level = 272,
         /** integer property controlling the log level for file logging in a federate see \ref helics_log_levels*/
-        helics_property_int_console_log_level = 274,
+        helics_property_int_console_log_level = 274
     } helics_properties;
 
     /** enumeration of options that apply to handles*/
