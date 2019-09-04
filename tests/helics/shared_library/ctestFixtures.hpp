@@ -6,9 +6,7 @@ SPDX-License-Identifier: BSD-3-Clause
 */
 
 #include <vector>
-#include <boost/test/unit_test.hpp>
-#include <boost/test/data/test_case.hpp>
-#include <boost/test/floating_point_comparison.hpp>
+#include <string>
 
 #include "../coreTypeLists.hpp"
 #include "helics/chelics.h"
@@ -21,7 +19,7 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #define HELICS_SIZE_MAX 512
 
-typedef helics_federate (*FedCreator) (char const *, helics_federate_info, helics_error *);
+typedef helics_federate (*FedCreator) (const char *, helics_federate_info, helics_error *);
 
 struct FederateTestFixture
 {
@@ -37,7 +35,7 @@ struct FederateTestFixture
                     helics_time time_delta = helics_time_zero,
                     const std::string &name_prefix = "fed");
 
-    std::vector<helics_federate> AddFederates (FedCreator ctor,
+    void AddFederates (FedCreator ctor,
                                                std::string core_type_name,
                                                int count,
                                                helics_broker broker,

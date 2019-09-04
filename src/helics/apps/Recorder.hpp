@@ -49,7 +49,7 @@ class Recorder : public App
     /** move construction*/
     Recorder (Recorder &&other_recorder) = default;
     /** move assignment*/
-    Recorder &operator= (Recorder &&record) = default;
+    Recorder &operator= (Recorder &&other_recorder) = default;
     /** destructor*/
     ~Recorder ();
     /** run the Player until the specified time*/

@@ -6,7 +6,7 @@ SPDX-License-Identifier: BSD-3-Clause
 */
 #include "HandleManager.hpp"
 #include "ActionMessage.hpp"
-// TODO move the flags out of actionMessage
+// TODO PT move the flags out of actionMessage
 
 namespace helics
 {
@@ -93,7 +93,7 @@ void HandleManager::addHandleAtIndex (const BasicHandleInfo &otherHandle, int32_
     }
     else if (index > 0)
     {
-        handles.resize (static_cast<size_t>(index) + 1);
+        handles.resize (static_cast<size_t> (index) + 1);
         // use placement new to reconstruct new object
         new (&handles[index]) BasicHandleInfo (otherHandle);
         addSearchFields (handles[index], index);

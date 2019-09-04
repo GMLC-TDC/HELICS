@@ -53,7 +53,7 @@ struct FederateTestFixture
     }
 
     template <class FedType>
-    std::vector<std::shared_ptr<FedType>> AddFederates (std::string core_type_name,
+    void AddFederates (std::string core_type_name,
                                                         int count,
                                                         std::shared_ptr<helics::Broker> broker,
                                                         helics::Time time_delta = helics::timeZero,
@@ -82,8 +82,6 @@ struct FederateTestFixture
             fi.setProperty (helics_property_time_delta, time_delta);
         }
 
-        std::vector<std::shared_ptr<FedType>> federates_added;
-
         switch (setup)
         {
         case 1:
@@ -104,7 +102,6 @@ struct FederateTestFixture
                 auto fedname = name_prefix + std::to_string (ii + offset);
                 auto fed = std::make_shared<FedType> (fedname, fi);
                 federates[ii + offset] = fed;
-                federates_added.push_back (fed);
             }
         }
         break;
@@ -125,7 +122,6 @@ struct FederateTestFixture
                 auto fedname = name_prefix + std::to_string (ii + offset);
                 auto fed = std::make_shared<FedType> (fedname, fi);
                 federates[ii + offset] = fed;
-                federates_added.push_back (fed);
             }
         }
         break;
@@ -179,13 +175,11 @@ struct FederateTestFixture
                 auto fedname = name_prefix + std::to_string (ii + offset);
                 auto fed = std::make_shared<FedType> (fedname, fi);
                 federates[ii + offset] = fed;
-                federates_added.push_back (fed);
                 if (ii + 1 < count)
                 {
                     auto fedname2 = name_prefix + std::to_string (ii + offset + 1);
                     auto fed2 = std::make_shared<FedType> (fedname2, fi);
                     federates[ii + offset + 1] = fed2;
-                    federates_added.push_back (fed2);
                 }
             }
         }
@@ -225,8 +219,6 @@ struct FederateTestFixture
         }
         break;
         }
-
-        return federates_added;
     }
 
     template <class FedType>

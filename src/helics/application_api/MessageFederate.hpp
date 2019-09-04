@@ -47,7 +47,7 @@ class MessageFederate : public virtual Federate  // using virtual inheritance to
     // copy constructor and copy assignment are disabled
   public:
     /** destructor */
-    ~MessageFederate ();
+    virtual ~MessageFederate ();
     /** move assignment*/
     MessageFederate &operator= (MessageFederate &&mFed) noexcept;
 

@@ -60,7 +60,7 @@ void BrokerServer::startServers ()
 #ifdef ENABLE_ZMQ_CORE
     if (zmq_server)
     {
-        serverloops_.emplace_back ([this] () { startZMQserver (); });
+        serverloops_.emplace_back ([this]() { startZMQserver (); });
     }
     if (zmq_ss_server)
     {
@@ -126,7 +126,7 @@ findBroker (const ActionMessage &rx, core_type ctype, int startPort)
     std::string brkinit;
     bool newbrk{false};
     auto &strs = rx.getStringData ();
-    if (strs.size () > 0)
+    if (!strs.empty ())
     {
         brkname = strs[0];
     }
@@ -162,7 +162,7 @@ findBroker (const ActionMessage &rx, core_type ctype, int startPort)
     return {brk, newbrk};
 }
 
-static ActionMessage generateReply (const ActionMessage &, std::shared_ptr<Broker> &brk)
+static ActionMessage generateReply (const ActionMessage & /*cmd*/, std::shared_ptr<Broker> &brk)
 {
     ActionMessage rep (CMD_PROTOCOL);
     rep.messageID = NEW_BROKER_INFORMATION;

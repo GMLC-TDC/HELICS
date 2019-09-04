@@ -39,7 +39,7 @@ int main (int argc, char *argv[])
     helics::FederateInfo fi;
     if (ret == helics::helicsCLI11App::parse_output::help_call)
     {
-        fi.loadInfoFromArgs ("--help");
+        (void)(fi.loadInfoFromArgs ("--help"));
         return 0;
     }
     else if (ret != helics::helicsCLI11App::parse_output::ok)

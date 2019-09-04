@@ -406,14 +406,6 @@ endif(CYGWIN)
 # Enable ZeroMQ
 # -------------------------------------------------------------
 
-# just check some internal options
-if(BUILD_DEBUG_ONLY AND BUILD_RELEASE_ONLY)
-    message(
-        fatal
-        "BOTH BUILD_DEBUG_ONLY AND BUILD_RELEASE_ONLY cannot be specified together otherwise nothing works"
-    )
-endif()
-
 option(ENABLE_ZMQ_CORE "Enable ZeroMQ networking library" ON)
 mark_as_advanced(ENABLE_ZMQ_CORE)
 # If ZeroMQ library is enabled try to locate it and link against it

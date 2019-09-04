@@ -38,7 +38,8 @@ int main (int argc, char *argv[])
       .footer ("helics_broker <broker args ..> starts a broker with the given args and waits for it to "
                "complete\n")
       ->footer ([] () {
-          helics::apps::BrokerApp{"-?"};
+          helics::apps::BrokerApp app{"-?"};
+          (void)(app);
           return std::string{};
       });
     cmdLine.allow_extras ();

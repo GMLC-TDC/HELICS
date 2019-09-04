@@ -30,7 +30,7 @@ class ZmqCommsSS final : public NetworkCommsInterface
     /** default constructor*/
     ZmqCommsSS () noexcept;
     /** destructor*/
-    ~ZmqCommsSS ();
+    ~ZmqCommsSS () final;
     /** load network information into the comms object*/
     virtual void loadNetworkInfo (const NetworkBrokerData &netInfo) override;
     /** set the port numbers for the local ports*/
