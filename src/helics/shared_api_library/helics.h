@@ -564,7 +564,7 @@ extern "C"
 
     /** request the next time for federate execution
     @param fed the federate to make the request of
-    @param requestTime the next requested time
+    @param timeDelta the requested amount of time to advance
     @param[in,out] err an error object that will contain an error code and string if any error occurred during the execution of the function
     @return the time granted to the federate, will return helics_time_maxtime if the simulation has terminated
     invalid*/
