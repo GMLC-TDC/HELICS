@@ -155,24 +155,8 @@ class ActionMessage
 
     // functions that convert to and from a byte stream
 
-    int serializedByteCount () const
-    {
-        int size = 45;
-        size += static_cast<int> (payload.size ());
-        if (messageAction == CMD_TIME_REQUEST)
-        {
-            size += 24;
-        }
-        if (!stringData.empty ())
-        {
-            for (auto &str : stringData)
-            {
-                // 4(to store the length)+length of the string
-                size += static_cast<int> (str.size ()) + 4;
-            }
-        }
-        return size;
-    }
+    /** generate a size of the message in bytes if it were to be serialized*/
+    int serializedByteCount () const;
     /** convert a command to a raw data bytes
     @param[out] data pointer to memory to store the command
     @param buffer_size  the size of the buffer

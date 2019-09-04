@@ -38,10 +38,11 @@ class local_federate_id
     bool operator< (local_federate_id id) const noexcept { return (fid < id.fid); };
     /** check if the operator is valid
     @details valid operators have been set to something other than the default value*/
-    bool isValid () const { return (fid != -2'000'000'000); }
+    bool isValid () const { return (fid != invalid_fid); }
 
   private:
-    base_type fid = -2'000'000'000;  //!< the underlying index value
+    static constexpr base_type invalid_fid = -2'000'000'000;  //!< defined invalid handle
+    base_type fid{invalid_fid};  //!< the underlying index value
 };
 
 /** stream operator for a federate_id
@@ -70,10 +71,11 @@ class interface_handle
     /** comparison operator for sorting*/
     bool operator< (interface_handle id) const noexcept { return (hid < id.hid); };
     bool operator> (interface_handle id) const noexcept { return (hid > id.hid); };
-    bool isValid () const { return (hid != -1'700'000'000); }
+    bool isValid () const { return (hid != invalid_handle); }
 
   private:
-    base_type hid = -1'700'000'000;  //!< the underlying index value
+    static constexpr base_type invalid_handle{-1'700'000'000};
+    base_type hid{invalid_handle};  //!< the underlying index value
 };
 
 /** stream operator for a federate_id
@@ -193,7 +195,7 @@ class global_handle
     @details for use in maps and other things*/
     explicit operator uint64_t () const
     {
-        auto key = static_cast<uint64_t> (fed_id.baseValue ()) << 32u;
+        auto key = static_cast<uint64_t> (fed_id.baseValue ()) << 32U;
         key += static_cast<uint64_t> (handle.baseValue ()) & (0x0000'0000'FFFF'FFFF);
         return key;
     }

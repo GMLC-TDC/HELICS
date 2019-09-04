@@ -56,7 +56,7 @@ class Echo : public App
     /** move construction*/
     Echo (Echo &&other_echo) noexcept;
     /** move assignment*/
-    Echo &operator= (Echo &&fed) noexcept;
+    Echo &operator= (Echo &&other_echo) noexcept;
 
     /** run the Echo federate until the specified time
     @param stopTime_input the desired stop time

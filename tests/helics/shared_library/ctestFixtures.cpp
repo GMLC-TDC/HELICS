@@ -142,7 +142,7 @@ void FederateTestFixture::SetupTest (FedCreator ctor,
     AddFederates (ctor, core_type_name, count, broker, time_delta, name_prefix);
 }
 
-std::vector<helics_federate> FederateTestFixture::AddFederates (FedCreator ctor,
+void FederateTestFixture::AddFederates (FedCreator ctor,
                                                                 std::string core_type_name,
                                                                 int count,
                                                                 helics_broker broker,
@@ -172,8 +172,6 @@ std::vector<helics_federate> FederateTestFixture::AddFederates (FedCreator ctor,
     CE (helicsFederateInfoSetCoreTypeFromString (fi, core_type_name.c_str (), &err));
     CE (helicsFederateInfoSetTimeProperty (fi, helics_property_time_delta, time_delta, &err));
 
-    std::vector<helics_federate> federates_added;
-
     switch (setup)
     {
     case 1:
@@ -191,7 +189,6 @@ std::vector<helics_federate> FederateTestFixture::AddFederates (FedCreator ctor,
             auto fed = ctor (name.c_str (), fi, &err);
             BOOST_CHECK_EQUAL (err.error_code, 0);
             federates[ii + offset] = fed;
-            federates_added.push_back (fed);
         }
         helicsCoreFree (core);
     }
@@ -211,7 +208,6 @@ std::vector<helics_federate> FederateTestFixture::AddFederates (FedCreator ctor,
             auto fed = ctor (name.c_str (), fi, &err);
             BOOST_CHECK_EQUAL (err.error_code, 0);
             federates[ii + offset] = fed;
-            federates_added.push_back (fed);
             helicsCoreFree (core);
         }
     }
@@ -242,7 +238,6 @@ std::vector<helics_federate> FederateTestFixture::AddFederates (FedCreator ctor,
     break;
     }
     helicsFederateInfoFree (fi);
-    return federates_added;
 }
 
 helics_federate FederateTestFixture::GetFederateAt (int index)

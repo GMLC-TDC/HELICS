@@ -1679,7 +1679,8 @@ void CommonCore::deliverMessage (ActionMessage &message)
                         {
                             if (FiltI->filterOp != nullptr)
                             {
-                                FiltI->filterOp->process (createMessageFromCommand (message));
+								//this is a cloning filter the whole point is that it would not modify the message so the return is irrelevent
+                                (void)(FiltI->filterOp->process (createMessageFromCommand (message)));
                             }
                         }
                     }
@@ -4074,7 +4075,8 @@ ActionMessage &CommonCore::processMessage (ActionMessage &m)
                 {
                     if (filt->cloning)
                     {
-                        filt->filterOp->process (createMessageFromCommand (m));
+						//cloning filter the return is not useful
+                        (void)(filt->filterOp->process (createMessageFromCommand (m)));
                     }
                     else
                     {
@@ -4163,7 +4165,7 @@ void CommonCore::processDestFilterReturn (ActionMessage &command)
                     {
                         if (FiltI->cloning)
                         {
-                            FiltI->filterOp->process (createMessageFromCommand (command));
+                            (void)(FiltI->filterOp->process (createMessageFromCommand (command)));
                         }
                     }
                 }
@@ -4287,7 +4289,7 @@ void CommonCore::processMessageFilter (ActionMessage &cmd)
             {
                 if (FiltI->cloning)
                 {
-                    FiltI->filterOp->process (createMessageFromCommand (std::move (cmd)));
+                    (void)(FiltI->filterOp->process (createMessageFromCommand (std::move (cmd))));
                 }
                 else
                 {
