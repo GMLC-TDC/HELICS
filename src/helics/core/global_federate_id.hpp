@@ -41,12 +41,13 @@ class global_broker_id
 
     bool isFederate () const { return ((gid >= global_federate_id_shift) && (gid < global_broker_id_shift)); }
     bool isBroker () const { return (gid >= global_broker_id_shift); }
-    bool isValid () const { return (gid != -2'010'000'000); }
+    bool isValid () const { return (gid != invalid_global_broker_id); }
     base_type localIndex () const { return gid - global_broker_id_shift; }
 
   private:
-    base_type gid = -2'010'000'000;  //!< the underlying index value
+    base_type gid = invalid_global_broker_id;  //!< the underlying index value
     friend class global_federate_id;  // for allowing comparison operators to work well
+    static constexpr base_type invalid_global_broker_id{-2'010'000'000};
 };
 
 /** constant to use for indicating that a command is for the core itself from the Core Public API*/
@@ -91,13 +92,14 @@ class global_federate_id
     /** return true if the broker_id is a valid broker id code*/
     bool isBroker () const { return (gid >= global_broker_id_shift); }
     /** return true if the broker_id is a valid broker id code*/
-    bool isValid () const { return (gid != -2'010'000'000); }
+    bool isValid () const { return (gid != invalid_global_fed_id); }
     /** generate a local offset index
     @details the global_id is shifted by a certain amount*/
     constexpr base_type localIndex () const { return gid - global_federate_id_shift; }
 
   private:
-    base_type gid = -2'010'000'000;  //!< the underlying index value
+    base_type gid = invalid_global_fed_id;  //!< the underlying index value
+    static constexpr base_type invalid_global_fed_id{-2'010'000'000};
 };
 
 /** stream operator for a federate_id
@@ -118,7 +120,7 @@ class global_handle
     @details for use in maps and other things*/
     explicit operator uint64_t () const
     {
-        auto key = static_cast<uint64_t> (fed_id.baseValue ()) << 32u;
+        auto key = static_cast<uint64_t> (fed_id.baseValue ()) << 32U;
         key += static_cast<uint64_t> (handle.baseValue ()) & (0x0000'0000'FFFF'FFFF);
         return key;
     }
@@ -157,10 +159,11 @@ class route_id
     /** less than operator for sorting*/
     bool operator< (route_id id) const noexcept { return (rid < id.rid); };
     /** check if the route is valid*/
-    bool isValid () const { return (rid != -1'295'148'000); }
+    bool isValid () const { return (rid != invalid_route_id); }
 
   private:
-    base_type rid = -1'295'148'000;  //!< the underlying index value
+    base_type rid = invalid_route_id;  //!< the underlying index value
+    static constexpr base_type invalid_route_id{-1'295'148'000};
 };
 
 constexpr route_id parent_route_id (0);
