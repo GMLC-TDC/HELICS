@@ -7,12 +7,12 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include "helicsTypes.hpp"
 #include "ValueConverter.hpp"
+#include "gmlc/utilities/demangle.hpp"
 #include "gmlc/utilities/stringConversion.h"
 #include <algorithm>
 #include <numeric>
 #include <regex>
 #include <unordered_map>
-#include <boost/core/demangle.hpp>
 
 using namespace gmlc::utilities;
 
@@ -65,7 +65,7 @@ double vectorNorm (const std::vector<std::complex<double>> &vec)
 {
     return std::sqrt (
       std::inner_product (vec.begin (), vec.end (), vec.begin (), 0.0, std::plus<> (),
-                          [](const auto &a, const auto &b) { return (a * std::conj (b)).real (); }));
+                          [] (const auto &a, const auto &b) { return (a * std::conj (b)).real (); }));
 }
 
 std::string helicsComplexString (double real, double imag)
@@ -96,7 +96,7 @@ static const std::unordered_map<std::string, data_type> typeMap{
   {"double_vector", data_type::helics_vector},
   {"double vector", data_type::helics_vector},
   {typeid (std::vector<double>).name (), data_type::helics_vector},
-  {boost::core::demangle (typeid (std::vector<double>).name ()), data_type::helics_vector},
+  {gmlc::demangle (typeid (std::vector<double>).name ()), data_type::helics_vector},
   {typeid (double *).name (), data_type::helics_vector},
   {"complex", data_type::helics_complex},
   {"pair", data_type::helics_complex},
@@ -143,14 +143,14 @@ static const std::unordered_map<std::string, data_type> typeMap{
   {"complex_vector", data_type::helics_complex_vector},
   {"complex vector", data_type::helics_complex_vector},
   {typeid (std::vector<std::complex<double>>).name (), data_type::helics_complex_vector},
-  {boost::core::demangle (typeid (std::vector<std::complex<double>>).name ()), data_type::helics_complex_vector},
+  {gmlc::demangle (typeid (std::vector<std::complex<double>>).name ()), data_type::helics_complex_vector},
   {"d", data_type::helics_double},
   {"s", data_type::helics_string},
   {"f", data_type::helics_double},
   {"v", data_type::helics_vector},
   {"c", data_type::helics_complex},
   {typeid (std::complex<double>).name (), data_type::helics_complex},
-  {boost::core::demangle (typeid (std::complex<double>).name ()), data_type::helics_complex},
+  {gmlc::demangle (typeid (std::complex<double>).name ()), data_type::helics_complex},
   {"t", data_type::helics_time},
   {"i", data_type::helics_int},
   {"i64", data_type::helics_int},
@@ -160,13 +160,13 @@ static const std::unordered_map<std::string, data_type> typeMap{
   {"pt", data_type::helics_named_point},
   {"named_point", data_type::helics_named_point},
   {typeid (std::string).name (), data_type::helics_string},
-  {boost::core::demangle (typeid (std::string).name ()), data_type::helics_string},
+  {gmlc::demangle (typeid (std::string).name ()), data_type::helics_string},
   {typeid (char *).name (), data_type::helics_string},
   {typeid (const char *).name (), data_type::helics_string},
   {"default", data_type::helics_any},
   {"time", data_type::helics_time},
   {typeid (Time).name (), data_type::helics_time},
-  {boost::core::demangle (typeid (Time).name ()), data_type::helics_time},
+  {gmlc::demangle (typeid (Time).name ()), data_type::helics_time},
   {"tm", data_type::helics_time},
   {"def", data_type::helics_any},
   {"any", data_type::helics_any},
@@ -403,7 +403,7 @@ static int readSize (const std::string &val)
             // go to the alternative path if this fails
         }
     }
-    return std::count_if (val.begin () + fb, val.end (), [](auto c) { return (c == ',') || (c == ';'); }) + 1;
+    return std::count_if (val.begin () + fb, val.end (), [] (auto c) { return (c == ',') || (c == ';'); }) + 1;
 }
 
 std::complex<double> getComplexFromString (const std::string &val)
