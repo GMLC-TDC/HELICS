@@ -8,7 +8,6 @@ FROM ubuntu:18.04 as builder
 
 # Installs dependencies needed for building, with headers needed for development
 RUN apt-get update && apt-get install -y \
-  libboost-dev \
   libzmq5-dev \ 
   g++ \
   cmake git
@@ -31,7 +30,7 @@ RUN if [[ "$ENABLE_GITHUB" == "true" ]]; then rm -rf HELICS && git clone --depth
 
 # Generates the makefiles for building HELICS without tests, examples, C shared library, or the IPC core
 # Build type is set to release for the optimized binaries (and smaller size)
-RUN mkdir build && cd build && cmake -DBUILD_HELICS_TESTS=OFF -DENABLE_IPC_CORE=OFF -DBUILD_HELICS_EXAMPLES=OFF -DBUILD_C_SHARED_LIB=OFF \
+RUN mkdir build && cd build && cmake -DBUILD_HELICS_TESTS=OFF -DDISABLE_BOOST=ON -DBUILD_HELICS_EXAMPLES=OFF -DBUILD_C_SHARED_LIB=OFF \
   -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/root/develop/helics-install /root/HELICS
 
 # Compile and install HELICS to a temporary prefix (for easy copying to the final image)
