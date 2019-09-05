@@ -712,6 +712,21 @@ extern "C"
     */
     HELICS_EXPORT void helicsFederateSetGlobal (helics_federate fed, const char *valueName, const char *value, helics_error *err);
 
+    /** log a message through a federate
+    @param fed the federate to set the global through
+    @param logmessage the message to put in the log
+    @param[in,out] err a pointer to an error object for catching errors
+    */
+    HELICS_EXPORT void helicsFederateLogMessage (helics_federate fed, const char *logmessage, helics_error *err);
+
+    /** log a message through a federate
+    @param fed the federate to set the global through
+    @param loglevel the level of the message to log see /ref helics_log_levels
+    @param logmessage the message to put in the log
+    @param[in,out] err a pointer to an error object for catching errors
+    */
+    HELICS_EXPORT void helicsFederateLogMessageLevel (helics_federate fed, int loglevel, const char *logmessage, helics_error *err);
+
     /** set a global value in a core
     @details this overwrites any previous value for this name
     @param core the core to set the global through

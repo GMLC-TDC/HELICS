@@ -16,8 +16,6 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <future>
 #include <gmlc/libguarded/guarded.hpp>
 #include <boost/test/unit_test.hpp>
-#include <boost/test/data/test_case.hpp>
-#include <boost/test/tools/floating_point_comparison.hpp>
 
 /** these test cases test out user-directed logging functionality
  */
@@ -37,7 +35,7 @@ BOOST_AUTO_TEST_CASE (basic_logging)
     auto Fed = std::make_shared<helics::Federate> ("test1", fi);
 
     gmlc::libguarded::guarded<std::vector<std::pair<int, std::string>>> mlog;
-    Fed->setLoggingCallback ([&mlog](int level, const std::string &, const std::string &message) {
+    Fed->setLoggingCallback ([&mlog] (int level, const std::string &, const std::string &message) {
         mlog.lock ()->emplace_back (level, message);
     });
 
@@ -53,22 +51,56 @@ BOOST_AUTO_TEST_CASE (file_logging)
     fi.coreInitString = "--autobroker --logfile logfile.txt --fileloglevel=5";
 
     auto Fed = std::make_shared<helics::Federate> ("test1", fi);
-
+    const std::string lfilename = "logfile.txt";
     Fed->enterExecutingMode ();
     Fed->finalize ();
     auto cr = Fed->getCorePointer ();
     Fed.reset ();
-    BOOST_CHECK (ghc::filesystem::exists ("logfile.txt"));
+
+    BOOST_CHECK (ghc::filesystem::exists (lfilename));
     cr->waitForDisconnect ();
     cr.reset ();
     helics::cleanupHelicsLibrary ();
     std::error_code ec;
-    bool res = ghc::filesystem::remove ("logfile.txt", ec);
+    bool res = ghc::filesystem::remove (lfilename, ec);
     int ii = 0;
     while (!res)
     {
         std::this_thread::sleep_for (std::chrono::milliseconds (100));
-        res = ghc::filesystem::remove ("logfile.txt", ec);
+        res = ghc::filesystem::remove (lfilename, ec);
+        ++ii;
+        if (ii > 15)
+        {
+            break;
+        }
+    }
+    BOOST_CHECK (res);
+}
+
+BOOST_AUTO_TEST_CASE (file_logging_p2)
+{
+    helics::FederateInfo fi (CORE_TYPE_TO_TEST);
+    fi.coreInitString = "--autobroker --fileloglevel=5";
+
+    auto Fed = std::make_shared<helics::Federate> ("test1", fi);
+    auto cr = Fed->getCorePointer ();
+    const std::string lfilename = "logfile2.txt";
+    cr->setLogFile (lfilename);
+    Fed->enterExecutingMode ();
+    Fed->finalize ();
+
+    Fed.reset ();
+    BOOST_CHECK (ghc::filesystem::exists (lfilename));
+    cr->waitForDisconnect ();
+    cr.reset ();
+    helics::cleanupHelicsLibrary ();
+    std::error_code ec;
+    bool res = ghc::filesystem::remove (lfilename, ec);
+    int ii = 0;
+    while (!res)
+    {
+        std::this_thread::sleep_for (std::chrono::milliseconds (100));
+        res = ghc::filesystem::remove (lfilename, ec);
         ++ii;
         if (ii > 15)
         {
@@ -87,7 +119,7 @@ BOOST_AUTO_TEST_CASE (check_log_message)
     auto Fed = std::make_shared<helics::Federate> ("test1", fi);
 
     gmlc::libguarded::guarded<std::vector<std::pair<int, std::string>>> mlog;
-    Fed->setLoggingCallback ([&mlog](int level, const std::string &, const std::string &message) {
+    Fed->setLoggingCallback ([&mlog] (int level, const std::string &, const std::string &message) {
         mlog.lock ()->emplace_back (level, message);
     });
 
@@ -117,8 +149,8 @@ BOOST_AUTO_TEST_CASE (check_log_message_levels)
     auto Fed = std::make_shared<helics::Federate> ("test1", fi);
 
     gmlc::libguarded::guarded<std::vector<std::pair<int, std::string>>> mlog;
-    Fed->setLoggingCallback ([&mlog](int level, const std::string &, const std::string &message) {
-      mlog.lock ()->emplace_back (level, message);
+    Fed->setLoggingCallback ([&mlog] (int level, const std::string &, const std::string &message) {
+        mlog.lock ()->emplace_back (level, message);
     });
 
     Fed->enterExecutingMode ();
@@ -153,8 +185,8 @@ BOOST_AUTO_TEST_CASE (check_log_message_levels_high)
     auto Fed = std::make_shared<helics::Federate> ("test1", fi);
 
     gmlc::libguarded::guarded<std::vector<std::pair<int, std::string>>> mlog;
-    Fed->setLoggingCallback ([&mlog](int level, const std::string &, const std::string &message) {
-      mlog.lock ()->emplace_back (level, message);
+    Fed->setLoggingCallback ([&mlog] (int level, const std::string &, const std::string &message) {
+        mlog.lock ()->emplace_back (level, message);
     });
 
     Fed->enterExecutingMode ();

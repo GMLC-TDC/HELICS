@@ -25,11 +25,11 @@ namespace helics
 {
 Logger::Logger () : logCore (LoggerManager::getLoggerCore ())
 {
-    coreIndex = logCore->addFileProcessor ([this](std::string &&message) { logFunction (std::move (message)); });
+    coreIndex = logCore->addFileProcessor ([this] (std::string &&message) { logFunction (std::move (message)); });
 }
 Logger::Logger (std::shared_ptr<LoggingCore> core) : logCore (std::move (core))
 {
-    coreIndex = logCore->addFileProcessor ([this](std::string &&message) { logFunction (std::move (message)); });
+    coreIndex = logCore->addFileProcessor ([this] (std::string &&message) { logFunction (std::move (message)); });
 }
 
 Logger::~Logger () { logCore->haltOperations (coreIndex); }
@@ -103,6 +103,13 @@ void Logger::logFunction (std::string &&message)
                     if (outFile.is_open ())
                     {
                         outFile.flush ();
+                    }
+                }
+                if (message.compare (3, 5, "close") == 0)
+                {
+                    if (outFile.is_open ())
+                    {
+                        outFile.close ();
                     }
                 }
             }
