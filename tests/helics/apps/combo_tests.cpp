@@ -4,8 +4,7 @@ Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance
 the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
-#include <boost/test/unit_test.hpp>
-#include <boost/test/data/test_case.hpp>
+#include "gtest/gtest.h"
 
 #ifdef _MSC_VER
 #pragma warning(push, 0)
@@ -26,12 +25,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helics/core/BrokerFactory.hpp"
 #include <future>
 
-namespace utf = boost::unit_test;
-
-BOOST_AUTO_TEST_SUITE (combo_tests, *utf::label ("ci"))
-
-// this is the same as another test in test recorders
-BOOST_AUTO_TEST_CASE (save_load_file1)
+static void generateFiles (const ghc::filesystem::path &f1, const ghc::filesystem::path &f2)
 {
     helics::FederateInfo fi (helics::core_type::TEST);
     fi.coreName = "ccore2";
@@ -63,13 +57,13 @@ BOOST_AUTO_TEST_CASE (save_load_file1)
 
     e1.send ("d2", "this is a test message");
     pub1.publish (4.7);
-    BOOST_CHECK_EQUAL (retTime, 1.0);
+    EXPECT_EQ (retTime, 1.0);
 
     e2.send ("d1", "this is a test message2");
 
     mfed2.requestTimeAsync (2.0);
     retTime = mfed.requestTime (2.0);
-    BOOST_CHECK_EQUAL (retTime, 2.0);
+    EXPECT_EQ (retTime, 2.0);
 
     mfed2.requestTimeComplete ();
     pub1.publish (4.7);
@@ -77,21 +71,54 @@ BOOST_AUTO_TEST_CASE (save_load_file1)
     mfed.finalize ();
     mfed2.finalize ();
     fut.get ();
-    BOOST_CHECK_EQUAL (rec1.messageCount (), 2u);
-    BOOST_CHECK_EQUAL (rec1.pointCount (), 3u);
+    EXPECT_EQ (rec1.messageCount (), 2u);
+    EXPECT_EQ (rec1.pointCount (), 3u);
 
-    auto filename = ghc::filesystem::temp_directory_path () / "savefile.txt";
-    rec1.saveFile (filename.string ());
+    rec1.saveFile (f1.string ());
 
-    BOOST_CHECK (ghc::filesystem::exists (filename));
+    EXPECT_TRUE (ghc::filesystem::exists (f1));
 
-    auto filename2 = ghc::filesystem::temp_directory_path () / "savefile.json";
-    rec1.saveFile (filename2.string ());
+    rec1.saveFile (f2.string ());
 
-    BOOST_CHECK (ghc::filesystem::exists (filename2));
+    EXPECT_TRUE (ghc::filesystem::exists (f2));
 }
 
-BOOST_AUTO_TEST_CASE (save_load_file_binary)
+static void useFile (const std::string &corename, const std::string &file)
+{
+    helics::FederateInfo fi (helics::core_type::TEST);
+    fi.coreName = corename;
+    fi.coreInitString = "-f 1 --autobroker";
+    fi.setProperty (helics_property_time_period, 1.0);
+
+    helics::apps::Player play1 ("play1", fi);
+    play1.loadFile (file);
+
+    play1.initialize ();
+    EXPECT_EQ (play1.pointCount (), 3u);
+    EXPECT_EQ (play1.publicationCount (), 1u);
+    EXPECT_EQ (play1.messageCount (), 2u);
+    EXPECT_EQ (play1.endpointCount (), 2u);
+
+    play1.finalize ();
+    ghc::filesystem::remove (file);
+}
+
+// this is the same as another test in test recorders
+TEST (combo_tests, save_load_file1)
+{
+    auto filename1 = ghc::filesystem::temp_directory_path () / "savefile.txt";
+
+    auto filename2 = ghc::filesystem::temp_directory_path () / "savefile.json";
+
+    generateFiles (filename1, filename2);
+    ASSERT_TRUE (ghc::filesystem::exists (filename1));
+    ASSERT_TRUE (ghc::filesystem::exists (filename2));
+
+    useFile ("ccore4", filename1.string ());
+    useFile ("ccore5", filename2.string ());
+}
+
+static void generateFiles_binary (const ghc::filesystem::path &f1, const ghc::filesystem::path &f2)
 {
     helics::FederateInfo fi (helics::core_type::TEST);
     fi.coreName = "ccore3";
@@ -127,7 +154,7 @@ BOOST_AUTO_TEST_CASE (save_load_file_binary)
     }
     e1.send ("d2", n5);
     pub1.publish (4.7);
-    BOOST_CHECK_EQUAL (retTime, 1.0);
+    EXPECT_EQ (retTime, 1.0);
     helics::data_block n6 (256);
     for (int ii = 0; ii < 256; ++ii)
     {
@@ -137,7 +164,7 @@ BOOST_AUTO_TEST_CASE (save_load_file_binary)
 
     mfed2.requestTimeAsync (2.0);
     retTime = mfed.requestTime (2.0);
-    BOOST_CHECK_EQUAL (retTime, 2.0);
+    EXPECT_EQ (retTime, 2.0);
 
     mfed2.requestTimeComplete ();
     pub1.publish (4.7);
@@ -145,141 +172,69 @@ BOOST_AUTO_TEST_CASE (save_load_file_binary)
     mfed.finalize ();
     mfed2.finalize ();
     fut.get ();
-    BOOST_CHECK_EQUAL (rec1.messageCount (), 2u);
-    BOOST_CHECK_EQUAL (rec1.pointCount (), 3u);
+    EXPECT_EQ (rec1.messageCount (), 2u);
+    EXPECT_EQ (rec1.pointCount (), 3u);
 
-    auto filename = ghc::filesystem::temp_directory_path () / "savefile_binary.txt";
-    rec1.saveFile (filename.string ());
+    rec1.saveFile (f1.string ());
 
-    BOOST_CHECK (ghc::filesystem::exists (filename));
+    EXPECT_TRUE (ghc::filesystem::exists (f1));
 
+    rec1.saveFile (f2.string ());
+
+    EXPECT_TRUE (ghc::filesystem::exists (f2));
+}
+
+static void useFileBinary (const std::string &corename, const std::string &file)
+{
+    helics::FederateInfo fi (helics::core_type::TEST);
+    fi.coreType = helics::core_type::TEST;
+    fi.coreName = corename;
+    fi.coreInitString = "-f 1 --autobroker";
+    fi.setProperty (helics_property_time_period, 1.0);
+
+    helics::apps::Player play1 ("play1", fi);
+    play1.loadFile (file);
+
+    play1.initialize ();
+    EXPECT_EQ (play1.pointCount (), 3u);
+    EXPECT_EQ (play1.publicationCount (), 1u);
+    EXPECT_EQ (play1.messageCount (), 2u);
+    EXPECT_EQ (play1.endpointCount (), 2u);
+
+    auto &b1 = play1.getMessage (0);
+    helics::data_block n5 (256);
+    for (int ii = 0; ii < 256; ++ii)
+    {
+        n5[ii] = ii;
+    }
+    EXPECT_EQ (b1.mess.data.to_string (), n5.to_string ());
+
+    auto &b2 = play1.getMessage (1);
+    helics::data_block n6 (256);
+    for (int ii = 0; ii < 256; ++ii)
+    {
+        n6[ii] = 255 - ii;
+    }
+    EXPECT_EQ (b2.mess.data.to_string (), n6.to_string ());
+    play1.finalize ();
+    ghc::filesystem::remove (file);
+}
+
+TEST (combo_tests, save_load_file_binary)
+{
+    auto filename1 = ghc::filesystem::temp_directory_path () / "savefile_binary.txt";
     auto filename2 = ghc::filesystem::temp_directory_path () / "savefile_binary.json";
-    rec1.saveFile (filename2.string ());
 
-    BOOST_CHECK (ghc::filesystem::exists (filename2));
+    generateFiles_binary (filename1, filename2);
+    ASSERT_TRUE (ghc::filesystem::exists (filename1));
+
+    ASSERT_TRUE (ghc::filesystem::exists (filename2));
+
+    useFileBinary ("ccore6", filename1.string ());
+    useFileBinary ("ccore7", filename2.string ());
 }
 
-BOOST_AUTO_TEST_CASE (check_created_files1, *boost::unit_test::depends_on ("combo_tests/save_load_file1"))
-{
-    helics::FederateInfo fi (helics::core_type::TEST);
-    fi.coreName = "ccore4";
-    fi.coreInitString = "-f 1 --autobroker";
-    fi.setProperty (helics_property_time_period, 1.0);
-
-    helics::apps::Player play1 ("play1", fi);
-    auto filename = ghc::filesystem::temp_directory_path () / "savefile.txt";
-    play1.loadFile (filename.string ());
-
-    play1.initialize ();
-    BOOST_CHECK_EQUAL (play1.pointCount (), 3u);
-    BOOST_CHECK_EQUAL (play1.publicationCount (), 1u);
-    BOOST_CHECK_EQUAL (play1.messageCount (), 2u);
-    BOOST_CHECK_EQUAL (play1.endpointCount (), 2u);
-
-    play1.finalize ();
-    ghc::filesystem::remove (filename);
-}
-
-BOOST_AUTO_TEST_CASE (check_created_files2, *boost::unit_test::depends_on ("combo_tests/save_load_file1"))
-{
-    helics::FederateInfo fi (helics::core_type::TEST);
-    fi.coreName = "ccore5";
-    fi.coreInitString = "-f 1 --autobroker";
-    fi.setProperty (helics_property_time_period, 1.0);
-
-    helics::apps::Player play1 ("play1", fi);
-    auto filename = ghc::filesystem::temp_directory_path () / "savefile.json";
-    play1.loadFile (filename.string ());
-
-    play1.initialize ();
-    BOOST_CHECK_EQUAL (play1.pointCount (), 3u);
-    BOOST_CHECK_EQUAL (play1.publicationCount (), 1u);
-    BOOST_CHECK_EQUAL (play1.messageCount (), 2u);
-    BOOST_CHECK_EQUAL (play1.endpointCount (), 2u);
-
-    play1.finalize ();
-    ghc::filesystem::remove (filename);
-}
-
-BOOST_AUTO_TEST_CASE (check_created_files_binary1,
-                      *boost::unit_test::depends_on ("combo_tests/save_load_file_binary"))
-{
-    helics::FederateInfo fi (helics::core_type::TEST);
-    fi.coreType = helics::core_type::TEST;
-    fi.coreName = "ccore6";
-    fi.coreInitString = "-f 1 --autobroker";
-    fi.setProperty (helics_property_time_period, 1.0);
-
-    helics::apps::Player play1 ("play1", fi);
-    auto filename = ghc::filesystem::temp_directory_path () / "savefile_binary.txt";
-    play1.loadFile (filename.string ());
-
-    play1.initialize ();
-    BOOST_CHECK_EQUAL (play1.pointCount (), 3u);
-    BOOST_CHECK_EQUAL (play1.publicationCount (), 1u);
-    BOOST_CHECK_EQUAL (play1.messageCount (), 2u);
-    BOOST_CHECK_EQUAL (play1.endpointCount (), 2u);
-
-    auto &b1 = play1.getMessage (0);
-    helics::data_block n5 (256);
-    for (int ii = 0; ii < 256; ++ii)
-    {
-        n5[ii] = ii;
-    }
-    BOOST_CHECK_EQUAL (b1.mess.data.to_string (), n5.to_string ());
-
-    auto &b2 = play1.getMessage (1);
-    helics::data_block n6 (256);
-    for (int ii = 0; ii < 256; ++ii)
-    {
-        n6[ii] = 255 - ii;
-    }
-    BOOST_CHECK_EQUAL (b2.mess.data.to_string (), n6.to_string ());
-    play1.finalize ();
-    ghc::filesystem::remove (filename);
-}
-
-BOOST_AUTO_TEST_CASE (check_created_files_binary2,
-                      *boost::unit_test::depends_on ("combo_tests/save_load_file_binary"))
-{
-    helics::FederateInfo fi (helics::core_type::TEST);
-    fi.coreType = helics::core_type::TEST;
-    fi.coreName = "ccore7";
-    fi.coreInitString = "-f 1 --autobroker";
-    fi.setProperty (helics_property_time_period, 1.0);
-
-    helics::apps::Player play1 ("play1", fi);
-    auto filename = ghc::filesystem::temp_directory_path () / "savefile_binary.json";
-    play1.loadFile (filename.string ());
-
-    play1.initialize ();
-    BOOST_CHECK_EQUAL (play1.pointCount (), 3u);
-    BOOST_CHECK_EQUAL (play1.publicationCount (), 1u);
-    BOOST_CHECK_EQUAL (play1.messageCount (), 2u);
-
-    BOOST_CHECK_EQUAL (play1.endpointCount (), 2u);
-
-    auto &b1 = play1.getMessage (0);
-    helics::data_block n5 (256);
-    for (int ii = 0; ii < 256; ++ii)
-    {
-        n5[ii] = ii;
-    }
-    BOOST_CHECK_EQUAL (b1.mess.data.to_string (), n5.to_string ());
-
-    auto &b2 = play1.getMessage (1);
-    helics::data_block n6 (256);
-    for (int ii = 0; ii < 256; ++ii)
-    {
-        n6[ii] = 255 - ii;
-    }
-    BOOST_CHECK_EQUAL (b2.mess.data.to_string (), n6.to_string ());
-
-    play1.finalize ();
-    ghc::filesystem::remove (filename);
-}
-
-BOOST_AUTO_TEST_CASE (check_combination_file_load)
+TEST (combo_tests, check_combination_file_load)
 {
     helics::FederateInfo fi (helics::core_type::TEST);
     fi.coreName = "ccore_combo";
@@ -316,12 +271,10 @@ BOOST_AUTO_TEST_CASE (check_combination_file_load)
             fed.getPublication (1).publish (1);
         }
     }
-    BOOST_CHECK_EQUAL (fed.pendingMessages (), 3u);
+    EXPECT_EQ (fed.pendingMessages (), 3u);
     fed.finalize ();
     fut_play.get ();
     fut_rec.get ();
-    BOOST_CHECK_EQUAL (rec1.messageCount (), 2u);
-    BOOST_CHECK_EQUAL (rec1.pointCount (), 2u);
+    EXPECT_EQ (rec1.messageCount (), 2u);
+    EXPECT_EQ (rec1.pointCount (), 2u);
 }
-
-BOOST_AUTO_TEST_SUITE_END ()

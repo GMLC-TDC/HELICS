@@ -4,24 +4,15 @@ Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance
 the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
-#include "helics/helics-config.h"
-
-#ifndef BOOST_STATIC
-#define BOOST_TEST_DYN_LINK
-#endif
-
-#define BOOST_TEST_MODULE helics_apps - tests
-#define BOOST_TEST_DETECT_MEMORY_LEAK 0
 
 #include "../../../src/helics/application_api/Federate.hpp"
-#include <boost/test/unit_test.hpp>
+#include <gtest/gtest.h>
 
-struct globalTestConfig
+struct globalTestConfig : public ::testing::Environment
 {
-    globalTestConfig () = default;
-    ~globalTestConfig () { helics::cleanupHelicsLibrary (); }
+    virtual void TearDown () override { helics::cleanupHelicsLibrary (); }
 };
 
+// register the global setup and teardown structure
+::testing::Environment *const foo_env = ::testing::AddGlobalTestEnvironment (new globalTestConfig);
 //____________________________________________________________________________//
-
-BOOST_GLOBAL_FIXTURE (globalTestConfig);

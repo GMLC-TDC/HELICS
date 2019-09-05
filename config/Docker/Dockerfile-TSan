@@ -1,12 +1,8 @@
-FROM ubuntu:18.04 as builder
-
-# Sets the number of threads for make to use
-ARG MAKE_PARALLEL
+FROM ubuntu:19.04 as builder
 
 RUN apt update && apt install -y \
-  libboost-dev \
-  python3-dev \
-  build-essential clang cmake git wget subversion vim && rm -rf /var/lib/apt/lists/*
+  python3 \
+  make clang cmake git wget subversion
 
 WORKDIR /root/develop
 
@@ -14,11 +10,23 @@ RUN svn co http://llvm.org/svn/llvm-project/llvm/trunk llvm
 RUN (cd llvm/projects && svn co http://llvm.org/svn/llvm-project/libcxx/trunk libcxx)
 RUN (cd llvm/projects && svn co http://llvm.org/svn/llvm-project/libcxxabi/trunk libcxxabi)
 
-RUN  mkdir libcxx_tsan && cd libcxx_tsan &&  cmake ../llvm -DCMAKE_BUILD_TYPE=Release -DLLVM_USE_SANITIZER=Thread -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++
-RUN cd libcxx_tsan && make cxx -j${MAKE_PARALLEL:-2}
-ENV TSAN_CFLAGS="-fsanitize=thread -stdlib=libc++ -L/root/develop/libcxx_tsan/lib -lc++abi -I/root/develop/libcxx_tsan/include -I/root/develop/libcxx_tsan/include/c++/v1 -Wno-unused-command-line-argument -g -O1 -Wl,-rpath=/root/develop/libcxx_tsan/lib"
+# Sets the number of threads for make to use
+ARG MAKE_PARALLEL
 
-RUN rm -rf llvm
+RUN  mkdir libcxx_tsan_build && cd libcxx_tsan_build &&  cmake ../llvm -DCMAKE_BUILD_TYPE=Release -DLLVM_USE_SANITIZER=Thread -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++
+RUN cd libcxx_tsan_build && make cxx -j${MAKE_PARALLEL:-2}
+
+RUN mkdir -p /root/develop/libcxx_tsan/include && cp -r /root/develop/libcxx_tsan_build/include/* /root/develop/libcxx_tsan/include/
+RUN mkdir -p /root/develop/libcxx_tsan/lib && cp -r /root/develop/libcxx_tsan_build/lib/* /root/develop/libcxx_tsan/lib/
+
+FROM ubuntu:19.04
+
+RUN apt update && apt install -y \
+  libboost-dev \
+  clang cmake make git && apt-get clean && ln -s /usr/bin/llvm-symbolizer-8 /usr/bin/llvm-symbolizer
+
+#copy the built libraries from the builder images
+COPY --from=builder /root/develop/libcxx_tsan /root/develop/libcxx_tsan
 
 # Create script to build helics
 RUN printf "#!/bin/bash \
@@ -33,14 +41,5 @@ RUN printf "#!/bin/bash \
 \n/root/develop/HELICS/build/tests/helics/common/common-tests \
 \n/root/develop/HELICS/build/tests/helics/system_tests/system-tests \
 \n" > /root/develop/buildhelics.sh
-RUN chmod 775 /root/develop/buildhelics.sh
 
-RUN ln -s /usr/bin/llvm-symbolizer-6.0 /usr/bin/llvm-symbolizer
-
-#ENV PYTHONPATH /usr/local/python
-
-# Python must be installed after the PYTHONPATH is set above for it to
-# recognize and import libhelicsSharedLib.so.
-#RUN apt install -y --no-install-recommends python3-dev \
-  
-
+ENV TSAN_CFLAGS="-fsanitize=thread -stdlib=libc++ -L/root/develop/libcxx_tsan/lib -lc++abi -I/root/develop/libcxx_tsan/include -I/root/develop/libcxx_tsan/include/c++/v1 -Wno-unused-command-line-argument -g -O1 -Wl,-rpath=/root/develop/libcxx_tsan/lib"
