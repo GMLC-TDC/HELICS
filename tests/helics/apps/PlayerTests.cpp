@@ -4,8 +4,7 @@ Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance
 the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
-#include <boost/test/unit_test.hpp>
-#include <boost/test/data/test_case.hpp>
+#include "gtest/gtest.h"
 
 #include <cstdio>
 
@@ -15,11 +14,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helics/core/BrokerFactory.hpp"
 #include <future>
 
-namespace utf = boost::unit_test;
-
-BOOST_AUTO_TEST_SUITE (player_tests, *utf::label ("ci"))
-
-BOOST_AUTO_TEST_CASE (simple_player_test)
+TEST (player_tests, simple_player_test)
 {
     helics::FederateInfo fi (helics::core_type::TEST);
 
@@ -37,27 +32,27 @@ BOOST_AUTO_TEST_CASE (simple_player_test)
     auto fut = std::async (std::launch::async, [&play1]() { play1.run (); });
     vfed.enterExecutingMode ();
     auto retTime = vfed.requestTime (5);
-    BOOST_CHECK_EQUAL (retTime, 1.0);
+    EXPECT_EQ (retTime, 1.0);
     auto val = sub1.getValue<double> ();
-    BOOST_CHECK_EQUAL (val, 0.5);
+    EXPECT_EQ (val, 0.5);
 
     retTime = vfed.requestTime (5);
-    BOOST_CHECK_EQUAL (retTime, 2.0);
+    EXPECT_EQ (retTime, 2.0);
     val = sub1.getValue<double> ();
-    BOOST_CHECK_EQUAL (val, 0.7);
+    EXPECT_EQ (val, 0.7);
 
     retTime = vfed.requestTime (5);
-    BOOST_CHECK_EQUAL (retTime, 3.0);
+    EXPECT_EQ (retTime, 3.0);
     val = sub1.getValue<double> ();
-    BOOST_CHECK_EQUAL (val, 0.8);
+    EXPECT_EQ (val, 0.8);
 
     retTime = vfed.requestTime (5);
-    BOOST_CHECK_EQUAL (retTime, 5.0);
+    EXPECT_EQ (retTime, 5.0);
     vfed.finalize ();
     fut.get ();
 }
 
-BOOST_AUTO_TEST_CASE (simple_player_test_diff_inputs)
+TEST (player_tests, simple_player_test_diff_inputs)
 {
     helics::FederateInfo fi (helics::core_type::TEST);
     fi.coreName = "pcore2";
@@ -74,32 +69,32 @@ BOOST_AUTO_TEST_CASE (simple_player_test_diff_inputs)
     auto fut = std::async (std::launch::async, [&play1]() { play1.run (); });
     vfed.enterExecutingMode ();
     auto retTime = vfed.requestTime (5);
-    BOOST_CHECK_EQUAL (retTime, 1.0);
+    EXPECT_EQ (retTime, 1.0);
     auto val = sub1.getValue<double> ();
-    BOOST_CHECK_EQUAL (val, 5.0);
+    EXPECT_EQ (val, 5.0);
 
     retTime = vfed.requestTime (5);
-    BOOST_CHECK_EQUAL (retTime, 2.0);
+    EXPECT_EQ (retTime, 2.0);
     val = sub1.getValue<double> ();
-    BOOST_CHECK_EQUAL (val, 0.7);
+    EXPECT_EQ (val, 0.7);
 
     retTime = vfed.requestTime (5);
-    BOOST_CHECK_EQUAL (retTime, 3.0);
+    EXPECT_EQ (retTime, 3.0);
     val = sub1.getValue<double> ();
-    BOOST_CHECK_EQUAL (val, 0.8);
+    EXPECT_EQ (val, 0.8);
 
     retTime = vfed.requestTime (5);
-    BOOST_CHECK_EQUAL (retTime, 4.0);
+    EXPECT_EQ (retTime, 4.0);
     val = sub1.getValue<double> ();
-    BOOST_CHECK_EQUAL (val, 5.0);
+    EXPECT_EQ (val, 5.0);
 
     retTime = vfed.requestTime (5);
-    BOOST_CHECK_EQUAL (retTime, 5.0);
+    EXPECT_EQ (retTime, 5.0);
     vfed.finalize ();
     fut.get ();
 }
 
-BOOST_AUTO_TEST_CASE (simple_player_test_iterative)
+TEST (player_tests, simple_player_test_iterative)
 {
     helics::FederateInfo fi (helics::core_type::TEST);
     fi.coreName = "pcore3";
@@ -116,31 +111,31 @@ BOOST_AUTO_TEST_CASE (simple_player_test_iterative)
     auto fut = std::async (std::launch::async, [&play1]() { play1.run (); });
     vfed.enterExecutingMode ();
     auto retTime = vfed.requestTimeIterative (5, helics::iteration_request::iterate_if_needed);
-    BOOST_CHECK_EQUAL (retTime.grantedTime, 1.0);
-    BOOST_CHECK (retTime.state == helics::iteration_result::next_step);
+    EXPECT_EQ (retTime.grantedTime, 1.0);
+    EXPECT_TRUE (retTime.state == helics::iteration_result::next_step);
     auto val = sub1.getValue<double> ();
-    BOOST_CHECK_EQUAL (val, 0.5);
+    EXPECT_EQ (val, 0.5);
 
     retTime = vfed.requestTimeIterative (5, helics::iteration_request::iterate_if_needed);
-    BOOST_CHECK_EQUAL (retTime.grantedTime, 1.0);
-    BOOST_CHECK (retTime.state == helics::iteration_result::iterating);
+    EXPECT_EQ (retTime.grantedTime, 1.0);
+    EXPECT_TRUE (retTime.state == helics::iteration_result::iterating);
     val = sub1.getValue<double> ();
-    BOOST_CHECK_EQUAL (val, 0.7);
+    EXPECT_EQ (val, 0.7);
 
     retTime = vfed.requestTimeIterative (5, helics::iteration_request::iterate_if_needed);
-    BOOST_CHECK_EQUAL (retTime.grantedTime, 1.0);
-    BOOST_CHECK (retTime.state == helics::iteration_result::iterating);
+    EXPECT_EQ (retTime.grantedTime, 1.0);
+    EXPECT_TRUE (retTime.state == helics::iteration_result::iterating);
     val = sub1.getValue<double> ();
-    BOOST_CHECK_EQUAL (val, 0.8);
+    EXPECT_EQ (val, 0.8);
 
     retTime = vfed.requestTimeIterative (5, helics::iteration_request::iterate_if_needed);
-    BOOST_CHECK_EQUAL (retTime.grantedTime, 5.0);
-    BOOST_CHECK (retTime.state == helics::iteration_result::next_step);
+    EXPECT_EQ (retTime.grantedTime, 5.0);
+    EXPECT_TRUE (retTime.state == helics::iteration_result::next_step);
     vfed.finalize ();
     fut.get ();
 }
 
-BOOST_AUTO_TEST_CASE (simple_player_test2)
+TEST (player_tests, simple_player_test2)
 {
     helics::FederateInfo fi (helics::core_type::TEST);
     fi.coreName = "pcore4";
@@ -164,28 +159,28 @@ BOOST_AUTO_TEST_CASE (simple_player_test2)
     vfed.enterExecutingMode ();
 
     auto retTime = vfed.requestTime (5);
-    BOOST_CHECK_EQUAL (retTime, 1.0);
+    EXPECT_EQ (retTime, 1.0);
     auto val = sub1.getValue<double> ();
-    BOOST_CHECK_EQUAL (val, 0.5);
+    EXPECT_EQ (val, 0.5);
     val = sub2.getValue<double> ();
-    BOOST_CHECK_CLOSE (val, 0.4, 0.000001);
+    EXPECT_DOUBLE_EQ (val, 0.4);
 
     retTime = vfed.requestTime (5);
-    BOOST_CHECK_EQUAL (retTime, 2.0);
+    EXPECT_EQ (retTime, 2.0);
     val = sub1.getValue<double> ();
-    BOOST_CHECK_EQUAL (val, 0.7);
+    EXPECT_EQ (val, 0.7);
     val = sub2.getValue<double> ();
-    BOOST_CHECK_EQUAL (val, 0.6);
+    EXPECT_EQ (val, 0.6);
 
     retTime = vfed.requestTime (5);
-    BOOST_CHECK_EQUAL (retTime, 3.0);
+    EXPECT_EQ (retTime, 3.0);
     val = sub1.getValue<double> ();
-    BOOST_CHECK_EQUAL (val, 0.8);
+    EXPECT_EQ (val, 0.8);
     val = sub2.getValue<double> ();
-    BOOST_CHECK_EQUAL (val, 0.9);
+    EXPECT_EQ (val, 0.9);
 
     retTime = vfed.requestTime (5);
-    BOOST_CHECK_EQUAL (retTime, 5.0);
+    EXPECT_EQ (retTime, 5.0);
     vfed.finalize ();
     fut.get ();
 }
@@ -193,16 +188,20 @@ BOOST_AUTO_TEST_CASE (simple_player_test2)
 static constexpr const char *simple_files[] = {"example1.player", "example2.player", "example3.player",
                                                "example4.player", "example5.json",   "example5.player"};
 
-BOOST_DATA_TEST_CASE (simple_player_test_files, boost::unit_test::data::make (simple_files), file)
+class player_file_tests : public ::testing::TestWithParam<const char *>
+{
+};
+
+TEST_P (player_file_tests, test_files)
 {
     static char indx = 'a';
     helics::FederateInfo fi (helics::core_type::TEST);
-    fi.coreName = std::string ("pcore5") + file;
+    fi.coreName = std::string ("pcore5") + GetParam ();
     fi.coreName.push_back (indx++);
     fi.coreInitString = "-f 2 --autobroker";
     helics::apps::Player play1 ("player1", fi);
 
-    play1.loadFile (std::string (TEST_DIR) + file);
+    play1.loadFile (std::string (TEST_DIR) + GetParam ());
 
     helics::ValueFederate vfed ("block1", fi);
     auto &sub1 = vfed.registerSubscription ("pub1");
@@ -210,36 +209,36 @@ BOOST_DATA_TEST_CASE (simple_player_test_files, boost::unit_test::data::make (si
     auto fut = std::async (std::launch::async, [&play1]() { play1.run (); });
     vfed.enterExecutingMode ();
     auto val = sub1.getValue<double> ();
-    BOOST_CHECK_EQUAL (val, 0.3);
+    EXPECT_EQ (val, 0.3);
 
     auto retTime = vfed.requestTime (5);
-    BOOST_CHECK_EQUAL (retTime, 1.0);
+    EXPECT_EQ (retTime, 1.0);
     val = sub1.getValue<double> ();
-    BOOST_CHECK_EQUAL (val, 0.5);
+    EXPECT_EQ (val, 0.5);
     val = sub2.getValue<double> ();
-    BOOST_CHECK_CLOSE (val, 0.4, 0.000001);
+    EXPECT_DOUBLE_EQ (val, 0.4);
 
     retTime = vfed.requestTime (5);
-    BOOST_CHECK_EQUAL (retTime, 2.0);
+    EXPECT_EQ (retTime, 2.0);
     val = sub1.getValue<double> ();
-    BOOST_CHECK_EQUAL (val, 0.7);
+    EXPECT_EQ (val, 0.7);
     val = sub2.getValue<double> ();
-    BOOST_CHECK_EQUAL (val, 0.6);
+    EXPECT_EQ (val, 0.6);
 
     retTime = vfed.requestTime (5);
-    BOOST_CHECK_EQUAL (retTime, 3.0);
+    EXPECT_EQ (retTime, 3.0);
     val = sub1.getValue<double> ();
-    BOOST_CHECK_EQUAL (val, 0.8);
+    EXPECT_EQ (val, 0.8);
     val = sub2.getValue<double> ();
-    BOOST_CHECK_EQUAL (val, 0.9);
+    EXPECT_EQ (val, 0.9);
 
     retTime = vfed.requestTime (5);
-    BOOST_CHECK_EQUAL (retTime, 5.0);
+    EXPECT_EQ (retTime, 5.0);
     vfed.finalize ();
     fut.get ();
 }
 
-BOOST_AUTO_TEST_CASE (simple_player_mlinecomment)
+TEST (player_tests, simple_player_mlinecomment)
 {
     static char indx = 'a';
     helics::FederateInfo fi (helics::core_type::TEST);
@@ -249,50 +248,50 @@ BOOST_AUTO_TEST_CASE (simple_player_mlinecomment)
     helics::apps::Player play1 ("player1", fi);
     play1.loadFile (std::string (TEST_DIR) + "/example_comments.player");
 
-    BOOST_CHECK_EQUAL (play1.pointCount (), 7u);
+    EXPECT_EQ (play1.pointCount (), 7u);
     helics::ValueFederate vfed ("block1", fi);
     auto &sub1 = vfed.registerSubscription ("pub1");
     auto &sub2 = vfed.registerSubscription ("pub2");
     auto fut = std::async (std::launch::async, [&play1]() { play1.run (); });
     vfed.enterExecutingMode ();
     auto val = sub1.getValue<double> ();
-    BOOST_CHECK_EQUAL (val, 0.3);
+    EXPECT_EQ (val, 0.3);
 
     auto retTime = vfed.requestTime (5);
-    BOOST_CHECK_EQUAL (retTime, 1.0);
+    EXPECT_EQ (retTime, 1.0);
     val = sub1.getValue<double> ();
-    BOOST_CHECK_EQUAL (val, 0.5);
+    EXPECT_EQ (val, 0.5);
     val = sub2.getValue<double> ();
-    BOOST_CHECK_CLOSE (val, 0.4, 0.000001);
+    EXPECT_DOUBLE_EQ (val, 0.4);
 
     retTime = vfed.requestTime (5);
-    BOOST_CHECK_EQUAL (retTime, 2.0);
+    EXPECT_EQ (retTime, 2.0);
     val = sub1.getValue<double> ();
-    BOOST_CHECK_EQUAL (val, 0.7);
+    EXPECT_EQ (val, 0.7);
     val = sub2.getValue<double> ();
-    BOOST_CHECK_EQUAL (val, 0.6);
+    EXPECT_EQ (val, 0.6);
 
     retTime = vfed.requestTime (5);
-    BOOST_CHECK_EQUAL (retTime, 3.0);
+    EXPECT_EQ (retTime, 3.0);
     val = sub1.getValue<double> ();
-    BOOST_CHECK_EQUAL (val, 0.8);
+    EXPECT_EQ (val, 0.8);
     val = sub2.getValue<double> ();
-    BOOST_CHECK_EQUAL (val, 0.9);
+    EXPECT_EQ (val, 0.9);
 
     retTime = vfed.requestTime (5);
-    BOOST_CHECK_EQUAL (retTime, 5.0);
+    EXPECT_EQ (retTime, 5.0);
     vfed.finalize ();
     fut.get ();
-    BOOST_CHECK_EQUAL (play1.publicationCount (), 2u);
+    EXPECT_EQ (play1.publicationCount (), 2u);
 }
 
 #ifdef ENABLE_IPC_CORE
-BOOST_DATA_TEST_CASE (simple_player_test_files_cmdline, boost::unit_test::data::make (simple_files), file)
+TEST_P (player_file_tests, test_files_cmd)
 {
     std::this_thread::sleep_for (std::chrono::milliseconds (300));
     auto brk = helics::BrokerFactory::create (helics::core_type::IPC, "ipc_broker", "-f 2");
     brk->connect ();
-    std::string exampleFile = std::string (TEST_DIR) + file;
+    std::string exampleFile = std::string (TEST_DIR) + GetParam ();
 
     std::vector<std::string> args{"", "--name=player", "--broker=ipc_broker", "--coretype=ipc", exampleFile};
     char *argv[5];
@@ -313,31 +312,31 @@ BOOST_DATA_TEST_CASE (simple_player_test_files_cmdline, boost::unit_test::data::
     auto fut = std::async (std::launch::async, [&play1]() { play1.run (); });
     vfed.enterExecutingMode ();
     auto val = sub1.getValue<double> ();
-    BOOST_CHECK_EQUAL (val, 0.3);
+    EXPECT_EQ (val, 0.3);
 
     auto retTime = vfed.requestTime (5);
-    BOOST_CHECK_EQUAL (retTime, 1.0);
+    EXPECT_EQ (retTime, 1.0);
     val = sub1.getValue<double> ();
-    BOOST_CHECK_EQUAL (val, 0.5);
+    EXPECT_EQ (val, 0.5);
     val = sub2.getValue<double> ();
-    BOOST_CHECK_CLOSE (val, 0.4, 0.000001);
+    EXPECT_DOUBLE_EQ (val, 0.4);
 
     retTime = vfed.requestTime (5);
-    BOOST_CHECK_EQUAL (retTime, 2.0);
+    EXPECT_EQ (retTime, 2.0);
     val = sub1.getValue<double> ();
-    BOOST_CHECK_EQUAL (val, 0.7);
+    EXPECT_EQ (val, 0.7);
     val = sub2.getValue<double> ();
-    BOOST_CHECK_EQUAL (val, 0.6);
+    EXPECT_EQ (val, 0.6);
 
     retTime = vfed.requestTime (5);
-    BOOST_CHECK_EQUAL (retTime, 3.0);
+    EXPECT_EQ (retTime, 3.0);
     val = sub1.getValue<double> ();
-    BOOST_CHECK_EQUAL (val, 0.8);
+    EXPECT_EQ (val, 0.8);
     val = sub2.getValue<double> ();
-    BOOST_CHECK_EQUAL (val, 0.9);
+    EXPECT_EQ (val, 0.9);
 
     retTime = vfed.requestTime (5);
-    BOOST_CHECK_EQUAL (retTime, 5.0);
+    EXPECT_EQ (retTime, 5.0);
     vfed.finalize ();
     fut.get ();
     brk = nullptr;
@@ -347,7 +346,7 @@ BOOST_DATA_TEST_CASE (simple_player_test_files_cmdline, boost::unit_test::data::
 
 #ifdef ENABLE_ZMQ_CORE
 #ifndef DISABLE_SYSTEM_CALL_TESTS
-BOOST_DATA_TEST_CASE (simple_player_test_files_ext, boost::unit_test::data::make (simple_files), file)
+TEST_P (player_file_tests, test_files_ext)
 {
     std::this_thread::sleep_for (std::chrono::milliseconds (300));
     exeTestRunner playerExe (std::string (HELICS_INSTALL_LOC), std::string (HELICS_BUILD_LOC) + "/apps/",
@@ -356,10 +355,10 @@ BOOST_DATA_TEST_CASE (simple_player_test_files_ext, boost::unit_test::data::make
     exeTestRunner brokerExe (std::string (HELICS_INSTALL_LOC), std::string (HELICS_BUILD_LOC) + "/apps/",
                              "helics_broker");
 
-    BOOST_REQUIRE (playerExe.isActive ());
-    BOOST_REQUIRE (brokerExe.isActive ());
+    ASSERT_TRUE (playerExe.isActive ());
+    ASSERT_TRUE (brokerExe.isActive ());
     auto res = brokerExe.runAsync ("-f 2 --coretype=zmq --name=zmq_broker");
-    std::string exampleFile = std::string (TEST_DIR) + file;
+    std::string exampleFile = std::string (TEST_DIR) + GetParam ();
     auto res2 = playerExe.runCaptureOutputAsync ("--name=player --coretype=zmq " + exampleFile);
 
     helics::FederateInfo fi (helics::core_type::ZMQ);
@@ -370,31 +369,31 @@ BOOST_DATA_TEST_CASE (simple_player_test_files_ext, boost::unit_test::data::make
     auto &sub2 = vfed.registerSubscription ("pub2");
     vfed.enterExecutingMode ();
     auto val = sub1.getValue<double> ();
-    BOOST_CHECK_EQUAL (val, 0.3);
+    EXPECT_EQ (val, 0.3);
 
     auto retTime = vfed.requestTime (5);
-    BOOST_CHECK_EQUAL (retTime, 1.0);
+    EXPECT_EQ (retTime, 1.0);
     val = sub1.getValue<double> ();
-    BOOST_CHECK_EQUAL (val, 0.5);
+    EXPECT_EQ (val, 0.5);
     val = sub2.getValue<double> ();
-    BOOST_CHECK_CLOSE (val, 0.4, 0.000001);
+    EXPECT_DOUBLE_EQ (val, 0.4);
 
     retTime = vfed.requestTime (5);
-    BOOST_CHECK_EQUAL (retTime, 2.0);
+    EXPECT_EQ (retTime, 2.0);
     val = sub1.getValue<double> ();
-    BOOST_CHECK_EQUAL (val, 0.7);
+    EXPECT_EQ (val, 0.7);
     val = sub2.getValue<double> ();
-    BOOST_CHECK_EQUAL (val, 0.6);
+    EXPECT_EQ (val, 0.6);
 
     retTime = vfed.requestTime (5);
-    BOOST_CHECK_EQUAL (retTime, 3.0);
+    EXPECT_EQ (retTime, 3.0);
     val = sub1.getValue<double> ();
-    BOOST_CHECK_EQUAL (val, 0.8);
+    EXPECT_EQ (val, 0.8);
     val = sub2.getValue<double> ();
-    BOOST_CHECK_EQUAL (val, 0.9);
+    EXPECT_EQ (val, 0.9);
 
     retTime = vfed.requestTime (5);
-    BOOST_CHECK_EQUAL (retTime, 5.0);
+    EXPECT_EQ (retTime, 5.0);
     vfed.finalize ();
     auto out2 = res2.get ();
     res.get ();
@@ -404,7 +403,9 @@ BOOST_DATA_TEST_CASE (simple_player_test_files_ext, boost::unit_test::data::make
 #endif
 #endif
 
-BOOST_AUTO_TEST_CASE (simple_player_testjson)
+INSTANTIATE_TEST_SUITE_P (player_tests, player_file_tests, ::testing::ValuesIn (simple_files));
+
+TEST (player_tests, simple_player_testjson)
 {
     helics::FederateInfo fi (helics::core_type::TEST);
     fi.coreName = "pcore7";
@@ -419,33 +420,33 @@ BOOST_AUTO_TEST_CASE (simple_player_testjson)
     vfed.enterExecutingMode ();
 
     auto retTime = vfed.requestTime (5);
-    BOOST_CHECK_EQUAL (retTime, 1.0);
+    EXPECT_EQ (retTime, 1.0);
     auto val = sub1.getValue<double> ();
-    BOOST_CHECK_EQUAL (val, 0.5);
+    EXPECT_EQ (val, 0.5);
     val = sub2.getValue<double> ();
-    BOOST_CHECK_CLOSE (val, 0.4, 0.000001);
+    EXPECT_DOUBLE_EQ (val, 0.4);
 
     retTime = vfed.requestTime (5);
-    BOOST_CHECK_EQUAL (retTime, 2.0);
+    EXPECT_EQ (retTime, 2.0);
     val = sub1.getValue<double> ();
-    BOOST_CHECK_EQUAL (val, 0.7);
+    EXPECT_EQ (val, 0.7);
     val = sub2.getValue<double> ();
-    BOOST_CHECK_EQUAL (val, 0.6);
+    EXPECT_EQ (val, 0.6);
 
     retTime = vfed.requestTime (5);
-    BOOST_CHECK_EQUAL (retTime, 3.0);
+    EXPECT_EQ (retTime, 3.0);
     val = sub1.getValue<double> ();
-    BOOST_CHECK_EQUAL (val, 0.8);
+    EXPECT_EQ (val, 0.8);
     val = sub2.getValue<double> ();
-    BOOST_CHECK_EQUAL (val, 0.9);
+    EXPECT_EQ (val, 0.9);
 
     retTime = vfed.requestTime (5);
-    BOOST_CHECK_EQUAL (retTime, 5.0);
+    EXPECT_EQ (retTime, 5.0);
     vfed.finalize ();
     fut.get ();
 }
 
-BOOST_AUTO_TEST_CASE (player_test_message)
+TEST (player_tests, player_test_message)
 {
     helics::FederateInfo fi (helics::core_type::TEST);
     fi.coreName = "pcore8";
@@ -460,21 +461,21 @@ BOOST_AUTO_TEST_CASE (player_test_message)
     mfed.enterExecutingMode ();
 
     auto retTime = mfed.requestTime (5);
-    BOOST_CHECK_EQUAL (retTime, 1.0);
+    EXPECT_EQ (retTime, 1.0);
     auto mess = e1.getMessage ();
-    BOOST_CHECK (mess);
+    EXPECT_TRUE (mess);
     if (mess)
     {
-        BOOST_CHECK_EQUAL (mess->source, "src");
-        BOOST_CHECK_EQUAL (mess->dest, "dest");
-        BOOST_CHECK_EQUAL (mess->data.to_string (), "this is a message");
+        EXPECT_EQ (mess->source, "src");
+        EXPECT_EQ (mess->dest, "dest");
+        EXPECT_EQ (mess->data.to_string (), "this is a message");
     }
 
     mfed.finalize ();
     fut.get ();
 }
 
-BOOST_AUTO_TEST_CASE (player_test_message2)
+TEST (player_tests, player_test_message2)
 {
     helics::FederateInfo fi (helics::core_type::TEST);
     fi.coreName = "pcore9";
@@ -492,42 +493,42 @@ BOOST_AUTO_TEST_CASE (player_test_message2)
     mfed.enterExecutingMode ();
 
     auto retTime = mfed.requestTime (5);
-    BOOST_CHECK_EQUAL (retTime, 1.0);
+    EXPECT_EQ (retTime, 1.0);
     auto mess = e1.getMessage ();
-    BOOST_CHECK (mess);
+    EXPECT_TRUE (mess);
     if (mess)
     {
-        BOOST_CHECK_EQUAL (mess->source, "src");
-        BOOST_CHECK_EQUAL (mess->dest, "dest");
-        BOOST_CHECK_EQUAL (mess->data.to_string (), "this is a test message");
+        EXPECT_EQ (mess->source, "src");
+        EXPECT_EQ (mess->dest, "dest");
+        EXPECT_EQ (mess->data.to_string (), "this is a test message");
     }
 
     retTime = mfed.requestTime (5);
-    BOOST_CHECK_EQUAL (retTime, 2.0);
+    EXPECT_EQ (retTime, 2.0);
     mess = e1.getMessage ();
-    BOOST_CHECK (mess);
+    EXPECT_TRUE (mess);
     if (mess)
     {
-        BOOST_CHECK_EQUAL (mess->source, "src");
-        BOOST_CHECK_EQUAL (mess->dest, "dest");
-        BOOST_CHECK_EQUAL (mess->data.to_string (), "this is test message2");
+        EXPECT_EQ (mess->source, "src");
+        EXPECT_EQ (mess->dest, "dest");
+        EXPECT_EQ (mess->data.to_string (), "this is test message2");
     }
 
     retTime = mfed.requestTime (5);
-    BOOST_CHECK_EQUAL (retTime, 3.0);
+    EXPECT_EQ (retTime, 3.0);
     mess = e1.getMessage ();
-    BOOST_CHECK (mess);
+    EXPECT_TRUE (mess);
     if (mess)
     {
-        BOOST_CHECK_EQUAL (mess->source, "src");
-        BOOST_CHECK_EQUAL (mess->dest, "dest");
-        BOOST_CHECK_EQUAL (mess->data.to_string (), "this is message 3");
+        EXPECT_EQ (mess->source, "src");
+        EXPECT_EQ (mess->dest, "dest");
+        EXPECT_EQ (mess->data.to_string (), "this is message 3");
     }
     mfed.finalize ();
     fut.get ();
 }
 
-BOOST_AUTO_TEST_CASE (player_test_message3)
+TEST (player_tests, player_test_message3)
 {
     helics::FederateInfo fi (helics::core_type::TEST);
     fi.coreName = "pcore10";
@@ -546,36 +547,36 @@ BOOST_AUTO_TEST_CASE (player_test_message3)
     mfed.enterExecutingMode ();
 
     auto retTime = mfed.requestTime (5);
-    BOOST_CHECK_EQUAL (retTime, 1.0);
+    EXPECT_EQ (retTime, 1.0);
     auto mess = e1.getMessage ();
-    BOOST_CHECK (mess);
+    EXPECT_TRUE (mess);
     if (mess)
     {
-        BOOST_CHECK_EQUAL (mess->source, "src");
-        BOOST_CHECK_EQUAL (mess->dest, "dest");
-        BOOST_CHECK_EQUAL (mess->data.to_string (), "this is a test message");
+        EXPECT_EQ (mess->source, "src");
+        EXPECT_EQ (mess->dest, "dest");
+        EXPECT_EQ (mess->data.to_string (), "this is a test message");
     }
 
     retTime = mfed.requestTime (5);
-    BOOST_CHECK_EQUAL (retTime, 2.0);
+    EXPECT_EQ (retTime, 2.0);
     mess = e1.getMessage ();
-    BOOST_CHECK (mess);
+    EXPECT_TRUE (mess);
     if (mess)
     {
-        BOOST_CHECK_EQUAL (mess->source, "src");
-        BOOST_CHECK_EQUAL (mess->dest, "dest");
-        BOOST_CHECK_EQUAL (mess->data.to_string (), "this is test message2");
+        EXPECT_EQ (mess->source, "src");
+        EXPECT_EQ (mess->dest, "dest");
+        EXPECT_EQ (mess->data.to_string (), "this is test message2");
     }
 
     retTime = mfed.requestTime (5);
-    BOOST_CHECK_EQUAL (retTime, 3.0);
+    EXPECT_EQ (retTime, 3.0);
     mess = e1.getMessage ();
-    BOOST_CHECK (mess);
+    EXPECT_TRUE (mess);
     if (mess)
     {
-        BOOST_CHECK_EQUAL (mess->source, "src");
-        BOOST_CHECK_EQUAL (mess->dest, "dest");
-        BOOST_CHECK_EQUAL (mess->data.to_string (), "this is message 3");
+        EXPECT_EQ (mess->source, "src");
+        EXPECT_EQ (mess->dest, "dest");
+        EXPECT_EQ (mess->data.to_string (), "this is message 3");
     }
     mfed.finalize ();
     fut.get ();
@@ -584,72 +585,78 @@ BOOST_AUTO_TEST_CASE (player_test_message3)
 static constexpr const char *simple_message_files[] = {"example_message1.player", "example_message2.player",
                                                        "example_message3.json"};
 
-BOOST_DATA_TEST_CASE (simple_message_player_test_files, boost::unit_test::data::make (simple_message_files), file)
+class player_message_file_tests : public ::testing::TestWithParam<const char *>
+{
+};
+
+TEST_P (player_message_file_tests, message_test_files)
 {
     static char indx = 'a';
     helics::FederateInfo fi (helics::core_type::TEST);
-    fi.coreName = std::string ("pcore11") + file;
+    fi.coreName = std::string ("pcore11") + GetParam ();
     fi.coreName.push_back (indx++);
     fi.coreInitString = "-f 2 --autobroker";
     helics::apps::Player play1 ("player1", fi);
 
     helics::MessageFederate mfed ("block1", fi);
     helics::Endpoint e1 (helics::GLOBAL, &mfed, "dest");
-    play1.loadFile (std::string (TEST_DIR) + file);
+    play1.loadFile (std::string (TEST_DIR) + GetParam ());
     auto fut = std::async (std::launch::async, [&play1]() { play1.run (); });
     mfed.enterExecutingMode ();
 
     auto retTime = mfed.requestTime (5);
-    BOOST_CHECK_EQUAL (retTime, 1.0);
+    EXPECT_EQ (retTime, 1.0);
     auto mess = e1.getMessage ();
-    BOOST_CHECK (mess);
+    EXPECT_TRUE (mess);
     if (mess)
     {
-        BOOST_CHECK_EQUAL (mess->source, "src");
-        BOOST_CHECK_EQUAL (mess->dest, "dest");
-        BOOST_CHECK_EQUAL (mess->data.to_string (), "this is a test message");
+        EXPECT_EQ (mess->source, "src");
+        EXPECT_EQ (mess->dest, "dest");
+        EXPECT_EQ (mess->data.to_string (), "this is a test message");
     }
 
     retTime = mfed.requestTime (5);
-    BOOST_CHECK_EQUAL (retTime, 2.0);
+    EXPECT_EQ (retTime, 2.0);
     mess = e1.getMessage ();
-    BOOST_CHECK (mess);
+    EXPECT_TRUE (mess);
     if (mess)
     {
-        BOOST_CHECK_EQUAL (mess->source, "src");
-        BOOST_CHECK_EQUAL (mess->dest, "dest");
-        BOOST_CHECK_EQUAL (mess->data.to_string (), "this is test message2");
+        EXPECT_EQ (mess->source, "src");
+        EXPECT_EQ (mess->dest, "dest");
+        EXPECT_EQ (mess->data.to_string (), "this is test message2");
     }
 
     retTime = mfed.requestTime (5);
-    BOOST_CHECK_EQUAL (retTime, 3.0);
+    EXPECT_EQ (retTime, 3.0);
     mess = e1.getMessage ();
-    BOOST_CHECK (mess);
+    EXPECT_TRUE (mess);
     if (mess)
     {
-        BOOST_CHECK_EQUAL (mess->source, "src");
-        BOOST_CHECK_EQUAL (mess->dest, "dest");
-        BOOST_CHECK_EQUAL (mess->data.to_string (), "this is message 3");
+        EXPECT_EQ (mess->source, "src");
+        EXPECT_EQ (mess->dest, "dest");
+        EXPECT_EQ (mess->data.to_string (), "this is message 3");
     }
     mfed.finalize ();
     fut.get ();
 }
 
-BOOST_AUTO_TEST_CASE (player_test_help)
+INSTANTIATE_TEST_SUITE_P (player_tests, player_message_file_tests, ::testing::ValuesIn (simple_message_files));
+
+TEST (player_tests, player_test_help)
 {
     std::vector<std::string> args{"--quiet", "--version"};
     helics::apps::Player play1 (args);
 
-    BOOST_CHECK (!play1.isActive ());
+    EXPECT_TRUE (!play1.isActive ());
 
     args.emplace_back ("-?");
     helics::apps::Player play2 (args);
 
-    BOOST_CHECK (!play2.isActive ());
+    EXPECT_TRUE (!play2.isActive ());
 }
 #ifndef DISABLE_SYSTEM_CALL_TESTS
 /*
-BOOST_AUTO_TEST_CASE (simple_player_test)
+TEST( player_tests,simple_player_test)
 {
     static exeTestRunner playerExe (HELICS_BIN_LOC "apps/", "helics_player");
 
@@ -662,11 +669,9 @@ exampleFile);
 
     auto val = res2.get ();
     auto val2 = res.get ();
-    BOOST_CHECK_EQUAL (val2, 0);
+    EXPECT_EQ (val2, 0);
     std::string compareString = "read file 24 points for 1 tags";
-    BOOST_CHECK (val.compare (0, compareString.size (), compareString) == 0);
+    EXPECT_TRUE (val.compare (0, compareString.size (), compareString) == 0);
 }
 */
 #endif
-
-BOOST_AUTO_TEST_SUITE_END ()

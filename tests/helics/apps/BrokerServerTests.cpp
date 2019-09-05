@@ -4,8 +4,7 @@ Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance
 the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
-#include <boost/test/unit_test.hpp>
-#include <boost/test/data/test_case.hpp>
+#include "gtest/gtest.h"
 
 #include "exeTestHelper.h"
 
@@ -16,12 +15,9 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include <cstdio>
 
-namespace utf = boost::unit_test;
 using namespace helics;
 
-BOOST_AUTO_TEST_SUITE (broker_server_tests, *utf::label ("ci"))
-
-BOOST_AUTO_TEST_CASE (startup_tests)
+TEST (broker_server_tests, startup_tests)
 {
     apps::BrokerServer brks (std::vector<std::string>{"--zmq"});
     bool active = brks.hasActiveBrokers ();
@@ -30,21 +26,21 @@ BOOST_AUTO_TEST_CASE (startup_tests)
         std::this_thread::sleep_for (std::chrono::milliseconds (300));
         active = brks.hasActiveBrokers ();
     }
-    BOOST_CHECK (!active);
+    EXPECT_TRUE (!active);
     brks.startServers ();
 
     auto cr = helics::CoreFactory::create (helics::core_type::ZMQ, "--brokername=fred");
-    BOOST_CHECK (cr->isConfigured ());
+    EXPECT_TRUE (cr->isConfigured ());
     cr->connect ();
-    BOOST_CHECK (cr->isConnected ());
+    EXPECT_TRUE (cr->isConnected ());
 
     auto cr2 = helics::CoreFactory::create (helics::core_type::ZMQ, "--brokername=fred2");
-    BOOST_CHECK (cr2->isConfigured ());
+    EXPECT_TRUE (cr2->isConfigured ());
     cr2->connect ();
-    BOOST_CHECK (cr2->isConnected ());
+    EXPECT_TRUE (cr2->isConnected ());
 
     auto objs = helics::BrokerFactory::getAllBrokers ();
-    BOOST_CHECK_EQUAL (objs.size (), 2u);
+    EXPECT_EQ (objs.size (), 2u);
 
     brks.forceTerminate ();
     cr->disconnect ();
@@ -59,12 +55,12 @@ BOOST_AUTO_TEST_CASE (startup_tests)
     {
         cr2disconnect = cr2->waitForDisconnect (std::chrono::milliseconds (1000));
     }
-    BOOST_CHECK (crdisconnect);
-    BOOST_CHECK (cr2disconnect);
+    EXPECT_TRUE (crdisconnect);
+    EXPECT_TRUE (cr2disconnect);
     cleanupHelicsLibrary ();
 }
 
-BOOST_AUTO_TEST_CASE (execution_tests)
+TEST (broker_server_tests, execution_tests)
 {
     apps::BrokerServer brks (std::vector<std::string>{"--zmq"});
     brks.startServers ();
@@ -80,7 +76,7 @@ BOOST_AUTO_TEST_CASE (execution_tests)
     auto &sub = fed2.registerSubscription ("key1");
     sub.setOption (helics_handle_option_connection_required);
     fed1.enterExecutingModeAsync ();
-    BOOST_CHECK_NO_THROW (fed2.enterExecutingMode ());
+    EXPECT_NO_THROW (fed2.enterExecutingMode ());
     fed1.enterExecutingModeComplete ();
 
     fed1.finalize ();
@@ -89,7 +85,7 @@ BOOST_AUTO_TEST_CASE (execution_tests)
     cleanupHelicsLibrary ();
 }
 
-BOOST_AUTO_TEST_CASE (execution_tests_duplicate)
+TEST (broker_server_tests, execution_tests_duplicate)
 {
     apps::BrokerServer brks (std::vector<std::string>{"--zmq"});
     brks.startServers ();
@@ -105,7 +101,7 @@ BOOST_AUTO_TEST_CASE (execution_tests_duplicate)
     auto &sub2 = fed2.registerSubscription ("key1");
     sub2.setOption (helics_handle_option_connection_required);
     fed1.enterExecutingModeAsync ();
-    BOOST_CHECK_NO_THROW (fed2.enterExecutingMode ());
+    EXPECT_NO_THROW (fed2.enterExecutingMode ());
     fed1.enterExecutingModeComplete ();
 
     fi.coreName = "c3b";
@@ -118,7 +114,7 @@ BOOST_AUTO_TEST_CASE (execution_tests_duplicate)
     auto &sub4 = fed4.registerSubscription ("key1");
     sub4.setOption (helics_handle_option_connection_required);
     fed3.enterExecutingModeAsync ();
-    BOOST_CHECK_NO_THROW (fed4.enterExecutingMode ());
+    EXPECT_NO_THROW (fed4.enterExecutingMode ());
     fed3.enterExecutingModeComplete ();
 
     pub1.publish (27.5);
@@ -132,8 +128,8 @@ BOOST_AUTO_TEST_CASE (execution_tests_duplicate)
     fed2.requestTime (1.0);
     fed1.requestTimeComplete ();
 
-    BOOST_CHECK_EQUAL (sub2.getValue<double> (), 27.5);
-    BOOST_CHECK_EQUAL (sub4.getValue<double> (), 30.6);
+    EXPECT_EQ (sub2.getValue<double> (), 27.5);
+    EXPECT_EQ (sub4.getValue<double> (), 30.6);
     fed1.finalize ();
     fed2.finalize ();
     fed3.finalize ();
@@ -141,5 +137,3 @@ BOOST_AUTO_TEST_CASE (execution_tests_duplicate)
     brks.forceTerminate ();
     cleanupHelicsLibrary ();
 }
-
-BOOST_AUTO_TEST_SUITE_END ()
