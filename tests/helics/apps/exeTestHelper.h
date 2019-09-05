@@ -9,9 +9,6 @@
  * For details, see the LICENSE file.
  * LLNS Copyright End
  */
-
-#ifndef EXE_HELPER_HEADER_
-#define EXE_HELPER_HEADER_
 #pragma once
 #include <future>
 #include <string>
@@ -33,9 +30,14 @@ class exeTestRunner
     bool isActive () const { return active; };
 
     int run (const std::string &args) const;
+    /** run the executable in an async context with the given args and return a future of the return code
+    @param args a string containing the command line arguments for the executable
+    @return a future with the return value of the executable*/
     std::future<int> runAsync (const std::string &args) const;
     std::string runCaptureOutput (const std::string &args) const;
+    /** run the executable in an async context with the given args and capture the command line output and return a
+    future
+    @param args a string containing the command line arguments for the executable
+    @return a future with the executable command line output*/
     std::future<std::string> runCaptureOutputAsync (const std::string &args) const;
 };
-
-#endif
