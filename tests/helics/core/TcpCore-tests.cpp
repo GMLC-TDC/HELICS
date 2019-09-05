@@ -496,8 +496,8 @@ TEST (TcpCore_tests, tcpCore_core_broker_default_test)
 
     auto ccore = static_cast<helics::tcp::TcpCore *> (core.get ());
     // this will test the automatic port allocation
-    int match = ccore->getAddress ().compare (0, 13, "localhost:242");
-    EXPECT_EQ (match, 0) << ccore->getAddress () << " does not match expected>localhost:242XX\n";
+    int match = ccore->getAddress ().compare (0, 12, "localhost:24");
+    EXPECT_EQ (match, 0) << ccore->getAddress () << " does not match expected>localhost:24XXX\n";
 
     core->disconnect ();
     broker->disconnect ();
