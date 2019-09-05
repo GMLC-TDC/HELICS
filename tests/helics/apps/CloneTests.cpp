@@ -143,24 +143,19 @@ TEST (clone_tests, simple_clone_test_message)
     auto cnt = c1.messageCount ();
     EXPECT_EQ (cnt, 2u);
     c1.saveFile ("eptsave.json");
-}
+    // now test the files
+    auto fi2 = helics::loadFederateInfo ("eptsave.json");
+    fi2.coreName = "clone_core5";
+    fi2.coreInitString = "--autobroker";
+    fi2.coreType = helics::core_type::TEST;
+    helics::apps::Player p1 ("c1", fi2);
+    p1.loadFile ("eptsave.json");
 
-TEST (clone_tests,
-      simple_clone_test_message_file,
-      *boost::unit_test::depends_on ("clone_tests/simple_clone_test_message"))
-{
-    auto fi = helics::loadFederateInfo ("eptsave.json");
-    fi.coreName = "clone_core5";
-    fi.coreInitString = "--autobroker";
-    fi.coreType = helics::core_type::TEST;
-    helics::apps::Player c1 ("c1", fi);
-    c1.loadFile ("eptsave.json");
+    p1.initialize ();
 
-    c1.initialize ();
-
-    EXPECT_EQ (c1.messageCount (), 2u);
-    EXPECT_EQ (c1.endpointCount (), 3u);
-    c1.finalize ();
+    EXPECT_EQ (p1.messageCount (), 2u);
+    EXPECT_EQ (p1.endpointCount (), 3u);
+    p1.finalize ();
     ghc::filesystem::remove ("eptsave.json");
 }
 
@@ -206,26 +201,21 @@ TEST (clone_tests, simple_clone_test_combo)
     EXPECT_EQ (cnt, 3u);
 
     c1.saveFile ("combsave.json");
-}
 
-TEST (clone_tests,
-      simple_clone_test_combo_file,
-      *boost::unit_test::depends_on ("clone_tests/simple_clone_test_combo"))
-{
-    auto fi = helics::loadFederateInfo ("combsave.json");
-    fi.coreName = "clone_core7";
-    fi.coreInitString = "--autobroker";
-    fi.coreType = helics::core_type::TEST;
-    helics::apps::Player c1 ("c1", fi);
-    c1.loadFile ("combsave.json");
+    auto fi2 = helics::loadFederateInfo ("combsave.json");
+    fi2.coreName = "clone_core7";
+    fi2.coreInitString = "--autobroker";
+    fi2.coreType = helics::core_type::TEST;
+    helics::apps::Player p1 ("c1", fi2);
+    p1.loadFile ("combsave.json");
 
-    c1.initialize ();
+    p1.initialize ();
 
-    EXPECT_EQ (c1.messageCount (), 2u);
-    EXPECT_EQ (c1.endpointCount (), 3u);
-    EXPECT_EQ (c1.pointCount (), 3u);
-    EXPECT_EQ (c1.publicationCount (), 2u);
-    c1.finalize ();
+    EXPECT_EQ (p1.messageCount (), 2u);
+    EXPECT_EQ (p1.endpointCount (), 3u);
+    EXPECT_EQ (p1.pointCount (), 3u);
+    EXPECT_EQ (p1.publicationCount (), 2u);
+    p1.finalize ();
     ghc::filesystem::remove ("combsave.json");
 }
 
