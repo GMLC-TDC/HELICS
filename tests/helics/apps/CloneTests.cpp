@@ -88,25 +88,20 @@ TEST (clone_tests, simple_clone_test_pub2)
     EXPECT_EQ (icnt, 2);
     c1.saveFile ("pubtest2.json");
 
-    EXPECT_TRUE (ghc::filesystem::exists ("pubtest2.json"));
-}
+    ASSERT_TRUE (ghc::filesystem::exists ("pubtest2.json"));
 
-TEST (clone_tests,
-      simple_clone_test_pub2_file,
-      *boost::unit_test::depends_on ("clone_tests/simple_clone_test_pub2"))
-{
-    auto fi = helics::loadFederateInfo ("pubtest2.json");
-    fi.coreName = "clone_core3";
-    fi.coreInitString = "--autobroker";
-    fi.coreType = helics::core_type::TEST;
-    helics::apps::Player c1 ("c1", fi);
-    c1.loadFile ("pubtest2.json");
+    auto fi2 = helics::loadFederateInfo ("pubtest2.json");
+    fi2.coreName = "clone_core3";
+    fi2.coreInitString = "--autobroker";
+    fi2.coreType = helics::core_type::TEST;
+    helics::apps::Player p1 ("p1", fi2);
+    p1.loadFile ("pubtest2.json");
 
-    c1.initialize ();
+    p1.initialize ();
 
-    EXPECT_EQ (c1.pointCount (), 3u);
-    EXPECT_EQ (c1.publicationCount (), 2u);
-    c1.finalize ();
+    EXPECT_EQ (p1.pointCount (), 3u);
+    EXPECT_EQ (p1.publicationCount (), 2u);
+    p1.finalize ();
     ghc::filesystem::remove ("pubtest2.json");
 }
 
@@ -148,7 +143,7 @@ TEST (clone_tests, simple_clone_test_message)
     fi2.coreName = "clone_core5";
     fi2.coreInitString = "--autobroker";
     fi2.coreType = helics::core_type::TEST;
-    helics::apps::Player p1 ("c1", fi2);
+    helics::apps::Player p1 ("p1", fi2);
     p1.loadFile ("eptsave.json");
 
     p1.initialize ();
@@ -206,7 +201,7 @@ TEST (clone_tests, simple_clone_test_combo)
     fi2.coreName = "clone_core7";
     fi2.coreInitString = "--autobroker";
     fi2.coreType = helics::core_type::TEST;
-    helics::apps::Player p1 ("c1", fi2);
+    helics::apps::Player p1 ("p1", fi2);
     p1.loadFile ("combsave.json");
 
     p1.initialize ();
@@ -268,24 +263,22 @@ TEST (clone_tests, simple_clone_test_sub)
     EXPECT_EQ (icnt, 2);
     c1.saveFile ("subtest.json");
 
-    EXPECT_TRUE (ghc::filesystem::exists ("subtest.json"));
-}
+    ASSERT_TRUE (ghc::filesystem::exists ("subtest.json"));
 
-TEST (clone_tests, simple_clone_test_sub_file, *boost::unit_test::depends_on ("clone_tests/simple_clone_test_sub"))
-{
-    auto fi = helics::loadFederateInfo ("subtest.json");
-    fi.coreName = "clone_core9";
-    fi.coreInitString = "--autobroker";
-    fi.coreType = helics::core_type::TEST;
-    helics::apps::Player c1 ("c1", fi);
-    c1.loadFile ("subtest.json");
+    // now test the file loading
+    auto fi2 = helics::loadFederateInfo ("subtest.json");
+    fi2.coreName = "clone_core9";
+    fi2.coreInitString = "--autobroker";
+    fi2.coreType = helics::core_type::TEST;
+    helics::apps::Player p1 ("p1", fi2);
+    p1.loadFile ("subtest.json");
 
-    c1.initialize ();
+    p1.initialize ();
 
-    EXPECT_EQ (c1.pointCount (), 3u);
-    EXPECT_EQ (c1.publicationCount (), 2u);
-    EXPECT_EQ (c1.accessUnderlyingFederate ().getInputCount (), 2);
-    c1.finalize ();
+    EXPECT_EQ (p1.pointCount (), 3u);
+    EXPECT_EQ (p1.publicationCount (), 2u);
+    EXPECT_EQ (p1.accessUnderlyingFederate ().getInputCount (), 2);
+    p1.finalize ();
     ghc::filesystem::remove ("subtest.json");
 }
 

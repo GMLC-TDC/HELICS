@@ -640,6 +640,8 @@ TEST_P (player_message_file_tests, message_test_files)
     fut.get ();
 }
 
+INSTANTIATE_TEST_SUITE_P (player_tests, player_message_file_tests, ::testing::ValuesIn (simple_message_files));
+
 TEST (player_tests, player_test_help)
 {
     std::vector<std::string> args{"--quiet", "--version"};
