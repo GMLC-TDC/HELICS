@@ -11,7 +11,7 @@ A note on future revisions.
 Minor release with bug fixes and a few additional features
 ### Changed
 -   helics apps tests is converted to use google test and is now being run through the sanitizers
--   The C interface helics logging callback specifications now include a user data object.  This is technically a breaking change, but there were a few issues with the current implementation so it is not entirely clear it was usable as it was.  There are now some tests for the functionality
+-   **BREAKING CHANGE** The C interface helics logging callback specifications now include a user data object.  This is technically a breaking change, but there were a few issues with the current implementation so it is not entirely clear it was usable as it was.  There are now some tests for the functionality.  This log callback specification was not available in the language API's and the C++ API has not changed, only the C interface to specifying direct logging callbacks.  This is considered a minor change due to no known users of this interface at present and as it was it wasn't entirely operational.  No further changes are expected.  
 -  The use of Boost C++ in the helics core and application api are now limited to the IPC core(there are no plans to remove this usage) and an option to `DISABLE_BOOST` is available in the CMAKE files.  This will turn off the IPC_CORE and any optional uses of boost in some of the libraries.  Future features may use Boost but should retain the ability to disable its use.  
 
 ### Fixed
@@ -19,7 +19,8 @@ Minor release with bug fixes and a few additional features
 - some issues related to file logs
 
 ### Added
--   logMessage functions in the federate for user specified log messages
+-   logMessage functions in the federate for user specified log messages and levels
+    -  `logDebugMessage`, `logWarningMessage`, `logErrorMessage`, `logInfoMessage` function in all API's to simplify common logging operations
 -   function to set the log file from the core C++ API
 -   A CMAKE option to disable BOOST entirely
 

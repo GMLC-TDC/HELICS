@@ -249,11 +249,11 @@ class Federate
     /** define a logging function to use for logging message and notices from the federation and individual
     federate
     @param logFunction the callback function for doing something with a log message
-    it takes 3 inputs an integer for logLevel 0-4+  0 -error, 1- warning 2-status, 3-debug 44trace
+    it takes 3 inputs an integer for logLevel /ref helics_log_level
     A string indicating the source of the message and another string with the actual message
     */
     void
-    setLoggingCallback (const std::function<void(int, const std::string &, const std::string &)> &logFunction);
+    setLoggingCallback (const std::function<void (int, const std::string &, const std::string &)> &logFunction);
 
     /** make a query of the core
     @details this call is blocking until the value is returned which make take some time depending on the size of
@@ -512,10 +512,34 @@ class Federate
    */
     virtual void logMessage (int level, const std::string &message) const;
 
-    /** log a simplified message to the federate Logger
+    /** log an error message to the federate Logger
     @param message the message to log
     */
-    virtual void logMessage (const std::string &message) const { logMessage (-2, message); }
+    virtual void logErrorMessage (const std::string &message) const
+    {
+        logMessage (helics_log_level_error, message);
+    }
+    /** log a warning message to the federate Logger
+    @param message the message to log
+    */
+    virtual void logWarningMessage (const std::string &message) const
+    {
+        logMessage (helics_log_level_warning, message);
+    }
+    /** log an info message to the federate Logger
+    @param message the message to log
+    */
+    virtual void logInfoMessage (const std::string &message) const
+    {
+        logMessage (helics_log_level_summary, message);
+    }
+    /** log a debug message to the federate Logger
+    @param message the message to log
+    */
+    virtual void logDebugMessage (const std::string &message) const
+    {
+        logMessage (helics_log_level_data, message);
+    }
 
   private:
     /** register filter interfaces defined in  file or string

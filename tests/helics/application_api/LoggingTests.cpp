@@ -124,7 +124,7 @@ BOOST_AUTO_TEST_CASE (check_log_message)
     });
 
     Fed->enterExecutingMode ();
-    Fed->logMessage ("test MEXAGE");
+    Fed->logInfoMessage ("test MEXAGE");
     Fed->requestNextStep ();
     Fed->finalize ();
 
@@ -138,6 +138,59 @@ BOOST_AUTO_TEST_CASE (check_log_message)
         }
     }
     BOOST_CHECK (found);
+}
+
+BOOST_AUTO_TEST_CASE (check_log_message_functions)
+{
+    helics::FederateInfo fi (CORE_TYPE_TO_TEST);
+    fi.coreInitString = "--autobroker";
+    fi.setProperty (helics::defs::log_level, helics_log_level_trace);
+
+    auto Fed = std::make_shared<helics::Federate> ("test1", fi);
+
+    gmlc::libguarded::guarded<std::vector<std::pair<int, std::string>>> mlog;
+    Fed->setLoggingCallback ([&mlog] (int level, const std::string &, const std::string &message) {
+        mlog.lock ()->emplace_back (level, message);
+    });
+
+    Fed->enterExecutingMode ();
+    Fed->logErrorMessage ("test ERROR");
+    Fed->logWarningMessage ("test WARNING");
+    Fed->logInfoMessage ("test INFO");
+    Fed->logDebugMessage ("test DEBUG");
+    Fed->requestNextStep ();
+    Fed->finalize ();
+
+    auto llock = mlog.lock ();
+    auto &messages = *llock;
+    int order = 0;
+    for (auto &m : llock)
+    {
+        if (m.second.find ("ERROR") != std::string::npos)
+        {
+            BOOST_CHECK_EQUAL (m.first, helics_log_level_error);
+            BOOST_CHECK_EQUAL (order, 0);
+            order = 1;
+        }
+        if (m.second.find ("WARNING") != std::string::npos)
+        {
+            BOOST_CHECK_EQUAL (m.first, helics_log_level_warning);
+            BOOST_CHECK_EQUAL (order, 1);
+            order = 2;
+        }
+        if (m.second.find ("INFO") != std::string::npos)
+        {
+            BOOST_CHECK_EQUAL (m.first, helics_log_level_summary);
+            BOOST_CHECK_EQUAL (order, 2);
+            order = 3;
+        }
+        if (m.second.find ("DEBUG") != std::string::npos)
+        {
+            BOOST_CHECK_GT (m.first, helics_log_level_summary);
+            BOOST_CHECK_EQUAL (order, 3);
+            order = 4;
+        }
+    }
 }
 
 BOOST_AUTO_TEST_CASE (check_log_message_levels)
