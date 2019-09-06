@@ -42,7 +42,7 @@ BOOST_AUTO_TEST_CASE (check_log_message)
     BOOST_CHECK_EQUAL (err.error_code, 0);
 
     helicsFederateEnterExecutingMode (fed, &err);
-    helicsFederateLogMessage (fed, "test MEXAGE", &err);
+    helicsFederateLogInfoMessage (fed, "test MEXAGE", &err);
     helicsFederateRequestNextStep (fed, &err);
     helicsFederateFinalize (fed, &err);
     BOOST_CHECK_EQUAL (err.error_code, 0);
@@ -80,8 +80,8 @@ BOOST_AUTO_TEST_CASE (check_log_message_levels)
     BOOST_CHECK_EQUAL (err.error_code, 0);
 
     helicsFederateEnterExecutingMode (fed, &err);
-    helicsFederateLogMessageLevel (fed, 3, "test MEXAGE1", &err);
-    helicsFederateLogMessageLevel (fed, 8, "test MEXAGE2", &err);
+    helicsFederateLogLevelMessage (fed, 3, "test MEXAGE1", &err);
+    helicsFederateLogLevelMessage (fed, 8, "test MEXAGE2", &err);
     helicsFederateRequestNextStep (fed, &err);
     helicsFederateFinalize (fed, &err);
     BOOST_CHECK_EQUAL (err.error_code, 0);
@@ -125,8 +125,8 @@ BOOST_AUTO_TEST_CASE (check_log_message_levels_high)
     BOOST_CHECK_EQUAL (err.error_code, 0);
 
     helicsFederateEnterExecutingMode (fed, &err);
-    helicsFederateLogMessageLevel (fed, 3, "test MEXAGE1", &err);
-    helicsFederateLogMessageLevel (fed, 8, "test MEXAGE2", &err);
+    helicsFederateLogLevelMessage (fed, 3, "test MEXAGE1", &err);
+    helicsFederateLogLevelMessage (fed, 8, "test MEXAGE2", &err);
     helicsFederateRequestNextStep (fed, &err);
     helicsFederateFinalize (fed, &err);
     BOOST_CHECK_EQUAL (err.error_code, 0);

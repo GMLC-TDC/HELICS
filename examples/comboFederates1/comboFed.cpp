@@ -21,12 +21,13 @@ int main (int argc, char *argv[])
     helics::apps::BrokerApp brk;
     std::string brokerArgs = "";
 
-    app.add_option_function<std::string> ("--target,-t",
-                                          [&vtarget, &mtarget](const std::string &name) {
-                                              vtarget = name;
-                                              mtarget = name;
-                                          },
-                                          "name of the federate to target");
+    app.add_option_function<std::string> (
+      "--target,-t",
+      [&vtarget, &mtarget] (const std::string &name) {
+          vtarget = name;
+          mtarget = name;
+      },
+      "name of the federate to target");
     app.add_option ("--valuetarget", vtarget, "name of the value federate to target", true);
     app.add_option ("--messagetarget", mtarget, "name of the message federate to target", true);
     app.add_option ("--endpoint,-e", targetEndpoint, "name of the target endpoint", true);
@@ -67,7 +68,7 @@ int main (int argc, char *argv[])
 
     auto &subid = cFed->registerSubscription (vtarget + "/pub", "double");
 
-    cFed->logMessage ("Registration Complete");
+    cFed->logInfoMessage ("Registration Complete");
 
     std::cout << "entering init State\n";
     cFed->enterInitializingMode ();
@@ -98,7 +99,7 @@ int main (int argc, char *argv[])
     }
     cFed->logMessage (7, "Process Complete.");
     cFed->logMessage (1, "Reached End of application.");
-    cFed->logMessage ("Calling Finalize.");
+    cFed->logInfoMessage ("Calling Finalize.");
     cFed->finalize ();
     return 0;
 }
