@@ -1012,10 +1012,7 @@ message_processing_result FederateState::processActionMessage (ActionMessage &cm
                 timeCoord->disconnect ();
                 cmd.dest_id = parent_broker_id;
                 setState (HELICS_TERMINATING);
-                if (parent_ != nullptr)
-                {
-                    parent_->addActionMessage (cmd);
-                }
+                routeMessage (cmd);
             }
         }
         else
@@ -1296,6 +1293,22 @@ message_processing_result FederateState::processActionMessage (ActionMessage &cm
     case CMD_INTERFACE_CONFIGURE:
         setInterfaceProperty (cmd);
         break;
+    case CMD_QUERY:
+    {
+        std::string repStr;
+        ActionMessage queryResp (CMD_QUERY_REPLY);
+        queryResp.dest_id = cmd.source_id;
+        queryResp.source_id = cmd.dest_id;
+        queryResp.messageID = cmd.messageID;
+        queryResp.counter = cmd.counter;
+        const std::string &target = cmd.getString (targetStringLoc);
+
+        queryResp.source_id = global_id;
+
+        queryResp.payload = processQueryActual (cmd.payload);
+        routeMessage (queryResp);
+    }
+    break;
     }
     return message_processing_result::continue_processing;
 }
