@@ -96,7 +96,7 @@ namespace helics
 FederateState::FederateState (const std::string &name_, const CoreFederateInfo &info_)
     : name (name_), global_id{global_federate_id ()}
 {
-    timeCoord = std::make_unique<TimeCoordinator> ([this](const ActionMessage &msg) { routeMessage (msg); });
+    timeCoord = std::make_unique<TimeCoordinator> ([this] (const ActionMessage &msg) { routeMessage (msg); });
     for (const auto &prop : info_.timeProps)
     {
         setProperty (prop.first, prop.second);
@@ -404,23 +404,20 @@ stx::optional<ActionMessage> FederateState::processPostTerminationAction (const 
 
 iteration_result FederateState::waitSetup ()
 {
-    if (!processing.test_and_set ())
+    if (try_lock ())
     {  // only enter this loop once per federate
         auto ret = processQueue ();
-        processing.clear (std::memory_order_release);
+        unlock ();
         return static_cast<iteration_result> (ret);
     }
 
-    while (processing.test_and_set ())
-    {
-        std::this_thread::sleep_for (50ms);
-    }
+    sleeplock ();
     iteration_result ret;
     switch (getState ())
     {
     case HELICS_CREATED:
     {  // we are still in the created state
-        processing.clear (std::memory_order_release);
+        unlock ();
         return waitSetup ();
     }
     case HELICS_ERROR:
@@ -434,16 +431,16 @@ iteration_result FederateState::waitSetup ()
         break;
     }
 
-    processing.clear (std::memory_order_release);
+    unlock ();
     return ret;
 }
 
 iteration_result FederateState::enterInitializingMode ()
 {
-    if (!processing.test_and_set ())
+    if (try_lock ())
     {  // only enter this loop once per federate
         auto ret = processQueue ();
-        processing.clear (std::memory_order_release);
+        unlock ();
         if (ret == message_processing_result::next_step)
         {
             time_granted = initialTime;
@@ -452,10 +449,7 @@ iteration_result FederateState::enterInitializingMode ()
         return static_cast<iteration_result> (ret);
     }
 
-    while (processing.test_and_set ())
-    {
-        std::this_thread::sleep_for (50ms);
-    }
+    sleeplock ();
     iteration_result ret;
     switch (getState ())
     {
@@ -467,20 +461,20 @@ iteration_result FederateState::enterInitializingMode ()
         break;
     case HELICS_CREATED:
     {
-        processing.clear (std::memory_order_release);
+        unlock ();
         return enterInitializingMode ();
     }
     default:  // everything >= HELICS_INITIALIZING
         ret = iteration_result::next_step;
         break;
     }
-    processing.clear (std::memory_order_release);
+    unlock ();
     return ret;
 }
 
 iteration_result FederateState::enterExecutingMode (iteration_request iterate)
 {
-    if (!processing.test_and_set ())
+    if (try_lock ())
     {  // only enter this loop once per federate
         // timeCoord->enteringExecMode (iterate);
         ActionMessage exec (CMD_EXEC_REQUEST);
@@ -526,13 +520,13 @@ iteration_result FederateState::enterExecutingMode (iteration_request iterate)
             break;
         }
 
-        processing.clear (std::memory_order_release);
+        unlock ();
         if ((realtime) && (ret == message_processing_result::next_step))
         {
             if (!mTimer)
             {
                 mTimer = std::make_shared<MessageTimer> (
-                  [this](ActionMessage &&mess) { return this->addAction (std::move (mess)); });
+                  [this] (ActionMessage &&mess) { return this->addAction (std::move (mess)); });
             }
             start_clock_time = std::chrono::steady_clock::now ();
         }
@@ -540,10 +534,7 @@ iteration_result FederateState::enterExecutingMode (iteration_request iterate)
     }
     // the following code is for situation which this has been called multiple times, which really shouldn't be
     // done but it isn't really an error so we need to deal with it.
-    while (processing.test_and_set ())
-    {
-        std::this_thread::sleep_for (50ms);
-    }
+    sleeplock ();
     iteration_result ret;
     switch (getState ())
     {
@@ -562,13 +553,13 @@ iteration_result FederateState::enterExecutingMode (iteration_request iterate)
         ret = iteration_result::next_step;
         break;
     }
-    processing.clear (std::memory_order_release);
+    unlock ();
     return ret;
 }
 
 iteration_time FederateState::requestTime (Time nextTime, iteration_request iterate)
 {
-    if (!processing.test_and_set ())
+    if (try_lock ())
     {  // only enter this loop once per federate
         Time lastTime = timeCoord->getGrantedTime ();
         events.clear ();  // clear the event queue
@@ -677,7 +668,7 @@ iteration_time FederateState::requestTime (Time nextTime, iteration_request iter
             }
         }
 
-        processing.clear (std::memory_order_release);
+        unlock ();
         if ((retTime.grantedTime > nextTime) && (nextTime > lastTime))
         {
             if (!ignore_time_mismatch_warnings)
@@ -691,10 +682,7 @@ iteration_time FederateState::requestTime (Time nextTime, iteration_request iter
     }
     // this would not be good practice to get into this part of the function
     // but the area must protect itself and should return something sensible
-    while (processing.test_and_set ())
-    {
-        std::this_thread::sleep_for (50ms);
-    }
+    sleeplock ();
     iteration_result ret = iterating ? iteration_result::iterating : iteration_result::next_step;
     if (state == HELICS_FINISHED)
     {
@@ -705,7 +693,7 @@ iteration_time FederateState::requestTime (Time nextTime, iteration_request iter
         ret = iteration_result::error;
     }
     iteration_time retTime = {time_granted, ret};
-    processing.clear (std::memory_order_release);
+    unlock ();
     return retTime;
 }
 
@@ -750,20 +738,17 @@ void FederateState::fillEventVectorNextIteration (Time currentTime)
 
 iteration_result FederateState::genericUnspecifiedQueueProcess ()
 {
-    if (!processing.test_and_set ())
+    if (try_lock ())
     {  // only 1 thread can enter this loop once per federate
         auto ret = processQueue ();
         time_granted = timeCoord->getGrantedTime ();
         allowed_send_time = timeCoord->allowedSendTime ();
-        processing.clear (std::memory_order_release);
+        unlock ();
         return static_cast<iteration_result> (ret);
     }
 
-    while (processing.test_and_set ())
-    {
-        std::this_thread::sleep_for (50ms);
-    }
-    processing.clear (std::memory_order_release);
+    sleeplock ();
+    unlock ();
     return iteration_result::next_step;
 }
 
@@ -1322,36 +1307,24 @@ void FederateState::setProperties (const ActionMessage &cmd)
         switch (cmd.action ())
         {
         case CMD_FED_CONFIGURE_FLAG:
-            while (processing.test_and_set ())
-            {
-                ;  // spin
-            }
+            spinlock ();
             setOptionFlag (cmd.messageID, checkActionFlag (cmd, indicator_flag));
-            processing.clear (std::memory_order_release);
+            unlock ();
             break;
         case CMD_FED_CONFIGURE_TIME:
-            while (processing.test_and_set ())
-            {
-                ;  // spin
-            }
+            spinlock ();
             setProperty (cmd.messageID, cmd.actionTime);
-            processing.clear (std::memory_order_release);
+            unlock ();
             break;
         case CMD_FED_CONFIGURE_INT:
-            while (processing.test_and_set ())
-            {
-                ;  // spin
-            }
+            spinlock ();
             setProperty (cmd.messageID, cmd.counter);
-            processing.clear (std::memory_order_release);
+            unlock ();
             break;
         case CMD_INTERFACE_CONFIGURE:
-            while (processing.test_and_set ())
-            {
-                ;  // spin
-            }
+            spinlock ();
             setInterfaceProperty (cmd);
-            processing.clear (std::memory_order_release);
+            unlock ();
             break;
         default:
             break;
@@ -1714,12 +1687,9 @@ Time FederateState::nextMessageTime () const
 
 void FederateState::setCoreObject (CommonCore *parent)
 {
-    while (processing.test_and_set ())
-    {
-        ;  // spin
-    }
+    spinlock ();
     parent_ = parent;
-    processing.clear (std::memory_order_release);
+    unlock ();
 }
 
 void FederateState::logMessage (int level, const std::string &logMessageSource, const std::string &message) const
@@ -1734,19 +1704,19 @@ void FederateState::logMessage (int level, const std::string &logMessageSource, 
     }
 }
 
-std::string FederateState::processQuery (const std::string &query) const
+std::string FederateState::processQueryActual (const std::string &query) const
 {
     if (query == "publications")
     {
-        return generateStringVector (interfaceInformation.getPublications (), [](auto &pub) { return pub->key; });
+        return generateStringVector (interfaceInformation.getPublications (), [] (auto &pub) { return pub->key; });
     }
     if (query == "inputs")
     {
-        return generateStringVector (interfaceInformation.getInputs (), [](auto &inp) { return inp->key; });
+        return generateStringVector (interfaceInformation.getInputs (), [] (auto &inp) { return inp->key; });
     }
     if (query == "endpoints")
     {
-        return generateStringVector (interfaceInformation.getEndpoints (), [](auto &ept) { return ept->key; });
+        return generateStringVector (interfaceInformation.getEndpoints (), [] (auto &ept) { return ept->key; });
     }
     if (query == "interfaces")
     {
@@ -1764,8 +1734,10 @@ std::string FederateState::processQuery (const std::string &query) const
                 s << isrc.fed_id << ':' << isrc.handle << ';';
             }
         }
+        ipts.unlock ();
+        unlock ();
         auto str = s.str ();
-        if (str.back() == ';')
+        if (str.back () == ';')
         {
             str.pop_back ();
         }
@@ -1775,7 +1747,7 @@ std::string FederateState::processQuery (const std::string &query) const
     if (query == "dependencies")
     {
         return generateStringVector (timeCoord->getDependencies (),
-                                     [](auto &dep) { return std::to_string (dep.baseValue ()); });
+                                     [] (auto &dep) { return std::to_string (dep.baseValue ()); });
     }
     if (query == "timeconfig")
     {
@@ -1797,12 +1769,44 @@ std::string FederateState::processQuery (const std::string &query) const
     if (query == "dependents")
     {
         return generateStringVector (timeCoord->getDependents (),
-                                     [](auto &dep) { return std::to_string (dep.baseValue ()); });
+                                     [] (auto &dep) { return std::to_string (dep.baseValue ()); });
     }
     if (queryCallback)
     {
         return queryCallback (query);
     }
     return "#invalid";
+}
+
+std::string FederateState::processQuery (const std::string &query, bool waitable) const
+{
+    std::string qstring;
+    if (query == "publications" || query == "inputs" || query == "endpoints")
+    {  // these never need to be locked
+        qstring = processQueryActual (query);
+    }
+    else
+    {  // the rest might to prevent a race condition
+        bool locked = false;
+        if (waitable)
+        {
+            sleeplock ();
+            locked = true;
+        }
+        else
+        {
+            locked = try_lock ();
+        }
+        if (locked)
+        {
+            qstring = processQueryActual (query);
+            unlock ();
+        }
+        else
+        {
+            qstring = "#wait";
+        }
+    }
+    return qstring;
 }
 }  // namespace helics

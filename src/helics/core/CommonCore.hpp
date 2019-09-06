@@ -409,8 +409,10 @@ class CommonCore : public Core, public BrokerBase
     /** generate a query response for a federate if possible
     @param fed a pointer to the federateState object to query
     @param queryStr  the string containing the actual query
+    @param waitable  if set to true the query will wait until the federate becomes available if set to false and
+    the federate can't answer immediately a #wait string will be returned.
     */
-    std::string federateQuery (const FederateState *fed, const std::string &queryStr) const;
+    std::string federateQuery (const FederateState *fed, const std::string &queryStr, bool waitable) const;
 
     /** send an error code to all the federates*/
     void sendErrorToFederates (int error_code);

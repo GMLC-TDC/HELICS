@@ -1679,7 +1679,8 @@ void CommonCore::deliverMessage (ActionMessage &message)
                         {
                             if (FiltI->filterOp != nullptr)
                             {
-								//this is a cloning filter the whole point is that it would not modify the message so the return is irrelevent
+                                // this is a cloning filter the whole point is that it would not modify the message
+                                // so the return is irrelevent
                                 (void)(FiltI->filterOp->process (createMessageFromCommand (message)));
                             }
                         }
@@ -1951,7 +1952,7 @@ void CommonCore::setQueryCallback (local_federate_id federateID,
     fed->setQueryCallback (std::move (queryFunction));
 }
 
-std::string CommonCore::federateQuery (const FederateState *fed, const std::string &queryStr) const
+std::string CommonCore::federateQuery (const FederateState *fed, const std::string &queryStr, bool waitable) const
 {
     if (fed == nullptr)
     {
@@ -1974,7 +1975,7 @@ std::string CommonCore::federateQuery (const FederateState *fed, const std::stri
         return std::to_string (static_cast<int> (fed->getState ()));
     }
 
-    return fed->processQuery (queryStr);
+    return fed->processQuery (queryStr, waitable);
 }
 
 std::string CommonCore::coreQuery (const std::string &queryStr) const
@@ -2153,7 +2154,7 @@ std::string CommonCore::query (const std::string &target, const std::string &que
     auto fed = (target != "federate") ? getFederate (target) : getFederateAt (local_federate_id (0));
     if (fed != nullptr)
     {
-        return federateQuery (fed, queryStr);
+        return federateQuery (fed, queryStr, true);
     }
     ActionMessage querycmd (CMD_QUERY);
     querycmd.source_id = global_id.load ();
@@ -2333,7 +2334,7 @@ void CommonCore::processPriorityCommand (ActionMessage &&command)
         else
         {
             auto fedptr = getFederateCore (target);
-            repStr = federateQuery (fedptr, command.payload);
+            repStr = federateQuery (fedptr, command.payload, false);
         }
 
         queryResp.payload = std::move (repStr);
@@ -4075,7 +4076,7 @@ ActionMessage &CommonCore::processMessage (ActionMessage &m)
                 {
                     if (filt->cloning)
                     {
-						//cloning filter the return is not useful
+                        // cloning filter the return is not useful
                         (void)(filt->filterOp->process (createMessageFromCommand (m)));
                     }
                     else
