@@ -293,11 +293,11 @@ if(GENERATE_DOXYGEN_DOC)
             "${PROJECT_BINARY_DIR}/docs"
         )
         configure_file(
-            ${HELICS_CURRENT_SOURCE_DIR}/config/Doxyfile.in
-            ${HELICS_CURRENT_BINARY_DIR}/Doxyfile @ONLY
+            ${HELICS_SOURCE_DIR}/config/Doxyfile.in
+            ${HELICS_BINARY_DIR}/Doxyfile @ONLY
         )
         add_custom_target(
-            helics_doc ${DOXYGEN_EXECUTABLE} ${HELICS_CURRENT_BINARY_DIR}/Doxyfile
+            doc ${DOXYGEN_EXECUTABLE} ${HELICS_BINARY_DIR}/Doxyfile
             WORKING_DIRECTORY ${DOXYGET_OUTPUT_DIR}
             COMMENT "Generating API documentation with Doxygen"
             VERBATIM
