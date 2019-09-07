@@ -5,7 +5,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 A note on future revisions.  
-  Everything within a major version number should be code compatible (with the exception of experimental interfaces).  The most notable example of an experimental interface is the support for multiple source inputs.  The APIs to deal with this will change in future minor releases.  Everything within a single minor release should be network compatible with other federates on the same minor release number.  Compatibility across minor release numbers may be possible in some situations but we are not going to guarantee this as those components are subject to performance improvements and may need to be modified at some point.  Patch releases will be limited to bug fixes and other improvements not impacting the public API or network compatibility.  Check [here](./docs/Public_API.md) for details on what is included and excluded from the public API and version stability.
+  Everything within a major version number should be code compatible (with the exception of experimental interfaces).  The most notable example of an experimental interface is the support for multiple source inputs.  The APIs to deal with this will change in future minor releases.  Everything within a single minor release should be network compatible with other federates on the same minor release number.  Compatibility across minor release numbers may be possible in some situations but we are not going to guarantee this as those components are subject to performance improvements and may need to be modified at some point.  Patch releases will be limited to bug fixes and other improvements not impacting the public API or network compatibility.  Check the [Public API](./docs/Public_API.md) for details on what is included and excluded from the public API and version stability.
 
 ## \[2.2.1\] ~ 2019-09-15
 Minor release with bug fixes and a few additional features
@@ -44,11 +44,11 @@ Minor release with some updates to the networking portion of HELICS and some API
 -   The ability to specify a broker key for brokers and cores to limit linking to those cores with the appropriate key
 -   A units library into HELICS,  mismatched units are checked and units published as a double with units on the publication and subscription converted internally
 -   A new API for messages in the C interface.  The old interface has difficulties when working with binary data in the message structure.  So a message object API was created with appropriate methods to access the data.  The previous message API will be deprecated in release 2.3 and removed in 3.0.  
--  A clone app for cloning an existing federate including all publications and subscriptions and all data that is being sent out.  It is accessible through the helics_app clone subcommand
--  CI tests using docker for clang memory sanitizer and the octave interface.
--  Scripts for generating a single zip file with all the code including submodules.  This will be generated for each new release.  
--  A broker server that generate multiple brokers on a single system and handles the port allocation intelligently. (Only ZMQ currently supported, this is not backwards compatible, though regular 2.2 brokers should work with 2.1 federates if needed.)
-- A Docker image containing the HELICS apps (available on Docker Hub for tagged releases and the latest develop branch at https://hub.docker.com/r/helics/helics)
+-   A clone app for cloning an existing federate including all publications and subscriptions and all data that is being sent out.  It is accessible through the helics_app clone subcommand
+-   CI tests using docker for clang memory sanitizer and the octave interface.
+-   Scripts for generating a single zip file with all the code including submodules.  This will be generated for each new release.  
+-   A broker server that generate multiple brokers on a single system and handles the port allocation intelligently. (Only ZMQ currently supported, this is not backwards compatible, though regular 2.2 brokers should work with 2.1 federates if needed.)
+-   A Docker image containing the HELICS apps (available on Docker Hub for tagged releases and the latest develop branch at [https://hub.docker.com/r/helics/helics](https://hub.docker.com/r/helics/helics))
 
 ### Removed
 -   ENABLE_SWIG option in cmake as always ON.  This option will only appear for interfaces that have existing build files.  For swig generated interfaces that do not have prebuilt files (octave, python2, and C#) this option will no longer appear as swig is required.  

@@ -21,7 +21,7 @@ class Core
 {
   public:
     /** Default constructor*/
-    Core () HELICS_NOTHROW: core (HELICS_NULL_POINTER){};
+    Core () HELICS_NOTHROW : core (HELICS_NULL_POINTER){};
     /** construct with type, core name and initialization string */
     Core (const std::string &type, const std::string &name, const std::string &initString)
     {
@@ -67,9 +67,7 @@ class Core
     /** create a destination Filter on the specified federate
     @details filters can be created through a federate or a core , linking through a federate allows
     a few extra features of name matching to function on the federate interface but otherwise equivalent behavior
-    @param fed the fed to register through
     @param type the type of filter to create
-    @param target the name of endpoint to target
     @param name the name of the filter (can be NULL)
     @return a helics_filter object
     */
@@ -81,7 +79,6 @@ class Core
     /** create a cloning Filter on the specified federate
     @details cloning filters copy a message and send it to multiple locations source and destination can be added
     through other functions
-    @param fed the fed to register through
     @param deliveryEndpoint the specified endpoint to deliver the message
     @return a helics_filter object
     */
@@ -89,14 +86,18 @@ class Core
     {
         return CloningFilter (helicsCoreRegisterCloningFilter (core, deliveryEndpoint.c_str (), hThrowOnError ()));
     }
-    /** set a global federation value*/
+
+    /** set a global federation value
+    @param valueName the name of the global value to set
+    @param value actual value of the global variable
+    */
     void setGlobal (const std::string &valueName, const std::string &value)
     {
         helicsCoreSetGlobal (core, valueName.c_str (), value.c_str (), hThrowOnError ());
     }
 
   protected:
-    helics_core core;
+    helics_core core;  //!< reference to the underlying core object
 };
 
 }  // namespace helicscpp
