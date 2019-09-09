@@ -1791,7 +1791,7 @@ std::string FederateState::processQueryActual (const std::string &query) const
     return "#invalid";
 }
 
-std::string FederateState::processQuery (const std::string &query, bool waitable) const
+std::string FederateState::processQuery (const std::string &query) const
 {
     std::string qstring;
     if (query == "publications" || query == "inputs" || query == "endpoints")
@@ -1800,17 +1800,7 @@ std::string FederateState::processQuery (const std::string &query, bool waitable
     }
     else
     {  // the rest might to prevent a race condition
-        bool locked = false;
-        if (waitable)
-        {
-            sleeplock ();
-            locked = true;
-        }
-        else
-        {
-            locked = try_lock ();
-        }
-        if (locked)
+        if (try_lock ())
         {
             qstring = processQueryActual (query);
             unlock ();

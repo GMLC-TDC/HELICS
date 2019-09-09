@@ -326,8 +326,8 @@ class FederateState
     }
     /** generate the result of a query string
     @param query a query string
-    @return the resulting string from the query*/
-    std::string processQuery (const std::string &query, bool waitable) const;
+    @return the resulting string from the query or "#wait" if the federate is not available to answer immediately*/
+    std::string processQuery (const std::string &query) const;
     /** check if a value should be published or not
     @param pub_id the handle of the publication
     @param data the raw data to check
