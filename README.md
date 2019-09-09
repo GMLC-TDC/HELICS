@@ -86,10 +86,14 @@ Our [ReadTheDocs](https://helics.readthedocs.io/en/latest/index.html) site provi
 
 Additionally, our initial requirements document can be found [here](docs/introduction/original_specification.md), which describes a number of our early design considerations.
 
-### [CHANGELOG](CHANGELOG.md) 
+### [CHANGELOG](CHANGELOG.md)
 For a history of changes to HELICS
 ### [ROADMAP](docs/ROADMAP.md)
 For a snapshot of some plans for what is to come
+
+## Docker
+
+Some of the HELICS apps are available from [docker](https://cloud.docker.com/u/helics/repository/docker/helics/helics).  This image does not include any libraries for linking just the executables.  `helics_broker`, `helics_app`, `helics_recorder`, `helics_player`, and `helics_broker_server`.  Other images are expected to be available in the future.  See [Docker](https://github.com/GMLC-TDC/HELICS/blob/master/docs/docker.md) for a few more details.
 
 ## Tools with HELICS support
 
@@ -106,7 +110,7 @@ We are always looking for help adding support for more tools, so please contact 
 -   [PSST](https://github.com/kdheepak/psst), an open-source python-based unit-commitment and dispatch market simulator. HELICS examples are included in the  [HELICS-Tutorial](https://github.com/GMLC-TDC/HELICS-Tutorial)
 -   [MATPOWER](http://www.pserc.cornell.edu/matpower/), an open-source Matlab based power flow and optimal power flow tool. HELICS support currently (4/14/2018) under development.
 -   [InterPSS](http://www.interpss.org/), a Java-based power systems simulator. HELICS support currently (4/14/2018) under development.
-- Commercial tools that have interacted with HELICS, include Power World, PSS/e, PSLF, and Cyme.  
+-   Commercial tools that have interacted with HELICS, include Power World, PSS/e, PSLF, and Cyme.  
 
 ### Communication Tools
 
@@ -118,8 +122,8 @@ We are always looking for help adding support for more tools, so please contact 
 -   [HELICS CLI](https://github.com/GMLC-TDC/helics-cli) provides a simple way to automate configuring, starting, and stopping HELICS co-simulations.
 -   [Player](https://helics.readthedocs.io/en/latest/apps/Player.html), which acts as a simple send-only federate that simply publishes a stream of timed HELICS messages from a user-defined file. HELICS Player is included in the HELICS distribution.
 -   [Recorder](https://helics.readthedocs.io/en/latest/apps/Recorder.html), which acts as a simple receive-only federate that prints out or saves messages from one or more subscribed streams. HELICS Recorder is included in the HELICS distribution.
--  [Broker](https://helics.readthedocs.io/en/latest/apps/Broker.html),  Which is a command line tool for running a Broker.  There is also a Broker Server which can generate brokers as needed.  
-- [App](https://helics.readthedocs.io/en/latest/apps/App.htm).  Is a general app executable which can run a number of other apps including Player and Recorder, as well as a [Tracer](https://helics.readthedocs.io/en/latest/apps/App.html#tracer), [Echo](https://helics.readthedocs.io/en/latest/apps/App.html#echo), [Source](https://helics.readthedocs.io/en/latest/apps/App.html#source), and [Clone](https://helics.readthedocs.io/en/latest/apps/App.html#clone).   
+-   [Broker](https://helics.readthedocs.io/en/latest/apps/Broker.html),  Which is a command line tool for running a Broker.  There is also a Broker Server which can generate brokers as needed.  
+-   [App](https://helics.readthedocs.io/en/latest/apps/App.htm).  Is a general app executable which can run a number of other apps including Player and Recorder, as well as a [Tracer](https://helics.readthedocs.io/en/latest/apps/App.html#tracer), [Echo](https://helics.readthedocs.io/en/latest/apps/App.html#echo), [Source](https://helics.readthedocs.io/en/latest/apps/App.html#source), and [Clone](https://helics.readthedocs.io/en/latest/apps/App.html#clone).   
 
 ## Contributing
 Contributors are welcome see the [Contributing](CONTRIBUTING.md) guidelines for me details on the process of contributing.  And the [Code of Conduct](.github/CODE_OF_CONDUCT.md) for guidelines on the community expectations.  All prior contributors can be found [here](CONTRIBUTORS.md)
