@@ -102,7 +102,7 @@ class FederateState
     std::vector<global_federate_id> delayedFederates;  //!< list of federates to delay messages from
     Time time_granted = startupTime;  //!< the most recent granted time;
     Time allowed_send_time = startupTime;  //!< the next time a message can be sent;
-    std::atomic_flag processing = ATOMIC_FLAG_INIT;  //!< the federate is processing
+    mutable std::atomic_flag processing = ATOMIC_FLAG_INIT;  //!< the federate is processing
   private:
     /** a logging function for logging or printing messages*/
     std::function<void (int, const std::string &, const std::string &)> loggerFunction;
@@ -179,7 +179,7 @@ class FederateState
     int endpointCount () const;
     /** get the number of inputs*/
     int inputCount () const;
-    /** locks the processing*/
+    /** locks the processing with a busy loop*/
     void lock ()
     {
         while (processing.test_and_set ())
@@ -187,8 +187,26 @@ class FederateState
             ;  // spin
         }
     }
+    /** locks the processing with a busy loop*/
+    void spinlock () const
+    {
+        while (processing.test_and_set ())
+        {
+            ;  // spin
+        }
+    }
+    /** locks the processing with a sleep loop*/
+    void sleeplock () const
+    {
+        while (processing.test_and_set ())
+        {
+            std::this_thread::sleep_for (std::chrono::milliseconds (50));
+        }
+    }
+    /** trys to lock the processing return true if successful and false if not*/
+    bool try_lock () const { return !processing.test_and_set (); }
     /** unlocks the processing*/
-    void unlock () { processing.clear (std::memory_order_release); }
+    void unlock () const { processing.clear (std::memory_order_release); }
 
   private:
     /** process the federate queue until returnable event
@@ -232,6 +250,8 @@ class FederateState
     void addDependent (global_federate_id fedThatDependsOnThis);
     /** check the interfaces for any issues*/
     int checkInterfaces ();
+    /** generate results from a query*/
+    std::string processQueryActual (const std::string &query) const;
 
   public:
     /** get the granted time of a federate*/
@@ -306,7 +326,7 @@ class FederateState
     }
     /** generate the result of a query string
     @param query a query string
-    @return the resulting string from the query*/
+    @return the resulting string from the query or "#wait" if the federate is not available to answer immediately*/
     std::string processQuery (const std::string &query) const;
     /** check if a value should be published or not
     @param pub_id the handle of the publication

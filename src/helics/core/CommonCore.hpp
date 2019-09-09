@@ -409,6 +409,8 @@ class CommonCore : public Core, public BrokerBase
     /** generate a query response for a federate if possible
     @param fed a pointer to the federateState object to query
     @param queryStr  the string containing the actual query
+    @return "#wait" if the lock cannot be granted immediately and no result can be obtained otherwise an answer to
+    the query
     */
     std::string federateQuery (const FederateState *fed, const std::string &queryStr) const;
 

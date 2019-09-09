@@ -1679,7 +1679,8 @@ void CommonCore::deliverMessage (ActionMessage &message)
                         {
                             if (FiltI->filterOp != nullptr)
                             {
-								//this is a cloning filter the whole point is that it would not modify the message so the return is irrelevent
+                                // this is a cloning filter the whole point is that it would not modify the message
+                                // so the return is irrelevent
                                 (void)(FiltI->filterOp->process (createMessageFromCommand (message)));
                             }
                         }
@@ -1973,7 +1974,6 @@ std::string CommonCore::federateQuery (const FederateState *fed, const std::stri
     {
         return std::to_string (static_cast<int> (fed->getState ()));
     }
-
     return fed->processQuery (queryStr);
 }
 
@@ -2153,8 +2153,39 @@ std::string CommonCore::query (const std::string &target, const std::string &que
     auto fed = (target != "federate") ? getFederate (target) : getFederateAt (local_federate_id (0));
     if (fed != nullptr)
     {
-        return federateQuery (fed, queryStr);
+        std::string ret = federateQuery (fed, queryStr);
+        if (ret != "#wait")
+        {
+            return ret;
+        }
+        ActionMessage fedquerycmd (CMD_QUERY);
+        fedquerycmd.source_id = global_id.load ();
+        fedquerycmd.dest_id = fed->global_id;
+        auto index = ++queryCounter;
+        fedquerycmd.messageID = index;
+        fedquerycmd.payload = queryStr;
+        fedquerycmd.setStringData (target);
+        auto queryResult = ActiveQueries.getFuture (fedquerycmd.messageID);
+        fed->addAction (std::move (fedquerycmd));
+        std::future_status status = std::future_status::timeout;
+        while (status == std::future_status::timeout)
+        {
+            status = queryResult.wait_for (std::chrono::milliseconds (50));
+            if (status == std::future_status::ready)
+            {
+                auto qres = queryResult.get ();
+                ActiveQueries.finishedWithValue (index);
+                return qres;
+            }
+            ret = federateQuery (fed, queryStr);
+            if (ret != "#wait")
+            {
+                ActiveQueries.finishedWithValue (index);
+                return ret;
+            }
+        }
     }
+
     ActionMessage querycmd (CMD_QUERY);
     querycmd.source_id = global_id.load ();
     auto index = ++queryCounter;
@@ -2334,6 +2365,12 @@ void CommonCore::processPriorityCommand (ActionMessage &&command)
         {
             auto fedptr = getFederateCore (target);
             repStr = federateQuery (fedptr, command.payload);
+            if (repStr == "#wait")
+            {
+                command.dest_id = fedptr->global_id;
+                fedptr->addAction (std::move (command));
+                break;
+            }
         }
 
         queryResp.payload = std::move (repStr);
@@ -4075,7 +4112,7 @@ ActionMessage &CommonCore::processMessage (ActionMessage &m)
                 {
                     if (filt->cloning)
                     {
-						//cloning filter the return is not useful
+                        // cloning filter the return is not useful
                         (void)(filt->filterOp->process (createMessageFromCommand (m)));
                     }
                     else
