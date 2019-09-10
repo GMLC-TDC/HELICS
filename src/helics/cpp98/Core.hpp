@@ -59,11 +59,28 @@ class Core
         return *this;
     }
 #endif
+    /** set the core to ready to enter init
+   @details this function only needs to be called for cores that don't have any federates but may
+   have filters for cores with federates it won't do anything*/
     void setReadyToInit () { helicsCoreSetReadyToInit (core, hThrowOnError ()); }
-    void disconnect () { helicsCoreDisconnect (core, hThrowOnError ()); }
-
+    
+	/**
+     * disconnect the core from its broker
+     */
+	void disconnect () { helicsCoreDisconnect (core, hThrowOnError ()); }
+    /** waits in the current thread until the broker is disconnected
+    @param msToWait  the timeout to wait for disconnect (-1) implies no timeout
+    @return true if the disconnect was successful false if it timed out
+     */
+    bool waitForDisconnect (int msToWait = -1)
+    {
+        return helicsCoreWaitForDisconnect (core, msToWait, hThrowOnError ());
+    }
+    /** get an identifier string for the core
+     */
     const char *getIdentifier () const { return helicsCoreGetIdentifier (core); }
-
+    /** get the connection network or connection address for the core*/
+    const char *getAddress () const { return helicsCoreGetAddress (core); }
     /** create a destination Filter on the specified federate
     @details filters can be created through a federate or a core , linking through a federate allows
     a few extra features of name matching to function on the federate interface but otherwise equivalent behavior

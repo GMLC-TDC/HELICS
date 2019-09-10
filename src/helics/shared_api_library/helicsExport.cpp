@@ -991,6 +991,18 @@ const char *helicsBrokerGetAddress (helics_broker broker)
     return add.c_str ();
 }
 
+const char *helicsCoreGetAddress (helics_core core)
+{
+    auto cr = getCore (core, nullptr);
+    if (cr == nullptr)
+    {
+        return nullstr.c_str ();
+    }
+
+    auto &add = cr->getAddress ();
+    return add.c_str ();
+}
+
 void helicsCoreSetReadyToInit (helics_core core, helics_error *err)
 {
     auto cr = getCore (core, err);
@@ -1026,13 +1038,22 @@ helics_bool helicsBrokerWaitForDisconnect (helics_broker broker, int msToWait, h
     {
         return helics_true;
     }
-    brk->waitForDisconnect (std::chrono::milliseconds (msToWait));
-    if (brk->isConnected ())
-    {
-        return helics_false;
-    }
-    return helics_true;
+    bool res=brk->waitForDisconnect (std::chrono::milliseconds (msToWait));
+    return res ? helics_true : helics_false;
 }
+
+
+helics_bool helicsCoreWaitForDisconnect (helics_core core, int msToWait, helics_error *err)
+{
+    auto cr = getCore(core, err);
+    if (cr == nullptr)
+    {
+        return helics_true;
+    }
+    bool res = cr->waitForDisconnect (std::chrono::milliseconds (msToWait));
+    return res ? helics_true : helics_false;
+}
+
 void helicsBrokerDisconnect (helics_broker broker, helics_error *err)
 {
     auto brk = getBroker (broker, err);

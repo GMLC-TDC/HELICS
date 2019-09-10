@@ -181,8 +181,9 @@ namespace std
 template <>
 struct hash<helics::global_federate_id>
 {
-    using argument_type = helics::global_federate_id;
-    using result_type = std::size_t;
+    using argument_type = helics::global_federate_id;  //!< typedef for input type of hash
+    using result_type = std::size_t;  //!< typedef for output result
+    /** hash operator*/
     result_type operator() (argument_type const &key) const noexcept
     {
         return std::hash<helics::global_federate_id::base_type>{}(key.baseValue ());
@@ -193,8 +194,9 @@ struct hash<helics::global_federate_id>
 template <>
 struct hash<helics::global_broker_id>
 {
-    using argument_type = helics::global_broker_id;
-    using result_type = std::size_t;
+    using argument_type = helics::global_broker_id;  //!< typedef for input type of hash
+    using result_type = std::size_t;  //!< typedef for output result
+    /** hash operator*/
     result_type operator() (argument_type const &key) const noexcept
     {
         return std::hash<helics::global_broker_id::base_type>{}(key.baseValue ());
@@ -205,8 +207,9 @@ struct hash<helics::global_broker_id>
 template <>
 struct hash<helics::route_id>
 {
-    using argument_type = helics::route_id;
-    using result_type = std::size_t;
+    using argument_type = helics::route_id;  //!< typedef for input type of hash
+    using result_type = std::size_t;  //!< typedef for output result
+    /** hash operator*/
     result_type operator() (argument_type const &key) const noexcept
     {
         return std::hash<helics::route_id::base_type>{}(key.baseValue ());
@@ -218,8 +221,9 @@ struct hash<helics::route_id>
 template <>
 struct hash<helics::global_handle>
 {
-    using argument_type = helics::global_handle;
-    using result_type = std::size_t;
+    using argument_type = helics::global_handle;  //!< typedef for input type of hash
+    using result_type = std::size_t;  //!< typedef for output result
+    /** hash operator*/
     result_type operator() (argument_type const &key) const noexcept
     {
         return std::hash<uint64_t>{}(static_cast<uint64_t> (key));

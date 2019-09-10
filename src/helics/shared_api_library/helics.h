@@ -133,12 +133,19 @@ extern "C"
     HELICS_EXPORT void
     helicsBrokerAddDestinationFilterToEndpoint (helics_broker broker, const char *filter, const char *endpoint, helics_error *err);
 
-    /** wait for the broker to disconnect
-  @param broker the broker to wait for
+    /** wait for the core to disconnect
+  @param core the core to wait for
   @param msToWait the time out in millisecond (<0 for infinite timeout)
   @param[in,out] err an error object that will contain an error code and string if any error occurred during the execution of the function
   @return helics_true if the disconnect was successful,  helics_false if there was a timeout
   */
+    HELICS_EXPORT helics_bool helicsCoreWaitForDisconnect (helics_core core, int msToWait, helics_error *err);
+    /** wait for the broker to disconnect
+ @param broker the broker to wait for
+ @param msToWait the time out in millisecond (<0 for infinite timeout)
+ @param[in,out] err an error object that will contain an error code and string if any error occurred during the execution of the function
+ @return helics_true if the disconnect was successful,  helics_false if there was a timeout
+ */
     HELICS_EXPORT helics_bool helicsBrokerWaitForDisconnect (helics_broker broker, int msToWait, helics_error *err);
 
     /** check if a core is connected
@@ -185,6 +192,11 @@ extern "C"
     @return a string with the network address of the broker
     */
     HELICS_EXPORT const char *helicsBrokerGetAddress (helics_broker broker);
+    /** get the network address associated with a core
+    @param core the core to query
+    @return a string with the network address of the broker
+    */
+    HELICS_EXPORT const char *helicsCoreGetAddress (helics_core core);
 
     /** set the core to ready for init
     @details this function is used for cores that have filters but no federates so there needs to be

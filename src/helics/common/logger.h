@@ -57,8 +57,8 @@ class Logger
     /** open a file to write the log messages
     @param file the name of the file to write messages to*/
     void openFile (const std::string &file);
-    /** close the file for logging
-    @param file the name of the file to write messages to*/
+    /** close the current file for logging
+     */
     void closeFile ();
     /** function to start the logging thread
     @param cLevel the console print level

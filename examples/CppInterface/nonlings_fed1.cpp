@@ -42,7 +42,7 @@ int main (int /*argc*/, char ** /*argv*/)
     helicscpp::FederateInfo fi ("zmq");
 
     /* Federate init string */
-    fi.setCoreInitString (fedinitstring);
+    fi.setCoreInit(fedinitstring);
     fi.setProperty (helics_property_time_delta, deltat);
     fi.setProperty (helics_property_int_max_iterations, 100);
 
