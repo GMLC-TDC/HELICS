@@ -7,6 +7,7 @@
 [![](https://img.shields.io/conda/pn/gmlc-tdc/helics.svg)](https://anaconda.org/gmlc-tdc/helics/)
 [![](https://api.codacy.com/project/badge/Grade/83ba19b36b714c729ec3a3d18504505e?branch=develop)](https://www.codacy.com/app/GMLC-TDC/HELICS?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=GMLC-TDC/HELICS&amp;utm_campaign=Badge_Grade;branch=develop)
 [![CircleCI](https://circleci.com/gh/GMLC-TDC/HELICS/tree/develop.svg?style=svg)](https://circleci.com/gh/GMLC-TDC/HELICS/tree/develop)
+[![Documentation Status](https://readthedocs.org/projects/helics/badge/?version=latest)](https://helics.readthedocs.io/en/latest/?badge=latest)
 [![Releases](https://img.shields.io/github/tag-date/GMLC-TDC/HELICS.svg)](https://github.com/GMLC-TDC/HELICS/releases)
 [![](https://img.shields.io/badge/License-BSD-blue.svg)](https://github.com/GMLC-TDC/HELICS/blob/master/LICENSE)
 
