@@ -249,6 +249,25 @@ jobs:
       install: true
       script: scripts/trigger-dependent-ci-builds.sh
 
+    - stage: "Documentation"
+      os: linux
+      dist: trusty
+      compiler: gcc
+      language: cpp
+      addons:
+        apt:
+          packages:
+            - doxygen
+            - doxygen-doc
+            - python-pip
+      install:
+        - pip install -U pip
+        - pip install sphinx
+        - pip install -r requirements.txt
+      script:
+        - cd docs && make rtddoxygen html
+      after_success: skip
+
 branches:
   except:
     - gh-pages
@@ -292,14 +311,6 @@ script:
 
   # Create an installer using CPack
   - if [[ "$ENABLE_CPACK" ]]; then cpack -G STGZ -B $(pwd)/cpack-output ; fi
-
-jobs:
-  include:
-    - stage: "Documentation"
-      os: linux
-      script:
-        - cd docs && make rtddoxygen html
-      after_success: skip
 
 notifications:
     email: false
