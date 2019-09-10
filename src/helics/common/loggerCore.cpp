@@ -121,7 +121,7 @@ void LoggingCore::processingLoop ()
                     {
                         break;  // break the loop
                     }
-                    msg.push_back ('$');
+                    msg.push_back ('^');
                 }
             }
         }

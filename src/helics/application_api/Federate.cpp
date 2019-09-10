@@ -1311,4 +1311,9 @@ std::string const &Federate::getInfo (interface_handle handle)
     return (coreObject) ? coreObject->getInterfaceInfo (handle) : emptyStr;
 }
 
+void Federate::logMessage (int level, const std::string &message) const
+{
+    coreObject->logMessage (fedID, level, message);
+}
+
 }  // namespace helics

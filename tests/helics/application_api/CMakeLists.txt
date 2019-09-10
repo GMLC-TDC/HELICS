@@ -25,6 +25,7 @@ set(
   CombinationFederateTests.cpp
   ValueFederateSingleTransfer.cpp
   ValueFederateDualTransfer.cpp
+  LoggingTests.cpp
 )
 
 add_executable(

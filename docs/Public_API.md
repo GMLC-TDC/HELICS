@@ -42,7 +42,7 @@ The public API includes the following
 * Shared Library headers (c)
   * api-data.h
   * helics.h
-  * helicsCallbacks.h
+  * helicsCallbacks.h (Not well used and considered experimental yet)
   * MessageFederate.h
   * MessageFilters.h
   * ValueFederate.h

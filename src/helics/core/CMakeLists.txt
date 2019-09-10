@@ -105,6 +105,8 @@ set(
 	loggingHelper.hpp
 	CommsBroker.hpp
 	CommsBroker_impl.hpp
+	global_federate_id.hpp
+	basic_core_types.hpp
 	TimeoutMonitor.h
 	CoreBroker.hpp
 	InterfaceInfo.hpp

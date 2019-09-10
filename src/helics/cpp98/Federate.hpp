@@ -365,6 +365,32 @@ class Federate
         helicsFederateSetGlobal (fed, valueName.c_str (), value.c_str (), hThrowOnError ());
     }
 
+    /** log an error message*/
+    void logErrorMessage (const std::string &message)
+    {
+        helicsFederateLogErrorMessage (fed, message.c_str (), hThrowOnError ());
+    }
+    /** log a warning message*/
+    void logWarningMessage (const std::string &message)
+    {
+        helicsFederateLogWarningMessage (fed, message.c_str (), hThrowOnError ());
+    }
+    /** log an info message*/
+    void logInfoMessage (const std::string &message)
+    {
+        helicsFederateLogInfoMessage (fed, message.c_str (), hThrowOnError ());
+    }
+    /** log a debug message*/
+    void logDebugMessage (const std::string &message)
+    {
+        helicsFederateLogDebugMessage (fed, message.c_str (), hThrowOnError ());
+    }
+    /** log a message with a specified log level*/
+    void logMessage (int level, const std::string &message)
+    {
+        helicsFederateLogLevelMessage (fed, level, message.c_str (), hThrowOnError ());
+    }
+
   protected:
     helics_federate fed;
     bool exec_async_iterate;

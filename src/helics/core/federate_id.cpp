@@ -5,7 +5,7 @@ the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 
-#include "federate_id.hpp"
+#include "global_federate_id.hpp"
 
 #include <iostream>
 

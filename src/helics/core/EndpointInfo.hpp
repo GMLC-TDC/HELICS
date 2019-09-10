@@ -6,10 +6,7 @@ SPDX-License-Identifier: BSD-3-Clause
 */
 #pragma once
 
-#include "Core.hpp"
-#include "helics-time.hpp"
-
-#include "helics/helics-config.h"
+#include "basic_core_types.hpp"
 
 #include "../common/GuardedTypes.hpp"
 #include <deque>

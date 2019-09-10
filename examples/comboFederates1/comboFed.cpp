@@ -31,7 +31,7 @@ int main (int argc, char *argv[])
     app.add_option ("--valuetarget", vtarget, "name of the value federate to target", true);
     app.add_option ("--messagetarget", mtarget, "name of the message federate to target", true);
     app.add_option ("--endpoint,-e", targetEndpoint, "name of the target endpoint", true);
-    app.add_option ("--source,-e", myendpoint, "name of the source endpoint", true);
+    app.add_option ("--source,-s", myendpoint, "name of the source endpoint", true);
     app.add_option ("--startbroker", brokerArgs, "start a broker with the specified arguments");
 
     auto ret = app.helics_parse (argc, argv);
@@ -67,6 +67,9 @@ int main (int argc, char *argv[])
     auto &pubid = cFed->registerPublication ("pub", "double");
 
     auto &subid = cFed->registerSubscription (vtarget + "/pub", "double");
+
+    cFed->logInfoMessage ("Registration Complete");
+
     std::cout << "entering init State\n";
     cFed->enterInitializingMode ();
     std::cout << "entered init State\n";
@@ -94,6 +97,9 @@ int main (int argc, char *argv[])
                       << cFed->getTarget (subid) << '\n';
         }
     }
+    cFed->logMessage (7, "Process Complete.");
+    cFed->logMessage (1, "Reached End of application.");
+    cFed->logInfoMessage ("Calling Finalize.");
     cFed->finalize ();
     return 0;
 }

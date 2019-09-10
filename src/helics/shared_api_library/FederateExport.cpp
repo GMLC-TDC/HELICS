@@ -1001,3 +1001,33 @@ void helicsFederateSetGlobal (helics_federate fed, const char *valueName, const 
     }
     fedObj->setGlobal (valueName, AS_STRING (value));
 }
+
+void helicsFederateLogErrorMessage (helics_federate fed, const char *logmessage, helics_error *err)
+{
+    helicsFederateLogLevelMessage (fed, helics_log_level_error, logmessage, err);
+}
+
+void helicsFederateLogWarningMessage (helics_federate fed, const char *logmessage, helics_error *err)
+{
+    helicsFederateLogLevelMessage (fed, helics_log_level_warning, logmessage, err);
+}
+
+void helicsFederateLogInfoMessage (helics_federate fed, const char *logmessage, helics_error *err)
+{
+    helicsFederateLogLevelMessage (fed, helics_log_level_summary, logmessage, err);
+}
+
+void helicsFederateLogDebugMessage (helics_federate fed, const char *logmessage, helics_error *err)
+{
+    helicsFederateLogLevelMessage (fed, helics_log_level_data, logmessage, err);
+}
+
+void helicsFederateLogLevelMessage (helics_federate fed, int loglevel, const char *logmessage, helics_error *err)
+{
+    auto fedObj = getFed (fed, err);
+    if (fedObj == nullptr)
+    {
+        return;
+    }
+    fedObj->logMessage (loglevel, AS_STRING (logmessage));
+}

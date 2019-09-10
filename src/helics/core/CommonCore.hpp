@@ -36,7 +36,6 @@ class FederateState;
 
 class BasicHandleInfo;
 class FilterCoordinator;
-class Logger;
 class FilterInfo;
 class TimeoutMonitor;
 enum class handle_type : char;
@@ -180,7 +179,9 @@ class CommonCore : public Core, public BrokerBase
     virtual void setLoggingLevel (int logLevel) override;
     virtual void setLoggingCallback (
       local_federate_id federateID,
-      std::function<void (int, const std::string &, const std::string &)> logFunction) override final;
+      std::function<void(int, const std::string &, const std::string &)> logFunction) override final;
+
+    virtual void setLogFile (const std::string &lfile) override final;
 
     virtual std::string query (const std::string &target, const std::string &queryStr) override;
     virtual void setQueryCallback (local_federate_id federateID,
@@ -248,10 +249,6 @@ class CommonCore : public Core, public BrokerBase
     bool allDisconnected () const;
     /** check if all federates have said good-bye*/
     bool allFedDisconnected () const;
-    virtual bool sendToLogger (global_federate_id federateID,
-                               int logLevel,
-                               const std::string &name,
-                               const std::string &message) const override;
 
   private:
     /** get the federate Information from the federateID*/

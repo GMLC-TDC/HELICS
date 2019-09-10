@@ -22,6 +22,7 @@ set(
   QueryTests.cpp 
   badInputTests.cpp
   comboConfigTests.cpp
+  loggingTests.cpp
 )
 
 set(

@@ -6,7 +6,7 @@ SPDX-License-Identifier: BSD-3-Clause
 */
 #pragma once
 #include "../helics_enums.h"
-#include "federate_id.hpp"
+
 #include <string>
 
 /** @file

@@ -608,7 +608,7 @@ class Core
 
     /** send a log message to the Core for logging
     @param federateID the federate that is sending the log message
-    @param logLevel  an integer for the log level (0- error, 1- warning, 2-status, 3-debug)
+    @param logLevel  an integer for the log level /ref helics_log_levels
     @param messageToLog the string to send to a logger
     */
     virtual void logMessage (local_federate_id federateID, int logLevel, const std::string &messageToLog) = 0;
@@ -623,15 +623,18 @@ class Core
     federate
     @param federateID  the identifier for the individual federate or 0 for the Core Logger
     @param logFunction the callback function for doing something with a log message
-    it takes 3 inputs an integer for logLevel 0-4+  0 -error, 1- warning 2-status, 3-debug 44trace
+    it takes 3 inputs an integer for logLevel /ref helics_log_levels
     A string indicating the source of the message and another string with the actual message
     */
     virtual void
     setLoggingCallback (local_federate_id federateID,
-                        std::function<void(int, const std::string &, const std::string &)> logFunction) = 0;
+                        std::function<void (int, const std::string &, const std::string &)> logFunction) = 0;
 
     /** set the core logging level*/
     virtual void setLoggingLevel (int logLevel) = 0;
+
+    /** set the core logging file*/
+    virtual void setLogFile (const std::string &lfile) = 0;
 
     /** set a federation global value
     @details this overwrites any previous value for this name

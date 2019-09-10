@@ -5,12 +5,16 @@ the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 #pragma once
+#include "helics/helics-config.h"
 
 #include "../core/helics-time.hpp"
-#include "helics/helics-config.h"
+
 #include "helicsTypes.hpp"
 
 #include "../helics_enums.h"
+
+#include "../core/federate_id.hpp"
+
 #include "FederateInfo.hpp"
 #include <atomic>
 #include <functional>
@@ -73,6 +77,7 @@ class Federate
       asyncCallInfo;  //!< pointer to a class defining the async call information
     std::unique_ptr<FilterFederateManager> fManager;  //!< class for managing filter operations
     std::string name;  //!< the name of the federate
+
   public:
     /**constructor taking a federate information structure
     @param fedname the name of the federate can be empty to use a name from the federateInfo
@@ -244,7 +249,7 @@ class Federate
     /** define a logging function to use for logging message and notices from the federation and individual
     federate
     @param logFunction the callback function for doing something with a log message
-    it takes 3 inputs an integer for logLevel 0-4+  0 -error, 1- warning 2-status, 3-debug 44trace
+    it takes 3 inputs an integer for logLevel /ref helics_log_level
     A string indicating the source of the message and another string with the actual message
     */
     void
@@ -500,6 +505,41 @@ class Federate
     @param handle the interface handle to get the extraction units for
     @return a const ref to  std::string containing the units */
     const std::string &getInterfaceUnits (interface_handle handle) const { return getExtractionUnits (handle); }
+
+    /** log a message to the federate Logger
+   @param level the logging level of the message
+   @param message the message to log
+   */
+    virtual void logMessage (int level, const std::string &message) const;
+
+    /** log an error message to the federate Logger
+    @param message the message to log
+    */
+    virtual void logErrorMessage (const std::string &message) const
+    {
+        logMessage (helics_log_level_error, message);
+    }
+    /** log a warning message to the federate Logger
+    @param message the message to log
+    */
+    virtual void logWarningMessage (const std::string &message) const
+    {
+        logMessage (helics_log_level_warning, message);
+    }
+    /** log an info message to the federate Logger
+    @param message the message to log
+    */
+    virtual void logInfoMessage (const std::string &message) const
+    {
+        logMessage (helics_log_level_summary, message);
+    }
+    /** log a debug message to the federate Logger
+    @param message the message to log
+    */
+    virtual void logDebugMessage (const std::string &message) const
+    {
+        logMessage (helics_log_level_data, message);
+    }
 
   private:
     /** register filter interfaces defined in  file or string
