@@ -162,7 +162,6 @@ BOOST_AUTO_TEST_CASE (check_log_message_functions)
     Fed->finalize ();
 
     auto llock = mlog.lock ();
-    auto &messages = *llock;
     int order = 0;
     for (auto &m : llock)
     {
