@@ -104,7 +104,7 @@ if(MSYS AND USE_LIBCXX)
   target_compile_definitions(application_api PUBLIC "-DSTX_NO_STD_OPTIONAL=1")
 endif()
 
-
+if (NOT HELICS_BINARY_ONLY_INSTALL)
 install(
   FILES ${public_application_api_headers}
   DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/helics/application_api
@@ -116,3 +116,4 @@ install(
   DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/helics
   COMPONENT headers
 )
+endif()

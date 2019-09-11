@@ -121,6 +121,9 @@ endif()
 option(HELICS_WITH_CMAKE_PACKAGE "Generate and install cmake package files" ${HELICS_ROOT_PROJ})
 mark_as_advanced(HELICS_WITH_CMAKE_PACKAGE)
 
+option(HELICS_BINARY_ONLY_INSTALL "only install the helics binary executables" OFF)
+mark_as_advanced(HELICS_BINARY_ONLY_INSTALL)
+
 
 # Install instructions for this target
 if(HELICS_WITH_CMAKE_PACKAGE)
@@ -294,7 +297,7 @@ if(GENERATE_DOXYGEN_DOC)
             ${HELICS_CURRENT_BINARY_DIR}/Doxyfile @ONLY
         )
         add_custom_target(
-            doc ${DOXYGEN_EXECUTABLE} ${HELICS_CURRENT_BINARY_DIR}/Doxyfile
+            helics_doc ${DOXYGEN_EXECUTABLE} ${HELICS_CURRENT_BINARY_DIR}/Doxyfile
             WORKING_DIRECTORY ${DOXYGET_OUTPUT_DIR}
             COMMENT "Generating API documentation with Doxygen"
             VERBATIM
@@ -644,6 +647,7 @@ else()
 
 endif()
 
+if (NOT HELICS_BINARY_ONLY_INSTALL)
 file(GLOB UTILITIES_HEADERS_INSTALL_H ${PROJECT_SOURCE_DIR}/ThirdParty/utilities/gmlc/utilities/*.h)
 file(GLOB UTILITIES_HEADERS_INSTALL_HPP ${PROJECT_SOURCE_DIR}/ThirdParty/utilities/gmlc/utilities/*.hpp)
 file(GLOB UTILITIES_HEADERS_INSTALL_EXTRA ${PROJECT_SOURCE_DIR}/ThirdParty/utilities/gmlc/utilities/extra/*.hpp)
@@ -660,6 +664,7 @@ install(
   DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/helics/utilities/extra
   COMPONENT headers
 )
+endif(NOT HELICS_BINARY_ONLY_INSTALL)
 
 # -----------------------------------------------------------------------------
 # CMAKE Subdirectories
@@ -684,7 +689,7 @@ if(BUILD_HELICS_EXAMPLES)
 endif(BUILD_HELICS_EXAMPLES)
 
 if(ENABLE_ZMQ_CORE AND NOT ZMQ_USE_STATIC_LIBRARY)
-    if(WIN32)
+    if(WIN32 AND NOT HELICS_BINARY_ONLY_INSTALL)
         install(
             FILES $<TARGET_LINKER_FILE:libzmq>
             DESTINATION ${CMAKE_INSTALL_LIBDIR}
@@ -709,19 +714,20 @@ endif(ENABLE_CLANG_TOOLS)
 
 add_subdirectory(interfaces)
 
-
+if (NOT HELICS_BINARY_ONLY_INSTALL)
 # add base swig interface files as install option, regardless of current interfaces built
 install(
     FILES interfaces/helics.i interfaces/output.i
     DESTINATION ${CMAKE_INSTALL_DATADIR}/helics/swig
     COMPONENT swig
 )
-
+endif()
 
 add_subdirectory(docs)
 
 endif(HELICS_ROOT_PROJ)
 
+if (NOT HELICS_BINARY_ONLY_INSTALL)
 install(TARGETS helics_base ${HELICS_EXPORT_COMMAND})
 install(TARGETS helics_base_includes ${HELICS_EXPORT_COMMAND})
 install(TARGETS compile_flags_target ${HELICS_EXPORT_COMMAND})
@@ -788,6 +794,7 @@ install(
     COMPONENT libs
 )
 endif()
+endif(NOT HELICS_BINARY_ONLY_INSTALL)
 # -----------------------------------------------------------------------------
 # Setup configure.h file for accessing configure options
 # -----------------------------------------------------------------------------
@@ -795,6 +802,7 @@ configure_file(
     "config/helics-config.h.in"
     "${HELICS_BINARY_DIR}/include/helics/helics-config.h"
 )
+if (NOT HELICS_BINARY_ONLY_INSTALL)
 install(
     FILES ${HELICS_BINARY_DIR}/include/helics/helics-config.h
     DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/helics
@@ -831,6 +839,9 @@ install(
     DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/helics
     COMPONENT headers
 )
+
+endif(NOT HELICS_BINARY_ONLY_INSTALL)
+
 if (HELICS_WITH_CMAKE_PACKAGE)
 
    include(CMakePackageConfigHelpers)
@@ -853,7 +864,7 @@ if (NOT HELICS_ROOT_PROJ)
 	set_target_properties(application_api helics_common helics_core helics-static PROPERTIES FOLDER helics)
 endif()
 
-if (HELICS_WITH_CMAKE_PACKAGE)
+if (HELICS_WITH_CMAKE_PACKAGE AND NOT HELICS_BINARY_ONLY_INSTALL)
 
 install(
     FILES

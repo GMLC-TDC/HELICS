@@ -1314,8 +1314,6 @@ message_processing_result FederateState::processActionMessage (ActionMessage &cm
         queryResp.source_id = cmd.dest_id;
         queryResp.messageID = cmd.messageID;
         queryResp.counter = cmd.counter;
-        const std::string &target = cmd.getString (targetStringLoc);
-
         queryResp.source_id = global_id;
 
         queryResp.payload = processQueryActual (cmd.payload);
