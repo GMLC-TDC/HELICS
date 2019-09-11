@@ -1,5 +1,5 @@
 #
-# Copyright © 2017-2018, Battelle Memorial Institute; Lawrence Livermore National
+# Copyright (c) 2017-2018, Battelle Memorial Institute; Lawrence Livermore National
 # Security, LLC; Alliance for Sustainable Energy, LLC All rights reserved.
 # SPDX-License-Identifier: BSD-3-Clause
 #
