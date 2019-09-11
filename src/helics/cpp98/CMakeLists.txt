@@ -37,6 +37,7 @@ if(MSVC)
   set_target_properties(helicsCpp98_ide PROPERTIES FOLDER interfaces)
 endif(MSVC)
 
+if (NOT HELICS_BINARY_ONLY_INSTALL)
 install(
   TARGETS helicsCpp98
   ${HELICS_EXPORT_COMMAND}
@@ -51,3 +52,4 @@ install(
   DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/helics/cpp98
   COMPONENT headers
 )
+endif()

@@ -2,6 +2,7 @@
 #so units cpp exports to the correct target export
 set(UNITS_LIBRARY_EXPORT_COMMAND ${HELICS_EXPORT_COMMAND} CACHE INTERNAL "")
 
+set(UNITS_BINARY_ONLY_INSTALL ${HELICS_BINARY_ONLY_INSTALL} CACHE INTERNAL "")
 if (MSVC)
   option(HELICS_UNITS_OBJLIB "use the units objlib for linking object files instead of the normal target" OFF)
 else(MSVC)

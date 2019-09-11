@@ -105,8 +105,10 @@ if(APPLE)
   target_compile_definitions(helics_common PUBLIC "-DSTX_NO_STD_ANY=1")
 endif(APPLE)
 
+if (NOT HELICS_BINARY_ONLY_INSTALL)
 install(
   FILES ${helics_public_common}
   DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/helics/common
   COMPONENT headers
 )
+endif()

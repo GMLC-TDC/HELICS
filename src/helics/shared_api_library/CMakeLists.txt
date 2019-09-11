@@ -104,7 +104,7 @@ else()
   )
 endif()
 
-
+if (NOT HELICS_BINARY_ONLY_INSTALL)
 install(
   FILES ${CMAKE_CURRENT_BINARY_DIR}/helics_export.h
   DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/helics/shared_api_library
@@ -123,3 +123,5 @@ install(
   DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/helics/shared_api_library
   COMPONENT headers
 )
+
+endif()

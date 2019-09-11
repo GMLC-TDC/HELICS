@@ -127,6 +127,7 @@ if(BUILD_APP_LIBRARY)
 	set_property(TEST app_subcommand_version_return app_subcommand_help_return PROPERTY LABELS Continuous)
   endif(BUILD_APP_EXECUTABLES)
 
+  if (NOT HELICS_BINARY_ONLY_INSTALL)
   install(
     TARGETS helics_apps
     ${HELICS_EXPORT_COMMAND}
@@ -144,7 +145,7 @@ if(BUILD_APP_LIBRARY)
     DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/helics
     COMPONENT headers
   )
-
+  endif(NOT HELICS_BINARY_ONLY_INSTALL)
 endif (BUILD_APP_LIBRARY)
 
 # configure executable app
