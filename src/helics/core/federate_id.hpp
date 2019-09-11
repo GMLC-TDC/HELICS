@@ -50,11 +50,11 @@ class local_federate_id
 std::ostream &operator<< (std::ostream &os, local_federate_id fid);
 
 /** constant to use for indicating that a command is for the core itself from the Core Public API*/
-constexpr local_federate_id local_core_id (-259);/** class defining a local_federate_id
-@details  the intent of this class is to limit the operations available on a federate identifier
-to those that are a actually required and make sense, and make it as low impact as possible.
-it also acts to limit any mistakes of a local_federate_id
-*/
+constexpr local_federate_id local_core_id (-259); /** class defining a local_federate_id
+ @details  the intent of this class is to limit the operations available on a federate identifier
+ to those that are a actually required and make sense, and make it as low impact as possible.
+ it also acts to limit any mistakes of a local_federate_id
+ */
 class interface_handle
 {
   public:
@@ -94,8 +94,9 @@ namespace std
 template <>
 struct hash<helics::local_federate_id>
 {
-    using argument_type = helics::local_federate_id;
-    using result_type = hash<helics::local_federate_id::base_type>::result_type;
+    using argument_type = helics::local_federate_id; //!< type of object to hash
+    using result_type = hash<helics::local_federate_id::base_type>::result_type; //!< the type of the return result
+    /** actual hash operator*/
     result_type operator() (argument_type const &key) const noexcept
     {
         return std::hash<helics::local_federate_id::base_type>{}(key.baseValue ());
@@ -106,8 +107,9 @@ struct hash<helics::local_federate_id>
 template <>
 struct hash<helics::interface_handle>
 {
-    using argument_type = helics::interface_handle;
-    using result_type = hash<helics::interface_handle::base_type>::result_type;
+    using argument_type = helics::interface_handle; //!< type of object to hash
+    using result_type = hash<helics::interface_handle::base_type>::result_type; //!< the type of the return result
+    /** actual hash operator*/
     result_type operator() (argument_type const &key) const noexcept
     {
         return std::hash<helics::interface_handle::base_type>{}(key.baseValue ());

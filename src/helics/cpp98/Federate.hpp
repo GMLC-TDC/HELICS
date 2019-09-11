@@ -353,13 +353,14 @@ class Federate
     helics_time requestNextStep () { return helicsFederateRequestNextStep (fed, hThrowOnError ()); }
 
     /** request a time advancement to the next allowed time
+	@param timeDelta the amount of time requested to advance
     @return the granted time step*/
     helics_time requestTimeAdvance (helics_time timeDelta)
     {
         return helicsFederateRequestTimeAdvance (fed, timeDelta, hThrowOnError ());
     }
     /** request a time advancement
-   @param nextInternalTimeStep the next requested time step
+   @param time the next requested time step
    @param iterate a requested iteration mode
    @return the granted time step in a structure containing a return time and an iteration_result*/
     helics_iteration_time requestTimeIterative (helics_time time, helics_iteration_request iterate)
@@ -371,13 +372,13 @@ class Federate
     }
     /**  request a time advancement and return immediately for asynchronous function.
     @details /ref requestTimeComplete should be called to finish the operation and get the result
-    @param nextInternalTimeStep the next requested time step
+    @param time the next requested time step
     */
     void requestTimeAsync (helics_time time) { helicsFederateRequestTimeAsync (fed, time, hThrowOnError ()); }
 
     /** request a time advancement with iterative call and return for asynchronous function.
   @details /ref requestTimeIterativeComplete should be called to finish the operation and get the result
-  @param nextInternalTimeStep the next requested time step
+  @param time the next requested time step
   @param iterate a requested iteration level (none, require, optional)
   */
     void requestTimeIterativeAsync (helics_time time, helics_iteration_request iterate)

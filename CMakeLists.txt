@@ -290,7 +290,7 @@ if(GENERATE_DOXYGEN_DOC)
             DOXYGEN_OUTPUT_DIR
             PATH
             "location to put Doxygen docs"
-            "${PROJECT_BINARY_DIR}/docs"
+            "${HELICS_BINARY_DIR}/docs"
         )
         configure_file(
             ${HELICS_SOURCE_DIR}/config/Doxyfile.in

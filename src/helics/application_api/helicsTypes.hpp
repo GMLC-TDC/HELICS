@@ -93,11 +93,13 @@ class identifier_id_t
 // specialize std::hash
 namespace std
 {
+/** custom hashing function for identifier types so they can be used in hash maps*/
 template <typename BaseType, helics::identifiers ID, BaseType invalidValue>
 struct hash<helics::identifier_id_t<BaseType, ID, invalidValue>>
 {
-    using argument_type = helics::identifier_id_t<BaseType, ID, invalidValue>;
-    using result_type = std::size_t;
+    using argument_type = helics::identifier_id_t<BaseType, ID, invalidValue>; //!< the type of object to hash
+    using result_type = std::size_t; //!< the result type of the hash code
+    /** the actual hash operator*/
     result_type operator() (argument_type const &key) const noexcept
     {
         return std::hash<BaseType>{}(key.value ());
