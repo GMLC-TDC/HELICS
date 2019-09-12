@@ -1002,6 +1002,38 @@ void helicsFederateSetGlobal (helics_federate fed, const char *valueName, const 
     fedObj->setGlobal (valueName, AS_STRING (value));
 }
 
+static constexpr char invalidFederateCore[] = "Federate core is not connected";
+void helicsFederateSetLogFile (helics_federate fed, const char *logFile, helics_error *err)
+{
+    auto fedObj = getFed (fed, err);
+    if (fedObj == nullptr)
+    {
+        return;
+    }
+    auto cr = fedObj->getCorePointer ();
+
+    try
+    {
+        if (cr)
+        {
+            cr->setLogFile (AS_STRING (logFile));
+        }
+        else
+        {
+            if (err != nullptr)
+            {
+                err->error_code = helics_error_invalid_function_call;
+                err->message = invalidFederateCore;
+            }
+            return;
+        }
+    }
+    catch (...)
+    {
+        helicsErrorHandler (err);
+    }
+}
+
 void helicsFederateLogErrorMessage (helics_federate fed, const char *logmessage, helics_error *err)
 {
     helicsFederateLogLevelMessage (fed, helics_log_level_error, logmessage, err);

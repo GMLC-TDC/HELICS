@@ -20,6 +20,6 @@ endif()
 
 add_subdirectory(comboFederates1)
 
-if(BUILD_C_SHARED_LIB)
+if(NOT DISABLE_C_SHARED_LIB)
   add_subdirectory(CppInterface)
-endif(BUILD_C_SHARED_LIB)
+endif()

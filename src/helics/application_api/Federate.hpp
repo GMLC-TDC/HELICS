@@ -514,33 +514,33 @@ class Federate
    @param level the logging level of the message
    @param message the message to log
    */
-    virtual void logMessage (int level, const std::string &message) const;
+    void logMessage (int level, const std::string &message) const;
 
     /** log an error message to the federate Logger
     @param message the message to log
     */
-    virtual void logErrorMessage (const std::string &message) const
+    void logErrorMessage (const std::string &message) const
     {
         logMessage (helics_log_level_error, message);
     }
     /** log a warning message to the federate Logger
     @param message the message to log
     */
-    virtual void logWarningMessage (const std::string &message) const
+    void logWarningMessage (const std::string &message) const
     {
         logMessage (helics_log_level_warning, message);
     }
     /** log an info message to the federate Logger
     @param message the message to log
     */
-    virtual void logInfoMessage (const std::string &message) const
+    void logInfoMessage (const std::string &message) const
     {
         logMessage (helics_log_level_summary, message);
     }
     /** log a debug message to the federate Logger
     @param message the message to log
     */
-    virtual void logDebugMessage (const std::string &message) const
+    void logDebugMessage (const std::string &message) const
     {
         logMessage (helics_log_level_data, message);
     }

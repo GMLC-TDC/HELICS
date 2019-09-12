@@ -723,6 +723,13 @@ extern "C"
     */
     HELICS_EXPORT void helicsFederateSetGlobal (helics_federate fed, const char *valueName, const char *value, helics_error *err);
 
+	/** set the logging file for a federate(actually on the core associated with a federate)
+    @param fed the federate to set the log file for
+    @param logFile the name of the log file
+    @param[in,out] err a pointer to an error object for catching errors
+    */
+    HELICS_EXPORT void helicsFederateSetLogFile (helics_federate fed, const char *logFile, helics_error *err);
+
     /** log an error message through a federate
     @param fed the federate to set the global through
     @param logmessage the message to put in the log
