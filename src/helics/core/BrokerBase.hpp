@@ -81,7 +81,7 @@ class BrokerBase
     std::atomic<broker_state_t> brokerState{created};  //!< flag indicating that the structure is past the
                                                        //!< initialization stage indicating that no more changes
                                                        //!< can be made to the number of federates or handles
-    bool noAutomaticID = false; //!< the broker should not automatically generate and ID
+    bool noAutomaticID = false; //!< the broker should not automatically generate an ID
     bool hasTimeDependency = false;  //!< set to true if the broker has Time dependencies
     bool enteredExecutionMode = false;  //!< flag indicating that the broker has entered execution mode
     bool waitingForBrokerPingReply = false;  //!< flag indicating we are waiting for a ping reply

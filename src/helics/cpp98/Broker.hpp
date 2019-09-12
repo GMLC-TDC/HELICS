@@ -108,7 +108,7 @@ class Broker
     {
         helicsBrokerSetGlobal (broker, valueName.c_str (), value.c_str (), hThrowOnError ());
     }
-    /** create a data Link between a named publication and a named input
+    /** create a data link between a named publication and a named input
      @param source the name of the publication
      @param target the name of the input*/
 	void dataLink(const std::string &source, const std::string &target)
@@ -131,7 +131,7 @@ class Broker
         helicsBrokerAddDestinationFilterToEndpoint (broker, filter.c_str (), target.c_str (), hThrowOnError ());
     }
   protected:
-    helics_broker broker; //!< underlying broker inforation
+    helics_broker broker; //!< underlying broker information
 };
 
 }  // namespace helicscpp

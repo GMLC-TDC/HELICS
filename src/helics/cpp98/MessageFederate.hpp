@@ -96,7 +96,7 @@ class MessageFederate : public virtual Federate
     /** Get a packet for any endpoints in the federate **/
     helics_message_object getMessage () { return helicsFederateGetMessageObject (fed); }
 
-	/**get the number of registered endpoints*/
+    /**get the number of registered endpoints*/
     int getEndpointCount () const { return helicsFederateGetEndpointCount (fed); }
 
   private:

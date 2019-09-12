@@ -89,13 +89,11 @@ The callback take 3 parameters about a message and in the case of `C` callbacks 
 A set of functions are available for individual federates to generate log messages
 
 ```cpp
-
     void logMessage (int level, const std::string &message) const;
     void logErrorMessage (const std::string &message) const;
     void logWarningMessage (const std::string &message) const;
     void logInfoMessage (const std::string &message) const;
     void logDebugMessage (const std::string &message) const;
-    
 ```
 
 These will log a message at the appropriate level or at a user specified level.  

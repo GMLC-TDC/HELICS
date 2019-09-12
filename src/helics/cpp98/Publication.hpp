@@ -93,7 +93,7 @@ class Publication
     /** get the interface information field of the publication*/
 	const char *getInfo () const { return helicsPublicationGetInfo (pub); }
 
-	/** set the interface information field of the publication*/
+    /** set the interface information field of the publication*/
     void setInfo (const std::string &info) { helicsPublicationSetInfo (pub, info.c_str (), HELICS_IGNORE_ERROR); }
   private:
     helics_publication pub;  //!< the reference to the underlying publication

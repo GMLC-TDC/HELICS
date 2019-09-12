@@ -52,7 +52,7 @@ class ValueFederate : public virtual Federate
         }
     }
     /**constructor taking a string with the required information
-    @param configString can be either a JSON file a TOML file (with extension TOML) or a string containing JSON
+    @param configString can be either a JSON file, a TOML file (with extension TOML), or a string containing JSON
     code
     */
     explicit ValueFederate (const std::string &configString)
@@ -230,7 +230,7 @@ class ValueFederate : public virtual Federate
 
 	/** register a !D indexed subscription
     @param name the base name of the publication to subscribe to
-    @param index1 the first index of the value to subscribe/
+    @param index1 the first index of the value to subscribe to
     @param units a string containing the requested units of the subscription output
     @return an input object getting the requested value
     */
@@ -242,7 +242,7 @@ class ValueFederate : public virtual Federate
 
     /** register a 2D indexed subscription
 	@param name the base name of the publication to subscribe to
-	@param index1 the first index of the value to subscribe/
+	@param index1 the first index of the value to subscribe to
 	@param index2 the second index of the value to subscribe to
 	@param units a string containing the requested units of the subscription output
 	@return an input object getting the requested value
