@@ -96,7 +96,7 @@ endif()
     PROPERTIES FOLDER "Extern")
     endif()
 
-# move a bunch of local variables and options to advanced
+# hide a bunch of local variables and options
   HIDE_VARIABLE(LIBZMQ_PEDANTIC)
   HIDE_VARIABLE(LIBZMQ_WERROR)
   HIDE_VARIABLE(ZMQ_BUILD_TESTS)
