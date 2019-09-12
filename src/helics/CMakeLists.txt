@@ -132,8 +132,15 @@ if(BUILD_SHARED_LIBS)
 
 endif(BUILD_SHARED_LIBS)
 
+	if (NOT HELICS_ROOT_PROJ)
+		set_target_properties(application_api helics_common helics_core helics-static PROPERTIES FOLDER helics)
+	endif()
+
 if (BUILD_APP_LIBRARY)
 	add_subdirectory(apps)
+	if (NOT HELICS_ROOT_PROJ)
+		set_target_properties(helics_apps PROPERTIES FOLDER helics)
+	endif()
 endif(BUILD_APP_LIBRARY)
 
 if(NOT DISABLE_C_SHARED_LIB)
@@ -147,3 +154,5 @@ if(NOT DISABLE_C_SHARED_LIB)
   )
   endif()
 endif()
+
+

@@ -840,8 +840,6 @@ install(
     COMPONENT headers
 )
 
-endif(NOT HELICS_BINARY_ONLY_INSTALL)
-
 if (HELICS_WITH_CMAKE_PACKAGE)
 
    include(CMakePackageConfigHelpers)
@@ -857,16 +855,8 @@ if (HELICS_WITH_CMAKE_PACKAGE)
     VERSION ${HELICS_VERSION}
     COMPATIBILITY SameMajorVersion
    )
-endif()
 
-if (NOT HELICS_ROOT_PROJ)
-	set_target_properties(helics_apps PROPERTIES FOLDER helics)
-	set_target_properties(application_api helics_common helics_core helics-static PROPERTIES FOLDER helics)
-endif()
-
-if (HELICS_WITH_CMAKE_PACKAGE AND NOT HELICS_BINARY_ONLY_INSTALL)
-
-install(
+   install(
     FILES
         ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake
         ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake
@@ -882,6 +872,8 @@ install(
     COMPONENT libs
 )
 endif()
+
+endif(NOT HELICS_BINARY_ONLY_INSTALL)
 
 # combine 3rd party license files for install package
 include(combineLicenses)

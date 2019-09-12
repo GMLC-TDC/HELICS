@@ -45,13 +45,13 @@ if(DISABLE_SYSTEM_CALL_TESTS)
   target_compile_definitions(helics_apps-tests PRIVATE -DDISABLE_SYSTEM_CALL_TESTS=1)
 endif()
 
-add_test(NAME helics_apps-tests COMMAND helics_apps-tests --report_level=short)
+add_test(NAME helics_apps-tests COMMAND helics_apps-tests )
 set_property(TEST helics_apps-tests PROPERTY LABELS HelicsApps Coverage Daily)
 
 # Tests for Continuous Integration builds
 add_test(
-  NAME helics_apps-ci-tests
-  COMMAND helics_apps-tests --run_test=@ci --report_level=short --log_level=test_suite
+  NAME helics_apps-ci-tests --gtest_filter=-*_exe
+  COMMAND helics_apps-tests 
 )
 set_property(TEST helics_apps-ci-tests PROPERTY LABELS Continuous)
 

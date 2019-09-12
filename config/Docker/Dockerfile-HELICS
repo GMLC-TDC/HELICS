@@ -4,7 +4,7 @@
 # 2. run git submodule update --init after a normal git clone
 # 3. download and extract a tar file from a HELICS release that includes submodules
 
-FROM ubuntu:18.04 as builder
+FROM ubuntu:19.04 as builder
 
 # Installs dependencies needed for building, with headers needed for development
 RUN apt-get update && apt-get install -y \
@@ -26,7 +26,7 @@ ARG GIT_BRANCH=develop
 
 # Remove the copied source directory and replace it with a GitHub clone
 # The git clone part of this line shows how to recursively clone a specific branch from a git repository
-RUN if [[ "$ENABLE_GITHUB" == "true" ]]; then rm -rf HELICS && git clone --depth 1 --recurse-submodules --branch $GIT_BRANCH https://github.com/GMLC-TDC/HELICS; fi
+RUN if [ "${ENABLE_GITHUB-}" = "true" ]; then rm -rf HELICS && git clone --depth 1 --recurse-submodules --branch $GIT_BRANCH https://github.com/GMLC-TDC/HELICS; fi
 
 # Generates the makefiles for building HELICS without tests, examples, C shared library, or the IPC core
 # Build type is set to release for the optimized binaries (and smaller size)
@@ -39,7 +39,7 @@ RUN cd build && make -j${MAKE_PARALLEL:-2} install
 ##############################################################################
 
 # Create final image with the HELICS apps
-FROM ubuntu:18.04
+FROM ubuntu:19.04
 
 # Install the runtime libraries needed for ZeroMQ without development files
 RUN apt-get update && apt-get install -y libzmq5 && apt-get clean
