@@ -297,11 +297,12 @@ if(GENERATE_DOXYGEN_DOC)
             ${HELICS_BINARY_DIR}/Doxyfile @ONLY
         )
         add_custom_target(
-            doc ${DOXYGEN_EXECUTABLE} ${HELICS_BINARY_DIR}/Doxyfile
+            helics_doxygen ${DOXYGEN_EXECUTABLE} ${HELICS_BINARY_DIR}/Doxyfile
             WORKING_DIRECTORY ${DOXYGET_OUTPUT_DIR}
             COMMENT "Generating API documentation with Doxygen"
             VERBATIM
         )
+		set_target_properties(helics_doxygen PROPERTIES FOLDER docs)
     endif(DOXYGEN_FOUND)
 endif(GENERATE_DOXYGEN_DOC)
 

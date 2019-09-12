@@ -77,7 +77,7 @@ class FederateInfo
     /// Set the separator character
     void setSeparator (char sep) { helicsFederateInfoSetSeparator (fi, sep, HELICS_NULL_POINTER); }
     /** set the core init string to use in the federateInfo
-    @param corenInit the core name to use*/
+    @param coreInit the core name to use*/
     void setCoreInit (const std::string &coreInit)
     {
         helicsFederateInfoSetCoreInitString (fi, coreInit.c_str (), HELICS_NULL_POINTER);
@@ -94,7 +94,7 @@ class FederateInfo
     {
         helicsFederateInfoSetCoreTypeFromString (fi, coretype.c_str (), hThrowOnError ());
     }
-    /** set the core type from an integer \ref helics_core_types
+    /** set the core type from an integer \ref helics_core_type
     @param coretype an integer code with the federate type
     */
     void setCoreType (int coretype) { helicsFederateInfoSetCoreType (fi, coretype, HELICS_NULL_POINTER); }
@@ -201,9 +201,9 @@ class Federate
    @param flag an index into the flag /ref flag-definitions.h
    @param flagValue the value of the flag defaults to true
    */
-    void setFlagOption (int flag, bool value = true)
+    void setFlagOption (int flag, bool flagValue = true)
     {
-        helicsFederateSetFlagOption (fed, flag, value ? helics_true : helics_false, hThrowOnError ());
+        helicsFederateSetFlagOption (fed, flag, flagValue ? helics_true : helics_false, hThrowOnError ());
     }
     /**  set a time property option for the federate
     @param tProperty an index of the option to set
@@ -230,14 +230,14 @@ class Federate
         return (helicsFederateGetFlagOption (fed, flag, hThrowOnError ()) != helics_false);
     }
     /** get the value of a time option for the federate
-    @param option the option to get
+    @param tProperty the option to get
     */
     helics_time getTimeProperty (int tProperty) const
     {
         return helicsFederateGetTimeProperty (fed, tProperty, hThrowOnError ());
     }
     /**  get an integer option for the federate
-   @param option  the option to inquire
+   @param intProperty  the option to inquire
    */
     int getIntegerProperty (int intProperty) const
     {
@@ -255,9 +255,9 @@ class Federate
     @details call is only valid in startup mode
     @param configString  the location of the file or config String to load to generate the interfaces
     */
-    void registerInterfaces (const std::string &configFile)
+    void registerInterfaces (const std::string &configString)
     {
-        helicsFederateRegisterInterfaces (fed, configFile.c_str (), hThrowOnError ());
+        helicsFederateRegisterInterfaces (fed, configString.c_str (), hThrowOnError ());
     }
     /** get the current state of the federate*/
     helics_federate_state getCurrentMode () const { return helicsFederateGetState (fed, HELICS_NULL_POINTER); }

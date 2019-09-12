@@ -15,11 +15,15 @@ SPDX-License-Identifier: BSD-3-Clause
 
 namespace helicscpp
 {
-/** defining an exception class for state transition errors*/
+/** defining an exception class for helics errors*/
 class HelicsException : public std::runtime_error
 {
   public:
-    explicit HelicsException (int error_code, const char *s) : std::runtime_error (s), eCode (error_code) {}
+    /** constructor for the exeception
+	@param error_code an integer code of the error
+	@param error_string a string describing the error
+	*/
+    explicit HelicsException (int error_code, const char *error_string) : std::runtime_error (error_string), eCode (error_code) {}
     /** get the error code */
     int errorCode () const { return eCode; }
 

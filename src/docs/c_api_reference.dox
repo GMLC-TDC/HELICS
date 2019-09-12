@@ -34,11 +34,13 @@ Index of functions available in the C and by extension the language API's
 functions applying to a \ref helics_core object
  - \ref helicsCoreClone
  - \ref helicsCoreIsValid
+ - \ref helicsCoreWaitForDisconnect
  - \ref helicsCoreIsConnected
  - \ref helicsCoreDataLink
  - \ref helicsCoreAddSourceFilterToEndpoint
  - \ref helicsCoreAddDestinationFilterToEndpoint
  - \ref helicsCoreGetIdentifier
+ - \ref helicsCoreGetAddress
  - \ref helicsCoreSetReadyToInit
  - \ref helicsCoreDisconnect
  - \ref helicsCoreDestroy
@@ -48,7 +50,7 @@ functions applying to a \ref helics_core object
  - \ref helicsCoreRegisterFilter
  - \ref helicsCoreRegisterCloningFilter
 
- \section general broker Broker Functions 
+ \section broker Broker Functions 
 Functions applying to a \ref helics_broker object
  - \ref helicsBrokerClone
  - \ref helicsBrokerIsValid

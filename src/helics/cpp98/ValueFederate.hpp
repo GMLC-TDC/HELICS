@@ -17,6 +17,7 @@ SPDX-License-Identifier: BSD-3-Clause
 
 namespace helicscpp
 {
+/** enumeration of the available types of publications and inputs*/
 enum PubSubTypes
 {
     STRING_TYPE = helics_data_type_string,
@@ -29,6 +30,7 @@ enum PubSubTypes
     RAW_TYPE = helics_data_type_raw
 };
 
+/** Class defining a ValueFederate object which interacts with publication and Inputs*/
 class ValueFederate : public virtual Federate
 {
   private:
@@ -99,7 +101,7 @@ class ValueFederate : public virtual Federate
 
 	/** register a publication
     @details call is only valid in startup mode
-    @param key the name of the publication
+    @param name the name of the publication
     @param type a string defining the type of the publication
     @param units a string defining the units of the publication [optional]
     @return a publication id object for use as an identifier
@@ -115,7 +117,7 @@ class ValueFederate : public virtual Federate
 
 	/** register a publication
     @details call is only valid in startup mode by default prepends the name with the federate name
-    @param key the name of the publication
+    @param name the name of the publication
 	@param type the type of publication to register 
     @param units  the optional units of the publication
     @return an identifier for use with this publication
@@ -130,7 +132,7 @@ class ValueFederate : public virtual Federate
 
 	/** register a publication
     @details call is only valid in startup mode
-    @param key the name of the publication
+    @param name the name of the publication
     @param type a string defining the type of the publication
     @param units a string defining the units of the publication [optional]
     @return a publication object for use as an identifier
@@ -152,10 +154,10 @@ class ValueFederate : public virtual Federate
     @return a publication object for use as an identifier
     */
     Publication
-    registerGlobalPublication (const std::string &name, helics_data_type type, const std::string &units = "")
+    registerGlobalPublication (const std::string &key, helics_data_type type, const std::string &units = "")
     {
         helics_publication pub =
-          helicsFederateRegisterGlobalPublication (fed, name.c_str (), type, units.c_str (), hThrowOnError ());
+          helicsFederateRegisterGlobalPublication (fed, key.c_str (), type, units.c_str (), hThrowOnError ());
         pubs.push_back (pub);
         return Publication (pub);
     }
@@ -163,41 +165,41 @@ class ValueFederate : public virtual Federate
 	/** register a publication as part of an indexed structure
     @details call is only valid in startup mode by default prepends the name with the federate name
     the name is registered as a global structure with the index appended
-    @param key the name of the publication
+    @param key the name of the publication to register
     @param index1 an index associated with the publication
 	@param type an enumeration value describing the type of the publication
     @param units  the optional units of the publication
     @return an identifier for use with this publication
     */
-    Publication registerPublicationIndexed (const std::string &name,
+    Publication registerPublicationIndexed (const std::string &key,
                                             int index1,
                                             helics_data_type type,
                                             const std::string &units = "")
     {
-        std::string indexed_name = name + '_' + toStr (index1);
+        std::string indexed_name = key + '_' + toStr (index1);
         return registerGlobalPublication (indexed_name, type, units);
     }
 
 	/** register a publication as part of a 2 dimensional indexed structure
     @details call is only valid in startup mode by default prepends the name with the federate name
     the name is registered as a global structure with the indices appended
-    @param key the name of the publication
+    @param key the base name of the publication
     @param index1 an index associated with the publication
     @param index2 a second index
     @param type an enumeration value describing the type of the publication
 	@param units  the optional units of the publication
     @return an identifier for use with this publication
     */
-    Publication registerPublicationIndexed (const std::string &name,
+    Publication registerPublicationIndexed (const std::string &key,
                                             int index1,
                                             int index2,
                                             helics_data_type type,
                                             const std::string &units = std::string ())
     {
-        std::string indexed_name = name + '_' + toStr (index1) + '_' + toStr (index2);
+        std::string indexed_name = key+ '_' + toStr (index1) + '_' + toStr (index2);
         return registerGlobalPublication (indexed_name, type, units);
     }
-    /** register publications from a JSON output file or string
+    /** register publications   from a JSON output file or string
 	@details generates interface based on the data contained in a JSON file
 	or string
 	*/

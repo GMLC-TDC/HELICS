@@ -36,22 +36,26 @@ class Core
     ~Core () { helicsCoreFree (core); }
     /** implicit operator so the object can be used with the c api functions natively*/
     operator helics_core () { return core; }
-    /** explicity get the base helics_core object*/
+    /** explicitly get the base helics_core object*/
     helics_core baseObject () const { return core; }
+    /** check if the core is connected to the broker*/
     bool isConnected () const { return helicsCoreIsConnected (core); }
-
+    /** copy constructor*/
     Core (const Core &cr) { core = helicsCoreClone (cr.core, hThrowOnError ()); }
-    Core &operator= (const Core &cr)
+    /** copy assignment*/
+	Core &operator= (const Core &cr)
     {
         core = helicsCoreClone (cr.core, hThrowOnError ());
         return *this;
     }
 #ifdef HELICS_HAS_RVALUE_REFS
+    /** move constructor*/
     Core (Core &&cr) HELICS_NOTHROW
     {
         core = cr.core;
         cr.core = HELICS_NULL_POINTER;
     }
+    /** move assignment*/
     Core &operator= (Core &&cr) HELICS_NOTHROW
     {
         core = cr.core;

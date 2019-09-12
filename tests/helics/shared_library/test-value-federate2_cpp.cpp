@@ -36,11 +36,11 @@ TEST_P (vfed_type_tests, test_block_send_receive)
     SCOPED_TRACE ("calling get federate");
     auto vFed1 = GetFederateAs<helicscpp::ValueFederate> (0);
     ASSERT_TRUE ((vFed1));
-    auto pubid1 = vFed1->registerTypePublication ("pub1", "string", "");
+    auto pubid1 = vFed1->registerPublication ("pub1", "string", "");
     EXPECT_TRUE (pubid1.baseObject () != nullptr);
     auto pubid2 = vFed1->registerGlobalPublication ("pub2", helics_data_type_int, "");
     EXPECT_TRUE (pubid2.baseObject () != nullptr);
-    auto pubid3 = vFed1->registerTypePublication ("pub3", "");
+    auto pubid3 = vFed1->registerPublication ("pub3", "");
     EXPECT_TRUE (pubid3.baseObject () != nullptr);
     auto sub1 = vFed1->registerSubscription ("fed0/pub3");
     SCOPED_TRACE ("reg opt1");

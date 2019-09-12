@@ -28,7 +28,7 @@ This document contains tentative plans for changes and improvements of note in u
 -   plugin architecture for user defined cores
 
 ## \[3.0\] ~ Late Spring 2020
--   Upgrade minimum compilers and build systems. Currently planned targets are gcc 7.0, clang 5.0, MSVC 2017 15.7, CMake 3.10.   This is a setup which should be supported on Ubuntu 18.04 repositories.  Minimum Boost version will also be updated though Boost is becoming less critical for the HELICS core so may not be that important. Certain features may require new boost version than what would be available on 18.04.  HELICS 3.0 will not be released until Ubuntu 20.04 LTS is out and RHEL 8.0 has been out for a year, and RHEL 8.1 is released.    
+-   Upgrade minimum compilers and build systems. Currently planned targets are gcc 7.0, clang 5.0, MSVC 2017 15.7, CMake 3.10.  This is a setup which should be supported on Ubuntu 18.04 repositories.  Minimum Boost version will also be updated though Boost is becoming less critical for the HELICS core so may not be that important. Certain features may require new boost version than what would be available on 18.04.  HELICS 3.0 will not be released until Ubuntu 20.04 LTS is out and RHEL 8.0 has been out for a year, and RHEL 8.1 is released.   For other platforms Xcode 10 and Intel 19 compilers will be the minimum required compilers for building with those systems. 
 -   Control interface
 -   Dynamic Federation support
 -   remove deprecated functions

@@ -36,4 +36,6 @@ SPDX-License-Identifier: BSD-3-Clause
 #define HELICS_NOTHROW throw ()
 #define HELICS_NULL_POINTER NULL
 #endif
+
+#define HELICS_IGNORE_ERROR HELICS_NULL_POINTER
 #endif
