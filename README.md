@@ -125,11 +125,11 @@ We are always looking for help adding support for more tools, so please contact 
 -   [HELICS CLI](https://github.com/GMLC-TDC/helics-cli) provides a simple way to automate configuring, starting, and stopping HELICS co-simulations.
 -   [Player](https://helics.readthedocs.io/en/latest/apps/Player.html), which acts as a simple send-only federate that simply publishes a stream of timed HELICS messages from a user-defined file. HELICS Player is included in the HELICS distribution.
 -   [Recorder](https://helics.readthedocs.io/en/latest/apps/Recorder.html), which acts as a simple receive-only federate that prints out or saves messages from one or more subscribed streams. HELICS Recorder is included in the HELICS distribution.
--   [Broker](https://helics.readthedocs.io/en/latest/apps/Broker.html),  Which is a command line tool for running a Broker.  There is also a Broker Server which can generate brokers as needed.  
--   [App](https://helics.readthedocs.io/en/latest/apps/App.htm).  Is a general app executable which can run a number of other apps including Player and Recorder, as well as a [Tracer](https://helics.readthedocs.io/en/latest/apps/App.html#tracer), [Echo](https://helics.readthedocs.io/en/latest/apps/App.html#echo), [Source](https://helics.readthedocs.io/en/latest/apps/App.html#source), and [Clone](https://helics.readthedocs.io/en/latest/apps/App.html#clone).   
+-   [Broker](https://helics.readthedocs.io/en/latest/apps/Broker.html),  which is a command line tool for running a Broker.  There is also a Broker Server which can generate brokers as needed.  
+-   [App](https://helics.readthedocs.io/en/latest/apps/App.htm) is a general app executable which can run a number of other apps including Player and Recorder, as well as a [Tracer](https://helics.readthedocs.io/en/latest/apps/App.html#tracer), [Echo](https://helics.readthedocs.io/en/latest/apps/App.html#echo), [Source](https://helics.readthedocs.io/en/latest/apps/App.html#source), and [Clone](https://helics.readthedocs.io/en/latest/apps/App.html#clone).   
 
 ## Contributing
-Contributors are welcome see the [Contributing](CONTRIBUTING.md) guidelines for me details on the process of contributing.  And the [Code of Conduct](.github/CODE_OF_CONDUCT.md) for guidelines on the community expectations.  All prior contributors can be found [here](CONTRIBUTORS.md)
+Contributors are welcome see the [Contributing](CONTRIBUTING.md) guidelines for more details on the process of contributing.  And the [Code of Conduct](.github/CODE_OF_CONDUCT.md) for guidelines on the community expectations.  All prior contributors can be found [here](CONTRIBUTORS.md)
 
 ### Optional components
 A list of optional component that are not included in HELICS but are optionally used by the library

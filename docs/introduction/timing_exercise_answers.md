@@ -25,7 +25,8 @@ A few simple exercises about co-simulation timing
 ***
 
 **Key Principle**:  Federates are interrupted if there is updated data available and allowed time prior to the requested time
-2.	 Federation Setup \[A:  period=1,`wait_for_current_time_update`; B:  period=2; C:  period=3\]
+
+2.   Federation Setup \[A:  period=1,`wait_for_current_time_update`; B:  period=2; C:  period=3\]
 
      a.	At what time will the data from Federate B published at time 2, be available to Federate A? **_2_**
 
@@ -38,7 +39,8 @@ A few simple exercises about co-simulation timing
 
 ***
 **Key Principle**:  Federates are granted the next allowed time after the time specified in a request if they are not interrupted.
-3.	 Federation Setup \[A:  period=1; B:  period=2,offset=1,time_delta=2; C:  period=3\]
+
+3.   Federation Setup \[A:  period=1; B:  period=2,offset=1,time_delta=2; C:  period=3\]
 
      a.	After time=0 what is the next allowable time for Federate B? **_3_**, *time=1 is not allowed due to time_delta*
 
@@ -52,7 +54,9 @@ A few simple exercises about co-simulation timing
     b.	If Federate B were not uninterruptible what time would it be granted? **_4_**
 ***
 ![alt text](../img/timing_fed_setup.png "Exercise Federate Setup")
-5.	Federation Setup \[A:  period=1; B:  period=2; C:  period=3\], Federates will send an update when they have received an update from the all other connected federates.  Federate A sends an update at time 0, what is the Update sequence
+
+5.  Federation Setup \[A:  period=1; B:  period=2; C:  period=3\], Federates will send an update when they have received an update from the all other connected federates.  Federate A sends an update at time 0, what is the Update sequence
+
 | Time        | Federate(s)     |
 | ------------- |:-------------:|
 |    3   |   C    |

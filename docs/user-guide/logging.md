@@ -19,7 +19,7 @@ helicsFederateInfoSetIntegerProperty(fi,helics_property_int_log_level, helics_lo
 ```
 
 ```python
-    h.helicsFederateInfoSetIntegerProperty(fi,h.helics_property_int_log_level, h.helics_log_level_data)
+h.helicsFederateInfoSetIntegerProperty(fi,h.helics_property_int_log_level, h.helics_log_level_data)
 ```
 
 There are several levels used inside HELICS for logging
@@ -67,15 +67,15 @@ helicsFederateSetLogFile(fed,"logfile.txt",&err);
 A federate also can set a logging callback so log messages can be processed in whatever fashion is desired by a federate.  In C++ the method on a federate is
 ```cpp
  void
-    setLoggingCallback (const std::function<void(int, const std::string &, const std::string &)> &logFunction);
+setLoggingCallback (const std::function<void(int, const std::string &, const std::string &)> &logFunction);
 ```
 
 ```c
 void
-    helicsFederateSetLoggingCallback (helics_federate fed,
-                                      void (*logger) (int loglevel, const char *identifier, const char *message, void *userData),
-                                      void *userdata,
-                                      helics_error *err);
+helicsFederateSetLoggingCallback (helics_federate fed,
+                                  void (*logger) (int loglevel, const char *identifier, const char *message, void *userData),
+                                  void *userdata,
+                                  helics_error *err);
 ```
 
 These functions are not available in the language API's yet
@@ -89,11 +89,11 @@ The callback take 3 parameters about a message and in the case of `C` callbacks 
 A set of functions are available for individual federates to generate log messages
 
 ```cpp
-    void logMessage (int level, const std::string &message) const;
-    void logErrorMessage (const std::string &message) const;
-    void logWarningMessage (const std::string &message) const;
-    void logInfoMessage (const std::string &message) const;
-    void logDebugMessage (const std::string &message) const;
+void logMessage (int level, const std::string &message) const;
+void logErrorMessage (const std::string &message) const;
+void logWarningMessage (const std::string &message) const;
+void logInfoMessage (const std::string &message) const;
+void logDebugMessage (const std::string &message) const;
 ```
 
 These will log a message at the appropriate level or at a user specified level.  
