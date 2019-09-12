@@ -136,6 +136,23 @@ endif(BUILD_SHARED_LIBS)
 		set_target_properties(application_api helics_common helics_core helics-static PROPERTIES FOLDER helics)
 	endif()
 
+
+option(
+    BUILD_APP_LIBRARY
+    "Build helics application library (a static library containing objects for broker, player, recorder, and helics_apps"
+    ON
+)
+
+if (HELICS_ROOT_PROJ)
+	option(
+		BUILD_APP_EXECUTABLES
+		"Build helics applications to run various apps, including broker, player, recorder, and helics_apps"
+		${BUILD_APP_LIBRARY}
+	)
+else()
+	SET(BUILD_APP_EXECUTABLES OFF)
+endif()
+
 if (BUILD_APP_LIBRARY)
 	add_subdirectory(apps)
 	if (NOT HELICS_ROOT_PROJ)
