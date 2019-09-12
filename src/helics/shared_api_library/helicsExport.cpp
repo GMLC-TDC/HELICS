@@ -832,6 +832,7 @@ void helicsCoreDataLink (helics_core core, const char *source, const char *targe
 }
 
 static constexpr char invalidGlobalString[] = "Global name cannot be null";
+
 void helicsBrokerSetGlobal (helics_broker broker, const char *valueName, const char *value, helics_error *err)
 {
     auto brk = getBroker (broker, err);
@@ -849,6 +850,16 @@ void helicsBrokerSetGlobal (helics_broker broker, const char *valueName, const c
         return;
     }
     brk->setGlobal (valueName, AS_STRING (value));
+}
+
+void helicsBrokerSetLogFile(helics_broker broker, const char *logFileName, helics_error *err)
+{
+    auto brk = getBroker (broker, err);
+    if (brk == nullptr)
+    {
+        return;
+    }
+    brk->setLogFile (AS_STRING (logFileName));
 }
 
 void helicsBrokerAddSourceFilterToEndpoint (helics_broker broker, const char *filter, const char *endpoint, helics_error *err)
@@ -954,6 +965,16 @@ void helicsCoreSetGlobal (helics_core core, const char *valueName, const char *v
         return;
     }
     cr->setGlobal (valueName, AS_STRING (value));
+}
+
+void helicsCoreSetLogFile (helics_core core, const char *logFileName, helics_error *err)
+{
+    auto cr = getCore (core, err);
+    if (cr == nullptr)
+    {
+        return;
+    }
+    cr->setLogFile (AS_STRING (logFileName));
 }
 
 const char *helicsBrokerGetIdentifier (helics_broker broker)

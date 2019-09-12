@@ -699,8 +699,7 @@ extern "C"
     */
     HELICS_EXPORT helics_bool helicsFederateGetFlagOption (helics_federate fed, int flag, helics_error *err);
 
-    /**  set the logging level for the federate
-    @ details debug and trace only do anything if they were enabled in the compilation
+    /**  Get the current value of an integer property (such as a logging level)
     @param fed the federate to get the flag for
     @param intProperty a code for the property to set /ref helics_handle_options
     @param[in,out] err a pointer to an error object for catching errors
@@ -777,6 +776,20 @@ extern "C"
     @param[in,out] err an error object that will contain an error code and string if any error occurred during the execution of the function
     */
     HELICS_EXPORT void helicsBrokerSetGlobal (helics_broker broker, const char *valueName, const char *value, helics_error *err);
+
+	/** set a the log file on a core
+    @param core the core to set the global through
+    @param logFileName the name of the file to log to
+    @param[in,out] err an error object that will contain an error code and string if any error occurred during the execution of the function
+    */
+    HELICS_EXPORT void helicsCoreSetLogFile (helics_core core, const char *logFileName, helics_error *err);
+
+	/** set a the log file on a broker
+    @param broker the broker to set the global through
+    @param logFileName the name of the file to log to
+    @param[in,out] err an error object that will contain an error code and string if any error occurred during the execution of the function
+    */
+    HELICS_EXPORT void helicsBrokerSetLogFile (helics_broker broker, const char *logFileName, helics_error *err);
 
     /** create a query object
     @details a query object consists of a target and query string
