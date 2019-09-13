@@ -7,14 +7,11 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include "Filters.hpp"
 #include "FilterOperations.hpp"
-#include "MessageOperators.hpp"
 
-#include <iostream>
+#include <algorithm>
 #include <map>
 #include <memory>
-#include <random>
-#include <regex>
-#include <thread>
+#include <utility>
 
 namespace helics
 {

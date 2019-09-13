@@ -6,7 +6,6 @@ SPDX-License-Identifier: BSD-3-Clause
 */
 #pragma once
 #include <complex>
-#include <cstdint>
 #include <limits>
 #include <string>
 #include <typeinfo>
@@ -123,12 +122,12 @@ class NamedPoint
     bool operator== (const NamedPoint &np) const
     {
         return ((std::isnan (value)) && (std::isnan (np.value))) ? (name == np.name) :
-                                                                    ((value == np.value) && (name == np.name));
+                                                                   ((value == np.value) && (name == np.name));
     }
     bool operator!= (const NamedPoint &np) const { return !operator== (np); }
     bool operator< (const NamedPoint &np) const
     {
-        return (name == np.name) ? (name <np.name) : (value < np.value);
+        return (name == np.name) ? (name < np.name) : (value < np.value);
     }
 };
 

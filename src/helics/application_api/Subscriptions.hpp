@@ -7,6 +7,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #pragma once
 
 #include "Inputs.hpp"
+#include <array>
 
 /** @file
 @details helper function for generate subscriptions of specify types
@@ -86,7 +87,7 @@ class VectorSubscription
     std::string m_key;  //!< the key for the subscription
     std::string m_units;  //!< the defined units of the federate
     std::vector<Input> ids;  //!< the id of the federate
-    std::function<void(int, Time)> update_callback;  //!< callback function for when a value is updated
+    std::function<void (int, Time)> update_callback;  //!< callback function for when a value is updated
     std::vector<X> vals;  //!< storage for the values
   public:
     VectorSubscription () noexcept {};
@@ -117,7 +118,7 @@ class VectorSubscription
 
         for (auto &id : ids)
         {
-            fed->setInputNotificationCallback (id, [this](Input &inp, Time tm) { handleCallback (inp, tm); });
+            fed->setInputNotificationCallback (id, [this] (Input &inp, Time tm) { handleCallback (inp, tm); });
         }
     }
     /**constructor to build a subscription object
@@ -149,7 +150,7 @@ class VectorSubscription
         // need to transfer the callback to the new object
         for (auto &id : ids)
         {
-            fed->setInputNotificationCallback (id, [this](Input &inp, Time tm) { handleCallback (inp, tm); });
+            fed->setInputNotificationCallback (id, [this] (Input &inp, Time tm) { handleCallback (inp, tm); });
         }
     };
     /** move assignment*/
@@ -164,7 +165,7 @@ class VectorSubscription
         // need to transfer the callback to the new object
         for (auto &id : ids)
         {
-            fed->setInputNotificationCallback (id, [this](Input &inp, Time tm) { handleCallback (inp, tm); });
+            fed->setInputNotificationCallback (id, [this] (Input &inp, Time tm) { handleCallback (inp, tm); });
         }
         return *this;
     }
@@ -179,7 +180,7 @@ class VectorSubscription
     @param callback a function with signature void(X val, Time time)
     val is the new value and time is the time the value was updated
     */
-    void setInputNotificationCallback (std::function<void(int, Time)> callback)
+    void setInputNotificationCallback (std::function<void (int, Time)> callback)
     {
         update_callback = std::move (callback);
     }
@@ -207,7 +208,7 @@ class VectorSubscription2d
     std::string m_key;  //!< the name of the subscription
     std::string m_units;  //!< the defined units of the federate
     std::vector<Input> ids;  //!< the id of the federate
-    std::function<void(int, Time)> update_callback;  //!< callback function for when a value is updated
+    std::function<void (int, Time)> update_callback;  //!< callback function for when a value is updated
     std::vector<X> vals;  //!< storage for the values
     std::array<int, 4> indices;  //!< storage for the indices and start values
   public:
@@ -254,7 +255,7 @@ class VectorSubscription2d
         indices[3] = count_y;
         for (auto &id : ids)
         {
-            fed->setInputNotificationCallback (id, [this](Input &inp, Time tm) { handleCallback (inp, tm); });
+            fed->setInputNotificationCallback (id, [this] (Input &inp, Time tm) { handleCallback (inp, tm); });
         }
     }
 
@@ -270,7 +271,7 @@ class VectorSubscription2d
         // need to transfer the callback to the new object
         for (auto &id : ids)
         {
-            fed->setInputNotificationCallback (id, [this](Input &inp, Time tm) { handleCallback (inp, tm); });
+            fed->setInputNotificationCallback (id, [this] (Input &inp, Time tm) { handleCallback (inp, tm); });
         }
         indices = vs.indices;
         return *this;
@@ -294,7 +295,7 @@ class VectorSubscription2d
     @param callback a function with signature void(X val, Time time)
     val is the new value and time is the time the value was updated
     */
-    void setInputNotificationCallback (std::function<void(int, Time)> callback)
+    void setInputNotificationCallback (std::function<void (int, Time)> callback)
     {
         update_callback = std::move (callback);
     }

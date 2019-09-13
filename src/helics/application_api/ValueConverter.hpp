@@ -13,8 +13,8 @@ the purpose of these objects are to convert a specific type into a data block fo
 
 #include "../core/Core.hpp"
 #include "data_view.hpp"
-#include <complex>
-#include <type_traits>
+#include "helicsTypes.hpp"
+#include <string>
 
 namespace helics
 {
