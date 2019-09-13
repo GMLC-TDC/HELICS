@@ -9,7 +9,7 @@
 
 if(NOT ENABLE_SWIG OR NOT SWIG_EXECUTABLE)
 
-  message(ERROR "Python 2 build requires swig")
+  message(SEND_ERROR "Python 2 build requires swig")
 
 endif()
 
