@@ -27,7 +27,7 @@ include(FetchContent)
 FetchContent_Declare(
   libzmq
   GIT_REPOSITORY https://github.com/zeromq/libzmq.git
-  GIT_TAG        v4.3.1
+  GIT_TAG        v4.3.2
 )
 
 FetchContent_GetProperties(libzmq)
@@ -50,7 +50,7 @@ include(GitUtils)
 git_clone(
              PROJECT_NAME                    ${lcName}
              GIT_URL                         https://github.com/zeromq/libzmq.git
-             GIT_TAG                         v4.3.1
+             GIT_TAG                         v4.3.2
 			 DIRECTORY                       ${PROJECT_BINARY_DIR}/_deps
        )
 	   
@@ -115,6 +115,9 @@ endif()
   HIDE_VARIABLE(ENABLE_ASAN)
   HIDE_VARIABLE(ENABLE_RADIX_TREE)
   HIDE_VARIABLE(ENABLE_EVENTFD)
+  HIDE_VARIABLE(ZMQ_CV_IMPL)
+  HIDE_VARIABLE(BUILD_TESTS)
+  HIDE_VARIABLE(ZMQ_WIN32_WINNT)
   
 if(ZMQ_USE_STATIC_LIBRARY)
   set(zmq_target_output "libzmq-static")

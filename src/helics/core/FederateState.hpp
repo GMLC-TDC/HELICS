@@ -8,20 +8,15 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include "../common/GuardedTypes.hpp"
 #include "ActionMessage.hpp"
-#include "CommonCore.hpp"
-#include "Core.hpp"
-#include "CoreFederateInfo.hpp"
+#include "BasicHandleInfo.hpp"
 #include "InterfaceInfo.hpp"
-#include "TimeDependencies.hpp"
 #include "core-data.hpp"
 #include "core-types.hpp"
 #include "gmlc/containers/BlockingQueue.hpp"
 #include "helics-time.hpp"
-#include "helics/helics-config.h"
 #include <atomic>
 #include <chrono>
 #include <map>
-#include <mutex>
 #include <vector>
 
 namespace helics
@@ -31,6 +26,7 @@ class PublicationInfo;
 class EndpointInfo;
 class FilterInfo;
 class CommonCore;
+class CoreFederateInfo;
 
 class TimeCoordinator;
 class MessageTimer;
@@ -105,7 +101,7 @@ class FederateState
     mutable std::atomic_flag processing = ATOMIC_FLAG_INIT;  //!< the federate is processing
   private:
     /** a logging function for logging or printing messages*/
-    std::function<void(int, const std::string &, const std::string &)>
+    std::function<void (int, const std::string &, const std::string &)>
       loggerFunction;  //!< callback for logging functions
     std::function<std::string (const std::string &)> queryCallback;  //!< a callback for additional queries
     /** find the next Value Event*/
@@ -317,7 +313,7 @@ class FederateState
     @details function must have signature void(int level, const std::string &sourceName, const std::string
     &message)
     */
-    void setLogger (std::function<void(int, const std::string &, const std::string &)> logFunction)
+    void setLogger (std::function<void (int, const std::string &, const std::string &)> logFunction)
     {
         loggerFunction = std::move (logFunction);
     }
