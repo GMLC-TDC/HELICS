@@ -38,7 +38,8 @@ if(ENABLE_SWIG OR SWIG_REQUIRED)
     if(NOT CMAKE_PROGRAM_PATH)
       set(
         CMAKE_PROGRAM_PATH
-	"C:/local/swigwin-4.0.0"
+		"C:/ProgramData/chocolatey/bin"
+	    "C:/local/swigwin-4.0.0"
         "C:/local/swigwin-3.0.12"
         "C:/local/swigwin-3.0.11"
         "C:/local/swigwin-3.0.10"
@@ -47,7 +48,8 @@ if(ENABLE_SWIG OR SWIG_REQUIRED)
       set(
         CMAKE_PROGRAM_PATH
         "${CMAKE_PROGRAM_PATH}"
-	"C:/local/swigwin-4.0.0"
+		"C:/ProgramData/chocolatey/bin"
+	    "C:/local/swigwin-4.0.0"
         "C:/local/swigwin-3.0.12"
         "C:/local/swigwin-3.0.11"
         "C:/local/swigwin-3.0.10"

@@ -120,7 +120,7 @@ PyModule_AddObject(m, "HelicsException", pHelicsException);
   /* Check if is a list */
   if (PyList_Check($input)) {
     int i;
-    $1 = PyList_Size($input);
+    $1 = (int)(PyList_Size($input));
     $2 = (char **) malloc(($1+1)*sizeof(char *));
     for (i = 0; i < $1; i++) {
       PyObject *o = PyList_GetItem($input,i);
@@ -150,7 +150,7 @@ PyModule_AddObject(m, "HelicsException", pHelicsException);
     PyErr_SetString(PyExc_ValueError,"Expected a list");
     return NULL;
   }
-  $2=PyList_Size($input);
+  $2=(int)(PyList_Size($input));
   $1 = (double *) malloc($2*sizeof(double));
 
   for (i = 0; i < $2; i++) {
@@ -217,20 +217,20 @@ PyModule_AddObject(m, "HelicsException", pHelicsException);
 	{
 	case PyUnicode_1BYTE_KIND:
 	default:
-		$2=PyUnicode_GetLength($input);
+		$2=(int)(PyUnicode_GetLength($input));
 	break;
 	case PyUnicode_2BYTE_KIND:
 	case PyUnicode_WCHAR_KIND:
-		$2=PyUnicode_GetLength($input)*2;
+		$2=(int)(PyUnicode_GetLength($input)*2);
 	break;
 	case PyUnicode_4BYTE_KIND:
-		$2=PyUnicode_GetLength($input)*4;
+		$2=(int)(PyUnicode_GetLength($input)*4);
 	break;
 	}
   }
   else if (PyBytes_Check($input)) {
     $1=PyBytes_AsString($input);
-	$2=PyBytes_Size($input);
+	$2=(int)(PyBytes_Size($input));
   }
   else
   {
