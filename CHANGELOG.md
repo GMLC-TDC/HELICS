@@ -10,21 +10,26 @@ A note on future revisions.
 ## \[2.2.1\] ~ 2019-09-15
 Minor release with bug fixes and a few additional features
 ### Changed
--   helics apps tests is converted to use google test and is now being run through the sanitizers
+-   helics apps tests is converted to use Google test and is now being run through the sanitizers
 -   **BREAKING CHANGE** The C interface helics logging callback specifications now include a user data object.  This is technically a breaking change, but there were a few issues with the current implementation so it is not entirely clear it was usable as it was.  There are now some tests for the functionality.  This log callback specification was not available in the language API's and the C++ API has not changed, only the C interface to specifying direct logging callbacks.  This is considered a minor change due to no known users of this interface at present and as it was it wasn't entirely operational.  No further changes are expected.  
 -  The use of Boost C++ in the helics core and application api are now limited to the IPC core(there are no plans to remove this usage) and an option to `DISABLE_BOOST` is available in the CMAKE files.  This will turn off the IPC_CORE and any optional uses of boost in some of the libraries.  Future features may use Boost but should retain the ability to disable its use.  
 - Some function names in the C\+\+98 API were changed to better match the C\+\+ API and were documented more completely through doxygen
-- The doxygen project was renamed
+- The doxygen cmake project was renamed from doc to helics_doxygen
+- several variables used by submodules in cmake were hidden
+- updated zmq subproject version to 4.3.2
 
 ### Fixed
 -  there was a 32 bit issue when using certain vector operation functions in HELICS when compiled with 32 bit, this was preventing the arm 32 from running the tests fully.  This issue has been fixed.
+- Fixed a race condition related to queries of subscriptions and inputs of a federate if done remotely.  The core could lock or a race condition could occur.  
 - some issues related to file logs
+- started to address some recommendations for `include-what-you-use`
 
 ### Added
 -   logMessage functions in the federate for user specified log messages and levels
     -  `logDebugMessage`, `logWarningMessage`, `logErrorMessage`, `logInfoMessage` function in all API's to simplify common logging operations
 -   function to set the log file from the core C++ API
 -   A CMAKE option to disable BOOST entirely
+-   A CMAKE options to `HELICS_BINARY_ONLY_INSTALL which will restrict the install to executables and shared libraries with no headers or static libraries.  
 
 ### Removed
  

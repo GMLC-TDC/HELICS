@@ -3,7 +3,7 @@ Docker installation
 
 Requirements
 ------------
-Docker version 19.03.1
+Docker version 19
 
 
 Getting a docker from the hub
@@ -22,7 +22,7 @@ docker search helics
 |helics/clang-msan|container for running clang memory sanitizer|
 |helics/helics|container with installed HELICS executables|
 
-
+the `helics/helics` repository contains a number of tags corresponding to different versions of helics with the all the apps and executables present for each different version.  
 ```bash
 docker pull helics/octave
 ```
