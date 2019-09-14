@@ -12,7 +12,7 @@ A few simple exercises about co-simulation timing
 -   **Uninteruptible**: a federate can only be granted requested times
 -   **wait_for_current_time_update**:  specify that a federate should wait until all federates executing at the current time have finished.  
 
-![alt text](../img/timing_fed_setup.png "Exercise Federate Setup")
+![Connectivity Diagram](../img/timing_fed_setup.png "Exercise Federate Setup")
 
 1.  Federation Setup \[A:  period=1; B:  period=2; C:  period=3\]
 
@@ -53,7 +53,7 @@ A few simple exercises about co-simulation timing
 
     b.	If Federate B were not uninterruptible what time would it be granted? `_______________`
 ***
-![alt text](../img/timing_fed_setup.png "Exercise Federate Setup")
+![Connectivity Diagram](../img/timing_fed_setup.png "Exercise Federate Setup")
 
 5.  Federation Setup \[A:  period=1; B:  period=2; C:  period=3\], Federates will send an update when they have received an update from the all other connected federates.  Federate A sends an update at time 0, what is the update sequence
 
