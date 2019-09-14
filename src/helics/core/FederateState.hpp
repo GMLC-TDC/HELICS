@@ -17,6 +17,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <atomic>
 #include <chrono>
 #include <map>
+#include <thread>
 #include <vector>
 
 namespace helics
@@ -101,7 +102,7 @@ class FederateState
     mutable std::atomic_flag processing = ATOMIC_FLAG_INIT;  //!< the federate is processing
   private:
     /** a logging function for logging or printing messages*/
-    std::function<void (int, const std::string &, const std::string &)>
+    std::function<void(int, const std::string &, const std::string &)>
       loggerFunction;  //!< callback for logging functions
     std::function<std::string (const std::string &)> queryCallback;  //!< a callback for additional queries
     /** find the next Value Event*/
@@ -180,14 +181,6 @@ class FederateState
     /** get the number of inputs*/
     int inputCount () const;
     /** locks the processing with a busy loop*/
-    void lock ()
-    {
-        while (processing.test_and_set ())
-        {
-            ;  // spin
-        }
-    }
-    /** locks the processing with a busy loop*/
     void spinlock () const
     {
         while (processing.test_and_set ())
@@ -203,6 +196,9 @@ class FederateState
             std::this_thread::sleep_for (std::chrono::milliseconds (50));
         }
     }
+    /** locks the processing so FederateState can be used with lock_guard*/
+    void lock () { spinlock (); }
+
     /** trys to lock the processing return true if successful and false if not*/
     bool try_lock () const { return !processing.test_and_set (); }
     /** unlocks the processing*/
@@ -313,7 +309,7 @@ class FederateState
     @details function must have signature void(int level, const std::string &sourceName, const std::string
     &message)
     */
-    void setLogger (std::function<void (int, const std::string &, const std::string &)> logFunction)
+    void setLogger (std::function<void(int, const std::string &, const std::string &)> logFunction)
     {
         loggerFunction = std::move (logFunction);
     }
