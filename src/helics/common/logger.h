@@ -20,8 +20,6 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include <atomic>
 #include <fstream>
-#include <functional>
-#include <map>
 #include <memory>
 #include <mutex>
 

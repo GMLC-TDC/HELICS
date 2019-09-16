@@ -6,10 +6,13 @@ SPDX-License-Identifier: BSD-3-Clause
 */
 #include "FederateState.hpp"
 
+#include "CommonCore.hpp"
+#include "CoreFederateInfo.hpp"
 #include "EndpointInfo.hpp"
 #include "NamedInputInfo.hpp"
 #include "PublicationInfo.hpp"
 #include "TimeCoordinator.hpp"
+#include "TimeDependencies.hpp"
 #include "helics_definitions.hpp"
 #include "queryHelpers.hpp"
 #include <algorithm>

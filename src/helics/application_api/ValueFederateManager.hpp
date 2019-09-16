@@ -7,15 +7,15 @@ SPDX-License-Identifier: BSD-3-Clause
 #pragma once
 
 #include "../common/GuardedTypes.hpp"
-#include "../core/Core.hpp"
-#include "../core/federate_id_extra.hpp"
+#include "../core/federate_id.hpp"
 #include "Inputs.hpp"
 #include "Publications.hpp"
-#include "gmlc/containers/DualMappedVector.hpp"
-
 #include "data_view.hpp"
+#include "gmlc/containers/DualMappedVector.hpp"
 #include "helicsTypes.hpp"
-#include <atomic>
+#include <memory>
+#include <string>
+#include <vector>
 
 namespace helics
 {

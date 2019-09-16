@@ -114,7 +114,7 @@ PyModule_AddObject(m, "HelicsException", pHelicsException);
   /* Check if is a list */
   if (PyList_Check($input)) {
     int i;
-    $1 = PyList_Size($input);
+    $1 = (int)(PyList_Size($input));
     $2 = (char **) malloc(($1+1)*sizeof(char *));
     for (i = 0; i < $1; i++) {
       PyObject *o = PyList_GetItem($input,i);
@@ -144,7 +144,7 @@ PyModule_AddObject(m, "HelicsException", pHelicsException);
     PyErr_SetString(PyExc_ValueError,"Expected a list");
     return NULL;
   }
-  $2=PyList_Size($input);
+  $2=(int)(PyList_Size($input));
   $1 = (double *) malloc($2*sizeof(double));
 
   for (i = 0; i < $2; i++) {

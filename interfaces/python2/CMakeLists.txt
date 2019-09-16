@@ -7,7 +7,7 @@
 # SPDX-License-Identifier: BSD-3-Clause
 #
 
-if(NOT ENABLE_SWIG OR NOT SWIG_EXECUTABLE)
+if(NOT SWIG_EXECUTABLE)
 
   message(SEND_ERROR "Python 2 build requires swig")
 
