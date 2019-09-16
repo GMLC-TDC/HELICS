@@ -8,20 +8,16 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include "../common/GuardedTypes.hpp"
 #include "ActionMessage.hpp"
-#include "CommonCore.hpp"
-#include "Core.hpp"
-#include "CoreFederateInfo.hpp"
+#include "BasicHandleInfo.hpp"
 #include "InterfaceInfo.hpp"
-#include "TimeDependencies.hpp"
 #include "core-data.hpp"
 #include "core-types.hpp"
 #include "gmlc/containers/BlockingQueue.hpp"
 #include "helics-time.hpp"
-#include "helics/helics-config.h"
 #include <atomic>
 #include <chrono>
 #include <map>
-#include <mutex>
+#include <thread>
 #include <vector>
 
 namespace helics
@@ -31,6 +27,7 @@ class PublicationInfo;
 class EndpointInfo;
 class FilterInfo;
 class CommonCore;
+class CoreFederateInfo;
 
 class TimeCoordinator;
 class MessageTimer;
@@ -184,14 +181,6 @@ class FederateState
     /** get the number of inputs*/
     int inputCount () const;
     /** locks the processing with a busy loop*/
-    void lock ()
-    {
-        while (processing.test_and_set ())
-        {
-            ;  // spin
-        }
-    }
-    /** locks the processing with a busy loop*/
     void spinlock () const
     {
         while (processing.test_and_set ())
@@ -207,6 +196,9 @@ class FederateState
             std::this_thread::sleep_for (std::chrono::milliseconds (50));
         }
     }
+    /** locks the processing so FederateState can be used with lock_guard*/
+    void lock () { spinlock (); }
+
     /** trys to lock the processing return true if successful and false if not*/
     bool try_lock () const { return !processing.test_and_set (); }
     /** unlocks the processing*/

@@ -79,6 +79,8 @@ if(MSVC)
                                           # "registry" is returned
         set(
             _ZeroMQ_VERSIONS
+			"4_3_2"
+			"4_3_1"
             "4_3_0"
             "4_2_5"
             "4_2_4"

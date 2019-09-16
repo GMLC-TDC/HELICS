@@ -7,7 +7,6 @@ SPDX-License-Identifier: BSD-3-Clause
 #pragma once
 
 #include "MessageFederate.hpp"
-#include <mutex>
 #include <type_traits>
 
 namespace helics
@@ -165,7 +164,7 @@ class Endpoint
     @param callback a function with signature void(endpoint_id_t, Time)
     time is the time the value was updated  This callback is a notification callback and doesn't return the value
     */
-    void setCallback (const std::function<void(const Endpoint &, Time)> &callback)
+    void setCallback (const std::function<void (const Endpoint &, Time)> &callback)
     {
         fed->setMessageNotificationCallback (*this, callback);
     }

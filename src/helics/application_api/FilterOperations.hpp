@@ -11,14 +11,19 @@ file defines some common filter operations
 */
 
 #include "../common/GuardedTypes.hpp"
-#include "../core/Core.hpp"
+#include "../core/helics-time.hpp"
 #include "gmlc/libguarded/cow_guarded.hpp"
 #include <atomic>
 #include <set>
+#include <string>
+#include <vector>
 
 namespace helics
 {
+class Core;
+class FilterOperator;
 class MessageTimeOperator;
+class Message;
 class MessageConditionalOperator;
 class MessageDestOperator;
 class CloneOperator;

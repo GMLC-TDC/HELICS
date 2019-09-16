@@ -11,6 +11,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <chrono>
 #include <memory>
 #include <string>
+#include <vector>
 
 namespace helics
 {

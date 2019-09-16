@@ -29,7 +29,7 @@ TEST (player_tests, simple_player_test)
 
     helics::ValueFederate vfed ("block1", fi);
     auto &sub1 = vfed.registerSubscription ("pub1");
-    auto fut = std::async (std::launch::async, [&play1]() { play1.run (); });
+    auto fut = std::async (std::launch::async, [&play1] () { play1.run (); });
     vfed.enterExecutingMode ();
     auto retTime = vfed.requestTime (5);
     EXPECT_EQ (retTime, 1.0);
@@ -66,7 +66,7 @@ TEST (player_tests, simple_player_test_diff_inputs)
     play1.addPoint (4.0, "pub1", "c[3.0+0j, 0.0-4.0j]");
     helics::ValueFederate vfed ("block1", fi);
     auto &sub1 = vfed.registerSubscription ("pub1");
-    auto fut = std::async (std::launch::async, [&play1]() { play1.run (); });
+    auto fut = std::async (std::launch::async, [&play1] () { play1.run (); });
     vfed.enterExecutingMode ();
     auto retTime = vfed.requestTime (5);
     EXPECT_EQ (retTime, 1.0);
@@ -108,7 +108,7 @@ TEST (player_tests, simple_player_test_iterative)
 
     helics::ValueFederate vfed ("block1", fi);
     auto &sub1 = vfed.registerSubscription ("pub1");
-    auto fut = std::async (std::launch::async, [&play1]() { play1.run (); });
+    auto fut = std::async (std::launch::async, [&play1] () { play1.run (); });
     vfed.enterExecutingMode ();
     auto retTime = vfed.requestTimeIterative (5, helics::iteration_request::iterate_if_needed);
     EXPECT_EQ (retTime.grantedTime, 1.0);
@@ -155,7 +155,7 @@ TEST (player_tests, simple_player_test2)
     helics::ValueFederate vfed ("block1", fi);
     auto &sub1 = vfed.registerSubscription ("pub1");
     auto &sub2 = vfed.registerSubscription ("pub2");
-    auto fut = std::async (std::launch::async, [&play1]() { play1.run (); });
+    auto fut = std::async (std::launch::async, [&play1] () { play1.run (); });
     vfed.enterExecutingMode ();
 
     auto retTime = vfed.requestTime (5);
@@ -206,7 +206,7 @@ TEST_P (player_file_tests, test_files)
     helics::ValueFederate vfed ("block1", fi);
     auto &sub1 = vfed.registerSubscription ("pub1");
     auto &sub2 = vfed.registerSubscription ("pub2");
-    auto fut = std::async (std::launch::async, [&play1]() { play1.run (); });
+    auto fut = std::async (std::launch::async, [&play1] () { play1.run (); });
     vfed.enterExecutingMode ();
     auto val = sub1.getValue<double> ();
     EXPECT_EQ (val, 0.3);
@@ -252,7 +252,7 @@ TEST (player_tests, simple_player_mlinecomment)
     helics::ValueFederate vfed ("block1", fi);
     auto &sub1 = vfed.registerSubscription ("pub1");
     auto &sub2 = vfed.registerSubscription ("pub2");
-    auto fut = std::async (std::launch::async, [&play1]() { play1.run (); });
+    auto fut = std::async (std::launch::async, [&play1] () { play1.run (); });
     vfed.enterExecutingMode ();
     auto val = sub1.getValue<double> ();
     EXPECT_EQ (val, 0.3);
@@ -309,7 +309,7 @@ TEST_P (player_file_tests, test_files_cmd)
     helics::ValueFederate vfed ("obj", fi);
     auto &sub1 = vfed.registerSubscription ("pub1");
     auto &sub2 = vfed.registerSubscription ("pub2");
-    auto fut = std::async (std::launch::async, [&play1]() { play1.run (); });
+    auto fut = std::async (std::launch::async, [&play1] () { play1.run (); });
     vfed.enterExecutingMode ();
     auto val = sub1.getValue<double> ();
     EXPECT_EQ (val, 0.3);
@@ -346,7 +346,7 @@ TEST_P (player_file_tests, test_files_cmd)
 
 #ifdef ENABLE_ZMQ_CORE
 #ifndef DISABLE_SYSTEM_CALL_TESTS
-TEST_P (player_file_tests, test_files_ext)
+TEST_P (player_file_tests, test_files_exe)
 {
     std::this_thread::sleep_for (std::chrono::milliseconds (300));
     exeTestRunner playerExe (std::string (HELICS_INSTALL_LOC), std::string (HELICS_BUILD_LOC) + "/apps/",
@@ -416,7 +416,7 @@ TEST (player_tests, simple_player_testjson)
     helics::ValueFederate vfed ("block1", fi);
     auto &sub1 = vfed.registerSubscription ("pub1");
     auto &sub2 = vfed.registerSubscription ("pub2");
-    auto fut = std::async (std::launch::async, [&play1]() { play1.run (); });
+    auto fut = std::async (std::launch::async, [&play1] () { play1.run (); });
     vfed.enterExecutingMode ();
 
     auto retTime = vfed.requestTime (5);
@@ -457,7 +457,7 @@ TEST (player_tests, player_test_message)
     helics::Endpoint e1 (helics::GLOBAL, &mfed, "dest");
 
     play1.addMessage (1.0, "src", "dest", "this is a message");
-    auto fut = std::async (std::launch::async, [&play1]() { play1.run (); });
+    auto fut = std::async (std::launch::async, [&play1] () { play1.run (); });
     mfed.enterExecutingMode ();
 
     auto retTime = mfed.requestTime (5);
@@ -489,7 +489,7 @@ TEST (player_tests, player_test_message2)
     play1.addMessage (2.0, "src", "dest", "this is test message2");
 
     play1.addMessage (3.0, "src", "dest", "this is message 3");
-    auto fut = std::async (std::launch::async, [&play1]() { play1.run (); });
+    auto fut = std::async (std::launch::async, [&play1] () { play1.run (); });
     mfed.enterExecutingMode ();
 
     auto retTime = mfed.requestTime (5);
@@ -543,7 +543,7 @@ TEST (player_tests, player_test_message3)
 
     play1.addMessage (2.0, 3.0, "src", "dest", "this is message 3");
     // mfed.getCorePointer()->setLoggingLevel(helics::invalid_fed_id, 5);
-    auto fut = std::async (std::launch::async, [&play1]() { play1.run (); });
+    auto fut = std::async (std::launch::async, [&play1] () { play1.run (); });
     mfed.enterExecutingMode ();
 
     auto retTime = mfed.requestTime (5);
@@ -601,7 +601,7 @@ TEST_P (player_message_file_tests, message_test_files)
     helics::MessageFederate mfed ("block1", fi);
     helics::Endpoint e1 (helics::GLOBAL, &mfed, "dest");
     play1.loadFile (std::string (TEST_DIR) + GetParam ());
-    auto fut = std::async (std::launch::async, [&play1]() { play1.run (); });
+    auto fut = std::async (std::launch::async, [&play1] () { play1.run (); });
     mfed.enterExecutingMode ();
 
     auto retTime = mfed.requestTime (5);
@@ -656,7 +656,7 @@ TEST (player_tests, player_test_help)
 }
 #ifndef DISABLE_SYSTEM_CALL_TESTS
 /*
-TEST( player_tests,simple_player_test)
+TEST( player_tests,simple_player_test_exe)
 {
     static exeTestRunner playerExe (HELICS_BIN_LOC "apps/", "helics_player");
 

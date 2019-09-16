@@ -7,14 +7,9 @@ SPDX-License-Identifier: BSD-3-Clause
 #pragma once
 
 #include "global_federate_id.hpp"
-#include "helics-time.hpp"
-#include "helics/helics-config.h"
 
 #include <cstdint>
-#include <map>
-#include <mutex>
-#include <thread>
-#include <utility>
+#include <string>
 #include <vector>
 
 namespace helics

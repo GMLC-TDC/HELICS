@@ -25,7 +25,6 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <memory>
 #include <mutex>
 #include <string>
-#include <vector>
 
 // The choice for noexcept isn't set correctly in asio::io_context (including asio.hpp instead didn't help)
 // With Boost 1.58 this resulted in a compile error, apparently from the BOOST_NOEXCEPT define being empty

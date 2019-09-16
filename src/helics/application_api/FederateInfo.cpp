@@ -5,13 +5,12 @@ the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 
-#include "Federate.hpp"
+#include "FederateInfo.hpp"
 
 #include "../common/JsonProcessingFunctions.hpp"
 #include "../common/TomlProcessingFunctions.hpp"
 #include "../core/core-exceptions.hpp"
 #include "../core/helicsVersion.hpp"
-#include <fstream>
 #include <iostream>
 #include <set>
 

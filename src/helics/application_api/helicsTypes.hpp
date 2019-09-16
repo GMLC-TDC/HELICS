@@ -6,7 +6,6 @@ SPDX-License-Identifier: BSD-3-Clause
 */
 #pragma once
 #include <complex>
-#include <cstdint>
 #include <limits>
 #include <string>
 #include <typeinfo>
