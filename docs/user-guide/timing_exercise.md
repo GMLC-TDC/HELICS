@@ -53,7 +53,9 @@ A few simple exercises about co-simulation timing
 
 5.  Federation Setup \[A:  period=1; B:  period=2; C:  period=3\], Federates will send an update when they have received an update from the all other connected federates.  Federate A sends an update at time 0, what is the update sequence
 
-     | Time        | Federate(s)     |
+<center>
+
+| Time        | Federate(s)     |
 | ------------- |:-------------:|
 |       |       |
 |       |       |
@@ -63,6 +65,6 @@ A few simple exercises about co-simulation timing
 |       |       |
 |       |       |
 
-
+</center>
 ***
 For answers see [answers](timing_exercise_answers.md)
