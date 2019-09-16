@@ -11,8 +11,9 @@
 set -e
 set -C # noclobber
 #
+# installing github for python
 
-usage="$(basename "$0") [-h] [-t s] [-r s] [-l s] -- create archive source tarball with all submodules
+usage="$(basename "$0") [-h] [-t s] [-r s] [-l s] -- archive and upload source tarbal to github
 where:
     -h  show this help text
     -t  source code tag (v2.1.1)
@@ -24,7 +25,7 @@ where:
 
     URL: https://github.com/GMLC-TDC/HELICS/releases"
 
-while getopts ':ht:r:l:' option; do
+while getopts ':ht:r:l:k:i:s:' option; do
   case "$option" in
     h) echo "$usage"
        exit
@@ -34,6 +35,12 @@ while getopts ':ht:r:l:' option; do
     r) repo=$OPTARG
        ;;
     l) release=$OPTARG
+       ;;
+    k) GITHUB_TOKEN=$OPTARG
+       ;;
+    i) CLIENT_ID=$OPTARG
+       ;;
+    s) CLIENT_SECRET=$OPTARG
        ;;
     :) printf "missing argument for -%s\n" "$OPTARG" >&2
        echo "$usage" >&2
@@ -47,28 +54,26 @@ while getopts ':ht:r:l:' option; do
 done
 shift $((OPTIND - 1))
 
+pip install pygithub
+
 echo "> creating root archive"
 export ROOT_ARCHIVE_DIR="$(pwd)"
 
 git checkout $tag
 git submodule update --init
-export OUTPUT_FILE="Helics-${release}.tar.gz"
+export OUTPUT_FILE="HELICS-${tag}.tar.gz"
 # create root archive
-git archive --verbose --format "tar" --output "$ROOT_ARCHIVE_DIR/repo-output.tar" "$(git rev-parse --abbrev-ref HEAD)"
+git archive --verbose --prefix "repo/" --format "tar" --output "$ROOT_ARCHIVE_DIR/repo-output.tar" "master"
 
 echo "> appending submodule archives"
 # for each of git submodules append to the root archive
-git submodule foreach --recursive 'git archive --verbose --prefix=$path/ --format tar "$(git rev-parse --abbrev-ref HEAD)" --output $ROOT_ARCHIVE_DIR/repo-output-sub-$sha1.tar'
-
+git submodule foreach --recursive 'git archive --verbose --prefix=repo/$path/ --format tar master --output $ROOT_ARCHIVE_DIR/repo-output-sub-$sha1.tar'
 
 if (( $(ls repo-output-sub*.tar | wc -l) != 0  )); then
   # combine all archives into one tar
   echo
   echo "> combining all tars"
-  for archivetar in $(ls repo-output-sub*.tar); do
-    echo $archivetar
-    tar --concatenate --file=repo-output.tar "$archivetar"
-  done
+  tar --file repo-output.tar --append repo-output-sub*.tar
 
   # remove sub tars
   echo "> removing all sub tars"
@@ -81,4 +86,18 @@ gzip --force --verbose repo-output.tar
 
 echo "> moving output file to $OUTPUT_FILE"
 mv repo-output.tar.gz $OUTPUT_FILE
+
+cmd="python git-all-archive.py --repo $repo --release $release --version $tag"
+if [ "${GITHUB_TOKEN}a" != "a" ]; then
+    cmd="${cmd} --token $GITHUB_TOKEN"
+fi
+if [[ "${CLIENT_ID}a" != "a" ]]; then
+    cmd="${cmd} --client_id $CLIENT_ID"
+fi
+if [[ "${CLIENT_SECRET}a" != "a" ]]; then
+    cmd="$cmd --client_secret $CLIENT_SECRET"
+fi
+echo
+echo "> running $cmd"
+$cmd
 
