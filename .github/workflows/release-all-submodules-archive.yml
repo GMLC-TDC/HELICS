@@ -9,6 +9,8 @@ jobs:
     
     steps:
     - uses: actions/checkout@v1
+    - name: Event dump
+      run: cat $GITHUB_EVENT_PATH
     - name: Run a multi-line script
       run: |
         echo $(jq --raw-output '.action' $GITHUB_EVENT_PATH)
