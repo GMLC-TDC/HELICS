@@ -1,0 +1,15 @@
+name: Release all submodules archive
+
+on: [release]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v1
+    - name: Run a multi-line script
+      run: |
+        echo $(jq --raw-output '.action' $GITHUB_EVENT_PATH)
+        echo $(jq --raw-output '.release.upload_url' $GITHUB_EVENT_PATH)
