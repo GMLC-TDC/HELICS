@@ -21,6 +21,7 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
+        echo $GITHUB_REF
         AUTH_HEADER="Authorization: token ${GITHUB_TOKEN}"
         RELEASE_ID=$(jq --raw-output '.release.id' $GITHUB_EVENT_PATH)
         FILE="Helics-${GITHUB_REF}.tar.gz"
