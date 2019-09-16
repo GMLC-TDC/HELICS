@@ -8,11 +8,11 @@
 #
 
 # Generate SWIG wrapper for MATLAB
-if(NOT MATLAB_GENERATE_ONLY)
+if(NOT SWIG_GENERATE_INTERFACE_FILES_ONLY)
   find_package(Matlab COMPONENTS MAIN_PROGRAM)
 endif()
 
-if(ENABLE_SWIG AND SWIG_EXECUTABLE)
+if(SWIG_EXECUTABLE)
 
   execute_process(COMMAND ${SWIG_EXECUTABLE} -help OUTPUT_VARIABLE SWIG_HELP_OUTPUT)
   string(FIND "${SWIG_HELP_OUTPUT}" "-matlab" MATLAB_HELP_FOUND)
@@ -22,7 +22,7 @@ if(ENABLE_SWIG AND SWIG_EXECUTABLE)
   endif()
 endif()
 message(STATUS "Building MATLAB")
-if(NOT ENABLE_SWIG OR MATLAB_SWIG_NOT_AVAILABLE)
+if(NOT SWIG_EXECUTABLE OR MATLAB_SWIG_NOT_AVAILABLE)
 
   add_custom_command(
     OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/helicsMEX.cpp
@@ -62,7 +62,7 @@ else()
       ${CMAKE_CURRENT_SOURCE_DIR}/matlab_maps.i
   )
 
-  if(OVERWRITE_MATLAB_FILES)
+  if(HELICS_OVERWRITE_INTERFACE_FILES)
     add_custom_target(
       mfile_overwrite ALL
       COMMAND
@@ -70,7 +70,7 @@ else()
         ${CMAKE_CURRENT_SOURCE_DIR}/overwriteMatlabFiles.cmake
       DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/helicsMEX.cpp
     )
-  endif(OVERWRITE_MATLAB_FILES)
+  endif(HELICS_OVERWRITE_INTERFACE_FILES)
 
   # add_custom_command(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/helicsMEX.cpp COMMAND
   # ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_SOURCE_DIR}/modifyOctSourceFile.cmake DEPENDS
@@ -131,15 +131,15 @@ else()
   )
 endif()
 
-if(NOT MATLAB_GENERATE_ONLY)
+if(NOT SWIG_GENERATE_INTERFACE_FILES_ONLY)
   add_custom_target(
     helicsMEX ALL
     DEPENDS
       ${CMAKE_CURRENT_BINARY_DIR}/helicsMEX.${Matlab_MEX_EXTENSION} helicsSharedLib
   )
   set_target_properties(helicsMEX PROPERTIES FOLDER interfaces)
-else(NOT MATLAB_GENERATE_ONLY)
-  if(NOT OVERWRITE_MATLAB_FILES)
+else(NOT SWIG_GENERATE_INTERFACE_FILES_ONLY)
+  if(NOT HELICS_OVERWRITE_INTERFACE_FILES)
   #extra target for generation only and no overwrite
    add_custom_target(
       matlab_create ALL
@@ -147,7 +147,7 @@ else(NOT MATLAB_GENERATE_ONLY)
       DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/helicsMEX.cpp
     )
   endif()
-endif(NOT MATLAB_GENERATE_ONLY)
+endif(NOT SWIG_GENERATE_INTERFACE_FILES_ONLY)
 
 file(GLOB HSHARED_LIB_SOURCES ${CMAKE_SOURCE_DIR}/src/helics/shared_api_library/*.h)
 
