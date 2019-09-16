@@ -7,17 +7,11 @@ SPDX-License-Identifier: BSD-3-Clause
 #pragma once
 
 #include "../common/GuardedTypes.hpp"
-#include "../core/Core.hpp"
 #include "Filters.hpp"
 #include "gmlc/containers/MappedVector.hpp"
-#include <cstdint>
-#include <deque>
-#include <functional>
-#include <map>
 #include <memory>
-#include <unordered_map>
-#include <unordered_set>
-#include <utility>
+#include <string>
+
 namespace helics
 {
 class Core;

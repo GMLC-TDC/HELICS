@@ -8,14 +8,14 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include "../core/Core.hpp"
 #include "Federate.hpp"
-#include "helics/helics-config.h"
 #include "helics/helics_enums.h"
+#include <memory>
+#include <string>
 
 namespace helics
 {
 class FilterOperations;
-class Federate;
-
+class FilterOperator;
 /** a set of common defined filters*/
 enum class filter_types
 {

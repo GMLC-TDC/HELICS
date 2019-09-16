@@ -7,8 +7,8 @@ the top-level NOTICE for additional details. All rights reserved. SPDX-License-I
 #include "../application_api/testFixtures.hpp"
 #include "gtest/gtest.h"
 #include "helics/ValueFederates.hpp"
+#include <array>
 #include <future>
-
 /** tests for the different flag options and considerations*/
 
 struct update_tests : public FederateTestFixture, public ::testing::Test

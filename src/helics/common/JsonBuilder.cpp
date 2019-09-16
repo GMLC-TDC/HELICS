@@ -8,6 +8,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "JsonBuilder.hpp"
 #include "JsonProcessingFunctions.hpp"
 #include "gmlc/utilities/stringOps.h"
+#include <utility>
 
 namespace helics
 {

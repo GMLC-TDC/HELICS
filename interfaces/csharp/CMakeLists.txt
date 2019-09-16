@@ -22,19 +22,7 @@ if(ENABLE_SWIG AND SWIG_EXECUTABLE)
   set_target_properties(CShelics PROPERTIES FOLDER interfaces)
 
 else()
- file(
-    COPY
-    ${CMAKE_CURRENT_SOURCE_DIR}/interface/
-    DESTINATION
-    ${CMAKE_CURRENT_BINARY_DIR}
-  )
-  if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX)
-    # Update if necessary
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-long-long")
-  endif()
-  #add_library(JNIhelics SHARED interface/helicsJavaJAVA_wrap.c)
-  #target_link_libraries(JNIhelics helicsSharedLib ${JAVA_LIBRARIES})
-  #set_target_properties(JNIhelics PROPERTIES FOLDER interfaces)
+ message(SEND_ERROR "C# interface build requires swig")
 endif() # ENABLE_SWIG
 
 # Set the output library name to _helics

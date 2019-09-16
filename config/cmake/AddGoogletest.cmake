@@ -53,17 +53,16 @@ macro(add_gtest TESTNAME)
 
 endmacro()
 
-mark_as_advanced(
-gmock_build_tests
-gtest_build_samples
-gtest_build_tests
-gtest_disable_pthreads
-gtest_force_shared_crt
-gtest_hide_internal_symbols
-BUILD_GMOCK
-BUILD_GTEST
-INSTALL_GTEST
-)
+HIDE_VARIABLE(gmock_build_tests)
+HIDE_VARIABLE(gtest_build_samples)
+HIDE_VARIABLE(gtest_build_tests)
+HIDE_VARIABLE(gtest_disable_pthreads)
+HIDE_VARIABLE(gtest_force_shared_crt)
+HIDE_VARIABLE(gtest_hide_internal_symbols)
+HIDE_VARIABLE(BUILD_GMOCK)
+HIDE_VARIABLE(BUILD_GTEST)
+HIDE_VARIABLE(INSTALL_GTEST)
+
 
 set_target_properties(gtest gtest_main gmock gmock_main
     PROPERTIES FOLDER "Extern")

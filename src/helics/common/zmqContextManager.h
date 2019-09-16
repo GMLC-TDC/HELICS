@@ -22,7 +22,6 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <map>
 #include <memory>
 #include <string>
-#include <vector>
 namespace zmq
 {
 class context_t;

@@ -18,6 +18,7 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include "loggerCore.hpp"
 #include <iostream>
+#include <tuple>
 
 namespace helics
 {

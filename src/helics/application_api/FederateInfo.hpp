@@ -6,6 +6,8 @@ SPDX-License-Identifier: BSD-3-Clause
 */
 #pragma once
 #include "../core/CoreFederateInfo.hpp"
+#include "../core/core-types.hpp"
+#include <memory>
 
 namespace helics
 {

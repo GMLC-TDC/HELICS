@@ -15,7 +15,6 @@ SPDX-License-Identifier: BSD-3-Clause
 namespace helics
 {
 class Core;
-class CommonCore;
 /**
  * Factory for building Core API instances.
  */

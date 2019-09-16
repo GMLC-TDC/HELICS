@@ -7,6 +7,8 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include "ValueConverter.hpp"
 #include "ValueConverter_impl.hpp"
+#include <complex>
+#include <vector>
 
 namespace helics
 {
