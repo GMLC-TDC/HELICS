@@ -22,9 +22,8 @@ A few simple exercises about co-simulation timing
 
     c. 	What is the next time all federate will be able to execute simultaneously? **_6_**
 
-***
 
-**Key Principle**:  Federates are interrupted if there is updated data available and allowed time prior to the requested time
+     **Key Principle**:  *Federates are interrupted if there is updated data available and allowed time prior to the requested time*
 
 2.   Federation Setup \[A:  period=1,`wait_for_current_time_update`; B:  period=2; C:  period=3\]
 
@@ -37,8 +36,7 @@ A few simple exercises about co-simulation timing
      e.	If A did not have the `wait_for_current_time_update` flag active, what time would Federate A receive the data? **_3_**
 
 
-***
-**Key Principle**:  Federates are granted the next allowed time after the time specified in a request if they are not interrupted.
+     **Key Principle**:  *Federates are granted the next allowed time after the time specified in a request if they are not interrupted.*
 
 3.   Federation Setup \[A:  period=1; B:  period=2,offset=1,time_delta=2; C:  period=3\]
 
@@ -46,14 +44,13 @@ A few simple exercises about co-simulation timing
 
      b.	Federate C requested a time of 4, what time is Federate C granted? **_6_**
 
-***
 4.  Federation Setup \[A:  period=1; B:  period=2,uninterruptible; C:  period=3\]
 
     a.	Federate C Publishes at time 3,  Federate B requests time 6, what time will it be granted?**_6_**, _B cannot be granted anything other than 6 due to uninterruptible flag_
 
     b.	If Federate B were not uninterruptible what time would it be granted? **_4_**
-***
-![Connectivity Diagram](../img/timing_fed_setup.png "Exercise Federate Setup")
+
+     ![Connectivity Diagram](../img/timing_fed_setup.png "Exercise Federate Setup")
 
 5.  Federation Setup \[A:  period=1; B:  period=2; C:  period=3\], Federates will send an update when they have received an update from the all other connected federates.  Federate A sends an update at time 0, what is the Update sequence
 

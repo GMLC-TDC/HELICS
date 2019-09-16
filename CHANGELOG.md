@@ -7,22 +7,23 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 A note on future revisions.  
   Everything within a major version number should be code compatible (with the exception of experimental interfaces).  The most notable example of an experimental interface is the support for multiple source inputs.  The APIs to deal with this will change in future minor releases.  Everything within a single minor release should be network compatible with other federates on the same minor release number.  Compatibility across minor release numbers may be possible in some situations but we are not going to guarantee this as those components are subject to performance improvements and may need to be modified at some point.  Patch releases will be limited to bug fixes and other improvements not impacting the public API or network compatibility.  Check the [Public API](./docs/Public_API.md) for details on what is included and excluded from the public API and version stability.
 
-## \[2.2.1\] ~ 2019-09-15
+## \[2.2.1\] ~ 2019-09-19
 Minor release with bug fixes and a few additional features
 ### Changed
 -   helics apps tests is converted to use Google test and is now being run through the sanitizers
 -   **BREAKING CHANGE** The C interface helics logging callback specifications now include a user data object.  This is technically a breaking change, but there were a few issues with the current implementation so it is not entirely clear it was usable as it was.  There are now some tests for the functionality.  This log callback specification was not available in the language API's and the C++ API has not changed, only the C interface to specifying direct logging callbacks.  This is considered a minor change due to no known users of this interface at present and as it was it wasn't entirely operational.  No further changes are expected.  
 -  The use of Boost C++ in the helics core and application api are now limited to the IPC core(there are no plans to remove this usage) and an option to `DISABLE_BOOST` is available in the CMAKE files.  This will turn off the IPC_CORE and any optional uses of boost in some of the libraries.  Future features may use Boost but should retain the ability to disable its use.  
-- Some function names in the C\+\+98 API were changed to better match the C\+\+ API and were documented more completely through doxygen
-- The doxygen cmake project was renamed from doc to helics_doxygen
+- **BREAKING CHANGE** Some function names in the C\+\+98 API were changed to better match the C\+\+ API and were documented more completely through doxygen,  these were listed as potentially changing in the [Public API](/docs/Public_API.md) so this is not a consideration for semantic versioning.  The C++98 API also has limited numbers of users at this point yet and may not be fully stable until HELICS 3.0 release
+- The doxygen cmake project was renamed from `doc` to `helics_doxygen`
 - several variables used by submodules in cmake were hidden
 - updated zmq subproject version to 4.3.2
 
 ### Fixed
--  there was a 32 bit issue when using certain vector operation functions in HELICS when compiled with 32 bit, this was preventing the arm 32 from running the tests fully.  This issue has been fixed.
+-  There was a 32 bit issue when using certain vector operation functions in HELICS when compiled with 32 bit, this was preventing the arm 32 from running the tests fully.  This issue has been fixed.
 - Fixed a race condition related to queries of subscriptions and inputs of a federate if done remotely.  The core could lock or a race condition could occur.  
 - some issues related to file logs
 - started to address some recommendations for `include-what-you-use`
+-  The cmake conditions for building the C# interface and Python2 interface were not completely correct and incorrectly showed an error which was also incorrectly ignored, so it all worked unless there was an actual error, but those issues have been resolved.  
 
 ### Added
 -   logMessage functions in the federate for user specified log messages and levels

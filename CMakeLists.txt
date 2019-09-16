@@ -13,7 +13,7 @@ project(HELICS VERSION 2.2.1)
 # HELICS Version number
 # -----------------------------------------------------------------------------
 set(HELICS_VERSION_BUILD)
-set(HELICS_DATE "09-16-19")
+set(HELICS_DATE "09-19-19")
 
 set(
     HELICS_VERSION_UNDERSCORE
