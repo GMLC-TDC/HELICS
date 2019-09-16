@@ -119,6 +119,16 @@ if(WIN32)
       ${CMAKE_CURRENT_BINARY_DIR}/mkhelicsMEXFile.m helicsSharedLib
       ${CMAKE_CURRENT_BINARY_DIR}/helicsMEX.cpp
   )
+  elseif (APPLE)
+  add_custom_command(
+    OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/helicsMEX.${Matlab_MEX_EXTENSION}
+    COMMAND
+      ${Matlab_MAIN_PROGRAM} -nojvm -nodisplay -nosplash -r
+      "\"run('${CMAKE_CURRENT_BINARY_DIR}/mkhelicsMEXFile.m');quit;\""
+    DEPENDS
+      ${CMAKE_CURRENT_BINARY_DIR}/mkhelicsMEXFile.m helicsSharedLib
+      ${CMAKE_CURRENT_BINARY_DIR}/helicsMEX.cpp
+  )
 else()
   add_custom_command(
     OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/helicsMEX.${Matlab_MEX_EXTENSION}

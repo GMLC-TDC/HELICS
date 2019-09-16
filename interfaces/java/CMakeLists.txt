@@ -6,19 +6,21 @@
 #
 # SPDX-License-Identifier: BSD-3-Clause
 #
+if(NOT SWIG_GENERATE_INTERFACE_FILES_ONLY)
+   find_package(Java REQUIRED)
+   find_package(JNI REQUIRED)
+   include(UseJava)
 
-find_package(Java REQUIRED)
-find_package(JNI REQUIRED)
-include(UseJava)
+   include_directories(${JAVA_INCLUDE_PATH})
+   include_directories(${JNI_INCLUDE_DIRS})
+endif()
 
-include_directories(${JAVA_INCLUDE_PATH})
-include_directories(${JNI_INCLUDE_DIRS})
 
-if(ENABLE_SWIG AND SWIG_EXECUTABLE)
+if(SWIG_EXECUTABLE)
 # Enable generation using swig
 
   set_property(SOURCE helicsJava.i PROPERTY SWIG_MODULE_NAME JNIhelics)
-
+  
   set(CMAKE_SWIG_FLAGS "-package;com.java.helics")
   if(${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION} VERSION_GREATER 3.7)
     swig_add_library(JNIhelics TYPE MODULE LANGUAGE java SOURCES helicsJava.i)
