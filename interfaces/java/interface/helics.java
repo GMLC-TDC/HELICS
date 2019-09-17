@@ -95,6 +95,10 @@ public class helics {
     helicsJNI.helicsBrokerAddDestinationFilterToEndpoint(SWIGTYPE_p_void.getCPtr(broker), filter, endpoint);
   }
 
+  public static int helicsCoreWaitForDisconnect(SWIGTYPE_p_void core, int msToWait) {
+    return helicsJNI.helicsCoreWaitForDisconnect(SWIGTYPE_p_void.getCPtr(core), msToWait);
+  }
+
   public static int helicsBrokerWaitForDisconnect(SWIGTYPE_p_void broker, int msToWait) {
     return helicsJNI.helicsBrokerWaitForDisconnect(SWIGTYPE_p_void.getCPtr(broker), msToWait);
   }
@@ -125,6 +129,10 @@ public class helics {
 
   public static String helicsBrokerGetAddress(SWIGTYPE_p_void broker) {
     return helicsJNI.helicsBrokerGetAddress(SWIGTYPE_p_void.getCPtr(broker));
+  }
+
+  public static String helicsCoreGetAddress(SWIGTYPE_p_void core) {
+    return helicsJNI.helicsCoreGetAddress(SWIGTYPE_p_void.getCPtr(core));
   }
 
   public static void helicsCoreSetReadyToInit(SWIGTYPE_p_void core) {
@@ -426,6 +434,10 @@ public class helics {
     helicsJNI.helicsFederateSetGlobal(SWIGTYPE_p_void.getCPtr(fed), valueName, value);
   }
 
+  public static void helicsFederateSetLogFile(SWIGTYPE_p_void fed, String logFile) {
+    helicsJNI.helicsFederateSetLogFile(SWIGTYPE_p_void.getCPtr(fed), logFile);
+  }
+
   public static void helicsFederateLogErrorMessage(SWIGTYPE_p_void fed, String logmessage) {
     helicsJNI.helicsFederateLogErrorMessage(SWIGTYPE_p_void.getCPtr(fed), logmessage);
   }
@@ -452,6 +464,14 @@ public class helics {
 
   public static void helicsBrokerSetGlobal(SWIGTYPE_p_void broker, String valueName, String value) {
     helicsJNI.helicsBrokerSetGlobal(SWIGTYPE_p_void.getCPtr(broker), valueName, value);
+  }
+
+  public static void helicsCoreSetLogFile(SWIGTYPE_p_void core, String logFileName) {
+    helicsJNI.helicsCoreSetLogFile(SWIGTYPE_p_void.getCPtr(core), logFileName);
+  }
+
+  public static void helicsBrokerSetLogFile(SWIGTYPE_p_void broker, String logFileName) {
+    helicsJNI.helicsBrokerSetLogFile(SWIGTYPE_p_void.getCPtr(broker), logFileName);
   }
 
   public static SWIGTYPE_p_void helicsCreateQuery(String target, String query) {

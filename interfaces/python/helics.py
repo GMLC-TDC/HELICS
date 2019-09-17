@@ -279,6 +279,9 @@ def helicsBrokerAddSourceFilterToEndpoint(broker: 'helics_broker', filter: 'char
 def helicsBrokerAddDestinationFilterToEndpoint(broker: 'helics_broker', filter: 'char const *', endpoint: 'char const *') -> "void":
     return _helics.helicsBrokerAddDestinationFilterToEndpoint(broker, filter, endpoint)
 
+def helicsCoreWaitForDisconnect(core: 'helics_core', msToWait: 'int') -> "helics_bool":
+    return _helics.helicsCoreWaitForDisconnect(core, msToWait)
+
 def helicsBrokerWaitForDisconnect(broker: 'helics_broker', msToWait: 'int') -> "helics_bool":
     return _helics.helicsBrokerWaitForDisconnect(broker, msToWait)
 
@@ -302,6 +305,9 @@ def helicsCoreGetIdentifier(core: 'helics_core') -> "char const *":
 
 def helicsBrokerGetAddress(broker: 'helics_broker') -> "char const *":
     return _helics.helicsBrokerGetAddress(broker)
+
+def helicsCoreGetAddress(core: 'helics_core') -> "char const *":
+    return _helics.helicsCoreGetAddress(core)
 
 def helicsCoreSetReadyToInit(core: 'helics_core') -> "void":
     return _helics.helicsCoreSetReadyToInit(core)
@@ -519,6 +525,9 @@ def helicsFederateGetCurrentTime(fed: 'helics_federate') -> "helics_time":
 def helicsFederateSetGlobal(fed: 'helics_federate', valueName: 'char const *', value: 'char const *') -> "void":
     return _helics.helicsFederateSetGlobal(fed, valueName, value)
 
+def helicsFederateSetLogFile(fed: 'helics_federate', logFile: 'char const *') -> "void":
+    return _helics.helicsFederateSetLogFile(fed, logFile)
+
 def helicsFederateLogErrorMessage(fed: 'helics_federate', logmessage: 'char const *') -> "void":
     return _helics.helicsFederateLogErrorMessage(fed, logmessage)
 
@@ -539,6 +548,12 @@ def helicsCoreSetGlobal(core: 'helics_core', valueName: 'char const *', value: '
 
 def helicsBrokerSetGlobal(broker: 'helics_broker', valueName: 'char const *', value: 'char const *') -> "void":
     return _helics.helicsBrokerSetGlobal(broker, valueName, value)
+
+def helicsCoreSetLogFile(core: 'helics_core', logFileName: 'char const *') -> "void":
+    return _helics.helicsCoreSetLogFile(core, logFileName)
+
+def helicsBrokerSetLogFile(broker: 'helics_broker', logFileName: 'char const *') -> "void":
+    return _helics.helicsBrokerSetLogFile(broker, logFileName)
 
 def helicsCreateQuery(target: 'char const *', query: 'char const *') -> "helics_query":
     return _helics.helicsCreateQuery(target, query)

@@ -145,6 +145,7 @@ public class helicsJNI {
   public final static native void helicsBrokerDataLink(long jarg1, String jarg2, String jarg3);
   public final static native void helicsBrokerAddSourceFilterToEndpoint(long jarg1, String jarg2, String jarg3);
   public final static native void helicsBrokerAddDestinationFilterToEndpoint(long jarg1, String jarg2, String jarg3);
+  public final static native int helicsCoreWaitForDisconnect(long jarg1, int jarg2);
   public final static native int helicsBrokerWaitForDisconnect(long jarg1, int jarg2);
   public final static native int helicsCoreIsConnected(long jarg1);
   public final static native void helicsCoreDataLink(long jarg1, String jarg2, String jarg3);
@@ -153,6 +154,7 @@ public class helicsJNI {
   public final static native String helicsBrokerGetIdentifier(long jarg1);
   public final static native String helicsCoreGetIdentifier(long jarg1);
   public final static native String helicsBrokerGetAddress(long jarg1);
+  public final static native String helicsCoreGetAddress(long jarg1);
   public final static native void helicsCoreSetReadyToInit(long jarg1);
   public final static native void helicsCoreDisconnect(long jarg1);
   public final static native long helicsGetFederateByName(String jarg1);
@@ -225,6 +227,7 @@ public class helicsJNI {
   public final static native int helicsFederateGetIntegerProperty(long jarg1, int jarg2);
   public final static native double helicsFederateGetCurrentTime(long jarg1);
   public final static native void helicsFederateSetGlobal(long jarg1, String jarg2, String jarg3);
+  public final static native void helicsFederateSetLogFile(long jarg1, String jarg2);
   public final static native void helicsFederateLogErrorMessage(long jarg1, String jarg2);
   public final static native void helicsFederateLogWarningMessage(long jarg1, String jarg2);
   public final static native void helicsFederateLogInfoMessage(long jarg1, String jarg2);
@@ -232,6 +235,8 @@ public class helicsJNI {
   public final static native void helicsFederateLogLevelMessage(long jarg1, int jarg2, String jarg3);
   public final static native void helicsCoreSetGlobal(long jarg1, String jarg2, String jarg3);
   public final static native void helicsBrokerSetGlobal(long jarg1, String jarg2, String jarg3);
+  public final static native void helicsCoreSetLogFile(long jarg1, String jarg2);
+  public final static native void helicsBrokerSetLogFile(long jarg1, String jarg2);
   public final static native long helicsCreateQuery(String jarg1, String jarg2);
   public final static native String helicsQueryExecute(long jarg1, long jarg2);
   public final static native String helicsQueryCoreExecute(long jarg1, long jarg2);
