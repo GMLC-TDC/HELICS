@@ -45,6 +45,7 @@ if (WIN32)
 
 #message(STATUS "win32 octave search")
 set (octave_versions
+Octave-5.1.0.0
 Octave-4.4.0
 Octave-4.2.1
 Octave-4.2.0
@@ -100,7 +101,7 @@ mark_as_advanced(MKOCTFILE_EXECUTABLE)
 if (NOT OCTAVE_EXECUTABLE)
 set(OCTAVE_EXECUTABLE OCTAVE_EXECUTABLE-NOTFOUND)
 endif()
-find_program(OCTAVE_EXECUTABLE NAME octave
+find_program(OCTAVE_EXECUTABLE NAME octave octave.vbs
 	HINTS 
 		${OCTAVE_INSTALL_LOCATION} 
 	PATHS 

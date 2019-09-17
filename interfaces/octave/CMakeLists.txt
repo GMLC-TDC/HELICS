@@ -20,7 +20,6 @@ if(NOT MKOCTFILE_EXECUTABLE)
   )
 endif()
 
-if(ENABLE_SWIG OR SWIG_REQUIRED)
     # Compile OCT file add_custom_target("helicsOCT" ALL)
   file(GLOB SHARED_LIB_HEADERS ${CMAKE_SOURCE_DIR}/src/helics/shared_api_library/*.h)
 
@@ -44,15 +43,6 @@ if(ENABLE_SWIG OR SWIG_REQUIRED)
     DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/helicsOCTAVE_wrap.cxx
   )
 
-
-else()
-
-message(STATUS "building octave from included cpp file")
-configure_file(
-    ${CMAKE_CURRENT_SOURCE_DIR}/helicsOCTAVE_wrap.cpp
-    ${CMAKE_CURRENT_BINARY_DIR}/helicsOCTAVE_wrap.cpp COPYONLY
-  )
-endif()
 
 add_custom_command(
   OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/mkhelicsOCTFile.m

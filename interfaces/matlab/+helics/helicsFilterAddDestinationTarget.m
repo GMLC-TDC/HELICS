@@ -1,3 +1,3 @@
 function varargout = helicsFilterAddDestinationTarget(varargin)
-  [varargout{1:nargout}] = helicsMEX(275, varargin{:});
+  [varargout{1:nargout}] = helicsMEX(285, varargin{:});
 end
