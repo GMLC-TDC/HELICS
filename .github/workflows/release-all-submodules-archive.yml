@@ -1,11 +1,11 @@
 name: Release all submodules archive
 
-on: [release]
+on: release
 
 jobs:
   build:
     runs-on: ubuntu-latest
-    if: github.event.action == published
+    if: github.event.action == "published"
     steps:
     - uses: actions/checkout@v1
     - name: Create archive
