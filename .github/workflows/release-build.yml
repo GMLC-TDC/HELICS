@@ -37,5 +37,6 @@ jobs:
         name: all-submodules-archive
     - name: Print some info on fetched artifacts
       run: |
-        ls
+        ls -lh
+        ls all-submodules-archive
         sha256sum --help
