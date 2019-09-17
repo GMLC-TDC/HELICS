@@ -1,0 +1,26 @@
+name: Release all submodules archive
+
+on: release
+
+jobs:
+  create-all-submodule-archive:
+    name: Create all submodule archive
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v1
+      if: github.event.action == 'published'
+    - name: Create archive
+      if: github.event.action == 'published'
+      # Creates the archive then moves it to an artifact subfolder
+      run: ./scripts/_git-all-archive.sh -l "$(git rev-parse --abbrev-ref "${GITHUB_REF}")" && mkdir artifact && mv "Helics-$(git rev-parse --abbrev-ref "${GITHUB_REF}").tar.gz" artifact/
+    - name: Upload archive to release
+      if: github.event.action == 'published'
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        UPLOAD_URL: ${{ github.event.release.upload_url }}
+      run: ./.github/workflows/upload-release-asset.sh "artifact/Helics-$(git rev-parse --abbrev-ref "${GITHUB_REF}").tar.gz"
+    - name: Upload artifact
+      uses: actions/upload-artifact@v1
+      with:
+        name: all-submodules-archive
+        path: artifact
