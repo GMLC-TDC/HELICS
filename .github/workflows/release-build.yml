@@ -47,7 +47,7 @@ jobs:
       with:
         python-version: '3.7'
         architecture: ${{ matrix.arch }}
-    - name: Build ${{ matrix.msvc_ver }} ${{ matrix.arch }} installer
+    - name: Build installer
       if: github.event.action == 'published'
       env:
         BUILD_ARCH: ${{ matrix.arch }}
@@ -55,13 +55,11 @@ jobs:
         MSVC_VER: ${{ matrix.msvc_ver }}
       run: |
         echo "Building with ${BUILD_GEN} for ${BUILD_ARCH}"
-        python --version
-        # Run CMake with Win32 instad of x86
+        # Run CMake with Win32 instead of x86
         #python -m pip install --upgrade pip
         #choco install -y swig
         mkdir artifact
         touch artifact/test-${BUILD_GEN}-${MSVC_VER}-${BUILD_ARCH}
-        
     - name: Upload artifact
       if: github.event.action == 'published'
       uses: actions/upload-artifact@v1
@@ -70,10 +68,12 @@ jobs:
         path: artifact
         
   generate-sha256:
-    name: Calculate SHA256 for all artifacts
+    name: Calculate SHA256 for release assets
     needs: [create-all-submodule-archive, build-windows]
     runs-on: ubuntu-latest
     steps:
+    - uses: actions/checkout@v1
+      if: github.event.action == 'published'
     - name: Get all submodules archive
       if: github.event.action == 'published'
       uses: actions/download-artifact@v1
@@ -88,7 +88,10 @@ jobs:
         path: artifacts
     - name: Print some info on fetched artifacts
       if: github.event.action == 'published'
-      run: |
-        TAG_VERSION=$(git rev-parse --abbrev-ref "${GITHUB_REF}")
-        cd artifacts
-        sha256sum * > "Helics-${TAG_VERSION#v}-SHA-256.txt"
+      run: sha256sum * > "Helics-$(git rev-parse --abbrev-ref "${GITHUB_REF}")-SHA-256.txt"
+    - name: Upload SHA-256 file to release
+      if: github.event.action == 'published'
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        UPLOAD_URL: ${{ github.event.release.upload_url }}
+      run: ./.github/workflows/upload-release-asset.sh "artifacts/Helics-$(git rev-parse --abbrev-ref "${GITHUB_REF}")-SHA-256.txt"
