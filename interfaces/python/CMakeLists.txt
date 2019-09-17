@@ -7,11 +7,13 @@
 # SPDX-License-Identifier: BSD-3-Clause
 #
 
-if(BUILD_PYTHON_INTERFACE)
+if(SWIG_GENERATE_INTERFACE_FILES_ONLY)
+ include (${CMAKE_CURRENT_SOURCE_DIR}/pythonSwigGenerateOnly.cmake)
+else()
   set(Python_ADDITIONAL_VERSIONS 3.4 3.5 3.6 3.7 3.8)
   find_package(PythonInterp 3)
   find_package(PythonLibs 3 REQUIRED)
-endif(BUILD_PYTHON_INTERFACE)
+
 
 if(ENABLE_SWIG AND SWIG_EXECUTABLE)
 
@@ -67,9 +69,9 @@ else()
   if(NOT ${CMAKE_VERSION} VERSION_LESS "3.12.0")
     # Use the Python_add_library function added in 3.12.0
     find_package(Python COMPONENTS Development)
-    Python_add_library(helicsPYTHON MODULE helics_wrap.c)
+    Python_add_library(helicsPYTHON MODULE helicsPython.c)
   else()
-    add_library(helicsPYTHON MODULE helics_wrap.c)
+    add_library(helicsPYTHON MODULE helicsPython.c)
     # Add path to Python include directory
     target_include_directories(helicsPYTHON PUBLIC ${PYTHON_INCLUDE_DIRS})
 
@@ -124,3 +126,5 @@ endif()
 
 install(FILES ${CMAKE_CURRENT_BINARY_DIR}/helics.py DESTINATION python COMPONENT python)
 install_key_files_with_comp(python)
+
+endif(SWIG_GENERATE_INTERFACE_FILES_ONLY)
