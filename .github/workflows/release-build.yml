@@ -74,7 +74,7 @@ jobs:
         UPLOAD_URL: ${{ github.event.release.upload_url }}
       shell: bash
       working-directory: ./artifact
-      run: ../.github/workflows/upload-release-asset.sh "Helics-*.exe"
+      run: ../.github/workflows/upload-release-asset.sh "$(ls Helics-*.exe)"
     - name: Upload artifact
       if: github.event.action == 'published'
       uses: actions/upload-artifact@v1
