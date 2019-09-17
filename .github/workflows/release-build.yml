@@ -63,6 +63,12 @@ jobs:
         cd ../artifact
         EXE_NAME=$(ls Helics-*)
         mv $EXE_NAME ${EXE_NAME/-win/-${MSVC_VER}-win}
+    - name: Upload installer to release
+      if: github.event.action == 'published'
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        UPLOAD_URL: ${{ github.event.release.upload_url }}
+      run: ./.github/workflows/upload-release-asset.sh "artifact/Helics-*.exe"
     - name: Upload artifact
       if: github.event.action == 'published'
       uses: actions/upload-artifact@v1
