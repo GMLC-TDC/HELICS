@@ -32,9 +32,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name Get all submodules archive
-    uses: actions/download-artifact@v1
-    with:
-      name: all-submodules-archive
+      uses: actions/download-artifact@v1
+      with:
+        name: all-submodules-archive
     - name: Print some info on fetched artifacts
       run: |
         ls
