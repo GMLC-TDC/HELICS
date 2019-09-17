@@ -66,5 +66,7 @@ A few simple exercises about co-simulation timing
 |       |       |
 
 </center>
+
 ***
+
 For answers see [answers](timing_exercise_answers.md)
