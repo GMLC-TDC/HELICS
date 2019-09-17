@@ -20,7 +20,22 @@ jobs:
         UPLOAD_URL: ${{ github.event.release.upload_url }}
       run: ./.github/workflows/upload-release-asset.sh "artifact/Helics-$(git rev-parse --abbrev-ref "${GITHUB_REF}").tar.gz"
     - name: Upload artifact
+      if: github.event.action == 'published'
       uses: actions/upload-artifact@v1
       with:
         name: all-submodules-archive
         path: artifact
+
+  asset-postprocess:
+    name: Run some commands on all uploaded artifacts
+    needs: [create-all-submodule-archive]
+    runs-on: ubuntu-latest
+    steps:
+    - name Get all submodules archive
+    uses: actions/download-artifact@v1
+    with:
+      name: all-submodules-archive
+    - name: Print some info on fetched artifacts
+      run: |
+        ls
+        sha256sum --help
