@@ -65,6 +65,7 @@ jobs:
         cpack_dir="${cpack_dir%/cmake}"
         "${cpack_dir}/cpack"
         EXE_NAME="$(ls Helics-*.exe)"
+        mkdir ../artifact
         mv "$EXE_NAME" "../artifact/${EXE_NAME/-win/-${MSVC_VER}-win}"
     - name: Upload installer to release
       if: github.event.action == 'published'
