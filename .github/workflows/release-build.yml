@@ -42,6 +42,7 @@ jobs:
       env:
         BUILD_ARCH: ${{ matrix.arch }}
         BUILD_GEN: ${{ matrix.cmake_gen }}
+      shell: bash
       run: |
         echo "Building with ${BUILD_GEN} for ${BUILD_ARCH}"
         which python || true
