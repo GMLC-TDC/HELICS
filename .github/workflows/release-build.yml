@@ -57,13 +57,14 @@ jobs:
       shell: bash
       run: |
         echo "Building with ${BUILD_GEN} for ${BUILD_ARCH}"
+        which cmake
         choco install -y swig
         mkdir build && cd build
         cmake -G "${BUILD_GEN}" -A "${BUILD_ARCH/x86/Win32}" -DCMAKE_BUILD_TYPE=Release -DENABLE_PACKAGE_BUILD=ON -DBUILD_PYTHON_INTERFACE=ON -DBUILD_SHARED_LIBS=ON -DBUILD_HELICS_EXAMPLES=OFF -DBUILD_TESTING=OFF ..
         cmake --build . --config Release
         cpack_dir=$(which cmake)
-        PATH="${cmake_dir%/cmake}:$PATH"
-        cpack -B ../artifact
+        cpack_dir="${cmake_dir%/cmake}"
+        ${cpack_dir}/cpack -B ../artifact
         cd ../artifact
         EXE_NAME=$(ls Helics-*)
         mv $EXE_NAME ${EXE_NAME/-win/-${MSVC_VER}-win}
