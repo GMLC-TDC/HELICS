@@ -35,8 +35,14 @@ jobs:
       uses: actions/download-artifact@v1
       with:
         name: all-submodules-archive
+    - name: Get all submodules archive subfolder
+      uses: actions/download-artifact@v1
+      with:
+        name: all-submodules-archive
+        path: artifacts
     - name: Print some info on fetched artifacts
       run: |
         ls -lh
         ls all-submodules-archive
+        ls -lh artifacts
         sha256sum --help
