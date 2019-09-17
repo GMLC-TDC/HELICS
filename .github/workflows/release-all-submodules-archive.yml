@@ -3,14 +3,16 @@ name: Release all submodules archive
 on: release
 
 jobs:
-  build:
+  create-archive:
     runs-on: ubuntu-latest
-    if: github.event.action == 'published'
     steps:
     - uses: actions/checkout@v1
+      if: github.event.action == 'published'
     - name: Create archive
+      if: github.event.action == 'published'
       run: ./scripts/_git-all-archive.sh -l "$(git rev-parse --abbrev-ref "${GITHUB_REF}")"
     - name: Upload archive to release
+      if: github.event.action == 'published'
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         UPLOAD_URL: ${{ github.event.release.upload_url }}
@@ -27,3 +29,4 @@ jobs:
         -H "Content-Type: ${CONTENT_TYPE}" \
         --upload-file "${FILE}" \
         "${UPLOAD_URL%\{*}?name=${FILE}"
+        
