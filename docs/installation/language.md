@@ -167,7 +167,7 @@ The above instructions will have to be modified slightly to support Windows,  CM
 
 ## HELICS with Octave
 
-To install HELICS with Octave support, you will need to add `BUILD_OCTAVE_INTERFACE=ON`.  Swig is required to build the octave interface from source this can be installed via package managers such as a apt on Ubuntu or [chocolatey](https://chocolatey.org/packages?q=swig) on Windows, Octave can also be installed in this manor.
+To install HELICS with Octave support, you will need to add `BUILD_OCTAVE_INTERFACE=ON`.  Swig is required to build the Octave interface from source; it can be installed via package managers such as apt on Ubuntu or [chocolatey](https://chocolatey.org/packages?q=swig) on Windows, Octave can also be installed in this manner.
 
 ```
 git clone https://github.com/GMLC-TDC/HELICS

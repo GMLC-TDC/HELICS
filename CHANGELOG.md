@@ -30,7 +30,7 @@ Minor release with bug fixes and a few additional features
     -  `logDebugMessage`, `logWarningMessage`, `logErrorMessage`, `logInfoMessage` function in all API's to simplify common logging operations
 -   function to set the log file from the core C++ API
 -   A CMAKE option to disable BOOST entirely
--   A CMAKE options to `HELICS_BINARY_ONLY_INSTALL which will restrict the install to executables and shared libraries with no headers or static libraries. 
+-   A CMAKE option `HELICS_BINARY_ONLY_INSTALL` which will restrict the install to executables and shared libraries with no headers or static libraries. 
 -   Some CMAKE capabilities to better generate the interface files.   
 
 ### Removed
