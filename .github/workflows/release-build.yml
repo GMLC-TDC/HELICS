@@ -59,7 +59,7 @@ jobs:
         echo "Building with ${BUILD_GEN} for ${BUILD_ARCH}"
         choco install -y swig
         mkdir build && cd build
-        cmake -G "${BUILD_GEN}" -A "${BUILD_ARCH/x86/Win32}" -DCMAKE_BUILD_TYPE=Release -DENABLE_PACKAGE_BUILD=ON -DBUILD_PYTHON_INTERFACE=ON -DBUILD_SHARED_LIBS=ON -DBUILD_HELICS_EXAMPLES=OFF -DBUILD_TESTING=OFF
+        cmake -G "${BUILD_GEN}" -A "${BUILD_ARCH/x86/Win32}" -DCMAKE_BUILD_TYPE=Release -DENABLE_PACKAGE_BUILD=ON -DBUILD_PYTHON_INTERFACE=ON -DBUILD_SHARED_LIBS=ON -DBUILD_HELICS_EXAMPLES=OFF -DBUILD_TESTING=OFF ..
         cmake --build . --config Release
         cpack -B ../artifact
         cd ../artifact
