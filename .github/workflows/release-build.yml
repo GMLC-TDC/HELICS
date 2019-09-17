@@ -25,24 +25,52 @@ jobs:
       with:
         name: all-submodules-archive
         path: artifact
-
+        
+  build-windows:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [windows-2016, windows-2019]
+        arch: [Win32, x64]
+        include:
+          - os: windows-2016
+            cmake_gen: 'Visual Studio 15 2017'
+          - os: windows-2019
+            cmake_gen: 'Visual Studio 16 2019'
+    steps:
+    - name: Test matrix
+      env:
+        BUILD_ARCH: ${{ matrix.arch }}
+        BUILD_GEN: ${{ matrix.cmake_gen }}
+      run: |
+        echo "Building with ${BUILD_GEN} for ${BUILD_ARCH}"
+        which python || true
+        which python3 || true
+        mkdir artifact
+        touch artifact/testfile${BUILD_ARCH}
+    - name: Upload artifact
+      if: github.event.action == 'published'
+      uses: actions/upload-artifact@v1
+      with:
+        name: windows-build
+        path: artifact
+        
   asset-postprocess:
     name: Run some commands on all uploaded artifacts
-    needs: [create-all-submodule-archive]
+    needs: [create-all-submodule-archive, build-windows]
     runs-on: ubuntu-latest
     steps:
     - name: Get all submodules archive
       uses: actions/download-artifact@v1
       with:
         name: all-submodules-archive
-    - name: Get all submodules archive subfolder
+        path: artifacts
+    - name: Get windows build archive
       uses: actions/download-artifact@v1
       with:
-        name: all-submodules-archive
+        name: windows-build
         path: artifacts
     - name: Print some info on fetched artifacts
       run: |
-        ls -lh
-        ls all-submodules-archive
         ls -lh artifacts
         sha256sum --help
