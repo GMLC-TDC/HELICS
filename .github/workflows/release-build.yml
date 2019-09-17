@@ -18,7 +18,8 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         UPLOAD_URL: ${{ github.event.release.upload_url }}
-      run: ./.github/workflows/upload-release-asset.sh "artifact/Helics-$(git rev-parse --abbrev-ref "${GITHUB_REF}").tar.gz"
+      working-directory: ./artifact
+      run: ../.github/workflows/upload-release-asset.sh "Helics-$(git rev-parse --abbrev-ref "${GITHUB_REF}").tar.gz"
     - name: Upload artifact
       if: github.event.action == 'published'
       uses: actions/upload-artifact@v1
@@ -53,6 +54,7 @@ jobs:
         BUILD_ARCH: ${{ matrix.arch }}
         BUILD_GEN: ${{ matrix.cmake_gen }}
         MSVC_VER: ${{ matrix.msvc_ver }}
+      shell: bash
       run: |
         echo "Building with ${BUILD_GEN} for ${BUILD_ARCH}"
         choco install -y swig
@@ -68,7 +70,9 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         UPLOAD_URL: ${{ github.event.release.upload_url }}
-      run: ./.github/workflows/upload-release-asset.sh "artifact/Helics-*.exe"
+      shell: bash
+      working-directory: ./artifact
+      run: ../.github/workflows/upload-release-asset.sh "Helics-*.exe"
     - name: Upload artifact
       if: github.event.action == 'published'
       uses: actions/upload-artifact@v1
@@ -103,4 +107,5 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         UPLOAD_URL: ${{ github.event.release.upload_url }}
-      run: ./.github/workflows/upload-release-asset.sh "artifacts/Helics-$(git rev-parse --abbrev-ref "${GITHUB_REF}")-SHA-256.txt"
+      working-directory: ./artifacts
+      run: ../.github/workflows/upload-release-asset.sh "Helics-$(git rev-parse --abbrev-ref "${GITHUB_REF}")-SHA-256.txt"
