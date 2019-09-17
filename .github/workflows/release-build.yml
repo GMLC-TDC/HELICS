@@ -61,12 +61,9 @@ jobs:
         mkdir build && cd build
         cmake -G "${BUILD_GEN}" -A "${BUILD_ARCH/x86/Win32}" -DCMAKE_BUILD_TYPE=Release -DENABLE_PACKAGE_BUILD=ON -DBUILD_PYTHON_INTERFACE=ON -DBUILD_SHARED_LIBS=ON -DBUILD_HELICS_EXAMPLES=OFF -DBUILD_TESTING=OFF ..
         cmake --build . --config Release
-        choco_pack_dir="$(which cpack)"
-        choco_pack_dir="$(dirname $choco_pack_dir)"
-        pushd "$choco_pack_dir" && mv cpack choco-alias-cpack && popd
         cpack_dir="$(which cmake)"
         cpack_dir="${cpack_dir%/cmake}"
-        "${cpack_dir}/cpack" -B ../artifact
+        "${cpack_dir}/cpack" -B $(pwd)/../artifact
         cd ../artifact
         EXE_NAME=$(ls Helics-*)
         mv $EXE_NAME ${EXE_NAME/-win/-${MSVC_VER}-win}
