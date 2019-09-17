@@ -31,7 +31,7 @@ jobs:
     needs: [create-all-submodule-archive]
     runs-on: ubuntu-latest
     steps:
-    - name Get all submodules archive
+    - name: Get all submodules archive
       uses: actions/download-artifact@v1
       with:
         name: all-submodules-archive
