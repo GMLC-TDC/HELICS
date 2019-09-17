@@ -19,7 +19,7 @@ extern "C"
 {
 #endif
 
-    /** add a logging callback to a broker
+    /** set the logging callback to a broker
     @details add a logging callback function for the C The logging callback will be called when
     a message flows into a broker from the core or from a broker
     @param broker the broker object in which to create a subscription must have been create with helicsCreateValueFederate or
@@ -30,28 +30,28 @@ extern "C"
     @param[in,out] err a pointer to an error object for catching errors
     */
     HELICS_EXPORT void
-    helicsBrokerAddLoggingCallback (helics_broker broker,
+    helicsBrokerSetLoggingCallback (helics_broker broker,
                                     void (*logger) (int loglevel, const char *identifier, const char *message, void *userData),
                                     void *userdata,
                                     helics_error *err);
 
-    /** add a logging callback to a core
+    /** set the logging callback for a core
     @details add a logging callback function for the C The logging callback will be called when
     a message flows into a core from the core or from a broker
     @param core the core object in which to create a subscription must have been create with helicsCreateValueFederate or
     helicsCreateCombinationFederate
-    @param logger a callback with signature void(int, const char *, const char *);
+    @param logger a callback with signature void(int, const char *, const char *, void *);
     the function arguments are loglevel,  an identifier, and a message string
     @param userdata a point to user data that is passed to the function when executing
     @param[in,out] err a pointer to an error object for catching errors
     */
     HELICS_EXPORT void
-    helicsCoreAddLoggingCallback (helics_core core,
+    helicsCoreSetLoggingCallback (helics_core core,
                                   void (*logger) (int loglevel, const char *identifier, const char *message, void *userData),
                                   void *userdata,
                                   helics_error *err);
 
-    /** add a logging callback to a federate
+    /** set the logging callback for a federate
        @details add a logging callback function for the C The logging callback will be called when
        a message flows into a federate from the core or from a federate
        @param fed the federate object in which to create a subscription must have been create with helicsCreateValueFederate or
@@ -62,7 +62,7 @@ extern "C"
         @param[in,out] err a pointer to an error object for catching errors
        */
     HELICS_EXPORT void
-    helicsFederateAddLoggingCallback (helics_federate fed,
+    helicsFederateSetLoggingCallback (helics_federate fed,
                                       void (*logger) (int loglevel, const char *identifier, const char *message, void *userData),
                                       void *userdata,
                                       helics_error *err);

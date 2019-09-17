@@ -13,7 +13,7 @@ project(HELICS VERSION 2.2.1)
 # HELICS Version number
 # -----------------------------------------------------------------------------
 set(HELICS_VERSION_BUILD)
-set(HELICS_DATE "09-16-19")
+set(HELICS_DATE "09-19-19")
 
 set(
     HELICS_VERSION_UNDERSCORE
@@ -290,18 +290,19 @@ if(GENERATE_DOXYGEN_DOC)
             DOXYGEN_OUTPUT_DIR
             PATH
             "location to put Doxygen docs"
-            "${PROJECT_BINARY_DIR}/docs"
+            "${HELICS_BINARY_DIR}/docs"
         )
         configure_file(
-            ${HELICS_CURRENT_SOURCE_DIR}/config/Doxyfile.in
-            ${HELICS_CURRENT_BINARY_DIR}/Doxyfile @ONLY
+            ${HELICS_SOURCE_DIR}/config/Doxyfile.in
+            ${HELICS_BINARY_DIR}/Doxyfile @ONLY
         )
         add_custom_target(
-            helics_doc ${DOXYGEN_EXECUTABLE} ${HELICS_CURRENT_BINARY_DIR}/Doxyfile
+            helics_doxygen ${DOXYGEN_EXECUTABLE} ${HELICS_BINARY_DIR}/Doxyfile
             WORKING_DIRECTORY ${DOXYGET_OUTPUT_DIR}
             COMMENT "Generating API documentation with Doxygen"
             VERBATIM
         )
+		set_target_properties(helics_doxygen PROPERTIES FOLDER docs)
     endif(DOXYGEN_FOUND)
 endif(GENERATE_DOXYGEN_DOC)
 

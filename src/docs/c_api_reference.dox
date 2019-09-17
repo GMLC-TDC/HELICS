@@ -34,21 +34,24 @@ Index of functions available in the C and by extension the language API's
 functions applying to a \ref helics_core object
  - \ref helicsCoreClone
  - \ref helicsCoreIsValid
+ - \ref helicsCoreWaitForDisconnect
  - \ref helicsCoreIsConnected
  - \ref helicsCoreDataLink
  - \ref helicsCoreAddSourceFilterToEndpoint
  - \ref helicsCoreAddDestinationFilterToEndpoint
  - \ref helicsCoreGetIdentifier
+ - \ref helicsCoreGetAddress
  - \ref helicsCoreSetReadyToInit
  - \ref helicsCoreDisconnect
  - \ref helicsCoreDestroy
  - \ref helicsCoreFree
  - \ref helicsCoreSetGlobal
- - \ref helicsCoreAddLoggingCallback
+ - \ref helicsCoreSetLogFile
+ - \ref helicsCoreSetLoggingCallback
  - \ref helicsCoreRegisterFilter
  - \ref helicsCoreRegisterCloningFilter
 
- \section general broker Broker Functions 
+ \section broker Broker Functions 
 Functions applying to a \ref helics_broker object
  - \ref helicsBrokerClone
  - \ref helicsBrokerIsValid
@@ -63,7 +66,8 @@ Functions applying to a \ref helics_broker object
  - \ref helicsBrokerDestroy
  - \ref helicsBrokerFree
  - \ref helicsBrokerSetGlobal
- - \ref helicsBrokerAddLoggingCallback
+ - \ref helicsBrokerSetLogFile
+ - \ref helicsBrokerSetLoggingCallback
 
  \section fedinfo Federate Info Functions 
 Functions applying to a \ref helics_federate_info object
@@ -72,9 +76,11 @@ Functions applying to a \ref helics_federate_info object
  - \ref helicsFederateInfoFree
  - \ref helicsFederateInfoSetCoreName
  - \ref helicsFederateInfoSetCoreInitString
+ - \ref helicsFederateInfoSetBrokerInitString
  - \ref helicsFederateInfoSetCoreType
  - \ref helicsFederateInfoSetCoreTypeFromString
  - \ref helicsFederateInfoSetBroker
+ - \ref helicsFederateInfoSetBrokerKey
  - \ref helicsFederateInfoSetBrokerPort
  - \ref helicsFederateInfoSetLocalPort
  - \ref helicsFederateInfoSetFlagOption
@@ -105,6 +111,7 @@ Functions applying to all \ref helics_federate objects
  - \ref helicsFederateGetState
  - \ref helicsFederateGetCoreObject
  - \ref helicsFederateRequestTime
+ - \ref helicsFederateRequestTimeAdvance
  - \ref helicsFederateRequestNextStep
  - \ref helicsFederateRequestTimeIterative
  - \ref helicsFederateRequestTimeAsync
@@ -121,7 +128,13 @@ Functions applying to all \ref helics_federate objects
  - \ref helicsFederateGetIntegerProperty
  - \ref helicsFederateGetCurrentTime
  - \ref helicsFederateSetGlobal
- - \ref helicsFederateAddLoggingCallback
+ - \ref helicsFederateSetLogFile
+ - \ref helicsFederateLogErrorMessage
+ - \ref helicsFederateLogWarningMessage
+ - \ref helicsFederateLogInfoMessage
+ - \ref helicsFederateLogDebugMessage
+ - \ref helicsFederateLogLevelMessage
+ - \ref helicsFederateSetLoggingCallback
 
  \section vfederate Value Federate Functions 
 functions applying to federates created as a value or combination federate \ref helics_federate objects
@@ -139,6 +152,9 @@ functions applying to federates created as a value or combination federate \ref 
  - \ref helicsFederateGetInput
  - \ref helicsFederateGetInputByIndex
  - \ref helicsFederateGetSubscription
+ - \ref helicsFederateClearUpdates
+ - \ref helicsFederateRegisterFromPublicationJSON
+ - \ref helicsFederatePublishJSON
  - \ref helicsFederateGetPublicationCount
  - \ref helicsFederateGetInputCount
 
@@ -195,12 +211,15 @@ functions applying to a \ref helics_input object
  - \ref helicsInputGetKey
  - \ref helicsSubscriptionGetKey
  - \ref helicsInputGetUnits
+ - \ref helicsInputGetInjectionUnits
+ - \ref helicsInputGetExtractionUnits
  - \ref helicsInputGetInfo
  - \ref helicsInputSetInfo
  - \ref helicsInputGetOption
  - \ref helicsInputSetOption
  - \ref helicsInputIsUpdated
  - \ref helicsInputLastUpdateTime
+ - \ref helicsInputClearUpdate
 
  \section message Message Federate Functions 
 Functions applying to federates created as a value or combination federate \ref helics_federate objects
@@ -211,7 +230,37 @@ Functions applying to federates created as a value or combination federate \ref 
  - \ref helicsFederateHasMessage
  - \ref helicsFederatePendingMessages
  - \ref helicsFederateGetMessage
+ - \ref helicsFederateGetMessageObject
+ - \ref helicsFederateCreateMessageObject
+ - \ref helicsFederateClearMessages
  - \ref helicsFederateGetEndpointCount
+
+ \section messageObject Message object Functions 
+functions applying to a \ref helics_message_object
+ - \ref helicsMessageGetSource
+ - \ref helicsMessageGetDestination
+ - \ref helicsMessageGetOriginalSource
+ - \ref helicsMessageGetOriginalDestination
+ - \ref helicsMessageGetTime
+ - \ref helicsMessageGetString
+ - \ref helicsMessageGetMessageID
+ - \ref helicsMessageCheckFlag
+ - \ref helicsMessageGetRawDataSize
+ - \ref helicsMessageGetRawData
+ - \ref helicsMessageIsValid
+ - \ref helicsMessageSetSource
+ - \ref helicsMessageSetDestination
+ - \ref helicsMessageSetOriginalSource
+ - \ref helicsMessageSetOriginalDestination
+ - \ref helicsMessageSetTime
+ - \ref helicsMessageResize
+ - \ref helicsMessageReserve
+ - \ref helicsMessageSetMessageID
+ - \ref helicsMessageClearFlags
+ - \ref helicsMessageSetFlagOption
+ - \ref helicsMessageSetString
+ - \ref helicsMessageSetData
+ - \ref helicsMessageAppendData
 
  \section endpoint Endpoint interface Functions 
 functions applying to a \ref helics_endpoint object
@@ -220,10 +269,13 @@ functions applying to a \ref helics_endpoint object
  - \ref helicsEndpointSendMessageRaw
  - \ref helicsEndpointSendEventRaw
  - \ref helicsEndpointSendMessage
+ - \ref helicsEndpointSendMessageObject
  - \ref helicsEndpointSubscribe
  - \ref helicsEndpointHasMessage
  - \ref helicsEndpointPendingMessages
  - \ref helicsEndpointGetMessage
+ - \ref helicsEndpointGetMessageObject
+ - \ref helicsEndpointClearMessages
  - \ref helicsEndpointGetType
  - \ref helicsEndpointGetName
  - \ref helicsEndpointGetInfo

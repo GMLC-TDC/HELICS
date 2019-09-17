@@ -17,64 +17,61 @@ namespace helicscpp
 class Input
 {
   public:
+    /** construct from a helics_input object*/
     explicit Input (helics_input hsub) HELICS_NOTHROW : inp (hsub) {}
-    Input () HELICS_NOTHROW : inp (HELICS_NULL_POINTER){};
-
+    /** default constructor*/
+	Input () HELICS_NOTHROW : inp (HELICS_NULL_POINTER){};
+    /** copy constructor*/
     Input (const Input &inputs) HELICS_NOTHROW : inp (inputs.inp) {}
-
+    /** copy assign*/
     Input &operator= (const Input &input)
     {
         inp = input.inp;
         return *this;
     }
-
+    /** cast to helics_input object*/
     operator helics_input () const { return inp; }
-
+    /** extract the base object*/
     helics_input baseObject () const { return inp; }
-    /** Methods to set default values for subscriptions **/
-    void setDefaultValue (const char *data, int len)
+    /** Methods to set default values for inputs **/
+    /** set the default value as a raw data with length*/
+    void setDefault(const char *data, int len)
     {
-        // returns helics_status
         helicsInputSetDefaultRaw (inp, data, len, NULL);
     }
-
-    void setDefaultValue (const std::string &str)
+    /** set the default value as a string*/
+    void setDefault (const std::string &str)
     {
-        // returns helics_status
         helicsInputSetDefaultString (inp, str.c_str (), NULL);
     }
-
-    void setDefaultValue (int64_t val)
+    /** set the default value as an integer*/
+    void setDefault(int64_t val)
     {
-        // returns helics_status
         helicsInputSetDefaultInteger (inp, val, NULL);
     }
-
-    void setDefaultValue (bool val)
+    /** set the default bool value*/
+    void setDefault(bool val)
     {
-        // returns helics_status
         helicsInputSetDefaultBoolean (inp, val ? helics_true : helics_false, NULL);
     }
-
-    void setDefaultValue (double val)
+    /** set the default double value*/
+    void setDefault(double val)
     {
-        // returns helics_status
         helicsInputSetDefaultDouble (inp, val, NULL);
     }
-
-    void setDefaultValue (const std::complex<double> &cmplx)
+    /** set the default complex value*/
+    void setDefault(const std::complex<double> &cmplx)
     {
-        // returns helics_status
         helicsInputSetDefaultComplex (inp, cmplx.real (), cmplx.imag (), NULL);
     }
-
-    void setDefaultValue (const std::vector<double> &data)
+    /** set the default vector data value*/
+    void setDefault(const std::vector<double> &data)
     {
-        // returns helics_status
         helicsInputSetDefaultVector (inp, data.data (), static_cast<int> (data.size () * sizeof (double)), NULL);
     }
 
     /** Methods to get subscription values **/
+    /** get a raw value as a character vector*/
     int getRawValue (std::vector<char> &data)
     {
         int size = helicsInputGetRawValueSize (inp);
@@ -82,9 +79,10 @@ class Input
         helicsInputGetRawValue (inp, data.data (), static_cast<int> (data.size ()), &size, NULL);
         return size;
     }
-
+    /** get the size of the raw value */
     int getRawValueSize () { return helicsInputGetRawValueSize (inp); }
 
+	/** get the current value as a string*/
     std::string getString ()
     {
         int size = helicsInputGetStringSize (inp);
@@ -103,7 +101,7 @@ class Input
         }
         return result;
     }
-
+    /** get the current value as a named point*/
     void getNamedPoint (std::string &name, double *val)
     {
         int size = helicsInputGetStringSize (inp);
@@ -113,30 +111,33 @@ class Input
         helicsInputGetNamedPoint (inp, &name[0], size + 1, &size, val, NULL);
         name.resize (size);
     }
-
+    /** get the current value as a 64 bit integer*/
     int64_t getInteger () { return helicsInputGetInteger (inp, NULL); }
-
+    /** get the value as a boolean*/
     bool getBoolean ()
     {
         helics_bool val = helicsInputGetBoolean (inp, NULL);
         return (val == helics_true);
     }
-
+    /** get the value as a double*/
     double getDouble () { return helicsInputGetDouble (inp, NULL); }
-
+    /** get the value as a complex number*/
     std::complex<double> getComplex ()
     {
         helics_complex hc = helicsInputGetComplexObject (inp, NULL);
         std::complex<double> result (hc.real, hc.imag);
         return result;
     }
-
+    /** get the current value as a vector of doubles
+	@param data pointer to space to store the current values
+	@param maxlen the maximum size of the allowed vector
+	@return the actual size of the vector stored*/
     int getVector (double *data, int maxlen)
     {
         helicsInputGetVector (inp, data, maxlen, &maxlen, hThrowOnError ());
         return maxlen;
     }
-
+    /** get the current value and store it in a std::vector<double>*/
     void getVector (std::vector<double> &data)
     {
         int actualSize = helicsInputGetVectorSize (inp);
@@ -144,22 +145,26 @@ class Input
         helicsInputGetVector (inp, data.data (), actualSize, NULL, hThrowOnError ());
     }
 
-    /** Check if a subscription is updated **/
+    /** Check if an input is updated **/
     bool isUpdated () const { return (helicsInputIsUpdated (inp) > 0); }
 
-    /** Get the last time a subscription was updated **/
+    /** Get the last time an input was updated **/
     helics_time getLastUpdateTime () const { return helicsInputLastUpdateTime (inp); }
 
     /** clear the updated flag*/
     void clearUpdate () { helicsInputClearUpdate (inp); }
     // call helicsInputIsUpdated for each inp
-
+    
+    /** get the Name/Key for the input
+   @details the name is the local name if given, key is the full key name*/
     const char *getKey () const { return helicsInputGetKey (inp); }
-
-    const char *getUnits () const { return helicsInputGetUnits (inp); }
-
-    const char *getType () const { return helicsInputGetType (inp); }
-
+    /** get the units associated with a input*/
+    const char *getUnits () const { return helicsInputGetExtractionUnits (inp); }
+    /** get the units associated with a input*/
+    const char *getInjectionUnits () const { return helicsInputGetInjectionUnits (inp); }
+    /** get the type of the input*/
+	const char *getType () const { return helicsInputGetType (inp); }
+    /** get an associated target*/
     const char *getTarget () const { return helicsSubscriptionGetKey (inp); }
 
   private:

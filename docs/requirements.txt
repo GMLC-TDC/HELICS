@@ -7,3 +7,4 @@ nbsphinx==0.3.3
 breathe==4.11.1
 pypandoc==1.4
 recommonmark==0.5.0
+sphinx-markdown-tables==0.0.9

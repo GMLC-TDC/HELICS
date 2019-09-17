@@ -345,6 +345,7 @@ extern "C"
     /** set a flag on a message
     @param message the message object in question
     @param flag an index of a flag to set on the message
+    @param flagValue the desired value of the flag
     @param[in,out] err an error object to fill out in case of an error*/
     HELICS_EXPORT void helicsMessageSetFlagOption (helics_message_object message, int flag, helics_bool flagValue, helics_error *err);
     /** set the data payload of a message as a string

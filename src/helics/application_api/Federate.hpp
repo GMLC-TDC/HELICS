@@ -118,7 +118,8 @@ class Federate
     void enterInitializingMode ();
 
     /** enter the initialization mode after all interfaces have been defined
-    @details  the call will not block
+    @details  the call will not block but a call to \ref enterInitializingModeComplete should be made to complete
+    the call sequence
     */
     void enterInitializingModeAsync ();
     /** called after one of the async calls and will indicate true if an async operation has completed
@@ -134,7 +135,9 @@ class Federate
     */
     iteration_result enterExecutingMode (iteration_request iterate = iteration_request::no_iterations);
     /** enter the normal execution mode
-    @details call will block until all federates have entered this mode
+    @details call will return immediately but \ref enterExecutingModeComplete should be called to complete the
+    operation
+    @param iterate an optional flag indicating the desired iteration mode
     */
     void enterExecutingModeAsync (iteration_request iterate = iteration_request::no_iterations);
     /** complete the async call for entering Execution state
@@ -179,6 +182,7 @@ class Federate
     Time requestNextStep () { return requestTime (timeZero); }
 
     /** request a time advancement by a certain amount
+    @param timeDelta the amount of time to advance
     @return the granted time step*/
     Time requestTimeAdvance (Time timeDelta) { return requestTime (currentTime + timeDelta); }
 
@@ -228,23 +232,23 @@ class Federate
     virtual void setFlagOption (int flag, bool flagValue = true);
     /**  set an integer option for the federate
     @param option an index of the option to set
-    @param optionValue  and integer option value for an integer based property
+    @param optionValue an integer option value for an integer based property
     */
     void setProperty (int32_t option, int32_t optionValue);
 
     /** get the value of a time option for the federate
     @param option the option to get
     */
-    Time getTimeProperty (int32_t option);
+    Time getTimeProperty (int32_t option) const;
 
     /** get the value of a flag option
     @param flag an index into the flag /ref flag-definitions.h
     */
-    virtual bool getFlagOption (int flag);
-    /**  set an integer option for the federate
+    virtual bool getFlagOption (int flag) const;
+    /**  get an integer option for the federate
     @param option  the option to inquire see /ref defs
     */
-    int getIntegerProperty (int32_t option);
+    int getIntegerProperty (int32_t option) const;
 
     /** define a logging function to use for logging message and notices from the federation and individual
     federate
@@ -253,7 +257,7 @@ class Federate
     A string indicating the source of the message and another string with the actual message
     */
     void
-    setLoggingCallback (const std::function<void (int, const std::string &, const std::string &)> &logFunction);
+    setLoggingCallback (const std::function<void(int, const std::string &, const std::string &)> &logFunction);
 
     /** make a query of the core
     @details this call is blocking until the value is returned which make take some time depending on the size of
@@ -386,24 +390,24 @@ class Federate
     interface was nameless*/
     const std::string &getInterfaceName (interface_handle handle) const;
 
-    /** get the id of a source filter from the name of the endpoint
+    /** get a filter from its name
     @param filterName the name of the filter
     @return a reference to a filter object which could be invalid if filterName is not valid*/
     const Filter &getFilter (const std::string &filterName) const;
 
-    /** get the id of a source filter from the name of the endpoint
-  @param index the index number of the federate to retrieve
-  @return a reference to a filter object which could be invalid if index is not valid*/
+    /** get a filter from its index
+    @param index the index of a filter
+    @return a reference to a filter object which could be invalid if filterName is not valid*/
     const Filter &getFilter (int index) const;
 
-    /** get the id of a source filter from the name of the endpoint
-  @param filterName the name of the filter
- @return a reference to a filter object which could be invalid if filteName is not valid*/
+    /** get a filter from its name
+      @param filterName the name of the filter
+      @return a reference to a filter object which could be invalid if filterName is not valid*/
     Filter &getFilter (const std::string &filterName);
 
-    /** get the id of a source filter from the name of the endpoint
-  @param index the index location of the filter
-  @return a reference to a filter object which could be invalid if index is not valid*/
+    /** get a filter from its index
+    @param index the index of a filter
+    @return a reference to a filter object which could be invalid if filterName is not valid*/
     Filter &getFilter (int index);
 
     /** @brief register a operator for the specified filter
@@ -510,33 +514,33 @@ class Federate
    @param level the logging level of the message
    @param message the message to log
    */
-    virtual void logMessage (int level, const std::string &message) const;
+    void logMessage (int level, const std::string &message) const;
 
     /** log an error message to the federate Logger
     @param message the message to log
     */
-    virtual void logErrorMessage (const std::string &message) const
+    void logErrorMessage (const std::string &message) const
     {
         logMessage (helics_log_level_error, message);
     }
     /** log a warning message to the federate Logger
     @param message the message to log
     */
-    virtual void logWarningMessage (const std::string &message) const
+    void logWarningMessage (const std::string &message) const
     {
         logMessage (helics_log_level_warning, message);
     }
     /** log an info message to the federate Logger
     @param message the message to log
     */
-    virtual void logInfoMessage (const std::string &message) const
+    void logInfoMessage (const std::string &message) const
     {
         logMessage (helics_log_level_summary, message);
     }
     /** log a debug message to the federate Logger
     @param message the message to log
     */
-    virtual void logDebugMessage (const std::string &message) const
+    void logDebugMessage (const std::string &message) const
     {
         logMessage (helics_log_level_data, message);
     }

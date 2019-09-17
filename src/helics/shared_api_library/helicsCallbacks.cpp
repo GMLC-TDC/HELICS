@@ -15,7 +15,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <mutex>
 #include <vector>
 
-void helicsBrokerAddLoggingCallback (helics_broker broker,
+void helicsBrokerSetLoggingCallback (helics_broker broker,
                                      void (*logger) (int loglevel, const char *identifier, const char *message, void *userdata),
                                      void *userdata,
                                      helics_error *err)
@@ -44,7 +44,7 @@ void helicsBrokerAddLoggingCallback (helics_broker broker,
     }
 }
 
-void helicsCoreAddLoggingCallback (helics_core core,
+void helicsCoreSetLoggingCallback (helics_core core,
                                    void (*logger) (int loglevel, const char *identifier, const char *message, void *userdata),
                                    void *userdata,
                                    helics_error *err)
@@ -74,7 +74,7 @@ void helicsCoreAddLoggingCallback (helics_core core,
     }
 }
 
-void helicsFederateAddLoggingCallback (helics_federate fed,
+void helicsFederateSetLoggingCallback (helics_federate fed,
                                        void (*logger) (int loglevel, const char *identifier, const char *message, void *userdata),
                                        void *userdata,
                                        helics_error *err)

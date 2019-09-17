@@ -37,7 +37,7 @@ BOOST_AUTO_TEST_CASE (check_log_message)
         mp->lock ()->emplace_back (level, message);
     };
 
-    helicsFederateAddLoggingCallback (fed, logg, &mlog, &err);
+    helicsFederateSetLoggingCallback (fed, logg, &mlog, &err);
 
     BOOST_CHECK_EQUAL (err.error_code, 0);
 
@@ -75,7 +75,7 @@ BOOST_AUTO_TEST_CASE (check_log_message_levels)
         mp->lock ()->emplace_back (level, message);
     };
 
-    helicsFederateAddLoggingCallback (fed, logg, &mlog, &err);
+    helicsFederateSetLoggingCallback (fed, logg, &mlog, &err);
 
     BOOST_CHECK_EQUAL (err.error_code, 0);
 
@@ -120,7 +120,7 @@ BOOST_AUTO_TEST_CASE (check_log_message_levels_high)
         mp->lock ()->emplace_back (level, message);
     };
 
-    helicsFederateAddLoggingCallback (fed, logg, &mlog, &err);
+    helicsFederateSetLoggingCallback (fed, logg, &mlog, &err);
 
     BOOST_CHECK_EQUAL (err.error_code, 0);
 

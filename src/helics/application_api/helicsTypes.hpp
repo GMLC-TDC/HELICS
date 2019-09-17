@@ -17,7 +17,7 @@ SPDX-License-Identifier: BSD-3-Clause
 */
 namespace helics
 {
-using identifier_type = std::uint32_t;
+using identifier_type = std::uint32_t;  //!< specify the underlying type used in the identifiers
 using std::int32_t;
 using std::int64_t;
 
@@ -92,11 +92,13 @@ class identifier_id_t
 // specialize std::hash
 namespace std
 {
+/** custom hashing function for identifier types so they can be used in hash maps*/
 template <typename BaseType, helics::identifiers ID, BaseType invalidValue>
 struct hash<helics::identifier_id_t<BaseType, ID, invalidValue>>
 {
-    using argument_type = helics::identifier_id_t<BaseType, ID, invalidValue>;
-    using result_type = std::size_t;
+    using argument_type = helics::identifier_id_t<BaseType, ID, invalidValue>; //!< the type of object to hash
+    using result_type = std::size_t; //!< the result type of the hash code
+    /** the actual hash operator*/
     result_type operator() (argument_type const &key) const noexcept
     {
         return std::hash<BaseType>{}(key.value ());
@@ -117,17 +119,33 @@ class NamedPoint
   public:
     std::string name;  //!< the text value for the named point
     double value = std::numeric_limits<double>::quiet_NaN ();  //!< the data value for the named point
-    NamedPoint () = default;
+    /** default constructor*/
+	NamedPoint () = default;
+    /** construct directly from name value*/
     NamedPoint (std::string valname, double valval) : name (std::move (valname)), value (valval) {}
-    bool operator== (const NamedPoint &np) const
+    /** equality operator
+	@details if either value is nan it check only the string
+	otherwise it checks the name and value
+	@return true if the objects are equivalent*/
+	bool operator== (const NamedPoint &np) const
     {
         return ((std::isnan (value)) && (std::isnan (np.value))) ? (name == np.name) :
                                                                    ((value == np.value) && (name == np.name));
     }
     bool operator!= (const NamedPoint &np) const { return !operator== (np); }
-    bool operator< (const NamedPoint &np) const
+    /** less than operator 
+	@details checks by name order, then value order
+	*/
+	bool operator< (const NamedPoint &np) const
     {
         return (name == np.name) ? (name < np.name) : (value < np.value);
+    }
+    /** greater than operator
+    @details checks by name order, then value order
+    */
+    bool operator> (const NamedPoint &np) const
+    {
+        return (name == np.name) ? (name > np.name) : (value > np.value);
     }
 };
 

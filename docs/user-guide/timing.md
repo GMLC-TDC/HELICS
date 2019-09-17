@@ -59,3 +59,7 @@ Items of notes:
 * Generator Controller gets granted a time of 1 ms (at the first grant time) even though is requested `maxTime` because a message was created by the Power System federate at that time stamp. As Generator Controller depends on nothing else, HELICS was able to grant it the same time as Power System even though it is clearly performing its calculations after Power System has performed its. 
 * Relatedly, Generator Controller requests a time of `maxTime` once it has calculated the new control signals for Generator. Due to the value set by `timeDelta`, the soonest time it can be granted would be 0.01 ms after its most recent granted time (1.01  in the case of the first operational period, 2.01 in the case of the second period.) 
 * When Logger is granted a time of 1 ms, the values it will record are those previously published by other federates. Specifically, the new values that Power System is calculating are not available for Logger to record.
+
+## Exercises
+
+To get a reader some practice on how timing working in HELICS some exercises originally used as part of an in person tutorial are [available](./timing_exercise.md)

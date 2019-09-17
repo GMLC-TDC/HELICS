@@ -133,12 +133,19 @@ extern "C"
     HELICS_EXPORT void
     helicsBrokerAddDestinationFilterToEndpoint (helics_broker broker, const char *filter, const char *endpoint, helics_error *err);
 
-    /** wait for the broker to disconnect
-  @param broker the broker to wait for
+    /** wait for the core to disconnect
+  @param core the core to wait for
   @param msToWait the time out in millisecond (<0 for infinite timeout)
   @param[in,out] err an error object that will contain an error code and string if any error occurred during the execution of the function
   @return helics_true if the disconnect was successful,  helics_false if there was a timeout
   */
+    HELICS_EXPORT helics_bool helicsCoreWaitForDisconnect (helics_core core, int msToWait, helics_error *err);
+    /** wait for the broker to disconnect
+ @param broker the broker to wait for
+ @param msToWait the time out in millisecond (<0 for infinite timeout)
+ @param[in,out] err an error object that will contain an error code and string if any error occurred during the execution of the function
+ @return helics_true if the disconnect was successful,  helics_false if there was a timeout
+ */
     HELICS_EXPORT helics_bool helicsBrokerWaitForDisconnect (helics_broker broker, int msToWait, helics_error *err);
 
     /** check if a core is connected
@@ -185,6 +192,11 @@ extern "C"
     @return a string with the network address of the broker
     */
     HELICS_EXPORT const char *helicsBrokerGetAddress (helics_broker broker);
+    /** get the network address associated with a core
+    @param core the core to query
+    @return a string with the network address of the broker
+    */
+    HELICS_EXPORT const char *helicsCoreGetAddress (helics_core core);
 
     /** set the core to ready for init
     @details this function is used for cores that have filters but no federates so there needs to be
@@ -687,8 +699,7 @@ extern "C"
     */
     HELICS_EXPORT helics_bool helicsFederateGetFlagOption (helics_federate fed, int flag, helics_error *err);
 
-    /**  set the logging level for the federate
-    @ details debug and trace only do anything if they were enabled in the compilation
+    /**  Get the current value of an integer property (such as a logging level)
     @param fed the federate to get the flag for
     @param intProperty a code for the property to set /ref helics_handle_options
     @param[in,out] err a pointer to an error object for catching errors
@@ -711,6 +722,13 @@ extern "C"
     @param[in,out] err a pointer to an error object for catching errors
     */
     HELICS_EXPORT void helicsFederateSetGlobal (helics_federate fed, const char *valueName, const char *value, helics_error *err);
+
+	/** set the logging file for a federate(actually on the core associated with a federate)
+    @param fed the federate to set the log file for
+    @param logFile the name of the log file
+    @param[in,out] err a pointer to an error object for catching errors
+    */
+    HELICS_EXPORT void helicsFederateSetLogFile (helics_federate fed, const char *logFile, helics_error *err);
 
     /** log an error message through a federate
     @param fed the federate to set the global through
@@ -765,6 +783,20 @@ extern "C"
     @param[in,out] err an error object that will contain an error code and string if any error occurred during the execution of the function
     */
     HELICS_EXPORT void helicsBrokerSetGlobal (helics_broker broker, const char *valueName, const char *value, helics_error *err);
+
+	/** set a the log file on a core
+    @param core the core to set the global through
+    @param logFileName the name of the file to log to
+    @param[in,out] err an error object that will contain an error code and string if any error occurred during the execution of the function
+    */
+    HELICS_EXPORT void helicsCoreSetLogFile (helics_core core, const char *logFileName, helics_error *err);
+
+	/** set a the log file on a broker
+    @param broker the broker to set the global through
+    @param logFileName the name of the file to log to
+    @param[in,out] err an error object that will contain an error code and string if any error occurred during the execution of the function
+    */
+    HELICS_EXPORT void helicsBrokerSetLogFile (helics_broker broker, const char *logFileName, helics_error *err);
 
     /** create a query object
     @details a query object consists of a target and query string

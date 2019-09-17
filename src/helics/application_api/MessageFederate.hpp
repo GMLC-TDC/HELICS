@@ -22,7 +22,7 @@ class MessageFederate : public virtual Federate  // using virtual inheritance to
     @param fedName the name of the messageFederate, can be left empty to use a default or one from fi
     @param fi  a federate information structure
     */
-    explicit MessageFederate (const std::string &fedName, const FederateInfo &fi);
+    MessageFederate (const std::string &fedName, const FederateInfo &fi);
     /**constructor taking a core and a federate information structure, sore information in fi is ignored
     @param fedName the name of the messageFederate, can be left empty to use a default or one from fi
     @param core a shared ptr to a core to join
@@ -70,7 +70,8 @@ class MessageFederate : public virtual Federate  // using virtual inheritance to
     @details call is only valid in startup mode
     @param name the name of the endpoint
     @param type the defined type of the interface for endpoint checking if requested
-    */
+    @return a Reference to an Endpoint Object
+	*/
     Endpoint &registerGlobalEndpoint (const std::string &name, const std::string &type = std::string ());
 
     virtual void registerInterfaces (const std::string &configString) override;
@@ -193,7 +194,7 @@ class MessageFederate : public virtual Federate  // using virtual inheritance to
     Endpoint &getEndpoint (const std::string &name) const;
 
     /** get an Endpoint from an index
-    @param index the index of the endpoint to retrieve
+    @param index the index of the endpoint to retrieve index is 0 based
     @return an Endpoint*/
     Endpoint &getEndpoint (int index) const;
 

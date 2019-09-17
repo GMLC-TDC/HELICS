@@ -42,6 +42,7 @@ class BrokerApp
     */
     BrokerApp (int argc, char *argv[]);
     /** construct from command line arguments
+    @param ctype the type of broker to create
     @param argc the number of arguments
     @param argv the strings in the input
     */

@@ -10,12 +10,13 @@ If you would like to contribute to the HELICS project see [CONTRIBUTING](CONTRIB
 -   Monish Mukherjee*
 -   Jacob Hansen*
 -   Marc Eberlein*
+-   Shrirang Abhyankar
 
 ### Lawrence Livermore National Lab
 -   Ryan Mast*
 -   Steve Smith
 -   Philip Top*
--   Denis Nadeau*
+-   Denis Nadeau
 
 ### National Renewable Energy Lab
 -   Himanshu Jain
@@ -25,7 +26,7 @@ If you would like to contribute to the HELICS project see [CONTRIBUTING](CONTRIB
 -   Matt Irish
 
 ### Argonne National Lab
--   Shrirang Abhyankar
+-   Shrirang Abhyankar (now PNNL)
 -   Karthikeyan Balasubramaniam*
 
 `*` currently active
