@@ -30,9 +30,11 @@ Minor release with bug fixes and a few additional features
     -  `logDebugMessage`, `logWarningMessage`, `logErrorMessage`, `logInfoMessage` function in all API's to simplify common logging operations
 -   function to set the log file from the core C++ API
 -   A CMAKE option to disable BOOST entirely
--   A CMAKE options to `HELICS_BINARY_ONLY_INSTALL which will restrict the install to executables and shared libraries with no headers or static libraries.  
+-   A CMAKE options to `HELICS_BINARY_ONLY_INSTALL which will restrict the install to executables and shared libraries with no headers or static libraries. 
+-   Some CMAKE capabilities to better generate the interface files.   
 
 ### Removed
+-  The included build files for the Octave interface have been removed.  It is now required to use swig to build these files.  The interface file was only valid for Octave 4.2 and had potential to break in later versions.  Given the 3 versions of octave in common use it was deemed prudent to just remove the included file and require swig to generate the correct interface.  
  
 
 ## \[2.2.0\] - 2019-08-26

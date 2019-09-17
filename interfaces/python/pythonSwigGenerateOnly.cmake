@@ -33,6 +33,7 @@ file(GLOB SHARED_LIB_HEADERS ${CMAKE_SOURCE_DIR}/src/helics/shared_api_library/*
         ${CMAKE_CURRENT_SOURCE_DIR}/overwritePythonFiles.cmake
       DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/helicsPython.c
     )
+	set_target_properties( pyfile_overwrite PROPERTIES FOLDER interfaces)
   else(HELICS_OVERWRITE_INTERFACE_FILES)
   #extra target for generation only and no overwrite
    add_custom_target(
@@ -40,4 +41,5 @@ file(GLOB SHARED_LIB_HEADERS ${CMAKE_SOURCE_DIR}/src/helics/shared_api_library/*
       COMMAND
       DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/helicsPython.c
     )
+	set_target_properties( python_create PROPERTIES FOLDER interfaces)
 endif(HELICS_OVERWRITE_INTERFACE_FILES)
