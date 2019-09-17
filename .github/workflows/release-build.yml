@@ -63,10 +63,9 @@ jobs:
         cmake --build . --config Release
         cpack_dir="$(which cmake)"
         cpack_dir="${cpack_dir%/cmake}"
-        "${cpack_dir}/cpack" -B $(pwd)/../artifact
-        cd ../artifact
-        EXE_NAME=$(ls Helics-*)
-        mv $EXE_NAME ${EXE_NAME/-win/-${MSVC_VER}-win}
+        "${cpack_dir}/cpack"
+        EXE_NAME="$(ls Helics-*.exe)"
+        mv "$EXE_NAME" "../artifact/${EXE_NAME/-win/-${MSVC_VER}-win}"
     - name: Upload installer to release
       if: github.event.action == 'published'
       env:
