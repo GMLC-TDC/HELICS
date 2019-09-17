@@ -16,7 +16,7 @@ jobs:
         echo $(jq --raw-output '.action' $GITHUB_EVENT_PATH)
         echo $(jq --raw-output '.release.upload_url' $GITHUB_EVENT_PATH)
     - name: Create archive
-      run: ./scripts/_git-all-archive.sh -t $GITHUB_REF
+      run: ./scripts/_git-all-archive.sh -l "$(git rev-parse --abbrev-ref "${GITHUB_REF}")"
     - name: Upload archive to release
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -24,7 +24,7 @@ jobs:
         echo $GITHUB_REF
         AUTH_HEADER="Authorization: token ${GITHUB_TOKEN}"
         RELEASE_ID=$(jq --raw-output '.release.id' $GITHUB_EVENT_PATH)
-        FILE="Helics-${GITHUB_REF}.tar.gz"
+        FILE="Helics-$(git rev-parse --abbrev-ref "${GITHUB_REF}").tar.gz"
         CONTENT_TYPE="$(file -b --mime-type $FILE)"
         CONTENT_LENGTH="$(stat -c%s "$FILE")"
         UPLOAD_URL="https://uploads.github.com/repos/${GITHUB_REPOSITORY}/releases/${RELEASE_ID}/assets?name=${FILE}"
