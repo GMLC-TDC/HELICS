@@ -31,34 +31,46 @@ jobs:
     strategy:
       matrix:
         os: [windows-2016, windows-2019]
-        arch: [Win32, x64]
+        arch: [x86, x64]
         include:
           - os: windows-2016
             cmake_gen: 'Visual Studio 15 2017'
+            msvc_ver: 'msvc2017'
           - os: windows-2019
             cmake_gen: 'Visual Studio 16 2019'
+            msvc_ver: 'msvc2019'
     steps:
-    - name: Test matrix
+    - uses: actions/checkout@v1
+      if: github.event.action == 'published'
+    - uses: actions/setup-python@v1
+      if: github.event.action == 'published'
+      with:
+        python-version: '3.7'
+        architecture: ${{ matrix.arch }}
+    - name: Build ${{ matrix.msvc_ver }} ${{ matrix.arch }} installer
       if: github.event.action == 'published'
       env:
         BUILD_ARCH: ${{ matrix.arch }}
         BUILD_GEN: ${{ matrix.cmake_gen }}
-      shell: bash
+        MSVC_VER: ${{ matrix.msvc_ver }}
       run: |
         echo "Building with ${BUILD_GEN} for ${BUILD_ARCH}"
-        which python || true
-        which python3 || true
+        python --version
+        # Run CMake with Win32 instad of x86
+        #python -m pip install --upgrade pip
+        #choco install -y swig
         mkdir artifact
-        touch artifact/testfile${BUILD_ARCH}
+        touch artifact/test-${BUILD_GEN}-${MSVC_VER}-${BUILD_ARCH}
+        
     - name: Upload artifact
       if: github.event.action == 'published'
       uses: actions/upload-artifact@v1
       with:
-        name: windows-build
+        name: windows-installers
         path: artifact
         
-  asset-postprocess:
-    name: Run some commands on all uploaded artifacts
+  generate-sha256:
+    name: Calculate SHA256 for all artifacts
     needs: [create-all-submodule-archive, build-windows]
     runs-on: ubuntu-latest
     steps:
@@ -68,14 +80,15 @@ jobs:
       with:
         name: all-submodules-archive
         path: artifacts
-    - name: Get windows build archive
+    - name: Get Windows installers
       if: github.event.action == 'published'
       uses: actions/download-artifact@v1
       with:
-        name: windows-build
+        name: windows-installers
         path: artifacts
     - name: Print some info on fetched artifacts
       if: github.event.action == 'published'
       run: |
-        ls -lh artifacts
-        sha256sum --help
+        TAG_VERSION=$(git rev-parse --abbrev-ref "${GITHUB_REF}")
+        cd artifacts
+        sha256sum * > "Helics-${TAG_VERSION#v}-SHA-256.txt"
