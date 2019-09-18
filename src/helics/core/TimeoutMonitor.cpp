@@ -15,10 +15,10 @@ namespace helics
 {
 void TimeoutMonitor::tick (CommonCore *core)
 {
-    if (waitingForPingReply)
+    if (parentConnection.waitingForPingReply)
     {
         auto now = std::chrono::steady_clock::now ();
-        if (now - lastParentPing > timeout)
+        if (now - parentConnection.lastPing > timeout)
         {
             // try to reset the connection to the broker
             // brokerReconnect()
@@ -48,8 +48,8 @@ void TimeoutMonitor::tick (CommonCore *core)
             png.source_id = core->global_broker_id_local;
             png.dest_id = core->higher_broker_id;
             core->transmit (parent_route_id, png);
-            lastParentPing = std::chrono::steady_clock::now ();
-            waitingForPingReply = true;
+            parentConnection.lastPing = std::chrono::steady_clock::now ();
+            parentConnection.waitingForPingReply = true;
         }
         //}
     }
@@ -66,7 +66,7 @@ void TimeoutMonitor::tick (CommonCore *core)
         if (waitingForConnection)
         {
             auto now = std::chrono::steady_clock::now ();
-            if (now - startWaiting > timeout)
+            if (now - parentConnection.startWaiting > timeout)
             {
                 ActionMessage png (CMD_CHECK_CONNECTIONS);
                 png.source_id = core->global_broker_id_local;
@@ -101,6 +101,8 @@ void TimeoutMonitor::tick (CommonCore *core)
 
 void TimeoutMonitor::tick (CoreBroker *brk)
 {
+    // check the connections
+
     if (!brk->isRoot ())
     {
         if (waitingForPingReply)
@@ -179,12 +181,38 @@ void TimeoutMonitor::tick (CoreBroker *brk)
             }
         }
     }
+    else
+    {
+    }
 }
 
-void TimeoutMonitor::pingReply (const ActionMessage & /*cmd*/)
+void TimeoutMonitor::reset ()
 {
-    waitingForPingReply = false;
+    parentConnection.waitingForPingReply = false;
     waitingForConnection = false;
+    for (auto &conn : connections)
+    {
+        conn.waitingForPingReply = false;
+    }
+}
+
+void TimeoutMonitor::pingReply (const ActionMessage &cmd)
+{
+    if (cmd.source_id == global_federate_id (parentConnection.connection))
+    {
+        parentConnection.waitingForPingReply = false;
+        waitingForConnection = false;
+    }
+    else
+    {
+        for (auto &conn : connections)
+        {
+            if (cmd.source_id == global_federate_id (conn.connection))
+            {
+                conn.waitingForPingReply = false;
+            }
+        }
+    }
 }
 
 }  // namespace helics
