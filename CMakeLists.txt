@@ -65,7 +65,7 @@ if(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
                 CACHE PATH "default install path"
                 FORCE
             )
-		elif (CYGWIN)
+		elseif (CYGWIN)
 			set(
                 CMAKE_INSTALL_PREFIX
                 "/usr/local/helics_${HELICS_VERSION_UNDERSCORE}/"
