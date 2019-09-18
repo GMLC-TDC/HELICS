@@ -23,8 +23,7 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         UPLOAD_URL: ${{ github.event.release.upload_url }}
-      working-directory: ./artifact
-      run: ../.github/workflows/upload-release-asset.sh "Helics-$(git rev-parse --abbrev-ref "${GITHUB_REF}").tar.gz"
+      run: ./.github/workflows/upload-release-asset.sh "artifact/Helics-$(git rev-parse --abbrev-ref "${GITHUB_REF}").tar.gz"
       
     - name: Upload artifact
       if: github.event.action == 'published'
@@ -91,8 +90,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         UPLOAD_URL: ${{ github.event.release.upload_url }}
       shell: bash
-      working-directory: ./artifact
-      run: ../.github/workflows/upload-release-asset.sh "$(ls Helics-*.exe)"
+      run: ./.github/workflows/upload-release-asset.sh "artifact/$(ls Helics-*.exe)"
       
     # GitHub Actions combines artifacts uploaded with the same name
     - name: Upload artifact
@@ -136,5 +134,4 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         UPLOAD_URL: ${{ github.event.release.upload_url }}
-      working-directory: ./artifacts
-      run: ../.github/workflows/upload-release-asset.sh "Helics-$(git rev-parse --abbrev-ref "${GITHUB_REF}")-SHA-256.txt"
+      run: ./.github/workflows/upload-release-asset.sh "artifacts/Helics-$(git rev-parse --abbrev-ref "${GITHUB_REF}")-SHA-256.txt"
