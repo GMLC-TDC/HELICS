@@ -8,12 +8,14 @@
 #
 
 # Generate SWIG wrapper for MATLAB
-if(NOT MATLAB_GENERATE_ONLY)
-  find_package(Matlab COMPONENTS MAIN_PROGRAM)
-endif()
+if(SWIG_GENERATE_INTERFACE_FILES_ONLY)
+  include (${CMAKE_CURRENT_SOURCE_DIR}/matlabSwigGenerateOnly.cmake)
+else()
+find_package(Matlab COMPONENTS MAIN_PROGRAM)
+
 
 if(ENABLE_SWIG AND SWIG_EXECUTABLE)
-
+	#check to make sure the swig executable supports matlab
   execute_process(COMMAND ${SWIG_EXECUTABLE} -help OUTPUT_VARIABLE SWIG_HELP_OUTPUT)
   string(FIND "${SWIG_HELP_OUTPUT}" "-matlab" MATLAB_HELP_FOUND)
   if(${MATLAB_HELP_FOUND} LESS 0)
@@ -21,8 +23,9 @@ if(ENABLE_SWIG AND SWIG_EXECUTABLE)
     message(warning " SWIG VERSION does not support matlab, reverting to build only")
   endif()
 endif()
+
 message(STATUS "Building MATLAB")
-if(NOT ENABLE_SWIG OR MATLAB_SWIG_NOT_AVAILABLE)
+if(NOT SWIG_EXECUTABLE OR MATLAB_SWIG_NOT_AVAILABLE)
 
   add_custom_command(
     OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/helicsMEX.cpp
@@ -61,16 +64,6 @@ else()
       ${SHARED_LIB_HEADERS}
       ${CMAKE_CURRENT_SOURCE_DIR}/matlab_maps.i
   )
-
-  if(OVERWRITE_MATLAB_FILES)
-    add_custom_target(
-      mfile_overwrite ALL
-      COMMAND
-        ${CMAKE_COMMAND} -D TARGET_DIR=${CMAKE_CURRENT_SOURCE_DIR} -P
-        ${CMAKE_CURRENT_SOURCE_DIR}/overwriteMatlabFiles.cmake
-      DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/helicsMEX.cpp
-    )
-  endif(OVERWRITE_MATLAB_FILES)
 
   # add_custom_command(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/helicsMEX.cpp COMMAND
   # ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_SOURCE_DIR}/modifyOctSourceFile.cmake DEPENDS
@@ -119,6 +112,16 @@ if(WIN32)
       ${CMAKE_CURRENT_BINARY_DIR}/mkhelicsMEXFile.m helicsSharedLib
       ${CMAKE_CURRENT_BINARY_DIR}/helicsMEX.cpp
   )
+  elseif (APPLE)
+  add_custom_command(
+    OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/helicsMEX.${Matlab_MEX_EXTENSION}
+    COMMAND
+      ${Matlab_MAIN_PROGRAM} -nojvm -nodisplay -nosplash -r
+      "\"run('${CMAKE_CURRENT_BINARY_DIR}/mkhelicsMEXFile.m');quit;\""
+    DEPENDS
+      ${CMAKE_CURRENT_BINARY_DIR}/mkhelicsMEXFile.m helicsSharedLib
+      ${CMAKE_CURRENT_BINARY_DIR}/helicsMEX.cpp
+  )
 else()
   add_custom_command(
     OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/helicsMEX.${Matlab_MEX_EXTENSION}
@@ -131,23 +134,12 @@ else()
   )
 endif()
 
-if(NOT MATLAB_GENERATE_ONLY)
   add_custom_target(
     helicsMEX ALL
     DEPENDS
       ${CMAKE_CURRENT_BINARY_DIR}/helicsMEX.${Matlab_MEX_EXTENSION} helicsSharedLib
   )
   set_target_properties(helicsMEX PROPERTIES FOLDER interfaces)
-else(NOT MATLAB_GENERATE_ONLY)
-  if(NOT OVERWRITE_MATLAB_FILES)
-  #extra target for generation only and no overwrite
-   add_custom_target(
-      matlab_create ALL
-      COMMAND
-      DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/helicsMEX.cpp
-    )
-  endif()
-endif(NOT MATLAB_GENERATE_ONLY)
 
 file(GLOB HSHARED_LIB_SOURCES ${CMAKE_SOURCE_DIR}/src/helics/shared_api_library/*.h)
 
@@ -195,3 +187,5 @@ install(
   DESTINATION matlab/+helics
   COMPONENT matlab
 )
+
+endif()

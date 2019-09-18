@@ -1,7 +1,7 @@
 function v = helics_filter_type_delay()
   persistent vInitialized;
   if isempty(vInitialized)
-    vInitialized = helicsMEX(0, 81);
+    vInitialized = helicsMEX(0, 83);
   end
   v = vInitialized;
 end
