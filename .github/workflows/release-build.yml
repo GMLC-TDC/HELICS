@@ -90,7 +90,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         UPLOAD_URL: ${{ github.event.release.upload_url }}
       shell: bash
-      run: ./.github/workflows/upload-release-asset.sh "artifact/$(ls Helics-*.exe)"
+      run: ./.github/workflows/upload-release-asset.sh "$(ls artifact/Helics-*.exe)"
       
     # GitHub Actions combines artifacts uploaded with the same name
     - name: Upload artifact
