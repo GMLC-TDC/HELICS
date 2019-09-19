@@ -82,7 +82,7 @@ else()
 
   if(NOT ${CMAKE_VERSION} VERSION_LESS "3.12.0")
     # Use the Python_add_library function added in 3.12.0
-    Python_add_library(helicsPYTHON MODULE helicsPython.c)
+    Python3_add_library(helicsPYTHON MODULE helicsPython.c)
   else()
     add_library(helicsPYTHON MODULE helicsPython.c)
     # Add path to Python include directory
