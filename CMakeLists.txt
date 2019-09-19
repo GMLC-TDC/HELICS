@@ -124,6 +124,7 @@ mark_as_advanced(HELICS_WITH_CMAKE_PACKAGE)
 option(HELICS_BINARY_ONLY_INSTALL "only install the helics binary executables" OFF)
 mark_as_advanced(HELICS_BINARY_ONLY_INSTALL)
 
+option(DISABLE_STATIC_LIB_INSTALL "Disable installing of static libraries" OFF)
 
 # Install instructions for this target
 if(HELICS_WITH_CMAKE_PACKAGE)
@@ -635,22 +636,25 @@ else()
 endif()
 
 if (NOT HELICS_BINARY_ONLY_INSTALL)
-file(GLOB UTILITIES_HEADERS_INSTALL_H ${PROJECT_SOURCE_DIR}/ThirdParty/utilities/gmlc/utilities/*.h)
-file(GLOB UTILITIES_HEADERS_INSTALL_HPP ${PROJECT_SOURCE_DIR}/ThirdParty/utilities/gmlc/utilities/*.hpp)
-file(GLOB UTILITIES_HEADERS_INSTALL_EXTRA ${PROJECT_SOURCE_DIR}/ThirdParty/utilities/gmlc/utilities/extra/*.hpp)
+  # Install if the C++ shared library or static library is installed
+  if (BUILD_SHARED_LIBS OR NOT DISABLE_STATIC_LIB_INSTALL)
+    file(GLOB UTILITIES_HEADERS_INSTALL_H ${PROJECT_SOURCE_DIR}/ThirdParty/utilities/gmlc/utilities/*.h)
+    file(GLOB UTILITIES_HEADERS_INSTALL_HPP ${PROJECT_SOURCE_DIR}/ThirdParty/utilities/gmlc/utilities/*.hpp)
+    file(GLOB UTILITIES_HEADERS_INSTALL_EXTRA ${PROJECT_SOURCE_DIR}/ThirdParty/utilities/gmlc/utilities/extra/*.hpp)
 
-install(
-  FILES ${UTILITIES_HEADERS_INSTALL_H} ${UTILITIES_HEADERS_INSTALL_HPP}
-  ${PROJECT_SOURCE_DIR}/ThirdParty/utilities/LICENSE
-  DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/helics/utilities/
-  COMPONENT headers
-)
+    install(
+      FILES ${UTILITIES_HEADERS_INSTALL_H} ${UTILITIES_HEADERS_INSTALL_HPP}
+      ${PROJECT_SOURCE_DIR}/ThirdParty/utilities/LICENSE
+      DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/helics/utilities/
+      COMPONENT headers
+    )
 
-install(
-  FILES ${UTILITIES_HEADERS_INSTALL_EXTRA}
-  DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/helics/utilities/extra
-  COMPONENT headers
-)
+    install(
+      FILES ${UTILITIES_HEADERS_INSTALL_EXTRA}
+      DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/helics/utilities/extra
+      COMPONENT headers
+    )
+  endif()
 endif(NOT HELICS_BINARY_ONLY_INSTALL)
 
 # -----------------------------------------------------------------------------
@@ -677,11 +681,13 @@ endif(BUILD_HELICS_EXAMPLES)
 
 if(ENABLE_ZMQ_CORE AND NOT ZMQ_USE_STATIC_LIBRARY)
     if(WIN32 AND NOT HELICS_BINARY_ONLY_INSTALL)
-        install(
-            FILES $<TARGET_LINKER_FILE:libzmq>
-            DESTINATION ${CMAKE_INSTALL_LIBDIR}
-            COMPONENT libs
-        )
+        if(BUILD_SHARED_LIBS OR NOT DISABLE_STATIC_LIB_INSTALL)
+            install(
+                FILES $<TARGET_LINKER_FILE:libzmq>
+                DESTINATION ${CMAKE_INSTALL_LIBDIR}
+                COMPONENT libs
+            )
+        endif()
     endif()
 endif()
 
@@ -805,27 +811,29 @@ option(HELICS_INSTALL_CEREAL "Install a copy of the cereal headers used for comp
 
 mark_as_advanced(HELICS_INSTALL_CEREAL)
 
-if (HELICS_INSTALL_CEREAL)
-install(
-    DIRECTORY ThirdParty/cereal
-    DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/helics/external/optional
-    COMPONENT cereal
-)
-add_library(cereal INTERFACE)
-add_library(HELICS::cereal ALIAS cereal)
-target_include_directories(cereal
-    INTERFACE
-        $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/ThirdParty>
-        $<INSTALL_INTERFACE:$<INSTALL_PREFIX>/include/helics/external/optional>
-)
-install(TARGETS cereal ${HELICS_EXPORT_COMMAND} COMPONENT cereal)
-endif()
+if (BUILD_SHARED_LIBS OR NOT DISABLE_STATIC_LIB_INSTALL)
+  if (HELICS_INSTALL_CEREAL)
+  install(
+      DIRECTORY ThirdParty/cereal
+      DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/helics/external/optional
+      COMPONENT cereal
+  )
+  add_library(cereal INTERFACE)
+  add_library(HELICS::cereal ALIAS cereal)
+  target_include_directories(cereal
+      INTERFACE
+          $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/ThirdParty>
+          $<INSTALL_INTERFACE:$<INSTALL_PREFIX>/include/helics/external/optional>
+  )
+  install(TARGETS cereal ${HELICS_EXPORT_COMMAND} COMPONENT cereal)
+  endif()
 
-install(
-    DIRECTORY ThirdParty/helics/external
-    DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/helics
-    COMPONENT headers
-)
+  install(
+      DIRECTORY ThirdParty/helics/external
+      DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/helics
+      COMPONENT headers
+  )
+endif()
 
 if (HELICS_WITH_CMAKE_PACKAGE)
 

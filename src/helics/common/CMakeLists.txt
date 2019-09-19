@@ -106,9 +106,11 @@ if(APPLE)
 endif(APPLE)
 
 if (NOT HELICS_BINARY_ONLY_INSTALL)
-install(
-  FILES ${helics_public_common}
-  DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/helics/common
-  COMPONENT headers
-)
+  if (BUILD_SHARED_LIBS OR NOT DISABLE_STATIC_LIB_INSTALL)
+    install(
+      FILES ${helics_public_common}
+      DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/helics/common
+      COMPONENT headers
+    )
+  endif()
 endif()
