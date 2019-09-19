@@ -278,15 +278,17 @@ if(ENABLE_MPI_CORE)
 endif(ENABLE_MPI_CORE)
 
 if (NOT HELICS_BINARY_ONLY_INSTALL)
-install(
-  FILES ${PUBLIC_INCLUDE_FILES}
-  DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/helics/core
-  COMPONENT headers
-)
+  if (BUILD_SHARED_LIBS OR NOT DISABLE_STATIC_LIB_INSTALL)
+    install(
+      FILES ${PUBLIC_INCLUDE_FILES}
+      DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/helics/core
+      COMPONENT headers
+    )
 
-install(
-  FILES ../helics_enums.h
-  DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/helics
-  COMPONENT headers
-)
+    install(
+      FILES ../helics_enums.h
+      DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/helics
+      COMPONENT headers
+    )
+  endif()
 endif()
