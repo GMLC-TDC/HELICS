@@ -22,10 +22,25 @@ if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX)
   )
 endif()
 
-find_package(PythonLibs 2 REQUIRED)
+ if(NOT ${CMAKE_VERSION} VERSION_LESS "3.12.0")
+	if (PYTHON_ROOT_DIR)
+		set(Python3_ROOT_DIR ${PYTHON_ROOT_DIR})
+	endif()
+    # Use the Python_add_library function added in 3.12.0
+    find_package(Python2 COMPONENTS Development)
+	set(HELICS_PYTHON_INCLUDES ${Python2_INCLUDE_DIRS})
+	set(HELICS_PYTHON_LIBS ${Python2_LIBRARIES})
 
-include_directories(${PYTHON_INCLUDE_PATH})
-include_directories(${PYTHON_INCLUDE_DIRS})
+  else()
+    set(Python_ADDITIONAL_VERSIONS 3.4 3.5 3.6 3.7 3.8)
+    find_package(PythonLibs 2 REQUIRED)
+
+	set(HELICS_PYTHON_INCLUDES ${PYTHON_INCLUDE_DIRS})
+	set(HELICS_PYTHON_LIBS ${PYTHON_LIBRARIES})
+  endif()
+  
+
+include_directories(${HELICS_PYTHON_INCLUDES})
 
 set(CMAKE_SWIG_FLAGS "")
 
@@ -43,7 +58,7 @@ if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
   # https://groups.google.com/a/continuum.io/d/msg/anaconda/057P4uNWyCU/Iem6OtjB CQAJ
   set_target_properties(_helics PROPERTIES LINK_FLAGS "-undefined dynamic_lookup")
 else()
-  swig_link_libraries(helics ${PYTHON_LIBRARIES})
+  swig_link_libraries(helics ${HELICS_PYTHON_LIBS})
 endif()
 
 set_target_properties(_helics PROPERTIES FOLDER interfaces)
