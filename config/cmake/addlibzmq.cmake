@@ -171,18 +171,22 @@ install(
     FILES $<TARGET_FILE:${zmq_target_output}>
     DESTINATION ${CMAKE_INSTALL_BINDIR}
     COMPONENT libs
-  )
-  
+)
+
+if(BUILD_SHARED_LIBS OR NOT DISABLE_STATIC_LIB_INSTALL)
   install(
     FILES $<TARGET_LINKER_FILE:${zmq_target_output}>
     DESTINATION ${CMAKE_INSTALL_LIBDIR}
     COMPONENT libs
   )
+endif()
   
 if(MSVC AND NOT EMBEDDED_DEBUG_INFO AND NOT HELICS_BINARY_ONLY_INSTALL)
-  install(
-    FILES $<TARGET_PDB_FILE:${zmq_target_output}>
-    DESTINATION ${CMAKE_INSTALL_BINDIR}
-    OPTIONAL COMPONENT libs
-  )
+  if(BUILD_SHARED_LIBS OR NOT DISABLE_STATIC_LIB_INSTALL)
+    install(
+      FILES $<TARGET_PDB_FILE:${zmq_target_output}>
+      DESTINATION ${CMAKE_INSTALL_BINDIR}
+      OPTIONAL COMPONENT libs
+    )
+  endif()
 endif()
