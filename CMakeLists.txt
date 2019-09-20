@@ -519,7 +519,13 @@ if("${isSystemDir}" STREQUAL "-1")
 endif()
 
 # add the local directory to the rpath
-list(APPEND CMAKE_INSTALL_RPATH "./")
+
+	if(APPLE)
+		list(APPEND CMAKE_INSTALL_RPATH "@loader_path/.")
+		list(APPEND CMAKE_INSTALL_RPATH "@executable_pat/.")
+	else()
+	    list(APPEND CMAKE_INSTALL_RPATH "./")
+	endif()
 
 if(NOT WIN32)
     if(ENABLE_ZMQ_CORE AND NOT ZMQ_USE_STATIC_LIBRARY)
