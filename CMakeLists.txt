@@ -146,12 +146,16 @@ option(
 )
 mark_as_advanced(DISABLE_C_SHARED_LIB)
 
-
-
 option(BUILD_SHARED_LIBS "install shared libraries for the CXX interface" OFF)
 
 if(NOT DISABLE_C_SHARED_LIB OR BUILD_SHARED_LIBS)
     set(BUILD_HELICS_SHARED_LIBS ON)
+endif()
+
+if(BUILD_SHARED_LIBS OR NOT DISABLE_STATIC_LIB_INSTALL)
+    set(HELICS_INSTALL_CPP14_HEADERS ON)
+else()
+    set(HELICS_INSTALL_CPP14_HEADERS OFF)
 endif()
 
 cmake_dependent_option(
@@ -637,7 +641,7 @@ endif()
 
 if (NOT HELICS_BINARY_ONLY_INSTALL)
   # Install if the C++ shared library or static library is installed
-  if (BUILD_SHARED_LIBS OR NOT DISABLE_STATIC_LIB_INSTALL)
+  if (HELICS_INSTALL_CPP14_HEADERS)
     file(GLOB UTILITIES_HEADERS_INSTALL_H ${PROJECT_SOURCE_DIR}/ThirdParty/utilities/gmlc/utilities/*.h)
     file(GLOB UTILITIES_HEADERS_INSTALL_HPP ${PROJECT_SOURCE_DIR}/ThirdParty/utilities/gmlc/utilities/*.hpp)
     file(GLOB UTILITIES_HEADERS_INSTALL_EXTRA ${PROJECT_SOURCE_DIR}/ThirdParty/utilities/gmlc/utilities/extra/*.hpp)
@@ -811,7 +815,7 @@ option(HELICS_INSTALL_CEREAL "Install a copy of the cereal headers used for comp
 
 mark_as_advanced(HELICS_INSTALL_CEREAL)
 
-if (BUILD_SHARED_LIBS OR NOT DISABLE_STATIC_LIB_INSTALL)
+if (HELICS_INSTALL_CPP14_HEADERS)
   if (HELICS_INSTALL_CEREAL)
   install(
       DIRECTORY ThirdParty/cereal

@@ -127,14 +127,16 @@ if(BUILD_APP_LIBRARY)
 	set_property(TEST app_subcommand_version_return app_subcommand_help_return PROPERTY LABELS Continuous)
   endif(BUILD_APP_EXECUTABLES)
 
-  if (NOT HELICS_BINARY_ONLY_INSTALL AND NOT DISABLE_STATIC_LIB_INSTALL)
+  if (NOT DISABLE_STATIC_LIB_INSTALL)
   install(
     TARGETS helics_apps
     ${HELICS_EXPORT_COMMAND}
     DESTINATION ${CMAKE_INSTALL_LIBDIR}
     COMPONENT libs
   )
+  endif()
 
+  if (HELICS_INSTALL_CPP14_HEADERS)
   install(
     FILES ${helics_apps_public_headers}
     DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/helics/apps
@@ -145,7 +147,7 @@ if(BUILD_APP_LIBRARY)
     DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/helics
     COMPONENT headers
   )
-  endif(NOT HELICS_BINARY_ONLY_INSTALL AND NOT DISABLE_STATIC_LIB_INSTALL)
+  endif(HELICS_INSTALL_CPP14_HEADERS)
 endif (BUILD_APP_LIBRARY)
 
 # configure executable app

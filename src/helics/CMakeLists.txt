@@ -89,7 +89,7 @@ endif()
 
 if (NOT HELICS_BINARY_ONLY_INSTALL)
   # Install the header if the C++ shared library is built
-  if (BUILD_SHARED_LIBS OR NOT DISABLE_STATIC_LIB_INSTALL)
+  if (HELICS_INSTALL_CPP14_HEADERS)
     install(
       FILES helics.hpp
       DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/helics
