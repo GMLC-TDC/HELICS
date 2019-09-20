@@ -76,6 +76,7 @@ else()
     target_include_directories(helicsPYTHON PUBLIC ${PYTHON_INCLUDE_DIRS})
 
     # Get list of libraries to link with for Python module
+	if (NOT MSVC)
     execute_process(
       COMMAND
           ${PYTHON_EXECUTABLE}
@@ -86,15 +87,17 @@ else()
     )
     # Clean-up leading and trailing whitespace
     string(STRIP ${pymodule_libs} pymodule_libs)
-	
-	  if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+	else()
+	  set(pymodule_libs "")
+	endif()
+  if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
     # https://groups.google.com/a/continuum.io/d/msg/anaconda/057P4uNWyCU/Iem6Ot jBCQAJ
     set_target_properties(helicsPYTHON PROPERTIES LINK_FLAGS "-undefined dynamic_lookup")
   else()
         target_link_libraries(helicsPYTHON PUBLIC ${pymodule_libs} ${PYTHON_LIBRARIES})
   endif()
 
-
+if (NOT MSVC)
     # Get list of compiler flags for compiling Python module
     execute_process(
       COMMAND
@@ -108,6 +111,9 @@ else()
     string(STRIP ${pymodule_includes} pymodule_includes)
     string(REPLACE " " ";" pymodule_includes "${pymodule_includes}")
     target_compile_options(helicsPYTHON PUBLIC ${pymodule_includes})
+	
+ endif()
+	
 	copy_key_files_to_target_location(helicsPYTHON PUBLIC)
     copy_shared_target(helicsPYTHON PUBLIC)
 

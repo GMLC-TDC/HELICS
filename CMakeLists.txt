@@ -522,7 +522,7 @@ endif()
 
 	if(APPLE)
 		list(APPEND CMAKE_INSTALL_RPATH "@loader_path/.")
-		list(APPEND CMAKE_INSTALL_RPATH "@executable_pat/.")
+		list(APPEND CMAKE_INSTALL_RPATH "@executable_path/.")
 	else()
 	    list(APPEND CMAKE_INSTALL_RPATH "./")
 	endif()
