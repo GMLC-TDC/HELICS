@@ -24,7 +24,6 @@ endif()
 
 #at some point in the future (HELICS 3) switch everything to use find_package(Python2 ...)
 
-    set(Python_ADDITIONAL_VERSIONS 3.4 3.5 3.6 3.7 3.8)
     find_package(PythonLibs 2 REQUIRED)
   
 
