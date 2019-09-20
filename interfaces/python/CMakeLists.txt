@@ -43,7 +43,7 @@ else()
     # https://groups.google.com/a/continuum.io/d/msg/anaconda/057P4uNWyCU/Iem6Ot jBCQAJ
 			set_target_properties(_helics PROPERTIES LINK_FLAGS "-undefined dynamic_lookup")
 		else()
-			swig_link_libraries(helics ${PYTHON_LIBRARIES})
+			swig_link_libraries(helics ${Python3_LIBRARIES})
 		endif()
 
 		
