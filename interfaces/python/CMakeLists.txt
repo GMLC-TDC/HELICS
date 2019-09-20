@@ -20,66 +20,74 @@ else()
 	endif()
  
  if (HELICS_USE_NEW_PYTHON_FIND)
-	FindPackage(Python3 Interpreter Development)
+	Find_package(Python3 COMPONENTS Interpreter Development)
 	if(ENABLE_SWIG AND SWIG_EXECUTABLE)
     
-  # https://stackoverflow.com/a/3818084/5451769
-  if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX)
-    # Update if necessary
-    set(
-      CMAKE_C_FLAGS
-      "${CMAKE_C_FLAGS} -Wno-long-long -Wno-overlength-strings -Wno-ignored-attributes"
-    )
-  endif()
+		# https://stackoverflow.com/a/3818084/5451769
+		if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX)
+			# Update if necessary
+			set(
+				CMAKE_C_FLAGS
+				"${CMAKE_C_FLAGS} -Wno-long-long -Wno-overlength-strings -Wno-ignored-attributes"
+				)
+		endif()
 
-  set(CMAKE_SWIG_FLAGS "-py3")
+		set(CMAKE_SWIG_FLAGS "-py3")
 
-  set_property(SOURCE ../helics.i PROPERTY SWIG_MODULE_NAME helics)
+		set_property(SOURCE ../helics.i PROPERTY SWIG_MODULE_NAME helics)
 
-  
-    swig_add_library(helics TYPE MODULE LANGUAGE python SOURCES helicsPython.i)
+		swig_add_library(helics TYPE MODULE LANGUAGE python SOURCES helicsPython.i)
 
-  swig_link_libraries(helics helicsSharedLib Python3::Module)
-  if (MSVC)
-	target_compile_options(_helics PRIVATE "/wd4100")
-  else(MSVC)
-   target_compile_options(_helics PRIVATE "-Wno-long-long")
-  endif(MSVC)
+		swig_link_libraries(helics helicsSharedLib)
+		if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+    # https://groups.google.com/a/continuum.io/d/msg/anaconda/057P4uNWyCU/Iem6Ot jBCQAJ
+			set_target_properties(_helics PROPERTIES LINK_FLAGS "-undefined dynamic_lookup")
+		else()
+			swig_link_libraries(helics ${PYTHON_LIBRARIES})
+		endif()
 
-  set_target_properties(_helics PROPERTIES FOLDER interfaces)
+		
+		target_include_directories(_helics PRIVATE ${Python3_INCLUDE_DIRS})
+		if (MSVC)
+			target_compile_options(_helics PRIVATE "/wd4100")
+		else(MSVC)
+			target_compile_options(_helics PRIVATE "-Wno-long-long")
+		endif(MSVC)
 
-  install(TARGETS _helics DESTINATION python COMPONENT python)
+		set_target_properties(_helics PROPERTIES FOLDER interfaces)
 
-  copy_key_files_to_target_location(_helics)
-  copy_shared_target(_helics)
+		install(TARGETS _helics DESTINATION python COMPONENT python)
+
+		copy_key_files_to_target_location(_helics)
+		copy_shared_target(_helics)
  
-else()
-  message("Building without swig cmake ${CMAKE_VERSION}")
-    python3_add_library(helicsPYTHON MODULE helicsPython.c)
+	else()
+		message("Building without swig cmake ${CMAKE_VERSION}")
+		python3_add_library(helicsPYTHON MODULE helicsPython.c)
 	
-	copy_key_files_to_target_location(helicsPYTHON PUBLIC)
-    copy_shared_target(helicsPYTHON PUBLIC)
+		copy_key_files_to_target_location(helicsPYTHON PUBLIC)
+		copy_shared_target(helicsPYTHON PUBLIC)
 
 
-  # Set the output library name to _helics
-  set_target_properties(helicsPYTHON
-      PROPERTIES PREFIX "_"
+		# Set the output library name to _helics
+		set_target_properties(helicsPYTHON
+			PROPERTIES PREFIX "_"
                  OUTPUT_NAME "helics"
-  )
-  target_link_libraries(helicsPYTHON PUBLIC helicsSharedLib)
+		)
+		target_link_libraries(helicsPYTHON PUBLIC helicsSharedLib)
 
+		set_target_properties(helicsPYTHON PROPERTIES FOLDER interfaces)
+		install(TARGETS helicsPYTHON DESTINATION python COMPONENT python)
 
-  install(TARGETS helicsPYTHON DESTINATION python COMPONENT python)
+		configure_file(
+			${CMAKE_CURRENT_SOURCE_DIR}/setup.py.in ${CMAKE_CURRENT_BINARY_DIR}/setup.py
+		)
+		configure_file(
+			${CMAKE_CURRENT_SOURCE_DIR}/helics.py ${CMAKE_CURRENT_BINARY_DIR}/helics.py
+			COPYONLY
+		)
 
-  configure_file(
-    ${CMAKE_CURRENT_SOURCE_DIR}/setup.py.in ${CMAKE_CURRENT_BINARY_DIR}/setup.py
-  )
-  configure_file(
-    ${CMAKE_CURRENT_SOURCE_DIR}/helics.py ${CMAKE_CURRENT_BINARY_DIR}/helics.py
-    COPYONLY
-  )
-
-endif()
+	endif()
  else()
 
     set(Python_ADDITIONAL_VERSIONS 3.4 3.5 3.6 3.7 3.8)
@@ -181,6 +189,8 @@ if (NOT MSVC)
     string(REPLACE " " ";" pymodule_includes "${pymodule_includes}")
     target_compile_options(helicsPYTHON PUBLIC ${pymodule_includes})
 	
+	set_target_properties(helicsPYTHON PROPERTIES FOLDER interfaces)
+
  endif()
 	
 	copy_key_files_to_target_location(helicsPYTHON PUBLIC)

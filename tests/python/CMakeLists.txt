@@ -8,7 +8,7 @@
 #
 
 if (HELICS_USE_NEW_PYTHON_FIND)
-	find_package(Python3 Interpreter)
+	find_package(Python3 COMPONENTS Interpreter)
 	set(PYTHON_EXECUTABLE ${Python3_EXECUTABLE})
 else()
 
