@@ -20,7 +20,7 @@ else()
 	endif()
  
  if (HELICS_USE_NEW_PYTHON_FIND)
-	Find_package(Python3 COMPONENTS Interpreter Development)
+	find_package(Python3 COMPONENTS Interpreter Development)
 	if(ENABLE_SWIG AND SWIG_EXECUTABLE)
     
 		# https://stackoverflow.com/a/3818084/5451769
