@@ -10,25 +10,14 @@
 if(SWIG_GENERATE_INTERFACE_FILES_ONLY)
  include (${CMAKE_CURRENT_SOURCE_DIR}/pythonSwigGenerateOnly.cmake)
 else()
-  if(NOT ${CMAKE_VERSION} VERSION_LESS "3.12.0")
-	if (PYTHON_ROOT_DIR)
-		set(Python3_ROOT_DIR ${PYTHON_ROOT_DIR})
-	endif()
-    # Use the Python_add_library function added in 3.12.0
-    find_package(Python3 COMPONENTS Interpreter Development)
-	set(HELICS_PYTHON_INCLUDES ${Python3_INCLUDE_DIRS})
-	set(HELICS_PYTHON_LIBS ${Python3_LIBRARIES})
-	set(HELICS_PYTHON_EXE ${Python3_EXECUTABLE})
-  else()
+
+#at some point in the future (HELICS 3) switch everything to use find_package(Python3 ...)
+
     set(Python_ADDITIONAL_VERSIONS 3.4 3.5 3.6 3.7 3.8)
-    find_package(PythonInterp 3 REQUIRED)
+	if (NOT PYTHON_EXECUTABLE)
+       find_package(PythonInterp 3 REQUIRED)
+	endif()
     find_package(PythonLibs 3 REQUIRED)
-
-	set(HELICS_PYTHON_INCLUDES ${PYTHON_INCLUDE_DIRS})
-	set(HELICS_PYTHON_LIBS ${PYTHON_LIBRARIES})
-	set(HELICS_PYTHON_EXE ${PYTHON_EXECUTABLE})
-  endif()
-
 
 if(ENABLE_SWIG AND SWIG_EXECUTABLE)
 
@@ -41,7 +30,7 @@ if(ENABLE_SWIG AND SWIG_EXECUTABLE)
     )
   endif()
 
-  include_directories(${HELICS_PYTHON_INCLUDES})
+  include_directories(${PYTHON_INCLUDE_DIRS})
 
   set(CMAKE_SWIG_FLAGS "-py3")
 
@@ -63,7 +52,7 @@ if(ENABLE_SWIG AND SWIG_EXECUTABLE)
     # https://groups.google.com/a/continuum.io/d/msg/anaconda/057P4uNWyCU/Iem6Ot jBCQAJ
     set_target_properties(_helics PROPERTIES LINK_FLAGS "-undefined dynamic_lookup")
   else()
-    swig_link_libraries(helics ${HELICS_PYTHON_LIBS})
+    swig_link_libraries(helics ${PYTHON_LIBRARIES})
   endif()
 
   set_target_properties(_helics PROPERTIES FOLDER interfaces)
@@ -80,18 +69,16 @@ if(ENABLE_SWIG AND SWIG_EXECUTABLE)
 else()
   message("Building without swig")
 
-  if(NOT ${CMAKE_VERSION} VERSION_LESS "3.12.0")
-    # Use the Python_add_library function added in 3.12.0
-    Python3_add_library(helicsPYTHON MODULE helicsPython.c)
-  else()
+#convert to use the python3_add_library in HELICS 3 
+
     add_library(helicsPYTHON MODULE helicsPython.c)
     # Add path to Python include directory
-    target_include_directories(helicsPYTHON PUBLIC ${HELICS_PYTHON_INCLUDES})
+    target_include_directories(helicsPYTHON PUBLIC ${PYTHON_INCLUDE_DIRS})
 
     # Get list of libraries to link with for Python module
     execute_process(
       COMMAND
-          ${HELICS_PYTHON_EXE}
+          ${PYTHON_EXECUTABLE}
           "-c"
           "from distutils import sysconfig; print(sysconfig.get_config_var('BLDSHARED').split(' ', 1)[1])"
       OUTPUT_VARIABLE
@@ -99,12 +86,12 @@ else()
     )
     # Clean-up leading and trailing whitespace
     string(STRIP ${pymodule_libs} pymodule_libs)
-    target_link_libraries(helicsPYTHON PUBLIC ${pymodule_libs} ${HELICS_PYTHON_LIBS})
+    target_link_libraries(helicsPYTHON PUBLIC ${pymodule_libs} ${PYTHON_LIBRARIES})
 
     # Get list of compiler flags for compiling Python module
     execute_process(
       COMMAND
-          ${HELICS_PYTHON_EXE}
+          ${PYTHON_EXECUTABLE}
           "-c"
           "from distutils import sysconfig; print(sysconfig.get_config_var('CFLAGS').split(' ', 1)[1])"
       OUTPUT_VARIABLE
@@ -116,7 +103,7 @@ else()
     target_compile_options(helicsPYTHON PUBLIC ${pymodule_includes})
 	copy_key_files_to_target_location(helicsPYTHON PUBLIC)
     copy_shared_target(helicsPYTHON PUBLIC)
-  endif()
+
 
   # Set the output library name to _helics
   set_target_properties(helicsPYTHON
