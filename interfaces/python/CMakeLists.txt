@@ -67,10 +67,10 @@ if(ENABLE_SWIG AND SWIG_EXECUTABLE)
   copy_shared_target(_helics)
  
 else()
-  message("Building without swig")
+  message("Building without swig cmake ${CMAKE_VERSION}")
 
 #convert to use the python3_add_library in HELICS 3 
-
+    
     add_library(helicsPYTHON MODULE helicsPython.c)
     # Add path to Python include directory
     target_include_directories(helicsPYTHON PUBLIC ${PYTHON_INCLUDE_DIRS})
@@ -86,7 +86,14 @@ else()
     )
     # Clean-up leading and trailing whitespace
     string(STRIP ${pymodule_libs} pymodule_libs)
-    target_link_libraries(helicsPYTHON PUBLIC ${pymodule_libs} ${PYTHON_LIBRARIES})
+	
+	  if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+    # https://groups.google.com/a/continuum.io/d/msg/anaconda/057P4uNWyCU/Iem6Ot jBCQAJ
+    set_target_properties(helicsPYTHON PROPERTIES LINK_FLAGS "-undefined dynamic_lookup")
+  else()
+        target_link_libraries(helicsPYTHON PUBLIC ${pymodule_libs} ${PYTHON_LIBRARIES})
+  endif()
+
 
     # Get list of compiler flags for compiling Python module
     execute_process(
@@ -111,6 +118,7 @@ else()
                  OUTPUT_NAME "helics"
   )
   target_link_libraries(helicsPYTHON PUBLIC helicsSharedLib)
+
 
   install(TARGETS helicsPYTHON DESTINATION python COMPONENT python)
 
