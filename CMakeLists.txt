@@ -125,6 +125,7 @@ option(HELICS_BINARY_ONLY_INSTALL "only install the helics binary executables" O
 mark_as_advanced(HELICS_BINARY_ONLY_INSTALL)
 
 option(DISABLE_STATIC_LIB_INSTALL "Disable installing of static libraries" OFF)
+mark_as_advanced(DISABLE_STATIC_LIB_INSTALL)
 
 # Install instructions for this target
 if(HELICS_WITH_CMAKE_PACKAGE)
