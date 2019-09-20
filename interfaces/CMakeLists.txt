@@ -71,8 +71,8 @@ if(ENABLE_SWIG OR SWIG_REQUIRED)
     cmake_policy(SET CMP0078 OLD)
   endif()
   if(POLICY CMP0086)
-    # Policy CMP0086 introduced since CMake 3.15.2 we haven't made use of this so new or old shouldn't impact anything
-    cmake_policy(SET CMP0086 NEW)
+    # Policy CMP0086 the old behavior is assumed in the java interface, TODO: PT examine its usage and implications for now leave it at the OLD
+    cmake_policy(SET CMP0086 OLD)
   endif()
   find_package(SWIG REQUIRED 3.0)
   include(${SWIG_USE_FILE})
