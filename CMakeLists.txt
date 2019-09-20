@@ -124,6 +124,8 @@ mark_as_advanced(HELICS_WITH_CMAKE_PACKAGE)
 option(HELICS_BINARY_ONLY_INSTALL "only install the helics binary executables" OFF)
 mark_as_advanced(HELICS_BINARY_ONLY_INSTALL)
 
+option(DISABLE_STATIC_LIB_INSTALL "Disable installing of static libraries" OFF)
+mark_as_advanced(DISABLE_STATIC_LIB_INSTALL)
 
 # Install instructions for this target
 if(HELICS_WITH_CMAKE_PACKAGE)
@@ -145,12 +147,16 @@ option(
 )
 mark_as_advanced(DISABLE_C_SHARED_LIB)
 
-
-
 option(BUILD_SHARED_LIBS "install shared libraries for the CXX interface" OFF)
 
 if(NOT DISABLE_C_SHARED_LIB OR BUILD_SHARED_LIBS)
     set(BUILD_HELICS_SHARED_LIBS ON)
+endif()
+
+if(BUILD_SHARED_LIBS OR NOT DISABLE_STATIC_LIB_INSTALL)
+    set(HELICS_INSTALL_CPP14_HEADERS ON)
+else()
+    set(HELICS_INSTALL_CPP14_HEADERS OFF)
 endif()
 
 cmake_dependent_option(
@@ -635,22 +641,25 @@ else()
 endif()
 
 if (NOT HELICS_BINARY_ONLY_INSTALL)
-file(GLOB UTILITIES_HEADERS_INSTALL_H ${PROJECT_SOURCE_DIR}/ThirdParty/utilities/gmlc/utilities/*.h)
-file(GLOB UTILITIES_HEADERS_INSTALL_HPP ${PROJECT_SOURCE_DIR}/ThirdParty/utilities/gmlc/utilities/*.hpp)
-file(GLOB UTILITIES_HEADERS_INSTALL_EXTRA ${PROJECT_SOURCE_DIR}/ThirdParty/utilities/gmlc/utilities/extra/*.hpp)
+  # Install if the C++ shared library or static library is installed
+  if (HELICS_INSTALL_CPP14_HEADERS)
+    file(GLOB UTILITIES_HEADERS_INSTALL_H ${PROJECT_SOURCE_DIR}/ThirdParty/utilities/gmlc/utilities/*.h)
+    file(GLOB UTILITIES_HEADERS_INSTALL_HPP ${PROJECT_SOURCE_DIR}/ThirdParty/utilities/gmlc/utilities/*.hpp)
+    file(GLOB UTILITIES_HEADERS_INSTALL_EXTRA ${PROJECT_SOURCE_DIR}/ThirdParty/utilities/gmlc/utilities/extra/*.hpp)
 
-install(
-  FILES ${UTILITIES_HEADERS_INSTALL_H} ${UTILITIES_HEADERS_INSTALL_HPP}
-  ${PROJECT_SOURCE_DIR}/ThirdParty/utilities/LICENSE
-  DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/helics/utilities/
-  COMPONENT headers
-)
+    install(
+      FILES ${UTILITIES_HEADERS_INSTALL_H} ${UTILITIES_HEADERS_INSTALL_HPP}
+      ${PROJECT_SOURCE_DIR}/ThirdParty/utilities/LICENSE
+      DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/helics/utilities/
+      COMPONENT headers
+    )
 
-install(
-  FILES ${UTILITIES_HEADERS_INSTALL_EXTRA}
-  DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/helics/utilities/extra
-  COMPONENT headers
-)
+    install(
+      FILES ${UTILITIES_HEADERS_INSTALL_EXTRA}
+      DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/helics/utilities/extra
+      COMPONENT headers
+    )
+  endif()
 endif(NOT HELICS_BINARY_ONLY_INSTALL)
 
 # -----------------------------------------------------------------------------
@@ -677,11 +686,13 @@ endif(BUILD_HELICS_EXAMPLES)
 
 if(ENABLE_ZMQ_CORE AND NOT ZMQ_USE_STATIC_LIBRARY)
     if(WIN32 AND NOT HELICS_BINARY_ONLY_INSTALL)
-        install(
-            FILES $<TARGET_LINKER_FILE:libzmq>
-            DESTINATION ${CMAKE_INSTALL_LIBDIR}
-            COMPONENT libs
-        )
+        if(BUILD_SHARED_LIBS OR NOT DISABLE_STATIC_LIB_INSTALL)
+            install(
+                FILES $<TARGET_LINKER_FILE:libzmq>
+                DESTINATION ${CMAKE_INSTALL_LIBDIR}
+                COMPONENT libs
+            )
+        endif()
     endif()
 endif()
 
@@ -805,27 +816,29 @@ option(HELICS_INSTALL_CEREAL "Install a copy of the cereal headers used for comp
 
 mark_as_advanced(HELICS_INSTALL_CEREAL)
 
-if (HELICS_INSTALL_CEREAL)
-install(
-    DIRECTORY ThirdParty/cereal
-    DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/helics/external/optional
-    COMPONENT cereal
-)
-add_library(cereal INTERFACE)
-add_library(HELICS::cereal ALIAS cereal)
-target_include_directories(cereal
-    INTERFACE
-        $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/ThirdParty>
-        $<INSTALL_INTERFACE:$<INSTALL_PREFIX>/include/helics/external/optional>
-)
-install(TARGETS cereal ${HELICS_EXPORT_COMMAND} COMPONENT cereal)
-endif()
+if (HELICS_INSTALL_CPP14_HEADERS)
+  if (HELICS_INSTALL_CEREAL)
+  install(
+      DIRECTORY ThirdParty/cereal
+      DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/helics/external/optional
+      COMPONENT cereal
+  )
+  add_library(cereal INTERFACE)
+  add_library(HELICS::cereal ALIAS cereal)
+  target_include_directories(cereal
+      INTERFACE
+          $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/ThirdParty>
+          $<INSTALL_INTERFACE:$<INSTALL_PREFIX>/include/helics/external/optional>
+  )
+  install(TARGETS cereal ${HELICS_EXPORT_COMMAND} COMPONENT cereal)
+  endif()
 
-install(
-    DIRECTORY ThirdParty/helics/external
-    DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/helics
-    COMPONENT headers
-)
+  install(
+      DIRECTORY ThirdParty/helics/external
+      DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/helics
+      COMPONENT headers
+  )
+endif()
 
 if (HELICS_WITH_CMAKE_PACKAGE)
 
