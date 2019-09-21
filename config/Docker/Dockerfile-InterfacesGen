@@ -1,0 +1,23 @@
+# The docker build command should be run from the root folder of the HELICS source code repository with submodules cloned
+#this docker file is intended to generate a container 
+
+FROM fedora:31 as builder
+
+# Installs dependencies needed for building, with headers needed for development
+RUN dnf install g++ git autoconf libtool shtool make pcre-devel byacc -y
+
+WORKDIR /root
+
+RUN git clone --recurse-submodules --branch matlab https://github.com/jaeandersson/swig.git
+RUN mkdir swig-matlab && cd swig && sh autogen.sh && ./configure --prefix=/root/swig-matlab 
+RUN cd swig && make -j4 && make install
+
+
+# Create final image with the HELICS apps
+FROM fedora:31
+
+# Install the runtime libraries needed for ZeroMQ without development files
+RUN dnf install g++ git cmake make swig -y
+
+# Copy the HELICS install from the builder image stage above to a location in the PATH env var
+COPY --from=builder /root/swig-matlab /root/swig-matlab
