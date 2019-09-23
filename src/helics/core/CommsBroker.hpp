@@ -39,6 +39,7 @@ class CommsBroker : public BrokerT
     virtual bool tryReconnect () override;
     /** disconnect the comm object*/
     void commDisconnect ();
+    /** load the comms object directly*/
     void loadComms ();
 
   public:
@@ -48,5 +49,7 @@ class CommsBroker : public BrokerT
     virtual void addRoute (route_id rid, const std::string &routeInfo) override;
 
     virtual void removeRoute (route_id rid) override;
+    /** get a pointer to the comms object*/
+    COMMS *getCommsObjectPointer ();
 };
 }  // namespace helics
