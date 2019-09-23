@@ -53,6 +53,7 @@ enum class action_t : int32_t
     cmd_check_connections = 297,  //!< command to check for any connections
     cmd_ping = 298,  //!< request for an Echo response
     cmd_ping_reply = 299,  //!< response to a ping request
+    cmd_broker_ping = 306,  //!< ping to send to a broker to also ping subbrokers and cores
 
     cmd_init = 10,  //!< request entry to init mode
     cmd_init_grant = 11,  //!< grant entry to initialization mode
@@ -144,6 +145,8 @@ enum class action_t : int32_t
     cmd_close_interface = 133,  //!< cmd to close all communications from an interface
     cmd_multi_message = 1037,  //!< cmd that encapsulates a bunch of messages in its payload
 
+    cmd_connection_error = 2034,  //!< cmd indicating a connection error with a broker/federate
+
     cmd_protocol_priority = -60000,  //!< priority command used by protocol stacks and ignored by core
     cmd_protocol = 60000,  //!< command used in the protocol stacks and ignored by the core
     cmd_protocol_big = cmd_info_basis + 60000,  //!< command used in the protocol stacks with the additional info
@@ -169,9 +172,11 @@ enum class action_t : int32_t
 #define CMD_DISCONNECT_FED_ACK action_message_def::action_t::cmd_disconnect_fed_ack
 #define CMD_DISCONNECT_CORE_ACK action_message_def::action_t::cmd_disconnect_core_ack
 #define CMD_DISCONNECT_BROKER_ACK action_message_def::action_t::cmd_disconnect_broker_ack
+#define CMD_CONNECTION_ERROR action_message_def::action_t::cmd_connection_error
 
 #define CMD_CHECK_CONNECTIONS action_message_def::action_t::cmd_check_connections
 #define CMD_PING action_message_def::action_t::cmd_ping
+#define CMD_BROKER_PING action_message_def::action_t::cmd_broker_setup
 #define CMD_PING_REPLY action_message_def::action_t::cmd_ping_reply
 #define CMD_BROKER_SETUP action_message_def::action_t::cmd_broker_setup
 #define CMD_BROKER_LOCATION action_message_def::action_t::cmd_broker_location
@@ -307,6 +312,7 @@ enum class action_t : int32_t
 #define UPDATE_FILTER_OPERATOR 572
 #define UPDATE_QUERY_CALLBACK 581
 #define UPDATE_LOGGING_CALLBACK 592
+#define REQUEST_TICK_FORWARDING 607
 
 /** return the name of the action
 @param action The action to get the name for

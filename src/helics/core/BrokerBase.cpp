@@ -118,7 +118,7 @@ std::shared_ptr<helicsCLI11App> BrokerBase::generateBaseCLI ()
     logging_group->add_option ("--logfile", logFile, "the file to log the messages to")->ignore_underscore ();
     logging_group
       ->add_option_function<int> (
-        "--loglevel,--log-level", [this] (int val) { setLogLevel (val); },
+        "--loglevel,--log-level", [this](int val) { setLogLevel (val); },
         "the level which to log the higher this is set to the more gets logs(-1) for no logging")
       ->transform (CLI::CheckedTransformer (&log_level_map, CLI::ignore_case, CLI::ignore_underscore));
 
@@ -203,7 +203,7 @@ void BrokerBase::configureBase ()
     }
 
     timeCoord = std::make_unique<ForwardingTimeCoordinator> ();
-    timeCoord->setMessageSender ([this] (const ActionMessage &msg) { addActionMessage (msg); });
+    timeCoord->setMessageSender ([this](const ActionMessage &msg) { addActionMessage (msg); });
 
     loggingObj = std::make_unique<Logger> ();
     if (!logFile.empty ())
@@ -402,7 +402,7 @@ void BrokerBase::queueProcessingLoop ()
     asio::steady_timer ticktimer (serv->getBaseContext ());
     activeProtector active (true, false);
 
-    auto timerCallback = [this, &active] (const std::error_code &ec) { timerTickHandler (this, active, ec); };
+    auto timerCallback = [this, &active](const std::error_code &ec) { timerTickHandler (this, active, ec); };
     if (tickTimer > timeZero)
     {
         if (tickTimer < Time (0.5))
@@ -415,7 +415,7 @@ void BrokerBase::queueProcessingLoop ()
     }
     global_broker_id_local = global_id.load ();
     int messagesSinceLastTick = 0;
-    auto logDump = [&, this] () {
+    auto logDump = [&, this]() {
         if (dumplog)
         {
             for (auto &act : dumpMessages)
@@ -458,7 +458,7 @@ void BrokerBase::queueProcessingLoop ()
                 contextLoop = nullptr;
                 contextLoop = serv->startContextLoop ();
             }
-            if (messagesSinceLastTick == 0)
+            if (messagesSinceLastTick == 0 || forwardTick)
             {
 #ifndef DISABLE_TICK
 
@@ -470,6 +470,15 @@ void BrokerBase::queueProcessingLoop ()
             ticktimer.expires_at (std::chrono::steady_clock::now () + tickTimer.to_ns ());
             active = std::make_pair (true, true);
             ticktimer.async_wait (timerCallback);
+            break;
+        case CMD_PING:
+            // ping is processed normally but doesn't count as an actual message for timeout purposes unless it
+            // comes from the parent
+            if (command.source_id != parent_broker_id)
+            {
+                ++messagesSinceLastTick;
+            }
+            processCommand (std::move (command));
             break;
         case CMD_IGNORE:
         default:
@@ -526,6 +535,7 @@ action_message_def::action_t BrokerBase::commandProcessor (ActionMessage &comman
     case CMD_TERMINATE_IMMEDIATELY:
     case CMD_STOP:
     case CMD_TICK:
+    case CMD_PING:
         return command.action ();
     case CMD_MULTI_MESSAGE:
         for (int ii = 0; ii < command.counter; ++ii)

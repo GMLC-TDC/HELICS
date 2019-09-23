@@ -745,8 +745,11 @@ void CoreBroker::processCommand (ActionMessage &&command)
         break;
 
     case CMD_TICK:
-        timeoutMon->tick (this);
-        LOG_SUMMARY (global_broker_id_local, getIdentifier (), " broker tick");
+        if (brokerState == broker_state_t::operating)
+        {
+            timeoutMon->tick (this);
+            LOG_SUMMARY (global_broker_id_local, getIdentifier (), " broker tick");
+        }
         break;
     case CMD_PING:
         if (command.dest_id == global_broker_id_local)
@@ -761,10 +764,24 @@ void CoreBroker::processCommand (ActionMessage &&command)
             routeMessage (command);
         }
         break;
+    case CMD_BROKER_PING:
+        if (command.dest_id == global_broker_id_local)
+        {
+            ActionMessage pngrep (CMD_PING_REPLY);
+            pngrep.dest_id = command.source_id;
+            pngrep.source_id = global_broker_id_local;
+            routeMessage (pngrep);
+            timeoutMon->pingSub (this);
+        }
+        else
+        {
+            routeMessage (command);
+        }
+        break;
     case CMD_PING_REPLY:
         if (command.dest_id == global_broker_id_local)
         {
-            timeoutMon->pingReply (command);
+            timeoutMon->pingReply (command, this);
         }
         else
         {
@@ -775,6 +792,41 @@ void CoreBroker::processCommand (ActionMessage &&command)
         sendDisconnect ();
         addActionMessage (CMD_STOP);
         LOG_WARNING (global_broker_id_local, getIdentifier (), "disconnecting from check connections");
+        break;
+    case CMD_CONNECTION_ERROR:
+        // if anyone else as has terminated assume they finalized and the connection was lost
+        if (command.dest_id == global_broker_id_local)
+        {
+            bool partDisconnected{false};
+            bool ignore{false};
+            for (auto &brk : _brokers)
+            {
+                if (brk.isDisconnected)
+                {
+                    partDisconnected = true;
+                }
+                if (brk.isDisconnected && brk.global_id == command.source_id)
+                {
+                    // the broker in question is already disconnected, ignore this
+                    ignore = true;
+                    break;
+                }
+            }
+            if (ignore)
+            {
+                break;
+            }
+            if (partDisconnected)
+            {  // we are going to assume it disconnected just assume broker even though it may be a core, there
+               // probably isn't any difference for this purpose
+                command.setAction (CMD_DISCONNECT_BROKER);
+                processDisconnect (command);
+            }
+        }
+        else
+        {
+            routeMessage (command);
+        }
         break;
     case CMD_INIT:
     {
@@ -1225,6 +1277,8 @@ void CoreBroker::processBrokerConfigureCommands (ActionMessage &cmd)
             }
         }
         break;
+    case REQUEST_TICK_FORWARDING:
+        forwardTick = checkActionFlag (cmd, indicator_flag);
     default:
         break;
     }
@@ -1697,7 +1751,8 @@ std::shared_ptr<helicsCLI11App> CoreBroker::generateCLI ()
 {
     auto app = std::make_shared<helicsCLI11App> ("Option for Broker");
     app->remove_helics_specifics ();
-    app->add_flag_callback ("--root", [this]() { setAsRoot (); }, "specify whether the broker is a root");
+    app->add_flag_callback (
+      "--root", [this]() { setAsRoot (); }, "specify whether the broker is a root");
     return app;
 }
 
@@ -2267,15 +2322,6 @@ void CoreBroker::processDisconnect (ActionMessage &command)
         }
         break;
     case CMD_DISCONNECT_CORE:
-        if (brk != nullptr)
-        {
-            disconnectBroker (*brk);
-            if (!isRootc)
-            {
-                transmit (parent_route_id, command);
-            }
-        }
-        break;
     case CMD_DISCONNECT_BROKER:
         if (brk != nullptr)
         {
@@ -2446,25 +2492,27 @@ std::string CoreBroker::generateQueryAnswer (const std::string &request)
     }
     if (request == "inputs")
     {
-        return generateStringVector_if (handles, [](auto &handle) { return handle.key; },
-                                        [](auto &handle) { return (handle.handleType == handle_type::input); });
+        return generateStringVector_if (
+          handles, [](auto &handle) { return handle.key; },
+          [](auto &handle) { return (handle.handleType == handle_type::input); });
     }
     if (request == "publications")
     {
-        return generateStringVector_if (handles, [](auto &handle) { return handle.key; },
-                                        [](auto &handle) {
-                                            return (handle.handleType == handle_type::publication);
-                                        });
+        return generateStringVector_if (
+          handles, [](auto &handle) { return handle.key; },
+          [](auto &handle) { return (handle.handleType == handle_type::publication); });
     }
     if (request == "filters")
     {
-        return generateStringVector_if (handles, [](auto &handle) { return handle.key; },
-                                        [](auto &handle) { return (handle.handleType == handle_type::filter); });
+        return generateStringVector_if (
+          handles, [](auto &handle) { return handle.key; },
+          [](auto &handle) { return (handle.handleType == handle_type::filter); });
     }
     if (request == "endpoints")
     {
-        return generateStringVector_if (handles, [](auto &handle) { return handle.key; },
-                                        [](auto &handle) { return (handle.handleType == handle_type::endpoint); });
+        return generateStringVector_if (
+          handles, [](auto &handle) { return handle.key; },
+          [](auto &handle) { return (handle.handleType == handle_type::endpoint); });
     }
     if (request == "federate_map")
     {
