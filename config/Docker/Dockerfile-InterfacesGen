@@ -13,11 +13,33 @@ RUN mkdir swig-matlab && cd swig && sh autogen.sh && ./configure --prefix=/root/
 RUN cd swig && make -j4 && make install
 
 
-# Create final image with the HELICS apps
-FROM fedora:31
+# Create an intermediate image for creating the build directories
+FROM fedora:31 as Hbuilder
 
-# Install the runtime libraries needed for ZeroMQ without development files
+# Install the tools for building
 RUN dnf install g++ git cmake make swig -y
 
 # Copy the HELICS install from the builder image stage above to a location in the PATH env var
 COPY --from=builder /root/swig-matlab /root/swig-matlab
+
+WORKDIR /root
+
+RUN git clone --recurse-submodules --branch develop https://github.com/GMLC-TDC/HELICS.git
+
+RUN cd HELICS && mkdir build_matlab && mkdir build_interface
+
+RUN cd HELICS/build_matlab && cmake -DBUILD_MATLAB_INTERFACE=ON -DSWIG_GENERATE_INTERFACE_FILES_ONLY=ON -DHELICS_OVERWRITE_INTERFACE_FILES=ON -DBUILD_HELICS_EXAMPLES=OFF -DENABLE_ZMQ_CORE=OFF -DBUILD_HELICS_TESTS=OFF -DBUILD_APP_EXECUTABLES=OFF -DDISABLE_BOOST=ON -DENABLE_SWIG=ON -DSWIG_EXECUTABLE=/root/swig-matlab/bin/swig ..
+
+RUN cd HELICS/build_interface && cmake -DBUILD_PYTHON_INTERFACE=ON -DBUILD_JAVA_INTERFACE=ON -DSWIG_GENERATE_INTERFACE_FILES_ONLY=ON -DHELICS_OVERWRITE_INTERFACE_FILES=ON -DBUILD_HELICS_EXAMPLES=OFF -DENABLE_ZMQ_CORE=OFF -DBUILD_HELICS_TESTS=OFF -DBUILD_APP_EXECUTABLES=OFF -DDISABLE_BOOST=ON -DENABLE_SWIG=ON ..
+
+# Create a final image with the HELICS folders as setup
+FROM fedora:31
+
+# Install the tools for building
+RUN dnf install g++ git cmake make swig -y
+
+# Copy the HELICS install from the builder image stage above to a location in the PATH env var
+COPY --from=builder /root/swig-matlab /root/swig-matlab
+COPY --from=Hbuilder /root/HELICS /root/HELICS
+
+WORKDIR /root/HELICS
