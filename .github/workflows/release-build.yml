@@ -77,7 +77,7 @@ jobs:
         cpack_dir="$(which cmake)"
         cpack_dir="${cpack_dir%/cmake}"
         mkdir build && cd build
-        cmake -G "${BUILD_GEN}" -A "${BUILD_ARCH/x86/Win32}" -DCMAKE_BUILD_TYPE=Debug -DENABLE_PACKAGE_BUILD=ON -DBUILD_SHARED_LIBS=ON -DBUILD_HELICS_EXAMPLES=OFF -DBUILD_TESTING=OFF -BUILD_APP_EXECUTABLES=OFF -DDISABLE_C_SHARED_LIB=ON ..
+        cmake -G "${BUILD_GEN}" -A "${BUILD_ARCH/x86/Win32}" -DCMAKE_BUILD_TYPE=Debug -DENABLE_PACKAGE_BUILD=ON -DBUILD_SHARED_LIBS=ON -DBUILD_HELICS_EXAMPLES=OFF -DBUILD_TESTING=OFF -DBUILD_APP_EXECUTABLES=OFF -DDISABLE_C_SHARED_LIB=ON ..
         cmake --build . --config Debug
         "${cpack_dir}/cpack" -G "ZIP" -B "$(pwd)/../tmp_dir"
         pushd ../tmp_dir
