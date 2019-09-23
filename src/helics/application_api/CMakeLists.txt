@@ -105,15 +105,18 @@ if(MSYS AND USE_LIBCXX)
 endif()
 
 if (NOT HELICS_BINARY_ONLY_INSTALL)
-install(
-  FILES ${public_application_api_headers}
-  DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/helics/application_api
-  COMPONENT headers
-)
+  # Install headers if the static library or C++ shared library are installed
+  if (HELICS_INSTALL_CPP14_HEADERS)
+    install(
+      FILES ${public_application_api_headers}
+      DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/helics/application_api
+      COMPONENT headers
+    )
 
-install(
-  FILES ${conv_headers}
-  DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/helics
-  COMPONENT headers
-)
+    install(
+      FILES ${conv_headers}
+      DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/helics
+      COMPONENT headers
+    )
+  endif()
 endif()

@@ -88,18 +88,23 @@ endif()
 endif()
 
 if (NOT HELICS_BINARY_ONLY_INSTALL)
-install(
-  FILES helics.hpp
-  DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/helics
-  COMPONENT headers
-)
+  # Install the header if the C++ shared library is built
+  if (HELICS_INSTALL_CPP14_HEADERS)
+    install(
+      FILES helics.hpp
+      DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/helics
+      COMPONENT headers
+    )
+  endif()
 
-install(
-  TARGETS helics-static
-  ${HELICS_EXPORT_COMMAND}
-  DESTINATION ${CMAKE_INSTALL_LIBDIR}
-  COMPONENT libs
-)
+  if (NOT DISABLE_STATIC_LIB_INSTALL)
+    install(
+      TARGETS helics-static
+      ${HELICS_EXPORT_COMMAND}
+      DESTINATION ${CMAKE_INSTALL_LIBDIR}
+      COMPONENT libs
+    )
+  endif()
 endif()
 
 if(BUILD_SHARED_LIBS)

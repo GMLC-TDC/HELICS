@@ -1,3 +1,3 @@
 function varargout = helicsFederateClone(varargin)
-  [varargout{1:nargout}] = helicsMEX(68, varargin{:});
+  [varargout{1:nargout}] = helicsMEX(70, varargin{:});
 end

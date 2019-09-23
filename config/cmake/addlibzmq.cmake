@@ -19,6 +19,12 @@ if(ZMQ_USE_STATIC_LIBRARY)
         set(zmq_shared_build ON)
     endif()
 	
+if (MINGW)
+set(HELICS_LIBZMQ_VERSION v4.3.1)
+else()
+set(HELICS_LIBZMQ_VERSION v4.3.2)
+endif()
+
 string(TOLOWER "libzmq" lcName)
 
 if(NOT CMAKE_VERSION VERSION_LESS 3.11)
@@ -27,7 +33,7 @@ include(FetchContent)
 FetchContent_Declare(
   libzmq
   GIT_REPOSITORY https://github.com/zeromq/libzmq.git
-  GIT_TAG        v4.3.2
+  GIT_TAG        ${HELICS_LIBZMQ_VERSION}
 )
 
 FetchContent_GetProperties(libzmq)
@@ -50,7 +56,7 @@ include(GitUtils)
 git_clone(
              PROJECT_NAME                    ${lcName}
              GIT_URL                         https://github.com/zeromq/libzmq.git
-             GIT_TAG                         v4.3.2
+             GIT_TAG                         ${HELICS_LIBZMQ_VERSION}
 			 DIRECTORY                       ${PROJECT_BINARY_DIR}/_deps
        )
 	   
@@ -77,6 +83,7 @@ endif()
   set(BUILD_STATIC ${zmq_static_build} CACHE BOOL "" FORCE)
   set(BUILD_SHARED ${zmq_shared_build} CACHE BOOL "" FORCE)
   message(STATUS "zmq install lib dir ${CMAKE_INSTALL_LIBDIR}")
+  
   set(ZEROMQ_CMAKECONFIG_INSTALL_DIR ${CMAKE_INSTALL_LIBDIR}/cmake/ZeroMQ CACHE BOOL "" FORCE)
   # Bring the populated content into the build
   add_subdirectory(${${lcName}_SOURCE_DIR} ${${lcName}_BINARY_DIR})
@@ -106,6 +113,7 @@ endif()
   HIDE_VARIABLE(WITH_VMCI)
   HIDE_VARIABLE(WITH_PERF_TOOL)
   HIDE_VARIABLE(WITH_DOCS)
+  HIDE_VARIABLE(BUILD_SHARED)
   HIDE_VARIABLE(ZEROMQ_CMAKECONFIG_INSTALL_DIR)
   HIDE_VARIABLE(POLLER)
    HIDE_VARIABLE(API_POLLER)
@@ -117,6 +125,8 @@ endif()
   HIDE_VARIABLE(ENABLE_EVENTFD)
   HIDE_VARIABLE(ZMQ_CV_IMPL)
   HIDE_VARIABLE(BUILD_TESTS)
+  
+
   HIDE_VARIABLE(ZMQ_WIN32_WINNT)
   
 if(ZMQ_USE_STATIC_LIBRARY)
@@ -137,10 +147,12 @@ foreach( SOURCE_FILE ${ZMQ_PUBLIC_HEADER_TARGETS} )
 set_target_properties(${zmq_target_output} PROPERTIES PUBLIC_HEADER "${NEW_ZMQ_PUBLIC_HEADERS}")
 
 if (NOT HELICS_BINARY_ONLY_INSTALL)
-install(FILES ${NEW_ZMQ_PUBLIC_HEADERS} 
-    DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
-    COMPONENT headers
-	)
+  if (BUILD_SHARED_LIBS OR NOT DISABLE_STATIC_LIB_INSTALL)
+    install(FILES ${NEW_ZMQ_PUBLIC_HEADERS} 
+        DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+        COMPONENT headers
+    )
+  endif()
 endif()
 endif()
 
@@ -160,18 +172,22 @@ install(
     FILES $<TARGET_FILE:${zmq_target_output}>
     DESTINATION ${CMAKE_INSTALL_BINDIR}
     COMPONENT libs
-  )
-  
+)
+
+if(BUILD_SHARED_LIBS OR NOT DISABLE_STATIC_LIB_INSTALL)
   install(
     FILES $<TARGET_LINKER_FILE:${zmq_target_output}>
     DESTINATION ${CMAKE_INSTALL_LIBDIR}
     COMPONENT libs
   )
+endif()
   
 if(MSVC AND NOT EMBEDDED_DEBUG_INFO AND NOT HELICS_BINARY_ONLY_INSTALL)
-  install(
-    FILES $<TARGET_PDB_FILE:${zmq_target_output}>
-    DESTINATION ${CMAKE_INSTALL_BINDIR}
-    OPTIONAL COMPONENT libs
-  )
+  if(BUILD_SHARED_LIBS OR NOT DISABLE_STATIC_LIB_INSTALL)
+    install(
+      FILES $<TARGET_PDB_FILE:${zmq_target_output}>
+      DESTINATION ${CMAKE_INSTALL_BINDIR}
+      OPTIONAL COMPONENT libs
+    )
+  endif()
 endif()
