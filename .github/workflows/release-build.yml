@@ -79,16 +79,16 @@ jobs:
         mkdir build && cd build
         cmake -G "${BUILD_GEN}" -A "${BUILD_ARCH/x86/Win32}" -DCMAKE_BUILD_TYPE=Debug -DENABLE_PACKAGE_BUILD=ON -DBUILD_SHARED_LIBS=ON -DBUILD_HELICS_EXAMPLES=OFF -DBUILD_TESTING=OFF -DBUILD_APP_EXECUTABLES=OFF -DDISABLE_C_SHARED_LIB=ON ..
         cmake --build . --config Debug
-        "${cpack_dir}/cpack" -G "ZIP" -B "$(pwd)/../tmp_dir"
+        "${cpack_dir}/cpack" -G "ZIP" -C Debug -B "$(pwd)/../tmp_dir"
         pushd ../tmp_dir
         rm -rf _CPack_Packages
         ZIP_FILE="$(ls Helics-*.zip)"
         7z e "$ZIP_FILE"
         rm "$ZIP_FILE"
         popd
-        cmake -DCMAKE_BUILD_TYPE=Release
+        cmake -G "${BUILD_GEN}" -A "${BUILD_ARCH/x86/Win32}" -DCMAKE_BUILD_TYPE=Release -DENABLE_PACKAGE_BUILD=ON -DBUILD_SHARED_LIBS=ON -DBUILD_HELICS_EXAMPLES=OFF -DBUILD_TESTING=OFF -DBUILD_APP_EXECUTABLES=OFF -DDISABLE_C_SHARED_LIB=ON ..
         cmake --build . --config Release
-        "${cpack_dir}/cpack" -G "ZIP" -B "$(pwd)/../tmp_dir"
+        "${cpack_dir}/cpack" -G "ZIP" -C Release -B "$(pwd)/../tmp_dir"
         cd ../tmp_dir
         rm -rf _CPack_Packages
         ZIP_FILE="$(ls Helics-*.zip)"
@@ -158,7 +158,7 @@ jobs:
         cmake --build . --config Release
         cpack_dir="$(which cmake)"
         cpack_dir="${cpack_dir%/cmake}"
-        "${cpack_dir}/cpack" -G "${CPACK_GEN}" -B "$(pwd)/../artifact"
+        "${cpack_dir}/cpack" -G "${CPACK_GEN}" -C Release -B "$(pwd)/../artifact"
         cd ../artifact
         rm -rf _CPack_Packages
         
