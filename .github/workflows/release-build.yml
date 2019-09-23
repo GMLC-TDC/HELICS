@@ -33,14 +33,14 @@ jobs:
         path: artifact
         
 ################################
-# Build Windows installers
+# Build MSVC archives
 ################################
-  build-windows:
+  build-windows-msvc:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
         os: [windows-2016, windows-2019]
-        arch: [x86, x64]
+        arch: [x64]
         include:
           - os: windows-2016
             cmake_gen: 'Visual Studio 15 2017'
@@ -74,15 +74,28 @@ jobs:
       run: |
         echo "Building with ${BUILD_GEN} for ${BUILD_ARCH}"
         choco install -y swig
-        mkdir build && cd build
-        cmake -G "${BUILD_GEN}" -A "${BUILD_ARCH/x86/Win32}" -DCMAKE_BUILD_TYPE=Release -DENABLE_PACKAGE_BUILD=ON -DBUILD_PYTHON_INTERFACE=ON -DBUILD_SHARED_LIBS=ON -DBUILD_HELICS_EXAMPLES=OFF -DBUILD_TESTING=OFF ..
-        cmake --build . --config Release
         cpack_dir="$(which cmake)"
         cpack_dir="${cpack_dir%/cmake}"
-        "${cpack_dir}/cpack"
-        EXE_NAME="$(ls Helics-*.exe)"
-        mkdir ../artifact
-        mv "$EXE_NAME" "../artifact/${EXE_NAME/-win/-${MSVC_VER}-win}"
+        mkdir build && cd build
+        cmake -G "${BUILD_GEN}" -A "${BUILD_ARCH/x86/Win32}" -DCMAKE_BUILD_TYPE=Debug -DENABLE_PACKAGE_BUILD=ON -DBUILD_SHARED_LIBS=ON -DBUILD_HELICS_EXAMPLES=OFF -DBUILD_TESTING=OFF -BUILD_APP_EXECUTABLES=OFF -DDISABLE_C_SHARED_LIB=ON ..
+        cmake --build . --config Debug
+        "${cpack_dir}/cpack" -G "ZIP" -B "$(pwd)/../tmp_dir"
+        pushd ../tmp_dir
+        rm -rf _CPack_Packages
+        ZIP_FILE="$(ls Helics-*.zip)"
+        7z e "$ZIP_FILE"
+        rm "$ZIP_FILE"
+        popd
+        cmake -DCMAKE_BUILD_TYPE=Release
+        cmake --build . --config Release
+        "${cpack_dir}/cpack" -G "ZIP" -B "$(pwd)/../tmp_dir"
+        cd ../tmp_dir
+        rm -rf _CPack_Packages
+        ZIP_FILE="$(ls Helics-*.zip)"
+        7z e "$ZIP_FILE"
+        rm "$ZIP_FILE"
+        7z a "$ZIP_FILE" *
+        mv "$ZIP_FILE" "../artifact/${ZIP_FILE/-win/-${MSVC_VER}-win}"
         
     - name: Upload installer to release
       if: github.event.action == 'published'
@@ -90,7 +103,72 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         UPLOAD_URL: ${{ github.event.release.upload_url }}
       shell: bash
-      run: ./.github/workflows/upload-release-asset.sh "$(ls artifact/Helics-*.exe)"
+      run: ./.github/workflows/upload-release-asset.sh "$(ls artifact/Helics-*.zip)"
+      
+    # GitHub Actions combines artifacts uploaded with the same name
+    - name: Upload artifact
+      if: github.event.action == 'published'
+      uses: actions/upload-artifact@v1
+      with:
+        name: windows-installers
+        path: artifact
+        
+################################
+# Build Windows installer
+################################
+  build-windows-installer:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [windows-2019]
+        arch: [x64]
+        cpack_gen: [NSIS, ZIP]
+        include:
+          - os: windows-2019
+            cmake_gen: 'Visual Studio 16 2019'
+            msvc_ver: 'msvc2019'
+    steps:
+    - uses: actions/checkout@v1
+      if: github.event.action == 'published'
+      
+    # Build with Python 3.6 interface
+    - uses: actions/setup-python@v1
+      if: github.event.action == 'published'
+      with:
+        python-version: '3.6'
+        architecture: ${{ matrix.arch }}
+        
+    # Compile HELICS and create the installer
+    - name: Build installer
+      if: github.event.action == 'published'
+      env:
+        BUILD_ARCH: ${{ matrix.arch }}
+        BUILD_GEN: ${{ matrix.cmake_gen }}
+        MSVC_VER: ${{ matrix.msvc_ver }}
+        CPACK_GEN: ${{ matrix.cpack_gen }}
+      shell: bash
+      # This uses bash variable substitution in a few places
+      # 1. replacing x86 with Win32 (setting the Python version uses x86)
+      # 2. getting the cmake directory for running cpack with an absolute path (chocolatey has an unfortunately named alias)
+      run: |
+        echo "Building ${CPACK_GEN} installer with ${BUILD_GEN} for ${BUILD_ARCH}"
+        choco install -y swig
+        mkdir build && cd build
+        cmake -G "${BUILD_GEN}" -A "${BUILD_ARCH/x86/Win32}" -DCMAKE_BUILD_TYPE=Release -DENABLE_PACKAGE_BUILD=ON -DBUILD_PYTHON_INTERFACE=ON -DBUILD_JAVA_INTERFACE=ON -DDISABLE_STATIC_LIB_INSTALL=ON -DSTATIC_STANDARD_LIB=ON -DBUILD_HELICS_EXAMPLES=OFF -DBUILD_TESTING=OFF ..
+        cmake --build . --config Release
+        cpack_dir="$(which cmake)"
+        cpack_dir="${cpack_dir%/cmake}"
+        "${cpack_dir}/cpack" -G "${CPACK_GEN}" -B "$(pwd)/../artifact"
+        cd ../artifact
+        rm -rf _CPack_Packages
+        
+    - name: Upload installer to release
+      if: github.event.action == 'published'
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        UPLOAD_URL: ${{ github.event.release.upload_url }}
+      shell: bash
+      run: ./.github/workflows/upload-release-asset.sh "$(ls artifact/Helics-*)"
       
     # GitHub Actions combines artifacts uploaded with the same name
     - name: Upload artifact
@@ -105,7 +183,7 @@ jobs:
 ################################
   generate-sha256:
     name: Calculate SHA256 for release assets
-    needs: [create-all-submodule-archive, build-windows]
+    needs: [create-all-submodule-archive, build-windows-installer, build-windows-msvc]
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v1
