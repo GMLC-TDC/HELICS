@@ -29,9 +29,10 @@ Minor release with bug fixes and a few additional features
 -   logMessage functions in the federate for user specified log messages and levels
     -  `logDebugMessage`, `logWarningMessage`, `logErrorMessage`, `logInfoMessage` function in all API's to simplify common logging operations
 -   function to set the log file from the core C++ API
--   A CMAKE option to disable BOOST entirely
+-   A CMAKE option to disable BOOST entirely `DISABLE_BOOST`
 -   A CMAKE option `HELICS_BINARY_ONLY_INSTALL` which will restrict the install to executables and shared libraries with no headers or static libraries. 
--   Some CMAKE capabilities to better generate the interface files.   
+-   Some CMAKE capabilities to better generate the interface files. 
+-   automatic release file generation for visual studio builds, windows installers, full source code tar files, and shared library package.    
 
 ### Removed
 -  The included build files for the Octave interface have been removed.  It is now required to use swig to build these files.  The interface file was only valid for Octave 4.2 and had potential to break in later versions.  Given the 3 versions of octave in common use it was deemed prudent to just remove the included file and require swig to generate the correct interface.  
