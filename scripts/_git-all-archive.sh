@@ -18,9 +18,6 @@ where:
     -t  source code tag (v2.1.1)
     -r  repo (GMLC-TDC/HELICS)
     -l  release tag (can be different than checkout tag ex: v0.0.0archive)
-    -k  github Personal access token (read/write permission)
-    -i  github client id (github OAuth [optional])
-    -s  github client secret (github OAut [optional])
 
     URL: https://github.com/GMLC-TDC/HELICS/releases"
 
@@ -52,9 +49,10 @@ export ROOT_ARCHIVE_DIR="$(pwd)"
 
 git checkout $tag
 git submodule update --init
-export OUTPUT_FILE="Helics-${release}.tar.gz"
+OUTPUT_BASENAME="HELICS-${release}-source"
+export OUTPUT_FILE="${OUTPUT_BASENAME}.tar.gz"
 # create root archive
-git archive --verbose --format "tar" --output "$ROOT_ARCHIVE_DIR/repo-output.tar" "$(git rev-parse --abbrev-ref HEAD)"
+git archive --verbose --format "tar" --output "${ROOT_ARCHIVE_DIR}/${OUTPUT_BASENAME}.tar" "$(git rev-parse --abbrev-ref HEAD)"
 
 echo "> appending submodule archives"
 # for each of git submodules append to the root archive
@@ -67,7 +65,7 @@ if (( $(ls repo-output-sub*.tar | wc -l) != 0  )); then
   echo "> combining all tars"
   for archivetar in $(ls repo-output-sub*.tar); do
     echo $archivetar
-    tar --concatenate --file=repo-output.tar "$archivetar"
+    tar --concatenate --file="${OUTPUT_BASENAME}.tar" "$archivetar"
   done
 
   # remove sub tars
@@ -77,8 +75,8 @@ fi
 
 # gzip the tar
 echo "> gzipping final tar"
-gzip --force --verbose repo-output.tar
+gzip --force --verbose "${OUTPUT_BASENAME}.tar"
 
 echo "> moving output file to $OUTPUT_FILE"
-mv repo-output.tar.gz $OUTPUT_FILE
+mv "${OUTPUT_BASENAME}.tar.gz" "$OUTPUT_FILE"
 
