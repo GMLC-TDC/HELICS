@@ -10,8 +10,7 @@ This name is prepended for any local interfaces.
 
 ## Core information
 
-Certain information is used by the federate to establish linkages to a core object this.
-
+Certain information is used by the federate to establish linkages to a core object this. 
 ### Core name
 
  the corename identifies a potentially preexisting core in the same process that can be used
@@ -24,7 +23,8 @@ See [Core Types](CoreTypes) for more details on the specific types of cores whic
 ### Coreinitstring
 
 The core init string is a string used by any created core to establish connectivity with a broker.
-This includes port numbers, addresses, and the minimum number of federates.
+This includes port numbers, addresses, and the minimum number of federates. This is usually entered as a string containing command line arguments such as `"--timeout=2s --broker 192.168.2.1"`
+
 
 ## Timing information
 
