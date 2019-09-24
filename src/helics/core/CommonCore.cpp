@@ -2761,9 +2761,10 @@ void CommonCore::processCommand (ActionMessage &&command)
     case CMD_ERROR:
         if (command.dest_id == global_broker_id_local)
         {
-            if (command.source_id == higher_broker_id)
+            if (command.source_id == higher_broker_id || command.source_id == parent_broker_id)
             {
                 sendErrorToFederates (command.messageID);
+                brokerState = broker_state_t::errored;
             }
             else
             {

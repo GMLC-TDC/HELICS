@@ -87,7 +87,7 @@ const BasicBrokerInfo *CoreBroker::getBrokerById (global_broker_id brokerid) con
 }
 
 void CoreBroker::setLoggingCallback (
-  const std::function<void (int, const std::string &, const std::string &)> &logFunction)
+  const std::function<void(int, const std::string &, const std::string &)> &logFunction)
 {
     ActionMessage loggerUpdate (CMD_BROKER_CONFIGURE);
     loggerUpdate.messageID = UPDATE_LOGGING_CALLBACK;
@@ -660,13 +660,14 @@ std::string CoreBroker::generateFederationSummary () const
             break;
         }
     }
-    std::string output = fmt::format (
-      "Federation Summary> \n\t{} federates [min {}]\n\t{}/{} brokers/cores [min {}]\n\t{} "
-      "publications\n\t{} inputs\n\t{} endpoints\n\t{} filters\n<<<<<<<<<",
-      _federates.size (), minFederateCount,
-      std::count_if (_brokers.begin (), _brokers.end (), [] (auto &brk) { return brk._core == false; }),
-      std::count_if (_brokers.begin (), _brokers.end (), [] (auto &brk) { return brk._core == true; }),
-      minBrokerCount, pubs, ipts, epts, filt);
+    std::string output =
+      fmt::format ("Federation Summary> \n\t{} federates [min {}]\n\t{}/{} brokers/cores [min {}]\n\t{} "
+                   "publications\n\t{} inputs\n\t{} endpoints\n\t{} filters\n<<<<<<<<<",
+                   _federates.size (), minFederateCount,
+                   std::count_if (_brokers.begin (), _brokers.end (),
+                                  [](auto &brk) { return brk._core == false; }),
+                   std::count_if (_brokers.begin (), _brokers.end (), [](auto &brk) { return brk._core == true; }),
+                   minBrokerCount, pubs, ipts, epts, filt);
     return output;
 }
 
@@ -828,8 +829,24 @@ void CoreBroker::processCommand (ActionMessage &&command)
             }
             else
             {
-                LOG_ERROR (global_broker_id_local, getIdentifier (),
-                           fmt::format ("lost comms with {}", command.source_id.baseValue ()));
+                if (isRootc)
+                {
+                    std::string lcom = fmt::format ("lost comms with {}", command.source_id.baseValue ());
+                    LOG_ERROR (global_broker_id_local, getIdentifier (), lcom);
+                    ActionMessage elink (CMD_ERROR);
+                    elink.payload = lcom;
+                    elink.messageID = defs::errors::connection_failure;
+                    broadcast (elink);
+                    brokerState = broker_state_t::errored;
+                    addActionMessage (CMD_USER_DISCONNECT);  // TODO::PT this needs something better but this does
+                                                             // what is needed for now
+                }
+                else
+                {
+                    // pass it up the chain let the root deal with it
+                    command.dest_id = parent_broker_id;
+                    transmit (parent_route_id, command);
+                }
             }
         }
         else
@@ -1149,9 +1166,14 @@ void CoreBroker::processCommand (ActionMessage &&command)
         }
         break;
     case CMD_ERROR:
-        if (isRootc)
+        if (isRootc || command.dest_id == global_broker_id_local)
         {
             sendToLogger (command.source_id, log_level::error, std::string (), command.payload);
+            if (command.source_id == parent_broker_id)
+            {
+                broadcast (command);
+            }
+            brokerState = broker_state_t::errored;
         }
         else
         {
@@ -1280,7 +1302,7 @@ void CoreBroker::processBrokerConfigureCommands (ActionMessage &cmd)
             auto op = dataAirlocks[cmd.counter].try_unload ();
             if (op)
             {
-                auto M = stx::any_cast<std::function<void (int, const std::string &, const std::string &)>> (
+                auto M = stx::any_cast<std::function<void(int, const std::string &, const std::string &)>> (
                   std::move (*op));
                 setLoggerFunction (std::move (M));
             }
@@ -1761,7 +1783,7 @@ std::shared_ptr<helicsCLI11App> CoreBroker::generateCLI ()
     auto app = std::make_shared<helicsCLI11App> ("Option for Broker");
     app->remove_helics_specifics ();
     app->add_flag_callback (
-      "--root", [this] () { setAsRoot (); }, "specify whether the broker is a root");
+      "--root", [this]() { setAsRoot (); }, "specify whether the broker is a root");
     return app;
 }
 
@@ -2005,7 +2027,7 @@ void CoreBroker::executeInitializationOperations ()
                 eMiss.source_id = global_broker_id_local;
                 eMiss.messageID = defs::errors::connection_failure;
                 unknownHandles.processRequiredUnknowns (
-                  [this, &eMiss] (const std::string &target, char type, global_handle handle) {
+                  [this, &eMiss](const std::string &target, char type, global_handle handle) {
                       switch (type)
                       {
                       case 'p':
@@ -2040,7 +2062,7 @@ void CoreBroker::executeInitializationOperations ()
             wMiss.source_id = global_broker_id_local;
             wMiss.messageID = defs::errors::connection_failure;
             unknownHandles.processNonOptionalUnknowns (
-              [this, &wMiss] (const std::string &target, char type, global_handle handle) {
+              [this, &wMiss](const std::string &target, char type, global_handle handle) {
                   switch (type)
                   {
                   case 'p':
@@ -2499,35 +2521,35 @@ std::string CoreBroker::generateQueryAnswer (const std::string &request)
     }
     if (request == "federates")
     {
-        return generateStringVector (_federates, [] (auto &fed) { return fed.name; });
+        return generateStringVector (_federates, [](auto &fed) { return fed.name; });
     }
     if (request == "brokers")
     {
-        return generateStringVector (_brokers, [] (auto &brk) { return brk.name; });
+        return generateStringVector (_brokers, [](auto &brk) { return brk.name; });
     }
     if (request == "inputs")
     {
         return generateStringVector_if (
-          handles, [] (auto &handle) { return handle.key; },
-          [] (auto &handle) { return (handle.handleType == handle_type::input); });
+          handles, [](auto &handle) { return handle.key; },
+          [](auto &handle) { return (handle.handleType == handle_type::input); });
     }
     if (request == "publications")
     {
         return generateStringVector_if (
-          handles, [] (auto &handle) { return handle.key; },
-          [] (auto &handle) { return (handle.handleType == handle_type::publication); });
+          handles, [](auto &handle) { return handle.key; },
+          [](auto &handle) { return (handle.handleType == handle_type::publication); });
     }
     if (request == "filters")
     {
         return generateStringVector_if (
-          handles, [] (auto &handle) { return handle.key; },
-          [] (auto &handle) { return (handle.handleType == handle_type::filter); });
+          handles, [](auto &handle) { return handle.key; },
+          [](auto &handle) { return (handle.handleType == handle_type::filter); });
     }
     if (request == "endpoints")
     {
         return generateStringVector_if (
-          handles, [] (auto &handle) { return handle.key; },
-          [] (auto &handle) { return (handle.handleType == handle_type::endpoint); });
+          handles, [](auto &handle) { return handle.key; },
+          [](auto &handle) { return (handle.handleType == handle_type::endpoint); });
     }
     if (request == "federate_map")
     {
@@ -2566,12 +2588,12 @@ std::string CoreBroker::generateQueryAnswer (const std::string &request)
     if (request == "dependson")
     {
         return generateStringVector (timeCoord->getDependencies (),
-                                     [] (const auto &dep) { return std::to_string (dep.baseValue ()); });
+                                     [](const auto &dep) { return std::to_string (dep.baseValue ()); });
     }
     if (request == "dependents")
     {
         return generateStringVector (timeCoord->getDependents (),
-                                     [] (const auto &dep) { return std::to_string (dep.baseValue ()); });
+                                     [](const auto &dep) { return std::to_string (dep.baseValue ()); });
     }
     if (request == "dependencies")
     {
@@ -2840,7 +2862,7 @@ void CoreBroker::processQuery (const ActionMessage &m)
         }
         else if (m.payload == "list")
         {
-            queryResp.payload = generateStringVector (global_values, [] (const auto &gv) { return gv.first; });
+            queryResp.payload = generateStringVector (global_values, [](const auto &gv) { return gv.first; });
         }
         else if (m.payload == "all")
         {
@@ -3098,13 +3120,13 @@ bool CoreBroker::allInitReady () const
     }
 
     return std::all_of (_brokers.begin (), _brokers.end (),
-                        [] (const auto &brk) { return ((brk._nonLocal) || (brk._initRequested)); });
+                        [](const auto &brk) { return ((brk._nonLocal) || (brk._initRequested)); });
 }
 
 bool CoreBroker::allDisconnected () const
 {
     return std::all_of (_brokers.begin (), _brokers.end (),
-                        [] (const auto &brk) { return ((brk._nonLocal) || (brk.isDisconnected)); });
+                        [](const auto &brk) { return ((brk._nonLocal) || (brk.isDisconnected)); });
 }
 
 }  // namespace helics
