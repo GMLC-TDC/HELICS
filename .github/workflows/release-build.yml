@@ -184,7 +184,7 @@ jobs:
 ################################
 # Build Windows shared library
 ################################
-  build-windows-installer:
+  build-windows-sharedlib:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
@@ -249,7 +249,7 @@ jobs:
 ################################
   generate-sha256:
     name: Calculate SHA256 for release assets
-    needs: [create-all-submodule-archive, build-windows-installer, build-windows-msvc]
+    needs: [create-all-submodule-archive, build-windows-installer, build-windows-msvc, build-windows-sharedlib]
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v1
