@@ -52,11 +52,11 @@ jobs:
     - uses: actions/checkout@v1
       if: github.event.action == 'published'
       
-    # Build with Python 3.7 interface
+    # Build with Python 3.6 interface
     - uses: actions/setup-python@v1
       if: github.event.action == 'published'
       with:
-        python-version: '3.7'
+        python-version: '3.6'
         architecture: ${{ matrix.arch }}
         
     # Compile HELICS and create the installer
@@ -158,6 +158,69 @@ jobs:
         choco install -y swig
         mkdir build && cd build
         cmake -G "${BUILD_GEN}" -A "${BUILD_ARCH/x86/Win32}" -DCMAKE_BUILD_TYPE=Release -DENABLE_PACKAGE_BUILD=ON -DBUILD_PYTHON_INTERFACE=ON -DBUILD_JAVA_INTERFACE=ON -DDISABLE_STATIC_LIB_INSTALL=ON -DSTATIC_STANDARD_LIB=ON -DBUILD_HELICS_EXAMPLES=OFF -DBUILD_TESTING=OFF .. || true
+        cmake --build . --config Release
+        cpack_dir="$(which cmake)"
+        cpack_dir="${cpack_dir%/cmake}"
+        "${cpack_dir}/cpack" -G "${CPACK_GEN}" -C Release -B "$(pwd)/../artifact"
+        cd ../artifact
+        rm -rf _CPack_Packages
+        
+    - name: Upload installer to release
+      if: github.event.action == 'published'
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        UPLOAD_URL: ${{ github.event.release.upload_url }}
+      shell: bash
+      run: ./.github/workflows/upload-release-asset.sh "$(ls artifact/Helics-*)"
+      
+    # GitHub Actions combines artifacts uploaded with the same name
+    - name: Upload artifact
+      if: github.event.action == 'published'
+      uses: actions/upload-artifact@v1
+      with:
+        name: windows-installers
+        path: artifact
+        
+################################
+# Build Windows shared library
+################################
+  build-windows-installer:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [windows-2019]
+        arch: [x64]
+        include:
+          - os: windows-2019
+            cmake_gen: 'Visual Studio 16 2019'
+            msvc_ver: 'msvc2019'
+    steps:
+    - uses: actions/checkout@v1
+      if: github.event.action == 'published'
+      
+    # Build with Python 3.6 interface
+    - uses: actions/setup-python@v1
+      if: github.event.action == 'published'
+      with:
+        python-version: '3.6'
+        architecture: ${{ matrix.arch }}
+        
+    # Compile HELICS and create the installer
+    - name: Build installer
+      if: github.event.action == 'published'
+      env:
+        BUILD_ARCH: ${{ matrix.arch }}
+        BUILD_GEN: ${{ matrix.cmake_gen }}
+        MSVC_VER: ${{ matrix.msvc_ver }}
+      shell: bash
+      # This uses bash variable substitution in a few places
+      # 1. replacing x86 with Win32 (setting the Python version uses x86)
+      # 2. getting the cmake directory for running cpack with an absolute path (chocolatey has an unfortunately named alias)
+      run: |
+        echo "Building shared library with ${BUILD_GEN} for ${BUILD_ARCH}"
+        choco install -y swig
+        mkdir build && cd build
+        cmake -G "TGZ" -A "${BUILD_ARCH/x86/Win32}" -DCMAKE_BUILD_TYPE=Release -DENABLE_PACKAGE_BUILD=ON -DDISABLE_STATIC_LIB_INSTALL=ON -DSTATIC_STANDARD_LIB=ON -DBUILD_APP_EXECUTABLES=OFF -DBUILD_HELICS_EXAMPLES=OFF -DBUILD_TESTING=OFF .. || true
         cmake --build . --config Release
         cpack_dir="$(which cmake)"
         cpack_dir="${cpack_dir%/cmake}"
