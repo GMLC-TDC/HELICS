@@ -220,11 +220,11 @@ jobs:
         echo "Building shared library with ${BUILD_GEN} for ${BUILD_ARCH}"
         choco install -y swig
         mkdir build && cd build
-        cmake -G "TGZ" -A "${BUILD_ARCH/x86/Win32}" -DCMAKE_BUILD_TYPE=Release -DENABLE_PACKAGE_BUILD=ON -DDISABLE_STATIC_LIB_INSTALL=ON -DSTATIC_STANDARD_LIB=ON -DBUILD_APP_EXECUTABLES=OFF -DBUILD_HELICS_EXAMPLES=OFF -DBUILD_TESTING=OFF .. || true
+        cmake -G "${BUILD_GEN}" -A "${BUILD_ARCH/x86/Win32}" -DCMAKE_BUILD_TYPE=Release -DENABLE_PACKAGE_BUILD=ON -DDISABLE_STATIC_LIB_INSTALL=ON -DSTATIC_STANDARD_LIB=ON -DBUILD_APP_EXECUTABLES=OFF -DBUILD_HELICS_EXAMPLES=OFF -DBUILD_TESTING=OFF .. || true
         cmake --build . --config Release
         cpack_dir="$(which cmake)"
         cpack_dir="${cpack_dir%/cmake}"
-        "${cpack_dir}/cpack" -G "${CPACK_GEN}" -C Release -B "$(pwd)/../artifact"
+        "${cpack_dir}/cpack" -G "TGZ" -C Release -B "$(pwd)/../artifact"
         cd ../artifact
         rm -rf _CPack_Packages
         
