@@ -77,6 +77,3 @@ fi
 echo "> gzipping final tar"
 gzip --force --verbose "${OUTPUT_BASENAME}.tar"
 
-echo "> moving output file to $OUTPUT_FILE"
-mv "${OUTPUT_BASENAME}.tar.gz" "$OUTPUT_FILE"
-
