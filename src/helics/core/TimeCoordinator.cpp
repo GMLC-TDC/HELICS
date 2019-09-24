@@ -310,7 +310,7 @@ Time TimeCoordinator::generateAllowedTime (Time testTime) const
         }
         if (testTime - time_grantBase > info.period)
         {
-            auto blk = static_cast<int> (std::ceil ((testTime - time_grantBase) / info.period));
+            auto blk = std::ceil ((testTime - time_grantBase) / info.period);
             testTime = time_grantBase + blk * info.period;
         }
         else
