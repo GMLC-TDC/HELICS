@@ -227,6 +227,8 @@ jobs:
         "${cpack_dir}/cpack" -G "TGZ" -C Release -B "$(pwd)/../artifact"
         cd ../artifact
         rm -rf _CPack_Packages
+        ARCHIVE_FILE="$(ls Helics-*)"
+        mv "$ARCHIVE_FILE" "${ARCHIVE_FILE/Helics-/Helics-shared-}"
         
     - name: Upload installer to release
       if: github.event.action == 'published'
