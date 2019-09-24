@@ -283,12 +283,18 @@ void TestComms::queue_tx_function ()
     setTxStatus (connection_status::terminated);
 }
 
-void TestComms::closeReceiver ()
+void TestComms::haltComms ()
 {
-    if (getTxStatus () == connection_status::connected)
+    if (getRxStatus () == connection_status::connected)
     {
         ActionMessage cmd (CMD_PROTOCOL);
         cmd.messageID = CLOSE_RECEIVER;
+        transmit (control_route, cmd);
+    }
+    if (getTxStatus () == connection_status::connected)
+    {
+        ActionMessage cmd (CMD_PROTOCOL);
+        cmd.messageID = DISCONNECT;
         transmit (control_route, cmd);
     }
 }

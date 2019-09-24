@@ -1971,17 +1971,15 @@ std::string CommonCore::coreQuery (const std::string &queryStr) const
     }
     if (queryStr == "publications")
     {
-        return generateStringVector_if (loopHandles, [](const auto &handle) { return handle.key; },
-                                        [](const auto &handle) {
-                                            return (handle.handleType == handle_type::publication);
-                                        });
+        return generateStringVector_if (
+          loopHandles, [](const auto &handle) { return handle.key; },
+          [](const auto &handle) { return (handle.handleType == handle_type::publication); });
     }
     if (queryStr == "endpoints")
     {
-        return generateStringVector_if (loopHandles, [](const auto &handle) { return handle.key; },
-                                        [](const auto &handle) {
-                                            return (handle.handleType == handle_type::endpoint);
-                                        });
+        return generateStringVector_if (
+          loopHandles, [](const auto &handle) { return handle.key; },
+          [](const auto &handle) { return (handle.handleType == handle_type::endpoint); });
     }
     if (queryStr == "dependson")
     {
@@ -2472,10 +2470,14 @@ void CommonCore::processCommand (ActionMessage &&command)
     case CMD_IGNORE:
         break;
     case CMD_TICK:
-        timeoutMon->tick (this);
-        LOG_WARNING (global_broker_id_local, getIdentifier (), " core tick");
+        if (brokerState == broker_state_t::operating)
+        {
+            timeoutMon->tick (this);
+            LOG_SUMMARY (global_broker_id_local, getIdentifier (), " core tick");
+        }
         break;
     case CMD_PING:
+    case CMD_BROKER_PING:  // broker ping for core is the same as core
         if (command.dest_id == global_broker_id_local)
         {
             ActionMessage pngrep (CMD_PING_REPLY);
@@ -2759,9 +2761,10 @@ void CommonCore::processCommand (ActionMessage &&command)
     case CMD_ERROR:
         if (command.dest_id == global_broker_id_local)
         {
-            if (command.source_id == higher_broker_id)
+            if (command.source_id == higher_broker_id || command.source_id == parent_broker_id)
             {
                 sendErrorToFederates (command.messageID);
+                brokerState = broker_state_t::errored;
             }
             else
             {

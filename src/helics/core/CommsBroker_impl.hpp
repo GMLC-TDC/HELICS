@@ -44,7 +44,7 @@ template <class COMMS, class BrokerT>
 void CommsBroker<COMMS, BrokerT>::loadComms ()
 {
     comms = std::make_unique<COMMS> ();
-    comms->setCallback ([this](ActionMessage &&M) { BrokerBase::addActionMessage (std::move (M)); });
+    comms->setCallback ([this] (ActionMessage &&M) { BrokerBase::addActionMessage (std::move (M)); });
 }
 
 template <class COMMS, class BrokerT>
@@ -113,6 +113,12 @@ template <class COMMS, class BrokerT>
 void CommsBroker<COMMS, BrokerT>::removeRoute (route_id rid)
 {
     comms->removeRoute (rid);
+}
+
+template <class COMMS, class BrokerT>
+COMMS *CommsBroker<COMMS, BrokerT>::getCommsObjectPointer ()
+{
+    return comms.get ();
 }
 
 }  // namespace helics

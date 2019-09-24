@@ -138,7 +138,8 @@ std::shared_ptr<helicsCLI11App> BrokerBase::generateBaseCLI ()
       "heartbeat time in ms, if there is no broker communication for 2 ticks then "
       "secondary actions are taken  (can also be entered as a time like '10s' or '45ms')");
     timeout_group->add_option ("--timeout", timeout,
-                               "time to wait to establish a network default unit is in ms (can also be entered as "
+                               "time to wait to establish a network or for a connection to communicate, default "
+                               "unit is in ms (can also be entered as "
                                "a time like '10s' or '45ms') ");
     timeout_group->add_option (
       "--networktimeout", networkTimeout,
@@ -272,7 +273,8 @@ void BrokerBase::setLoggingFile (const std::string &lfile)
     }
 }
 
-void BrokerBase::setLoggerFunction (std::function<void(int, const std::string &, const std::string &)> logFunction)
+void BrokerBase::setLoggerFunction (
+  std::function<void (int, const std::string &, const std::string &)> logFunction)
 {
     loggerFunction = std::move (logFunction);
     if (loggerFunction)
@@ -458,7 +460,7 @@ void BrokerBase::queueProcessingLoop ()
                 contextLoop = nullptr;
                 contextLoop = serv->startContextLoop ();
             }
-            if (messagesSinceLastTick == 0)
+            if (messagesSinceLastTick == 0 || forwardTick)
             {
 #ifndef DISABLE_TICK
 
@@ -470,6 +472,15 @@ void BrokerBase::queueProcessingLoop ()
             ticktimer.expires_at (std::chrono::steady_clock::now () + tickTimer.to_ns ());
             active = std::make_pair (true, true);
             ticktimer.async_wait (timerCallback);
+            break;
+        case CMD_PING:
+            // ping is processed normally but doesn't count as an actual message for timeout purposes unless it
+            // comes from the parent
+            if (command.source_id != parent_broker_id)
+            {
+                ++messagesSinceLastTick;
+            }
+            processCommand (std::move (command));
             break;
         case CMD_IGNORE:
         default:
@@ -526,6 +537,7 @@ action_message_def::action_t BrokerBase::commandProcessor (ActionMessage &comman
     case CMD_TERMINATE_IMMEDIATELY:
     case CMD_STOP:
     case CMD_TICK:
+    case CMD_PING:
         return command.action ();
     case CMD_MULTI_MESSAGE:
         for (int ii = 0; ii < command.counter; ++ii)

@@ -31,11 +31,12 @@ Minor release with bug fixes and a few additional features
 -   function to set the log file from the core C++ API
 -   A CMAKE option to disable BOOST entirely `DISABLE_BOOST`
 -   A CMAKE option `HELICS_BINARY_ONLY_INSTALL` which will restrict the install to executables and shared libraries with no headers or static libraries. 
--   Some CMAKE capabilities to better generate the interface files. 
--   automatic release file generation for visual studio builds, windows installers, full source code tar files, and shared library package.    
+-   Some CMAKE capabilities to better generate the interface files.  
+-   Timeouts on the broker for broker connections,  more work is likely needed in the future but for now if a path times out, if things were already disconnecting it assumes it is the equivalent of a disconnect, and if not the federation errors and terminates.
+-   Automatic release file generation for visual studio builds, windows installers, full source code tar files, and a shared library package.    
 
 ### Removed
--  The included build files for the Octave interface have been removed.  It is now required to use swig to build these files.  The interface file was only valid for Octave 4.2 and had potential to break in later versions.  Given the 3 versions of octave in common use it was deemed prudent to just remove the included file and require swig to generate the correct interface.  
+-  The included build files for the Octave interface have been removed.  It is now required to use swig to build these files.  The interface file was only valid for Octave 4.2 and had potential to break in later versions.  Given the 3 versions of octave in common use it was deemed prudent to just remove the included file and require swig to generate the correct interface, this may be added back in the next release if more testing shows this to not be an issue.    
  
 
 ## \[2.2.0\] - 2019-08-26

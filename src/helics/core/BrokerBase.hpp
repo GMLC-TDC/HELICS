@@ -81,13 +81,15 @@ class BrokerBase
     std::atomic<broker_state_t> brokerState{created};  //!< flag indicating that the structure is past the
                                                        //!< initialization stage indicating that no more changes
                                                        //!< can be made to the number of federates or handles
-    bool noAutomaticID = false; //!< the broker should not automatically generate an ID
-    bool hasTimeDependency = false;  //!< set to true if the broker has Time dependencies
-    bool enteredExecutionMode = false;  //!< flag indicating that the broker has entered execution mode
-    bool waitingForBrokerPingReply = false;  //!< flag indicating we are waiting for a ping reply
-    bool hasFilters = false;  //!< flag indicating filters come through the broker
-    std::string lastErrorString;  //!< storage for last error string
+    bool noAutomaticID{false};  //!< the broker should not automatically generate an ID
+    bool hasTimeDependency{false};  //!< set to true if the broker has Time dependencies
+    bool enteredExecutionMode{false};  //!< flag indicating that the broker has entered execution mode
+    bool waitingForBrokerPingReply{false};  //!< flag indicating we are waiting for a ping reply
+    bool hasFilters{false};  //!< flag indicating filters come through the broker
+    bool forwardTick{false};  //!< indicator that ticks should be forwarded to the command processor regardless
+
     std::atomic<int> errorCode{0};  //!< storage for last error code
+    std::string lastErrorString;  //!< storage for last error string
 
   public:
     explicit BrokerBase (bool DisableQueue = false) noexcept;
@@ -123,7 +125,6 @@ class BrokerBase
     @param fileLevel the logging level for the log file
     */
     void setLogLevels (int32_t consoleLevel, int32_t fileLevel);
-
 
   private:
     /** start main broker loop*/
@@ -168,7 +169,7 @@ class BrokerBase
     /** set the broker error state and error string*/
     void setErrorState (int eCode, const std::string &estring);
     /** set the logging file if using the default logger*/
-	void setLoggingFile (const std::string &lfile);
+    void setLoggingFile (const std::string &lfile);
 
   public:
     /** close all the threads*/

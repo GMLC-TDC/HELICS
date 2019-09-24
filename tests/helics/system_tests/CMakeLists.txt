@@ -18,6 +18,7 @@ set(
   flagTests.cpp
   updateTests.cpp
   networkTests.cpp
+  brokerTimeoutTests.cpp
   ../application_api/testFixtures.cpp
   ../application_api/testFixtures.hpp
 )
