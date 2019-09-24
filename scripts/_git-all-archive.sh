@@ -49,7 +49,7 @@ export ROOT_ARCHIVE_DIR="$(pwd)"
 
 git checkout $tag
 git submodule update --init
-OUTPUT_BASENAME="HELICS-${release}-source"
+OUTPUT_BASENAME="Helics-${release}-source"
 export OUTPUT_FILE="${OUTPUT_BASENAME}.tar.gz"
 # create root archive
 git archive --verbose --format "tar" --output "${ROOT_ARCHIVE_DIR}/${OUTPUT_BASENAME}.tar" "$(git rev-parse --abbrev-ref HEAD)"
