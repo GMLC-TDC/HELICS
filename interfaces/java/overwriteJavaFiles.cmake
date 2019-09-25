@@ -1,3 +1,4 @@
+
 configure_file(helicsJava.c ${TARGET_DIR}/helicsJava.c COPYONLY)
 
  FILE(GLOB JAVA_FILES *.java)
