@@ -14,10 +14,12 @@ RUN cd swig && make -j4 && make install
 
 
 # Create an intermediate image for creating the build directories
-FROM fedora:31 as Hbuilder
+FROM fedora:31 as Hbase
 
 # Install the tools for building
-RUN dnf install g++ git cmake make swig -y
+RUN dnf install g++ git cmake make swig -y  && dnf clean
+
+FROM Hbase as Hbuilder
 
 # Copy the HELICS install from the builder image stage above to a location in the PATH env var
 COPY --from=builder /root/swig-matlab /root/swig-matlab
@@ -32,14 +34,12 @@ RUN cd HELICS/build_matlab && cmake -DBUILD_MATLAB_INTERFACE=ON -DSWIG_GENERATE_
 
 RUN cd HELICS/build_interface && cmake -DBUILD_PYTHON_INTERFACE=ON -DBUILD_JAVA_INTERFACE=ON -DSWIG_GENERATE_INTERFACE_FILES_ONLY=ON -DHELICS_OVERWRITE_INTERFACE_FILES=ON -DBUILD_HELICS_EXAMPLES=OFF -DENABLE_ZMQ_CORE=OFF -DBUILD_HELICS_TESTS=OFF -DBUILD_APP_EXECUTABLES=OFF -DDISABLE_BOOST=ON -DENABLE_SWIG=ON ..
 
-# Create a final image with the HELICS folders as setup
-FROM fedora:31
+# copy a script that executes the build
+COPY interface_gen_script.sh /root/HELICS/interface_gen_script.sh
 
-# Install the tools for building
-RUN dnf install g++ git cmake make swig -y
+# Create a final image with the HELICS folders as setup
+FROM Hbase
 
 # Copy the HELICS install from the builder image stage above to a location in the PATH env var
 COPY --from=builder /root/swig-matlab /root/swig-matlab
 COPY --from=Hbuilder /root/HELICS /root/HELICS
-
-WORKDIR /root/HELICS
