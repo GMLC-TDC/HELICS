@@ -4,8 +4,8 @@ tests=(
     /root/project/build/tests/helics/common/common-tests
     "/root/project/build/tests/helics/system_tests/system-tests --gtest_filter=-*realtime*"
 	/root/project/build/tests/helics/apps/helics_apps-tests
-	/root/project/build/tests/helics/shared_library/shared-library-ci-tests-cpp
-	/root/project/build/tests/helics/shared_library/shared-library-ci-tests
+	/root/project/build/tests/helics/shared_library/shared-library-tests-cpp
+	/root/project/build/tests/helics/shared_library/shared-library-tests
 )
 
 SUMRESULT=0
