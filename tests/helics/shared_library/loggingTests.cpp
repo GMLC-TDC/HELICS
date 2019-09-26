@@ -52,6 +52,8 @@ TEST (logging_tests, check_log_message)
         }
     }
     EXPECT_TRUE (found);
+    helicsFederateFree (fed);
+    helicsFederateInfoFree (fi);
 }
 
 TEST (logging_tests, check_log_message_levels)
@@ -97,6 +99,8 @@ TEST (logging_tests, check_log_message_levels)
         }
     }
     EXPECT_TRUE (found_low && !found_high);
+    helicsFederateFree (fed);
+    helicsFederateInfoFree (fi);
 }
 
 TEST (logging_tests, check_log_message_levels_high)
@@ -142,4 +146,6 @@ TEST (logging_tests, check_log_message_levels_high)
         }
     }
     EXPECT_TRUE (found_low && found_high);
+    helicsFederateFree (fed);
+    helicsFederateInfoFree (fi);
 }
