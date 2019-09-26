@@ -5,7 +5,7 @@ tests=(
     "/root/project/build/tests/helics/system_tests/system-tests --gtest_filter=-*realtime*"
 	/root/project/build/tests/helics/apps/helics_apps-tests
 	/root/project/build/tests/helics/shared_library/shared-library-tests-cpp
-	/root/project/build/tests/helics/shared_library/shared-library-tests
+	"/root/project/build/tests/helics/shared_library/shared-library-tests --gtest_filter=-*bad_input*"
 )
 
 SUMRESULT=0
