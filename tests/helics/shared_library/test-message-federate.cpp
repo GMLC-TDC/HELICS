@@ -56,22 +56,22 @@ TEST_P (mfed_simple_type_tests, endpoint_registration)
     EXPECT_TRUE (mFed1State == helics_state_execution);
 
     const char *name = helicsEndpointGetName (epid);
-    EXPECT_EQ (name, "fed0/ep1");
+    EXPECT_STREQ (name, "fed0/ep1");
     name = helicsEndpointGetName (epid2);
-    EXPECT_EQ (name, "ep2");
+    EXPECT_STREQ (name, "ep2");
 
     const char *type = helicsEndpointGetType (epid);
     const char *type2 = helicsEndpointGetType (epid2);
-    EXPECT_EQ (type, "");
-    EXPECT_EQ (type2, "random");
+    EXPECT_STREQ (type, "");
+    EXPECT_STREQ (type2, "random");
 
     auto epid_b = helicsFederateGetEndpoint (mFed1, "ep2", &err);
     type = helicsEndpointGetType (epid_b);
-    EXPECT_EQ (type, "random");
+    EXPECT_STREQ (type, "random");
 
     auto epid_c = helicsFederateGetEndpointByIndex (mFed1, 0, &err);
     name = helicsEndpointGetName (epid_c);
-    EXPECT_EQ (name, "fed0/ep1");
+    EXPECT_STREQ (name, "fed0/ep1");
 
     CE (helicsFederateFinalize (mFed1, &err));
 
@@ -321,7 +321,7 @@ TEST_P (mfed_type_tests, send_receive_2fed_multisend)
     res = helicsFederatePendingMessages (mFed2);
     EXPECT_EQ (res, 3);
 
-    EXPECT_EQ (helicsEndpointGetDefaultDestination (epid), "ep2");
+    EXPECT_STREQ (helicsEndpointGetDefaultDestination (epid), "ep2");
 
     CE (helicsFederateFinalizeAsync (mFed1, &err));
     CE (helicsFederateFinalize (mFed2, &err));

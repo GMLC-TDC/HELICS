@@ -75,7 +75,7 @@ target_compile_definitions(
 
 add_test(
   NAME shared-library-tests
-  COMMAND shared-library-tests --log_level=message --report_level=short
+  COMMAND shared-library-tests
 )
 
 target_compile_definitions(
@@ -92,7 +92,7 @@ target_compile_definitions(
 
 add_test(
   NAME shared-library-tests-cpp
-  COMMAND shared-library-tests-cpp --log_level=message --report_level=short
+  COMMAND shared-library-tests-cpp
 )
 
 set_property(TEST shared-library-tests PROPERTY LABELS SharedLibrary Coverage Daily)
@@ -104,17 +104,11 @@ add_test(
   NAME shared-library-ci-tests
   COMMAND
     shared-library-tests
-    --run_test=@ci
-    --log_level=test_suite
-    --report_level=short
 )
 add_test(
   NAME shared-library-ci-tests-cpp
   COMMAND
     shared-library-tests-cpp
-    --run_test=@ci
-    --log_level=test_suite
-    --report_level=short
 )
 
 set_property(TEST shared-library-ci-tests PROPERTY LABELS Continuous)

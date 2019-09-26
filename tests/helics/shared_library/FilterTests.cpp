@@ -52,11 +52,11 @@ TEST_P (filter_type_tests, registration)
     auto f1_b = helicsFederateGetFilter (fFed, "filter1", &err);
     const char *tmp;
     tmp = helicsFilterGetName (f1_b);
-    EXPECT_EQ (tmp, "filter0/filter1");
+    EXPECT_STREQ (tmp, "filter0/filter1");
 
     auto f1_c = helicsFederateGetFilterByIndex (fFed, 2, &err);
     tmp = helicsFilterGetName (f1_c);
-    EXPECT_EQ (tmp, "filter0/c4");
+    EXPECT_STREQ (tmp, "filter0/c4");
     CE (helicsFederateEnterExecutingModeAsync (fFed, &err));
     CE (helicsFederateEnterExecutingMode (mFed, &err));
     CE (helicsFederateEnterExecutingModeComplete (fFed, &err));
@@ -101,14 +101,14 @@ TEST_P (filter_type_tests, info_tests)
     CE (helicsFilterSetInfo (f3, "f3_test", &err));
 
     // Check endpoints
-    EXPECT_EQ (helicsEndpointGetInfo (p1), "p1_test");
-    EXPECT_EQ (helicsEndpointGetInfo (p2), "p2_test");
-    EXPECT_EQ (helicsEndpointGetInfo (ep1), "ep1_test");
+    EXPECT_STREQ (helicsEndpointGetInfo (p1), "p1_test");
+    EXPECT_STREQ (helicsEndpointGetInfo (p2), "p2_test");
+    EXPECT_STREQ (helicsEndpointGetInfo (ep1), "ep1_test");
 
     // Check filters
-    EXPECT_EQ (helicsFilterGetInfo (f1), "f1_test");
-    EXPECT_EQ (helicsFilterGetInfo (f2), "f2_test");
-    EXPECT_EQ (helicsFilterGetInfo (f3), "f3_test");
+    EXPECT_STREQ (helicsFilterGetInfo (f1), "f1_test");
+    EXPECT_STREQ (helicsFilterGetInfo (f2), "f2_test");
+    EXPECT_STREQ (helicsFilterGetInfo (f3), "f3_test");
 
     CE (helicsFederateEnterExecutingModeAsync (fFed, &err));
     CE (helicsFederateEnterExecutingMode (mFed, &err));
@@ -197,9 +197,9 @@ TEST_P (filter_type_tests, message_filter_function)
     ASSERT_TRUE (helicsEndpointHasMessage (p2));
 
     auto m2 = helicsEndpointGetMessage (p2);
-    EXPECT_EQ (m2.source, "port1");
-    EXPECT_EQ (m2.original_source, "port1");
-    EXPECT_EQ (m2.dest, "port2");
+    EXPECT_STREQ (m2.source, "port1");
+    EXPECT_STREQ (m2.original_source, "port1");
+    EXPECT_STREQ (m2.dest, "port2");
     EXPECT_EQ (m2.length, static_cast<int64_t> (data.size ()));
     EXPECT_EQ (m2.time, 2.5);
 
@@ -259,9 +259,9 @@ TEST_P (filter_simple_type_tests, function_mObj)
     ASSERT_TRUE (helicsEndpointHasMessage (p2));
 
     auto m2 = helicsEndpointGetMessageObject (p2);
-    EXPECT_EQ (helicsMessageGetSource (m2), "port1");
-    EXPECT_EQ (helicsMessageGetOriginalSource (m2), "port1");
-    EXPECT_EQ (helicsMessageGetDestination (m2), "port2");
+    EXPECT_STREQ (helicsMessageGetSource (m2), "port1");
+    EXPECT_STREQ (helicsMessageGetOriginalSource (m2), "port1");
+    EXPECT_STREQ (helicsMessageGetDestination (m2), "port2");
     EXPECT_EQ (helicsMessageGetRawDataSize (m2), static_cast<int64_t> (data.size ()));
     EXPECT_EQ (helicsMessageGetTime (m2), 2.5);
 
@@ -339,9 +339,9 @@ TEST_P (filter_type_tests, function_two_stage)
     ASSERT_TRUE (helicsEndpointHasMessage (p2));
 
     auto m2 = helicsEndpointGetMessage (p2);
-    EXPECT_EQ (m2.source, "port1");
-    EXPECT_EQ (m2.original_source, "port1");
-    EXPECT_EQ (m2.dest, "port2");
+    EXPECT_STREQ (m2.source, "port1");
+    EXPECT_STREQ (m2.original_source, "port1");
+    EXPECT_STREQ (m2.dest, "port2");
     EXPECT_EQ (m2.length, static_cast<int64_t> (data.size ()));
     EXPECT_EQ (m2.time, 2.5);
 
@@ -411,9 +411,9 @@ TEST_P (filter_type_tests, function2)
     ASSERT_TRUE (helicsEndpointHasMessage (p2));
 
     auto m2 = helicsEndpointGetMessage (p2);
-    EXPECT_EQ (m2.source, "port1");
-    EXPECT_EQ (m2.original_source, "port1");
-    EXPECT_EQ (m2.dest, "port2");
+    EXPECT_STREQ (m2.source, "port1");
+    EXPECT_STREQ (m2.original_source, "port1");
+    EXPECT_STREQ (m2.dest, "port2");
     EXPECT_EQ (m2.length, static_cast<int64_t> (data.size ()));
     EXPECT_EQ (m2.time, 2.5);
 

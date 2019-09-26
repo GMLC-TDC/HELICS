@@ -105,14 +105,14 @@ TEST_P (vfed2_simple_type_tests, async_calls)
     CE (helicsInputGetString (subid, s, STRINGLEN, nullptr, &err));
 
     // make sure the string is what we expect
-    EXPECT_EQ (s, "string1");
+    EXPECT_STREQ (s, "string1");
 
     // publish a second string
     CE (helicsPublicationPublishString (pubid, "string2", &err));
 
     // make sure the value is still what we expect
     CE (helicsInputGetString (subid, s, STRINGLEN, nullptr, &err));
-    EXPECT_EQ (s, "string1");
+    EXPECT_STREQ (s, "string1");
 
     // advance time
     CE (helicsFederateRequestTimeAsync (vFed1, 2.0, &err));
@@ -125,7 +125,7 @@ TEST_P (vfed2_simple_type_tests, async_calls)
 
     // make sure the value was updated
     CE (helicsInputGetString (subid, s, STRINGLEN, nullptr, &err));
-    EXPECT_EQ (s, "string2");
+    EXPECT_STREQ (s, "string2");
 
     CE (helicsFederateFinalize (vFed1, &err));
     CE (helicsFederateFinalize (vFed2, &err));
