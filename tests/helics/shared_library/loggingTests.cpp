@@ -7,7 +7,7 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include "gmlc/libguarded/guarded.hpp"
 #include <complex>
-#include <boost/test/unit_test.hpp>
+#include <gtest/gtest.h>
 
 /** these test cases test out the value converters
  */
@@ -15,12 +15,8 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include "helics/shared_api_library/helicsCallbacks.h"
 
-namespace utf = boost::unit_test;
-
-BOOST_AUTO_TEST_SUITE (logging_tests, *utf::label ("ci"))
-
 using logblocktype = gmlc::libguarded::guarded<std::vector<std::pair<int, std::string>>>;
-BOOST_AUTO_TEST_CASE (check_log_message)
+TEST (logging_tests, check_log_message)
 {
     auto fi = helicsCreateFederateInfo ();
     auto err = helicsErrorInitialize ();
@@ -39,13 +35,13 @@ BOOST_AUTO_TEST_CASE (check_log_message)
 
     helicsFederateSetLoggingCallback (fed, logg, &mlog, &err);
 
-    BOOST_CHECK_EQUAL (err.error_code, 0);
+    EXPECT_EQ (err.error_code, 0);
 
     helicsFederateEnterExecutingMode (fed, &err);
     helicsFederateLogInfoMessage (fed, "test MEXAGE", &err);
     helicsFederateRequestNextStep (fed, &err);
     helicsFederateFinalize (fed, &err);
-    BOOST_CHECK_EQUAL (err.error_code, 0);
+    EXPECT_EQ (err.error_code, 0);
     auto llock = mlog.lock ();
     bool found = false;
     for (auto &m : llock)
@@ -55,10 +51,10 @@ BOOST_AUTO_TEST_CASE (check_log_message)
             found = true;
         }
     }
-    BOOST_CHECK (found);
+    EXPECT_TRUE (found);
 }
 
-BOOST_AUTO_TEST_CASE (check_log_message_levels)
+TEST (logging_tests, check_log_message_levels)
 {
     auto fi = helicsCreateFederateInfo ();
     auto err = helicsErrorInitialize ();
@@ -77,14 +73,14 @@ BOOST_AUTO_TEST_CASE (check_log_message_levels)
 
     helicsFederateSetLoggingCallback (fed, logg, &mlog, &err);
 
-    BOOST_CHECK_EQUAL (err.error_code, 0);
+    EXPECT_EQ (err.error_code, 0);
 
     helicsFederateEnterExecutingMode (fed, &err);
     helicsFederateLogLevelMessage (fed, 3, "test MEXAGE1", &err);
     helicsFederateLogLevelMessage (fed, 8, "test MEXAGE2", &err);
     helicsFederateRequestNextStep (fed, &err);
     helicsFederateFinalize (fed, &err);
-    BOOST_CHECK_EQUAL (err.error_code, 0);
+    EXPECT_EQ (err.error_code, 0);
 
     auto llock = mlog.lock ();
     bool found_low = false;
@@ -100,10 +96,10 @@ BOOST_AUTO_TEST_CASE (check_log_message_levels)
             found_high = true;
         }
     }
-    BOOST_CHECK (found_low && !found_high);
+    EXPECT_TRUE (found_low && !found_high);
 }
 
-BOOST_AUTO_TEST_CASE (check_log_message_levels_high)
+TEST (logging_tests, check_log_message_levels_high)
 {
     auto fi = helicsCreateFederateInfo ();
     auto err = helicsErrorInitialize ();
@@ -122,14 +118,14 @@ BOOST_AUTO_TEST_CASE (check_log_message_levels_high)
 
     helicsFederateSetLoggingCallback (fed, logg, &mlog, &err);
 
-    BOOST_CHECK_EQUAL (err.error_code, 0);
+    EXPECT_EQ (err.error_code, 0);
 
     helicsFederateEnterExecutingMode (fed, &err);
     helicsFederateLogLevelMessage (fed, 3, "test MEXAGE1", &err);
     helicsFederateLogLevelMessage (fed, 8, "test MEXAGE2", &err);
     helicsFederateRequestNextStep (fed, &err);
     helicsFederateFinalize (fed, &err);
-    BOOST_CHECK_EQUAL (err.error_code, 0);
+    EXPECT_EQ (err.error_code, 0);
 
     auto llock = mlog.lock ();
     bool found_low = false;
@@ -145,7 +141,5 @@ BOOST_AUTO_TEST_CASE (check_log_message_levels_high)
             found_high = true;
         }
     }
-    BOOST_CHECK (found_low && found_high);
+    EXPECT_TRUE (found_low && found_high);
 }
-
-BOOST_AUTO_TEST_SUITE_END ()

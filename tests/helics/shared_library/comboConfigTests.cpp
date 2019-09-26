@@ -7,44 +7,40 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include "ctestFixtures.hpp"
 
-#include <boost/test/unit_test.hpp>
-#include <boost/test/data/test_case.hpp>
+#include <gtest/gtest.h>
 
-namespace bdata = boost::unit_test::data;
-namespace utf = boost::unit_test;
-
-BOOST_FIXTURE_TEST_SUITE (config_tests, FederateTestFixture, *utf::label ("ci"))
+struct config_tests : public FederateTestFixture, public ::testing::Test
+{
+};
 
 /** test simple creation and destruction*/
-BOOST_AUTO_TEST_CASE (control_file_test)
+TEST_F (config_tests, control_file_test)
 {
     helics_broker broker = AddBroker ("zmq", 1);
-    BOOST_CHECK (nullptr != broker);
+    EXPECT_TRUE (nullptr != broker);
 
     std::string testFile (TEST_DIR);
     testFile.append ("Control_test.json");
 
     auto cfed = helicsCreateCombinationFederateFromConfig (testFile.c_str (), &err);
 
-    BOOST_CHECK (helicsFederateIsValid (cfed));
+    EXPECT_TRUE (helicsFederateIsValid (cfed));
 
-    BOOST_CHECK_EQUAL (helicsFederateGetEndpointCount (cfed), 6);
-    BOOST_CHECK_EQUAL (helicsFederateGetFilterCount (cfed), 6);
-    BOOST_CHECK_EQUAL (helicsFederateGetInputCount (cfed), 7);
+    EXPECT_EQ (helicsFederateGetEndpointCount (cfed), 6);
+    EXPECT_EQ (helicsFederateGetFilterCount (cfed), 6);
+    EXPECT_EQ (helicsFederateGetInputCount (cfed), 7);
 
     auto ept = helicsFederateGetEndpointByIndex (cfed, 0, &err);
 
-    BOOST_CHECK_EQUAL (helicsEndpointGetName (ept), "EV_Controller/EV6");
+    EXPECT_STREQ (helicsEndpointGetName (ept), "EV_Controller/EV6");
 
     auto filt = helicsFederateGetFilterByIndex (cfed, 3, &err);
 
-    BOOST_CHECK_EQUAL (helicsFilterGetName (filt), "EV_Controller/filterEV3");
+    EXPECT_STREQ (helicsFilterGetName (filt), "EV_Controller/filterEV3");
 
     auto ipt = helicsFederateGetInputByIndex (cfed, 4, &err);
-    BOOST_CHECK_EQUAL (helicsSubscriptionGetKey (ipt), "IEEE_123_feeder_0/charge_EV3");
+    EXPECT_STREQ (helicsSubscriptionGetKey (ipt), "IEEE_123_feeder_0/charge_EV3");
 
     helicsFederateDestroy (cfed);
     helicsBrokerDestroy (broker);
 }
-
-BOOST_AUTO_TEST_SUITE_END ()
