@@ -42,5 +42,4 @@ TEST_F (config_tests, control_file_test)
     EXPECT_STREQ (helicsSubscriptionGetKey (ipt), "IEEE_123_feeder_0/charge_EV3");
 
     helicsFederateDestroy (cfed);
-    helicsBrokerDestroy (broker);
 }
