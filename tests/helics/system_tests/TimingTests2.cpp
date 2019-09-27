@@ -38,7 +38,7 @@ TEST_F (timing_tests2, small_time_test)
     vFed1->enterExecutingModeAsync ();
     vFed2->enterExecutingMode ();
     vFed1->enterExecutingModeComplete ();
-    auto echoRun = [&] () {
+    auto echoRun = [&]() {
         helics::Time grantedTime = helics::timeZero;
         helics::Time stopTime (100, time_units::ns);
         while (grantedTime < stopTime)
@@ -108,7 +108,7 @@ TEST_F (timing_tests2, small_period_test)
 
     int cnt = 0;
     int cmess = 0;
-    auto rxrun = [rx, &erx, &cnt, &cmess] () {
+    auto rxrun = [rx, &erx, &cnt, &cmess]() {
         rx->enterExecutingMode ();
         helics::Time maxtime = 1e9;
         helics::Time ctime = -1;
@@ -131,9 +131,8 @@ TEST_F (timing_tests2, small_period_test)
         }
         rx->finalize ();
     };
-    auto send1run = [send1, &s1] () {
+    auto send1run = [send1, &s1]() {
         send1->enterExecutingMode ();
-        helics::Time maxtime = 1e6;
         helics::Time ctime = helics::timeZero;
         while (ctime <= 10.0)
         {
@@ -146,9 +145,8 @@ TEST_F (timing_tests2, small_period_test)
         send1->finalize ();
     };
 
-    auto send2run = [send2, &s2] () {
+    auto send2run = [send2, &s2]() {
         send2->enterExecutingMode ();
-        helics::Time maxtime = 1e6;
         helics::Time ctime = helics::timeZero;
         while (ctime <= 10.0)
         {

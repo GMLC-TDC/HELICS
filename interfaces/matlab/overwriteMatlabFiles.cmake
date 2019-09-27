@@ -1,4 +1,4 @@
-configure_file(helicsMex.cpp ${TARGET_DIR}/helicsMex.cpp COPYONLY)
+configure_file(helicsMEX.cpp ${TARGET_DIR}/helicsMEX.cpp COPYONLY)
 
  FILE(GLOB MATLAB_FILES *.m)
  message(STATUS ${MATLAB_FILES})

@@ -8,11 +8,13 @@ aliases:
       mkdir -p build
       cd build
       eval cmake .. ${CMAKE_FLAGS}
-      make -j 4 install
+      make -j 4
 
   - &run_octave_tests
     name: run_octave_tests
     command: |
+       cd build
+       make install
        cd ${OCTAVETEST}
        # this return the write error code in RESULT
        octave -W -V --eval "source('runTestsCIRCLECI.m');"
