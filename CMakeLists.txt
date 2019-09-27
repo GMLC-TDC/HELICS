@@ -26,32 +26,37 @@ if(HELICS_VERSION_BUILD)
         "${HELICS_VERSION_UNDERSCORE}-${HELICS_VERSION_BUILD}"
     )
 endif()
+find_package(Git)
+if (GIT_FOUND)
+	execute_process(COMMAND ${GIT_EXECUTABLE} describe --tags --dirty OUTPUT_VARIABLE TAG_DESCRIPTION)
+	message(STATUS ${TAG_DESCRIPTION})
+endif(GIT_FOUND)
 set(HELICS_VERSION_STRING "${HELICS_VERSION} (${HELICS_DATE})")
 
 # -----------------------------------------------------------------------------
 # set the module path and include some common macros
 # -----------------------------------------------------------------------------
 
-
-if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
-	set(HELICS_ROOT_PROJ ON)
-else()
-    set(HELICS_ROOT_PROJ OFF)
-endif()
-
-if (HELICS_ROOT_PROJ)
-set(CMAKE_MODULE_PATH
-     ${CMAKE_MODULE_PATH} "${PROJECT_SOURCE_DIR}/config/cmake/"
-)
+if (CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
+   set_property(GLOBAL PROPERTY USE_FOLDERS ON)
+   set(CMAKE_MODULE_PATH
+       ${CMAKE_MODULE_PATH} "${PROJECT_SOURCE_DIR}/config/cmake/"
+   )
 else()
 	set(ORIGINAL_MODULE_PATH ${CMAKE_MODULE_PATH})
 	set(CMAKE_MODULE_PATH
     "${PROJECT_SOURCE_DIR}/config/cmake/" ${CMAKE_MODULE_PATH}
 )
+get_property(helics-use-folders GLOBAL PROPERTY USE_FOLDERS)
+  set_property(GLOBAL PROPERTY USE_FOLDERS ${helics-use-folders})
 endif()
+
 include(extraMacros)
 include(CMakeDependentOption)
 include(copy_key_files)
+include(CTest)
+include(ucm)
+
 # include(BuildType)
 # -----------------------------------------------------------------------------
 # set the install path to a local directory
@@ -93,39 +98,29 @@ option(DISABLE_BOOST OFF "disable all references to the Boost C++ libraries")
 mark_as_advanced(DISABLE_BOOST)
 
 
-if (HELICS_ROOT_PROJ)
-if (DEFINED BUILD_TESTING)
-option(BUILD_HELICS_TESTS "Enable the test executables to be built" ${BUILD_TESTING})
-else()
-option(BUILD_HELICS_TESTS "Enable the test executables to be built" ON)
-endif()
 
-if (NOT DISABLE_BOOST)
-	if (MINGW AND NOT UNIX_LIKE)
-		option(BUILD_HELICS_BOOST_TESTS "Enable the test executables built using boost unit tests" OFF)
-	else()
-		option(BUILD_HELICS_BOOST_TESTS "Enable the test executables built using boost unit tests" ON)
-	endif()
-	mark_as_advanced(BUILD_HELICS_BOOST_TESTS)
-else()
-	set(BUILD_HELICS_BOOST_TESTS OFF)
-endif()
+cmake_dependent_option(HELICS_BUILD_TESTS
+        	  "Enable the HELICS test executables to be built" OFF
+              "BUILD_TESTING;CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME" OFF)
+      
+cmake_dependent_option(HELICS_BUILD_EXAMPLES
+          "Build HELICS examples" OFF
+         "CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME" OFF)
 
-option(BUILD_HELICS_EXAMPLES "Enable the example executables to be built" ON)
+cmake_dependent_option(BUILD_HELICS_BOOST_TESTS
+          "Enable the test executables built using boost unit tests" ${HELICS_BUILD_TESTS}
+         "NOT DISABLE_BOOST AND NOT (MINGW AND NOT UNIX_LIKE)" OFF)
+		 mark_as_advanced(BUILD_HELICS_BOOST_TESTS)
 
-
-
-else()
-endif()
-
-option(HELICS_WITH_CMAKE_PACKAGE "Generate and install cmake package files" ${HELICS_ROOT_PROJ})
-mark_as_advanced(HELICS_WITH_CMAKE_PACKAGE)
+cmake_dependent_option(HELICS_WITH_CMAKE_PACKAGE
+          "Generate and install cmake package files" ON
+         "CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME" OFF)
 
 option(HELICS_BINARY_ONLY_INSTALL "only install the helics binary executables" OFF)
 mark_as_advanced(HELICS_BINARY_ONLY_INSTALL)
 
-option(DISABLE_STATIC_LIB_INSTALL "Disable installing of static libraries" OFF)
-mark_as_advanced(DISABLE_STATIC_LIB_INSTALL)
+option(HELICS_DISABLE_STATIC_LIB_INSTALL "Disable installing of static libraries" OFF)
+mark_as_advanced(HELICS_DISABLE_STATIC_LIB_INSTALL)
 
 # Install instructions for this target
 if(HELICS_WITH_CMAKE_PACKAGE)
@@ -133,13 +128,6 @@ if(HELICS_WITH_CMAKE_PACKAGE)
 else(HELICS_WITH_CMAKE_PACKAGE)
     set(HELICS_EXPORT_COMMAND)
 endif(HELICS_WITH_CMAKE_PACKAGE)
-
-# enable testing
-if(BUILD_HELICS_TESTS)
-    include(CTest)
-endif()
-
-set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
 option(
     DISABLE_C_SHARED_LIB OFF
@@ -197,7 +185,7 @@ if (NOT TARGET compile_flags_target)
    add_library(compile_flags_target INTERFACE)
 endif()
 
-if (HELICS_ROOT_PROJ)
+if (CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
 	include(compiler_flags)
 	message(STATUS "setting version build options to \"${CXX_STANDARD_FLAG}\"")
 	if(CXX_STANDARD_FLAG)
@@ -213,15 +201,23 @@ if (HELICS_ROOT_PROJ)
 
 endif()
 
- if (HELICS_ROOT_PROJ)
+
 cmake_dependent_option(
     STATIC_STANDARD_LIB
     "Link against a static standard lib"
     OFF
-    "NOT USE_LIBCXX"
+    "NOT USE_LIBCXX AND CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME"
     OFF
 )
-include(ucm)
+
+cmake_dependent_option(
+    HELICS_EMBEDDED_DEBUG_INFO
+    "embed debug info into obj files"
+    OFF
+    "MSVC AND CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME"
+    OFF
+)
+
 mark_as_advanced(STATIC_STANDARD_LIB)
 if(STATIC_STANDARD_LIB)
     ucm_set_runtime(STATIC)
@@ -229,28 +225,27 @@ else()
     ucm_set_runtime(DYNAMIC)
 endif()
 
-if(MSVC)
-    option(EMBEDDED_DEBUG_INFO "embed debug info into obj files" OFF)
+
     mark_as_advanced(EMBEDDED_DEBUG_INFO)
-    if(EMBEDDED_DEBUG_INFO)
+    if(HELICS_EMBEDDED_DEBUG_INFO)
         ucm_set_embedded_debug(EMBEDDED)
     else()
         ucm_set_embedded_debug(EXTERNAL)
     endif()
-endif(MSVC)
-endif (HELICS_ROOT_PROJ)
+
 # -------------------------------------------------------------
 # add coverage target
 # -------------------------------------------------------------
-if(BUILD_HELICS_TESTS)
-    cmake_dependent_option(
+
+cmake_dependent_option(
         TEST_CODE_COVERAGE
         "Build a target for testing code coverage"
         OFF
-        "BUILD_HELICS_TESTS"
+        "HELICS_BUILD_TESTS"
         OFF
     )
-    if(TEST_CODE_COVERAGE)
+
+if(HELICS_BUILD_TESTS AND TEST_CODE_COVERAGE)
         if(CMAKE_BUILD_TYPE STREQUAL "Coverage")
             include(CodeCoverage)
 
@@ -275,7 +270,6 @@ if(BUILD_HELICS_TESTS)
                     "CMAKE_BUILD_TYPE must be set to Coverage for testing code coverage"
             )
         endif()
-    endif(TEST_CODE_COVERAGE)
 endif()
 mark_as_advanced(TEST_CODE_COVERAGE)
 
@@ -361,7 +355,9 @@ option(ENABLE_TCP_CORE "Enable TCP core types" ON)
 option(ENABLE_UDP_CORE "Enable UDP core types" ON)
 cmake_dependent_option(ENABLE_IPC_CORE "Enable Interprocess communication types" ON "NOT DISABLE_BOOST" OFF)
 option(ENABLE_TEST_CORE "Enable test inprocess core type" ON)
-mark_as_advanced(ENABLE_MPI_CORE ENABLE_ZMQ_CORE ENABLE_TCP_CORE ENABLE_UDP_CORE ENABLE_TEST_CORE ENABLE_IPC_CORE)
+option(ENABLE_ZMQ_CORE "Enable ZeroMQ networking library" ON)
+
+mark_as_advanced(ENABLE_MPI_CORE ENABLE_ZMQ_CORE ENABLE_TCP_CORE ENABLE_UDP_CORE ENABLE_TEST_CORE ENABLE_IPC_CORE ENABLE_ZMQ_CORE)
 
 # -------------------------------------------------------------
 # finding MPI
@@ -408,16 +404,12 @@ if(MINGW AND NOT UNIX_LIKE)
     target_link_libraries(helics_base INTERFACE wsock32 ws2_32)
 endif()
 
-if (CYGWIN)
-	target_compile_definitions(helics_base_includes INTERFACE -D_XOPEN_SOURCE=500 -D__USE_W32_SOCKETS -D_WIN32_WINNT=0x0601)
-endif(CYGWIN)
+target_compile_definitions(helics_base_includes INTERFACE $<$<BOOL:${CYGWIN}>:-D_XOPEN_SOURCE=500 -D__USE_W32_SOCKETS -D_WIN32_WINNT=0x0601>)
 
 # -------------------------------------------------------------
 # Enable ZeroMQ
 # -------------------------------------------------------------
 
-option(ENABLE_ZMQ_CORE "Enable ZeroMQ networking library" ON)
-mark_as_advanced(ENABLE_ZMQ_CORE)
 # If ZeroMQ library is enabled try to locate it and link against it
 
 if(ENABLE_ZMQ_CORE)
@@ -621,7 +613,7 @@ HIDE_VARIABLE(GMLC_UTILITIES_USE_BOOST_SPIRIT)
 HIDE_VARIABLE(GMLC_UTILITIES_WITH_CMAKE_PACKAGE)
 
 if (GMLC_UTILITIES_OBJECT_LIB)
-   if (NOT HELICS_ROOT_PROJ)
+   if (NOT CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
 	add_library(HELICS::utilities INTERFACE IMPORTED )
 	set_target_properties(HELICS::utilities PROPERTIES
        INTERFACE_INCLUDE_DIRECTORIES $<BUILD_INTERFACE:ThirdParty/utilities/gmlc>
@@ -678,7 +670,7 @@ add_subdirectory(src)
 # Build the tests
 # -----------------------------------------------------------------------------
 
-if(BUILD_HELICS_TESTS AND BUILD_TESTING AND ENABLE_TEST_CORE)
+if(HELICS_BUILD_TESTS AND BUILD_TESTING AND ENABLE_TEST_CORE)
     mark_as_advanced(BUILD_TESTING)
     add_subdirectory(tests)
 endif()
@@ -715,7 +707,7 @@ endif()
 # -------------------------------------------------------------
 # Enable clang analysis and formatting tools
 # -------------------------------------------------------------
-if (HELICS_ROOT_PROJ)
+if (CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
 option(
     ENABLE_CLANG_TOOLS
     "if clang is found enable some custom targets for clang formatting and tidy"
@@ -739,7 +731,7 @@ endif()
 
 add_subdirectory(docs)
 
-endif(HELICS_ROOT_PROJ)
+endif(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
 
 if (NOT HELICS_BINARY_ONLY_INSTALL)
 install(TARGETS helics_base ${HELICS_EXPORT_COMMAND})
@@ -1086,7 +1078,7 @@ if(ENABLE_PACKAGE_BUILD)
     include(CPack)
 endif(ENABLE_PACKAGE_BUILD)
 
-if (NOT HELICS_ROOT_PROJ)
+if (NOT CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
 	#restore the original module path
 	set(CMAKE_MODULE_PATH ${ORIGINAL_MODULE_PATH})
 endif()
