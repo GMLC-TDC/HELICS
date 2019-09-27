@@ -8,19 +8,12 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helics/chelics.h"
 #include "helics/helics-config.h"
 
-#ifndef BOOST_STATIC
-#define BOOST_TEST_DYN_LINK
-#endif
-
-#define BOOST_TEST_MODULE c_shared_library_tests
-#define BOOST_TEST_DETECT_MEMORY_LEAK 0
-
+#include "gtest/gtest.h"
 #include <iostream>
-#include <boost/test/unit_test.hpp>
-struct globalTestConfig
+
+struct globalTestConfig : public ::testing::Environment
 {
-    globalTestConfig () = default;
-    ~globalTestConfig ()
+    virtual void TearDown () override
     {
         // std::cout << "cleaning up" << std::endl;
         helicsCloseLibrary ();
@@ -28,6 +21,5 @@ struct globalTestConfig
     }
 };
 
-//____________________________________________________________________________//
-
-BOOST_GLOBAL_FIXTURE (globalTestConfig);
+// register the global setup and teardown structure
+::testing::Environment *const foo_env = ::testing::AddGlobalTestEnvironment (new globalTestConfig);

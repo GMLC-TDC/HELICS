@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-3-Clause
 */
 #include "ctestFixtures.hpp"
 #include "helics/shared_api_library/internal/api_objects.h"
-#include <boost/test/unit_test.hpp>
-
+#include <cassert>
 #include <cctype>
 
 static bool hasIndexCode (const std::string &type_name)
@@ -125,7 +124,7 @@ FederateTestFixture::AddBroker (const std::string &core_type_name, const std::st
     {
         broker = StartBrokerImp (core_type_name, initialization_string + " " + extraBrokerArgs);
     }
-    BOOST_CHECK (helicsBrokerIsValid (broker) == helics_true);
+    assert (helicsBrokerIsValid (broker) == helics_true);
     brokers.push_back (broker);
     return broker;
 }
@@ -138,16 +137,16 @@ void FederateTestFixture::SetupTest (FedCreator ctor,
 {
     ctype = core_type_name;
     helics_broker broker = AddBroker (core_type_name, count);
-    BOOST_CHECK (nullptr != broker);
+    assert (helicsBrokerIsValid (broker) == helics_true);
     AddFederates (ctor, core_type_name, count, broker, time_delta, name_prefix);
 }
 
 void FederateTestFixture::AddFederates (FedCreator ctor,
-                                                                std::string core_type_name,
-                                                                int count,
-                                                                helics_broker broker,
-                                                                helics_time time_delta,
-                                                                const std::string &name_prefix)
+                                        std::string core_type_name,
+                                        int count,
+                                        helics_broker broker,
+                                        helics_time time_delta,
+                                        const std::string &name_prefix)
 {
     bool hasIndex = hasIndexCode (core_type_name);
     int setup = (hasIndex) ? getIndexCode (core_type_name) : 1;
@@ -169,8 +168,8 @@ void FederateTestFixture::AddFederates (FedCreator ctor,
     }
 
     helics_federate_info fi = helicsCreateFederateInfo ();
-    CE (helicsFederateInfoSetCoreTypeFromString (fi, core_type_name.c_str (), &err));
-    CE (helicsFederateInfoSetTimeProperty (fi, helics_property_time_delta, time_delta, &err));
+    helicsFederateInfoSetCoreTypeFromString (fi, core_type_name.c_str (), &err);
+    helicsFederateInfoSetTimeProperty (fi, helics_property_time_delta, time_delta, &err);
 
     switch (setup)
     {
@@ -179,15 +178,16 @@ void FederateTestFixture::AddFederates (FedCreator ctor,
     {
         auto init = initString + " --federates " + std::to_string (count);
         auto core = helicsCreateCore (core_type_name.c_str (), NULL, init.c_str (), &err);
-        BOOST_REQUIRE_EQUAL (err.error_code, 0);
-        CE (helicsFederateInfoSetCoreName (fi, helicsCoreGetIdentifier (core), &err));
+
+        helicsFederateInfoSetCoreName (fi, helicsCoreGetIdentifier (core), &err);
+        assert (err.error_code == 0);
         size_t offset = federates.size ();
         federates.resize (count + offset);
         for (int ii = 0; ii < count; ++ii)
         {
             auto name = name_prefix + std::to_string (ii + offset);
             auto fed = ctor (name.c_str (), fi, &err);
-            BOOST_CHECK_EQUAL (err.error_code, 0);
+            assert (err.error_code == 0);
             federates[ii + offset] = fed;
         }
         helicsCoreFree (core);
@@ -201,12 +201,12 @@ void FederateTestFixture::AddFederates (FedCreator ctor,
         {
             auto init = initString + " --federates 1";
             auto core = helicsCreateCore (core_type_name.c_str (), NULL, init.c_str (), &err);
-            BOOST_REQUIRE_EQUAL (err.error_code, 0);
-            CE (helicsFederateInfoSetCoreName (fi, helicsCoreGetIdentifier (core), &err));
 
+            helicsFederateInfoSetCoreName (fi, helicsCoreGetIdentifier (core), &err);
+            assert (err.error_code == 0);
             auto name = name_prefix + std::to_string (ii + offset);
             auto fed = ctor (name.c_str (), fi, &err);
-            BOOST_CHECK_EQUAL (err.error_code, 0);
+            assert (err.error_code == 0);
             federates[ii + offset] = fed;
             helicsCoreFree (core);
         }

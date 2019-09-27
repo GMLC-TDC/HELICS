@@ -7,18 +7,15 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include "ctestFixtures.hpp"
 
-#include <boost/test/unit_test.hpp>
-#include <boost/test/data/test_case.hpp>
+#include <gtest/gtest.h>
 
-namespace bdata = boost::unit_test::data;
-namespace utf = boost::unit_test;
-
-BOOST_FIXTURE_TEST_SUITE (query_tests, FederateTestFixture, *utf::label ("ci"))
-
-/** test simple creation and destruction*/
-BOOST_DATA_TEST_CASE (test_publication_queries, bdata::make (core_types), core_type)
+class query_tests : public ::testing::TestWithParam<const char *>, public FederateTestFixture
 {
-    SetupTest (helicsCreateValueFederate, core_type, 2);
+};
+/** test simple creation and destruction*/
+TEST_P (query_tests, publication_queries)
+{
+    SetupTest (helicsCreateValueFederate, GetParam (), 2);
     auto vFed1 = GetFederateAt (0);
     auto vFed2 = GetFederateAt (1);
 
@@ -37,21 +34,21 @@ BOOST_DATA_TEST_CASE (test_publication_queries, bdata::make (core_types), core_t
 
     CE (std::string res (helicsQueryCoreExecute (q1, core, &err)));
 
-    BOOST_CHECK_EQUAL (res, "[pub1;fed0/pub2]");
+    EXPECT_EQ (res, "[pub1;fed0/pub2]");
 
     CE (std::string res2 = helicsQueryExecute (q1, vFed2, &err));
-    BOOST_CHECK_EQUAL (res2, "[pub1;fed0/pub2]");
+    EXPECT_EQ (res2, "[pub1;fed0/pub2]");
 
     helicsQueryFree (q1);
     q1 = helicsCreateQuery ("fed1", "isinit");
 
     CE (res = helicsQueryExecute (q1, vFed1, &err));
-    BOOST_CHECK_EQUAL (res, "true");
+    EXPECT_EQ (res, "true");
     helicsQueryFree (q1);
 
     q1 = helicsCreateQuery ("fed1", "publications");
     CE (res = helicsQueryExecute (q1, vFed1, &err));
-    BOOST_CHECK_EQUAL (res, "[fed1/pub3]");
+    EXPECT_EQ (res, "[fed1/pub3]");
     helicsQueryFree (q1);
     helicsCoreFree (core);
     CE (helicsFederateFinalizeAsync (vFed1, &err));
@@ -59,9 +56,9 @@ BOOST_DATA_TEST_CASE (test_publication_queries, bdata::make (core_types), core_t
     CE (helicsFederateFinalizeComplete (vFed1, &err));
 }
 
-BOOST_DATA_TEST_CASE (test_broker_queries, bdata::make (core_types), core_type)
+TEST_P (query_tests, broker_queries)
 {
-    SetupTest (helicsCreateValueFederate, core_type, 2);
+    SetupTest (helicsCreateValueFederate, GetParam (), 2);
     auto vFed1 = GetFederateAt (0);
     auto vFed2 = GetFederateAt (1);
 
@@ -75,10 +72,10 @@ BOOST_DATA_TEST_CASE (test_broker_queries, bdata::make (core_types), core_type)
     str.append (helicsFederateGetName (vFed2));
     str.push_back (']');
 
-    BOOST_CHECK_EQUAL (res, str);
+    EXPECT_EQ (res, str);
 
     CE (std::string res2 = helicsQueryExecute (q1, vFed1, &err));
-    BOOST_CHECK_EQUAL (res2, str);
+    EXPECT_EQ (res2, str);
     CE (helicsFederateEnterInitializingModeAsync (vFed1, &err));
     CE (helicsFederateEnterInitializingMode (vFed2, &err));
     CE (helicsFederateEnterInitializingModeComplete (vFed1, &err));
@@ -89,4 +86,4 @@ BOOST_DATA_TEST_CASE (test_broker_queries, bdata::make (core_types), core_type)
     CE (helicsFederateFinalizeComplete (vFed1, &err));
 }
 
-BOOST_AUTO_TEST_SUITE_END ()
+INSTANTIATE_TEST_SUITE_P (query_tests, query_tests, ::testing::ValuesIn (core_types));

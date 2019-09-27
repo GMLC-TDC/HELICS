@@ -49,7 +49,7 @@ add_executable(
 target_link_libraries(
   shared-library-tests
   helicsSharedLib
-  helics_boost_test_base
+  helics_google_test_base
 )
 target_link_libraries(
   shared-library-tests-cpp
@@ -57,7 +57,6 @@ target_link_libraries(
   helics_google_test_base
 )
 
-add_dependencies(shared-library-tests helicsSharedLib)
 set_target_properties(
   shared-library-tests shared-library-tests-cpp
   PROPERTIES FOLDER tests
@@ -76,7 +75,7 @@ target_compile_definitions(
 
 add_test(
   NAME shared-library-tests
-  COMMAND shared-library-tests --log_level=message --report_level=short
+  COMMAND shared-library-tests
 )
 
 target_compile_definitions(
@@ -93,7 +92,7 @@ target_compile_definitions(
 
 add_test(
   NAME shared-library-tests-cpp
-  COMMAND shared-library-tests-cpp --log_level=message --report_level=short
+  COMMAND shared-library-tests-cpp
 )
 
 set_property(TEST shared-library-tests PROPERTY LABELS SharedLibrary Coverage Daily)
@@ -105,17 +104,11 @@ add_test(
   NAME shared-library-ci-tests
   COMMAND
     shared-library-tests
-    --run_test=@ci
-    --log_level=test_suite
-    --report_level=short
 )
 add_test(
   NAME shared-library-ci-tests-cpp
   COMMAND
     shared-library-tests-cpp
-    --run_test=@ci
-    --log_level=test_suite
-    --report_level=short
 )
 
 set_property(TEST shared-library-ci-tests PROPERTY LABELS Continuous)
