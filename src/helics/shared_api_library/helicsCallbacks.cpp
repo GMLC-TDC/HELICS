@@ -1,5 +1,5 @@
 /*
-Copyright © 2017-2019,
+Copyright (c) 2017-2019,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See the top-level NOTICE for
 additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
@@ -15,8 +15,9 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <mutex>
 #include <vector>
 
-void helicsBrokerAddLoggingCallback (helics_broker broker,
-                                     void (*logger) (int loglevel, const char *identifier, const char *message),
+void helicsBrokerSetLoggingCallback (helics_broker broker,
+                                     void (*logger) (int loglevel, const char *identifier, const char *message, void *userdata),
+                                     void *userdata,
                                      helics_error *err)
 {
     auto brk = getBroker (broker, err);
@@ -26,9 +27,16 @@ void helicsBrokerAddLoggingCallback (helics_broker broker,
     }
     try
     {
-        brk->setLoggingCallback ([logger](int loglevel, const std::string &ident, const std::string &message) {
-            logger (loglevel, ident.c_str (), message.c_str ());
-        });
+        if (logger == nullptr)
+        {
+            brk->setLoggingCallback ({});
+        }
+        else
+        {
+            brk->setLoggingCallback ([logger, userdata] (int loglevel, const std::string &ident, const std::string &message) {
+                logger (loglevel, ident.c_str (), message.c_str (), userdata);
+            });
+        }
     }
     catch (...)
     {
@@ -36,8 +44,9 @@ void helicsBrokerAddLoggingCallback (helics_broker broker,
     }
 }
 
-void helicsCoreAddLoggingCallback (helics_core core,
-                                   void (*logger) (int loglevel, const char *identifier, const char *message),
+void helicsCoreSetLoggingCallback (helics_core core,
+                                   void (*logger) (int loglevel, const char *identifier, const char *message, void *userdata),
+                                   void *userdata,
                                    helics_error *err)
 {
     auto cr = getCore (core, err);
@@ -47,9 +56,17 @@ void helicsCoreAddLoggingCallback (helics_core core,
     }
     try
     {
-        cr->setLoggingCallback (helics::local_core_id, [logger](int loglevel, const std::string &ident, const std::string &message) {
-            logger (loglevel, ident.c_str (), message.c_str ());
-        });
+        if (logger == nullptr)
+        {
+            cr->setLoggingCallback (helics::local_core_id, {});
+        }
+        else
+        {
+            cr->setLoggingCallback (helics::local_core_id,
+                                    [logger, userdata] (int loglevel, const std::string &ident, const std::string &message) {
+                                        logger (loglevel, ident.c_str (), message.c_str (), userdata);
+                                    });
+        }
     }
     catch (...)
     {
@@ -57,8 +74,9 @@ void helicsCoreAddLoggingCallback (helics_core core,
     }
 }
 
-void helicsFederateAddLoggingCallback (helics_federate fed,
-                                       void (*logger) (int loglevel, const char *identifier, const char *message),
+void helicsFederateSetLoggingCallback (helics_federate fed,
+                                       void (*logger) (int loglevel, const char *identifier, const char *message, void *userdata),
+                                       void *userdata,
                                        helics_error *err)
 {
     auto fedptr = getFed (fed, err);
@@ -66,11 +84,19 @@ void helicsFederateAddLoggingCallback (helics_federate fed,
     {
         return;
     }
+
     try
     {
-        fedptr->setLoggingCallback ([logger](int loglevel, const std::string &ident, const std::string &message) {
-            logger (loglevel, ident.c_str (), message.c_str ());
-        });
+        if (logger == nullptr)
+        {
+            fedptr->setLoggingCallback ({});
+        }
+        else
+        {
+            fedptr->setLoggingCallback ([logger, userdata] (int loglevel, const std::string &ident, const std::string &message) {
+                logger (loglevel, ident.c_str (), message.c_str (), userdata);
+            });
+        }
     }
     catch (...)
     {

@@ -1,5 +1,5 @@
 /*
-Copyright © 2017-2019,
+Copyright (c) 2017-2019,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
 the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
@@ -74,6 +74,9 @@ class Broker
     */
     virtual void setLoggingCallback (
       const std::function<void (int, const std::string &, const std::string &)> &logFunction) = 0;
+
+    /** set the broker logging file*/
+    virtual void setLogFile (const std::string &lfile) = 0;
 
     /** waits in the current thread until the broker is disconnected
     @param msToWait  the timeout to wait for disconnect

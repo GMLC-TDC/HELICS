@@ -1,5 +1,5 @@
 /*
-Copyright © 2017-2019,
+Copyright (c) 2017-2019,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
 the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
@@ -16,7 +16,6 @@ functions for dealing with query results*/
 namespace helics
 {
 class Federate;
-
 
 /** function takes a query result and vectorizes it if the query is a vector result, if not the results go into the
  * first element of the vector
@@ -69,6 +68,6 @@ bool waitForFed (helics::Federate *fed,
 @param fedName the name of the federate we are querying
 @return a string vector of the names of the publication that are subscribed to
 */
-std::string queryFederateSubscriptions (helics::Federate *fed, const std::string &FedName);
+std::string queryFederateSubscriptions (helics::Federate *fed, const std::string &fedName);
 
 }  // namespace helics

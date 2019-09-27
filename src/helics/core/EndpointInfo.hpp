@@ -1,15 +1,12 @@
 /*
-Copyright © 2017-2019,
+Copyright (c) 2017-2019,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
 the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 #pragma once
 
-#include "Core.hpp"
-#include "helics-time.hpp"
-
-#include "helics/helics-config.h"
+#include "basic_core_types.hpp"
 
 #include "../common/GuardedTypes.hpp"
 #include <deque>

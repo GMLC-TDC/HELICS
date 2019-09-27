@@ -1,5 +1,5 @@
 #
-# Copyright © 2017-2018, Battelle Memorial Institute; Lawrence Livermore National
+# Copyright (c) 2017-2018, Battelle Memorial Institute; Lawrence Livermore National
 # Security, LLC; Alliance for Sustainable Energy, LLC All rights reserved. See LICENSE
 # file and DISCLAIMER for more details.
 #
@@ -20,6 +20,6 @@ endif()
 
 add_subdirectory(comboFederates1)
 
-if(BUILD_C_SHARED_LIB)
+if(NOT DISABLE_C_SHARED_LIB)
   add_subdirectory(CppInterface)
-endif(BUILD_C_SHARED_LIB)
+endif()

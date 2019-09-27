@@ -8,11 +8,13 @@ aliases:
       mkdir -p build
       cd build
       eval cmake .. ${CMAKE_FLAGS}
-      make -j 4 install
+      make -j 4
 
   - &run_octave_tests
     name: run_octave_tests
     command: |
+       cd build
+       make install
        cd ${OCTAVETEST}
        # this return the write error code in RESULT
        octave -W -V --eval "source('runTestsCIRCLECI.m');"
@@ -45,7 +47,7 @@ jobs:
     docker:
       - image: helics/clang-tsan:latest
     environment:
-      CMAKE_FLAGS: '-DCMAKE_CXX_COMPILER=clang++ -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_FLAGS="-fsanitize=thread -stdlib=libc++ -L/root/develop/libcxx_tsan/lib -lc++abi -I/root/develop/libcxx_tsan/include -I/root/develop/libcxx_tsan/include/c++/v1 -Wno-unused-command-line-argument -g -O1 -Wl,-rpath=/root/develop/libcxx_tsan/lib"  -DBUILD_HELICS_BOOST_TESTS=OFF -DZMQ_SUBPROJECT=ON  -DZMQ_FORCE_SUBPROJECT=ON'
+      CMAKE_FLAGS: '-DCMAKE_CXX_COMPILER=clang++ -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_FLAGS="-fsanitize=thread -stdlib=libc++ -L/root/develop/libcxx_tsan/lib -lc++abi -I/root/develop/libcxx_tsan/include -I/root/develop/libcxx_tsan/include/c++/v1 -Wno-unused-command-line-argument -g -O1 -Wl,-rpath=/root/develop/libcxx_tsan/lib"  -DBUILD_HELICS_BOOST_TESTS=OFF -DZMQ_SUBPROJECT=ON  -DZMQ_FORCE_SUBPROJECT=ON -DDISABLE_SYSTEM_CALL_TESTS=ON'
 
     steps:
       - checkout
@@ -58,7 +60,8 @@ jobs:
     docker:
       - image: helics/clang-asan:latest
     environment:
-      CMAKE_FLAGS: '-DCMAKE_CXX_COMPILER=clang++ -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_FLAGS="-fsanitize=undefined,address -stdlib=libc++ -L/root/develop/libcxx_asan/lib -lc++abi -I/root/develop/libcxx_asan/include -I/root/develop/libcxx_asan/include/c++/v1 -Wno-unused-command-line-argument -fno-omit-frame-pointer -g -O1 -Wl,-rpath=/root/develop/libcxx_asan/lib"  -DBUILD_HELICS_BOOST_TESTS=OFF -DZMQ_SUBPROJECT=ON  -DZMQ_FORCE_SUBPROJECT=ON'
+      CMAKE_FLAGS: '-DCMAKE_CXX_COMPILER=clang++ -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_FLAGS="-fsanitize=undefined,address -stdlib=libc++ -L/root/develop/libcxx_asan/lib -lc++abi -I/root/develop/libcxx_asan/include -I/root/develop/libcxx_asan/include/c++/v1 -Wno-unused-command-line-argument -fno-omit-frame-pointer -g -O1 -Wl,-rpath=/root/develop/libcxx_asan/lib -fsanitize-blacklist=/root/project/.circleci/asan_blacklist.txt"  -DBUILD_HELICS_BOOST_TESTS=OFF -DZMQ_SUBPROJECT=ON  -DZMQ_FORCE_SUBPROJECT=ON'
+      LSAN_OPTIONS: 'suppressions=/root/project/.circleci/leak_suppression.txt'
 
     steps:
       - checkout

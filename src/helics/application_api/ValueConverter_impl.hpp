@@ -1,5 +1,5 @@
 /*
-Copyright © 2017-2019,
+Copyright (c) 2017-2019,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
 the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
@@ -205,7 +205,7 @@ void ValueConverter<X>::convert (const X *vals, size_t size, data_block &store)
 {
     detail::ostringbufstream s;
     archiver oa (s);
-    oa (cereal::make_size_tag (size));  // number of elements
+    oa (cereal::make_size_tag (static_cast<cereal::size_type>(size)));  // number of elements
     for (size_t ii = 0; ii < size; ++ii)
     {
         oa (vals[ii]);

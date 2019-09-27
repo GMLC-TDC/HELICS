@@ -1,5 +1,5 @@
 /*
-Copyright © 2017-2019,
+Copyright (c) 2017-2019,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
 the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
@@ -8,14 +8,14 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include "../core/Core.hpp"
 #include "Federate.hpp"
-#include "helics/helics-config.h"
 #include "helics/helics_enums.h"
+#include <memory>
+#include <string>
 
 namespace helics
 {
 class FilterOperations;
-class Federate;
-
+class FilterOperator;
 /** a set of common defined filters*/
 enum class filter_types
 {

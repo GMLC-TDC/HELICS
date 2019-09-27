@@ -1,5 +1,5 @@
 #
-# Copyright © 2017-2019, Battelle Memorial Institute; Lawrence Livermore National
+# Copyright (c) 2017-2019, Battelle Memorial Institute; Lawrence Livermore National
 # Security, LLC; Alliance for Sustainable Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 #
 # SPDX-License-Identifier: BSD-3-Clause
@@ -105,8 +105,12 @@ if(APPLE)
   target_compile_definitions(helics_common PUBLIC "-DSTX_NO_STD_ANY=1")
 endif(APPLE)
 
-install(
-  FILES ${helics_public_common}
-  DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/helics/common
-  COMPONENT headers
-)
+if (NOT HELICS_BINARY_ONLY_INSTALL)
+  if (HELICS_INSTALL_CPP14_HEADERS)
+    install(
+      FILES ${helics_public_common}
+      DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/helics/common
+      COMPONENT headers
+    )
+  endif()
+endif()

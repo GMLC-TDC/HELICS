@@ -1,12 +1,12 @@
 /*
-Copyright © 2017-2019,
+Copyright (c) 2017-2019,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
 the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 #include "HandleManager.hpp"
 #include "ActionMessage.hpp"
-// TODO move the flags out of actionMessage
+// TODO PT move the flags out of actionMessage
 
 namespace helics
 {
@@ -93,7 +93,7 @@ void HandleManager::addHandleAtIndex (const BasicHandleInfo &otherHandle, int32_
     }
     else if (index > 0)
     {
-        handles.resize (static_cast<size_t>(index) + 1);
+        handles.resize (static_cast<size_t> (index) + 1);
         // use placement new to reconstruct new object
         new (&handles[index]) BasicHandleInfo (otherHandle);
         addSearchFields (handles[index], index);

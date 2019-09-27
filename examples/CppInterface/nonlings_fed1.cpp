@@ -1,5 +1,5 @@
 /*
-Copyright © 2017-2019,
+Copyright (c) 2017-2019,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
 the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
@@ -42,7 +42,7 @@ int main (int /*argc*/, char ** /*argv*/)
     helicscpp::FederateInfo fi ("zmq");
 
     /* Federate init string */
-    fi.setCoreInitString (fedinitstring);
+    fi.setCoreInit(fedinitstring);
     fi.setProperty (helics_property_time_delta, deltat);
     fi.setProperty (helics_property_int_max_iterations, 100);
 
@@ -53,7 +53,7 @@ int main (int /*argc*/, char ** /*argv*/)
     printf (" Value federate created\n");
 
     /* Register the publication */
-    pub = vfed->registerGlobalTypePublication ("testA", "double");
+    pub = vfed->registerGlobalPublication ("testA", "double");
     printf (" Publication registered\n");
 
     sub = vfed->registerSubscription ("testB");

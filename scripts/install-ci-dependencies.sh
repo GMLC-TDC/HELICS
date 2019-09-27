@@ -198,6 +198,7 @@ pyver=$(python3 -c 'import sys; ver=sys.version_info[:2]; print(".".join(map(str
 
 export PYTHON_LIB_PATH=$(python3-config --prefix)/lib/libpython${pyver}m.${shared_lib_ext}
 export PYTHON_INCLUDE_PATH=$(python3-config --prefix)/include/python${pyver}m/
+export PYTHON_EXECUTABLE=$(which python3)
 
 # Tell macOS users to use Homebrew to install additional dependencies
 if [[ "$TRAVIS" != "true" && "$os_name" == Darwin ]]; then

@@ -1,5 +1,5 @@
 /*
-Copyright © 2017-2019,
+Copyright (c) 2017-2019,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
 the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
@@ -15,32 +15,20 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "ForwardingTimeCoordinator.hpp"
 #include "flagOperations.hpp"
 #include "gmlc/libguarded/guarded.hpp"
+#include "gmlc/utilities/stringOps.h"
 #include "loggingHelper.hpp"
 #include <asio/steady_timer.hpp>
 #include <iostream>
-#include <random>
 
-static constexpr auto chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
-
-static inline std::string genId (size_t seed)
+static inline std::string genId ()
 {
-    std::string nm = std::string (24, '-');
-    if (seed == 0)
-    {
-        seed = std::chrono::high_resolution_clock::now ().time_since_epoch ().count ();
-        seed += std::hash<std::thread::id>{}(std::this_thread::get_id ());
-    }
-    std::mt19937 rng (
-      static_cast<unsigned int> (seed));  // random-number engine used (Mersenne-Twister in this case)
-    std::uniform_int_distribution<int> uni (0, 61);  // guaranteed unbiased
+    std::string nm = gmlc::utilities::randomString (24);
 
-    for (int ii = 1; ii < 24; ii++)
-    {
-        if ((ii != 6) && (ii != 12) && (ii != 18))
-        {
-            nm[ii] = chars[uni (rng)];
-        }
-    }
+    nm[0] = '-';
+    nm[6] = '-';
+    nm[12] = '-';
+    nm[18] = '-';
+
 #ifdef _WIN32
     std::string pid_str = std::to_string (GetCurrentProcessId ()) + nm;
 #else
@@ -60,6 +48,11 @@ BrokerBase::BrokerBase (const std::string &broker_name, bool DisableQueue)
 
 BrokerBase::~BrokerBase ()
 {
+    if (loggingObj)
+    {
+        loggingObj->closeFile ();
+        loggingObj->haltLogging ();
+    }
     if (!queueDisabled)
     {
         try
@@ -125,7 +118,7 @@ std::shared_ptr<helicsCLI11App> BrokerBase::generateBaseCLI ()
     logging_group->add_option ("--logfile", logFile, "the file to log the messages to")->ignore_underscore ();
     logging_group
       ->add_option_function<int> (
-        "--loglevel,--log-level", [this](int val) { setLogLevel (val); },
+        "--loglevel,--log-level", [this] (int val) { setLogLevel (val); },
         "the level which to log the higher this is set to the more gets logs(-1) for no logging")
       ->transform (CLI::CheckedTransformer (&log_level_map, CLI::ignore_case, CLI::ignore_underscore));
 
@@ -145,7 +138,8 @@ std::shared_ptr<helicsCLI11App> BrokerBase::generateBaseCLI ()
       "heartbeat time in ms, if there is no broker communication for 2 ticks then "
       "secondary actions are taken  (can also be entered as a time like '10s' or '45ms')");
     timeout_group->add_option ("--timeout", timeout,
-                               "time to wait to establish a network default unit is in ms (can also be entered as "
+                               "time to wait to establish a network or for a connection to communicate, default "
+                               "unit is in ms (can also be entered as "
                                "a time like '10s' or '45ms') ");
     timeout_group->add_option (
       "--networktimeout", networkTimeout,
@@ -205,12 +199,12 @@ void BrokerBase::configureBase ()
     {
         if (identifier.empty ())
         {
-            identifier = genId (reinterpret_cast<size_t> (this));
+            identifier = genId ();
         }
     }
 
     timeCoord = std::make_unique<ForwardingTimeCoordinator> ();
-    timeCoord->setMessageSender ([this](const ActionMessage &msg) { addActionMessage (msg); });
+    timeCoord->setMessageSender ([this] (const ActionMessage &msg) { addActionMessage (msg); });
 
     loggingObj = std::make_unique<Logger> ();
     if (!logFile.empty ())
@@ -252,7 +246,7 @@ bool BrokerBase::sendToLogger (global_federate_id federateID,
     return false;
 }
 
-void BrokerBase::generateNewIdentifier () { identifier = genId (0); }
+void BrokerBase::generateNewIdentifier () { identifier = genId (); }
 
 void BrokerBase::setErrorState (int eCode, const std::string &estring)
 {
@@ -261,7 +255,26 @@ void BrokerBase::setErrorState (int eCode, const std::string &estring)
     brokerState.store (broker_state_t::errored);
 }
 
-void BrokerBase::setLoggerFunction (std::function<void(int, const std::string &, const std::string &)> logFunction)
+void BrokerBase::setLoggingFile (const std::string &lfile)
+{
+    if (loggingObj)
+    {
+        if (loggingObj->isRunning ())
+        {
+            loggingObj->haltLogging ();
+            logFile = lfile;
+            loggingObj->openFile (logFile);
+            loggingObj->startLogging ();
+        }
+    }
+    else
+    {
+        logFile = lfile;
+    }
+}
+
+void BrokerBase::setLoggerFunction (
+  std::function<void (int, const std::string &, const std::string &)> logFunction)
 {
     loggerFunction = std::move (logFunction);
     if (loggerFunction)
@@ -391,7 +404,7 @@ void BrokerBase::queueProcessingLoop ()
     asio::steady_timer ticktimer (serv->getBaseContext ());
     activeProtector active (true, false);
 
-    auto timerCallback = [this, &active](const std::error_code &ec) { timerTickHandler (this, active, ec); };
+    auto timerCallback = [this, &active] (const std::error_code &ec) { timerTickHandler (this, active, ec); };
     if (tickTimer > timeZero)
     {
         if (tickTimer < Time (0.5))
@@ -404,7 +417,7 @@ void BrokerBase::queueProcessingLoop ()
     }
     global_broker_id_local = global_id.load ();
     int messagesSinceLastTick = 0;
-    auto logDump = [&, this]() {
+    auto logDump = [&, this] () {
         if (dumplog)
         {
             for (auto &act : dumpMessages)
@@ -447,7 +460,7 @@ void BrokerBase::queueProcessingLoop ()
                 contextLoop = nullptr;
                 contextLoop = serv->startContextLoop ();
             }
-            if (messagesSinceLastTick == 0)
+            if (messagesSinceLastTick == 0 || forwardTick)
             {
 #ifndef DISABLE_TICK
 
@@ -459,6 +472,15 @@ void BrokerBase::queueProcessingLoop ()
             ticktimer.expires_at (std::chrono::steady_clock::now () + tickTimer.to_ns ());
             active = std::make_pair (true, true);
             ticktimer.async_wait (timerCallback);
+            break;
+        case CMD_PING:
+            // ping is processed normally but doesn't count as an actual message for timeout purposes unless it
+            // comes from the parent
+            if (command.source_id != parent_broker_id)
+            {
+                ++messagesSinceLastTick;
+            }
+            processCommand (std::move (command));
             break;
         case CMD_IGNORE:
         default:
@@ -515,6 +537,7 @@ action_message_def::action_t BrokerBase::commandProcessor (ActionMessage &comman
     case CMD_TERMINATE_IMMEDIATELY:
     case CMD_STOP:
     case CMD_TICK:
+    case CMD_PING:
         return command.action ();
     case CMD_MULTI_MESSAGE:
         for (int ii = 0; ii < command.counter; ++ii)

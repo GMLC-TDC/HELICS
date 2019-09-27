@@ -1,5 +1,5 @@
 /*
-Copyright © 2017-2019,
+Copyright (c) 2017-2019,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
 the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
@@ -13,8 +13,8 @@ the purpose of these objects are to convert a specific type into a data block fo
 
 #include "../core/Core.hpp"
 #include "data_view.hpp"
-#include <complex>
-#include <type_traits>
+#include "helicsTypes.hpp"
+#include <string>
 
 namespace helics
 {

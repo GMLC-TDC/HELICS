@@ -1,5 +1,5 @@
 /*
-Copyright © 2017-2019,
+Copyright (c) 2017-2019,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
 the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
@@ -9,8 +9,6 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "HelicsPrimaryTypes.hpp"
 #include "ValueFederate.hpp"
 #include "helicsTypes.hpp"
-#include <algorithm>
-#include <array>
 
 namespace units
 {
@@ -41,15 +39,15 @@ class Input
     double delta = -1.0;  //!< the minimum difference
     std::string actualName;  //!< the name of the Input
     // this needs to match the defV type
-    mpark::variant<std::function<void(const double &, Time)>,
-                   std::function<void(const int64_t &, Time)>,
-                   std::function<void(const std::string &, Time)>,
-                   std::function<void(const std::complex<double> &, Time)>,
-                   std::function<void(const std::vector<double> &, Time)>,
-                   std::function<void(const std::vector<std::complex<double>> &, Time)>,
-                   std::function<void(const NamedPoint &, Time)>,
-                   std::function<void(const bool &, Time)>,
-                   std::function<void(const Time &, Time)>>
+    mpark::variant<std::function<void (const double &, Time)>,
+                   std::function<void (const int64_t &, Time)>,
+                   std::function<void (const std::string &, Time)>,
+                   std::function<void (const std::complex<double> &, Time)>,
+                   std::function<void (const std::vector<double> &, Time)>,
+                   std::function<void (const std::vector<std::complex<double>> &, Time)>,
+                   std::function<void (const NamedPoint &, Time)>,
+                   std::function<void (const bool &, Time)>,
+                   std::function<void (const Time &, Time)>>
       value_callback;  //!< callback function for the federate
   public:
     /** Default constructor*/
@@ -162,10 +160,10 @@ class Input
     @param callback a function with signature void( Time time)
     time is the time the value was updated  This callback is a notification callback and doesn't return the value
     */
-    void registerNotificationCallback (std::function<void(Time)> callback)
+    void registerNotificationCallback (std::function<void (Time)> callback)
     {
         fed->setInputNotificationCallback (*this,
-                                           [this, callback = std::move (callback)](const Input &, Time time) {
+                                           [this, callback = std::move (callback)] (const Input &, Time time) {
                                                if (isUpdated ())
                                                {
                                                    callback (time);
@@ -237,14 +235,14 @@ class Input
     val is the new value and time is the time the value was updated
     */
     template <class X>
-    void setInputNotificationCallback (std::function<void(const X &, Time)> callback)
+    void setInputNotificationCallback (std::function<void (const X &, Time)> callback)
     {
         static_assert (
           helicsType<X> () != data_type::helics_custom,
           "callback type must be a primary helics type one of \"double, int64_t, named_point, bool, Time "
           "std::vector<double>, std::vector<std::complex<double>>, std::complex<double>\"");
         value_callback = std::move (callback);
-        fed->setInputNotificationCallback (*this, [this](Input &, Time time) { handleCallback (time); });
+        fed->setInputNotificationCallback (*this, [this] (Input &, Time time) { handleCallback (time); });
     }
 
   private:
@@ -409,8 +407,8 @@ class InputT : public Input
 {
   public:
   private:
-    std::function<void(X, Time)> value_callback;  //!< callback function for the federate
-    std::function<double(const X &v1, const X &v2)>
+    std::function<void (X, Time)> value_callback;  //!< callback function for the federate
+    std::function<double (const X &v1, const X &v2)>
       changeDetectionOperator;  //!< callback function for change detection
     // determine if we can convert to a primary type
     using is_convertible_to_primary_type =
@@ -454,10 +452,10 @@ class InputT : public Input
     @param callback a function with signature void(X val, Time time)
     val is the new value and time is the time the value was updated
     */
-    void setInputNotificationCallback (std::function<void(X, Time)> callback)
+    void setInputNotificationCallback (std::function<void (X, Time)> callback)
     {
         value_callback = callback;
-        fed->setInputNotificationCallback (*this, [=](Input &, Time time) { handleCallback (time); });
+        fed->setInputNotificationCallback (*this, [=] (Input &, Time time) { handleCallback (time); });
     }
     /** set a default value
     @param val the value to set as the default

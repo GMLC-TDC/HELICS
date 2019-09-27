@@ -1,12 +1,10 @@
 /*
-Copyright © 2017-2019,
+Copyright (c) 2017-2019,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
 the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
-#include <boost/test/unit_test.hpp>
-#include <boost/test/data/test_case.hpp>
-#include <boost/test/tools/floating_point_comparison.hpp>
+#include "gtest/gtest.h"
 
 #include <cstdio>
 
@@ -20,12 +18,9 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <future>
 #include <iostream>
 
-namespace utf = boost::unit_test;
 using namespace std::literals::chrono_literals;
 
-BOOST_AUTO_TEST_SUITE (tracer_tests, *utf::label ("ci"))
-
-BOOST_AUTO_TEST_CASE (simple_tracer_test)
+TEST (tracer_tests, simple_tracer_test)
 {
     std::atomic<double> lastVal{-1e49};
     std::atomic<double> lastTime{0.0};
@@ -45,11 +40,11 @@ BOOST_AUTO_TEST_CASE (simple_tracer_test)
     auto fut = std::async (std::launch::async, [&trace1]() { trace1.runTo (4); });
     vfed.enterExecutingMode ();
     auto retTime = vfed.requestTime (1);
-    BOOST_CHECK_EQUAL (retTime, 1.0);
+    EXPECT_EQ (retTime, 1.0);
     pub1.publish (3.4);
 
     retTime = vfed.requestTime (2.0);
-    BOOST_CHECK_EQUAL (retTime, 2.0);
+    EXPECT_EQ (retTime, 2.0);
     int cnt = 0;
     while (lastTime < 0.5)
     {
@@ -59,20 +54,20 @@ BOOST_AUTO_TEST_CASE (simple_tracer_test)
             break;
         }
     }
-    BOOST_CHECK_CLOSE (lastTime.load (), 1.0, 0.00000001);
-    BOOST_CHECK_CLOSE (lastVal.load (), 3.4, 0.000000001);
+    EXPECT_DOUBLE_EQ (lastTime.load (), 1.0);
+    EXPECT_DOUBLE_EQ (lastVal.load (), 3.4);
     pub1.publish (4.7);
 
     retTime = vfed.requestTime (5);
-    BOOST_CHECK_EQUAL (retTime, 5.0);
+    EXPECT_EQ (retTime, 5.0);
     vfed.finalize ();
     fut.get ();
-    BOOST_CHECK_CLOSE (lastTime.load (), 2.0, 0.000000001);
-    BOOST_CHECK_CLOSE (lastVal.load (), 4.7, 0.000000001);
+    EXPECT_DOUBLE_EQ (lastTime.load (), 2.0);
+    EXPECT_DOUBLE_EQ (lastVal.load (), 4.7);
     trace1.finalize ();
 }
 
-BOOST_AUTO_TEST_CASE (tracer_test_message)
+TEST (tracer_tests, tracer_test_message)
 {
     gmlc::libguarded::guarded<std::unique_ptr<helics::Message>> mguard;
     std::atomic<double> lastTime{0.0};
@@ -96,7 +91,7 @@ BOOST_AUTO_TEST_CASE (tracer_test_message)
 
     auto retTime = mfed.requestTime (1.0);
     e1.send ("src1", "this is a test message");
-    BOOST_CHECK_EQUAL (retTime, 1.0);
+    EXPECT_EQ (retTime, 1.0);
     retTime = mfed.requestTime (2.0);
     int cnt = 0;
     while (lastTime < 0.5)
@@ -107,16 +102,16 @@ BOOST_AUTO_TEST_CASE (tracer_test_message)
             break;
         }
     }
-    BOOST_CHECK_CLOSE (lastTime.load (), 1.0, 0.00000001);
+    EXPECT_DOUBLE_EQ (lastTime.load (), 1.0);
     {
         auto mhandle = mguard.lock ();
-        BOOST_REQUIRE (*mhandle);
-        BOOST_CHECK_EQUAL ((*mhandle)->data.to_string (), "this is a test message");
-        BOOST_CHECK_EQUAL ((*mhandle)->source, "d1");
-        BOOST_CHECK_EQUAL ((*mhandle)->dest, "src1");
+        ASSERT_TRUE (*mhandle);
+        EXPECT_EQ ((*mhandle)->data.to_string (), "this is a test message");
+        EXPECT_EQ ((*mhandle)->source, "d1");
+        EXPECT_EQ ((*mhandle)->dest, "src1");
     }
     e1.send ("src1", "this is a test message2");
-    BOOST_CHECK_EQUAL (retTime, 2.0);
+    EXPECT_EQ (retTime, 2.0);
     mfed.finalize ();
     cnt = 0;
     while (lastTime < 1.5)
@@ -127,13 +122,13 @@ BOOST_AUTO_TEST_CASE (tracer_test_message)
             break;
         }
     }
-    BOOST_CHECK_CLOSE (lastTime.load (), 2.0, 0.00000001);
+    EXPECT_DOUBLE_EQ (lastTime.load (), 2.0);
     {
         auto mhandle = mguard.lock ();
-        BOOST_REQUIRE (*mhandle);
-        BOOST_CHECK_EQUAL ((*mhandle)->data.to_string (), "this is a test message2");
-        BOOST_CHECK_EQUAL ((*mhandle)->source, "d1");
-        BOOST_CHECK_EQUAL ((*mhandle)->dest, "src1");
+        ASSERT_TRUE (*mhandle);
+        EXPECT_EQ ((*mhandle)->data.to_string (), "this is a test message2");
+        EXPECT_EQ ((*mhandle)->source, "d1");
+        EXPECT_EQ ((*mhandle)->dest, "src1");
     }
 
     fut.get ();
@@ -142,11 +137,15 @@ BOOST_AUTO_TEST_CASE (tracer_test_message)
 static constexpr const char *simple_files[] = {"example1.recorder", "example2.record",    "example3rec.json",
                                                "example4rec.json",  "exampleCapture.txt", "exampleCapture.json"};
 
-BOOST_DATA_TEST_CASE (simple_tracer_test_files, boost::unit_test::data::make (simple_files), file)
+class tracer_file_tests : public ::testing::TestWithParam<const char *>
+{
+};
+
+TEST_P (tracer_file_tests, simple_tracer_test_files)
 {
     static char indx = 'a';
     helics::FederateInfo fi (helics::core_type::TEST);
-    fi.coreName = std::string ("tcore1") + file;
+    fi.coreName = std::string ("tcore1") + GetParam ();
     fi.coreName.push_back (indx++);
     fi.coreInitString = "-f 2 --autobroker";
     helics::apps::Tracer trace1 ("trace1", fi);
@@ -154,7 +153,7 @@ BOOST_DATA_TEST_CASE (simple_tracer_test_files, boost::unit_test::data::make (si
     std::atomic<int> counter{0};
     auto cb = [&counter](helics::Time, const std::string &, const std::string &) { ++counter; };
     trace1.setValueCallback (cb);
-    trace1.loadFile (std::string (TEST_DIR) + file);
+    trace1.loadFile (std::string (TEST_DIR) + GetParam ());
 
     helics::ValueFederate vfed ("block1", fi);
     helics::Publication pub1 (helics::GLOBAL, &vfed, "pub1", helics::data_type::helics_double);
@@ -163,42 +162,48 @@ BOOST_DATA_TEST_CASE (simple_tracer_test_files, boost::unit_test::data::make (si
     auto fut = std::async (std::launch::async, [&trace1]() { trace1.runTo (4); });
     vfed.enterExecutingMode ();
     auto retTime = vfed.requestTime (1);
-    BOOST_CHECK_EQUAL (retTime, 1.0);
+    EXPECT_EQ (retTime, 1.0);
     pub1.publish (3.4);
 
     retTime = vfed.requestTime (1.5);
-    BOOST_CHECK_EQUAL (retTime, 1.5);
+    EXPECT_EQ (retTime, 1.5);
     pub2.publish (5.7);
 
     retTime = vfed.requestTime (2.0);
-    BOOST_CHECK_EQUAL (retTime, 2.0);
+    EXPECT_EQ (retTime, 2.0);
     pub1.publish (4.7);
 
     retTime = vfed.requestTime (3.0);
-    BOOST_CHECK_EQUAL (retTime, 3.0);
+    EXPECT_EQ (retTime, 3.0);
     pub2.publish ("3.9");
 
     retTime = vfed.requestTime (5);
-    BOOST_CHECK_EQUAL (retTime, 5.0);
+    EXPECT_EQ (retTime, 5.0);
 
     vfed.finalize ();
     fut.get ();
-    BOOST_CHECK_EQUAL (counter.load (), 4);
+    EXPECT_EQ (counter.load (), 4);
     trace1.finalize ();
 }
 
+INSTANTIATE_TEST_SUITE_P (tracer_tests, tracer_file_tests, ::testing::ValuesIn (simple_files));
+
 static constexpr const char *simple_message_files[] = {"example4.recorder", "example5.record", "example6rec.json"};
 
-BOOST_DATA_TEST_CASE (simple_tracer_test_message_files, boost::unit_test::data::make (simple_message_files), file)
+class tracer_message_file_tests : public ::testing::TestWithParam<const char *>
+{
+};
+
+TEST_P (tracer_message_file_tests, test_message_files)
 {
     static char indx = 'a';
     helics::FederateInfo fi (helics::core_type::TEST);
-    fi.coreName = std::string ("tcore1b") + file;
+    fi.coreName = std::string ("tcore1b") + GetParam ();
     fi.coreName.push_back (indx++);
     fi.coreInitString = " -f 2 --autobroker";
     helics::apps::Tracer trace1 ("trace1", fi);
 
-    trace1.loadFile (std::string (TEST_DIR) + file);
+    trace1.loadFile (std::string (TEST_DIR) + GetParam ());
 
     std::atomic<int> counter{0};
     auto cb = [&counter](helics::Time, const std::string &, const std::string &) { ++counter; };
@@ -216,42 +221,40 @@ BOOST_DATA_TEST_CASE (simple_tracer_test_message_files, boost::unit_test::data::
     auto fut = std::async (std::launch::async, [&trace1]() { trace1.runTo (5); });
     cfed.enterExecutingMode ();
     auto retTime = cfed.requestTime (1);
-    BOOST_CHECK_EQUAL (retTime, 1.0);
+    EXPECT_EQ (retTime, 1.0);
     pub1.publish (3.4);
     e1.send ("src1", "this is a test message");
 
     retTime = cfed.requestTime (1.5);
-    BOOST_CHECK_EQUAL (retTime, 1.5);
+    EXPECT_EQ (retTime, 1.5);
     pub2.publish (5.7);
 
     retTime = cfed.requestTime (2.0);
-    BOOST_CHECK_EQUAL (retTime, 2.0);
+    EXPECT_EQ (retTime, 2.0);
     e1.send ("src1", "this is a test message2");
     pub1.publish (4.7);
 
     retTime = cfed.requestTime (3.0);
-    BOOST_CHECK_EQUAL (retTime, 3.0);
+    EXPECT_EQ (retTime, 3.0);
     pub2.publish ("3.9");
 
     retTime = cfed.requestTime (5);
-    BOOST_CHECK_EQUAL (retTime, 5.0);
+    EXPECT_EQ (retTime, 5.0);
 
     cfed.finalize ();
     fut.get ();
-    BOOST_CHECK_EQUAL (counter.load (), 4);
-    BOOST_CHECK_EQUAL (mcounter.load (), 2);
+    EXPECT_EQ (counter.load (), 4);
+    EXPECT_EQ (mcounter.load (), 2);
     trace1.finalize ();
 }
 
 #ifdef ENABLE_IPC_CORE
-BOOST_DATA_TEST_CASE (simple_tracer_test_message_files_cmd,
-                      boost::unit_test::data::make (simple_message_files),
-                      file)
+TEST_P (tracer_message_file_tests, test_message_files_cmd)
 {
     std::this_thread::sleep_for (300ms);
     auto brk = helics::BrokerFactory::create (helics::core_type::IPC, "ipc_broker", "-f 2");
     brk->connect ();
-    std::string exampleFile = std::string (TEST_DIR) + file;
+    std::string exampleFile = std::string (TEST_DIR) + GetParam ();
     std::vector<std::string> args{"", "--name=rec", "--coretype=ipc", exampleFile};
 
     char *argv[4];
@@ -277,35 +280,37 @@ BOOST_DATA_TEST_CASE (simple_tracer_test_message_files_cmd,
     auto fut = std::async (std::launch::async, [&trace1]() { trace1.runTo (5); });
     cfed.enterExecutingMode ();
     auto retTime = cfed.requestTime (1);
-    BOOST_CHECK_EQUAL (retTime, 1.0);
+    EXPECT_EQ (retTime, 1.0);
     pub1.publish (3.4);
     e1.send ("src1", "this is a test message");
 
     retTime = cfed.requestTime (1.5);
-    BOOST_CHECK_EQUAL (retTime, 1.5);
+    EXPECT_EQ (retTime, 1.5);
     pub2.publish (5.7);
 
     retTime = cfed.requestTime (2.0);
-    BOOST_CHECK_EQUAL (retTime, 2.0);
+    EXPECT_EQ (retTime, 2.0);
     e1.send ("src1", "this is a test message2");
     pub1.publish (4.7);
 
     retTime = cfed.requestTime (3.0);
-    BOOST_CHECK_EQUAL (retTime, 3.0);
+    EXPECT_EQ (retTime, 3.0);
     pub2.publish ("3.9");
 
     retTime = cfed.requestTime (5);
-    BOOST_CHECK_EQUAL (retTime, 5.0);
+    EXPECT_EQ (retTime, 5.0);
 
     cfed.finalize ();
     fut.get ();
-    BOOST_CHECK_EQUAL (counter.load (), 4);
+    EXPECT_EQ (counter.load (), 4);
     trace1.finalize ();
     std::this_thread::sleep_for (300ms);
 }
 #endif
 
-BOOST_AUTO_TEST_CASE (tracer_test_destendpoint_clone)
+INSTANTIATE_TEST_SUITE_P (tracer_tests, tracer_message_file_tests, ::testing::ValuesIn (simple_message_files));
+
+TEST (tracer_tests, tracer_test_destendpoint_clone)
 {
     gmlc::libguarded::guarded<std::unique_ptr<helics::Message>> mguard;
     std::atomic<double> lastTime{0.0};
@@ -339,11 +344,11 @@ BOOST_AUTO_TEST_CASE (tracer_test_destendpoint_clone)
     mfed2.requestTimeComplete ();
 
     e1.send ("d2", "this is a test message");
-    BOOST_CHECK_EQUAL (retTime, 1.0);
+    EXPECT_EQ (retTime, 1.0);
 
     mfed2.requestTimeAsync (2.0);
     retTime = mfed.requestTime (2.0);
-    BOOST_CHECK_EQUAL (retTime, 2.0);
+    EXPECT_EQ (retTime, 2.0);
     mfed2.requestTimeComplete ();
 
     int cnt = 0;
@@ -355,13 +360,13 @@ BOOST_AUTO_TEST_CASE (tracer_test_destendpoint_clone)
             break;
         }
     }
-    BOOST_CHECK_CLOSE (lastTime.load (), 1.0, 0.00000001);
+    EXPECT_DOUBLE_EQ (lastTime.load (), 1.0);
     {
         auto mhandle = mguard.lock ();
-        BOOST_REQUIRE (*mhandle);
-        BOOST_CHECK_EQUAL ((*mhandle)->data.to_string (), "this is a test message");
-        BOOST_CHECK_EQUAL ((*mhandle)->source, "d1");
-        BOOST_CHECK_EQUAL ((*mhandle)->original_dest, "d2");
+        ASSERT_TRUE (*mhandle);
+        EXPECT_EQ ((*mhandle)->data.to_string (), "this is a test message");
+        EXPECT_EQ ((*mhandle)->source, "d1");
+        EXPECT_EQ ((*mhandle)->original_dest, "d2");
     }
     e2.send ("d1", "this is a test message2");
     mfed.finalize ();
@@ -375,18 +380,18 @@ BOOST_AUTO_TEST_CASE (tracer_test_destendpoint_clone)
             break;
         }
     }
-    BOOST_CHECK_CLOSE (lastTime.load (), 2.0, 0.00000001);
+    EXPECT_DOUBLE_EQ (lastTime.load (), 2.0);
     {
         auto mhandle = mguard.lock ();
-        BOOST_REQUIRE (*mhandle);
-        BOOST_CHECK_EQUAL ((*mhandle)->data.to_string (), "this is a test message2");
-        BOOST_CHECK_EQUAL ((*mhandle)->source, "d2");
-        BOOST_CHECK_EQUAL ((*mhandle)->original_dest, "d1");
+        ASSERT_TRUE (*mhandle);
+        EXPECT_EQ ((*mhandle)->data.to_string (), "this is a test message2");
+        EXPECT_EQ ((*mhandle)->source, "d2");
+        EXPECT_EQ ((*mhandle)->original_dest, "d1");
     }
     fut.get ();
 }
 
-BOOST_AUTO_TEST_CASE (tracer_test_srcendpoint_clone)
+TEST (tracer_tests, srcendpoint_clone)
 {
     gmlc::libguarded::guarded<std::unique_ptr<helics::Message>> mguard;
     std::atomic<double> lastTime{0.0};
@@ -421,11 +426,11 @@ BOOST_AUTO_TEST_CASE (tracer_test_srcendpoint_clone)
     mfed2.requestTimeComplete ();
 
     e1.send ("d2", "this is a test message");
-    BOOST_CHECK_EQUAL (retTime, 1.0);
+    EXPECT_EQ (retTime, 1.0);
 
     mfed2.requestTimeAsync (2.0);
     retTime = mfed.requestTime (2.0);
-    BOOST_CHECK_EQUAL (retTime, 2.0);
+    EXPECT_EQ (retTime, 2.0);
     mfed2.requestTimeComplete ();
     int cnt = 0;
     while (lastTime < 0.5)
@@ -436,30 +441,30 @@ BOOST_AUTO_TEST_CASE (tracer_test_srcendpoint_clone)
             break;
         }
     }
-    BOOST_CHECK_CLOSE (lastTime.load (), 1.0, 0.00000001);
+    EXPECT_DOUBLE_EQ (lastTime.load (), 1.0);
     {
         auto mhandle = mguard.lock ();
-        BOOST_REQUIRE (*mhandle);
-        BOOST_CHECK_EQUAL ((*mhandle)->data.to_string (), "this is a test message");
-        BOOST_CHECK_EQUAL ((*mhandle)->source, "d1");
-        BOOST_CHECK_EQUAL ((*mhandle)->original_dest, "d2");
+        ASSERT_TRUE (*mhandle);
+        EXPECT_EQ ((*mhandle)->data.to_string (), "this is a test message");
+        EXPECT_EQ ((*mhandle)->source, "d1");
+        EXPECT_EQ ((*mhandle)->original_dest, "d2");
     }
     e2.send ("d1", "this is a test message2");
 
     mfed.finalize ();
     mfed2.finalize ();
     fut.get ();
-    BOOST_CHECK_CLOSE (lastTime.load (), 2.0, 0.00000001);
+    EXPECT_DOUBLE_EQ (lastTime.load (), 2.0);
     {
         auto mhandle = mguard.lock ();
-        BOOST_REQUIRE (*mhandle);
-        BOOST_CHECK_EQUAL ((*mhandle)->data.to_string (), "this is a test message2");
-        BOOST_CHECK_EQUAL ((*mhandle)->source, "d2");
-        BOOST_CHECK_EQUAL ((*mhandle)->original_dest, "d1");
+        ASSERT_TRUE (*mhandle);
+        EXPECT_EQ ((*mhandle)->data.to_string (), "this is a test message2");
+        EXPECT_EQ ((*mhandle)->source, "d2");
+        EXPECT_EQ ((*mhandle)->original_dest, "d1");
     }
 }
 
-BOOST_AUTO_TEST_CASE (tracer_test_endpoint_clone)
+TEST (tracer_tests, tracer_test_endpoint_clone)
 {
     gmlc::libguarded::guarded<std::unique_ptr<helics::Message>> mguard;
     std::atomic<double> lastTime{0.0};
@@ -495,11 +500,11 @@ BOOST_AUTO_TEST_CASE (tracer_test_endpoint_clone)
     mfed2.requestTimeComplete ();
 
     e1.send ("d2", "this is a test message");
-    BOOST_CHECK_EQUAL (retTime, 1.0);
+    EXPECT_EQ (retTime, 1.0);
 
     mfed2.requestTimeAsync (2.0);
     retTime = mfed.requestTime (2.0);
-    BOOST_CHECK_EQUAL (retTime, 2.0);
+    EXPECT_EQ (retTime, 2.0);
     mfed2.requestTimeComplete ();
     int cnt = 0;
     while (lastTime < 0.5)
@@ -510,26 +515,26 @@ BOOST_AUTO_TEST_CASE (tracer_test_endpoint_clone)
             break;
         }
     }
-    BOOST_CHECK_CLOSE (lastTime.load (), 1.0, 0.00000001);
+    EXPECT_DOUBLE_EQ (lastTime.load (), 1.0);
     {
         auto mhandle = mguard.lock ();
-        BOOST_REQUIRE (*mhandle);
-        BOOST_CHECK_EQUAL ((*mhandle)->data.to_string (), "this is a test message");
-        BOOST_CHECK_EQUAL ((*mhandle)->source, "d1");
-        BOOST_CHECK_EQUAL ((*mhandle)->original_dest, "d2");
+        ASSERT_TRUE (*mhandle);
+        EXPECT_EQ ((*mhandle)->data.to_string (), "this is a test message");
+        EXPECT_EQ ((*mhandle)->source, "d1");
+        EXPECT_EQ ((*mhandle)->original_dest, "d2");
     }
     e2.send ("d1", "this is a test message2");
 
     mfed.finalize ();
     mfed2.finalize ();
     fut.get ();
-    BOOST_CHECK_CLOSE (lastTime.load (), 2.0, 0.00000001);
+    EXPECT_DOUBLE_EQ (lastTime.load (), 2.0);
     {
         auto mhandle = mguard.lock ();
-        BOOST_REQUIRE (*mhandle);
-        BOOST_CHECK_EQUAL ((*mhandle)->data.to_string (), "this is a test message2");
-        BOOST_CHECK_EQUAL ((*mhandle)->source, "d2");
-        BOOST_CHECK_EQUAL ((*mhandle)->original_dest, "d1");
+        ASSERT_TRUE (*mhandle);
+        EXPECT_EQ ((*mhandle)->data.to_string (), "this is a test message2");
+        EXPECT_EQ ((*mhandle)->source, "d2");
+        EXPECT_EQ ((*mhandle)->original_dest, "d1");
     }
 }
 
@@ -538,13 +543,17 @@ static constexpr const char *simple_clone_test_files[] = {"clone_example1.txt", 
                                                           "clone_example5.txt",  "clone_example6.txt",
                                                           "clone_example7.json", "clone_example8.JSON"};
 
-BOOST_DATA_TEST_CASE (simple_clone_test_file, boost::unit_test::data::make (simple_clone_test_files), file)
+class tracer_clone_file_tests : public ::testing::TestWithParam<const char *>
+{
+};
+
+TEST_P (tracer_clone_file_tests, simple_clone_test_file)
 {
     static char indx = 'a';
     gmlc::libguarded::guarded<std::unique_ptr<helics::Message>> mguard;
     std::atomic<double> lastTime{0.0};
     helics::FederateInfo fi (helics::core_type::TEST);
-    fi.coreName = std::string ("tcore4") + file;
+    fi.coreName = std::string ("tcore4") + GetParam ();
     fi.coreName.push_back (indx++);
     fi.coreInitString = "-f3 --autobroker";
     helics::apps::Tracer trace1 ("trace1", fi);
@@ -556,7 +565,7 @@ BOOST_DATA_TEST_CASE (simple_clone_test_file, boost::unit_test::data::make (simp
     helics::Endpoint &e1 = mfed.registerGlobalEndpoint ("d1");
     helics::Endpoint &e2 = mfed2.registerGlobalEndpoint ("d2");
 
-    trace1.loadFile (std::string (TEST_DIR) + file);
+    trace1.loadFile (std::string (TEST_DIR) + GetParam ());
     auto cb = [&mguard, &lastTime](helics::Time tm, std::unique_ptr<helics::Message> mess) {
         mguard = std::move (mess);
         lastTime = static_cast<double> (tm);
@@ -572,11 +581,11 @@ BOOST_DATA_TEST_CASE (simple_clone_test_file, boost::unit_test::data::make (simp
     mfed2.requestTimeComplete ();
 
     e1.send ("d2", "this is a test message");
-    BOOST_CHECK_EQUAL (retTime, 1.0);
+    EXPECT_EQ (retTime, 1.0);
 
     mfed2.requestTimeAsync (2.0);
     retTime = mfed.requestTime (2.0);
-    BOOST_CHECK_EQUAL (retTime, 2.0);
+    EXPECT_EQ (retTime, 2.0);
     mfed2.requestTimeComplete ();
     int cnt = 0;
     while (lastTime < 0.5)
@@ -587,43 +596,43 @@ BOOST_DATA_TEST_CASE (simple_clone_test_file, boost::unit_test::data::make (simp
             break;
         }
     }
-    BOOST_CHECK_CLOSE (lastTime.load (), 1.0, 0.00000001);
+    EXPECT_FLOAT_EQ (lastTime.load (), 1.0);
     {
         auto mhandle = mguard.lock ();
-        BOOST_REQUIRE (*mhandle);
-        BOOST_CHECK_EQUAL ((*mhandle)->data.to_string (), "this is a test message");
-        BOOST_CHECK_EQUAL ((*mhandle)->source, "d1");
-        BOOST_CHECK_EQUAL ((*mhandle)->original_dest, "d2");
+        ASSERT_TRUE (*mhandle);
+        EXPECT_EQ ((*mhandle)->data.to_string (), "this is a test message");
+        EXPECT_EQ ((*mhandle)->source, "d1");
+        EXPECT_EQ ((*mhandle)->original_dest, "d2");
     }
 
     e2.send ("d1", "this is a test message2");
     mfed.finalize ();
     mfed2.finalize ();
     fut.get ();
-    BOOST_CHECK_CLOSE (lastTime.load (), 2.0, 0.00000001);
+    EXPECT_FLOAT_EQ (lastTime.load (), 2.0);
     {
         auto mhandle = mguard.lock ();
-        BOOST_REQUIRE (*mhandle);
-        BOOST_CHECK_EQUAL ((*mhandle)->data.to_string (), "this is a test message2");
-        BOOST_CHECK_EQUAL ((*mhandle)->source, "d2");
-        BOOST_CHECK_EQUAL ((*mhandle)->original_dest, "d1");
+        ASSERT_TRUE (*mhandle);
+        EXPECT_EQ ((*mhandle)->data.to_string (), "this is a test message2");
+        EXPECT_EQ ((*mhandle)->source, "d2");
+        EXPECT_EQ ((*mhandle)->original_dest, "d1");
     }
 }
 
-#ifdef ENABLE_ZMQ_TESTS
+INSTANTIATE_TEST_SUITE_P (tracer_tests, tracer_clone_file_tests, ::testing::ValuesIn (simple_clone_test_files));
+
+#ifdef ENABLE_ZMQ_CORE
 #ifndef DISABLE_SYSTEM_CALL_TESTS
-BOOST_DATA_TEST_CASE (simple_tracer_test_message_files_exe,
-                      boost::unit_test::data::make (simple_message_files),
-                      file)
+TEST_P (tracer_message_file_tests, test_message_files_exe)
 {
     std::this_thread::sleep_for (300ms);
     auto brk = helics::BrokerFactory::create (helics::core_type::ZMQ, "z_broker", "-f 2");
     brk->connect ();
-    std::string exampleFile = std::string (TEST_DIR) + file;
+    std::string exampleFile = std::string (TEST_DIR) + GetParam ();
 
     std::string cmdArg ("--name=tracer --coretype=zmq --stop=5s --print --skiplog " + exampleFile);
     exeTestRunner tracerExe (HELICS_INSTALL_LOC, HELICS_BUILD_LOC "apps/", "helics_app");
-    BOOST_REQUIRE (tracerExe.isActive ());
+    ASSERT_TRUE (tracerExe.isActive ());
     auto out = tracerExe.runCaptureOutputAsync (std::string ("tracer " + cmdArg));
     helics::FederateInfo fi (helics::core_type::ZMQ);
     fi.coreInitString = "";
@@ -635,36 +644,37 @@ BOOST_DATA_TEST_CASE (simple_tracer_test_message_files_exe,
 
     cfed.enterExecutingMode ();
     auto retTime = cfed.requestTime (1);
-    BOOST_CHECK_EQUAL (retTime, 1.0);
+    EXPECT_EQ (retTime, 1.0);
     pub1.publish (3.4);
     e1.send ("src1", "this is a test message");
 
     retTime = cfed.requestTime (1.5);
-    BOOST_CHECK_EQUAL (retTime, 1.5);
+    EXPECT_EQ (retTime, 1.5);
     pub2.publish (5.7);
 
     retTime = cfed.requestTime (2.0);
-    BOOST_CHECK_EQUAL (retTime, 2.0);
+    EXPECT_EQ (retTime, 2.0);
     e1.send ("src1", "this is a test message2");
     pub1.publish (4.7);
 
     retTime = cfed.requestTime (3.0);
-    BOOST_CHECK_EQUAL (retTime, 3.0);
+    EXPECT_EQ (retTime, 3.0);
     pub2.publish ("3.9");
 
     retTime = cfed.requestTime (5);
-    BOOST_CHECK_EQUAL (retTime, 5.0);
+    EXPECT_EQ (retTime, 5.0);
 
     cfed.finalize ();
     std::string outAct = out.get ();
     int mcount = 0;
     int valcount = 0;
-    auto vec = stringOps::splitline (outAct, "\n\r", stringOps::delimiter_compression::on);
+    auto vec = gmlc::utilities::stringOps::splitline (outAct, "\n\r",
+                                                      gmlc::utilities::stringOps::delimiter_compression::on);
     auto cnt = std::count_if (vec.begin (), vec.end (),
                               [](const std::string &str) { return (!(str.empty ()) && (str[0] == '[')); });
     // 6 messages, 1 return line, 1 empty line
-    BOOST_CHECK_EQUAL (cnt, 6);
-    BOOST_CHECK_EQUAL (*(vec.end () - 2), "execution returned 0");
+    EXPECT_EQ (cnt, 6);
+    EXPECT_EQ (*(vec.end () - 1), "execution returned 0");
     for (const auto &line : vec)
     {
         if (line.find ("]value") != std::string::npos)
@@ -676,10 +686,9 @@ BOOST_DATA_TEST_CASE (simple_tracer_test_message_files_exe,
             ++mcount;
         }
     }
-    BOOST_CHECK_EQUAL (mcount, 2);
-    BOOST_CHECK_EQUAL (valcount, 4);
+    EXPECT_EQ (mcount, 2);
+    EXPECT_EQ (valcount, 4);
 }
 
 #endif
 #endif
-BOOST_AUTO_TEST_SUITE_END ()

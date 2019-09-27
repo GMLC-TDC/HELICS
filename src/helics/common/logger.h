@@ -1,5 +1,5 @@
 /*
-Copyright © 2017-2019,
+Copyright (c) 2017-2019,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
 the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
@@ -20,14 +20,15 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include <atomic>
 #include <fstream>
-#include <functional>
-#include <map>
 #include <memory>
 #include <mutex>
 
 namespace helics
 {
 class LoggingCore;
+
+constexpr int always_log = -100000;  //!< level that will always log
+constexpr int log_everything = 100;  //!< level that will log everything
 
 /** class implementing a thread safe Logger
 @details the Logger uses a queuing mechanism and condition variable to store messages to a queue and print/display
@@ -38,11 +39,12 @@ class Logger
   private:
     std::atomic<bool> halted{true};  //!< indicator that the Logger was halted
     std::mutex fileLock;  //!< mutex to protect the file itself
+    std::atomic<bool> hasFile{false};  //!< flag indicating the logger has a file
     std::ofstream outFile;  //!< the stream to write the log messages
     std::shared_ptr<LoggingCore> logCore;  //!< pointer to the core operation
     int coreIndex = -1;  //!< index into the core
-    std::atomic<int> consoleLevel{100};  //!< level below which we need to print to the console
-    std::atomic<int> fileLevel{100};  //!< level below which we need to print to a file
+    std::atomic<int> consoleLevel{log_everything};  //!< level below which we need to print to the console
+    std::atomic<int> fileLevel{log_everything};  //!< level below which we need to print to a file
   public:
     /** default constructor*/
     Logger ();
@@ -53,13 +55,16 @@ class Logger
     /** open a file to write the log messages
     @param file the name of the file to write messages to*/
     void openFile (const std::string &file);
+    /** close the current file for logging
+     */
+    void closeFile ();
     /** function to start the logging thread
     @param cLevel the console print level
     @param fLevel the file print level  messages coming in below these levels will be printed*/
     void startLogging (int cLevel, int fLevel);
     /** overload of @see startLogging with unspecified logging levels*/
     void startLogging () { startLogging (consoleLevel, fileLevel); }
-    /** stop logging for a time messages received while halted are ignored*/
+    /** stop logging for a time, messages received while halted are ignored*/
     void haltLogging ();
     /** log a message at a particular level
     @param level the level of the message
@@ -69,7 +74,7 @@ class Logger
     /** message to log without regard for levels*
     @param logMessage the message to log
     */
-    void log (std::string logMessage) { log (-100000, std::move (logMessage)); }
+    void log (std::string logMessage) { log (always_log, std::move (logMessage)); }
     /** flush the log queue*/
     void flush ();
     /** check if the Logger is running*/
@@ -90,8 +95,8 @@ class LoggerNoThread
   private:
     std::ofstream outFile;  //!< the file stream to write the log messages to
   public:
-    int consoleLevel = 100;  //!< level below which we need to print to the console
-    int fileLevel = 100;  //!< level below which we need to print to a file
+    int consoleLevel = log_everything;  //!< level below which we need to print to the console
+    int fileLevel = log_everything;  //!< level below which we need to print to a file
   public:
     /** default constructor*/
     LoggerNoThread ();
@@ -100,6 +105,8 @@ class LoggerNoThread
     /** open a file to write the log messages
     @param file the name of the file to write messages to*/
     void openFile (const std::string &file);
+    /** close the file for logging*/
+    void closeFile ();
     /** function to start the logging thread
     @param cLevel the console print level
     @param fLevel the file print level  messages coming in below these levels will be printed*/
@@ -116,7 +123,7 @@ class LoggerNoThread
     /** message to log without regard for levels*
     @param logMessage the message to log
     */
-    void log (const std::string &logMessage) { log (-100000, logMessage); }
+    void log (const std::string &logMessage) { log (always_log, logMessage); }
     /** check if the logging thread is running*/
     bool isRunning () const;
     /** flush the log queue*/

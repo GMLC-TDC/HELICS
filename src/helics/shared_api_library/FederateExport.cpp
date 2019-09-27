@@ -1,5 +1,5 @@
 /*
-Copyright © 2017-2019,
+Copyright (c) 2017-2019,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See the top-level NOTICE for
 additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
@@ -1000,4 +1000,66 @@ void helicsFederateSetGlobal (helics_federate fed, const char *valueName, const 
         return;
     }
     fedObj->setGlobal (valueName, AS_STRING (value));
+}
+
+static constexpr char invalidFederateCore[] = "Federate core is not connected";
+void helicsFederateSetLogFile (helics_federate fed, const char *logFile, helics_error *err)
+{
+    auto fedObj = getFed (fed, err);
+    if (fedObj == nullptr)
+    {
+        return;
+    }
+    auto cr = fedObj->getCorePointer ();
+
+    try
+    {
+        if (cr)
+        {
+            cr->setLogFile (AS_STRING (logFile));
+        }
+        else
+        {
+            if (err != nullptr)
+            {
+                err->error_code = helics_error_invalid_function_call;
+                err->message = invalidFederateCore;
+            }
+            return;
+        }
+    }
+    catch (...)
+    {
+        helicsErrorHandler (err);
+    }
+}
+
+void helicsFederateLogErrorMessage (helics_federate fed, const char *logmessage, helics_error *err)
+{
+    helicsFederateLogLevelMessage (fed, helics_log_level_error, logmessage, err);
+}
+
+void helicsFederateLogWarningMessage (helics_federate fed, const char *logmessage, helics_error *err)
+{
+    helicsFederateLogLevelMessage (fed, helics_log_level_warning, logmessage, err);
+}
+
+void helicsFederateLogInfoMessage (helics_federate fed, const char *logmessage, helics_error *err)
+{
+    helicsFederateLogLevelMessage (fed, helics_log_level_summary, logmessage, err);
+}
+
+void helicsFederateLogDebugMessage (helics_federate fed, const char *logmessage, helics_error *err)
+{
+    helicsFederateLogLevelMessage (fed, helics_log_level_data, logmessage, err);
+}
+
+void helicsFederateLogLevelMessage (helics_federate fed, int loglevel, const char *logmessage, helics_error *err)
+{
+    auto fedObj = getFed (fed, err);
+    if (fedObj == nullptr)
+    {
+        return;
+    }
+    fedObj->logMessage (loglevel, AS_STRING (logmessage));
 }

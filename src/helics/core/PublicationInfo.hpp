@@ -1,20 +1,15 @@
 /*
-Copyright © 2017-2019,
+Copyright (c) 2017-2019,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
 the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 #pragma once
 
-#include "Core.hpp"
-#include "helics-time.hpp"
-#include "helics/helics-config.h"
+#include "global_federate_id.hpp"
 
 #include <cstdint>
-#include <map>
-#include <mutex>
-#include <thread>
-#include <utility>
+#include <string>
 #include <vector>
 
 namespace helics

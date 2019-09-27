@@ -95,7 +95,7 @@ Getting and building from source:
 
 ## Windows Installers
 
-Windows installers are available with the different [releases](https://github.com/GMLC-TDC/HELICS/releases).  The release includes installers for the Debug version and Release version. As well as a zip file of the install directory. The static libraries included with the installer will work with Visual Studio 2017.
+Windows installers are available with the different [releases](https://github.com/GMLC-TDC/HELICS/releases).  The release includes zip archives with static libraries containing both the Debug version and Release version for several versions of Visual Studio. There is also an installer and zip file for getting the HELICS apps and shared library along with pre-built Python 3.6 and Java 1.8 interfaces. There is also an archive with just the C shared library and headers, intended for use with 3rd party interfaces.
 
 ## Testing
 

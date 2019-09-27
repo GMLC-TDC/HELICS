@@ -1,12 +1,13 @@
 /*
-Copyright © 2017-2019,
+Copyright (c) 2017-2019,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
 the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 #pragma once
 
-#include "Core.hpp"
+#include "basic_core_types.hpp"
+
 #include "flagOperations.hpp"
 
 namespace helics
@@ -25,9 +26,10 @@ enum class handle_type : char
 enum handle_flag_definitions
 {
     mapped_flag = extra_flag1,
-    has_source_filter_flag = extra_flag2,
-    has_dest_filter_flag = extra_flag3,
-    has_non_cloning_dest_filter_flag = extra_flag4
+    has_source_filter_flag = extra_flag2,  //!< indicator that an endpoint or message has a source filter
+    has_dest_filter_flag = extra_flag3,  //!< indicator that an endpoint or message has a destination filter
+    has_non_cloning_dest_filter_flag =
+      extra_flag4  //!< indicator that the endpoint or filter has a destination filter that alters the message
 };
 
 /** class defining and capturing basic information about a handle*/
@@ -60,13 +62,14 @@ class BasicHandleInfo
     const std::string key;  //!< the name of the handle
     const std::string type;  //!< the type of data used by the handle
     const std::string units;  //!< the units associated with the handle
-    std::string interface_info;
+    std::string interface_info;  //!< storage for a user info string
     const std::string &type_in;  //!< the input type of a filter
     const std::string &type_out;  //!< the output type of a filter
-
+    /** get the interface handle information */
     interface_handle getInterfaceHandle () const { return handle.handle; }
+    /** extract a global federate id */
     global_federate_id getFederateId () const { return handle.fed_id; }
-
+    /** set the user level information field*/
     void setInfoField (std::string &info) { interface_info = info; }
 };
 }  // namespace helics

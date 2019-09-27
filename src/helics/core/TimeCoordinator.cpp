@@ -1,5 +1,5 @@
 /*
-Copyright © 2017-2019,
+Copyright (c) 2017-2019,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
 the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
@@ -310,7 +310,7 @@ Time TimeCoordinator::generateAllowedTime (Time testTime) const
         }
         if (testTime - time_grantBase > info.period)
         {
-            auto blk = static_cast<int> (std::ceil ((testTime - time_grantBase) / info.period));
+            auto blk = std::ceil ((testTime - time_grantBase) / info.period);
             testTime = time_grantBase + blk * info.period;
         }
         else

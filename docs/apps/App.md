@@ -42,6 +42,10 @@ and others.  Used much like the player in situations some test signals are neede
 
 The [Broker](Broker.html) executes a broker like the stand alone Broker app, it does not include the broker terminal application.
 
+#### Clone
+
+The [Clone](Clone.html) has the ability to copy another federate and record it to a file that can be used by a Player.  It will duplicate all publications and subscriptions of a federate.  
+
 #### MultiBroker
 
 The Multibroker is an in progress development of a broker that can interact with multiple communication modes.  Such as a single broker that can act as a bridge between MPI and ZeroMQ or other network protocols.  More documentation will be available as the multibroker is developed

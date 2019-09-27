@@ -1,5 +1,5 @@
 #
-# Copyright © 2017-2019, Battelle Memorial Institute; Lawrence Livermore National
+# Copyright (c) 2017-2019, Battelle Memorial Institute; Lawrence Livermore National
 # Security, LLC; Alliance for Sustainable Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 #
 # SPDX-License-Identifier: BSD-3-Clause
@@ -105,6 +105,8 @@ set(
 	loggingHelper.hpp
 	CommsBroker.hpp
 	CommsBroker_impl.hpp
+	global_federate_id.hpp
+	basic_core_types.hpp
 	TimeoutMonitor.h
 	CoreBroker.hpp
 	InterfaceInfo.hpp
@@ -275,14 +277,18 @@ if(ENABLE_MPI_CORE)
   )
 endif(ENABLE_MPI_CORE)
 
-install(
-  FILES ${PUBLIC_INCLUDE_FILES}
-  DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/helics/core
-  COMPONENT headers
-)
+if (NOT HELICS_BINARY_ONLY_INSTALL)
+  if (HELICS_INSTALL_CPP14_HEADERS)
+    install(
+      FILES ${PUBLIC_INCLUDE_FILES}
+      DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/helics/core
+      COMPONENT headers
+    )
 
-install(
-  FILES ../helics_enums.h
-  DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/helics
-  COMPONENT headers
-)
+    install(
+      FILES ../helics_enums.h
+      DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/helics
+      COMPONENT headers
+    )
+  endif()
+endif()

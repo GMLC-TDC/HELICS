@@ -1,5 +1,5 @@
 /*
-Copyright © 2017-2019,
+Copyright (c) 2017-2019,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
 the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
@@ -26,8 +26,6 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <array>
 #include <atomic>
 #include <set>
-#include <thread>
-#include <utility>
 
 namespace helics
 {
@@ -36,7 +34,6 @@ class FederateState;
 
 class BasicHandleInfo;
 class FilterCoordinator;
-class Logger;
 class FilterInfo;
 class TimeoutMonitor;
 enum class handle_type : char;
@@ -182,6 +179,8 @@ class CommonCore : public Core, public BrokerBase
       local_federate_id federateID,
       std::function<void (int, const std::string &, const std::string &)> logFunction) override final;
 
+    virtual void setLogFile (const std::string &lfile) override final;
+
     virtual std::string query (const std::string &target, const std::string &queryStr) override;
     virtual void setQueryCallback (local_federate_id federateID,
                                    std::function<std::string (const std::string &)> queryFunction) override;
@@ -248,10 +247,6 @@ class CommonCore : public Core, public BrokerBase
     bool allDisconnected () const;
     /** check if all federates have said good-bye*/
     bool allFedDisconnected () const;
-    virtual bool sendToLogger (global_federate_id federateID,
-                               int logLevel,
-                               const std::string &name,
-                               const std::string &message) const override;
 
   private:
     /** get the federate Information from the federateID*/
@@ -409,6 +404,8 @@ class CommonCore : public Core, public BrokerBase
     /** generate a query response for a federate if possible
     @param fed a pointer to the federateState object to query
     @param queryStr  the string containing the actual query
+    @return "#wait" if the lock cannot be granted immediately and no result can be obtained otherwise an answer to
+    the query
     */
     std::string federateQuery (const FederateState *fed, const std::string &queryStr) const;
 

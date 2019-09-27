@@ -1,5 +1,5 @@
 /*
-Copyright © 2017-2019,
+Copyright (c) 2017-2019,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
 the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
@@ -44,7 +44,7 @@ template <class COMMS, class BrokerT>
 void CommsBroker<COMMS, BrokerT>::loadComms ()
 {
     comms = std::make_unique<COMMS> ();
-    comms->setCallback ([this](ActionMessage &&M) { BrokerBase::addActionMessage (std::move (M)); });
+    comms->setCallback ([this] (ActionMessage &&M) { BrokerBase::addActionMessage (std::move (M)); });
 }
 
 template <class COMMS, class BrokerT>
@@ -113,6 +113,12 @@ template <class COMMS, class BrokerT>
 void CommsBroker<COMMS, BrokerT>::removeRoute (route_id rid)
 {
     comms->removeRoute (rid);
+}
+
+template <class COMMS, class BrokerT>
+COMMS *CommsBroker<COMMS, BrokerT>::getCommsObjectPointer ()
+{
+    return comms.get ();
 }
 
 }  // namespace helics

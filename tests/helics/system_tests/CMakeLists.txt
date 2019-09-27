@@ -1,5 +1,5 @@
 #
-# Copyright © 2017-2019, Battelle Memorial Institute; Lawrence Livermore National
+# Copyright (c) 2017-2019, Battelle Memorial Institute; Lawrence Livermore National
 # Security, LLC; Alliance for Sustainable Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved. 
 # 
 # SPDX-License-Identifier: BSD-3-Clause
@@ -18,6 +18,7 @@ set(
   flagTests.cpp
   updateTests.cpp
   networkTests.cpp
+  brokerTimeoutTests.cpp
   ../application_api/testFixtures.cpp
   ../application_api/testFixtures.hpp
 )
@@ -39,7 +40,7 @@ target_compile_definitions(
 
 add_test(
   NAME system-tests
-  COMMAND system-tests --log_level=message --report_level=short
+  COMMAND system-tests
 )
 set_property(TEST system-tests PROPERTY LABELS System Coverage Daily TSAN)
 

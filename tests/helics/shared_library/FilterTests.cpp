@@ -1,5 +1,5 @@
 /*
-Copyright © 2017-2019,
+Copyright (c) 2017-2019,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
 the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
@@ -8,7 +8,6 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "ctestFixtures.hpp"
 #include <boost/test/unit_test.hpp>
 #include <boost/test/data/test_case.hpp>
-#include <boost/test/floating_point_comparison.hpp>
 
 #include <future>
 /** these test cases test out the message federates

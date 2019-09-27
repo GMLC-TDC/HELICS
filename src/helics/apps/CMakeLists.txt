@@ -1,5 +1,5 @@
 #
-# Copyright © 2017-2019, Battelle Memorial Institute; Lawrence Livermore National
+# Copyright (c) 2017-2019, Battelle Memorial Institute; Lawrence Livermore National
 # Security, LLC; Alliance for Sustainable Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 #
 # SPDX-License-Identifier: BSD-3-Clause
@@ -127,13 +127,16 @@ if(BUILD_APP_LIBRARY)
 	set_property(TEST app_subcommand_version_return app_subcommand_help_return PROPERTY LABELS Continuous)
   endif(BUILD_APP_EXECUTABLES)
 
+  if (NOT DISABLE_STATIC_LIB_INSTALL)
   install(
     TARGETS helics_apps
     ${HELICS_EXPORT_COMMAND}
     DESTINATION ${CMAKE_INSTALL_LIBDIR}
     COMPONENT libs
   )
+  endif()
 
+  if (HELICS_INSTALL_CPP14_HEADERS)
   install(
     FILES ${helics_apps_public_headers}
     DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/helics/apps
@@ -144,7 +147,7 @@ if(BUILD_APP_LIBRARY)
     DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/helics
     COMPONENT headers
   )
-
+  endif(HELICS_INSTALL_CPP14_HEADERS)
 endif (BUILD_APP_LIBRARY)
 
 # configure executable app

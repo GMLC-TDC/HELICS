@@ -1,5 +1,5 @@
 /*
-Copyright © 2017-2019,
+Copyright (c) 2017-2019,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
 the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
@@ -56,7 +56,7 @@ class Echo : public App
     /** move construction*/
     Echo (Echo &&other_echo) noexcept;
     /** move assignment*/
-    Echo &operator= (Echo &&fed) noexcept;
+    Echo &operator= (Echo &&other_echo) noexcept;
 
     /** run the Echo federate until the specified time
     @param stopTime_input the desired stop time

@@ -1,5 +1,5 @@
 #
-# Copyright © 2017-2019, Battelle Memorial Institute; Lawrence Livermore National
+# Copyright (c) 2017-2019, Battelle Memorial Institute; Lawrence Livermore National
 # Security, LLC; Alliance for Sustainable Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 #
 # SPDX-License-Identifier: BSD-3-Clause
@@ -24,6 +24,9 @@ set(
 add_library(helicsCpp98 INTERFACE)
 target_link_libraries(helicsCpp98 INTERFACE helicsSharedLib)
 add_library(HELICS::helicsCpp98 ALIAS helicsCpp98)
+target_include_directories(helicsCpp98 INTERFACE $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/src/helics>
+        $<INSTALL_INTERFACE:$<INSTALL_PREFIX>/include>)
+
 
 # this is purely so the files show up nicely in an IDE, other ides might use it as well
 # but that can be added when/if the need arises
@@ -34,6 +37,7 @@ if(MSVC)
   set_target_properties(helicsCpp98_ide PROPERTIES FOLDER interfaces)
 endif(MSVC)
 
+if (NOT HELICS_BINARY_ONLY_INSTALL)
 install(
   TARGETS helicsCpp98
   ${HELICS_EXPORT_COMMAND}
@@ -48,3 +52,4 @@ install(
   DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/helics/cpp98
   COMPONENT headers
 )
+endif()

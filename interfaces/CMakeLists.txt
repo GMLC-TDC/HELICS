@@ -6,6 +6,7 @@
 #
 # SPDX-License-Identifier: BSD-3-Clause
 #
+
 if (NOT DISABLE_C_SHARED_INTERFACE)
 
 option(BUILD_PYTHON_INTERFACE "Build Python extension" OFF)
@@ -23,8 +24,14 @@ if(${CMAKE_VERSION} VERSION_GREATER 3.8)
     option(BUILD_CSHARP_INTERFACE "Build C# extension" OFF)
 endif()
 
+#these are purposely hidden options since they will only be used for very select purposes
+option(SWIG_GENERATE_INTERFACE_FILES_ONLY "Use Swig to generate the interface files but not build" OFF)
+hide_variable(SWIG_GENERATE_INTERFACE_FILES_ONLY)
 
-IF(BUILD_CSHARP_INTERFACE OR BUILD_OCTAVE_INTERFACE OR BUILD_PYTHON2_INTERFACE)
+option(HELICS_OVERWRITE_INTERFACE_FILES "have cmake automatically overwrite the interface build files" OFF)
+hide_variable(HELICS_OVERWRITE_INTERFACE_FILES)
+
+if(BUILD_CSHARP_INTERFACE OR BUILD_PYTHON2_INTERFACE OR BUILD_OCTAVE_INTERFACE OR SWIG_GENERATE_INTERFACE_FILES_ONLY)
 set(SWIG_REQUIRED ON)
 else()
 set(SWIG_REQUIRED OFF)
@@ -33,12 +40,14 @@ option(ENABLE_SWIG OFF "use swig to generate the interface files")
 endif()
 endif()
 
+
 if(ENABLE_SWIG OR SWIG_REQUIRED)
   if(WIN32 AND NOT MSYS)
     if(NOT CMAKE_PROGRAM_PATH)
       set(
         CMAKE_PROGRAM_PATH
-	"C:/local/swigwin-4.0.0"
+		"C:/ProgramData/chocolatey/bin"
+	    "C:/local/swigwin-4.0.0"
         "C:/local/swigwin-3.0.12"
         "C:/local/swigwin-3.0.11"
         "C:/local/swigwin-3.0.10"
@@ -47,7 +56,8 @@ if(ENABLE_SWIG OR SWIG_REQUIRED)
       set(
         CMAKE_PROGRAM_PATH
         "${CMAKE_PROGRAM_PATH}"
-	"C:/local/swigwin-4.0.0"
+		"C:/ProgramData/chocolatey/bin"
+	    "C:/local/swigwin-4.0.0"
         "C:/local/swigwin-3.0.12"
         "C:/local/swigwin-3.0.11"
         "C:/local/swigwin-3.0.10"
@@ -59,6 +69,10 @@ if(ENABLE_SWIG OR SWIG_REQUIRED)
     # with older versions (see cmake_minimum_required) we should put 'cmake_policy' under
     # condition.
     cmake_policy(SET CMP0078 OLD)
+  endif()
+  if(POLICY CMP0086)
+    # Policy CMP0086 the old behavior is assumed in the java interface, TODO: PT examine its usage and implications for now leave it at the OLD
+    cmake_policy(SET CMP0086 OLD)
   endif()
   find_package(SWIG REQUIRED 3.0)
   include(${SWIG_USE_FILE})

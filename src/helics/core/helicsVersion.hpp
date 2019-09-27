@@ -1,5 +1,5 @@
 /*
-Copyright © 2017-2019,
+Copyright (c) 2017-2019,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
 the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
@@ -22,5 +22,7 @@ constexpr int versionMajor = HELICS_VERSION_MAJOR;
 constexpr int versionMinor = HELICS_VERSION_MINOR;
 /** get the patch number*/
 constexpr int versionPatch = HELICS_VERSION_PATCH;
+/** the build string if any*/
+constexpr auto versionBuild = HELICS_VERSION_BUILD;
 
 }  // namespace helics

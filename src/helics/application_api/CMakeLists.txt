@@ -1,5 +1,5 @@
 #
-# Copyright © 2017-2019, Battelle Memorial Institute; Lawrence Livermore National
+# Copyright (c) 2017-2019, Battelle Memorial Institute; Lawrence Livermore National
 # Security, LLC; Alliance for Sustainable Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved. 
 # 
 # SPDX-License-Identifier: BSD-3-Clause
@@ -104,15 +104,19 @@ if(MSYS AND USE_LIBCXX)
   target_compile_definitions(application_api PUBLIC "-DSTX_NO_STD_OPTIONAL=1")
 endif()
 
+if (NOT HELICS_BINARY_ONLY_INSTALL)
+  # Install headers if the static library or C++ shared library are installed
+  if (HELICS_INSTALL_CPP14_HEADERS)
+    install(
+      FILES ${public_application_api_headers}
+      DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/helics/application_api
+      COMPONENT headers
+    )
 
-install(
-  FILES ${public_application_api_headers}
-  DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/helics/application_api
-  COMPONENT headers
-)
-
-install(
-  FILES ${conv_headers}
-  DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/helics
-  COMPONENT headers
-)
+    install(
+      FILES ${conv_headers}
+      DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/helics
+      COMPONENT headers
+    )
+  endif()
+endif()

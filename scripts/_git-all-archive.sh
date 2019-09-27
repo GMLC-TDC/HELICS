@@ -1,5 +1,5 @@
 #
-# Copyright © 2017-2019,
+# Copyright (c) 2017-2019,
 # Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
 # the top-level NOTICE for additional details. All rights reserved.
 # SPDX-License-Identifier: BSD-3-Clause
@@ -11,21 +11,17 @@
 set -e
 set -C # noclobber
 #
-# installing github for python
 
-usage="$(basename "$0") [-h] [-t s] [-r s] [-l s] -- archive and upload source tarbal to github
+usage="$(basename "$0") [-h] [-t s] [-r s] [-l s] -- create archive source tarball with all submodules
 where:
     -h  show this help text
     -t  source code tag (v2.1.1)
     -r  repo (GMLC-TDC/HELICS)
     -l  release tag (can be different than checkout tag ex: v0.0.0archive)
-    -k  github Personal access token (read/write permission)
-    -i  github client id (github OAuth [optional])
-    -s  github client secret (github OAut [optional])
 
     URL: https://github.com/GMLC-TDC/HELICS/releases"
 
-while getopts ':ht:r:l:k:i:s:' option; do
+while getopts ':ht:r:l:' option; do
   case "$option" in
     h) echo "$usage"
        exit
@@ -35,12 +31,6 @@ while getopts ':ht:r:l:k:i:s:' option; do
     r) repo=$OPTARG
        ;;
     l) release=$OPTARG
-       ;;
-    k) GITHUB_TOKEN=$OPTARG
-       ;;
-    i) CLIENT_ID=$OPTARG
-       ;;
-    s) CLIENT_SECRET=$OPTARG
        ;;
     :) printf "missing argument for -%s\n" "$OPTARG" >&2
        echo "$usage" >&2
@@ -54,26 +44,29 @@ while getopts ':ht:r:l:k:i:s:' option; do
 done
 shift $((OPTIND - 1))
 
-pip install pygithub
-
 echo "> creating root archive"
 export ROOT_ARCHIVE_DIR="$(pwd)"
 
 git checkout $tag
 git submodule update --init
-export OUTPUT_FILE="HELICS-${tag}.tar.gz"
+OUTPUT_BASENAME="Helics-${release}-source"
+export OUTPUT_FILE="${OUTPUT_BASENAME}.tar.gz"
 # create root archive
-git archive --verbose --prefix "repo/" --format "tar" --output "$ROOT_ARCHIVE_DIR/repo-output.tar" "master"
+git archive --verbose --format "tar" --output "${ROOT_ARCHIVE_DIR}/${OUTPUT_BASENAME}.tar" "$(git rev-parse --abbrev-ref HEAD)"
 
 echo "> appending submodule archives"
 # for each of git submodules append to the root archive
-git submodule foreach --recursive 'git archive --verbose --prefix=repo/$path/ --format tar master --output $ROOT_ARCHIVE_DIR/repo-output-sub-$sha1.tar'
+git submodule foreach --recursive 'git archive --verbose --prefix=$path/ --format tar "$(git rev-parse --abbrev-ref HEAD)" --output $ROOT_ARCHIVE_DIR/repo-output-sub-$sha1.tar'
+
 
 if (( $(ls repo-output-sub*.tar | wc -l) != 0  )); then
   # combine all archives into one tar
   echo
   echo "> combining all tars"
-  tar --file repo-output.tar --append repo-output-sub*.tar
+  for archivetar in $(ls repo-output-sub*.tar); do
+    echo $archivetar
+    tar --concatenate --file="${OUTPUT_BASENAME}.tar" "$archivetar"
+  done
 
   # remove sub tars
   echo "> removing all sub tars"
@@ -82,22 +75,5 @@ fi
 
 # gzip the tar
 echo "> gzipping final tar"
-gzip --force --verbose repo-output.tar
-
-echo "> moving output file to $OUTPUT_FILE"
-mv repo-output.tar.gz $OUTPUT_FILE
-
-cmd="python git-all-archive.py --repo $repo --release $release --version $tag"
-if [ "${GITHUB_TOKEN}a" != "a" ]; then
-    cmd="${cmd} --token $GITHUB_TOKEN"
-fi
-if [[ "${CLIENT_ID}a" != "a" ]]; then
-    cmd="${cmd} --client_id $CLIENT_ID"
-fi
-if [[ "${CLIENT_SECRET}a" != "a" ]]; then
-    cmd="$cmd --client_secret $CLIENT_SECRET"
-fi
-echo
-echo "> running $cmd"
-$cmd
+gzip --force --verbose "${OUTPUT_BASENAME}.tar"
 

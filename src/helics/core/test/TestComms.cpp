@@ -1,5 +1,5 @@
 /*
-Copyright © 2017-2019,
+Copyright (c) 2017-2019,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
 the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
@@ -283,12 +283,18 @@ void TestComms::queue_tx_function ()
     setTxStatus (connection_status::terminated);
 }
 
-void TestComms::closeReceiver ()
+void TestComms::haltComms ()
 {
-    if (getTxStatus () == connection_status::connected)
+    if (getRxStatus () == connection_status::connected)
     {
         ActionMessage cmd (CMD_PROTOCOL);
         cmd.messageID = CLOSE_RECEIVER;
+        transmit (control_route, cmd);
+    }
+    if (getTxStatus () == connection_status::connected)
+    {
+        ActionMessage cmd (CMD_PROTOCOL);
+        cmd.messageID = DISCONNECT;
         transmit (control_route, cmd);
     }
 }

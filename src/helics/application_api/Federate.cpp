@@ -1,5 +1,5 @@
 /*
-Copyright © 2017-2019,
+Copyright (c) 2017-2019,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
 the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
@@ -421,9 +421,12 @@ void Federate::setProperty (int32_t option, int32_t optionValue)
     coreObject->setIntegerProperty (fedID, option, optionValue);
 }
 
-Time Federate::getTimeProperty (int32_t option) { return coreObject->getTimeProperty (fedID, option); }
+Time Federate::getTimeProperty (int32_t option) const { return coreObject->getTimeProperty (fedID, option); }
 
-int32_t Federate::getIntegerProperty (int32_t option) { return coreObject->getIntegerProperty (fedID, option); }
+int32_t Federate::getIntegerProperty (int32_t option) const
+{
+    return coreObject->getIntegerProperty (fedID, option);
+}
 
 void Federate::setLoggingCallback (
   const std::function<void(int, const std::string &, const std::string &)> &logFunction)
@@ -433,7 +436,7 @@ void Federate::setLoggingCallback (
 
 void Federate::setFlagOption (int flag, bool flagValue) { coreObject->setFlagOption (fedID, flag, flagValue); }
 
-bool Federate::getFlagOption (int flag) { return coreObject->getFlagOption (fedID, flag); }
+bool Federate::getFlagOption (int flag) const{ return coreObject->getFlagOption (fedID, flag); }
 void Federate::finalize ()
 {  // since finalize is called in the destructor we can't allow any potential virtual function calls
     switch (currentMode)
@@ -642,9 +645,6 @@ void Federate::requestTimeAsync (Time nextInternalTimeStep)
     }
 }
 
-/** request a time advancement
-@param the next requested time step
-@return the granted time step*/
 void Federate::requestTimeIterativeAsync (Time nextInternalTimeStep, iteration_request iterate)
 {
     auto exp = modes::executing;
@@ -1309,6 +1309,11 @@ void Federate::setInfo (interface_handle handle, const std::string &info)
 std::string const &Federate::getInfo (interface_handle handle)
 {
     return (coreObject) ? coreObject->getInterfaceInfo (handle) : emptyStr;
+}
+
+void Federate::logMessage (int level, const std::string &message) const
+{
+    coreObject->logMessage (fedID, level, message);
 }
 
 }  // namespace helics

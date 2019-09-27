@@ -1,5 +1,5 @@
 #
-# Copyright © 2017-2018, Battelle Memorial Institute; Lawrence Livermore National
+# Copyright (c) 2017-2018, Battelle Memorial Institute; Lawrence Livermore National
 # Security, LLC; Alliance for Sustainable Energy, LLC All rights reserved.
 # SPDX-License-Identifier: BSD-3-Clause
 #
@@ -19,16 +19,15 @@ target_link_libraries(helics_google_test_base INTERFACE helics_base_includes com
 add_subdirectory(core)
 add_subdirectory(common)
 add_subdirectory(system_tests)
+add_subdirectory(apps)
 
 if (BUILD_BOOST_TESTS)
 
 add_subdirectory(application_api)
 
-if(BUILD_C_SHARED_LIB OR INTERFACE_BUILD)
+if(NOT DISABLE_C_SHARED_LIB)
     add_subdirectory(shared_library)
 endif()
-
-add_subdirectory(apps)
 
 add_subdirectory(performance_tests)
 endif()
@@ -41,7 +40,7 @@ add_test(find-package-tests ${CMAKE_CTEST_COMMAND} -C ${CMAKE_BUILD_TYPE}
                             --build-options
                             "-DHELICS_DIR=${PROJECT_BINARY_DIR}"
                             "-DBUILD_SHARED_LIBS=${BUILD_SHARED_LIBS}"
-                            "-DBUILD_C_SHARED_LIB=${BUILD_C_SHARED_LIB}"
+                            "-DDISABLE_C_SHARED_LIB=${DISABLE_C_SHARED_LIB}"
                             "-DBUILD_APPS=${BUILD_APPS}"
                             "-DZeroMQ_INSTALL_PATH=${ZeroMQ_INSTALL_PATH}"
                             "-DBOOST_INSTALL_PATH=${BOOST_INSTALL_PATH}"
@@ -64,7 +63,7 @@ if (ENABLE_SLOW_PACKAGING_TESTS)
                                 --build-generator-platform "${CMAKE_GENERATOR_PLATFORM}"
                                 --build-options
                                 "-DBUILD_SHARED_LIBS=${BUILD_SHARED_LIBS}"
-                                "-DBUILD_C_SHARED_LIB=${BUILD_C_SHARED_LIB}"
+                                "-DDISABLE_C_SHARED_LIB=${DISABLE_C_SHARED_LIB}"
                                 "-DBUILD_APPS=${BUILD_APPS}"
                                 "-DBUILD_HELICS_TESTS=OFF"
                                 "-DBUILD_HELICS_EXAMPLES=OFF"

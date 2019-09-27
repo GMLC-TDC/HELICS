@@ -1,5 +1,5 @@
 /*
-Copyright © 2017-2019,
+Copyright (c) 2017-2019,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
 the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
@@ -71,7 +71,7 @@ std::unique_ptr<helicsCLI11App> BrokerApp::generateParser ()
     app->add_option ("--name,-n", name, "name of the broker");
     app->allow_extras ();
     auto app_p = app.get ();
-    app->footer ([app_p] () {
+    app->footer ([app_p]() {
         auto coreType = helics::coreTypeFromString ((*app_p)["--core"]->as<std::string> ());
         BrokerFactory::displayHelp (coreType);
         return std::string ();
@@ -89,13 +89,8 @@ void BrokerApp::processArgs (std::unique_ptr<helicsCLI11App> &app)
     }
 }
 
-/** run the Echo federate until the specified time
-@param stopTime_input the desired stop time
-*/
-/** check if the Broker is running*/
 bool BrokerApp::isActive () const { return ((broker) && (broker->isConnected ())); }
 
-/** forceably disconnect the broker*/
 void BrokerApp::forceTerminate ()
 {
     if (!broker)

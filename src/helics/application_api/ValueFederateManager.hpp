@@ -1,5 +1,5 @@
 /*
-Copyright © 2017-2019,
+Copyright (c) 2017-2019,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
 the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
@@ -7,15 +7,15 @@ SPDX-License-Identifier: BSD-3-Clause
 #pragma once
 
 #include "../common/GuardedTypes.hpp"
-#include "../core/Core.hpp"
-#include "../core/federate_id_extra.hpp"
+#include "../core/federate_id.hpp"
 #include "Inputs.hpp"
 #include "Publications.hpp"
-#include "gmlc/containers/DualMappedVector.hpp"
-
 #include "data_view.hpp"
+#include "gmlc/containers/DualMappedVector.hpp"
 #include "helicsTypes.hpp"
-#include <atomic>
+#include <memory>
+#include <string>
+#include <vector>
 
 namespace helics
 {

@@ -144,7 +144,7 @@ jobs:
         - USE_SWIG=true
         - CI_BOOST_VERSION=1.58.0
         - SKIP_TEST_RUN=true
-        - JOB_OPTION_FLAGS="-DBUILD_HELICS_BOOST_TESTS=OFF"
+        - JOB_OPTION_FLAGS="-DBUILD_HELICS_BOOST_TESTS=OFF -DDISABLE_BOOST=ON"
 
     - os: windows
       name: "MinGW"
@@ -199,28 +199,6 @@ jobs:
         - GCOV_TOOL=gcov-6
         - USE_MPI=mpich
         - CTEST_VERBOSE=true
-    # TSAN build
-    - <<: *daily_linux
-      name: "Clang 5 Thread Sanitizer"
-      compiler: clang
-      addons:
-        apt:
-          sources:
-            - ubuntu-toolchain-r-test
-            - llvm-toolchain-trusty-5.0
-          packages:
-            - libstdc++-6-dev
-            - clang-5.0
-      env:
-        - MATRIX_EVAL="COMPILER=clang && CC='clang-5.0' && CXX='clang++-5.0'"
-        - CCACHE_CPP2=yes
-        - CI_TEST_CONFIG="TSAN"
-        - DISABLE_INTERFACES="Python,Java"
-        - RUN_SANITIZER=tsan
-        - USE_MPI=mpich
-        - JOB_OPTION_FLAGS="-C../scripts/tsan-cache.cmake"
-        - ZMQ_SUBPROJECT=true
-        - ZMQ_FORCE_SUBPROJECT=true
     # UBSAN build
     - <<: *daily_linux
       name: "Clang 5 Undefined Behavior Sanitizer"

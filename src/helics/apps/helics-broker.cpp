@@ -1,5 +1,5 @@
 /*
-Copyright © 2017-2019,
+Copyright (c) 2017-2019,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
 the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
@@ -38,7 +38,8 @@ int main (int argc, char *argv[])
       .footer ("helics_broker <broker args ..> starts a broker with the given args and waits for it to "
                "complete\n")
       ->footer ([] () {
-          helics::apps::BrokerApp{"-?"};
+          helics::apps::BrokerApp app{"-?"};
+          (void)(app);
           return std::string{};
       });
     cmdLine.allow_extras ();

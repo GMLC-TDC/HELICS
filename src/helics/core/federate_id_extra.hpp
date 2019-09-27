@@ -1,13 +1,13 @@
 /*
-Copyright © 2017-2019,
+Copyright (c) 2017-2019,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
 the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 
 #pragma once
+#include "global_federate_id.hpp"
 #include "gmlc/containers/MapTraits.hpp"
-#include "federate_id.hpp"
 
 /** override the is_easily_hashable type_trait of interface_handle for use in DualMappedVector and some other types
  * that may optionally use std::map or std::unordered_map*/

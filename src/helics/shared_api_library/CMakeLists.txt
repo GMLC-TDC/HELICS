@@ -1,5 +1,5 @@
 #
-# Copyright © 2017-2019, Battelle Memorial Institute; Lawrence Livermore National
+# Copyright (c) 2017-2019, Battelle Memorial Institute; Lawrence Livermore National
 # Security, LLC; Alliance for Sustainable Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 #
 # SPDX-License-Identifier: BSD-3-Clause
@@ -104,7 +104,7 @@ else()
   )
 endif()
 
-
+if (NOT HELICS_BINARY_ONLY_INSTALL)
 install(
   FILES ${CMAKE_CURRENT_BINARY_DIR}/helics_export.h
   DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/helics/shared_api_library
@@ -123,3 +123,5 @@ install(
   DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/helics/shared_api_library
   COMPONENT headers
 )
+
+endif()

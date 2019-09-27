@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2017-2019, Battelle Memorial Institute
+Copyright (c) 2017-2019, Battelle Memorial Institute
 All rights reserved.
 
 This software was co-developed by Pacific Northwest National Laboratory, operated by the Battelle Memorial

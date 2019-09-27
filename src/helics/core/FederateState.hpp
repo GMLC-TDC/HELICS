@@ -1,5 +1,5 @@
 /*
-Copyright © 2017-2019,
+Copyright (c) 2017-2019,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
 the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
@@ -8,20 +8,16 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include "../common/GuardedTypes.hpp"
 #include "ActionMessage.hpp"
-#include "CommonCore.hpp"
-#include "Core.hpp"
-#include "CoreFederateInfo.hpp"
+#include "BasicHandleInfo.hpp"
 #include "InterfaceInfo.hpp"
-#include "TimeDependencies.hpp"
 #include "core-data.hpp"
 #include "core-types.hpp"
 #include "gmlc/containers/BlockingQueue.hpp"
 #include "helics-time.hpp"
-#include "helics/helics-config.h"
 #include <atomic>
 #include <chrono>
 #include <map>
-#include <mutex>
+#include <thread>
 #include <vector>
 
 namespace helics
@@ -31,6 +27,7 @@ class PublicationInfo;
 class EndpointInfo;
 class FilterInfo;
 class CommonCore;
+class CoreFederateInfo;
 
 class TimeCoordinator;
 class MessageTimer;
@@ -102,10 +99,11 @@ class FederateState
     std::vector<global_federate_id> delayedFederates;  //!< list of federates to delay messages from
     Time time_granted = startupTime;  //!< the most recent granted time;
     Time allowed_send_time = startupTime;  //!< the next time a message can be sent;
-    std::atomic_flag processing = ATOMIC_FLAG_INIT;  //!< the federate is processing
+    mutable std::atomic_flag processing = ATOMIC_FLAG_INIT;  //!< the federate is processing
   private:
     /** a logging function for logging or printing messages*/
-    std::function<void (int, const std::string &, const std::string &)> loggerFunction;
+    std::function<void(int, const std::string &, const std::string &)>
+      loggerFunction;  //!< callback for logging functions
     std::function<std::string (const std::string &)> queryCallback;  //!< a callback for additional queries
     /** find the next Value Event*/
     Time nextValueTime () const;
@@ -129,8 +127,11 @@ class FederateState
     void reInit ();
     /** get the name of the federate*/
     const std::string &getIdentifier () const { return name; }
+    /** get the current state of the federate*/
     federate_state getState () const;
+    /** get the information that comes from the interface including timing information*/
     InterfaceInfo &interfaces () { return interfaceInformation; }
+    /** const version of the interface info retrieval function*/
     const InterfaceInfo &interfaces () const { return interfaceInformation; }
 
     /** get the size of a message queue for a specific endpoint or filter handle*/
@@ -179,16 +180,29 @@ class FederateState
     int endpointCount () const;
     /** get the number of inputs*/
     int inputCount () const;
-    /** locks the processing*/
-    void lock ()
+    /** locks the processing with a busy loop*/
+    void spinlock () const
     {
         while (processing.test_and_set ())
         {
             ;  // spin
         }
     }
+    /** locks the processing with a sleep loop*/
+    void sleeplock () const
+    {
+        while (processing.test_and_set ())
+        {
+            std::this_thread::sleep_for (std::chrono::milliseconds (50));
+        }
+    }
+    /** locks the processing so FederateState can be used with lock_guard*/
+    void lock () { spinlock (); }
+
+    /** trys to lock the processing return true if successful and false if not*/
+    bool try_lock () const { return !processing.test_and_set (); }
     /** unlocks the processing*/
-    void unlock () { processing.clear (std::memory_order_release); }
+    void unlock () const { processing.clear (std::memory_order_release); }
 
   private:
     /** process the federate queue until returnable event
@@ -232,6 +246,8 @@ class FederateState
     void addDependent (global_federate_id fedThatDependsOnThis);
     /** check the interfaces for any issues*/
     int checkInterfaces ();
+    /** generate results from a query*/
+    std::string processQueryActual (const std::string &query) const;
 
   public:
     /** get the granted time of a federate*/
@@ -293,7 +309,7 @@ class FederateState
     @details function must have signature void(int level, const std::string &sourceName, const std::string
     &message)
     */
-    void setLogger (std::function<void (int, const std::string &, const std::string &)> logFunction)
+    void setLogger (std::function<void(int, const std::string &, const std::string &)> logFunction)
     {
         loggerFunction = std::move (logFunction);
     }
@@ -306,7 +322,7 @@ class FederateState
     }
     /** generate the result of a query string
     @param query a query string
-    @return the resulting string from the query*/
+    @return the resulting string from the query or "#wait" if the federate is not available to answer immediately*/
     std::string processQuery (const std::string &query) const;
     /** check if a value should be published or not
     @param pub_id the handle of the publication

@@ -1,5 +1,5 @@
 /*
-Copyright © 2017-2019,
+Copyright (c) 2017-2019,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See the top-level NOTICE for
 additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
@@ -832,6 +832,7 @@ void helicsCoreDataLink (helics_core core, const char *source, const char *targe
 }
 
 static constexpr char invalidGlobalString[] = "Global name cannot be null";
+
 void helicsBrokerSetGlobal (helics_broker broker, const char *valueName, const char *value, helics_error *err)
 {
     auto brk = getBroker (broker, err);
@@ -849,6 +850,16 @@ void helicsBrokerSetGlobal (helics_broker broker, const char *valueName, const c
         return;
     }
     brk->setGlobal (valueName, AS_STRING (value));
+}
+
+void helicsBrokerSetLogFile(helics_broker broker, const char *logFileName, helics_error *err)
+{
+    auto brk = getBroker (broker, err);
+    if (brk == nullptr)
+    {
+        return;
+    }
+    brk->setLogFile (AS_STRING (logFileName));
 }
 
 void helicsBrokerAddSourceFilterToEndpoint (helics_broker broker, const char *filter, const char *endpoint, helics_error *err)
@@ -956,6 +967,16 @@ void helicsCoreSetGlobal (helics_core core, const char *valueName, const char *v
     cr->setGlobal (valueName, AS_STRING (value));
 }
 
+void helicsCoreSetLogFile (helics_core core, const char *logFileName, helics_error *err)
+{
+    auto cr = getCore (core, err);
+    if (cr == nullptr)
+    {
+        return;
+    }
+    cr->setLogFile (AS_STRING (logFileName));
+}
+
 const char *helicsBrokerGetIdentifier (helics_broker broker)
 {
     auto brk = getBroker (broker, nullptr);
@@ -988,6 +1009,18 @@ const char *helicsBrokerGetAddress (helics_broker broker)
     }
 
     auto &add = brk->getAddress ();
+    return add.c_str ();
+}
+
+const char *helicsCoreGetAddress (helics_core core)
+{
+    auto cr = getCore (core, nullptr);
+    if (cr == nullptr)
+    {
+        return nullstr.c_str ();
+    }
+
+    auto &add = cr->getAddress ();
     return add.c_str ();
 }
 
@@ -1026,13 +1059,22 @@ helics_bool helicsBrokerWaitForDisconnect (helics_broker broker, int msToWait, h
     {
         return helics_true;
     }
-    brk->waitForDisconnect (std::chrono::milliseconds (msToWait));
-    if (brk->isConnected ())
-    {
-        return helics_false;
-    }
-    return helics_true;
+    bool res=brk->waitForDisconnect (std::chrono::milliseconds (msToWait));
+    return res ? helics_true : helics_false;
 }
+
+
+helics_bool helicsCoreWaitForDisconnect (helics_core core, int msToWait, helics_error *err)
+{
+    auto cr = getCore(core, err);
+    if (cr == nullptr)
+    {
+        return helics_true;
+    }
+    bool res = cr->waitForDisconnect (std::chrono::milliseconds (msToWait));
+    return res ? helics_true : helics_false;
+}
+
 void helicsBrokerDisconnect (helics_broker broker, helics_error *err)
 {
     auto brk = getBroker (broker, err);

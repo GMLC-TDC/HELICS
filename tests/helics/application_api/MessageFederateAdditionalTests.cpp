@@ -1,5 +1,5 @@
 /*
-Copyright © 2017-2019,
+Copyright (c) 2017-2019,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
 the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
@@ -440,7 +440,7 @@ BOOST_DATA_TEST_CASE (threefedPingPong, bdata::make (core_types), core_type)
     {
         return;
     }
-    AddBroker (core_type, "-f 3");
+    auto brk=AddBroker (core_type, "-f 3");
 
     auto crtype = helics::coreTypeFromString (core_type);
     PingPongFed p1 ("fedA", 0.5, crtype);

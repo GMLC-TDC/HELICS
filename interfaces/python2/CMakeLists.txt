@@ -7,9 +7,9 @@
 # SPDX-License-Identifier: BSD-3-Clause
 #
 
-if(NOT ENABLE_SWIG OR NOT SWIG_EXECUTABLE)
+if(NOT SWIG_EXECUTABLE)
 
-  message(ERROR "Python 2 build requires swig")
+  message(SEND_ERROR "Python 2 build requires swig")
 
 endif()
 
@@ -22,9 +22,11 @@ if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX)
   )
 endif()
 
-find_package(PythonLibs 2 REQUIRED)
+#at some point in the future (HELICS 3) switch everything to use find_package(Python2 ...)
 
-include_directories(${PYTHON_INCLUDE_PATH})
+    find_package(PythonLibs 2 REQUIRED)
+  
+
 include_directories(${PYTHON_INCLUDE_DIRS})
 
 set(CMAKE_SWIG_FLAGS "")

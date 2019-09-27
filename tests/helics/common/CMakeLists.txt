@@ -1,5 +1,5 @@
 #
-# Copyright © 2017-2019, Battelle Memorial Institute; Lawrence Livermore National
+# Copyright (c) 2017-2019, Battelle Memorial Institute; Lawrence Livermore National
 # Security, LLC; Alliance for Sustainable Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved. 
 # 
 # SPDX-License-Identifier: BSD-3-Clause
@@ -23,7 +23,7 @@ set_target_properties(common-tests PROPERTIES FOLDER tests)
 
 add_test(
   NAME common-tests
-  COMMAND common-tests --log_level=message --report_level=short
+  COMMAND common-tests
 )
 set_property(
   TEST common-tests
@@ -35,16 +35,4 @@ set_property(
     Continuous
 )
 
-foreach(keyfile IN LISTS KEY_LIBRARY_FILES)
-  add_custom_command(
-    TARGET
-    common-tests
-    POST_BUILD # Adds a post-build event to core tests
-    COMMAND
-      ${CMAKE_COMMAND}
-      -E
-      copy_if_different # which executes "cmake - E copy_if_different..."
-      "${keyfile}" # <--this is in-file
-      "$<TARGET_FILE_DIR:common-tests>/"
-  ) # <--this is out-file path
-endforeach(keyfile)
+copy_key_files_to_target_location(common-tests)

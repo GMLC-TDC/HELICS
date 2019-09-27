@@ -1,5 +1,5 @@
 /*
-Copyright © 2017-2019,
+Copyright (c) 2017-2019,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
 the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
@@ -21,7 +21,6 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "gmlc/concurrency/TripWire.hpp"
 #include "gmlc/containers/BlockingQueue.hpp"
 #include <atomic>
-#include <fstream>
 #include <functional>
 #include <map>
 #include <memory>
@@ -35,7 +34,7 @@ class LoggingCore
   private:
     static std::atomic<bool> fastShutdown;  // set to true to enable a fast shutdown
     std::thread loggingThread;  //!< the thread object containing the thread running the actual Logger
-    std::vector<std::function<void(std::string &&message)>> functions;  //!< container for the functions
+    std::vector<std::function<void (std::string &&message)>> functions;  //!< container for the functions
     std::mutex functionLock;  //!< lock for updating the functions
     gmlc::containers::BlockingQueue<std::pair<int32_t, std::string>>
       loggingQueue;  //!< the actual queue containing the strings to log
@@ -65,11 +64,11 @@ class LoggingCore
     /** add a file processing callback (not just files)
     @param newFunction the callback to call on receipt of a message
     */
-    int addFileProcessor (std::function<void(std::string &&message)> newFunction);
+    int addFileProcessor (std::function<void (std::string &&message)> newFunction);
     /** remove a function callback*/
     void haltOperations (int loggerIndex);
     /** update a callback for a particular instance*/
-    void updateProcessingFunction (int index, std::function<void(std::string &&message)> newFunction);
+    void updateProcessingFunction (int index, std::function<void (std::string &&message)> newFunction);
     /** enable a fast shutdown in situations where a thread may be force-ably terminated*/
     static void setFastShutdown ();
 

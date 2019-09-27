@@ -1,5 +1,5 @@
 /*
-Copyright © 2017-2019,
+Copyright (c) 2017-2019,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See the top-level NOTICE for
 additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
@@ -170,11 +170,11 @@ extern "C"
     HELICS_EXPORT helics_message_object helicsFederateGetMessageObject (helics_federate fed);
 
     /** create a new empty message object
-	@details, the message is empty and isValid will return false since there is no data associated with the message yet. 
+    @details, the message is empty and isValid will return false since there is no data associated with the message yet.
     @return a helics_message_object containing the message data*/
     HELICS_EXPORT helics_message_object helicsFederateCreateMessageObject (helics_federate fed, helics_error *err);
-    
-	/** clear all stored messages from a federate
+
+    /** clear all stored messages from a federate
     @details this clears messages retrieved through helicsFederateGetMessage or helicsFederateGetMessageObject
     @param fed the federate to clear the message for
     */
@@ -205,8 +205,8 @@ extern "C"
     @param end the filter to query
     @return a string with the info field string*/
     HELICS_EXPORT const char *helicsEndpointGetInfo (helics_endpoint end);
-    
-	/** set the data in the info field for an filter
+
+    /** set the data in the info field for an filter
     @param end the endpoint to query
     @param info the string to set
     @param[in,out] err an error object to fill out in case of an error*/
@@ -330,7 +330,7 @@ extern "C"
     /** reserve space in a buffer but don't actually resize
     @details the message data buffer will be reserved but not resized
     @param message the message object in question
-    @param newSize the new size in bytes of the buffer
+    @param reserveSize the number of bytes to reserve in the message object
     @param[in,out] err an error object to fill out in case of an error*/
     HELICS_EXPORT void helicsMessageReserve (helics_message_object message, int reserveSize, helics_error *err);
     /** set the message ID for the message
@@ -345,6 +345,7 @@ extern "C"
     /** set a flag on a message
     @param message the message object in question
     @param flag an index of a flag to set on the message
+    @param flagValue the desired value of the flag
     @param[in,out] err an error object to fill out in case of an error*/
     HELICS_EXPORT void helicsMessageSetFlagOption (helics_message_object message, int flag, helics_bool flagValue, helics_error *err);
     /** set the data payload of a message as a string

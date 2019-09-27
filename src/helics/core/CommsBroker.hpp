@@ -1,5 +1,5 @@
 /*
-Copyright © 2017-2019,
+Copyright (c) 2017-2019,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
 the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
@@ -39,6 +39,7 @@ class CommsBroker : public BrokerT
     virtual bool tryReconnect () override;
     /** disconnect the comm object*/
     void commDisconnect ();
+    /** load the comms object directly*/
     void loadComms ();
 
   public:
@@ -48,5 +49,7 @@ class CommsBroker : public BrokerT
     virtual void addRoute (route_id rid, const std::string &routeInfo) override;
 
     virtual void removeRoute (route_id rid) override;
+    /** get a pointer to the comms object*/
+    COMMS *getCommsObjectPointer ();
 };
 }  // namespace helics

@@ -1,5 +1,5 @@
 /*
-Copyright © 2017-2019,
+Copyright (c) 2017-2019,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
 the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
@@ -11,14 +11,19 @@ file defines some common filter operations
 */
 
 #include "../common/GuardedTypes.hpp"
-#include "../core/Core.hpp"
+#include "../core/helics-time.hpp"
 #include "gmlc/libguarded/cow_guarded.hpp"
 #include <atomic>
 #include <set>
+#include <string>
+#include <vector>
 
 namespace helics
 {
+class Core;
+class FilterOperator;
 class MessageTimeOperator;
+class Message;
 class MessageConditionalOperator;
 class MessageDestOperator;
 class CloneOperator;

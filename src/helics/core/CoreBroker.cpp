@@ -1,5 +1,5 @@
 /*
-Copyright © 2017-2019,
+Copyright (c) 2017-2019,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
 the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
@@ -296,7 +296,7 @@ void CoreBroker::processPriorityCommand (ActionMessage &&command)
             _federates.back ().global_id = global_federate_id (
               static_cast<global_federate_id::base_type> (_federates.size ()) - 1 + global_federate_id_shift);
             _federates.addSearchTermForIndex (_federates.back ().global_id,
-                                              static_cast<size_t>(_federates.back ().global_id.baseValue ()) -
+                                              static_cast<size_t> (_federates.back ().global_id.baseValue ()) -
                                                 global_federate_id_shift);
             auto route_id = _federates.back ().route;
             auto global_fedid = _federates.back ().global_id;
@@ -745,8 +745,11 @@ void CoreBroker::processCommand (ActionMessage &&command)
         break;
 
     case CMD_TICK:
-        timeoutMon->tick (this);
-        LOG_SUMMARY (global_broker_id_local, getIdentifier (), " broker tick");
+        if (brokerState == broker_state_t::operating)
+        {
+            timeoutMon->tick (this);
+            LOG_SUMMARY (global_broker_id_local, getIdentifier (), " broker tick");
+        }
         break;
     case CMD_PING:
         if (command.dest_id == global_broker_id_local)
@@ -761,10 +764,24 @@ void CoreBroker::processCommand (ActionMessage &&command)
             routeMessage (command);
         }
         break;
+    case CMD_BROKER_PING:
+        if (command.dest_id == global_broker_id_local)
+        {
+            ActionMessage pngrep (CMD_PING_REPLY);
+            pngrep.dest_id = command.source_id;
+            pngrep.source_id = global_broker_id_local;
+            routeMessage (pngrep);
+            timeoutMon->pingSub (this);
+        }
+        else
+        {
+            routeMessage (command);
+        }
+        break;
     case CMD_PING_REPLY:
         if (command.dest_id == global_broker_id_local)
         {
-            timeoutMon->pingReply (command);
+            timeoutMon->pingReply (command, this);
         }
         else
         {
@@ -775,6 +792,67 @@ void CoreBroker::processCommand (ActionMessage &&command)
         sendDisconnect ();
         addActionMessage (CMD_STOP);
         LOG_WARNING (global_broker_id_local, getIdentifier (), "disconnecting from check connections");
+        break;
+    case CMD_CONNECTION_ERROR:
+        // if anyone else as has terminated assume they finalized and the connection was lost
+        if (command.dest_id == global_broker_id_local)
+        {
+            bool partDisconnected{false};
+            bool ignore{false};
+            for (auto &brk : _brokers)
+            {
+                if (brk.isDisconnected)
+                {
+                    partDisconnected = true;
+                }
+                if (brk.isDisconnected && brk.global_id == command.source_id)
+                {
+                    // the broker in question is already disconnected, ignore this
+                    ignore = true;
+                    break;
+                }
+            }
+            if (ignore)
+            {
+                break;
+            }
+            if (partDisconnected)
+            {  // we are going to assume it disconnected just assume broker even though it may be a core, there
+               // probably isn't any difference for this purpose
+                LOG_CONNECTIONS (global_broker_id_local, getIdentifier (),
+                                 fmt::format ("disconnecting {} from communication timeout",
+                                              command.source_id.baseValue ()));
+                command.setAction (CMD_DISCONNECT);
+                command.dest_id = parent_broker_id;
+                setActionFlag (command, error_flag);
+                processDisconnect (command);
+            }
+            else
+            {
+                if (isRootc)
+                {
+                    std::string lcom = fmt::format ("lost comms with {}", command.source_id.baseValue ());
+                    LOG_ERROR (global_broker_id_local, getIdentifier (), lcom);
+                    ActionMessage elink (CMD_ERROR);
+                    elink.payload = lcom;
+                    elink.messageID = defs::errors::connection_failure;
+                    broadcast (elink);
+                    brokerState = broker_state_t::errored;
+                    addActionMessage (CMD_USER_DISCONNECT);  // TODO::PT this needs something better but this does
+                                                             // what is needed for now
+                }
+                else
+                {
+                    // pass it up the chain let the root deal with it
+                    command.dest_id = parent_broker_id;
+                    transmit (parent_route_id, command);
+                }
+            }
+        }
+        else
+        {
+            routeMessage (command);
+        }
         break;
     case CMD_INIT:
     {
@@ -1088,9 +1166,14 @@ void CoreBroker::processCommand (ActionMessage &&command)
         }
         break;
     case CMD_ERROR:
-        if (isRootc)
+        if (isRootc || command.dest_id == global_broker_id_local)
         {
             sendToLogger (command.source_id, log_level::error, std::string (), command.payload);
+            if (command.source_id == parent_broker_id)
+            {
+                broadcast (command);
+            }
+            brokerState = broker_state_t::errored;
         }
         else
         {
@@ -1225,6 +1308,8 @@ void CoreBroker::processBrokerConfigureCommands (ActionMessage &cmd)
             }
         }
         break;
+    case REQUEST_TICK_FORWARDING:
+        forwardTick = checkActionFlag (cmd, indicator_flag);
     default:
         break;
     }
@@ -2223,10 +2308,13 @@ void CoreBroker::processDisconnect (ActionMessage &command)
                 {
                     if ((brk != nullptr) && (!brk->_nonLocal))
                     {
-                        ActionMessage dis ((brk->_core) ? CMD_DISCONNECT_CORE_ACK : CMD_DISCONNECT_BROKER_ACK);
-                        dis.source_id = global_broker_id_local;
-                        dis.dest_id = brk->global_id;
-                        transmit (brk->route, dis);
+                        if (!checkActionFlag (command, error_flag))
+                        {
+                            ActionMessage dis ((brk->_core) ? CMD_DISCONNECT_CORE_ACK : CMD_DISCONNECT_BROKER_ACK);
+                            dis.source_id = global_broker_id_local;
+                            dis.dest_id = brk->global_id;
+                            transmit (brk->route, dis);
+                        }
                         brk->_sent_disconnect_ack = true;
                         removeRoute (brk->route);
                     }
@@ -2237,10 +2325,13 @@ void CoreBroker::processDisconnect (ActionMessage &command)
             {
                 if ((brk != nullptr) && (!brk->_nonLocal))
                 {
-                    ActionMessage dis ((brk->_core) ? CMD_DISCONNECT_CORE_ACK : CMD_DISCONNECT_BROKER_ACK);
-                    dis.source_id = global_broker_id_local;
-                    dis.dest_id = brk->global_id;
-                    transmit (brk->route, dis);
+                    if (!checkActionFlag (command, error_flag))
+                    {
+                        ActionMessage dis ((brk->_core) ? CMD_DISCONNECT_CORE_ACK : CMD_DISCONNECT_BROKER_ACK);
+                        dis.source_id = global_broker_id_local;
+                        dis.dest_id = brk->global_id;
+                        transmit (brk->route, dis);
+                    }
                     brk->_sent_disconnect_ack = true;
                     if ((!isRootc) && (brokerState < broker_state_t::operating))
                     {
@@ -2268,15 +2359,6 @@ void CoreBroker::processDisconnect (ActionMessage &command)
         }
         break;
     case CMD_DISCONNECT_CORE:
-        if (brk != nullptr)
-        {
-            disconnectBroker (*brk);
-            if (!isRootc)
-            {
-                transmit (parent_route_id, command);
-            }
-        }
-        break;
     case CMD_DISCONNECT_BROKER:
         if (brk != nullptr)
         {
@@ -2325,6 +2407,8 @@ void CoreBroker::setLoggingLevel (int logLevel)
     cmd.counter = logLevel;
     addActionMessage (cmd);
 }
+
+void CoreBroker::setLogFile (const std::string &lfile) { setLoggingFile (lfile); }
 
 // public query function
 std::string CoreBroker::query (const std::string &target, const std::string &queryStr)
@@ -2557,8 +2641,8 @@ std::string CoreBroker::getNameList (std::string gidString) const
         {
             gidString.append (info->key);
             gidString.push_back (';');
-		}
-       
+        }
+
         index += 2;
     }
     if (gidString.back () == ';')

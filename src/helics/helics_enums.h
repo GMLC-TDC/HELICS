@@ -1,5 +1,5 @@
 /*
-Copyright © 2017-2019,
+Copyright (c) 2017-2019,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
 the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
@@ -178,7 +178,11 @@ extern "C"
         /** integer property controlling the maximum number of iterations in a federate*/
         helics_property_int_max_iterations = 259,
         /** integer property controlling the log level in a federate see \ref helics_log_levels*/
-        helics_property_int_log_level = 271
+        helics_property_int_log_level = 271,
+        /** integer property controlling the log level for file logging in a federate see \ref helics_log_levels*/
+        helics_property_int_file_log_level = 272,
+        /** integer property controlling the log level for file logging in a federate see \ref helics_log_levels*/
+        helics_property_int_console_log_level = 274
     } helics_properties;
 
     /** enumeration of options that apply to handles*/

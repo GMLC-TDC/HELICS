@@ -1,5 +1,5 @@
 #
-# Copyright © 2017-2019, Battelle Memorial Institute; Lawrence Livermore National
+# Copyright (c) 2017-2019, Battelle Memorial Institute; Lawrence Livermore National
 # Security, LLC; Alliance for Sustainable Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 #
 # SPDX-License-Identifier: BSD-3-Clause
@@ -87,18 +87,25 @@ endif()
 
 endif()
 
-install(
-  FILES helics.hpp
-  DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/helics
-  COMPONENT headers
-)
+if (NOT HELICS_BINARY_ONLY_INSTALL)
+  # Install the header if the C++ shared library is built
+  if (HELICS_INSTALL_CPP14_HEADERS)
+    install(
+      FILES helics.hpp
+      DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/helics
+      COMPONENT headers
+    )
+  endif()
 
-install(
-  TARGETS helics-static
-  ${HELICS_EXPORT_COMMAND}
-  DESTINATION ${CMAKE_INSTALL_LIBDIR}
-  COMPONENT libs
-)
+  if (NOT DISABLE_STATIC_LIB_INSTALL)
+    install(
+      TARGETS helics-static
+      ${HELICS_EXPORT_COMMAND}
+      DESTINATION ${CMAKE_INSTALL_LIBDIR}
+      COMPONENT libs
+    )
+  endif()
+endif()
 
 if(BUILD_SHARED_LIBS)
   install(
@@ -130,16 +137,44 @@ if(BUILD_SHARED_LIBS)
 
 endif(BUILD_SHARED_LIBS)
 
+	if (NOT HELICS_ROOT_PROJ)
+		set_target_properties(application_api helics_common helics_core helics-static PROPERTIES FOLDER helics)
+	endif()
+
+
+option(
+    BUILD_APP_LIBRARY
+    "Build helics application library (a static library containing objects for broker, player, recorder, and helics_apps"
+    ON
+)
+
+if (HELICS_ROOT_PROJ)
+	option(
+		BUILD_APP_EXECUTABLES
+		"Build helics applications to run various apps, including broker, player, recorder, and helics_apps"
+		${BUILD_APP_LIBRARY}
+	)
+else()
+	SET(BUILD_APP_EXECUTABLES OFF)
+endif()
+
 if (BUILD_APP_LIBRARY)
 	add_subdirectory(apps)
+	if (NOT HELICS_ROOT_PROJ)
+		set_target_properties(helics_apps PROPERTIES FOLDER helics)
+	endif()
 endif(BUILD_APP_LIBRARY)
 
 if(NOT DISABLE_C_SHARED_LIB)
   add_subdirectory(shared_api_library)
   add_subdirectory(cpp98)
+  if (NOT HELICS_BINARY_ONLY_INSTALL)
   install(
     FILES chelics.h
     DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/helics
     COMPONENT headers
   )
+  endif()
 endif()
+
+

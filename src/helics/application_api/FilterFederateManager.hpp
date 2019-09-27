@@ -1,5 +1,5 @@
 /*
-Copyright © 2017-2019,
+Copyright (c) 2017-2019,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
 the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
@@ -7,17 +7,11 @@ SPDX-License-Identifier: BSD-3-Clause
 #pragma once
 
 #include "../common/GuardedTypes.hpp"
-#include "../core/Core.hpp"
 #include "Filters.hpp"
 #include "gmlc/containers/MappedVector.hpp"
-#include <cstdint>
-#include <deque>
-#include <functional>
-#include <map>
 #include <memory>
-#include <unordered_map>
-#include <unordered_set>
-#include <utility>
+#include <string>
+
 namespace helics
 {
 class Core;

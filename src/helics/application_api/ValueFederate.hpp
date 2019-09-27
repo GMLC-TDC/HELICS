@@ -1,5 +1,5 @@
 /*
-Copyright © 2017-2019,
+Copyright (c) 2017-2019,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
 the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
@@ -91,7 +91,7 @@ class ValueFederate : public virtual Federate  // using virtual inheritance to a
     @param key the name of the publication
     @param type a string defining the type of the publication
     @param units a string defining the units of the publication [optional]
-    @return a publication id object for use as an identifier
+    @return a publication object reference for use as an identifier
     */
     Publication &registerGlobalPublication (const std::string &key,
                                             const std::string &type,
@@ -278,8 +278,10 @@ class ValueFederate : public virtual Federate  // using virtual inheritance to a
     void registerValueInterfaces (const std::string &configString);
 
   private:
+    /** register interfaces through a json file or string*/
     void registerValueInterfacesJson (const std::string &jsonString);
-    void registerValueInterfacesToml (const std::string &tomlString);
+    /** register interface through a toml value or string*/
+	void registerValueInterfacesToml (const std::string &tomlString);
 
   public:
     /** get a value as raw data block from the system

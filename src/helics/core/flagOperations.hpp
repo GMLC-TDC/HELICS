@@ -1,5 +1,5 @@
 /*
-Copyright © 2017-2019,
+Copyright (c) 2017-2019,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
 the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
@@ -22,7 +22,7 @@ enum operation_flags : uint16_t
     indicator_flag = 5,  //!< flag used for setting values
     empty_flag = 6,  //!< flag indicating that the message is empty
     extra_flag1 = 7,  //!< extra flag
-    optional_flag = 8,  //!< flag indicating that a dependency is a forwarding coordinator
+    optional_flag = 8,  //!< flag indicating that a connection is optional and may not be matched
     clone_flag = 9,  //!< flag indicating the filter is a clone filter or the data needs to be cloned
     extra_flag2 = 8,  //!< extra flag
     destination_processing_flag = 11,  //!< flag indicating the message is for destination processing

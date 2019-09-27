@@ -1,5 +1,5 @@
 /*
-Copyright © 2017-2019,
+Copyright (c) 2017-2019,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
 the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
@@ -29,9 +29,9 @@ class TestComms final : public CommsInterface
   private:
     virtual void queue_rx_function () override;  //!< the functional loop for the receive queue
     virtual void queue_tx_function () override;  //!< the loop for transmitting data
-    virtual void closeReceiver () override;  //!< function to instruct the receiver loop to close
-
   public:
+    /** user function in the test comms to force the communication to stop immediately for testing purposes*/
+    void haltComms ();
     /** return a dummy port number*/
     int getPort () const { return -1; };
 

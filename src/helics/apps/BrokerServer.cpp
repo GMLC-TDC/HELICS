@@ -1,5 +1,5 @@
 /*
-Copyright � 2017-2019,
+Copyright (c) 2017-2019,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
 the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
@@ -8,6 +8,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "BrokerServer.hpp"
 
 #include "../common/JsonProcessingFunctions.hpp"
+#include "gmlc/utilities/stringOps.h"
 
 #include "../core/ActionMessage.hpp"
 #include "../core/BrokerFactory.hpp"
@@ -20,45 +21,26 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "../core/zmq/ZmqCommsCommon.h"
 #endif
 
-#include <random>
-
-static std::string random_string (std::string::size_type length)
-{
-    static constexpr auto chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
-
-    thread_local static std::mt19937 rg{std::random_device{}()};
-    thread_local static std::uniform_int_distribution<std::string::size_type> pick (0, 61);
-
-    std::string s;
-
-    s.reserve (length);
-
-    while (length--)
-        s.push_back (chars[pick (rg)]);
-
-    return s;
-}
-
 namespace helics
 {
 namespace apps
 {
-BrokerServer::BrokerServer () noexcept : zmq_server{true}, server_name_{random_string (5)} {}
+BrokerServer::BrokerServer () noexcept : zmq_server{true}, server_name_{gmlc::utilities::randomString (5)} {}
 
-BrokerServer::BrokerServer (int argc, char *argv[]) : server_name_{random_string (5)}
+BrokerServer::BrokerServer (int argc, char *argv[]) : server_name_{gmlc::utilities::randomString (5)}
 {
     auto app = generateArgProcessing ();
     app->helics_parse (argc, argv);
 }
 
-BrokerServer::BrokerServer (std::vector<std::string> args) : server_name_{random_string (5)}
+BrokerServer::BrokerServer (std::vector<std::string> args) : server_name_{gmlc::utilities::randomString (5)}
 {
     auto app = generateArgProcessing ();
     app->helics_parse (args);
 }
 
 BrokerServer::BrokerServer (const std::string &configFile)
-    : configFile_ (configFile), server_name_{random_string (5)}
+    : configFile_ (configFile), server_name_{gmlc::utilities::randomString (5)}
 {
 }
 
@@ -78,7 +60,7 @@ void BrokerServer::startServers ()
 #ifdef ENABLE_ZMQ_CORE
     if (zmq_server)
     {
-        serverloops_.emplace_back ([this] () { startZMQserver (); });
+        serverloops_.emplace_back ([this]() { startZMQserver (); });
     }
     if (zmq_ss_server)
     {
@@ -144,7 +126,7 @@ findBroker (const ActionMessage &rx, core_type ctype, int startPort)
     std::string brkinit;
     bool newbrk{false};
     auto &strs = rx.getStringData ();
-    if (strs.size () > 0)
+    if (!strs.empty ())
     {
         brkname = strs[0];
     }
@@ -180,7 +162,7 @@ findBroker (const ActionMessage &rx, core_type ctype, int startPort)
     return {brk, newbrk};
 }
 
-static ActionMessage generateReply (const ActionMessage &, std::shared_ptr<Broker> &brk)
+static ActionMessage generateReply (const ActionMessage & /*cmd*/, std::shared_ptr<Broker> &brk)
 {
     ActionMessage rep (CMD_PROTOCOL);
     rep.messageID = NEW_BROKER_INFORMATION;
