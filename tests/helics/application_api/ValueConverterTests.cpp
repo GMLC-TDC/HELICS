@@ -18,11 +18,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helics/application_api/data_view.hpp"
 #include "helics/core/core-data.hpp"
 
-namespace utf = boost::unit_test;
-
 using namespace std::string_literals;
-
-BOOST_AUTO_TEST_SUITE (value_converter_tests)
 
 template <class X>
 void converterTests (const X &testValue1,
@@ -67,7 +63,7 @@ void converterTests (const X &testValue1,
     EXPECT_TRUE (res3 == testValue2);
 }
 
-BOOST_AUTO_TEST_CASE (converter_tests)
+TEST (valueConverter_tests, basic)
 {
     converterTests (45.54, 23.7e-7, sizeof (double) + 1, sizeof (double) + 1, "double");
     converterTests<int> (45, -234252, sizeof (int) + 1, sizeof (int) + 1, "int32");
@@ -90,7 +86,7 @@ BOOST_AUTO_TEST_CASE (converter_tests)
     vecd testv2 (234, 0.45);
     converterTests<vecd> (vec1, testv2, 0, 0, "double_vector");
 }
-BOOST_AUTO_TEST_CASE (named_point_converter_tests)
+TEST (valueConverter_tests, named_point)
 {
     helics::NamedPoint A{"tests", 47.676};
     helics::NamedPoint B{"this is a long string test", 99.345345};
@@ -101,7 +97,7 @@ BOOST_AUTO_TEST_CASE (named_point_converter_tests)
     converterTests<helics::NamedPoint> (C, D, C.name.size () + 17, D.name.size () + 17, "named_point");
 }
 
-BOOST_AUTO_TEST_CASE (test_traits)
+TEST (valueConverter_tests, traits)
 {
     EXPECT_TRUE (helics::is_vector<std::vector<double>>::value == true);
     EXPECT_TRUE (helics::is_vector<std::vector<std::complex<double>>>::value == true);
@@ -120,7 +116,7 @@ BOOST_AUTO_TEST_CASE (test_traits)
     EXPECT_TRUE (helics::is_iterable<int>::value == false);
 }
 
-BOOST_AUTO_TEST_CASE (test_minSize)
+TEST (valueConverter_tests, minSize)
 {
     EXPECT_EQ (helics::getMinSize<std::vector<double>> (), 9u);
     EXPECT_EQ (helics::getMinSize<double> (), sizeof (double) + 1);
@@ -135,7 +131,7 @@ BOOST_AUTO_TEST_CASE (test_minSize)
 /** this one is a bit annoying to use the template so it gets its own case
 we are testing vectors of strings
 */
-BOOST_AUTO_TEST_CASE (vector_string_converter_tests)
+TEST (valueConverter_tests, vector_string)
 {
     using vecstr = std::vector<std::string>;
     using converter = helics::ValueConverter<vecstr>;
@@ -166,7 +162,7 @@ BOOST_AUTO_TEST_CASE (vector_string_converter_tests)
     EXPECT_TRUE (val3 == test2);
 }
 
-BOOST_AUTO_TEST_CASE (test_block_vectors)
+TEST (valueConverter_tests, block_vectors)
 {
     using vecblock = std::vector<helics::data_block>;
     using converter = helics::ValueConverter<vecblock>;
@@ -204,15 +200,15 @@ BOOST_AUTO_TEST_CASE (test_block_vectors)
 }
 
 /** check that the converters do actually throw on invalid sizes*/
-BOOST_AUTO_TEST_CASE (test_converter_errors)
+TEST (valueConverter_tests, errors)
 {
     auto vb1 = helics::ValueConverter<double>::convert (3.1415);
     auto vb2 = helics::ValueConverter<int>::convert (10);
 
-    BOOST_CHECK_THROW (helics::ValueConverter<double>::interpret (vb2), std::invalid_argument);
-    BOOST_CHECK_LT (vb2.size (), 8u);
-    BOOST_CHECK_GT (vb2.size (), 4u);
-    BOOST_CHECK_THROW (helics::ValueConverter<std::complex<double>>::interpret (vb1), std::invalid_argument);
-    BOOST_CHECK_LT (vb1.size (), 12u);
-    BOOST_CHECK_GT (vb1.size (), 8u);
+    EXPECT_THROW (helics::ValueConverter<double>::interpret (vb2), std::invalid_argument);
+    EXPECT_LT (vb2.size (), 8u);
+    EXPECT_GT (vb2.size (), 4u);
+    EXPECT_THROW (helics::ValueConverter<std::complex<double>>::interpret (vb1), std::invalid_argument);
+    EXPECT_LT (vb1.size (), 12u);
+    EXPECT_GT (vb1.size (), 8u);
 }

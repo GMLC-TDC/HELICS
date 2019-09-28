@@ -17,20 +17,17 @@ SPDX-License-Identifier: BSD-3-Clause
 /** these test cases test out the message federates
  */
 
-BOOST_FIXTURE_TEST_SUITE (additional_filter_tests, FederateTestFixture)
-
-namespace bdata = boost::unit_test::data;
-
-namespace utf = boost::unit_test;
-
 /**
 Test rerouter filter
 This test case sets reroute filter on a source endpoint. This means message
 sent from this endpoint will be rerouted to a new destination endpoint.
 */
 
-BOOST_TEST_DECORATOR (*utf::label ("ci"))
-BOOST_DATA_TEST_CASE (message_reroute_filter_object1, bdata::make (core_types), GetParam ())
+class filter_type_tests : public ::testing::TestWithParam<const char *>, public FederateTestFixture
+{
+};
+
+TEST_P (filter_type_tests, message_reroute_filter_object1)
 {
     auto broker = AddBroker (GetParam (), 2);
 
@@ -61,7 +58,7 @@ BOOST_DATA_TEST_CASE (message_reroute_filter_object1, bdata::make (core_types), 
     mFed->requestTimeComplete ();
 
     EXPECT_TRUE (!mFed->hasMessage (p2));
-    BOOST_REQUIRE (mFed->hasMessage (p3));
+    ASSERT_TRUE (mFed->hasMessage (p3));
 
     auto m2 = mFed->getMessage (p3);
     EXPECT_EQ (m2->source, "port1");
@@ -79,7 +76,7 @@ BOOST_DATA_TEST_CASE (message_reroute_filter_object1, bdata::make (core_types), 
     EXPECT_TRUE (fFed->getCurrentMode () == helics::Federate::modes::finalize);
 }
 
-BOOST_DATA_TEST_CASE (message_reroute_filter_object1_close, bdata::make (core_types), GetParam ())
+TEST_P (filter_type_tests, message_reroute_filter_object1_close_ci_skip)
 {
     auto broker = AddBroker (GetParam (), 2);
 
@@ -110,7 +107,7 @@ BOOST_DATA_TEST_CASE (message_reroute_filter_object1_close, bdata::make (core_ty
     mFed->requestTimeComplete ();
 
     EXPECT_TRUE (!mFed->hasMessage (p2));
-    BOOST_REQUIRE (mFed->hasMessage (p3));
+    ASSERT_TRUE (mFed->hasMessage (p3));
 
     auto m2 = mFed->getMessage (p3);
     EXPECT_EQ (m2->source, "port1");
@@ -142,8 +139,7 @@ This test case sets reroute filter on a source endpoint with a condition paramet
 This means message sent from this endpoint will be rerouted to a new destination
 endpoint only if condition matches.
 */
-BOOST_TEST_DECORATOR (*utf::label ("ci"))
-BOOST_DATA_TEST_CASE (message_reroute_filter_condition, bdata::make (core_types), GetParam ())
+TEST_P (filter_type_tests, message_reroute_filter_condition)
 {
     auto broker = AddBroker (GetParam (), 2);
     AddFederates<helics::MessageFederate> (GetParam (), 1, broker, 1.0, "filter");
@@ -176,7 +172,7 @@ BOOST_DATA_TEST_CASE (message_reroute_filter_condition, bdata::make (core_types)
     fFed->requestTime (1.0);
     mFed->requestTimeComplete ();
     EXPECT_TRUE (!mFed->hasMessage (p2));
-    BOOST_REQUIRE (mFed->hasMessage (p3));
+    ASSERT_TRUE (mFed->hasMessage (p3));
     auto m2 = mFed->getMessage (p3);
 
     EXPECT_EQ (m2->source, "port1");
@@ -199,7 +195,7 @@ This test case sets reroute filter on a destination endpoint. This means message
 sent to this endpoint will be rerouted to a new destination endpoint.
 */
 
-BOOST_DATA_TEST_CASE (message_reroute_filter_object2, bdata::make (core_types), GetParam ())
+TEST_P (filter_type_tests, message_reroute_filter_object2_ci_skip)
 {
     auto broker = AddBroker (GetParam (), 2);
 
@@ -234,7 +230,7 @@ BOOST_DATA_TEST_CASE (message_reroute_filter_object2, bdata::make (core_types), 
     fFed->requestTime (1.0);
     mFed->requestTimeComplete ();
     // this one was delivered to the original destination
-    BOOST_REQUIRE (mFed->hasMessage (p2));
+    ASSERT_TRUE (mFed->hasMessage (p2));
 
     // this message should be delivered to the rerouted destination
     mFed->sendMessage (p1, "test324525", data);
@@ -266,7 +262,7 @@ This test case sets random drop filter on a source endpoint with a particular
 message drop probability. This means messages may be dropped randomly with a
 probability of 0.75.
 */
-BOOST_DATA_TEST_CASE (message_random_drop_object, bdata::make (core_types), GetParam ())
+TEST_P (filter_type_tests, message_random_drop_object_ci_skip)
 {
     auto broker = AddBroker (GetParam (), 2);
     AddFederates<helics::MessageFederate> (GetParam (), 1, broker, 1.0, "filter");
@@ -313,8 +309,8 @@ BOOST_DATA_TEST_CASE (message_random_drop_object, bdata::make (core_types), GetP
     // this should result in an expected error of 1 in 10K tests
     double ebar = 4.5 * std::sqrt (drop_prob * (1.0 - drop_prob) / iterations);
 
-    BOOST_CHECK_GE (pest, drop_prob - ebar);
-    BOOST_CHECK_LE (pest, drop_prob + ebar);
+    EXPECT_GE (pest, drop_prob - ebar);
+    EXPECT_LE (pest, drop_prob + ebar);
     mFed->finalizeAsync ();
     fFed->finalize ();
     mFed->finalizeComplete ();
@@ -327,7 +323,7 @@ This test case sets random drop filter on a source endpoint with a particular
 message arrival probability. This means messages may be received randomly with a
 probability of 0.9.
 */
-BOOST_DATA_TEST_CASE (message_random_drop_object1, bdata::make (core_types), GetParam ())
+TEST_P (filter_type_tests, message_random_drop_object1_ci_skip)
 {
     auto broker = AddBroker (GetParam (), 2);
     AddFederates<helics::MessageFederate> (GetParam (), 1, broker, 1.0, "filter");
@@ -373,8 +369,8 @@ BOOST_DATA_TEST_CASE (message_random_drop_object1, bdata::make (core_types), Get
     // this should result in an expected error of 1 in 10K tests
     double ebar = 4.5 * std::sqrt (prob * (1.0 - prob) / iterations);
 
-    BOOST_CHECK_GE (pest, prob - ebar);
-    BOOST_CHECK_LE (pest, prob + ebar);
+    EXPECT_GE (pest, prob - ebar);
+    EXPECT_LE (pest, prob + ebar);
     mFed->finalizeAsync ();
     fFed->finalize ();
     mFed->finalizeComplete ();
@@ -387,7 +383,7 @@ This test case sets random drop filter on a destination endpoint with a particul
 message drop probability. This means messages may be dropped randomly with a
 probability of 0.75.
 */
-BOOST_DATA_TEST_CASE (message_random_drop_dest_object, bdata::make (core_types), GetParam ())
+TEST_P (filter_type_tests, message_random_drop_dest_object_ci_skip)
 {
     auto broker = AddBroker (GetParam (), 2);
     AddFederates<helics::MessageFederate> (GetParam (), 1, broker, 1.0, "filter");
@@ -436,8 +432,8 @@ BOOST_DATA_TEST_CASE (message_random_drop_dest_object, bdata::make (core_types),
     // this should result in an expected error of 1 in 10K tests
     double ebar = 4.5 * std::sqrt (drop_prob * (1.0 - drop_prob) / iterations);
 
-    BOOST_CHECK_GE (pest, drop_prob - ebar);
-    BOOST_CHECK_LE (pest, drop_prob + ebar);
+    EXPECT_GE (pest, drop_prob - ebar);
+    EXPECT_LE (pest, drop_prob + ebar);
     mFed->finalizeAsync ();
     fFed->finalize ();
     mFed->finalizeComplete ();
@@ -449,7 +445,7 @@ This test case sets random drop filter on a destination endpoint with a particul
 message arrival probability. This means messages may be received randomly with a
 probability of 0.9.
 */
-BOOST_DATA_TEST_CASE (message_random_drop_dest_object1, bdata::make (core_types), GetParam ())
+TEST_P (filter_type_tests, message_random_drop_dest_object1_ci_skip)
 {
     auto broker = AddBroker (GetParam (), 2);
     AddFederates<helics::MessageFederate> (GetParam (), 1, broker, 1.0, "filter");
@@ -494,8 +490,8 @@ BOOST_DATA_TEST_CASE (message_random_drop_dest_object1, bdata::make (core_types)
     // this should result in an expected error of 1 in 10K tests
     double ebar = 4.5 * std::sqrt (prob * (1.0 - prob) / iterations);
 
-    BOOST_CHECK_GE (pest, prob - ebar);
-    BOOST_CHECK_LE (pest, prob + ebar);
+    EXPECT_GE (pest, prob - ebar);
+    EXPECT_LE (pest, prob + ebar);
     mFed->finalizeAsync ();
     fFed->finalize ();
     mFed->finalizeComplete ();
@@ -507,7 +503,7 @@ This test case sets random delay filter on a source endpoint.
 This means messages may be delayed by random delay based on
 binomial distribution.
 */
-BOOST_DATA_TEST_CASE (message_random_delay_object, bdata::make (core_types), GetParam ())
+TEST_P (filter_type_tests, message_random_delay_object_ci_skip)
 {
     auto broker = AddBroker (GetParam (), 2);
     AddFederates<helics::MessageFederate> (GetParam (), 1, broker, 1.0, "filter");
@@ -566,7 +562,7 @@ BOOST_DATA_TEST_CASE (message_random_delay_object, bdata::make (core_types), Get
 /**
 Test filter info fields
 */
-BOOST_DATA_TEST_CASE (test_filter_info_field, bdata::make (core_types), GetParam ())
+TEST_P (filter_type_tests, test_filter_info_field_ci_skip)
 {
     auto broker = AddBroker (GetParam (), 2);
     AddFederates<helics::MessageFederate> (GetParam (), 1, broker, 1.0, "filter");
@@ -614,4 +610,4 @@ BOOST_DATA_TEST_CASE (test_filter_info_field, bdata::make (core_types), GetParam
     mFed->finalizeComplete ();
 }
 
-BOOST_AUTO_TEST_CASE (test_empty) {}
+INSTANTIATE_TEST_SUITE_P (filter_tests, filter_type_tests, ::testing::ValuesIn (core_types));

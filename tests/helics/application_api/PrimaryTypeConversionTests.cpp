@@ -15,11 +15,8 @@ SPDX-License-Identifier: BSD-3-Clause
  */
 #include "helics/application_api/HelicsPrimaryTypes.hpp"
 
-namespace utf = boost::unit_test;
-
 using namespace std::string_literals;
 using namespace helics;
-BOOST_AUTO_TEST_SUITE (type_conversion_tests, *utf::label ("ci"))
 
 template <class T1, class T2>
 bool checkTypeConversion1 (const T1 &val1, const T2 &exp)
@@ -34,7 +31,7 @@ bool checkTypeConversion1 (const T1 &val1, const T2 &exp)
     return true;
 }
 
-BOOST_AUTO_TEST_CASE (vectorNorm_tests)
+TEST (type_conversion_tests, vectorNorm_tests)
 {
     using c = std::complex<double>;
     using cv = std::vector<c>;
@@ -52,13 +49,13 @@ BOOST_AUTO_TEST_CASE (vectorNorm_tests)
                std::sqrt (25.0 * 5.0));
 }
 
-BOOST_AUTO_TEST_CASE (string_type_tests)
+TEST (type_conversion_tests, string_type_tests)
 {
     EXPECT_TRUE (helicsType<std::string> () == data_type::helics_string);
     // EXPECT_TRUE(helicsType<char *>() == data_type::helics_string);
 }
 
-BOOST_AUTO_TEST_CASE (string_converstion_tests)
+TEST (type_conversion_tests, string_converstion_tests)
 {
     std::string vstr ("45.786");
     double val = 45.786;
@@ -75,7 +72,7 @@ BOOST_AUTO_TEST_CASE (string_converstion_tests)
     EXPECT_TRUE (checkTypeConversion1 (test1, NamedPoint{test1, std::nan ("0")}));
 }
 
-BOOST_AUTO_TEST_CASE (double_type_tests)
+TEST (type_conversion_tests, double_type_tests)
 {
     EXPECT_TRUE (helicsType<double> () == data_type::helics_double);
     EXPECT_TRUE (helicsType<float> () == data_type::helics_custom);
@@ -83,7 +80,7 @@ BOOST_AUTO_TEST_CASE (double_type_tests)
     EXPECT_TRUE (isConvertableType<double> () == false);
 }
 
-BOOST_AUTO_TEST_CASE (double_conversion_tests)
+TEST (type_conversion_tests, double_conversion_tests)
 {
     double val = 45.786;
     EXPECT_TRUE (checkTypeConversion1 (val, val));
@@ -97,7 +94,7 @@ BOOST_AUTO_TEST_CASE (double_conversion_tests)
     EXPECT_TRUE (checkTypeConversion1 (val, NamedPoint{"value", val}));
 }
 
-BOOST_AUTO_TEST_CASE (integer_type_tests)
+TEST (type_conversion_tests, integer_type_tests)
 {
     EXPECT_TRUE (helicsType<int64_t> () == data_type::helics_int);
     EXPECT_TRUE (helicsType<int> () == data_type::helics_custom);
@@ -113,7 +110,7 @@ BOOST_AUTO_TEST_CASE (integer_type_tests)
     EXPECT_TRUE (isConvertableType<unsigned char> () == true);
 }
 
-BOOST_AUTO_TEST_CASE (namedType_tests)
+TEST (type_conversion_tests, namedType_tests)
 {
     EXPECT_TRUE (getTypeFromString ("int") == data_type::helics_int);
     EXPECT_TRUE (getTypeFromString ("INT") == data_type::helics_int);
@@ -137,7 +134,7 @@ BOOST_AUTO_TEST_CASE (namedType_tests)
     EXPECT_TRUE (getTypeFromString (typeid (Time).name ()) == data_type::helics_time);
 }
 
-BOOST_AUTO_TEST_CASE (integer_conversion_tests)
+TEST (type_conversion_tests, integer_conversion_tests)
 {
     int64_t val = -10;
     EXPECT_TRUE (checkTypeConversion1 (val, val));
@@ -154,13 +151,13 @@ BOOST_AUTO_TEST_CASE (integer_conversion_tests)
     EXPECT_TRUE (checkTypeConversion1 (val, NamedPoint{"value", static_cast<double> (val)}));
 }
 
-BOOST_AUTO_TEST_CASE (namedpoint_type_tests)
+TEST (type_conversion_tests, namedpoint_type_tests)
 {
     EXPECT_TRUE (helicsType<NamedPoint> () == data_type::helics_named_point);
     // EXPECT_TRUE(helicsType<char *>() == data_type::helics_string);
 }
 
-BOOST_AUTO_TEST_CASE (namedpoint_conversion_tests)
+TEST (type_conversion_tests, namedpoint_conversion_tests)
 {
     double val = 45.786;
     NamedPoint vp{"point", val};
@@ -190,5 +187,5 @@ BOOST_AUTO_TEST_CASE (namedpoint_conversion_tests)
     auto s = helicsNamedPointString (t1);
     auto t2 = helicsGetNamedPoint (s);
     EXPECT_EQ (t1.name, t2.name);
-    BOOST_CHECK_CLOSE (t1.value, t2.value, 0.00001);
+    EXPECT_NEAR (t1.value, t2.value, 0.00001);
 }

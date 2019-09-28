@@ -26,7 +26,7 @@ class combofed_type_tests : public ::testing::TestWithParam<const char *>, publi
 
 // const std::string core_types[] = {"udp" };
 /** test simple creation and destruction*/
-TEST_P (combofed_single_type_tests, initialize_tests, bdata::make (core_types_single), GetParam ())
+TEST_P (combofed_single_type_tests, initialize_tests)
 {
     SetupTest<helics::CombinationFederate> (GetParam (), 1);
     auto vFed1 = GetFederateAs<helics::ValueFederate> (0);
@@ -40,7 +40,7 @@ TEST_P (combofed_single_type_tests, initialize_tests, bdata::make (core_types_si
     EXPECT_TRUE (vFed1->getCurrentMode () == helics::Federate::modes::finalize);
 }
 
-TEST_P (combofed_single_type_tests, publication_registration, bdata::make (core_types_single), GetParam ())
+TEST_P (combofed_single_type_tests, publication_registration)
 {
     SetupTest<helics::CombinationFederate> (GetParam (), 1);
     auto vFed1 = GetFederateAs<helics::ValueFederate> (0);
@@ -71,7 +71,7 @@ TEST_P (combofed_single_type_tests, publication_registration, bdata::make (core_
     EXPECT_TRUE (vFed1->getCurrentMode () == helics::Federate::modes::finalize);
 }
 
-TEST_P (combofed_single_type_tests, single_transfer, bdata::make (core_types_single), GetParam ())
+TEST_P (combofed_single_type_tests, single_transfer)
 {
     SetupTest<helics::CombinationFederate> (GetParam (), 1);
     auto vFed1 = GetFederateAs<helics::ValueFederate> (0);
@@ -106,7 +106,7 @@ TEST_P (combofed_single_type_tests, single_transfer, bdata::make (core_types_sin
     EXPECT_EQ (s, "string2");
 }
 
-TEST_P (combofed_single_type_tests, endpoint_registration, bdata::make (core_types_single), GetParam ())
+TEST_P (combofed_single_type_tests, endpoint_registration)
 {
     SetupTest<helics::CombinationFederate> (GetParam (), 1);
     auto mFed1 = GetFederateAs<helics::MessageFederate> (0);
@@ -134,7 +134,7 @@ TEST_P (combofed_single_type_tests, endpoint_registration, bdata::make (core_typ
     EXPECT_TRUE (mFed1->getCurrentMode () == helics::Federate::modes::finalize);
 }
 
-TEST_P (combofed_type_tests, send_receive_2fed, bdata::make (core_types), GetParam ())
+TEST_P (combofed_type_tests, send_receive_2fed)
 {
     SetupTest<helics::CombinationFederate> (GetParam (), 2);
     auto mFed1 = GetFederateAs<helics::CombinationFederate> (0);
@@ -146,7 +146,7 @@ TEST_P (combofed_type_tests, send_receive_2fed, bdata::make (core_types), GetPar
     mFed1->setProperty (helics_property_time_delta, 1.0);
     mFed2->setProperty (helics_property_time_delta, 1.0);
 
-    auto f1finish = std::async (std::launch::async, [&] () { mFed1->enterExecutingMode (); });
+    auto f1finish = std::async (std::launch::async, [&]() { mFed1->enterExecutingMode (); });
     mFed2->enterExecutingMode ();
     f1finish.wait ();
 
@@ -159,7 +159,7 @@ TEST_P (combofed_type_tests, send_receive_2fed, bdata::make (core_types), GetPar
     mFed1->sendMessage (epid, "ep2", data);
     mFed2->sendMessage (epid2, "fed0/ep1", data2);
     // move the time to 1.0
-    auto f1time = std::async (std::launch::async, [&] () { return mFed1->requestTime (1.0); });
+    auto f1time = std::async (std::launch::async, [&]() { return mFed1->requestTime (1.0); });
     auto gtime = mFed2->requestTime (1.0);
 
     EXPECT_EQ (gtime, 1.0);
@@ -188,7 +188,7 @@ TEST_P (combofed_type_tests, send_receive_2fed, bdata::make (core_types), GetPar
     EXPECT_TRUE (mFed2->getCurrentMode () == helics::Federate::modes::finalize);
 }
 
-TEST_P (combofed_type_tests, multimode_transfer, bdata::make (core_types), GetParam ())
+TEST_P (combofed_type_tests, multimode_transfer)
 {
     SetupTest<helics::CombinationFederate> (GetParam (), 2);
     auto cFed1 = GetFederateAs<helics::CombinationFederate> (0);
@@ -205,7 +205,7 @@ TEST_P (combofed_type_tests, multimode_transfer, bdata::make (core_types), GetPa
     cFed1->setProperty (helics_property_time_delta, 1.0);
     cFed2->setProperty (helics_property_time_delta, 1.0);
 
-    auto f1finish = std::async (std::launch::async, [&] () { cFed1->enterExecutingMode (); });
+    auto f1finish = std::async (std::launch::async, [&]() { cFed1->enterExecutingMode (); });
     cFed2->enterExecutingMode ();
     f1finish.wait ();
     // publish string1 at time=0.0;
@@ -220,7 +220,7 @@ TEST_P (combofed_type_tests, multimode_transfer, bdata::make (core_types), GetPa
     cFed1->sendMessage (epid, "ep2", data);
     cFed2->sendMessage (epid2, "fed0/ep1", data2);
     // move the time to 1.0
-    auto f1time = std::async (std::launch::async, [&] () { return cFed1->requestTime (1.0); });
+    auto f1time = std::async (std::launch::async, [&]() { return cFed1->requestTime (1.0); });
     auto gtime = cFed2->requestTime (1.0);
 
     EXPECT_EQ (gtime, 1.0);
@@ -255,7 +255,7 @@ TEST_P (combofed_type_tests, multimode_transfer, bdata::make (core_types), GetPa
     EXPECT_EQ (M2->data[245], data[245]);
 
     // advance time
-    f1time = std::async (std::launch::async, [&] () { return cFed1->requestTime (2.0); });
+    f1time = std::async (std::launch::async, [&]() { return cFed1->requestTime (2.0); });
     gtime = cFed2->requestTime (2.0);
 
     EXPECT_EQ (gtime, 2.0);

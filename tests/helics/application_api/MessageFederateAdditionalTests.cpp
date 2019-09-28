@@ -17,12 +17,20 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <thread>
 /** these test cases test out the message federates
  */
-namespace bdata = boost::unit_test::data;
-namespace utf = boost::unit_test;
 
-BOOST_FIXTURE_TEST_SUITE (message_federate_additional_tests, FederateTestFixture, *utf::label ("ci"))
+class mfed_add_single_type_tests : public ::testing::TestWithParam<const char *>, public FederateTestFixture
+{
+};
 
-BOOST_DATA_TEST_CASE (message_federate_initialize_tests, bdata::make (core_types_single), GetParam ())
+class mfed_add_type_tests : public ::testing::TestWithParam<const char *>, public FederateTestFixture
+{
+};
+
+class mfed_add_all_type_tests : public ::testing::TestWithParam<const char *>, public FederateTestFixture
+{
+};
+
+TEST_P (mfed_add_single_type_tests, initialize_tests)
 {
     SetupTest<helics::MessageFederate> (GetParam (), 1);
     auto mFed1 = GetFederateAs<helics::MessageFederate> (0);
@@ -37,7 +45,7 @@ BOOST_DATA_TEST_CASE (message_federate_initialize_tests, bdata::make (core_types
     EXPECT_TRUE (mFed1->getCurrentMode () == helics::Federate::modes::finalize);
 }
 
-BOOST_DATA_TEST_CASE (message_federate_endpoint_registration, bdata::make (core_types_single), GetParam ())
+TEST_P (mfed_add_single_type_tests, endpoint_registration)
 {
     SetupTest<helics::MessageFederate> (GetParam (), 1);
     auto mFed1 = GetFederateAs<helics::MessageFederate> (0);
@@ -66,7 +74,7 @@ BOOST_DATA_TEST_CASE (message_federate_endpoint_registration, bdata::make (core_
 }
 
 // same as previous test case but using endpoint objects
-BOOST_DATA_TEST_CASE (message_federate_endpoint_registration_objs, bdata::make (core_types_single), GetParam ())
+TEST_P (mfed_add_single_type_tests, endpoint_registration_objs)
 {
     SetupTest<helics::MessageFederate> (GetParam (), 1);
     auto mFed1 = GetFederateAs<helics::MessageFederate> (0);
@@ -92,7 +100,7 @@ BOOST_DATA_TEST_CASE (message_federate_endpoint_registration_objs, bdata::make (
     EXPECT_TRUE (mFed1->getCurrentMode () == helics::Federate::modes::finalize);
 }
 
-BOOST_DATA_TEST_CASE (message_federate_send_receive_callback, bdata::make (core_types_single), GetParam ())
+TEST_P (mfed_add_single_type_tests, send_receive_callback)
 {
     SetupTest<helics::MessageFederate> (GetParam (), 1);
     auto mFed1 = GetFederateAs<helics::MessageFederate> (0);
@@ -102,7 +110,7 @@ BOOST_DATA_TEST_CASE (message_federate_send_receive_callback, bdata::make (core_
 
     helics::interface_handle rxend;
     helics::Time timeRx;
-    auto mend = [&] (const helics::Endpoint &ept, helics::Time rtime) {
+    auto mend = [&](const helics::Endpoint &ept, helics::Time rtime) {
         rxend = ept.getHandle ();
         timeRx = rtime;
     };
@@ -131,7 +139,7 @@ BOOST_DATA_TEST_CASE (message_federate_send_receive_callback, bdata::make (core_
     EXPECT_TRUE (rxend == epid2.getHandle ());
     EXPECT_EQ (timeRx, helics::Time (1.0));
     auto M = mFed1->getMessage (epid2);
-    BOOST_REQUIRE (M);
+    ASSERT_TRUE (M);
     ASSERT_EQ (M->data.size (), data.size ());
 
     EXPECT_EQ (M->data[245], data[245]);
@@ -140,7 +148,7 @@ BOOST_DATA_TEST_CASE (message_federate_send_receive_callback, bdata::make (core_
     EXPECT_TRUE (mFed1->getCurrentMode () == helics::Federate::modes::finalize);
 }
 
-BOOST_DATA_TEST_CASE (message_federate_send_receive_callback_obj, bdata::make (core_types_single), GetParam ())
+TEST_P (mfed_add_single_type_tests, send_receive_callback_obj)
 {
     SetupTest<helics::MessageFederate> (GetParam (), 1);
     auto mFed1 = GetFederateAs<helics::MessageFederate> (0);
@@ -150,7 +158,7 @@ BOOST_DATA_TEST_CASE (message_federate_send_receive_callback_obj, bdata::make (c
 
     helics::interface_handle rxend;
     helics::Time timeRx;
-    auto mend = [&] (const helics::Endpoint &ept, helics::Time rtime) {
+    auto mend = [&](const helics::Endpoint &ept, helics::Time rtime) {
         rxend = ept.getHandle ();
         timeRx = rtime;
     };
@@ -177,7 +185,7 @@ BOOST_DATA_TEST_CASE (message_federate_send_receive_callback_obj, bdata::make (c
     EXPECT_TRUE (rxend == ep2.getHandle ());
     EXPECT_EQ (timeRx, helics::Time (1.0));
     auto M = ep2.getMessage ();
-    BOOST_REQUIRE (M);
+    ASSERT_TRUE (M);
     ASSERT_EQ (M->data.size (), data.size ());
 
     EXPECT_EQ (M->data[245], data[245]);
@@ -186,7 +194,7 @@ BOOST_DATA_TEST_CASE (message_federate_send_receive_callback_obj, bdata::make (c
     EXPECT_TRUE (mFed1->getCurrentMode () == helics::Federate::modes::finalize);
 }
 
-BOOST_DATA_TEST_CASE (message_federate_send_receive_callback_obj2, bdata::make (core_types_single), GetParam ())
+TEST_P (mfed_add_single_type_tests, send_receive_callback_obj2)
 {
     SetupTest<helics::MessageFederate> (GetParam (), 1);
     auto mFed1 = GetFederateAs<helics::MessageFederate> (0);
@@ -196,7 +204,7 @@ BOOST_DATA_TEST_CASE (message_federate_send_receive_callback_obj2, bdata::make (
 
     helics::interface_handle rxend;
     helics::Time timeRx;
-    auto mend = [&] (const helics::Endpoint &ept, helics::Time rtime) {
+    auto mend = [&](const helics::Endpoint &ept, helics::Time rtime) {
         rxend = ept.getHandle ();
         timeRx = rtime;
     };
@@ -223,7 +231,7 @@ BOOST_DATA_TEST_CASE (message_federate_send_receive_callback_obj2, bdata::make (
     EXPECT_TRUE (rxend == ep2.getHandle ());
     EXPECT_EQ (timeRx, helics::Time (1.0));
     auto M = ep2.getMessage ();
-    BOOST_REQUIRE (M);
+    ASSERT_TRUE (M);
     ASSERT_EQ (M->data.size (), data.size ());
 
     EXPECT_EQ (M->data[245], data[245]);
@@ -232,9 +240,7 @@ BOOST_DATA_TEST_CASE (message_federate_send_receive_callback_obj2, bdata::make (
     EXPECT_TRUE (mFed1->getCurrentMode () == helics::Federate::modes::finalize);
 }
 
-BOOST_DATA_TEST_CASE (message_federate_send_receive_2fed_multisend_callback,
-                      bdata::make (core_types_all),
-                      GetParam ())
+TEST_P (mfed_add_all_type_tests, send_receive_2fed_multisend_callback)
 {
     SetupTest<helics::MessageFederate> (GetParam (), 2);
     auto mFed1 = GetFederateAs<helics::MessageFederate> (0);
@@ -244,13 +250,13 @@ BOOST_DATA_TEST_CASE (message_federate_send_receive_2fed_multisend_callback,
     auto &epid2 = mFed2->registerGlobalEndpoint ("ep2", "random");
     std::atomic<int> e1cnt{0};
     std::atomic<int> e2cnt{0};
-    mFed1->setMessageNotificationCallback (epid, [&] (const helics::Endpoint &, helics::Time) { ++e1cnt; });
-    mFed2->setMessageNotificationCallback (epid2, [&] (const helics::Endpoint &, helics::Time) { ++e2cnt; });
+    mFed1->setMessageNotificationCallback (epid, [&](const helics::Endpoint &, helics::Time) { ++e1cnt; });
+    mFed2->setMessageNotificationCallback (epid2, [&](const helics::Endpoint &, helics::Time) { ++e2cnt; });
     // mFed1->getCorePointer()->setLoggingLevel(0, 5);
     mFed1->setProperty (helics_property_time_delta, 1.0);
     mFed2->setProperty (helics_property_time_delta, 1.0);
 
-    auto f1finish = std::async (std::launch::async, [&] () { mFed1->enterExecutingMode (); });
+    auto f1finish = std::async (std::launch::async, [&]() { mFed1->enterExecutingMode (); });
     mFed2->enterExecutingMode ();
     f1finish.wait ();
 
@@ -266,7 +272,7 @@ BOOST_DATA_TEST_CASE (message_federate_send_receive_2fed_multisend_callback,
     mFed1->sendMessage (epid, "ep2", data3);
     mFed1->sendMessage (epid, "ep2", data4);
     // move the time to 1.0
-    auto f1time = std::async (std::launch::async, [&] () { return mFed1->requestTime (1.0); });
+    auto f1time = std::async (std::launch::async, [&]() { return mFed1->requestTime (1.0); });
     auto gtime = mFed2->requestTime (1.0);
 
     EXPECT_EQ (gtime, 1.0);
@@ -279,7 +285,7 @@ BOOST_DATA_TEST_CASE (message_federate_send_receive_2fed_multisend_callback,
     EXPECT_EQ (cnt, 4);
 
     auto M1 = mFed2->getMessage (epid2);
-    BOOST_REQUIRE (M1);
+    ASSERT_TRUE (M1);
     ASSERT_EQ (M1->data.size (), data1.size ());
 
     EXPECT_EQ (M1->data[245], data1[245]);
@@ -287,7 +293,7 @@ BOOST_DATA_TEST_CASE (message_federate_send_receive_2fed_multisend_callback,
     cnt = mFed2->pendingMessages (epid2);
     EXPECT_EQ (cnt, 3);
     auto M2 = mFed2->getMessage ();
-    BOOST_REQUIRE (M2);
+    ASSERT_TRUE (M2);
     ASSERT_EQ (M2->data.size (), data2.size ());
     EXPECT_EQ (M2->data[245], data2[245]);
     cnt = mFed2->pendingMessages (epid2);
@@ -322,7 +328,7 @@ class PingPongFed
     std::unique_ptr<helics::MessageFederate> mFed;
     helics::Time delta;  // the minimum time delta for the federate
     std::string name;  //!< the name of the federate
-    helics::GetParam () coreType;
+    helics::core_type coreType;
     std::vector<std::pair<helics::Time, std::string>> triggers;
     helics::Endpoint *ep{nullptr};
     int index{0};
@@ -331,7 +337,7 @@ class PingPongFed
     int pings{0};  //!< the number of pings received
     int pongs{0};  //!< the number of pongs received
   public:
-    PingPongFed (const std::string &fname, helics::Time tDelta, helics::GetParam () ctype)
+    PingPongFed (const std::string &fname, helics::Time tDelta, helics::core_type ctype)
         : delta (tDelta), name (fname), coreType (ctype)
     {
         if (delta <= 0.0)
@@ -432,7 +438,7 @@ class PingPongFed
     }
 };
 
-BOOST_DATA_TEST_CASE (threefedPingPong, bdata::make (core_types), GetParam ())
+TEST_P (mfed_add_type_tests, threefedPingPong)
 {
     if (GetParam () != std::string ("test"))
     {
@@ -452,9 +458,9 @@ BOOST_DATA_TEST_CASE (threefedPingPong, bdata::make (core_types), GetParam ())
     p3.addTrigger (3.0, "fedB/port");
     p3.addTrigger (4.0, "fedA/port");
 
-    auto t1 = std::thread ([&p1] () { p1.run (6.0); });
-    auto t2 = std::thread ([&p2] () { p2.run (6.0); });
-    auto t3 = std::thread ([&p3] () { p3.run (6.0); });
+    auto t1 = std::thread ([&p1]() { p1.run (6.0); });
+    auto t2 = std::thread ([&p2]() { p2.run (6.0); });
+    auto t3 = std::thread ([&p3]() { p3.run (6.0); });
 
     t1.join ();
     t2.join ();
@@ -467,11 +473,19 @@ BOOST_DATA_TEST_CASE (threefedPingPong, bdata::make (core_types), GetParam ())
     EXPECT_EQ (p3.pongs, 2);
 }
 
+INSTANTIATE_TEST_SUITE_P (mfed_add_tests, mfed_add_single_type_tests, ::testing::ValuesIn (core_types_single));
+INSTANTIATE_TEST_SUITE_P (mfed_add_tests, mfed_add_type_tests, ::testing::ValuesIn (core_types));
+INSTANTIATE_TEST_SUITE_P (mfed_add_tests, mfed_add_all_type_tests, ::testing::ValuesIn (core_types_all));
+
 static constexpr const char *config_files[] = {"example_message_fed.json", "example_message_fed.toml"};
 
-BOOST_DATA_TEST_CASE (test_file_load, bdata::make (config_files), file)
+class mfed_file_config_files : public ::testing::TestWithParam<const char *>, public FederateTestFixture
 {
-    helics::MessageFederate mFed (std::string (TEST_DIR) + file);
+};
+
+TEST_P (mfed_file_config_files, test_file_load)
+{
+    helics::MessageFederate mFed (std::string (TEST_DIR) + GetParam ());
 
     EXPECT_EQ (mFed.getName (), "messageFed");
 
@@ -485,11 +499,17 @@ BOOST_DATA_TEST_CASE (test_file_load, bdata::make (config_files), file)
     mFed.disconnect ();
 }
 
+INSTANTIATE_TEST_SUITE_P (mfed_add_tests, mfed_file_config_files, ::testing::ValuesIn (config_files));
+
 static constexpr const char *filter_config_files[] = {"example_filters.json", "example_filters.toml"};
 
-BOOST_DATA_TEST_CASE (test_file_load_filter, bdata::make (filter_config_files), file)
+class mfed_file_filter_config_files : public ::testing::TestWithParam<const char *>, public FederateTestFixture
 {
-    helics::MessageFederate mFed (std::string (TEST_DIR) + file);
+};
+
+TEST_P (mfed_file_filter_config_files, test_file_load_filter)
+{
+    helics::MessageFederate mFed (std::string (TEST_DIR) + GetParam ());
 
     EXPECT_EQ (mFed.getName (), "filterFed");
 
@@ -507,3 +527,7 @@ BOOST_DATA_TEST_CASE (test_file_load_filter, bdata::make (filter_config_files), 
     EXPECT_EQ (mFed.getFilter (0).getInfo (), "this is an information string for use by the application");
     mFed.disconnect ();
 }
+
+INSTANTIATE_TEST_SUITE_P (mfed_add_tests,
+                          mfed_file_filter_config_files,
+                          ::testing::ValuesIn (filter_config_files));

@@ -17,44 +17,28 @@ SPDX-License-Identifier: BSD-3-Clause
 
 /** these test cases test out the value federates
  */
-namespace bdata = boost::unit_test::data;
-namespace utf = boost::unit_test;
-
-BOOST_FIXTURE_TEST_SUITE (value_federate_dual_transfer, FederateTestFixture)
+class vfed_dual_transfer_ci_skip : public ::testing::TestWithParam<const char *>, public FederateTestFixture
+{
+};
 
 /** test case checking that the transfer between two federates works as expected
  */
-BOOST_DATA_TEST_CASE (value_federate_dual_transfer_types1, bdata::make (core_types), GetParam ())
-{
-    runDualFederateTest<double> (GetParam (), 10.3, 45.3, 22.7);
-}
+TEST_P (vfed_dual_transfer_ci_skip, double1) { runDualFederateTest<double> (GetParam (), 10.3, 45.3, 22.7); }
 
-BOOST_DATA_TEST_CASE (value_federate_dual_transfer_types2, bdata::make (core_types), GetParam ())
-{
-    runDualFederateTest<int> (GetParam (), 5, 8, 43);
-}
+TEST_P (vfed_dual_transfer_ci_skip, int1) { runDualFederateTest<int> (GetParam (), 5, 8, 43); }
 
-BOOST_DATA_TEST_CASE (value_federate_dual_transfer_types3, bdata::make (core_types), GetParam ())
-{
-    runDualFederateTest<int> (GetParam (), -5, 1241515, -43);
-}
+TEST_P (vfed_dual_transfer_ci_skip, int2) { runDualFederateTest<int> (GetParam (), -5, 1241515, -43); }
 
-BOOST_DATA_TEST_CASE (value_federate_dual_transfer_types4, bdata::make (core_types), GetParam ())
-{
-    runDualFederateTest<char> (GetParam (), 'c', '\0', '\n');
-}
+TEST_P (vfed_dual_transfer_ci_skip, types4) { runDualFederateTest<char> (GetParam (), 'c', '\0', '\n'); }
 
-BOOST_DATA_TEST_CASE (value_federate_dual_transfer_types5, bdata::make (core_types), GetParam ())
+TEST_P (vfed_dual_transfer_ci_skip, uint64_t1)
 {
     runDualFederateTest<uint64_t> (GetParam (), 234252315, 0xFFF1'2345'7124'1412, 23521513412);
 }
 
-BOOST_DATA_TEST_CASE (value_federate_dual_transfer_types6, bdata::make (core_types), GetParam ())
-{
-    runDualFederateTest<float> (GetParam (), 10.3f, 45.3f, 22.7f);
-}
+TEST_P (vfed_dual_transfer_ci_skip, float1) { runDualFederateTest<float> (GetParam (), 10.3f, 45.3f, 22.7f); }
 
-BOOST_DATA_TEST_CASE (value_federate_dual_transfer_types7, bdata::make (core_types), GetParam ())
+TEST_P (vfed_dual_transfer_ci_skip, string)
 {
     runDualFederateTest<std::string> (GetParam (), "start", "inside of the functional relationship of helics",
                                       std::string ("I am a string"));
@@ -63,38 +47,28 @@ BOOST_DATA_TEST_CASE (value_federate_dual_transfer_types7, bdata::make (core_typ
 /** test case checking that the transfer between two federates works as expected with publication and subscription
  * objects
  */
-BOOST_DATA_TEST_CASE (value_federate_dual_transfer_types_obj1, bdata::make (core_types), GetParam ())
-{
-    runDualFederateTestObj<double> (GetParam (), 10.3, 45.3, 22.7);
-}
+TEST_P (vfed_dual_transfer_ci_skip, obj_double) { runDualFederateTestObj<double> (GetParam (), 10.3, 45.3, 22.7); }
 
-BOOST_DATA_TEST_CASE (value_federate_dual_transfer_types_obj2, bdata::make (core_types), GetParam ())
-{
-    runDualFederateTestObj<int> (GetParam (), 5, 8, 43);
-}
+TEST_P (vfed_dual_transfer_ci_skip, obj_int1) { runDualFederateTestObj<int> (GetParam (), 5, 8, 43); }
 
-BOOST_DATA_TEST_CASE (value_federate_dual_transfer_types_obj3, bdata::make (core_types), GetParam ())
-{
-    runDualFederateTestObj<int> (GetParam (), -5, 1241515, -43);
-}
+TEST_P (vfed_dual_transfer_ci_skip, obj_int2) { runDualFederateTestObj<int> (GetParam (), -5, 1241515, -43); }
 
-BOOST_DATA_TEST_CASE (value_federate_dual_transfer_types_obj4, bdata::make (core_types), GetParam ())
-{
-    runDualFederateTestObj<char> (GetParam (), 'c', '\0', '\n');
-}
+TEST_P (vfed_dual_transfer_ci_skip, obj_char) { runDualFederateTestObj<char> (GetParam (), 'c', '\0', '\n'); }
 
-BOOST_DATA_TEST_CASE (value_federate_dual_transfer_types_obj5, bdata::make (core_types), GetParam ())
+TEST_P (vfed_dual_transfer_ci_skip, obj_uint64_t)
 {
     runDualFederateTestObj<uint64_t> (GetParam (), 234252315, 0xFFF1'2345'7124'1412, 23521513412);
 }
 
-BOOST_DATA_TEST_CASE (value_federate_dual_transfer_types_obj6, bdata::make (core_types), GetParam ())
+TEST_P (vfed_dual_transfer_ci_skip, obj_float)
 {
     runDualFederateTestObj<float> (GetParam (), 10.3f, 45.3f, 22.7f);
 }
 
-BOOST_DATA_TEST_CASE (value_federate_dual_transfer_types_obj7, bdata::make (core_types), GetParam ())
+TEST_P (vfed_dual_transfer_ci_skip, obj_string)
 {
     runDualFederateTestObj<std::string> (GetParam (), "start", "inside of the functional relationship of helics",
                                          std::string ("I am a string"));
 }
+
+INSTANTIATE_TEST_SUITE_P (vfed_dual_transfer_tests, vfed_dual_transfer_ci_skip, ::testing::ValuesIn (core_types));

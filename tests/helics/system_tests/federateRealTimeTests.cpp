@@ -25,7 +25,7 @@ struct federate_realtime_tests : public FederateTestFixture, public ::testing::T
 };
 #define CORE_TYPE_TO_TEST helics::core_type::TEST
 
-TEST_F (federate_realtime_tests, federate_delay_tests_skip_ci)
+TEST_F (federate_realtime_tests, federate_delay_tests_ci_skip)
 {
     auto broker = AddBroker ("test", 1);
     helics::FederateInfo fi (CORE_TYPE_TO_TEST);
@@ -65,7 +65,7 @@ TEST_F (federate_realtime_tests, federate_delay_tests_skip_ci)
     broker->disconnect ();
 }
 
-TEST_F (federate_realtime_tests, federate_trigger_tests_adelay_skip_ci)
+TEST_F (federate_realtime_tests, federate_trigger_tests_adelay_ci_skip)
 {
     auto broker = AddBroker ("test", 1);
     helics::FederateInfo fi (CORE_TYPE_TO_TEST);
@@ -118,7 +118,7 @@ TEST_F (federate_realtime_tests, federate_trigger_tests_adelay_skip_ci)
     broker->disconnect ();
 }
 
-TEST_F (federate_realtime_tests, federate_trigger_tests_skip_ci)
+TEST_F (federate_realtime_tests, federate_trigger_tests_ci_skip)
 {
     auto broker = AddBroker ("test", 1);
     helics::FederateInfo fi (CORE_TYPE_TO_TEST);

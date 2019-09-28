@@ -16,13 +16,17 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <gtest/gtest.h>
 /** these test cases test out the message federates
  */
-namespace bdata = boost::unit_test::data;
-namespace utf = boost::unit_test;
 
-BOOST_FIXTURE_TEST_SUITE (filter_tests, FederateTestFixture, *utf::label ("ci"))
+class filter_single_type_test : public ::testing::TestWithParam<const char *>, public FederateTestFixture
+{
+};
+
+class filter_all_type_test : public ::testing::TestWithParam<const char *>, public FederateTestFixture
+{
+};
 
 /** test registration of filters*/
-BOOST_DATA_TEST_CASE (message_filter_registration, bdata::make (core_types_single), GetParam ())
+TEST_P (filter_single_type_test, message_filter_registration)
 {
     auto broker = AddBroker (GetParam (), 2);
 
@@ -60,7 +64,7 @@ BOOST_DATA_TEST_CASE (message_filter_registration, bdata::make (core_types_singl
 /** test a filter operator
 The filter operator delays the message by 2.5 seconds meaning it should arrive by 3 sec into the simulation
 */
-BOOST_DATA_TEST_CASE (message_filter_function, bdata::make (core_types_single), GetParam ())
+TEST_P (filter_single_type_test, message_filter_function)
 {
     auto broker = AddBroker (GetParam (), 2);
     AddFederates<helics::MessageFederate> (GetParam (), 1, broker, 1.0, "filter");
@@ -76,7 +80,7 @@ BOOST_DATA_TEST_CASE (message_filter_function, bdata::make (core_types_single), 
     fFed->addSourceTarget (f1, "port1");
     EXPECT_TRUE (f1.getHandle ().isValid ());
     auto timeOperator = std::make_shared<helics::MessageTimeOperator> ();
-    timeOperator->setTimeFunction ([] (helics::Time time_in) { return time_in + 2.5; });
+    timeOperator->setTimeFunction ([](helics::Time time_in) { return time_in + 2.5; });
     fFed->setFilterOperator (f1, timeOperator);
 
     fFed->enterExecutingModeAsync ();
@@ -108,7 +112,7 @@ BOOST_DATA_TEST_CASE (message_filter_function, bdata::make (core_types_single), 
     fFed->requestTimeAsync (3.0);
     auto retTime = mFed->requestTime (3.0);
     EXPECT_EQ (retTime, 3.0);
-    BOOST_REQUIRE (mFed->hasMessage (p2));
+    ASSERT_TRUE (mFed->hasMessage (p2));
 
     auto m2 = mFed->getMessage (p2);
     EXPECT_EQ (m2->source, "port1");
@@ -129,7 +133,7 @@ BOOST_DATA_TEST_CASE (message_filter_function, bdata::make (core_types_single), 
 The filter operator delays the message by 2.5 seconds meaning it should arrive by 3 sec into the simulation
 */
 
-BOOST_DATA_TEST_CASE (message_filter_object, bdata::make (core_types_single), GetParam ())
+TEST_P (filter_single_type_test, message_filter_object)
 {
     auto broker = AddBroker (GetParam (), 2);
     AddFederates<helics::MessageFederate> (GetParam (), 1, broker, 1.0, "filter");
@@ -163,12 +167,12 @@ BOOST_DATA_TEST_CASE (message_filter_object, bdata::make (core_types_single), Ge
     mFed->requestTimeAsync (2.0);
     fFed->requestTime (2.0);
     mFed->requestTimeComplete ();
-    BOOST_REQUIRE (!mFed->hasMessage (p2));
+    ASSERT_TRUE (!mFed->hasMessage (p2));
 
     fFed->requestTimeAsync (3.0);
     /*auto retTime = */ mFed->requestTime (3.0);
 
-    BOOST_REQUIRE (mFed->hasMessage (p2));
+    ASSERT_TRUE (mFed->hasMessage (p2));
 
     auto m2 = mFed->getMessage (p2);
     EXPECT_EQ (m2->source, "port1");
@@ -189,7 +193,7 @@ BOOST_DATA_TEST_CASE (message_filter_object, bdata::make (core_types_single), Ge
 The filter operator delays the message by 2.5 seconds meaning it should arrive by 3 sec into the simulation
 */
 
-BOOST_DATA_TEST_CASE (message_dest_filter_function, bdata::make (core_types_single), GetParam ())
+TEST_P (filter_single_type_test, message_dest_filter_function)
 {
     auto broker = AddBroker (GetParam (), 2);
     AddFederates<helics::MessageFederate> (GetParam (), 1, broker, 1.0, "filter");
@@ -205,7 +209,7 @@ BOOST_DATA_TEST_CASE (message_dest_filter_function, bdata::make (core_types_sing
     fFed->addDestinationTarget (f1, "port2");
     EXPECT_TRUE (f1.getHandle ().isValid ());
     auto timeOperator = std::make_shared<helics::MessageTimeOperator> ();
-    timeOperator->setTimeFunction ([] (helics::Time time_in) { return time_in + 2.5; });
+    timeOperator->setTimeFunction ([](helics::Time time_in) { return time_in + 2.5; });
     fFed->setFilterOperator (f1, timeOperator);
 
     fFed->enterExecutingModeAsync ();
@@ -226,12 +230,12 @@ BOOST_DATA_TEST_CASE (message_dest_filter_function, bdata::make (core_types_sing
     }
 
     mFed->requestTime (2.0);
-    BOOST_REQUIRE (!mFed->hasMessage (p2));
+    ASSERT_TRUE (!mFed->hasMessage (p2));
 
     fFed->requestTimeAsync (3.0);
     /*auto retTime = */ mFed->requestTime (3.0);
 
-    BOOST_REQUIRE (mFed->hasMessage (p2));
+    ASSERT_TRUE (mFed->hasMessage (p2));
 
     auto m2 = mFed->getMessage (p2);
     EXPECT_EQ (m2->source, "port1");
@@ -252,7 +256,7 @@ BOOST_DATA_TEST_CASE (message_dest_filter_function, bdata::make (core_types_sing
 The filter operator delays the message by 2.5 seconds meaning it should arrive by 3 sec into the simulation
 */
 
-BOOST_DATA_TEST_CASE (message_dest_filter_function_t2, bdata::make (core_types_all), GetParam ())
+TEST_P (filter_all_type_test, message_dest_filter_function_t2)
 {
     auto broker = AddBroker (GetParam (), 2);
     AddFederates<helics::MessageFederate> (GetParam (), 2, broker, 0.5, "message");
@@ -267,7 +271,7 @@ BOOST_DATA_TEST_CASE (message_dest_filter_function_t2, bdata::make (core_types_a
     mFed2->addSourceTarget (f1, "port1");
     EXPECT_TRUE (f1.getHandle ().isValid ());
     auto timeOperator = std::make_shared<helics::MessageTimeOperator> ();
-    timeOperator->setTimeFunction ([] (helics::Time time_in) { return time_in + 2.5; });
+    timeOperator->setTimeFunction ([](helics::Time time_in) { return time_in + 2.5; });
     mFed2->setFilterOperator (f1, timeOperator);
 
     mFed1->enterExecutingModeAsync ();
@@ -288,13 +292,13 @@ BOOST_DATA_TEST_CASE (message_dest_filter_function_t2, bdata::make (core_types_a
     mFed1->requestTimeAsync (2.0);
     mFed2->requestTime (2.0);
     mFed1->requestTimeComplete ();
-    BOOST_REQUIRE (!mFed2->hasMessage (p2));
+    ASSERT_TRUE (!mFed2->hasMessage (p2));
 
     mFed1->requestTimeAsync (3.0);
     auto retTime = mFed2->requestTime (3.0);
 
     EXPECT_TRUE (retTime == 2.5);
-    BOOST_REQUIRE (mFed2->hasMessage (p2));
+    ASSERT_TRUE (mFed2->hasMessage (p2));
 
     auto m2 = mFed2->getMessage (p2);
 
@@ -310,7 +314,7 @@ BOOST_DATA_TEST_CASE (message_dest_filter_function_t2, bdata::make (core_types_a
 The filter operator delays the message by 2.5 seconds meaning it should arrive by 3 sec into the simulation
 */
 
-BOOST_DATA_TEST_CASE (message_dest_filter_object, bdata::make (core_types_single), GetParam ())
+TEST_P (filter_single_type_test, message_dest_filter_object)
 {
     auto broker = AddBroker (GetParam (), 2);
     AddFederates<helics::MessageFederate> (GetParam (), 1, broker, 1.0, "filter");
@@ -344,12 +348,12 @@ BOOST_DATA_TEST_CASE (message_dest_filter_object, bdata::make (core_types_single
     mFed->requestTimeAsync (2.0);
     fFed->requestTime (2.0);
     mFed->requestTimeComplete ();
-    BOOST_REQUIRE (!mFed->hasMessage (p2));
+    ASSERT_TRUE (!mFed->hasMessage (p2));
 
     fFed->requestTimeAsync (3.0);
     /*auto retTime = */ mFed->requestTime (3.0);
 
-    BOOST_REQUIRE (mFed->hasMessage (p2));
+    ASSERT_TRUE (mFed->hasMessage (p2));
 
     auto m2 = mFed->getMessage (p2);
     EXPECT_EQ (m2->source, "port1");
@@ -382,7 +386,7 @@ static bool two_stage_filter_test (std::shared_ptr<helics::MessageFederate> &mFe
     bool correct = true;
 
     auto timeOperator = std::make_shared<helics::MessageTimeOperator> ();
-    timeOperator->setTimeFunction ([] (helics::Time time_in) { return time_in + 1.25; });
+    timeOperator->setTimeFunction ([](helics::Time time_in) { return time_in + 1.25; });
     fFed1->setFilterOperator (f1, timeOperator);
     fFed2->setFilterOperator (f2, timeOperator);
 
@@ -465,7 +469,7 @@ static bool two_stage_filter_test (std::shared_ptr<helics::MessageFederate> &mFe
 The filter operator delays the message by 2.5 seconds meaning it should arrive by 3 sec into the simulation
 */
 
-BOOST_DATA_TEST_CASE (message_filter_function_two_stage, bdata::make (core_types_single), GetParam ())
+TEST_P (filter_single_type_test, message_filter_function_two_stage)
 {
     auto broker = AddBroker (GetParam (), 3);
     AddFederates<helics::MessageFederate> (GetParam (), 1, broker, 1.0, "filter");
@@ -491,9 +495,7 @@ BOOST_DATA_TEST_CASE (message_filter_function_two_stage, bdata::make (core_types
     EXPECT_TRUE (res);
 }
 
-BOOST_DATA_TEST_CASE (message_filter_function_two_stage_endpoint_target,
-                      bdata::make (core_types_single),
-                      GetParam ())
+TEST_P (filter_single_type_test, message_filter_function_two_stage_endpoint_target)
 {
     auto broker = AddBroker (GetParam (), 3);
     AddFederates<helics::MessageFederate> (GetParam (), 1, broker, 1.0, "filter");
@@ -521,9 +523,7 @@ BOOST_DATA_TEST_CASE (message_filter_function_two_stage_endpoint_target,
     EXPECT_TRUE (res);
 }
 
-BOOST_DATA_TEST_CASE (message_filter_function_two_stage_endpoint_target_dest,
-                      bdata::make (core_types_single),
-                      GetParam ())
+TEST_P (filter_single_type_test, message_filter_function_two_stage_endpoint_target_dest)
 {
     auto broker = AddBroker (GetParam (), 3);
     AddFederates<helics::MessageFederate> (GetParam (), 1, broker, 1.0, "filter");
@@ -552,9 +552,7 @@ BOOST_DATA_TEST_CASE (message_filter_function_two_stage_endpoint_target_dest,
     EXPECT_TRUE (res);
 }
 
-BOOST_DATA_TEST_CASE (message_filter_function_two_stage_broker_filter_link,
-                      bdata::make (core_types_single),
-                      GetParam ())
+TEST_P (filter_single_type_test, message_filter_function_two_stage_broker_filter_link)
 {
     auto broker = AddBroker (GetParam (), 3);
     AddFederates<helics::MessageFederate> (GetParam (), 1, broker, 1.0, "filter");
@@ -583,9 +581,7 @@ BOOST_DATA_TEST_CASE (message_filter_function_two_stage_broker_filter_link,
     EXPECT_TRUE (res);
 }
 
-BOOST_DATA_TEST_CASE (message_filter_function_two_stage_broker_filter_link_switch_order,
-                      bdata::make (core_types_single),
-                      GetParam ())
+TEST_P (filter_single_type_test, message_filter_function_two_stage_broker_filter_link_switch_order)
 {
     auto broker = AddBroker (GetParam (), 3);
     AddFederates<helics::MessageFederate> (GetParam (), 1, broker, 1.0, "filter");
@@ -608,9 +604,7 @@ BOOST_DATA_TEST_CASE (message_filter_function_two_stage_broker_filter_link_switc
     EXPECT_TRUE (res);
 }
 
-BOOST_DATA_TEST_CASE (message_filter_function_two_stage_broker_filter_link_late,
-                      bdata::make (core_types_single),
-                      GetParam ())
+TEST_P (filter_single_type_test, message_filter_function_two_stage_broker_filter_link_late)
 {
     auto broker = AddBroker (GetParam (), 3);
     AddFederates<helics::MessageFederate> (GetParam (), 1, broker, 1.0, "filter");
@@ -634,9 +628,7 @@ BOOST_DATA_TEST_CASE (message_filter_function_two_stage_broker_filter_link_late,
     EXPECT_TRUE (res);
 }
 
-BOOST_DATA_TEST_CASE (message_filter_function_two_stage_broker_filter_link_early,
-                      bdata::make (core_types_single),
-                      GetParam ())
+TEST_P (filter_single_type_test, message_filter_function_two_stage_broker_filter_link_early)
 {
     auto broker = AddBroker (GetParam (), 3);
 
@@ -665,10 +657,10 @@ BOOST_DATA_TEST_CASE (message_filter_function_two_stage_broker_filter_link_early
 The filter operator delays the message by 2.5 seconds meaning it should arrive by 3 sec into the simulation
 */
 
-BOOST_DATA_TEST_CASE (message_filter_function_two_stage_object, bdata::make (core_types_single), GetParam ())
+TEST_P (filter_single_type_test, message_filter_function_two_stage_object)
 {
     auto broker = AddBroker (GetParam (), 3);
-    BOOST_REQUIRE (broker);
+    ASSERT_TRUE (broker);
     AddFederates<helics::MessageFederate> (GetParam (), 1, broker, 1.0, "filter");
     AddFederates<helics::MessageFederate> (GetParam (), 1, broker, 1.0, "filter2");
     AddFederates<helics::MessageFederate> (GetParam (), 1, broker, 1.0, "message");
@@ -677,9 +669,9 @@ BOOST_DATA_TEST_CASE (message_filter_function_two_stage_object, bdata::make (cor
     auto fFed2 = GetFederateAs<helics::MessageFederate> (1);
     auto mFed = GetFederateAs<helics::MessageFederate> (2);
 
-    BOOST_REQUIRE (fFed);
-    BOOST_REQUIRE (fFed2);
-    BOOST_REQUIRE (mFed);
+    ASSERT_TRUE (fFed);
+    ASSERT_TRUE (fFed2);
+    ASSERT_TRUE (mFed);
     auto &p1 = mFed->registerGlobalEndpoint ("port1");
     auto &p2 = mFed->registerGlobalEndpoint ("port2");
 
@@ -714,7 +706,7 @@ BOOST_DATA_TEST_CASE (message_filter_function_two_stage_object, bdata::make (cor
     fFed->requestTime (2.0);
     mFed->requestTimeComplete ();
     fFed2->requestTimeComplete ();
-    BOOST_REQUIRE (!mFed->hasMessage (p2));
+    ASSERT_TRUE (!mFed->hasMessage (p2));
 
     fFed->requestTimeAsync (3.0);
     fFed2->requestTimeAsync (3.0);
@@ -723,7 +715,7 @@ BOOST_DATA_TEST_CASE (message_filter_function_two_stage_object, bdata::make (cor
     {
         printf ("missing message\n");
     }
-    BOOST_REQUIRE (mFed->hasMessage (p2));
+    ASSERT_TRUE (mFed->hasMessage (p2));
 
     auto m2 = mFed->getMessage (p2);
     EXPECT_EQ (m2->source, "port1");
@@ -750,7 +742,7 @@ BOOST_DATA_TEST_CASE (message_filter_function_two_stage_object, bdata::make (cor
 The filter operator delays the message by 2.5 seconds meaning it should arrive by 3 sec into the simulation
 */
 
-BOOST_DATA_TEST_CASE (message_filter_function2, bdata::make (core_types_single), GetParam ())
+TEST_P (filter_single_type_test, message_filter_function2)
 {
     auto broker = AddBroker (GetParam (), 2);
     AddFederates<helics::MessageFederate> (GetParam (), 1, broker, 1.0, "filter");
@@ -758,8 +750,8 @@ BOOST_DATA_TEST_CASE (message_filter_function2, bdata::make (core_types_single),
 
     auto fFed = GetFederateAs<helics::MessageFederate> (0);
     auto mFed = GetFederateAs<helics::MessageFederate> (1);
-    BOOST_REQUIRE (fFed);
-    BOOST_REQUIRE (mFed);
+    ASSERT_TRUE (fFed);
+    ASSERT_TRUE (mFed);
 
     auto &p1 = mFed->registerGlobalEndpoint ("port1");
     auto &p2 = mFed->registerGlobalEndpoint ("port2");
@@ -769,7 +761,7 @@ BOOST_DATA_TEST_CASE (message_filter_function2, bdata::make (core_types_single),
     fFed->addSourceTarget (f1, "port2");
     EXPECT_TRUE (f1.getHandle ().isValid ());
     auto timeOperator = std::make_shared<helics::MessageTimeOperator> ();
-    timeOperator->setTimeFunction ([] (helics::Time time_in) { return time_in + 2.5; });
+    timeOperator->setTimeFunction ([](helics::Time time_in) { return time_in + 2.5; });
     fFed->setFilterOperator (f1, timeOperator);
 
     fFed->enterExecutingModeAsync ();
@@ -790,12 +782,12 @@ BOOST_DATA_TEST_CASE (message_filter_function2, bdata::make (core_types_single),
     mFed->requestTimeAsync (2.0);
     fFed->requestTime (2.0);
     mFed->requestTimeComplete ();
-    BOOST_REQUIRE (!mFed->hasMessage (p2));
+    ASSERT_TRUE (!mFed->hasMessage (p2));
 
     std::this_thread::yield ();
     mFed->requestTime (3.0);
 
-    BOOST_REQUIRE (mFed->hasMessage (p2));
+    ASSERT_TRUE (mFed->hasMessage (p2));
 
     auto m2 = mFed->getMessage (p2);
     EXPECT_EQ (m2->source, "port1");
@@ -813,7 +805,7 @@ BOOST_DATA_TEST_CASE (message_filter_function2, bdata::make (core_types_single),
     EXPECT_TRUE (fFed->getCurrentMode () == helics::Federate::modes::finalize);
 }
 
-BOOST_DATA_TEST_CASE (message_filter_function2_rem_target, bdata::make (core_types_single), GetParam ())
+TEST_P (filter_single_type_test, message_filter_function2_rem_target)
 {
     auto broker = AddBroker (GetParam (), 2);
     AddFederates<helics::MessageFederate> (GetParam (), 1, broker, 1.0, "filter");
@@ -821,8 +813,8 @@ BOOST_DATA_TEST_CASE (message_filter_function2_rem_target, bdata::make (core_typ
 
     auto fFed = GetFederateAs<helics::MessageFederate> (0);
     auto mFed = GetFederateAs<helics::MessageFederate> (1);
-    BOOST_REQUIRE (fFed);
-    BOOST_REQUIRE (mFed);
+    ASSERT_TRUE (fFed);
+    ASSERT_TRUE (mFed);
 
     auto &p1 = mFed->registerGlobalEndpoint ("port1");
     auto &p2 = mFed->registerGlobalEndpoint ("port2");
@@ -832,7 +824,7 @@ BOOST_DATA_TEST_CASE (message_filter_function2_rem_target, bdata::make (core_typ
     fFed->addSourceTarget (f1, "port2");
     EXPECT_TRUE (f1.getHandle ().isValid ());
     auto timeOperator = std::make_shared<helics::MessageTimeOperator> ();
-    timeOperator->setTimeFunction ([] (helics::Time time_in) { return time_in + 2.5; });
+    timeOperator->setTimeFunction ([](helics::Time time_in) { return time_in + 2.5; });
     fFed->setFilterOperator (f1, timeOperator);
 
     fFed->enterExecutingModeAsync ();
@@ -853,12 +845,12 @@ BOOST_DATA_TEST_CASE (message_filter_function2_rem_target, bdata::make (core_typ
     mFed->requestTimeAsync (2.0);
     fFed->requestTime (2.0);
     mFed->requestTimeComplete ();
-    BOOST_REQUIRE (!mFed->hasMessage (p2));
+    ASSERT_TRUE (!mFed->hasMessage (p2));
 
     std::this_thread::yield ();
     mFed->requestTime (3.0);
 
-    BOOST_REQUIRE (mFed->hasMessage (p2));
+    ASSERT_TRUE (mFed->hasMessage (p2));
 
     auto m2 = mFed->getMessage (p2);
     EXPECT_EQ (m2->source, "port1");
@@ -887,7 +879,11 @@ BOOST_DATA_TEST_CASE (message_filter_function2_rem_target, bdata::make (core_typ
     EXPECT_TRUE (fFed->getCurrentMode () == helics::Federate::modes::finalize);
 }
 
-BOOST_AUTO_TEST_CASE (message_clone_test)
+class filter_test : public ::testing::Test, public FederateTestFixture
+{
+};
+
+TEST_F (filter_test, message_clone_test)
 {
     auto broker = AddBroker ("test", 3);
     AddFederates<helics::MessageFederate> ("test", 1, broker, 1.0, "source");
@@ -956,7 +952,7 @@ BOOST_AUTO_TEST_CASE (message_clone_test)
     EXPECT_TRUE (sFed->getCurrentMode () == helics::Federate::modes::finalize);
 }
 
-BOOST_AUTO_TEST_CASE (message_multi_clone_test)
+TEST_F (filter_test, message_multi_clone_test)
 {
     auto broker = AddBroker ("test", 4);
     AddFederates<helics::MessageFederate> ("test", 2, broker, 1.0, "source");
@@ -1065,7 +1061,7 @@ BOOST_AUTO_TEST_CASE (message_multi_clone_test)
 /** test whether a core termination when it should
  */
 
-BOOST_DATA_TEST_CASE (test_filter_core_termination, bdata::make (core_types_single), GetParam ())
+TEST_P (filter_single_type_test, test_filter_core_termination)
 {
     auto broker = AddBroker (GetParam (), 2);
     AddFederates<helics::MessageFederate> (GetParam (), 1, broker, 1.0, "filter");
@@ -1081,7 +1077,7 @@ BOOST_DATA_TEST_CASE (test_filter_core_termination, bdata::make (core_types_sing
     auto f1 = c2->registerFilter ("filter1", std::string (), std::string ());
     c2->addSourceTarget (f1, "port1");
     auto timeOperator = std::make_shared<helics::MessageTimeOperator> ();
-    timeOperator->setTimeFunction ([] (helics::Time time_in) { return time_in + 2.5; });
+    timeOperator->setTimeFunction ([](helics::Time time_in) { return time_in + 2.5; });
     c2->setFilterOperator (f1, timeOperator);
 
     fFed->enterExecutingModeAsync ();
@@ -1100,11 +1096,11 @@ BOOST_DATA_TEST_CASE (test_filter_core_termination, bdata::make (core_types_sing
     EXPECT_TRUE (!res);
 
     mFed->requestTime (2.0);
-    BOOST_REQUIRE (!mFed->hasMessage (p2));
+    ASSERT_TRUE (!mFed->hasMessage (p2));
     EXPECT_TRUE (c2->isConnected ());
     mFed->requestTime (3.0);
     mFed->sendMessage (p1, "port2", data);
-    BOOST_REQUIRE (mFed->hasMessage (p2));
+    ASSERT_TRUE (mFed->hasMessage (p2));
 
     auto m2 = mFed->getMessage (p2);
     EXPECT_EQ (m2->source, "port1");
@@ -1127,3 +1123,6 @@ BOOST_DATA_TEST_CASE (test_filter_core_termination, bdata::make (core_types_sing
     EXPECT_TRUE (!c2->isConnected ());
     EXPECT_TRUE (fFed->getCurrentMode () == helics::Federate::modes::finalize);
 }
+
+INSTANTIATE_TEST_SUITE_P (filter_tests, filter_single_type_test, ::testing::ValuesIn (core_types_simple));
+INSTANTIATE_TEST_SUITE_P (filter_tests, filter_all_type_test, ::testing::ValuesIn (core_types_all));

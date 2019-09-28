@@ -19,13 +19,27 @@ SPDX-License-Identifier: BSD-3-Clause
 
 /** these test cases test out the value federates with some additional tests
  */
-namespace bdata = boost::unit_test::data;
-namespace utf = boost::unit_test;
 
-BOOST_FIXTURE_TEST_SUITE (value_federate_additional_tests, FederateTestFixture)
+class valuefed_add_single_type_tests_ci_skip : public ::testing::TestWithParam<const char *>,
+                                               public FederateTestFixture
+{
+};
+
+class valuefed_add_all_type_tests_ci_skip : public ::testing::TestWithParam<const char *>,
+                                            public FederateTestFixture
+{
+};
+
+class valuefed_add_type_tests_ci_skip : public ::testing::TestWithParam<const char *>, public FederateTestFixture
+{
+};
+
+class valuefed_add_tests_ci_skip : public ::testing::Test, public FederateTestFixture
+{
+};
 
 /** test simple creation and destruction*/
-BOOST_DATA_TEST_CASE (value_federate_initialize_tests, bdata::make (core_types_single), GetParam ())
+TEST_P (valuefed_add_single_type_tests_ci_skip, initialize)
 {
     SetupTest<helics::ValueFederate> (GetParam (), 1);
     auto vFed1 = GetFederateAs<helics::ValueFederate> (0);
@@ -40,7 +54,12 @@ BOOST_DATA_TEST_CASE (value_federate_initialize_tests, bdata::make (core_types_s
 }
 
 #ifdef ENABLE_ZMQ_CORE
-BOOST_DATA_TEST_CASE (value_federate_publication_registration, bdata::make (ztypes), GetParam ())
+
+class valuefed_add_ztype_tests : public ::testing::TestWithParam<const char *>, public FederateTestFixture
+{
+};
+
+TEST_P (valuefed_add_ztype_tests, publication_registration)
 {
     SetupTest<helics::ValueFederate> (GetParam (), 1);
     auto vFed1 = GetFederateAs<helics::ValueFederate> (0);
@@ -70,8 +89,12 @@ BOOST_DATA_TEST_CASE (value_federate_publication_registration, bdata::make (ztyp
 
     EXPECT_TRUE (vFed1->getCurrentMode () == helics::Federate::modes::finalize);
 }
+
+INSTANTIATE_TEST_SUITE_P (vfed_add_tests, valuefed_add_ztype_tests, ::testing::ValuesIn (ztypes));
+
 #endif
-BOOST_DATA_TEST_CASE (value_federate_publisher_registration, bdata::make (core_types_single), GetParam ())
+
+TEST_P (valuefed_add_single_type_tests_ci_skip, publisher_registration)
 {
     SetupTest<helics::ValueFederate> (GetParam (), 1);
     auto vFed1 = GetFederateAs<helics::ValueFederate> (0);
@@ -102,7 +125,7 @@ BOOST_DATA_TEST_CASE (value_federate_publisher_registration, bdata::make (core_t
     EXPECT_TRUE (vFed1->getCurrentMode () == helics::Federate::modes::finalize);
 }
 
-BOOST_DATA_TEST_CASE (value_federate_subscription_registration, bdata::make (core_types_single), GetParam ())
+TEST_P (valuefed_add_single_type_tests_ci_skip, subscription_registration)
 {
     SetupTest<helics::ValueFederate> (GetParam (), 1);
     auto vFed1 = GetFederateAs<helics::ValueFederate> (0);
@@ -138,9 +161,7 @@ BOOST_DATA_TEST_CASE (value_federate_subscription_registration, bdata::make (cor
     helics::cleanupHelicsLibrary ();
 }
 
-BOOST_DATA_TEST_CASE (value_federate_subscription_and_publication_registration,
-                      bdata::make (core_types_single),
-                      GetParam ())
+TEST_P (valuefed_add_single_type_tests_ci_skip, subscription_and_publication_registration)
 {
     SetupTest<helics::ValueFederate> (GetParam (), 1);
     auto vFed1 = GetFederateAs<helics::ValueFederate> (0);
@@ -187,9 +208,7 @@ BOOST_DATA_TEST_CASE (value_federate_subscription_and_publication_registration,
     helics::cleanupHelicsLibrary ();
 }
 
-BOOST_DATA_TEST_CASE (value_federate_input_and_publication_registration,
-                      bdata::make (core_types_single),
-                      GetParam ())
+TEST_P (valuefed_add_single_type_tests_ci_skip, input_and_publication_registration)
 {
     SetupTest<helics::ValueFederate> (GetParam (), 1);
     auto vFed1 = GetFederateAs<helics::ValueFederate> (0);
@@ -239,7 +258,7 @@ BOOST_DATA_TEST_CASE (value_federate_input_and_publication_registration,
     helics::cleanupHelicsLibrary ();
 }
 
-BOOST_DATA_TEST_CASE (value_federate_single_transfer, bdata::make (core_types_single), GetParam ())
+TEST_P (valuefed_add_single_type_tests_ci_skip, single_transfer)
 {
     SetupTest<helics::ValueFederate> (GetParam (), 1);
     auto vFed1 = GetFederateAs<helics::ValueFederate> (0);
@@ -274,7 +293,7 @@ BOOST_DATA_TEST_CASE (value_federate_single_transfer, bdata::make (core_types_si
     EXPECT_EQ (s, "string2");
 }
 
-BOOST_DATA_TEST_CASE (value_federate_dual_transfer_string, bdata::make (core_types_all), GetParam ())
+TEST_P (valuefed_add_all_type_tests_ci_skip, dual_transfer_string)
 {
     // this one is going to test really ugly strings
     // this is a bizarre string since it contains a \0 and icc 17 can't be used inside a boost data test case
@@ -283,7 +302,7 @@ BOOST_DATA_TEST_CASE (value_federate_dual_transfer_string, bdata::make (core_typ
     runDualFederateTest<std::string> (GetParam (), std::string (86263, '\0'), specialString, std::string ());
 }
 
-BOOST_DATA_TEST_CASE (value_federate_dual_transfer_vector, bdata::make (core_types), GetParam ())
+TEST_P (valuefed_add_type_tests_ci_skip, dual_transfer_vector)
 {
     std::vector<double> defVec = {34.3, 24.2};
     std::vector<double> v1Vec = {12.4, 14.7, 16.34, 18.17};
@@ -291,7 +310,7 @@ BOOST_DATA_TEST_CASE (value_federate_dual_transfer_vector, bdata::make (core_typ
     runDualFederateTestv2<std::vector<double>> (GetParam (), defVec, v1Vec, v2Vec);
 }
 
-BOOST_DATA_TEST_CASE (value_federate_dual_transfer_complex, bdata::make (core_types), GetParam ())
+TEST_P (valuefed_add_type_tests_ci_skip, dual_transfer_complex)
 {
     std::complex<double> def = {54.23233, 0.7};
     std::complex<double> v1 = std::polar (10.0, 0.43);
@@ -299,7 +318,7 @@ BOOST_DATA_TEST_CASE (value_federate_dual_transfer_complex, bdata::make (core_ty
     runDualFederateTest<std::complex<double>> (GetParam (), def, v1, v2);
 }
 
-BOOST_AUTO_TEST_CASE (value_federate_dual_transfer_complex_long)
+TEST_F (valuefed_add_tests_ci_skip, dual_transfer_complex_long)
 {
     std::complex<double> def = {54.23233, 0.7};
     std::complex<double> v1 = std::polar (10.0, 0.43);
@@ -307,7 +326,7 @@ BOOST_AUTO_TEST_CASE (value_federate_dual_transfer_complex_long)
     runDualFederateTest<std::complex<double>> ("test_7", def, v1, v2);
 }
 
-BOOST_DATA_TEST_CASE (value_federate_dual_transfer_types_obj8, bdata::make (core_types), GetParam ())
+TEST_P (valuefed_add_type_tests_ci_skip, dual_transfer_types_obj8)
 {
     // this is a bizarre string since it contains a \0 and icc 17 can't be used inside a boost data test case
     decltype (auto) cstr = "inside\n\0 of the \0\n functional\r \brelationship of helics\n";
@@ -316,7 +335,7 @@ BOOST_DATA_TEST_CASE (value_federate_dual_transfer_types_obj8, bdata::make (core
     runDualFederateTestObj<std::string> (GetParam (), std::string (86263, '\0'), specialString, std::string ());
 }
 
-BOOST_DATA_TEST_CASE (value_federate_dual_transfer_types_obj9, bdata::make (core_types_all), GetParam ())
+TEST_P (valuefed_add_all_type_tests_ci_skip, dual_transfer_types_obj9)
 {
     std::complex<double> def = {54.23233, 0.7};
     std::complex<double> v1 = std::polar (10.0, 0.43);
@@ -324,7 +343,7 @@ BOOST_DATA_TEST_CASE (value_federate_dual_transfer_types_obj9, bdata::make (core
     runDualFederateTestObj<std::complex<double>> (GetParam (), def, v1, v2);
 }
 
-BOOST_DATA_TEST_CASE (value_federate_dual_transfer_types_obj10, bdata::make (core_types), GetParam ())
+TEST_P (valuefed_add_type_tests_ci_skip, dual_transfer_types_obj10)
 {
     helics::NamedPoint def{"trigger", 0.7};
     helics::NamedPoint v1{"response", -1e-12};
@@ -332,14 +351,14 @@ BOOST_DATA_TEST_CASE (value_federate_dual_transfer_types_obj10, bdata::make (cor
     runDualFederateTestObjv2<helics::NamedPoint> (GetParam (), def, v1, v2);
 }
 
-BOOST_DATA_TEST_CASE (value_federate_dual_transfer_types_obj11, bdata::make (core_types), GetParam ())
+TEST_P (valuefed_add_type_tests_ci_skip, dual_transfer_types_obj11)
 {
     runDualFederateTestObj<bool> (GetParam (), true, false, true);
 }
 
 /** test the callback specification with a vector list*/
 
-BOOST_DATA_TEST_CASE (test_vector_callback_lists, bdata::make (core_types_single), GetParam ())
+TEST_P (valuefed_add_single_type_tests_ci_skip, vector_callback_lists)
 {
     SetupTest<helics::ValueFederate> (GetParam (), 1, 1.0);
     auto vFed1 = GetFederateAs<helics::ValueFederate> (0);
@@ -356,8 +375,8 @@ BOOST_DATA_TEST_CASE (test_vector_callback_lists, bdata::make (core_types_single
     helics::data_block db (547, ';');
     int ccnt = 0;
     // set subscriptions 1 and 2 to have callbacks
-    vFed1->setInputNotificationCallback (sub1, [&] (helics::Input &, helics::Time) { ++ccnt; });
-    vFed1->setInputNotificationCallback (sub2, [&] (helics::Input &, helics::Time) { ++ccnt; });
+    vFed1->setInputNotificationCallback (sub1, [&](helics::Input &, helics::Time) { ++ccnt; });
+    vFed1->setInputNotificationCallback (sub2, [&](helics::Input &, helics::Time) { ++ccnt; });
     vFed1->enterExecutingMode ();
     vFed1->publishRaw (pubid3, db);
     vFed1->requestTime (1.0);
@@ -375,13 +394,13 @@ BOOST_DATA_TEST_CASE (test_vector_callback_lists, bdata::make (core_types_single
     vFed1->requestTime (5.0);
     EXPECT_EQ (ccnt, 2);
 
-    BOOST_CHECK_CLOSE (static_cast<double> (vFed1->getLastUpdateTime (sub3)), 3.0, 0.000001);
+    EXPECT_NEAR (static_cast<double> (vFed1->getLastUpdateTime (sub3)), 3.0, 0.000001);
     vFed1->finalize ();
 }
 
 /** test the publish/subscribe to a vectorized array*/
 
-BOOST_DATA_TEST_CASE (test_indexed_pubs_subs, bdata::make (core_types_single), GetParam ())
+TEST_P (valuefed_add_single_type_tests_ci_skip, indexed_pubs_subs)
 {
     SetupTest<helics::ValueFederate> (GetParam (), 1);
     auto vFed1 = GetFederateAs<helics::ValueFederate> (0);
@@ -404,14 +423,14 @@ BOOST_DATA_TEST_CASE (test_indexed_pubs_subs, bdata::make (core_types_single), G
     auto v2 = vFed1->getDouble (sub2);
     auto v3 = vFed1->getDouble (sub3);
 
-    BOOST_CHECK_CLOSE (10.0, v1, 0.00000001);
-    BOOST_CHECK_CLOSE (20.0, v2, 0.00000001);
-    BOOST_CHECK_CLOSE (30.0, v3, 0.00000001);
+    EXPECT_NEAR (10.0, v1, 0.00000001);
+    EXPECT_NEAR (20.0, v2, 0.00000001);
+    EXPECT_NEAR (30.0, v3, 0.00000001);
 }
 
 /** test the publish/subscribe to a vectorized array*/
 
-BOOST_DATA_TEST_CASE (test_async_calls, bdata::make (core_types), GetParam ())
+TEST_P (valuefed_add_type_tests_ci_skip, async_calls)
 {
     SetupTest<helics::ValueFederate> (GetParam (), 2);
     auto vFed1 = GetFederateAs<helics::ValueFederate> (0);
@@ -468,7 +487,7 @@ BOOST_DATA_TEST_CASE (test_async_calls, bdata::make (core_types), GetParam ())
 }
 
 /** test info field for multiple publications */
-BOOST_DATA_TEST_CASE (test_info_field, bdata::make (core_types_single), GetParam ())
+TEST_P (valuefed_add_single_type_tests_ci_skip, info_field)
 {
     SetupTest<helics::ValueFederate> (GetParam (), 1);
     auto vFed1 = GetFederateAs<helics::ValueFederate> (0);
@@ -490,7 +509,7 @@ BOOST_DATA_TEST_CASE (test_info_field, bdata::make (core_types_single), GetParam
 }
 
 /** test the pub/sub info field*/
-BOOST_DATA_TEST_CASE (test_info_pubs_subs, bdata::make (core_types_single), GetParam ())
+TEST_P (valuefed_add_single_type_tests_ci_skip, info_pubs_subs)
 {
     SetupTest<helics::ValueFederate> (GetParam (), 1);
     auto vFed1 = GetFederateAs<helics::ValueFederate> (0);
@@ -532,11 +551,11 @@ BOOST_DATA_TEST_CASE (test_info_pubs_subs, bdata::make (core_types_single), GetP
 }
 
 /** test the default constructor and move constructor and move assignment*/
-BOOST_AUTO_TEST_CASE (test_move_calls)
+TEST_F (valuefed_add_tests_ci_skip, test_move_calls)
 {
     helics::ValueFederate vFed;
 
-    helics::FederateInfo fi (helics::GetParam ()::TEST);
+    helics::FederateInfo fi (helics::core_type::TEST);
     fi.coreInitString = "-f 3 --autobroker";
     vFed = helics::ValueFederate ("test1", fi);
     EXPECT_EQ (vFed.getName (), "test1");
@@ -544,14 +563,18 @@ BOOST_AUTO_TEST_CASE (test_move_calls)
     helics::ValueFederate vFedMoved (std::move (vFed));
     EXPECT_EQ (vFedMoved.getName (), "test1");
     // verify that this was moved so this does produce a warning on some systems about use after move
-    BOOST_CHECK_NE (vFed.getName (), "test1");
+    EXPECT_NE (vFed.getName (), "test1");
 }
 
 static constexpr const char *config_files[] = {"example_value_fed.json", "example_value_fed.toml"};
 
-BOOST_DATA_TEST_CASE (test_file_load, boost::unit_test::data::make (config_files), file)
+class valuefed_add_configfile_tests : public ::testing::TestWithParam<const char *>, public FederateTestFixture
 {
-    helics::ValueFederate vFed (std::string (TEST_DIR) + file);
+};
+
+TEST_P (valuefed_add_configfile_tests, file_load)
+{
+    helics::ValueFederate vFed (std::string (TEST_DIR) + GetParam ());
 
     EXPECT_EQ (vFed.getName (), "valueFed");
 
@@ -575,9 +598,11 @@ BOOST_DATA_TEST_CASE (test_file_load, boost::unit_test::data::make (config_files
     vFed.disconnect ();
 }
 
-BOOST_AUTO_TEST_CASE (test_json_publish, *utf::label ("ci"))
+INSTANTIATE_TEST_SUITE_P (valuefed_tests, valuefed_add_configfile_tests, ::testing::ValuesIn (config_files));
+
+TEST (valuefed_json_tests, json_publish)
 {
-    helics::FederateInfo fi (helics::GetParam ()::TEST);
+    helics::FederateInfo fi (helics::core_type::TEST);
     fi.separator = '/';
     fi.coreInitString = "--autobroker";
     helics::ValueFederate vFed ("test2", fi);
@@ -614,9 +639,9 @@ BOOST_AUTO_TEST_CASE (test_json_publish, *utf::label ("ci"))
     vFed.disconnect ();
 }
 
-BOOST_AUTO_TEST_CASE (test_json_register_publish, *utf::label ("ci"))
+TEST (valuefed_json_tests, test_json_register_publish)
 {
-    helics::FederateInfo fi (helics::GetParam ()::TEST);
+    helics::FederateInfo fi (helics::core_type::TEST);
     fi.separator = '/';
     fi.coreInitString = "--autobroker";
     helics::ValueFederate vFed ("test2", fi);
@@ -644,3 +669,11 @@ BOOST_AUTO_TEST_CASE (test_json_register_publish, *utf::label ("ci"))
 
     vFed.disconnect ();
 }
+
+INSTANTIATE_TEST_SUITE_P (valuefed_tests,
+                          valuefed_add_single_type_tests_ci_skip,
+                          ::testing::ValuesIn (core_types_single));
+INSTANTIATE_TEST_SUITE_P (valuefed_tests, valuefed_add_type_tests_ci_skip, ::testing::ValuesIn (core_types));
+INSTANTIATE_TEST_SUITE_P (valuefed_tests,
+                          valuefed_add_all_type_tests_ci_skip,
+                          ::testing::ValuesIn (core_types_all));
