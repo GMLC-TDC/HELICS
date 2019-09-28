@@ -54,10 +54,10 @@ struct FederateTestFixture
 
     template <class FedType>
     void AddFederates (std::string core_type_name,
-                                                        int count,
-                                                        std::shared_ptr<helics::Broker> broker,
-                                                        helics::Time time_delta = helics::timeZero,
-                                                        const std::string &name_prefix = defaultNamePrefix)
+                       int count,
+                       std::shared_ptr<helics::Broker> broker,
+                       helics::Time time_delta = helics::timeZero,
+                       const std::string &name_prefix = defaultNamePrefix)
     {
         bool hasIndex = hasIndexCode (core_type_name);
         int setup = (hasIndex) ? getIndexCode (core_type_name) : 1;
@@ -88,12 +88,12 @@ struct FederateTestFixture
         default:
         {
             size_t offset = federates.size ();
-            auto core_type = helics::coreTypeFromString (core_type_name);
-            //  auto core = helics::CoreFactory::create (core_type, name_prefix + "_core_" + std::to_string
+            auto GetParam () = helics::coreTypeFromString (core_type_name);
+            //  auto core = helics::CoreFactory::create (GetParam(), name_prefix + "_core_" + std::to_string
             //  (offset),
             //                                          initString + " --federates " + std::to_string (count));
             auto core =
-              helics::CoreFactory::create (core_type, initString + " --federates " + std::to_string (count));
+              helics::CoreFactory::create (GetParam (), initString + " --federates " + std::to_string (count));
             fi.coreName = core->getIdentifier ();
 
             federates.resize (count + offset);
@@ -107,16 +107,16 @@ struct FederateTestFixture
         break;
         case 2:
         {  // each federate has its own core
-            auto core_type = helics::coreTypeFromString (core_type_name);
+            auto GetParam () = helics::coreTypeFromString (core_type_name);
             size_t offset = federates.size ();
             federates.resize (count + offset);
             for (int ii = 0; ii < count; ++ii)
             {
                 //     auto core =
-                //     helics::CoreFactory::create (core_type, name_prefix + "_core_" + std::to_string (ii +
+                //     helics::CoreFactory::create (GetParam(), name_prefix + "_core_" + std::to_string (ii +
                 //     offset),
                 //                                    initString + " --federates 1");
-                auto core = helics::CoreFactory::create (core_type, initString + " --federates 1");
+                auto core = helics::CoreFactory::create (GetParam (), initString + " --federates 1");
                 fi.coreName = core->getIdentifier ();
 
                 auto fedname = name_prefix + std::to_string (ii + offset);
@@ -163,13 +163,13 @@ struct FederateTestFixture
         break;
         case 5:  // pairs of federates per core
         {
-            auto core_type = helics::coreTypeFromString (core_type_name);
+            auto GetParam () = helics::coreTypeFromString (core_type_name);
             size_t offset = federates.size ();
             federates.resize (count + offset);
             for (int ii = 0; ii < count; ii += 2)
             {
-                auto core = helics::CoreFactory::create (core_type, initString + " --federates " +
-                                                                      std::to_string ((ii < count - 1) ? 2 : 1));
+                auto core = helics::CoreFactory::create (GetParam (), initString + " --federates " +
+                                                                        std::to_string ((ii < count - 1) ? 2 : 1));
                 fi.coreName = core->getIdentifier ();
 
                 auto fedname = name_prefix + std::to_string (ii + offset);

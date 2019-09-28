@@ -27,7 +27,7 @@ int getIndexCode (const std::string &type_name) { return static_cast<int> (type_
 
 auto StartBrokerImp (const std::string &core_type_name, const std::string &initialization_string)
 {
-    helics::core_type type;
+    helics::GetParam () type;
     if (hasIndexCode (core_type_name))
     {
         std::string new_type (core_type_name.begin (), core_type_name.end () - 2);
@@ -40,11 +40,11 @@ auto StartBrokerImp (const std::string &core_type_name, const std::string &initi
     std::shared_ptr<helics::Broker> broker;
     switch (type)
     {
-    case helics::core_type::TCP:
+    case helics::GetParam ()::TCP:
         broker = helics::BrokerFactory::create (type, initialization_string + " --reuse_address");
         break;
-    case helics::core_type::IPC:
-    case helics::core_type::INTERPROCESS:
+    case helics::GetParam ()::IPC:
+    case helics::GetParam ()::INTERPROCESS:
         broker = helics::BrokerFactory::create (type, initialization_string + " --client");
         break;
     default:

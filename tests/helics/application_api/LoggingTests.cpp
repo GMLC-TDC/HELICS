@@ -15,12 +15,12 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helics/external/filesystem.hpp"
 #include <future>
 #include <gmlc/libguarded/guarded.hpp>
-#include <boost/test/unit_test.hpp>
+#include <gtest/gtest.h>
 
 /** these test cases test out user-directed logging functionality
  */
 
-#define CORE_TYPE_TO_TEST helics::core_type::TEST
+#define CORE_TYPE_TO_TEST helics::GetParam ()::TEST
 
 namespace utf = boost::unit_test;
 
@@ -42,7 +42,7 @@ BOOST_AUTO_TEST_CASE (basic_logging)
     Fed->enterExecutingMode ();
     Fed->finalize ();
 
-    BOOST_CHECK (!mlog.lock ()->empty ());
+    EXPECT_TRUE (!mlog.lock ()->empty ());
 }
 
 BOOST_AUTO_TEST_CASE (file_logging)
@@ -57,7 +57,7 @@ BOOST_AUTO_TEST_CASE (file_logging)
     auto cr = Fed->getCorePointer ();
     Fed.reset ();
 
-    BOOST_CHECK (ghc::filesystem::exists (lfilename));
+    EXPECT_TRUE (ghc::filesystem::exists (lfilename));
     cr->waitForDisconnect ();
     cr.reset ();
     helics::cleanupHelicsLibrary ();
@@ -74,7 +74,7 @@ BOOST_AUTO_TEST_CASE (file_logging)
             break;
         }
     }
-    BOOST_CHECK (res);
+    EXPECT_TRUE (res);
 }
 
 BOOST_AUTO_TEST_CASE (file_logging_p2)
@@ -90,7 +90,7 @@ BOOST_AUTO_TEST_CASE (file_logging_p2)
     Fed->finalize ();
 
     Fed.reset ();
-    BOOST_CHECK (ghc::filesystem::exists (lfilename));
+    EXPECT_TRUE (ghc::filesystem::exists (lfilename));
     cr->waitForDisconnect ();
     cr.reset ();
     helics::cleanupHelicsLibrary ();
@@ -107,7 +107,7 @@ BOOST_AUTO_TEST_CASE (file_logging_p2)
             break;
         }
     }
-    BOOST_CHECK (res);
+    EXPECT_TRUE (res);
 }
 
 BOOST_AUTO_TEST_CASE (check_log_message)
@@ -137,7 +137,7 @@ BOOST_AUTO_TEST_CASE (check_log_message)
             found = true;
         }
     }
-    BOOST_CHECK (found);
+    EXPECT_TRUE (found);
 }
 
 BOOST_AUTO_TEST_CASE (check_log_message_functions)
@@ -167,26 +167,26 @@ BOOST_AUTO_TEST_CASE (check_log_message_functions)
     {
         if (m.second.find ("ERROR") != std::string::npos)
         {
-            BOOST_CHECK_EQUAL (m.first, helics_log_level_error);
-            BOOST_CHECK_EQUAL (order, 0);
+            EXPECT_EQ (m.first, helics_log_level_error);
+            EXPECT_EQ (order, 0);
             order = 1;
         }
         if (m.second.find ("WARNING") != std::string::npos)
         {
-            BOOST_CHECK_EQUAL (m.first, helics_log_level_warning);
-            BOOST_CHECK_EQUAL (order, 1);
+            EXPECT_EQ (m.first, helics_log_level_warning);
+            EXPECT_EQ (order, 1);
             order = 2;
         }
         if (m.second.find ("INFO") != std::string::npos)
         {
-            BOOST_CHECK_EQUAL (m.first, helics_log_level_summary);
-            BOOST_CHECK_EQUAL (order, 2);
+            EXPECT_EQ (m.first, helics_log_level_summary);
+            EXPECT_EQ (order, 2);
             order = 3;
         }
         if (m.second.find ("DEBUG") != std::string::npos)
         {
             BOOST_CHECK_GT (m.first, helics_log_level_summary);
-            BOOST_CHECK_EQUAL (order, 3);
+            EXPECT_EQ (order, 3);
             order = 4;
         }
     }
@@ -225,7 +225,7 @@ BOOST_AUTO_TEST_CASE (check_log_message_levels)
             found_high = true;
         }
     }
-    BOOST_CHECK (found_low && !found_high);
+    EXPECT_TRUE (found_low && !found_high);
 }
 
 BOOST_AUTO_TEST_CASE (check_log_message_levels_high)
@@ -261,7 +261,5 @@ BOOST_AUTO_TEST_CASE (check_log_message_levels_high)
             found_high = true;
         }
     }
-    BOOST_CHECK (found_low && found_high);
+    EXPECT_TRUE (found_low && found_high);
 }
-
-BOOST_AUTO_TEST_SUITE_END ()

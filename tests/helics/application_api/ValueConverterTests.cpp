@@ -5,8 +5,7 @@ the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 
-#include <boost/test/unit_test.hpp>
-#include <boost/test/tools/floating_point_comparison.hpp>
+#include <gtest/gtest.h>
 
 #include <complex>
 #include <list>
@@ -38,34 +37,34 @@ void converterTests (const X &testValue1,
     if (!type.empty ())
     {
         auto typeString = converter.type ();
-        BOOST_CHECK_EQUAL (type, typeString);
+        EXPECT_EQ (type, typeString);
     }
 
     // convert to a data view
     auto dv = converter.convert (testValue1);
     if (sz1 > 0)
     {
-        BOOST_CHECK_EQUAL (dv.size (), sz1);
+        EXPECT_EQ (dv.size (), sz1);
     }
 
     // convert back to a value
     auto res = converter.interpret (dv);
-    BOOST_CHECK (res == testValue1);
+    EXPECT_TRUE (res == testValue1);
     // convert back to a value in a different way
     X res2;
     converter.interpret (dv, res2);
-    BOOST_CHECK (res2 == testValue1);
+    EXPECT_TRUE (res2 == testValue1);
 
     helics::data_block db;
 
     converter.convert (testValue2, db);
     if (sz2 > 0)
     {
-        BOOST_CHECK_EQUAL (db.size (), sz2);
+        EXPECT_EQ (db.size (), sz2);
     }
 
     auto res3 = converter.interpret (db);
-    BOOST_CHECK (res3 == testValue2);
+    EXPECT_TRUE (res3 == testValue2);
 }
 
 BOOST_AUTO_TEST_CASE (converter_tests)
@@ -104,33 +103,33 @@ BOOST_AUTO_TEST_CASE (named_point_converter_tests)
 
 BOOST_AUTO_TEST_CASE (test_traits)
 {
-    BOOST_CHECK (helics::is_vector<std::vector<double>>::value == true);
-    BOOST_CHECK (helics::is_vector<std::vector<std::complex<double>>>::value == true);
-    BOOST_CHECK (helics::is_vector<std::string>::value == false);
-    BOOST_CHECK (helics::is_vector<double>::value == false);
+    EXPECT_TRUE (helics::is_vector<std::vector<double>>::value == true);
+    EXPECT_TRUE (helics::is_vector<std::vector<std::complex<double>>>::value == true);
+    EXPECT_TRUE (helics::is_vector<std::string>::value == false);
+    EXPECT_TRUE (helics::is_vector<double>::value == false);
 
-    BOOST_CHECK (helics::is_iterable<std::vector<std::complex<double>>>::value == true);
-    BOOST_CHECK (helics::is_iterable<std::string>::value == true);
-    BOOST_CHECK (helics::is_iterable<double>::value == false);
+    EXPECT_TRUE (helics::is_iterable<std::vector<std::complex<double>>>::value == true);
+    EXPECT_TRUE (helics::is_iterable<std::string>::value == true);
+    EXPECT_TRUE (helics::is_iterable<double>::value == false);
 
-    BOOST_CHECK (helics::is_iterable<std::vector<std::string>>::value == true);
-    BOOST_CHECK (helics::is_iterable<std::list<std::string>>::value == true);
-    BOOST_CHECK (helics::is_iterable<std::list<double>>::value == true);
-    BOOST_CHECK (helics::is_iterable<std::set<std::string>>::value == true);
-    BOOST_CHECK (helics::is_iterable<std::set<double>>::value == true);
-    BOOST_CHECK (helics::is_iterable<int>::value == false);
+    EXPECT_TRUE (helics::is_iterable<std::vector<std::string>>::value == true);
+    EXPECT_TRUE (helics::is_iterable<std::list<std::string>>::value == true);
+    EXPECT_TRUE (helics::is_iterable<std::list<double>>::value == true);
+    EXPECT_TRUE (helics::is_iterable<std::set<std::string>>::value == true);
+    EXPECT_TRUE (helics::is_iterable<std::set<double>>::value == true);
+    EXPECT_TRUE (helics::is_iterable<int>::value == false);
 }
 
 BOOST_AUTO_TEST_CASE (test_minSize)
 {
-    BOOST_CHECK_EQUAL (helics::getMinSize<std::vector<double>> (), 9u);
-    BOOST_CHECK_EQUAL (helics::getMinSize<double> (), sizeof (double) + 1);
-    BOOST_CHECK_EQUAL (helics::getMinSize<int> (), sizeof (int) + 1);
-    BOOST_CHECK_EQUAL (helics::getMinSize<std::complex<double>> (), sizeof (std::complex<double>) + 1);
-    BOOST_CHECK_EQUAL (helics::getMinSize<std::string> (), 0u);
-    BOOST_CHECK_EQUAL (helics::getMinSize<const char *> (), 0u);
-    BOOST_CHECK_EQUAL (helics::getMinSize<std::set<double>> (), 9u);
-    BOOST_CHECK_EQUAL (helics::getMinSize<helics::NamedPoint> (), 10u);
+    EXPECT_EQ (helics::getMinSize<std::vector<double>> (), 9u);
+    EXPECT_EQ (helics::getMinSize<double> (), sizeof (double) + 1);
+    EXPECT_EQ (helics::getMinSize<int> (), sizeof (int) + 1);
+    EXPECT_EQ (helics::getMinSize<std::complex<double>> (), sizeof (std::complex<double>) + 1);
+    EXPECT_EQ (helics::getMinSize<std::string> (), 0u);
+    EXPECT_EQ (helics::getMinSize<const char *> (), 0u);
+    EXPECT_EQ (helics::getMinSize<std::set<double>> (), 9u);
+    EXPECT_EQ (helics::getMinSize<helics::NamedPoint> (), 10u);
 }
 
 /** this one is a bit annoying to use the template so it gets its own case
@@ -144,17 +143,17 @@ BOOST_AUTO_TEST_CASE (vector_string_converter_tests)
     vecstr testValue1 = {"test1", "test45", "this is a longer string to test", ""};
     // check the type
     auto type = converter::type ();
-    BOOST_CHECK_EQUAL (type, "string_vector");
+    EXPECT_EQ (type, "string_vector");
 
     // convert to a data view
     auto dv = converter::convert (testValue1);
     // convert back to a vector
     auto val = converter::interpret (dv);
-    BOOST_CHECK (val == testValue1);
+    EXPECT_TRUE (val == testValue1);
     // convert back to a string in a different way
     vecstr val2;
     converter::interpret (dv, val2);
-    BOOST_CHECK (val2 == testValue1);
+    EXPECT_TRUE (val2 == testValue1);
 
     vecstr test2{
       "test string 1",
@@ -164,7 +163,7 @@ BOOST_AUTO_TEST_CASE (vector_string_converter_tests)
     converter::convert (test2, db);
 
     auto val3 = converter::interpret (db);
-    BOOST_CHECK (val3 == test2);
+    EXPECT_TRUE (val3 == test2);
 }
 
 BOOST_AUTO_TEST_CASE (test_block_vectors)
@@ -183,25 +182,25 @@ BOOST_AUTO_TEST_CASE (test_block_vectors)
 
     auto res = helics::ValueConverter<std::vector<helics::data_view>>::interpret (rb);
 
-    BOOST_REQUIRE_EQUAL (res.size (), vb.size ());
-    BOOST_CHECK_EQUAL (res[0].size (), vb[0].size ());
-    BOOST_CHECK_EQUAL (res[0][5], vb[0][5]);
+    ASSERT_EQ (res.size (), vb.size ());
+    EXPECT_EQ (res[0].size (), vb[0].size ());
+    EXPECT_EQ (res[0][5], vb[0][5]);
 
-    BOOST_CHECK (res[1].string () == vb[1].to_string ());
+    EXPECT_TRUE (res[1].string () == vb[1].to_string ());
 
-    BOOST_CHECK_EQUAL (3.1415, helics::ValueConverter<double>::interpret (res[2]));
-    BOOST_CHECK_EQUAL (9999, helics::ValueConverter<int>::interpret (res[3]));
+    EXPECT_EQ (3.1415, helics::ValueConverter<double>::interpret (res[2]));
+    EXPECT_EQ (9999, helics::ValueConverter<int>::interpret (res[3]));
 
     auto res2 = helics::ValueConverter<std::vector<helics::data_block>>::interpret (rb);
 
-    BOOST_REQUIRE_EQUAL (res2.size (), vb.size ());
-    BOOST_CHECK_EQUAL (res2[0].size (), vb[0].size ());
-    BOOST_CHECK_EQUAL (res2[0][5], vb[0][5]);
+    ASSERT_EQ (res2.size (), vb.size ());
+    EXPECT_EQ (res2[0].size (), vb[0].size ());
+    EXPECT_EQ (res2[0][5], vb[0][5]);
 
-    BOOST_CHECK (res2[1].to_string () == vb[1].to_string ());
+    EXPECT_TRUE (res2[1].to_string () == vb[1].to_string ());
 
-    BOOST_CHECK_EQUAL (3.1415, helics::ValueConverter<double>::interpret (res2[2]));
-    BOOST_CHECK_EQUAL (9999, helics::ValueConverter<int>::interpret (res2[3]));
+    EXPECT_EQ (3.1415, helics::ValueConverter<double>::interpret (res2[2]));
+    EXPECT_EQ (9999, helics::ValueConverter<int>::interpret (res2[3]));
 }
 
 /** check that the converters do actually throw on invalid sizes*/
@@ -217,5 +216,3 @@ BOOST_AUTO_TEST_CASE (test_converter_errors)
     BOOST_CHECK_LT (vb1.size (), 12u);
     BOOST_CHECK_GT (vb1.size (), 8u);
 }
-
-BOOST_AUTO_TEST_SUITE_END ()

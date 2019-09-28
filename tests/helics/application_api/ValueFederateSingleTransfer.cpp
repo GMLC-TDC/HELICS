@@ -13,9 +13,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helics/core/CoreFactory.hpp"
 #include "testFixtures.hpp"
 #include <future>
-#include <boost/test/unit_test.hpp>
-#include <boost/test/data/test_case.hpp>
-#include <boost/test/tools/floating_point_comparison.hpp>
+#include <gtest/gtest.h>
 
 /** these test cases test out the value federates
  */
@@ -24,54 +22,54 @@ namespace utf = boost::unit_test;
 
 BOOST_FIXTURE_TEST_SUITE (value_federate_single_transfer, FederateTestFixture)
 
-BOOST_DATA_TEST_CASE (value_federate_single_transfer_types1, bdata::make (core_types_single), core_type)
+BOOST_DATA_TEST_CASE (value_federate_single_transfer_types1, bdata::make (core_types_single), GetParam ())
 {
-    runFederateTest<double> (core_type, 10.3, 45.3, 22.7);
+    runFederateTest<double> (GetParam (), 10.3, 45.3, 22.7);
 }
 
-BOOST_DATA_TEST_CASE (value_federate_single_transfer_types2, bdata::make (core_types_single), core_type)
+BOOST_DATA_TEST_CASE (value_federate_single_transfer_types2, bdata::make (core_types_single), GetParam ())
 {
-    runFederateTest<double> (core_type, 1.0, 0.0, 3.0);
+    runFederateTest<double> (GetParam (), 1.0, 0.0, 3.0);
 }
 
-BOOST_DATA_TEST_CASE (value_federate_single_transfer_types3, bdata::make (core_types_single), core_type)
+BOOST_DATA_TEST_CASE (value_federate_single_transfer_types3, bdata::make (core_types_single), GetParam ())
 {
-    runFederateTest<int> (core_type, 5, 8, 43);
+    runFederateTest<int> (GetParam (), 5, 8, 43);
 }
 
-BOOST_DATA_TEST_CASE (value_federate_single_transfer_types4, bdata::make (core_types_single), core_type)
+BOOST_DATA_TEST_CASE (value_federate_single_transfer_types4, bdata::make (core_types_single), GetParam ())
 {
-    runFederateTest<int> (core_type, -5, 1241515, -43);
+    runFederateTest<int> (GetParam (), -5, 1241515, -43);
 }
 
-BOOST_DATA_TEST_CASE (value_federate_single_transfer_types5, bdata::make (core_types_single), core_type)
+BOOST_DATA_TEST_CASE (value_federate_single_transfer_types5, bdata::make (core_types_single), GetParam ())
 {
-    runFederateTest<int16_t> (core_type, -5, 23023, -43);
+    runFederateTest<int16_t> (GetParam (), -5, 23023, -43);
 }
 
-BOOST_DATA_TEST_CASE (value_federate_single_transfer_types6, bdata::make (core_types_single), core_type)
+BOOST_DATA_TEST_CASE (value_federate_single_transfer_types6, bdata::make (core_types_single), GetParam ())
 {
-    runFederateTest<uint64_t> (core_type, 234252315, 0xFFF1'2345'7124'1412, 23521513412);
+    runFederateTest<uint64_t> (GetParam (), 234252315, 0xFFF1'2345'7124'1412, 23521513412);
 }
 
-BOOST_DATA_TEST_CASE (value_federate_single_transfer_types7, bdata::make (core_types_single), core_type)
+BOOST_DATA_TEST_CASE (value_federate_single_transfer_types7, bdata::make (core_types_single), GetParam ())
 {
-    runFederateTest<float> (core_type, 10.3f, 45.3f, 22.7f);
+    runFederateTest<float> (GetParam (), 10.3f, 45.3f, 22.7f);
 }
 
-BOOST_DATA_TEST_CASE (value_federate_single_transfer_types8, bdata::make (core_types_single), core_type)
+BOOST_DATA_TEST_CASE (value_federate_single_transfer_types8, bdata::make (core_types_single), GetParam ())
 {
-    runFederateTest<std::string> (core_type, "start", "inside of the functional relationship of helics",
+    runFederateTest<std::string> (GetParam (), "start", "inside of the functional relationship of helics",
                                   std::string ("I am a string"));
 }
 
-BOOST_DATA_TEST_CASE (value_federate_single_transfer_types9, bdata::make (core_types_single), core_type)
+BOOST_DATA_TEST_CASE (value_federate_single_transfer_types9, bdata::make (core_types_single), GetParam ())
 {
-    runFederateTestv2<std::vector<double>> (core_type, {34.3, 24.2}, {12.4, 14.7, 16.34, 18.17},
+    runFederateTestv2<std::vector<double>> (GetParam (), {34.3, 24.2}, {12.4, 14.7, 16.34, 18.17},
                                             {9.9999, 8.8888, 7.7777});
 }
 
-BOOST_DATA_TEST_CASE (value_federate_single_transfer_types10, bdata::make (core_types_single), core_type)
+BOOST_DATA_TEST_CASE (value_federate_single_transfer_types10, bdata::make (core_types_single), GetParam ())
 {
     // this is a bizarre string since it contains a \0 and in icc 17 can't be used inside a boost data test case
     // for some unknown reason
@@ -80,64 +78,80 @@ BOOST_DATA_TEST_CASE (value_federate_single_transfer_types10, bdata::make (core_
     std::vector<std::string> sv1{"hip", "hop"};
     std::vector<std::string> sv2{"this is the first string\n", "this is the second string", specialString};
     std::vector<std::string> sv3{"string1", "String2", "string3", "string4", "string5", "string6", "string8"};
-    runFederateTestv2 (core_type, sv1, sv2, sv3);
+    runFederateTestv2 (GetParam (), sv1, sv2, sv3);
 }
 
-BOOST_DATA_TEST_CASE (value_federate_single_transfer_types11, bdata::make (core_types_single), core_type)
+BOOST_DATA_TEST_CASE (value_federate_single_transfer_types11, bdata::make (core_types_single), GetParam ())
 {
     std::complex<double> def = {54.23233, 0.7};
     std::complex<double> v1 = std::polar (10.0, 0.43);
     std::complex<double> v2 = {-3e45, 1e-23};
-    runFederateTest<std::complex<double>> (core_type, def, v1, v2);
+    runFederateTest<std::complex<double>> (GetParam (), def, v1, v2);
 }
 
-BOOST_DATA_TEST_CASE (value_federate_single_transfer_types_publishers1, bdata::make (core_types_single), core_type)
+BOOST_DATA_TEST_CASE (value_federate_single_transfer_types_publishers1,
+                      bdata::make (core_types_single),
+                      GetParam ())
 {
-    runFederateTestObj<double> (core_type, 10.3, 45.3, 22.7);
+    runFederateTestObj<double> (GetParam (), 10.3, 45.3, 22.7);
 }
 
-BOOST_DATA_TEST_CASE (value_federate_single_transfer_types_publishers2, bdata::make (core_types_single), core_type)
+BOOST_DATA_TEST_CASE (value_federate_single_transfer_types_publishers2,
+                      bdata::make (core_types_single),
+                      GetParam ())
 {
-    runFederateTestObj<double> (core_type, 1.0, 0.0, 3.0);
+    runFederateTestObj<double> (GetParam (), 1.0, 0.0, 3.0);
 }
 
-BOOST_DATA_TEST_CASE (value_federate_single_transfer_types_publishers3, bdata::make (core_types_single), core_type)
+BOOST_DATA_TEST_CASE (value_federate_single_transfer_types_publishers3,
+                      bdata::make (core_types_single),
+                      GetParam ())
 {
-    runFederateTestObj<int> (core_type, 5, 8, 43);
+    runFederateTestObj<int> (GetParam (), 5, 8, 43);
 }
 
-BOOST_DATA_TEST_CASE (value_federate_single_transfer_types_publishers4, bdata::make (core_types_single), core_type)
+BOOST_DATA_TEST_CASE (value_federate_single_transfer_types_publishers4,
+                      bdata::make (core_types_single),
+                      GetParam ())
 {
-    runFederateTestObj<int> (core_type, -5, 1241515, -43);
+    runFederateTestObj<int> (GetParam (), -5, 1241515, -43);
 }
 
-BOOST_DATA_TEST_CASE (value_federate_single_transfer_types_publishers5, bdata::make (core_types_single), core_type)
+BOOST_DATA_TEST_CASE (value_federate_single_transfer_types_publishers5,
+                      bdata::make (core_types_single),
+                      GetParam ())
 {
-    runFederateTestObj<int16_t> (core_type, -5, 23023, -43);
+    runFederateTestObj<int16_t> (GetParam (), -5, 23023, -43);
 }
 
-BOOST_DATA_TEST_CASE (value_federate_single_transfer_types_publishers6, bdata::make (core_types_single), core_type)
+BOOST_DATA_TEST_CASE (value_federate_single_transfer_types_publishers6,
+                      bdata::make (core_types_single),
+                      GetParam ())
 {
-    runFederateTestObj<uint64_t> (core_type, 234252315, 0xFFF1'2345'7124'1412, 23521513412);
+    runFederateTestObj<uint64_t> (GetParam (), 234252315, 0xFFF1'2345'7124'1412, 23521513412);
 }
 
-BOOST_DATA_TEST_CASE (value_federate_single_transfer_types_publishers7, bdata::make (core_types_single), core_type)
+BOOST_DATA_TEST_CASE (value_federate_single_transfer_types_publishers7,
+                      bdata::make (core_types_single),
+                      GetParam ())
 {
-    runFederateTestObj<float> (core_type, 10.3f, 45.3f, 22.7f);
+    runFederateTestObj<float> (GetParam (), 10.3f, 45.3f, 22.7f);
 }
 
-BOOST_DATA_TEST_CASE (value_federate_single_transfer_types_publishers8, bdata::make (core_types_single), core_type)
+BOOST_DATA_TEST_CASE (value_federate_single_transfer_types_publishers8,
+                      bdata::make (core_types_single),
+                      GetParam ())
 {
-    runFederateTestObj<std::string> (core_type, "start", "inside of the functional relationship of helics",
+    runFederateTestObj<std::string> (GetParam (), "start", "inside of the functional relationship of helics",
                                      std::string ("I am a string"));
 }
 
-BOOST_DATA_TEST_CASE (value_federate_single_transfer_types_publishers9, bdata::make (core_types_single), core_type)
+BOOST_DATA_TEST_CASE (value_federate_single_transfer_types_publishers9,
+                      bdata::make (core_types_single),
+                      GetParam ())
 {
     std::complex<double> def = {54.23233, 0.7};
     std::complex<double> v1 = std::polar (10.0, 0.43);
     std::complex<double> v2 = {-3e45, 1e-23};
-    runFederateTestObj<std::complex<double>> (core_type, def, v1, v2);
+    runFederateTestObj<std::complex<double>> (GetParam (), def, v1, v2);
 }
-
-BOOST_AUTO_TEST_SUITE_END ()
