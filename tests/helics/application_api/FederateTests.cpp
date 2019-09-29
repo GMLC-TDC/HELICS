@@ -302,7 +302,7 @@ TEST_P (federate_global_files, global_file_ci_skip)
     brk->waitForDisconnect ();
 }
 
-TEST_P (federate_global_files, core_global_file_ci_skip, )
+TEST_P (federate_global_files, core_global_file_ci_skip)
 {
     auto brk = helics::BrokerFactory::create (helics::core_type::TEST, "b1", "-f2");
     brk->connect ();

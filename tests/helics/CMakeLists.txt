@@ -20,14 +20,13 @@ add_subdirectory(core)
 add_subdirectory(common)
 add_subdirectory(system_tests)
 add_subdirectory(apps)
+add_subdirectory(application_api)
 
 if(NOT DISABLE_C_SHARED_LIB)
     add_subdirectory(shared_library)
 endif()
 
 if (BUILD_BOOST_TESTS)
-
-add_subdirectory(application_api)
 
 add_subdirectory(performance_tests)
 endif()
