@@ -103,12 +103,12 @@ set_property(TEST shared-library-tests-cpp PROPERTY LABELS SharedLibraryCpp Cove
 add_test(
   NAME shared-library-ci-tests
   COMMAND
-    shared-library-tests
+    shared-library-tests --gtest_filter=-*ci_skip*
 )
 add_test(
   NAME shared-library-ci-tests-cpp
   COMMAND
-    shared-library-tests-cpp
+    shared-library-tests-cpp --gtest_filter=-*ci_skip*
 )
 
 set_property(TEST shared-library-ci-tests PROPERTY LABELS Continuous)

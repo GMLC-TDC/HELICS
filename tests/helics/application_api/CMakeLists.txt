@@ -31,7 +31,7 @@ set(
 add_executable(
   application-api-tests ${application_api_test_sources} ${application_api_test_headers}
 )
-target_link_libraries(application-api-tests helics-static helics_boost_test_base)
+target_link_libraries(application-api-tests helics-static helics_google_test_base)
 
 set_target_properties(application-api-tests PROPERTIES FOLDER tests)
 
@@ -47,7 +47,7 @@ target_compile_definitions(
 
 add_test(
   NAME application-api-tests
-  COMMAND application-api-tests --log_level=test_suite --report_level=short
+  COMMAND application-api-tests
 )
 set_property(TEST application-api-tests PROPERTY LABELS ApplicationApi Coverage Daily)
 
@@ -56,9 +56,7 @@ add_test(
   NAME application-api-ci-tests
   COMMAND
     application-api-tests
-    --run_test=@ci
-    --log_level=test_suite
-    --report_level=short
+    --gtest_filter=-*ci_skip*
 )
 set_property(TEST application-api-ci-tests PROPERTY LABELS Continuous)
 

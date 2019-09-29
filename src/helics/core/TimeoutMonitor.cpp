@@ -252,12 +252,12 @@ void TimeoutMonitor::pingSub (CoreBroker *brk)
     }
     if (activePing)
     {
-        ActionMessage tick (CMD_BROKER_CONFIGURE);
-        tick.dest_id = global_federate_id (brk->global_id);
-        tick.source_id = global_federate_id (brk->global_id);
-        tick.messageID = REQUEST_TICK_FORWARDING;
-        setActionFlag (tick, indicator_flag);
-        brk->addActionMessage (tick);
+        ActionMessage tickf (CMD_BROKER_CONFIGURE);
+        tickf.dest_id = global_federate_id (brk->global_id);
+        tickf.source_id = global_federate_id (brk->global_id);
+        tickf.messageID = REQUEST_TICK_FORWARDING;
+        setActionFlag (tickf, indicator_flag);
+        brk->addActionMessage (tickf);
     }
 }
 

@@ -15,18 +15,14 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helics/external/filesystem.hpp"
 #include <future>
 #include <gmlc/libguarded/guarded.hpp>
-#include <boost/test/unit_test.hpp>
+#include <gtest/gtest.h>
 
 /** these test cases test out user-directed logging functionality
  */
 
 #define CORE_TYPE_TO_TEST helics::core_type::TEST
 
-namespace utf = boost::unit_test;
-
-BOOST_AUTO_TEST_SUITE (logging_tests, *utf::label ("ci"))
-
-BOOST_AUTO_TEST_CASE (basic_logging)
+TEST (logging_tests, basic_logging)
 {
     helics::FederateInfo fi (CORE_TYPE_TO_TEST);
     fi.coreInitString = "--autobroker";
@@ -35,17 +31,17 @@ BOOST_AUTO_TEST_CASE (basic_logging)
     auto Fed = std::make_shared<helics::Federate> ("test1", fi);
 
     gmlc::libguarded::guarded<std::vector<std::pair<int, std::string>>> mlog;
-    Fed->setLoggingCallback ([&mlog] (int level, const std::string &, const std::string &message) {
+    Fed->setLoggingCallback ([&mlog](int level, const std::string &, const std::string &message) {
         mlog.lock ()->emplace_back (level, message);
     });
 
     Fed->enterExecutingMode ();
     Fed->finalize ();
 
-    BOOST_CHECK (!mlog.lock ()->empty ());
+    EXPECT_TRUE (!mlog.lock ()->empty ());
 }
 
-BOOST_AUTO_TEST_CASE (file_logging)
+TEST (logging_tests, file_logging)
 {
     helics::FederateInfo fi (CORE_TYPE_TO_TEST);
     fi.coreInitString = "--autobroker --logfile logfile.txt --fileloglevel=5";
@@ -57,7 +53,7 @@ BOOST_AUTO_TEST_CASE (file_logging)
     auto cr = Fed->getCorePointer ();
     Fed.reset ();
 
-    BOOST_CHECK (ghc::filesystem::exists (lfilename));
+    EXPECT_TRUE (ghc::filesystem::exists (lfilename));
     cr->waitForDisconnect ();
     cr.reset ();
     helics::cleanupHelicsLibrary ();
@@ -74,10 +70,10 @@ BOOST_AUTO_TEST_CASE (file_logging)
             break;
         }
     }
-    BOOST_CHECK (res);
+    EXPECT_TRUE (res);
 }
 
-BOOST_AUTO_TEST_CASE (file_logging_p2)
+TEST (logging_tests, file_logging_p2)
 {
     helics::FederateInfo fi (CORE_TYPE_TO_TEST);
     fi.coreInitString = "--autobroker --fileloglevel=5";
@@ -90,7 +86,7 @@ BOOST_AUTO_TEST_CASE (file_logging_p2)
     Fed->finalize ();
 
     Fed.reset ();
-    BOOST_CHECK (ghc::filesystem::exists (lfilename));
+    EXPECT_TRUE (ghc::filesystem::exists (lfilename));
     cr->waitForDisconnect ();
     cr.reset ();
     helics::cleanupHelicsLibrary ();
@@ -107,10 +103,10 @@ BOOST_AUTO_TEST_CASE (file_logging_p2)
             break;
         }
     }
-    BOOST_CHECK (res);
+    EXPECT_TRUE (res);
 }
 
-BOOST_AUTO_TEST_CASE (check_log_message)
+TEST (logging_tests, check_log_message)
 {
     helics::FederateInfo fi (CORE_TYPE_TO_TEST);
     fi.coreInitString = "--autobroker";
@@ -119,7 +115,7 @@ BOOST_AUTO_TEST_CASE (check_log_message)
     auto Fed = std::make_shared<helics::Federate> ("test1", fi);
 
     gmlc::libguarded::guarded<std::vector<std::pair<int, std::string>>> mlog;
-    Fed->setLoggingCallback ([&mlog] (int level, const std::string &, const std::string &message) {
+    Fed->setLoggingCallback ([&mlog](int level, const std::string &, const std::string &message) {
         mlog.lock ()->emplace_back (level, message);
     });
 
@@ -137,10 +133,10 @@ BOOST_AUTO_TEST_CASE (check_log_message)
             found = true;
         }
     }
-    BOOST_CHECK (found);
+    EXPECT_TRUE (found);
 }
 
-BOOST_AUTO_TEST_CASE (check_log_message_functions)
+TEST (logging_tests, check_log_message_functions)
 {
     helics::FederateInfo fi (CORE_TYPE_TO_TEST);
     fi.coreInitString = "--autobroker";
@@ -149,7 +145,7 @@ BOOST_AUTO_TEST_CASE (check_log_message_functions)
     auto Fed = std::make_shared<helics::Federate> ("test1", fi);
 
     gmlc::libguarded::guarded<std::vector<std::pair<int, std::string>>> mlog;
-    Fed->setLoggingCallback ([&mlog] (int level, const std::string &, const std::string &message) {
+    Fed->setLoggingCallback ([&mlog](int level, const std::string &, const std::string &message) {
         mlog.lock ()->emplace_back (level, message);
     });
 
@@ -167,32 +163,32 @@ BOOST_AUTO_TEST_CASE (check_log_message_functions)
     {
         if (m.second.find ("ERROR") != std::string::npos)
         {
-            BOOST_CHECK_EQUAL (m.first, helics_log_level_error);
-            BOOST_CHECK_EQUAL (order, 0);
+            EXPECT_EQ (m.first, helics_log_level_error);
+            EXPECT_EQ (order, 0);
             order = 1;
         }
         if (m.second.find ("WARNING") != std::string::npos)
         {
-            BOOST_CHECK_EQUAL (m.first, helics_log_level_warning);
-            BOOST_CHECK_EQUAL (order, 1);
+            EXPECT_EQ (m.first, helics_log_level_warning);
+            EXPECT_EQ (order, 1);
             order = 2;
         }
         if (m.second.find ("INFO") != std::string::npos)
         {
-            BOOST_CHECK_EQUAL (m.first, helics_log_level_summary);
-            BOOST_CHECK_EQUAL (order, 2);
+            EXPECT_EQ (m.first, helics_log_level_summary);
+            EXPECT_EQ (order, 2);
             order = 3;
         }
         if (m.second.find ("DEBUG") != std::string::npos)
         {
-            BOOST_CHECK_GT (m.first, helics_log_level_summary);
-            BOOST_CHECK_EQUAL (order, 3);
+            EXPECT_GT (m.first, helics_log_level_summary);
+            EXPECT_EQ (order, 3);
             order = 4;
         }
     }
 }
 
-BOOST_AUTO_TEST_CASE (check_log_message_levels)
+TEST (logging_tests, check_log_message_levels)
 {
     helics::FederateInfo fi (CORE_TYPE_TO_TEST);
     fi.coreInitString = "--autobroker";
@@ -201,7 +197,7 @@ BOOST_AUTO_TEST_CASE (check_log_message_levels)
     auto Fed = std::make_shared<helics::Federate> ("test1", fi);
 
     gmlc::libguarded::guarded<std::vector<std::pair<int, std::string>>> mlog;
-    Fed->setLoggingCallback ([&mlog] (int level, const std::string &, const std::string &message) {
+    Fed->setLoggingCallback ([&mlog](int level, const std::string &, const std::string &message) {
         mlog.lock ()->emplace_back (level, message);
     });
 
@@ -225,10 +221,10 @@ BOOST_AUTO_TEST_CASE (check_log_message_levels)
             found_high = true;
         }
     }
-    BOOST_CHECK (found_low && !found_high);
+    EXPECT_TRUE (found_low && !found_high);
 }
 
-BOOST_AUTO_TEST_CASE (check_log_message_levels_high)
+TEST (logging_tests, check_log_message_levels_high)
 {
     helics::FederateInfo fi (CORE_TYPE_TO_TEST);
     fi.coreInitString = "--autobroker";
@@ -237,7 +233,7 @@ BOOST_AUTO_TEST_CASE (check_log_message_levels_high)
     auto Fed = std::make_shared<helics::Federate> ("test1", fi);
 
     gmlc::libguarded::guarded<std::vector<std::pair<int, std::string>>> mlog;
-    Fed->setLoggingCallback ([&mlog] (int level, const std::string &, const std::string &message) {
+    Fed->setLoggingCallback ([&mlog](int level, const std::string &, const std::string &message) {
         mlog.lock ()->emplace_back (level, message);
     });
 
@@ -261,7 +257,5 @@ BOOST_AUTO_TEST_CASE (check_log_message_levels_high)
             found_high = true;
         }
     }
-    BOOST_CHECK (found_low && found_high);
+    EXPECT_TRUE (found_low && found_high);
 }
-
-BOOST_AUTO_TEST_SUITE_END ()

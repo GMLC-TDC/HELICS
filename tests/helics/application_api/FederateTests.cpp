@@ -11,19 +11,13 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helics/core/Core.hpp"
 #include "helics/core/core-exceptions.hpp"
 #include <future>
-#include <boost/test/unit_test.hpp>
-#include <boost/test/data/test_case.hpp>
-#include <boost/test/tools/floating_point_comparison.hpp>
+#include <gtest/gtest.h>
 /** these test cases test out the value converters
  */
 
 #define CORE_TYPE_TO_TEST helics::core_type::TEST
 
-namespace utf = boost::unit_test;
-
-BOOST_AUTO_TEST_SUITE (federate_tests)
-
-BOOST_AUTO_TEST_CASE (federate_initialize_tests, *utf::label ("ci"))
+TEST (federate_tests, federate_initialize_tests)
 {
     helics::FederateInfo fi (CORE_TYPE_TO_TEST);
     fi.coreInitString = "--autobroker";
@@ -31,44 +25,44 @@ BOOST_AUTO_TEST_CASE (federate_initialize_tests, *utf::label ("ci"))
     auto Fed = std::make_shared<helics::Federate> ("test1", fi);
 
     auto core = Fed->getCorePointer ();
-    BOOST_REQUIRE ((core));
+    ASSERT_TRUE ((core));
 
     auto name = std::string (core->getFederateName (Fed->getID ()));
 
-    BOOST_CHECK_EQUAL (name, Fed->getName ());
-    BOOST_CHECK (Fed->getCurrentMode () == helics::Federate::modes::startup);
+    EXPECT_EQ (name, Fed->getName ());
+    EXPECT_TRUE (Fed->getCurrentMode () == helics::Federate::modes::startup);
     Fed->enterInitializingMode ();
-    BOOST_CHECK (Fed->getCurrentMode () == helics::Federate::modes::initializing);
+    EXPECT_TRUE (Fed->getCurrentMode () == helics::Federate::modes::initializing);
     Fed->enterExecutingMode ();
-    BOOST_CHECK (Fed->getCurrentMode () == helics::Federate::modes::executing);
+    EXPECT_TRUE (Fed->getCurrentMode () == helics::Federate::modes::executing);
     Fed = nullptr;  // force the destructor
 }
 
-BOOST_AUTO_TEST_CASE (federate_time_step_tests, *utf::label ("ci"))
+TEST (federate_tests, time_step_tests)
 {
     helics::FederateInfo fi (CORE_TYPE_TO_TEST);
     fi.coreInitString = "--autobroker";
 
     auto Fed = std::make_shared<helics::Federate> ("test1", fi);
 
-    BOOST_CHECK (Fed->getCurrentMode () == helics::Federate::modes::startup);
+    EXPECT_TRUE (Fed->getCurrentMode () == helics::Federate::modes::startup);
     Fed->enterInitializingMode ();
-    BOOST_CHECK (Fed->getCurrentMode () == helics::Federate::modes::initializing);
+    EXPECT_TRUE (Fed->getCurrentMode () == helics::Federate::modes::initializing);
     Fed->enterExecutingMode ();
-    BOOST_CHECK (Fed->getCurrentMode () == helics::Federate::modes::executing);
+    EXPECT_TRUE (Fed->getCurrentMode () == helics::Federate::modes::executing);
 
     auto res = Fed->requestTime (1.0);
-    BOOST_CHECK_EQUAL (res, 1.0);
+    EXPECT_EQ (res, 1.0);
     res = Fed->requestTime (2.0);
-    BOOST_CHECK_EQUAL (res, 2.0);
+    EXPECT_EQ (res, 2.0);
 
     res = Fed->requestTime (3.0);
-    BOOST_CHECK_EQUAL (res, 3.0);
+    EXPECT_EQ (res, 3.0);
 }
 
-BOOST_AUTO_TEST_CASE (federate_broker_disconnect_test)
+TEST (federate_tests, broker_disconnect_test_ci_skip)
 {
-    auto brk = helics::BrokerFactory::create (helics::core_type::TEST, "b1", "-f 1");
+    auto brk = helics::BrokerFactory::create (CORE_TYPE_TO_TEST, "b1", "-f 1");
     brk->connect ();
     helics::FederateInfo fi (CORE_TYPE_TO_TEST);
 
@@ -76,49 +70,49 @@ BOOST_AUTO_TEST_CASE (federate_broker_disconnect_test)
 
     auto Fed = std::make_shared<helics::Federate> ("test1", fi);
 
-    BOOST_CHECK (Fed->getCurrentMode () == helics::Federate::modes::startup);
+    EXPECT_TRUE (Fed->getCurrentMode () == helics::Federate::modes::startup);
     Fed->enterInitializingMode ();
-    BOOST_CHECK (Fed->getCurrentMode () == helics::Federate::modes::initializing);
+    EXPECT_TRUE (Fed->getCurrentMode () == helics::Federate::modes::initializing);
     Fed->enterExecutingMode ();
-    BOOST_CHECK (Fed->getCurrentMode () == helics::Federate::modes::executing);
+    EXPECT_TRUE (Fed->getCurrentMode () == helics::Federate::modes::executing);
 
     auto res = Fed->requestTime (1.0);
-    BOOST_CHECK_EQUAL (res, 1.0);
+    EXPECT_EQ (res, 1.0);
     res = Fed->requestTime (2.0);
-    BOOST_CHECK_EQUAL (res, 2.0);
+    EXPECT_EQ (res, 2.0);
 
     res = Fed->requestTime (3.0);
-    BOOST_CHECK_EQUAL (res, 3.0);
+    EXPECT_EQ (res, 3.0);
     brk->disconnect ();
     std::this_thread::sleep_for (std::chrono::seconds (1));
     auto cptr = Fed->getCorePointer ();
-    BOOST_CHECK (!cptr->isConnected ());
+    EXPECT_TRUE (!cptr->isConnected ());
     res = Fed->requestTime (4.0);
-    BOOST_CHECK_EQUAL (res, helics::Time::maxVal ());
-    BOOST_CHECK (Fed->getCurrentMode () == helics::Federate::modes::finalize);
+    EXPECT_EQ (res, helics::Time::maxVal ());
+    EXPECT_TRUE (Fed->getCurrentMode () == helics::Federate::modes::finalize);
 }
 
 #ifdef ENABLE_ZMQ_CORE
 // TODO PT:: make this work for all test types
-BOOST_AUTO_TEST_CASE (federate_bad_broker_error_zmq)
+TEST (federate_tests, bad_broker_error_zmq_ci_skip)
 {
     helics::FederateInfo fi (helics::core_type::ZMQ);
     fi.coreInitString = "--broker=b1 --tick=200 --timeout=800 --networktimeout=400";
 
-    BOOST_CHECK_THROW (std::make_shared<helics::Federate> ("test1", fi), helics::RegistrationFailure);
+    EXPECT_THROW (std::make_shared<helics::Federate> ("test1", fi), helics::RegistrationFailure);
 }
 
-BOOST_AUTO_TEST_CASE (federate_timeout_error_zmq)
+TEST (federate_tests, timeout_error_zmq_ci_skip)
 {
     helics::FederateInfo fi (helics::core_type::ZMQ);
     fi.coreInitString = "--tick=200 --timeout=800 --networktimeout=400";
 
-    BOOST_CHECK_THROW (std::make_shared<helics::Federate> ("test1", fi), helics::RegistrationFailure);
+    EXPECT_THROW (std::make_shared<helics::Federate> ("test1", fi), helics::RegistrationFailure);
 }
 
 #endif
 
-BOOST_AUTO_TEST_CASE (federate_multiple_federates, *utf::label ("ci"))
+TEST (federate_tests, federate_multiple_federates)
 {
     helics::FederateInfo fi (CORE_TYPE_TO_TEST);
     fi.coreName = "core1-mult";
@@ -128,47 +122,47 @@ BOOST_AUTO_TEST_CASE (federate_multiple_federates, *utf::label ("ci"))
 
     auto Fed2 = std::make_shared<helics::Federate> ("fed2", fi);
 
-    BOOST_CHECK (Fed1->getCurrentMode () == helics::Federate::modes::startup);
-    BOOST_CHECK (Fed2->getCurrentMode () == helics::Federate::modes::startup);
+    EXPECT_TRUE (Fed1->getCurrentMode () == helics::Federate::modes::startup);
+    EXPECT_TRUE (Fed2->getCurrentMode () == helics::Federate::modes::startup);
 
-    BOOST_CHECK (Fed1->getID () != Fed2->getID ());
+    EXPECT_TRUE (Fed1->getID () != Fed2->getID ());
 
-    auto f1finish = std::async (std::launch::async, [&] () { Fed1->enterInitializingMode (); });
+    auto f1finish = std::async (std::launch::async, [&]() { Fed1->enterInitializingMode (); });
     Fed2->enterInitializingMode ();
 
     f1finish.wait ();
-    BOOST_CHECK (Fed1->getCurrentMode () == helics::Federate::modes::initializing);
-    BOOST_CHECK (Fed2->getCurrentMode () == helics::Federate::modes::initializing);
+    EXPECT_TRUE (Fed1->getCurrentMode () == helics::Federate::modes::initializing);
+    EXPECT_TRUE (Fed2->getCurrentMode () == helics::Federate::modes::initializing);
 
-    f1finish = std::async (std::launch::async, [&] () { Fed1->enterExecutingMode (); });
+    f1finish = std::async (std::launch::async, [&]() { Fed1->enterExecutingMode (); });
     Fed2->enterExecutingMode ();
     f1finish.wait ();
-    BOOST_CHECK (Fed1->getCurrentMode () == helics::Federate::modes::executing);
-    BOOST_CHECK (Fed2->getCurrentMode () == helics::Federate::modes::executing);
+    EXPECT_TRUE (Fed1->getCurrentMode () == helics::Federate::modes::executing);
+    EXPECT_TRUE (Fed2->getCurrentMode () == helics::Federate::modes::executing);
 
-    auto f1step = std::async (std::launch::async, [&] () { return Fed1->requestTime (1.0); });
+    auto f1step = std::async (std::launch::async, [&]() { return Fed1->requestTime (1.0); });
     auto f2step = Fed2->requestTime (1.0);
 
     auto f1stepVal = f1step.get ();
-    BOOST_CHECK_EQUAL (f2step, 1.0);
-    BOOST_CHECK_EQUAL (f1stepVal, 1.0);
+    EXPECT_EQ (f2step, 1.0);
+    EXPECT_EQ (f1stepVal, 1.0);
 
-    BOOST_CHECK_EQUAL (Fed1->getCurrentTime (), 1.0);
+    EXPECT_EQ (Fed1->getCurrentTime (), 1.0);
 
-    f1step = std::async (std::launch::async, [&] () { return Fed1->requestTime (3.0); });
+    f1step = std::async (std::launch::async, [&]() { return Fed1->requestTime (3.0); });
     f2step = Fed2->requestTime (3.0);
 
     f1stepVal = f1step.get ();
-    BOOST_CHECK_EQUAL (f2step, 3.0);
-    BOOST_CHECK_EQUAL (f1stepVal, 3.0);
+    EXPECT_EQ (f2step, 3.0);
+    EXPECT_EQ (f1stepVal, 3.0);
 
-    BOOST_CHECK_THROW (Fed1->enterInitializingMode (), helics::InvalidFunctionCall);
+    EXPECT_THROW (Fed1->enterInitializingMode (), helics::InvalidFunctionCall);
     Fed1->finalize ();
     Fed2->finalize ();
 }
 
 /** the same as the previous test except with multiple cores and a single broker*/
-BOOST_AUTO_TEST_CASE (federate_multiple_federates_multi_cores, *utf::label ("ci"))
+TEST (federate_tests, multiple_federates_multi_cores)
 {
     helics::FederateInfo fi (CORE_TYPE_TO_TEST);
     fi.coreName = "core_mc1";
@@ -179,44 +173,44 @@ BOOST_AUTO_TEST_CASE (federate_multiple_federates_multi_cores, *utf::label ("ci"
 
     auto Fed2 = std::make_shared<helics::Federate> ("fed2", fi);
 
-    BOOST_CHECK (Fed1->getCurrentMode () == helics::Federate::modes::startup);
-    BOOST_CHECK (Fed2->getCurrentMode () == helics::Federate::modes::startup);
+    EXPECT_TRUE (Fed1->getCurrentMode () == helics::Federate::modes::startup);
+    EXPECT_TRUE (Fed2->getCurrentMode () == helics::Federate::modes::startup);
 
-    auto f1finish = std::async (std::launch::async, [&] () { Fed1->enterInitializingMode (); });
+    auto f1finish = std::async (std::launch::async, [&]() { Fed1->enterInitializingMode (); });
     Fed2->enterInitializingMode ();
 
     f1finish.wait ();
-    BOOST_CHECK (Fed1->getCurrentMode () == helics::Federate::modes::initializing);
-    BOOST_CHECK (Fed2->getCurrentMode () == helics::Federate::modes::initializing);
+    EXPECT_TRUE (Fed1->getCurrentMode () == helics::Federate::modes::initializing);
+    EXPECT_TRUE (Fed2->getCurrentMode () == helics::Federate::modes::initializing);
 
-    f1finish = std::async (std::launch::async, [&] () { Fed1->enterExecutingMode (); });
+    f1finish = std::async (std::launch::async, [&]() { Fed1->enterExecutingMode (); });
     Fed2->enterExecutingMode ();
     f1finish.wait ();
-    BOOST_CHECK (Fed1->getCurrentMode () == helics::Federate::modes::executing);
-    BOOST_CHECK (Fed2->getCurrentMode () == helics::Federate::modes::executing);
+    EXPECT_TRUE (Fed1->getCurrentMode () == helics::Federate::modes::executing);
+    EXPECT_TRUE (Fed2->getCurrentMode () == helics::Federate::modes::executing);
 
-    auto f1step = std::async (std::launch::async, [&] () { return Fed1->requestTime (1.0); });
+    auto f1step = std::async (std::launch::async, [&]() { return Fed1->requestTime (1.0); });
     auto f2step = Fed2->requestTime (1.0);
 
     auto f1stepVal = f1step.get ();
-    BOOST_CHECK_EQUAL (f2step, 1.0);
-    BOOST_CHECK_EQUAL (f1stepVal, 1.0);
+    EXPECT_EQ (f2step, 1.0);
+    EXPECT_EQ (f1stepVal, 1.0);
 
-    BOOST_CHECK_EQUAL (Fed1->getCurrentTime (), 1.0);
+    EXPECT_EQ (Fed1->getCurrentTime (), 1.0);
 
-    f1step = std::async (std::launch::async, [&] () { return Fed1->requestTime (3.0); });
+    f1step = std::async (std::launch::async, [&]() { return Fed1->requestTime (3.0); });
     f2step = Fed2->requestTime (3.0);
 
     f1stepVal = f1step.get ();
-    BOOST_CHECK_EQUAL (f2step, 3.0);
-    BOOST_CHECK_EQUAL (f1stepVal, 3.0);
+    EXPECT_EQ (f2step, 3.0);
+    EXPECT_EQ (f1stepVal, 3.0);
 
-    BOOST_CHECK_THROW (Fed1->enterInitializingMode (), helics::InvalidFunctionCall);
+    EXPECT_THROW (Fed1->enterInitializingMode (), helics::InvalidFunctionCall);
     Fed1->finalize ();
     Fed2->finalize ();
 }
 
-BOOST_AUTO_TEST_CASE (federate_multiple_federates_async_calls, *utf::label ("ci"))
+TEST (federate_tests, multiple_federates_async_calls)
 {
     helics::FederateInfo fi (CORE_TYPE_TO_TEST);
     fi.coreName = "core_async";
@@ -226,56 +220,59 @@ BOOST_AUTO_TEST_CASE (federate_multiple_federates_async_calls, *utf::label ("ci"
 
     auto Fed2 = std::make_shared<helics::Federate> ("fed2", fi);
 
-    BOOST_CHECK (Fed1->getCurrentMode () == helics::Federate::modes::startup);
-    BOOST_CHECK (Fed2->getCurrentMode () == helics::Federate::modes::startup);
+    EXPECT_TRUE (Fed1->getCurrentMode () == helics::Federate::modes::startup);
+    EXPECT_TRUE (Fed2->getCurrentMode () == helics::Federate::modes::startup);
 
-    BOOST_CHECK_NE (Fed1->getID (), Fed2->getID ());
+    EXPECT_NE (Fed1->getID (), Fed2->getID ());
 
     Fed1->enterInitializingModeAsync ();
     Fed2->enterInitializingMode ();
 
     Fed1->enterInitializingModeComplete ();
 
-    BOOST_CHECK (Fed1->getCurrentMode () == helics::Federate::modes::initializing);
-    BOOST_CHECK (Fed2->getCurrentMode () == helics::Federate::modes::initializing);
+    EXPECT_TRUE (Fed1->getCurrentMode () == helics::Federate::modes::initializing);
+    EXPECT_TRUE (Fed2->getCurrentMode () == helics::Federate::modes::initializing);
 
     Fed1->enterExecutingModeAsync ();
     Fed2->enterExecutingMode ();
     Fed1->enterExecutingModeComplete ();
-    BOOST_CHECK (Fed1->getCurrentMode () == helics::Federate::modes::executing);
-    BOOST_CHECK (Fed2->getCurrentMode () == helics::Federate::modes::executing);
+    EXPECT_TRUE (Fed1->getCurrentMode () == helics::Federate::modes::executing);
+    EXPECT_TRUE (Fed2->getCurrentMode () == helics::Federate::modes::executing);
 
     Fed1->requestTimeAsync (1.0);
     auto f2step = Fed2->requestTime (1.0);
 
     auto f1stepVal = Fed1->requestTimeComplete ();
-    BOOST_CHECK_EQUAL (f2step, 1.0);
-    BOOST_CHECK_EQUAL (f1stepVal, 1.0);
+    EXPECT_EQ (f2step, 1.0);
+    EXPECT_EQ (f1stepVal, 1.0);
 
-    BOOST_CHECK_EQUAL (Fed1->getCurrentTime (), 1.0);
+    EXPECT_EQ (Fed1->getCurrentTime (), 1.0);
 
     Fed1->requestTimeAsync (3.0);
     f2step = Fed2->requestTime (3.0);
 
     f1stepVal = Fed1->requestTimeComplete ();
-    BOOST_CHECK_EQUAL (f2step, 3.0);
-    BOOST_CHECK_EQUAL (f1stepVal, 3.0);
+    EXPECT_EQ (f2step, 3.0);
+    EXPECT_EQ (f1stepVal, 3.0);
 
-    BOOST_CHECK_THROW (Fed1->enterInitializingMode (), helics::InvalidFunctionCall);
-    BOOST_CHECK_THROW (Fed1->requestTimeComplete (), helics::InvalidFunctionCall);
+    EXPECT_THROW (Fed1->enterInitializingMode (), helics::InvalidFunctionCall);
+    EXPECT_THROW (Fed1->requestTimeComplete (), helics::InvalidFunctionCall);
     Fed1->finalize ();
     Fed2->finalize ();
 }
 
-static const std::vector<std::string> simple_global_files{"example_globals1.json", "example_globals1.toml",
-                                                          "example_globals2.json"};
-namespace bdata = boost::unit_test::data;
+static constexpr const char *simple_global_files[] = {"example_globals1.json", "example_globals1.toml",
+                                                      "example_globals2.json"};
 
-BOOST_DATA_TEST_CASE (federate_global_file, bdata::make (simple_global_files), file_name)
+class federate_global_files : public ::testing::TestWithParam<const char *>
+{
+};
+
+TEST_P (federate_global_files, global_file_ci_skip)
 {
     auto brk = helics::BrokerFactory::create (helics::core_type::TEST, "b1", "-f 2");
     brk->connect ();
-    auto testFile = std::string (TEST_DIR) + file_name;
+    auto testFile = std::string (TEST_DIR) + GetParam ();
     brk->makeConnections (testFile);
 
     helics::FederateInfo fi (CORE_TYPE_TO_TEST);
@@ -292,20 +289,20 @@ BOOST_DATA_TEST_CASE (federate_global_file, bdata::make (simple_global_files), f
     Fed1->enterInitializingModeComplete ();
 
     auto str1 = Fed1->query ("global", "global1");
-    BOOST_CHECK_EQUAL (str1, "this is a global1 value");
+    EXPECT_EQ (str1, "this is a global1 value");
     str1 = Fed2->query ("global", "global1");
-    BOOST_CHECK_EQUAL (str1, "this is a global1 value");
+    EXPECT_EQ (str1, "this is a global1 value");
 
     str1 = Fed1->query ("global", "global2");
-    BOOST_CHECK_EQUAL (str1, "this is another global value");
+    EXPECT_EQ (str1, "this is another global value");
     str1 = Fed2->query ("global", "global2");
-    BOOST_CHECK_EQUAL (str1, "this is another global value");
+    EXPECT_EQ (str1, "this is another global value");
     Fed1->finalize ();
     Fed2->finalize ();
     brk->waitForDisconnect ();
 }
 
-BOOST_DATA_TEST_CASE (federate_core_global_file, bdata::make (simple_global_files), file_name)
+TEST_P (federate_global_files, core_global_file_ci_skip)
 {
     auto brk = helics::BrokerFactory::create (helics::core_type::TEST, "b1", "-f2");
     brk->connect ();
@@ -319,7 +316,7 @@ BOOST_DATA_TEST_CASE (federate_core_global_file, bdata::make (simple_global_file
     auto Fed2 = std::make_shared<helics::Federate> ("fed2", fi);
 
     auto cr = Fed1->getCorePointer ();
-    auto testFile = std::string (TEST_DIR) + file_name;
+    auto testFile = std::string (TEST_DIR) + GetParam ();
     cr->makeConnections (testFile);
     Fed1->enterInitializingModeAsync ();
     Fed2->enterInitializingMode ();
@@ -327,32 +324,32 @@ BOOST_DATA_TEST_CASE (federate_core_global_file, bdata::make (simple_global_file
     Fed1->enterInitializingModeComplete ();
 
     auto str1 = Fed1->query ("global", "global1");
-    BOOST_CHECK_EQUAL (str1, "this is a global1 value");
+    EXPECT_EQ (str1, "this is a global1 value");
     str1 = Fed2->query ("global", "global1");
-    BOOST_CHECK_EQUAL (str1, "this is a global1 value");
+    EXPECT_EQ (str1, "this is a global1 value");
     str1 = cr->query ("global", "global1");
-    BOOST_CHECK_EQUAL (str1, "this is a global1 value");
+    EXPECT_EQ (str1, "this is a global1 value");
     str1 = brk->query ("global", "global1");
-    BOOST_CHECK_EQUAL (str1, "this is a global1 value");
+    EXPECT_EQ (str1, "this is a global1 value");
 
     str1 = Fed1->query ("global", "global2");
-    BOOST_CHECK_EQUAL (str1, "this is another global value");
+    EXPECT_EQ (str1, "this is another global value");
     str1 = Fed2->query ("global", "global2");
-    BOOST_CHECK_EQUAL (str1, "this is another global value");
+    EXPECT_EQ (str1, "this is another global value");
     str1 = cr->query ("global", "global2");
-    BOOST_CHECK_EQUAL (str1, "this is another global value");
+    EXPECT_EQ (str1, "this is another global value");
     str1 = brk->query ("global", "global2");
-    BOOST_CHECK_EQUAL (str1, "this is another global value");
+    EXPECT_EQ (str1, "this is another global value");
 
     auto str2 = Fed1->query ("global", "list");
-    BOOST_CHECK ((str2 == "[global1;global2]") || (str2 == "[global2;global1]"));
+    EXPECT_TRUE ((str2 == "[global1;global2]") || (str2 == "[global2;global1]"));
 
     auto str3 = Fed1->query ("global", "all");
-    BOOST_CHECK_NE (str3, "#invalid");
+    EXPECT_NE (str3, "#invalid");
     Fed1->finalize ();
     Fed2->finalize ();
     cr = nullptr;
     brk->waitForDisconnect ();
 }
 
-BOOST_AUTO_TEST_SUITE_END ()
+INSTANTIATE_TEST_SUITE_P (federate_tests, federate_global_files, ::testing::ValuesIn (simple_global_files));

@@ -49,7 +49,7 @@ add_test(
   NAME system-ci-tests
   COMMAND
     system-tests
-    --gtest_filter=-*skip_ci*
+    --gtest_filter=-*ci_skip*
 )
 set_property(TEST system-ci-tests PROPERTY LABELS Continuous Valgrind)
 

@@ -11,7 +11,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helics/application_api/ValueFederate.hpp"
 #include "testFixtures.hpp"
 #include <future>
-#include <boost/test/unit_test.hpp>
+#include <gtest/gtest.h>
 
 template <class X>
 void runFederateTest (const std::string &core_type_str,
@@ -36,29 +36,29 @@ void runFederateTest (const std::string &core_type_str,
 
     auto val = subid.getValue<X> ();
 
-    BOOST_CHECK_EQUAL (val, defaultValue);
+    EXPECT_EQ (val, defaultValue);
 
     auto gtime = vFed->requestTime (1.0);
-    BOOST_CHECK_EQUAL (gtime, 1.0);
+    EXPECT_EQ (gtime, 1.0);
     // get the value
     subid.getValue (val);
     // make sure the string is what we expect
-    BOOST_CHECK_EQUAL (val, testValue1);
+    EXPECT_EQ (val, testValue1);
     // publish a second string
     pubid.publish (testValue2);
     // make sure the value is still what we expect
     subid.getValue (val);
-    BOOST_CHECK_EQUAL (val, testValue1);
+    EXPECT_EQ (val, testValue1);
 
     // advance time
     gtime = vFed->requestTime (2.0);
     // make sure the value was updated
-    BOOST_CHECK_EQUAL (gtime, 2.0);
+    EXPECT_EQ (gtime, 2.0);
     subid.getValue (val);
-    BOOST_CHECK_EQUAL (val, testValue2);
+    EXPECT_EQ (val, testValue2);
 
     vFed->finalize ();
-    BOOST_CHECK (vFed->getCurrentMode () == helics::Federate::modes::finalize);
+    EXPECT_TRUE (vFed->getCurrentMode () == helics::Federate::modes::finalize);
     helics::cleanupHelicsLibrary ();
 }
 
@@ -85,26 +85,26 @@ void runFederateTestObj (const std::string &core_type_str,
     pubid.publish (testValue1);
     X val;
     subid.getValue (val);
-    BOOST_CHECK_EQUAL (val, defaultValue);
+    EXPECT_EQ (val, defaultValue);
 
     auto gtime = vFed->requestTime (1.0);
-    BOOST_CHECK_EQUAL (gtime, 1.0);
+    EXPECT_EQ (gtime, 1.0);
     // get the value
     subid.getValue (val);
     // make sure the string is what we expect
-    BOOST_CHECK_EQUAL (val, testValue1);
+    EXPECT_EQ (val, testValue1);
     // publish a second string
     pubid.publish (testValue2);
     // make sure the value is still what we expect
     val = subid.getValue ();
-    BOOST_CHECK_EQUAL (val, testValue1);
+    EXPECT_EQ (val, testValue1);
 
     // advance time
     gtime = vFed->requestTime (2.0);
     // make sure the value was updated
-    BOOST_CHECK_EQUAL (gtime, 2.0);
+    EXPECT_EQ (gtime, 2.0);
     val = subid.getValue ();
-    BOOST_CHECK_EQUAL (val, testValue2);
+    EXPECT_EQ (val, testValue2);
 
     vFed->finalize ();
 }
@@ -131,27 +131,27 @@ void runFederateTestv2 (const std::string &core_type_str,
     pubid.publish (testValue1);
 
     X val = subid.getValue<X> ();
-    BOOST_CHECK (val == defaultValue);
+    EXPECT_TRUE (val == defaultValue);
 
     auto gtime = vFed->requestTime (1.0);
-    BOOST_CHECK_EQUAL (gtime, 1.0);
+    EXPECT_EQ (gtime, 1.0);
     // get the value
     subid.getValue (val);
     // make sure the string is what we expect
 
-    BOOST_CHECK (val == testValue1);
+    EXPECT_TRUE (val == testValue1);
     // publish a second string
     pubid.publish (testValue2);
     // make sure the value is still what we expect
     subid.getValue (val);
 
-    BOOST_CHECK (val == testValue1);
+    EXPECT_TRUE (val == testValue1);
     // advance time
     gtime = vFed->requestTime (2.0);
     // make sure the value was updated
-    BOOST_CHECK_EQUAL (gtime, 2.0);
+    EXPECT_EQ (gtime, 2.0);
     subid.getValue (val);
-    BOOST_CHECK (val == testValue2);
+    EXPECT_TRUE (val == testValue2);
     vFed->finalize ();
     helics::cleanupHelicsLibrary ();
 }
@@ -177,26 +177,26 @@ void runFederateTestObjv2 (const std::string &core_type_str,
     // publish string1 at time=0.0;
     pubid.publish (testValue1);
     auto val = sub.getValue ();
-    BOOST_CHECK (val == defaultValue);
+    EXPECT_TRUE (val == defaultValue);
 
     auto gtime = vFed->requestTime (1.0);
-    BOOST_CHECK_EQUAL (gtime, 1.0);
+    EXPECT_EQ (gtime, 1.0);
     // get the value
     sub.getValue (val);
     // make sure the string is what we expect
-    BOOST_CHECK (val == testValue1);
+    EXPECT_TRUE (val == testValue1);
     // publish a second string
     pubid.publish (testValue2);
     // make sure the value is still what we expect
     val = sub.getValue ();
-    BOOST_CHECK (val == testValue1);
+    EXPECT_TRUE (val == testValue1);
 
     // advance time
     gtime = vFed->requestTime (2.0);
     // make sure the value was updated
-    BOOST_CHECK_EQUAL (gtime, 2.0);
+    EXPECT_EQ (gtime, 2.0);
     val = sub.getValue ();
-    BOOST_CHECK (val == testValue2);
+    EXPECT_TRUE (val == testValue2);
 
     vFed->finalize ();
 }
@@ -222,7 +222,7 @@ void runDualFederateTest (const std::string &core_type_str,
 
     subid.setDefault (defaultValue);
 
-    auto f1finish = std::async (std::launch::async, [&]() { fedA->enterExecutingMode (); });
+    auto f1finish = std::async (std::launch::async, [&] () { fedA->enterExecutingMode (); });
     fedB->enterExecutingMode ();
     f1finish.wait ();
     // publish string1 at time=0.0;
@@ -230,35 +230,35 @@ void runDualFederateTest (const std::string &core_type_str,
 
     X val = subid.getValue<X> ();
 
-    BOOST_CHECK_EQUAL (val, defaultValue);
+    EXPECT_EQ (val, defaultValue);
 
-    auto f1time = std::async (std::launch::async, [&]() { return fedA->requestTime (1.0); });
+    auto f1time = std::async (std::launch::async, [&] () { return fedA->requestTime (1.0); });
     auto gtime = fedB->requestTime (1.0);
 
-    BOOST_CHECK_EQUAL (gtime, 1.0);
-    BOOST_CHECK_EQUAL (f1time.get (), 1.0);
+    EXPECT_EQ (gtime, 1.0);
+    EXPECT_EQ (f1time.get (), 1.0);
     // get the value
     subid.getValue (val);
     // make sure the string is what we expect
-    BOOST_CHECK_EQUAL (val, testValue1);
+    EXPECT_EQ (val, testValue1);
 
     // publish a second string
     pubid.publish (testValue2);
     // make sure the value is still what we expect
     subid.getValue (val);
 
-    BOOST_CHECK_EQUAL (val, testValue1);
+    EXPECT_EQ (val, testValue1);
 
     // advance time
-    f1time = std::async (std::launch::async, [&]() { return fedA->requestTime (2.0); });
+    f1time = std::async (std::launch::async, [&] () { return fedA->requestTime (2.0); });
     gtime = fedB->requestTime (2.0);
 
-    BOOST_CHECK_EQUAL (gtime, 2.0);
-    BOOST_CHECK_EQUAL (f1time.get (), 2.0);
+    EXPECT_EQ (gtime, 2.0);
+    EXPECT_EQ (f1time.get (), 2.0);
 
     // make sure the value was updated
     subid.getValue (val);
-    BOOST_CHECK_EQUAL (val, testValue2);
+    EXPECT_EQ (val, testValue2);
     fedA->finalizeAsync ();
     fedB->finalize ();
     fedA->finalizeComplete ();
@@ -285,37 +285,37 @@ void runDualFederateTestv2 (const std::string &core_type_str,
     fedB->setProperty (helics_property_time_delta, 1.0);
 
     subid.setDefault (defaultValue);
-    auto f1finish = std::async (std::launch::async, [&]() { fedA->enterExecutingMode (); });
+    auto f1finish = std::async (std::launch::async, [&] () { fedA->enterExecutingMode (); });
     fedB->enterExecutingMode ();
     f1finish.wait ();
     // publish string1 at time=0.0;
     pubid.publish (testValue1);
     X val = subid.getValue<X> ();
-    BOOST_CHECK (val == defaultValue);
-    auto f1time = std::async (std::launch::async, [&]() { return fedA->requestTime (1.0); });
+    EXPECT_TRUE (val == defaultValue);
+    auto f1time = std::async (std::launch::async, [&] () { return fedA->requestTime (1.0); });
     auto gtime = fedB->requestTime (1.0);
 
-    BOOST_CHECK_EQUAL (gtime, 1.0);
-    BOOST_CHECK_EQUAL (f1time.get (), 1.0);
+    EXPECT_EQ (gtime, 1.0);
+    EXPECT_EQ (f1time.get (), 1.0);
     // get the value
     subid.getValue (val);
     // make sure the string is what we expect
-    BOOST_CHECK (val == testValue1);
+    EXPECT_TRUE (val == testValue1);
     // publish a second string
     pubid.publish (testValue2);
     // make sure the value is still what we expect
     subid.getValue (val);
-    BOOST_CHECK (val == testValue1);
+    EXPECT_TRUE (val == testValue1);
     // advance time
-    f1time = std::async (std::launch::async, [&]() { return fedA->requestTime (2.0); });
+    f1time = std::async (std::launch::async, [&] () { return fedA->requestTime (2.0); });
     gtime = fedB->requestTime (2.0);
 
-    BOOST_CHECK_EQUAL (gtime, 2.0);
-    BOOST_CHECK_EQUAL (f1time.get (), 2.0);
+    EXPECT_EQ (gtime, 2.0);
+    EXPECT_EQ (f1time.get (), 2.0);
 
     // make sure the value was updated
     subid.getValue (val);
-    BOOST_CHECK (val == testValue2);
+    EXPECT_TRUE (val == testValue2);
     fedA->finalizeAsync ();
     fedB->finalize ();
     fedA->finalizeComplete ();
@@ -343,7 +343,7 @@ void runDualFederateTestObj (const std::string &core_type_str,
 
     subid.setDefault (defaultValue);
 
-    auto f1finish = std::async (std::launch::async, [&]() { fedA->enterExecutingMode (); });
+    auto f1finish = std::async (std::launch::async, [&] () { fedA->enterExecutingMode (); });
     fedB->enterExecutingMode ();
     f1finish.wait ();
     // publish string1 at time=0.0;
@@ -352,34 +352,34 @@ void runDualFederateTestObj (const std::string &core_type_str,
     X val;
     subid.getValue (val);
 
-    BOOST_CHECK_EQUAL (val, defaultValue);
+    EXPECT_EQ (val, defaultValue);
 
-    auto f1time = std::async (std::launch::async, [&]() { return fedA->requestTime (1.0); });
+    auto f1time = std::async (std::launch::async, [&] () { return fedA->requestTime (1.0); });
     auto gtime = fedB->requestTime (1.0);
 
-    BOOST_CHECK_EQUAL (gtime, 1.0);
-    BOOST_CHECK_EQUAL (f1time.get (), 1.0);
+    EXPECT_EQ (gtime, 1.0);
+    EXPECT_EQ (f1time.get (), 1.0);
     // get the value
     subid.getValue (val);
     // make sure the string is what we expect
-    BOOST_CHECK_EQUAL (val, testValue1);
+    EXPECT_EQ (val, testValue1);
 
     // publish a second string
     pubid.publish (testValue2);
 
     subid.getValue (val);
-    BOOST_CHECK_EQUAL (val, testValue1);
+    EXPECT_EQ (val, testValue1);
 
     // advance time
-    f1time = std::async (std::launch::async, [&]() { return fedA->requestTime (2.0); });
+    f1time = std::async (std::launch::async, [&] () { return fedA->requestTime (2.0); });
     gtime = fedB->requestTime (2.0);
 
-    BOOST_CHECK_EQUAL (gtime, 2.0);
-    BOOST_CHECK_EQUAL (f1time.get (), 2.0);
+    EXPECT_EQ (gtime, 2.0);
+    EXPECT_EQ (f1time.get (), 2.0);
 
     // make sure the value was updated
     subid.getValue (val);
-    BOOST_CHECK_EQUAL (val, testValue2);
+    EXPECT_EQ (val, testValue2);
     fedA->finalizeAsync ();
     fedB->finalize ();
     fedA->finalizeComplete ();
@@ -407,7 +407,7 @@ void runDualFederateTestObjv2 (const std::string &core_type_str,
 
     subid.setDefault (defaultValue);
 
-    auto f1finish = std::async (std::launch::async, [&]() { fedA->enterExecutingMode (); });
+    auto f1finish = std::async (std::launch::async, [&] () { fedA->enterExecutingMode (); });
     fedB->enterExecutingMode ();
     f1finish.wait ();
     // publish string1 at time=0.0;
@@ -415,34 +415,34 @@ void runDualFederateTestObjv2 (const std::string &core_type_str,
 
     X val = subid.getValue ();
 
-    BOOST_CHECK (val == defaultValue);
+    EXPECT_TRUE (val == defaultValue);
 
-    auto f1time = std::async (std::launch::async, [&]() { return fedA->requestTime (1.0); });
+    auto f1time = std::async (std::launch::async, [&] () { return fedA->requestTime (1.0); });
     auto gtime = fedB->requestTime (1.0);
 
-    BOOST_CHECK_EQUAL (gtime, 1.0);
-    BOOST_CHECK_EQUAL (f1time.get (), 1.0);
+    EXPECT_EQ (gtime, 1.0);
+    EXPECT_EQ (f1time.get (), 1.0);
     // get the value
     subid.getValue (val);
     // make sure the string is what we expect
-    BOOST_CHECK (val == testValue1);
+    EXPECT_TRUE (val == testValue1);
 
     // publish a second string
     pubid.publish (testValue2);
 
     subid.getValue (val);
-    BOOST_CHECK (val == testValue1);
+    EXPECT_TRUE (val == testValue1);
 
     // advance time
-    f1time = std::async (std::launch::async, [&]() { return fedA->requestTime (2.0); });
+    f1time = std::async (std::launch::async, [&] () { return fedA->requestTime (2.0); });
     gtime = fedB->requestTime (2.0);
 
-    BOOST_CHECK_EQUAL (gtime, 2.0);
-    BOOST_CHECK_EQUAL (f1time.get (), 2.0);
+    EXPECT_EQ (gtime, 2.0);
+    EXPECT_EQ (f1time.get (), 2.0);
 
     // make sure the value was updated
     subid.getValue (val);
-    BOOST_CHECK (val == testValue2);
+    EXPECT_TRUE (val == testValue2);
     fedA->finalizeAsync ();
     fedB->finalize ();
     fedA->finalizeComplete ();

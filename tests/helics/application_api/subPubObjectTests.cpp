@@ -5,8 +5,7 @@ the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 
-#include <boost/test/unit_test.hpp>
-#include <boost/test/tools/floating_point_comparison.hpp>
+#include <gtest/gtest.h>
 
 #include <complex>
 /** these test cases test out the value converters
@@ -17,13 +16,9 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "units/units/units.hpp"
 #include <future>
 
-namespace utf = boost::unit_test;
-
-BOOST_AUTO_TEST_SUITE (subPubObject_tests)
-
 #define CORE_TYPE_TO_TEST helics::core_type::TEST
 
-BOOST_AUTO_TEST_CASE (subscriptionTObject_tests, *utf::label ("ci"))
+TEST (subscriptionTObject, tests)
 {
     helics::FederateInfo fi (CORE_TYPE_TO_TEST);
     fi.coreInitString = "--autobroker";
@@ -39,28 +34,28 @@ BOOST_AUTO_TEST_CASE (subscriptionTObject_tests, *utf::label ("ci"))
     pubObj.publish ("string1");
     auto gtime = vFed->requestTime (1.0);
 
-    BOOST_CHECK_EQUAL (gtime, 1.0);
+    EXPECT_EQ (gtime, 1.0);
     std::string s = subObj.getValue ();
 
     // make sure the string is what we expect
-    BOOST_CHECK_EQUAL (s, "string1");
+    EXPECT_EQ (s, "string1");
     // publish a second string
     pubObj.publish ("string2");
     // make sure the value is still what we expect
     subObj.getValue (s);
 
-    BOOST_CHECK_EQUAL (s, "string1");
+    EXPECT_EQ (s, "string1");
     // advance time
     gtime = vFed->requestTime (2.0);
     // make sure the value was updated
-    BOOST_CHECK_EQUAL (gtime, 2.0);
+    EXPECT_EQ (gtime, 2.0);
     subObj.getValue (s);
 
-    BOOST_CHECK_EQUAL (s, "string2");
+    EXPECT_EQ (s, "string2");
     vFed->finalize ();
 }
 
-BOOST_AUTO_TEST_CASE (subscriptionObject_tests, *utf::label ("ci"))
+TEST (subscriptionObject, tests)
 {
     helics::FederateInfo fi (CORE_TYPE_TO_TEST);
 
@@ -77,24 +72,24 @@ BOOST_AUTO_TEST_CASE (subscriptionObject_tests, *utf::label ("ci"))
     pubObj->publish ("string1");
     auto gtime = vFed->requestTime (1.0);
 
-    BOOST_CHECK_EQUAL (gtime, 1.0);
+    EXPECT_EQ (gtime, 1.0);
     std::string s = subObj.getValue<std::string> ();
     // int64_t val = subObj.getValue<int64_t>();
     // make sure the string is what we expect
-    BOOST_CHECK_EQUAL (s, "string1");
+    EXPECT_EQ (s, "string1");
     // publish a second string
     pubObj->publish ("string2");
     // make sure the value is still what we expect
     subObj.getValue<std::string> (s);
 
-    BOOST_CHECK_EQUAL (s, "string1");
+    EXPECT_EQ (s, "string1");
     // advance time
     gtime = vFed->requestTime (2.0);
     // make sure the value was updated
-    BOOST_CHECK_EQUAL (gtime, 2.0);
+    EXPECT_EQ (gtime, 2.0);
     subObj.getValue (s);
 
-    BOOST_CHECK_EQUAL (s, "string2");
+    EXPECT_EQ (s, "string2");
     vFed->finalize ();
 }
 
@@ -115,11 +110,11 @@ void runPubSubTypeTests (const TX &valtx, const RX &valrx)
     pubObj->publish (valtx);
     auto gtime = vFed->requestTime (1.0);
 
-    BOOST_CHECK_EQUAL (gtime, 1.0);
+    EXPECT_EQ (gtime, 1.0);
     auto s = subObj.getValue<RX> ();
     // int64_t val = subObj.getValue<int64_t>();
     // make sure the object is what we expect
-    BOOST_CHECK_MESSAGE (s == valrx, std::string (typeid (TX).name ()) + " to " + typeid (RX).name ());
+    EXPECT_TRUE (s == valrx) << (std::string (typeid (TX).name ()) + " to " + typeid (RX).name ());
     vFed->finalize ();
 }
 
@@ -140,7 +135,7 @@ void runPubSubThroughTypeTests (const TX &valtx, const RX &valrx)
     pubObj->publish (valtx);
     auto gtime = vFed->requestTime (1.0);
 
-    BOOST_CHECK_EQUAL (gtime, 1.0);
+    EXPECT_EQ (gtime, 1.0);
     auto s = subObj.getValue<RX> ();
     // int64_t val = subObj.getValue<int64_t>();
     // make sure the object is what we expect
@@ -149,13 +144,13 @@ void runPubSubThroughTypeTests (const TX &valtx, const RX &valrx)
     vFed->finalize ();
 }
 
-BOOST_AUTO_TEST_CASE (subscriptionObject_type_tests, *utf::label ("ci"))
+TEST (subscriptionObject, type_tests)
 {
     runPubSubTypeTests<std::string, double> ("3.14159", 3.14159);
     runPubSubTypeTests<double, std::string> (3.14159, std::to_string (3.141590));
 }
 
-BOOST_AUTO_TEST_CASE (subscriptionObject_type_tests_ext)
+TEST (subscriptionObject, type_tests_ci_skip)
 {
     runPubSubTypeTests<int64_t, double> (34, 34.0);
     runPubSubTypeTests<int64_t, std::string> (34, "34");
@@ -164,7 +159,7 @@ BOOST_AUTO_TEST_CASE (subscriptionObject_type_tests_ext)
     runPubSubTypeTests<helics::NamedPoint, int64_t> ({std::string (), -3.14159}, -3);
 }
 
-BOOST_AUTO_TEST_CASE (subscriptionObject_bool_tests, *utf::label ("ci"))
+TEST (subscriptionObject, bool_tests)
 {
     runPubSubTypeTests<bool, int64_t> (true, 1);
     runPubSubTypeTests<bool, std::string> (true, "1");
@@ -172,7 +167,7 @@ BOOST_AUTO_TEST_CASE (subscriptionObject_bool_tests, *utf::label ("ci"))
     runPubSubTypeTests<std::string, bool> ("0", false);
 }
 
-BOOST_AUTO_TEST_CASE (subscriptionObject_bool_tests_ext)
+TEST (subscriptionObject, bool_tests_ci_skip)
 {
     runPubSubTypeTests<bool, double> (false, 0.0);
     runPubSubTypeTests<int64_t, bool> (-10, true);
@@ -181,7 +176,7 @@ BOOST_AUTO_TEST_CASE (subscriptionObject_bool_tests_ext)
     runPubSubTypeTests<helics::NamedPoint, bool> ({"0", std::nan ("0")}, false);
 }
 
-BOOST_AUTO_TEST_CASE (subscriptionObject_complex_tests, *utf::label ("ci"))
+TEST (subscriptionObject, complex_tests)
 {
     using c = std::complex<double>;
 
@@ -192,7 +187,7 @@ BOOST_AUTO_TEST_CASE (subscriptionObject_complex_tests, *utf::label ("ci"))
     runPubSubTypeTests<c, double> (c (0, 2), 2.0);
 }
 
-BOOST_AUTO_TEST_CASE (subscriptionObject_complex_tests_ext)
+TEST (subscriptionObject, complex_tests_ci_skip)
 {
     using c = std::complex<double>;
 
@@ -214,7 +209,7 @@ BOOST_AUTO_TEST_CASE (subscriptionObject_complex_tests_ext)
     runPubSubTypeTests<c, int64_t> (c (3.0, 4.0), 5);
 }
 
-BOOST_AUTO_TEST_CASE (subscriptionObject_vector_tests, *utf::label ("ci"))
+TEST (subscriptionObject, vector_tests)
 {
     using v = std::vector<double>;
     v tvec1{12.4, 0.3, 0.7};
@@ -227,7 +222,7 @@ BOOST_AUTO_TEST_CASE (subscriptionObject_vector_tests, *utf::label ("ci"))
     runPubSubTypeTests<std::string, v> (helics::helicsVectorString (tvec2), tvec2);
 }
 
-BOOST_AUTO_TEST_CASE (subscriptionObject_vector_tests_ext)
+TEST (subscriptionObject, vector_tests_ci_skip)
 {
     using v = std::vector<double>;
     using c = std::complex<double>;
@@ -259,7 +254,7 @@ BOOST_AUTO_TEST_CASE (subscriptionObject_vector_tests_ext)
     runPubSubTypeTests<int64_t, v> (56, v{56});
 }
 
-BOOST_AUTO_TEST_CASE (subscriptionObject_complex_vector_tests, *utf::label ("ci"))
+TEST (subscriptionObject, complex_vector_tests)
 {
     using v = std::vector<double>;
     using c = std::complex<double>;
@@ -285,7 +280,7 @@ BOOST_AUTO_TEST_CASE (subscriptionObject_complex_vector_tests, *utf::label ("ci"
                                                 {helics::helicsComplexVectorString (tcvec2), std::nan ("0")});
 }
 
-BOOST_AUTO_TEST_CASE (subscriptionObject_complex_vector_tests_ext)
+TEST (subscriptionObject, complex_vector_tests_ci_skip)
 {
     using v = std::vector<double>;
     using c = std::complex<double>;
@@ -319,7 +314,7 @@ BOOST_AUTO_TEST_CASE (subscriptionObject_complex_vector_tests_ext)
     runPubSubTypeTests<int64_t, vc> (56, vc{c{56}});
 }
 
-BOOST_AUTO_TEST_CASE (subscriptionChangeDetection_tests, *utf::label ("ci"))
+TEST (subscriptionObject, ChangeDetection_tests)
 {
     helics::FederateInfo fi (CORE_TYPE_TO_TEST);
     fi.coreInitString = "--autobroker";
@@ -337,31 +332,31 @@ BOOST_AUTO_TEST_CASE (subscriptionChangeDetection_tests, *utf::label ("ci"))
     pubObj->publish (23.7);
     auto gtime = vFed->requestTime (1.0);
 
-    BOOST_CHECK_EQUAL (gtime, 1.0);
-    BOOST_CHECK (subObj1.isUpdated ());
-    BOOST_CHECK (subObj2.isUpdated ());
+    EXPECT_EQ (gtime, 1.0);
+    EXPECT_TRUE (subObj1.isUpdated ());
+    EXPECT_TRUE (subObj2.isUpdated ());
     // check a second time
-    BOOST_CHECK (subObj1.isUpdated ());
-    BOOST_CHECK (subObj2.isUpdated ());
+    EXPECT_TRUE (subObj1.isUpdated ());
+    EXPECT_TRUE (subObj2.isUpdated ());
     auto val1 = subObj1.getValue<double> ();
     auto val2 = subObj2.getValue<double> ();
     // now that we got the value it should not be updated
-    BOOST_CHECK (!subObj1.isUpdated ());
-    BOOST_CHECK (!subObj2.isUpdated ());
-    BOOST_CHECK_EQUAL (val1, val2);
-    BOOST_CHECK_EQUAL (val1, 23.7);
+    EXPECT_TRUE (!subObj1.isUpdated ());
+    EXPECT_TRUE (!subObj2.isUpdated ());
+    EXPECT_EQ (val1, val2);
+    EXPECT_EQ (val1, 23.7);
     // publish a second string
     pubObj->publish (23.61);
     // advance time
     gtime = vFed->requestTime (2.0);
 
-    BOOST_CHECK (subObj1.isUpdated ());
-    BOOST_CHECK (!subObj2.isUpdated ());
+    EXPECT_TRUE (subObj1.isUpdated ());
+    EXPECT_TRUE (!subObj2.isUpdated ());
 
     vFed->finalize ();
 }
 
-BOOST_AUTO_TEST_CASE (subscriptionstringSize_tests, *utf::label ("ci"))
+TEST (subscriptionObject, Size_tests)
 {
     helics::FederateInfo fi (CORE_TYPE_TO_TEST);
 
@@ -380,18 +375,18 @@ BOOST_AUTO_TEST_CASE (subscriptionstringSize_tests, *utf::label ("ci"))
     pubObj->publish (str);
     auto gtime = vFed->requestTime (1.0);
 
-    BOOST_CHECK_EQUAL (gtime, 1.0);
-    BOOST_CHECK (subObj.isUpdated ());
-    BOOST_CHECK_EQUAL (subObj.getStringSize (), str.size ());
-    BOOST_CHECK_EQUAL (subObj.getRawSize (), str.size ());
+    EXPECT_EQ (gtime, 1.0);
+    EXPECT_TRUE (subObj.isUpdated ());
+    EXPECT_EQ (subObj.getStringSize (), str.size ());
+    EXPECT_EQ (subObj.getRawSize (), str.size ());
     auto val1 = subObj.getValue<std::string> ();
     // now that we got the value it should not be updated
-    BOOST_CHECK (!subObj.isUpdated ());
-    BOOST_CHECK_EQUAL (val1, str);
+    EXPECT_TRUE (!subObj.isUpdated ());
+    EXPECT_EQ (val1, str);
     vFed->finalize ();
 }
 
-BOOST_AUTO_TEST_CASE (subscriptionVectorSize_tests, *utf::label ("ci"))
+TEST (subscriptionObject, VectorSize_tests)
 {
     helics::FederateInfo fi (CORE_TYPE_TO_TEST);
     fi.coreInitString = "--autobroker";
@@ -410,18 +405,18 @@ BOOST_AUTO_TEST_CASE (subscriptionVectorSize_tests, *utf::label ("ci"))
     pubObj->publish (tvec);
     auto gtime = vFed->requestTime (1.0);
 
-    BOOST_CHECK_EQUAL (gtime, 1.0);
-    BOOST_CHECK (subObj.isUpdated ());
-    BOOST_CHECK_EQUAL (subObj.getVectorSize (), tvec.size ());
+    EXPECT_EQ (gtime, 1.0);
+    EXPECT_TRUE (subObj.isUpdated ());
+    EXPECT_EQ (subObj.getVectorSize (), tvec.size ());
 
     auto val1 = subObj.getValue<std::vector<double>> ();
     // now that we got the value it should not be updated
-    BOOST_CHECK (!subObj.isUpdated ());
-    BOOST_CHECK (val1 == tvec);
+    EXPECT_TRUE (!subObj.isUpdated ());
+    EXPECT_TRUE (val1 == tvec);
     vFed->finalize ();
 }
 
-BOOST_AUTO_TEST_CASE (subscriptionDefaults_test, *utf::label ("ci"))
+TEST (subscriptionObject, Defaults_test)
 {
     helics::FederateInfo fi (CORE_TYPE_TO_TEST);
     fi.coreInitString = "--autobroker";
@@ -437,30 +432,30 @@ BOOST_AUTO_TEST_CASE (subscriptionDefaults_test, *utf::label ("ci"))
     vFed->enterExecutingMode ();
     auto gtime = vFed->requestTime (1.0);
 
-    BOOST_CHECK_EQUAL (gtime, 1.0);
-    BOOST_CHECK (!subObj1.isUpdated ());
-    BOOST_CHECK (!subObj2.isUpdated ());
+    EXPECT_EQ (gtime, 1.0);
+    EXPECT_TRUE (!subObj1.isUpdated ());
+    EXPECT_TRUE (!subObj2.isUpdated ());
 
     auto val1 = subObj1.getValue<double> ();
     auto val2 = subObj2.getValue<double> ();
 
-    BOOST_CHECK_EQUAL (val1, 45.3);
-    BOOST_CHECK_EQUAL (val2, 67.4);
+    EXPECT_EQ (val1, 45.3);
+    EXPECT_EQ (val2, 67.4);
 
     // advance time
     gtime = vFed->requestTime (2.0);
 
-    BOOST_CHECK (!subObj1.isUpdated ());
-    BOOST_CHECK (!subObj2.isUpdated ());
+    EXPECT_TRUE (!subObj1.isUpdated ());
+    EXPECT_TRUE (!subObj2.isUpdated ());
     val1 = subObj1.getValue<double> ();
     val2 = subObj2.getValue<double> ();
 
-    BOOST_CHECK_EQUAL (val1, 45.3);
-    BOOST_CHECK_EQUAL (val2, 67.4);
+    EXPECT_EQ (val1, 45.3);
+    EXPECT_EQ (val2, 67.4);
     vFed->finalize ();
 }
 
-BOOST_AUTO_TEST_CASE (input_test, *utf::label ("ci"))
+TEST (inputObject, test)
 {
     helics::FederateInfo fi (CORE_TYPE_TO_TEST);
     fi.coreInitString = "--autobroker";
@@ -479,40 +474,40 @@ BOOST_AUTO_TEST_CASE (input_test, *utf::label ("ci"))
 
     vFed->requestTime (1.0);
 
-    BOOST_CHECK (subObj1.isUpdated ());
-    BOOST_CHECK (subObj2.isUpdated ());
+    EXPECT_TRUE (subObj1.isUpdated ());
+    EXPECT_TRUE (subObj2.isUpdated ());
 
     auto val1 = subObj1.getValue<double> ();
     auto val2 = subObj2.getValue<double> ();
 
-    BOOST_CHECK_EQUAL (val1, 10.0);
-    BOOST_CHECK_EQUAL (val2, 10.3);
+    EXPECT_EQ (val1, 10.0);
+    EXPECT_EQ (val2, 10.3);
     auto I1 = subObj1;
     auto I2 = subObj2;
 
     val1 = subObj1.getValue<double> ();
     val2 = subObj2.getValue<double> ();
 
-    BOOST_CHECK_EQUAL (val1, 10.0);
-    BOOST_CHECK_EQUAL (val2, 10.3);
+    EXPECT_EQ (val1, 10.0);
+    EXPECT_EQ (val2, 10.3);
 
-    BOOST_CHECK_EQUAL (I1.getValue<double> (), 10.0);
-    BOOST_CHECK_EQUAL (I2.getValue<double> (), 10.3);
+    EXPECT_EQ (I1.getValue<double> (), 10.0);
+    EXPECT_EQ (I2.getValue<double> (), 10.3);
 
     // advance time
     vFed->requestTime (2.0);
 
-    BOOST_CHECK (!subObj1.isUpdated ());
-    BOOST_CHECK (!subObj2.isUpdated ());
+    EXPECT_TRUE (!subObj1.isUpdated ());
+    EXPECT_TRUE (!subObj2.isUpdated ());
     val1 = subObj1.getValue<double> ();
     val2 = subObj2.getValue<double> ();
 
-    BOOST_CHECK_EQUAL (val1, 10.0);
-    BOOST_CHECK_EQUAL (val2, 10.3);
+    EXPECT_EQ (val1, 10.0);
+    EXPECT_EQ (val2, 10.3);
     vFed->finalize ();
 }
 
-BOOST_AUTO_TEST_CASE (input_unit_test, *utf::label ("ci"))
+TEST (inputObject, units)
 {
     helics::FederateInfo fi (CORE_TYPE_TO_TEST);
     fi.coreInitString = "--autobroker";
@@ -532,16 +527,16 @@ BOOST_AUTO_TEST_CASE (input_unit_test, *utf::label ("ci"))
 
     vFed->requestTime (1.0);
 
-    BOOST_CHECK (subObj1.isUpdated ());
-    BOOST_CHECK (subObj2.isUpdated ());
+    EXPECT_TRUE (subObj1.isUpdated ());
+    EXPECT_TRUE (subObj2.isUpdated ());
 
     auto val1 = subObj1.getValue<double> ();
     auto val2 = subObj2.getValue<double> ();
     auto val3 = subObj3.getValue<double> ();
 
-    BOOST_CHECK_CLOSE (val1, 0.1, 0.0001);
-    BOOST_CHECK_CLOSE (val2, 4.0, 0.01);
-    BOOST_CHECK_EQUAL (val3, 100.0);
+    EXPECT_NEAR (val1, 0.1, 0.0001);
+    EXPECT_NEAR (val2, 4.0, 0.01);
+    EXPECT_EQ (val3, 100.0);
     p1.publish (2.0, "km");
     p2.publish (43.8, "cm");
 
@@ -551,9 +546,9 @@ BOOST_AUTO_TEST_CASE (input_unit_test, *utf::label ("ci"))
     val2 = subObj2.getValue<double> ();
     val3 = subObj3.getValue<double> ();
 
-    BOOST_CHECK_CLOSE (val1, 2.0, 0.0001);
-    BOOST_CHECK_CLOSE (val2, 43.8, 0.01);
-    BOOST_CHECK_CLOSE (val3, 2000.0, 0.0001);
+    EXPECT_NEAR (val1, 2.0, 0.0001);
+    EXPECT_NEAR (val2, 43.8, 0.01);
+    EXPECT_NEAR (val3, 2000.0, 0.0001);
 
     p1.publish (40000.0, units::precise::mm);
     p2.publish (2.3, units::precise::mile);
@@ -564,10 +559,8 @@ BOOST_AUTO_TEST_CASE (input_unit_test, *utf::label ("ci"))
     val2 = subObj2.getValue<double> ();
     val3 = subObj3.getValue<double> ();
 
-    BOOST_CHECK_CLOSE (val1, 0.04, 0.0001);
-    BOOST_CHECK_CLOSE (val2, units::convert (2.3, units::precise::mile, units::precise::cm), 0.01);
-    BOOST_CHECK_CLOSE (val3, 40.0, 0.0001);
+    EXPECT_NEAR (val1, 0.04, 0.0001);
+    EXPECT_NEAR (val2, units::convert (2.3, units::precise::mile, units::precise::cm), 0.01);
+    EXPECT_NEAR (val3, 40.0, 0.0001);
     vFed->finalize ();
 }
-
-BOOST_AUTO_TEST_SUITE_END ()

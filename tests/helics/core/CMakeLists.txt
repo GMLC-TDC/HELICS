@@ -63,7 +63,7 @@ add_test(
   NAME core-ci-tests
   COMMAND
     core-tests
-    --gtest_filter=-*skip_ci*
+    --gtest_filter=-*ci_skip*
 )
 set_property(TEST core-ci-tests PROPERTY LABELS Continuous)
 #set_property(TEST core-ci-tests PROPERTY LABELS DebugTest)

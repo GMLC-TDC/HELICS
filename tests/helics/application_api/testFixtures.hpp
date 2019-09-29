@@ -54,10 +54,10 @@ struct FederateTestFixture
 
     template <class FedType>
     void AddFederates (std::string core_type_name,
-                                                        int count,
-                                                        std::shared_ptr<helics::Broker> broker,
-                                                        helics::Time time_delta = helics::timeZero,
-                                                        const std::string &name_prefix = defaultNamePrefix)
+                       int count,
+                       std::shared_ptr<helics::Broker> broker,
+                       helics::Time time_delta = helics::timeZero,
+                       const std::string &name_prefix = defaultNamePrefix)
     {
         bool hasIndex = hasIndexCode (core_type_name);
         int setup = (hasIndex) ? getIndexCode (core_type_name) : 1;
