@@ -10,12 +10,12 @@ A note on future revisions.
 ## \[2.3.0\] ~ 2019-10-31
 Minor release 
 ### Changed
--  Converted the shared_library_tests and Application_api tests to use google test
+-  Converted the shared_library_tests and Application_api tests to use Google test instead of Boost test
 
 ### Fixed 
 
 ### Added
--   A set of included helics benchmarks using google benchmark
+-   A set of included helics benchmarks using the Google benchmark library.
 
 ### Removed
 
