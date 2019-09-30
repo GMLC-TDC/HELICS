@@ -1,4 +1,4 @@
-FROM ubuntu:19.04 as builder
+FROM ubuntu:19.10 as builder
 
 
 RUN apt update && apt install -y \
@@ -21,29 +21,17 @@ RUN mkdir -p /root/develop/libcxx_msan/include && cp -r /root/develop/libcxx_msa
 RUN mkdir -p /root/develop/libcxx_msan/lib && cp -r /root/develop/libcxx_msan_build/lib/* /root/develop/libcxx_msan/lib/
 
 # Create final image with the build tools and the compiled libraries
-FROM ubuntu:19.04
+FROM ubuntu:19.10
 
 RUN apt update && apt install -y \
   libboost-dev \
-  clang cmake make git && apt-get clean && ln -s /usr/bin/llvm-symbolizer-8 /usr/bin/llvm-symbolizer
+  clang cmake make git && apt-get clean && ln -s /usr/bin/llvm-symbolizer-9 /usr/bin/llvm-symbolizer
 
 #copy the built libraries from the builder images
 COPY --from=builder /root/develop/libcxx_msan /root/develop/libcxx_msan
 
-# Create script to build helics
-RUN printf "#!/bin/bash \
-\ngit clone https://github.com/GMLC-TDC/HELICS.git \
-\ncd HELICS \
-\nmkdir build \
-\ncd build \
-\ncmake .. -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_FLAGS=\"${MSAN_CFLAGS}\"  -DBUILD_HELICS_BOOST_TESTS=OFF -DZMQ_SUBPROJECT=ON  -DZMQ_FORCE_SUBPROJECT=ON \
-\ncd /root/develop/HELICS/build \
-\nmake -j${MAKE_PARALLEL:-2} \
-\n/root/develop/HELICS/build/tests/helics/core/core-tests \
-\n/root/develop/HELICS/build/tests/helics/common/common-tests \
-\n/root/develop/HELICS/build/tests/helics/system_tests/system-tests \
-\n" > /root/develop/buildhelics.sh
-
+# copy script to build and run HELICS
+COPY helics_build_run_msan.sh /root/develop/helics_build_run_msan.sh
 
 ENV MSAN_CFLAGS="-fsanitize=memory -stdlib=libc++ -L/root/develop/libcxx_msan/lib -lc++abi -I/root/develop/libcxx_msan/include -I/root/develop/libcxx_msan/include/c++/v1 -Wno-unused-command-line-argument -fno-omit-frame-pointer -g -O1 -Wl,-rpath=/root/develop/libcxx_msan/lib"
 
