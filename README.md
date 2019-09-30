@@ -137,6 +137,12 @@ A list of optional component that are not included in HELICS but are optionally 
 #### [zmq](http://www.zeromq.org)
   ZeroMQ message passing is used in the ZMQ core networking.  The automatic download currently uses version 4.3.1. No ZMQ library code is included in the HELICS source.  HELICS installers include ZeroMQ binary libraries. ZeroMQ is licensed under [LGPL](https://github.com/zeromq/libzmq/blob/master/COPYING.LESSER) with a modification to allow for linking and in various forms and distribution of the binary under different terms if the library was not modified.  No modification of the ZMQ library or any of the ZeroMQ source files is included in the HELICS source code.  It is an optional component and can be excluded by setting  `ENABLE_ZMQ_CORE` to `OFF`
 
+### [Google Test](https://github.com/google/googletest)  
+  HELICS tests are written to use the Google Test and mock frameworks. Google Test is included in the source tarball but is downloaded as an optional component. Google Test is released with a [BSD-3 clause](https://github.com/google/googletest/blob/master/LICENSE) license.
+
+### [Google Benchmark](https://github.com/google/benchmark)  
+ Some timing benchmarks with HELICS are written to use the Google Benchmark library. Benchmarks is an optional component and is not included in the main source tarball and must be downloaded separately. Google Benchmark is released with an [Apache 2.0](https://github.com/google/benchmark/blob/v1.5.0/LICENSE) license.
+
 
 ## Publications
 

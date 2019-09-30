@@ -7,7 +7,19 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 A note on future revisions.  
   Everything within a major version number should be code compatible (with the exception of experimental interfaces).  The most notable example of an experimental interface is the support for multiple source inputs.  The APIs to deal with this will change in future minor releases.  Everything within a single minor release should be network compatible with other federates on the same minor release number.  Compatibility across minor release numbers may be possible in some situations but we are not going to guarantee this as those components are subject to performance improvements and may need to be modified at some point.  Patch releases will be limited to bug fixes and other improvements not impacting the public API or network compatibility.  Check the [Public API](./docs/Public_API.md) for details on what is included and excluded from the public API and version stability.
 
-## \[2.2.1\] ~ 2019-09-27
+## \[2.3.0\] ~ 2019-10-31
+Minor release 
+### Changed
+-  Converted the shared_library_tests and Application_api tests to use Google test instead of Boost test
+
+### Fixed 
+
+### Added
+-   A set of included helics benchmarks using the Google benchmark library.
+
+### Removed
+
+## \[2.2.1\] - 2019-09-27
 Minor release with bug fixes and a few additional features
 ### Changed
 -   helics apps tests is converted to use Google test and is now being run through the sanitizers

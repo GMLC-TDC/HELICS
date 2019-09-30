@@ -683,6 +683,16 @@ if(BUILD_HELICS_TESTS AND BUILD_TESTING AND ENABLE_TEST_CORE)
     add_subdirectory(tests)
 endif()
 
+option(
+  HELICS_BUILD_BENCHMARKS
+  "Build some benchmark tests using google benchmark"
+  OFF
+)
+
+if (HELICS_BUILD_BENCHMARKS)
+ add_subdirectory(benchmarks)
+endif()
+
 # -----------------------------------------------------------------------------
 # Setup Examples
 # -----------------------------------------------------------------------------
@@ -897,12 +907,32 @@ set(LICENSE_LIST
 	"GMLC Utilities" "${PROJECT_SOURCE_DIR}/ThirdParty/utilities/LICENSE"
 )
 
+if(NOT CMAKE_VERSION VERSION_LESS 3.11)
+
 if(BUILD_HELICS_TESTS)
-	list(APPEND LICENSE_LIST "Google Test" "${PROJECT_SOURCE_DIR}/ThirdParty/googletest/LICENSE")
+	list(APPEND LICENSE_LIST "Google Test" "${PROJECT_BINARY_DIR}/_deps/googletest-src/LICENSE")
+endif()
+
+if(HELICS_BUILD_BENCHMARKS)
+	list(APPEND LICENSE_LIST "Google Benchmark" "${PROJECT_BINARY_DIR}/_deps/gbenchmark-src/LICENSE")
 endif()
 
 if (EXISTS ${PROJECT_BINARY_DIR}/_deps/libzmq-src)
 	list(APPEND LICENSE_LIST "ZeroMQ" "${PROJECT_BINARY_DIR}/_deps/libzmq-src/COPYING")
+endif()
+
+else()
+if(BUILD_HELICS_TESTS)
+	list(APPEND LICENSE_LIST "Google Test" "${PROJECT_BINARY_DIR}/_deps/googletest/LICENSE")
+endif()
+
+if(HELICS_BUILD_BENCHMARKS)
+	list(APPEND LICENSE_LIST "Google Benchmark" "${PROJECT_BINARY_DIR}/_deps/gbenchmark/LICENSE")
+endif()
+
+if (EXISTS ${PROJECT_BINARY_DIR}/_deps/libzmq)
+	list(APPEND LICENSE_LIST "ZeroMQ" "${PROJECT_BINARY_DIR}/_deps/libzmq/COPYING")
+endif()
 endif()
 
 combineLicenses(${PROJECT_BINARY_DIR}/THIRDPARTY_LICENSES ${LICENSE_LIST})
