@@ -50,6 +50,7 @@ set(BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE)
 set(CMAKE_SUPPRESS_DEVELOPER_WARNINGS 1 CACHE BOOL "")
 add_subdirectory(${${gtName}_SOURCE_DIR} ${${gtName}_BINARY_DIR} EXCLUDE_FROM_ALL)
 
+message(STATUS "loading google-test directory ${${gtName}_SOURCE_DIR}")
 if (NOT MSVC)
 #target_Compile_options(gtest PRIVATE "-Wno-undef")
 #target_Compile_options(gmock PRIVATE "-Wno-undef")
