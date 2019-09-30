@@ -6,6 +6,7 @@
 #
 
 set(HELICS_GTEST_VERSION dc1ca9ae4c206434e450ed4ff535ca7c20c79e3c)
+#depending on what the version is set to the git_clone command may need to change to GIT_TAG||GIT_BRANCH|GIT_COMMIT
 
 string(TOLOWER "googletest" gtName)
 
@@ -34,7 +35,7 @@ include(GitUtils)
 git_clone(
              PROJECT_NAME                    googletest
              GIT_URL                         https://github.com/google/googletest.git
-             GIT_TAG                         ${HELICS_GTEST_VERSION}
+             GIT_COMMIT                         ${HELICS_GTEST_VERSION}
 			 DIRECTORY                       ${PROJECT_BINARY_DIR}/_deps
        )
 	   

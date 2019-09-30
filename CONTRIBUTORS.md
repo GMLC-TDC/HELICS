@@ -61,9 +61,6 @@ Several components of libGuarded are being used in the core and application libr
 ### [fmt](http://fmtlib.net/latest/index.html)
 fmt replaces boost::format for internal logging and message printing. The library is included as a submodule.  HELICS uses the header only library for the time being. fmt is licensed under [BSD 2 clause](https://github.com/fmtlib/fmt/blob/master/LICENSE.rst) license.
 
-### [Google Test](https://github.com/google/googletest)  
-  A few of the tests are written to use the Google Test and mock frameworks. Google Test is included as a submodule. Google Test is released with a [BSD-3 clause](https://github.com/google/googletest/blob/master/LICENSE) license.
-
 ### [gmlc/containers](https://github.com/GMLC-TDC/containers)  
 Several containers developed for HELICS and other applications were branched into a separate repository as a header only library. It is included in HELICS as a submodule and is released under a [BSD-3 clause](https://github.com/GMLC-TDC/containers/blob/master/LICENSE) license.
 
