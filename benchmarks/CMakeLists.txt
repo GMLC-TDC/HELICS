@@ -1,7 +1,11 @@
-if(NOT EXISTS "${HELICS_SOURCE_DIR}/extern/benchmark/CMakeLists.txt")
-    message(FATAL_ERROR "You have requested tests be built, but googlebenchmark is not downloaded. Please run:
-    git submodule update --init")
-endif()
+##############################################################################
+# Copyright (c) 2017-2019,
+# Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See the top-level NOTICE for additional details.
+#All rights reserved. 
+# 
+# SPDX-License-Identifier: BSD-3-Clause
+#
+##############################################################################
 
 include(AddGooglebenchmark)
 

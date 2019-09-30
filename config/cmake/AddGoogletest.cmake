@@ -5,15 +5,49 @@
 #
 #
 
-if(NOT EXISTS "${PROJECT_SOURCE_DIR}/ThirdParty/googletest/CMakeLists.txt")
-	submod_update(${PROJECT_SOURCE_DIR}/ThirdParty/googletest)
+set(HELICS_GTEST_VERSION dc1ca9ae4c206434e450ed4ff535ca7c20c79e3c)
+
+string(TOLOWER "googletest" gtName)
+
+if(NOT CMAKE_VERSION VERSION_LESS 3.11)
+include(FetchContent)
+
+FetchContent_Declare(
+  googletest
+  GIT_REPOSITORY https://github.com/google/googletest.git
+  GIT_TAG        ${HELICS_GTEST_VERSION}
+)
+
+FetchContent_GetProperties(googletest)
+
+if(NOT ${gtName}_POPULATED)
+  # Fetch the content using previously declared details
+  FetchContent_Populate(googletest)
+
+endif()
+else() #cmake <3.11
+
+# create the directory first
+file(MAKE_DIRECTORY ${PROJECT_BINARY_DIR}/_deps)
+
+include(GitUtils)
+git_clone(
+             PROJECT_NAME                    googletest
+             GIT_URL                         https://github.com/google/googletest.git
+             GIT_TAG                         ${HELICS_GTEST_VERSION}
+			 DIRECTORY                       ${PROJECT_BINARY_DIR}/_deps
+       )
+	   
+set(${gtName}_BINARY_DIR ${PROJECT_BINARY_DIR}/_deps/${gtName}-build)
+
 endif()
 
 set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
-set(BUILD_SHARED_LIBS OFF)
+
+set(BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE)
 
 set(CMAKE_SUPPRESS_DEVELOPER_WARNINGS 1 CACHE BOOL "")
-add_subdirectory("${PROJECT_SOURCE_DIR}/ThirdParty/googletest" "${PROJECT_BINARY_DIR}/ThirdParty/googletest" EXCLUDE_FROM_ALL)
+add_subdirectory(${${gtName}_SOURCE_DIR} ${${gtName}_BINARY_DIR} EXCLUDE_FROM_ALL)
 
 if (NOT MSVC)
 #target_Compile_options(gtest PRIVATE "-Wno-undef")

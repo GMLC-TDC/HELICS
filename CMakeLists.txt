@@ -684,12 +684,12 @@ if(BUILD_HELICS_TESTS AND BUILD_TESTING AND ENABLE_TEST_CORE)
 endif()
 
 option(
-  BUILD_HELICS_BENCHMARKS
+  HELICS_BUILD_BENCHMARKS
   "Build some benchmark tests using google benchmark"
   OFF
 )
 
-if (BUILD_HELICS_BENCHMARKS)
+if (HELICS_BUILD_BENCHMARKS)
  add_subdirectory(benchmarks)
 endif()
 
@@ -908,7 +908,11 @@ set(LICENSE_LIST
 )
 
 if(BUILD_HELICS_TESTS)
-	list(APPEND LICENSE_LIST "Google Test" "${PROJECT_SOURCE_DIR}/ThirdParty/googletest/LICENSE")
+	list(APPEND LICENSE_LIST "Google Test" "${PROJECT_BINARY_DIR}/_deps/googletest-src/LICENSE")
+endif()
+
+if(HELICS_BUILD_BENCHMARKS)
+	list(APPEND LICENSE_LIST "Google Benchmark" "${PROJECT_BINARY_DIR}/_deps/gbenchmark-src/LICENSE")
 endif()
 
 if (EXISTS ${PROJECT_BINARY_DIR}/_deps/libzmq-src)
