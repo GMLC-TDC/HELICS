@@ -12,9 +12,11 @@ target_link_libraries(helics_boost_test_base INTERFACE helics_base_includes comp
 endif()
 
 include(AddGoogletest)
-add_library(helics_google_test_base INTERFACE)
-target_link_libraries(helics_google_test_base INTERFACE gtest gtest_main gmock)
-target_link_libraries(helics_google_test_base INTERFACE helics_base_includes compile_flags_target)
+
+# add a baseline library for underlying dependencies and flags for test executables
+add_library(helics_test_base INTERFACE)
+target_link_libraries(helics_test_base INTERFACE gtest gtest_main gmock)
+target_link_libraries(helics_test_base INTERFACE helics_base_includes compile_flags_target)
 
 add_subdirectory(core)
 add_subdirectory(common)
@@ -26,10 +28,6 @@ if(NOT DISABLE_C_SHARED_LIB)
     add_subdirectory(shared_library)
 endif()
 
-if (BUILD_BOOST_TESTS)
-
-add_subdirectory(performance_tests)
-endif()
 
 # Tests for other CMake projects including and using HELICS using find_package
 add_test(find-package-tests ${CMAKE_CTEST_COMMAND} -C ${CMAKE_BUILD_TYPE}
