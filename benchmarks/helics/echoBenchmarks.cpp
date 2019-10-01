@@ -22,6 +22,8 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <condition_variable>
 #include <mutex>
 
+#include "helics/helics-config.h"
+
 class countdown
 {
   public:
@@ -61,7 +63,7 @@ using namespace helics;
 class EchoHub
 {
   public:
-    helics::Time finalTime = helics::Time (1000, time_units::ns);  // final time
+    helics::Time finalTime = helics::Time (100, time_units::ms);  // final time
   private:
     std::unique_ptr<helics::ValueFederate> vFed;
     std::vector<helics::Publication> pubs;
@@ -123,9 +125,6 @@ class EchoHub
 
 class EchoLeaf
 {
-  public:
-    helics::Time deltaTime = helics::Time (10, time_units::ns);  // sampling rate
-    helics::Time finalTime = helics::Time (1000, time_units::ns);  // final time
   private:
     std::unique_ptr<helics::ValueFederate> vFed;
     helics::Publication pub;
@@ -163,12 +162,14 @@ class EchoLeaf
 
     void mainLoop ()
     {
-        auto nextTime = deltaTime;
-        std::string txstring (100, '1');
-        while (nextTime < finalTime + deltaTime / 2)
+        int cnt = 0;
+        const std::string txstring = std::to_string (100000 + index_) + (100, '1');
+        const int iter = 5000;
+        while (cnt <= iter + 1)
         {
-            nextTime = vFed->requestTime (nextTime + deltaTime);
-            if (nextTime <= finalTime)
+            vFed->requestNextStep ();
+            ++cnt;
+            if (cnt <= iter)
             {
                 vFed->publish (pub, txstring);
             }
@@ -209,9 +210,9 @@ static void BM_echo_singleCore (benchmark::State &state)
         std::vector<std::thread> threadlist (static_cast<size_t> (feds) + 1);
         for (int ii = 0; ii < feds; ++ii)
         {
-            threadlist[ii] = std::thread ([&] (EchoLeaf &lf) { lf.run (cdt); }, std::ref (leafs[ii]));
+            threadlist[ii] = std::thread ([&](EchoLeaf &lf) { lf.run (cdt); }, std::ref (leafs[ii]));
         }
-        threadlist[feds] = std::thread ([&] () { hub.run (cdt); });
+        threadlist[feds] = std::thread ([&]() { hub.run (cdt); });
         std::this_thread::yield ();
         cdt.wait ();
         std::this_thread::sleep_for (std::chrono::milliseconds (20));
@@ -227,8 +228,9 @@ static void BM_echo_singleCore (benchmark::State &state)
 // Register the function as a benchmark
 BENCHMARK (BM_echo_singleCore)
   ->RangeMultiplier (2)
-  ->Range (1, 1 << 6)
+  ->Range (1, 1 << 8)
   ->Unit (benchmark::TimeUnit::kMillisecond)
+  ->Iterations (3)
   ->UseRealTime ();
 
 static void BM_echo_multiCore (benchmark::State &state, core_type cType)
@@ -242,7 +244,7 @@ static void BM_echo_multiCore (benchmark::State &state, core_type cType)
 
         auto broker = helics::BrokerFactory::create (cType, "brokerb",
                                                      std::string ("--federates=") + std::to_string (feds + 1));
-        broker->setLoggingLevel (0);
+        broker->setLoggingLevel (helics_log_level_no_print);
         auto wcore = helics::CoreFactory::create (cType, std::string ("--federates=1"));
         // this is to delay until the threads are ready
         wcore->setFlagOption (helics::local_core_id, helics_flag_delay_init_entry, true);
@@ -260,9 +262,9 @@ static void BM_echo_multiCore (benchmark::State &state, core_type cType)
         std::vector<std::thread> threadlist (static_cast<size_t> (feds) + 1);
         for (int ii = 0; ii < feds; ++ii)
         {
-            threadlist[ii] = std::thread ([&] (EchoLeaf &lf) { lf.run (cdt); }, std::ref (leafs[ii]));
+            threadlist[ii] = std::thread ([&](EchoLeaf &lf) { lf.run (cdt); }, std::ref (leafs[ii]));
         }
-        threadlist[feds] = std::thread ([&] () { hub.run (cdt); });
+        threadlist[feds] = std::thread ([&]() { hub.run (cdt); });
         std::this_thread::yield ();
         cdt.wait ();
         std::this_thread::sleep_for (std::chrono::milliseconds (50));
@@ -278,51 +280,69 @@ static void BM_echo_multiCore (benchmark::State &state, core_type cType)
     }
 }
 
+static constexpr int64_t maxscale{1 << 4};
 // Register the test core benchmarks
 BENCHMARK_CAPTURE (BM_echo_multiCore, testCore, core_type::TEST)
   ->RangeMultiplier (2)
-  ->Range (1, 1 << 4)
+  ->Range (1, maxscale)
   ->Unit (benchmark::TimeUnit::kMillisecond)
   ->UseRealTime ();
 
+#ifdef ENABLE_ZMQ_CORE
 // Register the ZMQ benchmarks
 BENCHMARK_CAPTURE (BM_echo_multiCore, zmqCore, core_type::ZMQ)
   ->RangeMultiplier (2)
-  ->Range (1, 1 << 4)
+  ->Range (1, maxscale)
+  ->Iterations (3)
   ->Unit (benchmark::TimeUnit::kMillisecond)
   ->UseRealTime ();
 
 // Register the ZMQ benchmarks
 BENCHMARK_CAPTURE (BM_echo_multiCore, zmqssCore, core_type::ZMQ_SS)
   ->RangeMultiplier (2)
-  ->Range (1, 1 << 4)
+  ->Range (1, maxscale)
+  ->Iterations (3)
   ->Unit (benchmark::TimeUnit::kMillisecond)
   ->UseRealTime ();
 
+#endif
+
+#ifdef ENABLE_IPC_CORE
 // Register the IPC benchmarks
 BENCHMARK_CAPTURE (BM_echo_multiCore, ipcCore, core_type::IPC)
   ->RangeMultiplier (2)
-  ->Range (1, 1 << 4)
+  ->Range (1, maxscale)
+  ->Iterations (3)
   ->Unit (benchmark::TimeUnit::kMillisecond)
   ->UseRealTime ();
 
+#endif
+
+#ifdef ENABLE_TCP_CORE
 // Register the TCP benchmarks
 BENCHMARK_CAPTURE (BM_echo_multiCore, tcpCore, core_type::TCP)
   ->RangeMultiplier (2)
-  ->Range (1, 1 << 4)
+  ->Range (1, maxscale)
+  ->Iterations (3)
   ->Unit (benchmark::TimeUnit::kMillisecond)
   ->UseRealTime ();
 
 // Register the TCP SS benchmarks
 BENCHMARK_CAPTURE (BM_echo_multiCore, tcpssCore, core_type::TCP_SS)
   ->RangeMultiplier (2)
-  ->Range (1, 1 << 4)
+  ->Range (1, maxscale)
+  ->Iterations (3)
   ->Unit (benchmark::TimeUnit::kMillisecond)
   ->UseRealTime ();
 
+#endif
+
+#ifdef ENABLE_UDP_CORE
 // Register the UDP benchmarks
 BENCHMARK_CAPTURE (BM_echo_multiCore, udpCore, core_type::UDP)
   ->RangeMultiplier (2)
   ->Range (1, 1 << 4)
+  ->Iterations (3)
   ->Unit (benchmark::TimeUnit::kMillisecond)
   ->UseRealTime ();
+#endif

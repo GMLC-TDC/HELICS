@@ -423,7 +423,7 @@ bool CommsInterface::reconnect ()
             (tx_status.load () == connection_status::connected));
 }
 
-void CommsInterface::setCallback (std::function<void (ActionMessage &&)> callback)
+void CommsInterface::setCallback (std::function<void(ActionMessage &&)> callback)
 {
     if (propertyLock ())
     {
@@ -433,9 +433,13 @@ void CommsInterface::setCallback (std::function<void (ActionMessage &&)> callbac
 }
 
 void CommsInterface::setLoggingCallback (
-  std::function<void (int level, const std::string &name, const std::string &message)> callback)
+  std::function<void(int level, const std::string &name, const std::string &message)> callback)
 {
-    loggingCallback = std::move (callback);
+    if (propertyLock ())
+    {
+        loggingCallback = std::move (callback);
+        propertyUnLock ();
+    }
 }
 
 void CommsInterface::setMessageSize (int maxMsgSize, int maxCount)
@@ -489,7 +493,7 @@ void CommsInterface::logMessage (const std::string &message) const
 {
     if (loggingCallback)
     {
-        loggingCallback (3, name, message);
+        loggingCallback (helics_log_level_interfaces, "commMessage||" + name, message);
     }
     else
     {
@@ -501,7 +505,7 @@ void CommsInterface::logWarning (const std::string &message) const
 {
     if (loggingCallback)
     {
-        loggingCallback (1, name, message);
+        loggingCallback (helics_log_level_warning, "commWarning||" + name, message);
     }
     else
     {
@@ -513,7 +517,7 @@ void CommsInterface::logError (const std::string &message) const
 {
     if (loggingCallback)
     {
-        loggingCallback (0, name, message);
+        loggingCallback (helics_log_level_error, "commERROR||" + name, message);
     }
     else
     {
