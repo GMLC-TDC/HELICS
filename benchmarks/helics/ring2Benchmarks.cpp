@@ -62,7 +62,7 @@ class RingTransmit
 {
   public:
     helics::Time deltaTime = helics::Time (10, time_units::ns);  // sampling rate
-    helics::Time finalTime = helics::Time (100000, time_units::ns);  // final time
+    helics::Time finalTime = helics::Time (10000, time_units::ns);  // final time
     int loopCount = 0;
 
   private:
@@ -102,14 +102,8 @@ class RingTransmit
         }
         vFed = std::make_unique<helics::ValueFederate> (name, fi);
         pub = &vFed->registerPublicationIndexed<std::string> ("pub", index_);
-        if (index_ == 0)
-        {
-            sub = &vFed->registerSubscriptionIndexed ("pub", maxIndex_ - 1);
-        }
-        else
-        {
-            sub = &vFed->registerSubscriptionIndexed ("pub", index_ - 1);
-        }
+        sub = &vFed->registerSubscriptionIndexed ("pub", (index_ == 0) ? maxIndex_ - 1 : index_ - 1);
+
         initialized = true;
     }
 
@@ -170,11 +164,12 @@ static void BM_ring2_singleCore (benchmark::State &state)
             thrd.join ();
         }
         state.PauseTiming ();
-        if (links[0].loopCount != 100000)
+        if (links[0].loopCount != 10000)
         {
             std::cout << "incorrect loop count received (" << links[0].loopCount << ") instead of 100000"
                       << std::endl;
         }
+        state.ResumeTiming ();
     }
 }
 // Register the function as a benchmark
@@ -220,46 +215,54 @@ static void BM_ring2_multiCore (benchmark::State &state, core_type cType)
             thrd.join ();
         }
         state.PauseTiming ();
-        if (links[0].loopCount != 100000)
+        if (links[0].loopCount != 10000)
         {
             std::cout << "incorrect loop count received (" << links[0].loopCount << ") instead of 100000"
                       << std::endl;
         }
         broker->disconnect ();
+        state.ResumeTiming ();
     }
 }
 
 // Register the test core benchmarks
 BENCHMARK_CAPTURE (BM_ring2_multiCore, testCore, core_type::TEST)
   ->Unit (benchmark::TimeUnit::kMillisecond)
+  ->Iterations (3)
   ->UseRealTime ();
 
 // Register the ZMQ benchmarks
 BENCHMARK_CAPTURE (BM_ring2_multiCore, zmqCore, core_type::ZMQ)
   ->Unit (benchmark::TimeUnit::kMillisecond)
+  ->Iterations (3)
   ->UseRealTime ();
 
 // Register the ZMQ benchmarks
 BENCHMARK_CAPTURE (BM_ring2_multiCore, zmqssCore, core_type::ZMQ_SS)
   ->Unit (benchmark::TimeUnit::kMillisecond)
+  ->Iterations (3)
   ->UseRealTime ();
 
 // Register the IPC benchmarks
 BENCHMARK_CAPTURE (BM_ring2_multiCore, ipcCore, core_type::IPC)
   ->Unit (benchmark::TimeUnit::kMillisecond)
+  ->Iterations (3)
   ->UseRealTime ();
 
 // Register the TCP benchmarks
 BENCHMARK_CAPTURE (BM_ring2_multiCore, tcpCore, core_type::TCP)
   ->Unit (benchmark::TimeUnit::kMillisecond)
+  ->Iterations (3)
   ->UseRealTime ();
 
 // Register the TCP SS benchmarks
 BENCHMARK_CAPTURE (BM_ring2_multiCore, tcpssCore, core_type::TCP_SS)
   ->Unit (benchmark::TimeUnit::kMillisecond)
+  ->Iterations (3)
   ->UseRealTime ();
 
 // Register the UDP benchmarks
 BENCHMARK_CAPTURE (BM_ring2_multiCore, udpCore, core_type::UDP)
   ->Unit (benchmark::TimeUnit::kMillisecond)
+  ->Iterations (3)
   ->UseRealTime ();

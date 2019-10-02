@@ -176,14 +176,8 @@ bool TimeCoordinator::updateNextExecutionTime ()
 
 void TimeCoordinator::updateNextPossibleEventTime ()
 {
-    if (!iterating)
-    {
-        time_next = getNextPossibleTime ();
-    }
-    else
-    {
-        time_next = time_granted;
-    }
+    time_next = (!iterating) ? getNextPossibleTime () : time_granted;
+
     if (info.uninterruptible)
     {
         time_next = time_requested;
@@ -496,6 +490,7 @@ void TimeCoordinator::sendTimeRequest () const
     upd.source_id = source_id;
     upd.actionTime = time_next;
     upd.Te = (time_exec != Time::maxVal ()) ? time_exec + info.outputDelay : time_exec;
+    // THIS LINE IS AN INTERESTING QUESTION
     upd.Tdemin = (time_minDe < time_next) ? time_next : time_minDe;
 
     if (iterating)
