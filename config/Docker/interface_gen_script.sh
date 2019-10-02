@@ -1,3 +1,4 @@
+#!/usr/bin/sh
 
 cd /root/HELICS
 git pull

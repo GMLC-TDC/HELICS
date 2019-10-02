@@ -17,7 +17,7 @@ RUN cd swig && make -j4 && make install
 FROM fedora:31 as Hbase
 
 # Install the tools for building
-RUN dnf install g++ git cmake make swig -y  && dnf clean
+RUN dnf install g++ git cmake make swig -y  && dnf clean all
 
 FROM Hbase as Hbuilder
 
