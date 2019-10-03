@@ -27,7 +27,7 @@ SPDX-License-Identifier: BSD-3-Clause
 class countdown
 {
   public:
-    countdown (int start) : counter_{start} {}
+    explicit countdown (int start) : counter_{start} {}
 
     void decrement ()
     {
@@ -210,9 +210,9 @@ static void BM_echo_singleCore (benchmark::State &state)
         std::vector<std::thread> threadlist (static_cast<size_t> (feds) + 1);
         for (int ii = 0; ii < feds; ++ii)
         {
-            threadlist[ii] = std::thread ([&] (EchoLeaf &lf) { lf.run (cdt); }, std::ref (leafs[ii]));
+            threadlist[ii] = std::thread ([&](EchoLeaf &lf) { lf.run (cdt); }, std::ref (leafs[ii]));
         }
-        threadlist[feds] = std::thread ([&] () { hub.run (cdt); });
+        threadlist[feds] = std::thread ([&]() { hub.run (cdt); });
         std::this_thread::yield ();
         cdt.wait ();
         std::this_thread::sleep_for (std::chrono::milliseconds (20));
@@ -262,9 +262,9 @@ static void BM_echo_multiCore (benchmark::State &state, core_type cType)
         std::vector<std::thread> threadlist (static_cast<size_t> (feds) + 1);
         for (int ii = 0; ii < feds; ++ii)
         {
-            threadlist[ii] = std::thread ([&] (EchoLeaf &lf) { lf.run (cdt); }, std::ref (leafs[ii]));
+            threadlist[ii] = std::thread ([&](EchoLeaf &lf) { lf.run (cdt); }, std::ref (leafs[ii]));
         }
-        threadlist[feds] = std::thread ([&] () { hub.run (cdt); });
+        threadlist[feds] = std::thread ([&]() { hub.run (cdt); });
         std::this_thread::yield ();
         cdt.wait ();
         std::this_thread::sleep_for (std::chrono::milliseconds (50));

@@ -25,7 +25,7 @@ SPDX-License-Identifier: BSD-3-Clause
 class countdown
 {
   public:
-    countdown (int start) : counter_{start} {}
+    explicit countdown (int start) : counter_{start} {}
 
     void decrement ()
     {
