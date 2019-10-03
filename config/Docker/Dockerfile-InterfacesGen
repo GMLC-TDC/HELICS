@@ -1,5 +1,4 @@
-# The docker build command should be run from the root folder of the HELICS source code repository with submodules cloned
-#this docker file is intended to generate a container 
+# This Dockerfile creates an image with the tools needed to generate the swig interfaces for HELICS
 
 FROM fedora:31 as builder
 
