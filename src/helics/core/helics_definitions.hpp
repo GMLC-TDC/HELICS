@@ -37,6 +37,10 @@ enum flags : int
     /** flag indicating a federate should only grant time if all other federates have already passed the requested
      * time*/
     wait_for_current_time_update = helics_flag_wait_for_current_time_update,
+    /** flag indicating a federate should only operate on a restrictive time policy which means no second order
+    projections and potentially very slow time advancement on gap conditions.  Should only be used in selective
+    circumstances*/
+    restrictive_time_policy = helics_flag_restrictive_time_policy,
     /** flag indicating that a federate has rollback capability*/
     rollback = helics_flag_rollback,
     /** flag indicating that a federate performs forward computation and does internal rollback*/

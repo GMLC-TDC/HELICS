@@ -96,6 +96,7 @@ class RingTransmit
         maxIndex_ = maxIndex;
         helics::FederateInfo fi;
         fi.coreName = coreName;
+        fi.setFlagOption (helics_flag_restrictive_time_policy);
         if (index == 0)
         {
             // fi.setProperty (helics_property_int_log_level, helics_log_level_timing);
@@ -150,7 +151,7 @@ static void BM_ring2_singleCore (benchmark::State &state)
         std::vector<std::thread> threadlist (feds);
         for (int ii = 0; ii < feds; ++ii)
         {
-            threadlist[ii] = std::thread ([&] (RingTransmit &link) { link.run (cdt); }, std::ref (links[ii]));
+            threadlist[ii] = std::thread ([&](RingTransmit &link) { link.run (cdt); }, std::ref (links[ii]));
         }
 
         std::this_thread::yield ();
@@ -201,7 +202,7 @@ static void BM_ring2_multiCore (benchmark::State &state, core_type cType)
         std::vector<std::thread> threadlist (feds);
         for (int ii = 0; ii < feds; ++ii)
         {
-            threadlist[ii] = std::thread ([&] (RingTransmit &link) { link.run (cdt); }, std::ref (links[ii]));
+            threadlist[ii] = std::thread ([&](RingTransmit &link) { link.run (cdt); }, std::ref (links[ii]));
         }
 
         std::this_thread::yield ();
