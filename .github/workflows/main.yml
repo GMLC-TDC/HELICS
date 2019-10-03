@@ -1,0 +1,29 @@
+name: Generate SWIG Interfaces
+
+on: [push]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+    container:
+      image: helics/buildenv:interface-gen
+    
+    steps:
+    - uses: actions/checkout@v1
+    - name: Run SWIG
+      run: |
+        mkdir build_matlab
+        pushd build_matlab
+        cmake -DBUILD_MATLAB_INTERFACE=ON -DSWIG_GENERATE_INTERFACE_FILES_ONLY=ON -DHELICS_OVERWRITE_INTERFACE_FILES=ON -DBUILD_HELICS_EXAMPLES=OFF -DENABLE_ZMQ_CORE=OFF -DBUILD_HELICS_TESTS=OFF -DBUILD_APP_EXECUTABLES=OFF -DDISABLE_BOOST=ON -DENABLE_SWIG=ON -DSWIG_EXECUTABLE=/root/swig-matlab/bin/swig ..
+        make -j2 mfile_overwrite
+        popd
+        mkdir build_interface
+        pushd build_interface
+        cmake -DBUILD_PYTHON_INTERFACE=ON -DBUILD_JAVA_INTERFACE=ON -DSWIG_GENERATE_INTERFACE_FILES_ONLY=ON -DHELICS_OVERWRITE_INTERFACE_FILES=ON -DBUILD_HELICS_EXAMPLES=OFF -DENABLE_ZMQ_CORE=OFF -DBUILD_HELICS_TESTS=OFF -DBUILD_APP_EXECUTABLES=OFF -DDISABLE_BOOST=ON -DENABLE_SWIG=ON ..
+        make -j2 pyfile_overwrite
+        make -j2 javafile_overwrite
+        popd
+    - name: Check changed files
+      run: |
+        git status
