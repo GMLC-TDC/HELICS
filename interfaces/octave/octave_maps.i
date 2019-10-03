@@ -215,7 +215,7 @@ static octave_value throwHelicsOctaveError(helics_error *err) {
 }
 
 %typemap(argout) (void *data, int maxDatalen, int *actualSize) {
- _outv = SWIG_FromCharPtrAndSize($1,*$3);
+ _outv = SWIG_FromCharPtrAndSize(static_cast<char *>($1),*$3);
   if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
 }
 
@@ -235,6 +235,6 @@ static octave_value throwHelicsOctaveError(helics_error *err) {
 }
 
 %typemap(argout) (void *data, int maxMessagelen, int *actualSize) {
-_outv = SWIG_FromCharPtrAndSize($1,*$3);
+_outv = SWIG_FromCharPtrAndSize(static_cast<char *>($1),*$3);
   if (_outv.is_defined()) _outp = SWIG_Octave_AppendOutput(_outp, _outv);
 }
