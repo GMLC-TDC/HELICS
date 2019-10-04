@@ -44,7 +44,7 @@ jobs:
     displayName: 'Configure HELICS'
     condition: eq( variables['Agent.OS'], 'Windows_NT' )
     
-    - task: CMake@1
+  - task: CMake@1
     inputs:
       cmakeArgs: -DBUILD_PYTHON_INTERFACE=ON .
     displayName: 'Configure HELICS Python interface'
