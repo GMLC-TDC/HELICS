@@ -1290,7 +1290,7 @@ void CoreBroker::processBrokerConfigureCommands (ActionMessage &cmd)
         break;
         */
     case defs::properties::log_level:
-        setLogLevel (cmd.counter);
+        setLogLevel (cmd.getExtraData ());
         break;
     case UPDATE_LOGGING_CALLBACK:
         if (checkActionFlag (cmd, empty_flag))
@@ -2404,7 +2404,7 @@ void CoreBroker::setLoggingLevel (int logLevel)
     ActionMessage cmd (CMD_BROKER_CONFIGURE);
     cmd.dest_id = global_id.load ();
     cmd.messageID = defs::properties::log_level;
-    cmd.counter = logLevel;
+    cmd.setExtraData (logLevel);
     addActionMessage (cmd);
 }
 

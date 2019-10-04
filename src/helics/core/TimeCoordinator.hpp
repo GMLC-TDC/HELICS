@@ -39,6 +39,8 @@ class tcoptions
     // bool source_only = false;
     bool wait_for_current_time_updates = false;
     bool uninterruptible = false;
+    bool restrictive_time_policy = false;
+    // 1 byte gap
     int maxIterations = 50;
 };
 
@@ -69,7 +71,7 @@ class TimeCoordinator
     std::vector<global_federate_id> dependents;  //!< federates which temporally depend on this federate
     std::deque<std::pair<Time, int32_t>> timeBlocks;  //!< blocks for a particular timeblocking link
     tcoptions info;  //!< basic time control information
-    std::function<void (const ActionMessage &)> sendMessageFunction;  //!< callback used to send the messages
+    std::function<void(const ActionMessage &)> sendMessageFunction;  //!< callback used to send the messages
 
   public:
     global_federate_id source_id = global_federate_id (
@@ -85,7 +87,7 @@ class TimeCoordinator
     /** default constructor*/
     TimeCoordinator ();
     /** construct from a federate info and message send function*/
-    explicit TimeCoordinator (std::function<void (const ActionMessage &)> sendMessageFunction_);
+    explicit TimeCoordinator (std::function<void(const ActionMessage &)> sendMessageFunction_);
 
     /** set a timeProperty for a the coordinator*/
     void setProperty (int timeProperty, Time propertyVal);
@@ -100,7 +102,7 @@ class TimeCoordinator
     /** get an option flag value*/
     int getIntegerProperty (int intProperty) const;
     /** set the callback function used for the sending messages*/
-    void setMessageSender (std::function<void (const ActionMessage &)> sendMessageFunction_);
+    void setMessageSender (std::function<void(const ActionMessage &)> sendMessageFunction_);
 
     /** get the current granted time*/
     Time getGrantedTime () const { return time_granted; }

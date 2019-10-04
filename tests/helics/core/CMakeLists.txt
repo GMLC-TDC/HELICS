@@ -47,7 +47,7 @@ if(ENABLE_MPI_CORE)
 endif()
 
 add_executable(core-tests ${core_test_sources} ${core_test_headers})
-target_link_libraries(core-tests helics-static helics_google_test_base)
+target_link_libraries(core-tests helics-static helics_test_base)
 
 target_include_directories(core-tests PRIVATE ${PROJECT_SOURCE_DIR}/src)
 target_compile_definitions(

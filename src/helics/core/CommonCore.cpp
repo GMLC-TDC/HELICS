@@ -682,7 +682,7 @@ void CommonCore::setIntegerProperty (local_federate_id federateID, int32_t prope
         ActionMessage cmd (CMD_CORE_CONFIGURE);
         cmd.dest_id = global_id.load ();
         cmd.messageID = property;
-        cmd.counter = propertyValue;
+        cmd.setExtraData (propertyValue);
         addActionMessage (cmd);
         return;
     }
@@ -693,7 +693,7 @@ void CommonCore::setIntegerProperty (local_federate_id federateID, int32_t prope
     }
     ActionMessage cmd (CMD_FED_CONFIGURE_INT);
     cmd.messageID = property;
-    cmd.counter = propertyValue;
+    cmd.setExtraData (propertyValue);
     fed->setProperties (cmd);
 }
 
@@ -1810,7 +1810,7 @@ void CommonCore::setLoggingLevel (int logLevel)
     ActionMessage cmd (CMD_CORE_CONFIGURE);
     cmd.dest_id = global_id.load ();
     cmd.messageID = defs::properties::log_level;
-    cmd.counter = logLevel;
+    cmd.setExtraData (logLevel);
     addActionMessage (cmd);
 }
 
@@ -3722,13 +3722,13 @@ void CommonCore::processCoreConfigureCommands (ActionMessage &cmd)
         }
         break;
     case defs::properties::log_level:
-        setLogLevel (cmd.counter);
+        setLogLevel (cmd.getExtraData ());
         break;
     case defs::properties::file_log_level:
-        setLogLevels (consoleLogLevel, cmd.counter);
+        setLogLevels (consoleLogLevel, cmd.getExtraData ());
         break;
     case defs::properties::console_log_level:
-        setLogLevels (cmd.counter, fileLogLevel);
+        setLogLevels (cmd.getExtraData (), fileLogLevel);
         break;
     case UPDATE_LOGGING_CALLBACK:
         if (checkActionFlag (cmd, empty_flag))

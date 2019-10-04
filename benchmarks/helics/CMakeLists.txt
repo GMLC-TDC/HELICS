@@ -1,6 +1,8 @@
 
 set(HELICS_BENCHMARKS
     ActionMessageBenchmarks
+	echoBenchmarks
+	ring2BenchMarks
     )
 
 # Only affects current directory, so safe
@@ -14,3 +16,5 @@ foreach(T ${HELICS_BENCHMARKS})
 	set_target_properties(${T} PROPERTIES FOLDER benchmarks)
    
 endforeach()
+
+copy_key_files_to_target_location(ActionMessageBenchmarks)

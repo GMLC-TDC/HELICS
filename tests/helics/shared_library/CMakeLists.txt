@@ -49,12 +49,12 @@ add_executable(
 target_link_libraries(
   shared-library-tests
   helicsSharedLib
-  helics_google_test_base
+  helics_test_base
 )
 target_link_libraries(
   shared-library-tests-cpp
   helicsSharedLib
-  helics_google_test_base
+  helics_test_base
 )
 
 set_target_properties(
