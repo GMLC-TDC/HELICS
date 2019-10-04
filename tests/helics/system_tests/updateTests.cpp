@@ -38,7 +38,7 @@ TEST_F (update_tests, test_single_update)
     // publish string1 at time=0.0;
     pub.publish (testValue);
 
-    double val;
+    double val{0};
     sub.getValue (val);
 
     EXPECT_EQ (val, 3.1);
@@ -118,7 +118,7 @@ TEST_F (update_tests, test_single_update_string)
     EXPECT_EQ (val, "9.340000");
     sub.getValue (val);
     EXPECT_TRUE (!sub.isUpdated ());
-    double v2;
+    double v2{0};
     sub.getValue (v2);
     EXPECT_TRUE (!sub.isUpdated ());
 
@@ -183,7 +183,7 @@ TEST_F (update_tests, test_single_update_vector)
     EXPECT_EQ (val, "v1[9.340000]");
     sub.getValue (val);
     EXPECT_TRUE (!sub.isUpdated ());
-    double v2;
+    double v2{0};
     sub.getValue (v2);
     EXPECT_TRUE (!sub.isUpdated ());
 
@@ -248,7 +248,7 @@ TEST_F (update_tests, test_single_update_vector_char_ptr)
     EXPECT_EQ (std::string (val.data ()), "v1[9.340000]");
     sub.getValue (val.data (), 50);
     EXPECT_TRUE (!sub.isUpdated ());
-    double v2;
+    double v2{0};
     sub.getValue (v2);
     EXPECT_TRUE (!sub.isUpdated ());
 
@@ -313,7 +313,7 @@ TEST_F (update_tests, test_single_update_vector_ptr)
     EXPECT_EQ (val[0], 9.340000);
     sub.getValue (val.data (), 50);
     EXPECT_TRUE (!sub.isUpdated ());
-    double v2;
+    double v2{0};
     sub.getValue (v2);
     EXPECT_TRUE (!sub.isUpdated ());
 

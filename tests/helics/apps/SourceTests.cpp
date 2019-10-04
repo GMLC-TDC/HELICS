@@ -20,14 +20,20 @@ TEST (source_tests, simple_source_test)
     helics::apps::Source src1 ("player1", fi);
     auto index = src1.addSignalGenerator ("ramp", "ramp");
     auto gen = src1.getGenerator (index);
-    ASSERT_TRUE (gen);
+
+    if (!gen)
+    {
+        src1.finalize ();
+        ASSERT_TRUE (gen);
+        return;
+    }
     gen->set ("ramp", 0.3);
     gen->set ("level", 1.0);
     src1.addPublication ("pub1", helics::data_type::helics_double, 1.0);
     src1.setStartTime ("pub1", 1.0);
     helics::ValueFederate vfed ("block1", fi);
     auto &sub1 = vfed.registerSubscription ("pub1");
-    auto fut = std::async (std::launch::async, [&src1]() {
+    auto fut = std::async (std::launch::async, [&src1] () {
         src1.runTo (5);
         src1.finalize ();
     });
@@ -74,6 +80,11 @@ TEST (source_tests, simple_source_test2)
     auto gen2 = src1.getGenerator (index2);
     EXPECT_TRUE (gen);
     EXPECT_TRUE (gen2);
+    if (!gen || !gen2)
+    {
+        src1.finalize ();
+        return;
+    }
     gen->set ("ramp", 0.3);
     gen->set ("level", 1.0);
     src1.addPublication ("pub1", "ramp", helics::data_type::helics_double, 1.0);
@@ -85,7 +96,7 @@ TEST (source_tests, simple_source_test2)
     helics::ValueFederate vfed ("block1", fi);
     auto &sub1 = vfed.registerSubscription ("pub1");
     auto &sub2 = vfed.registerSubscription ("pub2");
-    auto fut = std::async (std::launch::async, [&src1]() {
+    auto fut = std::async (std::launch::async, [&src1] () {
         src1.runTo (5);
         src1.finalize ();
     });
@@ -144,7 +155,7 @@ TEST (source_tests, sine_source_test)
     src1.setStartTime ("pub1", 1.0);
     helics::ValueFederate vfed ("block1", fi);
     auto &sub1 = vfed.registerSubscription ("pub1");
-    auto fut = std::async (std::launch::async, [&src1]() {
+    auto fut = std::async (std::launch::async, [&src1] () {
         src1.runTo (5);
         src1.finalize ();
     });
@@ -193,7 +204,7 @@ TEST (source_tests, simple_source_test_file)
 
     helics::ValueFederate vfed ("block1", fi);
     auto &sub1 = vfed.registerSubscription ("pub1");
-    auto fut = std::async (std::launch::async, [&src1]() {
+    auto fut = std::async (std::launch::async, [&src1] () {
         src1.runTo (5);
         src1.finalize ();
     });
@@ -237,7 +248,7 @@ TEST (source_tests, simple_source_test2_file)
     helics::ValueFederate vfed ("block1", fi);
     auto &sub1 = vfed.registerSubscription ("pub1");
     auto &sub2 = vfed.registerSubscription ("pub2");
-    auto fut = std::async (std::launch::async, [&src1]() {
+    auto fut = std::async (std::launch::async, [&src1] () {
         src1.runTo (5);
         src1.finalize ();
     });
@@ -287,7 +298,7 @@ TEST (source_tests, sine_source_test_file)
 
     helics::ValueFederate vfed ("block1", fi);
     auto &sub1 = vfed.registerSubscription ("pub1");
-    auto fut = std::async (std::launch::async, [&src1]() {
+    auto fut = std::async (std::launch::async, [&src1] () {
         src1.runTo (5);
         src1.finalize ();
     });

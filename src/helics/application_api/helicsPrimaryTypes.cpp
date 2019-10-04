@@ -939,7 +939,7 @@ void valueConvert (defV &val, data_type newType)
         {
             return;
         }
-        double V;
+        double V{0};
         valueExtract (val, V);
         val = V;
         break;
@@ -950,7 +950,7 @@ void valueConvert (defV &val, data_type newType)
         {
             return;
         }
-        int64_t V;
+        int64_t V{0};
         valueExtract (val, V);
         val = V;
         break;
@@ -961,7 +961,7 @@ void valueConvert (defV &val, data_type newType)
         {
             return;
         }
-        Time V;
+        Time V{timeZero};
         valueExtract (val, V);
         val = V.getBaseTimeCode ();
         break;

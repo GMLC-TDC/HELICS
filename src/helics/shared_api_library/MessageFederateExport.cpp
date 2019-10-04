@@ -181,7 +181,7 @@ void helicsEndpointSetDefaultDestination (helics_endpoint endpoint, const char *
     {
         return;
     }
-    CHECK_NULL_STRING (dest, void());
+    CHECK_NULL_STRING (dest, void ());
     try
     {
         endObj->endPtr->setDefaultDestination (dest);
@@ -376,7 +376,7 @@ void helicsEndpointSubscribe (helics_endpoint endpoint, const char *key, helics_
     {
         return;
     }
-    CHECK_NULL_STRING (key, void());
+    CHECK_NULL_STRING (key, void ());
     try
     {
         endObj->endPtr->subscribe (key);
@@ -462,6 +462,8 @@ helics_message helicsEndpointGetMessage (helics_endpoint endpoint)
         mess.source = message->source.c_str ();
         mess.original_dest = message->original_dest.c_str ();
         mess.time = static_cast<helics_time> (message->time);
+        mess.flags = message->flags;
+        mess.messageID = message->messageID;
         endObj->messages.push_back (std::move (message));
         return mess;
     }
@@ -509,6 +511,7 @@ helics_message helicsFederateGetMessage (helics_federate fed)
         mess.source = message->source.c_str ();
         mess.original_dest = message->original_dest.c_str ();
         mess.time = static_cast<helics_time> (message->time);
+        mess.messageID = message->messageID;
         fedObj->messages.push_back (std::move (message));
         return mess;
     }

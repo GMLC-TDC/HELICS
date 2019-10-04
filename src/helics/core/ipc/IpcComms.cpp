@@ -226,7 +226,8 @@ void IpcComms::queue_tx_function ()
 
     setTxStatus (connection_status::connected);
     bool IPCoperating = false;
-    while (true)
+    bool continueLoop{true};
+    while (continueLoop)
     {
         route_id rid;
         ActionMessage cmd;
@@ -251,7 +252,8 @@ void IpcComms::queue_tx_function ()
                     routes.erase (route_id{cmd.getExtraData ()});
                     continue;
                 case DISCONNECT:
-                    goto DISCONNECT_TX_QUEUE;
+                    continueLoop = false;
+                    continue;
                 }
             }
         }
@@ -293,7 +295,6 @@ void IpcComms::queue_tx_function ()
             }
         }
     }
-DISCONNECT_TX_QUEUE:
     setTxStatus (connection_status::terminated);
 }
 

@@ -29,7 +29,7 @@ int main (int argc, char *argv[])
                                            "and open a terminal control window "
                                            "for the broker server, run help in a terminal for more commands\n")
                   ->prefix_command ();
-    term->callback ([&runterminal]() { runterminal = true; });
+    term->callback ([&runterminal] () { runterminal = true; });
     helics::Time opTime (30.0, time_units::minutes);
     cmdLine
       .add_option ("--duration", opTime,
@@ -39,7 +39,7 @@ int main (int argc, char *argv[])
     cmdLine
       .footer ("helics_broker_server starts the broker servers with the given args and waits for a given duration "
                "to close the servers and wait until all generated brokers have finished\n")
-      ->footer ([]() {
+      ->footer ([] () {
           helics::apps::BrokerServer brk (std::vector<std::string>{"-?"});
           (void)brk;
           return std::string{};
@@ -107,7 +107,7 @@ void terminalFunction (std::vector<std::string> args)
     std::cout << "starting broker server\n";
     brokerServer->startServers ();
     std::cout << "broker servers started\n";
-    auto closeBrokerServer = [&brokerServer]() {
+    auto closeBrokerServer = [&brokerServer] () {
         if (!brokerServer)
         {
             std::cout << "Broker servers have terminated\n";
@@ -123,12 +123,12 @@ void terminalFunction (std::vector<std::string> args)
             std::cout << "Broker servers have terminated\n";
         }
     };
-    auto lsbrokers = []() {
+    auto lsbrokers = [] () {
         auto brks = helics::BrokerFactory::getAllBrokers ();
         int ii = 1;
         for (auto &brk : brks)
         {
-            std::cout <<ii<<": "<<brk->getIdentifier() << " Connected:" << brk->isConnected ()
+            std::cout << ii << ": " << brk->getIdentifier () << " Connected:" << brk->isConnected ()
                       << " open:" << brk->isOpenToNewFederates () << '\n';
         }
     };
@@ -201,13 +201,12 @@ void terminalFunction (std::vector<std::string> args)
     termProg.add_flag ("-q,--quit,--exit", cmdcont,
                        "stop the broker servers, close the terminal and wait for the brokers to exit");
     termProg.add_subcommand ("quit", "close the terminal and  wait for the brokers to exit")
-      ->callback ([&cmdcont]() { cmdcont = false; });
-    termProg.add_subcommand ("ls", "list all brokers")
-      ->callback (lsbrokers);
+      ->callback ([&cmdcont] () { cmdcont = false; });
+    termProg.add_subcommand ("ls", "list all brokers")->callback (lsbrokers);
     termProg.add_subcommand ("terminate", "terminate the broker servers")->callback (closeBrokerServer);
 
     termProg.add_subcommand ("terminate!", "forcibly terminate the broker servers, shutdown all brokers and exit")
-      ->callback ([closeBrokerServer, &cmdcont]() {
+      ->callback ([closeBrokerServer, &cmdcont] () {
           cmdcont = false;
           closeBrokerServer ();
       });
@@ -229,7 +228,7 @@ void terminalFunction (std::vector<std::string> args)
         status (true);
     });
     */
-    termProg.add_subcommand ("help", "display the help")->callback ([&termProg]() {
+    termProg.add_subcommand ("help", "display the help")->callback ([&termProg] () {
         termProg.helics_parse ("-?");
     });
     /*
@@ -277,6 +276,11 @@ void terminalFunction (std::vector<std::string> args)
     {
         std::string cmdin;
         std::cout << "\nhelics_broker_server>>";
+        if (cmdin == "quit()")
+        {  // this is to make it work like python and to have an exit condition in case the termProg fails somehow
+            cmdcont = false;
+            continue;
+        }
         std::getline (std::cin, cmdin);
         termProg.helics_parse (cmdin);
     }

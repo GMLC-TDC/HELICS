@@ -560,6 +560,29 @@ iteration_result FederateState::enterExecutingMode (iteration_request iterate)
     return ret;
 }
 
+bool FederateState::publishData (interface_handle handle,
+                                 ActionMessage &basecmd,
+                                 std::function<void (ActionMessage &)> cb)
+{
+    if (try_lock ())
+    {
+        auto pubInfo = interfaceInformation.getPublication (handle);
+        if (pubInfo != nullptr)
+        {
+            basecmd.source_handle = handle;
+            basecmd.source_id = global_id;
+            for (auto &subscriber : pubInfo->subscribers)
+            {
+                basecmd.dest_id = subscriber.fed_id;
+                basecmd.dest_handle = subscriber.handle;
+                cb (basecmd);
+            }
+        }
+        return true;
+    }
+    return false;
+}
+
 iteration_time FederateState::requestTime (Time nextTime, iteration_request iterate)
 {
     if (try_lock ())

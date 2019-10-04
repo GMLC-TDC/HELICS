@@ -22,7 +22,7 @@ template <class T1, class T2>
 bool checkTypeConversion1 (const T1 &val1, const T2 &exp)
 {
     defV val = val1;
-    T2 v2;
+    T2 v2{};
     valueExtract (val, v2);
     if (v2 != exp)
     {

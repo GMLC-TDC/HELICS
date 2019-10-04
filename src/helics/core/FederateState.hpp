@@ -102,7 +102,7 @@ class FederateState
     mutable std::atomic_flag processing = ATOMIC_FLAG_INIT;  //!< the federate is processing
   private:
     /** a logging function for logging or printing messages*/
-    std::function<void(int, const std::string &, const std::string &)>
+    std::function<void (int, const std::string &, const std::string &)>
       loggerFunction;  //!< callback for logging functions
     std::function<std::string (const std::string &)> queryCallback;  //!< a callback for additional queries
     /** find the next Value Event*/
@@ -285,6 +285,13 @@ class FederateState
     @return an iteration time with two elements the granted time and the convergence state
     */
     iteration_time requestTime (Time nextTime, iteration_request iterate);
+    /** direct publish data to a handles subscribers
+    @param handle the publication handle to use
+    @param basecmd the command to send to all the subscribers
+    @param cb a callback function to use for sending the commands
+    */
+    bool publishData (interface_handle handle, ActionMessage &basecmd, std::function<void (ActionMessage &)> cb);
+
     /** function to process the queue in a generic fashion used to just process messages
     with no specific end in mind
     */
@@ -309,7 +316,7 @@ class FederateState
     @details function must have signature void(int level, const std::string &sourceName, const std::string
     &message)
     */
-    void setLogger (std::function<void(int, const std::string &, const std::string &)> logFunction)
+    void setLogger (std::function<void (int, const std::string &, const std::string &)> logFunction)
     {
         loggerFunction = std::move (logFunction);
     }
