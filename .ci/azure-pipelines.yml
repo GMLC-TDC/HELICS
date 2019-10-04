@@ -15,12 +15,15 @@ jobs:
   # -----------------------
   # Install dependencies
   # -----------------------
-  - powershell: Set-ExecutionPolicy Bypass -Scope Process -Force; iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
+  - powershell: |
+      Set-ExecutionPolicy Bypass -Scope Process -Force; iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
+    #  choco install boost-msvc-14.1 --yes --limit-output
+      echo "##vso[task.prependpath]C:\ProgramData\chocolatey\bin"
     condition: eq( variables['imageName'], 'vs2015-win2012r2' )
-    displayName: Install chocolatey
+    displayName: Install chocolatey and boost
   - bash: |
       choco install swig --yes --limit-output
-      pip3 install pytest
+    #  pip3 install pytest
     condition: eq( variables['Agent.OS'], 'Windows_NT' )
     displayName: Install swig
   - task: UsePythonVersion@0
