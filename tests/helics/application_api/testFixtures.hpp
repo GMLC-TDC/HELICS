@@ -39,7 +39,7 @@ struct FederateTestFixture
         auto broker = AddBroker (core_type_name, count);
         if (!broker)
         {
-            throw (std::exception ("unable to add broker"));
+            throw (std::runtime_error ("unable to add broker"));
         }
         if (!broker->isConnected ())
         {
