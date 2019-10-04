@@ -1,0 +1,63 @@
+jobs:
+- job: Windows
+  strategy:
+    matrix:
+      VS2015:
+        imageName: "vs2015-win2012r2"
+      VS2017:
+        imageName: "vs2017-win2016"
+      VS2019:
+        imageName: "windows-2019"
+  pool:
+    vmImage: $(imageName)
+
+  steps:
+  # -----------------------
+  # Install dependencies
+  # -----------------------
+  - bash: |
+      choco install swig --yes --limit-output
+    condition: eq( variables['Agent.OS'], 'Windows_NT' )
+    displayName: Install swig
+
+  # -----------------------
+  # Configure HELICS
+  # -----------------------
+  - task: CMake@1
+    inputs:
+      cmakeArgs: -Ax64 -DCMAKE_BUILD_TYPE=Release -DENABLE_PACKAGE_BUILD=ON -DENABLE_SWIG=ON -DBUILD_SHARED_LIBS=ON -DBUILD_PYTHON_INTERFACE=ON -DBUILD_JAVA_INTERFACE=ON ..
+    displayName: 'Configure HELICS'
+    condition: eq( variables['Agent.OS'], 'Windows_NT' )
+
+  # -----------------------
+  # Build HELICS
+  # -----------------------
+  - bash: cmake --build . --config Release --parallel
+    displayName: 'Build HELICS'
+    workingDirectory: build
+    
+  # -----------------------
+  # Package HELICS
+  # -----------------------
+  - bash: |
+      cpack_dir="$(which cmake)"
+      cpack_dir="${cpack_dir%/cmake}"
+      "${cpack_dir}/cpack" -C Release -B "$PWD/installer-output"
+    displayName: 'Package HELICS'
+    workingDirectory: build
+  - task: CopyFiles@2
+    inputs:
+      sourceFolder: '$(Build.SourcesDirectory)/build/installer-output'
+      contents: '*.exe'
+      TargetFolder: '$(Build.ArtifactStagingDirectory)'
+  - task: PublishBuildArtifacts@1
+    inputs:
+      pathtoPublish: '$(Build.ArtifactStagingDirectory)'
+      artifactName: installer
+    
+  # -----------------------
+  # Test HELICS
+  # -----------------------
+  - bash: ctest --output-on-failure --timeout 480 -C Release -L "Continuous|PackagingFast"
+    displayName: 'Test HELICS'
+    workingDirectory: build
