@@ -5,6 +5,9 @@ jobs:
       VS2015-64bit:
         imageName: "vs2015-win2012r2"
         vsArch: "x64"
+      VS2017-32bit:
+        imageName: "vs2017-win2016"
+        vsArch: "Win32"
       VS2017-64bit:
         imageName: "vs2017-win2016"
         vsArch: "x64"
@@ -31,7 +34,8 @@ jobs:
     
   - task: UsePythonVersion@0
     inputs:
-      versionSpec: '3.4' 
+      versionSpec: '3.4'
+      architecture: $(vsArch)
     condition: ne( variables['imageName'], 'vs2015-win2012r2' )
     
   - bash: pip3 install pytest
@@ -43,7 +47,7 @@ jobs:
   # -----------------------
   - task: CMake@1
     inputs:
-      cmakeArgs: -Ax64 -DCMAKE_BUILD_TYPE=Release -DENABLE_SWIG=ON -DBUILD_SHARED_LIBS=ON -DBUILD_JAVA_INTERFACE=ON -DBUILD_HELICS_BOOST_TESTS=OFF ..
+      cmakeArgs: -A $(vsArch) -DCMAKE_BUILD_TYPE=Release -DENABLE_SWIG=ON -DBUILD_SHARED_LIBS=ON -DBUILD_JAVA_INTERFACE=ON -DBUILD_HELICS_BOOST_TESTS=OFF ..
     displayName: 'Configure HELICS'
     condition: eq( variables['Agent.OS'], 'Windows_NT' )
     
@@ -87,6 +91,12 @@ jobs:
   # -----------------------
   # Test HELICS
   # -----------------------
-  - bash: ctest --output-on-failure --timeout 480 -C Release -L "Continuous|PackagingFast"
+  - bash: ctest --output-on-failure --timeout 480 -C Release -L "Continuous"
     displayName: 'Test HELICS'
     workingDirectory: build
+    
+  # Packaging tests for VS builds using newer CMake
+  - bash: ctest --output-on-failure --timeout 480 -C Release -L "PackagingFast"
+    displayName: 'Test HELICS'
+    workingDirectory: build
+    condition: ne( variables['imageName'], 'vs2015-win2012r2' )
