@@ -4,15 +4,19 @@ jobs:
     matrix:
       VS2015-64bit:
         imageName: "vs2015-win2012r2"
+        pyArch: "x64"
         vsArch: "x64"
       VS2017-32bit:
         imageName: "vs2017-win2016"
+        pyArch: "x86"
         vsArch: "Win32"
       VS2017-64bit:
         imageName: "vs2017-win2016"
+        pyArch: "x64"
         vsArch: "x64"
       VS2019-64bit:
         imageName: "windows-2019"
+        pyArch: "x64"
         vsArch: "x64"
   pool:
     vmImage: $(imageName)
@@ -35,7 +39,7 @@ jobs:
   - task: UsePythonVersion@0
     inputs:
       versionSpec: '3.4'
-      architecture: $(vsArch)
+      architecture: $(pyArch)
     condition: ne( variables['imageName'], 'vs2015-win2012r2' )
     
   - bash: pip3 install pytest
