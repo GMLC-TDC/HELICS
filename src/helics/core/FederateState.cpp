@@ -414,13 +414,12 @@ iteration_result FederateState::waitSetup ()
         return static_cast<iteration_result> (ret);
     }
 
-    sleeplock ();
+    std::lock_guard<FederateState> fedlock (*this);
     iteration_result ret;
     switch (getState ())
     {
     case HELICS_CREATED:
     {  // we are still in the created state
-        unlock ();
         return waitSetup ();
     }
     case HELICS_ERROR:
@@ -434,7 +433,6 @@ iteration_result FederateState::waitSetup ()
         break;
     }
 
-    unlock ();
     return ret;
 }
 
@@ -452,7 +450,7 @@ iteration_result FederateState::enterInitializingMode ()
         return static_cast<iteration_result> (ret);
     }
 
-    sleeplock ();
+    std::lock_guard<FederateState> fedlock (*this);
     iteration_result ret;
     switch (getState ())
     {
@@ -464,14 +462,12 @@ iteration_result FederateState::enterInitializingMode ()
         break;
     case HELICS_CREATED:
     {
-        unlock ();
         return enterInitializingMode ();
     }
     default:  // everything >= HELICS_INITIALIZING
         ret = iteration_result::next_step;
         break;
     }
-    unlock ();
     return ret;
 }
 
@@ -537,7 +533,7 @@ iteration_result FederateState::enterExecutingMode (iteration_request iterate)
     }
     // the following code is for situation which this has been called multiple times, which really shouldn't be
     // done but it isn't really an error so we need to deal with it.
-    sleeplock ();
+    std::lock_guard<FederateState> plock (*this);
     iteration_result ret;
     switch (getState ())
     {
@@ -556,8 +552,18 @@ iteration_result FederateState::enterExecutingMode (iteration_request iterate)
         ret = iteration_result::next_step;
         break;
     }
-    unlock ();
     return ret;
+}
+
+std::vector<global_handle> FederateState::getSubscribers (interface_handle handle)
+{
+    std::lock_guard<FederateState> fedlock (*this);
+    auto pubInfo = interfaceInformation.getPublication (handle);
+    if (pubInfo != nullptr)
+    {
+        return pubInfo->subscribers;
+    }
+    return {};
 }
 
 iteration_time FederateState::requestTime (Time nextTime, iteration_request iterate)
@@ -685,7 +691,7 @@ iteration_time FederateState::requestTime (Time nextTime, iteration_request iter
     }
     // this would not be good practice to get into this part of the function
     // but the area must protect itself and should return something sensible
-    sleeplock ();
+    std::lock_guard<FederateState> fedlock (*this);
     iteration_result ret = iterating ? iteration_result::iterating : iteration_result::next_step;
     if (state == HELICS_FINISHED)
     {
@@ -696,7 +702,6 @@ iteration_time FederateState::requestTime (Time nextTime, iteration_request iter
         ret = iteration_result::error;
     }
     iteration_time retTime = {time_granted, ret};
-    unlock ();
     return retTime;
 }
 
@@ -750,8 +755,7 @@ iteration_result FederateState::genericUnspecifiedQueueProcess ()
         return static_cast<iteration_result> (ret);
     }
 
-    sleeplock ();
-    unlock ();
+    std::lock_guard<FederateState> fedlock (*this);
     return iteration_result::next_step;
 }
 

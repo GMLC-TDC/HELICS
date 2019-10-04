@@ -197,7 +197,12 @@ TEST_F (mfed_tests, message_object_tests)
     ASSERT_EQ (helicsMessageGetRawDataSize (M), 500);
 
     char *rdata = static_cast<char *> (helicsMessageGetRawDataPointer (M));
-    EXPECT_EQ (rdata[245], 'a');
+    EXPECT_NE (rdata, nullptr);
+    if (rdata != nullptr)
+    {
+        EXPECT_EQ (rdata[245], 'a');
+    }
+
     CE (helicsFederateFinalize (mFed1, &err));
 
     CE (mFed1State = helicsFederateGetState (mFed1, &err));

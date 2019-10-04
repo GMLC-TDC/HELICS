@@ -128,7 +128,7 @@ void terminalFunction (std::vector<std::string> args)
         int ii = 1;
         for (auto &brk : brks)
         {
-            std::cout <<ii<<": "<<brk->getIdentifier() << " Connected:" << brk->isConnected ()
+            std::cout << ii << ": " << brk->getIdentifier () << " Connected:" << brk->isConnected ()
                       << " open:" << brk->isOpenToNewFederates () << '\n';
         }
     };
@@ -198,12 +198,11 @@ void terminalFunction (std::vector<std::string> args)
     bool cmdcont = true;
     helics::helicsCLI11App termProg ("helics broker server command line terminal");
     termProg.ignore_case ();
-    termProg.add_flag ("-q,--quit,--exit", cmdcont,
+    termProg.add_flag ("-q{false},--quit{false},--exit{false}", cmdcont,
                        "stop the broker servers, close the terminal and wait for the brokers to exit");
     termProg.add_subcommand ("quit", "close the terminal and  wait for the brokers to exit")
       ->callback ([&cmdcont]() { cmdcont = false; });
-    termProg.add_subcommand ("ls", "list all brokers")
-      ->callback (lsbrokers);
+    termProg.add_subcommand ("ls", "list all brokers")->callback (lsbrokers);
     termProg.add_subcommand ("terminate", "terminate the broker servers")->callback (closeBrokerServer);
 
     termProg.add_subcommand ("terminate!", "forcibly terminate the broker servers, shutdown all brokers and exit")
@@ -278,6 +277,11 @@ void terminalFunction (std::vector<std::string> args)
         std::string cmdin;
         std::cout << "\nhelics_broker_server>>";
         std::getline (std::cin, cmdin);
+        if (cmdin == "exit" || cmdin == "q")
+        {  // provide a fast path to exit without going through the terminal command line processor
+            cmdcont = false;
+            continue;
+        }
         termProg.helics_parse (cmdin);
     }
 }

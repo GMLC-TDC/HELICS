@@ -191,13 +191,25 @@ class FederateState
     /** locks the processing with a sleep loop*/
     void sleeplock () const
     {
+        if (!processing.test_and_set ())
+        {
+            return;
+        }
+        // spin for 10000 tries
+        for (int ii = 0; ii < 10000; ++ii)
+        {
+            if (!processing.test_and_set ())
+            {
+                return;
+            }
+        }
         while (processing.test_and_set ())
         {
-            std::this_thread::sleep_for (std::chrono::milliseconds (50));
+            std::this_thread::yield ();
         }
     }
     /** locks the processing so FederateState can be used with lock_guard*/
-    void lock () { spinlock (); }
+    void lock () { sleeplock (); }
 
     /** trys to lock the processing return true if successful and false if not*/
     bool try_lock () const { return !processing.test_and_set (); }
@@ -285,6 +297,11 @@ class FederateState
     @return an iteration time with two elements the granted time and the convergence state
     */
     iteration_time requestTime (Time nextTime, iteration_request iterate);
+    /** get a list of current subscribers to a publication
+    @param handle the publication handle to use
+    */
+    std::vector<global_handle> getSubscribers (interface_handle handle);
+
     /** function to process the queue in a generic fashion used to just process messages
     with no specific end in mind
     */

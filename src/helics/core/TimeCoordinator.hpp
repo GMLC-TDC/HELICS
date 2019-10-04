@@ -115,7 +115,7 @@ class TimeCoordinator
     /** get the current iteration counter for an iterative call
     @details this will work properly even when a federate is processing
     */
-    int32_t getCurrentIteration () const { return iteration; }
+    int32_t getCurrentIteration () const { return iteration.load (); }
     /** compute updates to time values
     @return true if they have been modified
     */
