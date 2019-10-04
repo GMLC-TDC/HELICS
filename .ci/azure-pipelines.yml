@@ -40,14 +40,14 @@ jobs:
   # -----------------------
   - task: CMake@1
     inputs:
-      cmakeArgs: -Ax64 -DCMAKE_BUILD_TYPE=Release -DENABLE_PACKAGE_BUILD=ON -DENABLE_SWIG=ON -DBUILD_SHARED_LIBS=ON -DBUILD_JAVA_INTERFACE=ON -DBUILD_HELICS_BOOST_TESTS=OFF ..
+      cmakeArgs: -Ax64 -DCMAKE_BUILD_TYPE=Release -DENABLE_SWIG=ON -DBUILD_SHARED_LIBS=ON -DBUILD_JAVA_INTERFACE=ON -DBUILD_HELICS_BOOST_TESTS=OFF ..
     displayName: 'Configure HELICS'
     condition: eq( variables['Agent.OS'], 'Windows_NT' )
     
   - task: CMake@1
     inputs:
-      cmakeArgs: -DBUILD_PYTHON_INTERFACE=ON HELICS_USE_NEW_PYTHON_FIND=ON .
-    displayName: 'Configure HELICS Python interface'
+      cmakeArgs: -DBUILD_PYTHON_INTERFACE=ON HELICS_USE_NEW_PYTHON_FIND=ON -DENABLE_PACKAGE_BUILD=ON .
+    displayName: 'Configure Python interface and package build (requires CMake 3.13+)'
     condition: ne( variables['imageName'], 'vs2015-win2012r2' )
 
   # -----------------------
@@ -66,15 +66,20 @@ jobs:
       "${cpack_dir}/cpack" -C Release -B "$PWD/installer-output"
     displayName: 'Package HELICS'
     workingDirectory: build
+    condition: ne( variables['imageName'], 'vs2015-win2012r2' )
+    
   - task: CopyFiles@2
     inputs:
       sourceFolder: '$(Build.SourcesDirectory)/build/installer-output'
       contents: '*.exe'
       TargetFolder: '$(Build.ArtifactStagingDirectory)'
+    condition: ne( variables['imageName'], 'vs2015-win2012r2' )
+      
   - task: PublishBuildArtifacts@1
     inputs:
       pathtoPublish: '$(Build.ArtifactStagingDirectory)'
       artifactName: installer
+    condition: ne( variables['imageName'], 'vs2015-win2012r2' )
     
   # -----------------------
   # Test HELICS
