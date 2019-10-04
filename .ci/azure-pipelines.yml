@@ -18,26 +18,37 @@ jobs:
   - powershell: |
       Set-ExecutionPolicy Bypass -Scope Process -Force; iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
       echo "##vso[task.prependpath]C:\ProgramData\chocolatey\bin"
-    #  choco install boost-msvc-14.1 --yes --limit-output
+      choco install boost-msvc-14.1 --yes --limit-output
     condition: eq( variables['imageName'], 'vs2015-win2012r2' )
     displayName: Install chocolatey and boost
-  - bash: |
-      choco install swig --yes --limit-output
-    #  pip3 install pytest
+    
+  - bash: choco install swig --yes --limit-output
     condition: eq( variables['Agent.OS'], 'Windows_NT' )
     displayName: Install swig
+    
+  - bash: pip3 install pytest
+    condition: ne( variables['imageName'], 'vs2015-win2012r2' )
+    displayName: Install pytest
+    
   - task: UsePythonVersion@0
     inputs:
       versionSpec: '3.6' 
+    condition: ne( variables['imageName'], 'vs2015-win2012r2' )
 
   # -----------------------
   # Configure HELICS
   # -----------------------
   - task: CMake@1
     inputs:
-      cmakeArgs: -Ax64 -DCMAKE_BUILD_TYPE=Release -DENABLE_PACKAGE_BUILD=ON -DENABLE_SWIG=ON -DBUILD_SHARED_LIBS=ON -DBUILD_PYTHON_INTERFACE=ON -DBUILD_JAVA_INTERFACE=ON ..
+      cmakeArgs: -Ax64 -DCMAKE_BUILD_TYPE=Release -DENABLE_PACKAGE_BUILD=ON -DENABLE_SWIG=ON -DBUILD_SHARED_LIBS=ON -DBUILD_JAVA_INTERFACE=ON ..
     displayName: 'Configure HELICS'
     condition: eq( variables['Agent.OS'], 'Windows_NT' )
+    
+    - task: CMake@1
+    inputs:
+      cmakeArgs: -DBUILD_PYTHON_INTERFACE=ON .
+    displayName: 'Configure HELICS Python interface'
+    condition: ne( variables['imageName'], 'vs2015-win2012r2' )
 
   # -----------------------
   # Build HELICS
