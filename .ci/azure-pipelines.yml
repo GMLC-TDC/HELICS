@@ -32,7 +32,7 @@ jobs:
     
   - task: UsePythonVersion@0
     inputs:
-      versionSpec: '3.6' 
+      versionSpec: '3.4' 
     condition: ne( variables['imageName'], 'vs2015-win2012r2' )
 
   # -----------------------
