@@ -65,6 +65,12 @@ BrokerBase::~BrokerBase ()
         }
     }
 }
+std::function<void(int, const std::string &, const std::string &)> BrokerBase::getLoggingCallback () const
+{
+    return [this](int level, const std::string &name, const std::string &message) {
+        sendToLogger (global_id.load (), level, name, message);
+    };
+}
 
 void BrokerBase::joinAllThreads ()
 {
@@ -118,7 +124,7 @@ std::shared_ptr<helicsCLI11App> BrokerBase::generateBaseCLI ()
     logging_group->add_option ("--logfile", logFile, "the file to log the messages to")->ignore_underscore ();
     logging_group
       ->add_option_function<int> (
-        "--loglevel,--log-level", [this] (int val) { setLogLevel (val); },
+        "--loglevel,--log-level", [this](int val) { setLogLevel (val); },
         "the level which to log the higher this is set to the more gets logs(-1) for no logging")
       ->transform (CLI::CheckedTransformer (&log_level_map, CLI::ignore_case, CLI::ignore_underscore));
 
@@ -204,7 +210,7 @@ void BrokerBase::configureBase ()
     }
 
     timeCoord = std::make_unique<ForwardingTimeCoordinator> ();
-    timeCoord->setMessageSender ([this] (const ActionMessage &msg) { addActionMessage (msg); });
+    timeCoord->setMessageSender ([this](const ActionMessage &msg) { addActionMessage (msg); });
 
     loggingObj = std::make_unique<Logger> ();
     if (!logFile.empty ())
@@ -273,8 +279,7 @@ void BrokerBase::setLoggingFile (const std::string &lfile)
     }
 }
 
-void BrokerBase::setLoggerFunction (
-  std::function<void (int, const std::string &, const std::string &)> logFunction)
+void BrokerBase::setLoggerFunction (std::function<void(int, const std::string &, const std::string &)> logFunction)
 {
     loggerFunction = std::move (logFunction);
     if (loggerFunction)
@@ -404,7 +409,7 @@ void BrokerBase::queueProcessingLoop ()
     asio::steady_timer ticktimer (serv->getBaseContext ());
     activeProtector active (true, false);
 
-    auto timerCallback = [this, &active] (const std::error_code &ec) { timerTickHandler (this, active, ec); };
+    auto timerCallback = [this, &active](const std::error_code &ec) { timerTickHandler (this, active, ec); };
     if (tickTimer > timeZero)
     {
         if (tickTimer < Time (0.5))
@@ -417,7 +422,7 @@ void BrokerBase::queueProcessingLoop ()
     }
     global_broker_id_local = global_id.load ();
     int messagesSinceLastTick = 0;
-    auto logDump = [&, this] () {
+    auto logDump = [&, this]() {
         if (dumplog)
         {
             for (auto &act : dumpMessages)

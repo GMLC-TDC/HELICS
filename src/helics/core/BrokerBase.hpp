@@ -172,6 +172,8 @@ class BrokerBase
     void setLoggingFile (const std::string &lfile);
 
   public:
+    /** generate a callback function for the logging purposes*/
+    std::function<void(int, const std::string &, const std::string &)> getLoggingCallback () const;
     /** close all the threads*/
     void joinAllThreads ();
     friend class TimeoutMonitor;

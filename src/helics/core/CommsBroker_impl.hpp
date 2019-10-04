@@ -45,9 +45,7 @@ void CommsBroker<COMMS, BrokerT>::loadComms ()
 {
     comms = std::make_unique<COMMS> ();
     comms->setCallback ([this](ActionMessage &&M) { BrokerBase::addActionMessage (std::move (M)); });
-    comms->setLoggingCallback ([this](int level, const std::string &name, const std::string &message) {
-        BrokerBase::sendToLogger (parent_broker_id, level, name, message);
-    });
+    comms->setLoggingCallback (BrokerBase::getLoggingCallback ());
 }
 
 template <class COMMS, class BrokerT>
