@@ -2,12 +2,15 @@ jobs:
 - job: Windows
   strategy:
     matrix:
-      VS2015:
+      VS2015-64bit:
         imageName: "vs2015-win2012r2"
-      VS2017:
+        vsArch: "x64"
+      VS2017-64bit:
         imageName: "vs2017-win2016"
-      VS2019:
+        vsArch: "x64"
+      VS2019-64bit:
         imageName: "windows-2019"
+        vsArch: "x64"
   pool:
     vmImage: $(imageName)
 
@@ -53,7 +56,7 @@ jobs:
   # -----------------------
   # Build HELICS
   # -----------------------
-  - bash: cmake --build . --config Release --parallel
+  - bash: cmake --build . --config Release
     displayName: 'Build HELICS'
     workingDirectory: build
     
