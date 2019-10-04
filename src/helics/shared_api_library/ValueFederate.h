@@ -312,11 +312,11 @@ extern "C"
     /** get the raw data for the latest value of a subscription
     @param ipt the input to get the data for
     @param[out] data the memory location of the data
-    @param maxlen the maximum size of information that data can hold
+    @param maxDatalen the maximum size of information that data can hold
     @param[out] actualSize  the actual length of data copied to data
     @param[in,out] err a pointer to an error object for catching errors
     */
-    HELICS_EXPORT void helicsInputGetRawValue (helics_input ipt, void *data, int maxlen, int *actualSize, helics_error *err);
+    HELICS_EXPORT void helicsInputGetRawValue (helics_input ipt, void *data, int maxDatalen, int *actualSize, helics_error *err);
 
     /** get the size of a value for subscription assuming return as a string
     @returns the size of the string
