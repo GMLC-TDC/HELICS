@@ -47,14 +47,14 @@ jobs:
   # -----------------------
   - task: CMake@1
     inputs:
-      cmakeArgs: -A $(vsArch) -DCMAKE_BUILD_TYPE=Release -DENABLE_SWIG=ON -DBUILD_SHARED_LIBS=ON -DBUILD_JAVA_INTERFACE=ON -DBUILD_HELICS_BOOST_TESTS=OFF ..
+      cmakeArgs: -A $(vsArch) -DCMAKE_BUILD_TYPE=Release -DENABLE_SWIG=ON -DBUILD_SHARED_LIBS=ON -DBUILD_HELICS_BOOST_TESTS=OFF ..
     displayName: 'Configure HELICS'
     condition: eq( variables['Agent.OS'], 'Windows_NT' )
     
   - task: CMake@1
     inputs:
-      cmakeArgs: -DBUILD_PYTHON_INTERFACE=ON HELICS_USE_NEW_PYTHON_FIND=ON -DENABLE_PACKAGE_BUILD=ON .
-    displayName: 'Configure Python interface and package build (requires CMake 3.13+)'
+      cmakeArgs: -DBUILD_JAVA_INTERFACE=ON -DENABLE_PACKAGE_BUILD=ON .
+    displayName: 'Configure Java interface and package build (requires CMake 3.13+)'
     condition: ne( variables['imageName'], 'vs2015-win2012r2' )
 
   # -----------------------
@@ -97,6 +97,6 @@ jobs:
     
   # Packaging tests for VS builds using newer CMake
   - bash: ctest --output-on-failure --timeout 480 -C Release -L "PackagingFast"
-    displayName: 'Test HELICS'
+    displayName: 'Test HELICS packaging'
     workingDirectory: build
     condition: ne( variables['imageName'], 'vs2015-win2012r2' )
