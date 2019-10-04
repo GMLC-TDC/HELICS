@@ -29,14 +29,14 @@ jobs:
     condition: eq( variables['Agent.OS'], 'Windows_NT' )
     displayName: Install swig
     
-  - bash: pip3 install pytest
-    condition: ne( variables['imageName'], 'vs2015-win2012r2' )
-    displayName: Install pytest
-    
   - task: UsePythonVersion@0
     inputs:
       versionSpec: '3.4' 
     condition: ne( variables['imageName'], 'vs2015-win2012r2' )
+    
+  - bash: pip3 install pytest
+    condition: ne( variables['imageName'], 'vs2015-win2012r2' )
+    displayName: Install pytest
 
   # -----------------------
   # Configure HELICS
