@@ -17,8 +17,8 @@ jobs:
   # -----------------------
   - powershell: |
       Set-ExecutionPolicy Bypass -Scope Process -Force; iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
-    #  choco install boost-msvc-14.1 --yes --limit-output
       echo "##vso[task.prependpath]C:\ProgramData\chocolatey\bin"
+    #  choco install boost-msvc-14.1 --yes --limit-output
     condition: eq( variables['imageName'], 'vs2015-win2012r2' )
     displayName: Install chocolatey and boost
   - bash: |
