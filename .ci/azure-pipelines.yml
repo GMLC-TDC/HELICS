@@ -15,11 +15,17 @@ jobs:
   # -----------------------
   # Install dependencies
   # -----------------------
+  - powershell: Set-ExecutionPolicy Bypass -Scope Process -Force; iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
+    condition: eq( variables['imageName'], 'vs2015-win2012r2' )
+    displayName: Install chocolatey
   - bash: |
       choco install swig --yes --limit-output
       pip3 install pytest
     condition: eq( variables['Agent.OS'], 'Windows_NT' )
     displayName: Install swig
+  - task: UsePythonVersion@0
+    inputs:
+      versionSpec: '3.6' 
 
   # -----------------------
   # Configure HELICS
