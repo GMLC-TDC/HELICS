@@ -17,6 +17,7 @@ jobs:
   # -----------------------
   - bash: |
       choco install swig --yes --limit-output
+      pip3 install pytest
     condition: eq( variables['Agent.OS'], 'Windows_NT' )
     displayName: Install swig
 
