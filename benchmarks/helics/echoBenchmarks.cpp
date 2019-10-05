@@ -18,43 +18,9 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <iostream>
 #include <thread>
 
-#include <atomic>
-#include <condition_variable>
-#include <mutex>
+#include <gmlc/concurrency/Barrier.hpp>
 
 #include "helics/helics-config.h"
-
-class countdown
-{
-  public:
-    explicit countdown (int start) : counter_{start} {}
-
-    void decrement ()
-    {
-        std::unique_lock<std::mutex> lck (mtx);
-        --counter_;
-        if (counter_ == 0)
-        {
-            cv.notify_all ();
-        }
-    }
-    void wait ()
-    {
-        if (counter_ > 0)
-        {
-            std::unique_lock<std::mutex> lck (mtx);
-            while (counter_.load () > 0)
-            {
-                cv.wait (lck);
-            }
-        }
-    }
-
-  private:
-    std::mutex mtx;
-    std::condition_variable cv;
-    std::atomic<int> counter_;
-};
 
 using helics::operator"" _t ;
 // static constexpr helics::Time tend = 3600.0_t;  // simulation end time
@@ -74,16 +40,14 @@ class EchoHub
   public:
     EchoHub () = default;
 
-    void run (countdown &cdt)
+    void run (std::function<void()> callOnReady)
     {
         if (!initialized)
         {
             throw ("must initialize first");
         }
-        vFed->enterInitializingModeAsync ();
-        cdt.decrement ();
-        vFed->enterInitializingModeComplete ();
         vFed->enterExecutingMode ();
+        callOnReady ();
         mainLoop ();
     };
 
@@ -136,16 +100,14 @@ class EchoLeaf
   public:
     EchoLeaf () = default;
 
-    void run (countdown &cdt)
+    void run (std::function<void()> callOnReady)
     {
         if (!initialized)
         {
             throw ("must initialize first");
         }
-        vFed->enterInitializingModeAsync ();
-        cdt.decrement ();
-        vFed->enterInitializingModeComplete ();
         vFed->enterExecutingMode ();
+        callOnReady ();
         mainLoop ();
     };
     void initialize (const std::string &coreName, int index)
@@ -194,11 +156,9 @@ static void BM_echo_singleCore (benchmark::State &state)
         state.PauseTiming ();
 
         int feds = static_cast<int> (state.range (0));
-        countdown cdt (feds + 1);
+        gmlc::concurrency::Barrier brr (feds + 2);
         auto wcore = helics::CoreFactory::create (core_type::TEST, std::string ("--autobroker --federates=") +
                                                                      std::to_string (feds + 1));
-        // this is to delay until the threads are ready
-        wcore->setFlagOption (helics::local_core_id, helics_flag_delay_init_entry, true);
         EchoHub hub;
         hub.initialize (wcore->getIdentifier (), feds);
         std::vector<EchoLeaf> leafs (feds);
@@ -210,15 +170,12 @@ static void BM_echo_singleCore (benchmark::State &state)
         std::vector<std::thread> threadlist (static_cast<size_t> (feds) + 1);
         for (int ii = 0; ii < feds; ++ii)
         {
-            threadlist[ii] = std::thread ([&](EchoLeaf &lf) { lf.run (cdt); }, std::ref (leafs[ii]));
+            threadlist[ii] =
+              std::thread ([&](EchoLeaf &lf) { lf.run ([&brr]() { brr.wait (); }); }, std::ref (leafs[ii]));
         }
-        threadlist[feds] = std::thread ([&]() { hub.run (cdt); });
-        std::this_thread::yield ();
-        cdt.wait ();
-        std::this_thread::sleep_for (std::chrono::milliseconds (20));
-        std::this_thread::yield ();
+        threadlist[feds] = std::thread ([&]() { hub.run ([&brr]() { brr.wait (); }); });
+        brr.wait ();
         state.ResumeTiming ();
-        wcore->setFlagOption (helics::local_core_id, helics_flag_enable_init_entry, true);
         for (auto &thrd : threadlist)
         {
             thrd.join ();
@@ -240,14 +197,13 @@ static void BM_echo_multiCore (benchmark::State &state, core_type cType)
         state.PauseTiming ();
 
         int feds = static_cast<int> (state.range (0));
-        countdown cdt (feds + 1);
+        gmlc::concurrency::Barrier brr (feds + 2);
 
         auto broker = helics::BrokerFactory::create (cType, "brokerb",
                                                      std::string ("--federates=") + std::to_string (feds + 1));
         broker->setLoggingLevel (helics_log_level_no_print);
         auto wcore = helics::CoreFactory::create (cType, std::string ("--federates=1"));
         // this is to delay until the threads are ready
-        wcore->setFlagOption (helics::local_core_id, helics_flag_delay_init_entry, true);
         EchoHub hub;
         hub.initialize (wcore->getIdentifier (), feds);
         std::vector<EchoLeaf> leafs (feds);
@@ -262,15 +218,13 @@ static void BM_echo_multiCore (benchmark::State &state, core_type cType)
         std::vector<std::thread> threadlist (static_cast<size_t> (feds) + 1);
         for (int ii = 0; ii < feds; ++ii)
         {
-            threadlist[ii] = std::thread ([&](EchoLeaf &lf) { lf.run (cdt); }, std::ref (leafs[ii]));
+            threadlist[ii] =
+              std::thread ([&](EchoLeaf &lf) { lf.run ([&brr]() { brr.wait (); }); }, std::ref (leafs[ii]));
         }
-        threadlist[feds] = std::thread ([&]() { hub.run (cdt); });
-        std::this_thread::yield ();
-        cdt.wait ();
-        std::this_thread::sleep_for (std::chrono::milliseconds (50));
-        std::this_thread::yield ();
+        threadlist[feds] = std::thread ([&]() { hub.run ([&brr]() { brr.wait (); }); });
+
+        brr.wait ();
         state.ResumeTiming ();
-        wcore->setFlagOption (helics::local_core_id, helics_flag_enable_init_entry, true);
         for (auto &thrd : threadlist)
         {
             thrd.join ();
