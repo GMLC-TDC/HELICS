@@ -1910,9 +1910,16 @@ void CoreBroker::disconnect ()
 {
     ActionMessage udisconnect (CMD_USER_DISCONNECT);
     addActionMessage (udisconnect);
+    int cnt{0};
     while (!waitForDisconnect (std::chrono::milliseconds (200)))
     {
-        LOG_WARNING (global_id.load (), getIdentifier (), "waiting on disconnect");
+        ++cnt;
+        LOG_WARNING (global_id.load (), getIdentifier (),
+                     "waiting on disconnect: current state=" + std::to_string (brokerState.load ()));
+        if (cnt == 5)
+        {
+            addActionMessage (udisconnect);
+        }
     }
 }
 

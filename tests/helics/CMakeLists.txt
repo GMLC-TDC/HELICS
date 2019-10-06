@@ -21,7 +21,11 @@ target_link_libraries(helics_test_base INTERFACE helics_base_includes compile_fl
 add_subdirectory(core)
 add_subdirectory(common)
 add_subdirectory(system_tests)
-add_subdirectory(apps)
+
+if (BUILD_APP_LIBRARY)
+   add_subdirectory(apps)
+endif()
+
 add_subdirectory(application_api)
 
 if(NOT DISABLE_C_SHARED_LIB)
