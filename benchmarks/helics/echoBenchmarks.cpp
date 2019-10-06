@@ -36,18 +36,21 @@ class EchoHub
     std::vector<helics::Input> subs;
     int cnt_ = 10;
     bool initialized = false;
+    bool readyToRun = false;
 
   public:
     EchoHub () = default;
 
     void run (std::function<void()> callOnReady)
     {
-        if (!initialized)
+        if (!readyToRun)
         {
-            throw ("must initialize first");
+            makeReady ();
         }
-        vFed->enterExecutingMode ();
-        callOnReady ();
+        if (callOnReady)
+        {
+            callOnReady ();
+        }
         mainLoop ();
     };
 
@@ -66,6 +69,16 @@ class EchoHub
             subs.push_back (vFed->registerSubscriptionIndexed ("leafsend", ii));
         }
         initialized = true;
+    }
+
+    void makeReady ()
+    {
+        if (!initialized)
+        {
+            throw ("must initialize first");
+        }
+        vFed->enterExecutingMode ();
+        readyToRun = true;
     }
 
     void mainLoop ()
@@ -96,18 +109,21 @@ class EchoLeaf
 
     int index_ = 0;
     bool initialized = false;
+    bool readyToRun = false;
 
   public:
     EchoLeaf () = default;
 
     void run (std::function<void()> callOnReady)
     {
-        if (!initialized)
+        if (!readyToRun)
         {
-            throw ("must initialize first");
+            makeReady ();
         }
-        vFed->enterExecutingMode ();
-        callOnReady ();
+        if (callOnReady)
+        {
+            callOnReady ();
+        }
         mainLoop ();
     };
     void initialize (const std::string &coreName, int index)
@@ -120,6 +136,16 @@ class EchoLeaf
         pub = vFed->registerPublicationIndexed<std::string> ("leafsend", index_);
         sub = vFed->registerSubscriptionIndexed ("leafrx", index_);
         initialized = true;
+    }
+
+    void makeReady ()
+    {
+        if (!initialized)
+        {
+            throw ("must initialize first");
+        }
+        vFed->enterExecutingMode ();
+        readyToRun = true;
     }
 
     void mainLoop ()
@@ -156,7 +182,7 @@ static void BM_echo_singleCore (benchmark::State &state)
         state.PauseTiming ();
 
         int feds = static_cast<int> (state.range (0));
-        gmlc::concurrency::Barrier brr (feds + 2);
+        gmlc::concurrency::Barrier brr (feds + 1);
         auto wcore = helics::CoreFactory::create (core_type::TEST, std::string ("--autobroker --federates=") +
                                                                      std::to_string (feds + 1));
         EchoHub hub;
@@ -167,19 +193,24 @@ static void BM_echo_singleCore (benchmark::State &state)
             leafs[ii].initialize (wcore->getIdentifier (), ii);
         }
 
-        std::vector<std::thread> threadlist (static_cast<size_t> (feds) + 1);
+        std::vector<std::thread> threadlist (static_cast<size_t> (feds));
         for (int ii = 0; ii < feds; ++ii)
         {
             threadlist[ii] =
               std::thread ([&](EchoLeaf &lf) { lf.run ([&brr]() { brr.wait (); }); }, std::ref (leafs[ii]));
         }
-        threadlist[feds] = std::thread ([&]() { hub.run ([&brr]() { brr.wait (); }); });
+        hub.makeReady ();
         brr.wait ();
         state.ResumeTiming ();
+        hub.run ([]() {});
+        state.PauseTiming ();
         for (auto &thrd : threadlist)
         {
             thrd.join ();
         }
+        wcore.reset ();
+        cleanupHelicsLibrary ();
+        state.ResumeTiming ();
     }
 }
 // Register the function as a benchmark
@@ -197,7 +228,7 @@ static void BM_echo_multiCore (benchmark::State &state, core_type cType)
         state.PauseTiming ();
 
         int feds = static_cast<int> (state.range (0));
-        gmlc::concurrency::Barrier brr (feds + 2);
+        gmlc::concurrency::Barrier brr (feds + 1);
 
         auto broker = helics::BrokerFactory::create (cType, "brokerb",
                                                      std::string ("--federates=") + std::to_string (feds + 1));
@@ -215,22 +246,27 @@ static void BM_echo_multiCore (benchmark::State &state, core_type cType)
             leafs[ii].initialize (cores[ii]->getIdentifier (), ii);
         }
 
-        std::vector<std::thread> threadlist (static_cast<size_t> (feds) + 1);
+        std::vector<std::thread> threadlist (static_cast<size_t> (feds));
         for (int ii = 0; ii < feds; ++ii)
         {
             threadlist[ii] =
               std::thread ([&](EchoLeaf &lf) { lf.run ([&brr]() { brr.wait (); }); }, std::ref (leafs[ii]));
         }
-        threadlist[feds] = std::thread ([&]() { hub.run ([&brr]() { brr.wait (); }); });
-
+        hub.makeReady ();
         brr.wait ();
         state.ResumeTiming ();
+        hub.run ([]() {});
+        state.PauseTiming ();
         for (auto &thrd : threadlist)
         {
             thrd.join ();
         }
-        state.PauseTiming ();
         broker->disconnect ();
+        broker.reset ();
+        cores.clear ();
+        wcore.reset ();
+        cleanupHelicsLibrary ();
+
         state.ResumeTiming ();
     }
 }

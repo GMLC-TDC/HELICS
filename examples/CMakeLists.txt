@@ -17,8 +17,9 @@ if(EXAMPLES_WARNINGS_AS_ERROR)
     add_compile_options(-Werror)
   endif(WIN32)
 endif()
-
-add_subdirectory(comboFederates1)
+if (BUILD_APP_LIBRARY)
+  add_subdirectory(comboFederates1)
+endif()
 
 if(NOT DISABLE_C_SHARED_LIB)
   add_subdirectory(CppInterface)

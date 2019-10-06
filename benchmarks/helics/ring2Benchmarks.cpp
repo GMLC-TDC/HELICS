@@ -18,41 +18,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <iostream>
 #include <thread>
 
-#include <atomic>
-#include <condition_variable>
-#include <mutex>
-
-class countdown
-{
-  public:
-    explicit countdown (int start) : counter_{start} {}
-
-    void decrement ()
-    {
-        std::unique_lock<std::mutex> lck (mtx);
-        --counter_;
-        if (counter_ == 0)
-        {
-            cv.notify_all ();
-        }
-    }
-    void wait ()
-    {
-        if (counter_ > 0)
-        {
-            std::unique_lock<std::mutex> lck (mtx);
-            while (counter_.load () > 0)
-            {
-                cv.wait (lck);
-            }
-        }
-    }
-
-  private:
-    std::mutex mtx;
-    std::condition_variable cv;
-    std::atomic<int> counter_;
-};
+#include <gmlc/concurrency/Barrier.hpp>
 
 using helics::operator"" _t ;
 // static constexpr helics::Time tend = 3600.0_t;  // simulation end time
@@ -72,23 +38,22 @@ class RingTransmit
 
     int index_ = 0;
     int maxIndex_ = 0;
-    bool initialized = false;
+    bool initialized{false};
+    bool readyToRun{false};
 
   public:
     RingTransmit () = default;
 
-    void run (countdown &cdt)
+    void run (std::function<void()> callOnReady = nullptr)
     {
-        if (!initialized)
+        makeReady ();
+        if (callOnReady)
         {
-            throw ("must initialize first");
+            callOnReady ();
         }
-        vFed->enterInitializingModeAsync ();
-        cdt.decrement ();
-        vFed->enterInitializingModeComplete ();
-        vFed->enterExecutingMode ();
         mainLoop ();
     };
+
     void initialize (const std::string &coreName, int index, int maxIndex)
     {
         std::string name = "ringlink_" + std::to_string (index);
@@ -106,6 +71,16 @@ class RingTransmit
         sub = &vFed->registerSubscriptionIndexed ("pub", (index_ == 0) ? maxIndex_ - 1 : index_ - 1);
 
         initialized = true;
+    }
+
+    void makeReady ()
+    {
+        if (!initialized)
+        {
+            throw ("must initialize first");
+        }
+        vFed->enterExecutingMode ();
+        readyToRun = true;
     }
 
     void mainLoop ()
@@ -138,38 +113,33 @@ static void BM_ring2_singleCore (benchmark::State &state)
     {
         state.PauseTiming ();
         int feds = 2;
-        countdown cdt (2);
+        gmlc::concurrency::Barrier brr (feds);
         auto wcore = helics::CoreFactory::create (core_type::TEST, std::string ("--autobroker --federates=2"));
-        // this is to delay until the threads are ready
-        wcore->setFlagOption (helics::local_core_id, helics_flag_delay_init_entry, true);
+
         std::vector<RingTransmit> links (feds);
         for (int ii = 0; ii < feds; ++ii)
         {
             links[ii].initialize (wcore->getIdentifier (), ii, feds);
         }
 
-        std::vector<std::thread> threadlist (feds);
-        for (int ii = 0; ii < feds; ++ii)
-        {
-            threadlist[ii] = std::thread ([&](RingTransmit &link) { link.run (cdt); }, std::ref (links[ii]));
-        }
+        std::thread rthread ([&](RingTransmit &link) { link.run ([&brr]() { brr.wait (); }); },
+                             std::ref (links[1]));
 
-        std::this_thread::yield ();
-        cdt.wait ();
-        std::this_thread::sleep_for (std::chrono::milliseconds (20));
-        std::this_thread::yield ();
+        links[0].makeReady ();
+        brr.wait ();
+
         state.ResumeTiming ();
-        wcore->setFlagOption (helics::local_core_id, helics_flag_enable_init_entry, true);
-        for (auto &thrd : threadlist)
-        {
-            thrd.join ();
-        }
+        links[0].run ();
         state.PauseTiming ();
+        rthread.join ();
+
         if (links[0].loopCount != 10000)
         {
             std::cout << "incorrect loop count received (" << links[0].loopCount << ") instead of 100000"
                       << std::endl;
         }
+        wcore.reset ();
+        cleanupHelicsLibrary ();
         state.ResumeTiming ();
     }
 }
@@ -182,15 +152,14 @@ static void BM_ring2_multiCore (benchmark::State &state, core_type cType)
     {
         state.PauseTiming ();
         int feds = 2;
-        countdown cdt (2);
+        gmlc::concurrency::Barrier brr (feds);
         auto broker = helics::BrokerFactory::create (cType, std::string ("--federates=2"));
         broker->setLoggingLevel (0);
 
         auto wcore =
           helics::CoreFactory::create (cType, std::string (" --federates=1 --broker=" + broker->getIdentifier ()));
         wcore->connect ();
-        // this is to delay until the threads are ready
-        wcore->setFlagOption (helics::local_core_id, helics_flag_delay_init_entry, true);
+
         std::vector<RingTransmit> links (feds);
         auto ocore =
           helics::CoreFactory::create (cType, std::string (" --federates=1 --broker=" + broker->getIdentifier ()));
@@ -199,29 +168,33 @@ static void BM_ring2_multiCore (benchmark::State &state, core_type cType)
         ocore->connect ();
         links[1].initialize (ocore->getIdentifier (), 1, feds);
 
-        std::vector<std::thread> threadlist (feds);
-        for (int ii = 0; ii < feds; ++ii)
+        std::vector<std::thread> threadlist (feds - 1);
+        for (int ii = 0; ii < feds - 1; ++ii)
         {
-            threadlist[ii] = std::thread ([&](RingTransmit &link) { link.run (cdt); }, std::ref (links[ii]));
+            threadlist[ii] = std::thread ([&](RingTransmit &link) { link.run ([&brr]() { brr.wait (); }); },
+                                          std::ref (links[ii + 1]));
         }
 
-        std::this_thread::yield ();
-        cdt.wait ();
-        std::this_thread::sleep_for (std::chrono::milliseconds (20));
-        std::this_thread::yield ();
+        links[0].makeReady ();
+        brr.wait ();
         state.ResumeTiming ();
-        wcore->setFlagOption (helics::local_core_id, helics_flag_enable_init_entry, true);
+        links[0].run ();
+        state.PauseTiming ();
         for (auto &thrd : threadlist)
         {
             thrd.join ();
         }
-        state.PauseTiming ();
+
         if (links[0].loopCount != 10000)
         {
             std::cout << "incorrect loop count received (" << links[0].loopCount << ") instead of 100000"
                       << std::endl;
         }
         broker->disconnect ();
+        ocore.reset ();
+        broker.reset ();
+        wcore.reset ();
+        cleanupHelicsLibrary ();
         state.ResumeTiming ();
     }
 }
