@@ -22,7 +22,7 @@ add_subdirectory(core)
 add_subdirectory(common)
 add_subdirectory(system_tests)
 
-if (BUILD_APPS_LIBRARY)
+if (BUILD_APP_LIBRARY)
    add_subdirectory(apps)
 endif()
 
