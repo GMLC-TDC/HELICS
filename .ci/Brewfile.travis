@@ -1,3 +1,4 @@
 brew "ccache"
 brew "cmake"
+brew "swig"
 brew "zeromq"
