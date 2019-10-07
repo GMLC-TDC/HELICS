@@ -2,7 +2,8 @@
 set(HELICS_BENCHMARKS
     ActionMessageBenchmarks
 	echoBenchmarks
-	ring2BenchMarks
+	ringBenchmarks
+	messageLookupBenchmarks
     )
 
 # Only affects current directory, so safe

@@ -41,7 +41,7 @@ class EchoHub
   public:
     EchoHub () = default;
 
-    void run (std::function<void()> callOnReady)
+    void run (std::function<void()> callOnReady = {})
     {
         if (!readyToRun)
         {
@@ -114,7 +114,7 @@ class EchoLeaf
   public:
     EchoLeaf () = default;
 
-    void run (std::function<void()> callOnReady)
+    void run (std::function<void()> callOnReady = {})
     {
         if (!readyToRun)
         {
