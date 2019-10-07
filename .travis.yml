@@ -73,6 +73,10 @@ jobs:
         - HOMEBREW_NO_AUTO_UPDATE=1
         - USE_SWIG=false
       osx_image: xcode8.3
+      addons:
+        homebrew:
+          brewfile: .ci/Brewfile-minimal.travis
+          update: true
 
     - <<: *linux_base
       name: "GCC 6"
