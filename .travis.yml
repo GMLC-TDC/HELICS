@@ -64,14 +64,14 @@ jobs:
         - HOMEBREW_NO_AUTO_UPDATE=1
       osx_image: xcode10.2
 
-    # XCode 9.2, OS X 10.12
+    # XCode 9.4, OS X 10.13
     - <<: *osx_base
-      name: "XCode 9.2, macOS 10.12"
+      name: "XCode 9.4, macOS 10.13"
       #if: (branch = develop AND type IN (cron)) OR (branch = master AND type IN (push, pull_request))
       env:
-        - MATRIX_EVAL="COMPILER=clang && BUILD_TYPE=Release && TRAVIS_XCODE_VERSION=92"
+        - MATRIX_EVAL="COMPILER=clang && BUILD_TYPE=Release && TRAVIS_XCODE_VERSION=94"
         - HOMEBREW_NO_AUTO_UPDATE=1
-      osx_image: xcode9.2
+      osx_image: xcode9.4
 
     - <<: *linux_base
       name: "GCC 6"
