@@ -7,21 +7,21 @@
 # SPDX-License-Identifier: BSD-3-Clause
 #
 
-if (NOT DISABLE_C_SHARED_INTERFACE)
 
-option(BUILD_PYTHON_INTERFACE "Build Python extension" OFF)
-option(
+cmake_dependent_option(BUILD_PYTHON_INTERFACE "Build Python extension" OFF "NOT DISABLE_C_SHARED_INTERFACE" OFF)
+
+cmake_dependent_option(
     BUILD_PYTHON2_INTERFACE
     "Build Python2.7 extension(Requires swig and will not build if \"PYTHON_INTERFACE\" is active)"
-    OFF
+    OFF "NOT DISABLE_C_SHARED_INTERFACE" OFF
 )
-option(BUILD_MATLAB_INTERFACE "Build Matlab Extension" OFF)
-option(BUILD_OCTAVE_INTERFACE "Build Octave extension" OFF)
-option(BUILD_JAVA_INTERFACE "Build Java extension" OFF)
+cmake_dependent_option(BUILD_MATLAB_INTERFACE "Build Matlab Extension" OFF "NOT DISABLE_C_SHARED_INTERFACE" OFF)
+cmake_dependent_option(BUILD_OCTAVE_INTERFACE "Build Octave extension" OFF "NOT DISABLE_C_SHARED_INTERFACE" OFF)
+cmake_dependent_option(BUILD_JAVA_INTERFACE "Build Java extension" OFF "NOT DISABLE_C_SHARED_INTERFACE" OFF)
 
 if(${CMAKE_VERSION} VERSION_GREATER 3.8)
     # cmake projects are only available for csharp from 3.8 onward
-    option(BUILD_CSHARP_INTERFACE "Build C# extension" OFF)
+    cmake_dependent_option(BUILD_CSHARP_INTERFACE "Build C# extension" OFF "NOT DISABLE_C_SHARED_INTERFACE" OFF)
 endif()
 
 #these are purposely hidden options since they will only be used for very select purposes
@@ -35,10 +35,9 @@ if(BUILD_CSHARP_INTERFACE OR BUILD_PYTHON2_INTERFACE OR BUILD_OCTAVE_INTERFACE O
 set(SWIG_REQUIRED ON)
 else()
 set(SWIG_REQUIRED OFF)
-if (BUILD_PYTHON_INTERFACE OR BUILD_MATLAB_INTERFACE OR BUILD_JAVA_INTERFACE)
-option(ENABLE_SWIG OFF "use swig to generate the interface files")
 endif()
-endif()
+
+cmake_dependent_option(ENABLE_SWIG "use swig to generate the interface files" OFF "NOT SWIG_REQUIRED AND (BUILD_PYTHON_INTERFACE OR BUILD_MATLAB_INTERFACE OR BUILD_JAVA_INTERFACE)" ON)
 
 
 if(ENABLE_SWIG OR SWIG_REQUIRED)
@@ -108,5 +107,3 @@ endif()
 if(BUILD_CSHARP_INTERFACE)
    add_subdirectory(csharp)
 endif()
-
-endif()  # disable c shared interface

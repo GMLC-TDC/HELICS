@@ -15,19 +15,6 @@ show_variable(
     "${BOOST_INSTALL_PATH}"
 )
 
-if(WIN32 AND NOT MSYS)
-option(USE_BOOST_STATIC_LIBS "Build using boost static Libraries" ON)
-else()
-option(USE_BOOST_STATIC_LIBS "Build using boost static Libraries" OFF)
-endif()
-
-mark_as_advanced(USE_BOOST_STATIC_LIBS)
-
-if(USE_BOOST_STATIC_LIBS)
-    set(Boost_USE_STATIC_LIBS ON)
-    set(BOOST_STATIC ON)
-endif()
-
 if(WIN32 AND NOT UNIX_LIKE)
 
     set(
@@ -101,16 +88,11 @@ hide_variable(BOOST_TEST_PATH)
 
 if(NOT BOOST_REQUIRED_LIBRARIES)
     set(BOOST_REQUIRED_LIBRARIES)
-    if(BUILD_TESTING AND BUILD_HELICS_TESTS AND BUILD_HELICS_BOOST_TESTS)
-        message(STATUS "adding unit testing")
-        list(APPEND BOOST_REQUIRED_LIBRARIES unit_test_framework)
-    endif()
 endif()
 
 # Minimum version of Boost required for building HELICS
 set(BOOST_MINIMUM_VERSION 1.58)
 
-set(Boost_USE_STATIC_LIBS ${USE_BOOST_STATIC_LIBS})
 if (BOOST_REQUIRED_LIBRARIES)
 message(STATUS "Finding with components\n")
 find_package(

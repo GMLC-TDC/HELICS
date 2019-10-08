@@ -6,7 +6,7 @@ shopt -s nocasematch
 
 # Setup the flags for configuring HELICS with CMake
 OPTION_FLAGS_ARR=()
-OPTION_FLAGS_ARR+=("-DBUILD_C_SHARED_LIB=ON" "-DBUILD_SHARED_LIBS=ON" "-DEXAMPLES_WARNINGS_AS_ERROR=ON")
+OPTION_FLAGS_ARR+=("-DHELICS_BUILD_TESTS=ON -DHELICS_BUILD_EXAMPLES=ON -DHELICS_BUILD_CXX_SHARED_LIB=ON" "-DEXAMPLES_WARNINGS_AS_ERROR=ON")
 
 # Enable adding the slower packaging tests; will not run for CI builds unless they run ctest with the Packaging label
 OPTION_FLAGS_ARR+=("-DENABLE_SLOW_PACKAGING_TESTS=ON")
@@ -47,7 +47,7 @@ fi
 
 # CPack/Install options
 if [[ "$ENABLE_CPACK" ]]; then
-    OPTION_FLAGS_ARR+=("-DENABLE_PACKAGE_BUILD=ON")
+    OPTION_FLAGS_ARR+=("-DHELICS_ENABLE_PACKAGE_BUILD=ON")
 fi
 if [[ "$INSTALL_SYSTEM_LIBRARIES" ]]; then
     OPTION_FLAGS_ARR+=("-DINSTALL_SYSTEM_LIBRARIES=ON")

@@ -5,7 +5,7 @@
 # SPDX-License-Identifier: BSD-3-Clause
 #
 
-if(BUILD_APP_LIBRARY)
+if(HELICS_BUILD_APP_LIBRARY)
 
   set(
     helics_apps_public_headers
@@ -61,7 +61,7 @@ if(BUILD_APP_LIBRARY)
   # add and alias library to match the find_package
   add_library(HELICS::helics_apps ALIAS helics_apps)
 
-  if (BUILD_APP_EXECUTABLES)
+  if (HELICS_BUILD_APP_EXECUTABLES)
     add_executable(helics_player playerMain.cpp)
     target_link_libraries(helics_player PUBLIC helics_apps)
 	target_link_libraries(helics_player PRIVATE compile_flags_target)
@@ -125,9 +125,9 @@ if(BUILD_APP_LIBRARY)
 	add_test(NAME app_subcommand_version_return COMMAND helics_app player --version)
 	add_test(NAME app_subcommand_help_return COMMAND helics_app player --help)
 	set_property(TEST app_subcommand_version_return app_subcommand_help_return PROPERTY LABELS Continuous)
-  endif(BUILD_APP_EXECUTABLES)
+  endif(HELICS_BUILD_APP_EXECUTABLES)
 
-  if (NOT DISABLE_STATIC_LIB_INSTALL)
+  if (NOT HELICS_DISABLE_STATIC_LIB_INSTALL)
   install(
     TARGETS helics_apps
     ${HELICS_EXPORT_COMMAND}
@@ -148,12 +148,12 @@ if(BUILD_APP_LIBRARY)
     COMPONENT headers
   )
   endif(HELICS_INSTALL_CPP14_HEADERS)
-endif (BUILD_APP_LIBRARY)
+endif (HELICS_BUILD_APP_LIBRARY)
 
 # configure executable app
 
 if (NOT CYGWIN)
-if (BUILD_APP_EXECUTABLES)
+if (HELICS_BUILD_APP_EXECUTABLES)
 configure_file(helicsConfigMain.h.in ${CMAKE_CURRENT_BINARY_DIR}/helicsConfigMain.h)
 add_executable(
   helics-config helicsConfigMain.cpp ${CMAKE_CURRENT_BINARY_DIR}/helicsConfigMain.h
@@ -170,6 +170,6 @@ install(
   RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR} COMPONENT libs
 )
 
-endif(BUILD_APP_EXECUTABLES)
+endif(HELICS_BUILD_APP_EXECUTABLES)
 
 endif(NOT CYGWIN)

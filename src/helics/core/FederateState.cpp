@@ -29,7 +29,7 @@ static const std::string emptyStr;
 #define LOG_ERROR(message) logMessage (helics_log_level_error, emptyStr, message)
 #define LOG_WARNING(message) logMessage (helics_log_level_warning, emptyStr, message)
 
-#ifdef ENABLE_LOGGING
+#ifdef HELICS_ENABLE_LOGGING
 
 #define LOG_SUMMARY(message)                                                                                      \
     do                                                                                                            \
@@ -49,7 +49,7 @@ static const std::string emptyStr;
         }                                                                                                         \
     } while (false)
 
-#ifdef ENABLE_DEBUG_LOGGING
+#ifdef HELICS_ENABLE_DEBUG_LOGGING
 #define LOG_TIMING(message)                                                                                       \
     do                                                                                                            \
     {                                                                                                             \
@@ -72,7 +72,7 @@ static const std::string emptyStr;
 #define LOG_DATA(message)
 #endif
 
-#ifdef ENABLE_TRACE_LOGGING
+#ifdef HELICS_ENABLE_TRACE_LOGGING
 #define LOG_TRACE(message)                                                                                        \
     do                                                                                                            \
     {                                                                                                             \
@@ -99,7 +99,7 @@ namespace helics
 FederateState::FederateState (const std::string &name_, const CoreFederateInfo &info_)
     : name (name_), global_id{global_federate_id ()}
 {
-    timeCoord = std::make_unique<TimeCoordinator> ([this](const ActionMessage &msg) { routeMessage (msg); });
+    timeCoord = std::make_unique<TimeCoordinator> ([this] (const ActionMessage &msg) { routeMessage (msg); });
     for (const auto &prop : info_.timeProps)
     {
         setProperty (prop.first, prop.second);
@@ -525,7 +525,7 @@ iteration_result FederateState::enterExecutingMode (iteration_request iterate)
             if (!mTimer)
             {
                 mTimer = std::make_shared<MessageTimer> (
-                  [this](ActionMessage &&mess) { return this->addAction (std::move (mess)); });
+                  [this] (ActionMessage &&mess) { return this->addAction (std::move (mess)); });
             }
             start_clock_time = std::chrono::steady_clock::now ();
         }
@@ -1743,15 +1743,15 @@ std::string FederateState::processQueryActual (const std::string &query) const
 {
     if (query == "publications")
     {
-        return generateStringVector (interfaceInformation.getPublications (), [](auto &pub) { return pub->key; });
+        return generateStringVector (interfaceInformation.getPublications (), [] (auto &pub) { return pub->key; });
     }
     if (query == "inputs")
     {
-        return generateStringVector (interfaceInformation.getInputs (), [](auto &inp) { return inp->key; });
+        return generateStringVector (interfaceInformation.getInputs (), [] (auto &inp) { return inp->key; });
     }
     if (query == "endpoints")
     {
-        return generateStringVector (interfaceInformation.getEndpoints (), [](auto &ept) { return ept->key; });
+        return generateStringVector (interfaceInformation.getEndpoints (), [] (auto &ept) { return ept->key; });
     }
     if (query == "interfaces")
     {
@@ -1782,7 +1782,7 @@ std::string FederateState::processQueryActual (const std::string &query) const
     if (query == "dependencies")
     {
         return generateStringVector (timeCoord->getDependencies (),
-                                     [](auto &dep) { return std::to_string (dep.baseValue ()); });
+                                     [] (auto &dep) { return std::to_string (dep.baseValue ()); });
     }
     if (query == "timeconfig")
     {
@@ -1804,7 +1804,7 @@ std::string FederateState::processQueryActual (const std::string &query) const
     if (query == "dependents")
     {
         return generateStringVector (timeCoord->getDependents (),
-                                     [](auto &dep) { return std::to_string (dep.baseValue ()); });
+                                     [] (auto &dep) { return std::to_string (dep.baseValue ()); });
     }
     if (queryCallback)
     {

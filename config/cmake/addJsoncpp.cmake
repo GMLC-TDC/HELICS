@@ -14,11 +14,10 @@ endif()
 set(JSONCPP_DISABLE_CCACHE ON CACHE INTERNAL "")
 
 if (MSVC)
-  option(JSONCPP_OBJLIB OFF "use jsoncpp objlib for linking object files instead of the normal target") 
-else(MSVC)
- # for Everything but MSVC turn this on to not conflict with system jsoncpp if any
-  option(JSONCPP_OBJLIB ON "use jsoncpp objlib for linking object files instead of the normal target") 
-endif(MSVC)
+option(JSONCPP_OBJLIB "use jsoncpp objlib for linking object files instead of the normal target" OFF) 
+else()
+option(JSONCPP_OBJLIB "use jsoncpp objlib for linking object files instead of the normal target" ON) 
+endif()
 
 mark_as_advanced(JSONCPP_OBJLIB)
 
