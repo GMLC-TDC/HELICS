@@ -151,7 +151,9 @@ class EchoLeaf
     void mainLoop ()
     {
         int cnt = 0;
-        const std::string txstring = std::to_string (100000 + index_) + (100, '1');
+        // this is  to make a fixed size string that is different for each federate but has sufficient length to
+        // get beyond SSO
+        const std::string txstring = std::to_string (100000 + index_) + std::string (100, '1');
         const int iter = 5000;
         while (cnt <= iter + 1)
         {
