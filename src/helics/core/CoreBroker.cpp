@@ -215,6 +215,19 @@ void CoreBroker::processPriorityCommand (ActionMessage &&command)
                             command.source_id.baseValue ()));
     switch (command.action ())
     {
+    case CMD_PING_PRIORITY:
+        if (command.dest_id == global_broker_id_local)
+        {
+            ActionMessage pngrep (CMD_PING_REPLY);
+            pngrep.dest_id = command.source_id;
+            pngrep.source_id = global_broker_id_local;
+            routeMessage (pngrep);
+        }
+        else
+        {
+            routeMessage (command);
+        }
+        break;
     case CMD_BROKER_SETUP:
     {
         global_broker_id_local = global_id.load ();
