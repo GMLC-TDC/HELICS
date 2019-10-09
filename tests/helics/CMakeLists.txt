@@ -5,11 +5,6 @@
 #
 
 # add a baseline library for underlying dependencies and flags for test executables
-if (BUILD_BOOST_TESTS)
-add_library(helics_boost_test_base INTERFACE)
-target_link_libraries(helics_boost_test_base INTERFACE Boostlibs::test)
-target_link_libraries(helics_boost_test_base INTERFACE helics_base_includes compile_flags_target)
-endif()
 
 include(AddGoogletest)
 
@@ -22,13 +17,13 @@ add_subdirectory(core)
 add_subdirectory(common)
 add_subdirectory(system_tests)
 
-if (BUILD_APP_LIBRARY)
+if (HELICS_BUILD_APP_LIBRARY)
    add_subdirectory(apps)
 endif()
 
 add_subdirectory(application_api)
 
-if(NOT DISABLE_C_SHARED_LIB)
+if(NOT HELICS_DISABLE_C_SHARED_LIB)
     add_subdirectory(shared_library)
 endif()
 
@@ -40,9 +35,9 @@ add_test(find-package-tests ${CMAKE_CTEST_COMMAND} -C ${CMAKE_BUILD_TYPE}
                             --build-generator-platform "${CMAKE_GENERATOR_PLATFORM}"
                             --build-options
                             "-DHELICS_DIR=${PROJECT_BINARY_DIR}"
-                            "-DBUILD_SHARED_LIBS=${BUILD_SHARED_LIBS}"
-                            "-DDISABLE_C_SHARED_LIB=${DISABLE_C_SHARED_LIB}"
-                            "-DBUILD_APPS=${BUILD_APPS}"
+                            "-DBUILD_SHARED_LIBS=${HELICS_BUILD_CXX_SHARED_LIB}"
+                            "-DHELICS_DISABLE_C_SHARED_LIB=${HELICS_DISABLE_C_SHARED_LIB}"
+                            "-DBUILD_APPS=${HELICS_BUILD_APP_LIBRARY}"
                             "-DZeroMQ_INSTALL_PATH=${ZeroMQ_INSTALL_PATH}"
                             "-DBOOST_INSTALL_PATH=${BOOST_INSTALL_PATH}"
                             "-DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}"
@@ -63,11 +58,11 @@ if (ENABLE_SLOW_PACKAGING_TESTS)
                                 --build-generator "${CMAKE_GENERATOR}"
                                 --build-generator-platform "${CMAKE_GENERATOR_PLATFORM}"
                                 --build-options
-                                "-DBUILD_SHARED_LIBS=${BUILD_SHARED_LIBS}"
-                                "-DDISABLE_C_SHARED_LIB=${DISABLE_C_SHARED_LIB}"
-                                "-DBUILD_APPS=${BUILD_APPS}"
-                                "-DBUILD_HELICS_TESTS=OFF"
-                                "-DBUILD_HELICS_EXAMPLES=OFF"
+                                 "-DBUILD_SHARED_LIBS=${HELICS_BUILD_CXX_SHARED_LIB}"
+                                 "-DHELICS_DISABLE_C_SHARED_LIB=${HELICS_DISABLE_C_SHARED_LIB}"
+                                 "-DBUILD_APPS=${HELICS_BUILD_APP_LIBRARY}"
+                                "-DHELICS_BUILD_TESTS=OFF"
+                                "-DHELICS_BUILD_EXAMPLES=OFF"
                                 "-DZeroMQ_INSTALL_PATH=${ZeroMQ_INSTALL_PATH}"
                                 "-DBOOST_INSTALL_PATH=${BOOST_INSTALL_PATH}"
                                 "-DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}"

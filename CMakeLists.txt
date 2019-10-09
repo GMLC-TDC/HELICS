@@ -26,13 +26,8 @@ if(HELICS_VERSION_BUILD)
         "${HELICS_VERSION_UNDERSCORE}-${HELICS_VERSION_BUILD}"
     )
 endif()
-find_package(Git)
-if (GIT_FOUND)
-	execute_process(COMMAND ${GIT_EXECUTABLE} describe --tags --dirty OUTPUT_VARIABLE TAG_DESCRIPTION)
-	message(STATUS ${TAG_DESCRIPTION})
-endif(GIT_FOUND)
 set(HELICS_VERSION_STRING "${HELICS_VERSION} (${HELICS_DATE})")
-
+	
 # -----------------------------------------------------------------------------
 # set the module path and include some common macros
 # -----------------------------------------------------------------------------
@@ -50,6 +45,10 @@ else()
 get_property(helics-use-folders GLOBAL PROPERTY USE_FOLDERS)
   set_property(GLOBAL PROPERTY USE_FOLDERS ${helics-use-folders})
 endif()
+
+#generate a version description based on git tags
+include(version_describe)
+git_version_describe(HELICS_SOURCE_DIR HELICS_VERSION_DESCRIPTION)
 
 include(extraMacros)
 include(CMakeDependentOption)

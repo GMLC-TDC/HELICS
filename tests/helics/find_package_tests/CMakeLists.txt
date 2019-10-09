@@ -21,7 +21,7 @@ if(BUILD_SHARED_LIBS)
 endif()
 
 # Test the C and C++98 targets
-if(BUILD_C_SHARED_LIB)
+if(NOT HELICS_DISABLE_C_SHARED_LIB)
     add_executable(c-shared-library-test main.c)
     target_link_libraries(c-shared-library-test HELICS::helicsSharedLib)
 
