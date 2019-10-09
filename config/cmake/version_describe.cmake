@@ -6,18 +6,19 @@
 
 find_package(Git)
 
+# this function is to get a nicely formatted build string for later reference in a human readable format that has some utility for automation.  
+# the resulting format would be empty if the build matches a tag exactly, and otherwise <branch_name>-<git hash>[-dirty]  if dirty is present there are uncommitted changes in the repo
+# called like git_version_describe(${PROJECT_SOURCE_DIR} result)  then result will contain the description string
+
 function(git_version_describe source_path result)
   message(STATUS "Source ${source_path}")
   if (GIT_FOUND)
 	execute_process(COMMAND ${GIT_EXECUTABLE} -C ${source_path} --work-tree ${source_path} describe --tags OUTPUT_VARIABLE TAG_DESCRIPTION OUTPUT_STRIP_TRAILING_WHITESPACE)
-	message(STATUS "output=${TAG_DESCRIPTION}" )
 	string(LENGTH ${TAG_DESCRIPTION} tag_length)
 	if (tag_length GREATER 16)
 	    string(FIND ${TAG_DESCRIPTION} "-" last_dash_loc REVERSE)
 		string(SUBSTRING ${TAG_DESCRIPTION} ${last_dash_loc} -1 hash_string)
-		message (STATUS "hash string=${hash_string}")
 		execute_process(COMMAND ${GIT_EXECUTABLE} -C ${source_path} --work-tree ${source_path} describe --all --tags --dirty OUTPUT_VARIABLE TAG_DESCRIPTION2 OUTPUT_STRIP_TRAILING_WHITESPACE)
-		message(STATUS "${TAG_DESCRIPTION2}" )
 		string(FIND ${TAG_DESCRIPTION2} "-dirty" dirty_loc)
 		if (dirty_loc GREATER 0)
 			string(SUBSTRING ${TAG_DESCRIPTION2} 0 ${dirty_loc} tag_desc)
@@ -40,6 +41,5 @@ function(git_version_describe source_path result)
   else(GIT_FOUND)
 	set(${result} "" PARENT_SCOPE)
   endif(GIT_FOUND)
-  message(STATUS "final version tag is ${tag_desc}")
 endfunction()
 
