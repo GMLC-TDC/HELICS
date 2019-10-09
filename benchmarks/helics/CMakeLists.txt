@@ -4,6 +4,7 @@ set(HELICS_BENCHMARKS
 	echoBenchmarks
 	ringBenchmarks
 	messageLookupBenchmarks
+	conversionBenchmarks
     )
 
 # Only affects current directory, so safe
