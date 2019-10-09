@@ -48,7 +48,7 @@ endif()
 
 #generate a version description based on git tags
 include(version_describe)
-git_version_describe(HELICS_SOURCE_DIR HELICS_VERSION_DESCRIPTION)
+git_version_describe(${HELICS_SOURCE_DIR} HELICS_VERSION_DESCRIPTION)
 
 include(extraMacros)
 include(CMakeDependentOption)

@@ -7,16 +7,17 @@
 find_package(Git)
 
 function(git_version_describe source_path result)
+  message(STATUS "Source ${source_path}")
   if (GIT_FOUND)
-	execute_process(COMMAND ${GIT_EXECUTABLE} --work-tree ${source_path} describe --tags OUTPUT_VARIABLE TAG_DESCRIPTION)
-	
+	execute_process(COMMAND ${GIT_EXECUTABLE} -C ${source_path} --work-tree ${source_path} describe --tags OUTPUT_VARIABLE TAG_DESCRIPTION)
+	message(STATUS "output=${TAG_DESCRIPTION}" )
 	string(LENGTH ${TAG_DESCRIPTION} TAG_LENGTH)
 	if (TAG_LENGTH GREATER 12)
-		execute_process(COMMAND ${GIT_EXECUTABLE} --work-tree ${source_path} describe --all --tags --dirty OUTPUT_VARIABLE TAG_DESCRIPTION2)
+		execute_process(COMMAND ${GIT_EXECUTABLE} -C ${source_path} --work-tree ${source_path} describe --all --tags --dirty OUTPUT_VARIABLE TAG_DESCRIPTION2)
+		message(STATUS "${TAG_DESCRIPTION2}" )
 	endif()
 
-	message(STATUS "${TAG_DESCRIPTION}" )
-    message(STATUS "${TAG_DESCRIPTION2}" )
+
 	set(${result} ${TAG_DESCRIPTION} PARENT_SCOPE)
   else()
 	set(${result} "" PARENT_SCOPE)
