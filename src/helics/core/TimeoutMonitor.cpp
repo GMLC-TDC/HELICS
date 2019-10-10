@@ -31,7 +31,7 @@ void TimeoutMonitor::tick (CommonCore *core)
         }
         else
         {  // ping again
-            ActionMessage png (CMD_PING);
+            ActionMessage png (CMD_PING_PRIORITY);
             png.source_id = core->global_broker_id_local;
             png.dest_id = core->higher_broker_id;
             core->transmit (parent_route_id, png);
@@ -44,7 +44,7 @@ void TimeoutMonitor::tick (CommonCore *core)
         //{
         if (core->higher_broker_id.isValid ())
         {
-            ActionMessage png (CMD_PING);
+            ActionMessage png (CMD_PING_PRIORITY);
             png.source_id = core->global_broker_id_local;
             png.dest_id = core->higher_broker_id;
             core->transmit (parent_route_id, png);
@@ -121,7 +121,7 @@ void TimeoutMonitor::tick (CoreBroker *brk)
         }
         else
         {  // ping again
-            ActionMessage png (CMD_PING);
+            ActionMessage png (CMD_PING_PRIORITY);
             png.source_id = brk->global_broker_id_local;
             png.dest_id = brk->higher_broker_id;
             brk->transmit (parent_route_id, png);
@@ -160,7 +160,7 @@ void TimeoutMonitor::tick (CoreBroker *brk)
                 //{
                 if (brk->higher_broker_id.isValid ())
                 {
-                    ActionMessage png (CMD_PING);
+                    ActionMessage png (CMD_PING_PRIORITY);
                     png.source_id = brk->global_broker_id_local;
                     png.dest_id = brk->higher_broker_id;
                     brk->transmit (parent_route_id, png);
