@@ -8,12 +8,12 @@
 #
 
 
-cmake_dependent_option(BUILD_PYTHON_INTERFACE "Build Python extension" OFF "NOT HELICS_DISABLE_C_SHARED_LIB" OFF)
+cmake_dependent_option(BUILD_PYTHON_INTERFACE "Build Python extension" OFF "NOT BUILD_PYTHON2_INTERFACE AND NOT HELICS_DISABLE_C_SHARED_LIB" OFF)
 
 cmake_dependent_option(
     BUILD_PYTHON2_INTERFACE
     "Build Python2.7 extension(Requires swig and will not build if \"PYTHON_INTERFACE\" is active)"
-    OFF "NOT HELICS_DISABLE_C_SHARED_LIB" OFF
+    OFF "NOT BUILD_PYTHON_INTERFACE AND NOT HELICS_DISABLE_C_SHARED_LIB" OFF
 )
 cmake_dependent_option(BUILD_MATLAB_INTERFACE "Build Matlab Extension" OFF "NOT HELICS_DISABLE_C_SHARED_LIB" OFF)
 cmake_dependent_option(BUILD_OCTAVE_INTERFACE "Build Octave extension" OFF "NOT HELICS_DISABLE_C_SHARED_LIB" OFF)
@@ -37,7 +37,7 @@ else()
 set(SWIG_REQUIRED OFF)
 endif()
 
-cmake_dependent_option(ENABLE_SWIG "use swig to generate the interface files" OFF "NOT SWIG_REQUIRED AND (BUILD_PYTHON_INTERFACE OR BUILD_MATLAB_INTERFACE OR BUILD_JAVA_INTERFACE)" ON)
+cmake_dependent_option(ENABLE_SWIG "use swig to generate the interface files" OFF "BUILD_PYTHON_INTERFACE OR BUILD_MATLAB_INTERFACE OR BUILD_JAVA_INTERFACE" ON)
 
 
 if(ENABLE_SWIG OR SWIG_REQUIRED)
