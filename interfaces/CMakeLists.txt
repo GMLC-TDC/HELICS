@@ -37,7 +37,7 @@ else()
 set(SWIG_REQUIRED OFF)
 endif()
 
-cmake_dependent_option(ENABLE_SWIG "use swig to generate the interface files" OFF "BUILD_PYTHON_INTERFACE OR BUILD_MATLAB_INTERFACE OR BUILD_JAVA_INTERFACE" ON)
+cmake_dependent_option(ENABLE_SWIG "use swig to generate the interface files" OFF "BUILD_PYTHON_INTERFACE OR BUILD_MATLAB_INTERFACE OR BUILD_JAVA_INTERFACE" OFF)
 
 
 if(ENABLE_SWIG OR SWIG_REQUIRED)
