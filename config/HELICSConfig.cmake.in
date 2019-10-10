@@ -92,11 +92,11 @@ check_required_components(${PN})
 
 get_target_property(${PN}_INCLUDE_DIRS HELICS::helics_base_includes INTERFACE_INCLUDE_DIRECTORIES)
 
-if (@BUILD_C_SHARED_LIB@)
+if (NOT @HELICS_DISABLE_C_SHARED_LIB@)
     get_target_property(${PN}_C_SHARED_LIBRARY HELICS::helicsSharedLib LOCATION)
 endif()
 
-if (@BUILD_SHARED_LIBS@)
+if (@HELICS_BUILD_CXX_SHARED_LIB@)
     get_target_property(${PN}_CXX_SHARED_LIBRARY HELICS::helics-shared LOCATION)
 endif()
 
@@ -105,7 +105,7 @@ message(STATUS "INCLUDE DIRS HELICS: ${HELICS_INCLUDE_DIRS}")
 message(STATUS "C_SHARED_LIBRARY: ${HELICS_C_SHARED_LIBRARY}")
 
 #load some variables with the locations the different executables
-if (@BUILD_APP_EXECUTABLES@)
+if (@HELICS_BUILD_APP_EXECUTABLES@)
 
 get_target_property(HELICS_APPLIB_LOCATION HELICS::helics_apps LOCATION)
 get_filename_component(APP_CHECK_LOC "${HELICS_APPLIB_LOCATION}" PATH)
