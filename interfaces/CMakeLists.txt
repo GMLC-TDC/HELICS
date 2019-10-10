@@ -8,20 +8,20 @@
 #
 
 
-cmake_dependent_option(BUILD_PYTHON_INTERFACE "Build Python extension" OFF "NOT DISABLE_C_SHARED_INTERFACE" OFF)
+cmake_dependent_option(BUILD_PYTHON_INTERFACE "Build Python extension" OFF "NOT HELICS_DISABLE_C_SHARED_LIB" OFF)
 
 cmake_dependent_option(
     BUILD_PYTHON2_INTERFACE
     "Build Python2.7 extension(Requires swig and will not build if \"PYTHON_INTERFACE\" is active)"
-    OFF "NOT DISABLE_C_SHARED_INTERFACE" OFF
+    OFF "NOT HELICS_DISABLE_C_SHARED_LIB" OFF
 )
-cmake_dependent_option(BUILD_MATLAB_INTERFACE "Build Matlab Extension" OFF "NOT DISABLE_C_SHARED_INTERFACE" OFF)
-cmake_dependent_option(BUILD_OCTAVE_INTERFACE "Build Octave extension" OFF "NOT DISABLE_C_SHARED_INTERFACE" OFF)
-cmake_dependent_option(BUILD_JAVA_INTERFACE "Build Java extension" OFF "NOT DISABLE_C_SHARED_INTERFACE" OFF)
+cmake_dependent_option(BUILD_MATLAB_INTERFACE "Build Matlab Extension" OFF "NOT HELICS_DISABLE_C_SHARED_LIB" OFF)
+cmake_dependent_option(BUILD_OCTAVE_INTERFACE "Build Octave extension" OFF "NOT HELICS_DISABLE_C_SHARED_LIB" OFF)
+cmake_dependent_option(BUILD_JAVA_INTERFACE "Build Java extension" OFF "NOT HELICS_DISABLE_C_SHARED_LIB" OFF)
 
 if(${CMAKE_VERSION} VERSION_GREATER 3.8)
     # cmake projects are only available for csharp from 3.8 onward
-    cmake_dependent_option(BUILD_CSHARP_INTERFACE "Build C# extension" OFF "NOT DISABLE_C_SHARED_INTERFACE" OFF)
+    cmake_dependent_option(BUILD_CSHARP_INTERFACE "Build C# extension" OFF "NOT HELICS_DISABLE_C_SHARED_LIB" OFF)
 endif()
 
 #these are purposely hidden options since they will only be used for very select purposes

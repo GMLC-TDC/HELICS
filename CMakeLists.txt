@@ -240,7 +240,7 @@ else()
     ucm_set_runtime(DYNAMIC)
 endif()
 
-mark_as_advanced(EMBEDDED_DEBUG_INFO)
+mark_as_advanced(HELICS_EMBEDDED_DEBUG_INFO)
 if(HELICS_EMBEDDED_DEBUG_INFO)
     ucm_set_embedded_debug(EMBEDDED)
 else()
