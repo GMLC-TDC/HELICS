@@ -285,7 +285,7 @@ if(HELICS_BUILD_TESTS AND HELICS_TEST_CODE_COVERAGE)
         )
     endif()
 endif()
-mark_as_advanced(TEST_CODE_COVERAGE)
+mark_as_advanced(HELICS_TEST_CODE_COVERAGE)
 
 # -------------------------------------------------------------
 # Get some configuration for C++17 as that becomes available

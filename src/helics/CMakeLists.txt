@@ -24,21 +24,14 @@ add_library(
   $<$<BOOL:${HELICS_UNITS_OBJLIB}>:$<TARGET_OBJECTS:units-object>>
 )
 
-target_link_libraries(helics-static PUBLIC helics_base helics_base_includes)
+target_link_libraries(helics-static PUBLIC helics_base helics_base_includes
+	$<$<NOT:$<BOOL:${JSONCPP_OBJLIB}>>:jsoncpp_lib>
+	$<$<NOT:$<BOOL:${GMLC_UTILITIES_OBJECT_LIB}>>:HELICS::utilities>
+	$<$<NOT:$<BOOL:${HELICS_UNITS_OBJLIB}>>:units::units>
+	)
 # add and alias library to match the find_package
 add_library(HELICS::helics-static ALIAS helics-static)
 
-if (NOT JSONCPP_OBJLIB)
-  target_link_libraries(helics-static PUBLIC jsoncpp_lib)
-endif()
-
-if (NOT GMLC_UTILITIES_OBJECT_LIB)
-  target_link_libraries(helics-static PUBLIC HELICS::utilities)
-endif()
-
-if (NOT HELICS_UNITS_OBJLIB)
-  target_link_libraries(helics-static PUBLIC units::units)
-endif()
 
 if(HELICS_BUILD_CXX_SHARED_LIB)
   add_library(
@@ -54,7 +47,11 @@ if(HELICS_BUILD_CXX_SHARED_LIB)
   )
 
   add_library(HELICS::helics-shared ALIAS helics-shared)
-  target_link_libraries(helics-shared PRIVATE helics_base helics_base_includes)
+  target_link_libraries(helics-shared PRIVATE helics_base helics_base_includes
+  	$<$<NOT:$<BOOL:${JSONCPP_OBJLIB}>>:jsoncpp_lib>
+	$<$<NOT:$<BOOL:${GMLC_UTILITIES_OBJECT_LIB}>>:HELICS::utilities>
+	$<$<NOT:$<BOOL:${HELICS_UNITS_OBJLIB}>>:units::units>
+	)
   target_include_directories(helics-shared
     INTERFACE
       $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/src>
@@ -67,17 +64,6 @@ if(HELICS_BUILD_CXX_SHARED_LIB)
     SOVERSION ${HELICS_VERSION_MAJOR}
   )
 
-  if (NOT JSONCPP_OBJLIB)
-    target_link_libraries(helics-shared PRIVATE jsoncpp_lib)
-  endif()
-
-  if (NOT GMLC_UTILITIES_OBJECT_LIB)
-	target_link_libraries(helics-shared PUBLIC HELICS::utilities)
-  endif()
-
-if (NOT HELICS_UNITS_OBJLIB)
-  target_link_libraries(helics-shared PUBLIC units::units)
-endif()
   if(WIN32)
     set_target_properties(helics-shared PROPERTIES WINDOWS_EXPORT_ALL_SYMBOLS TRUE)
 
