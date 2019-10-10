@@ -4,6 +4,9 @@
 # SPDX-License-Identifier: BSD-3-Clause
 #
 
+get_directory_property(hasParent PARENT_DIRECTORY)
+if(hasParent)
+
 add_subdirectory(helics)
 
 if(NOT SWIG_GENERATE_INTERFACE_FILES_ONLY)
@@ -28,4 +31,18 @@ if(BUILD_CSHARP_INTERFACE)
 endif()
 
 endif(NOT SWIG_GENERATE_INTERFACE_FILES_ONLY)
+
+else()
+	cmake_minimum_required(VERSION 3.4)
+	set(HELICS_BUILD_TESTS ON CACHE BOOL "")
+	set(BUILD_PYTHON_INTERFACE OFF CACHE BOOL "")
+	set(BUILD_PYTHON2_INTERFACE OFF CACHE BOOL "")
+	set(BUILD_MATLAB_INTERFACE OFF CACHE BOOL "")
+	set(BUILD_JAVA_INTERFACE OFF CACHE BOOL "")
+	set(BUILD_CSHARP_INTERFACE OFF CACHE BOOL "")
+	set(HELICS_BUILD_EXAMPLES OFF CACHE BOOL "")
+	set(HELICS_BUILD_BENCHMARKS OFF CACHE BOOL "")
+	#now call into the root directory
+	add_subdirectory(.. ${CMAKE_CURRENT_BINARY_DIR}/root/)
+endif()
 
