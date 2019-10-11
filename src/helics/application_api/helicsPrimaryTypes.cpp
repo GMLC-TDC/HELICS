@@ -524,6 +524,52 @@ void valueExtract (const defV &dv, char &val)
     }
 }
 
+void valueExtract (const defV &dv, bool &val)
+{
+    switch (dv.index ())
+    {
+    case double_loc:  // double
+        val = std::abs (mpark::get<double> (dv)) > 0.0;
+        break;
+    case int_loc:  // int64_t
+    default:
+        val = (mpark::get<int64_t> (dv) != 0);
+        break;
+    case string_loc:  // string
+    {
+        auto &str = mpark::get<std::string> (dv);
+        val = !(str.empty () || str == "0" || str == "F" || str == "f" || str == "false");
+        break;
+    }
+    case complex_loc:  // complex
+        val = std::abs (mpark::get<std::complex<double>> (dv)) > 0.0;
+        break;
+    case vector_loc:  // vector
+    {
+        auto &vec = mpark::get<std::vector<double>> (dv);
+        val = !vec.empty () && std::abs (vec[0]) > 0.0;
+        break;
+    }
+    case complex_vector_loc:
+    {
+        auto &vec = mpark::get<std::vector<std::complex<double>>> (dv);
+        val = !vec.empty () && std::abs (vec[0]) > 0.0;
+        break;
+    }
+    case named_point_loc:
+    {
+        auto &np = mpark::get<NamedPoint> (dv);
+        auto &str = np.name;
+        val = !(str.empty () || str == "0" || str == "F" || str == "f" || str == "false");
+        if (val)
+        {
+            val = str == "value" && std::abs (np.value) > 0.0;
+        }
+    }
+    break;
+    }
+}
+
 void valueExtract (const data_view &dv, data_type baseType, std::string &val)
 {
     switch (baseType)
