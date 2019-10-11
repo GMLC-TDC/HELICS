@@ -71,7 +71,7 @@ if(HELICS_ENABLE_EXTRA_COMPILER_WARNINGS)
     # target_compile_options(compile_flags_target INTERFACE
     # $<$<COMPILE_LANGUAGE:CXX>:-Wpadded>) add some gnu specific options if the compiler
     # is newer
-    if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
+    if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
         # this option produces a number of warnings in third party libraries but useful
         # for checking for any internal usages
         if(CMAKE_CXX_COMPILER_VERSION VERSION_GREATER 6.0)
@@ -94,7 +94,7 @@ if(HELICS_ENABLE_EXTRA_COMPILER_WARNINGS)
             )
         endif()
     endif()
-    if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+    if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
         if(CMAKE_CXX_COMPILER_VERSION VERSION_GREATER 6.0)
             target_compile_options(
                 compile_flags_target

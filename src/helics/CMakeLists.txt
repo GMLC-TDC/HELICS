@@ -50,7 +50,7 @@ if(HELICS_BUILD_CXX_SHARED_LIB)
   target_link_libraries(helics-shared PRIVATE helics_base helics_base_includes
   	$<$<NOT:$<BOOL:${JSONCPP_OBJLIB}>>:jsoncpp_lib>
 	$<$<NOT:$<BOOL:${GMLC_UTILITIES_OBJECT_LIB}>>:HELICS::utilities>
-	$<$<NOT:$<BOOL:${HELICS_UNITS_OBJLIB}>>:HELICS::units-static>
+	$<$<NOT:$<BOOL:${HELICS_UNITS_OBJLIB}>>:units-static>
 	)
   target_include_directories(helics-shared
     INTERFACE
