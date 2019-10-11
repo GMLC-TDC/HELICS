@@ -541,7 +541,7 @@ TcpServer::TcpServer (asio::io_context &io_context,
     if ((address == "*") || (address == "tcp://*"))
     {
         endpoints.emplace_back (asio::ip::address_v4::any (), portNum);
-  //      endpoints.emplace_back (asio::ip::address_v6::any (), portNum);
+        //      endpoints.emplace_back (asio::ip::address_v6::any (), portNum);
     }
     else if (address == "localhost")
     {
@@ -605,12 +605,15 @@ TcpServer::TcpServer (asio::io_context &io_context, int portNum, int nominalBuff
     initialConnect ();
 }
 
-TcpServer::~TcpServer () try
+TcpServer::~TcpServer ()
 {
-    close ();
-}
-catch (...)
-{
+    try
+    {
+        close ();
+    }
+    catch (...)
+    {
+    }
 }
 
 void TcpServer::initialConnect ()

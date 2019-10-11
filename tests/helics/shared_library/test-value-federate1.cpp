@@ -393,7 +393,7 @@ void runFederateTestInteger (const char *core, int64_t defaultValue, int64_t tes
     // register the publications
     auto pubid = helicsFederateRegisterGlobalPublication (vFed, "pub1", helics_data_type_int, "", &err);
     auto subid = helicsFederateRegisterSubscription (vFed, "pub1", "", &err);
-    CE (helicsInputSetDefaultDouble (subid, defaultValue, &err));
+    CE (helicsInputSetDefaultInteger (subid, defaultValue, &err));
     CE (helicsFederateEnterExecutingMode (vFed, &err));
 
     // publish string1 at time=0.0;

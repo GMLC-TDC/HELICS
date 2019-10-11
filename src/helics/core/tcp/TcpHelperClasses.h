@@ -194,13 +194,16 @@ class TcpAcceptor : public std::enable_shared_from_this<TcpAcceptor>
         return pointer (new TcpAcceptor (io_context, port));
     }
     /** destructor to make sure everything is closed without threading issues*/
-    ~TcpAcceptor () try
+    ~TcpAcceptor ()
     {
-        close ();
+        try
+        {
+            close ();
+        }
+        catch (...)
+        {
+        };
     }
-    catch (...)
-    {
-    };
 
     /** connect the acceptor to the socket*/
     bool connect ();
