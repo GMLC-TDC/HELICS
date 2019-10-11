@@ -560,10 +560,13 @@ void valueExtract (const defV &dv, bool &val)
     {
         auto &np = mpark::get<NamedPoint> (dv);
         auto &str = np.name;
-        val = !(str.empty () || str == "0" || str == "F" || str == "f" || str == "false");
+        val = !(str == "0" || str == "F" || str == "f" || str == "false");
         if (val)
         {
-            val = str == "value" && std::abs (np.value) > 0.0;
+            if ((str == "value" || str.empty ()) && np.value == 0.0)
+            {
+                val = false;
+            }
         }
     }
     break;
