@@ -220,6 +220,8 @@ if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
 
 endif()
 
+add_library(HELICS::compile_flags_target ALIAS compile_flags_target)
+
 cmake_dependent_option(
     STATIC_STANDARD_LIB
     "Link against a static standard lib"

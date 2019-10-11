@@ -51,7 +51,7 @@ if(HELICS_BUILD_APP_LIBRARY)
   )
 
   target_link_libraries(helics_apps PUBLIC helics-static)
-  target_link_libraries(helics_apps PRIVATE compile_flags_target)
+  target_link_libraries(helics_apps PRIVATE HELICS::compile_flags_target)
   target_include_directories(
     helics_apps SYSTEM
     PRIVATE $<TARGET_PROPERTY:fmt::fmt-header-only,INTERFACE_INCLUDE_DIRECTORIES>
