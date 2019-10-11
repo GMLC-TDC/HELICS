@@ -6,6 +6,7 @@ SPDX-License-Identifier: BSD-3-Clause
 */
 #pragma once
 
+#include "Core.hpp"
 #include "core-types.hpp"
 #include <chrono>
 #include <memory>
@@ -14,7 +15,6 @@ SPDX-License-Identifier: BSD-3-Clause
 
 namespace helics
 {
-class Core;
 /**
  * Factory for building Core API instances.
  */

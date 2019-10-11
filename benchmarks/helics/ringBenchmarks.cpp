@@ -146,28 +146,25 @@ static void BM_ring2_singleCore (benchmark::State &state)
 // Register the function as a benchmark
 BENCHMARK (BM_ring2_singleCore)->Unit (benchmark::TimeUnit::kMillisecond)->UseRealTime ()->Iterations (3);
 
-static void BM_ring2_multiCore (benchmark::State &state, core_type cType)
+static void BM_ring_multiCore (benchmark::State &state, core_type cType)
 {
     for (auto _ : state)
     {
         state.PauseTiming ();
-        int feds = 2;
+        int feds = static_cast<int> (state.range (0));
         gmlc::concurrency::Barrier brr (feds);
-        auto broker = helics::BrokerFactory::create (cType, std::string ("--federates=2"));
+        auto broker = helics::BrokerFactory::create (cType, std::string ("--federates=") + std::to_string (feds));
         broker->setLoggingLevel (0);
 
-        auto wcore =
-          helics::CoreFactory::create (cType, std::string (" --federates=1 --broker=" + broker->getIdentifier ()));
-        wcore->connect ();
-
         std::vector<RingTransmit> links (feds);
-        auto ocore =
-          helics::CoreFactory::create (cType, std::string (" --federates=1 --broker=" + broker->getIdentifier ()));
-
-        links[0].initialize (wcore->getIdentifier (), 0, feds);
-        ocore->connect ();
-        links[1].initialize (ocore->getIdentifier (), 1, feds);
-
+        std::vector<std::shared_ptr<Core>> cores (feds);
+        for (int ii = 0; ii < feds; ++ii)
+        {
+            cores[ii] = helics::CoreFactory::create (cType, std::string (" --federates=1 --broker=" +
+                                                                         broker->getIdentifier ()));
+            cores[ii]->connect ();
+            links[ii].initialize (cores[ii]->getIdentifier (), ii, feds);
+        }
         std::vector<std::thread> threadlist (feds - 1);
         for (int ii = 0; ii < feds - 1; ++ii)
         {
@@ -191,52 +188,92 @@ static void BM_ring2_multiCore (benchmark::State &state, core_type cType)
                       << std::endl;
         }
         broker->disconnect ();
-        ocore.reset ();
         broker.reset ();
-        wcore.reset ();
+        cores.clear ();
         cleanupHelicsLibrary ();
         state.ResumeTiming ();
     }
 }
 
 // Register the test core benchmarks
-BENCHMARK_CAPTURE (BM_ring2_multiCore, testCore, core_type::TEST)
+BENCHMARK_CAPTURE (BM_ring_multiCore, testCore, core_type::TEST)
   ->Unit (benchmark::TimeUnit::kMillisecond)
+  ->Arg (2)
+  ->Arg (3)
+  ->Arg (4)
+  ->Arg (6)
+  ->Arg (10)
+  ->Arg (20)
   ->Iterations (3)
   ->UseRealTime ();
 
 // Register the ZMQ benchmarks
-BENCHMARK_CAPTURE (BM_ring2_multiCore, zmqCore, core_type::ZMQ)
+BENCHMARK_CAPTURE (BM_ring_multiCore, zmqCore, core_type::ZMQ)
   ->Unit (benchmark::TimeUnit::kMillisecond)
   ->Iterations (3)
+  ->Arg (2)
+  ->Arg (3)
+  ->Arg (4)
+  ->Arg (6)
+  ->Arg (10)
+  ->Arg (20)
   ->UseRealTime ();
 
 // Register the ZMQ benchmarks
-BENCHMARK_CAPTURE (BM_ring2_multiCore, zmqssCore, core_type::ZMQ_SS)
+BENCHMARK_CAPTURE (BM_ring_multiCore, zmqssCore, core_type::ZMQ_SS)
   ->Unit (benchmark::TimeUnit::kMillisecond)
   ->Iterations (3)
+  ->Arg (2)
+  ->Arg (3)
+  ->Arg (4)
+  ->Arg (6)
+  ->Arg (10)
+  ->Arg (20)
   ->UseRealTime ();
 
 // Register the IPC benchmarks
-BENCHMARK_CAPTURE (BM_ring2_multiCore, ipcCore, core_type::IPC)
+BENCHMARK_CAPTURE (BM_ring_multiCore, ipcCore, core_type::IPC)
   ->Unit (benchmark::TimeUnit::kMillisecond)
   ->Iterations (3)
+  ->Arg (2)
+  ->Arg (3)
+  ->Arg (4)
+  ->Arg (10)
+  ->Arg (20)
   ->UseRealTime ();
 
 // Register the TCP benchmarks
-BENCHMARK_CAPTURE (BM_ring2_multiCore, tcpCore, core_type::TCP)
+BENCHMARK_CAPTURE (BM_ring_multiCore, tcpCore, core_type::TCP)
   ->Unit (benchmark::TimeUnit::kMillisecond)
   ->Iterations (3)
+  ->Arg (2)
+  ->Arg (3)
+  ->Arg (4)
+  ->Arg (6)
+  ->Arg (10)
+  ->Arg (20)
   ->UseRealTime ();
 
 // Register the TCP SS benchmarks
-BENCHMARK_CAPTURE (BM_ring2_multiCore, tcpssCore, core_type::TCP_SS)
+BENCHMARK_CAPTURE (BM_ring_multiCore, tcpssCore, core_type::TCP_SS)
   ->Unit (benchmark::TimeUnit::kMillisecond)
   ->Iterations (3)
+  ->Arg (2)
+  ->Arg (3)
+  ->Arg (4)
+  ->Arg (6)
+  ->Arg (10)
+  ->Arg (20)
   ->UseRealTime ();
 
 // Register the UDP benchmarks
-BENCHMARK_CAPTURE (BM_ring2_multiCore, udpCore, core_type::UDP)
+BENCHMARK_CAPTURE (BM_ring_multiCore, udpCore, core_type::UDP)
   ->Unit (benchmark::TimeUnit::kMillisecond)
   ->Iterations (3)
+  ->Arg (2)
+  ->Arg (3)
+  ->Arg (4)
+  ->Arg (6)
+  ->Arg (10)
+  ->Arg (20)
   ->UseRealTime ();

@@ -35,6 +35,10 @@ if [[ "$USE_SWIG" == 'true' ]]; then
     OPTION_FLAGS_ARR+=("-DENABLE_SWIG=ON")
 fi
 
+if [[ "$BUILD_BENCHMARKS" == 'true' ]]; then
+    OPTION_FLAGS_ARR+=("-DHELICS_BUILD_BENCHMARKS=ON")
+fi
+
 # Options related to the CMake build type
 if [[ "$BUILD_TYPE" ]]; then
     OPTION_FLAGS_ARR+=("-DCMAKE_BUILD_TYPE=${BUILD_TYPE}")
