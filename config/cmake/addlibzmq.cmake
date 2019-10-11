@@ -86,8 +86,11 @@ endif()
   
   set(ZEROMQ_CMAKECONFIG_INSTALL_DIR ${CMAKE_INSTALL_LIBDIR}/cmake/ZeroMQ CACHE BOOL "" FORCE)
   # Bring the populated content into the build
-  add_subdirectory(${${lcName}_SOURCE_DIR} ${${lcName}_BINARY_DIR})
   set(COMPILER_SUPPORTS_CXX11 ON)
+  set(ZMQ_HAVE_NOEXCEPT ON)
+
+  add_subdirectory(${${lcName}_SOURCE_DIR} ${${lcName}_BINARY_DIR})
+  
   set(ZeroMQ_FOUND TRUE)
 
   set_target_properties(clang-format clang-format-check clang-format-diff PROPERTIES FOLDER "Extern/zmq_clang_format")

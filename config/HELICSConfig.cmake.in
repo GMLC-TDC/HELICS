@@ -99,6 +99,10 @@ endif()
 
 if (@HELICS_BUILD_CXX_SHARED_LIB@)
     get_target_property(${PN}_CXX_SHARED_LIBRARY HELICS::helics-shared LOCATION)
+	if (EXISTS ${CMAKE_CURRENT_LIST_DIR}/include)
+		target_include_directories(HELICS::helics-shared INTERFACE ${CMAKE_CURRENT_LIST_DIR}/include)
+	endif()
+
 endif()
 
 get_target_property(${PN}_STATIC_LIBRARY HELICS::helics-static LOCATION)
