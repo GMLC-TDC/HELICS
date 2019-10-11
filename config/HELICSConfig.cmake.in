@@ -123,13 +123,14 @@ if (EXISTS ${CMAKE_CURRENT_LIST_DIR}/include)
     set_property(TARGET HELICS::helics-static  APPEND PROPERTY
             INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_CURRENT_LIST_DIR}/include"
         )
-    if (NOT EXISTS ${CMAKE_CURRENT_LIST_DIR}/../../../@CMAKE_INSTALL_INCLUDEDIR@/helics/utilities)
+endif()
+if (NOT EXISTS ${CMAKE_CURRENT_LIST_DIR}/../../../@CMAKE_INSTALL_INCLUDEDIR@/helics/utilities)
     set_property(TARGET HELICS::helics-static APPEND PROPERTY
             INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_CURRENT_LIST_DIR}/../ThirdParty/utilities/gmlc/"
-        )
-    endif()
-
+    )
 endif()
+
+
 
 message(STATUS "INCLUDE DIRS HELICS: ${HELICS_INCLUDE_DIRS}")
 message(STATUS "C_SHARED_LIBRARY: ${HELICS_C_SHARED_LIBRARY}")
@@ -147,7 +148,6 @@ if (@HELICS_BUILD_APP_EXECUTABLES@)
             INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_CURRENT_LIST_DIR}/../ThirdParty/utilities/gmlc/"
         )
     endif()
-endif()
 
 get_target_property(HELICS_APPLIB_LOCATION HELICS::helics_apps LOCATION)
 get_filename_component(APP_CHECK_LOC "${HELICS_APPLIB_LOCATION}" PATH)

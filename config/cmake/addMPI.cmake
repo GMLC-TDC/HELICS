@@ -1,3 +1,4 @@
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # LLNS Copyright Start
 # Copyright (c) 2014-2018, Lawrence Livermore National Security
 # This work was performed under the auspices of the U.S. Department
@@ -7,15 +8,17 @@
 # All rights reserved.
 # For details, see the LICENSE file.
 # LLNS Copyright End
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-#
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Copyright (c) 2017-2019, Battelle Memorial Institute; Lawrence Livermore
 # National Security, LLC; Alliance for Sustainable Energy, LLC.
-# See the top-level NOTICE for additional details. 
-#All rights reserved.
+# See the top-level NOTICE for additional details.
+# All rights reserved.
 #
 # SPDX-License-Identifier: BSD-3-Clause
-#
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 find_package(MPI)
 if(NOT MPI_C_FOUND)
     if(MSVC) # the cmake find MPI doesn't completely work for visual studio 2017
