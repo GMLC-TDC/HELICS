@@ -49,17 +49,11 @@ if(HELICS_BUILD_CXX_SHARED_LIB)
   )
 
   add_library(HELICS::helics-shared ALIAS helics-shared)
-  target_link_libraries(helics-shared PRIVATE helics_base helics_base_includes
+  target_link_libraries(helics-shared PUBLIC helics_base_includes PRIVATE helics_base
 	$<$<NOT:$<BOOL:${JSONCPP_OBJLIB}>>:HELICS::jsoncpp_lib>
 	$<$<NOT:$<BOOL:${GMLC_UTILITIES_OBJECT_LIB}>>:HELICS::utilities>
 	$<$<NOT:$<BOOL:${HELICS_UNITS_OBJLIB}>>:HELICS::units-static>
 	)
-  target_include_directories(helics-shared
-    INTERFACE
-      $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/src>
-      $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/ThirdParty>
-      $<INSTALL_INTERFACE:$<INSTALL_PREFIX>/include>
-  )
 
   set_target_properties(helics-shared PROPERTIES
     VERSION ${HELICS_VERSION}
