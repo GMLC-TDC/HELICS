@@ -65,7 +65,7 @@ double vectorNorm (const std::vector<std::complex<double>> &vec)
 {
     return std::sqrt (
       std::inner_product (vec.begin (), vec.end (), vec.begin (), 0.0, std::plus<> (),
-                          [] (const auto &a, const auto &b) { return (a * std::conj (b)).real (); }));
+                          [](const auto &a, const auto &b) { return (a * std::conj (b)).real (); }));
 }
 
 std::string helicsComplexString (double real, double imag)
@@ -403,7 +403,8 @@ static int readSize (const std::string &val)
             // go to the alternative path if this fails
         }
     }
-    return std::count_if (val.begin () + fb, val.end (), [] (auto c) { return (c == ',') || (c == ';'); }) + 1;
+    auto res = std::count_if (val.begin () + fb, val.end (), [](auto c) { return (c == ',') || (c == ';'); }) + 1;
+    return static_cast<int> (res);
 }
 
 std::complex<double> getComplexFromString (const std::string &val)
@@ -641,7 +642,8 @@ data_block typeConvert (data_type type, int64_t val)
     default:
         return ValueConverter<int64_t>::convert (val);
     case data_type::helics_complex:
-        return ValueConverter<std::complex<double>>::convert (std::complex<double> (val, 0.0));
+        return ValueConverter<std::complex<double>>::convert (
+          std::complex<double> (static_cast<double> (val), 0.0));
     case data_type::helics_bool:
         return (val != 0) ? "1" : "0";
     case data_type::helics_string:
@@ -836,7 +838,7 @@ data_block typeConvert (data_type type, const std::vector<std::complex<double>> 
     case data_type::helics_double:
         return ValueConverter<double>::convert (std::abs (val[0]));
     case data_type::helics_int:
-        return ValueConverter<int64_t>::convert (std::abs (val[0]));  // NOLINT
+        return ValueConverter<int64_t>::convert (static_cast<int64_t> (std::abs (val[0])));  // NOLINT
     case data_type::helics_complex:
         return ValueConverter<std::complex<double>>::convert (val[0]);
     case data_type::helics_bool:
@@ -868,7 +870,7 @@ data_block typeConvert (data_type type, const std::complex<double> &val)
     case data_type::helics_double:
         return ValueConverter<double>::convert (std::abs (val));
     case data_type::helics_int:
-        return ValueConverter<double>::convert (static_cast<int64_t> (std::abs (val)));
+        return ValueConverter<int64_t>::convert (static_cast<int64_t> (std::abs (val)));
     case data_type::helics_complex:
     default:
         return ValueConverter<std::complex<double>>::convert (val);

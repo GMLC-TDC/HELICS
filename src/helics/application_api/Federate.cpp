@@ -258,7 +258,7 @@ void Federate::enterInitializingModeComplete ()
         {
             asyncInfo->initFuture.get ();
         }
-        catch (const std::exception &e)
+        catch (const std::exception &)
         {
             currentMode = modes::error;
             throw;
@@ -436,7 +436,7 @@ void Federate::setLoggingCallback (
 
 void Federate::setFlagOption (int flag, bool flagValue) { coreObject->setFlagOption (fedID, flag, flagValue); }
 
-bool Federate::getFlagOption (int flag) const{ return coreObject->getFlagOption (fedID, flag); }
+bool Federate::getFlagOption (int flag) const { return coreObject->getFlagOption (fedID, flag); }
 void Federate::finalize ()
 {  // since finalize is called in the destructor we can't allow any potential virtual function calls
     switch (currentMode)
@@ -450,7 +450,7 @@ void Federate::finalize ()
         {
             asyncInfo->initFuture.get ();
         }
-        catch (const std::exception &e)
+        catch (const std::exception &)
         {
             currentMode = modes::error;
             throw;
@@ -580,7 +580,7 @@ Time Federate::requestTime (Time nextInternalTimeStep)
             }
             return newTime;
         }
-        catch (const FunctionExecutionFailure &fee)
+        catch (const FunctionExecutionFailure &)
         {
             currentMode = modes::error;
             throw;

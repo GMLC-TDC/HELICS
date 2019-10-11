@@ -349,7 +349,7 @@ TEST (ZMQCore_tests, zmqComms_rx_test)
         auto cnt = pushSocket.send (buffer, ZMQ_DONTWAIT);
         EXPECT_EQ (cnt, buffer.size ());
     }
-    catch (const zmq::error_t &ze)
+    catch (const zmq::error_t &)
     {
         GTEST_FAIL () << "Message failed to send";
     }

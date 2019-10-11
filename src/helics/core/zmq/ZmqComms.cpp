@@ -481,7 +481,7 @@ void ZmqComms::queue_tx_function ()
             return;
         }
     }
-    catch (const zmq::error_t &e)
+    catch (const zmq::error_t &)
     {
         controlSocket.close ();
         return;
