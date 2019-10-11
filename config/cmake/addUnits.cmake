@@ -42,7 +42,7 @@ if (HELICS_UNITS_OBJLIB)
 	set_target_properties(units-object PROPERTIES FOLDER Extern)
 else()
 	set_target_properties(units-static PROPERTIES FOLDER Extern)
-	add_library(HELICS::units ALIAS units-static)
+	add_library(HELICS::units-static ALIAS units-static)
 endif()
 
 HIDE_VARIABLE(BUILD_UNITS_FUZZ_TARGETS)

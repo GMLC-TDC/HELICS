@@ -144,6 +144,7 @@ else(HELICS_WITH_CMAKE_PACKAGE)
     set(HELICS_EXPORT_COMMAND)
 endif(HELICS_WITH_CMAKE_PACKAGE)
 
+message(STATUS "EXport command=${HELICS_EXPORT_COMMAND}")
 option(HELICS_DISABLE_C_SHARED_LIB OFF
        "turn off building of the HELICS C shared library interface")
 mark_as_advanced(HELICS_DISABLE_C_SHARED_LIB)
