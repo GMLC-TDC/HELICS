@@ -46,6 +46,8 @@ endif()
 set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
 
 set(BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE)
+set(HAVE_STD_REGEX ON CACHE BOOL "" FORCE)
+hide_variable(HAVE_STD_REGEX)
 
 set(CMAKE_SUPPRESS_DEVELOPER_WARNINGS 1 CACHE BOOL "")
 add_subdirectory(${${gtName}_SOURCE_DIR} ${${gtName}_BINARY_DIR} EXCLUDE_FROM_ALL)
@@ -89,15 +91,15 @@ macro(add_gtest TESTNAME)
 
 endmacro()
 
-HIDE_VARIABLE(gmock_build_tests)
-HIDE_VARIABLE(gtest_build_samples)
-HIDE_VARIABLE(gtest_build_tests)
-HIDE_VARIABLE(gtest_disable_pthreads)
-HIDE_VARIABLE(gtest_force_shared_crt)
-HIDE_VARIABLE(gtest_hide_internal_symbols)
-HIDE_VARIABLE(BUILD_GMOCK)
-HIDE_VARIABLE(BUILD_GTEST)
-HIDE_VARIABLE(INSTALL_GTEST)
+hide_variable(gmock_build_tests)
+hide_variable(gtest_build_samples)
+hide_variable(gtest_build_tests)
+hide_variable(gtest_disable_pthreads)
+hide_variable(gtest_force_shared_crt)
+hide_variable(gtest_hide_internal_symbols)
+hide_variable(BUILD_GMOCK)
+hide_variable(BUILD_GTEST)
+hide_variable(INSTALL_GTEST)
 
 
 set_target_properties(gtest gtest_main gmock gmock_main

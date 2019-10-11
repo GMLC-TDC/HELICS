@@ -379,7 +379,7 @@ static void timerTickHandler (BrokerBase *bbase, activeProtector &active, const 
             }
             catch (std::exception &e)
             {
-                std::cout << "exception caught from addActionMessage" << std::endl;
+                std::cerr << "exception caught from addActionMessage" << e.what () << std::endl;
             }
         }
         else

@@ -88,6 +88,7 @@ set_target_properties(HELICS::utilities PROPERTIES
     )
 endif()
 
+
 check_required_components(${PN})
 
 get_target_property(${PN}_INCLUDE_DIRS HELICS::helics_base_includes INTERFACE_INCLUDE_DIRECTORIES)
@@ -101,11 +102,20 @@ if (@HELICS_BUILD_CXX_SHARED_LIB@)
 endif()
 
 get_target_property(${PN}_STATIC_LIBRARY HELICS::helics-static LOCATION)
+
+if (EXISTS ${CMAKE_CURRENT_LIST_DIR}/include)
+	target_include_directories(HELICS::helics_static INTERFACE ${CMAKE_CURRENT_LIST_DIR}/include)
+endif()
+
 message(STATUS "INCLUDE DIRS HELICS: ${HELICS_INCLUDE_DIRS}")
 message(STATUS "C_SHARED_LIBRARY: ${HELICS_C_SHARED_LIBRARY}")
 
 #load some variables with the locations the different executables
 if (@HELICS_BUILD_APP_EXECUTABLES@)
+
+if (EXISTS ${CMAKE_CURRENT_LIST_DIR}/include)
+	target_include_directories(HELICS::helics_apps INTERFACE ${CMAKE_CURRENT_LIST_DIR}/include)
+endif()
 
 get_target_property(HELICS_APPLIB_LOCATION HELICS::helics_apps LOCATION)
 get_filename_component(APP_CHECK_LOC "${HELICS_APPLIB_LOCATION}" PATH)

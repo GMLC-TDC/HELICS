@@ -341,7 +341,7 @@ void UdpComms::queue_tx_function ()
 
                         routes.emplace (route_id{cmd.getExtraData ()}, *resolver.resolve (queryNew));
                     }
-                    catch (std::exception &e)
+                    catch (std::exception &)
                     {
                         // TODO:: do something???
                     }

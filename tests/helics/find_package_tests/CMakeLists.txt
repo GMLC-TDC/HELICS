@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.4.0)
 project(HELICS-find-package-test)
 
 # Test the HELICS CMake package config
-find_package(HELICS 2 REQUIRED)
+find_package(HELICS 2.3 REQUIRED)
 
 #  add some tests inside of the cmake
 if (NOT EXISTS ${HELICS_BROKER})

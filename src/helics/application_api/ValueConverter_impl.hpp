@@ -144,7 +144,7 @@ class ostringbuf : public std::streambuf
     {
         sbuf_.append (pbase (), pptr ());
         std::ptrdiff_t n = pptr () - pbase ();
-        pbump (-n);
+        pbump (static_cast<int> (-n));
     }
 
   private:
@@ -205,7 +205,7 @@ void ValueConverter<X>::convert (const X *vals, size_t size, data_block &store)
 {
     detail::ostringbufstream s;
     archiver oa (s);
-    oa (cereal::make_size_tag (static_cast<cereal::size_type>(size)));  // number of elements
+    oa (cereal::make_size_tag (static_cast<cereal::size_type> (size)));  // number of elements
     for (size_t ii = 0; ii < size; ++ii)
     {
         oa (vals[ii]);
@@ -242,8 +242,8 @@ struct is_iterable<T,
                    typename std::enable_if_t<
                      std::is_same<decltype (std::begin (T ()) != std::end (T ()),  // begin/end and operator != and
                                                                                    // has default constructor
-                                            void (),
-                                            void (*std::begin (T ())),  // dereference operator
+                                            void(),
+                                            void(*std::begin (T ())),  // dereference operator
                                             std::true_type{}),
                                   std::true_type>::value>>
 {
