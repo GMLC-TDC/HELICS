@@ -43,8 +43,10 @@ set(HAVE_STDINT_H ON)
 set(HAVE_DECIMAL_POINT ON)
 add_subdirectory("${HELICS_SOURCE_DIR}/ThirdParty/jsoncpp" "${PROJECT_BINARY_DIR}/ThirdParty/jsoncpp")
 
+if (NOT JSONCPP_OBJLIB)
+	add_library(HELICS::jsoncpp_lib ALIAS jsoncpp_lib)
+endif()
 
-add_library(HELICS::jsoncpp_lib ALIAS jsoncpp_lib)
 if (OLD_CMAKE_INSTALL_INCLUDEDIR)
     set(CMAKE_INSTALL_INCLUDEDIR ${OLD_CMAKE_INSTALL_INCLUDEDIR})
 endif()

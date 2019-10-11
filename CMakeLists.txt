@@ -1,9 +1,8 @@
-#
-# Copyright (c) 2017-2019, Battelle Memorial Institute; Lawrence Livermore
-# National Security, LLC; Alliance for Sustainable Energy, LLC.  See the top-
-# level NOTICE for additional details. All rights reserved. SPDX-License-
-# Identifier: BSD-3-Clause
-#
+# ###############################################################
+# Copyright (c) 2017-2019, Battelle Memorial Institute; Lawrence Livermore National
+# Security, LLC; Alliance for Sustainable Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
+# SPDX-License-Identifier: BSD-3-Clause
+# ###############################################################
 
 cmake_minimum_required(VERSION 3.4)
 cmake_policy(VERSION 3.4)
@@ -523,7 +522,7 @@ list(
         CMAKE_PLATFORM_IMPLICIT_LINK_DIRECTORIES
         "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_BINDIR}" isSystemDir
 )
-if("${isSystemDir}" STREQUAL "-1")
+if(isSystemDir STREQUAL "-1")
     list(
         APPEND
             CMAKE_INSTALL_RPATH CMAKE_INSTALL_RPATH
@@ -536,7 +535,7 @@ list(
         CMAKE_PLATFORM_IMPLICIT_LINK_DIRECTORIES
         "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}" isSystemDir
 )
-if("${isSystemDir}" STREQUAL "-1")
+if(isSystemDir STREQUAL "-1")
     list(APPEND CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}")
 endif()
 
