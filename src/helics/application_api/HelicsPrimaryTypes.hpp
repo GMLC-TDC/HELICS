@@ -113,6 +113,8 @@ void valueExtract (const data_view &dv, data_type baseType, NamedPoint &val);
 
 void valueExtract (const data_view &dv, data_type baseType, Time &val);
 
+void valueExtract (const data_view &dv, data_type baseType, bool &val);
+
 void valueExtract (const data_view &dv, data_type baseType, defV &val);
 
 /** extract the value from a variant to a numerical type*/

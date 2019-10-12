@@ -142,6 +142,7 @@
 #ifdef ZMQ_CPP11_PARTIAL
 #define ZMQ_IS_TRIVIALLY_COPYABLE(T) __has_trivial_copy(T)
 #else
+#include <type_traits>
 #define ZMQ_IS_TRIVIALLY_COPYABLE(T) std::is_trivially_copyable<T>::value
 #endif
 #endif

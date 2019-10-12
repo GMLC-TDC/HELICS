@@ -571,6 +571,27 @@ void helicsGetComplexVector (const std::string &val, std::vector<std::complex<do
     }
 }
 
+bool helicsBoolValue (const std::string &val)
+{
+    static const std::unordered_map<std::string, bool> knownStrings{
+
+      {"0", false},       {"00", false},    {"\0", false},       {"0000", false},   {std::string (8, '\0'), false},
+      {"1", true},        {"false", false}, {"true", true},      {"on", true},      {"off", false},
+      {"ON", true},       {"OFF", false},   {"False", false},    {"True", true},    {"FALSE", false},
+      {"TRUE", true},     {"f", false},     {"t", true},         {"F", false},      {"T", true},
+      {"n", false},       {"y", true},      {"N", false},        {"Y", true},       {"no", false},
+      {"yes", true},      {"No", false},    {"Yes", true},       {"NO", false},     {"YES", true},
+      {"disable", false}, {"enable", true}, {"disabled", false}, {"enabled", true}, {std::string{}, false},
+    };
+    // all known false strings are captured in known strings so if it isn't in there it evaluates to true
+    auto res = knownStrings.find (val);
+    if (res != knownStrings.end ())
+    {
+        return res->second;
+    }
+    return true;
+}
+
 data_block emptyBlock (data_type outputType, data_type inputType = data_type::helics_any)
 {
     switch (outputType)
@@ -687,7 +708,7 @@ data_block typeConvert (data_type type, const char *val)
     case data_type::helics_complex:
         return ValueConverter<std::complex<double>>::convert (helicsGetComplex (val));
     case data_type::helics_bool:
-        return (std::string ("0") == val) ? "0" : "1";
+        return (helicsBoolValue (val)) ? "0" : "1";
     case data_type::helics_string:
     default:
         return data_block (val);
@@ -716,7 +737,7 @@ data_block typeConvert (data_type type, const std::string &val)
     case data_type::helics_complex:
         return ValueConverter<std::complex<double>>::convert (helicsGetComplex (val));
     case data_type::helics_bool:
-        return (val == "0") ? val : "1";
+        return (helicsBoolValue (val)) ? "1" : "0";
     case data_type::helics_string:
     default:
         return val;
@@ -756,7 +777,7 @@ data_block typeConvert (data_type type, const std::vector<double> &val)
         return ValueConverter<std::complex<double>>::convert (V);
     }
     case data_type::helics_bool:
-        return (val[0] != 0.0) ? "1" : "0";
+        return (vectorNorm (val) != 0.0) ? "1" : "0";
     case data_type::helics_string:
         return helicsVectorString (val);
     case data_type::helics_named_point:
@@ -805,7 +826,23 @@ data_block typeConvert (data_type type, const double *vals, size_t size)
         return ValueConverter<std::complex<double>>::convert (V);
     }
     case data_type::helics_bool:
-        return (vals[0] != 0.0) ? "1" : "0";
+        if (size == 0)
+        {
+            return "0";
+        }
+        if (vals[0] != 0.0)
+        {
+            return "1";
+        }
+        for (int ii = 1; ii < size; ++ii)
+        {
+            if (vals[ii] != 0)
+            {
+                return "1";
+            }
+        }
+        return "0";
+        break;
     case data_type::helics_string:
         return helicsVectorString (vals, size);
     case data_type::helics_named_point:
@@ -842,7 +879,7 @@ data_block typeConvert (data_type type, const std::vector<std::complex<double>> 
     case data_type::helics_complex:
         return ValueConverter<std::complex<double>>::convert (val[0]);
     case data_type::helics_bool:
-        return (std::abs (val[0]) != 0.0) ? "1" : "0";
+        return (vectorNorm (val) != 0.0) ? "1" : "0";
     case data_type::helics_string:
         return helicsComplexVectorString (val);
     case data_type::helics_named_point:
