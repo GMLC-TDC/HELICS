@@ -48,14 +48,14 @@ add_test(find-package-tests ${CMAKE_CTEST_COMMAND} -C ${CMAKE_BUILD_TYPE}
 )
 set_property(TEST find-package-tests PROPERTY LABELS Packaging PackagingFast)
 
-option(
-    ENABLE_SLOW_PACKAGING_TESTS
-    "Enable the packaging tests that may take a long time to run" OFF
+cmake_dependent_option(
+    HELICS_ENABLE_SLOW_PACKAGING_TESTS
+    "Enable the slower helics packaging tests that may take a long time to run" OFF "HELICS_BUILD_TESTS" OFF
 )
-mark_as_advanced(ENABLE_SLOW_PACKAGING_TESTS)
+mark_as_advanced(HELICS_ENABLE_SLOW_PACKAGING_TESTS)
 
 # Tests for adding HELICS as a subproject using add_subdirectory
-if (ENABLE_SLOW_PACKAGING_TESTS)
+if (HELICS_ENABLE_SLOW_PACKAGING_TESTS)
     add_test(add-subdirectory-tests ${CMAKE_CTEST_COMMAND} -C ${CMAKE_BUILD_TYPE}
                                 --build-and-test "${CMAKE_CURRENT_SOURCE_DIR}/add_subdirectory_tests" "${CMAKE_CURRENT_BINARY_DIR}/add_subdirectory_tests"
                                 --build-generator "${CMAKE_GENERATOR}"

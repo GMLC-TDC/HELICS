@@ -87,7 +87,13 @@
 #include <memory>
 #endif
 #ifdef ZMQ_CPP17
+#ifdef __has_include
+#if __has_include(<optional>)
 #include <optional>
+#define ZMQ_HAS_OPTIONAL 1
+#endif
+#endif
+
 #endif
 
 /*  Version macros for compile-time API version detection                     */
@@ -700,7 +706,7 @@ struct recv_buffer_size
 namespace detail
 {
 
-#ifdef ZMQ_CPP17
+#if ZMQ_HAS_OPTIONAL > 0
 using send_result_t = std::optional<size_t>;
 using recv_result_t = std::optional<size_t>;
 using recv_buffer_result_t = std::optional<recv_buffer_size>;

@@ -16,7 +16,7 @@ project(HELICS VERSION 2.3.0)
 # HELICS Version number
 # -----------------------------------------------------------------------------
 set(HELICS_VERSION_BUILD)
-set(HELICS_DATE "2019-10-09")
+set(HELICS_DATE "2019-10-12")
 
 set(
     HELICS_VERSION_UNDERSCORE
@@ -49,7 +49,7 @@ include(version_describe)
 git_version_describe(${HELICS_SOURCE_DIR} HELICS_VERSION_DESCRIPTION)
 
 if(HELICS_VERSION_DESCRIPTION)
-    message(STATUS "final version tag is ${HELICS_VERSION_DESCRIPTION}")
+    message(STATUS "helics version tag description is ${HELICS_VERSION_DESCRIPTION}")
     string(TIMESTAMP current_date "%Y-%m-%d")
     set(
         HELICS_VERSION_STRING
@@ -146,7 +146,6 @@ else(HELICS_WITH_CMAKE_PACKAGE)
     set(HELICS_EXPORT_COMMAND)
 endif(HELICS_WITH_CMAKE_PACKAGE)
 
-message(STATUS "EXport command=${HELICS_EXPORT_COMMAND}")
 option(HELICS_DISABLE_C_SHARED_LIB OFF
        "turn off building of the HELICS C shared library interface")
 mark_as_advanced(HELICS_DISABLE_C_SHARED_LIB)
@@ -206,7 +205,7 @@ endif()
 
 if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
     include(compiler_flags)
-    message(STATUS "setting version build options to \"${CXX_STANDARD_FLAG}\"")
+    message(STATUS "setting helics C++ standard build option to \"${CXX_STANDARD_FLAG}\"")
     if(CXX_STANDARD_FLAG)
         if(MSVC)
             target_compile_options(helics_base_includes INTERFACE ${CXX_STANDARD_FLAG})
