@@ -970,7 +970,7 @@ void valueExtract (const data_view &dv, data_type baseType, bool &val)
         }
         else
         {
-            val = helicsBoolValue (dv.string);
+            val = helicsBoolValue (dv.string ());
         }
         break;
     }
