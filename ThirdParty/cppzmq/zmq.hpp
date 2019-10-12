@@ -136,11 +136,9 @@
 #if defined(ZMQ_CPP11) && !defined(__llvm__) && !defined(__INTEL_COMPILER) \
     && defined(__GNUC__) && __GNUC__ < 5
 #define ZMQ_CPP11_PARTIAL
-#pragma message "The value of __GLIBCXX__ in GNUC is " XSTR(__GLIBCXX__)
-#elif defined(__llvm__) && defined(__GLIBCXX__) && __GLIBCXX__ < 20160803
-#define XSTR(x) STR(x)
-#define STR(x) #x
-#pragma message "The value of __GLIBCXX__ in LLVM is " XSTR(__GLIBCXX__)
+#elif defined(__llvm__) && defined(__GLIBCXX__) && __GLIBCXX__ < 20160805
+//the date here is the last date of gcc 4.9.4, which 
+// effectively means libstdc++ from gcc 5.5 and higher won't trigger this branch
 #define ZMQ_CPP11_PARTIAL
 #endif
 
