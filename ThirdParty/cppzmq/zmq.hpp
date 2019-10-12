@@ -136,7 +136,11 @@
 #if defined(ZMQ_CPP11) && !defined(__llvm__) && !defined(__INTEL_COMPILER) \
     && defined(__GNUC__) && __GNUC__ < 5
 #define ZMQ_CPP11_PARTIAL
+#pragma message "The value of __GLIBCXX__ in GNUC is " XSTR(__GLIBCXX__)
 #elif defined(__llvm__) && defined(__GLIBCXX__) && __GLIBCXX__ < 20160803
+#define XSTR(x) STR(x)
+#define STR(x) #x
+#pragma message "The value of __GLIBCXX__ in LLVM is " XSTR(__GLIBCXX__)
 #define ZMQ_CPP11_PARTIAL
 #endif
 
