@@ -101,6 +101,14 @@ endif()
 option(HELICS_DISABLE_BOOST OFF "disable all references to the Boost C++ libraries")
 mark_as_advanced(HELICS_DISABLE_BOOST)
 
+# we want to acknowledge this flag since it is standard C++ but it can cause issues in submodules so we need to set other variables
+if (BUILD_SHARED_LIBS)
+	set(HELICS_DISABLE_STATIC_LIB_INSTALL ON CACHE BOOL "")
+	set(HELICS_BUILD_CXX_SHARED_LIB ON CACHE BOOL "")
+	set(HELICS_DISABLE_C_SHARED_LIB OFF CACHE BOOL "")
+	set(BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE)
+endif()
+
 cmake_dependent_option(
     HELICS_BUILD_TESTS
     "Enable the HELICS test executables to be built"
@@ -164,7 +172,7 @@ else()
 endif()
 
 cmake_dependent_option(
-    USE_POSITION_INDEPENDENT_CODE
+    HELICS_USE_POSITION_INDEPENDENT_CODE
     "Build the libraries with Position independent code Useful if only building the static library and it will be used later in a shared library"
     OFF
     "HELICS_DISABLE_C_SHARED_LIB AND NOT HELICS_BUILD_CXX_SHARED_LIB"
@@ -174,7 +182,7 @@ cmake_dependent_option(
 if(
     NOT HELICS_DISABLE_C_SHARED_LIB
     OR HELICS_BUILD_CXX_SHARED_LIB
-    OR USE_POSITION_INDEPENDENT_CODE
+    OR HELICS_USE_POSITION_INDEPENDENT_CODE
 )
     set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 endif()
@@ -192,7 +200,7 @@ add_library(helics_base_includes INTERFACE)
 
 target_link_libraries(helics_base INTERFACE helics_base_includes)
 # Prohibit in-source build
-if("${PROJECT_SOURCE_DIR}" STREQUAL "${PROJECT_BINARY_DIR}")
+if(PROJECT_SOURCE_DIR STREQUAL PROJECT_BINARY_DIR)
     message(
         FATAL_ERROR
             "In-source build is not supported. Please, use an empty directory for building the project."
@@ -343,7 +351,7 @@ endif()
 
 if(
     NOT EXISTS
-    "${PROJECT_SOURCE_DIR}/ThirdParty/concurrency/gmlc/concurrency/TriggerVariable.hpp"
+    "${PROJECT_SOURCE_DIR}/ThirdParty/concurrency/gmlc/concurrency/Barrier.hpp"
 )
     submod_update(ThirdParty/concurrency)
 endif()
@@ -426,7 +434,7 @@ endif()
 # -------------------------------------------------------------
 if(MSYS OR CYGWIN)
     target_link_libraries(helics_base INTERFACE wsock32 ws2_32 Iphlpapi)
-    if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+    if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
         set(ENABLE_IPC_CORE FALSE)
     endif()
 endif()
@@ -438,7 +446,7 @@ endif()
 target_compile_definitions(
     helics_base_includes
     INTERFACE
-    $<$<BOOL:${CYGWIN}>:-D_XOPEN_SOURCE=500
+    $<$<PLATFORM_ID:Cygwin>:-D_XOPEN_SOURCE=500
     -D__USE_W32_SOCKETS
     -D_WIN32_WINNT=0x0601>
 )
