@@ -109,14 +109,14 @@ int ZmqComms::replyToIncomingMessage (zmq::message_t &msg, zmq::socket_t &sock)
         }
         auto reply = generateReplyToIncomingMessage (M);
         auto str = reply.to_string ();
-        sock.send (str.data (), str.size ());
+        sock.send (str);
         return 0;
     }
 
     ActionCallback (std::move (M));
     ActionMessage resp (CMD_PRIORITY_ACK);
     auto str = resp.to_string ();
-    sock.send (str.data (), str.size ());
+    sock.send (str);
     return 0;
 }
 
@@ -148,7 +148,7 @@ void ZmqComms::queue_rx_function ()
     while (PortNumber == -1)
     {
         zmq::message_t msg;
-        controlSocket.recv (&msg);
+        controlSocket.recv (msg);
         if (msg.size () < 10)
         {
             continue;
@@ -233,7 +233,7 @@ void ZmqComms::queue_rx_function ()
             zmq::message_t msg;
             if ((poller[0].revents & ZMQ_POLLIN) != 0)
             {
-                controlSocket.recv (&msg);
+                controlSocket.recv (msg);
 
                 auto status = processIncomingMessage (msg);
                 if (status < 0)
@@ -243,7 +243,7 @@ void ZmqComms::queue_rx_function ()
             }
             if ((poller[1].revents & ZMQ_POLLIN) != 0)
             {
-                pullSocket.recv (&msg);
+                pullSocket.recv (msg);
                 auto status = processIncomingMessage (msg);
                 if (status < 0)
                 {
@@ -254,7 +254,7 @@ void ZmqComms::queue_rx_function ()
             {
                 if ((poller[2].revents & ZMQ_POLLIN) != 0)
                 {
-                    repSocket.recv (&msg);
+                    repSocket.recv (msg);
                     auto status = replyToIncomingMessage (msg, repSocket);
                     if (status < 0)
                     {
@@ -378,25 +378,25 @@ int ZmqComms::initializeBrokerConnections (zmq::socket_t &controlSocket)
                 }
                 if (rc > 0)
                 {
-                    brokerReq.recv (&msg);
+                    brokerReq.recv (msg);
 
                     ActionMessage rxcmd (static_cast<char *> (msg.data ()), msg.size ());
                     if (isProtocolCommand (rxcmd))
                     {
                         if (rxcmd.messageID == PORT_DEFINITIONS)
                         {
-                            controlSocket.send (msg);
+                            controlSocket.send (msg, zmq::send_flags::none);
                             return 0;
                         }
                         if (rxcmd.messageID == DISCONNECT)
                         {
-                            controlSocket.send (msg);
+                            controlSocket.send (msg, zmq::send_flags::none);
                             setTxStatus (connection_status::terminated);
                             return (-3);
                         }
                         if (rxcmd.messageID == DISCONNECT_ERROR)
                         {
-                            controlSocket.send (msg);
+                            controlSocket.send (msg, zmq::send_flags::none);
                             setTxStatus (connection_status::error);
                             return (-4);
                         }
@@ -560,7 +560,7 @@ void ZmqComms::queue_tx_function ()
         {
             if (hasBroker)
             {
-                brokerPushSocket.send (buffer.data (), buffer.size ());
+                brokerPushSocket.send (zmq::const_buffer (buffer.data (), buffer.size ()), zmq::send_flags::none);
             }
             else
             {
@@ -571,7 +571,7 @@ void ZmqComms::queue_tx_function ()
         {  // send to rx thread loop
             try
             {
-                controlSocket.send (buffer.data (), buffer.size (), ZMQ_NOBLOCK);
+                controlSocket.send (zmq::const_buffer (buffer.data (), buffer.size ()), zmq::send_flags::dontwait);
             }
             catch (const zmq::error_t &e)
             {
@@ -592,13 +592,13 @@ void ZmqComms::queue_tx_function ()
             auto rt_find = routes.find (rid);
             if (rt_find != routes.end ())
             {
-                rt_find->second.send (buffer.data (), buffer.size ());
+                rt_find->second.send (zmq::const_buffer (buffer.data (), buffer.size ()));
             }
             else
             {
                 if (hasBroker)
                 {
-                    brokerPushSocket.send (buffer.data (), buffer.size ());
+                    brokerPushSocket.send (zmq::const_buffer (buffer.data (), buffer.size ()));
                 }
                 else
                 {
@@ -619,7 +619,7 @@ CLOSE_TX_LOOP:
     {
         try
         {
-            controlSocket.send (std::string ("close"), ZMQ_NOBLOCK);
+            controlSocket.send (std::string ("close"), zmq::send_flags::dontwait);
         }
         catch (const zmq::error_t &)
         {

@@ -7,19 +7,15 @@
 # SPDX-License-Identifier: BSD-3-Clause
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-if(EXAMPLES_WARNINGS_AS_ERROR)
+if(HELICS_EXAMPLES_WARNINGS_AS_ERROR)
   # the examples had better compile without warnings otherwise they should not be
-  # allowed
-  if(WIN32)
-    if(MSVC)
-      add_compile_options(/WX)
-    else(MSVC)
-      add_compile_options(-Werror)
-    endif(MSVC)
-  else(WIN32)
-    add_compile_options(-Werror)
-  endif(WIN32)
+add_compile_options(
+        $<$<CXX_COMPILER_ID:MSVC>:/WX>>
+        $<$<NOT:$<CXX_COMPILER_ID:MSVC>>:-Werror>>
+)
+
 endif()
+
 if (HELICS_BUILD_APP_LIBRARY)
   add_subdirectory(comboFederates1)
 endif()
