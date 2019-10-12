@@ -1638,7 +1638,7 @@ inline void proxy_steerable(socket_ref frontend,
 }
 #endif
 
-template<> inline std::string socket_t::getsockopt(int option_) const
+template<> inline std::string socket_base::getsockopt(int option_) const
 {
     size_t optlen = 256;
     std::string ret(optlen,'\0');
