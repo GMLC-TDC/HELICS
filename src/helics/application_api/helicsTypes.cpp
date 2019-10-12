@@ -826,15 +826,7 @@ data_block typeConvert (data_type type, const double *vals, size_t size)
         return ValueConverter<std::complex<double>>::convert (V);
     }
     case data_type::helics_bool:
-        if (size == 0)
-        {
-            return "0";
-        }
-        if (vals[0] != 0.0)
-        {
-            return "1";
-        }
-        for (int ii = 1; ii < size; ++ii)
+        for (size_t ii = 0; ii < size; ++ii)
         {
             if (vals[ii] != 0)
             {

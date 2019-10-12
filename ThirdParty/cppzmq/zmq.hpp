@@ -136,6 +136,8 @@
 #if defined(ZMQ_CPP11) && !defined(__llvm__) && !defined(__INTEL_COMPILER) \
     && defined(__GNUC__) && __GNUC__ < 5
 #define ZMQ_CPP11_PARTIAL
+#elif defined(__llvm__) && defined(__GLIBCXX__) && __GLIBCXX__ < 20160803
+#define ZMQ_CPP11_PARTIAL
 #endif
 
 #ifdef ZMQ_CPP11
