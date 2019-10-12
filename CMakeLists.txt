@@ -182,6 +182,9 @@ cmake_dependent_option(
     ON
 )
 
+cmake_dependent_option(HELICS_GENERATE_DOXYGEN_DOC "Generate HELICS Doxygen doc target" OFF "CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME"
+    OFF)
+
 if(
     NOT HELICS_DISABLE_C_SHARED_LIB
     OR HELICS_BUILD_CXX_SHARED_LIB
@@ -308,8 +311,6 @@ mark_as_advanced(HELICS_TEST_CODE_COVERAGE)
 # message(STATUS ${CMAKE_CXX_FLAGS})
 set(CONFIGURE_TARGET_LOCATION ${HELICS_BINARY_DIR}/include/helics/)
 include(configGenerator)
-
-option(HELICS_GENERATE_DOXYGEN_DOC "Generate Doxygen doc target" OFF)
 
 if(HELICS_GENERATE_DOXYGEN_DOC)
     find_package(Doxygen)
@@ -666,7 +667,6 @@ if(GMLC_UTILITIES_OBJECT_LIB)
     endif()
     set_target_properties(gmlc_utilities_obj PROPERTIES FOLDER Extern)
     if(NOT HELICS_DISABLE_BOOST)
-        message(STATUS "Boost include=${Boost_INCLUDE_DIRS}")
         target_include_directories(
             gmlc_utilities_obj SYSTEM
             PRIVATE $<BUILD_INTERFACE:${Boost_INCLUDE_DIRS}>
@@ -677,7 +677,6 @@ else()
     add_library(HELICS::utilities ALIAS gmlc_utilities)
     set_target_properties(gmlc_utilities PROPERTIES FOLDER Extern)
     if(NOT HELICS_DISABLE_BOOST)
-        message(STATUS "Boost include=${Boost_INCLUDE_DIRS}")
         target_include_directories(
             gmlc_utilities SYSTEM
             PRIVATE $<BUILD_INTERFACE:${Boost_INCLUDE_DIRS}>

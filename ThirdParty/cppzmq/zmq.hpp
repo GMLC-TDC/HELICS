@@ -136,8 +136,8 @@
 #if defined(ZMQ_CPP11) && !defined(__llvm__) && !defined(__INTEL_COMPILER) \
     && defined(__GNUC__) && __GNUC__ < 5
 #define ZMQ_CPP11_PARTIAL
-#elif defined(__llvm__) && defined(__GLIBCXX__) && __GLIBCXX__ < 20160805
-//the date here is the last date of gcc 4.9.4, which 
+#elif defined(__GLIBCXX__) && __GLIBCXX__ < 20160805
+//the date here is the last date of gcc 4.9.4, which
 // effectively means libstdc++ from gcc 5.5 and higher won't trigger this branch
 #define ZMQ_CPP11_PARTIAL
 #endif
