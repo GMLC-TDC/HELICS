@@ -1402,6 +1402,14 @@ public:
 protected:
     void *_handle;
 };
+template<> inline std::string socket_base::getsockopt(int option_) const
+{
+    size_t optlen = 256;
+    std::string ret(optlen,'\0');
+    getsockopt(option_, &ret[0], &optlen);
+    ret.resize(optlen);
+    return ret;
+}
 } // namespace detail
 
 #ifdef ZMQ_CPP11
@@ -1637,14 +1645,6 @@ inline void proxy_steerable(socket_ref frontend,
         throw error_t();
 }
 #endif
-
-template<> inline std::string socket_base::getsockopt(int option_) const
-{
-    size_t optlen = 256;
-    std::string ret(optlen,'\0');
-    getsockopt(option_, &ret[0], &optlen);
-    return ret;
-}
 
 class monitor_t
 {
