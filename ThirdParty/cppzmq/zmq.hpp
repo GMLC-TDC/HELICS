@@ -92,6 +92,9 @@
 #include <optional>
 #define ZMQ_HAS_OPTIONAL 1
 #endif
+#if __has_include(<string_view>)
+#define ZMQ_HAS_STRING_VIEW 1
+#endif
 #endif
 
 #endif
@@ -1103,7 +1106,7 @@ const_buffer buffer(const std::basic_string<T, Traits, Allocator> &data,
     return detail::buffer_contiguous_sequence(data, n_bytes);
 }
 
-#ifdef ZMQ_CPP17
+#if ZMQ_HAS_STRING_VIEW > 0
 // std::basic_string_view
 template<class T, class Traits>
 const_buffer buffer(std::basic_string_view<T, Traits> data) noexcept
