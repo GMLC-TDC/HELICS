@@ -71,7 +71,7 @@ There are a few additional options available for generating HELICS packages or c
 
 
 ## Hidden Options
-There are a few options in the CMake system that are not visible in the GUI they mainly deal with particular situations related to release and code generation and should not be normally used they are all default off.
+There are a few options in the CMake system that are not visible in the GUI they mainly deal with particular situations related to release, testing, and code generation and should not be normally used. They are all default off.
 
 -  `HELICS_SWIG_GENERATE_INTERFACE_FILES_ONLY` : use swig to generate the interface files for the different languages but don't compile them.  
 -  `HELICS_OVERWRITE_INTERFACE_FILES` : Instruct CMake to take the generated files, and overwrite the existing interface files for the given language, only applies to python, Matlab, and Java.  This is used in the generation of the interface files for releases and the git repo.  It is only active is `HELICS_SWIG_GENERATE_INTERFACE_FILES_ONLY` is enabled.  

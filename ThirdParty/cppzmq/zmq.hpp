@@ -714,7 +714,7 @@ struct recv_buffer_size
 namespace detail
 {
 
-#if ZMQ_HAS_OPTIONAL > 0
+#if defined(ZMQ_HAS_OPTIONAL) && (ZMQ_HAS_OPTIONAL > 0)
 using send_result_t = std::optional<size_t>;
 using recv_result_t = std::optional<size_t>;
 using recv_buffer_result_t = std::optional<recv_buffer_size>;
@@ -1111,7 +1111,7 @@ const_buffer buffer(const std::basic_string<T, Traits, Allocator> &data,
     return detail::buffer_contiguous_sequence(data, n_bytes);
 }
 
-#if ZMQ_HAS_STRING_VIEW > 0
+#if defined(ZMQ_HAS_STRING_VIEW) && (ZMQ_HAS_STIRNG_VIEW > 0)
 // std::basic_string_view
 template<class T, class Traits>
 const_buffer buffer(std::basic_string_view<T, Traits> data) noexcept
