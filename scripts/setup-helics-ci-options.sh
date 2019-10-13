@@ -13,15 +13,15 @@ OPTION_FLAGS_ARR+=("-DHELICS_ENABLE_SLOW_PACKAGING_TESTS=ON")
 
 # Options to control building zeromq
 if [[ "$ZMQ_SUBPROJECT" ]]; then
-    OPTION_FLAGS_ARR+=("-DZMQ_SUBPROJECT=ON")
+    OPTION_FLAGS_ARR+=("-DHELICS_ZMQ_SUBPROJECT=ON")
 fi
 
 if [[ "$ZMQ_FORCE_SUBPROJECT" ]]; then
-    OPTION_FLAGS_ARR+=("-DZMQ_FORCE_SUBPROJECT=ON")
+    OPTION_FLAGS_ARR+=("-DHELICS_ZMQ_FORCE_SUBPROJECT=ON")
 fi
 
 if [[ "$ZMQ_STATIC" ]]; then
-    OPTION_FLAGS_ARR+=("-DZMQ_USE_STATIC_LIBRARY=ON")
+    OPTION_FLAGS_ARR+=("-DHELICS_USE_ZMQ_STATIC_LIBRARY=ON")
 fi
 
 # Options to control building swig interfaces
@@ -43,7 +43,7 @@ fi
 if [[ "$BUILD_TYPE" ]]; then
     OPTION_FLAGS_ARR+=("-DCMAKE_BUILD_TYPE=${BUILD_TYPE}")
     if [[ "$BUILD_TYPE" == "Coverage" ]]; then
-        OPTION_FLAGS_ARR+=("-DTEST_CODE_COVERAGE=ON")
+        OPTION_FLAGS_ARR+=("-DHELICS_TEST_CODE_COVERAGE=ON")
     fi
 else
     OPTION_FLAGS_ARR+=("-DCMAKE_BUILD_TYPE=Release")
@@ -71,7 +71,7 @@ fi
 
 # Travis related options
 if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
-    OPTION_FLAGS_ARR+=("-DDISABLE_SYSTEM_CALL_TESTS=ON")
+    OPTION_FLAGS_ARR+=("-DHELICS_DISABLE_SYSTEM_CALL_TESTS=ON")
 fi
 export HELICS_OPTION_FLAGS=${OPTION_FLAGS_ARR[@]}
 

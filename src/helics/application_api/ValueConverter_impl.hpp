@@ -152,7 +152,7 @@ class ostringbuf : public std::streambuf
     {
         if (ch != traits_type::eof ())
         {
-            *pptr () = ch;
+            *pptr () = static_cast<char> (ch);
             pbump (1);  // always safe due to buffer at 1 space reserved
             move_to_string_and_flush ();
             return ch;

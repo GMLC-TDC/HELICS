@@ -18,7 +18,7 @@ mark_as_advanced(HELICS_ENABLE_ERROR_ON_WARNINGS)
 # -------------------------------------------------------------
 # Setup compiler options and configurations
 # -------------------------------------------------------------
-message(STATUS "setting up for ${CMAKE_CXX_COMPILER_ID}")
+message(STATUS "setting up for ${CMAKE_CXX_COMPILER_ID} on ${CMAKE_SYSTEM}")
 if(NOT TARGET compile_flags_target)
     add_library(compile_flags_target INTERFACE)
 endif()
@@ -109,29 +109,13 @@ endif(HELICS_ENABLE_EXTRA_COMPILER_WARNINGS)
 # -------------------------------------------------------------
 if(MSVC)
 
-    target_compile_options(compile_flags_target INTERFACE -D_CRT_SECURE_NO_WARNINGS)
-    target_compile_options(compile_flags_target INTERFACE -D_SCL_SECURE_NO_WARNINGS)
+    target_compile_options(compile_flags_target INTERFACE -D_CRT_SECURE_NO_WARNINGS -D_SCL_SECURE_NO_WARNINGS)
     # these next two should be global
     add_compile_options(/MP /EHsc)
-    add_compile_options(/sdl)
-    if(ENABLE_EXTRA_COMPILER_WARNINGS)
-        target_compile_options(
-            compile_flags_target
-            INTERFACE
-                -W4
-                /wd4065
-                /wd4101
-                /wd4102
-                /wd4244
-                /wd4297
-                /wd4355
-                /wd4800
-                /wd4484
-                /wd4702
-                /wd4996
-        )
-    endif(ENABLE_EXTRA_COMPILER_WARNINGS)
-    add_definitions(-D_WIN32_WINNT=0x0601)
+    if(HELICS_ENABLE_EXTRA_COMPILER_WARNINGS)
+        target_compile_options(compile_flags_target INTERFACE /W4 /sdl /wd4244)
+    endif(HELICS_ENABLE_EXTRA_COMPILER_WARNINGS)
+    target_compile_options(compile_flags_target INTERFACE -D_WIN32_WINNT=0x0601)
 else(MSVC)
     option(USE_LIBCXX "Use Libc++ vs as opposed to the default" OFF)
     mark_as_advanced(USE_LIBCXX)

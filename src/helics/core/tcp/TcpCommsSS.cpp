@@ -172,8 +172,8 @@ void TcpCommsSS::queue_tx_function ()
 
     if (serverMode)
     {
-        server =
-          TcpServer::create (ioctx->getBaseContext (), localTargetAddress, PortNumber, true, maxMessageSize);
+        server = TcpServer::create (ioctx->getBaseContext (), localTargetAddress,
+                                    static_cast<uint16_t> (PortNumber.load ()), true, maxMessageSize);
         while (!server->isReady ())
         {
             logWarning ("retrying tcp bind");

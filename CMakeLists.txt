@@ -65,6 +65,7 @@ include(copy_key_files)
 include(CTest)
 include(ucm)
 
+
 # include(BuildType)
 # -----------------------------------------------------------------------------
 # set the install path to a local directory
@@ -218,6 +219,7 @@ if(NOT TARGET compile_flags_target)
 endif()
 
 if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
+    mark_as_advanced(BUILD_TESTING)
     include(compiler_flags)
     message(STATUS "setting helics C++ standard build option to \"${CXX_STANDARD_FLAG}\"")
     if(CXX_STANDARD_FLAG)

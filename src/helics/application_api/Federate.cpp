@@ -418,7 +418,7 @@ void Federate::setProperty (int32_t option, Time timeValue)
 
 void Federate::setProperty (int32_t option, int32_t optionValue)
 {
-    coreObject->setIntegerProperty (fedID, option, optionValue);
+    coreObject->setIntegerProperty (fedID, option, static_cast<int16_t> (optionValue));
 }
 
 Time Federate::getTimeProperty (int32_t option) const { return coreObject->getTimeProperty (fedID, option); }

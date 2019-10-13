@@ -67,7 +67,7 @@ void UdpComms::queue_rx_function ()
     {
         try
         {
-            socket.bind (udp::endpoint (udpnet (interfaceNetwork), PortNumber));
+            socket.bind (udp::endpoint (udpnet (interfaceNetwork), static_cast<uint16_t> (PortNumber)));
             bindsuccess = true;
         }
         catch (const std::system_error &error)
@@ -80,7 +80,8 @@ void UdpComms::queue_rx_function ()
                     ++PortNumber;
                     try
                     {
-                        socket.bind (udp::endpoint (udpnet (interfaceNetwork), PortNumber));
+                        socket.bind (
+                          udp::endpoint (udpnet (interfaceNetwork), static_cast<uint16_t> (PortNumber)));
                         bindsuccess = true;
                     }
                     catch (const std::system_error &)

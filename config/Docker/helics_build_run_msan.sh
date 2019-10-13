@@ -3,7 +3,7 @@ git git clone --recurse-submodules --branch develop https://github.com/GMLC-TDC/
 cd HELICS
 mkdir build-msan
 cd build-msan
-cmake .. -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_FLAGS="${MSAN_CFLAGS}"  -DHELICS_BUILD_TESTS=ON -DZMQ_SUBPROJECT=ON  -DZMQ_FORCE_SUBPROJECT=ON
+cmake .. -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_FLAGS="${MSAN_CFLAGS}"  -DHELICS_BUILD_TESTS=ON -DHELICS_ZMQ_SUBPROJECT=ON  -DHELICS_ZMQ_FORCE_SUBPROJECT=ON
 cd /root/develop/HELICS/build-msan
 make -j2
 
