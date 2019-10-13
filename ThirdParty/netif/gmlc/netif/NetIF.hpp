@@ -15,7 +15,7 @@ All rights reserved. SPDX-License-Identifier: BSD-3-Clause
 // other platforms might need different headers -- detecting with macros:
 // https://sourceforge.net/p/predef/wiki/OperatingSystems/
 // https://stackoverflow.com/questions/142508/how-do-i-check-os-with-a-preprocessor-directive
-#if defined(_WIN32)
+#if defined(_WIN32) || defined(__USE_W32_SOCKETS)
 #include <WS2tcpip.h>
 #include <iphlpapi.h>
 #include <winsock2.h>
@@ -32,13 +32,13 @@ namespace gmlc
 {
 namespace netif
 {
-#if defined(_WIN32)
+#if defined(_WIN32) || defined(__USE_W32_SOCKETS)
 using IF_ADDRS = PIP_ADAPTER_ADDRESSES;
 #else
 using IF_ADDRS = struct ifaddrs *;
 #endif
 
-#if defined(_WIN32)
+#if defined(_WIN32) || defined(__USE_W32_SOCKETS)
 using IF_ADDRS_UNICAST = PIP_ADAPTER_UNICAST_ADDRESS;
 #else
 using IF_ADDRS_UNICAST = struct ifaddrs *;
@@ -95,7 +95,7 @@ inline std::string addressToString (struct sockaddr *addr, int sa_len)
  */
 inline void freeAddresses (IF_ADDRS addrs)
 {
-#if defined(_WIN32)
+#if defined(_WIN32) || defined(__USE_W32_SOCKETS)
     HeapFree (GetProcessHeap (), 0, addrs);
 #else
     freeifaddrs (addrs);
@@ -113,7 +113,7 @@ inline void freeAddresses (IF_ADDRS addrs)
  */
 inline auto getAddresses (int family, IF_ADDRS *addrs)
 {
-#if defined(_WIN32)
+#if defined(_WIN32) || defined(__USE_W32_SOCKETS)
     // Windows API: https://docs.microsoft.com/en-us/windows/win32/api/iphlpapi/nf-iphlpapi-getadaptersaddresses
     DWORD rv = 0;
     ULONG bufLen = 15000;  // recommended size from Windows API docs to avoid error
@@ -158,7 +158,7 @@ inline auto getAddresses (int family, IF_ADDRS *addrs)
  */
 inline auto getSockAddr (IF_ADDRS_UNICAST addr)
 {
-#if defined(_WIN32)
+#if defined(_WIN32) || defined(__USE_W32_SOCKETS)
     return addr->Address.lpSockaddr;
 #else
     return addr->ifa_addr;
@@ -172,7 +172,7 @@ inline auto getSockAddr (IF_ADDRS_UNICAST addr)
  */
 inline int getSockAddrLen (IF_ADDRS_UNICAST addr)
 {
-#if defined(_WIN32)
+#if defined(_WIN32) || defined(__USE_W32_SOCKETS)
     return addr->Address.iSockaddrLength;
 #else
     return sizeof (*addr->ifa_addr);
@@ -189,7 +189,7 @@ inline int getSockAddrLen (IF_ADDRS_UNICAST addr)
  */
 inline IF_ADDRS_UNICAST getNextAddress (int family, IF_ADDRS_UNICAST addrs)
 {
-#if defined(_WIN32)
+#if defined(_WIN32) || defined(__USE_W32_SOCKETS)
     (void)family;
     return addrs->Next;
 #else
@@ -237,7 +237,7 @@ std::vector<std::string> getInterfaceAddresses (int family)
 
     getAddresses (family, &allAddrs);
 
-#if defined(_WIN32)
+#if defined(_WIN32) || defined(__USE_W32_SOCKETS)
     WSADATA wsaData;
     if (WSAStartup (0x202, &wsaData) != 0)
     {
@@ -260,7 +260,7 @@ std::vector<std::string> getInterfaceAddresses (int family)
             }
         }
 
-#if defined(_WIN32)
+#if defined(_WIN32) || defined(__USE_W32_SOCKETS)
         winAddrs = winAddrs->Next;
     }
     WSACleanup ();

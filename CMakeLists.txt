@@ -449,14 +449,15 @@ if(MINGW AND NOT UNIX_LIKE)
     target_link_libraries(helics_base INTERFACE wsock32 ws2_32)
 endif()
 
+if (CYGWIN)
 target_compile_definitions(
     helics_base_includes
     INTERFACE
-    $<$<PLATFORM_ID:Cygwin>:-D_XOPEN_SOURCE=500
+    -D_XOPEN_SOURCE=500
     -D__USE_W32_SOCKETS
-    -D_WIN32_WINNT=0x0601>
+    -D_WIN32_WINNT=0x0601
 )
-
+endif()
 # -------------------------------------------------------------
 # Enable ZeroMQ
 # -------------------------------------------------------------

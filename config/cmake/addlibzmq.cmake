@@ -30,6 +30,10 @@ string(TOLOWER "libzmq" lcName)
 if(NOT CMAKE_VERSION VERSION_LESS 3.11)
 include(FetchContent)
 
+mark_as_advanced(FETCHCONTENT_BASE_DIR)
+mark_as_advanced(FETCHCONTENT_FULLY_DISCONNECTED)
+mark_as_advanced(FETCHCONTENT_QUIET)
+
 FetchContent_Declare(
   libzmq
   GIT_REPOSITORY https://github.com/zeromq/libzmq.git
@@ -47,7 +51,10 @@ if(NOT ${lcName}_POPULATED)
   file(DOWNLOAD https://raw.githubusercontent.com/zeromq/libzmq/master/builds/cmake/ZeroMQConfig.cmake.in ${${lcName}_SOURCE_DIR}/builds/cmake/ZeroMQConfig.cmake.in)
   
 endif()
-else() #cmake <3.11
+
+hide_variable(FETCHCONTENT_SOURCE_DIR_LIBZMQ)
+hide_variable(FETCHCONTENT_UPDATES_DISCONNECTED_LIBZMQ)
+else() #CMake <3.11
 
 # create the directory first
 file(MAKE_DIRECTORY ${PROJECT_BINARY_DIR}/_deps)
@@ -76,7 +83,7 @@ endif()
   set(ENABLE_CURVE OFF CACHE BOOL "" FORCE)
   set(ENABLE_DRAFTS OFF CACHE BOOL "" FORCE)
   set(WITH_DOCS OFF CACHE BOOL "" FORCE)
-  set(ZMQ_LOCAL_BUILD ON CACHE BOOL "" FORCE)
+  set(HELICS_ZMQ_LOCAL_BUILD ON CACHE INTERNAL "")
   set(LIBZMQ_PEDANTIC OFF CACHE BOOL "" FORCE)
   set(WITH_PERF_TOOL OFF CACHE BOOL "" FORCE)
   set(ENABLE_CPACK OFF CACHE BOOL "" FORCE)
@@ -126,7 +133,6 @@ endif()
   hide_variable(ZMQ_CV_IMPL)
   hide_variable(BUILD_TESTS)
   hide_variable(ENABLE_INTRINSICS)
-  
 
   hide_variable(ZMQ_WIN32_WINNT)
   

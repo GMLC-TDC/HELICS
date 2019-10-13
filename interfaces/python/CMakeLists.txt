@@ -7,21 +7,14 @@
 # SPDX-License-Identifier: BSD-3-Clause
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-if(SWIG_GENERATE_INTERFACE_FILES_ONLY)
+if(HELICS_SWIG_GENERATE_INTERFACE_FILES_ONLY)
  include (${CMAKE_CURRENT_SOURCE_DIR}/pythonSwigGenerateOnly.cmake)
 else()
-#at some point in the future (HELICS 3) switch everything to use find_package(Python3 ...)
-	if(${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION} VERSION_GREATER 3.12)
-		option(HELICS_USE_NEW_PYTHON_FIND "Use the FindPython Routine only available from cmake 3.12 and later" OFF)
-		mark_as_advanced(HELICS_USE_NEW_PYTHON_FIND)
-	else()
-		set(HELICS_USE_NEW_PYTHON_FIND OFF CACHE BOOL "" FORCE)
-		hide_variable(HELICS_USE_NEW_PYTHON_FIND)
-	endif()
+
  
  if (HELICS_USE_NEW_PYTHON_FIND)
 	find_package(Python3 COMPONENTS Interpreter Development)
-	if(ENABLE_SWIG AND SWIG_EXECUTABLE)
+	if(HELICS_ENABLE_SWIG AND SWIG_EXECUTABLE)
     
 		# https://stackoverflow.com/a/3818084/5451769
 		if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX)
@@ -96,7 +89,7 @@ else()
 	endif()
     find_package(PythonLibs 3 REQUIRED)
 
-if(ENABLE_SWIG AND SWIG_EXECUTABLE)
+if(HELICS_ENABLE_SWIG AND SWIG_EXECUTABLE)
 
   # https://stackoverflow.com/a/3818084/5451769
   if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX)
@@ -221,4 +214,4 @@ endif()
 install(FILES ${CMAKE_CURRENT_BINARY_DIR}/helics.py DESTINATION python COMPONENT python)
 install_key_files_with_comp(python)
 
-endif(SWIG_GENERATE_INTERFACE_FILES_ONLY)
+endif(HELICS_SWIG_GENERATE_INTERFACE_FILES_ONLY)

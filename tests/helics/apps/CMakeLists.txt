@@ -43,7 +43,7 @@ target_compile_definitions(
   -DHELICS_INSTALL_LOC=\"${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_BINDIR}\"
 )
 
-if(DISABLE_SYSTEM_CALL_TESTS)
+if(HELICS_DISABLE_SYSTEM_CALL_TESTS)
   target_compile_definitions(helics_apps-tests PRIVATE -DDISABLE_SYSTEM_CALL_TESTS=1)
 endif()
 

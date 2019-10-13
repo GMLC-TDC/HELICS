@@ -27,6 +27,10 @@ if(NOT ${gbName}_POPULATED)
   FetchContent_Populate(gbenchmark)
 
 endif()
+
+hide_variable(FETCHCONTENT_SOURCE_DIR_GBENCHMARK)
+hide_variable(FETCHCONTENT_UPDATES_DISCONNECTED_GBENCHMARK)
+
 else() #cmake <3.11
 
 # create the directory first

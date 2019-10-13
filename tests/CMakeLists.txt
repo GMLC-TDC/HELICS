@@ -12,7 +12,7 @@ if(hasParent)
 
 add_subdirectory(helics)
 
-if(NOT SWIG_GENERATE_INTERFACE_FILES_ONLY)
+if(NOT HELICS_SWIG_GENERATE_INTERFACE_FILES_ONLY)
 if(BUILD_PYTHON_INTERFACE)
   add_subdirectory(python)
 endif()
@@ -33,7 +33,7 @@ if(BUILD_CSHARP_INTERFACE)
    #add_subdirectory(csharp)
 endif()
 
-endif(NOT SWIG_GENERATE_INTERFACE_FILES_ONLY)
+endif(NOT HELICS_SWIG_GENERATE_INTERFACE_FILES_ONLY)
 
 else()
 	cmake_minimum_required(VERSION 3.4)

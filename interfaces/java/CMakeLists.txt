@@ -7,7 +7,7 @@
 # SPDX-License-Identifier: BSD-3-Clause
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-if(SWIG_GENERATE_INTERFACE_FILES_ONLY)
+if(HELICS_SWIG_GENERATE_INTERFACE_FILES_ONLY)
  include (${CMAKE_CURRENT_SOURCE_DIR}/javaSwigGenerateOnly.cmake)
 else()
    find_package(Java REQUIRED)
@@ -18,7 +18,7 @@ else()
    include_directories(${JNI_INCLUDE_DIRS})
 
 
-if(ENABLE_SWIG AND SWIG_EXECUTABLE)
+if(HELICS_ENABLE_SWIG AND SWIG_EXECUTABLE)
 # Enable generation using swig
 
   set_property(SOURCE helicsJava.i PROPERTY SWIG_MODULE_NAME JNIhelics)
@@ -54,7 +54,7 @@ else()
   add_library(JNIhelics SHARED interface/helicsJava.c)
   target_link_libraries(JNIhelics helicsSharedLib ${JAVA_LIBRARIES})
   set_target_properties(JNIhelics PROPERTIES FOLDER interfaces)
-endif() # ENABLE_SWIG
+endif() # HELICS_ENABLE_SWIG
 
 configure_file(
   MakeJarCMakeLists.txt.in ${CMAKE_CURRENT_BINARY_DIR}/CMakeLists.txt @ONLY

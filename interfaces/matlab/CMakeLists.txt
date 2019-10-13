@@ -8,19 +8,19 @@
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 # Generate SWIG wrapper for MATLAB
-if(SWIG_GENERATE_INTERFACE_FILES_ONLY)
+if(HELICS_SWIG_GENERATE_INTERFACE_FILES_ONLY)
   include (${CMAKE_CURRENT_SOURCE_DIR}/matlabSwigGenerateOnly.cmake)
 else()
 find_package(Matlab COMPONENTS MAIN_PROGRAM)
 
 
-if(ENABLE_SWIG AND SWIG_EXECUTABLE)
+if(HELICS_ENABLE_SWIG AND SWIG_EXECUTABLE)
 	#check to make sure the swig executable supports matlab
   execute_process(COMMAND ${SWIG_EXECUTABLE} -help OUTPUT_VARIABLE SWIG_HELP_OUTPUT)
   string(FIND "${SWIG_HELP_OUTPUT}" "-matlab" MATLAB_HELP_FOUND)
   if(${MATLAB_HELP_FOUND} LESS 0)
     set(MATLAB_SWIG_NOT_AVAILABLE 1)
-    message(warning " SWIG VERSION does not support matlab, reverting to build only")
+    message(warning " SWIG VERSION does not support Matlab, reverting to build only")
   endif()
 endif()
 

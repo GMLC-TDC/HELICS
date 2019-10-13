@@ -1,6 +1,6 @@
-# Windows Installation
+# Windows Installation #
 
-## Requirements
+## Requirements ##
 
 -   Microsoft Visual C++ 2015 or newer (MS Build Tools also works)
 -   CMake 3.4 or newer(CMake should be newer than the Visual Studio and Boost version you are using)
@@ -8,7 +8,7 @@
 -   Boost 1.58 or newer
 -   MS-MPI v8 or newer (if MPI support is needed)
 
-## Setup for Visual Studio
+## Setup for Visual Studio ##
 
 *Note*: Keep in mind that your CMake version should be newer than the boost version and your visual studio version. If you have an older CMake, you may want an older boost version. Alternatively, you can choose to upgrade your version of CMake.
 
@@ -97,11 +97,11 @@ Getting and building from source:
    replaced with the name of one of the projects to build only that
    part of HELICS.
 
-## Windows Installers
+## Windows Installers ##
 
 Windows installers are available with the different [releases](https://github.com/GMLC-TDC/HELICS/releases).  The release includes zip archives with static libraries containing both the Debug version and Release version for several versions of Visual Studio. There is also an installer and zip file for getting the HELICS apps and shared library along with pre-built Python 3.6 and Java 1.8 interfaces. There is also an archive with just the C shared library and headers, intended for use with 3rd party interfaces.
 
-## Testing
+## Testing ##
 
 A quick test is to double check the versions of the HELICS player and
 recorder (located in the 'build/src/helics/apps/player/Debug' folder):
@@ -110,18 +110,18 @@ recorder (located in the 'build/src/helics/apps/player/Debug' folder):
 > cd C:/Path/To/build/src/helics/apps/Debug
 
 > helics_player.exe --version
-x.x.x XXXX-XX-XX
+x.x.x 20XX-XX-XX
 
 > helics_recorder.exe --version
-x.x.x XXXX-XX-XX  
+x.x.x 20XX-XX-XX  
 ```
 there may be additional build information if a non tagged version is built.  
 
-## Building HELICS with python support
+## Building HELICS with python support ##
 
 Setting `-DBUILD_PYTHON_INTERFACE=ON` will generate a project to build the python interface, if python is installed to a system
-path then the appropriate libraries and flags will be automatically found.  If SWIG is available and you wish to regenerate the interface
-set SWIG\_EXECUTABLE to the location of swig.exe.  Otherwise DISABLE\_SWIG can be set to ON to build using repo sources for the interface.
+path then the appropriate libraries and flags will be automatically found.  If SWIG is available and you wish to regenerate the interface, `ENABLE_SWIG` can be set to ON to use swig
+to generate the interface files.  `SWIG_EXECUTABLE` can be set to the path of the swig.exe if
 We highly recommend using Anaconda3/Miniconda3 for the Python distribution.
 Additionally, you will need to ensure that the Python distribution used is built using the same compiler architecture (x86/x64) as the one you are using to build HELICS, as well as the one that was used to build Boost (as mentioned above).
 ZeroMQ will be built using the CMake build process.
@@ -158,7 +158,7 @@ IPython 6.2.1 -- An enhanced Interactive Python. Type '?' for help.
 In [1]: import helics
 
 In [2]: helics.helicsGetVersion()
-Out[2]: 'x.x.x (XX-XX-XX)'
+Out[2]: 'x.x.x (20XX-XX-XX)'
 
 ```
 

@@ -11,13 +11,21 @@ A note on future revisions.
 Minor release 
 ### Changed
 -  Converted the shared_library_tests and Application_api tests to use Google test instead of Boost test
+- most HELICS CMake options have changed to HELICS_**, with the exception of BUILD_XXX_INTERFACE, and ENABLE_XXX_CORE.  These options will not change until HELICS 3.0, at which point all HELICS related CMake options that are not standard CMAKE options will have a leading HELICS_ 
+- Some attempts were made to further modernize the usage in CMake,  This effort ended up fixing a few bugs in certain conditions and simplifying things, the cmake code was also run through a formatter
 
 ### Fixed 
+-  Race condition when removing subscriptions or targets from an interface
+-  Fixed mistakenly excluded tests and the resulting failures in the CI builds
+-  some of the interface functions(Python, Java, etc) were generating incorrect code for getting raw data from inputs.  
 
 ### Added
 -   A set of included helics benchmarks using the Google benchmark library.
+-   the src, test, benchmarks directory can now be used as a root directory for CMake to do the appropriate build with few options.  
+-  dedicated internal functions for conversion of bool operators,  strings such as "off", "false", "disabled", "inactive" are now supported as valid bool values.  
 
 ### Removed
+-  All tests using boost::test have now been replaced with Google test, so references and linking to boost::test has been removed
 
 ## \[2.2.1\] - 2019-09-27
 Minor release with bug fixes and a few additional features
@@ -123,7 +131,7 @@ The main focus of this minor release is cleaning up the build system and extract
 -   The command line arguments are error checked and the help prints all available options (thanks to CLI11)
 -   the core tests and common tests now use google test instead of boost test.  More tests are expected to be migrated in the future.  
 -   updates to the HELICSConfig.cmake file that gets installed to be more resilient to different directory structures.
--   use ZMQ as a subproject if needed instead of an autobuild and install it as a target if needed. The CMake option to enable this is ZMQ_LOCAL_BUILD, replacing AUTOBUILD_ZMQ.
+-   use ZMQ as a subproject if needed instead of an autobuild and install it as a target if needed. The CMake option to enable this is ZMQ_SUBPROJECT, replacing AUTOBUILD_ZMQ.
 -   the cereal library is not installed by default except on visual studio, and there is a CMAKE option to install it `HELICS_INSTALL_CEREAL`
 -   some update to the noexcept policy on c++98 interface
 

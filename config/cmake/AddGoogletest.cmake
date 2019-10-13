@@ -21,6 +21,9 @@ string(TOLOWER "googletest" gtName)
 
 if(NOT CMAKE_VERSION VERSION_LESS 3.11)
 include(FetchContent)
+mark_as_advanced(FETCHCONTENT_BASE_DIR)
+mark_as_advanced(FETCHCONTENT_FULLY_DISCONNECTED)
+mark_as_advanced(FETCHCONTENT_QUIET)
 
 FetchContent_Declare(
   googletest
@@ -35,6 +38,8 @@ if(NOT ${gtName}_POPULATED)
   FetchContent_Populate(googletest)
 
 endif()
+hide_variable(FETCHCONTENT_SOURCE_DIR_GOOGLETEST)
+hide_variable(FETCHCONTENT_UPDATES_DISCONNECTED_GOOGLETEST)
 else() #cmake <3.11
 
 # create the directory first
