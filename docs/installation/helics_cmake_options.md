@@ -58,9 +58,10 @@ Options effect the connection of libraries used in HELICS and how they are linke
 -  `HELICS_ZMQ_FORCE_SUBPROJECT`: \[Default=OFF\] Force ZMQ to be built and linked as a subproject.  
 -  `ZeroMQ_INSTALL_PATH`:  Can be used to specify a path to ZeroMQ for inclusion.  
 
-#### Options related to helics tests
+#### Options related to helics tests and CI configurations
 -  `HELICS_TEST_CODE_COVERAGE` :\[Default=OFF\] turn on code coverage testing, enables additional linkage and options inside HELICS for coverage testing, mainly useful inside the CI or for testing.  
 -  `HELICS_ENABLE_SLOW_PACKAGING_TESTS`:  \[Default=OFF\] Turn on some additional packaging tests, Mainly used in some of the CI testing to make sure HELICS works as a subproject
+-  `HELICS_ENABLE_CLANG_TOOLS`:  \[Default=OFF\] Enables some helper targets for using clang-tidy and clang-format.  
 
 ### Packaging and Install
 There are a few additional options available for generating HELICS packages or customizing an installation.  
@@ -76,3 +77,4 @@ There are a few options in the CMake system that are not visible in the GUI they
 -  `HELICS_SWIG_GENERATE_INTERFACE_FILES_ONLY` : use swig to generate the interface files for the different languages but don't compile them.  
 -  `HELICS_OVERWRITE_INTERFACE_FILES` : Instruct CMake to take the generated files, and overwrite the existing interface files for the given language, only applies to python, Matlab, and Java.  This is used in the generation of the interface files for releases and the git repo.  It is only active is `HELICS_SWIG_GENERATE_INTERFACE_FILES_ONLY` is enabled.  
 - `HELICS_DISABLE_SYSTEM_CALL_TESTS` :  There are a few test that execute system calls, which could be problematic to compile or execute on certain platforms.  This option removes those tests from compilation.  
+-  `INSTALL_SYSTEM_LIBRARIES` : Install system libraries with the installation,  mainly useful for making a complete installer package with all needed libraries included.  

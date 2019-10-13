@@ -582,9 +582,9 @@ void runFederateTestVectorD (const char *core,
     // test getting a vector as a string
     actualLen = helicsInputGetStringSize (subid);
     std::string buf;
-    buf.resize (actualLen + 2);
+    buf.resize (static_cast<size_t> (actualLen) + 2);
     CE (helicsInputGetString (subid, &(buf[0]), static_cast<int> (buf.size ()), &actualLen, &err));
-    buf.resize (actualLen - 1);
+    buf.resize (static_cast<size_t> (actualLen) - 1);
     EXPECT_EQ (buf[0], 'v');
     EXPECT_EQ (buf.back (), ']');
 

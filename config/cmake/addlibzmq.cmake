@@ -33,6 +33,7 @@ include(FetchContent)
 mark_as_advanced(FETCHCONTENT_BASE_DIR)
 mark_as_advanced(FETCHCONTENT_FULLY_DISCONNECTED)
 mark_as_advanced(FETCHCONTENT_QUIET)
+mark_as_advanced(FETCHCONTENT_UPDATES_DISCONNECTED)
 
 FetchContent_Declare(
   libzmq

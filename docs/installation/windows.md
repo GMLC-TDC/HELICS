@@ -22,13 +22,13 @@ To set up your environment:
    but tests will not). For CMake to detect it automatically either
    extract Boost to the root of your drive, or set the `BOOST_INSTALL_PATH`
    environment variable to the install location. The CMake will only automatically find
-    boost 1.61 or newer.
+    boost 1.58 or newer.
    Building with Visual Studio 2017 will require boost 1.65.1 or newer and CMake 3.9
     or newer.  Use 14.0 versions for Visual Studio 2015, 14.1 files for Visual studio 2017.  Visual studio 2019 will require CMake 3.14 or later.  
-    Boost 1.70 with CMake 3.14 is the current recommended configuration.
+    Boost 1.70 with CMake 3.14+ is the current recommended configuration.
 3. *Optional* Only if you need a global Install of ZeroMQ [ZeroMQ](http://zeromq.org/build:_start).
    We **highly recommend skipping** this step and running CMake with the
-   `ZMQ_LOCAL_BUILD=ON` option enabled(which is default on windows) to automatically set up a project-only
+   `HELICS_ZMQ_SUBPROJECT=ON` option enabled(which is default on windows) to automatically set up a project-only
    copy of ZeroMQ. The ZeroMQ Windows installer is **very**
    outdated and will not work with new versions of Visual Studio.  The CMake generator from ZeroMQ on windows is also functional and can be used to store ZMQ in another location that will need to be specified for HELICS.
 4. *Optional* Install
@@ -36,15 +36,15 @@ To set up your environment:
    if you need MPI support.
 5. *Optional* Install
    [SWIG](http://www.swig.org/download.html)
-   if you wish to generate the interface libraries, appropriate build files are included in the repository so it shouldn't be necessary to regenerate unless the libraries are modified.  If you want to generate the MATLAB interface a modified version of swig is necessary see [MATLAB Swig](../introduction/matlab).  For Matlab, Python 3, and Java swig is not necessary.  For Octave, Python2, and CSharp swig install is necessary.  The simplest way to install swig is to use [chocolatey](https://chocolatey.org/) and use
+   if you wish to generate the interface libraries, appropriate build files are included in the repository so it shouldn't be necessary to regenerate unless the libraries are modified.  If you want to generate the MATLAB interface a modified version of swig is necessary see [MATLAB Swig](../introduction/matlab).  For Matlab, Python 3, and Java swig is not necessary.  For Octave, Python2, and C\# swig install is necessary.  The simplest way to install swig is to use [chocolatey](https://chocolatey.org/) and use
    ```
    choco install swig
    ```
    from windows power shell.  
 6. Open a Visual Studio Command Prompt, and go to your working
-   directory.
-7. Make sure *CMake* and *git* are available in the Command Prompt.
-   If they aren't, add them to the system PATH variable.
+    directory.
+7.  Make sure *CMake* and *git* are available in the Command Prompt.
+    If they aren't, add them to the system PATH variable.
 
 Getting and building from source:
 
@@ -185,7 +185,7 @@ All packages can be installed by typing the following:
 ```bash
 $ pacman -Sy base-devel mingw-w64-x86_64-toolchain git mingw-w64-x86_64-CMake mingw-w64-x86_64-boost mingw-w64-x86_64-qt5 mingw-w64-x86_64-zeromq
 ```
-For base-devel and mingw-w64-x86_64-toolchain you may have to hit enter for installing all packages that are part of the group package. The qt5 package is quite large, if you are only using it once it might be faster to use cCMake which is a text based interface to CMake. After all the packages have been installed has been done /mingw64/bin must be in the PATH environment variable. If it isn't then it must be added. Please note that this is only necessary if you are compiling in MSYS2 shell. If you are compiling in the MSYS2 MINGW-64bit shell then /mingw64/bin will be automatically added to the PATH environment variable.
+For base-devel and mingw-w64-x86_64-toolchain you may have to hit enter for installing all packages that are part of the group package. The qt5 package is quite large, if you are only using it once it might be faster to use ccmake which is a text based interface to CMake. After all the packages have been installed has been done /mingw64/bin must be in the PATH environment variable. If it isn't then it must be added. Please note that this is only necessary if you are compiling in MSYS2 shell. If you are compiling in the MSYS2 MINGW-64bit shell then /mingw64/bin will be automatically added to the PATH environment variable. If not
 ```bash
 $ export PATH=$PATH:/mingw64/bin
 ```
