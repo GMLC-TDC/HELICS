@@ -19,6 +19,7 @@
 -   `BUILD_JAVA_INTERACE`  : \[Default=OFF\] Build the HELICS Java Interface
 -   `BUILD_MATLAB_INTERACE`  : \[Default=OFF\] Build the HELICS Matlab Interface
 -   `BUILD_CSHARP_INTERACE`  : \[Default=OFF\] Build the HELICS C# Interface, NOTE: Only available for CMake 3.8 or higher.  
+-   `CMAKE_CXX_STANDARD` : specify the C++ standard to use in building, HELICS requires 14 or higher,  HELICS 3.0 will require 17 or higher.  
 
 NOTE:  Most HELICS options are prefixed with HELICS_ to separate them from other libraries so HELICS can be used cleanly as a subproject.  The BUILD_XXX_INTERFACE options have not been changed since that would be a large change in an intermediate version, but they will be changed in HELICS 3.0 to HELICS_BUILD_XXXX_INTERFACE to complete the prefixing change for consistency across the library.  
 
