@@ -560,7 +560,7 @@ void valueExtract (const defV &dv, bool &val)
     {
         auto &np = mpark::get<NamedPoint> (dv);
         auto &str = np.name;
-        val = helicsBoolValue (str);
+        val = str.empty () || helicsBoolValue (str);
         if (val)
         {
             if ((str == "value" || str.empty ()) && np.value == 0.0)
@@ -985,7 +985,7 @@ void valueExtract (const data_view &dv, data_type baseType, bool &val)
     {
         auto npval = ValueConverter<NamedPoint>::interpret (dv);
         auto &str = npval.name;
-        val = helicsBoolValue (str);
+        val = str.empty () || helicsBoolValue (str);
         if (val)
         {
             if ((str == "value" || str.empty ()) && npval.value == 0.0)

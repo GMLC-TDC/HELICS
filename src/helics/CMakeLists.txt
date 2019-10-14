@@ -16,111 +16,118 @@ add_subdirectory(application_api)
 # -------------------------------------------------------------
 
 add_library(
-  helics-static
-  STATIC
-  $<TARGET_OBJECTS:application_api>
-  $<TARGET_OBJECTS:helics_core>
-  $<TARGET_OBJECTS:helics_common>
-  $<$<BOOL:${JSONCPP_OBJLIB}>:$<TARGET_OBJECTS:jsoncppobj_lib>>
-  $<$<BOOL:${GMLC_UTILITIES_OBJECT_LIB}>:$<TARGET_OBJECTS:gmlc_utilities_obj>>
-  $<$<BOOL:${HELICS_UNITS_OBJLIB}>:$<TARGET_OBJECTS:units-object>>
-)
-
-target_link_libraries(helics-static PUBLIC helics_base helics_base_includes
-	$<$<NOT:$<BOOL:${JSONCPP_OBJLIB}>>:HELICS::jsoncpp_lib>
-	$<$<NOT:$<BOOL:${GMLC_UTILITIES_OBJECT_LIB}>>:HELICS::utilities>
-	$<$<NOT:$<BOOL:${HELICS_UNITS_OBJLIB}>>:HELICS::units-static>
-	)
-# add and alias library to match the find_package
-add_library(HELICS::helics-static ALIAS helics-static)
-
-
-if(HELICS_BUILD_CXX_SHARED_LIB)
-  add_library(
-    helics-shared
-    SHARED
-    ../empty.cpp
+    helics-static STATIC
     $<TARGET_OBJECTS:application_api>
     $<TARGET_OBJECTS:helics_core>
     $<TARGET_OBJECTS:helics_common>
-	$<$<BOOL:${GMLC_UTILITIES_OBJECT_LIB}>:$<TARGET_OBJECTS:gmlc_utilities_obj>>
-	$<$<BOOL:${HELICS_UNITS_OBJLIB}>:$<TARGET_OBJECTS:units-object>>
-	$<$<BOOL:${JSONCPP_OBJLIB}>:$<TARGET_OBJECTS:jsoncppobj_lib>>
-  )
+    $<$<BOOL:${JSONCPP_OBJLIB}>:$<TARGET_OBJECTS:jsoncppobj_lib>>
+    $<$<BOOL:${GMLC_UTILITIES_OBJECT_LIB}>:$<TARGET_OBJECTS:gmlc_utilities_obj>>
+    $<$<BOOL:${HELICS_UNITS_OBJLIB}>:$<TARGET_OBJECTS:units-object>>
+)
 
-  add_library(HELICS::helics-shared ALIAS helics-shared)
-  target_link_libraries(helics-shared PUBLIC helics_base_includes PRIVATE helics_base
-	$<$<NOT:$<BOOL:${JSONCPP_OBJLIB}>>:HELICS::jsoncpp_lib>
-	$<$<NOT:$<BOOL:${GMLC_UTILITIES_OBJECT_LIB}>>:HELICS::utilities>
-	$<$<NOT:$<BOOL:${HELICS_UNITS_OBJLIB}>>:HELICS::units-static>
-	)
+target_link_libraries(
+    helics-static
+    PUBLIC
+        helics_base
+        helics_base_includes
+        $<$<NOT:$<BOOL:${JSONCPP_OBJLIB}>>:HELICS::jsoncpp_lib>
+        $<$<NOT:$<BOOL:${GMLC_UTILITIES_OBJECT_LIB}>>:HELICS::utilities>
+        $<$<NOT:$<BOOL:${HELICS_UNITS_OBJLIB}>>:HELICS::units-static>
+)
+# add and alias library to match the find_package
+add_library(HELICS::helics-static ALIAS helics-static)
 
-  set_target_properties(helics-shared PROPERTIES
-    VERSION ${HELICS_VERSION}
-    SOVERSION ${HELICS_VERSION_MAJOR}
-  )
+if(HELICS_BUILD_CXX_SHARED_LIB)
+    add_library(
+        helics-shared SHARED
+        ../empty.cpp
+        $<TARGET_OBJECTS:application_api>
+        $<TARGET_OBJECTS:helics_core>
+        $<TARGET_OBJECTS:helics_common>
+        $<$<BOOL:${GMLC_UTILITIES_OBJECT_LIB}>:$<TARGET_OBJECTS:gmlc_utilities_obj>>
+        $<$<BOOL:${HELICS_UNITS_OBJLIB}>:$<TARGET_OBJECTS:units-object>>
+        $<$<BOOL:${JSONCPP_OBJLIB}>:$<TARGET_OBJECTS:jsoncppobj_lib>>
+    )
 
-  if(WIN32)
-    set_target_properties(helics-shared PROPERTIES WINDOWS_EXPORT_ALL_SYMBOLS TRUE)
+    add_library(HELICS::helics-shared ALIAS helics-shared)
+    target_link_libraries(
+        helics-shared
+        PUBLIC helics_base_includes
+        PRIVATE
+            helics_base $<$<NOT:$<BOOL:${JSONCPP_OBJLIB}>>:HELICS::jsoncpp_lib>
+            $<$<NOT:$<BOOL:${GMLC_UTILITIES_OBJECT_LIB}>>:HELICS::utilities>
+            $<$<NOT:$<BOOL:${HELICS_UNITS_OBJLIB}>>:HELICS::units-static>
+    )
 
-  endif()
+    set_target_properties(
+        helics-shared
+        PROPERTIES VERSION ${HELICS_VERSION} SOVERSION ${HELICS_VERSION_MAJOR}
+    )
+
+    if(WIN32)
+        set_target_properties(helics-shared PROPERTIES WINDOWS_EXPORT_ALL_SYMBOLS TRUE)
+
+    endif()
 
 endif()
 
-if (NOT HELICS_BINARY_ONLY_INSTALL)
-  # Install the header if the C++ shared library is built
-  if (HELICS_INSTALL_CPP14_HEADERS)
-    install(
-      FILES helics.hpp
-      DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/helics
-      COMPONENT headers
-    )
-  endif()
+if(NOT HELICS_BINARY_ONLY_INSTALL)
+    # Install the header if the C++ shared library is built
+    if(HELICS_INSTALL_CPP14_HEADERS)
+        install(
+            FILES helics.hpp
+            DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/helics
+            COMPONENT headers
+        )
+    endif()
 
-  if (NOT HELICS_DISABLE_STATIC_LIB_INSTALL)
-    install(
-      TARGETS helics-static
-      ${HELICS_EXPORT_COMMAND}
-      DESTINATION ${CMAKE_INSTALL_LIBDIR}
-      COMPONENT libs
-    )
-  endif()
+    if(NOT HELICS_DISABLE_STATIC_LIB_INSTALL)
+        install(
+            TARGETS
+                helics-static
+                ${HELICS_EXPORT_COMMAND}
+                DESTINATION
+                ${CMAKE_INSTALL_LIBDIR}
+                COMPONENT
+                libs
+        )
+    endif()
 endif()
 
 if(HELICS_BUILD_CXX_SHARED_LIB)
-  install(
-    TARGETS helics-shared
-    ${HELICS_EXPORT_COMMAND}
-    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
-    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
-    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-  )
+    install(
+        TARGETS helics-shared ${HELICS_EXPORT_COMMAND}
+        RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+        ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+        LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    )
 
-  if(WIN32)
-    install(
-      FILES $<TARGET_LINKER_FILE:helics-shared>
-      DESTINATION ${CMAKE_INSTALL_LIBDIR}
-      COMPONENT libs
-    )
-    install(
-      FILES $<TARGET_FILE:helics-shared>
-      DESTINATION ${CMAKE_INSTALL_BINDIR}
-      COMPONENT Runtime
-    )
-  else()
-    install(
-      TARGETS helics-shared
-      DESTINATION ${CMAKE_INSTALL_LIBDIR}
-      COMPONENT Runtime
-    )
-  endif()
+    if(WIN32)
+        install(
+            FILES $<TARGET_LINKER_FILE:helics-shared>
+            DESTINATION ${CMAKE_INSTALL_LIBDIR}
+            COMPONENT libs
+        )
+        install(
+            FILES $<TARGET_FILE:helics-shared>
+            DESTINATION ${CMAKE_INSTALL_BINDIR}
+            COMPONENT Runtime
+        )
+    else()
+        install(
+            TARGETS helics-shared DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT
+            RUNTIME
+        )
+    endif()
 
 endif(HELICS_BUILD_CXX_SHARED_LIB)
 
-	if (NOT CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
-		set_target_properties(application_api helics_common helics_core helics-static PROPERTIES FOLDER helics)
-	endif()
-
+if(NOT CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
+    set_target_properties(
+        application_api helics_common helics_core helics-static
+        PROPERTIES FOLDER helics
+    )
+endif()
 
 option(
     HELICS_BUILD_APP_LIBRARY
@@ -128,30 +135,29 @@ option(
     ON
 )
 
-	cmake_dependent_option(
-		HELICS_BUILD_APP_EXECUTABLES
-		"Build helics applications to run various apps, including broker, player, recorder, and helics_apps"
-		ON "HELICS_BUILD_APP_LIBRARY AND CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME" OFF
-	)
+cmake_dependent_option(
+    HELICS_BUILD_APP_EXECUTABLES
+    "Build helics applications to run various apps, including broker, player, recorder, and helics_apps"
+    ON
+    "HELICS_BUILD_APP_LIBRARY AND CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME"
+    OFF
+)
 
-
-if (HELICS_BUILD_APP_LIBRARY)
-	add_subdirectory(apps)
-	if (NOT CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
-		set_target_properties(helics_apps PROPERTIES FOLDER helics)
-	endif()
+if(HELICS_BUILD_APP_LIBRARY)
+    add_subdirectory(apps)
+    if(NOT CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
+        set_target_properties(helics_apps PROPERTIES FOLDER helics)
+    endif()
 endif(HELICS_BUILD_APP_LIBRARY)
 
 if(NOT HELICS_DISABLE_C_SHARED_LIB)
-  add_subdirectory(shared_api_library)
-  add_subdirectory(cpp98)
-  if (NOT HELICS_BINARY_ONLY_INSTALL)
-  install(
-    FILES chelics.h
-    DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/helics
-    COMPONENT headers
-  )
-  endif()
+    add_subdirectory(shared_api_library)
+    add_subdirectory(cpp98)
+    if(NOT HELICS_BINARY_ONLY_INSTALL)
+        install(
+            FILES chelics.h
+            DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/helics
+            COMPONENT headers
+        )
+    endif()
 endif()
-
-

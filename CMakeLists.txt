@@ -65,7 +65,6 @@ include(copy_key_files)
 include(CTest)
 include(ucm)
 
-
 # include(BuildType)
 # -----------------------------------------------------------------------------
 # set the install path to a local directory
@@ -102,15 +101,16 @@ endif()
 option(HELICS_DISABLE_BOOST OFF "disable all references to the Boost C++ libraries")
 mark_as_advanced(HELICS_DISABLE_BOOST)
 
-# we want to acknowledge this flag since it is standard C++ but it can cause issues in submodules so we need to set other variables
-if (BUILD_SHARED_LIBS)
-	set(HELICS_DISABLE_STATIC_LIB_INSTALL ON CACHE BOOL "")
-	set(HELICS_BUILD_CXX_SHARED_LIB ON CACHE BOOL "")
-	set(HELICS_DISABLE_C_SHARED_LIB OFF CACHE BOOL "")
-	set(BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE)
-	if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
-		hide_variable(BUILD_SHARED_LIBS)
-	endif()
+# we want to acknowledge this flag since it is standard C++ but it can cause issues in
+# submodules so we need to set other variables
+if(BUILD_SHARED_LIBS)
+    set(HELICS_DISABLE_STATIC_LIB_INSTALL ON CACHE BOOL "")
+    set(HELICS_BUILD_CXX_SHARED_LIB ON CACHE BOOL "")
+    set(HELICS_DISABLE_C_SHARED_LIB OFF CACHE BOOL "")
+    set(BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE)
+    if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
+        hide_variable(BUILD_SHARED_LIBS)
+    endif()
 endif()
 
 cmake_dependent_option(
@@ -183,8 +183,13 @@ cmake_dependent_option(
     ON
 )
 
-cmake_dependent_option(HELICS_GENERATE_DOXYGEN_DOC "Generate HELICS Doxygen doc target" OFF "CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME"
-    OFF)
+cmake_dependent_option(
+    HELICS_GENERATE_DOXYGEN_DOC
+    "Generate HELICS Doxygen doc target"
+    OFF
+    "CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME"
+    OFF
+)
 
 if(
     NOT HELICS_DISABLE_C_SHARED_LIB
@@ -221,7 +226,9 @@ endif()
 if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
     mark_as_advanced(BUILD_TESTING)
     include(compiler_flags)
-    message(STATUS "setting helics C++ standard build option to \"${CXX_STANDARD_FLAG}\"")
+    message(
+        STATUS "setting helics C++ standard build option to \"${CXX_STANDARD_FLAG}\""
+    )
     if(CXX_STANDARD_FLAG)
         if(MSVC)
             target_compile_options(helics_base_includes INTERFACE ${CXX_STANDARD_FLAG})
@@ -449,14 +456,14 @@ if(MINGW AND NOT UNIX_LIKE)
     target_link_libraries(helics_base INTERFACE wsock32 ws2_32)
 endif()
 
-if (CYGWIN)
-target_compile_definitions(
-    helics_base_includes
-    INTERFACE
-    -D_XOPEN_SOURCE=500
-    -D__USE_W32_SOCKETS
-    -D_WIN32_WINNT=0x0601
-)
+if(CYGWIN)
+    target_compile_definitions(
+        helics_base_includes
+        INTERFACE
+        -D_XOPEN_SOURCE=500
+        -D__USE_W32_SOCKETS
+        -D_WIN32_WINNT=0x0601
+    )
 endif()
 # -------------------------------------------------------------
 # Enable ZeroMQ

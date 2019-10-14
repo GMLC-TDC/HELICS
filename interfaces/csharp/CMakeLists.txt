@@ -7,31 +7,46 @@
 # SPDX-License-Identifier: BSD-3-Clause
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-if(ENABLE_SWIG AND SWIG_EXECUTABLE)
-   # Enable generation using swig
+if(SWIG_EXECUTABLE)
+    # Enable generation using swig
 
-  set_property(SOURCE helicsCsharp.i PROPERTY SWIG_MODULE_NAME csharp)
-  #set_source_files_properties(helicsCsharp.i PROPERTIES SWIG_FLAGS "-outfile;helics.cs")
-  set(CMAKE_SWIG_FLAGS "-outfile;helics.cs;-namespace;gmlc")
+    set_property(SOURCE helicsCsharp.i PROPERTY SWIG_MODULE_NAME csharp)
+    # set_source_files_properties(helicsCsharp.i PROPERTIES SWIG_FLAGS
+    # "-outfile;helics.cs")
+    set(CMAKE_SWIG_FLAGS "-outfile;helics.cs;-namespace;gmlc")
 
-  swig_add_library(CShelics TYPE MODULE LANGUAGE csharp SOURCES helicsCsharp.i)
+    swig_add_library(
+        CShelics
+        TYPE
+        MODULE
+        LANGUAGE
+        csharp
+        SOURCES
+        helicsCsharp.i
+    )
 
-  swig_link_libraries(CShelics helicsSharedLib)
+    swig_link_libraries(CShelics helicsSharedLib)
 
-  set_target_properties(CShelics PROPERTIES FOLDER interfaces)
+    set_target_properties(CShelics PROPERTIES FOLDER interfaces)
 
 else()
- message(SEND_ERROR "C# interface build requires swig")
-endif() # ENABLE_SWIG
+    message(SEND_ERROR "C# interface build requires swig")
+endif() # SWIG_EXECUTABLE
 
 # Set the output library name to _helics
 set_target_properties(CShelics PROPERTIES DEBUG_POSTFIX "")
 
 copy_key_files_to_target_location(CShelics)
-  copy_shared_target(CShelics)
+copy_shared_target(CShelics)
 
 install_key_files_with_comp(csharp)
 
-install(TARGETS CShelics DESTINATION csharp COMPONENT csharp)
+install(
+    TARGETS
+        CShelics
+        DESTINATION
+        csharp
+        COMPONENT
+        csharp
+)
 install(FILES ${CMAKE_CURRENT_BINARY_DIR}/helics.cs DESTINATION csharp COMPONENT csharp)
-

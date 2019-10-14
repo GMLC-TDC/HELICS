@@ -13,28 +13,21 @@
 
 set(common_test_headers)
 
-set(
-  common_test_sources
-  common-tests.cpp
-  TimeTests.cpp
-)
+set(common_test_sources common-tests.cpp TimeTests.cpp)
 
 add_executable(common-tests ${common_test_sources} ${common_test_headers})
 target_link_libraries(common-tests PRIVATE helics-static helics_test_base)
 set_target_properties(common-tests PROPERTIES FOLDER tests)
 
-add_test(
-  NAME common-tests
-  COMMAND common-tests
-)
+add_test(NAME common-tests COMMAND common-tests)
 set_property(
-  TEST common-tests
-  PROPERTY
-    LABELS
-    Common
-    Daily
-    Coverage
-    Continuous
+    TEST common-tests
+    PROPERTY
+        LABELS
+        Common
+        Daily
+        Coverage
+        Continuous
 )
 
 copy_key_files_to_target_location(common-tests)
