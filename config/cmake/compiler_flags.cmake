@@ -7,8 +7,9 @@
 # SPDX-License-Identifier: BSD-3-Clause
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-option(HELICS_ENABLE_EXTRA_COMPILER_WARNINGS
-       "disable compiler warning for ${CMAKE_PROJECT_NAME} build" ON)
+cmake_conditional_option(HELICS_ENABLE_EXTRA_COMPILER_WARNINGS
+       "disable compiler warning for ${CMAKE_PROJECT_NAME} build" "CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME")
+
 option(HELICS_ENABLE_ERROR_ON_WARNINGS
        "generate a compiler error for any warning encountered" OFF)
 
@@ -18,7 +19,10 @@ mark_as_advanced(HELICS_ENABLE_ERROR_ON_WARNINGS)
 # -------------------------------------------------------------
 # Setup compiler options and configurations
 # -------------------------------------------------------------
-message(STATUS "setting up for ${CMAKE_CXX_COMPILER_ID} on ${CMAKE_SYSTEM}")
+if (CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
+   message(STATUS "setting up for ${CMAKE_CXX_COMPILER_ID} on ${CMAKE_SYSTEM}")
+endif()
+
 if(NOT TARGET compile_flags_target)
     add_library(compile_flags_target INTERFACE)
 endif()

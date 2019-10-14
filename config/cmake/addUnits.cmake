@@ -11,14 +11,13 @@
 set(UNITS_LIBRARY_EXPORT_COMMAND ${HELICS_EXPORT_COMMAND} CACHE INTERNAL "")
 
 set(UNITS_BINARY_ONLY_INSTALL ${HELICS_BINARY_ONLY_INSTALL} CACHE INTERNAL "")
-if(NOT BUILD_SHARED_LIBS AND DISABLE_STATIC_LIB_INSTALL)
+if(NOT HELICS_BUILD_CXX_SHARED_LIB AND DISABLE_STATIC_LIB_INSTALL)
     set(UNITS_BINARY_ONLY_INSTALL ON CACHE INTERNAL "")
 endif()
 cmake_conditional_option(HELICS_UNITS_OBJLIB
            "use the units objlib for linking object files instead of the normal target"
            "NOT MSVC")
-
-mark_as_advanced(HELICS_UNITS_OBJLIB)
+mark_as_advanced(HELICS_UNIT_OBJLIB)
 
 if(NOT CMAKE_CXX_STANDARD)
     set(CMAKE_CXX_STANDARD 14) # Supported values are ``11``, ``14``, and ``17``.

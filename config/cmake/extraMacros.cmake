@@ -1,3 +1,12 @@
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# Copyright (c) 2017-2019, Battelle Memorial Institute; Lawrence Livermore
+# National Security, LLC; Alliance for Sustainable Energy, LLC.
+# See the top-level NOTICE for additional details.
+# All rights reserved.
+#
+# SPDX-License-Identifier: BSD-3-Clause
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 # -------------------------------------------------------------
 # MACRO definitions
 # -------------------------------------------------------------
@@ -71,4 +80,53 @@ macro(CMAKE_CONDITIONAL_OPTION option doc condition)
     else()
        option(${option} "${doc}" OFF)
     endif()
+endmacro()
+
+#[=======================================================================[.rst:
+CMake Dependent advacned option
+--------------------
+
+Macro to provide an advanced option dependent on other options.
+
+This macro presents an advanced option to the user only if a set of other
+conditions are true.  When the option is not presented a default value
+is used, but any value set by the user is preserved for when the
+option is presented again.  Example invocation:
+
+::
+
+  CMAKE_DEPENDENT_ADVANCED_OPTION(USE_FOO "Use Foo"
+                         "USE_BAR;NOT USE_ZOT")
+
+If USE_BAR is true and USE_ZOT is false, this provides an option
+called USE_FOO that defaults to ON.  Otherwise, it sets USE_FOO to
+OFF.  If the status of USE_BAR or USE_ZOT ever changes, any value for
+the USE_FOO option is saved so that when the option is re-enabled it
+retains its old value.
+#]=======================================================================]
+
+macro(CMAKE_DEPENDENT_ADVANCED_OPTION option doc default depends force)
+  if(${option}_ISSET MATCHES "^${option}_ISSET$")
+    set(${option}_AVAILABLE 1)
+    foreach(d ${depends})
+      string(REGEX REPLACE " +" ";" CMAKE_DEPENDENT_OPTION_DEP "${d}")
+      if(${CMAKE_DEPENDENT_OPTION_DEP})
+      else()
+        set(${option}_AVAILABLE 0)
+      endif()
+    endforeach()
+    if(${option}_AVAILABLE)
+      option(${option} "${doc}" "${default}")
+      set(${option} "${${option}}" CACHE BOOL "${doc}" FORCE)
+	  mark_as_advanced(${option})
+    else()
+      if(${option} MATCHES "^${option}$")
+      else()
+        set(${option} "${${option}}" CACHE INTERNAL "${doc}")
+      endif()
+      set(${option} ${force})
+    endif()
+  else()
+    set(${option} "${${option}_ISSET}")
+  endif()
 endmacro()

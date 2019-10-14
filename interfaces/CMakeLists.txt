@@ -44,16 +44,14 @@ cmake_dependent_option(
     OFF
 )
 
-if(${CMAKE_VERSION} VERSION_GREATER 3.8)
     # cmake projects are only available for csharp from 3.8 onward
     cmake_dependent_option(
         BUILD_CSHARP_INTERFACE
         "Build C# extension"
         OFF
-        "NOT HELICS_DISABLE_C_SHARED_LIB"
+        "NOT HELICS_DISABLE_C_SHARED_LIB;CMAKE_VERSION VERSION_GREATER 3.8"
         OFF
     )
-endif()
 
 # these are purposely hidden options since they will only be used for very select
 # purposes
@@ -76,23 +74,11 @@ else()
     set(swig_required OFF)
 endif()
 
-if(
-    BUILD_PYTHON_INTERFACE
-    OR BUILD_PYTHON2_INTERFACE
-    AND NOT HELICS_SWIG_GENERATE_INTERFACE_FILES_ONLY
-)
     # at some point in the future (HELICS 3) switch everything to use
     # find_package(Python3 ...)
-    if(${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION} VERSION_GREATER 3.12)
-        option(HELICS_USE_NEW_PYTHON_FIND
-               "Use the FindPython Routine only available from cmake 3.12 and later"
-               OFF)
-        mark_as_advanced(HELICS_USE_NEW_PYTHON_FIND)
-    else()
-        set(HELICS_USE_NEW_PYTHON_FIND OFF CACHE BOOL "" FORCE)
-        hide_variable(HELICS_USE_NEW_PYTHON_FIND)
-    endif()
-endif()
+	cmake_dependent_advanced_option(HELICS_USE_NEW_PYTHON_FIND "Use the FindPython Routine only available from cmake 3.12 and later" OFF "CMAKE_VERSION VERSION_GREATER 3.12;NOT HELICS_SWIG_GENERATE_INTERFACE_FILES_ONLY; BUILD_PYTHON_INTERFACE
+    OR BUILD_PYTHON2_INTERFACE" OFF)
+    
 
 cmake_dependent_option(
     HELICS_ENABLE_SWIG

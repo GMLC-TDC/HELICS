@@ -103,14 +103,16 @@ mark_as_advanced(HELICS_DISABLE_BOOST)
 
 # we want to acknowledge this flag since it is standard C++ but it can cause issues in
 # submodules so we need to set other variables
+if(NOT DEFINED BUILD_SHARED_LIBS)
+    set(BUILD_SHARED_LIBS OFF CACHE INTERNAL "")
+endif()
 if(BUILD_SHARED_LIBS)
     set(HELICS_DISABLE_STATIC_LIB_INSTALL ON CACHE BOOL "")
     set(HELICS_BUILD_CXX_SHARED_LIB ON CACHE BOOL "")
     set(HELICS_DISABLE_C_SHARED_LIB OFF CACHE BOOL "")
+    set(old_build_shared ON)
+    # we need this to prevent submodules from building shared libs
     set(BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE)
-    if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
-        hide_variable(BUILD_SHARED_LIBS)
-    endif()
 endif()
 
 cmake_dependent_option(
@@ -175,7 +177,7 @@ else()
     set(HELICS_INSTALL_CPP14_HEADERS OFF)
 endif()
 
-cmake_dependent_option(
+cmake_dependent_advanced_option(
     HELICS_USE_POSITION_INDEPENDENT_CODE
     "Build the libraries with Position independent code Useful if only building the static library and it will be used later in a shared library"
     OFF
@@ -244,7 +246,7 @@ endif()
 
 add_library(HELICS::compile_flags_target ALIAS compile_flags_target)
 
-cmake_dependent_option(
+cmake_dependent_advanced_option(
     STATIC_STANDARD_LIB
     "Link against a static standard lib"
     OFF
@@ -252,7 +254,7 @@ cmake_dependent_option(
     OFF
 )
 
-cmake_dependent_option(
+cmake_dependent_advanced_option(
     HELICS_EMBEDDED_DEBUG_INFO
     "embed debug info into obj files"
     OFF
@@ -260,14 +262,12 @@ cmake_dependent_option(
     OFF
 )
 
-mark_as_advanced(STATIC_STANDARD_LIB)
 if(STATIC_STANDARD_LIB)
     ucm_set_runtime(STATIC)
 else()
     ucm_set_runtime(DYNAMIC)
 endif()
 
-mark_as_advanced(HELICS_EMBEDDED_DEBUG_INFO)
 if(HELICS_EMBEDDED_DEBUG_INFO)
     ucm_set_embedded_debug(EMBEDDED)
 else()
@@ -278,7 +278,7 @@ endif()
 # add coverage target
 # -------------------------------------------------------------
 
-cmake_dependent_option(
+cmake_dependent_advanced_option(
     HELICS_TEST_CODE_COVERAGE
     "Build a target for testing code coverage"
     OFF
@@ -312,7 +312,6 @@ if(HELICS_BUILD_TESTS AND HELICS_TEST_CODE_COVERAGE)
         )
     endif()
 endif()
-mark_as_advanced(HELICS_TEST_CODE_COVERAGE)
 
 # -------------------------------------------------------------
 # Get some configuration for C++17 as that becomes available
@@ -596,22 +595,20 @@ endif()
 
 option(HELICS_ENABLE_LOGGING "enable normal, debug, and trace logging in HELICS" ON)
 
-cmake_dependent_option(
+cmake_dependent_advanced_option(
     HELICS_ENABLE_TRACE_LOGGING
     "enable trace logging"
     ON
     "HELICS_ENABLE_LOGGING"
     ON
 )
-cmake_dependent_option(
+cmake_dependent_advanced_option(
     HELICS_ENABLE_DEBUG_LOGGING
     "enable debug logging"
     ON
     "HELICS_ENABLE_LOGGING"
     ON
 )
-mark_as_advanced(HELICS_ENABLE_TRACE_LOGGING)
-mark_as_advanced(HELICS_ENABLE_DEBUG_LOGGING)
 
 # -----------------------------------------------------------------------------
 # create the fmt header only targets
@@ -875,10 +872,10 @@ if(NOT HELICS_BINARY_ONLY_INSTALL)
         COMPONENT headers
     )
 
-    option(
+    cmake_conditional_option(
         HELICS_INSTALL_CEREAL
         "Install a copy of the cereal headers used for compiling and a CMake target to include them"
-        ${MSVC}
+        "MSVC"
     )
 
     mark_as_advanced(HELICS_INSTALL_CEREAL)
@@ -1031,8 +1028,13 @@ install(
 # -------------------------------------------------------------
 # CPack
 # -------------------------------------------------------------
-cmake_dependent_option(HELICS_ENABLE_PACKAGE_BUILD
-       "Add projects for making packages and installers for HELICS" OFF "CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME" OFF)
+cmake_dependent_option(
+    HELICS_ENABLE_PACKAGE_BUILD
+    "Add projects for making packages and installers for HELICS"
+    OFF
+    "CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME"
+    OFF
+)
 
 if(HELICS_ENABLE_PACKAGE_BUILD)
 
@@ -1173,4 +1175,7 @@ endif(HELICS_ENABLE_PACKAGE_BUILD)
 if(NOT CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
     # restore the original module path
     set(CMAKE_MODULE_PATH ${ORIGINAL_MODULE_PATH})
+    if(old_build_shared)
+        set(BUILD_SHARED_LIBS ON CACHE BOOL "" FORCE)
+    endif()
 endif()

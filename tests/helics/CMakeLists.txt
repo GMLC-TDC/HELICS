@@ -58,14 +58,13 @@ add_test(
 )
 set_property(TEST find-package-tests PROPERTY LABELS Packaging PackagingFast)
 
-cmake_dependent_option(
+cmake_dependent_advanced_option(
     HELICS_ENABLE_SLOW_PACKAGING_TESTS
     "Enable the slower helics packaging tests that may take a long time to run"
     OFF
     "HELICS_BUILD_TESTS"
     OFF
 )
-mark_as_advanced(HELICS_ENABLE_SLOW_PACKAGING_TESTS)
 
 # Tests for adding HELICS as a subproject using add_subdirectory
 if(HELICS_ENABLE_SLOW_PACKAGING_TESTS)

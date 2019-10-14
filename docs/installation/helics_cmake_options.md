@@ -66,7 +66,6 @@ Options effect the connection of libraries used in HELICS and how they are linke
 
 ### Packaging and Install
 There are a few additional options available for generating HELICS packages or customizing an installation.  
--  `ENABLE_CPACK`  : \[Default=OFF\] enable CPACK generation, this is a CMake generated option but is the key to enabling CPack packaging to work.
 -  `HELICS_BINARY_ONLY_INSTALL` : \[Default=OFF\] only install binary files (executables and shared libraries), no headers or static libraries
 -  `HELICS_DISABLE_STATIC_LIB_INSTALL`  : \[Default=OFF\] Only install the binary files and headers
 -  `HELICS_INSTALL_CEREAL` : \[Default=ON\] install the cereal library for serialization, not needed if you don't plan to "cerealize" interesting types that are not regularly done inside HELICS.
