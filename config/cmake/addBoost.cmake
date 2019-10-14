@@ -7,12 +7,7 @@
 # SPDX-License-Identifier: BSD-3-Clause
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-show_variable(
-    BOOST_INSTALL_PATH
-    PATH
-    "Boost root directory"
-    "${BOOST_INSTALL_PATH}"
-)
+show_variable(BOOST_INSTALL_PATH PATH "Boost root directory" "${BOOST_INSTALL_PATH}")
 
 mark_as_advanced(BOOST_INSTALL_PATH)
 
@@ -20,8 +15,8 @@ if(WIN32 AND NOT UNIX_LIKE)
 
     set(
         boost_versions
-		boost_1_71_0
-		boost_1_70_0
+        boost_1_71_0
+        boost_1_70_0
         boost_1_69_0
         boost_1_68_0
         boost_1_67_0
@@ -32,7 +27,7 @@ if(WIN32 AND NOT UNIX_LIKE)
         boost_1_63_0
         boost_1_62_0
         boost_1_61_0
-		boost_1_58_0
+        boost_1_58_0
     )
 
     set(
@@ -42,8 +37,8 @@ if(WIN32 AND NOT UNIX_LIKE)
         C:/local
         C:/local/boost
         C:/Libraries
-		"C:/Program Files/boost"
-		C:/ProgramData/chocolatey/lib
+        "C:/Program Files/boost"
+        C:/ProgramData/chocolatey/lib
         D:
         D:/boost
         D:/local
@@ -53,8 +48,8 @@ if(WIN32 AND NOT UNIX_LIKE)
     # create an empty list
     list(APPEND boost_paths "")
     mark_as_advanced(BOOST_INSTALL_PATH)
-	foreach(boostver ${boost_versions})
-		foreach(dir ${poss_prefixes})
+    foreach(boostver ${boost_versions})
+        foreach(dir ${poss_prefixes})
             if(IS_DIRECTORY ${dir}/${boostver})
                 if(EXISTS ${dir}/${boostver}/boost/version.hpp)
                     list(APPEND boost_paths ${dir}/${boostver})
@@ -94,20 +89,22 @@ endif()
 # Minimum version of Boost required for building HELICS
 set(BOOST_MINIMUM_VERSION 1.58)
 
-if (BOOST_REQUIRED_LIBRARIES)
-find_package(
-    Boost ${BOOST_MINIMUM_VERSION}
-    COMPONENTS ${BOOST_REQUIRED_LIBRARIES}
-    REQUIRED
-)
+if(BOOST_REQUIRED_LIBRARIES)
+    find_package(
+        Boost ${BOOST_MINIMUM_VERSION}
+        COMPONENTS ${BOOST_REQUIRED_LIBRARIES}
+        REQUIRED
+    )
 else()
-find_package(Boost ${BOOST_MINIMUM_VERSION})
+    find_package(Boost ${BOOST_MINIMUM_VERSION})
 endif()
 # Minimum version of Boost required for building test suite
 set(BOOST_VERSION_LEVEL ${Boost_MINOR_VERSION})
 
 # message(STATUS "Using Boost include files : ${Boost_INCLUDE_DIR} |")
+
 # message(STATUS "Using Boost libraries in : ${Boost_LIBRARY_DIRS} |")
+
 # message(STATUS "Using Boost libraries : ${Boost_LIBRARIES} |")
 set(modifier,"")
 foreach(loop_var ${Boost_LIBRARIES})
@@ -147,19 +144,19 @@ endforeach(loop_var)
 #
 
 if(${Boost_USE_STATIC_LIBS})
-	if (NOT TARGET Boostlibs::core)
-		add_library(Boostlibs::core STATIC IMPORTED)
-	endif()
-	if (NOT TARGET Boostlibs::test)
-		add_library(Boostlibs::test STATIC IMPORTED)
-	endif()
+    if(NOT TARGET Boostlibs::core)
+        add_library(Boostlibs::core STATIC IMPORTED)
+    endif()
+    if(NOT TARGET Boostlibs::test)
+        add_library(Boostlibs::test STATIC IMPORTED)
+    endif()
 else()
-	if (NOT TARGET Boostlibs::core)
-		add_library(Boostlibs::core UNKNOWN IMPORTED)
-	endif()
-	if (NOT TARGET Boostlibs::test)
-		add_library(Boostlibs::test UNKNOWN IMPORTED)
-	endif()
+    if(NOT TARGET Boostlibs::core)
+        add_library(Boostlibs::core UNKNOWN IMPORTED)
+    endif()
+    if(NOT TARGET Boostlibs::test)
+        add_library(Boostlibs::test UNKNOWN IMPORTED)
+    endif()
     # if(MINGW) set_property(TARGET Boostlibs::core PROPERTY
     # INTERFACE_COMPILE_DEFINTIONS BOOST_USE_WINDOWS_H) endif()
 endif()
@@ -171,10 +168,7 @@ math(EXPR rng "${core_release_size} - 1")
 
 if(core_debug_size EQUAL 0)
     list(GET Boost_LIBRARIES_core_release 0 first_lib)
-    set_target_properties(
-        Boostlibs::core
-        PROPERTIES IMPORTED_LOCATION ${first_lib}
-    )
+    set_target_properties(Boostlibs::core PROPERTIES IMPORTED_LOCATION ${first_lib})
 
     foreach(item RANGE 1 ${rng})
         list(GET Boost_LIBRARIES_core_release ${item} next_lib)
@@ -196,9 +190,7 @@ else()
     set_target_properties(
         Boostlibs::core
         PROPERTIES
-            IMPORTED_LOCATION_DEBUG
-            ${first_lib_d}
-            IMPORTED_LOCATION_RELEASE
+            IMPORTED_LOCATION_DEBUG ${first_lib_d} IMPORTED_LOCATION_RELEASE
             ${first_lib_r}
     )
 
@@ -214,43 +206,38 @@ else()
         set_target_properties(
             Boostlibs::${rand_name}
             PROPERTIES
-                IMPORTED_LOCATION_DEBUG
-                ${next_lib_d}
-                IMPORTED_LOCATION_RELEASE
+                IMPORTED_LOCATION_DEBUG ${next_lib_d} IMPORTED_LOCATION_RELEASE
                 ${next_lib_r}
         )
         list(APPEND boost_core_deps Boostlibs::${rand_name})
     endforeach()
 endif()
 
-if (Boost_INCLUDE_DIR)
-set_target_properties(
-    Boostlibs::core Boostlibs::test
-    PROPERTIES INTERFACE_SYSTEM_INCLUDE_DIRECTORIES ${Boost_INCLUDE_DIR}
-)
+if(Boost_INCLUDE_DIR)
+    set_target_properties(
+        Boostlibs::core Boostlibs::test
+        PROPERTIES INTERFACE_SYSTEM_INCLUDE_DIRECTORIES ${Boost_INCLUDE_DIR}
+    )
 endif()
-if (BOOST_REQUIRED_LIBRARIES)
-set_target_properties(
-    Boostlibs::core
-    PROPERTIES INTERFACE_LINK_LIBRARIES "${boost_core_deps}"
-)
+if(BOOST_REQUIRED_LIBRARIES)
+    set_target_properties(
+        Boostlibs::core
+        PROPERTIES INTERFACE_LINK_LIBRARIES "${boost_core_deps}"
+    )
 
-if(Boost_LIBRARIES_test_debug)
-    set_target_properties(
-        Boostlibs::test
-        PROPERTIES
-            IMPORTED_LOCATION_DEBUG
-            "${Boost_LIBRARIES_test_debug}"
-            IMPORTED_LOCATION_RELEASE
-            "${Boost_LIBRARIES_test_release}"
-    )
-else()
-    set_target_properties(
-        Boostlibs::test
-        PROPERTIES IMPORTED_LOCATION "${Boost_LIBRARIES_test_release}"
-    )
+    if(Boost_LIBRARIES_test_debug)
+        set_target_properties(
+            Boostlibs::test
+            PROPERTIES
+                IMPORTED_LOCATION_DEBUG "${Boost_LIBRARIES_test_debug}"
+                IMPORTED_LOCATION_RELEASE "${Boost_LIBRARIES_test_release}"
+        )
+    else()
+        set_target_properties(
+            Boostlibs::test
+            PROPERTIES IMPORTED_LOCATION "${Boost_LIBRARIES_test_release}"
+        )
+    endif()
 endif()
-endif()
-# message(STATUS "Using Boost core debug libraries :
-# ${Boost_LIBRARIES_core_debug}") message(STATUS "Using Boost core release
-# libraries : ${Boost_LIBRARIES_core_release}")
+# message(STATUS "Using Boost core debug libraries : ${Boost_LIBRARIES_core_debug}")
+# message(STATUS "Using Boost core release libraries : ${Boost_LIBRARIES_core_release}")

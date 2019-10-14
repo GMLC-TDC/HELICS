@@ -12,13 +12,12 @@ set(default_build_type "Release")
 
 if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
     message(
-        STATUS
-            "Setting build type to '${default_build_type}' as none was specified."
+        STATUS "Setting build type to '${default_build_type}' as none was specified."
     )
     set(
-        CMAKE_BUILD_TYPE "${default_build_type}"
-        CACHE STRING "Choose the type of build."
-        FORCE
+        CMAKE_BUILD_TYPE
+        "${default_build_type}"
+        CACHE STRING "Choose the type of build." FORCE
     )
     # Set the possible values of build type for cmake-gui
     set_property(

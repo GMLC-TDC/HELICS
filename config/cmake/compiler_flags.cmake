@@ -109,7 +109,10 @@ endif(HELICS_ENABLE_EXTRA_COMPILER_WARNINGS)
 # -------------------------------------------------------------
 if(MSVC)
 
-    target_compile_options(compile_flags_target INTERFACE -D_CRT_SECURE_NO_WARNINGS -D_SCL_SECURE_NO_WARNINGS)
+    target_compile_options(
+        compile_flags_target
+        INTERFACE -D_CRT_SECURE_NO_WARNINGS -D_SCL_SECURE_NO_WARNINGS
+    )
     # these next two should be global
     add_compile_options(/MP /EHsc)
     if(HELICS_ENABLE_EXTRA_COMPILER_WARNINGS)

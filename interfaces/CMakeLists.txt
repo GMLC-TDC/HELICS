@@ -11,7 +11,7 @@ cmake_dependent_option(
     BUILD_PYTHON_INTERFACE
     "Build Python extension"
     OFF
-    "NOT BUILD_PYTHON2_INTERFACE AND NOT HELICS_DISABLE_C_SHARED_LIB"
+    "NOT BUILD_PYTHON2_INTERFACE;NOT HELICS_DISABLE_C_SHARED_LIB"
     OFF
 )
 
@@ -19,7 +19,7 @@ cmake_dependent_option(
     BUILD_PYTHON2_INTERFACE
     "Build Python2.7 extension(Requires swig and will not build if \"BUILD_PYTHON_INTERFACE\" is active)"
     OFF
-    "NOT BUILD_PYTHON_INTERFACE AND NOT HELICS_DISABLE_C_SHARED_LIB"
+    "NOT BUILD_PYTHON_INTERFACE;NOT HELICS_DISABLE_C_SHARED_LIB"
     OFF
 )
 cmake_dependent_option(

@@ -179,7 +179,7 @@ cmake_dependent_option(
     HELICS_USE_POSITION_INDEPENDENT_CODE
     "Build the libraries with Position independent code Useful if only building the static library and it will be used later in a shared library"
     OFF
-    "HELICS_DISABLE_C_SHARED_LIB AND NOT HELICS_BUILD_CXX_SHARED_LIB"
+    "HELICS_DISABLE_C_SHARED_LIB;NOT HELICS_BUILD_CXX_SHARED_LIB"
     ON
 )
 
@@ -248,7 +248,7 @@ cmake_dependent_option(
     STATIC_STANDARD_LIB
     "Link against a static standard lib"
     OFF
-    "NOT USE_LIBCXX AND CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME"
+    "NOT USE_LIBCXX;CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME"
     OFF
 )
 
@@ -256,7 +256,7 @@ cmake_dependent_option(
     HELICS_EMBEDDED_DEBUG_INFO
     "embed debug info into obj files"
     OFF
-    "MSVC AND CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME"
+    "MSVC;CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME"
     OFF
 )
 
@@ -1031,8 +1031,8 @@ install(
 # -------------------------------------------------------------
 # CPack
 # -------------------------------------------------------------
-option(HELICS_ENABLE_PACKAGE_BUILD
-       "Add projects for making packages and installers for HELICS" OFF)
+cmake_dependent_option(HELICS_ENABLE_PACKAGE_BUILD
+       "Add projects for making packages and installers for HELICS" OFF "CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME" OFF)
 
 if(HELICS_ENABLE_PACKAGE_BUILD)
 
