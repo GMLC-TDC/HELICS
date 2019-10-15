@@ -143,9 +143,10 @@ TEST (type_conversion_tests, integer_conversion_tests)
     EXPECT_TRUE (checkTypeConversion1 (val, static_cast<float> (val)));
     EXPECT_TRUE (checkTypeConversion1 (val, static_cast<short> (val)));
     EXPECT_TRUE (checkTypeConversion1 (val, static_cast<int> (val)));
-    EXPECT_TRUE (checkTypeConversion1 (val, std::complex<double> (val, 0)));
+    EXPECT_TRUE (checkTypeConversion1 (val, std::complex<double> (static_cast<double> (val), 0)));
     EXPECT_TRUE (checkTypeConversion1 (val, std::vector<double>{static_cast<double> (val)}));
-    EXPECT_TRUE (checkTypeConversion1 (val, std::vector<std::complex<double>>{std::complex<double> (val, 0.0)}));
+    EXPECT_TRUE (checkTypeConversion1 (val, std::vector<std::complex<double>>{
+                                              std::complex<double> (static_cast<double> (val), 0.0)}));
     EXPECT_TRUE (checkTypeConversion1 (val, true));
     EXPECT_TRUE (checkTypeConversion1 (static_cast<int64_t> (0), false));
     EXPECT_TRUE (checkTypeConversion1 (val, NamedPoint{"value", static_cast<double> (val)}));

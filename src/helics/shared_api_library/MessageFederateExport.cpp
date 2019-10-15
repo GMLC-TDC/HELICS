@@ -181,7 +181,7 @@ void helicsEndpointSetDefaultDestination (helics_endpoint endpoint, const char *
     {
         return;
     }
-    CHECK_NULL_STRING (dest, void ());
+    CHECK_NULL_STRING (dest, void());
     try
     {
         endObj->endPtr->setDefaultDestination (dest);
@@ -376,7 +376,7 @@ void helicsEndpointSubscribe (helics_endpoint endpoint, const char *key, helics_
     {
         return;
     }
-    CHECK_NULL_STRING (key, void ());
+    CHECK_NULL_STRING (key, void());
     try
     {
         endObj->endPtr->subscribe (key);
@@ -414,7 +414,7 @@ int helicsFederatePendingMessages (helics_federate fed)
     {
         return 0;
     }
-    return mFed->pendingMessages ();
+    return static_cast<int> (mFed->pendingMessages ());
 }
 
 int helicsEndpointPendingMessages (helics_endpoint endpoint)
@@ -424,7 +424,7 @@ int helicsEndpointPendingMessages (helics_endpoint endpoint)
     {
         return 0;
     }
-    return endObj->endPtr->pendingMessages ();
+    return static_cast<int> (endObj->endPtr->pendingMessages ());
 }
 
 static helics_message emptyMessage ()

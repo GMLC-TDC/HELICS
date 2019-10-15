@@ -139,7 +139,7 @@ generateConnection (std::shared_ptr<AsioContextManager> &ioctx, const std::strin
         std::tie (interface, port) = extractInterfaceandPortString (address);
         return TcpConnection::create (ioctx->getBaseContext (), interface, port);
     }
-    catch (std::exception &e)
+    catch (std::exception &)
     {
         // TODO(PT):: do something???
     }
@@ -162,18 +162,18 @@ void TcpCommsSS::queue_tx_function ()
     TcpServer::pointer server;
     auto ioctx = AsioContextManager::getContextPointer ();
     auto contextLoop = ioctx->startContextLoop ();
-    auto dataCall = [this] (TcpConnection::pointer connection, const char *data, size_t datasize) {
+    auto dataCall = [this](TcpConnection::pointer connection, const char *data, size_t datasize) {
         return dataReceive (connection, data, datasize);
     };
     CommsInterface *ci = this;
-    auto errorCall = [ci] (TcpConnection::pointer connection, const std::error_code &error) {
+    auto errorCall = [ci](TcpConnection::pointer connection, const std::error_code &error) {
         return commErrorHandler (ci, connection, error);
     };
 
     if (serverMode)
     {
-        server =
-          TcpServer::create (ioctx->getBaseContext (), localTargetAddress, PortNumber, true, maxMessageSize);
+        server = TcpServer::create (ioctx->getBaseContext (), localTargetAddress,
+                                    static_cast<uint16_t> (PortNumber.load ()), true, maxMessageSize);
         while (!server->isReady ())
         {
             logWarning ("retrying tcp bind");

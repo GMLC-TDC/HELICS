@@ -52,7 +52,7 @@ TEST (ZMQCore_tests, zmqComms_broker_test)
 
     zmq::message_t rxmsg;
 
-    repSocket.recv (&rxmsg);
+    repSocket.recv (rxmsg);
 
     EXPECT_GT (rxmsg.size (), 32u);
 
@@ -91,9 +91,9 @@ TEST (ZMQCore_tests, zmqRequestSet_test1)
     EXPECT_TRUE (reqset.waiting ());
 
     zmq::message_t msg;
-    repSocket1.recv (&msg);
+    repSocket1.recv (msg);
 
-    repSocket1.send (msg);
+    repSocket1.send (msg, zmq::send_flags::none);
     // should still be waiting
     EXPECT_TRUE (reqset.waiting ());
     auto msgCnt = reqset.checkForMessages (100ms);
@@ -110,15 +110,15 @@ TEST (ZMQCore_tests, zmqRequestSet_test1)
     reqset.transmit (2, M);
     EXPECT_TRUE (reqset.waiting ());
 
-    repSocket2.recv (&msg);
+    repSocket2.recv (msg);
 
-    repSocket2.send (msg);
+    repSocket2.send (msg, zmq::send_flags::none);
     msgCnt = reqset.checkForMessages (100ms);
 
     EXPECT_TRUE (reqset.waiting ());
-    repSocket2.recv (&msg);
+    repSocket2.recv (msg);
 
-    repSocket2.send (msg);
+    repSocket2.send (msg, zmq::send_flags::none);
     reqset.checkForMessages (100ms);
     EXPECT_TRUE (!reqset.waiting ());
 
@@ -160,16 +160,16 @@ TEST (ZMQCore_tests, zmqRequestSet_test2)
     reqset.transmit (2, M);
     reqset.transmit (3, M);
     zmq::message_t msg;
-    repSocket1.recv (&msg);
+    repSocket1.recv (msg);
 
-    repSocket1.send (msg);
+    repSocket1.send (msg, zmq::send_flags::none);
 
-    repSocket2.recv (&msg);
+    repSocket2.recv (msg);
 
-    repSocket2.send (msg);
-    repSocket3.recv (&msg);
+    repSocket2.send (msg, zmq::send_flags::none);
+    repSocket3.recv (msg);
 
-    repSocket3.send (msg);
+    repSocket3.send (msg, zmq::send_flags::none);
 
     // make sure the check receives all messages
     reqset.checkForMessages (50ms);
@@ -194,17 +194,17 @@ TEST (ZMQCore_tests, zmqRequestSet_test2)
     reqset.transmit (2, M);
     reqset.transmit (3, M);
     std::this_thread::yield ();
-    repSocket1.recv (&msg);
+    repSocket1.recv (msg);
 
-    repSocket1.send (msg);
+    repSocket1.send (msg, zmq::send_flags::none);
     std::this_thread::yield ();
-    repSocket2.recv (&msg);
+    repSocket2.recv (msg);
 
-    repSocket2.send (msg);
+    repSocket2.send (msg, zmq::send_flags::none);
     std::this_thread::yield ();
-    repSocket3.recv (&msg);
+    repSocket3.recv (msg);
 
-    repSocket3.send (msg);
+    repSocket3.send (msg, zmq::send_flags::none);
     auto res = reqset.checkForMessages (400ms);
     if (res != 6)
     {
@@ -282,7 +282,7 @@ TEST (ZMQCore_tests, zmqComms_broker_test_transmit)
     comm.transmit (helics::parent_route_id, helics::CMD_IGNORE);
     zmq::message_t rxmsg;
 
-    pullSocket.recv (&rxmsg);
+    pullSocket.recv (rxmsg);
 
     EXPECT_GT (rxmsg.size (), 32u);
     helics::ActionMessage rM (static_cast<char *> (rxmsg.data ()), rxmsg.size ());
@@ -346,10 +346,10 @@ TEST (ZMQCore_tests, zmqComms_rx_test)
     std::string buffer = cmd.to_string ();
     try
     {
-        auto cnt = pushSocket.send (buffer, ZMQ_DONTWAIT);
+        auto cnt = pushSocket.send (buffer, zmq::send_flags::dontwait);
         EXPECT_EQ (cnt, buffer.size ());
     }
-    catch (const zmq::error_t &ze)
+    catch (const zmq::error_t &)
     {
         GTEST_FAIL () << "Message failed to send";
     }
@@ -577,7 +577,7 @@ TEST (ZMQCore_tests, zmqCore_initialization_test)
 
     zmq::message_t rxmsg;
 
-    pullSocket.recv (&rxmsg);
+    pullSocket.recv (rxmsg);
 
     EXPECT_GT (rxmsg.size (), 32u);
     helics::ActionMessage rM (static_cast<char *> (rxmsg.data ()), rxmsg.size ());

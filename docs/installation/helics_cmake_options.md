@@ -1,0 +1,80 @@
+# HELICS CMake options
+
+## Main Options
+
+-  `CMake_INSTALL_PREFIX`:  CMake variable listing where to install the files
+-   `HELICS_BUILD_APP_LIBRARY` :  \[Default=ON\] tell HELICS to build the [app]() Library
+-   `HELICS_BUILD_APP_EXECUTABLES` : \[Default=ON\]build some executables associated with the apps
+-   `HELICS_BUILD_BENCHMARKS` :  \[Default=OFF\]Build some timing benchmarks associated with HELICS
+-   `HELICS_BUILD_CXX_SHARED_LIB` :  \[Default=OFF\]Build a C++ shared library with the underlying C++ interface to HELICS
+-   `HELICS_BUILD_EXAMPLES` :  \[Default=OFF\]Build a few select examples using HELICS,  this is mostly for testing purposes.  The main examples repo is [here](https://github.com/GMLC-TDC/HELICS-Examples)
+-   `HELICS_BUILD_TESTS` :  \[Default=OFF\]Build the HELICS unit and system test executables.
+-   `HELICS_ENABLE_LOGGING` :  \[Default=ON\] Enable debug and higher levels of logging,  if this is turned off that capability is completely removed from HELICS
+-   `HELICS_ENABLE_PACKAGE_BUILD` : \[Default=OFF\] Enable the generation of some installer packages for HELICS
+-   `HELICS_GENERATE_DOXYGEN_DOC` :  \[Default=OFF\] Generate doxygen documentation for HELICS
+-   `HELICS_WITH_CMAKE_PACKAGE` : \[Default=ON\] Generate a `HELICSConfig.cmake` file on install for loading into other libraries
+-   `BUILD_OCTAVE_INTERACE`  : \[Default=OFF\] Build the HELICS Octave Interface
+-   `BUILD_PYTHON_INTERACE`  : \[Default=OFF\] Build the HELICS Python3 Interface
+-   `BUILD_PYTHON2_INTERACE`  : \[Default=OFF\] Build the HELICS Python2 Interface (can be used at the same time as BUILD_PYTHON_INTERFACE)
+-   `BUILD_JAVA_INTERACE`  : \[Default=OFF\] Build the HELICS Java Interface
+-   `BUILD_MATLAB_INTERACE`  : \[Default=OFF\] Build the HELICS Matlab Interface
+-   `BUILD_CSHARP_INTERACE`  : \[Default=OFF\] Build the HELICS C# Interface, NOTE: Only available for CMake 3.8 or higher.  
+-   `CMAKE_CXX_STANDARD` : specify the C++ standard to use in building, HELICS requires 14 or higher,  HELICS 3.0 will require 17 or higher.  
+
+NOTE:  Most HELICS options are prefixed with HELICS_ to separate them from other libraries so HELICS can be used cleanly as a subproject.  The BUILD_XXX_INTERFACE options have not been changed since that would be a large change in an intermediate version, but they will be changed in HELICS 3.0 to HELICS_BUILD_XXXX_INTERFACE to complete the prefixing change for consistency across the library.  
+
+## Advanced Options
+
+There are several different additional options available to configure HELICS for particular situations, most of which are not needed for general use and the default options should suffice.
+
+### HELICS Configuration options
+These options effect the configuration of HELICS itself and how/what gets built into the HELICS core libraries
+-  `ENABLE_ZMQ_CORE` : \[Default=ON\] enable the HELICS ZeroMQ related core types
+-  `ENABLE_TCP_CORE` : \[Default=ON\] enable the HELICS TCPIP related core types
+-  `ENABLE_UDP_CORE` : \[Default=ON\] enable the HELICS UDP core type
+-  `ENABLE_IPC_CORE` : \[Default=ON\] enable the HELICS interprocess shared memory related core types
+-  `ENABLE_TEST_CORE` : \[Default=ON\] enable the HELICS in process core type,
+-  `ENABLE_MPI_CORE` : \[Default=OFF\] enable the HELICS Message Passing interface(MPI) related core types, most commonly used for High performance computing application (HPC)
+
+#### HELICS logging Options
+-   `HELICS_ENABLE_TRACE_LOGGING` :  \[Default=ON\] Enable trace level of logging inside HELICS,  if this is turned off that capability is completely removed from HELICS
+-   `HELICS_ENABLE_DEBUG_LOGGING` :  \[Default=ON\] Enable debug levels of logging inside HELICS,  if this is turned off that capability is completely removed from HELICS
+
+### Build configuration Options
+Options effect the connection of libraries used in HELICS and how they are linked.
+-  `HELICS_DISABLE_BOOST` : \[Default=OFF\] Completely turn off searching and inclusion of boost libraries.  This will disable the IPC core and few other features, possibly more in the future.  
+-  `HELICS_UNITS_OBJLIB` : \[Default=OFF (MSVC), ON (elsewhere)\]  Link the units library using objects instead of a separate static library
+-  `ENABLE_SUBMODULE_UPDATE` : \[Default=ON\] enable CMake to automatically download the submodules and update them if Unnecessary
+-   `HELICS_ENABLE_ERROR_ON_WARNING` :\[Default=OFF\] turns on Werror or equivalent,  probably not useful for normal activity,  There isn't many warnings but left in to allow the possibility
+-  `HELICS_ENABLE_EXTRA_COMPILER_WARNINGS` : \[Default=ON\] turn on higher levels of warnings in the compilers,  can be turned off if you didn't need or want the warning checks.
+-  `JSONCPP_OBJLIB`:  \[Default=OFF (MSVC), ON (elsewhere)\] Build and link JSONCPP library as an object library instead of a separate static Library
+-  `STATIC_STANDARD_LIB`:   \[Default=OFF\] link the standard library as a static library for no additional C++ system dependencies
+-  `HELICS_ENABLE_SWIG`:    \[Default=OFF\] conditional option if `BUILD_MATLAB_INTERACE` or `BUILD_PYTHON_INTERFACE` or `BUILD_JAVA_INTERACE` is selected and no other option that requires swig is used.  This enables swig usage in cases where it would not otherwise be necessary.
+-  `HELICS_USE_NEW_PYTHON_FIND`:  \[Default=OFF\] if python is required, this option can be set to use newer FindPython routines from CMake, if CMake version in use is >=3.12,  This does change the variables that need to be set to link to a specific python, but can be helpful in some situations with newer python versions.   
+
+#### ZeroMQ related Options
+-  `HELICS_USE_SYSTEM_ZEROMQ_ONLY`:  \[Default=OFF\] Only find Zeromq through the system libraries, never attempt a local build.
+-  `HELICS_USE_ZMQ_STATIC_LIBRARY`:  \[Default=OFF\] Build and link Zeromq using a static library.  (NOTE:  This has licensing implications if the resulting binary is distributed)
+-  `HELICS_ZMQ_SUBPROJECT`: \[Default=ON (MSVC) OFF(otherwise)\] Allow ZeroMQ to be built as a subproject if a system library is not found
+-  `HELICS_ZMQ_FORCE_SUBPROJECT`: \[Default=OFF\] Force ZMQ to be built and linked as a subproject.  
+-  `ZeroMQ_INSTALL_PATH`:  Can be used to specify a path to ZeroMQ for inclusion.  
+
+#### Options related to helics tests and CI configurations
+-  `HELICS_TEST_CODE_COVERAGE` :\[Default=OFF\] turn on code coverage testing, enables additional linkage and options inside HELICS for coverage testing, mainly useful inside the CI or for testing.  
+-  `HELICS_ENABLE_SLOW_PACKAGING_TESTS`:  \[Default=OFF\] Turn on some additional packaging tests, Mainly used in some of the CI testing to make sure HELICS works as a subproject
+-  `HELICS_ENABLE_CLANG_TOOLS`:  \[Default=OFF\] Enables some helper targets for using clang-tidy and clang-format.  
+
+### Packaging and Install
+There are a few additional options available for generating HELICS packages or customizing an installation.  
+-  `HELICS_BINARY_ONLY_INSTALL` : \[Default=OFF\] only install binary files (executables and shared libraries), no headers or static libraries
+-  `HELICS_DISABLE_STATIC_LIB_INSTALL`  : \[Default=OFF\] Only install the binary files and headers
+-  `HELICS_INSTALL_CEREAL` : \[Default=ON\] install the cereal library for serialization, not needed if you don't plan to "cerealize" interesting types that are not regularly done inside HELICS.
+
+
+## Hidden Options
+There are a few options in the CMake system that are not visible in the GUI they mainly deal with particular situations related to release, testing, and code generation and should not be normally used. They are all default off.
+
+-  `HELICS_SWIG_GENERATE_INTERFACE_FILES_ONLY` : use swig to generate the interface files for the different languages but don't compile them.  
+-  `HELICS_OVERWRITE_INTERFACE_FILES` : Instruct CMake to take the generated files, and overwrite the existing interface files for the given language, only applies to python, Matlab, and Java.  This is used in the generation of the interface files for releases and the git repo.  It is only active is `HELICS_SWIG_GENERATE_INTERFACE_FILES_ONLY` is enabled.  
+- `HELICS_DISABLE_SYSTEM_CALL_TESTS` :  There are a few test that execute system calls, which could be problematic to compile or execute on certain platforms.  This option removes those tests from compilation.  
+-  `INSTALL_SYSTEM_LIBRARIES` : Install system libraries with the installation,  mainly useful for making a complete installer package with all needed libraries included.  

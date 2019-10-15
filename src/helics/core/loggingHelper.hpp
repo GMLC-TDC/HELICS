@@ -38,7 +38,7 @@ enum log_level : int
 #define LOG_WARNING_SIMPLE(message)                                                                               \
     sendToLogger (global_broker_id_local, log_level::warning, getIdentifier (), message);
 
-#ifdef ENABLE_LOGGING
+#ifdef HELICS_ENABLE_LOGGING
 #define LOG_SUMMARY(id, ident, message)                                                                           \
     if (maxLogLevel >= log_level::summary)                                                                        \
     {                                                                                                             \
@@ -57,7 +57,7 @@ enum log_level : int
         sendToLogger (id, log_level::interfaces, ident, message);                                                 \
     }
 
-#ifdef ENABLE_DEBUG_LOGGING
+#ifdef HELICS_ENABLE_DEBUG_LOGGING
 #define LOG_TIMING(id, ident, message)                                                                            \
     if (maxLogLevel >= log_level::timing)                                                                         \
     {                                                                                                             \
@@ -73,7 +73,7 @@ enum log_level : int
 #define LOG_DATA_MESSAGES(id, ident, message)
 #endif
 
-#ifdef ENABLE_TRACE_LOGGING
+#ifdef HELICS_ENABLE_TRACE_LOGGING
 #define LOG_TRACE(id, ident, message)                                                                             \
     if (maxLogLevel >= log_level::trace)                                                                          \
     {                                                                                                             \

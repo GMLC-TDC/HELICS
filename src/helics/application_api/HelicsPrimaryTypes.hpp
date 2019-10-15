@@ -7,9 +7,9 @@ SPDX-License-Identifier: BSD-3-Clause
 #pragma once
 
 #include "ValueConverter.hpp"
+#include "helics/external/variant.hpp"
 #include "helics/helics-config.h"
 #include "helicsTypes.hpp"
-#include "helics/external/variant.hpp"
 #include <cmath>
 #include <complex>
 #include <cstdint>
@@ -98,6 +98,9 @@ void valueExtract (const defV &dv, Time &val);
 /** extract the value from a variant to a character*/
 void valueExtract (const defV &dv, char &val);
 
+/** extract the value from a variant to a bool*/
+void valueExtract (const defV &dv, bool &val);
+
 void valueExtract (const data_view &dv, data_type baseType, std::string &val);
 
 void valueExtract (const data_view &dv, data_type baseType, std::vector<double> &val);
@@ -109,6 +112,8 @@ void valueExtract (const data_view &dv, data_type baseType, std::vector<std::com
 void valueExtract (const data_view &dv, data_type baseType, NamedPoint &val);
 
 void valueExtract (const data_view &dv, data_type baseType, Time &val);
+
+void valueExtract (const data_view &dv, data_type baseType, bool &val);
 
 void valueExtract (const data_view &dv, data_type baseType, defV &val);
 

@@ -33,7 +33,7 @@ constexpr Time timeEpsilon = Time::epsilon ();
 /** definition of the smallest negative increment of time*/
 constexpr Time negEpsilon = -Time::epsilon ();
 /** user defined literal for a time variable*/
-constexpr Time operator"" _t (long double val) { return Time (val); }  // NOLINT
+constexpr Time operator"" _t (long double val) { return Time (static_cast<double> (val)); }  // NOLINT
 
 /** simple structure with the time and completion marker for iterations or dense time steps*/
 struct iteration_time
