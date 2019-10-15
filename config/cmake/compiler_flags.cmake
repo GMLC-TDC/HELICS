@@ -122,6 +122,7 @@ if(MSVC)
     if(HELICS_ENABLE_EXTRA_COMPILER_WARNINGS)
         target_compile_options(compile_flags_target INTERFACE /W4 /sdl /wd4244)
     endif(HELICS_ENABLE_EXTRA_COMPILER_WARNINGS)
+	#TODO::PT this should probably be detected not assumed
     target_compile_options(compile_flags_target INTERFACE -D_WIN32_WINNT=0x0601)
 else(MSVC)
     option(USE_LIBCXX "Use Libc++ vs as opposed to the default" OFF)

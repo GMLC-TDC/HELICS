@@ -52,11 +52,9 @@ else() # cmake <3.11
 
 endif()
 
-set(BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE)
-
-set(BENCHMARK_ENABLE_GTEST_TESTS OFF CACHE BOOL "")
-set(BENCHMARK_ENABLE_TESTING OFF CACHE BOOL "Suppressing benchmark's tests" FORCE)
-set(BENCHMARK_ENABLE_INSTALL OFF CACHE BOOL "" FORCE)
+set(BENCHMARK_ENABLE_GTEST_TESTS OFF CACHE INTERNAL "")
+set(BENCHMARK_ENABLE_TESTING OFF CACHE INTERNAL "Suppressing benchmark's tests")
+set(BENCHMARK_ENABLE_INSTALL OFF CACHE INTERNAL "" )
 
 add_subdirectory(${${gbName}_SOURCE_DIR} ${${gbName}_BINARY_DIR} EXCLUDE_FROM_ALL)
 
@@ -74,14 +72,13 @@ hide_variable(BENCHMARK_BUILD_32_BITS)
 hide_variable(BENCHMARK_DOWNLOAD_DEPENDENCIES)
 hide_variable(BENCHMARK_ENABLE_ASSEMBLY_TESTS)
 hide_variable(BENCHMARK_ENABLE_EXCEPTIONS)
-hide_variable(BENCHMARK_ENABLE_GTEST_TESTS)
-hide_variable(BENCHMARK_ENABLE_INSTALL)
 hide_variable(BENCHMARK_ENABLE_LTO)
-hide_variable(BENCHMARK_ENABLE_TESTING)
 hide_variable(BENCHMARK_USE_LIBCXX)
 hide_variable(LIBRT)
 
 set_target_properties(benchmark benchmark_main PROPERTIES FOLDER "Extern")
+target_compile_options(benchmark_main PRIVATE $<$<CXX_COMPILER_ID:MSVC>:/wd4244>)
+target_compile_options(benchmark PRIVATE $<$<CXX_COMPILER_ID:MSVC>:/wd4244>)
 
 if(MSVC AND MSVC_VERSION GREATER_EQUAL 1900)
     target_compile_definitions(benchmark PUBLIC
