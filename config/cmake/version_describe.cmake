@@ -66,7 +66,7 @@ function(git_version_describe source_path result)
         if(NOT TAGGING_ERROR)
             string(LENGTH ${TAG_DESCRIPTION} tag_length)
             if(tag_length GREATER 16)
-				message(STATUS "got ${TAG_DESCRIPTION} from prev section")
+                message(STATUS "got ${TAG_DESCRIPTION} from prev section")
                 string(FIND ${TAG_DESCRIPTION} "-" last_dash_loc REVERSE)
                 if(last_dash_loc GREATER 0)
                     string(SUBSTRING ${TAG_DESCRIPTION} ${last_dash_loc} -1 hash_string)
@@ -82,8 +82,12 @@ function(git_version_describe source_path result)
                             --tags
                             --dirty
                         OUTPUT_VARIABLE TAG_DESCRIPTION2
+                        ERROR_VARIABLE TAGGING_ERROR
                         OUTPUT_STRIP_TRAILING_WHITESPACE
                     )
+                    if (TAGGING_ERROR)
+                        set(TAG_DESCRIPTION2 ${TAG_DESCRIPTION})
+                    endif()
                     string(FIND ${TAG_DESCRIPTION2} ${hash_string} hash_loc)
                     if(hash_loc LESS 0)
                         string(FIND ${TAG_DESCRIPTION2} "-dirty" dirty_loc)
