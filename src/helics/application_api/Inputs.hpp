@@ -13,7 +13,7 @@ SPDX-License-Identifier: BSD-3-Clause
 namespace units
 {
 class precise_unit;
-}
+} // namespace units
 
 namespace helics
 {

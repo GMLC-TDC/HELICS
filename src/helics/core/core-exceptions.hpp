@@ -21,7 +21,7 @@ class HelicsException : public std::exception
     std::string errorMessage = "HELICS EXCEPTION";
 
   public:
-    HelicsException () noexcept = default;
+    HelicsException () = default;
     explicit HelicsException (std::string message) noexcept: errorMessage (std::move (message)) {}
     virtual const char *what () const noexcept override { return errorMessage.c_str (); }
 };

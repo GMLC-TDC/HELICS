@@ -364,7 +364,7 @@ NamedPoint helicsGetNamedPoint (const std::string &val)
             return {val, std::nan ("0")};
         }
         auto V = helicsGetComplex (val);
-        if (V.real () < -1e48)
+        if (V.real () < invalidDouble)
         {
             return {val, std::nan ("0")};
         }

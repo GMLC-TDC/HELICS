@@ -95,7 +95,7 @@ void CoreBroker::setLoggingCallback (
     if (logFunction)
     {
         auto ii = getNextAirlockIndex ();
-        dataAirlocks[ii].load (std::move (logFunction));
+        dataAirlocks[ii].load (logFunction);
         loggerUpdate.counter = ii;
     }
     else
@@ -2858,7 +2858,7 @@ void CoreBroker::processQuery (const ActionMessage &m)
         queryResp.dest_id = m.source_id;
         queryResp.source_id = global_broker_id_local;
         queryResp.messageID = m.messageID;
-        queryResp.payload = getNameList (std::move (m.payload));
+        queryResp.payload = getNameList (m.payload);
         if (queryResp.dest_id == global_broker_id_local)
         {
             ActiveQueries.setDelayedValue (m.messageID, queryResp.payload);
