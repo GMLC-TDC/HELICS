@@ -38,13 +38,8 @@ constexpr Time operator"" _t (long double val) { return Time (static_cast<double
 /** simple structure with the time and completion marker for iterations or dense time steps*/
 struct iteration_time
 {
-  public:
     Time grantedTime;  //!< the time of the granted step
     iteration_result state;  //!< the convergence state
-    /** default constructor*/
-    iteration_time () = default;
-    /** construct from properties*/
-    constexpr iteration_time (Time t, iteration_result iterate) noexcept : grantedTime (t), state (iterate){};
 };
 
 /** generate a time from a string

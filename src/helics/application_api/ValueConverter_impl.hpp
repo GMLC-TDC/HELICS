@@ -81,26 +81,33 @@ class membuf : public std::streambuf
     int_type underflow ()
     {
         if (current_ == end_)
+        {
             return traits_type::eof ();
+        }
 
         return traits_type::to_int_type (*current_);
     }
     int_type uflow ()
     {
         if (current_ == end_)
+        {
             return traits_type::eof ();
+        }
 
         return traits_type::to_int_type (*current_++);
     }
     int_type pbackfail (int_type ch)
     {
         if (current_ == begin_ || (ch != traits_type::eof () && ch != current_[-1]))
+        {
             return traits_type::eof ();
+        }
 
         return traits_type::to_int_type (*--current_);
     }
     std::streamsize showmanyc () { return end_ - current_; }
 
+  public:
     // copy ctor and assignment not implemented;
     // copying not allowed
     membuf (const membuf &) = delete;
@@ -127,7 +134,7 @@ class ostringbuf : public std::streambuf
     ostringbuf ()
     {
         char *base = abuf_.data ();
-        setp (base, base + 63);  // one less than the buffer size
+        setp (base, base + bufsize-1);  // one less than the buffer size
     }
     /** reserve a size of the buffer*/
     void reserve (size_t size) { sbuf_.reserve (size); }
@@ -172,7 +179,8 @@ class ostringbuf : public std::streambuf
     ostringbuf &operator= (const ostringbuf &) = delete;
 
   private:
-    std::array<char, 64> abuf_;
+    static constexpr size_t bufsize = 64;
+    std::array<char, bufsize> abuf_;
     std::string sbuf_;
 };
 

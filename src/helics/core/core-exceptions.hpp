@@ -21,8 +21,8 @@ class HelicsException : public std::exception
     std::string errorMessage = "HELICS EXCEPTION";
 
   public:
-    HelicsException () = default;
-    explicit HelicsException (std::string message) : errorMessage (std::move (message)) {}
+    HelicsException () noexcept = default;
+    explicit HelicsException (std::string message) noexcept: errorMessage (std::move (message)) {}
     virtual const char *what () const noexcept override { return errorMessage.c_str (); }
 };
 
@@ -30,7 +30,7 @@ class HelicsException : public std::exception
 class FunctionExecutionFailure : public HelicsException
 {
   public:
-    explicit FunctionExecutionFailure (std::string message = "HELICS execution failure")
+    explicit FunctionExecutionFailure (std::string message = "HELICS execution failure") noexcept
         : HelicsException (std::move (message)){};
 };
 
@@ -38,7 +38,7 @@ class FunctionExecutionFailure : public HelicsException
 class InvalidIdentifier : public HelicsException
 {
   public:
-    explicit InvalidIdentifier (std::string message = "invalid identifier")
+    explicit InvalidIdentifier (std::string message = "invalid identifier") noexcept
         : HelicsException (std::move (message)){};
 };
 
@@ -46,7 +46,7 @@ class InvalidIdentifier : public HelicsException
 class InvalidParameter : public HelicsException
 {
   public:
-    explicit InvalidParameter (std::string message = "invalid parameter")
+    explicit InvalidParameter (std::string message = "invalid parameter") noexcept
         : HelicsException (std::move (message)){};
 };
 
@@ -54,7 +54,7 @@ class InvalidParameter : public HelicsException
 class InvalidConversion : public HelicsException
 {
   public:
-    explicit InvalidConversion (std::string message = "unable to perform the requested conversion")
+    explicit InvalidConversion (std::string message = "unable to perform the requested conversion") noexcept
         : HelicsException (std::move (message)){};
 };
 
@@ -62,7 +62,7 @@ class InvalidConversion : public HelicsException
 class InvalidFunctionCall : public HelicsException
 {
   public:
-    explicit InvalidFunctionCall (std::string message = "invalid function call")
+    explicit InvalidFunctionCall (std::string message = "invalid function call") noexcept
         : HelicsException (std::move (message)){};
 };
 
@@ -70,7 +70,7 @@ class InvalidFunctionCall : public HelicsException
 class ConnectionFailure : public HelicsException
 {
   public:
-    explicit ConnectionFailure (std::string message = "failed to connect")
+    explicit ConnectionFailure (std::string message = "failed to connect") noexcept
         : HelicsException (std::move (message)){};
 };
 
@@ -78,7 +78,7 @@ class ConnectionFailure : public HelicsException
 class RegistrationFailure : public HelicsException
 {
   public:
-    explicit RegistrationFailure (std::string message = "registration failure")
+    explicit RegistrationFailure (std::string message = "registration failure") noexcept
         : HelicsException (std::move (message)){};
 };
 
@@ -86,7 +86,7 @@ class RegistrationFailure : public HelicsException
 class HelicsSystemFailure : public HelicsException
 {
   public:
-    explicit HelicsSystemFailure (std::string message = "HELICS system failure")
+    explicit HelicsSystemFailure (std::string message = "HELICS system failure") noexcept
         : HelicsException (std::move (message)){};
 };
 }  // namespace helics

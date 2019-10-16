@@ -55,7 +55,7 @@ bool changeDetected (const defV &prevValue, const NamedPoint &val, double deltaV
 bool changeDetected (const defV &prevValue, bool val, double deltaV);
 
 /** directly convert the boolean to integer*/
-inline int64_t make_valid (bool obj) { return (obj) ? 1ll : 0ll; }
+inline int64_t make_valid (bool obj) { return (obj) ? 1LL : 0LL; }
 
 /** directly convert the boolean to integer*/
 inline int64_t make_valid (uint64_t val) { return static_cast<int64_t> (val); }
@@ -169,11 +169,12 @@ valueExtract (const defV &dv, X &val)
 template <class X>
 std::enable_if_t<std::is_arithmetic<X>::value> valueExtract (const data_view &dv, data_type baseType, X &val)
 {
+    constexpr size_t byte_order_check_size = 1;
     switch (baseType)
     {
     case data_type::helics_any:
     {
-        if (dv.size () == 9)
+        if (dv.size () == sizeof (double) + byte_order_check_size)
         {
             auto V = ValueConverter<double>::interpret (dv);
             if (std::isnormal (V))
@@ -186,12 +187,12 @@ std::enable_if_t<std::is_arithmetic<X>::value> valueExtract (const data_view &dv
                 val = static_cast<X> (Vint);
             }
         }
-        else if (dv.size () == 17)
+        else if (dv.size () == 2 * sizeof (double) + byte_order_check_size)
         {
             auto V = ValueConverter<std::complex<double>>::interpret (dv);
             val = static_cast<X> (std::abs (V));
         }
-        else if (dv.size () == 5)
+        else if (dv.size () == sizeof (int) + byte_order_check_size)
         {
             auto V = ValueConverter<float>::interpret (dv);
             if (std::isnormal (V))
@@ -204,7 +205,7 @@ std::enable_if_t<std::is_arithmetic<X>::value> valueExtract (const data_view &dv
                 val = static_cast<X> (Vint);
             }
         }
-        else if (dv.size () == 1)
+        else if (dv.size () == sizeof(char))
         {
             val = static_cast<X> ((dv[0] == '0') ? 0 : 1);
         }

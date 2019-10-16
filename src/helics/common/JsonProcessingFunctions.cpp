@@ -76,20 +76,18 @@ helics::Time loadJsonTime (const Json::Value &timeElement, time_units defaultUni
             }
             return helics::Time (timeElement["value"].asDouble () * toSecondMultiplier (defaultUnits));
         }
+        return helics::Time::minVal ();
     }
-    else if (timeElement.isInt64 ())
+    if (timeElement.isInt64 ())
     {
         return helics::Time (timeElement.asInt64 (), defaultUnits);
     }
-    else if (timeElement.isDouble ())
+    if (timeElement.isDouble ())
     {
         return helics::Time (timeElement.asDouble () * toSecondMultiplier (defaultUnits));
     }
-    else
-    {
-        return helics::loadTimeFromString (timeElement.asString ());
-    }
-    return helics::Time::minVal ();
+    return helics::loadTimeFromString (timeElement.asString ());
+    
 }
 
 std::string getKey (const Json::Value &element)
@@ -104,10 +102,9 @@ std::string generateJsonString (const Json::Value &block)
     Json::StreamWriterBuilder builder;
     builder["commentStyle"] = "None";
     builder["indentation"] = "   ";  // or whatever you like
-    auto writer = builder.newStreamWriter ();
+    auto writer = std::unique_ptr<Json::StreamWriter>(builder.newStreamWriter ());
     std::stringstream sstr;
     writer->write (block, &sstr);
     auto ret = sstr.str ();
-    delete writer;
     return ret;
 }

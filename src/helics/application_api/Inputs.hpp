@@ -163,7 +163,7 @@ class Input
     void registerNotificationCallback (std::function<void (Time)> callback)
     {
         fed->setInputNotificationCallback (*this,
-                                           [this, callback = std::move (callback)] (const Input &, Time time) {
+                                           [this, callback = std::move (callback)] (const Input & /*inp*/, Time time) {
                                                if (isUpdated ())
                                                {
                                                    callback (time);
