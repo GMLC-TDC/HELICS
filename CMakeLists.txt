@@ -12,11 +12,16 @@ cmake_policy(VERSION 3.4)
 
 project(HELICS VERSION 2.3.0)
 
+if(POLICY CMP0069)
+    # Policy CMP0069 INTERPROCEDURAL OPTIMIZATION, just use the new policy since this isn't used for old systems
+    cmake_policy(SET CMP0069 NEW)
+endif()
+
 # -----------------------------------------------------------------------------
 # HELICS Version number
 # -----------------------------------------------------------------------------
 set(HELICS_VERSION_BUILD)
-set(HELICS_DATE "2019-10-12")
+set(HELICS_DATE "2019-10-16")
 
 set(
     HELICS_VERSION_UNDERSCORE
