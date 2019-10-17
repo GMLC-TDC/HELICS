@@ -33,8 +33,8 @@ class RingTransmit
 
   private:
     std::unique_ptr<helics::ValueFederate> vFed;
-    helics::Publication *pub;
-    helics::Input *sub;
+    helics::Publication *pub=nullptr;
+    helics::Input *sub=nullptr;
 
     int index_ = 0;
     int maxIndex_ = 0;

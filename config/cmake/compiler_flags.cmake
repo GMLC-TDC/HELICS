@@ -6,15 +6,39 @@
 #
 # SPDX-License-Identifier: BSD-3-Clause
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+include(CMakeDependentOption)
+if (WIN32)
+# from https://stackoverflow.com/a/40217291/2019765 by squareskittles
+    macro(get_WIN32_WINNT version)
+        if(CMAKE_SYSTEM_VERSION)
+            set(ver ${CMAKE_SYSTEM_VERSION})
+            string(REGEX MATCH "^([0-9]+).([0-9])" ver ${ver})
+            string(REGEX MATCH "^([0-9]+)" verMajor ${ver})
+            # Check for Windows 10, b/c we'll need to convert to hex 'A'.
+            if("${verMajor}" MATCHES "10")
+                set(verMajor "A")
+                string(REGEX REPLACE "^([0-9]+)" ${verMajor} ver ${ver})
+            endif("${verMajor}" MATCHES "10")
+            # Remove all remaining '.' characters.
+            string(REPLACE "." "" ver ${ver})
+            # Prepend each digit with a zero.
+            string(REGEX REPLACE "([0-9A-Z])" "0\\1" ver ${ver})
+            set(${version} "0x${ver}")
+        endif(CMAKE_SYSTEM_VERSION)
+    endmacro(get_WIN32_WINNT)
+endif()
+    
+	
+cmake_dependent_option(${PROJECT_NAME}_ENABLE_EXTRA_COMPILER_WARNINGS
+       "disable compiler warning for ${CMAKE_PROJECT_NAME} build" ON "CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME" OFF)
 
-cmake_conditional_option(HELICS_ENABLE_EXTRA_COMPILER_WARNINGS
-       "disable compiler warning for ${CMAKE_PROJECT_NAME} build" "CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME")
-
-option(HELICS_ENABLE_ERROR_ON_WARNINGS
-       "generate a compiler error for any warning encountered" OFF)
-
-mark_as_advanced(HELICS_ENABLE_EXTRA_COMPILER_WARNINGS)
-mark_as_advanced(HELICS_ENABLE_ERROR_ON_WARNINGS)
+cmake_dependent_option(${PROJECT_NAME}_ENABLE_ERROR_ON_WARNINGS
+       "generate a compiler error for any warning encountered" OFF "CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME" OFF)
+	   
+if (CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
+    mark_as_advanced(${PROJECT_NAME}_ENABLE_EXTRA_COMPILER_WARNINGS)
+    mark_as_advanced(${PROJECT_NAME}_ENABLE_ERROR_ON_WARNINGS)
+endif()
 
 # -------------------------------------------------------------
 # Setup compiler options and configurations
@@ -30,11 +54,11 @@ endif()
 target_compile_options(
     compile_flags_target
     INTERFACE
-        $<$<CXX_COMPILER_ID:MSVC>:$<$<BOOL:${HELICS_ENABLE_ERROR_ON_WARNINGS}>:/WX>>
-        $<$<NOT:$<CXX_COMPILER_ID:MSVC>>:$<$<BOOL:${HELICS_ENABLE_ERROR_ON_WARNINGS}>:-Werror>>
+        $<$<CXX_COMPILER_ID:MSVC>:$<$<BOOL:${${PROJECT_NAME}_ENABLE_ERROR_ON_WARNINGS}>:/WX>>
+        $<$<NOT:$<CXX_COMPILER_ID:MSVC>>:$<$<BOOL:${${PROJECT_NAME}_ENABLE_ERROR_ON_WARNINGS}>:-Werror>>
 )
 
-if(HELICS_ENABLE_EXTRA_COMPILER_WARNINGS)
+if(${PROJECT_NAME}_ENABLE_EXTRA_COMPILER_WARNINGS)
     target_compile_options(
         compile_flags_target
         INTERFACE $<$<NOT:$<CXX_COMPILER_ID:MSVC>>:-Wall -pedantic>
@@ -106,7 +130,7 @@ if(HELICS_ENABLE_EXTRA_COMPILER_WARNINGS)
             )
         endif()
     endif()
-endif(HELICS_ENABLE_EXTRA_COMPILER_WARNINGS)
+endif(${PROJECT_NAME}_ENABLE_EXTRA_COMPILER_WARNINGS)
 
 # -------------------------------------------------------------
 # Extra definitions for visual studio
@@ -119,11 +143,15 @@ if(MSVC)
     )
     # these next two should be global
     add_compile_options(/MP /EHsc)
-    if(HELICS_ENABLE_EXTRA_COMPILER_WARNINGS)
+    if(${PROJECT_NAME}_ENABLE_EXTRA_COMPILER_WARNINGS)
         target_compile_options(compile_flags_target INTERFACE /W4 /sdl /wd4244)
-    endif(HELICS_ENABLE_EXTRA_COMPILER_WARNINGS)
-	#TODO::PT this should probably be detected not assumed
-    target_compile_options(compile_flags_target INTERFACE -D_WIN32_WINNT=0x0601)
+    endif(${PROJECT_NAME}_ENABLE_EXTRA_COMPILER_WARNINGS)
+	get_win32_winnt(COPTION_WIN32_WINNT_DEFAULT)
+    target_compile_options(compile_flags_target INTERFACE "-D_WIN32_WINNT=${COPTION_WIN32_WINNT_DEFAULT}")
+	message(
+        STATUS
+            "Detected _WIN32_WINNT from CMAKE_SYSTEM_VERSION: ${COPTION_WIN32_WINNT_DEFAULT}"
+    )
 else(MSVC)
     option(USE_LIBCXX "Use Libc++ vs as opposed to the default" OFF)
     mark_as_advanced(USE_LIBCXX)

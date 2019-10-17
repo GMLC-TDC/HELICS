@@ -7,7 +7,7 @@
 # SPDX-License-Identifier: BSD-3-Clause
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-set(HELICS_GBENCHMARK_VERSION v1.5.0)
+set(gbenchmark_version v1.5.0)
 
 string(TOLOWER "gbenchmark" gbName)
 
@@ -17,7 +17,7 @@ if(NOT CMAKE_VERSION VERSION_LESS 3.11)
     fetchcontent_declare(
         gbenchmark
         GIT_REPOSITORY https://github.com/google/benchmark.git
-        GIT_TAG ${HELICS_GBENCHMARK_VERSION}
+        GIT_TAG ${gbenchmark_version}
     )
 
     fetchcontent_getproperties(gbenchmark)
@@ -43,7 +43,7 @@ else() # cmake <3.11
         GIT_URL
         https://github.com/google/benchmark.git
         GIT_TAG
-        ${HELICS_GBENCHMARK_VERSION}
+        ${gbenchmark_version}
         DIRECTORY
         ${PROJECT_BINARY_DIR}/_deps
     )

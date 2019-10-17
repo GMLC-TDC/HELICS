@@ -12,7 +12,8 @@
 # which gives output on failed tests without having to set an environment variable.
 #
 
-set(HELICS_GTEST_VERSION dc1ca9ae4c206434e450ed4ff535ca7c20c79e3c)
+set(gtest_version release-1.10.0)
+set(gtest_vtype GIT_TAG)
 # depending on what the version is set to the git_clone command may need to change to
 # GIT_TAG||GIT_BRANCH|GIT_COMMIT
 
@@ -27,7 +28,7 @@ if(NOT CMAKE_VERSION VERSION_LESS 3.11)
     fetchcontent_declare(
         googletest
         GIT_REPOSITORY https://github.com/google/googletest.git
-        GIT_TAG ${HELICS_GTEST_VERSION}
+        GIT_TAG ${gtest_version}
     )
 
     fetchcontent_getproperties(googletest)
@@ -50,8 +51,8 @@ else() # cmake <3.11
         googletest
         GIT_URL
         https://github.com/google/googletest.git
-        GIT_COMMIT
-        ${HELICS_GTEST_VERSION}
+        ${gtest_vtype}
+        ${gtest_version}
         DIRECTORY
         ${PROJECT_BINARY_DIR}/_deps
     )

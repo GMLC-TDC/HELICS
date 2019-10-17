@@ -102,7 +102,7 @@ class FederateState
     mutable std::atomic_flag processing = ATOMIC_FLAG_INIT;  //!< the federate is processing
   private:
     /** a logging function for logging or printing messages*/
-    std::function<void(int, const std::string &, const std::string &)>
+    std::function<void (int, const std::string &, const std::string &)>
       loggerFunction;  //!< callback for logging functions
     std::function<std::string (const std::string &)> queryCallback;  //!< a callback for additional queries
     /** find the next Value Event*/
@@ -326,7 +326,7 @@ class FederateState
     @details function must have signature void(int level, const std::string &sourceName, const std::string
     &message)
     */
-    void setLogger (std::function<void(int, const std::string &, const std::string &)> logFunction)
+    void setLogger (std::function<void (int, const std::string &, const std::string &)> logFunction)
     {
         loggerFunction = std::move (logFunction);
     }
@@ -341,7 +341,8 @@ class FederateState
     @param query a query string
     @return the resulting string from the query or "#wait" if the federate is not available to answer immediately*/
     std::string processQuery (const std::string &query) const;
-    /** check if a value should be published or not
+    /** check if a value should be published or not and if needed archive it as a changed value for future change
+    detection
     @param pub_id the handle of the publication
     @param data the raw data to check
     @param len the length of the data

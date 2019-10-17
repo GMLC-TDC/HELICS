@@ -488,10 +488,13 @@ inline X invalidValue ()
     return X ();
 }
 
+/// defined constant for an invalid value as a double 
+constexpr double invalidDouble = -1e48;
+
 template <>
 constexpr double invalidValue<double> ()
 {
-    return -1e48;
+    return invalidDouble;
 }
 
 template <>

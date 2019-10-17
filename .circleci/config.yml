@@ -38,8 +38,6 @@ jobs:
       CMAKE_FLAGS: "-DBUILD_OCTAVE_INTERFACE=ON -DHELICS_BUILD_TESTS=ON"
     steps:
       - checkout
-      - setup_remote_docker: 
-         docker_layer_caching: true   # Save time when caching
       - run: *setup_helics
       - run: *run_octave_tests
 
@@ -52,8 +50,6 @@ jobs:
 
     steps:
       - checkout
-      - setup_remote_docker: 
-         docker_layer_caching: true   # Save time when caching
       - run: *setup_helics
       - run: *run_helics_tests
 
@@ -61,14 +57,12 @@ jobs:
     docker:
       - image: helics/buildenv:sanitizers
     environment:
-      CMAKE_FLAGS: '-DCMAKE_CXX_COMPILER=clang++ -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_FLAGS="-fsanitize=undefined,address -stdlib=libc++ -L/root/develop/libcxx_asan/lib -lc++abi -I/root/develop/libcxx_asan/include -I/root/develop/libcxx_asan/include/c++/v1 -Wno-unused-command-line-argument -fno-omit-frame-pointer -g -O1 -Wl,-rpath=/root/develop/libcxx_asan/lib -fsanitize-blacklist=/root/project/.circleci/asan_blacklist.txt"  -DHELICS_BUILD_TESTS=ON -DHELICS_ZMQ_SUBPROJECT=ON  -DHELICS_ZMQ_FORCE_SUBPROJECT=ON'
+      CMAKE_FLAGS: '-DCMAKE_CXX_COMPILER=clang++ -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_FLAGS="-fsanitize=undefined,address -fsanitize-address-use-after-scope -stdlib=libc++ -L/root/develop/libcxx_asan/lib -lc++abi -I/root/develop/libcxx_asan/include -I/root/develop/libcxx_asan/include/c++/v1 -Wno-unused-command-line-argument -fno-omit-frame-pointer -g -O1 -Wl,-rpath=/root/develop/libcxx_asan/lib -fsanitize-blacklist=/root/project/.circleci/asan_blacklist.txt"  -DHELICS_BUILD_TESTS=ON -DHELICS_ZMQ_SUBPROJECT=ON  -DHELICS_ZMQ_FORCE_SUBPROJECT=ON'
       LSAN_OPTIONS: 'suppressions=/root/project/.circleci/leak_suppression.txt'
       UBSAN_OPTIONS: 'print_stacktrace=1'
 
     steps:
       - checkout
-      - setup_remote_docker: 
-         docker_layer_caching: true   # Save time when caching
       - run: *setup_helics
       - run: *run_helics_tests
 
@@ -80,8 +74,6 @@ jobs:
 
     steps:
       - checkout
-      - setup_remote_docker: 
-         docker_layer_caching: true   # Save time when caching
       - run: *setup_helics
       - run: *run_helics_tests
 

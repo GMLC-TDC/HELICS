@@ -29,7 +29,7 @@ class NamedInputInfo
             : time (recordTime), data (std::move (recordData))
         {
         }
-        dataRecord (Time recordTime, int recordIteration, std::shared_ptr<const data_block> recordData)
+        dataRecord (Time recordTime, unsigned int recordIteration, std::shared_ptr<const data_block> recordData)
             : time (recordTime), iteration (recordIteration), data (std::move (recordData))
         {
         }

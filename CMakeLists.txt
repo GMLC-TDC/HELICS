@@ -12,11 +12,16 @@ cmake_policy(VERSION 3.4)
 
 project(HELICS VERSION 2.3.0)
 
+if(POLICY CMP0069)
+    # Policy CMP0069 INTERPROCEDURAL OPTIMIZATION, just use the new policy since this isn't used for old systems
+    cmake_policy(SET CMP0069 NEW)
+endif()
+
 # -----------------------------------------------------------------------------
 # HELICS Version number
 # -----------------------------------------------------------------------------
 set(HELICS_VERSION_BUILD)
-set(HELICS_DATE "2019-10-12")
+set(HELICS_DATE "2019-10-16")
 
 set(
     HELICS_VERSION_UNDERSCORE
@@ -390,11 +395,11 @@ option(ENABLE_MPI_CORE "Enable MPI networking library" OFF)
 option(ENABLE_ZMQ_CORE "Enable ZeroMQ networking library" ON)
 option(ENABLE_TCP_CORE "Enable TCP core types" ON)
 option(ENABLE_UDP_CORE "Enable UDP core types" ON)
-cmake_dependent_option(
+cmake_dependent_advanced_option(
     ENABLE_IPC_CORE
     "Enable Interprocess communication types"
     ON
-    "NOT DISABLE_BOOST"
+    "NOT HELICS_DISABLE_BOOST"
     OFF
 )
 option(ENABLE_TEST_CORE "Enable test inprocess core type" ON)
@@ -406,7 +411,6 @@ mark_as_advanced(
     ENABLE_TCP_CORE
     ENABLE_UDP_CORE
     ENABLE_TEST_CORE
-    ENABLE_IPC_CORE
     ENABLE_ZMQ_CORE
 )
 
@@ -540,6 +544,10 @@ set(CMAKE_MACOSX_RPATH ON)
 # add the automatically determined parts of the RPATH which point to directories outside
 # the build tree to the install RPATH
 set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
+
+if (NOT APPLE)
+	set(CMAKE_INSTALL_RPATH $ORIGIN)
+endif()
 
 # the RPATH to be used when installing, but only if it's not a system directory
 list(

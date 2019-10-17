@@ -340,11 +340,8 @@ bool checkUnitMatch (const std::string &unit1, const std::string &unit2, bool st
         double conv = units::quick_convert (u1, u2);
         return (!std::isnan (conv));
     }
-    else
-    {
-        double conv = units::convert (u1, u2);
-        return (!std::isnan (conv));
-    }
+    double conv = units::convert (u1, u2);
+    return (!std::isnan (conv));
 }
 
 }  // namespace helics

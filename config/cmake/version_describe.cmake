@@ -61,7 +61,7 @@ function(git_version_describe source_path result)
                 ERROR_VARIABLE TAGGING_ERROR
                 OUTPUT_STRIP_TRAILING_WHITESPACE
             )
-            # message(STATUS "got ${TAG_DESCRIPTION} from third try")
+            message(STATUS "got ${TAG_DESCRIPTION} from third try")
         endif()
         if(NOT TAGGING_ERROR)
             string(LENGTH ${TAG_DESCRIPTION} tag_length)
@@ -81,8 +81,12 @@ function(git_version_describe source_path result)
                             --tags
                             --dirty
                         OUTPUT_VARIABLE TAG_DESCRIPTION2
+                        ERROR_VARIABLE TAGGING_ERROR
                         OUTPUT_STRIP_TRAILING_WHITESPACE
                     )
+                    if (TAGGING_ERROR)
+                        set(TAG_DESCRIPTION2 ${TAG_DESCRIPTION})
+                    endif()
                     string(FIND ${TAG_DESCRIPTION2} ${hash_string} hash_loc)
                     if(hash_loc LESS 0)
                         string(FIND ${TAG_DESCRIPTION2} "-dirty" dirty_loc)
