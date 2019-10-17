@@ -38,7 +38,6 @@ jobs:
       CMAKE_FLAGS: "-DBUILD_OCTAVE_INTERFACE=ON -DHELICS_BUILD_TESTS=ON"
     steps:
       - checkout
-      - setup_remote_docker: 
       - run: *setup_helics
       - run: *run_octave_tests
 
@@ -51,7 +50,6 @@ jobs:
 
     steps:
       - checkout
-      - setup_remote_docker: 
       - run: *setup_helics
       - run: *run_helics_tests
 
@@ -65,7 +63,6 @@ jobs:
 
     steps:
       - checkout
-      - setup_remote_docker: 
       - run: *setup_helics
       - run: *run_helics_tests
 
@@ -77,7 +74,6 @@ jobs:
 
     steps:
       - checkout
-      - setup_remote_docker: 
       - run: *setup_helics
       - run: *run_helics_tests
 
