@@ -452,7 +452,7 @@ if(MSYS OR CYGWIN)
 endif()
 
 if(MINGW AND NOT UNIX_LIKE)
-    target_link_libraries(helics_base INTERFACE wsock32 ws2_32)
+    target_link_libraries(helics_base INTERFACE wsock32 ws2_32 iphlpapi)
 endif()
 
 if(CYGWIN)
