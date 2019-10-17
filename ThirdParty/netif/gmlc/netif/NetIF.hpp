@@ -16,7 +16,7 @@ All rights reserved. SPDX-License-Identifier: BSD-3-Clause
 // https://sourceforge.net/p/predef/wiki/OperatingSystems/
 // https://stackoverflow.com/questions/142508/how-do-i-check-os-with-a-preprocessor-directive
 #if defined(_WIN32) || defined(__USE_W32_SOCKETS)
-#include <WS2tcpip.h>
+#include <ws2tcpip.h>
 #include <iphlpapi.h>
 #include <winsock2.h>
 #ifdef _MSC_VER
