@@ -205,27 +205,6 @@ jobs:
         - GCOV_TOOL=gcov-6
         - USE_MPI=mpich
         - CTEST_VERBOSE=true
-    # UBSAN build
-    - <<: *daily_linux
-      name: "Clang 5 Undefined Behavior Sanitizer"
-      compiler: clang
-      addons:
-        apt:
-          sources:
-            - ubuntu-toolchain-r-test
-            - llvm-toolchain-trusty-5.0
-          packages:
-            - libstdc++-6-dev
-            - clang-5.0
-      env:
-        - MATRIX_EVAL="COMPILER=clang && CC='clang-5.0' && CXX='clang++-5.0'"
-        - CCACHE_CPP2=yes
-        - DISABLE_INTERFACES="Python,Java"
-        - RUN_SANITIZER=ubsan
-        - USE_MPI=mpich
-        - JOB_OPTION_FLAGS="-C../scripts/ubsan-cache.cmake"
-        - ZMQ_SUBPROJECT=true
-        - ZMQ_FORCE_SUBPROJECT=true
       
     - stage: trigger dependent repositories
       if: branch IN (master, develop)
