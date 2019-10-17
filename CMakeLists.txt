@@ -445,14 +445,14 @@ endif()
 # add some additional libraries for MINGW and MSYS
 # -------------------------------------------------------------
 if(MSYS OR CYGWIN)
-    target_link_libraries(helics_base INTERFACE wsock32 ws2_32 Iphlpapi)
+    target_link_libraries(helics_base INTERFACE wsock32 ws2_32 iphlpapi)
     if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
         set(ENABLE_IPC_CORE FALSE)
     endif()
 endif()
 
 if(MINGW AND NOT UNIX_LIKE)
-    target_link_libraries(helics_base INTERFACE wsock32 ws2_32)
+    target_link_libraries(helics_base INTERFACE wsock32 ws2_32 iphlpapi)
 endif()
 
 if(CYGWIN)
