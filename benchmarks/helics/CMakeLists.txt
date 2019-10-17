@@ -14,6 +14,7 @@ set(
     ringBenchmarks
     messageLookupBenchmarks
     conversionBenchmarks
+	echoMessageBenchmarks
 )
 
 # Only affects current directory, so safe
