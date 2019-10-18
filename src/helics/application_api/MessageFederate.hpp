@@ -67,23 +67,33 @@ class HELICS_CXX_EXPORT MessageFederate:
   public:
     /** register an endpoint
     @details call is only valid in startup mode
-    @param name the name of the endpoint
+    @param eptName the name of the endpoint
     @param type the defined type of the interface for endpoint checking if requested
     */
-    Endpoint& registerEndpoint(
-        const std::string& name = std::string(),
-        const std::string& type = std::string());
+    Endpoint &
+    registerEndpoint (const std::string &eptName = std::string (), const std::string &type = std::string ());
 
     /** register an endpoint directly without prepending the federate name
     @details call is only valid in startup mode
-    @param name the name of the endpoint
+    @param eptName the name of the endpoint
     @param type the defined type of the interface for endpoint checking if requested
     @return a Reference to an Endpoint Object
     */
-    Endpoint&
-        registerGlobalEndpoint(const std::string& name, const std::string& type = std::string());
+    Endpoint &registerGlobalEndpoint (const std::string &eptName, const std::string &type = std::string ());
 
-    virtual void registerInterfaces(const std::string& configString) override;
+	/** register an indexed Endpoint
+    @details register a global endpoint as part of a 1D array of endpoints
+    @param eptName the name of the endpoint array
+    @param index1 the index into a 1 dimensional array of endpoints
+    @param type the optional type on the endpoint
+    */
+    Endpoint &
+    registerIndexedEndpoint (const std::string &eptName, int index1, const std::string &type = std::string ())
+    {
+        return registerGlobalEndpoint (eptName + '_' + std::to_string (index1), type);
+    }
+
+    virtual void registerInterfaces (const std::string &configString) override;
 
     /** register a set Message interfaces
     @details call is only valid in startup mode it is a protected call to add an

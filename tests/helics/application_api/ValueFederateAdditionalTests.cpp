@@ -407,15 +407,15 @@ TEST_P(valuefed_add_single_type_tests_ci_skip, indexed_pubs_subs)
     SetupTest<helics::ValueFederate>(GetParam(), 1);
     auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
 
-    auto pubid1 = vFed1->registerPublicationIndexed<double>("pub1", 0);
-    auto pubid2 = vFed1->registerPublicationIndexed<double>("pub1", 1);
+    auto pubid1 = vFed1->registerIndexedPublication<double> ("pub1", 0);
+    auto pubid2 = vFed1->registerIndexedPublication<double> ("pub1", 1);
 
-    auto pubid3 = vFed1->registerPublicationIndexed<double>("pub1", 2);
+    auto pubid3 = vFed1->registerIndexedPublication<double> ("pub1", 2);
 
-    auto sub1 = vFed1->registerSubscriptionIndexed("pub1", 0);
-    auto sub2 = vFed1->registerSubscriptionIndexed("pub1", 1);
-    auto sub3 = vFed1->registerSubscriptionIndexed("pub1", 2);
-    vFed1->enterExecutingMode();
+    auto sub1 = vFed1->registerIndexedSubscription ("pub1", 0);
+    auto sub2 = vFed1->registerIndexedSubscription ("pub1", 1);
+    auto sub3 = vFed1->registerIndexedSubscription ("pub1", 2);
+    vFed1->enterExecutingMode ();
 
     vFed1->publish(pubid1, 10.0);
     vFed1->publish(pubid2, 20.0);
@@ -513,15 +513,15 @@ TEST_P(valuefed_add_single_type_tests_ci_skip, info_field)
 /** test the pub/sub info field*/
 TEST_P(valuefed_add_single_type_tests_ci_skip, info_pubs_subs)
 {
-    SetupTest<helics::ValueFederate>(GetParam(), 1);
-    auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
-    vFed1->setFlagOption(helics_handle_option_connection_optional);
-    auto pubid1 = vFed1->registerPublicationIndexed<double>("pub1", 0);
-    pubid1.setInfo(std::string("pub_test1"));
+    SetupTest<helics::ValueFederate> (GetParam (), 1);
+    auto vFed1 = GetFederateAs<helics::ValueFederate> (0);
+    vFed1->setFlagOption (helics_handle_option_connection_optional);
+    auto pubid1 = vFed1->registerIndexedPublication<double> ("pub1", 0);
+    pubid1.setInfo (std::string ("pub_test1"));
 
-    auto sub1 = vFed1->registerSubscriptionIndexed("pub1", 0);
-    auto sub2 = vFed1->registerSubscriptionIndexed("pub1", 1);
-    auto sub3 = vFed1->registerSubscriptionIndexed("pub1", 2);
+    auto sub1 = vFed1->registerIndexedSubscription ("pub1", 0);
+    auto sub2 = vFed1->registerIndexedSubscription ("pub1", 1);
+    auto sub3 = vFed1->registerIndexedSubscription ("pub1", 2);
 
     sub1.setInfo(std::string("sub_test1"));
     sub2.setInfo(std::string("sub_test2"));

@@ -64,9 +64,9 @@ class RingTransmit {
         if (index == 0) {
             // fi.setProperty (helics_property_int_log_level, helics_log_level_timing);
         }
-        vFed = std::make_unique<helics::ValueFederate>(name, fi);
-        pub = &vFed->registerPublicationIndexed<std::string>("pub", index_);
-        sub = &vFed->registerSubscriptionIndexed("pub", (index_ == 0) ? maxIndex_ - 1 : index_ - 1);
+        vFed = std::make_unique<helics::ValueFederate> (name, fi);
+        pub = &vFed->registerIndexedPublication<std::string> ("pub", index_);
+        sub = &vFed->registerIndexedSubscription ("pub", (index_ == 0) ? maxIndex_ - 1 : index_ - 1);
 
         initialized = true;
     }

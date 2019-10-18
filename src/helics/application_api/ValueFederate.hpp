@@ -124,11 +124,9 @@ class HELICS_CXX_EXPORT ValueFederate:
     @param units  the optional units of the publication
     @return an identifier for use with this publication
     */
-    template<typename X>
-    Publication& registerPublicationIndexed(
-        const std::string& key,
-        int index1,
-        const std::string& units = std::string())
+    template <typename X>
+    Publication &
+    registerIndexedPublication (const std::string &key, int index1, const std::string &units = std::string ())
     {
         return registerGlobalPublication<X>(key + '_' + std::to_string(index1), units);
     }
@@ -141,12 +139,11 @@ class HELICS_CXX_EXPORT ValueFederate:
     @param units  the optional units of the publication
     @return an identifier for use with this publication
     */
-    template<typename X>
-    Publication& registerPublicationIndexed(
-        const std::string& key,
-        int index1,
-        int index2,
-        const std::string& units = std::string())
+    template <typename X>
+    Publication &registerIndexedPublication (const std::string &key,
+                                             int index1,
+                                             int index2,
+                                             const std::string &units = std::string ())
     {
         return registerGlobalPublication<X>(
             key + '_' + std::to_string(index1) + '_' + std::to_string(index2), units);
@@ -195,11 +192,8 @@ class HELICS_CXX_EXPORT ValueFederate:
     @param index1 the index into a 1 dimensional array of values
     @param units the optional units on the subscription
     */
-    template<typename X>
-    Input& registerInputIndexed(
-        const std::string& key,
-        int index1,
-        const std::string& units = std::string())
+    template <typename X>
+    Input &registerIndexedInput (const std::string &key, int index1, const std::string &units = std::string ())
     {
         return registerGlobalInput<X>(key + '_' + std::to_string(index1), units);
     }
@@ -213,12 +207,11 @@ class HELICS_CXX_EXPORT ValueFederate:
   @param units  the optional units of the publication
   @return an identifier for use with this publication
   */
-    template<typename X>
-    Input& registerInputIndexed(
-        const std::string& key,
-        int index1,
-        int index2,
-        const std::string& units = std::string())
+    template <typename X>
+    Input &registerIndexedInput (const std::string &key,
+                                 int index1,
+                                 int index2,
+                                 const std::string &units = std::string ())
     {
         return registerGlobalInput<X>(
             key + '_' + std::to_string(index1) + '_' + std::to_string(index2), units);
@@ -237,10 +230,8 @@ class HELICS_CXX_EXPORT ValueFederate:
     @param index1 the index into a 1 dimensional array of values
     @param units the optional units on the subscription
     */
-    Input& registerSubscriptionIndexed(
-        const std::string& target,
-        int index1,
-        const std::string& units = std::string())
+    Input &
+    registerIndexedSubscription (const std::string &target, int index1, const std::string &units = std::string ())
     {
         return registerSubscription(target + '_' + std::to_string(index1), units);
     }
@@ -252,11 +243,10 @@ class HELICS_CXX_EXPORT ValueFederate:
     @param index2 the 2nd index of a 2-D value structure
     @param units the optional units on the subscription
     */
-    Input& registerSubscriptionIndexed(
-        const std::string& target,
-        int index1,
-        int index2,
-        const std::string& units = std::string())
+    Input &registerIndexedSubscription (const std::string &target,
+                                        int index1,
+                                        int index2,
+                                        const std::string &units = std::string ())
     {
         return registerSubscription(
             target + '_' + std::to_string(index1) + '_' + std::to_string(index2), units);

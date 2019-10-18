@@ -14,8 +14,9 @@ set(HELICS_BENCHMARKS
     ringBenchmarks
     messageLookupBenchmarks
     conversionBenchmarks
-    echoMessageBenchmarks
-    messageSendBenchmarks
+	echoMessageBenchmarks
+	ringMessageBenchmarks
+	messageSendBenchmarks
     pholdBenchmarks
     timingBenchmarks
 )

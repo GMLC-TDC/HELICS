@@ -120,9 +120,10 @@ class VectorSubscription {
         ids.reserve(count);
         vals.resize(count, defValue);
 
-        for (auto ind = startIndex; ind < startIndex + count; ++ind) {
-            auto id = fed->registerSubscriptionIndexed(m_key, ind, m_units);
-            ids.push_back(id);
+        for (auto ind = startIndex; ind < startIndex + count; ++ind)
+        {
+            auto id = fed->registerIndexedSubscription (m_key, ind, m_units);
+            ids.push_back (id);
         }
 
         for (auto& id : ids) {
@@ -257,10 +258,12 @@ class VectorSubscription2d {
         ids.reserve(count_x * count_y);
         vals.resize(count_x * count_y, defValue);
 
-        for (auto ind_x = startIndex_x; ind_x < startIndex_x + count_x; ++ind_x) {
-            for (auto ind_y = startIndex_y; ind_y < startIndex_y + count_y; ++ind_y) {
-                auto id = fed->registerSubscriptionIndexed(m_key, ind_x, ind_y, m_units);
-                ids.push_back(id);
+        for (auto ind_x = startIndex_x; ind_x < startIndex_x + count_x; ++ind_x)
+        {
+            for (auto ind_y = startIndex_y; ind_y < startIndex_y + count_y; ++ind_y)
+            {
+                auto id = fed->registerIndexedSubscription (m_key, ind_x, ind_y, m_units);
+                ids.push_back (id);
             }
         }
 
