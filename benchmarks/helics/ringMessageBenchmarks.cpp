@@ -59,7 +59,7 @@ class RingTransmitMessage
         maxIndex_ = maxIndex;
         helics::FederateInfo fi;
         fi.coreName = coreName;
-       // fi.setFlagOption (helics_flag_restrictive_time_policy);
+        fi.setFlagOption (helics_flag_restrictive_time_policy);
         if (index == 0)
         {
             // fi.setProperty (helics_property_int_log_level, helics_log_level_timing);

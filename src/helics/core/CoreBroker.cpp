@@ -123,9 +123,8 @@ bool CoreBroker::verifyBrokerKey(ActionMessage& mess) const
 {
     if (mess.getStringData().size() > 1) {
         return verifyBrokerKey(mess.getString(1));
-    } else {
-        return brokerKey.empty();
     }
+    return brokerKey.empty ();
 }
 /** verify the broker key contained in a string
 @return false if the keys do not match*/
@@ -1581,10 +1580,9 @@ void CoreBroker::configureFromVector(std::vector<std::string> args)
 
 std::shared_ptr<helicsCLI11App> CoreBroker::generateCLI()
 {
-    auto app = std::make_shared<helicsCLI11App>("Option for Broker");
-    app->remove_helics_specifics();
-    app->add_flag_callback(
-        "--root", [this]() { setAsRoot(); }, "specify whether the broker is a root");
+    auto app = std::make_shared<helicsCLI11App> ("Option for Broker");
+    app->remove_helics_specifics ();
+    app->add_flag_callback ("--root", [this]() { setAsRoot (); }, "specify whether the broker is a root");
     return app;
 }
 
@@ -2266,29 +2264,27 @@ std::string CoreBroker::generateQueryAnswer(const std::string& request)
     if (request == "brokers") {
         return generateStringVector(_brokers, [](auto& brk) { return brk.name; });
     }
-    if (request == "inputs") {
-        return generateStringVector_if(
-            handles,
-            [](auto& handle) { return handle.key; },
-            [](auto& handle) { return (handle.handleType == handle_type::input); });
+    if (request == "inputs")
+    {
+        return generateStringVector_if (handles, [](auto &handle) { return handle.key; },
+                                        [](auto &handle) { return (handle.handleType == handle_type::input); });
     }
-    if (request == "publications") {
-        return generateStringVector_if(
-            handles,
-            [](auto& handle) { return handle.key; },
-            [](auto& handle) { return (handle.handleType == handle_type::publication); });
+    if (request == "publications")
+    {
+        return generateStringVector_if (handles, [](auto &handle) { return handle.key; },
+                                        [](auto &handle) {
+                                            return (handle.handleType == handle_type::publication);
+                                        });
     }
-    if (request == "filters") {
-        return generateStringVector_if(
-            handles,
-            [](auto& handle) { return handle.key; },
-            [](auto& handle) { return (handle.handleType == handle_type::filter); });
+    if (request == "filters")
+    {
+        return generateStringVector_if (handles, [](auto &handle) { return handle.key; },
+                                        [](auto &handle) { return (handle.handleType == handle_type::filter); });
     }
-    if (request == "endpoints") {
-        return generateStringVector_if(
-            handles,
-            [](auto& handle) { return handle.key; },
-            [](auto& handle) { return (handle.handleType == handle_type::endpoint); });
+    if (request == "endpoints")
+    {
+        return generateStringVector_if (handles, [](auto &handle) { return handle.key; },
+                                        [](auto &handle) { return (handle.handleType == handle_type::endpoint); });
     }
     if (request == "federate_map") {
         if (fedMap.isCompleted()) {
