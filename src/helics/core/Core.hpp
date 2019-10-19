@@ -8,8 +8,10 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include "core-data.hpp"
 #include "federate_id.hpp"
+#include "helics_export.h"
 #include <functional>
 #include <utility>
+
 
 /** @file
  * The HELICS core interface.  Abstract class that is
@@ -35,7 +37,7 @@ namespace helics
 class CoreFederateInfo;
 
 /** the class defining the core interface through an abstract class*/
-class Core
+class HELICS_EXPORT Core
 {
   public:
     /** default constructor*/

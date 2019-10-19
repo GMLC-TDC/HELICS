@@ -7,6 +7,15 @@
 # SPDX-License-Identifier: BSD-3-Clause
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+include(GenerateExportHeader)
+
+#for including the helics_export.h
+target_include_directories(
+        helics_base_includes
+        INTERFACE $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>
+    )
+
+target_compile_definitions(helics_base_includes INTERFACE helics_shared_EXPORTS)
 add_subdirectory(common)
 add_subdirectory(core)
 add_subdirectory(application_api)
@@ -34,10 +43,15 @@ target_link_libraries(
         $<$<NOT:$<BOOL:${GMLC_UTILITIES_OBJECT_LIB}>>:HELICS::utilities>
         $<$<NOT:$<BOOL:${HELICS_UNITS_OBJLIB}>>:HELICS::units-static>
 )
+
+#target_compile_definitions(helics-static PUBLIC HELICS_STATIC_DEFINE)
+
+
 # add and alias library to match the find_package
 add_library(HELICS::helics-static ALIAS helics-static)
 
 if(HELICS_BUILD_CXX_SHARED_LIB)
+
     add_library(
         helics-shared SHARED
         ../empty.cpp
@@ -59,16 +73,24 @@ if(HELICS_BUILD_CXX_SHARED_LIB)
             $<$<NOT:$<BOOL:${HELICS_UNITS_OBJLIB}>>:HELICS::units-static>
     )
 
+	target_include_directories(
+        helics-shared
+        PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>
+    )
+
     set_target_properties(
         helics-shared
         PROPERTIES VERSION ${HELICS_VERSION} SOVERSION ${HELICS_VERSION_MAJOR}
     )
 
-    if(WIN32)
-        set_target_properties(helics-shared PROPERTIES WINDOWS_EXPORT_ALL_SYMBOLS TRUE)
+	set_target_properties(
+   helics-shared
+    PROPERTIES CXX_VISIBILITY_PRESET hidden C_VISIBILITY_PRESET hidden VISIBILITY_INLINES_HIDDEN ON
+)
 
-    endif()
-
+generate_export_header(helics-shared BASE_NAME helics)
+else()
+generate_export_header(helics-static BASE_NAME helics)
 endif()
 
 if(NOT HELICS_BINARY_ONLY_INSTALL)
