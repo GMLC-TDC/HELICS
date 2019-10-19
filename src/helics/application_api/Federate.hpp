@@ -6,7 +6,7 @@ SPDX-License-Identifier: BSD-3-Clause
 */
 #pragma once
 #include "helics/helics-config.h"
-
+#include "helics_cxx_export.h"
 #include "../core/helics-time.hpp"
 
 #include "helicsTypes.hpp"
@@ -45,7 +45,7 @@ class CloningFilter;
 
 /** base class for a federate in the application API
  */
-class Federate
+class HELICS_CXX_EXPORT Federate
 {
   public:
     /** the allowable operation modes of the federate*/

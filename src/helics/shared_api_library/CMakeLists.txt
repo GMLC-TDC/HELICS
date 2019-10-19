@@ -52,7 +52,7 @@ set_target_properties(
     helicsSharedLib
     PROPERTIES CXX_VISIBILITY_PRESET hidden C_VISIBILITY_PRESET hidden
 )
-target_link_libraries(helicsSharedLib PRIVATE helics-static)
+target_link_libraries(helicsSharedLib PRIVATE helics_application_api)
 target_link_libraries(helicsSharedLib PRIVATE compile_flags_target)
 
 if(UNIX OR MINGW)

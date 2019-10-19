@@ -19,7 +19,8 @@ class Input;
 /** @brief PIMPL design pattern with the implementation details for the ValueFederate*/
 class ValueFederateManager;
 /** class defining the value based interface */
-class ValueFederate : public virtual Federate  // using virtual inheritance to allow combination federate
+class HELICS_CXX_EXPORT ValueFederate
+    : public virtual Federate  // using virtual inheritance to allow combination federate
 {
   public:
     /**constructor taking a federate information structure and using the default core

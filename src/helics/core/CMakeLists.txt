@@ -195,56 +195,26 @@ if(ENABLE_MPI_CORE)
     list(APPEND INCLUDE_FILES ${MPI_HEADER_FILES})
 endif(ENABLE_MPI_CORE)
 
-add_library(helics_core OBJECT ${SRC_FILES} ${INCLUDE_FILES} ${PUBLIC_INCLUDE_FILES})
+add_library(helics_core STATIC ${SRC_FILES} ${INCLUDE_FILES} ${PUBLIC_INCLUDE_FILES})
 
-target_include_directories(
-    helics_core
-    PRIVATE $<TARGET_PROPERTY:helics_base_includes,INTERFACE_INCLUDE_DIRECTORIES>
-)
-target_include_directories(
-    helics_core SYSTEM
-    PRIVATE
-        $<TARGET_PROPERTY:helics_base_includes,INTERFACE_SYSTEM_INCLUDE_DIRECTORIES>
-)
-target_compile_definitions(
-    helics_core PRIVATE
-    $<TARGET_PROPERTY:helics_base_includes,INTERFACE_COMPILE_DEFINITIONS>
-)
-target_compile_definitions(helics_core PRIVATE BOOST_DATE_TIME_NO_LIB)
-target_compile_options(
-    helics_core
-    PRIVATE $<TARGET_PROPERTY:helics_base_includes,INTERFACE_COMPILE_OPTIONS>
-)
-
-target_compile_options(
-    helics_core
-    PRIVATE $<TARGET_PROPERTY:compile_flags_target,INTERFACE_COMPILE_OPTIONS>
-)
+target_link_libraries(helics_core PUBLIC helics_common PRIVATE fmt::fmt )
 
 if(TARGET Boost::boost)
+	target_compile_definitions(helics_core PRIVATE BOOST_DATE_TIME_NO_LIB)
     target_include_directories(
         helics_core SYSTEM
         PRIVATE $<TARGET_PROPERTY:Boost::boost,INTERFACE_SYSTEM_INCLUDE_DIRECTORIES>
     )
 endif()
 
-target_include_directories(
-    helics_core SYSTEM
-    PRIVATE $<TARGET_PROPERTY:fmt::fmt-header-only,INTERFACE_INCLUDE_DIRECTORIES>
-)
-target_compile_definitions(
-    helics_core PRIVATE
-    $<TARGET_PROPERTY:fmt::fmt-header-only,INTERFACE_COMPILE_DEFINITIONS>
-)
-
 if(ENABLE_MPI_CORE)
     source_group("mpi" FILES ${MPI_SOURCE_FILES} ${MPI_HEADER_FILES})
 endif(ENABLE_MPI_CORE)
 
 if(ENABLE_ZMQ_CORE)
-    target_include_directories(
-        helics_core SYSTEM
-        PRIVATE $<TARGET_PROPERTY:${ZeroMQ_DEPENDENCY},INTERFACE_INCLUDE_DIRECTORIES>
+    target_link_libraries(
+        helics_core PRIVATE
+        ${ZeroMQ_DEPENDENCY}
     )
     source_group("zmq" FILES ${ZMQ_SOURCE_FILES} ${ZMQ_HEADER_FILES})
 endif(ENABLE_ZMQ_CORE)

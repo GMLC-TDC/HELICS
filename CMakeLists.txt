@@ -628,22 +628,6 @@ include(addfmt)
 # -----------------------------------------------------------
 include(addJsoncpp)
 
-if(JSONCPP_OBJLIB)
-    target_include_directories(
-        helics_base_includes SYSTEM
-        INTERFACE
-            $<BUILD_INTERFACE:$<TARGET_PROPERTY:jsoncpp_headers,INTERFACE_INCLUDE_DIRECTORIES>>
-    )
-    set_target_properties(jsoncppobj_lib PROPERTIES FOLDER Extern)
-else()
-    target_include_directories(
-        helics_base_includes SYSTEM
-        INTERFACE
-            $<BUILD_INTERFACE:$<TARGET_PROPERTY:jsoncpp_lib,INTERFACE_INCLUDE_DIRECTORIES>>
-    )
-    set_target_properties(jsoncpp_lib PROPERTIES FOLDER Extern)
-endif()
-
 # --------------------------------------------------------------
 # Create the target for unitslib
 # -----------------------------------------------------------
@@ -653,11 +637,8 @@ include(addUnits)
 # create utilities target
 # -----------------------------------------------------------------------------
 
-set(GMLC_UTILITIES_OBJECT_LIB ON CACHE INTERNAL "")
-set(GMLC_UTILITIES_STATIC_LIB OFF CACHE INTERNAL "")
-if(NOT GMLC_UTILITIES_OBJECT_LIB)
-    set(UTILITIES_LIBRARY_EXPORT_COMMAND ${HELICS_EXPORT_COMMAND} CACHE INTERNAL "")
-endif()
+set(GMLC_UTILITIES_OBJECT_LIB OFF CACHE INTERNAL "")
+set(GMLC_UTILITIES_STATIC_LIB ON CACHE INTERNAL "")
 
 add_subdirectory(ThirdParty/utilities)
 
@@ -666,29 +647,7 @@ hide_variable(GMLC_UTILITIES_INCLUDE_BOOST)
 hide_variable(GMLC_UTILITIES_USE_BOOST_SPIRIT)
 hide_variable(GMLC_UTILITIES_WITH_CMAKE_PACKAGE)
 
-if(GMLC_UTILITIES_OBJECT_LIB)
-    if(NOT CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
-        add_library(HELICS::utilities INTERFACE IMPORTED)
-        set_target_properties(
-            HELICS::utilities
-            PROPERTIES
-                INTERFACE_INCLUDE_DIRECTORIES
-                $<BUILD_INTERFACE:ThirdParty/utilities/gmlc>
-        )
-        set_target_properties(
-            HELICS::utilities
-            PROPERTIES INTERFACE_LINK_LIBRARIES "HELICS::helics-static"
-        )
-    endif()
-    set_target_properties(gmlc_utilities_obj PROPERTIES FOLDER Extern)
-    if(NOT HELICS_DISABLE_BOOST)
-        target_include_directories(
-            gmlc_utilities_obj SYSTEM
-            PRIVATE $<BUILD_INTERFACE:${Boost_INCLUDE_DIRS}>
-        )
-    endif()
 
-else()
     add_library(HELICS::utilities ALIAS gmlc_utilities)
     set_target_properties(gmlc_utilities PROPERTIES FOLDER Extern)
     if(NOT HELICS_DISABLE_BOOST)
@@ -697,8 +656,6 @@ else()
             PRIVATE $<BUILD_INTERFACE:${Boost_INCLUDE_DIRS}>
         )
     endif()
-
-endif()
 
 if(NOT HELICS_BINARY_ONLY_INSTALL)
     # Install if the C++ shared library or static library is installed

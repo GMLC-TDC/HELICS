@@ -45,16 +45,9 @@ if(HELICS_BUILD_APP_LIBRARY)
                                    ${helics_apps_public_headers}
                                    ${helics_apps_private_headers})
 
-    target_link_libraries(helics_apps PUBLIC helics-static)
-    target_link_libraries(helics_apps PRIVATE HELICS::compile_flags_target)
-    target_include_directories(
-        helics_apps SYSTEM
-        PRIVATE $<TARGET_PROPERTY:fmt::fmt-header-only,INTERFACE_INCLUDE_DIRECTORIES>
-    )
-    target_compile_definitions(
-        helics_apps PRIVATE
-        $<TARGET_PROPERTY:fmt::fmt-header-only,INTERFACE_COMPILE_DEFINITIONS>
-    )
+    target_link_libraries(helics_apps PUBLIC helics_application_api)
+    target_link_libraries(helics_apps PRIVATE HELICS::compile_flags_target fmt::fmt)
+    
     # add and alias library to match the find_package
     add_library(HELICS::helics_apps ALIAS helics_apps)
 
@@ -147,18 +140,6 @@ if(HELICS_BUILD_APP_LIBRARY)
             PROPERTY LABELS Continuous
         )
     endif(HELICS_BUILD_APP_EXECUTABLES)
-
-    if(NOT HELICS_DISABLE_STATIC_LIB_INSTALL)
-        install(
-            TARGETS
-                helics_apps
-                ${HELICS_EXPORT_COMMAND}
-                DESTINATION
-                ${CMAKE_INSTALL_LIBDIR}
-                COMPONENT
-                libs
-        )
-    endif()
 
     if(HELICS_INSTALL_CPP14_HEADERS)
         install(

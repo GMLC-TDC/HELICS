@@ -15,7 +15,8 @@ namespace helics
 class MessageFederateManager;
 class Endpoint;
 /** class defining the block communication based interface */
-class MessageFederate : public virtual Federate  // using virtual inheritance to allow combination federate
+class HELICS_CXX_EXPORT MessageFederate
+    : public virtual Federate  // using virtual inheritance to allow combination federate
 {
   public:
     /**constructor taking a federate information structure and using the default core

@@ -13,7 +13,7 @@ SPDX-License-Identifier: BSD-3-Clause
 namespace helics
 {
 /** class defining a federate that can use both the value and message interfaces */
-class CombinationFederate : public ValueFederate, public MessageFederate
+class HELICS_CXX_EXPORT CombinationFederate : public ValueFederate, public MessageFederate
 {
   public:
     /** default constructor*/

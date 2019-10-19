@@ -31,9 +31,13 @@ set(
     LoggingTests.cpp
 )
 
+if(ENABLE_ZMQ_CORE)
+    list(APPEND application-api-tests zmqSSTests.cpp)
+endif()
+
 add_executable(application-api-tests ${application_api_test_sources}
                                      ${application_api_test_headers})
-target_link_libraries(application-api-tests helics-static helics_test_base)
+target_link_libraries(application-api-tests helics_application_api helics_test_base)
 
 set_target_properties(application-api-tests PROPERTIES FOLDER tests)
 
