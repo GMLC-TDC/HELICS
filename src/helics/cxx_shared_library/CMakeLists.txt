@@ -98,11 +98,6 @@ file(
      DESTINATION ${PROJECT_BINARY_DIR}/include/helics
 )
 
-file(
-     COPY ${CMAKE_CURRENT_BINARY_DIR}/../helics_cxx_export.h 
-     DESTINATION ${PROJECT_BINARY_DIR}/include/
-)
-
 set(core_include_files 
 	../core/helics-time.hpp
 	../core/core-data.hpp
@@ -111,6 +106,8 @@ set(core_include_files
 	../core/CoreFederateInfo.hpp
 	../core/Core.hpp
 	../core/helics_definitions.hpp 
+	../core/helicsCLI11.hpp
+	../core/helicsVersion.hpp
 	)
 
 file(

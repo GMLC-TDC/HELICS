@@ -27,15 +27,20 @@ add_subdirectory(application_api)
 
 if(HELICS_BUILD_CXX_SHARED_LIB)
 
-   add_subdirectory(cxx_shared_library)
+    add_subdirectory(cxx_shared_library)
 
-if(NOT CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
+    if(NOT CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
         set_target_properties(helics-shared PROPERTIES FOLDER helics)
     endif()
-generate_export_header(helics-shared BASE_NAME helics_cxx)
+    generate_export_header(helics-shared BASE_NAME helics_cxx)
 else()
-generate_export_header(helics_application_api BASE_NAME helics_cxx)
+    generate_export_header(helics_application_api BASE_NAME helics_cxx)
 endif()
+
+file(
+     COPY ${CMAKE_CURRENT_BINARY_DIR}/helics_cxx_export.h 
+     DESTINATION ${PROJECT_BINARY_DIR}/include/
+)
 
 if(NOT HELICS_BINARY_ONLY_INSTALL)
     # Install the header if the C++ shared library is built

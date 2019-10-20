@@ -7,13 +7,13 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helics/application_api/CombinationFederate.hpp"
 #include "helics/application_api/BrokerApp.hpp"
 #include "helics/core/helics_definitions.hpp"
-#include "helics/external/CLI11/CLI11.hpp"
+#include "helics/core/helicsCLI11.hpp"
 #include <iostream>
 #include <thread>
 
 int main (int argc, char *argv[])
 {
-    CLI::App app ("Combination Fed", "ComboFed");
+    helics::helicsCLI11App app ("Combination Fed", "ComboFed");
     std::string targetEndpoint = "endpoint";
     std::string vtarget = "fed";
     std::string mtarget = "fed";
@@ -33,23 +33,20 @@ int main (int argc, char *argv[])
     app.add_option ("--source,-s", myendpoint, "name of the source endpoint", true);
     app.add_option ("--startbroker", brokerArgs, "start a broker with the specified arguments");
 
+    auto ret = app.helics_parse (argc, argv);
+
     helics::FederateInfo fi;
-    try
-    {
-        app.parse (argc, argv);
-    }
-    catch (CLI::CallForHelp)
+    if (ret == helics::helicsCLI11App::parse_output::help_call)
     {
         (void)(fi.loadInfoFromArgs ("--help"));
         return 0;
-	}
-	catch (CLI::Error)
-	{
+    }
+    else if (ret != helics::helicsCLI11App::parse_output::ok)
+    {
         return -1;
-	}
-    
+    }
     fi.defName = "fed";
-    fi.loadInfoFromArgs (app.remaining_for_passthrough());
+    fi.loadInfoFromArgs (app.remainArgs ());
 
     std::string etarget = mtarget + "/" + targetEndpoint;
 
