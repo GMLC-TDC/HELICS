@@ -46,7 +46,7 @@ class data_block
     /** copy constructor */
     data_block (const data_block &db) = default;
     /** move constructor */
-    data_block (data_block &&db) noexcept;
+    data_block (data_block &&db) = default;
     /** construct from char * */
     // NOLINTNEXTLINE
     /* implicit */ data_block (const char *s) : m_data (s){};
@@ -71,7 +71,7 @@ class data_block
     /** copy assignment operator*/
     data_block &operator= (const data_block &db) = default;
     /** move assignment operator*/
-    data_block &operator= (data_block &&db) noexcept;
+    data_block &operator= (data_block &&db)=default;
     /** assign from a string*/
     data_block &operator= (std::string str)
     {
@@ -155,21 +155,24 @@ class Message
   public:
     /** default constructor*/
     Message () = default;
-    /** default destructor*/
-    ~Message () = default;
-    /** move constructor*/
-    Message (Message &&m) noexcept;
-    /** copy constructor*/
-    Message (const Message &m) = default;
-    /** move assignment*/
-    Message &operator= (Message &&m) noexcept;
-    /** copy assignment*/
-    Message &operator= (const Message &m) = default;
     /** swap operation for the Message*/
-    void swap (Message &m2) noexcept;
+    void swap (Message &m2) noexcept
+    {
+        std::swap (time, m2.time);
+        std::swap (flags, m2.flags);
+        std::swap (messageID, m2.messageID);
+        original_source.swap (m2.original_source);
+        source.swap (m2.source);
+        dest.swap (m2.dest);
+        data.swap (m2.data);
+        original_dest.swap (m2.original_dest);
+    }
     /** check if the Message contains an actual Message
     @return false if there is no Message data*/
-    bool isValid () const noexcept;
+    bool isValid () const noexcept
+    {
+        return (!data.empty ()) ? true : ((!source.empty ()) ? true : (!dest.empty ()));
+    }
     /** get the payload as a string*/
     const std::string &to_string () const { return data.to_string (); }
 };

@@ -11,51 +11,6 @@ SPDX-License-Identifier: BSD-3-Clause
 
 namespace helics
 {
-data_block::data_block (data_block &&db) noexcept : m_data (std::move (db.m_data)) {}
-
-data_block &data_block::operator= (data_block &&db) noexcept
-{
-    m_data = std::move (db.m_data);
-    return *this;
-}
-
-Message::Message (Message &&m) noexcept
-    : time (m.time), flags (m.flags), messageID (m.messageID), data (std::move (m.data)),
-      dest (std::move (m.dest)), source (std::move (m.source)), original_source (std::move (m.original_source)),
-      original_dest (std::move (m.original_dest))
-
-{
-}
-
-Message &Message::operator= (Message &&m) noexcept
-{
-    time = m.time;
-    flags = m.flags;
-    messageID = m.messageID;
-    data = std::move (m.data);
-    original_source = std::move (m.original_source);
-    source = std::move (m.source);
-    dest = std::move (m.dest);
-    original_dest = std::move (m.original_dest);
-    return *this;
-}
-
-void Message::swap (Message &m2) noexcept
-{
-    std::swap (time, m2.time);
-    std::swap (flags, m2.flags);
-    std::swap (messageID, m2.messageID);
-    original_source.swap (m2.original_source);
-    source.swap (m2.source);
-    dest.swap (m2.dest);
-    data.swap (m2.data);
-    original_dest.swap (m2.original_dest);
-}
-
-bool Message::isValid () const noexcept
-{
-    return (!data.empty ()) ? true : ((!source.empty ()) ? true : (!dest.empty ()));
-}
 
 static const std::set<std::string> global_match_strings{"any", "all", "data", "string", "block"};
 

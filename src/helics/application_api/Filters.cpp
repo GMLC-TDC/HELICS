@@ -184,6 +184,10 @@ const std::string &Filter::getExtractionType () const
     return emptyStr;
 }
 
+const std::string &Filter::getInfo () const { return corePtr->getInterfaceInfo (handle); }
+
+void Filter::setInfo (const std::string &info) { corePtr->setInterfaceInfo (handle, info); }
+
 void Filter::set (const std::string &property, double val)
 {
     if (filtOp)

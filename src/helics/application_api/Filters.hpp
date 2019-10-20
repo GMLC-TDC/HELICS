@@ -88,9 +88,9 @@ class HELICS_CXX_EXPORT Filter
     const std::string &getExtractionType () const;
 
     /** get the interface information field of the publication*/
-    const std::string &getInfo () const { return corePtr->getInterfaceInfo (handle); }
+    const std::string &getInfo () const;
     /** set the interface information field of the publication*/
-    void setInfo (const std::string &info) { corePtr->setInterfaceInfo (handle, info); }
+    void setInfo (const std::string &info);
 
     /** set a property on a filter
     @param property the name of the property of the filter to change
@@ -127,7 +127,7 @@ class HELICS_CXX_EXPORT Filter
 };
 
 /** class used to clone message for delivery to other endpoints*/
-class CloningFilter : public Filter
+class HELICS_CXX_EXPORT CloningFilter : public Filter
 {
   public:
     /** default constructor*/
