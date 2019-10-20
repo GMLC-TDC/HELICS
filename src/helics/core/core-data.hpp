@@ -71,7 +71,7 @@ class data_block
     /** copy assignment operator*/
     data_block &operator= (const data_block &db) = default;
     /** move assignment operator*/
-    data_block &operator= (data_block &&db)=default;
+    data_block &operator= (data_block &&db) = default;
     /** assign from a string*/
     data_block &operator= (std::string str)
     {
@@ -156,17 +156,7 @@ class Message
     /** default constructor*/
     Message () = default;
     /** swap operation for the Message*/
-    void swap (Message &m2) noexcept
-    {
-        std::swap (time, m2.time);
-        std::swap (flags, m2.flags);
-        std::swap (messageID, m2.messageID);
-        original_source.swap (m2.original_source);
-        source.swap (m2.source);
-        dest.swap (m2.dest);
-        data.swap (m2.data);
-        original_dest.swap (m2.original_dest);
-    }
+    void swap (Message &m2) noexcept;
     /** check if the Message contains an actual Message
     @return false if there is no Message data*/
     bool isValid () const noexcept
@@ -230,7 +220,7 @@ bool matchingTypes (const std::string &type1, const std::string &type2);
 
 namespace std
 {
-/** overloaded swap function for helics::data_black*/
+/** overloaded swap function for helics::data_block*/
 template <>
 inline void swap (helics::data_block &db1, helics::data_block &db2) noexcept
 {
@@ -247,3 +237,18 @@ inline void swap (helics::Message &m1, helics::Message &m2) noexcept
     m1.swap (m2);
 }
 }  // namespace std
+
+namespace helics
+{
+inline void Message::swap (Message &m2) noexcept
+{
+    std::swap (time, m2.time);
+    std::swap (flags, m2.flags);
+    std::swap (messageID, m2.messageID);
+    original_source.swap (m2.original_source);
+    source.swap (m2.source);
+    dest.swap (m2.dest);
+    data.swap (m2.data);
+    original_dest.swap (m2.original_dest);
+}
+}  // namespace helics
