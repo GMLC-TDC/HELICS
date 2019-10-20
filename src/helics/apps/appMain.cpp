@@ -9,7 +9,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "../core/BrokerFactory.hpp"
 #include "../core/core-exceptions.hpp"
 #include "../core/helicsCLI11.hpp"
-#include "BrokerApp.hpp"
+#include "../application_api/BrokerApp.hpp"
 #include "Clone.hpp"
 #include "Echo.hpp"
 #include "Player.hpp"

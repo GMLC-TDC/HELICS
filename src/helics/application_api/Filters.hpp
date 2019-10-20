@@ -36,7 +36,7 @@ enum class filter_types
 filter_types filterTypeFromString (const std::string &filterType) noexcept;
 
 /** class for managing a particular filter*/
-class Filter
+class HELICS_CXX_EXPORT Filter
 {
   protected:
     Core *corePtr = nullptr;  //!< the Core to use

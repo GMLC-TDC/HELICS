@@ -34,7 +34,7 @@ if(NOT CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
     endif()
 generate_export_header(helics-shared BASE_NAME helics_cxx)
 else()
-generate_export_header(application_api_static BASE_NAME helics_cxx)
+generate_export_header(helics_application_api BASE_NAME helics_cxx)
 endif()
 
 if(NOT HELICS_BINARY_ONLY_INSTALL)
@@ -52,7 +52,7 @@ endif()
 
 if(NOT CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
     set_target_properties(
-        application_api helics_common helics_core
+        helics_application_api helics_common helics_core
         PROPERTIES FOLDER helics
     )
 endif()

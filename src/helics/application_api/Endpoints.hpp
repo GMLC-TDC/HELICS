@@ -12,7 +12,7 @@ SPDX-License-Identifier: BSD-3-Clause
 namespace helics
 {
 /** class to manage an endpoint */
-class Endpoint
+class HELICS_CXX_EXPORT Endpoint
 {
   private:
     MessageFederate *fed = nullptr;  //!< the MessageFederate to interact with

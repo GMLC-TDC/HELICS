@@ -7,26 +7,23 @@
 # SPDX-License-Identifier: BSD-3-Clause
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-add_executable(comboFed comboFed.cpp)
+add_executable(comboFed_shared comboFed.cpp)
 
-target_link_libraries(comboFed PUBLIC helics_apps)
-target_link_libraries(comboFed PRIVATE compile_flags_target)
-set_target_properties(comboFed PROPERTIES FOLDER examples)
-
-# configure_file(${CMAKE_CURRENT_SOURCE_DIR}/run.sh ${CMAKE_CURRENT_BINARY_DIR}/run.sh
-# COPYONLY)
+target_link_libraries(comboFed_shared PUBLIC helics-shared)
+target_link_libraries(comboFed_shared PRIVATE compile_flags_target)
+set_target_properties(comboFed_shared PROPERTIES FOLDER examples)
 
 add_custom_command(
     TARGET
-    comboFed
+    comboFed_shared
     POST_BUILD # Adds a post-build event to api tests
     COMMAND
         ${CMAKE_COMMAND}
         -E
         copy_if_different # which executes "cmake - E copy_if_different..."
         "${CMAKE_CURRENT_SOURCE_DIR}/run.sh" # <--this is in- file
-        "$<TARGET_FILE_DIR:comboFed>/"
+        "$<TARGET_FILE_DIR:comboFed_shared>/"
 ) # <--this is out-file path
 
-copy_key_files_to_target_location(comboFed)
+copy_key_files_to_target_location(comboFed_shared)
 

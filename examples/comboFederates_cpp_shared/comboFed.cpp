@@ -6,14 +6,14 @@ SPDX-License-Identifier: BSD-3-Clause
 */
 #include "helics/application_api/CombinationFederate.hpp"
 #include "helics/application_api/BrokerApp.hpp"
-#include "helics/core/helicsCLI11.hpp"
 #include "helics/core/helics_definitions.hpp"
+#include "helics/external/CLI11/CLI11.hpp"
 #include <iostream>
 #include <thread>
 
 int main (int argc, char *argv[])
 {
-    helics::helicsCLI11App app ("Combination Fed", "ComboFed");
+    CLI::App app ("Combination Fed", "ComboFed");
     std::string targetEndpoint = "endpoint";
     std::string vtarget = "fed";
     std::string mtarget = "fed";
@@ -21,33 +21,35 @@ int main (int argc, char *argv[])
     helics::apps::BrokerApp brk;
     std::string brokerArgs = "";
 
-    app.add_option_function<std::string> (
-      "--target,-t",
-      [&vtarget, &mtarget] (const std::string &name) {
-          vtarget = name;
-          mtarget = name;
-      },
-      "name of the federate to target");
+    app.add_option_function<std::string> ("--target,-t",
+                                          [&vtarget, &mtarget](const std::string &name) {
+                                              vtarget = name;
+                                              mtarget = name;
+                                          },
+                                          "name of the federate to target");
     app.add_option ("--valuetarget", vtarget, "name of the value federate to target", true);
     app.add_option ("--messagetarget", mtarget, "name of the message federate to target", true);
     app.add_option ("--endpoint,-e", targetEndpoint, "name of the target endpoint", true);
     app.add_option ("--source,-s", myendpoint, "name of the source endpoint", true);
     app.add_option ("--startbroker", brokerArgs, "start a broker with the specified arguments");
 
-    auto ret = app.helics_parse (argc, argv);
-
     helics::FederateInfo fi;
-    if (ret == helics::helicsCLI11App::parse_output::help_call)
+    try
+    {
+        app.parse (argc, argv);
+    }
+    catch (CLI::CallForHelp)
     {
         (void)(fi.loadInfoFromArgs ("--help"));
         return 0;
-    }
-    else if (ret != helics::helicsCLI11App::parse_output::ok)
-    {
+	}
+	catch (CLI::Error)
+	{
         return -1;
-    }
+	}
+    
     fi.defName = "fed";
-    fi.loadInfoFromArgs (app.remainArgs ());
+    fi.loadInfoFromArgs (app.remaining_for_passthrough());
 
     std::string etarget = mtarget + "/" + targetEndpoint;
 

@@ -26,6 +26,7 @@ set(
     queryFunctions.hpp
     FederateInfo.hpp
     Inputs.hpp
+	BrokerApp.hpp
 )
 
 set(conv_headers ../application_api.hpp ../ValueFederates.hpp ../MessageFederates.hpp)
@@ -59,10 +60,11 @@ set(
     queryFunctions.cpp
     FederateInfo.cpp
     Inputs.cpp
+	BrokerApp.cpp
 )
 
 add_library(helics_application_api STATIC ${application_api_sources} ${conv_headers}
-                                   ${public_application_api_headers}
+                                   ${application_api_headers}
                                    ${private_application_api_headers})
 
 target_link_libraries(helics_application_api PUBLIC helics_core)

@@ -7,6 +7,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #pragma once
 #include "../core/CoreFederateInfo.hpp"
 #include "../core/core-types.hpp"
+#include "helics_cxx_export.h"
 #include <memory>
 
 namespace helics
@@ -14,7 +15,7 @@ namespace helics
 class helicsCLI11App;
 /** data class defining federate properties and information
  */
-class FederateInfo : public CoreFederateInfo
+class HELICS_CXX_EXPORT FederateInfo : public CoreFederateInfo
 {
   public:
     int uniqueKey = 0;  //!< location for keying the info for application purposes

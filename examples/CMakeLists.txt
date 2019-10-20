@@ -21,3 +21,7 @@ endif()
 if(NOT HELICS_DISABLE_C_SHARED_LIB)
     add_subdirectory(CppInterface)
 endif()
+
+if (HELICS_BUILD_CXX_SHARED_LIB)
+	add_subdirectory(comboFederates_cpp_shared)
+endif()

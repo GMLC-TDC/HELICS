@@ -18,7 +18,7 @@ class precise_unit;
 namespace helics
 {
 /** base class for a input object*/
-class Input
+class HELICS_CXX_EXPORT Input
 {
   protected:
     ValueFederate *fed = nullptr;  //!< reference to the value federate

@@ -6,7 +6,6 @@ SPDX-License-Identifier: BSD-3-Clause
 */
 
 #include "FederateInfo.hpp"
-
 #include "../common/JsonProcessingFunctions.hpp"
 #include "../common/TomlProcessingFunctions.hpp"
 #include "../core/core-exceptions.hpp"

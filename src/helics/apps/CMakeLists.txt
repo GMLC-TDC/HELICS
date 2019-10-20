@@ -17,7 +17,6 @@ if(HELICS_BUILD_APP_LIBRARY)
         Source.hpp
         Tracer.hpp
         helicsApp.hpp
-        BrokerApp.hpp
         MultiBroker.hpp
         Clone.hpp
         BrokerServer.hpp
@@ -35,7 +34,6 @@ if(HELICS_BUILD_APP_LIBRARY)
         Source.cpp
         Tracer.cpp
         helicsApp.cpp
-        BrokerApp.cpp
         MultiBroker.cpp
         Clone.cpp
         BrokerServer.cpp

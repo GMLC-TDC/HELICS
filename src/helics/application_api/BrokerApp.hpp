@@ -7,6 +7,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #pragma once
 
 #include "../core/core-types.hpp"
+#include "helics_cxx_export.h"
 
 #include <memory>
 #include <string>
@@ -22,7 +23,7 @@ namespace apps
 /** class implementing a Broker object.  This object is meant to a be a very simple broker executor with a similar
  * interface to the other apps
  */
-class BrokerApp
+class HELICS_CXX_EXPORT BrokerApp
 {
   public:
     /** default constructor*/

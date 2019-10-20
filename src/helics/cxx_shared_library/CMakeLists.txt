@@ -26,6 +26,7 @@ set(
     ../application_api/queryFunctions.hpp
     ../application_api/FederateInfo.hpp
     ../application_api/Inputs.hpp
+	../application_api/BrokerApp.hpp
 )
 
 set(
@@ -38,6 +39,7 @@ set(
 )
 
 set(conv_headers ../application_api.hpp ../ValueFederates.hpp ../MessageFederates.hpp)
+set(basic_headers ../helics_enums.h)
 
 set(
     helics_shared_sources
@@ -59,6 +61,7 @@ set(
     ../application_api/queryFunctions.cpp
     ../application_api/FederateInfo.cpp
     ../application_api/Inputs.cpp
+	../application_api/BrokerApp.cpp
 )
 
    
@@ -85,12 +88,58 @@ endif()
     PROPERTIES CXX_VISIBILITY_PRESET hidden C_VISIBILITY_PRESET hidden VISIBILITY_INLINES_HIDDEN ON
 )
 
+file(
+     COPY ${helics_shared_public_headers}
+     DESTINATION ${PROJECT_BINARY_DIR}/include/helics/application_api
+)
+
+file(
+     COPY ${conv_headers} ${basic_headers}
+     DESTINATION ${PROJECT_BINARY_DIR}/include/helics
+)
+
+file(
+     COPY ${CMAKE_CURRENT_BINARY_DIR}/../helics_cxx_export.h 
+     DESTINATION ${PROJECT_BINARY_DIR}/include/
+)
+
+set(core_include_files 
+	../core/helics-time.hpp
+	../core/core-data.hpp
+	../core/core-types.hpp
+	../core/federate_id.hpp
+	../core/CoreFederateInfo.hpp
+	../core/Core.hpp
+	../core/helics_definitions.hpp 
+	)
+
+file(
+     COPY ${core_include_files}
+     DESTINATION ${PROJECT_BINARY_DIR}/include/helics/core
+)
+
+set(utilities_include_files 
+	${PROJECT_SOURCE_DIR}/ThirdParty/utilities/gmlc/utilities/timeRepresentation.hpp)
+
+file(
+     COPY ${utilities_include_files}
+     DESTINATION ${PROJECT_BINARY_DIR}/include/helics/utilities
+)
+		
+
+file(
+     COPY ${PROJECT_SOURCE_DIR}/ThirdParty/helics/external
+     DESTINATION ${PROJECT_BINARY_DIR}/include/helics
+)
+		
+target_include_directories(helics-shared 
+		INTERFACE $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}/include>)
 
 if(NOT HELICS_BINARY_ONLY_INSTALL)
     # Install the header if the C++ shared library is built
     if(HELICS_INSTALL_CPP14_HEADERS)
         install(
-            FILES helics.hpp
+            FILES helics.hpp ${helics_shared_sources}
             DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/helics
             COMPONENT headers
         )
