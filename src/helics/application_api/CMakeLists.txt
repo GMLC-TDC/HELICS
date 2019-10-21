@@ -27,6 +27,7 @@ set(
     FederateInfo.hpp
     Inputs.hpp
 	BrokerApp.hpp
+	CoreApp.hpp
 )
 
 set(conv_headers ../application_api.hpp ../ValueFederates.hpp ../MessageFederates.hpp)
@@ -61,6 +62,7 @@ set(
     FederateInfo.cpp
     Inputs.cpp
 	BrokerApp.cpp
+	CoreApp.cpp
 )
 
 add_library(helics_application_api STATIC ${application_api_sources} ${conv_headers}

@@ -657,32 +657,6 @@ hide_variable(GMLC_UTILITIES_WITH_CMAKE_PACKAGE)
         )
     endif()
 
-if(NOT HELICS_BINARY_ONLY_INSTALL)
-    # Install if the C++ shared library or static library is installed
-    if(HELICS_INSTALL_CPP14_HEADERS)
-        file(GLOB UTILITIES_HEADERS_INSTALL_H
-             ${PROJECT_SOURCE_DIR}/ThirdParty/utilities/gmlc/utilities/*.h)
-        file(GLOB UTILITIES_HEADERS_INSTALL_HPP
-             ${PROJECT_SOURCE_DIR}/ThirdParty/utilities/gmlc/utilities/*.hpp)
-        file(GLOB UTILITIES_HEADERS_INSTALL_EXTRA
-             ${PROJECT_SOURCE_DIR}/ThirdParty/utilities/gmlc/utilities/extra/*.hpp)
-
-        install(
-            FILES
-                ${UTILITIES_HEADERS_INSTALL_H} ${UTILITIES_HEADERS_INSTALL_HPP}
-                ${PROJECT_SOURCE_DIR}/ThirdParty/utilities/LICENSE
-            DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/helics/utilities/
-            COMPONENT headers
-        )
-
-        install(
-            FILES ${UTILITIES_HEADERS_INSTALL_EXTRA}
-            DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/helics/utilities/extra
-            COMPONENT headers
-        )
-    endif()
-endif(NOT HELICS_BINARY_ONLY_INSTALL)
-
 # -----------------------------------------------------------------------------
 # CMAKE Subdirectories
 # -----------------------------------------------------------------------------
@@ -837,31 +811,8 @@ if(NOT HELICS_BINARY_ONLY_INSTALL)
         COMPONENT headers
     )
 
-    cmake_conditional_option(
-        HELICS_INSTALL_CEREAL
-        "Install a copy of the cereal headers used for compiling and a CMake target to include them"
-        "MSVC"
-    )
-
-    mark_as_advanced(HELICS_INSTALL_CEREAL)
-
     if(HELICS_INSTALL_CPP14_HEADERS)
-        if(HELICS_INSTALL_CEREAL)
-            install(
-                DIRECTORY ThirdParty/cereal
-                DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/helics/external/optional
-                COMPONENT cereal
-            )
-            add_library(cereal INTERFACE)
-            add_library(HELICS::cereal ALIAS cereal)
-            target_include_directories(
-                cereal
-                INTERFACE
-                    $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/ThirdParty>
-                    $<INSTALL_INTERFACE:$<INSTALL_PREFIX>/include/helics/external/optional>
-            )
-            install(TARGETS cereal ${HELICS_EXPORT_COMMAND} COMPONENT cereal)
-        endif()
+        
 
         install(
             DIRECTORY ThirdParty/helics/external

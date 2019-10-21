@@ -67,38 +67,8 @@ message(STATUS "checking for ${PACKAGE_PREFIX_DIR}/@CMAKE_INSTALL_LIBDIR@/cmake/
 endif()
 endif()
 
-if (NOT TARGET HELICS::jsoncpp_headers)
-    add_library(HELICS::jsoncpp_headers INTERFACE IMPORTED)
-    set_target_properties(HELICS::jsoncpp_headers PROPERTIES
-       INTERFACE_LINK_LIBRARIES "HELICS::jsoncpp_lib"
-    )
-endif()
-
-if (NOT TARGET HELICS::utilities)
-    add_library(HELICS::utilities INTERFACE IMPORTED )
-    set_target_properties(HELICS::utilities PROPERTIES
-       INTERFACE_INCLUDE_DIRECTORIES ${CMAKE_CURRENT_LIST_DIR}/../../../@CMAKE_INSTALL_INCLUDEDIR@/helics/
-    )
-    if (TARGET HELICS::helics-static)
-        set_target_properties(HELICS::utilities PROPERTIES
-           INTERFACE_LINK_LIBRARIES "HELICS::helics-static"
-        )
-    endif()
-else()
-set_target_properties(HELICS::utilities PROPERTIES
-       INTERFACE_INCLUDE_DIRECTORIES ${CMAKE_CURRENT_LIST_DIR}/../../../@CMAKE_INSTALL_INCLUDEDIR@/helics/
-    )
-endif()
-if (NOT EXISTS ${CMAKE_CURRENT_LIST_DIR}/../../../@CMAKE_INSTALL_INCLUDEDIR@/helics/utilities)
-    set_property(TARGET HELICS::utilities APPEND PROPERTY
-            INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_CURRENT_LIST_DIR}/../ThirdParty/utilities/gmlc/"
-        )
-endif()
-
 
 check_required_components(${PN})
-
-get_target_property(${PN}_INCLUDE_DIRS HELICS::helics_base_includes INTERFACE_INCLUDE_DIRECTORIES)
 
 if (NOT @HELICS_DISABLE_C_SHARED_LIB@)
     get_target_property(${PN}_C_SHARED_LIBRARY HELICS::helicsSharedLib LOCATION)
@@ -111,28 +81,14 @@ if (@HELICS_BUILD_CXX_SHARED_LIB@)
             INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_CURRENT_LIST_DIR}/include"
         )
     endif()
-    if (NOT EXISTS ${CMAKE_CURRENT_LIST_DIR}/../../../@CMAKE_INSTALL_INCLUDEDIR@/helics/utilities)
-        set_property(TARGET HELICS::helics-shared APPEND PROPERTY
-            INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_CURRENT_LIST_DIR}/../ThirdParty/utilities/gmlc/utilities/"
-        )
-    endif()
-
+    
+	get_target_property(${PN}_INCLUDE_DIRS HELICS::helics-shared INTERFACE_INCLUDE_DIRECTORIES)
+	get_target_property(HELICS_APPLIB_LOCATION HELICS::helics-shared LOCATION)
+elseif (NOT @HELICS_DISABLE_C_SHARED_LIB@)
+	get_target_property(HELICS_APPLIB_LOCATION HELICS::helicsSharedLib LOCATION)
+else()
+	get_filename_component(HELICS_APPLIB_LOCATION "${CMAKE_CURRENT_LIST_DIR}" PATH)
 endif()
-
-if (TARGET HELICS::helics-static)
-    get_target_property(${PN}_STATIC_LIBRARY HELICS::helics-static LOCATION)
-    if (EXISTS ${CMAKE_CURRENT_LIST_DIR}/include)
-        set_property(TARGET HELICS::helics-static  APPEND PROPERTY
-                INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_CURRENT_LIST_DIR}/include"
-            )
-    endif()
-    if (NOT EXISTS ${CMAKE_CURRENT_LIST_DIR}/../../../@CMAKE_INSTALL_INCLUDEDIR@/helics/utilities)
-        set_property(TARGET HELICS::helics-static APPEND PROPERTY
-                INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_CURRENT_LIST_DIR}/../ThirdParty/utilities/gmlc/utilities/"
-        )
-    endif()
-endif()
-
 
 message(STATUS "INCLUDE DIRS HELICS: ${HELICS_INCLUDE_DIRS}")
 message(STATUS "C_SHARED_LIBRARY: ${HELICS_C_SHARED_LIBRARY}")
@@ -140,18 +96,6 @@ message(STATUS "C_SHARED_LIBRARY: ${HELICS_C_SHARED_LIBRARY}")
 #load some variables with the locations the different executables
 if (@HELICS_BUILD_APP_EXECUTABLES@)
 
-    if (EXISTS ${CMAKE_CURRENT_LIST_DIR}/include)
-        set_property(TARGET HELICS::helics_apps  APPEND PROPERTY
-            INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_CURRENT_LIST_DIR}/include"
-        )
-    endif()
-    if (NOT EXISTS ${CMAKE_CURRENT_LIST_DIR}/../../../@CMAKE_INSTALL_INCLUDEDIR@/helics/utilities)
-        set_property(TARGET HELICS::helics_apps APPEND PROPERTY
-            INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_CURRENT_LIST_DIR}/../ThirdParty/utilities/gmlc/utilities"
-        )
-    endif()
-
-get_target_property(HELICS_APPLIB_LOCATION HELICS::helics_apps LOCATION)
 get_filename_component(APP_CHECK_LOC "${HELICS_APPLIB_LOCATION}" PATH)
 get_filename_component(APP_CHECK_LOC2 "${APP_CHECK_LOC}" PATH)
 

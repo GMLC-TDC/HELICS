@@ -6,6 +6,7 @@ SPDX-License-Identifier: BSD-3-Clause
 */
 
 #include "TomlProcessingFunctions.hpp"
+#include "../core/coreTimeOperations.hpp"
 #include <fstream>
 
 bool hasTomlExtension (const std::string &tomlString)
@@ -61,7 +62,7 @@ helics::Time loadTomlTime (const toml::Value &timeElement, time_units defaultUni
         auto units = timeElement.find ("units");
         if (units != nullptr)
         {
-            defaultUnits = helics::timeUnitsFromString (units->as<std::string> ());
+            defaultUnits = helics::core::timeUnitsFromString (units->as<std::string> ());
         }
         auto val = timeElement.find ("value");
         if (val != nullptr)
@@ -87,7 +88,7 @@ helics::Time loadTomlTime (const toml::Value &timeElement, time_units defaultUni
     }
     else
     {
-        return helics::loadTimeFromString (timeElement.as<std::string> ());
+        return helics::core::loadTimeFromString (timeElement.as<std::string> ());
     }
     return helics::Time::minVal ();
 }

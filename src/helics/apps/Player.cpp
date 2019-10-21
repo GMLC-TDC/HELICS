@@ -96,7 +96,7 @@ std::unique_ptr<helicsCLI11App> Player::generateParser ()
         [this](CLI::results_t res) {
             try
             {
-                units = timeUnitsFromString (res[0]);
+                units = core::timeUnitsFromString (res[0]);
                 timeMultiplier = toSecondMultiplier (units);
                 return true;
             }
@@ -164,7 +164,7 @@ helics::Time Player::extractTime (const std::string &str, int lineNumber) const
         {
             return helics::Time (std::stoll (str), time_units::ns);
         }
-        return loadTimeFromString (str, units);
+        return core::loadTimeFromString (str, units);
     }
     catch (const std::invalid_argument &)
     {

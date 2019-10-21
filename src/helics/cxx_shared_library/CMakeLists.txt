@@ -27,6 +27,7 @@ set(
     ../application_api/FederateInfo.hpp
     ../application_api/Inputs.hpp
 	../application_api/BrokerApp.hpp
+	../application_api/CoreApp.hpp
 )
 
 set(
@@ -49,7 +50,6 @@ set(
     ../application_api/MessageFederateManager.cpp
     ../application_api/MessageOperators.cpp
     ../application_api/ValueFederate.cpp
-    ../application_api/ValueConverter.cpp
     ../application_api/ValueFederateManager.cpp
     ../application_api/helicsPrimaryTypes.cpp
     ../application_api/Publications.cpp
@@ -62,15 +62,18 @@ set(
     ../application_api/FederateInfo.cpp
     ../application_api/Inputs.cpp
 	../application_api/BrokerApp.cpp
+	../application_api/CoreApp.cpp
+	timeOperations.cpp
 )
 
    
-   add_library(helics-shared SHARED ${helics_shared_sources} ${conv_headers}
+   add_library(helics-shared SHARED ${helics_shared_sources} ${conv_headers} timeOperations.hpp
                                    ${helics_shared_public_headers}
                                    ${helics_shared_private_headers})
 
 target_link_libraries(helics-shared PRIVATE helics_core)
 target_compile_definitions(helics-shared PRIVATE helics_shared_EXPORTS)
+target_compile_definitions(helics-shared PUBLIC HELICS_SHARED_LIBRARY)
 
 if(MSYS AND USE_LIBCXX)
     target_compile_definitions(helics-shared PUBLIC "-DSTX_NO_STD_OPTIONAL=1")
@@ -108,6 +111,7 @@ set(core_include_files
 	../core/helics_definitions.hpp 
 	../core/helicsCLI11.hpp
 	../core/helicsVersion.hpp
+	timeOperations.hpp
 	)
 
 file(
@@ -123,26 +127,25 @@ file(
      DESTINATION ${PROJECT_BINARY_DIR}/include/helics/utilities
 )
 		
-
 file(
      COPY ${PROJECT_SOURCE_DIR}/ThirdParty/helics/external
      DESTINATION ${PROJECT_BINARY_DIR}/include/helics
 )
-		
+
+install(
+                DIRECTORY ${PROJECT_SOURCE_DIR}/ThirdParty/cereal
+                DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/helics/external/optional
+                COMPONENT cereal
+            )
+            
 target_include_directories(helics-shared 
-		INTERFACE $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}/include>)
+		INTERFACE $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}/include>
+		$<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/ThirdParty>
+		 $<INSTALL_INTERFACE:$<INSTALL_PREFIX>/${CMAKE_INSTALL_INCLUDEDIR}>
+		 $<INSTALL_INTERFACE:$<INSTALL_PREFIX>/${CMAKE_INSTALL_INCLUDEDIR}/helics/external/optional>
+		 PRIVATE $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
+		)
 
-if(NOT HELICS_BINARY_ONLY_INSTALL)
-    # Install the header if the C++ shared library is built
-    if(HELICS_INSTALL_CPP14_HEADERS)
-        install(
-            FILES helics.hpp ${helics_shared_sources}
-            DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/helics
-            COMPONENT headers
-        )
-    endif()
-
-endif()
 
 
     install(
@@ -169,4 +172,22 @@ endif()
             RUNTIME
         )
     endif()
+
+	if(NOT HELICS_BINARY_ONLY_INSTALL)
+
+    if(MSVC AND NOT EMBEDDED_DEBUG_INFO)
+        install(
+            FILES $<TARGET_PDB_FILE:helicsSharedLib>
+            DESTINATION ${CMAKE_INSTALL_BINDIR}
+            OPTIONAL
+            COMPONENT libs
+        )
+    endif()
+    install(DIRECTORY
+        ${PROJECT_BINARY_DIR}/include/helics
+        DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+        COMPONENT headers
+    )
+
+endif()
 

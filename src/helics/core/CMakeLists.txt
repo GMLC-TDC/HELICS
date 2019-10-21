@@ -30,13 +30,13 @@ set(
     CommsInterface.cpp
     CommsBroker.cpp
     NetworkBrokerData.cpp
-    helics-time.cpp
     HandleManager.cpp
     FilterCoordinator.cpp
     UnknownHandleManager.cpp
     MessageTimer.cpp
     federate_id.cpp
     TimeoutMonitor.cpp
+	coreTimeOperations.cpp
 )
 
 set(TESTCORE_SOURCE_FILES test/TestBroker.cpp test/TestCore.cpp test/TestComms.cpp)
@@ -92,6 +92,7 @@ set(
 
 set(
     INCLUDE_FILES
+	coreTimeOperations.hpp
     BrokerBase.hpp
     TimeDependencies.hpp
     TimeCoordinator.hpp

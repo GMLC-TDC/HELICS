@@ -10,7 +10,7 @@ SPDX-License-Identifier: BSD-3-Clause
 /** these test cases test data_block and data_view objects
  */
 
-#include "helics/core/helics-time.hpp"
+#include "helics/core/coreTimeOperations.hpp"
 #include "helics/shared_api_library/api-data.h"
 
 using namespace helics;
@@ -166,6 +166,8 @@ TEST (time_tests, comparison_tests)
 
 TEST (time_tests, test_string_conversions)
 {
+    using namespace helics::core;
+
     EXPECT_EQ (loadTimeFromString ("10"), Time (10));
     EXPECT_EQ (loadTimeFromString ("-10"), Time (-10));
 

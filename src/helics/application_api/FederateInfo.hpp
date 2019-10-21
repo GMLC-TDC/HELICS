@@ -83,21 +83,21 @@ class HELICS_CXX_EXPORT FederateInfo : public CoreFederateInfo
 
 /** generate a FederateInfo object from a config file (JSON, TOML)
  */
-FederateInfo loadFederateInfo (const std::string &configString);
+HELICS_CXX_EXPORT FederateInfo loadFederateInfo (const std::string &configString);
 
 /** generate string for passing arguments to the core*/
-std::string generateFullCoreInitString (const FederateInfo &fi);
+HELICS_CXX_EXPORT std::string generateFullCoreInitString (const FederateInfo &fi);
 
 /** get an integer property/flag from a string name of the property or flag
 @param val a name of property to get an integer index code for used in /ref CoreFederateInfo::setProperty
 @return the integer code for a given property
 */
-int getPropertyIndex (std::string val);
+HELICS_CXX_EXPORT int getPropertyIndex (std::string val);
 
 /** get an integer option index for a binary flag option
 @param val a name of flag option to get an integer index code for used in /ref CoreFederateInfo::setOptionFlag
 @return the integer code for a given property
 */
-int getOptionIndex (std::string val);
+HELICS_CXX_EXPORT int getOptionIndex (std::string val);
 
 }  // namespace helics

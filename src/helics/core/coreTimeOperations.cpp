@@ -5,12 +5,14 @@ the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 
-#include "helics-time.hpp"
+#include "coreTimeOperations.hpp"
 #include "gmlc/utilities/stringOps.h"
 #include <map>
 
 namespace helics
 {
+	namespace core
+		{
 const std::map<std::string, time_units> time_unitstrings{
   {"ps", time_units::ps},
   {"ns", time_units::ns},
@@ -72,4 +74,5 @@ helics::Time loadTimeFromString (std::string timeString, time_units defUnits)
     std::string units = stringOps::trim (timeString.substr (pos));
     return Time (val * toSecondMultiplier (timeUnitsFromString (units)));
 }
+}  // namespace core
 }  // namespace helics

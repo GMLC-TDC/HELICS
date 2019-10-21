@@ -396,7 +396,7 @@ class HELICS_CXX_EXPORT Input
 };
 
 /** convert a dataview to a double and do a unit conversion if appropriate*/
-double doubleExtractAndConvert (const data_view &dv,
+HELICS_CXX_EXPORT double doubleExtractAndConvert (const data_view &dv,
                                 const std::shared_ptr<units::precise_unit> &inputUnits,
                                 const std::shared_ptr<units::precise_unit> &outputUnits);
 

@@ -42,28 +42,4 @@ struct iteration_time
     iteration_result state;  //!< the convergence state
 };
 
-/** generate a time from a string
-@details the string can be a double or with units
-for example "1.234",  or "1032ms" or "10423425 ns"
-@return a helics time generated from the string
-@throw invalid_argument if the string is not a valid time
-*/
-Time loadTimeFromString (const std::string &timeString);
-
-/** generate a time from a string
-@details the string can be a double or with units
-for example "1.234"  or "1032ms"
-@param timeString the string containing the time
-@param defUnit the units to apply to a string with no other units specified
-@return a helics time generated from the string
-@throws invalid_argument if the string is not a valid time
-*/
-Time loadTimeFromString (std::string timeString, time_units defUnit);
-
-/** generate a time related unit,
-@return a time_units enumeration value
-@throw invalid_argument if the string is not a valid unit
-*/
-time_units timeUnitsFromString (const std::string &unitString);
-
 }  // namespace helics

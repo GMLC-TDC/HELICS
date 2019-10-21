@@ -33,6 +33,10 @@ if(HELICS_BUILD_CXX_SHARED_LIB)
         set_target_properties(helics-shared PROPERTIES FOLDER helics)
     endif()
     generate_export_header(helics-shared BASE_NAME helics_cxx)
+    file(
+       COPY ${CMAKE_CURRENT_BINARY_DIR}/helics_cxx_export.h 
+       DESTINATION ${PROJECT_BINARY_DIR}/include/helics/application_api
+    )
 else()
     generate_export_header(helics_application_api BASE_NAME helics_cxx)
 endif()

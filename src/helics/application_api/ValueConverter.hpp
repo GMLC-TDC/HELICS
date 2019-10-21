@@ -15,7 +15,6 @@ the purpose of these objects are to convert a specific type into a data block fo
 #include "data_view.hpp"
 #include "helicsTypes.hpp"
 #include <string>
-
 namespace helics
 {
 /** converter for a basic value*/
@@ -60,3 +59,8 @@ class ValueConverter<std::string>
     static std::string type () { return "string"; }
 };
 }  // namespace helics
+
+//This should be at the end since it depends on the definitions in here
+#ifndef HELICS_CXX_STATIC_DEFINE
+#include "ValueConverter_impl.hpp"
+#endif
