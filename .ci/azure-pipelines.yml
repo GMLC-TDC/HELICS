@@ -36,10 +36,13 @@ jobs:
     condition: eq( variables['Agent.OS'], 'Windows_NT' )
     displayName: Install swig
     
+  - bash: echo $JAVA_HOME && ls $JAVA_HOME && ls C:\Program Files\Java
+    displayName: Java env info
+    
   - task: JavaToolInstaller@0
     inputs:
       jdkArchitectureOption: $(langArch)
-    condition: ne( variables['langArch'], 'x64' )
+    condition: ne( variables['langArch'], 'x86' )
     
   - task: UsePythonVersion@0
     inputs:
