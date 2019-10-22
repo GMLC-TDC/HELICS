@@ -21,7 +21,6 @@ set(
     EndpointInfo.cpp
     ActionMessage.cpp
     CoreBroker.cpp
-    core-types.cpp
     core-data.cpp
     TimeCoordinator.cpp
     NetworkCommsInterface.cpp
@@ -37,6 +36,7 @@ set(
     federate_id.cpp
     TimeoutMonitor.cpp
 	coreTimeOperations.cpp
+	coreTypeOperations.cpp
 )
 
 set(TESTCORE_SOURCE_FILES test/TestBroker.cpp test/TestCore.cpp test/TestComms.cpp)
@@ -93,6 +93,7 @@ set(
 set(
     INCLUDE_FILES
 	coreTimeOperations.hpp
+	coreTypeOperations.hpp
     BrokerBase.hpp
     TimeDependencies.hpp
     TimeCoordinator.hpp
@@ -202,10 +203,7 @@ target_link_libraries(helics_core PUBLIC helics_common PRIVATE fmt::fmt compile_
 
 if(TARGET Boost::boost)
 	target_compile_definitions(helics_core PRIVATE BOOST_DATE_TIME_NO_LIB)
-    target_include_directories(
-        helics_core SYSTEM
-        PRIVATE $<TARGET_PROPERTY:Boost::boost,INTERFACE_SYSTEM_INCLUDE_DIRECTORIES>
-    )
+	target_link_libraries(helics_core PRIVATE Boost::boost)
 endif()
 
 if(ENABLE_MPI_CORE)
@@ -244,19 +242,3 @@ if(ENABLE_MPI_CORE)
             "${MPI_C_ADDITIONAL_INCLUDE_DIRS}"
     )
 endif(ENABLE_MPI_CORE)
-
-if(NOT HELICS_BINARY_ONLY_INSTALL)
-    if(HELICS_INSTALL_CPP14_HEADERS)
-        install(
-            FILES ${PUBLIC_INCLUDE_FILES}
-            DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/helics/core
-            COMPONENT headers
-        )
-
-        install(
-            FILES ../helics_enums.h
-            DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/helics
-            COMPONENT headers
-        )
-    endif()
-endif()

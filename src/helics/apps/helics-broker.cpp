@@ -38,7 +38,7 @@ int main (int argc, char *argv[])
       .footer ("helics_broker <broker args ..> starts a broker with the given args and waits for it to "
                "complete\n")
       ->footer ([]() {
-          helics::apps::BrokerApp app{"-?"};
+          helics::BrokerApp app{"-?"};
           (void)(app);
           return std::string{};
       });
@@ -69,7 +69,7 @@ int main (int argc, char *argv[])
                 // I am purposely making an object that creates and destroys itself on the same line because this
                 // will run until termination so will take a while
                 {
-                    helics::apps::BrokerApp brkapp{cmdLine.remaining_for_passthrough (true)};
+                    helics::BrokerApp brkapp{cmdLine.remaining_for_passthrough (true)};
                 }
                 std::cout << "broker restart in 3 seconds" << std::endl;
                 std::this_thread::sleep_for (std::chrono::seconds (1));
@@ -82,7 +82,7 @@ int main (int argc, char *argv[])
         }
         else
         {
-            helics::apps::BrokerApp broker (cmdLine.remaining_for_passthrough ());
+            helics::BrokerApp broker (cmdLine.remaining_for_passthrough ());
         }
     }
     catch (const std::invalid_argument &ia)
@@ -104,7 +104,7 @@ int main (int argc, char *argv[])
 void terminalFunction (std::vector<std::string> args)
 {
     std::cout << "starting broker\n";
-    auto broker = std::make_unique<helics::apps::BrokerApp> (args);
+    auto broker = std::make_unique<helics::BrokerApp> (args);
     auto closeBroker = [&broker]() {
         if (!broker)
         {
@@ -129,7 +129,7 @@ void terminalFunction (std::vector<std::string> args)
         }
         if (!broker)
         {
-            broker = std::make_unique<helics::apps::BrokerApp> (args);
+            broker = std::make_unique<helics::BrokerApp> (args);
             std::cout << "broker has started\n";
         }
         else if (broker->isActive ())
@@ -138,7 +138,7 @@ void terminalFunction (std::vector<std::string> args)
             {
                 broker->forceTerminate ();
                 broker = nullptr;
-                broker = std::make_unique<helics::apps::BrokerApp> (args);
+                broker = std::make_unique<helics::BrokerApp> (args);
                 std::cout << "broker was forceably terminated and restarted\n";
             }
             else
@@ -149,7 +149,7 @@ void terminalFunction (std::vector<std::string> args)
         else
         {
             broker = nullptr;
-            broker = std::make_unique<helics::apps::BrokerApp> (args);
+            broker = std::make_unique<helics::BrokerApp> (args);
             std::cout << "broker has restarted\n";
         }
     };

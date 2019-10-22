@@ -37,6 +37,7 @@ class shared_guarded;
 namespace helics
 {
 class Core;
+class CoreApp;
 class AsyncFedCallInfo;
 class MessageOperator;
 class FilterFederateManager;
@@ -90,6 +91,13 @@ class HELICS_CXX_EXPORT Federate
     @param fi  a federate information structure
     */
     Federate (const std::string &fedname, const std::shared_ptr<Core> &core, const FederateInfo &fi);
+
+	/**constructor taking a CoreApp and a federate information structure
+    @param fedname the name of the federate can be empty to use a name from the federateInfo
+    @param core a CoreApp with the core core connect to.
+    @param fi  a federate information structure
+    */
+    Federate (const std::string &fedname, CoreApp &core, const FederateInfo &fi);
     /**constructor taking a file with the required information
     @param configString can be either a JSON file or a string containing JSON code or a TOML file
     */
@@ -561,5 +569,5 @@ class HELICS_CXX_EXPORT Federate
 /** function to do some housekeeping work
 @details this runs some cleanup routines and tries to close out any residual thread that haven't been shutdown
 yet*/
-void cleanupHelicsLibrary ();
+HELICS_CXX_EXPORT void cleanupHelicsLibrary ();
 }  // namespace helics

@@ -139,18 +139,7 @@ if(HELICS_BUILD_APP_LIBRARY)
         )
     endif(HELICS_BUILD_APP_EXECUTABLES)
 
-    if(HELICS_INSTALL_CPP14_HEADERS)
-        install(
-            FILES ${helics_apps_public_headers}
-            DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/helics/apps
-            COMPONENT headers
-        )
-        install(
-            FILES ../helics_apps.hpp
-            DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/helics
-            COMPONENT headers
-        )
-    endif(HELICS_INSTALL_CPP14_HEADERS)
+    
 endif(HELICS_BUILD_APP_LIBRARY)
 
 # configure executable app

@@ -7,8 +7,6 @@ SPDX-License-Identifier: BSD-3-Clause
 #pragma once
 #include "../helics_enums.h"
 
-#include <string>
-
 /** @file
 @details definitions of types an enumerations used in helics
 */
@@ -81,21 +79,6 @@ enum class iteration_request : signed char
     force_iteration = 1,  //!< force an iteration whether it is needed or not
     iterate_if_needed = 2,  //!< indicator that the iterations need to continue
 };
-
-/**generate a string based on the core type*/
-std::string to_string (core_type type);
-
-/** generate a core type value from a std::string
-@param type a string describing the desired core type
-@return a value of the helics_core_type enumeration
-helics::core_type::unrecognized if the type is not valid
-*/
-core_type coreTypeFromString (std::string type) noexcept;
-
-/**
- * Returns true if core/broker type specified is available in current compilation.
- */
-bool isCoreTypeAvailable (core_type type) noexcept;
 
 }  // namespace helics
 

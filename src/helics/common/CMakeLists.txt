@@ -60,29 +60,13 @@ target_link_libraries(helics_common PUBLIC helics_base helics_base_includes PRIV
 target_link_libraries(helics_common PUBLIC HELICS::jsoncpp_lib HELICS::utilities HELICS::units-static) 
 
 if(TARGET Boost::boost)
-    target_include_directories(
-        helics_common SYSTEM
-        PRIVATE $<TARGET_PROPERTY:Boost::boost,INTERFACE_SYSTEM_INCLUDE_DIRECTORIES>
-    )
+   target_link_libraries(helics_common PRIVATE Boost::boost)
 endif()
 
 if(ENABLE_ZMQ_CORE)
-    target_include_directories(
-        helics_common SYSTEM
-        PRIVATE $<TARGET_PROPERTY:${ZeroMQ_DEPENDENCY},INTERFACE_INCLUDE_DIRECTORIES>
-    )
+   target_link_libraries(helics_common PRIVATE ${ZeroMQ_DEPENDENCY})
 endif(ENABLE_ZMQ_CORE)
 
 if(APPLE)
     target_compile_definitions(helics_common PUBLIC "-DSTX_NO_STD_ANY=1")
 endif(APPLE)
-
-if(NOT HELICS_BINARY_ONLY_INSTALL)
-    if(HELICS_INSTALL_CPP14_HEADERS)
-        install(
-            FILES ${helics_public_common}
-            DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/helics/common
-            COMPONENT headers
-        )
-    endif()
-endif()

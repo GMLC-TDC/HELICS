@@ -28,6 +28,8 @@ set(
     ../application_api/Inputs.hpp
 	../application_api/BrokerApp.hpp
 	../application_api/CoreApp.hpp
+	../application_api/timeOperations.hpp
+	../application_api/typeOperations.hpp
 )
 
 set(
@@ -63,11 +65,12 @@ set(
     ../application_api/Inputs.cpp
 	../application_api/BrokerApp.cpp
 	../application_api/CoreApp.cpp
-	timeOperations.cpp
+	../application_api/timeOperations.cpp
+	../application_api/typeOperations.cpp
 )
 
    
-   add_library(helics-shared SHARED ${helics_shared_sources} ${conv_headers} timeOperations.hpp
+   add_library(helics-shared SHARED ${helics_shared_sources} ${conv_headers}
                                    ${helics_shared_public_headers}
                                    ${helics_shared_private_headers})
 
@@ -111,7 +114,6 @@ set(core_include_files
 	../core/helics_definitions.hpp 
 	../core/helicsCLI11.hpp
 	../core/helicsVersion.hpp
-	timeOperations.hpp
 	)
 
 file(

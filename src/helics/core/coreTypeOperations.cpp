@@ -14,6 +14,8 @@ SPDX-License-Identifier: BSD-3-Clause
 
 namespace helics
 {
+	namespace core
+		{
 std::string to_string (core_type type)
 {
     switch (type)
@@ -227,5 +229,5 @@ bool isCoreTypeAvailable (core_type type) noexcept
 
     return available;
 }
-
+}  // namespace core
 }  // namespace helics

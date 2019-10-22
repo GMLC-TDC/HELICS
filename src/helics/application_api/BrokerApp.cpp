@@ -8,13 +8,12 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "../core/BrokerFactory.hpp"
 #include "../core/CoreBroker.hpp"
 #include "../core/core-exceptions.hpp"
+#include "../core/coreTypeOperations.hpp"
 #include "../core/helicsCLI11.hpp"
 #include <fstream>
 #include <iostream>
 
 namespace helics
-{
-namespace apps
 {
 BrokerApp::BrokerApp (core_type ctype, std::vector<std::string> args)
 {
@@ -72,7 +71,7 @@ std::unique_ptr<helicsCLI11App> BrokerApp::generateParser ()
     app->allow_extras ();
     auto app_p = app.get ();
     app->footer ([app_p]() {
-        auto coreType = helics::coreTypeFromString ((*app_p)["--core"]->as<std::string> ());
+        auto coreType = helics::core::coreTypeFromString ((*app_p)["--core"]->as<std::string> ());
         BrokerFactory::displayHelp (coreType);
         return std::string ();
     });
@@ -103,5 +102,49 @@ void BrokerApp::forceTerminate ()
     }
 }
 
-}  // namespace apps
+void BrokerApp::dataLink (const std::string &source, const std::string &target)
+{
+    if (broker)
+    {
+        broker->dataLink (source, target);
+    }
+}
+/** add a source Filter to an endpoint*/
+void BrokerApp::addSourceFilterToEndpoint (const std::string &filter, const std::string &endpoint)
+{
+    if (broker)
+    {
+        broker->addSourceFilterToEndpoint (filter, endpoint);
+    }
+}
+/** add a destination Filter to an endpoint*/
+void BrokerApp::addDestinationFilterToEndpoint (const std::string &filter, const std::string &endpoint)
+{
+    if (broker)
+    {
+        broker->addDestinationFilterToEndpoint (filter, endpoint);
+    }
+}
+static const std::string estring{};
+/** get the identifier of the broker*/
+const std::string &BrokerApp::getIdentifier () const
+{
+    return (broker) ? broker->getIdentifier () : estring;
+}
+/** get the network address of the broker*/
+const std::string &BrokerApp::getAddress () const { return (broker) ? broker->getAddress () : estring; }
+/** make a query at the broker*/
+std::string BrokerApp::query (const std::string &target, const std::string &query)
+{
+    return (broker) ? broker->query (target, query) : std::string ("#error");
+}
+/** set the log file to use for the broker*/
+void BrokerApp::setLogFile (const std::string &logFile)
+{
+    if (broker)
+    {
+        broker->setLogFile (logFile);
+    }
+}
+
 }  // namespace helics

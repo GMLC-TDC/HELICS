@@ -247,7 +247,6 @@ template <>
 inline constexpr const char *typeNameString<int64_t> ()
 {
     return typestrings::i64str;
-    ;
 }
 /** for 64 bit unsigned integer*/
 template <>
@@ -527,7 +526,7 @@ constexpr std::complex<double> invalidValue<std::complex<double>> ()
 {
     return {invalidValue<double> (), 0.0};
 }
-
+/// Helper template to remove const volatile references
 template <typename T>
 using remove_cv_ref = std::remove_cv_t<std::remove_reference_t<T>>;
 

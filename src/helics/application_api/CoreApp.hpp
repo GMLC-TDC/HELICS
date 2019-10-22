@@ -18,8 +18,6 @@ namespace helics
 class Core;
 class helicsCLI11App;
 
-namespace apps
-{
 /** class implementing a Core object.  This object is meant to a be a very simple broker executor with a similar
  * interface to the other apps
  */
@@ -69,9 +67,28 @@ class HELICS_CXX_EXPORT CoreApp
 
     /** forceably disconnect the broker*/
     void forceTerminate ();
+    /** link a publication and input*/
+    void dataLink (const std::string &source, const std::string &target);
+    /** add a source Filter to an endpoint*/
+    void addSourceFilterToEndpoint (const std::string &filter, const std::string &endpoint);
+    /** add a destination Filter to an endpoint*/
+    void addDestinationFilterToEndpoint (const std::string &filter, const std::string &endpoint);
+
+    /** get the identifier of the broker*/
+    const std::string &getIdentifier () const;
+    /** get the network address of the broker*/
+    const std::string &getAddress () const;
+    /** make a query at the broker*/
+    std::string query (const std::string &target, const std::string &query);
+    /** set the log file to use for the broker*/
+    void setLogFile (const std::string &logFile);
+    /** tell the core that is ready to enter initialization mode*/
+	void setReadyToInit ();
+#ifdef HELICS_CXX_STATIC_DEFINE
     /** overload the -> operator so broker functions can be called if needed
      */
     auto *operator-> () const { return core.operator-> (); }
+#endif
     /** get a copy of the core pointer*/
     std::shared_ptr<Core> getCopyofCorePointer () const { return core; }
 
@@ -81,5 +98,5 @@ class HELICS_CXX_EXPORT CoreApp
     std::shared_ptr<Core> core;  //!< the actual endpoint objects
     std::string name;  //!< the name of the broker
 };
-}  // namespace apps
+
 }  // namespace helics

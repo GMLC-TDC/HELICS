@@ -7,6 +7,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "../common/loggerCore.hpp"
 #include "../core/BrokerFactory.hpp"
 #include "../core/CoreFactory.hpp"
+#include "../core/coreTypeOperations.hpp"
 #include "../helics.hpp"
 #include "helics.h"
 #include "internal/api_objects.h"
@@ -55,8 +56,8 @@ helics_bool helicsIsCoreTypeAvailable (const char *type)
     {
         return helics_false;
     }
-    auto coreType = helics::coreTypeFromString (type);
-    return (helics::isCoreTypeAvailable (coreType)) ? helics_true : helics_false;
+    auto coreType = helics::core::coreTypeFromString (type);
+    return (helics::core::isCoreTypeAvailable (coreType)) ? helics_true : helics_false;
 }
 
 // random integer for validation purposes of endpoints
@@ -315,7 +316,7 @@ void helicsFederateInfoSetCoreTypeFromString (helics_federate_info fi, const cha
         }
         else
         {
-            hfi->coreType = helics::coreTypeFromString (coretype);
+            hfi->coreType = helics::core::coreTypeFromString (coretype);
         }
     }
     catch (...)
@@ -559,7 +560,7 @@ helics_core helicsCreateCore (const char *type, const char *name, const char *in
         return nullptr;
     }
 
-    helics::core_type ct = (type != nullptr) ? helics::coreTypeFromString (type) : helics::core_type::DEFAULT;
+    helics::core_type ct = (type != nullptr) ? helics::core::coreTypeFromString (type) : helics::core_type::DEFAULT;
 
     if (ct == helics::core_type::UNRECOGNIZED)
     {
@@ -594,7 +595,7 @@ helics_core helicsCreateCoreFromArgs (const char *type, const char *name, int ar
     {
         return nullptr;
     }
-    helics::core_type ct = (type != nullptr) ? helics::coreTypeFromString (type) : helics::core_type::DEFAULT;
+    helics::core_type ct = (type != nullptr) ? helics::core::coreTypeFromString (type) : helics::core_type::DEFAULT;
 
     if (ct == helics::core_type::UNRECOGNIZED)
     {
@@ -689,7 +690,7 @@ helics_broker helicsCreateBroker (const char *type, const char *name, const char
     {
         return nullptr;
     }
-    helics::core_type ct = (type != nullptr) ? helics::coreTypeFromString (type) : helics::core_type::DEFAULT;
+    helics::core_type ct = (type != nullptr) ? helics::core::coreTypeFromString (type) : helics::core_type::DEFAULT;
 
     if (ct == helics::core_type::UNRECOGNIZED)
     {
@@ -723,7 +724,7 @@ helics_broker helicsCreateBrokerFromArgs (const char *type, const char *name, in
     {
         return nullptr;
     }
-    helics::core_type ct = (type != nullptr) ? helics::coreTypeFromString (type) : helics::core_type::DEFAULT;
+    helics::core_type ct = (type != nullptr) ? helics::core::coreTypeFromString (type) : helics::core_type::DEFAULT;
 
     if (ct == helics::core_type::UNRECOGNIZED)
     {

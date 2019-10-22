@@ -17,6 +17,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "../common/addTargets.hpp"
 #include "../core/Core.hpp"
 #include "AsyncFedCallInfo.hpp"
+#include "CoreApp.hpp"
 #include "helics/helics-config.h"
 
 #include "FilterFederateManager.hpp"
@@ -83,6 +84,11 @@ Federate::Federate (const std::string &fedName, const FederateInfo &fi) : name (
     currentTime = coreObject->getCurrentTime (fedID);
     asyncCallInfo = std::make_unique<shared_guarded_m<AsyncFedCallInfo>> ();
     fManager = std::make_unique<FilterFederateManager> (coreObject.get (), this, fedID);
+}
+
+Federate::Federate (const std::string &fedname, CoreApp &core, const FederateInfo &fi)
+    : Federate (fedname, core.getCopyofCorePointer (), fi)
+{
 }
 
 Federate::Federate (const std::string &fedName, const std::shared_ptr<Core> &core, const FederateInfo &fi)

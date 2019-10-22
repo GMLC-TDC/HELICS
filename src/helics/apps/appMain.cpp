@@ -108,10 +108,10 @@ int main (int argc, char *argv[])
     app.add_subcommand ("broker", "Helics Broker App")
       ->callback ([&app] () {
           std::cout << "broker subcommand\n";
-          helics::apps::BrokerApp broker (app.remaining_for_passthrough (true));
+          helics::BrokerApp broker (app.remaining_for_passthrough (true));
       })
       ->footer ([=] {
-          helics::apps::BrokerApp broker (argc, argv);
+          helics::BrokerApp broker (argc, argv);
           return std::string{};
       });
     app.footer ("helics_app [SUBCOMMAND] --help will display the options for a particular subcommand");

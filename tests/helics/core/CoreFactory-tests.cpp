@@ -9,11 +9,12 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helics/core/CommonCore.hpp"
 #include "helics/core/CoreFactory.hpp"
 #include "helics/helics-config.h"
+#include "helics/core/coreTypeOperations.hpp"
 
 #ifdef ENABLE_ZMQ_CORE
 TEST (CoreFactory_tests, ZmqCore_test)
 {
-    EXPECT_EQ (helics::isCoreTypeAvailable (helics::core_type::ZMQ), true);
+    EXPECT_EQ (helics::core::isCoreTypeAvailable (helics::core_type::ZMQ), true);
 
     auto core = helics::CoreFactory::create (helics::core_type::ZMQ, "");
     ASSERT_TRUE (core);
@@ -21,7 +22,7 @@ TEST (CoreFactory_tests, ZmqCore_test)
     core = nullptr;
 }
 #else  // ENABLE_ZMQ_CORE
-TEST (CoreFactory_tests, ZmqCore_test) { EXPECT_EQ (helics::isCoreTypeAvailable (helics::core_type::ZMQ), false); }
+TEST (CoreFactory_tests, ZmqCore_test) { EXPECT_EQ (helics::core::isCoreTypeAvailable (helics::core_type::ZMQ), false); }
 #endif  // ENABLE_ZMQ_CORE
 
 /*
@@ -29,7 +30,7 @@ TEST (CoreFactory_tests, ZmqCore_test) { EXPECT_EQ (helics::isCoreTypeAvailable 
 
 TEST(CoreFactory_tests,MpiCore_test)
 {
-    EXPECT_EQ (helics::isCoreTypeAvailable (helics::core_type::MPI), true);
+    EXPECT_EQ (helics::core::isCoreTypeAvailable (helics::core_type::MPI), true);
     auto core = helics::CoreFactory::create (helics::core_type::MPI, "");
     ASSERT_TRUE (core != nullptr);
     helics::CoreFactory::unregisterCore (core->getIdentifier ());
@@ -45,7 +46,7 @@ TEST(CoreFactory_tests,MpiCore_test)
 
 TEST (CoreFactory_tests, TestCore_test)
 {
-    EXPECT_EQ (helics::isCoreTypeAvailable (helics::core_type::TEST), true);
+    EXPECT_EQ (helics::core::isCoreTypeAvailable (helics::core_type::TEST), true);
 
     auto core = helics::CoreFactory::create (helics::core_type::TEST, "");
     ASSERT_TRUE (core);
@@ -55,8 +56,8 @@ TEST (CoreFactory_tests, TestCore_test)
 #ifdef ENABLE_IPC_CORE
 TEST (CoreFactory_tests, InterprocessCore_test)
 {
-    EXPECT_EQ (helics::isCoreTypeAvailable (helics::core_type::INTERPROCESS), true);
-    EXPECT_EQ (helics::isCoreTypeAvailable (helics::core_type::IPC), true);
+    EXPECT_EQ (helics::core::isCoreTypeAvailable (helics::core_type::INTERPROCESS), true);
+    EXPECT_EQ (helics::core::isCoreTypeAvailable (helics::core_type::IPC), true);
 
     auto core = helics::CoreFactory::create (helics::core_type::INTERPROCESS, "");
     ASSERT_TRUE (core);
@@ -72,14 +73,14 @@ TEST (CoreFactory_tests, InterprocessCore_test)
 #else
 TEST (CoreFactory_tests, InterprocessCore_test)
 {
-    EXPECT_EQ (helics::isCoreTypeAvailable (helics::core_type::INTERPROCESS), false);
-    EXPECT_EQ (helics::isCoreTypeAvailable (helics::core_type::IPC), false);
+    EXPECT_EQ (helics::core::isCoreTypeAvailable (helics::core_type::INTERPROCESS), false);
+    EXPECT_EQ (helics::core::isCoreTypeAvailable (helics::core_type::IPC), false);
 }
 #endif
 #ifdef ENABLE_TCP_CORE
 TEST (CoreFactory_tests, tcpCore_test)
 {
-    EXPECT_EQ (helics::isCoreTypeAvailable (helics::core_type::TCP), true);
+    EXPECT_EQ (helics::core::isCoreTypeAvailable (helics::core_type::TCP), true);
 
     auto core = helics::CoreFactory::create (helics::core_type::TCP, "");
     ASSERT_TRUE (core);
@@ -93,7 +94,7 @@ TEST (CoreFactory_tests, tcpCore_test) { EXPECT_EQ (helics::isCoreTypeAvailable 
 #ifdef ENABLE_TCP_CORE
 TEST (CoreFactory_tests, tcpSSCore_test)
 {
-    EXPECT_EQ (helics::isCoreTypeAvailable (helics::core_type::TCP_SS), true);
+    EXPECT_EQ (helics::core::isCoreTypeAvailable (helics::core_type::TCP_SS), true);
 
     auto core = helics::CoreFactory::create (helics::core_type::TCP_SS, "");
     ASSERT_TRUE (core);
@@ -103,14 +104,14 @@ TEST (CoreFactory_tests, tcpSSCore_test)
 #else
 TEST (CoreFactory_tests, tcpSSCore_test)
 {
-    EXPECT_EQ (helics::isCoreTypeAvailable (helics::core_type::TCP_SS), false);
+    EXPECT_EQ (helics::core::isCoreTypeAvailable (helics::core_type::TCP_SS), false);
 }
 #endif
 
 #ifdef ENABLE_UDP_CORE
 TEST (CoreFactory_tests, udpCore_test)
 {
-    EXPECT_EQ (helics::isCoreTypeAvailable (helics::core_type::UDP), true);
+    EXPECT_EQ (helics::core::isCoreTypeAvailable (helics::core_type::UDP), true);
 
     auto core = helics::CoreFactory::create (helics::core_type::UDP, "");
     ASSERT_TRUE (core != nullptr);
@@ -123,5 +124,5 @@ TEST (CoreFactory_tests, udpCore_test)
     core2 = nullptr;
 }
 #else
-TEST (CoreFactory_tests, udpCore_test) { EXPECT_EQ (helics::isCoreTypeAvailable (helics::core_type::UDP), false); }
+TEST (CoreFactory_tests, udpCore_test) { EXPECT_EQ (helics::core::isCoreTypeAvailable (helics::core_type::UDP), false); }
 #endif

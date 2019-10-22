@@ -18,8 +18,6 @@ namespace helics
 class Broker;
 class helicsCLI11App;
 
-namespace apps
-{
 /** class implementing a Broker object.  This object is meant to a be a very simple broker executor with a similar
  * interface to the other apps
  */
@@ -69,15 +67,38 @@ class HELICS_CXX_EXPORT BrokerApp
 
     /** forceably disconnect the broker*/
     void forceTerminate ();
-    /** overload the -> operator so broker functions can be called if needed
+    /** link a publication and input*/
+    void dataLink (const std::string &source, const std::string &target);
+    /** add a source Filter to an endpoint*/
+	void addSourceFilterToEndpoint (const std::string &filter, const std::string &endpoint);
+    /** add a destination Filter to an endpoint*/
+    void addDestinationFilterToEndpoint (const std::string &filter, const std::string &endpoint);
+
+	/** get the identifier of the broker*/
+	const std::string &getIdentifier () const;
+    /** get the network address of the broker*/
+    const std::string &getAddress () const;
+    /** make a query at the broker*/
+	std::string query (const std::string &target, const std::string &query);
+    /** set the log file to use for the broker*/
+	void setLogFile (const std::string &logFile);
+
+#ifdef HELICS_CXX_STATIC_DEFINE
+    /** overload the -> operator so all broker functions can be called if needed
      */
     auto *operator-> () const { return broker.operator-> (); }
-
+#endif
   private:
     void processArgs (std::unique_ptr<helicsCLI11App> &app);
     std::unique_ptr<helicsCLI11App> generateParser ();
     std::shared_ptr<Broker> broker;  //!< the actual endpoint objects
     std::string name;  //!< the name of the broker
 };
-}  // namespace apps
+
+// for maintaining the symbol in a public header
+namespace apps
+{
+using helics::BrokerApp;
+} // namespace apps
+
 }  // namespace helics

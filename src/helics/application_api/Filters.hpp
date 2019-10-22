@@ -172,7 +172,7 @@ class HELICS_CXX_EXPORT CloningFilter : public Filter
 @param name the name of the filter (optional)
 @return a unique pointer to a destination Filter object,  note destroying the object does not deactivate the filter
 */
-Filter &make_filter (filter_types type, Federate *fed, const std::string &name = EMPTY_STRING);
+HELICS_CXX_EXPORT Filter &make_filter (filter_types type, Federate *fed, const std::string &name = EMPTY_STRING);
 
 /** create a  filter
 @param locality the visibility of the filter global or local
@@ -181,7 +181,7 @@ Filter &make_filter (filter_types type, Federate *fed, const std::string &name =
 @param name the name of the filter (optional)
 @return a unique pointer to a destination Filter object,  note destroying the object does not deactivate the filter
 */
-Filter &make_filter (interface_visibility locality,
+HELICS_CXX_EXPORT Filter &make_filter (interface_visibility locality,
                      filter_types type,
                      Federate *fed,
                      const std::string &name = EMPTY_STRING);
@@ -192,7 +192,8 @@ Filter &make_filter (interface_visibility locality,
 @param name the name of the filter (optional)
 @return a unique pointer to a source Filter object,  note destroying the object does not deactivate the filter
 */
-std::unique_ptr<Filter> make_filter (filter_types type, Core *cr, const std::string &name = EMPTY_STRING);
+HELICS_CXX_EXPORT std::unique_ptr<Filter>
+make_filter (filter_types type, Core *cr, const std::string &name = EMPTY_STRING);
 
 /** create a  filter
 @param type the type of filter to create
@@ -201,7 +202,7 @@ std::unique_ptr<Filter> make_filter (filter_types type, Core *cr, const std::str
 @param name the name of the filter (optional)
 @return a unique pointer to a destination Filter object,  note destroying the object does not deactivate the filter
 */
-CloningFilter &make_cloning_filter (filter_types type,
+HELICS_CXX_EXPORT CloningFilter &make_cloning_filter (filter_types type,
                                     Federate *fed,
                                     const std::string &delivery,
                                     const std::string &name = EMPTY_STRING);
@@ -214,7 +215,7 @@ CloningFilter &make_cloning_filter (filter_types type,
 @param name the name of the filter (optional)
 @return a unique pointer to a destination Filter object,  note destroying the object does not deactivate the filter
 */
-CloningFilter &make_cloning_filter (interface_visibility locality,
+HELICS_CXX_EXPORT CloningFilter &make_cloning_filter (interface_visibility locality,
                                     filter_types type,
                                     Federate *fed,
                                     const std::string &delivery,
@@ -227,7 +228,7 @@ CloningFilter &make_cloning_filter (interface_visibility locality,
 @param name the name of the filter (optional)
 @return a unique pointer to a source Filter object,  note destroying the object does not deactivate the filter
 */
-std::unique_ptr<CloningFilter> make_cloning_filter (filter_types type,
+HELICS_CXX_EXPORT std::unique_ptr<CloningFilter> make_cloning_filter (filter_types type,
                                                     Core *cr,
                                                     const std::string &delivery,
                                                     const std::string &name = EMPTY_STRING);

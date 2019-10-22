@@ -8,13 +8,13 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "../core/CoreFactory.hpp"
 #include "../core/core-exceptions.hpp"
 #include "../core/helicsCLI11.hpp"
+#include "../core/coreTypeOperations.hpp"
 #include <fstream>
 #include <iostream>
 
 namespace helics
 {
-namespace apps
-{
+
 CoreApp::CoreApp (core_type ctype, std::vector<std::string> args)
 {
     auto app = generateParser ();
@@ -67,11 +67,11 @@ std::unique_ptr<helicsCLI11App> CoreApp::generateParser ()
 {
     auto app = std::make_unique<helicsCLI11App> ("Broker application");
     app->addTypeOption ();
-    app->add_option ("--name,-n", name, "name of the broker");
+    app->add_option ("--name,-n", name, "name of the core");
     app->allow_extras ();
     auto app_p = app.get ();
     app->footer ([app_p]() {
-        auto coreType = helics::coreTypeFromString ((*app_p)["--core"]->as<std::string> ());
+        auto coreType = helics::core::coreTypeFromString ((*app_p)["--core"]->as<std::string> ());
         //CoreFactory:: (coreType);
         return std::string ();
     });
@@ -102,5 +102,56 @@ void CoreApp::forceTerminate ()
     }
 }
 
-}  // namespace apps
+
+void CoreApp::dataLink (const std::string &source, const std::string &target)
+{
+    if (core)
+    {
+        core->dataLink (source, target);
+    }
+}
+/** add a source Filter to an endpoint*/
+void CoreApp::addSourceFilterToEndpoint (const std::string &filter, const std::string &endpoint)
+{
+    if (core)
+    {
+        core->addSourceFilterToEndpoint (filter, endpoint);
+    }
+}
+/** add a destination Filter to an endpoint*/
+void CoreApp::addDestinationFilterToEndpoint (const std::string &filter, const std::string &endpoint)
+{
+    if (core)
+    {
+        core->addDestinationFilterToEndpoint (filter, endpoint);
+    }
+}
+
+static const std::string estring{};
+/** get the identifier of the core*/
+const std::string &CoreApp::getIdentifier () const { return (core) ? core->getIdentifier () : estring; }
+/** get the network address of the core*/
+const std::string &CoreApp::getAddress () const { return (core) ? core->getAddress () : estring; }
+/** make a query at the core*/
+std::string CoreApp::query (const std::string &target, const std::string &query)
+{
+     return (core) ? core->query (target, query) : std::string ("#error");
+}
+/** set the log file to use for the core*/
+void CoreApp::setLogFile (const std::string &logFile)
+{
+    if (core)
+    {
+        core->setLogFile (logFile);
+    }
+}
+
+void CoreApp::setReadyToInit()
+{
+    if (core)
+    {
+        core->setCoreReadyToInit ();
+    }
+}
+
 }  // namespace helics

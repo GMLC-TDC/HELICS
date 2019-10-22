@@ -31,11 +31,11 @@ auto StartBrokerImp (const std::string &core_type_name, const std::string &initi
     if (hasIndexCode (core_type_name))
     {
         std::string new_type (core_type_name.begin (), core_type_name.end () - 2);
-        type = helics::coreTypeFromString (new_type);
+        type = helics::core::coreTypeFromString (new_type);
     }
     else
     {
-        type = helics::coreTypeFromString (core_type_name);
+        type = helics::core::coreTypeFromString (core_type_name);
     }
     std::shared_ptr<helics::Broker> broker;
     switch (type)
