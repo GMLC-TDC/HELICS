@@ -96,8 +96,8 @@ namespace std
 template <typename BaseType, helics::identifiers ID, BaseType invalidValue>
 struct hash<helics::identifier_id_t<BaseType, ID, invalidValue>>
 {
-    using argument_type = helics::identifier_id_t<BaseType, ID, invalidValue>; //!< the type of object to hash
-    using result_type = std::size_t; //!< the result type of the hash code
+    using argument_type = helics::identifier_id_t<BaseType, ID, invalidValue>;  //!< the type of object to hash
+    using result_type = std::size_t;  //!< the result type of the hash code
     /** the actual hash operator*/
     result_type operator() (argument_type const &key) const noexcept
     {
@@ -120,23 +120,23 @@ class NamedPoint
     std::string name;  //!< the text value for the named point
     double value = std::numeric_limits<double>::quiet_NaN ();  //!< the data value for the named point
     /** default constructor*/
-	NamedPoint () = default;
+    NamedPoint () = default;
     /** construct directly from name value*/
     NamedPoint (std::string valname, double valval) : name (std::move (valname)), value (valval) {}
     /** equality operator
-	@details if either value is nan it check only the string
-	otherwise it checks the name and value
-	@return true if the objects are equivalent*/
-	bool operator== (const NamedPoint &np) const
+    @details if either value is nan it check only the string
+    otherwise it checks the name and value
+    @return true if the objects are equivalent*/
+    bool operator== (const NamedPoint &np) const
     {
         return ((std::isnan (value)) && (std::isnan (np.value))) ? (name == np.name) :
                                                                    ((value == np.value) && (name == np.name));
     }
     bool operator!= (const NamedPoint &np) const { return !operator== (np); }
-    /** less than operator 
-	@details checks by name order, then value order
-	*/
-	bool operator< (const NamedPoint &np) const
+    /** less than operator
+    @details checks by name order, then value order
+    */
+    bool operator< (const NamedPoint &np) const
     {
         return (name == np.name) ? (name < np.name) : (value < np.value);
     }
@@ -343,6 +343,8 @@ NamedPoint helicsGetNamedPoint (const std::string &val);
 double getDoubleFromString (const std::string &val);
 /** get a complex number from a string*/
 std::complex<double> getComplexFromString (const std::string &val);
+/** get the boolean value of a string*/
+bool helicsBoolValue (const std::string &val);
 /** compute the L2 norm of a vector*/
 double vectorNorm (const std::vector<double> &vec);
 /** compute the L2 norm of a magnitudes of a complex vector*/
@@ -486,10 +488,13 @@ inline X invalidValue ()
     return X ();
 }
 
+/// defined constant for an invalid value as a double 
+constexpr double invalidDouble = -1e48;
+
 template <>
 constexpr double invalidValue<double> ()
 {
-    return -1e48;
+    return invalidDouble;
 }
 
 template <>

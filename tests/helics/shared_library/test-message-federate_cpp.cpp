@@ -61,7 +61,7 @@ TEST_P (mfed_type_tests, message_federate_endpoint_registration)
 
     mFed1->finalize ();
 
-    mFed1State = mFed1->getCurrentMode();
+    mFed1State = mFed1->getCurrentMode ();
     EXPECT_TRUE (mFed1State == helics_federate_state::helics_state_finalize);
 }
 
@@ -92,8 +92,11 @@ TEST_P (mfed_type_tests, message_federate_send_receive)
     auto M = epid2.getMessage ();
     // BOOST_REQUIRE (M);
     ASSERT_EQ (M.length, 500);
-
-    EXPECT_EQ (M.data[245], 'a');
+    EXPECT_NE (M.data, nullptr);
+    if (M.data != nullptr)
+    {
+        EXPECT_EQ (M.data[245], 'a');
+    }
     mFed1->finalize ();
 
     auto mFed1State = mFed1->getCurrentMode ();

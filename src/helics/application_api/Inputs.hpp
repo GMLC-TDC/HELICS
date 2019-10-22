@@ -13,7 +13,7 @@ SPDX-License-Identifier: BSD-3-Clause
 namespace units
 {
 class precise_unit;
-}
+} // namespace units
 
 namespace helics
 {
@@ -163,7 +163,7 @@ class Input
     void registerNotificationCallback (std::function<void (Time)> callback)
     {
         fed->setInputNotificationCallback (*this,
-                                           [this, callback = std::move (callback)] (const Input &, Time time) {
+                                           [this, callback = std::move (callback)] (const Input & /*inp*/, Time time) {
                                                if (isUpdated ())
                                                {
                                                    callback (time);

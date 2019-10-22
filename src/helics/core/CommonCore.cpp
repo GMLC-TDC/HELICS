@@ -682,7 +682,7 @@ void CommonCore::setIntegerProperty (local_federate_id federateID, int32_t prope
         ActionMessage cmd (CMD_CORE_CONFIGURE);
         cmd.dest_id = global_id.load ();
         cmd.messageID = property;
-        cmd.counter = propertyValue;
+        cmd.setExtraData (propertyValue);
         addActionMessage (cmd);
         return;
     }
@@ -693,7 +693,7 @@ void CommonCore::setIntegerProperty (local_federate_id federateID, int32_t prope
     }
     ActionMessage cmd (CMD_FED_CONFIGURE_INT);
     cmd.messageID = property;
-    cmd.counter = propertyValue;
+    cmd.setExtraData (propertyValue);
     fed->setProperties (cmd);
 }
 
@@ -1234,14 +1234,53 @@ void CommonCore::setValue (interface_handle handle, const char *data, uint64_t l
     {
         LOG_DATA_MESSAGES (parent_broker_id, fed->getIdentifier (),
                            fmt::format ("setting Value for {} size {}", handleInfo->key, len));
-        ActionMessage mv (CMD_PUB);
-        mv.source_id = handleInfo->getFederateId ();
-        mv.source_handle = handle;
-        mv.counter = static_cast<uint16_t> (fed->getCurrentIteration ());
-        mv.payload = std::string (data, len);
-        mv.actionTime = fed->nextAllowedSendTime ();
 
-        actionQueue.push (std::move (mv));
+        auto subs = fed->getSubscribers (handle);
+        if (subs.empty ())
+        {
+            return;
+        }
+        if (subs.size () == 1)
+        {
+            ActionMessage mv (CMD_PUB);
+            mv.source_id = handleInfo->getFederateId ();
+            mv.source_handle = handle;
+            mv.setDestination (subs[0]);
+            mv.counter = static_cast<uint16_t> (fed->getCurrentIteration ());
+            mv.payload = std::string (data, len);
+            mv.actionTime = fed->nextAllowedSendTime ();
+
+            actionQueue.push (std::move (mv));
+            return;
+        }
+        else
+        {
+            ActionMessage package (CMD_MULTI_MESSAGE);
+            package.source_id = handleInfo->getFederateId ();
+            package.source_handle = handle;
+
+            ActionMessage mv (CMD_PUB);
+            mv.source_id = handleInfo->getFederateId ();
+            mv.source_handle = handle;
+            mv.counter = static_cast<uint16_t> (fed->getCurrentIteration ());
+            mv.payload = std::string (data, len);
+            mv.actionTime = fed->nextAllowedSendTime ();
+
+            for (auto &target : subs)
+            {
+                mv.setDestination (target);
+                auto res = appendMessage (package, mv);
+                if (res < 0)  // deal with max package size if there are a lot of subscribers
+                {
+                    actionQueue.push (std::move (package));
+                    package = ActionMessage (CMD_MULTI_MESSAGE);
+                    package.source_id = handleInfo->getFederateId ();
+                    package.source_handle = handle;
+                    appendMessage (package, mv);
+                }
+            }
+            actionQueue.push (std::move (package));
+        }
     }
 }
 
@@ -1252,11 +1291,12 @@ std::shared_ptr<const data_block> CommonCore::getValue (interface_handle handle)
     {
         throw (InvalidIdentifier ("Handle is invalid (getValue)"));
     }
-    // todo:: this is a long chain should be refactored
+
     if (handleInfo->handleType != handle_type::input)
     {
         throw (InvalidIdentifier ("Handle does not identify an input"));
     }
+    // TODO::PT this is a long chain should be refactored
     return getFederateAt (handleInfo->local_fed_id)->interfaces ().getInput (handle)->getData ();
 }
 
@@ -1267,11 +1307,12 @@ std::vector<std::shared_ptr<const data_block>> CommonCore::getAllValues (interfa
     {
         throw (InvalidIdentifier ("Handle is invalid (getValue)"));
     }
-    // todo:: this is a long chain should be refactored
+
     if (handleInfo->handleType != handle_type::input)
     {
         throw (InvalidIdentifier ("Handle does not identify an input"));
     }
+    // todo:: this is a long chain should be refactored
     return getFederateAt (handleInfo->local_fed_id)->interfaces ().getInput (handle)->getAllData ();
 }
 
@@ -1810,7 +1851,7 @@ void CommonCore::setLoggingLevel (int logLevel)
     ActionMessage cmd (CMD_CORE_CONFIGURE);
     cmd.dest_id = global_id.load ();
     cmd.messageID = defs::properties::log_level;
-    cmd.counter = logLevel;
+    cmd.setExtraData (logLevel);
     addActionMessage (cmd);
 }
 
@@ -2217,6 +2258,15 @@ void CommonCore::processPriorityCommand (ActionMessage &&command)
                             command.source_id.baseValue ()));
     switch (command.action ())
     {
+    case CMD_PING_PRIORITY:
+        if (command.dest_id == global_broker_id_local)
+        {
+            ActionMessage pngrep (CMD_PING_REPLY);
+            pngrep.dest_id = command.source_id;
+            pngrep.source_id = global_broker_id_local;
+            routeMessage (pngrep);
+        }
+        break;
     case CMD_REG_FED:
     {
         // this one in the core needs to be the thread-safe version
@@ -2353,9 +2403,16 @@ void CommonCore::processPriorityCommand (ActionMessage &&command)
             repStr = federateQuery (fedptr, command.payload);
             if (repStr == "#wait")
             {
-                command.dest_id = fedptr->global_id;
-                fedptr->addAction (std::move (command));
-                break;
+                if (fedptr != nullptr)
+                {
+                    command.dest_id = fedptr->global_id;
+                    fedptr->addAction (std::move (command));
+                    break;
+                }
+                else
+                {
+                    repStr = "#error";
+                }
             }
         }
 
@@ -2712,30 +2769,8 @@ void CommonCore::processCommand (ActionMessage &&command)
         processDestFilterReturn (command);
         break;
     case CMD_PUB:
-        // route the message to all the subscribers
-        if (command.dest_id == parent_broker_id)
-        {
-            auto fed = getFederateCore (command.source_id);
-            if (fed != nullptr)
-            {
-                auto pubInfo = fed->interfaces ().getPublication (command.source_handle);
-                if (pubInfo != nullptr)
-                {
-                    for (auto &subscriber : pubInfo->subscribers)
-                    {
-                        command.dest_id = subscriber.fed_id;
-                        command.dest_handle = subscriber.handle;
-                        routeMessage (command);
-                    }
-                }
-            }
-        }
-        else
-        {
-            routeMessage (command);
-        }
+        routeMessage (command);
         break;
-
     case CMD_LOG:
         if (command.dest_id == global_broker_id_local)
         {
@@ -3722,13 +3757,13 @@ void CommonCore::processCoreConfigureCommands (ActionMessage &cmd)
         }
         break;
     case defs::properties::log_level:
-        setLogLevel (cmd.counter);
+        setLogLevel (cmd.getExtraData ());
         break;
     case defs::properties::file_log_level:
-        setLogLevels (consoleLogLevel, cmd.counter);
+        setLogLevels (consoleLogLevel, cmd.getExtraData ());
         break;
     case defs::properties::console_log_level:
-        setLogLevels (cmd.counter, fileLogLevel);
+        setLogLevels (cmd.getExtraData (), fileLogLevel);
         break;
     case UPDATE_LOGGING_CALLBACK:
         if (checkActionFlag (cmd, empty_flag))

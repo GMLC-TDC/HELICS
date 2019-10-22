@@ -28,7 +28,7 @@ DelayFilterOperation::DelayFilterOperation (Time delayTime) : delay (delayTime)
     {
         delay = timeZero;
     }
-    td = std::make_shared<MessageTimeOperator> ([this] (Time messageTime) { return messageTime + delay; });
+    td = std::make_shared<MessageTimeOperator> ([this](Time messageTime) { return messageTime + delay; });
 }
 
 void DelayFilterOperation::set (const std::string &property, double val)
@@ -50,7 +50,7 @@ void DelayFilterOperation::setString (const std::string &property, const std::st
         {
             delay = loadTimeFromString (val);
         }
-        catch (const std::invalid_argument &ia)
+        catch (const std::invalid_argument &)
         {
             throw (helics::InvalidParameter (val + " is not a valid time string"));
         }
@@ -222,7 +222,7 @@ class randomDelayGenerator
 
 RandomDelayFilterOperation::RandomDelayFilterOperation ()
     : td (std::make_shared<MessageTimeOperator> (
-        [this] (Time messageTime) { return messageTime + rdelayGen->generate (); })),
+        [this](Time messageTime) { return messageTime + rdelayGen->generate (); })),
       rdelayGen (std::make_unique<randomDelayGenerator> ())
 {
 }
@@ -269,7 +269,7 @@ std::shared_ptr<FilterOperator> RandomDelayFilterOperation::getOperator ()
 RandomDropFilterOperation::RandomDropFilterOperation ()
 {
     tcond = std::make_shared<MessageConditionalOperator> (
-      [this] (const Message *) { return (randDouble (random_dists_t::bernoulli, (1.0 - dropProb), 1.0) > 0.1); });
+      [this](const Message *) { return (randDouble (random_dists_t::bernoulli, (1.0 - dropProb), 1.0) > 0.1); });
 }
 
 RandomDropFilterOperation::~RandomDropFilterOperation () = default;
@@ -290,7 +290,7 @@ std::shared_ptr<FilterOperator> RandomDropFilterOperation::getOperator ()
 RerouteFilterOperation::RerouteFilterOperation ()
 {
     op = std::make_shared<MessageDestOperator> (
-      [this] (const std::string &src, const std::string &dest) { return rerouteOperation (src, dest); });
+      [this](const std::string &src, const std::string &dest) { return rerouteOperation (src, dest); });
 }
 
 RerouteFilterOperation::~RerouteFilterOperation () = default;
@@ -361,7 +361,7 @@ std::string RerouteFilterOperation::rerouteOperation (const std::string &src, co
 
 FirewallFilterOperation::FirewallFilterOperation ()
 {
-    op = std::make_shared<FirewallOperator> ([this] (const Message *mess) { return allowPassed (mess); });
+    op = std::make_shared<FirewallOperator> ([this](const Message *mess) { return allowPassed (mess); });
 }
 
 FirewallFilterOperation::~FirewallFilterOperation () = default;
@@ -379,7 +379,7 @@ bool FirewallFilterOperation::allowPassed (const Message * /*mess*/) const { ret
 
 CloneFilterOperation::CloneFilterOperation (Core *core) : coreptr (core)
 {
-    op = std::make_shared<CloneOperator> ([this] (const Message *mess) { sendMessage (mess); });
+    op = std::make_shared<CloneOperator> ([this](const Message *mess) { sendMessage (mess); });
 }
 
 CloneFilterOperation::~CloneFilterOperation () = default;

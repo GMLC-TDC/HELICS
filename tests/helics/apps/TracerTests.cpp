@@ -596,7 +596,7 @@ TEST_P (tracer_clone_file_tests, simple_clone_test_file)
             break;
         }
     }
-    EXPECT_FLOAT_EQ (lastTime.load (), 1.0);
+    EXPECT_DOUBLE_EQ (lastTime.load (), 1.0);
     {
         auto mhandle = mguard.lock ();
         ASSERT_TRUE (*mhandle);
@@ -609,7 +609,7 @@ TEST_P (tracer_clone_file_tests, simple_clone_test_file)
     mfed.finalize ();
     mfed2.finalize ();
     fut.get ();
-    EXPECT_FLOAT_EQ (lastTime.load (), 2.0);
+    EXPECT_DOUBLE_EQ (lastTime.load (), 2.0);
     {
         auto mhandle = mguard.lock ();
         ASSERT_TRUE (*mhandle);

@@ -57,12 +57,13 @@ Alternatively, you can install from source. See the next section for more inform
     linux
     docker
     language
+    helics_cmake_options
 ```
 
 The following are a few things that could be useful to know before starting out.
 
 Firstly, you can follow HELICS development on our [GitHub](https://github.com/GMLC-TDC/HELICS) page.
-HELICS is open-source. The development team uses `git` for version control, and GitHub to host the code publically.
+HELICS is open-source. The development team uses `git` for version control, and GitHub to host the code publicly.
 The latest HELICS will be on the `develop` branch.
 Tagged releases occur on the `master` branch.
 If you clone the HELICS repository, you will be placed in the `master` branch by default.
@@ -75,7 +76,7 @@ git checkout develop
 To switch to a tagged release, you can type the following:
 
 ```bash
-git checkout v1.0.1
+git checkout v2.3.0
 ```
 
 You will not need a full understanding of how `git` works for installing HELICS, but if you are interested you can find a good `git` resource in [this page](https://git-scm.com/book/en/v2).
@@ -96,4 +97,4 @@ This means you can pass it configurations settings as a key value pair by adding
 For example, to build the Python extension all you need to do is pass in `-DBUILD_PYTHON_INTERFACE=ON`.
 You can also run `ccmake .` in the build folder, to get a command line interactive prompt to change configuration settings.
 On Windows, you can use the cmake GUI to do the same.
-Again, there are more instructions in the individual installation pages but a useful trick to know if something isn't documented or a slightly more advanced feature is required.
+Again, there are more instructions in the individual installation pages but a useful trick to know if something isn't documented or a slightly more advanced feature is required.  Available CMake options for HELICS are documented [here](helics_cmake_option.md).

@@ -1,11 +1,11 @@
 {
-  "line_width": 80,
+  "line_width": 88,
   "dangle_parens": true,
   "command_case": "lower",
   "separate_fn_name_with_space": false,
   "always_wrap": [],
   "separate_ctrl_name_with_space": false,
-  "max_subargs_per_line": 3,
+  "max_subargs_per_line": 4,
   "tab_size": 4,
   "keyword_case": "upper",
   "enum_char": ".",

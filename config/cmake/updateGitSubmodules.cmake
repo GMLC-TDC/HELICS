@@ -1,9 +1,19 @@
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# Copyright (c) 2017-2019, Battelle Memorial Institute; Lawrence Livermore
+# National Security, LLC; Alliance for Sustainable Energy, LLC.
+# See the top-level NOTICE for additional details.
+# All rights reserved.
+#
+# SPDX-License-Identifier: BSD-3-Clause
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 # Based on https://cliutils.gitlab.io/modern-cmake/chapters/projects/submodule.html
 
 find_package(Git QUIET)
 if(GIT_FOUND AND (GIT_VERSION_STRING VERSION_GREATER "1.5.2"))
     if(EXISTS "${PROJECT_SOURCE_DIR}/.git")
         option(ENABLE_SUBMODULE_UPDATE "Checkout and update git submodules" ON)
+		mark_as_advanced(ENABLE_SUBMODULE_UPDATE)
     else()
         message(STATUS "${PROJECT_SOURCE_DIR} is not a Git repository. Clone ${PROJECT_NAME} with Git or ensure you get copies of all the Git submodules code.")
     endif()

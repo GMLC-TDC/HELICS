@@ -40,17 +40,19 @@ class MessageFederate : public virtual Federate  // using virtual inheritance to
     MessageFederate (const std::string &name, const std::string &configString);
     /** move constructor*/
     MessageFederate (MessageFederate &&mFed) noexcept;
+    /** delete copy constructor*/
+    MessageFederate(const MessageFederate &mFed) = delete;
     /** default constructor*/
     MessageFederate ();
     /** special constructor should only be used by child classes in constructor due to virtual inheritance*/
     explicit MessageFederate (bool res);
     // copy constructor and copy assignment are disabled
-  public:
     /** destructor */
     virtual ~MessageFederate ();
     /** move assignment*/
     MessageFederate &operator= (MessageFederate &&mFed) noexcept;
-
+    /** delete copy assignment*/
+	MessageFederate &operator= (const MessageFederate &mFed) = delete;
   protected:
     virtual void startupToInitializeStateTransition () override;
     virtual void initializeToExecuteStateTransition () override;

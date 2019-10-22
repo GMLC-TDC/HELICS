@@ -1,21 +1,23 @@
-#
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Copyright (c) 2017-2019, Battelle Memorial Institute; Lawrence Livermore
 # National Security, LLC; Alliance for Sustainable Energy, LLC.
-# See the top-level NOTICE for additional details. 
-#All rights reserved.
+# See the top-level NOTICE for additional details.
+# All rights reserved.
 #
 # SPDX-License-Identifier: BSD-3-Clause
-#
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 #
 # Find the ZeroMQ includes and library
 #
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # This module defines
 # ZeroMQ_INCLUDE_DIR, where to find zmq.h
 # ZeroMQ_LIBRARY, the library needed to use ZeroMQ
 # ZeroMQ_FOUND, if false, you cannot build anything that requires ZeroMQ.
 # ZeroMQ_SHARED_LIB the shared library that needs to be associated with the executable
 # adds targets for libzmq and libzmq-static
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 set(ZeroMQ_FOUND 0)
 
@@ -24,19 +26,13 @@ set(
     "[HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\ZeroMQ (x64);DisplayIcon]"
 )
 
-# this is to deal with something weird when specifying the install path from an
-# external source
+# this is to deal with something weird when specifying the install path from an external
+# source
 
 if("${ZeroMQ_INSTALL_PATH}" STREQUAL "")
     set(ZeroMQ_PATH2 "")
 else()
-    string(
-        REPLACE
-            "?"
-            ""
-            ZeroMQ_PATH2
-            ${ZeroMQ_INSTALL_PATH}
-    )
+    string(REPLACE "?" "" ZeroMQ_PATH2 ${ZeroMQ_INSTALL_PATH})
 endif()
 
 if(NOT ZeroMQ_LIBRARY_ONLY)
@@ -44,9 +40,7 @@ if(NOT ZeroMQ_LIBRARY_ONLY)
         ZeroMQ_ROOT_DIR
         NAMES include/zmq.h
         HINTS
-            ${ZeroMQ_INCLUDE_PATH}
-            ${ZeroMQ_REGISTRY_PATH}
-            ${ZeroMQ_INSTALL_PATH}
+            ${ZeroMQ_INCLUDE_PATH} ${ZeroMQ_REGISTRY_PATH} ${ZeroMQ_INSTALL_PATH}
             ${ZeroMQ_PATH2}
         PATHS /usr /usr/local
     )
@@ -63,24 +57,17 @@ if(MSVC)
     )
 
     # Replace dots with underscores
-    string(
-        REGEX
-        REPLACE
-            "\\."
-            "_"
-            ZeroMQ_NAME
-            ${ZeroMQ_NAME}
-    )
+    string(REGEX REPLACE "\\." "_" ZeroMQ_NAME ${ZeroMQ_NAME})
     # Get Visual studio version number
 
     # message(STATUS "toolset =${CMAKE_VS_PLATFORM_TOOLSET}")
 
-    if(${ZeroMQ_NAME} MATCHES "registry") # if key was not found, the string
-                                          # "registry" is returned
+    if(${ZeroMQ_NAME} MATCHES "registry") # if key was not found, the string "registry"
+                                          # is returned
         set(
             _ZeroMQ_VERSIONS
-			"4_3_2"
-			"4_3_1"
+            "4_3_2"
+            "4_3_1"
             "4_3_0"
             "4_2_5"
             "4_2_4"
@@ -100,8 +87,7 @@ if(MSVC)
         foreach(ver ${_ZeroMQ_VERSIONS})
             list(
                 APPEND
-                    ZeroMQ_LIBRARY_NAME
-                    "libzmq-${CMAKE_VS_PLATFORM_TOOLSET}-mt-${ver}"
+                    ZeroMQ_LIBRARY_NAME "libzmq-${CMAKE_VS_PLATFORM_TOOLSET}-mt-${ver}"
             )
         endforeach()
         foreach(ver ${_ZeroMQ_VERSIONS})
@@ -166,76 +152,76 @@ find_library(
     PATHS /lib /usr/lib /usr/local/lib
 )
 
-if (ZeroMQ_REQUIRE_HEADERS)
-if(ZeroMQ_INCLUDE_DIR)
-if(
-    (ZeroMQ_LIBRARY AND NOT ZeroMQ_LIBRARY-NOTFOUND)
-    OR (ZeroMQ_STATIC_LIBRARY AND NOT ZeroMQ_STATIC_LIBRARY-NOTFOUND)
-)
-    set(ZeroMQ_FOUND 1)
-endif()
-endif()
+if(ZeroMQ_REQUIRE_HEADERS)
+    if(ZeroMQ_INCLUDE_DIR)
+        if(
+            (ZeroMQ_LIBRARY AND NOT ZeroMQ_LIBRARY-NOTFOUND)
+            OR (ZeroMQ_STATIC_LIBRARY AND NOT ZeroMQ_STATIC_LIBRARY-NOTFOUND)
+        )
+            set(ZeroMQ_FOUND 1)
+        endif()
+    endif()
 else(ZeroMQ_REQUIRE_HEADERS)
-if(
-    (ZeroMQ_LIBRARY AND NOT ZeroMQ_LIBRARY-NOTFOUND)
-    OR (ZeroMQ_STATIC_LIBRARY AND NOT ZeroMQ_STATIC_LIBRARY-NOTFOUND)
-)
-    set(ZeroMQ_FOUND 1)
-endif()
+    if(
+        (ZeroMQ_LIBRARY AND NOT ZeroMQ_LIBRARY-NOTFOUND)
+        OR (ZeroMQ_STATIC_LIBRARY AND NOT ZeroMQ_STATIC_LIBRARY-NOTFOUND)
+    )
+        set(ZeroMQ_FOUND 1)
+    endif()
 endif(ZeroMQ_REQUIRE_HEADERS)
 
-if (ZeroMQ_FOUND)
-# Create shared library target
-if(ZeroMQ_LIBRARY AND NOT ZeroMQ_LIBRARY-NOTFOUND)
-    message(STATUS "Found ZeroMQ library: ${ZeroMQ_LIBRARY}")
-    # this is static because we are pointing to the library for the linker, not
-    # the shared object
-    add_library(libzmq STATIC IMPORTED)
-    if(ZeroMQ_DEBUG_LIBRARY)
-        set_target_properties(
-            libzmq
-            PROPERTIES IMPORTED_LOCATION_RELEASE "${ZeroMQ_LIBRARY}"
-        )
-        set_target_properties(
-            libzmq
-            PROPERTIES IMPORTED_LOCATION_DEBUG "${ZeroMQ_DEBUG_LIBRARY}"
-        )
-    else(ZeroMQ_DEBUG_LIBRARY)
-        set_target_properties(
-            libzmq
-            PROPERTIES IMPORTED_LOCATION "${ZeroMQ_LIBRARY}"
-        )
-    endif(ZeroMQ_DEBUG_LIBRARY)
-    if(ZeroMQ_INCLUDE_DIR)
-        message(STATUS "Found ZeroMQ headers: ${ZeroMQ_INCLUDE_DIR}")
-        set_target_properties(
-            libzmq
-            PROPERTIES INTERFACE_INCLUDE_DIRECTORIES "${ZeroMQ_INCLUDE_DIR}"
-        )
+if(ZeroMQ_FOUND)
+    # Create shared library target
+    if(ZeroMQ_LIBRARY AND NOT ZeroMQ_LIBRARY-NOTFOUND)
+        message(STATUS "Found ZeroMQ library: ${ZeroMQ_LIBRARY}")
+        # this is static because we are pointing to the library for the linker, not the
+        # shared object
+        add_library(libzmq STATIC IMPORTED)
+        if(ZeroMQ_DEBUG_LIBRARY)
+            set_target_properties(
+                libzmq
+                PROPERTIES IMPORTED_LOCATION_RELEASE "${ZeroMQ_LIBRARY}"
+            )
+            set_target_properties(
+                libzmq
+                PROPERTIES IMPORTED_LOCATION_DEBUG "${ZeroMQ_DEBUG_LIBRARY}"
+            )
+        else(ZeroMQ_DEBUG_LIBRARY)
+            set_target_properties(
+                libzmq
+                PROPERTIES IMPORTED_LOCATION "${ZeroMQ_LIBRARY}"
+            )
+        endif(ZeroMQ_DEBUG_LIBRARY)
+        if(ZeroMQ_INCLUDE_DIR)
+            message(STATUS "Found ZeroMQ headers: ${ZeroMQ_INCLUDE_DIR}")
+            set_target_properties(
+                libzmq
+                PROPERTIES INTERFACE_INCLUDE_DIRECTORIES "${ZeroMQ_INCLUDE_DIR}"
+            )
+        endif()
+    else()
+        if(NOT ZeroMQ_FIND_QUIETLY)
+            message(
+                SEND_ERROR
+                    "Could not find ZeroMQ libraries/headers! Please install ZeroMQ with libraries and headers"
+            )
+        endif(NOT ZeroMQ_FIND_QUIETLY)
     endif()
-else()
-    if(NOT ZeroMQ_FIND_QUIETLY)
-        message(
-            SEND_ERROR
-                "Could not find ZeroMQ libraries/headers! Please install ZeroMQ with libraries and headers"
-        )
-    endif(NOT ZeroMQ_FIND_QUIETLY)
-endif()
 
-# Create static library target
-if(ZeroMQ_STATIC_LIBRARY AND NOT ZeroMQ_STATIC_LIBRARY-NOTFOUND)
-    add_library(libzmq-static STATIC IMPORTED)
-    set_target_properties(
-        libzmq-static
-        PROPERTIES IMPORTED_LOCATION "${ZeroMQ_STATIC_LIBRARY}"
-    )
-    if(ZeroMQ_INCLUDE_DIR)
+    # Create static library target
+    if(ZeroMQ_STATIC_LIBRARY AND NOT ZeroMQ_STATIC_LIBRARY-NOTFOUND)
+        add_library(libzmq-static STATIC IMPORTED)
         set_target_properties(
             libzmq-static
-            PROPERTIES INTERFACE_INCLUDE_DIRECTORIES "${ZeroMQ_INCLUDE_DIR}"
+            PROPERTIES IMPORTED_LOCATION "${ZeroMQ_STATIC_LIBRARY}"
         )
+        if(ZeroMQ_INCLUDE_DIR)
+            set_target_properties(
+                libzmq-static
+                PROPERTIES INTERFACE_INCLUDE_DIRECTORIES "${ZeroMQ_INCLUDE_DIR}"
+            )
+        endif()
     endif()
-endif()
 endif()
 
 # show the variables only in the advanced view

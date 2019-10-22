@@ -414,7 +414,7 @@ int helicsFederatePendingMessages (helics_federate fed)
     {
         return 0;
     }
-    return mFed->pendingMessages ();
+    return static_cast<int> (mFed->pendingMessages ());
 }
 
 int helicsEndpointPendingMessages (helics_endpoint endpoint)
@@ -424,7 +424,7 @@ int helicsEndpointPendingMessages (helics_endpoint endpoint)
     {
         return 0;
     }
-    return endObj->endPtr->pendingMessages ();
+    return static_cast<int> (endObj->endPtr->pendingMessages ());
 }
 
 static helics_message emptyMessage ()
@@ -462,6 +462,8 @@ helics_message helicsEndpointGetMessage (helics_endpoint endpoint)
         mess.source = message->source.c_str ();
         mess.original_dest = message->original_dest.c_str ();
         mess.time = static_cast<helics_time> (message->time);
+        mess.flags = message->flags;
+        mess.messageID = message->messageID;
         endObj->messages.push_back (std::move (message));
         return mess;
     }
@@ -509,6 +511,7 @@ helics_message helicsFederateGetMessage (helics_federate fed)
         mess.source = message->source.c_str ();
         mess.original_dest = message->original_dest.c_str ();
         mess.time = static_cast<helics_time> (message->time);
+        mess.messageID = message->messageID;
         fedObj->messages.push_back (std::move (message));
         return mess;
     }

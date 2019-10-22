@@ -279,11 +279,12 @@ extern "C"
     /** get the raw data for a message object
     @param message a message object to get the data for
     @param[out] data the memory location of the data
-    @param maxlen the maximum size of information that data can hold
+    @param maxMessagelen the maximum size of information that data can hold
     @param[out] actualSize  the actual length of data copied to data
     @param[in,out] err a pointer to an error object for catching errors
     */
-    HELICS_EXPORT void helicsMessageGetRawData (helics_message_object message, void *data, int maxMessagelen, int *actualSize, helics_error *err);
+    HELICS_EXPORT void
+    helicsMessageGetRawData (helics_message_object message, void *data, int maxMessagelen, int *actualSize, helics_error *err);
 
     /** get a pointer to the raw data of a message
     @param message a message object to get the data for

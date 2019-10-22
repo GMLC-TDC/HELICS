@@ -253,7 +253,7 @@ void BrokerServer::startZMQserver ()
         if (rc > 0)
         {
             zmq::message_t msg;
-            repSocket.recv (&msg);
+            repSocket.recv (msg);
             auto sz = msg.size ();
             if (sz < 25)
             {
@@ -261,7 +261,7 @@ void BrokerServer::startZMQserver ()
                     std::string ("close_server:") + server_name_)
                 {
                     //      std::cerr << "received close server message" << std::endl;
-                    repSocket.send (msg);
+                    repSocket.send (msg, zmq::send_flags::none);
                     break;
                 }
                 else
@@ -295,14 +295,14 @@ void BrokerServer::startZMQserver ()
                             }
                             auto mess = generateReply (rxcmd, nbrk.first);
                             auto str = mess.to_string ();
-                            repSocket.send (str.data (), str.size ());
+                            repSocket.send (str);
                         }
                         else
                         {
                             ActionMessage rep (CMD_PROTOCOL);
                             rep.messageID = DELAY;
                             auto str = rep.to_string ();
-                            repSocket.send (str.data (), str.size ());
+                            repSocket.send (str);
                         }
                     }
                     break;

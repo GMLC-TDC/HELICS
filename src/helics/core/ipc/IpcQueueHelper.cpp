@@ -98,7 +98,7 @@ ActionMessage OwnedQueue::getMessage ()
         return (CMD_ERROR);
     }
     size_t rx_size = 0;
-    unsigned int priority;
+    unsigned int priority{0};
     while (true)
     {
         rqueue->receive (buffer.data (), mxSize, rx_size, priority);
@@ -123,7 +123,7 @@ stx::optional<ActionMessage> OwnedQueue::getMessage (int timeout)
         return stx::nullopt;
     }
     size_t rx_size = 0;
-    unsigned int priority;
+    unsigned int priority{0};
     while (true)
     {
         if (timeout >= 0)

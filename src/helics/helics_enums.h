@@ -92,6 +92,10 @@ extern "C"
         /** flag indicating a federate should only grant time if all other federates have already passed the
          * requested time*/
         helics_flag_wait_for_current_time_update = 10,
+        /** flag indicating a federate should operate on a restrictive time policy, which disallows some 2nd order
+        time evaluation and can be useful for certain types of dependency cycles
+        and update patterns, but generally shouldn't be used as it can lead to some very slow update conditions*/
+        helics_flag_restrictive_time_policy = 11,
         /** flag indicating that a federate has rollback capability*/
         helics_flag_rollback = 12,
         /** flag indicating that a federate performs forward computation and does internal rollback*/

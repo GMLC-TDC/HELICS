@@ -71,7 +71,12 @@ jobs:
       env:
         - MATRIX_EVAL="COMPILER=clang && BUILD_TYPE=Release && TRAVIS_XCODE_VERSION=83"
         - HOMEBREW_NO_AUTO_UPDATE=1
+        - USE_SWIG=false
       osx_image: xcode8.3
+      addons:
+        homebrew:
+          brewfile: .ci/Brewfile-minimal.travis
+          update: true
 
     - <<: *linux_base
       name: "GCC 6"
@@ -104,6 +109,7 @@ jobs:
         - MATRIX_EVAL="COMPILER=clang && CC='clang-5.0' && CXX='clang++-5.0'"
         - CCACHE_CPP2=yes
         - USE_SWIG=true
+        - BUILD_BENCHMARKS=true
         - USE_CMAKE_VERSION=3.14.5
         - CXX_STANDARD=17
 
@@ -144,7 +150,7 @@ jobs:
         - USE_SWIG=true
         - CI_BOOST_VERSION=1.58.0
         - SKIP_TEST_RUN=true
-        - JOB_OPTION_FLAGS="-DBUILD_HELICS_BOOST_TESTS=OFF -DDISABLE_BOOST=ON"
+        - JOB_OPTION_FLAGS="-DDISABLE_BOOST=ON"
 
     - os: windows
       name: "MinGW"
@@ -153,7 +159,7 @@ jobs:
         - DISABLE_INTERFACES="Python,Java"
         - SKIP_TEST_RUN=true
         - CORE_CI_TEST=true
-        - JOB_OPTION_FLAGS='-DBUILD_HELICS_BOOST_TESTS=OFF -DCMAKE_SH=CMAKE_SH-NOTFOUND'
+        - JOB_OPTION_FLAGS=' -DCMAKE_SH=CMAKE_SH-NOTFOUND'
         - CMAKE_GENERATOR="MinGW Makefiles"
         - HELICS_DEPENDENCY_FLAGS="-DBOOST_INSTALL_PATH=/c/local/boost_1_58_0 -DCMAKE_C_COMPILER=/c/ProgramData/chocolatey/lib/mingw/tools/install/mingw64/bin/gcc.exe -DCMAKE_CXX_COMPILER=/c/ProgramData/chocolatey/lib/mingw/tools/install/mingw64/bin/g++.exe"
       install:
@@ -199,27 +205,6 @@ jobs:
         - GCOV_TOOL=gcov-6
         - USE_MPI=mpich
         - CTEST_VERBOSE=true
-    # UBSAN build
-    - <<: *daily_linux
-      name: "Clang 5 Undefined Behavior Sanitizer"
-      compiler: clang
-      addons:
-        apt:
-          sources:
-            - ubuntu-toolchain-r-test
-            - llvm-toolchain-trusty-5.0
-          packages:
-            - libstdc++-6-dev
-            - clang-5.0
-      env:
-        - MATRIX_EVAL="COMPILER=clang && CC='clang-5.0' && CXX='clang++-5.0'"
-        - CCACHE_CPP2=yes
-        - DISABLE_INTERFACES="Python,Java"
-        - RUN_SANITIZER=ubsan
-        - USE_MPI=mpich
-        - JOB_OPTION_FLAGS="-C../scripts/ubsan-cache.cmake"
-        - ZMQ_SUBPROJECT=true
-        - ZMQ_FORCE_SUBPROJECT=true
       
     - stage: trigger dependent repositories
       if: branch IN (master, develop)

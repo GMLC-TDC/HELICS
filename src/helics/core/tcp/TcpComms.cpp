@@ -92,7 +92,7 @@ size_t TcpComms::dataReceive (std::shared_ptr<TcpConnection> connection, const c
                 {
                     connection->send (rep.packetize ());
                 }
-                catch (const std::system_error &se)
+                catch (const std::system_error &)
                 {
                 }
             }
@@ -143,16 +143,18 @@ void TcpComms::queue_rx_function ()
         return;
     }
     auto ioctx = AsioContextManager::getContextPointer ();
-    auto server = helics::tcp::TcpServer::create (ioctx->getBaseContext (), localTargetAddress, PortNumber,
-                                                  reuse_address, maxMessageSize);
+    auto server =
+      helics::tcp::TcpServer::create (ioctx->getBaseContext (), localTargetAddress,
+                                      static_cast<uint16_t> (PortNumber.load ()), reuse_address, maxMessageSize);
     while (!server->isReady ())
     {
         if ((autoPortNumber) && (hasBroker))
         {  // If we failed and we are on an automatically assigned port number,  just try a different port
             server->close ();
             ++PortNumber;
-            server = helics::tcp::TcpServer::create (ioctx->getBaseContext (), localTargetAddress, PortNumber,
-                                                     reuse_address, maxMessageSize);
+            server =
+              helics::tcp::TcpServer::create (ioctx->getBaseContext (), localTargetAddress,
+                                              static_cast<uint16_t> (PortNumber), reuse_address, maxMessageSize);
         }
         else
         {
@@ -169,11 +171,11 @@ void TcpComms::queue_rx_function ()
         }
     }
     auto contextLoop = ioctx->startContextLoop ();
-    server->setDataCall ([this] (TcpConnection::pointer connection, const char *data, size_t datasize) {
+    server->setDataCall ([this](TcpConnection::pointer connection, const char *data, size_t datasize) {
         return dataReceive (connection, data, datasize);
     });
     CommsInterface *ci = this;
-    server->setErrorCall ([ci] (TcpConnection::pointer connection, const std::error_code &error) {
+    server->setErrorCall ([ci](TcpConnection::pointer connection, const std::error_code &error) {
         return commErrorHandler (ci, connection, error);
     });
     server->start ();
@@ -236,7 +238,7 @@ bool TcpComms::establishBrokerConnection (std::shared_ptr<AsioContextManager> &i
                                           std::shared_ptr<TcpConnection> &brokerConnection)
 {
     // lambda function that does the proper termination
-    auto terminate = [&, this] (connection_status status) -> bool {
+    auto terminate = [&, this](connection_status status) -> bool {
         if (brokerConnection)
         {
             brokerConnection->close ();
@@ -291,7 +293,7 @@ bool TcpComms::establishBrokerConnection (std::shared_ptr<AsioContextManager> &i
             std::vector<char> rx (512);
             tcp::endpoint brk;
             brokerConnection->async_receive (rx.data (), 128,
-                                             [this, &rx] (const std::error_code &error, size_t bytes) {
+                                             [this, &rx](const std::error_code &error, size_t bytes) {
                                                  if (!error)
                                                  {
                                                      txReceive (rx.data (), bytes, std::string ());
@@ -411,7 +413,7 @@ void TcpComms::queue_tx_function ()
 
                         routes.emplace (route_id{cmd.getExtraData ()}, std::move (new_connect));
                     }
-                    catch (std::exception &e)
+                    catch (std::exception &)
                     {
                         // TODO(PT):: do something???
                     }
