@@ -36,7 +36,7 @@ jobs:
     condition: eq( variables['Agent.OS'], 'Windows_NT' )
     displayName: Install swig
     
-  - bash: echo $JAVA_HOME && ls $JAVA_HOME && ls C:\Program Files\Java
+  - bash: echo $JAVA_HOME && ls "$JAVA_HOME" && ls "C:\\Program Files\\Java"
     displayName: Java env info
     
   - task: JavaToolInstaller@0
