@@ -27,7 +27,7 @@ jobs:
   # -----------------------
   - powershell: |
       Set-ExecutionPolicy Bypass -Scope Process -Force; iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
-      echo "##vso[task.prependpath]C:\ProgramData\chocolatey\bin"
+      echo "##vso[task.prependpath]C:\\ProgramData\\chocolatey\\bin"
       choco install boost-msvc-14.1 --yes --limit-output
     condition: eq( variables['imageName'], 'vs2015-win2012r2' )
     displayName: Install chocolatey and boost
@@ -54,13 +54,13 @@ jobs:
   # -----------------------
   - task: CMake@1
     inputs:
-      cmakeArgs: -A $(vsArch) -DCMAKE_BUILD_TYPE=Release -DENABLE_SWIG=ON -DBUILD_SHARED_LIBS=ON -DBUILD_HELICS_BOOST_TESTS=OFF ..
+      cmakeArgs: -A $(vsArch) -DCMAKE_BUILD_TYPE=Release -DHELICS_ENABLE_SWIG=ON -DBUILD_SHARED_LIBS=ON ..
     displayName: 'Configure HELICS'
     condition: eq( variables['Agent.OS'], 'Windows_NT' )
     
   - task: CMake@1
     inputs:
-      cmakeArgs: -DENABLE_PACKAGE_BUILD=ON .
+      cmakeArgs: -DHELICS_ENABLE_PACKAGE_BUILD=ON .
     displayName: 'Configure package build (requires CMake 3.13+)'
     condition: ne( variables['imageName'], 'vs2015-win2012r2' )
     
