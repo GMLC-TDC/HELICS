@@ -28,9 +28,9 @@ jobs:
   - powershell: |
       Set-ExecutionPolicy Bypass -Scope Process -Force; iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
       echo "##vso[task.prependpath]C:\\ProgramData\\chocolatey\\bin"
-      choco install boost-msvc-14.1 --yes --limit-output
+      choco install boost-msvc-14.1 cmake --yes --limit-output
     condition: eq( variables['imageName'], 'vs2015-win2012r2' )
-    displayName: Install chocolatey and boost
+    displayName: Install chocolatey, boost, and newer cmake
     
   - bash: choco install swig --yes --limit-output
     condition: eq( variables['Agent.OS'], 'Windows_NT' )
