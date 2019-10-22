@@ -36,13 +36,8 @@ jobs:
     condition: eq( variables['Agent.OS'], 'Windows_NT' )
     displayName: Install swig
     
-  - bash: echo $JAVA_HOME && ls "$JAVA_HOME" && ls "C:\\Program Files\\Java"
-    displayName: Java env info
-    
-  - task: JavaToolInstaller@0
-    inputs:
-      jdkArchitectureOption: $(langArch)
-    condition: ne( variables['langArch'], 'x86' )
+  - bash: cmake --version
+    displayName: CMake version
     
   - task: UsePythonVersion@0
     inputs:
@@ -88,7 +83,7 @@ jobs:
   - bash: |
       cpack_dir="$(which cmake)"
       cpack_dir="${cpack_dir%/cmake}"
-      "${cpack_dir}/cpack" -G "TGZ" -C Release -B "$PWD/installer-output"
+      "${cpack_dir}/cpack" -G "NSIS" -C Release -B "$PWD/installer-output"
     displayName: 'Package HELICS'
     workingDirectory: build
     condition: ne( variables['imageName'], 'vs2015-win2012r2' )
@@ -96,7 +91,7 @@ jobs:
   - task: CopyFiles@2
     inputs:
       sourceFolder: '$(Build.SourcesDirectory)/build/installer-output'
-      contents: '*.tar.gz'
+      contents: '*.exe'
       TargetFolder: '$(Build.ArtifactStagingDirectory)'
     condition: ne( variables['imageName'], 'vs2015-win2012r2' )
       
