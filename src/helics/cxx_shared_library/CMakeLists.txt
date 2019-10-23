@@ -74,9 +74,10 @@ set(
                                    ${helics_shared_public_headers}
                                    ${helics_shared_private_headers})
 
+target_compile_options(helics-shared PUBLIC $<$<CXX_COMPILER_ID:MSVC>:/wd4251>)
+
 target_link_libraries(helics-shared PRIVATE helics_core)
-target_compile_definitions(helics-shared PRIVATE helics_shared_EXPORTS)
-target_compile_definitions(helics-shared PUBLIC HELICS_SHARED_LIBRARY)
+target_compile_definitions(helics-shared PRIVATE helics_shared_EXPORTS PUBLIC HELICS_SHARED_LIBRARY)
 
 if(MSYS AND USE_LIBCXX)
     target_compile_definitions(helics-shared PUBLIC "-DSTX_NO_STD_OPTIONAL=1")
@@ -177,7 +178,7 @@ target_include_directories(helics-shared
 
 	if(NOT HELICS_BINARY_ONLY_INSTALL)
 
-    if(MSVC AND NOT EMBEDDED_DEBUG_INFO)
+    if(MSVC AND NOT HELICS_EMBEDDED_DEBUG_INFO)
         install(
             FILES $<TARGET_PDB_FILE:helicsSharedLib>
             DESTINATION ${CMAKE_INSTALL_BINDIR}

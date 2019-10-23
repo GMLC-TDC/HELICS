@@ -639,7 +639,7 @@ include(addUnits)
 
 set(GMLC_UTILITIES_OBJECT_LIB OFF CACHE INTERNAL "")
 set(GMLC_UTILITIES_STATIC_LIB ON CACHE INTERNAL "")
-
+set(GMLC_UTILITIES_INSTALL OFF CACHE INTERNAL "")
 add_subdirectory(ThirdParty/utilities)
 
 hide_variable(GMLC_UTILITIES_GENERATE_DOXYGEN_DOC)
@@ -683,18 +683,6 @@ if(HELICS_BUILD_EXAMPLES)
     add_subdirectory(examples)
 endif(HELICS_BUILD_EXAMPLES)
 
-if(ENABLE_ZMQ_CORE AND NOT ZMQ_USE_STATIC_LIBRARY)
-    if(WIN32 AND NOT HELICS_BINARY_ONLY_INSTALL)
-        if(NOT HELICS_DISABLE_STATIC_LIB_INSTALL)
-            install(
-                FILES $<TARGET_LINKER_FILE:libzmq>
-                DESTINATION ${CMAKE_INSTALL_LIBDIR}
-                COMPONENT libs
-            )
-        endif()
-    endif()
-endif()
-
 # -------------------------------------------------------------
 # Enable clang analysis and formatting tools
 # -------------------------------------------------------------
@@ -724,17 +712,8 @@ if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
 endif(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
 
 if(NOT HELICS_BINARY_ONLY_INSTALL)
-    install(TARGETS helics_base ${HELICS_EXPORT_COMMAND})
-    install(TARGETS helics_base_includes ${HELICS_EXPORT_COMMAND})
     install(TARGETS compile_flags_target ${HELICS_EXPORT_COMMAND})
-    set(
-        helics_static_file
-        "${CMAKE_STATIC_LIBRARY_PREFIX}helics-static${CMAKE_STATIC_LIBRARY_SUFFIX}"
-    )
-    set(
-        helics_static_file_debug
-        "${CMAKE_STATIC_LIBRARY_PREFIX}helics-static${CMAKE_DEBUG_POSTFIX}${CMAKE_STATIC_LIBRARY_SUFFIX}"
-    )
+   
     if(HELICS_BUILD_CXX_SHARED_LIB)
         set(
             helics_cxx_shared_file
@@ -762,13 +741,6 @@ if(NOT HELICS_BINARY_ONLY_INSTALL)
         set(helics_c_shared_file)
         set(helics_c_shared_file_debug)
     endif()
-
-    # Copy required CMake module files to build tree for importing build tree with
-    # find_package
-    file(
-        COPY config/cmake/addMPI.cmake config/cmake/FindZeroMQ.cmake
-        DESTINATION ${CMAKE_CURRENT_BINARY_DIR}
-    )
 
     if(HELICS_WITH_CMAKE_PACKAGE)
 
