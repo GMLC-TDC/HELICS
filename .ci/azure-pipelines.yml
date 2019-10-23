@@ -55,16 +55,10 @@ jobs:
   # -----------------------
   - task: CMake@1
     inputs:
-      cmakeArgs: -A $(vsArch) -DHELICS_ENABLE_SWIG=ON -DBUILD_SHARED_LIBS=ON -DHELICS_BUILD_CXX_SHARED_LIB=ON -DHELICS_BUILD_TESTS=ON -DHELICS_BUILD_EXAMPLES=ON ..
+      cmakeArgs: -A $(vsArch) -DHELICS_ENABLE_SWIG=ON -DBUILD_SHARED_LIBS=ON -DHELICS_BUILD_CXX_SHARED_LIB=ON -DHELICS_ENABLE_PACKAGE_BUILD=ON -DHELICS_BUILD_TESTS=ON -DHELICS_BUILD_EXAMPLES=ON ..
     
     displayName: 'Configure HELICS'
     condition: eq( variables['Agent.OS'], 'Windows_NT' )
-    
-  - task: CMake@1
-    inputs:
-      cmakeArgs: -DHELICS_ENABLE_PACKAGE_BUILD=ON .
-    displayName: 'Configure package build (requires CMake 3.13+)'
-    condition: ne( variables['imageName'], 'vs2015-win2012r2' )
     
   - task: CMake@1
     inputs:
