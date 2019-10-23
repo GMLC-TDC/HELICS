@@ -279,21 +279,21 @@ std::vector<std::pair<int, std::string>> InterfaceInfo::checkInterfacesForIssues
                   fmt::format ("Input {} is single source only but has more than one connection", ipt->key));
             }
         }
-        for (auto &source : ipt->source_types)
+        for (auto &source : ipt->source_info)
         {
-            if (!checkTypeMatch (ipt->type, source.first, ipt->strict_type_matching))
+            if (!checkTypeMatch (ipt->type, std::get<1>(source), ipt->strict_type_matching))
             {
                 issues.emplace_back (
                   helics::defs::errors::connection_failure,
                   fmt::format ("Input \"{}\" source has mismatched types: {} is not compatible with {}", ipt->key,
-                               ipt->type, source.first));
+                               ipt->type, std::get<1> (source)));
             }
-            if ((!ipt->ignore_unit_mismatch) && (!checkUnitMatch (ipt->units, source.second, false)))
+            if ((!ipt->ignore_unit_mismatch) && (!checkUnitMatch (ipt->units, std::get<2> (source), false)))
             {
                 issues.emplace_back (
                   helics::defs::errors::connection_failure,
                   fmt::format ("Input \"{}\" source has incompatible unit: {} is not convertible to {}", ipt->key,
-                               source.second, ipt->units));
+                               std::get<2> (source), ipt->units));
             }
         }
     }

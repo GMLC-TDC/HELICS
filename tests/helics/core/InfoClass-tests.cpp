@@ -273,7 +273,7 @@ TEST (InfoClass_tests, inputinfo_test)
     EXPECT_EQ (subI.required, false);
 
     helics::global_handle testHandle (helics::global_federate_id (5), helics::interface_handle (45));
-    subI.addSource (testHandle, "double", std::string ());
+    subI.addSource (testHandle, "","double", std::string ());
     // No data available, shouldn't get a data_block back
     ret_data = subI.getData (0);
     EXPECT_TRUE (!ret_data);

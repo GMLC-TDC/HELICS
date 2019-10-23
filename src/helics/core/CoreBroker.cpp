@@ -1347,6 +1347,7 @@ void CoreBroker::checkForNamedInterface (ActionMessage &command)
                 routeMessage (command);
                 command.setAction (CMD_ADD_PUBLISHER);
                 command.swapSourceDest ();
+                command.name = pub->key;
                 command.setStringData (pub->type, pub->units);
                 routeMessage (command);
             }
@@ -1383,6 +1384,7 @@ void CoreBroker::checkForNamedInterface (ActionMessage &command)
                 command.setAction (CMD_ADD_SUBSCRIBER);
                 command.swapSourceDest ();
                 command.clearStringData ();
+                command.name = inp->key;
                 routeMessage (command);
             }
             else

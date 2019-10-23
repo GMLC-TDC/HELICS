@@ -1235,7 +1235,7 @@ message_processing_result FederateState::processActionMessage (ActionMessage &cm
         auto subI = interfaceInformation.getInput (cmd.dest_handle);
         if (subI != nullptr)
         {
-            subI->addSource (cmd.getSource (), cmd.getString (typeStringLoc), cmd.getString (unitStringLoc));
+            subI->addSource (cmd.getSource (), cmd.name, cmd.getString (typeStringLoc), cmd.getString (unitStringLoc));
             addDependency (cmd.source_id);
         }
     }
@@ -1262,6 +1262,15 @@ message_processing_result FederateState::processActionMessage (ActionMessage &cm
         }
 
         break;
+    case CMD_REMOVE_NAMED_PUBLICATION:
+    {
+        auto subI = interfaceInformation.getInput (cmd.source_handle);
+        if (subI != nullptr)
+        {
+            subI->removeSource (cmd.name, (cmd.actionTime != timeZero) ? cmd.actionTime : time_granted);
+        }
+        break;
+    }
     case CMD_REMOVE_PUBLICATION:
     {
         auto subI = interfaceInformation.getInput (cmd.dest_handle);

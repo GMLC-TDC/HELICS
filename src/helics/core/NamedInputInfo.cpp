@@ -92,7 +92,7 @@ void NamedInputInfo::addData (global_handle source_id,
     }
 }
 
-void NamedInputInfo::addSource (global_handle newSource, const std::string &stype, const std::string &sunits)
+void NamedInputInfo::addSource (global_handle newSource, const std::string &sourceName, const std::string &stype, const std::string &sunits)
 {
     if (input_sources.empty ())
     {
@@ -100,7 +100,7 @@ void NamedInputInfo::addSource (global_handle newSource, const std::string &styp
         inputUnits = sunits;
     }
     input_sources.push_back (newSource);
-    source_types.emplace_back (stype, sunits);
+    source_info.emplace_back (sourceName, stype, sunits);
     data_queues.resize (input_sources.size ());
     current_data.resize (input_sources.size ());
     deactivated.push_back (Time::maxVal ());
@@ -117,7 +117,29 @@ void NamedInputInfo::removeSource (global_handle sourceToRemove, Time minTime)
             {
                 data_queues[ii].pop_back ();
             }
-            deactivated[ii] = minTime;
+            if (minTime < deactivated[ii])
+            {
+                deactivated[ii] = minTime;
+            }
+        }
+        // there could be duplicate sources so we need to do the full loop
+    }
+}
+
+void NamedInputInfo::removeSource (const std::string &sourceName, Time minTime)
+{
+    for (size_t ii = 0; ii < source_info.size (); ++ii)
+    {
+        if (std::get<0>(source_info[ii]) == sourceName)
+        {
+            while ((!data_queues[ii].empty ()) && (data_queues[ii].back ().time > minTime))
+            {
+                data_queues[ii].pop_back ();
+            }
+            if (minTime < deactivated[ii])
+            {
+                deactivated[ii] = minTime;
+            }
         }
         // there could be duplicate sources so we need to do the full loop
     }
