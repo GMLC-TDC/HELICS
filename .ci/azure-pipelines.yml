@@ -111,7 +111,9 @@ jobs:
     workingDirectory: build
     
   # Packaging tests for VS builds using newer CMake
-  - powershell: ctest --output-on-failure --timeout 480 -C Release -L "PackagingFast"
+  - bash: |
+      ls
+      ctest --output-on-failure --timeout 480 -C Release -L "PackagingFast"
     displayName: 'Test HELICS packaging'
     workingDirectory: build
     condition: ne( variables['imageName'], 'vs2015-win2012r2' )
