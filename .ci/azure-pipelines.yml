@@ -37,14 +37,6 @@ jobs:
     condition: eq( variables['Agent.OS'], 'Windows_NT' )
     displayName: Install swig
     
-  - bash: cmake --version
-    displayName: CMake version
-    
-  - task: CMake@1
-    inputs:
-      cmakeArgs: --version
-    displayName: CMake task version
-    
   - task: UsePythonVersion@0
     inputs:
       versionSpec: '3.4'
@@ -60,7 +52,7 @@ jobs:
   # -----------------------
   - task: CMake@1
     inputs:
-      cmakeArgs: -A $(vsArch) -DHELICS_ENABLE_SWIG=ON -DBUILD_SHARED_LIBS=ON -DHELICS_BUILD_CXX_SHARED_LIB=ON -DHELICS_ENABLE_PACKAGE_BUILD=ON -DHELICS_BUILD_TESTS=ON -DHELICS_BUILD_EXAMPLES=ON ..
+      cmakeArgs: -A $(vsArch) -DHELICS_ENABLE_SWIG=ON -DHELICS_BUILD_CXX_SHARED_LIB=ON -DHELICS_ENABLE_PACKAGE_BUILD=ON -DHELICS_BUILD_TESTS=ON -DHELICS_BUILD_EXAMPLES=ON ..
     displayName: 'Configure HELICS'
     condition: eq( variables['Agent.OS'], 'Windows_NT' )
     
@@ -94,19 +86,6 @@ jobs:
       contents: '*.exe'
       TargetFolder: '$(Build.ArtifactStagingDirectory)'
     condition: ne( variables['imageName'], 'vs2015-win2012r2' )
-    
-  - bash: |
-      tar -zcvf vs2019.tar.gz ../
-    displayName: 'Package HELICS'
-    workingDirectory: build
-    condition: eq( variables['imageName'], 'windows-2019' )
-    
-  - task: CopyFiles@2
-    inputs:
-      sourceFolder: '$(Build.SourcesDirectory)/build'
-      contents: '*.tar.gz'
-      TargetFolder: '$(Build.ArtifactStagingDirectory)'
-    condition: eq( variables['imageName'], 'windows-2019' )
       
   - task: PublishBuildArtifacts@1
     inputs:
@@ -121,13 +100,7 @@ jobs:
     displayName: 'Test HELICS'
     workingDirectory: build
     
-  # Packaging tests for VS builds using newer CMake
-  - bash: |
-      ls
-      ctest --output-on-failure --timeout 480 -C Release -L "PackagingFast"
-      echo "=======CMakeError.log========"
-      cat tests/helics/find_package_tests/CMakeFiles/CMakeError.log
-      echo "=======CMakeOutput.log======="
-      cat tests/helics/find_package_tests/CMakeFiles/CMakeOutput.log
+  # Packaging tests
+  - bash: ctest --output-on-failure --timeout 480 -C Release -L "PackagingFast"
     displayName: 'Test HELICS packaging'
     workingDirectory: build
