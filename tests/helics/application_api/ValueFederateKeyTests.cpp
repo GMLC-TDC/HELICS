@@ -836,6 +836,73 @@ TEST_P (valuefed_all_type_tests, dual_transfer_remove_target)
     vFed2->finalize ();
 }
 
+TEST_F (valuefed_tests, rem_target_single_test)
+{
+    SetupTest<helics::ValueFederate> ("test", 2);
+    auto vFed1 = GetFederateAs<helics::ValueFederate> (0);
+    auto vFed2 = GetFederateAs<helics::ValueFederate> (1);
+
+    // register the publications
+    auto &pubid = vFed1->registerGlobalPublication<std::string> ("pub1");
+
+    auto &subid = vFed2->registerSubscription ("pub1");
+    vFed1->setProperty (helics_property_time_delta, 1.0);
+    vFed2->setProperty (helics_property_time_delta, 1.0);
+
+    auto f1finish = std::async (std::launch::async, [&]() { vFed1->enterExecutingMode (); });
+    vFed2->enterExecutingMode ();
+    f1finish.wait ();
+	//both at executionMode
+    // publish string1 at time=0.0;
+    vFed1->publish (pubid, "string1");
+    auto gtime = vFed1->requestTime (1.0);
+    EXPECT_EQ (gtime, 1.0);
+    // publish a second string
+    vFed1->publish (pubid, "string2");
+    gtime = vFed1->requestTime (2.0);
+    vFed1->publish (pubid, "string3");
+    gtime=vFed1->requestTime (3.0);
+    EXPECT_EQ (gtime, 3.0);
+    vFed1->finalize ();
+
+	//now start on vFed2
+    gtime = vFed2->requestTime (1.0);
+    EXPECT_EQ (gtime, 1.0);
+    // get the value
+    std::string s = vFed2->getString (subid);
+
+    // make sure the string is what we expect
+    EXPECT_EQ (s, "string1");
+    
+    // make sure the value is still what we expect
+    subid.getValue (s);
+    EXPECT_EQ (s, "string1");
+    // the target removal occurs at time 1, thus any message sent after 1.0 should be ignored
+    subid.removeTarget ("pub1");
+    // advance time
+    
+    gtime = vFed2->requestTime (2.0);
+
+    EXPECT_EQ (gtime, 2.0);
+    // make sure the value was updated
+
+    subid.getValue (s);
+
+    EXPECT_EQ (s, "string2");
+   
+    // so in theory the remove target could take a little while since it needs to route through the core on
+    // occasion
+    gtime = vFed2->requestTime (3.0);
+    EXPECT_EQ (gtime, 3.0);
+
+    // make sure the value is still what we expect
+    s = vFed2->getString (subid);
+    // make sure we didn't get the last publish
+    EXPECT_EQ (s, "string2");
+    
+    vFed2->finalize ();
+}
+
 TEST_P (valuefed_single_type_tests, dual_transfer_remove_target_input)
 {
     SetupTest<helics::ValueFederate> (GetParam (), 2);

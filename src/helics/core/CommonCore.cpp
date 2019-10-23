@@ -1122,6 +1122,7 @@ void CommonCore::removeTarget (interface_handle handle, const std::string &targe
         break;
     case handle_type::input:
         cmd.setAction (CMD_REMOVE_NAMED_PUBLICATION);
+        fed->addAction (cmd);
         break;
     case handle_type::endpoint:
         cmd.setAction (CMD_REMOVE_NAMED_FILTER);
@@ -2012,15 +2013,17 @@ std::string CommonCore::coreQuery (const std::string &queryStr) const
     }
     if (queryStr == "publications")
     {
-        return generateStringVector_if (
-          loopHandles, [](const auto &handle) { return handle.key; },
-          [](const auto &handle) { return (handle.handleType == handle_type::publication); });
+        return generateStringVector_if (loopHandles, [](const auto &handle) { return handle.key; },
+                                        [](const auto &handle) {
+                                            return (handle.handleType == handle_type::publication);
+                                        });
     }
     if (queryStr == "endpoints")
     {
-        return generateStringVector_if (
-          loopHandles, [](const auto &handle) { return handle.key; },
-          [](const auto &handle) { return (handle.handleType == handle_type::endpoint); });
+        return generateStringVector_if (loopHandles, [](const auto &handle) { return handle.key; },
+                                        [](const auto &handle) {
+                                            return (handle.handleType == handle_type::endpoint);
+                                        });
     }
     if (queryStr == "dependson")
     {
@@ -3086,10 +3089,12 @@ void CommonCore::checkForNamedInterface (ActionMessage &command)
             }
             command.setAction (CMD_ADD_SUBSCRIBER);
             command.setDestination (pub->handle);
+            auto name = std::move (command.name);
             command.name.clear ();
 
             addTargetToInterface (command);
             command.setAction (CMD_ADD_PUBLISHER);
+            command.name = std::move (name);
             command.swapSourceDest ();
             command.setStringData (pub->type, pub->units);
             addTargetToInterface (command);
@@ -3102,7 +3107,8 @@ void CommonCore::checkForNamedInterface (ActionMessage &command)
     break;
     case CMD_ADD_NAMED_INPUT:
     {
-        auto inp = loopHandles.getInput (command.name);
+        auto inputName = std::move(command.name);
+        auto inp = loopHandles.getInput (inputName);
         if (inp != nullptr)
         {
             if (checkActionFlag (*inp, disconnected_flag))
@@ -3125,6 +3131,7 @@ void CommonCore::checkForNamedInterface (ActionMessage &command)
             command.setAction (CMD_ADD_SUBSCRIBER);
             command.swapSourceDest ();
             command.clearStringData ();
+            command.name = inputName;
             addTargetToInterface (command);
         }
         else
@@ -3941,7 +3948,7 @@ void CommonCore::sendDisconnect ()
 }
 bool CommonCore::checkForLocalPublication (ActionMessage &cmd)
 {
-    auto pub = loopHandles.getPublication (cmd.payload);
+    auto pub = loopHandles.getPublication (cmd.name);
     if (pub != nullptr)
     {
         // now send the same command to the publication
@@ -3956,7 +3963,7 @@ bool CommonCore::checkForLocalPublication (ActionMessage &cmd)
         notice.dest_handle = cmd.source_handle;
         notice.source_id = pub->getFederateId ();
         notice.source_handle = pub->getInterfaceHandle ();
-        notice.payload = pub->type;
+        notice.setStringData (pub->type, pub->units);
         routeMessage (notice);
         return true;
     }
