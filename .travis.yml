@@ -159,6 +159,8 @@ jobs:
         - DISABLE_INTERFACES="Python,Java"
         - SKIP_TEST_RUN=true
         - CORE_CI_TEST=true
+        - ZMQ_SUBPROJECT=true
+        - ZMQ_FORCE_SUBPROJECT=true
         - JOB_OPTION_FLAGS=' -DCMAKE_SH=CMAKE_SH-NOTFOUND'
         - CMAKE_GENERATOR="MinGW Makefiles"
         - HELICS_DEPENDENCY_FLAGS="-DBOOST_INSTALL_PATH=/c/local/boost_1_58_0 -DCMAKE_C_COMPILER=/c/ProgramData/chocolatey/lib/mingw/tools/install/mingw64/bin/gcc.exe -DCMAKE_CXX_COMPILER=/c/ProgramData/chocolatey/lib/mingw/tools/install/mingw64/bin/g++.exe"
