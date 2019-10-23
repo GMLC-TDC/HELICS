@@ -40,6 +40,11 @@ jobs:
   - bash: cmake --version
     displayName: CMake version
     
+  - task: CMake@1
+    inputs:
+      cmakeArgs: --version
+    displayName: CMake task version
+    
   - task: UsePythonVersion@0
     inputs:
       versionSpec: '3.4'
@@ -56,7 +61,6 @@ jobs:
   - task: CMake@1
     inputs:
       cmakeArgs: -A $(vsArch) -DHELICS_ENABLE_SWIG=ON -DBUILD_SHARED_LIBS=ON -DHELICS_BUILD_CXX_SHARED_LIB=ON -DHELICS_ENABLE_PACKAGE_BUILD=ON -DHELICS_BUILD_TESTS=ON -DHELICS_BUILD_EXAMPLES=ON ..
-    
     displayName: 'Configure HELICS'
     condition: eq( variables['Agent.OS'], 'Windows_NT' )
     
