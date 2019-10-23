@@ -805,9 +805,10 @@ TEST_P (valuefed_all_type_tests, dual_transfer_remove_target)
     // make sure the value is still what we expect
     subid.getValue (s);
     EXPECT_EQ (s, "string1");
-    // advance time
+    // the target removal occurs at time 1, thus any message sent after 1.0 should be ignored
     subid.removeTarget ("pub1");
-    f1time = std::async (std::launch::async, [&]() { return vFed1->requestTime (2.0); });
+    // advance time
+    f1time = std::async (std::launch::async, [&] () { return vFed1->requestTime (2.0); });
     gtime = vFed2->requestTime (2.0);
 
     EXPECT_EQ (gtime, 2.0);
@@ -818,26 +819,16 @@ TEST_P (valuefed_all_type_tests, dual_transfer_remove_target)
     subid.getValue (s);
 
     EXPECT_EQ (s, "string2");
-
+    vFed1->publish (pubid, "string3");
     // so in theory the remove target could take a little while since it needs to route through the core on
     // occasion
-    // and this is an asynchronous operation so there is no guarantees the remove will stop the next broadcast
-    // but it should do it within the next timestep so we have an extra loop here
-    f1time = std::async (std::launch::async, [&]() {
-        vFed1->requestTime (3.0);
-        return vFed1->requestTime (4.0);
-    });
+    f1time = std::async (std::launch::async, [&] () { return vFed1->requestTime (3.0); });
     gtime = vFed2->requestTime (3.0);
-    gtime = vFed2->requestTime (4.0);
-    EXPECT_EQ (gtime, 4.0);
+    EXPECT_EQ (gtime, 3.0);
     gtime = f1time.get ();
-    EXPECT_EQ (gtime, 4.0);
-    vFed1->publish (pubid, "string3");
-    // make sure the value is still what we expect
+    EXPECT_EQ (gtime, 3.0);
 
-    // advance time
-    f1time = std::async (std::launch::async, [&]() { return vFed1->requestTime (5.0); });
-    gtime = vFed2->requestTime (5.0);
+    // make sure the value is still what we expect
     s = vFed2->getString (subid);
     // make sure we didn't get the last publish
     EXPECT_EQ (s, "string2");
