@@ -90,6 +90,13 @@ jobs:
       contents: '*.exe'
       TargetFolder: '$(Build.ArtifactStagingDirectory)'
     condition: ne( variables['imageName'], 'vs2015-win2012r2' )
+    
+  - task: CopyFiles@2
+    inputs:
+      sourceFolder: '$(Build.SourcesDirectory)/..
+      contents: '*'
+      TargetFolder: '$(Build.ArtifactStagingDirectory)'
+    condition: eq variables['imageName'], 'windows-2019' )
       
   - task: PublishBuildArtifacts@1
     inputs:
@@ -114,4 +121,3 @@ jobs:
       cat tests/helics/find_package_tests/CMakeFiles/CMakeOutput.log
     displayName: 'Test HELICS packaging'
     workingDirectory: build
-    condition: ne( variables['imageName'], 'vs2015-win2012r2' )
