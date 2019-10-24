@@ -71,7 +71,7 @@ jobs:
   # -----------------------
   # Build HELICS
   # -----------------------
-  - bash: cmake --build . --config Release
+  - bash: cmake --build . --config Release -- -maxcpucount:2
     displayName: 'Build HELICS'
     workingDirectory: build
     
