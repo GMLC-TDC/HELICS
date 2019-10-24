@@ -58,6 +58,12 @@ jobs:
     
   - task: CMake@1
     inputs:
+      cmakeArgs: -DBUILD_PYTHON_INTERFACE=ON .
+    displayName: 'Configure Python interface'
+    condition: and(ne( variables['imageName'], 'vs2015-win2012r2' ), eq( variables['langArch'], 'x64' ))
+    
+  - task: CMake@1
+    inputs:
       cmakeArgs: -DBUILD_JAVA_INTERFACE=ON .
     displayName: 'Configure Java interface'
     condition: and(ne( variables['imageName'], 'vs2015-win2012r2' ), eq( variables['langArch'], 'x64' ))
