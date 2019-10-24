@@ -74,14 +74,14 @@ set(
                                    ${helics_shared_public_headers}
                                    ${helics_shared_private_headers})
 
-target_compile_options(helics-shared PUBLIC $<$<CXX_COMPILER_ID:MSVC>:/wd4251>)
-
 target_link_libraries(helics-shared PRIVATE helics_core)
 target_compile_definitions(helics-shared PRIVATE helics_shared_EXPORTS PUBLIC HELICS_SHARED_LIBRARY)
 
 if(MSYS AND USE_LIBCXX)
     target_compile_definitions(helics-shared PUBLIC "-DSTX_NO_STD_OPTIONAL=1")
 endif()
+
+target_compile_options(helics-shared PUBLIC $<$<CXX_COMPILER_ID:MSVC>:/wd4251>)
 
     add_library(HELICS::helics-shared ALIAS helics-shared)
 

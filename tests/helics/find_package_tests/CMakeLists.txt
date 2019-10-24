@@ -19,10 +19,6 @@ if(NOT EXISTS ${HELICS_BROKER})
     message(FATAL_ERROR "unable to locate HELICS_BROKER at ${HELICS_BROKER}")
 endif()
 
-# Test the CXX static library target
-add_executable(static-library-test main.cpp)
-target_link_libraries(static-library-test HELICS::helics-static)
-
 # Test the CXX shared library target
 if(HELICS_BUILD_CXX_SHARED_LIB)
     add_executable(shared-library-test main.cpp)
@@ -39,8 +35,3 @@ if(NOT HELICS_DISABLE_C_SHARED_LIB)
     set_property(TARGET cpp98-shared-library-test PROPERTY CXX_STANDARD 98)
 endif()
 
-# Test the helics_app static library target
-if(HELICS_BUILD_APP_LIBRARY)
-    add_executable(apps-library-test main-apps.cpp)
-    target_link_libraries(apps-library-test HELICS::helics_apps)
-endif()
