@@ -1,4 +1,4 @@
-# Integrating a Simulator into HELICS #
+# Integrating a Simulator with HELICS #
 
 At some point, maybe from the very beginning of your time with HELICS co-simulation, you'll have an interest or need to include a simulator in your co-simulation that HELICS doesn't support. Maybe it's an existing open-source simulator, maybe it's commercial software, maybe it's a small controller simulator you'd like to test in an existing model. HELICS has been designed to make it as easy as possible to integrate a new simulator. Before writing code, though, it is important to more specifically define the task.
 

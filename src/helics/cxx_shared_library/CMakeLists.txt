@@ -41,7 +41,7 @@ set(
     ../application_api/FilterFederateManager.hpp
 )
 
-set(conv_headers ../application_api.hpp ../ValueFederates.hpp ../MessageFederates.hpp)
+set(conv_headers ../application_api.hpp ../ValueFederates.hpp ../MessageFederates.hpp ../helics.hpp)
 set(basic_headers ../helics_enums.h)
 
 set(

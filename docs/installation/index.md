@@ -57,6 +57,7 @@ Alternatively, you can install from source. See the next section for more inform
     linux
     docker
     language
+	linking
     helics_cmake_options
 ```
 

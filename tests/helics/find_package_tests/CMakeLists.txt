@@ -15,8 +15,8 @@ project(HELICS-find-package-test)
 find_package(HELICS 2.3 REQUIRED)
 
 # add some tests inside of the CMake
-if(NOT EXISTS ${HELICS_BROKER})
-    message(FATAL_ERROR "unable to locate HELICS_BROKER at ${HELICS_BROKER}")
+if(NOT TARGET HELICS::helics_broker)
+    message(FATAL_ERROR "unable to locate HELICS_BROKER target")
 endif()
 
 # Test the CXX shared library target
