@@ -79,9 +79,11 @@ if (NOT TARGET HELICS::utilities)
     set_target_properties(HELICS::utilities PROPERTIES
        INTERFACE_INCLUDE_DIRECTORIES ${CMAKE_CURRENT_LIST_DIR}/../../../@CMAKE_INSTALL_INCLUDEDIR@/helics/
     )
-    set_target_properties(HELICS::utilities PROPERTIES
-       INTERFACE_LINK_LIBRARIES "HELICS::helics-static"
-    )
+    if (TARGET HELICS::helics-static)
+        set_target_properties(HELICS::utilities PROPERTIES
+           INTERFACE_LINK_LIBRARIES "HELICS::helics-static"
+        )
+    endif()
 else()
 set_target_properties(HELICS::utilities PROPERTIES
        INTERFACE_INCLUDE_DIRECTORIES ${CMAKE_CURRENT_LIST_DIR}/../../../@CMAKE_INSTALL_INCLUDEDIR@/helics/
@@ -117,19 +119,19 @@ if (@HELICS_BUILD_CXX_SHARED_LIB@)
 
 endif()
 
-get_target_property(${PN}_STATIC_LIBRARY HELICS::helics-static LOCATION)
-
-if (EXISTS ${CMAKE_CURRENT_LIST_DIR}/include)
-    set_property(TARGET HELICS::helics-static  APPEND PROPERTY
-            INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_CURRENT_LIST_DIR}/include"
+if (TARGET HELICS::helics-static)
+    get_target_property(${PN}_STATIC_LIBRARY HELICS::helics-static LOCATION)
+    if (EXISTS ${CMAKE_CURRENT_LIST_DIR}/include)
+        set_property(TARGET HELICS::helics-static  APPEND PROPERTY
+                INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_CURRENT_LIST_DIR}/include"
+            )
+    endif()
+    if (NOT EXISTS ${CMAKE_CURRENT_LIST_DIR}/../../../@CMAKE_INSTALL_INCLUDEDIR@/helics/utilities)
+        set_property(TARGET HELICS::helics-static APPEND PROPERTY
+                INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_CURRENT_LIST_DIR}/../ThirdParty/utilities/gmlc/utilities/"
         )
+    endif()
 endif()
-if (NOT EXISTS ${CMAKE_CURRENT_LIST_DIR}/../../../@CMAKE_INSTALL_INCLUDEDIR@/helics/utilities)
-    set_property(TARGET HELICS::helics-static APPEND PROPERTY
-            INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_CURRENT_LIST_DIR}/../ThirdParty/utilities/gmlc/utilities/"
-    )
-endif()
-
 
 
 message(STATUS "INCLUDE DIRS HELICS: ${HELICS_INCLUDE_DIRS}")
