@@ -34,11 +34,11 @@ if (@HELICS_BUILD_CXX_SHARED_LIB@)
     endif()
     
 	get_target_property(${PN}_INCLUDE_DIRS HELICS::helics-shared INTERFACE_INCLUDE_DIRECTORIES)
-	get_target_property(HELICS_APPLIB_LOCATION HELICS::helics-shared LOCATION)
+	get_target_property(HELICS_LIB_LOCATION HELICS::helics-shared LOCATION)
 elseif (NOT @HELICS_DISABLE_C_SHARED_LIB@)
-	get_target_property(HELICS_APPLIB_LOCATION HELICS::helicsSharedLib LOCATION)
+	get_target_property(HELICS_LIB_LOCATION HELICS::helicsSharedLib LOCATION)
 else()
-	get_filename_component(HELICS_APPLIB_LOCATION "${CMAKE_CURRENT_LIST_DIR}" PATH)
+	get_filename_component(HELICS_LIB_LOCATION "${CMAKE_CURRENT_LIST_DIR}" PATH)
 endif()
 
 message(STATUS "INCLUDE DIRS HELICS: ${HELICS_INCLUDE_DIRS}")
@@ -47,11 +47,12 @@ message(STATUS "C_SHARED_LIBRARY: ${HELICS_C_SHARED_LIBRARY}")
 #load some variables with the locations the different executables
 if (@HELICS_BUILD_APP_EXECUTABLES@)
 
-get_filename_component(APP_CHECK_LOC "${HELICS_APPLIB_LOCATION}" PATH)
+get_filename_component(APP_CHECK_LOC "${HELICS_LIB_LOCATION}" PATH)
 get_filename_component(APP_CHECK_LOC2 "${APP_CHECK_LOC}" PATH)
 
 find_program(HELICS_PLAYER helics_player 
     PATHS ${PACKAGE_PREFIX_DIR}/@CMAKE_INSTALL_BINDIR@ 
+	${HELICS_LIB_LOCATION}
     ${APP_CHECK_LOC}
     ${APP_CHECK_LOC2}
     PATH_SUFFIXES Release @CMAKE_INSTALL_BINDIR@ Debug
@@ -63,6 +64,7 @@ find_program(HELICS_PLAYER helics_player
     
 find_program(HELICS_RECORDER helics_recorder 
     PATHS ${PACKAGE_PREFIX_DIR}/@CMAKE_INSTALL_BINDIR@
+	${HELICS_LIB_LOCATION}
     ${APP_CHECK_LOC}
     ${APP_CHECK_LOC2}
     PATH_SUFFIXES Release @CMAKE_INSTALL_BINDIR@ Debug
@@ -73,6 +75,7 @@ find_program(HELICS_RECORDER helics_recorder
     
 find_program(HELICS_APP helics_app 
     PATHS ${PACKAGE_PREFIX_DIR}/@CMAKE_INSTALL_BINDIR@
+	${HELICS_LIB_LOCATION}
     ${APP_CHECK_LOC}
     ${APP_CHECK_LOC2}
     PATH_SUFFIXES Release @CMAKE_INSTALL_BINDIR@ Debug
@@ -83,6 +86,7 @@ find_program(HELICS_APP helics_app
     
 find_program(HELICS_BROKER helics_broker 
     PATHS ${PACKAGE_PREFIX_DIR}/@CMAKE_INSTALL_BINDIR@
+	${HELICS_LIB_LOCATION}
     ${APP_CHECK_LOC}
     ${APP_CHECK_LOC2}
     PATH_SUFFIXES Release @CMAKE_INSTALL_BINDIR@ Debug
@@ -91,7 +95,7 @@ find_program(HELICS_BROKER helics_broker
     NO_CMAKE_SYSTEM_PATH
     )
     
-    unset(HELICS_APPLIB_LOCATION)
+    unset(HELICS_LIB_LOCATION)
     unset(APP_CHECK_LOC)
     unset(APP_CHECK_LOC2)
 endif()  #HELICS_BUILD_APP_EXECUTABLES

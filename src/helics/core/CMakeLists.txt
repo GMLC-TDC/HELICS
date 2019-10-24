@@ -242,3 +242,5 @@ if(ENABLE_MPI_CORE)
             "${MPI_C_ADDITIONAL_INCLUDE_DIRS}"
     )
 endif(ENABLE_MPI_CORE)
+
+add_library(HELICS::ccore ALIAS helics_core)

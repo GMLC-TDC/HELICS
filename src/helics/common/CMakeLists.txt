@@ -70,3 +70,5 @@ endif(ENABLE_ZMQ_CORE)
 if(APPLE)
     target_compile_definitions(helics_common PUBLIC "-DSTX_NO_STD_ANY=1")
 endif(APPLE)
+
+add_library(HELICS::common ALIAS helics_common)

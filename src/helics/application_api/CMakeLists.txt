@@ -75,3 +75,5 @@ target_compile_definitions(helics_application_api PUBLIC HELICS_CXX_STATIC_DEFIN
 if(MSYS AND USE_LIBCXX)
     target_compile_definitions(helics_application_api PUBLIC "-DSTX_NO_STD_OPTIONAL=1")
 endif()
+
+add_library(HELICS::application_api ALIAS helics_application_api)

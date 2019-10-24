@@ -47,7 +47,7 @@ if(HELICS_BUILD_APP_LIBRARY)
     target_link_libraries(helics_apps PRIVATE HELICS::compile_flags_target fmt::fmt)
     
     # add and alias library to match the find_package
-    add_library(HELICS::helics_apps ALIAS helics_apps)
+    add_library(HELICS::apps ALIAS helics_apps)
 
     if(HELICS_BUILD_APP_EXECUTABLES)
         add_executable(helics_player playerMain.cpp)
