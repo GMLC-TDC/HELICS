@@ -67,6 +67,20 @@ else()
                     COMPONENT
                     python
             )
+            
+            if(WIN32)
+                add_custom_command(
+                    TARGET
+                    _helics
+                    POST_BUILD
+                    COMMAND
+                        ${CMAKE_COMMAND}
+                        -E
+                        copy_if_different # which executes "cmake - E copy_if_different..."
+                        "${CMAKE_CURRENT_BINARY_DIR}/helics.py" # <--this is in-file
+                        "$<TARGET_FILE_DIR:_helics>/"
+                )
+            endif()
 
             copy_key_files_to_target_location(_helics)
             copy_shared_target(_helics)
@@ -99,6 +113,10 @@ else()
                            ${CMAKE_CURRENT_BINARY_DIR}/setup.py)
             configure_file(${CMAKE_CURRENT_SOURCE_DIR}/helics.py
                            ${CMAKE_CURRENT_BINARY_DIR}/helics.py COPYONLY)
+            if(WIN32)
+                configure_file(${CMAKE_CURRENT_SOURCE_DIR}/helics.py
+                               $<TARGET_FILE_DIR:helicsPYTHON>/helics.py COPYONLY)
+            endif()
 
         endif()
     else()
@@ -178,6 +196,20 @@ else()
                     COMPONENT
                     python
             )
+
+            if(WIN32)
+                add_custom_command(
+                    TARGET
+                    _helics
+                    POST_BUILD
+                    COMMAND
+                        ${CMAKE_COMMAND}
+                        -E
+                        copy_if_different # which executes "cmake - E copy_if_different..."
+                        "${CMAKE_CURRENT_BINARY_DIR}/helics.py" # <--this is in-file
+                        "$<TARGET_FILE_DIR:_helics>/"
+                )
+            endif()
 
             copy_key_files_to_target_location(_helics)
             copy_shared_target(_helics)
@@ -259,6 +291,10 @@ else()
                            ${CMAKE_CURRENT_BINARY_DIR}/setup.py)
             configure_file(${CMAKE_CURRENT_SOURCE_DIR}/helics.py
                            ${CMAKE_CURRENT_BINARY_DIR}/helics.py COPYONLY)
+            if(WIN32)
+                configure_file(${CMAKE_CURRENT_SOURCE_DIR}/helics.py
+                               $<TARGET_FILE_DIR:helicsPYTHON>/helics.py COPYONLY)
+            endif()
 
         endif()
     endif()
