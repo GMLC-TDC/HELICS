@@ -10,7 +10,7 @@ Header file for inclusion of the entire apps library
 */
 #pragma once
 
-#include "apps/BrokerApp.hpp"
+#include "application_api/BrokerApp.hpp"
 #include "apps/Echo.hpp"
 #include "apps/Player.hpp"
 #include "apps/Recorder.hpp"
