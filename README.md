@@ -24,6 +24,11 @@
   <td><a href="https://travis-ci.org/GMLC-TDC/HELICS"><img src="https://travis-ci.org/GMLC-TDC/HELICS.svg?branch=develop" alt="Build Status" /></a></td>
   </tr>
   <tr>
+  <td>Azure</td>
+  <td><a href="https://dev.azure.com/HELICS-test/HELICS/_build/latest?definitionId=5&branchName=master"><img src="https://dev.azure.com/HELICS-test/HELICS/_apis/build/status/GMLC-TDC.HELICS?branchName=master" alt="Build Status" /></a></td>
+  <td><a href="https://dev.azure.com/HELICS-test/HELICS/_build/latest?definitionId=5&branchName=develop"><img src="https://dev.azure.com/HELICS-test/HELICS/_apis/build/status/GMLC-TDC.HELICS?branchName=develop" alt="Build Status" /></a></td>
+  </tr>
+  <tr>
   <td>Appveyor</td>
   <td><a href="https://ci.appveyor.com/project/HELICS/helics/branch/master"><img src="https://ci.appveyor.com/api/projects/status/9rnwrtelsa68k5lt/branch/master?svg=true" alt="Build Status" /></a></td>
   <td><a href="https://ci.appveyor.com/project/HELICS/helics/branch/develop"><img src="https://ci.appveyor.com/api/projects/status/9rnwrtelsa68k5lt/branch/develop?svg=true" alt="Build Status" /></a></td>
