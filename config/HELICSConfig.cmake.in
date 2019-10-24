@@ -2,9 +2,19 @@
 # This module sets the following variables in your project::
 #
 #   HELICS_FOUND - true if HELICS found on the system
-#   HELICS_INCLUDE_DIR - the directory containing HELICS headers
+#   HELICS_INCLUDE_DIR - the directory containing HELICS headers for the C shared library if available
 #   HELICS_C_SHARED_LIBRARY - the C shared library
 # 	HELICS_CXX_SHARED_LIBRARY -the C++ shared library
+#   It also creates the following targets if they are available (not all are always built depending on the configuration)
+#   HELICS::helicsSharedLib for the C based shared library
+#   HELICS::helics-shared for C++ based shared libary
+#   HELICS::cpp98 for the C++98 header only library wrapper for the C shared library
+#   HELICS::helics_player is an execuable target for the HELICS player
+#   HELICS::helics_broker is an executable target for the helics broker executable
+#   HELICS::helics_recorder is an executable target for the helics_recorder executable
+#   HELICS::helics_app is an executable target for the helics_app executable
+#   HELICS::helics_broker_server is an executable target for the helics_broker_server executable
+#   HELICS::helics-config is a an executable target for the helics-config application
 
 @PACKAGE_INIT@
 
@@ -30,33 +40,12 @@ if (@HELICS_BUILD_CXX_SHARED_LIB@)
         )
     endif()
     
-	get_target_property(${PN}_INCLUDE_DIRS HELICS::helics-shared INTERFACE_INCLUDE_DIRECTORIES)
-elseif (NOT @HELICS_DISABLE_C_SHARED_LIB@)
-	get_target_property(HELICS_LIB_LOCATION HELICS::helicsSharedLib LOCATION)
+endif()
+
+if (NOT @HELICS_DISABLE_C_SHARED_LIB@)
 	get_target_property(${PN}_INCLUDE_DIRS HELICS::helicsSharedLib INTERFACE_INCLUDE_DIRECTORIES)
-endif()
-
-message(STATUS "INCLUDE DIRS HELICS: ${HELICS_INCLUDE_DIRS}")
-message(STATUS "C_SHARED_LIBRARY: ${HELICS_C_SHARED_LIBRARY}")
-
-if (TARGET HELICS::helics_player)
-	add_executable(HELICS::Player ALIAS HELICS::helics_player)
-endif()
-
-if (TARGET HELICS::helics_recorder)
-	add_executable(HELICS::Recorder ALIAS HELICS::helics_recorder)
-endif()
-
-if (TARGET HELICS::helics_broker)
-	add_executable(HELICS::Broker ALIAS HELICS::helics_broker)
-endif()
-
-if (TARGET HELICS::helics_broker_server)
-	add_executable(HELICS::Broker_server ALIAS HELICS::helics_broker_server)
-endif()
-
-if (TARGET HELICS::helics_app)
-	add_executable(HELICS::App ALIAS HELICS::helics_app)
+	message(STATUS "HELICS_INCLUDE DIR HELICS: ${HELICS_INCLUDE_DIR}")
+    message(STATUS "HELICS_C_SHARED_LIBRARY: ${HELICS_C_SHARED_LIBRARY}")
 endif()
 
 set(CMAKE_MODULE_PATH ${SAVED_PARENT_CMAKE_MODULE_PATH})
