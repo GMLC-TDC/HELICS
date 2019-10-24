@@ -57,7 +57,7 @@ add_library(helics_common STATIC ${common_sources} ${common_headers})
 set_target_properties(helics_common PROPERTIES LINKER_LANGUAGE CXX)
 
 target_link_libraries(helics_common PUBLIC helics_base helics_base_includes PRIVATE compile_flags_target)
-target_link_libraries(helics_common PUBLIC HELICS::jsoncpp_lib HELICS::utilities HELICS::units-static) 
+target_link_libraries(helics_common PUBLIC HELICS::jsoncpp_lib HELICS::utilities HELICS::units) 
 
 if(TARGET Boost::boost)
    target_link_libraries(helics_common PRIVATE Boost::boost)
