@@ -93,19 +93,6 @@ jobs:
       TargetFolder: '$(Build.ArtifactStagingDirectory)'
     condition: ne( variables['imageName'], 'vs2015-win2012r2' )
   
-  - bash: |
-      tar -zcvf vs2019.tar.gz ../
-    displayName: 'Package HELICS'
-    workingDirectory: build
-    condition: eq( variables['imageName'], 'windows-2019' )
-    
-  - task: CopyFiles@2
-    inputs:
-      sourceFolder: '$(Build.SourcesDirectory)/build'
-      contents: '*.tar.gz'
-      TargetFolder: '$(Build.ArtifactStagingDirectory)'
-    condition: eq( variables['imageName'], 'windows-2019' )
-  
   - task: PublishBuildArtifacts@1
     inputs:
       pathtoPublish: '$(Build.ArtifactStagingDirectory)'
