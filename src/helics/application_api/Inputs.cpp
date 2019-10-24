@@ -373,7 +373,7 @@ int Input::getValue (double *data, int maxsize)
 {
     auto V = getValueRef<std::vector<double>> ();
     int length = std::min (static_cast<int> (V.size ()), maxsize);
-    std::copy (V.data (), V.data () + length, data);
+    std::copy (V.begin (), V.begin () + length, data);
     hasUpdate = false;
     return length;
 }
