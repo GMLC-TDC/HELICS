@@ -5,10 +5,7 @@
 #   HELICS_INCLUDE_DIR - the directory containing HELICS headers
 #   HELICS_C_SHARED_LIBRARY - the C shared library
 # 	HELICS_CXX_SHARED_LIBRARY -the C++ shared library
-#   HELICS_PLAYER -- the player executable
-#  	HELICS_RECORDER -- the recorder executable
-#   HELICS_APP  -- the helics app executable
-#   HELICS_BROKER -- the helics broker executable
+
 @PACKAGE_INIT@
 
 set(PN HELICS)
@@ -34,70 +31,32 @@ if (@HELICS_BUILD_CXX_SHARED_LIB@)
     endif()
     
 	get_target_property(${PN}_INCLUDE_DIRS HELICS::helics-shared INTERFACE_INCLUDE_DIRECTORIES)
-	get_target_property(HELICS_LIB_LOCATION HELICS::helics-shared LOCATION)
 elseif (NOT @HELICS_DISABLE_C_SHARED_LIB@)
 	get_target_property(HELICS_LIB_LOCATION HELICS::helicsSharedLib LOCATION)
-else()
-	get_filename_component(HELICS_LIB_LOCATION "${CMAKE_CURRENT_LIST_DIR}" PATH)
+	get_target_property(${PN}_INCLUDE_DIRS HELICS::helicsSharedLib INTERFACE_INCLUDE_DIRECTORIES)
 endif()
 
 message(STATUS "INCLUDE DIRS HELICS: ${HELICS_INCLUDE_DIRS}")
 message(STATUS "C_SHARED_LIBRARY: ${HELICS_C_SHARED_LIBRARY}")
 
-#load some variables with the locations the different executables
-if (@HELICS_BUILD_APP_EXECUTABLES@)
+if (TARGET HELICS::helics_player)
+	add_executable(HELICS::Player ALIAS HELICS::helics_player)
+endif()
 
-get_filename_component(APP_CHECK_LOC "${HELICS_LIB_LOCATION}" PATH)
-get_filename_component(APP_CHECK_LOC2 "${APP_CHECK_LOC}" PATH)
+if (TARGET HELICS::helics_recorder)
+	add_executable(HELICS::Recorder ALIAS HELICS::helics_recorder)
+endif()
 
-find_program(HELICS_PLAYER helics_player 
-    PATHS ${PACKAGE_PREFIX_DIR}/@CMAKE_INSTALL_BINDIR@ 
-	${HELICS_LIB_LOCATION}
-    ${APP_CHECK_LOC}
-    ${APP_CHECK_LOC2}
-    PATH_SUFFIXES Release @CMAKE_INSTALL_BINDIR@ Debug
-    NO_CMAKE_PATH
-    NO_CMAKE_ENVIRONMENT_PATH
-    NO_CMAKE_SYSTEM_PATH
-    )
-    
-    
-find_program(HELICS_RECORDER helics_recorder 
-    PATHS ${PACKAGE_PREFIX_DIR}/@CMAKE_INSTALL_BINDIR@
-	${HELICS_LIB_LOCATION}
-    ${APP_CHECK_LOC}
-    ${APP_CHECK_LOC2}
-    PATH_SUFFIXES Release @CMAKE_INSTALL_BINDIR@ Debug
-    NO_CMAKE_PATH
-    NO_CMAKE_ENVIRONMENT_PATH
-    NO_CMAKE_SYSTEM_PATH
-    )
-    
-find_program(HELICS_APP helics_app 
-    PATHS ${PACKAGE_PREFIX_DIR}/@CMAKE_INSTALL_BINDIR@
-	${HELICS_LIB_LOCATION}
-    ${APP_CHECK_LOC}
-    ${APP_CHECK_LOC2}
-    PATH_SUFFIXES Release @CMAKE_INSTALL_BINDIR@ Debug
-    NO_CMAKE_PATH
-    NO_CMAKE_ENVIRONMENT_PATH
-    NO_CMAKE_SYSTEM_PATH
-    )
-    
-find_program(HELICS_BROKER helics_broker 
-    PATHS ${PACKAGE_PREFIX_DIR}/@CMAKE_INSTALL_BINDIR@
-	${HELICS_LIB_LOCATION}
-    ${APP_CHECK_LOC}
-    ${APP_CHECK_LOC2}
-    PATH_SUFFIXES Release @CMAKE_INSTALL_BINDIR@ Debug
-    NO_CMAKE_PATH
-    NO_CMAKE_ENVIRONMENT_PATH
-    NO_CMAKE_SYSTEM_PATH
-    )
-    
-    unset(HELICS_LIB_LOCATION)
-    unset(APP_CHECK_LOC)
-    unset(APP_CHECK_LOC2)
-endif()  #HELICS_BUILD_APP_EXECUTABLES
+if (TARGET HELICS::helics_broker)
+	add_executable(HELICS::Broker ALIAS HELICS::helics_broker)
+endif()
+
+if (TARGET HELICS::helics_broker_server)
+	add_executable(HELICS::Broker_server ALIAS HELICS::helics_broker_server)
+endif()
+
+if (TARGET HELICS::helics_app)
+	add_executable(HELICS::App ALIAS HELICS::helics_app)
+endif()
 
 set(CMAKE_MODULE_PATH ${SAVED_PARENT_CMAKE_MODULE_PATH})

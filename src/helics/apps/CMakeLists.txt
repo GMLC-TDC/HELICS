@@ -57,6 +57,7 @@ if(HELICS_BUILD_APP_LIBRARY)
         install(
             TARGETS
                 helics_player
+				EXPORT ${HELICS_EXPORT_COMMAND}
                 DESTINATION
                 ${CMAKE_INSTALL_BINDIR}
                 COMPONENT
@@ -70,6 +71,7 @@ if(HELICS_BUILD_APP_LIBRARY)
         install(
             TARGETS
                 helics_recorder
+				EXPORT ${HELICS_EXPORT_COMMAND}
                 DESTINATION
                 ${CMAKE_INSTALL_BINDIR}
                 COMPONENT
@@ -106,6 +108,7 @@ if(HELICS_BUILD_APP_LIBRARY)
             TARGETS
                 helics_broker
                 helics_broker_server
+				EXPORT ${HELICS_EXPORT_COMMAND}
                 DESTINATION
                 ${CMAKE_INSTALL_BINDIR}
                 COMPONENT
@@ -119,6 +122,7 @@ if(HELICS_BUILD_APP_LIBRARY)
         install(
             TARGETS
                 helics_app
+				EXPORT ${HELICS_EXPORT_COMMAND}
                 DESTINATION
                 ${CMAKE_INSTALL_BINDIR}
                 COMPONENT
@@ -161,7 +165,7 @@ if(NOT CYGWIN)
         )
 
         install(
-            TARGETS helics-config
+            TARGETS helics-config EXPORT ${HELICS_EXPORT_COMMAND}
             RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR} COMPONENT libs
         )
 
