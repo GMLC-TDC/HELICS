@@ -52,7 +52,7 @@ jobs:
   # -----------------------
   - task: CMake@1
     inputs:
-      cmakeArgs: -A $(vsArch) -DHELICS_ENABLE_SWIG=ON -DHELICS_BUILD_CXX_SHARED_LIB=ON -DHELICS_ENABLE_PACKAGE_BUILD=ON -DHELICS_BUILD_TESTS=ON -DHELICS_BUILD_EXAMPLES=ON -DCMAKE_CXX_FLAGS="/MP2" ..
+      cmakeArgs: -A $(vsArch) -DHELICS_ENABLE_SWIG=ON -DHELICS_BUILD_CXX_SHARED_LIB=ON -DHELICS_ENABLE_PACKAGE_BUILD=ON -DHELICS_BUILD_TESTS=ON -DHELICS_BUILD_EXAMPLES=ON ..
     displayName: 'Configure HELICS'
     condition: eq( variables['Agent.OS'], 'Windows_NT' )
     
@@ -71,7 +71,7 @@ jobs:
   # -----------------------
   # Build HELICS
   # -----------------------
-  - bash: cmake --build . --config Release -- -maxcpucount:2
+  - bash: cmake --build . --config Release
     displayName: 'Build HELICS'
     workingDirectory: build
     
