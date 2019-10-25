@@ -84,7 +84,7 @@ TEST (broker_timeout_tests, core_fail_error)
     Fed1->finalize ();
 }
 
-TEST (broker_timeout_tests, maintain_connection_ci_skip)
+TEST (broker_timeout_tests, maintain_connection)
 {
     auto brk = helics::BrokerFactory::create (helics::core_type::ZMQ, "--timeout=100ms");
     brk->connect ();
@@ -99,7 +99,7 @@ TEST (broker_timeout_tests, maintain_connection_ci_skip)
     sub1.setDefault (std::string ("String1"));
 
     Fed1->enterExecutingMode ();
-    int counter = 45;
+    int counter = 50;
     while (counter > 0)
     {
         std::this_thread::sleep_for (std::chrono::seconds (1));
