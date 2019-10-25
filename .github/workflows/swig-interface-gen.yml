@@ -28,8 +28,9 @@ jobs:
       run: |
         git diff --name-only | grep -E 'interfaces/*'
         if [[ "$?" == "0" ]];
+        then
           hash=$(sha256sum $(git diff --name-only | grep -E 'interfaces/*' | xargs) | sha256sum | cut -c 1-5 -)
           echo "ChangeHash=$hash"
-          echo ::set-env name=CREATE_PR_BRANCH::swig-update-${hash}
+          echo "::set-env name=CREATE_PR_BRANCH::swig-update-${hash}"
         fi
     - uses: ./.github/actions/create-file-update-pr
