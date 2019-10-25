@@ -3,6 +3,7 @@ FROM alpine:latest
 RUN apk add --no-cache \
     bash \
     jq \
+    git \
     ca-certificates \
     curl
 
