@@ -26,11 +26,12 @@ jobs:
         popd
     - name: Check changed files
       run: |
-        git diff --name-only | grep -E 'interfaces/*'
+        git diff --name-only | grep -E 'interfaces/*' > swig-changed-files.txt
         if [[ "$?" == "0" ]];
         then
-          hash=$(sha256sum $(git diff --name-only | grep -E 'interfaces/*' | xargs) | sha256sum | cut -c 1-5 -)
+          hash=$(sha256sum $(cat swig-changed-files.txt) | sha256sum | cut -c 1-5 -)
           echo "ChangeHash=$hash"
           echo "::set-env name=CREATE_PR_BRANCH::swig-update-${hash}"
         fi
+        rm swig-changed-files.txt
     - uses: ./.github/actions/create-file-update-pr
