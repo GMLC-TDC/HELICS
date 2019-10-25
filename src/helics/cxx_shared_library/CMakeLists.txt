@@ -115,6 +115,7 @@ set(core_include_files
 	../core/helics_definitions.hpp 
 	../core/helicsCLI11.hpp
 	../core/helicsVersion.hpp
+	../core/core-exceptions.hpp
 	)
 
 file(
