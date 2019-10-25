@@ -1,0 +1,5 @@
+name: 'Test'
+description: 'Testing local action'
+runs:
+  using: 'docker'
+  image: '.github/actions/create-file-update-pr/Dockerfile'

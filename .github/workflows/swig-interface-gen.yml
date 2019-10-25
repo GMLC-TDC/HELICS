@@ -27,3 +27,4 @@ jobs:
     - name: Check changed files
       run: |
         git status
+    - uses: .github/actions/create-file-update-pr
