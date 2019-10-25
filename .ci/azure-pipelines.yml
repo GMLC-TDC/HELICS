@@ -1,0 +1,112 @@
+jobs:
+- job: Windows
+  strategy:
+    matrix:
+      VS2015-64bit:
+        imageName: "vs2015-win2012r2"
+        langArch: "x64"
+        vsArch: "x64"
+      VS2017-32bit:
+        imageName: "vs2017-win2016"
+        langArch: "x86"
+        vsArch: "Win32"
+      VS2017-64bit:
+        imageName: "vs2017-win2016"
+        langArch: "x64"
+        vsArch: "x64"
+      VS2019-64bit:
+        imageName: "windows-2019"
+        langArch: "x64"
+        vsArch: "x64"
+  pool:
+    vmImage: $(imageName)
+
+  steps:
+  # -----------------------
+  # Install dependencies
+  # -----------------------
+  - powershell: |
+      Set-ExecutionPolicy Bypass -Scope Process -Force; iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
+      echo "##vso[task.prependpath]C:\\ProgramData\\chocolatey\\bin"
+      choco install boost-msvc-14.1 cmake --yes --limit-output
+      echo "##vso[task.prependpath]C:\\Program Files\\CMake\\bin"
+    condition: eq( variables['imageName'], 'vs2015-win2012r2' )
+    displayName: Install chocolatey, boost, and newer cmake
+    
+  - bash: choco install swig --yes --limit-output
+    condition: eq( variables['Agent.OS'], 'Windows_NT' )
+    displayName: Install swig
+    
+  - task: UsePythonVersion@0
+    inputs:
+      versionSpec: '3.4'
+      architecture: $(langArch)
+    condition: ne( variables['imageName'], 'vs2015-win2012r2' )
+    
+  - bash: pip3 install pytest
+    condition: ne( variables['imageName'], 'vs2015-win2012r2' )
+    displayName: Install pytest
+
+  # -----------------------
+  # Configure HELICS
+  # -----------------------
+  - task: CMake@1
+    inputs:
+      cmakeArgs: -A $(vsArch) -DHELICS_ENABLE_SWIG=ON -DHELICS_BUILD_CXX_SHARED_LIB=ON -DHELICS_ENABLE_PACKAGE_BUILD=ON -DHELICS_BUILD_TESTS=ON -DHELICS_BUILD_EXAMPLES=ON ..
+    displayName: 'Configure HELICS'
+    condition: eq( variables['Agent.OS'], 'Windows_NT' )
+    
+#  - task: CMake@1
+#    inputs:
+#      cmakeArgs: -DBUILD_PYTHON_INTERFACE=ON .
+#    displayName: 'Configure Python interface'
+#    condition: and(ne( variables['imageName'], 'vs2015-win2012r2' ), eq( variables['langArch'], 'x64' ))
+    
+  - task: CMake@1
+    inputs:
+      cmakeArgs: -DBUILD_JAVA_INTERFACE=ON .
+    displayName: 'Configure Java interface'
+    condition: and(ne( variables['imageName'], 'vs2015-win2012r2' ), eq( variables['langArch'], 'x64' ))
+
+  # -----------------------
+  # Build HELICS
+  # -----------------------
+  - bash: cmake --build . --config Release
+    displayName: 'Build HELICS'
+    workingDirectory: build
+    
+  # -----------------------
+  # Package HELICS
+  # -----------------------
+  - bash: |
+      cpack_dir="$(which cmake)"
+      cpack_dir="${cpack_dir%/cmake}"
+      "${cpack_dir}/cpack" -G "NSIS" -C Release -B "$PWD/installer-output"
+    displayName: 'Package HELICS'
+    workingDirectory: build
+    condition: ne( variables['imageName'], 'vs2015-win2012r2' )
+    
+  - task: CopyFiles@2
+    inputs:
+      sourceFolder: '$(Build.SourcesDirectory)/build/installer-output'
+      contents: '*.exe'
+      TargetFolder: '$(Build.ArtifactStagingDirectory)'
+    condition: ne( variables['imageName'], 'vs2015-win2012r2' )
+  
+  - task: PublishBuildArtifacts@1
+    inputs:
+      pathtoPublish: '$(Build.ArtifactStagingDirectory)'
+      artifactName: installer
+    condition: ne( variables['imageName'], 'vs2015-win2012r2' )
+    
+  # -----------------------
+  # Test HELICS
+  # -----------------------
+  - bash: ctest --output-on-failure --timeout 480 -C Release -L "Continuous"
+    displayName: 'Test HELICS'
+    workingDirectory: build
+    
+  # Packaging tests
+  - bash: ctest --output-on-failure --timeout 480 -C Release -L "PackagingFast"
+    displayName: 'Test HELICS packaging'
+    workingDirectory: build
