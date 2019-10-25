@@ -25,6 +25,8 @@ jobs:
         make -j2 javafile_overwrite
         popd
     - name: Check changed files
+      id: hash
       run: |
         git status
+        echo ::set-env name=change_hash::f00d600d
     - uses: ./.github/actions/create-file-update-pr
