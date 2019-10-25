@@ -5,6 +5,10 @@ the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 #pragma once
+
+#ifndef HELICS_CORE_TYPES_HEADER
+#    define HELICS_CORE_TYPES_HEADER
+
 #include "../helics_enums.h"
 
 /** @file
@@ -91,3 +95,4 @@ constexpr auto FORCE_ITERATION =
 constexpr auto ITERATE_IF_NEEDED =
   helics::iteration_request::iterate_if_needed;  //!< simplified alias to indicate that helics should iterate if
                                                  //!< warranted
+#endif

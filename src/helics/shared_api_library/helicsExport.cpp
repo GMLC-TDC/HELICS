@@ -366,14 +366,7 @@ void helicsFederateInfoSetBrokerPort (helics_federate_info fi, int brokerPort, h
     {
         return;
     }
-    try
-    {
-        hfi->brokerPort = brokerPort;
-    }
-    catch (...)
-    {
-        return helicsErrorHandler (err);
-    }
+    hfi->brokerPort = brokerPort;
 }
 
 void helicsFederateInfoSetLocalPort (helics_federate_info fi, const char *localPort, helics_error *err)
@@ -383,14 +376,7 @@ void helicsFederateInfoSetLocalPort (helics_federate_info fi, const char *localP
     {
         return;
     }
-    try
-    {
-        hfi->localport = AS_STRING (localPort);
-    }
-    catch (...)
-    {
-        return helicsErrorHandler (err);
-    }
+    hfi->localport = AS_STRING (localPort);
 }
 
 int helicsGetPropertyIndex (const char *val)

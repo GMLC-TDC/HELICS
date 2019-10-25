@@ -199,15 +199,9 @@ const char *helicsEndpointGetDefaultDestination (helics_endpoint endpoint)
     {
         return nullcstr;
     }
-    try
-    {
-        auto &str = endObj->endPtr->getDefaultDestination ();
-        return str.c_str ();
-    }
-    catch (...)
-    {
-        return nullcstr;
-    }
+    auto &str = endObj->endPtr->getDefaultDestination ();
+    return str.c_str ();
+    
 }
 
 void helicsEndpointSendMessageRaw (helics_endpoint endpoint, const char *dest, const void *data, int inputDataLength, helics_error *err)
@@ -648,16 +642,8 @@ const char *helicsEndpointGetName (helics_endpoint endpoint)
     {
         return nullcstr;
     }
-
-    try
-    {
-        auto &type = endObj->endPtr->getName ();
-        return type.c_str ();
-    }
-    catch (...)
-    {
-        return nullcstr;
-    }
+    auto &type = endObj->endPtr->getName ();
+    return type.c_str ();
 }
 
 int helicsFederateGetEndpointCount (helics_federate fed)

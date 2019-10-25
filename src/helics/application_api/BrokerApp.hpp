@@ -9,6 +9,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "../core/core-types.hpp"
 #include "helics_cxx_export.h"
 
+#include <chrono>
 #include <memory>
 #include <string>
 #include <vector>
@@ -55,33 +56,29 @@ class HELICS_CXX_EXPORT BrokerApp
     @param argString a merged string with all the arguments
     */
     BrokerApp (core_type ctype, const std::string &argString);
-    /** move construction*/
-    BrokerApp (BrokerApp &&brokerApp) = default;
-    /** move assignment*/
-    BrokerApp &operator= (BrokerApp &&brokerApp) = default;
-    /** the destructor will wait until the broker is finished before returning- unless forceTerminate() is used*/
-    ~BrokerApp ();
 
     /** check if the Broker is running*/
-    bool isActive () const;
+    bool isConnected () const;
 
     /** forceably disconnect the broker*/
     void forceTerminate ();
+    /** wait for the broker to normally disconnect for a certain amount of time*/
+    bool waitForDisconnect (std::chrono::milliseconds waitTime = std::chrono::milliseconds (0));
     /** link a publication and input*/
     void dataLink (const std::string &source, const std::string &target);
     /** add a source Filter to an endpoint*/
-	void addSourceFilterToEndpoint (const std::string &filter, const std::string &endpoint);
+    void addSourceFilterToEndpoint (const std::string &filter, const std::string &endpoint);
     /** add a destination Filter to an endpoint*/
     void addDestinationFilterToEndpoint (const std::string &filter, const std::string &endpoint);
 
-	/** get the identifier of the broker*/
-	const std::string &getIdentifier () const;
+    /** get the identifier of the broker*/
+    const std::string &getIdentifier () const;
     /** get the network address of the broker*/
     const std::string &getAddress () const;
     /** make a query at the broker*/
-	std::string query (const std::string &target, const std::string &query);
+    std::string query (const std::string &target, const std::string &query);
     /** set the log file to use for the broker*/
-	void setLogFile (const std::string &logFile);
+    void setLogFile (const std::string &logFile);
 
 #ifdef HELICS_CXX_STATIC_DEFINE
     /** overload the -> operator so all broker functions can be called if needed
@@ -95,10 +92,38 @@ class HELICS_CXX_EXPORT BrokerApp
     std::string name;  //!< the name of the broker
 };
 
+/** class that waits for a broker to terminate before finishing the destructor*/
+class BrokerKeeper
+{
+  public:
+    template <class... Args>
+    BrokerKeeper (Args &&... args) : Brk (std::forward<... Args> (args))
+    {
+    }
+    BrokerKeeper (BrokerKeeper &&brkeep) = default;
+    BrokerKeeper (const BrokerKeeper &brkeep) = default;
+    BrokerKeeper &operator=(BrokerKeeper &&brkeep) = default;
+    BrokerKeeper &operator= (const BrokerKeeper &brkeep) = default;
+	///is the broker connected
+	bool isConnected () { return brk.isConnected (); }
+	/// Force terminate the broker
+	void forceTerminate () { brk.forceTerminate (); }
+	/// the destructor waits for the broker to terminate
+    ~BrokerKeeper ()
+    {
+        if (brk.isConnected ())
+        {
+            brk.waitForDisconnect ();
+        }
+	}
+
+  private:
+    BrokerApp brk;
+};
 // for maintaining the symbol in a public header
 namespace apps
 {
 using helics::BrokerApp;
-} // namespace apps
+}  // namespace apps
 
 }  // namespace helics

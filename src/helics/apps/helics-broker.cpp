@@ -112,11 +112,11 @@ void terminalFunction (std::vector<std::string> args)
             return;
         }
         broker->forceTerminate ();
-        while (broker->isActive ())
+        while (broker->isConnected ())
         {
             std::this_thread::sleep_for (std::chrono::milliseconds (100));
         }
-        if (!broker->isActive ())
+        if (!broker->isConnected ())
         {
             std::cout << "Broker has terminated\n";
         }
@@ -132,7 +132,7 @@ void terminalFunction (std::vector<std::string> args)
             broker = std::make_unique<helics::BrokerApp> (args);
             std::cout << "broker has started\n";
         }
-        else if (broker->isActive ())
+        else if (broker->isConnected ())
         {
             if (force)
             {

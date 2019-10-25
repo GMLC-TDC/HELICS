@@ -12,6 +12,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <memory>
 #include <string>
 #include <vector>
+#include <chrono>
 
 namespace helics
 {
@@ -55,18 +56,14 @@ class HELICS_CXX_EXPORT CoreApp
     @param argString a merged string with all the arguments
     */
     CoreApp (core_type ctype, const std::string &argString);
-    /** move construction*/
-    CoreApp (CoreApp &&coreApp) = default;
-    /** move assignment*/
-    CoreApp &operator= (CoreApp &&coreApp) = default;
-    /** the destructor will wait until the broker is finished before returning- unless forceTerminate() is used*/
-    ~CoreApp ();
 
     /** check if the Core is running*/
-    bool isActive () const;
+    bool isConnected () const;
 
     /** forceably disconnect the broker*/
     void forceTerminate ();
+    /** wait for the broker to normally disconnect for a certain amount of time*/
+    bool waitForDisconnect (std::chrono::milliseconds waitTime = std::chrono::milliseconds (0));
     /** link a publication and input*/
     void dataLink (const std::string &source, const std::string &target);
     /** add a source Filter to an endpoint*/
@@ -91,7 +88,6 @@ class HELICS_CXX_EXPORT CoreApp
 #endif
     /** get a copy of the core pointer*/
     std::shared_ptr<Core> getCopyofCorePointer () const { return core; }
-
   private:
     void processArgs (std::unique_ptr<helicsCLI11App> &app);
     std::unique_ptr<helicsCLI11App> generateParser ();
@@ -99,4 +95,32 @@ class HELICS_CXX_EXPORT CoreApp
     std::string name;  //!< the name of the broker
 };
 
+/** class that waits for a core to terminate before finishing the destructor*/
+class CoreKeeper
+{
+  public:
+    template <class... Args>
+    CoreKeeper (Args &&... args) : cr (std::forward<... Args> (args))
+    {
+    }
+    CoreKeeper (CoreKeeper &&brkeep) = default;
+    CoreKeeper (const CoreKeeper &crkeep) = default;
+    CoreKeeper &operator= (CoreKeeper &&crkeep) = default;
+    CoreKeeper &operator= (const CoreKeeper &crkeep) = default;
+    /// is the core connected
+    bool isConnected () { return cr.isConnected (); }
+    /// Force terminate the core
+    void forceTerminate () { cr.forceTerminate (); }
+    /// the destructor waits for the broker to terminate
+    ~CoreKeeper ()
+    {
+		if (cr.isConnected ())
+        {
+            cr.waitForDisconnect ();
+        }
+    }
+
+  private:
+   CoreApp cr;
+};
 }  // namespace helics

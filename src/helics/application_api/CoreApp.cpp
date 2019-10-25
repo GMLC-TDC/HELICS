@@ -51,18 +51,6 @@ CoreApp::CoreApp (core_type ctype, const std::string &argString)
 
 CoreApp::CoreApp (const std::string &argString) : CoreApp (core_type::DEFAULT, argString) {}
 
-CoreApp::~CoreApp ()
-{
-    if (!core)
-    {
-        return;
-    }
-    // this sleeps until disconnected
-    core->waitForDisconnect ();
-    core = nullptr;
-    helics::CoreFactory::cleanUpCores (std::chrono::milliseconds (500));
-}
-
 std::unique_ptr<helicsCLI11App> CoreApp::generateParser ()
 {
     auto app = std::make_unique<helicsCLI11App> ("Broker application");
@@ -88,7 +76,7 @@ void CoreApp::processArgs (std::unique_ptr<helicsCLI11App> &app)
     }
 }
 
-bool CoreApp::isActive () const { return ((core) && (core->isConnected ())); }
+bool CoreApp::isConnected () const { return ((core) && (core->isConnected ())); }
 
 void CoreApp::forceTerminate ()
 {
@@ -102,6 +90,14 @@ void CoreApp::forceTerminate ()
     }
 }
 
+bool CoreApp::waitForDisconnect (std::chrono::milliseconds waitTime)
+{
+    if (core)
+    {
+        return core->waitForDisconnect (waitTime);
+    }
+    return true;
+}
 
 void CoreApp::dataLink (const std::string &source, const std::string &target)
 {

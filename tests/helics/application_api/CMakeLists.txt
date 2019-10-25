@@ -59,3 +59,24 @@ add_test(
 set_property(TEST application-api-ci-tests PROPERTY LABELS Continuous)
 
 copy_key_files_to_target_location(application-api-tests)
+
+if (HELICS_BUILD_CXX_SHARED_LIB)
+set(
+    shared_cxx_test_sources
+    MessageFederateKeyTests.cpp
+    ValueFederateKeyTests.cpp
+    FilterTests.cpp
+    testFixtures_shared.cpp
+	testFixtures_shared.hpp
+	) 
+
+add_executable(shared_cxx-tests ${shared_cxx_test_sources})
+
+target_link_libraries(shared_cxx-tests HELICS::helics-shared helics_test_base)
+
+set_target_properties(shared_cxx-tests PROPERTIES FOLDER tests)
+
+add_test(NAME shared_cxx-tests COMMAND shared_cxx-tests)
+set_property(TEST shared_cxx-tests PROPERTY LABELS ApplicationApi Coverage Daily)
+
+endif()

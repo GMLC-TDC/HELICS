@@ -244,3 +244,9 @@ if(ENABLE_MPI_CORE)
 endif(ENABLE_MPI_CORE)
 
 add_library(HELICS::ccore ALIAS helics_core)
+
+target_compile_options(
+        helics_core
+        PRIVATE
+            $<$<COMPILE_LANGUAGE:CXX>:$<$<NOT:$<CXX_COMPILER_ID:MSVC>>:-Wno-strict-aliasing>>
+    )

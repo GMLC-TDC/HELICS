@@ -51,16 +51,13 @@ BrokerApp::BrokerApp (core_type ctype, const std::string &argString)
 
 BrokerApp::BrokerApp (const std::string &argString) : BrokerApp (core_type::DEFAULT, argString) {}
 
-BrokerApp::~BrokerApp ()
+bool BrokerApp::waitForDisconnect (std::chrono::milliseconds waitTime)
 {
-    if (!broker)
+    if (broker)
     {
-        return;
-    }
-    // this sleeps until disconnected
-    broker->waitForDisconnect ();
-    broker = nullptr;
-    helics::BrokerFactory::cleanUpBrokers (std::chrono::milliseconds (500));
+		return broker->waitForDisconnect (waitTime);
+	}
+    return true;
 }
 
 std::unique_ptr<helicsCLI11App> BrokerApp::generateParser ()
@@ -88,7 +85,7 @@ void BrokerApp::processArgs (std::unique_ptr<helicsCLI11App> &app)
     }
 }
 
-bool BrokerApp::isActive () const { return ((broker) && (broker->isConnected ())); }
+bool BrokerApp::isConnected () const { return ((broker) && (broker->isConnected ())); }
 
 void BrokerApp::forceTerminate ()
 {
@@ -127,10 +124,7 @@ void BrokerApp::addDestinationFilterToEndpoint (const std::string &filter, const
 }
 static const std::string estring{};
 /** get the identifier of the broker*/
-const std::string &BrokerApp::getIdentifier () const
-{
-    return (broker) ? broker->getIdentifier () : estring;
-}
+const std::string &BrokerApp::getIdentifier () const { return (broker) ? broker->getIdentifier () : estring; }
 /** get the network address of the broker*/
 const std::string &BrokerApp::getAddress () const { return (broker) ? broker->getAddress () : estring; }
 /** make a query at the broker*/
