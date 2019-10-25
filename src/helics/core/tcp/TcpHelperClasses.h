@@ -189,18 +189,21 @@ class TcpAcceptor : public std::enable_shared_from_this<TcpAcceptor>
         return pointer (new TcpAcceptor (io_context, ep));
     }
 
-    static pointer create (asio::io_context &io_context, int port)
+    static pointer create (asio::io_context &io_context, uint16_t port)
     {
         return pointer (new TcpAcceptor (io_context, port));
     }
     /** destructor to make sure everything is closed without threading issues*/
-    ~TcpAcceptor () try
+    ~TcpAcceptor ()
     {
-        close ();
+        try
+        {
+            close ();
+        }
+        catch (...)
+        {
+        };
     }
-    catch (...)
-    {
-    };
 
     /** connect the acceptor to the socket*/
     bool connect ();
@@ -238,7 +241,7 @@ class TcpAcceptor : public std::enable_shared_from_this<TcpAcceptor>
 
   private:
     TcpAcceptor (asio::io_context &io_context, asio::ip::tcp::endpoint &ep);
-    TcpAcceptor (asio::io_context &io_context, int port);
+    TcpAcceptor (asio::io_context &io_context, uint16_t port);
     /** function for handling the asynchronous return from a read request*/
     void
     handle_accept (TcpAcceptor::pointer ptr, TcpConnection::pointer new_connection, const std::error_code &error);
@@ -265,10 +268,10 @@ class TcpServer : public std::enable_shared_from_this<TcpServer>
 
     static pointer create (asio::io_context &io_context,
                            const std::string &address,
-                           int PortNum,
+                           uint16_t PortNum,
                            bool reuse_port = false,
                            int nominalBufferSize = 10192);
-    static pointer create (asio::io_context &io_context, int PortNum, int nominalBufferSize = 10192);
+    static pointer create (asio::io_context &io_context, uint16_t PortNum, int nominalBufferSize = 10192);
 
   public:
     ~TcpServer ();
@@ -300,7 +303,7 @@ class TcpServer : public std::enable_shared_from_this<TcpServer>
   private:
     TcpServer (asio::io_context &io_context,
                const std::string &address,
-               int portNum,
+               uint16_t portNum,
                bool port_reuse,
                int nominalBufferSize);
     TcpServer (asio::io_context &io_context,
@@ -308,7 +311,7 @@ class TcpServer : public std::enable_shared_from_this<TcpServer>
                const std::string &port,
                bool port_reuse,
                int nominalBufferSize);
-    TcpServer (asio::io_context &io_context, int portNum, int nominalBufferSize);
+    TcpServer (asio::io_context &io_context, uint16_t portNum, int nominalBufferSize);
 
     void initialConnect ();
     asio::io_context &ioctx;

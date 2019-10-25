@@ -1,112 +1,160 @@
-#
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Copyright (c) 2017-2019, Battelle Memorial Institute; Lawrence Livermore
 # National Security, LLC; Alliance for Sustainable Energy, LLC.
 # See the top-level NOTICE for additional details.
 # All rights reserved.
 #
 # SPDX-License-Identifier: BSD-3-Clause
-#
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-if (NOT DISABLE_C_SHARED_INTERFACE)
-
-option(BUILD_PYTHON_INTERFACE "Build Python extension" OFF)
-option(
-    BUILD_PYTHON2_INTERFACE
-    "Build Python2.7 extension(Requires swig and will not build if \"PYTHON_INTERFACE\" is active)"
+cmake_dependent_option(
+    BUILD_PYTHON_INTERFACE
+    "Build Python extension"
+    OFF
+    "NOT BUILD_PYTHON2_INTERFACE;NOT HELICS_DISABLE_C_SHARED_LIB"
     OFF
 )
-option(BUILD_MATLAB_INTERFACE "Build Matlab Extension" OFF)
-option(BUILD_OCTAVE_INTERFACE "Build Octave extension" OFF)
-option(BUILD_JAVA_INTERFACE "Build Java extension" OFF)
 
-if(${CMAKE_VERSION} VERSION_GREATER 3.8)
+cmake_dependent_option(
+    BUILD_PYTHON2_INTERFACE
+    "Build Python2.7 extension(Requires swig and will not build if \"BUILD_PYTHON_INTERFACE\" is active)"
+    OFF
+    "NOT BUILD_PYTHON_INTERFACE;NOT HELICS_DISABLE_C_SHARED_LIB"
+    OFF
+)
+cmake_dependent_option(
+    BUILD_MATLAB_INTERFACE
+    "Build Matlab Extension"
+    OFF
+    "NOT HELICS_DISABLE_C_SHARED_LIB"
+    OFF
+)
+cmake_dependent_option(
+    BUILD_OCTAVE_INTERFACE
+    "Build Octave extension"
+    OFF
+    "NOT HELICS_DISABLE_C_SHARED_LIB"
+    OFF
+)
+cmake_dependent_option(
+    BUILD_JAVA_INTERFACE
+    "Build Java extension"
+    OFF
+    "NOT HELICS_DISABLE_C_SHARED_LIB"
+    OFF
+)
+
     # cmake projects are only available for csharp from 3.8 onward
-    option(BUILD_CSHARP_INTERFACE "Build C# extension" OFF)
-endif()
+    cmake_dependent_option(
+        BUILD_CSHARP_INTERFACE
+        "Build C# extension"
+        OFF
+        "NOT HELICS_DISABLE_C_SHARED_LIB;CMAKE_VERSION VERSION_GREATER 3.8"
+        OFF
+    )
 
-#these are purposely hidden options since they will only be used for very select purposes
-option(SWIG_GENERATE_INTERFACE_FILES_ONLY "Use Swig to generate the interface files but not build" OFF)
-hide_variable(SWIG_GENERATE_INTERFACE_FILES_ONLY)
+# these are purposely hidden options since they will only be used for very select
+# purposes
+option(HELICS_SWIG_GENERATE_INTERFACE_FILES_ONLY
+       "Use Swig to generate the interface files but not build" OFF)
+hide_variable(HELICS_SWIG_GENERATE_INTERFACE_FILES_ONLY)
 
-option(HELICS_OVERWRITE_INTERFACE_FILES "have cmake automatically overwrite the interface build files" OFF)
+option(HELICS_OVERWRITE_INTERFACE_FILES
+       "have cmake automatically overwrite the interface build files" OFF)
 hide_variable(HELICS_OVERWRITE_INTERFACE_FILES)
 
-if(BUILD_CSHARP_INTERFACE OR BUILD_PYTHON2_INTERFACE OR BUILD_OCTAVE_INTERFACE OR SWIG_GENERATE_INTERFACE_FILES_ONLY)
-set(SWIG_REQUIRED ON)
+if(
+    BUILD_CSHARP_INTERFACE
+    OR BUILD_PYTHON2_INTERFACE
+    OR BUILD_OCTAVE_INTERFACE
+    OR SWIG_GENERATE_INTERFACE_FILES_ONLY
+)
+    set(swig_required ON)
 else()
-set(SWIG_REQUIRED OFF)
-if (BUILD_PYTHON_INTERFACE OR BUILD_MATLAB_INTERFACE OR BUILD_JAVA_INTERFACE)
-option(ENABLE_SWIG OFF "use swig to generate the interface files")
-endif()
+    set(swig_required OFF)
 endif()
 
+    # at some point in the future (HELICS 3) switch everything to use
+    # find_package(Python3 ...)
+	cmake_dependent_advanced_option(HELICS_USE_NEW_PYTHON_FIND "Use the FindPython Routine only available from cmake 3.12 and later" OFF "CMAKE_VERSION VERSION_GREATER 3.12;NOT HELICS_SWIG_GENERATE_INTERFACE_FILES_ONLY; BUILD_PYTHON_INTERFACE
+    OR BUILD_PYTHON2_INTERFACE" OFF)
+    
 
-if(ENABLE_SWIG OR SWIG_REQUIRED)
-  if(WIN32 AND NOT MSYS)
-    if(NOT CMAKE_PROGRAM_PATH)
-      set(
-        CMAKE_PROGRAM_PATH
-		"C:/ProgramData/chocolatey/bin"
-	    "C:/local/swigwin-4.0.0"
-        "C:/local/swigwin-3.0.12"
-        "C:/local/swigwin-3.0.11"
-        "C:/local/swigwin-3.0.10"
-      )
-    else()
-      set(
-        CMAKE_PROGRAM_PATH
-        "${CMAKE_PROGRAM_PATH}"
-		"C:/ProgramData/chocolatey/bin"
-	    "C:/local/swigwin-4.0.0"
-        "C:/local/swigwin-3.0.12"
-        "C:/local/swigwin-3.0.11"
-        "C:/local/swigwin-3.0.10"
-      )
+cmake_dependent_option(
+    HELICS_ENABLE_SWIG
+    "use swig to generate the interface files"
+    OFF
+    "BUILD_PYTHON_INTERFACE OR BUILD_MATLAB_INTERFACE OR BUILD_JAVA_INTERFACE"
+    OFF
+)
+
+if(HELICS_ENABLE_SWIG OR swig_required)
+    if(WIN32 AND NOT MSYS)
+        if(NOT CMAKE_PROGRAM_PATH)
+            set(
+                CMAKE_PROGRAM_PATH
+                "C:/ProgramData/chocolatey/bin"
+                "C:/local/swigwin-4.0.0"
+                "C:/local/swigwin-3.0.12"
+                "C:/local/swigwin-3.0.11"
+                "C:/local/swigwin-3.0.10"
+            )
+        else()
+            set(
+                CMAKE_PROGRAM_PATH
+                "${CMAKE_PROGRAM_PATH}"
+                "C:/ProgramData/chocolatey/bin"
+                "C:/local/swigwin-4.0.0"
+                "C:/local/swigwin-3.0.12"
+                "C:/local/swigwin-3.0.11"
+                "C:/local/swigwin-3.0.10"
+            )
+        endif()
     endif()
-  endif()
-  if(POLICY CMP0078)
-    # Policy CMP0078 introduced since CMake 3.13.2 so if we want to be compatible this affects the targets generated by swig
-    # with older versions (see cmake_minimum_required) we should put 'cmake_policy' under
-    # condition.
-    cmake_policy(SET CMP0078 OLD)
-  endif()
-  if(POLICY CMP0086)
-    # Policy CMP0086 the old behavior is assumed in the java interface, TODO: PT examine its usage and implications for now leave it at the OLD
-    cmake_policy(SET CMP0086 OLD)
-  endif()
-  find_package(SWIG REQUIRED 3.0)
-  include(${SWIG_USE_FILE})
+    if(POLICY CMP0078)
+        # Policy CMP0078 introduced since CMake 3.13.2 so if we want to be compatible
+        # this affects the targets generated by swig with older versions (see
+        # cmake_minimum_required) we should put 'cmake_policy' under condition.
+        cmake_policy(SET CMP0078 OLD)
+    endif()
+    if(POLICY CMP0086)
+        # Policy CMP0086 the old behavior is assumed in the java interface, TODO: PT
+        # examine its usage and implications for now leave it at the OLD
+        cmake_policy(SET CMP0086 OLD)
+    endif()
+    find_package(SWIG REQUIRED 3.0)
+    include(${SWIG_USE_FILE})
 endif()
 
+# these includes are for all the interface builds which use the shared library
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 include_directories("${HELICS_SOURCE_DIR}/src/helics/shared_api_library")
 include_directories("${HELICS_BINARY_DIR}/src/helics/shared_api_library")
 
 if(BUILD_PYTHON_INTERFACE)
-  add_subdirectory(python)
-  if(BUILD_PYTHON2_INTERFACE)
-    message(
-      WARNING "PYTHON2 interface will not be built since python 3 build is active"
-    )
-  endif()
+    add_subdirectory(python)
+    if(BUILD_PYTHON2_INTERFACE)
+        message(
+            WARNING
+                "PYTHON2 interface will not be built since python 3 build is active"
+        )
+    endif()
 elseif(BUILD_PYTHON2_INTERFACE)
-  add_subdirectory(python2)
+    add_subdirectory(python2)
 endif()
 
 if(BUILD_JAVA_INTERFACE)
-  add_subdirectory(java)
+    add_subdirectory(java)
 endif()
 
 if(BUILD_MATLAB_INTERFACE)
-  add_subdirectory(matlab)
+    add_subdirectory(matlab)
 endif()
 
 if(BUILD_OCTAVE_INTERFACE)
-  add_subdirectory(octave)
+    add_subdirectory(octave)
 endif()
 
 if(BUILD_CSHARP_INTERFACE)
-   add_subdirectory(csharp)
+    add_subdirectory(csharp)
 endif()
-
-endif()  # disable c shared interface

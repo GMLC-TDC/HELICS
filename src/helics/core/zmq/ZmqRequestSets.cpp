@@ -88,7 +88,7 @@ int ZmqRequestSets::checkForMessages (std::chrono::milliseconds timeout)
     {
         if ((active_routes[ii].revents & ZMQ_POLLIN) > 0)
         {
-            routes[active_messages[ii].route]->recv (&msg);
+            routes[active_messages[ii].route]->recv (msg);
             active_routes[ii].events = 0;
             Responses.emplace_back (static_cast<char *> (msg.data ()),
                                     msg.size ());  // convert to an ActionMessage here

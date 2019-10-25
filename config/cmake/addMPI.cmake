@@ -1,3 +1,4 @@
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # LLNS Copyright Start
 # Copyright (c) 2014-2018, Lawrence Livermore National Security
 # This work was performed under the auspices of the U.S. Department
@@ -7,41 +8,43 @@
 # All rights reserved.
 # For details, see the LICENSE file.
 # LLNS Copyright End
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-#
+# ~~~
 # Copyright (c) 2017-2019, Battelle Memorial Institute; Lawrence Livermore
 # National Security, LLC; Alliance for Sustainable Energy, LLC.
-# See the top-level NOTICE for additional details. 
-#All rights reserved.
+# See the top-level NOTICE for additional details.
+# All rights reserved.
 #
 # SPDX-License-Identifier: BSD-3-Clause
-#
+# ~~~
+
 find_package(MPI)
 if(NOT MPI_C_FOUND)
     if(MSVC) # the cmake find MPI doesn't completely work for visual studio 2017
 
         if(NOT MPI_CXX_COMPILER)
-            # message(STATUS "not mpi cxx compiler") For building MPI programs
-            # the selected Visual Studio compiler is used, namely cl.exe. So
-            # there is no need to set a specific MPI compiler.
+            # message(STATUS "not mpi cxx compiler") For building MPI programs the
+            # selected Visual Studio compiler is used, namely cl.exe. So there is no
+            # need to set a specific MPI compiler.
             set(
-                MPI_CXX_COMPILER "${CMAKE_CXX_COMPILER}"
-                CACHE FILEPATH "Mpi CXX compiler"
-                FORCE
+                MPI_CXX_COMPILER
+                "${CMAKE_CXX_COMPILER}"
+                CACHE FILEPATH "Mpi CXX compiler" FORCE
             )
             set(
-                MPI_C_COMPILER "${CMAKE_C_COMPILER}"
-                CACHE FILEPATH "Mpi C compiler"
-                FORCE
+                MPI_C_COMPILER
+                "${CMAKE_C_COMPILER}"
+                CACHE FILEPATH "Mpi C compiler" FORCE
             )
         endif(NOT MPI_CXX_COMPILER)
         if(MPIEXEC_EXECUTABLE) # if we found this then the target was found
             if(NOT MPI_C_LIBRARIES)
                 if(MPI_msmpi_LIBRARY)
                     set(
-                        MPI_C_LIBRARIES ${MPI_msmpi_LIBRARY}
-                        CACHE STRING "MPI C libraries"
-                        FORCE
+                        MPI_C_LIBRARIES
+                        ${MPI_msmpi_LIBRARY}
+                        CACHE STRING "MPI C libraries" FORCE
                     )
                 else()
                     # TODO not sure how MPICH libraries are laid out on Windows
@@ -51,8 +54,7 @@ if(NOT MPI_C_FOUND)
         endif()
     else()
         # message(STATUS "MPI ${MPIEXEC} yyyyyy88888 ${MPI_C_LIBRARIES}")
-        if(MPIEXEC AND MPI_C_LIBRARIES) # if we found this then the target was
-                                        # found
+        if(MPIEXEC AND MPI_C_LIBRARIES) # if we found this then the target was found
             set(MPI_C_FOUND TRUE)
         endif()
     endif()

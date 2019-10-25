@@ -153,6 +153,8 @@ class Endpoint
     @param mess a reference to an actual message object
     */
     void send (const Message &mess) const { fed->sendMessage (*this, mess); }
+    /** send a pointer to a message object*/
+    void send (std::unique_ptr<Message> mess) const { fed->sendMessage (*this, std::move(mess)); }
     /** get an available message if there is no message the returned object is empty*/
     auto getMessage () const { return fed->getMessage (*this); }
     /** check if there is a message available*/

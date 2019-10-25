@@ -95,7 +95,7 @@ void CoreBroker::setLoggingCallback (
     if (logFunction)
     {
         auto ii = getNextAirlockIndex ();
-        dataAirlocks[ii].load (std::move (logFunction));
+        dataAirlocks[ii].load (logFunction);
         loggerUpdate.counter = ii;
     }
     else
@@ -215,6 +215,19 @@ void CoreBroker::processPriorityCommand (ActionMessage &&command)
                             command.source_id.baseValue ()));
     switch (command.action ())
     {
+    case CMD_PING_PRIORITY:
+        if (command.dest_id == global_broker_id_local)
+        {
+            ActionMessage pngrep (CMD_PING_REPLY);
+            pngrep.dest_id = command.source_id;
+            pngrep.source_id = global_broker_id_local;
+            routeMessage (pngrep);
+        }
+        else
+        {
+            routeMessage (command);
+        }
+        break;
     case CMD_BROKER_SETUP:
     {
         global_broker_id_local = global_id.load ();
@@ -1290,7 +1303,7 @@ void CoreBroker::processBrokerConfigureCommands (ActionMessage &cmd)
         break;
         */
     case defs::properties::log_level:
-        setLogLevel (cmd.counter);
+        setLogLevel (cmd.getExtraData ());
         break;
     case UPDATE_LOGGING_CALLBACK:
         if (checkActionFlag (cmd, empty_flag))
@@ -1334,6 +1347,7 @@ void CoreBroker::checkForNamedInterface (ActionMessage &command)
                 routeMessage (command);
                 command.setAction (CMD_ADD_PUBLISHER);
                 command.swapSourceDest ();
+                command.name = pub->key;
                 command.setStringData (pub->type, pub->units);
                 routeMessage (command);
             }
@@ -1370,6 +1384,7 @@ void CoreBroker::checkForNamedInterface (ActionMessage &command)
                 command.setAction (CMD_ADD_SUBSCRIBER);
                 command.swapSourceDest ();
                 command.clearStringData ();
+                command.name = inp->key;
                 routeMessage (command);
             }
             else
@@ -1910,9 +1925,16 @@ void CoreBroker::disconnect ()
 {
     ActionMessage udisconnect (CMD_USER_DISCONNECT);
     addActionMessage (udisconnect);
+    int cnt{0};
     while (!waitForDisconnect (std::chrono::milliseconds (200)))
     {
-        LOG_WARNING (global_id.load (), getIdentifier (), "waiting on disconnect");
+        ++cnt;
+        LOG_WARNING (global_id.load (), getIdentifier (),
+                     "waiting on disconnect: current state=" + std::to_string (brokerState.load ()));
+        if (cnt == 5)
+        {
+            addActionMessage (udisconnect);
+        }
     }
 }
 
@@ -2404,7 +2426,7 @@ void CoreBroker::setLoggingLevel (int logLevel)
     ActionMessage cmd (CMD_BROKER_CONFIGURE);
     cmd.dest_id = global_id.load ();
     cmd.messageID = defs::properties::log_level;
-    cmd.counter = logLevel;
+    cmd.setExtraData (logLevel);
     addActionMessage (cmd);
 }
 
@@ -2838,7 +2860,7 @@ void CoreBroker::processQuery (const ActionMessage &m)
         queryResp.dest_id = m.source_id;
         queryResp.source_id = global_broker_id_local;
         queryResp.messageID = m.messageID;
-        queryResp.payload = getNameList (std::move (m.payload));
+        queryResp.payload = getNameList (m.payload);
         if (queryResp.dest_id == global_broker_id_local)
         {
             ActiveQueries.setDelayedValue (m.messageID, queryResp.payload);

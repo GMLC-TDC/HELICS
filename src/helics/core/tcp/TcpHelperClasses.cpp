@@ -351,7 +351,7 @@ TcpAcceptor::TcpAcceptor (asio::io_context &io_context, tcp::endpoint &ep) : end
     acceptor_.open (ep.protocol ());
 }
 
-TcpAcceptor::TcpAcceptor (asio::io_context &io_context, int port)
+TcpAcceptor::TcpAcceptor (asio::io_context &io_context, uint16_t port)
     : endpoint_ (asio::ip::address_v4::any (), port), acceptor_ (io_context, endpoint_.protocol ()),
       state (accepting_state_t::connected)
 {
@@ -533,7 +533,7 @@ void TcpAcceptor::handle_accept (TcpAcceptor::pointer ptr,
 
 TcpServer::TcpServer (asio::io_context &io_context,
                       const std::string &address,
-                      int portNum,
+                      uint16_t portNum,
                       bool port_reuse,
                       int nominalBufferSize)
     : ioctx (io_context), bufferSize (nominalBufferSize), reuse_address (port_reuse)
@@ -541,7 +541,7 @@ TcpServer::TcpServer (asio::io_context &io_context,
     if ((address == "*") || (address == "tcp://*"))
     {
         endpoints.emplace_back (asio::ip::address_v4::any (), portNum);
-  //      endpoints.emplace_back (asio::ip::address_v6::any (), portNum);
+        //      endpoints.emplace_back (asio::ip::address_v6::any (), portNum);
     }
     else if (address == "localhost")
     {
@@ -598,19 +598,22 @@ TcpServer::TcpServer (asio::io_context &io_context,
     initialConnect ();
 }
 
-TcpServer::TcpServer (asio::io_context &io_context, int portNum, int nominalBufferSize)
+TcpServer::TcpServer (asio::io_context &io_context, uint16_t portNum, int nominalBufferSize)
     : ioctx (io_context), bufferSize (nominalBufferSize)
 {
     endpoints.emplace_back (asio::ip::tcp::v4 (), portNum);
     initialConnect ();
 }
 
-TcpServer::~TcpServer () try
+TcpServer::~TcpServer ()
 {
-    close ();
-}
-catch (...)
-{
+    try
+    {
+        close ();
+    }
+    catch (...)
+    {
+    }
 }
 
 void TcpServer::initialConnect ()
@@ -696,7 +699,7 @@ bool TcpServer::reConnect (std::chrono::milliseconds timeOut)
 
 TcpServer::pointer TcpServer::create (asio::io_context &io_context,
                                       const std::string &address,
-                                      int PortNum,
+                                      uint16_t PortNum,
                                       bool reuse_port,
                                       int nominalBufferSize)
 {
@@ -712,7 +715,7 @@ TcpServer::pointer TcpServer::create (asio::io_context &io_context,
     return pointer (new TcpServer (io_context, address, port, reuse_port, nominalBufferSize));
 }
 
-TcpServer::pointer TcpServer::create (asio::io_context &io_context, int PortNum, int nominalBufferSize)
+TcpServer::pointer TcpServer::create (asio::io_context &io_context, uint16_t PortNum, int nominalBufferSize)
 {
     return pointer (new TcpServer (io_context, PortNum, nominalBufferSize));
 }

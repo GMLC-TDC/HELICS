@@ -341,7 +341,7 @@ char Input::getValueChar ()
         }
         else
         {
-            int64_t out;
+            int64_t out = invalidValue<int64_t> ();
             if (type == helics::data_type::helics_double)
             {
                 out = static_cast<int64_t> (doubleExtractAndConvert (dv, inputUnits, outputUnits));

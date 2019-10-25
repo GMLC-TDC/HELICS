@@ -28,19 +28,20 @@ LoggingCore::LoggingCore () { loggingThread = std::thread (&LoggingCore::process
 
 LoggingCore::~LoggingCore ()
 {
-    if (fastShutdown)
+    try
     {
-        if (!tripDetector.isTripped ())
+        if (fastShutdown)
+        {
+            if (!tripDetector.isTripped ())
+            {
+                loggingQueue.emplace (-1, "!!>close");
+            }
+        }
+        else
         {
             loggingQueue.emplace (-1, "!!>close");
         }
-    }
-    else
-    {
-        loggingQueue.emplace (-1, "!!>close");
-    }
-    try
-    {
+
         loggingThread.join ();
     }
     catch (...)
@@ -58,7 +59,7 @@ void LoggingCore::addMessage (int index, std::string &&message)
 }
 
 void LoggingCore::addMessage (int index, const std::string &message) { loggingQueue.emplace (index, message); }
-int LoggingCore::addFileProcessor (std::function<void (std::string &&message)> newFunction)
+int LoggingCore::addFileProcessor (std::function<void(std::string &&message)> newFunction)
 {
     std::lock_guard<std::mutex> fLock (functionLock);
     for (int ii = 0; ii < static_cast<int> (functions.size ()); ++ii)
@@ -86,7 +87,7 @@ void LoggingCore::haltOperations (int loggerIndex)
 }
 
 /** update a callback for a particular instance*/
-void LoggingCore::updateProcessingFunction (int index, std::function<void (std::string &&message)> newFunction)
+void LoggingCore::updateProcessingFunction (int index, std::function<void(std::string &&message)> newFunction)
 {
     std::lock_guard<std::mutex> fLock (functionLock);
     if (index < static_cast<int> (functions.size ()))

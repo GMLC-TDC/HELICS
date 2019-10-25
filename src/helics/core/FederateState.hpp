@@ -102,7 +102,7 @@ class FederateState
     mutable std::atomic_flag processing = ATOMIC_FLAG_INIT;  //!< the federate is processing
   private:
     /** a logging function for logging or printing messages*/
-    std::function<void(int, const std::string &, const std::string &)>
+    std::function<void (int, const std::string &, const std::string &)>
       loggerFunction;  //!< callback for logging functions
     std::function<std::string (const std::string &)> queryCallback;  //!< a callback for additional queries
     /** find the next Value Event*/
@@ -191,13 +191,25 @@ class FederateState
     /** locks the processing with a sleep loop*/
     void sleeplock () const
     {
+        if (!processing.test_and_set ())
+        {
+            return;
+        }
+        // spin for 10000 tries
+        for (int ii = 0; ii < 10000; ++ii)
+        {
+            if (!processing.test_and_set ())
+            {
+                return;
+            }
+        }
         while (processing.test_and_set ())
         {
-            std::this_thread::sleep_for (std::chrono::milliseconds (50));
+            std::this_thread::yield ();
         }
     }
     /** locks the processing so FederateState can be used with lock_guard*/
-    void lock () { spinlock (); }
+    void lock () { sleeplock (); }
 
     /** trys to lock the processing return true if successful and false if not*/
     bool try_lock () const { return !processing.test_and_set (); }
@@ -285,6 +297,11 @@ class FederateState
     @return an iteration time with two elements the granted time and the convergence state
     */
     iteration_time requestTime (Time nextTime, iteration_request iterate);
+    /** get a list of current subscribers to a publication
+    @param handle the publication handle to use
+    */
+    std::vector<global_handle> getSubscribers (interface_handle handle);
+
     /** function to process the queue in a generic fashion used to just process messages
     with no specific end in mind
     */
@@ -309,7 +326,7 @@ class FederateState
     @details function must have signature void(int level, const std::string &sourceName, const std::string
     &message)
     */
-    void setLogger (std::function<void(int, const std::string &, const std::string &)> logFunction)
+    void setLogger (std::function<void (int, const std::string &, const std::string &)> logFunction)
     {
         loggerFunction = std::move (logFunction);
     }
@@ -324,7 +341,8 @@ class FederateState
     @param query a query string
     @return the resulting string from the query or "#wait" if the federate is not available to answer immediately*/
     std::string processQuery (const std::string &query) const;
-    /** check if a value should be published or not
+    /** check if a value should be published or not and if needed archive it as a changed value for future change
+    detection
     @param pub_id the handle of the publication
     @param data the raw data to check
     @param len the length of the data

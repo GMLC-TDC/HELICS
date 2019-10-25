@@ -15,10 +15,10 @@ SPDX-License-Identifier: BSD-3-Clause
 
 namespace helics
 {
-static auto nullMessageFunction = [] (const ActionMessage &) {};
+static auto nullMessageFunction = [](const ActionMessage &) {};
 TimeCoordinator::TimeCoordinator () : sendMessageFunction (nullMessageFunction) {}
 
-TimeCoordinator::TimeCoordinator (std::function<void (const ActionMessage &)> sendMessageFunction_)
+TimeCoordinator::TimeCoordinator (std::function<void(const ActionMessage &)> sendMessageFunction_)
     : sendMessageFunction (std::move (sendMessageFunction_))
 {
     if (!sendMessageFunction)
@@ -27,7 +27,7 @@ TimeCoordinator::TimeCoordinator (std::function<void (const ActionMessage &)> se
     }
 }
 
-void TimeCoordinator::setMessageSender (std::function<void (const ActionMessage &)> sendMessageFunction_)
+void TimeCoordinator::setMessageSender (std::function<void(const ActionMessage &)> sendMessageFunction_)
 {
     sendMessageFunction = std::move (sendMessageFunction_);
     if (!sendMessageFunction)
@@ -176,21 +176,15 @@ bool TimeCoordinator::updateNextExecutionTime ()
 
 void TimeCoordinator::updateNextPossibleEventTime ()
 {
-    if (!iterating)
-    {
-        time_next = getNextPossibleTime ();
-    }
-    else
-    {
-        time_next = time_granted;
-    }
+    time_next = (!iterating) ? getNextPossibleTime () : time_granted;
+
     if (info.uninterruptible)
     {
         time_next = time_requested;
     }
     else
     {
-        if (time_minminDe < Time::maxVal ())
+        if (time_minminDe < Time::maxVal () && !info.restrictive_time_policy)
         {
             if (time_minminDe + info.inputDelay > time_next)
             {
@@ -246,6 +240,10 @@ std::string TimeCoordinator::generateConfig () const
     std::stringstream s;
     s << "\"uninterruptible\":" << ((info.uninterruptible) ? " true,\n" : "false,\n");
     s << "\"wait_for_current_time_updates\":" << ((info.wait_for_current_time_updates) ? " true,\n" : "false,\n");
+    if (info.restrictive_time_policy)
+    {
+        s << "\"restrictive_time_policy\":true,\n";
+    }
     s << "\"max_iterations\":" << info.maxIterations;
     if (info.period > timeZero)
     {
@@ -780,7 +778,7 @@ message_process_result TimeCoordinator::processTimeBlockMessage (const ActionMes
             else
             {
                 auto blk = std::find_if (timeBlocks.begin (), timeBlocks.end (),
-                                         [&cmd] (const auto &block) { return (block.second == cmd.messageID); });
+                                         [&cmd](const auto &block) { return (block.second == cmd.messageID); });
                 if (blk != timeBlocks.end ())
                 {
                     ltime = blk->first;
@@ -792,7 +790,7 @@ message_process_result TimeCoordinator::processTimeBlockMessage (const ActionMes
                 if (!timeBlocks.empty ())
                 {
                     auto res = std::min_element (timeBlocks.begin (), timeBlocks.end (),
-                                                 [] (const auto &blk1, const auto &blk2) {
+                                                 [](const auto &blk1, const auto &blk2) {
                                                      return (blk1.first < blk2.first);
                                                  });
                     time_block = res->first;
@@ -888,6 +886,9 @@ void TimeCoordinator::setOptionFlag (int optionFlag, bool value)
     case defs::flags::wait_for_current_time_update:
         info.wait_for_current_time_updates = value;
         break;
+    case defs::flags::restrictive_time_policy:
+        info.restrictive_time_policy = value;
+        break;
     default:
         break;
     }
@@ -936,6 +937,8 @@ bool TimeCoordinator::getOptionFlag (int optionFlag) const
         return !info.uninterruptible;
     case defs::flags::wait_for_current_time_update:
         return info.wait_for_current_time_updates;
+    case defs::flags::restrictive_time_policy:
+        return info.restrictive_time_policy;
     default:
         throw (std::invalid_argument ("flag not recognized"));
     }
