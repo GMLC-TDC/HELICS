@@ -1,4 +1,10 @@
-FROM alpine:3.10
+FROM alpine:latest
+
+RUN apk add --no-cache \
+    bash \
+    jq \
+    ca-certificates \
+    curl
 
 COPY entrypoint.sh /entrypoint.sh
 
