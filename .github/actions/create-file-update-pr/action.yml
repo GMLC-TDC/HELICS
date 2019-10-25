@@ -1,5 +1,10 @@
 name: 'Test'
 description: 'Testing local action'
+inputs:
+  testvar:
+    description: 'Test input'
+    required: true
+    default: 'Default Value'
 runs:
   using: 'docker'
   image: 'Dockerfile'
