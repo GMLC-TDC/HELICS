@@ -4,7 +4,7 @@ files_changed=$(git diff --staged --name-only)
 if [[ "$files_changed" != "" ]];
 then
   hash=$(sha256sum ${files_changed} | sha256sum | cut -c 1-12 -)
-  current_branch=$(git rev-parse --symbolic-full-name --abbrev-ref ${GITHUB_REF})
+  current_branch=${GITHUB_REF#refs/heads/}
   
   echo "Hash=$hash"
   echo "Current branch=$current_branch"
@@ -18,14 +18,7 @@ then
   then
     git checkout -b "${pr_branch}"
     git commit -m "${INPUT_COMMIT_MSG}"
-    git show
+    git push
   fi
   echo $pr_branch
 fi
-
-cat $GITHUB_EVENT_PATH
-
-echo "Ref:"
-jq --raw-output .ref "$GITHUB_EVENT_PATH"
-
-printenv
