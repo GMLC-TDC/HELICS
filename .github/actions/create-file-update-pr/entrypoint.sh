@@ -35,14 +35,15 @@ then
     curl -XPOST -fsSL \
 	 -H "${AUTH_HEADER}" \
 	 -H "${API_HEADER}" \
+	 --user "${INPUT_GIT_NAME}"
 	 --data "${pr_api_data}" \
 	 "${PR_URL}"
   fi
   
-  #curl -XGET -fsSL \
-  #     -H "${AUTH_HEADER}" \
-  #     -H "${API_HEADER}" \
-  #     "${PR_URL}?state=open&base=${current_branch}&head=${pr_branch}"
+  curl -XGET -fsSL \
+       -H "${AUTH_HEADER}" \
+       -H "${API_HEADER}" \
+       "${PR_URL}?state=open&base=${current_branch}&head=${pr_branch}"
       
   echo $pr_branch
 fi
