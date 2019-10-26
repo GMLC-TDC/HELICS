@@ -1,5 +1,8 @@
 #!/bin/bash
 
+git config --global credential.helper store
+echo "https://${GITHUB_TOKEN}:x-oauth-basic@github.com" >> $HOME\.git-credentials
+
 files_changed=$(git diff --staged --name-only)
 if [[ "$files_changed" != "" ]];
 then
