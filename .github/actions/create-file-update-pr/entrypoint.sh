@@ -6,8 +6,6 @@ API_VERSION=v3
 API_HEADER="Accept: application/vnd.github.${API_VERSION}+json; application/vnd.github.shadow-cat-preview+json; application/vnd.github.symmetra-preview+json; application/vnd.github.sailor-v-preview+json"
 AUTH_HEADER="Authorization: token ${GITHUB_TOKEN}"
 
-echo -n "Test input" | jq --raw-input --slurp "."
-
 files_changed=$(git diff --staged --name-only)
 if [[ "$files_changed" != "" ]];
 then
@@ -29,7 +27,11 @@ then
     git commit -m "${INPUT_COMMIT_MSG}"
     git push -u origin "${pr_branch}"
     
-    pr_api_data="{\"title\":${INPUT_PR_TITLE}, \"body\":${INPUT_PR_BODY}, \"base\":${current_branch}, \"head\":${pr_branch}, \"draft\":false}"
+    PR_TITLE="$(echo -n "${INPUT_PR_TITLE}" | jq --raw-input --slurp ".")"
+    PR_BODY="$(echo -n "${INPUT_PR_BODY}" | jq --raw-input --slurp ".")"
+    PR_BASE="$(echo -n "${current_branch}" | jq --raw-input --slurp ".")"
+    PR_HEAD="$(echo -n "${pr_branch}" | jq --raw-input --slurp ".")"
+    pr_api_data="{\"title\":${PR_TITLE}, \"body\":${PR_BODY}, \"base\":${PR_BASE}, \"head\":${PR_HEAD}, \"draft\":false}"
     curl -XPOST -fsSL \
 	 -H "${AUTH_HEADER}" \
 	 -H "${API_HEADER}" \
