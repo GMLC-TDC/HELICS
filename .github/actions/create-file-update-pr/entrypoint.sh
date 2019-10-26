@@ -18,7 +18,7 @@ then
   then
     git checkout -b "${pr_branch}"
     git commit -m "${INPUT_COMMIT_MSG}"
-    git push
+    git -u push origin "${pr_branch}"
   fi
   echo $pr_branch
 fi
