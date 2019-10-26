@@ -33,7 +33,8 @@ jobs:
         fi
     - uses: ./.github/actions/create-file-update-pr
       with:
-        CHANGE_COMMIT_MSG: "Update SWIG generated interface files"
-        CHANGE_PR_TITLE: "Update SWIG generated interface files"
-        CHANGE_GIT_EMAIL: "HELICS-bot@users.noreply.github.com"
-        CHANGE_GIT_NAME: "HELICS-bot"
+        COMMIT_MSG: "Update SWIG generated interface files"
+        PR_TITLE: "Update SWIG generated interface files"
+        GIT_EMAIL: "HELICS-bot@users.noreply.github.com"
+        GIT_NAME: "HELICS-bot"
+        BRANCH_PREFIX: "swig-gen/"
