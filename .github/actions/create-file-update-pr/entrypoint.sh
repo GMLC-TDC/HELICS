@@ -3,14 +3,10 @@
 files_changed=$(git diff --staged --name-only)
 if [[ "$files_changed" != "" ]];
 then
-  sha256sum ${files_changed} > changed_hashes.txt
-  cat changed_hashes.txt
-  hash_chk=$(cat changed_hashes.txt | sha256sum | cut -c 1-12 -)
   hash=$(sha256sum ${files_changed} | sha256sum | cut -c 1-12 -)
-  current_branch=$(git branch --show-current)
+  current_branch=$(git rev-parse --symbolic-full-name --abbrev-ref ${GITHUB_REF})
   
   echo "Hash=$hash"
-  echo "Hash Check=$hash_chk"
   echo "Current branch=$current_branch"
   
   git config user.name "${INPUT_GIT_NAME}"
@@ -18,7 +14,12 @@ then
   
   pr_branch="${INPUT_BRANCH_PREFIX}update-${current_branch}-${hash}"
   git ls-remote --exit-code . "origin/${pr_branch}"
-  echo $?
+  if [[ "$?" != "0" ]];
+  then
+    git checkout -b "${pr_branch}"
+    git commit -m "${INPUT_COMMIT_MSG}"
+    git show
+  fi
   echo $pr_branch
 fi
 
