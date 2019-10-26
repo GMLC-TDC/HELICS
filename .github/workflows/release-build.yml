@@ -1,4 +1,4 @@
-name: Release all submodules archive
+name: Build release artifacts
 
 on: release
 
