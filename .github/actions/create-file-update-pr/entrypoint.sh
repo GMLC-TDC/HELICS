@@ -26,24 +26,29 @@ then
     git checkout -b "${pr_branch}"
     git commit -m "${INPUT_COMMIT_MSG}"
     git push -u origin "${pr_branch}"
-    
-    PR_TITLE="$(echo -n "${INPUT_PR_TITLE}" | jq --raw-input --slurp ".")"
-    PR_BODY="$(echo -n "${INPUT_PR_BODY}" | jq --raw-input --slurp ".")"
-    PR_BASE="$(echo -n "${current_branch}" | jq --raw-input --slurp ".")"
-    PR_HEAD="$(echo -n "${pr_branch}" | jq --raw-input --slurp ".")"
-    pr_api_data="{\"title\":${PR_TITLE}, \"body\":${PR_BODY}, \"base\":${PR_BASE}, \"head\":${PR_HEAD}, \"draft\":false}"
-    curl -XPOST -fsSL \
-	 -H "${AUTH_HEADER}" \
-	 -H "${API_HEADER}" \
-	 --user "${INPUT_GIT_NAME}"
-	 --data "${pr_api_data}" \
-	 "${PR_URL}"
   fi
   
-  curl -XGET -fsSL \
-       -H "${AUTH_HEADER}" \
-       -H "${API_HEADER}" \
-       "${PR_URL}?state=open&base=${current_branch}&head=${pr_branch}"
-      
-  echo $pr_branch
+  PR_TITLE="$(echo -n "${INPUT_PR_TITLE}" | jq --raw-input --slurp ".")"
+  PR_BODY="$(echo -n "${INPUT_PR_BODY}" | jq --raw-input --slurp ".")"
+  PR_BASE="$(echo -n "${current_branch}" | jq --raw-input --slurp ".")"
+  PR_HEAD="$(echo -n "${pr_branch}" | jq --raw-input --slurp ".")"
+  pr_api_data="{\"title\":${PR_TITLE}, \"body\":${PR_BODY}, \"base\":${PR_BASE}, \"head\":${PR_HEAD}, \"draft\":false}"
+    
+  check_pr_exists=$(curl -XGET -fsSL \
+                         -H "${AUTH_HEADER}" \
+                         -H "${API_HEADER}" \
+                         --data "${pr_api_data}" \
+                         "${PR_URL}")
+  existing_pr_ref=$(echo "${RESPONSE}" | jq --raw-output '.[] | .head.ref')
+  echo "Existing ref: ${existing_pr_ref}"
+  
+  if [[ "${existing_pr_ref}" == "${pr_branch}" ]];
+  then
+    curl -XPOST -fsSL \
+         -H "${AUTH_HEADER}" \
+         -H "${API_HEADER}" \
+         --user "${INPUT_GIT_NAME}" \
+         --data "${pr_api_data}" \
+         "${PR_URL}"
+  fi
 fi
