@@ -26,12 +26,19 @@ then
     git checkout -b "${pr_branch}"
     git commit -m "${INPUT_COMMIT_MSG}"
     git push -u origin "${pr_branch}"
+    
+    pr_api_data="{\"base\":${current_branch}, \"head\":${pr_branch}, \"title\":${INPUT_PR_TITLE}, \"body\":${INPUT_PR_BODY}}"
+    curl -XPOST -fsSL \
+	 -H "${AUTH_HEADER}" \
+	 -H "${API_HEADER}" \
+	 --data "${pr_api_data}" \
+	 "${PR_URL}"
   fi
   
   curl -XGET -fsSL \
-			-H "${AUTH_HEADER}" \
-			-H "${API_HEADER}" \
-			"${PR_URL}?state=open&base=${current_branch}"
+       -H "${AUTH_HEADER}" \
+       -H "${API_HEADER}" \
+       "${PR_URL}?state=open&base=${current_branch}&head=${pr_branch}"
       
   echo $pr_branch
 fi
