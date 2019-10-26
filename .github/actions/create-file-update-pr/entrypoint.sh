@@ -40,7 +40,6 @@ then
     curl -XPOST -fsSL \
          -H "${AUTH_HEADER}" \
          -H "${API_HEADER}" \
-         --user "${INPUT_GIT_NAME}" \
          --data "${pr_api_data}" \
          "${PR_URL}"
   fi
