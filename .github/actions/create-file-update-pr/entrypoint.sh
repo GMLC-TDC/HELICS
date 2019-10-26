@@ -27,7 +27,7 @@ then
     git commit -m "${INPUT_COMMIT_MSG}"
     git push -u origin "${pr_branch}"
     
-    pr_api_data="{\"base\":${current_branch}, \"head\":${pr_branch}, \"title\":${INPUT_PR_TITLE}, \"body\":${INPUT_PR_BODY}}"
+    pr_api_data="{\"title\":${INPUT_PR_TITLE}, \"body\":${INPUT_PR_BODY}, \"base\":${current_branch}, \"head\":${pr_branch}, \"draft\":false}"
     curl -XPOST -fsSL \
 	 -H "${AUTH_HEADER}" \
 	 -H "${API_HEADER}" \
@@ -35,10 +35,10 @@ then
 	 "${PR_URL}"
   fi
   
-  curl -XGET -fsSL \
-       -H "${AUTH_HEADER}" \
-       -H "${API_HEADER}" \
-       "${PR_URL}?state=open&base=${current_branch}&head=${pr_branch}"
+  #curl -XGET -fsSL \
+  #     -H "${AUTH_HEADER}" \
+  #     -H "${API_HEADER}" \
+  #     "${PR_URL}?state=open&base=${current_branch}&head=${pr_branch}"
       
   echo $pr_branch
 fi
