@@ -35,3 +35,5 @@ jobs:
       with:
         CHANGE_COMMIT_MSG: "Update SWIG generated interface files"
         CHANGE_PR_TITLE: "Update SWIG generated interface files"
+        CHANGE_GIT_EMAIL: "HELICS-bot@users.noreply.github.com"
+        CHANGE_GIT_NAME: "HELICS-bot"
