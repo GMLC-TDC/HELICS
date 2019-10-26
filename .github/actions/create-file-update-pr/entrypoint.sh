@@ -1,7 +1,10 @@
 #!/bin/bash
 
-clone_url=$(jq --raw-output .repository.clone_url "$GITHUB_EVENT_PATH")
-clone_url="https://x-access-token:${GITHUB_TOKEN}@${clone_url#https://}"
+PR_URL=$(jq --raw-output .repository.pulls_url "$GITHUB_EVENT_PATH")
+PR_URL=${PR_URL%\{*}
+API_VERSION=v3
+API_HEADER="Accept: application/vnd.github.${API_VERSION}+json; application/vnd.github.shadow-cat-preview+json; application/vnd.github.symmetra-preview+json; application/vnd.github.sailor-v-preview+json"
+AUTH_HEADER="Authorization: token ${GITHUB_TOKEN}"
 
 files_changed=$(git diff --staged --name-only)
 if [[ "$files_changed" != "" ]];
@@ -12,7 +15,7 @@ then
   echo "Hash=$hash"
   echo "Current branch=$current_branch"
   
-  git remote set-url origin "${clone_url}"
+  git remote set-url origin "https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}"
   git config user.name "${INPUT_GIT_NAME}"
   git config user.email "${INPUT_GIT_EMAIL}"
   
@@ -24,5 +27,11 @@ then
     git commit -m "${INPUT_COMMIT_MSG}"
     git push -u origin "${pr_branch}"
   fi
+  
+  curl -XGET -fsSL \
+			-H "${AUTH_HEADER}" \
+			-H "${API_HEADER}" \
+			"${PR_URL}?state=open&base=${current_branch}"
+      
   echo $pr_branch
 fi
