@@ -1,7 +1,7 @@
 #!/bin/bash
 
-git config --global credential.helper store
-echo "https://${GITHUB_TOKEN}:x-oauth-basic@github.com" >> $HOME\.git-credentials
+clone_url=$(jq --raw-output .repository.clone_url "$GITHUB_EVENT_PATH")
+clone_url="https://x-access-token:${GITHUB_TOKEN}@${clone_url#https://}"
 
 files_changed=$(git diff --staged --name-only)
 if [[ "$files_changed" != "" ]];
@@ -12,6 +12,7 @@ then
   echo "Hash=$hash"
   echo "Current branch=$current_branch"
   
+  git remote set-url origin "${clone_url}"
   git config user.name "${INPUT_GIT_NAME}"
   git config user.email "${INPUT_GIT_EMAIL}"
   
