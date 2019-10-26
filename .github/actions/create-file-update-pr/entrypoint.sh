@@ -10,6 +10,6 @@ fi
 cat $GITHUB_EVENT_PATH
 
 echo "Ref:"
-jq --raw-output github.ref "$GITHUB_EVENT_PATH"
+jq --raw-output .ref "$GITHUB_EVENT_PATH"
 
 printenv
