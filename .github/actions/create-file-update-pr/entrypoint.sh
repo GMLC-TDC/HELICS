@@ -7,7 +7,9 @@ then
   echo "ChangeHash=$hash"
 fi
 
+cat $GITHUB_EVENT_PATH
+
 echo "Ref:"
-jq --raw-output .pull_request.head.ref "$GITHUB_EVENT_PATH"
+jq --raw-output github.ref "$GITHUB_EVENT_PATH"
 
 printenv
