@@ -20,8 +20,8 @@
   </tr>
   <tr>
   <td>Travis CI</td>
-  <td><a href="https://travis-ci.org/GMLC-TDC/HELICS"><img src="https://travis-ci.org/GMLC-TDC/HELICS.svg?branch=master" alt="Build Status" /></a></td>
-  <td><a href="https://travis-ci.org/GMLC-TDC/HELICS"><img src="https://travis-ci.org/GMLC-TDC/HELICS.svg?branch=develop" alt="Build Status" /></a></td>
+  <td><a href="https://travis-ci.com/GMLC-TDC/HELICS"><img src="https://travis-ci.com/GMLC-TDC/HELICS.svg?branch=master" alt="Build Status" /></a></td>
+  <td><a href="https://travis-ci.com/GMLC-TDC/HELICS"><img src="https://travis-ci.com/GMLC-TDC/HELICS.svg?branch=develop" alt="Build Status" /></a></td>
   </tr>
   <tr>
   <td>Appveyor</td>
