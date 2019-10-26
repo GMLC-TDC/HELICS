@@ -10,8 +10,13 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helics/application_api/Filters.hpp"
 #include "helics/application_api/MessageFederate.hpp"
 #include "helics/application_api/MessageOperators.hpp"
-#include "helics/core/Broker.hpp"
-#include "testFixtures.hpp"
+
+#ifndef HELICS_SHARED_LIBRARY
+#    include "testFixtures.hpp"
+#    include "helics/core/Broker.hpp"
+#else
+#    include "testFixtures_shared.hpp"
+#endif
 #include <future>
 #include <gtest/gtest.h>
 /** these test cases test out the message federates
@@ -33,7 +38,8 @@ TEST_P (filter_single_type_test, message_filter_registration)
     AddFederates<helics::MessageFederate> (GetParam (), 1, broker, helics::timeZero, "filter");
     AddFederates<helics::MessageFederate> (GetParam (), 1, broker, helics::timeZero, "message");
     // broker->setLoggingLevel (3);
-    broker = nullptr;
+    broker.reset ();
+    
     auto fFed = GetFederateAs<helics::MessageFederate> (0);
     auto mFed = GetFederateAs<helics::MessageFederate> (1);
 
@@ -566,6 +572,7 @@ TEST_P (filter_single_type_test, message_filter_function_two_stage_broker_filter
     auto &p1 = mFed->registerGlobalEndpoint ("port1");
     auto &p2 = mFed->registerGlobalEndpoint ("port2");
     std::this_thread::sleep_for (std::chrono::milliseconds (200));
+
     broker->addSourceFilterToEndpoint ("filter1", "port1");
     broker->addDestinationFilterToEndpoint ("filter2", "port2");
 
@@ -660,7 +667,6 @@ The filter operator delays the message by 2.5 seconds meaning it should arrive b
 TEST_P (filter_single_type_test, message_filter_function_two_stage_object)
 {
     auto broker = AddBroker (GetParam (), 3);
-    ASSERT_TRUE (broker);
     AddFederates<helics::MessageFederate> (GetParam (), 1, broker, 1.0, "filter");
     AddFederates<helics::MessageFederate> (GetParam (), 1, broker, 1.0, "filter2");
     AddFederates<helics::MessageFederate> (GetParam (), 1, broker, 1.0, "message");

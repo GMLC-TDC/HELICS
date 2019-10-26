@@ -77,12 +77,12 @@ class MessageConditionalOperator : public FilterOperator
     /** default constructor*/
     MessageConditionalOperator () = default;
     /** set the function to modify the data of the message in the constructor*/
-    explicit MessageConditionalOperator (std::function<bool(const Message *)> userConditionalFunction);
+    explicit MessageConditionalOperator (std::function<bool (const Message *)> userConditionalFunction);
     /** set the function to modify the data of the message*/
-    void setConditionFunction (std::function<bool(const Message *)> userConditionFunction);
+    void setConditionFunction (std::function<bool (const Message *)> userConditionFunction);
 
   private:
-    std::function<bool(const Message *)> evalFunction;  //!< the function actually doing the processing
+    std::function<bool (const Message *)> evalFunction;  //!< the function actually doing the processing
     virtual std::unique_ptr<Message> process (std::unique_ptr<Message> message) override;
 };
 
@@ -96,12 +96,12 @@ class CloneOperator : public FilterOperator
     /** default constructor*/
     CloneOperator () = default;
     /** set the function to modify the data of the message in the constructor*/
-    explicit CloneOperator (std::function<void(const Message *)> userCloneFunction);
+    explicit CloneOperator (std::function<void (const Message *)> userCloneFunction);
     /** set the function to modify the data of the message*/
-    void setCloneFunction (std::function<void(const Message *)> userCloneFunction);
+    void setCloneFunction (std::function<void (const Message *)> userCloneFunction);
 
   private:
-    std::function<void(const Message *)> evalFunction;  //!< the function actually doing the processing
+    std::function<void (const Message *)> evalFunction;  //!< the function actually doing the processing
     virtual std::unique_ptr<Message> process (std::unique_ptr<Message> message) override;
 };
 
@@ -125,14 +125,14 @@ class FirewallOperator : public FilterOperator
     /** default constructor*/
     FirewallOperator () = default;
     /** set the function to modify the data of the message in the constructor*/
-    explicit FirewallOperator (std::function<bool(const Message *)> userCheckFunction);
+    explicit FirewallOperator (std::function<bool (const Message *)> userCheckFunction);
     /** set the function to modify the data of the message*/
-    void setCheckFunction (std::function<bool(const Message *)> userCheckFunction);
+    void setCheckFunction (std::function<bool (const Message *)> userCheckFunction);
     /** set the operation to perform on positive checkFunction*/
     void setOperation (operations newop) { operation.store (newop); }
 
   private:
-    std::function<bool(const Message *)> checkFunction;  //!< the function actually doing the processing
+    std::function<bool (const Message *)> checkFunction;  //!< the function actually doing the processing
     std::atomic<operations> operation{operations::drop};  //!< the operation to perform if the firewall triggers
     virtual std::unique_ptr<Message> process (std::unique_ptr<Message> message) override;
 };

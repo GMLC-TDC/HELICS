@@ -60,7 +60,7 @@ class ValueConverter<std::string>
 };
 }  // namespace helics
 
-//This should be at the end since it depends on the definitions in here
+// This should be at the end since it depends on the definitions in here
 #ifndef HELICS_CXX_STATIC_DEFINE
-#include "ValueConverter_impl.hpp"
+#    include "ValueConverter_impl.hpp"
 #endif

@@ -9,10 +9,10 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "../core/core-types.hpp"
 #include "helics_cxx_export.h"
 
+#include <chrono>
 #include <memory>
 #include <string>
 #include <vector>
-#include <chrono>
 
 namespace helics
 {
@@ -80,7 +80,7 @@ class HELICS_CXX_EXPORT CoreApp
     /** set the log file to use for the broker*/
     void setLogFile (const std::string &logFile);
     /** tell the core that is ready to enter initialization mode*/
-	void setReadyToInit ();
+    void setReadyToInit ();
 #ifdef HELICS_CXX_STATIC_DEFINE
     /** overload the -> operator so broker functions can be called if needed
      */
@@ -88,6 +88,7 @@ class HELICS_CXX_EXPORT CoreApp
 #endif
     /** get a copy of the core pointer*/
     std::shared_ptr<Core> getCopyofCorePointer () const { return core; }
+
   private:
     void processArgs (std::unique_ptr<helicsCLI11App> &app);
     std::unique_ptr<helicsCLI11App> generateParser ();
@@ -114,13 +115,13 @@ class CoreKeeper
     /// the destructor waits for the broker to terminate
     ~CoreKeeper ()
     {
-		if (cr.isConnected ())
+        if (cr.isConnected ())
         {
             cr.waitForDisconnect ();
         }
     }
 
   private:
-   CoreApp cr;
+    CoreApp cr;
 };
 }  // namespace helics

@@ -10,12 +10,12 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helics/external/variant.hpp"
 #include "helics/helics-config.h"
 #include "helicsTypes.hpp"
+#include "helics_cxx_export.h"
 #include <cmath>
 #include <complex>
 #include <cstdint>
 #include <string>
 #include <vector>
-#include "helics_cxx_export.h"
 /** @file
 @brief naming a set of types that are interchangeable and recognizable inside the HELICS application API and core
 */
@@ -208,7 +208,7 @@ std::enable_if_t<std::is_arithmetic<X>::value> valueExtract (const data_view &dv
                 val = static_cast<X> (Vint);
             }
         }
-        else if (dv.size () == sizeof(char))
+        else if (dv.size () == sizeof (char))
         {
             val = static_cast<X> ((dv[0] == '0') ? 0 : 1);
         }

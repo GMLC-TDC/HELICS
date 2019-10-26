@@ -16,7 +16,7 @@ add_library(helics_test_base INTERFACE)
 target_link_libraries(helics_test_base INTERFACE gtest gtest_main gmock)
 target_link_libraries(
     helics_test_base
-    INTERFACE helics_base_includes compile_flags_target
+    INTERFACE compile_flags_target
 )
 
 add_subdirectory(core)

@@ -79,12 +79,16 @@ class HELICS_CXX_EXPORT BrokerApp
     std::string query (const std::string &target, const std::string &query);
     /** set the log file to use for the broker*/
     void setLogFile (const std::string &logFile);
-
-#ifdef HELICS_CXX_STATIC_DEFINE
+    /** clear the pointer to the broker*/
+    void reset ();
+    #ifdef HELICS_CXX_STATIC_DEFINE
     /** overload the -> operator so all broker functions can be called if needed
      */
     auto *operator-> () const { return broker.operator-> (); }
-#endif
+    #else
+    BrokerApp *operator-> () { return this; }
+    const BrokerApp *operator-> () const { return this; }
+    #endif
   private:
     void processArgs (std::unique_ptr<helicsCLI11App> &app);
     std::unique_ptr<helicsCLI11App> generateParser ();
@@ -102,20 +106,20 @@ class BrokerKeeper
     }
     BrokerKeeper (BrokerKeeper &&brkeep) = default;
     BrokerKeeper (const BrokerKeeper &brkeep) = default;
-    BrokerKeeper &operator=(BrokerKeeper &&brkeep) = default;
+    BrokerKeeper &operator= (BrokerKeeper &&brkeep) = default;
     BrokerKeeper &operator= (const BrokerKeeper &brkeep) = default;
-	///is the broker connected
-	bool isConnected () { return brk.isConnected (); }
-	/// Force terminate the broker
-	void forceTerminate () { brk.forceTerminate (); }
-	/// the destructor waits for the broker to terminate
+    /// is the broker connected
+    bool isConnected () { return brk.isConnected (); }
+    /// Force terminate the broker
+    void forceTerminate () { brk.forceTerminate (); }
+    /// the destructor waits for the broker to terminate
     ~BrokerKeeper ()
     {
         if (brk.isConnected ())
         {
             brk.waitForDisconnect ();
         }
-	}
+    }
 
   private:
     BrokerApp brk;

@@ -10,6 +10,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helics/application_api/Federate.hpp"
 #include "helics/application_api/CoreApp.hpp"
 #include "helics/application_api/BrokerApp.hpp"
+#include "helics/application_api/typeOperations.hpp"
 #include <iostream>
 #include <memory>
 #include <stdexcept>
@@ -36,13 +37,13 @@ struct FederateTestFixture
     {
         ctype = core_type_name;
         auto broker = AddBroker (core_type_name, count);
-        if (!broker.isActive ())
+        if (!broker.isConnected ())
         {
-            broker->disconnect ();
-            broker = nullptr;
+            broker.forceTerminate ();
+            broker.reset();
             helics::cleanupHelicsLibrary ();
             broker = AddBroker (core_type_name, count);
-            if (!broker.isActive ())
+            if (!broker.isConnected ())
             {
                 throw (std::runtime_error ("Unable to connect rootbroker"));
             }
@@ -74,7 +75,7 @@ struct FederateTestFixture
             initString.append (extraCoreArgs);
         }
 
-        helics::FederateInfo fi (helics::core::coreTypeFromString (core_type_name));
+        helics::FederateInfo fi (helics::coreTypeFromString (core_type_name));
         if (time_delta != helics::timeZero)
         {
             fi.setProperty (helics_property_time_delta, time_delta);
@@ -86,7 +87,7 @@ struct FederateTestFixture
         default:
         {
             size_t offset = federates.size ();
-            auto core_type = helics::core::coreTypeFromString (core_type_name);
+            auto core_type = helics::coreTypeFromString (core_type_name);
             //  auto core = helics::CoreFactory::create (core_type, name_prefix + "_core_" + std::to_string
             //  (offset),
             //                                          initString + " --federates " + std::to_string (count));
@@ -104,7 +105,7 @@ struct FederateTestFixture
         break;
         case 2:
         {  // each federate has its own core
-            auto core_type = helics::core::coreTypeFromString (core_type_name);
+            auto core_type = helics::coreTypeFromString (core_type_name);
             size_t offset = federates.size ();
             federates.resize (count + offset);
             for (int ii = 0; ii < count; ++ii)
@@ -160,7 +161,7 @@ struct FederateTestFixture
         break;
         case 5:  // pairs of federates per core
         {
-            auto core_type = helics::core::coreTypeFromString (core_type_name);
+            auto core_type = helics::coreTypeFromString (core_type_name);
             size_t offset = federates.size ();
             federates.resize (count + offset);
             for (int ii = 0; ii < count; ii += 2)
@@ -168,7 +169,7 @@ struct FederateTestFixture
                 helics::CoreApp core (core_type,
                                       initString + " --federates " +
                                                                       std::to_string ((ii < count - 1) ? 2 : 1));
-                fi.coreName = core->getIdentifier ();
+                fi.coreName = core.getIdentifier ();
 
                 auto fedname = name_prefix + std::to_string (ii + offset);
                 auto fed = std::make_shared<FedType> (fedname, fi);
@@ -190,7 +191,7 @@ struct FederateTestFixture
             for (int ii = 0; ii < count; ii += 4)
             {
                 int fedcnt = (ii > count - 3) ? 4 : (count - ii);
-                auto &subbroker =
+                auto subbroker =
                   AddBroker (core_type_name, initString + " --federates " + std::to_string (fedcnt));
                 if (!subbroker->isConnected ())
                 {
@@ -207,7 +208,7 @@ struct FederateTestFixture
             newTypeString.push_back ('4');
             for (int ii = 0; ii < count; ++ii)
             {
-                auto &subbroker = AddBroker (core_type_name, initString + " --federates 1");
+                auto subbroker = AddBroker (core_type_name, initString + " --federates 1");
                 if (!subbroker->isConnected ())
                 {
                     throw (std::runtime_error ("Unable to connect subbroker(mode 4)"));

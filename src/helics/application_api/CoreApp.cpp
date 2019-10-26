@@ -7,14 +7,13 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "CoreApp.hpp"
 #include "../core/CoreFactory.hpp"
 #include "../core/core-exceptions.hpp"
-#include "../core/helicsCLI11.hpp"
 #include "../core/coreTypeOperations.hpp"
+#include "../core/helicsCLI11.hpp"
 #include <fstream>
 #include <iostream>
 
 namespace helics
 {
-
 CoreApp::CoreApp (core_type ctype, std::vector<std::string> args)
 {
     auto app = generateParser ();
@@ -58,9 +57,9 @@ std::unique_ptr<helicsCLI11App> CoreApp::generateParser ()
     app->add_option ("--name,-n", name, "name of the core");
     app->allow_extras ();
     auto app_p = app.get ();
-    app->footer ([app_p]() {
+    app->footer ([app_p] () {
         auto coreType = helics::core::coreTypeFromString ((*app_p)["--core"]->as<std::string> ());
-        //CoreFactory:: (coreType);
+        // CoreFactory:: (coreType);
         return std::string ();
     });
     return app;
@@ -131,7 +130,7 @@ const std::string &CoreApp::getAddress () const { return (core) ? core->getAddre
 /** make a query at the core*/
 std::string CoreApp::query (const std::string &target, const std::string &query)
 {
-     return (core) ? core->query (target, query) : std::string ("#error");
+    return (core) ? core->query (target, query) : std::string ("#error");
 }
 /** set the log file to use for the core*/
 void CoreApp::setLogFile (const std::string &logFile)
@@ -142,7 +141,7 @@ void CoreApp::setLogFile (const std::string &logFile)
     }
 }
 
-void CoreApp::setReadyToInit()
+void CoreApp::setReadyToInit ()
 {
     if (core)
     {

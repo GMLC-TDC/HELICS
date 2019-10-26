@@ -51,6 +51,10 @@ if(NOT TARGET compile_flags_target)
     add_library(compile_flags_target INTERFACE)
 endif()
 
+if (NOT TARGET build_flags_target)
+	add_library(build_flags_target INTERFACE)
+endif()
+
 target_compile_options(
     compile_flags_target
     INTERFACE
@@ -136,15 +140,19 @@ if(MSVC)
 
     target_compile_options(
         compile_flags_target
-        INTERFACE -D_CRT_SECURE_NO_WARNINGS -D_SCL_SECURE_NO_WARNINGS
+        INTERFACE -D_CRT_SECURE_NO_WARNINGS -D_SCL_SECURE_NO_WARNINGS /MP
     )
     # these next two should be global
-    add_compile_options(/MP /EHsc)
+    target_compile_options(build_flags_target INTERFACE /EHsc)
+	
+	if (CMAKE_VERSION VERSION_GREATER 3.13.0)
+	   target_link_options(compile_flags_target INTERFACE /debug:fastlink /incremental)
+	endif()
     if(${PROJECT_NAME}_ENABLE_EXTRA_COMPILER_WARNINGS)
-        target_compile_options(compile_flags_target INTERFACE /W4 /sdl /wd4244)
+        target_compile_options(compile_flags_target INTERFACE /W4 /sdl /wd4244 )
     endif(${PROJECT_NAME}_ENABLE_EXTRA_COMPILER_WARNINGS)
 	get_win32_winnt(COPTION_WIN32_WINNT_DEFAULT)
-    target_compile_options(compile_flags_target INTERFACE "-D_WIN32_WINNT=${COPTION_WIN32_WINNT_DEFAULT}")
+    target_compile_options(build_flags_target INTERFACE "-D_WIN32_WINNT=${COPTION_WIN32_WINNT_DEFAULT}")
 	message(
         STATUS
             "Detected _WIN32_WINNT from CMAKE_SYSTEM_VERSION: ${COPTION_WIN32_WINNT_DEFAULT}"
@@ -154,9 +162,9 @@ else(MSVC)
     mark_as_advanced(USE_LIBCXX)
     # this is a global option on all parts
     if(USE_LIBCXX)
-        add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-stdlib=libc++>)
-        link_libraries("-stdlib=libc++")
-        link_libraries("c++abi")
+        target_compile_options(build_flags_target INTERFACE $<$<COMPILE_LANGUAGE:CXX>:-stdlib=libc++>)
+        target_link_libraries(build_flags_target INTERFACE "-stdlib=libc++")
+        target_link_libraries(build_flags_target INTERFACE "c++abi")
     endif(USE_LIBCXX)
 endif()
 
@@ -164,3 +172,19 @@ endif()
 # Check and set latest CXX Standard supported by compiler
 # -------------------------------------------------------------
 include(CheckLatestCXXStandardOption)
+
+message(
+        STATUS "setting helics C++ standard build option to \"${CXX_STANDARD_FLAG}\""
+    )
+if(CXX_STANDARD_FLAG)
+   if(MSVC)
+       target_compile_options(build_flags_target INTERFACE ${CXX_STANDARD_FLAG})
+   else(MSVC)
+       target_compile_options(
+           build_flags_target
+           INTERFACE $<$<COMPILE_LANGUAGE:CXX>:${CXX_STANDARD_FLAG}>
+       )
+   endif(MSVC)
+endif(CXX_STANDARD_FLAG)
+
+

@@ -141,9 +141,9 @@ bool waitForFed (helics::Federate *fed, const std::string &fedName, std::chrono:
 std::string queryFederateSubscriptions (helics::Federate *fed, const std::string &fedName)
 {
     auto res = fed->query (fedName, "subscriptions");
-    if (res.size () > 2 && res!="#invalid")
+    if (res.size () > 2 && res != "#invalid")
     {
-        res=fed->query ("gid_to_name", res);
+        res = fed->query ("gid_to_name", res);
     }
     return res;
 }

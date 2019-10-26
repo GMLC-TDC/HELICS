@@ -5,7 +5,8 @@ the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 #pragma once
-
+#ifndef _HELICS_TIME_HEADER_
+#define _HELICS_TIME_HEADER_
 #include "../utilities/timeRepresentation.hpp"
 #include "core-types.hpp"
 #include "helics/helics-config.h"
@@ -43,3 +44,5 @@ struct iteration_time
 };
 
 }  // namespace helics
+
+#endif //_HELICS_TIME_HEADER_

@@ -134,7 +134,7 @@ class ostringbuf : public std::streambuf
     ostringbuf ()
     {
         char *base = abuf_.data ();
-        setp (base, base + bufsize-1);  // one less than the buffer size
+        setp (base, base + bufsize - 1);  // one less than the buffer size
     }
     /** reserve a size of the buffer*/
     void reserve (size_t size) { sbuf_.reserve (size); }
@@ -250,8 +250,8 @@ struct is_iterable<T,
                    typename std::enable_if_t<
                      std::is_same<decltype (std::begin (T ()) != std::end (T ()),  // begin/end and operator != and
                                                                                    // has default constructor
-                                            void(),
-                                            void(*std::begin (T ())),  // dereference operator
+                                            void (),
+                                            void (*std::begin (T ())),  // dereference operator
                                             std::true_type{}),
                                   std::true_type>::value>>
 {

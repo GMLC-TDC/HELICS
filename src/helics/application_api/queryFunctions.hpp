@@ -8,10 +8,10 @@ SPDX-License-Identifier: BSD-3-Clause
 /** @file
 functions for dealing with query results*/
 
+#include "helics_cxx_export.h"
 #include <chrono>
 #include <string>
 #include <vector>
-#include "helics_cxx_export.h"
 
 // forward declare Federate
 namespace helics
@@ -50,8 +50,8 @@ interface
 @return true if the federate is now trying to enter initialization false if the timeout was reached
 */
 HELICS_CXX_EXPORT bool waitForInit (helics::Federate *fed,
-                  const std::string &fedName,
-                  std::chrono::milliseconds timeout = std::chrono::milliseconds (10000));
+                                    const std::string &fedName,
+                                    std::chrono::milliseconds timeout = std::chrono::milliseconds (10000));
 
 /** helper function to wait for a particular federate to be created
 @details this is useful if some reason we need to make sure a federate is created before proceeding
@@ -61,8 +61,8 @@ HELICS_CXX_EXPORT bool waitForInit (helics::Federate *fed,
 @return true if the federate exists, false if the timeout occurred
 */
 HELICS_CXX_EXPORT bool waitForFed (helics::Federate *fed,
-                 const std::string &fedName,
-                 std::chrono::milliseconds timeout = std::chrono::milliseconds (10000));
+                                   const std::string &fedName,
+                                   std::chrono::milliseconds timeout = std::chrono::milliseconds (10000));
 
 /** helper function to get a list of all the publications a federate subscribes to
 @param fed  a pointer to the federate

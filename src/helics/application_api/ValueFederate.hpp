@@ -282,7 +282,7 @@ class HELICS_CXX_EXPORT ValueFederate
     /** register interfaces through a json file or string*/
     void registerValueInterfacesJson (const std::string &jsonString);
     /** register interface through a toml value or string*/
-	void registerValueInterfacesToml (const std::string &tomlString);
+    void registerValueInterfacesToml (const std::string &tomlString);
 
   public:
     /** get a value as raw data block from the system

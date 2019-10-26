@@ -6,8 +6,8 @@ SPDX-License-Identifier: BSD-3-Clause
 */
 
 #include "HelicsPrimaryTypes.hpp"
-#include "ValueConverter.hpp"
 #include "../core/coreTimeOperations.hpp"
+#include "ValueConverter.hpp"
 #include <set>
 namespace helics
 {

@@ -5,7 +5,6 @@ the top-level NOTICE for additional details. All rights reserved. SPDX-License-I
 */
 
 #include "helics/chelics.h"
-#include "helics/helics-config.h"
 
 #include "gtest/gtest.h"
 #include <iostream>

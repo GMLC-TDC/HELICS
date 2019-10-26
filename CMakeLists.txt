@@ -155,9 +155,6 @@ cmake_dependent_option(
 option(HELICS_BINARY_ONLY_INSTALL "only install the helics binary executables" OFF)
 mark_as_advanced(HELICS_BINARY_ONLY_INSTALL)
 
-option(HELICS_DISABLE_STATIC_LIB_INSTALL "Disable installing of static libraries" OFF)
-mark_as_advanced(HELICS_DISABLE_STATIC_LIB_INSTALL)
-
 # Install instructions for this target
 if(HELICS_WITH_CMAKE_PACKAGE)
     set(HELICS_EXPORT_COMMAND EXPORT helics-targets)
@@ -171,16 +168,6 @@ mark_as_advanced(HELICS_DISABLE_C_SHARED_LIB)
 
 option(HELICS_BUILD_CXX_SHARED_LIB
        "build the shared libraries for the HELICS CXX interface" OFF)
-
-if(
-    HELICS_BUILD_CXX_SHARED_LIB
-    OR NOT HELICS_DISABLE_C_SHARED_LIB
-    OR NOT HELICS_DISABLE_STATIC_LIB_INSTALL
-)
-    set(HELICS_INSTALL_CPP14_HEADERS ON)
-else()
-    set(HELICS_INSTALL_CPP14_HEADERS OFF)
-endif()
 
 cmake_dependent_advanced_option(
     HELICS_USE_POSITION_INDEPENDENT_CODE
@@ -215,9 +202,7 @@ endif()
 
 # add a baseline library for underlying dependencies and flags
 add_library(helics_base INTERFACE)
-add_library(helics_base_includes INTERFACE)
 
-target_link_libraries(helics_base INTERFACE helics_base_includes)
 # Prohibit in-source build
 if(PROJECT_SOURCE_DIR STREQUAL PROJECT_BINARY_DIR)
     message(
@@ -233,50 +218,39 @@ endif()
 if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
     mark_as_advanced(BUILD_TESTING)
     include(compiler_flags)
-    message(
-        STATUS "setting helics C++ standard build option to \"${CXX_STANDARD_FLAG}\""
-    )
-    if(CXX_STANDARD_FLAG)
-        if(MSVC)
-            target_compile_options(helics_base_includes INTERFACE ${CXX_STANDARD_FLAG})
-        else(MSVC)
-            target_compile_options(
-                helics_base_includes
-                INTERFACE $<$<COMPILE_LANGUAGE:CXX>:${CXX_STANDARD_FLAG}>
-            )
-        endif(MSVC)
-    endif(CXX_STANDARD_FLAG)
-
+    
 endif()
 
 add_library(HELICS::compile_flags_target ALIAS compile_flags_target)
+add_library(HELICS::build_flags_target ALIAS build_flags_target)
 
-cmake_dependent_advanced_option(
-    STATIC_STANDARD_LIB
-    "Link against a static standard lib"
-    OFF
-    "NOT USE_LIBCXX;CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME"
-    OFF
-)
+if (CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
+	if (NOT USE_LIBCXX)
+		show_variable(STATIC_STANDARD_LIB STRING "Link against a static standard lib" default)
+		set_property(CACHE STATIC_STANDARD_LIB PROPERTY STRINGS default static dynamic)
+	else()
+		hide_variable(STATIC_STANDARD_LIB)
+	endif()
+	if (MSVC)
+		show_variable(HELICS_EMBEDDED_DEBUG_INFO STRING "embed debug info into lib files" default)
+		set_property(CACHE HELICS_EMBEDDED_DEBUG_INFO PROPERTY STRINGS default embedded external)
+	else()
+		hide_variable(HELICS_EMBEDDED_DEBUG_INFO)
+	endif()
+endif()
 
-cmake_dependent_advanced_option(
-    HELICS_EMBEDDED_DEBUG_INFO
-    "embed debug info into obj files"
-    OFF
-    "MSVC;CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME"
-    OFF
-)
-
-if(STATIC_STANDARD_LIB)
+if(STATIC_STANDARD_LIB STREQUAL "default")
+elseif(STATIC_STANDARD_LIB STREQUAL "static")
     ucm_set_runtime(STATIC)
 else()
     ucm_set_runtime(DYNAMIC)
 endif()
 
-if(HELICS_EMBEDDED_DEBUG_INFO)
-    ucm_set_embedded_debug(EMBEDDED)
+if(HELICS_EMBEDDED_DEBUG_INFO STREQUAL "default")
+elseif(HELICS_EMBEDDED_DEBUG_INFO STREQUAL "external")
+	ucm_set_embedded_debug(EXTERNAL)
 else()
-    ucm_set_embedded_debug(EXTERNAL)
+     ucm_set_embedded_debug(EMBEDDED)
 endif()
 
 # -------------------------------------------------------------
@@ -714,7 +688,7 @@ endif(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
 if(NOT HELICS_BINARY_ONLY_INSTALL)
     install(TARGETS compile_flags_target ${HELICS_EXPORT_COMMAND})
    
-    if(HELICS_BUILD_CXX_SHARED_LIB)
+ #[[   if(HELICS_BUILD_CXX_SHARED_LIB)
         set(
             helics_cxx_shared_file
             "${CMAKE_SHARED_LIBRARY_PREFIX}helics-shared${CMAKE_SHARED_LIBRARY_SUFFIX}"
@@ -741,7 +715,7 @@ if(NOT HELICS_BINARY_ONLY_INSTALL)
         set(helics_c_shared_file)
         set(helics_c_shared_file_debug)
     endif()
-
+#]]
     if(HELICS_WITH_CMAKE_PACKAGE)
 
         set(
@@ -772,26 +746,6 @@ endif(NOT HELICS_BINARY_ONLY_INSTALL)
 configure_file("config/helics-config.h.in"
                "${HELICS_BINARY_DIR}/include/helics/helics-config.h")
 if(NOT HELICS_BINARY_ONLY_INSTALL)
-    install(
-        FILES ${HELICS_BINARY_DIR}/include/helics/helics-config.h
-        DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/helics
-        COMPONENT headers
-    )
-    install(
-        FILES ${HELICS_BINARY_DIR}/include/helics/compiler-config.h
-        DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/helics
-        COMPONENT headers
-    )
-
-    if(HELICS_INSTALL_CPP14_HEADERS)
-        
-
-        install(
-            DIRECTORY ThirdParty/helics/external
-            DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/helics
-            COMPONENT headers
-        )
-    endif()
 
     if(HELICS_WITH_CMAKE_PACKAGE)
 
@@ -812,12 +766,6 @@ if(NOT HELICS_BINARY_ONLY_INSTALL)
             FILES
                 ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake
                 ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake
-            DESTINATION ${HELICS_CMAKECONFIG_INSTALL_DIR}
-            COMPONENT libs
-        )
-        # install required additional cmake files
-        install(
-            FILES config/cmake/addMPI.cmake config/cmake/FindZeroMQ.cmake
             DESTINATION ${HELICS_CMAKECONFIG_INSTALL_DIR}
             COMPONENT libs
         )

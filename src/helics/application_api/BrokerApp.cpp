@@ -55,8 +55,8 @@ bool BrokerApp::waitForDisconnect (std::chrono::milliseconds waitTime)
 {
     if (broker)
     {
-		return broker->waitForDisconnect (waitTime);
-	}
+        return broker->waitForDisconnect (waitTime);
+    }
     return true;
 }
 
@@ -67,7 +67,7 @@ std::unique_ptr<helicsCLI11App> BrokerApp::generateParser ()
     app->add_option ("--name,-n", name, "name of the broker");
     app->allow_extras ();
     auto app_p = app.get ();
-    app->footer ([app_p]() {
+    app->footer ([app_p] () {
         auto coreType = helics::core::coreTypeFromString ((*app_p)["--core"]->as<std::string> ());
         BrokerFactory::displayHelp (coreType);
         return std::string ();
@@ -141,4 +141,5 @@ void BrokerApp::setLogFile (const std::string &logFile)
     }
 }
 
+void BrokerApp::reset () { broker = nullptr; }
 }  // namespace helics
