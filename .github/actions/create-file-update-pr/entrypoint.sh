@@ -6,6 +6,8 @@ API_VERSION=v3
 API_HEADER="Accept: application/vnd.github.${API_VERSION}+json; application/vnd.github.shadow-cat-preview+json; application/vnd.github.symmetra-preview+json; application/vnd.github.sailor-v-preview+json"
 AUTH_HEADER="Authorization: token ${GITHUB_TOKEN}"
 
+echo -n "Test input" | jq --raw-input --slurp "."
+
 files_changed=$(git diff --staged --name-only)
 if [[ "$files_changed" != "" ]];
 then
