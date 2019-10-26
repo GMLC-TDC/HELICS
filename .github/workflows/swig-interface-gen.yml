@@ -32,6 +32,8 @@ jobs:
           git add interfaces/
         fi
     - uses: ./.github/actions/create-file-update-pr
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         COMMIT_MSG: "Update SWIG generated interface files"
         PR_TITLE: "Update SWIG generated interface files"
