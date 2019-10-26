@@ -10,8 +10,8 @@ A note on future revisions.
 Bug fix release
 
 ### Fixed
--  links in the README changed with an automated move to travis-ci.com
--  Issue #853,  which was causing core connections to timeout if no direct communication was observed for a period of time.  This bug fix release fixes that issue where the pings were not being correctly accounted for in the timeout detection. 
+-  Links in the README changed with an automated move to travis-ci.com
+-  Fix issue #853, which was causing core connections to timeout if no direct communication was observed for a period of time.  This bug fix release fixes that issue where the pings were not being correctly accounted for in the timeout detection. 
 - Fix Ctrl-C issue when using HELICS in some language api's
 
 ## \[2.2.1\] ~ 2019-09-27
