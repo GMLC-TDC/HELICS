@@ -32,3 +32,6 @@ jobs:
           git add interfaces/
         fi
     - uses: ./.github/actions/create-file-update-pr
+      with:
+        CHANGE_COMMIT_MSG: "Update SWIG generated interface files"
+        CHANGE_PR_TITLE: "Update SWIG generated interface files"
