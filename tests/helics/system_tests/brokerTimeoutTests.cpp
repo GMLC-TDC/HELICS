@@ -53,10 +53,10 @@ TEST (broker_timeout_tests, core_fail_timeout)
 
 TEST (broker_timeout_tests, core_fail_error)
 {
-    auto brk = helics::BrokerFactory::create (CORE_TYPE_TO_TEST, "--timeout=200ms --tick 50ms");
+    auto brk = helics::BrokerFactory::create (helics::core_type::TEST, "--timeout=200ms --tick 50ms");
     brk->connect ();
 
-    helics::FederateInfo fi (CORE_TYPE_TO_TEST);
+    helics::FederateInfo fi (helics::core_type::TEST);
     fi.coreName = "c3";
 
     auto Fed1 = std::make_shared<helics::ValueFederate> ("test1", fi);
@@ -82,4 +82,31 @@ TEST (broker_timeout_tests, core_fail_error)
     cr->disconnect ();
     Fed2->finalize ();
     Fed1->finalize ();
+}
+
+TEST (broker_timeout_tests, maintain_connection_ci_skip)
+{
+    auto brk = helics::BrokerFactory::create (helics::core_type::ZMQ, "--timeout=100ms");
+    brk->connect ();
+
+    helics::FederateInfo fi (helics::core_type::ZMQ);
+    fi.coreName = "c3";
+    fi.setProperty (helics_property_time_delta, 0.01);
+    auto Fed1 = std::make_shared<helics::ValueFederate> ("test1", fi);
+
+    Fed1->registerGlobalPublication<std::string> ("pub1");
+    auto &sub1 = Fed1->registerSubscription ("pub1");
+    sub1.setDefault (std::string ("String1"));
+
+    Fed1->enterExecutingMode ();
+    int counter = 50;
+    while (counter > 0)
+    {
+        std::this_thread::sleep_for (std::chrono::seconds (1));
+        --counter;
+    }
+    EXPECT_TRUE (brk->isConnected ());
+    EXPECT_TRUE (Fed1->getCorePointer ()->isConnected ());
+    Fed1->finalize ();
+    brk->waitForDisconnect ();
 }
