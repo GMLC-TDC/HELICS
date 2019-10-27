@@ -54,11 +54,6 @@ Each [release](https://github.com/GMLC-TDC/HELICS/releases/latest) comes with a 
 
 Some support to Conda is provided see [conda install](https://helics.readthedocs.io/en/latest/installation/package_manager.html#install-using-conda-windows-macos-linux) for the Instructions.  It is  supported through a separate [repo](https://github.com/GMLC-TDC/helics-conda).
 
-### Brew
-
-On MacOS there is a [brew package](https://helics.readthedocs.io/en/latest/installation/package_manager.html#install-using-brew-macos) for HELICS supported in a separate [repository](https://github.com/GMLC-TDC/homebrew-helics).  
-
-
 ## Build from Source Instructions
 
 [Windows](https://helics.readthedocs.io/en/latest/installation/windows.html)
@@ -113,7 +108,7 @@ We are always looking for help adding support for more tools, so please contact 
 -   [PSST](https://github.com/kdheepak/psst), an open-source python-based unit-commitment and dispatch market simulator. HELICS examples are included in the  [HELICS-Tutorial](https://github.com/GMLC-TDC/HELICS-Tutorial)
 -   [MATPOWER](http://www.pserc.cornell.edu/matpower/), an open-source Matlab based power flow and optimal power flow tool. HELICS support currently (4/14/2018) under development.
 -   [InterPSS](http://www.interpss.org/), a Java-based power systems simulator. HELICS support currently (4/14/2018) under development.
--   Commercial tools that have interacted with HELICS, include Power World, PSS/e, PSLF, and Cyme.  
+-   Commercial tools that have interacted with HELICS, include Power World, PSS/e, PSLF, and Cyme.
 
 ### Communication Tools
 
@@ -125,8 +120,8 @@ We are always looking for help adding support for more tools, so please contact 
 -   [HELICS CLI](https://github.com/GMLC-TDC/helics-cli) provides a simple way to automate configuring, starting, and stopping HELICS co-simulations.
 -   [Player](https://helics.readthedocs.io/en/latest/apps/Player.html), which acts as a simple send-only federate that simply publishes a stream of timed HELICS messages from a user-defined file. HELICS Player is included in the HELICS distribution.
 -   [Recorder](https://helics.readthedocs.io/en/latest/apps/Recorder.html), which acts as a simple receive-only federate that prints out or saves messages from one or more subscribed streams. HELICS Recorder is included in the HELICS distribution.
--   [Broker](https://helics.readthedocs.io/en/latest/apps/Broker.html),  which is a command line tool for running a Broker.  There is also a Broker Server which can generate brokers as needed.  
--   [App](https://helics.readthedocs.io/en/latest/apps/App.htm) is a general app executable which can run a number of other apps including Player and Recorder, as well as a [Tracer](https://helics.readthedocs.io/en/latest/apps/App.html#tracer), [Echo](https://helics.readthedocs.io/en/latest/apps/App.html#echo), [Source](https://helics.readthedocs.io/en/latest/apps/App.html#source), and [Clone](https://helics.readthedocs.io/en/latest/apps/App.html#clone).   
+-   [Broker](https://helics.readthedocs.io/en/latest/apps/Broker.html),  which is a command line tool for running a Broker.  There is also a Broker Server which can generate brokers as needed.
+-   [App](https://helics.readthedocs.io/en/latest/apps/App.htm) is a general app executable which can run a number of other apps including Player and Recorder, as well as a [Tracer](https://helics.readthedocs.io/en/latest/apps/App.html#tracer), [Echo](https://helics.readthedocs.io/en/latest/apps/App.html#echo), [Source](https://helics.readthedocs.io/en/latest/apps/App.html#source), and [Clone](https://helics.readthedocs.io/en/latest/apps/App.html#clone).
 
 ## Contributing
 Contributors are welcome see the [Contributing](CONTRIBUTING.md) guidelines for more details on the process of contributing.  And the [Code of Conduct](.github/CODE_OF_CONDUCT.md) for guidelines on the community expectations.  All prior contributors can be found [here](CONTRIBUTORS.md)

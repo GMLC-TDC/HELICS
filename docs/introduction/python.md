@@ -12,7 +12,6 @@ We recommend using Anaconda3/Miniconda3, although this should work with most ver
 To make an interface that is similar across different languages, we use SWIG to generate the Python bindings to the `helicsSharedLib` shared library.
 SWIG claims to be compatible with most Python versions, dating back to Python 2.0. And recommends that for the best results, one should consider using Python 2.3 or newer.
 
-Installation of HELICS on a Mac can be done using `brew` which comes with the ability to build the Python extension as well.
 HELICS can also be built from source and linked with the required Python version.
 See the page on the Installation instructions for more information regarding this.
 
