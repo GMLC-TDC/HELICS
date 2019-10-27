@@ -3,3 +3,9 @@
 
 %include "../helics.i"
 
+/* Add atexit */
+%pythoncode %{
+import atexit
+atexit.register(helicsCloseLibrary)
+%}
+
