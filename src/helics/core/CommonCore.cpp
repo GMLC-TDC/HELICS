@@ -35,6 +35,7 @@ SPDX-License-Identifier: BSD-3-Clause
 
 namespace helics
 {
+// timeoutMon is a unique_ptr
 CommonCore::CommonCore () noexcept : timeoutMon (new TimeoutMonitor) {}
 
 CommonCore::CommonCore (bool /*arg*/) noexcept : timeoutMon (new TimeoutMonitor) {}
@@ -2328,6 +2329,7 @@ void CommonCore::processPriorityCommand (ActionMessage &&command)
             timeCoord->source_id = global_broker_id_local;
             higher_broker_id = global_broker_id (command.source_id);
             transmitDelayedMessages ();
+            timeoutMon->setParentId (higher_broker_id);
             timeoutMon->reset ();
         }
         break;
