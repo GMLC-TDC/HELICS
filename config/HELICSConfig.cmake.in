@@ -26,18 +26,19 @@ include(CMakeFindDependencyMacro)
 
 include(${CMAKE_CURRENT_LIST_DIR}/helics-targets.cmake)
 
-check_required_components(${PN})
-
 if (NOT @HELICS_DISABLE_C_SHARED_LIB@)
     get_target_property(${PN}_C_SHARED_LIBRARY HELICS::helicsSharedLib LOCATION)
 endif()
 
 if (@HELICS_BUILD_CXX_SHARED_LIB@)
     get_target_property(${PN}_CXX_SHARED_LIBRARY HELICS::helics-shared LOCATION)
-    if (EXISTS ${CMAKE_CURRENT_LIST_DIR}/include)
+    if (EXISTS ${CMAKE_CURRENT_LIST_DIR}/include/helics_cxx)
         set_property(TARGET HELICS::helics-shared APPEND PROPERTY
-            INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_CURRENT_LIST_DIR}/include"
+            INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_CURRENT_LIST_DIR}/include/helics_cxx"
         )
+		get_target_property(cxx_include_dirs HELICS::helics-shared PROPERTY INTERFACE_INCLUDE_DIRECTORIES)
+		list(REMOVE_ITEM cxx_include_dirs "/helics_cxx")
+		set_property(TARGET HELICS::helics-shared PROPERTY INTERFACE_INCLUDE_DIRECTORIES ${cxx_include_dirs})
     endif()
     
 endif()
@@ -47,5 +48,7 @@ if (NOT @HELICS_DISABLE_C_SHARED_LIB@)
 	message(STATUS "HELICS_INCLUDE DIR HELICS: ${HELICS_INCLUDE_DIR}")
     message(STATUS "HELICS_C_SHARED_LIBRARY: ${HELICS_C_SHARED_LIBRARY}")
 endif()
+
+check_required_components(${PN})
 
 set(CMAKE_MODULE_PATH ${SAVED_PARENT_CMAKE_MODULE_PATH})
