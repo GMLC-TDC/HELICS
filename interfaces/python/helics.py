@@ -1004,3 +1004,5 @@ def helicsFilterGetOption(filt: "helics_filter", option: "int") -> "helics_bool"
 import atexit
 atexit.register(helicsCloseLibrary)
 
+
+
