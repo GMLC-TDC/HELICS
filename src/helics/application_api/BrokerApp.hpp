@@ -90,6 +90,8 @@ class HELICS_CXX_EXPORT BrokerApp
     BrokerApp *operator-> () { return this; }
     const BrokerApp *operator-> () const { return this; }
     #endif
+    /** get a copy of the core pointer*/
+    std::shared_ptr<Broker> getCopyofBrokerPointer () const { return broker; }
   private:
     void processArgs (std::unique_ptr<helicsCLI11App> &app);
     std::unique_ptr<helicsCLI11App> generateParser ();

@@ -86,6 +86,9 @@ class HELICS_CXX_EXPORT CoreApp
     /** overload the -> operator so broker functions can be called if needed
      */
     auto *operator-> () const { return core.operator-> (); }
+#else
+    CoreApp *operator-> () { return this; }
+    const CoreApp *operator-> () const { return this; }
 #endif
     /** get a copy of the core pointer*/
     std::shared_ptr<Core> getCopyofCorePointer () const { return core; }
@@ -102,7 +105,7 @@ class CoreKeeper
 {
   public:
     template <class... Args>
-    CoreKeeper (Args &&... args) : cr (std::forward<Args...> (args))
+    CoreKeeper (Args &&... args) : cr (std::forward<Args...> (args...))
     {
     }
     CoreKeeper (CoreKeeper &&brkeep) = default;
