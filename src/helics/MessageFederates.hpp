@@ -9,5 +9,5 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "application_api/Endpoints.hpp"
 #include "application_api/Filters.hpp"
 #include "application_api/MessageFederate.hpp"
-#include "core/CoreFactory.hpp"
+#include "application_api/CoreApp.hpp"
 #include "core/helics_definitions.hpp"

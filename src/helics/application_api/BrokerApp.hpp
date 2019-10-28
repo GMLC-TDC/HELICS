@@ -70,7 +70,8 @@ class HELICS_CXX_EXPORT BrokerApp
     void addSourceFilterToEndpoint (const std::string &filter, const std::string &endpoint);
     /** add a destination Filter to an endpoint*/
     void addDestinationFilterToEndpoint (const std::string &filter, const std::string &endpoint);
-
+    /** make connections between interfaces with a file*/
+    void makeConnections (const std::string &file);
     /** get the identifier of the broker*/
     const std::string &getIdentifier () const;
     /** get the network address of the broker*/

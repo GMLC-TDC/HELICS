@@ -21,7 +21,6 @@ set(
     EndpointInfo.cpp
     ActionMessage.cpp
     CoreBroker.cpp
-    core-data.cpp
     TimeCoordinator.cpp
     NetworkCommsInterface.cpp
     ForwardingTimeCoordinator.cpp

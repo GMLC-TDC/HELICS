@@ -79,4 +79,6 @@ set_target_properties(shared_cxx-tests PROPERTIES FOLDER tests)
 add_test(NAME shared_cxx-tests COMMAND shared_cxx-tests)
 set_property(TEST shared_cxx-tests PROPERTY LABELS ApplicationApi Coverage Daily)
 
+target_compile_definitions(shared_cxx-tests PRIVATE
+                           "-DTEST_DIR=\"${CMAKE_CURRENT_SOURCE_DIR}/../test_files/\"")
 endif()

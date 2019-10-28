@@ -11,7 +11,7 @@ include(GenerateExportHeader)
 
 #for including the helics_export.h
 target_include_directories(
-        helics_base_includes
+        helics_base
         INTERFACE $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>
     )
 
@@ -35,7 +35,7 @@ if(HELICS_BUILD_CXX_SHARED_LIB)
     generate_export_header(helics-shared BASE_NAME helics_cxx)
     file(
        COPY ${CMAKE_CURRENT_BINARY_DIR}/helics_cxx_export.h 
-       DESTINATION ${PROJECT_BINARY_DIR}/include/helics/application_api
+       DESTINATION ${PROJECT_BINARY_DIR}/include/helics_cxx/helics/application_api
     )
 else()
     generate_export_header(helics_application_api BASE_NAME helics_cxx)
@@ -43,21 +43,8 @@ endif()
 
 file(
      COPY ${CMAKE_CURRENT_BINARY_DIR}/helics_cxx_export.h 
-     DESTINATION ${PROJECT_BINARY_DIR}/include/
+     DESTINATION ${PROJECT_BINARY_DIR}/helics_generated_includes
 )
-
-if(NOT HELICS_BINARY_ONLY_INSTALL)
-    # Install the header if the C++ shared library is built
-    if(HELICS_INSTALL_CPP14_HEADERS)
-        install(
-            FILES helics.hpp
-            DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/helics
-            COMPONENT headers
-        )
-    endif()
-
-endif()
-
 
 if(NOT CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
     set_target_properties(

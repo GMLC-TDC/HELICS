@@ -219,11 +219,5 @@ inline bool isValidIndex (sizeType testSize, const SizedDataType &vec)
 {
     return ((testSize >= sizeType (0)) && (testSize < static_cast<sizeType> (vec.size ())));
 }
-/** check if two data types are compatible with eachother
-@param type1 the first type to match
-@param type2 the second type to check
-@return true if the types are compatible with eachother
-*/
-bool matchingTypes (const std::string &type1, const std::string &type2);
 
 }  // namespace helics

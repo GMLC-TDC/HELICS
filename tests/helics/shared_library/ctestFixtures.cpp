@@ -5,7 +5,6 @@ the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 #include "ctestFixtures.hpp"
-#include "helics/shared_api_library/internal/api_objects.h"
 #include <cassert>
 #include <cctype>
 

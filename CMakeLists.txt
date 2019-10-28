@@ -296,8 +296,18 @@ endif()
 # Get some configuration for C++17 as that becomes available
 # -------------------------------------------------------------
 # message(STATUS ${CMAKE_CXX_FLAGS})
-set(CONFIGURE_TARGET_LOCATION ${HELICS_BINARY_DIR}/include/helics/)
+set(CONFIGURE_TARGET_LOCATION ${HELICS_BINARY_DIR}/helics_generated_includes/helics/)
 include(configGenerator)
+
+
+# -----------------------------------------------------------------------------
+# Setup configure.h file for accessing configure options
+# -----------------------------------------------------------------------------
+configure_file("config/helics-config.h.in"
+               "${HELICS_BINARY_DIR}/helics_generated_includes/helics/helics-config.h")
+
+target_include_directories(helics_base INTERFACE $<BUILD_INTERFACE:${HELICS_BINARY_DIR}/helics_generated_includes/>)
+
 
 if(HELICS_GENERATE_DOXYGEN_DOC)
     find_package(Doxygen)
@@ -435,7 +445,7 @@ endif()
 
 if(CYGWIN)
     target_compile_definitions(
-        helics_base_includes
+        helics_base
         INTERFACE
         -D_XOPEN_SOURCE=500
         -D__USE_W32_SOCKETS
@@ -454,7 +464,7 @@ if(ENABLE_ZMQ_CORE)
     if(ZeroMQ_FOUND)
         if(ZMQ_USE_STATIC_LIBRARY)
             set(ZeroMQ_DEPENDENCY libzmq-static)
-            target_compile_definitions(helics_base_includes INTERFACE -DZMQ_STATIC)
+            target_compile_definitions(helics_base INTERFACE -DZMQ_STATIC)
         else()
             set(ZeroMQ_DEPENDENCY libzmq)
         endif()
@@ -469,7 +479,7 @@ endif()
 # global include directories
 # -------------------------------------------------------------
 target_include_directories(
-    helics_base_includes
+    helics_base
     INTERFACE
         $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/src>
         $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}/include>
@@ -484,13 +494,13 @@ target_include_directories(
 # install
 
 target_include_directories(
-    helics_base_includes SYSTEM
+    helics_base SYSTEM
     INTERFACE $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/ThirdParty>
 )
 
 if(NOT HELICS_DISABLE_BOOST)
     target_include_directories(
-        helics_base_includes SYSTEM
+        helics_base SYSTEM
         INTERFACE $<BUILD_INTERFACE:${Boost_INCLUDE_DIR}>
     )
 endif()
@@ -498,9 +508,9 @@ endif()
 # -------------------------------------------------------------
 # Asio include directories
 # -------------------------------------------------------------
-target_compile_definitions(helics_base_includes INTERFACE "-DASIO_STANDALONE")
+target_compile_definitions(helics_base INTERFACE "-DASIO_STANDALONE")
 target_include_directories(
-    helics_base_includes SYSTEM
+    helics_base SYSTEM
     INTERFACE $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/ThirdParty/asio/asio/include>
 )
 
@@ -661,17 +671,16 @@ endif(HELICS_BUILD_EXAMPLES)
 # Enable clang analysis and formatting tools
 # -------------------------------------------------------------
 if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
-    option(HELICS_ENABLE_CLANG_TOOLS
+    cmake_dependent_advanced_option(HELICS_ENABLE_CLANG_TOOLS
            "if clang is found enable some custom targets for clang formatting and tidy"
-           OFF)
-    mark_as_advanced(HELICS_ENABLE_CLANG_TOOLS)
+           OFF "CMAKE_CXX_COMPILER_ID STREQUAL \"Clang\"" OFF)
     if(HELICS_ENABLE_CLANG_TOOLS)
         include(clang-cxx-dev-tools)
     endif(HELICS_ENABLE_CLANG_TOOLS)
 
     add_subdirectory(interfaces)
 
-    if(NOT HELICS_BINARY_ONLY_INSTALL)
+    if(NOT HELICS_BINARY_ONLY_INSTALL AND NOT HELICS_DISABLE_C_SHARED_LIB)
         # add base swig interface files as install option, regardless of current
         # interfaces built
         install(
@@ -687,7 +696,7 @@ endif(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
 
 if(NOT HELICS_BINARY_ONLY_INSTALL)
     install(TARGETS compile_flags_target ${HELICS_EXPORT_COMMAND})
-   
+    install(TARGETS build_flags_target ${HELICS_EXPORT_COMMAND})
  #[[   if(HELICS_BUILD_CXX_SHARED_LIB)
         set(
             helics_cxx_shared_file
@@ -740,11 +749,7 @@ if(NOT HELICS_BINARY_ONLY_INSTALL)
         )
     endif()
 endif(NOT HELICS_BINARY_ONLY_INSTALL)
-# -----------------------------------------------------------------------------
-# Setup configure.h file for accessing configure options
-# -----------------------------------------------------------------------------
-configure_file("config/helics-config.h.in"
-               "${HELICS_BINARY_DIR}/include/helics/helics-config.h")
+
 if(NOT HELICS_BINARY_ONLY_INSTALL)
 
     if(HELICS_WITH_CMAKE_PACKAGE)

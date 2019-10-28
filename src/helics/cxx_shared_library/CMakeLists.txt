@@ -7,42 +7,6 @@
 # SPDX-License-Identifier: BSD-3-Clause
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-set(
-    helics_shared_public_headers
-    ../application_api/CombinationFederate.hpp
-    ../application_api/Publications.hpp
-    ../application_api/Subscriptions.hpp
-    ../application_api/Endpoints.hpp
-    ../application_api/Filters.hpp
-    ../application_api/Federate.hpp
-    ../application_api/helicsTypes.hpp
-    ../application_api/data_view.hpp
-    ../application_api/MessageFederate.hpp
-    ../application_api/MessageOperators.hpp
-    ../application_api/ValueConverter.hpp
-    ../application_api/ValueConverter_impl.hpp
-    ../application_api/ValueFederate.hpp
-    ../application_api/HelicsPrimaryTypes.hpp
-    ../application_api/queryFunctions.hpp
-    ../application_api/FederateInfo.hpp
-    ../application_api/Inputs.hpp
-	../application_api/BrokerApp.hpp
-	../application_api/CoreApp.hpp
-	../application_api/timeOperations.hpp
-	../application_api/typeOperations.hpp
-)
-
-set(
-    helics_shared_private_headers
-    ../application_api/MessageFederateManager.hpp
-    ../application_api/ValueFederateManager.hpp
-    ../application_api/AsyncFedCallInfo.hpp
-    ../application_api/FilterOperations.hpp
-    ../application_api/FilterFederateManager.hpp
-)
-
-set(conv_headers ../application_api.hpp ../ValueFederates.hpp ../MessageFederates.hpp ../helics.hpp)
-set(basic_headers ../helics_enums.h)
 
 set(
     helics_shared_sources
@@ -69,8 +33,11 @@ set(
 	../application_api/typeOperations.cpp
 )
 
-   
-   add_library(helics-shared SHARED ${helics_shared_sources} ${conv_headers}
+set(HELICS_LIBRARY_SOURCE_DIR ${HELICS_SOURCE_DIR}/src/helics)
+
+include(${CMAKE_CURRENT_SOURCE_DIR}/cxx_file_list.cmake)
+
+add_library(helics-shared SHARED ${helics_shared_sources} ${conv_headers}
                                    ${helics_shared_public_headers}
                                    ${helics_shared_private_headers})
 
@@ -95,62 +62,29 @@ target_compile_options(helics-shared PUBLIC $<$<CXX_COMPILER_ID:MSVC>:/wd4251>)
     PROPERTIES CXX_VISIBILITY_PRESET hidden C_VISIBILITY_PRESET hidden VISIBILITY_INLINES_HIDDEN ON
 )
 
-file(
-     COPY ${helics_shared_public_headers}
-     DESTINATION ${PROJECT_BINARY_DIR}/include/helics/application_api
-)
+file(MAKE_DIRECTORY ${HELICS_BINARY_DIR}/include/helics_cxx)
 
-file(
-     COPY ${conv_headers} ${basic_headers}
-     DESTINATION ${PROJECT_BINARY_DIR}/include/helics
-)
+add_custom_command(TARGET helics-shared POST_BUILD
+                   COMMAND ${CMAKE_COMMAND} -DHELICS_CXX_HEADER_FILE_LOC=${HELICS_BINARY_DIR}/include/helics_cxx 
+					   -DHELICS_LIBRARY_SOURCE_DIR=${HELICS_LIBRARY_SOURCE_DIR} -DHELICS_SOURCE_DIR=${HELICS_SOURCE_DIR} 
+					   -DHELICS_BINARY_DIR=${HELICS_BINARY_DIR}
+					   -P
+                       ${CMAKE_CURRENT_SOURCE_DIR}/collect_cxx_shared_headers.cmake)
 
-set(core_include_files 
-	../core/helics-time.hpp
-	../core/core-data.hpp
-	../core/core-types.hpp
-	../core/federate_id.hpp
-	../core/CoreFederateInfo.hpp
-	../core/Core.hpp
-	../core/helics_definitions.hpp 
-	../core/helicsCLI11.hpp
-	../core/helicsVersion.hpp
-	../core/core-exceptions.hpp
-	)
-
-file(
-     COPY ${core_include_files}
-     DESTINATION ${PROJECT_BINARY_DIR}/include/helics/core
-)
-
-set(utilities_include_files 
-	${PROJECT_SOURCE_DIR}/ThirdParty/utilities/gmlc/utilities/timeRepresentation.hpp)
-
-file(
-     COPY ${utilities_include_files}
-     DESTINATION ${PROJECT_BINARY_DIR}/include/helics/utilities
-)
-		
-file(
-     COPY ${PROJECT_SOURCE_DIR}/ThirdParty/helics/external
-     DESTINATION ${PROJECT_BINARY_DIR}/include/helics
-)
 
 install(
-                DIRECTORY ${PROJECT_SOURCE_DIR}/ThirdParty/cereal
-                DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/helics/external/optional
-                COMPONENT cereal
-            )
+    DIRECTORY ${PROJECT_SOURCE_DIR}/ThirdParty/cereal
+    DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/helics_cxx/helics/external/optional
+    COMPONENT cereal
+)
             
 target_include_directories(helics-shared 
-		INTERFACE $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}/include>
+		INTERFACE $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}/include/helics_cxx>
 		$<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/ThirdParty>
-		 $<INSTALL_INTERFACE:$<INSTALL_PREFIX>/${CMAKE_INSTALL_INCLUDEDIR}>
-		 $<INSTALL_INTERFACE:$<INSTALL_PREFIX>/${CMAKE_INSTALL_INCLUDEDIR}/helics/external/optional>
+		 $<INSTALL_INTERFACE:$<INSTALL_PREFIX>/${CMAKE_INSTALL_INCLUDEDIR}>/helics_cxx
+		 $<INSTALL_INTERFACE:$<INSTALL_PREFIX>/${CMAKE_INSTALL_INCLUDEDIR}/helics_cxx/helics/external/optional>
 		 PRIVATE $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
 		)
-
-
 
     install(
         TARGETS helics-shared ${HELICS_EXPORT_COMMAND}
@@ -188,7 +122,7 @@ target_include_directories(helics-shared
         )
     endif()
     install(DIRECTORY
-        ${PROJECT_BINARY_DIR}/include/helics
+        ${PROJECT_BINARY_DIR}/include/helics_cxx
         DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
         COMPONENT headers
     )

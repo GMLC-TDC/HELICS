@@ -122,6 +122,14 @@ void BrokerApp::addDestinationFilterToEndpoint (const std::string &filter, const
         broker->addDestinationFilterToEndpoint (filter, endpoint);
     }
 }
+
+void BrokerApp::makeConnections(const std::string &file)
+{
+    if (broker)
+    {
+        broker->makeConnections (file);
+    }
+}
 static const std::string estring{};
 /** get the identifier of the broker*/
 const std::string &BrokerApp::getIdentifier () const { return (broker) ? broker->getIdentifier () : estring; }

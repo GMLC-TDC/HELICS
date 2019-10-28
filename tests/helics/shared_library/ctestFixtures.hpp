@@ -10,7 +10,6 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include "../coreTypeLists.hpp"
 #include "helics/chelics.h"
-#include "helics/helics-config.h"
 
 #define CE(command)                                                                                               \
     helicsErrorClear (&err);                                                                                      \

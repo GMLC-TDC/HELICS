@@ -122,6 +122,14 @@ void CoreApp::addDestinationFilterToEndpoint (const std::string &filter, const s
     }
 }
 
+void CoreApp::makeConnections (const std::string &file)
+{
+    if (core)
+    {
+        core->makeConnections (file);
+    }
+}
+
 static const std::string estring{};
 /** get the identifier of the core*/
 const std::string &CoreApp::getIdentifier () const { return (core) ? core->getIdentifier () : estring; }
