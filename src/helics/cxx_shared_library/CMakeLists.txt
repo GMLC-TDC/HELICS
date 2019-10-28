@@ -48,7 +48,7 @@ if(MSYS AND USE_LIBCXX)
     target_compile_definitions(helics-shared PUBLIC "-DSTX_NO_STD_OPTIONAL=1")
 endif()
 
-target_compile_options(helics-shared PUBLIC $<$<CXX_COMPILER_ID:MSVC>:/wd4251>)
+target_compile_options(helics-shared PUBLIC $<$<CXX_COMPILER_ID:MSVC>:/wd4251 /wd4275>)
 
     add_library(HELICS::helics-shared ALIAS helics-shared)
 

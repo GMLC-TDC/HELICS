@@ -72,7 +72,7 @@ set(
 
 add_executable(shared_cxx-tests ${shared_cxx_test_sources})
 
-target_link_libraries(shared_cxx-tests HELICS::helics-shared helics_test_base)
+target_link_libraries(shared_cxx-tests helics_test_base HELICS::helics-shared)
 
 set_target_properties(shared_cxx-tests PROPERTIES FOLDER tests)
 
