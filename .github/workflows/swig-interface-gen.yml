@@ -29,12 +29,14 @@ jobs:
         make -j2 javafile_overwrite
         popd
     - name: Stage changed interface files
+      shell: bash --noprofile --norc {0}
       run: |
         git diff --name-only | grep -E 'interfaces/*'
         if [[ "$?" == "0" ]];
         then
           git add interfaces/
         fi
+        exit 0
     - uses: ./.github/actions/create-file-update-pr
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
