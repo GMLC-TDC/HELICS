@@ -69,7 +69,7 @@ int main (int argc, char *argv[])
                 // I am purposely making an object that creates and destroys itself on the same line because this
                 // will run until termination so will take a while
                 {
-                    helics::BrokerApp brkapp{cmdLine.remaining_for_passthrough (true)};
+                    helics::BrokerKeeper brkapp{cmdLine.remaining_for_passthrough (true)};
                 }
                 std::cout << "broker restart in 3 seconds" << std::endl;
                 std::this_thread::sleep_for (std::chrono::seconds (1));
@@ -82,7 +82,7 @@ int main (int argc, char *argv[])
         }
         else
         {
-            helics::BrokerApp broker (cmdLine.remaining_for_passthrough ());
+            helics::BrokerKeeper broker (cmdLine.remaining_for_passthrough ());
         }
     }
     catch (const std::invalid_argument &ia)

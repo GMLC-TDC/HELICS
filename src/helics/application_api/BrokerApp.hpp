@@ -102,7 +102,7 @@ class BrokerKeeper
 {
   public:
     template <class... Args>
-    BrokerKeeper (Args &&... args) : Brk (std::forward<... Args> (args))
+    BrokerKeeper (Args &&... args) : brk (std::forward<Args...> (args...))
     {
     }
     BrokerKeeper (BrokerKeeper &&brkeep) = default;

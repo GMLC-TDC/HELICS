@@ -6,7 +6,6 @@ SPDX-License-Identifier: BSD-3-Clause
 */
 
 #include "../common/loggerCore.hpp"
-#include "../core/BrokerFactory.hpp"
 #include "../core/core-exceptions.hpp"
 #include "../core/helicsCLI11.hpp"
 #include "../application_api/BrokerApp.hpp"
@@ -108,7 +107,7 @@ int main (int argc, char *argv[])
     app.add_subcommand ("broker", "Helics Broker App")
       ->callback ([&app] () {
           std::cout << "broker subcommand\n";
-          helics::BrokerApp broker (app.remaining_for_passthrough (true));
+          helics::BrokerKeeper broker (app.remaining_for_passthrough (true));
       })
       ->footer ([=] {
           helics::BrokerApp broker (argc, argv);
