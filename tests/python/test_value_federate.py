@@ -1,3 +1,4 @@
+import os
 import time
 import pytest as pt
 import helics as h
@@ -375,3 +376,80 @@ def test_value_federate_runFederateTestVectorD(vFed):
 
     value = h.helicsInputGetVector(subid)
     assert value == [3, 4, 5]
+
+@pt.fixture
+def helicsBroker():
+    initstring = "-f 1 --name=mainbroker"
+    #TODO: should add an assert here about helicsGetVersion
+    h.helicsGetVersion()
+
+    # Create broker #
+    broker = h.helicsCreateBroker("zmq", "", initstring)
+
+    isconnected = h.helicsBrokerIsConnected(broker)
+
+    if isconnected == 1:
+        pass
+
+    yield broker
+
+    h.helicsBrokerFree(broker)
+    h.helicsCloseLibrary()
+
+@pt.mark.skipif(os.getenv("HELICS_PYTHON_ADDITIONAL_TESTS", "") == "", reason="Disabled by default.")
+def test_value_federate_runFederateTimeoutTest(helicsBroker):
+
+    fedinitstring = "--broker=mainbroker --federates=1"
+    deltat = 0.01
+
+    # Create Federate Info object that describes the federate properties #
+    fedinfo = h.helicsCreateFederateInfo()
+
+    # Set Federate name #
+    h.helicsFederateInfoSetCoreName(fedinfo, "TestA Core")
+
+    # Set core type from string #
+    h.helicsFederateInfoSetCoreTypeFromString(fedinfo, "zmq")
+
+    # Federate init string #
+    h.helicsFederateInfoSetCoreInitString(fedinfo, fedinitstring)
+
+    # Set the message interval (timedelta) for federate. Note th#
+    # HELICS minimum message time interval is 1 ns and by default
+    # it uses a time delta of 1 second. What is provided to the
+    # setTimedelta routine is a multiplier for the default timedelta.
+
+    # Set one second message interval #
+    h.helicsFederateInfoSetTimeProperty(fedinfo, h.helics_property_time_delta, deltat)
+
+    h.helicsFederateInfoSetIntegerProperty(fedinfo, h.helics_property_int_log_level, 1)
+
+    vFed = h.helicsCreateValueFederate("TestA Federate", fedinfo)
+
+    defaultValue = "String1"
+    testValue = "String2"
+    pubid = h.helicsFederateRegisterGlobalPublication (vFed, "pub1", h.helics_data_type_string, "")
+    subid = h.helicsFederateRegisterSubscription (vFed, "pub1", "")
+    h.helicsInputSetDefaultString(subid, defaultValue)
+
+    h.helicsFederateEnterExecutingMode(vFed)
+
+    counter = 60
+    while counter > 0:
+        counter -= 1
+        time.sleep(1)
+
+    # Broker should be connected at this point
+    assert h.helicsBrokerIsConnected(helicsBroker) == 1, "Broker should still be connected"
+
+    h.helicsFederateFinalize(vFed)
+
+    state = h.helicsFederateGetState(vFed)
+    assert state == 3
+
+    while (h.helicsBrokerIsConnected(helicsBroker)):
+        time.sleep(1)
+
+    h.helicsFederateInfoFree(fedinfo)
+    h.helicsFederateFree(vFed)
+

@@ -4,13 +4,23 @@
 This document contains tentative plans for changes and improvements of note in upcoming versions of the HELICS library.  All dates are approximate and subject to change, but this is a snapshot of the current planning thoughts. See the [projects](https://github.com/GMLC-TDC/HELICS/projects) for additional details
 
 
-## \[2.3\] ~ 2019-10-31
+## \[2.3\] ~ 2019-11-10
 
 -   See [HELICS 2.3](https://github.com/GMLC-TDC/HELICS/projects/15) for up to date information
 -   All features and dates here are tentative and subject to change
 
 ### Features and Improvements
+-   Additional unit tests and more porting to google tests
+-   modernization and cleanup of the HELICS cmake build system
+-   bug fixes
+-   construct a C++ shared library with the public API for helics that is more usable and restricted to the public interface
+-   additional CI builds
+-   library updates
+-   Benchmark tests
+-   automated generation of some parts of the code
 
+
+## \[2.4\] ~ Winter 2019-2020
 -   Network reliability related improvements
 -   Some additional logging capabilities
 -   Multi-broker to allow multiple communication cores to be connected in the same federation(possible)
@@ -18,10 +28,7 @@ This document contains tentative plans for changes and improvements of note in u
 -   Additional package manager integration
 -   Performance improvements and tests
 -   messageObject callbacks into the C library
--   Additional unit tests and more porting to google tests
 -   Separate out networking library
-
-## \[2.4\] ~ Winter 2019-2020
 -   Single thread cores
 -   Debugging tools
 -   SSL capable core
