@@ -8,8 +8,8 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include "helics/core/CommonCore.hpp"
 #include "helics/core/CoreFactory.hpp"
-#include "helics/helics-config.h"
 #include "helics/core/coreTypeOperations.hpp"
+#include "helics/helics-config.h"
 
 #ifdef ENABLE_ZMQ_CORE
 TEST (CoreFactory_tests, ZmqCore_test)
@@ -22,7 +22,10 @@ TEST (CoreFactory_tests, ZmqCore_test)
     core = nullptr;
 }
 #else  // ENABLE_ZMQ_CORE
-TEST (CoreFactory_tests, ZmqCore_test) { EXPECT_EQ (helics::core::isCoreTypeAvailable (helics::core_type::ZMQ), false); }
+TEST (CoreFactory_tests, ZmqCore_test)
+{
+    EXPECT_EQ (helics::core::isCoreTypeAvailable (helics::core_type::ZMQ), false);
+}
 #endif  // ENABLE_ZMQ_CORE
 
 /*
@@ -88,7 +91,10 @@ TEST (CoreFactory_tests, tcpCore_test)
     core = nullptr;
 }
 #else
-TEST (CoreFactory_tests, tcpCore_test) { EXPECT_EQ (helics::isCoreTypeAvailable (helics::core_type::TCP), false); }
+TEST (CoreFactory_tests, tcpCore_test)
+{
+    EXPECT_EQ (helics::core::isCoreTypeAvailable (helics::core_type::TCP), false);
+}
 #endif
 
 #ifdef ENABLE_TCP_CORE
@@ -124,5 +130,8 @@ TEST (CoreFactory_tests, udpCore_test)
     core2 = nullptr;
 }
 #else
-TEST (CoreFactory_tests, udpCore_test) { EXPECT_EQ (helics::core::isCoreTypeAvailable (helics::core_type::UDP), false); }
+TEST (CoreFactory_tests, udpCore_test)
+{
+    EXPECT_EQ (helics::core::isCoreTypeAvailable (helics::core_type::UDP), false);
+}
 #endif

@@ -300,13 +300,7 @@ set(CONFIGURE_TARGET_LOCATION ${HELICS_BINARY_DIR}/helics_generated_includes/hel
 include(configGenerator)
 
 
-# -----------------------------------------------------------------------------
-# Setup configure.h file for accessing configure options
-# -----------------------------------------------------------------------------
-configure_file("config/helics-config.h.in"
-               "${HELICS_BINARY_DIR}/helics_generated_includes/helics/helics-config.h")
 
-target_include_directories(helics_base INTERFACE $<BUILD_INTERFACE:${HELICS_BINARY_DIR}/helics_generated_includes/>)
 
 
 if(HELICS_GENERATE_DOXYGEN_DOC)
@@ -474,6 +468,14 @@ if(ENABLE_ZMQ_CORE)
         message(FATAL_ERROR "ZeroMQ not found")
     endif(ZeroMQ_FOUND)
 endif()
+
+# -----------------------------------------------------------------------------
+# Setup configure.h file for accessing configure options
+# -----------------------------------------------------------------------------
+configure_file("config/helics-config.h.in"
+               "${HELICS_BINARY_DIR}/helics_generated_includes/helics/helics-config.h")
+
+target_include_directories(helics_base INTERFACE $<BUILD_INTERFACE:${HELICS_BINARY_DIR}/helics_generated_includes/>)
 
 # -------------------------------------------------------------
 # global include directories
