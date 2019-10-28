@@ -215,6 +215,10 @@ if(NOT TARGET compile_flags_target)
     add_library(compile_flags_target INTERFACE)
 endif()
 
+if(NOT TARGET build_flags_target)
+    add_library(build_flags_target INTERFACE)
+endif()
+
 if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
     mark_as_advanced(BUILD_TESTING)
     include(compiler_flags)
