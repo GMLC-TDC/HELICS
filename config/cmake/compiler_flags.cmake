@@ -172,6 +172,16 @@ else(MSVC)
     endif(USE_LIBCXX)
 endif()
 
+## remove potential duplicates from the flags
+
+get_target_property(compile_flags_list compile_flags_target PROPERTY INTERFACE_COMPILE_OPTIONS)
+list(REMOVE_DUPLICATES compile_flags_list)
+set_property(TARGET compile_flags_target PROPERTY INTERFACE_COMPILE_OPTIONS ${compile_flags_list})
+
+get_target_property(link_flags_list compile_flags_target PROPERTY INTERFACE_LINK_OPTIONS)
+list(REMOVE_DUPLICATES link_flags_list)
+set_property(TARGET compile_flags_target PROPERTY INTERFACE_LINK_OPTIONS ${link_flags_list})
+
 # -------------------------------------------------------------
 # Check and set latest CXX Standard supported by compiler
 # -------------------------------------------------------------
@@ -182,8 +192,10 @@ message(
     )
 if(CXX_STANDARD_FLAG)
    if(MSVC)
+       add_compile_options(${CXX_STANDARD_FLAG})
        target_compile_options(build_flags_target INTERFACE ${CXX_STANDARD_FLAG})
    else(MSVC)
+       add_compile_options($<$<COMPILE_LANGUAGE:CXX>:${CXX_STANDARD_FLAG}>)
        target_compile_options(
            build_flags_target
            INTERFACE $<$<COMPILE_LANGUAGE:CXX>:${CXX_STANDARD_FLAG}>
@@ -191,4 +203,7 @@ if(CXX_STANDARD_FLAG)
    endif(MSVC)
 endif(CXX_STANDARD_FLAG)
 
-
+## remove potential duplicates from the flags
+get_target_property(build_flags_list build_flags_target PROPERTY INTERFACE_COMPILE_OPTIONS)
+list(REMOVE_DUPLICATES build_flags_list)
+set_property(TARGET build_flags_target PROPERTY INTERFACE_COMPILE_OPTIONS ${build_flags_list})
