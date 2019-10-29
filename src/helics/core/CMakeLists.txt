@@ -138,7 +138,7 @@ set(
 set(TESTCORE_HEADER_FILES test/TestCore.h test/TestBroker.h test/TestComms.h)
 
 
-set(INPROCCORE_HEADER_FILES inproc/InprocCore.h inproc/inprocBroker.h inproc/InprocComms.h)
+set(INPROCCORE_HEADER_FILES inproc/InprocCore.h inproc/InprocBroker.h inproc/InprocComms.h)
 
 
 set(
