@@ -29,6 +29,3 @@ test_script:
   - cd build
   - ctest --output-on-failure --timeout 480 -C Release -L "SystemCI"
   - cd ..
-
-artifacts:
-  - path: build/installer-output/Helics-*.exe
