@@ -10,19 +10,14 @@ platform:
 configuration:
   - Release
 
-cache:
-  - C:\ProgramData\chocolatey\bin -> appveyor.yml
-  - C:\ProgramData\chocolatey\lib -> appveyor.yml
-
 install:
   - cd %APPVEYOR_BUILD_FOLDER%
   - git submodule update --init --recursive
 
 before_build:
-  - IF NOT EXIST C:\ProgramData\chocolatey\bin\swig.exe choco install swig --yes --limit-output #> $null
   - mkdir build
   - cd build
-  - cmake .. -G "Visual Studio 14 2015 Win64" -DBOOST_INSTALL_PATH=C:/libraries/boost_1_63_0 -DHELICS_ENABLE_PACKAGE_BUILD=ON -DHELICS_ENABLE_SWIG=ON -DHELICS_BUILD_TESTS=ON -DHELICS_BUILD_EXAMPLES=ON -DHELICS_BUILD_CXX_SHARED_LIB=ON -DBUILD_JAVA_INTERFACE=ON
+  - cmake .. -G "Visual Studio 14 2015 Win64" -DBOOST_INSTALL_PATH=C:/libraries/boost_1_63_0 -DHELICS_ENABLE_SWIG=OFF -DHELICS_BUILD_TESTS=ON -DHELICS_BUILD_EXAMPLES=ON -DHELICS_BUILD_CXX_SHARED_LIB=ON -DBUILD_PYTHON_INTERFACE=ON
   - cd ..
 
 build:
@@ -30,14 +25,9 @@ build:
   parallel: true
   verbosity: minimal
 
-after_build:
-  - cd build
-  - cpack -B %cd%/installer-output
-  - cd ..
-
 test_script:
   - cd build
-  - ctest --output-on-failure --timeout 480 -C Release -L "Continuous|PackagingFast"
+  - ctest --output-on-failure --timeout 480 -C Release -L "SystemCI"
   - cd ..
 
 artifacts:
