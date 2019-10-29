@@ -12,9 +12,9 @@ namespace helics
 
 time_units timeUnitsFromString (const std::string &unitString) { return core::timeUnitsFromString (unitString); }
 
-helics::Time loadTimeFromString (const std::string &timeString) { return core::loadTimeFromString (timeString); }
+Time loadTimeFromString (const std::string &timeString) { return core::loadTimeFromString (timeString); }
 
-helics::Time loadTimeFromString (std::string timeString, time_units defUnits)
+Time loadTimeFromString (std::string timeString, time_units defUnits)
 {
     return core::loadTimeFromString (timeString, defUnits);
 }

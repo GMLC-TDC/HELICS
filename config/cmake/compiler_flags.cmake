@@ -179,8 +179,10 @@ list(REMOVE_DUPLICATES compile_flags_list)
 set_property(TARGET compile_flags_target PROPERTY INTERFACE_COMPILE_OPTIONS ${compile_flags_list})
 
 get_target_property(link_flags_list compile_flags_target INTERFACE_LINK_OPTIONS)
-list(REMOVE_DUPLICATES link_flags_list)
-set_property(TARGET compile_flags_target PROPERTY INTERFACE_LINK_OPTIONS ${link_flags_list})
+if (link_flags_list)
+    list(REMOVE_DUPLICATES link_flags_list)
+    set_property(TARGET compile_flags_target PROPERTY INTERFACE_LINK_OPTIONS ${link_flags_list})
+endif()
 
 # -------------------------------------------------------------
 # Check and set latest CXX Standard supported by compiler

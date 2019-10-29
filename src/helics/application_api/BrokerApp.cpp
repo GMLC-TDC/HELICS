@@ -68,7 +68,7 @@ std::unique_ptr<helicsCLI11App> BrokerApp::generateParser ()
     app->allow_extras ();
     auto app_p = app.get ();
     app->footer ([app_p] () {
-        auto coreType = (*app_p)["--core"]->as<helics::core_type> ();
+        auto coreType = coreTypeFromString((*app_p)["--core"]->as<std::string> ());
         BrokerFactory::displayHelp (coreType);
         return std::string ();
     });

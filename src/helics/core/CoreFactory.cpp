@@ -470,5 +470,27 @@ void unregisterCore (const std::string &name)
     }
 }
 
+
+static const std::string helpStr{"--help"};
+
+void displayHelp (core_type type)
+{
+    if (type == core_type::DEFAULT || type == core_type::UNRECOGNIZED)
+    {
+        std::cout << "All core types have similar options\n";
+        auto cr = makeCore (core_type::DEFAULT, emptyString);
+        cr->configure (helpStr);
+#ifdef ENABLE_TCP_CORE
+        cr = makeCore (core_type::TCP_SS, emptyString);
+        cr->configure (helpStr);
+#endif
+    }
+    else
+    {
+        auto cr = makeCore (type, emptyString);
+        cr->configure (helpStr);
+    }
+}
+
 }  // namespace CoreFactory
 }  // namespace helics
