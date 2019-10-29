@@ -50,6 +50,6 @@ set_property(
 
 # Tests for Continuous Integration builds
 add_test(NAME system-ci-tests COMMAND system-tests --gtest_filter=-*ci_skip*)
-set_property(TEST system-ci-tests PROPERTY LABELS Continuous Valgrind)
+set_property(TEST system-ci-tests PROPERTY LABELS SystemCI Continuous Valgrind)
 
 copy_key_files_to_target_location(system-tests)

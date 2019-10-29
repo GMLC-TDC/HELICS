@@ -53,6 +53,6 @@ add_test(
     NAME helics_apps-ci-tests
     COMMAND helics_apps-tests --gtest_filter=-*_exe*:*ci_skip*
 )
-set_property(TEST helics_apps-ci-tests PROPERTY LABELS Continuous)
+set_property(TEST helics_apps-ci-tests PROPERTY LABELS HelicsAppsCI Continuous)
 
 copy_key_files_to_target_location(helics_apps-tests)
