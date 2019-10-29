@@ -72,17 +72,14 @@ add_custom_command(TARGET helics-shared POST_BUILD
                        ${CMAKE_CURRENT_SOURCE_DIR}/collect_cxx_shared_headers.cmake)
 
 
-install(
-    DIRECTORY ${PROJECT_SOURCE_DIR}/ThirdParty/cereal
-    DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/helics_cxx/helics/external/optional
-    COMPONENT cereal
+file(COPY ${PROJECT_SOURCE_DIR}/ThirdParty/cereal
+    DESTINATION ${HELICS_BINARY_DIR}/include/helics_cxx 
 )
             
 target_include_directories(helics-shared 
 		INTERFACE $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}/include/helics_cxx>
 		$<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/ThirdParty>
 		 $<INSTALL_INTERFACE:$<INSTALL_PREFIX>/${CMAKE_INSTALL_INCLUDEDIR}>/helics_cxx
-		 $<INSTALL_INTERFACE:$<INSTALL_PREFIX>/${CMAKE_INSTALL_INCLUDEDIR}/helics_cxx/helics/external/optional>
 		 PRIVATE $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
 		)
 
@@ -115,7 +112,7 @@ target_include_directories(helics-shared
 
     if(MSVC AND NOT HELICS_EMBEDDED_DEBUG_INFO)
         install(
-            FILES $<TARGET_PDB_FILE:helicsSharedLib>
+            FILES $<TARGET_PDB_FILE:helics-shared>
             DESTINATION ${CMAKE_INSTALL_BINDIR}
             OPTIONAL
             COMPONENT libs

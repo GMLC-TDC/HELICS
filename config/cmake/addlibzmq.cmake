@@ -115,14 +115,9 @@ set(
 set(COMPILER_SUPPORTS_CXX11 ON)
 set(ZMQ_HAVE_NOEXCEPT ON)
 
-add_subdirectory(${${lcName}_SOURCE_DIR} ${${lcName}_BINARY_DIR})
+add_subdirectory(${${lcName}_SOURCE_DIR} ${${lcName}_BINARY_DIR} EXCLUDE_FROM_ALL)
 
 set(ZeroMQ_FOUND TRUE)
-
-set_target_properties(
-    clang-format clang-format-check clang-format-diff
-    PROPERTIES FOLDER "Extern/zmq_clang_format"
-)
 
 if(HELICS_USE_ZMQ_STATIC_LIBRARY)
     set_target_properties(libzmq-static PROPERTIES FOLDER "Extern")
@@ -161,63 +156,26 @@ else()
     set(zmq_target_output "libzmq")
 endif()
 
-get_target_property(ZMQ_PUBLIC_HEADER_TARGETS ${zmq_target_output} PUBLIC_HEADER)
-
-if(ZMQ_PUBLIC_HEADER_TARGETS)
-
-    set(NEW_ZMQ_PUBLIC_HEADERS)
-    foreach(SOURCE_FILE ${ZMQ_PUBLIC_HEADER_TARGETS})
-        list(APPEND NEW_ZMQ_PUBLIC_HEADERS ${${lcName}_SOURCE_DIR}/${SOURCE_FILE})
-    endforeach()
-    set_target_properties(
-        ${zmq_target_output}
-        PROPERTIES PUBLIC_HEADER "${NEW_ZMQ_PUBLIC_HEADERS}"
-    )
-
-    if(NOT HELICS_BINARY_ONLY_INSTALL)
-        if(HELICS_BUILD_CXX_SHARED_LIB OR NOT HELICS_DISABLE_STATIC_LIB_INSTALL)
-            install(
-                FILES ${NEW_ZMQ_PUBLIC_HEADERS}
-                DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
-                COMPONENT headers
-            )
-        endif()
-    endif()
-endif()
-
-if(NOT CMAKE_VERSION VERSION_LESS 3.13)
-    message(STATUS "installing ${zmq_target_output} as HELICS EXPORT")
-    install(
-        TARGETS ${zmq_target_output} ${HELICS_EXPORT_COMMAND}
-        ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
-        LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-        RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
-        PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR} COMPONENT libs
-    )
-
-endif()
-
-install(
-    FILES $<TARGET_FILE:${zmq_target_output}>
-    DESTINATION ${CMAKE_INSTALL_BINDIR}
-    COMPONENT libs
-)
-
 if(HELICS_BUILD_CXX_SHARED_LIB OR NOT HELICS_DISABLE_STATIC_LIB_INSTALL)
-    install(
-        FILES $<TARGET_LINKER_FILE:${zmq_target_output}>
-        DESTINATION ${CMAKE_INSTALL_LIBDIR}
-        COMPONENT libs
-    )
-endif()
 
-if(MSVC AND NOT EMBEDDED_DEBUG_INFO AND NOT HELICS_BINARY_ONLY_INSTALL)
-    if(HELICS_BUILD_CXX_SHARED_LIB OR NOT HELICS_DISABLE_STATIC_LIB_INSTALL)
-        install(
+	if(NOT HELICS_USE_ZMQ_STATIC_LIBRARY)
+		install(
+			FILES $<TARGET_FILE:${zmq_target_output}>
+			DESTINATION ${CMAKE_INSTALL_BINDIR}
+			COMPONENT libs
+		)
+		if(MSVC AND NOT EMBEDDED_DEBUG_INFO AND NOT HELICS_BINARY_ONLY_INSTALL )
+		install(
             FILES $<TARGET_PDB_FILE:${zmq_target_output}>
             DESTINATION ${CMAKE_INSTALL_BINDIR}
             OPTIONAL
             COMPONENT libs
         )
-    endif()
+		endif()
+	endif()
+    install(
+        FILES $<TARGET_LINKER_FILE:${zmq_target_output}>
+        DESTINATION ${CMAKE_INSTALL_LIBDIR}
+        COMPONENT libs
+    )
 endif()

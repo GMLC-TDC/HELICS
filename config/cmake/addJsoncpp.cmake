@@ -31,11 +31,6 @@ if(BUILD_SHARED_LIBS)
     set(BUILD_SHARED_LIBS OFF)
 endif()
 
-if(CMAKE_INSTALL_INCLUDEDIR)
-    set(OLD_CMAKE_INSTALL_INCLUDEDIR ${CMAKE_INSTALL_INCLUDEDIR})
-    set(CMAKE_INSTALL_INCLUDEDIR ${CMAKE_INSTALL_INCLUDEDIR}/helics/external/optional)
-endif()
-
 # these are internal variables used in JSONCPP that we know to be true based on the
 # requirements in HELICS for newer compilers than JSONCPP supports
 set(HAVE_CLOCALE ON)
@@ -44,15 +39,11 @@ set(COMPILER_HAS_DEPRECATED ON)
 set(HAVE_STDINT_H ON)
 set(HAVE_DECIMAL_POINT ON)
 add_subdirectory("${HELICS_SOURCE_DIR}/ThirdParty/jsoncpp"
-                 "${PROJECT_BINARY_DIR}/ThirdParty/jsoncpp")
+                 "${PROJECT_BINARY_DIR}/ThirdParty/jsoncpp" EXCLUDE_FROM_ALL)
 
 
 add_library(HELICS::jsoncpp_lib ALIAS jsoncpp_lib)
 set_target_properties(jsoncpp_lib PROPERTIES FOLDER Extern)
-
-if(OLD_CMAKE_INSTALL_INCLUDEDIR)
-    set(CMAKE_INSTALL_INCLUDEDIR ${OLD_CMAKE_INSTALL_INCLUDEDIR})
-endif()
 
 if(OLD_BUILD_SHARED_LIBS)
     set(BUILD_SHARED_LIBS ${OLD_BUILD_SHARED_LIBS})
@@ -62,8 +53,3 @@ hide_variable(JSONCPP_WITH_STRICT_ISO)
 hide_variable(JSONCPP_WITH_WARNING_AS_ERROR)
 hide_variable(DEBUG_LIBNAME_SUFFIX)
 hide_variable(JSONCPP_USE_SECURE_MEMORY)
-
-# don't want build_shared_libs to show up since it interacts oddly with the submodules
-if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
-    hide_variable(BUILD_SHARED_LIBS)
-endif()
