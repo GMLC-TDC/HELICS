@@ -45,6 +45,8 @@ enum class core_type : int
     NNG = helics_core_type_nng,  //!< reserved for future Nanomsg implementation
     ZMQ_SS = helics_core_type_zmq_test,  //!< single socket version of ZMQ core for better scalability performance
     HTTP = helics_core_type_http,  //!< core/broker using web traffic
+    WEBSOCKET = helics_core_type_websocket,  //!< core/broker using web sockets
+    INPROC = helics_core_type_inproc,  //!< core/broker using a stripped down in process core type
     UNRECOGNIZED = 22,  //!< unknown
 
 };

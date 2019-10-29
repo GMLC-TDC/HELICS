@@ -37,6 +37,10 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "tcp/TcpCore.h"
 #endif
 
+#ifdef ENABLE_INPROC_CORE
+#include "inproc/InprocCore.h"
+#endif
+
 #include "helicsCLI11.hpp"
 #include <cassert>
 #include <cstring>
@@ -136,6 +140,20 @@ std::shared_ptr<Core> makeCore (core_type type, const std::string &name)
         break;
 #else
         throw (HelicsException ("TEST core is not available"));
+#endif
+    case core_type::INPROC:
+#ifdef ENABLE_INPROC_CORE
+        if (name.empty ())
+        {
+            core = std::make_shared<inproc::InprocCore> ();
+        }
+        else
+        {
+            core = std::make_shared<inproc::InprocCore> (name);
+        }
+        break;
+#else
+        throw (HelicsException ("Inproc core is not available"));
 #endif
     case core_type::INTERPROCESS:
     case core_type::IPC:
@@ -354,7 +372,7 @@ std::shared_ptr<Core> FindOrCreate (core_type type, const std::string &core_name
 
 /** lambda function to join cores before the destruction happens to avoid potential problematic calls in the
  * loops*/
-static auto destroyerCallFirst = [](auto &core) {
+static auto destroyerCallFirst = [] (auto &core) {
     core->processDisconnect (true);
     core->joinAllThreads ();
 };
@@ -400,6 +418,12 @@ static bool isJoinableCoreOfType (core_type type, const std::shared_ptr<CommonCo
 #else
             break;
 #endif
+        case core_type::INPROC:
+#ifdef ENABLE_INPROC_CORE
+            return (dynamic_cast<inproc::InprocCore *> (ptr.get ()) != nullptr);
+#else
+            break;
+#endif
         case core_type::INTERPROCESS:
         case core_type::IPC:
 #ifdef ENABLE_IPC_CORE
@@ -432,9 +456,18 @@ static bool isJoinableCoreOfType (core_type type, const std::shared_ptr<CommonCo
     return false;
 }
 
+static bool isJoinableCoreForType (core_type type, const std::shared_ptr<CommonCore> &ptr)
+{
+    if (type == core_type::INPROC || type == core_type::TEST)
+    {
+        return isJoinableCoreOfType (core_type::INPROC, ptr) || isJoinableCoreOfType (core_type::TEST, ptr);
+    }
+    return isJoinableCoreOfType (type, ptr);
+}
+
 std::shared_ptr<Core> findJoinableCoreOfType (core_type type)
 {
-    return searchableObjects.findObject ([type](auto &ptr) { return isJoinableCoreOfType (type, ptr); });
+    return searchableObjects.findObject ([type] (auto &ptr) { return isJoinableCoreForType (type, ptr); });
 }
 
 bool registerCore (const std::shared_ptr<Core> &core)
@@ -466,7 +499,7 @@ void unregisterCore (const std::string &name)
 {
     if (!searchableObjects.removeObject (name))
     {
-        searchableObjects.removeObject ([&name](auto &obj) { return (obj->getIdentifier () == name); });
+        searchableObjects.removeObject ([&name] (auto &obj) { return (obj->getIdentifier () == name); });
     }
 }
 

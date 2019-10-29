@@ -34,6 +34,10 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "tcp/TcpCommsSS.h"
 #endif
 
+#ifdef ENABLE_INPROC_CORE
+#include "inproc/InprocComms.h"
+#endif
+
 #ifdef ENABLE_MPI_CORE
 #include "mpi/MpiComms.h"
 #endif
@@ -67,6 +71,11 @@ template class CommsBroker<tcp::TcpComms, CommonCore>;
 template class CommsBroker<tcp::TcpComms, CoreBroker>;
 template class CommsBroker<tcp::TcpCommsSS, CommonCore>;
 template class CommsBroker<tcp::TcpCommsSS, CoreBroker>;
+#endif
+
+#ifdef ENABLE_INPROC_CORE
+template class CommsBroker<inproc::InprocComms, CommonCore>;
+template class CommsBroker<inproc::InprocComms, CoreBroker>;
 #endif
 
 #ifdef ENABLE_MPI_CORE
