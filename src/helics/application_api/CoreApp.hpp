@@ -117,7 +117,7 @@ class CoreKeeper
 {
   public:
     template <class... Args>
-    CoreKeeper (Args &&... args) : cr (std::forward<Args...> (args...))
+    explicit CoreKeeper (Args &&... args) : cr (std::forward<Args...> (args...))
     {
     }
     CoreKeeper (CoreKeeper &&brkeep) = default;
