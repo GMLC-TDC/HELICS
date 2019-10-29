@@ -52,6 +52,6 @@ add_test(
     NAME application-api-ci-tests
     COMMAND application-api-tests --gtest_filter=-*ci_skip*
 )
-set_property(TEST application-api-ci-tests PROPERTY LABELS Continuous)
+set_property(TEST application-api-ci-tests PROPERTY LABELS ApplicationApiCI Continuous)
 
 copy_key_files_to_target_location(application-api-tests)
