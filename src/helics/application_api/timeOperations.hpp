@@ -7,6 +7,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #pragma once
 #include "helics_cxx_export.h"
 #include "../core/helics-time.hpp"
+#include <string>
 /** @file
 @details defining the time representation to use throughout helics
 */

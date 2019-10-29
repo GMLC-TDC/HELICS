@@ -77,6 +77,8 @@ void CoreApp::processArgs (std::unique_ptr<helicsCLI11App> &app)
 
 bool CoreApp::isConnected () const { return ((core) && (core->isConnected ())); }
 
+bool CoreApp::isOpenToNewFederates () const { return ((core) && (core->isOpenToNewFederates ())); }
+
 void CoreApp::forceTerminate ()
 {
     if (!core)
@@ -140,6 +142,24 @@ std::string CoreApp::query (const std::string &target, const std::string &query)
 {
     return (core) ? core->query (target, query) : std::string ("#error");
 }
+
+void CoreApp::setGlobal(const std::string &valueName, const std::string &value)
+{
+    if (core)
+    {
+        core->setGlobal (valueName, value);
+    }
+}
+
+
+void CoreApp::setLoggingLevel(int loglevel)
+{
+    if (core)
+    {
+        core->setLoggingLevel (loglevel);
+    }
+}
+
 /** set the log file to use for the core*/
 void CoreApp::setLogFile (const std::string &logFile)
 {

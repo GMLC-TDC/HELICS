@@ -87,6 +87,8 @@ void BrokerApp::processArgs (std::unique_ptr<helicsCLI11App> &app)
 
 bool BrokerApp::isConnected () const { return ((broker) && (broker->isConnected ())); }
 
+bool BrokerApp::isOpenToNewFederates () const { return ((broker) && (broker->isOpenToNewFederates ())); }
+
 void BrokerApp::forceTerminate ()
 {
     if (!broker)
@@ -140,6 +142,23 @@ std::string BrokerApp::query (const std::string &target, const std::string &quer
 {
     return (broker) ? broker->query (target, query) : std::string ("#error");
 }
+
+void BrokerApp::setGlobal (const std::string &valueName, const std::string &value)
+{
+    if (broker)
+    {
+        broker->setGlobal (valueName, value);
+    }
+}
+
+void BrokerApp::setLoggingLevel (int loglevel)
+{
+    if (broker)
+    {
+        broker->setLoggingLevel (loglevel);
+    }
+}
+
 /** set the log file to use for the broker*/
 void BrokerApp::setLogFile (const std::string &logFile)
 {

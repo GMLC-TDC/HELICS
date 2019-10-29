@@ -17,11 +17,16 @@ if(POLICY CMP0069)
     cmake_policy(SET CMP0069 NEW)
 endif()
 
+if(POLICY CMP0074)
+    # Policy CMP0074 find_package uses <PackageName>_ROOT variables
+    cmake_policy(SET CMP0074 NEW)
+endif()
+
 # -----------------------------------------------------------------------------
 # HELICS Version number
 # -----------------------------------------------------------------------------
 set(HELICS_VERSION_BUILD)
-set(HELICS_DATE "10-27-19")
+set(HELICS_DATE "10-30-19")
 
 set(
     HELICS_VERSION_UNDERSCORE

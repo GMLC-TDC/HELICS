@@ -59,6 +59,9 @@ class HELICS_CXX_EXPORT BrokerApp
 
     /** check if the Broker is running*/
     bool isConnected () const;
+    /** check if the broker is ready to accept new federates or cores
+     */
+    bool isOpenToNewFederates () const;
 
     /** forceably disconnect the broker*/
     void forceTerminate ();
@@ -78,8 +81,18 @@ class HELICS_CXX_EXPORT BrokerApp
     const std::string &getAddress () const;
     /** make a query at the broker*/
     std::string query (const std::string &target, const std::string &query);
+    /** set a federation global value
+     @details this overwrites any previous value for this name
+     globals can be queried with a target of "global" and queryStr of the value to Query
+     @param valueName the name of the global to set
+     @param value the value of the global
+     */
+    void setGlobal (const std::string &valueName, const std::string &value);
+
     /** set the log file to use for the broker*/
     void setLogFile (const std::string &logFile);
+    /** set the minimum log level to use in the broker*/
+    void setLoggingLevel (int loglevel);
     /** clear the pointer to the broker*/
     void reset ();
     #ifdef HELICS_CXX_STATIC_DEFINE
