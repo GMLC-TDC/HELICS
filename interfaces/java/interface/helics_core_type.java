@@ -21,6 +21,8 @@ public final class helics_core_type {
   public final static helics_core_type helics_core_type_nng = new helics_core_type("helics_core_type_nng", helicsJNI.helics_core_type_nng_get());
   public final static helics_core_type helics_core_type_tcp_ss = new helics_core_type("helics_core_type_tcp_ss", helicsJNI.helics_core_type_tcp_ss_get());
   public final static helics_core_type helics_core_type_http = new helics_core_type("helics_core_type_http", helicsJNI.helics_core_type_http_get());
+  public final static helics_core_type helics_core_type_websocket = new helics_core_type("helics_core_type_websocket", helicsJNI.helics_core_type_websocket_get());
+  public final static helics_core_type helics_core_type_inproc = new helics_core_type("helics_core_type_inproc", helicsJNI.helics_core_type_inproc_get());
 
   public final int swigValue() {
     return swigValue;
@@ -56,7 +58,7 @@ public final class helics_core_type {
     swigNext = this.swigValue+1;
   }
 
-  private static helics_core_type[] swigValues = { helics_core_type_default, helics_core_type_zmq, helics_core_type_mpi, helics_core_type_test, helics_core_type_interprocess, helics_core_type_ipc, helics_core_type_tcp, helics_core_type_udp, helics_core_type_zmq_test, helics_core_type_nng, helics_core_type_tcp_ss, helics_core_type_http };
+  private static helics_core_type[] swigValues = { helics_core_type_default, helics_core_type_zmq, helics_core_type_mpi, helics_core_type_test, helics_core_type_interprocess, helics_core_type_ipc, helics_core_type_tcp, helics_core_type_udp, helics_core_type_zmq_test, helics_core_type_nng, helics_core_type_tcp_ss, helics_core_type_http, helics_core_type_websocket, helics_core_type_inproc };
   private static int swigNext = 0;
   private final int swigValue;
   private final String swigName;

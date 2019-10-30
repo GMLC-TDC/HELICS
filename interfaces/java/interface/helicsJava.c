@@ -365,6 +365,30 @@ SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_helics_1core_1type_1http_
 }
 
 
+SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_helics_1core_1type_1websocket_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  helics_core_type result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (helics_core_type)helics_core_type_websocket;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_helics_1core_1type_1inproc_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  helics_core_type result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (helics_core_type)helics_core_type_inproc;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
 SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_helics_1data_1type_1string_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
   helics_data_type result;
