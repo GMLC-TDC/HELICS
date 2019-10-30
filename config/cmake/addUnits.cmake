@@ -18,11 +18,10 @@ set(UNITS_BUILD_OBJECT_LIBRARY OFF CACHE INTERNAL "")
 set(UNITS_BUILD_STATIC_LIBRARY ON CACHE INTERNAL "")
 set(UNITS_BUILD_SHARED_LIBRARY OFF CACHE INTERNAL "")
 
-add_subdirectory("${HELICS_SOURCE_DIR}/ThirdParty/units"
+add_subdirectory("${PROJECT_SOURCE_DIR}/ThirdParty/units"
                  "${PROJECT_BINARY_DIR}/ThirdParty/units")
 
 set_target_properties(units-static PROPERTIES FOLDER Extern)
-add_library(HELICS::units ALIAS units-static)
 
 hide_variable(UNITS_HEADER_ONLY)
 hide_variable(UNITS_BUILD_OBJECT_LIBRARY)

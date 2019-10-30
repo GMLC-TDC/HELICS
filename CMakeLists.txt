@@ -51,7 +51,6 @@ else()
     set(ORIGINAL_MODULE_PATH ${CMAKE_MODULE_PATH})
     set(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/config/cmake/" ${CMAKE_MODULE_PATH})
     get_property(helics-use-folders GLOBAL PROPERTY USE_FOLDERS)
-    set_property(GLOBAL PROPERTY USE_FOLDERS ${helics-use-folders})
 endif()
 
 # generate a version description based on git tags
@@ -143,13 +142,13 @@ cmake_dependent_option(
 
 cmake_dependent_option(
     HELICS_BUILD_BENCHMARKS
-    "Build HELICS examples"
+    "Build HELICS Benchmarks"
     OFF
     "CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME"
     OFF
 )
 
-cmake_dependent_option(
+cmake_dependent_advanced_option(
     HELICS_WITH_CMAKE_PACKAGE
     "Generate and install cmake package files"
     ON
@@ -307,10 +306,6 @@ endif()
 # message(STATUS ${CMAKE_CXX_FLAGS})
 set(CONFIGURE_TARGET_LOCATION ${HELICS_BINARY_DIR}/helics_generated_includes/helics/)
 include(configGenerator)
-
-
-
-
 
 if(HELICS_GENERATE_DOXYGEN_DOC)
     find_package(Doxygen)
@@ -495,7 +490,7 @@ target_include_directories(
     INTERFACE
         $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/src>
         $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}/include>
-        $<INSTALL_INTERFACE:$<INSTALL_PREFIX>/include>
+        $<INSTALL_INTERFACE:$<INSTALL_PREFIX>/${CMAKE_INSTALL_INCLUDE_DIR}>
         $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/ThirdParty/containers>
         $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/ThirdParty/concurrency>
         $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/ThirdParty/netif>
@@ -623,11 +618,13 @@ include(addfmt)
 # Create the target for jsoncpp
 # -----------------------------------------------------------
 include(addJsoncpp)
+add_library(HELICS::jsoncpp_lib ALIAS jsoncpp_lib)
 
 # --------------------------------------------------------------
 # Create the target for unitslib
 # -----------------------------------------------------------
 include(addUnits)
+add_library(HELICS::units ALIAS units-static)
 
 # -----------------------------------------------------------------------------
 # create utilities target

@@ -15,10 +15,6 @@ set(DEBUG_LIBNAME_SUFFIX ${CMAKE_DEBUG_POSTFIX} CACHE INTERNAL "")
 # so json cpp exports to the correct target export
 
 set(INSTALL_EXPORT "" CACHE INTERNAL "")
-set(JSONCPP_BINARY_ONLY_INSTALL ${HELICS_BINARY_ONLY_INSTALL} CACHE INTERNAL "")
-if( NOT HELICS_BUILD_CXX_SHARED_LIB)
-    set(JSONCPP_BINARY_ONLY_INSTALL ON CACHE INTERNAL "")
-endif()
 
 set(JSONCPP_DISABLE_CCACHE ON CACHE INTERNAL "")
 
@@ -38,11 +34,10 @@ set(HAVE_LOCALECONV ON)
 set(COMPILER_HAS_DEPRECATED ON)
 set(HAVE_STDINT_H ON)
 set(HAVE_DECIMAL_POINT ON)
-add_subdirectory("${HELICS_SOURCE_DIR}/ThirdParty/jsoncpp"
+add_subdirectory("${PROJECT_SOURCE_DIR}/ThirdParty/jsoncpp"
                  "${PROJECT_BINARY_DIR}/ThirdParty/jsoncpp" EXCLUDE_FROM_ALL)
 
 
-add_library(HELICS::jsoncpp_lib ALIAS jsoncpp_lib)
 set_target_properties(jsoncpp_lib PROPERTIES FOLDER Extern)
 
 if(OLD_BUILD_SHARED_LIBS)
