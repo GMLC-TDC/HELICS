@@ -38,6 +38,10 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "tcp/TcpBroker.h"
 #endif
 
+#ifdef ENABLE_INPROC_CORE
+#include "inproc/InprocBroker.h"
+#endif
+
 #include <cassert>
 
 namespace helics
@@ -122,6 +126,20 @@ std::shared_ptr<Broker> makeBroker (core_type type, const std::string &name)
         break;
 #else
         throw (HelicsException ("Test broker type is not available"));
+#endif
+    case core_type::INPROC:
+#ifdef ENABLE_INPROC_CORE
+        if (name.empty ())
+        {
+            broker = std::make_shared<inproc::InprocBroker> ();
+        }
+        else
+        {
+            broker = std::make_shared<inproc::InprocBroker> (name);
+        }
+        break;
+#else
+        throw (HelicsException ("in process broker type is not available"));
 #endif
     case core_type::INTERPROCESS:
     case core_type::IPC:
@@ -301,6 +319,12 @@ static bool isJoinableBrokerOfType (core_type type, const std::shared_ptr<Broker
 #else
             return false;
 #endif
+        case core_type::INPROC:
+#ifdef ENABLE_INPROC_CORE
+            return (dynamic_cast<inproc::InprocBroker *> (ptr.get ()) != nullptr);
+#else
+            return false;
+#endif
         case core_type::INTERPROCESS:
         case core_type::IPC:
 #ifdef ENABLE_IPC_CORE
@@ -327,9 +351,18 @@ static bool isJoinableBrokerOfType (core_type type, const std::shared_ptr<Broker
     return false;
 }
 
+static bool isJoinableBrokerForType (core_type type, const std::shared_ptr<Broker> &ptr)
+{
+    if (type == core_type::INPROC || type == core_type::TEST)
+    {
+        return isJoinableBrokerOfType (core_type::INPROC, ptr) || isJoinableBrokerOfType (core_type::TEST, ptr);
+    }
+    return isJoinableBrokerOfType (type, ptr);
+}
+
 std::shared_ptr<Broker> findJoinableBrokerOfType (core_type type)
 {
-    return searchableObjects.findObject ([type] (auto &ptr) { return isJoinableBrokerOfType (type, ptr); });
+    return searchableObjects.findObject ([type] (auto &ptr) { return isJoinableBrokerForType (type, ptr); });
 }
 
 std::vector<std::shared_ptr<Broker>> getAllBrokers () { return searchableObjects.getObjects (); }

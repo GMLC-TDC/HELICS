@@ -22,6 +22,7 @@ set(
     ForwardingTimeCoordinatorTests.cpp
     TimeCoordinatorTests.cpp
     networkInfoTests.cpp
+	InprocCore-Tests.cpp
 )
 
 if(ENABLE_TEST_CORE)

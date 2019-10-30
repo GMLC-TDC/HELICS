@@ -403,6 +403,7 @@ cmake_dependent_advanced_option(
     OFF
 )
 option(ENABLE_TEST_CORE "Enable test inprocess core type" ON)
+option(ENABLE_INPROC_CORE "Enable inprocess core type" ON)
 option(ENABLE_ZMQ_CORE "Enable ZeroMQ networking library" ON)
 
 mark_as_advanced(
