@@ -40,6 +40,9 @@ set(
 
 set(TESTCORE_SOURCE_FILES test/TestBroker.cpp test/TestCore.cpp test/TestComms.cpp)
 
+set(INPROCCORE_SOURCE_FILES inproc/InprocBroker.cpp inproc/InprocCore.cpp inproc/InprocComms.cpp)
+
+
 set(
     IPC_SOURCE_FILES
     ipc/IpcCore.cpp ipc/IpcBroker.cpp ipc/IpcComms.cpp ipc/IpcQueueHelper.cpp
@@ -135,6 +138,10 @@ set(
 
 set(TESTCORE_HEADER_FILES test/TestCore.h test/TestBroker.h test/TestComms.h)
 
+
+set(INPROCCORE_HEADER_FILES inproc/InprocCore.h inproc/InprocBroker.h inproc/InprocComms.h)
+
+
 set(
     IPC_HEADER_FILES
     ipc/IpcCore.h ipc/IpcBroker.h ipc/IpcComms.h ipc/IpcQueueHelper.h
@@ -169,6 +176,11 @@ set(
 if(ENABLE_TEST_CORE)
     list(APPEND SRC_FILES ${TESTCORE_SOURCE_FILES})
     list(APPEND INCLUDE_FILES ${TESTCORE_HEADER_FILES})
+endif()
+
+if(ENABLE_INPROC_CORE)
+    list(APPEND SRC_FILES ${INPROCCORE_SOURCE_FILES})
+    list(APPEND INCLUDE_FILES ${INPROCCORE_HEADER_FILES})
 endif()
 
 if(ENABLE_UDP_CORE)
@@ -231,6 +243,10 @@ endif()
 
 if(ENABLE_TCP_CORE)
     source_group("tcp" FILES ${TCP_SOURCE_FILES} ${TCP_HEADER_FILES})
+endif()
+
+if(ENABLE_INPROC_CORE)
+    source_group("inproc" FILES ${INPROCCORE_SOURCE_FILES} ${INPROCCORE_HEADER_FILES})
 endif()
 
 if(ENABLE_MPI_CORE)

@@ -73,6 +73,8 @@ helics_core_type_zmq_test = _helics.helics_core_type_zmq_test
 helics_core_type_nng = _helics.helics_core_type_nng
 helics_core_type_tcp_ss = _helics.helics_core_type_tcp_ss
 helics_core_type_http = _helics.helics_core_type_http
+helics_core_type_websocket = _helics.helics_core_type_websocket
+helics_core_type_inproc = _helics.helics_core_type_inproc
 helics_data_type_string = _helics.helics_data_type_string
 helics_data_type_double = _helics.helics_data_type_double
 helics_data_type_int = _helics.helics_data_type_int
@@ -1003,4 +1005,6 @@ def helicsFilterGetOption(filt: "helics_filter", option: "int") -> "helics_bool"
 
 import atexit
 atexit.register(helicsCloseLibrary)
+
+
 

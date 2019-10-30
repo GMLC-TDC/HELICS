@@ -42,6 +42,10 @@ std::string to_string (core_type type)
         return "udp_";
     case core_type::NNG:
         return "nng_";
+    case core_type::INPROC:
+        return "inproc_";
+    case core_type::WEBSOCKET:
+        return "websocket_";
     default:
         return std::string ();
     }
@@ -87,7 +91,10 @@ static const std::unordered_map<std::string, core_type> coreTypes{{"default", co
                                                                   {"test", core_type::TEST},
                                                                   {"UDP", core_type::UDP},
                                                                   {"local", core_type::TEST},
-                                                                  {"inprocess", core_type::TEST},
+                                                                  {"inprocess", core_type::INPROC},
+                                                                  {"websocket", core_type::WEBSOCKET},
+                                                                  {"web", core_type::WEBSOCKET},
+                                                                  {"inproc", core_type::INPROC},
                                                                   {"http", core_type::HTTP},
                                                                   {"HTTP", core_type::HTTP},
                                                                   {"web", core_type::HTTP},
@@ -150,6 +157,14 @@ core_type coreTypeFromString (std::string type) noexcept
     {
         return core_type::MPI;
     }
+    if (type.compare (0, 6, "inproc") == 0)
+    {
+        return core_type::INPROC;
+    }
+    if (type.compare (0, 3, "web") == 0)
+    {
+        return core_type::WEBSOCKET;
+    }
     return core_type::UNRECOGNIZED;
 }
 
@@ -189,6 +204,12 @@ core_type coreTypeFromString (std::string type) noexcept
 #define TEST_AVAILABILITY true
 #endif
 
+#ifndef ENABLE_INPROC_CORE
+#define INPROC_AVAILABILITY false
+#else
+#define INPROC_AVAILABILITY true
+#endif
+
 bool isCoreTypeAvailable (core_type type) noexcept
 {
     bool available = false;
@@ -221,7 +242,11 @@ bool isCoreTypeAvailable (core_type type) noexcept
     case core_type::DEFAULT:  // default should always be available
         available = true;
         break;
+    case core_type::INPROC:
+        available = INPROC_AVAILABILITY;
+        break;
     case core_type::HTTP:
+    case core_type::WEBSOCKET:
         available = false;
         break;
     default:

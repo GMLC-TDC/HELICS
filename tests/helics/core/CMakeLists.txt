@@ -22,6 +22,7 @@ set(
     ForwardingTimeCoordinatorTests.cpp
     TimeCoordinatorTests.cpp
     networkInfoTests.cpp
+	InprocCore-Tests.cpp
 )
 
 if(ENABLE_TEST_CORE)
@@ -60,6 +61,6 @@ set_property(TEST core-tests PROPERTY LABELS Core Coverage Daily)
 
 # Tests for Continuous Integration builds
 add_test(NAME core-ci-tests COMMAND core-tests --gtest_filter=-*ci_skip*)
-set_property(TEST core-ci-tests PROPERTY LABELS Continuous)
+set_property(TEST core-ci-tests PROPERTY LABELS CoreCI Continuous)
 # set_property(TEST core-ci-tests PROPERTY LABELS DebugTest)
 copy_key_files_to_target_location(core-tests)

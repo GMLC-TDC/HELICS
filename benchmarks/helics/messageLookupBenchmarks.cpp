@@ -42,7 +42,7 @@ class messageGenerator
   public:
     messageGenerator () = default;
 
-    void run (std::function<void()> callOnReady = {})
+    void run (std::function<void ()> callOnReady = {})
     {
         if (!readyToRun)
         {
@@ -168,7 +168,7 @@ static void BM_mgen_multiCore (benchmark::State &state, core_type cType)
         std::vector<std::thread> threadlist (feds - 1);
         for (int ii = 0; ii < feds - 1; ++ii)
         {
-            threadlist[ii] = std::thread ([&](messageGenerator &gen) { gen.run ([&brr]() { brr.wait (); }); },
+            threadlist[ii] = std::thread ([&] (messageGenerator &gen) { gen.run ([&brr] () { brr.wait (); }); },
                                           std::ref (gens[ii + 1]));
         }
 
@@ -191,7 +191,7 @@ static void BM_mgen_multiCore (benchmark::State &state, core_type cType)
 }
 
 // Register the test core benchmarks
-BENCHMARK_CAPTURE (BM_mgen_multiCore, testCore, core_type::TEST)
+BENCHMARK_CAPTURE (BM_mgen_multiCore, inprocCore, core_type::INPROC)
   ->Unit (benchmark::TimeUnit::kMillisecond)
   ->Ranges ({{32, 1 << 19}, {2, 64 * 4}})
   ->UseRealTime ();

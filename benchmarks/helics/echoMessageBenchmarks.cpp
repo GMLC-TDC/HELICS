@@ -37,7 +37,7 @@ class EchoMessageHub
   public:
     EchoMessageHub () = default;
 
-    void run (std::function<void()> callOnReady = {})
+    void run (std::function<void ()> callOnReady = {})
     {
         if (!readyToRun)
         {
@@ -75,14 +75,14 @@ class EchoMessageHub
         auto cTime = 0.0_t;
         while (cTime <= finalTime)
         {
-			while (ept.hasMessage())
-			{
+            while (ept.hasMessage ())
+            {
                 auto m = ept.getMessage ();
                 std::swap (m->source, m->dest);
                 std::swap (m->original_source, m->original_dest);
-                ept.send (std::move(m));
-			}
-           
+                ept.send (std::move (m));
+            }
+
             cTime = mFed->requestTime (finalTime + 0.05);
         }
         mFed->finalize ();
@@ -102,7 +102,7 @@ class EchoMessageLeaf
   public:
     EchoMessageLeaf () = default;
 
-    void run (std::function<void()> callOnReady = {})
+    void run (std::function<void ()> callOnReady = {})
     {
         if (!readyToRun)
         {
@@ -121,7 +121,7 @@ class EchoMessageLeaf
         helics::FederateInfo fi;
         fi.coreName = coreName;
         mFed = std::make_unique<helics::MessageFederate> (name, fi);
-		//this is a local endpoint
+        // this is a local endpoint
         ept = mFed->registerEndpoint ("leaf");
         initialized = true;
     }
@@ -151,10 +151,10 @@ class EchoMessageLeaf
             {
                 ept.send ("echo", txstring);
             }
-            while (ept.hasMessage())
+            while (ept.hasMessage ())
             {
                 auto m = ept.getMessage ();
-                auto &nstring = m->data.to_string();
+                auto &nstring = m->data.to_string ();
                 if (nstring != txstring)
                 {
                     std::cout << "incorrect string\n";
@@ -174,8 +174,8 @@ static void BM_echo_singleCore (benchmark::State &state)
 
         int feds = static_cast<int> (state.range (0));
         gmlc::concurrency::Barrier brr (feds + 1);
-        auto wcore = helics::CoreFactory::create (core_type::TEST, std::string ("--autobroker --federates=") +
-                                                                     std::to_string (feds + 1));
+        auto wcore = helics::CoreFactory::create (core_type::INPROC, std::string ("--autobroker --federates=") +
+                                                                       std::to_string (feds + 1));
         EchoMessageHub hub;
         hub.initialize (wcore->getIdentifier ());
         std::vector<EchoMessageLeaf> leafs (feds);
@@ -187,13 +187,13 @@ static void BM_echo_singleCore (benchmark::State &state)
         std::vector<std::thread> threadlist (static_cast<size_t> (feds));
         for (int ii = 0; ii < feds; ++ii)
         {
-            threadlist[ii] =
-              std::thread ([&](EchoMessageLeaf &lf) { lf.run ([&brr]() { brr.wait (); }); }, std::ref (leafs[ii]));
+            threadlist[ii] = std::thread ([&] (EchoMessageLeaf &lf) { lf.run ([&brr] () { brr.wait (); }); },
+                                          std::ref (leafs[ii]));
         }
         hub.makeReady ();
         brr.wait ();
         state.ResumeTiming ();
-        hub.run ([]() {});
+        hub.run ([] () {});
         state.PauseTiming ();
         for (auto &thrd : threadlist)
         {
@@ -240,13 +240,13 @@ static void BM_echo_multiCore (benchmark::State &state, core_type cType)
         std::vector<std::thread> threadlist (static_cast<size_t> (feds));
         for (int ii = 0; ii < feds; ++ii)
         {
-            threadlist[ii] =
-              std::thread ([&](EchoMessageLeaf &lf) { lf.run ([&brr]() { brr.wait (); }); }, std::ref (leafs[ii]));
+            threadlist[ii] = std::thread ([&] (EchoMessageLeaf &lf) { lf.run ([&brr] () { brr.wait (); }); },
+                                          std::ref (leafs[ii]));
         }
         hub.makeReady ();
         brr.wait ();
         state.ResumeTiming ();
-        hub.run ([]() {});
+        hub.run ([] () {});
         state.PauseTiming ();
         for (auto &thrd : threadlist)
         {
@@ -263,10 +263,10 @@ static void BM_echo_multiCore (benchmark::State &state, core_type cType)
 }
 
 static constexpr int64_t maxscale{1 << 5};
-// Register the test core benchmarks
-BENCHMARK_CAPTURE (BM_echo_multiCore, testCore, core_type::TEST)
+// Register the inproc core benchmarks
+BENCHMARK_CAPTURE (BM_echo_multiCore, inprocCore, core_type::INPROC)
   ->RangeMultiplier (2)
-  ->Range (1, maxscale*2)
+  ->Range (1, maxscale * 2)
   ->Unit (benchmark::TimeUnit::kMillisecond)
   ->UseRealTime ();
 
@@ -293,7 +293,7 @@ BENCHMARK_CAPTURE (BM_echo_multiCore, zmqssCore, core_type::ZMQ_SS)
 // Register the IPC benchmarks
 BENCHMARK_CAPTURE (BM_echo_multiCore, ipcCore, core_type::IPC)
   ->RangeMultiplier (2)
-  ->Range (1, maxscale*2)
+  ->Range (1, maxscale * 2)
   ->Iterations (1)
   ->Unit (benchmark::TimeUnit::kMillisecond)
   ->UseRealTime ();

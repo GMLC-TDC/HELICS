@@ -88,8 +88,8 @@ add_test(
     COMMAND shared-library-tests-cpp --gtest_filter=-*ci_skip*
 )
 
-set_property(TEST shared-library-ci-tests PROPERTY LABELS Continuous)
-set_property(TEST shared-library-ci-tests-cpp PROPERTY LABELS Continuous)
+set_property(TEST shared-library-ci-tests PROPERTY LABELS SharedLibraryCI Continuous)
+set_property(TEST shared-library-ci-tests-cpp PROPERTY LABELS SharedLibraryCppCI Continuous)
 
 copy_key_files_to_target_location(shared-library-tests)
 copy_shared_target(shared-library-tests)
