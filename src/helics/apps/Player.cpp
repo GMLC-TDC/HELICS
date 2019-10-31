@@ -22,6 +22,15 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "gmlc/utilities/base64.h"
 #include "gmlc/utilities/stringOps.h"
 
+#ifdef HELICS_SHARED_LIBRARY
+#    include "../application_api/timeOperations.hpp"
+using helics::timeUnitsFromString;
+#else
+#    include "../core/coreTimeOperations.hpp"
+using helics::core::timeUnitsFromString;
+
+#endif
+
 /** test if a string has a base64 wrapper*/
 static int hasB64Wrapper (const std::string &str);
 /** function to decode data strings for messages*/
@@ -82,7 +91,7 @@ std::unique_ptr<helicsCLI11App> Player::generateParser ()
     app
       ->add_option (
         "--datatype",
-        [this](CLI::results_t res) {
+        [this] (CLI::results_t res) {
             defType = helics::getTypeFromString (res[0]);
             return (defType != helics::data_type::helics_custom);
         },
@@ -93,10 +102,10 @@ std::unique_ptr<helicsCLI11App> Player::generateParser ()
     app
       ->add_option (
         "--time_units",
-        [this](CLI::results_t res) {
+        [this] (CLI::results_t res) {
             try
             {
-                units = core::timeUnitsFromString (res[0]);
+                units = timeUnitsFromString (res[0]);
                 timeMultiplier = toSecondMultiplier (units);
                 return true;
             }
@@ -164,7 +173,7 @@ helics::Time Player::extractTime (const std::string &str, int lineNumber) const
         {
             return helics::Time (std::stoll (str), time_units::ns);
         }
-        return core::loadTimeFromString (str, units);
+        return loadTimeFromString (str, units);
     }
     catch (const std::invalid_argument &)
     {

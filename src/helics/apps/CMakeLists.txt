@@ -17,10 +17,13 @@ if(HELICS_BUILD_APP_LIBRARY)
         Source.hpp
         Tracer.hpp
         helicsApp.hpp
-        MultiBroker.hpp
         Clone.hpp
-        BrokerServer.hpp
     )
+
+	set(helics_apps_broker_headers 
+		 MultiBroker.hpp
+		 BrokerServer.hpp
+		 )
 
     set(helics_apps_private_headers PrecHelper.hpp SignalGenerators.hpp)
 
@@ -34,14 +37,17 @@ if(HELICS_BUILD_APP_LIBRARY)
         Source.cpp
         Tracer.cpp
         helicsApp.cpp
-        MultiBroker.cpp
-        Clone.cpp
-        BrokerServer.cpp
+        Clone.cpp 
     )
 
+	set(helics_apps_broker_files
+		MultiBroker.cpp
+		BrokerServer.cpp
+	)
+
     add_library(helics_apps STATIC ../helics_apps.hpp ${helics_apps_library_files}
-                                   ${helics_apps_public_headers}
-                                   ${helics_apps_private_headers})
+                                   ${helics_apps_public_headers} ${helics_apps_broker_headers}
+                                   ${helics_apps_private_headers} ${helics_apps_broker_files})
 
     target_link_libraries(helics_apps PUBLIC helics_application_api)
     target_link_libraries(helics_apps PRIVATE HELICS::compile_flags_target fmt::fmt)
@@ -149,7 +155,7 @@ if(HELICS_BUILD_APP_LIBRARY)
                                    ${helics_apps_private_headers})
 
     target_link_libraries(helics-apps-shared PUBLIC HELICS::helics-shared)
-    target_link_libraries(helics-apps-shared PRIVATE HELICS::compile_flags_target fmt::fmt HELICS::utilities)
+    target_link_libraries(helics-apps-shared PRIVATE helics_common fmt::fmt HELICS::utilities)
     
     # add and alias library to match the find_package
     add_library(HELICS::helics-apps-shared ALIAS helics-apps-shared)
@@ -165,10 +171,6 @@ if(HELICS_BUILD_APP_LIBRARY)
    helics-apps-shared
     PROPERTIES CXX_VISIBILITY_PRESET hidden C_VISIBILITY_PRESET hidden VISIBILITY_INLINES_HIDDEN ON
     )
-
-	target_include_directories(helics-apps-shared 
-		 PRIVATE $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/ThirdParty>
-		)
 
     install(
         TARGETS helics-apps-shared  ${HELICS_EXPORT_COMMAND}
