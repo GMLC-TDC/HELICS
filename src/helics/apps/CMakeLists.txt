@@ -143,6 +143,71 @@ if(HELICS_BUILD_APP_LIBRARY)
         )
     endif(HELICS_BUILD_APP_EXECUTABLES)
 
+	if (HELICS_BUILD_CXX_SHARED_LIB)
+	 add_library(helics-apps-shared SHARED ../helics_apps.hpp ${helics_apps_library_files}
+                                   ${helics_apps_public_headers}
+                                   ${helics_apps_private_headers})
+
+    target_link_libraries(helics-apps-shared PUBLIC HELICS::helics-shared)
+    target_link_libraries(helics-apps-shared PRIVATE HELICS::compile_flags_target fmt::fmt HELICS::utilities)
+    
+    # add and alias library to match the find_package
+    add_library(HELICS::helics-apps-shared ALIAS helics-apps-shared)
+
+	target_compile_definitions(helics-apps-shared PRIVATE helics_shared_EXPORTS)
+
+    set_target_properties(
+        helics-apps-shared
+        PROPERTIES VERSION ${HELICS_VERSION} SOVERSION ${HELICS_VERSION_MAJOR}
+    )
+
+	set_target_properties(
+   helics-apps-shared
+    PROPERTIES CXX_VISIBILITY_PRESET hidden C_VISIBILITY_PRESET hidden VISIBILITY_INLINES_HIDDEN ON
+    )
+
+	target_include_directories(helics-apps-shared 
+		 PRIVATE $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/ThirdParty>
+		)
+
+    install(
+        TARGETS helics-apps-shared  ${HELICS_EXPORT_COMMAND}
+        RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+        ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+        LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    )
+
+    if(WIN32)
+        install(
+            FILES $<TARGET_LINKER_FILE:helics-apps-shared >
+            DESTINATION ${CMAKE_INSTALL_LIBDIR}
+            COMPONENT libs
+        )
+        install(
+            FILES $<TARGET_FILE:helics-apps-shared >
+            DESTINATION ${CMAKE_INSTALL_BINDIR}
+            COMPONENT Runtime
+        )
+    else()
+        install(
+            TARGETS helics-apps-shared  DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT
+            RUNTIME
+        )
+    endif()
+
+	if(NOT HELICS_BINARY_ONLY_INSTALL)
+
+    if(MSVC AND NOT HELICS_EMBEDDED_DEBUG_INFO)
+        install(
+            FILES $<TARGET_PDB_FILE:helics-apps-shared >
+            DESTINATION ${CMAKE_INSTALL_BINDIR}
+            OPTIONAL
+            COMPONENT libs
+        )
+    endif()
+
+	endif()
+	endif()
     
 endif(HELICS_BUILD_APP_LIBRARY)
 
