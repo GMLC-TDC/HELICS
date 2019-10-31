@@ -11,8 +11,8 @@ SPDX-License-Identifier: BSD-3-Clause
 
 namespace helics
 {
-	namespace core
-		{
+namespace core
+{
 const std::map<std::string, time_units> time_unitstrings{
   {"ps", time_units::ps},
   {"ns", time_units::ns},

@@ -6,8 +6,8 @@ SPDX-License-Identifier: BSD-3-Clause
 */
 #pragma once
 
+#include "application_api/CoreApp.hpp"
 #include "application_api/Endpoints.hpp"
 #include "application_api/Filters.hpp"
 #include "application_api/MessageFederate.hpp"
-#include "application_api/CoreApp.hpp"
 #include "core/helics_definitions.hpp"

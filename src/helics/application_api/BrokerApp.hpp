@@ -28,14 +28,20 @@ class HELICS_CXX_EXPORT BrokerApp
     /** default constructor*/
     BrokerApp () = default;
     /** construct from command line arguments in a vector
- @param args the command line arguments to pass in a reverse vector
- */
+    @param args the command line arguments to pass in a reverse vector
+    */
     explicit BrokerApp (std::vector<std::string> args);
     /** construct from command line arguments in a vector
      @param ctype the type of broker to create
-@param args the command line arguments to pass in a reverse vector
-*/
+     @param args the command line arguments to pass in a reverse vector
+    */
     BrokerApp (core_type ctype, std::vector<std::string> args);
+    /** construct from command line arguments in a vector
+     @param ctype the type of broker to create
+     @param broker_name the name of the broker
+     @param args the command line arguments to pass in a reverse vector
+    */
+    BrokerApp (core_type ctype, const std::string &broker_name, std::vector<std::string> args);
     /** construct from command line arguments
     @param argc the number of arguments
     @param argv the strings in the input
@@ -47,6 +53,13 @@ class HELICS_CXX_EXPORT BrokerApp
     @param argv the strings in the input
     */
     BrokerApp (core_type ctype, int argc, char *argv[]);
+    /** construct from command line arguments
+    @param ctype the type of broker to create
+    @param broker_name the name of the broker
+    @param argc the number of arguments
+    @param argv the strings in the input
+    */
+    BrokerApp (core_type ctype, const std::string &broker_name, int argc, char *argv[]);
     /** construct from command line arguments parsed as a single string
     @param argString a merged string with all the arguments
     */
@@ -56,6 +69,12 @@ class HELICS_CXX_EXPORT BrokerApp
     @param argString a merged string with all the arguments
     */
     BrokerApp (core_type ctype, const std::string &argString);
+    /** construct from command line arguments parsed as a single string
+    @param ctype the type of broker to create
+    @param broker_name the name of the broker
+    @param argString a merged string with all the arguments
+    */
+    BrokerApp (core_type ctype, const std::string &name, const std::string &argString);
 
     /** check if the Broker is running*/
     bool isConnected () const;
@@ -95,16 +114,17 @@ class HELICS_CXX_EXPORT BrokerApp
     void setLoggingLevel (int loglevel);
     /** clear the pointer to the broker*/
     void reset ();
-    #ifdef HELICS_CXX_STATIC_DEFINE
+#ifdef HELICS_CXX_STATIC_DEFINE
     /** overload the -> operator so all broker functions can be called if needed
      */
     auto *operator-> () const { return broker.operator-> (); }
-    #else
+#else
     BrokerApp *operator-> () { return this; }
     const BrokerApp *operator-> () const { return this; }
-    #endif
+#endif
     /** get a copy of the core pointer*/
     std::shared_ptr<Broker> getCopyofBrokerPointer () const { return broker; }
+
   private:
     void processArgs (std::unique_ptr<helicsCLI11App> &app);
     std::unique_ptr<helicsCLI11App> generateParser ();

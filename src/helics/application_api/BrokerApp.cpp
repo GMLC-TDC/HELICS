@@ -15,7 +15,10 @@ SPDX-License-Identifier: BSD-3-Clause
 
 namespace helics
 {
-BrokerApp::BrokerApp (core_type ctype, std::vector<std::string> args)
+const std::string estring;
+
+BrokerApp::BrokerApp (core_type ctype, const std::string &broker_name, std::vector<std::string> args)
+    : name (broker_name)
 {
     auto app = generateParser ();
     app->setDefaultCoreType (ctype);
@@ -25,9 +28,17 @@ BrokerApp::BrokerApp (core_type ctype, std::vector<std::string> args)
     }
 }
 
-BrokerApp::BrokerApp (std::vector<std::string> args) : BrokerApp (core_type::DEFAULT, std::move (args)) {}
+BrokerApp::BrokerApp (core_type ctype, std::vector<std::string> args)
+    : BrokerApp (ctype, std::string{}, std::move (args))
+{
+}
 
-BrokerApp::BrokerApp (core_type ctype, int argc, char *argv[])
+BrokerApp::BrokerApp (std::vector<std::string> args)
+    : BrokerApp (core_type::DEFAULT, std::string{}, std::move (args))
+{
+}
+
+BrokerApp::BrokerApp (core_type ctype, const std::string &broker_name, int argc, char *argv[]) : name (broker_name)
 {
     auto app = generateParser ();
     app->setDefaultCoreType (ctype);
@@ -37,9 +48,12 @@ BrokerApp::BrokerApp (core_type ctype, int argc, char *argv[])
     }
 }
 
-BrokerApp::BrokerApp (int argc, char *argv[]) : BrokerApp (core_type::DEFAULT, argc, argv) {}
+BrokerApp::BrokerApp (core_type ctype, int argc, char *argv[]) : BrokerApp (ctype, std::string{}, argc, argv) {}
 
-BrokerApp::BrokerApp (core_type ctype, const std::string &argString)
+BrokerApp::BrokerApp (int argc, char *argv[]) : BrokerApp (core_type::DEFAULT, std::string{}, argc, argv) {}
+
+BrokerApp::BrokerApp (core_type ctype, const std::string &broker_name, const std::string &argString)
+    : name (broker_name)
 {
     auto app = generateParser ();
     app->setDefaultCoreType (ctype);
@@ -49,7 +63,27 @@ BrokerApp::BrokerApp (core_type ctype, const std::string &argString)
     }
 }
 
-BrokerApp::BrokerApp (const std::string &argString) : BrokerApp (core_type::DEFAULT, argString) {}
+BrokerApp::BrokerApp (core_type ctype, const std::string &argString) : BrokerApp (ctype, std::string{}, argString)
+{
+}
+
+BrokerApp::BrokerApp (const std::string &argString)
+{
+    if (argString.find_first_of ('-') == std::string::npos)
+    {
+        broker = BrokerFactory::findBroker (argString);
+        if (broker)
+        {
+            name = broker->getIdentifier ();
+            return;
+        }
+    }
+    auto app = generateParser ();
+    if (app->helics_parse (argString) == helicsCLI11App::parse_output::ok)
+    {
+        processArgs (app);
+    }
+}
 
 bool BrokerApp::waitForDisconnect (std::chrono::milliseconds waitTime)
 {
@@ -64,11 +98,14 @@ std::unique_ptr<helicsCLI11App> BrokerApp::generateParser ()
 {
     auto app = std::make_unique<helicsCLI11App> ("Broker application");
     app->addTypeOption ();
-    app->add_option ("--name,-n", name, "name of the broker");
+    if (name.empty ())
+    {
+        app->add_option ("--name,-n", name, "name of the broker");
+    }
     app->allow_extras ();
     auto app_p = app.get ();
     app->footer ([app_p] () {
-        auto coreType = coreTypeFromString((*app_p)["--core"]->as<std::string> ());
+        auto coreType = coreTypeFromString ((*app_p)["--core"]->as<std::string> ());
         BrokerFactory::displayHelp (coreType);
         return std::string ();
     });
@@ -78,8 +115,22 @@ std::unique_ptr<helicsCLI11App> BrokerApp::generateParser ()
 void BrokerApp::processArgs (std::unique_ptr<helicsCLI11App> &app)
 {
     auto remArgs = app->remaining_for_passthrough ();
-    broker = BrokerFactory::create (app->getCoreType (), name, remArgs);
-    if (!broker->isConnected ())
+    try
+    {
+        broker = BrokerFactory::create (app->getCoreType (), name, remArgs);
+    }
+    catch (const helics::RegistrationFailure &)
+    {
+        if (!name.empty ())
+        {
+            broker = BrokerFactory::findBroker (name);
+            if (broker)
+            {
+                return;
+            }
+        }
+    }
+    if (!broker || !broker->isConnected ())
     {
         throw (ConnectionFailure ("Broker is unable to connect\n"));
     }
@@ -125,14 +176,14 @@ void BrokerApp::addDestinationFilterToEndpoint (const std::string &filter, const
     }
 }
 
-void BrokerApp::makeConnections(const std::string &file)
+void BrokerApp::makeConnections (const std::string &file)
 {
     if (broker)
     {
         broker->makeConnections (file);
     }
 }
-static const std::string estring{};
+
 /** get the identifier of the broker*/
 const std::string &BrokerApp::getIdentifier () const { return (broker) ? broker->getIdentifier () : estring; }
 /** get the network address of the broker*/

@@ -33,7 +33,7 @@ class ForwardingTimeCoordinator
     TimeDependencies dependencies;  //!< federates which this Federate is temporally dependent on
     std::vector<global_federate_id> dependents;  //!< federates which temporally depend on this federate
 
-    std::function<void(const ActionMessage &)> sendMessageFunction;  //!< callback used to send the messages
+    std::function<void (const ActionMessage &)> sendMessageFunction;  //!< callback used to send the messages
 
   public:
     global_federate_id source_id = global_federate_id (
@@ -46,7 +46,7 @@ class ForwardingTimeCoordinator
     ForwardingTimeCoordinator () = default;
 
     /** set the callback function used for the sending messages*/
-    void setMessageSender (std::function<void(const ActionMessage &)> userSendMessageFunction)
+    void setMessageSender (std::function<void (const ActionMessage &)> userSendMessageFunction)
     {
         sendMessageFunction = std::move (userSendMessageFunction);
     }

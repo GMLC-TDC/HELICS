@@ -6,11 +6,11 @@ SPDX-License-Identifier: BSD-3-Clause
 */
 #pragma once
 #ifndef _HELICS_TIME_HEADER_
-#define _HELICS_TIME_HEADER_
-#include "../utilities/timeRepresentation.hpp"
-#include "core-types.hpp"
-#include "helics/helics-config.h"
-#include <cstdint>
+#    define _HELICS_TIME_HEADER_
+#    include "../utilities/timeRepresentation.hpp"
+#    include "core-types.hpp"
+#    include "helics/helics-config.h"
+#    include <cstdint>
 /** @file
 @details defining the time representation to use throughout helics
 */
@@ -21,11 +21,11 @@ namespace helics
  *
  * Class represents time in the core.
  */
-#ifdef HELICS_USE_PICOSECOND_TIME
+#    ifdef HELICS_USE_PICOSECOND_TIME
 using Time = TimeRepresentation<count_time<12>>;
-#else
+#    else
 using Time = TimeRepresentation<count_time<9>>;
-#endif
+#    endif
 
 /** constexpr definition for starting time*/
 constexpr Time timeZero = Time::zeroVal ();
@@ -45,4 +45,4 @@ struct iteration_time
 
 }  // namespace helics
 
-#endif //_HELICS_TIME_HEADER_
+#endif  //_HELICS_TIME_HEADER_

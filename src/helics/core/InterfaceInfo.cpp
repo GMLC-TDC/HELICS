@@ -281,7 +281,7 @@ std::vector<std::pair<int, std::string>> InterfaceInfo::checkInterfacesForIssues
         }
         for (auto &source : ipt->source_info)
         {
-            if (!checkTypeMatch (ipt->type, std::get<1>(source), ipt->strict_type_matching))
+            if (!checkTypeMatch (ipt->type, std::get<1> (source), ipt->strict_type_matching))
             {
                 issues.emplace_back (
                   helics::defs::errors::connection_failure,

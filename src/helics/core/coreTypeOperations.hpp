@@ -38,5 +38,5 @@ bool isCoreTypeAvailable (core_type type) noexcept;
 @return true if the types are compatible with eachother
 */
 bool matchingTypes (const std::string &type1, const std::string &type2);
-}   // namespace core
+}  // namespace core
 }  // namespace helics

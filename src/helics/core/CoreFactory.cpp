@@ -11,34 +11,34 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "core-types.hpp"
 #include "helics/helics-config.h"
 #ifdef ENABLE_ZMQ_CORE
-#include "zmq/ZmqCore.h"
+#    include "zmq/ZmqCore.h"
 #endif
 
 #ifdef ENABLE_MPI_CORE
-#include "mpi/MpiCore.h"
+#    include "mpi/MpiCore.h"
 #endif
 
 #include "gmlc/concurrency/DelayedDestructor.hpp"
 #include "gmlc/concurrency/SearchableObjectHolder.hpp"
 
 #ifdef ENABLE_TEST_CORE
-#include "test/TestCore.h"
+#    include "test/TestCore.h"
 #endif
 
 #ifdef ENABLE_IPC_CORE
-#include "ipc/IpcCore.h"
+#    include "ipc/IpcCore.h"
 #endif
 
 #ifdef ENABLE_UDP_CORE
-#include "udp/UdpCore.h"
+#    include "udp/UdpCore.h"
 #endif
 
 #ifdef ENABLE_TCP_CORE
-#include "tcp/TcpCore.h"
+#    include "tcp/TcpCore.h"
 #endif
 
 #ifdef ENABLE_INPROC_CORE
-#include "inproc/InprocCore.h"
+#    include "inproc/InprocCore.h"
 #endif
 
 #include "helicsCLI11.hpp"
@@ -57,27 +57,27 @@ std::shared_ptr<Core> makeCore (core_type type, const std::string &name)
 #ifdef ENABLE_ZMQ_CORE
         type = core_type::ZMQ;
 #else
-#ifdef ENABLE_TCP_CORE
+#    ifdef ENABLE_TCP_CORE
         type = core_type::TCP;
-#else
-#ifdef ENABLE_UDP_CORE
+#    else
+#        ifdef ENABLE_UDP_CORE
         type = core_type::UDP;
-#else
-#ifdef ENABLE_MPI_CORE
+#        else
+#            ifdef ENABLE_MPI_CORE
         type = core_type::MPI;
-#else
-#ifdef ENABLE_IPC_CORE
+#            else
+#                ifdef ENABLE_IPC_CORE
         type = core_type::IPC;
-#else
-#ifdef ENABLE_TEST_CORE
+#                else
+#                    ifdef ENABLE_TEST_CORE
         type = core_type::TEST;
-#else
+#                    else
         type = core_type::UNRECOGNIZED;
-#endif  // ENABLE_TEST_CORE
-#endif  // ENABLE_IPC_CORE
-#endif  // ENABLE_MPI_CORE
-#endif  // ENABLE_UDP_CORE
-#endif  // ENABLE_TCP_CORE
+#                    endif  // ENABLE_TEST_CORE
+#                endif  // ENABLE_IPC_CORE
+#            endif  // ENABLE_MPI_CORE
+#        endif  // ENABLE_UDP_CORE
+#    endif  // ENABLE_TCP_CORE
 #endif  // ENABLE_ZMQ_CORE
     }
 
@@ -502,7 +502,6 @@ void unregisterCore (const std::string &name)
         searchableObjects.removeObject ([&name] (auto &obj) { return (obj->getIdentifier () == name); });
     }
 }
-
 
 static const std::string helpStr{"--help"};
 
