@@ -71,7 +71,7 @@ class data_block
     /** copy assignment operator*/
     data_block &operator= (const data_block &db) = default;
     /** move assignment operator*/
-    data_block &operator= (data_block &&db)=default;
+    data_block &operator= (data_block &&db) = default;
     /** assign from a string*/
     data_block &operator= (std::string str)
     {

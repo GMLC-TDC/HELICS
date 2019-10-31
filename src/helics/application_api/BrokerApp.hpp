@@ -38,7 +38,7 @@ class HELICS_CXX_EXPORT BrokerApp
     BrokerApp (core_type ctype, std::vector<std::string> args);
     /** construct from command line arguments in a vector
      @param ctype the type of broker to create
-	 @param broker_name the name of the broker
+     @param broker_name the name of the broker
      @param args the command line arguments to pass in a reverse vector
     */
     BrokerApp (core_type ctype, const std::string &broker_name, std::vector<std::string> args);
@@ -114,16 +114,17 @@ class HELICS_CXX_EXPORT BrokerApp
     void setLoggingLevel (int loglevel);
     /** clear the pointer to the broker*/
     void reset ();
-    #ifdef HELICS_CXX_STATIC_DEFINE
+#ifdef HELICS_CXX_STATIC_DEFINE
     /** overload the -> operator so all broker functions can be called if needed
      */
     auto *operator-> () const { return broker.operator-> (); }
-    #else
+#else
     BrokerApp *operator-> () { return this; }
     const BrokerApp *operator-> () const { return this; }
-    #endif
+#endif
     /** get a copy of the core pointer*/
     std::shared_ptr<Broker> getCopyofBrokerPointer () const { return broker; }
+
   private:
     void processArgs (std::unique_ptr<helicsCLI11App> &app);
     std::unique_ptr<helicsCLI11App> generateParser ();

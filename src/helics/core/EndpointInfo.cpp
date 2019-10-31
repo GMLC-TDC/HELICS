@@ -34,7 +34,7 @@ Time EndpointInfo::firstMessageTime () const
     return (handle->empty ()) ? Time::maxVal () : handle->front ()->time;
 }
 // this is the function which determines message order
-static auto msgSorter = [](const auto &m1, const auto &m2) {
+static auto msgSorter = [] (const auto &m1, const auto &m2) {
     // first by time
     return (m1->time != m2->time) ? (m1->time < m2->time) : (m1->original_source < m2->original_source);
 };

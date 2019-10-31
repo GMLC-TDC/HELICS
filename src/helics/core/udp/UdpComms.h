@@ -14,8 +14,8 @@ SPDX-License-Identifier: BSD-3-Clause
 class AsioContextManager;
 namespace asio
 {
-    class io_context;
-} // namespace asio
+class io_context;
+}  // namespace asio
 
 namespace helics
 {

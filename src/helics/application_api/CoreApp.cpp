@@ -46,17 +46,9 @@ CoreApp::CoreApp (core_type ctype, const std::string &coreName, int argc, char *
     }
 }
 
-CoreApp::CoreApp (core_type ctype, int argc, char *argv[])
-{
-    auto app = generateParser ();
-    app->setDefaultCoreType (ctype);
-    if (app->helics_parse (argc, argv) == helicsCLI11App::parse_output::ok)
-    {
-        processArgs (app);
-    }
-}
+CoreApp::CoreApp (core_type ctype, int argc, char *argv[]) : CoreApp (ctype, std::string{}, argc, argv) {}
 
-CoreApp::CoreApp (int argc, char *argv[]) : CoreApp (core_type::DEFAULT, argc, argv) {}
+CoreApp::CoreApp (int argc, char *argv[]) : CoreApp (core_type::DEFAULT, std::string{}, argc, argv) {}
 
 CoreApp::CoreApp (core_type ctype, const std::string &coreName, const std::string &argString) : name (coreName)
 {
@@ -68,31 +60,39 @@ CoreApp::CoreApp (core_type ctype, const std::string &coreName, const std::strin
     }
 }
 
-CoreApp::CoreApp (core_type ctype, const std::string &argString)
+CoreApp::CoreApp (core_type ctype, const std::string &argString) : CoreApp (ctype, std::string{}, argString) {}
+
+CoreApp::CoreApp (const std::string &argString)
 {
+    if (argString.find_first_of ('-') == std::string::npos)
+    {
+        core = CoreFactory::findCore (argString);
+        if (core)
+        {
+            name = core->getIdentifier ();
+            return;
+        }
+    }
     auto app = generateParser ();
-    app->setDefaultCoreType (ctype);
     if (app->helics_parse (argString) == helicsCLI11App::parse_output::ok)
     {
         processArgs (app);
     }
 }
 
-CoreApp::CoreApp (const std::string &argString) : CoreApp (core_type::DEFAULT, argString) {}
-
 std::unique_ptr<helicsCLI11App> CoreApp::generateParser ()
 {
     auto app = std::make_unique<helicsCLI11App> ("Broker application");
     app->addTypeOption ();
-	if (name.empty())
-	{
+    if (name.empty ())
+    {
         app->add_option ("--name,-n", name, "name of the core");
-	}
+    }
     app->allow_extras ();
     auto app_p = app.get ();
     app->footer ([app_p] () {
-        auto coreType = helics::core::coreTypeFromString((*app_p)["--core"]->as<std::string> ());
-        CoreFactory::displayHelp(coreType);
+        auto coreType = helics::core::coreTypeFromString ((*app_p)["--core"]->as<std::string> ());
+        CoreFactory::displayHelp (coreType);
         return std::string ();
     });
     return app;
@@ -101,8 +101,23 @@ std::unique_ptr<helicsCLI11App> CoreApp::generateParser ()
 void CoreApp::processArgs (std::unique_ptr<helicsCLI11App> &app)
 {
     auto remArgs = app->remaining_for_passthrough ();
-    core = CoreFactory::create (app->getCoreType (), name, remArgs);
-    if (!core->isConnected ())
+    try
+    {
+        core = CoreFactory::create (app->getCoreType (), name, remArgs);
+    }
+    catch (const helics::RegistrationFailure &)
+    {
+        if (!name.empty ())
+        {
+            core = CoreFactory::findCore (name);
+            if (core)
+            {
+                name = core->getIdentifier ();
+                return;
+            }
+        }
+    }
+    if (!core || !core->isConnected ())
     {
         throw (ConnectionFailure ("Core is unable to connect\n"));
     }
@@ -176,7 +191,7 @@ std::string CoreApp::query (const std::string &target, const std::string &query)
     return (core) ? core->query (target, query) : std::string ("#error");
 }
 
-void CoreApp::setGlobal(const std::string &valueName, const std::string &value)
+void CoreApp::setGlobal (const std::string &valueName, const std::string &value)
 {
     if (core)
     {
@@ -184,8 +199,7 @@ void CoreApp::setGlobal(const std::string &valueName, const std::string &value)
     }
 }
 
-
-void CoreApp::setLoggingLevel(int loglevel)
+void CoreApp::setLoggingLevel (int loglevel)
 {
     if (core)
     {

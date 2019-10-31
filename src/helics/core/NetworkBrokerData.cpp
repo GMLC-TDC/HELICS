@@ -30,19 +30,20 @@ std::shared_ptr<helicsCLI11App> NetworkBrokerData::commandLineParser (const std:
       ->add_flag ("--local{0},--ipv4{4},--ipv6{6},--all{10},--external{10}", interfaceNetwork,
                   "specify external interface to use, default is --local")
       ->disable_flag_override ();
-    nbparser->add_option_function<std::string> ("--brokeraddress",
-                                                [this, localAddress](const std::string &addr) {
-                                                    auto brkprt = extractInterfaceandPort (addr);
-                                                    brokerAddress = brkprt.first;
-                                                    brokerPort = brkprt.second;
-                                                    checkAndUpdateBrokerAddress (localAddress);
-                                                },
-                                                "location of the broker i.e network address");
+    nbparser->add_option_function<std::string> (
+      "--brokeraddress",
+      [this, localAddress] (const std::string &addr) {
+          auto brkprt = extractInterfaceandPort (addr);
+          brokerAddress = brkprt.first;
+          brokerPort = brkprt.second;
+          checkAndUpdateBrokerAddress (localAddress);
+      },
+      "location of the broker i.e network address");
     nbparser->add_flag ("--reuse_address", reuse_address,
                         "allow the server to reuse a bound address, mostly useful for tcp cores");
     nbparser->add_option_function<std::string> (
       "--broker",
-      [this, localAddress](std::string addr) {
+      [this, localAddress] (std::string addr) {
           auto brkr = BrokerFactory::findBroker (addr);
           if (brkr)
           {
@@ -77,50 +78,53 @@ std::shared_ptr<helicsCLI11App> NetworkBrokerData::commandLineParser (const std:
                         "allow a broker to be automatically created if one is not available");
     nbparser->add_option ("--brokerinit", brokerInitString, "the initialization string for the broker");
     nbparser
-      ->add_flag_function ("--client{0},--server{1}",
-                           [this](int64_t val) {
-                               switch (server_mode)
-                               {
-                               case server_mode_options::unspecified:
-                               case server_mode_options::server_default_active:
-                               case server_mode_options::server_default_deactivated:
-                                   server_mode = (val > 0) ? server_mode_options::server_active :
-                                                             server_mode_options::server_deactivated;
-                                   break;
-                               default:
-                                   break;
-                               }
-                           },
-                           "specify that the network connection should be a server or client")
+      ->add_flag_function (
+        "--client{0},--server{1}",
+        [this] (int64_t val) {
+            switch (server_mode)
+            {
+            case server_mode_options::unspecified:
+            case server_mode_options::server_default_active:
+            case server_mode_options::server_default_deactivated:
+                server_mode =
+                  (val > 0) ? server_mode_options::server_active : server_mode_options::server_deactivated;
+                break;
+            default:
+                break;
+            }
+        },
+        "specify that the network connection should be a server or client")
       ->disable_flag_override ();
-    nbparser->add_option_function<std::string> ("--interface,--localinterface",
-                                                [this](const std::string &addr) {
-                                                    auto localprt = extractInterfaceandPort (addr);
-                                                    localInterface = localprt.first;
-                                                    // this may get overridden later
-                                                    portNumber = localprt.second;
-                                                },
-                                                "the local interface to use for the receive ports");
+    nbparser->add_option_function<std::string> (
+      "--interface,--localinterface",
+      [this] (const std::string &addr) {
+          auto localprt = extractInterfaceandPort (addr);
+          localInterface = localprt.first;
+          // this may get overridden later
+          portNumber = localprt.second;
+      },
+      "the local interface to use for the receive ports");
     nbparser->add_option ("--port,-p", portNumber, "port number to use")
       ->transform (CLI::Transformer ({{"auto", "-1"}}, CLI::ignore_case));
     nbparser->add_option ("--brokerport", brokerPort, "The port number to use to connect with the broker");
     nbparser
-      ->add_option_function<int> ("--localport",
-                                  [this](int port) {
-                                      if (port == -999)
-                                      {
-                                          use_os_port = true;
-                                      }
-                                      else
-                                      {
-                                          portNumber = port;
-                                      }
-                                  },
-                                  "port number for the local receive port")
+      ->add_option_function<int> (
+        "--localport",
+        [this] (int port) {
+            if (port == -999)
+            {
+                use_os_port = true;
+            }
+            else
+            {
+                portNumber = port;
+            }
+        },
+        "port number for the local receive port")
       ->transform (CLI::Transformer ({{"auto", "-1"}, {"os", "-999"}}, CLI::ignore_case));
     nbparser->add_option ("--portstart", portStart, "starting port for automatic port definitions");
 
-    nbparser->add_callback ([this]() {
+    nbparser->add_callback ([this] () {
         if ((!brokerAddress.empty ()) && (brokerPort == -1))
         {
             if ((localInterface.empty ()) && (portNumber != -1))

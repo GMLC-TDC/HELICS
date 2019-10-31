@@ -4,19 +4,19 @@ Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance
 the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
-#include "core-types.hpp"
 #include "core-exceptions.hpp"
+#include "core-types.hpp"
 #include "helics/helics-config.h"
 #include <algorithm>
 #include <cctype>
 #include <map>
-#include <unordered_map>
 #include <set>
+#include <unordered_map>
 
 namespace helics
 {
-	namespace core
-		{
+namespace core
+{
 std::string to_string (core_type type)
 {
     switch (type)
@@ -169,45 +169,45 @@ core_type coreTypeFromString (std::string type) noexcept
 }
 
 #ifndef ENABLE_ZMQ_CORE
-#define ZMQ_AVAILABILITY false
+#    define ZMQ_AVAILABILITY false
 #else
-#define ZMQ_AVAILABILITY true
+#    define ZMQ_AVAILABILITY true
 #endif
 
 #ifndef ENABLE_MPI_CORE
-#define MPI_AVAILABILITY false
+#    define MPI_AVAILABILITY false
 #else
-#define MPI_AVAILABILITY true
+#    define MPI_AVAILABILITY true
 #endif
 
 #ifndef ENABLE_TCP_CORE
-#define TCP_AVAILABILITY false
+#    define TCP_AVAILABILITY false
 #else
-#define TCP_AVAILABILITY true
+#    define TCP_AVAILABILITY true
 #endif
 
 #ifndef ENABLE_UDP_CORE
-#define UDP_AVAILABILITY false
+#    define UDP_AVAILABILITY false
 #else
-#define UDP_AVAILABILITY true
+#    define UDP_AVAILABILITY true
 #endif
 
 #ifndef ENABLE_IPC_CORE
-#define IPC_AVAILABILITY false
+#    define IPC_AVAILABILITY false
 #else
-#define IPC_AVAILABILITY true
+#    define IPC_AVAILABILITY true
 #endif
 
 #ifndef ENABLE_TEST_CORE
-#define TEST_AVAILABILITY false
+#    define TEST_AVAILABILITY false
 #else
-#define TEST_AVAILABILITY true
+#    define TEST_AVAILABILITY true
 #endif
 
 #ifndef ENABLE_INPROC_CORE
-#define INPROC_AVAILABILITY false
+#    define INPROC_AVAILABILITY false
 #else
-#define INPROC_AVAILABILITY true
+#    define INPROC_AVAILABILITY true
 #endif
 
 bool isCoreTypeAvailable (core_type type) noexcept
@@ -255,7 +255,6 @@ bool isCoreTypeAvailable (core_type type) noexcept
 
     return available;
 }
-
 
 static const std::set<std::string> global_match_strings{"any", "all", "data", "string", "block"};
 

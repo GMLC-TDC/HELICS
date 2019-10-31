@@ -52,7 +52,8 @@ std::shared_ptr<const data_block> NamedInputInfo::getData ()
     return nullptr;
 }
 
-static auto recordComparison = [](const NamedInputInfo::dataRecord &rec1, const NamedInputInfo::dataRecord &rec2) {
+static auto recordComparison = [] (const NamedInputInfo::dataRecord &rec1,
+                                   const NamedInputInfo::dataRecord &rec2) {
     return (rec1.time < rec2.time) ? true : ((rec1.time == rec2.time) ? (rec1.iteration < rec2.iteration) : false);
 };
 
@@ -92,7 +93,10 @@ void NamedInputInfo::addData (global_handle source_id,
     }
 }
 
-void NamedInputInfo::addSource (global_handle newSource, const std::string &sourceName, const std::string &stype, const std::string &sunits)
+void NamedInputInfo::addSource (global_handle newSource,
+                                const std::string &sourceName,
+                                const std::string &stype,
+                                const std::string &sunits)
 {
     if (input_sources.empty ())
     {
@@ -130,7 +134,7 @@ void NamedInputInfo::removeSource (const std::string &sourceName, Time minTime)
 {
     for (size_t ii = 0; ii < source_info.size (); ++ii)
     {
-        if (std::get<0>(source_info[ii]) == sourceName)
+        if (std::get<0> (source_info[ii]) == sourceName)
         {
             while ((!data_queues[ii].empty ()) && (data_queues[ii].back ().time > minTime))
             {

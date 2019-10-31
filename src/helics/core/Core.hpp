@@ -11,7 +11,6 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <functional>
 #include <utility>
 
-
 /** @file
  * The HELICS core interface.  Abstract class that is
  * implemented for the specific communication systems (e.g. ZMQ and
