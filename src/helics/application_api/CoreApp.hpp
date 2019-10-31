@@ -36,6 +36,13 @@ class HELICS_CXX_EXPORT CoreApp
 @param args the command line arguments to pass in a reverse vector
 */
     CoreApp (core_type ctype, std::vector<std::string> args);
+
+	 /** construct from command line arguments in a vector
+    @param ctype the type of core to create
+	@param coreName the name of the core to use
+    @param args the command line arguments to pass in a reverse vector
+*/
+    CoreApp (core_type ctype, const std::string &coreName,std::vector<std::string> args);
     /** construct from command line arguments
     @param argc the number of arguments
     @param argv the strings in the input
@@ -43,6 +50,13 @@ class HELICS_CXX_EXPORT CoreApp
     CoreApp (int argc, char *argv[]);
     /** construct from command line arguments
     @param ctype the type of core to create
+    @param argc the number of arguments
+    @param argv the strings in the input
+    */
+    CoreApp (core_type ctype, const std::string &coreName, int argc, char *argv[]);
+    /** construct from command line arguments
+    @param ctype the type of core to create
+	@param coreName the name of the core to use
     @param argc the number of arguments
     @param argv the strings in the input
     */
@@ -56,6 +70,12 @@ class HELICS_CXX_EXPORT CoreApp
     @param argString a merged string with all the arguments
     */
     CoreApp (core_type ctype, const std::string &argString);
+    /** construct from command line arguments parsed as a single string
+    @param ctype the type of core to create
+	@param coreName the name of the core to use or create
+    @param argString a merged string with all the arguments
+    */
+    CoreApp (core_type ctype, const std::string &coreName, const std::string &argString);
 
     /** check if the Core is running*/
     bool isConnected () const;

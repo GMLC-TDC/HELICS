@@ -14,6 +14,16 @@ SPDX-License-Identifier: BSD-3-Clause
 
 namespace helics
 {
+CoreApp::CoreApp (core_type ctype, const std::string &coreName, std::vector<std::string> args) : name (coreName)
+{
+    auto app = generateParser ();
+    app->setDefaultCoreType (ctype);
+    if (app->helics_parse (std::move (args)) == helicsCLI11App::parse_output::ok)
+    {
+        processArgs (app);
+    }
+}
+
 CoreApp::CoreApp (core_type ctype, std::vector<std::string> args)
 {
     auto app = generateParser ();
@@ -26,6 +36,16 @@ CoreApp::CoreApp (core_type ctype, std::vector<std::string> args)
 
 CoreApp::CoreApp (std::vector<std::string> args) : CoreApp (core_type::DEFAULT, std::move (args)) {}
 
+CoreApp::CoreApp (core_type ctype, const std::string &coreName, int argc, char *argv[]) : name (coreName)
+{
+    auto app = generateParser ();
+    app->setDefaultCoreType (ctype);
+    if (app->helics_parse (argc, argv) == helicsCLI11App::parse_output::ok)
+    {
+        processArgs (app);
+    }
+}
+
 CoreApp::CoreApp (core_type ctype, int argc, char *argv[])
 {
     auto app = generateParser ();
@@ -37,6 +57,16 @@ CoreApp::CoreApp (core_type ctype, int argc, char *argv[])
 }
 
 CoreApp::CoreApp (int argc, char *argv[]) : CoreApp (core_type::DEFAULT, argc, argv) {}
+
+CoreApp::CoreApp (core_type ctype, const std::string &coreName, const std::string &argString) : name (coreName)
+{
+    auto app = generateParser ();
+    app->setDefaultCoreType (ctype);
+    if (app->helics_parse (argString) == helicsCLI11App::parse_output::ok)
+    {
+        processArgs (app);
+    }
+}
 
 CoreApp::CoreApp (core_type ctype, const std::string &argString)
 {
@@ -54,7 +84,10 @@ std::unique_ptr<helicsCLI11App> CoreApp::generateParser ()
 {
     auto app = std::make_unique<helicsCLI11App> ("Broker application");
     app->addTypeOption ();
-    app->add_option ("--name,-n", name, "name of the core");
+	if (name.empty())
+	{
+        app->add_option ("--name,-n", name, "name of the core");
+	}
     app->allow_extras ();
     auto app_p = app.get ();
     app->footer ([app_p] () {
