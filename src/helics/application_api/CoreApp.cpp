@@ -186,9 +186,9 @@ const std::string &CoreApp::getIdentifier () const { return (core) ? core->getId
 /** get the network address of the core*/
 const std::string &CoreApp::getAddress () const { return (core) ? core->getAddress () : estring; }
 /** make a query at the core*/
-std::string CoreApp::query (const std::string &target, const std::string &query)
+std::string CoreApp::query (const std::string &target, const std::string &queryStr)
 {
-    return (core) ? core->query (target, query) : std::string ("#error");
+    return (core) ? core->query (target, queryStr) : std::string ("#error");
 }
 
 void CoreApp::setGlobal (const std::string &valueName, const std::string &value)

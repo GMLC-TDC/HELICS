@@ -98,8 +98,12 @@ class HELICS_CXX_EXPORT BrokerApp
     const std::string &getIdentifier () const;
     /** get the network address of the broker*/
     const std::string &getAddress () const;
-    /** make a query at the broker*/
-    std::string query (const std::string &target, const std::string &query);
+    /** make a query at the broker
+	@param target the target of the query "federation", "parent", "broker", or a specific named object
+	@param queryStr the query to make
+	@return a string containing the query results
+	*/
+    std::string query (const std::string &target, const std::string &queryStr);
     /** set a federation global value
      @details this overwrites any previous value for this name
      globals can be queried with a target of "global" and queryStr of the value to Query

@@ -189,9 +189,9 @@ const std::string &BrokerApp::getIdentifier () const { return (broker) ? broker-
 /** get the network address of the broker*/
 const std::string &BrokerApp::getAddress () const { return (broker) ? broker->getAddress () : estring; }
 /** make a query at the broker*/
-std::string BrokerApp::query (const std::string &target, const std::string &query)
+std::string BrokerApp::query (const std::string &target, const std::string &queryStr)
 {
-    return (broker) ? broker->query (target, query) : std::string ("#error");
+    return (broker) ? broker->query (target, queryStr) : std::string ("#error");
 }
 
 void BrokerApp::setGlobal (const std::string &valueName, const std::string &value)

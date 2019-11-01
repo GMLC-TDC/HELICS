@@ -9,12 +9,10 @@
 
 include(GenerateExportHeader)
 
-#for including the helics_export.h
+# for including the helics_export.h
 target_include_directories(
-        helics_base
-        INTERFACE $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>
-    )
-
+    helics_base INTERFACE $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>
+)
 
 add_subdirectory(common)
 add_subdirectory(core)
@@ -24,7 +22,6 @@ add_subdirectory(application_api)
 # Add the main HELICS library
 # -------------------------------------------------------------
 
-
 if(HELICS_BUILD_CXX_SHARED_LIB)
 
     add_subdirectory(cxx_shared_library)
@@ -33,23 +30,20 @@ if(HELICS_BUILD_CXX_SHARED_LIB)
         set_target_properties(helics-shared PROPERTIES FOLDER helics)
     endif()
     generate_export_header(helics-shared BASE_NAME helics_cxx)
-    file(
-       COPY ${CMAKE_CURRENT_BINARY_DIR}/helics_cxx_export.h 
-       DESTINATION ${PROJECT_BINARY_DIR}/include/helics_cxx/helics/application_api
+    file(COPY ${CMAKE_CURRENT_BINARY_DIR}/helics_cxx_export.h
+         DESTINATION ${PROJECT_BINARY_DIR}/include/helics_cxx/helics/application_api
     )
 else()
     generate_export_header(helics_application_api BASE_NAME helics_cxx)
 endif()
 
-file(
-     COPY ${CMAKE_CURRENT_BINARY_DIR}/helics_cxx_export.h 
+file(COPY ${CMAKE_CURRENT_BINARY_DIR}/helics_cxx_export.h
      DESTINATION ${PROJECT_BINARY_DIR}/helics_generated_includes
 )
 
 if(NOT CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
     set_target_properties(
-        helics_application_api helics_common helics_core
-        PROPERTIES FOLDER helics
+        helics_application_api helics_common helics_core PROPERTIES FOLDER helics
     )
 endif()
 

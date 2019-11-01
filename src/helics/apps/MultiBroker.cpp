@@ -116,6 +116,7 @@ generateComms (const std::string &type, const std::string &initString = std::str
     case core_type::TEST:
     case core_type::NNG:
     case core_type::UNRECOGNIZED:
+	case core_type::WEBSOCKET:
         break;
     }
     if (comm)

@@ -7,8 +7,7 @@
 # SPDX-License-Identifier: BSD-3-Clause
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-set(
-    application_api_headers
+set(application_api_headers
     CombinationFederate.hpp
     Publications.hpp
     Subscriptions.hpp
@@ -26,22 +25,18 @@ set(
     queryFunctions.hpp
     FederateInfo.hpp
     Inputs.hpp
-	BrokerApp.hpp
+    BrokerApp.hpp
+	CoreApp.hpp
 )
 
 set(conv_headers ../application_api.hpp ../ValueFederates.hpp ../MessageFederates.hpp)
 
-set(
-    private_application_api_headers
-    MessageFederateManager.hpp
-    ValueFederateManager.hpp
-    AsyncFedCallInfo.hpp
-    FilterOperations.hpp
-    FilterFederateManager.hpp
+set(private_application_api_headers
+    MessageFederateManager.hpp ValueFederateManager.hpp AsyncFedCallInfo.hpp
+    FilterOperations.hpp FilterFederateManager.hpp
 )
 
-set(
-    application_api_sources
+set(application_api_sources
     CombinationFederate.cpp
     Federate.cpp
     MessageFederate.cpp
@@ -60,12 +55,15 @@ set(
     queryFunctions.cpp
     FederateInfo.cpp
     Inputs.cpp
-	BrokerApp.cpp
+    BrokerApp.cpp
+	CoreApp.cpp
 )
 
-add_library(helics_application_api STATIC ${application_api_sources} ${conv_headers}
-                                   ${application_api_headers}
-                                   ${private_application_api_headers})
+add_library(
+    helics_application_api STATIC
+    ${application_api_sources} ${conv_headers} ${application_api_headers}
+    ${private_application_api_headers}
+)
 
 target_link_libraries(helics_application_api PUBLIC helics_core)
 
