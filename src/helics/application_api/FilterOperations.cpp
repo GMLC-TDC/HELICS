@@ -8,7 +8,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "FilterOperations.hpp"
 #include "../core/Core.hpp"
 #include "../core/core-exceptions.hpp"
-#include "../core/coreTimeOperations.hpp"
+#include "../utilities/timeStringOps.hpp"
 #include "MessageOperators.hpp"
 #include <algorithm>
 #include <iostream>
@@ -49,7 +49,7 @@ void DelayFilterOperation::setString (const std::string &property, const std::st
     {
         try
         {
-            delay = core::loadTimeFromString (val);
+            delay = gmlc::utilities::loadTimeFromString<Time> (val);
         }
         catch (const std::invalid_argument &)
         {
@@ -252,12 +252,12 @@ void RandomDelayFilterOperation::setString (const std::string &property, const s
     }
     else if ((property == "param1") || (property == "mean") || (property == "min") || (property == "alpha"))
     {
-        auto tm = core::loadTimeFromString (val);
+        auto tm = gmlc::utilities::loadTimeFromString<Time> (val);
         rdelayGen->param1.store (static_cast<double> (tm));
     }
     else if ((property == "param2") || (property == "stddev") || (property == "max") || (property == "beta"))
     {
-        auto tm = core::loadTimeFromString (val);
+        auto tm = gmlc::utilities::loadTimeFromString<Time> (val);
         rdelayGen->param2.store (static_cast<double> (tm));
     }
 }

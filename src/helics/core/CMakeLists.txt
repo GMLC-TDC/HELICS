@@ -34,7 +34,6 @@ set(
     MessageTimer.cpp
     federate_id.cpp
     TimeoutMonitor.cpp
-	coreTimeOperations.cpp
 	coreTypeOperations.cpp
 )
 
@@ -94,7 +93,6 @@ set(
 
 set(
     INCLUDE_FILES
-	coreTimeOperations.hpp
 	coreTypeOperations.hpp
     BrokerBase.hpp
     TimeDependencies.hpp

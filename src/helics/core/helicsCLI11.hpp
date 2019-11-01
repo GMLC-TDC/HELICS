@@ -20,12 +20,16 @@ using helics::coreTypeFromString;
 using helics::loadTimeFromString;
 using helics::to_string;
 #else
-#    include "coreTimeOperations.hpp"
+#    include "../utilities/timeStringOps.hpp"
 #    include "coreTypeOperations.hpp"
 
 using helics::core::coreTypeFromString;
-using helics::core::loadTimeFromString;
 using helics::core::to_string;
+/** generate a local function that uses the utilities library*/
+inline helics::Time loadTimeFromString (const std::string &str, time_units defUnit)
+{
+    return gmlc::utilities::loadTimeFromString<helics::Time> (str, defUnit);
+}
 
 #endif
 #include "helicsVersion.hpp"
