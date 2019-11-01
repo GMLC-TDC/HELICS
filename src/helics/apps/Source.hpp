@@ -81,6 +81,13 @@ class HELICS_CXX_EXPORT Source : public App
     @param fi  a federate information structure
     */
     Source (const std::string &name, const std::shared_ptr<Core> &core, const FederateInfo &fi);
+
+    /**constructor taking a federate information structure and using the given core
+    @param name the name of the federate (can be empty to use defaults from fi)
+    @param core a coreApp object that can be joined
+    @param fi  a federate information structure
+    */
+    Source (const std::string &name, CoreApp &core, const FederateInfo &fi);
     /**constructor taking a file with the required information
     @param name the name of the source object (can be empty to use defaults from fi)
     @param configString file a JSON or TOML file or string containing configuration informatino

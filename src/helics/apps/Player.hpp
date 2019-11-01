@@ -66,6 +66,12 @@ class HELICS_CXX_EXPORT Player : public App
     @param fi  a federate information structure
     */
     Player (const std::string &name, const std::shared_ptr<Core> &core, const FederateInfo &fi);
+    /**constructor taking a federate information structure and using the given core
+    @param name the name of the federate (can be empty to use defaults from fi)
+    @param core a coreApp object that can be joined
+    @param fi  a federate information structure
+    */
+    Player (const std::string &name, CoreApp &core, const FederateInfo &fi);
     /**constructor taking a file with the required information
     @param appName the name of the app
     @param configString JSON, TOML or text file or JSON string defining the federate information and other

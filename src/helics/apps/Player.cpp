@@ -125,6 +125,11 @@ Player::Player (const std::string &appName, const std::shared_ptr<Core> &core, c
     fed->setFlagOption (helics_flag_source_only);
 }
 
+Player::Player (const std::string &appName, CoreApp &core, const FederateInfo &fi) : App (appName, core, fi)
+{
+    fed->setFlagOption (helics_flag_source_only);
+}
+
 Player::Player (const std::string &appName, const std::string &configString) : App (appName, configString)
 {
     fed->setFlagOption (helics_flag_source_only);

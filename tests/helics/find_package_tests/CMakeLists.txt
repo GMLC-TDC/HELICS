@@ -23,6 +23,13 @@ endif()
 if(HELICS_BUILD_CXX_SHARED_LIB)
     add_executable(shared-library-test main.cpp)
     target_link_libraries(shared-library-test HELICS::helics-shared)
+	
+	# Test the helics_app static library target
+    if(HELICS_BUILD_APP_LIBRARY)
+       add_executable(apps-library-test main-apps.cpp)
+       target_link_libraries(apps-library-test HELICS::helics-apps-shared)
+    endif()
+
 endif()
 
 # Test the C and C++98 targets

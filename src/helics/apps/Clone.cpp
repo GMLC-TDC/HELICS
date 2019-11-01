@@ -65,6 +65,11 @@ Clone::Clone (const std::string &appName, const std::shared_ptr<Core> &core, con
     fed->setFlagOption (helics_flag_observer);
 }
 
+Clone::Clone (const std::string &appName, CoreApp &core, const FederateInfo &fi) : App (appName, core, fi)
+{
+    fed->setFlagOption (helics_flag_observer);
+}
+
 Clone::Clone (const std::string &appName, const std::string &jsonString) : App (appName, jsonString)
 {
     fed->setFlagOption (helics_flag_observer);

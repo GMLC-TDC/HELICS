@@ -42,6 +42,14 @@ class HELICS_CXX_EXPORT Clone : public App
     @param fi  a federate information structure
     */
     Clone (const std::string &name, const std::shared_ptr<Core> &core, const FederateInfo &fi);
+
+    /**constructor taking a federate information structure and using the given core
+    @param name the name of the federate (can be empty to use defaults from fi)
+    @param core a coreApp object that can be joined
+    @param fi  a federate information structure
+    */
+    Clone (const std::string &name, CoreApp &core, const FederateInfo &fi);
+
     /**constructor taking a file with the required information
     @param name the name of the app
     @param file a file defining the federate information in JSon or text

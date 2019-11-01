@@ -47,6 +47,12 @@ class HELICS_CXX_EXPORT Echo : public App
     @param fi  a federate information structure
     */
     Echo (const std::string &name, const std::shared_ptr<Core> &core, const FederateInfo &fi);
+    /**constructor taking a federate information structure and using the given core
+    @param name the name of the federate (can be empty to use defaults from fi)
+    @param core a coreApp object that can be joined
+    @param fi  a federate information structure
+    */
+    Echo (const std::string &name, CoreApp &core, const FederateInfo &fi);
     /**constructor taking a file with the required information
     @param name the name of the echo app, can be empty to get name from fi or default
     @param jsonString file or JSON string defining the federate information and other configuration
