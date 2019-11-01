@@ -160,10 +160,5 @@ class BrokerKeeper
   private:
     BrokerApp brk;
 };
-// for maintaining the symbol in a public header
-namespace apps
-{
-using helics::BrokerApp;
-}  // namespace apps
 
-}  // namespace helics
+} //namespace helics

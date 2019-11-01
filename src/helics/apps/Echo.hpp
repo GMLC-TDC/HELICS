@@ -22,7 +22,7 @@ protection, that will result in undefined behavior.  One exception is the setEch
 const methods will not cause problems but may not give consistent answers if used from multiple threads unless
 protected.
 */
-class Echo : public App
+class HELICS_CXX_EXPORT Echo : public App
 {
   public:
     /** default constructor*/

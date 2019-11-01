@@ -67,3 +67,15 @@ set(core_include_files
 set(utilities_include_files 
 	${HELICS_SOURCE_DIR}/ThirdParty/utilities/gmlc/utilities/timeRepresentation.hpp)
 
+    set(
+        helics_apps_public_headers
+        ${HELICS_LIBRARY_SOURCE_DIR}/apps/Player.hpp
+        ${HELICS_LIBRARY_SOURCE_DIR}/apps/Recorder.hpp
+        ${HELICS_LIBRARY_SOURCE_DIR}/apps/Echo.hpp
+        ${HELICS_LIBRARY_SOURCE_DIR}/apps/Source.hpp
+        ${HELICS_LIBRARY_SOURCE_DIR}/apps/Tracer.hpp
+        ${HELICS_LIBRARY_SOURCE_DIR}/apps/helicsApp.hpp
+        ${HELICS_LIBRARY_SOURCE_DIR}/apps/Clone.hpp
+		${HELICS_LIBRARY_SOURCE_DIR}/apps/CoreApp.hpp
+		${HELICS_LIBRARY_SOURCE_DIR}/apps/BrokerApp.hpp
+    )

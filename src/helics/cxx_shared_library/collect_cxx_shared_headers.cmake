@@ -41,3 +41,10 @@ file(
      COPY ${HELICS_BINARY_DIR}/helics_generated_includes/helics
      DESTINATION ${HELICS_CXX_HEADER_FILE_LOC}/
 )
+
+if (HELICS_BUILD_APP_LIBRARY)
+file(
+     COPY ${helics_apps_public_headers}
+     DESTINATION ${HELICS_CXX_HEADER_FILE_LOC}/helics/apps
+)
+endif()

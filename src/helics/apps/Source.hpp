@@ -20,9 +20,8 @@ namespace helics
 namespace apps
 {
 /** helper class for containing a signal generator source*/
-class SourceObject
+struct SourceObject
 {
-  public:
     Publication pub;
     Time period;
     Time nextTime;
@@ -32,7 +31,7 @@ class SourceObject
 };
 
 /** parent class for a signal generator which generates values to feed into a helics federation*/
-class SignalGenerator
+class HELICS_CXX_EXPORT SignalGenerator
 {
   protected:
     Time lastTime = timeZero;
@@ -57,7 +56,7 @@ and sending signals at the appropriate times
 @details  the source class is NOT threadsafe,  don't try to use it from multiple threads without external
 protection, that will result in undefined behavior
 */
-class Source : public App
+class HELICS_CXX_EXPORT Source : public App
 {
   public:
     /** default constructor*/

@@ -18,6 +18,8 @@ if(HELICS_BUILD_APP_LIBRARY)
         Tracer.hpp
         helicsApp.hpp
         Clone.hpp
+		CoreApp.hpp
+		BrokerApp.hpp
     )
 
 	set(helics_apps_broker_headers 
@@ -37,7 +39,7 @@ if(HELICS_BUILD_APP_LIBRARY)
         Source.cpp
         Tracer.cpp
         helicsApp.cpp
-        Clone.cpp 
+        Clone.cpp
     )
 
 	set(helics_apps_broker_files
@@ -181,12 +183,12 @@ if(HELICS_BUILD_APP_LIBRARY)
 
     if(WIN32)
         install(
-            FILES $<TARGET_LINKER_FILE:helics-apps-shared >
+            FILES $<TARGET_LINKER_FILE:helics-apps-shared>
             DESTINATION ${CMAKE_INSTALL_LIBDIR}
             COMPONENT libs
         )
         install(
-            FILES $<TARGET_FILE:helics-apps-shared >
+            FILES $<TARGET_FILE:helics-apps-shared>
             DESTINATION ${CMAKE_INSTALL_BINDIR}
             COMPONENT Runtime
         )
@@ -201,7 +203,7 @@ if(HELICS_BUILD_APP_LIBRARY)
 
     if(MSVC AND NOT HELICS_EMBEDDED_DEBUG_INFO)
         install(
-            FILES $<TARGET_PDB_FILE:helics-apps-shared >
+            FILES $<TARGET_PDB_FILE:helics-apps-shared>
             DESTINATION ${CMAKE_INSTALL_BINDIR}
             OPTIONAL
             COMPONENT libs

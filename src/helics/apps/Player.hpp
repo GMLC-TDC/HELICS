@@ -19,9 +19,8 @@ namespace helics
 {
 namespace apps
 {
-class ValueSetter
+struct ValueSetter
 {
-  public:
     Time time;
     int iteration = 0;
     int index;
@@ -30,9 +29,8 @@ class ValueSetter
     defV value;
 };
 
-class MessageHolder
+struct MessageHolder
 {
-  public:
     Time sendTime;
     int index;
     Message mess;
@@ -43,7 +41,7 @@ and sending signals at the appropriate times
 @details  the Player class is not thread-safe,  don't try to use it from multiple threads without external
 protection, that will result in undefined behavior
 */
-class Player : public App
+class HELICS_CXX_EXPORT Player : public App
 {
   public:
     /** default constructor*/

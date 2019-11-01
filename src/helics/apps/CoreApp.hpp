@@ -4,15 +4,16 @@ Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance
 the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
-
-/** @file
-Header file for inclusion of the entire apps library
-*/
 #pragma once
 
-#include "apps/BrokerApp.hpp"
-#include "apps/Echo.hpp"
-#include "apps/Player.hpp"
-#include "apps/Recorder.hpp"
-#include "apps/Source.hpp"
-#include "apps/Tracer.hpp"
+#include "../application_api/CoreApp.hpp"
+
+// for maintaining the symbol in a public header
+namespace helics
+{
+namespace apps
+{
+using CoreApp = CoreApp;
+}  // namespace apps
+
+}  // namespace helics

@@ -98,7 +98,7 @@ std::unique_ptr<helicsCLI11App> Player::generateParser ()
         [this] (CLI::results_t res) {
             try
             {
-                units = timeUnitsFromString (res[0]);
+                units = gmlc::utilities::timeUnitsFromString (res[0]);
                 timeMultiplier = toSecondMultiplier (units);
                 return true;
             }

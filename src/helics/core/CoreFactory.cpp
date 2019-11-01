@@ -45,8 +45,6 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <cassert>
 #include <cstring>
 
-DECLARE_TRIPLINE ()
-
 namespace helics
 {
 std::shared_ptr<Core> makeCore (core_type type, const std::string &name)

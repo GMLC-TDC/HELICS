@@ -21,7 +21,7 @@ class CloningFilter;
 namespace apps
 {
 /** class designed to capture data points from a set of subscriptions or endpoints*/
-class Clone : public App
+class HELICS_CXX_EXPORT Clone : public App
 {
   public:
     /** construct from a FederateInfo structure

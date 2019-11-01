@@ -26,7 +26,7 @@ namespace apps
 @details  the App class is not thread-safe in non-const methods,  don't try to use it from multiple threads without
 external protection, that will result in undefined behavior
 */
-class App
+class HELICS_CXX_EXPORT App
 {
   public:
     /** default constructor*/

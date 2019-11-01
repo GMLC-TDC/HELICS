@@ -20,7 +20,7 @@ class CloningFilter;
 namespace apps
 {
 /** class designed to capture data points from a set of subscriptions or endpoints*/
-class Recorder : public App
+class HELICS_CXX_EXPORT Recorder : public App
 {
   public:
     /** construct from a FederateInfo structure
