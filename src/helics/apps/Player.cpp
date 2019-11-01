@@ -22,14 +22,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "gmlc/utilities/base64.h"
 #include "gmlc/utilities/stringOps.h"
 
-#ifdef HELICS_SHARED_LIBRARY
-#    include "../application_api/timeOperations.hpp"
-using helics::timeUnitsFromString;
-#else
-#    include "../core/coreTimeOperations.hpp"
-using helics::core::timeUnitsFromString;
-
-#endif
+#include "gmlc/utilities/timeStringOps.hpp"
 
 /** test if a string has a base64 wrapper*/
 static int hasB64Wrapper (const std::string &str);

@@ -10,9 +10,9 @@ SPDX-License-Identifier: BSD-3-Clause
 /** these test cases test data_block and data_view objects
  */
 
-#include "helics/core/coreTimeOperations.hpp"
+#include "gmlc/utilities/timeStringOps.hpp"
 #include "helics/shared_api_library/api-data.h"
-
+#include "helics/core/helics-time.hpp"
 using namespace helics;
 
 TEST (time_tests, simple_times)
@@ -166,22 +166,22 @@ TEST (time_tests, comparison_tests)
 
 TEST (time_tests, test_string_conversions)
 {
-    using namespace helics::core;
+    using namespace gmlc::utilities;
 
-    EXPECT_EQ (loadTimeFromString ("10"), Time (10));
-    EXPECT_EQ (loadTimeFromString ("-10"), Time (-10));
+    EXPECT_EQ (loadTimeFromString<Time> ("10"), Time (10));
+    EXPECT_EQ (loadTimeFromString<Time> ("-10"), Time (-10));
 
-    EXPECT_EQ (loadTimeFromString ("45", time_units::ms), Time (45, time_units::ms));
-    EXPECT_EQ (loadTimeFromString ("45000 us", time_units::ms), Time (45, time_units::ms));
+    EXPECT_EQ (loadTimeFromString<Time> ("45", time_units::ms), Time (45, time_units::ms));
+    EXPECT_EQ (loadTimeFromString<Time> ("45000 us", time_units::ms), Time (45, time_units::ms));
 
-    EXPECT_EQ (loadTimeFromString ("0.045   s"), Time (45, time_units::ms));
+    EXPECT_EQ (loadTimeFromString<Time> ("0.045   s"), Time (45, time_units::ms));
 
-    EXPECT_EQ (loadTimeFromString ("0.045 seconds"), Time (45, time_units::ms));
+    EXPECT_EQ (loadTimeFromString<Time> ("0.045 seconds"), Time (45, time_units::ms));
 
-    EXPECT_EQ (loadTimeFromString ("4.5 ms"), Time (0.0045));
-    EXPECT_EQ (loadTimeFromString ("4.5ms"), Time (0.0045));
+    EXPECT_EQ (loadTimeFromString<Time> ("4.5 ms"), Time (0.0045));
+    EXPECT_EQ (loadTimeFromString<Time> ("4.5ms"), Time (0.0045));
 
-    EXPECT_THROW (loadTimeFromString ("happy"), std::invalid_argument);
+    EXPECT_THROW (loadTimeFromString<Time> ("happy"), std::invalid_argument);
 }
 
 TEST (time_tests, chrono_tests)
