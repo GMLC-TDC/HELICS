@@ -45,7 +45,7 @@ class local_federate_id
     base_type fid{invalid_fid};  //!< the underlying index value
 };
 
-#ifndef HELICS_SHARED_LIBRARY
+#if defined HELICS_STATIC_CORE_LIBRARY && !defined HELICS_SHARED_LIBRARY
 /** stream operator for a federate_id
  */
 std::ostream &operator<< (std::ostream &os, local_federate_id fid);
@@ -81,7 +81,7 @@ class interface_handle
     base_type hid{invalid_handle};  //!< the underlying index value
 };
 
-#ifndef HELICS_SHARED_LIBRARY
+#if defined HELICS_STATIC_CORE_LIBRARY && !defined HELICS_SHARED_LIBRARY
 /** stream operator for a interface handle
  */
 std::ostream &operator<< (std::ostream &os, interface_handle handle);

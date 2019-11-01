@@ -47,6 +47,7 @@ set(
 
 set(conv_headers ${HELICS_LIBRARY_SOURCE_DIR}/application_api.hpp ${HELICS_LIBRARY_SOURCE_DIR}/ValueFederates.hpp ${HELICS_LIBRARY_SOURCE_DIR}/MessageFederates.hpp ${HELICS_LIBRARY_SOURCE_DIR}/helics.hpp)
 set(basic_headers ${HELICS_LIBRARY_SOURCE_DIR}/helics_enums.h)
+set(basic_app_headers ${HELICS_LIBRARY_SOURCE_DIR}/helics_apps.hpp)
 
 set(core_include_files 
 	${HELICS_LIBRARY_SOURCE_DIR}/core/helics-time.hpp

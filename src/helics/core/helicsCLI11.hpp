@@ -12,7 +12,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #undef CLI11_EXPERIMENTAL_OPTIONAL
 #include "core-types.hpp"
 #include "helics-time.hpp"
-#ifdef HELICS_SHARED_LIBRARY
+#if defined HELICS_SHARED_LIBRARY || !defined HELICS_STATIC_CORE_LIBRARY
 #    include "../application_api/timeOperations.hpp"
 #    include "../application_api/typeOperations.hpp"
 

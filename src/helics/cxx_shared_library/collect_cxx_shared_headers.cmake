@@ -43,11 +43,13 @@ file(
 )
 
 if (HELICS_BUILD_APP_LIBRARY)
-message(STATUS "copying app files")
 file(
      COPY ${helics_apps_public_headers}
      DESTINATION ${HELICS_CXX_HEADER_FILE_LOC}/helics/apps
 )
-else ()
-message(STATUS "NOT copying app files")
+file(
+     COPY ${conv_headers} ${basic_app_headers}
+     DESTINATION ${HELICS_CXX_HEADER_FILE_LOC}/helics
+)
+
 endif()

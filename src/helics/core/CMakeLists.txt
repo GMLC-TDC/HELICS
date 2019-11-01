@@ -263,3 +263,7 @@ target_compile_options(
         PRIVATE
             $<$<COMPILE_LANGUAGE:CXX>:$<$<NOT:$<CXX_COMPILER_ID:MSVC>>:-Wno-strict-aliasing>>
     )
+
+
+#adding a definition flag for some interaction with the shared library
+target_compile_definitions(helics_core PUBLIC HELICS_STATIC_CORE_LIBRARY)
