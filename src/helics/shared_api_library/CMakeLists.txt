@@ -7,18 +7,11 @@
 # SPDX-License-Identifier: BSD-3-Clause
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-set(
-    helicsShared_headers
-    helics.h
-    api-data.h
-    ValueFederate.h
-    MessageFederate.h
-    MessageFilters.h
-    helicsCallbacks.h
+set(helicsShared_headers helics.h api-data.h ValueFederate.h MessageFederate.h
+                         MessageFilters.h helicsCallbacks.h
 )
 
-set(
-    helicsShared_sources
+set(helicsShared_sources
     helicsExport.cpp
     FederateExport.cpp
     ValueFederateExport.cpp
@@ -38,19 +31,17 @@ generate_export_header(helicsSharedLib BASE_NAME helics)
 target_include_directories(
     helicsSharedLib
     PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>
-    INTERFACE
-        $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/src>
-        $<INSTALL_INTERFACE:$<INSTALL_PREFIX>/${CMAKE_INSTALL_INCLUDEDIR}>
+    INTERFACE $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/src>
+              $<INSTALL_INTERFACE:$<INSTALL_PREFIX>/${CMAKE_INSTALL_INCLUDEDIR}>
 )
 
 set_target_properties(
-    helicsSharedLib
-    PROPERTIES VERSION ${HELICS_VERSION} SOVERSION ${HELICS_VERSION_MAJOR}
+    helicsSharedLib PROPERTIES VERSION ${HELICS_VERSION} SOVERSION
+                               ${HELICS_VERSION_MAJOR}
 )
 
 set_target_properties(
-    helicsSharedLib
-    PROPERTIES CXX_VISIBILITY_PRESET hidden C_VISIBILITY_PRESET hidden
+    helicsSharedLib PROPERTIES CXX_VISIBILITY_PRESET hidden C_VISIBILITY_PRESET hidden
 )
 target_link_libraries(helicsSharedLib PRIVATE helics_application_api)
 target_link_libraries(helicsSharedLib PRIVATE compile_flags_target)
@@ -93,31 +84,36 @@ if(WIN32)
         ${HELICS_EXCLUSION_COMMAND}
     )
 else()
-    install(
-        TARGETS helicsSharedLib DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT
-        RUNTIME ${HELICS_EXCLUSION_COMMAND}
+    install(TARGETS helicsSharedLib DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT
+            RUNTIME ${HELICS_EXCLUSION_COMMAND}
     )
 endif()
 
+if(MSVC AND NOT HELICS_EMBEDDED_DEBUG_INFO)
+    install(
+        FILES $<TARGET_PDB_FILE:helicsSharedLib>
+        DESTINATION ${CMAKE_INSTALL_BINDIR}
+        OPTIONAL
+        COMPONENT libs
+    )
+endif()
 
+if(NOT HELICS_BINARY_ONLY_INSTALL)
     install(
         FILES ${CMAKE_CURRENT_BINARY_DIR}/helics_export.h
         DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/helics/shared_api_library
         COMPONENT headers
     )
 
-    if(MSVC AND NOT HELICS_EMBEDDED_DEBUG_INFO)
-        install(
-            FILES $<TARGET_PDB_FILE:helicsSharedLib>
-            DESTINATION ${CMAKE_INSTALL_BINDIR}
-            OPTIONAL
-            COMPONENT libs
-        )
-    endif()
     install(
         FILES ${helicsShared_headers}
         DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/helics/shared_api_library
         COMPONENT headers
     )
 
-
+    install(
+        FILES ../chelics.h ../helics98.hpp
+        DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/helics
+        COMPONENT headers
+    )
+endif()

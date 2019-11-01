@@ -794,7 +794,7 @@ set(
     "asio"
     "${PROJECT_SOURCE_DIR}/ThirdParty/asio/asio/LICENSE_1_0.txt"
     "cereal"
-    "${PROJECT_SOURCE_DIR}/ThirdParty/cereal/LICENSE"
+    "${PROJECT_SOURCE_DIR}/ThirdParty/helics/external/cereal/LICENSE"
     "GMLC Concurrency"
     "${PROJECT_SOURCE_DIR}/ThirdParty/concurrency/LICENSE"
     "libGuarded"

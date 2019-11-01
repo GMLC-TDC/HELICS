@@ -70,16 +70,11 @@ add_custom_command(TARGET helics-shared POST_BUILD
 					   -DHELICS_BINARY_DIR=${HELICS_BINARY_DIR} -DHELICS_BUILD_APP_LIBRARY=${HELICS_BUILD_APP_LIBRARY}
 					   -P
                        ${CMAKE_CURRENT_SOURCE_DIR}/collect_cxx_shared_headers.cmake)
-
-
-file(COPY ${PROJECT_SOURCE_DIR}/ThirdParty/cereal
-    DESTINATION ${HELICS_BINARY_DIR}/include/helics_cxx 
-)
             
 target_include_directories(helics-shared 
 		INTERFACE $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}/include/helics_cxx>
 		$<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/ThirdParty>
-		 $<INSTALL_INTERFACE:$<INSTALL_PREFIX>/${CMAKE_INSTALL_INCLUDEDIR}>/helics_cxx
+		 $<INSTALL_INTERFACE:$<INSTALL_PREFIX>/${CMAKE_INSTALL_INCLUDEDIR}>
 		 PRIVATE $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
 		)
 
@@ -119,8 +114,8 @@ target_include_directories(helics-shared
         )
     endif()
     install(DIRECTORY
-        ${PROJECT_BINARY_DIR}/include/helics_cxx
-        DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+        ${PROJECT_BINARY_DIR}/include/helics_cxx/
+        DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/
         COMPONENT headers
     )
 

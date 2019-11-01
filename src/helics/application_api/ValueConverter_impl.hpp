@@ -15,19 +15,19 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <algorithm>
 #include <array>
 #include <cassert>
-#include <cereal/archives/portable_binary.hpp>
-#include <cereal/cereal.hpp>
-#include <cereal/types/complex.hpp>
-#include <cereal/types/utility.hpp>
-#include <cereal/types/vector.hpp>
 #include <complex>
 #include <cstring>
+#include <helics/external/cereal/archives/portable_binary.hpp>
+#include <helics/external/cereal/cereal.hpp>
+#include <helics/external/cereal/types/complex.hpp>
+#include <helics/external/cereal/types/utility.hpp>
+#include <helics/external/cereal/types/vector.hpp>
 #include <iterator>
 #include <stdexcept>
 #include <type_traits>
 #include <utility>
-//#include <cereal/archives/binary.hpp>
-#include <cereal/types/string.hpp>
+//#include <helics/external/cereal/archives/binary.hpp>
+#include <helics/external/cereal/types/string.hpp>
 
 using archiver = cereal::PortableBinaryOutputArchive;
 

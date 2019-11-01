@@ -77,11 +77,4 @@ endif(HELICS_BUILD_APP_LIBRARY)
 if(NOT HELICS_DISABLE_C_SHARED_LIB)
     add_subdirectory(shared_api_library)
     add_subdirectory(cpp98)
-    if(NOT HELICS_BINARY_ONLY_INSTALL)
-        install(
-            FILES chelics.h
-            DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/helics
-            COMPONENT headers
-        )
-    endif()
 endif()
