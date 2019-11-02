@@ -164,6 +164,14 @@ if(HELICS_BUILD_APP_LIBRARY)
 
 	target_compile_definitions(helics-apps-shared PRIVATE helics_shared_EXPORTS)
 
+	target_include_directories(
+    helics-apps-shared
+    INTERFACE $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}/include/helics_cxx>
+              $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/ThirdParty>
+              $<INSTALL_INTERFACE:$<INSTALL_PREFIX>/${CMAKE_INSTALL_INCLUDEDIR}>
+    PRIVATE $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
+)
+
     set_target_properties(
         helics-apps-shared
         PROPERTIES VERSION ${HELICS_VERSION} SOVERSION ${HELICS_VERSION_MAJOR}
