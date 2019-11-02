@@ -24,10 +24,13 @@ if(HELICS_BUILD_CXX_SHARED_LIB)
     add_executable(shared-library-test main.cpp)
     target_link_libraries(shared-library-test HELICS::helics-shared)
 	
-	# Test the helics_app static library target
+	# Test the helics_app shared library target
     if(HELICS_BUILD_APP_LIBRARY)
        add_executable(apps-library-test main-apps.cpp)
-       target_link_libraries(apps-library-test HELICS::helics-apps-shared)
+       target_link_libraries(apps-library-test PUBLIC HELICS::helics-apps-shared)
+	   
+	    get_target_property(cxx_app_include_dir HELICS::helics-apps-shared INTERFACE_INCLUDE_DIRECTORIES)
+		message(STATUS "app-shared include dirs ${cxx_app_include_dir}")
     endif()
 
 endif()

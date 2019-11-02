@@ -37,7 +37,7 @@ if(HELICS_BUILD_APP_LIBRARY)
     file(COPY ${helics_apps_public_headers}
          DESTINATION ${HELICS_CXX_HEADER_FILE_LOC}/helics/apps
     )
-    file(COPY ${conv_headers} ${basic_app_headers}
+    file(COPY ${basic_app_headers}
          DESTINATION ${HELICS_CXX_HEADER_FILE_LOC}/helics
     )
 
