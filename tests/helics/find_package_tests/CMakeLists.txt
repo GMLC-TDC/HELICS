@@ -30,7 +30,15 @@ if(HELICS_BUILD_CXX_SHARED_LIB)
        target_link_libraries(apps-library-test PUBLIC HELICS::helics-apps-shared)
 	   
 	    get_target_property(cxx_app_include_dir HELICS::helics-apps-shared INTERFACE_INCLUDE_DIRECTORIES)
-		message(STATUS "app-shared include dirs ${cxx_app_include_dir}")
+		list(GET cxx_app_include_dir 0 first_include)
+		if (EXISTS ${first_include}/helics/helics_apps.hpp)
+			message(STATUS "${first_include}/helics/helics_apps.hpp EXISTS")
+		else()
+			message(STATUS "${first_include}/helics/helics_apps.hpp DOES NOT EXIST")
+			file(GLOB file_list ${first_include}/helics/*.hpp )
+			message(STATUS "list of files ${file_list}")
+		endif()
+		
     endif()
 
 endif()
