@@ -45,4 +45,8 @@ struct iteration_time
 
 }  // namespace helics
 
+// This next section should be removed in HELICS 3.0 but is needed to prevent breaking changes
+#    if defined HELICS_SHARED_LIBRARY || !defined HELICS_STATIC_CORE_LIBRARY
+#        include "../application_api/timeOperations.hpp"
+#    endif
 #endif  //_HELICS_TIME_HEADER_

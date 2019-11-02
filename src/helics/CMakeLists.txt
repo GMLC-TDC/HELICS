@@ -9,18 +9,33 @@
 
 include(GenerateExportHeader)
 
+option(
+    HELICS_BUILD_APP_LIBRARY
+    "Build helics application library (a static library containing objects for broker, player, recorder, and helics_apps"
+    ON
+)
+
+cmake_dependent_option(
+    HELICS_BUILD_APP_EXECUTABLES
+    "Build helics applications to run various apps, including broker, player, recorder, and helics_apps"
+    ON
+    "HELICS_BUILD_APP_LIBRARY;CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME"
+    OFF
+)
+
 # for including the helics_export.h
 target_include_directories(
     helics_base INTERFACE $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>
 )
 
+# -------------------------------------------------------------
+# Add the main HELICS libraries
+# -------------------------------------------------------------
+
+
 add_subdirectory(common)
 add_subdirectory(core)
 add_subdirectory(application_api)
-
-# -------------------------------------------------------------
-# Add the main HELICS library
-# -------------------------------------------------------------
 
 if(HELICS_BUILD_CXX_SHARED_LIB)
 
@@ -46,20 +61,6 @@ if(NOT CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
         helics_application_api helics_common helics_core PROPERTIES FOLDER helics
     )
 endif()
-
-option(
-    HELICS_BUILD_APP_LIBRARY
-    "Build helics application library (a static library containing objects for broker, player, recorder, and helics_apps"
-    ON
-)
-
-cmake_dependent_option(
-    HELICS_BUILD_APP_EXECUTABLES
-    "Build helics applications to run various apps, including broker, player, recorder, and helics_apps"
-    ON
-    "HELICS_BUILD_APP_LIBRARY AND CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME"
-    OFF
-)
 
 if(HELICS_BUILD_APP_LIBRARY)
     add_subdirectory(apps)

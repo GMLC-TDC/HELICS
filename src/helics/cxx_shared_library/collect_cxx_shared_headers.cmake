@@ -40,5 +40,6 @@ if(HELICS_BUILD_APP_LIBRARY)
     file(COPY ${basic_app_headers}
          DESTINATION ${HELICS_CXX_HEADER_FILE_LOC}/helics
     )
-
+else()
+	message(STATUS "BUILD app library is OFF")
 endif()
