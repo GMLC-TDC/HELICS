@@ -114,6 +114,7 @@ generateComms (const std::string &type, const std::string &initString = std::str
 #endif
     case core_type::HTTP:
     case core_type::TEST:
+	case core_type::INPROC:
     case core_type::NNG:
     case core_type::UNRECOGNIZED:
 	case core_type::WEBSOCKET:

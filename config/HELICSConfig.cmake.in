@@ -39,6 +39,14 @@ if (@HELICS_BUILD_CXX_SHARED_LIB@)
 		get_target_property(cxx_include_dirs HELICS::helics-shared INTERFACE_INCLUDE_DIRECTORIES)
 		list(REMOVE_ITEM cxx_include_dirs "/helics_cxx")
 		set_property(TARGET HELICS::helics-shared PROPERTY INTERFACE_INCLUDE_DIRECTORIES ${cxx_include_dirs})
+		if (@HELICS_BUILD_APP_LIBRARY@)
+		    set_property(TARGET HELICS::helics-apps-shared APPEND PROPERTY
+               INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_CURRENT_LIST_DIR}/include/helics_cxx"
+            )
+		    get_target_property(cxx_include_dirs HELICS::helics-apps-shared INTERFACE_INCLUDE_DIRECTORIES)
+		    list(REMOVE_ITEM cxx_include_dirs "/helics_cxx")
+		    set_property(TARGET HELICS::helics-apps-shared PROPERTY INTERFACE_INCLUDE_DIRECTORIES ${cxx_include_dirs})
+		endif()
     endif()
     
 endif()
