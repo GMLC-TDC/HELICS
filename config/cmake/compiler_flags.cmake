@@ -147,7 +147,7 @@ if(MSVC)
     target_compile_options(build_flags_target INTERFACE /EHsc)
 	
 	if (CMAKE_VERSION VERSION_GREATER 3.13.0)
-	   target_link_options(compile_flags_target INTERFACE /debug:fastlink /incremental)
+	   target_link_options(compile_flags_target INTERFACE /debug:fastlink)
 	endif()
     if(${PROJECT_NAME}_ENABLE_EXTRA_COMPILER_WARNINGS)
         target_compile_options(compile_flags_target INTERFACE /W4 /sdl /wd4244 )
