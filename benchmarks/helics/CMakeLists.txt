@@ -10,6 +10,7 @@
 set(
     HELICS_BENCHMARKS
     ActionMessageBenchmarks
+	filterBenchmarks
     echoBenchmarks
     ringBenchmarks
     messageLookupBenchmarks
