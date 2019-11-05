@@ -6,8 +6,8 @@ SPDX-License-Identifier: BSD-3-Clause
 */
 
 #include "helics/application_api/Endpoints.hpp"
-#include "helics/application_api/MessageFederate.hpp"
 #include "helics/application_api/Filters.hpp"
+#include "helics/application_api/MessageFederate.hpp"
 #include "helics/core/ActionMessage.hpp"
 #include "helics/core/BrokerFactory.hpp"
 #include "helics/core/CoreFactory.hpp"
@@ -184,7 +184,8 @@ static void BM_filter_singleCore (benchmark::State &state)
         {
             leafs[ii].initialize (wcore->getIdentifier (), ii);
         }
-
+        auto &filt1 = make_filter (helics::filter_types::delay, wcore.get ());
+        filt1->addDestinationTarget ("echo");
         std::vector<std::thread> threadlist (static_cast<size_t> (feds));
         for (int ii = 0; ii < feds; ++ii)
         {
