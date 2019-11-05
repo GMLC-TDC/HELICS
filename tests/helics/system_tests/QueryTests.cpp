@@ -427,33 +427,32 @@ TEST_F (query_tests, test_queries_query)
     vFed2->enterInitializingMode ();
     vFed1->enterInitializingModeComplete ();
 
-    
-	//federate queries
+    // federate queries
     auto res = vFed1->query ("queries");
     auto vec = helics::vectorizeQueryResult (res);
     for (auto &qstr : vec)
     {
         auto qres = vFed1->query (qstr);
-        EXPECT_NE (qres, "#invalid");
+        EXPECT_NE (qres, "#invalid") << qstr << " produced #invalid";
     }
 
-	res = vFed1->query ("core","queries");
+    res = vFed1->query ("core", "queries");
     vec = helics::vectorizeQueryResult (res);
     for (auto &qstr : vec)
     {
-        auto qres = vFed1->query ("core",qstr);
-        EXPECT_NE (qres, "#invalid");
+        auto qres = vFed1->query ("core", qstr);
+        EXPECT_NE (qres, "#invalid") << qstr << " produced #invalid in core";
     }
 
-	res = vFed1->query ("root", "queries");
+    res = vFed1->query ("root", "queries");
     vec = helics::vectorizeQueryResult (res);
     for (auto &qstr : vec)
     {
-        auto qres = vFed1->query ("root",qstr);
-        EXPECT_NE (qres, "#invalid");
+        auto qres = vFed1->query ("root", qstr);
+        EXPECT_NE (qres, "#invalid") << qstr << " produced #invalid in core";
     }
 
-	vFed1->finalize ();
+    vFed1->finalize ();
     vFed2->finalize ();
     helics::cleanupHelicsLibrary ();
 }

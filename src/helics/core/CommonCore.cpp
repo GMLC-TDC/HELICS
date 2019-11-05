@@ -2026,11 +2026,17 @@ std::string CommonCore::coreQuery (const std::string &queryStr) const
     {
         return generateStringVector_if (
           loopHandles, [](const auto &handle) { return handle.key; },
-          [](const auto &handle) { return (handle.handleType == handle_type::input); });
+          [](const auto &handle) { return ((handle.handleType == handle_type::input)&&!handle.key.empty()); });
+    }
+    if (queryStr == "filters")
+    {
+        return generateStringVector_if (
+          filters, [](const auto &filt) { return filt->key; },
+          [this](const auto &filt) { return ((filt->core_id== global_broker_id_local)&&!filt->key.empty()); });
     }
     if ((queryStr == "queries") || (queryStr == "available_queries"))
     {
-        return "[isinit;isconnected;name;address;queries;address;counts;summary;federates;inputs;endpoints;"
+        return "[isinit;isconnected;name;address;queries;address;federates;inputs;endpoints;"
                "publications;filters;federate_map;dependency_graph;dependencies;dependson;dependents]";
     }
     if (queryStr == "endpoints")
@@ -2052,6 +2058,10 @@ std::string CommonCore::coreQuery (const std::string &queryStr) const
     if (queryStr == "isinit")
     {
         return (allInitReady ()) ? "true" : "false";
+    }
+    if (queryStr == "isconnected")
+    {
+        return (isConnected()) ? "true" : "false";
     }
     if (queryStr == "name")
     {
