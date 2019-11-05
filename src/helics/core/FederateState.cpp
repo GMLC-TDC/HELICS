@@ -99,7 +99,7 @@ namespace helics
 FederateState::FederateState (const std::string &name_, const CoreFederateInfo &info_)
     : name (name_), global_id{global_federate_id ()}
 {
-    timeCoord = std::make_unique<TimeCoordinator> ([this] (const ActionMessage &msg) { routeMessage (msg); });
+    timeCoord = std::make_unique<TimeCoordinator> ([this](const ActionMessage &msg) { routeMessage (msg); });
     for (const auto &prop : info_.timeProps)
     {
         setProperty (prop.first, prop.second);
@@ -525,7 +525,7 @@ iteration_result FederateState::enterExecutingMode (iteration_request iterate)
             if (!mTimer)
             {
                 mTimer = std::make_shared<MessageTimer> (
-                  [this] (ActionMessage &&mess) { return this->addAction (std::move (mess)); });
+                  [this](ActionMessage &&mess) { return this->addAction (std::move (mess)); });
             }
             start_clock_time = std::chrono::steady_clock::now ();
         }
@@ -1235,7 +1235,8 @@ message_processing_result FederateState::processActionMessage (ActionMessage &cm
         auto subI = interfaceInformation.getInput (cmd.dest_handle);
         if (subI != nullptr)
         {
-            subI->addSource (cmd.getSource (), cmd.name, cmd.getString (typeStringLoc), cmd.getString (unitStringLoc));
+            subI->addSource (cmd.getSource (), cmd.name, cmd.getString (typeStringLoc),
+                             cmd.getString (unitStringLoc));
             addDependency (cmd.source_id);
         }
     }
@@ -1752,15 +1753,15 @@ std::string FederateState::processQueryActual (const std::string &query) const
 {
     if (query == "publications")
     {
-        return generateStringVector (interfaceInformation.getPublications (), [] (auto &pub) { return pub->key; });
+        return generateStringVector (interfaceInformation.getPublications (), [](auto &pub) { return pub->key; });
     }
     if (query == "inputs")
     {
-        return generateStringVector (interfaceInformation.getInputs (), [] (auto &inp) { return inp->key; });
+        return generateStringVector (interfaceInformation.getInputs (), [](auto &inp) { return inp->key; });
     }
     if (query == "endpoints")
     {
-        return generateStringVector (interfaceInformation.getEndpoints (), [] (auto &ept) { return ept->key; });
+        return generateStringVector (interfaceInformation.getEndpoints (), [](auto &ept) { return ept->key; });
     }
     if (query == "interfaces")
     {
@@ -1791,7 +1792,7 @@ std::string FederateState::processQueryActual (const std::string &query) const
     if (query == "dependencies")
     {
         return generateStringVector (timeCoord->getDependencies (),
-                                     [] (auto &dep) { return std::to_string (dep.baseValue ()); });
+                                     [](auto &dep) { return std::to_string (dep.baseValue ()); });
     }
     if (query == "timeconfig")
     {
@@ -1813,7 +1814,7 @@ std::string FederateState::processQueryActual (const std::string &query) const
     if (query == "dependents")
     {
         return generateStringVector (timeCoord->getDependents (),
-                                     [] (auto &dep) { return std::to_string (dep.baseValue ()); });
+                                     [](auto &dep) { return std::to_string (dep.baseValue ()); });
     }
     if (queryCallback)
     {
@@ -1828,6 +1829,11 @@ std::string FederateState::processQuery (const std::string &query) const
     if (query == "publications" || query == "inputs" || query == "endpoints")
     {  // these never need to be locked
         qstring = processQueryActual (query);
+    }
+    if ((query == "queries") || (query == "available_queries"))
+    {
+        qstring =
+          "publications;inputs;endpoints;interfaces;subscriptions;dependencies;timeconfig;config;dependents";
     }
     else
     {  // the rest might to prevent a race condition

@@ -38,7 +38,7 @@ Unrecognized queries or targets return `#invalid`
 Answers to queries can be
  - "true"/"false" [T/F]
  - a single string  `"answer"` [string]
- - a vector of string delimited by ``';'`` `[answer1;answer2;answer3]` [sv]
+ - a vector of strings delimited by ``';'`` `[answer1;answer2;answer3]` [sv]
  - a JSON string [JSON]
 
 ### Federate Queries
@@ -67,6 +67,8 @@ The following queries are defined for federates.  Federates may specify a callba
 | ``dependencies``  | list of the objects this federate depends on [sv]          |
 +-------------------+------------------------------------------------------------+
 | ``dependents``    | list of dependent objects [sv]                             |
++-------------------+------------------------------------------------------------+
+| ``queries``       | list of available queries [sv]                             |
 +-------------------+------------------------------------------------------------+
 ```
 
@@ -117,6 +119,8 @@ The following queries will be answered by a core.
 | ``federate_map``     | a Hierarchical map of the federates contained in a core [JSON]                      |
 +----------------------+-------------------------------------------------------------------------------------+
 | ``dependency_graph`` | a representation of the dependencies in the core and its contained federates [JSON] |
++-------------------+----------------------------------------------------------------------------------------+
+| ``queries``          | list of dependent objects [sv]                                                      |
 +----------------------+-------------------------------------------------------------------------------------+
 ```
 
@@ -157,6 +161,8 @@ The Following queries will be answered by a broker.
 +----------------------+-------------------------------------------------------------------------------------+
 | ``dependency_graph`` | a representation of the dependencies in the broker and all contained members [JSON] |
 +----------------------+-------------------------------------------------------------------------------------+
+| ``queries``          | list of dependent objects [sv]                                                      |
++----------------------+-------------------------------------------------------------------------------------+
 ```
 
 `federate_map` and `dependency_graph` when called from the root broker will generate a JSON string containing the entire structure of the federation.  This can take some time to assemble since all members must be queried.
@@ -172,7 +178,7 @@ std::string 	query (const std::string &queryStr)
 ```
 
 make the query of the current federate.
-and Asynchronous version is also available.
+an asynchronous version is also available.
 
 ```
 query_id_t 	queryAsync (const std::string &target, const std::string &queryStr)
