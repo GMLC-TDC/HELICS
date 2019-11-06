@@ -147,7 +147,6 @@ class EchoMessageLeaf
                 if (nstring != txstring)
                 {
                     throw( "incorrect string");
-                    break;
                 }
             }
         }
