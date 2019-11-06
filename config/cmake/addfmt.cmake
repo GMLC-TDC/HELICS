@@ -22,7 +22,9 @@ set(SUPPORTS_USER_DEFINED_LITERALS ON)
 set(FMT_HAS_VARIANT OFF)
 
 # get the FMT header only library
-add_subdirectory(ThirdParty/fmtlib EXCLUDE_FROM_ALL)
+add_subdirectory(ThirdParty/fmtlib)
+
+set_target_properties(fmt PROPERTIES FOLDER Extern)
 hide_variable(FMT_DOC)
 hide_variable(FMT_INSTALL)
 hide_variable(FMT_PEDANTIC)

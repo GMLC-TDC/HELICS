@@ -15,7 +15,8 @@ namespace helics
 class MessageFederateManager;
 class Endpoint;
 /** class defining the block communication based interface */
-class MessageFederate : public virtual Federate  // using virtual inheritance to allow combination federate
+class HELICS_CXX_EXPORT MessageFederate
+    : public virtual Federate  // using virtual inheritance to allow combination federate
 {
   public:
     /**constructor taking a federate information structure and using the default core
@@ -41,7 +42,7 @@ class MessageFederate : public virtual Federate  // using virtual inheritance to
     /** move constructor*/
     MessageFederate (MessageFederate &&mFed) noexcept;
     /** delete copy constructor*/
-    MessageFederate(const MessageFederate &mFed) = delete;
+    MessageFederate (const MessageFederate &mFed) = delete;
     /** default constructor*/
     MessageFederate ();
     /** special constructor should only be used by child classes in constructor due to virtual inheritance*/
@@ -52,7 +53,8 @@ class MessageFederate : public virtual Federate  // using virtual inheritance to
     /** move assignment*/
     MessageFederate &operator= (MessageFederate &&mFed) noexcept;
     /** delete copy assignment*/
-	MessageFederate &operator= (const MessageFederate &mFed) = delete;
+    MessageFederate &operator= (const MessageFederate &mFed) = delete;
+
   protected:
     virtual void startupToInitializeStateTransition () override;
     virtual void initializeToExecuteStateTransition () override;
@@ -73,7 +75,7 @@ class MessageFederate : public virtual Federate  // using virtual inheritance to
     @param name the name of the endpoint
     @param type the defined type of the interface for endpoint checking if requested
     @return a Reference to an Endpoint Object
-	*/
+    */
     Endpoint &registerGlobalEndpoint (const std::string &name, const std::string &type = std::string ());
 
     virtual void registerInterfaces (const std::string &configString) override;
@@ -203,13 +205,13 @@ class MessageFederate : public virtual Federate  // using virtual inheritance to
     /** register a callback for all endpoints
     @param callback the function to execute upon receipt of a message for any endpoint
     */
-    void setMessageNotificationCallback (const std::function<void(Endpoint &, Time)> &callback);
+    void setMessageNotificationCallback (const std::function<void (Endpoint &, Time)> &callback);
     /** register a callback for a specific endpoint
     @param ept the endpoint to associate with the specified callback
     @param callback the function to execute upon receipt of a message for the given endpoint
     */
     void
-    setMessageNotificationCallback (const Endpoint &ept, const std::function<void(Endpoint &, Time)> &callback);
+    setMessageNotificationCallback (const Endpoint &ept, const std::function<void (Endpoint &, Time)> &callback);
 
     /** add a named filter to an endpoint for all message coming from the endpoint*/
     void addSourceFilter (const Endpoint &ept, const std::string &filterName);

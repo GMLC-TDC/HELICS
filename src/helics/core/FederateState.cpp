@@ -31,65 +31,65 @@ static const std::string emptyStr;
 
 #ifdef HELICS_ENABLE_LOGGING
 
-#define LOG_SUMMARY(message)                                                                                      \
-    do                                                                                                            \
-    {                                                                                                             \
-        if (logLevel >= helics_log_level_summary)                                                                 \
+#    define LOG_SUMMARY(message)                                                                                  \
+        do                                                                                                        \
         {                                                                                                         \
-            logMessage (Hhelics_log_level_summary, emptyStr, message);                                            \
-        }                                                                                                         \
-    } while (false)
+            if (logLevel >= helics_log_level_summary)                                                             \
+            {                                                                                                     \
+                logMessage (Hhelics_log_level_summary, emptyStr, message);                                        \
+            }                                                                                                     \
+        } while (false)
 
-#define LOG_INTERFACES(message)                                                                                   \
-    do                                                                                                            \
-    {                                                                                                             \
-        if (logLevel >= helics_log_level_interfaces)                                                              \
+#    define LOG_INTERFACES(message)                                                                               \
+        do                                                                                                        \
         {                                                                                                         \
-            logMessage (helics_log_level_interfaces, emptyStr, message);                                          \
-        }                                                                                                         \
-    } while (false)
+            if (logLevel >= helics_log_level_interfaces)                                                          \
+            {                                                                                                     \
+                logMessage (helics_log_level_interfaces, emptyStr, message);                                      \
+            }                                                                                                     \
+        } while (false)
 
-#ifdef HELICS_ENABLE_DEBUG_LOGGING
-#define LOG_TIMING(message)                                                                                       \
-    do                                                                                                            \
-    {                                                                                                             \
-        if (logLevel >= helics_log_level_timing)                                                                  \
-        {                                                                                                         \
-            logMessage (helics_log_level_timing, emptyStr, message);                                              \
-        }                                                                                                         \
-    } while (false)
+#    ifdef HELICS_ENABLE_DEBUG_LOGGING
+#        define LOG_TIMING(message)                                                                               \
+            do                                                                                                    \
+            {                                                                                                     \
+                if (logLevel >= helics_log_level_timing)                                                          \
+                {                                                                                                 \
+                    logMessage (helics_log_level_timing, emptyStr, message);                                      \
+                }                                                                                                 \
+            } while (false)
 
-#define LOG_DATA(message)                                                                                         \
-    do                                                                                                            \
-    {                                                                                                             \
-        if (logLevel >= helics_log_level_data)                                                                    \
-        {                                                                                                         \
-            logMessage (helics_log_level_data, emptyStr, message);                                                \
-        }                                                                                                         \
-    } while (false)
-#else
-#define LOG_TIMING(message)
-#define LOG_DATA(message)
-#endif
+#        define LOG_DATA(message)                                                                                 \
+            do                                                                                                    \
+            {                                                                                                     \
+                if (logLevel >= helics_log_level_data)                                                            \
+                {                                                                                                 \
+                    logMessage (helics_log_level_data, emptyStr, message);                                        \
+                }                                                                                                 \
+            } while (false)
+#    else
+#        define LOG_TIMING(message)
+#        define LOG_DATA(message)
+#    endif
 
-#ifdef HELICS_ENABLE_TRACE_LOGGING
-#define LOG_TRACE(message)                                                                                        \
-    do                                                                                                            \
-    {                                                                                                             \
-        if (logLevel >= helics_log_level_trace)                                                                   \
-        {                                                                                                         \
-            logMessage (helics_log_level_trace, emptyStr, message);                                               \
-        }                                                                                                         \
-    } while (false)
-#else
-#define LOG_TRACE(message) ((void)0)
-#endif
+#    ifdef HELICS_ENABLE_TRACE_LOGGING
+#        define LOG_TRACE(message)                                                                                \
+            do                                                                                                    \
+            {                                                                                                     \
+                if (logLevel >= helics_log_level_trace)                                                           \
+                {                                                                                                 \
+                    logMessage (helics_log_level_trace, emptyStr, message);                                       \
+                }                                                                                                 \
+            } while (false)
+#    else
+#        define LOG_TRACE(message) ((void)0)
+#    endif
 #else  // LOGGING_DISABLED
-#define LOG_SUMMARY(message) ((void)0)
-#define LOG_INTERFACES(message) ((void)0)
-#define LOG_TIMING(message) ((void)0)
-#define LOG_DATA(message) ((void)0)
-#define LOG_TRACE(message) ((void)0)
+#    define LOG_SUMMARY(message) ((void)0)
+#    define LOG_INTERFACES(message) ((void)0)
+#    define LOG_TIMING(message) ((void)0)
+#    define LOG_DATA(message) ((void)0)
+#    define LOG_TRACE(message) ((void)0)
 #endif  // LOGGING_DISABLED
 
 using namespace std::chrono_literals;

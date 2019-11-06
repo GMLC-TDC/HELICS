@@ -1,5 +1,4 @@
 /*
-
 Copyright (c) 2017-2019,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
 the top-level NOTICE for additional details. All rights reserved.
@@ -142,9 +141,9 @@ bool waitForFed (helics::Federate *fed, const std::string &fedName, std::chrono:
 std::string queryFederateSubscriptions (helics::Federate *fed, const std::string &fedName)
 {
     auto res = fed->query (fedName, "subscriptions");
-    if (res.size () > 2 && res!="#invalid")
+    if (res.size () > 2 && res != "#invalid")
     {
-        res=fed->query ("gid_to_name", res);
+        res = fed->query ("gid_to_name", res);
     }
     return res;
 }

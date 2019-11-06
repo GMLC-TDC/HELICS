@@ -44,6 +44,8 @@ add_executable(shared-library-tests-cpp ${cpp_shared_library_test_sources}
 target_link_libraries(shared-library-tests helicsSharedLib helics_test_base)
 target_link_libraries(shared-library-tests-cpp helicsSharedLib helics_test_base)
 
+target_include_directories(shared-library-tests PRIVATE ${PROJECT_BINARY_DIR}/helics_generated_includes)
+target_include_directories(shared-library-tests-cpp PRIVATE ${PROJECT_BINARY_DIR}/helics_generated_includes)
 set_target_properties(
     shared-library-tests shared-library-tests-cpp
     PROPERTIES FOLDER tests

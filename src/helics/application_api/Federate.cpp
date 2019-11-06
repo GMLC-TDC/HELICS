@@ -17,6 +17,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "../common/addTargets.hpp"
 #include "../core/Core.hpp"
 #include "AsyncFedCallInfo.hpp"
+#include "CoreApp.hpp"
 #include "helics/helics-config.h"
 
 #include "FilterFederateManager.hpp"
@@ -83,6 +84,11 @@ Federate::Federate (const std::string &fedName, const FederateInfo &fi) : name (
     currentTime = coreObject->getCurrentTime (fedID);
     asyncCallInfo = std::make_unique<shared_guarded_m<AsyncFedCallInfo>> ();
     fManager = std::make_unique<FilterFederateManager> (coreObject.get (), this, fedID);
+}
+
+Federate::Federate (const std::string &fedname, CoreApp &core, const FederateInfo &fi)
+    : Federate (fedname, core.getCopyofCorePointer (), fi)
+{
 }
 
 Federate::Federate (const std::string &fedName, const std::shared_ptr<Core> &core, const FederateInfo &fi)
@@ -214,7 +220,7 @@ void Federate::enterInitializingModeAsync ()
     {
         currentMode = modes::pending_init;
         asyncInfo->initFuture =
-          std::async (std::launch::async, [this]() { coreObject->enterInitializingMode (fedID); });
+          std::async (std::launch::async, [this] () { coreObject->enterInitializingMode (fedID); });
     }
     else if (currentMode == modes::pending_init)
     {
@@ -335,7 +341,7 @@ void Federate::enterExecutingModeAsync (iteration_request iterate)
     {
     case modes::startup:
     {
-        auto eExecFunc = [this, iterate]() {
+        auto eExecFunc = [this, iterate] () {
             coreObject->enterInitializingMode (fedID);
             startupToInitializeStateTransition ();
             return coreObject->enterExecutingMode (fedID, iterate);
@@ -351,7 +357,7 @@ void Federate::enterExecutingModeAsync (iteration_request iterate)
         /* FALLTHROUGH */
     case modes::initializing:
     {
-        auto eExecFunc = [this, iterate]() { return coreObject->enterExecutingMode (fedID, iterate); };
+        auto eExecFunc = [this, iterate] () { return coreObject->enterExecutingMode (fedID, iterate); };
         auto asyncInfo = asyncCallInfo->lock ();
         currentMode = modes::pending_exec;
         asyncInfo->execFuture = std::async (std::launch::async, eExecFunc);
@@ -429,7 +435,7 @@ int32_t Federate::getIntegerProperty (int32_t option) const
 }
 
 void Federate::setLoggingCallback (
-  const std::function<void(int, const std::string &, const std::string &)> &logFunction)
+  const std::function<void (int, const std::string &, const std::string &)> &logFunction)
 {
     coreObject->setLoggingCallback (fedID, logFunction);
 }
@@ -512,7 +518,7 @@ void Federate::finalizeAsync ()
     default:
         break;
     }
-    auto finalizeFunc = [this]() { return coreObject->finalize (fedID); };
+    auto finalizeFunc = [this] () { return coreObject->finalize (fedID); };
     auto asyncInfo = asyncCallInfo->lock ();
     currentMode = modes::pending_finalize;
     asyncInfo->finalizeFuture = std::async (std::launch::async, finalizeFunc);
@@ -635,7 +641,7 @@ void Federate::requestTimeAsync (Time nextInternalTimeStep)
     if (currentMode.compare_exchange_strong (exp, modes::pending_time))
     {
         auto asyncInfo = asyncCallInfo->lock ();
-        asyncInfo->timeRequestFuture = std::async (std::launch::async, [this, nextInternalTimeStep]() {
+        asyncInfo->timeRequestFuture = std::async (std::launch::async, [this, nextInternalTimeStep] () {
             return coreObject->timeRequest (fedID, nextInternalTimeStep);
         });
     }
@@ -652,7 +658,7 @@ void Federate::requestTimeIterativeAsync (Time nextInternalTimeStep, iteration_r
     {
         auto asyncInfo = asyncCallInfo->lock ();
         asyncInfo->timeRequestIterativeFuture =
-          std::async (std::launch::async, [this, nextInternalTimeStep, iterate]() {
+          std::async (std::launch::async, [this, nextInternalTimeStep, iterate] () {
               return coreObject->requestTimeIterative (fedID, nextInternalTimeStep, iterate);
           });
     }
@@ -773,7 +779,7 @@ const std::string emptyStr;
 template <class Inp>
 static void loadOptions (Federate *fed, const Inp &data, Filter &filt)
 {
-    addTargets (data, "flags", [&filt](const std::string &target) {
+    addTargets (data, "flags", [&filt] (const std::string &target) {
         if (target.front () != '-')
         {
             filt.setOption (getOptionIndex (target), true);
@@ -799,8 +805,8 @@ static void loadOptions (Federate *fed, const Inp &data, Filter &filt)
     {
         fed->setInfo (filt.getHandle (), info);
     }
-    auto asrc = [&filt](const std::string &target) { filt.addSourceTarget (target); };
-    auto adest = [&filt](const std::string &target) { filt.addDestinationTarget (target); };
+    auto asrc = [&filt] (const std::string &target) { filt.addSourceTarget (target); };
+    auto adest = [&filt] (const std::string &target) { filt.addDestinationTarget (target); };
     addTargets (data, "targets", asrc);
     addTargets (data, "sourcetargets", asrc);
     addTargets (data, "desttargets", adest);
@@ -842,7 +848,7 @@ void Federate::registerFilterInterfacesJson (const std::string &jsonString)
             loadOptions (this, filt, filter);
             if (cloningflag)
             {
-                addTargets (filt, "delivery", [&filter](const std::string &target) {
+                addTargets (filt, "delivery", [&filter] (const std::string &target) {
                     static_cast<CloningFilter &> (filter).addDeliveryEndpoint (target);
                 });
             }
@@ -954,7 +960,7 @@ void Federate::registerFilterInterfacesToml (const std::string &tomlString)
 
             if (cloningflag)
             {
-                addTargets (filt, "delivery", [&filter](const std::string &target) {
+                addTargets (filt, "delivery", [&filter] (const std::string &target) {
                     static_cast<CloningFilter &> (filter).addDeliveryEndpoint (target);
                 });
             }
@@ -1093,8 +1099,8 @@ std::string Federate::query (const std::string &target, const std::string &query
 
 query_id_t Federate::queryAsync (const std::string &target, const std::string &queryStr)
 {
-    auto queryFut =
-      std::async (std::launch::async, [this, target, queryStr]() { return coreObject->query (target, queryStr); });
+    auto queryFut = std::async (std::launch::async,
+                                [this, target, queryStr] () { return coreObject->query (target, queryStr); });
     auto asyncInfo = asyncCallInfo->lock ();
     int cnt = asyncInfo->queryCounter++;
 
@@ -1104,7 +1110,7 @@ query_id_t Federate::queryAsync (const std::string &target, const std::string &q
 
 query_id_t Federate::queryAsync (const std::string &queryStr)
 {
-    auto queryFut = std::async (std::launch::async, [this, queryStr]() { return query (queryStr); });
+    auto queryFut = std::async (std::launch::async, [this, queryStr] () { return query (queryStr); });
     auto asyncInfo = asyncCallInfo->lock ();
     int cnt = asyncInfo->queryCounter++;
 

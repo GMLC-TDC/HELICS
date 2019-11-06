@@ -19,6 +19,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "PublicationInfo.hpp"
 #include "TimeoutMonitor.h"
 #include "core-exceptions.hpp"
+#include "coreTypeOperations.hpp"
 #include "helics_definitions.hpp"
 #include "loggingHelper.hpp"
 #include "queryHelpers.hpp"
@@ -3731,7 +3732,7 @@ void CommonCore::organizeFilterOperations ()
                     else
                     {
                         // TODO:: this will need some work to finish sorting out but should work for initial tests
-                        if (matchingTypes (fi->allSourceFilters[ii]->inputType, currentType))
+                        if (core::matchingTypes (fi->allSourceFilters[ii]->inputType, currentType))
                         {
                             used[ii] = true;
                             usedMore = true;

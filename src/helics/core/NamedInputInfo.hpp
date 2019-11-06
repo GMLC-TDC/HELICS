@@ -61,7 +61,8 @@ class NamedInputInfo
     std::vector<dataRecord> current_data;  //!< the most recent published data
     std::vector<global_handle> input_sources;  //!< the sources of the input signals
     std::vector<Time> deactivated;
-    std::vector<std::tuple<std::string, std::string,std::string>> source_info;  //!< the name,type,units of the sources
+    std::vector<std::tuple<std::string, std::string, std::string>>
+      source_info;  //!< the name,type,units of the sources
   private:
     std::vector<std::vector<dataRecord>> data_queues;  //!< queue of the data
 
@@ -97,7 +98,10 @@ class NamedInputInfo
     /** get the event based on the event queue*/
     Time nextValueTime () const;
     /** add a new source target to the input*/
-    void addSource (global_handle newSource,const std::string &sourceName, const std::string &stype, const std::string &sunits);
+    void addSource (global_handle newSource,
+                    const std::string &sourceName,
+                    const std::string &stype,
+                    const std::string &sunits);
     /** remove a source */
     void removeSource (global_handle sourceToRemove, Time minTime);
     /** remove a source */

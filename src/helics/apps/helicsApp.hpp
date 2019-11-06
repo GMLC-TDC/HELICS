@@ -7,7 +7,6 @@ SPDX-License-Identifier: BSD-3-Clause
 #pragma once
 
 #include "../application_api/CombinationFederate.hpp"
-#include "json/forwards.h"
 
 namespace CLI
 {
@@ -26,7 +25,7 @@ namespace apps
 @details  the App class is not thread-safe in non-const methods,  don't try to use it from multiple threads without
 external protection, that will result in undefined behavior
 */
-class App
+class HELICS_CXX_EXPORT App
 {
   public:
     /** default constructor*/
@@ -53,6 +52,12 @@ class App
     @param fi  a federate information structure
     */
     App (const std::string &appName, const std::shared_ptr<Core> &core, const FederateInfo &fi);
+    /**constructor taking a federate information structure and using the given coreApp
+    @param appName the name of the application, can be left empty to use a name specified in fi
+    @param core a pointer to core object which the federate can join
+    @param fi  a federate information structure
+    */
+    App (const std::string &appName, CoreApp &core, const FederateInfo &fi);
     /**constructor taking a file with the required information
     @param appName the name of the application, can be left empty to use a name specified in jsonString
     @param jsonString file or JSON string defining the federate information and other configuration
@@ -94,6 +99,7 @@ class App
     bool isActive () const { return !deactivated; }
     /** get a const reference to the federate*/
     const CombinationFederate &accessUnderlyingFederate () const { return *fed; }
+
   protected:
     /** load from a jsonString
     @param jsonString either a JSON filename or a string containing JSON

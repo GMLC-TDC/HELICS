@@ -22,6 +22,8 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "gmlc/utilities/base64.h"
 #include "gmlc/utilities/stringOps.h"
 
+#include "gmlc/utilities/timeStringOps.hpp"
+
 /** test if a string has a base64 wrapper*/
 static int hasB64Wrapper (const std::string &str);
 /** function to decode data strings for messages*/
@@ -82,7 +84,7 @@ std::unique_ptr<helicsCLI11App> Player::generateParser ()
     app
       ->add_option (
         "--datatype",
-        [this](CLI::results_t res) {
+        [this] (CLI::results_t res) {
             defType = helics::getTypeFromString (res[0]);
             return (defType != helics::data_type::helics_custom);
         },
@@ -93,10 +95,10 @@ std::unique_ptr<helicsCLI11App> Player::generateParser ()
     app
       ->add_option (
         "--time_units",
-        [this](CLI::results_t res) {
+        [this] (CLI::results_t res) {
             try
             {
-                units = timeUnitsFromString (res[0]);
+                units = gmlc::utilities::timeUnitsFromString (res[0]);
                 timeMultiplier = toSecondMultiplier (units);
                 return true;
             }
@@ -119,6 +121,11 @@ Player::Player (const std::string &appName, const FederateInfo &fi) : App (appNa
 
 Player::Player (const std::string &appName, const std::shared_ptr<Core> &core, const FederateInfo &fi)
     : App (appName, core, fi)
+{
+    fed->setFlagOption (helics_flag_source_only);
+}
+
+Player::Player (const std::string &appName, CoreApp &core, const FederateInfo &fi) : App (appName, core, fi)
 {
     fed->setFlagOption (helics_flag_source_only);
 }

@@ -20,6 +20,8 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <iostream>
 #include <tuple>
 
+DECLARE_TRIPLINE ()
+
 namespace helics
 {
 std::atomic<bool> LoggingCore::fastShutdown{false};

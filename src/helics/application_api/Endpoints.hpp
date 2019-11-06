@@ -12,7 +12,7 @@ SPDX-License-Identifier: BSD-3-Clause
 namespace helics
 {
 /** class to manage an endpoint */
-class Endpoint
+class HELICS_CXX_EXPORT Endpoint
 {
   private:
     MessageFederate *fed = nullptr;  //!< the MessageFederate to interact with
@@ -154,7 +154,7 @@ class Endpoint
     */
     void send (const Message &mess) const { fed->sendMessage (*this, mess); }
     /** send a pointer to a message object*/
-    void send (std::unique_ptr<Message> mess) const { fed->sendMessage (*this, std::move(mess)); }
+    void send (std::unique_ptr<Message> mess) const { fed->sendMessage (*this, std::move (mess)); }
     /** get an available message if there is no message the returned object is empty*/
     auto getMessage () const { return fed->getMessage (*this); }
     /** check if there is a message available*/

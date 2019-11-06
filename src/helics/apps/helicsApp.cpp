@@ -96,6 +96,11 @@ App::App (const std::string &appName, const std::shared_ptr<Core> &core, const F
 {
 }
 
+App::App (const std::string &appName, CoreApp &core, const FederateInfo &fi)
+    : fed (std::make_shared<CombinationFederate> (appName, core, fi))
+{
+}
+
 App::App (const std::string &appName, const std::string &jsonString)
     : fed (std::make_shared<CombinationFederate> (appName, jsonString))
 {

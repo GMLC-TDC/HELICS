@@ -21,8 +21,6 @@ set(
     EndpointInfo.cpp
     ActionMessage.cpp
     CoreBroker.cpp
-    core-types.cpp
-    core-data.cpp
     TimeCoordinator.cpp
     NetworkCommsInterface.cpp
     ForwardingTimeCoordinator.cpp
@@ -30,13 +28,13 @@ set(
     CommsInterface.cpp
     CommsBroker.cpp
     NetworkBrokerData.cpp
-    helics-time.cpp
     HandleManager.cpp
     FilterCoordinator.cpp
     UnknownHandleManager.cpp
     MessageTimer.cpp
     federate_id.cpp
     TimeoutMonitor.cpp
+	coreTypeOperations.cpp
 )
 
 set(TESTCORE_SOURCE_FILES test/TestBroker.cpp test/TestCore.cpp test/TestComms.cpp)
@@ -95,6 +93,7 @@ set(
 
 set(
     INCLUDE_FILES
+	coreTypeOperations.hpp
     BrokerBase.hpp
     TimeDependencies.hpp
     TimeCoordinator.hpp
@@ -207,56 +206,23 @@ if(ENABLE_MPI_CORE)
     list(APPEND INCLUDE_FILES ${MPI_HEADER_FILES})
 endif(ENABLE_MPI_CORE)
 
-add_library(helics_core OBJECT ${SRC_FILES} ${INCLUDE_FILES} ${PUBLIC_INCLUDE_FILES})
+add_library(helics_core STATIC ${SRC_FILES} ${INCLUDE_FILES} ${PUBLIC_INCLUDE_FILES})
 
-target_include_directories(
-    helics_core
-    PRIVATE $<TARGET_PROPERTY:helics_base_includes,INTERFACE_INCLUDE_DIRECTORIES>
-)
-target_include_directories(
-    helics_core SYSTEM
-    PRIVATE
-        $<TARGET_PROPERTY:helics_base_includes,INTERFACE_SYSTEM_INCLUDE_DIRECTORIES>
-)
-target_compile_definitions(
-    helics_core PRIVATE
-    $<TARGET_PROPERTY:helics_base_includes,INTERFACE_COMPILE_DEFINITIONS>
-)
-target_compile_definitions(helics_core PRIVATE BOOST_DATE_TIME_NO_LIB)
-target_compile_options(
-    helics_core
-    PRIVATE $<TARGET_PROPERTY:helics_base_includes,INTERFACE_COMPILE_OPTIONS>
-)
-
-target_compile_options(
-    helics_core
-    PRIVATE $<TARGET_PROPERTY:compile_flags_target,INTERFACE_COMPILE_OPTIONS>
-)
+target_link_libraries(helics_core PUBLIC helics_common PRIVATE fmt::fmt compile_flags_target)
 
 if(TARGET Boost::boost)
-    target_include_directories(
-        helics_core SYSTEM
-        PRIVATE $<TARGET_PROPERTY:Boost::boost,INTERFACE_SYSTEM_INCLUDE_DIRECTORIES>
-    )
+	target_compile_definitions(helics_core PRIVATE BOOST_DATE_TIME_NO_LIB)
+	target_link_libraries(helics_core PRIVATE Boost::boost)
 endif()
-
-target_include_directories(
-    helics_core SYSTEM
-    PRIVATE $<TARGET_PROPERTY:fmt::fmt-header-only,INTERFACE_INCLUDE_DIRECTORIES>
-)
-target_compile_definitions(
-    helics_core PRIVATE
-    $<TARGET_PROPERTY:fmt::fmt-header-only,INTERFACE_COMPILE_DEFINITIONS>
-)
 
 if(ENABLE_MPI_CORE)
     source_group("mpi" FILES ${MPI_SOURCE_FILES} ${MPI_HEADER_FILES})
 endif(ENABLE_MPI_CORE)
 
 if(ENABLE_ZMQ_CORE)
-    target_include_directories(
-        helics_core SYSTEM
-        PRIVATE $<TARGET_PROPERTY:${ZeroMQ_DEPENDENCY},INTERFACE_INCLUDE_DIRECTORIES>
+    target_link_libraries(
+        helics_core PRIVATE
+        ${ZeroMQ_DEPENDENCY}
     )
     source_group("zmq" FILES ${ZMQ_SOURCE_FILES} ${ZMQ_HEADER_FILES})
 endif(ENABLE_ZMQ_CORE)
@@ -290,18 +256,14 @@ if(ENABLE_MPI_CORE)
     )
 endif(ENABLE_MPI_CORE)
 
-if(NOT HELICS_BINARY_ONLY_INSTALL)
-    if(HELICS_INSTALL_CPP14_HEADERS)
-        install(
-            FILES ${PUBLIC_INCLUDE_FILES}
-            DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/helics/core
-            COMPONENT headers
-        )
+add_library(HELICS::ccore ALIAS helics_core)
 
-        install(
-            FILES ../helics_enums.h
-            DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/helics
-            COMPONENT headers
-        )
-    endif()
-endif()
+target_compile_options(
+        helics_core
+        PRIVATE
+            $<$<COMPILE_LANGUAGE:CXX>:$<$<NOT:$<CXX_COMPILER_ID:MSVC>>:-Wno-strict-aliasing>>
+    )
+
+
+#adding a definition flag for some interaction with the shared library
+target_compile_definitions(helics_core PUBLIC HELICS_STATIC_CORE_LIBRARY)

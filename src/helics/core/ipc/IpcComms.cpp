@@ -150,7 +150,7 @@ DISCONNECT_RX_QUEUE:
     }
     catch (boost::interprocess::interprocess_exception const &ipe)
     {
-        logError (std::string("error changing states:")+ipe.what());
+        logError (std::string ("error changing states:") + ipe.what ());
     }
     setRxStatus (connection_status::terminated);
 }

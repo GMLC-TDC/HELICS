@@ -53,57 +53,22 @@ if(ENABLE_ZMQ_CORE)
     list(APPEND common_sources ${zmq_sources})
 endif(ENABLE_ZMQ_CORE)
 
-add_library(helics_common OBJECT ${common_sources} ${common_headers})
+add_library(helics_common STATIC ${common_sources} ${common_headers})
 set_target_properties(helics_common PROPERTIES LINKER_LANGUAGE CXX)
 
-target_include_directories(
-    helics_common
-    PRIVATE $<TARGET_PROPERTY:helics_base_includes,INTERFACE_INCLUDE_DIRECTORIES>
-)
-target_include_directories(
-    helics_common SYSTEM
-    PRIVATE
-        $<TARGET_PROPERTY:helics_base_includes,INTERFACE_SYSTEM_INCLUDE_DIRECTORIES>
-)
-target_compile_definitions(
-    helics_common PRIVATE
-    $<TARGET_PROPERTY:helics_base_includes,INTERFACE_COMPILE_DEFINITIONS>
-)
+target_link_libraries(helics_common PUBLIC helics_base build_flags_target PRIVATE compile_flags_target)
+target_link_libraries(helics_common PUBLIC HELICS::jsoncpp_lib HELICS::utilities HELICS::units) 
 
 if(TARGET Boost::boost)
-    target_include_directories(
-        helics_common SYSTEM
-        PRIVATE $<TARGET_PROPERTY:Boost::boost,INTERFACE_SYSTEM_INCLUDE_DIRECTORIES>
-    )
+   target_link_libraries(helics_common PRIVATE Boost::boost)
 endif()
 
-target_compile_options(
-    helics_common
-    PRIVATE $<TARGET_PROPERTY:helics_base_includes,INTERFACE_COMPILE_OPTIONS>
-)
-
-target_compile_options(
-    helics_common
-    PRIVATE $<TARGET_PROPERTY:compile_flags_target,INTERFACE_COMPILE_OPTIONS>
-)
-
 if(ENABLE_ZMQ_CORE)
-    target_include_directories(
-        helics_common SYSTEM
-        PRIVATE $<TARGET_PROPERTY:${ZeroMQ_DEPENDENCY},INTERFACE_INCLUDE_DIRECTORIES>
-    )
+   target_link_libraries(helics_common PRIVATE ${ZeroMQ_DEPENDENCY})
 endif(ENABLE_ZMQ_CORE)
 
 if(APPLE)
     target_compile_definitions(helics_common PUBLIC "-DSTX_NO_STD_ANY=1")
 endif(APPLE)
 
-if(NOT HELICS_BINARY_ONLY_INSTALL)
-    if(HELICS_INSTALL_CPP14_HEADERS)
-        install(
-            FILES ${helics_public_common}
-            DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/helics/common
-            COMPONENT headers
-        )
-    endif()
-endif()
+add_library(HELICS::common ALIAS helics_common)

@@ -133,6 +133,13 @@ extern "C"
     HELICS_EXPORT void
     helicsBrokerAddDestinationFilterToEndpoint (helics_broker broker, const char *filter, const char *endpoint, helics_error *err);
 
+	/** load a file containing connection information
+    @param broker the broker to generate the connections from
+    @param file a JSON or TOML file containing connection information
+    @param[in,out] err a helics_error object, can be NULL if the errors are to be ignored*/
+    HELICS_EXPORT void
+    helicsBrokerMakeConnections (helics_broker broker, const char *file, helics_error *err);
+
     /** wait for the core to disconnect
   @param core the core to wait for
   @param msToWait the time out in millisecond (<0 for infinite timeout)
@@ -174,6 +181,13 @@ extern "C"
     @param[in,out] err a helics_error object, can be NULL if the errors are to be ignored*/
     HELICS_EXPORT void
     helicsCoreAddDestinationFilterToEndpoint (helics_core core, const char *filter, const char *endpoint, helics_error *err);
+
+
+	/** load a file containing connection information
+    @param core the core to generate the connections from
+    @param file a JSON or TOML file containing connection information
+    @param[in,out] err a helics_error object, can be NULL if the errors are to be ignored*/
+    HELICS_EXPORT void helicsCoreMakeConnections (helics_core core, const char *file, helics_error *err);
 
     /** get an identifier for the broker
     @param broker the broker to query

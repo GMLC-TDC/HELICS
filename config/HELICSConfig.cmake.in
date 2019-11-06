@@ -2,15 +2,20 @@
 # This module sets the following variables in your project::
 #
 #   HELICS_FOUND - true if HELICS found on the system
-#   HELICS_INCLUDE_DIR - the directory containing HELICS headers
+#   HELICS_INCLUDE_DIR - the directory containing HELICS headers for the C shared library if available
 #   HELICS_C_SHARED_LIBRARY - the C shared library
 # 	HELICS_CXX_SHARED_LIBRARY -the C++ shared library
-#   HELICS_STATIC_LIBRARY -the static Library
-# 	HELICS_DEPENDENCIES -- list of dependencies in the helics project
-#   HELICS_PLAYER -- the player executable
-#  	HELICS_RECORDER -- the recorder executable
-#   HELICS_APP  -- the helics app executable
-#   HELICS_BROKER -- the helics broker executable
+#   It also creates the following targets if they are available (not all are always built depending on the configuration)
+#   HELICS::helicsSharedLib for the C based shared library
+#   HELICS::helics-shared for C++ based shared libary
+#   HELICS::cpp98 for the C++98 header only library wrapper for the C shared library
+#   HELICS::helics_player is an execuable target for the HELICS player
+#   HELICS::helics_broker is an executable target for the helics broker executable
+#   HELICS::helics_recorder is an executable target for the helics_recorder executable
+#   HELICS::helics_app is an executable target for the helics_app executable
+#   HELICS::helics_broker_server is an executable target for the helics_broker_server executable
+#   HELICS::helics-config is a an executable target for the helics-config application
+
 @PACKAGE_INIT@
 
 set(PN HELICS)
@@ -19,86 +24,7 @@ set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_LIST_DIR})
 
 include(CMakeFindDependencyMacro)
 
-if (@ENABLE_ZMQ_CORE@)
-    if (NOT @ZMQ_LOCAL_BUILD@)
-        set(ZeroMQ_LIBRARY_ONLY ON)
-        if(NOT ZeroMQ_INSTALL_PATH)
-            if(ENV{ZeroMQ_INSTALL_PATH})
-                set(ZeroMQ_INSTALL_PATH $ENV{ZeroMQ_INSTALL_PATH})
-            endif()
-        endif()
-        # If ZeroMQ wasn't installed with this copy of HELICS, search for a system copy 
-        if (NOT ZeroMQ_FOUND)
-            unset(ZeroMQ_LIBRARY_PATH)
-            find_dependency(ZeroMQ)
-        endif()
-    endif()
-endif()
-
-if (@ENABLE_MPI_CORE@)
-    if (NOT TARGET MPI::MPI_C)
-        include(${CMAKE_CURRENT_LIST_DIR}/addMPI.cmake)
-    endif()
-endif()
-
-if (NOT TARGET Threads::Threads)
-    if (NOT WIN32)
-        set(THREADS_PREFER_PTHREAD_FLAG ON)
-    elseif (MSYS)
-        set(THREADS_PREFER_PTHREAD_FLAG ON)
-    endif()
-    find_dependency(Threads REQUIRED)
-endif()
-
 include(${CMAKE_CURRENT_LIST_DIR}/helics-targets.cmake)
-
-if (@ENABLE_ZMQ_CORE@)
-if (NOT TARGET @ZeroMQ_DEPENDENCY@ AND NOT TARGET HELICS::@ZeroMQ_DEPENDENCY@)
-
-message(STATUS "checking for ${PACKAGE_PREFIX_DIR}/@CMAKE_INSTALL_LIBDIR@/cmake/ZeroMQ/ZeroMQConfig.cmake")
-    if (EXISTS ${PACKAGE_PREFIX_DIR}/@CMAKE_INSTALL_LIBDIR@/cmake/ZeroMQ/ZeroMQConfig.cmake)
-        include(${PACKAGE_PREFIX_DIR}/@CMAKE_INSTALL_LIBDIR@/cmake/ZeroMQ/ZeroMQConfig.cmake)
-        message(STATUS "loading ZeroMQConfig")
-    else()
-    message(STATUS "finding ZMQ_PACKAGE")
-        unset(ZeroMQ_LIBRARY_ONLY)
-        find_package(ZeroMQ)
-    endif()
-endif()
-endif()
-
-if (NOT TARGET HELICS::jsoncpp_headers)
-    add_library(HELICS::jsoncpp_headers INTERFACE IMPORTED)
-    set_target_properties(HELICS::jsoncpp_headers PROPERTIES
-       INTERFACE_LINK_LIBRARIES "HELICS::jsoncpp_lib"
-    )
-endif()
-
-if (NOT TARGET HELICS::utilities)
-    add_library(HELICS::utilities INTERFACE IMPORTED )
-    set_target_properties(HELICS::utilities PROPERTIES
-       INTERFACE_INCLUDE_DIRECTORIES ${CMAKE_CURRENT_LIST_DIR}/../../../@CMAKE_INSTALL_INCLUDEDIR@/helics/
-    )
-    if (TARGET HELICS::helics-static)
-        set_target_properties(HELICS::utilities PROPERTIES
-           INTERFACE_LINK_LIBRARIES "HELICS::helics-static"
-        )
-    endif()
-else()
-set_target_properties(HELICS::utilities PROPERTIES
-       INTERFACE_INCLUDE_DIRECTORIES ${CMAKE_CURRENT_LIST_DIR}/../../../@CMAKE_INSTALL_INCLUDEDIR@/helics/
-    )
-endif()
-if (NOT EXISTS ${CMAKE_CURRENT_LIST_DIR}/../../../@CMAKE_INSTALL_INCLUDEDIR@/helics/utilities)
-    set_property(TARGET HELICS::utilities APPEND PROPERTY
-            INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_CURRENT_LIST_DIR}/../ThirdParty/utilities/gmlc/"
-        )
-endif()
-
-
-check_required_components(${PN})
-
-get_target_property(${PN}_INCLUDE_DIRS HELICS::helics_base_includes INTERFACE_INCLUDE_DIRECTORIES)
 
 if (NOT @HELICS_DISABLE_C_SHARED_LIB@)
     get_target_property(${PN}_C_SHARED_LIBRARY HELICS::helicsSharedLib LOCATION)
@@ -106,99 +32,14 @@ endif()
 
 if (@HELICS_BUILD_CXX_SHARED_LIB@)
     get_target_property(${PN}_CXX_SHARED_LIBRARY HELICS::helics-shared LOCATION)
-    if (EXISTS ${CMAKE_CURRENT_LIST_DIR}/include)
-        set_property(TARGET HELICS::helics-shared APPEND PROPERTY
-            INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_CURRENT_LIST_DIR}/include"
-        )
-    endif()
-    if (NOT EXISTS ${CMAKE_CURRENT_LIST_DIR}/../../../@CMAKE_INSTALL_INCLUDEDIR@/helics/utilities)
-        set_property(TARGET HELICS::helics-shared APPEND PROPERTY
-            INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_CURRENT_LIST_DIR}/../ThirdParty/utilities/gmlc/utilities/"
-        )
-    endif()
-
 endif()
 
-if (TARGET HELICS::helics-static)
-    get_target_property(${PN}_STATIC_LIBRARY HELICS::helics-static LOCATION)
-    if (EXISTS ${CMAKE_CURRENT_LIST_DIR}/include)
-        set_property(TARGET HELICS::helics-static  APPEND PROPERTY
-                INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_CURRENT_LIST_DIR}/include"
-            )
-    endif()
-    if (NOT EXISTS ${CMAKE_CURRENT_LIST_DIR}/../../../@CMAKE_INSTALL_INCLUDEDIR@/helics/utilities)
-        set_property(TARGET HELICS::helics-static APPEND PROPERTY
-                INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_CURRENT_LIST_DIR}/../ThirdParty/utilities/gmlc/utilities/"
-        )
-    endif()
+if (NOT @HELICS_DISABLE_C_SHARED_LIB@)
+	get_target_property(${PN}_INCLUDE_DIRS HELICS::helicsSharedLib INTERFACE_INCLUDE_DIRECTORIES)
+	message(STATUS "HELICS_INCLUDE DIR HELICS: ${HELICS_INCLUDE_DIR}")
+    message(STATUS "HELICS_C_SHARED_LIBRARY: ${HELICS_C_SHARED_LIBRARY}")
 endif()
 
-
-message(STATUS "INCLUDE DIRS HELICS: ${HELICS_INCLUDE_DIRS}")
-message(STATUS "C_SHARED_LIBRARY: ${HELICS_C_SHARED_LIBRARY}")
-
-#load some variables with the locations the different executables
-if (@HELICS_BUILD_APP_EXECUTABLES@)
-
-    if (EXISTS ${CMAKE_CURRENT_LIST_DIR}/include)
-        set_property(TARGET HELICS::helics_apps  APPEND PROPERTY
-            INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_CURRENT_LIST_DIR}/include"
-        )
-    endif()
-    if (NOT EXISTS ${CMAKE_CURRENT_LIST_DIR}/../../../@CMAKE_INSTALL_INCLUDEDIR@/helics/utilities)
-        set_property(TARGET HELICS::helics_apps APPEND PROPERTY
-            INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_CURRENT_LIST_DIR}/../ThirdParty/utilities/gmlc/utilities"
-        )
-    endif()
-
-get_target_property(HELICS_APPLIB_LOCATION HELICS::helics_apps LOCATION)
-get_filename_component(APP_CHECK_LOC "${HELICS_APPLIB_LOCATION}" PATH)
-get_filename_component(APP_CHECK_LOC2 "${APP_CHECK_LOC}" PATH)
-
-find_program(HELICS_PLAYER helics_player 
-    PATHS ${PACKAGE_PREFIX_DIR}/@CMAKE_INSTALL_BINDIR@ 
-    ${APP_CHECK_LOC}
-    ${APP_CHECK_LOC2}
-    PATH_SUFFIXES Release @CMAKE_INSTALL_BINDIR@ Debug
-    NO_CMAKE_PATH
-    NO_CMAKE_ENVIRONMENT_PATH
-    NO_CMAKE_SYSTEM_PATH
-    )
-    
-    
-find_program(HELICS_RECORDER helics_recorder 
-    PATHS ${PACKAGE_PREFIX_DIR}/@CMAKE_INSTALL_BINDIR@
-    ${APP_CHECK_LOC}
-    ${APP_CHECK_LOC2}
-    PATH_SUFFIXES Release @CMAKE_INSTALL_BINDIR@ Debug
-    NO_CMAKE_PATH
-    NO_CMAKE_ENVIRONMENT_PATH
-    NO_CMAKE_SYSTEM_PATH
-    )
-    
-find_program(HELICS_APP helics_app 
-    PATHS ${PACKAGE_PREFIX_DIR}/@CMAKE_INSTALL_BINDIR@
-    ${APP_CHECK_LOC}
-    ${APP_CHECK_LOC2}
-    PATH_SUFFIXES Release @CMAKE_INSTALL_BINDIR@ Debug
-    NO_CMAKE_PATH
-    NO_CMAKE_ENVIRONMENT_PATH
-    NO_CMAKE_SYSTEM_PATH
-    )
-    
-find_program(HELICS_BROKER helics_broker 
-    PATHS ${PACKAGE_PREFIX_DIR}/@CMAKE_INSTALL_BINDIR@
-    ${APP_CHECK_LOC}
-    ${APP_CHECK_LOC2}
-    PATH_SUFFIXES Release @CMAKE_INSTALL_BINDIR@ Debug
-    NO_CMAKE_PATH
-    NO_CMAKE_ENVIRONMENT_PATH
-    NO_CMAKE_SYSTEM_PATH
-    )
-    
-    unset(HELICS_APPLIB_LOCATION)
-    unset(APP_CHECK_LOC)
-    unset(APP_CHECK_LOC2)
-endif()  #HELICS_BUILD_APP_EXECUTABLES
+check_required_components(${PN})
 
 set(CMAKE_MODULE_PATH ${SAVED_PARENT_CMAKE_MODULE_PATH})

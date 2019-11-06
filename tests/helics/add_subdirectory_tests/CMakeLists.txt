@@ -16,7 +16,7 @@ add_subdirectory(../../.. helics)
 
 # Test the CXX static library target
 add_executable(static-library-test main.cpp)
-target_link_libraries(static-library-test HELICS::helics-static)
+target_link_libraries(static-library-test HELICS::application_api)
 
 # Test the CXX shared library target
 if(HELICS_BUILD_CXX_SHARED_LIB)
@@ -37,5 +37,5 @@ endif()
 # Test the helics_app static library target
 if(HELICS_BUILD_APP_LIBRARY)
     add_executable(apps-library-test main-apps.cpp)
-    target_link_libraries(apps-library-test HELICS::helics_apps)
+    target_link_libraries(apps-library-test HELICS::apps)
 endif()

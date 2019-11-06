@@ -186,7 +186,7 @@ class CoreBroker : public Broker, public BrokerBase
     virtual bool isOpenToNewFederates () const override;
 
     virtual void setLoggingCallback (
-      const std::function<void(int, const std::string &, const std::string &)> &logFunction) override final;
+      const std::function<void (int, const std::string &, const std::string &)> &logFunction) override final;
 
     virtual bool
     waitForDisconnect (std::chrono::milliseconds msToWait = std::chrono::milliseconds (0)) const override final;

@@ -13,12 +13,12 @@ SPDX-License-Identifier: BSD-3-Clause
 namespace units
 {
 class precise_unit;
-} // namespace units
+}  // namespace units
 
 namespace helics
 {
 /** base class for a input object*/
-class Input
+class HELICS_CXX_EXPORT Input
 {
   protected:
     ValueFederate *fed = nullptr;  //!< reference to the value federate
@@ -162,13 +162,13 @@ class Input
     */
     void registerNotificationCallback (std::function<void (Time)> callback)
     {
-        fed->setInputNotificationCallback (*this,
-                                           [this, callback = std::move (callback)] (const Input & /*inp*/, Time time) {
-                                               if (isUpdated ())
-                                               {
-                                                   callback (time);
-                                               }
-                                           });
+        fed->setInputNotificationCallback (*this, [this, callback = std::move (callback)] (const Input & /*inp*/,
+                                                                                           Time time) {
+            if (isUpdated ())
+            {
+                callback (time);
+            }
+        });
     }
     /** get the Name/Key for the input
     @details the name is the local name if given, key is the full key name*/
@@ -396,9 +396,9 @@ class Input
 };
 
 /** convert a dataview to a double and do a unit conversion if appropriate*/
-double doubleExtractAndConvert (const data_view &dv,
-                                const std::shared_ptr<units::precise_unit> &inputUnits,
-                                const std::shared_ptr<units::precise_unit> &outputUnits);
+HELICS_CXX_EXPORT double doubleExtractAndConvert (const data_view &dv,
+                                                  const std::shared_ptr<units::precise_unit> &inputUnits,
+                                                  const std::shared_ptr<units::precise_unit> &outputUnits);
 
 /** class to handle an input and extract a specific type
 @tparam X the class of the value associated with a input*/

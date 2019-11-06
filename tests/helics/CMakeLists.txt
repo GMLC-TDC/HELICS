@@ -16,7 +16,7 @@ add_library(helics_test_base INTERFACE)
 target_link_libraries(helics_test_base INTERFACE gtest gtest_main gmock)
 target_link_libraries(
     helics_test_base
-    INTERFACE helics_base_includes compile_flags_target
+    INTERFACE compile_flags_target
 )
 
 add_subdirectory(core)
@@ -50,9 +50,7 @@ add_test(
     "-DHELICS_DIR=${PROJECT_BINARY_DIR}"
     "-DHELICS_BUILD_CXX_SHARED_LIB=${HELICS_BUILD_CXX_SHARED_LIB}"
     "-DHELICS_DISABLE_C_SHARED_LIB=${HELICS_DISABLE_C_SHARED_LIB}"
-    "-DHELICS_BUILD_APP_LIBRARY=${HELICS_BUILD_APP_LIBRARY}"
-    "-DZeroMQ_INSTALL_PATH=${ZeroMQ_INSTALL_PATH}"
-    "-DBOOST_INSTALL_PATH=${BOOST_INSTALL_PATH}"
+	"-DHELICS_BUILD_APP_LIBRARY=${HELICS_BUILD_APP_LIBRARY}"
     "-DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}"
     "-DCMAKE_CXX_STANDARD=${CMAKE_CXX_STANDARD}"
 )

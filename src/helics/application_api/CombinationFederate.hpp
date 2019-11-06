@@ -13,7 +13,7 @@ SPDX-License-Identifier: BSD-3-Clause
 namespace helics
 {
 /** class defining a federate that can use both the value and message interfaces */
-class CombinationFederate : public ValueFederate, public MessageFederate
+class HELICS_CXX_EXPORT CombinationFederate : public ValueFederate, public MessageFederate
 {
   public:
     /** default constructor*/
@@ -29,6 +29,13 @@ class CombinationFederate : public ValueFederate, public MessageFederate
     @param fi  a federate information structure
     */
     CombinationFederate (const std::string &fedName, const std::shared_ptr<Core> &core, const FederateInfo &fi);
+
+    /**constructor taking a federate information structure and using the given CoreApp
+    @param fedName the name of the federate, may be left empty to use a default or one found in fi
+    @param core a pointer to core object which the federate can join
+    @param fi  a federate information structure
+    */
+    CombinationFederate (const std::string &fedName, CoreApp &core, const FederateInfo &fi);
     /**constructor taking a file with the required information
     @param configString a file or formatted String defining the federate information
     */

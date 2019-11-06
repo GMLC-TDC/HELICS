@@ -6,8 +6,8 @@ SPDX-License-Identifier: BSD-3-Clause
 */
 
 #include "HelicsPrimaryTypes.hpp"
+#include "../utilities/timeStringOps.hpp"
 #include "ValueConverter.hpp"
-
 #include <set>
 namespace helics
 {
@@ -453,7 +453,7 @@ void valueExtract (const defV &dv, Time &val)
             }
             else
             {
-                val = loadTimeFromString (mpark::get<std::string> (dv));
+                val = gmlc::utilities::loadTimeFromString<helics::Time> (mpark::get<std::string> (dv));
             }
         }
         catch (...)
@@ -910,7 +910,7 @@ void valueExtract (const data_view &dv, data_type baseType, Time &val)
             }
             else
             {
-                val = loadTimeFromString (dv.string ());
+                val = gmlc::utilities::loadTimeFromString<helics::Time> (dv.string ());
             }
         }
         catch (...)

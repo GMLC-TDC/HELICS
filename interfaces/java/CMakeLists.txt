@@ -23,7 +23,7 @@ else()
         set_property(SOURCE helicsJava.i PROPERTY SWIG_MODULE_NAME JNIhelics)
 
         set(CMAKE_SWIG_FLAGS "-package;com.java.helics")
-        if(${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION} VERSION_GREATER 3.7)
+        if(CMAKE_VERSION VERSION_GREATER 3.7)
             swig_add_library(
                 JNIhelics
                 TYPE

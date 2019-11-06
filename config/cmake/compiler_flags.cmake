@@ -51,6 +51,10 @@ if(NOT TARGET compile_flags_target)
     add_library(compile_flags_target INTERFACE)
 endif()
 
+if (NOT TARGET build_flags_target)
+	add_library(build_flags_target INTERFACE)
+endif()
+
 target_compile_options(
     compile_flags_target
     INTERFACE
@@ -80,17 +84,14 @@ if(${PROJECT_NAME}_ENABLE_EXTRA_COMPILER_WARNINGS)
     )
     target_compile_options(
         compile_flags_target
-        INTERFACE $<$<COMPILE_LANGUAGE:CXX>:$<$<CXX_COMPILER_ID:GNU>:-Wcast-align>>
+        INTERFACE $<$<COMPILE_LANGUAGE:CXX>:$<$<CXX_COMPILER_ID:GNU>:-Wcast-align -Wlogical-op>>
     )
     # target_compile_options(compile_flags_target INTERFACE
     # $<$<COMPILE_LANGUAGE:CXX>:-Wredundant-decls>)
     # target_compile_options(compile_flags_target INTERFACE
     # $<$<COMPILE_LANGUAGE:CXX>:-Wstrict-overflow=5>)
 
-    target_compile_options(
-        compile_flags_target
-        INTERFACE $<$<COMPILE_LANGUAGE:CXX>:$<$<CXX_COMPILER_ID:GNU>:-Wlogical-op>>
-    )
+   
     # this option produces a number of warnings in third party libraries
     # target_compile_options(compile_flags_target INTERFACE
     # $<$<COMPILE_LANGUAGE:CXX>:$<$<CXX_COMPILER_ID:GNU>:-Wold-style-cast>>) this
@@ -139,12 +140,17 @@ if(MSVC)
 
     target_compile_options(
         compile_flags_target
-        INTERFACE -D_CRT_SECURE_NO_WARNINGS -D_SCL_SECURE_NO_WARNINGS
+        INTERFACE -D_CRT_SECURE_NO_WARNINGS -D_SCL_SECURE_NO_WARNINGS /MP
     )
     # these next two should be global
-    add_compile_options(/MP /EHsc)
+    add_compile_options(/EHsc /MP)
+    target_compile_options(build_flags_target INTERFACE /EHsc)
+	
+	if (CMAKE_VERSION VERSION_GREATER 3.13.0)
+	   target_link_options(compile_flags_target INTERFACE /debug:fastlink)
+	endif()
     if(${PROJECT_NAME}_ENABLE_EXTRA_COMPILER_WARNINGS)
-        target_compile_options(compile_flags_target INTERFACE /W4 /sdl /wd4244)
+        target_compile_options(compile_flags_target INTERFACE /W4 /sdl /wd4244 )
     endif(${PROJECT_NAME}_ENABLE_EXTRA_COMPILER_WARNINGS)
 	get_win32_winnt(COPTION_WIN32_WINNT_DEFAULT)
     target_compile_options(compile_flags_target INTERFACE "-D_WIN32_WINNT=${COPTION_WIN32_WINNT_DEFAULT}")
@@ -160,10 +166,46 @@ else(MSVC)
         add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-stdlib=libc++>)
         link_libraries("-stdlib=libc++")
         link_libraries("c++abi")
+        target_compile_options(build_flags_target INTERFACE $<$<COMPILE_LANGUAGE:CXX>:-stdlib=libc++>)
+        target_link_libraries(build_flags_target INTERFACE "-stdlib=libc++")
+        target_link_libraries(build_flags_target INTERFACE "c++abi")
     endif(USE_LIBCXX)
+endif()
+
+## remove potential duplicates from the flags
+
+get_target_property(compile_flags_list compile_flags_target INTERFACE_COMPILE_OPTIONS)
+list(REMOVE_DUPLICATES compile_flags_list)
+set_property(TARGET compile_flags_target PROPERTY INTERFACE_COMPILE_OPTIONS ${compile_flags_list})
+
+get_target_property(link_flags_list compile_flags_target INTERFACE_LINK_OPTIONS)
+if (link_flags_list)
+    list(REMOVE_DUPLICATES link_flags_list)
+    set_property(TARGET compile_flags_target PROPERTY INTERFACE_LINK_OPTIONS ${link_flags_list})
 endif()
 
 # -------------------------------------------------------------
 # Check and set latest CXX Standard supported by compiler
 # -------------------------------------------------------------
 include(CheckLatestCXXStandardOption)
+
+message(
+        STATUS "setting helics C++ standard build option to \"${CXX_STANDARD_FLAG}\""
+    )
+if(CXX_STANDARD_FLAG)
+   if(MSVC)
+       add_compile_options(${CXX_STANDARD_FLAG})
+       target_compile_options(build_flags_target INTERFACE ${CXX_STANDARD_FLAG})
+   else(MSVC)
+       add_compile_options($<$<COMPILE_LANGUAGE:CXX>:${CXX_STANDARD_FLAG}>)
+       target_compile_options(
+           build_flags_target
+           INTERFACE $<$<COMPILE_LANGUAGE:CXX>:${CXX_STANDARD_FLAG}>
+       )
+   endif(MSVC)
+endif(CXX_STANDARD_FLAG)
+
+## remove potential duplicates from the flags
+get_target_property(build_flags_list build_flags_target INTERFACE_COMPILE_OPTIONS)
+list(REMOVE_DUPLICATES build_flags_list)
+set_property(TARGET build_flags_target PROPERTY INTERFACE_COMPILE_OPTIONS ${build_flags_list})

@@ -14,28 +14,29 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "gmlc/concurrency/SearchableObjectHolder.hpp"
 #include "gmlc/concurrency/TripWire.hpp"
 #include "helics/helics-config.h"
+
 #ifdef ENABLE_ZMQ_CORE
-#include "zmq/ZmqBroker.h"
+#    include "zmq/ZmqBroker.h"
 #endif
 
 #ifdef ENABLE_MPI_CORE
-#include "mpi/MpiBroker.h"
+#    include "mpi/MpiBroker.h"
 #endif
 
 #ifdef ENABLE_TEST_CORE
-#include "test/TestBroker.h"
+#    include "test/TestBroker.h"
 #endif
 
 #ifdef ENABLE_IPC_CORE
-#include "ipc/IpcBroker.h"
+#    include "ipc/IpcBroker.h"
 #endif
 
 #ifdef ENABLE_UDP_CORE
-#include "udp/UdpBroker.h"
+#    include "udp/UdpBroker.h"
 #endif
 
 #ifdef ENABLE_TCP_CORE
-#include "tcp/TcpBroker.h"
+#    include "tcp/TcpBroker.h"
 #endif
 
 #ifdef ENABLE_INPROC_CORE
@@ -56,15 +57,15 @@ std::shared_ptr<Broker> makeBroker (core_type type, const std::string &name)
 #ifdef ENABLE_ZMQ_CORE
         type = core_type::ZMQ;
 #else
-#ifdef ENABLE_TCP_CORE
+#    ifdef ENABLE_TCP_CORE
         type = core_type::TCP;
-#else
-#ifdef ENABLE_MPI_CORE
+#    else
+#        ifdef ENABLE_MPI_CORE
         type = core_type::MPI;
-#else
+#        else
         type = core_type::UDP;
-#endif
-#endif
+#        endif
+#    endif
 #endif
     }
 

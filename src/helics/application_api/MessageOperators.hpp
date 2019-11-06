@@ -6,11 +6,11 @@ SPDX-License-Identifier: BSD-3-Clause
 */
 #pragma once
 
-#include <atomic>
-#include <functional>
-
 #include "../core/core-data.hpp"
 #include "data_view.hpp"
+#include "helics_cxx_export.h"
+#include <atomic>
+#include <functional>
 /** @file
 @brief define helper classes to scope filter operations
 */
@@ -18,7 +18,7 @@ SPDX-License-Identifier: BSD-3-Clause
 namespace helics
 {
 /** class defining an message operator that operates purely on the time aspect of a message*/
-class MessageTimeOperator : public FilterOperator
+class HELICS_CXX_EXPORT MessageTimeOperator : public FilterOperator
 {
   public:
     /** default constructor*/
@@ -34,7 +34,7 @@ class MessageTimeOperator : public FilterOperator
 };
 
 /** class defining an message operator that operates purely on the destination aspect of a message*/
-class MessageDestOperator : public FilterOperator
+class HELICS_CXX_EXPORT MessageDestOperator : public FilterOperator
 {
   public:
     /** default constructor*/
@@ -52,7 +52,7 @@ class MessageDestOperator : public FilterOperator
 };
 
 /** class defining an message operator that operates purely on the data aspect of a message*/
-class MessageDataOperator : public FilterOperator
+class HELICS_CXX_EXPORT MessageDataOperator : public FilterOperator
 {
   public:
     /** default constructor*/
@@ -71,18 +71,18 @@ class MessageDataOperator : public FilterOperator
 @details  the evaluation function used should return true if the message should be allowed through
 false if it should be dropped
 */
-class MessageConditionalOperator : public FilterOperator
+class HELICS_CXX_EXPORT MessageConditionalOperator : public FilterOperator
 {
   public:
     /** default constructor*/
     MessageConditionalOperator () = default;
     /** set the function to modify the data of the message in the constructor*/
-    explicit MessageConditionalOperator (std::function<bool(const Message *)> userConditionalFunction);
+    explicit MessageConditionalOperator (std::function<bool (const Message *)> userConditionalFunction);
     /** set the function to modify the data of the message*/
-    void setConditionFunction (std::function<bool(const Message *)> userConditionFunction);
+    void setConditionFunction (std::function<bool (const Message *)> userConditionFunction);
 
   private:
-    std::function<bool(const Message *)> evalFunction;  //!< the function actually doing the processing
+    std::function<bool (const Message *)> evalFunction;  //!< the function actually doing the processing
     virtual std::unique_ptr<Message> process (std::unique_ptr<Message> message) override;
 };
 
@@ -90,18 +90,18 @@ class MessageConditionalOperator : public FilterOperator
 @details  the evaluation function used should return true if the message should be allowed through
 false if it should be dropped
 */
-class CloneOperator : public FilterOperator
+class HELICS_CXX_EXPORT CloneOperator : public FilterOperator
 {
   public:
     /** default constructor*/
     CloneOperator () = default;
     /** set the function to modify the data of the message in the constructor*/
-    explicit CloneOperator (std::function<void(const Message *)> userCloneFunction);
+    explicit CloneOperator (std::function<void (const Message *)> userCloneFunction);
     /** set the function to modify the data of the message*/
-    void setCloneFunction (std::function<void(const Message *)> userCloneFunction);
+    void setCloneFunction (std::function<void (const Message *)> userCloneFunction);
 
   private:
-    std::function<void(const Message *)> evalFunction;  //!< the function actually doing the processing
+    std::function<void (const Message *)> evalFunction;  //!< the function actually doing the processing
     virtual std::unique_ptr<Message> process (std::unique_ptr<Message> message) override;
 };
 
@@ -109,7 +109,7 @@ class CloneOperator : public FilterOperator
 @details  the evaluation function used should return true if the message should be allowed through
 false if it should be dropped
 */
-class FirewallOperator : public FilterOperator
+class HELICS_CXX_EXPORT FirewallOperator : public FilterOperator
 {
   public:
     /** enumeration of the possible operations of the firewall*/
@@ -125,14 +125,14 @@ class FirewallOperator : public FilterOperator
     /** default constructor*/
     FirewallOperator () = default;
     /** set the function to modify the data of the message in the constructor*/
-    explicit FirewallOperator (std::function<bool(const Message *)> userCheckFunction);
+    explicit FirewallOperator (std::function<bool (const Message *)> userCheckFunction);
     /** set the function to modify the data of the message*/
-    void setCheckFunction (std::function<bool(const Message *)> userCheckFunction);
+    void setCheckFunction (std::function<bool (const Message *)> userCheckFunction);
     /** set the operation to perform on positive checkFunction*/
     void setOperation (operations newop) { operation.store (newop); }
 
   private:
-    std::function<bool(const Message *)> checkFunction;  //!< the function actually doing the processing
+    std::function<bool (const Message *)> checkFunction;  //!< the function actually doing the processing
     std::atomic<operations> operation{operations::drop};  //!< the operation to perform if the firewall triggers
     virtual std::unique_ptr<Message> process (std::unique_ptr<Message> message) override;
 };

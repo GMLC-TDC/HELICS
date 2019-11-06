@@ -17,11 +17,15 @@ if(HELICS_BUILD_APP_LIBRARY)
         Source.hpp
         Tracer.hpp
         helicsApp.hpp
-        BrokerApp.hpp
-        MultiBroker.hpp
         Clone.hpp
-        BrokerServer.hpp
+		CoreApp.hpp
+		BrokerApp.hpp
     )
+
+	set(helics_apps_broker_headers 
+		 MultiBroker.hpp
+		 BrokerServer.hpp
+		 )
 
     set(helics_apps_private_headers PrecHelper.hpp SignalGenerators.hpp)
 
@@ -35,28 +39,23 @@ if(HELICS_BUILD_APP_LIBRARY)
         Source.cpp
         Tracer.cpp
         helicsApp.cpp
-        BrokerApp.cpp
-        MultiBroker.cpp
         Clone.cpp
-        BrokerServer.cpp
     )
+
+	set(helics_apps_broker_files
+		MultiBroker.cpp
+		BrokerServer.cpp
+	)
 
     add_library(helics_apps STATIC ../helics_apps.hpp ${helics_apps_library_files}
-                                   ${helics_apps_public_headers}
-                                   ${helics_apps_private_headers})
+                                   ${helics_apps_public_headers} ${helics_apps_broker_headers}
+                                   ${helics_apps_private_headers} ${helics_apps_broker_files})
 
-    target_link_libraries(helics_apps PUBLIC helics-static)
-    target_link_libraries(helics_apps PRIVATE HELICS::compile_flags_target)
-    target_include_directories(
-        helics_apps SYSTEM
-        PRIVATE $<TARGET_PROPERTY:fmt::fmt-header-only,INTERFACE_INCLUDE_DIRECTORIES>
-    )
-    target_compile_definitions(
-        helics_apps PRIVATE
-        $<TARGET_PROPERTY:fmt::fmt-header-only,INTERFACE_COMPILE_DEFINITIONS>
-    )
+    target_link_libraries(helics_apps PUBLIC helics_application_api)
+    target_link_libraries(helics_apps PRIVATE HELICS::compile_flags_target fmt::fmt)
+    
     # add and alias library to match the find_package
-    add_library(HELICS::helics_apps ALIAS helics_apps)
+    add_library(HELICS::apps ALIAS helics_apps)
 
     if(HELICS_BUILD_APP_EXECUTABLES)
         add_executable(helics_player playerMain.cpp)
@@ -66,6 +65,7 @@ if(HELICS_BUILD_APP_LIBRARY)
         install(
             TARGETS
                 helics_player
+				${HELICS_EXPORT_COMMAND}
                 DESTINATION
                 ${CMAKE_INSTALL_BINDIR}
                 COMPONENT
@@ -79,6 +79,7 @@ if(HELICS_BUILD_APP_LIBRARY)
         install(
             TARGETS
                 helics_recorder
+				${HELICS_EXPORT_COMMAND}
                 DESTINATION
                 ${CMAKE_INSTALL_BINDIR}
                 COMPONENT
@@ -115,6 +116,7 @@ if(HELICS_BUILD_APP_LIBRARY)
             TARGETS
                 helics_broker
                 helics_broker_server
+				${HELICS_EXPORT_COMMAND}
                 DESTINATION
                 ${CMAKE_INSTALL_BINDIR}
                 COMPONENT
@@ -128,6 +130,7 @@ if(HELICS_BUILD_APP_LIBRARY)
         install(
             TARGETS
                 helics_app
+				${HELICS_EXPORT_COMMAND}
                 DESTINATION
                 ${CMAKE_INSTALL_BINDIR}
                 COMPONENT
@@ -148,30 +151,76 @@ if(HELICS_BUILD_APP_LIBRARY)
         )
     endif(HELICS_BUILD_APP_EXECUTABLES)
 
-    if(NOT HELICS_DISABLE_STATIC_LIB_INSTALL)
+	if (HELICS_BUILD_CXX_SHARED_LIB)
+	 add_library(helics-apps-shared SHARED ../helics_apps.hpp ${helics_apps_library_files}
+                                   ${helics_apps_public_headers}
+                                   ${helics_apps_private_headers})
+
+    target_link_libraries(helics-apps-shared PUBLIC HELICS::helics-shared)
+    target_link_libraries(helics-apps-shared PRIVATE helics_common fmt::fmt HELICS::utilities)
+    
+    # add and alias library to match the find_package
+    add_library(HELICS::helics-apps-shared ALIAS helics-apps-shared)
+
+	target_compile_definitions(helics-apps-shared PRIVATE helics_shared_EXPORTS)
+
+	target_include_directories(
+    helics-apps-shared
+    INTERFACE $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}/include/helics_cxx>
+              $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/ThirdParty>
+              $<INSTALL_INTERFACE:$<INSTALL_PREFIX>/${CMAKE_INSTALL_INCLUDEDIR}>
+    PRIVATE $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
+)
+
+    set_target_properties(
+        helics-apps-shared
+        PROPERTIES VERSION ${HELICS_VERSION} SOVERSION ${HELICS_VERSION_MAJOR}
+    )
+
+	set_target_properties(
+   helics-apps-shared
+    PROPERTIES CXX_VISIBILITY_PRESET hidden C_VISIBILITY_PRESET hidden VISIBILITY_INLINES_HIDDEN ON
+    )
+
+    install(
+        TARGETS helics-apps-shared  ${HELICS_EXPORT_COMMAND}
+        RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+        ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+        LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    )
+
+    if(WIN32)
         install(
-            TARGETS
-                helics_apps
-                ${HELICS_EXPORT_COMMAND}
-                DESTINATION
-                ${CMAKE_INSTALL_LIBDIR}
-                COMPONENT
-                libs
+            FILES $<TARGET_LINKER_FILE:helics-apps-shared>
+            DESTINATION ${CMAKE_INSTALL_LIBDIR}
+            COMPONENT libs
+        )
+        install(
+            FILES $<TARGET_FILE:helics-apps-shared>
+            DESTINATION ${CMAKE_INSTALL_BINDIR}
+            COMPONENT Runtime
+        )
+    else()
+        install(
+            TARGETS helics-apps-shared  DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT
+            RUNTIME
         )
     endif()
 
-    if(HELICS_INSTALL_CPP14_HEADERS)
+	if(NOT HELICS_BINARY_ONLY_INSTALL)
+
+    if(MSVC AND NOT HELICS_EMBEDDED_DEBUG_INFO)
         install(
-            FILES ${helics_apps_public_headers}
-            DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/helics/apps
-            COMPONENT headers
+            FILES $<TARGET_PDB_FILE:helics-apps-shared>
+            DESTINATION ${CMAKE_INSTALL_BINDIR}
+            OPTIONAL
+            COMPONENT libs
         )
-        install(
-            FILES ../helics_apps.hpp
-            DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/helics
-            COMPONENT headers
-        )
-    endif(HELICS_INSTALL_CPP14_HEADERS)
+    endif()
+
+	endif()
+	endif()
+    
 endif(HELICS_BUILD_APP_LIBRARY)
 
 # configure executable app
@@ -193,7 +242,7 @@ if(NOT CYGWIN)
         )
 
         install(
-            TARGETS helics-config
+            TARGETS helics-config ${HELICS_EXPORT_COMMAND}
             RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR} COMPONENT libs
         )
 

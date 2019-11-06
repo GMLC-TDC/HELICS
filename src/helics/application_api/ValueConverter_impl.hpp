@@ -15,19 +15,19 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <algorithm>
 #include <array>
 #include <cassert>
-#include <cereal/archives/portable_binary.hpp>
-#include <cereal/cereal.hpp>
-#include <cereal/types/complex.hpp>
-#include <cereal/types/utility.hpp>
-#include <cereal/types/vector.hpp>
 #include <complex>
 #include <cstring>
+#include <helics/external/cereal/archives/portable_binary.hpp>
+#include <helics/external/cereal/cereal.hpp>
+#include <helics/external/cereal/types/complex.hpp>
+#include <helics/external/cereal/types/utility.hpp>
+#include <helics/external/cereal/types/vector.hpp>
 #include <iterator>
 #include <stdexcept>
 #include <type_traits>
 #include <utility>
-//#include <cereal/archives/binary.hpp>
-#include <cereal/types/string.hpp>
+//#include <helics/external/cereal/archives/binary.hpp>
+#include <helics/external/cereal/types/string.hpp>
 
 using archiver = cereal::PortableBinaryOutputArchive;
 
@@ -134,7 +134,7 @@ class ostringbuf : public std::streambuf
     ostringbuf ()
     {
         char *base = abuf_.data ();
-        setp (base, base + bufsize-1);  // one less than the buffer size
+        setp (base, base + bufsize - 1);  // one less than the buffer size
     }
     /** reserve a size of the buffer*/
     void reserve (size_t size) { sbuf_.reserve (size); }
@@ -250,8 +250,8 @@ struct is_iterable<T,
                    typename std::enable_if_t<
                      std::is_same<decltype (std::begin (T ()) != std::end (T ()),  // begin/end and operator != and
                                                                                    // has default constructor
-                                            void(),
-                                            void(*std::begin (T ())),  // dereference operator
+                                            void (),
+                                            void (*std::begin (T ())),  // dereference operator
                                             std::true_type{}),
                                   std::true_type>::value>>
 {

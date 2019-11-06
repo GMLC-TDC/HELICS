@@ -10,7 +10,7 @@ SPDX-License-Identifier: BSD-3-Clause
 
 namespace helics
 {
-MessageTimer::MessageTimer (std::function<void(ActionMessage &&)> sFunction)
+MessageTimer::MessageTimer (std::function<void (ActionMessage &&)> sFunction)
     : sendFunction (std::move (sFunction)), contextPtr (AsioContextManager::getContextPointer ()),
       loopHandle (contextPtr->startContextLoop ())
 {
@@ -45,7 +45,7 @@ int32_t MessageTimer::addTimer (time_type expirationTime, ActionMessage mess)
     std::unique_lock<std::mutex> lock (timerLock);
 
     auto index = static_cast<int32_t> (timers.size ());
-    auto timerCallback = [ptr = shared_from_this (), index](const std::error_code &ec) {
+    auto timerCallback = [ptr = shared_from_this (), index] (const std::error_code &ec) {
         processTimerCallback (ptr, index, ec);
     };
     buffers.push_back (std::move (mess));
@@ -96,7 +96,7 @@ void MessageTimer::updateTimer (int32_t timerIndex, time_type expirationTime, Ac
         expirationTimes[timerIndex] = expirationTime;
         buffers[timerIndex] = std::move (mess);
 
-        auto timerCallback = [ptr = shared_from_this (), timerIndex](const std::error_code &ec) {
+        auto timerCallback = [ptr = shared_from_this (), timerIndex] (const std::error_code &ec) {
             processTimerCallback (ptr, timerIndex, ec);
         };
 
@@ -111,7 +111,7 @@ bool MessageTimer::addTimeToTimer (int32_t timerIndex, std::chrono::nanoseconds 
     {
         auto newTime = timers[timerIndex]->expires_at () + time;
         timers[timerIndex]->expires_at (newTime);
-        auto timerCallback = [ptr = shared_from_this (), timerIndex](const std::error_code &ec) {
+        auto timerCallback = [ptr = shared_from_this (), timerIndex] (const std::error_code &ec) {
             processTimerCallback (ptr, timerIndex, ec);
         };
         expirationTimes[timerIndex] = newTime;
@@ -128,7 +128,7 @@ bool MessageTimer::updateTimer (int32_t timerIndex, time_type expirationTime)
     if ((timerIndex >= 0) && (timerIndex < static_cast<int32_t> (timers.size ())))
     {
         timers[timerIndex]->expires_at (expirationTime);
-        auto timerCallback = [ptr = shared_from_this (), timerIndex](const std::error_code &ec) {
+        auto timerCallback = [ptr = shared_from_this (), timerIndex] (const std::error_code &ec) {
             processTimerCallback (ptr, timerIndex, ec);
         };
         expirationTimes[timerIndex] = expirationTime;

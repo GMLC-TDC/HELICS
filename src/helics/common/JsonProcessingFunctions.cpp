@@ -6,6 +6,8 @@ SPDX-License-Identifier: BSD-3-Clause
 */
 
 #include "JsonProcessingFunctions.hpp"
+#include "../utilities/timeStringOps.hpp"
+#include "../core/helics-time.hpp"
 #include <fstream>
 #include <sstream>
 
@@ -66,7 +68,7 @@ helics::Time loadJsonTime (const Json::Value &timeElement, time_units defaultUni
     {
         if (timeElement.isMember ("units"))
         {
-            defaultUnits = helics::timeUnitsFromString (timeElement["units"].asString ());
+            defaultUnits = gmlc::utilities::timeUnitsFromString (timeElement["units"].asString ());
         }
         if (timeElement.isMember ("value"))
         {
@@ -86,7 +88,7 @@ helics::Time loadJsonTime (const Json::Value &timeElement, time_units defaultUni
     {
         return helics::Time (timeElement.asDouble () * toSecondMultiplier (defaultUnits));
     }
-    return helics::loadTimeFromString (timeElement.asString ());
+    return gmlc::utilities::loadTimeFromString<helics::Time> (timeElement.asString ());
     
 }
 

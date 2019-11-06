@@ -66,6 +66,11 @@ Source::Source (const std::string &appName, const std::shared_ptr<Core> &core, c
     fed->setFlagOption (helics_flag_source_only);
 }
 
+Source::Source (const std::string &appName, CoreApp &core, const FederateInfo &fi) : App (appName, core, fi)
+{
+    fed->setFlagOption (helics_flag_source_only);
+}
+
 Source::Source (const std::string &name, const std::string &configString) : App (name, configString)
 {
     fed->setFlagOption (helics_flag_source_only);
