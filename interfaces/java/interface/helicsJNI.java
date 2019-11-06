@@ -148,12 +148,14 @@ public class helicsJNI {
   public final static native void helicsBrokerDataLink(long jarg1, String jarg2, String jarg3);
   public final static native void helicsBrokerAddSourceFilterToEndpoint(long jarg1, String jarg2, String jarg3);
   public final static native void helicsBrokerAddDestinationFilterToEndpoint(long jarg1, String jarg2, String jarg3);
+  public final static native void helicsBrokerMakeConnections(long jarg1, String jarg2);
   public final static native int helicsCoreWaitForDisconnect(long jarg1, int jarg2);
   public final static native int helicsBrokerWaitForDisconnect(long jarg1, int jarg2);
   public final static native int helicsCoreIsConnected(long jarg1);
   public final static native void helicsCoreDataLink(long jarg1, String jarg2, String jarg3);
   public final static native void helicsCoreAddSourceFilterToEndpoint(long jarg1, String jarg2, String jarg3);
   public final static native void helicsCoreAddDestinationFilterToEndpoint(long jarg1, String jarg2, String jarg3);
+  public final static native void helicsCoreMakeConnections(long jarg1, String jarg2);
   public final static native String helicsBrokerGetIdentifier(long jarg1);
   public final static native String helicsCoreGetIdentifier(long jarg1);
   public final static native String helicsBrokerGetAddress(long jarg1);
