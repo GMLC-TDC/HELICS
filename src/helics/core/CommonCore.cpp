@@ -45,13 +45,13 @@ CommonCore::CommonCore (const std::string &core_name) : BrokerBase (core_name), 
 
 void CommonCore::configure (const std::string &configureString)
 {
-    broker_state_t exp = created;
+    broker_state_t exp = broker_state_t::created;
     if (brokerState.compare_exchange_strong (exp, broker_state_t::configuring))
     {
         // initialize the brokerbase
         if (parseArgs (configureString) < 0)
         {
-            brokerState = created;
+            brokerState = broker_state_t::created;
             return;
         }
         configureBase ();
@@ -60,13 +60,13 @@ void CommonCore::configure (const std::string &configureString)
 
 void CommonCore::configureFromArgs (int argc, char *argv[])
 {
-    broker_state_t exp = created;
+    broker_state_t exp = broker_state_t::created;
     if (brokerState.compare_exchange_strong (exp, broker_state_t::configuring))
     {
         // initialize the brokerbase
         if (parseArgs (argc, argv) < 0)
         {
-            brokerState = created;
+            brokerState = broker_state_t::created;
             return;
         }
         configureBase ();
@@ -75,13 +75,13 @@ void CommonCore::configureFromArgs (int argc, char *argv[])
 
 void CommonCore::configureFromVector (std::vector<std::string> args)
 {
-    broker_state_t exp = created;
+    broker_state_t exp = broker_state_t::created;
     if (brokerState.compare_exchange_strong (exp, broker_state_t::configuring))
     {
         // initialize the brokerbase
         if (parseArgs (std::move (args)) < 0)
         {
-            brokerState = created;
+            brokerState = broker_state_t::created;
             return;
         }
         configureBase ();
@@ -135,7 +135,7 @@ bool CommonCore::connect ()
 bool CommonCore::isConnected () const
 {
     auto currentState = brokerState.load (std::memory_order_acquire);
-    return ((currentState == operating) || (currentState == connected));
+    return ((currentState == broker_state_t::operating) || (currentState == broker_state_t::connected));
 }
 
 const std::string &CommonCore::getAddress () const
@@ -172,7 +172,7 @@ void CommonCore::processDisconnect (bool skipUnregister)
         }
         brokerDisconnect ();
     }
-    brokerState = terminated;
+    brokerState = broker_state_t::terminated;
     if (!skipUnregister)
     {
         unregister ();
@@ -321,9 +321,12 @@ route_id CommonCore::getRoute (global_federate_id global_fedid) const
     return (fnd != routing_table.end ()) ? fnd->second : parent_route_id;
 }
 
-bool CommonCore::isConfigured () const { return (brokerState >= configured); }
+bool CommonCore::isConfigured () const { return (brokerState >= broker_state_t::configured); }
 
-bool CommonCore::isOpenToNewFederates () const { return ((brokerState != created) && (brokerState < operating)); }
+bool CommonCore::isOpenToNewFederates () const
+{
+    return ((brokerState != broker_state_t::created) && (brokerState < broker_state_t::operating));
+}
 void CommonCore::error (local_federate_id federateID, int errorID)
 {
     auto fed = getFederateAt (federateID);
@@ -491,7 +494,7 @@ local_federate_id CommonCore::registerFederate (const std::string &name, const C
 {
     if (!waitCoreRegistration ())
     {
-        if (brokerState == errored)
+        if (brokerState == broker_state_t::errored)
         {
             if (!lastErrorString.empty ())
             {
@@ -501,7 +504,7 @@ local_federate_id CommonCore::registerFederate (const std::string &name, const C
         throw (
           RegistrationFailure ("core is unable to register and has timed out, federate cannot be registered"));
     }
-    if (brokerState >= operating)
+    if (brokerState >= broker_state_t::operating)
     {
         throw (RegistrationFailure ("Core has already moved to operating state"));
     }
@@ -579,7 +582,7 @@ local_federate_id CommonCore::getFederateId (const std::string &name) const
 
 int32_t CommonCore::getFederationSize ()
 {
-    if (brokerState >= operating)
+    if (brokerState >= broker_state_t::operating)
     {
         return _global_federation_size;
     }
@@ -1946,7 +1949,7 @@ FilterCoordinator *CommonCore::getFilterCoordinator (interface_handle handle)
     auto fnd = filterCoord.find (handle);
     if (fnd == filterCoord.end ())
     {
-        if (brokerState < operating)
+        if (brokerState < broker_state_t::operating)
         {
             // just make a dummy filterFunction so we have something to return
             auto ff = std::make_unique<FilterCoordinator> ();
@@ -1961,7 +1964,7 @@ FilterCoordinator *CommonCore::getFilterCoordinator (interface_handle handle)
 
 void CommonCore::setIdentifier (const std::string &name)
 {
-    if (brokerState == created)
+    if (brokerState == broker_state_t::created)
     {
         identifier = name;
     }
@@ -2939,7 +2942,7 @@ void CommonCore::processCommand (ActionMessage &&command)
             fed->init_transmitted = true;
             if (allInitReady ())
             {
-                broker_state_t exp = connected;
+                broker_state_t exp = broker_state_t::connected;
                 if (brokerState.compare_exchange_strong (exp, broker_state_t::initializing))
                 {  // make sure we only do this once
                     checkDependencies ();
@@ -2952,7 +2955,7 @@ void CommonCore::processCommand (ActionMessage &&command)
     break;
     case CMD_INIT_GRANT:
     {
-        broker_state_t exp = initializing;
+        broker_state_t exp = broker_state_t::initializing;
         if (brokerState.compare_exchange_strong (exp, broker_state_t::operating))
         {  // forward the grant to all federates
             organizeFilterOperations ();
@@ -3773,7 +3776,7 @@ void CommonCore::processCoreConfigureCommands (ActionMessage &cmd)
             delayInitCounter = 0;
             if (allInitReady ())
             {
-                broker_state_t exp = connected;
+                broker_state_t exp = broker_state_t::connected;
                 if (brokerState.compare_exchange_strong (exp, broker_state_t::initializing))
                 {  // make sure we only do this once
                     checkDependencies ();
