@@ -30,4 +30,7 @@ foreach(T ${HELICS_BENCHMARKS})
 
 endforeach()
 
+target_sources(filterBenchmarks PUBLIC EchoMessage.hpp)
+target_sources(echoMessageBenchmarks PUBLIC EchoMessage.hpp)
+
 copy_key_files_to_target_location(ActionMessageBenchmarks)
