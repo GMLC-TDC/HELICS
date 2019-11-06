@@ -1830,7 +1830,7 @@ std::string FederateState::processQuery (const std::string &query) const
     {  // these never need to be locked
         qstring = processQueryActual (query);
     }
-    if ((query == "queries") || (query == "available_queries"))
+    else if ((query == "queries") || (query == "available_queries"))
     {
         qstring =
           "publications;inputs;endpoints;interfaces;subscriptions;dependencies;timeconfig;config;dependents";
