@@ -95,6 +95,10 @@ public class helics {
     helicsJNI.helicsBrokerAddDestinationFilterToEndpoint(SWIGTYPE_p_void.getCPtr(broker), filter, endpoint);
   }
 
+  public static void helicsBrokerMakeConnections(SWIGTYPE_p_void broker, String file) {
+    helicsJNI.helicsBrokerMakeConnections(SWIGTYPE_p_void.getCPtr(broker), file);
+  }
+
   public static int helicsCoreWaitForDisconnect(SWIGTYPE_p_void core, int msToWait) {
     return helicsJNI.helicsCoreWaitForDisconnect(SWIGTYPE_p_void.getCPtr(core), msToWait);
   }
@@ -117,6 +121,10 @@ public class helics {
 
   public static void helicsCoreAddDestinationFilterToEndpoint(SWIGTYPE_p_void core, String filter, String endpoint) {
     helicsJNI.helicsCoreAddDestinationFilterToEndpoint(SWIGTYPE_p_void.getCPtr(core), filter, endpoint);
+  }
+
+  public static void helicsCoreMakeConnections(SWIGTYPE_p_void core, String file) {
+    helicsJNI.helicsCoreMakeConnections(SWIGTYPE_p_void.getCPtr(core), file);
   }
 
   public static String helicsBrokerGetIdentifier(SWIGTYPE_p_void broker) {

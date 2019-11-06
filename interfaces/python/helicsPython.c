@@ -4663,6 +4663,56 @@ fail:
 }
 
 
+SWIGINTERN PyObject *_wrap_helicsBrokerMakeConnections(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  helics_broker arg1 = (helics_broker) 0 ;
+  char *arg2 = (char *) 0 ;
+  helics_error *arg3 = (helics_error *) 0 ;
+  int res1 ;
+  int res2 ;
+  char *buf2 = 0 ;
+  int alloc2 = 0 ;
+  helics_error etemp3 ;
+  PyObject *swig_obj[2] ;
+  
+  {
+    etemp3=helicsErrorInitialize();
+    arg3=&etemp3;
+  }
+  if (!SWIG_Python_UnpackTuple(args, "helicsBrokerMakeConnections", 2, 2, swig_obj)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(swig_obj[0],SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsBrokerMakeConnections" "', argument " "1"" of type '" "helics_broker""'"); 
+  }
+  res2 = SWIG_AsCharPtrAndSize(swig_obj[1], &buf2, NULL, &alloc2);
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsBrokerMakeConnections" "', argument " "2"" of type '" "char const *""'");
+  }
+  arg2 = (char *)(buf2);
+  helicsBrokerMakeConnections(arg1,(char const *)arg2,arg3);
+  resultobj = SWIG_Py_Void();
+  if (alloc2 == SWIG_NEWOBJ) free((char*)buf2);
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsPythonException(arg3);
+      return NULL;
+    }
+  }
+  return resultobj;
+fail:
+  if (alloc2 == SWIG_NEWOBJ) free((char*)buf2);
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsPythonException(arg3);
+      return NULL;
+    }
+  }
+  return NULL;
+}
+
+
 SWIGINTERN PyObject *_wrap_helicsCoreWaitForDisconnect(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   helics_core arg1 = (helics_core) 0 ;
@@ -4956,6 +5006,56 @@ fail:
     if (arg4->error_code!=helics_ok)
     {
       throwHelicsPythonException(arg4);
+      return NULL;
+    }
+  }
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_helicsCoreMakeConnections(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  helics_core arg1 = (helics_core) 0 ;
+  char *arg2 = (char *) 0 ;
+  helics_error *arg3 = (helics_error *) 0 ;
+  int res1 ;
+  int res2 ;
+  char *buf2 = 0 ;
+  int alloc2 = 0 ;
+  helics_error etemp3 ;
+  PyObject *swig_obj[2] ;
+  
+  {
+    etemp3=helicsErrorInitialize();
+    arg3=&etemp3;
+  }
+  if (!SWIG_Python_UnpackTuple(args, "helicsCoreMakeConnections", 2, 2, swig_obj)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(swig_obj[0],SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsCoreMakeConnections" "', argument " "1"" of type '" "helics_core""'"); 
+  }
+  res2 = SWIG_AsCharPtrAndSize(swig_obj[1], &buf2, NULL, &alloc2);
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsCoreMakeConnections" "', argument " "2"" of type '" "char const *""'");
+  }
+  arg2 = (char *)(buf2);
+  helicsCoreMakeConnections(arg1,(char const *)arg2,arg3);
+  resultobj = SWIG_Py_Void();
+  if (alloc2 == SWIG_NEWOBJ) free((char*)buf2);
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsPythonException(arg3);
+      return NULL;
+    }
+  }
+  return resultobj;
+fail:
+  if (alloc2 == SWIG_NEWOBJ) free((char*)buf2);
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsPythonException(arg3);
       return NULL;
     }
   }
@@ -15391,12 +15491,14 @@ static PyMethodDef SwigMethods[] = {
 	 { "helicsBrokerDataLink", _wrap_helicsBrokerDataLink, METH_VARARGS, NULL},
 	 { "helicsBrokerAddSourceFilterToEndpoint", _wrap_helicsBrokerAddSourceFilterToEndpoint, METH_VARARGS, NULL},
 	 { "helicsBrokerAddDestinationFilterToEndpoint", _wrap_helicsBrokerAddDestinationFilterToEndpoint, METH_VARARGS, NULL},
+	 { "helicsBrokerMakeConnections", _wrap_helicsBrokerMakeConnections, METH_VARARGS, NULL},
 	 { "helicsCoreWaitForDisconnect", _wrap_helicsCoreWaitForDisconnect, METH_VARARGS, NULL},
 	 { "helicsBrokerWaitForDisconnect", _wrap_helicsBrokerWaitForDisconnect, METH_VARARGS, NULL},
 	 { "helicsCoreIsConnected", _wrap_helicsCoreIsConnected, METH_O, NULL},
 	 { "helicsCoreDataLink", _wrap_helicsCoreDataLink, METH_VARARGS, NULL},
 	 { "helicsCoreAddSourceFilterToEndpoint", _wrap_helicsCoreAddSourceFilterToEndpoint, METH_VARARGS, NULL},
 	 { "helicsCoreAddDestinationFilterToEndpoint", _wrap_helicsCoreAddDestinationFilterToEndpoint, METH_VARARGS, NULL},
+	 { "helicsCoreMakeConnections", _wrap_helicsCoreMakeConnections, METH_VARARGS, NULL},
 	 { "helicsBrokerGetIdentifier", _wrap_helicsBrokerGetIdentifier, METH_O, NULL},
 	 { "helicsCoreGetIdentifier", _wrap_helicsCoreGetIdentifier, METH_O, NULL},
 	 { "helicsBrokerGetAddress", _wrap_helicsBrokerGetAddress, METH_O, NULL},

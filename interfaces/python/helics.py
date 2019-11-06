@@ -253,6 +253,9 @@ def helicsBrokerAddSourceFilterToEndpoint(broker: "helics_broker", filter: "char
 def helicsBrokerAddDestinationFilterToEndpoint(broker: "helics_broker", filter: "char const *", endpoint: "char const *") -> "void":
     return _helics.helicsBrokerAddDestinationFilterToEndpoint(broker, filter, endpoint)
 
+def helicsBrokerMakeConnections(broker: "helics_broker", file: "char const *") -> "void":
+    return _helics.helicsBrokerMakeConnections(broker, file)
+
 def helicsCoreWaitForDisconnect(core: "helics_core", msToWait: "int") -> "helics_bool":
     return _helics.helicsCoreWaitForDisconnect(core, msToWait)
 
@@ -270,6 +273,9 @@ def helicsCoreAddSourceFilterToEndpoint(core: "helics_core", filter: "char const
 
 def helicsCoreAddDestinationFilterToEndpoint(core: "helics_core", filter: "char const *", endpoint: "char const *") -> "void":
     return _helics.helicsCoreAddDestinationFilterToEndpoint(core, filter, endpoint)
+
+def helicsCoreMakeConnections(core: "helics_core", file: "char const *") -> "void":
+    return _helics.helicsCoreMakeConnections(core, file)
 
 def helicsBrokerGetIdentifier(broker: "helics_broker") -> "char const *":
     return _helics.helicsBrokerGetIdentifier(broker)
