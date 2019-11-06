@@ -16,6 +16,7 @@ namespace helics
 {
 class FilterOperations;
 class FilterOperator;
+class CoreApp;
 /** a set of common defined filters*/
 enum class filter_types
 {
@@ -33,7 +34,7 @@ enum class filter_types
 #define EMPTY_STRING std::string ()
 
 /** get the filter type from a string*/
-filter_types filterTypeFromString (const std::string &filterType) noexcept;
+HELICS_CXX_EXPORT filter_types filterTypeFromString (const std::string &filterType) noexcept;
 
 /** class for managing a particular filter*/
 class HELICS_CXX_EXPORT Filter
@@ -195,6 +196,15 @@ HELICS_CXX_EXPORT Filter &make_filter (interface_visibility locality,
 HELICS_CXX_EXPORT std::unique_ptr<Filter>
 make_filter (filter_types type, Core *cr, const std::string &name = EMPTY_STRING);
 
+/** create a filter
+@param type the type of filter to create
+@param cr the core to create the filter through
+@param name the name of the filter (optional)
+@return a unique pointer to a source Filter object,  note destroying the object does not deactivate the filter
+*/
+HELICS_CXX_EXPORT std::unique_ptr<Filter>
+make_filter (filter_types type, CoreApp &cr, const std::string &name = EMPTY_STRING);
+
 /** create a  filter
 @param type the type of filter to create
 @param fed the federate to create the filter through
@@ -230,6 +240,18 @@ HELICS_CXX_EXPORT CloningFilter &make_cloning_filter (interface_visibility local
 */
 HELICS_CXX_EXPORT std::unique_ptr<CloningFilter> make_cloning_filter (filter_types type,
                                                                       Core *cr,
+                                                                      const std::string &delivery,
+                                                                      const std::string &name = EMPTY_STRING);
+
+/** create a cloning filter with a delivery location
+@param type the type of filter to create
+@param cr the core to create the filter through
+@param delivery the endpoint to deliver the cloned message to
+@param name the name of the filter (optional)
+@return a unique pointer to a source Filter object,  note destroying the object does not deactivate the filter
+*/
+HELICS_CXX_EXPORT std::unique_ptr<CloningFilter> make_cloning_filter (filter_types type,
+                                                                      CoreApp &cr,
                                                                       const std::string &delivery,
                                                                       const std::string &name = EMPTY_STRING);
 

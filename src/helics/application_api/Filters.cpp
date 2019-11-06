@@ -7,6 +7,7 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include "Filters.hpp"
 #include "FilterOperations.hpp"
+#include "CoreApp.hpp"
 
 #include <algorithm>
 #include <map>
@@ -144,14 +145,7 @@ void Filter::setFilterOperations (std::shared_ptr<FilterOperations> filterOps)
     filtOp = std::move (filterOps);
     if (corePtr != nullptr)
     {
-        if (filtOp)
-        {
-            corePtr->setFilterOperator (handle, filtOp->getOperator ());
-        }
-        else
-        {
-            corePtr->setFilterOperator (handle, nullptr);
-        }
+         corePtr->setFilterOperator (handle, (filtOp)?filtOp->getOperator ():nullptr);
     }
 }
 
@@ -338,7 +332,6 @@ Filter &make_filter (interface_visibility locality, filter_types type, Federate 
 }
 
 std::unique_ptr<Filter> make_filter (filter_types type, Core *cr, const std::string &name)
-
 {
     if (type == filter_types::clone)
     {
@@ -352,9 +345,13 @@ std::unique_ptr<Filter> make_filter (filter_types type, Core *cr, const std::str
     return dfilt;
 }
 
+std::unique_ptr<Filter> make_filter (filter_types type, CoreApp &cr, const std::string &name)
+{
+    return make_filter (type, cr.getCopyofCorePointer ().get (), name);
+}
+
 CloningFilter &
 make_cloning_filter (filter_types type, Federate *mFed, const std::string &delivery, const std::string &name)
-
 {
     auto &dfilt = mFed->registerCloningFilter (name);
     addOperations (&dfilt, type, mFed->getCorePointer ().get ());
@@ -384,6 +381,13 @@ make_cloning_filter (filter_types type, Core *cr, const std::string &delivery, c
     addOperations (dfilt.get (), type, cr);
     dfilt->addDeliveryEndpoint (delivery);
     return dfilt;
+}
+
+std::unique_ptr<CloningFilter>
+make_cloning_filter (filter_types type, CoreApp &cr, const std::string &delivery, const std::string &name)
+
+{
+    return make_cloning_filter (type, cr.getCopyofCorePointer ().get (), delivery, name);
 }
 
 }  // namespace helics
