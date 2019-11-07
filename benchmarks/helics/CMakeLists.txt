@@ -16,6 +16,7 @@ set(
     messageLookupBenchmarks
     conversionBenchmarks
 	echoMessageBenchmarks
+    pholdBenchmarks
 )
 
 # Only affects current directory, so safe
@@ -32,5 +33,6 @@ endforeach()
 
 target_sources(filterBenchmarks PUBLIC EchoMessage.hpp)
 target_sources(echoMessageBenchmarks PUBLIC EchoMessage.hpp)
+target_sources(pholdBenchmarks PUBLIC PholdFederate.hpp)
 
 copy_key_files_to_target_location(ActionMessageBenchmarks)
