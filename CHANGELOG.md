@@ -7,8 +7,8 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 A note on future revisions.  
   Everything within a major version number should be code compatible (with the exception of experimental interfaces).  The most notable example of an experimental interface is the support for multiple source inputs.  The APIs to deal with this will change in future minor releases.  Everything within a single minor release should be network compatible with other federates on the same minor release number.  Compatibility across minor release numbers may be possible in some situations but we are not going to guarantee this as those components are subject to performance improvements and may need to be modified at some point.  Patch releases will be limited to bug fixes and other improvements not impacting the public API or network compatibility.  Check the [Public API](./docs/Public_API.md) for details on what is included and excluded from the public API and version stability.
 
-## \[2.3.0\] ~ 2019-10-31
-Minor release with lots of cmake updates and build changes
+## \[2.3.0\] ~ 2019-11-12
+Minor release with lots of cmake updates and build changes and a few fixs and additions.  The biggest change is in the C++ shared library. 
 ### Changed
 -   Converted the shared_library_tests and Application_api tests to use Google test instead of Boost test
 -   Most HELICS CMake options have changed to HELICS_**, with the exception of BUILD_XXX_INTERFACE, and ENABLE_XXX_CORE.  These options will not change until HELICS 3.0, at which point all HELICS related CMake options that are not standard CMAKE options will have a leading HELICS_
@@ -20,6 +20,7 @@ Minor release with lots of cmake updates and build changes
     -   CMAKE options for building utilities/units/json as object libraries have been removed as they were no longer needed.  
     -   the cereal library is moved to the external folder in the helics directory and is now required to be available for the C++ shared library, so a cmake variable making it optional was removed.  
     -   The reason for this change was partly as a stepping stone for other internal library changes, and to simplify the build complexity and allow more flexibility in linking libraries without impacting the installed interfaces.  The previous methods and installed libraries were coming into conflict with other packages and posing increasing challenges in maintenance and linking.  This change forced more separation in the HELICS layers, and the installed libraries and simplified a lot of the build generation scripts.  
+-   CLI11, utilities, filesystem and units libraries were updated with latest revisions.  
 
 ### Fixed
 -   Race condition when removing subscriptions or targets from an interface
@@ -29,6 +30,13 @@ Minor release with lots of cmake updates and build changes
 
 ### Added
 -   A set of included helics benchmarks using the Google benchmark library.
+    - echo benchmark
+	- echo message benchmark
+	- ring benchmark
+	- ring message benchmark
+	- filter bechnmark based on echo message benchmark
+	- actionMessage benchmarks
+	- data conversion benchmarks
 -   the src, test, benchmarks directory can now be used as a root directory for CMake to do the appropriate build with few options.  
 -   dedicated internal functions for conversion of bool operators,  strings such as "off", "false", "disabled", "inactive" are now supported as valid bool values.  
 -   Shared libraries for the C++ Application api and apps library are built and installed containing only public API functions and classes.  
@@ -36,7 +44,15 @@ Minor release with lots of cmake updates and build changes
 -   Example linking with the shared libraries
 -   a build_flags_target is exported with flags that may effect compilation
 -   a compile_flags_target is exported, mostly for seeing which non-abi related flags HELICS was built with.  
--   a helicsXXXMakeConnections function which takes a file to establish linkages for Core and Broker to the C shared API.  
+-   a helicsXXXMakeConnections function which takes a file to establish linkages for Core and Broker to the C shared API. 
+-   automated generation of interface code for python, matlab, and java interfaces
+-   overloads of federate creation functions in C++ for CoreApp
+-   overloads of filter creation function in C++ to use CoreApp
+
+### Deprecated
+-   use of coreFactory and BrokerFactory when using the C++ shared library (use CoreApp and BrokerApp instead)
+-   coreType and helics-time string conversion functions are no longer defined in the helics-time header.  They are still there currently but are deprecated and will be removed in HELICS 3.0
+	use the typeOperations.hpp and timeOperations.hpp header instead which now defines those functions.  
 
 ### Removed
 -   All tests using boost::test have now been replaced with Google test, so references and linking to boost::test has been removed
