@@ -10,6 +10,7 @@
 set(
     HELICS_BENCHMARKS
     ActionMessageBenchmarks
+	filterBenchmarks
     echoBenchmarks
     ringBenchmarks
     messageLookupBenchmarks
@@ -28,5 +29,8 @@ foreach(T ${HELICS_BENCHMARKS})
     set_target_properties(${T} PROPERTIES FOLDER benchmarks)
 
 endforeach()
+
+target_sources(filterBenchmarks PUBLIC EchoMessage.hpp)
+target_sources(echoMessageBenchmarks PUBLIC EchoMessage.hpp)
 
 copy_key_files_to_target_location(ActionMessageBenchmarks)
