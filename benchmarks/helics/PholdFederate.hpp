@@ -12,7 +12,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <random>
 
 using namespace helics;
-/** class implementing the hub for an echo test*/
+/** class implementing a federate for the PHOLD benchmark*/
 class PholdFederate
 {
   public:
@@ -28,8 +28,9 @@ class PholdFederate
     int maxIndex_ = 0;
     int initEvCount_ = 16; // starting number of events
     double localProbability_ = .1; // probability of local events
-    double randTimeMean_ = deltaTime * 2;
+    double randTimeMean_ = deltaTime * 2; // mean for the exponential distribution used when picking event times
 
+    // classes related to the exponential distribution random number generator
     std::random_device rd;
     std::mt19937 rand_gen;
     std::exponential_distribution<> rand_exp;
@@ -107,6 +108,7 @@ class PholdFederate
         while (nextTime < finalTime)
         {
             nextTime = mFed->requestTime (finalTime);
+            // for each event message received, create a new event
             while (ept->hasMessage ())
             {
                 auto m = ept->getMessage ();
