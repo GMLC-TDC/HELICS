@@ -24,7 +24,7 @@ else()
                 )
             endif()
 
-            set(CMAKE_SWIG_FLAGS "-py3")
+            set(CMAKE_SWIG_FLAGS "-py3" "-doxygen")
 
             set_property(SOURCE ../helics.i PROPERTY SWIG_MODULE_NAME helics)
 
@@ -129,7 +129,7 @@ else()
 
             include_directories(${PYTHON_INCLUDE_DIRS})
 
-            set(CMAKE_SWIG_FLAGS "-py3")
+            set(CMAKE_SWIG_FLAGS "-py3" "-doxygen")
 
             set_property(SOURCE ../helics.i PROPERTY SWIG_MODULE_NAME helics)
 
