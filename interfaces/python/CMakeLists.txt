@@ -24,7 +24,11 @@ else()
                 )
             endif()
 
-            set(CMAKE_SWIG_FLAGS "-py3" "-doxygen")
+            set(CMAKE_SWIG_FLAGS "-py3")
+
+            if("${SWIG_VERSION}" VERSION_GREATER "4.0.0")
+                set(CMAKE_SWIG_FLAGS ${CMAKE_SWIG_FLAGS} "-doxygen")
+            endif()
 
             set_property(SOURCE ../helics.i PROPERTY SWIG_MODULE_NAME helics)
 
@@ -129,7 +133,11 @@ else()
 
             include_directories(${PYTHON_INCLUDE_DIRS})
 
-            set(CMAKE_SWIG_FLAGS "-py3" "-doxygen")
+            set(CMAKE_SWIG_FLAGS "-py3")
+
+            if("${SWIG_VERSION}" VERSION_GREATER "4.0.0")
+                set(CMAKE_SWIG_FLAGS ${CMAKE_SWIG_FLAGS} "-doxygen")
+            endif()
 
             set_property(SOURCE ../helics.i PROPERTY SWIG_MODULE_NAME helics)
 

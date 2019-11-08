@@ -29,7 +29,11 @@ find_package(PythonLibs 2 REQUIRED)
 
 include_directories(${PYTHON_INCLUDE_DIRS})
 
-set(CMAKE_SWIG_FLAGS "-doxygen")
+set(CMAKE_SWIG_FLAGS "")
+
+if("${SWIG_VERSION}" VERSION_GREATER "4.0.0")
+    set(CMAKE_SWIG_FLAGS ${CMAKE_SWIG_FLAGS} "-doxygen")
+endif()
 
 set_property(SOURCE ../helics.i PROPERTY SWIG_MODULE_NAME helics)
 
