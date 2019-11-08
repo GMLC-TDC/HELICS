@@ -30,8 +30,9 @@ class PholdFederate
     double localProbability_ = .1; // probability of local events
     double randTimeMean_ = deltaTime * 2; // mean for the exponential distribution used when picking event times
 
-    // classes related to the exponential distribution random number generator
-    std::random_device rd;
+    // classes related to the exponential and uniform distribution random number generator
+    bool generateRandomSeed = true; 
+    unsigned int seed = 0;
     std::mt19937 rand_gen;
     std::exponential_distribution<double> rand_exp;
     std::uniform_real_distribution<double> rand_uniform;
@@ -41,6 +42,9 @@ class PholdFederate
 
   public:
     PholdFederate () = default;
+
+    void setGenerateRandomSeed (bool b) { generateRandomSeed = b;  };
+    void setRandomSeed (unsigned int s) { seed = s; };
 
     void run (std::function<void ()> callOnReady = nullptr)
     {
@@ -63,8 +67,15 @@ class PholdFederate
         ept = &mFed->registerEndpoint ("ept");
 
         // en.cppreference.com/w/cpp/numeric/random/exponential_distribution
-        std::random_device rd;
-        rand_gen.seed(rd());
+        if (generateRandomSeed)
+        {
+            std::random_device rd;
+            rand_gen.seed(rd());
+        }
+        else
+        {
+            rand_gen.seed(seed);
+        }
         rand_exp = std::exponential_distribution<double> (1.0/randTimeMean_);
         rand_uniform = std::uniform_real_distribution<double> (0.0, 1.0);
         initialized = true;
