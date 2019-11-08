@@ -39,7 +39,7 @@ class PholdFederate
 
     // classes related to the exponential and uniform distribution random number generator
     bool generateRandomSeed = true; 
-    unsigned int seed = 0;
+    unsigned int seed = 0xABad5eed; // some suggestions for seed choice were that not having a majority of the bits as 0 is better
     std::mt19937 rand_gen;
     std::exponential_distribution<double> rand_exp;
     std::uniform_real_distribution<double> rand_uniform;
