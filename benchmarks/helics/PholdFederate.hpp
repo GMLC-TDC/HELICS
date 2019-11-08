@@ -33,7 +33,8 @@ class PholdFederate
     // classes related to the exponential distribution random number generator
     std::random_device rd;
     std::mt19937 rand_gen;
-    std::exponential_distribution<> rand_exp;
+    std::exponential_distribution<double> rand_exp;
+    std::uniform_real_distribution<double> rand_uniform;
 
     bool initialized{false};
     bool readyToRun{false};
@@ -62,9 +63,10 @@ class PholdFederate
         ept = &mFed->registerEndpoint ("ept");
 
         // en.cppreference.com/w/cpp/numeric/random/exponential_distribution
+        std::random_device rd;
         rand_gen.seed(rd());
-        rand_exp = std::exponential_distribution<> (1/randTimeMean_);
-
+        rand_exp = std::exponential_distribution<double> (1.0/randTimeMean_);
+        rand_uniform = std::uniform_real_distribution<double> (0.0, 1.0);
         initialized = true;
     }
 
@@ -89,7 +91,7 @@ class PholdFederate
     {
         // decide if the event is local or remote
         auto destIndex = index_;
-        if (static_cast<float>(rand()) / static_cast<float>(RAND_MAX) > localProbability_)
+        if (rand_uniform(rand_gen) > localProbability_)
         {
             destIndex = rand() % maxIndex_;
         }
