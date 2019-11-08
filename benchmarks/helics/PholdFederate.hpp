@@ -42,7 +42,8 @@ class PholdFederate
     unsigned int seed = 0xABad5eed; // some suggestions for seed choice were that not having a majority of the bits as 0 is better
     std::mt19937 rand_gen;
     std::exponential_distribution<double> rand_exp;
-    std::uniform_real_distribution<double> rand_uniform;
+    std::uniform_real_distribution<double> rand_uniform_double;
+    std::uniform_int_distribution<unsigned int> rand_uniform_int;
 
     bool initialized{false};
     bool readyToRun{false};
@@ -87,7 +88,12 @@ class PholdFederate
             rand_gen.seed(seed);
         }
         rand_exp = std::exponential_distribution<double> (1.0/randTimeMean_);
-        rand_uniform = std::uniform_real_distribution<double> (0.0, 1.0);
+        rand_uniform_double = std::uniform_real_distribution<double> (0.0, 1.0);
+        // create random number distribution for picking a destination if there is more than 1 federate
+        if (maxIndex_ > 1)
+        {
+            rand_uniform_int = std::uniform_int_distribution<unsigned int> (0, maxIndex_-2);
+        }
         initialized = true;
     }
 
@@ -112,9 +118,13 @@ class PholdFederate
     {
         // decide if the event is local or remote
         auto destIndex = index_;
-        if (rand_uniform(rand_gen) > localProbability_)
+        if (maxIndex_ > 1 && rand_uniform_double(rand_gen) > localProbability_)
         {
-            destIndex = rand() % maxIndex_;
+            destIndex = rand_uniform_int(rand_gen);
+            if (destIndex == index_)
+            {
+                destIndex = maxIndex_-1;
+            }
         }
 
         // set the event time to current time + lookahead + rand exponential (mean >= lookahead or ~2x lookahead)
