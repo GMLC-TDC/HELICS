@@ -13,6 +13,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <fstream>
 #include <iostream>
 #include <thread>
+#include <random>
 
 #include <gmlc/concurrency/Barrier.hpp>
 
@@ -33,8 +34,13 @@ static void BM_phold_singleCore (benchmark::State &state)
         auto wcore = helics::CoreFactory::create (core_type::INPROC, std::string ("--autobroker --federates=") +
                                                                        std::to_string (fed_count));
         std::vector<PholdFederate> feds (fed_count);
+        std::mt19937 rand_gen(0x600d5eed);
+        std::uniform_int_distribution<unsigned int> rand_seed;
         for (int ii = 0; ii < fed_count; ++ii)
         {
+            // set seeds for federates to deterministic values, but not all the same
+            feds[ii].setGenerateRandomSeed(false);
+            feds[ii].setRandomSeed(rand_seed(rand_gen));
             feds[ii].initialize (wcore->getIdentifier (), ii, fed_count);
         }
 
@@ -89,10 +95,17 @@ static void BM_phold_multiCore (benchmark::State &state, core_type cType)
         auto wcore = helics::CoreFactory::create (cType, std::string ("--federates=1"));
         std::vector<PholdFederate> feds (fed_count);
         std::vector<std::shared_ptr<helics::Core>> cores (fed_count);
+        
+        std::mt19937 rand_gen(0x600d5eed);
+        std::uniform_int_distribution<unsigned int> rand_seed;
         for (int ii = 0; ii < fed_count; ++ii)
         {
             cores[ii] = helics::CoreFactory::create (cType, "-f 1");
             cores[ii]->connect ();
+        
+            // set seeds for federates to deterministic values, but not all the same
+            feds[ii].setGenerateRandomSeed(false);
+            feds[ii].setRandomSeed(rand_seed(rand_gen));
             feds[ii].initialize (cores[ii]->getIdentifier (), ii, fed_count);
         }
 
