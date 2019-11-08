@@ -26,9 +26,16 @@ class PholdFederate
 
     int index_ = 0;
     int maxIndex_ = 0;
+  
+    // values from paper "Warp Speed: Executing Time Warp on 1,966,080 Cores"
+    // 16 circulating events per LP (also ran with 8 events per LP)
+    // 10% remote communications (also ran with 25%, 50%, and 100% remote communications)
+    // mean exponential distribution of 0.90
+    // optional lookahead of .1 (to prevent arbitrarily small increases in time with conservative simulators)
     unsigned int initEvCount_ = 16; // starting number of events
-    double localProbability_ = .1; // probability of local events
-    double randTimeMean_ = deltaTime * 2; // mean for the exponential distribution used when picking event times
+    double localProbability_ = .9; // probability of local events
+    double randTimeMean_ = deltaTime * .9; // mean for the exponential distribution used when picking event times
+    double lookahead_ = deltaTime * .1;
 
     // classes related to the exponential and uniform distribution random number generator
     bool generateRandomSeed = true; 
@@ -111,7 +118,7 @@ class PholdFederate
         }
 
         // set the event time to current time + lookahead + rand exponential (mean >= lookahead or ~2x lookahead)
-        helics::Time evTime = mFed->getCurrentTime() + deltaTime + helics::Time(rand_exp(rand_gen));
+        helics::Time evTime = mFed->getCurrentTime() + helics::Time(lookahead_) + helics::Time(rand_exp(rand_gen));
         std::string data = "ev";
         std::string dest = "phold_" + std::to_string(destIndex) + "/ept";
         ept->send(dest, data, evTime);
