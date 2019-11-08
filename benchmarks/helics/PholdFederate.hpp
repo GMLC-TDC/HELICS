@@ -26,7 +26,7 @@ class PholdFederate
 
     int index_ = 0;
     int maxIndex_ = 0;
-    int initEvCount_ = 16; // starting number of events
+    unsigned int initEvCount_ = 16; // starting number of events
     double localProbability_ = .1; // probability of local events
     double randTimeMean_ = deltaTime * 2; // mean for the exponential distribution used when picking event times
 
@@ -45,6 +45,9 @@ class PholdFederate
 
     void setGenerateRandomSeed (bool b) { generateRandomSeed = b;  };
     void setRandomSeed (unsigned int s) { seed = s; };
+    void setRandomTimeMean (double mean) { randTimeMean_ = mean; };
+    void setInitialEventCount (unsigned int count) { initEvCount_ = count; };
+    void setLocalProbability (double p) { localProbability_ = p; };
 
     void run (std::function<void ()> callOnReady = nullptr)
     {
@@ -90,7 +93,7 @@ class PholdFederate
         mFed->enterExecutingMode ();
 
         // create initial events (not included in benchmark time)
-        for (int i = 0; i < initEvCount_; i++)
+        for (unsigned int i = 0; i < initEvCount_; i++)
         {
             createNewEvent ();
         }
