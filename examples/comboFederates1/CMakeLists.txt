@@ -25,7 +25,7 @@ add_custom_command(
         -E
         copy_if_different # which executes "cmake - E copy_if_different..."
         "${CMAKE_CURRENT_SOURCE_DIR}/run.sh" # <--this is in- file
-        "$<TARGET_FILE_DIR:comboFed>/"
+        "$<TARGET_FILE_DIR:comboFed>"
 ) # <--this is out-file path
 
 copy_key_files_to_target_location(comboFed)
