@@ -23,6 +23,11 @@ else()
         set_property(SOURCE helicsJava.i PROPERTY SWIG_MODULE_NAME JNIhelics)
 
         set(CMAKE_SWIG_FLAGS "-package;com.java.helics")
+
+        if(SWIG_VERSION VERSION_GREATER_EQUAL "4.0.0")
+            set(CMAKE_SWIG_FLAGS ${CMAKE_SWIG_FLAGS} "-doxygen")
+        endif()
+
         if(CMAKE_VERSION VERSION_GREATER 3.7)
             swig_add_library(
                 JNIhelics
