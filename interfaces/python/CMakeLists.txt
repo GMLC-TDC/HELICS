@@ -26,7 +26,7 @@ else()
 
             set(CMAKE_SWIG_FLAGS "-py3")
 
-            if(SWIG_VERSION VERSION_GREATER_EQUAL "4.0.0")
+            if(SWIG_VERSION VERSION_GREATER "4.0.0")
                 set(CMAKE_SWIG_FLAGS ${CMAKE_SWIG_FLAGS} "-doxygen")
             endif()
 
@@ -135,7 +135,7 @@ else()
 
             set(CMAKE_SWIG_FLAGS "-py3")
 
-            if(SWIG_VERSION VERSION_GREATER_EQUAL "4.0.0")
+            if(SWIG_VERSION VERSION_GREATER "4.0.0")
                 set(CMAKE_SWIG_FLAGS ${CMAKE_SWIG_FLAGS} "-doxygen")
             endif()
 
