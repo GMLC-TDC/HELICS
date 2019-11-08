@@ -163,7 +163,7 @@ namespace CLI
 namespace detail
 {
 template <>
-inline bool lexical_cast<helics::Time> (std::string input, helics::Time &output)
+inline bool lexical_cast<helics::Time> (const std::string &input, helics::Time &output)
 {
     try
     {
