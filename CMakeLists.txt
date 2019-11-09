@@ -607,14 +607,6 @@ add_library(HELICS::units ALIAS units-static)
 # create utilities target
 # -----------------------------------------------------------------------------
 
-set(GMLC_UTILITIES_OBJECT_LIB
-    OFF
-    CACHE INTERNAL ""
-)
-set(GMLC_UTILITIES_STATIC_LIB
-    ON
-    CACHE INTERNAL ""
-)
 set(GMLC_UTILITIES_INSTALL
     OFF
     CACHE INTERNAL ""
@@ -625,6 +617,8 @@ hide_variable(GMLC_UTILITIES_GENERATE_DOXYGEN_DOC)
 hide_variable(GMLC_UTILITIES_INCLUDE_BOOST)
 hide_variable(GMLC_UTILITIES_USE_BOOST_SPIRIT)
 hide_variable(GMLC_UTILITIES_WITH_CMAKE_PACKAGE)
+hide_variable(GMLC_UTILITIES_OBJECT_LIB)
+hide_variable(GMLC_UTILITIES_STATIC_LIB)
 
 add_library(HELICS::utilities ALIAS gmlc_utilities)
 set_target_properties(gmlc_utilities PROPERTIES FOLDER Extern)
