@@ -77,7 +77,7 @@ jobs:
         cpack_dir="$(which cmake)"
         cpack_dir="${cpack_dir%/cmake}"
         mkdir build && cd build
-        cmake -G "${BUILD_GEN}" -A "${BUILD_ARCH/x86/Win32}" -DCMAKE_BUILD_TYPE=Debug -DENABLE_PACKAGE_BUILD=ON -DBUILD_SHARED_LIBS=ON -DBUILD_HELICS_EXAMPLES=OFF -DBUILD_TESTING=OFF -DBUILD_APP_EXECUTABLES=OFF -DDISABLE_C_SHARED_LIB=ON ..
+        cmake -G "${BUILD_GEN}" -A "${BUILD_ARCH/x86/Win32}" -DCMAKE_BUILD_TYPE=Debug -DHELICS_ENABLE_PACKAGE_BUILD=ON -DHELICS_BUILD_CXX_SHARED_LIB=ON -DHELICS_BUILD_EXAMPLES=OFF -DBUILD_TESTING=OFF -DHELICS_BUILD_APP_EXECUTABLES=OFF -DHELICS_BUILD_APP_LIBRARY=ON -DHELICS_DISABLE_C_SHARED_LIB=ON ..
         cmake --build . --config Debug
         echo "Packing Debug"
         "${cpack_dir}/cpack" -G "ZIP" -C Debug -B "$(pwd)/../tmp_dir"
@@ -87,7 +87,7 @@ jobs:
         7z x "$ZIP_FILE" -y
         rm "$ZIP_FILE"
         popd
-        cmake -G "${BUILD_GEN}" -A "${BUILD_ARCH/x86/Win32}" -DCMAKE_BUILD_TYPE=Release -DENABLE_PACKAGE_BUILD=ON -DBUILD_SHARED_LIBS=ON -DBUILD_HELICS_EXAMPLES=OFF -DBUILD_TESTING=OFF -DBUILD_APP_EXECUTABLES=OFF -DDISABLE_C_SHARED_LIB=ON ..
+        cmake -G "${BUILD_GEN}" -A "${BUILD_ARCH/x86/Win32}" -DCMAKE_BUILD_TYPE=Release -DHELICS_ENABLE_PACKAGE_BUILD=ON -DHELICS_BUILD_CXX_SHARED_LIB=ON -DHELICS_BUILD_EXAMPLES=OFF -DBUILD_TESTING=OFF -DHELICS_BUILD_APP_EXECUTABLES=OFF -DHELICS_BUILD_APP_LIBRARY=ON -DHELICS_DISABLE_C_SHARED_LIB=ON ..
         cmake --build . --config Release
         echo "Packing Release"
         "${cpack_dir}/cpack" -G "ZIP" -C Release -B "$(pwd)/../tmp_dir"
@@ -157,7 +157,7 @@ jobs:
         echo "Building ${CPACK_GEN} installer with ${BUILD_GEN} for ${BUILD_ARCH}"
         choco install -y swig
         mkdir build && cd build
-        cmake -G "${BUILD_GEN}" -A "${BUILD_ARCH/x86/Win32}" -DCMAKE_BUILD_TYPE=Release -DENABLE_PACKAGE_BUILD=ON -DBUILD_PYTHON_INTERFACE=ON -DBUILD_JAVA_INTERFACE=ON -DDISABLE_STATIC_LIB_INSTALL=ON -DSTATIC_STANDARD_LIB=ON -DBUILD_HELICS_EXAMPLES=OFF -DBUILD_TESTING=OFF .. || true
+        cmake -G "${BUILD_GEN}" -A "${BUILD_ARCH/x86/Win32}" -DCMAKE_BUILD_TYPE=Release -DHELICS_ENABLE_PACKAGE_BUILD=ON -DBUILD_PYTHON_INTERFACE=ON -DBUILD_JAVA_INTERFACE=ON -DHELICS_DISABLE_STATIC_LIB_INSTALL=ON -DSTATIC_STANDARD_LIB=ON -DHELICS_BUILD_EXAMPLES=OFF -DHELICS_BUILD_APP_EXECUTABLES=ON -DHELICS_BUILD_APP_LIBRARY=OFF -DBUILD_TESTING=OFF .. || true
         cmake --build . --config Release
         cpack_dir="$(which cmake)"
         cpack_dir="${cpack_dir%/cmake}"
@@ -220,7 +220,7 @@ jobs:
         echo "Building shared library with ${BUILD_GEN} for ${BUILD_ARCH}"
         choco install -y swig
         mkdir build && cd build
-        cmake -G "${BUILD_GEN}" -A "${BUILD_ARCH/x86/Win32}" -DCMAKE_BUILD_TYPE=Release -DENABLE_PACKAGE_BUILD=ON -DDISABLE_STATIC_LIB_INSTALL=ON -DSTATIC_STANDARD_LIB=ON -DBUILD_APP_EXECUTABLES=OFF -DBUILD_HELICS_EXAMPLES=OFF -DBUILD_TESTING=OFF .. || true
+        cmake -G "${BUILD_GEN}" -A "${BUILD_ARCH/x86/Win32}" -DCMAKE_BUILD_TYPE=Release -DHELICS_ENABLE_PACKAGE_BUILD=ON -DHELICS_DISABLE_STATIC_LIB_INSTALL=ON -DSTATIC_STANDARD_LIB=ON -DHELICS_BUILD_APP_EXECUTABLES=OFF -DHELICS_BUILD_APP_LIBRARY=OFF -DHELICS_BUILD_EXAMPLES=OFF -DBUILD_TESTING=OFF .. || true
         cmake --build . --config Release
         cpack_dir="$(which cmake)"
         cpack_dir="${cpack_dir%/cmake}"
