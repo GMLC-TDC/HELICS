@@ -50,10 +50,12 @@ jobs:
             cmake_gen: 'Visual Studio 16 2019'
             msvc_ver: 'msvc2019'
     steps:
-    - uses: actions/checkout@v1
+    - name: Checkout event ref
+      uses: actions/checkout@v1
       if: github.event.action == 'published'
     
-    - uses: actions/checkout@v1
+    - name: Checkout develop branch
+      uses: actions/checkout@v1
       with:
         ref: develop
       if: github.event_name == 'schedule'
@@ -134,10 +136,12 @@ jobs:
             cmake_gen: 'Visual Studio 16 2019'
             msvc_ver: 'msvc2019'
     steps:
-    - uses: actions/checkout@v1
+    - name: Checkout event ref
+      uses: actions/checkout@v1
       if: github.event.action == 'published'
     
-    - uses: actions/checkout@v1
+    - name: Checkout develop branch
+      uses: actions/checkout@v1
       with:
         ref: develop
       if: github.event_name == 'schedule'
@@ -200,19 +204,15 @@ jobs:
             cmake_gen: 'Visual Studio 16 2019'
             msvc_ver: 'msvc2019'
     steps:
-    - uses: actions/checkout@v1
+    - name: Checkout event ref
+      uses: actions/checkout@v1
       if: github.event.action == 'published'
-      
-    - uses: actions/checkout@v1
+    
+    - name: Checkout develop branch
+      uses: actions/checkout@v1
       with:
         ref: develop
       if: github.event_name == 'schedule'
-      
-    # Build with Python 3.6 interface
-    - uses: actions/setup-python@v1
-      with:
-        python-version: '3.6'
-        architecture: ${{ matrix.arch }}
         
     # Compile HELICS and create the installer
     - name: Build installer
