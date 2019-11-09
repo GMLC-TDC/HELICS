@@ -189,7 +189,7 @@ jobs:
     strategy:
       matrix:
         os: [windows-latest]
-        arch: [x64]
+        arch: [x64, x86]
         include:
           - os: windows-latest
             cmake_gen: 'Visual Studio 16 2019'
