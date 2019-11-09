@@ -6,7 +6,7 @@ shopt -s nocasematch
 
 # Setup the flags for configuring HELICS with CMake
 OPTION_FLAGS_ARR=()
-OPTION_FLAGS_ARR+=("-DHELICS_BUILD_TESTS=ON -DHELICS_BUILD_CXX_SHARED_LIB=ON" )
+OPTION_FLAGS_ARR+=("-DHELICS_BUILD_TESTS=ON -DHELICS_BUILD_EXAMPLES=ON -DHELICS_BUILD_CXX_SHARED_LIB=ON" "-DHELICS_EXAMPLES_WARNINGS_AS_ERROR=ON")
 
 # Enable adding the slower packaging tests; will not run for CI builds unless they run ctest with the Packaging label
 OPTION_FLAGS_ARR+=("-DHELICS_ENABLE_SLOW_PACKAGING_TESTS=ON")
@@ -40,9 +40,7 @@ if [[ "$BUILD_BENCHMARKS" == 'true' ]]; then
 fi
 
 if [[ "$DISABLE_EXAMPLES" ]]; then
-
-else
-    OPTION_FLAGS_ARR+=("-DHELICS_BUILD_EXAMPLES=ON" "-DHELICS_EXAMPLES_WARNINGS_AS_ERROR=ON")
+    OPTION_FLAGS_ARR+=("-DHELICS_BUILD_EXAMPLES=OFF")
 fi
 
 # Options related to the CMake build type
