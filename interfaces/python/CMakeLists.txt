@@ -188,7 +188,7 @@ else()
             )
 
             copy_key_files_to_target_location(_helics)
-            copy_shared_target(_helics)
+            copy_shared_target(_helics helicsSharedLib)
 
         else()
             message("Building without swig cmake ${CMAKE_VERSION}")
