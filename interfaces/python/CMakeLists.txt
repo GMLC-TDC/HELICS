@@ -252,7 +252,7 @@ else()
                 helicsPYTHON
                 PROPERTIES PREFIX "_" OUTPUT_NAME "helics"
             )
-            target_link_libraries(helicsPYTHON PUBLIC)
+            target_link_libraries(helicsPYTHON PUBLIC helicsSharedLib)
 
             install(
                 TARGETS

@@ -77,8 +77,8 @@ hide_variable(BENCHMARK_USE_LIBCXX)
 hide_variable(LIBRT)
 
 set_target_properties(benchmark benchmark_main PROPERTIES FOLDER "Extern")
-target_compile_options(benchmark_main PRIVATE $<$<CXX_COMPILER_ID:MSVC>:/wd4244>)
-target_compile_options(benchmark PRIVATE $<$<CXX_COMPILER_ID:MSVC>:/wd4244>)
+target_compile_options(benchmark_main PRIVATE $<$<CXX_COMPILER_ID:MSVC>:/wd4244 /wd4800>)
+target_compile_options(benchmark PRIVATE $<$<CXX_COMPILER_ID:MSVC>:/wd4244 /wd4800>)
 
 if(MSVC AND MSVC_VERSION GREATER_EQUAL 1900)
     target_compile_definitions(benchmark PUBLIC
