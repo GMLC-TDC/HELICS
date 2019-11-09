@@ -33,7 +33,7 @@ macro(copy_key_files_to_target_location target)
     endif(WIN32)
 endmacro()
 
-macro(copy_shared_target target)
+macro(copy_shared_target target shared_target)
     add_custom_command(
         TARGET
         ${target}
@@ -42,7 +42,7 @@ macro(copy_shared_target target)
             ${CMAKE_COMMAND}
             -E
             copy_if_different # which executes "cmake - E copy_if_different..."
-            "$<TARGET_FILE:helicsSharedLib>" # <--this is in- file
+            "$<TARGET_FILE:${shared_target}>" # <--this is in- file
             "$<TARGET_FILE_DIR:${target}>/"
     ) # <--this is out- file path
 endmacro()
@@ -82,7 +82,7 @@ macro(copy_key_files_to_target_located_at target loc)
     endif(WIN32)
 endmacro()
 
-macro(copy_shared_target_at target loc)
+macro(copy_shared_target_at target loc shared_target)
     add_custom_command(
         TARGET
         ${target}
@@ -91,7 +91,7 @@ macro(copy_shared_target_at target loc)
             ${CMAKE_COMMAND}
             -E
             copy_if_different # which executes "cmake - E copy_if_different..."
-            "$<TARGET_FILE:helicsSharedLib>" # <--this is in- file
+            "$<TARGET_FILE:${shared_target}>" # <--this is in- file
             "${loc}/"
     ) # <--this is out- file path
 endmacro()
