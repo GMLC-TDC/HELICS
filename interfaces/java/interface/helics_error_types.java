@@ -8,20 +8,65 @@
 
 package com.java.helics;
 
+/**
+ *  enumeration of return values from the C interface functions
+ */
 public final class helics_error_types {
+  /**
+   *  the function executed successfully 
+   */
   public final static helics_error_types helics_ok = new helics_error_types("helics_ok", helicsJNI.helics_ok_get());
+  /**
+   *  registration has failed
+   */
   public final static helics_error_types helics_error_registration_failure = new helics_error_types("helics_error_registration_failure", helicsJNI.helics_error_registration_failure_get());
+  /**
+   *  the operation to connect has failed
+   */
   public final static helics_error_types helics_error_connection_failure = new helics_error_types("helics_error_connection_failure", helicsJNI.helics_error_connection_failure_get());
+  /**
+   *  indicator that the object used was not a valid object 
+   */
   public final static helics_error_types helics_error_invalid_object = new helics_error_types("helics_error_invalid_object", helicsJNI.helics_error_invalid_object_get());
+  /**
+   *  the parameter passed was invalid and unable to be used
+   */
   public final static helics_error_types helics_error_invalid_argument = new helics_error_types("helics_error_invalid_argument", helicsJNI.helics_error_invalid_argument_get());
+  /**
+   *  the input was discarded and not used for some reason 
+   */
   public final static helics_error_types helics_error_discard = new helics_error_types("helics_error_discard", helicsJNI.helics_error_discard_get());
+  /**
+   *  the federate has terminated unexpectedly and the call cannot be completed
+   */
   public final static helics_error_types helics_error_system_failure = new helics_error_types("helics_error_system_failure", helicsJNI.helics_error_system_failure_get());
+  /**
+   *  the function issued a warning of some kind 
+   */
   public final static helics_error_types helics_warning = new helics_error_types("helics_warning", helicsJNI.helics_warning_get());
+  /**
+   *  error issued when an invalid state transition occurred 
+   */
   public final static helics_error_types helics_error_invalid_state_transition = new helics_error_types("helics_error_invalid_state_transition", helicsJNI.helics_error_invalid_state_transition_get());
+  /**
+   *  the call made was invalid in the present state of the calling object
+   */
   public final static helics_error_types helics_error_invalid_function_call = new helics_error_types("helics_error_invalid_function_call", helicsJNI.helics_error_invalid_function_call_get());
+  /**
+   *  the function execution has failed
+   */
   public final static helics_error_types helics_error_execution_failure = new helics_error_types("helics_error_execution_failure", helicsJNI.helics_error_execution_failure_get());
+  /**
+   *  insufficient space is available to store requested data
+   */
   public final static helics_error_types helics_error_insufficient_space = new helics_error_types("helics_error_insufficient_space", helicsJNI.helics_error_insufficient_space_get());
+  /**
+   *  the function produced a helics error of some other type 
+   */
   public final static helics_error_types helics_error_other = new helics_error_types("helics_error_other", helicsJNI.helics_error_other_get());
+  /**
+   *  an unknown non-helics error was produced
+   */
   public final static helics_error_types helics_error_external_type = new helics_error_types("helics_error_external_type", helicsJNI.helics_error_external_type_get());
 
   public final int swigValue() {

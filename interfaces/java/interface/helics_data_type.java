@@ -8,17 +8,53 @@
 
 package com.java.helics;
 
+/**
+ *  enumeration of allowable data types for publications and inputs
+ */
 public final class helics_data_type {
+  /**
+   *  a sequence of characters
+   */
   public final static helics_data_type helics_data_type_string = new helics_data_type("helics_data_type_string", helicsJNI.helics_data_type_string_get());
+  /**
+   *  a double precision floating point number
+   */
   public final static helics_data_type helics_data_type_double = new helics_data_type("helics_data_type_double", helicsJNI.helics_data_type_double_get());
+  /**
+   *  a 64 bit integer
+   */
   public final static helics_data_type helics_data_type_int = new helics_data_type("helics_data_type_int", helicsJNI.helics_data_type_int_get());
+  /**
+   *  a pair of doubles representing a complex number
+   */
   public final static helics_data_type helics_data_type_complex = new helics_data_type("helics_data_type_complex", helicsJNI.helics_data_type_complex_get());
+  /**
+   *  an array of doubles
+   */
   public final static helics_data_type helics_data_type_vector = new helics_data_type("helics_data_type_vector", helicsJNI.helics_data_type_vector_get());
+  /**
+   *  a complex vector object
+   */
   public final static helics_data_type helics_data_type_complex_vector = new helics_data_type("helics_data_type_complex_vector", helicsJNI.helics_data_type_complex_vector_get());
+  /**
+   *  a named point consisting of a string and a double
+   */
   public final static helics_data_type helics_data_type_named_point = new helics_data_type("helics_data_type_named_point", helicsJNI.helics_data_type_named_point_get());
+  /**
+   *  a boolean data type
+   */
   public final static helics_data_type helics_data_type_boolean = new helics_data_type("helics_data_type_boolean", helicsJNI.helics_data_type_boolean_get());
+  /**
+   *  time data type
+   */
   public final static helics_data_type helics_data_type_time = new helics_data_type("helics_data_type_time", helicsJNI.helics_data_type_time_get());
+  /**
+   *  raw data type
+   */
   public final static helics_data_type helics_data_type_raw = new helics_data_type("helics_data_type_raw", helicsJNI.helics_data_type_raw_get());
+  /**
+   *  open type that can be anything
+   */
   public final static helics_data_type helics_data_type_any = new helics_data_type("helics_data_type_any", helicsJNI.helics_data_type_any_get());
 
   public final int swigValue() {
