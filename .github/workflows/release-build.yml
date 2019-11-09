@@ -2,7 +2,7 @@ name: Build release artifacts
 
 on:
   schedule:
-    - cron: '15 09/2 * * *' # Run at in the early hours of the morning (UTC)
+    - cron: '15 09 * * *' # Run at in the early hours of the morning (UTC)
   release:
     types: published
 
