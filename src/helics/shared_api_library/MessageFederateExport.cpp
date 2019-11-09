@@ -792,11 +792,12 @@ helics_bool helicsMessageCheckFlag (helics_message_object message, int flag)
     {
         return helics_false;
     }
-    if (flag > 15 || flag < 0)
+	//bits in a uint16
+    if (flag >=(sizeof(uint16_t)*8) || flag < 0)
     {
         return helics_false;
     }
-    helics::Message *mess = reinterpret_cast<helics::Message *> (message);
+    auto mess = reinterpret_cast<helics::Message *> (message);
     return (checkActionFlag (*mess, flag) ? helics_true : helics_false);
 }
 
@@ -806,7 +807,7 @@ const char *helicsMessageGetString (helics_message_object message)
     {
         return nullcstr;
     }
-    helics::Message *mess = reinterpret_cast<helics::Message *> (message);
+    auto mess = reinterpret_cast<helics::Message *> (message);
     return mess->data.data ();
 }
 
@@ -816,7 +817,7 @@ int helicsMessageGetRawDataSize (helics_message_object message)
     {
         return 0;
     }
-    helics::Message *mess = reinterpret_cast<helics::Message *> (message);
+    auto mess = reinterpret_cast<helics::Message *> (message);
     return static_cast<int> (mess->data.size ());
 }
 
@@ -835,7 +836,7 @@ void helicsMessageGetRawData (helics_message_object message, void *data, int max
         }
         return;
     }
-    helics::Message *mess = reinterpret_cast<helics::Message *> (message);
+    auto mess = reinterpret_cast<helics::Message *> (message);
     if (static_cast<int> (mess->data.size ()) > maxMessagelen)
     {
         *actualSize = 0;
@@ -858,7 +859,7 @@ void *helicsMessageGetRawDataPointer (helics_message_object message)
     {
         return 0;
     }
-    helics::Message *mess = reinterpret_cast<helics::Message *> (message);
+    auto mess = reinterpret_cast<helics::Message *> (message);
     return mess->data.data ();
 }
 
@@ -868,7 +869,7 @@ helics_bool helicsMessageIsValid (helics_message_object message)
     {
         return helics_false;
     }
-    helics::Message *mess = reinterpret_cast<helics::Message *> (message);
+    auto mess = reinterpret_cast<helics::Message *> (message);
     return (mess->isValid () ? helics_true : helics_false);
 }
 
@@ -883,7 +884,7 @@ void helicsMessageSetSource (helics_message_object message, const char *src, hel
         }
         return;
     }
-    helics::Message *mess = reinterpret_cast<helics::Message *> (message);
+    auto mess = reinterpret_cast<helics::Message *> (message);
     mess->source = AS_STRING (src);
 }
 
@@ -898,7 +899,7 @@ void helicsMessageSetDestination (helics_message_object message, const char *des
         }
         return;
     }
-    helics::Message *mess = reinterpret_cast<helics::Message *> (message);
+    auto mess = reinterpret_cast<helics::Message *> (message);
     mess->dest = AS_STRING (dest);
 }
 void helicsMessageSetOriginalSource (helics_message_object message, const char *src, helics_error *err)
@@ -912,7 +913,7 @@ void helicsMessageSetOriginalSource (helics_message_object message, const char *
         }
         return;
     }
-    helics::Message *mess = reinterpret_cast<helics::Message *> (message);
+    auto mess = reinterpret_cast<helics::Message *> (message);
     mess->original_source = AS_STRING (src);
 }
 void helicsMessageSetOriginalDestination (helics_message_object message, const char *dest, helics_error *err)
@@ -926,7 +927,7 @@ void helicsMessageSetOriginalDestination (helics_message_object message, const c
         }
         return;
     }
-    helics::Message *mess = reinterpret_cast<helics::Message *> (message);
+    auto mess = reinterpret_cast<helics::Message *> (message);
     mess->original_dest = AS_STRING (dest);
 }
 void helicsMessageSetTime (helics_message_object message, helics_time time, helics_error *err)
@@ -940,7 +941,7 @@ void helicsMessageSetTime (helics_message_object message, helics_time time, heli
         }
         return;
     }
-    helics::Message *mess = reinterpret_cast<helics::Message *> (message);
+   auto mess = reinterpret_cast<helics::Message *> (message);
     mess->time = time;
 }
 
@@ -955,7 +956,7 @@ void helicsMessageResize (helics_message_object message, int newSize, helics_err
         }
         return;
     }
-    helics::Message *mess = reinterpret_cast<helics::Message *> (message);
+    auto mess = reinterpret_cast<helics::Message *> (message);
     mess->data.resize (newSize);
 }
 
@@ -970,7 +971,7 @@ void helicsMessageReserve (helics_message_object message, int reservedSize, heli
         }
         return;
     }
-    helics::Message *mess = reinterpret_cast<helics::Message *> (message);
+    auto mess = reinterpret_cast<helics::Message *> (message);
     mess->data.reserve (reservedSize);
 }
 
@@ -985,7 +986,7 @@ void helicsMessageSetMessageID (helics_message_object message, int32_t messageID
         }
         return;
     }
-    helics::Message *mess = reinterpret_cast<helics::Message *> (message);
+    auto mess = reinterpret_cast<helics::Message *> (message);
     mess->messageID = messageID;
 }
 
@@ -995,7 +996,7 @@ void helicsMessageClearFlags (helics_message_object message)
     {
         return;
     }
-    helics::Message *mess = reinterpret_cast<helics::Message *> (message);
+    auto mess = reinterpret_cast<helics::Message *> (message);
     mess->flags = 0;
 }
 
@@ -1019,7 +1020,7 @@ void helicsMessageSetFlagOption (helics_message_object message, int flag, helics
         }
         return;
     }
-    helics::Message *mess = reinterpret_cast<helics::Message *> (message);
+    auto mess = reinterpret_cast<helics::Message *> (message);
     if (flagValue == helics_true)
     {
         setActionFlag (*mess, flag);
@@ -1041,7 +1042,7 @@ void helicsMessageSetString (helics_message_object message, const char *str, hel
         }
         return;
     }
-    helics::Message *mess = reinterpret_cast<helics::Message *> (message);
+    auto mess = reinterpret_cast<helics::Message *> (message);
     mess->data = AS_STRING (str);
 }
 
@@ -1056,7 +1057,7 @@ void helicsMessageSetData (helics_message_object message, const void *data, int 
         }
         return;
     }
-    helics::Message *mess = reinterpret_cast<helics::Message *> (message);
+    auto mess = reinterpret_cast<helics::Message *> (message);
     mess->data.assign (static_cast<const char *> (data), inputDataLength);
 }
 
@@ -1071,6 +1072,6 @@ void helicsMessageAppendData (helics_message_object message, const void *data, i
         }
         return;
     }
-    helics::Message *mess = reinterpret_cast<helics::Message *> (message);
+    auto mess = reinterpret_cast<helics::Message *> (message);
     mess->data.append (static_cast<const char *> (data), inputDataLength);
 }

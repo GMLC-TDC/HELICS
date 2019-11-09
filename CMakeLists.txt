@@ -119,10 +119,6 @@ if(NOT DEFINED BUILD_SHARED_LIBS)
     )
 endif()
 if(BUILD_SHARED_LIBS)
-    set(HELICS_DISABLE_STATIC_LIB_INSTALL
-        ON
-        CACHE BOOL ""
-    )
     set(HELICS_BUILD_CXX_SHARED_LIB
         ON
         CACHE BOOL ""

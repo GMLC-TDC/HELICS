@@ -8,7 +8,7 @@ A note on future revisions.
   Everything within a major version number should be code compatible (with the exception of experimental interfaces).  The most notable example of an experimental interface is the support for multiple source inputs.  The APIs to deal with this will change in future minor releases.  Everything within a single minor release should be network compatible with other federates on the same minor release number.  Compatibility across minor release numbers may be possible in some situations but we are not going to guarantee this as those components are subject to performance improvements and may need to be modified at some point.  Patch releases will be limited to bug fixes and other improvements not impacting the public API or network compatibility.  Check the [Public API](./docs/Public_API.md) for details on what is included and excluded from the public API and version stability.
 
 ## \[2.3.0\] ~ 2019-11-12
-Minor release with lots of CMake updates and build changes and a few fixes and additions.  The biggest change is in the C++ shared library. 
+Minor release with lots of CMake updates and build changes and a few fixes and additions.  The biggest change is in the C++ shared library and removal of boost\:\:test. 
 ### Changed
 -   Converted the shared_library_tests and Application_api tests to use Google test instead of Boost test
 -   Most HELICS CMake options have changed to HELICS_**, with the exception of BUILD_XXX_INTERFACE, and ENABLE_XXX_CORE.  These options will not change until HELICS 3.0, at which point all HELICS related CMake options that are not standard CMAKE options will have a leading HELICS_
@@ -227,7 +227,7 @@ This is a major revision so this changelog will not capture all the changes that
 ## \[1.3.1\] - 2018-09-23
 
 ### Changed
--   wait for Broker now uses a condition variable instead of sleep and checking repeatedly
+-   wait_for_Broker now uses a condition variable instead of sleep and checking repeatedly
 
 ### Fixed
 -   some race conditions in a few test cases and in user disconnection calls for brokers
@@ -351,7 +351,7 @@ This is a major revision so this changelog will not capture all the changes that
 -   namedpoint functions in the C++ for publications and subscriptions, and corresponding functions in the C interface and language API's
 -   Boolean publication and subscription for C++ interface, and corresponding functions in the C interface and language API's
 -   new options for brokers, --local, --ipv4, --ipv6, --all,  are shortcuts for specifying external network interfaces
--   additional documentation, CONTRIBUTORS, ROADMAP, CONTRIBUTIONS, and some other other documentation improvements
+-   additional documentation, CONTRIBUTORS, ROADMAP, CONTRIBUTIONS, and some other documentation improvements
 
 ### Changed
 -   the default interface configuration for federates and brokers.  The --interface option is less important as interfaces should mostly get automatically determined by the broker address

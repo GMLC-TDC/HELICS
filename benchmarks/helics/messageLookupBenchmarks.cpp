@@ -92,7 +92,6 @@ class messageGenerator
         std::uniform_int_distribution<> messageSource (0, cnt_local_ - 1);  // define possible sources
         const std::string message = "hello";
         const std::string destName = "ept_";
-        auto cTime = 0.0_t;
         for (int jj = 0; jj < 100; ++jj)
         {
             for (int ii = 0; ii < perloop_message_; ++ii)
