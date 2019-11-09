@@ -8,6 +8,9 @@
 
 package com.java.helics;
 
+/**
+ *  structure defining a basic complex type
+ */
 public class helics_complex {
   private transient long swigCPtr;
   protected transient boolean swigCMemOwn;

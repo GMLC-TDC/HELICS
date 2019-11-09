@@ -8,10 +8,25 @@
 
 package com.java.helics;
 
+/**
+ *  enumeration of possible return values from an iterative time request
+ */
 public final class helics_iteration_result {
+  /**
+   *  the iterations have progressed to the next time 
+   */
   public final static helics_iteration_result helics_iteration_result_next_step = new helics_iteration_result("helics_iteration_result_next_step");
+  /**
+   *  there was an error 
+   */
   public final static helics_iteration_result helics_iteration_result_error = new helics_iteration_result("helics_iteration_result_error");
+  /**
+   *  the federation has halted 
+   */
   public final static helics_iteration_result helics_iteration_result_halted = new helics_iteration_result("helics_iteration_result_halted");
+  /**
+   *  the federate is iterating at current time 
+   */
   public final static helics_iteration_result helics_iteration_result_iterating = new helics_iteration_result("helics_iteration_result_iterating");
 
   public final int swigValue() {

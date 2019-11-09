@@ -8,16 +8,50 @@
 
 package com.java.helics;
 
+/**
+ *  enumeration of options that apply to handles
+ */
 public final class helics_handle_options {
+  /**
+   *  specify that a connection is required for an interface and will generate an error if not available
+   */
   public final static helics_handle_options helics_handle_option_connection_required = new helics_handle_options("helics_handle_option_connection_required", helicsJNI.helics_handle_option_connection_required_get());
+  /**
+   *  specify that a connection is NOT required for an interface and will only be made if available<br>
+   *         no warning will be issues if not available
+   */
   public final static helics_handle_options helics_handle_option_connection_optional = new helics_handle_options("helics_handle_option_connection_optional", helicsJNI.helics_handle_option_connection_optional_get());
+  /**
+   *  specify that only a single connection is allowed for an interface
+   */
   public final static helics_handle_options helics_handle_option_single_connection_only = new helics_handle_options("helics_handle_option_single_connection_only", helicsJNI.helics_handle_option_single_connection_only_get());
+  /**
+   *  specify that multiple connections are allowed for an interface
+   */
   public final static helics_handle_options helics_handle_option_multiple_connections_allowed = new helics_handle_options("helics_handle_option_multiple_connections_allowed", helicsJNI.helics_handle_option_multiple_connections_allowed_get());
+  /**
+   *  specify that the last data should be buffered and send on subscriptions after init
+   */
   public final static helics_handle_options helics_handle_option_buffer_data = new helics_handle_options("helics_handle_option_buffer_data", helicsJNI.helics_handle_option_buffer_data_get());
+  /**
+   *  specify that the types should be checked strictly for pub/sub and filters
+   */
   public final static helics_handle_options helics_handle_option_strict_type_checking = new helics_handle_options("helics_handle_option_strict_type_checking", helicsJNI.helics_handle_option_strict_type_checking_get());
+  /**
+   *  specify that the mismatching units should be ignored
+   */
   public final static helics_handle_options helics_handle_option_ignore_unit_mismatch = new helics_handle_options("helics_handle_option_ignore_unit_mismatch", helicsJNI.helics_handle_option_ignore_unit_mismatch_get());
+  /**
+   *  specify that an interface will only transmit on change(only applicable to publications)
+   */
   public final static helics_handle_options helics_handle_option_only_transmit_on_change = new helics_handle_options("helics_handle_option_only_transmit_on_change", helicsJNI.helics_handle_option_only_transmit_on_change_get());
+  /**
+   *  specify that an interface will only update if the value has actually changed
+   */
   public final static helics_handle_options helics_handle_option_only_update_on_change = new helics_handle_options("helics_handle_option_only_update_on_change", helicsJNI.helics_handle_option_only_update_on_change_get());
+  /**
+   *  specify that an interface does not participate in determining time interrupts
+   */
   public final static helics_handle_options helics_handle_option_ignore_interrupts = new helics_handle_options("helics_handle_option_ignore_interrupts", helicsJNI.helics_handle_option_ignore_interrupts_get());
 
   public final int swigValue() {

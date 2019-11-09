@@ -8,6 +8,10 @@
 
 package com.java.helics;
 
+/**
+ *  Message_t mapped to a c compatible structure<br>
+ * this will be deprecated in HELICS 2.3 and removed in HELICS 3.0
+ */
 public class helics_message {
   private transient long swigCPtr;
   protected transient boolean swigCMemOwn;
@@ -36,74 +40,128 @@ public class helics_message {
     }
   }
 
+  /**
+   *  message time 
+   */
   public void setTime(double value) {
     helicsJNI.helics_message_time_set(swigCPtr, this, value);
   }
 
+  /**
+   *  message time 
+   */
   public double getTime() {
     return helicsJNI.helics_message_time_get(swigCPtr, this);
   }
 
+  /**
+   *  message data 
+   */
   public void setData(String value) {
     helicsJNI.helics_message_data_set(swigCPtr, this, value);
   }
 
+  /**
+   *  message data 
+   */
   public String getData() {
     return helicsJNI.helics_message_data_get(swigCPtr, this);
   }
 
+  /**
+   *  message length 
+   */
   public void setLength(long value) {
     helicsJNI.helics_message_length_set(swigCPtr, this, value);
   }
 
+  /**
+   *  message length 
+   */
   public long getLength() {
     return helicsJNI.helics_message_length_get(swigCPtr, this);
   }
 
+  /**
+   *  message identification information
+   */
   public void setMessageID(SWIGTYPE_p_int32_t value) {
     helicsJNI.helics_message_messageID_set(swigCPtr, this, SWIGTYPE_p_int32_t.getCPtr(value));
   }
 
+  /**
+   *  message identification information
+   */
   public SWIGTYPE_p_int32_t getMessageID() {
     return new SWIGTYPE_p_int32_t(helicsJNI.helics_message_messageID_get(swigCPtr, this), true);
   }
 
+  /**
+   *  flags related to the message
+   */
   public void setFlags(SWIGTYPE_p_int16_t value) {
     helicsJNI.helics_message_flags_set(swigCPtr, this, SWIGTYPE_p_int16_t.getCPtr(value));
   }
 
+  /**
+   *  flags related to the message
+   */
   public SWIGTYPE_p_int16_t getFlags() {
     return new SWIGTYPE_p_int16_t(helicsJNI.helics_message_flags_get(swigCPtr, this), true);
   }
 
+  /**
+   *  original source 
+   */
   public void setOriginal_source(String value) {
     helicsJNI.helics_message_original_source_set(swigCPtr, this, value);
   }
 
+  /**
+   *  original source 
+   */
   public String getOriginal_source() {
     return helicsJNI.helics_message_original_source_get(swigCPtr, this);
   }
 
+  /**
+   *  the most recent source 
+   */
   public void setSource(String value) {
     helicsJNI.helics_message_source_set(swigCPtr, this, value);
   }
 
+  /**
+   *  the most recent source 
+   */
   public String getSource() {
     return helicsJNI.helics_message_source_get(swigCPtr, this);
   }
 
+  /**
+   *  the final destination 
+   */
   public void setDest(String value) {
     helicsJNI.helics_message_dest_set(swigCPtr, this, value);
   }
 
+  /**
+   *  the final destination 
+   */
   public String getDest() {
     return helicsJNI.helics_message_dest_get(swigCPtr, this);
   }
 
+  /**
+   *  the original destination of the message 
+   */
   public void setOriginal_dest(String value) {
     helicsJNI.helics_message_original_dest_set(swigCPtr, this, value);
   }
 
+  /**
+   *  the original destination of the message 
+   */
   public String getOriginal_dest() {
     return helicsJNI.helics_message_original_dest_get(swigCPtr, this);
   }

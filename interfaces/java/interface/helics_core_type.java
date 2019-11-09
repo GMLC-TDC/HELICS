@@ -8,20 +8,68 @@
 
 package com.java.helics;
 
+/**
+ *  pick a core type depending on compile configuration usually either ZMQ if available or TCP 
+ */
 public final class helics_core_type {
+  /**
+   *  a default core type that will default to something available
+   */
   public final static helics_core_type helics_core_type_default = new helics_core_type("helics_core_type_default", helicsJNI.helics_core_type_default_get());
+  /**
+   *  use the Zero MQ networking protocol 
+   */
   public final static helics_core_type helics_core_type_zmq = new helics_core_type("helics_core_type_zmq", helicsJNI.helics_core_type_zmq_get());
+  /**
+   *  use MPI for operation on a parallel cluster 
+   */
   public final static helics_core_type helics_core_type_mpi = new helics_core_type("helics_core_type_mpi", helicsJNI.helics_core_type_mpi_get());
+  /**
+   *  use the Test core if all federates are in the same process 
+   */
   public final static helics_core_type helics_core_type_test = new helics_core_type("helics_core_type_test", helicsJNI.helics_core_type_test_get());
+  /**
+   *  interprocess uses memory mapped files to transfer data (for use when all federates are<br>
+   *         on the same machine 
+   */
   public final static helics_core_type helics_core_type_interprocess = new helics_core_type("helics_core_type_interprocess", helicsJNI.helics_core_type_interprocess_get());
+  /**
+   *  interprocess uses memory mapped files to transfer data (for use when all federates are<br>
+   *         on the same machine ipc is the same as /ref helics_core_type_interprocess
+   */
   public final static helics_core_type helics_core_type_ipc = new helics_core_type("helics_core_type_ipc", helicsJNI.helics_core_type_ipc_get());
+  /**
+   *  use a generic TCP protocol message stream to send messages 
+   */
   public final static helics_core_type helics_core_type_tcp = new helics_core_type("helics_core_type_tcp", helicsJNI.helics_core_type_tcp_get());
+  /**
+   *  use UDP packets to send the data 
+   */
   public final static helics_core_type helics_core_type_udp = new helics_core_type("helics_core_type_udp", helicsJNI.helics_core_type_udp_get());
+  /**
+   *  single socket version of ZMQ core usually for high fed count on the same system
+   */
   public final static helics_core_type helics_core_type_zmq_test = new helics_core_type("helics_core_type_zmq_test", helicsJNI.helics_core_type_zmq_test_get());
+  /**
+   *  for using the nanomsg communications 
+   */
   public final static helics_core_type helics_core_type_nng = new helics_core_type("helics_core_type_nng", helicsJNI.helics_core_type_nng_get());
+  /**
+   *  a single socket version of the TCP core for more easily handling firewalls
+   */
   public final static helics_core_type helics_core_type_tcp_ss = new helics_core_type("helics_core_type_tcp_ss", helicsJNI.helics_core_type_tcp_ss_get());
+  /**
+   *  a core type using http for communication
+   */
   public final static helics_core_type helics_core_type_http = new helics_core_type("helics_core_type_http", helicsJNI.helics_core_type_http_get());
+  /**
+   *  a core using websockets for communication
+   */
   public final static helics_core_type helics_core_type_websocket = new helics_core_type("helics_core_type_websocket", helicsJNI.helics_core_type_websocket_get());
+  /**
+   *  an in process core type for handling communications in shared memory<br>
+   *                                    it is pretty similar to the test core but stripped from the "test" components
+   */
   public final static helics_core_type helics_core_type_inproc = new helics_core_type("helics_core_type_inproc", helicsJNI.helics_core_type_inproc_get());
 
   public final int swigValue() {

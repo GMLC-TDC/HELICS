@@ -8,21 +8,74 @@
 
 package com.java.helics;
 
+/**
+ *  single character data type  this is intentionally the same as string enumeration of possible federate flags
+ */
 public final class helics_federate_flags {
+  /**
+   *  flag indicating that a federate is observe only
+   */
   public final static helics_federate_flags helics_flag_observer = new helics_federate_flags("helics_flag_observer", helicsJNI.helics_flag_observer_get());
+  /**
+   *  flag indicating that a federate can only return requested times
+   */
   public final static helics_federate_flags helics_flag_uninterruptible = new helics_federate_flags("helics_flag_uninterruptible", helicsJNI.helics_flag_uninterruptible_get());
+  /**
+   *  flag indicating that a federate can be interrupted
+   */
   public final static helics_federate_flags helics_flag_interruptible = new helics_federate_flags("helics_flag_interruptible", helicsJNI.helics_flag_interruptible_get());
+  /**
+   *  flag indicating that a federate/interface is a signal generator only
+   */
   public final static helics_federate_flags helics_flag_source_only = new helics_federate_flags("helics_flag_source_only", helicsJNI.helics_flag_source_only_get());
+  /**
+   *  flag indicating a federate/interface should only transmit values if they have changed(binary<br>
+   *            equivalence)
+   */
   public final static helics_federate_flags helics_flag_only_transmit_on_change = new helics_federate_flags("helics_flag_only_transmit_on_change", helicsJNI.helics_flag_only_transmit_on_change_get());
+  /**
+   *  flag indicating a federate/interface should only trigger an update if a value has changed (binary<br>
+   * equivalence)
+   */
   public final static helics_federate_flags helics_flag_only_update_on_change = new helics_federate_flags("helics_flag_only_update_on_change", helicsJNI.helics_flag_only_update_on_change_get());
+  /**
+   *  flag indicating a federate should only grant time if all other federates have already passed the<br>
+   * requested time
+   */
   public final static helics_federate_flags helics_flag_wait_for_current_time_update = new helics_federate_flags("helics_flag_wait_for_current_time_update", helicsJNI.helics_flag_wait_for_current_time_update_get());
+  /**
+   *  flag indicating a federate should operate on a restrictive time policy, which disallows some 2nd order<br>
+   *         time evaluation and can be useful for certain types of dependency cycles<br>
+   *         and update patterns, but generally shouldn't be used as it can lead to some very slow update conditions
+   */
   public final static helics_federate_flags helics_flag_restrictive_time_policy = new helics_federate_flags("helics_flag_restrictive_time_policy", helicsJNI.helics_flag_restrictive_time_policy_get());
+  /**
+   *  flag indicating that a federate has rollback capability
+   */
   public final static helics_federate_flags helics_flag_rollback = new helics_federate_flags("helics_flag_rollback", helicsJNI.helics_flag_rollback_get());
+  /**
+   *  flag indicating that a federate performs forward computation and does internal rollback
+   */
   public final static helics_federate_flags helics_flag_forward_compute = new helics_federate_flags("helics_flag_forward_compute", helicsJNI.helics_flag_forward_compute_get());
+  /**
+   *  flag indicating that a federate needs to run in real time
+   */
   public final static helics_federate_flags helics_flag_realtime = new helics_federate_flags("helics_flag_realtime", helicsJNI.helics_flag_realtime_get());
+  /**
+   *  flag indicating that the federate will only interact on a single thread
+   */
   public final static helics_federate_flags helics_flag_single_thread_federate = new helics_federate_flags("helics_flag_single_thread_federate", helicsJNI.helics_flag_single_thread_federate_get());
+  /**
+   *  used to delay a core from entering initialization mode even if it would otherwise be ready
+   */
   public final static helics_federate_flags helics_flag_delay_init_entry = new helics_federate_flags("helics_flag_delay_init_entry", helicsJNI.helics_flag_delay_init_entry_get());
+  /**
+   *  used to clear the HELICS_DELAY_INIT_ENTRY flag in cores
+   */
   public final static helics_federate_flags helics_flag_enable_init_entry = new helics_federate_flags("helics_flag_enable_init_entry", helicsJNI.helics_flag_enable_init_entry_get());
+  /**
+   *  used to not display warnings on mismatched requested times
+   */
   public final static helics_federate_flags helics_flag_ignore_time_mismatch_warnings = new helics_federate_flags("helics_flag_ignore_time_mismatch_warnings", helicsJNI.helics_flag_ignore_time_mismatch_warnings_get());
 
   public final int swigValue() {

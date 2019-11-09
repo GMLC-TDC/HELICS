@@ -8,13 +8,38 @@
 
 package com.java.helics;
 
+/**
+ *  enumeration of the predefined filter types
+ */
 public final class helics_filter_type {
+  /**
+   *  a custom filter type that executes a user defined callback
+   */
   public final static helics_filter_type helics_filter_type_custom = new helics_filter_type("helics_filter_type_custom", helicsJNI.helics_filter_type_custom_get());
+  /**
+   *  a filter type that executes a fixed delay on a message
+   */
   public final static helics_filter_type helics_filter_type_delay = new helics_filter_type("helics_filter_type_delay", helicsJNI.helics_filter_type_delay_get());
+  /**
+   *  a filter type that executes a random delay on the messages
+   */
   public final static helics_filter_type helics_filter_type_random_delay = new helics_filter_type("helics_filter_type_random_delay", helicsJNI.helics_filter_type_random_delay_get());
+  /**
+   *  a filter type that randomly drops messages
+   */
   public final static helics_filter_type helics_filter_type_random_drop = new helics_filter_type("helics_filter_type_random_drop", helicsJNI.helics_filter_type_random_drop_get());
+  /**
+   *  a filter type that reroutes a message to a different destination than originally specified
+   */
   public final static helics_filter_type helics_filter_type_reroute = new helics_filter_type("helics_filter_type_reroute", helicsJNI.helics_filter_type_reroute_get());
+  /**
+   *  a filter type that duplicates a message and sends the copy to a different destination
+   */
   public final static helics_filter_type helics_filter_type_clone = new helics_filter_type("helics_filter_type_clone", helicsJNI.helics_filter_type_clone_get());
+  /**
+   *  a customizable filter type that can perform different actions on a message based on firewall like<br>
+   *            rules
+   */
   public final static helics_filter_type helics_filter_type_firewall = new helics_filter_type("helics_filter_type_firewall", helicsJNI.helics_filter_type_firewall_get());
 
   public final int swigValue() {

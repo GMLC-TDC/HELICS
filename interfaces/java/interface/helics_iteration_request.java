@@ -8,9 +8,21 @@
 
 package com.java.helics;
 
+/**
+ *  enumeration of the different iteration results
+ */
 public final class helics_iteration_request {
+  /**
+   *  no iteration is requested 
+   */
   public final static helics_iteration_request helics_iteration_request_no_iteration = new helics_iteration_request("helics_iteration_request_no_iteration");
+  /**
+   *  force iteration return when able 
+   */
   public final static helics_iteration_request helics_iteration_request_force_iteration = new helics_iteration_request("helics_iteration_request_force_iteration");
+  /**
+   *  only return an iteration if necessary 
+   */
   public final static helics_iteration_request helics_iteration_request_iterate_if_needed = new helics_iteration_request("helics_iteration_request_iterate_if_needed");
 
   public final int swigValue() {

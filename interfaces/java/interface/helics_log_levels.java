@@ -8,15 +8,45 @@
 
 package com.java.helics;
 
+/**
+ *  log level definitions
+ */
 public final class helics_log_levels {
+  /**
+   *  don't print anything except a few catastrophic errors
+   */
   public final static helics_log_levels helics_log_level_no_print = new helics_log_levels("helics_log_level_no_print", helicsJNI.helics_log_level_no_print_get());
+  /**
+   *  only print error level indicators
+   */
   public final static helics_log_levels helics_log_level_error = new helics_log_levels("helics_log_level_error", helicsJNI.helics_log_level_error_get());
+  /**
+   *  only print warnings and errors
+   */
   public final static helics_log_levels helics_log_level_warning = new helics_log_levels("helics_log_level_warning", helicsJNI.helics_log_level_warning_get());
+  /**
+   *  warning errors and summary level information
+   */
   public final static helics_log_levels helics_log_level_summary = new helics_log_levels("helics_log_level_summary", helicsJNI.helics_log_level_summary_get());
+  /**
+   *  summary+ notices about federate and broker connections +messages about network connections
+   */
   public final static helics_log_levels helics_log_level_connections = new helics_log_levels("helics_log_level_connections", helicsJNI.helics_log_level_connections_get());
+  /**
+   *  connections+ interface definitions
+   */
   public final static helics_log_levels helics_log_level_interfaces = new helics_log_levels("helics_log_level_interfaces", helicsJNI.helics_log_level_interfaces_get());
+  /**
+   *  interfaces + timing message
+   */
   public final static helics_log_levels helics_log_level_timing = new helics_log_levels("helics_log_level_timing", helicsJNI.helics_log_level_timing_get());
+  /**
+   *  timing+ data transfer notices
+   */
   public final static helics_log_levels helics_log_level_data = new helics_log_levels("helics_log_level_data", helicsJNI.helics_log_level_data_get());
+  /**
+   *  all internal messages
+   */
   public final static helics_log_levels helics_log_level_trace = new helics_log_levels("helics_log_level_trace", helicsJNI.helics_log_level_trace_get());
 
   public final int swigValue() {
