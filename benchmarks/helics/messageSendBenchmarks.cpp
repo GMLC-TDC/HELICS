@@ -98,7 +98,7 @@ class MessageExchangeFederate
         {
             while (ept.hasMessage ())
             {
-                auto m = ept.getMessage ();
+                ept.getMessage ();
             }
 
             for (int i = 0; i < msgCount; i++)
