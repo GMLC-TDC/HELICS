@@ -76,7 +76,7 @@ install(
 )
 
 copy_key_files_to_target_location(_helics)
-copy_shared_target(_helics)
+copy_shared_target(_helics helicsSharedLib)
 
 install(FILES ${CMAKE_CURRENT_BINARY_DIR}/helics.py DESTINATION python COMPONENT python)
 install_key_files_with_comp(python)

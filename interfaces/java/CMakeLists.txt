@@ -104,7 +104,7 @@ else()
     )
 
     copy_key_files_to_target_location(JNIhelics)
-    copy_shared_target(JNIhelics)
+    copy_shared_target(JNIhelics helicsSharedLib)
 
     install(
         FILES ${CMAKE_CURRENT_BINARY_DIR}/buildjar/helics-${HELICS_VERSION}.jar
