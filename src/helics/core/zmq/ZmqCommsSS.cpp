@@ -331,7 +331,6 @@ void ZmqCommsSS::queue_tx_function ()
 
     setRxStatus (connection_status::connected);
 
-    bool close_tx = false;
     int status = 0;
 
     bool haltLoop{false};
@@ -361,7 +360,7 @@ void ZmqCommsSS::queue_tx_function ()
                 if (rid == control_route)
                 {
                     processed = true;
-                    close_tx = processTxControlCmd (cmd, routes, connection_info);
+                    auto close_tx = processTxControlCmd (cmd, routes, connection_info);
 
                     if (close_tx)
                     {
