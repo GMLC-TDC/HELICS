@@ -36,4 +36,4 @@ if(HELICS_BUILD_TESTS AND NOT MSVC)
 endif()
 
 copy_key_files_to_target_location(nonlings_fed1_cpp)
-copy_shared_target(nonlings_fed1_cpp)
+copy_shared_target(nonlings_fed1_cpp helicsSharedLib)

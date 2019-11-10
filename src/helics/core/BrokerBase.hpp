@@ -65,7 +65,7 @@ class BrokerBase
     std::unique_ptr<ForwardingTimeCoordinator> timeCoord;  //!< object managing the time control
     gmlc::containers::BlockingPriorityQueue<ActionMessage> actionQueue;  //!< primary routing queue
     /** enumeration of the possible core states*/
-    enum broker_state_t : int16_t
+    enum class broker_state_t : int16_t
     {
         created = -6,  //!< the broker has been created
         configuring = -5,  //!< the broker is in the processing of configuring
@@ -78,7 +78,7 @@ class BrokerBase
         terminated = 3,  //!< the termination process has started
         errored = 7,  //!< an error was encountered
     };
-    std::atomic<broker_state_t> brokerState{created};  //!< flag indicating that the structure is past the
+    std::atomic<broker_state_t> brokerState{broker_state_t::created};  //!< flag indicating that the structure is past the
                                                        //!< initialization stage indicating that no more changes
                                                        //!< can be made to the number of federates or handles
     bool noAutomaticID{false};  //!< the broker should not automatically generate an ID

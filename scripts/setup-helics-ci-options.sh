@@ -39,6 +39,10 @@ if [[ "$BUILD_BENCHMARKS" == 'true' ]]; then
     OPTION_FLAGS_ARR+=("-DHELICS_BUILD_BENCHMARKS=ON")
 fi
 
+if [[ "$DISABLE_EXAMPLES" ]]; then
+    OPTION_FLAGS_ARR+=("-DHELICS_BUILD_EXAMPLES=OFF")
+fi
+
 # Options related to the CMake build type
 if [[ "$BUILD_TYPE" ]]; then
     OPTION_FLAGS_ARR+=("-DCMAKE_BUILD_TYPE=${BUILD_TYPE}")

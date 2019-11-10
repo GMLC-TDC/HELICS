@@ -396,7 +396,7 @@ TEST_P (player_file_tests, test_files_exe)
     retTime = vfed.requestTime (5);
     EXPECT_EQ (retTime, 5.0);
     vfed.finalize ();
-    auto out2 = res2.get ();
+    res2.get ();
     res.get ();
     // out = 0;
     std::this_thread::sleep_for (std::chrono::milliseconds (300));

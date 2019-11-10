@@ -37,7 +37,7 @@ endif() # SWIG_EXECUTABLE
 set_target_properties(CShelics PROPERTIES DEBUG_POSTFIX "")
 
 copy_key_files_to_target_location(CShelics)
-copy_shared_target(CShelics)
+copy_shared_target(CShelics helicsSharedLib)
 
 install_key_files_with_comp(csharp)
 

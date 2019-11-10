@@ -73,14 +73,14 @@ else()
             )
 
             copy_key_files_to_target_location(_helics)
-            copy_shared_target(_helics)
+            copy_shared_target(_helics helicsSharedLib)
 
         else()
             message("Building without swig cmake ${CMAKE_VERSION}")
             python3_add_library(helicsPYTHON MODULE helicsPython.c)
 
             copy_key_files_to_target_location(helicsPYTHON PUBLIC)
-            copy_shared_target(helicsPYTHON PUBLIC)
+            copy_shared_target(helicsPYTHON helicsSharedLib)
 
             # Set the output library name to _helics
             set_target_properties(
@@ -188,7 +188,7 @@ else()
             )
 
             copy_key_files_to_target_location(_helics)
-            copy_shared_target(_helics)
+            copy_shared_target(_helics helicsSharedLib)
 
         else()
             message("Building without swig cmake ${CMAKE_VERSION}")
@@ -244,8 +244,8 @@ else()
 
             endif()
 
-            copy_key_files_to_target_location(helicsPYTHON PUBLIC)
-            copy_shared_target(helicsPYTHON PUBLIC)
+            copy_key_files_to_target_location(helicsPYTHON)
+            copy_shared_target(helicsPYTHON helicsSharedLib)
 
             # Set the output library name to _helics
             set_target_properties(

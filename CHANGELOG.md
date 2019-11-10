@@ -7,19 +7,20 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 A note on future revisions.  
   Everything within a major version number should be code compatible (with the exception of experimental interfaces).  The most notable example of an experimental interface is the support for multiple source inputs.  The APIs to deal with this will change in future minor releases.  Everything within a single minor release should be network compatible with other federates on the same minor release number.  Compatibility across minor release numbers may be possible in some situations but we are not going to guarantee this as those components are subject to performance improvements and may need to be modified at some point.  Patch releases will be limited to bug fixes and other improvements not impacting the public API or network compatibility.  Check the [Public API](./docs/Public_API.md) for details on what is included and excluded from the public API and version stability.
 
-## \[2.3.0\] ~ 2019-10-31
-Minor release with lots of cmake updates and build changes
+## \[2.3.0\] ~ 2019-11-12
+Minor release with lots of CMake updates and build changes and a few fixes and additions.  The biggest change is in the C++ shared library and removal of boost\:\:test. 
 ### Changed
 -   Converted the shared_library_tests and Application_api tests to use Google test instead of Boost test
 -   Most HELICS CMake options have changed to HELICS_**, with the exception of BUILD_XXX_INTERFACE, and ENABLE_XXX_CORE.  These options will not change until HELICS 3.0, at which point all HELICS related CMake options that are not standard CMAKE options will have a leading HELICS_
--   Some attempts were made to further modernize the usage in CMake,  This effort ended up fixing a few bugs in certain conditions and simplifying things, the cmake code was also run through a formatter
--   The exported C++ shared library has been heavily modified to only include functions in the public API, and is now the recommended way to link with HELICS directly in a C++ program.  HELICS::helics-shared target is now available for linking through cmake.  If libraries were previously linking with the installed static library this is a BREAKING Change.  Those previously linking with the C++ shared library may also need modifications.  Changes include:
+-   Some attempts were made to further modernize the usage in CMake,  This effort ended up fixing a few bugs in certain conditions and simplifying things, the CMake code was also run through a formatter
+-   The exported C++ shared library has been heavily modified to only include functions in the public API, and is now the recommended way to link with HELICS directly in a C++ program.  HELICS::helics-shared target is now available for linking through CMake.  If libraries were previously linking with the installed static library this is a BREAKING Change.  Those previously linking with the C++ shared library may also need modifications.  Changes include:
     -   The coreFactory and brokerFactory headers are deprecated as part of the public headers, they are still used internally but should not be used by linking libraries.  The public version will remain stable but show deprecated messages.  The internal version used by the core will likely be modified in the future.  
     -   New Headers for CoreApp and BrokerApp can be used to provide nearly all the same capabilities in the application API.  
     -   new headers typeOperations.hpp and timeOperations.hpp were added to the Application_api to provide string operations for the time and core types.  In the shared-library core-time, and core-type headers included these headers but that will be deprecated in the future.  
     -   CMAKE options for building utilities/units/json as object libraries have been removed as they were no longer needed.  
-    -   the cereal library is moved to the external folder in the helics directory and is now required to be available for the C++ shared library, so a cmake variable making it optional was removed.  
+    -   the cereal library is moved to the external folder in the helics directory and is now required to be available for the C++ shared library, so a CMake variable making it optional was removed.  
     -   The reason for this change was partly as a stepping stone for other internal library changes, and to simplify the build complexity and allow more flexibility in linking libraries without impacting the installed interfaces.  The previous methods and installed libraries were coming into conflict with other packages and posing increasing challenges in maintenance and linking.  This change forced more separation in the HELICS layers, and the installed libraries and simplified a lot of the build generation scripts.  
+-   CLI11, utilities, filesystem and units libraries were updated with latest revisions.  
 
 ### Fixed
 -   Race condition when removing subscriptions or targets from an interface
@@ -29,6 +30,14 @@ Minor release with lots of cmake updates and build changes
 
 ### Added
 -   A set of included helics benchmarks using the Google benchmark library.
+    - echo benchmark
+	- echo message benchmark
+	- ring benchmark
+    - PHOLD benchmarks for single machine
+    - message size and count benchmark
+	- filter benchmark based on echo message benchmark
+	- actionMessage benchmarks
+	- data conversion benchmarks
 -   the src, test, benchmarks directory can now be used as a root directory for CMake to do the appropriate build with few options.  
 -   dedicated internal functions for conversion of bool operators,  strings such as "off", "false", "disabled", "inactive" are now supported as valid bool values.  
 -   Shared libraries for the C++ Application api and apps library are built and installed containing only public API functions and classes.  
@@ -36,14 +45,27 @@ Minor release with lots of cmake updates and build changes
 -   Example linking with the shared libraries
 -   a build_flags_target is exported with flags that may effect compilation
 -   a compile_flags_target is exported, mostly for seeing which non-abi related flags HELICS was built with.  
--   a helicsXXXMakeConnections function which takes a file to establish linkages for Core and Broker to the C shared API.  
+-   a helicsXXXMakeConnections function which takes a file to establish linkages for Core and Broker to the C shared API. 
+-   automated generation of interface code for python, matlab, and java interfaces
+-   overloads of federate creation functions in C++ for CoreApp
+-   overloads of filter creation function in C++ to use CoreApp
+-   docstrings were added using swig -doxygen to python, python2 and java interfaces
+-   add "queries" query to core, federate, and broker which gets a list of available queries
+-   add "isconnected", "filters", "inputs" query to core to retrieve list of available filters and inputs, and if the core is connected.  
+-   added an INPROC core type, which replaces the TEST core for most user uses, the TEST core does the same thing but has additional functionality to mock network issues for testing, more of these capabilities will be added.  The INPROC core will remain simplified and as fast as possible for in process federations. 
+-  Windows CI builds for visual studio 2019, 2017, 2015 on Azure, reduced workload on Appveyor.
+
+### Deprecated
+-   use of coreFactory and BrokerFactory when using the C++ shared library (use CoreApp and BrokerApp instead)
+-   coreType and helics-time string conversion functions are no longer defined in the helics-time header.  They are still there currently but are deprecated and will be removed in HELICS 3.0
+	use the typeOperations.hpp and timeOperations.hpp header instead which now defines those functions.  
 
 ### Removed
--   All tests using boost::test have now been replaced with Google test, so references and linking to boost::test has been removed
--   Exporting and installing the static libraries has been removed
+-   All tests using boost\:\:test have now been replaced with Google test, so references and linking to boost\:\:test has been removed
+-   Exporting and installing the static libraries has been removed (they can still be used by using HELICS as a subproject)
 -   CMake option to exclude static libs from the install has been removed
--   CMake options for building JSONCPP,  Utilities,  and units libraries as object libraries have been Removed
--   JSONCPP, Utilities, and units libraries are no longer installed in any form.  
+-   CMake options for building JSONCPP,  Utilities,  and units libraries as object libraries have been removed as object libraries are no longer being used
+-   JSONCPP, Utilities, and units libraries are no longer installed in any form libraries or headers.  
 -   CMake option to install CEREAL headers,(they are now required, but are in a different location)
 
 ## \[2.2.2\] ~ 2019-10-27
@@ -52,7 +74,7 @@ Bug fix release
 ### Fixed
 -   Links in the README changed with an automated move to travis-ci.com
 -   Fix issue #853, which was causing core connections to timeout if no direct communication was observed for a period of time.  This bug fix release fixes that issue where the pings were not being correctly accounted for in the timeout detection.
--   Fix Ctrl-C issue when using HELICS in some language api's
+-   Fix Ctrl-C issue when using HELICS in some language api's (python and Julia)
 
 
 
@@ -63,8 +85,8 @@ Minor release with bug fixes and a few additional features
 -   **BREAKING CHANGE** The C interface helics logging callback specifications now include a user data object.  This is technically a breaking change, but there were a few issues with the current implementation so it is not entirely clear it was usable as it was.  There are now some tests for the functionality.  This log callback specification was not available in the language API's and the C++ API has not changed, only the C interface to specifying direct logging callbacks.  This is considered a minor change due to no known users of this interface at present and as it was it wasn't entirely operational.  No further changes are expected.  
 -   The use of Boost C++ in the helics core and application api are now limited to the IPC core(there are no plans to remove this usage) and an option to `DISABLE_BOOST` is available in the CMAKE files.  This will turn off the IPC_CORE and any optional uses of boost in some of the libraries.  Future features may use Boost but should retain the ability to disable its use.  
 -   **BREAKING CHANGE** Some function names in the C\+\+98 API were changed to better match the C\+\+ API and were documented more completely through doxygen,  these were listed as potentially changing in the [Public API](/docs/Public_API.md) so this is not a consideration for semantic versioning.  The C++98 API also has limited numbers of users at this point yet and may not be fully stable until HELICS 3.0 release
--   The doxygen cmake project was renamed from `doc` to `helics_doxygen`
--   several variables used by submodules in cmake were hidden
+-   The doxygen CMake project was renamed from `doc` to `helics_doxygen`
+-   several variables used by submodules in CMake were hidden
 -   updated zmq subproject version to 4.3.2
 
 ### Fixed
@@ -72,7 +94,7 @@ Minor release with bug fixes and a few additional features
 -   Fixed a race condition related to queries of subscriptions and inputs of a federate if done remotely.  The core could lock or a race condition could occur.  
 -   some issues related to file logs
 -   started to address some recommendations for `include-what-you-use`
--   The cmake conditions for building the C# interface and Python2 interface were not completely correct and incorrectly showed an error which was also incorrectly ignored, so it all worked unless there was an actual error, but those issues have been resolved.  
+-   The CMake conditions for building the C# interface and Python2 interface were not completely correct and incorrectly showed an error which was also incorrectly ignored, so it all worked unless there was an actual error, but those issues have been resolved.  
 
 ### Added
 -   logMessage functions in the federate for user specified log messages and levels
@@ -112,7 +134,7 @@ Minor release with some updates to the networking portion of HELICS and some API
 -   A Docker image containing the HELICS apps (available on Docker Hub for tagged releases and the latest develop branch at [https://hub.docker.com/r/helics/helics](https://hub.docker.com/r/helics/helics))
 
 ### Removed
--   ENABLE_SWIG option in cmake as always ON.  This option will only appear for interfaces that have existing build files.  For swig generated interfaces that do not have prebuilt files (octave, python2, and C#) this option will no longer appear as swig is required.  
+-   ENABLE_SWIG option in CMake as always ON.  This option will only appear for interfaces that have existing build files.  For swig generated interfaces that do not have prebuilt files (octave, python2, and C#) this option will no longer appear as swig is required.  
 
 ## \[2.1.1\] - 2019-07-15
 Minor release which fixes a few bugs and add some JSON related input and queries
@@ -171,7 +193,7 @@ The main focus of this minor release is cleaning up the build system and extract
 -   potential issue with only_update_on_change_flag when used at the federate level, along with some tests
 
 ### Added
--   the HELICS library can now operate as a subproject in a larger cmake project if needed
+-   the HELICS library can now operate as a subproject in a larger CMake project if needed
 -   tcp cores have a --reuse-address flag to allow multiple brokers on the same port,  mostly useful for the test suite to prevent spurious failures due to the OS not releasing tcp ports in a timely manner.  
 -   several C++ api functions for using a vector of strings as command line arguments, in the federates and in the broker/core factory, this is related to the transition to CLI11
 -   tests for building HELICS with musl instead of glibc
@@ -205,7 +227,7 @@ This is a major revision so this changelog will not capture all the changes that
 ## \[1.3.1\] - 2018-09-23
 
 ### Changed
--   wait for Broker now uses a condition variable instead of sleep and checking repeatedly
+-   wait_for_Broker now uses a condition variable instead of sleep and checking repeatedly
 
 ### Fixed
 -   some race conditions in a few test cases and in user disconnection calls for brokers
@@ -243,7 +265,7 @@ This is a major revision so this changelog will not capture all the changes that
 
 ### Changed
 -   added better code for allowing static runtime builds
--   use the cmake version numbers instead of independent variables
+-   use the CMake version numbers instead of independent variables
 -   Environment variables are recognized in CMAKE find options- split API tests from system wide tests
 -   added options on MSVC to build with embedded system libraries and embedded debug info.
 
@@ -268,7 +290,7 @@ This is a major revision so this changelog will not capture all the changes that
 
 ### Changed
 -   conversion of doubles into the internal time base now rounds to the nearest ns instead of truncating
--   unify cmake scripts to use lower case commands
+-   unify CMake scripts to use lower case commands
 
 ## \[1.2.0\] - 2018-06-18
 
@@ -329,7 +351,7 @@ This is a major revision so this changelog will not capture all the changes that
 -   namedpoint functions in the C++ for publications and subscriptions, and corresponding functions in the C interface and language API's
 -   Boolean publication and subscription for C++ interface, and corresponding functions in the C interface and language API's
 -   new options for brokers, --local, --ipv4, --ipv6, --all,  are shortcuts for specifying external network interfaces
--   additional documentation, CONTRIBUTORS, ROADMAP, CONTRIBUTIONS, and some other other documentation improvements
+-   additional documentation, CONTRIBUTORS, ROADMAP, CONTRIBUTIONS, and some other documentation improvements
 
 ### Changed
 -   the default interface configuration for federates and brokers.  The --interface option is less important as interfaces should mostly get automatically determined by the broker address

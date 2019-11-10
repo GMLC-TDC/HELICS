@@ -184,7 +184,7 @@ static void BM_echo_singleCore (benchmark::State &state)
         state.PauseTiming ();
 
         int feds = static_cast<int> (state.range (0));
-        gmlc::concurrency::Barrier brr (feds + 1);
+        gmlc::concurrency::Barrier brr (static_cast<size_t>(feds) + 1);
         auto wcore = helics::CoreFactory::create (core_type::INPROC, std::string ("--autobroker --federates=") +
                                                                        std::to_string (feds + 1));
         EchoHub hub;
@@ -230,7 +230,7 @@ static void BM_echo_multiCore (benchmark::State &state, core_type cType)
         state.PauseTiming ();
 
         int feds = static_cast<int> (state.range (0));
-        gmlc::concurrency::Barrier brr (feds + 1);
+        gmlc::concurrency::Barrier brr (static_cast<size_t>(feds) + 1);
 
         auto broker = helics::BrokerFactory::create (cType, "brokerb",
                                                      std::string ("--federates=") + std::to_string (feds + 1));

@@ -331,10 +331,11 @@ void UdpComms::queue_tx_function ()
                 {
                 case NEW_ROUTE:
                 {
-                    auto &newroute = cmd.payload;
+                    
 
                     try
                     {
+                        auto &newroute = cmd.payload;
                         std::string interface;
                         std::string port;
                         std::tie (interface, port) = extractInterfaceandPortString (newroute);

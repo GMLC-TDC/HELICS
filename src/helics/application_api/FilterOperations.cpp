@@ -119,7 +119,10 @@ double randDouble (random_dists_t dist, double p1, double p2)
           new std::mt19937 (std::random_device{}() +
                             static_cast<unsigned int> (std::hash<std::thread::id>{}(std::this_thread::get_id ())));
     }
-
+    if (genPtr == nullptr)
+    {
+        throw (helics::FunctionExecutionFailure ("unable to allocate random generator"));
+    }
     auto &generator = *genPtr;
 
 #    endif
@@ -268,9 +271,10 @@ std::shared_ptr<FilterOperator> RandomDelayFilterOperation::getOperator ()
 }
 
 RandomDropFilterOperation::RandomDropFilterOperation ()
+    : tcond (std::make_shared<MessageConditionalOperator> ([this] (const Message *) {
+          return (randDouble (random_dists_t::bernoulli, (1.0 - dropProb), 1.0) > 0.1);
+      }))
 {
-    tcond = std::make_shared<MessageConditionalOperator> (
-      [this] (const Message *) { return (randDouble (random_dists_t::bernoulli, (1.0 - dropProb), 1.0) > 0.1); });
 }
 
 RandomDropFilterOperation::~RandomDropFilterOperation () = default;
@@ -289,9 +293,9 @@ std::shared_ptr<FilterOperator> RandomDropFilterOperation::getOperator ()
 }
 
 RerouteFilterOperation::RerouteFilterOperation ()
+    : op (std::make_shared<MessageDestOperator> (
+        [this] (const std::string &src, const std::string &dest) { return rerouteOperation (src, dest); }))
 {
-    op = std::make_shared<MessageDestOperator> (
-      [this] (const std::string &src, const std::string &dest) { return rerouteOperation (src, dest); });
 }
 
 RerouteFilterOperation::~RerouteFilterOperation () = default;
@@ -361,8 +365,8 @@ std::string RerouteFilterOperation::rerouteOperation (const std::string &src, co
 }
 
 FirewallFilterOperation::FirewallFilterOperation ()
+    : op (std::make_shared<FirewallOperator> ([this] (const Message *mess) { return allowPassed (mess); }))
 {
-    op = std::make_shared<FirewallOperator> ([this] (const Message *mess) { return allowPassed (mess); });
 }
 
 FirewallFilterOperation::~FirewallFilterOperation () = default;
@@ -378,9 +382,9 @@ std::shared_ptr<FilterOperator> FirewallFilterOperation::getOperator ()
 
 bool FirewallFilterOperation::allowPassed (const Message * /*mess*/) const { return true; }
 
-CloneFilterOperation::CloneFilterOperation (Core *core) : coreptr (core)
+CloneFilterOperation::CloneFilterOperation (Core *core)
+    : coreptr (core), op (std::make_shared<CloneOperator> ([this] (const Message *mess) { sendMessage (mess); }))
 {
-    op = std::make_shared<CloneOperator> ([this] (const Message *mess) { sendMessage (mess); });
 }
 
 CloneFilterOperation::~CloneFilterOperation () = default;

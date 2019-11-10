@@ -204,7 +204,7 @@ route_id CoreBroker::fillMessageRouteInformation (ActionMessage &mess)
 bool CoreBroker::isOpenToNewFederates () const
 {
     auto cstate = brokerState.load ();
-    return ((cstate != created) && (cstate < operating) && (!haltOperations));
+    return ((cstate != broker_state_t::created) && (cstate < broker_state_t::operating) && (!haltOperations));
 }
 
 void CoreBroker::processPriorityCommand (ActionMessage &&command)
@@ -258,7 +258,7 @@ void CoreBroker::processPriorityCommand (ActionMessage &&command)
             earlyMessages.push_back (std::move (command));
             break;
         }
-        if (brokerState != operating)
+        if (brokerState != broker_state_t::operating)
         {
             if (allInitReady ())
             {
@@ -354,7 +354,7 @@ void CoreBroker::processPriorityCommand (ActionMessage &&command)
                 return;
             }
         }
-        if (brokerState != operating)
+        if (brokerState != broker_state_t::operating)
         {
             if (allInitReady ())
             {
@@ -1868,7 +1868,7 @@ bool CoreBroker::connect ()
 bool CoreBroker::isConnected () const
 {
     auto state = brokerState.load (std::memory_order_acquire);
-    return ((state == operating) || (state == connected));
+    return ((state == broker_state_t::operating) || (state == broker_state_t::connected));
 }
 
 bool CoreBroker::waitForDisconnect (std::chrono::milliseconds msToWait) const
@@ -1932,7 +1932,7 @@ void CoreBroker::disconnect ()
     {
         ++cnt;
         LOG_WARNING (global_id.load (), getIdentifier (),
-                     "waiting on disconnect: current state=" + std::to_string (brokerState.load ()));
+                     "waiting on disconnect: current state=" + std::to_string (static_cast<int16_t>(brokerState.load ())));
         if (cnt == 5)
         {
             addActionMessage (udisconnect);

@@ -117,9 +117,9 @@ void CoreApp::processArgs (std::unique_ptr<helicsCLI11App> &app)
             }
         }
     }
-    if (!core || !core->isConnected ())
+    if (!core)
     {
-        throw (ConnectionFailure ("Core is unable to connect\n"));
+        throw (ConnectionFailure ("Unable to create core\n"));
     }
 }
 

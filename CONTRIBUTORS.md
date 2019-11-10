@@ -17,6 +17,7 @@ If you would like to contribute to the HELICS project see [CONTRIBUTING](CONTRIB
 -   Steve Smith
 -   Philip Top*
 -   Denis Nadeau
+-   Ben Salazar
 
 ### National Renewable Energy Lab
 -   Himanshu Jain

@@ -76,7 +76,7 @@ target_link_libraries(shared_cxx_app-tests helics_test_base helics_base HELICS::
 set_target_properties(shared_cxx_app-tests PROPERTIES FOLDER tests)
 
 add_test(NAME shared_cxx_app-tests COMMAND shared_cxx_app-tests)
-set_property(TEST shared_cxx_app-tests PROPERTY LABELS ApplicationApi Coverage Daily)
+set_property(TEST shared_cxx_app-tests PROPERTY LABELS ApplicationApi Coverage Daily Continuous)
 
 target_compile_definitions(shared_cxx_app-tests PRIVATE
                            "-DTEST_DIR=\"${CMAKE_CURRENT_SOURCE_DIR}/test_files/\"")
@@ -84,5 +84,6 @@ target_compile_definitions(shared_cxx_app-tests PRIVATE
 target_compile_definitions(shared_cxx_app-tests PRIVATE
                            DISABLE_SYSTEM_CALL_TESTS)
 
-
+copy_shared_target(shared_cxx_app-tests helics-apps-shared)
+copy_shared_target(shared_cxx_app-tests helics-shared)
 endif()

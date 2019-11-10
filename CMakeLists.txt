@@ -27,7 +27,8 @@ endif()
 # HELICS Version number
 # -----------------------------------------------------------------------------
 set(HELICS_VERSION_BUILD)
-set(HELICS_DATE "10-30-19")
+#use ISO date YYYY-MM-DD
+set(HELICS_DATE "2019-11-12")
 
 set(HELICS_VERSION_UNDERSCORE
     "${HELICS_VERSION_MAJOR}_${HELICS_VERSION_MINOR}_${HELICS_VERSION_PATCH}"
@@ -118,10 +119,6 @@ if(NOT DEFINED BUILD_SHARED_LIBS)
     )
 endif()
 if(BUILD_SHARED_LIBS)
-    set(HELICS_DISABLE_STATIC_LIB_INSTALL
-        ON
-        CACHE BOOL ""
-    )
     set(HELICS_BUILD_CXX_SHARED_LIB
         ON
         CACHE BOOL ""
@@ -607,14 +604,6 @@ add_library(HELICS::units ALIAS units-static)
 # create utilities target
 # -----------------------------------------------------------------------------
 
-set(GMLC_UTILITIES_OBJECT_LIB
-    OFF
-    CACHE INTERNAL ""
-)
-set(GMLC_UTILITIES_STATIC_LIB
-    ON
-    CACHE INTERNAL ""
-)
 set(GMLC_UTILITIES_INSTALL
     OFF
     CACHE INTERNAL ""
@@ -625,6 +614,8 @@ hide_variable(GMLC_UTILITIES_GENERATE_DOXYGEN_DOC)
 hide_variable(GMLC_UTILITIES_INCLUDE_BOOST)
 hide_variable(GMLC_UTILITIES_USE_BOOST_SPIRIT)
 hide_variable(GMLC_UTILITIES_WITH_CMAKE_PACKAGE)
+hide_variable(GMLC_UTILITIES_OBJECT_LIB)
+hide_variable(GMLC_UTILITIES_STATIC_LIB)
 
 add_library(HELICS::utilities ALIAS gmlc_utilities)
 set_target_properties(gmlc_utilities PROPERTIES FOLDER Extern)

@@ -587,7 +587,7 @@ TEST_P (valuefed_add_configfile_tests, file_load)
 
     EXPECT_EQ (id.getInfo (), "this is an information string for use by the application");
     auto pub2name = vFed.getInterfaceName (vFed.getPublication (1));
-    EXPECT_EQ (key, "fedName/pub2");
+    EXPECT_EQ (pub2name, "valueFed/pub2");
     // test the info from a file
     EXPECT_EQ (vFed.getPublication (0).getInfo (), "this is an information string for use by the application");
 

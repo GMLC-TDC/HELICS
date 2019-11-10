@@ -150,7 +150,7 @@ jobs:
         - USE_SWIG=true
         - CI_BOOST_VERSION=1.58.0
         - SKIP_TEST_RUN=true
-        - JOB_OPTION_FLAGS="-DDISABLE_BOOST=ON"
+        - JOB_OPTION_FLAGS="-DHELICS_DISABLE_BOOST=ON"
 
     - os: windows
       name: "MinGW"
@@ -161,6 +161,7 @@ jobs:
         - CORE_CI_TEST=true
         - ZMQ_SUBPROJECT=true
         - ZMQ_FORCE_SUBPROJECT=true
+        - DISABLE_EXAMPLES=true
         - JOB_OPTION_FLAGS=' -DCMAKE_SH=CMAKE_SH-NOTFOUND'
         - CMAKE_GENERATOR="MinGW Makefiles"
         - HELICS_DEPENDENCY_FLAGS="-DBOOST_INSTALL_PATH=/c/local/boost_1_58_0 -DCMAKE_C_COMPILER=/c/ProgramData/chocolatey/lib/mingw/tools/install/mingw64/bin/gcc.exe -DCMAKE_CXX_COMPILER=/c/ProgramData/chocolatey/lib/mingw/tools/install/mingw64/bin/g++.exe"
