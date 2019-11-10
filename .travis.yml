@@ -150,7 +150,7 @@ jobs:
         - USE_SWIG=true
         - CI_BOOST_VERSION=1.58.0
         - SKIP_TEST_RUN=true
-        - JOB_OPTION_FLAGS="-DDISABLE_BOOST=ON"
+        - JOB_OPTION_FLAGS="-DHELICS_DISABLE_BOOST=ON"
 
     - os: windows
       name: "MinGW"

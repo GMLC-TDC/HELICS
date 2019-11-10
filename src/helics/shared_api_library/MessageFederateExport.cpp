@@ -793,7 +793,7 @@ helics_bool helicsMessageCheckFlag (helics_message_object message, int flag)
         return helics_false;
     }
 	//bits in a uint16
-    if (flag >=(sizeof(uint16_t)*8) || flag < 0)
+    if (flag >=static_cast<int>(sizeof(uint16_t)*8) || flag < 0)
     {
         return helics_false;
     }
