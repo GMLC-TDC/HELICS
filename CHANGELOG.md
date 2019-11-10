@@ -181,7 +181,7 @@ The main focus of this minor release is cleaning up the build system and extract
 -   the logger headers were split into two sections.  The logger.h which includes the logger objects for use in federates was split from the loggerCore which is not publicly accessible.  
 -   The command line arguments are error checked and the help prints all available options (thanks to CLI11)
 -   the core tests and common tests now use google test instead of boost test.  More tests are expected to be migrated in the future.  
--   updates to the HELICSConfig.CMake file that gets installed to be more resilient to different directory structures.
+-   updates to the HELICSConfig.cmake file that gets installed to be more resilient to different directory structures.
 -   use ZMQ as a subproject if needed instead of an autobuild and install it as a target if needed. The CMake option to enable this is ZMQ_SUBPROJECT, replacing AUTOBUILD_ZMQ.
 -   the cereal library is not installed by default except on visual studio, and there is a CMAKE option to install it `HELICS_INSTALL_CEREAL`
 -   some update to the noexcept policy on c++98 interface
@@ -329,7 +329,7 @@ This is a major revision so this changelog will not capture all the changes that
 
 ### Changed
 -   upgrade autobuild ZMQ version to 4.2.5 and change CMake scripts to use zmq target
--   updated HELICSConfig.CMake install file to link properly to external libraries and find them if necessary, also included some find functions.  The find_package(HELICS) should work properly now
+-   updated HELICSConfig.cmake install file to link properly to external libraries and find them if necessary, also included some find functions.  The find_package(HELICS) should work properly now
 -   changed boost inclusion to use targets instead of files directly
 -   changed MPI inclusion to work better on windows and use targets instead of direct links
 -   update cereal library with latest bug fixes
@@ -343,7 +343,7 @@ This is a major revision so this changelog will not capture all the changes that
 -   inconsistent numerical conversion from vectors to doubles in subscriptions
 
 ### Removed
--   installation of HELICSImport.CMake  this is now redundant with updated HELICSConfig.CMake
+-   installation of HELICSImport.cmake  this is now redundant with updated HELICSConfig.cmake
 
 ## \[1.1.0\] - 2018-05-09
 

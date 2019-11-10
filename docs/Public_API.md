@@ -23,7 +23,7 @@ The public API includes the following
     *   FederateInfo.hpp
     *   Inputs.hpp
     *   BrokerApp.hpp (New in 2.3  Moved from App library)
-    *   CoreApp.hpp (New in 2.3)-  Operations and some capabilities my be added or tweaked in the next revision
+    *   CoreApp.hpp (New in 2.3)-  Operations and some capabilities may be added or tweaked in the next revision
     *   timeOperations.hpp (New in 2.3)-  previously functions were in helics-time.hpp
     *   typeOperations.hpp (New in 2.3)-  previously functions were in core-types.hpp
     *   Exceptions:  Any function or method dealing with Inputs with data from multiple sources is subject to change,  the vector subscriptions, and vector inputs are subject to change.  The functionality related to PublishJSON is considered experimental and may change in the future.  The queries to retrieve JSON may update the format of the returned JSON in the future.  

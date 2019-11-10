@@ -55,7 +55,7 @@ endif()
 set(BENCHMARK_ENABLE_GTEST_TESTS OFF CACHE INTERNAL "")
 set(BENCHMARK_ENABLE_TESTING OFF CACHE INTERNAL "Suppressing benchmark's tests")
 set(BENCHMARK_ENABLE_INSTALL OFF CACHE INTERNAL "" )
-# tell google benchmarks to use std regex since we conly compile on compilers with std regex
+# tell google benchmarks to use std regex since we only compile on compilers with std regex
 set(HAVE_STD_REGEX ON CACHE INTERNAL "" )
 set(HAVE_POSIX_REGEX OFF CACHE INTERNAL "" )
 set(HAVE_GNU_POSIX_REGEX OFF CACHE INTERNAL "" )
