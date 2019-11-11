@@ -272,6 +272,11 @@ jobs:
         ref: develop
       if: github.event_name == 'schedule'
         
+    # Build with Python 3.6 interface
+    - uses: actions/setup-python@v1
+      with:
+        python-version: '3.6'
+        
     # Compile HELICS and create the installer
     - name: Build installer
       shell: bash
