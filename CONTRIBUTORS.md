@@ -4,34 +4,31 @@ If you would like to contribute to the HELICS project see [CONTRIBUTING](CONTRIB
 ## Individual contributors
 ### Pacific Northwest National Lab
 -   Jeff Daily (Now AMD)
--   Andy Fisher*
--   Jason Fuller*
--   Shwetha Niddodi*
--   Monish Mukherjee*
--   Jacob Hansen*
--   Marc Eberlein*
+-   Andy Fisher
+-   Jason Fuller
+-   Shwetha Niddodi
+-   Monish Mukherjee
+-   Jacob Hansen
+-   Marc Eberlein
 -   Shrirang Abhyankar
 
 ### Lawrence Livermore National Lab
--   Ryan Mast*
+-   Ryan Mast
 -   Steve Smith
--   Philip Top*
+-   Philip Top
 -   Denis Nadeau
 -   Ben Salazar
 
 ### National Renewable Energy Lab
 -   Himanshu Jain
--   Dheepak Krishnamurthy*
--   Bryan Palmintier*
--   Bryan Richardson**
+-   Dheepak Krishnamurthy
+-   Bryan Palmintier
+-   Bryan Richardson
 -   Matt Irish
 
 ### Argonne National Lab
 -   Shrirang Abhyankar (now PNNL)
--   Karthikeyan Balasubramaniam*
-
-`*` currently active
-`**` subcontractor
+-   Karthikeyan Balasubramaniam
 
 ## Used Libraries or Code
 
@@ -48,7 +45,7 @@ If you would like to contribute to the HELICS project see [CONTRIBUTING](CONTRIB
   JsonCpp is used for parsing json files. It is included as a submodule from a slightly modified [fork](https://github.com/phlptp/jsoncpp.git) to add support for object libraries and to clean up some warning issues. JsonCpp is licensed under public domain or MIT in case public domain is not recognized [LICENSE](https://github.com/open-source-parsers/jsoncpp/blob/master/LICENSE).
 
 ### [CLI11](https://github.com/CLIUtils/CLI11)
-CLI11 is a command line parser and was used as a replacement for boost::program_options. Some modifications used in HELICS were committed to the CLI11 library and others are in the process of doing so. The modified single header library is included in the HELICS source code. The project was created by Henry Schreiner. CLI11 is available under a [3-Clause BSD](https://github.com/CLIUtils/CLI11/blob/master/LICENSE) license.
+CLI11 is a command line parser and was used as a replacement for boost::program_options. Some modifications used in HELICS were committed to the CLI11 library and others are in the process of doing so. The modified single header library is included in the HELICS source code. The project was created by Henry Schreiner. A modified version of the CLI11 header is included with a HELICS install,  Changes are currently being worked into upstream repositories.  CLI11 is available under a [3-Clause BSD](https://github.com/CLIUtils/CLI11/blob/master/LICENSE) license.
 
 ### [tinytoml](https://github.com/mayah/tinytoml)
   tinytoml is used for parsing toml files.  tinytoml is licensed under [BSD 2-clause](https://github.com/mayah/tinytoml/blob/master/LICENSE) license. The header file is included in HELICS source.
@@ -75,7 +72,7 @@ Several generic operations and utilities from HELICS and GridDyn are encapsuled 
 A library that provides runtime unit values, instead of individual unit types, for the purposes of working with units of measurement at run time possibly from user input.  It is included in HELICS as a submodule and is released under a [BSD-3 clause](https://github.com/LLNL/units/blob/master/LICENSE) license.
 
 ### [cereal](https://github.com/USCiLab/cereal)
-The cereal library is used for serialization of messages sent around inside HELICS. cereal is included in the HELICS source and licensed under the [BSD-3 clause](https://github.com/USCiLab/cereal/blob/master/LICENSE) license.
+The cereal library is used for serialization of messages sent around inside HELICS. A modified version of cereal is included in the HELICS source and licensed under the [BSD-3 clause](https://github.com/USCiLab/cereal/blob/master/LICENSE) license.   The modifications include modifying the headers to use relative paths instead of absolute so it can be included in different locations.  
 
 ### [FNCS](https://github.com/FNCS/fncs), [IGMS](https://www.nrel.gov/docs/fy16osti/65552.pdf), and FSKIT
 While not used directly, much of the inspiration for HELICS comes from three separate projects at the different National Labs. These include FNCS at PNNL, FSKIT at LLNL(unreleased), and IGMS(unreleased) at NREL. The lessons learned from these three co-simulation platforms was fed directly into the design of HELICS, and the hope that the combination and partnership is better than any one lab could have accomplished on their own.
