@@ -283,7 +283,7 @@ jobs:
       # 1. replacing x86 with Win32 (setting the Python version uses x86)
       # 2. getting the cmake directory for running cpack with an absolute path (chocolatey has an unfortunately named alias)
       run: |
-        brew install swig
+        brew install swig boost
         mkdir build && cd build
         cmake -DCMAKE_BUILD_TYPE=Release -DHELICS_ZMQ_SUBPROJECT=ON -DHELICS_ENABLE_PACKAGE_BUILD=ON -DSTATIC_STANDARD_LIB=ON -DHELICS_BUILD_APP_EXECUTABLES=OFF -DHELICS_BUILD_APP_LIBRARY=OFF -DHELICS_BUILD_EXAMPLES=OFF -DBUILD_TESTING=OFF .. || true
         cmake --build . --config Release
