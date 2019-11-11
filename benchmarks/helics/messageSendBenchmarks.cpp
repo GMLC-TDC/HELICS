@@ -159,7 +159,7 @@ static void BM_sendMessage (benchmark::State &state, core_type cType, bool singl
         std::vector<std::thread> threadlist (static_cast<size_t> (fed_count));
         for (int ii = 0; ii < fed_count; ++ii)
         {
-            threadlist[ii] = std::thread ([&] (MessageExchangeFederate &f) { f.run ([&brr] () { brr.wait (); }, [&brr] () { brr.wait (); }); },
+            threadlist[ii] = std::thread ([&] (MessageExchangeFederate &f) { f.run ([&brr] () { brr.wait ();brr.wait(); }, [&brr] () { brr.wait (); }); },
                                           std::ref (feds[ii]));
         }
 
@@ -167,6 +167,7 @@ static void BM_sendMessage (benchmark::State &state, core_type cType, bool singl
         brr.wait ();
         state.ResumeTiming ();
         brr.wait ();
+        brr.wait();
         state.PauseTiming ();
 
         // clean-up federate threads
