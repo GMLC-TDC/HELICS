@@ -62,7 +62,7 @@ The public API includes the following
     *   helicsApp.hpp
     *   BrokerApp.hpp  (aliased to application_api version)
     *   CoreApp.hpp  (aliased to application_api version)
-    *   BrokerServer.hpp (Removed in 2.3 as not useful for library operations, though still available in the static library)
+    *   BrokerServer.hpp (removed in 2.3 as not useful for library operations, though still available in the static library)
 
 *   Exceptions:  Any function dealing with Inputs concerning data from multiple sources is subject to change,  the vector subscription Objects, and vector Input objects are subject to change. Also some changes may occur in regard to units on the Application API.  
 
