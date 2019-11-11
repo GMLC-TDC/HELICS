@@ -55,7 +55,7 @@ Minor release with lots of CMake updates and build changes and a few fixes and a
 -   Add "isconnected", "filters", "inputs" query to core to retrieve list of available filters and inputs, and if the core is connected.  
 -   Added an INPROC core type, which replaces the TEST core for most user uses, the TEST core does the same thing but has additional functionality to mock network issues for testing, more of these capabilities will be added.  The INPROC core will remain simplified and as fast as possible for in process federations.
 -   Windows CI builds for visual studio 2019, 2017, 2015 on Azure, reduced workload on Appveyor.
--   Automatic release file generation for a shared library package on macOS and Linux, and a more complete macOS installer.    
+-   Automatic release file generation for a shared library package on macOS and Linux, and a more complete macOS installation archive. Supported versions are macOS Catalina 10.15 and Ubuntu 18.04, though the macOS binaries might work as far back as 10.11 and the Linux binary should work for older versions and different distributions.       
 
 ### Deprecated
 -   Use of coreFactory and brokerFactory when using the C++ shared library (use CoreApp and BrokerApp instead)
