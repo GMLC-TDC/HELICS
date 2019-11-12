@@ -446,7 +446,7 @@ if(ENABLE_ZMQ_CORE)
     include(addZeroMQ)
 
     if(ZeroMQ_FOUND)
-        if(ZMQ_USE_STATIC_LIBRARY)
+        if(HELICS_USE_ZMQ_STATIC_LIBRARY)
             set(ZeroMQ_DEPENDENCY libzmq-static)
             target_compile_definitions(helics_base INTERFACE -DZMQ_STATIC)
         else()
@@ -555,7 +555,7 @@ else()
 endif()
 
 if(NOT WIN32)
-    if(ENABLE_ZMQ_CORE AND NOT ZMQ_USE_STATIC_LIBRARY)
+    if(ENABLE_ZMQ_CORE AND NOT HELICS_USE_ZMQ_STATIC_LIBRARY)
         get_target_property(zmqlibfile libzmq IMPORTED_LOCATION)
         if(NOT zmqlibfile)
             get_target_property(zmqlibfile libzmq IMPORTED_LOCATION_RELEASE)
@@ -851,7 +851,7 @@ cmake_dependent_option(
 if(HELICS_ENABLE_PACKAGE_BUILD)
 
     if(CMAKE_VERSION VERSION_LESS 3.13)
-        if(ZMQ_SUBPROJECT OR ZMQ_FORCE_SUBPROJECT)
+        if(HELICS_ZMQ_SUBPROJECT OR HELICS_ZMQ_FORCE_SUBPROJECT)
             if(ENABLE_ZMQ_CORE)
                 message(
                     FATAL_ERROR
