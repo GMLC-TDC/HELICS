@@ -106,9 +106,15 @@ if(MSYS
     set(UNIX_LIKE TRUE)
 endif()
 
-# allow BOOST library inclusion to be turned off completely to be turned off completely
+# allow BOOST library inclusion to be turned off completely
+# this will disable the IPC core
 option(HELICS_DISABLE_BOOST OFF "disable all references to the Boost C++ libraries")
 mark_as_advanced(HELICS_DISABLE_BOOST)
+
+# allow ASIO library inclusion to be turned off completely 
+# this will disable the UDP and TCP core as well as the timeout detection and real-time features of HELICS
+option(HELICS_DISABLE_ASIO OFF "disable all references to the ASIO C++ libraries")
+mark_as_advanced(HELICS_DISABLE_ASIO)
 
 # we want to acknowledge this flag since it is standard C++ but it can cause issues in
 # submodules so we need to set other variables
@@ -330,8 +336,10 @@ if(NOT EXISTS "${PROJECT_SOURCE_DIR}/ThirdParty/fmtlib/CMakeLists.txt")
     submod_update(ThirdParty/fmtlib)
 endif()
 
-if(NOT EXISTS "${PROJECT_SOURCE_DIR}/ThirdParty/asio/asio/include/asio.hpp")
-    submod_update(ThirdParty/asio)
+if (NOT HELICS_DISABLE_ASIO)
+    if(NOT EXISTS "${PROJECT_SOURCE_DIR}/ThirdParty/asio/asio/include/asio.hpp")
+        submod_update(ThirdParty/asio)
+    endif()
 endif()
 
 if(NOT EXISTS "${PROJECT_SOURCE_DIR}/ThirdParty/jsoncpp/CMakeLists.txt")
@@ -370,8 +378,8 @@ endif()
 
 option(ENABLE_MPI_CORE "Enable MPI networking library" OFF)
 option(ENABLE_ZMQ_CORE "Enable ZeroMQ networking library" ON)
-option(ENABLE_TCP_CORE "Enable TCP core types" ON)
-option(ENABLE_UDP_CORE "Enable UDP core types" ON)
+cmake_dependent_advanced_option(ENABLE_TCP_CORE "Enable TCP core types" ON "NOT HELICS_DISABLE_ASIO" OFF)
+cmake_dependent_advanced_option(ENABLE_UDP_CORE "Enable UDP core types" ON "NOT HELICS_DISABLE_ASIO" OFF)
 cmake_dependent_advanced_option(
     ENABLE_IPC_CORE "Enable Interprocess communication types" ON
     "NOT HELICS_DISABLE_BOOST" OFF
@@ -381,7 +389,7 @@ option(ENABLE_INPROC_CORE "Enable inprocess core type" ON)
 option(ENABLE_ZMQ_CORE "Enable ZeroMQ networking library" ON)
 
 mark_as_advanced(
-    ENABLE_MPI_CORE ENABLE_ZMQ_CORE ENABLE_TCP_CORE ENABLE_UDP_CORE ENABLE_TEST_CORE
+    ENABLE_MPI_CORE ENABLE_ZMQ_CORE ENABLE_TEST_CORE
     ENABLE_ZMQ_CORE
 )
 
@@ -445,18 +453,18 @@ endif()
 if(ENABLE_ZMQ_CORE)
     include(addZeroMQ)
 
-    if(ZeroMQ_FOUND)
-        if(HELICS_USE_ZMQ_STATIC_LIBRARY)
-            set(ZeroMQ_DEPENDENCY libzmq-static)
-            target_compile_definitions(helics_base INTERFACE -DZMQ_STATIC)
-        else()
-            set(ZeroMQ_DEPENDENCY libzmq)
-        endif()
-        # message(STATUS "zmq dep ${ZeroMQ_DEPENDENCY}")
-        target_link_libraries(helics_base INTERFACE ${ZeroMQ_DEPENDENCY})
-    else(ZeroMQ_FOUND)
-        message(FATAL_ERROR "ZeroMQ not found")
-    endif(ZeroMQ_FOUND)
+    if(NOT ZeroMQ_FOUND)
+	    message(FATAL_ERROR "ZeroMQ not found needed for to enable the ZMQ Core")
+	endif()
+	
+    if(HELICS_USE_ZMQ_STATIC_LIBRARY)
+        set(ZeroMQ_DEPENDENCY libzmq-static)
+        target_compile_definitions(helics_base INTERFACE -DZMQ_STATIC)
+    else()
+        set(ZeroMQ_DEPENDENCY libzmq)
+    endif()
+    # message(STATUS "zmq dep ${ZeroMQ_DEPENDENCY}")
+    target_link_libraries(helics_base INTERFACE ${ZeroMQ_DEPENDENCY})
 endif()
 
 # -----------------------------------------------------------------------------
@@ -503,12 +511,13 @@ endif()
 # -------------------------------------------------------------
 # Asio include directories
 # -------------------------------------------------------------
-target_compile_definitions(helics_base INTERFACE "-DASIO_STANDALONE")
-target_include_directories(
-    helics_base SYSTEM
-    INTERFACE $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/ThirdParty/asio/asio/include>
-)
-
+if (NOT HELICS_DISABLE_ASIO)
+    target_compile_definitions(helics_base INTERFACE "-DASIO_STANDALONE")
+    target_include_directories(
+        helics_base SYSTEM
+        INTERFACE $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/ThirdParty/asio/asio/include>
+    )
+endif()
 # -------------------------------------------------------------
 # setting the RPATH
 # -------------------------------------------------------------
@@ -768,8 +777,6 @@ endif(NOT HELICS_BINARY_ONLY_INSTALL)
 # combine 3rd party license files for install package
 include(combineLicenses)
 set(LICENSE_LIST
-    "asio"
-    "${PROJECT_SOURCE_DIR}/ThirdParty/asio/asio/LICENSE_1_0.txt"
     "cereal"
     "${PROJECT_SOURCE_DIR}/ThirdParty/helics/external/cereal/LICENSE"
     "GMLC Concurrency"
@@ -806,7 +813,7 @@ if(NOT CMAKE_VERSION VERSION_LESS 3.11)
         )
     endif()
 
-    if(EXISTS ${PROJECT_BINARY_DIR}/_deps/libzmq-src)
+    if(EXISTS ${PROJECT_BINARY_DIR}/_deps/libzmq-src AND ENABLE_ZMQ_CORE)
         list(APPEND LICENSE_LIST "ZeroMQ"
                     "${PROJECT_BINARY_DIR}/_deps/libzmq-src/COPYING"
         )
@@ -825,9 +832,14 @@ else()
         )
     endif()
 
-    if(EXISTS ${PROJECT_BINARY_DIR}/_deps/libzmq)
+    if(EXISTS ${PROJECT_BINARY_DIR}/_deps/libzmq AND ENABLE_ZMQ_CORE)
         list(APPEND LICENSE_LIST "ZeroMQ" "${PROJECT_BINARY_DIR}/_deps/libzmq/COPYING")
     endif()
+endif()
+
+if (NOT HELICS_DISABLE_ASIO)
+	list(APPEND LICENSE_LIST "asio"
+    "${PROJECT_SOURCE_DIR}/ThirdParty/asio/asio/LICENSE_1_0.txt")
 endif()
 
 combinelicenses(${PROJECT_BINARY_DIR}/THIRDPARTY_LICENSES ${LICENSE_LIST})

@@ -23,6 +23,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #cmakedefine HELICS_ENABLE_TRACE_LOGGING
 #cmakedefine HELICS_ENABLE_DEBUG_LOGGING
 
+#cmakedefine HELICS_DISABLE_ASIO
 
 #cmakedefine HELICS_USE_PICOSECOND_TIME
 
