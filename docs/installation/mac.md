@@ -214,10 +214,10 @@ recorder:
 cd /path/to/helics_install/bin
 
 $ helics_player --version
-x.x.x (XX-XX-XX)
+x.x.x (20XX-XX-XX)
 
 $ helics_recorder --version
-x.x.x (XX-XX-XX)
+x.x.x (20XX-XX-XX)
 ```
 
 ### Testing HELICS with python support
@@ -233,7 +233,7 @@ IPython 6.2.1 -- An enhanced Interactive Python. Type '?' for help.
 In [1]: import helics
 
 In [2]: helics.helicsGetVersion()
-Out[2]: 'x.x.x (XX-XX-XX)'
+Out[2]: 'x.x.x (20XX-XX-XX)'
 
 ```
 
@@ -247,7 +247,7 @@ You can test this by opening MATLAB from the terminal or using the icon.
 /Applications/MATLAB_R2017b.app/bin/matlab -nodesktop -nosplash -nojvm
 ```
 
-and running 
+and running
 
 ```matlab
 >> helicsStartup
@@ -281,4 +281,3 @@ matlab -nodesktop -nosplash
 cd ~/GitRepos/GMLC-TDC/HELICS-examples/matlab
 pisender
 ```
-

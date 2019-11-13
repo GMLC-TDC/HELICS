@@ -28,7 +28,7 @@ TEST (messageTimer_tests, basic_test)
     // if this fails there is a separate error path that this doesn't account for
     EXPECT_TRUE (contextPtr->isRunning ());
     gmlc::libguarded::atomic_guarded<ActionMessage> M;
-    auto cback = [&M] (ActionMessage &&m) { M = std::move (m); };
+    auto cback = [&M](ActionMessage &&m) { M = std::move (m); };
     auto mtimer = std::make_shared<MessageTimer> (cback);
     std::this_thread::yield ();  // just get the loop started
     auto index = mtimer->addTimerFromNow (200ms, CMD_PROTOCOL);
@@ -58,7 +58,7 @@ TEST (messageTimer_tests, basic_test)
 TEST (messageTimer_tests, shorttime_test)
 {
     gmlc::libguarded::atomic_guarded<ActionMessage> M;
-    auto cback = [&] (ActionMessage &&m) { M = std::move (m); };
+    auto cback = [&](ActionMessage &&m) { M = std::move (m); };
     auto mtimer = std::make_shared<MessageTimer> (cback);
     auto index = mtimer->addTimerFromNow (0ms, CMD_PROTOCOL);
     EXPECT_EQ (index, 0);
@@ -72,11 +72,11 @@ TEST (messageTimer_tests, shorttime_test)
     }
 }
 
-TEST (messageTimer_tests_skip_ci, basic_test_update)
+TEST (messageTimer_tests_ci_skip, basic_test_update)
 {
     std::mutex mlock;
     helics::ActionMessage M;
-    auto cback = [&] (ActionMessage &&m) {
+    auto cback = [&](ActionMessage &&m) {
         std::lock_guard<std::mutex> locker (mlock);
         M = std::move (m);
     };
@@ -99,10 +99,10 @@ TEST (messageTimer_tests_skip_ci, basic_test_update)
     EXPECT_TRUE (M.action () == CMD_PROTOCOL);
 }
 
-TEST (messageTimer_tests_skip_ci, basic_test_multiple)
+TEST (messageTimer_tests_ci_skip, basic_test_multiple)
 {
     std::atomic<int> counter{0};
-    auto cback = [&counter] (helics::ActionMessage &&) { ++counter; };
+    auto cback = [&counter](helics::ActionMessage &&) { ++counter; };
     auto mtimer = std::make_shared<helics::MessageTimer> (cback);
 
     mtimer->addTimerFromNow (200ms, helics::CMD_PROTOCOL);
@@ -121,10 +121,10 @@ TEST (messageTimer_tests_skip_ci, basic_test_multiple)
     EXPECT_EQ (counter.load (), 4);
 }
 
-TEST (messageTimer_tests_skip_ci, basic_test_multiple_alt)
+TEST (messageTimer_tests_ci_skip, basic_test_multiple_alt)
 {
     std::atomic<int> counter{0};
-    auto cback = [&counter] (helics::ActionMessage &&) { ++counter; };
+    auto cback = [&counter](helics::ActionMessage &&) { ++counter; };
     auto mtimer = std::make_shared<helics::MessageTimer> (cback);
 
     auto ctime = std::chrono::steady_clock::now ();
@@ -144,10 +144,10 @@ TEST (messageTimer_tests_skip_ci, basic_test_multiple_alt)
     EXPECT_EQ (counter.load (), 4);
 }
 
-TEST (messageTimer_tests_skip_ci, basic_test_multiple_cancel)
+TEST (messageTimer_tests_ci_skip, basic_test_multiple_cancel)
 {
     std::atomic<int> counter{0};
-    auto cback = [&counter] (helics::ActionMessage &&) { ++counter; };
+    auto cback = [&counter](helics::ActionMessage &&) { ++counter; };
     auto mtimer = std::make_shared<helics::MessageTimer> (cback);
 
     mtimer->addTimerFromNow (200ms, helics::CMD_PROTOCOL);
@@ -167,10 +167,10 @@ TEST (messageTimer_tests_skip_ci, basic_test_multiple_cancel)
     EXPECT_EQ (counter.load (), 2);
 }
 
-TEST (messageTimer_tests_skip_ci, basic_test_multiple_change_time)
+TEST (messageTimer_tests_ci_skip, basic_test_multiple_change_time)
 {
     std::atomic<int> counter{0};
-    auto cback = [&counter] (helics::ActionMessage &&) { ++counter; };
+    auto cback = [&counter](helics::ActionMessage &&) { ++counter; };
     auto mtimer = std::make_shared<helics::MessageTimer> (cback);
 
     mtimer->addTimerFromNow (200ms, helics::CMD_PROTOCOL);
@@ -191,10 +191,10 @@ TEST (messageTimer_tests_skip_ci, basic_test_multiple_change_time)
     EXPECT_EQ (counter.load (), 4);
 }
 
-TEST (messageTimer_tests_skip_ci, basic_test_multiple_change_time2)
+TEST (messageTimer_tests_ci_skip, basic_test_multiple_change_time2)
 {
     std::atomic<int> counter{0};
-    auto cback = [&counter] (helics::ActionMessage &&) { ++counter; };
+    auto cback = [&counter](helics::ActionMessage &&) { ++counter; };
     auto mtimer = std::make_shared<helics::MessageTimer> (cback);
     auto ctime = std::chrono::steady_clock::now ();
     mtimer->addTimerFromNow (200ms, helics::CMD_PROTOCOL);
@@ -216,11 +216,11 @@ TEST (messageTimer_tests_skip_ci, basic_test_multiple_change_time2)
     EXPECT_EQ (counter.load (), 3);
 }
 
-TEST (messageTimer_tests_skip_ci, basic_test_updatemessage)
+TEST (messageTimer_tests_ci_skip, basic_test_updatemessage)
 {
     std::mutex mlock;
     helics::ActionMessage M;
-    auto cback = [&] (ActionMessage &&m) {
+    auto cback = [&](ActionMessage &&m) {
         std::lock_guard<std::mutex> locker (mlock);
         M = std::move (m);
     };
@@ -243,11 +243,11 @@ TEST (messageTimer_tests_skip_ci, basic_test_updatemessage)
     EXPECT_TRUE (M.action () == CMD_BROKER_ACK);
 }
 
-TEST (messageTimer_tests_skip_ci, basic_test_updatemessage2)
+TEST (messageTimer_tests_ci_skip, basic_test_updatemessage2)
 {
     std::mutex mlock;
     helics::ActionMessage M;
-    auto cback = [&] (ActionMessage &&m) {
+    auto cback = [&](ActionMessage &&m) {
         std::lock_guard<std::mutex> locker (mlock);
         M = std::move (m);
     };

@@ -21,13 +21,13 @@ steps:
   image: alpine
   commands:
   - apk update
-  - apk add --no-cache build-base git bash cmake ninja boost-dev zeromq-dev swig
+  - apk add --no-cache build-base git bash cmake ninja boost-dev zeromq-dev
   - gcc --version || echo "gcc not installed"
   - clang --version || echo "clang not installed"
   - cmake --version
   - git --version
   - mkdir build && cd build
-  - cmake -GNinja ..
+  - cmake -GNinja -DHELICS_BUILD_TESTS=ON -DHELICS_BUILD_EXAMPLES=ON ..
   - cmake --build .
   - ctest -L Continuous --output-on-failure
 
@@ -55,12 +55,12 @@ steps:
   image: alpine
   commands:
   - apk update
-  - apk add --no-cache build-base git bash cmake ninja boost-dev zeromq-dev swig
+  - apk add --no-cache build-base git bash cmake ninja boost-dev zeromq-dev
   - gcc --version || echo "gcc not installed"
   - clang --version || echo "clang not installed"
   - cmake --version
   - git --version
   - mkdir build && cd build
-  - cmake -GNinja ..
+  - cmake -GNinja -DHELICS_BUILD_TESTS=ON -DHELICS_BUILD_EXAMPLES=ON ..
   - cmake --build .
   - ctest -L Continuous --output-on-failure

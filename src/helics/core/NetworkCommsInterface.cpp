@@ -209,7 +209,7 @@ ActionMessage NetworkCommsInterface::generateReplyToIncomingMessage (ActionMessa
         break;
         case REQUEST_PORTS:
         {
-            int cnt = (cmd.counter <= 0) ? 2 : cmd.counter;
+            int cnt = (cmd.counter == 0) ? 2 : cmd.counter;
             auto openPort =
               (cmd.name.empty ()) ? findOpenPort (cnt, localHostString) : findOpenPort (cnt, cmd.name);
             ActionMessage portReply (CMD_PROTOCOL);

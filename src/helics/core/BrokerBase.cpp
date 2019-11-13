@@ -65,6 +65,12 @@ BrokerBase::~BrokerBase ()
         }
     }
 }
+std::function<void (int, const std::string &, const std::string &)> BrokerBase::getLoggingCallback () const
+{
+    return [this] (int level, const std::string &name, const std::string &message) {
+        sendToLogger (global_id.load (), level, name, message);
+    };
+}
 
 void BrokerBase::joinAllThreads ()
 {
@@ -374,7 +380,7 @@ static void timerTickHandler (BrokerBase *bbase, activeProtector &active, const 
             }
             catch (std::exception &e)
             {
-                std::cout << "exception caught from addActionMessage" << std::endl;
+                std::cerr << "exception caught from addActionMessage" << e.what () << std::endl;
             }
         }
         else

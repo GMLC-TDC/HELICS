@@ -81,14 +81,14 @@ class Broker
 	@return a helics_broker object*/
     helics_broker baseObject () const { return broker; }
     /** check if the broker is connected*/
-    bool isConnected () const { return helicsBrokerIsConnected (broker); }
+    bool isConnected () const { return (helicsBrokerIsConnected (broker) != helics_false); }
     /** waits in the current thread until the broker is disconnected
     @param msToWait  the timeout to wait for disconnect (-1) implies no timeout
     @return true if the disconnect was successful false if it timed out
      */
 	bool waitForDisconnect (int msToWait = -1)
     {
-        return helicsBrokerWaitForDisconnect (broker, msToWait, hThrowOnError ());
+        return (helicsBrokerWaitForDisconnect (broker, msToWait, hThrowOnError ()) != helics_false);
     }
     /** disconnect the broker from any other brokers and communications
      */

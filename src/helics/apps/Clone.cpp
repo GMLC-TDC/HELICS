@@ -65,6 +65,11 @@ Clone::Clone (const std::string &appName, const std::shared_ptr<Core> &core, con
     fed->setFlagOption (helics_flag_observer);
 }
 
+Clone::Clone (const std::string &appName, CoreApp &core, const FederateInfo &fi) : App (appName, core, fi)
+{
+    fed->setFlagOption (helics_flag_observer);
+}
+
 Clone::Clone (const std::string &appName, const std::string &jsonString) : App (appName, jsonString)
 {
     fed->setFlagOption (helics_flag_observer);
@@ -376,6 +381,10 @@ std::unique_ptr<Message> Clone::getMessage (int index) const
 std::shared_ptr<helicsCLI11App> Clone::buildArgParserApp ()
 {
     auto app = std::make_shared<helicsCLI11App> ("Command line options for the Clone App");
+    if (!app)
+    {
+        throw (FunctionExecutionFailure ("unable to allocate application CLI"));
+    }
     app->add_flag ("--allow_iteration", allow_iteration, "allow iteration on values")->ignore_underscore ();
 
     app->add_option ("--output,-o", outFileName, "the output file for recording the data", true);

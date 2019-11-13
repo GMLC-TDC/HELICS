@@ -39,6 +39,8 @@ class tcoptions
     // bool source_only = false;
     bool wait_for_current_time_updates = false;
     bool uninterruptible = false;
+    bool restrictive_time_policy = false;
+    // 1 byte gap
     int maxIterations = 50;
 };
 
@@ -113,7 +115,7 @@ class TimeCoordinator
     /** get the current iteration counter for an iterative call
     @details this will work properly even when a federate is processing
     */
-    int32_t getCurrentIteration () const { return iteration; }
+    int32_t getCurrentIteration () const { return iteration.load (); }
     /** compute updates to time values
     @return true if they have been modified
     */

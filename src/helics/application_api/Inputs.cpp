@@ -341,7 +341,7 @@ char Input::getValueChar ()
         }
         else
         {
-            int64_t out;
+            int64_t out = invalidValue<int64_t> ();
             if (type == helics::data_type::helics_double)
             {
                 out = static_cast<int64_t> (doubleExtractAndConvert (dv, inputUnits, outputUnits));
@@ -373,7 +373,7 @@ int Input::getValue (double *data, int maxsize)
 {
     auto V = getValueRef<std::vector<double>> ();
     int length = std::min (static_cast<int> (V.size ()), maxsize);
-    std::copy (V.data (), V.data () + length, data);
+    std::memmove (data, V.data (), length * sizeof (double));
     hasUpdate = false;
     return length;
 }

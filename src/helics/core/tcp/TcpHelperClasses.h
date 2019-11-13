@@ -62,9 +62,9 @@ class TcpConnection : public std::enable_shared_from_this<TcpConnection>
     /** set the callback for the data object*/
     void setDataCall (std::function<size_t (TcpConnection::pointer, const char *, size_t)> dataFunc);
     /** set the callback for an error*/
-    void setErrorCall (std::function<bool(TcpConnection::pointer, const std::error_code &)> errorFunc);
+    void setErrorCall (std::function<bool (TcpConnection::pointer, const std::error_code &)> errorFunc);
     /** set a logging function */
-    void setLoggingFunction (std::function<void(int loglevel, const std::string &logMessage)> logFunc);
+    void setLoggingFunction (std::function<void (int loglevel, const std::string &logMessage)> logFunc);
     /** send raw data
     @throws std::system_error on failure*/
     size_t send (const void *buffer, size_t dataLength);
@@ -110,13 +110,13 @@ class TcpConnection : public std::enable_shared_from_this<TcpConnection>
     */
     void async_receive (
       std::function<
-        void(TcpConnection::pointer, const char *buffer, size_t dataLength, const std::error_code &error)>
+        void (TcpConnection::pointer, const char *buffer, size_t dataLength, const std::error_code &error)>
         callback)
     {
         socket_.async_receive (asio::buffer (data, data.size ()),
                                [connection = shared_from_this (),
-                                callback = std::move (callback)](const std::error_code &error,
-                                                                 size_t bytes_transferred) {
+                                callback = std::move (callback)] (const std::error_code &error,
+                                                                  size_t bytes_transferred) {
                                    connection->handle_read (bytes_transferred, error, callback);
                                });
     }
@@ -147,7 +147,7 @@ class TcpConnection : public std::enable_shared_from_this<TcpConnection>
     void handle_read (
       size_t message_size,
       const std::error_code &error,
-      std::function<void(TcpConnection::pointer, const char *, size_t, const std::error_code &error)> callback)
+      std::function<void (TcpConnection::pointer, const char *, size_t, const std::error_code &error)> callback)
     {
         callback (shared_from_this (), data.data (), message_size, error);
     }
@@ -163,8 +163,8 @@ class TcpConnection : public std::enable_shared_from_this<TcpConnection>
     std::atomic<bool> connectionError{false};
     gmlc::concurrency::TriggerVariable connected;  //!< variable indicating connectivity
     std::function<size_t (TcpConnection::pointer, const char *, size_t)> dataCall;
-    std::function<bool(TcpConnection::pointer, const std::error_code &)> errorCall;
-    std::function<void(int level, const std::string &logMessage)> logFunction;
+    std::function<bool (TcpConnection::pointer, const std::error_code &)> errorCall;
+    std::function<void (int level, const std::string &logMessage)> logFunction;
     std::atomic<connection_state_t> state{connection_state_t::prestart};
     const int idcode;
     void connect_handler (const std::error_code &error);
@@ -189,18 +189,21 @@ class TcpAcceptor : public std::enable_shared_from_this<TcpAcceptor>
         return pointer (new TcpAcceptor (io_context, ep));
     }
 
-    static pointer create (asio::io_context &io_context, int port)
+    static pointer create (asio::io_context &io_context, uint16_t port)
     {
         return pointer (new TcpAcceptor (io_context, port));
     }
     /** destructor to make sure everything is closed without threading issues*/
-    ~TcpAcceptor () try
+    ~TcpAcceptor ()
     {
-        close ();
+        try
+        {
+            close ();
+        }
+        catch (...)
+        {
+        };
     }
-    catch (...)
-    {
-    };
 
     /** connect the acceptor to the socket*/
     bool connect ();
@@ -217,13 +220,13 @@ class TcpAcceptor : public std::enable_shared_from_this<TcpAcceptor>
     /** check if the acceptor is ready to begin accepting*/
     bool isConnected () const { return (state.load () == accepting_state_t::connected); }
     /** set the callback for the data object*/
-    void setAcceptCall (std::function<void(TcpAcceptor::pointer, TcpConnection::pointer)> accFunc)
+    void setAcceptCall (std::function<void (TcpAcceptor::pointer, TcpConnection::pointer)> accFunc)
     {
         acceptCall = std::move (accFunc);
     }
 
     /** set the error path callback*/
-    void setErrorCall (std::function<bool(TcpAcceptor::pointer, const std::error_code &)> errorFunc)
+    void setErrorCall (std::function<bool (TcpAcceptor::pointer, const std::error_code &)> errorFunc)
     {
         errorCall = std::move (errorFunc);
     }
@@ -238,14 +241,14 @@ class TcpAcceptor : public std::enable_shared_from_this<TcpAcceptor>
 
   private:
     TcpAcceptor (asio::io_context &io_context, asio::ip::tcp::endpoint &ep);
-    TcpAcceptor (asio::io_context &io_context, int port);
+    TcpAcceptor (asio::io_context &io_context, uint16_t port);
     /** function for handling the asynchronous return from a read request*/
     void
     handle_accept (TcpAcceptor::pointer ptr, TcpConnection::pointer new_connection, const std::error_code &error);
     asio::ip::tcp::endpoint endpoint_;
     asio::ip::tcp::acceptor acceptor_;
-    std::function<void(TcpAcceptor::pointer, TcpConnection::pointer)> acceptCall;
-    std::function<bool(TcpAcceptor::pointer, const std::error_code &)> errorCall;
+    std::function<void (TcpAcceptor::pointer, TcpConnection::pointer)> acceptCall;
+    std::function<bool (TcpAcceptor::pointer, const std::error_code &)> errorCall;
     std::atomic<accepting_state_t> state{accepting_state_t::opened};
     gmlc::concurrency::TriggerVariable accepting;
 };
@@ -265,10 +268,10 @@ class TcpServer : public std::enable_shared_from_this<TcpServer>
 
     static pointer create (asio::io_context &io_context,
                            const std::string &address,
-                           int PortNum,
+                           uint16_t PortNum,
                            bool reuse_port = false,
                            int nominalBufferSize = 10192);
-    static pointer create (asio::io_context &io_context, int PortNum, int nominalBufferSize = 10192);
+    static pointer create (asio::io_context &io_context, uint16_t PortNum, int nominalBufferSize = 10192);
 
   public:
     ~TcpServer ();
@@ -289,7 +292,7 @@ class TcpServer : public std::enable_shared_from_this<TcpServer>
         dataCall = std::move (dataFunc);
     }
     /** set the error path callback*/
-    void setErrorCall (std::function<bool(TcpConnection::pointer, const std::error_code &)> errorFunc)
+    void setErrorCall (std::function<bool (TcpConnection::pointer, const std::error_code &)> errorFunc)
     {
         errorCall = std::move (errorFunc);
     }
@@ -300,7 +303,7 @@ class TcpServer : public std::enable_shared_from_this<TcpServer>
   private:
     TcpServer (asio::io_context &io_context,
                const std::string &address,
-               int portNum,
+               uint16_t portNum,
                bool port_reuse,
                int nominalBufferSize);
     TcpServer (asio::io_context &io_context,
@@ -308,7 +311,7 @@ class TcpServer : public std::enable_shared_from_this<TcpServer>
                const std::string &port,
                bool port_reuse,
                int nominalBufferSize);
-    TcpServer (asio::io_context &io_context, int portNum, int nominalBufferSize);
+    TcpServer (asio::io_context &io_context, uint16_t portNum, int nominalBufferSize);
 
     void initialConnect ();
     asio::io_context &ioctx;
@@ -317,7 +320,7 @@ class TcpServer : public std::enable_shared_from_this<TcpServer>
     std::vector<asio::ip::tcp::endpoint> endpoints;
     size_t bufferSize;
     std::function<size_t (TcpConnection::pointer, const char *, size_t)> dataCall;
-    std::function<bool(TcpConnection::pointer, const std::error_code &error)> errorCall;
+    std::function<bool (TcpConnection::pointer, const std::error_code &error)> errorCall;
     std::atomic<bool> halted{false};
     bool reuse_address = false;
     // this data structure is protected by the accepting mutex

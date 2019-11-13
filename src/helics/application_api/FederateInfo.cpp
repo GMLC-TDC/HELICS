@@ -6,7 +6,6 @@ SPDX-License-Identifier: BSD-3-Clause
 */
 
 #include "FederateInfo.hpp"
-
 #include "../common/JsonProcessingFunctions.hpp"
 #include "../common/TomlProcessingFunctions.hpp"
 #include "../core/core-exceptions.hpp"
@@ -445,7 +444,7 @@ FederateInfo loadFederateInfoJson (const std::string &jsonString)
 
     replaceIfMember (doc, "broker", fi.broker);
     replaceIfMember (doc, "key", fi.key);
-    fi.brokerPort = getOrDefault (doc, "brokerport", int64_t (fi.brokerPort));
+    fi.brokerPort = static_cast<int> (getOrDefault (doc, "brokerport", int64_t (fi.brokerPort)));
     replaceIfMember (doc, "localport", fi.localport);
     replaceIfMember (doc, "autobroker", fi.autobroker);
     if (doc.isMember ("port"))
@@ -483,7 +482,7 @@ FederateInfo loadFederateInfoJson (const std::string &jsonString)
         {
             fi.coreType = coreTypeFromString (doc["core"].asString ());
         }
-        catch (const std::invalid_argument &ia)
+        catch (const std::invalid_argument &)
         {
             fi.coreName = doc["core"].asString ();
         }
@@ -494,7 +493,7 @@ FederateInfo loadFederateInfoJson (const std::string &jsonString)
         {
             fi.coreType = coreTypeFromString (doc["coreType"].asString ());
         }
-        catch (const std::invalid_argument &ia)
+        catch (const std::invalid_argument &)
         {
             std::cerr << "Unrecognized core type\n";
         }
@@ -505,7 +504,7 @@ FederateInfo loadFederateInfoJson (const std::string &jsonString)
         {
             fi.coreType = coreTypeFromString (doc["coretype"].asString ());
         }
-        catch (const std::invalid_argument &ia)
+        catch (const std::invalid_argument &)
         {
             std::cerr << "Unrecognized core type\n";
         }
@@ -516,7 +515,7 @@ FederateInfo loadFederateInfoJson (const std::string &jsonString)
         {
             fi.coreType = coreTypeFromString (doc["type"].asString ());
         }
-        catch (const std::invalid_argument &ia)
+        catch (const std::invalid_argument &)
         {
             std::cerr << "Unrecognized core type\n";
         }
@@ -615,7 +614,7 @@ FederateInfo loadFederateInfoToml (const std::string &tomlString)
         {
             fi.coreType = coreTypeFromString (doc["core"].as<std::string> ());
         }
-        catch (const std::invalid_argument &ia)
+        catch (const std::invalid_argument &)
         {
             fi.coreName = doc["core"].as<std::string> ();
         }
@@ -626,7 +625,7 @@ FederateInfo loadFederateInfoToml (const std::string &tomlString)
         {
             fi.coreType = coreTypeFromString (doc["coreType"].as<std::string> ());
         }
-        catch (const std::invalid_argument &ia)
+        catch (const std::invalid_argument &)
         {
             std::cerr << "Unrecognized core type\n";
         }
@@ -637,7 +636,7 @@ FederateInfo loadFederateInfoToml (const std::string &tomlString)
         {
             fi.coreType = coreTypeFromString (doc["coretype"].as<std::string> ());
         }
-        catch (const std::invalid_argument &ia)
+        catch (const std::invalid_argument &)
         {
             std::cerr << "Unrecognized core type\n";
         }
@@ -648,7 +647,7 @@ FederateInfo loadFederateInfoToml (const std::string &tomlString)
         {
             fi.coreType = coreTypeFromString (doc["type"].as<std::string> ());
         }
-        catch (const std::invalid_argument &ia)
+        catch (const std::invalid_argument &)
         {
             std::cerr << "Unrecognized core type\n";
         }

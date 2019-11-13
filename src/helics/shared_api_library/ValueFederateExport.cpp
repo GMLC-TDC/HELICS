@@ -1197,14 +1197,7 @@ void helicsInputSetDefaultInteger (helics_input inp, int64_t val, helics_error *
     {
         return;
     }
-    try
-    {
-        inpObj->inputPtr->setDefault (val);
-    }
-    catch (...)
-    {
-        helicsErrorHandler (err);
-    }
+    inpObj->inputPtr->setDefault (val);
 }
 
 void helicsInputSetDefaultBoolean (helics_input inp, helics_bool val, helics_error *err)
@@ -1214,14 +1207,7 @@ void helicsInputSetDefaultBoolean (helics_input inp, helics_bool val, helics_err
     {
         return;
     }
-    try
-    {
-        inpObj->inputPtr->setDefault ((val != helics_false));
-    }
-    catch (...)
-    {
-        helicsErrorHandler (err);
-    }
+    inpObj->inputPtr->setDefault ((val != helics_false));
 }
 
 void helicsInputSetDefaultDouble (helics_input inp, double val, helics_error *err)
@@ -1231,14 +1217,7 @@ void helicsInputSetDefaultDouble (helics_input inp, double val, helics_error *er
     {
         return;
     }
-    try
-    {
-        inpObj->inputPtr->setDefault (val);
-    }
-    catch (...)
-    {
-        helicsErrorHandler (err);
-    }
+    inpObj->inputPtr->setDefault (val);
 }
 
 void helicsInputSetDefaultTime (helics_input inp, helics_time val, helics_error *err)
@@ -1248,15 +1227,10 @@ void helicsInputSetDefaultTime (helics_input inp, helics_time val, helics_error 
     {
         return;
     }
-    try
-    {
-        helics::Time tval (val);
-        inpObj->inputPtr->setDefault (tval);
-    }
-    catch (...)
-    {
-        helicsErrorHandler (err);
-    }
+
+    helics::Time tval (val);
+   inpObj->inputPtr->setDefault (tval);
+   
 }
 
 void helicsInputSetDefaultChar (helics_input inp, char val, helics_error *err)
@@ -1266,14 +1240,7 @@ void helicsInputSetDefaultChar (helics_input inp, char val, helics_error *err)
     {
         return;
     }
-    try
-    {
-        inpObj->inputPtr->setDefault (val);
-    }
-    catch (...)
-    {
-        helicsErrorHandler (err);
-    }
+    inpObj->inputPtr->setDefault (val);
 }
 
 void helicsInputSetDefaultComplex (helics_input inp, double real, double imag, helics_error *err)
@@ -1283,14 +1250,9 @@ void helicsInputSetDefaultComplex (helics_input inp, double real, double imag, h
     {
         return;
     }
-    try
-    {
-        inpObj->inputPtr->setDefault (std::complex<double> (real, imag));
-    }
-    catch (...)
-    {
-        helicsErrorHandler (err);
-    }
+
+    inpObj->inputPtr->setDefault (std::complex<double> (real, imag));
+    
 }
 
 void helicsInputSetDefaultVector (helics_input inp, const double *vectorInput, int vectorLength, helics_error *err)
@@ -1492,15 +1454,8 @@ const char *helicsPublicationGetUnits (helics_publication pub)
     {
         return emptyStr.c_str ();
     }
-    try
-    {
-        const std::string &units = pubObj->pubPtr->getUnits ();
-        return units.c_str ();
-    }
-    catch (...)
-    {
-        return emptyStr.c_str ();
-    }
+    const std::string &units = pubObj->pubPtr->getUnits ();
+    return units.c_str ();
 }
 
 const char *helicsInputGetInfo (helics_input inp)

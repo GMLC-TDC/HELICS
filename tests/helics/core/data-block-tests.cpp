@@ -123,6 +123,7 @@ TEST (data_block_tests, data_block_data)
     rawdata[45] = '\221';
 
     EXPECT_EQ (test1[45], '\221');
+    EXPECT_EQ (rawdata[45], '\221');
 }
 
 /** test the swap function*/

@@ -57,6 +57,7 @@ void App::processArgs (std::unique_ptr<helicsCLI11App> &app, const std::string &
         {
             // this is just to run the help output
             FederateInfo helpTemp ("--help");
+            (void)helpTemp;
         }
         helpMode = true;
     }
@@ -92,6 +93,11 @@ App::App (const std::string &appName, const FederateInfo &fi)
 }
 
 App::App (const std::string &appName, const std::shared_ptr<Core> &core, const FederateInfo &fi)
+    : fed (std::make_shared<CombinationFederate> (appName, core, fi))
+{
+}
+
+App::App (const std::string &appName, CoreApp &core, const FederateInfo &fi)
     : fed (std::make_shared<CombinationFederate> (appName, core, fi))
 {
 }

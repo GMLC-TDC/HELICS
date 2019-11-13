@@ -32,7 +32,8 @@ class DependencyInfo
     global_federate_id fedID;  //!< identifier for the dependency
     global_federate_id minFed;  //!< identifier for the min dependency
     time_state_t time_state = time_state_t::initialized;  //!< the current state of the dependency
-
+    bool cyclic{false};  //!< indicator that the dependency is cyclic and should be reset more completely on grant
+    // 5 byte gap here
     Time Tnext = negEpsilon;  //!< next possible message or value
     Time Te = timeZero;  //!< the next currently scheduled event
     Time Tdemin = timeZero;  //!< min dependency event time

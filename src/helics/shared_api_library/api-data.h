@@ -109,7 +109,7 @@ extern "C"
         int64_t length; /*!< message length */
         int32_t messageID; /*!< message identification information*/
         int16_t flags; /*!< flags related to the message*/
-        const char *original_source; /** original source */
+        const char *original_source; /*!< original source */
         const char *source; /*!< the most recent source */
         const char *dest; /*!< the final destination */
         const char *original_dest; /*!< the original destination of the message */

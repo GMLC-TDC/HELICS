@@ -176,21 +176,15 @@ bool TimeCoordinator::updateNextExecutionTime ()
 
 void TimeCoordinator::updateNextPossibleEventTime ()
 {
-    if (!iterating)
-    {
-        time_next = getNextPossibleTime ();
-    }
-    else
-    {
-        time_next = time_granted;
-    }
+    time_next = (!iterating) ? getNextPossibleTime () : time_granted;
+
     if (info.uninterruptible)
     {
         time_next = time_requested;
     }
     else
     {
-        if (time_minminDe < Time::maxVal ())
+        if (time_minminDe < Time::maxVal () && !info.restrictive_time_policy)
         {
             if (time_minminDe + info.inputDelay > time_next)
             {
@@ -246,6 +240,10 @@ std::string TimeCoordinator::generateConfig () const
     std::stringstream s;
     s << "\"uninterruptible\":" << ((info.uninterruptible) ? " true,\n" : "false,\n");
     s << "\"wait_for_current_time_updates\":" << ((info.wait_for_current_time_updates) ? " true,\n" : "false,\n");
+    if (info.restrictive_time_policy)
+    {
+        s << "\"restrictive_time_policy\":true,\n";
+    }
     s << "\"max_iterations\":" << info.maxIterations;
     if (info.period > timeZero)
     {
@@ -888,6 +886,9 @@ void TimeCoordinator::setOptionFlag (int optionFlag, bool value)
     case defs::flags::wait_for_current_time_update:
         info.wait_for_current_time_updates = value;
         break;
+    case defs::flags::restrictive_time_policy:
+        info.restrictive_time_policy = value;
+        break;
     default:
         break;
     }
@@ -936,6 +937,8 @@ bool TimeCoordinator::getOptionFlag (int optionFlag) const
         return !info.uninterruptible;
     case defs::flags::wait_for_current_time_update:
         return info.wait_for_current_time_updates;
+    case defs::flags::restrictive_time_policy:
+        return info.restrictive_time_policy;
     default:
         throw (std::invalid_argument ("flag not recognized"));
     }

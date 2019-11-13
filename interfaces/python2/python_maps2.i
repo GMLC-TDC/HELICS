@@ -214,7 +214,7 @@ PyModule_AddObject(m, "HelicsException", pHelicsException);
 
 // Set argument to NULL before any conversion occurs
 %typemap(check)(void *data, int maxDatalen, int *actualSize) {
-    $2=helicsInputGetValueSize(arg1)+2;
+    $2=helicsInputGetRawValueSize(arg1)+2;
     $1 =  malloc($2);
 }
 
@@ -245,5 +245,3 @@ PyModule_AddObject(m, "HelicsException", pHelicsException);
 }
 
 %apply (char *STRING, size_t LENGTH) { (const void *data, int inputDataLength) };
-
-%apply (char *outputString, int maxStringLen, int *actualLength) {(void *data, int maxDatalen, int *actualSize)};

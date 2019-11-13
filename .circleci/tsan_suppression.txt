@@ -1,0 +1,2 @@
+# This is a known purposeful leak and possible resulting race condition detection on closing of shared libraries
+

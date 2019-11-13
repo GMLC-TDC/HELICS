@@ -7,16 +7,14 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include "ctestFixtures.hpp"
 
-#include <boost/test/unit_test.hpp>
-#include <boost/test/data/test_case.hpp>
+#include <gtest/gtest.h>
 
-namespace bdata = boost::unit_test::data;
-namespace utf = boost::unit_test;
-
-BOOST_FIXTURE_TEST_SUITE (bad_input_tests, FederateTestFixture, *utf::label ("ci"))
+struct bad_input_tests : public FederateTestFixture, public ::testing::Test
+{
+};
 
 /** test simple creation and destruction*/
-BOOST_AUTO_TEST_CASE (test_bad_fed)
+TEST_F (bad_input_tests, test_bad_fed)
 {
     SetupTest (helicsCreateValueFederate, "test", 1);
     auto vFed1 = GetFederateAt (0);
@@ -27,17 +25,17 @@ BOOST_AUTO_TEST_CASE (test_bad_fed)
 
     CE (helicsFederateEnterInitializingMode (vFed1, &err));
     helicsFederateEnterInitializingMode (vFed2, &err);
-    BOOST_CHECK_EQUAL (err.error_code, helics_error_invalid_object);
+    EXPECT_EQ (err.error_code, helics_error_invalid_object);
     helicsErrorClear (&err);
     // auto core = helicsFederateGetCoreObject(vFed1);
 
     CE (helicsFederateFinalize (vFed1, &err));
     helicsFederateFinalize (vFed2, &err);
-    BOOST_CHECK_EQUAL (err.error_code, helics_error_invalid_object);
+    EXPECT_EQ (err.error_code, helics_error_invalid_object);
 
     helicsFederateFree (vFed1);
     helicsFederateGetCurrentTime (vFed1, &err);
-    BOOST_CHECK_EQUAL (err.error_code, helics_error_invalid_object);
+    EXPECT_EQ (err.error_code, helics_error_invalid_object);
     helicsErrorClear (&err);
     // just make sure this doesn't crash
     helicsFederateFree (vFed1);
@@ -46,7 +44,7 @@ BOOST_AUTO_TEST_CASE (test_bad_fed)
 }
 
 /** test simple creation and destruction*/
-BOOST_AUTO_TEST_CASE (test_mistaken_free)
+TEST_F (bad_input_tests, test_mistaken_free)
 {
     SetupTest (helicsCreateValueFederate, "test", 1);
     auto vFed1 = GetFederateAt (0);
@@ -66,7 +64,7 @@ BOOST_AUTO_TEST_CASE (test_mistaken_free)
 }
 
 /** test simple creation and destruction*/
-BOOST_AUTO_TEST_CASE (test_mistaken_finalize)
+TEST_F (bad_input_tests, test_mistaken_finalize)
 {
     SetupTest (helicsCreateValueFederate, "test", 1);
     auto vFed1 = GetFederateAt (0);
@@ -75,7 +73,7 @@ BOOST_AUTO_TEST_CASE (test_mistaken_finalize)
     CE (helicsFederateEnterInitializingMode (vFed1, &err));
     helicsFederateFinalize (fi, &err);
 
-    BOOST_CHECK_NE (err.error_code, 0);
+    EXPECT_NE (err.error_code, 0);
 
     helicsFederateInfoFree (vFed1);  // this is totally wrong but we are testing it
     helicsFederateFree (fi);  // this is also backwards
@@ -86,4 +84,3 @@ BOOST_AUTO_TEST_CASE (test_mistaken_finalize)
     helicsFederateInfoFree (fi);  // now do the correct frees
     helicsFederateFree (vFed1);
 }
-BOOST_AUTO_TEST_SUITE_END ()

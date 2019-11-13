@@ -7,18 +7,16 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "gtest/gtest.h"
 
 #ifdef _MSC_VER
-#pragma warning(push, 0)
-#include "helics/external/filesystem.hpp"
-#pragma warning(pop)
+#    pragma warning(push, 0)
+#    include "helics/external/filesystem.hpp"
+#    pragma warning(pop)
 #else
-#include "helics/external/filesystem.hpp"
+#    include "helics/external/filesystem.hpp"
 #endif
 
-#include "exeTestHelper.h"
 #include "helics/application_api/Publications.hpp"
 #include "helics/apps/Clone.hpp"
 #include "helics/apps/Player.hpp"
-#include "helics/core/BrokerFactory.hpp"
 #include <cstdio>
 #include <future>
 
@@ -32,7 +30,7 @@ TEST (clone_tests, simple_clone_test_pub)
 
     helics::ValueFederate vfed ("block1", fi);
     helics::Publication pub1 (helics::GLOBAL, &vfed, "pub1", helics::data_type::helics_double);
-    auto fut = std::async (std::launch::async, [&c1]() { c1.runTo (4); });
+    auto fut = std::async (std::launch::async, [&c1] () { c1.runTo (4); });
     vfed.enterExecutingMode ();
     auto retTime = vfed.requestTime (1);
     EXPECT_EQ (retTime, 1.0);
@@ -66,7 +64,7 @@ TEST (clone_tests, simple_clone_test_pub2)
 
     auto &pub2 = vfed.registerPublication ("pub2", "double", "m");
 
-    auto fut = std::async (std::launch::async, [&c1]() { c1.runTo (4); });
+    auto fut = std::async (std::launch::async, [&c1] () { c1.runTo (4); });
     vfed.enterExecutingMode ();
     auto retTime = vfed.requestTime (1);
     EXPECT_EQ (retTime, 1.0);
@@ -119,7 +117,7 @@ TEST (clone_tests, simple_clone_test_message)
     auto &ept2 = mfed.registerGlobalEndpoint ("ept3");
     mfed.registerEndpoint ("e3");
 
-    auto fut = std::async (std::launch::async, [&c1]() { c1.runTo (4); });
+    auto fut = std::async (std::launch::async, [&c1] () { c1.runTo (4); });
     mfed.enterExecutingMode ();
     auto retTime = mfed.requestTime (1);
     EXPECT_EQ (retTime, 1.0);
@@ -172,7 +170,7 @@ TEST (clone_tests, simple_clone_test_combo)
 
     auto &pub2 = mfed.registerPublication ("pub2", "double", "m");
 
-    auto fut = std::async (std::launch::async, [&c1]() { c1.runTo (4); });
+    auto fut = std::async (std::launch::async, [&c1] () { c1.runTo (4); });
     mfed.enterExecutingMode ();
     auto retTime = mfed.requestTime (1);
     EXPECT_EQ (retTime, 1.0);
@@ -237,7 +235,7 @@ TEST (clone_tests, simple_clone_test_sub)
 
     vfed.registerSubscription ("block2/pub");
 
-    auto fut = std::async (std::launch::async, [&c1]() { c1.runTo (4); });
+    auto fut = std::async (std::launch::async, [&c1] () { c1.runTo (4); });
     vfed2.enterExecutingModeAsync ();
     vfed.enterExecutingMode ();
     vfed2.enterExecutingModeComplete ();

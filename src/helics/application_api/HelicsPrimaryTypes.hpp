@@ -7,9 +7,10 @@ SPDX-License-Identifier: BSD-3-Clause
 #pragma once
 
 #include "ValueConverter.hpp"
+#include "helics/external/variant.hpp"
 #include "helics/helics-config.h"
 #include "helicsTypes.hpp"
-#include "helics/external/variant.hpp"
+#include "helics_cxx_export.h"
 #include <cmath>
 #include <complex>
 #include <cstdint>
@@ -42,20 +43,21 @@ enum type_location
     named_point_loc = 6
 };
 /** detect a change from the previous values*/
-bool changeDetected (const defV &prevValue, const std::string &val, double deltaV);
-bool changeDetected (const defV &prevValue, const char *val, double deltaV);
-bool changeDetected (const defV &prevValue, const std::vector<double> &val, double deltaV);
-bool changeDetected (const defV &prevValue, const std::vector<std::complex<double>> &val, double deltaV);
-bool changeDetected (const defV &prevValue, const double *vals, size_t size, double deltaV);
-bool changeDetected (const defV &prevValue, const std::complex<double> &val, double deltaV);
-bool changeDetected (const defV &prevValue, double val, double deltaV);
-bool changeDetected (const defV &prevValue, int64_t val, double deltaV);
-bool changeDetected (const defV &prevValue, Time val, double deltaV);
-bool changeDetected (const defV &prevValue, const NamedPoint &val, double deltaV);
-bool changeDetected (const defV &prevValue, bool val, double deltaV);
+HELICS_CXX_EXPORT bool changeDetected (const defV &prevValue, const std::string &val, double deltaV);
+HELICS_CXX_EXPORT bool changeDetected (const defV &prevValue, const char *val, double deltaV);
+HELICS_CXX_EXPORT bool changeDetected (const defV &prevValue, const std::vector<double> &val, double deltaV);
+HELICS_CXX_EXPORT bool
+changeDetected (const defV &prevValue, const std::vector<std::complex<double>> &val, double deltaV);
+HELICS_CXX_EXPORT bool changeDetected (const defV &prevValue, const double *vals, size_t size, double deltaV);
+HELICS_CXX_EXPORT bool changeDetected (const defV &prevValue, const std::complex<double> &val, double deltaV);
+HELICS_CXX_EXPORT bool changeDetected (const defV &prevValue, double val, double deltaV);
+HELICS_CXX_EXPORT bool changeDetected (const defV &prevValue, int64_t val, double deltaV);
+HELICS_CXX_EXPORT bool changeDetected (const defV &prevValue, Time val, double deltaV);
+HELICS_CXX_EXPORT bool changeDetected (const defV &prevValue, const NamedPoint &val, double deltaV);
+HELICS_CXX_EXPORT bool changeDetected (const defV &prevValue, bool val, double deltaV);
 
 /** directly convert the boolean to integer*/
-inline int64_t make_valid (bool obj) { return (obj) ? 1ll : 0ll; }
+inline int64_t make_valid (bool obj) { return (obj) ? 1LL : 0LL; }
 
 /** directly convert the boolean to integer*/
 inline int64_t make_valid (uint64_t val) { return static_cast<int64_t> (val); }
@@ -78,39 +80,45 @@ decltype (auto) make_valid (X &&obj)
     return std::forward<X> (obj);
 }
 /** extract the value from a variant to a string*/
-void valueExtract (const defV &dv, std::string &val);
+HELICS_CXX_EXPORT void valueExtract (const defV &dv, std::string &val);
 
 /** extract the value from a variant to a complex number*/
-void valueExtract (const defV &dv, std::complex<double> &val);
+HELICS_CXX_EXPORT void valueExtract (const defV &dv, std::complex<double> &val);
 
 /** extract the value from a variant to a vector of doubles*/
-void valueExtract (const defV &dv, std::vector<double> &val);
+HELICS_CXX_EXPORT void valueExtract (const defV &dv, std::vector<double> &val);
 
 /** extract the value from a variant to a complex vector of doubles*/
-void valueExtract (const defV &dv, std::vector<std::complex<double>> &val);
+HELICS_CXX_EXPORT void valueExtract (const defV &dv, std::vector<std::complex<double>> &val);
 
 /** extract the value from a variant to a named point*/
-void valueExtract (const defV &dv, NamedPoint &val);
+HELICS_CXX_EXPORT void valueExtract (const defV &dv, NamedPoint &val);
 
 /** extract the value from a variant to a named point*/
-void valueExtract (const defV &dv, Time &val);
+HELICS_CXX_EXPORT void valueExtract (const defV &dv, Time &val);
 
 /** extract the value from a variant to a character*/
-void valueExtract (const defV &dv, char &val);
+HELICS_CXX_EXPORT void valueExtract (const defV &dv, char &val);
 
-void valueExtract (const data_view &dv, data_type baseType, std::string &val);
+/** extract the value from a variant to a bool*/
+HELICS_CXX_EXPORT void valueExtract (const defV &dv, bool &val);
 
-void valueExtract (const data_view &dv, data_type baseType, std::vector<double> &val);
+HELICS_CXX_EXPORT void valueExtract (const data_view &dv, data_type baseType, std::string &val);
 
-void valueExtract (const data_view &dv, data_type baseType, std::complex<double> &val);
+HELICS_CXX_EXPORT void valueExtract (const data_view &dv, data_type baseType, std::vector<double> &val);
 
-void valueExtract (const data_view &dv, data_type baseType, std::vector<std::complex<double>> &val);
+HELICS_CXX_EXPORT void valueExtract (const data_view &dv, data_type baseType, std::complex<double> &val);
 
-void valueExtract (const data_view &dv, data_type baseType, NamedPoint &val);
+HELICS_CXX_EXPORT void
+valueExtract (const data_view &dv, data_type baseType, std::vector<std::complex<double>> &val);
 
-void valueExtract (const data_view &dv, data_type baseType, Time &val);
+HELICS_CXX_EXPORT void valueExtract (const data_view &dv, data_type baseType, NamedPoint &val);
 
-void valueExtract (const data_view &dv, data_type baseType, defV &val);
+HELICS_CXX_EXPORT void valueExtract (const data_view &dv, data_type baseType, Time &val);
+
+HELICS_CXX_EXPORT void valueExtract (const data_view &dv, data_type baseType, bool &val);
+
+HELICS_CXX_EXPORT void valueExtract (const data_view &dv, data_type baseType, defV &val);
 
 /** extract the value from a variant to a numerical type*/
 template <class X>
@@ -164,11 +172,12 @@ valueExtract (const defV &dv, X &val)
 template <class X>
 std::enable_if_t<std::is_arithmetic<X>::value> valueExtract (const data_view &dv, data_type baseType, X &val)
 {
+    constexpr size_t byte_order_check_size = 1;
     switch (baseType)
     {
     case data_type::helics_any:
     {
-        if (dv.size () == 9)
+        if (dv.size () == sizeof (double) + byte_order_check_size)
         {
             auto V = ValueConverter<double>::interpret (dv);
             if (std::isnormal (V))
@@ -181,12 +190,12 @@ std::enable_if_t<std::is_arithmetic<X>::value> valueExtract (const data_view &dv
                 val = static_cast<X> (Vint);
             }
         }
-        else if (dv.size () == 17)
+        else if (dv.size () == 2 * sizeof (double) + byte_order_check_size)
         {
             auto V = ValueConverter<std::complex<double>>::interpret (dv);
             val = static_cast<X> (std::abs (V));
         }
-        else if (dv.size () == 5)
+        else if (dv.size () == sizeof (int) + byte_order_check_size)
         {
             auto V = ValueConverter<float>::interpret (dv);
             if (std::isnormal (V))
@@ -199,7 +208,7 @@ std::enable_if_t<std::is_arithmetic<X>::value> valueExtract (const data_view &dv
                 val = static_cast<X> (Vint);
             }
         }
-        else if (dv.size () == 1)
+        else if (dv.size () == sizeof (char))
         {
             val = static_cast<X> ((dv[0] == '0') ? 0 : 1);
         }
@@ -283,6 +292,6 @@ std::enable_if_t<std::is_arithmetic<X>::value> valueExtract (const data_view &dv
     }
 }
 
-void valueConvert (defV &val, data_type newType);
+HELICS_CXX_EXPORT void valueConvert (defV &val, data_type newType);
 
 }  // namespace helics

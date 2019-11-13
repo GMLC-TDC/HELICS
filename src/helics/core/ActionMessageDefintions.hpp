@@ -52,6 +52,7 @@ enum class action_t : int32_t
     cmd_disconnect_broker_ack = 1009,  //!< ack for broker disconnect
     cmd_check_connections = 297,  //!< command to check for any connections
     cmd_ping = 298,  //!< request for an Echo response
+    cmd_ping_priority = -298,  //!< request for an Echo response on priority channel
     cmd_ping_reply = 299,  //!< response to a ping request
     cmd_broker_ping = 306,  //!< ping to send to a broker to also ping subbrokers and cores
 
@@ -176,6 +177,8 @@ enum class action_t : int32_t
 
 #define CMD_CHECK_CONNECTIONS action_message_def::action_t::cmd_check_connections
 #define CMD_PING action_message_def::action_t::cmd_ping
+#define CMD_PING_PRIORITY action_message_def::action_t::cmd_ping_priority
+
 #define CMD_BROKER_PING action_message_def::action_t::cmd_broker_setup
 #define CMD_PING_REPLY action_message_def::action_t::cmd_ping_reply
 #define CMD_BROKER_SETUP action_message_def::action_t::cmd_broker_setup

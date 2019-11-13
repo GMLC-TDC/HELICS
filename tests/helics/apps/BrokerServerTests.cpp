@@ -11,8 +11,9 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helics/helics.hpp"
 
 #include "helics/apps/BrokerServer.hpp"
+#include "helics/core/BrokerFactory.hpp"
 #include "helics/core/Core.hpp"
-
+#include "helics/core/CoreFactory.hpp"
 #include <cstdio>
 
 using namespace helics;

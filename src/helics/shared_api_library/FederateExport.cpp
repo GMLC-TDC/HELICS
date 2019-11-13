@@ -953,14 +953,7 @@ void helicsFederateSetSeparator (helics_federate fed, char separator, helics_err
     {
         return;
     }
-    try
-    {
-        fedObj->setSeparator (separator);
-    }
-    catch (...)
-    {
-        helicsErrorHandler (err);
-    }
+    fedObj->setSeparator (separator);
 }
 
 helics_time helicsFederateGetCurrentTime (helics_federate fed, helics_error *err)
@@ -970,16 +963,8 @@ helics_time helicsFederateGetCurrentTime (helics_federate fed, helics_error *err
     {
         return helics_time_invalid;
     }
-    try
-    {
-        auto T = fedObj->getCurrentTime ();
-        return (T < helics::Time::maxVal ()) ? static_cast<double> (T) : helics_time_maxtime;
-    }
-    catch (...)
-    {
-        helicsErrorHandler (err);
-        return helics_time_invalid;
-    }
+    auto T = fedObj->getCurrentTime ();
+    return (T < helics::Time::maxVal ()) ? static_cast<double> (T) : helics_time_maxtime;
 }
 
 static constexpr char invalidGlobalString[] = "Global name cannot be null";

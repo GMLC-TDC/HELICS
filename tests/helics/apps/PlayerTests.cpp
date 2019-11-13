@@ -7,11 +7,12 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "gtest/gtest.h"
 
 #include <cstdio>
-
-#include "exeTestHelper.h"
+#ifndef DISABLE_SYSTEM_CALL_TESTS
+#    include "exeTestHelper.h"
+#endif
 #include "helics/application_api/Subscriptions.hpp"
+#include "helics/apps/BrokerApp.hpp"
 #include "helics/apps/Player.hpp"
-#include "helics/core/BrokerFactory.hpp"
 #include <future>
 
 TEST (player_tests, simple_player_test)
@@ -289,8 +290,8 @@ TEST (player_tests, simple_player_mlinecomment)
 TEST_P (player_file_tests, test_files_cmd)
 {
     std::this_thread::sleep_for (std::chrono::milliseconds (300));
-    auto brk = helics::BrokerFactory::create (helics::core_type::IPC, "ipc_broker", "-f 2");
-    brk->connect ();
+    helics::apps::BrokerApp brk (helics::core_type::IPC, "ipc_broker", "-f 2");
+
     std::string exampleFile = std::string (TEST_DIR) + GetParam ();
 
     std::vector<std::string> args{"", "--name=player", "--broker=ipc_broker", "--coretype=ipc", exampleFile};
@@ -339,13 +340,13 @@ TEST_P (player_file_tests, test_files_cmd)
     EXPECT_EQ (retTime, 5.0);
     vfed.finalize ();
     fut.get ();
-    brk = nullptr;
+    brk.reset ();
     std::this_thread::sleep_for (std::chrono::milliseconds (300));
 }
 #endif
 
 #ifdef ENABLE_ZMQ_CORE
-#ifndef DISABLE_SYSTEM_CALL_TESTS
+#    ifndef DISABLE_SYSTEM_CALL_TESTS
 TEST_P (player_file_tests, test_files_exe)
 {
     std::this_thread::sleep_for (std::chrono::milliseconds (300));
@@ -395,12 +396,12 @@ TEST_P (player_file_tests, test_files_exe)
     retTime = vfed.requestTime (5);
     EXPECT_EQ (retTime, 5.0);
     vfed.finalize ();
-    auto out2 = res2.get ();
+    res2.get ();
     res.get ();
     // out = 0;
     std::this_thread::sleep_for (std::chrono::milliseconds (300));
 }
-#endif
+#    endif
 #endif
 
 INSTANTIATE_TEST_SUITE_P (player_tests, player_file_tests, ::testing::ValuesIn (simple_files));

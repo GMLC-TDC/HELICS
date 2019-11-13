@@ -7,9 +7,9 @@ SPDX-License-Identifier: BSD-3-Clause
 #pragma once
 
 #include "../ActionMessage.hpp"
+#include "gmlc/containers/extra/optional.hpp"
 #include <algorithm>
 #include <cctype>
-#include "gmlc/containers/extra/optional.hpp"
 #include <iostream>
 #include <memory>
 #include <thread>
@@ -29,7 +29,8 @@ namespace ipc
  */
 inline std::string stringTranslateToCppName (std::string in)
 {
-    std::replace_if (in.begin (), in.end (), [](auto c) { return !(std::isalnum (c) || (c == '_')); }, '_');
+    std::replace_if (
+      in.begin (), in.end (), [] (auto c) { return !(std::isalnum (c) || (c == '_')); }, '_');
     return in;
 }
 /** enumeration of queue states*/

@@ -11,6 +11,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helics/core/BrokerFactory.hpp"
 #include "helics/core/Core.hpp"
 #include "helics/core/CoreFactory.hpp"
+#include "helics/core/coreTypeOperations.hpp"
 #include <iostream>
 #include <memory>
 #include <stdexcept>
@@ -37,7 +38,10 @@ struct FederateTestFixture
     {
         ctype = core_type_name;
         auto broker = AddBroker (core_type_name, count);
-
+        if (!broker)
+        {
+            throw (std::runtime_error ("unable to add broker"));
+        }
         if (!broker->isConnected ())
         {
             broker->disconnect ();
@@ -54,10 +58,10 @@ struct FederateTestFixture
 
     template <class FedType>
     void AddFederates (std::string core_type_name,
-                                                        int count,
-                                                        std::shared_ptr<helics::Broker> broker,
-                                                        helics::Time time_delta = helics::timeZero,
-                                                        const std::string &name_prefix = defaultNamePrefix)
+                       int count,
+                       std::shared_ptr<helics::Broker> broker,
+                       helics::Time time_delta = helics::timeZero,
+                       const std::string &name_prefix = defaultNamePrefix)
     {
         bool hasIndex = hasIndexCode (core_type_name);
         int setup = (hasIndex) ? getIndexCode (core_type_name) : 1;
@@ -76,7 +80,7 @@ struct FederateTestFixture
             initString.append (extraCoreArgs);
         }
 
-        helics::FederateInfo fi (helics::coreTypeFromString (core_type_name));
+        helics::FederateInfo fi (helics::core::coreTypeFromString (core_type_name));
         if (time_delta != helics::timeZero)
         {
             fi.setProperty (helics_property_time_delta, time_delta);
@@ -88,7 +92,7 @@ struct FederateTestFixture
         default:
         {
             size_t offset = federates.size ();
-            auto core_type = helics::coreTypeFromString (core_type_name);
+            auto core_type = helics::core::coreTypeFromString (core_type_name);
             //  auto core = helics::CoreFactory::create (core_type, name_prefix + "_core_" + std::to_string
             //  (offset),
             //                                          initString + " --federates " + std::to_string (count));
@@ -107,7 +111,7 @@ struct FederateTestFixture
         break;
         case 2:
         {  // each federate has its own core
-            auto core_type = helics::coreTypeFromString (core_type_name);
+            auto core_type = helics::core::coreTypeFromString (core_type_name);
             size_t offset = federates.size ();
             federates.resize (count + offset);
             for (int ii = 0; ii < count; ++ii)
@@ -163,7 +167,7 @@ struct FederateTestFixture
         break;
         case 5:  // pairs of federates per core
         {
-            auto core_type = helics::coreTypeFromString (core_type_name);
+            auto core_type = helics::core::coreTypeFromString (core_type_name);
             size_t offset = federates.size ();
             federates.resize (count + offset);
             for (int ii = 0; ii < count; ii += 2)

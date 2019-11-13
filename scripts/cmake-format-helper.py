@@ -10,7 +10,7 @@ CURRENT_DIRECTORY = os.path.realpath(os.path.dirname(__file__))
 def format_file(filename):
     """ Format cmake files """
 
-    cmd = f"cmake-format -i {filename} --line-width=88 --dangle-parens=True"
+    cmd = f"cmake-format -i {filename}"
     print(f"Formatting {filename}")
     p = subprocess.Popen(shlex.split(cmd))
     p.__filename = filename

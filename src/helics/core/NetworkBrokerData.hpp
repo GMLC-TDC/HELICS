@@ -126,7 +126,8 @@ void insertProtocol (std::string &networkAddress, interface_type interfaceT);
  */
 bool isipv6 (const std::string &address);
 
-/** create a combined address list with choices in a rough order of priority based on if they appear in both lists, followed by the high priority addresses, and low priority addresses last
+/** create a combined address list with choices in a rough order of priority based on if they appear in both lists,
+followed by the high priority addresses, and low priority addresses last
 
 @param high addresses that should be considered before low addresses
 @param low addresses that should be considered last
@@ -135,7 +136,7 @@ bool isipv6 (const std::string &address);
 std::vector<std::string> prioritizeExternalAddresses (std::vector<std::string> high, std::vector<std::string> low);
 
 /** get the external ipv4 address of the current computer
-*/
+ */
 std::string getLocalExternalAddressV4 ();
 
 /** get the external ipv4 Ethernet address of the current computer that best matches the listed server*/

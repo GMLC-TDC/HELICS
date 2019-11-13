@@ -29,67 +29,67 @@ static const std::string emptyStr;
 #define LOG_ERROR(message) logMessage (helics_log_level_error, emptyStr, message)
 #define LOG_WARNING(message) logMessage (helics_log_level_warning, emptyStr, message)
 
-#ifdef ENABLE_LOGGING
+#ifdef HELICS_ENABLE_LOGGING
 
-#define LOG_SUMMARY(message)                                                                                      \
-    do                                                                                                            \
-    {                                                                                                             \
-        if (logLevel >= helics_log_level_summary)                                                                 \
+#    define LOG_SUMMARY(message)                                                                                  \
+        do                                                                                                        \
         {                                                                                                         \
-            logMessage (Hhelics_log_level_summary, emptyStr, message);                                            \
-        }                                                                                                         \
-    } while (false)
+            if (logLevel >= helics_log_level_summary)                                                             \
+            {                                                                                                     \
+                logMessage (Hhelics_log_level_summary, emptyStr, message);                                        \
+            }                                                                                                     \
+        } while (false)
 
-#define LOG_INTERFACES(message)                                                                                   \
-    do                                                                                                            \
-    {                                                                                                             \
-        if (logLevel >= helics_log_level_interfaces)                                                              \
+#    define LOG_INTERFACES(message)                                                                               \
+        do                                                                                                        \
         {                                                                                                         \
-            logMessage (helics_log_level_interfaces, emptyStr, message);                                          \
-        }                                                                                                         \
-    } while (false)
+            if (logLevel >= helics_log_level_interfaces)                                                          \
+            {                                                                                                     \
+                logMessage (helics_log_level_interfaces, emptyStr, message);                                      \
+            }                                                                                                     \
+        } while (false)
 
-#ifdef ENABLE_DEBUG_LOGGING
-#define LOG_TIMING(message)                                                                                       \
-    do                                                                                                            \
-    {                                                                                                             \
-        if (logLevel >= helics_log_level_timing)                                                                  \
-        {                                                                                                         \
-            logMessage (helics_log_level_timing, emptyStr, message);                                              \
-        }                                                                                                         \
-    } while (false)
+#    ifdef HELICS_ENABLE_DEBUG_LOGGING
+#        define LOG_TIMING(message)                                                                               \
+            do                                                                                                    \
+            {                                                                                                     \
+                if (logLevel >= helics_log_level_timing)                                                          \
+                {                                                                                                 \
+                    logMessage (helics_log_level_timing, emptyStr, message);                                      \
+                }                                                                                                 \
+            } while (false)
 
-#define LOG_DATA(message)                                                                                         \
-    do                                                                                                            \
-    {                                                                                                             \
-        if (logLevel >= helics_log_level_data)                                                                    \
-        {                                                                                                         \
-            logMessage (helics_log_level_data, emptyStr, message);                                                \
-        }                                                                                                         \
-    } while (false)
-#else
-#define LOG_TIMING(message)
-#define LOG_DATA(message)
-#endif
+#        define LOG_DATA(message)                                                                                 \
+            do                                                                                                    \
+            {                                                                                                     \
+                if (logLevel >= helics_log_level_data)                                                            \
+                {                                                                                                 \
+                    logMessage (helics_log_level_data, emptyStr, message);                                        \
+                }                                                                                                 \
+            } while (false)
+#    else
+#        define LOG_TIMING(message)
+#        define LOG_DATA(message)
+#    endif
 
-#ifdef ENABLE_TRACE_LOGGING
-#define LOG_TRACE(message)                                                                                        \
-    do                                                                                                            \
-    {                                                                                                             \
-        if (logLevel >= helics_log_level_trace)                                                                   \
-        {                                                                                                         \
-            logMessage (helics_log_level_trace, emptyStr, message);                                               \
-        }                                                                                                         \
-    } while (false)
-#else
-#define LOG_TRACE(message) ((void)0)
-#endif
+#    ifdef HELICS_ENABLE_TRACE_LOGGING
+#        define LOG_TRACE(message)                                                                                \
+            do                                                                                                    \
+            {                                                                                                     \
+                if (logLevel >= helics_log_level_trace)                                                           \
+                {                                                                                                 \
+                    logMessage (helics_log_level_trace, emptyStr, message);                                       \
+                }                                                                                                 \
+            } while (false)
+#    else
+#        define LOG_TRACE(message) ((void)0)
+#    endif
 #else  // LOGGING_DISABLED
-#define LOG_SUMMARY(message) ((void)0)
-#define LOG_INTERFACES(message) ((void)0)
-#define LOG_TIMING(message) ((void)0)
-#define LOG_DATA(message) ((void)0)
-#define LOG_TRACE(message) ((void)0)
+#    define LOG_SUMMARY(message) ((void)0)
+#    define LOG_INTERFACES(message) ((void)0)
+#    define LOG_TIMING(message) ((void)0)
+#    define LOG_DATA(message) ((void)0)
+#    define LOG_TRACE(message) ((void)0)
 #endif  // LOGGING_DISABLED
 
 using namespace std::chrono_literals;
@@ -97,9 +97,9 @@ using namespace std::chrono_literals;
 namespace helics
 {
 FederateState::FederateState (const std::string &name_, const CoreFederateInfo &info_)
-    : name (name_), global_id{global_federate_id ()}
+    : name (name_), timeCoord (new TimeCoordinator ([this] (const ActionMessage &msg) { routeMessage (msg); })),
+      global_id{global_federate_id ()}
 {
-    timeCoord = std::make_unique<TimeCoordinator> ([this] (const ActionMessage &msg) { routeMessage (msg); });
     for (const auto &prop : info_.timeProps)
     {
         setProperty (prop.first, prop.second);
@@ -414,13 +414,12 @@ iteration_result FederateState::waitSetup ()
         return static_cast<iteration_result> (ret);
     }
 
-    sleeplock ();
+    std::lock_guard<FederateState> fedlock (*this);
     iteration_result ret;
     switch (getState ())
     {
     case HELICS_CREATED:
     {  // we are still in the created state
-        unlock ();
         return waitSetup ();
     }
     case HELICS_ERROR:
@@ -434,7 +433,6 @@ iteration_result FederateState::waitSetup ()
         break;
     }
 
-    unlock ();
     return ret;
 }
 
@@ -452,7 +450,7 @@ iteration_result FederateState::enterInitializingMode ()
         return static_cast<iteration_result> (ret);
     }
 
-    sleeplock ();
+    std::lock_guard<FederateState> fedlock (*this);
     iteration_result ret;
     switch (getState ())
     {
@@ -464,14 +462,12 @@ iteration_result FederateState::enterInitializingMode ()
         break;
     case HELICS_CREATED:
     {
-        unlock ();
         return enterInitializingMode ();
     }
     default:  // everything >= HELICS_INITIALIZING
         ret = iteration_result::next_step;
         break;
     }
-    unlock ();
     return ret;
 }
 
@@ -537,7 +533,7 @@ iteration_result FederateState::enterExecutingMode (iteration_request iterate)
     }
     // the following code is for situation which this has been called multiple times, which really shouldn't be
     // done but it isn't really an error so we need to deal with it.
-    sleeplock ();
+    std::lock_guard<FederateState> plock (*this);
     iteration_result ret;
     switch (getState ())
     {
@@ -556,8 +552,18 @@ iteration_result FederateState::enterExecutingMode (iteration_request iterate)
         ret = iteration_result::next_step;
         break;
     }
-    unlock ();
     return ret;
+}
+
+std::vector<global_handle> FederateState::getSubscribers (interface_handle handle)
+{
+    std::lock_guard<FederateState> fedlock (*this);
+    auto pubInfo = interfaceInformation.getPublication (handle);
+    if (pubInfo != nullptr)
+    {
+        return pubInfo->subscribers;
+    }
+    return {};
 }
 
 iteration_time FederateState::requestTime (Time nextTime, iteration_request iterate)
@@ -685,7 +691,7 @@ iteration_time FederateState::requestTime (Time nextTime, iteration_request iter
     }
     // this would not be good practice to get into this part of the function
     // but the area must protect itself and should return something sensible
-    sleeplock ();
+    std::lock_guard<FederateState> fedlock (*this);
     iteration_result ret = iterating ? iteration_result::iterating : iteration_result::next_step;
     if (state == HELICS_FINISHED)
     {
@@ -696,7 +702,6 @@ iteration_time FederateState::requestTime (Time nextTime, iteration_request iter
         ret = iteration_result::error;
     }
     iteration_time retTime = {time_granted, ret};
-    unlock ();
     return retTime;
 }
 
@@ -750,8 +755,7 @@ iteration_result FederateState::genericUnspecifiedQueueProcess ()
         return static_cast<iteration_result> (ret);
     }
 
-    sleeplock ();
-    unlock ();
+    std::lock_guard<FederateState> fedlock (*this);
     return iteration_result::next_step;
 }
 
@@ -1231,7 +1235,8 @@ message_processing_result FederateState::processActionMessage (ActionMessage &cm
         auto subI = interfaceInformation.getInput (cmd.dest_handle);
         if (subI != nullptr)
         {
-            subI->addSource (cmd.getSource (), cmd.getString (typeStringLoc), cmd.getString (unitStringLoc));
+            subI->addSource (cmd.getSource (), cmd.name, cmd.getString (typeStringLoc),
+                             cmd.getString (unitStringLoc));
             addDependency (cmd.source_id);
         }
     }
@@ -1258,6 +1263,15 @@ message_processing_result FederateState::processActionMessage (ActionMessage &cm
         }
 
         break;
+    case CMD_REMOVE_NAMED_PUBLICATION:
+    {
+        auto subI = interfaceInformation.getInput (cmd.source_handle);
+        if (subI != nullptr)
+        {
+            subI->removeSource (cmd.name, (cmd.actionTime != timeZero) ? cmd.actionTime : time_granted);
+        }
+        break;
+    }
     case CMD_REMOVE_PUBLICATION:
     {
         auto subI = interfaceInformation.getInput (cmd.dest_handle);
@@ -1301,7 +1315,7 @@ message_processing_result FederateState::processActionMessage (ActionMessage &cm
         setProperty (cmd.messageID, cmd.actionTime);
         break;
     case CMD_FED_CONFIGURE_INT:
-        setProperty (cmd.messageID, cmd.counter);
+        setProperty (cmd.messageID, cmd.getExtraData ());
         break;
     case CMD_FED_CONFIGURE_FLAG:
         setOptionFlag (cmd.messageID, checkActionFlag (cmd, indicator_flag));
@@ -1317,7 +1331,6 @@ message_processing_result FederateState::processActionMessage (ActionMessage &cm
         queryResp.source_id = cmd.dest_id;
         queryResp.messageID = cmd.messageID;
         queryResp.counter = cmd.counter;
-        queryResp.source_id = global_id;
 
         queryResp.payload = processQueryActual (cmd.payload);
         routeMessage (queryResp);
@@ -1345,7 +1358,7 @@ void FederateState::setProperties (const ActionMessage &cmd)
             break;
         case CMD_FED_CONFIGURE_INT:
             spinlock ();
-            setProperty (cmd.messageID, cmd.counter);
+            setProperty (cmd.messageID, cmd.getExtraData ());
             unlock ();
             break;
         case CMD_INTERFACE_CONFIGURE:
@@ -1815,6 +1828,11 @@ std::string FederateState::processQuery (const std::string &query) const
     if (query == "publications" || query == "inputs" || query == "endpoints")
     {  // these never need to be locked
         qstring = processQueryActual (query);
+    }
+    else if ((query == "queries") || (query == "available_queries"))
+    {
+        qstring =
+          "publications;inputs;endpoints;interfaces;subscriptions;dependencies;timeconfig;config;dependents";
     }
     else
     {  // the rest might to prevent a race condition

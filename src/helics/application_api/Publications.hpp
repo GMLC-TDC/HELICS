@@ -13,12 +13,12 @@ SPDX-License-Identifier: BSD-3-Clause
 namespace units
 {
 class precise_unit;
-}
+}  // namespace units
 
 namespace helics
 {
 /** define a publication object in the C++98 interface*/
-class Publication
+class HELICS_CXX_EXPORT Publication
 {
   protected:
     ValueFederate *fed = nullptr;  //!< the federate construct to interact with

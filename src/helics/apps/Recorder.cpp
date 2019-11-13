@@ -65,18 +65,26 @@ Recorder::Recorder (const std::string &appName, const std::shared_ptr<Core> &cor
     fed->setFlagOption (helics_flag_observer);
 }
 
+Recorder::Recorder (const std::string &appName, CoreApp &core, const FederateInfo &fi) : App (appName, core, fi)
+{
+    fed->setFlagOption (helics_flag_observer);
+}
+
 Recorder::Recorder (const std::string &appName, const std::string &jsonString) : App (appName, jsonString)
 {
     fed->setFlagOption (helics_flag_observer);
     Recorder::loadJsonFile (jsonString);
 }
 
-Recorder::~Recorder () try
+Recorder::~Recorder ()
 {
-    saveFile (outFileName);
-}
-catch (...)
-{
+    try
+    {
+        saveFile (outFileName);
+    }
+    catch (...)
+    {
+    }
 }
 
 void Recorder::loadJsonFile (const std::string &jsonString)
@@ -676,7 +684,7 @@ std::shared_ptr<helicsCLI11App> Recorder::buildArgParserApp ()
     auto clone_group =
       app->add_option_group ("cloning", "Options related to endpoint cloning operations and specifications");
     clone_group->add_option ("--clone", "existing endpoints to clone all packets to and from")
-      ->each ([this](const std::string &clone) {
+      ->each ([this] (const std::string &clone) {
           addDestEndpointClone (clone);
           addSourceEndpointClone (clone);
       })
@@ -687,7 +695,7 @@ std::shared_ptr<helicsCLI11App> Recorder::buildArgParserApp ()
       ->add_option (
         "--sourceclone",
         "existing endpoints to capture generated packets from, this argument may be specified multiple time")
-      ->each ([this](const std::string &clone) { addSourceEndpointClone (clone); })
+      ->each ([this] (const std::string &clone) { addSourceEndpointClone (clone); })
       ->delimiter (',')
       ->ignore_underscore ()
       ->type_size (-1);
@@ -695,7 +703,7 @@ std::shared_ptr<helicsCLI11App> Recorder::buildArgParserApp ()
     clone_group
       ->add_option ("--destclone", "existing endpoints to capture all packets with the specified endpoint as a "
                                    "destination, this argument may be specified multiple time")
-      ->each ([this](const std::string &clone) { addSourceEndpointClone (clone); })
+      ->each ([this] (const std::string &clone) { addSourceEndpointClone (clone); })
       ->delimiter (',')
       ->ignore_underscore ()
       ->type_size (-1);
@@ -706,7 +714,7 @@ std::shared_ptr<helicsCLI11App> Recorder::buildArgParserApp ()
     capture_group
       ->add_option ("--tag,--publication,--pub",
                     "tags(publications) to record, this argument may be specified any number of times")
-      ->each ([this](const std::string &tag) {
+      ->each ([this] (const std::string &tag) {
           auto taglist = stringOps::splitlineQuotes (tag);
           for (const auto &tagname : taglist)
           {
@@ -716,7 +724,7 @@ std::shared_ptr<helicsCLI11App> Recorder::buildArgParserApp ()
       ->type_size (-1);
 
     capture_group->add_option ("--endpoints", "endpoints to capture, this argument may be specified multiple time")
-      ->each ([this](const std::string &ept) {
+      ->each ([this] (const std::string &ept) {
           auto eptlist = stringOps::splitlineQuotes (ept);
           for (const auto &eptname : eptlist)
           {
@@ -728,7 +736,7 @@ std::shared_ptr<helicsCLI11App> Recorder::buildArgParserApp ()
     capture_group
       ->add_option ("--capture", "capture all the publications of a particular federate capture=\"fed1;fed2\"  "
                                  "supports multiple arguments or a comma separated list")
-      ->each ([this](const std::string &capt) {
+      ->each ([this] (const std::string &capt) {
           auto captFeds = stringOps::splitlineQuotes (capt);
           for (auto &captFed : captFeds)
           {

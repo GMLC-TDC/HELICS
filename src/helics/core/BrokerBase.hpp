@@ -51,7 +51,7 @@ class BrokerBase
       loggingObj;  //!< default logging object to use if the logging callback is not specified
     std::thread queueProcessingThread;  //!< thread for running the broker
     /** a logging function for logging or printing messages*/
-    std::function<void(int, const std::string &, const std::string &)> loggerFunction;
+    std::function<void (int, const std::string &, const std::string &)> loggerFunction;
 
     std::atomic<bool> haltOperations{false};  //!< flag indicating that no further message should be processed
   private:
@@ -65,7 +65,7 @@ class BrokerBase
     std::unique_ptr<ForwardingTimeCoordinator> timeCoord;  //!< object managing the time control
     gmlc::containers::BlockingPriorityQueue<ActionMessage> actionQueue;  //!< primary routing queue
     /** enumeration of the possible core states*/
-    enum broker_state_t : int16_t
+    enum class broker_state_t : int16_t
     {
         created = -6,  //!< the broker has been created
         configuring = -5,  //!< the broker is in the processing of configuring
@@ -78,7 +78,7 @@ class BrokerBase
         terminated = 3,  //!< the termination process has started
         errored = 7,  //!< an error was encountered
     };
-    std::atomic<broker_state_t> brokerState{created};  //!< flag indicating that the structure is past the
+    std::atomic<broker_state_t> brokerState{broker_state_t::created};  //!< flag indicating that the structure is past the
                                                        //!< initialization stage indicating that no more changes
                                                        //!< can be made to the number of federates or handles
     bool noAutomaticID{false};  //!< the broker should not automatically generate an ID
@@ -114,7 +114,7 @@ class BrokerBase
     std::string &message) the function takes a level indicating the logging level string with the source name and a
     string with the message
     */
-    void setLoggerFunction (std::function<void(int, const std::string &, const std::string &)> logFunction);
+    void setLoggerFunction (std::function<void (int, const std::string &, const std::string &)> logFunction);
 
     /** check if the main processing loop of a broker is running*/
     bool isRunning () const { return mainLoopIsRunning.load (); }
@@ -172,6 +172,8 @@ class BrokerBase
     void setLoggingFile (const std::string &lfile);
 
   public:
+    /** generate a callback function for the logging purposes*/
+    std::function<void (int, const std::string &, const std::string &)> getLoggingCallback () const;
     /** close all the threads*/
     void joinAllThreads ();
     friend class TimeoutMonitor;

@@ -12,8 +12,27 @@ SPDX-License-Identifier: BSD-3-Clause
 #undef CLI11_EXPERIMENTAL_OPTIONAL
 #include "core-types.hpp"
 #include "helics-time.hpp"
-#include "helicsVersion.hpp"
+#if defined HELICS_SHARED_LIBRARY || !defined HELICS_STATIC_CORE_LIBRARY
+#    include "../application_api/timeOperations.hpp"
+#    include "../application_api/typeOperations.hpp"
 
+using helics::coreTypeFromString;
+using helics::loadTimeFromString;
+using helics::to_string;
+#else
+#    include "../utilities/timeStringOps.hpp"
+#    include "coreTypeOperations.hpp"
+
+using helics::core::coreTypeFromString;
+using helics::core::to_string;
+/** generate a local function that uses the utilities library*/
+inline helics::Time loadTimeFromString (const std::string &str, time_units defUnit)
+{
+    return gmlc::utilities::loadTimeFromString<helics::Time> (str, defUnit);
+}
+
+#endif
+#include "helicsVersion.hpp"
 namespace helics
 {
 class helicsCLI11App : public CLI::App
@@ -120,12 +139,12 @@ class helicsCLI11App : public CLI::App
         og->add_option_function<std::string> (
             "--coretype,-t,--type,--core",
             [this] (const std::string &val) {
-                coreType = helics::coreTypeFromString (val);
+                coreType = coreTypeFromString (val);
                 if (coreType == core_type::UNRECOGNIZED)
                     throw CLI::ValidationError (val + " is NOT a recognized core type");
             },
             "type of the core to connect to")
-          ->default_str ("(" + helics::to_string (coreType) + ")");
+          ->default_str ("(" + to_string (coreType) + ")");
     }
     core_type getCoreType () const { return coreType; }
     /** set default core core type*/
@@ -144,11 +163,11 @@ namespace CLI
 namespace detail
 {
 template <>
-inline bool lexical_cast<helics::Time> (std::string input, helics::Time &output)
+inline bool lexical_cast<helics::Time> (const std::string &input, helics::Time &output)
 {
     try
     {
-        output = helics::loadTimeFromString (input, time_units::ms);
+        output = loadTimeFromString (input, time_units::ms);
     }
     catch (std::invalid_argument &)
     {

@@ -1,4 +1,11 @@
-
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# Copyright (c) 2017-2019, Battelle Memorial Institute; Lawrence Livermore
+# National Security, LLC; Alliance for Sustainable Energy, LLC.
+# See the top-level NOTICE for additional details.
+# All rights reserved.
+#
+# SPDX-License-Identifier: BSD-3-Clause
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 # -----------------------------------------------------------------------------
 # create the fmt header only targets
@@ -15,7 +22,9 @@ set(SUPPORTS_USER_DEFINED_LITERALS ON)
 set(FMT_HAS_VARIANT OFF)
 
 # get the FMT header only library
-add_subdirectory(ThirdParty/fmtlib EXCLUDE_FROM_ALL)
+add_subdirectory(ThirdParty/fmtlib)
+
+set_target_properties(fmt PROPERTIES FOLDER Extern)
 hide_variable(FMT_DOC)
 hide_variable(FMT_INSTALL)
 hide_variable(FMT_PEDANTIC)

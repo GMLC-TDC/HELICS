@@ -11,37 +11,39 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "core-types.hpp"
 #include "helics/helics-config.h"
 #ifdef ENABLE_ZMQ_CORE
-#include "zmq/ZmqCore.h"
+#    include "zmq/ZmqCore.h"
 #endif
 
 #ifdef ENABLE_MPI_CORE
-#include "mpi/MpiCore.h"
+#    include "mpi/MpiCore.h"
 #endif
 
 #include "gmlc/concurrency/DelayedDestructor.hpp"
 #include "gmlc/concurrency/SearchableObjectHolder.hpp"
 
 #ifdef ENABLE_TEST_CORE
-#include "test/TestCore.h"
+#    include "test/TestCore.h"
 #endif
 
 #ifdef ENABLE_IPC_CORE
-#include "ipc/IpcCore.h"
+#    include "ipc/IpcCore.h"
 #endif
 
 #ifdef ENABLE_UDP_CORE
-#include "udp/UdpCore.h"
+#    include "udp/UdpCore.h"
 #endif
 
 #ifdef ENABLE_TCP_CORE
-#include "tcp/TcpCore.h"
+#    include "tcp/TcpCore.h"
+#endif
+
+#ifdef ENABLE_INPROC_CORE
+#    include "inproc/InprocCore.h"
 #endif
 
 #include "helicsCLI11.hpp"
 #include <cassert>
 #include <cstring>
-
-DECLARE_TRIPLINE ()
 
 namespace helics
 {
@@ -53,27 +55,27 @@ std::shared_ptr<Core> makeCore (core_type type, const std::string &name)
 #ifdef ENABLE_ZMQ_CORE
         type = core_type::ZMQ;
 #else
-#ifdef ENABLE_TCP_CORE
+#    ifdef ENABLE_TCP_CORE
         type = core_type::TCP;
-#else
-#ifdef ENABLE_UDP_CORE
+#    else
+#        ifdef ENABLE_UDP_CORE
         type = core_type::UDP;
-#else
-#ifdef ENABLE_MPI_CORE
+#        else
+#            ifdef ENABLE_MPI_CORE
         type = core_type::MPI;
-#else
-#ifdef ENABLE_IPC_CORE
+#            else
+#                ifdef ENABLE_IPC_CORE
         type = core_type::IPC;
-#else
-#ifdef ENABLE_TEST_CORE
+#                else
+#                    ifdef ENABLE_TEST_CORE
         type = core_type::TEST;
-#else
+#                    else
         type = core_type::UNRECOGNIZED;
-#endif  // ENABLE_TEST_CORE
-#endif  // ENABLE_IPC_CORE
-#endif  // ENABLE_MPI_CORE
-#endif  // ENABLE_UDP_CORE
-#endif  // ENABLE_TCP_CORE
+#                    endif  // ENABLE_TEST_CORE
+#                endif  // ENABLE_IPC_CORE
+#            endif  // ENABLE_MPI_CORE
+#        endif  // ENABLE_UDP_CORE
+#    endif  // ENABLE_TCP_CORE
 #endif  // ENABLE_ZMQ_CORE
     }
 
@@ -136,6 +138,20 @@ std::shared_ptr<Core> makeCore (core_type type, const std::string &name)
         break;
 #else
         throw (HelicsException ("TEST core is not available"));
+#endif
+    case core_type::INPROC:
+#ifdef ENABLE_INPROC_CORE
+        if (name.empty ())
+        {
+            core = std::make_shared<inproc::InprocCore> ();
+        }
+        else
+        {
+            core = std::make_shared<inproc::InprocCore> (name);
+        }
+        break;
+#else
+        throw (HelicsException ("Inproc core is not available"));
 #endif
     case core_type::INTERPROCESS:
     case core_type::IPC:
@@ -354,7 +370,7 @@ std::shared_ptr<Core> FindOrCreate (core_type type, const std::string &core_name
 
 /** lambda function to join cores before the destruction happens to avoid potential problematic calls in the
  * loops*/
-static auto destroyerCallFirst = [](auto &core) {
+static auto destroyerCallFirst = [] (auto &core) {
     core->processDisconnect (true);
     core->joinAllThreads ();
 };
@@ -400,6 +416,12 @@ static bool isJoinableCoreOfType (core_type type, const std::shared_ptr<CommonCo
 #else
             break;
 #endif
+        case core_type::INPROC:
+#ifdef ENABLE_INPROC_CORE
+            return (dynamic_cast<inproc::InprocCore *> (ptr.get ()) != nullptr);
+#else
+            break;
+#endif
         case core_type::INTERPROCESS:
         case core_type::IPC:
 #ifdef ENABLE_IPC_CORE
@@ -432,9 +454,18 @@ static bool isJoinableCoreOfType (core_type type, const std::shared_ptr<CommonCo
     return false;
 }
 
+static bool isJoinableCoreForType (core_type type, const std::shared_ptr<CommonCore> &ptr)
+{
+    if (type == core_type::INPROC || type == core_type::TEST)
+    {
+        return isJoinableCoreOfType (core_type::INPROC, ptr) || isJoinableCoreOfType (core_type::TEST, ptr);
+    }
+    return isJoinableCoreOfType (type, ptr);
+}
+
 std::shared_ptr<Core> findJoinableCoreOfType (core_type type)
 {
-    return searchableObjects.findObject ([type](auto &ptr) { return isJoinableCoreOfType (type, ptr); });
+    return searchableObjects.findObject ([type] (auto &ptr) { return isJoinableCoreForType (type, ptr); });
 }
 
 bool registerCore (const std::shared_ptr<Core> &core)
@@ -466,7 +497,28 @@ void unregisterCore (const std::string &name)
 {
     if (!searchableObjects.removeObject (name))
     {
-        searchableObjects.removeObject ([&name](auto &obj) { return (obj->getIdentifier () == name); });
+        searchableObjects.removeObject ([&name] (auto &obj) { return (obj->getIdentifier () == name); });
+    }
+}
+
+static const std::string helpStr{"--help"};
+
+void displayHelp (core_type type)
+{
+    if (type == core_type::DEFAULT || type == core_type::UNRECOGNIZED)
+    {
+        std::cout << "All core types have similar options\n";
+        auto cr = makeCore (core_type::DEFAULT, emptyString);
+        cr->configure (helpStr);
+#ifdef ENABLE_TCP_CORE
+        cr = makeCore (core_type::TCP_SS, emptyString);
+        cr->configure (helpStr);
+#endif
+    }
+    else
+    {
+        auto cr = makeCore (type, emptyString);
+        cr->configure (helpStr);
     }
 }
 

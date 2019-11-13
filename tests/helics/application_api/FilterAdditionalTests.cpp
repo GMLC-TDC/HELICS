@@ -10,20 +10,12 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helics/application_api/MessageFederate.hpp"
 #include "helics/application_api/MessageOperators.hpp"
 #include "testFixtures.hpp"
+#include <gtest/gtest.h>
 #include <helics/core/Broker.hpp>
-#include <boost/test/unit_test.hpp>
-#include <boost/test/data/test_case.hpp>
-#include <boost/test/tools/floating_point_comparison.hpp>
 
 #include <future>
 /** these test cases test out the message federates
  */
-
-BOOST_FIXTURE_TEST_SUITE (additional_filter_tests, FederateTestFixture)
-
-namespace bdata = boost::unit_test::data;
-
-namespace utf = boost::unit_test;
 
 /**
 Test rerouter filter
@@ -31,13 +23,16 @@ This test case sets reroute filter on a source endpoint. This means message
 sent from this endpoint will be rerouted to a new destination endpoint.
 */
 
-BOOST_TEST_DECORATOR (*utf::label ("ci"))
-BOOST_DATA_TEST_CASE (message_reroute_filter_object1, bdata::make (core_types), core_type)
+class filter_type_tests : public ::testing::TestWithParam<const char *>, public FederateTestFixture
 {
-    auto broker = AddBroker (core_type, 2);
+};
 
-    AddFederates<helics::MessageFederate> (core_type, 1, broker, 1.0, "filter");
-    AddFederates<helics::MessageFederate> (core_type, 1, broker, 1.0, "message");
+TEST_P (filter_type_tests, message_reroute_filter_object1)
+{
+    auto broker = AddBroker (GetParam (), 2);
+
+    AddFederates<helics::MessageFederate> (GetParam (), 1, broker, 1.0, "filter");
+    AddFederates<helics::MessageFederate> (GetParam (), 1, broker, 1.0, "message");
 
     auto fFed = GetFederateAs<helics::MessageFederate> (0);
     auto mFed = GetFederateAs<helics::MessageFederate> (1);
@@ -54,7 +49,7 @@ BOOST_DATA_TEST_CASE (message_reroute_filter_object1, bdata::make (core_types), 
     mFed->enterExecutingMode ();
     fFed->enterExecutingModeComplete ();
 
-    BOOST_CHECK (fFed->getCurrentMode () == helics::Federate::modes::executing);
+    EXPECT_TRUE (fFed->getCurrentMode () == helics::Federate::modes::executing);
     helics::data_block data (500, 'a');
     mFed->sendMessage (p1, "port2", data);
 
@@ -62,14 +57,14 @@ BOOST_DATA_TEST_CASE (message_reroute_filter_object1, bdata::make (core_types), 
     fFed->requestTime (1.0);
     mFed->requestTimeComplete ();
 
-    BOOST_CHECK (!mFed->hasMessage (p2));
-    BOOST_REQUIRE (mFed->hasMessage (p3));
+    EXPECT_TRUE (!mFed->hasMessage (p2));
+    ASSERT_TRUE (mFed->hasMessage (p3));
 
     auto m2 = mFed->getMessage (p3);
-    BOOST_CHECK_EQUAL (m2->source, "port1");
-    BOOST_CHECK_EQUAL (m2->original_dest, "port2");
-    BOOST_CHECK_EQUAL (m2->dest, "port3");
-    BOOST_CHECK_EQUAL (m2->data.size (), data.size ());
+    EXPECT_EQ (m2->source, "port1");
+    EXPECT_EQ (m2->original_dest, "port2");
+    EXPECT_EQ (m2->dest, "port3");
+    EXPECT_EQ (m2->data.size (), data.size ());
 
     fFed->requestTimeAsync (2.0);
     mFed->requestTime (2.0);
@@ -78,15 +73,15 @@ BOOST_DATA_TEST_CASE (message_reroute_filter_object1, bdata::make (core_types), 
     mFed->finalizeAsync ();
     fFed->finalize ();
     mFed->finalizeComplete ();
-    BOOST_CHECK (fFed->getCurrentMode () == helics::Federate::modes::finalize);
+    EXPECT_TRUE (fFed->getCurrentMode () == helics::Federate::modes::finalize);
 }
 
-BOOST_DATA_TEST_CASE (message_reroute_filter_object1_close, bdata::make (core_types), core_type)
+TEST_P (filter_type_tests, message_reroute_filter_object1_close_ci_skip)
 {
-    auto broker = AddBroker (core_type, 2);
+    auto broker = AddBroker (GetParam (), 2);
 
-    AddFederates<helics::MessageFederate> (core_type, 1, broker, 1.0, "filter");
-    AddFederates<helics::MessageFederate> (core_type, 1, broker, 1.0, "message");
+    AddFederates<helics::MessageFederate> (GetParam (), 1, broker, 1.0, "filter");
+    AddFederates<helics::MessageFederate> (GetParam (), 1, broker, 1.0, "message");
 
     auto fFed = GetFederateAs<helics::MessageFederate> (0);
     auto mFed = GetFederateAs<helics::MessageFederate> (1);
@@ -103,7 +98,7 @@ BOOST_DATA_TEST_CASE (message_reroute_filter_object1_close, bdata::make (core_ty
     mFed->enterExecutingMode ();
     fFed->enterExecutingModeComplete ();
 
-    BOOST_CHECK (fFed->getCurrentMode () == helics::Federate::modes::executing);
+    EXPECT_TRUE (fFed->getCurrentMode () == helics::Federate::modes::executing);
     helics::data_block data (500, 'a');
     mFed->sendMessage (p1, "port2", data);
 
@@ -111,14 +106,14 @@ BOOST_DATA_TEST_CASE (message_reroute_filter_object1_close, bdata::make (core_ty
     fFed->requestTime (1.0);
     mFed->requestTimeComplete ();
 
-    BOOST_CHECK (!mFed->hasMessage (p2));
-    BOOST_REQUIRE (mFed->hasMessage (p3));
+    EXPECT_TRUE (!mFed->hasMessage (p2));
+    ASSERT_TRUE (mFed->hasMessage (p3));
 
     auto m2 = mFed->getMessage (p3);
-    BOOST_CHECK_EQUAL (m2->source, "port1");
-    BOOST_CHECK_EQUAL (m2->original_dest, "port2");
-    BOOST_CHECK_EQUAL (m2->dest, "port3");
-    BOOST_CHECK_EQUAL (m2->data.size (), data.size ());
+    EXPECT_EQ (m2->source, "port1");
+    EXPECT_EQ (m2->original_dest, "port2");
+    EXPECT_EQ (m2->dest, "port3");
+    EXPECT_EQ (m2->data.size (), data.size ());
 
     Filt.close ();
     mFed->sendMessage (p1, "port2", data);
@@ -127,15 +122,15 @@ BOOST_DATA_TEST_CASE (message_reroute_filter_object1_close, bdata::make (core_ty
     mFed->requestTime (2.0);
     fFed->requestTimeComplete ();
 
-    BOOST_CHECK (mFed->hasMessage (p2));
-    BOOST_CHECK (!mFed->hasMessage (p3));
+    EXPECT_TRUE (mFed->hasMessage (p2));
+    EXPECT_TRUE (!mFed->hasMessage (p3));
 
     m2 = mFed->getMessage (p2);
-    BOOST_CHECK_EQUAL (m2->dest, "port2");
-    BOOST_CHECK_EQUAL (m2->data.size (), data.size ());
+    EXPECT_EQ (m2->dest, "port2");
+    EXPECT_EQ (m2->data.size (), data.size ());
     mFed->finalize ();
     fFed->finalize ();
-    BOOST_CHECK (fFed->getCurrentMode () == helics::Federate::modes::finalize);
+    EXPECT_TRUE (fFed->getCurrentMode () == helics::Federate::modes::finalize);
 }
 
 /**
@@ -144,12 +139,11 @@ This test case sets reroute filter on a source endpoint with a condition paramet
 This means message sent from this endpoint will be rerouted to a new destination
 endpoint only if condition matches.
 */
-BOOST_TEST_DECORATOR (*utf::label ("ci"))
-BOOST_DATA_TEST_CASE (message_reroute_filter_condition, bdata::make (core_types), core_type)
+TEST_P (filter_type_tests, message_reroute_filter_condition)
 {
-    auto broker = AddBroker (core_type, 2);
-    AddFederates<helics::MessageFederate> (core_type, 1, broker, 1.0, "filter");
-    AddFederates<helics::MessageFederate> (core_type, 1, broker, 1.0, "message");
+    auto broker = AddBroker (GetParam (), 2);
+    AddFederates<helics::MessageFederate> (GetParam (), 1, broker, 1.0, "filter");
+    AddFederates<helics::MessageFederate> (GetParam (), 1, broker, 1.0, "message");
 
     auto fFed = GetFederateAs<helics::MessageFederate> (0);
     auto mFed = GetFederateAs<helics::MessageFederate> (1);
@@ -170,20 +164,20 @@ BOOST_DATA_TEST_CASE (message_reroute_filter_condition, bdata::make (core_types)
     mFed->enterExecutingMode ();
     fFed->enterExecutingModeComplete ();
 
-    BOOST_CHECK (fFed->getCurrentMode () == helics::Federate::modes::executing);
+    EXPECT_TRUE (fFed->getCurrentMode () == helics::Federate::modes::executing);
     helics::data_block data (500, 'a');
     mFed->sendMessage (p1, "endpt2", data);
 
     mFed->requestTimeAsync (1.0);
     fFed->requestTime (1.0);
     mFed->requestTimeComplete ();
-    BOOST_CHECK (!mFed->hasMessage (p2));
-    BOOST_REQUIRE (mFed->hasMessage (p3));
+    EXPECT_TRUE (!mFed->hasMessage (p2));
+    ASSERT_TRUE (mFed->hasMessage (p3));
     auto m2 = mFed->getMessage (p3);
 
-    BOOST_CHECK_EQUAL (m2->source, "port1");
-    BOOST_CHECK_EQUAL (m2->dest, "port3");
-    BOOST_CHECK_EQUAL (m2->data.size (), data.size ());
+    EXPECT_EQ (m2->source, "port1");
+    EXPECT_EQ (m2->dest, "port3");
+    EXPECT_EQ (m2->data.size (), data.size ());
 
     fFed->requestTimeAsync (2.0);
     mFed->requestTime (2.0);
@@ -192,7 +186,7 @@ BOOST_DATA_TEST_CASE (message_reroute_filter_condition, bdata::make (core_types)
     mFed->finalizeAsync ();
     fFed->finalize ();
     mFed->finalizeComplete ();
-    BOOST_CHECK (fFed->getCurrentMode () == helics::Federate::modes::finalize);
+    EXPECT_TRUE (fFed->getCurrentMode () == helics::Federate::modes::finalize);
 }
 
 /**
@@ -201,12 +195,12 @@ This test case sets reroute filter on a destination endpoint. This means message
 sent to this endpoint will be rerouted to a new destination endpoint.
 */
 
-BOOST_DATA_TEST_CASE (message_reroute_filter_object2, bdata::make (core_types), core_type)
+TEST_P (filter_type_tests, message_reroute_filter_object2_ci_skip)
 {
-    auto broker = AddBroker (core_type, 2);
+    auto broker = AddBroker (GetParam (), 2);
 
-    AddFederates<helics::MessageFederate> (core_type, 1, broker, 1.0, "filter");
-    AddFederates<helics::MessageFederate> (core_type, 1, broker, 1.0, "message");
+    AddFederates<helics::MessageFederate> (GetParam (), 1, broker, 1.0, "filter");
+    AddFederates<helics::MessageFederate> (GetParam (), 1, broker, 1.0, "message");
 
     auto fFed = GetFederateAs<helics::MessageFederate> (0);
     auto mFed = GetFederateAs<helics::MessageFederate> (1);
@@ -228,7 +222,7 @@ BOOST_DATA_TEST_CASE (message_reroute_filter_object2, bdata::make (core_types), 
     mFed->enterExecutingMode ();
     fFed->enterExecutingModeComplete ();
 
-    BOOST_CHECK (fFed->getCurrentMode () == helics::Federate::modes::executing);
+    EXPECT_TRUE (fFed->getCurrentMode () == helics::Federate::modes::executing);
     helics::data_block data (500, 'a');
     mFed->sendMessage (p1, "port2", data);
 
@@ -236,7 +230,7 @@ BOOST_DATA_TEST_CASE (message_reroute_filter_object2, bdata::make (core_types), 
     fFed->requestTime (1.0);
     mFed->requestTimeComplete ();
     // this one was delivered to the original destination
-    BOOST_REQUIRE (mFed->hasMessage (p2));
+    ASSERT_TRUE (mFed->hasMessage (p2));
 
     // this message should be delivered to the rerouted destination
     mFed->sendMessage (p1, "test324525", data);
@@ -246,20 +240,20 @@ BOOST_DATA_TEST_CASE (message_reroute_filter_object2, bdata::make (core_types), 
     mFed->requestTimeComplete ();
     if (mFed->hasMessage (p3) == false)
     {
-        BOOST_CHECK (mFed->hasMessage (p3));
+        EXPECT_TRUE (mFed->hasMessage (p3));
     }
     else
     {
         auto m2 = mFed->getMessage (p3);
-        BOOST_CHECK_EQUAL (m2->source, "port1");
-        BOOST_CHECK_EQUAL (m2->dest, "port3");
-        BOOST_CHECK_EQUAL (m2->data.size (), data.size ());
+        EXPECT_EQ (m2->source, "port1");
+        EXPECT_EQ (m2->dest, "port3");
+        EXPECT_EQ (m2->data.size (), data.size ());
     }
 
     mFed->finalizeAsync ();
     fFed->finalize ();
     mFed->finalizeComplete ();
-    BOOST_CHECK (fFed->getCurrentMode () == helics::Federate::modes::finalize);
+    EXPECT_TRUE (fFed->getCurrentMode () == helics::Federate::modes::finalize);
 }
 
 /**
@@ -268,11 +262,11 @@ This test case sets random drop filter on a source endpoint with a particular
 message drop probability. This means messages may be dropped randomly with a
 probability of 0.75.
 */
-BOOST_DATA_TEST_CASE (message_random_drop_object, bdata::make (core_types), core_type)
+TEST_P (filter_type_tests, message_random_drop_object_ci_skip)
 {
-    auto broker = AddBroker (core_type, 2);
-    AddFederates<helics::MessageFederate> (core_type, 1, broker, 1.0, "filter");
-    AddFederates<helics::MessageFederate> (core_type, 1, broker, 1.0, "message");
+    auto broker = AddBroker (GetParam (), 2);
+    AddFederates<helics::MessageFederate> (GetParam (), 1, broker, 1.0, "filter");
+    AddFederates<helics::MessageFederate> (GetParam (), 1, broker, 1.0, "message");
 
     auto fFed = GetFederateAs<helics::MessageFederate> (0);
     auto mFed = GetFederateAs<helics::MessageFederate> (1);
@@ -289,7 +283,7 @@ BOOST_DATA_TEST_CASE (message_random_drop_object, bdata::make (core_types), core
     mFed->enterExecutingMode ();
     fFed->enterExecutingModeComplete ();
 
-    BOOST_CHECK (fFed->getCurrentMode () == helics::Federate::modes::executing);
+    EXPECT_TRUE (fFed->getCurrentMode () == helics::Federate::modes::executing);
     helics::data_block data (100, 'a');
 
     double timestep = 0.0;  // 1 second
@@ -315,12 +309,12 @@ BOOST_DATA_TEST_CASE (message_random_drop_object, bdata::make (core_types), core
     // this should result in an expected error of 1 in 10K tests
     double ebar = 4.5 * std::sqrt (drop_prob * (1.0 - drop_prob) / iterations);
 
-    BOOST_CHECK_GE (pest, drop_prob - ebar);
-    BOOST_CHECK_LE (pest, drop_prob + ebar);
+    EXPECT_GE (pest, drop_prob - ebar);
+    EXPECT_LE (pest, drop_prob + ebar);
     mFed->finalizeAsync ();
     fFed->finalize ();
     mFed->finalizeComplete ();
-    BOOST_CHECK (fFed->getCurrentMode () == helics::Federate::modes::finalize);
+    EXPECT_TRUE (fFed->getCurrentMode () == helics::Federate::modes::finalize);
 }
 
 /**
@@ -329,11 +323,11 @@ This test case sets random drop filter on a source endpoint with a particular
 message arrival probability. This means messages may be received randomly with a
 probability of 0.9.
 */
-BOOST_DATA_TEST_CASE (message_random_drop_object1, bdata::make (core_types), core_type)
+TEST_P (filter_type_tests, message_random_drop_object1_ci_skip)
 {
-    auto broker = AddBroker (core_type, 2);
-    AddFederates<helics::MessageFederate> (core_type, 1, broker, 1.0, "filter");
-    AddFederates<helics::MessageFederate> (core_type, 1, broker, 1.0, "message");
+    auto broker = AddBroker (GetParam (), 2);
+    AddFederates<helics::MessageFederate> (GetParam (), 1, broker, 1.0, "filter");
+    AddFederates<helics::MessageFederate> (GetParam (), 1, broker, 1.0, "message");
 
     auto fFed = GetFederateAs<helics::MessageFederate> (0);
     auto mFed = GetFederateAs<helics::MessageFederate> (1);
@@ -352,7 +346,7 @@ BOOST_DATA_TEST_CASE (message_random_drop_object1, bdata::make (core_types), cor
     mFed->enterExecutingMode ();
     fFed->enterExecutingModeComplete ();
 
-    BOOST_CHECK (fFed->getCurrentMode () == helics::Federate::modes::executing);
+    EXPECT_TRUE (fFed->getCurrentMode () == helics::Federate::modes::executing);
     helics::data_block data (100, 'a');
 
     double timestep = 0.0;  // 1 second
@@ -375,12 +369,12 @@ BOOST_DATA_TEST_CASE (message_random_drop_object1, bdata::make (core_types), cor
     // this should result in an expected error of 1 in 10K tests
     double ebar = 4.5 * std::sqrt (prob * (1.0 - prob) / iterations);
 
-    BOOST_CHECK_GE (pest, prob - ebar);
-    BOOST_CHECK_LE (pest, prob + ebar);
+    EXPECT_GE (pest, prob - ebar);
+    EXPECT_LE (pest, prob + ebar);
     mFed->finalizeAsync ();
     fFed->finalize ();
     mFed->finalizeComplete ();
-    BOOST_CHECK (fFed->getCurrentMode () == helics::Federate::modes::finalize);
+    EXPECT_TRUE (fFed->getCurrentMode () == helics::Federate::modes::finalize);
 }
 
 /**
@@ -389,11 +383,11 @@ This test case sets random drop filter on a destination endpoint with a particul
 message drop probability. This means messages may be dropped randomly with a
 probability of 0.75.
 */
-BOOST_DATA_TEST_CASE (message_random_drop_dest_object, bdata::make (core_types), core_type)
+TEST_P (filter_type_tests, message_random_drop_dest_object_ci_skip)
 {
-    auto broker = AddBroker (core_type, 2);
-    AddFederates<helics::MessageFederate> (core_type, 1, broker, 1.0, "filter");
-    AddFederates<helics::MessageFederate> (core_type, 1, broker, 1.0, "message");
+    auto broker = AddBroker (GetParam (), 2);
+    AddFederates<helics::MessageFederate> (GetParam (), 1, broker, 1.0, "filter");
+    AddFederates<helics::MessageFederate> (GetParam (), 1, broker, 1.0, "message");
 
     auto fFed = GetFederateAs<helics::MessageFederate> (0);
     auto mFed = GetFederateAs<helics::MessageFederate> (1);
@@ -410,7 +404,7 @@ BOOST_DATA_TEST_CASE (message_random_drop_dest_object, bdata::make (core_types),
     mFed->enterExecutingMode ();
     fFed->enterExecutingModeComplete ();
 
-    BOOST_CHECK (fFed->getCurrentMode () == helics::Federate::modes::executing);
+    EXPECT_TRUE (fFed->getCurrentMode () == helics::Federate::modes::executing);
     helics::data_block data (100, 'a');
 
     double timestep = 0.0;  // 1 second
@@ -438,8 +432,8 @@ BOOST_DATA_TEST_CASE (message_random_drop_dest_object, bdata::make (core_types),
     // this should result in an expected error of 1 in 10K tests
     double ebar = 4.5 * std::sqrt (drop_prob * (1.0 - drop_prob) / iterations);
 
-    BOOST_CHECK_GE (pest, drop_prob - ebar);
-    BOOST_CHECK_LE (pest, drop_prob + ebar);
+    EXPECT_GE (pest, drop_prob - ebar);
+    EXPECT_LE (pest, drop_prob + ebar);
     mFed->finalizeAsync ();
     fFed->finalize ();
     mFed->finalizeComplete ();
@@ -451,11 +445,11 @@ This test case sets random drop filter on a destination endpoint with a particul
 message arrival probability. This means messages may be received randomly with a
 probability of 0.9.
 */
-BOOST_DATA_TEST_CASE (message_random_drop_dest_object1, bdata::make (core_types), core_type)
+TEST_P (filter_type_tests, message_random_drop_dest_object1_ci_skip)
 {
-    auto broker = AddBroker (core_type, 2);
-    AddFederates<helics::MessageFederate> (core_type, 1, broker, 1.0, "filter");
-    AddFederates<helics::MessageFederate> (core_type, 1, broker, 1.0, "message");
+    auto broker = AddBroker (GetParam (), 2);
+    AddFederates<helics::MessageFederate> (GetParam (), 1, broker, 1.0, "filter");
+    AddFederates<helics::MessageFederate> (GetParam (), 1, broker, 1.0, "message");
 
     auto fFed = GetFederateAs<helics::MessageFederate> (0);
     auto mFed = GetFederateAs<helics::MessageFederate> (1);
@@ -474,7 +468,7 @@ BOOST_DATA_TEST_CASE (message_random_drop_dest_object1, bdata::make (core_types)
     mFed->enterExecutingMode ();
     fFed->enterExecutingModeComplete ();
 
-    BOOST_CHECK (fFed->getCurrentMode () == helics::Federate::modes::executing);
+    EXPECT_TRUE (fFed->getCurrentMode () == helics::Federate::modes::executing);
     helics::data_block data (500, 'a');
 
     double timestep = 0.0;  // 1 second
@@ -496,8 +490,8 @@ BOOST_DATA_TEST_CASE (message_random_drop_dest_object1, bdata::make (core_types)
     // this should result in an expected error of 1 in 10K tests
     double ebar = 4.5 * std::sqrt (prob * (1.0 - prob) / iterations);
 
-    BOOST_CHECK_GE (pest, prob - ebar);
-    BOOST_CHECK_LE (pest, prob + ebar);
+    EXPECT_GE (pest, prob - ebar);
+    EXPECT_LE (pest, prob + ebar);
     mFed->finalizeAsync ();
     fFed->finalize ();
     mFed->finalizeComplete ();
@@ -509,11 +503,11 @@ This test case sets random delay filter on a source endpoint.
 This means messages may be delayed by random delay based on
 binomial distribution.
 */
-BOOST_DATA_TEST_CASE (message_random_delay_object, bdata::make (core_types), core_type)
+TEST_P (filter_type_tests, message_random_delay_object_ci_skip)
 {
-    auto broker = AddBroker (core_type, 2);
-    AddFederates<helics::MessageFederate> (core_type, 1, broker, 1.0, "filter");
-    AddFederates<helics::MessageFederate> (core_type, 1, broker, 1.0, "message");
+    auto broker = AddBroker (GetParam (), 2);
+    AddFederates<helics::MessageFederate> (GetParam (), 1, broker, 1.0, "filter");
+    AddFederates<helics::MessageFederate> (GetParam (), 1, broker, 1.0, "message");
 
     auto fFed = GetFederateAs<helics::MessageFederate> (0);
     auto mFed = GetFederateAs<helics::MessageFederate> (1);
@@ -532,7 +526,7 @@ BOOST_DATA_TEST_CASE (message_random_delay_object, bdata::make (core_types), cor
     mFed->enterExecutingMode ();
     fFed->enterExecutingModeComplete ();
 
-    BOOST_CHECK (fFed->getCurrentMode () == helics::Federate::modes::executing);
+    EXPECT_TRUE (fFed->getCurrentMode () == helics::Federate::modes::executing);
     helics::data_block data (100, 'a');
     mFed->sendMessage (p1, "port2", data);
 
@@ -549,30 +543,30 @@ BOOST_DATA_TEST_CASE (message_random_delay_object, bdata::make (core_types), cor
         if (mFed->hasMessage (p2))
         {
             auto m2 = mFed->getMessage (p2);
-            BOOST_CHECK_EQUAL (m2->source, "port1");
-            BOOST_CHECK_EQUAL (m2->dest, "port2");
-            BOOST_CHECK_EQUAL (m2->data.size (), data.size ());
+            EXPECT_EQ (m2->source, "port1");
+            EXPECT_EQ (m2->dest, "port2");
+            EXPECT_EQ (m2->data.size (), data.size ());
             actual_delay = m2->time;
             count++;
         }
     }
-    BOOST_CHECK_EQUAL (count, 1);
-    BOOST_CHECK (actual_delay <= 4);
+    EXPECT_EQ (count, 1);
+    EXPECT_TRUE (actual_delay <= 4);
 
     mFed->finalizeAsync ();
     fFed->finalize ();
     mFed->finalizeComplete ();
-    BOOST_CHECK (fFed->getCurrentMode () == helics::Federate::modes::finalize);
+    EXPECT_TRUE (fFed->getCurrentMode () == helics::Federate::modes::finalize);
 }
 
 /**
 Test filter info fields
 */
-BOOST_DATA_TEST_CASE (test_filter_info_field, bdata::make (core_types), core_type)
+TEST_P (filter_type_tests, test_filter_info_field_ci_skip)
 {
-    auto broker = AddBroker (core_type, 2);
-    AddFederates<helics::MessageFederate> (core_type, 1, broker, 1.0, "filter");
-    AddFederates<helics::MessageFederate> (core_type, 1, broker, 1.0, "message");
+    auto broker = AddBroker (GetParam (), 2);
+    AddFederates<helics::MessageFederate> (GetParam (), 1, broker, 1.0, "filter");
+    AddFederates<helics::MessageFederate> (GetParam (), 1, broker, 1.0, "message");
 
     auto fFed = GetFederateAs<helics::MessageFederate> (0);
     auto mFed = GetFederateAs<helics::MessageFederate> (1);
@@ -596,25 +590,24 @@ BOOST_DATA_TEST_CASE (test_filter_info_field, bdata::make (core_types), core_typ
     f3.setInfo ("f3_info");
 
     // Test Endpoint info field
-    BOOST_CHECK_EQUAL ("p1_info", p1.getInfo ());
-    BOOST_CHECK_EQUAL ("p2_info", p2.getInfo ());
-    BOOST_CHECK_EQUAL ("ep1_info", ep1.getInfo ());
-    BOOST_CHECK_EQUAL ("p1_info", mFed->getInfo (p1.getHandle ()));
-    BOOST_CHECK_EQUAL ("p2_info", mFed->getInfo (p2.getHandle ()));
-    BOOST_CHECK_EQUAL ("ep1_info", fFed->getInfo (ep1.getHandle ()));
+    EXPECT_EQ ("p1_info", p1.getInfo ());
+    EXPECT_EQ ("p2_info", p2.getInfo ());
+    EXPECT_EQ ("ep1_info", ep1.getInfo ());
+    EXPECT_EQ ("p1_info", mFed->getInfo (p1.getHandle ()));
+    EXPECT_EQ ("p2_info", mFed->getInfo (p2.getHandle ()));
+    EXPECT_EQ ("ep1_info", fFed->getInfo (ep1.getHandle ()));
 
     // Test Filter info field
-    BOOST_CHECK_EQUAL ("f1_info", f1.getInfo ());
-    BOOST_CHECK_EQUAL ("f2_info", f2.getInfo ());
-    BOOST_CHECK_EQUAL ("f3_info", f3.getInfo ());
-    BOOST_CHECK_EQUAL ("f1_info", fFed->getInfo (f1.getHandle ()));
-    BOOST_CHECK_EQUAL ("f2_info", fFed->getInfo (f2.getHandle ()));
-    BOOST_CHECK_EQUAL ("f3_info", fFed->getInfo (f3.getHandle ()));
+    EXPECT_EQ ("f1_info", f1.getInfo ());
+    EXPECT_EQ ("f2_info", f2.getInfo ());
+    EXPECT_EQ ("f3_info", f3.getInfo ());
+    EXPECT_EQ ("f1_info", fFed->getInfo (f1.getHandle ()));
+    EXPECT_EQ ("f2_info", fFed->getInfo (f2.getHandle ()));
+    EXPECT_EQ ("f3_info", fFed->getInfo (f3.getHandle ()));
 
     mFed->finalizeAsync ();
     fFed->finalize ();
     mFed->finalizeComplete ();
 }
 
-BOOST_AUTO_TEST_CASE (test_empty) {}
-BOOST_AUTO_TEST_SUITE_END ()
+INSTANTIATE_TEST_SUITE_P (filter_tests, filter_type_tests, ::testing::ValuesIn (core_types));

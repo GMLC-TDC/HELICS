@@ -39,7 +39,10 @@ extern "C"
         helics_core_type_nng = 9, /*!< for using the nanomsg communications */
         helics_core_type_tcp_ss =
           11, /*!< a single socket version of the TCP core for more easily handling firewalls*/
-        helics_core_type_http = 12 /*!< a core type using http for communication*/
+        helics_core_type_http = 12, /*!< a core type using http for communication*/
+        helics_core_type_websocket = 14, /*!< a core using websockets for communication*/
+        helics_core_type_inproc = 18 /*!< an in process core type for handling communications in shared memory
+                                   it is pretty similar to the test core but stripped from the "test" components*/
     } helics_core_type;
 
     /** enumeration of allowable data types for publications and inputs*/
@@ -92,6 +95,10 @@ extern "C"
         /** flag indicating a federate should only grant time if all other federates have already passed the
          * requested time*/
         helics_flag_wait_for_current_time_update = 10,
+        /** flag indicating a federate should operate on a restrictive time policy, which disallows some 2nd order
+        time evaluation and can be useful for certain types of dependency cycles
+        and update patterns, but generally shouldn't be used as it can lead to some very slow update conditions*/
+        helics_flag_restrictive_time_policy = 11,
         /** flag indicating that a federate has rollback capability*/
         helics_flag_rollback = 12,
         /** flag indicating that a federate performs forward computation and does internal rollback*/
