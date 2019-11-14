@@ -10,9 +10,11 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "gmlc/netif/NetIF.hpp"
 #include "helicsCLI11.hpp"
 
+#ifndef HELICS_DISABLE_ASIO
 #include "../common/AsioContextManager.h"
 #include <asio/ip/host_name.hpp>
 #include <asio/ip/tcp.hpp>
+#endif
 
 #include <algorithm>
 #include <iostream>
@@ -368,6 +370,7 @@ auto matchcount (InputIt1 first1, InputIt1 last1, InputIt2 first2, InputIt2 last
 
 std::string getLocalExternalAddressV4 ()
 {
+	#ifndef HELICS_DISABLE_ASIO
     auto srv = AsioContextManager::getContextPointer ();
 
     asio::ip::tcp::resolver resolver (srv->getBaseContext ());
@@ -376,6 +379,9 @@ std::string getLocalExternalAddressV4 ()
     asio::ip::tcp::endpoint endpoint = *it;
 
     auto resolved_address = endpoint.address ().to_string ();
+	#else
+    std::string resolved_address;
+	#endif
     auto interface_addresses = gmlc::netif::getInterfaceAddressesV4 ();
 
     // Return the resolved address if no interface addresses were found
@@ -423,6 +429,7 @@ std::string getLocalExternalAddressV4 ()
 
 std::string getLocalExternalAddressV4 (const std::string &server)
 {
+	#ifndef HELICS_DISABLE_ASIO
     auto srv = AsioContextManager::getContextPointer ();
 
     asio::ip::tcp::resolver resolver (srv->getBaseContext ());
@@ -439,21 +446,25 @@ std::string getLocalExternalAddressV4 (const std::string &server)
     asio::ip::tcp::resolver::iterator end;
 
     auto sstring = (it_server == end) ? server : servep.address ().to_string ();
-
+	#else
+    std::string sstring = server;
+	#endif
+	
     auto interface_addresses = gmlc::netif::getInterfaceAddressesV4 ();
 
+	std::vector<std::string> resolved_addresses;
+	#ifndef HELICS_DISABLE_ASIO
     asio::ip::tcp::resolver::query query (asio::ip::tcp::v4 (), asio::ip::host_name (), "");
     asio::ip::tcp::resolver::iterator it = resolver.resolve (query);
     // asio::ip::tcp::endpoint endpoint = *it;
-
-    std::vector<std::string> resolved_addresses;
+    
     while (it != end)
     {
         asio::ip::tcp::endpoint ept = *it;
         resolved_addresses.push_back (ept.address ().to_string ());
         ++it;
     }
-
+	#endif
     auto candidate_addresses = prioritizeExternalAddresses (interface_addresses, resolved_addresses);
 
     int cnt = 0;
@@ -473,6 +484,7 @@ std::string getLocalExternalAddressV4 (const std::string &server)
 
 std::string getLocalExternalAddressV6 ()
 {
+	#ifndef HELICS_DISABLE_ASIO
     auto srv = AsioContextManager::getContextPointer ();
 
     asio::ip::tcp::resolver resolver (srv->getBaseContext ());
@@ -481,6 +493,9 @@ std::string getLocalExternalAddressV6 ()
     asio::ip::tcp::endpoint endpoint = *it;
 
     auto resolved_address = endpoint.address ().to_string ();
+	#else
+    std::string resolved_address;
+	#endif
     auto interface_addresses = gmlc::netif::getInterfaceAddressesV6 ();
 
     // Return the resolved address if no interface addresses were found
@@ -528,6 +543,7 @@ std::string getLocalExternalAddressV6 ()
 
 std::string getLocalExternalAddressV6 (const std::string &server)
 {
+	#ifndef HELICS_DISABLE_ASIO
     auto srv = AsioContextManager::getContextPointer ();
 
     asio::ip::tcp::resolver resolver (srv->getBaseContext ());
@@ -538,20 +554,23 @@ std::string getLocalExternalAddressV6 (const std::string &server)
     asio::ip::tcp::resolver::iterator end;
 
     auto sstring = (it_server == end) ? server : servep.address ().to_string ();
+	#else
+    std::string sstring = server;
+	#endif
     auto interface_addresses = gmlc::netif::getInterfaceAddressesV6 ();
-
+    std::vector<std::string> resolved_addresses;
+	#ifndef HELICS_DISABLE_ASIO
     asio::ip::tcp::resolver::query query (asio::ip::tcp::v6 (), asio::ip::host_name (), "");
     asio::ip::tcp::resolver::iterator it = resolver.resolve (query);
     // asio::ip::tcp::endpoint endpoint = *it;
-
-    std::vector<std::string> resolved_addresses;
+    
     while (it != end)
     {
         asio::ip::tcp::endpoint ept = *it;
         resolved_addresses.push_back (ept.address ().to_string ());
         ++it;
     }
-
+	#endif
     auto candidate_addresses = prioritizeExternalAddresses (interface_addresses, resolved_addresses);
 
     int cnt = 0;

@@ -21,7 +21,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #    include <asio/steady_timer.hpp>
 #else
 #    ifdef _WIN32
-#        include <Processthreadsapi.h>
+#        include <windows.h>
 #    else
 #    endif
 #endif

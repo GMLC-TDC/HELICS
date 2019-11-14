@@ -31,11 +31,11 @@ set(
     HandleManager.cpp
     FilterCoordinator.cpp
     UnknownHandleManager.cpp
-    MessageTimer.cpp
     federate_id.cpp
     TimeoutMonitor.cpp
 	coreTypeOperations.cpp
 )
+
 
 set(TESTCORE_SOURCE_FILES test/TestBroker.cpp test/TestCore.cpp test/TestComms.cpp)
 
@@ -124,7 +124,6 @@ set(
     HandleManager.hpp
     UnknownHandleManager.hpp
     queryHelpers.hpp
-    MessageTimer.hpp
     NetworkBroker.hpp
     NetworkCore.hpp
     NetworkBroker_impl.hpp
@@ -133,6 +132,12 @@ set(
     networkDefaults.hpp
     ../helics_enums.h
 )
+
+if (NOT HELICS_DISABLE_ASIO)
+    list(APPEND SRC_FILES MessageTimer.cpp)
+    list(APPEND INCLUDE_FILES MessageTimer.hpp)
+endif()
+
 
 set(TESTCORE_HEADER_FILES test/TestCore.h test/TestBroker.h test/TestComms.h)
 
