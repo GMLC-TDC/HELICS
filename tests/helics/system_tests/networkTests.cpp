@@ -7,6 +7,7 @@ the top-level NOTICE for additional details. All rights reserved. SPDX-License-I
 #include "../application_api/testFixtures.hpp"
 #include "gtest/gtest.h"
 #include "helics/ValueFederates.hpp"
+#include "helics/helics-config.h"
 
 /** tests for some network options*/
 
@@ -14,6 +15,7 @@ struct network_tests : public FederateTestFixture, public ::testing::Test
 {
 };
 
+#ifdef ENABLE_TCP_CORE
 /** test simple creation and destruction*/
 TEST_F (network_tests, test_external_tcp)
 {
@@ -80,6 +82,9 @@ TEST_F (network_tests, test_external_tcpss_ipv4)
     vFed1->finalize ();
 }
 
+#endif
+
+#ifdef ENABLE_UDP_CORE
 /** test simple creation and destruction*/
 TEST_F (network_tests, test_external_udp)
 {
@@ -112,3 +117,5 @@ TEST_F (network_tests, test_external_udp_ipv4)
     vFed1->enterExecutingMode ();
     vFed1->finalize ();
 }
+
+#endif
