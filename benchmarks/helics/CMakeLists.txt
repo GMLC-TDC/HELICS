@@ -16,6 +16,7 @@ set(
     messageLookupBenchmarks
     conversionBenchmarks
 	echoMessageBenchmarks
+	messageSendBenchmarks
     pholdBenchmarks
 )
 
