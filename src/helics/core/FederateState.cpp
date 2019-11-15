@@ -13,6 +13,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "PublicationInfo.hpp"
 #include "TimeCoordinator.hpp"
 #include "TimeDependencies.hpp"
+#include "helics/helics-config.h"
 #include "helics_definitions.hpp"
 #include "queryHelpers.hpp"
 #include <algorithm>
@@ -21,8 +22,16 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <sstream>
 #include <thread>
 
-#include "MessageTimer.hpp"
-#include "helics/helics-config.h"
+#ifndef HELICS_DISABLE_ASIO
+#    include "MessageTimer.hpp"
+#else
+namespace helics
+{
+class MessageTimer
+{
+};
+}  // namespace helics
+#endif
 
 #include "../common/fmt_format.h"
 static const std::string emptyStr;
@@ -97,7 +106,7 @@ using namespace std::chrono_literals;
 namespace helics
 {
 FederateState::FederateState (const std::string &name_, const CoreFederateInfo &info_)
-    : name (name_), timeCoord (new TimeCoordinator ([this] (const ActionMessage &msg) { routeMessage (msg); })),
+    : name (name_), timeCoord (new TimeCoordinator ([this](const ActionMessage &msg) { routeMessage (msg); })),
       global_id{global_federate_id ()}
 {
     for (const auto &prop : info_.timeProps)
@@ -520,15 +529,17 @@ iteration_result FederateState::enterExecutingMode (iteration_request iterate)
         }
 
         unlock ();
+		#ifndef HELICS_DISABLE_ASIO
         if ((realtime) && (ret == message_processing_result::next_step))
         {
             if (!mTimer)
             {
                 mTimer = std::make_shared<MessageTimer> (
-                  [this] (ActionMessage &&mess) { return this->addAction (std::move (mess)); });
+                  [this](ActionMessage &&mess) { return this->addAction (std::move (mess)); });
             }
             start_clock_time = std::chrono::steady_clock::now ();
         }
+		#endif
         return static_cast<iteration_result> (ret);
     }
     // the following code is for situation which this has been called multiple times, which really shouldn't be
@@ -593,7 +604,8 @@ iteration_time FederateState::requestTime (Time nextTime, iteration_request iter
 
         addAction (treq);
         LOG_TRACE (timeCoord->printTimeStatus ());
-        // timeCoord->timeRequest (nextTime, iterate, nextValueTime (), nextMessageTime ());
+// timeCoord->timeRequest (nextTime, iterate, nextValueTime (), nextMessageTime ());
+#ifndef HELICS_DISABLE_ASIO
         if ((realtime) && (rt_lag < Time::maxVal ()))
         {
             auto current_clock_time = std::chrono::steady_clock::now ();
@@ -622,6 +634,7 @@ iteration_time FederateState::requestTime (Time nextTime, iteration_request iter
                 addAction (tforce);
             }
         }
+#endif
         auto ret = processQueue ();
         time_granted = timeCoord->getGrantedTime ();
         allowed_send_time = timeCoord->allowedSendTime ();
@@ -656,6 +669,7 @@ iteration_time FederateState::requestTime (Time nextTime, iteration_request iter
 
             break;
         }
+#ifndef HELICS_DISABLE_ASIO
         if (realtime)
         {
             if (rt_lag < Time::maxVal ())
@@ -676,6 +690,7 @@ iteration_time FederateState::requestTime (Time nextTime, iteration_request iter
                 }
             }
         }
+#endif
 
         unlock ();
         if ((retTime.grantedTime > nextTime) && (nextTime > lastTime))
@@ -1752,15 +1767,15 @@ std::string FederateState::processQueryActual (const std::string &query) const
 {
     if (query == "publications")
     {
-        return generateStringVector (interfaceInformation.getPublications (), [] (auto &pub) { return pub->key; });
+        return generateStringVector (interfaceInformation.getPublications (), [](auto &pub) { return pub->key; });
     }
     if (query == "inputs")
     {
-        return generateStringVector (interfaceInformation.getInputs (), [] (auto &inp) { return inp->key; });
+        return generateStringVector (interfaceInformation.getInputs (), [](auto &inp) { return inp->key; });
     }
     if (query == "endpoints")
     {
-        return generateStringVector (interfaceInformation.getEndpoints (), [] (auto &ept) { return ept->key; });
+        return generateStringVector (interfaceInformation.getEndpoints (), [](auto &ept) { return ept->key; });
     }
     if (query == "interfaces")
     {
@@ -1791,7 +1806,7 @@ std::string FederateState::processQueryActual (const std::string &query) const
     if (query == "dependencies")
     {
         return generateStringVector (timeCoord->getDependencies (),
-                                     [] (auto &dep) { return std::to_string (dep.baseValue ()); });
+                                     [](auto &dep) { return std::to_string (dep.baseValue ()); });
     }
     if (query == "timeconfig")
     {
@@ -1813,7 +1828,7 @@ std::string FederateState::processQueryActual (const std::string &query) const
     if (query == "dependents")
     {
         return generateStringVector (timeCoord->getDependents (),
-                                     [] (auto &dep) { return std::to_string (dep.baseValue ()); });
+                                     [](auto &dep) { return std::to_string (dep.baseValue ()); });
     }
     if (queryCallback)
     {

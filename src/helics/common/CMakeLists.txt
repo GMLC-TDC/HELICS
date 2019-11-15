@@ -12,7 +12,6 @@ set(
     JsonProcessingFunctions.hpp
     JsonBuilder.hpp
     TomlProcessingFunctions.hpp
-    AsioContextManager.h
     logger.h
     loggerCore.hpp
     GuardedTypes.hpp
@@ -23,7 +22,6 @@ set(
 
 set(
     common_sources
-    AsioContextManager.cpp
     JsonProcessingFunctions.cpp
     JsonBuilder.cpp
     TomlProcessingFunctions.cpp
@@ -52,6 +50,11 @@ if(ENABLE_ZMQ_CORE)
     list(APPEND common_headers ${zmq_headers})
     list(APPEND common_sources ${zmq_sources})
 endif(ENABLE_ZMQ_CORE)
+
+if (NOT HELICS_DISABLE_ASIO)
+    list(APPEND common_headers AsioContextManager.h)
+    list(APPEND common_sources AsioContextManager.cpp)
+endif()
 
 add_library(helics_common STATIC ${common_sources} ${common_headers})
 set_target_properties(helics_common PROPERTIES LINKER_LANGUAGE CXX)

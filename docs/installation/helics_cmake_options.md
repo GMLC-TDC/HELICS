@@ -6,7 +6,7 @@
 -   `HELICS_BUILD_APP_LIBRARY` :  \[Default=ON\] tell HELICS to build the [app]() Library
 -   `HELICS_BUILD_APP_EXECUTABLES` : \[Default=ON\]build some executables associated with the apps
 -   `HELICS_BUILD_BENCHMARKS` :  \[Default=OFF\]Build some timing benchmarks associated with HELICS
--   `HELICS_BUILD_CXX_SHARED_LIB` :  \[Default=OFF\]Build a C++ shared library with the underlying C++ interface to HELICS
+-   `HELICS_BUILD_CXX_SHARED_LIB` :  \[Default=OFF\]Build C++ shared libraries of the Application API C++ interface to HELICS and if `HELICS_BUILD_APP_LIBRARY` is also enabled another C++ shared library with the APP library
 -   `HELICS_BUILD_EXAMPLES` :  \[Default=OFF\]Build a few select examples using HELICS,  this is mostly for testing purposes.  The main examples repo is [here](https://github.com/GMLC-TDC/HELICS-Examples)
 -   `HELICS_BUILD_TESTS` :  \[Default=OFF\]Build the HELICS unit and system test executables.
 -   `HELICS_ENABLE_LOGGING` :  \[Default=ON\] Enable debug and higher levels of logging,  if this is turned off that capability is completely removed from HELICS
@@ -34,7 +34,8 @@ These options effect the configuration of HELICS itself and how/what gets built 
 -   `ENABLE_TCP_CORE` : \[Default=ON\] enable the HELICS TCPIP related core types
 -   `ENABLE_UDP_CORE` : \[Default=ON\] enable the HELICS UDP core type
 -   `ENABLE_IPC_CORE` : \[Default=ON\] enable the HELICS interprocess shared memory related core types
--   `ENABLE_TEST_CORE` : \[Default=ON\] enable the HELICS in process core type,
+-   `ENABLE_TEST_CORE` : \[Default=OFF\] enable the HELICS in process core type with some additional features for tests, required and enabled if the `HELICS_BUILD_TESTS` option is enabled
+-   `ENABLE_INPROC_CORE` : \[Default=ON\] enable the HELICS in process core type,  required if `HELICS_BUILD_BENCHMARKS` is on
 -   `ENABLE_MPI_CORE` : \[Default=OFF\] enable the HELICS Message Passing interface(MPI) related core types, most commonly used for High performance computing application (HPC)
 
 #### HELICS logging Options
@@ -44,12 +45,14 @@ These options effect the configuration of HELICS itself and how/what gets built 
 ### Build configuration Options
 Options effect the connection of libraries used in HELICS and how they are linked.
 -   `HELICS_DISABLE_BOOST` : \[Default=OFF\] Completely turn off searching and inclusion of boost libraries.  This will disable the IPC core and few other features, possibly more in the future.  
+-   `HELICS_DISABLE_ASIO` : \[Default=OFF\] Completely turn off  inclusion of ASIO libraries.  This will disable all TCP and UDP cores, disable real time mode for HELICS, and disable all timeout features for the Library so **use with caution**.  
 -   `ENABLE_SUBMODULE_UPDATE` : \[Default=ON\] enable CMake to automatically download the submodules and update them if Unnecessary
 -   `HELICS_ENABLE_ERROR_ON_WARNING` :\[Default=OFF\] turns on Werror or equivalent,  probably not useful for normal activity,  There isn't many warnings but left in to allow the possibility
 -   `HELICS_ENABLE_EXTRA_COMPILER_WARNINGS` : \[Default=ON\] turn on higher levels of warnings in the compilers,  can be turned off if you didn't need or want the warning checks.
 -   `STATIC_STANDARD_LIB`:   \[Default=OFF\] link the standard library as a static library for no additional C++ system dependencies
 -   `HELICS_ENABLE_SWIG`:    \[Default=OFF\] conditional option if `BUILD_MATLAB_INTERACE` or `BUILD_PYTHON_INTERFACE` or `BUILD_JAVA_INTERACE` is selected and no other option that requires swig is used.  This enables swig usage in cases where it would not otherwise be necessary.
 -   `HELICS_USE_NEW_PYTHON_FIND`:  \[Default=OFF\] if python is required, this option can be set to use newer FindPython routines from CMake, if CMake version in use is >=3.12,  This does change the variables that need to be set to link to a specific python, but can be helpful in some situations with newer python versions.   
+-   `Boost_NO_BOOST_CMAKE`: \[Default=OFF\] This is an option related to the Boost find module, but is occasionally needed if a specific version of boost is desired and there is a system copy of BoostConfig.cmake.  So if an incorrect version of boost is being found even when `BOOST_ROOT` is being specified this option might need to be set to `ON`.  
 
 #### ZeroMQ related Options
 -   `HELICS_USE_SYSTEM_ZEROMQ_ONLY`:  \[Default=OFF\] Only find Zeromq through the system libraries, never attempt a local build.
