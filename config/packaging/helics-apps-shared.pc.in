@@ -3,10 +3,11 @@ exec_prefix=@exec_prefix@
 libdir=@libdir@
 includedir=@includedir@
 
-Name: libhelics
-Description: helics C++ static library
+Name: libhelics-apps-shared
+Description: helics Apps C++ shared library
 Version: @HELICS_VERSION@
-Libs: -L${libdir} -lhelics
+Libs: -L${libdir} -lhelics-apps-shared
 Libs.private: -lstdc++ @PRIVATE_LIBS@
+Requires: libhelics
 Requires.private: @pkg_config_names_private@
 Cflags: -I${includedir} @pkg_config_defines@ @CXX_STANDARD_FLAG@
