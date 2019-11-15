@@ -489,7 +489,7 @@ void BrokerBase::queueProcessingLoop ()
             }
             messagesSinceLastTick = 0;
             // reschedule the timer
-#ifndef HELICS_DISABLE_ASIO
+			#ifndef HELICS_DISABLE_ASIO
             ticktimer.expires_at (std::chrono::steady_clock::now () + tickTimer.to_ns ());
             active = std::make_pair (true, true);
             ticktimer.async_wait (timerCallback);

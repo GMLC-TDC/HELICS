@@ -34,8 +34,8 @@ These options effect the configuration of HELICS itself and how/what gets built 
 -   `ENABLE_TCP_CORE` : \[Default=ON\] enable the HELICS TCPIP related core types
 -   `ENABLE_UDP_CORE` : \[Default=ON\] enable the HELICS UDP core type
 -   `ENABLE_IPC_CORE` : \[Default=ON\] enable the HELICS interprocess shared memory related core types
--   `ENABLE_TEST_CORE` : \[Default=OFF\] enable the HELICS in process core type with some additional features for tests, Required and enabled if the `HELICS_BUILD_TESTS` option is enabled,
--   `ENABLE_INPROC_CORE` : \[Default=ON\] enable the HELICS in process core type,  Required if `HELICS_BUILD_BENCHMARKS` is on. 
+-   `ENABLE_TEST_CORE` : \[Default=OFF\] enable the HELICS in process core type with some additional features for tests, required and enabled if the `HELICS_BUILD_TESTS` option is enabled
+-   `ENABLE_INPROC_CORE` : \[Default=ON\] enable the HELICS in process core type,  required if `HELICS_BUILD_BENCHMARKS` is on
 -   `ENABLE_MPI_CORE` : \[Default=OFF\] enable the HELICS Message Passing interface(MPI) related core types, most commonly used for High performance computing application (HPC)
 
 #### HELICS logging Options
@@ -52,7 +52,7 @@ Options effect the connection of libraries used in HELICS and how they are linke
 -   `STATIC_STANDARD_LIB`:   \[Default=OFF\] link the standard library as a static library for no additional C++ system dependencies
 -   `HELICS_ENABLE_SWIG`:    \[Default=OFF\] conditional option if `BUILD_MATLAB_INTERACE` or `BUILD_PYTHON_INTERFACE` or `BUILD_JAVA_INTERACE` is selected and no other option that requires swig is used.  This enables swig usage in cases where it would not otherwise be necessary.
 -   `HELICS_USE_NEW_PYTHON_FIND`:  \[Default=OFF\] if python is required, this option can be set to use newer FindPython routines from CMake, if CMake version in use is >=3.12,  This does change the variables that need to be set to link to a specific python, but can be helpful in some situations with newer python versions.   
--   `Boost_NO_BOOST_CMAKE`: \[Default=OFF\] This is an option related to the Boost find module, but is occasionally needed if a specific version of boost is desired and there is a system copy of BoostConfig.cmake.  So if an incorrect version of boost is being found even `BOOST_ROOT` is being specified this option might need to be set to `ON`.  
+-   `Boost_NO_BOOST_CMAKE`: \[Default=OFF\] This is an option related to the Boost find module, but is occasionally needed if a specific version of boost is desired and there is a system copy of BoostConfig.cmake.  So if an incorrect version of boost is being found even when `BOOST_ROOT` is being specified this option might need to be set to `ON`.  
 
 #### ZeroMQ related Options
 -   `HELICS_USE_SYSTEM_ZEROMQ_ONLY`:  \[Default=OFF\] Only find Zeromq through the system libraries, never attempt a local build.

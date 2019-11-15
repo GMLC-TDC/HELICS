@@ -454,7 +454,7 @@ if(ENABLE_ZMQ_CORE)
     include(addZeroMQ)
 
     if(NOT ZeroMQ_FOUND)
-	    message(FATAL_ERROR "ZeroMQ not found needed for to enable the ZMQ Core")
+	    message(FATAL_ERROR "ZeroMQ not found, needed to enable the ZMQ Core")
 	endif()
 	
     if(HELICS_USE_ZMQ_STATIC_LIBRARY)
