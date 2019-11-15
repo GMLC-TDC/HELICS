@@ -7,6 +7,23 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 A note on future revisions.  
   Everything within a major version number should be code compatible (with the exception of experimental interfaces).  The most notable example of an experimental interface is the support for multiple source inputs.  The APIs to deal with this will change in future minor releases.  Everything within a single minor release should be network compatible with other federates on the same minor release number.  Compatibility across minor release numbers may be possible in some situations but we are not going to guarantee this as those components are subject to performance improvements and may need to be modified at some point.  Patch releases will be limited to bug fixes and other improvements not impacting the public API or network compatibility.  Check the [Public API](./docs/Public_API.md) for details on what is included and excluded from the public API and version stability.
 
+## \[2.3.1\] ~ In Development
+Bug Fixes and some code refactoring
+### Changed
+
+### Fixed 
+-   Some documentation links in the docs
+
+### Added
+-   CMake option for `HELICS_DISABLE_ASIO` to completely remove the use the ASIO library, turns off the UDP, and TCP core types, all realtime capabilities, and timeout and heartbeat detection for cores and brokers.  ASIO doesn't support all version of cygwin.  
+   
+
+### Deprecated 
+
+### Removed
+-  The option for `ENABLE_INPROC_CORE` will not show in the cmake-gui if `HELICS_BUILD_BENCHMARKS` is enabled. 
+-  The Option for `ENABLE_TEST_CORE` will not show in the cmake-gui if `HELICS_BUILD_TESTS` is enabled.
+
 ## \[2.3.0\] ~ 2019-11-12
 Minor release with lots of CMake updates and build changes and a few fixes and additions.  The biggest change is in the C++ shared library and complete removal of boost\:\:test.
 ### Changed
