@@ -376,8 +376,12 @@ if(NOT HELICS_DISABLE_BOOST)
     include(addBoost)
 endif()
 
+# -------------------------------------------------------------
+# options for enabling specific core communication types
+# -------------------------------------------------------------
+
+
 option(ENABLE_MPI_CORE "Enable MPI networking library" OFF)
-option(ENABLE_ZMQ_CORE "Enable ZeroMQ networking library" ON)
 cmake_dependent_advanced_option(ENABLE_TCP_CORE "Enable TCP core types" ON "NOT HELICS_DISABLE_ASIO" OFF)
 cmake_dependent_advanced_option(ENABLE_UDP_CORE "Enable UDP core types" ON "NOT HELICS_DISABLE_ASIO" OFF)
 cmake_dependent_advanced_option(
@@ -390,7 +394,6 @@ option(ENABLE_ZMQ_CORE "Enable ZeroMQ networking library" ON)
 
 mark_as_advanced(
     ENABLE_MPI_CORE ENABLE_ZMQ_CORE
-    ENABLE_ZMQ_CORE
 )
 
 # -------------------------------------------------------------
