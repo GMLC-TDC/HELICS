@@ -871,7 +871,7 @@ set(prefix ${CMAKE_INSTALL_PREFIX})
 set(exec_prefix ${prefix}/${CMAKE_INSTALL_BINDIR})
 set(libdir ${prefix}/${CMAKE_INSTALL_LIBDIR})
 set(includedir ${prefix}/${CMAKE_INSTALL_INCLUDEDIR})
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/config/packaging/libhelics.pc.in ${CMAKE_CURRENT_BINARY_DIR}/libhelics.pc @ONLY)
+
 if (NOT HELICS_DISABLE_C_SHARED_LIB)
     configure_file(${CMAKE_CURRENT_SOURCE_DIR}/config/packaging/helicsSharedLib.pc.in ${CMAKE_CURRENT_BINARY_DIR}/helicsSharedLib.pc @ONLY)
 endif()
