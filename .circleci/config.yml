@@ -87,7 +87,7 @@ jobs:
     docker:
       - image: helics/buildenv:builder
     environment:
-      CMAKE_FLAGS: '-DHELICS_BUILD_CXX_SHARED_LIB'
+      CMAKE_FLAGS: '-DHELICS_BUILD_CXX_SHARED_LIB=ON'
     steps:
       - checkout
       - run: *setup_helics
