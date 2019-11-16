@@ -29,6 +29,12 @@ aliases:
        RESULT=$?
        exit $RESULT
 
+  - &run_installer_tests
+    name: run_intsller_tests
+    command: |
+       cd build
+       make install
+
 jobs:
   helicsoctave:
     docker:
@@ -64,7 +70,7 @@ jobs:
     steps:
       - checkout
       - run: *setup_helics
-      - run: *run_helics_tests
+      - run: *run_installer_tests
 
   helicsMSan:
     docker:
@@ -72,6 +78,16 @@ jobs:
     environment:
       CMAKE_FLAGS: '-DCMAKE_CXX_COMPILER=clang++ -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_FLAGS="-fsanitize=memory -stdlib=libc++ -L/root/develop/libcxx_msan/lib -lc++abi -I/root/develop/libcxx_msan/include -I/root/develop/libcxx_msan/include/c++/v1 -Wno-unused-command-line-argument -fno-omit-frame-pointer -g -O1 -Wl,-rpath=/root/develop/libcxx_msan/lib"  -DHELICS_BUILD_TESTS=ON -DHELICS_ZMQ_SUBPROJECT=ON  -DHELICS_ZMQ_FORCE_SUBPROJECT=ON'
 
+    steps:
+      - checkout
+      - run: *setup_helics
+      - run: *run_helics_tests
+
+  helicsInstall1:
+    docker:
+      - image: helics/buildenv:builder
+    environment:
+      CMAKE_FLAGS: '-DHELICS_BUILD_CXX_SHARED_LIB'
     steps:
       - checkout
       - run: *setup_helics
@@ -85,6 +101,7 @@ workflows:
       - helicsMSan
       - helicsASan
       - helicsTSan
+      - helicsInstall1
   nightly:
     triggers:
       - schedule:
