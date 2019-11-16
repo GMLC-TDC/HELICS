@@ -32,6 +32,7 @@ aliases:
   - &run_installer_tests
     name: run_installer_tests
     command: |
+       apt-get install pkg-config
        cd build
        make install
        ctest -V -R find-package-tests
