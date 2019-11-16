@@ -30,11 +30,12 @@ aliases:
        exit $RESULT
 
   - &run_installer_tests
-    name: run_intsller_tests
+    name: run_installer_tests
     command: |
        cd build
        make install
        ctest -V -R find-package-tests
+       ctest -V -R package-config-tests
 
 jobs:
   helicsoctave:

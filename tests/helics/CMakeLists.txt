@@ -96,7 +96,7 @@ if(HELICS_ENABLE_SLOW_PACKAGING_TESTS)
     set_property(TEST add-subdirectory-tests PROPERTY LABELS Packaging)
 endif()
 
-if (NOT MSVC) 
+if (NOT MSVC AND HELICS_INSTALL_PACKAGE_TESTS)
 if(NOT CMAKE_VERSION VERSION_LESS 3.6.0) 
     # Tests for other CMake projects using the package_config files
     add_test(package-config-tests ${CMAKE_CTEST_COMMAND} -C ${CMAKE_BUILD_TYPE}
@@ -104,7 +104,6 @@ if(NOT CMAKE_VERSION VERSION_LESS 3.6.0)
                             --build-generator "${CMAKE_GENERATOR}"
                             --build-generator-platform "${CMAKE_GENERATOR_PLATFORM}"
                             --build-options
-                            ${HELICS_PACKAGE_SEARCH_LOC}
                             "-DHELICS_BUILD_CXX_SHARED_LIB=${HELICS_BUILD_CXX_SHARED_LIB}"
                             "-DHELICS_DISABLE_C_SHARED_LIB=${HELICS_DISABLE_C_SHARED_LIB}"
                             "-DHELICS_BUILD_APP_LIBRARY=${HELICS_BUILD_APP_LIBRARY}"
