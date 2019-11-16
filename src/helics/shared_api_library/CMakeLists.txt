@@ -112,7 +112,7 @@ if(NOT HELICS_BINARY_ONLY_INSTALL)
     )
 
     install(
-        FILES ../chelics.h ../helics98.hpp
+        FILES ../chelics.h ../helics98.hpp ../helics_enums.h
         DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/helics
         COMPONENT headers
     )
