@@ -34,7 +34,7 @@ aliases:
     command: |
        cd build
        make install
-       ctest -R find-package-tests
+       ctest -V -R find-package-tests
 
 jobs:
   helicsoctave:
