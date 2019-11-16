@@ -34,6 +34,7 @@ aliases:
     command: |
        cd build
        make install
+       ctest -R find-package-tests
 
 jobs:
   helicsoctave:
@@ -87,7 +88,7 @@ jobs:
     docker:
       - image: helics/buildenv:builder
     environment:
-      CMAKE_FLAGS: '-DHELICS_BUILD_CXX_SHARED_LIB=ON -DHELICS_BUILD_TESTS=ON'
+      CMAKE_FLAGS: '-DHELICS_BUILD_CXX_SHARED_LIB=ON -DHELICS_BUILD_TESTS=ON -DHELICS_INSTALL_PACKAGE_TESTS=ON'
     steps:
       - checkout
       - run: *setup_helics

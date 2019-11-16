@@ -33,6 +33,12 @@ if(NOT HELICS_DISABLE_C_SHARED_LIB)
     add_subdirectory(shared_library)
 endif()
 
+if (HELICS_INSTALL_PACKAGE_TESTS)
+	set(HELICS_PACKAGE_SEARCH_LOC "-DHELICS_DIR=${PROJECT_BINARY_DIR}")
+else()
+	set(HELICS_PACKAGE_SEARCH_LOC )
+endif()
+
 # Tests for other CMake projects including and using HELICS using find_package
 add_test(
     find-package-tests
@@ -47,7 +53,7 @@ add_test(
     --build-generator-platform
     "${CMAKE_GENERATOR_PLATFORM}"
     --build-options
-    "-DHELICS_DIR=${PROJECT_BINARY_DIR}"
+    ${HELICS_PACKAGE_SEARCH_LOC}
     "-DHELICS_BUILD_CXX_SHARED_LIB=${HELICS_BUILD_CXX_SHARED_LIB}"
     "-DHELICS_DISABLE_C_SHARED_LIB=${HELICS_DISABLE_C_SHARED_LIB}"
 	"-DHELICS_BUILD_APP_LIBRARY=${HELICS_BUILD_APP_LIBRARY}"
@@ -90,18 +96,18 @@ if(HELICS_ENABLE_SLOW_PACKAGING_TESTS)
     set_property(TEST add-subdirectory-tests PROPERTY LABELS Packaging)
 endif()
 
-if (UNIX)  #this test won't do anything on windows since we don't generate the package config files on Windows
-if(NOT ${CMAKE_VERSION} VERSION_LESS "3.6.0") 
+if (NOT MSVC) 
+if(NOT CMAKE_VERSION VERSION_LESS 3.6.0) 
     # Tests for other CMake projects using the package_config files
     add_test(package-config-tests ${CMAKE_CTEST_COMMAND} -C ${CMAKE_BUILD_TYPE}
                             --build-and-test "${CMAKE_CURRENT_SOURCE_DIR}/package_config_tests" "${CMAKE_CURRENT_BINARY_DIR}/package_config_tests"
                             --build-generator "${CMAKE_GENERATOR}"
                             --build-generator-platform "${CMAKE_GENERATOR_PLATFORM}"
                             --build-options
-                            "-DHELICS_DIR=${PROJECT_BINARY_DIR}"
-                            "-DBUILD_SHARED_LIBS=${BUILD_SHARED_LIBS}"
-                            "-DBUILD_C_SHARED_LIB=${BUILD_C_SHARED_LIB}"
-                            "-DBUILD_APPS=${BUILD_APPS}"
+                            ${HELICS_PACKAGE_SEARCH_LOC}
+                            "-DHELICS_BUILD_CXX_SHARED_LIB=${HELICS_BUILD_CXX_SHARED_LIB}"
+                            "-DHELICS_DISABLE_C_SHARED_LIB=${HELICS_DISABLE_C_SHARED_LIB}"
+                            "-DHELICS_BUILD_APP_LIBRARY=${HELICS_BUILD_APP_LIBRARY}"
                             "-DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}"
                             "-DCMAKE_CXX_STANDARD=${CMAKE_CXX_STANDARD}"
 )
