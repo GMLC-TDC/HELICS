@@ -863,6 +863,7 @@ install(
 # pkg-config setup
 # -------------------------------------------------------------
 
+if (NOT MSVC)
 foreach(LIB ${HELICS_LIBRARIES})
   set(PRIVATE_LIBS "${PRIVATE_LIBS} -l${LIB}")
 endforeach()
@@ -874,14 +875,18 @@ set(includedir ${prefix}/${CMAKE_INSTALL_INCLUDEDIR})
 
 if (NOT HELICS_DISABLE_C_SHARED_LIB)
     configure_file(${CMAKE_CURRENT_SOURCE_DIR}/config/packaging/helicsSharedLib.pc.in ${CMAKE_CURRENT_BINARY_DIR}/helicsSharedLib.pc @ONLY)
+	install(FILES ${CMAKE_CURRENT_BINARY_DIR}/helicsSharedLib.pc DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig)
 endif()
 
 if (HELICS_BUILD_APP_LIBRARY AND HELICS_BUILD_CXX_SHARED_LIB)
    configure_file(${CMAKE_CURRENT_SOURCE_DIR}/config/packaging/helics-apps-shared.pc.in ${CMAKE_CURRENT_BINARY_DIR}/helics-apps-shared.pc @ONLY)
+   install(FILES ${CMAKE_CURRENT_BINARY_DIR}/helics-apps-shared.pc DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig)
 endif()
 
 if (HELICS_BUILD_CXX_SHARED_LIB)
    configure_file(${CMAKE_CURRENT_SOURCE_DIR}/config/packaging/helics-shared.pc.in ${CMAKE_CURRENT_BINARY_DIR}/helics-shared.pc @ONLY)
+   install(FILES ${CMAKE_CURRENT_BINARY_DIR}/helics-shared.pc DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig)
+endif()
 endif()
 
 # -------------------------------------------------------------
