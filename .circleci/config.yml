@@ -70,7 +70,7 @@ jobs:
     steps:
       - checkout
       - run: *setup_helics
-      - run: *run_installer_tests
+      - run: *run_helics_tests
 
   helicsMSan:
     docker:
@@ -87,11 +87,11 @@ jobs:
     docker:
       - image: helics/buildenv:builder
     environment:
-      CMAKE_FLAGS: '-DHELICS_BUILD_CXX_SHARED_LIB=ON'
+      CMAKE_FLAGS: '-DHELICS_BUILD_CXX_SHARED_LIB=ON -DHELICS_BUILD_TESTS=ON'
     steps:
       - checkout
       - run: *setup_helics
-      - run: *run_helics_tests
+      - run: *run_installer_tests
 
 workflows:
   version: 2
