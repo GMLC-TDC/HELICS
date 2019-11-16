@@ -94,6 +94,16 @@ jobs:
       - run: *setup_helics
       - run: *run_installer_tests
 
+  helicsInstall2:
+    docker:
+      - image: helics/buildenv:builder
+    environment:
+      CMAKE_FLAGS: '-DHELICS_BUILD_TESTS=ON -DHELICS_INSTALL_PACKAGE_TESTS=ON'
+    steps:
+      - checkout
+      - run: *setup_helics
+      - run: *run_installer_tests
+
 workflows:
   version: 2
   helics_test:
@@ -103,6 +113,7 @@ workflows:
       - helicsASan
       - helicsTSan
       - helicsInstall1
+      - helicsInstall2
   nightly:
     triggers:
       - schedule:
