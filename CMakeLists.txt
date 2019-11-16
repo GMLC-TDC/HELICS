@@ -376,21 +376,24 @@ if(NOT HELICS_DISABLE_BOOST)
     include(addBoost)
 endif()
 
+# -------------------------------------------------------------
+# options for enabling specific core communication types
+# -------------------------------------------------------------
+
+
 option(ENABLE_MPI_CORE "Enable MPI networking library" OFF)
-option(ENABLE_ZMQ_CORE "Enable ZeroMQ networking library" ON)
 cmake_dependent_advanced_option(ENABLE_TCP_CORE "Enable TCP core types" ON "NOT HELICS_DISABLE_ASIO" OFF)
 cmake_dependent_advanced_option(ENABLE_UDP_CORE "Enable UDP core types" ON "NOT HELICS_DISABLE_ASIO" OFF)
 cmake_dependent_advanced_option(
     ENABLE_IPC_CORE "Enable Interprocess communication types" ON
     "NOT HELICS_DISABLE_BOOST" OFF
 )
-option(ENABLE_TEST_CORE "Enable test inprocess core type" ON)
-option(ENABLE_INPROC_CORE "Enable inprocess core type" ON)
+cmake_dependent_advanced_option(ENABLE_TEST_CORE "Enable test inprocess core type" OFF "NOT HELICS_BUILD_TESTS" ON)
+cmake_dependent_advanced_option(ENABLE_INPROC_CORE "Enable inprocess core type" ON "NOT HELICS_BUILD_BENCHMARKS" ON )
 option(ENABLE_ZMQ_CORE "Enable ZeroMQ networking library" ON)
 
 mark_as_advanced(
-    ENABLE_MPI_CORE ENABLE_ZMQ_CORE ENABLE_TEST_CORE
-    ENABLE_ZMQ_CORE
+    ENABLE_MPI_CORE ENABLE_ZMQ_CORE
 )
 
 # -------------------------------------------------------------
@@ -646,13 +649,18 @@ add_subdirectory(src)
 
 if(HELICS_BUILD_TESTS
    AND BUILD_TESTING
-   AND ENABLE_TEST_CORE
 )
+    if (NOT ENABLE_TEST_CORE)
+		message(FATAL_ERROR "TEST CORE must be enabled to build the HELICS tests")
+	endif()
     mark_as_advanced(BUILD_TESTING)
     add_subdirectory(tests)
 endif()
 
 if(HELICS_BUILD_BENCHMARKS)
+    if (NOT ENABLE_INPROC_CORE)
+		message(FATAL_ERROR "INPROC CORE must be enabled to build the HELICS Benchmarks")
+	endif()
     add_subdirectory(benchmarks)
 endif()
 
