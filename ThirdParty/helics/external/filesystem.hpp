@@ -171,13 +171,13 @@
 // as ghc::filesystem::string_type.
 // #define GHC_WIN_WSTRING_STRING_TYPE
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-// Rais errors/exceptions when invalid unicode codepoints or UTF-8 sequences are found,
+// Raise errors/exceptions when invalid unicode codepoints or UTF-8 sequences are found,
 // instead of replacing them with the unicode replacement character (U+FFFD).
 // #define GHC_RAISE_UNICODE_ERRORS
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 // ghc::filesystem version in decimal (major * 10000 + minor * 100 + patch)
-#define GHC_FILESYSTEM_VERSION 10207L
+#define GHC_FILESYSTEM_VERSION 10208L
 
 namespace ghc {
 namespace filesystem {
