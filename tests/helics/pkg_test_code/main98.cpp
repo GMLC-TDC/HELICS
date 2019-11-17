@@ -6,9 +6,11 @@ SPDX-License-Identifier: BSD-3-Clause
 */
 
 #include "helics/cpp98/helics.hpp"
+#include <iostream>
 
 int main (int argc, char *argv[])
 {
     volatile helicscpp::FederateInfo fi;
+	std::cout<<helicsGetVersion()<<std::endl;
     return 0;
 }
