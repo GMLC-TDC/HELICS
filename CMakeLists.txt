@@ -79,22 +79,25 @@ include(ucm)
 # -----------------------------------------------------------------------------
 if(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
     if(WIN32)
-        if(MSYS)
-            set(CMAKE_INSTALL_PREFIX
-                "/usr/local/helics_${HELICS_VERSION_UNDERSCORE}/"
+        if(MSVC)
+			set(CMAKE_INSTALL_PREFIX
+                "C:/local/helics_${HELICS_VERSION_UNDERSCORE}/"
                 CACHE PATH "default install path" FORCE
             )
-        elseif(CYGWIN)
-            set(CMAKE_INSTALL_PREFIX
-                "/usr/local/helics_${HELICS_VERSION_UNDERSCORE}/"
-                CACHE PATH "default install path" FORCE
-            )
-        else(MSYS)
+		elseif (MINGW AND NOT MSYS)
             set(CMAKE_INSTALL_PREFIX
                 "C:/local/helics_${HELICS_VERSION_UNDERSCORE}/"
                 CACHE PATH "default install path" FORCE
             )
-        endif(MSYS)
+		elseif (MSYS)
+		#use CMAKE_OBJCOPY here since it is somewhat less likely to be overwridden by users rather than the compiler
+		    get_filename_component(path_bin ${CMAKE_OBJCOPY} DIRECTORY)
+			get_filename_component(path_install ${path_bin} DIRECTORY)
+		    set(CMAKE_INSTALL_PREFIX
+                ${path_install}
+                CACHE PATH "default install path" FORCE
+            )
+        endif(MSVC)
     endif(WIN32)
 endif()
 

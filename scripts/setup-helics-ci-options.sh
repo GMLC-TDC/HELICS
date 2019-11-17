@@ -8,8 +8,8 @@ shopt -s nocasematch
 OPTION_FLAGS_ARR=()
 OPTION_FLAGS_ARR+=("-DHELICS_BUILD_TESTS=ON -DHELICS_BUILD_EXAMPLES=ON -DHELICS_BUILD_CXX_SHARED_LIB=ON" "-DHELICS_EXAMPLES_WARNINGS_AS_ERROR=ON")
 
-# Enable adding the slower packaging tests; will not run for CI builds unless they run ctest with the Packaging label
-OPTION_FLAGS_ARR+=("-DHELICS_ENABLE_SLOW_PACKAGING_TESTS=ON")
+# Enable adding the slower subproject tests; will not run for CI builds unless they run ctest with the Packaging label
+OPTION_FLAGS_ARR+=("-DHELICS_ENABLE_SUBPROJECT_TESTS=ON")
 
 # Options to control building zeromq
 if [[ "$ZMQ_SUBPROJECT" ]]; then

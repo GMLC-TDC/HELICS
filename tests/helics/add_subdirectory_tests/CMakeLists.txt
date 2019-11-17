@@ -15,27 +15,27 @@ project(HELICS-find-package-test)
 add_subdirectory(../../.. helics)
 
 # Test the CXX static library target
-add_executable(static-library-test main.cpp)
+add_executable(static-library-test ../pkg_test_code/main.cpp)
 target_link_libraries(static-library-test HELICS::application_api)
 
 # Test the CXX shared library target
 if(HELICS_BUILD_CXX_SHARED_LIB)
-    add_executable(shared-library-test main.cpp)
+    add_executable(shared-library-test ../pkg_test_code/main.cpp)
     target_link_libraries(shared-library-test HELICS::helics-shared)
 endif()
 
 # Test the C and C++98 targets
 if(NOT HELICS_DISABLE_C_SHARED_LIB)
-    add_executable(c-shared-library-test main.c)
+    add_executable(c-shared-library-test ../pkg_test_code/main.c)
     target_link_libraries(c-shared-library-test HELICS::helicsSharedLib)
 
-    add_executable(cpp98-shared-library-test main98.cpp)
+    add_executable(cpp98-shared-library-test ../pkg_test_code/main98.cpp)
     target_link_libraries(cpp98-shared-library-test HELICS::helicsCpp98)
     set_property(TARGET cpp98-shared-library-test PROPERTY CXX_STANDARD 98)
 endif()
 
 # Test the helics_app static library target
 if(HELICS_BUILD_APP_LIBRARY)
-    add_executable(apps-library-test main-apps.cpp)
+    add_executable(apps-library-test ../pkg_test_code/main-apps.cpp)
     target_link_libraries(apps-library-test HELICS::apps)
 endif()
