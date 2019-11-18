@@ -63,7 +63,7 @@ Options effect the connection of libraries used in HELICS and how they are linke
 
 #### Options related to helics tests and CI configurations
 -   `HELICS_TEST_CODE_COVERAGE` :\[Default=OFF\] turn on code coverage testing, enables additional linkage and options inside HELICS for coverage testing, mainly useful inside the CI or for testing.  
--   `HELICS_ENABLE_SUBPROJECT_TESTS`:  \[Default=OFF\] Turn on some additional tests for using HELICS as a subproject, Mainly used in some of the CI testing to make sure HELICS works as a subproject.
+-   `HELICS_ENABLE_SUBPROJECT_TESTS`:  \[Default=OFF\] Turn on some additional tests for using HELICS as a subproject, mainly used in some of the CI testing to make sure HELICS works as a subproject.
 -   `HELICS_ENABLE_CLANG_TOOLS`:  \[Default=OFF\] Enables some helper targets for using clang-tidy and clang-format.  
 
 
