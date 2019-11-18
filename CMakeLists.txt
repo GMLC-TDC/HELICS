@@ -863,32 +863,43 @@ install(
 )
 
 # -------------------------------------------------------------
-# pkg-config setup
+# pkg-config setup and install
 # -------------------------------------------------------------
 
-if (NOT MSVC)
-foreach(LIB ${HELICS_LIBRARIES})
-  set(PRIVATE_LIBS "${PRIVATE_LIBS} -l${LIB}")
-endforeach()
+if (NOT MSVC AND NOT HELICS_BINARY_ONLY_INSTALL)
 
 set(prefix ${CMAKE_INSTALL_PREFIX})
 set(exec_prefix ${prefix}/${CMAKE_INSTALL_BINDIR})
 set(libdir ${prefix}/${CMAKE_INSTALL_LIBDIR})
 set(includedir ${prefix}/${CMAKE_INSTALL_INCLUDEDIR})
 
+if (USE_LIBCXX)
+    set(stdlib "-lc++ -lc++abi")
+elseif(STATIC_STANDARD_LIB STREQUAL "static")
+    set(stdlib )
+else()
+    set(stdlib -lstdc++)
+endif()
+
 if (NOT HELICS_DISABLE_C_SHARED_LIB)
     configure_file(${CMAKE_CURRENT_SOURCE_DIR}/config/packaging/helicsSharedLib.pc.in ${CMAKE_CURRENT_BINARY_DIR}/helicsSharedLib.pc @ONLY)
 	install(FILES ${CMAKE_CURRENT_BINARY_DIR}/helicsSharedLib.pc DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig)
 endif()
 
-if (HELICS_BUILD_APP_LIBRARY AND HELICS_BUILD_CXX_SHARED_LIB)
-   configure_file(${CMAKE_CURRENT_SOURCE_DIR}/config/packaging/helics-apps-shared.pc.in ${CMAKE_CURRENT_BINARY_DIR}/helics-apps-shared.pc @ONLY)
-   install(FILES ${CMAKE_CURRENT_BINARY_DIR}/helics-apps-shared.pc DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig)
+if (ENABLE_ZMQ_CORE AND NOT HELICS_USE_ZMQ_STATIC_LIBRARY)
+	set(zmq_pc_require libzmq)
 endif()
 
 if (HELICS_BUILD_CXX_SHARED_LIB)
+
    configure_file(${CMAKE_CURRENT_SOURCE_DIR}/config/packaging/helics-shared.pc.in ${CMAKE_CURRENT_BINARY_DIR}/helics-shared.pc @ONLY)
    install(FILES ${CMAKE_CURRENT_BINARY_DIR}/helics-shared.pc DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig)
+   
+   if (HELICS_BUILD_APP_LIBRARY)
+      configure_file(${CMAKE_CURRENT_SOURCE_DIR}/config/packaging/helics-apps-shared.pc.in ${CMAKE_CURRENT_BINARY_DIR}/helics-apps-shared.pc @ONLY)
+      install(FILES ${CMAKE_CURRENT_BINARY_DIR}/helics-apps-shared.pc DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig)
+   endif()
+
 endif()
 endif()
 

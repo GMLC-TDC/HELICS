@@ -8,6 +8,6 @@ Description: HELICS C shared library
 URL: www.helics.org
 Version: @HELICS_VERSION@
 Libs: -L${libdir} -lhelicsSharedLib
-Libs.private: -lstdc++ @PRIVATE_LIBS@
-Requires.private: @pkg_config_names_private@
+Libs.private: @stdlib@ @PRIVATE_LIBS@
+Requires.private: @zmq_pc_require@
 Cflags: -I${includedir} @pkg_config_defines@
