@@ -39,6 +39,12 @@ else()
 	set(HELICS_PACKAGE_SEARCH_LOC "-DHELICS_DIR=${PROJECT_BINARY_DIR}")
 endif()
 
+if (NOT MSVC)
+	set(package_test_command --test-command "${CMAKE_CTEST_COMMAND}")
+else() #don't try to run the tests on MSVC since that would require copying the dll's and doing some other setup that isn't that important to run on all OS
+	set(package_test_command )
+endif()
+
 # Tests for other CMake projects including and using HELICS using find_package
 add_test(
     find-package-tests
@@ -60,7 +66,7 @@ add_test(
 	"-DHELICS_VERSION=${HELICS_VERSION}"
     "-DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}"
     "-DCMAKE_CXX_STANDARD=${CMAKE_CXX_STANDARD}"
-	--test-command "${CMAKE_CTEST_COMMAND}"
+	${package_test_command}
 )
 set_property(TEST find-package-tests PROPERTY LABELS Packaging PackagingFast)
 
@@ -113,7 +119,7 @@ if(NOT CMAKE_VERSION VERSION_LESS 3.6.0)
 							"-DHELICS_VERSION=${HELICS_VERSION}"
                             "-DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}"
                             "-DCMAKE_CXX_STANDARD=${CMAKE_CXX_STANDARD}"
-							--test-command "${CMAKE_CTEST_COMMAND}"
+							${package_test_command}
 )
 set_property(TEST package-config-tests PROPERTY LABELS Packaging)
 endif()
