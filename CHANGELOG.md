@@ -11,12 +11,15 @@ A note on future revisions.
 Bug Fixes and some code refactoring, pkg-config files have been added to the installs
 ### Changed
 -   Default installation path for MSYS2 is now configured to be part of the system path, typically `/mingw64/`  or `mingw32/`
+-   `HELICS_ENABLE_SLOW_PACKAGING_TESTS` renamed to `HELICS_ENABLE_SUBPROJECT_TESTS` to better reflect usage
+-   filesystem library updated to clear up some warnings
 
 ### Fixed
 -   Some documentation links in the docs
-
+-   Missing `helics-enums.h` header from the install if `HELICS_BUILD_CXX_SHARED_LIB` was not enabled
+  
 ### Added
--   CMake option for `HELICS_DISABLE_ASIO` to completely remove the use the ASIO library, turns off the UDP, and TCP core types, all realtime capabilities, and timeout and heartbeat detection for cores and brokers.  ASIO doesn't support all version of cygwin.  
+-   CMake option for `HELICS_DISABLE_ASIO` to completely remove the use the ASIO library, turns off the UDP, and TCP core types, all real-time capabilities, and timeout and heartbeat detection for cores and brokers.  ASIO doesn't support all version of cygwin.  
 -   pck-config files for the shared libraries are now installed to `<prefix>/lib/pkg-config` on unix like systems  
 -   Tests and CI builds for installed CMake package files and pkg-config files
 
