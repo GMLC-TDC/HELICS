@@ -254,7 +254,7 @@ if(STATIC_STANDARD_LIB STREQUAL "default")
 
 elseif(STATIC_STANDARD_LIB STREQUAL "static")
     ucm_set_runtime(STATIC)
-else()
+elseif(STATIC_STANDARD_LIB STREQUAL "dynamic")
     ucm_set_runtime(DYNAMIC)
 endif()
 

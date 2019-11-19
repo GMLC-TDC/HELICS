@@ -44,12 +44,12 @@ These options effect the configuration of HELICS itself and how/what gets built 
 ### Build configuration Options
 Options effect the connection of libraries used in HELICS and how they are linked.
 -   `HELICS_DISABLE_BOOST` : \[Default=OFF\] Completely turn off searching and inclusion of boost libraries.  This will disable the IPC core and few other features, possibly more in the future.  
--   `ENABLE_SUBMODULE_UPDATE` : \[Default=ON\] enable CMake to automatically download the submodules and update them if Unnecessary
+-   `ENABLE_SUBMODULE_UPDATE` : \[Default=ON\] enable CMake to automatically download the submodules and update them if necessary
 -   `HELICS_ENABLE_ERROR_ON_WARNING` :\[Default=OFF\] turns on Werror or equivalent,  probably not useful for normal activity,  There isn't many warnings but left in to allow the possibility
--   `HELICS_ENABLE_EXTRA_COMPILER_WARNINGS` : \[Default=ON\] turn on higher levels of warnings in the compilers,  can be turned off if you didn't need or want the warning checks.
--   `STATIC_STANDARD_LIB`:   \[Default=OFF\] link the standard library as a static library for no additional C++ system dependencies
+-   `HELICS_ENABLE_EXTRA_COMPILER_WARNINGS` : \[Default=ON\] turn on higher levels of warnings in the compilers, can be turned off if you didn't need or want the warning checks.
+-   `STATIC_STANDARD_LIB`:   \[Default=""\] link the standard library as a static library for no additional C++ system dependencies (recognized values are `default`, `static`, and `dynamic`, anything else is treated the same as `default`)
 -   `HELICS_ENABLE_SWIG`:    \[Default=OFF\] conditional option if `BUILD_MATLAB_INTERACE` or `BUILD_PYTHON_INTERFACE` or `BUILD_JAVA_INTERACE` is selected and no other option that requires swig is used.  This enables swig usage in cases where it would not otherwise be necessary.
--   `HELICS_USE_NEW_PYTHON_FIND`:  \[Default=OFF\] if python is required, this option can be set to use newer FindPython routines from CMake, if CMake version in use is >=3.12,  This does change the variables that need to be set to link to a specific python, but can be helpful in some situations with newer python versions.   
+-   `HELICS_USE_NEW_PYTHON_FIND`:  \[Default=OFF\] if python is required, this option can be set to use newer FindPython routines from CMake, if CMake version in use is >=3.12, this does change the variables that need to be set to link to a specific python, but can be helpful in some situations with newer python versions.   
 
 #### ZeroMQ related Options
 -   `HELICS_USE_SYSTEM_ZEROMQ_ONLY`:  \[Default=OFF\] Only find Zeromq through the system libraries, never attempt a local build.
