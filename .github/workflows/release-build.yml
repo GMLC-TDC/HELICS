@@ -95,7 +95,7 @@ jobs:
 ################################
   build-installers:
     runs-on: ${{ matrix.os }}
-    name: Build ${{ runner.os }} ${{ matrix.arch }} ${{ cpack_gen }} Installer
+    name: Build ${{ matrix.os }} ${{ matrix.arch }} ${{ matrix.cpack_gen }} Installer
     strategy:
       matrix:
         id: [windows-x64-nsis, windows-x64-zip, macos-x64-tgz]
@@ -164,7 +164,7 @@ jobs:
 ################################
   build-sharedlibs:
     runs-on: ${{ matrix.os }}
-    name: Build ${{ runner.os }} ${{ matrix.arch }} Shared Library
+    name: Build ${{ matrix.os }} ${{ matrix.arch }} Shared Library
     strategy:
       matrix:
         id: [windows-x86, windows-x64, macos-x64, ubuntu-x64]
