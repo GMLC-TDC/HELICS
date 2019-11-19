@@ -6,8 +6,8 @@ SPDX-License-Identifier: BSD-3-Clause
 */
 
 #include "HelicsPrimaryTypes.hpp"
+#include "../utilities/timeStringOps.hpp"
 #include "ValueConverter.hpp"
-
 #include <set>
 namespace helics
 {
@@ -453,7 +453,7 @@ void valueExtract (const defV &dv, Time &val)
             }
             else
             {
-                val = loadTimeFromString (mpark::get<std::string> (dv));
+                val = gmlc::utilities::loadTimeFromString<helics::Time> (mpark::get<std::string> (dv));
             }
         }
         catch (...)
@@ -519,6 +519,55 @@ void valueExtract (const defV &dv, char &val)
     {
         auto &np = mpark::get<NamedPoint> (dv);
         val = np.name.empty () ? (static_cast<char> (np.value)) : np.name[0];
+    }
+    break;
+    }
+}
+
+void valueExtract (const defV &dv, bool &val)
+{
+    switch (dv.index ())
+    {
+    case double_loc:  // double
+        val = std::abs (mpark::get<double> (dv)) > 0.0;
+        break;
+    case int_loc:  // int64_t
+    default:
+        val = (mpark::get<int64_t> (dv) != 0);
+        break;
+    case string_loc:  // string
+    {
+        auto &str = mpark::get<std::string> (dv);
+        val = helicsBoolValue (str);
+        break;
+    }
+    case complex_loc:  // complex
+        val = std::abs (mpark::get<std::complex<double>> (dv)) > 0.0;
+        break;
+    case vector_loc:  // vector
+    {
+        auto &vec = mpark::get<std::vector<double>> (dv);
+        val = vectorNorm (vec) != 0.0;
+        break;
+    }
+    case complex_vector_loc:
+    {
+        auto &vec = mpark::get<std::vector<std::complex<double>>> (dv);
+        val = vectorNorm (vec) != 0.0;
+        break;
+    }
+    case named_point_loc:
+    {
+        auto &np = mpark::get<NamedPoint> (dv);
+        auto &str = np.name;
+        val = str.empty () || helicsBoolValue (str);
+        if (val)
+        {
+            if ((str == "value" || str.empty ()) && np.value == 0.0)
+            {
+                val = false;
+            }
+        }
     }
     break;
     }
@@ -861,7 +910,7 @@ void valueExtract (const data_view &dv, data_type baseType, Time &val)
             }
             else
             {
-                val = loadTimeFromString (dv.string ());
+                val = gmlc::utilities::loadTimeFromString<helics::Time> (dv.string ());
             }
         }
         catch (...)
@@ -898,6 +947,91 @@ void valueExtract (const data_view &dv, data_type baseType, Time &val)
     }
 }
 
+void valueExtract (const data_view &dv, data_type baseType, bool &val)
+{
+    switch (baseType)
+    {
+    case data_type::helics_any:
+    {
+        if (dv.size () == 9)
+        {
+            auto Vint = ValueConverter<int64_t>::interpret (dv);
+            val = (Vint != 0);
+        }
+        else if (dv.size () == 17)
+        {
+            auto V = ValueConverter<std::complex<double>>::interpret (dv);
+            val = (std::abs (V) != 0);
+        }
+        else if (dv.size () == 5)
+        {
+            auto Vint = ValueConverter<int32_t>::interpret (dv);
+            val = (Vint == 0);
+        }
+        else
+        {
+            val = helicsBoolValue (dv.string ());
+        }
+        break;
+    }
+    case data_type::helics_string:
+    default:
+        val = helicsBoolValue (dv.string ());
+        break;
+    case data_type::helics_bool:
+        val = (dv.string () != "0");
+        break;
+    case data_type::helics_named_point:
+    {
+        auto npval = ValueConverter<NamedPoint>::interpret (dv);
+        auto &str = npval.name;
+        val = str.empty () || helicsBoolValue (str);
+        if (val)
+        {
+            if ((str == "value" || str.empty ()) && npval.value == 0.0)
+            {
+                val = false;
+            }
+        }
+
+        break;
+    }
+    case data_type::helics_double:
+    {
+        auto V = ValueConverter<double>::interpret (dv);
+        val = std::abs (V) != 0;
+        break;
+    }
+    case data_type::helics_int:
+    case data_type::helics_time:
+    {
+        auto V = ValueConverter<int64_t>::interpret (dv);
+        val = (V != 0);
+        break;
+    }
+
+    case data_type::helics_vector:
+    {
+        auto V = ValueConverter<std::vector<double>>::interpret (dv);
+        val = (vectorNorm (V) != 0.0);
+        break;
+    }
+    case data_type::helics_complex:
+    {
+        auto V = ValueConverter<std::complex<double>>::interpret (dv);
+        val = (std::abs (V) != 0.0);
+        break;
+    }
+    case data_type::helics_complex_vector:
+    {
+        auto V = ValueConverter<std::vector<std::complex<double>>>::interpret (dv);
+        val = (vectorNorm (V) != 0.0);
+        break;
+    }
+    case data_type::helics_custom:
+        throw (std::invalid_argument ("unrecognized helics type"));
+    }
+}
 void valueExtract (const data_view &dv, data_type baseType, defV &val)
 {
     switch (baseType)

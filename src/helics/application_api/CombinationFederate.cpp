@@ -20,6 +20,11 @@ CombinationFederate::CombinationFederate (const std::string &fedName,
 {
 }
 
+CombinationFederate::CombinationFederate (const std::string &fedName, CoreApp &core, const FederateInfo &fi)
+    : Federate (fedName, core, fi), ValueFederate (true), MessageFederate (true)
+{
+}
+
 CombinationFederate::CombinationFederate (const std::string &configString)
     : Federate (std::string (), loadFederateInfo (configString)), ValueFederate (true), MessageFederate (true)
 {

@@ -31,10 +31,10 @@ TEST (logging_tests, basic_logging)
     auto Fed = std::make_shared<helics::Federate> ("test1", fi);
 
     gmlc::libguarded::guarded<std::vector<std::pair<int, std::string>>> mlog;
-    Fed->setLoggingCallback ([&mlog](int level, const std::string &, const std::string &message) {
+    Fed->setLoggingCallback ([&mlog] (int level, const std::string &, const std::string &message) {
         mlog.lock ()->emplace_back (level, message);
     });
-
+    Fed->logMessage (3, "test log message");
     Fed->enterExecutingMode ();
     Fed->finalize ();
 
@@ -115,7 +115,7 @@ TEST (logging_tests, check_log_message)
     auto Fed = std::make_shared<helics::Federate> ("test1", fi);
 
     gmlc::libguarded::guarded<std::vector<std::pair<int, std::string>>> mlog;
-    Fed->setLoggingCallback ([&mlog](int level, const std::string &, const std::string &message) {
+    Fed->setLoggingCallback ([&mlog] (int level, const std::string &, const std::string &message) {
         mlog.lock ()->emplace_back (level, message);
     });
 
@@ -145,7 +145,7 @@ TEST (logging_tests, check_log_message_functions)
     auto Fed = std::make_shared<helics::Federate> ("test1", fi);
 
     gmlc::libguarded::guarded<std::vector<std::pair<int, std::string>>> mlog;
-    Fed->setLoggingCallback ([&mlog](int level, const std::string &, const std::string &message) {
+    Fed->setLoggingCallback ([&mlog] (int level, const std::string &, const std::string &message) {
         mlog.lock ()->emplace_back (level, message);
     });
 
@@ -197,7 +197,7 @@ TEST (logging_tests, check_log_message_levels)
     auto Fed = std::make_shared<helics::Federate> ("test1", fi);
 
     gmlc::libguarded::guarded<std::vector<std::pair<int, std::string>>> mlog;
-    Fed->setLoggingCallback ([&mlog](int level, const std::string &, const std::string &message) {
+    Fed->setLoggingCallback ([&mlog] (int level, const std::string &, const std::string &message) {
         mlog.lock ()->emplace_back (level, message);
     });
 
@@ -233,7 +233,7 @@ TEST (logging_tests, check_log_message_levels_high)
     auto Fed = std::make_shared<helics::Federate> ("test1", fi);
 
     gmlc::libguarded::guarded<std::vector<std::pair<int, std::string>>> mlog;
-    Fed->setLoggingCallback ([&mlog](int level, const std::string &, const std::string &message) {
+    Fed->setLoggingCallback ([&mlog] (int level, const std::string &, const std::string &message) {
         mlog.lock ()->emplace_back (level, message);
     });
 

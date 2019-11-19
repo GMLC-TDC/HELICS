@@ -97,7 +97,7 @@ void Publication::publishInt (int64_t val)
     bool doPublish = true;
     if (changeDetectionEnabled)
     {
-        if (changeDetected (prevValue, val, static_cast<int64_t> (delta)))
+        if (changeDetected (prevValue, val, delta))
         {
             prevValue = val;
         }

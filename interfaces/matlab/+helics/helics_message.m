@@ -101,13 +101,13 @@ classdef helics_message < SwigRef
       else
         tmp = helicsMEX(29, varargin{:});
         self.swigPtr = tmp.swigPtr;
-        tmp.swigPtr = [];
+        tmp.SwigClear();
       end
     end
     function delete(self)
       if self.swigPtr
         helicsMEX(30, self);
-        self.swigPtr=[];
+        self.SwigClear();
       end
     end
   end

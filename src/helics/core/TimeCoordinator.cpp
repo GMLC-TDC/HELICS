@@ -15,10 +15,10 @@ SPDX-License-Identifier: BSD-3-Clause
 
 namespace helics
 {
-static auto nullMessageFunction = [](const ActionMessage &) {};
+static auto nullMessageFunction = [] (const ActionMessage &) {};
 TimeCoordinator::TimeCoordinator () : sendMessageFunction (nullMessageFunction) {}
 
-TimeCoordinator::TimeCoordinator (std::function<void(const ActionMessage &)> sendMessageFunction_)
+TimeCoordinator::TimeCoordinator (std::function<void (const ActionMessage &)> sendMessageFunction_)
     : sendMessageFunction (std::move (sendMessageFunction_))
 {
     if (!sendMessageFunction)
@@ -27,7 +27,7 @@ TimeCoordinator::TimeCoordinator (std::function<void(const ActionMessage &)> sen
     }
 }
 
-void TimeCoordinator::setMessageSender (std::function<void(const ActionMessage &)> sendMessageFunction_)
+void TimeCoordinator::setMessageSender (std::function<void (const ActionMessage &)> sendMessageFunction_)
 {
     sendMessageFunction = std::move (sendMessageFunction_);
     if (!sendMessageFunction)
@@ -778,7 +778,7 @@ message_process_result TimeCoordinator::processTimeBlockMessage (const ActionMes
             else
             {
                 auto blk = std::find_if (timeBlocks.begin (), timeBlocks.end (),
-                                         [&cmd](const auto &block) { return (block.second == cmd.messageID); });
+                                         [&cmd] (const auto &block) { return (block.second == cmd.messageID); });
                 if (blk != timeBlocks.end ())
                 {
                     ltime = blk->first;
@@ -790,7 +790,7 @@ message_process_result TimeCoordinator::processTimeBlockMessage (const ActionMes
                 if (!timeBlocks.empty ())
                 {
                     auto res = std::min_element (timeBlocks.begin (), timeBlocks.end (),
-                                                 [](const auto &blk1, const auto &blk2) {
+                                                 [] (const auto &blk1, const auto &blk2) {
                                                      return (blk1.first < blk2.first);
                                                  });
                     time_block = res->first;

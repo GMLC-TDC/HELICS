@@ -42,7 +42,7 @@ void TcpConnection::startReceive ()
         if (!triggerhalt)
         {
             socket_.async_receive (asio::buffer (data.data () + residBufferSize, data.size () - residBufferSize),
-                                   [this](const std::error_code &error, size_t bytes_transferred) {
+                                   [this] (const std::error_code &error, size_t bytes_transferred) {
                                        handle_read (error, bytes_transferred);
                                    });
             if (triggerhalt)
@@ -76,7 +76,7 @@ void TcpConnection::setDataCall (std::function<size_t (TcpConnection::pointer, c
         throw (std::runtime_error ("cannot set data callback after socket is started"));
     }
 }
-void TcpConnection::setErrorCall (std::function<bool(TcpConnection::pointer, const std::error_code &)> errorFunc)
+void TcpConnection::setErrorCall (std::function<bool (TcpConnection::pointer, const std::error_code &)> errorFunc)
 {
     if (state.load () == connection_state_t::prestart)
     {
@@ -88,7 +88,7 @@ void TcpConnection::setErrorCall (std::function<bool(TcpConnection::pointer, con
     }
 }
 
-void TcpConnection::setLoggingFunction (std::function<void(int loglevel, const std::string &logMessage)> logFunc)
+void TcpConnection::setLoggingFunction (std::function<void (int loglevel, const std::string &logMessage)> logFunc)
 {
     if (state.load () == connection_state_t::prestart)
     {
@@ -272,7 +272,7 @@ TcpConnection::TcpConnection (asio::io_context &io_context,
     tcp::resolver resolver (io_context);
     tcp::resolver::query query (tcp::v4 (), connection, port);
     tcp::resolver::iterator endpoint_iterator = resolver.resolve (query);
-    socket_.async_connect (*endpoint_iterator, [this](const std::error_code &error) { connect_handler (error); });
+    socket_.async_connect (*endpoint_iterator, [this] (const std::error_code &error) { connect_handler (error); });
 }
 
 void TcpConnection::connect_handler (const std::error_code &error)
@@ -351,7 +351,7 @@ TcpAcceptor::TcpAcceptor (asio::io_context &io_context, tcp::endpoint &ep) : end
     acceptor_.open (ep.protocol ());
 }
 
-TcpAcceptor::TcpAcceptor (asio::io_context &io_context, int port)
+TcpAcceptor::TcpAcceptor (asio::io_context &io_context, uint16_t port)
     : endpoint_ (asio::ip::address_v4::any (), port), acceptor_ (io_context, endpoint_.protocol ()),
       state (accepting_state_t::connected)
 {
@@ -440,7 +440,7 @@ bool TcpAcceptor::start (TcpConnection::pointer conn)
         acceptor_.listen ();
         auto ptr = shared_from_this ();
         acceptor_.async_accept (socket,
-                                [this, apointer = std::move (ptr), connection = std::move (conn)](
+                                [this, apointer = std::move (ptr), connection = std::move (conn)] (
                                   const std::error_code &error) { handle_accept (apointer, connection, error); });
         return true;
     }
@@ -533,7 +533,7 @@ void TcpAcceptor::handle_accept (TcpAcceptor::pointer ptr,
 
 TcpServer::TcpServer (asio::io_context &io_context,
                       const std::string &address,
-                      int portNum,
+                      uint16_t portNum,
                       bool port_reuse,
                       int nominalBufferSize)
     : ioctx (io_context), bufferSize (nominalBufferSize), reuse_address (port_reuse)
@@ -541,7 +541,7 @@ TcpServer::TcpServer (asio::io_context &io_context,
     if ((address == "*") || (address == "tcp://*"))
     {
         endpoints.emplace_back (asio::ip::address_v4::any (), portNum);
-  //      endpoints.emplace_back (asio::ip::address_v6::any (), portNum);
+        //      endpoints.emplace_back (asio::ip::address_v6::any (), portNum);
     }
     else if (address == "localhost")
     {
@@ -598,19 +598,22 @@ TcpServer::TcpServer (asio::io_context &io_context,
     initialConnect ();
 }
 
-TcpServer::TcpServer (asio::io_context &io_context, int portNum, int nominalBufferSize)
+TcpServer::TcpServer (asio::io_context &io_context, uint16_t portNum, int nominalBufferSize)
     : ioctx (io_context), bufferSize (nominalBufferSize)
 {
     endpoints.emplace_back (asio::ip::tcp::v4 (), portNum);
     initialConnect ();
 }
 
-TcpServer::~TcpServer () try
+TcpServer::~TcpServer ()
 {
-    close ();
-}
-catch (...)
-{
+    try
+    {
+        close ();
+    }
+    catch (...)
+    {
+    }
 }
 
 void TcpServer::initialConnect ()
@@ -632,7 +635,7 @@ void TcpServer::initialConnect ()
             acc->set_option (tcp::acceptor::reuse_address (false));
         }
         acc->setAcceptCall (
-          [this](TcpAcceptor::pointer accPtr, TcpConnection::pointer conn) { handle_accept (accPtr, conn); });
+          [this] (TcpAcceptor::pointer accPtr, TcpConnection::pointer conn) { handle_accept (accPtr, conn); });
         acceptors.push_back (std::move (acc));
     }
     bool anyConnect = false;
@@ -696,7 +699,7 @@ bool TcpServer::reConnect (std::chrono::milliseconds timeOut)
 
 TcpServer::pointer TcpServer::create (asio::io_context &io_context,
                                       const std::string &address,
-                                      int PortNum,
+                                      uint16_t PortNum,
                                       bool reuse_port,
                                       int nominalBufferSize)
 {
@@ -712,7 +715,7 @@ TcpServer::pointer TcpServer::create (asio::io_context &io_context,
     return pointer (new TcpServer (io_context, address, port, reuse_port, nominalBufferSize));
 }
 
-TcpServer::pointer TcpServer::create (asio::io_context &io_context, int PortNum, int nominalBufferSize)
+TcpServer::pointer TcpServer::create (asio::io_context &io_context, uint16_t PortNum, int nominalBufferSize)
 {
     return pointer (new TcpServer (io_context, PortNum, nominalBufferSize));
 }
@@ -800,7 +803,7 @@ TcpConnection::pointer TcpServer::findSocket (int connectorID) const
 {
     std::unique_lock<std::mutex> lock (accepting);
     auto ptr = std::find_if (connections.begin (), connections.end (),
-                             [connectorID](const auto &conn) { return (conn->getIdentifier () == connectorID); });
+                             [connectorID] (const auto &conn) { return (conn->getIdentifier () == connectorID); });
     if (ptr != connections.end ())
     {
         return *ptr;

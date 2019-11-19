@@ -446,7 +446,7 @@ TEST_P (mfed_add_type_tests, threefedPingPong)
     }
     auto brk = AddBroker (GetParam (), "-f 3");
 
-    auto crtype = helics::coreTypeFromString (GetParam ());
+    auto crtype = helics::core::coreTypeFromString (GetParam ());
     PingPongFed p1 ("fedA", 0.5, crtype);
     PingPongFed p2 ("fedB", 0.5, crtype);
     PingPongFed p3 ("fedC", 0.5, crtype);

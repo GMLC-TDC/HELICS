@@ -118,7 +118,7 @@ bool DependencyInfo::ProcessMessage (const ActionMessage &m)
 }
 
 // comparison helper lambda for comparing dependencies
-static auto dependencyCompare = [](const auto &dep, auto &target) { return (dep.fedID < target); };
+static auto dependencyCompare = [] (const auto &dep, auto &target) { return (dep.fedID < target); };
 
 bool TimeDependencies::isDependency (global_federate_id ofed) const
 {
@@ -205,18 +205,18 @@ bool TimeDependencies::checkIfReadyForExecEntry (bool iterating) const
 {
     if (iterating)
     {
-        return std::none_of (dependencies.begin (), dependencies.end (), [](const auto &dep) {
+        return std::none_of (dependencies.begin (), dependencies.end (), [] (const auto &dep) {
             return (dep.time_state == DependencyInfo::time_state_t::initialized);
         });
     }
-    return std::none_of (dependencies.begin (), dependencies.end (), [](const auto &dep) {
+    return std::none_of (dependencies.begin (), dependencies.end (), [] (const auto &dep) {
         return (dep.time_state < DependencyInfo::time_state_t::exec_requested);
     });
 }
 
 bool TimeDependencies::hasActiveTimeDependencies () const
 {
-    return std::any_of (dependencies.begin (), dependencies.end (), [](const auto &dep) {
+    return std::any_of (dependencies.begin (), dependencies.end (), [] (const auto &dep) {
         return ((dep.fedID.isFederate ()) && (dep.Tnext < Time::maxVal ()));
     });
 }

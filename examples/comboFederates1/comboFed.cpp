@@ -5,7 +5,7 @@ the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 #include "helics/application_api/CombinationFederate.hpp"
-#include "helics/apps/BrokerApp.hpp"
+#include "helics/application_api/BrokerApp.hpp"
 #include "helics/core/helicsCLI11.hpp"
 #include "helics/core/helics_definitions.hpp"
 #include <iostream>
@@ -18,7 +18,7 @@ int main (int argc, char *argv[])
     std::string vtarget = "fed";
     std::string mtarget = "fed";
     std::string myendpoint = "endpoint";
-    helics::apps::BrokerApp brk;
+    helics::BrokerApp brk;
     std::string brokerArgs = "";
 
     app.add_option_function<std::string> (
@@ -54,7 +54,7 @@ int main (int argc, char *argv[])
     fi.setProperty (helics::defs::properties::log_level, 5);
     if (app["--startbroker"]->count () > 0)
     {
-        brk = helics::apps::BrokerApp (fi.coreType, brokerArgs);
+        brk = helics::BrokerApp (fi.coreType, brokerArgs);
     }
 
     auto cFed = std::make_unique<helics::CombinationFederate> (std::string{}, fi);

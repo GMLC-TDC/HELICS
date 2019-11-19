@@ -6,6 +6,8 @@ the top-level NOTICE for additional details. All rights reserved. SPDX-License-I
 
 #include "../application_api/testFixtures.hpp"
 #include "gtest/gtest.h"
+#include "helics/application_api/CombinationFederate.hpp"
+#include "helics/application_api/Filters.hpp"
 #include "helics/application_api/Publications.hpp"
 #include "helics/application_api/ValueFederate.hpp"
 #include "helics/application_api/queryFunctions.hpp"
@@ -402,6 +404,54 @@ TEST_F (query_tests, test_query_subscriptions)
 
     auto subs = helics::queryFederateSubscriptions (vFed1.get (), "fed1");
     EXPECT_EQ (subs, "[pub1;pub2;pub3]");
+    vFed1->finalize ();
+    vFed2->finalize ();
+    helics::cleanupHelicsLibrary ();
+}
+
+TEST_F (query_tests, test_queries_query)
+{
+    SetupTest<helics::CombinationFederate> ("zmq2", 2);
+    auto vFed1 = GetFederateAs<helics::CombinationFederate> (0);
+    auto vFed2 = GetFederateAs<helics::CombinationFederate> (1);
+    vFed1->registerGlobalPublication<double> ("pub1");
+    vFed1->registerGlobalPublication<double> ("pub2");
+    vFed1->registerGlobalEndpoint ("pub3");
+
+    vFed2->registerSubscription ("pub1");
+    vFed2->registerSubscription ("pub2");
+    auto &f1 = vFed2->registerFilter ("f1");
+    f1.addSourceTarget ("pub3");
+    f1.addDestinationTarget ("pub3");
+    vFed1->enterInitializingModeAsync ();
+    vFed2->enterInitializingMode ();
+    vFed1->enterInitializingModeComplete ();
+
+    // federate queries
+    auto res = vFed1->query ("queries");
+    auto vec = helics::vectorizeQueryResult (res);
+    for (auto &qstr : vec)
+    {
+        auto qres = vFed1->query (qstr);
+        EXPECT_NE (qres, "#invalid") << qstr << " produced #invalid";
+    }
+
+    res = vFed1->query ("core", "queries");
+    vec = helics::vectorizeQueryResult (res);
+    for (auto &qstr : vec)
+    {
+        auto qres = vFed1->query ("core", qstr);
+        EXPECT_NE (qres, "#invalid") << qstr << " produced #invalid in core";
+    }
+
+    res = vFed1->query ("root", "queries");
+    vec = helics::vectorizeQueryResult (res);
+    for (auto &qstr : vec)
+    {
+        auto qres = vFed1->query ("root", qstr);
+        EXPECT_NE (qres, "#invalid") << qstr << " produced #invalid in core";
+    }
+
     vFed1->finalize ();
     vFed2->finalize ();
     helics::cleanupHelicsLibrary ();

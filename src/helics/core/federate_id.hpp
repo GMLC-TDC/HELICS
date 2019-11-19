@@ -45,10 +45,12 @@ class local_federate_id
     base_type fid{invalid_fid};  //!< the underlying index value
 };
 
+#if defined HELICS_STATIC_CORE_LIBRARY && !defined HELICS_SHARED_LIBRARY
 /** stream operator for a federate_id
  */
 std::ostream &operator<< (std::ostream &os, local_federate_id fid);
 
+#endif
 /** constant to use for indicating that a command is for the core itself from the Core Public API*/
 constexpr local_federate_id local_core_id (-259); /** class defining a local_federate_id
  @details  the intent of this class is to limit the operations available on a federate identifier
@@ -79,9 +81,11 @@ class interface_handle
     base_type hid{invalid_handle};  //!< the underlying index value
 };
 
-/** stream operator for a federate_id
+#if defined HELICS_STATIC_CORE_LIBRARY && !defined HELICS_SHARED_LIBRARY
+/** stream operator for a interface handle
  */
 std::ostream &operator<< (std::ostream &os, interface_handle handle);
+#endif
 
 constexpr interface_handle direct_send_handle =
   interface_handle (-1'745'234);  //!< this special handle can be used to directly send a message in a core
@@ -94,8 +98,9 @@ namespace std
 template <>
 struct hash<helics::local_federate_id>
 {
-    using argument_type = helics::local_federate_id; //!< type of object to hash
-    using result_type = hash<helics::local_federate_id::base_type>::result_type; //!< the type of the return result
+    using argument_type = helics::local_federate_id;  //!< type of object to hash
+    using result_type =
+      hash<helics::local_federate_id::base_type>::result_type;  //!< the type of the return result
     /** actual hash operator*/
     result_type operator() (argument_type const &key) const noexcept
     {
@@ -107,8 +112,8 @@ struct hash<helics::local_federate_id>
 template <>
 struct hash<helics::interface_handle>
 {
-    using argument_type = helics::interface_handle; //!< type of object to hash
-    using result_type = hash<helics::interface_handle::base_type>::result_type; //!< the type of the return result
+    using argument_type = helics::interface_handle;  //!< type of object to hash
+    using result_type = hash<helics::interface_handle::base_type>::result_type;  //!< the type of the return result
     /** actual hash operator*/
     result_type operator() (argument_type const &key) const noexcept
     {

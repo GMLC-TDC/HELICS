@@ -8,6 +8,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "FilterOperations.hpp"
 #include "../core/Core.hpp"
 #include "../core/core-exceptions.hpp"
+#include "../utilities/timeStringOps.hpp"
 #include "MessageOperators.hpp"
 #include <algorithm>
 #include <iostream>
@@ -48,9 +49,9 @@ void DelayFilterOperation::setString (const std::string &property, const std::st
     {
         try
         {
-            delay = loadTimeFromString (val);
+            delay = gmlc::utilities::loadTimeFromString<Time> (val);
         }
-        catch (const std::invalid_argument &ia)
+        catch (const std::invalid_argument &)
         {
             throw (helics::InvalidParameter (val + " is not a valid time string"));
         }
@@ -100,11 +101,11 @@ double randDouble (random_dists_t dist, double p1, double p2)
       std::random_device{}() +
       static_cast<unsigned int> (std::hash<std::thread::id>{}(std::this_thread::get_id ())));
 #else
-#if __clang_major__ >= 8
+#    if __clang_major__ >= 8
     static thread_local std::mt19937 generator (
       std::random_device{}() +
       static_cast<unsigned int> (std::hash<std::thread::id>{}(std::this_thread::get_id ())));
-#else
+#    else
     // this will leak on thread termination,  older apple clang does not have proper thread_local variables so
     // there really isn't any option
     //  static __thread std::mt19937 *genPtr =
@@ -118,10 +119,13 @@ double randDouble (random_dists_t dist, double p1, double p2)
           new std::mt19937 (std::random_device{}() +
                             static_cast<unsigned int> (std::hash<std::thread::id>{}(std::this_thread::get_id ())));
     }
-
+    if (genPtr == nullptr)
+    {
+        throw (helics::FunctionExecutionFailure ("unable to allocate random generator"));
+    }
     auto &generator = *genPtr;
 
-#endif
+#    endif
 #endif
     switch (dist)
     {
@@ -251,12 +255,12 @@ void RandomDelayFilterOperation::setString (const std::string &property, const s
     }
     else if ((property == "param1") || (property == "mean") || (property == "min") || (property == "alpha"))
     {
-        auto tm = loadTimeFromString (val);
+        auto tm = gmlc::utilities::loadTimeFromString<Time> (val);
         rdelayGen->param1.store (static_cast<double> (tm));
     }
     else if ((property == "param2") || (property == "stddev") || (property == "max") || (property == "beta"))
     {
-        auto tm = loadTimeFromString (val);
+        auto tm = gmlc::utilities::loadTimeFromString<Time> (val);
         rdelayGen->param2.store (static_cast<double> (tm));
     }
 }
@@ -267,9 +271,10 @@ std::shared_ptr<FilterOperator> RandomDelayFilterOperation::getOperator ()
 }
 
 RandomDropFilterOperation::RandomDropFilterOperation ()
+    : tcond (std::make_shared<MessageConditionalOperator> ([this] (const Message *) {
+          return (randDouble (random_dists_t::bernoulli, (1.0 - dropProb), 1.0) > 0.1);
+      }))
 {
-    tcond = std::make_shared<MessageConditionalOperator> (
-      [this] (const Message *) { return (randDouble (random_dists_t::bernoulli, (1.0 - dropProb), 1.0) > 0.1); });
 }
 
 RandomDropFilterOperation::~RandomDropFilterOperation () = default;
@@ -288,9 +293,9 @@ std::shared_ptr<FilterOperator> RandomDropFilterOperation::getOperator ()
 }
 
 RerouteFilterOperation::RerouteFilterOperation ()
+    : op (std::make_shared<MessageDestOperator> (
+        [this] (const std::string &src, const std::string &dest) { return rerouteOperation (src, dest); }))
 {
-    op = std::make_shared<MessageDestOperator> (
-      [this] (const std::string &src, const std::string &dest) { return rerouteOperation (src, dest); });
 }
 
 RerouteFilterOperation::~RerouteFilterOperation () = default;
@@ -360,8 +365,8 @@ std::string RerouteFilterOperation::rerouteOperation (const std::string &src, co
 }
 
 FirewallFilterOperation::FirewallFilterOperation ()
+    : op (std::make_shared<FirewallOperator> ([this] (const Message *mess) { return allowPassed (mess); }))
 {
-    op = std::make_shared<FirewallOperator> ([this] (const Message *mess) { return allowPassed (mess); });
 }
 
 FirewallFilterOperation::~FirewallFilterOperation () = default;
@@ -377,9 +382,9 @@ std::shared_ptr<FilterOperator> FirewallFilterOperation::getOperator ()
 
 bool FirewallFilterOperation::allowPassed (const Message * /*mess*/) const { return true; }
 
-CloneFilterOperation::CloneFilterOperation (Core *core) : coreptr (core)
+CloneFilterOperation::CloneFilterOperation (Core *core)
+    : coreptr (core), op (std::make_shared<CloneOperator> ([this] (const Message *mess) { sendMessage (mess); }))
 {
-    op = std::make_shared<CloneOperator> ([this] (const Message *mess) { sendMessage (mess); });
 }
 
 CloneFilterOperation::~CloneFilterOperation () = default;

@@ -5,9 +5,11 @@ the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 #pragma once
-#include "../helics_enums.h"
 
-#include <string>
+#ifndef HELICS_CORE_TYPES_HEADER
+#    define HELICS_CORE_TYPES_HEADER
+
+#    include "../helics_enums.h"
 
 /** @file
 @details definitions of types an enumerations used in helics
@@ -45,6 +47,8 @@ enum class core_type : int
     NNG = helics_core_type_nng,  //!< reserved for future Nanomsg implementation
     ZMQ_SS = helics_core_type_zmq_test,  //!< single socket version of ZMQ core for better scalability performance
     HTTP = helics_core_type_http,  //!< core/broker using web traffic
+    WEBSOCKET = helics_core_type_websocket,  //!< core/broker using web sockets
+    INPROC = helics_core_type_inproc,  //!< core/broker using a stripped down in process core type
     UNRECOGNIZED = 22,  //!< unknown
 
 };
@@ -82,21 +86,6 @@ enum class iteration_request : signed char
     iterate_if_needed = 2,  //!< indicator that the iterations need to continue
 };
 
-/**generate a string based on the core type*/
-std::string to_string (core_type type);
-
-/** generate a core type value from a std::string
-@param type a string describing the desired core type
-@return a value of the helics_core_type enumeration
-helics::core_type::unrecognized if the type is not valid
-*/
-core_type coreTypeFromString (std::string type) noexcept;
-
-/**
- * Returns true if core/broker type specified is available in current compilation.
- */
-bool isCoreTypeAvailable (core_type type) noexcept;
-
 }  // namespace helics
 
 constexpr auto ITERATION_COMPLETE =
@@ -108,3 +97,12 @@ constexpr auto FORCE_ITERATION =
 constexpr auto ITERATE_IF_NEEDED =
   helics::iteration_request::iterate_if_needed;  //!< simplified alias to indicate that helics should iterate if
                                                  //!< warranted
+
+// #TOBEDEPRECTATED The use of the the core-types header for the functions contained in ../application_api/typeOperations.hpp
+// is deprectaced and will be removed in HELICS 3.0 please use
+// ../application_api/typeOperations.hpp directory for those functions.
+// This next section should be removed in HELICS 3.0 but is needed to prevent breaking changes
+#    if defined HELICS_SHARED_LIBRARY || !defined HELICS_STATIC_CORE_LIBRARY
+#        include "../application_api/typeOperations.hpp"
+#    endif
+#endif

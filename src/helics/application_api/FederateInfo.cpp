@@ -6,7 +6,6 @@ SPDX-License-Identifier: BSD-3-Clause
 */
 
 #include "FederateInfo.hpp"
-
 #include "../common/JsonProcessingFunctions.hpp"
 #include "../common/TomlProcessingFunctions.hpp"
 #include "../core/core-exceptions.hpp"
@@ -277,19 +276,20 @@ std::unique_ptr<helicsCLI11App> FederateInfo::makeCLIApp ()
         "--timedelta", [this] (Time val) { setProperty (helics_property_time_delta, val); },
         "The minimum time between time grants for a Federate (default in ms)")
       ->ignore_underscore ();
-    app
+	auto rtgroup = app->add_option_group("realtime");
+    rtgroup
       ->add_option_function<Time> (
         "--rtlag", [this] (Time val) { setProperty (helics_property_time_rt_lag, val); },
         "the amount of the time the federate is allowed to lag realtime before "
         "corrective action is taken (default in ms)")
       ->ignore_underscore ();
-    app
+    rtgroup
       ->add_option_function<Time> (
         "--rtlead", [this] (Time val) { setProperty (helics_property_time_rt_lead, val); },
         "the amount of the time the federate is allowed to lead realtime before "
         "corrective action is taken (default in ms)")
       ->ignore_underscore ();
-    app
+    rtgroup
       ->add_option_function<Time> (
         "--rttolerance", [this] (Time val) { setProperty (helics_property_time_rt_tolerance, val); },
         "the time tolerance of the real time mode (default in ms)")
@@ -322,9 +322,9 @@ std::unique_ptr<helicsCLI11App> FederateInfo::makeCLIApp ()
       ->add_option (
         "--separator",
         [this] (CLI::results_t res) {
-            separator = res[0][0];
             if (res[0].size () != 1)
                 return false;
+			separator = res[0][0];
             return true;
         },
         "separator character for local federates")
@@ -336,6 +336,9 @@ std::unique_ptr<helicsCLI11App> FederateInfo::makeCLIApp ()
       ->delimiter (',')
       ->each ([this] (const std::string &flag) { loadFlags (*this, flag); });
     app->allow_extras ();
+#ifdef HELICS_DISABLE_ASIO
+	rtgroup->disabled();
+#endif
     return app;
 }
 
@@ -445,7 +448,7 @@ FederateInfo loadFederateInfoJson (const std::string &jsonString)
 
     replaceIfMember (doc, "broker", fi.broker);
     replaceIfMember (doc, "key", fi.key);
-    fi.brokerPort = getOrDefault (doc, "brokerport", int64_t (fi.brokerPort));
+    fi.brokerPort = static_cast<int> (getOrDefault (doc, "brokerport", int64_t (fi.brokerPort)));
     replaceIfMember (doc, "localport", fi.localport);
     replaceIfMember (doc, "autobroker", fi.autobroker);
     if (doc.isMember ("port"))
@@ -483,7 +486,7 @@ FederateInfo loadFederateInfoJson (const std::string &jsonString)
         {
             fi.coreType = coreTypeFromString (doc["core"].asString ());
         }
-        catch (const std::invalid_argument &ia)
+        catch (const std::invalid_argument &)
         {
             fi.coreName = doc["core"].asString ();
         }
@@ -494,7 +497,7 @@ FederateInfo loadFederateInfoJson (const std::string &jsonString)
         {
             fi.coreType = coreTypeFromString (doc["coreType"].asString ());
         }
-        catch (const std::invalid_argument &ia)
+        catch (const std::invalid_argument &)
         {
             std::cerr << "Unrecognized core type\n";
         }
@@ -505,7 +508,7 @@ FederateInfo loadFederateInfoJson (const std::string &jsonString)
         {
             fi.coreType = coreTypeFromString (doc["coretype"].asString ());
         }
-        catch (const std::invalid_argument &ia)
+        catch (const std::invalid_argument &)
         {
             std::cerr << "Unrecognized core type\n";
         }
@@ -516,7 +519,7 @@ FederateInfo loadFederateInfoJson (const std::string &jsonString)
         {
             fi.coreType = coreTypeFromString (doc["type"].asString ());
         }
-        catch (const std::invalid_argument &ia)
+        catch (const std::invalid_argument &)
         {
             std::cerr << "Unrecognized core type\n";
         }
@@ -615,7 +618,7 @@ FederateInfo loadFederateInfoToml (const std::string &tomlString)
         {
             fi.coreType = coreTypeFromString (doc["core"].as<std::string> ());
         }
-        catch (const std::invalid_argument &ia)
+        catch (const std::invalid_argument &)
         {
             fi.coreName = doc["core"].as<std::string> ();
         }
@@ -626,7 +629,7 @@ FederateInfo loadFederateInfoToml (const std::string &tomlString)
         {
             fi.coreType = coreTypeFromString (doc["coreType"].as<std::string> ());
         }
-        catch (const std::invalid_argument &ia)
+        catch (const std::invalid_argument &)
         {
             std::cerr << "Unrecognized core type\n";
         }
@@ -637,7 +640,7 @@ FederateInfo loadFederateInfoToml (const std::string &tomlString)
         {
             fi.coreType = coreTypeFromString (doc["coretype"].as<std::string> ());
         }
-        catch (const std::invalid_argument &ia)
+        catch (const std::invalid_argument &)
         {
             std::cerr << "Unrecognized core type\n";
         }
@@ -648,7 +651,7 @@ FederateInfo loadFederateInfoToml (const std::string &tomlString)
         {
             fi.coreType = coreTypeFromString (doc["type"].as<std::string> ());
         }
-        catch (const std::invalid_argument &ia)
+        catch (const std::invalid_argument &)
         {
             std::cerr << "Unrecognized core type\n";
         }

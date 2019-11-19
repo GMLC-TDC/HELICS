@@ -5,7 +5,7 @@ the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 
-#include "gmlc/libguarded/guarded.hpp"
+#include "../ThirdParty/concurrency/gmlc/libguarded/guarded.hpp"
 #include <complex>
 #include <gtest/gtest.h>
 

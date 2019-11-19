@@ -30,7 +30,7 @@ int main (int argc, char *argv[])
                                            "for the broker server, run help in a terminal for more commands\n")
                   ->prefix_command ();
     term->callback ([&runterminal]() { runterminal = true; });
-    helics::Time opTime (30.0, time_units::minutes);
+    helics::Time opTime (30, time_units::minutes);
     cmdLine
       .add_option ("--duration", opTime,
                    "specify the length of time the server should run before closing the server and waiting for "

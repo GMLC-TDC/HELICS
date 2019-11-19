@@ -39,6 +39,8 @@ class TimeoutMonitor
     void reset ();
     /** ping all a brokers sub connections*/
     void pingSub (CoreBroker *brk);
+    /** set the parent id*/
+    void setParentId (global_broker_id parent_id) { parentConnection.connection = parent_id; };
 
   private:
     std::chrono::milliseconds timeout{100000000};  //!< timeout for connections

@@ -41,7 +41,7 @@ class EchoHub
   public:
     EchoHub () = default;
 
-    void run (std::function<void()> callOnReady)
+    void run (std::function<void ()> callOnReady = {})
     {
         if (!readyToRun)
         {
@@ -114,7 +114,7 @@ class EchoLeaf
   public:
     EchoLeaf () = default;
 
-    void run (std::function<void()> callOnReady)
+    void run (std::function<void ()> callOnReady = {})
     {
         if (!readyToRun)
         {
@@ -151,7 +151,9 @@ class EchoLeaf
     void mainLoop ()
     {
         int cnt = 0;
-        const std::string txstring = std::to_string (100000 + index_) + (100, '1');
+        // this is  to make a fixed size string that is different for each federate but has sufficient length to
+        // get beyond SSO
+        const std::string txstring = std::to_string (100000 + index_) + std::string (100, '1');
         const int iter = 5000;
         while (cnt <= iter + 1)
         {
@@ -182,9 +184,9 @@ static void BM_echo_singleCore (benchmark::State &state)
         state.PauseTiming ();
 
         int feds = static_cast<int> (state.range (0));
-        gmlc::concurrency::Barrier brr (feds + 1);
-        auto wcore = helics::CoreFactory::create (core_type::TEST, std::string ("--autobroker --federates=") +
-                                                                     std::to_string (feds + 1));
+        gmlc::concurrency::Barrier brr (static_cast<size_t>(feds) + 1);
+        auto wcore = helics::CoreFactory::create (core_type::INPROC, std::string ("--autobroker --federates=") +
+                                                                       std::to_string (feds + 1));
         EchoHub hub;
         hub.initialize (wcore->getIdentifier (), feds);
         std::vector<EchoLeaf> leafs (feds);
@@ -197,12 +199,12 @@ static void BM_echo_singleCore (benchmark::State &state)
         for (int ii = 0; ii < feds; ++ii)
         {
             threadlist[ii] =
-              std::thread ([&](EchoLeaf &lf) { lf.run ([&brr]() { brr.wait (); }); }, std::ref (leafs[ii]));
+              std::thread ([&] (EchoLeaf &lf) { lf.run ([&brr] () { brr.wait (); }); }, std::ref (leafs[ii]));
         }
         hub.makeReady ();
         brr.wait ();
         state.ResumeTiming ();
-        hub.run ([]() {});
+        hub.run ([] () {});
         state.PauseTiming ();
         for (auto &thrd : threadlist)
         {
@@ -228,7 +230,7 @@ static void BM_echo_multiCore (benchmark::State &state, core_type cType)
         state.PauseTiming ();
 
         int feds = static_cast<int> (state.range (0));
-        gmlc::concurrency::Barrier brr (feds + 1);
+        gmlc::concurrency::Barrier brr (static_cast<size_t>(feds) + 1);
 
         auto broker = helics::BrokerFactory::create (cType, "brokerb",
                                                      std::string ("--federates=") + std::to_string (feds + 1));
@@ -250,12 +252,12 @@ static void BM_echo_multiCore (benchmark::State &state, core_type cType)
         for (int ii = 0; ii < feds; ++ii)
         {
             threadlist[ii] =
-              std::thread ([&](EchoLeaf &lf) { lf.run ([&brr]() { brr.wait (); }); }, std::ref (leafs[ii]));
+              std::thread ([&] (EchoLeaf &lf) { lf.run ([&brr] () { brr.wait (); }); }, std::ref (leafs[ii]));
         }
         hub.makeReady ();
         brr.wait ();
         state.ResumeTiming ();
-        hub.run ([]() {});
+        hub.run ([] () {});
         state.PauseTiming ();
         for (auto &thrd : threadlist)
         {
@@ -272,8 +274,8 @@ static void BM_echo_multiCore (benchmark::State &state, core_type cType)
 }
 
 static constexpr int64_t maxscale{1 << 4};
-// Register the test core benchmarks
-BENCHMARK_CAPTURE (BM_echo_multiCore, testCore, core_type::TEST)
+// Register the inproc core benchmarks
+BENCHMARK_CAPTURE (BM_echo_multiCore, inprocCore, core_type::INPROC)
   ->RangeMultiplier (2)
   ->Range (1, maxscale)
   ->Unit (benchmark::TimeUnit::kMillisecond)

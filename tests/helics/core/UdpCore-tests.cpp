@@ -321,6 +321,7 @@ TEST (UdpCore_tests, udpCore_initialization_test)
     core->disconnect ();
     core = nullptr;
     helics::CoreFactory::cleanUpCores (100ms);
+    srv.reset ();
 }
 
 /** test case checks default values and makes sure they all mesh together

@@ -9,7 +9,11 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helics/application_api/Publications.hpp"
 #include "helics/application_api/Subscriptions.hpp"
 #include "helics/application_api/ValueFederate.hpp"
-#include "testFixtures.hpp"
+#ifndef HELICS_SHARED_LIBRARY
+#    include "testFixtures.hpp"
+#else
+#    include "testFixtures_shared.hpp"
+#endif
 #include <future>
 #include <gtest/gtest.h>
 

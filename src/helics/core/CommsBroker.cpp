@@ -13,29 +13,33 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "CoreBroker.hpp"
 
 #ifdef ENABLE_IPC_CORE
-#include "ipc/IpcComms.h"
+#    include "ipc/IpcComms.h"
 #endif
 
 #ifdef ENABLE_UDP_CORE
-#include "udp/UdpComms.h"
+#    include "udp/UdpComms.h"
 #endif
 
 #ifdef ENABLE_TEST_CORE
-#include "test/TestComms.h"
+#    include "test/TestComms.h"
 #endif
 
 #ifdef ENABLE_ZMQ_CORE
-#include "zmq/ZmqComms.h"
-#include "zmq/ZmqCommsSS.h"
+#    include "zmq/ZmqComms.h"
+#    include "zmq/ZmqCommsSS.h"
 #endif
 
 #ifdef ENABLE_TCP_CORE
-#include "tcp/TcpComms.h"
-#include "tcp/TcpCommsSS.h"
+#    include "tcp/TcpComms.h"
+#    include "tcp/TcpCommsSS.h"
+#endif
+
+#ifdef ENABLE_INPROC_CORE
+#    include "inproc/InprocComms.h"
 #endif
 
 #ifdef ENABLE_MPI_CORE
-#include "mpi/MpiComms.h"
+#    include "mpi/MpiComms.h"
 #endif
 
 namespace helics
@@ -67,6 +71,11 @@ template class CommsBroker<tcp::TcpComms, CommonCore>;
 template class CommsBroker<tcp::TcpComms, CoreBroker>;
 template class CommsBroker<tcp::TcpCommsSS, CommonCore>;
 template class CommsBroker<tcp::TcpCommsSS, CoreBroker>;
+#endif
+
+#ifdef ENABLE_INPROC_CORE
+template class CommsBroker<inproc::InprocComms, CommonCore>;
+template class CommsBroker<inproc::InprocComms, CoreBroker>;
 #endif
 
 #ifdef ENABLE_MPI_CORE

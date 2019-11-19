@@ -10,9 +10,9 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "../core/Core.hpp"
 #include "../core/federate_id_extra.hpp"
 #include "Endpoints.hpp"
+#include "data_view.hpp"
 #include "gmlc/containers/DualMappedVector.hpp"
 #include "gmlc/containers/SimpleQueue.hpp"
-#include "data_view.hpp"
 #include <cstdint>
 #include <deque>
 #include <functional>
@@ -109,13 +109,13 @@ class MessageFederateManager
     @details there can only be one generic callback
     @param callback the function to call
     */
-    void setEndpointNotificationCallback (const std::function<void(Endpoint &, Time)> &callback);
+    void setEndpointNotificationCallback (const std::function<void (Endpoint &, Time)> &callback);
     /** register a callback function to call when the specified endpoint receives a message
     @param ept  the endpoint id to register the callback for
     @param callback the function to call
     */
     void
-    setEndpointNotificationCallback (const Endpoint &ept, const std::function<void(Endpoint &, Time)> &callback);
+    setEndpointNotificationCallback (const Endpoint &ept, const std::function<void (Endpoint &, Time)> &callback);
 
     /**disconnect from the coreObject*/
     void disconnect ();
@@ -132,12 +132,12 @@ class MessageFederateManager
     {
       public:
         gmlc::containers::SimpleQueue<std::unique_ptr<Message>> messages;
-        std::function<void(Endpoint &, Time)> callback;
+        std::function<void (Endpoint &, Time)> callback;
     };
     shared_guarded<
       gmlc::containers::DualMappedVector<Endpoint, std::string, interface_handle, reference_stability::stable>>
       local_endpoints;  //!< storage for the local endpoint information
-    atomic_guarded<std::function<void(Endpoint &, Time)>> allCallback;
+    atomic_guarded<std::function<void (Endpoint &, Time)>> allCallback;
     Time CurrentTime = Time::minVal ();  //!< the current simulation time
     Core *coreObject;  //!< the pointer to the actual core
     MessageFederate *mFed;  //!< pointer back to the message Federate

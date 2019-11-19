@@ -95,7 +95,7 @@ void CoreBroker::setLoggingCallback (
     if (logFunction)
     {
         auto ii = getNextAirlockIndex ();
-        dataAirlocks[ii].load (std::move (logFunction));
+        dataAirlocks[ii].load (logFunction);
         loggerUpdate.counter = ii;
     }
     else
@@ -204,7 +204,7 @@ route_id CoreBroker::fillMessageRouteInformation (ActionMessage &mess)
 bool CoreBroker::isOpenToNewFederates () const
 {
     auto cstate = brokerState.load ();
-    return ((cstate != created) && (cstate < operating) && (!haltOperations));
+    return ((cstate != broker_state_t::created) && (cstate < broker_state_t::operating) && (!haltOperations));
 }
 
 void CoreBroker::processPriorityCommand (ActionMessage &&command)
@@ -215,6 +215,19 @@ void CoreBroker::processPriorityCommand (ActionMessage &&command)
                             command.source_id.baseValue ()));
     switch (command.action ())
     {
+    case CMD_PING_PRIORITY:
+        if (command.dest_id == global_broker_id_local)
+        {
+            ActionMessage pngrep (CMD_PING_REPLY);
+            pngrep.dest_id = command.source_id;
+            pngrep.source_id = global_broker_id_local;
+            routeMessage (pngrep);
+        }
+        else
+        {
+            routeMessage (command);
+        }
+        break;
     case CMD_BROKER_SETUP:
     {
         global_broker_id_local = global_id.load ();
@@ -245,7 +258,7 @@ void CoreBroker::processPriorityCommand (ActionMessage &&command)
             earlyMessages.push_back (std::move (command));
             break;
         }
-        if (brokerState != operating)
+        if (brokerState != broker_state_t::operating)
         {
             if (allInitReady ())
             {
@@ -341,7 +354,7 @@ void CoreBroker::processPriorityCommand (ActionMessage &&command)
                 return;
             }
         }
-        if (brokerState != operating)
+        if (brokerState != broker_state_t::operating)
         {
             if (allInitReady ())
             {
@@ -533,6 +546,8 @@ void CoreBroker::processPriorityCommand (ActionMessage &&command)
                     brk.parent = global_broker_id_local;
                 }
             }
+            timeoutMon->setParentId (higher_broker_id);
+            timeoutMon->reset ();
             return;
         }
         auto broker = _brokers.find (command.name);
@@ -1334,6 +1349,7 @@ void CoreBroker::checkForNamedInterface (ActionMessage &command)
                 routeMessage (command);
                 command.setAction (CMD_ADD_PUBLISHER);
                 command.swapSourceDest ();
+                command.name = pub->key;
                 command.setStringData (pub->type, pub->units);
                 routeMessage (command);
             }
@@ -1370,6 +1386,7 @@ void CoreBroker::checkForNamedInterface (ActionMessage &command)
                 command.setAction (CMD_ADD_SUBSCRIBER);
                 command.swapSourceDest ();
                 command.clearStringData ();
+                command.name = inp->key;
                 routeMessage (command);
             }
             else
@@ -1851,7 +1868,7 @@ bool CoreBroker::connect ()
 bool CoreBroker::isConnected () const
 {
     auto state = brokerState.load (std::memory_order_acquire);
-    return ((state == operating) || (state == connected));
+    return ((state == broker_state_t::operating) || (state == broker_state_t::connected));
 }
 
 bool CoreBroker::waitForDisconnect (std::chrono::milliseconds msToWait) const
@@ -1915,7 +1932,7 @@ void CoreBroker::disconnect ()
     {
         ++cnt;
         LOG_WARNING (global_id.load (), getIdentifier (),
-                     "waiting on disconnect: current state=" + std::to_string (brokerState.load ()));
+                     "waiting on disconnect: current state=" + std::to_string (static_cast<int16_t>(brokerState.load ())));
         if (cnt == 5)
         {
             addActionMessage (udisconnect);
@@ -2505,6 +2522,11 @@ std::string CoreBroker::generateQueryAnswer (const std::string &request)
     {
         return getIdentifier ();
     }
+    if ((request == "queries")||(request=="available_queries"))
+    {
+        return "[isinit;isconnected;name;address;queries;address;counts;summary;federates;brokers;inputs;endpoints;"
+               "publications;filters;federate_map;dependency_graph;dependencies;dependson;dependents]";
+    }
     if (request == "address")
     {
         return getAddress ();
@@ -2845,7 +2867,7 @@ void CoreBroker::processQuery (const ActionMessage &m)
         queryResp.dest_id = m.source_id;
         queryResp.source_id = global_broker_id_local;
         queryResp.messageID = m.messageID;
-        queryResp.payload = getNameList (std::move (m.payload));
+        queryResp.payload = getNameList (m.payload);
         if (queryResp.dest_id == global_broker_id_local)
         {
             ActiveQueries.setDelayedValue (m.messageID, queryResp.payload);

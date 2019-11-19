@@ -1,0 +1,49 @@
+name: Generate SWIG Interfaces
+
+on:
+  push:
+    branches: 
+      - master
+      - develop
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+    container:
+      image: helics/buildenv:interface-gen
+    
+    steps:
+    - uses: actions/checkout@v1
+    - name: Run SWIG
+      run: |
+        mkdir build_matlab
+        pushd build_matlab
+        cmake -DBUILD_MATLAB_INTERFACE=ON -DHELICS_SWIG_GENERATE_INTERFACE_FILES_ONLY=ON -DHELICS_OVERWRITE_INTERFACE_FILES=ON -DHELICS_BUILD_EXAMPLES=OFF -DENABLE_ZMQ_CORE=OFF -DHELICS_BUILD_TESTS=OFF -DHELICS_BUILD_APP_EXECUTABLES=OFF -DHELICS_DISABLE_BOOST=ON -DHELICS_ENABLE_SWIG=ON -DSWIG_EXECUTABLE=/root/swig-matlab/bin/swig ..
+        make -j2 mfile_overwrite
+        popd
+        mkdir build_interface
+        pushd build_interface
+        cmake -DBUILD_PYTHON_INTERFACE=ON -DBUILD_JAVA_INTERFACE=ON -DHELICS_SWIG_GENERATE_INTERFACE_FILES_ONLY=ON -DHELICS_OVERWRITE_INTERFACE_FILES=ON -DHELICS_BUILD_EXAMPLES=OFF -DENABLE_ZMQ_CORE=OFF -DHELICS_BUILD_TESTS=OFF -DHELICS_BUILD_APP_EXECUTABLES=OFF -DHELICS_DISABLE_BOOST=ON -DHELICS_ENABLE_SWIG=ON ..
+        make -j2 pyfile_overwrite
+        make -j2 javafile_overwrite
+        popd
+    - name: Stage changed interface files
+      shell: bash --noprofile --norc {0}
+      run: |
+        git diff --name-only | grep -E 'interfaces/*'
+        if [[ "$?" == "0" ]];
+        then
+          git add interfaces/
+        fi
+        exit 0
+    - uses: ./.github/actions/create-file-update-pr
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        COMMIT_MSG: "Automated update to SWIG generated interface files"
+        PR_TITLE: "Automated update to SWIG generated interface files"
+        PR_BODY: "Automated update to SWIG generated interface files from commit https://github.com/${{ github.repository }}/commit/${{ github.sha }}."
+        GIT_EMAIL: "HELICS-bot@users.noreply.github.com"
+        GIT_NAME: "HELICS-bot"
+        BRANCH_PREFIX: "swig-gen/"

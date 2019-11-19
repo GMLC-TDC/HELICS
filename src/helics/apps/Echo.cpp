@@ -50,7 +50,9 @@ Echo::Echo (const std::string &name, const std::shared_ptr<Core> &core, const Fe
 {
 }
 
-Echo::Echo (const std::string &name, const std::string &jsonString): App (name, jsonString)
+Echo::Echo (const std::string &name, CoreApp &core, const FederateInfo &fi) : App (name, core, fi) {}
+
+Echo::Echo (const std::string &name, const std::string &jsonString) : App (name, jsonString)
 {
     Echo::loadJsonFile (jsonString);
 }

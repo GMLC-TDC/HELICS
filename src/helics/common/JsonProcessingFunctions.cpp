@@ -6,6 +6,8 @@ SPDX-License-Identifier: BSD-3-Clause
 */
 
 #include "JsonProcessingFunctions.hpp"
+#include "../utilities/timeStringOps.hpp"
+#include "../core/helics-time.hpp"
 #include <fstream>
 #include <sstream>
 
@@ -66,7 +68,7 @@ helics::Time loadJsonTime (const Json::Value &timeElement, time_units defaultUni
     {
         if (timeElement.isMember ("units"))
         {
-            defaultUnits = helics::timeUnitsFromString (timeElement["units"].asString ());
+            defaultUnits = gmlc::utilities::timeUnitsFromString (timeElement["units"].asString ());
         }
         if (timeElement.isMember ("value"))
         {
@@ -76,20 +78,18 @@ helics::Time loadJsonTime (const Json::Value &timeElement, time_units defaultUni
             }
             return helics::Time (timeElement["value"].asDouble () * toSecondMultiplier (defaultUnits));
         }
+        return helics::Time::minVal ();
     }
-    else if (timeElement.isInt64 ())
+    if (timeElement.isInt64 ())
     {
         return helics::Time (timeElement.asInt64 (), defaultUnits);
     }
-    else if (timeElement.isDouble ())
+    if (timeElement.isDouble ())
     {
         return helics::Time (timeElement.asDouble () * toSecondMultiplier (defaultUnits));
     }
-    else
-    {
-        return helics::loadTimeFromString (timeElement.asString ());
-    }
-    return helics::Time::minVal ();
+    return gmlc::utilities::loadTimeFromString<helics::Time> (timeElement.asString ());
+    
 }
 
 std::string getKey (const Json::Value &element)
@@ -104,10 +104,9 @@ std::string generateJsonString (const Json::Value &block)
     Json::StreamWriterBuilder builder;
     builder["commentStyle"] = "None";
     builder["indentation"] = "   ";  // or whatever you like
-    auto writer = builder.newStreamWriter ();
+    auto writer = std::unique_ptr<Json::StreamWriter>(builder.newStreamWriter ());
     std::stringstream sstr;
     writer->write (block, &sstr);
     auto ret = sstr.str ();
-    delete writer;
     return ret;
 }

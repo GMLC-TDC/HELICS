@@ -22,6 +22,8 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "gmlc/utilities/base64.h"
 #include "gmlc/utilities/stringOps.h"
 
+#include "gmlc/utilities/timeStringOps.hpp"
+
 /** test if a string has a base64 wrapper*/
 static int hasB64Wrapper (const std::string &str);
 /** function to decode data strings for messages*/
@@ -80,30 +82,32 @@ std::unique_ptr<helicsCLI11App> Player::generateParser ()
     app->add_option ("--marker", nextPrintTimeStep,
                      "print a statement indicating time advancement every <arg> period during the simulation");
     app
-      ->add_option ("--datatype",
-                    [this](CLI::results_t res) {
-                        defType = helics::getTypeFromString (res[0]);
-                        return (defType != helics::data_type::helics_custom);
-                    },
-                    "type of the publication data type to use", false)
+      ->add_option (
+        "--datatype",
+        [this] (CLI::results_t res) {
+            defType = helics::getTypeFromString (res[0]);
+            return (defType != helics::data_type::helics_custom);
+        },
+        "type of the publication data type to use", false)
       ->take_last ()
       ->ignore_underscore ();
 
     app
-      ->add_option ("--time_units",
-                    [this](CLI::results_t res) {
-                        try
-                        {
-                            units = timeUnitsFromString (res[0]);
-                            timeMultiplier = toSecondMultiplier (units);
-                            return true;
-                        }
-                        catch (...)
-                        {
-                            return false;
-                        }
-                    },
-                    "the default units on the timestamps used in file based input", false)
+      ->add_option (
+        "--time_units",
+        [this] (CLI::results_t res) {
+            try
+            {
+                units = gmlc::utilities::timeUnitsFromString (res[0]);
+                timeMultiplier = toSecondMultiplier (units);
+                return true;
+            }
+            catch (...)
+            {
+                return false;
+            }
+        },
+        "the default units on the timestamps used in file based input", false)
       ->take_last ()
       ->ignore_underscore ();
 
@@ -117,6 +121,11 @@ Player::Player (const std::string &appName, const FederateInfo &fi) : App (appNa
 
 Player::Player (const std::string &appName, const std::shared_ptr<Core> &core, const FederateInfo &fi)
     : App (appName, core, fi)
+{
+    fed->setFlagOption (helics_flag_source_only);
+}
+
+Player::Player (const std::string &appName, CoreApp &core, const FederateInfo &fi) : App (appName, core, fi)
 {
     fed->setFlagOption (helics_flag_source_only);
 }
@@ -164,7 +173,7 @@ helics::Time Player::extractTime (const std::string &str, int lineNumber) const
         }
         return loadTimeFromString (str, units);
     }
-    catch (const std::invalid_argument &ia)
+    catch (const std::invalid_argument &)
     {
         std::cerr << "ill formed time on line " << lineNumber << '\n';
         return helics::Time::minVal ();
@@ -347,7 +356,7 @@ void Player::loadTextFile (const std::string &filename)
                 }
                 if (pIndex > 0)
                 {
-                    points[pIndex].pubName = points[static_cast<size_t>(pIndex) - 1].pubName;
+                    points[pIndex].pubName = points[static_cast<size_t> (pIndex) - 1].pubName;
                 }
                 else
                 {
@@ -378,7 +387,7 @@ void Player::loadTextFile (const std::string &filename)
                 }
                 if ((blk[1].empty ()) && (pIndex > 0))
                 {
-                    points[pIndex].pubName = points[static_cast<size_t>(pIndex) - 1].pubName;
+                    points[pIndex].pubName = points[static_cast<size_t> (pIndex) - 1].pubName;
                 }
                 else
                 {
@@ -409,7 +418,7 @@ void Player::loadTextFile (const std::string &filename)
                 }
                 if ((blk[1].empty ()) && (pIndex > 0))
                 {
-                    points[pIndex].pubName = points[static_cast<size_t>(pIndex) - 1].pubName;
+                    points[pIndex].pubName = points[static_cast<size_t> (pIndex) - 1].pubName;
                 }
                 else
                 {

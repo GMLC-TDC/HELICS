@@ -156,13 +156,13 @@ int ZmqCommsSS::replyToIncomingMessage (zmq::message_t &msg, zmq::socket_t &sock
         }
         auto reply = generateReplyToIncomingMessage (M);
         auto str = reply.to_string ();
-        sock.send (str.data (), str.size ());
+        sock.send (str);
         return 0;
     }
     ActionCallback (std::move (M));
     ActionMessage resp (CMD_PRIORITY_ACK);
     auto str = resp.to_string ();
-    sock.send (str.data (), str.size ());
+    sock.send (str);
     return 0;
 }
 
@@ -209,7 +209,7 @@ int ZmqCommsSS::initializeBrokerConnections (zmq::socket_t &brokerSocket, zmq::s
         cmessage.name = name;
         cmessage.payload = getAddress ();
         cmessage.to_vector (buffer);
-        brokerConnection.send (buffer.data (), buffer.size (), ZMQ_NOBLOCK);
+        brokerConnection.send (zmq::const_buffer (buffer.data (), buffer.size ()), zmq::send_flags::dontwait);
     }
     return 0;
 }
@@ -331,7 +331,6 @@ void ZmqCommsSS::queue_tx_function ()
 
     setRxStatus (connection_status::connected);
 
-    bool close_tx = false;
     int status = 0;
 
     bool haltLoop{false};
@@ -361,7 +360,7 @@ void ZmqCommsSS::queue_tx_function ()
                 if (rid == control_route)
                 {
                     processed = true;
-                    close_tx = processTxControlCmd (cmd, routes, connection_info);
+                    auto close_tx = processTxControlCmd (cmd, routes, connection_info);
 
                     if (close_tx)
                     {
@@ -379,7 +378,8 @@ void ZmqCommsSS::queue_tx_function ()
                     if (hasBroker)
                     {
                         std::string empty;
-                        brokerConnection.send (buffer.data (), buffer.size (), ZMQ_NOBLOCK);
+                        brokerConnection.send (zmq::const_buffer (buffer.data (), buffer.size ()),
+                                               zmq::send_flags::dontwait);
                     }
                     else
                     {
@@ -404,16 +404,18 @@ void ZmqCommsSS::queue_tx_function ()
                         std::string route_name = rt_find->second;
                         std::string empty;
                         // Need to first send identity and empty string
-                        brokerSocket.send (route_name.c_str (), route_name.size (), ZMQ_SNDMORE);
-                        brokerSocket.send (empty.c_str (), empty.size (), ZMQ_SNDMORE);
+                        brokerSocket.send (route_name, zmq::send_flags::sndmore);
+                        brokerSocket.send (empty, zmq::send_flags::sndmore);
                         // Send the actual data
-                        brokerSocket.send (buffer.data (), buffer.size (), ZMQ_NOBLOCK);
+                        brokerSocket.send (zmq::const_buffer (buffer.data (), buffer.size ()),
+                                           zmq::send_flags::dontwait);
                     }
                     else
                     {
                         if (hasBroker)
                         {
-                            brokerConnection.send (buffer.data (), buffer.size (), ZMQ_NOBLOCK);
+                            brokerConnection.send (zmq::const_buffer (buffer.data (), buffer.size ()),
+                                                   zmq::send_flags::dontwait);
                         }
                         else
                         {
@@ -489,13 +491,13 @@ int ZmqCommsSS::processRxMessage (zmq::socket_t &brokerSocket,
 
     if (serverMode)
     {
-        brokerSocket.recv (&msg1);
-        brokerSocket.recv (&msg2);
+        brokerSocket.recv (msg1);
+        brokerSocket.recv (msg2);
     }
     else
     {
-        brokerConnection.recv (&msg1);
-        brokerConnection.recv (&msg2);
+        brokerConnection.recv (msg1);
+        brokerConnection.recv (msg2);
     }
     status = processIncomingMessage (msg2, connection_info);
 

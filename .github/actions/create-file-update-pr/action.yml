@@ -1,0 +1,5 @@
+name: 'Create File Update PR'
+description: 'Pushes a new branch with changed files and opens a PR for updating the changed files in the base branch'
+runs:
+  using: 'docker'
+  image: 'Dockerfile'

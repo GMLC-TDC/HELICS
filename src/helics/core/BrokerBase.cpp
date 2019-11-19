@@ -7,7 +7,6 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include "BrokerBase.hpp"
 
-#include "../common/AsioContextManager.h"
 #include "../common/logger.h"
 #include "helicsCLI11.hpp"
 
@@ -17,7 +16,16 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "gmlc/libguarded/guarded.hpp"
 #include "gmlc/utilities/stringOps.h"
 #include "loggingHelper.hpp"
-#include <asio/steady_timer.hpp>
+#ifndef HELICS_DISABLE_ASIO
+#    include "../common/AsioContextManager.h"
+#    include <asio/steady_timer.hpp>
+#else
+#    ifdef _WIN32
+#        include <windows.h>
+#    else
+#    endif
+#endif
+
 #include <iostream>
 
 static inline std::string genId ()
@@ -308,7 +316,7 @@ void BrokerBase::setLogLevels (int32_t consoleLevel, int32_t fileLevel)
 {
     consoleLogLevel = consoleLevel;
     fileLogLevel = fileLevel;
-    maxLogLevel = std::max (consoleLogLevel, fileLogLevel);
+    maxLogLevel = (std::max)(consoleLogLevel, fileLogLevel);
     if (loggingObj)
     {
         loggingObj->changeLevels (consoleLogLevel, fileLogLevel);
@@ -340,7 +348,7 @@ void BrokerBase::addActionMessage (ActionMessage &&m)
         actionQueue.emplace (std::move (m));
     }
 }
-
+#ifndef HELICS_DISABLE_ASIO
 using activeProtector = gmlc::libguarded::guarded<std::pair<bool, bool>>;
 
 static void haltTimer (activeProtector &active, asio::steady_timer &tickTimer)
@@ -379,7 +387,7 @@ static void timerTickHandler (BrokerBase *bbase, activeProtector &active, const 
             }
             catch (std::exception &e)
             {
-                std::cout << "exception caught from addActionMessage" << std::endl;
+                std::cerr << "exception caught from addActionMessage" << e.what () << std::endl;
             }
         }
         else
@@ -392,6 +400,8 @@ static void timerTickHandler (BrokerBase *bbase, activeProtector &active, const 
     p->second = false;
 }
 
+#endif
+
 bool BrokerBase::tryReconnect () { return false; }
 
 //#define DISABLE_TICK
@@ -403,7 +413,7 @@ void BrokerBase::queueProcessingLoop ()
         return;
     }
     std::vector<ActionMessage> dumpMessages;
-
+	#ifndef HELICS_DISABLE_ASIO
     auto serv = AsioContextManager::getContextPointer ();
     auto contextLoop = serv->startContextLoop ();
     asio::steady_timer ticktimer (serv->getBaseContext ());
@@ -420,6 +430,7 @@ void BrokerBase::queueProcessingLoop ()
         ticktimer.expires_at (std::chrono::steady_clock::now () + tickTimer.to_ns ());
         ticktimer.async_wait (timerCallback);
     }
+	#endif
     global_broker_id_local = global_id.load ();
     int messagesSinceLastTick = 0;
     auto logDump = [&, this]() {
@@ -435,8 +446,10 @@ void BrokerBase::queueProcessingLoop ()
     };
     if (haltOperations)
     {
+		#ifndef HELICS_DISABLE_ASIO
         haltTimer (active, ticktimer);
         contextLoop = nullptr;
+		#endif
         mainLoopIsRunning.store (false);
         return;
     }
@@ -462,8 +475,10 @@ void BrokerBase::queueProcessingLoop ()
         case CMD_TICK:
             if (checkActionFlag (command, error_flag))
             {
+				#ifndef HELICS_DISABLE_ASIO
                 contextLoop = nullptr;
                 contextLoop = serv->startContextLoop ();
+				#endif
             }
             if (messagesSinceLastTick == 0 || forwardTick)
             {
@@ -474,9 +489,11 @@ void BrokerBase::queueProcessingLoop ()
             }
             messagesSinceLastTick = 0;
             // reschedule the timer
+			#ifndef HELICS_DISABLE_ASIO
             ticktimer.expires_at (std::chrono::steady_clock::now () + tickTimer.to_ns ());
             active = std::make_pair (true, true);
             ticktimer.async_wait (timerCallback);
+			#endif
             break;
         case CMD_PING:
             // ping is processed normally but doesn't count as an actual message for timeout purposes unless it
@@ -491,8 +508,10 @@ void BrokerBase::queueProcessingLoop ()
         default:
             break;
         case CMD_TERMINATE_IMMEDIATELY:
+			#ifndef HELICS_DISABLE_ASIO
             haltTimer (active, ticktimer);
             contextLoop = nullptr;
+			#endif
             mainLoopIsRunning.store (false);
             logDump ();
             {
@@ -509,8 +528,10 @@ void BrokerBase::queueProcessingLoop ()
             }
             return;  // immediate return
         case CMD_STOP:
+			#ifndef HELICS_DISABLE_ASIO
             haltTimer (active, ticktimer);
             contextLoop = nullptr;
+			#endif
             if (!haltOperations)
             {
                 processCommand (std::move (command));

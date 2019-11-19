@@ -6,6 +6,7 @@ SPDX-License-Identifier: BSD-3-Clause
 */
 #pragma once
 
+#include "Core.hpp"
 #include "core-types.hpp"
 #include <chrono>
 #include <memory>
@@ -14,7 +15,6 @@ SPDX-License-Identifier: BSD-3-Clause
 
 namespace helics
 {
-class Core;
 /**
  * Factory for building Core API instances.
  */
@@ -131,6 +131,9 @@ size_t cleanUpCores (std::chrono::milliseconds delay);
 @return true if the copyFromName was found and the copy successful
  */
 bool copyCoreIdentifier (const std::string &copyFromName, const std::string &copyToName);
+
+/** display the help listing for a particular core_type*/
+void displayHelp (core_type type = core_type::UNRECOGNIZED);
 }  // namespace CoreFactory
 
 }  // namespace helics

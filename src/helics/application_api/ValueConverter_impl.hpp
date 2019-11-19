@@ -15,19 +15,19 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <algorithm>
 #include <array>
 #include <cassert>
-#include <cereal/archives/portable_binary.hpp>
-#include <cereal/cereal.hpp>
-#include <cereal/types/complex.hpp>
-#include <cereal/types/utility.hpp>
-#include <cereal/types/vector.hpp>
 #include <complex>
 #include <cstring>
+#include <helics/external/cereal/archives/portable_binary.hpp>
+#include <helics/external/cereal/cereal.hpp>
+#include <helics/external/cereal/types/complex.hpp>
+#include <helics/external/cereal/types/utility.hpp>
+#include <helics/external/cereal/types/vector.hpp>
 #include <iterator>
 #include <stdexcept>
 #include <type_traits>
 #include <utility>
-//#include <cereal/archives/binary.hpp>
-#include <cereal/types/string.hpp>
+//#include <helics/external/cereal/archives/binary.hpp>
+#include <helics/external/cereal/types/string.hpp>
 
 using archiver = cereal::PortableBinaryOutputArchive;
 
@@ -81,26 +81,33 @@ class membuf : public std::streambuf
     int_type underflow ()
     {
         if (current_ == end_)
+        {
             return traits_type::eof ();
+        }
 
         return traits_type::to_int_type (*current_);
     }
     int_type uflow ()
     {
         if (current_ == end_)
+        {
             return traits_type::eof ();
+        }
 
         return traits_type::to_int_type (*current_++);
     }
     int_type pbackfail (int_type ch)
     {
         if (current_ == begin_ || (ch != traits_type::eof () && ch != current_[-1]))
+        {
             return traits_type::eof ();
+        }
 
         return traits_type::to_int_type (*--current_);
     }
     std::streamsize showmanyc () { return end_ - current_; }
 
+  public:
     // copy ctor and assignment not implemented;
     // copying not allowed
     membuf (const membuf &) = delete;
@@ -127,7 +134,7 @@ class ostringbuf : public std::streambuf
     ostringbuf ()
     {
         char *base = abuf_.data ();
-        setp (base, base + 63);  // one less than the buffer size
+        setp (base, base + bufsize - 1);  // one less than the buffer size
     }
     /** reserve a size of the buffer*/
     void reserve (size_t size) { sbuf_.reserve (size); }
@@ -144,7 +151,7 @@ class ostringbuf : public std::streambuf
     {
         sbuf_.append (pbase (), pptr ());
         std::ptrdiff_t n = pptr () - pbase ();
-        pbump (-n);
+        pbump (static_cast<int> (-n));
     }
 
   private:
@@ -152,7 +159,7 @@ class ostringbuf : public std::streambuf
     {
         if (ch != traits_type::eof ())
         {
-            *pptr () = ch;
+            *pptr () = static_cast<char> (ch);
             pbump (1);  // always safe due to buffer at 1 space reserved
             move_to_string_and_flush ();
             return ch;
@@ -172,7 +179,8 @@ class ostringbuf : public std::streambuf
     ostringbuf &operator= (const ostringbuf &) = delete;
 
   private:
-    std::array<char, 64> abuf_;
+    static constexpr size_t bufsize = 64;
+    std::array<char, bufsize> abuf_;
     std::string sbuf_;
 };
 
@@ -205,7 +213,7 @@ void ValueConverter<X>::convert (const X *vals, size_t size, data_block &store)
 {
     detail::ostringbufstream s;
     archiver oa (s);
-    oa (cereal::make_size_tag (static_cast<cereal::size_type>(size)));  // number of elements
+    oa (cereal::make_size_tag (static_cast<cereal::size_type> (size)));  // number of elements
     for (size_t ii = 0; ii < size; ++ii)
     {
         oa (vals[ii]);

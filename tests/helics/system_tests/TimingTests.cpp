@@ -15,6 +15,8 @@ the top-level NOTICE for additional details. All rights reserved. SPDX-License-I
 #include "../application_api/testFixtures.hpp"
 #include "helics/helics.hpp"
 
+#include "helics/helics-config.h"
+
 struct timing_tests : public FederateTestFixture, public ::testing::Test
 {
 };

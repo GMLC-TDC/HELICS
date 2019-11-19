@@ -39,7 +39,10 @@ extern "C"
         helics_core_type_nng = 9, /*!< for using the nanomsg communications */
         helics_core_type_tcp_ss =
           11, /*!< a single socket version of the TCP core for more easily handling firewalls*/
-        helics_core_type_http = 12 /*!< a core type using http for communication*/
+        helics_core_type_http = 12, /*!< a core type using http for communication*/
+        helics_core_type_websocket = 14, /*!< a core using websockets for communication*/
+        helics_core_type_inproc = 18 /*!< an in process core type for handling communications in shared memory
+                                   it is pretty similar to the test core but stripped from the "test" components*/
     } helics_core_type;
 
     /** enumeration of allowable data types for publications and inputs*/

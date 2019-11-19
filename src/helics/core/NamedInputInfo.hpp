@@ -8,7 +8,7 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include "basic_core_types.hpp"
 
-#include <utility>
+#include <tuple>
 #include <vector>
 
 namespace helics
@@ -29,7 +29,7 @@ class NamedInputInfo
             : time (recordTime), data (std::move (recordData))
         {
         }
-        dataRecord (Time recordTime, int recordIteration, std::shared_ptr<const data_block> recordData)
+        dataRecord (Time recordTime, unsigned int recordIteration, std::shared_ptr<const data_block> recordData)
             : time (recordTime), iteration (recordIteration), data (std::move (recordData))
         {
         }
@@ -61,7 +61,8 @@ class NamedInputInfo
     std::vector<dataRecord> current_data;  //!< the most recent published data
     std::vector<global_handle> input_sources;  //!< the sources of the input signals
     std::vector<Time> deactivated;
-    std::vector<std::pair<std::string, std::string>> source_types;  //!< the type and units of the sources
+    std::vector<std::tuple<std::string, std::string, std::string>>
+      source_info;  //!< the name,type,units of the sources
   private:
     std::vector<std::vector<dataRecord>> data_queues;  //!< queue of the data
 
@@ -97,9 +98,14 @@ class NamedInputInfo
     /** get the event based on the event queue*/
     Time nextValueTime () const;
     /** add a new source target to the input*/
-    void addSource (global_handle newSource, const std::string &stype, const std::string &sunits);
+    void addSource (global_handle newSource,
+                    const std::string &sourceName,
+                    const std::string &stype,
+                    const std::string &sunits);
     /** remove a source */
     void removeSource (global_handle sourceToRemove, Time minTime);
+    /** remove a source */
+    void removeSource (const std::string &sourceName, Time minTime);
     /** clear all non-current data*/
     void clearFutureData ();
 

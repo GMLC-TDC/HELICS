@@ -7,6 +7,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "../common/loggerCore.hpp"
 #include "../core/BrokerFactory.hpp"
 #include "../core/CoreFactory.hpp"
+#include "../core/coreTypeOperations.hpp"
 #include "../helics.hpp"
 #include "helics.h"
 #include "internal/api_objects.h"
@@ -55,8 +56,8 @@ helics_bool helicsIsCoreTypeAvailable (const char *type)
     {
         return helics_false;
     }
-    auto coreType = helics::coreTypeFromString (type);
-    return (helics::isCoreTypeAvailable (coreType)) ? helics_true : helics_false;
+    auto coreType = helics::core::coreTypeFromString (type);
+    return (helics::core::isCoreTypeAvailable (coreType)) ? helics_true : helics_false;
 }
 
 // random integer for validation purposes of endpoints
@@ -315,7 +316,7 @@ void helicsFederateInfoSetCoreTypeFromString (helics_federate_info fi, const cha
         }
         else
         {
-            hfi->coreType = helics::coreTypeFromString (coretype);
+            hfi->coreType = helics::core::coreTypeFromString (coretype);
         }
     }
     catch (...)
@@ -365,14 +366,7 @@ void helicsFederateInfoSetBrokerPort (helics_federate_info fi, int brokerPort, h
     {
         return;
     }
-    try
-    {
-        hfi->brokerPort = brokerPort;
-    }
-    catch (...)
-    {
-        return helicsErrorHandler (err);
-    }
+    hfi->brokerPort = brokerPort;
 }
 
 void helicsFederateInfoSetLocalPort (helics_federate_info fi, const char *localPort, helics_error *err)
@@ -382,14 +376,7 @@ void helicsFederateInfoSetLocalPort (helics_federate_info fi, const char *localP
     {
         return;
     }
-    try
-    {
-        hfi->localport = AS_STRING (localPort);
-    }
-    catch (...)
-    {
-        return helicsErrorHandler (err);
-    }
+    hfi->localport = AS_STRING (localPort);
 }
 
 int helicsGetPropertyIndex (const char *val)
@@ -559,7 +546,7 @@ helics_core helicsCreateCore (const char *type, const char *name, const char *in
         return nullptr;
     }
 
-    helics::core_type ct = (type != nullptr) ? helics::coreTypeFromString (type) : helics::core_type::DEFAULT;
+    helics::core_type ct = (type != nullptr) ? helics::core::coreTypeFromString (type) : helics::core_type::DEFAULT;
 
     if (ct == helics::core_type::UNRECOGNIZED)
     {
@@ -594,7 +581,7 @@ helics_core helicsCreateCoreFromArgs (const char *type, const char *name, int ar
     {
         return nullptr;
     }
-    helics::core_type ct = (type != nullptr) ? helics::coreTypeFromString (type) : helics::core_type::DEFAULT;
+    helics::core_type ct = (type != nullptr) ? helics::core::coreTypeFromString (type) : helics::core_type::DEFAULT;
 
     if (ct == helics::core_type::UNRECOGNIZED)
     {
@@ -689,7 +676,7 @@ helics_broker helicsCreateBroker (const char *type, const char *name, const char
     {
         return nullptr;
     }
-    helics::core_type ct = (type != nullptr) ? helics::coreTypeFromString (type) : helics::core_type::DEFAULT;
+    helics::core_type ct = (type != nullptr) ? helics::core::coreTypeFromString (type) : helics::core_type::DEFAULT;
 
     if (ct == helics::core_type::UNRECOGNIZED)
     {
@@ -723,7 +710,7 @@ helics_broker helicsCreateBrokerFromArgs (const char *type, const char *name, in
     {
         return nullptr;
     }
-    helics::core_type ct = (type != nullptr) ? helics::coreTypeFromString (type) : helics::core_type::DEFAULT;
+    helics::core_type ct = (type != nullptr) ? helics::core::coreTypeFromString (type) : helics::core_type::DEFAULT;
 
     if (ct == helics::core_type::UNRECOGNIZED)
     {
@@ -852,7 +839,7 @@ void helicsBrokerSetGlobal (helics_broker broker, const char *valueName, const c
     brk->setGlobal (valueName, AS_STRING (value));
 }
 
-void helicsBrokerSetLogFile(helics_broker broker, const char *logFileName, helics_error *err)
+void helicsBrokerSetLogFile (helics_broker broker, const char *logFileName, helics_error *err)
 {
     auto brk = getBroker (broker, err);
     if (brk == nullptr)
@@ -900,6 +887,23 @@ void helicsBrokerAddDestinationFilterToEndpoint (helics_broker broker, const cha
     brk->addDestinationFilterToEndpoint (filter, endpoint);
 }
 
+void helicsBrokerMakeConnections (helics_broker broker, const char *file, helics_error *err)
+{
+    auto brk = getBroker (broker, err);
+    if (brk == nullptr)
+    {
+        return;
+    }
+    try
+    {
+        brk->makeConnections (AS_STRING (file));
+	}
+    catch (...)
+    {
+        helicsErrorHandler (err);
+    }
+}
+
 void helicsCoreAddSourceFilterToEndpoint (helics_core core, const char *filter, const char *endpoint, helics_error *err)
 {
     auto cr = getCore (core, err);
@@ -936,6 +940,23 @@ void helicsCoreAddDestinationFilterToEndpoint (helics_core core, const char *fil
         return;
     }
     cr->addDestinationFilterToEndpoint (filter, endpoint);
+}
+
+void helicsCoreMakeConnections (helics_core core, const char *file, helics_error *err)
+{
+    auto cr = getCore (core, err);
+    if (cr == nullptr)
+    {
+        return;
+    }
+    try
+    {
+        cr->makeConnections (AS_STRING (file));
+    }
+    catch (...)
+    {
+        helicsErrorHandler (err);
+    }
 }
 
 helics_bool helicsCoreIsConnected (helics_core core)
@@ -1059,14 +1080,13 @@ helics_bool helicsBrokerWaitForDisconnect (helics_broker broker, int msToWait, h
     {
         return helics_true;
     }
-    bool res=brk->waitForDisconnect (std::chrono::milliseconds (msToWait));
+    bool res = brk->waitForDisconnect (std::chrono::milliseconds (msToWait));
     return res ? helics_true : helics_false;
 }
 
-
 helics_bool helicsCoreWaitForDisconnect (helics_core core, int msToWait, helics_error *err)
 {
-    auto cr = getCore(core, err);
+    auto cr = getCore (core, err);
     if (cr == nullptr)
     {
         return helics_true;
@@ -1165,7 +1185,7 @@ void helicsCloseLibrary (void)
 {
     using namespace std::literals::chrono_literals;
     clearAllObjects ();
-    auto ret = std::async (std::launch::async, [] () { helics::CoreFactory::cleanUpCores (2000ms); });
+    auto ret = std::async (std::launch::async, []() { helics::CoreFactory::cleanUpCores (2000ms); });
     helics::BrokerFactory::cleanUpBrokers (2000ms);
     ret.get ();
 
@@ -1438,7 +1458,7 @@ void MasterObjectHolder::clearBroker (int index)
         (*broker)[index] = nullptr;
         if (broker->size () > 10)
         {
-            if (std::none_of (broker->begin (), broker->end (), [] (const auto &brk) { return static_cast<bool> (brk); }))
+            if (std::none_of (broker->begin (), broker->end (), [](const auto &brk) { return static_cast<bool> (brk); }))
             {
                 broker->clear ();
             }
@@ -1455,7 +1475,7 @@ void MasterObjectHolder::clearCore (int index)
         (*core)[index] = nullptr;
         if (core->size () > 10)
         {
-            if (std::none_of (core->begin (), core->end (), [] (const auto &cr) { return static_cast<bool> (cr); }))
+            if (std::none_of (core->begin (), core->end (), [](const auto &cr) { return static_cast<bool> (cr); }))
             {
                 core->clear ();
             }
@@ -1472,7 +1492,7 @@ void MasterObjectHolder::clearFed (int index)
         (*fed)[index] = nullptr;
         if (fed->size () > 10)
         {
-            if (std::none_of (fed->begin (), fed->end (), [] (const auto &fd) { return static_cast<bool> (fd); }))
+            if (std::none_of (fed->begin (), fed->end (), [](const auto &fd) { return static_cast<bool> (fd); }))
             {
                 fed->clear ();
             }

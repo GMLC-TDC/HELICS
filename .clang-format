@@ -12,6 +12,7 @@ BreakBeforeBinaryOperators: false
 BreakBeforeBraces: Allman
 BreakBeforeTernaryOperators: false
 BreakConstructorInitializersBeforeComma: false
+IndentPPDirectives: AfterHash
 ColumnLimit: 115
 CommentPragmas: ''
 KeepEmptyLinesAtTheStartOfBlocks: false

@@ -12,6 +12,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <vector>
 
 #include "../core/core-data.hpp"
+#include "helics_cxx_export.h"
 /** @file
 @details basic type information and control for HELICS
 */
@@ -96,8 +97,8 @@ namespace std
 template <typename BaseType, helics::identifiers ID, BaseType invalidValue>
 struct hash<helics::identifier_id_t<BaseType, ID, invalidValue>>
 {
-    using argument_type = helics::identifier_id_t<BaseType, ID, invalidValue>; //!< the type of object to hash
-    using result_type = std::size_t; //!< the result type of the hash code
+    using argument_type = helics::identifier_id_t<BaseType, ID, invalidValue>;  //!< the type of object to hash
+    using result_type = std::size_t;  //!< the result type of the hash code
     /** the actual hash operator*/
     result_type operator() (argument_type const &key) const noexcept
     {
@@ -120,23 +121,23 @@ class NamedPoint
     std::string name;  //!< the text value for the named point
     double value = std::numeric_limits<double>::quiet_NaN ();  //!< the data value for the named point
     /** default constructor*/
-	NamedPoint () = default;
+    NamedPoint () = default;
     /** construct directly from name value*/
     NamedPoint (std::string valname, double valval) : name (std::move (valname)), value (valval) {}
     /** equality operator
-	@details if either value is nan it check only the string
-	otherwise it checks the name and value
-	@return true if the objects are equivalent*/
-	bool operator== (const NamedPoint &np) const
+    @details if either value is nan it check only the string
+    otherwise it checks the name and value
+    @return true if the objects are equivalent*/
+    bool operator== (const NamedPoint &np) const
     {
         return ((std::isnan (value)) && (std::isnan (np.value))) ? (name == np.name) :
                                                                    ((value == np.value) && (name == np.name));
     }
     bool operator!= (const NamedPoint &np) const { return !operator== (np); }
-    /** less than operator 
-	@details checks by name order, then value order
-	*/
-	bool operator< (const NamedPoint &np) const
+    /** less than operator
+    @details checks by name order, then value order
+    */
+    bool operator< (const NamedPoint &np) const
     {
         return (name == np.name) ? (name < np.name) : (value < np.value);
     }
@@ -246,7 +247,6 @@ template <>
 inline constexpr const char *typeNameString<int64_t> ()
 {
     return typestrings::i64str;
-    ;
 }
 /** for 64 bit unsigned integer*/
 template <>
@@ -301,68 +301,70 @@ inline constexpr bool isRawType (data_type type)
 }
 
 /** sometimes we just need a ref to a string for the basic types*/
-const std::string &typeNameStringRef (data_type type);
+HELICS_CXX_EXPORT const std::string &typeNameStringRef (data_type type);
 
 /** convert a string to a type*/
-data_type getTypeFromString (const std::string &typeName);
+HELICS_CXX_EXPORT data_type getTypeFromString (const std::string &typeName);
 
 /** generate a string representation of a complex number from separate real and imaginary parts*/
-std::string helicsComplexString (double real, double imag);
+HELICS_CXX_EXPORT std::string helicsComplexString (double real, double imag);
 /** generate a string representation of a complex number */
-std::string helicsComplexString (std::complex<double> val);
+HELICS_CXX_EXPORT std::string helicsComplexString (std::complex<double> val);
 /** generate a string representation of a vector
 @details string will look like v[1.02,45]*/
-std::string helicsVectorString (const std::vector<double> &val);
+HELICS_CXX_EXPORT std::string helicsVectorString (const std::vector<double> &val);
 /** generate a string representation of a vector from pointer and size
 @details string will look like v[1.02,45]*/
-std::string helicsVectorString (const double *vals, size_t size);
+HELICS_CXX_EXPORT std::string helicsVectorString (const double *vals, size_t size);
 /** generate a string representation of a complex vector
 @details string will look like cv[1.02+2j,45]*/
-std::string helicsComplexVectorString (const std::vector<std::complex<double>> &val);
+HELICS_CXX_EXPORT std::string helicsComplexVectorString (const std::vector<std::complex<double>> &val);
 /** generate a named point string
 @details string will look like {"<name>":val}
 */
-std::string helicsNamedPointString (const NamedPoint &point);
-std::string helicsNamedPointString (const std::string &pointName, double val);
-std::string helicsNamedPointString (const char *pointName, double val);
+HELICS_CXX_EXPORT std::string helicsNamedPointString (const NamedPoint &point);
+HELICS_CXX_EXPORT std::string helicsNamedPointString (const std::string &pointName, double val);
+HELICS_CXX_EXPORT std::string helicsNamedPointString (const char *pointName, double val);
 /** convert a string to a complex number*/
-std::complex<double> helicsGetComplex (const std::string &val);
+HELICS_CXX_EXPORT std::complex<double> helicsGetComplex (const std::string &val);
 /** convert a string to a vector*/
-std::vector<double> helicsGetVector (const std::string &val);
-void helicsGetVector (const std::string &val, std::vector<double> &data);
+HELICS_CXX_EXPORT std::vector<double> helicsGetVector (const std::string &val);
+HELICS_CXX_EXPORT void helicsGetVector (const std::string &val, std::vector<double> &data);
 
 /** convert a string to a complex vector*/
-std::vector<std::complex<double>> helicsGetComplexVector (const std::string &val);
+HELICS_CXX_EXPORT std::vector<std::complex<double>> helicsGetComplexVector (const std::string &val);
 
 /** convert a string to a complex vector using an existing vector*/
-void helicsGetComplexVector (const std::string &val, std::vector<std::complex<double>> &data);
+HELICS_CXX_EXPORT void helicsGetComplexVector (const std::string &val, std::vector<std::complex<double>> &data);
 
 /** convert a string to a named point*/
-NamedPoint helicsGetNamedPoint (const std::string &val);
+HELICS_CXX_EXPORT NamedPoint helicsGetNamedPoint (const std::string &val);
 /** get a double from a string*/
-double getDoubleFromString (const std::string &val);
+HELICS_CXX_EXPORT double getDoubleFromString (const std::string &val);
 /** get a complex number from a string*/
-std::complex<double> getComplexFromString (const std::string &val);
+HELICS_CXX_EXPORT std::complex<double> getComplexFromString (const std::string &val);
+/** get the boolean value of a string*/
+HELICS_CXX_EXPORT bool helicsBoolValue (const std::string &val);
 /** compute the L2 norm of a vector*/
-double vectorNorm (const std::vector<double> &vec);
+HELICS_CXX_EXPORT double vectorNorm (const std::vector<double> &vec);
 /** compute the L2 norm of a magnitudes of a complex vector*/
-double vectorNorm (const std::vector<std::complex<double>> &vec);
+HELICS_CXX_EXPORT double vectorNorm (const std::vector<std::complex<double>> &vec);
 /** convert a value to a data block to be interpreted using the specified type
 @param type the type used for the data conversion
 @param val a double to convert
 */
-data_block typeConvert (data_type type, double val);
-data_block typeConvert (data_type type, int64_t val);
-data_block typeConvert (data_type type, const char *val);
-data_block typeConvert (data_type type, const std::string &val);
-data_block typeConvert (data_type type, const std::vector<double> &val);
-data_block typeConvert (data_type type, const double *vals, size_t size);
-data_block typeConvert (data_type type, const std::vector<std::complex<double>> &val);
-data_block typeConvert (data_type type, const std::complex<double> &val);
-data_block typeConvert (data_type type, const NamedPoint &val);
-data_block typeConvert (data_type type, const char *str, double val);
-data_block typeConvert (data_type type, const std::string &str, double val);
-data_block typeConvert (data_type type, bool val);
+HELICS_CXX_EXPORT data_block typeConvert (data_type type, double val);
+HELICS_CXX_EXPORT data_block typeConvert (data_type type, int64_t val);
+HELICS_CXX_EXPORT data_block typeConvert (data_type type, const char *val);
+HELICS_CXX_EXPORT data_block typeConvert (data_type type, const std::string &val);
+HELICS_CXX_EXPORT data_block typeConvert (data_type type, const std::vector<double> &val);
+HELICS_CXX_EXPORT data_block typeConvert (data_type type, const double *vals, size_t size);
+HELICS_CXX_EXPORT data_block typeConvert (data_type type, const std::vector<std::complex<double>> &val);
+HELICS_CXX_EXPORT data_block typeConvert (data_type type, const std::complex<double> &val);
+HELICS_CXX_EXPORT data_block typeConvert (data_type type, const NamedPoint &val);
+HELICS_CXX_EXPORT data_block typeConvert (data_type type, const char *str, double val);
+HELICS_CXX_EXPORT data_block typeConvert (data_type type, const std::string &str, double val);
+HELICS_CXX_EXPORT data_block typeConvert (data_type type, bool val);
 
 /** template function for generating a known name of a type*/
 template <class X>
@@ -486,10 +488,13 @@ inline X invalidValue ()
     return X ();
 }
 
+/// defined constant for an invalid value as a double
+constexpr double invalidDouble = -1e48;
+
 template <>
 constexpr double invalidValue<double> ()
 {
-    return -1e48;
+    return invalidDouble;
 }
 
 template <>
@@ -521,7 +526,7 @@ constexpr std::complex<double> invalidValue<std::complex<double>> ()
 {
     return {invalidValue<double> (), 0.0};
 }
-
+/// Helper template to remove const volatile references
 template <typename T>
 using remove_cv_ref = std::remove_cv_t<std::remove_reference_t<T>>;
 

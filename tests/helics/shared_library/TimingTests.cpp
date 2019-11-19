@@ -10,7 +10,6 @@ SPDX-License-Identifier: BSD-3-Clause
 /** these test cases test out the value converters
  */
 #include "ctestFixtures.hpp"
-#include "helics/helics.hpp"
 
 struct timing_tests : public FederateTestFixture, public ::testing::Test
 {

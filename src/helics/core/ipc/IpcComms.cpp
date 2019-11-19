@@ -150,7 +150,7 @@ DISCONNECT_RX_QUEUE:
     }
     catch (boost::interprocess::interprocess_exception const &ipe)
     {
-        logError ("error changing states");
+        logError (std::string ("error changing states:") + ipe.what ());
     }
     setRxStatus (connection_status::terminated);
 }
@@ -319,7 +319,7 @@ void IpcComms::closeReceiver ()
             std::string buffer = cmd.to_string ();
             rxQueue->send (buffer.data (), buffer.size (), 3);
         }
-        catch (boost::interprocess::interprocess_exception const &ipe)
+        catch (boost::interprocess::interprocess_exception const &)
         {
             if (!disconnecting)
             {

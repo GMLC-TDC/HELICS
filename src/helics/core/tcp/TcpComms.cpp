@@ -92,7 +92,7 @@ size_t TcpComms::dataReceive (std::shared_ptr<TcpConnection> connection, const c
                 {
                     connection->send (rep.packetize ());
                 }
-                catch (const std::system_error &se)
+                catch (const std::system_error &)
                 {
                 }
             }
@@ -143,16 +143,18 @@ void TcpComms::queue_rx_function ()
         return;
     }
     auto ioctx = AsioContextManager::getContextPointer ();
-    auto server = helics::tcp::TcpServer::create (ioctx->getBaseContext (), localTargetAddress, PortNumber,
-                                                  reuse_address, maxMessageSize);
+    auto server =
+      helics::tcp::TcpServer::create (ioctx->getBaseContext (), localTargetAddress,
+                                      static_cast<uint16_t> (PortNumber.load ()), reuse_address, maxMessageSize);
     while (!server->isReady ())
     {
         if ((autoPortNumber) && (hasBroker))
         {  // If we failed and we are on an automatically assigned port number,  just try a different port
             server->close ();
             ++PortNumber;
-            server = helics::tcp::TcpServer::create (ioctx->getBaseContext (), localTargetAddress, PortNumber,
-                                                     reuse_address, maxMessageSize);
+            server =
+              helics::tcp::TcpServer::create (ioctx->getBaseContext (), localTargetAddress,
+                                              static_cast<uint16_t> (PortNumber), reuse_address, maxMessageSize);
         }
         else
         {
@@ -411,7 +413,7 @@ void TcpComms::queue_tx_function ()
 
                         routes.emplace (route_id{cmd.getExtraData ()}, std::move (new_connect));
                     }
-                    catch (std::exception &e)
+                    catch (std::exception &)
                     {
                         // TODO(PT):: do something???
                     }

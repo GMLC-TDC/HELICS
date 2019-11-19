@@ -8,8 +8,8 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include "../../common/zmqContextManager.h"
 #include "../ActionMessage.hpp"
-#include "gmlc/containers/extra/optional.hpp"
 #include "cppzmq/zmq.hpp"
+#include "gmlc/containers/extra/optional.hpp"
 #include <deque>
 #include <map>
 #include <string>
@@ -22,7 +22,7 @@ namespace zeromq
 class WaitingResponse
 {
   public:
-    int route=0;  //!< the route identifier for the socket
+    int route = 0;  //!< the route identifier for the socket
     std::uint16_t loops = 0;  //!< the number of loops
     bool waiting = false;  //!< whether the response is waiting
     ActionMessage txmsg;  //!< the most recently sent message

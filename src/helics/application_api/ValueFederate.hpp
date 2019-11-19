@@ -19,7 +19,8 @@ class Input;
 /** @brief PIMPL design pattern with the implementation details for the ValueFederate*/
 class ValueFederateManager;
 /** class defining the value based interface */
-class ValueFederate : public virtual Federate  // using virtual inheritance to allow combination federate
+class HELICS_CXX_EXPORT ValueFederate
+    : public virtual Federate  // using virtual inheritance to allow combination federate
 {
   public:
     /**constructor taking a federate information structure and using the default core
@@ -281,7 +282,7 @@ class ValueFederate : public virtual Federate  // using virtual inheritance to a
     /** register interfaces through a json file or string*/
     void registerValueInterfacesJson (const std::string &jsonString);
     /** register interface through a toml value or string*/
-	void registerValueInterfacesToml (const std::string &tomlString);
+    void registerValueInterfacesToml (const std::string &tomlString);
 
   public:
     /** get a value as raw data block from the system

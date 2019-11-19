@@ -38,55 +38,55 @@ enum log_level : int
 #define LOG_WARNING_SIMPLE(message)                                                                               \
     sendToLogger (global_broker_id_local, log_level::warning, getIdentifier (), message);
 
-#ifdef ENABLE_LOGGING
-#define LOG_SUMMARY(id, ident, message)                                                                           \
-    if (maxLogLevel >= log_level::summary)                                                                        \
-    {                                                                                                             \
-        sendToLogger (id, log_level::summary, ident, message);                                                    \
-    }
+#ifdef HELICS_ENABLE_LOGGING
+#    define LOG_SUMMARY(id, ident, message)                                                                       \
+        if (maxLogLevel >= log_level::summary)                                                                    \
+        {                                                                                                         \
+            sendToLogger (id, log_level::summary, ident, message);                                                \
+        }
 
-#define LOG_CONNECTIONS(id, ident, message)                                                                       \
-    if (maxLogLevel >= log_level::connections)                                                                    \
-    {                                                                                                             \
-        sendToLogger (id, log_level::connections, ident, message);                                                \
-    }
+#    define LOG_CONNECTIONS(id, ident, message)                                                                   \
+        if (maxLogLevel >= log_level::connections)                                                                \
+        {                                                                                                         \
+            sendToLogger (id, log_level::connections, ident, message);                                            \
+        }
 
-#define LOG_INTERFACES(id, ident, message)                                                                        \
-    if (maxLogLevel >= log_level::interfaces)                                                                     \
-    {                                                                                                             \
-        sendToLogger (id, log_level::interfaces, ident, message);                                                 \
-    }
+#    define LOG_INTERFACES(id, ident, message)                                                                    \
+        if (maxLogLevel >= log_level::interfaces)                                                                 \
+        {                                                                                                         \
+            sendToLogger (id, log_level::interfaces, ident, message);                                             \
+        }
 
-#ifdef ENABLE_DEBUG_LOGGING
-#define LOG_TIMING(id, ident, message)                                                                            \
-    if (maxLogLevel >= log_level::timing)                                                                         \
-    {                                                                                                             \
-        sendToLogger (id, log_level::timing, ident, message);                                                     \
-    }
-#define LOG_DATA_MESSAGES(id, ident, message)                                                                     \
-    if (maxLogLevel >= log_level::data)                                                                           \
-    {                                                                                                             \
-        sendToLogger (id, log_level::data, ident, message);                                                       \
-    }
+#    ifdef HELICS_ENABLE_DEBUG_LOGGING
+#        define LOG_TIMING(id, ident, message)                                                                    \
+            if (maxLogLevel >= log_level::timing)                                                                 \
+            {                                                                                                     \
+                sendToLogger (id, log_level::timing, ident, message);                                             \
+            }
+#        define LOG_DATA_MESSAGES(id, ident, message)                                                             \
+            if (maxLogLevel >= log_level::data)                                                                   \
+            {                                                                                                     \
+                sendToLogger (id, log_level::data, ident, message);                                               \
+            }
+#    else
+#        define LOG_TIMING(id, ident, message)
+#        define LOG_DATA_MESSAGES(id, ident, message)
+#    endif
+
+#    ifdef HELICS_ENABLE_TRACE_LOGGING
+#        define LOG_TRACE(id, ident, message)                                                                     \
+            if (maxLogLevel >= log_level::trace)                                                                  \
+            {                                                                                                     \
+                sendToLogger (id, log_level::trace, ident, message);                                              \
+            }
+#    else
+#        define LOG_TRACE(id, ident, message)
+#    endif
 #else
-#define LOG_TIMING(id, ident, message)
-#define LOG_DATA_MESSAGES(id, ident, message)
-#endif
-
-#ifdef ENABLE_TRACE_LOGGING
-#define LOG_TRACE(id, ident, message)                                                                             \
-    if (maxLogLevel >= log_level::trace)                                                                          \
-    {                                                                                                             \
-        sendToLogger (id, log_level::trace, ident, message);                                                      \
-    }
-#else
-#define LOG_TRACE(id, ident, message)
-#endif
-#else
-#define LOG_SUMMARY(id, ident, message)
-#define LOG_CONNECTIONS(id, ident, message)
-#define LOG_INTERFACES(id, ident, message)
-#define LOG_TIMING(id, ident, message)
-#define LOG_DATA_MESSAGES(id, ident, message)
-#define LOG_TRACE(id, ident, message)
+#    define LOG_SUMMARY(id, ident, message)
+#    define LOG_CONNECTIONS(id, ident, message)
+#    define LOG_INTERFACES(id, ident, message)
+#    define LOG_TIMING(id, ident, message)
+#    define LOG_DATA_MESSAGES(id, ident, message)
+#    define LOG_TRACE(id, ident, message)
 #endif

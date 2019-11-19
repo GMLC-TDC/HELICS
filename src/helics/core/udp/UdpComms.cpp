@@ -67,7 +67,7 @@ void UdpComms::queue_rx_function ()
     {
         try
         {
-            socket.bind (udp::endpoint (udpnet (interfaceNetwork), PortNumber));
+            socket.bind (udp::endpoint (udpnet (interfaceNetwork), static_cast<uint16_t> (PortNumber)));
             bindsuccess = true;
         }
         catch (const std::system_error &error)
@@ -80,7 +80,8 @@ void UdpComms::queue_rx_function ()
                     ++PortNumber;
                     try
                     {
-                        socket.bind (udp::endpoint (udpnet (interfaceNetwork), PortNumber));
+                        socket.bind (
+                          udp::endpoint (udpnet (interfaceNetwork), static_cast<uint16_t> (PortNumber)));
                         bindsuccess = true;
                     }
                     catch (const std::system_error &)
@@ -330,10 +331,11 @@ void UdpComms::queue_tx_function ()
                 {
                 case NEW_ROUTE:
                 {
-                    auto &newroute = cmd.payload;
+                    
 
                     try
                     {
+                        auto &newroute = cmd.payload;
                         std::string interface;
                         std::string port;
                         std::tie (interface, port) = extractInterfaceandPortString (newroute);
@@ -341,7 +343,7 @@ void UdpComms::queue_tx_function ()
 
                         routes.emplace (route_id{cmd.getExtraData ()}, *resolver.resolve (queryNew));
                     }
-                    catch (std::exception &e)
+                    catch (std::exception &)
                     {
                         // TODO:: do something???
                     }

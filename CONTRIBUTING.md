@@ -34,6 +34,9 @@ This section guides you through submitting a feature request, or enhancement for
 
  A pull request including a bug fix or feature will always be welcome.
 
+### Other repositories
+
+There are a number of separate repositories included in the [GMLC-TDC organization](https://github.com/GMLC-TDC).  Please feel free to explore those repositories for examples and additional tools, and to contribute.  
 
 #### Before Submitting An Enhancement Suggestion
 
