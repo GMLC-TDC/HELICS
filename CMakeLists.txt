@@ -552,6 +552,7 @@ if(APPLE)
     list(APPEND CMAKE_INSTALL_RPATH "@executable_path/.")
 else()
     list(APPEND CMAKE_INSTALL_RPATH "./")
+    list(APPEND CMAKE_INSTALL_RPATH "./../${CMAKE_INSTALL_LIBDIR}")
 endif()
 
 if(NOT WIN32)
