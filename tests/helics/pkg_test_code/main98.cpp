@@ -11,6 +11,6 @@ SPDX-License-Identifier: BSD-3-Clause
 int main (int argc, char *argv[])
 {
     volatile helicscpp::FederateInfo fi;
-	std::cout<<helicsGetVersion()<<std::endl;
+    std::cout<<helicsGetVersion()<<std::endl;
     return 0;
 }
