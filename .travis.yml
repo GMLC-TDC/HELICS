@@ -67,7 +67,7 @@ jobs:
     # XCode 9.4, OS X 10.13
     - <<: *osx_base
       name: "XCode 9.4, macOS 10.13"
-      if: (branch = develop AND type IN (cron, pull_request)) OR (branch = master AND type IN (push, pull_request))
+      if: (branch = develop AND type IN (cron)) OR (branch = master AND type IN (push, pull_request))
       env:
         - MATRIX_EVAL="COMPILER=clang && BUILD_TYPE=Release && TRAVIS_XCODE_VERSION=94"
         - HOMEBREW_NO_AUTO_UPDATE=1
