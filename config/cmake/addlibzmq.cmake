@@ -161,7 +161,12 @@ if(HELICS_BUILD_CXX_SHARED_LIB OR NOT HELICS_DISABLE_C_SHARED_LIB)
 	if(NOT HELICS_USE_ZMQ_STATIC_LIBRARY)
 		set_target_properties(${zmq_target_output} PROPERTIES PUBLIC_HEADER "")
 		if(NOT ${CMAKE_VERSION} VERSION_LESS "3.13")
-		   install(TARGETS ${zmq_target_output})
+		   install(TARGETS ${zmq_target_output}
+               RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+               ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+               LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+               FRAMEWORK DESTINATION "Library/Frameworks"
+		   )
 		elseif(WIN32)
 		   install(
                FILES $<TARGET_FILE:${zmq_target_output}>
