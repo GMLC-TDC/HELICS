@@ -1,0 +1,13 @@
+prefix=@prefix@
+exec_prefix=@exec_prefix@
+libdir=@libdir@
+includedir=@includedir@
+
+Name: libhelicsSharedLib
+Description: HELICS C shared library
+URL: www.helics.org
+Version: @HELICS_VERSION@
+Libs: -L${libdir} -lhelicsSharedLib
+Libs.private: @stdlib@ @PRIVATE_LIBS@
+Requires.private: @zmq_pc_require@
+Cflags: -I${includedir} @pkg_config_defines@

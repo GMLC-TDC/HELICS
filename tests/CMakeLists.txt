@@ -37,14 +37,38 @@ if(hasParent)
 
 else()
     cmake_minimum_required(VERSION 3.4)
-    set(HELICS_BUILD_TESTS ON CACHE INTERNAL "")
-    set(BUILD_PYTHON_INTERFACE OFF CACHE INTERNAL "")
-    set(BUILD_PYTHON2_INTERFACE OFF CACHE INTERNAL "")
-    set(BUILD_MATLAB_INTERFACE OFF CACHE INTERNAL "")
-    set(BUILD_JAVA_INTERFACE OFF CACHE INTERNAL "")
-    set(BUILD_CSHARP_INTERFACE OFF CACHE INTERNAL "")
-    set(HELICS_BUILD_EXAMPLES OFF CACHE INTERNAL "")
-    set(HELICS_BUILD_BENCHMARKS OFF CACHE INTERNAL "")
+    set(HELICS_BUILD_TESTS
+        ON
+        CACHE INTERNAL ""
+    )
+    set(BUILD_PYTHON_INTERFACE
+        OFF
+        CACHE INTERNAL ""
+    )
+    set(BUILD_PYTHON2_INTERFACE
+        OFF
+        CACHE INTERNAL ""
+    )
+    set(BUILD_MATLAB_INTERFACE
+        OFF
+        CACHE INTERNAL ""
+    )
+    set(BUILD_JAVA_INTERFACE
+        OFF
+        CACHE INTERNAL ""
+    )
+    set(BUILD_CSHARP_INTERFACE
+        OFF
+        CACHE INTERNAL ""
+    )
+    set(HELICS_BUILD_EXAMPLES
+        OFF
+        CACHE INTERNAL ""
+    )
+    set(HELICS_BUILD_BENCHMARKS
+        OFF
+        CACHE INTERNAL ""
+    )
     # now call into the root directory
     add_subdirectory(.. ${CMAKE_CURRENT_BINARY_DIR}/root/)
 endif()

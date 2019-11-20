@@ -5,10 +5,14 @@ the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 
-#include "helics/helics_apps.hpp"
-
-int main (int argc, char *argv[])
+#include "helics/chelics.h"
+#include <stdio.h>
+int main ()
 {
-    volatile helics::apps::BrokerApp broker("--help");
-    return 0;
+    volatile helics_federate_info fedinfo = helicsCreateFederateInfo();
+	helicsFederateInfoFree(fedinfo);
+	printf("%s\n",helicsGetVersion());
+    helicsCloseLibrary ();
+    return (0);
 }
+

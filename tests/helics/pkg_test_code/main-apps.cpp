@@ -5,10 +5,10 @@ the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 
-#include "helics/cpp98/helics.hpp"
+#include "helics/helics_apps.hpp"
 
 int main (int argc, char *argv[])
 {
-    volatile helicscpp::FederateInfo fi;
+    volatile helics::apps::Player play({"--version"});
     return 0;
 }

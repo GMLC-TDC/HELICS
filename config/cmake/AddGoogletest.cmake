@@ -24,6 +24,7 @@ if(NOT CMAKE_VERSION VERSION_LESS 3.11)
     mark_as_advanced(FETCHCONTENT_BASE_DIR)
     mark_as_advanced(FETCHCONTENT_FULLY_DISCONNECTED)
     mark_as_advanced(FETCHCONTENT_QUIET)
+	mark_as_advanced(FETCHCONTENT_UPDATES_DISCONNECTED)
 
     fetchcontent_declare(
         googletest
