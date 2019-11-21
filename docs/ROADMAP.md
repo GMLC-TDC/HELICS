@@ -13,18 +13,21 @@ This document contains tentative plans for changes and improvements of note in u
 -   Broker-server continued development and support for tcp/udp cores
 -   Additional package manager integration
 -   Performance improvements and tests
+-   Multi-node benchmark tests
 -   messageObject callbacks into the C library
+-   Improved installers for MacOS
 -   Automated code formatting in github
 -   Separate out networking library
 -   Debugging tools
--   SSL capable core (unlikely)
 -   Split core library between comms layer components and actual core API
--   Plugin architecture for user defined cores (unlikely)
 -   Drop tested support for Xcode 8
 
 ## \[2.5\] - Spring 2020
--   Single thread cores
+-   Single thread cores(possible)
+-   Plugin architecture for user defined cores (possible)
+-   SSL capable core
 -   Some dynamic federation support
+-   Websocket based core type
 -   Internal text based message format option for general backwards compatibility
 
 ## \[3.0\] ~ Late Spring-Early Summer 2020

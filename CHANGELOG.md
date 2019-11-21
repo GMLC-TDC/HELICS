@@ -7,16 +7,21 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 A note on future revisions.  
   Everything within a major version number should be code compatible (with the exception of experimental interfaces).  The most notable example of an experimental interface is the support for multiple source inputs.  The APIs to deal with this will change in future minor releases.  Everything within a single minor release should be network compatible with other federates on the same minor release number.  Compatibility across minor release numbers may be possible in some situations but we are not going to guarantee this as those components are subject to performance improvements and may need to be modified at some point.  Patch releases will be limited to bug fixes and other improvements not impacting the public API or network compatibility.  Check the [Public API](./docs/Public_API.md) for details on what is included and excluded from the public API and version stability.
 
-## \[2.3.1\] ~ In Development
+## \[2.3.1\] - 2019-11-22
 Bug Fixes and some code refactoring, pkg-config files have been added to the installs
 ### Changed
 -   Default installation path for MSYS2 is now configured to be part of the system path, typically `/mingw64/`  or `/mingw32/`
 -   `HELICS_ENABLE_SLOW_PACKAGING_TESTS` renamed to `HELICS_ENABLE_SUBPROJECT_TESTS` to better reflect usage
 -   filesystem library updated to clear up some warnings
+-   The CI system now runs Xcode9 as the oldest release
+-   Automatic build system was changed to use scripts 
 
 ### Fixed
 -   Some documentation links in the docs
 -   Missing `helics-enums.h` header from the install if `HELICS_BUILD_CXX_SHARED_LIB` was not enabled
+-  ZMQ install locations on Linux and MacOS if ZMQ is used as a subproject without the HELICS_USE_ZMQ_STATIC_LIB
+-   The linux shared library release build so it is compatible with a larger number of systems including older ones back to glibc 2.12. 
+-  Fix some issues with using the STATIC_STANDARD_LIB CMake option
   
 ### Added
 -   CMake option for `HELICS_DISABLE_ASIO` to completely remove the use the ASIO library, turns off the UDP, and TCP core types, all real-time capabilities, and timeout and heartbeat detection for cores and brokers.  ASIO doesn't support all version of cygwin.  
@@ -24,12 +29,13 @@ Bug Fixes and some code refactoring, pkg-config files have been added to the ins
 -   Tests and CI builds for installed CMake package files and pkg-config files
 
 ### Deprecated
+-  trying to install on linux/macos systems with cmake older than 3.13 and ZMQ used as a subproject with the shared library is no longer supported.  It is likely this use scenario was broken before, now it produces a warning.  
 
 ### Removed
 -   If `HELICS_BUILD_BENCHMARKS` is enabled, the option for `ENABLE_INPROC_CORE` will not show in the cmake-gui.
 -   If `HELICS_BUILD_TESTS` is enabled, the option for `ENABLE_TEST_CORE` will not show in the cmake-gui.
 
-## \[2.3.0\] ~ 2019-11-12
+## \[2.3.0\] - 2019-11-12
 Minor release with lots of CMake updates and build changes and a few fixes and additions.  The biggest change is in the C++ shared library and complete removal of boost\:\:test.
 ### Changed
 -   Converted the shared_library_tests and application_api tests to use Google test instead of Boost test
@@ -92,7 +98,7 @@ Minor release with lots of CMake updates and build changes and a few fixes and a
 -   JSONCPP, Utilities, and units libraries are no longer installed in any form, libraries or headers.  
 -   CMake option to install CEREAL headers (they are now required, but are in a different location)
 
-## \[2.2.2\] ~ 2019-10-27
+## \[2.2.2\] - 2019-10-27
 Bug fix release
 
 ### Fixed

@@ -5,8 +5,9 @@ Requirements
 ------------
 
 * Ubuntu 16 or newer
-* C++11 compiler (C++14 preferred)
+* C++14 compiler
 * CMake 3.4 or newer
+* Gcc 4.9 or newer (GCC 7.3.1 has a bug and won't work)
 * git
 * Boost 1.58 or newer
 * ZeroMQ 4.1.4 or newer (if ZeroMQ support is needed)
