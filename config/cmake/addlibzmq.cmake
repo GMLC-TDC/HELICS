@@ -173,6 +173,8 @@ if(HELICS_BUILD_CXX_SHARED_LIB OR NOT HELICS_DISABLE_C_SHARED_LIB)
                DESTINATION ${CMAKE_INSTALL_BINDIR}
                COMPONENT libs
 		   )
+		else()
+           message(WARNING "Update to CMake 3.13+ or enable the HELICS_USE_ZMQ_STATIC_LIBRARY CMake option to install when using ZMQ as a subproject")
 		endif()
 		if(MSVC AND NOT EMBEDDED_DEBUG_INFO AND NOT HELICS_BINARY_ONLY_INSTALL )
 		   install(
