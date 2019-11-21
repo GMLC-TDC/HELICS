@@ -15,12 +15,11 @@ This document contains tentative plans for changes and improvements of note in u
 -   Performance improvements and tests
 -   Multi-node benchmark tests
 -   messageObject callbacks into the C library
--   Improved installers for MacOS
+-   Improved installers for macOS
 -   Automated code formatting in github
 -   Separate out networking library
 -   Debugging tools
 -   Split core library between comms layer components and actual core API
--   Drop tested support for Xcode 8
 
 ## \[2.5\] - Spring 2020
 -   Single thread cores(possible)

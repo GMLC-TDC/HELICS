@@ -14,14 +14,14 @@ Bug Fixes and some code refactoring, pkg-config files have been added to the ins
 -   `HELICS_ENABLE_SLOW_PACKAGING_TESTS` renamed to `HELICS_ENABLE_SUBPROJECT_TESTS` to better reflect usage
 -   filesystem library updated to clear up some warnings
 -   The CI system now runs Xcode9 as the oldest release
--   Automatic build system was changed to use scripts 
+-   Automatic releases build system was changed to use scripts 
 
 ### Fixed
 -   Some documentation links in the docs
 -   Missing `helics-enums.h` header from the install if `HELICS_BUILD_CXX_SHARED_LIB` was not enabled
--  ZMQ install locations on Linux and MacOS if ZMQ is used as a subproject without the HELICS_USE_ZMQ_STATIC_LIB
+-  ZMQ install locations on Linux and macOS if ZMQ is used as a subproject without the HELICS_USE_ZMQ_STATIC_LIB option enabled
 -   The linux shared library release build so it is compatible with a larger number of systems including older ones back to glibc 2.12. 
--  Fix some issues with using the STATIC_STANDARD_LIB CMake option
+-  Fix some documentation and issues with using the STATIC_STANDARD_LIB CMake option
   
 ### Added
 -   CMake option for `HELICS_DISABLE_ASIO` to completely remove the use the ASIO library, turns off the UDP, and TCP core types, all real-time capabilities, and timeout and heartbeat detection for cores and brokers.  ASIO doesn't support all version of cygwin.  
@@ -29,7 +29,7 @@ Bug Fixes and some code refactoring, pkg-config files have been added to the ins
 -   Tests and CI builds for installed CMake package files and pkg-config files
 
 ### Deprecated
--  trying to install on linux/macos systems with cmake older than 3.13 and ZMQ used as a subproject with the shared library is no longer supported.  It is likely this use scenario was broken before, now it produces a warning.  
+-  Trying to install on linux/macos systems with cmake older than 3.13 and ZMQ used as a subproject with the shared library is no longer supported.  It is likely this use scenario was broken before, now it produces a warning.  
 
 ### Removed
 -   If `HELICS_BUILD_BENCHMARKS` is enabled, the option for `ENABLE_INPROC_CORE` will not show in the cmake-gui.
