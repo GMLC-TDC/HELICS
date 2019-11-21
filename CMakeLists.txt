@@ -264,7 +264,7 @@ if(STATIC_STANDARD_LIB STREQUAL "default")
 
 elseif(STATIC_STANDARD_LIB STREQUAL "static")
     ucm_set_runtime(STATIC)
-else()
+elseif(STATIC_STANDARD_LIB STREQUAL "dynamic")
     ucm_set_runtime(DYNAMIC)
 endif()
 
@@ -573,6 +573,7 @@ if(APPLE)
     list(APPEND CMAKE_INSTALL_RPATH "@executable_path/.")
 else()
     list(APPEND CMAKE_INSTALL_RPATH "./")
+    list(APPEND CMAKE_INSTALL_RPATH "./../${CMAKE_INSTALL_LIBDIR}")
 endif()
 
 if(NOT WIN32)
