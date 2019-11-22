@@ -10,7 +10,7 @@
 cmake_minimum_required(VERSION 3.4)
 cmake_policy(VERSION 3.4)
 
-project(HELICS VERSION 2.3.0)
+project(HELICS VERSION 2.3.1)
 
 if(POLICY CMP0069)
     # Policy CMP0069 INTERPROCEDURAL OPTIMIZATION, just use the new policy since this
@@ -28,7 +28,7 @@ endif()
 # -----------------------------------------------------------------------------
 set(HELICS_VERSION_BUILD)
 # use ISO date YYYY-MM-DD
-set(HELICS_DATE "2019-11-13")
+set(HELICS_DATE "2019-11-22")
 
 set(HELICS_VERSION_UNDERSCORE
     "${HELICS_VERSION_MAJOR}_${HELICS_VERSION_MINOR}_${HELICS_VERSION_PATCH}"
@@ -264,7 +264,7 @@ if(STATIC_STANDARD_LIB STREQUAL "default")
 
 elseif(STATIC_STANDARD_LIB STREQUAL "static")
     ucm_set_runtime(STATIC)
-else()
+elseif(STATIC_STANDARD_LIB STREQUAL "dynamic")
     ucm_set_runtime(DYNAMIC)
 endif()
 
@@ -573,6 +573,7 @@ if(APPLE)
     list(APPEND CMAKE_INSTALL_RPATH "@executable_path/.")
 else()
     list(APPEND CMAKE_INSTALL_RPATH "./")
+    list(APPEND CMAKE_INSTALL_RPATH "./../${CMAKE_INSTALL_LIBDIR}")
 endif()
 
 if(NOT WIN32)

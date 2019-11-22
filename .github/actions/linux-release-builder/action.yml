@@ -1,0 +1,9 @@
+name: 'Linux Release Builder'
+description: 'Runs a build using a container image with an old glibc to get a binary that works on more Linux systems'
+inputs:
+  script:
+    description: 'Bash script to run in the container'
+    required: true
+runs:
+  using: 'docker'
+  image: 'Dockerfile'

@@ -19,12 +19,7 @@ function(git_version_describe source_path result)
     if(GIT_FOUND)
         execute_process(
             COMMAND
-                ${GIT_EXECUTABLE}
-                -C
-                ${source_path}
-                --work-tree
-                ${source_path}
-                describe
+                ${GIT_EXECUTABLE} -C ${source_path} --work-tree ${source_path} describe
                 --tags
             OUTPUT_VARIABLE TAG_DESCRIPTION
             ERROR_VARIABLE TAGGING_ERROR
@@ -32,13 +27,8 @@ function(git_version_describe source_path result)
         )
         if(TAGGING_ERROR)
             execute_process(
-                COMMAND
-                    ${GIT_EXECUTABLE}
-                    -C
-                    ${source_path}
-                    --work-tree
-                    ${source_path}
-                    describe
+                COMMAND ${GIT_EXECUTABLE} -C ${source_path} --work-tree ${source_path}
+                        describe
                 OUTPUT_VARIABLE TAG_DESCRIPTION
                 ERROR_VARIABLE TAGGING_ERROR
                 OUTPUT_STRIP_TRAILING_WHITESPACE
@@ -47,16 +37,8 @@ function(git_version_describe source_path result)
         if(TAGGING_ERROR)
             execute_process(
                 COMMAND
-                    ${GIT_EXECUTABLE}
-                    -C
-                    ${source_path}
-                    --work-tree
-                    ${source_path}
-                    describe
-                    --all
-                    --tags
-                    --dirty
-                    --long
+                    ${GIT_EXECUTABLE} -C ${source_path} --work-tree ${source_path}
+                    describe --all --tags --dirty --long
                 OUTPUT_VARIABLE TAG_DESCRIPTION
                 ERROR_VARIABLE TAGGING_ERROR
                 OUTPUT_STRIP_TRAILING_WHITESPACE
@@ -71,28 +53,21 @@ function(git_version_describe source_path result)
                     string(SUBSTRING ${TAG_DESCRIPTION} ${last_dash_loc} -1 hash_string)
                     execute_process(
                         COMMAND
-                            ${GIT_EXECUTABLE}
-                            -C
-                            ${source_path}
-                            --work-tree
-                            ${source_path}
-                            describe
-                            --all
-                            --tags
-                            --dirty
+                            ${GIT_EXECUTABLE} -C ${source_path} --work-tree
+                            ${source_path} describe --all --tags --dirty
                         OUTPUT_VARIABLE TAG_DESCRIPTION2
                         ERROR_VARIABLE TAGGING_ERROR
                         OUTPUT_STRIP_TRAILING_WHITESPACE
                     )
-                    if (TAGGING_ERROR)
+                    if(TAGGING_ERROR)
                         set(TAG_DESCRIPTION2 ${TAG_DESCRIPTION})
                     endif()
                     string(FIND ${TAG_DESCRIPTION2} ${hash_string} hash_loc)
                     if(hash_loc LESS 0)
                         string(FIND ${TAG_DESCRIPTION2} "-dirty" dirty_loc)
                         if(dirty_loc GREATER 0)
-                            string(
-                                SUBSTRING ${TAG_DESCRIPTION2} 0 ${dirty_loc} tag_desc
+                            string(SUBSTRING ${TAG_DESCRIPTION2} 0 ${dirty_loc}
+                                             tag_desc
                             )
                             string(APPEND tag_desc ${hash_string} "-dirty")
                         else()
@@ -109,8 +84,14 @@ function(git_version_describe source_path result)
             endif()
         endif()
 
-        set(${result} ${tag_desc} PARENT_SCOPE)
+        set(${result}
+            ${tag_desc}
+            PARENT_SCOPE
+        )
     else(GIT_FOUND)
-        set(${result} "" PARENT_SCOPE)
+        set(${result}
+            ""
+            PARENT_SCOPE
+        )
     endif(GIT_FOUND)
 endfunction()
