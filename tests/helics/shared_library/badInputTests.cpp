@@ -84,3 +84,17 @@ TEST_F (bad_input_tests, test_mistaken_finalize)
     helicsFederateInfoFree (fi);  // now do the correct frees
     helicsFederateFree (vFed1);
 }
+
+
+TEST(error_tests, unavailable_core_type) 
+{
+	auto err = helicsErrorInitialize ();
+    auto core = helicsCreateCore ("nng", "test", "", &err);
+    EXPECT_NE (err.error_code, 0);
+    helicsErrorClear (&err);
+    auto brk = helicsCreateBroker ("nng", "test", "", &err);
+    EXPECT_NE (err.error_code, 0);
+
+	helicsCoreDestroy (core);
+    helicsBrokerDestroy (brk);
+}
