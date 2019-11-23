@@ -370,7 +370,7 @@ TEST_P (error_tests_type, test_duplicate_broker_name)
 
 INSTANTIATE_TEST_SUITE_P (error_tests, error_tests_type, ::testing::ValuesIn (core_types_simple));
 
-constexpr const char *networkCores[] = {"zmq", "udp"};
+constexpr const char *networkCores[] = {ZMQTEST UDPTEST};
 
 class network_error_tests : public ::testing::TestWithParam<const char *>, public FederateTestFixture
 {

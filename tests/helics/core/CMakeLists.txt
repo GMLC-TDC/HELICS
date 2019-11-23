@@ -17,7 +17,6 @@ set(
     ActionMessage-tests.cpp
     BrokerClassTests.cpp
     CoreFactory-tests.cpp
-    MessageTimerTests.cpp
     data-block-tests.cpp
     ForwardingTimeCoordinatorTests.cpp
     TimeCoordinatorTests.cpp
@@ -47,6 +46,10 @@ endif()
 
 if(ENABLE_MPI_CORE)
     list(APPEND core_test_sources MpiCore-tests.cpp)
+endif()
+
+if (NOT HELICS_DISABLE_ASIO)
+    list(APPEND core_test_sources MessageTimerTests.cpp)
 endif()
 
 add_executable(core-tests ${core_test_sources} ${core_test_headers})

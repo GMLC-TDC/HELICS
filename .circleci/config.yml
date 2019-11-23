@@ -29,6 +29,14 @@ aliases:
        RESULT=$?
        exit $RESULT
 
+  - &run_installer_tests
+    name: run_installer_tests
+    command: |
+       cd build
+       make install
+       ctest -V -R find-package-tests
+       ctest -V -R package-config-tests
+
 jobs:
   helicsoctave:
     docker:
@@ -77,6 +85,26 @@ jobs:
       - run: *setup_helics
       - run: *run_helics_tests
 
+  helicsInstall1:
+    docker:
+      - image: helics/buildenv:builder
+    environment:
+      CMAKE_FLAGS: '-DHELICS_BUILD_CXX_SHARED_LIB=ON -DHELICS_BUILD_TESTS=ON -DHELICS_INSTALL_PACKAGE_TESTS=ON'
+    steps:
+      - checkout
+      - run: *setup_helics
+      - run: *run_installer_tests
+
+  helicsInstall2:
+    docker:
+      - image: helics/buildenv:builder
+    environment:
+      CMAKE_FLAGS: '-DHELICS_BUILD_TESTS=ON -DHELICS_INSTALL_PACKAGE_TESTS=ON'
+    steps:
+      - checkout
+      - run: *setup_helics
+      - run: *run_installer_tests
+
 workflows:
   version: 2
   helics_test:
@@ -85,6 +113,8 @@ workflows:
       - helicsMSan
       - helicsASan
       - helicsTSan
+      - helicsInstall1
+      - helicsInstall2
   nightly:
     triggers:
       - schedule:

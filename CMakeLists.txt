@@ -10,7 +10,7 @@
 cmake_minimum_required(VERSION 3.4)
 cmake_policy(VERSION 3.4)
 
-project(HELICS VERSION 2.3.0)
+project(HELICS VERSION 2.3.1)
 
 if(POLICY CMP0069)
     # Policy CMP0069 INTERPROCEDURAL OPTIMIZATION, just use the new policy since this
@@ -27,8 +27,8 @@ endif()
 # HELICS Version number
 # -----------------------------------------------------------------------------
 set(HELICS_VERSION_BUILD)
-#use ISO date YYYY-MM-DD
-set(HELICS_DATE "2019-11-13")
+# use ISO date YYYY-MM-DD
+set(HELICS_DATE "2019-11-22")
 
 set(HELICS_VERSION_UNDERSCORE
     "${HELICS_VERSION_MAJOR}_${HELICS_VERSION_MINOR}_${HELICS_VERSION_PATCH}"
@@ -79,22 +79,26 @@ include(ucm)
 # -----------------------------------------------------------------------------
 if(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
     if(WIN32)
-        if(MSYS)
-            set(CMAKE_INSTALL_PREFIX
-                "/usr/local/helics_${HELICS_VERSION_UNDERSCORE}/"
-                CACHE PATH "default install path" FORCE
-            )
-        elseif(CYGWIN)
-            set(CMAKE_INSTALL_PREFIX
-                "/usr/local/helics_${HELICS_VERSION_UNDERSCORE}/"
-                CACHE PATH "default install path" FORCE
-            )
-        else(MSYS)
+        if(MSVC)
             set(CMAKE_INSTALL_PREFIX
                 "C:/local/helics_${HELICS_VERSION_UNDERSCORE}/"
                 CACHE PATH "default install path" FORCE
             )
-        endif(MSYS)
+        elseif(MINGW AND NOT MSYS)
+            set(CMAKE_INSTALL_PREFIX
+                "C:/local/helics_${HELICS_VERSION_UNDERSCORE}/"
+                CACHE PATH "default install path" FORCE
+            )
+        elseif(MSYS)
+            # use CMAKE_OBJCOPY here since it is somewhat less likely to be overwridden
+            # by users rather than the compiler
+            get_filename_component(path_bin ${CMAKE_OBJCOPY} DIRECTORY)
+            get_filename_component(path_install ${path_bin} DIRECTORY)
+            set(CMAKE_INSTALL_PREFIX
+                ${path_install}
+                CACHE PATH "default install path" FORCE
+            )
+        endif(MSVC)
     endif(WIN32)
 endif()
 
@@ -106,9 +110,15 @@ if(MSYS
     set(UNIX_LIKE TRUE)
 endif()
 
-# allow BOOST library inclusion to be turned off completely to be turned off completely
+# allow BOOST library inclusion to be turned off completely this will disable the IPC
+# core
 option(HELICS_DISABLE_BOOST OFF "disable all references to the Boost C++ libraries")
 mark_as_advanced(HELICS_DISABLE_BOOST)
+
+# allow ASIO library inclusion to be turned off completely this will disable the UDP and
+# TCP core as well as the timeout detection and real-time features of HELICS
+option(HELICS_DISABLE_ASIO OFF "disable all references to the ASIO C++ libraries")
+mark_as_advanced(HELICS_DISABLE_ASIO)
 
 # we want to acknowledge this flag since it is standard C++ but it can cause issues in
 # submodules so we need to set other variables
@@ -330,8 +340,10 @@ if(NOT EXISTS "${PROJECT_SOURCE_DIR}/ThirdParty/fmtlib/CMakeLists.txt")
     submod_update(ThirdParty/fmtlib)
 endif()
 
-if(NOT EXISTS "${PROJECT_SOURCE_DIR}/ThirdParty/asio/asio/include/asio.hpp")
-    submod_update(ThirdParty/asio)
+if(NOT HELICS_DISABLE_ASIO)
+    if(NOT EXISTS "${PROJECT_SOURCE_DIR}/ThirdParty/asio/asio/include/asio.hpp")
+        submod_update(ThirdParty/asio)
+    endif()
 endif()
 
 if(NOT EXISTS "${PROJECT_SOURCE_DIR}/ThirdParty/jsoncpp/CMakeLists.txt")
@@ -368,22 +380,30 @@ if(NOT HELICS_DISABLE_BOOST)
     include(addBoost)
 endif()
 
+# -------------------------------------------------------------
+# options for enabling specific core communication types
+# -------------------------------------------------------------
+
 option(ENABLE_MPI_CORE "Enable MPI networking library" OFF)
-option(ENABLE_ZMQ_CORE "Enable ZeroMQ networking library" ON)
-option(ENABLE_TCP_CORE "Enable TCP core types" ON)
-option(ENABLE_UDP_CORE "Enable UDP core types" ON)
+cmake_dependent_advanced_option(
+    ENABLE_TCP_CORE "Enable TCP core types" ON "NOT HELICS_DISABLE_ASIO" OFF
+)
+cmake_dependent_advanced_option(
+    ENABLE_UDP_CORE "Enable UDP core types" ON "NOT HELICS_DISABLE_ASIO" OFF
+)
 cmake_dependent_advanced_option(
     ENABLE_IPC_CORE "Enable Interprocess communication types" ON
     "NOT HELICS_DISABLE_BOOST" OFF
 )
-option(ENABLE_TEST_CORE "Enable test inprocess core type" ON)
-option(ENABLE_INPROC_CORE "Enable inprocess core type" ON)
+cmake_dependent_advanced_option(
+    ENABLE_TEST_CORE "Enable test inprocess core type" OFF "NOT HELICS_BUILD_TESTS" ON
+)
+cmake_dependent_advanced_option(
+    ENABLE_INPROC_CORE "Enable inprocess core type" ON "NOT HELICS_BUILD_BENCHMARKS" ON
+)
 option(ENABLE_ZMQ_CORE "Enable ZeroMQ networking library" ON)
 
-mark_as_advanced(
-    ENABLE_MPI_CORE ENABLE_ZMQ_CORE ENABLE_TCP_CORE ENABLE_UDP_CORE ENABLE_TEST_CORE
-    ENABLE_ZMQ_CORE
-)
+mark_as_advanced(ENABLE_MPI_CORE ENABLE_ZMQ_CORE)
 
 # -------------------------------------------------------------
 # finding MPI
@@ -445,18 +465,18 @@ endif()
 if(ENABLE_ZMQ_CORE)
     include(addZeroMQ)
 
-    if(ZeroMQ_FOUND)
-        if(HELICS_USE_ZMQ_STATIC_LIBRARY)
-            set(ZeroMQ_DEPENDENCY libzmq-static)
-            target_compile_definitions(helics_base INTERFACE -DZMQ_STATIC)
-        else()
-            set(ZeroMQ_DEPENDENCY libzmq)
-        endif()
-        # message(STATUS "zmq dep ${ZeroMQ_DEPENDENCY}")
-        target_link_libraries(helics_base INTERFACE ${ZeroMQ_DEPENDENCY})
-    else(ZeroMQ_FOUND)
-        message(FATAL_ERROR "ZeroMQ not found")
-    endif(ZeroMQ_FOUND)
+    if(NOT ZeroMQ_FOUND)
+        message(FATAL_ERROR "ZeroMQ not found, needed to enable the ZMQ Core")
+    endif()
+
+    if(HELICS_USE_ZMQ_STATIC_LIBRARY)
+        set(ZeroMQ_DEPENDENCY libzmq-static)
+        target_compile_definitions(helics_base INTERFACE -DZMQ_STATIC)
+    else()
+        set(ZeroMQ_DEPENDENCY libzmq)
+    endif()
+    # message(STATUS "zmq dep ${ZeroMQ_DEPENDENCY}")
+    target_link_libraries(helics_base INTERFACE ${ZeroMQ_DEPENDENCY})
 endif()
 
 # -----------------------------------------------------------------------------
@@ -503,12 +523,13 @@ endif()
 # -------------------------------------------------------------
 # Asio include directories
 # -------------------------------------------------------------
-target_compile_definitions(helics_base INTERFACE "-DASIO_STANDALONE")
-target_include_directories(
-    helics_base SYSTEM
-    INTERFACE $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/ThirdParty/asio/asio/include>
-)
-
+if(NOT HELICS_DISABLE_ASIO)
+    target_compile_definitions(helics_base INTERFACE "-DASIO_STANDALONE")
+    target_include_directories(
+        helics_base SYSTEM
+        INTERFACE $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/ThirdParty/asio/asio/include>
+    )
+endif()
 # -------------------------------------------------------------
 # setting the RPATH
 # -------------------------------------------------------------
@@ -636,15 +657,20 @@ add_subdirectory(src)
 # Build the tests
 # -----------------------------------------------------------------------------
 
-if(HELICS_BUILD_TESTS
-   AND BUILD_TESTING
-   AND ENABLE_TEST_CORE
-)
+if(HELICS_BUILD_TESTS AND BUILD_TESTING)
+    if(NOT ENABLE_TEST_CORE)
+        message(FATAL_ERROR "TEST CORE must be enabled to build the HELICS tests")
+    endif()
     mark_as_advanced(BUILD_TESTING)
     add_subdirectory(tests)
 endif()
 
 if(HELICS_BUILD_BENCHMARKS)
+    if(NOT ENABLE_INPROC_CORE)
+        message(
+            FATAL_ERROR "INPROC CORE must be enabled to build the HELICS Benchmarks"
+        )
+    endif()
     add_subdirectory(benchmarks)
 endif()
 
@@ -769,8 +795,6 @@ endif(NOT HELICS_BINARY_ONLY_INSTALL)
 # combine 3rd party license files for install package
 include(combineLicenses)
 set(LICENSE_LIST
-    "asio"
-    "${PROJECT_SOURCE_DIR}/ThirdParty/asio/asio/LICENSE_1_0.txt"
     "cereal"
     "${PROJECT_SOURCE_DIR}/ThirdParty/helics/external/cereal/LICENSE"
     "GMLC Concurrency"
@@ -807,7 +831,7 @@ if(NOT CMAKE_VERSION VERSION_LESS 3.11)
         )
     endif()
 
-    if(EXISTS ${PROJECT_BINARY_DIR}/_deps/libzmq-src)
+    if(EXISTS ${PROJECT_BINARY_DIR}/_deps/libzmq-src AND ENABLE_ZMQ_CORE)
         list(APPEND LICENSE_LIST "ZeroMQ"
                     "${PROJECT_BINARY_DIR}/_deps/libzmq-src/COPYING"
         )
@@ -826,9 +850,15 @@ else()
         )
     endif()
 
-    if(EXISTS ${PROJECT_BINARY_DIR}/_deps/libzmq)
+    if(EXISTS ${PROJECT_BINARY_DIR}/_deps/libzmq AND ENABLE_ZMQ_CORE)
         list(APPEND LICENSE_LIST "ZeroMQ" "${PROJECT_BINARY_DIR}/_deps/libzmq/COPYING")
     endif()
+endif()
+
+if(NOT HELICS_DISABLE_ASIO)
+    list(APPEND LICENSE_LIST "asio"
+                "${PROJECT_SOURCE_DIR}/ThirdParty/asio/asio/LICENSE_1_0.txt"
+    )
 endif()
 
 combinelicenses(${PROJECT_BINARY_DIR}/THIRDPARTY_LICENSES ${LICENSE_LIST})
@@ -839,6 +869,62 @@ install(
     DESTINATION ${CMAKE_INSTALL_DOCDIR}
     COMPONENT libs
 )
+
+# -------------------------------------------------------------
+# pkg-config setup and install
+# -------------------------------------------------------------
+
+if(NOT MSVC AND NOT HELICS_BINARY_ONLY_INSTALL)
+
+    set(prefix ${CMAKE_INSTALL_PREFIX})
+    set(exec_prefix ${prefix}/${CMAKE_INSTALL_BINDIR})
+    set(libdir ${prefix}/${CMAKE_INSTALL_LIBDIR})
+    set(includedir ${prefix}/${CMAKE_INSTALL_INCLUDEDIR})
+
+    if(USE_LIBCXX)
+        set(stdlib "-lc++ -lc++abi")
+    elseif(STATIC_STANDARD_LIB STREQUAL "static")
+        set(stdlib)
+    else()
+        set(stdlib -lstdc++)
+    endif()
+
+    if(NOT HELICS_DISABLE_C_SHARED_LIB)
+        configure_file(
+            ${CMAKE_CURRENT_SOURCE_DIR}/config/packaging/helicsSharedLib.pc.in
+            ${CMAKE_CURRENT_BINARY_DIR}/helicsSharedLib.pc @ONLY
+        )
+        install(FILES ${CMAKE_CURRENT_BINARY_DIR}/helicsSharedLib.pc
+                DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig
+        )
+    endif()
+
+    if(ENABLE_ZMQ_CORE AND NOT HELICS_USE_ZMQ_STATIC_LIBRARY)
+        set(zmq_pc_require libzmq)
+    endif()
+
+    if(HELICS_BUILD_CXX_SHARED_LIB)
+
+        configure_file(
+            ${CMAKE_CURRENT_SOURCE_DIR}/config/packaging/helics-shared.pc.in
+            ${CMAKE_CURRENT_BINARY_DIR}/helics-shared.pc @ONLY
+        )
+        install(FILES ${CMAKE_CURRENT_BINARY_DIR}/helics-shared.pc
+                DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig
+        )
+
+        if(HELICS_BUILD_APP_LIBRARY)
+            configure_file(
+                ${CMAKE_CURRENT_SOURCE_DIR}/config/packaging/helics-apps-shared.pc.in
+                ${CMAKE_CURRENT_BINARY_DIR}/helics-apps-shared.pc @ONLY
+            )
+            install(FILES ${CMAKE_CURRENT_BINARY_DIR}/helics-apps-shared.pc
+                    DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig
+            )
+        endif()
+
+    endif()
+endif()
 
 # -------------------------------------------------------------
 # CPack

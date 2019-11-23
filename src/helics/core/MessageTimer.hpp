@@ -6,8 +6,9 @@ SPDX-License-Identifier: BSD-3-Clause
 */
 #pragma once
 
-#include "../common/AsioContextManager.h"
+
 #include "ActionMessage.hpp"
+#include "../common/AsioContextManager.h"
 #include <asio/steady_timer.hpp>
 #include <memory>
 #include <mutex>

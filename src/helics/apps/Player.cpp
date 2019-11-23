@@ -563,7 +563,7 @@ void Player::loadJsonFile (const std::string &jsonString)
             points.back ().time = ptime;
             points.back ().iteration = iterationIndex;
             points.back ().pubName = key;
-            points.back ().value = val;
+            points.back ().value = std::move(val);
             if (!type.empty ())
             {
                 points.back ().type = type;

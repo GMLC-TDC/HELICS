@@ -7,15 +7,15 @@
 # SPDX-License-Identifier: BSD-3-Clause
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-set(
-    HELICS_BENCHMARKS
+set(HELICS_BENCHMARKS
     ActionMessageBenchmarks
-	filterBenchmarks
+    filterBenchmarks
     echoBenchmarks
     ringBenchmarks
     messageLookupBenchmarks
     conversionBenchmarks
-	echoMessageBenchmarks
+    echoMessageBenchmarks
+    messageSendBenchmarks
     pholdBenchmarks
 )
 

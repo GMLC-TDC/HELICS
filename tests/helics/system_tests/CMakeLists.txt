@@ -13,17 +13,19 @@ set(
     TimingTests.cpp
     iterationTests.cpp
     ErrorTests.cpp
-    federateRealTimeTests.cpp
     TimingTests2.cpp
     QueryTests.cpp
     heat-transfer-tests.cpp
     flagTests.cpp
     updateTests.cpp
     networkTests.cpp
-    brokerTimeoutTests.cpp
     ../application_api/testFixtures.cpp
     ../application_api/testFixtures.hpp
 )
+
+if (NOT HELICS_DISABLE_ASIO)
+	list(APPEND system_test_sources federateRealTimeTests.cpp brokerTimeoutTests.cpp)
+endif()
 
 add_executable(system-tests ${system_test_sources} ${system_test_headers})
 target_link_libraries(system-tests helics_application_api helics_test_base)
