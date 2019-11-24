@@ -95,6 +95,7 @@ static const std::unordered_map<std::string, core_type> coreTypes{{"default", co
                                                                   {"websocket", core_type::WEBSOCKET},
                                                                   {"web", core_type::WEBSOCKET},
                                                                   {"inproc", core_type::INPROC},
+                                                                  {"nng", core_type::NNG},
                                                                   {"http", core_type::HTTP},
                                                                   {"HTTP", core_type::HTTP},
                                                                   {"web", core_type::HTTP},

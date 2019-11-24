@@ -557,22 +557,29 @@ helics_core helicsCreateCore (const char *type, const char *name, const char *in
         }
         return nullptr;
     }
-    auto core = std::make_unique<helics::CoreObject> ();
-    core->valid = coreValidationIdentifier;
-    auto nstring = AS_STRING (name);
-    if (nstring.empty ())
+    try
     {
-        core->coreptr = helics::CoreFactory::create (ct, AS_STRING (initString));
+        auto core = std::make_unique<helics::CoreObject> ();
+        core->valid = coreValidationIdentifier;
+        auto nstring = AS_STRING (name);
+        if (nstring.empty ())
+        {
+            core->coreptr = helics::CoreFactory::create (ct, AS_STRING (initString));
+        }
+        else
+        {
+            core->coreptr = helics::CoreFactory::FindOrCreate (ct, nstring, AS_STRING (initString));
+        }
+
+        auto retcore = reinterpret_cast<helics_core> (core.get ());
+        getMasterHolder ()->addCore (std::move (core));
+        return retcore;
     }
-    else
+    catch (...)
     {
-        core->coreptr = helics::CoreFactory::FindOrCreate (ct, nstring, AS_STRING (initString));
+        helicsErrorHandler (err);
+        return nullptr;
     }
-
-    auto retcore = reinterpret_cast<helics_core> (core.get ());
-    getMasterHolder ()->addCore (std::move (core));
-
-    return retcore;
 }
 
 helics_core helicsCreateCoreFromArgs (const char *type, const char *name, int argc, const char *const *argv, helics_error *err)
@@ -897,7 +904,7 @@ void helicsBrokerMakeConnections (helics_broker broker, const char *file, helics
     try
     {
         brk->makeConnections (AS_STRING (file));
-	}
+    }
     catch (...)
     {
         helicsErrorHandler (err);
