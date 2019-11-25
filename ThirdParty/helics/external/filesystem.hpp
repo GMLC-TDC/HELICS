@@ -177,7 +177,7 @@
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 // ghc::filesystem version in decimal (major * 10000 + minor * 100 + patch)
-#define GHC_FILESYSTEM_VERSION 10209L
+#define GHC_FILESYSTEM_VERSION 10210L
 
 namespace ghc {
 namespace filesystem {
@@ -1086,7 +1086,7 @@ enum class portable_error {
 };
 GHC_FS_API std::error_code make_error_code(portable_error err);
 #ifdef GHC_OS_WINDOWS
-GHC_FS_API std::error_code make_system_error(DWORD err = 0);
+GHC_FS_API std::error_code make_system_error(uint32_t err = 0);
 #else
 GHC_FS_API std::error_code make_system_error(int err = 0);
 #endif
@@ -1141,7 +1141,7 @@ GHC_INLINE std::error_code make_error_code(portable_error err)
 }
 
 #ifdef GHC_OS_WINDOWS
-GHC_INLINE std::error_code make_system_error(DWORD err)
+GHC_INLINE std::error_code make_system_error(uint32_t err)
 {
     return std::error_code(err ? static_cast<int>(err) : static_cast<int>(::GetLastError()), std::system_category());
 }
@@ -1602,7 +1602,14 @@ GHC_INLINE void create_symlink(const path& target_name, const path& new_symlink,
         ec = detail::make_error_code(detail::portable_error::not_supported);
         return;
     }
-    static CreateSymbolicLinkW_fp api_call = reinterpret_cast<CreateSymbolicLinkW_fp>(reinterpret_cast<void*>(GetProcAddress(GetModuleHandleW(L"kernel32.dll"), "CreateSymbolicLinkW")));
+#if defined(__GNUC__) && __GNUC__ >= 8
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wcast-function-type"
+#endif
+    static CreateSymbolicLinkW_fp api_call = reinterpret_cast<CreateSymbolicLinkW_fp>(GetProcAddress(GetModuleHandleW(L"kernel32.dll"), "CreateSymbolicLinkW"));
+#if defined(__GNUC__) && __GNUC__ >= 8
+#pragma GCC diagnostic pop
+#endif
     if (api_call) {
         if (api_call(detail::fromUtf8<std::wstring>(new_symlink.u8string()).c_str(), detail::fromUtf8<std::wstring>(target_name.u8string()).c_str(), to_directory ? 1 : 0) == 0) {
             auto result = ::GetLastError();
@@ -1619,7 +1626,14 @@ GHC_INLINE void create_symlink(const path& target_name, const path& new_symlink,
 
 GHC_INLINE void create_hardlink(const path& target_name, const path& new_hardlink, std::error_code& ec)
 {
-    static CreateHardLinkW_fp api_call = reinterpret_cast<CreateHardLinkW_fp>(reinterpret_cast<void*>(GetProcAddress(GetModuleHandleW(L"kernel32.dll"), "CreateHardLinkW")));
+#if defined(__GNUC__) && __GNUC__ >= 8
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wcast-function-type"
+#endif
+    static CreateHardLinkW_fp api_call = reinterpret_cast<CreateHardLinkW_fp>(GetProcAddress(GetModuleHandleW(L"kernel32.dll"), "CreateHardLinkW"));
+#if defined(__GNUC__) && __GNUC__ >= 8
+#pragma GCC diagnostic pop
+#endif
     if (api_call) {
         if (api_call(detail::fromUtf8<std::wstring>(new_hardlink.u8string()).c_str(), detail::fromUtf8<std::wstring>(target_name.u8string()).c_str(), NULL) == 0) {
             ec = detail::make_system_error();
@@ -4176,7 +4190,7 @@ GHC_INLINE void rename(const path& from, const path& to, std::error_code& ec) no
     ec.clear();
 #ifdef GHC_OS_WINDOWS
     if (from != to) {
-        if (!MoveFileW(detail::fromUtf8<std::wstring>(from.u8string()).c_str(), detail::fromUtf8<std::wstring>(to.u8string()).c_str())) {
+        if (!MoveFileExW(detail::fromUtf8<std::wstring>(from.u8string()).c_str(), detail::fromUtf8<std::wstring>(to.u8string()).c_str(), (DWORD)MOVEFILE_REPLACE_EXISTING)) {
             ec = detail::make_system_error();
         }
     }
