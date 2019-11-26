@@ -25,5 +25,7 @@ bool bindzmqSocket (zmq::socket_t &socket,
                     int port,
                     std::chrono::milliseconds timeout,
                     std::chrono::milliseconds period = defaultPeriod);
+/** get the ZeroMQ version currently in use*/
+std::string getZMQVersion();
 }  // namespace hzmq
 }  // namespace helics

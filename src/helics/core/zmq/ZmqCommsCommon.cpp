@@ -46,5 +46,12 @@ bool bindzmqSocket (zmq::socket_t &socket,
     return bindsuccess;
 }
 
+std::string getZMQVersion ()
+{
+    auto vers = zmq::version ();
+    return std::string ("ZMQ v") + std::to_string (std::get<0> (vers)) + '.' +
+           std::to_string (std::get<2> (vers)) + '.' + std::to_string (std::get<0> (vers));
+}
+
 }  // namespace hzmq
 }  // namespace helics

@@ -40,6 +40,8 @@ if(HELICS_VERSION_BUILD)
     )
 endif()
 
+set(HELICS_COMPILER_VERSION "${CMAKE_SYSTEM}:${CMAKE_CXX_COMPILER_ID}-${CMAKE_CXX_COMPILER_VERSION}")
+message(STATUS "SYSTEM INFO -> ${HELICS_COMPILER_VERSION}")
 # -----------------------------------------------------------------------------
 # set the module path and include some common macros
 # -----------------------------------------------------------------------------

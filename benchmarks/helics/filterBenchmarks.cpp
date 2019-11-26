@@ -10,6 +10,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helics/core/BrokerFactory.hpp"
 #include "helics/core/CoreFactory.hpp"
 #include <benchmark/benchmark.h>
+#include "helics_benchmark_main.h"
 #include <chrono>
 #include <fstream>
 #include <iostream>
@@ -208,3 +209,5 @@ BENCHMARK_CAPTURE (BM_filter_multiCore, inprocCore, core_type::INPROC)
           ->Unit (benchmark::TimeUnit::kMillisecond)
           ->UseRealTime ();
 #endif
+
+HELICS_BENCHMARK_MAIN();

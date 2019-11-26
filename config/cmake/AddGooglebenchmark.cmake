@@ -62,8 +62,17 @@ set(HAVE_GNU_POSIX_REGEX OFF CACHE INTERNAL "" )
 add_subdirectory(${${gbName}_SOURCE_DIR} ${${gbName}_BINARY_DIR} EXCLUDE_FROM_ALL)
 
 # Target must already exist
-macro(add_benchmark TESTNAME)
+macro(add_benchmark_with_main TESTNAME)
     target_link_libraries(${TESTNAME} PUBLIC benchmark benchmark_main Threads::Threads)
+    if(WIN32)
+        target_link_libraries(${TESTNAME} PUBLIC shlwapi)
+    endif()
+    set_target_properties(${TESTNAME} PROPERTIES FOLDER "benchmarks")
+
+endmacro()
+
+macro(add_benchmark TESTNAME)
+    target_link_libraries(${TESTNAME} PUBLIC benchmark Threads::Threads)
     if(WIN32)
         target_link_libraries(${TESTNAME} PUBLIC shlwapi)
     endif()
