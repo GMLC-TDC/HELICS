@@ -1,0 +1,17 @@
+#!/bin/bash
+
+files=()
+for file in `git diff --cached --name-only --diff-filter=ACMRT | grep -E "\.(cpp|hpp|c|h)$"`; do
+  if ! cmp -s <(git show :${file}) <(git show :${file}|clang-format); then
+    files+=("${file}")
+  fi
+done
+
+if [[ -n "${files}" ]]; then
+    echo "Clang-format found issues with the following files:"
+    printf "%s\n" "${files[@]}"
+    echo "Run clang-format -i <filename> to resolve the issue before committing, or commit with --no-verify"
+    exit 1
+else
+    echo "Clang-format check passed successfully."
+fi

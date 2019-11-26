@@ -1085,3 +1085,5 @@ if(NOT CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
         )
     endif()
 endif()
+
+include(addGitHooks)
