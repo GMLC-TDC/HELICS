@@ -506,6 +506,7 @@ helics_message helicsFederateGetMessage (helics_federate fed)
         mess.original_dest = message->original_dest.c_str ();
         mess.time = static_cast<helics_time> (message->time);
         mess.messageID = message->messageID;
+		mess.flags = message->flags;
         fedObj->messages.push_back (std::move (message));
         return mess;
     }

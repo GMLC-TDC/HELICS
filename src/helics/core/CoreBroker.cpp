@@ -1854,9 +1854,9 @@ bool CoreBroker::connect ()
             }
             return res;
         }
-        if (brokerState == broker_state_t::connecting)
+        if (brokerState.load() == broker_state_t::connecting)
         {
-            while (brokerState == broker_state_t::connecting)
+            while (brokerState.load() == broker_state_t::connecting)
             {
                 std::this_thread::sleep_for (std::chrono::milliseconds (20));
             }
