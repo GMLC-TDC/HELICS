@@ -28,7 +28,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #if defined(_WIN32) || defined(WIN32)
 #    include <intrin.h>
 // code modified from https://weseetips.wordpress.com/tag/c-get-cpu-name/
-inline std::string getCPUIdentifier ()
+inline std::string getCPUModel ()
 {  // Get extended ids.
     int CPUInfo[4] = {-1};
     __cpuid (CPUInfo, 0x80000000);
@@ -60,12 +60,12 @@ inline std::string getCPUIdentifier ()
 #elif defined(__unix__)
 #    include <cstdio>
 #    include <cstdlib>
-inline std::string getCPUIdentifier ()
+inline std::string getCPUModel ()
 {  // Get extended ids.
     FILE *fp = fopen ("/proc/cpuinfo", "r");
     if (fp==nullptr)
     {
-        return std::string{HELICS_BUILD_PROCESSOR};
+        return std::string{};
 	}
     size_t n = 0;
     char *line = NULL;
@@ -88,11 +88,11 @@ inline std::string getCPUIdentifier ()
         auto eline = info.find_first_of ("\n\r\0", modelLoc);
         return info.substr (cloc + 1, eline - cloc - 1);
     }
-    return std::string{HELICS_BUILD_PROCESSOR};
+    return std::string{};
 }
 
 #else
-inline std::string getCPUIdentifier ()
+inline std::string getCPUModel ()
 {  // Get extended ids.
     return std::string{HELICS_BUILD_PROCESSOR};
 }
@@ -107,6 +107,13 @@ inline void printHELICSsystemInfo ()
 #endif
     std::cout << "Compiler = " << HELICS_COMPILER_VERSION << '\n';
     std::cout << "Build Flags =" << HELICS_BUILD_FLAGS << '\n';
-    std::cout << "-------------------------------------------\n";
-    std::cout << "CPU ID: " << getCPUIdentifier () << std::endl;
+	std::cout << "------------PROCESSOR INFO ----------------\n";
+	std::cout << "HOST PROCESSOR TYPE: " << HELICS_BUILD_PROCESSOR << '\n';
+	auto cpumodel = getCPUModel();
+	if (!cpumodel.empty())
+	{
+		std::cout << "CPU MODEL: " << cpumodel << '\n';
+	}
+	std::cout << "-------------------------------------------" << std::endl;
+    
 }
