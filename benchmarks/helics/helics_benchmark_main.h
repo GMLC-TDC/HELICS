@@ -62,20 +62,27 @@ inline std::string getCPUIdentifier ()
 #    include <cstdlib>
 inline std::string getCPUIdentifier ()
 {  // Get extended ids.
-    FILE *f = fopen ("/proc/cpuinfo", "r");
-    fseek (f, 0, SEEK_END);
-    long fsize = ftell (f);
-    fseek (f, 0, SEEK_SET); /* same as rewind(f); */
-
-    char *string = static_cast<char *>(malloc (fsize + 1));
-    fread (string, 1, fsize, f);
-    fclose (f);
-
-    string[fsize] = 0;
-    std::string info (string);
+    FILE *fp = fopen ("/proc/cpuinfo", "r");
+    if (fp==nullptr)
+    {
+        return std::string{HELICS_BUILD_PROCESSOR};
+	}
+    size_t n = 0;
+    char *line = NULL;
+    std::string info;
+    while (getline (&line, &n, fp) > 0)
+    {
+        if (strstr (line, "model name"))
+        {
+            info.append (line);
+            break;
+        }
+    }
+    free (line);
+    fclose (fp);
     std::cout << info << '\n';
     auto modelLoc = info.find ("model name");
-	
+
     if (modelLoc != std::string::npos)
     {
         auto cloc = info.find_first_of (':', modelLoc);
