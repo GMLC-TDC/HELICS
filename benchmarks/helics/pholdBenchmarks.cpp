@@ -8,13 +8,13 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "PholdFederate.hpp"
 #include "helics/core/BrokerFactory.hpp"
 #include "helics/core/CoreFactory.hpp"
-#include <benchmark/benchmark.h>
 #include "helics_benchmark_main.h"
+#include <benchmark/benchmark.h>
 #include <chrono>
 #include <fstream>
 #include <iostream>
-#include <thread>
 #include <random>
+#include <thread>
 
 #include <gmlc/concurrency/Barrier.hpp>
 
@@ -31,25 +31,25 @@ static void BM_phold_singleCore (benchmark::State &state)
         state.PauseTiming ();
 
         int fed_count = static_cast<int> (state.range (0));
-        gmlc::concurrency::Barrier brr (static_cast<size_t>(fed_count));
+        gmlc::concurrency::Barrier brr (static_cast<size_t> (fed_count));
         auto wcore = helics::CoreFactory::create (core_type::INPROC, std::string ("--autobroker --federates=") +
                                                                        std::to_string (fed_count));
         std::vector<PholdFederate> feds (fed_count);
-        std::mt19937 rand_gen(0x600d5eed);
+        std::mt19937 rand_gen (0x600d5eed);
         std::uniform_int_distribution<unsigned int> rand_seed;
         for (int ii = 0; ii < fed_count; ++ii)
         {
             // set seeds for federates to deterministic values, but not all the same
-            feds[ii].setGenerateRandomSeed(false);
-            feds[ii].setRandomSeed(rand_seed(rand_gen));
+            feds[ii].setGenerateRandomSeed (false);
+            feds[ii].setRandomSeed (rand_seed (rand_gen));
             feds[ii].initialize (wcore->getIdentifier (), ii, fed_count);
         }
 
-        std::vector<std::thread> threadlist (static_cast<size_t> (fed_count-1));
-        for (int ii = 0; ii < fed_count-1; ++ii)
+        std::vector<std::thread> threadlist (static_cast<size_t> (fed_count - 1));
+        for (int ii = 0; ii < fed_count - 1; ++ii)
         {
             threadlist[ii] = std::thread ([&] (PholdFederate &f) { f.run ([&brr] () { brr.wait (); }); },
-                                          std::ref (feds[ii+1]));
+                                          std::ref (feds[ii + 1]));
         }
         feds[0].makeReady ();
         brr.wait ();
@@ -67,7 +67,7 @@ static void BM_phold_singleCore (benchmark::State &state)
             totalEvCount += feds[ii].evCount;
         }
         state.counters["EvCount"] = totalEvCount;
- 
+
         wcore.reset ();
         cleanupHelicsLibrary ();
         state.ResumeTiming ();
@@ -88,7 +88,7 @@ static void BM_phold_multiCore (benchmark::State &state, core_type cType)
         state.PauseTiming ();
 
         int fed_count = static_cast<int> (state.range (0));
-        gmlc::concurrency::Barrier brr (static_cast<size_t>(fed_count));
+        gmlc::concurrency::Barrier brr (static_cast<size_t> (fed_count));
 
         auto broker = helics::BrokerFactory::create (cType, "brokerb",
                                                      std::string ("--federates=") + std::to_string (fed_count));
@@ -96,25 +96,25 @@ static void BM_phold_multiCore (benchmark::State &state, core_type cType)
         auto wcore = helics::CoreFactory::create (cType, std::string ("--federates=1"));
         std::vector<PholdFederate> feds (fed_count);
         std::vector<std::shared_ptr<helics::Core>> cores (fed_count);
-        
-        std::mt19937 rand_gen(0x600d5eed);
+
+        std::mt19937 rand_gen (0x600d5eed);
         std::uniform_int_distribution<unsigned int> rand_seed;
         for (int ii = 0; ii < fed_count; ++ii)
         {
             cores[ii] = helics::CoreFactory::create (cType, "-f 1");
             cores[ii]->connect ();
-        
+
             // set seeds for federates to deterministic values, but not all the same
-            feds[ii].setGenerateRandomSeed(false);
-            feds[ii].setRandomSeed(rand_seed(rand_gen));
+            feds[ii].setGenerateRandomSeed (false);
+            feds[ii].setRandomSeed (rand_seed (rand_gen));
             feds[ii].initialize (cores[ii]->getIdentifier (), ii, fed_count);
         }
 
-        std::vector<std::thread> threadlist (static_cast<size_t> (fed_count-1));
-        for (int ii = 0; ii < fed_count-1; ++ii)
+        std::vector<std::thread> threadlist (static_cast<size_t> (fed_count - 1));
+        for (int ii = 0; ii < fed_count - 1; ++ii)
         {
             threadlist[ii] = std::thread ([&] (PholdFederate &f) { f.run ([&brr] () { brr.wait (); }); },
-                                          std::ref (feds[ii+1]));
+                                          std::ref (feds[ii + 1]));
         }
         feds[0].makeReady ();
         brr.wait ();
@@ -193,7 +193,7 @@ BENCHMARK_CAPTURE (BM_phold_multiCore, tcpCore, core_type::TCP)
 // Register the TCP SS benchmarks
 BENCHMARK_CAPTURE (BM_phold_multiCore, tcpssCore, core_type::TCP_SS)
   ->RangeMultiplier (2)
-  ->Range (1, 1) // This is set to 1; any higher seems to result in deadlock (OS buffer limit?)
+  ->Range (1, 1)  // This is set to 1; any higher seems to result in deadlock (OS buffer limit?)
   ->Iterations (1)
   ->Unit (benchmark::TimeUnit::kMillisecond)
   ->UseRealTime ();
@@ -210,4 +210,4 @@ BENCHMARK_CAPTURE (BM_phold_multiCore, udpCore, core_type::UDP)
   ->UseRealTime ();
 #endif
 
-HELICS_BENCHMARK_MAIN();
+HELICS_BENCHMARK_MAIN ();

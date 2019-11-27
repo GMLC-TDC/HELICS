@@ -144,4 +144,4 @@ static void BM_AM_depacketize_strings (benchmark::State &state)
 // Register the function as a benchmark
 BENCHMARK (BM_AM_depacketize_strings);
 
-HELICS_BENCHMARK_MAIN();
+HELICS_BENCHMARK_MAIN ();

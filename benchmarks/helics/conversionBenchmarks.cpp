@@ -7,8 +7,8 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include "helics/application_api/ValueConverter.hpp"
 #include "helics/application_api/ValueConverter_impl.hpp"
-#include <benchmark/benchmark.h>
 #include "helics_benchmark_main.h"
+#include <benchmark/benchmark.h>
 
 using namespace helics;
 template <class T>
@@ -74,4 +74,4 @@ BENCHMARK_CAPTURE (BM_interpret,
 
 BENCHMARK_CAPTURE (BM_interpret, vector_interp, std::vector<double>{26.5, 18.6, -48.5, -5.4e-12});
 
-HELICS_BENCHMARK_MAIN();
+HELICS_BENCHMARK_MAIN ();

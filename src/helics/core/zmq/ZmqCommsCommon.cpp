@@ -50,7 +50,7 @@ std::string getZMQVersion ()
 {
     auto vers = zmq::version ();
     return std::string ("ZMQ v") + std::to_string (std::get<0> (vers)) + '.' +
-           std::to_string (std::get<2> (vers)) + '.' + std::to_string (std::get<0> (vers));
+           std::to_string (std::get<1> (vers)) + '.' + std::to_string (std::get<2> (vers));
 }
 
 }  // namespace hzmq
