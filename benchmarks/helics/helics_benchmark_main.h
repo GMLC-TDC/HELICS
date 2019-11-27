@@ -90,7 +90,25 @@ inline std::string getCPUIdentifier ()
     }
     return std::string{HELICS_BUILD_PROCESSOR};
 }
-
+#elif defined(__APPLE__)
+#    include <cstdlib>
+#    include <sys/types.h>
+#    include <sys/sysctl.h>
+inline std::string getCPUIdentifier ()
+{
+    std::string info;
+    size_t name_sz = 0;
+    if (!sysctlbyname ("machdep.cpu.brand_string", nullptr, &name_sz, nullptr, 0))
+    {
+        char *buffer = static_cast<char*> (malloc (name_sz));
+        if (!sysctlbyname ("machdep.cpu.brand_string", buffer, &name_sz, nullptr, 0))
+        {
+            info = std::string (buffer, name_sz);
+        }
+        free (buffer);
+    }
+    return info;
+}
 #else
 inline std::string getCPUIdentifier ()
 {  // Get extended ids.
