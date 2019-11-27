@@ -1,6 +1,9 @@
 ---
 name: Support or design question
 about: Ask a detailed question or start a design discussion
+title: ''
+labels: ''
+assignees: ''
 
 ---
 
