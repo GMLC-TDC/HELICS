@@ -8,7 +8,9 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "EchoMessage.hpp"
 #include "helics/core/BrokerFactory.hpp"
 #include "helics/core/CoreFactory.hpp"
+#include "helics_benchmark_main.h"
 #include <benchmark/benchmark.h>
+
 #include <chrono>
 #include <fstream>
 #include <iostream>
@@ -28,7 +30,7 @@ static void BM_echo_singleCore (benchmark::State &state)
         state.PauseTiming ();
 
         int feds = static_cast<int> (state.range (0));
-        gmlc::concurrency::Barrier brr (static_cast<size_t>(feds) + 1);
+        gmlc::concurrency::Barrier brr (static_cast<size_t> (feds) + 1);
         auto wcore = helics::CoreFactory::create (core_type::INPROC, std::string ("--autobroker --federates=") +
                                                                        std::to_string (feds + 1));
         EchoMessageHub hub;
@@ -74,7 +76,7 @@ static void BM_echo_multiCore (benchmark::State &state, core_type cType)
         state.PauseTiming ();
 
         int feds = static_cast<int> (state.range (0));
-        gmlc::concurrency::Barrier brr (static_cast<size_t>(feds) + 1);
+        gmlc::concurrency::Barrier brr (static_cast<size_t> (feds) + 1);
 
         auto broker = helics::BrokerFactory::create (cType, "brokerb",
                                                      std::string ("--federates=") + std::to_string (feds + 1));
@@ -183,3 +185,5 @@ BENCHMARK_CAPTURE (BM_echo_multiCore, udpCore, core_type::UDP)
   ->Unit (benchmark::TimeUnit::kMillisecond)
   ->UseRealTime ();
 #endif
+
+HELICS_BENCHMARK_MAIN (echoMessageBenchmark);

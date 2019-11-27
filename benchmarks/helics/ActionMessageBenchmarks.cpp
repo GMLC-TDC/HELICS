@@ -6,7 +6,7 @@ SPDX-License-Identifier: BSD-3-Clause
 */
 
 #include "helics/core/ActionMessage.hpp"
-#include <benchmark/benchmark.h>
+#include "helics_benchmark_main.h"
 
 using namespace helics;
 
@@ -143,3 +143,5 @@ static void BM_AM_depacketize_strings (benchmark::State &state)
 }
 // Register the function as a benchmark
 BENCHMARK (BM_AM_depacketize_strings);
+
+HELICS_BENCHMARK_MAIN (actionMessageBenchmark);

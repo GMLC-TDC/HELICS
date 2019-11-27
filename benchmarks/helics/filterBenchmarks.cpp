@@ -5,10 +5,11 @@ the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 
-#include "helics/application_api/Filters.hpp"
 #include "EchoMessage.hpp"
+#include "helics/application_api/Filters.hpp"
 #include "helics/core/BrokerFactory.hpp"
 #include "helics/core/CoreFactory.hpp"
+#include "helics_benchmark_main.h"
 #include <benchmark/benchmark.h>
 #include <chrono>
 #include <fstream>
@@ -54,13 +55,13 @@ static void BM_filter_singleCore (benchmark::State &state)
         std::vector<std::thread> threadlist (static_cast<size_t> (feds));
         for (int ii = 0; ii < feds; ++ii)
         {
-            threadlist[ii] =
-              std::thread ([&](EchoMessageLeaf &lf) { lf.run ([&brr]() { brr.wait (); }); }, std::ref (leafs[ii]));
+            threadlist[ii] = std::thread ([&] (EchoMessageLeaf &lf) { lf.run ([&brr] () { brr.wait (); }); },
+                                          std::ref (leafs[ii]));
         }
         hub.makeReady ();
         brr.wait ();
         state.ResumeTiming ();
-        hub.run ([]() {});
+        hub.run ([] () {});
         state.PauseTiming ();
         for (auto &thrd : threadlist)
         {
@@ -121,13 +122,13 @@ static void BM_filter_multiCore (benchmark::State &state, core_type cType)
         std::vector<std::thread> threadlist (static_cast<size_t> (feds));
         for (int ii = 0; ii < feds; ++ii)
         {
-            threadlist[ii] =
-              std::thread ([&](EchoMessageLeaf &lf) { lf.run ([&brr]() { brr.wait (); }); }, std::ref (leafs[ii]));
+            threadlist[ii] = std::thread ([&] (EchoMessageLeaf &lf) { lf.run ([&brr] () { brr.wait (); }); },
+                                          std::ref (leafs[ii]));
         }
         hub.makeReady ();
         brr.wait ();
         state.ResumeTiming ();
-        hub.run ([]() {});
+        hub.run ([] () {});
         state.PauseTiming ();
         for (auto &thrd : threadlist)
         {
@@ -146,65 +147,67 @@ static void BM_filter_multiCore (benchmark::State &state, core_type cType)
 static constexpr int64_t maxscale{1 << 5};
 // Register the inproc core benchmarks
 BENCHMARK_CAPTURE (BM_filter_multiCore, inprocCore, core_type::INPROC)
-->RangeMultiplier(2)
-  ->Ranges ({{1, maxscale*2}, {1, 2}})
+  ->RangeMultiplier (2)
+  ->Ranges ({{1, maxscale * 2}, {1, 2}})
   ->Unit (benchmark::TimeUnit::kMillisecond)
   ->UseRealTime ();
 #ifdef ENABLE_ZMQ_CORE
-        // Register the ZMQ benchmarks
-        BENCHMARK_CAPTURE (BM_filter_multiCore, zmqCore, core_type::ZMQ)
-          ->RangeMultiplier (2)
+// Register the ZMQ benchmarks
+BENCHMARK_CAPTURE (BM_filter_multiCore, zmqCore, core_type::ZMQ)
+  ->RangeMultiplier (2)
   ->Ranges ({{1, maxscale}, {1, 2}})
-          ->Iterations (1)
-          ->Unit (benchmark::TimeUnit::kMillisecond)
-          ->UseRealTime ();
+  ->Iterations (1)
+  ->Unit (benchmark::TimeUnit::kMillisecond)
+  ->UseRealTime ();
 
-        // Register the ZMQ benchmarks
-        BENCHMARK_CAPTURE (BM_filter_multiCore, zmqssCore, core_type::ZMQ_SS)
-          ->RangeMultiplier (2)
-          ->Ranges ({{1, maxscale}, {1, 2}})
-          ->Iterations (1)
-          ->Unit (benchmark::TimeUnit::kMillisecond)
-          ->UseRealTime ();
+// Register the ZMQ benchmarks
+BENCHMARK_CAPTURE (BM_filter_multiCore, zmqssCore, core_type::ZMQ_SS)
+  ->RangeMultiplier (2)
+  ->Ranges ({{1, maxscale}, {1, 2}})
+  ->Iterations (1)
+  ->Unit (benchmark::TimeUnit::kMillisecond)
+  ->UseRealTime ();
 
 #endif
 
 #ifdef ENABLE_IPC_CORE
-        // Register the IPC benchmarks
-        BENCHMARK_CAPTURE (BM_filter_multiCore, ipcCore, core_type::IPC)
-          ->RangeMultiplier (2)
-          ->Ranges ({{1, maxscale}, {1, 2}})
-          ->Iterations (1)
-          ->Unit (benchmark::TimeUnit::kMillisecond)
-          ->UseRealTime ();
+// Register the IPC benchmarks
+BENCHMARK_CAPTURE (BM_filter_multiCore, ipcCore, core_type::IPC)
+  ->RangeMultiplier (2)
+  ->Ranges ({{1, maxscale}, {1, 2}})
+  ->Iterations (1)
+  ->Unit (benchmark::TimeUnit::kMillisecond)
+  ->UseRealTime ();
 
 #endif
 
 #ifdef ENABLE_TCP_CORE
-        // Register the TCP benchmarks
-        BENCHMARK_CAPTURE (BM_filter_multiCore, tcpCore, core_type::TCP)
-          ->RangeMultiplier (2)
-          ->Ranges ({{1, maxscale}, {1, 2}})
-          ->Iterations (1)
-          ->Unit (benchmark::TimeUnit::kMillisecond)
-          ->UseRealTime ();
+// Register the TCP benchmarks
+BENCHMARK_CAPTURE (BM_filter_multiCore, tcpCore, core_type::TCP)
+  ->RangeMultiplier (2)
+  ->Ranges ({{1, maxscale}, {1, 2}})
+  ->Iterations (1)
+  ->Unit (benchmark::TimeUnit::kMillisecond)
+  ->UseRealTime ();
 
-        // Register the TCP SS benchmarks
-        BENCHMARK_CAPTURE (BM_filter_multiCore, tcpssCore, core_type::TCP_SS)
-          ->RangeMultiplier (2)
-          ->Ranges ({{1, maxscale}, {1, 2}})
-          ->Iterations (1)
-          ->Unit (benchmark::TimeUnit::kMillisecond)
-          ->UseRealTime ();
+// Register the TCP SS benchmarks
+BENCHMARK_CAPTURE (BM_filter_multiCore, tcpssCore, core_type::TCP_SS)
+  ->RangeMultiplier (2)
+  ->Ranges ({{1, maxscale}, {1, 2}})
+  ->Iterations (1)
+  ->Unit (benchmark::TimeUnit::kMillisecond)
+  ->UseRealTime ();
 
 #endif
 
 #ifdef ENABLE_UDP_CORE
-        // Register the UDP benchmarks
-        BENCHMARK_CAPTURE (BM_filter_multiCore, udpCore, core_type::UDP)
-          ->RangeMultiplier (2)
-          ->Ranges ({{1, maxscale}, {1, 2}})
-          ->Iterations (1)
-          ->Unit (benchmark::TimeUnit::kMillisecond)
-          ->UseRealTime ();
+// Register the UDP benchmarks
+BENCHMARK_CAPTURE (BM_filter_multiCore, udpCore, core_type::UDP)
+  ->RangeMultiplier (2)
+  ->Ranges ({{1, maxscale}, {1, 2}})
+  ->Iterations (1)
+  ->Unit (benchmark::TimeUnit::kMillisecond)
+  ->UseRealTime ();
 #endif
+
+HELICS_BENCHMARK_MAIN (filterBenchmark);

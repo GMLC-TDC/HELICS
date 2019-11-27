@@ -13,7 +13,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helics/core/BrokerFactory.hpp"
 #include "helics/core/CoreFactory.hpp"
 #include "helics/helics-config.h"
-#include <benchmark/benchmark.h>
+#include "helics_benchmark_main.h"
 #include <chrono>
 #include <fstream>
 #include <iostream>
@@ -287,3 +287,5 @@ BENCHMARK_CAPTURE (BM_ring_multiCore, udpCore, core_type::UDP)
   ->Arg (20)
   ->UseRealTime ();
 #endif
+
+HELICS_BENCHMARK_MAIN(ringBenchmark);
