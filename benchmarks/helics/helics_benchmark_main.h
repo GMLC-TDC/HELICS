@@ -58,8 +58,8 @@ inline std::string getCPUIdentifier ()
     return std::string (CPUBrandString);
 }
 #elif defined(__unix__)
-#    include <stdio>
-#    include <stdlib>
+#    include <cstdio>
+#    include <cstdlib>
 inline std::string getCPUIdentifier ()
 {  // Get extended ids.
     FILE *f = fopen ("/proc/cpuinfo", "r");
