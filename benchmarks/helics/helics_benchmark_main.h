@@ -13,12 +13,13 @@ SPDX-License-Identifier: BSD-3-Clause
 #endif
 
 // Helper macro to create a main routine in a test that runs the benchmarks
-#define HELICS_BENCHMARK_MAIN()                                                                                   \
+#define HELICS_BENCHMARK_MAIN(label)                                                                              \
     int main (int argc, char **argv)                                                                              \
     {                                                                                                             \
         ::benchmark::Initialize (&argc, argv);                                                                    \
         if (::benchmark::ReportUnrecognizedArguments (argc, argv))                                                \
             return 1;                                                                                             \
+        std::cout << "#benchmark:" << #label << '\n';                                                             \
         printHELICSsystemInfo ();                                                                                 \
         ::benchmark::RunSpecifiedBenchmarks ();                                                                   \
     }                                                                                                             \
@@ -33,5 +34,6 @@ inline void printHELICSsystemInfo()
 	std::cout << helics::hzmq::getZMQVersion() << '\n';
 #endif
 	std::cout << "Compiler = " << HELICS_COMPILER_VERSION << '\n';
+    std::cout << "Build Flags =" << HELICS_BUILD_FLAGS << '\n';
 	std::cout << "-------------------------------------------" << std::endl;
 }

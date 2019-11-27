@@ -74,4 +74,4 @@ BENCHMARK_CAPTURE (BM_interpret,
 
 BENCHMARK_CAPTURE (BM_interpret, vector_interp, std::vector<double>{26.5, 18.6, -48.5, -5.4e-12});
 
-HELICS_BENCHMARK_MAIN ();
+HELICS_BENCHMARK_MAIN (conversionBenchmark);

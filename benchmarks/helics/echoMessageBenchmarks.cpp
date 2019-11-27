@@ -186,4 +186,4 @@ BENCHMARK_CAPTURE (BM_echo_multiCore, udpCore, core_type::UDP)
   ->UseRealTime ();
 #endif
 
-HELICS_BENCHMARK_MAIN ();
+HELICS_BENCHMARK_MAIN (echoMessageBenchmark);

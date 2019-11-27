@@ -268,4 +268,4 @@ BENCHMARK_CAPTURE (BM_ring_multiCore, udpCore, core_type::UDP)
   ->UseRealTime ();
   */
 
-HELICS_BENCHMARK_MAIN();
+HELICS_BENCHMARK_MAIN(messageLookupBenchmark);

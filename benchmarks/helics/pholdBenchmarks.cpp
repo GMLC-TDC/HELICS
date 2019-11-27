@@ -210,4 +210,4 @@ BENCHMARK_CAPTURE (BM_phold_multiCore, udpCore, core_type::UDP)
   ->UseRealTime ();
 #endif
 
-HELICS_BENCHMARK_MAIN ();
+HELICS_BENCHMARK_MAIN (pholdBenchmark);

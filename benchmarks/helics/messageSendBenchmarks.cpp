@@ -283,4 +283,4 @@ BENCHMARK_CAPTURE (BM_sendMessage, udpMultiCore, core_type::UDP)
   ->UseRealTime ();
 #endif
 
-HELICS_BENCHMARK_MAIN();
+HELICS_BENCHMARK_MAIN(messageSendBenchmark);
