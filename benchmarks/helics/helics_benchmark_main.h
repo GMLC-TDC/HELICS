@@ -73,7 +73,9 @@ inline std::string getCPUIdentifier ()
 
     string[fsize] = 0;
     std::string info (string);
+    std::cout << info << '\n';
     auto modelLoc = info.find ("model name");
+	
     if (modelLoc != std::string::npos)
     {
         auto cloc = info.find_first_of (':', modelLoc);
