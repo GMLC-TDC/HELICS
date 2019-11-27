@@ -160,7 +160,7 @@ cmake_dependent_option(
 
 cmake_dependent_option(
     HELICS_BUILD_BENCHMARKS "Build HELICS Benchmarks" OFF
-    "CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME" OFF
+    "CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME;CMAKE_VERSION VERSION_GREATER 3.5" OFF
 )
 
 cmake_dependent_advanced_option(

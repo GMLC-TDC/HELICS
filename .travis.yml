@@ -90,6 +90,7 @@ jobs:
       env:
         - MATRIX_EVAL="COMPILER=gcc && CC=gcc-6 && CXX=g++-6"
         - USE_SWIG=true
+        - USE_CMAKE_VERSION=3.7.2
         - BUILD_BENCHMARKS=true
         - USE_MPI=mpich
 
