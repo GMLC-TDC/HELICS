@@ -80,7 +80,6 @@ inline std::string getCPUIdentifier ()
     }
     free (line);
     fclose (fp);
-    std::cout << info << '\n';
     auto modelLoc = info.find ("model name");
 
     if (modelLoc != std::string::npos)
