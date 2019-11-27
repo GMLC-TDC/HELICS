@@ -19,7 +19,7 @@ SPDX-License-Identifier: BSD-3-Clause
         ::benchmark::Initialize (&argc, argv);                                                                    \
         if (::benchmark::ReportUnrecognizedArguments (argc, argv))                                                \
             return 1;                                                                                             \
-        std::cout << "#benchmark:" << #label << '\n';                                                             \
+        std::cout << "HELICS_BENCHMARK: " << #label << '\n';                                                      \
         printHELICSsystemInfo ();                                                                                 \
         ::benchmark::RunSpecifiedBenchmarks ();                                                                   \
     }                                                                                                             \
@@ -61,7 +61,7 @@ inline std::string getCPUModel ()
 #    include <cstdio>
 #    include <cstdlib>
 inline std::string getCPUModel ()
-{  // Get extended ids.
+{  // Get the cpu from /proc/cpuinfo
     FILE *fp = fopen ("/proc/cpuinfo", "r");
     if (fp==nullptr)
     {
@@ -94,7 +94,7 @@ inline std::string getCPUModel ()
 #    include <cstdlib>
 #    include <sys/types.h>
 #    include <sys/sysctl.h>
-inline std::string getCPUIdentifier ()
+inline std::string getCPUModel ()
 {
     std::string info;
     size_t name_sz = 0;
@@ -111,20 +111,20 @@ inline std::string getCPUIdentifier ()
 }
 #else
 inline std::string getCPUModel ()
-{  // Get extended ids.
-    return std::string{HELICS_BUILD_PROCESSOR};
+{ 
+    return std::string{};
 }
 #endif
 /// Generate a report of the compilers used and zmq version linked as well as the version info for HELICS
 /// for use with the benchmarks
 inline void printHELICSsystemInfo ()
 {
-    std::cout << "------------HELICS BUILD INFO -------------\nHELICS " << HELICS_VERSION_STRING << '\n';
+    std::cout << "------------HELICS BUILD INFO -------------\nHELICS VERSION: " << HELICS_VERSION_STRING << '\n';
 #ifdef ENABLE_ZMQ_CORE
-    std::cout << helics::hzmq::getZMQVersion () << '\n';
+    std::cout <<"ZMQ VERSION: "<< helics::hzmq::getZMQVersion () << '\n';
 #endif
-    std::cout << "Compiler = " << HELICS_COMPILER_VERSION << '\n';
-    std::cout << "Build Flags =" << HELICS_BUILD_FLAGS << '\n';
+    std::cout << "COMPILER INFO: " << HELICS_COMPILER_VERSION << '\n';
+    std::cout << "BUILD FLAGS: " << HELICS_BUILD_FLAGS << '\n';
 	std::cout << "------------PROCESSOR INFO ----------------\n";
 	std::cout << "HOST PROCESSOR TYPE: " << HELICS_BUILD_PROCESSOR << '\n';
 	auto cpumodel = getCPUModel();
@@ -133,5 +133,5 @@ inline void printHELICSsystemInfo ()
 		std::cout << "CPU MODEL: " << cpumodel << '\n';
 	}
 	std::cout << "-------------------------------------------" << std::endl;
-    
+	std::cout << "DATETIME: ";
 }
