@@ -67,7 +67,7 @@ inline std::string getCPUIdentifier ()
     long fsize = ftell (f);
     fseek (f, 0, SEEK_SET); /* same as rewind(f); */
 
-    char *string = malloc (fsize + 1);
+    char *string = static_cast<char *>(malloc (fsize + 1));
     fread (string, 1, fsize, f);
     fclose (f);
 
