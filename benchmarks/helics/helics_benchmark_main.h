@@ -133,5 +133,4 @@ inline void printHELICSsystemInfo ()
 		std::cout << "CPU MODEL: " << cpumodel << '\n';
 	}
 	std::cout << "-------------------------------------------" << std::endl;
-	std::cout << "DATETIME: ";
 }
