@@ -23,6 +23,12 @@ jobs:
       image: helics/buildenv:clang-format
     
     steps:
+    - uses: actions/github-script@0.3.0
+      if: github.event_name == 'issue_comment'
+      with:
+        github-token: ${{secrets.GITHUB_TOKEN}}
+        script: |
+          github.issues.createComment({...context.issue, body: 'Okay, commit https://github.com/${{ github.repository }}/commit/${{ github.sha }} is being formatted. A PR with the changes will be open soon! :sunglasses:'})
     - uses: actions/checkout@v1
     - name: Run clang-format
       run: |
