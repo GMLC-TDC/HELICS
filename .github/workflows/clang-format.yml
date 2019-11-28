@@ -18,7 +18,6 @@ jobs:
     - name: Run clang-format
       run: |
         clang-format --version
-        find * | grep -v "^ThirdParty" | grep -E ".*\.[ch](p{2})?$"
         find * | grep -v "^ThirdParty" | grep -E ".*\.[ch](p{2})?$" | xargs clang-format -i -style=file
         
     - name: Stage changed source files
@@ -34,9 +33,9 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        COMMIT_MSG: "Automated formatting update to source files"
-        PR_TITLE: "Automated formatting update to source files"
-        PR_BODY: "Automated formatting update to source files in commit https://github.com/${{ github.repository }}/commit/${{ github.sha }}."
+        COMMIT_MSG: "Automated formatting of source files"
+        PR_TITLE: "Automated formatting of source files"
+        PR_BODY: "Automated formatting of source files in commit https://github.com/${{ github.repository }}/commit/${{ github.sha }}."
         GIT_EMAIL: "HELICS-bot@users.noreply.github.com"
         GIT_NAME: "HELICS-bot"
         BRANCH_PREFIX: "clang-format/"
