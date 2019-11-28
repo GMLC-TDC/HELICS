@@ -10,6 +10,7 @@ on:
       - '**.[ch]pp'
       - '**.[ch]'
       - '!ThirdParty/**'
+      - '!interfaces/**'
 #    branches: 
 #      - master
 #      - develop
@@ -26,7 +27,7 @@ jobs:
     - name: Run clang-format
       run: |
         clang-format --version
-        find * | grep -v "^ThirdParty" | grep -E ".*\.[ch](p{2})?$" | xargs clang-format -i -style=file
+        find * | grep -v -e "^ThirdParty" -e "^interfaces" | grep -E ".*\.[ch](p{2})?$" | xargs clang-format -i -style=file
         
     - name: Stage changed source files
       shell: bash --noprofile --norc {0}
