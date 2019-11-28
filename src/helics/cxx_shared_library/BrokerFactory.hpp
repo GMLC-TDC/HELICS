@@ -17,13 +17,16 @@ namespace helics
 namespace BrokerFactory
 {
 #define HELICS_SHARED_DEPRECATED                                                                                  \
-    [[deprecated ("Broker Factory is deprecated for use in the C++ shared library use BrokerApp instead if you really need the functionality either link to the static library and/or contact the developers with the requirements to potentially add it to BrokerApp")]]
+    [[deprecated ("Broker Factory is deprecated for use in the C++ shared library use BrokerApp instead if you "  \
+                  "really need the functionality either link to the static library and/or contact the "           \
+                  "developers with the requirements to potentially add it to BrokerApp")]]
 /**
  * Creates a Broker object of the specified type.
  *
  * Invokes initialize() on the instantiated Core object.
  */
-HELICS_SHARED_DEPRECATED std::shared_ptr<Broker> create (core_type type, const std::string &initializationString) {
+HELICS_SHARED_DEPRECATED std::shared_ptr<Broker> create (core_type type, const std::string &initializationString)
+{
     BrokerApp brk (type, initializationString);
     return brk.getCopyofBrokerPointer ();
 }

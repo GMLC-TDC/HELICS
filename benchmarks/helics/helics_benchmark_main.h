@@ -63,10 +63,10 @@ inline std::string getCPUModel ()
 inline std::string getCPUModel ()
 {  // Get the cpu from /proc/cpuinfo
     FILE *fp = fopen ("/proc/cpuinfo", "r");
-    if (fp==nullptr)
+    if (fp == nullptr)
     {
         return std::string{};
-	}
+    }
     size_t n = 0;
     char *line = NULL;
     std::string info;
@@ -92,15 +92,15 @@ inline std::string getCPUModel ()
 }
 #elif defined(__APPLE__)
 #    include <cstdlib>
-#    include <sys/types.h>
 #    include <sys/sysctl.h>
+#    include <sys/types.h>
 inline std::string getCPUModel ()
 {
     std::string info;
     size_t name_sz = 0;
     if (!sysctlbyname ("machdep.cpu.brand_string", nullptr, &name_sz, nullptr, 0))
     {
-        char *buffer = static_cast<char*> (malloc (name_sz));
+        char *buffer = static_cast<char *> (malloc (name_sz));
         if (!sysctlbyname ("machdep.cpu.brand_string", buffer, &name_sz, nullptr, 0))
         {
             info = std::string (buffer, name_sz);
@@ -110,10 +110,7 @@ inline std::string getCPUModel ()
     return info;
 }
 #else
-inline std::string getCPUModel ()
-{ 
-    return std::string{};
-}
+inline std::string getCPUModel () { return std::string{}; }
 #endif
 /// Generate a report of the compilers used and zmq version linked as well as the version info for HELICS
 /// for use with the benchmarks
@@ -121,16 +118,16 @@ inline void printHELICSsystemInfo ()
 {
     std::cout << "------------HELICS BUILD INFO -------------\nHELICS VERSION: " << HELICS_VERSION_STRING << '\n';
 #ifdef ENABLE_ZMQ_CORE
-    std::cout <<"ZMQ VERSION: "<< helics::hzmq::getZMQVersion () << '\n';
+    std::cout << "ZMQ VERSION: " << helics::hzmq::getZMQVersion () << '\n';
 #endif
     std::cout << "COMPILER INFO: " << HELICS_COMPILER_VERSION << '\n';
     std::cout << "BUILD FLAGS: " << HELICS_BUILD_FLAGS << '\n';
-	std::cout << "------------PROCESSOR INFO ----------------\n";
-	std::cout << "HOST PROCESSOR TYPE: " << HELICS_BUILD_PROCESSOR << '\n';
-	auto cpumodel = getCPUModel();
-	if (!cpumodel.empty())
-	{
-		std::cout << "CPU MODEL: " << cpumodel << '\n';
-	}
-	std::cout << "-------------------------------------------" << std::endl;
+    std::cout << "------------PROCESSOR INFO ----------------\n";
+    std::cout << "HOST PROCESSOR TYPE: " << HELICS_BUILD_PROCESSOR << '\n';
+    auto cpumodel = getCPUModel ();
+    if (!cpumodel.empty ())
+    {
+        std::cout << "CPU MODEL: " << cpumodel << '\n';
+    }
+    std::cout << "-------------------------------------------" << std::endl;
 }

@@ -17,8 +17,8 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "../core/networkDefaults.hpp"
 
 #ifdef ENABLE_ZMQ_CORE
-#include "../common/zmqContextManager.h"
-#include "../core/zmq/ZmqCommsCommon.h"
+#    include "../common/zmqContextManager.h"
+#    include "../core/zmq/ZmqCommsCommon.h"
 #endif
 
 namespace helics

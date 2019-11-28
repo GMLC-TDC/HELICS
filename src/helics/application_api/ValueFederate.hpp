@@ -482,12 +482,12 @@ class HELICS_CXX_EXPORT ValueFederate
     @details there can only be one generic callback
     @param callback the function to call signature void(input_id_t, Time)
     */
-    void setInputNotificationCallback (std::function<void (Input &, Time)> callback);
+    void setInputNotificationCallback (std::function<void(Input &, Time)> callback);
     /** register a callback function to call when the specified subscription is updated
     @param inp an input to set the notification callback for
     @param callback the function to call
     */
-    void setInputNotificationCallback (Input &inp, std::function<void (Input &, Time)> callback);
+    void setInputNotificationCallback (Input &inp, std::function<void(Input &, Time)> callback);
 
     /** get a count of the number publications registered*/
     int getPublicationCount () const;

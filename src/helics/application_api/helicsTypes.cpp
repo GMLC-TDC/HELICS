@@ -65,7 +65,7 @@ double vectorNorm (const std::vector<std::complex<double>> &vec)
 {
     return std::sqrt (
       std::inner_product (vec.begin (), vec.end (), vec.begin (), 0.0, std::plus<> (),
-                          [] (const auto &a, const auto &b) { return (a * std::conj (b)).real (); }));
+                          [](const auto &a, const auto &b) { return (a * std::conj (b)).real (); }));
 }
 
 std::string helicsComplexString (double real, double imag)
@@ -403,7 +403,7 @@ static int readSize (const std::string &val)
             // go to the alternative path if this fails
         }
     }
-    auto res = std::count_if (val.begin () + fb, val.end (), [] (auto c) { return (c == ',') || (c == ';'); }) + 1;
+    auto res = std::count_if (val.begin () + fb, val.end (), [](auto c) { return (c == ',') || (c == ';'); }) + 1;
     return static_cast<int> (res);
 }
 

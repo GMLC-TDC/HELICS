@@ -46,12 +46,12 @@ class dataBlock
 
     int next_data_size () const;
 
-    int pop(unsigned char *block);
+    int pop (unsigned char *block);
 
     /** reverse the order in which the data will be extracted*/
     void reverse ();
     /** clear all data from the dataBlock*/
-	void clear ();
+    void clear ();
 };
 /** class implementing a blocking queue with a priority channel
 @details this class uses locks one for push and pull it can exhibit longer blocking times if the internal

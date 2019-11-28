@@ -127,7 +127,7 @@ TEST_F (timing_tests, test_uninteruptible_flag)
     auto pub = helics::make_publication<double> (helics::GLOBAL, vFed1.get (), "pub1");
     vFed2->registerSubscription ("pub1");
 
-    auto rfed1 = [&] () {
+    auto rfed1 = [&]() {
         vFed1->enterExecutingMode ();
         for (double ii = 1.0; ii <= 100.0; ii += 1.0)
         {
@@ -136,7 +136,7 @@ TEST_F (timing_tests, test_uninteruptible_flag)
         }
     };
 
-    auto rfed2 = [&] () {
+    auto rfed2 = [&]() {
         vFed2->enterExecutingMode ();
         std::vector<helics::Time> res;
         for (double ii = 5.0; ii <= 100.0; ii += 5.0)
@@ -174,7 +174,7 @@ TEST_F (timing_tests, test_uninteruptible_flag_option)
     auto &IP2 = vFed2->registerSubscription ("pub1");
     // test with the handle option vs the federate option
     IP2.setOption (helics::defs::options::ignore_interrupts);
-    auto rfed1 = [&] () {
+    auto rfed1 = [&]() {
         vFed1->enterExecutingMode ();
         for (double ii = 1.0; ii <= 100.0; ii += 1.0)
         {
@@ -183,7 +183,7 @@ TEST_F (timing_tests, test_uninteruptible_flag_option)
         }
     };
 
-    auto rfed2 = [&] () {
+    auto rfed2 = [&]() {
         vFed2->enterExecutingMode ();
         std::vector<helics::Time> res;
         for (double ii = 5.0; ii <= 100.0; ii += 5.0)
@@ -225,7 +225,7 @@ TEST_F (timing_tests, test_uninteruptible_flag_two_way_comm)
     vFed1->registerSubscription ("pub2");
     vFed2->registerSubscription ("pub1");
 
-    auto rfed1 = [&] () {
+    auto rfed1 = [&]() {
         vFed1->enterExecutingMode ();
         for (double ii = 1.0; ii <= 100.0; ii += 1.0)
         {
@@ -234,7 +234,7 @@ TEST_F (timing_tests, test_uninteruptible_flag_two_way_comm)
         }
     };
 
-    auto rfed2 = [&] () {
+    auto rfed2 = [&]() {
         vFed2->enterExecutingMode ();
         std::vector<helics::Time> res;
         for (double ii = 5.0; ii <= 100.0; ii += 5.0)
