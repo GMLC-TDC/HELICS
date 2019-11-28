@@ -20,7 +20,7 @@ class Input
     /** construct from a helics_input object*/
     explicit Input (helics_input hsub) HELICS_NOTHROW : inp (hsub) {}
     /** default constructor*/
-	Input () HELICS_NOTHROW : inp (HELICS_NULL_POINTER){};
+    Input () HELICS_NOTHROW : inp (HELICS_NULL_POINTER){};
     /** copy constructor*/
     Input (const Input &inputs) HELICS_NOTHROW : inp (inputs.inp) {}
     /** copy assign*/
@@ -35,37 +35,22 @@ class Input
     helics_input baseObject () const { return inp; }
     /** Methods to set default values for inputs **/
     /** set the default value as a raw data with length*/
-    void setDefault(const char *data, int len)
-    {
-        helicsInputSetDefaultRaw (inp, data, len, NULL);
-    }
+    void setDefault (const char *data, int len) { helicsInputSetDefaultRaw (inp, data, len, NULL); }
     /** set the default value as a string*/
-    void setDefault (const std::string &str)
-    {
-        helicsInputSetDefaultString (inp, str.c_str (), NULL);
-    }
+    void setDefault (const std::string &str) { helicsInputSetDefaultString (inp, str.c_str (), NULL); }
     /** set the default value as an integer*/
-    void setDefault(int64_t val)
-    {
-        helicsInputSetDefaultInteger (inp, val, NULL);
-    }
+    void setDefault (int64_t val) { helicsInputSetDefaultInteger (inp, val, NULL); }
     /** set the default bool value*/
-    void setDefault(bool val)
-    {
-        helicsInputSetDefaultBoolean (inp, val ? helics_true : helics_false, NULL);
-    }
+    void setDefault (bool val) { helicsInputSetDefaultBoolean (inp, val ? helics_true : helics_false, NULL); }
     /** set the default double value*/
-    void setDefault(double val)
-    {
-        helicsInputSetDefaultDouble (inp, val, NULL);
-    }
+    void setDefault (double val) { helicsInputSetDefaultDouble (inp, val, NULL); }
     /** set the default complex value*/
-    void setDefault(const std::complex<double> &cmplx)
+    void setDefault (const std::complex<double> &cmplx)
     {
         helicsInputSetDefaultComplex (inp, cmplx.real (), cmplx.imag (), NULL);
     }
     /** set the default vector data value*/
-    void setDefault(const std::vector<double> &data)
+    void setDefault (const std::vector<double> &data)
     {
         helicsInputSetDefaultVector (inp, data.data (), static_cast<int> (data.size () * sizeof (double)), NULL);
     }
@@ -82,7 +67,7 @@ class Input
     /** get the size of the raw value */
     int getRawValueSize () { return helicsInputGetRawValueSize (inp); }
 
-	/** get the current value as a string*/
+    /** get the current value as a string*/
     std::string getString ()
     {
         int size = helicsInputGetStringSize (inp);
@@ -129,9 +114,9 @@ class Input
         return result;
     }
     /** get the current value as a vector of doubles
-	@param data pointer to space to store the current values
-	@param maxlen the maximum size of the allowed vector
-	@return the actual size of the vector stored*/
+    @param data pointer to space to store the current values
+    @param maxlen the maximum size of the allowed vector
+    @return the actual size of the vector stored*/
     int getVector (double *data, int maxlen)
     {
         helicsInputGetVector (inp, data, maxlen, &maxlen, hThrowOnError ());
@@ -154,7 +139,7 @@ class Input
     /** clear the updated flag*/
     void clearUpdate () { helicsInputClearUpdate (inp); }
     // call helicsInputIsUpdated for each inp
-    
+
     /** get the Name/Key for the input
    @details the name is the local name if given, key is the full key name*/
     const char *getKey () const { return helicsInputGetKey (inp); }
@@ -163,7 +148,7 @@ class Input
     /** get the units associated with a input*/
     const char *getInjectionUnits () const { return helicsInputGetInjectionUnits (inp); }
     /** get the type of the input*/
-	const char *getType () const { return helicsInputGetType (inp); }
+    const char *getType () const { return helicsInputGetType (inp); }
     /** get an associated target*/
     const char *getTarget () const { return helicsSubscriptionGetKey (inp); }
 

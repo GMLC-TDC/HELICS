@@ -177,7 +177,7 @@ class CommonCore : public Core, public BrokerBase
     virtual void setLoggingLevel (int logLevel) override;
     virtual void setLoggingCallback (
       local_federate_id federateID,
-      std::function<void (int, const std::string &, const std::string &)> logFunction) override final;
+      std::function<void(int, const std::string &, const std::string &)> logFunction) override final;
 
     virtual void setLogFile (const std::string &lfile) override final;
 

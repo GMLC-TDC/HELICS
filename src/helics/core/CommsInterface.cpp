@@ -423,7 +423,7 @@ bool CommsInterface::reconnect ()
             (tx_status.load () == connection_status::connected));
 }
 
-void CommsInterface::setCallback (std::function<void (ActionMessage &&)> callback)
+void CommsInterface::setCallback (std::function<void(ActionMessage &&)> callback)
 {
     if (propertyLock ())
     {
@@ -433,7 +433,7 @@ void CommsInterface::setCallback (std::function<void (ActionMessage &&)> callbac
 }
 
 void CommsInterface::setLoggingCallback (
-  std::function<void (int level, const std::string &name, const std::string &message)> callback)
+  std::function<void(int level, const std::string &name, const std::string &message)> callback)
 {
     if (propertyLock ())
     {

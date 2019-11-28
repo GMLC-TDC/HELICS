@@ -29,9 +29,9 @@ class MessageFederate : public virtual Federate
         fed = helicsCreateMessageFederate (fedName.c_str (), fi.getInfo (), hThrowOnError ());
     }
 
-	 /**constructor taking a string with the required information
-   @param configString can be either a JSON file, TOML file or a string containing JSON code
-   */
+    /**constructor taking a string with the required information
+  @param configString can be either a JSON file, TOML file or a string containing JSON code
+  */
     explicit MessageFederate (const std::string &configString)
     {
         fed = helicsCreateMessageFederateFromConfig (configString.c_str (), hThrowOnError ());
@@ -47,7 +47,7 @@ class MessageFederate : public virtual Federate
     @param name the name of the endpoint
     @param type the defined type of the interface for endpoint checking if requested
     @return an Endpoint Object
-	*/
+    */
     Endpoint registerEndpoint (const std::string &name, const std::string &type = std::string ())
     {
         helics_endpoint ep = helicsFederateRegisterEndpoint (fed, name.c_str (), type.c_str (), hThrowOnError ());
@@ -55,11 +55,11 @@ class MessageFederate : public virtual Federate
         return Endpoint (ep);
     }
 
-	/** register an endpoint directly without prepending the federate name
+    /** register an endpoint directly without prepending the federate name
     @param name the name of the endpoint
     @param type the defined type of the interface for endpoint checking if requested
      @return an Endpoint Object
-	*/
+    */
     Endpoint registerGlobalEndpoint (const std::string &name, const std::string &type = std::string ())
     {
         helics_endpoint ep =
@@ -68,7 +68,7 @@ class MessageFederate : public virtual Federate
         return Endpoint (ep);
     }
 
-	/** get an Endpoint from its name 
+    /** get an Endpoint from its name
     @param name the name of the endpoint to retrieve
     @return an Endpoint*/
     Endpoint getEndpoint (const std::string &name)

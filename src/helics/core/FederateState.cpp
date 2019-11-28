@@ -529,7 +529,7 @@ iteration_result FederateState::enterExecutingMode (iteration_request iterate)
         }
 
         unlock ();
-		#ifndef HELICS_DISABLE_ASIO
+#ifndef HELICS_DISABLE_ASIO
         if ((realtime) && (ret == message_processing_result::next_step))
         {
             if (!mTimer)
@@ -539,7 +539,7 @@ iteration_result FederateState::enterExecutingMode (iteration_request iterate)
             }
             start_clock_time = std::chrono::steady_clock::now ();
         }
-		#endif
+#endif
         return static_cast<iteration_result> (ret);
     }
     // the following code is for situation which this has been called multiple times, which really shouldn't be

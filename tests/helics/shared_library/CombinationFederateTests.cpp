@@ -20,7 +20,7 @@ All rights reserved. See LICENSE file and DISCLAIMER for more details.
 namespace bdata = boost::unit_test::data;
 namespace utf = boost::unit_test;
 
-BOOST_FIXTURE_TEST_SUITE (combo_federate_tests, FederateTestFixture, *utf::label("ci"))
+BOOST_FIXTURE_TEST_SUITE (combo_federate_tests, FederateTestFixture, *utf::label ("ci"))
 
 // const std::string core_types[] = {"udp" };
 /** test simple creation and destruction*/

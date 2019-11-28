@@ -18,28 +18,29 @@ class PholdFederate
   public:
     helics::Time deltaTime = helics::Time (10, time_units::ns);  // sampling rate
     helics::Time finalTime = helics::Time (10000, time_units::ns);  // final time
-    int evCount = 0; // number of events handled by this federate
+    int evCount = 0;  // number of events handled by this federate
 
   private:
     std::unique_ptr<helics::MessageFederate> mFed;
-    helics::Endpoint* ept;
+    helics::Endpoint *ept;
 
     int index_ = 0;
     int maxIndex_ = 0;
-  
+
     // values from paper "Warp Speed: Executing Time Warp on 1,966,080 Cores"
     // 16 circulating events per LP (also ran with 8 events per LP)
     // 10% remote communications (also ran with 25%, 50%, and 100% remote communications)
     // mean exponential distribution of 0.90
     // optional lookahead of .1 (to prevent arbitrarily small increases in time with conservative simulators)
-    unsigned int initEvCount_ = 16; // starting number of events
-    double localProbability_ = .9; // probability of local events
-    double randTimeMean_ = deltaTime * .9; // mean for the exponential distribution used when picking event times
+    unsigned int initEvCount_ = 16;  // starting number of events
+    double localProbability_ = .9;  // probability of local events
+    double randTimeMean_ = deltaTime * .9;  // mean for the exponential distribution used when picking event times
     double lookahead_ = deltaTime * .1;
 
     // classes related to the exponential and uniform distribution random number generator
-    bool generateRandomSeed = true; 
-    unsigned int seed = 0xABad5eed; // some suggestions for seed choice were that not having a majority of the bits as 0 is better
+    bool generateRandomSeed = true;
+    unsigned int seed =
+      0xABad5eed;  // some suggestions for seed choice were that not having a majority of the bits as 0 is better
     std::mt19937 rand_gen;
     std::exponential_distribution<double> rand_exp;
     std::uniform_real_distribution<double> rand_uniform_double;
@@ -51,13 +52,13 @@ class PholdFederate
   public:
     PholdFederate () = default;
 
-    void setGenerateRandomSeed (bool b) { generateRandomSeed = b;  };
+    void setGenerateRandomSeed (bool b) { generateRandomSeed = b; };
     void setRandomSeed (unsigned int s) { seed = s; };
     void setRandomTimeMean (double mean) { randTimeMean_ = mean; };
     void setInitialEventCount (unsigned int count) { initEvCount_ = count; };
     void setLocalProbability (double p) { localProbability_ = p; };
 
-    void run (std::function<void ()> callOnReady = nullptr)
+    void run (std::function<void()> callOnReady = nullptr)
     {
         makeReady ();
         if (callOnReady)
@@ -81,18 +82,18 @@ class PholdFederate
         if (generateRandomSeed)
         {
             std::random_device rd;
-            rand_gen.seed(rd());
+            rand_gen.seed (rd ());
         }
         else
         {
-            rand_gen.seed(seed);
+            rand_gen.seed (seed);
         }
-        rand_exp = std::exponential_distribution<double> (1.0/randTimeMean_);
+        rand_exp = std::exponential_distribution<double> (1.0 / randTimeMean_);
         rand_uniform_double = std::uniform_real_distribution<double> (0.0, 1.0);
         // create random number distribution for picking a destination if there is more than 1 federate
         if (maxIndex_ > 1)
         {
-            rand_uniform_int = std::uniform_int_distribution<unsigned int> (0, maxIndex_-2);
+            rand_uniform_int = std::uniform_int_distribution<unsigned int> (0, maxIndex_ - 2);
         }
         initialized = true;
     }
@@ -118,20 +119,21 @@ class PholdFederate
     {
         // decide if the event is local or remote
         auto destIndex = index_;
-        if (maxIndex_ > 1 && rand_uniform_double(rand_gen) > localProbability_)
+        if (maxIndex_ > 1 && rand_uniform_double (rand_gen) > localProbability_)
         {
-            destIndex = rand_uniform_int(rand_gen);
+            destIndex = rand_uniform_int (rand_gen);
             if (destIndex == index_)
             {
-                destIndex = maxIndex_-1;
+                destIndex = maxIndex_ - 1;
             }
         }
 
         // set the event time to current time + lookahead + rand exponential (mean >= lookahead or ~2x lookahead)
-        helics::Time evTime = mFed->getCurrentTime() + helics::Time(lookahead_) + helics::Time(rand_exp(rand_gen));
+        helics::Time evTime =
+          mFed->getCurrentTime () + helics::Time (lookahead_) + helics::Time (rand_exp (rand_gen));
         std::string data = "ev";
-        std::string dest = "phold_" + std::to_string(destIndex) + "/ept";
-        ept->send(dest, data, evTime);
+        std::string dest = "phold_" + std::to_string (destIndex) + "/ept";
+        ept->send (dest, data, evTime);
     }
 
     void mainLoop ()
@@ -146,9 +148,8 @@ class PholdFederate
             {
                 auto m = ept->getMessage ();
                 evCount++;
-                createNewEvent();
+                createNewEvent ();
             }
-
         }
         mFed->finalize ();
     }
