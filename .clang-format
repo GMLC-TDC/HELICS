@@ -23,7 +23,7 @@ Cpp11BracedListStyle: true
 DerivePointerBinding: false
 IndentCaseLabels: false
 IndentFunctionDeclarationAfterType: false
-IndentWidth: 4
+IndentWidth: 2
 Language: Cpp
 MaxEmptyLinesToKeep: 1
 NamespaceIndentation: None
@@ -52,6 +52,6 @@ IncludeCategories:
   - Regex:           '.*'
     Priority:        1
 Standard: Cpp11
-TabWidth: 4
+TabWidth: 2
 UseTab: Never
 
