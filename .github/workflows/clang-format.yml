@@ -1,6 +1,8 @@
 name: Format source code
 
 on:
+  pull_request_review_comment:
+    types: [created]
   issue_comment:
     types: [created]
   push:
@@ -17,7 +19,7 @@ on:
 
 jobs:
   build:
-    if: github.event_name != 'issue_comment' || contains(github.event.comment.body, '/format')
+    if: github.event_name != 'pull_request_review_comment' || contains(github.event.comment.body, '/format')
     runs-on: ubuntu-latest
     container:
       image: helics/buildenv:clang-format
