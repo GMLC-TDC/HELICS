@@ -1,0 +1,42 @@
+name: Format source code
+
+on:
+  push:
+#    branches: 
+#      - master
+#      - develop
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+    container:
+      image: helics/buildenv:clang-format
+    
+    steps:
+    - uses: actions/checkout@v1
+    - name: Run clang-format
+      run: |
+        clang-format --version
+        find * | grep -v "^ThirdParty" | grep -E ".*\.[ch](p{2})?$"
+        find * | grep -v "^ThirdParty" | grep -E ".*\.[ch](p{2})?$" | xargs clang-format -i -style=file
+        
+    - name: Stage changed source files
+      shell: bash --noprofile --norc {0}
+      run: |
+        git diff --name-only | grep -E ".*\.[h|c](p{2})?$"
+        if [[ "$?" == "0" ]];
+        then
+          git add *.cpp *.hpp *.c *.h
+        fi
+        exit 0
+    - uses: ./.github/actions/create-file-update-pr
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        COMMIT_MSG: "Automated formatting update to source files"
+        PR_TITLE: "Automated formatting update to source files"
+        PR_BODY: "Automated formatting update to source files in commit https://github.com/${{ github.repository }}/commit/${{ github.sha }}."
+        GIT_EMAIL: "HELICS-bot@users.noreply.github.com"
+        GIT_NAME: "HELICS-bot"
+        BRANCH_PREFIX: "clang-format/"
