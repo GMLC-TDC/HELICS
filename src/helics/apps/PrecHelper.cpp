@@ -16,7 +16,7 @@ using namespace helics;
 
 data_type getType (const std::string &typeString)
 {
-    auto tstr = gmlc::utilities::stringOps::trim(typeString);
+    auto tstr = gmlc::utilities::stringOps::trim (typeString);
     // trim the string
     if (tstr.empty ())
     {

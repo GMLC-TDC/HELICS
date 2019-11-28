@@ -60,7 +60,7 @@ inline int64_t getOrDefault (const Json::Value &element, const std::string &key,
 
 inline void callIfMember (const Json::Value &element,
                           const std::string &key,
-                          const std::function<void (const std::string &, helics::Time)> &call)
+                          const std::function<void(const std::string &, helics::Time)> &call)
 {
     if (element.isMember (key))
     {
@@ -70,7 +70,7 @@ inline void callIfMember (const Json::Value &element,
 
 inline void callIfMember (const Json::Value &element,
                           const std::string &key,
-                          const std::function<void (const std::string &, bool)> &call)
+                          const std::function<void(const std::string &, bool)> &call)
 {
     if (element.isMember (key))
     {
@@ -80,7 +80,7 @@ inline void callIfMember (const Json::Value &element,
 
 inline void callIfMember (const Json::Value &element,
                           const std::string &key,
-                          const std::function<void (const std::string &, int)> &call)
+                          const std::function<void(const std::string &, int)> &call)
 {
     if (element.isMember (key))
     {
@@ -90,7 +90,7 @@ inline void callIfMember (const Json::Value &element,
 
 inline void callIfMember (const Json::Value &element,
                           const std::string &key,
-                          const std::function<void (const std::string &)> &call)
+                          const std::function<void(const std::string &)> &call)
 {
     if (element.isMember (key))
     {

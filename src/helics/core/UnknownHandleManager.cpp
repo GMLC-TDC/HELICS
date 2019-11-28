@@ -205,7 +205,7 @@ bool UnknownHandleManager::hasRequiredUnknowns () const
 }
 
 void UnknownHandleManager::processNonOptionalUnknowns (
-  std::function<void (const std::string &, char, global_handle handle)> cfunc) const
+  std::function<void(const std::string &, char, global_handle handle)> cfunc) const
 {
     for (auto &upub : unknown_publications)
     {
@@ -243,7 +243,7 @@ void UnknownHandleManager::processNonOptionalUnknowns (
 }
 
 void UnknownHandleManager::processRequiredUnknowns (
-  std::function<void (const std::string &, char, global_handle handle)> cfunc) const
+  std::function<void(const std::string &, char, global_handle handle)> cfunc) const
 {
     for (auto &upub : unknown_publications)
     {

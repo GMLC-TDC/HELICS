@@ -33,7 +33,7 @@ TEST (source_tests, simple_source_test)
     src1.setStartTime ("pub1", 1.0);
     helics::ValueFederate vfed ("block1", fi);
     auto &sub1 = vfed.registerSubscription ("pub1");
-    auto fut = std::async (std::launch::async, [&src1] () {
+    auto fut = std::async (std::launch::async, [&src1]() {
         src1.runTo (5);
         src1.finalize ();
     });
@@ -96,7 +96,7 @@ TEST (source_tests, simple_source_test2)
     helics::ValueFederate vfed ("block1", fi);
     auto &sub1 = vfed.registerSubscription ("pub1");
     auto &sub2 = vfed.registerSubscription ("pub2");
-    auto fut = std::async (std::launch::async, [&src1] () {
+    auto fut = std::async (std::launch::async, [&src1]() {
         src1.runTo (5);
         src1.finalize ();
     });
@@ -155,7 +155,7 @@ TEST (source_tests, sine_source_test)
     src1.setStartTime ("pub1", 1.0);
     helics::ValueFederate vfed ("block1", fi);
     auto &sub1 = vfed.registerSubscription ("pub1");
-    auto fut = std::async (std::launch::async, [&src1] () {
+    auto fut = std::async (std::launch::async, [&src1]() {
         src1.runTo (5);
         src1.finalize ();
     });
@@ -204,7 +204,7 @@ TEST (source_tests, simple_source_test_file)
 
     helics::ValueFederate vfed ("block1", fi);
     auto &sub1 = vfed.registerSubscription ("pub1");
-    auto fut = std::async (std::launch::async, [&src1] () {
+    auto fut = std::async (std::launch::async, [&src1]() {
         src1.runTo (5);
         src1.finalize ();
     });
@@ -248,7 +248,7 @@ TEST (source_tests, simple_source_test2_file)
     helics::ValueFederate vfed ("block1", fi);
     auto &sub1 = vfed.registerSubscription ("pub1");
     auto &sub2 = vfed.registerSubscription ("pub2");
-    auto fut = std::async (std::launch::async, [&src1] () {
+    auto fut = std::async (std::launch::async, [&src1]() {
         src1.runTo (5);
         src1.finalize ();
     });
@@ -298,7 +298,7 @@ TEST (source_tests, sine_source_test_file)
 
     helics::ValueFederate vfed ("block1", fi);
     auto &sub1 = vfed.registerSubscription ("pub1");
-    auto fut = std::async (std::launch::async, [&src1] () {
+    auto fut = std::async (std::launch::async, [&src1]() {
         src1.runTo (5);
         src1.finalize ();
     });

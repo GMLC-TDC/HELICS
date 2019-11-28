@@ -29,22 +29,21 @@ std::shared_ptr<helicsCLI11App> MpiCore::generateCLI ()
     auto hApp = CommonCore::generateCLI ();
     hApp->description ("Message Passing Interface Core operation command line arguments");
     hApp
-      ->add_option_function<std::string> ("--broker_address,--broker",
-                                          [this](const std::string &addr) {
-                                              auto delim_pos = addr.find_first_of (':', 1);
-                                              try
-                                              {
-                                                  brokerRank = std::stoi (addr.substr (0, delim_pos));
-                                                  brokerTag =
-                                                    std::stoi (addr.substr (delim_pos + 1, addr.length ()));
-                                              }
-                                              catch (const std::invalid_argument &)
-                                              {
-                                                  throw (CLI::ValidationError (
-                                                    "address does not evaluate to integers"));
-                                              }
-                                          },
-                                          "location of a broker using mpi (rank:tag)")
+      ->add_option_function<std::string> (
+        "--broker_address,--broker",
+        [this](const std::string &addr) {
+            auto delim_pos = addr.find_first_of (':', 1);
+            try
+            {
+                brokerRank = std::stoi (addr.substr (0, delim_pos));
+                brokerTag = std::stoi (addr.substr (delim_pos + 1, addr.length ()));
+            }
+            catch (const std::invalid_argument &)
+            {
+                throw (CLI::ValidationError ("address does not evaluate to integers"));
+            }
+        },
+        "location of a broker using mpi (rank:tag)")
       ->ignore_underscore ();
     hApp->add_option ("--broker_rank,--rank", brokerRank, "mpi rank of a broker using mpi")->ignore_underscore ();
     hApp->add_option ("--broker_tag,--tag", brokerTag, "mpi tag of a broker using mpi")->ignore_underscore ();

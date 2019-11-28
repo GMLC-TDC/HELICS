@@ -10,8 +10,8 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helics/core/ActionMessage.hpp"
 #include "helics/core/BrokerFactory.hpp"
 #include "helics/core/CoreFactory.hpp"
-#include <benchmark/benchmark.h>
 #include "helics_benchmark_main.h"
+#include <benchmark/benchmark.h>
 #include <chrono>
 #include <fstream>
 #include <iostream>
@@ -43,7 +43,7 @@ class messageGenerator
   public:
     messageGenerator () = default;
 
-    void run (std::function<void ()> callOnReady = {})
+    void run (std::function<void()> callOnReady = {})
     {
         if (!readyToRun)
         {
@@ -168,7 +168,7 @@ static void BM_mgen_multiCore (benchmark::State &state, core_type cType)
         std::vector<std::thread> threadlist (feds - 1);
         for (int ii = 0; ii < feds - 1; ++ii)
         {
-            threadlist[ii] = std::thread ([&] (messageGenerator &gen) { gen.run ([&brr] () { brr.wait (); }); },
+            threadlist[ii] = std::thread ([&](messageGenerator &gen) { gen.run ([&brr]() { brr.wait (); }); },
                                           std::ref (gens[ii + 1]));
         }
 
@@ -268,4 +268,4 @@ BENCHMARK_CAPTURE (BM_ring_multiCore, udpCore, core_type::UDP)
   ->UseRealTime ();
   */
 
-HELICS_BENCHMARK_MAIN(messageLookupBenchmark);
+HELICS_BENCHMARK_MAIN (messageLookupBenchmark);

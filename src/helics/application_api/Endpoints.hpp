@@ -166,7 +166,7 @@ class HELICS_CXX_EXPORT Endpoint
     @param callback a function with signature void(endpoint_id_t, Time)
     time is the time the value was updated  This callback is a notification callback and doesn't return the value
     */
-    void setCallback (const std::function<void (const Endpoint &, Time)> &callback)
+    void setCallback (const std::function<void(const Endpoint &, Time)> &callback)
     {
         fed->setMessageNotificationCallback (*this, callback);
     }

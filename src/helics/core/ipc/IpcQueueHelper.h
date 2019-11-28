@@ -30,7 +30,7 @@ namespace ipc
 inline std::string stringTranslateToCppName (std::string in)
 {
     std::replace_if (
-      in.begin (), in.end (), [] (auto c) { return !(std::isalnum (c) || (c == '_')); }, '_');
+      in.begin (), in.end (), [](auto c) { return !(std::isalnum (c) || (c == '_')); }, '_');
     return in;
 }
 /** enumeration of queue states*/

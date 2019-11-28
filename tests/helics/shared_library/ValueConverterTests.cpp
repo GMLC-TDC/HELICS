@@ -23,7 +23,7 @@ namespace utf = boost::unit_test;
 
 using namespace std::string_literals;
 
-BOOST_AUTO_TEST_SUITE (value_converter_tests, *utf::label("ci"))
+BOOST_AUTO_TEST_SUITE (value_converter_tests, *utf::label ("ci"))
 
 template <class X>
 void converterTests (const X &testValue1,
