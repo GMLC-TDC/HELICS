@@ -1,8 +1,8 @@
 name: Format source code
 
 on:
-  issue_comment:
-    types: [created]
+#  issue_comment:
+#    types: [created]
   push:
     paths:
       - '.github/workflows/clang-format.yml'
@@ -17,18 +17,18 @@ on:
 
 jobs:
   build:
-    if: github.event_name != 'issue_comment' || contains(github.event.comment.body, '/format')
+#    if: github.event_name != 'issue_comment' || contains(github.event.comment.body, '/format')
     runs-on: ubuntu-latest
     container:
       image: helics/buildenv:clang-format
     
     steps:
-    - uses: actions/github-script@0.3.0
-      if: github.event_name == 'issue_comment'
-      with:
-        github-token: ${{secrets.GITHUB_TOKEN}}
-        script: |
-          github.issues.createComment({...context.issue, body: 'Okay, commit https://github.com/${{ github.repository }}/commit/${{ github.sha }} is being formatted. A PR with the changes will be open soon! :sunglasses:'})
+#    - uses: actions/github-script@0.3.0
+#      if: github.event_name == 'issue_comment'
+#      with:
+#        github-token: ${{secrets.GITHUB_TOKEN}}
+#        script: |
+#          github.issues.createComment({...context.issue, body: 'Okay, commit https://github.com/${{ github.repository }}/commit/${{ github.sha }} is being formatted. A PR with the changes will be open soon! :sunglasses:'})
     - uses: actions/checkout@v1
     - name: Run clang-format
       run: |
