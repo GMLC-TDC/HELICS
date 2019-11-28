@@ -11,9 +11,9 @@ on:
       - '**.[ch]'
       - '!ThirdParty/**'
       - '!interfaces/**'
-#    branches: 
-#      - master
-#      - develop
+    branches: 
+      - master
+      - develop
 
 jobs:
   build:
