@@ -19,8 +19,8 @@ class CombinationFederate : public ValueFederate, public MessageFederate
 {
   public:
     /** construct a combination federate
-	@param name the name of the federate
-	@param fi the federateInfo object to use for the construction information*/
+    @param name the name of the federate
+    @param fi the federateInfo object to use for the construction information*/
     explicit CombinationFederate (const std::string &name, FederateInfo &fi)
     {
         fed = helicsCreateCombinationFederate (name.c_str (), fi.getInfo (), hThrowOnError ());

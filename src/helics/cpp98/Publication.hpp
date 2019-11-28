@@ -18,9 +18,9 @@ class Publication
 {
   public:
     /** construct from a helics_publication*/
-    explicit Publication (helics_publication hpub) HELICS_NOTHROW: pub (hpub) {}
+    explicit Publication (helics_publication hpub) HELICS_NOTHROW : pub (hpub) {}
     /** default constructor*/
-	Publication ()HELICS_NOTHROW:pub(HELICS_NULL_POINTER){};
+    Publication () HELICS_NOTHROW : pub (HELICS_NULL_POINTER){};
     /** copy constructor*/
     Publication (const Publication &publication) : pub (publication.pub) {}
     /** copy assignment*/
@@ -31,21 +31,19 @@ class Publication
     }
     // there is no need for move operators since copying the underlying object is fine, it is a non-owning pointer
     /** cast operator to the underlying helics_publication object*/
-	operator helics_publication () const { return pub; }
+    operator helics_publication () const { return pub; }
     /** return the underlying helics_publication object*/
     helics_publication baseObject () const { return pub; }
     /** Methods to publish values **/
 
-	/** publish raw data from a pointer and length*/
+    /** publish raw data from a pointer and length*/
     void publish (const char *data, int len)
     {
         // returns helics_status
         helicsPublicationPublishRaw (pub, data, len, HELICS_IGNORE_ERROR);
     }
     /** publish a string from a char * */
-    void publish (const char *str)
-    { helicsPublicationPublishString (pub, str, HELICS_IGNORE_ERROR);
-    }
+    void publish (const char *str) { helicsPublicationPublishString (pub, str, HELICS_IGNORE_ERROR); }
     /** publish a string value*/
     void publish (const std::string &str)
     {
@@ -59,9 +57,7 @@ class Publication
         helicsPublicationPublishInteger (pub, val, HELICS_IGNORE_ERROR);
     }
     /** publish a double*/
-    void publish (double val)
-    { helicsPublicationPublishDouble (pub, val, HELICS_IGNORE_ERROR);
-    }
+    void publish (double val) { helicsPublicationPublishDouble (pub, val, HELICS_IGNORE_ERROR); }
 
     /** publish a complex number*/
     void publish (std::complex<double> cmplx)
@@ -91,10 +87,11 @@ class Publication
     /** get the type for the publication*/
     const char *getType () const { return helicsPublicationGetType (pub); }
     /** get the interface information field of the publication*/
-	const char *getInfo () const { return helicsPublicationGetInfo (pub); }
+    const char *getInfo () const { return helicsPublicationGetInfo (pub); }
 
     /** set the interface information field of the publication*/
     void setInfo (const std::string &info) { helicsPublicationSetInfo (pub, info.c_str (), HELICS_IGNORE_ERROR); }
+
   private:
     helics_publication pub;  //!< the reference to the underlying publication
 };

@@ -33,7 +33,7 @@ void helicsBrokerSetLoggingCallback (helics_broker broker,
         }
         else
         {
-            brk->setLoggingCallback ([logger, userdata] (int loglevel, const std::string &ident, const std::string &message) {
+            brk->setLoggingCallback ([logger, userdata](int loglevel, const std::string &ident, const std::string &message) {
                 logger (loglevel, ident.c_str (), message.c_str (), userdata);
             });
         }
@@ -63,7 +63,7 @@ void helicsCoreSetLoggingCallback (helics_core core,
         else
         {
             cr->setLoggingCallback (helics::local_core_id,
-                                    [logger, userdata] (int loglevel, const std::string &ident, const std::string &message) {
+                                    [logger, userdata](int loglevel, const std::string &ident, const std::string &message) {
                                         logger (loglevel, ident.c_str (), message.c_str (), userdata);
                                     });
         }
@@ -93,7 +93,7 @@ void helicsFederateSetLoggingCallback (helics_federate fed,
         }
         else
         {
-            fedptr->setLoggingCallback ([logger, userdata] (int loglevel, const std::string &ident, const std::string &message) {
+            fedptr->setLoggingCallback ([logger, userdata](int loglevel, const std::string &ident, const std::string &message) {
                 logger (loglevel, ident.c_str (), message.c_str (), userdata);
             });
         }

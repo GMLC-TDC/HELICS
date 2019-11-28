@@ -84,7 +84,7 @@ std::unique_ptr<helicsCLI11App> Player::generateParser ()
     app
       ->add_option (
         "--datatype",
-        [this] (CLI::results_t res) {
+        [this](CLI::results_t res) {
             defType = helics::getTypeFromString (res[0]);
             return (defType != helics::data_type::helics_custom);
         },
@@ -95,7 +95,7 @@ std::unique_ptr<helicsCLI11App> Player::generateParser ()
     app
       ->add_option (
         "--time_units",
-        [this] (CLI::results_t res) {
+        [this](CLI::results_t res) {
             try
             {
                 units = gmlc::utilities::timeUnitsFromString (res[0]);
@@ -563,7 +563,7 @@ void Player::loadJsonFile (const std::string &jsonString)
             points.back ().time = ptime;
             points.back ().iteration = iterationIndex;
             points.back ().pubName = key;
-            points.back ().value = std::move(val);
+            points.back ().value = std::move (val);
             if (!type.empty ())
             {
                 points.back ().type = type;

@@ -5,15 +5,14 @@ the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 #pragma once
-#include "helics_cxx_export.h"
 #include "../core/helics-time.hpp"
+#include "helics_cxx_export.h"
 #include <string>
 /** @file
 @details defining the time representation to use throughout helics
 */
 namespace helics
 {
-
 /** generate a time from a string
 @details the string can be a double or with units
 for example "1.234",  or "1032ms" or "10423425 ns"

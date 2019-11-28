@@ -115,7 +115,7 @@ static const std::string emptyStr;
 template <class Inp>
 static void loadOptions (MessageFederate *fed, const Inp &data, Endpoint &ept)
 {
-    addTargets (data, "flags", [&ept] (const std::string &target) {
+    addTargets (data, "flags", [&ept](const std::string &target) {
         if (target.front () != '-')
         {
             ept.setOption (getOptionIndex (target), true);
@@ -142,11 +142,11 @@ static void loadOptions (MessageFederate *fed, const Inp &data, Endpoint &ept)
         fed->setInfo (ept.getHandle (), info);
     }
     addTargets (data, "knownDestinations",
-                [&ept, fed] (const std::string &dest) { fed->registerKnownCommunicationPath (ept, dest); });
-    addTargets (data, "subscriptions", [&ept, fed] (const std::string &sub) { fed->subscribe (ept, sub); });
-    addTargets (data, "filters", [&ept] (const std::string &filt) { ept.addSourceFilter (filt); });
-    addTargets (data, "sourceFilters", [&ept] (const std::string &filt) { ept.addSourceFilter (filt); });
-    addTargets (data, "destFilters", [&ept] (const std::string &filt) { ept.addDestinationFilter (filt); });
+                [&ept, fed](const std::string &dest) { fed->registerKnownCommunicationPath (ept, dest); });
+    addTargets (data, "subscriptions", [&ept, fed](const std::string &sub) { fed->subscribe (ept, sub); });
+    addTargets (data, "filters", [&ept](const std::string &filt) { ept.addSourceFilter (filt); });
+    addTargets (data, "sourceFilters", [&ept](const std::string &filt) { ept.addSourceFilter (filt); });
+    addTargets (data, "destFilters", [&ept](const std::string &filt) { ept.addDestinationFilter (filt); });
 
     auto defTarget = getOrDefault (data, "target", emptyStr);
     replaceIfMember (data, "destination", defTarget);
@@ -301,12 +301,12 @@ Endpoint &MessageFederate::getEndpoint (const std::string &eptName) const
 
 Endpoint &MessageFederate::getEndpoint (int index) const { return mfManager->getEndpoint (index); }
 
-void MessageFederate::setMessageNotificationCallback (const std::function<void (Endpoint &ept, Time)> &callback)
+void MessageFederate::setMessageNotificationCallback (const std::function<void(Endpoint &ept, Time)> &callback)
 {
     mfManager->setEndpointNotificationCallback (callback);
 }
 void MessageFederate::setMessageNotificationCallback (const Endpoint &ept,
-                                                      const std::function<void (Endpoint &ept, Time)> &callback)
+                                                      const std::function<void(Endpoint &ept, Time)> &callback)
 {
     mfManager->setEndpointNotificationCallback (ept, callback);
 }

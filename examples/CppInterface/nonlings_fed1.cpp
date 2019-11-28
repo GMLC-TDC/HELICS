@@ -11,9 +11,9 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <math.h>
 #include <stdio.h>
 #ifdef _MSC_VER
-#include <windows.h>
+#    include <windows.h>
 #else
-#include <unistd.h>
+#    include <unistd.h>
 #endif
 
 int main (int /*argc*/, char ** /*argv*/)
@@ -42,7 +42,7 @@ int main (int /*argc*/, char ** /*argv*/)
     helicscpp::FederateInfo fi ("zmq");
 
     /* Federate init string */
-    fi.setCoreInit(fedinitstring);
+    fi.setCoreInit (fedinitstring);
     fi.setProperty (helics_property_time_delta, deltat);
     fi.setProperty (helics_property_int_max_iterations, 100);
 

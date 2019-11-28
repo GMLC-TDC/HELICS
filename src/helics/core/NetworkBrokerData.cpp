@@ -11,9 +11,9 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helicsCLI11.hpp"
 
 #ifndef HELICS_DISABLE_ASIO
-#include "../common/AsioContextManager.h"
-#include <asio/ip/host_name.hpp>
-#include <asio/ip/tcp.hpp>
+#    include "../common/AsioContextManager.h"
+#    include <asio/ip/host_name.hpp>
+#    include <asio/ip/tcp.hpp>
 #endif
 
 #include <algorithm>
@@ -34,7 +34,7 @@ std::shared_ptr<helicsCLI11App> NetworkBrokerData::commandLineParser (const std:
       ->disable_flag_override ();
     nbparser->add_option_function<std::string> (
       "--brokeraddress",
-      [this, localAddress] (const std::string &addr) {
+      [this, localAddress](const std::string &addr) {
           auto brkprt = extractInterfaceandPort (addr);
           brokerAddress = brkprt.first;
           brokerPort = brkprt.second;
@@ -45,7 +45,7 @@ std::shared_ptr<helicsCLI11App> NetworkBrokerData::commandLineParser (const std:
                         "allow the server to reuse a bound address, mostly useful for tcp cores");
     nbparser->add_option_function<std::string> (
       "--broker",
-      [this, localAddress] (std::string addr) {
+      [this, localAddress](std::string addr) {
           auto brkr = BrokerFactory::findBroker (addr);
           if (brkr)
           {
@@ -82,7 +82,7 @@ std::shared_ptr<helicsCLI11App> NetworkBrokerData::commandLineParser (const std:
     nbparser
       ->add_flag_function (
         "--client{0},--server{1}",
-        [this] (int64_t val) {
+        [this](int64_t val) {
             switch (server_mode)
             {
             case server_mode_options::unspecified:
@@ -99,7 +99,7 @@ std::shared_ptr<helicsCLI11App> NetworkBrokerData::commandLineParser (const std:
       ->disable_flag_override ();
     nbparser->add_option_function<std::string> (
       "--interface,--localinterface",
-      [this] (const std::string &addr) {
+      [this](const std::string &addr) {
           auto localprt = extractInterfaceandPort (addr);
           localInterface = localprt.first;
           // this may get overridden later
@@ -112,7 +112,7 @@ std::shared_ptr<helicsCLI11App> NetworkBrokerData::commandLineParser (const std:
     nbparser
       ->add_option_function<int> (
         "--localport",
-        [this] (int port) {
+        [this](int port) {
             if (port == -999)
             {
                 use_os_port = true;
@@ -126,7 +126,7 @@ std::shared_ptr<helicsCLI11App> NetworkBrokerData::commandLineParser (const std:
       ->transform (CLI::Transformer ({{"auto", "-1"}, {"os", "-999"}}, CLI::ignore_case));
     nbparser->add_option ("--portstart", portStart, "starting port for automatic port definitions");
 
-    nbparser->add_callback ([this] () {
+    nbparser->add_callback ([this]() {
         if ((!brokerAddress.empty ()) && (brokerPort == -1))
         {
             if ((localInterface.empty ()) && (portNumber != -1))
@@ -370,7 +370,7 @@ auto matchcount (InputIt1 first1, InputIt1 last1, InputIt2 first2, InputIt2 last
 
 std::string getLocalExternalAddressV4 ()
 {
-	#ifndef HELICS_DISABLE_ASIO
+#ifndef HELICS_DISABLE_ASIO
     auto srv = AsioContextManager::getContextPointer ();
 
     asio::ip::tcp::resolver resolver (srv->getBaseContext ());
@@ -379,9 +379,9 @@ std::string getLocalExternalAddressV4 ()
     asio::ip::tcp::endpoint endpoint = *it;
 
     auto resolved_address = endpoint.address ().to_string ();
-	#else
+#else
     std::string resolved_address;
-	#endif
+#endif
     auto interface_addresses = gmlc::netif::getInterfaceAddressesV4 ();
 
     // Return the resolved address if no interface addresses were found
@@ -429,7 +429,7 @@ std::string getLocalExternalAddressV4 ()
 
 std::string getLocalExternalAddressV4 (const std::string &server)
 {
-	#ifndef HELICS_DISABLE_ASIO
+#ifndef HELICS_DISABLE_ASIO
     auto srv = AsioContextManager::getContextPointer ();
 
     asio::ip::tcp::resolver resolver (srv->getBaseContext ());
@@ -446,25 +446,25 @@ std::string getLocalExternalAddressV4 (const std::string &server)
     asio::ip::tcp::resolver::iterator end;
 
     auto sstring = (it_server == end) ? server : servep.address ().to_string ();
-	#else
+#else
     std::string sstring = server;
-	#endif
-	
+#endif
+
     auto interface_addresses = gmlc::netif::getInterfaceAddressesV4 ();
 
-	std::vector<std::string> resolved_addresses;
-	#ifndef HELICS_DISABLE_ASIO
+    std::vector<std::string> resolved_addresses;
+#ifndef HELICS_DISABLE_ASIO
     asio::ip::tcp::resolver::query query (asio::ip::tcp::v4 (), asio::ip::host_name (), "");
     asio::ip::tcp::resolver::iterator it = resolver.resolve (query);
     // asio::ip::tcp::endpoint endpoint = *it;
-    
+
     while (it != end)
     {
         asio::ip::tcp::endpoint ept = *it;
         resolved_addresses.push_back (ept.address ().to_string ());
         ++it;
     }
-	#endif
+#endif
     auto candidate_addresses = prioritizeExternalAddresses (interface_addresses, resolved_addresses);
 
     int cnt = 0;
@@ -484,7 +484,7 @@ std::string getLocalExternalAddressV4 (const std::string &server)
 
 std::string getLocalExternalAddressV6 ()
 {
-	#ifndef HELICS_DISABLE_ASIO
+#ifndef HELICS_DISABLE_ASIO
     auto srv = AsioContextManager::getContextPointer ();
 
     asio::ip::tcp::resolver resolver (srv->getBaseContext ());
@@ -493,9 +493,9 @@ std::string getLocalExternalAddressV6 ()
     asio::ip::tcp::endpoint endpoint = *it;
 
     auto resolved_address = endpoint.address ().to_string ();
-	#else
+#else
     std::string resolved_address;
-	#endif
+#endif
     auto interface_addresses = gmlc::netif::getInterfaceAddressesV6 ();
 
     // Return the resolved address if no interface addresses were found
@@ -543,7 +543,7 @@ std::string getLocalExternalAddressV6 ()
 
 std::string getLocalExternalAddressV6 (const std::string &server)
 {
-	#ifndef HELICS_DISABLE_ASIO
+#ifndef HELICS_DISABLE_ASIO
     auto srv = AsioContextManager::getContextPointer ();
 
     asio::ip::tcp::resolver resolver (srv->getBaseContext ());
@@ -554,23 +554,23 @@ std::string getLocalExternalAddressV6 (const std::string &server)
     asio::ip::tcp::resolver::iterator end;
 
     auto sstring = (it_server == end) ? server : servep.address ().to_string ();
-	#else
+#else
     std::string sstring = server;
-	#endif
+#endif
     auto interface_addresses = gmlc::netif::getInterfaceAddressesV6 ();
     std::vector<std::string> resolved_addresses;
-	#ifndef HELICS_DISABLE_ASIO
+#ifndef HELICS_DISABLE_ASIO
     asio::ip::tcp::resolver::query query (asio::ip::tcp::v6 (), asio::ip::host_name (), "");
     asio::ip::tcp::resolver::iterator it = resolver.resolve (query);
     // asio::ip::tcp::endpoint endpoint = *it;
-    
+
     while (it != end)
     {
         asio::ip::tcp::endpoint ept = *it;
         resolved_addresses.push_back (ept.address ().to_string ());
         ++it;
     }
-	#endif
+#endif
     auto candidate_addresses = prioritizeExternalAddresses (interface_addresses, resolved_addresses);
 
     int cnt = 0;

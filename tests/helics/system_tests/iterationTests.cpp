@@ -63,7 +63,7 @@ std::pair<double, int> runInitIterations (helics::ValueFederate *vfed, int index
     auto &sub_high = vfed->registerSubscription (high_target);
     double index2 = 2.0 * static_cast<double> (index);
     sub_low.setDefault (index2);
-    sub_high.setDefault (index2+1.0);
+    sub_high.setDefault (index2 + 1.0);
     vfed->enterInitializingMode ();
     auto cval = index2 + 0.5;
 
@@ -92,7 +92,7 @@ run_iteration_round_robin (std::vector<std::shared_ptr<helics::ValueFederate>> &
     {
         auto vFed = fedVec[ii].get ();
         futures.push_back (
-          std::async (std::launch::async, [vFed, ii, N] () { return runInitIterations (vFed, ii, N); }));
+          std::async (std::launch::async, [vFed, ii, N]() { return runInitIterations (vFed, ii, N); }));
     }
     std::vector<std::pair<double, int>> results (N);
     for (decltype (N) ii = 0; ii < N; ++ii)
@@ -112,8 +112,8 @@ TEST_P (iteration_tests_type, execution_iteration_round_robin_ci_skip)
     auto vFed1 = GetFederateAs<helics::ValueFederate> (0).get ();
     auto vFed2 = GetFederateAs<helics::ValueFederate> (1).get ();
     auto vFed3 = GetFederateAs<helics::ValueFederate> (2).get ();
-    auto fut1 = std::async (std::launch::async, [vFed1] () { return runInitIterations (vFed1, 0, 3); });
-    auto fut2 = std::async (std::launch::async, [vFed2] () { return runInitIterations (vFed2, 1, 3); });
+    auto fut1 = std::async (std::launch::async, [vFed1]() { return runInitIterations (vFed1, 0, 3); });
+    auto fut2 = std::async (std::launch::async, [vFed2]() { return runInitIterations (vFed2, 1, 3); });
 
     auto res3 = runInitIterations (vFed3, 2, 3);
     auto res2 = fut2.get ();
