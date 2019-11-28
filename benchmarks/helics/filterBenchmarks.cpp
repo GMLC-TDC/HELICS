@@ -25,52 +25,52 @@ using namespace helics;
 
 static void BM_filter_singleCore (benchmark::State &state)
 {
-    for (auto _ : state)
+  for (auto _ : state)
+  {
+    state.PauseTiming ();
+
+    int feds = static_cast<int> (state.range (0));
+    gmlc::concurrency::Barrier brr (static_cast<size_t> (feds) + 1);
+    auto wcore = helics::CoreFactory::create (core_type::INPROC, std::string ("--autobroker --federates=") +
+                                                                   std::to_string (feds + 1));
+    EchoMessageHub hub;
+    hub.initialize (wcore->getIdentifier ());
+    std::vector<EchoMessageLeaf> leafs (feds);
+    for (int ii = 0; ii < feds; ++ii)
     {
-        state.PauseTiming ();
-
-        int feds = static_cast<int> (state.range (0));
-        gmlc::concurrency::Barrier brr (static_cast<size_t> (feds) + 1);
-        auto wcore = helics::CoreFactory::create (core_type::INPROC, std::string ("--autobroker --federates=") +
-                                                                       std::to_string (feds + 1));
-        EchoMessageHub hub;
-        hub.initialize (wcore->getIdentifier ());
-        std::vector<EchoMessageLeaf> leafs (feds);
-        for (int ii = 0; ii < feds; ++ii)
-        {
-            leafs[ii].initialize (wcore->getIdentifier (), ii);
-        }
-        auto filt1 = make_filter (helics::filter_types::delay, wcore.get ());
-        // either add a source filter on Echo or a destination Filter on Echo
-        // this filter does nothing other than make the message route through a filter
-        if (state.range (1) == 1)
-        {
-            filt1->addSourceTarget ("echo");
-        }
-        else
-        {
-            filt1->addDestinationTarget ("echo");
-        }
-
-        std::vector<std::thread> threadlist (static_cast<size_t> (feds));
-        for (int ii = 0; ii < feds; ++ii)
-        {
-            threadlist[ii] = std::thread ([&] (EchoMessageLeaf &lf) { lf.run ([&brr] () { brr.wait (); }); },
-                                          std::ref (leafs[ii]));
-        }
-        hub.makeReady ();
-        brr.wait ();
-        state.ResumeTiming ();
-        hub.run ([] () {});
-        state.PauseTiming ();
-        for (auto &thrd : threadlist)
-        {
-            thrd.join ();
-        }
-        wcore.reset ();
-        cleanupHelicsLibrary ();
-        state.ResumeTiming ();
+      leafs[ii].initialize (wcore->getIdentifier (), ii);
     }
+    auto filt1 = make_filter (helics::filter_types::delay, wcore.get ());
+    // either add a source filter on Echo or a destination Filter on Echo
+    // this filter does nothing other than make the message route through a filter
+    if (state.range (1) == 1)
+    {
+      filt1->addSourceTarget ("echo");
+    }
+    else
+    {
+      filt1->addDestinationTarget ("echo");
+    }
+
+    std::vector<std::thread> threadlist (static_cast<size_t> (feds));
+    for (int ii = 0; ii < feds; ++ii)
+    {
+      threadlist[ii] =
+        std::thread ([&](EchoMessageLeaf &lf) { lf.run ([&brr]() { brr.wait (); }); }, std::ref (leafs[ii]));
+    }
+    hub.makeReady ();
+    brr.wait ();
+    state.ResumeTiming ();
+    hub.run ([]() {});
+    state.PauseTiming ();
+    for (auto &thrd : threadlist)
+    {
+      thrd.join ();
+    }
+    wcore.reset ();
+    cleanupHelicsLibrary ();
+    state.ResumeTiming ();
+  }
 }
 // Register the function as a benchmark
 BENCHMARK (BM_filter_singleCore)
@@ -82,66 +82,66 @@ BENCHMARK (BM_filter_singleCore)
 
 static void BM_filter_multiCore (benchmark::State &state, core_type cType)
 {
-    for (auto _ : state)
+  for (auto _ : state)
+  {
+    state.PauseTiming ();
+
+    int feds = static_cast<int> (state.range (0));
+    gmlc::concurrency::Barrier brr (static_cast<size_t> (feds) + 1);
+
+    auto broker =
+      helics::BrokerFactory::create (cType, "brokerb", std::string ("--federates=") + std::to_string (feds + 1));
+    broker->setLoggingLevel (helics_log_level_no_print);
+    auto wcore = helics::CoreFactory::create (cType, std::string ("--federates=1"));
+
+    auto filtcore = helics::CoreFactory::create (cType, std::string{"--federates=0"});
+    // this is to delay until the threads are ready
+    EchoMessageHub hub;
+    hub.initialize (wcore->getIdentifier ());
+    std::vector<EchoMessageLeaf> leafs (feds);
+    std::vector<std::shared_ptr<helics::Core>> cores (feds);
+    for (int ii = 0; ii < feds; ++ii)
     {
-        state.PauseTiming ();
-
-        int feds = static_cast<int> (state.range (0));
-        gmlc::concurrency::Barrier brr (static_cast<size_t> (feds) + 1);
-
-        auto broker = helics::BrokerFactory::create (cType, "brokerb",
-                                                     std::string ("--federates=") + std::to_string (feds + 1));
-        broker->setLoggingLevel (helics_log_level_no_print);
-        auto wcore = helics::CoreFactory::create (cType, std::string ("--federates=1"));
-
-        auto filtcore = helics::CoreFactory::create (cType, std::string{"--federates=0"});
-        // this is to delay until the threads are ready
-        EchoMessageHub hub;
-        hub.initialize (wcore->getIdentifier ());
-        std::vector<EchoMessageLeaf> leafs (feds);
-        std::vector<std::shared_ptr<helics::Core>> cores (feds);
-        for (int ii = 0; ii < feds; ++ii)
-        {
-            cores[ii] = helics::CoreFactory::create (cType, "-f 1");
-            cores[ii]->connect ();
-            leafs[ii].initialize (cores[ii]->getIdentifier (), ii);
-        }
-        filtcore->connect ();
-        auto filt1 = make_filter (helics::filter_types::delay, filtcore.get ());
-        // either add a source filter on Echo or a destination Filter on Echo
-        // this filter does nothing other than make the message route through a filter
-        if (state.range (1) == 1)
-        {
-            filt1->addSourceTarget ("echo");
-        }
-        else
-        {
-            filt1->addDestinationTarget ("echo");
-        }
-        filtcore->setCoreReadyToInit ();
-        std::vector<std::thread> threadlist (static_cast<size_t> (feds));
-        for (int ii = 0; ii < feds; ++ii)
-        {
-            threadlist[ii] = std::thread ([&] (EchoMessageLeaf &lf) { lf.run ([&brr] () { brr.wait (); }); },
-                                          std::ref (leafs[ii]));
-        }
-        hub.makeReady ();
-        brr.wait ();
-        state.ResumeTiming ();
-        hub.run ([] () {});
-        state.PauseTiming ();
-        for (auto &thrd : threadlist)
-        {
-            thrd.join ();
-        }
-        broker->disconnect ();
-        broker.reset ();
-        cores.clear ();
-        wcore.reset ();
-        cleanupHelicsLibrary ();
-
-        state.ResumeTiming ();
+      cores[ii] = helics::CoreFactory::create (cType, "-f 1");
+      cores[ii]->connect ();
+      leafs[ii].initialize (cores[ii]->getIdentifier (), ii);
     }
+    filtcore->connect ();
+    auto filt1 = make_filter (helics::filter_types::delay, filtcore.get ());
+    // either add a source filter on Echo or a destination Filter on Echo
+    // this filter does nothing other than make the message route through a filter
+    if (state.range (1) == 1)
+    {
+      filt1->addSourceTarget ("echo");
+    }
+    else
+    {
+      filt1->addDestinationTarget ("echo");
+    }
+    filtcore->setCoreReadyToInit ();
+    std::vector<std::thread> threadlist (static_cast<size_t> (feds));
+    for (int ii = 0; ii < feds; ++ii)
+    {
+      threadlist[ii] =
+        std::thread ([&](EchoMessageLeaf &lf) { lf.run ([&brr]() { brr.wait (); }); }, std::ref (leafs[ii]));
+    }
+    hub.makeReady ();
+    brr.wait ();
+    state.ResumeTiming ();
+    hub.run ([]() {});
+    state.PauseTiming ();
+    for (auto &thrd : threadlist)
+    {
+      thrd.join ();
+    }
+    broker->disconnect ();
+    broker.reset ();
+    cores.clear ();
+    wcore.reset ();
+    cleanupHelicsLibrary ();
+
+    state.ResumeTiming ();
+  }
 }
 
 static constexpr int64_t maxscale{1 << 5};

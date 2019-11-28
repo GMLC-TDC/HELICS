@@ -15,20 +15,20 @@ namespace helics
 /** define the network access*/
 enum class interface_networks : char
 {
-    local = 0,  //!< just open local ports
-    ipv4 = 4,  //!< use external ipv4 ports
-    ipv6 = 6,  //!< use external ipv6 ports
-    all = 10,  //!< use all external ports
+  local = 0,  //!< just open local ports
+  ipv4 = 4,  //!< use external ipv4 ports
+  ipv6 = 6,  //!< use external ipv6 ports
+  all = 10,  //!< use all external ports
 };
 
 /** define keys for particular interfaces*/
 enum class interface_type : char
 {
-    tcp = 0,  //!< using tcp ports for communication
-    udp = 1,  //!< using udp ports for communication
-    ip = 2,  //!< using both types of ports (tcp/or udp) for communication
-    ipc = 3,  //!< using ipc locations
-    inproc = 4,  //!< using inproc sockets for communications
+  tcp = 0,  //!< using tcp ports for communication
+  udp = 1,  //!< using udp ports for communication
+  ip = 2,  //!< using both types of ports (tcp/or udp) for communication
+  ipc = 3,  //!< using ipc locations
+  inproc = 4,  //!< using inproc sockets for communications
 };
 
 class helicsCLI11App;
@@ -37,49 +37,48 @@ class helicsCLI11App;
  */
 class NetworkBrokerData
 {
-  public:
-    enum class server_mode_options : char
-    {
-        unspecified = 0,
-        server_default_active = 1,
-        server_default_deactivated = 2,
-        server_active = 3,
-        server_deactivated = 4,
-    };
+public:
+  enum class server_mode_options : char
+  {
+    unspecified = 0,
+    server_default_active = 1,
+    server_default_deactivated = 2,
+    server_active = 3,
+    server_deactivated = 4,
+  };
 
-    std::string brokerName;  //!< the identifier for the broker
-    std::string brokerAddress;  //!< the address or domain name of the broker
-    std::string localInterface;  //!< the interface to use for the local connection
-    std::string brokerInitString;  //!< a string containing arguments for the broker initialization
-    int portNumber = -1;  //!< the port number for the local interface
-    int brokerPort = -1;  //!< the port number to use for the main broker interface
-    int portStart = -1;  //!< the starting port for automatic port definitions
-    int maxMessageSize = 16 * 256;  //!< maximum message size
-    int maxMessageCount = 256;  //!< maximum message count
-    int maxRetries = 5;  //!< the maximum number of retries to establish a network connection
-    interface_networks interfaceNetwork = interface_networks::local;
-    bool reuse_address = false;  //!< allow reuse of binding address
-    bool use_os_port =
-      false;  //!< specify that any automatic port allocation should use operating system allocation
-    bool autobroker = false;  //!< flag for specifying an automatic broker generation
-    server_mode_options server_mode = server_mode_options::unspecified;  //!< setup a server mode
-  public:
-    NetworkBrokerData () = default;
-    /** constructor from the allowed type*/
-    explicit NetworkBrokerData (interface_type type) : allowedType (type){};
+  std::string brokerName;  //!< the identifier for the broker
+  std::string brokerAddress;  //!< the address or domain name of the broker
+  std::string localInterface;  //!< the interface to use for the local connection
+  std::string brokerInitString;  //!< a string containing arguments for the broker initialization
+  int portNumber = -1;  //!< the port number for the local interface
+  int brokerPort = -1;  //!< the port number to use for the main broker interface
+  int portStart = -1;  //!< the starting port for automatic port definitions
+  int maxMessageSize = 16 * 256;  //!< maximum message size
+  int maxMessageCount = 256;  //!< maximum message count
+  int maxRetries = 5;  //!< the maximum number of retries to establish a network connection
+  interface_networks interfaceNetwork = interface_networks::local;
+  bool reuse_address = false;  //!< allow reuse of binding address
+  bool use_os_port = false;  //!< specify that any automatic port allocation should use operating system allocation
+  bool autobroker = false;  //!< flag for specifying an automatic broker generation
+  server_mode_options server_mode = server_mode_options::unspecified;  //!< setup a server mode
+public:
+  NetworkBrokerData () = default;
+  /** constructor from the allowed type*/
+  explicit NetworkBrokerData (interface_type type) : allowedType (type){};
 
-    /** generate a command line argument parser for the network broker data
-     @param localAddress a predefined string containing the desired local only address
-    */
-    std::shared_ptr<helicsCLI11App> commandLineParser (const std::string &localAddress);
-    /** set the desired interface type
-     */
-    void setInterfaceType (interface_type type) { allowedType = type; }
+  /** generate a command line argument parser for the network broker data
+   @param localAddress a predefined string containing the desired local only address
+  */
+  std::shared_ptr<helicsCLI11App> commandLineParser (const std::string &localAddress);
+  /** set the desired interface type
+   */
+  void setInterfaceType (interface_type type) { allowedType = type; }
 
-  private:
-    /** do some checking on the brokerAddress*/
-    void checkAndUpdateBrokerAddress (const std::string &localAddress);
-    interface_type allowedType = interface_type::ip;
+private:
+  /** do some checking on the brokerAddress*/
+  void checkAndUpdateBrokerAddress (const std::string &localAddress);
+  interface_type allowedType = interface_type::ip;
 };
 
 /** generate a string with a full address based on an interface string and port number

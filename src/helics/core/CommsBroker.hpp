@@ -20,36 +20,36 @@ communication methods*/
 template <class COMMS, class BrokerT>
 class CommsBroker : public BrokerT
 {
-  protected:
-    std::atomic<int> disconnectionStage{0};  //!< the stage of disconnection
-    std::unique_ptr<COMMS> comms;  //!< the actual comms object
-    std::atomic<bool> brokerInitialized{false};  //!< atomic protecting local initialization
-  public:
-    /** default constructor*/
-    CommsBroker () noexcept;
-    /** create from a single argument*/
-    explicit CommsBroker (bool arg) noexcept;
-    /** create from an object name*/
-    explicit CommsBroker (const std::string &obj_name);
-    /** destructor*/
-    ~CommsBroker ();
+protected:
+  std::atomic<int> disconnectionStage{0};  //!< the stage of disconnection
+  std::unique_ptr<COMMS> comms;  //!< the actual comms object
+  std::atomic<bool> brokerInitialized{false};  //!< atomic protecting local initialization
+public:
+  /** default constructor*/
+  CommsBroker () noexcept;
+  /** create from a single argument*/
+  explicit CommsBroker (bool arg) noexcept;
+  /** create from an object name*/
+  explicit CommsBroker (const std::string &obj_name);
+  /** destructor*/
+  ~CommsBroker ();
 
-  private:
-    virtual void brokerDisconnect () override;
-    virtual bool tryReconnect () override;
-    /** disconnect the comm object*/
-    void commDisconnect ();
-    /** load the comms object directly*/
-    void loadComms ();
+private:
+  virtual void brokerDisconnect () override;
+  virtual bool tryReconnect () override;
+  /** disconnect the comm object*/
+  void commDisconnect ();
+  /** load the comms object directly*/
+  void loadComms ();
 
-  public:
-    virtual void transmit (route_id rid, const ActionMessage &cmd) override;
-    virtual void transmit (route_id rid, ActionMessage &&cmd) override;
+public:
+  virtual void transmit (route_id rid, const ActionMessage &cmd) override;
+  virtual void transmit (route_id rid, ActionMessage &&cmd) override;
 
-    virtual void addRoute (route_id rid, const std::string &routeInfo) override;
+  virtual void addRoute (route_id rid, const std::string &routeInfo) override;
 
-    virtual void removeRoute (route_id rid) override;
-    /** get a pointer to the comms object*/
-    COMMS *getCommsObjectPointer ();
+  virtual void removeRoute (route_id rid) override;
+  /** get a pointer to the comms object*/
+  COMMS *getCommsObjectPointer ();
 };
 }  // namespace helics

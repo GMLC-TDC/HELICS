@@ -13,11 +13,11 @@ SPDX-License-Identifier: BSD-3-Clause
 
 struct globalTestConfig : public ::testing::Environment
 {
-    virtual void TearDown () override
-    {
-        helics::CoreFactory::cleanUpCores ();
-        helics::BrokerFactory::cleanUpBrokers ();
-    }
+  virtual void TearDown () override
+  {
+    helics::CoreFactory::cleanUpCores ();
+    helics::BrokerFactory::cleanUpBrokers ();
+  }
 };
 
 // register the global setup and teardown structure

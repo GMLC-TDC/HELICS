@@ -19,29 +19,29 @@ ZmqCore::ZmqCore () noexcept { netInfo.server_mode = NetworkBrokerData::server_m
 
 ZmqCore::ZmqCore (const std::string &core_name) : NetworkCore (core_name)
 {
-    netInfo.server_mode = NetworkBrokerData::server_mode_options::server_deactivated;
+  netInfo.server_mode = NetworkBrokerData::server_mode_options::server_deactivated;
 }
 
 bool ZmqCore::brokerConnect ()
 {
-    ZmqContextManager::startContext ();
-    return NetworkCore::brokerConnect ();
+  ZmqContextManager::startContext ();
+  return NetworkCore::brokerConnect ();
 }
 
 ZmqCoreSS::ZmqCoreSS () noexcept
 {
-    netInfo.server_mode = NetworkBrokerData::server_mode_options::server_deactivated;
+  netInfo.server_mode = NetworkBrokerData::server_mode_options::server_deactivated;
 }
 
 ZmqCoreSS::ZmqCoreSS (const std::string &core_name) : NetworkCore (core_name)
 {
-    netInfo.server_mode = NetworkBrokerData::server_mode_options::server_deactivated;
+  netInfo.server_mode = NetworkBrokerData::server_mode_options::server_deactivated;
 }
 
 bool ZmqCoreSS::brokerConnect ()
 {
-    ZmqContextManager::startContext ();
-    return NetworkCore::brokerConnect ();
+  ZmqContextManager::startContext ();
+  return NetworkCore::brokerConnect ();
 }
 
 }  // namespace zeromq

@@ -1,8 +1,7 @@
 #include <expirimental/string_view>
 
-int main()
+int main ()
 {
-    std::expirimental::string_view X("string");
-    return 0;
+  std::expirimental::string_view X ("string");
+  return 0;
 }
-

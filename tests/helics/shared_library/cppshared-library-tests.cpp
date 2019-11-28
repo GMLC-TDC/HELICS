@@ -11,12 +11,12 @@ the top-level NOTICE for additional details. All rights reserved. SPDX-License-I
 
 struct globalTestConfig : public ::testing::Environment
 {
-    virtual void TearDown () override
-    {
-        // std::cout << "cleaning up" << std::endl;
-        helicsCloseLibrary ();
-        // std::cout << "finished cleaning up" << std::endl;
-    }
+  virtual void TearDown () override
+  {
+    // std::cout << "cleaning up" << std::endl;
+    helicsCloseLibrary ();
+    // std::cout << "finished cleaning up" << std::endl;
+  }
 };
 
 // register the global setup and teardown structure

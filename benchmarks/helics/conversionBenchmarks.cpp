@@ -14,12 +14,12 @@ using namespace helics;
 template <class T>
 static void BM_conversion (benchmark::State &state, const T &arg)
 {
-    T val{arg};
-    helics::data_block store;
-    for (auto _ : state)
-    {
-        helics::ValueConverter<T>::convert (val, store);
-    }
+  T val{arg};
+  helics::data_block store;
+  for (auto _ : state)
+  {
+    helics::ValueConverter<T>::convert (val, store);
+  }
 }
 // Register the function as a benchmark
 BENCHMARK_CAPTURE (BM_conversion, double_conv, -356.56e-27);
@@ -44,15 +44,15 @@ BENCHMARK_CAPTURE (BM_conversion, vector_conv, std::vector<double>{26.5, 18.6, -
 template <class T>
 static void BM_interpret (benchmark::State &state, const T &arg)
 {
-    T val{arg};
-    helics::data_block store;
-    helics::ValueConverter<T>::convert (val, store);
-    data_view stv{store};
-    T val2;
-    for (auto _ : state)
-    {
-        ValueConverter<T>::interpret (stv, val2);
-    }
+  T val{arg};
+  helics::data_block store;
+  helics::ValueConverter<T>::convert (val, store);
+  data_view stv{store};
+  T val2;
+  for (auto _ : state)
+  {
+    ValueConverter<T>::interpret (stv, val2);
+  }
 }
 
 BENCHMARK_CAPTURE (BM_interpret, double_interp, -356.56e-27);

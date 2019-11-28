@@ -10,26 +10,26 @@ SPDX-License-Identifier: BSD-3-Clause
 
 int main (int argc, char *argv[])
 {
-    int ret = 0;
-    try
+  int ret = 0;
+  try
+  {
+    helics::apps::Player Player (argc, argv);
+    if (Player.isActive ())
     {
-        helics::apps::Player Player (argc, argv);
-        if (Player.isActive ())
-        {
-            Player.run ();
-        }
+      Player.run ();
     }
-    catch (const std::invalid_argument &ia)
-    {
-        std::cerr << ia.what () << std::endl;
-        ret = -2;
-    }
-    catch (const helics::HelicsException &he)
-    {
-        std::cerr << he.what () << std::endl;
-        ret = -4;
-    }
+  }
+  catch (const std::invalid_argument &ia)
+  {
+    std::cerr << ia.what () << std::endl;
+    ret = -2;
+  }
+  catch (const helics::HelicsException &he)
+  {
+    std::cerr << he.what () << std::endl;
+    ret = -4;
+  }
 
-    helics::cleanupHelicsLibrary ();
-    return ret;
+  helics::cleanupHelicsLibrary ();
+  return ret;
 }

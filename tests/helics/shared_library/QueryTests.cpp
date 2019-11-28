@@ -15,75 +15,75 @@ class query_tests : public ::testing::TestWithParam<const char *>, public Federa
 /** test simple creation and destruction*/
 TEST_P (query_tests, publication_queries)
 {
-    SetupTest (helicsCreateValueFederate, GetParam (), 2);
-    auto vFed1 = GetFederateAt (0);
-    auto vFed2 = GetFederateAt (1);
+  SetupTest (helicsCreateValueFederate, GetParam (), 2);
+  auto vFed1 = GetFederateAt (0);
+  auto vFed2 = GetFederateAt (1);
 
-    // register the publications
+  // register the publications
 
-    helicsFederateRegisterGlobalTypePublication (vFed1, "pub1", "double", "", &err);
-    helicsFederateRegisterTypePublication (vFed1, "pub2", "double", "", &err);
-    helicsFederateRegisterTypePublication (vFed2, "pub3", "double", "", &err);
-    CE (helicsFederateEnterInitializingModeAsync (vFed1, &err));
-    CE (helicsFederateEnterInitializingMode (vFed2, &err));
-    CE (helicsFederateEnterInitializingModeComplete (vFed1, &err));
+  helicsFederateRegisterGlobalTypePublication (vFed1, "pub1", "double", "", &err);
+  helicsFederateRegisterTypePublication (vFed1, "pub2", "double", "", &err);
+  helicsFederateRegisterTypePublication (vFed2, "pub3", "double", "", &err);
+  CE (helicsFederateEnterInitializingModeAsync (vFed1, &err));
+  CE (helicsFederateEnterInitializingMode (vFed2, &err));
+  CE (helicsFederateEnterInitializingModeComplete (vFed1, &err));
 
-    auto core = helicsFederateGetCoreObject (vFed1, &err);
+  auto core = helicsFederateGetCoreObject (vFed1, &err);
 
-    auto q1 = helicsCreateQuery ("fed0", "publications");
+  auto q1 = helicsCreateQuery ("fed0", "publications");
 
-    CE (std::string res (helicsQueryCoreExecute (q1, core, &err)));
+  CE (std::string res (helicsQueryCoreExecute (q1, core, &err)));
 
-    EXPECT_EQ (res, "[pub1;fed0/pub2]");
+  EXPECT_EQ (res, "[pub1;fed0/pub2]");
 
-    CE (std::string res2 = helicsQueryExecute (q1, vFed2, &err));
-    EXPECT_EQ (res2, "[pub1;fed0/pub2]");
+  CE (std::string res2 = helicsQueryExecute (q1, vFed2, &err));
+  EXPECT_EQ (res2, "[pub1;fed0/pub2]");
 
-    helicsQueryFree (q1);
-    q1 = helicsCreateQuery ("fed1", "isinit");
+  helicsQueryFree (q1);
+  q1 = helicsCreateQuery ("fed1", "isinit");
 
-    CE (res = helicsQueryExecute (q1, vFed1, &err));
-    EXPECT_EQ (res, "true");
-    helicsQueryFree (q1);
+  CE (res = helicsQueryExecute (q1, vFed1, &err));
+  EXPECT_EQ (res, "true");
+  helicsQueryFree (q1);
 
-    q1 = helicsCreateQuery ("fed1", "publications");
-    CE (res = helicsQueryExecute (q1, vFed1, &err));
-    EXPECT_EQ (res, "[fed1/pub3]");
-    helicsQueryFree (q1);
-    helicsCoreFree (core);
-    CE (helicsFederateFinalizeAsync (vFed1, &err));
-    CE (helicsFederateFinalize (vFed2, &err));
-    CE (helicsFederateFinalizeComplete (vFed1, &err));
+  q1 = helicsCreateQuery ("fed1", "publications");
+  CE (res = helicsQueryExecute (q1, vFed1, &err));
+  EXPECT_EQ (res, "[fed1/pub3]");
+  helicsQueryFree (q1);
+  helicsCoreFree (core);
+  CE (helicsFederateFinalizeAsync (vFed1, &err));
+  CE (helicsFederateFinalize (vFed2, &err));
+  CE (helicsFederateFinalizeComplete (vFed1, &err));
 }
 
 TEST_P (query_tests, broker_queries)
 {
-    SetupTest (helicsCreateValueFederate, GetParam (), 2);
-    auto vFed1 = GetFederateAt (0);
-    auto vFed2 = GetFederateAt (1);
+  SetupTest (helicsCreateValueFederate, GetParam (), 2);
+  auto vFed1 = GetFederateAt (0);
+  auto vFed2 = GetFederateAt (1);
 
-    CE (auto core = helicsFederateGetCoreObject (vFed1, &err));
+  CE (auto core = helicsFederateGetCoreObject (vFed1, &err));
 
-    auto q1 = helicsCreateQuery ("root", "federates");
-    std::string res = helicsQueryCoreExecute (q1, core, nullptr);
-    std::string str ("[");
-    str.append (helicsFederateGetName (vFed1));
-    str.push_back (';');
-    str.append (helicsFederateGetName (vFed2));
-    str.push_back (']');
+  auto q1 = helicsCreateQuery ("root", "federates");
+  std::string res = helicsQueryCoreExecute (q1, core, nullptr);
+  std::string str ("[");
+  str.append (helicsFederateGetName (vFed1));
+  str.push_back (';');
+  str.append (helicsFederateGetName (vFed2));
+  str.push_back (']');
 
-    EXPECT_EQ (res, str);
+  EXPECT_EQ (res, str);
 
-    CE (std::string res2 = helicsQueryExecute (q1, vFed1, &err));
-    EXPECT_EQ (res2, str);
-    CE (helicsFederateEnterInitializingModeAsync (vFed1, &err));
-    CE (helicsFederateEnterInitializingMode (vFed2, &err));
-    CE (helicsFederateEnterInitializingModeComplete (vFed1, &err));
-    helicsQueryFree (q1);
-    helicsCoreFree (core);
-    CE (helicsFederateFinalizeAsync (vFed1, &err));
-    CE (helicsFederateFinalize (vFed2, &err));
-    CE (helicsFederateFinalizeComplete (vFed1, &err));
+  CE (std::string res2 = helicsQueryExecute (q1, vFed1, &err));
+  EXPECT_EQ (res2, str);
+  CE (helicsFederateEnterInitializingModeAsync (vFed1, &err));
+  CE (helicsFederateEnterInitializingMode (vFed2, &err));
+  CE (helicsFederateEnterInitializingModeComplete (vFed1, &err));
+  helicsQueryFree (q1);
+  helicsCoreFree (core);
+  CE (helicsFederateFinalizeAsync (vFed1, &err));
+  CE (helicsFederateFinalize (vFed2, &err));
+  CE (helicsFederateFinalizeComplete (vFed1, &err));
 }
 
 INSTANTIATE_TEST_SUITE_P (query_tests, query_tests, ::testing::ValuesIn (core_types));

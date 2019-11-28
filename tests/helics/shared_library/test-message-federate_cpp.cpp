@@ -26,81 +26,81 @@ class mfed_type_tests : public ::testing::TestWithParam<const char *>, public Fe
 /** test simple creation and destruction*/
 TEST_P (mfed_type_tests, message_federate_initialize_tests)
 {
-    SetupTest<helicscpp::MessageFederate> (GetParam (), 1);
-    auto mFed1 = GetFederateAs<helicscpp::MessageFederate> (0);
+  SetupTest<helicscpp::MessageFederate> (GetParam (), 1);
+  auto mFed1 = GetFederateAs<helicscpp::MessageFederate> (0);
 
-    mFed1->enterExecutingMode ();
+  mFed1->enterExecutingMode ();
 
-    helics_federate_state mFed1State = mFed1->getCurrentMode ();
-    EXPECT_TRUE (mFed1State == helics_state_execution);
+  helics_federate_state mFed1State = mFed1->getCurrentMode ();
+  EXPECT_TRUE (mFed1State == helics_state_execution);
 
-    mFed1->finalize ();
+  mFed1->finalize ();
 
-    mFed1State = mFed1->getCurrentMode ();
-    EXPECT_TRUE (mFed1State == helics_federate_state::helics_state_finalize);
+  mFed1State = mFed1->getCurrentMode ();
+  EXPECT_TRUE (mFed1State == helics_federate_state::helics_state_finalize);
 }
 
 TEST_P (mfed_type_tests, message_federate_endpoint_registration)
 {
-    SetupTest<helicscpp::MessageFederate> (GetParam (), 1);
-    auto mFed1 = GetFederateAs<helicscpp::MessageFederate> (0);
+  SetupTest<helicscpp::MessageFederate> (GetParam (), 1);
+  auto mFed1 = GetFederateAs<helicscpp::MessageFederate> (0);
 
-    auto epid = mFed1->registerEndpoint ("ep1");
-    auto epid2 = mFed1->registerGlobalEndpoint ("ep2", "random");
+  auto epid = mFed1->registerEndpoint ("ep1");
+  auto epid2 = mFed1->registerGlobalEndpoint ("ep2", "random");
 
-    mFed1->enterExecutingMode ();
+  mFed1->enterExecutingMode ();
 
-    helics_federate_state mFed1State = mFed1->getCurrentMode ();
-    EXPECT_TRUE (mFed1State == helics_state_execution);
+  helics_federate_state mFed1State = mFed1->getCurrentMode ();
+  EXPECT_TRUE (mFed1State == helics_state_execution);
 
-    EXPECT_EQ (std::string (epid.getName ()), "fed0/ep1");
-    EXPECT_EQ (std::string (epid2.getName ()), "ep2");
+  EXPECT_EQ (std::string (epid.getName ()), "fed0/ep1");
+  EXPECT_EQ (std::string (epid2.getName ()), "ep2");
 
-    EXPECT_EQ (std::string (epid.getType ()), "");
-    EXPECT_EQ (std::string (epid2.getType ()), "random");
+  EXPECT_EQ (std::string (epid.getType ()), "");
+  EXPECT_EQ (std::string (epid2.getType ()), "random");
 
-    mFed1->finalize ();
+  mFed1->finalize ();
 
-    mFed1State = mFed1->getCurrentMode ();
-    EXPECT_TRUE (mFed1State == helics_federate_state::helics_state_finalize);
+  mFed1State = mFed1->getCurrentMode ();
+  EXPECT_TRUE (mFed1State == helics_federate_state::helics_state_finalize);
 }
 
 TEST_P (mfed_type_tests, message_federate_send_receive)
 {
-    SetupTest<helicscpp::MessageFederate> (GetParam (), 1, 1.0);
-    auto mFed1 = GetFederateAs<helicscpp::MessageFederate> (0);
+  SetupTest<helicscpp::MessageFederate> (GetParam (), 1, 1.0);
+  auto mFed1 = GetFederateAs<helicscpp::MessageFederate> (0);
 
-    auto epid = mFed1->registerEndpoint ("ep1");
-    auto epid2 = mFed1->registerGlobalEndpoint ("ep2", "random");
+  auto epid = mFed1->registerEndpoint ("ep1");
+  auto epid2 = mFed1->registerGlobalEndpoint ("ep2", "random");
 
-    mFed1->enterExecutingMode ();
+  mFed1->enterExecutingMode ();
 
-    std::string data (500, 'a');
+  std::string data (500, 'a');
 
-    epid.sendMessage ("ep2", data, 0.0);
-    helics_time time = mFed1->requestTime (1.0);
+  epid.sendMessage ("ep2", data, 0.0);
+  helics_time time = mFed1->requestTime (1.0);
 
-    EXPECT_EQ (time, 1.0);
+  EXPECT_EQ (time, 1.0);
 
-    auto res = mFed1->hasMessage ();
-    EXPECT_TRUE (res);
-    res = epid.hasMessage ();
-    EXPECT_TRUE (res == false);
-    res = epid2.hasMessage ();
-    EXPECT_TRUE (res);
+  auto res = mFed1->hasMessage ();
+  EXPECT_TRUE (res);
+  res = epid.hasMessage ();
+  EXPECT_TRUE (res == false);
+  res = epid2.hasMessage ();
+  EXPECT_TRUE (res);
 
-    auto M = epid2.getMessage ();
-    // BOOST_REQUIRE (M);
-    ASSERT_EQ (M.length, 500);
-    EXPECT_NE (M.data, nullptr);
-    if (M.data != nullptr)
-    {
-        EXPECT_EQ (M.data[245], 'a');
-    }
-    mFed1->finalize ();
+  auto M = epid2.getMessage ();
+  // BOOST_REQUIRE (M);
+  ASSERT_EQ (M.length, 500);
+  EXPECT_NE (M.data, nullptr);
+  if (M.data != nullptr)
+  {
+    EXPECT_EQ (M.data[245], 'a');
+  }
+  mFed1->finalize ();
 
-    auto mFed1State = mFed1->getCurrentMode ();
-    EXPECT_TRUE (mFed1State == helics_federate_state::helics_state_finalize);
+  auto mFed1State = mFed1->getCurrentMode ();
+  EXPECT_TRUE (mFed1State == helics_federate_state::helics_state_finalize);
 }
 
 INSTANTIATE_TEST_SUITE_P (mfed_tests, mfed_type_tests, ::testing::ValuesIn (core_types_simple));

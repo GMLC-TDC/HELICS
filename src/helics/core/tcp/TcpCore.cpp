@@ -21,27 +21,27 @@ TcpCoreSS::TcpCoreSS (const std::string &core_name) : NetworkCore (core_name) {}
 
 std::shared_ptr<helicsCLI11App> TcpCoreSS::generateCLI ()
 {
-    auto hApp = NetworkCore::generateCLI ();
-    hApp->description ("TCP Single Socket Core ");
-    hApp->add_option ("--connections", connections, "target link connections");
-    hApp->add_flag ("--no_outgoing_connection", no_outgoing_connections, "disable outgoing connections")
-      ->ignore_underscore ();
-    return hApp;
+  auto hApp = NetworkCore::generateCLI ();
+  hApp->description ("TCP Single Socket Core ");
+  hApp->add_option ("--connections", connections, "target link connections");
+  hApp->add_flag ("--no_outgoing_connection", no_outgoing_connections, "disable outgoing connections")
+    ->ignore_underscore ();
+  return hApp;
 }
 
 bool TcpCoreSS::brokerConnect ()
 {
-    std::unique_lock<std::mutex> lock (dataMutex);
-    if (!connections.empty ())
-    {
-        comms->addConnections (connections);
-    }
-    if (no_outgoing_connections)
-    {
-        comms->setFlag ("allow_outgoing", false);
-    }
-    lock.unlock ();
-    return NetworkCore::brokerConnect ();
+  std::unique_lock<std::mutex> lock (dataMutex);
+  if (!connections.empty ())
+  {
+    comms->addConnections (connections);
+  }
+  if (no_outgoing_connections)
+  {
+    comms->setFlag ("allow_outgoing", false);
+  }
+  lock.unlock ();
+  return NetworkCore::brokerConnect ();
 }
 
 }  // namespace tcp

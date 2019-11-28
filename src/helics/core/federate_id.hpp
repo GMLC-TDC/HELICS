@@ -22,27 +22,27 @@ it also acts to limit any mistakes of a local_federate_id
 */
 class local_federate_id
 {
-  public:
-    using base_type = identififier_base_type;
-    /** default constructor*/
-    constexpr local_federate_id () = default;
-    /** convert a base type value into a local_federate id*/
-    constexpr explicit local_federate_id (base_type val) noexcept : fid (val){};
-    /** extract the base value of the id code*/
-    constexpr base_type baseValue () const { return fid; }
-    /** equality operator*/
-    bool operator== (local_federate_id id) const noexcept { return (fid == id.fid); };
-    /** inequality operator*/
-    bool operator!= (local_federate_id id) const noexcept { return (fid != id.fid); };
-    /** less than operator for sorting*/
-    bool operator< (local_federate_id id) const noexcept { return (fid < id.fid); };
-    /** check if the operator is valid
-    @details valid operators have been set to something other than the default value*/
-    bool isValid () const { return (fid != invalid_fid); }
+public:
+  using base_type = identififier_base_type;
+  /** default constructor*/
+  constexpr local_federate_id () = default;
+  /** convert a base type value into a local_federate id*/
+  constexpr explicit local_federate_id (base_type val) noexcept : fid (val){};
+  /** extract the base value of the id code*/
+  constexpr base_type baseValue () const { return fid; }
+  /** equality operator*/
+  bool operator== (local_federate_id id) const noexcept { return (fid == id.fid); };
+  /** inequality operator*/
+  bool operator!= (local_federate_id id) const noexcept { return (fid != id.fid); };
+  /** less than operator for sorting*/
+  bool operator< (local_federate_id id) const noexcept { return (fid < id.fid); };
+  /** check if the operator is valid
+  @details valid operators have been set to something other than the default value*/
+  bool isValid () const { return (fid != invalid_fid); }
 
-  private:
-    static constexpr base_type invalid_fid = -2'000'000'000;  //!< defined invalid handle
-    base_type fid{invalid_fid};  //!< the underlying index value
+private:
+  static constexpr base_type invalid_fid = -2'000'000'000;  //!< defined invalid handle
+  base_type fid{invalid_fid};  //!< the underlying index value
 };
 
 #if defined HELICS_STATIC_CORE_LIBRARY && !defined HELICS_SHARED_LIBRARY
@@ -59,26 +59,26 @@ constexpr local_federate_id local_core_id (-259); /** class defining a local_fed
  */
 class interface_handle
 {
-  public:
-    using base_type = identififier_base_type;
-    /** default constructor*/
-    constexpr interface_handle () = default;
+public:
+  using base_type = identififier_base_type;
+  /** default constructor*/
+  constexpr interface_handle () = default;
 
-    constexpr explicit interface_handle (base_type val) noexcept : hid (val){};
-    /** extract the base value of the id code*/
-    constexpr base_type baseValue () const { return hid; }
-    /** equality operator*/
-    bool operator== (interface_handle id) const noexcept { return (hid == id.hid); };
-    /** inequality operator*/
-    bool operator!= (interface_handle id) const noexcept { return (hid != id.hid); };
-    /** comparison operator for sorting*/
-    bool operator< (interface_handle id) const noexcept { return (hid < id.hid); };
-    bool operator> (interface_handle id) const noexcept { return (hid > id.hid); };
-    bool isValid () const { return (hid != invalid_handle); }
+  constexpr explicit interface_handle (base_type val) noexcept : hid (val){};
+  /** extract the base value of the id code*/
+  constexpr base_type baseValue () const { return hid; }
+  /** equality operator*/
+  bool operator== (interface_handle id) const noexcept { return (hid == id.hid); };
+  /** inequality operator*/
+  bool operator!= (interface_handle id) const noexcept { return (hid != id.hid); };
+  /** comparison operator for sorting*/
+  bool operator< (interface_handle id) const noexcept { return (hid < id.hid); };
+  bool operator> (interface_handle id) const noexcept { return (hid > id.hid); };
+  bool isValid () const { return (hid != invalid_handle); }
 
-  private:
-    static constexpr base_type invalid_handle{-1'700'000'000};
-    base_type hid{invalid_handle};  //!< the underlying index value
+private:
+  static constexpr base_type invalid_handle{-1'700'000'000};
+  base_type hid{invalid_handle};  //!< the underlying index value
 };
 
 #if defined HELICS_STATIC_CORE_LIBRARY && !defined HELICS_SHARED_LIBRARY
@@ -98,27 +98,26 @@ namespace std
 template <>
 struct hash<helics::local_federate_id>
 {
-    using argument_type = helics::local_federate_id;  //!< type of object to hash
-    using result_type =
-      hash<helics::local_federate_id::base_type>::result_type;  //!< the type of the return result
-    /** actual hash operator*/
-    result_type operator() (argument_type const &key) const noexcept
-    {
-        return std::hash<helics::local_federate_id::base_type>{}(key.baseValue ());
-    }
+  using argument_type = helics::local_federate_id;  //!< type of object to hash
+  using result_type = hash<helics::local_federate_id::base_type>::result_type;  //!< the type of the return result
+  /** actual hash operator*/
+  result_type operator() (argument_type const &key) const noexcept
+  {
+    return std::hash<helics::local_federate_id::base_type>{}(key.baseValue ());
+  }
 };
 
 /** define a template specialization for hash function for interface_handle so it can be used in unordered_map*/
 template <>
 struct hash<helics::interface_handle>
 {
-    using argument_type = helics::interface_handle;  //!< type of object to hash
-    using result_type = hash<helics::interface_handle::base_type>::result_type;  //!< the type of the return result
-    /** actual hash operator*/
-    result_type operator() (argument_type const &key) const noexcept
-    {
-        return std::hash<helics::interface_handle::base_type>{}(key.baseValue ());
-    }
+  using argument_type = helics::interface_handle;  //!< type of object to hash
+  using result_type = hash<helics::interface_handle::base_type>::result_type;  //!< the type of the return result
+  /** actual hash operator*/
+  result_type operator() (argument_type const &key) const noexcept
+  {
+    return std::hash<helics::interface_handle::base_type>{}(key.baseValue ());
+  }
 };
 
 }  // namespace std

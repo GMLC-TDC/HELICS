@@ -15,13 +15,13 @@ Endpoint::Endpoint (interface_visibility locality,
                     const std::string &name,
                     const std::string &type)
 {
-    if (locality == interface_visibility::global)
-    {
-        operator= (mFed->registerGlobalEndpoint (name, type));
-    }
-    else
-    {
-        operator= (mFed->registerEndpoint (name, type));
-    }
+  if (locality == interface_visibility::global)
+  {
+    operator= (mFed->registerGlobalEndpoint (name, type));
+  }
+  else
+  {
+    operator= (mFed->registerEndpoint (name, type));
+  }
 }
 }  // namespace helics

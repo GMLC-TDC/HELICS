@@ -1,8 +1,7 @@
 #include <optional>
 
-int main()
+int main ()
 {
-    std::optional<int> b = 5;
-    return 0;
+  std::optional<int> b = 5;
+  return 0;
 }
-

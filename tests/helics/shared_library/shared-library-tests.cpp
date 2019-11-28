@@ -12,12 +12,12 @@ SPDX-License-Identifier: BSD-3-Clause
 
 struct globalTestConfig : public ::testing::Environment
 {
-    virtual void TearDown () override
-    {
-        // std::cout << "cleaning up" << std::endl;
-        helicsCloseLibrary ();
-        // std::cout << "finished cleaning up" << std::endl;
-    }
+  virtual void TearDown () override
+  {
+    // std::cout << "cleaning up" << std::endl;
+    helicsCloseLibrary ();
+    // std::cout << "finished cleaning up" << std::endl;
+  }
 };
 
 // register the global setup and teardown structure

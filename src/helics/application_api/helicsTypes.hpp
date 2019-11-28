@@ -27,18 +27,18 @@ constexpr identifier_type invalid_id_value = static_cast<identifier_type> (-1); 
 /** the known types of identifiers*/
 enum class identifiers : char
 {
-    publication,
-    input,
-    filter,
-    endpoint,
-    query,
+  publication,
+  input,
+  filter,
+  endpoint,
+  query,
 };
 
 /** enumeration of locality namespaces*/
 enum class interface_visibility
 {
-    local,
-    global,
+  local,
+  global,
 };
 
 constexpr interface_visibility GLOBAL = interface_visibility::global;
@@ -52,41 +52,41 @@ it also acts to limit any mistakes of on type of identifier for another
 template <typename BaseType, identifiers ID, BaseType invalidValue>
 class identifier_id_t
 {
-  private:
-    BaseType ivalue = invalidValue;  //!< the underlying index value
+private:
+  BaseType ivalue = invalidValue;  //!< the underlying index value
 
-  public:
-    static const identifiers identity{ID};  //!< the type of the identifier
-    using underlyingType = BaseType;
-    /** default constructor*/
-    constexpr identifier_id_t () noexcept : ivalue (invalidValue){};
-    /** value based constructor*/
-    constexpr explicit identifier_id_t (BaseType val) noexcept : ivalue (val){};
-    /** copy constructor*/
-    constexpr identifier_id_t (const identifier_id_t &id) noexcept : ivalue (id.ivalue){};
-    /** assignment from number*/
-    identifier_id_t &operator= (BaseType val) noexcept
-    {
-        ivalue = val;
-        return *this;
-    };
-    /** copy assignment*/
-    identifier_id_t &operator= (const identifier_id_t &id) noexcept
-    {
-        ivalue = id.ivalue;
-        return *this;
-    };
+public:
+  static const identifiers identity{ID};  //!< the type of the identifier
+  using underlyingType = BaseType;
+  /** default constructor*/
+  constexpr identifier_id_t () noexcept : ivalue (invalidValue){};
+  /** value based constructor*/
+  constexpr explicit identifier_id_t (BaseType val) noexcept : ivalue (val){};
+  /** copy constructor*/
+  constexpr identifier_id_t (const identifier_id_t &id) noexcept : ivalue (id.ivalue){};
+  /** assignment from number*/
+  identifier_id_t &operator= (BaseType val) noexcept
+  {
+    ivalue = val;
+    return *this;
+  };
+  /** copy assignment*/
+  identifier_id_t &operator= (const identifier_id_t &id) noexcept
+  {
+    ivalue = id.ivalue;
+    return *this;
+  };
 
-    /** get the underlying value*/
-    BaseType value () const noexcept { return ivalue; };
-    /** equality operator*/
-    bool operator== (identifier_id_t id) const noexcept { return (ivalue == id.ivalue); };
-    /** inequality operator*/
-    bool operator!= (identifier_id_t id) const noexcept { return (ivalue != id.ivalue); };
-    /** less than operator for sorting*/
-    bool operator< (identifier_id_t id) const noexcept { return (ivalue < id.ivalue); };
-    // check if the current value is not the invalidValue
-    bool isValid () const noexcept { return (ivalue != invalidValue); };
+  /** get the underlying value*/
+  BaseType value () const noexcept { return ivalue; };
+  /** equality operator*/
+  bool operator== (identifier_id_t id) const noexcept { return (ivalue == id.ivalue); };
+  /** inequality operator*/
+  bool operator!= (identifier_id_t id) const noexcept { return (ivalue != id.ivalue); };
+  /** less than operator for sorting*/
+  bool operator< (identifier_id_t id) const noexcept { return (ivalue < id.ivalue); };
+  // check if the current value is not the invalidValue
+  bool isValid () const noexcept { return (ivalue != invalidValue); };
 };
 }  // namespace helics
 
@@ -97,13 +97,10 @@ namespace std
 template <typename BaseType, helics::identifiers ID, BaseType invalidValue>
 struct hash<helics::identifier_id_t<BaseType, ID, invalidValue>>
 {
-    using argument_type = helics::identifier_id_t<BaseType, ID, invalidValue>;  //!< the type of object to hash
-    using result_type = std::size_t;  //!< the result type of the hash code
-    /** the actual hash operator*/
-    result_type operator() (argument_type const &key) const noexcept
-    {
-        return std::hash<BaseType>{}(key.value ());
-    }
+  using argument_type = helics::identifier_id_t<BaseType, ID, invalidValue>;  //!< the type of object to hash
+  using result_type = std::size_t;  //!< the result type of the hash code
+  /** the actual hash operator*/
+  result_type operator() (argument_type const &key) const noexcept { return std::hash<BaseType>{}(key.value ()); }
 };
 }  // namespace std
 
@@ -117,45 +114,39 @@ using query_id_t = identifier_id_t<identifier_type, identifiers::query, invalid_
 /** data class for pair of a string and double*/
 class NamedPoint
 {
-  public:
-    std::string name;  //!< the text value for the named point
-    double value = std::numeric_limits<double>::quiet_NaN ();  //!< the data value for the named point
-    /** default constructor*/
-    NamedPoint () = default;
-    /** construct directly from name value*/
-    NamedPoint (std::string valname, double valval) : name (std::move (valname)), value (valval) {}
-    /** equality operator
-    @details if either value is nan it check only the string
-    otherwise it checks the name and value
-    @return true if the objects are equivalent*/
-    bool operator== (const NamedPoint &np) const
-    {
-        return ((std::isnan (value)) && (std::isnan (np.value))) ? (name == np.name) :
-                                                                   ((value == np.value) && (name == np.name));
-    }
-    bool operator!= (const NamedPoint &np) const { return !operator== (np); }
-    /** less than operator
-    @details checks by name order, then value order
-    */
-    bool operator< (const NamedPoint &np) const
-    {
-        return (name == np.name) ? (name < np.name) : (value < np.value);
-    }
-    /** greater than operator
-    @details checks by name order, then value order
-    */
-    bool operator> (const NamedPoint &np) const
-    {
-        return (name == np.name) ? (name > np.name) : (value > np.value);
-    }
+public:
+  std::string name;  //!< the text value for the named point
+  double value = std::numeric_limits<double>::quiet_NaN ();  //!< the data value for the named point
+  /** default constructor*/
+  NamedPoint () = default;
+  /** construct directly from name value*/
+  NamedPoint (std::string valname, double valval) : name (std::move (valname)), value (valval) {}
+  /** equality operator
+  @details if either value is nan it check only the string
+  otherwise it checks the name and value
+  @return true if the objects are equivalent*/
+  bool operator== (const NamedPoint &np) const
+  {
+    return ((std::isnan (value)) && (std::isnan (np.value))) ? (name == np.name) :
+                                                               ((value == np.value) && (name == np.name));
+  }
+  bool operator!= (const NamedPoint &np) const { return !operator== (np); }
+  /** less than operator
+  @details checks by name order, then value order
+  */
+  bool operator< (const NamedPoint &np) const { return (name == np.name) ? (name < np.name) : (value < np.value); }
+  /** greater than operator
+  @details checks by name order, then value order
+  */
+  bool operator> (const NamedPoint &np) const { return (name == np.name) ? (name > np.name) : (value > np.value); }
 };
 
 /** template class for generating a known name of a type*/
 template <class X>
 inline constexpr const char *typeNameString ()
 {
-    // this will probably not be the same on all platforms
-    return typeid (X).name ();
+  // this will probably not be the same on all platforms
+  return typeid (X).name ();
 }
 namespace typestrings
 {
@@ -183,121 +174,121 @@ constexpr auto strstr = "string";
 template <>
 inline constexpr const char *typeNameString<std::vector<std::string>> ()
 {
-    return typestrings::svecstr;
+  return typestrings::svecstr;
 }
 template <>
 inline constexpr const char *typeNameString<std::vector<double>> ()
 {
-    return typestrings::dvecstr;
+  return typestrings::dvecstr;
 }
 
 template <>
 inline constexpr const char *typeNameString<std::vector<std::complex<double>>> ()
 {
-    return typestrings::cvecstr;
+  return typestrings::cvecstr;
 }
 
 /** for float*/
 template <>
 inline constexpr const char *typeNameString<double> ()
 {
-    return typestrings::doublestr;
+  return typestrings::doublestr;
 }
 
 /** for float*/
 template <>
 inline constexpr const char *typeNameString<float> ()
 {
-    return typestrings::floatstr;
+  return typestrings::floatstr;
 }
 
 /** for boolean*/
 template <>
 inline constexpr const char *typeNameString<bool> ()
 {
-    return typestrings::boolstr;
+  return typestrings::boolstr;
 }
 
 /** for character*/
 template <>
 inline constexpr const char *typeNameString<char> ()
 {
-    return typestrings::charstr;
+  return typestrings::charstr;
 }
 /** for unsigned character*/
 template <>
 inline constexpr const char *typeNameString<unsigned char> ()
 {
-    return typestrings::ucharstr;
+  return typestrings::ucharstr;
 }
 /** for integer*/
 template <>
 inline constexpr const char *typeNameString<std::int32_t> ()
 {
-    return typestrings::i32str;
+  return typestrings::i32str;
 }
 /** for unsigned integer*/
 template <>
 inline constexpr const char *typeNameString<std::uint32_t> ()
 {
-    return typestrings::ui32str;
+  return typestrings::ui32str;
 }
 /** for 64 bit unsigned integer*/
 template <>
 inline constexpr const char *typeNameString<int64_t> ()
 {
-    return typestrings::i64str;
+  return typestrings::i64str;
 }
 /** for 64 bit unsigned integer*/
 template <>
 inline constexpr const char *typeNameString<std::uint64_t> ()
 {
-    return typestrings::ui64str;
+  return typestrings::ui64str;
 }
 /** for complex double*/
 template <>
 inline constexpr const char *typeNameString<std::complex<float>> ()
 {
-    return typestrings::cfloatstr;
+  return typestrings::cfloatstr;
 }
 /** for complex double*/
 template <>
 inline constexpr const char *typeNameString<std::complex<double>> ()
 {
-    return typestrings::cdoublestr;
+  return typestrings::cdoublestr;
 }
 template <>
 inline constexpr const char *typeNameString<std::string> ()
 {
-    return typestrings::strstr;
+  return typestrings::strstr;
 }
 
 template <>
 inline constexpr const char *typeNameString<NamedPoint> ()
 {
-    return typestrings::npstr;
+  return typestrings::npstr;
 }
 /** the base types for  helics*/
 enum class data_type : int
 {
-    helics_string = helics_data_type_string,
-    helics_double = helics_data_type_double,
-    helics_int = helics_data_type_int,
+  helics_string = helics_data_type_string,
+  helics_double = helics_data_type_double,
+  helics_int = helics_data_type_int,
 
-    helics_complex = helics_data_type_complex,
-    helics_vector = helics_data_type_vector,
-    helics_complex_vector = helics_data_type_complex_vector,
-    helics_named_point = helics_data_type_named_point,
-    helics_bool = helics_data_type_boolean,
-    helics_time = helics_data_type_time,
-    helics_custom = helics_data_type_raw,
-    helics_any = helics_data_type_any,
-    helics_unknown = 262355,
+  helics_complex = helics_data_type_complex,
+  helics_vector = helics_data_type_vector,
+  helics_complex_vector = helics_data_type_complex_vector,
+  helics_named_point = helics_data_type_named_point,
+  helics_bool = helics_data_type_boolean,
+  helics_time = helics_data_type_time,
+  helics_custom = helics_data_type_raw,
+  helics_any = helics_data_type_any,
+  helics_unknown = 262355,
 };
 
 inline constexpr bool isRawType (data_type type)
 {
-    return (type == data_type::helics_any) || (type == data_type::helics_custom);
+  return (type == data_type::helics_any) || (type == data_type::helics_custom);
 }
 
 /** sometimes we just need a ref to a string for the basic types*/
@@ -370,122 +361,122 @@ HELICS_CXX_EXPORT data_block typeConvert (data_type type, bool val);
 template <class X>
 constexpr data_type helicsType ()
 {
-    return data_type::helics_custom;
+  return data_type::helics_custom;
 }
 
 template <>
 constexpr data_type helicsType<int64_t> ()
 {
-    return data_type::helics_int;
+  return data_type::helics_int;
 }
 
 template <>
 constexpr data_type helicsType<bool> ()
 {
-    return data_type::helics_bool;
+  return data_type::helics_bool;
 }
 
 template <>
 constexpr data_type helicsType<std::string> ()
 {
-    return data_type::helics_string;
+  return data_type::helics_string;
 }
 
 template <>
 constexpr data_type helicsType<NamedPoint> ()
 {
-    return data_type::helics_named_point;
+  return data_type::helics_named_point;
 }
 template <>
 constexpr data_type helicsType<double> ()
 {
-    return data_type::helics_double;
+  return data_type::helics_double;
 }
 
 template <>
 constexpr data_type helicsType<Time> ()
 {
-    return data_type::helics_time;
+  return data_type::helics_time;
 }
 
 template <>
 constexpr data_type helicsType<std::complex<double>> ()
 {
-    return data_type::helics_complex;
+  return data_type::helics_complex;
 }
 
 template <>
 constexpr data_type helicsType<std::vector<double>> ()
 {
-    return data_type::helics_vector;
+  return data_type::helics_vector;
 }
 
 template <>
 constexpr data_type helicsType<std::vector<std::complex<double>>> ()
 {
-    return data_type::helics_complex_vector;
+  return data_type::helics_complex_vector;
 }
 
 // check if the type is directly convertible to a base HelicsType
 template <class X>
 constexpr bool isConvertableType ()
 {
-    return false;
+  return false;
 }
 
 template <>
 constexpr bool isConvertableType<float> ()
 {
-    return true;
+  return true;
 }
 
 template <>
 constexpr bool isConvertableType<long double> ()
 {
-    return true;
+  return true;
 }
 
 template <>
 constexpr bool isConvertableType<int32_t> ()
 {
-    return true;
+  return true;
 }
 
 template <>
 constexpr bool isConvertableType<int16_t> ()
 {
-    return true;
+  return true;
 }
 
 template <>
 constexpr bool isConvertableType<uint16_t> ()
 {
-    return true;
+  return true;
 }
 
 template <>
 constexpr bool isConvertableType<char> ()
 {
-    return true;
+  return true;
 }
 
 template <>
 constexpr bool isConvertableType<unsigned char> ()
 {
-    return true;
+  return true;
 }
 
 template <>
 constexpr bool isConvertableType<uint64_t> ()
 {
-    return true;
+  return true;
 }
 
 /** generate an invalid value for the various types*/
 template <class X>
 inline X invalidValue ()
 {
-    return X ();
+  return X ();
 }
 
 /// defined constant for an invalid value as a double
@@ -494,37 +485,37 @@ constexpr double invalidDouble = -1e48;
 template <>
 constexpr double invalidValue<double> ()
 {
-    return invalidDouble;
+  return invalidDouble;
 }
 
 template <>
 constexpr int64_t invalidValue<int64_t> ()
 {
-    return (std::numeric_limits<int64_t>::min) ();
+  return (std::numeric_limits<int64_t>::min) ();
 }
 
 template <>
 constexpr uint64_t invalidValue<uint64_t> ()
 {
-    return (std::numeric_limits<uint64_t>::max) ();
+  return (std::numeric_limits<uint64_t>::max) ();
 }
 
 template <>
 constexpr Time invalidValue<Time> ()
 {
-    return Time::minVal ();
+  return Time::minVal ();
 }
 
 template <>
 inline NamedPoint invalidValue<NamedPoint> ()
 {
-    return {std::string (), std::nan ("0")};
+  return {std::string (), std::nan ("0")};
 }
 
 template <>
 constexpr std::complex<double> invalidValue<std::complex<double>> ()
 {
-    return {invalidValue<double> (), 0.0};
+  return {invalidValue<double> (), 0.0};
 }
 /// Helper template to remove const volatile references
 template <typename T>

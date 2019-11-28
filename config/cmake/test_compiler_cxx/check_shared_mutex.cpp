@@ -1,9 +1,8 @@
 #include <shared_mutex>
 
-int main()
+int main ()
 {
-    std::shared_mutex mtx;
-    mtx.lock_shared();
-    mtx.unlock_shared();
+  std::shared_mutex mtx;
+  mtx.lock_shared ();
+  mtx.unlock_shared ();
 }
-

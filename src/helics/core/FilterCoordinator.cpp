@@ -12,26 +12,26 @@ namespace helics
 {
 void FilterCoordinator::closeFilter (global_handle filt)
 {
-    if (destFilter != nullptr)
+  if (destFilter != nullptr)
+  {
+    if ((destFilter->core_id == filt.fed_id) && (destFilter->handle == filt.handle))
     {
-        if ((destFilter->core_id == filt.fed_id) && (destFilter->handle == filt.handle))
-        {
-            setActionFlag (*destFilter, disconnected_flag);
-        }
+      setActionFlag (*destFilter, disconnected_flag);
     }
-    for (auto sFilt : allSourceFilters)
+  }
+  for (auto sFilt : allSourceFilters)
+  {
+    if ((sFilt->core_id == filt.fed_id) && (sFilt->handle == filt.handle))
     {
-        if ((sFilt->core_id == filt.fed_id) && (sFilt->handle == filt.handle))
-        {
-            setActionFlag (*sFilt, disconnected_flag);
-        }
+      setActionFlag (*sFilt, disconnected_flag);
     }
-    for (auto cFilt : cloningDestFilters)
+  }
+  for (auto cFilt : cloningDestFilters)
+  {
+    if ((cFilt->core_id == filt.fed_id) && (cFilt->handle == filt.handle))
     {
-        if ((cFilt->core_id == filt.fed_id) && (cFilt->handle == filt.handle))
-        {
-            setActionFlag (*cFilt, disconnected_flag);
-        }
+      setActionFlag (*cFilt, disconnected_flag);
     }
+  }
 }
 }  // namespace helics

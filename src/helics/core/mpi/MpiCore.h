@@ -18,24 +18,24 @@ class MpiComms;
 /** implementation for the core that uses mpi messages to communicate*/
 class MpiCore final : public CommsBroker<MpiComms, CommonCore>
 {
-  public:
-    /** default constructor*/
-    MpiCore () noexcept;
-    explicit MpiCore (const std::string &core_name);
-    ~MpiCore ();
+public:
+  /** default constructor*/
+  MpiCore () noexcept;
+  explicit MpiCore (const std::string &core_name);
+  ~MpiCore ();
 
-  protected:
-    virtual std::shared_ptr<helicsCLI11App> generateCLI () override;
+protected:
+  virtual std::shared_ptr<helicsCLI11App> generateCLI () override;
 
-  public:
-    virtual std::string generateLocalAddressString () const override;
+public:
+  virtual std::string generateLocalAddressString () const override;
 
-  private:
-    mutable std::mutex dataMutex;  //!< mutex protecting the configuration information
-    std::string brokerAddress;  //!< the mpi rank:tag of the broker
-    int brokerRank{0};
-    int brokerTag{0};
-    virtual bool brokerConnect () override;
+private:
+  mutable std::mutex dataMutex;  //!< mutex protecting the configuration information
+  std::string brokerAddress;  //!< the mpi rank:tag of the broker
+  int brokerRank{0};
+  int brokerTag{0};
+  virtual bool brokerConnect () override;
 };
 
 }  // namespace mpi

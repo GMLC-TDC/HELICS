@@ -27,173 +27,170 @@ using namespace helics;
 /** class implementing the hub for an echo test*/
 class RingTransmit
 {
-  public:
-    helics::Time deltaTime = helics::Time (10, time_units::ns);  // sampling rate
-    helics::Time finalTime = helics::Time (10000, time_units::ns);  // final time
-    int loopCount = 0;
+public:
+  helics::Time deltaTime = helics::Time (10, time_units::ns);  // sampling rate
+  helics::Time finalTime = helics::Time (10000, time_units::ns);  // final time
+  int loopCount = 0;
 
-  private:
-    std::unique_ptr<helics::ValueFederate> vFed;
-    helics::Publication *pub = nullptr;
-    helics::Input *sub = nullptr;
+private:
+  std::unique_ptr<helics::ValueFederate> vFed;
+  helics::Publication *pub = nullptr;
+  helics::Input *sub = nullptr;
 
-    int index_ = 0;
-    int maxIndex_ = 0;
-    bool initialized{false};
-    bool readyToRun{false};
+  int index_ = 0;
+  int maxIndex_ = 0;
+  bool initialized{false};
+  bool readyToRun{false};
 
-  public:
-    RingTransmit () = default;
+public:
+  RingTransmit () = default;
 
-    void run (std::function<void ()> callOnReady = nullptr)
+  void run (std::function<void()> callOnReady = nullptr)
+  {
+    makeReady ();
+    if (callOnReady)
     {
-        makeReady ();
-        if (callOnReady)
-        {
-            callOnReady ();
-        }
-        mainLoop ();
-    };
-
-    void initialize (const std::string &coreName, int index, int maxIndex)
-    {
-        std::string name = "ringlink_" + std::to_string (index);
-        index_ = index;
-        maxIndex_ = maxIndex;
-        helics::FederateInfo fi;
-        fi.coreName = coreName;
-        fi.setFlagOption (helics_flag_restrictive_time_policy);
-        if (index == 0)
-        {
-            // fi.setProperty (helics_property_int_log_level, helics_log_level_timing);
-        }
-        vFed = std::make_unique<helics::ValueFederate> (name, fi);
-        pub = &vFed->registerPublicationIndexed<std::string> ("pub", index_);
-        sub = &vFed->registerSubscriptionIndexed ("pub", (index_ == 0) ? maxIndex_ - 1 : index_ - 1);
-
-        initialized = true;
+      callOnReady ();
     }
+    mainLoop ();
+  };
 
-    void makeReady ()
+  void initialize (const std::string &coreName, int index, int maxIndex)
+  {
+    std::string name = "ringlink_" + std::to_string (index);
+    index_ = index;
+    maxIndex_ = maxIndex;
+    helics::FederateInfo fi;
+    fi.coreName = coreName;
+    fi.setFlagOption (helics_flag_restrictive_time_policy);
+    if (index == 0)
     {
-        if (!initialized)
-        {
-            throw ("must initialize first");
-        }
-        vFed->enterExecutingMode ();
-        readyToRun = true;
+      // fi.setProperty (helics_property_int_log_level, helics_log_level_timing);
     }
+    vFed = std::make_unique<helics::ValueFederate> (name, fi);
+    pub = &vFed->registerPublicationIndexed<std::string> ("pub", index_);
+    sub = &vFed->registerSubscriptionIndexed ("pub", (index_ == 0) ? maxIndex_ - 1 : index_ - 1);
 
-    void mainLoop ()
+    initialized = true;
+  }
+
+  void makeReady ()
+  {
+    if (!initialized)
     {
-        if (index_ == 0)
-        {
-            std::string txstring (100, '1');
-            pub->publish (txstring);
-            ++loopCount;
-        }
-        auto nextTime = deltaTime;
-
-        while (nextTime < finalTime)
-        {
-            nextTime = vFed->requestTime (finalTime);
-            if (vFed->isUpdated (*sub))
-            {
-                auto &nstring = vFed->getString (*sub);
-                vFed->publish (*pub, nstring);
-                ++loopCount;
-            }
-        }
-        vFed->finalize ();
+      throw ("must initialize first");
     }
+    vFed->enterExecutingMode ();
+    readyToRun = true;
+  }
+
+  void mainLoop ()
+  {
+    if (index_ == 0)
+    {
+      std::string txstring (100, '1');
+      pub->publish (txstring);
+      ++loopCount;
+    }
+    auto nextTime = deltaTime;
+
+    while (nextTime < finalTime)
+    {
+      nextTime = vFed->requestTime (finalTime);
+      if (vFed->isUpdated (*sub))
+      {
+        auto &nstring = vFed->getString (*sub);
+        vFed->publish (*pub, nstring);
+        ++loopCount;
+      }
+    }
+    vFed->finalize ();
+  }
 };
 
 static void BM_ring2_singleCore (benchmark::State &state)
 {
-    for (auto _ : state)
+  for (auto _ : state)
+  {
+    state.PauseTiming ();
+    int feds = 2;
+    gmlc::concurrency::Barrier brr (feds);
+    auto wcore = helics::CoreFactory::create (core_type::INPROC, std::string ("--autobroker --federates=2"));
+
+    std::vector<RingTransmit> links (feds);
+    for (int ii = 0; ii < feds; ++ii)
     {
-        state.PauseTiming ();
-        int feds = 2;
-        gmlc::concurrency::Barrier brr (feds);
-        auto wcore = helics::CoreFactory::create (core_type::INPROC, std::string ("--autobroker --federates=2"));
-
-        std::vector<RingTransmit> links (feds);
-        for (int ii = 0; ii < feds; ++ii)
-        {
-            links[ii].initialize (wcore->getIdentifier (), ii, feds);
-        }
-
-        std::thread rthread ([&] (RingTransmit &link) { link.run ([&brr] () { brr.wait (); }); },
-                             std::ref (links[1]));
-
-        links[0].makeReady ();
-        brr.wait ();
-
-        state.ResumeTiming ();
-        links[0].run ();
-        state.PauseTiming ();
-        rthread.join ();
-
-        if (links[0].loopCount != 10000)
-        {
-            std::cout << "incorrect loop count received (" << links[0].loopCount << ") instead of 100000"
-                      << std::endl;
-        }
-        wcore.reset ();
-        cleanupHelicsLibrary ();
-        state.ResumeTiming ();
+      links[ii].initialize (wcore->getIdentifier (), ii, feds);
     }
+
+    std::thread rthread ([&](RingTransmit &link) { link.run ([&brr]() { brr.wait (); }); }, std::ref (links[1]));
+
+    links[0].makeReady ();
+    brr.wait ();
+
+    state.ResumeTiming ();
+    links[0].run ();
+    state.PauseTiming ();
+    rthread.join ();
+
+    if (links[0].loopCount != 10000)
+    {
+      std::cout << "incorrect loop count received (" << links[0].loopCount << ") instead of 100000" << std::endl;
+    }
+    wcore.reset ();
+    cleanupHelicsLibrary ();
+    state.ResumeTiming ();
+  }
 }
 // Register the function as a benchmark
 BENCHMARK (BM_ring2_singleCore)->Unit (benchmark::TimeUnit::kMillisecond)->UseRealTime ()->Iterations (3);
 
 static void BM_ring_multiCore (benchmark::State &state, core_type cType)
 {
-    for (auto _ : state)
+  for (auto _ : state)
+  {
+    state.PauseTiming ();
+    int feds = static_cast<int> (state.range (0));
+    gmlc::concurrency::Barrier brr (feds);
+    auto broker = helics::BrokerFactory::create (cType, std::string ("--federates=") + std::to_string (feds));
+    broker->setLoggingLevel (0);
+
+    std::vector<RingTransmit> links (feds);
+    std::vector<std::shared_ptr<Core>> cores (feds);
+    for (int ii = 0; ii < feds; ++ii)
     {
-        state.PauseTiming ();
-        int feds = static_cast<int> (state.range (0));
-        gmlc::concurrency::Barrier brr (feds);
-        auto broker = helics::BrokerFactory::create (cType, std::string ("--federates=") + std::to_string (feds));
-        broker->setLoggingLevel (0);
-
-        std::vector<RingTransmit> links (feds);
-        std::vector<std::shared_ptr<Core>> cores (feds);
-        for (int ii = 0; ii < feds; ++ii)
-        {
-            cores[ii] = helics::CoreFactory::create (cType, std::string (" --federates=1 --broker=" +
-                                                                         broker->getIdentifier ()));
-            cores[ii]->connect ();
-            links[ii].initialize (cores[ii]->getIdentifier (), ii, feds);
-        }
-        std::vector<std::thread> threadlist (feds - 1);
-        for (int ii = 0; ii < feds - 1; ++ii)
-        {
-            threadlist[ii] = std::thread ([&] (RingTransmit &link) { link.run ([&brr] () { brr.wait (); }); },
-                                          std::ref (links[ii + 1]));
-        }
-
-        links[0].makeReady ();
-        brr.wait ();
-        state.ResumeTiming ();
-        links[0].run ();
-        state.PauseTiming ();
-        for (auto &thrd : threadlist)
-        {
-            thrd.join ();
-        }
-
-        if (links[0].loopCount != 10000)
-        {
-            std::cout << "incorrect loop count received (" << links[0].loopCount << ") instead of 100000"
-                      << std::endl;
-        }
-        broker->disconnect ();
-        broker.reset ();
-        cores.clear ();
-        cleanupHelicsLibrary ();
-        state.ResumeTiming ();
+      cores[ii] =
+        helics::CoreFactory::create (cType, std::string (" --federates=1 --broker=" + broker->getIdentifier ()));
+      cores[ii]->connect ();
+      links[ii].initialize (cores[ii]->getIdentifier (), ii, feds);
     }
+    std::vector<std::thread> threadlist (feds - 1);
+    for (int ii = 0; ii < feds - 1; ++ii)
+    {
+      threadlist[ii] =
+        std::thread ([&](RingTransmit &link) { link.run ([&brr]() { brr.wait (); }); }, std::ref (links[ii + 1]));
+    }
+
+    links[0].makeReady ();
+    brr.wait ();
+    state.ResumeTiming ();
+    links[0].run ();
+    state.PauseTiming ();
+    for (auto &thrd : threadlist)
+    {
+      thrd.join ();
+    }
+
+    if (links[0].loopCount != 10000)
+    {
+      std::cout << "incorrect loop count received (" << links[0].loopCount << ") instead of 100000" << std::endl;
+    }
+    broker->disconnect ();
+    broker.reset ();
+    cores.clear ();
+    cleanupHelicsLibrary ();
+    state.ResumeTiming ();
+  }
 }
 
 // Register the test core benchmarks
@@ -288,4 +285,4 @@ BENCHMARK_CAPTURE (BM_ring_multiCore, udpCore, core_type::UDP)
   ->UseRealTime ();
 #endif
 
-HELICS_BENCHMARK_MAIN(ringBenchmark);
+HELICS_BENCHMARK_MAIN (ringBenchmark);

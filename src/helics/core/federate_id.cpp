@@ -13,37 +13,37 @@ namespace helics
 {
 std::ostream &operator<< (std::ostream &os, local_federate_id fid)
 {
-    os << fid.baseValue ();
-    return os;
+  os << fid.baseValue ();
+  return os;
 }
 
 std::ostream &operator<< (std::ostream &os, interface_handle handle)
 {
-    os << handle.baseValue ();
-    return os;
+  os << handle.baseValue ();
+  return os;
 }
 
 std::ostream &operator<< (std::ostream &os, global_broker_id id)
 {
-    os << id.baseValue ();
-    return os;
+  os << id.baseValue ();
+  return os;
 }
 
 std::ostream &operator<< (std::ostream &os, global_federate_id id)
 {
-    os << id.baseValue ();
-    return os;
+  os << id.baseValue ();
+  return os;
 }
 
 std::ostream &operator<< (std::ostream &os, global_handle id)
 {
-    os << id.fed_id.baseValue () << "::" << id.handle.baseValue ();
-    return os;
+  os << id.fed_id.baseValue () << "::" << id.handle.baseValue ();
+  return os;
 }
 
 std::ostream &operator<< (std::ostream &os, route_id id)
 {
-    os << id.baseValue ();
-    return os;
+  os << id.baseValue ();
+  return os;
 }
 }  // namespace helics

@@ -20,18 +20,18 @@ using TcpCore = NetworkCore<TcpComms, interface_type::tcp>;
 /** implementation for the core that uses tcp messages to communicate*/
 class TcpCoreSS final : public NetworkCore<TcpCommsSS, interface_type::tcp>
 {
-  public:
-    /** default constructor*/
-    TcpCoreSS () noexcept;
-    TcpCoreSS (const std::string &core_name);
+public:
+  /** default constructor*/
+  TcpCoreSS () noexcept;
+  TcpCoreSS (const std::string &core_name);
 
-  protected:
-    virtual std::shared_ptr<helicsCLI11App> generateCLI () override;
+protected:
+  virtual std::shared_ptr<helicsCLI11App> generateCLI () override;
 
-  private:
-    std::vector<std::string> connections;  //!< defined connections
-    bool no_outgoing_connections = false;  //!< disable outgoing connections if true;
-    virtual bool brokerConnect () override;
+private:
+  std::vector<std::string> connections;  //!< defined connections
+  bool no_outgoing_connections = false;  //!< disable outgoing connections if true;
+  virtual bool brokerConnect () override;
 };
 
 }  // namespace tcp

@@ -26,21 +26,21 @@ Echo::Echo (int argc, char *argv[]) : App ("echo", argc, argv) { processArgs ();
 
 void Echo::processArgs ()
 {
-    helicsCLI11App app ("Options specific to the Echo App");
-    app.add_option ("--delay", delayTime, "the delay with which the echo app will echo message");
-    if (!deactivated)
+  helicsCLI11App app ("Options specific to the Echo App");
+  app.add_option ("--delay", delayTime, "the delay with which the echo app will echo message");
+  if (!deactivated)
+  {
+    app.parse (remArgs);
+    if (!masterFileName.empty ())
     {
-        app.parse (remArgs);
-        if (!masterFileName.empty ())
-        {
-            loadFile (masterFileName);
-        }
+      loadFile (masterFileName);
     }
-    else if (helpMode)
-    {
-        app.remove_helics_specifics ();
-        std::cout << app.help ();
-    }
+  }
+  else if (helpMode)
+  {
+    app.remove_helics_specifics ();
+    std::cout << app.help ();
+  }
 }
 
 Echo::Echo (const std::string &name, const FederateInfo &fi) : App (name, fi) {}
@@ -54,7 +54,7 @@ Echo::Echo (const std::string &name, CoreApp &core, const FederateInfo &fi) : Ap
 
 Echo::Echo (const std::string &name, const std::string &jsonString) : App (name, jsonString)
 {
-    Echo::loadJsonFile (jsonString);
+  Echo::loadJsonFile (jsonString);
 }
 
 Echo::Echo (Echo &&other_echo) noexcept
@@ -64,83 +64,83 @@ Echo::Echo (Echo &&other_echo) noexcept
 
 Echo &Echo::operator= (Echo &&other_echo) noexcept
 {
-    endpoints = std::move (other_echo.endpoints);
-    std::lock_guard<std::mutex> lock (delayTimeLock);
-    delayTime = other_echo.delayTime;
-    echoCounter = other_echo.echoCounter;
-    App::operator= (std::move (other_echo));
-    return *this;
+  endpoints = std::move (other_echo.endpoints);
+  std::lock_guard<std::mutex> lock (delayTimeLock);
+  delayTime = other_echo.delayTime;
+  echoCounter = other_echo.echoCounter;
+  App::operator= (std::move (other_echo));
+  return *this;
 }
 
 void Echo::runTo (Time stopTime_input)
 {
-    auto md = fed->getCurrentMode ();
-    if (md == Federate::modes::startup)
-    {
-        initialize ();
-    }
-    if (md < Federate::modes::executing)
-    {
-        fed->enterExecutingMode ();
-    }
-    else if (md == Federate::modes::finalize)
-    {
-        return;
-    }
-    auto ctime = fed->getCurrentTime ();
-    while (ctime < stopTime_input)
-    {
-        ctime = fed->requestTime (stopTime_input);
-    }
+  auto md = fed->getCurrentMode ();
+  if (md == Federate::modes::startup)
+  {
+    initialize ();
+  }
+  if (md < Federate::modes::executing)
+  {
+    fed->enterExecutingMode ();
+  }
+  else if (md == Federate::modes::finalize)
+  {
+    return;
+  }
+  auto ctime = fed->getCurrentTime ();
+  while (ctime < stopTime_input)
+  {
+    ctime = fed->requestTime (stopTime_input);
+  }
 }
 
 void Echo::setEchoDelay (Time delay)
 {
-    std::lock_guard<std::mutex> lock (delayTimeLock);
-    delayTime = delay;
+  std::lock_guard<std::mutex> lock (delayTimeLock);
+  delayTime = delay;
 }
 
 void Echo::echoMessage (const Endpoint &ept, Time currentTime)
 {
-    auto m = ept.getMessage ();
-    std::lock_guard<std::mutex> lock (delayTimeLock);
-    while (m)
-    {
-        ept.send (m->original_source, m->data, currentTime + delayTime);
-        m = ept.getMessage ();
-    }
+  auto m = ept.getMessage ();
+  std::lock_guard<std::mutex> lock (delayTimeLock);
+  while (m)
+  {
+    ept.send (m->original_source, m->data, currentTime + delayTime);
+    m = ept.getMessage ();
+  }
 }
 
 void Echo::addEndpoint (const std::string &endpointName, const std::string &endpointType)
 {
-    endpoints.emplace_back (fed->registerGlobalEndpoint (endpointName, endpointType));
-    endpoints.back ().setCallback (
-      [this] (const Endpoint &ept, Time messageTime) { echoMessage (ept, messageTime); });
+  endpoints.emplace_back (fed->registerGlobalEndpoint (endpointName, endpointType));
+  endpoints.back ().setCallback (
+    [this](const Endpoint &ept, Time messageTime) { echoMessage (ept, messageTime); });
 }
 
 void Echo::loadJsonFile (const std::string &jsonFile)
 {
-    loadJsonFileConfiguration ("echo", jsonFile);
-    auto eptCount = fed->getEndpointCount ();
-    for (int ii = 0; ii < eptCount; ++ii)
+  loadJsonFileConfiguration ("echo", jsonFile);
+  auto eptCount = fed->getEndpointCount ();
+  for (int ii = 0; ii < eptCount; ++ii)
+  {
+    endpoints.emplace_back (fed->getEndpoint (ii));
+    endpoints.back ().setCallback (
+      [this](const Endpoint &ept, Time messageTime) { echoMessage (ept, messageTime); });
+  }
+
+  auto doc = loadJson (jsonFile);
+
+  if (doc.isMember ("echo"))
+  {
+    auto echoConfig = doc["echo"];
+
+    if (echoConfig.isMember ("delay"))
     {
-        endpoints.emplace_back (fed->getEndpoint (ii));
-        endpoints.back ().setCallback (
-          [this] (const Endpoint &ept, Time messageTime) { echoMessage (ept, messageTime); });
+      std::lock_guard<std::mutex> lock (delayTimeLock);
+      delayTime = loadJsonTime (echoConfig["delay"]);
     }
-
-    auto doc = loadJson (jsonFile);
-
-    if (doc.isMember ("echo"))
-    {
-        auto echoConfig = doc["echo"];
-
-        if (echoConfig.isMember ("delay"))
-        {
-            std::lock_guard<std::mutex> lock (delayTimeLock);
-            delayTime = loadJsonTime (echoConfig["delay"]);
-        }
-    }
+  }
 }
 
 }  // namespace apps

@@ -15,19 +15,19 @@ namespace helics
 template <class COMMS, interface_type baseline = interface_type::ip>
 class NetworkCore : public CommsBroker<COMMS, CommonCore>
 {
-  public:
-    /** default constructor*/
-    NetworkCore () noexcept;
-    explicit NetworkCore (const std::string &broker_name);
+public:
+  /** default constructor*/
+  NetworkCore () noexcept;
+  explicit NetworkCore (const std::string &broker_name);
 
-  public:
-    virtual std::string generateLocalAddressString () const override;
+public:
+  virtual std::string generateLocalAddressString () const override;
 
-  protected:
-    virtual std::shared_ptr<helicsCLI11App> generateCLI () override;
-    virtual bool brokerConnect () override;
-    mutable std::mutex dataMutex;  //!< mutex protecting the configuration information
-    NetworkBrokerData netInfo{baseline};  //!< structure containing the networking information
+protected:
+  virtual std::shared_ptr<helicsCLI11App> generateCLI () override;
+  virtual bool brokerConnect () override;
+  mutable std::mutex dataMutex;  //!< mutex protecting the configuration information
+  NetworkBrokerData netInfo{baseline};  //!< structure containing the networking information
 };
 
 }  // namespace helics

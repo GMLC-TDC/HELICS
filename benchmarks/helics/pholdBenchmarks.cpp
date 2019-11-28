@@ -25,53 +25,53 @@ using namespace helics;
 
 static void BM_phold_singleCore (benchmark::State &state)
 {
-    for (auto _ : state)
+  for (auto _ : state)
+  {
+    std::cout << "starting run" << std::endl;
+    state.PauseTiming ();
+
+    int fed_count = static_cast<int> (state.range (0));
+    gmlc::concurrency::Barrier brr (static_cast<size_t> (fed_count));
+    auto wcore = helics::CoreFactory::create (core_type::INPROC, std::string ("--autobroker --federates=") +
+                                                                   std::to_string (fed_count));
+    std::vector<PholdFederate> feds (fed_count);
+    std::mt19937 rand_gen (0x600d5eed);
+    std::uniform_int_distribution<unsigned int> rand_seed;
+    for (int ii = 0; ii < fed_count; ++ii)
     {
-        std::cout << "starting run" << std::endl;
-        state.PauseTiming ();
-
-        int fed_count = static_cast<int> (state.range (0));
-        gmlc::concurrency::Barrier brr (static_cast<size_t> (fed_count));
-        auto wcore = helics::CoreFactory::create (core_type::INPROC, std::string ("--autobroker --federates=") +
-                                                                       std::to_string (fed_count));
-        std::vector<PholdFederate> feds (fed_count);
-        std::mt19937 rand_gen (0x600d5eed);
-        std::uniform_int_distribution<unsigned int> rand_seed;
-        for (int ii = 0; ii < fed_count; ++ii)
-        {
-            // set seeds for federates to deterministic values, but not all the same
-            feds[ii].setGenerateRandomSeed (false);
-            feds[ii].setRandomSeed (rand_seed (rand_gen));
-            feds[ii].initialize (wcore->getIdentifier (), ii, fed_count);
-        }
-
-        std::vector<std::thread> threadlist (static_cast<size_t> (fed_count - 1));
-        for (int ii = 0; ii < fed_count - 1; ++ii)
-        {
-            threadlist[ii] = std::thread ([&] (PholdFederate &f) { f.run ([&brr] () { brr.wait (); }); },
-                                          std::ref (feds[ii + 1]));
-        }
-        feds[0].makeReady ();
-        brr.wait ();
-        state.ResumeTiming ();
-        feds[0].run ([] () {});
-        state.PauseTiming ();
-        for (auto &thrd : threadlist)
-        {
-            thrd.join ();
-        }
-
-        int totalEvCount = 0;
-        for (int ii = 0; ii < fed_count; ++ii)
-        {
-            totalEvCount += feds[ii].evCount;
-        }
-        state.counters["EvCount"] = totalEvCount;
-
-        wcore.reset ();
-        cleanupHelicsLibrary ();
-        state.ResumeTiming ();
+      // set seeds for federates to deterministic values, but not all the same
+      feds[ii].setGenerateRandomSeed (false);
+      feds[ii].setRandomSeed (rand_seed (rand_gen));
+      feds[ii].initialize (wcore->getIdentifier (), ii, fed_count);
     }
+
+    std::vector<std::thread> threadlist (static_cast<size_t> (fed_count - 1));
+    for (int ii = 0; ii < fed_count - 1; ++ii)
+    {
+      threadlist[ii] =
+        std::thread ([&](PholdFederate &f) { f.run ([&brr]() { brr.wait (); }); }, std::ref (feds[ii + 1]));
+    }
+    feds[0].makeReady ();
+    brr.wait ();
+    state.ResumeTiming ();
+    feds[0].run ([]() {});
+    state.PauseTiming ();
+    for (auto &thrd : threadlist)
+    {
+      thrd.join ();
+    }
+
+    int totalEvCount = 0;
+    for (int ii = 0; ii < fed_count; ++ii)
+    {
+      totalEvCount += feds[ii].evCount;
+    }
+    state.counters["EvCount"] = totalEvCount;
+
+    wcore.reset ();
+    cleanupHelicsLibrary ();
+    state.ResumeTiming ();
+  }
 }
 // Register the function as a benchmark
 BENCHMARK (BM_phold_singleCore)
@@ -83,64 +83,64 @@ BENCHMARK (BM_phold_singleCore)
 
 static void BM_phold_multiCore (benchmark::State &state, core_type cType)
 {
-    for (auto _ : state)
+  for (auto _ : state)
+  {
+    state.PauseTiming ();
+
+    int fed_count = static_cast<int> (state.range (0));
+    gmlc::concurrency::Barrier brr (static_cast<size_t> (fed_count));
+
+    auto broker =
+      helics::BrokerFactory::create (cType, "brokerb", std::string ("--federates=") + std::to_string (fed_count));
+    broker->setLoggingLevel (helics_log_level_no_print);
+    auto wcore = helics::CoreFactory::create (cType, std::string ("--federates=1"));
+    std::vector<PholdFederate> feds (fed_count);
+    std::vector<std::shared_ptr<helics::Core>> cores (fed_count);
+
+    std::mt19937 rand_gen (0x600d5eed);
+    std::uniform_int_distribution<unsigned int> rand_seed;
+    for (int ii = 0; ii < fed_count; ++ii)
     {
-        state.PauseTiming ();
+      cores[ii] = helics::CoreFactory::create (cType, "-f 1");
+      cores[ii]->connect ();
 
-        int fed_count = static_cast<int> (state.range (0));
-        gmlc::concurrency::Barrier brr (static_cast<size_t> (fed_count));
-
-        auto broker = helics::BrokerFactory::create (cType, "brokerb",
-                                                     std::string ("--federates=") + std::to_string (fed_count));
-        broker->setLoggingLevel (helics_log_level_no_print);
-        auto wcore = helics::CoreFactory::create (cType, std::string ("--federates=1"));
-        std::vector<PholdFederate> feds (fed_count);
-        std::vector<std::shared_ptr<helics::Core>> cores (fed_count);
-
-        std::mt19937 rand_gen (0x600d5eed);
-        std::uniform_int_distribution<unsigned int> rand_seed;
-        for (int ii = 0; ii < fed_count; ++ii)
-        {
-            cores[ii] = helics::CoreFactory::create (cType, "-f 1");
-            cores[ii]->connect ();
-
-            // set seeds for federates to deterministic values, but not all the same
-            feds[ii].setGenerateRandomSeed (false);
-            feds[ii].setRandomSeed (rand_seed (rand_gen));
-            feds[ii].initialize (cores[ii]->getIdentifier (), ii, fed_count);
-        }
-
-        std::vector<std::thread> threadlist (static_cast<size_t> (fed_count - 1));
-        for (int ii = 0; ii < fed_count - 1; ++ii)
-        {
-            threadlist[ii] = std::thread ([&] (PholdFederate &f) { f.run ([&brr] () { brr.wait (); }); },
-                                          std::ref (feds[ii + 1]));
-        }
-        feds[0].makeReady ();
-        brr.wait ();
-        state.ResumeTiming ();
-        feds[0].run ([] () {});
-        state.PauseTiming ();
-        for (auto &thrd : threadlist)
-        {
-            thrd.join ();
-        }
-
-        int totalEvCount = 0;
-        for (auto &f : feds)
-        {
-            totalEvCount += f.evCount;
-        }
-        state.counters["EvCount"] = totalEvCount;
-
-        broker->disconnect ();
-        broker.reset ();
-        cores.clear ();
-        wcore.reset ();
-        cleanupHelicsLibrary ();
-
-        state.ResumeTiming ();
+      // set seeds for federates to deterministic values, but not all the same
+      feds[ii].setGenerateRandomSeed (false);
+      feds[ii].setRandomSeed (rand_seed (rand_gen));
+      feds[ii].initialize (cores[ii]->getIdentifier (), ii, fed_count);
     }
+
+    std::vector<std::thread> threadlist (static_cast<size_t> (fed_count - 1));
+    for (int ii = 0; ii < fed_count - 1; ++ii)
+    {
+      threadlist[ii] =
+        std::thread ([&](PholdFederate &f) { f.run ([&brr]() { brr.wait (); }); }, std::ref (feds[ii + 1]));
+    }
+    feds[0].makeReady ();
+    brr.wait ();
+    state.ResumeTiming ();
+    feds[0].run ([]() {});
+    state.PauseTiming ();
+    for (auto &thrd : threadlist)
+    {
+      thrd.join ();
+    }
+
+    int totalEvCount = 0;
+    for (auto &f : feds)
+    {
+      totalEvCount += f.evCount;
+    }
+    state.counters["EvCount"] = totalEvCount;
+
+    broker->disconnect ();
+    broker.reset ();
+    cores.clear ();
+    wcore.reset ();
+    cleanupHelicsLibrary ();
+
+    state.ResumeTiming ();
+  }
 }
 
 static constexpr int64_t maxscale{1 << 5};

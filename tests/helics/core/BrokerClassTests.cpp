@@ -13,18 +13,18 @@ SPDX-License-Identifier: BSD-3-Clause
 /** test the assignment and retrieval of global value from a broker object*/
 TEST (broker_tests, global_value_test)
 {
-    auto brk = helics::BrokerFactory::create (helics::core_type::TEST, "gbroker", "-f2 --root");
-    std::string globalVal = "this is a string constant that functions as a global";
-    std::string globalVal2 = "this is a second string constant that functions as a global";
-    brk->setGlobal ("testglobal", globalVal);
-    auto res = brk->query ("global", "testglobal");
-    EXPECT_EQ (res, globalVal);
-    brk->setGlobal ("testglobal2", globalVal2);
+  auto brk = helics::BrokerFactory::create (helics::core_type::TEST, "gbroker", "-f2 --root");
+  std::string globalVal = "this is a string constant that functions as a global";
+  std::string globalVal2 = "this is a second string constant that functions as a global";
+  brk->setGlobal ("testglobal", globalVal);
+  auto res = brk->query ("global", "testglobal");
+  EXPECT_EQ (res, globalVal);
+  brk->setGlobal ("testglobal2", globalVal2);
 
-    res = brk->query ("global", "testglobal");
-    EXPECT_EQ (res, globalVal);
-    res = brk->query ("global", "testglobal2");
-    EXPECT_EQ (res, globalVal2);
-    brk->disconnect ();
-    EXPECT_FALSE (brk->isConnected ());
+  res = brk->query ("global", "testglobal");
+  EXPECT_EQ (res, globalVal);
+  res = brk->query ("global", "testglobal2");
+  EXPECT_EQ (res, globalVal2);
+  brk->disconnect ();
+  EXPECT_FALSE (brk->isConnected ());
 }

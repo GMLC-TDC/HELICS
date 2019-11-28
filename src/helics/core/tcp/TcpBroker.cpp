@@ -22,27 +22,27 @@ TcpBrokerSS::TcpBrokerSS (const std::string &broker_name) : NetworkBroker (broke
 
 std::shared_ptr<helicsCLI11App> TcpBrokerSS::generateCLI ()
 {
-    auto hApp = NetworkBroker::generateCLI ();
-    hApp->description ("TCP Single Socket Broker arguments");
-    hApp->add_option ("--connections", connections, "target link connections");
-    hApp->add_flag ("--no_outgoing_connection", no_outgoing_connections, "disable outgoing connections")
-      ->ignore_underscore ();
-    return hApp;
+  auto hApp = NetworkBroker::generateCLI ();
+  hApp->description ("TCP Single Socket Broker arguments");
+  hApp->add_option ("--connections", connections, "target link connections");
+  hApp->add_flag ("--no_outgoing_connection", no_outgoing_connections, "disable outgoing connections")
+    ->ignore_underscore ();
+  return hApp;
 }
 
 bool TcpBrokerSS::brokerConnect ()
 {
-    std::unique_lock<std::mutex> lock (dataMutex);
-    if (!connections.empty ())
-    {
-        comms->addConnections (connections);
-    }
-    if (no_outgoing_connections)
-    {
-        comms->setFlag ("allow_outgoing", false);
-    }
-    lock.unlock ();
-    return NetworkBroker::brokerConnect ();
+  std::unique_lock<std::mutex> lock (dataMutex);
+  if (!connections.empty ())
+  {
+    comms->addConnections (connections);
+  }
+  if (no_outgoing_connections)
+  {
+    comms->setFlag ("allow_outgoing", false);
+  }
+  lock.unlock ();
+  return NetworkBroker::brokerConnect ();
 }
 
 }  // namespace tcp

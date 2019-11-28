@@ -22,71 +22,71 @@ struct timing_tests2 : public FederateTestFixture, public ::testing::Test
 
 TEST_F (timing_tests2, small_time_test)
 {
-    SetupTest<helics::ValueFederate> ("test", 2);
-    auto vFed1 = GetFederateAs<helics::ValueFederate> (0);
-    auto vFed2 = GetFederateAs<helics::ValueFederate> (1);
+  SetupTest<helics::ValueFederate> ("test", 2);
+  auto vFed1 = GetFederateAs<helics::ValueFederate> (0);
+  auto vFed2 = GetFederateAs<helics::ValueFederate> (1);
 
-    auto pub1_a = helics::make_publication<double> (helics::GLOBAL, vFed1, "pub1_a");
-    auto pub1_b = helics::make_publication<double> (helics::GLOBAL, vFed1, "pub1_b");
-    auto pub2_a = helics::make_publication<double> (helics::GLOBAL, vFed2, "pub2_a");
-    auto pub2_b = helics::make_publication<double> (helics::GLOBAL, vFed2, "pub2_b");
+  auto pub1_a = helics::make_publication<double> (helics::GLOBAL, vFed1, "pub1_a");
+  auto pub1_b = helics::make_publication<double> (helics::GLOBAL, vFed1, "pub1_b");
+  auto pub2_a = helics::make_publication<double> (helics::GLOBAL, vFed2, "pub2_a");
+  auto pub2_b = helics::make_publication<double> (helics::GLOBAL, vFed2, "pub2_b");
 
-    auto sub1_a = vFed2->registerSubscription ("pub1_a");
-    auto sub1_b = vFed2->registerSubscription ("pub1_b");
-    auto sub2_a = vFed2->registerSubscription ("pub2_a");
-    auto sub2_b = vFed2->registerSubscription ("pub2_b");
-    vFed1->enterExecutingModeAsync ();
-    vFed2->enterExecutingMode ();
-    vFed1->enterExecutingModeComplete ();
-    auto echoRun = [&]() {
-        helics::Time grantedTime = helics::timeZero;
-        helics::Time stopTime (100, time_units::ns);
-        while (grantedTime < stopTime)
-        {
-            grantedTime = vFed2->requestTime (stopTime);
-            if (sub1_a.isUpdated ())
-            {
-                auto val = sub1_a.getValue<double> ();
-                pub2_a->publish (val);
-            }
-            if (sub1_b.isUpdated ())
-            {
-                auto val = sub1_b.getValue<double> ();
-                pub2_b->publish (val);
-            }
-        }
-    };
-
-    auto fut = std::async (echoRun);
+  auto sub1_a = vFed2->registerSubscription ("pub1_a");
+  auto sub1_b = vFed2->registerSubscription ("pub1_b");
+  auto sub2_a = vFed2->registerSubscription ("pub2_a");
+  auto sub2_b = vFed2->registerSubscription ("pub2_b");
+  vFed1->enterExecutingModeAsync ();
+  vFed2->enterExecutingMode ();
+  vFed1->enterExecutingModeComplete ();
+  auto echoRun = [&]() {
     helics::Time grantedTime = helics::timeZero;
-    helics::Time requestedTime (10, time_units::ns);
     helics::Time stopTime (100, time_units::ns);
     while (grantedTime < stopTime)
     {
-        grantedTime = vFed1->requestTime (requestedTime);
-        if (grantedTime == requestedTime)
-        {
-            pub1_a->publish (10.3);
-            pub1_b->publish (11.2);
-            requestedTime += helics::Time (10, time_units::ns);
-        }
-        else
-        {
-            EXPECT_TRUE (grantedTime == requestedTime - helics::Time (9, time_units::ns));
-            // printf("grantedTime=%e\n", static_cast<double>(grantedTime));
-            if (sub2_a.isUpdated ())
-            {
-                EXPECT_EQ (sub2_a.getValue<double> (), 10.3);
-            }
-            if (sub2_b.isUpdated ())
-            {
-                EXPECT_EQ (sub2_b.getValue<double> (), 11.2);
-            }
-        }
+      grantedTime = vFed2->requestTime (stopTime);
+      if (sub1_a.isUpdated ())
+      {
+        auto val = sub1_a.getValue<double> ();
+        pub2_a->publish (val);
+      }
+      if (sub1_b.isUpdated ())
+      {
+        auto val = sub1_b.getValue<double> ();
+        pub2_b->publish (val);
+      }
     }
-    vFed1->finalize ();
-    fut.get ();
-    vFed2->finalize ();
+  };
+
+  auto fut = std::async (echoRun);
+  helics::Time grantedTime = helics::timeZero;
+  helics::Time requestedTime (10, time_units::ns);
+  helics::Time stopTime (100, time_units::ns);
+  while (grantedTime < stopTime)
+  {
+    grantedTime = vFed1->requestTime (requestedTime);
+    if (grantedTime == requestedTime)
+    {
+      pub1_a->publish (10.3);
+      pub1_b->publish (11.2);
+      requestedTime += helics::Time (10, time_units::ns);
+    }
+    else
+    {
+      EXPECT_TRUE (grantedTime == requestedTime - helics::Time (9, time_units::ns));
+      // printf("grantedTime=%e\n", static_cast<double>(grantedTime));
+      if (sub2_a.isUpdated ())
+      {
+        EXPECT_EQ (sub2_a.getValue<double> (), 10.3);
+      }
+      if (sub2_b.isUpdated ())
+      {
+        EXPECT_EQ (sub2_b.getValue<double> (), 11.2);
+      }
+    }
+  }
+  vFed1->finalize ();
+  fut.get ();
+  vFed2->finalize ();
 }
 
 /** based on bug found by Manoj Kumar Cebol Sundarrajan
@@ -94,80 +94,80 @@ where a very small period could cause the time to be negative
 */
 TEST_F (timing_tests2, small_period_test)
 {
-    SetupTest<helics::MessageFederate> ("test", 3);
-    auto rx = GetFederateAs<helics::MessageFederate> (0);
-    rx->setProperty (helics::defs::properties::time_delta, 1.0);
-    rx->setProperty (helics::defs::properties::period, 0.000001);
-    rx->setProperty (helics::defs::properties::offset, 0.0);
-    auto send1 = GetFederateAs<helics::MessageFederate> (1);
-    auto send2 = GetFederateAs<helics::MessageFederate> (2);
+  SetupTest<helics::MessageFederate> ("test", 3);
+  auto rx = GetFederateAs<helics::MessageFederate> (0);
+  rx->setProperty (helics::defs::properties::time_delta, 1.0);
+  rx->setProperty (helics::defs::properties::period, 0.000001);
+  rx->setProperty (helics::defs::properties::offset, 0.0);
+  auto send1 = GetFederateAs<helics::MessageFederate> (1);
+  auto send2 = GetFederateAs<helics::MessageFederate> (2);
 
-    auto &erx = rx->registerEndpoint ("data");
-    auto &s1 = send1->registerEndpoint ("data");
-    auto &s2 = send2->registerEndpoint ("data");
+  auto &erx = rx->registerEndpoint ("data");
+  auto &s1 = send1->registerEndpoint ("data");
+  auto &s2 = send2->registerEndpoint ("data");
 
-    int cnt = 0;
-    int cmess = 0;
-    auto rxrun = [rx, &erx, &cnt, &cmess]() {
-        rx->enterExecutingMode ();
-        helics::Time maxtime = 1e9;
-        helics::Time ctime = -1;
-        while (ctime < maxtime)
-        {
-            ctime = rx->requestTime (maxtime);
-            // std::cout << "receiver: granted time " << static_cast<double> (ctime) << std::endl;
-            ++cnt;
-            while (erx.hasMessage ())
-            {
-                auto m = erx.getMessage ();
-                // std::cout << "receiver: message from " << m->source << " with data " << m->data.to_string ()
-                //           << std::endl;
-                ++cmess;
-            }
-            if (cnt > 300)
-            {
-                break;
-            }
-        }
-        rx->finalize ();
-    };
-    auto send1run = [send1, &s1]() {
-        send1->enterExecutingMode ();
-        helics::Time ctime = helics::timeZero;
-        while (ctime <= 10.0)
-        {
-            ctime += 1.0;
-            ctime = send1->requestTime (ctime);
-            std::this_thread::sleep_for (std::chrono::milliseconds (10));
-            //   std::cout << "sender1: sending message at time " << static_cast<double> (ctime) << std::endl;
-            s1.send ("fed0/data", "3.14");
-        }
-        send1->finalize ();
-    };
+  int cnt = 0;
+  int cmess = 0;
+  auto rxrun = [rx, &erx, &cnt, &cmess]() {
+    rx->enterExecutingMode ();
+    helics::Time maxtime = 1e9;
+    helics::Time ctime = -1;
+    while (ctime < maxtime)
+    {
+      ctime = rx->requestTime (maxtime);
+      // std::cout << "receiver: granted time " << static_cast<double> (ctime) << std::endl;
+      ++cnt;
+      while (erx.hasMessage ())
+      {
+        auto m = erx.getMessage ();
+        // std::cout << "receiver: message from " << m->source << " with data " << m->data.to_string ()
+        //           << std::endl;
+        ++cmess;
+      }
+      if (cnt > 300)
+      {
+        break;
+      }
+    }
+    rx->finalize ();
+  };
+  auto send1run = [send1, &s1]() {
+    send1->enterExecutingMode ();
+    helics::Time ctime = helics::timeZero;
+    while (ctime <= 10.0)
+    {
+      ctime += 1.0;
+      ctime = send1->requestTime (ctime);
+      std::this_thread::sleep_for (std::chrono::milliseconds (10));
+      //   std::cout << "sender1: sending message at time " << static_cast<double> (ctime) << std::endl;
+      s1.send ("fed0/data", "3.14");
+    }
+    send1->finalize ();
+  };
 
-    auto send2run = [send2, &s2]() {
-        send2->enterExecutingMode ();
-        helics::Time ctime = helics::timeZero;
-        while (ctime <= 10.0)
-        {
-            ctime += 1.0;
-            ctime = send2->requestTime (ctime);
-            std::this_thread::sleep_for (std::chrono::milliseconds (20));
-            // std::cout << "sender2: sending message at time " << static_cast<double> (ctime) << std::endl;
-            s2.send ("fed0/data", "3.14");
-        }
-        send2->finalize ();
-    };
+  auto send2run = [send2, &s2]() {
+    send2->enterExecutingMode ();
+    helics::Time ctime = helics::timeZero;
+    while (ctime <= 10.0)
+    {
+      ctime += 1.0;
+      ctime = send2->requestTime (ctime);
+      std::this_thread::sleep_for (std::chrono::milliseconds (20));
+      // std::cout << "sender2: sending message at time " << static_cast<double> (ctime) << std::endl;
+      s2.send ("fed0/data", "3.14");
+    }
+    send2->finalize ();
+  };
 
-    auto futrx = std::async (std::launch::async, rxrun);
-    auto futs1 = std::async (std::launch::async, send1run);
-    auto futs2 = std::async (std::launch::async, send2run);
+  auto futrx = std::async (std::launch::async, rxrun);
+  auto futs1 = std::async (std::launch::async, send1run);
+  auto futs2 = std::async (std::launch::async, send2run);
 
-    futs1.get ();
-    futs2.get ();
-    futrx.get ();
-    EXPECT_EQ (cnt, 12);
-    EXPECT_EQ (cmess, 22);
+  futs1.get ();
+  futs2.get ();
+  futrx.get ();
+  EXPECT_EQ (cnt, 12);
+  EXPECT_EQ (cmess, 22);
 }
 
 /** this test requires a major change to the timing subsystem

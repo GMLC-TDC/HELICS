@@ -22,43 +22,43 @@ static const std::string localHostString = "localhost";
 
 int NetworkCommsInterface::PortAllocator::findOpenPort (int count, const std::string &host)
 {
-    if ((host == "127.0.0.1") || (host == "::1"))
+  if ((host == "127.0.0.1") || (host == "::1"))
+  {
+    return findOpenPort (count, localHostString);
+  }
+  auto np = nextPorts.find (host);
+  int nextPort = startingPort;
+  if (np == nextPorts.end ())
+  {
+    nextPorts[host] = startingPort;
+    nextPorts[host] += count;
+  }
+  else
+  {
+    nextPort = np->second;
+    (np->second) += count;
+  }
+  if (isPortUsed (host, nextPort))
+  {
+    ++nextPort;
+    while (isPortUsed (host, nextPort))
     {
-        return findOpenPort (count, localHostString);
+      ++nextPort;
     }
-    auto np = nextPorts.find (host);
-    int nextPort = startingPort;
-    if (np == nextPorts.end ())
-    {
-        nextPorts[host] = startingPort;
-        nextPorts[host] += count;
-    }
-    else
-    {
-        nextPort = np->second;
-        (np->second) += count;
-    }
-    if (isPortUsed (host, nextPort))
-    {
-        ++nextPort;
-        while (isPortUsed (host, nextPort))
-        {
-            ++nextPort;
-        }
-        nextPorts[host] = nextPort + count;
-    }
-    for (int ii = 0; ii < count; ++ii)
-    {
-        addUsedPort (host, nextPort + ii);
-    }
-    return nextPort;
+    nextPorts[host] = nextPort + count;
+  }
+  for (int ii = 0; ii < count; ++ii)
+  {
+    addUsedPort (host, nextPort + ii);
+  }
+  return nextPort;
 }
 
 void NetworkCommsInterface::PortAllocator::addUsedPort (int port) { usedPort[localHostString].insert (port); }
 
 void NetworkCommsInterface::PortAllocator::addUsedPort (const std::string &host, int port)
 {
-    usedPort[host].insert (port);
+  usedPort[host].insert (port);
 }
 /*
     int startingPort;
@@ -67,216 +67,215 @@ void NetworkCommsInterface::PortAllocator::addUsedPort (const std::string &host,
     */
 bool NetworkCommsInterface::PortAllocator::isPortUsed (const std::string &host, int port) const
 {
-    auto fnd = usedPort.find (host);
-    if (fnd == usedPort.end ())
-    {
-        return false;
-    }
-    return (fnd->second.count (port) != 0);
+  auto fnd = usedPort.find (host);
+  if (fnd == usedPort.end ())
+  {
+    return false;
+  }
+  return (fnd->second.count (port) != 0);
 }
 
 /** load network information into the comms object*/
 void NetworkCommsInterface::loadNetworkInfo (const NetworkBrokerData &netInfo)
 {
-    CommsInterface::loadNetworkInfo (netInfo);
-    if (!propertyLock ())
+  CommsInterface::loadNetworkInfo (netInfo);
+  if (!propertyLock ())
+  {
+    return;
+  }
+  brokerPort = netInfo.brokerPort;
+  PortNumber = netInfo.portNumber;
+  maxRetries = netInfo.maxRetries;
+  switch (networkType)
+  {
+  case interface_type::tcp:
+  case interface_type::udp:
+    removeProtocol (brokerTargetAddress);
+    removeProtocol (localTargetAddress);
+    break;
+  default:
+    break;
+  }
+  if (localTargetAddress.empty ())
+  {
+    auto bTarget = stripProtocol (brokerTargetAddress);
+    if ((bTarget == localHostString) || (bTarget == "127.0.0.1"))
     {
-        return;
+      localTargetAddress = localHostString;
     }
-    brokerPort = netInfo.brokerPort;
-    PortNumber = netInfo.portNumber;
-    maxRetries = netInfo.maxRetries;
-    switch (networkType)
+    else if (bTarget.empty ())
     {
-    case interface_type::tcp:
-    case interface_type::udp:
-        removeProtocol (brokerTargetAddress);
-        removeProtocol (localTargetAddress);
+      switch (interfaceNetwork)
+      {
+      case interface_networks::local:
+        localTargetAddress = localHostString;
         break;
-    default:
+      default:
+        localTargetAddress = "*";
         break;
+      }
     }
-    if (localTargetAddress.empty ())
+    else
     {
-        auto bTarget = stripProtocol (brokerTargetAddress);
-        if ((bTarget == localHostString) || (bTarget == "127.0.0.1"))
-        {
-            localTargetAddress = localHostString;
-        }
-        else if (bTarget.empty ())
-        {
-            switch (interfaceNetwork)
-            {
-            case interface_networks::local:
-                localTargetAddress = localHostString;
-                break;
-            default:
-                localTargetAddress = "*";
-                break;
-            }
-        }
-        else
-        {
-            localTargetAddress = generateMatchingInterfaceAddress (brokerTargetAddress, interfaceNetwork);
-        }
+      localTargetAddress = generateMatchingInterfaceAddress (brokerTargetAddress, interfaceNetwork);
     }
+  }
 
-    if (netInfo.portStart > 0)
-    {
-        openPorts.setStartingPortNumber (netInfo.portStart);
-    }
+  if (netInfo.portStart > 0)
+  {
+    openPorts.setStartingPortNumber (netInfo.portStart);
+  }
 
-    if (PortNumber > 0)
-    {
-        autoPortNumber = false;
-    }
-    useOsPortAllocation = netInfo.use_os_port;
-    propertyUnLock ();
+  if (PortNumber > 0)
+  {
+    autoPortNumber = false;
+  }
+  useOsPortAllocation = netInfo.use_os_port;
+  propertyUnLock ();
 }
 
 void NetworkCommsInterface::setBrokerPort (int brokerPortNumber)
 {
-    if (propertyLock ())
-    {
-        brokerPort = brokerPortNumber;
-        propertyUnLock ();
-    }
+  if (propertyLock ())
+  {
+    brokerPort = brokerPortNumber;
+    propertyUnLock ();
+  }
 }
 
 int NetworkCommsInterface::findOpenPort (int count, const std::string &host)
 {
-    if (openPorts.getDefaultStartingPort () < 0)
-    {
-        auto dport = PortNumber - getDefaultBrokerPort ();
-        auto start =
-          (dport < 10 * count) ? getDefaultBrokerPort () + 10 * count * (dport + 1) : PortNumber + 5 * count;
-        openPorts.setStartingPortNumber (start);
-    }
-    return openPorts.findOpenPort (count, host);
+  if (openPorts.getDefaultStartingPort () < 0)
+  {
+    auto dport = PortNumber - getDefaultBrokerPort ();
+    auto start =
+      (dport < 10 * count) ? getDefaultBrokerPort () + 10 * count * (dport + 1) : PortNumber + 5 * count;
+    openPorts.setStartingPortNumber (start);
+  }
+  return openPorts.findOpenPort (count, host);
 }
 
 void NetworkCommsInterface::setPortNumber (int localPortNumber)
 {
-    if (propertyLock ())
+  if (propertyLock ())
+  {
+    PortNumber = localPortNumber;
+    if (PortNumber > 0)
     {
-        PortNumber = localPortNumber;
-        if (PortNumber > 0)
-        {
-            autoPortNumber = false;
-        }
-        propertyUnLock ();
+      autoPortNumber = false;
     }
+    propertyUnLock ();
+  }
 }
 
 void NetworkCommsInterface::setAutomaticPortStartPort (int startingPort)
 {
-    if (propertyLock ())
-    {
-        openPorts.setStartingPortNumber (startingPort);
-        propertyUnLock ();
-    }
+  if (propertyLock ())
+  {
+    openPorts.setStartingPortNumber (startingPort);
+    propertyUnLock ();
+  }
 }
 
 void NetworkCommsInterface::setFlag (const std::string &flag, bool val)
 {
-    if (flag == "os_port")
+  if (flag == "os_port")
+  {
+    if (propertyLock ())
     {
-        if (propertyLock ())
-        {
-            useOsPortAllocation = val;
-            propertyUnLock ();
-        }
+      useOsPortAllocation = val;
+      propertyUnLock ();
     }
-    else
-    {
-        NetworkCommsInterface::setFlag (flag, val);
-    }
+  }
+  else
+  {
+    NetworkCommsInterface::setFlag (flag, val);
+  }
 }
 
 ActionMessage NetworkCommsInterface::generateReplyToIncomingMessage (ActionMessage &cmd)
 {
-    if (isProtocolCommand (cmd))
+  if (isProtocolCommand (cmd))
+  {
+    switch (cmd.messageID)
     {
-        switch (cmd.messageID)
-        {
-        case QUERY_PORTS:
-        {
-            ActionMessage portReply (CMD_PROTOCOL);
-            portReply.messageID = PORT_DEFINITIONS;
-            portReply.setExtraData (PortNumber);
-            return portReply;
-        }
-        break;
-        case REQUEST_PORTS:
-        {
-            int cnt = (cmd.counter == 0) ? 2 : cmd.counter;
-            auto openPort =
-              (cmd.name.empty ()) ? findOpenPort (cnt, localHostString) : findOpenPort (cnt, cmd.name);
-            ActionMessage portReply (CMD_PROTOCOL);
-            portReply.messageID = PORT_DEFINITIONS;
-            portReply.source_id = global_federate_id (PortNumber);
-            portReply.setExtraData (openPort);
-            portReply.counter = cmd.counter;
-            return portReply;
-        }
-        break;
-        default:
-            break;
-        }
+    case QUERY_PORTS:
+    {
+      ActionMessage portReply (CMD_PROTOCOL);
+      portReply.messageID = PORT_DEFINITIONS;
+      portReply.setExtraData (PortNumber);
+      return portReply;
     }
-    ActionMessage resp (CMD_IGNORE);
-    return resp;
+    break;
+    case REQUEST_PORTS:
+    {
+      int cnt = (cmd.counter == 0) ? 2 : cmd.counter;
+      auto openPort = (cmd.name.empty ()) ? findOpenPort (cnt, localHostString) : findOpenPort (cnt, cmd.name);
+      ActionMessage portReply (CMD_PROTOCOL);
+      portReply.messageID = PORT_DEFINITIONS;
+      portReply.source_id = global_federate_id (PortNumber);
+      portReply.setExtraData (openPort);
+      portReply.counter = cmd.counter;
+      return portReply;
+    }
+    break;
+    default:
+      break;
+    }
+  }
+  ActionMessage resp (CMD_IGNORE);
+  return resp;
 }
 
 std::string NetworkCommsInterface::getAddress () const
 {
-    if ((PortNumber < 0) && (!serverMode))
-    {
-        return name;
-    }
-    if ((localTargetAddress == "tcp://*") || (localTargetAddress == "tcp://0.0.0.0"))
-    {
-        return makePortAddress ("tcp://127.0.0.1", PortNumber);
-    }
-    if ((localTargetAddress == "*") || (localTargetAddress == "0.0.0.0"))
-    {
-        return makePortAddress ("127.0.0.1", PortNumber);
-    }
-    return makePortAddress (localTargetAddress, PortNumber);
+  if ((PortNumber < 0) && (!serverMode))
+  {
+    return name;
+  }
+  if ((localTargetAddress == "tcp://*") || (localTargetAddress == "tcp://0.0.0.0"))
+  {
+    return makePortAddress ("tcp://127.0.0.1", PortNumber);
+  }
+  if ((localTargetAddress == "*") || (localTargetAddress == "0.0.0.0"))
+  {
+    return makePortAddress ("127.0.0.1", PortNumber);
+  }
+  return makePortAddress (localTargetAddress, PortNumber);
 }
 
 ActionMessage NetworkCommsInterface::generatePortRequest (int cnt) const
 {
-    ActionMessage req (CMD_PROTOCOL);
-    req.messageID = REQUEST_PORTS;
-    req.payload = stripProtocol (localTargetAddress);
-    req.counter = cnt;
-    req.setStringData (brokerName, brokerInitString);
-    return req;
+  ActionMessage req (CMD_PROTOCOL);
+  req.messageID = REQUEST_PORTS;
+  req.payload = stripProtocol (localTargetAddress);
+  req.counter = cnt;
+  req.setStringData (brokerName, brokerInitString);
+  return req;
 }
 
 void NetworkCommsInterface::loadPortDefinitions (const ActionMessage &cmd)
 {
-    if (cmd.action () == CMD_PROTOCOL)
+  if (cmd.action () == CMD_PROTOCOL)
+  {
+    if (cmd.messageID == PORT_DEFINITIONS)
     {
-        if (cmd.messageID == PORT_DEFINITIONS)
+      PortNumber = cmd.getExtraData ();
+      if ((openPorts.getDefaultStartingPort () < 0))
+      {
+        if (PortNumber < getDefaultBrokerPort () + 100)
         {
-            PortNumber = cmd.getExtraData ();
-            if ((openPorts.getDefaultStartingPort () < 0))
-            {
-                if (PortNumber < getDefaultBrokerPort () + 100)
-                {
-                    openPorts.setStartingPortNumber (getDefaultBrokerPort () + 100 +
-                                                     (PortNumber - getDefaultBrokerPort () - 2) * 6);
-                }
-                else
-                {
-                    openPorts.setStartingPortNumber (getDefaultBrokerPort () + 110 +
-                                                     (PortNumber - getDefaultBrokerPort () - 100) * 6);
-                }
-            }
+          openPorts.setStartingPortNumber (getDefaultBrokerPort () + 100 +
+                                           (PortNumber - getDefaultBrokerPort () - 2) * 6);
         }
+        else
+        {
+          openPorts.setStartingPortNumber (getDefaultBrokerPort () + 110 +
+                                           (PortNumber - getDefaultBrokerPort () - 100) * 6);
+        }
+      }
     }
+  }
 }
 
 }  // namespace helics

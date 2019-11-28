@@ -25,41 +25,41 @@ using namespace helics;
 
 static void BM_echo_singleCore (benchmark::State &state)
 {
-    for (auto _ : state)
+  for (auto _ : state)
+  {
+    state.PauseTiming ();
+
+    int feds = static_cast<int> (state.range (0));
+    gmlc::concurrency::Barrier brr (static_cast<size_t> (feds) + 1);
+    auto wcore = helics::CoreFactory::create (core_type::INPROC, std::string ("--autobroker --federates=") +
+                                                                   std::to_string (feds + 1));
+    EchoMessageHub hub;
+    hub.initialize (wcore->getIdentifier ());
+    std::vector<EchoMessageLeaf> leafs (feds);
+    for (int ii = 0; ii < feds; ++ii)
     {
-        state.PauseTiming ();
-
-        int feds = static_cast<int> (state.range (0));
-        gmlc::concurrency::Barrier brr (static_cast<size_t> (feds) + 1);
-        auto wcore = helics::CoreFactory::create (core_type::INPROC, std::string ("--autobroker --federates=") +
-                                                                       std::to_string (feds + 1));
-        EchoMessageHub hub;
-        hub.initialize (wcore->getIdentifier ());
-        std::vector<EchoMessageLeaf> leafs (feds);
-        for (int ii = 0; ii < feds; ++ii)
-        {
-            leafs[ii].initialize (wcore->getIdentifier (), ii);
-        }
-
-        std::vector<std::thread> threadlist (static_cast<size_t> (feds));
-        for (int ii = 0; ii < feds; ++ii)
-        {
-            threadlist[ii] = std::thread ([&] (EchoMessageLeaf &lf) { lf.run ([&brr] () { brr.wait (); }); },
-                                          std::ref (leafs[ii]));
-        }
-        hub.makeReady ();
-        brr.wait ();
-        state.ResumeTiming ();
-        hub.run ([] () {});
-        state.PauseTiming ();
-        for (auto &thrd : threadlist)
-        {
-            thrd.join ();
-        }
-        wcore.reset ();
-        cleanupHelicsLibrary ();
-        state.ResumeTiming ();
+      leafs[ii].initialize (wcore->getIdentifier (), ii);
     }
+
+    std::vector<std::thread> threadlist (static_cast<size_t> (feds));
+    for (int ii = 0; ii < feds; ++ii)
+    {
+      threadlist[ii] =
+        std::thread ([&](EchoMessageLeaf &lf) { lf.run ([&brr]() { brr.wait (); }); }, std::ref (leafs[ii]));
+    }
+    hub.makeReady ();
+    brr.wait ();
+    state.ResumeTiming ();
+    hub.run ([]() {});
+    state.PauseTiming ();
+    for (auto &thrd : threadlist)
+    {
+      thrd.join ();
+    }
+    wcore.reset ();
+    cleanupHelicsLibrary ();
+    state.ResumeTiming ();
+  }
 }
 // Register the function as a benchmark
 BENCHMARK (BM_echo_singleCore)
@@ -71,52 +71,52 @@ BENCHMARK (BM_echo_singleCore)
 
 static void BM_echo_multiCore (benchmark::State &state, core_type cType)
 {
-    for (auto _ : state)
+  for (auto _ : state)
+  {
+    state.PauseTiming ();
+
+    int feds = static_cast<int> (state.range (0));
+    gmlc::concurrency::Barrier brr (static_cast<size_t> (feds) + 1);
+
+    auto broker =
+      helics::BrokerFactory::create (cType, "brokerb", std::string ("--federates=") + std::to_string (feds + 1));
+    broker->setLoggingLevel (helics_log_level_no_print);
+    auto wcore = helics::CoreFactory::create (cType, std::string ("--federates=1"));
+    // this is to delay until the threads are ready
+    EchoMessageHub hub;
+    hub.initialize (wcore->getIdentifier ());
+    std::vector<EchoMessageLeaf> leafs (feds);
+    std::vector<std::shared_ptr<helics::Core>> cores (feds);
+    for (int ii = 0; ii < feds; ++ii)
     {
-        state.PauseTiming ();
-
-        int feds = static_cast<int> (state.range (0));
-        gmlc::concurrency::Barrier brr (static_cast<size_t> (feds) + 1);
-
-        auto broker = helics::BrokerFactory::create (cType, "brokerb",
-                                                     std::string ("--federates=") + std::to_string (feds + 1));
-        broker->setLoggingLevel (helics_log_level_no_print);
-        auto wcore = helics::CoreFactory::create (cType, std::string ("--federates=1"));
-        // this is to delay until the threads are ready
-        EchoMessageHub hub;
-        hub.initialize (wcore->getIdentifier ());
-        std::vector<EchoMessageLeaf> leafs (feds);
-        std::vector<std::shared_ptr<helics::Core>> cores (feds);
-        for (int ii = 0; ii < feds; ++ii)
-        {
-            cores[ii] = helics::CoreFactory::create (cType, "-f 1");
-            cores[ii]->connect ();
-            leafs[ii].initialize (cores[ii]->getIdentifier (), ii);
-        }
-
-        std::vector<std::thread> threadlist (static_cast<size_t> (feds));
-        for (int ii = 0; ii < feds; ++ii)
-        {
-            threadlist[ii] = std::thread ([&] (EchoMessageLeaf &lf) { lf.run ([&brr] () { brr.wait (); }); },
-                                          std::ref (leafs[ii]));
-        }
-        hub.makeReady ();
-        brr.wait ();
-        state.ResumeTiming ();
-        hub.run ([] () {});
-        state.PauseTiming ();
-        for (auto &thrd : threadlist)
-        {
-            thrd.join ();
-        }
-        broker->disconnect ();
-        broker.reset ();
-        cores.clear ();
-        wcore.reset ();
-        cleanupHelicsLibrary ();
-
-        state.ResumeTiming ();
+      cores[ii] = helics::CoreFactory::create (cType, "-f 1");
+      cores[ii]->connect ();
+      leafs[ii].initialize (cores[ii]->getIdentifier (), ii);
     }
+
+    std::vector<std::thread> threadlist (static_cast<size_t> (feds));
+    for (int ii = 0; ii < feds; ++ii)
+    {
+      threadlist[ii] =
+        std::thread ([&](EchoMessageLeaf &lf) { lf.run ([&brr]() { brr.wait (); }); }, std::ref (leafs[ii]));
+    }
+    hub.makeReady ();
+    brr.wait ();
+    state.ResumeTiming ();
+    hub.run ([]() {});
+    state.PauseTiming ();
+    for (auto &thrd : threadlist)
+    {
+      thrd.join ();
+    }
+    broker->disconnect ();
+    broker.reset ();
+    cores.clear ();
+    wcore.reset ();
+    cleanupHelicsLibrary ();
+
+    state.ResumeTiming ();
+  }
 }
 
 static constexpr int64_t maxscale{1 << 5};

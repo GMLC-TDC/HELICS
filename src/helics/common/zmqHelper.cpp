@@ -51,20 +51,20 @@ static const std::map<std::string, zmq::socket_type> socketMap{
 
 socket_type socketTypeFromString (const std::string &socketType)
 {
-    auto fnd = socketMap.find (socketType);
-    if (fnd != socketMap.end ())
-    {
-        return fnd->second;
-    }
+  auto fnd = socketMap.find (socketType);
+  if (fnd != socketMap.end ())
+  {
+    return fnd->second;
+  }
 
-    /* try making it lower case*/
-    std::string lowerCase (socketType);
-    std::transform (socketType.cbegin (), socketType.cend (), lowerCase.begin (), ::tolower);
-    fnd = socketMap.find (lowerCase);
-    if (fnd != socketMap.end ())
-    {
-        return fnd->second;
-    }
-    assert (false);  // NEED to make this a throw operation instead once exceptions are integrated
-    return socket_type::req;
+  /* try making it lower case*/
+  std::string lowerCase (socketType);
+  std::transform (socketType.cbegin (), socketType.cend (), lowerCase.begin (), ::tolower);
+  fnd = socketMap.find (lowerCase);
+  if (fnd != socketMap.end ())
+  {
+    return fnd->second;
+  }
+  assert (false);  // NEED to make this a throw operation instead once exceptions are integrated
+  return socket_type::req;
 }

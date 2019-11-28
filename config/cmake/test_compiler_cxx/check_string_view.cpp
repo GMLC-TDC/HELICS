@@ -1,8 +1,7 @@
 #include <string_view>
 
-int main()
+int main ()
 {
-    std::string_view X("string");
-    return 0;
+  std::string_view X ("string");
+  return 0;
 }
-

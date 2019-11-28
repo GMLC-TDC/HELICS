@@ -12,8 +12,8 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helics/core/ActionMessage.hpp"
 #include "helics/core/BrokerFactory.hpp"
 #include "helics/core/CoreFactory.hpp"
-#include <benchmark/benchmark.h>
 #include "helics_benchmark_main.h"
+#include <benchmark/benchmark.h>
 #include <chrono>
 #include <fstream>
 #include <iostream>
@@ -29,192 +29,192 @@ using namespace helics;
 /** class implementing the hub for an echo test*/
 class EchoHub
 {
-  public:
-    helics::Time finalTime = helics::Time (100, time_units::ms);  // final time
-  private:
-    std::unique_ptr<helics::ValueFederate> vFed;
-    std::vector<helics::Publication> pubs;
-    std::vector<helics::Input> subs;
-    int cnt_ = 10;
-    bool initialized = false;
-    bool readyToRun = false;
+public:
+  helics::Time finalTime = helics::Time (100, time_units::ms);  // final time
+private:
+  std::unique_ptr<helics::ValueFederate> vFed;
+  std::vector<helics::Publication> pubs;
+  std::vector<helics::Input> subs;
+  int cnt_ = 10;
+  bool initialized = false;
+  bool readyToRun = false;
 
-  public:
-    EchoHub () = default;
+public:
+  EchoHub () = default;
 
-    void run (std::function<void ()> callOnReady = {})
+  void run (std::function<void()> callOnReady = {})
+  {
+    if (!readyToRun)
     {
-        if (!readyToRun)
-        {
-            makeReady ();
-        }
-        if (callOnReady)
-        {
-            callOnReady ();
-        }
-        mainLoop ();
-    };
-
-    void initialize (const std::string &coreName, int cnt)
-    {
-        cnt_ = cnt;
-        std::string name = "echohub";
-        helics::FederateInfo fi;
-        fi.coreName = coreName;
-        vFed = std::make_unique<helics::ValueFederate> (name, fi);
-        pubs.reserve (cnt_);
-        subs.reserve (cnt_);
-        for (int ii = 0; ii < cnt_; ++ii)
-        {
-            pubs.push_back (vFed->registerPublicationIndexed<std::string> ("leafrx", ii));
-            subs.push_back (vFed->registerSubscriptionIndexed ("leafsend", ii));
-        }
-        initialized = true;
+      makeReady ();
     }
-
-    void makeReady ()
+    if (callOnReady)
     {
-        if (!initialized)
-        {
-            throw ("must initialize first");
-        }
-        vFed->enterExecutingMode ();
-        readyToRun = true;
+      callOnReady ();
     }
+    mainLoop ();
+  };
 
-    void mainLoop ()
+  void initialize (const std::string &coreName, int cnt)
+  {
+    cnt_ = cnt;
+    std::string name = "echohub";
+    helics::FederateInfo fi;
+    fi.coreName = coreName;
+    vFed = std::make_unique<helics::ValueFederate> (name, fi);
+    pubs.reserve (cnt_);
+    subs.reserve (cnt_);
+    for (int ii = 0; ii < cnt_; ++ii)
     {
-        auto cTime = 0.0_t;
-        while (cTime <= finalTime)
-        {
-            for (int ii = 0; ii < cnt_; ++ii)
-            {
-                if (vFed->isUpdated (subs[ii]))
-                {
-                    auto &val = vFed->getString (subs[ii]);
-                    pubs[ii].publish (val);
-                }
-            }
-            cTime = vFed->requestTime (finalTime + 0.05);
-        }
-        vFed->finalize ();
+      pubs.push_back (vFed->registerPublicationIndexed<std::string> ("leafrx", ii));
+      subs.push_back (vFed->registerSubscriptionIndexed ("leafsend", ii));
     }
+    initialized = true;
+  }
+
+  void makeReady ()
+  {
+    if (!initialized)
+    {
+      throw ("must initialize first");
+    }
+    vFed->enterExecutingMode ();
+    readyToRun = true;
+  }
+
+  void mainLoop ()
+  {
+    auto cTime = 0.0_t;
+    while (cTime <= finalTime)
+    {
+      for (int ii = 0; ii < cnt_; ++ii)
+      {
+        if (vFed->isUpdated (subs[ii]))
+        {
+          auto &val = vFed->getString (subs[ii]);
+          pubs[ii].publish (val);
+        }
+      }
+      cTime = vFed->requestTime (finalTime + 0.05);
+    }
+    vFed->finalize ();
+  }
 };
 
 class EchoLeaf
 {
-  private:
-    std::unique_ptr<helics::ValueFederate> vFed;
-    helics::Publication pub;
-    helics::Input sub;
+private:
+  std::unique_ptr<helics::ValueFederate> vFed;
+  helics::Publication pub;
+  helics::Input sub;
 
-    int index_ = 0;
-    bool initialized = false;
-    bool readyToRun = false;
+  int index_ = 0;
+  bool initialized = false;
+  bool readyToRun = false;
 
-  public:
-    EchoLeaf () = default;
+public:
+  EchoLeaf () = default;
 
-    void run (std::function<void ()> callOnReady = {})
+  void run (std::function<void()> callOnReady = {})
+  {
+    if (!readyToRun)
     {
-        if (!readyToRun)
-        {
-            makeReady ();
-        }
-        if (callOnReady)
-        {
-            callOnReady ();
-        }
-        mainLoop ();
-    };
-    void initialize (const std::string &coreName, int index)
-    {
-        std::string name = "echoleaf_" + std::to_string (index);
-        index_ = index;
-        helics::FederateInfo fi;
-        fi.coreName = coreName;
-        vFed = std::make_unique<helics::ValueFederate> (name, fi);
-        pub = vFed->registerPublicationIndexed<std::string> ("leafsend", index_);
-        sub = vFed->registerSubscriptionIndexed ("leafrx", index_);
-        initialized = true;
+      makeReady ();
     }
-
-    void makeReady ()
+    if (callOnReady)
     {
-        if (!initialized)
-        {
-            throw ("must initialize first");
-        }
-        vFed->enterExecutingMode ();
-        readyToRun = true;
+      callOnReady ();
     }
+    mainLoop ();
+  };
+  void initialize (const std::string &coreName, int index)
+  {
+    std::string name = "echoleaf_" + std::to_string (index);
+    index_ = index;
+    helics::FederateInfo fi;
+    fi.coreName = coreName;
+    vFed = std::make_unique<helics::ValueFederate> (name, fi);
+    pub = vFed->registerPublicationIndexed<std::string> ("leafsend", index_);
+    sub = vFed->registerSubscriptionIndexed ("leafrx", index_);
+    initialized = true;
+  }
 
-    void mainLoop ()
+  void makeReady ()
+  {
+    if (!initialized)
     {
-        int cnt = 0;
-        // this is  to make a fixed size string that is different for each federate but has sufficient length to
-        // get beyond SSO
-        const std::string txstring = std::to_string (100000 + index_) + std::string (100, '1');
-        const int iter = 5000;
-        while (cnt <= iter + 1)
-        {
-            vFed->requestNextStep ();
-            ++cnt;
-            if (cnt <= iter)
-            {
-                vFed->publish (pub, txstring);
-            }
-            if (vFed->isUpdated (sub))
-            {
-                auto &nstring = vFed->getString (sub);
-                if (nstring != txstring)
-                {
-                    std::cout << "incorrect string\n";
-                    break;
-                }
-            }
-        }
-        vFed->finalize ();
+      throw ("must initialize first");
     }
+    vFed->enterExecutingMode ();
+    readyToRun = true;
+  }
+
+  void mainLoop ()
+  {
+    int cnt = 0;
+    // this is  to make a fixed size string that is different for each federate but has sufficient length to
+    // get beyond SSO
+    const std::string txstring = std::to_string (100000 + index_) + std::string (100, '1');
+    const int iter = 5000;
+    while (cnt <= iter + 1)
+    {
+      vFed->requestNextStep ();
+      ++cnt;
+      if (cnt <= iter)
+      {
+        vFed->publish (pub, txstring);
+      }
+      if (vFed->isUpdated (sub))
+      {
+        auto &nstring = vFed->getString (sub);
+        if (nstring != txstring)
+        {
+          std::cout << "incorrect string\n";
+          break;
+        }
+      }
+    }
+    vFed->finalize ();
+  }
 };
 
 static void BM_echo_singleCore (benchmark::State &state)
 {
-    for (auto _ : state)
+  for (auto _ : state)
+  {
+    state.PauseTiming ();
+
+    int feds = static_cast<int> (state.range (0));
+    gmlc::concurrency::Barrier brr (static_cast<size_t> (feds) + 1);
+    auto wcore = helics::CoreFactory::create (core_type::INPROC, std::string ("--autobroker --federates=") +
+                                                                   std::to_string (feds + 1));
+    EchoHub hub;
+    hub.initialize (wcore->getIdentifier (), feds);
+    std::vector<EchoLeaf> leafs (feds);
+    for (int ii = 0; ii < feds; ++ii)
     {
-        state.PauseTiming ();
-
-        int feds = static_cast<int> (state.range (0));
-        gmlc::concurrency::Barrier brr (static_cast<size_t>(feds) + 1);
-        auto wcore = helics::CoreFactory::create (core_type::INPROC, std::string ("--autobroker --federates=") +
-                                                                       std::to_string (feds + 1));
-        EchoHub hub;
-        hub.initialize (wcore->getIdentifier (), feds);
-        std::vector<EchoLeaf> leafs (feds);
-        for (int ii = 0; ii < feds; ++ii)
-        {
-            leafs[ii].initialize (wcore->getIdentifier (), ii);
-        }
-
-        std::vector<std::thread> threadlist (static_cast<size_t> (feds));
-        for (int ii = 0; ii < feds; ++ii)
-        {
-            threadlist[ii] =
-              std::thread ([&] (EchoLeaf &lf) { lf.run ([&brr] () { brr.wait (); }); }, std::ref (leafs[ii]));
-        }
-        hub.makeReady ();
-        brr.wait ();
-        state.ResumeTiming ();
-        hub.run ([] () {});
-        state.PauseTiming ();
-        for (auto &thrd : threadlist)
-        {
-            thrd.join ();
-        }
-        wcore.reset ();
-        cleanupHelicsLibrary ();
-        state.ResumeTiming ();
+      leafs[ii].initialize (wcore->getIdentifier (), ii);
     }
+
+    std::vector<std::thread> threadlist (static_cast<size_t> (feds));
+    for (int ii = 0; ii < feds; ++ii)
+    {
+      threadlist[ii] =
+        std::thread ([&](EchoLeaf &lf) { lf.run ([&brr]() { brr.wait (); }); }, std::ref (leafs[ii]));
+    }
+    hub.makeReady ();
+    brr.wait ();
+    state.ResumeTiming ();
+    hub.run ([]() {});
+    state.PauseTiming ();
+    for (auto &thrd : threadlist)
+    {
+      thrd.join ();
+    }
+    wcore.reset ();
+    cleanupHelicsLibrary ();
+    state.ResumeTiming ();
+  }
 }
 // Register the function as a benchmark
 BENCHMARK (BM_echo_singleCore)
@@ -226,52 +226,52 @@ BENCHMARK (BM_echo_singleCore)
 
 static void BM_echo_multiCore (benchmark::State &state, core_type cType)
 {
-    for (auto _ : state)
+  for (auto _ : state)
+  {
+    state.PauseTiming ();
+
+    int feds = static_cast<int> (state.range (0));
+    gmlc::concurrency::Barrier brr (static_cast<size_t> (feds) + 1);
+
+    auto broker =
+      helics::BrokerFactory::create (cType, "brokerb", std::string ("--federates=") + std::to_string (feds + 1));
+    broker->setLoggingLevel (helics_log_level_no_print);
+    auto wcore = helics::CoreFactory::create (cType, std::string ("--federates=1"));
+    // this is to delay until the threads are ready
+    EchoHub hub;
+    hub.initialize (wcore->getIdentifier (), feds);
+    std::vector<EchoLeaf> leafs (feds);
+    std::vector<std::shared_ptr<helics::Core>> cores (feds);
+    for (int ii = 0; ii < feds; ++ii)
     {
-        state.PauseTiming ();
-
-        int feds = static_cast<int> (state.range (0));
-        gmlc::concurrency::Barrier brr (static_cast<size_t>(feds) + 1);
-
-        auto broker = helics::BrokerFactory::create (cType, "brokerb",
-                                                     std::string ("--federates=") + std::to_string (feds + 1));
-        broker->setLoggingLevel (helics_log_level_no_print);
-        auto wcore = helics::CoreFactory::create (cType, std::string ("--federates=1"));
-        // this is to delay until the threads are ready
-        EchoHub hub;
-        hub.initialize (wcore->getIdentifier (), feds);
-        std::vector<EchoLeaf> leafs (feds);
-        std::vector<std::shared_ptr<helics::Core>> cores (feds);
-        for (int ii = 0; ii < feds; ++ii)
-        {
-            cores[ii] = helics::CoreFactory::create (cType, "-f 1");
-            cores[ii]->connect ();
-            leafs[ii].initialize (cores[ii]->getIdentifier (), ii);
-        }
-
-        std::vector<std::thread> threadlist (static_cast<size_t> (feds));
-        for (int ii = 0; ii < feds; ++ii)
-        {
-            threadlist[ii] =
-              std::thread ([&] (EchoLeaf &lf) { lf.run ([&brr] () { brr.wait (); }); }, std::ref (leafs[ii]));
-        }
-        hub.makeReady ();
-        brr.wait ();
-        state.ResumeTiming ();
-        hub.run ([] () {});
-        state.PauseTiming ();
-        for (auto &thrd : threadlist)
-        {
-            thrd.join ();
-        }
-        broker->disconnect ();
-        broker.reset ();
-        cores.clear ();
-        wcore.reset ();
-        cleanupHelicsLibrary ();
-
-        state.ResumeTiming ();
+      cores[ii] = helics::CoreFactory::create (cType, "-f 1");
+      cores[ii]->connect ();
+      leafs[ii].initialize (cores[ii]->getIdentifier (), ii);
     }
+
+    std::vector<std::thread> threadlist (static_cast<size_t> (feds));
+    for (int ii = 0; ii < feds; ++ii)
+    {
+      threadlist[ii] =
+        std::thread ([&](EchoLeaf &lf) { lf.run ([&brr]() { brr.wait (); }); }, std::ref (leafs[ii]));
+    }
+    hub.makeReady ();
+    brr.wait ();
+    state.ResumeTiming ();
+    hub.run ([]() {});
+    state.PauseTiming ();
+    for (auto &thrd : threadlist)
+    {
+      thrd.join ();
+    }
+    broker->disconnect ();
+    broker.reset ();
+    cores.clear ();
+    wcore.reset ();
+    cleanupHelicsLibrary ();
+
+    state.ResumeTiming ();
+  }
 }
 
 static constexpr int64_t maxscale{1 << 4};
@@ -341,4 +341,4 @@ BENCHMARK_CAPTURE (BM_echo_multiCore, udpCore, core_type::UDP)
   ->UseRealTime ();
 #endif
 
-HELICS_BENCHMARK_MAIN(echoBenchmark);
+HELICS_BENCHMARK_MAIN (echoBenchmark);

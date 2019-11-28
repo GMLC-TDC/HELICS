@@ -34,64 +34,64 @@ std::string getKey (const toml::Value &element);
 template <class X>
 inline X getOrDefault (const toml::Value &element, const std::string &key, const X &defVal)
 {
-    auto val = element.find (key);
-    return (val != nullptr) ? val->as<X> () : defVal;
+  auto val = element.find (key);
+  return (val != nullptr) ? val->as<X> () : defVal;
 }
 
 inline void callIfMember (const toml::Value &element,
                           const std::string &key,
-                          const std::function<void (const std::string &)> &call)
+                          const std::function<void(const std::string &)> &call)
 {
-    auto val = element.find (key);
-    if (val != nullptr)
-    {
-        call (val->as<std::string> ());
-    }
+  auto val = element.find (key);
+  if (val != nullptr)
+  {
+    call (val->as<std::string> ());
+  }
 }
 
 inline void callIfMember (const toml::Value &element,
                           const std::string &key,
-                          const std::function<void (const std::string &, helics::Time)> &call)
+                          const std::function<void(const std::string &, helics::Time)> &call)
 {
-    auto val = element.find (key);
-    if (val != nullptr)
-    {
-        call (key, loadTomlTime (*val));
-    }
+  auto val = element.find (key);
+  if (val != nullptr)
+  {
+    call (key, loadTomlTime (*val));
+  }
 }
 
 template <class X>
 inline void callIfMember (const toml::Value &element,
                           const std::string &key,
-                          const std::function<void (const std::string &, X)> &call)
+                          const std::function<void(const std::string &, X)> &call)
 {
-    auto val = element.find (key);
-    if (val != nullptr)
-    {
-        call (key, val->as<X> ());
-    }
+  auto val = element.find (key);
+  if (val != nullptr)
+  {
+    call (key, val->as<X> ());
+  }
 }
 
 inline void replaceIfMember (const toml::Value &element, const std::string &key, helics::Time &timeVal)
 {
-    auto val = element.find (key);
-    if (val != nullptr)
-    {
-        timeVal = loadTomlTime (*val);
-    }
+  auto val = element.find (key);
+  if (val != nullptr)
+  {
+    timeVal = loadTomlTime (*val);
+  }
 }
 
 template <class X>
 inline void replaceIfMember (const toml::Value &element, const std::string &key, X &loc)
 {
-    auto val = element.find (key);
-    if (val != nullptr)
-    {
-        loc = val->as<X> ();
-    }
+  auto val = element.find (key);
+  if (val != nullptr)
+  {
+    loc = val->as<X> ();
+  }
 }
 
 inline bool isMember (const toml::Value &element, const std::string &key)
 {
-    return (element.find (key) != nullptr);
+  return (element.find (key) != nullptr);
 }

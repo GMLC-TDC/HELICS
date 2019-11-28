@@ -28,13 +28,13 @@ CombinationFederate::CombinationFederate (const std::string &fedName, CoreApp &c
 CombinationFederate::CombinationFederate (const std::string &configString)
     : Federate (std::string (), loadFederateInfo (configString)), ValueFederate (true), MessageFederate (true)
 {
-    CombinationFederate::registerInterfaces (configString);
+  CombinationFederate::registerInterfaces (configString);
 }
 
 CombinationFederate::CombinationFederate (const std::string &fedName, const std::string &configString)
     : Federate (fedName, loadFederateInfo (configString)), ValueFederate (true), MessageFederate (true)
 {
-    CombinationFederate::registerInterfaces (configString);
+  CombinationFederate::registerInterfaces (configString);
 }
 
 CombinationFederate::CombinationFederate (CombinationFederate &&) noexcept = default;
@@ -42,44 +42,44 @@ CombinationFederate::~CombinationFederate () = default;
 
 void CombinationFederate::disconnect ()
 {
-    ValueFederate::disconnect ();
-    MessageFederate::disconnect ();
+  ValueFederate::disconnect ();
+  MessageFederate::disconnect ();
 }
 
 CombinationFederate &CombinationFederate::operator= (CombinationFederate &&) noexcept = default;
 
 void CombinationFederate::updateTime (Time newTime, Time oldTime)
 {
-    ValueFederate::updateTime (newTime, oldTime);
-    MessageFederate::updateTime (newTime, oldTime);
+  ValueFederate::updateTime (newTime, oldTime);
+  MessageFederate::updateTime (newTime, oldTime);
 }
 
 void CombinationFederate::startupToInitializeStateTransition ()
 {
-    ValueFederate::startupToInitializeStateTransition ();
-    MessageFederate::startupToInitializeStateTransition ();
+  ValueFederate::startupToInitializeStateTransition ();
+  MessageFederate::startupToInitializeStateTransition ();
 }
 
 void CombinationFederate::initializeToExecuteStateTransition ()
 {
-    ValueFederate::initializeToExecuteStateTransition ();
-    MessageFederate::initializeToExecuteStateTransition ();
+  ValueFederate::initializeToExecuteStateTransition ();
+  MessageFederate::initializeToExecuteStateTransition ();
 }
 
 std::string CombinationFederate::localQuery (const std::string &queryStr) const
 {
-    std::string res = ValueFederate::localQuery (queryStr);
-    if (res.empty ())
-    {
-        res = MessageFederate::localQuery (queryStr);
-    }
-    return res;
+  std::string res = ValueFederate::localQuery (queryStr);
+  if (res.empty ())
+  {
+    res = MessageFederate::localQuery (queryStr);
+  }
+  return res;
 }
 
 void CombinationFederate::registerInterfaces (const std::string &configString)
 {
-    ValueFederate::registerValueInterfaces (configString);
-    MessageFederate::registerMessageInterfaces (configString);
-    Federate::registerFilterInterfaces (configString);
+  ValueFederate::registerValueInterfaces (configString);
+  MessageFederate::registerMessageInterfaces (configString);
+  Federate::registerFilterInterfaces (configString);
 }
 }  // namespace helics

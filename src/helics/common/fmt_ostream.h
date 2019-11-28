@@ -6,12 +6,12 @@ SPDX-License-Identifier: BSD-3-Clause
 */
 #pragma once
 #ifdef _MSC_VER
-#pragma warning(push, 0)
-#include <fmt/ostream.h>
-#pragma warning(pop)
+#  pragma warning(push, 0)
+#  include <fmt/ostream.h>
+#  pragma warning(pop)
 #else
-#ifdef __GNUC__
-#pragma GCC system_header
-#endif
-#include <fmt/ostream.h>
+#  ifdef __GNUC__
+#    pragma GCC system_header
+#  endif
+#  include <fmt/ostream.h>
 #endif
