@@ -27,7 +27,6 @@ static void BM_phold_singleCore (benchmark::State &state)
 {
     for (auto _ : state)
     {
-        std::cout << "starting run" << std::endl;
         state.PauseTiming ();
 
         int fed_count = static_cast<int> (state.range (0));
@@ -174,7 +173,7 @@ BENCHMARK_CAPTURE (BM_phold_multiCore, zmqssCore, core_type::ZMQ_SS)
 // Register the IPC benchmarks
 BENCHMARK_CAPTURE (BM_phold_multiCore, ipcCore, core_type::IPC)
   ->RangeMultiplier (2)
-  ->Range (1, maxscale * 2)
+  ->Range (1, maxscale)
   ->Iterations (1)
   ->Unit (benchmark::TimeUnit::kMillisecond)
   ->UseRealTime ();

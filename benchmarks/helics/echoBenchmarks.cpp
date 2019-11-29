@@ -221,7 +221,7 @@ BENCHMARK (BM_echo_singleCore)
   ->RangeMultiplier (2)
   ->Range (1, 1 << 8)
   ->Unit (benchmark::TimeUnit::kMillisecond)
-  ->Iterations (3)
+  ->Iterations (1)
   ->UseRealTime ();
 
 static void BM_echo_multiCore (benchmark::State &state, core_type cType)
@@ -287,7 +287,7 @@ BENCHMARK_CAPTURE (BM_echo_multiCore, inprocCore, core_type::INPROC)
 BENCHMARK_CAPTURE (BM_echo_multiCore, zmqCore, core_type::ZMQ)
   ->RangeMultiplier (2)
   ->Range (1, maxscale)
-  ->Iterations (3)
+  ->Iterations (1)
   ->Unit (benchmark::TimeUnit::kMillisecond)
   ->UseRealTime ();
 
@@ -295,7 +295,7 @@ BENCHMARK_CAPTURE (BM_echo_multiCore, zmqCore, core_type::ZMQ)
 BENCHMARK_CAPTURE (BM_echo_multiCore, zmqssCore, core_type::ZMQ_SS)
   ->RangeMultiplier (2)
   ->Range (1, maxscale)
-  ->Iterations (3)
+  ->Iterations (1)
   ->Unit (benchmark::TimeUnit::kMillisecond)
   ->UseRealTime ();
 
@@ -306,7 +306,7 @@ BENCHMARK_CAPTURE (BM_echo_multiCore, zmqssCore, core_type::ZMQ_SS)
 BENCHMARK_CAPTURE (BM_echo_multiCore, ipcCore, core_type::IPC)
   ->RangeMultiplier (2)
   ->Range (1, maxscale)
-  ->Iterations (3)
+  ->Iterations (1)
   ->Unit (benchmark::TimeUnit::kMillisecond)
   ->UseRealTime ();
 
@@ -317,7 +317,7 @@ BENCHMARK_CAPTURE (BM_echo_multiCore, ipcCore, core_type::IPC)
 BENCHMARK_CAPTURE (BM_echo_multiCore, tcpCore, core_type::TCP)
   ->RangeMultiplier (2)
   ->Range (1, maxscale)
-  ->Iterations (3)
+  ->Iterations (1)
   ->Unit (benchmark::TimeUnit::kMillisecond)
   ->UseRealTime ();
 
@@ -325,7 +325,7 @@ BENCHMARK_CAPTURE (BM_echo_multiCore, tcpCore, core_type::TCP)
 BENCHMARK_CAPTURE (BM_echo_multiCore, tcpssCore, core_type::TCP_SS)
   ->RangeMultiplier (2)
   ->Range (1, maxscale)
-  ->Iterations (3)
+  ->Iterations (1)
   ->Unit (benchmark::TimeUnit::kMillisecond)
   ->UseRealTime ();
 
@@ -336,7 +336,7 @@ BENCHMARK_CAPTURE (BM_echo_multiCore, tcpssCore, core_type::TCP_SS)
 BENCHMARK_CAPTURE (BM_echo_multiCore, udpCore, core_type::UDP)
   ->RangeMultiplier (2)
   ->Range (1, 1 << 4)
-  ->Iterations (3)
+  ->Iterations (1)
   ->Unit (benchmark::TimeUnit::kMillisecond)
   ->UseRealTime ();
 #endif

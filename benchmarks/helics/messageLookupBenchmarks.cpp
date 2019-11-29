@@ -193,7 +193,19 @@ static void BM_mgen_multiCore (benchmark::State &state, core_type cType)
 // Register the test core benchmarks
 BENCHMARK_CAPTURE (BM_mgen_multiCore, inprocCore, core_type::INPROC)
   ->Unit (benchmark::TimeUnit::kMillisecond)
-  ->Ranges ({{32, 1 << 19}, {2, 64 * 4}})
+  ->Ranges ({{32, 1 << 15}, {2, 64}})
+  ->UseRealTime ();
+
+// Register the test core benchmarks
+BENCHMARK_CAPTURE (BM_mgen_multiCore, inprocCore_big2, core_type::INPROC)
+  ->Unit (benchmark::TimeUnit::kMillisecond)
+  ->Ranges ({{1<<17, 1 << 19}, {2,2}})
+  ->UseRealTime ();
+
+// Register the test core benchmarks
+BENCHMARK_CAPTURE (BM_mgen_multiCore, inprocCore_big8, core_type::INPROC)
+  ->Unit (benchmark::TimeUnit::kMillisecond)
+  ->Ranges ({{1 << 17, 1 << 19}, {8, 8}})
   ->UseRealTime ();
 /*
 // Register the ZMQ benchmarks
