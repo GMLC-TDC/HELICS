@@ -115,6 +115,7 @@ jobs:
   benchmarkjob:
     docker:
       - image: helics/buildenv:builder
+    resource_class: large
     environment:
       CMAKE_FLAGS: '-DHELICS_BUILD_BENCHMARKS=ON -DBM_RESULT_DIR=/tmp/bm_results/ -DHELICS_DISABLE_C_SHARED_LIB=ON'
     steps:
