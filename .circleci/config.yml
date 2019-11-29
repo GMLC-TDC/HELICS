@@ -41,6 +41,7 @@ aliases:
     name: run_benchmarks
     command: |
        mkdir /tmp/bm_results
+       cd build
        make RUN_KEY_BENCHMARKS
 
 jobs:
@@ -115,7 +116,7 @@ jobs:
     docker:
       - image: helics/buildenv:builder
     environment:
-      CMAKE_FLAGS: '-DHELICS_BUILD_BENCHMARKS=ON -DBM_RESULT_DIR=/tmp/bm_results/'
+      CMAKE_FLAGS: '-DHELICS_BUILD_BENCHMARKS=ON -DBM_RESULT_DIR=/tmp/bm_results/ -DHELICS_DISABLE_C_SHARED_LIB=ON'
     steps:
       - checkout
       - run: *setup_helics
