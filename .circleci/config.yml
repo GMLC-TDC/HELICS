@@ -135,7 +135,6 @@ workflows:
       - helicsTSan
       - helicsInstall1
       - helicsInstall2
-      - benchmarkjob
   nightly:
     triggers:
       - schedule:
