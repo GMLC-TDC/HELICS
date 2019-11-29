@@ -119,7 +119,7 @@ static void BM_mgen_singleFed (benchmark::State &state)
     {
         state.PauseTiming ();
 
-        auto wcore = helics::CoreFactory::create (core_type::TEST, std::string ("--autobroker "));
+        auto wcore = helics::CoreFactory::create (core_type::INPROC, std::string ("--autobroker "));
         messageGenerator mgen;
         mgen.initialize (wcore->getIdentifier (), static_cast<int> (state.range (0)),
                          static_cast<int> (state.range (0)), 100, 0);
