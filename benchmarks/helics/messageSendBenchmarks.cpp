@@ -277,7 +277,7 @@ BENCHMARK_CAPTURE (BM_sendMessage, tcpssMultiCore, core_type::TCP_SS)
 BENCHMARK_CAPTURE (BM_sendMessage, udpMultiCore, core_type::UDP)
   //->RangeMultiplier (2)
   ->Ranges ({{1, 1<<15}, {1, 1}}) // msg size of 65536 bytes causes error/terminate, though somewhere about 8K the benchmark time drops from several ms to <1ms
-  ->Ranges ({{1, 1}, {1, 1<<9}}) // msg count has a bigger effect on time taken (increasing size had minimal effect on times); larger sizes/counts did seem to result in hanging, maybe an important packet was lost
+  ->Ranges ({{1, 1}, {1, 1<<6}}) // msg count has a bigger effect on time taken (increasing size had minimal effect on times); larger sizes/counts did seem to result in hanging, maybe an important packet was lost
   ->Iterations (1)
   ->Unit (benchmark::TimeUnit::kMillisecond)
   ->UseRealTime ();

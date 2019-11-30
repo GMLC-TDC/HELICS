@@ -23,6 +23,11 @@ if(POLICY CMP0074)
     cmake_policy(SET CMP0074 NEW)
 endif()
 
+if(POLICY CMP0076)
+    # Policy CMP0074 target_sources now converts relative paths to absolute
+    cmake_policy(SET CMP0076 NEW)
+endif()
+
 # -----------------------------------------------------------------------------
 # HELICS Version number
 # -----------------------------------------------------------------------------

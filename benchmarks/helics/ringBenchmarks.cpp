@@ -216,7 +216,6 @@ BENCHMARK_CAPTURE (BM_ring_multiCore, zmqCore, core_type::ZMQ)
   ->Arg (4)
   ->Arg (6)
   ->Arg (10)
-  ->Arg (20)
   ->UseRealTime ();
 
 // Register the ZMQ benchmarks
@@ -227,7 +226,6 @@ BENCHMARK_CAPTURE (BM_ring_multiCore, zmqssCore, core_type::ZMQ_SS)
   ->Arg (4)
   ->Arg (6)
   ->Arg (10)
-  ->Arg (20)
   ->UseRealTime ();
 #endif
 
@@ -250,7 +248,6 @@ BENCHMARK_CAPTURE (BM_ring_multiCore, tcpCore, core_type::TCP)
   ->Arg (4)
   ->Arg (6)
   ->Arg (10)
-  ->Arg (20)
   ->UseRealTime ();
 
 // Register the TCP SS benchmarks
@@ -261,7 +258,6 @@ BENCHMARK_CAPTURE (BM_ring_multiCore, tcpssCore, core_type::TCP_SS)
   ->Arg (4)
   ->Arg (6)
   ->Arg (10)
-  ->Arg (20)
   ->UseRealTime ();
 
 #endif
@@ -275,7 +271,6 @@ BENCHMARK_CAPTURE (BM_ring_multiCore, udpCore, core_type::UDP)
   ->Arg (4)
   ->Arg (6)
   ->Arg (10)
-  ->Arg (20)
   ->UseRealTime ();
 #endif
 

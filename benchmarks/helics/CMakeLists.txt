@@ -51,8 +51,9 @@ add_custom_target(RUN_ALL_BENCHMARKS
 				  COMMAND ringBenchmarks --benchmark_format=json ">${BM_RESULT_DIR}bm_ringResults${current_date}_${rname}.txt"
 				  COMMAND messageLookupBenchmarks --benchmark_format=json ">${BM_RESULT_DIR}bm_messageLookupResults${current_date}_${rname}.txt"
 				  COMMAND echoMessageBenchmarks --benchmark_format=json ">${BM_RESULT_DIR}bm_echoMessageResults${current_date}_${rname}.txt"
+				  COMMAND pholdBenchmarks --benchmark_format=json ">${BM_RESULT_DIR}bm_pholdResults${current_date}_${rname}.txt"
 				  COMMAND messageSendBenchmarks --benchmark_format=json ">${BM_RESULT_DIR}bm_messageSendResults${current_date}_${rname}.txt"
-				  COMMAND pholdBenchmarks --benchmark_format=json ">${BM_RESULT_DIR}bm_pholdResults${current_date}_${rname}.txt") 
+				  ) 
 
 foreach(T ${HELICS_BENCHMARKS})
 	add_dependencies(RUN_ALL_BENCHMARKS ${T})
