@@ -10,8 +10,8 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helics/core/ActionMessage.hpp"
 #include "helics/core/BrokerFactory.hpp"
 #include "helics/core/CoreFactory.hpp"
-#include <benchmark/benchmark.h>
 #include "helics_benchmark_main.h"
+#include <benchmark/benchmark.h>
 #include <chrono>
 #include <fstream>
 #include <iostream>
@@ -138,17 +138,18 @@ BENCHMARK (BM_mgen_singleFed)
   ->RangeMultiplier (4)
   ->Range (1, 1 << 18)
   ->Unit (benchmark::TimeUnit::kMillisecond)
-  ->Iterations (2)
+  ->Iterations (1)
   ->UseRealTime ();
 
 static void BM_mgen_multiCore (benchmark::State &state, core_type cType)
 {
-    if (state.range (0) < state.range (1) * 8)
-    {
-        return;
-    }
     for (auto _ : state)
     {
+        if (state.range (0) < state.range (1) * 8)
+        {
+            continue;
+        }
+
         state.PauseTiming ();
         int feds = static_cast<int> (state.range (1));
         gmlc::concurrency::Barrier brr (feds);
@@ -194,18 +195,22 @@ static void BM_mgen_multiCore (benchmark::State &state, core_type cType)
 BENCHMARK_CAPTURE (BM_mgen_multiCore, inprocCore, core_type::INPROC)
   ->Unit (benchmark::TimeUnit::kMillisecond)
   ->Ranges ({{32, 1 << 15}, {2, 64}})
+  ->Iterations (1)
   ->UseRealTime ();
+
 
 // Register the test core benchmarks
 BENCHMARK_CAPTURE (BM_mgen_multiCore, inprocCore_big2, core_type::INPROC)
   ->Unit (benchmark::TimeUnit::kMillisecond)
-  ->Ranges ({{1<<17, 1 << 19}, {2,2}})
+  ->Ranges ({{1 << 17, 1 << 19}, {2, 2}})
+  ->Iterations (1)
   ->UseRealTime ();
 
 // Register the test core benchmarks
 BENCHMARK_CAPTURE (BM_mgen_multiCore, inprocCore_big8, core_type::INPROC)
   ->Unit (benchmark::TimeUnit::kMillisecond)
   ->Ranges ({{1 << 17, 1 << 19}, {8, 8}})
+  ->Iterations (1)
   ->UseRealTime ();
 /*
 // Register the ZMQ benchmarks
@@ -280,4 +285,4 @@ BENCHMARK_CAPTURE (BM_ring_multiCore, udpCore, core_type::UDP)
   ->UseRealTime ();
   */
 
-HELICS_BENCHMARK_MAIN(messageLookupBenchmark);
+HELICS_BENCHMARK_MAIN (messageLookupBenchmark);
