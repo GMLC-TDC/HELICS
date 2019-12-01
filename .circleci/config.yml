@@ -36,6 +36,13 @@ aliases:
        make install
        ctest -V -R find-package-tests
        ctest -V -R package-config-tests
+       
+  - &run_benchmarks
+    name: run_benchmarks
+    command: |
+       mkdir /tmp/bm_results
+       cd build
+       make RUN_KEY_BENCHMARKS
 
 jobs:
   helicsoctave:
@@ -104,6 +111,19 @@ jobs:
       - checkout
       - run: *setup_helics
       - run: *run_installer_tests
+      
+  benchmarkjob:
+    docker:
+      - image: helics/buildenv:builder
+    environment:
+      CMAKE_FLAGS: '-DHELICS_BUILD_BENCHMARKS=ON -DBM_RESULT_DIR=/tmp/bm_results/ -DHELICS_DISABLE_C_SHARED_LIB=ON'
+    steps:
+      - checkout
+      - run: *setup_helics
+      - run: *run_benchmarks
+
+      - store_artifacts:
+          path: /tmp/bm_results
 
 workflows:
   version: 2
@@ -118,7 +138,7 @@ workflows:
   nightly:
     triggers:
       - schedule:
-          cron: "0 0 * * *"
+          cron: "0 8 * * *"
           filters:
             branches:
               only:
@@ -128,4 +148,14 @@ workflows:
       - helicsMSan
       - helicsASan
       - helicsTSan
+  benchmark:
+    triggers:
+      - schedule:
+          cron: "17 9 * * 0,2,5"
+          filters:
+            branches:
+              only:
+                - develop
+    jobs:
+      - benchmarkjob
 

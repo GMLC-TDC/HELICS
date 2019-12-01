@@ -122,7 +122,7 @@ function(git_clone)
         endif()
 
         execute_process(
-                COMMAND             ${GIT_EXECUTABLE} clone ${PARGS_GIT_URL} --recursive
+                COMMAND             ${GIT_EXECUTABLE} clone ${PARGS_GIT_URL} --recursive ${${SOURCE_DIR}}
                 WORKING_DIRECTORY   ${PARGS_DIRECTORY}
                 OUTPUT_VARIABLE     git_output)
     endif()

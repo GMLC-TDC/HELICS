@@ -28,7 +28,7 @@ else()
             set(CMAKE_SWIG_FLAGS ${CMAKE_SWIG_FLAGS} "-doxygen")
         endif()
 
-        if(CMAKE_VERSION VERSION_GREATER 3.7)
+        if(${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION} VERSION_GREATER 3.7)
             swig_add_library(
                 JNIhelics
                 TYPE

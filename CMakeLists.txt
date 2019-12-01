@@ -23,6 +23,11 @@ if(POLICY CMP0074)
     cmake_policy(SET CMP0074 NEW)
 endif()
 
+if(POLICY CMP0076)
+    # Policy CMP0074 target_sources now converts relative paths to absolute
+    cmake_policy(SET CMP0076 NEW)
+endif()
+
 # -----------------------------------------------------------------------------
 # HELICS Version number
 # -----------------------------------------------------------------------------
@@ -40,7 +45,7 @@ if(HELICS_VERSION_BUILD)
     )
 endif()
 
-set(HELICS_COMPILER_VERSION "${CMAKE_GENERATOR} ${CMAKE_SYSTEM}:${CMAKE_CXX_COMPILER_ID}-${CMAKE_CXX_COMPILER_VERSION}")
+set(HELICS_COMPILER_VERSION "${CMAKE_GENERATOR} ${CMAKE_GENERATOR_PLATFORM} ${CMAKE_SYSTEM}:${CMAKE_CXX_COMPILER_ID}-${CMAKE_CXX_COMPILER_VERSION}")
 message(STATUS "SYSTEM INFO -> ${HELICS_COMPILER_VERSION}")
 
 # -----------------------------------------------------------------------------
@@ -160,7 +165,7 @@ cmake_dependent_option(
 
 cmake_dependent_option(
     HELICS_BUILD_BENCHMARKS "Build HELICS Benchmarks" OFF
-    "CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME" OFF
+    "CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME;CMAKE_VERSION VERSION_GREATER 3.5" OFF
 )
 
 cmake_dependent_advanced_option(

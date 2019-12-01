@@ -205,32 +205,27 @@ BENCHMARK_CAPTURE (BM_ring_multiCore, inprocCore, core_type::INPROC)
   ->Arg (6)
   ->Arg (10)
   ->Arg (20)
-  ->Iterations (3)
   ->UseRealTime ();
 
 #ifdef ENABLE_ZMQ_CORE
 // Register the ZMQ benchmarks
 BENCHMARK_CAPTURE (BM_ring_multiCore, zmqCore, core_type::ZMQ)
   ->Unit (benchmark::TimeUnit::kMillisecond)
-  ->Iterations (3)
   ->Arg (2)
   ->Arg (3)
   ->Arg (4)
   ->Arg (6)
   ->Arg (10)
-  ->Arg (20)
   ->UseRealTime ();
 
 // Register the ZMQ benchmarks
 BENCHMARK_CAPTURE (BM_ring_multiCore, zmqssCore, core_type::ZMQ_SS)
   ->Unit (benchmark::TimeUnit::kMillisecond)
-  ->Iterations (3)
   ->Arg (2)
   ->Arg (3)
   ->Arg (4)
   ->Arg (6)
   ->Arg (10)
-  ->Arg (20)
   ->UseRealTime ();
 #endif
 
@@ -238,12 +233,9 @@ BENCHMARK_CAPTURE (BM_ring_multiCore, zmqssCore, core_type::ZMQ_SS)
 // Register the IPC benchmarks
 BENCHMARK_CAPTURE (BM_ring_multiCore, ipcCore, core_type::IPC)
   ->Unit (benchmark::TimeUnit::kMillisecond)
-  ->Iterations (3)
   ->Arg (2)
   ->Arg (3)
   ->Arg (4)
-  ->Arg (10)
-  ->Arg (20)
   ->UseRealTime ();
 #endif
 
@@ -251,25 +243,21 @@ BENCHMARK_CAPTURE (BM_ring_multiCore, ipcCore, core_type::IPC)
 // Register the TCP benchmarks
 BENCHMARK_CAPTURE (BM_ring_multiCore, tcpCore, core_type::TCP)
   ->Unit (benchmark::TimeUnit::kMillisecond)
-  ->Iterations (3)
   ->Arg (2)
   ->Arg (3)
   ->Arg (4)
   ->Arg (6)
   ->Arg (10)
-  ->Arg (20)
   ->UseRealTime ();
 
 // Register the TCP SS benchmarks
 BENCHMARK_CAPTURE (BM_ring_multiCore, tcpssCore, core_type::TCP_SS)
   ->Unit (benchmark::TimeUnit::kMillisecond)
-  ->Iterations (3)
   ->Arg (2)
   ->Arg (3)
   ->Arg (4)
   ->Arg (6)
   ->Arg (10)
-  ->Arg (20)
   ->UseRealTime ();
 
 #endif
@@ -278,13 +266,11 @@ BENCHMARK_CAPTURE (BM_ring_multiCore, tcpssCore, core_type::TCP_SS)
 // Register the UDP benchmarks
 BENCHMARK_CAPTURE (BM_ring_multiCore, udpCore, core_type::UDP)
   ->Unit (benchmark::TimeUnit::kMillisecond)
-  ->Iterations (3)
   ->Arg (2)
   ->Arg (3)
   ->Arg (4)
   ->Arg (6)
   ->Arg (10)
-  ->Arg (20)
   ->UseRealTime ();
 #endif
 
