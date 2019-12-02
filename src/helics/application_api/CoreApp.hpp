@@ -50,13 +50,13 @@ class HELICS_CXX_EXPORT CoreApp
     CoreApp (int argc, char *argv[]);
     /** construct from command line arguments
     @param ctype the type of core to create
+	@param coreName the name of the core to use
     @param argc the number of arguments
     @param argv the strings in the input
     */
     CoreApp (core_type ctype, const std::string &coreName, int argc, char *argv[]);
     /** construct from command line arguments
     @param ctype the type of core to create
-    @param coreName the name of the core to use
     @param argc the number of arguments
     @param argv the strings in the input
     */

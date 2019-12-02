@@ -55,11 +55,11 @@ class HELICS_CXX_EXPORT BrokerApp
     BrokerApp (core_type ctype, int argc, char *argv[]);
     /** construct from command line arguments
     @param ctype the type of broker to create
-    @param broker_name the name of the broker
+    @param brokerName the name of the broker
     @param argc the number of arguments
     @param argv the strings in the input
     */
-    BrokerApp (core_type ctype, const std::string &broker_name, int argc, char *argv[]);
+    BrokerApp (core_type ctype, const std::string &brokerName, int argc, char *argv[]);
     /** construct from command line arguments parsed as a single string
     @param argString a merged string with all the arguments
     */
@@ -71,10 +71,10 @@ class HELICS_CXX_EXPORT BrokerApp
     BrokerApp (core_type ctype, const std::string &argString);
     /** construct from command line arguments parsed as a single string
     @param ctype the type of broker to create
-    @param broker_name the name of the broker
+    @param brokerName the name of the broker
     @param argString a merged string with all the arguments
     */
-    BrokerApp (core_type ctype, const std::string &name, const std::string &argString);
+    BrokerApp (core_type ctype, const std::string &brokerName, const std::string &argString);
 
     /** check if the Broker is running*/
     bool isConnected () const;
