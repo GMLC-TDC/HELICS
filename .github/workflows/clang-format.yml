@@ -3,6 +3,7 @@ name: Format source code
 on:
 #  issue_comment:
 #    types: [created]
+  pull_request:
   push:
     paths:
       - '.github/workflows/clang-format.yml'
@@ -45,7 +46,9 @@ jobs:
           git add *.cpp *.hpp *.c *.h
         fi
         exit 0
+        
     - uses: ./.github/actions/create-file-update-pr
+      if: github.event_name == 'push'
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
@@ -55,3 +58,17 @@ jobs:
         GIT_EMAIL: "HELICS-bot@users.noreply.github.com"
         GIT_NAME: "HELICS-bot"
         BRANCH_PREFIX: "clang-format/"
+        
+    - uses: ./.github/actions/create-file-update-pr
+      if: github.event_name == 'pull_request'
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        COMMIT_MSG: "Automated formatting of source files"
+        PR_TITLE: "Automated formatting of source files"
+        PR_BODY: "Automated formatting of source files in commit https://github.com/${{ github.repository }}/commit/${{ github.sha }}."
+        GIT_EMAIL: "HELICS-bot@users.noreply.github.com"
+        GIT_NAME: "HELICS-bot"
+        BRANCH_PREFIX: "clang-format/"
+        NO_HASH: "true"
+        REPLACE_BRANCH: "true"
