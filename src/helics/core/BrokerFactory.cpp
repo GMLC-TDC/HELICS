@@ -40,7 +40,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #endif
 
 #ifdef ENABLE_INPROC_CORE
-#include "inproc/InprocBroker.h"
+#    include "inproc/InprocBroker.h"
 #endif
 
 #include <cassert>
@@ -267,7 +267,7 @@ std::shared_ptr<Broker> create (core_type type, const std::string &broker_name, 
 
 /** lambda function to join cores before the destruction happens to avoid potential problematic calls in the
  * loops*/
-static auto destroyerCallFirst = [] (auto &broker) {
+static auto destroyerCallFirst = [](auto &broker) {
     auto tbroker = std::dynamic_pointer_cast<CoreBroker> (broker);
     if (tbroker)
     {
@@ -363,7 +363,7 @@ static bool isJoinableBrokerForType (core_type type, const std::shared_ptr<Broke
 
 std::shared_ptr<Broker> findJoinableBrokerOfType (core_type type)
 {
-    return searchableObjects.findObject ([type] (auto &ptr) { return isJoinableBrokerForType (type, ptr); });
+    return searchableObjects.findObject ([type](auto &ptr) { return isJoinableBrokerForType (type, ptr); });
 }
 
 std::vector<std::shared_ptr<Broker>> getAllBrokers () { return searchableObjects.getObjects (); }
@@ -403,7 +403,7 @@ void unregisterBroker (const std::string &name)
 {
     if (!searchableObjects.removeObject (name))
     {
-        searchableObjects.removeObject ([&name] (auto &obj) { return (obj->getIdentifier () == name); });
+        searchableObjects.removeObject ([&name](auto &obj) { return (obj->getIdentifier () == name); });
     }
 }
 

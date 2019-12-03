@@ -9,6 +9,6 @@ SPDX-License-Identifier: BSD-3-Clause
 
 int main (int argc, char *argv[])
 {
-    volatile helics::apps::Player play({"--version"});
+    volatile helics::apps::Player play ({"--version"});
     return 0;
 }

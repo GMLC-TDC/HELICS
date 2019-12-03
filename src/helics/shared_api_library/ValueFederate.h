@@ -352,7 +352,8 @@ extern "C"
 
     /**
     * \defgroup getValue GetValue functions
-    @details data can be returned in number of formats,  for instance if data is published as a double it can be returned as a string and vice versa,  not all translations make that much sense but they do work.
+    @details data can be returned in number of formats,  for instance if data is published as a double it can be returned as a string and
+    vice versa,  not all translations make that much sense but they do work.
     * @{
     */
     /** get the size of the raw value for subscription

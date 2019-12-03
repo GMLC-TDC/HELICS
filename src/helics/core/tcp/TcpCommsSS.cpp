@@ -162,11 +162,11 @@ void TcpCommsSS::queue_tx_function ()
     TcpServer::pointer server;
     auto ioctx = AsioContextManager::getContextPointer ();
     auto contextLoop = ioctx->startContextLoop ();
-    auto dataCall = [this] (TcpConnection::pointer connection, const char *data, size_t datasize) {
+    auto dataCall = [this](TcpConnection::pointer connection, const char *data, size_t datasize) {
         return dataReceive (connection, data, datasize);
     };
     CommsInterface *ci = this;
-    auto errorCall = [ci] (TcpConnection::pointer connection, const std::error_code &error) {
+    auto errorCall = [ci](TcpConnection::pointer connection, const std::error_code &error) {
         return commErrorHandler (ci, connection, error);
     };
 

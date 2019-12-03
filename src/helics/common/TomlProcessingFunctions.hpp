@@ -40,7 +40,7 @@ inline X getOrDefault (const toml::Value &element, const std::string &key, const
 
 inline void callIfMember (const toml::Value &element,
                           const std::string &key,
-                          const std::function<void (const std::string &)> &call)
+                          const std::function<void(const std::string &)> &call)
 {
     auto val = element.find (key);
     if (val != nullptr)
@@ -51,7 +51,7 @@ inline void callIfMember (const toml::Value &element,
 
 inline void callIfMember (const toml::Value &element,
                           const std::string &key,
-                          const std::function<void (const std::string &, helics::Time)> &call)
+                          const std::function<void(const std::string &, helics::Time)> &call)
 {
     auto val = element.find (key);
     if (val != nullptr)
@@ -63,7 +63,7 @@ inline void callIfMember (const toml::Value &element,
 template <class X>
 inline void callIfMember (const toml::Value &element,
                           const std::string &key,
-                          const std::function<void (const std::string &, X)> &call)
+                          const std::function<void(const std::string &, X)> &call)
 {
     auto val = element.find (key);
     if (val != nullptr)

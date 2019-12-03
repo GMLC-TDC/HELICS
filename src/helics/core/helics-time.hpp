@@ -47,7 +47,7 @@ struct iteration_time
 
 // #TOBEDEPRECTATED The use of the the core-types header for the functions contained in
 // ../application_api/timeOperations.hpp is deprectaced and will be removed in HELICS 3.0
-// please use ../application_api/timeOperations.hpp directory for those functions.  
+// please use ../application_api/timeOperations.hpp directory for those functions.
 // This next section should be removed in HELICS 3.0 but is needed to prevent breaking changes
 #    if defined HELICS_SHARED_LIBRARY || !defined HELICS_STATIC_CORE_LIBRARY
 #        include "../application_api/timeOperations.hpp"

@@ -19,9 +19,9 @@ class Filter
 {
   public:
     /** construct from C level helics_filter object*/
-    explicit Filter (helics_filter hfilt) HELICS_NOTHROW: filt (hfilt) {}
+    explicit Filter (helics_filter hfilt) HELICS_NOTHROW : filt (hfilt) {}
     /** default constructor*/
-	Filter ()HELICS_NOTHROW:filt(HELICS_NULL_POINTER){};
+    Filter () HELICS_NOTHROW : filt (HELICS_NULL_POINTER){};
     /** copy constructor*/
     Filter (const Filter &filter) : filt (filter.filt) {}
     /** copy assignment*/
@@ -31,7 +31,7 @@ class Filter
         return *this;
     }
 
-	/** cast operator to get the underlying object*/
+    /** cast operator to get the underlying object*/
     operator helics_filter () const { return filt; }
     /** get the underlying helics_filter object*/
     helics_filter baseObject () const { return filt; }
@@ -76,20 +76,21 @@ class Filter
     /** get the interface information field of the filter*/
     const char *getInfo () const { return helicsFilterGetInfo (filt); }
     /** set the interface information field of the filter*/
-    void setInfo (const std::string &info) { helicsFilterSetInfo (filt, info.c_str(),HELICS_IGNORE_ERROR); }
+    void setInfo (const std::string &info) { helicsFilterSetInfo (filt, info.c_str (), HELICS_IGNORE_ERROR); }
+
   protected:
     helics_filter filt;  //!< the reference to the underlying publication
 };
 
 /** cloning filter extends some operations on filters
-*/
+ */
 class CloningFilter : public Filter
 {
   public:
     /** construct from underlying filter object*/
-    explicit CloningFilter (helics_filter hfilt) HELICS_NOTHROW: Filter (hfilt) {}
+    explicit CloningFilter (helics_filter hfilt) HELICS_NOTHROW : Filter (hfilt) {}
     /** default constructor*/
-	CloningFilter () HELICS_NOTHROW{};
+    CloningFilter () HELICS_NOTHROW{};
     /** copy constructor*/
     CloningFilter (const CloningFilter &filter) : Filter (filter) {}
     /** copy assignment*/

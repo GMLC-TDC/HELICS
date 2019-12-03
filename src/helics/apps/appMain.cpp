@@ -5,10 +5,10 @@ the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 
+#include "../application_api/BrokerApp.hpp"
 #include "../common/loggerCore.hpp"
 #include "../core/core-exceptions.hpp"
 #include "../core/helicsCLI11.hpp"
-#include "../application_api/BrokerApp.hpp"
 #include "Clone.hpp"
 #include "Echo.hpp"
 #include "Player.hpp"
@@ -23,7 +23,7 @@ int main (int argc, char *argv[])
     helics::helicsCLI11App app ("simple execution for all the different HELICS apps", "helics_app");
     app.ignore_case ()->prefix_command ();
     app.add_subcommand ("player", "Helics Player App")
-      ->callback ([&app] () {
+      ->callback ([&app]() {
           helics::apps::Player player (app.remaining_for_passthrough (true));
           std::cout << "player subcommand\n";
           if (player.isActive ())
@@ -37,7 +37,7 @@ int main (int argc, char *argv[])
       });
 
     app.add_subcommand ("recorder", "Helics Recorder App")
-      ->callback ([&app] () {
+      ->callback ([&app]() {
           helics::apps::Recorder recorder (app.remaining_for_passthrough (true));
           std::cout << "recorder subcommand\n";
           if (recorder.isActive ())
@@ -50,7 +50,7 @@ int main (int argc, char *argv[])
           return std::string{};
       });
     app.add_subcommand ("clone", "Helics Clone App")
-      ->callback ([&app] () {
+      ->callback ([&app]() {
           helics::apps::Clone cloner (app.remaining_for_passthrough (true));
           std::cout << "clone subcommand\n";
           if (cloner.isActive ())
@@ -63,7 +63,7 @@ int main (int argc, char *argv[])
           return std::string{};
       });
     app.add_subcommand ("echo", "Helics Echo App")
-      ->callback ([&app] () {
+      ->callback ([&app]() {
           std::cout << "echo subcommand\n";
           helics::apps::Echo echo (app.remaining_for_passthrough (true));
           if (echo.isActive ())
@@ -77,7 +77,7 @@ int main (int argc, char *argv[])
       });
 
     app.add_subcommand ("source", "Helics Source App")
-      ->callback ([&app] () {
+      ->callback ([&app]() {
           std::cout << "source subcommand\n";
           helics::apps::Source source (app.remaining_for_passthrough (true));
           if (source.isActive ())
@@ -91,7 +91,7 @@ int main (int argc, char *argv[])
       });
 
     app.add_subcommand ("tracer", "Helics Tracer App")
-      ->callback ([&app] () {
+      ->callback ([&app]() {
           std::cout << "tracer subcommand\n";
           helics::apps::Tracer tracer (app.remaining_for_passthrough (true));
           if (tracer.isActive ())
@@ -105,7 +105,7 @@ int main (int argc, char *argv[])
       });
 
     app.add_subcommand ("broker", "Helics Broker App")
-      ->callback ([&app] () {
+      ->callback ([&app]() {
           std::cout << "broker subcommand\n";
           helics::BrokerKeeper broker (app.remaining_for_passthrough (true));
       })

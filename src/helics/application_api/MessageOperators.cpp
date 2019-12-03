@@ -71,13 +71,13 @@ std::unique_ptr<Message> MessageDestOperator::process (std::unique_ptr<Message> 
 }
 
 MessageConditionalOperator::MessageConditionalOperator (
-  std::function<bool (const Message *)> userConditionalFunction)
+  std::function<bool(const Message *)> userConditionalFunction)
     : evalFunction (std::move (userConditionalFunction))
 {
 }
 
 void MessageConditionalOperator::setConditionFunction (
-  std::function<bool (const Message *)> userConditionalFunction)
+  std::function<bool(const Message *)> userConditionalFunction)
 {
     evalFunction = std::move (userConditionalFunction);
 }
@@ -95,12 +95,12 @@ std::unique_ptr<Message> MessageConditionalOperator::process (std::unique_ptr<Me
     return message;
 }
 
-CloneOperator::CloneOperator (std::function<void (const Message *)> userCloneFunction)
+CloneOperator::CloneOperator (std::function<void(const Message *)> userCloneFunction)
     : evalFunction (std::move (userCloneFunction))
 {
 }
 
-void CloneOperator::setCloneFunction (std::function<void (const Message *)> userCloneFunction)
+void CloneOperator::setCloneFunction (std::function<void(const Message *)> userCloneFunction)
 {
     evalFunction = std::move (userCloneFunction);
 }
@@ -114,12 +114,12 @@ std::unique_ptr<Message> CloneOperator::process (std::unique_ptr<Message> messag
     return message;
 }
 
-FirewallOperator::FirewallOperator (std::function<bool (const Message *)> userCheckFunction)
+FirewallOperator::FirewallOperator (std::function<bool(const Message *)> userCheckFunction)
     : checkFunction (std::move (userCheckFunction))
 {
 }
 
-void FirewallOperator::setCheckFunction (std::function<bool (const Message *)> userCheckFunction)
+void FirewallOperator::setCheckFunction (std::function<bool(const Message *)> userCheckFunction)
 {
     checkFunction = std::move (userCheckFunction);
 }
