@@ -31,14 +31,14 @@ class BrokerBase
   protected:
     std::atomic<global_broker_id> global_id{
       parent_broker_id};  //!< the unique identifier for the broker(core or broker)
-    global_broker_id global_broker_id_local;  //!< meant to be the same as global_id but not atomically protected
+	global_broker_id global_broker_id_local{};  //!< meant to be the same as global_id but not atomically protected
     global_broker_id higher_broker_id{0};  //!< the id code of the broker 1 level about this broker
     std::atomic<int32_t> maxLogLevel{1};  //!< the logging level to use levels >=this will be ignored
-    int32_t consoleLogLevel = 1;  //!< the logging level for console display
-    int32_t fileLogLevel = 1;  //!< the logging level for logging to a file
-    int32_t minFederateCount = 1;  //!< the minimum number of federates that must connect before entering init mode
-    int32_t minBrokerCount = 0;  //!< the minimum number of brokers that must connect before entering init mode
-    int32_t maxIterationCount = 10000;  //!< the maximum number of iterative loops that are allowed
+	int32_t consoleLogLevel{ 1 };  //!< the logging level for console display
+	int32_t fileLogLevel{ 1 };  //!< the logging level for logging to a file
+	int32_t minFederateCount{ 1 };  //!< the minimum number of federates that must connect before entering init mode
+	int32_t minBrokerCount{ 0 };  //!< the minimum number of brokers that must connect before entering init mode
+	int32_t maxIterationCount{ 10000 };  //!< the maximum number of iterative loops that are allowed
     Time tickTimer{5.0};  //!< the length of each heartbeat tick
     Time timeout{30.0};  //!< timeout to wait to establish a broker connection before giving up
     Time networkTimeout{-1.0};  //!< timeout to establish a socket connection before giving up
@@ -56,9 +56,9 @@ class BrokerBase
     std::atomic<bool> haltOperations{false};  //!< flag indicating that no further message should be processed
   private:
     std::atomic<bool> mainLoopIsRunning{false};  //!< flag indicating that the main processing loop is running
-    bool dumplog = false;  //!< flag indicating the broker should capture a dump log
-    bool forceLoggingFlush = false;  //!< force the log to flush after every message
-    bool queueDisabled = false;  //!< flag indicating that the message queue should not be used and all functions
+	bool dumplog{ false };  //!< flag indicating the broker should capture a dump log
+	bool forceLoggingFlush{ false };  //!< force the log to flush after every message
+	bool queueDisabled{ false };  //!< flag indicating that the message queue should not be used and all functions
                                  //!< called directly instead of distinct thread
   protected:
     std::string logFile;  //!< the file to log message to

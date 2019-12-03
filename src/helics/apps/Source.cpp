@@ -123,12 +123,8 @@ void Source::loadJsonFile (const std::string &jsonString)
     auto pubCount = fed->getPublicationCount ();
     for (int ii = 0; ii < pubCount; ++ii)
     {
-        SourceObject newObj;
-
-        newObj.pub = fed->getPublication (ii);
-        newObj.period = defaultPeriod;
-        sources.push_back (newObj);
-        pubids[newObj.pub.getKey ()] = static_cast<int> (sources.size ()) - 1;
+        sources.emplace_back (fed->getPublication(ii),defaultPeriod);
+        pubids[sources.back().pub.getKey ()] = static_cast<int> (sources.size ()) - 1;
     }
     /* auto eptCount = fed->getEndpointCount();
      for (int ii = 0; ii < eptCount; ++ii)
@@ -319,17 +315,8 @@ void Source::addPublication (const std::string &key,
         std::cerr << "publication already exists\n";
         return;
     }
-    SourceObject newObj;
+	SourceObject newObj(Publication(useLocal ? interface_visibility::local : interface_visibility::global, fed, key, typeNameStringRef(type), units), period);
 
-    if (useLocal)
-    {
-        newObj.pub = fed->registerPublication (key, typeNameStringRef (type), units);
-    }
-    else
-    {
-        newObj.pub = fed->registerGlobalPublication (key, typeNameStringRef (type), units);
-    }
-    newObj.period = period;
     if (!generator.empty ())
     {
         auto res = generatorLookup.find (generator);
@@ -338,7 +325,7 @@ void Source::addPublication (const std::string &key,
             newObj.generatorIndex = res->second;
         }
     }
-    sources.push_back (newObj);
+    sources.push_back (std::move(newObj));
     pubids[key] = static_cast<int> (sources.size ()) - 1;
 }
 
