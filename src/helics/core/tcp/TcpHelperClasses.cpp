@@ -42,7 +42,7 @@ void TcpConnection::startReceive ()
         if (!triggerhalt)
         {
             socket_.async_receive (asio::buffer (data.data () + residBufferSize, data.size () - residBufferSize),
-                                   [this] (const std::error_code &error, size_t bytes_transferred) {
+                                   [this](const std::error_code &error, size_t bytes_transferred) {
                                        handle_read (error, bytes_transferred);
                                    });
             if (triggerhalt)
@@ -76,7 +76,7 @@ void TcpConnection::setDataCall (std::function<size_t (TcpConnection::pointer, c
         throw (std::runtime_error ("cannot set data callback after socket is started"));
     }
 }
-void TcpConnection::setErrorCall (std::function<bool (TcpConnection::pointer, const std::error_code &)> errorFunc)
+void TcpConnection::setErrorCall (std::function<bool(TcpConnection::pointer, const std::error_code &)> errorFunc)
 {
     if (state.load () == connection_state_t::prestart)
     {
@@ -88,7 +88,7 @@ void TcpConnection::setErrorCall (std::function<bool (TcpConnection::pointer, co
     }
 }
 
-void TcpConnection::setLoggingFunction (std::function<void (int loglevel, const std::string &logMessage)> logFunc)
+void TcpConnection::setLoggingFunction (std::function<void(int loglevel, const std::string &logMessage)> logFunc)
 {
     if (state.load () == connection_state_t::prestart)
     {
@@ -272,7 +272,7 @@ TcpConnection::TcpConnection (asio::io_context &io_context,
     tcp::resolver resolver (io_context);
     tcp::resolver::query query (tcp::v4 (), connection, port);
     tcp::resolver::iterator endpoint_iterator = resolver.resolve (query);
-    socket_.async_connect (*endpoint_iterator, [this] (const std::error_code &error) { connect_handler (error); });
+    socket_.async_connect (*endpoint_iterator, [this](const std::error_code &error) { connect_handler (error); });
 }
 
 void TcpConnection::connect_handler (const std::error_code &error)
@@ -440,7 +440,7 @@ bool TcpAcceptor::start (TcpConnection::pointer conn)
         acceptor_.listen ();
         auto ptr = shared_from_this ();
         acceptor_.async_accept (socket,
-                                [this, apointer = std::move (ptr), connection = std::move (conn)] (
+                                [this, apointer = std::move (ptr), connection = std::move (conn)](
                                   const std::error_code &error) { handle_accept (apointer, connection, error); });
         return true;
     }
@@ -635,7 +635,7 @@ void TcpServer::initialConnect ()
             acc->set_option (tcp::acceptor::reuse_address (false));
         }
         acc->setAcceptCall (
-          [this] (TcpAcceptor::pointer accPtr, TcpConnection::pointer conn) { handle_accept (accPtr, conn); });
+          [this](TcpAcceptor::pointer accPtr, TcpConnection::pointer conn) { handle_accept (accPtr, conn); });
         acceptors.push_back (std::move (acc));
     }
     bool anyConnect = false;
@@ -803,7 +803,7 @@ TcpConnection::pointer TcpServer::findSocket (int connectorID) const
 {
     std::unique_lock<std::mutex> lock (accepting);
     auto ptr = std::find_if (connections.begin (), connections.end (),
-                             [connectorID] (const auto &conn) { return (conn->getIdentifier () == connectorID); });
+                             [connectorID](const auto &conn) { return (conn->getIdentifier () == connectorID); });
     if (ptr != connections.end ())
     {
         return *ptr;

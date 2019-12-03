@@ -250,8 +250,8 @@ struct is_iterable<T,
                    typename std::enable_if_t<
                      std::is_same<decltype (std::begin (T ()) != std::end (T ()),  // begin/end and operator != and
                                                                                    // has default constructor
-                                            void (),
-                                            void (*std::begin (T ())),  // dereference operator
+                                            void(),
+                                            void(*std::begin (T ())),  // dereference operator
                                             std::true_type{}),
                                   std::true_type>::value>>
 {

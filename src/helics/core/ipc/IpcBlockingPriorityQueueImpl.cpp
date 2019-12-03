@@ -25,7 +25,7 @@ bool dataBlock::push (const unsigned char *block, int blockSize) {}
 
 int dataBlock::next_data_size () const {}
 
-int dataBlock::pop(unsigned char *block) {}
+int dataBlock::pop (unsigned char *block) {}
 
 /** reverse the order in which the data will be extracted*/
 void dataBlock::reverse () {}
@@ -42,10 +42,9 @@ void IpcBlockingPriorityQueueImpl::clear ()
     scoped_lock<interprocess_mutex> pushLock (m_pushLock);  // second pushLock
     pullData.clear ();
     pushData.clear ();
-    //TODO add the priority block
+    // TODO add the priority block
     queueEmptyFlag = true;
 }
-
 
 /** push an element onto the queue
 val the value to push on the queue
@@ -56,7 +55,7 @@ void IpcBlockingPriorityQueueImpl::push (const unsigned char *data, size_t size)
     scoped_lock<interprocess_mutex> pushLock (m_pushLock);  // only one lock on this branch
     if (!pushData.empty ())
     {
-        pushData.push (data,size);
+        pushData.push (data, size);
     }
     else
     {
@@ -67,11 +66,11 @@ void IpcBlockingPriorityQueueImpl::push (const unsigned char *data, size_t size)
             conditionLock.unlock ();
             // release the push lock so we don't get a potential deadlock condition
             pushLock.unlock ();
-			//all locks released
-			//no lock the pulllock
-            scoped_lock<interprocess_mutex> pullLock (m_pullLock); 
-			conditionLock.lock ();
-            queueEmptyFlag = false; //reset the queueEmptyflag
+            // all locks released
+            // no lock the pulllock
+            scoped_lock<interprocess_mutex> pullLock (m_pullLock);
+            conditionLock.lock ();
+            queueEmptyFlag = false;  // reset the queueEmptyflag
             conditionLock.unlock ();
             if (pullData.empty ())
             {
@@ -351,7 +350,7 @@ because this is meant for multi-threaded applications this may or may not have a
 depending on the number of consumers
 */
 bool empty () const;
-};
+};  // namespace detail
 
 template <typename T>
 stx::optional<T> BlockingPriorityQueue<T>::try_pop ()
@@ -419,6 +418,6 @@ bool BlockingPriorityQueue<T>::empty () const
     return queueEmptyFlag;
 }
 
-}  // namespace detail
 }  // namespace ipc
+}  // namespace helics
 }  // namespace helics

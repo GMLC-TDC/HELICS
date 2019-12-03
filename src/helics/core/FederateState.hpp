@@ -102,7 +102,7 @@ class FederateState
     mutable std::atomic_flag processing = ATOMIC_FLAG_INIT;  //!< the federate is processing
   private:
     /** a logging function for logging or printing messages*/
-    std::function<void (int, const std::string &, const std::string &)>
+    std::function<void(int, const std::string &, const std::string &)>
       loggerFunction;  //!< callback for logging functions
     std::function<std::string (const std::string &)> queryCallback;  //!< a callback for additional queries
     /** find the next Value Event*/
@@ -326,7 +326,7 @@ class FederateState
     @details function must have signature void(int level, const std::string &sourceName, const std::string
     &message)
     */
-    void setLogger (std::function<void (int, const std::string &, const std::string &)> logFunction)
+    void setLogger (std::function<void(int, const std::string &, const std::string &)> logFunction)
     {
         loggerFunction = std::move (logFunction);
     }

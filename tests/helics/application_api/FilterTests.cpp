@@ -12,8 +12,8 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helics/application_api/MessageOperators.hpp"
 
 #ifndef HELICS_SHARED_LIBRARY
-#    include "testFixtures.hpp"
 #    include "helics/core/Broker.hpp"
+#    include "testFixtures.hpp"
 #else
 #    include "testFixtures_shared.hpp"
 #endif
@@ -39,7 +39,7 @@ TEST_P (filter_single_type_test, message_filter_registration)
     AddFederates<helics::MessageFederate> (GetParam (), 1, broker, helics::timeZero, "message");
     // broker->setLoggingLevel (3);
     broker.reset ();
-    
+
     auto fFed = GetFederateAs<helics::MessageFederate> (0);
     auto mFed = GetFederateAs<helics::MessageFederate> (1);
 

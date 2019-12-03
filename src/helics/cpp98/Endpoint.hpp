@@ -10,8 +10,8 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include "../shared_api_library/MessageFederate.h"
 #include "helicsExceptions.hpp"
-#include <vector>
 #include <string>
+#include <vector>
 
 namespace helicscpp
 {
@@ -19,11 +19,11 @@ class Endpoint
 {
   public:
     /** construct from a helics_endpoint object*/
-    explicit Endpoint (helics_endpoint hep) HELICS_NOTHROW: ep (hep) {}
+    explicit Endpoint (helics_endpoint hep) HELICS_NOTHROW : ep (hep) {}
     /** default constructor*/
-	Endpoint () HELICS_NOTHROW : ep (HELICS_NULL_POINTER){};
+    Endpoint () HELICS_NOTHROW : ep (HELICS_NULL_POINTER){};
     /** copy constructor*/
-    Endpoint (const Endpoint &endpoint) HELICS_NOTHROW: ep (endpoint.ep) {}
+    Endpoint (const Endpoint &endpoint) HELICS_NOTHROW : ep (endpoint.ep) {}
     /** copy assignment*/
     Endpoint &operator= (const Endpoint &endpoint)
     {
@@ -60,7 +60,8 @@ class Endpoint
     */
     void sendMessage (const char *data, size_t data_size)
     {
-        helicsEndpointSendMessageRaw (ep, HELICS_NULL_POINTER, data, static_cast<int> (data_size), hThrowOnError ());
+        helicsEndpointSendMessageRaw (ep, HELICS_NULL_POINTER, data, static_cast<int> (data_size),
+                                      hThrowOnError ());
     }
 
     /** send a data block and length
@@ -79,10 +80,11 @@ class Endpoint
    */
     void sendMessage (const char *data, size_t data_size, helics_time time)
     {
-        helicsEndpointSendEventRaw (ep, HELICS_NULL_POINTER, data, static_cast<int> (data_size), time, hThrowOnError ());
+        helicsEndpointSendEventRaw (ep, HELICS_NULL_POINTER, data, static_cast<int> (data_size), time,
+                                    hThrowOnError ());
     }
     /** send a data block and length
-	@param dest destination to send the message to
+    @param dest destination to send the message to
     @param data pointer to data location
     @param data_size the length of the data
     @param time the time to send the message
@@ -100,10 +102,10 @@ class Endpoint
                                       hThrowOnError ());
     }
 
-     /** send a string to a particular destination
-	 @param dest the target endpoint to send the data to
-     @param data the information to send
-   */
+    /** send a string to a particular destination
+    @param dest the target endpoint to send the data to
+    @param data the information to send
+  */
     void sendMessage (const std::string &dest, const std::string &data)
     {
         helicsEndpointSendMessageRaw (ep, dest.c_str (), data.c_str (), static_cast<int> (data.size ()),
@@ -111,7 +113,7 @@ class Endpoint
     }
     /** send a string at a particular time
      @param data the information to send
-	 @param time the time the message should be delivered
+     @param time the time the message should be delivered
    */
     void sendMessage (const std::string &data, helics_time time)
     {
@@ -167,8 +169,8 @@ class Endpoint
                                     hThrowOnError ());
     }
 
-	/** send a message object
-   */
+    /** send a message object
+     */
     void sendMessage (helics_message &message)
     {
         // returns helicsStatus
@@ -179,12 +181,13 @@ class Endpoint
     /** get the specified type of the endpoint*/
     std::string getType () { return helicsEndpointGetType (ep); }
 
-	 /** get the interface information field of the filter*/
+    /** get the interface information field of the filter*/
     const char *getInfo () const { return helicsEndpointGetInfo (ep); }
     /** set the interface information field of the filter*/
     void setInfo (const std::string &info) { helicsEndpointSetInfo (ep, info.c_str (), HELICS_IGNORE_ERROR); }
+
   private:
-    helics_endpoint ep; //!< the underlying helics_endpoint object
+    helics_endpoint ep;  //!< the underlying helics_endpoint object
 };
 }  // namespace helicscpp
 #endif

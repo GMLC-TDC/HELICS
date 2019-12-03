@@ -6,9 +6,8 @@ SPDX-License-Identifier: BSD-3-Clause
 */
 #pragma once
 
-
-#include "ActionMessage.hpp"
 #include "../common/AsioContextManager.h"
+#include "ActionMessage.hpp"
 #include <asio/steady_timer.hpp>
 #include <memory>
 #include <mutex>
@@ -21,7 +20,7 @@ class MessageTimer : public std::enable_shared_from_this<MessageTimer>
 {
   public:
     using time_type = decltype (std::chrono::steady_clock::now ());
-    explicit MessageTimer (std::function<void (ActionMessage &&)> sFunction);
+    explicit MessageTimer (std::function<void(ActionMessage &&)> sFunction);
     /** ad a timer and message to the queue
     @returns an index for referencing the timer in the future*/
     int32_t addTimerFromNow (std::chrono::nanoseconds time, ActionMessage mess);
@@ -51,7 +50,7 @@ class MessageTimer : public std::enable_shared_from_this<MessageTimer>
     std::mutex timerLock;  //!< lock protecting the timer buffers
     std::vector<ActionMessage> buffers;
     std::vector<time_type> expirationTimes;
-    const std::function<void (ActionMessage &&)> sendFunction;  //!< the callback to use when sending a message
+    const std::function<void(ActionMessage &&)> sendFunction;  //!< the callback to use when sending a message
     std::vector<std::shared_ptr<asio::steady_timer>> timers;
     std::shared_ptr<AsioContextManager> contextPtr;  //!< context manager to for handling real time operations
     decltype (contextPtr->startContextLoop ()) loopHandle;  //!< loop controller for async real time operations
