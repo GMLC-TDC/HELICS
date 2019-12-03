@@ -11,7 +11,12 @@ files_changed=$(git diff --staged --name-only)
 if [[ "$files_changed" != "" ]];
 then
   hash=$(sha256sum "${files_changed}" | sha256sum | cut -c 1-12 -)
-  current_branch="${GITHUB_REF#refs/heads/}"
+  if [[ "${GITHUB_REF}" == "refs/pull/"* ]];
+  then
+    current_branch="${GITHUB_HEAD_REF}"
+  else
+    current_branch="${GITHUB_REF#refs/heads/}"
+  fi
 
   # Set the git origin url for committing using a GITHUB_TOKEN
   git remote set-url origin "https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}"
