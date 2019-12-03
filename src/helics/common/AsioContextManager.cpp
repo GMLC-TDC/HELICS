@@ -160,7 +160,7 @@ AsioContextManager::LoopHandle AsioContextManager::startContextLoop ()
     if (running.compare_exchange_strong (exp, loop_mode::starting))
     {
         auto ptr = shared_from_this ();
-        std::packaged_task<void ()> contextTask ([ptr = std::move (ptr)] () { contextProcessingLoop (ptr); });
+        std::packaged_task<void()> contextTask ([ptr = std::move (ptr)]() { contextProcessingLoop (ptr); });
         //   std::cout << "run Context loop " << runCounter << "\n";
         std::unique_lock<std::mutex> nullLock (runningLoopLock);
 
@@ -186,8 +186,8 @@ AsioContextManager::LoopHandle AsioContextManager::startContextLoop ()
             if (running.compare_exchange_strong (exp, loop_mode::starting))
             {
                 auto ptr = shared_from_this ();
-                std::packaged_task<void ()> contextTask (
-                  [ptr = std::move (ptr)] () { contextProcessingLoop (ptr); });
+                std::packaged_task<void()> contextTask (
+                  [ptr = std::move (ptr)]() { contextProcessingLoop (ptr); });
                 nullLock.lock ();
                 nullwork = std::make_unique<asio::io_context::work> (getBaseContext ());
                 loopRet = contextTask.get_future ();

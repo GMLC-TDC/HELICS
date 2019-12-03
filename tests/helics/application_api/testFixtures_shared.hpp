@@ -7,9 +7,9 @@ SPDX-License-Identifier: BSD-3-Clause
 #pragma once
 
 #include "../coreTypeLists.hpp"
-#include "helics/application_api/Federate.hpp"
-#include "helics/application_api/CoreApp.hpp"
 #include "helics/application_api/BrokerApp.hpp"
+#include "helics/application_api/CoreApp.hpp"
+#include "helics/application_api/Federate.hpp"
 #include "helics/application_api/typeOperations.hpp"
 #include <iostream>
 #include <memory>
@@ -26,8 +26,7 @@ struct FederateTestFixture
     ~FederateTestFixture ();
 
     helics::BrokerApp AddBroker (const std::string &core_type_name, int count);
-    helics::BrokerApp 
-    AddBroker (const std::string &core_type_name, const std::string &initialization_string);
+    helics::BrokerApp AddBroker (const std::string &core_type_name, const std::string &initialization_string);
 
     template <class FedType>
     void SetupTest (const std::string &core_type_name,
@@ -40,7 +39,7 @@ struct FederateTestFixture
         if (!broker.isConnected ())
         {
             broker.forceTerminate ();
-            broker.reset();
+            broker.reset ();
             helics::cleanupHelicsLibrary ();
             broker = AddBroker (core_type_name, count);
             if (!broker.isConnected ())
@@ -167,8 +166,7 @@ struct FederateTestFixture
             for (int ii = 0; ii < count; ii += 2)
             {
                 helics::CoreApp core (core_type,
-                                      initString + " --federates " +
-                                                                      std::to_string ((ii < count - 1) ? 2 : 1));
+                                      initString + " --federates " + std::to_string ((ii < count - 1) ? 2 : 1));
                 fi.coreName = core.getIdentifier ();
 
                 auto fedname = name_prefix + std::to_string (ii + offset);

@@ -370,7 +370,7 @@ std::shared_ptr<Core> FindOrCreate (core_type type, const std::string &core_name
 
 /** lambda function to join cores before the destruction happens to avoid potential problematic calls in the
  * loops*/
-static auto destroyerCallFirst = [] (auto &core) {
+static auto destroyerCallFirst = [](auto &core) {
     core->processDisconnect (true);
     core->joinAllThreads ();
 };
@@ -465,7 +465,7 @@ static bool isJoinableCoreForType (core_type type, const std::shared_ptr<CommonC
 
 std::shared_ptr<Core> findJoinableCoreOfType (core_type type)
 {
-    return searchableObjects.findObject ([type] (auto &ptr) { return isJoinableCoreForType (type, ptr); });
+    return searchableObjects.findObject ([type](auto &ptr) { return isJoinableCoreForType (type, ptr); });
 }
 
 bool registerCore (const std::shared_ptr<Core> &core)
@@ -497,7 +497,7 @@ void unregisterCore (const std::string &name)
 {
     if (!searchableObjects.removeObject (name))
     {
-        searchableObjects.removeObject ([&name] (auto &obj) { return (obj->getIdentifier () == name); });
+        searchableObjects.removeObject ([&name](auto &obj) { return (obj->getIdentifier () == name); });
     }
 }
 

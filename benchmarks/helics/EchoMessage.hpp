@@ -9,7 +9,6 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helics/application_api/MessageFederate.hpp"
 #include "helics/core/ActionMessage.hpp"
 
-
 using helics::operator"" _t ;
 // static constexpr helics::Time tend = 3600.0_t;  // simulation end time
 /** class implementing the hub for an echo test*/
@@ -146,7 +145,7 @@ class EchoMessageLeaf
                 auto &nstring = m->data.to_string ();
                 if (nstring != txstring)
                 {
-                    throw( "incorrect string");
+                    throw ("incorrect string");
                 }
             }
         }

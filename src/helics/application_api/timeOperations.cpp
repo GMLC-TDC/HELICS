@@ -10,10 +10,15 @@ SPDX-License-Identifier: BSD-3-Clause
 
 namespace helics
 {
+time_units timeUnitsFromString (const std::string &unitString)
+{
+    return gmlc::utilities::timeUnitsFromString (unitString);
+}
 
-time_units timeUnitsFromString (const std::string &unitString) { return gmlc::utilities::timeUnitsFromString (unitString); }
-
-Time loadTimeFromString (const std::string &timeString) { return gmlc::utilities::loadTimeFromString<Time> (timeString); }
+Time loadTimeFromString (const std::string &timeString)
+{
+    return gmlc::utilities::loadTimeFromString<Time> (timeString);
+}
 
 Time loadTimeFromString (std::string timeString, time_units defUnits)
 {
@@ -21,5 +26,3 @@ Time loadTimeFromString (std::string timeString, time_units defUnits)
 }
 
 }  // namespace helics
-
-

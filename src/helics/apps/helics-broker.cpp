@@ -4,12 +4,12 @@ Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance
 the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
+#include "../application_api/BrokerApp.hpp"
 #include "../application_api/Federate.hpp"
 #include "../application_api/queryFunctions.hpp"
 #include "../core/Broker.hpp"
 #include "../core/core-exceptions.hpp"
 #include "../core/helicsCLI11.hpp"
-#include "../application_api/BrokerApp.hpp"
 #include "gmlc/utilities/stringOps.h"
 #include <iostream>
 #include <thread>

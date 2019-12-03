@@ -98,11 +98,11 @@ class HELICS_CXX_EXPORT CoreApp
     const std::string &getIdentifier () const;
     /** get the network address of the core*/
     const std::string &getAddress () const;
-	/** make a query at the core
-	@param target the target of the query "federation", "parent", "core","broker" or a specific named object
-	@param queryStr the query to make
-	@return a string containing the query results
-	*/
+    /** make a query at the core
+    @param target the target of the query "federation", "parent", "core","broker" or a specific named object
+    @param queryStr the query to make
+    @return a string containing the query results
+    */
     std::string query (const std::string &target, const std::string &queryStr);
     /** set a federation global value
     @details this overwrites any previous value for this name

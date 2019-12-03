@@ -201,7 +201,6 @@ const char *helicsEndpointGetDefaultDestination (helics_endpoint endpoint)
     }
     auto &str = endObj->endPtr->getDefaultDestination ();
     return str.c_str ();
-    
 }
 
 void helicsEndpointSendMessageRaw (helics_endpoint endpoint, const char *dest, const void *data, int inputDataLength, helics_error *err)
@@ -792,8 +791,8 @@ helics_bool helicsMessageCheckFlag (helics_message_object message, int flag)
     {
         return helics_false;
     }
-	//bits in a uint16
-    if (flag >=static_cast<int>(sizeof(uint16_t)*8) || flag < 0)
+    // bits in a uint16
+    if (flag >= static_cast<int> (sizeof (uint16_t) * 8) || flag < 0)
     {
         return helics_false;
     }
@@ -941,7 +940,7 @@ void helicsMessageSetTime (helics_message_object message, helics_time time, heli
         }
         return;
     }
-   auto mess = reinterpret_cast<helics::Message *> (message);
+    auto mess = reinterpret_cast<helics::Message *> (message);
     mess->time = time;
 }
 

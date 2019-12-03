@@ -26,11 +26,11 @@ BOOST_FIXTURE_TEST_SUITE (federate_realtime_tests, FederateTestFixture)
 
 BOOST_AUTO_TEST_CASE (federate_delay_tests)
 {
-    auto broker = AddBroker("test", 1);
+    auto broker = AddBroker ("test", 1);
     helics::FederateInfo fi ("test1");
     fi.coreType = CORE_TYPE_TO_TEST;
     fi.coreName = "cdelay";
-    fi.coreInitString = std::string("1 --broker=")+broker->getIdentifier();
+    fi.coreInitString = std::string ("1 --broker=") + broker->getIdentifier ();
     fi.realtime = true;
     fi.rt_lead = 0.1;
     fi.period = 0.5;
@@ -62,16 +62,16 @@ BOOST_AUTO_TEST_CASE (federate_delay_tests)
     }
     BOOST_CHECK_LT (outofTimeBounds, 3);
     fed->finalize ();
-    broker->disconnect();
+    broker->disconnect ();
 }
 
 BOOST_AUTO_TEST_CASE (federate_trigger_tests_adelay)
 {
-    auto broker = AddBroker("test", 1);
+    auto broker = AddBroker ("test", 1);
     helics::FederateInfo fi ("test1");
     fi.coreType = CORE_TYPE_TO_TEST;
     fi.coreName = "adelay";
-    fi.coreInitString = std::string("2 --broker=") + broker->getIdentifier();
+    fi.coreInitString = std::string ("2 --broker=") + broker->getIdentifier ();
     fi.realtime = true;
     fi.rt_lag = 0.1;
     fi.rt_lead = 0.1;
@@ -116,16 +116,16 @@ BOOST_AUTO_TEST_CASE (federate_trigger_tests_adelay)
     BOOST_CHECK_EQUAL (warnCounter, 8);
     fed2->finalize ();
     fed->finalize ();
-    broker->disconnect();
+    broker->disconnect ();
 }
 
 BOOST_AUTO_TEST_CASE (federate_trigger_tests)
 {
-    auto broker = AddBroker("test", 1);
+    auto broker = AddBroker ("test", 1);
     helics::FederateInfo fi ("test1");
     fi.coreType = CORE_TYPE_TO_TEST;
     fi.coreName = "ctrig";
-    fi.coreInitString = std::string("2 --broker=") + broker->getIdentifier();
+    fi.coreInitString = std::string ("2 --broker=") + broker->getIdentifier ();
     fi.realtime = true;
     fi.rt_lag = 0.1;
     fi.rt_lead = 0.1;
@@ -179,6 +179,6 @@ BOOST_AUTO_TEST_CASE (federate_trigger_tests)
     BOOST_CHECK_LT (outofTimeBounds, 3);
     fed2->finalize ();
     fed->finalize ();
-    broker->disconnect();
+    broker->disconnect ();
 }
 BOOST_AUTO_TEST_SUITE_END ()

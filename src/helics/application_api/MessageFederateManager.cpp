@@ -235,8 +235,8 @@ std::string MessageFederateManager::localQuery (const std::string &queryStr) con
     if (queryStr == "endpoints")
     {
         ret = generateStringVector_if (
-          local_endpoints.lock_shared (), [] (const auto &info) { return info.actualName; },
-          [] (const auto &info) { return (!info.actualName.empty ()); });
+          local_endpoints.lock_shared (), [](const auto &info) { return info.actualName; },
+          [](const auto &info) { return (!info.actualName.empty ()); });
     }
     return ret;
 }
@@ -297,14 +297,14 @@ void MessageFederateManager::addDestinationFilter (const Endpoint &ept, const st
 }
 
 void MessageFederateManager::setEndpointNotificationCallback (
-  const std::function<void (Endpoint &, Time)> &callback)
+  const std::function<void(Endpoint &, Time)> &callback)
 {
     allCallback.store (callback);
 }
 
 void MessageFederateManager::setEndpointNotificationCallback (
   const Endpoint &ept,
-  const std::function<void (Endpoint &, Time)> &callback)
+  const std::function<void(Endpoint &, Time)> &callback)
 {
     if (ept.dataReference != nullptr)
     {

@@ -4,8 +4,8 @@ Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance
 the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
-#include "helics/application_api/CombinationFederate.hpp"
 #include "helics/application_api/BrokerApp.hpp"
+#include "helics/application_api/CombinationFederate.hpp"
 #include "helics/core/helicsCLI11.hpp"
 #include "helics/core/helics_definitions.hpp"
 #include <iostream>
@@ -23,7 +23,7 @@ int main (int argc, char *argv[])
 
     app.add_option_function<std::string> (
       "--target,-t",
-      [&vtarget, &mtarget] (const std::string &name) {
+      [&vtarget, &mtarget](const std::string &name) {
           vtarget = name;
           mtarget = name;
       },

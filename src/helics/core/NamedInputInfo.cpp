@@ -52,8 +52,7 @@ std::shared_ptr<const data_block> NamedInputInfo::getData ()
     return nullptr;
 }
 
-static auto recordComparison = [] (const NamedInputInfo::dataRecord &rec1,
-                                   const NamedInputInfo::dataRecord &rec2) {
+static auto recordComparison = [](const NamedInputInfo::dataRecord &rec1, const NamedInputInfo::dataRecord &rec2) {
     return (rec1.time < rec2.time) ? true : ((rec1.time == rec2.time) ? (rec1.iteration < rec2.iteration) : false);
 };
 
