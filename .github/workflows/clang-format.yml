@@ -4,6 +4,7 @@ on:
 #  issue_comment:
 #    types: [created]
   pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
   push:
     paths:
       - '.github/workflows/clang-format.yml'
@@ -19,6 +20,7 @@ on:
 
 jobs:
   build:
+    if: github.event.pull_request.draft != true
 #    if: github.event_name != 'issue_comment' || contains(github.event.comment.body, '/format')
     runs-on: ubuntu-latest
     container:
@@ -31,7 +33,14 @@ jobs:
 #        github-token: ${{secrets.GITHUB_TOKEN}}
 #        script: |
 #          github.issues.createComment({...context.issue, body: 'Okay, commit https://github.com/${{ github.repository }}/commit/${{ github.sha }} is being formatted. A PR with the changes will be open soon! :sunglasses:'})
-    - uses: actions/checkout@v1
+    - name: Checkout event Ref
+      uses: actions/checkout@v1
+      if: github.event_name != 'pull_request'
+    - name: Checkout PR Head Ref
+      uses: actions/checkout@v1
+      if: github.event_name == 'pull_request'
+      with:
+        ref: ${{ github.head_ref }}
     - name: Run clang-format
       run: |
         clang-format --version
@@ -47,7 +56,8 @@ jobs:
         fi
         exit 0
         
-    - uses: ./.github/actions/create-file-update-pr
+    - name: Create a file update PR with hash
+      uses: ./.github/actions/create-file-update-pr
       if: github.event_name == 'push'
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -59,7 +69,8 @@ jobs:
         GIT_NAME: "HELICS-bot"
         BRANCH_PREFIX: "clang-format/"
         
-    - uses: ./.github/actions/create-file-update-pr
+    - name: Create/update a file update PR with no hash
+      uses: ./.github/actions/create-file-update-pr
       if: github.event_name == 'pull_request'
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
