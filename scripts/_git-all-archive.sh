@@ -47,7 +47,7 @@ shift $((OPTIND - 1))
 echo "> creating root archive"
 export ROOT_ARCHIVE_DIR="$(pwd)"
 
-git checkout $tag
+git checkout "$tag"
 git submodule update --init
 OUTPUT_BASENAME="Helics-${release}-source"
 export OUTPUT_FILE="${OUTPUT_BASENAME}.tar.gz"
@@ -64,7 +64,7 @@ if (( $(ls repo-output-sub*.tar | wc -l) != 0  )); then
   echo
   echo "> combining all tars"
   for archivetar in $(ls repo-output-sub*.tar); do
-    echo $archivetar
+    echo "$archivetar"
     tar --concatenate --file="${OUTPUT_BASENAME}.tar" "$archivetar"
   done
 

@@ -59,7 +59,7 @@ pip install pygithub
 echo "> creating root archive"
 export ROOT_ARCHIVE_DIR="$(pwd)"
 
-git checkout $tag
+git checkout "$tag"
 git submodule update --init
 export OUTPUT_FILE="HELICS-${tag}.tar.gz"
 # create root archive
@@ -85,7 +85,7 @@ echo "> gzipping final tar"
 gzip --force --verbose repo-output.tar
 
 echo "> moving output file to $OUTPUT_FILE"
-mv repo-output.tar.gz $OUTPUT_FILE
+mv repo-output.tar.gz "$OUTPUT_FILE"
 
 cmd="python git-all-archive.py --repo $repo --release $release --version $tag"
 if [ "${GITHUB_TOKEN}a" != "a" ]; then
