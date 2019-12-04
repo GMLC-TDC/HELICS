@@ -66,7 +66,7 @@ else
     export CTEST_OUTPUT_ON_FAILURE=true
 
     if [[ "$TEST_CONFIG_GIVEN" == "true" ]]; then
-        test_label=$(tr '[:upper:]' '[:lower:]' <<< $TEST_CONFIG)
+        test_label=$(tr '[:upper:]' '[:lower:]' <<< "$TEST_CONFIG")
         case "${test_label}" in
 	    # Recognize aliases/case-insensitive versions of some values for TEST_CONFIG
             *daily*)
@@ -113,10 +113,10 @@ else
     if [[ "$DISABLE_UNIT_TESTS" != "true" ]]; then
 	if [[ -n "${TEST_CONFIG}" ]]; then
         	echo "Running ${TEST_CONFIG} tests"
-        	ctest -L ${TEST_CONFIG} ${CTEST_OPTIONS}
+        	ctest -L ${TEST_CONFIG} "${CTEST_OPTIONS}"
 	else
 		echo "Running all tests"
-		ctest ${CTEST_OPTIONS}
+		ctest "${CTEST_OPTIONS}"
 	fi
     fi
 fi

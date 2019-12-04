@@ -1,6 +1,6 @@
 #!/bin/bash
 
-BUILD_MESSAGE="Test ${TRAVIS_REPO_SLUG} ${TRAVIS_COMMIT_RANGE}"
+#BUILD_MESSAGE="Test ${TRAVIS_REPO_SLUG} ${TRAVIS_COMMIT_RANGE}"
 
 # Trigger HELICS-FMI build
 #body='{
@@ -33,14 +33,14 @@ trigger_azure_build () {
     "reason": "individualCI",
     "sourceBranch": "refs/heads/'${TRAVIS_BRANCH}'"
     }'
-    
+
     curl -s -X POST \
          -H "Content-Type: application/json" \
          -H "Accept: application/json" \
          -H "Authorization: Basic ${HELICSBOT_AZURE_TOKEN}" \
          -d "$body" \
-         https://dev.azure.com/${azure_slug}/_apis/build/builds?api-version=4.1
-    
+         "https://dev.azure.com/${azure_slug}/_apis/build/builds?api-version=4.1"
+
     echo "===Triggering Azure build==="
     echo "Slug: $azure_slug"
     echo "Definition ID: $def_id"
