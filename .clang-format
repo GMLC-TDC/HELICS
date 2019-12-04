@@ -14,7 +14,7 @@ AllowShortBlocksOnASingleLine: 'false'
 AllowShortCaseLabelsOnASingleLine: 'false'
 AllowShortFunctionsOnASingleLine: 'true'
 AllowShortIfStatementsOnASingleLine: 'true'
-AllowShortLambdasOnASingleLine: 'true'
+#AllowShortLambdasOnASingleLine: 'true'
 AllowShortLoopsOnASingleLine: 'false'
 AlwaysBreakAfterDefinitionReturnType: None
 AlwaysBreakAfterReturnType: None
