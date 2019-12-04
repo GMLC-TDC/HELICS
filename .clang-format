@@ -7,7 +7,7 @@ AlignConsecutiveMacros: 'true'
 AlignEscapedNewlines: Right
 AlignOperands: 'false'
 AlignTrailingComments: 'false'
-AllowAllArgumentsOnNextLine: 'false'
+#AllowAllArgumentsOnNextLine: 'false'
 AllowAllConstructorInitializersOnNextLine: 'false'
 AllowAllParametersOfDeclarationOnNextLine: 'false'
 AllowShortBlocksOnASingleLine: 'false'
