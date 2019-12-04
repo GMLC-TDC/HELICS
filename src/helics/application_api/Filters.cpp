@@ -6,8 +6,8 @@ SPDX-License-Identifier: BSD-3-Clause
 */
 
 #include "Filters.hpp"
-#include "FilterOperations.hpp"
 #include "CoreApp.hpp"
+#include "FilterOperations.hpp"
 
 #include <algorithm>
 #include <map>
@@ -145,7 +145,7 @@ void Filter::setFilterOperations (std::shared_ptr<FilterOperations> filterOps)
     filtOp = std::move (filterOps);
     if (corePtr != nullptr)
     {
-         corePtr->setFilterOperator (handle, (filtOp)?filtOp->getOperator ():nullptr);
+        corePtr->setFilterOperator (handle, (filtOp) ? filtOp->getOperator () : nullptr);
     }
 }
 

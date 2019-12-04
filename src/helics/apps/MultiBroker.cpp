@@ -11,21 +11,21 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <mutex>
 #include <thread>
 #ifdef ENABLE_UDP_CORE
-#include "../core/udp/UdpComms.h"
+#    include "../core/udp/UdpComms.h"
 #endif
 #ifdef ENABLE_TCP_CORE
-#include "../core/tcp/TcpComms.h"
-#include "../core/tcp/TcpCommsSS.h"
+#    include "../core/tcp/TcpComms.h"
+#    include "../core/tcp/TcpCommsSS.h"
 #endif
 #ifdef ENABLE_ZMQ_CORE
-#include "../core/zmq/ZmqComms.h"
-#include "../core/zmq/ZmqCommsSS.h"
+#    include "../core/zmq/ZmqComms.h"
+#    include "../core/zmq/ZmqCommsSS.h"
 #endif
 #ifdef ENABLE_MPI_CORE
-#include "../core/mpi/MpiComms.h"
+#    include "../core/mpi/MpiComms.h"
 #endif
 #ifdef ENABLE_IPC_CORE
-#include "../core/ipc/IpcComms.h"
+#    include "../core/ipc/IpcComms.h"
 #endif
 #include "../core/NetworkBrokerData.hpp"
 #include "../core/helicsCLI11.hpp"
@@ -48,7 +48,7 @@ static void loadTypeSpecificArgs (helics::core_type ctype, CommsInterface *comm,
         auto cm = dynamic_cast<tcp::TcpCommsSS *> (comm);
         helicsCLI11App tsparse;
         tsparse.add_option_function<std::vector<std::string>> (
-          "--connections", [cm] (const std::vector<std::string> &conns) { cm->addConnections (conns); },
+          "--connections", [cm](const std::vector<std::string> &conns) { cm->addConnections (conns); },
           "target link connections");
         tsparse.allow_extras ();
         tsparse.helics_parse (std::move (args));
@@ -114,10 +114,10 @@ generateComms (const std::string &type, const std::string &initString = std::str
 #endif
     case core_type::HTTP:
     case core_type::TEST:
-	case core_type::INPROC:
+    case core_type::INPROC:
     case core_type::NNG:
     case core_type::UNRECOGNIZED:
-	case core_type::WEBSOCKET:
+    case core_type::WEBSOCKET:
         break;
     }
     if (comm)
@@ -136,7 +136,7 @@ MultiBroker::MultiBroker (const std::string & /*configFile*/) { loadComms (); }
 void MultiBroker::loadComms ()
 {
     masterComm = generateComms ("def");
-    masterComm->setCallback ([this] (ActionMessage &&M) { BrokerBase::addActionMessage (std::move (M)); });
+    masterComm->setCallback ([this](ActionMessage &&M) { BrokerBase::addActionMessage (std::move (M)); });
 }
 
 MultiBroker::~MultiBroker ()

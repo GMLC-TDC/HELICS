@@ -36,7 +36,7 @@ struct FederateTestFixture_cpp
             broker->disconnect ();
             broker = nullptr;
             helicsCleanupLibrary ();
-            broker = AddBroker (core_type_name, count); 
+            broker = AddBroker (core_type_name, count);
             if (!broker->isConnected ())
             {
                 throw (std::runtime_error ("Unable to connect rootbroker"));
@@ -47,10 +47,10 @@ struct FederateTestFixture_cpp
 
     template <class FedType>
     void AddFederates (std::string core_type_name,
-                                                                    int count,
-                                                                    helicscpp::Broker &broker,
-                                                                    helics_time time_delta = helics_time_zero,
-                                                                    const std::string &name_prefix = "fed")
+                       int count,
+                       helicscpp::Broker &broker,
+                       helics_time time_delta = helics_time_zero,
+                       const std::string &name_prefix = "fed")
     {
         bool hasIndex = hasIndexCode (core_type_name);
         int setup = (hasIndex) ? getIndexCode (core_type_name) : 1;

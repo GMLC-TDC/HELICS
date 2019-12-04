@@ -32,7 +32,7 @@ TEST_F (update_tests, test_single_update)
 
     sub.setDefault (3.1);
     double testValue = 4.79;
-    auto f1finish = std::async (std::launch::async, [&] () { fedA->enterExecutingMode (); });
+    auto f1finish = std::async (std::launch::async, [&]() { fedA->enterExecutingMode (); });
     fedB->enterExecutingMode ();
     f1finish.wait ();
     // publish string1 at time=0.0;
@@ -43,7 +43,7 @@ TEST_F (update_tests, test_single_update)
 
     EXPECT_EQ (val, 3.1);
 
-    auto f1time = std::async (std::launch::async, [&] () { return fedA->requestTime (1.0); });
+    auto f1time = std::async (std::launch::async, [&]() { return fedA->requestTime (1.0); });
     auto gtime = fedB->requestTime (1.0);
 
     EXPECT_EQ (gtime, 1.0);
@@ -81,7 +81,7 @@ TEST_F (update_tests, test_single_update_string)
     sub.setDefault (3.1);
     double testValue = 4.79;
     double testValue2 = 9.34;
-    auto f1finish = std::async (std::launch::async, [&] () { fedA->enterExecutingMode (); });
+    auto f1finish = std::async (std::launch::async, [&]() { fedA->enterExecutingMode (); });
     fedB->enterExecutingMode ();
     f1finish.wait ();
     // publish string1 at time=0.0;
@@ -92,7 +92,7 @@ TEST_F (update_tests, test_single_update_string)
 
     EXPECT_EQ (val, "3.100000");
 
-    auto f1time = std::async (std::launch::async, [&] () { return fedA->requestTime (1.0); });
+    auto f1time = std::async (std::launch::async, [&]() { return fedA->requestTime (1.0); });
     auto gtime = fedB->requestTime (1.0);
 
     EXPECT_EQ (gtime, 1.0);
@@ -107,7 +107,7 @@ TEST_F (update_tests, test_single_update_string)
     EXPECT_TRUE (!sub.isUpdated ());
     pub.publish (testValue2);
 
-    f1time = std::async (std::launch::async, [&] () { return fedA->requestTime (2.0); });
+    f1time = std::async (std::launch::async, [&]() { return fedA->requestTime (2.0); });
     gtime = fedB->requestTime (2.0);
     EXPECT_EQ (f1time.get (), 2.0);
     EXPECT_TRUE (sub.isUpdated ());
@@ -146,7 +146,7 @@ TEST_F (update_tests, test_single_update_vector)
     sub.setDefault (3.1);
     double testValue = 4.79;
     double testValue2 = 9.34;
-    auto f1finish = std::async (std::launch::async, [&] () { fedA->enterExecutingMode (); });
+    auto f1finish = std::async (std::launch::async, [&]() { fedA->enterExecutingMode (); });
     fedB->enterExecutingMode ();
     f1finish.wait ();
     // publish string1 at time=0.0;
@@ -157,7 +157,7 @@ TEST_F (update_tests, test_single_update_vector)
 
     EXPECT_EQ (val, "3.100000");
 
-    auto f1time = std::async (std::launch::async, [&] () { return fedA->requestTime (1.0); });
+    auto f1time = std::async (std::launch::async, [&]() { return fedA->requestTime (1.0); });
     auto gtime = fedB->requestTime (1.0);
 
     EXPECT_EQ (gtime, 1.0);
@@ -172,7 +172,7 @@ TEST_F (update_tests, test_single_update_vector)
     EXPECT_TRUE (!sub.isUpdated ());
     pub.publish (testValue2);
 
-    f1time = std::async (std::launch::async, [&] () { return fedA->requestTime (2.0); });
+    f1time = std::async (std::launch::async, [&]() { return fedA->requestTime (2.0); });
     gtime = fedB->requestTime (2.0);
     EXPECT_EQ (f1time.get (), 2.0);
     EXPECT_TRUE (sub.isUpdated ());
@@ -211,7 +211,7 @@ TEST_F (update_tests, test_single_update_vector_char_ptr)
     sub.setDefault (3.1);
     double testValue = 4.79;
     double testValue2 = 9.34;
-    auto f1finish = std::async (std::launch::async, [&] () { fedA->enterExecutingMode (); });
+    auto f1finish = std::async (std::launch::async, [&]() { fedA->enterExecutingMode (); });
     fedB->enterExecutingMode ();
     f1finish.wait ();
     // publish string1 at time=0.0;
@@ -222,7 +222,7 @@ TEST_F (update_tests, test_single_update_vector_char_ptr)
 
     EXPECT_EQ (std::string (val.data ()), "3.100000");
 
-    auto f1time = std::async (std::launch::async, [&] () { return fedA->requestTime (1.0); });
+    auto f1time = std::async (std::launch::async, [&]() { return fedA->requestTime (1.0); });
     auto gtime = fedB->requestTime (1.0);
 
     EXPECT_EQ (gtime, 1.0);
@@ -237,7 +237,7 @@ TEST_F (update_tests, test_single_update_vector_char_ptr)
     EXPECT_TRUE (!sub.isUpdated ());
     pub.publish (testValue2);
 
-    f1time = std::async (std::launch::async, [&] () { return fedA->requestTime (2.0); });
+    f1time = std::async (std::launch::async, [&]() { return fedA->requestTime (2.0); });
     gtime = fedB->requestTime (2.0);
     EXPECT_EQ (f1time.get (), 2.0);
     EXPECT_TRUE (sub.isUpdated ());
@@ -276,7 +276,7 @@ TEST_F (update_tests, test_single_update_vector_ptr)
     sub.setDefault (3.1);
     double testValue = 4.79;
     double testValue2 = 9.34;
-    auto f1finish = std::async (std::launch::async, [&] () { fedA->enterExecutingMode (); });
+    auto f1finish = std::async (std::launch::async, [&]() { fedA->enterExecutingMode (); });
     fedB->enterExecutingMode ();
     f1finish.wait ();
     // publish string1 at time=0.0;
@@ -287,7 +287,7 @@ TEST_F (update_tests, test_single_update_vector_ptr)
 
     EXPECT_EQ (val[0], 3.100000);
 
-    auto f1time = std::async (std::launch::async, [&] () { return fedA->requestTime (1.0); });
+    auto f1time = std::async (std::launch::async, [&]() { return fedA->requestTime (1.0); });
     auto gtime = fedB->requestTime (1.0);
 
     EXPECT_EQ (gtime, 1.0);
@@ -302,7 +302,7 @@ TEST_F (update_tests, test_single_update_vector_ptr)
     EXPECT_TRUE (!sub.isUpdated ());
     pub.publish (testValue2);
 
-    f1time = std::async (std::launch::async, [&] () { return fedA->requestTime (2.0); });
+    f1time = std::async (std::launch::async, [&]() { return fedA->requestTime (2.0); });
     gtime = fedB->requestTime (2.0);
     EXPECT_EQ (f1time.get (), 2.0);
     EXPECT_TRUE (sub.isUpdated ());

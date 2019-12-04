@@ -81,7 +81,7 @@ TEST_F (federate_realtime_tests, federate_trigger_tests_adelay_ci_skip)
     auto fed2 = std::make_shared<helics::ValueFederate> ("test2", fi);
     helics::Publication pubid (helics::GLOBAL, fed2, "pub1", helics::data_type::helics_double);
     std::atomic<int> warnCounter{0};
-    fed->setLoggingCallback ([&warnCounter] (int logLevel, const std::string &, const std::string &) {
+    fed->setLoggingCallback ([&warnCounter](int logLevel, const std::string &, const std::string &) {
         if (logLevel == 1)
         {
             ++warnCounter;

@@ -97,13 +97,13 @@ int ZmqRequestSets::checkForMessages (std::chrono::milliseconds timeout)
         }
     }
     auto res = std::remove_if (active_routes.begin (), active_routes.end (),
-                               [] (const auto &ar) { return (ar.events == 0); });
+                               [](const auto &ar) { return (ar.events == 0); });
     if (res != active_routes.end ())
     {
         active_routes.erase (res, active_routes.end ());
     }
     auto res2 = std::remove_if (active_messages.begin (), active_messages.end (),
-                                [] (const auto &am) { return (!am.waiting); });
+                                [](const auto &am) { return (!am.waiting); });
     if (res2 != active_messages.end ())
     {
         active_messages.erase (res2, active_messages.end ());
@@ -133,7 +133,7 @@ void ZmqRequestSets::SendDelayedMessages ()
     if (still_waiting)
     {
         auto rem = std::remove_if (waiting_messages.begin (), waiting_messages.end (),
-                                   [] (const auto &wm) { return (wm.first == 0); });
+                                   [](const auto &wm) { return (wm.first == 0); });
         if (rem != waiting_messages.end ())
         {
             waiting_messages.erase (rem, waiting_messages.end ());

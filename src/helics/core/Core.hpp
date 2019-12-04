@@ -628,7 +628,7 @@ class Core
     */
     virtual void
     setLoggingCallback (local_federate_id federateID,
-                        std::function<void (int, const std::string &, const std::string &)> logFunction) = 0;
+                        std::function<void(int, const std::string &, const std::string &)> logFunction) = 0;
 
     /** set the core logging level*/
     virtual void setLoggingLevel (int logLevel) = 0;

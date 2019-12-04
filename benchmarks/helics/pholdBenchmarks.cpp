@@ -47,13 +47,13 @@ static void BM_phold_singleCore (benchmark::State &state)
         std::vector<std::thread> threadlist (static_cast<size_t> (fed_count - 1));
         for (int ii = 0; ii < fed_count - 1; ++ii)
         {
-            threadlist[ii] = std::thread ([&] (PholdFederate &f) { f.run ([&brr] () { brr.wait (); }); },
-                                          std::ref (feds[ii + 1]));
+            threadlist[ii] =
+              std::thread ([&](PholdFederate &f) { f.run ([&brr]() { brr.wait (); }); }, std::ref (feds[ii + 1]));
         }
         feds[0].makeReady ();
         brr.wait ();
         state.ResumeTiming ();
-        feds[0].run ([] () {});
+        feds[0].run ([]() {});
         state.PauseTiming ();
         for (auto &thrd : threadlist)
         {
@@ -112,13 +112,13 @@ static void BM_phold_multiCore (benchmark::State &state, core_type cType)
         std::vector<std::thread> threadlist (static_cast<size_t> (fed_count - 1));
         for (int ii = 0; ii < fed_count - 1; ++ii)
         {
-            threadlist[ii] = std::thread ([&] (PholdFederate &f) { f.run ([&brr] () { brr.wait (); }); },
-                                          std::ref (feds[ii + 1]));
+            threadlist[ii] =
+              std::thread ([&](PholdFederate &f) { f.run ([&brr]() { brr.wait (); }); }, std::ref (feds[ii + 1]));
         }
         feds[0].makeReady ();
         brr.wait ();
         state.ResumeTiming ();
-        feds[0].run ([] () {});
+        feds[0].run ([]() {});
         state.PauseTiming ();
         for (auto &thrd : threadlist)
         {

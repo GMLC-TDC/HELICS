@@ -9,74 +9,75 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helics/helics-config.h"
 
 #ifdef ENABLE_ZMQ_CORE
-#define ZMQTEST "zmq",
-#define ZMQTEST2 "zmq_2",
-#define ZMQTEST3 "zmq_3",
-#define ZMQTEST4 "zmq_4",
+#    define ZMQTEST "zmq",
+#    define ZMQTEST2 "zmq_2",
+#    define ZMQTEST3 "zmq_3",
+#    define ZMQTEST4 "zmq_4",
 
-#define ZMQSSTEST "zmq_ss",
-#define ZMQSSTEST2 "zmq_ss_2",
+#    define ZMQSSTEST "zmq_ss",
+#    define ZMQSSTEST2 "zmq_ss_2",
 #else
-#define ZMQTEST
-#define ZMQTEST2
-#define ZMQTEST3
-#define ZMQTEST4
+#    define ZMQTEST
+#    define ZMQTEST2
+#    define ZMQTEST3
+#    define ZMQTEST4
 
-#define ZMQSSTEST
-#define ZMQSSTEST2
+#    define ZMQSSTEST
+#    define ZMQSSTEST2
 #endif
 
 #ifdef ENABLE_TCP_CORE
-#define TCPTEST "tcp",
-#define TCPTEST2 "tcp_2",
-#define TCPTEST3 "tcp_3",
-#define TCPTEST4 "tcp_4",
+#    define TCPTEST "tcp",
+#    define TCPTEST2 "tcp_2",
+#    define TCPTEST3 "tcp_3",
+#    define TCPTEST4 "tcp_4",
 
-#define TCPSSTEST "tcpss",
-#define TCPSSTEST2 "tcpss_2",
+#    define TCPSSTEST "tcpss",
+#    define TCPSSTEST2 "tcpss_2",
 #else
-#define TCPTEST
-#define TCPTEST2
-#define TCPTEST3
-#define TCPTEST4
+#    define TCPTEST
+#    define TCPTEST2
+#    define TCPTEST3
+#    define TCPTEST4
 
-#define TCPSSTEST
-#define TCPSSTEST2
+#    define TCPSSTEST
+#    define TCPSSTEST2
 #endif
 
 #ifdef ENABLE_IPC_CORE
-#define IPCTEST "ipc",
-#define IPCTEST2 "ipc_2",
+#    define IPCTEST "ipc",
+#    define IPCTEST2 "ipc_2",
 
 #else
-#define IPCTEST
-#define IPCTEST2
+#    define IPCTEST
+#    define IPCTEST2
 #endif
 
 #ifdef ENABLE_UDP_CORE
-#define UDPTEST "udp",
-#define UDPTEST2 "udp_2",
-#define UDPTEST3 "udp_3",
-#define UDPTEST4 "udp_4",
+#    define UDPTEST "udp",
+#    define UDPTEST2 "udp_2",
+#    define UDPTEST3 "udp_3",
+#    define UDPTEST4 "udp_4",
 
 #else
-#define UDPTEST
-#define UDPTEST2
-#define UDPTEST3
-#define UDPTEST4
+#    define UDPTEST
+#    define UDPTEST2
+#    define UDPTEST3
+#    define UDPTEST4
 
 #endif
 
 #ifdef ENABLE_INPROC_CORE
-#define INPROCTEST "inproc",
-#define INPROCTEST2 "inproc_2",
-#define INPROCTEST3 "inproc_3",
-#define INPROCTEST4 "inproc_4",
-#else //if the INPROC core is turned off then just use the test core since it is required to be available for tests
-#define INPROCTEST "test"
-#define INPROCTEST2 "test_2"
-#define INPROCTEST3 "test_3"
-#define INPROCTEST4 "test_4"
+#    define INPROCTEST "inproc",
+#    define INPROCTEST2 "inproc_2",
+#    define INPROCTEST3 "inproc_3",
+#    define INPROCTEST4 "inproc_4",
+#else  // if the INPROC core is turned off then just use the test core since it is required to be available for
+       // tests
+#    define INPROCTEST "test"
+#    define INPROCTEST2 "test_2"
+#    define INPROCTEST3 "test_3"
+#    define INPROCTEST4 "test_4"
 #endif
 
 #ifdef ENABLE_ZMQ_CORE

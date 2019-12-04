@@ -11,6 +11,6 @@ SPDX-License-Identifier: BSD-3-Clause
 int main (int argc, char *argv[])
 {
     volatile helics::FederateInfo fi;
-	helics::BrokerApp("--version");
+    helics::BrokerApp ("--version");
     return 0;
 }

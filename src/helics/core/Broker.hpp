@@ -72,8 +72,8 @@ class Broker
     std::string &message) the function takes a level indicating the logging level string with the source name and a
     string with the message
     */
-    virtual void setLoggingCallback (
-      const std::function<void (int, const std::string &, const std::string &)> &logFunction) = 0;
+    virtual void
+    setLoggingCallback (const std::function<void(int, const std::string &, const std::string &)> &logFunction) = 0;
 
     /** set the broker logging file*/
     virtual void setLogFile (const std::string &lfile) = 0;
