@@ -207,8 +207,6 @@ BENCHMARK_CAPTURE (BM_sendMessage, singleCore, core_type::INPROC, true)
   ->UseRealTime ();
 
 // Register multi core benchmarks
-
-static constexpr int64_t maxscale{1 << 5};
 // Register the inproc core benchmarks
 BENCHMARK_CAPTURE (BM_sendMessage, inprocMultiCore, core_type::INPROC)
   //->RangeMultiplier (2)

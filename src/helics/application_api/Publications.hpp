@@ -21,18 +21,18 @@ namespace helics
 class HELICS_CXX_EXPORT Publication
 {
   protected:
-    ValueFederate *fed = nullptr;  //!< the federate construct to interact with
+	  ValueFederate * fed{ nullptr };  //!< the federate construct to interact with
     interface_handle handle;  //!< the internal id of the publication
   private:
-    int referenceIndex = -1;  //!< an index used for callback lookup
-    void *dataReference = nullptr;  //!< pointer to a piece of containing data
-    double delta = -1.0;  //!< the minimum change to publish
+	  int referenceIndex{ -1 };  //!< an index used for callback lookup
+	void *dataReference{ nullptr };  //!< pointer to a piece of containing data
+	double delta{ -1.0 };  //!< the minimum change to publish
   protected:
-    data_type pubType = data_type::helics_any;  //!< the type of publication
-    bool changeDetectionEnabled = false;  //!< the change detection is enabled
-    bool disableAssign = false;  //!< disable assignment for the object
+	  data_type pubType{ data_type::helics_any };  //!< the type of publication
+	  bool changeDetectionEnabled{ false };  //!< the change detection is enabled
+	  bool disableAssign{ false };  //!< disable assignment for the object
   private:
-    size_t customTypeHash = 0;  //!< a hash code for the custom type = 0; //!< store a hash code for a custom type
+	  size_t customTypeHash{ 0 };  //!< a hash code for the custom type = 0; //!< store a hash code for a custom type
     mutable defV prevValue;  //!< the previous value of the publication
     std::string pubKey;  //!< the name of the publication
     std::string pubUnits;  //!< the defined units of the publication
