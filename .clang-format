@@ -1,9 +1,9 @@
----
+--- 
 AccessModifierOffset: '-2'
 AlignAfterOpenBracket: AlwaysBreak
-AlignConsecutiveMacros: 'true'
 AlignConsecutiveAssignments: 'true'
 AlignConsecutiveDeclarations: 'false'
+AlignConsecutiveMacros: 'true'
 AlignEscapedNewlines: Right
 AlignOperands: 'false'
 AlignTrailingComments: 'false'
@@ -12,9 +12,9 @@ AllowAllConstructorInitializersOnNextLine: 'false'
 AllowAllParametersOfDeclarationOnNextLine: 'false'
 AllowShortBlocksOnASingleLine: 'false'
 AllowShortCaseLabelsOnASingleLine: 'false'
-AllowShortFunctionsOnASingleLine: Empty
-AllowShortIfStatementsOnASingleLine: Never
-AllowShortLambdasOnASingleLine: Empty
+AllowShortFunctionsOnASingleLine: 'true'
+AllowShortIfStatementsOnASingleLine: 'true'
+AllowShortLambdasOnASingleLine: 'true'
 AllowShortLoopsOnASingleLine: 'false'
 AlwaysBreakAfterDefinitionReturnType: None
 AlwaysBreakAfterReturnType: None
@@ -22,12 +22,11 @@ AlwaysBreakBeforeMultilineStrings: 'false'
 AlwaysBreakTemplateDeclarations: 'Yes'
 BinPackArguments: 'false'
 BinPackParameters: 'false'
-BreakBeforeBraces: Attach
+BreakBeforeBraces: Allman
 BreakBeforeTernaryOperators: 'false'
 BreakConstructorInitializers: AfterColon
 BreakInheritanceList: AfterColon
 BreakStringLiterals: 'false'
-IndentPPDirectives: AfterHash
 ColumnLimit: 115
 CompactNamespaces: 'false'
 ConstructorInitializerAllOnOneLineOrOnePerLine: 'false'
@@ -64,8 +63,8 @@ SpaceAfterLogicalNot: 'false'
 SpaceAfterTemplateKeyword: 'false'
 SpaceBeforeAssignmentOperators: 'true'
 SpaceBeforeCpp11BracedList: 'false'
-SpaceBeforeCtorInitializerColon: 'true'
-SpaceBeforeInheritanceColon: 'true'
+SpaceBeforeCtorInitializerColon: 'false'
+SpaceBeforeInheritanceColon: 'false'
 SpaceBeforeParens: ControlStatements
 SpaceBeforeRangeBasedForLoopColon: 'true'
 SpaceInEmptyParentheses: 'false'
@@ -78,12 +77,3 @@ SpacesInSquareBrackets: 'false'
 Standard: Cpp11
 TabWidth: '4'
 UseTab: Never
-IncludeCategories:
-  - Regex:           '^<boost/test/unit_test.hpp'
-    Priority:        2
-  - Regex:           '(boost)/'
-    Priority:        3
-  - Regex:           '.*'
-    Priority:        1
-
-...
