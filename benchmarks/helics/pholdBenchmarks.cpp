@@ -92,7 +92,7 @@ static void BM_phold_multiCore (benchmark::State &state, core_type cType)
         auto broker = helics::BrokerFactory::create (cType, "brokerb",
                                                      std::string ("--federates=") + std::to_string (fed_count));
         broker->setLoggingLevel (helics_log_level_no_print);
-        auto wcore = helics::CoreFactory::create (cType, std::string ("--federates=1"));
+        auto wcore = helics::CoreFactory::create (cType, std::string ("--log_level=no_print --federates=1"));
         std::vector<PholdFederate> feds (fed_count);
         std::vector<std::shared_ptr<helics::Core>> cores (fed_count);
 
@@ -100,7 +100,7 @@ static void BM_phold_multiCore (benchmark::State &state, core_type cType)
         std::uniform_int_distribution<unsigned int> rand_seed;
         for (int ii = 0; ii < fed_count; ++ii)
         {
-            cores[ii] = helics::CoreFactory::create (cType, "-f 1");
+            cores[ii] = helics::CoreFactory::create (cType, "-f 1 --log_level=no_print");
             cores[ii]->connect ();
 
             // set seeds for federates to deterministic values, but not all the same

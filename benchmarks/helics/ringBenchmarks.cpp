@@ -155,13 +155,13 @@ static void BM_ring_multiCore (benchmark::State &state, core_type cType)
         int feds = static_cast<int> (state.range (0));
         gmlc::concurrency::Barrier brr (feds);
         auto broker = helics::BrokerFactory::create (cType, std::string ("--federates=") + std::to_string (feds));
-        broker->setLoggingLevel (0);
+        broker->setLoggingLevel(helics_log_level_no_print);
 
         std::vector<RingTransmit> links (feds);
         std::vector<std::shared_ptr<Core>> cores (feds);
         for (int ii = 0; ii < feds; ++ii)
         {
-            cores[ii] = helics::CoreFactory::create (cType, std::string (" --federates=1 --broker=" +
+            cores[ii] = helics::CoreFactory::create (cType, std::string ("--log_level=no_print --federates=1 --broker=" +
                                                                          broker->getIdentifier ()));
             cores[ii]->connect ();
             links[ii].initialize (cores[ii]->getIdentifier (), ii, feds);

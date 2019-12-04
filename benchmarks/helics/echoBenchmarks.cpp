@@ -236,7 +236,7 @@ static void BM_echo_multiCore (benchmark::State &state, core_type cType)
         auto broker = helics::BrokerFactory::create (cType, "brokerb",
                                                      std::string ("--federates=") + std::to_string (feds + 1));
         broker->setLoggingLevel (helics_log_level_no_print);
-        auto wcore = helics::CoreFactory::create (cType, std::string ("--federates=1"));
+        auto wcore = helics::CoreFactory::create (cType, std::string ("--federates=1 --log_level=no_print"));
         // this is to delay until the threads are ready
         EchoHub hub;
         hub.initialize (wcore->getIdentifier (), feds);
@@ -244,7 +244,7 @@ static void BM_echo_multiCore (benchmark::State &state, core_type cType)
         std::vector<std::shared_ptr<helics::Core>> cores (feds);
         for (int ii = 0; ii < feds; ++ii)
         {
-            cores[ii] = helics::CoreFactory::create (cType, "-f 1");
+            cores[ii] = helics::CoreFactory::create (cType, "-f 1 --log_level=no_print");
             cores[ii]->connect ();
             leafs[ii].initialize (cores[ii]->getIdentifier (), ii);
         }

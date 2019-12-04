@@ -8,51 +8,51 @@
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 # file to include ZMQ
-option(HELICS_USE_SYSTEM_ZEROMQ_ONLY
+option(${PROJECT}_USE_SYSTEM_ZEROMQ_ONLY
        "only search for system zeromq libraries, bypass local build options" OFF)
 
-mark_as_advanced(HELICS_USE_SYSTEM_ZEROMQ_ONLY)
+mark_as_advanced(${PROJECT}_USE_SYSTEM_ZEROMQ_ONLY)
 
 if(MSVC)
     cmake_dependent_option(
-        HELICS_ZMQ_SUBPROJECT
+        ${PROJECT}_ZMQ_SUBPROJECT
         "enable ZMQ to automatically download and include as a subproject"
         ON
-        "NOT USE_SYSTEM_ZEROMQ_ONLY"
+        "NOT ${PROJECT}_USE_SYSTEM_ZEROMQ_ONLY"
         OFF
     )
 else()
     cmake_dependent_option(
-        HELICS_ZMQ_SUBPROJECT
+        ${PROJECT}_ZMQ_SUBPROJECT
         "enable ZMQ to automatically download and include as a subproject"
         OFF
-        "NOT USE_SYSTEM_ZEROMQ_ONLY"
+        "NOT ${PROJECT}_USE_SYSTEM_ZEROMQ_ONLY"
         OFF
     )
 endif()
 cmake_dependent_option(
-    HELICS_ZMQ_FORCE_SUBPROJECT
+    ${PROJECT}_ZMQ_FORCE_SUBPROJECT
     "force ZMQ to automatically download and include as a subproject"
     OFF
-    "NOT USE_SYSTEM_ZEROMQ_ONLY"
+    "NOT ${PROJECT}_USE_SYSTEM_ZEROMQ_ONLY"
     OFF
 )
 
-mark_as_advanced(HELICS_USE_SYSTEM_ZEROMQ_ONLY)
-mark_as_advanced(HELICS_ZMQ_SUBPROJECT)
-mark_as_advanced(HELICS_ZMQ_FORCE_SUBPROJECT)
+mark_as_advanced(${PROJECT}_USE_SYSTEM_ZEROMQ_ONLY)
+mark_as_advanced(${PROJECT}_ZMQ_SUBPROJECT)
+mark_as_advanced(${PROJECT}_ZMQ_FORCE_SUBPROJECT)
 
-option(HELICS_USE_ZMQ_STATIC_LIBRARY "use the ZMQ static library" OFF)
+option(${PROJECT}_USE_ZMQ_STATIC_LIBRARY "use the ZMQ static library" OFF)
 
-mark_as_advanced(HELICS_USE_ZMQ_STATIC_LIBRARY)
+mark_as_advanced(${PROJECT}_USE_ZMQ_STATIC_LIBRARY)
 
 # flag that zeromq headers are required
 set(ZeroMQ_REQUIRE_HEADERS ON)
 
-if(HELICS_USE_SYSTEM_ZEROMQ_ONLY)
+if(${PROJECT}_USE_SYSTEM_ZEROMQ_ONLY)
     find_package(ZeroMQ)
-    set(HELICS_ZMQ_LOCAL_BUILD OFF CACHE INTERNAL "")
-elseif(HELICS_ZMQ_FORCE_SUBPROJECT)
+    set(${PROJECT}_ZMQ_LOCAL_BUILD OFF CACHE INTERNAL "")
+elseif(${PROJECT}_ZMQ_FORCE_SUBPROJECT)
     include(addlibzmq)
 else()
 
@@ -118,7 +118,7 @@ else()
         endif()
     endif()
 
-endif() # USE_SYSTEM_ZEROMQ_ONLY
+endif() # ${PROJECT}_USE_SYSTEM_ZEROMQ_ONLY
 hide_variable(ZeroMQ_DIR)
 
 if(WIN32)

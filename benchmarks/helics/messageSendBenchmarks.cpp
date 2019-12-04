@@ -140,13 +140,13 @@ static void BM_sendMessage (benchmark::State &state, core_type cType, bool singl
         int msg_count = state.range(1);
         if (singleCore)
         {
-            wcore = helics::CoreFactory::create (cType, std::string ("--federates=") + std::to_string (wcore_fed_count));
+            wcore = helics::CoreFactory::create (cType, std::string ("--log_level=no_print --federates=") + std::to_string (wcore_fed_count));
         }
         for (int ii = 0; ii < fed_count; ++ii)
         {
             if (!singleCore)
             {
-                cores[ii] = helics::CoreFactory::create (cType, "-f 1");
+                cores[ii] = helics::CoreFactory::create (cType, "-f 1 --log_level=no_print");
                 cores[ii]->connect ();
                 feds[ii].initialize (cores[ii]->getIdentifier (), ii, msg_size, msg_count);
             }
