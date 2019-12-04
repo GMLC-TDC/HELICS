@@ -1,7 +1,7 @@
 --- 
 AccessModifierOffset: '-2'
 AlignAfterOpenBracket: AlwaysBreak
-AlignConsecutiveAssignments: 'true'
+AlignConsecutiveAssignments: 'false'
 AlignConsecutiveDeclarations: 'false'
 #AlignConsecutiveMacros: 'true'
 AlignEscapedNewlines: Right
@@ -50,11 +50,11 @@ ObjCSpaceAfterProperty: 'true'
 ObjCSpaceBeforeProtocolList: 'true'
 PenaltyBreakBeforeFirstCallParameter: '120'
 PenaltyBreakComment: '300'
-PenaltyBreakFirstLessLess: '0'
+PenaltyBreakFirstLessLess: '30'
 PenaltyBreakString: '1000'
 PenaltyExcessCharacter: '1000000'
-PenaltyReturnTypeOnItsOwnLine: '20'
-PointerAlignment: Middle
+PenaltyReturnTypeOnItsOwnLine: '40'
+PointerAlignment: Left
 ReflowComments: 'false'
 SortIncludes: 'true'
 SortUsingDeclarations: 'true'
