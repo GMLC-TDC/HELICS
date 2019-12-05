@@ -205,13 +205,13 @@ class HELICS_CXX_EXPORT MessageFederate
     /** register a callback for all endpoints
     @param callback the function to execute upon receipt of a message for any endpoint
     */
-    void setMessageNotificationCallback (const std::function<void (Endpoint &, Time)> &callback);
+    void setMessageNotificationCallback (const std::function<void(Endpoint &, Time)> &callback);
     /** register a callback for a specific endpoint
     @param ept the endpoint to associate with the specified callback
     @param callback the function to execute upon receipt of a message for the given endpoint
     */
     void
-    setMessageNotificationCallback (const Endpoint &ept, const std::function<void (Endpoint &, Time)> &callback);
+    setMessageNotificationCallback (const Endpoint &ept, const std::function<void(Endpoint &, Time)> &callback);
 
     /** add a named filter to an endpoint for all message coming from the endpoint*/
     void addSourceFilter (const Endpoint &ept, const std::string &filterName);

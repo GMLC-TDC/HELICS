@@ -51,8 +51,8 @@ class FederateState
     const std::string name;  //!< the name of the federate
     std::unique_ptr<TimeCoordinator> timeCoord;  //!< object that manages the time to determine granting
   public:
-	  local_federate_id local_id;  //!< id code for the local federate descriptor
-	  std::atomic<global_federate_id> global_id;  //!< global id code, default to invalid
+    local_federate_id local_id;  //!< id code for the local federate descriptor
+    std::atomic<global_federate_id> global_id;  //!< global id code, default to invalid
 
   private:
     std::atomic<federate_state> state{HELICS_CREATED};  //!< the current state of the federate
@@ -69,22 +69,22 @@ class FederateState
   public:
     std::atomic<bool> init_transmitted{false};  //!< the initialization request has been transmitted
   private:
-	  int errorCode{ 0 };  //!< storage for an error code
-	  CommonCore *parent_{ nullptr };  //!< pointer to the higher level;
+    int errorCode{0};  //!< storage for an error code
+    CommonCore *parent_{nullptr};  //!< pointer to the higher level;
     std::string errorString;  //!< storage for an error string populated on an error
     decltype (std::chrono::steady_clock::now ())
       start_clock_time;  //!< time the initialization mode started for real time capture
-	Time rt_lag{ timeZero };  //!< max lag for the rt control
-	Time rt_lead{ timeZero };  //!< min lag for the realtime control
-	int32_t realTimeTimerIndex{ -1 };  //!< the timer index for the real time timer;
+    Time rt_lag{timeZero};  //!< max lag for the rt control
+    Time rt_lead{timeZero};  //!< min lag for the realtime control
+    int32_t realTimeTimerIndex{-1};  //!< the timer index for the real time timer;
   public:
     std::atomic<bool> init_requested{false};  //!< this federate has requested entry to initialization
   private:
-	  bool iterating{ false };  //!< the federate is iterating at a time step
-	  bool timeGranted_mode{
-		false };  //!< indicator if the federate is in a granted state or a requested state waiting to grant
+    bool iterating{false};  //!< the federate is iterating at a time step
+    bool timeGranted_mode{
+      false};  //!< indicator if the federate is in a granted state or a requested state waiting to grant
     // 1 byte free
-	  int logLevel{ 1 };  //!< the level of logging used in the federate
+    int logLevel{1};  //!< the level of logging used in the federate
 
     //   std::vector<ActionMessage> messLog;
   private:
@@ -102,7 +102,7 @@ class FederateState
     mutable std::atomic_flag processing = ATOMIC_FLAG_INIT;  //!< the federate is processing
   private:
     /** a logging function for logging or printing messages*/
-    std::function<void (int, const std::string &, const std::string &)>
+    std::function<void(int, const std::string &, const std::string &)>
       loggerFunction;  //!< callback for logging functions
     std::function<std::string (const std::string &)> queryCallback;  //!< a callback for additional queries
     /** find the next Value Event*/
@@ -326,7 +326,7 @@ class FederateState
     @details function must have signature void(int level, const std::string &sourceName, const std::string
     &message)
     */
-    void setLogger (std::function<void (int, const std::string &, const std::string &)> logFunction)
+    void setLogger (std::function<void(int, const std::string &, const std::string &)> logFunction)
     {
         loggerFunction = std::move (logFunction);
     }

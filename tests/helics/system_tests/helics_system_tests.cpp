@@ -15,7 +15,6 @@ struct globalTestConfig : public ::testing::Environment
 {
     virtual void TearDown () override
     {
-
         helics::CoreFactory::cleanUpCores ();
         helics::BrokerFactory::cleanUpBrokers ();
     }

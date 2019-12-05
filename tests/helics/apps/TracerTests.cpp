@@ -26,7 +26,7 @@ TEST (tracer_tests, simple_tracer_test)
 {
     std::atomic<double> lastVal{-1e49};
     std::atomic<double> lastTime{0.0};
-    auto cb = [&lastVal, &lastTime] (helics::Time tm, const std::string &, const std::string &newval) {
+    auto cb = [&lastVal, &lastTime](helics::Time tm, const std::string &, const std::string &newval) {
         lastTime = static_cast<double> (tm);
         lastVal = std::stod (newval);
     };
@@ -39,7 +39,7 @@ TEST (tracer_tests, simple_tracer_test)
     trace1.setValueCallback (cb);
     helics::ValueFederate vfed ("block1", fi);
     helics::Publication pub1 (helics::GLOBAL, &vfed, "pub1", helics::data_type::helics_double);
-    auto fut = std::async (std::launch::async, [&trace1] () { trace1.runTo (4); });
+    auto fut = std::async (std::launch::async, [&trace1]() { trace1.runTo (4); });
     vfed.enterExecutingMode ();
     auto retTime = vfed.requestTime (1);
     EXPECT_EQ (retTime, 1.0);
@@ -78,7 +78,7 @@ TEST (tracer_tests, tracer_test_message)
     fi.coreInitString = "-f 2 --autobroker";
     helics::apps::Tracer trace1 ("trace1", fi);
 
-    auto cb = [&mguard, &lastTime] (helics::Time tm, const std::string &, std::unique_ptr<helics::Message> mess) {
+    auto cb = [&mguard, &lastTime](helics::Time tm, const std::string &, std::unique_ptr<helics::Message> mess) {
         mguard = std::move (mess);
         lastTime = static_cast<double> (tm);
     };
@@ -88,7 +88,7 @@ TEST (tracer_tests, tracer_test_message)
 
     trace1.addEndpoint ("src1");
     trace1.setEndpointMessageCallback (cb);
-    auto fut = std::async (std::launch::async, [&trace1] () { trace1.runTo (5.0); });
+    auto fut = std::async (std::launch::async, [&trace1]() { trace1.runTo (5.0); });
     mfed.enterExecutingMode ();
 
     auto retTime = mfed.requestTime (1.0);
@@ -153,7 +153,7 @@ TEST_P (tracer_file_tests, simple_tracer_test_files)
     helics::apps::Tracer trace1 ("trace1", fi);
 
     std::atomic<int> counter{0};
-    auto cb = [&counter] (helics::Time, const std::string &, const std::string &) { ++counter; };
+    auto cb = [&counter](helics::Time, const std::string &, const std::string &) { ++counter; };
     trace1.setValueCallback (cb);
     trace1.loadFile (std::string (TEST_DIR) + GetParam ());
 
@@ -161,7 +161,7 @@ TEST_P (tracer_file_tests, simple_tracer_test_files)
     helics::Publication pub1 (helics::GLOBAL, &vfed, "pub1", helics::data_type::helics_double);
     helics::Publication pub2 (helics::GLOBAL, &vfed, "pub2", helics::data_type::helics_double);
 
-    auto fut = std::async (std::launch::async, [&trace1] () { trace1.runTo (4); });
+    auto fut = std::async (std::launch::async, [&trace1]() { trace1.runTo (4); });
     vfed.enterExecutingMode ();
     auto retTime = vfed.requestTime (1);
     EXPECT_EQ (retTime, 1.0);
@@ -208,11 +208,11 @@ TEST_P (tracer_message_file_tests, test_message_files)
     trace1.loadFile (std::string (TEST_DIR) + GetParam ());
 
     std::atomic<int> counter{0};
-    auto cb = [&counter] (helics::Time, const std::string &, const std::string &) { ++counter; };
+    auto cb = [&counter](helics::Time, const std::string &, const std::string &) { ++counter; };
     trace1.setValueCallback (cb);
 
     std::atomic<int> mcounter{0};
-    auto cbm = [&mcounter] (helics::Time, const std::string &, std::unique_ptr<helics::Message>) { ++mcounter; };
+    auto cbm = [&mcounter](helics::Time, const std::string &, std::unique_ptr<helics::Message>) { ++mcounter; };
     trace1.setEndpointMessageCallback (cbm);
 
     helics::CombinationFederate cfed ("block1", fi);
@@ -220,7 +220,7 @@ TEST_P (tracer_message_file_tests, test_message_files)
     helics::Publication pub2 (helics::GLOBAL, &cfed, "pub2", helics::data_type::helics_double);
     helics::Endpoint e1 (helics::GLOBAL, &cfed, "d1");
 
-    auto fut = std::async (std::launch::async, [&trace1] () { trace1.runTo (5); });
+    auto fut = std::async (std::launch::async, [&trace1]() { trace1.runTo (5); });
     cfed.enterExecutingMode ();
     auto retTime = cfed.requestTime (1);
     EXPECT_EQ (retTime, 1.0);
@@ -266,7 +266,7 @@ TEST_P (tracer_message_file_tests, test_message_files_cmd)
 
     helics::apps::Tracer trace1 (4, argv);
     std::atomic<int> counter{0};
-    auto cb = [&counter] (helics::Time, const std::string &, const std::string &) { ++counter; };
+    auto cb = [&counter](helics::Time, const std::string &, const std::string &) { ++counter; };
     trace1.setValueCallback (cb);
 
     helics::FederateInfo fi;
@@ -278,7 +278,7 @@ TEST_P (tracer_message_file_tests, test_message_files_cmd)
     helics::Publication pub2 (helics::GLOBAL, &cfed, "pub2", helics::data_type::helics_double);
     helics::Endpoint e1 (helics::GLOBAL, &cfed, "d1");
 
-    auto fut = std::async (std::launch::async, [&trace1] () { trace1.runTo (5); });
+    auto fut = std::async (std::launch::async, [&trace1]() { trace1.runTo (5); });
     cfed.enterExecutingMode ();
     auto retTime = cfed.requestTime (1);
     EXPECT_EQ (retTime, 1.0);
@@ -321,7 +321,7 @@ TEST (tracer_tests, tracer_test_destendpoint_clone)
     helics::apps::Tracer trace1 ("trace1", fi);
     fi.setProperty (helics_property_time_period, 1.0);
 
-    auto cb = [&mguard, &lastTime] (helics::Time tm, std::unique_ptr<helics::Message> mess) {
+    auto cb = [&mguard, &lastTime](helics::Time tm, std::unique_ptr<helics::Message> mess) {
         mguard = std::move (mess);
         lastTime = static_cast<double> (tm);
     };
@@ -335,7 +335,7 @@ TEST (tracer_tests, tracer_test_destendpoint_clone)
     trace1.addDestEndpointClone ("d1");
     trace1.addDestEndpointClone ("d2");
 
-    auto fut = std::async (std::launch::async, [&trace1] () { trace1.runTo (5.0); });
+    auto fut = std::async (std::launch::async, [&trace1]() { trace1.runTo (5.0); });
     mfed2.enterExecutingModeAsync ();
     mfed.enterExecutingMode ();
     mfed2.enterExecutingModeComplete ();
@@ -400,7 +400,7 @@ TEST (tracer_tests, srcendpoint_clone)
     fi.coreName = "tcoresrc";
     fi.coreInitString = "-f 3 --autobroker";
     helics::apps::Tracer trace1 ("trace1", fi);
-    auto cb = [&mguard, &lastTime] (helics::Time tm, std::unique_ptr<helics::Message> mess) {
+    auto cb = [&mguard, &lastTime](helics::Time tm, std::unique_ptr<helics::Message> mess) {
         mguard = std::move (mess);
         lastTime = static_cast<double> (tm);
     };
@@ -417,7 +417,7 @@ TEST (tracer_tests, srcendpoint_clone)
     trace1.addSourceEndpointClone ("d1");
     trace1.addSourceEndpointClone ("d2");
 
-    auto fut = std::async (std::launch::async, [&trace1] () { trace1.runTo (5.0); });
+    auto fut = std::async (std::launch::async, [&trace1]() { trace1.runTo (5.0); });
     mfed2.enterExecutingModeAsync ();
     mfed.enterExecutingMode ();
     mfed2.enterExecutingModeComplete ();
@@ -474,7 +474,7 @@ TEST (tracer_tests, tracer_test_endpoint_clone)
     fi.coreInitString = "-f 3 --autobroker";
     helics::apps::Tracer trace1 ("trace1", fi);
 
-    auto cb = [&mguard, &lastTime] (helics::Time tm, std::unique_ptr<helics::Message> mess) {
+    auto cb = [&mguard, &lastTime](helics::Time tm, std::unique_ptr<helics::Message> mess) {
         mguard = std::move (mess);
         lastTime = static_cast<double> (tm);
     };
@@ -491,7 +491,7 @@ TEST (tracer_tests, tracer_test_endpoint_clone)
     trace1.addDestEndpointClone ("d1");
     trace1.addSourceEndpointClone ("d1");
 
-    auto fut = std::async (std::launch::async, [&trace1] () { trace1.runTo (5.0); });
+    auto fut = std::async (std::launch::async, [&trace1]() { trace1.runTo (5.0); });
     mfed2.enterExecutingModeAsync ();
     mfed.enterExecutingMode ();
     mfed2.enterExecutingModeComplete ();
@@ -567,12 +567,12 @@ TEST_P (tracer_clone_file_tests, simple_clone_test_file)
     helics::Endpoint &e2 = mfed2.registerGlobalEndpoint ("d2");
 
     trace1.loadFile (std::string (TEST_DIR) + GetParam ());
-    auto cb = [&mguard, &lastTime] (helics::Time tm, std::unique_ptr<helics::Message> mess) {
+    auto cb = [&mguard, &lastTime](helics::Time tm, std::unique_ptr<helics::Message> mess) {
         mguard = std::move (mess);
         lastTime = static_cast<double> (tm);
     };
     trace1.setClonedMessageCallback (cb);
-    auto fut = std::async (std::launch::async, [&trace1] () { trace1.runTo (5.0); });
+    auto fut = std::async (std::launch::async, [&trace1]() { trace1.runTo (5.0); });
     mfed2.enterExecutingModeAsync ();
     mfed.enterExecutingMode ();
     mfed2.enterExecutingModeComplete ();
@@ -671,7 +671,7 @@ TEST_P (tracer_message_file_tests, test_message_files_exe)
     auto vec = gmlc::utilities::stringOps::splitline (outAct, "\n\r",
                                                       gmlc::utilities::stringOps::delimiter_compression::on);
     auto cnt = std::count_if (vec.begin (), vec.end (),
-                              [] (const std::string &str) { return (!(str.empty ()) && (str[0] == '[')); });
+                              [](const std::string &str) { return (!(str.empty ()) && (str[0] == '[')); });
     // 6 messages, 1 return line, 1 empty line
     EXPECT_EQ (cnt, 6);
     EXPECT_EQ (*(vec.end () - 1), "execution returned 0");

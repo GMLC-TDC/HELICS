@@ -45,7 +45,7 @@ class RingTransmit
   public:
     RingTransmit () = default;
 
-    void run (std::function<void ()> callOnReady = nullptr)
+    void run (std::function<void()> callOnReady = nullptr)
     {
         makeReady ();
         if (callOnReady)
@@ -123,7 +123,7 @@ static void BM_ring2_singleCore (benchmark::State &state)
             links[ii].initialize (wcore->getIdentifier (), ii, feds);
         }
 
-        std::thread rthread ([&] (RingTransmit &link) { link.run ([&brr] () { brr.wait (); }); },
+        std::thread rthread ([&](RingTransmit &link) { link.run ([&brr]() { brr.wait (); }); },
                              std::ref (links[1]));
 
         links[0].makeReady ();
@@ -155,21 +155,22 @@ static void BM_ring_multiCore (benchmark::State &state, core_type cType)
         int feds = static_cast<int> (state.range (0));
         gmlc::concurrency::Barrier brr (feds);
         auto broker = helics::BrokerFactory::create (cType, std::string ("--federates=") + std::to_string (feds));
-        broker->setLoggingLevel(helics_log_level_no_print);
+        broker->setLoggingLevel (helics_log_level_no_print);
 
         std::vector<RingTransmit> links (feds);
         std::vector<std::shared_ptr<Core>> cores (feds);
         for (int ii = 0; ii < feds; ++ii)
         {
-            cores[ii] = helics::CoreFactory::create (cType, std::string ("--log_level=no_print --federates=1 --broker=" +
-                                                                         broker->getIdentifier ()));
+            cores[ii] =
+              helics::CoreFactory::create (cType, std::string ("--log_level=no_print --federates=1 --broker=" +
+                                                               broker->getIdentifier ()));
             cores[ii]->connect ();
             links[ii].initialize (cores[ii]->getIdentifier (), ii, feds);
         }
         std::vector<std::thread> threadlist (feds - 1);
         for (int ii = 0; ii < feds - 1; ++ii)
         {
-            threadlist[ii] = std::thread ([&] (RingTransmit &link) { link.run ([&brr] () { brr.wait (); }); },
+            threadlist[ii] = std::thread ([&](RingTransmit &link) { link.run ([&brr]() { brr.wait (); }); },
                                           std::ref (links[ii + 1]));
         }
 
@@ -274,4 +275,4 @@ BENCHMARK_CAPTURE (BM_ring_multiCore, udpCore, core_type::UDP)
   ->UseRealTime ();
 #endif
 
-HELICS_BENCHMARK_MAIN(ringBenchmark);
+HELICS_BENCHMARK_MAIN (ringBenchmark);

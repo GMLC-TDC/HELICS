@@ -9,10 +9,9 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <stdio.h>
 int main ()
 {
-    volatile helics_federate_info fedinfo = helicsCreateFederateInfo();
-	helicsFederateInfoFree(fedinfo);
-	printf("%s\n",helicsGetVersion());
+    volatile helics_federate_info fedinfo = helicsCreateFederateInfo ();
+    helicsFederateInfoFree (fedinfo);
+    printf ("%s\n", helicsGetVersion ());
     helicsCloseLibrary ();
     return (0);
 }
-

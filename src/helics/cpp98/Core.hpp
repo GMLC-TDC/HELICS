@@ -43,7 +43,7 @@ class Core
     /** copy constructor*/
     Core (const Core &cr) { core = helicsCoreClone (cr.core, hThrowOnError ()); }
     /** copy assignment*/
-	Core &operator= (const Core &cr)
+    Core &operator= (const Core &cr)
     {
         core = helicsCoreClone (cr.core, hThrowOnError ());
         return *this;
@@ -67,11 +67,11 @@ class Core
    @details this function only needs to be called for cores that don't have any federates but may
    have filters for cores with federates it won't do anything*/
     void setReadyToInit () { helicsCoreSetReadyToInit (core, hThrowOnError ()); }
-    
-	/**
+
+    /**
      * disconnect the core from its broker
      */
-	void disconnect () { helicsCoreDisconnect (core, hThrowOnError ()); }
+    void disconnect () { helicsCoreDisconnect (core, hThrowOnError ()); }
     /** waits in the current thread until the broker is disconnected
     @param msToWait  the timeout to wait for disconnect (-1) implies no timeout
     @return true if the disconnect was successful false if it timed out

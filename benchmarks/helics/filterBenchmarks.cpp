@@ -55,13 +55,13 @@ static void BM_filter_singleCore (benchmark::State &state)
         std::vector<std::thread> threadlist (static_cast<size_t> (feds));
         for (int ii = 0; ii < feds; ++ii)
         {
-            threadlist[ii] = std::thread ([&] (EchoMessageLeaf &lf) { lf.run ([&brr] () { brr.wait (); }); },
-                                          std::ref (leafs[ii]));
+            threadlist[ii] =
+              std::thread ([&](EchoMessageLeaf &lf) { lf.run ([&brr]() { brr.wait (); }); }, std::ref (leafs[ii]));
         }
         hub.makeReady ();
         brr.wait ();
         state.ResumeTiming ();
-        hub.run ([] () {});
+        hub.run ([]() {});
         state.PauseTiming ();
         for (auto &thrd : threadlist)
         {
@@ -122,13 +122,13 @@ static void BM_filter_multiCore (benchmark::State &state, core_type cType)
         std::vector<std::thread> threadlist (static_cast<size_t> (feds));
         for (int ii = 0; ii < feds; ++ii)
         {
-            threadlist[ii] = std::thread ([&] (EchoMessageLeaf &lf) { lf.run ([&brr] () { brr.wait (); }); },
-                                          std::ref (leafs[ii]));
+            threadlist[ii] =
+              std::thread ([&](EchoMessageLeaf &lf) { lf.run ([&brr]() { brr.wait (); }); }, std::ref (leafs[ii]));
         }
         hub.makeReady ();
         brr.wait ();
         state.ResumeTiming ();
-        hub.run ([] () {});
+        hub.run ([]() {});
         state.PauseTiming ();
         for (auto &thrd : threadlist)
         {

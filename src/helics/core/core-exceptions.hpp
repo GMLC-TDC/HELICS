@@ -22,7 +22,7 @@ class HelicsException : public std::exception
 
   public:
     HelicsException () = default;
-    explicit HelicsException (std::string message) noexcept: errorMessage (std::move (message)) {}
+    explicit HelicsException (std::string message) noexcept : errorMessage (std::move (message)) {}
     virtual const char *what () const noexcept override { return errorMessage.c_str (); }
 };
 

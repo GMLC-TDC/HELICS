@@ -226,7 +226,7 @@ void runDualFederateTest (const std::string &core_type_str,
 
     subid.setDefault (defaultValue);
 
-    auto f1finish = std::async (std::launch::async, [&] () { fedA->enterExecutingMode (); });
+    auto f1finish = std::async (std::launch::async, [&]() { fedA->enterExecutingMode (); });
     fedB->enterExecutingMode ();
     f1finish.wait ();
     // publish string1 at time=0.0;
@@ -236,7 +236,7 @@ void runDualFederateTest (const std::string &core_type_str,
 
     EXPECT_EQ (val, defaultValue);
 
-    auto f1time = std::async (std::launch::async, [&] () { return fedA->requestTime (1.0); });
+    auto f1time = std::async (std::launch::async, [&]() { return fedA->requestTime (1.0); });
     auto gtime = fedB->requestTime (1.0);
 
     EXPECT_EQ (gtime, 1.0);
@@ -254,7 +254,7 @@ void runDualFederateTest (const std::string &core_type_str,
     EXPECT_EQ (val, testValue1);
 
     // advance time
-    f1time = std::async (std::launch::async, [&] () { return fedA->requestTime (2.0); });
+    f1time = std::async (std::launch::async, [&]() { return fedA->requestTime (2.0); });
     gtime = fedB->requestTime (2.0);
 
     EXPECT_EQ (gtime, 2.0);
@@ -289,14 +289,14 @@ void runDualFederateTestv2 (const std::string &core_type_str,
     fedB->setProperty (helics_property_time_delta, 1.0);
 
     subid.setDefault (defaultValue);
-    auto f1finish = std::async (std::launch::async, [&] () { fedA->enterExecutingMode (); });
+    auto f1finish = std::async (std::launch::async, [&]() { fedA->enterExecutingMode (); });
     fedB->enterExecutingMode ();
     f1finish.wait ();
     // publish string1 at time=0.0;
     pubid.publish (testValue1);
     X val = subid.getValue<X> ();
     EXPECT_TRUE (val == defaultValue);
-    auto f1time = std::async (std::launch::async, [&] () { return fedA->requestTime (1.0); });
+    auto f1time = std::async (std::launch::async, [&]() { return fedA->requestTime (1.0); });
     auto gtime = fedB->requestTime (1.0);
 
     EXPECT_EQ (gtime, 1.0);
@@ -311,7 +311,7 @@ void runDualFederateTestv2 (const std::string &core_type_str,
     subid.getValue (val);
     EXPECT_TRUE (val == testValue1);
     // advance time
-    f1time = std::async (std::launch::async, [&] () { return fedA->requestTime (2.0); });
+    f1time = std::async (std::launch::async, [&]() { return fedA->requestTime (2.0); });
     gtime = fedB->requestTime (2.0);
 
     EXPECT_EQ (gtime, 2.0);
@@ -347,7 +347,7 @@ void runDualFederateTestObj (const std::string &core_type_str,
 
     subid.setDefault (defaultValue);
 
-    auto f1finish = std::async (std::launch::async, [&] () { fedA->enterExecutingMode (); });
+    auto f1finish = std::async (std::launch::async, [&]() { fedA->enterExecutingMode (); });
     fedB->enterExecutingMode ();
     f1finish.wait ();
     // publish string1 at time=0.0;
@@ -358,7 +358,7 @@ void runDualFederateTestObj (const std::string &core_type_str,
 
     EXPECT_EQ (val, defaultValue);
 
-    auto f1time = std::async (std::launch::async, [&] () { return fedA->requestTime (1.0); });
+    auto f1time = std::async (std::launch::async, [&]() { return fedA->requestTime (1.0); });
     auto gtime = fedB->requestTime (1.0);
 
     EXPECT_EQ (gtime, 1.0);
@@ -375,7 +375,7 @@ void runDualFederateTestObj (const std::string &core_type_str,
     EXPECT_EQ (val, testValue1);
 
     // advance time
-    f1time = std::async (std::launch::async, [&] () { return fedA->requestTime (2.0); });
+    f1time = std::async (std::launch::async, [&]() { return fedA->requestTime (2.0); });
     gtime = fedB->requestTime (2.0);
 
     EXPECT_EQ (gtime, 2.0);
@@ -411,7 +411,7 @@ void runDualFederateTestObjv2 (const std::string &core_type_str,
 
     subid.setDefault (defaultValue);
 
-    auto f1finish = std::async (std::launch::async, [&] () { fedA->enterExecutingMode (); });
+    auto f1finish = std::async (std::launch::async, [&]() { fedA->enterExecutingMode (); });
     fedB->enterExecutingMode ();
     f1finish.wait ();
     // publish string1 at time=0.0;
@@ -421,7 +421,7 @@ void runDualFederateTestObjv2 (const std::string &core_type_str,
 
     EXPECT_TRUE (val == defaultValue);
 
-    auto f1time = std::async (std::launch::async, [&] () { return fedA->requestTime (1.0); });
+    auto f1time = std::async (std::launch::async, [&]() { return fedA->requestTime (1.0); });
     auto gtime = fedB->requestTime (1.0);
 
     EXPECT_EQ (gtime, 1.0);
@@ -438,7 +438,7 @@ void runDualFederateTestObjv2 (const std::string &core_type_str,
     EXPECT_TRUE (val == testValue1);
 
     // advance time
-    f1time = std::async (std::launch::async, [&] () { return fedA->requestTime (2.0); });
+    f1time = std::async (std::launch::async, [&]() { return fedA->requestTime (2.0); });
     gtime = fedB->requestTime (2.0);
 
     EXPECT_EQ (gtime, 2.0);

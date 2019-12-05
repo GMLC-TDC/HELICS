@@ -47,7 +47,7 @@ class MessageExchangeFederate
   public:
     MessageExchangeFederate () = default;
 
-    void run (std::function<void ()> callOnReady = {}, std::function<void ()> callOnEnd = {})
+    void run (std::function<void()> callOnReady = {}, std::function<void()> callOnEnd = {})
     {
         if (!readyToRun)
         {
@@ -162,13 +162,13 @@ static void BM_sendMessage (benchmark::State &state, core_type cType, bool singl
         for (int ii = 0; ii < fed_count; ++ii)
         {
             threadlist[ii] = std::thread (
-              [&] (MessageExchangeFederate &f) {
+              [&](MessageExchangeFederate &f) {
                   f.run (
-                    [&brr] () {
+                    [&brr]() {
                         brr.wait ();
                         brr.wait ();
                     },
-                    [&brr] () { brr.wait (); });
+                    [&brr]() { brr.wait (); });
               },
               std::ref (feds[ii]));
         }
