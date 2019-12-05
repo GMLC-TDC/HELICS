@@ -23,14 +23,14 @@ cmake_dependent_advanced_option(HELICS_ENABLE_GIT_HOOKS "Activate git hooks to r
 
 find_package(Git)
 
-if (GIT_FOUND AND (GIT_VERSION_STRING VERSION_GREATER_EQUAL "2.9"))
+if (GIT_FOUND AND (NOT GIT_VERSION_STRING VERSION_LESS "2.9"))
     if (HELICS_ENABLE_GIT_HOOKS)
         set_git_hooks_enabled()
     else ()
         set_git_hooks_disabled()
     endif ()
-elseif (GIT_FOUND AND (GIT_VERSION_STRING VERSION_LESS "2.9"))
+elseif (HELICS_ENABLE_GIT_HOOKS AND GIT_FOUND AND (GIT_VERSION_STRING VERSION_LESS "2.9"))
     message(WARNING "Git version earlier than 2.9 found, update Git to enable git hooks.")
-else ()
-    message("Git not found, git hooks will not be enabled.")
+elseif (HELICS_ENABLE_GIT_HOOKS AND (NOT GIT_FOUND))
+    message(WARNING "Git not found, git hooks will not be enabled.")
 endif ()
