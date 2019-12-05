@@ -113,7 +113,7 @@ class messageGenerator
     }
 };
 
-static void BM_mgen_singleFed (benchmark::State &state)
+static void BM_mgen_singleCore (benchmark::State &state)
 {
     for (auto _ : state)
     {
@@ -134,7 +134,7 @@ static void BM_mgen_singleFed (benchmark::State &state)
     }
 }
 // Register the function as a benchmark
-BENCHMARK (BM_mgen_singleFed)
+BENCHMARK (BM_mgen_singleCore)
   ->RangeMultiplier (4)
   ->Range (1, 1 << 18)
   ->Unit (benchmark::TimeUnit::kMillisecond)
