@@ -1,0 +1,21 @@
+root = true
+
+[*]
+end_of_line = lf
+
+# HELICS C/C++ source files
+[{benchmarks,examples,src,tests}/**.{cpp,hpp,c,h}]
+indent_style = space
+indent_size = 4
+charset = utf-8
+trim_trailing_whitespace = true
+insert_final_newline = true
+
+# HELICS Python source files
+[{benchmarks,examples,scripts,tests}/**.py]
+indent_style = space
+indent_size = 4
+
+[CMakeLists.txt]
+indent_style = space
+indent_size = 4
