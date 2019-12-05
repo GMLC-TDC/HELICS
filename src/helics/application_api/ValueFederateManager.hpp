@@ -49,7 +49,7 @@ struct input_info
     interface_handle coreID;  //!< Handle from the core
     input_id_t id;  //!< the id used as the identifier
 
-    std::function<void (Input &, Time)> callback;  //!< callback to trigger on update
+    std::function<void(Input &, Time)> callback;  //!< callback to trigger on update
     bool hasUpdate = false;  //!< indicator that there was an update
     input_info (const std::string &n_name, const std::string &n_type, const std::string &n_units)
         : name (n_name), type (n_type), units (n_units){};
@@ -172,12 +172,12 @@ class ValueFederateManager
     @details there can only be one generic callback
     @param callback the function to call
     */
-    void setInputNotificationCallback (std::function<void (Input &, Time)> callback);
+    void setInputNotificationCallback (std::function<void(Input &, Time)> callback);
     /** register a callback function to call when the specified subscription is updated
     @param inp  the id to register the callback for
     @param callback the function to call
     */
-    void setInputNotificationCallback (const Input &inp, std::function<void (Input &, Time)> callback);
+    void setInputNotificationCallback (const Input &inp, std::function<void(Input &, Time)> callback);
 
     /** disconnect from the coreObject*/
     void disconnect ();
@@ -205,7 +205,7 @@ class ValueFederateManager
     Core *coreObject;  //!< the pointer to the actual core
     ValueFederate *fed;  //!< pointer back to the value Federate for creation of the Publication/Inputs
     local_federate_id fedID;  //!< the federation ID from the core API
-    atomic_guarded<std::function<void (Input &, Time)>> allCallback;  //!< the global callback function
+    atomic_guarded<std::function<void(Input &, Time)>> allCallback;  //!< the global callback function
     shared_guarded<std::vector<std::unique_ptr<input_info>>>
       inputData;  //!< the storage for the message queues and other unique Endpoint information
     shared_guarded<std::multimap<std::string, interface_handle>>

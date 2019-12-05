@@ -1854,9 +1854,9 @@ bool CoreBroker::connect ()
             }
             return res;
         }
-        if (brokerState.load() == broker_state_t::connecting)
+        if (brokerState.load () == broker_state_t::connecting)
         {
-            while (brokerState.load() == broker_state_t::connecting)
+            while (brokerState.load () == broker_state_t::connecting)
             {
                 std::this_thread::sleep_for (std::chrono::milliseconds (20));
             }
@@ -1932,7 +1932,8 @@ void CoreBroker::disconnect ()
     {
         ++cnt;
         LOG_WARNING (global_id.load (), getIdentifier (),
-                     "waiting on disconnect: current state=" + std::to_string (static_cast<int16_t>(brokerState.load ())));
+                     "waiting on disconnect: current state=" +
+                       std::to_string (static_cast<int16_t> (brokerState.load ())));
         if (cnt == 5)
         {
             addActionMessage (udisconnect);
@@ -2522,9 +2523,10 @@ std::string CoreBroker::generateQueryAnswer (const std::string &request)
     {
         return getIdentifier ();
     }
-    if ((request == "queries")||(request=="available_queries"))
+    if ((request == "queries") || (request == "available_queries"))
     {
-        return "[isinit;isconnected;name;address;queries;address;counts;summary;federates;brokers;inputs;endpoints;"
+        return "[isinit;isconnected;name;address;queries;address;counts;summary;federates;brokers;inputs;"
+               "endpoints;"
                "publications;filters;federate_map;dependency_graph;dependencies;dependson;dependents]";
     }
     if (request == "address")

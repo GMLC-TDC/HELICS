@@ -24,11 +24,11 @@ struct SourceObject
 {
     Publication pub;
     Time period;
-	Time nextTime{ timeZero };
-	int generatorIndex{ -1 };
+    Time nextTime{timeZero};
+    int generatorIndex{-1};
     std::string generatorName;
-	SourceObject() = default;
-	SourceObject(const Publication &p, Time per) :pub(p), period(per) {};
+    SourceObject () = default;
+    SourceObject (const Publication &p, Time per) : pub (p), period (per){};
     // source type
 };
 

@@ -55,9 +55,9 @@ class BasicHandleInfo
 
     const global_handle handle{};  //!< the global federate id for the creator of the handle
     local_federate_id local_fed_id{};  //!< the local federate id of the handle
-	const handle_type handleType{ handle_type::unknown };  //!< the type of the handle
-	bool used{ false };  //!< indicator that the handle is being used to link with another federate
-	uint16_t flags{ 0 };  //!< flags corresponding to the flags used in ActionMessages +some extra ones
+    const handle_type handleType{handle_type::unknown};  //!< the type of the handle
+    bool used{false};  //!< indicator that the handle is being used to link with another federate
+    uint16_t flags{0};  //!< flags corresponding to the flags used in ActionMessages +some extra ones
 
     const std::string key;  //!< the name of the handle
     const std::string type;  //!< the type of data used by the handle

@@ -35,7 +35,7 @@ create (core_type type, const std::string &core_name, const std::string &initial
     CoreApp cr (type, core_name, initializationString);
     return cr.getCopyofCorePointer ();
 }
-      /**
+/**
  * Creates a Core API object of the specified type.
  *
  * Invokes initialize() on the instantiated Core object.
@@ -54,7 +54,7 @@ create (core_type type, const std::string &initializationString)
 */
 HELICS_SHARED_DEPRECATED_CORE std::shared_ptr<Core> create (core_type type, int argc, char *argv[])
 {
-    CoreApp cr (type, argc,argv);
+    CoreApp cr (type, argc, argv);
     return cr.getCopyofCorePointer ();
 }
 
@@ -75,7 +75,7 @@ HELICS_SHARED_DEPRECATED_CORE std::shared_ptr<Core> create (std::vector<std::str
 */
 HELICS_SHARED_DEPRECATED_CORE std::shared_ptr<Core> create (core_type type, std::vector<std::string> args)
 {
-    CoreApp cr (type,  args);
+    CoreApp cr (type, args);
     return cr.getCopyofCorePointer ();
 }
 
@@ -146,17 +146,12 @@ FindOrCreate (core_type type, const std::string &coreName, std::vector<std::stri
 }
 
 /** try to find a joinable core of a specific type*/
-HELICS_SHARED_DEPRECATED_CORE std::shared_ptr<Core> findJoinableCoreOfType (core_type type)
-{
-    return nullptr;
-}
+HELICS_SHARED_DEPRECATED_CORE std::shared_ptr<Core> findJoinableCoreOfType (core_type type) { return nullptr; }
 
 /** locate a registered Core by name
 @param name the name of the core to find
 @return a shared_ptr to the testCore*/
-HELICS_SHARED_DEPRECATED_CORE std::shared_ptr<Core> findCore (const std::string &name)
-{
-    return nullptr;}
+HELICS_SHARED_DEPRECATED_CORE std::shared_ptr<Core> findCore (const std::string &name) { return nullptr; }
 
 /** register a testCore so it can be found by others
 @details also cleans up any leftover bCoresrokers that were previously unregistered this can be controlled by

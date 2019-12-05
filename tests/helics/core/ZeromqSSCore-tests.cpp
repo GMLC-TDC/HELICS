@@ -50,11 +50,11 @@ TEST (ZMQSSCore_tests, zmqSSComm_transmit)
     comm2.setPortNumber (DEFAULT_ZMQSS_BROKER_PORT_NUMBER);
     comm2.setServerMode (true);
 
-    comm.setCallback ([&counter, &act] (helics::ActionMessage m) {
+    comm.setCallback ([&counter, &act](helics::ActionMessage m) {
         ++counter;
         act = m;
     });
-    comm2.setCallback ([&counter2, &act2] (helics::ActionMessage m) {
+    comm2.setCallback ([&counter2, &act2](helics::ActionMessage m) {
         ++counter2;
         act2 = m;
     });
@@ -116,15 +116,15 @@ TEST (ZMQSSCore_tests, zmqSSComm_addroute)
     comm3.setPortNumber (DEFAULT_ZMQSS_BROKER_PORT_NUMBER);
     comm3.setServerMode (true);
 
-    comm.setCallback ([&counter, &act] (helics::ActionMessage m) {
+    comm.setCallback ([&counter, &act](helics::ActionMessage m) {
         ++counter;
         act = m;
     });
-    comm2.setCallback ([&counter2, &act2] (helics::ActionMessage m) {
+    comm2.setCallback ([&counter2, &act2](helics::ActionMessage m) {
         ++counter2;
         act2 = m;
     });
-    comm3.setCallback ([&counter3, &act3] (helics::ActionMessage m) {
+    comm3.setCallback ([&counter3, &act3](helics::ActionMessage m) {
         ++counter3;
         act3 = m;
     });
@@ -181,7 +181,7 @@ TEST (ZMQSSCore_tests, zmqSSCore_initialization_test)
     comm.setName ("test_broker");
     comm.setPortNumber (DEFAULT_ZMQSS_BROKER_PORT_NUMBER);
     comm.setServerMode (true);
-    comm.setCallback ([&counter, &msgs, &msgLock] (helics::ActionMessage m) {
+    comm.setCallback ([&counter, &msgs, &msgLock](helics::ActionMessage m) {
         ++counter;
         std::lock_guard<std::mutex> lock (msgLock);
         msgs.push_back (m);

@@ -30,23 +30,23 @@ class ActionMessage
 {
     // need to try to make sure this object is under 64 bytes in size to fit in cache lines NOT there yet
   private:
-	  action_message_def::action_t messageAction{ CMD_IGNORE };  // 4 -- command
+    action_message_def::action_t messageAction{CMD_IGNORE};  // 4 -- command
   public:
-	  int32_t messageID{ 0 };  //!< 8 -- message ID for a variety of purposes
+    int32_t messageID{0};  //!< 8 -- message ID for a variety of purposes
     global_federate_id source_id{parent_broker_id};  //!< 12 -- for federate_id or route_id
-	interface_handle source_handle{};  //!< 16 -- for local handle or local code
+    interface_handle source_handle{};  //!< 16 -- for local handle or local code
     global_federate_id dest_id{parent_broker_id};  //!< 20 fed_id for a targeted message
-	interface_handle dest_handle{};  //!< 24 local handle for a targeted message
-	uint16_t counter{ 0 };  //!< 26 counter for filter tracking or message counter
-	uint16_t flags{ 0 };  //!<  28 set of messageFlags
-	uint32_t sequenceID{ 0 };  //!< a sequence number for ordering
-	Time actionTime{ timeZero };  //!< 40 the time an action took place or will take place	//32
+    interface_handle dest_handle{};  //!< 24 local handle for a targeted message
+    uint16_t counter{0};  //!< 26 counter for filter tracking or message counter
+    uint16_t flags{0};  //!<  28 set of messageFlags
+    uint32_t sequenceID{0};  //!< a sequence number for ordering
+    Time actionTime{timeZero};  //!< 40 the time an action took place or will take place	//32
     std::string
       payload;  //!< string containing the data	//96 std::string is 32 bytes on most platforms (except libc++)
     std::string &name;  //!< alias payload to a name reference for registration functions
-	Time Te{ timeZero };  //!< 48 event time
-	Time Tdemin{ timeZero };  //!< 56 min dependent event time
-	Time Tso{ timeZero };  //!< 64 the second order dependent time
+    Time Te{timeZero};  //!< 48 event time
+    Time Tdemin{timeZero};  //!< 56 min dependent event time
+    Time Tso{timeZero};  //!< 64 the second order dependent time
   private:
     std::vector<std::string> stringData;  //!< container for extra string data
   public:

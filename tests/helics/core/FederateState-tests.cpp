@@ -185,7 +185,7 @@ TEST_F (federateStateTests, basic_processmessage_test)
 
     // Test returning when the initialization state is entered
     cmd.setAction (helics::CMD_INIT_GRANT);
-    auto fs_process = std::async (std::launch::async, [&] () { return fs->enterInitializingMode (); });
+    auto fs_process = std::async (std::launch::async, [&]() { return fs->enterInitializingMode (); });
     EXPECT_EQ (fs->getState (), federate_state::HELICS_CREATED);
     fs->addAction (cmd);
     fs_process.wait ();
@@ -196,8 +196,8 @@ TEST_F (federateStateTests, basic_processmessage_test)
     cmd.setAction (helics::CMD_STOP);
     fs->addAction (cmd);
     EXPECT_EQ (fs->getState (), federate_state::HELICS_INITIALIZING);
-    auto fs_process2 = std::async (std::launch::async,
-                                   [&] () { return fs->enterExecutingMode (iteration_request::no_iterations); });
+    auto fs_process2 =
+      std::async (std::launch::async, [&]() { return fs->enterExecutingMode (iteration_request::no_iterations); });
 
     fs->global_id = global_federate_id (0);  // if it doesn't match the id in the command, this will hang
     fs_process2.wait ();
@@ -216,7 +216,7 @@ TEST_F (federateStateTests, basic_processmessage_test)
     cmd.dest_id = fed22;
     cmd.name = "fed_name";
     clearActionFlag (cmd, error_flag);
-    fs_process = std::async (std::launch::async, [&] () { return fs->waitSetup (); });
+    fs_process = std::async (std::launch::async, [&]() { return fs->waitSetup (); });
     fs->addAction (cmd);
     fs_process.wait ();
     EXPECT_TRUE (fs_process.get () == iteration_result::next_step);
@@ -226,7 +226,7 @@ TEST_F (federateStateTests, basic_processmessage_test)
     cmd.setAction (helics::CMD_FED_ACK);
     cmd.dest_id = global_federate_id (23);
     setActionFlag (cmd, error_flag);
-    fs_process = std::async (std::launch::async, [&] () { return fs->waitSetup (); });
+    fs_process = std::async (std::launch::async, [&]() { return fs->waitSetup (); });
     fs->addAction (cmd);
     fs_process.wait ();
     EXPECT_TRUE (fs_process.get () == iteration_result::error);
@@ -238,8 +238,8 @@ TEST_F (federateStateTests, basic_processmessage_test)
 
     // Test returning when an error occurs
     cmd.setAction (helics::CMD_ERROR);
-    fs_process2 = std::async (std::launch::async,
-                              [&] () { return fs->enterExecutingMode (iteration_request::no_iterations); });
+    fs_process2 =
+      std::async (std::launch::async, [&]() { return fs->enterExecutingMode (iteration_request::no_iterations); });
     auto st = fs->getState ();
     EXPECT_TRUE ((st == federate_state::HELICS_INITIALIZING) || (st == federate_state::HELICS_EXECUTING));
     fs->addAction (cmd);
