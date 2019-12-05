@@ -6,50 +6,48 @@ SPDX-License-Identifier: BSD-3-Clause
 */
 #pragma once
 #include "global_federate_id.hpp"
+
 #include <chrono>
 #include <vector>
 
-namespace helics
-{
+namespace helics {
 class CommonCore;
 class CoreBroker;
 class ActionMessage;
 
 /** struct for managing the timeouts on the individual connections*/
-struct linkConnection
-{
-    bool waitingForPingReply{false};  //!< indicator that the connection is waiting
-    bool activeConnection{false};  //!< indicator that the connection is active
-    global_federate_id connection{0};  //!< the id of the connection
-    decltype (std::chrono::steady_clock::now ()) lastPing;
+struct linkConnection {
+    bool waitingForPingReply{false}; //!< indicator that the connection is waiting
+    bool activeConnection{false}; //!< indicator that the connection is active
+    global_federate_id connection{0}; //!< the id of the connection
+    decltype(std::chrono::steady_clock::now()) lastPing;
 };
 /** class to handle timeouts and other issues for cores and brokers*/
-class TimeoutMonitor
-{
+class TimeoutMonitor {
   public:
     /** tick function for a core,  executes one tick*/
-    void tick (CommonCore *core);
+    void tick(CommonCore* core);
     /** tick function for a broker,  executes one tick*/
-    void tick (CoreBroker *brk);
+    void tick(CoreBroker* brk);
     /** get a ping reply*/
-    void pingReply (const ActionMessage &m, CoreBroker *brk = nullptr);
+    void pingReply(const ActionMessage& m, CoreBroker* brk = nullptr);
     /**  set the overall timeout for the connection monitor*/
-    void setTimeout (std::chrono::milliseconds to) { timeout = to; }
+    void setTimeout(std::chrono::milliseconds to) { timeout = to; }
     /** reset the monitor to initial conditions*/
-    void reset ();
+    void reset();
     /** ping all a brokers sub connections*/
-    void pingSub (CoreBroker *brk);
+    void pingSub(CoreBroker* brk);
     /** set the parent id*/
-    void setParentId (global_broker_id parent_id) { parentConnection.connection = parent_id; };
+    void setParentId(global_broker_id parent_id) { parentConnection.connection = parent_id; };
 
   private:
-    std::chrono::milliseconds timeout{100000000};  //!< timeout for connections
-    bool waitingForConnection{false};  //!< waiting for initial connection
-    decltype (std::chrono::steady_clock::now ()) startWaiting;  //!< time that the waiting has started
-    linkConnection parentConnection;  //!< the connection information for the parent
-    std::vector<linkConnection> connections;  //!< connection information for the other connections
+    std::chrono::milliseconds timeout{100000000}; //!< timeout for connections
+    bool waitingForConnection{false}; //!< waiting for initial connection
+    decltype(std::chrono::steady_clock::now()) startWaiting; //!< time that the waiting has started
+    linkConnection parentConnection; //!< the connection information for the parent
+    std::vector<linkConnection> connections; //!< connection information for the other connections
 
     // int tickCounter;
 };
 
-}  // namespace helics
+} // namespace helics

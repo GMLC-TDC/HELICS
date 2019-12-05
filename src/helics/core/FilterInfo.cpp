@@ -10,12 +10,13 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <algorithm>
 #include <cstring>
 
-namespace helics
+namespace helics {
+void FilterInfo::removeTarget(global_handle targetToRemove)
 {
-void FilterInfo::removeTarget (global_handle targetToRemove)
-{
-    sourceTargets.erase (std::remove (sourceTargets.begin (), sourceTargets.end (), targetToRemove),
-                         sourceTargets.end ());
-    destTargets.erase (std::remove (destTargets.begin (), destTargets.end (), targetToRemove), destTargets.end ());
+    sourceTargets.erase(
+        std::remove(sourceTargets.begin(), sourceTargets.end(), targetToRemove),
+        sourceTargets.end());
+    destTargets.erase(
+        std::remove(destTargets.begin(), destTargets.end(), targetToRemove), destTargets.end());
 }
-}  // namespace helics
+} // namespace helics

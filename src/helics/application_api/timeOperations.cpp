@@ -6,20 +6,24 @@ SPDX-License-Identifier: BSD-3-Clause
 */
 
 #include "timeOperations.hpp"
+
 #include "../utilities/timeStringOps.hpp"
 
-namespace helics
+namespace helics {
+
+time_units timeUnitsFromString(const std::string& unitString)
 {
-
-time_units timeUnitsFromString (const std::string &unitString) { return gmlc::utilities::timeUnitsFromString (unitString); }
-
-Time loadTimeFromString (const std::string &timeString) { return gmlc::utilities::loadTimeFromString<Time> (timeString); }
-
-Time loadTimeFromString (std::string timeString, time_units defUnits)
-{
-    return gmlc::utilities::loadTimeFromString<Time> (timeString, defUnits);
+    return gmlc::utilities::timeUnitsFromString(unitString);
 }
 
-}  // namespace helics
+Time loadTimeFromString(const std::string& timeString)
+{
+    return gmlc::utilities::loadTimeFromString<Time>(timeString);
+}
 
+Time loadTimeFromString(std::string timeString, time_units defUnits)
+{
+    return gmlc::utilities::loadTimeFromString<Time>(timeString, defUnits);
+}
 
+} // namespace helics

@@ -19,7 +19,6 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helics/core/zmq/ZmqCore.h"
 
 #include "gtest/gtest.h"
-
 #include <future>
 #include <iostream>
 
@@ -29,9 +28,9 @@ using helics::Core;
 
 const std::string host = "tcp://127.0.0.1";
 
-TEST (ZMQSSCore_tests, zmqSSComm_transmit)
+TEST(ZMQSSCore_tests, zmqSSComm_transmit)
 {
-    std::this_thread::sleep_for (400ms);
+    std::this_thread::sleep_for(400ms);
     std::atomic<int> counter{0};
     std::atomic<int> counter2{0};
     guarded<helics::ActionMessage> act;
@@ -39,56 +38,54 @@ TEST (ZMQSSCore_tests, zmqSSComm_transmit)
 
     helics::zeromq::ZmqCommsSS comm;
     helics::zeromq::ZmqCommsSS comm2;
-    comm.loadTargetInfo (host, host);
+    comm.loadTargetInfo(host, host);
     // comm2 is the broker
-    comm2.loadTargetInfo (host, std::string ());
+    comm2.loadTargetInfo(host, std::string());
 
-    comm.setBrokerPort (DEFAULT_ZMQSS_BROKER_PORT_NUMBER);
-    comm.setName ("test_comms");
-    comm.setServerMode (false);
-    comm2.setName ("test_broker");
-    comm2.setPortNumber (DEFAULT_ZMQSS_BROKER_PORT_NUMBER);
-    comm2.setServerMode (true);
+    comm.setBrokerPort(DEFAULT_ZMQSS_BROKER_PORT_NUMBER);
+    comm.setName("test_comms");
+    comm.setServerMode(false);
+    comm2.setName("test_broker");
+    comm2.setPortNumber(DEFAULT_ZMQSS_BROKER_PORT_NUMBER);
+    comm2.setServerMode(true);
 
-    comm.setCallback ([&counter, &act] (helics::ActionMessage m) {
+    comm.setCallback([&counter, &act](helics::ActionMessage m) {
         ++counter;
         act = m;
     });
-    comm2.setCallback ([&counter2, &act2] (helics::ActionMessage m) {
+    comm2.setCallback([&counter2, &act2](helics::ActionMessage m) {
         ++counter2;
         act2 = m;
     });
     // need to launch the connection commands at the same time since they depend on each other in this case
-    auto connected_fut = std::async (std::launch::async, [&comm] { return comm.connect (); });
-    bool connected2 = comm2.connect ();
-    ASSERT_TRUE (connected2);
-    bool connected1 = connected_fut.get ();
-    if (!connected1)
-    {  // lets just try again if it is not connected
-        connected1 = comm.connect ();
+    auto connected_fut = std::async(std::launch::async, [&comm] { return comm.connect(); });
+    bool connected2 = comm2.connect();
+    ASSERT_TRUE(connected2);
+    bool connected1 = connected_fut.get();
+    if (!connected1) { // lets just try again if it is not connected
+        connected1 = comm.connect();
     }
-    ASSERT_TRUE (connected1);
+    ASSERT_TRUE(connected1);
 
-    comm.transmit (helics::parent_route_id, helics::CMD_ACK);
-    std::this_thread::sleep_for (250ms);
-    if (counter2 != 1)
-    {
-        std::this_thread::sleep_for (500ms);
+    comm.transmit(helics::parent_route_id, helics::CMD_ACK);
+    std::this_thread::sleep_for(250ms);
+    if (counter2 != 1) {
+        std::this_thread::sleep_for(500ms);
     }
-    ASSERT_EQ (counter2, 2);
-    EXPECT_TRUE (act2.lock ()->action () == helics::action_message_def::action_t::cmd_ack);
+    ASSERT_EQ(counter2, 2);
+    EXPECT_TRUE(act2.lock()->action() == helics::action_message_def::action_t::cmd_ack);
 
-    comm2.disconnect ();
-    EXPECT_FALSE (comm2.isConnected ());
-    comm.disconnect ();
-    EXPECT_FALSE (comm.isConnected ());
+    comm2.disconnect();
+    EXPECT_FALSE(comm2.isConnected());
+    comm.disconnect();
+    EXPECT_FALSE(comm.isConnected());
 
-    std::this_thread::sleep_for (100ms);
+    std::this_thread::sleep_for(100ms);
 }
 
-TEST (ZMQSSCore_tests, zmqSSComm_addroute)
+TEST(ZMQSSCore_tests, zmqSSComm_addroute)
 {
-    std::this_thread::sleep_for (400ms);
+    std::this_thread::sleep_for(400ms);
     std::atomic<int> counter{0};
     std::atomic<int> counter2{0};
     std::atomic<int> counter3{0};
@@ -99,183 +96,168 @@ TEST (ZMQSSCore_tests, zmqSSComm_addroute)
     helics::zeromq::ZmqCommsSS comm;
     helics::zeromq::ZmqCommsSS comm2;
     helics::zeromq::ZmqCommsSS comm3;
-    comm.loadTargetInfo (host, host);
-    comm2.loadTargetInfo (host, host);
+    comm.loadTargetInfo(host, host);
+    comm2.loadTargetInfo(host, host);
     // comm3 is the broker
-    comm3.loadTargetInfo (host, std::string ());
+    comm3.loadTargetInfo(host, std::string());
 
-    comm.setBrokerPort (DEFAULT_ZMQSS_BROKER_PORT_NUMBER);
-    comm.setName ("test1");
-    comm.setServerMode (false);
+    comm.setBrokerPort(DEFAULT_ZMQSS_BROKER_PORT_NUMBER);
+    comm.setName("test1");
+    comm.setServerMode(false);
 
-    comm2.setBrokerPort (DEFAULT_ZMQSS_BROKER_PORT_NUMBER);
-    comm2.setName ("test2");
-    comm2.setServerMode (false);
+    comm2.setBrokerPort(DEFAULT_ZMQSS_BROKER_PORT_NUMBER);
+    comm2.setName("test2");
+    comm2.setServerMode(false);
 
-    comm3.setName ("test_broker");
-    comm3.setPortNumber (DEFAULT_ZMQSS_BROKER_PORT_NUMBER);
-    comm3.setServerMode (true);
+    comm3.setName("test_broker");
+    comm3.setPortNumber(DEFAULT_ZMQSS_BROKER_PORT_NUMBER);
+    comm3.setServerMode(true);
 
-    comm.setCallback ([&counter, &act] (helics::ActionMessage m) {
+    comm.setCallback([&counter, &act](helics::ActionMessage m) {
         ++counter;
         act = m;
     });
-    comm2.setCallback ([&counter2, &act2] (helics::ActionMessage m) {
+    comm2.setCallback([&counter2, &act2](helics::ActionMessage m) {
         ++counter2;
         act2 = m;
     });
-    comm3.setCallback ([&counter3, &act3] (helics::ActionMessage m) {
+    comm3.setCallback([&counter3, &act3](helics::ActionMessage m) {
         ++counter3;
         act3 = m;
     });
     // need to launch the connection commands at the same time since they depend on each other in this case
-    auto connected_fut = std::async (std::launch::async, [&comm] { return comm.connect (); });
-    auto connected_fut2 = std::async (std::launch::async, [&comm2] { return comm2.connect (); });
-    bool connected1 = comm3.connect ();
-    ASSERT_TRUE (connected1);
-    bool connected2 = connected_fut.get ();
-    if (!connected2)
-    {  // lets just try again if it is not connected
-        connected2 = comm.connect ();
+    auto connected_fut = std::async(std::launch::async, [&comm] { return comm.connect(); });
+    auto connected_fut2 = std::async(std::launch::async, [&comm2] { return comm2.connect(); });
+    bool connected1 = comm3.connect();
+    ASSERT_TRUE(connected1);
+    bool connected2 = connected_fut.get();
+    if (!connected2) { // lets just try again if it is not connected
+        connected2 = comm.connect();
     }
-    ASSERT_TRUE (connected2);
-    connected2 = connected_fut2.get ();
-    if (!connected2)
-    {  // lets just try again if it is not connected
-        connected2 = comm2.connect ();
+    ASSERT_TRUE(connected2);
+    connected2 = connected_fut2.get();
+    if (!connected2) { // lets just try again if it is not connected
+        connected2 = comm2.connect();
     }
-    ASSERT_TRUE (connected2);
-    comm.transmit (helics::parent_route_id, helics::CMD_ACK);
-    std::this_thread::sleep_for (250ms);
-    if (counter3 != 3)
-    {
-        std::this_thread::sleep_for (500ms);
+    ASSERT_TRUE(connected2);
+    comm.transmit(helics::parent_route_id, helics::CMD_ACK);
+    std::this_thread::sleep_for(250ms);
+    if (counter3 != 3) {
+        std::this_thread::sleep_for(500ms);
     }
-    ASSERT_EQ (counter3, 3);
-    comm3.addRoute (helics::route_id (2), comm2.getAddress ());
-    comm3.transmit (helics::route_id (2), helics::CMD_ACK);
-    std::this_thread::sleep_for (250ms);
-    if (counter2 != 1)
-    {
-        std::this_thread::sleep_for (500ms);
+    ASSERT_EQ(counter3, 3);
+    comm3.addRoute(helics::route_id(2), comm2.getAddress());
+    comm3.transmit(helics::route_id(2), helics::CMD_ACK);
+    std::this_thread::sleep_for(250ms);
+    if (counter2 != 1) {
+        std::this_thread::sleep_for(500ms);
     }
-    ASSERT_EQ (counter2, 1);
-    EXPECT_TRUE (act2.lock ()->action () == helics::action_message_def::action_t::cmd_ack);
+    ASSERT_EQ(counter2, 1);
+    EXPECT_TRUE(act2.lock()->action() == helics::action_message_def::action_t::cmd_ack);
 
-    comm.disconnect ();
-    EXPECT_TRUE (!comm.isConnected ());
-    comm2.disconnect ();
-    EXPECT_TRUE (!comm2.isConnected ());
-    comm3.disconnect ();
-    EXPECT_TRUE (!comm3.isConnected ());
-    std::this_thread::sleep_for (100ms);
+    comm.disconnect();
+    EXPECT_TRUE(!comm.isConnected());
+    comm2.disconnect();
+    EXPECT_TRUE(!comm2.isConnected());
+    comm3.disconnect();
+    EXPECT_TRUE(!comm3.isConnected());
+    std::this_thread::sleep_for(100ms);
 }
 
-TEST (ZMQSSCore_tests, zmqSSCore_initialization_test)
+TEST(ZMQSSCore_tests, zmqSSCore_initialization_test)
 {
     std::atomic<int> counter{0};
     std::vector<helics::ActionMessage> msgs;
     helics::zeromq::ZmqCommsSS comm;
     std::mutex msgLock;
-    comm.loadTargetInfo (host, std::string ());
-    comm.setName ("test_broker");
-    comm.setPortNumber (DEFAULT_ZMQSS_BROKER_PORT_NUMBER);
-    comm.setServerMode (true);
-    comm.setCallback ([&counter, &msgs, &msgLock] (helics::ActionMessage m) {
+    comm.loadTargetInfo(host, std::string());
+    comm.setName("test_broker");
+    comm.setPortNumber(DEFAULT_ZMQSS_BROKER_PORT_NUMBER);
+    comm.setServerMode(true);
+    comm.setCallback([&counter, &msgs, &msgLock](helics::ActionMessage m) {
         ++counter;
-        std::lock_guard<std::mutex> lock (msgLock);
-        msgs.push_back (m);
+        std::lock_guard<std::mutex> lock(msgLock);
+        msgs.push_back(m);
     });
-    comm.connect ();
+    comm.connect();
 
     std::string initializationString = "--name=core1";
-    auto core = helics::CoreFactory::create (helics::core_type::ZMQ_SS, initializationString);
+    auto core = helics::CoreFactory::create(helics::core_type::ZMQ_SS, initializationString);
 
-    ASSERT_TRUE (core);
-    EXPECT_TRUE (core->isConfigured ());
+    ASSERT_TRUE(core);
+    EXPECT_TRUE(core->isConfigured());
 
-    std::this_thread::sleep_for (100ms);
-    bool connected = core->connect ();
-    EXPECT_TRUE (connected);
+    std::this_thread::sleep_for(100ms);
+    bool connected = core->connect();
+    EXPECT_TRUE(connected);
 
-    if (connected)
-    {
+    if (connected) {
         int cnt = 0;
-        while (counter == 0)
-        {
-            std::this_thread::sleep_for (100ms);
+        while (counter == 0) {
+            std::this_thread::sleep_for(100ms);
             ++cnt;
-            if (cnt > 30)
-            {
+            if (cnt > 30) {
                 break;
             }
         }
-        EXPECT_GE (counter, 1);
-        std::unique_lock<std::mutex> mLock (msgLock);
-        if (!msgs.empty ())
-        {
-            auto rM = msgs.at (0);
-            mLock.unlock ();
-            EXPECT_EQ (rM.name, "core1");
+        EXPECT_GE(counter, 1);
+        std::unique_lock<std::mutex> mLock(msgLock);
+        if (!msgs.empty()) {
+            auto rM = msgs.at(0);
+            mLock.unlock();
+            EXPECT_EQ(rM.name, "core1");
             // std::cout << "rM.name: " << rM.name << std::endl;
-            EXPECT_TRUE (rM.action () == helics::action_message_def::action_t::cmd_protocol);
-        }
-        else
-        {
-            mLock.unlock ();
+            EXPECT_TRUE(rM.action() == helics::action_message_def::action_t::cmd_protocol);
+        } else {
+            mLock.unlock();
         }
         cnt = 0;
-        while (counter == 1)
-        {
-            std::this_thread::sleep_for (100ms);
+        while (counter == 1) {
+            std::this_thread::sleep_for(100ms);
             ++cnt;
-            if (cnt > 30)
-            {
+            if (cnt > 30) {
                 break;
             }
         }
-        EXPECT_GE (counter, 2);
-        mLock.lock ();
-        if (!msgs.empty ())
-        {
-            auto rM2 = msgs.at (1);
-            mLock.unlock ();
-            EXPECT_EQ (rM2.name, "core1");
+        EXPECT_GE(counter, 2);
+        mLock.lock();
+        if (!msgs.empty()) {
+            auto rM2 = msgs.at(1);
+            mLock.unlock();
+            EXPECT_EQ(rM2.name, "core1");
             // std::cout << "rM.name: " << rM2.name << std::endl;
-            EXPECT_TRUE (rM2.action () == helics::action_message_def::action_t::cmd_reg_broker);
-        }
-        else
-        {
-            mLock.unlock ();
+            EXPECT_TRUE(rM2.action() == helics::action_message_def::action_t::cmd_reg_broker);
+        } else {
+            mLock.unlock();
         }
     }
-    core->disconnect ();
-    comm.disconnect ();
+    core->disconnect();
+    comm.disconnect();
     core = nullptr;
-    msgs.clear ();
-    helics::CoreFactory::cleanUpCores (100ms);
+    msgs.clear();
+    helics::CoreFactory::cleanUpCores(100ms);
 }
 
 /** test case checks default values and makes sure they all mesh together
 also tests the automatic port determination for cores
 */
-TEST (ZMQSSCore_tests, zmqSSCore_core_broker_default_test)
+TEST(ZMQSSCore_tests, zmqSSCore_core_broker_default_test)
 {
     std::string initializationString = "-f 1";
 
-    auto broker = helics::BrokerFactory::create (helics::core_type::ZMQ_SS, initializationString);
+    auto broker = helics::BrokerFactory::create(helics::core_type::ZMQ_SS, initializationString);
 
-    auto core = helics::CoreFactory::create (helics::core_type::ZMQ_SS, initializationString);
-    bool connected = broker->isConnected ();
-    EXPECT_TRUE (connected);
-    connected = core->connect ();
-    EXPECT_TRUE (connected);
+    auto core = helics::CoreFactory::create(helics::core_type::ZMQ_SS, initializationString);
+    bool connected = broker->isConnected();
+    EXPECT_TRUE(connected);
+    connected = core->connect();
+    EXPECT_TRUE(connected);
 
-    core->disconnect ();
+    core->disconnect();
 
-    EXPECT_TRUE (!core->isConnected ());
-    broker->disconnect ();
-    EXPECT_TRUE (!broker->isConnected ());
-    helics::CoreFactory::cleanUpCores (200ms);
-    helics::BrokerFactory::cleanUpBrokers (200ms);
+    EXPECT_TRUE(!core->isConnected());
+    broker->disconnect();
+    EXPECT_TRUE(!broker->isConnected());
+    helics::CoreFactory::cleanUpCores(200ms);
+    helics::BrokerFactory::cleanUpBrokers(200ms);
 }

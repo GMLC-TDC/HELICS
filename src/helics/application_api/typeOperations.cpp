@@ -5,16 +5,22 @@ the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 #include "typeOperations.hpp"
+
 #include "../core/coreTypeOperations.hpp"
 
-namespace helics
+namespace helics {
+std::string to_string(core_type type)
 {
-std::string to_string (core_type type) { return core::to_string (type); }
-
-core_type coreTypeFromString (std::string type) noexcept
-{
-    return core::coreTypeFromString (type);
+    return core::to_string(type);
 }
 
-bool isCoreTypeAvailable (core_type type) noexcept { return core::isCoreTypeAvailable (type); }
-}  // namespace helics
+core_type coreTypeFromString(std::string type) noexcept
+{
+    return core::coreTypeFromString(type);
+}
+
+bool isCoreTypeAvailable(core_type type) noexcept
+{
+    return core::isCoreTypeAvailable(type);
+}
+} // namespace helics

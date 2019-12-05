@@ -2,7 +2,6 @@
 
 int main()
 {
-    std::variant<int,double> b = 5;
+    std::variant<int, double> b = 5;
     return 0;
 }
-

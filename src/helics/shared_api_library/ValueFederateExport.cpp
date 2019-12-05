@@ -1229,8 +1229,7 @@ void helicsInputSetDefaultTime (helics_input inp, helics_time val, helics_error 
     }
 
     helics::Time tval (val);
-   inpObj->inputPtr->setDefault (tval);
-   
+    inpObj->inputPtr->setDefault (tval);
 }
 
 void helicsInputSetDefaultChar (helics_input inp, char val, helics_error *err)
@@ -1252,7 +1251,6 @@ void helicsInputSetDefaultComplex (helics_input inp, double real, double imag, h
     }
 
     inpObj->inputPtr->setDefault (std::complex<double> (real, imag));
-    
 }
 
 void helicsInputSetDefaultVector (helics_input inp, const double *vectorInput, int vectorLength, helics_error *err)

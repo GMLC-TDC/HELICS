@@ -6,4 +6,3 @@ int main()
     mtx.lock_shared();
     mtx.unlock_shared();
 }
-

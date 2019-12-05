@@ -5,44 +5,42 @@ the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 #include "TcpCore.h"
+
 #include "../NetworkCore_impl.hpp"
 #include "../helicsCLI11.hpp"
 #include "TcpComms.h"
 #include "TcpCommsSS.h"
 
-namespace helics
-{
+namespace helics {
 template class NetworkCore<tcp::TcpComms, interface_type::tcp>;
-namespace tcp
-{
-TcpCoreSS::TcpCoreSS () noexcept {}
+namespace tcp {
+    TcpCoreSS::TcpCoreSS() noexcept {}
 
-TcpCoreSS::TcpCoreSS (const std::string &core_name) : NetworkCore (core_name) {}
+    TcpCoreSS::TcpCoreSS(const std::string& core_name): NetworkCore(core_name) {}
 
-std::shared_ptr<helicsCLI11App> TcpCoreSS::generateCLI ()
-{
-    auto hApp = NetworkCore::generateCLI ();
-    hApp->description ("TCP Single Socket Core ");
-    hApp->add_option ("--connections", connections, "target link connections");
-    hApp->add_flag ("--no_outgoing_connection", no_outgoing_connections, "disable outgoing connections")
-      ->ignore_underscore ();
-    return hApp;
-}
-
-bool TcpCoreSS::brokerConnect ()
-{
-    std::unique_lock<std::mutex> lock (dataMutex);
-    if (!connections.empty ())
+    std::shared_ptr<helicsCLI11App> TcpCoreSS::generateCLI()
     {
-        comms->addConnections (connections);
+        auto hApp = NetworkCore::generateCLI();
+        hApp->description("TCP Single Socket Core ");
+        hApp->add_option("--connections", connections, "target link connections");
+        hApp->add_flag(
+                "--no_outgoing_connection", no_outgoing_connections, "disable outgoing connections")
+            ->ignore_underscore();
+        return hApp;
     }
-    if (no_outgoing_connections)
-    {
-        comms->setFlag ("allow_outgoing", false);
-    }
-    lock.unlock ();
-    return NetworkCore::brokerConnect ();
-}
 
-}  // namespace tcp
-}  // namespace helics
+    bool TcpCoreSS::brokerConnect()
+    {
+        std::unique_lock<std::mutex> lock(dataMutex);
+        if (!connections.empty()) {
+            comms->addConnections(connections);
+        }
+        if (no_outgoing_connections) {
+            comms->setFlag("allow_outgoing", false);
+        }
+        lock.unlock();
+        return NetworkCore::brokerConnect();
+    }
+
+} // namespace tcp
+} // namespace helics

@@ -154,15 +154,14 @@ extern "C"
     HELICS_EXPORT void
     helicsBrokerAddDestinationFilterToEndpoint (helics_broker broker, const char *filter, const char *endpoint, helics_error *err);
 
-	/** load a file containing connection information
+    /** load a file containing connection information
     @param broker the broker to generate the connections from
     @param file a JSON or TOML file containing connection information
     @forcpponly
     @param[in,out] err a helics_error object, can be NULL if the errors are to be ignored
     @endforcpponly
     */
-    HELICS_EXPORT void
-    helicsBrokerMakeConnections (helics_broker broker, const char *file, helics_error *err);
+    HELICS_EXPORT void helicsBrokerMakeConnections (helics_broker broker, const char *file, helics_error *err);
 
     /** wait for the core to disconnect
   @param core the core to wait for
@@ -219,8 +218,7 @@ extern "C"
     HELICS_EXPORT void
     helicsCoreAddDestinationFilterToEndpoint (helics_core core, const char *filter, const char *endpoint, helics_error *err);
 
-
-	/** load a file containing connection information
+    /** load a file containing connection information
     @param core the core to generate the connections from
     @param file a JSON or TOML file containing connection information
     @forcpponly
@@ -889,7 +887,7 @@ extern "C"
     */
     HELICS_EXPORT void helicsFederateSetGlobal (helics_federate fed, const char *valueName, const char *value, helics_error *err);
 
-	/** set the logging file for a federate(actually on the core associated with a federate)
+    /** set the logging file for a federate(actually on the core associated with a federate)
     @param fed the federate to set the log file for
     @param logFile the name of the log file
     @forcpponly
@@ -966,7 +964,7 @@ extern "C"
     */
     HELICS_EXPORT void helicsBrokerSetGlobal (helics_broker broker, const char *valueName, const char *value, helics_error *err);
 
-	/** set a the log file on a core
+    /** set a the log file on a core
     @param core the core to set the global through
     @param logFileName the name of the file to log to
     @forcpponly
@@ -975,7 +973,7 @@ extern "C"
     */
     HELICS_EXPORT void helicsCoreSetLogFile (helics_core core, const char *logFileName, helics_error *err);
 
-	/** set a the log file on a broker
+    /** set a the log file on a broker
     @param broker the broker to set the global through
     @param logFileName the name of the file to log to
     @forcpponly

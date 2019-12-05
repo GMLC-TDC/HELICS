@@ -7,20 +7,17 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helics/helics-config.h"
 
 #include "gtest/gtest.h"
-
 #include <helics/core/BrokerFactory.hpp>
 #include <helics/core/CoreFactory.hpp>
 
-struct globalTestConfig : public ::testing::Environment
-{
-    virtual void TearDown () override
+struct globalTestConfig: public ::testing::Environment {
+    virtual void TearDown() override
     {
-
-        helics::CoreFactory::cleanUpCores ();
-        helics::BrokerFactory::cleanUpBrokers ();
+        helics::CoreFactory::cleanUpCores();
+        helics::BrokerFactory::cleanUpBrokers();
     }
 };
 
 // register the global setup and teardown structure
-::testing::Environment *const foo_env = ::testing::AddGlobalTestEnvironment (new globalTestConfig);
+::testing::Environment* const foo_env = ::testing::AddGlobalTestEnvironment(new globalTestConfig);
 //____________________________________________________________________________//
