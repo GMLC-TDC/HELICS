@@ -144,11 +144,11 @@ install_boost () {
     fi
 
     if [[ "${cxxflags_arr[*]}" ]]; then
-        cxxflags_var="cxxflags=${cxxflags_arr[@]}"
+        cxxflags_var="cxxflags=${cxxflags_arr[*]}"
     fi
 
     if [[ "${linkflags_arr[*]}" ]]; then
-        linkflags_var="linkflags=${linkflags_arr[@]}"
+        linkflags_var="linkflags=${linkflags_arr[*]}"
     fi
 
     echo Boost link type: $b2_link_type
