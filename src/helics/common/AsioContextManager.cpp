@@ -38,7 +38,7 @@ std::shared_ptr<AsioContextManager>
     std::shared_ptr<AsioContextManager> contextPtr;
     std::lock_guard<std::mutex> ctxlock(
         contextLock); // just to ensure that nothing funny happens if you try
-        // to get a context while it is being constructed
+    // to get a context while it is being constructed
     auto fnd = contexts.find(contextName);
     if (fnd != contexts.end()) {
         contextPtr = fnd->second;
@@ -56,7 +56,7 @@ std::shared_ptr<AsioContextManager>
 {
     std::lock_guard<std::mutex> ctxlock(
         contextLock); // just to ensure that nothing funny happens if you try
-        // to get a context while it is being constructed
+    // to get a context while it is being constructed
     auto fnd = contexts.find(contextName);
     if (fnd != contexts.end()) {
         return fnd->second;

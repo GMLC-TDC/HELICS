@@ -32,7 +32,7 @@ namespace tcp {
         bool no_outgoing_connections = false; //!< disable outgoing connections if true;
         std::vector<std::string>
             connections; //!< defined connections These are connections that the comm section
-            //!< reaches out to regardless of whether it is a broker/core/ or server
+        //!< reaches out to regardless of whether it is a broker/core/ or server
     };
 
 } // namespace tcp

@@ -353,8 +353,8 @@ class CommonCore: public Core, public BrokerBase {
         loopFederates; // federate pointers stored for the core loop
     std::atomic<int32_t> messageCounter{
         54}; //!< counter for the number of messages that have been sent, nothing
-        //!< magical about 54 just a number bigger than 1 to prevent
-        //!< confusion
+    //!< magical about 54 just a number bigger than 1 to prevent
+    //!< confusion
 
     ordered_guarded<HandleManager> handles; //!< local handle information;
     HandleManager

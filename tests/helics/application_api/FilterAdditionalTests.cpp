@@ -157,7 +157,7 @@ TEST_P(filter_type_tests, message_reroute_filter_condition)
     filter_op->setString("newdestination", "port3");
     filter_op->setString(
         "condition", "end"); // match all messages with a destination endpoint stating with
-        // "end"
+    // "end"
     fFed->setFilterOperator(f1, filter_op->getOperator());
 
     fFed->enterExecutingModeAsync();
