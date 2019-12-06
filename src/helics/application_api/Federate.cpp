@@ -213,28 +213,21 @@ void Federate::enterInitializingModeAsync()
 
 bool Federate::isAsyncOperationCompleted() const
 {
+    constexpr std::chrono::seconds wait_delay(0);
+    auto ready = std::future_status::ready;
+
     auto asyncInfo = asyncCallInfo->lock_shared();
     switch (currentMode) {
         case modes::pending_init:
-            return (
-                asyncInfo->initFuture.wait_for(std::chrono::seconds(0)) ==
-                std::future_status::ready);
+            return (asyncInfo->initFuture.wait_for(wait_delay) == ready);
         case modes::pending_exec:
-            return (
-                asyncInfo->execFuture.wait_for(std::chrono::seconds(0)) ==
-                std::future_status::ready);
+            return (asyncInfo->execFuture.wait_for(wait_delay) == ready);
         case modes::pending_time:
-            return (
-                asyncInfo->timeRequestFuture.wait_for(std::chrono::seconds(0)) ==
-                std::future_status::ready);
+            return (asyncInfo->timeRequestFuture.wait_for(wait_delay) == ready);
         case modes::pending_iterative_time:
-            return (
-                asyncInfo->timeRequestIterativeFuture.wait_for(std::chrono::seconds(0)) ==
-                std::future_status::ready);
+            return (asyncInfo->timeRequestIterativeFuture.wait_for(wait_delay) == ready);
         case modes::pending_finalize:
-            return (
-                asyncInfo->finalizeFuture.wait_for(std::chrono::seconds(0)) ==
-                std::future_status::ready);
+            return (asyncInfo->finalizeFuture.wait_for(wait_delay) == ready);
         default:
             return false;
     }
