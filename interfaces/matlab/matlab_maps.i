@@ -252,7 +252,7 @@ static void throwHelicsMatlabError(helics_error *err) {
 
 // Set argument to NULL before any conversion occurs
 %typemap(check)(void *data, int maxDatalen, int *actualSize) {
-    $2=helicsSubscriptionGetValueSize(arg1)+2;
+    $2 = helicsInputGetRawValueSize(arg1) + 2;
     $1 =  malloc($2);
 }
 
