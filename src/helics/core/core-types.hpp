@@ -94,7 +94,7 @@ constexpr auto FORCE_ITERATION =
     helics::iteration_request::force_iteration; //!< simplified alias to force an iteration
 constexpr auto ITERATE_IF_NEEDED = helics::iteration_request::
     iterate_if_needed; //!< simplified alias to indicate that helics should iterate if
-    //!< warranted
+//!< warranted
 
 // #TOBEDEPRECTATED The use of the the core-types header for the functions contained in ../application_api/typeOperations.hpp
 // is deprectaced and will be removed in HELICS 3.0 please use

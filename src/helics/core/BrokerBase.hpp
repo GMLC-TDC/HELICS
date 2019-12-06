@@ -65,7 +65,7 @@ class BrokerBase {
     bool forceLoggingFlush{false}; //!< force the log to flush after every message
     bool queueDisabled{
         false}; //!< flag indicating that the message queue should not be used and all functions
-        //!< called directly instead of distinct thread
+    //!< called directly instead of distinct thread
   protected:
     std::string logFile; //!< the file to log message to
     std::unique_ptr<ForwardingTimeCoordinator> timeCoord; //!< object managing the time control
@@ -85,8 +85,8 @@ class BrokerBase {
     };
     std::atomic<broker_state_t> brokerState{
         broker_state_t::created}; //!< flag indicating that the structure is past the
-        //!< initialization stage indicating that no more changes
-        //!< can be made to the number of federates or handles
+    //!< initialization stage indicating that no more changes
+    //!< can be made to the number of federates or handles
     bool noAutomaticID{false}; //!< the broker should not automatically generate an ID
     bool hasTimeDependency{false}; //!< set to true if the broker has Time dependencies
     bool enteredExecutionMode{
