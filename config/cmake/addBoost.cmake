@@ -86,7 +86,7 @@ if(NOT BOOST_REQUIRED_LIBRARIES)
     set(BOOST_REQUIRED_LIBRARIES)
 endif()
 
-# Minimum version of Boost required for building HELICS
+# Minimum version of Boost required for building a project
 set(BOOST_MINIMUM_VERSION 1.58)
 
 if(BOOST_REQUIRED_LIBRARIES)

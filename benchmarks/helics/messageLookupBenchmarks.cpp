@@ -113,7 +113,7 @@ class messageGenerator
     }
 };
 
-static void BM_mgen_singleFed (benchmark::State &state)
+static void BM_mgen_singleCore (benchmark::State &state)
 {
     for (auto _ : state)
     {
@@ -134,7 +134,7 @@ static void BM_mgen_singleFed (benchmark::State &state)
     }
 }
 // Register the function as a benchmark
-BENCHMARK (BM_mgen_singleFed)
+BENCHMARK (BM_mgen_singleCore)
   ->RangeMultiplier (4)
   ->Range (1, 1 << 18)
   ->Unit (benchmark::TimeUnit::kMillisecond)
@@ -154,13 +154,13 @@ static void BM_mgen_multiCore (benchmark::State &state, core_type cType)
         int feds = static_cast<int> (state.range (1));
         gmlc::concurrency::Barrier brr (feds);
         auto broker = helics::BrokerFactory::create (cType, std::string ("--federates=") + std::to_string (feds));
-        broker->setLoggingLevel (0);
+        broker->setLoggingLevel (helics_log_level_no_print);
 
         std::vector<messageGenerator> gens (feds);
         std::vector<std::shared_ptr<Core>> cores (feds);
         for (int ii = 0; ii < feds; ++ii)
         {
-            cores[ii] = helics::CoreFactory::create (cType, std::string (" --federates=1 --broker=" +
+            cores[ii] = helics::CoreFactory::create (cType, std::string (" --federates=1 --log_level=no_print --broker=" +
                                                                          broker->getIdentifier ()));
             cores[ii]->connect ();
             gens[ii].initialize (cores[ii]->getIdentifier (), static_cast<int> (state.range (0) / state.range (1)),
