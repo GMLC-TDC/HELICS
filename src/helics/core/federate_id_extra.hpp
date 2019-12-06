@@ -11,48 +11,42 @@ SPDX-License-Identifier: BSD-3-Clause
 
 /** override the is_easily_hashable type_trait of interface_handle for use in DualMappedVector and some other types
  * that may optionally use std::map or std::unordered_map*/
-template <>
-struct is_easily_hashable<helics::interface_handle>
-{
+template<>
+struct is_easily_hashable<helics::interface_handle> {
     static constexpr bool value = true;
 };
 
 /** override the is_easily_hashable type_trait for use in DualMappedVector and some other types that may optionally
  * use std::map or std::unordered_map*/
-template <>
-struct is_easily_hashable<helics::global_federate_id>
-{
+template<>
+struct is_easily_hashable<helics::global_federate_id> {
     static constexpr bool value = true;
 };
 
 /** override the is_easily_hashable type_trait for use in DualMappedVector and some other types that may optionally
  * use std::map or std::unordered_map*/
-template <>
-struct is_easily_hashable<helics::local_federate_id>
-{
+template<>
+struct is_easily_hashable<helics::local_federate_id> {
     static constexpr bool value = true;
 };
 
 /** override the is_easily_hashable type_trait for use in DualMappedVector and some other types that may optionally
  * use std::map or std::unordered_map*/
-template <>
-struct is_easily_hashable<helics::global_broker_id>
-{
+template<>
+struct is_easily_hashable<helics::global_broker_id> {
     static constexpr bool value = true;
 };
 
 /** override the is_easily_hashable type_trait for use in DualMappedVector and some other types that may optionally
  * use std::map or std::unordered_map*/
-template <>
-struct is_easily_hashable<helics::route_id>
-{
+template<>
+struct is_easily_hashable<helics::route_id> {
     static constexpr bool value = true;
 };
 
 /** override the is_easily_hashable type_trait for use in DualMappedVector and some other types that may optionally
  * use std::map or std::unordered_map*/
-template <>
-struct is_easily_hashable<helics::global_handle>
-{
+template<>
+struct is_easily_hashable<helics::global_handle> {
     static constexpr bool value = true;
 };

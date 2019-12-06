@@ -9,32 +9,33 @@ SPDX-License-Identifier: BSD-3-Clause
 #pragma once
 
 //  Detect whether the compiler supports C++11 rvalue references.
-#if (defined(__GNUC__) && (__GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ > 2)) &&                              \
-     defined(__GXX_EXPERIMENTAL_CXX0X__))
-#define HELICS_HAS_RVALUE_REFS
+#if (                                                                                              \
+    defined(__GNUC__) && (__GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ > 2)) &&                \
+    defined(__GXX_EXPERIMENTAL_CXX0X__))
+#    define HELICS_HAS_RVALUE_REFS
 #elif defined(__clang__)
-#if __has_feature(cxx_rvalue_references)
-#define HELICS_HAS_RVALUE_REFS
-#endif
+#    if __has_feature(cxx_rvalue_references)
+#        define HELICS_HAS_RVALUE_REFS
+#    endif
 #elif defined(_MSC_VER) && (_MSC_VER >= 1900)
-#define HELICS_HAS_RVALUE_REFS
+#    define HELICS_HAS_RVALUE_REFS
 #elif defined(_MSC_VER) && (_MSC_VER >= 1600)
-#define HELICS_HAS_RVALUE_REFS
+#    define HELICS_HAS_RVALUE_REFS
 #endif
 
 //  Detect whether the compiler supports C++11.
 #if __cplusplus > 199711L
-#define HELICS_THROWS_EXCEPTION noexcept (false)
-#define HELICS_NOTHROW noexcept
-#define HELICS_NULL_POINTER nullptr
+#    define HELICS_THROWS_EXCEPTION noexcept(false)
+#    define HELICS_NOTHROW noexcept
+#    define HELICS_NULL_POINTER nullptr
 #elif defined(_MSC_VER) && (_MSC_VER >= 1900)
-#define HELICS_THROWS_EXCEPTION noexcept (false)
-#define HELICS_NOTHROW noexcept
-#define HELICS_NULL_POINTER nullptr
+#    define HELICS_THROWS_EXCEPTION noexcept(false)
+#    define HELICS_NOTHROW noexcept
+#    define HELICS_NULL_POINTER nullptr
 #else
-#define HELICS_THROWS_EXCEPTION throw (HelicsException)
-#define HELICS_NOTHROW throw ()
-#define HELICS_NULL_POINTER NULL
+#    define HELICS_THROWS_EXCEPTION throw(HelicsException)
+#    define HELICS_NOTHROW throw()
+#    define HELICS_NULL_POINTER NULL
 #endif
 
 #define HELICS_IGNORE_ERROR HELICS_NULL_POINTER

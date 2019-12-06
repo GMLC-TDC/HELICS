@@ -9,11 +9,9 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "../application_api/BrokerApp.hpp"
 
 // for maintaining the symbol in a public header
-namespace helics
-{
-namespace apps
-{
-using BrokerApp = BrokerApp;
-}  // namespace apps
+namespace helics {
+namespace apps {
+    using BrokerApp = BrokerApp;
+} // namespace apps
 
-}  // namespace helics
+} // namespace helics

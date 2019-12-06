@@ -14,150 +14,146 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <string>
 #include <vector>
 
-namespace helics
-{
+namespace helics {
 class Broker;
 class helicsCLI11App;
 
 /** class implementing a Broker object.  This object is meant to a be a very simple broker executor with a similar
  * interface to the other apps
  */
-class HELICS_CXX_EXPORT BrokerApp
-{
+class HELICS_CXX_EXPORT BrokerApp {
   public:
     /** default constructor*/
-    BrokerApp () = default;
+    BrokerApp() = default;
     /** construct from command line arguments in a vector
     @param args the command line arguments to pass in a reverse vector
     */
-    explicit BrokerApp (std::vector<std::string> args);
+    explicit BrokerApp(std::vector<std::string> args);
     /** construct from command line arguments in a vector
      @param ctype the type of broker to create
      @param args the command line arguments to pass in a reverse vector
     */
-    BrokerApp (core_type ctype, std::vector<std::string> args);
+    BrokerApp(core_type ctype, std::vector<std::string> args);
     /** construct from command line arguments in a vector
      @param ctype the type of broker to create
      @param broker_name the name of the broker
      @param args the command line arguments to pass in a reverse vector
     */
-    BrokerApp (core_type ctype, const std::string &broker_name, std::vector<std::string> args);
+    BrokerApp(core_type ctype, const std::string& broker_name, std::vector<std::string> args);
     /** construct from command line arguments
     @param argc the number of arguments
     @param argv the strings in the input
     */
-    BrokerApp (int argc, char *argv[]);
+    BrokerApp(int argc, char* argv[]);
     /** construct from command line arguments
     @param ctype the type of broker to create
     @param argc the number of arguments
     @param argv the strings in the input
     */
-    BrokerApp (core_type ctype, int argc, char *argv[]);
+    BrokerApp(core_type ctype, int argc, char* argv[]);
     /** construct from command line arguments
     @param ctype the type of broker to create
     @param brokerName the name of the broker
     @param argc the number of arguments
     @param argv the strings in the input
     */
-    BrokerApp (core_type ctype, const std::string &brokerName, int argc, char *argv[]);
+    BrokerApp(core_type ctype, const std::string& brokerName, int argc, char* argv[]);
     /** construct from command line arguments parsed as a single string
     @param argString a merged string with all the arguments
     */
-    explicit BrokerApp (const std::string &argString);
+    explicit BrokerApp(const std::string& argString);
     /** construct from command line arguments parsed as a single string
     @param ctype the type of broker to create
     @param argString a merged string with all the arguments
     */
-    BrokerApp (core_type ctype, const std::string &argString);
+    BrokerApp(core_type ctype, const std::string& argString);
     /** construct from command line arguments parsed as a single string
     @param ctype the type of broker to create
     @param brokerName the name of the broker
     @param argString a merged string with all the arguments
     */
-    BrokerApp (core_type ctype, const std::string &brokerName, const std::string &argString);
+    BrokerApp(core_type ctype, const std::string& brokerName, const std::string& argString);
 
     /** check if the Broker is running*/
-    bool isConnected () const;
+    bool isConnected() const;
     /** check if the broker is ready to accept new federates or cores
      */
-    bool isOpenToNewFederates () const;
+    bool isOpenToNewFederates() const;
 
     /** forceably disconnect the broker*/
-    void forceTerminate ();
+    void forceTerminate();
     /** wait for the broker to normally disconnect for a certain amount of time*/
-    bool waitForDisconnect (std::chrono::milliseconds waitTime = std::chrono::milliseconds (0));
+    bool waitForDisconnect(std::chrono::milliseconds waitTime = std::chrono::milliseconds(0));
     /** link a publication and input*/
-    void dataLink (const std::string &source, const std::string &target);
+    void dataLink(const std::string& source, const std::string& target);
     /** add a source Filter to an endpoint*/
-    void addSourceFilterToEndpoint (const std::string &filter, const std::string &endpoint);
+    void addSourceFilterToEndpoint(const std::string& filter, const std::string& endpoint);
     /** add a destination Filter to an endpoint*/
-    void addDestinationFilterToEndpoint (const std::string &filter, const std::string &endpoint);
+    void addDestinationFilterToEndpoint(const std::string& filter, const std::string& endpoint);
     /** make connections between interfaces with a file*/
-    void makeConnections (const std::string &file);
+    void makeConnections(const std::string& file);
     /** get the identifier of the broker*/
-    const std::string &getIdentifier () const;
+    const std::string& getIdentifier() const;
     /** get the network address of the broker*/
-    const std::string &getAddress () const;
+    const std::string& getAddress() const;
     /** make a query at the broker
 	@param target the target of the query "federation", "parent", "broker", or a specific named object
 	@param queryStr the query to make
 	@return a string containing the query results
 	*/
-    std::string query (const std::string &target, const std::string &queryStr);
+    std::string query(const std::string& target, const std::string& queryStr);
     /** set a federation global value
      @details this overwrites any previous value for this name
      globals can be queried with a target of "global" and queryStr of the value to Query
      @param valueName the name of the global to set
      @param value the value of the global
      */
-    void setGlobal (const std::string &valueName, const std::string &value);
+    void setGlobal(const std::string& valueName, const std::string& value);
 
     /** set the log file to use for the broker*/
-    void setLogFile (const std::string &logFile);
+    void setLogFile(const std::string& logFile);
     /** set the minimum log level to use in the broker*/
-    void setLoggingLevel (int loglevel);
+    void setLoggingLevel(int loglevel);
     /** clear the pointer to the broker*/
-    void reset ();
+    void reset();
 #ifdef HELICS_CXX_STATIC_DEFINE
     /** overload the -> operator so all broker functions can be called if needed
      */
-    auto *operator-> () const { return broker.operator-> (); }
+    auto* operator-> () const { return broker.operator->(); }
 #else
-    BrokerApp *operator-> () { return this; }
-    const BrokerApp *operator-> () const { return this; }
+    BrokerApp* operator->() { return this; }
+    const BrokerApp* operator->() const { return this; }
 #endif
     /** get a copy of the core pointer*/
-    std::shared_ptr<Broker> getCopyofBrokerPointer () const { return broker; }
+    std::shared_ptr<Broker> getCopyofBrokerPointer() const { return broker; }
 
   private:
-    void processArgs (std::unique_ptr<helicsCLI11App> &app);
-    std::unique_ptr<helicsCLI11App> generateParser ();
-    std::shared_ptr<Broker> broker;  //!< the actual endpoint objects
-    std::string name;  //!< the name of the broker
+    void processArgs(std::unique_ptr<helicsCLI11App>& app);
+    std::unique_ptr<helicsCLI11App> generateParser();
+    std::shared_ptr<Broker> broker; //!< the actual endpoint objects
+    std::string name; //!< the name of the broker
 };
 
 /** class that waits for a broker to terminate before finishing the destructor*/
-class BrokerKeeper
-{
+class BrokerKeeper {
   public:
-    template <class... Args>
-    explicit BrokerKeeper (Args &&... args) : brk (std::forward<Args...> (args...))
+    template<class... Args>
+    explicit BrokerKeeper(Args&&... args): brk(std::forward<Args...>(args...))
     {
     }
-    BrokerKeeper (BrokerKeeper &&brkeep) = default;
-    BrokerKeeper (const BrokerKeeper &brkeep) = default;
-    BrokerKeeper &operator= (BrokerKeeper &&brkeep) = default;
-    BrokerKeeper &operator= (const BrokerKeeper &brkeep) = default;
+    BrokerKeeper(BrokerKeeper&& brkeep) = default;
+    BrokerKeeper(const BrokerKeeper& brkeep) = default;
+    BrokerKeeper& operator=(BrokerKeeper&& brkeep) = default;
+    BrokerKeeper& operator=(const BrokerKeeper& brkeep) = default;
     /// is the broker connected
-    bool isConnected () { return brk.isConnected (); }
+    bool isConnected() { return brk.isConnected(); }
     /// Force terminate the broker
-    void forceTerminate () { brk.forceTerminate (); }
+    void forceTerminate() { brk.forceTerminate(); }
     /// the destructor waits for the broker to terminate
-    ~BrokerKeeper ()
+    ~BrokerKeeper()
     {
-        if (brk.isConnected ())
-        {
-            brk.waitForDisconnect ();
+        if (brk.isConnected()) {
+            brk.waitForDisconnect();
         }
     }
 

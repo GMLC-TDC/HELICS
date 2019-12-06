@@ -9,41 +9,40 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include <iostream>
 
-namespace helics
+namespace helics {
+std::ostream& operator<<(std::ostream& os, local_federate_id fid)
 {
-std::ostream &operator<< (std::ostream &os, local_federate_id fid)
-{
-    os << fid.baseValue ();
+    os << fid.baseValue();
     return os;
 }
 
-std::ostream &operator<< (std::ostream &os, interface_handle handle)
+std::ostream& operator<<(std::ostream& os, interface_handle handle)
 {
-    os << handle.baseValue ();
+    os << handle.baseValue();
     return os;
 }
 
-std::ostream &operator<< (std::ostream &os, global_broker_id id)
+std::ostream& operator<<(std::ostream& os, global_broker_id id)
 {
-    os << id.baseValue ();
+    os << id.baseValue();
     return os;
 }
 
-std::ostream &operator<< (std::ostream &os, global_federate_id id)
+std::ostream& operator<<(std::ostream& os, global_federate_id id)
 {
-    os << id.baseValue ();
+    os << id.baseValue();
     return os;
 }
 
-std::ostream &operator<< (std::ostream &os, global_handle id)
+std::ostream& operator<<(std::ostream& os, global_handle id)
 {
-    os << id.fed_id.baseValue () << "::" << id.handle.baseValue ();
+    os << id.fed_id.baseValue() << "::" << id.handle.baseValue();
     return os;
 }
 
-std::ostream &operator<< (std::ostream &os, route_id id)
+std::ostream& operator<<(std::ostream& os, route_id id)
 {
-    os << id.baseValue ();
+    os << id.baseValue();
     return os;
 }
-}  // namespace helics
+} // namespace helics

@@ -7,17 +7,16 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include "helics/core/BrokerFactory.hpp"
 #include "helics/core/CoreFactory.hpp"
+#include "helics/helics-config.h"
 #include "helics_benchmark_main.h"
+
 #include <benchmark/benchmark.h>
 #include <chrono>
 #include <fstream>
+#include <gmlc/concurrency/Barrier.hpp>
 #include <iostream>
 #include <random>
 #include <thread>
-
-#include <gmlc/concurrency/Barrier.hpp>
-
-#include "helics/helics-config.h"
 
 using namespace helics;
 
@@ -26,14 +25,13 @@ using namespace helics;
 #include "helics/application_api/MessageFederate.hpp"
 #include "helics/core/ActionMessage.hpp"
 
-using helics::operator"" _t ;
+using helics::operator"" _t;
 // static constexpr helics::Time tend = 3600.0_t;  // simulation end time
 /** class implementing a federate that sends messages to another (and vice versa)*/
-class MessageExchangeFederate
-{
+class MessageExchangeFederate {
   public:
-    helics::Time deltaTime = helics::Time (10, time_units::ns);  // sampling rate
-    helics::Time finalTime = helics::Time (10, time_units::ns);  // final time
+    helics::Time deltaTime = helics::Time(10, time_units::ns); // sampling rate
+    helics::Time finalTime = helics::Time(10, time_units::ns); // final time
   private:
     std::unique_ptr<helics::MessageFederate> mFed;
     helics::Endpoint ept;
@@ -45,155 +43,140 @@ class MessageExchangeFederate
     std::string dest;
 
   public:
-    MessageExchangeFederate () = default;
+    MessageExchangeFederate() = default;
 
-    void run (std::function<void ()> callOnReady = {}, std::function<void ()> callOnEnd = {})
+    void run(std::function<void()> callOnReady = {}, std::function<void()> callOnEnd = {})
     {
-        if (!readyToRun)
-        {
-            makeReady ();
+        if (!readyToRun) {
+            makeReady();
         }
-        if (callOnReady)
-        {
-            callOnReady ();
+        if (callOnReady) {
+            callOnReady();
         }
-        mainLoop ();
-        if (callOnEnd)
-        {
-            callOnEnd ();
+        mainLoop();
+        if (callOnEnd) {
+            callOnEnd();
         }
     };
 
-    void initialize (const std::string &coreName, int i, int msg_size, int msg_count)
+    void initialize(const std::string& coreName, int i, int msg_size, int msg_count)
     {
-        std::string name = "msgExchange_" + std::to_string (i);
+        std::string name = "msgExchange_" + std::to_string(i);
         helics::FederateInfo fi;
         fi.coreName = coreName;
-        mFed = std::make_unique<helics::MessageFederate> (name, fi);
-        ept = mFed->registerEndpoint ("ept");
+        mFed = std::make_unique<helics::MessageFederate>(name, fi);
+        ept = mFed->registerEndpoint("ept");
 
         // set the destination to the other federate in the pair
-        dest = "msgExchange_" + std::to_string ((i + 1) % 2) + "/ept";
+        dest = "msgExchange_" + std::to_string((i + 1) % 2) + "/ept";
 
         // create a message string to send
-        msg = std::string (msg_size, '0');
+        msg = std::string(msg_size, '0');
         msgCount = msg_count;
 
         initialized = true;
     }
 
-    void makeReady ()
+    void makeReady()
     {
-        if (!initialized)
-        {
-            throw ("must initialize first");
+        if (!initialized) {
+            throw("must initialize first");
         }
-        mFed->enterExecutingMode ();
+        mFed->enterExecutingMode();
         readyToRun = true;
     }
 
-    void mainLoop ()
+    void mainLoop()
     {
         auto cTime = 0.0_t;
-        while (cTime < finalTime)
-        {
-            while (ept.hasMessage ())
-            {
-                ept.getMessage ();
+        while (cTime < finalTime) {
+            while (ept.hasMessage()) {
+                ept.getMessage();
             }
 
-            for (int i = 0; i < msgCount; i++)
-            {
-                ept.send (dest, msg);
+            for (int i = 0; i < msgCount; i++) {
+                ept.send(dest, msg);
             }
 
-            cTime = mFed->requestTimeAdvance (deltaTime);
+            cTime = mFed->requestTimeAdvance(deltaTime);
         }
-        mFed->finalize ();
+        mFed->finalize();
     }
 };
 
-static void BM_sendMessage (benchmark::State &state, core_type cType, bool singleCore = false)
+static void BM_sendMessage(benchmark::State& state, core_type cType, bool singleCore = false)
 {
-    for (auto _ : state)
-    {
-        state.PauseTiming ();
+    for (auto _ : state) {
+        state.PauseTiming();
 
         int fed_count = 2;
-        gmlc::concurrency::Barrier brr (static_cast<size_t> (fed_count + 1));
+        gmlc::concurrency::Barrier brr(static_cast<size_t>(fed_count + 1));
 
-        auto broker = helics::BrokerFactory::create (cType, "brokerb",
-                                                     std::string ("--federates=") + std::to_string (fed_count));
-        broker->setLoggingLevel (helics_log_level_no_print);
+        auto broker = helics::BrokerFactory::create(
+            cType, "brokerb", std::string("--federates=") + std::to_string(fed_count));
+        broker->setLoggingLevel(helics_log_level_no_print);
 
         int wcore_fed_count = 1;
-        if (!singleCore)
-        {
+        if (!singleCore) {
             wcore_fed_count = fed_count;
         }
         std::shared_ptr<helics::Core> wcore;
-        std::vector<MessageExchangeFederate> feds (fed_count);
-        std::vector<std::shared_ptr<helics::Core>> cores (fed_count);
+        std::vector<MessageExchangeFederate> feds(fed_count);
+        std::vector<std::shared_ptr<helics::Core>> cores(fed_count);
 
         // create cores and federates
-        int msg_size = state.range (0);
-        int msg_count = state.range (1);
-        if (singleCore)
-        {
-            wcore = helics::CoreFactory::create (cType, std::string ("--log_level=no_print --federates=") +
-                                                          std::to_string (wcore_fed_count));
+        int msg_size = state.range(0);
+        int msg_count = state.range(1);
+        if (singleCore) {
+            wcore = helics::CoreFactory::create(
+                cType,
+                std::string("--log_level=no_print --federates=") + std::to_string(wcore_fed_count));
         }
-        for (int ii = 0; ii < fed_count; ++ii)
-        {
-            if (!singleCore)
-            {
-                cores[ii] = helics::CoreFactory::create (cType, "-f 1 --log_level=no_print");
-                cores[ii]->connect ();
-                feds[ii].initialize (cores[ii]->getIdentifier (), ii, msg_size, msg_count);
-            }
-            else
-            {
-                feds[ii].initialize (wcore->getIdentifier (), ii, msg_size, msg_count);
+        for (int ii = 0; ii < fed_count; ++ii) {
+            if (!singleCore) {
+                cores[ii] = helics::CoreFactory::create(cType, "-f 1 --log_level=no_print");
+                cores[ii]->connect();
+                feds[ii].initialize(cores[ii]->getIdentifier(), ii, msg_size, msg_count);
+            } else {
+                feds[ii].initialize(wcore->getIdentifier(), ii, msg_size, msg_count);
             }
         }
 
         // create threads for federates and get most of them running
-        std::vector<std::thread> threadlist (static_cast<size_t> (fed_count));
-        for (int ii = 0; ii < fed_count; ++ii)
-        {
-            threadlist[ii] = std::thread (
-              [&] (MessageExchangeFederate &f) {
-                  f.run (
-                    [&brr] () {
-                        brr.wait ();
-                        brr.wait ();
-                    },
-                    [&brr] () { brr.wait (); });
-              },
-              std::ref (feds[ii]));
+        std::vector<std::thread> threadlist(static_cast<size_t>(fed_count));
+        for (int ii = 0; ii < fed_count; ++ii) {
+            threadlist[ii] = std::thread(
+                [&](MessageExchangeFederate& f) {
+                    f.run(
+                        [&brr]() {
+                            brr.wait();
+                            brr.wait();
+                        },
+                        [&brr]() { brr.wait(); });
+                },
+                std::ref(feds[ii]));
         }
 
         // synchronize the federates and run the benchmark with timing
-        brr.wait ();
-        state.ResumeTiming ();
-        brr.wait ();
-        brr.wait ();
-        state.PauseTiming ();
+        brr.wait();
+        state.ResumeTiming();
+        brr.wait();
+        brr.wait();
+        state.PauseTiming();
 
         // clean-up federate threads
-        for (auto &thrd : threadlist)
-        {
-            thrd.join ();
+        for (auto& thrd : threadlist) {
+            thrd.join();
         }
 
         // reset state for next benchmark
-        broker->disconnect ();
-        broker.reset ();
-        cores.clear ();
-        wcore.reset ();
-        cleanupHelicsLibrary ();
+        broker->disconnect();
+        broker.reset();
+        cores.clear();
+        wcore.reset();
+        cleanupHelicsLibrary();
 
-        state.ResumeTiming ();
+        state.ResumeTiming();
     }
 }
 
@@ -207,48 +190,48 @@ static void BM_sendMessage (benchmark::State &state, core_type cType, bool singl
 // The first element in the ranges is message size, and the second is message count
 
 // Register the single core benchmark
-BENCHMARK_CAPTURE (BM_sendMessage, singleCore, core_type::INPROC, true)
-  //->RangeMultiplier (2)
-  ->Ranges ({{1, 1 << 20}, {1, 1}})  // 1GB takes about 6 seconds
-  ->Ranges ({{1, 1}, {1, 1 << 9}})
-  ->Iterations (1)
-  ->Unit (benchmark::TimeUnit::kMillisecond)
-  ->UseRealTime ();
+BENCHMARK_CAPTURE(BM_sendMessage, singleCore, core_type::INPROC, true)
+    //->RangeMultiplier (2)
+    ->Ranges({{1, 1 << 20}, {1, 1}}) // 1GB takes about 6 seconds
+    ->Ranges({{1, 1}, {1, 1 << 9}})
+    ->Iterations(1)
+    ->Unit(benchmark::TimeUnit::kMillisecond)
+    ->UseRealTime();
 
 // Register multi core benchmarks
 // Register the inproc core benchmarks
 // clang-format off
 BENCHMARK_CAPTURE(BM_sendMessage, multiCore/inprocCore, core_type::INPROC)
-  // clang-format on
-  //->RangeMultiplier (2)
-  ->Ranges ({{1, 1 << 20}, {1, 1}})  // 1GB takes about 6 seconds
-  ->Ranges ({{1, 1}, {1, 1 << 9}})
-  ->Iterations (1)
-  ->Unit (benchmark::TimeUnit::kMillisecond)
-  ->UseRealTime ();
+    // clang-format on
+    //->RangeMultiplier (2)
+    ->Ranges({{1, 1 << 20}, {1, 1}}) // 1GB takes about 6 seconds
+    ->Ranges({{1, 1}, {1, 1 << 9}})
+    ->Iterations(1)
+    ->Unit(benchmark::TimeUnit::kMillisecond)
+    ->UseRealTime();
 
 #ifdef ENABLE_ZMQ_CORE
 // Register the ZMQ benchmarks
 // clang-format off
 BENCHMARK_CAPTURE(BM_sendMessage, multiCore/zmqCore, core_type::ZMQ)
-  // clang-format on
-  //->RangeMultiplier (2)
-  ->Ranges ({{1, 1 << 20}, {1, 1}})  // 1GB takes about 30 seconds
-  ->Ranges ({{1, 1}, {1, 1 << 9}})
-  ->Iterations (1)
-  ->Unit (benchmark::TimeUnit::kMillisecond)
-  ->UseRealTime ();
+    // clang-format on
+    //->RangeMultiplier (2)
+    ->Ranges({{1, 1 << 20}, {1, 1}}) // 1GB takes about 30 seconds
+    ->Ranges({{1, 1}, {1, 1 << 9}})
+    ->Iterations(1)
+    ->Unit(benchmark::TimeUnit::kMillisecond)
+    ->UseRealTime();
 
 // Register the ZMQ SS benchmarks
 // clang-format off
 BENCHMARK_CAPTURE(BM_sendMessage, multiCore/zmqssCore, core_type::ZMQ_SS)
-  // clang-format on
-  //->RangeMultiplier (2)
-  ->Ranges ({{1, 1 << 20}, {1, 1}})
-  ->Ranges ({{1, 1}, {1, 1 << 9}})
-  ->Iterations (1)
-  ->Unit (benchmark::TimeUnit::kMillisecond)
-  ->UseRealTime ();
+    // clang-format on
+    //->RangeMultiplier (2)
+    ->Ranges({{1, 1 << 20}, {1, 1}})
+    ->Ranges({{1, 1}, {1, 1 << 9}})
+    ->Iterations(1)
+    ->Unit(benchmark::TimeUnit::kMillisecond)
+    ->UseRealTime();
 
 #endif
 
@@ -256,14 +239,15 @@ BENCHMARK_CAPTURE(BM_sendMessage, multiCore/zmqssCore, core_type::ZMQ_SS)
 // Register the IPC benchmarks
 // clang-format off
 BENCHMARK_CAPTURE (BM_sendMessage, multiCore/ipcCore, core_type::IPC)
-  // clang-format on
-  //->RangeMultiplier (2)
-  ->Ranges ({{1, 1 << 11}, {1, 1}})  // msg size of 4096 bytes causes Boost transmit error
-  ->Ranges ({{1, 1 << 11}, {1, 1 << 9}})  // msg count has a much bigger effect on time taken (increasing size had
-                                          // no noticeable effect on times)
-  ->Iterations (1)
-  ->Unit (benchmark::TimeUnit::kMillisecond)
-  ->UseRealTime ();
+    // clang-format on
+    //->RangeMultiplier (2)
+    ->Ranges({{1, 1 << 11}, {1, 1}}) // msg size of 4096 bytes causes Boost transmit error
+    ->Ranges({{1, 1 << 11},
+              {1, 1 << 9}}) // msg count has a much bigger effect on time taken (increasing size had
+    // no noticeable effect on times)
+    ->Iterations(1)
+    ->Unit(benchmark::TimeUnit::kMillisecond)
+    ->UseRealTime();
 
 #endif
 
@@ -271,28 +255,30 @@ BENCHMARK_CAPTURE (BM_sendMessage, multiCore/ipcCore, core_type::IPC)
 // Register the TCP benchmarks
 // clang-format off
 BENCHMARK_CAPTURE(BM_sendMessage, multiCore/tcpCore, core_type::TCP)
-  // clang-format on
-  //->RangeMultiplier (2)
-  ->Ranges ({{1, 1 << 11}, {1, 1}})  // msg size of 4096 bytes causes error/terminate
-  ->Ranges (
-    {{1, 1},
-     {1, 1 << 9}})  // msg count has a bigger effect on time taken (increasing size had minimal effect on times)
-  ->Iterations (1)
-  ->Unit (benchmark::TimeUnit::kMillisecond)
-  ->UseRealTime ();
+    // clang-format on
+    //->RangeMultiplier (2)
+    ->Ranges({{1, 1 << 11}, {1, 1}}) // msg size of 4096 bytes causes error/terminate
+    ->Ranges(
+        {{1, 1},
+         {1,
+          1 << 9}}) // msg count has a bigger effect on time taken (increasing size had minimal effect on times)
+    ->Iterations(1)
+    ->Unit(benchmark::TimeUnit::kMillisecond)
+    ->UseRealTime();
 
 // Register the TCP SS benchmarks
 // clang-format off
 BENCHMARK_CAPTURE(BM_sendMessage, multiCore/tcpssCore, core_type::TCP_SS)
-  // clang-format on
-  //->RangeMultiplier (2)
-  ->Ranges ({{1, 1 << 11}, {1, 1}})  // msg size of 4096 bytes causes error/terminate
-  ->Ranges (
-    {{1, 1},
-     {1, 1 << 9}})  // msg count has a bigger effect on time taken (increasing size had minimal effect on times)
-  ->Iterations (1)
-  ->Unit (benchmark::TimeUnit::kMillisecond)
-  ->UseRealTime ();
+    // clang-format on
+    //->RangeMultiplier (2)
+    ->Ranges({{1, 1 << 11}, {1, 1}}) // msg size of 4096 bytes causes error/terminate
+    ->Ranges(
+        {{1, 1},
+         {1,
+          1 << 9}}) // msg count has a bigger effect on time taken (increasing size had minimal effect on times)
+    ->Iterations(1)
+    ->Unit(benchmark::TimeUnit::kMillisecond)
+    ->UseRealTime();
 
 #endif
 
@@ -300,17 +286,19 @@ BENCHMARK_CAPTURE(BM_sendMessage, multiCore/tcpssCore, core_type::TCP_SS)
 // Register the UDP benchmarks
 // clang-format off
 BENCHMARK_CAPTURE(BM_sendMessage, multiCore/udpCore, core_type::UDP)
-  // clang-format on
-  //->RangeMultiplier (2)
-  ->Ranges ({{1, 1 << 15}, {1, 1}})  // msg size of 65536 bytes causes error/terminate, though somewhere about 8K
-                                     // the benchmark time drops from several ms to <1ms
-  ->Ranges (
-    {{1, 1},
-     {1, 1 << 6}})  // msg count has a bigger effect on time taken (increasing size had minimal effect on times);
-                    // larger sizes/counts did seem to result in hanging, maybe an important packet was lost
-  ->Iterations (1)
-  ->Unit (benchmark::TimeUnit::kMillisecond)
-  ->UseRealTime ();
+    // clang-format on
+    //->RangeMultiplier (2)
+    ->Ranges({{1, 1 << 15},
+              {1, 1}}) // msg size of 65536 bytes causes error/terminate, though somewhere about 8K
+    // the benchmark time drops from several ms to <1ms
+    ->Ranges(
+        {{1, 1},
+         {1,
+          1 << 6}}) // msg count has a bigger effect on time taken (increasing size had minimal effect on times);
+    // larger sizes/counts did seem to result in hanging, maybe an important packet was lost
+    ->Iterations(1)
+    ->Unit(benchmark::TimeUnit::kMillisecond)
+    ->UseRealTime();
 #endif
 
-HELICS_BENCHMARK_MAIN (messageSendBenchmark);
+HELICS_BENCHMARK_MAIN(messageSendBenchmark);

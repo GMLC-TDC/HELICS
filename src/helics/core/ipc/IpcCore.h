@@ -8,13 +8,11 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include "../NetworkCore.hpp"
 
-namespace helics
-{
-namespace ipc
-{
-class IpcComms;
-/** implementation for the core that uses an ipc queue to communicate*/
-using IpcCore = NetworkCore<IpcComms, interface_type::ipc>;
+namespace helics {
+namespace ipc {
+    class IpcComms;
+    /** implementation for the core that uses an ipc queue to communicate*/
+    using IpcCore = NetworkCore<IpcComms, interface_type::ipc>;
 
-}  // namespace ipc
-}  // namespace helics
+} // namespace ipc
+} // namespace helics
