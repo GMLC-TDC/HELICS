@@ -59,7 +59,7 @@ class TimeCoordinator {
     Time time_value = Time::maxVal(); //!< the time of the earliest value event
     Time time_grantBase =
         Time::minVal(); //!< time to use as a basis for calculating the next grantable
-        //!< time(usually time granted unless values are changing)
+    //!< time(usually time granted unless values are changing)
     Time time_block = Time::maxVal(); //!< a blocking time to not grant time >= the specified time
     shared_guarded_m<std::vector<global_federate_id>>
         dependent_federates; //!< these are to maintain an accessible record of dependent federates
