@@ -8,33 +8,32 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include "../NetworkBroker.hpp"
 #include "../core-types.hpp"
-namespace helics
-{
-namespace tcp
-{
-class TcpComms;
-class TcpCommsSS;
-/** implementation for the core that uses TCP messages to communicate*/
-using TcpBroker = NetworkBroker<TcpComms, interface_type::tcp, static_cast<int> (core_type::TCP)>;
+namespace helics {
+namespace tcp {
+    class TcpComms;
+    class TcpCommsSS;
+    /** implementation for the core that uses TCP messages to communicate*/
+    using TcpBroker =
+        NetworkBroker<TcpComms, interface_type::tcp, static_cast<int>(core_type::TCP)>;
 
-/** single socket version of the TCP broker*/
-class TcpBrokerSS final
-    : public NetworkBroker<TcpCommsSS, interface_type::tcp, static_cast<int> (core_type::TCP_SS)>
-{
-  public:
-    /** default constructor*/
-    explicit TcpBrokerSS (bool rootBroker = false) noexcept;
-    explicit TcpBrokerSS (const std::string &broker_name);
+    /** single socket version of the TCP broker*/
+    class TcpBrokerSS final:
+        public NetworkBroker<TcpCommsSS, interface_type::tcp, static_cast<int>(core_type::TCP_SS)> {
+      public:
+        /** default constructor*/
+        explicit TcpBrokerSS(bool rootBroker = false) noexcept;
+        explicit TcpBrokerSS(const std::string& broker_name);
 
-  protected:
-    virtual std::shared_ptr<helicsCLI11App> generateCLI () override;
+      protected:
+        virtual std::shared_ptr<helicsCLI11App> generateCLI() override;
 
-  private:
-    virtual bool brokerConnect () override;
-    bool no_outgoing_connections = false;  //!< disable outgoing connections if true;
-    std::vector<std::string> connections;  //!< defined connections These are connections that the comm section
-                                           //!< reaches out to regardless of whether it is a broker/core/ or server
-};
+      private:
+        virtual bool brokerConnect() override;
+        bool no_outgoing_connections = false; //!< disable outgoing connections if true;
+        std::vector<std::string>
+            connections; //!< defined connections These are connections that the comm section
+            //!< reaches out to regardless of whether it is a broker/core/ or server
+    };
 
-}  // namespace tcp
-}  // namespace helics
+} // namespace tcp
+} // namespace helics

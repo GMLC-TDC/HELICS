@@ -6,38 +6,34 @@ SPDX-License-Identifier: BSD-3-Clause
 */
 #pragma once
 #include "../NetworkCore.hpp"
-namespace helics
-{
-namespace zeromq
-{
-class ZmqComms;
-class ZmqCommsSS;
+namespace helics {
+namespace zeromq {
+    class ZmqComms;
+    class ZmqCommsSS;
 
-/** implementation for the core that uses zmq messages to communicate*/
-class ZmqCore final : public NetworkCore<ZmqComms, interface_type::tcp>
-{
-  public:
-    /** default constructor*/
-    ZmqCore () noexcept;
-    /** construct from with a core name*/
-    ZmqCore (const std::string &core_name);
+    /** implementation for the core that uses zmq messages to communicate*/
+    class ZmqCore final: public NetworkCore<ZmqComms, interface_type::tcp> {
+      public:
+        /** default constructor*/
+        ZmqCore() noexcept;
+        /** construct from with a core name*/
+        ZmqCore(const std::string& core_name);
 
-  private:
-    virtual bool brokerConnect () override;
-};
+      private:
+        virtual bool brokerConnect() override;
+    };
 
-/** implementation for the core that uses zmq messages to communicate*/
-class ZmqCoreSS final : public NetworkCore<ZmqCommsSS, interface_type::tcp>
-{
-  public:
-    /** default constructor*/
-    ZmqCoreSS () noexcept;
-    /** construct from with a core name*/
-    ZmqCoreSS (const std::string &core_name);
+    /** implementation for the core that uses zmq messages to communicate*/
+    class ZmqCoreSS final: public NetworkCore<ZmqCommsSS, interface_type::tcp> {
+      public:
+        /** default constructor*/
+        ZmqCoreSS() noexcept;
+        /** construct from with a core name*/
+        ZmqCoreSS(const std::string& core_name);
 
-  private:
-    virtual bool brokerConnect () override;
-};
+      private:
+        virtual bool brokerConnect() override;
+    };
 
-}  // namespace zeromq
-}  // namespace helics
+} // namespace zeromq
+} // namespace helics

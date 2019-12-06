@@ -8,42 +8,39 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include "../NetworkCommsInterface.hpp"
 #include "helics/helics-config.h"
+
 #include <future>
 #include <set>
 
 class AsioContextManager;
-namespace asio
-{
+namespace asio {
 class io_context;
-}  // namespace asio
+} // namespace asio
 
-namespace helics
-{
-namespace udp
-{
-/** implementation for the communication interface that uses ZMQ messages to communicate*/
-class UdpComms final : public NetworkCommsInterface
-{
-  public:
-    /** default constructor*/
-    UdpComms ();
-    /** destructor*/
-    ~UdpComms ();
+namespace helics {
+namespace udp {
+    /** implementation for the communication interface that uses ZMQ messages to communicate*/
+    class UdpComms final: public NetworkCommsInterface {
+      public:
+        /** default constructor*/
+        UdpComms();
+        /** destructor*/
+        ~UdpComms();
 
-    virtual void loadNetworkInfo (const NetworkBrokerData &netInfo) override;
+        virtual void loadNetworkInfo(const NetworkBrokerData& netInfo) override;
 
-  private:
-    virtual int getDefaultBrokerPort () const override;
-    virtual void queue_rx_function () override;  //!< the functional loop for the receive queue
-    virtual void queue_tx_function () override;  //!< the loop for transmitting data
-    virtual void closeReceiver () override;  //!< function to instruct the receiver loop to close
+      private:
+        virtual int getDefaultBrokerPort() const override;
+        virtual void queue_rx_function() override; //!< the functional loop for the receive queue
+        virtual void queue_tx_function() override; //!< the loop for transmitting data
+        virtual void closeReceiver() override; //!< function to instruct the receiver loop to close
 
-    // promise and future for communicating port number from tx_thread to rx_thread
-    std::promise<int> promisePort;
-    std::future<int> futurePort;
+        // promise and future for communicating port number from tx_thread to rx_thread
+        std::promise<int> promisePort;
+        std::future<int> futurePort;
 
-  public:
-};
+      public:
+    };
 
-}  // namespace udp
-}  // namespace helics
+} // namespace udp
+} // namespace helics

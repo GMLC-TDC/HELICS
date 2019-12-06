@@ -6,12 +6,13 @@ SPDX-License-Identifier: BSD-3-Clause
 */
 
 #include "ValueConverter.hpp"
+
 #include "ValueConverter_impl.hpp"
+
 #include <complex>
 #include <vector>
 
-namespace helics
-{
+namespace helics {
 template class ValueConverter<int64_t>;
 template class ValueConverter<uint64_t>;
 template class ValueConverter<char>;
@@ -26,4 +27,4 @@ template class ValueConverter<std::vector<double>>;
 template class ValueConverter<std::vector<std::string>>;
 template class ValueConverter<std::vector<std::complex<double>>>;
 template class ValueConverter<NamedPoint>;
-}  // namespace helics
+} // namespace helics

@@ -6,10 +6,10 @@ SPDX-License-Identifier: BSD-3-Clause
 */
 
 #include "IpcCore.h"
+
 #include "../NetworkCore_impl.hpp"
 #include "IpcComms.h"
 
-namespace helics
-{
+namespace helics {
 template class NetworkCore<ipc::IpcComms, interface_type::ipc>;
-}  // namespace helics
+} // namespace helics

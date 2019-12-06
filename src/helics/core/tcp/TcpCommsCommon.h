@@ -10,30 +10,30 @@ SPDX-License-Identifier: BSD-3-Clause
 @details function in this file are common function used between the different TCP comms */
 
 #include "TcpHelperClasses.h"
+
 #include <chrono>
 
 class AsioContextManager;
-namespace asio
-{
+namespace asio {
 class io_context;
-}  // namespace asio
+} // namespace asio
 
-namespace helics
-{
+namespace helics {
 class CommsInterface;
 
-namespace tcp
-{
-/** establish a connection to a server by as associated timeout*/
-TcpConnection::pointer makeConnection (asio::io_context &io_context,
-                                       const std::string &connection,
-                                       const std::string &port,
-                                       size_t bufferSize,
-                                       std::chrono::milliseconds timeOut);
+namespace tcp {
+    /** establish a connection to a server by as associated timeout*/
+    TcpConnection::pointer makeConnection(
+        asio::io_context& io_context,
+        const std::string& connection,
+        const std::string& port,
+        size_t bufferSize,
+        std::chrono::milliseconds timeOut);
 
-/** do some checking and logging about errors if the interface is connected*/
-bool commErrorHandler (CommsInterface *comm,
-                       std::shared_ptr<TcpConnection> connection,
-                       const std::error_code &error);
-}  // namespace tcp
-}  // namespace helics
+    /** do some checking and logging about errors if the interface is connected*/
+    bool commErrorHandler(
+        CommsInterface* comm,
+        std::shared_ptr<TcpConnection> connection,
+        const std::error_code& error);
+} // namespace tcp
+} // namespace helics

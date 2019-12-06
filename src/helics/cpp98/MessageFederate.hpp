@@ -13,32 +13,30 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "Endpoint.hpp"
 #include "Federate.hpp"
 
-namespace helicscpp
-{
+namespace helicscpp {
 /** class defining the block communication based interface */
 
-class MessageFederate : public virtual Federate
-{
+class MessageFederate: public virtual Federate {
   public:
     /**constructor taking a federate information structure and using the default core
   @param fedName the name of the messageFederate, can be left empty to use a default or one from fi
   @param fi  a federate information structure
   */
-    MessageFederate (const std::string &fedName, FederateInfo &fi)
+    MessageFederate(const std::string& fedName, FederateInfo& fi)
     {
-        fed = helicsCreateMessageFederate (fedName.c_str (), fi.getInfo (), hThrowOnError ());
+        fed = helicsCreateMessageFederate(fedName.c_str(), fi.getInfo(), hThrowOnError());
     }
 
-	 /**constructor taking a string with the required information
+    /**constructor taking a string with the required information
    @param configString can be either a JSON file, TOML file or a string containing JSON code
    */
-    explicit MessageFederate (const std::string &configString)
+    explicit MessageFederate(const std::string& configString)
     {
-        fed = helicsCreateMessageFederateFromConfig (configString.c_str (), hThrowOnError ());
+        fed = helicsCreateMessageFederateFromConfig(configString.c_str(), hThrowOnError());
     }
 
     /** Default constructor, not meant to be used*/
-    MessageFederate () HELICS_NOTHROW {}
+    MessageFederate() HELICS_NOTHROW {}
 
     /** Methods for registering endpoints **/
 
@@ -48,59 +46,61 @@ class MessageFederate : public virtual Federate
     @param type the defined type of the interface for endpoint checking if requested
     @return an Endpoint Object
 	*/
-    Endpoint registerEndpoint (const std::string &name, const std::string &type = std::string ())
+    Endpoint registerEndpoint(const std::string& name, const std::string& type = std::string())
     {
-        helics_endpoint ep = helicsFederateRegisterEndpoint (fed, name.c_str (), type.c_str (), hThrowOnError ());
-        local_endpoints.push_back (ep);
-        return Endpoint (ep);
+        helics_endpoint ep =
+            helicsFederateRegisterEndpoint(fed, name.c_str(), type.c_str(), hThrowOnError());
+        local_endpoints.push_back(ep);
+        return Endpoint(ep);
     }
 
-	/** register an endpoint directly without prepending the federate name
+    /** register an endpoint directly without prepending the federate name
     @param name the name of the endpoint
     @param type the defined type of the interface for endpoint checking if requested
      @return an Endpoint Object
 	*/
-    Endpoint registerGlobalEndpoint (const std::string &name, const std::string &type = std::string ())
+    Endpoint
+        registerGlobalEndpoint(const std::string& name, const std::string& type = std::string())
     {
         helics_endpoint ep =
-          helicsFederateRegisterGlobalEndpoint (fed, name.c_str (), type.c_str (), hThrowOnError ());
-        local_endpoints.push_back (ep);
-        return Endpoint (ep);
+            helicsFederateRegisterGlobalEndpoint(fed, name.c_str(), type.c_str(), hThrowOnError());
+        local_endpoints.push_back(ep);
+        return Endpoint(ep);
     }
 
-	/** get an Endpoint from its name 
+    /** get an Endpoint from its name 
     @param name the name of the endpoint to retrieve
     @return an Endpoint*/
-    Endpoint getEndpoint (const std::string &name)
+    Endpoint getEndpoint(const std::string& name)
     {
-        return Endpoint (helicsFederateGetEndpoint (fed, name.c_str (), hThrowOnError ()));
+        return Endpoint(helicsFederateGetEndpoint(fed, name.c_str(), hThrowOnError()));
     }
     /** get an Endpoint from an index
     @param index the index of the endpoint to retrieve index is 0 based
     @return an Endpoint*/
-    Endpoint getEndpoint (int index)
+    Endpoint getEndpoint(int index)
     {
-        return Endpoint (helicsFederateGetEndpointByIndex (fed, index, hThrowOnError ()));
+        return Endpoint(helicsFederateGetEndpointByIndex(fed, index, hThrowOnError()));
     }
 
     /** Checks if federate has any messages **/
-    bool hasMessage () const
+    bool hasMessage() const
     {
         // returns int, 1 = true, 0 = false
-        return (helicsFederateHasMessage (fed) > 0);
+        return (helicsFederateHasMessage(fed) > 0);
     }
 
     /** Returns the number of pending receives for all endpoints. **/
-    int pendingMessages () const { return helicsFederatePendingMessages (fed); }
+    int pendingMessages() const { return helicsFederatePendingMessages(fed); }
 
     /** Get a packet for any endpoints in the federate **/
-    helics_message_object getMessage () { return helicsFederateGetMessageObject (fed); }
+    helics_message_object getMessage() { return helicsFederateGetMessageObject(fed); }
 
     /**get the number of registered endpoints*/
-    int getEndpointCount () const { return helicsFederateGetEndpointCount (fed); }
+    int getEndpointCount() const { return helicsFederateGetEndpointCount(fed); }
 
   private:
     std::vector<helics_endpoint> local_endpoints;
 };
-}  // namespace helicscpp
+} // namespace helicscpp
 #endif

@@ -5,10 +5,10 @@ the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 #include "InprocCore.h"
+
 #include "../NetworkCore_impl.hpp"
 #include "InprocComms.h"
 
-namespace helics
-{
+namespace helics {
 template class NetworkCore<inproc::InprocComms, interface_type::inproc>;
-}  // namespace helics
+} // namespace helics
