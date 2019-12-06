@@ -6,80 +6,88 @@ SPDX-License-Identifier: BSD-3-Clause
 */
 #include "CombinationFederate.hpp"
 
-namespace helics
-{
-CombinationFederate::CombinationFederate () = default;
-CombinationFederate::CombinationFederate (const std::string &fedName, const FederateInfo &fi)
-    : Federate (fedName, fi), ValueFederate (true), MessageFederate (true)
-{
-}
-CombinationFederate::CombinationFederate (const std::string &fedName,
-                                          const std::shared_ptr<Core> &core,
-                                          const FederateInfo &fi)
-    : Federate (fedName, core, fi), ValueFederate (true), MessageFederate (true)
+namespace helics {
+CombinationFederate::CombinationFederate() = default;
+CombinationFederate::CombinationFederate(const std::string& fedName, const FederateInfo& fi):
+    Federate(fedName, fi), ValueFederate(true), MessageFederate(true)
 {
 }
-
-CombinationFederate::CombinationFederate (const std::string &fedName, CoreApp &core, const FederateInfo &fi)
-    : Federate (fedName, core, fi), ValueFederate (true), MessageFederate (true)
+CombinationFederate::CombinationFederate(
+    const std::string& fedName,
+    const std::shared_ptr<Core>& core,
+    const FederateInfo& fi):
+    Federate(fedName, core, fi),
+    ValueFederate(true), MessageFederate(true)
 {
 }
 
-CombinationFederate::CombinationFederate (const std::string &configString)
-    : Federate (std::string (), loadFederateInfo (configString)), ValueFederate (true), MessageFederate (true)
+CombinationFederate::CombinationFederate(
+    const std::string& fedName,
+    CoreApp& core,
+    const FederateInfo& fi):
+    Federate(fedName, core, fi),
+    ValueFederate(true), MessageFederate(true)
 {
-    CombinationFederate::registerInterfaces (configString);
 }
 
-CombinationFederate::CombinationFederate (const std::string &fedName, const std::string &configString)
-    : Federate (fedName, loadFederateInfo (configString)), ValueFederate (true), MessageFederate (true)
+CombinationFederate::CombinationFederate(const std::string& configString):
+    Federate(std::string(), loadFederateInfo(configString)), ValueFederate(true),
+    MessageFederate(true)
 {
-    CombinationFederate::registerInterfaces (configString);
+    CombinationFederate::registerInterfaces(configString);
 }
 
-CombinationFederate::CombinationFederate (CombinationFederate &&) noexcept = default;
-CombinationFederate::~CombinationFederate () = default;
-
-void CombinationFederate::disconnect ()
+CombinationFederate::CombinationFederate(
+    const std::string& fedName,
+    const std::string& configString):
+    Federate(fedName, loadFederateInfo(configString)),
+    ValueFederate(true), MessageFederate(true)
 {
-    ValueFederate::disconnect ();
-    MessageFederate::disconnect ();
+    CombinationFederate::registerInterfaces(configString);
 }
 
-CombinationFederate &CombinationFederate::operator= (CombinationFederate &&) noexcept = default;
+CombinationFederate::CombinationFederate(CombinationFederate&&) noexcept = default;
+CombinationFederate::~CombinationFederate() = default;
 
-void CombinationFederate::updateTime (Time newTime, Time oldTime)
+void CombinationFederate::disconnect()
 {
-    ValueFederate::updateTime (newTime, oldTime);
-    MessageFederate::updateTime (newTime, oldTime);
+    ValueFederate::disconnect();
+    MessageFederate::disconnect();
 }
 
-void CombinationFederate::startupToInitializeStateTransition ()
+CombinationFederate& CombinationFederate::operator=(CombinationFederate&&) noexcept = default;
+
+void CombinationFederate::updateTime(Time newTime, Time oldTime)
 {
-    ValueFederate::startupToInitializeStateTransition ();
-    MessageFederate::startupToInitializeStateTransition ();
+    ValueFederate::updateTime(newTime, oldTime);
+    MessageFederate::updateTime(newTime, oldTime);
 }
 
-void CombinationFederate::initializeToExecuteStateTransition ()
+void CombinationFederate::startupToInitializeStateTransition()
 {
-    ValueFederate::initializeToExecuteStateTransition ();
-    MessageFederate::initializeToExecuteStateTransition ();
+    ValueFederate::startupToInitializeStateTransition();
+    MessageFederate::startupToInitializeStateTransition();
 }
 
-std::string CombinationFederate::localQuery (const std::string &queryStr) const
+void CombinationFederate::initializeToExecuteStateTransition()
 {
-    std::string res = ValueFederate::localQuery (queryStr);
-    if (res.empty ())
-    {
-        res = MessageFederate::localQuery (queryStr);
+    ValueFederate::initializeToExecuteStateTransition();
+    MessageFederate::initializeToExecuteStateTransition();
+}
+
+std::string CombinationFederate::localQuery(const std::string& queryStr) const
+{
+    std::string res = ValueFederate::localQuery(queryStr);
+    if (res.empty()) {
+        res = MessageFederate::localQuery(queryStr);
     }
     return res;
 }
 
-void CombinationFederate::registerInterfaces (const std::string &configString)
+void CombinationFederate::registerInterfaces(const std::string& configString)
 {
-    ValueFederate::registerValueInterfaces (configString);
-    MessageFederate::registerMessageInterfaces (configString);
-    Federate::registerFilterInterfaces (configString);
+    ValueFederate::registerValueInterfaces(configString);
+    MessageFederate::registerMessageInterfaces(configString);
+    Federate::registerFilterInterfaces(configString);
 }
-}  // namespace helics
+} // namespace helics

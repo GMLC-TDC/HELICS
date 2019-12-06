@@ -8,81 +8,80 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include "CommsInterface.hpp"
 #include "helics/helics-config.h"
+
 #include <map>
 #include <set>
 
-namespace helics
-{
+namespace helics {
 /** implementation for the communication interface that uses ZMQ messages to communicate*/
-class NetworkCommsInterface : public CommsInterface
-{
+class NetworkCommsInterface: public CommsInterface {
   private:
-    class PortAllocator
-    {
+    class PortAllocator {
       public:
         /** get an open port for a particular host*/
-        int findOpenPort (int count, const std::string &host = "localhost");
-        void setStartingPortNumber (int startPort) { startingPort = startPort; }
-        int getDefaultStartingPort () const { return startingPort; }
-        void addUsedPort (int port);
-        void addUsedPort (const std::string &host, int port);
+        int findOpenPort(int count, const std::string& host = "localhost");
+        void setStartingPortNumber(int startPort) { startingPort = startPort; }
+        int getDefaultStartingPort() const { return startingPort; }
+        void addUsedPort(int port);
+        void addUsedPort(const std::string& host, int port);
 
       private:
         int startingPort = -1;
         std::map<std::string, std::set<int>> usedPort;
         std::map<std::string, int> nextPorts;
-        bool isPortUsed (const std::string &host, int port) const;
+        bool isPortUsed(const std::string& host, int port) const;
     };
 
   public:
     /** default constructor*/
-    explicit NetworkCommsInterface (
-      interface_type type,
-      CommsInterface::thread_generation threads = CommsInterface::thread_generation::dual) noexcept;
+    explicit NetworkCommsInterface(
+        interface_type type,
+        CommsInterface::thread_generation threads =
+            CommsInterface::thread_generation::dual) noexcept;
 
     /** load network information into the comms interface object*/
-    virtual void loadNetworkInfo (const NetworkBrokerData &netInfo) override;
+    virtual void loadNetworkInfo(const NetworkBrokerData& netInfo) override;
     /** set the port numbers for the local ports*/
-    void setBrokerPort (int brokerPortNumber);
+    void setBrokerPort(int brokerPortNumber);
     /** set the local port number to use for incoming connections*/
-    void setPortNumber (int localPortNumber);
+    void setPortNumber(int localPortNumber);
     /** get the local port number to use for incoming connections*/
-    int getPortNumber () const { return PortNumber.load (); }
+    int getPortNumber() const { return PortNumber.load(); }
     /** set the automatic port numbering starting port*/
-    void setAutomaticPortStartPort (int startingPort);
+    void setAutomaticPortStartPort(int startingPort);
     /** set a flag on the communication system*/
-    virtual void setFlag (const std::string &flag, bool val) override;
+    virtual void setFlag(const std::string& flag, bool val) override;
 
   protected:
     int brokerPort = -1;
     std::atomic<int> PortNumber{-1};
     bool autoPortNumber = true;
-    bool useOsPortAllocation = false;  //!< use the operating system to allocate a port number
+    bool useOsPortAllocation = false; //!< use the operating system to allocate a port number
     const interface_type networkType;
     interface_networks network = interface_networks::ipv4;
     std::atomic<bool> hasBroker{false};
-    int maxRetries = 5;  // the maximum number of network retries
+    int maxRetries = 5; // the maximum number of network retries
 
   private:
-    PortAllocator openPorts;  //!< a structure to deal with port allocations
+    PortAllocator openPorts; //!< a structure to deal with port allocations
 
   public:
     /** find an open port for a subBroker*/
-    int findOpenPort (int count, const std::string &host);
+    int findOpenPort(int count, const std::string& host);
     /** for protocol messages some require an immediate reply from the comms interface itself*/
-    ActionMessage generateReplyToIncomingMessage (ActionMessage &cmd);
+    ActionMessage generateReplyToIncomingMessage(ActionMessage& cmd);
 
   public:
     /** get the port number of the comms object to push message to*/
-    int getPort () const { return PortNumber; };
+    int getPort() const { return PortNumber; };
     /** get the network address of the comms interface*/
-    std::string getAddress () const;
+    std::string getAddress() const;
     /** return the default Broker port*/
-    virtual int getDefaultBrokerPort () const = 0;
+    virtual int getDefaultBrokerPort() const = 0;
 
   protected:
-    ActionMessage generatePortRequest (int cnt = 1) const;
-    void loadPortDefinitions (const ActionMessage &cmd);
+    ActionMessage generatePortRequest(int cnt = 1) const;
+    void loadPortDefinitions(const ActionMessage& cmd);
 };
 
-}  // namespace helics
+} // namespace helics

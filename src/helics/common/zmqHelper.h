@@ -19,9 +19,8 @@ SPDX-License-Identifier: BSD-3-Clause
 #pragma once
 #include <string>
 
-namespace zmq
-{
+namespace zmq {
 enum class socket_type : int;
-}  // namespace zmq
+} // namespace zmq
 
-zmq::socket_type socketTypeFromString (const std::string &socketType);
+zmq::socket_type socketTypeFromString(const std::string& socketType);

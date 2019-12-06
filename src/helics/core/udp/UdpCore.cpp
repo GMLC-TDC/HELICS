@@ -6,10 +6,10 @@ SPDX-License-Identifier: BSD-3-Clause
 */
 
 #include "UdpCore.h"
+
 #include "../NetworkCore_impl.hpp"
 #include "UdpComms.h"
 
-namespace helics
-{
+namespace helics {
 template class NetworkCore<udp::UdpComms, interface_type::udp>;
-}  // namespace helics
+} // namespace helics

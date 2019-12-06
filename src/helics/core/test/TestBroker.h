@@ -9,14 +9,13 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include "../NetworkBroker.hpp"
 
-namespace helics
-{
-namespace testcore
-{
-class TestComms;
+namespace helics {
+namespace testcore {
+    class TestComms;
 
-/** implementation for the core that uses IPC messages to communicate*/
-using TestBroker = NetworkBroker<TestComms, interface_type::inproc, static_cast<int> (core_type::TEST)>;
+    /** implementation for the core that uses IPC messages to communicate*/
+    using TestBroker =
+        NetworkBroker<TestComms, interface_type::inproc, static_cast<int>(core_type::TEST)>;
 
-}  // namespace testcore
-}  // namespace helics
+} // namespace testcore
+} // namespace helics

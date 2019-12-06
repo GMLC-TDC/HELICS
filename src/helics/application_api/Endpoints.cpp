@@ -6,22 +6,20 @@ SPDX-License-Identifier: BSD-3-Clause
 */
 
 #include "Endpoints.hpp"
+
 #include "../core/core-exceptions.hpp"
 
-namespace helics
+namespace helics {
+Endpoint::Endpoint(
+    interface_visibility locality,
+    MessageFederate* mFed,
+    const std::string& name,
+    const std::string& type)
 {
-Endpoint::Endpoint (interface_visibility locality,
-                    MessageFederate *mFed,
-                    const std::string &name,
-                    const std::string &type)
-{
-    if (locality == interface_visibility::global)
-    {
-        operator= (mFed->registerGlobalEndpoint (name, type));
-    }
-    else
-    {
-        operator= (mFed->registerEndpoint (name, type));
+    if (locality == interface_visibility::global) {
+        operator=(mFed->registerGlobalEndpoint(name, type));
+    } else {
+        operator=(mFed->registerEndpoint(name, type));
     }
 }
-}  // namespace helics
+} // namespace helics

@@ -3,14 +3,13 @@ Copyright (c) 2017-2018,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC
 All rights reserved. See LICENSE file and DISCLAIMER for more details.
 */
-#include <boost/test/unit_test.hpp>
-#include <boost/test/data/test_case.hpp>
-#include <boost/test/floating_point_comparison.hpp>
-
-#include <future>
-
 #include "ctestFixtures.hpp"
 #include "test_configuration.h"
+
+#include <boost/test/data/test_case.hpp>
+#include <boost/test/floating_point_comparison.hpp>
+#include <boost/test/unit_test.hpp>
+#include <future>
 
 using namespace std::string_literals;
 /** these test cases test out the value federates
@@ -18,211 +17,229 @@ using namespace std::string_literals;
 namespace bdata = boost::unit_test::data;
 namespace utf = boost::unit_test;
 
-BOOST_FIXTURE_TEST_SUITE (value_federate_tests, FederateTestFixture)
+BOOST_FIXTURE_TEST_SUITE(value_federate_tests, FederateTestFixture)
 
 // const std::string core_types[] = {"udp" };
 /** test simple creation and destruction*/
-BOOST_DATA_TEST_CASE (value_federate_initialize_tests, bdata::make (core_types_single), core_type, *utf::label("ci"))
+BOOST_DATA_TEST_CASE(
+    value_federate_initialize_tests,
+    bdata::make(core_types_single),
+    core_type,
+    *utf::label("ci"))
 {
-    SetupTest (helicsCreateValueFederate, core_type, 1);
-    auto vFed1 = GetFederateAt (0);
+    SetupTest(helicsCreateValueFederate, core_type, 1);
+    auto vFed1 = GetFederateAt(0);
 
-    CE (helicsFederateEnterExecutionMode (vFed1));
+    CE(helicsFederateEnterExecutionMode(vFed1));
 
     federate_state state;
-    CE (helicsFederateGetState (vFed1, &state));
-    BOOST_CHECK (state == helics_execution_state);
+    CE(helicsFederateGetState(vFed1, &state));
+    BOOST_CHECK(state == helics_execution_state);
 
-    CE (helicsFederateFinalize (vFed1));
+    CE(helicsFederateFinalize(vFed1));
 
-    CE (helicsFederateGetState (vFed1, &state));
-    BOOST_CHECK (state == helics_finalize_state);
+    CE(helicsFederateGetState(vFed1, &state));
+    BOOST_CHECK(state == helics_finalize_state);
 }
 
-BOOST_DATA_TEST_CASE (value_federate_publication_registration, bdata::make (core_types_single), core_type, *utf::label("ci"))
+BOOST_DATA_TEST_CASE(
+    value_federate_publication_registration,
+    bdata::make(core_types_single),
+    core_type,
+    *utf::label("ci"))
 {
-    SetupTest (helicsCreateValueFederate, core_type, 1);
-    auto vFed1 = GetFederateAt (0);
+    SetupTest(helicsCreateValueFederate, core_type, 1);
+    auto vFed1 = GetFederateAt(0);
 
-    auto pubid = helicsFederateRegisterPublication (vFed1, "pub1", "string", "");
-    auto pubid2 = helicsFederateRegisterGlobalPublication (vFed1, "pub2", "int", "");
+    auto pubid = helicsFederateRegisterPublication(vFed1, "pub1", "string", "");
+    auto pubid2 = helicsFederateRegisterGlobalPublication(vFed1, "pub2", "int", "");
 
-    auto pubid3 = helicsFederateRegisterPublication (vFed1, "pub3", "double", "V");
-    CE (helicsFederateEnterExecutionMode (vFed1));
+    auto pubid3 = helicsFederateRegisterPublication(vFed1, "pub3", "double", "V");
+    CE(helicsFederateEnterExecutionMode(vFed1));
 
     federate_state state;
-    CE (helicsFederateGetState (vFed1, &state));
-    BOOST_CHECK (state == helics_execution_state);
+    CE(helicsFederateGetState(vFed1, &state));
+    BOOST_CHECK(state == helics_execution_state);
 
     char sv[HELICS_SIZE_MAX];
-    CE (helicsPublicationGetKey (pubid, sv, HELICS_SIZE_MAX));
-    BOOST_CHECK_EQUAL (sv, "fed0/pub1");
+    CE(helicsPublicationGetKey(pubid, sv, HELICS_SIZE_MAX));
+    BOOST_CHECK_EQUAL(sv, "fed0/pub1");
     char sv2[HELICS_SIZE_MAX];
-    CE (helicsPublicationGetKey (pubid2, sv2, HELICS_SIZE_MAX));
-    BOOST_CHECK_EQUAL (sv2, "pub2");
+    CE(helicsPublicationGetKey(pubid2, sv2, HELICS_SIZE_MAX));
+    BOOST_CHECK_EQUAL(sv2, "pub2");
     char pub3name[HELICS_SIZE_MAX];
-    CE (helicsPublicationGetKey (pubid3, pub3name, HELICS_SIZE_MAX));
-    BOOST_CHECK_EQUAL (pub3name, "fed0/pub3");
+    CE(helicsPublicationGetKey(pubid3, pub3name, HELICS_SIZE_MAX));
+    BOOST_CHECK_EQUAL(pub3name, "fed0/pub3");
 
     char tmp[HELICS_SIZE_MAX];
-    CE (helicsPublicationGetType (pubid3, tmp, HELICS_SIZE_MAX));
-    BOOST_CHECK_EQUAL (tmp, "double");
-    CE (helicsPublicationGetUnits (pubid3, tmp, HELICS_SIZE_MAX));
-    BOOST_CHECK_EQUAL (tmp, "V");
+    CE(helicsPublicationGetType(pubid3, tmp, HELICS_SIZE_MAX));
+    BOOST_CHECK_EQUAL(tmp, "double");
+    CE(helicsPublicationGetUnits(pubid3, tmp, HELICS_SIZE_MAX));
+    BOOST_CHECK_EQUAL(tmp, "V");
 
     // BOOST_CHECK (vFed1->getPublicationId ("pub1") == pubid);
     // BOOST_CHECK (vFed1->getPublicationId ("pub2") == pubid2);
     // BOOST_CHECK (vFed1->getPublicationId ("fed0/pub1") == pubid);
-    CE (helicsFederateFinalize (vFed1));
+    CE(helicsFederateFinalize(vFed1));
 
-    CE (helicsFederateGetState (vFed1, &state));
-    BOOST_CHECK (state == helics_finalize_state);
+    CE(helicsFederateGetState(vFed1, &state));
+    BOOST_CHECK(state == helics_finalize_state);
 }
 
-BOOST_DATA_TEST_CASE (value_federate_publisher_registration, bdata::make (core_types_single), core_type, *utf::label("ci"))
+BOOST_DATA_TEST_CASE(
+    value_federate_publisher_registration,
+    bdata::make(core_types_single),
+    core_type,
+    *utf::label("ci"))
 {
-    SetupTest (helicsCreateValueFederate, core_type, 1);
-    auto vFed1 = GetFederateAt (0);
+    SetupTest(helicsCreateValueFederate, core_type, 1);
+    auto vFed1 = GetFederateAt(0);
 
-    auto pubid = helicsFederateRegisterTypePublication (vFed1, "pub1", HELICS_STRING_TYPE, "");
-    auto pubid2 = helicsFederateRegisterGlobalTypePublication (vFed1, "pub2", HELICS_INT_TYPE, "");
-    auto pubid3 = helicsFederateRegisterTypePublication (vFed1, "pub3", HELICS_DOUBLE_TYPE, "V");
-    CE (helicsFederateEnterExecutionMode (vFed1));
+    auto pubid = helicsFederateRegisterTypePublication(vFed1, "pub1", HELICS_STRING_TYPE, "");
+    auto pubid2 = helicsFederateRegisterGlobalTypePublication(vFed1, "pub2", HELICS_INT_TYPE, "");
+    auto pubid3 = helicsFederateRegisterTypePublication(vFed1, "pub3", HELICS_DOUBLE_TYPE, "V");
+    CE(helicsFederateEnterExecutionMode(vFed1));
 
     federate_state state;
-    CE (helicsFederateGetState (vFed1, &state));
-    BOOST_CHECK (state == helics_execution_state);
+    CE(helicsFederateGetState(vFed1, &state));
+    BOOST_CHECK(state == helics_execution_state);
 
     char sv[HELICS_SIZE_MAX];
-    CE (helicsPublicationGetKey (pubid, sv, HELICS_SIZE_MAX));
+    CE(helicsPublicationGetKey(pubid, sv, HELICS_SIZE_MAX));
     char sv2[HELICS_SIZE_MAX];
-    CE (helicsPublicationGetKey (pubid2, sv2, HELICS_SIZE_MAX));
-    BOOST_CHECK_EQUAL (sv, "fed0/pub1");
-    BOOST_CHECK_EQUAL (sv2, "pub2");
+    CE(helicsPublicationGetKey(pubid2, sv2, HELICS_SIZE_MAX));
+    BOOST_CHECK_EQUAL(sv, "fed0/pub1");
+    BOOST_CHECK_EQUAL(sv2, "pub2");
     char pub3name[HELICS_SIZE_MAX];
-    CE (helicsPublicationGetKey (pubid3, pub3name, HELICS_SIZE_MAX));
-    BOOST_CHECK_EQUAL (pub3name, "fed0/pub3");
+    CE(helicsPublicationGetKey(pubid3, pub3name, HELICS_SIZE_MAX));
+    BOOST_CHECK_EQUAL(pub3name, "fed0/pub3");
 
     char tmp[HELICS_SIZE_MAX];
-    CE (helicsPublicationGetType (pubid3, tmp, HELICS_SIZE_MAX));
-    BOOST_CHECK_EQUAL (tmp, "double");
-    CE (helicsPublicationGetUnits (pubid3, tmp, HELICS_SIZE_MAX));
-    BOOST_CHECK_EQUAL (tmp, "V");
+    CE(helicsPublicationGetType(pubid3, tmp, HELICS_SIZE_MAX));
+    BOOST_CHECK_EQUAL(tmp, "double");
+    CE(helicsPublicationGetUnits(pubid3, tmp, HELICS_SIZE_MAX));
+    BOOST_CHECK_EQUAL(tmp, "V");
 
     // BOOST_CHECK (vFed1->getPublicationId ("pub1") == pubid.getID ());
     // BOOST_CHECK (vFed1->getPublicationId ("pub2") == pubid2.getID ());
     // BOOST_CHECK (vFed1->getPublicationId ("fed0/pub1") == pubid.getID ());
-    CE (helicsFederateFinalize (vFed1));
+    CE(helicsFederateFinalize(vFed1));
 
-    CE (helicsFederateGetState (vFed1, &state));
-    BOOST_CHECK (state == helics_finalize_state);
+    CE(helicsFederateGetState(vFed1, &state));
+    BOOST_CHECK(state == helics_finalize_state);
 }
 
-BOOST_DATA_TEST_CASE (value_federate_subscription_registration, bdata::make (core_types_single), core_type, *utf::label("ci"))
+BOOST_DATA_TEST_CASE(
+    value_federate_subscription_registration,
+    bdata::make(core_types_single),
+    core_type,
+    *utf::label("ci"))
 {
-    SetupTest (helicsCreateValueFederate, core_type, 1);
-    auto vFed1 = GetFederateAt (0);
+    SetupTest(helicsCreateValueFederate, core_type, 1);
+    auto vFed1 = GetFederateAt(0);
 
-    auto subid = helicsFederateRegisterSubscription (vFed1, "sub1", "double", "V");
-    auto subid2 = helicsFederateRegisterTypeSubscription (vFed1, "sub2", HELICS_INT_TYPE, "");
+    auto subid = helicsFederateRegisterSubscription(vFed1, "sub1", "double", "V");
+    auto subid2 = helicsFederateRegisterTypeSubscription(vFed1, "sub2", HELICS_INT_TYPE, "");
 
-    auto subid3 = helicsFederateRegisterOptionalSubscription (vFed1, "sub3", "double", "V");
-    CE (helicsFederateEnterExecutionMode (vFed1));
+    auto subid3 = helicsFederateRegisterOptionalSubscription(vFed1, "sub3", "double", "V");
+    CE(helicsFederateEnterExecutionMode(vFed1));
 
     federate_state state;
-    CE (helicsFederateGetState (vFed1, &state));
-    BOOST_CHECK (state == helics_execution_state);
+    CE(helicsFederateGetState(vFed1, &state));
+    BOOST_CHECK(state == helics_execution_state);
 
     char sv[HELICS_SIZE_MAX];
-    CE (helicsSubscriptionGetKey (subid, sv, HELICS_SIZE_MAX));
+    CE(helicsSubscriptionGetKey(subid, sv, HELICS_SIZE_MAX));
     char sv2[HELICS_SIZE_MAX];
-    CE (helicsSubscriptionGetKey (subid2, sv2, HELICS_SIZE_MAX));
-    BOOST_CHECK_EQUAL (sv, "sub1");
-    BOOST_CHECK_EQUAL (sv2, "sub2");
+    CE(helicsSubscriptionGetKey(subid2, sv2, HELICS_SIZE_MAX));
+    BOOST_CHECK_EQUAL(sv, "sub1");
+    BOOST_CHECK_EQUAL(sv2, "sub2");
     char sub3name[HELICS_SIZE_MAX];
-    CE (helicsSubscriptionGetKey (subid3, sub3name, HELICS_SIZE_MAX));
+    CE(helicsSubscriptionGetKey(subid3, sub3name, HELICS_SIZE_MAX));
 
     // vFed1->addSubscriptionShortcut (subid, "Shortcut");
-    BOOST_CHECK_EQUAL (sub3name, "sub3");
+    BOOST_CHECK_EQUAL(sub3name, "sub3");
 
     char tmp[HELICS_SIZE_MAX];
-    CE (helicsSubscriptionGetType (subid3, tmp, HELICS_SIZE_MAX));
-    BOOST_CHECK_EQUAL (tmp, "double");
-    CE (helicsSubscriptionGetUnits (subid3, tmp, HELICS_SIZE_MAX));
-    BOOST_CHECK_EQUAL (tmp, "V");
+    CE(helicsSubscriptionGetType(subid3, tmp, HELICS_SIZE_MAX));
+    BOOST_CHECK_EQUAL(tmp, "double");
+    CE(helicsSubscriptionGetUnits(subid3, tmp, HELICS_SIZE_MAX));
+    BOOST_CHECK_EQUAL(tmp, "V");
 
     // BOOST_CHECK (vFed1->getSubscriptionId ("sub1") == subid);
     // BOOST_CHECK (vFed1->getSubscriptionId ("sub2") == subid2);
 
     // BOOST_CHECK (vFed1->getSubscriptionId ("Shortcut") == subid);
 
-    CE (helicsFederateFinalize (vFed1));
+    CE(helicsFederateFinalize(vFed1));
 
-    CE (helicsFederateGetState (vFed1, &state));
-    BOOST_CHECK (state == helics_finalize_state);
-    helicsCleanupHelicsLibrary ();
+    CE(helicsFederateGetState(vFed1, &state));
+    BOOST_CHECK(state == helics_finalize_state);
+    helicsCleanupHelicsLibrary();
 }
 
-BOOST_DATA_TEST_CASE (value_federate_subscription_and_publication_registration,
-                      bdata::make (core_types_single),
-                      core_type,
-                      *utf::label("ci"))
+BOOST_DATA_TEST_CASE(
+    value_federate_subscription_and_publication_registration,
+    bdata::make(core_types_single),
+    core_type,
+    *utf::label("ci"))
 {
-    SetupTest (helicsCreateValueFederate, core_type, 1);
-    auto vFed1 = GetFederateAt (0);
+    SetupTest(helicsCreateValueFederate, core_type, 1);
+    auto vFed1 = GetFederateAt(0);
 
     // register the publications
-    auto pubid = helicsFederateRegisterTypePublication (vFed1, "pub1", HELICS_STRING_TYPE, "");
-    auto pubid2 = helicsFederateRegisterGlobalTypePublication (vFed1, "pub2", HELICS_INT_TYPE, "");
+    auto pubid = helicsFederateRegisterTypePublication(vFed1, "pub1", HELICS_STRING_TYPE, "");
+    auto pubid2 = helicsFederateRegisterGlobalTypePublication(vFed1, "pub2", HELICS_INT_TYPE, "");
 
-    auto pubid3 = helicsFederateRegisterPublication (vFed1, "pub3", "double", "V");
+    auto pubid3 = helicsFederateRegisterPublication(vFed1, "pub3", "double", "V");
 
-    auto subid = helicsFederateRegisterOptionalSubscription (vFed1, "sub1", "double", "V");
-    auto subid2 = helicsFederateRegisterOptionalTypeSubscription (vFed1, "sub2", HELICS_INT_TYPE, "");
+    auto subid = helicsFederateRegisterOptionalSubscription(vFed1, "sub1", "double", "V");
+    auto subid2 =
+        helicsFederateRegisterOptionalTypeSubscription(vFed1, "sub2", HELICS_INT_TYPE, "");
 
-    auto subid3 = helicsFederateRegisterOptionalSubscription (vFed1, "sub3", "double", "V");
+    auto subid3 = helicsFederateRegisterOptionalSubscription(vFed1, "sub3", "double", "V");
     // enter execution
-    CE (helicsFederateEnterExecutionMode (vFed1));
+    CE(helicsFederateEnterExecutionMode(vFed1));
 
     federate_state state;
-    CE (helicsFederateGetState (vFed1, &state));
-    BOOST_CHECK (state == helics_execution_state);
+    CE(helicsFederateGetState(vFed1, &state));
+    BOOST_CHECK(state == helics_execution_state);
 
     char sv[HELICS_SIZE_MAX];
-    CE (helicsSubscriptionGetKey (subid, sv, HELICS_SIZE_MAX));
+    CE(helicsSubscriptionGetKey(subid, sv, HELICS_SIZE_MAX));
     char sv2[HELICS_SIZE_MAX];
-    CE (helicsSubscriptionGetKey (subid2, sv2, HELICS_SIZE_MAX));
-    BOOST_CHECK_EQUAL (sv, "sub1");
-    BOOST_CHECK_EQUAL (sv2, "sub2");
+    CE(helicsSubscriptionGetKey(subid2, sv2, HELICS_SIZE_MAX));
+    BOOST_CHECK_EQUAL(sv, "sub1");
+    BOOST_CHECK_EQUAL(sv2, "sub2");
     char sub3name[HELICS_SIZE_MAX];
-    CE (helicsSubscriptionGetKey (subid3, sub3name, HELICS_SIZE_MAX));
-    BOOST_CHECK_EQUAL (sub3name, "sub3");
+    CE(helicsSubscriptionGetKey(subid3, sub3name, HELICS_SIZE_MAX));
+    BOOST_CHECK_EQUAL(sub3name, "sub3");
 
     char tmp[HELICS_SIZE_MAX];
-    CE (helicsSubscriptionGetType (subid3, tmp, HELICS_SIZE_MAX));
-    BOOST_CHECK_EQUAL (tmp, "double");
-    CE (helicsSubscriptionGetUnits (subid3, tmp, HELICS_SIZE_MAX));
-    BOOST_CHECK_EQUAL (tmp, "V");
+    CE(helicsSubscriptionGetType(subid3, tmp, HELICS_SIZE_MAX));
+    BOOST_CHECK_EQUAL(tmp, "double");
+    CE(helicsSubscriptionGetUnits(subid3, tmp, HELICS_SIZE_MAX));
+    BOOST_CHECK_EQUAL(tmp, "V");
 
     // check publications
 
-    CE (helicsPublicationGetKey (pubid, sv, HELICS_SIZE_MAX));
-    CE (helicsPublicationGetKey (pubid2, sv2, HELICS_SIZE_MAX));
-    BOOST_CHECK_EQUAL (sv, "fed0/pub1");
-    BOOST_CHECK_EQUAL (sv2, "pub2");
+    CE(helicsPublicationGetKey(pubid, sv, HELICS_SIZE_MAX));
+    CE(helicsPublicationGetKey(pubid2, sv2, HELICS_SIZE_MAX));
+    BOOST_CHECK_EQUAL(sv, "fed0/pub1");
+    BOOST_CHECK_EQUAL(sv2, "pub2");
     char pub3name[HELICS_SIZE_MAX];
-    CE (helicsPublicationGetKey (pubid3, pub3name, HELICS_SIZE_MAX));
-    BOOST_CHECK_EQUAL (pub3name, "fed0/pub3");
+    CE(helicsPublicationGetKey(pubid3, pub3name, HELICS_SIZE_MAX));
+    BOOST_CHECK_EQUAL(pub3name, "fed0/pub3");
 
-    CE (helicsPublicationGetType (pubid3, tmp, HELICS_SIZE_MAX));
-    BOOST_CHECK_EQUAL (tmp, "double");
-    CE (helicsPublicationGetUnits (pubid3, tmp, HELICS_SIZE_MAX));
-    BOOST_CHECK_EQUAL (tmp, "V");
-    CE (helicsFederateFinalize (vFed1));
+    CE(helicsPublicationGetType(pubid3, tmp, HELICS_SIZE_MAX));
+    BOOST_CHECK_EQUAL(tmp, "double");
+    CE(helicsPublicationGetUnits(pubid3, tmp, HELICS_SIZE_MAX));
+    BOOST_CHECK_EQUAL(tmp, "V");
+    CE(helicsFederateFinalize(vFed1));
 
-    CE (helicsFederateGetState (vFed1, &state));
-    BOOST_CHECK (state == helics_finalize_state);
-    helicsCleanupHelicsLibrary ();
+    CE(helicsFederateGetState(vFed1, &state));
+    BOOST_CHECK(state == helics_finalize_state);
+    helicsCleanupHelicsLibrary();
 }
 #if 0
 
@@ -281,9 +298,9 @@ BOOST_DATA_TEST_CASE (value_federate_subscriber_and_publisher_registration,
     BOOST_CHECK (state == helics_finalize_state);
 }
 
-#if ENABLE_TEST_TIMEOUTS > 0
+#    if ENABLE_TEST_TIMEOUTS > 0
 BOOST_TEST_DECORATOR (*utf::timeout (5))
-#endif
+#    endif
 BOOST_DATA_TEST_CASE (value_federate_single_transfer, bdata::make (core_types_single), core_type)
 {
     SetupTest (helicsCreateValueFederate, core_type, 1);
@@ -320,9 +337,9 @@ BOOST_DATA_TEST_CASE (value_federate_single_transfer, bdata::make (core_types_si
     BOOST_CHECK_EQUAL (s, "string2");
 }
 
-#if ENABLE_TEST_TIMEOUTS > 0
+#    if ENABLE_TEST_TIMEOUTS > 0
 BOOST_TEST_DECORATOR (*utf::timeout (5))
-#endif
+#    endif
 BOOST_DATA_TEST_CASE (value_federate_single_transfer_publisher, bdata::make (core_types_single), core_type)
 {
     SetupTest (helicsCreateValueFederate, core_type, 1);
@@ -503,85 +520,85 @@ void runFederateTestv2 (const std::string &core_type_str,
     helicsCleanupHelicsLibrary ();
 }
 
-#ifndef QUICK_TESTS_ONLY
+#    ifndef QUICK_TESTS_ONLY
 
-#if ENABLE_TEST_TIMEOUTS > 0
+#        if ENABLE_TEST_TIMEOUTS > 0
 BOOST_TEST_DECORATOR (*utf::timeout (35))
-#endif
+#        endif
 BOOST_DATA_TEST_CASE (value_federate_single_transfer_types1, bdata::make (core_types_single), core_type)
 {
     runFederateTest<double> (core_type, 10.3, 45.3, 22.7);
 }
 
-#if ENABLE_TEST_TIMEOUTS > 0
+#        if ENABLE_TEST_TIMEOUTS > 0
 BOOST_TEST_DECORATOR (*utf::timeout (35))
-#endif
+#        endif
 BOOST_DATA_TEST_CASE (value_federate_single_transfer_types2, bdata::make (core_types_single), core_type)
 {
     runFederateTest<double> (core_type, 1.0, 0.0, 3.0);
 }
 
-#if ENABLE_TEST_TIMEOUTS > 0
+#        if ENABLE_TEST_TIMEOUTS > 0
 BOOST_TEST_DECORATOR (*utf::timeout (35))
-#endif
+#        endif
 BOOST_DATA_TEST_CASE (value_federate_single_transfer_types3, bdata::make (core_types_single), core_type)
 {
     runFederateTest<int> (core_type, 5, 8, 43);
 }
 
-#if ENABLE_TEST_TIMEOUTS > 0
+#        if ENABLE_TEST_TIMEOUTS > 0
 BOOST_TEST_DECORATOR (*utf::timeout (35))
-#endif
+#        endif
 BOOST_DATA_TEST_CASE (value_federate_single_transfer_types4, bdata::make (core_types_single), core_type)
 {
     runFederateTest<int> (core_type, -5, 1241515, -43);
 }
 
-#if ENABLE_TEST_TIMEOUTS > 0
+#        if ENABLE_TEST_TIMEOUTS > 0
 BOOST_TEST_DECORATOR (*utf::timeout (35))
-#endif
+#        endif
 BOOST_DATA_TEST_CASE (value_federate_single_transfer_types5, bdata::make (core_types_single), core_type)
 {
     runFederateTest<int16_t> (core_type, -5, 23023, -43);
 }
 
-#if ENABLE_TEST_TIMEOUTS > 0
+#        if ENABLE_TEST_TIMEOUTS > 0
 BOOST_TEST_DECORATOR (*utf::timeout (35))
-#endif
+#        endif
 BOOST_DATA_TEST_CASE (value_federate_single_transfer_types6, bdata::make (core_types_single), core_type)
 {
     runFederateTest<uint64_t> (core_type, 234252315, 0xFFF1'2345'7124'1412, 23521513412);
 }
 
-#if ENABLE_TEST_TIMEOUTS > 0
+#        if ENABLE_TEST_TIMEOUTS > 0
 BOOST_TEST_DECORATOR (*utf::timeout (35))
-#endif
+#        endif
 BOOST_DATA_TEST_CASE (value_federate_single_transfer_types7, bdata::make (core_types_single), core_type)
 {
     runFederateTest<float> (core_type, 10.3f, 45.3f, 22.7f);
 }
 
-#if ENABLE_TEST_TIMEOUTS > 0
+#        if ENABLE_TEST_TIMEOUTS > 0
 BOOST_TEST_DECORATOR (*utf::timeout (35))
-#endif
+#        endif
 BOOST_DATA_TEST_CASE (value_federate_single_transfer_types8, bdata::make (core_types_single), core_type)
 {
     runFederateTest<std::string> (core_type, "start", "inside of the functional relationship of helics",
                                   std::string ("I am a string"));
 }
 
-#if ENABLE_TEST_TIMEOUTS > 0
+#        if ENABLE_TEST_TIMEOUTS > 0
 BOOST_TEST_DECORATOR (*utf::timeout (35))
-#endif
+#        endif
 BOOST_DATA_TEST_CASE (value_federate_single_transfer_types9, bdata::make (core_types_single), core_type)
 {
     runFederateTestv2<std::vector<double>> (core_type, {34.3, 24.2}, {12.4, 14.7, 16.34, 18.17},
                                             {9.9999, 8.8888, 7.7777});
 }
 
-#if ENABLE_TEST_TIMEOUTS > 0
+#        if ENABLE_TEST_TIMEOUTS > 0
 BOOST_TEST_DECORATOR (*utf::timeout (35))
-#endif
+#        endif
 BOOST_DATA_TEST_CASE (value_federate_single_transfer_types10, bdata::make (core_types_single), core_type)
 {
     std::vector<std::string> sv1{"hip", "hop"};
@@ -592,9 +609,9 @@ BOOST_DATA_TEST_CASE (value_federate_single_transfer_types10, bdata::make (core_
     runFederateTestv2 (core_type, sv1, sv2, sv3);
 }
 
-#if ENABLE_TEST_TIMEOUTS > 0
+#        if ENABLE_TEST_TIMEOUTS > 0
 BOOST_TEST_DECORATOR (*utf::timeout (35))
-#endif
+#        endif
 BOOST_DATA_TEST_CASE (value_federate_single_transfer_types11, bdata::make (core_types_single), core_type)
 {
     std::complex<double> def = {54.23233, 0.7};
@@ -603,66 +620,66 @@ BOOST_DATA_TEST_CASE (value_federate_single_transfer_types11, bdata::make (core_
     runFederateTest<std::complex<double>> (core_type, def, v1, v2);
 }
 
-#if ENABLE_TEST_TIMEOUTS > 0
+#        if ENABLE_TEST_TIMEOUTS > 0
 BOOST_TEST_DECORATOR (*utf::timeout (5))
-#endif
+#        endif
 BOOST_DATA_TEST_CASE (value_federate_single_transfer_types_publishers1, bdata::make (core_types_single), core_type)
 {
     runFederateTestObj<double> (core_type, 10.3, 45.3, 22.7);
 }
-#if ENABLE_TEST_TIMEOUTS > 0
+#        if ENABLE_TEST_TIMEOUTS > 0
 BOOST_TEST_DECORATOR (*utf::timeout (5))
-#endif
+#        endif
 BOOST_DATA_TEST_CASE (value_federate_single_transfer_types_publishers2, bdata::make (core_types_single), core_type)
 {
     runFederateTestObj<double> (core_type, 1.0, 0.0, 3.0);
 }
-#if ENABLE_TEST_TIMEOUTS > 0
+#        if ENABLE_TEST_TIMEOUTS > 0
 BOOST_TEST_DECORATOR (*utf::timeout (5))
-#endif
+#        endif
 BOOST_DATA_TEST_CASE (value_federate_single_transfer_types_publishers3, bdata::make (core_types_single), core_type)
 {
     runFederateTestObj<int> (core_type, 5, 8, 43);
 }
-#if ENABLE_TEST_TIMEOUTS > 0
+#        if ENABLE_TEST_TIMEOUTS > 0
 BOOST_TEST_DECORATOR (*utf::timeout (5))
-#endif
+#        endif
 BOOST_DATA_TEST_CASE (value_federate_single_transfer_types_publishers4, bdata::make (core_types_single), core_type)
 {
     runFederateTestObj<int> (core_type, -5, 1241515, -43);
 }
-#if ENABLE_TEST_TIMEOUTS > 0
+#        if ENABLE_TEST_TIMEOUTS > 0
 BOOST_TEST_DECORATOR (*utf::timeout (5))
-#endif
+#        endif
 BOOST_DATA_TEST_CASE (value_federate_single_transfer_types_publishers5, bdata::make (core_types_single), core_type)
 {
     runFederateTestObj<int16_t> (core_type, -5, 23023, -43);
 }
-#if ENABLE_TEST_TIMEOUTS > 0
+#        if ENABLE_TEST_TIMEOUTS > 0
 BOOST_TEST_DECORATOR (*utf::timeout (5))
-#endif
+#        endif
 BOOST_DATA_TEST_CASE (value_federate_single_transfer_types_publishers6, bdata::make (core_types_single), core_type)
 {
     runFederateTestObj<uint64_t> (core_type, 234252315, 0xFFF1'2345'7124'1412, 23521513412);
 }
-#if ENABLE_TEST_TIMEOUTS > 0
+#        if ENABLE_TEST_TIMEOUTS > 0
 BOOST_TEST_DECORATOR (*utf::timeout (5))
-#endif
+#        endif
 BOOST_DATA_TEST_CASE (value_federate_single_transfer_types_publishers7, bdata::make (core_types_single), core_type)
 {
     runFederateTestObj<float> (core_type, 10.3f, 45.3f, 22.7f);
 }
-#if ENABLE_TEST_TIMEOUTS > 0
+#        if ENABLE_TEST_TIMEOUTS > 0
 BOOST_TEST_DECORATOR (*utf::timeout (5))
-#endif
+#        endif
 BOOST_DATA_TEST_CASE (value_federate_single_transfer_types_publishers8, bdata::make (core_types_single), core_type)
 {
     runFederateTestObj<std::string> (core_type, "start", "inside of the functional relationship of helics",
                                      std::string ("I am a string"));
 }
-#if ENABLE_TEST_TIMEOUTS > 0
+#        if ENABLE_TEST_TIMEOUTS > 0
 BOOST_TEST_DECORATOR (*utf::timeout (5))
-#endif
+#        endif
 BOOST_DATA_TEST_CASE (value_federate_single_transfer_types_publishers9, bdata::make (core_types_single), core_type)
 {
     std::complex<double> def = {54.23233, 0.7};
@@ -671,10 +688,10 @@ BOOST_DATA_TEST_CASE (value_federate_single_transfer_types_publishers9, bdata::m
     runFederateTestObj<std::complex<double>> (core_type, def, v1, v2);
 }
 
-#endif
-#if ENABLE_TEST_TIMEOUTS > 0
+#    endif
+#    if ENABLE_TEST_TIMEOUTS > 0
 BOOST_TEST_DECORATOR (*utf::timeout (5))
-#endif
+#    endif
 BOOST_DATA_TEST_CASE (value_federate_dual_transfer, bdata::make (core_types), core_type)
 {
     SetupTest (helicsCreateValueFederate, core_type, 2);
@@ -907,71 +924,71 @@ void runDualFederateTestObj (const std::string &core_type_str,
     helicsCleanupHelicsLibrary ();
 }
 
-#ifndef QUICK_TESTS_ONLY
+#    ifndef QUICK_TESTS_ONLY
 /** test case checking that the transfer between two federates works as expected
  */
-#if ENABLE_TEST_TIMEOUTS > 0
+#        if ENABLE_TEST_TIMEOUTS > 0
 BOOST_TEST_DECORATOR (*utf::timeout (10))
-#endif
+#        endif
 BOOST_DATA_TEST_CASE (value_federate_dual_transfer_types1, bdata::make (core_types), core_type)
 {
     runDualFederateTest<double> (core_type, 10.3, 45.3, 22.7);
 }
 
-#if ENABLE_TEST_TIMEOUTS > 0
+#        if ENABLE_TEST_TIMEOUTS > 0
 BOOST_TEST_DECORATOR (*utf::timeout (10))
-#endif
+#        endif
 BOOST_DATA_TEST_CASE (value_federate_dual_transfer_types2, bdata::make (core_types), core_type)
 {
     runDualFederateTest<int> (core_type, 5, 8, 43);
 }
 
-#if ENABLE_TEST_TIMEOUTS > 0
+#        if ENABLE_TEST_TIMEOUTS > 0
 BOOST_TEST_DECORATOR (*utf::timeout (10))
-#endif
+#        endif
 BOOST_DATA_TEST_CASE (value_federate_dual_transfer_types3, bdata::make (core_types), core_type)
 {
     runDualFederateTest<int> (core_type, -5, 1241515, -43);
 }
 
-#if ENABLE_TEST_TIMEOUTS > 0
+#        if ENABLE_TEST_TIMEOUTS > 0
 BOOST_TEST_DECORATOR (*utf::timeout (10))
-#endif
+#        endif
 BOOST_DATA_TEST_CASE (value_federate_dual_transfer_types4, bdata::make (core_types), core_type)
 {
     runDualFederateTest<char> (core_type, 'c', '\0', '\n');
 }
 
-#if ENABLE_TEST_TIMEOUTS > 0
+#        if ENABLE_TEST_TIMEOUTS > 0
 BOOST_TEST_DECORATOR (*utf::timeout (10))
-#endif
+#        endif
 BOOST_DATA_TEST_CASE (value_federate_dual_transfer_types5, bdata::make (core_types), core_type)
 {
     runDualFederateTest<uint64_t> (core_type, 234252315, 0xFFF1'2345'7124'1412, 23521513412);
 }
 
-#if ENABLE_TEST_TIMEOUTS > 0
+#        if ENABLE_TEST_TIMEOUTS > 0
 BOOST_TEST_DECORATOR (*utf::timeout (10))
-#endif
+#        endif
 BOOST_DATA_TEST_CASE (value_federate_dual_transfer_types6, bdata::make (core_types), core_type)
 {
     runDualFederateTest<float> (core_type, 10.3f, 45.3f, 22.7f);
 }
 
-#if ENABLE_TEST_TIMEOUTS > 0
+#        if ENABLE_TEST_TIMEOUTS > 0
 BOOST_TEST_DECORATOR (*utf::timeout (10))
-#endif
+#        endif
 BOOST_DATA_TEST_CASE (value_federate_dual_transfer_types7, bdata::make (core_types), core_type)
 {
     runDualFederateTest<std::string> (core_type, "start", "inside of the functional relationship of helics",
                                       std::string ("I am a string"));
 }
 
-#endif /*ifndef QUICK_TEST_ONLY*/
+#    endif /*ifndef QUICK_TEST_ONLY*/
 
-#if ENABLE_TEST_TIMEOUTS > 0
+#    if ENABLE_TEST_TIMEOUTS > 0
 BOOST_TEST_DECORATOR (*utf::timeout (10))
-#endif
+#    endif
 BOOST_DATA_TEST_CASE (value_federate_dual_transfer_types8, bdata::make (core_types), core_type)
 {
     // this one is going to test really ugly strings
@@ -980,9 +997,9 @@ BOOST_DATA_TEST_CASE (value_federate_dual_transfer_types8, bdata::make (core_typ
                                       std::string (""));
 }
 
-#if ENABLE_TEST_TIMEOUTS > 0
+#    if ENABLE_TEST_TIMEOUTS > 0
 BOOST_TEST_DECORATOR (*utf::timeout (10))
-#endif
+#    endif
 BOOST_DATA_TEST_CASE (value_federate_dual_transfer_types9, bdata::make (core_types), core_type)
 {
     std::vector<double> defVec = {34.3, 24.2};
@@ -991,9 +1008,9 @@ BOOST_DATA_TEST_CASE (value_federate_dual_transfer_types9, bdata::make (core_typ
     runDualFederateTestv2<std::vector<double>> (core_type, defVec, v1Vec, v2Vec);
 }
 
-#if ENABLE_TEST_TIMEOUTS > 0
+#    if ENABLE_TEST_TIMEOUTS > 0
 BOOST_TEST_DECORATOR (*utf::timeout (5))
-#endif
+#    endif
 BOOST_DATA_TEST_CASE (value_federate_dual_transfer_types10, bdata::make (core_types), core_type)
 {
     std::complex<double> def = {54.23233, 0.7};
@@ -1002,61 +1019,61 @@ BOOST_DATA_TEST_CASE (value_federate_dual_transfer_types10, bdata::make (core_ty
     runDualFederateTest<std::complex<double>> (core_type, def, v1, v2);
 }
 
-#ifndef QUICK_TESTS_ONLY
+#    ifndef QUICK_TESTS_ONLY
 /** test case checking that the transfer between two federates works as expected with publication and subscription
  * objects
  */
-#if ENABLE_TEST_TIMEOUTS > 0
+#        if ENABLE_TEST_TIMEOUTS > 0
 BOOST_TEST_DECORATOR (*utf::timeout (6))
-#endif
+#        endif
 BOOST_DATA_TEST_CASE (value_federate_dual_transfer_types_obj1, bdata::make (core_types), core_type)
 {
     runDualFederateTestObj<double> (core_type, 10.3, 45.3, 22.7);
 }
 
-#if ENABLE_TEST_TIMEOUTS > 0
+#        if ENABLE_TEST_TIMEOUTS > 0
 BOOST_TEST_DECORATOR (*utf::timeout (6))
-#endif
+#        endif
 BOOST_DATA_TEST_CASE (value_federate_dual_transfer_types_obj2, bdata::make (core_types), core_type)
 {
     runDualFederateTestObj<int> (core_type, 5, 8, 43);
 }
 
-#if ENABLE_TEST_TIMEOUTS > 0
+#        if ENABLE_TEST_TIMEOUTS > 0
 BOOST_TEST_DECORATOR (*utf::timeout (6))
-#endif
+#        endif
 BOOST_DATA_TEST_CASE (value_federate_dual_transfer_types_obj3, bdata::make (core_types), core_type)
 {
     runDualFederateTestObj<int> (core_type, -5, 1241515, -43);
 }
 
-#if ENABLE_TEST_TIMEOUTS > 0
+#        if ENABLE_TEST_TIMEOUTS > 0
 BOOST_TEST_DECORATOR (*utf::timeout (6))
-#endif
+#        endif
 BOOST_DATA_TEST_CASE (value_federate_dual_transfer_types_obj4, bdata::make (core_types), core_type)
 {
     runDualFederateTestObj<char> (core_type, 'c', '\0', '\n');
 }
 
-#if ENABLE_TEST_TIMEOUTS > 0
+#        if ENABLE_TEST_TIMEOUTS > 0
 BOOST_TEST_DECORATOR (*utf::timeout (6))
-#endif
+#        endif
 BOOST_DATA_TEST_CASE (value_federate_dual_transfer_types_obj5, bdata::make (core_types), core_type)
 {
     runDualFederateTestObj<uint64_t> (core_type, 234252315, 0xFFF1'2345'7124'1412, 23521513412);
 }
 
-#if ENABLE_TEST_TIMEOUTS > 0
+#        if ENABLE_TEST_TIMEOUTS > 0
 BOOST_TEST_DECORATOR (*utf::timeout (6))
-#endif
+#        endif
 BOOST_DATA_TEST_CASE (value_federate_dual_transfer_types_obj6, bdata::make (core_types), core_type)
 {
     runDualFederateTestObj<float> (core_type, 10.3f, 45.3f, 22.7f);
 }
 
-#if ENABLE_TEST_TIMEOUTS > 0
+#        if ENABLE_TEST_TIMEOUTS > 0
 BOOST_TEST_DECORATOR (*utf::timeout (6))
-#endif
+#        endif
 BOOST_DATA_TEST_CASE (value_federate_dual_transfer_types_obj7, bdata::make (core_types), core_type)
 {
     runDualFederateTestObj<std::string> (core_type, "start", "inside of the functional relationship of helics",
@@ -1064,11 +1081,11 @@ BOOST_DATA_TEST_CASE (value_federate_dual_transfer_types_obj7, bdata::make (core
     // this one is going to test really ugly strings
 }
 
-#endif /** ifndef QUICK_TESTS_ONLY*/
+#    endif /** ifndef QUICK_TESTS_ONLY*/
 
-#if ENABLE_TEST_TIMEOUTS > 0
+#    if ENABLE_TEST_TIMEOUTS > 0
 BOOST_TEST_DECORATOR (*utf::timeout (6))
-#endif
+#    endif
 BOOST_DATA_TEST_CASE (value_federate_dual_transfer_types_obj8, bdata::make (core_types), core_type)
 {
     runDualFederateTestObj<std::string> (core_type, std::string (86263, '\0'),
@@ -1076,9 +1093,9 @@ BOOST_DATA_TEST_CASE (value_federate_dual_transfer_types_obj8, bdata::make (core
                                          std::string (""));
 }
 
-#if ENABLE_TEST_TIMEOUTS > 0
+#    if ENABLE_TEST_TIMEOUTS > 0
 BOOST_TEST_DECORATOR (*utf::timeout (6))
-#endif
+#    endif
 BOOST_DATA_TEST_CASE (value_federate_dual_transfer_types_obj9, bdata::make (core_types), core_type)
 {
     std::complex<double> def = {54.23233, 0.7};
@@ -1087,9 +1104,9 @@ BOOST_DATA_TEST_CASE (value_federate_dual_transfer_types_obj9, bdata::make (core
     runDualFederateTestObj<std::complex<double>> (core_type, def, v1, v2);
 }
 
-#if ENABLE_TEST_TIMEOUTS > 0
+#    if ENABLE_TEST_TIMEOUTS > 0
 BOOST_TEST_DECORATOR (*utf::timeout (40))
-#endif
+#    endif
 BOOST_DATA_TEST_CASE (value_federate_single_init_publish, bdata::make (core_types), core_type)
 {
     SetupTest (helicsCreateValueFederate, core_type, 1);
@@ -1133,4 +1150,4 @@ BOOST_DATA_TEST_CASE (value_federate_single_init_publish, bdata::make (core_type
     BOOST_CHECK_EQUAL (val, 3.0);
 }
 #endif
-BOOST_AUTO_TEST_SUITE_END ()
+BOOST_AUTO_TEST_SUITE_END()

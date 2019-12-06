@@ -10,15 +10,18 @@ SPDX-License-Identifier: BSD-3-Clause
 #pragma once
 
 #include "CombinationFederate.hpp"
+
 #include <string>
 
 /**
  * HELICS C++98 Interface
  */
-namespace helicscpp
-{
+namespace helicscpp {
 /** get a string with the helics version info*/
-std::string getHelicsVersionString () { return std::string (helicsGetVersion ()); }
+std::string getHelicsVersionString()
+{
+    return std::string(helicsGetVersion());
+}
 
-}  // namespace helicscpp
+} // namespace helicscpp
 #endif

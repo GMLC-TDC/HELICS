@@ -6,108 +6,89 @@ SPDX-License-Identifier: BSD-3-Clause
 */
 
 #include "TomlProcessingFunctions.hpp"
-#include "../utilities/timeStringOps.hpp"
+
 #include "../core/helics-time.hpp"
+#include "../utilities/timeStringOps.hpp"
+
 #include <fstream>
 
-bool hasTomlExtension (const std::string &tomlString)
+bool hasTomlExtension(const std::string& tomlString)
 {
-    auto ext = tomlString.substr (tomlString.length () - 4);
+    auto ext = tomlString.substr(tomlString.length() - 4);
     return ((ext == "toml") || (ext == "TOML") || (ext == ".ini") || (ext == ".INI"));
 }
 
-toml::Value loadToml (const std::string &tomlString)
+toml::Value loadToml(const std::string& tomlString)
 {
-    if (tomlString.size () > 128)
-    {
-        try
-        {
-            return loadTomlStr (tomlString);
+    if (tomlString.size() > 128) {
+        try {
+            return loadTomlStr(tomlString);
         }
-        catch (const std::invalid_argument &)
-        {
+        catch (const std::invalid_argument&) {
             // just pass through this was an assumption
         }
     }
-    std::ifstream file (tomlString);
+    std::ifstream file(tomlString);
 
-    if (file.is_open ())
-    {
-        toml::ParseResult pr = toml::parse (file);
-        if (!pr.valid ())
-        {
-            throw (std::invalid_argument (pr.errorReason));
+    if (file.is_open()) {
+        toml::ParseResult pr = toml::parse(file);
+        if (!pr.valid()) {
+            throw(std::invalid_argument(pr.errorReason));
         }
 
         return pr.value;
     }
-    return loadTomlStr (tomlString);
+    return loadTomlStr(tomlString);
 }
 
-toml::Value loadTomlStr (const std::string &tomlString)
+toml::Value loadTomlStr(const std::string& tomlString)
 {
-    std::istringstream tstring (tomlString);
-    toml::ParseResult pr = toml::parse (tstring);
-    if (pr.valid ())
-    {
+    std::istringstream tstring(tomlString);
+    toml::ParseResult pr = toml::parse(tstring);
+    if (pr.valid()) {
         return pr.value;
     }
-    throw (std::invalid_argument (pr.errorReason));
+    throw(std::invalid_argument(pr.errorReason));
 }
 
 /** read a time from a JSON value element*/
-helics::Time loadTomlTime (const toml::Value &timeElement, time_units defaultUnits)
+helics::Time loadTomlTime(const toml::Value& timeElement, time_units defaultUnits)
 {
-    if (timeElement.is<toml::Table> ())
-    {
-        auto units = timeElement.find ("units");
-        if (units != nullptr)
-        {
-            defaultUnits = gmlc::utilities::timeUnitsFromString (units->as<std::string> ());
+    if (timeElement.is<toml::Table>()) {
+        auto units = timeElement.find("units");
+        if (units != nullptr) {
+            defaultUnits = gmlc::utilities::timeUnitsFromString(units->as<std::string>());
         }
-        auto val = timeElement.find ("value");
-        if (val != nullptr)
-        {
-            if (val->is<int64_t> ())
-            {
-                return {val->as<int64_t> (), defaultUnits};
+        auto val = timeElement.find("value");
+        if (val != nullptr) {
+            if (val->is<int64_t>()) {
+                return {val->as<int64_t>(), defaultUnits};
             }
-            return {val->as<double> () * toSecondMultiplier (defaultUnits)};
+            return {val->as<double>() * toSecondMultiplier(defaultUnits)};
         }
+    } else if (timeElement.is<int64_t>()) {
+        return {timeElement.as<int64_t>(), defaultUnits};
+    } else if (timeElement.is<double>()) {
+        return {timeElement.as<double>() * toSecondMultiplier(defaultUnits)};
+    } else if (timeElement.is<toml::Time>()) {
+        return {
+            static_cast<std::chrono::nanoseconds>(timeElement.as<toml::Time>().time_since_epoch())};
+    } else {
+        return gmlc::utilities::loadTimeFromString<helics::Time>(timeElement.as<std::string>());
     }
-    else if (timeElement.is<int64_t> ())
-    {
-        return {timeElement.as<int64_t> (), defaultUnits};
-    }
-    else if (timeElement.is<double> ())
-    {
-        return {timeElement.as<double> () * toSecondMultiplier (defaultUnits)};
-    }
-    else if (timeElement.is<toml::Time> ())
-    {
-        return {static_cast<std::chrono::nanoseconds> (timeElement.as<toml::Time> ().time_since_epoch ())};
-    }
-    else
-    {
-        return gmlc::utilities::loadTimeFromString<helics::Time> (timeElement.as<std::string> ());
-    }
-    return helics::Time::minVal ();
+    return helics::Time::minVal();
 }
 
-std::string getKey (const toml::Value &element)
+std::string getKey(const toml::Value& element)
 {
     std::string retval;
-    auto mem = element.find ("key");
-    if (mem != nullptr)
-    {
-        retval = mem->as<std::string> ();
-    }
-    else
-    {
-        auto name = element.find ("name");
-        if (name != nullptr)
-        {
-            retval = name->as<std::string> ();
+    auto mem = element.find("key");
+    if (mem != nullptr) {
+        retval = mem->as<std::string>();
+    } else {
+        auto name = element.find("name");
+        if (name != nullptr) {
+            retval = name->as<std::string>();
         }
     }
     return retval;

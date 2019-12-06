@@ -11,8 +11,7 @@ SPDX-License-Identifier: BSD-3-Clause
 /** @file
 file linking with version info and containing some convenience functions
 */
-namespace helics
-{
+namespace helics {
 /** a string representation of the HELICS version*/
 constexpr auto versionString = HELICS_VERSION_STRING;
 
@@ -25,4 +24,4 @@ constexpr int versionPatch = HELICS_VERSION_PATCH;
 /** the build string if any*/
 constexpr auto versionBuild = HELICS_VERSION_BUILD;
 
-}  // namespace helics
+} // namespace helics

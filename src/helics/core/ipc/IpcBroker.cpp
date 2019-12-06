@@ -5,10 +5,10 @@ the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 #include "IpcBroker.h"
+
 #include "../NetworkBroker_impl.hpp"
 #include "IpcComms.h"
 
-namespace helics
-{
-template class NetworkBroker<ipc::IpcComms, interface_type::ipc, static_cast<int> (core_type::IPC)>;
-}  // namespace helics
+namespace helics {
+template class NetworkBroker<ipc::IpcComms, interface_type::ipc, static_cast<int>(core_type::IPC)>;
+} // namespace helics
