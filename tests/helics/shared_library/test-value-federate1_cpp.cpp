@@ -681,9 +681,9 @@ BOOST_DATA_TEST_CASE(
 
     CE(helicsPublicationGetType(
         pubid3, pubtype, 100)); // in this function the publication type is returned
-        // in the char * argument of the function. The
-        // return type is just to check that the function
-        // execution was successful
+    // in the char * argument of the function. The
+    // return type is just to check that the function
+    // execution was successful
     BOOST_CHECK_EQUAL(pubtype, "double");
     CE(helicsPublicationGetUnits(pubid3, pubunit3, 100));
     BOOST_CHECK_EQUAL(pubunit3, "V");
