@@ -55,28 +55,14 @@ jobs:
         fi
         exit 0
         
-    - name: Create a file update PR with hash
-      uses: ./.github/actions/create-file-update-pr
-      if: github.event_name == 'push'
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        COMMIT_MSG: "Automated formatting of source files"
-        PR_TITLE: "Automated formatting of source files"
-        PR_BODY: "Automated formatting of source files in commit https://github.com/${{ github.repository }}/commit/${{ github.sha }}."
-        GIT_EMAIL: "HELICS-bot@users.noreply.github.com"
-        GIT_NAME: "HELICS-bot"
-        BRANCH_PREFIX: "clang-format/"
-        
     - name: Create/update a file update PR with no hash
       uses: ./.github/actions/create-file-update-pr
-      if: github.event_name == 'pull_request'
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         COMMIT_MSG: "Automated formatting of source files"
         PR_TITLE: "Automated formatting of source files"
-        PR_BODY: "Automated formatting of source files in commit https://github.com/${{ github.repository }}/commit/${{ github.sha }}."
+        PR_BODY: "Automated formatting of source files in commit https://github.com/${{ github.repository }}/commit/${{ github.sha }} from ref ${{ github.ref }}."
         GIT_EMAIL: "HELICS-bot@users.noreply.github.com"
         GIT_NAME: "HELICS-bot"
         BRANCH_PREFIX: "clang-format/"
