@@ -158,15 +158,21 @@ install_boost () {
     fetch_and_untar "${boost_version_str}.tar.gz" \
         "http://sourceforge.net/projects/boost/files/boost/${boost_version}/${boost_version_str}.tar.gz/download"
     cd "${boost_version_str}/" || return;
-    ./bootstrap.sh --with-libraries="" --with-toolset="${boost_toolset}";
-    ./b2 install -j2 --prefix="${install_path}" \
-        variant=release \
-        link=${b2_link_type} \
-        threading=multi \
-        toolset="${boost_toolset}" \
-        "${cxxflags_var}" \
-        "${linkflags_var}" \
-        ${b2_extra_options} >/dev/null;
+
+    if [[ "${BOOST_BUILD_LIBS}" ]]; then
+        ./bootstrap.sh --with-libraries="${BOOST_BUILD_LIBS}" --with-toolset="${boost_toolset}";
+        ./b2 install -j2 --prefix="${install_path}" \
+            variant=release \
+            link=${b2_link_type} \
+            threading=multi \
+            toolset="${boost_toolset}" \
+            "${cxxflags_var}" \
+            "${linkflags_var}" \
+            ${b2_extra_options} >/dev/null;
+    else
+        mkdir -p "${install_path}/include" || exit
+        cp -r boost "${install_path}/include"
+    fi
 }
 
 install_cmake () {

@@ -129,11 +129,7 @@ if [[ "$os_name" == "Linux" ]]; then
     # Install Boost
     if [[ ! -d "${boost_install_path}" ]]; then
         echo "*** build boost"
-        boost_sanitizer=""
-        if [[ "$RUN_SANITIZER" == "tsan" ]]; then
-            boost_sanitizer="BOOST_SANITIZER=thread"
-        fi
-        "${boost_sanitizer}" ${WAIT_COMMAND} ./scripts/install-dependency.sh boost ${boost_version} "${boost_install_path}"
+        ${WAIT_COMMAND} ./scripts/install-dependency.sh boost ${boost_version} "${boost_install_path}"
         echo "*** built boost successfully"
     fi
 
@@ -186,7 +182,8 @@ else
         last_pyversion=${last_pyversion/#\*/}
         # Remove a trailing set of parenthesis saying where the version was set
         last_pyversion=${last_pyversion%(*)}
-
+        # Remove whitespace
+        last_pyversion="$(echo -e "$last_pyversion" | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')"
         pyenv global "${last_pyversion}"
     fi
 
