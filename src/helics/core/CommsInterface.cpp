@@ -226,7 +226,7 @@ bool CommsInterface::connect()
             if (queue_transmitter.joinable()) {
                 syncLock.unlock();
                 closeTransmitter();
-                syncLock.unlock();
+                syncLock.lock();
                 if (queue_transmitter.joinable()) {
                     queue_transmitter.join();
                 }
