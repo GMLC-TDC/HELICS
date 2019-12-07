@@ -61,7 +61,7 @@ Publication& ValueFederateManager::registerPublication(
     if (!key.empty()) {
         active = pubHandle->insert(key, coreID, fed, coreID, key, type, units);
     } else {
-        active = pubHandle->insert(nullptr, coreID, fed, coreID, key, type, units);
+        active = pubHandle->insert(no_search, coreID, fed, coreID, key, type, units);
     }
 
     if (active) {
@@ -81,7 +81,7 @@ Input& ValueFederateManager::registerInput(
     if (!key.empty()) {
         active = inpHandle->insert(key, coreID, fed, coreID, key, units);
     } else {
-        active = inpHandle->insert(nullptr, coreID, fed, coreID, key, units);
+        active = inpHandle->insert(no_search, coreID, fed, coreID, key, units);
     }
     if (active) {
         auto& ref = inpHandle->back();
