@@ -257,7 +257,7 @@ static void throwHelicsMatlabError(helics_error *err) {
 }
 
 %typemap(argout) (void *data, int maxDatalen, int *actualSize) {
- if (--resc>=0) *resv++ = SWIG_FromCharPtrAndSize($1,*$3);
+ if (--resc>=0) *resv++ = SWIG_FromCharPtrAndSize((char*)$1,*$3);
 }
 
 // typemap for raw message data functions
@@ -276,5 +276,5 @@ static void throwHelicsMatlabError(helics_error *err) {
 }
 
 %typemap(argout) (void *data, int maxMessagelen, int *actualSize) {
- if (--resc>=0) *resv++ = SWIG_FromCharPtrAndSize($1,*$3);
+ if (--resc>=0) *resv++ = SWIG_FromCharPtrAndSize((char*)$1,*$3);
 }
