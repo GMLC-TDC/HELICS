@@ -179,7 +179,7 @@ std::shared_ptr<LoggerManager> LoggerManager::getLoggerManager(const std::string
 {
     std::lock_guard<std::mutex> loglock(
         loggerLock); // just to ensure that nothing funny happens if you try to
-        // get a context while it is being constructed
+    // get a context while it is being constructed
     auto fnd = loggers.find(loggerName);
     if (fnd != loggers.end()) {
         return fnd->second;

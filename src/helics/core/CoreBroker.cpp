@@ -757,7 +757,7 @@ void CoreBroker::processCommand(ActionMessage&& command)
                         brokerState = broker_state_t::errored;
                         addActionMessage(
                             CMD_USER_DISCONNECT); // TODO::PT this needs something better but this does
-                            // what is needed for now
+                        // what is needed for now
                     } else {
                         // pass it up the chain let the root deal with it
                         command.dest_id = parent_broker_id;
