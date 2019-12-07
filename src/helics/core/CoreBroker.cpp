@@ -633,7 +633,7 @@ void CoreBroker::sendDisconnect()
 	_brokers.apply([this,&bye](auto &brk){
         if (!brk.isDisconnected) {
             if (brk.parent == global_broker_id_local) {
-                routeMessage(bye, brk.global_id);
+                this->routeMessage(bye, brk.global_id);
                 brk.isDisconnected = true;
             }
             if (hasTimeDependency) {
@@ -901,7 +901,7 @@ void CoreBroker::processCommand(ActionMessage&& command)
                         dis.dest_id = brk.global_id;
                         this->transmit(brk.route, dis);
                         brk._sent_disconnect_ack = true;
-                        removeRoute(brk.route);
+                        this->removeRoute(brk.route);
                     }
 					});
                 addActionMessage(CMD_STOP);
