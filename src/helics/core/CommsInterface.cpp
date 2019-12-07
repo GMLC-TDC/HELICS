@@ -255,6 +255,7 @@ bool CommsInterface::connect()
                         queue_watcher.join();
                     }
                 }
+				syncLock.unlock();
             }
         }
         syncLock.lock();

@@ -487,9 +487,7 @@ int ValueFederateManager::getInputCount() const
 
 void ValueFederateManager::clearUpdates()
 {
-    for (auto& inp : inputs.lock()) {
-        inp.clearUpdate();
-    }
+	inputs.lock()->apply([](auto &inp) {inp.clearUpdate(); });
 }
 
 void ValueFederateManager::clearUpdate(const Input& inp)
