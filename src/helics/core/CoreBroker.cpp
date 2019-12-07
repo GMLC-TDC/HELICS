@@ -899,7 +899,7 @@ void CoreBroker::processCommand(ActionMessage&& command)
                             (brk._core) ? CMD_DISCONNECT_CORE_ACK : CMD_DISCONNECT_BROKER_ACK);
                         dis.source_id = global_broker_id_local;
                         dis.dest_id = brk.global_id;
-                        transmit(brk.route, dis);
+                        this->transmit(brk.route, dis);
                         brk._sent_disconnect_ack = true;
                         removeRoute(brk.route);
                     }
