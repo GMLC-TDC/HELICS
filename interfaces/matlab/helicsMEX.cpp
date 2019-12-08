@@ -8925,14 +8925,14 @@ int _wrap_helicsInputGetRawValue(int resc, mxArray *resv[], int argc, mxArray *a
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsInputGetRawValue" "', argument " "1"" of type '" "helics_input""'"); 
   }
   {
-    arg3=helicsSubscriptionGetValueSize(arg1)+2;
+    arg3 = helicsInputGetRawValueSize(arg1) + 2;
     arg2 =  malloc(arg3);
   }
   helicsInputGetRawValue(arg1,arg2,arg3,arg4,arg5);
   _out = (mxArray*)0;
   if (_out) --resc, *resv++ = _out;
   {
-    if (--resc>=0) *resv++ = SWIG_FromCharPtrAndSize(arg2,*arg4);
+    if (--resc>=0) *resv++ = SWIG_FromCharPtrAndSize((char*)arg2,*arg4);
   }
   {
     if (arg2) free(arg2);
@@ -11886,7 +11886,7 @@ int _wrap_helicsMessageGetRawData(int resc, mxArray *resv[], int argc, mxArray *
   _out = (mxArray*)0;
   if (_out) --resc, *resv++ = _out;
   {
-    if (--resc>=0) *resv++ = SWIG_FromCharPtrAndSize(arg2,*arg4);
+    if (--resc>=0) *resv++ = SWIG_FromCharPtrAndSize((char*)arg2,*arg4);
   }
   {
     if (arg2) free(arg2);
