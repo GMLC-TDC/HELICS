@@ -11,7 +11,7 @@ if [[ "$TRAVIS" == "true" ]]; then
     WAIT_COMMAND=travis_wait
 
     # Convert commit message to lower case
-    commit_msg=$(tr '[:upper:]' '[:lower:]' <<< ${TRAVIS_COMMIT_MESSAGE})
+    commit_msg=$(tr '[:upper:]' '[:lower:]' <<< "${TRAVIS_COMMIT_MESSAGE}")
 
     if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
         os_name="Linux"
@@ -68,39 +68,39 @@ zmq_install_path=${CI_DEPENDENCY_DIR}/zmq
 if [[ $commit_msg == *'[update_cache]'* ]]; then
     individual="false"
     if [[ $commit_msg == *'boost'* ]]; then
-        rm -rf ${boost_install_path};
+        rm -rf "${boost_install_path}";
         individual="true"
     fi
     if [[ $commit_msg == *'zmq'* ]]; then
-        rm -rf ${zmq_install_path};
+        rm -rf "${zmq_install_path}";
         individual="true"
     fi
     if [[ $commit_msg == *'swig'* ]]; then
-        rm -rf ${swig_install_path};
+        rm -rf "${swig_install_path}";
         individual="true"
     fi
     if [[ "$USE_MPI" ]]; then
-        if [[$commit_msg == *'mpi'* ]]; then
-            rm -rf ${mpi_install_path};
+        if [[ $commit_msg == *'mpi'* ]]; then
+            rm -rf "${mpi_install_path}";
             individual="true"
         fi
     fi
 
     # If no dependency named in commit message, update entire cache
     if [[ "$individual" != 'true' ]]; then
-        rm -rf ${CI_DEPENDENCY_DIR};
+        rm -rf "${CI_DEPENDENCY_DIR}";
     fi
 fi
 
 if [[ ! -d "${CI_DEPENDENCY_DIR}" ]]; then
-    mkdir -p ${CI_DEPENDENCY_DIR};
+    mkdir -p "${CI_DEPENDENCY_DIR}";
 fi
 
 # Only compile these dependencies on Linux, to install them on macOS use the Brewfile .ci/Brewfile.travis
 if [[ "$os_name" == "Linux" ]]; then
     # Install CMake
     if [[ ! -d "${cmake_install_path}" ]]; then
-        ./scripts/install-dependency.sh cmake ${cmake_version} ${cmake_install_path}
+        ./scripts/install-dependency.sh cmake ${cmake_version} "${cmake_install_path}"
     fi
 
     # Set path to CMake executable depending on OS
@@ -114,7 +114,7 @@ if [[ "$os_name" == "Linux" ]]; then
 
     # Install SWIG
     if [[ ! -d "${swig_install_path}" ]]; then
-        ./scripts/install-dependency.sh swig ${swig_version} ${swig_install_path}
+        ./scripts/install-dependency.sh swig ${swig_version} "${swig_install_path}"
     fi
     export PATH="${swig_install_path}/bin:${PATH}"
     echo "*** built swig successfully {$PATH}"
@@ -122,18 +122,14 @@ if [[ "$os_name" == "Linux" ]]; then
     # Install ZeroMQ
     if [[ "$TRAVIS" != "true" && ! -d "${zmq_install_path}" ]]; then
         echo "*** build libzmq"
-        ./scripts/install-dependency.sh zmq ${zmq_version} ${zmq_install_path}
+        ./scripts/install-dependency.sh zmq ${zmq_version} "${zmq_install_path}"
         echo "*** built zmq successfully"
     fi
 
     # Install Boost
     if [[ ! -d "${boost_install_path}" ]]; then
         echo "*** build boost"
-        local boost_sanitizer=""
-        if [[ "$RUN_SANITIZER" == "tsan" ]]; then
-            boost_sanitizer="BOOST_SANITIZER=thread"
-        fi
-        ${BOOST_SANITIZER} ${WAIT_COMMAND} ./scripts/install-dependency.sh boost ${boost_version} ${boost_install_path}
+        ${WAIT_COMMAND} ./scripts/install-dependency.sh boost ${boost_version} "${boost_install_path}"
         echo "*** built boost successfully"
     fi
 
@@ -153,8 +149,8 @@ fi
 if [[ "$USE_MPI" ]]; then
     if [[ ! -d "${mpi_install_path}" ]]; then
         # if mpi_implementation isn't set, then the mpi implementation requested wasn't recognized
-        if [[ ! -z "${mpi_implementation}" ]]; then
-            ${WAIT_COMMAND} ./scripts/install-dependency.sh ${mpi_implementation} ${mpi_version} ${mpi_install_path}
+        if [[ -n "${mpi_implementation}" ]]; then
+            ${WAIT_COMMAND} ./scripts/install-dependency.sh ${mpi_implementation} ${mpi_version} "${mpi_install_path}"
         fi
     fi
 fi
@@ -168,7 +164,7 @@ fi
 
 if [[ "$os_name" == "Darwin" && -x "$(command -v brew)" ]]; then
     wget https://repo.continuum.io/miniconda/Miniconda3-latest-MacOSX-x86_64.sh -O miniconda.sh;
-    bash miniconda.sh -b -p $HOME/miniconda
+    bash miniconda.sh -b -p "$HOME/miniconda"
     export PATH="$HOME/miniconda/bin:$PATH"
     conda config --set always_yes yes --set changeps1 no
     conda update -q conda
@@ -186,8 +182,9 @@ else
         last_pyversion=${last_pyversion/#\*/}
         # Remove a trailing set of parenthesis saying where the version was set
         last_pyversion=${last_pyversion%(*)}
-
-        pyenv global ${last_pyversion}
+        # Remove whitespace
+        last_pyversion="$(echo -e "$last_pyversion" | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')"
+        pyenv global "${last_pyversion}"
     fi
 
     python3 -m pip install --user --upgrade pip wheel
@@ -198,7 +195,7 @@ pyver=$(python3 -c 'import sys; ver=sys.version_info[:2]; print(".".join(map(str
 
 export PYTHON_LIB_PATH=$(python3-config --prefix)/lib/libpython${pyver}m.${shared_lib_ext}
 export PYTHON_INCLUDE_PATH=$(python3-config --prefix)/include/python${pyver}m/
-export PYTHON_EXECUTABLE=$(which python3)
+export PYTHON_EXECUTABLE=$(command -v python3)
 
 # Tell macOS users to use Homebrew to install additional dependencies
 if [[ "$TRAVIS" != "true" && "$os_name" == Darwin ]]; then

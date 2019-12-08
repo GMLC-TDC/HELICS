@@ -37,10 +37,10 @@ while getopts p:d:n: options; do
    esac
 done
 shift $((OPTIND - 1))
-cd ${DIRECTORY}
-ROOT_DIRECTORY=`pwd`
+cd "${DIRECTORY}"
+ROOT_DIRECTORY=$(pwd)
 echo "> checkout tag ${NAME}"
-git checkout ${NAME}
+git checkout "${NAME}"
 echo "> archiving main repository"
 git archive --verbose --prefix "repo/" --format "tar" --output "./${PREFIX}-output.tar" "master"
 echo "> checking out all submodules"
