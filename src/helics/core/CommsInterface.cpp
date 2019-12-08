@@ -5,9 +5,7 @@ the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 #include "CommsInterface.hpp"
-
 #include "NetworkBrokerData.hpp"
-
 #include <iostream>
 
 namespace helics {
@@ -17,7 +15,7 @@ CommsInterface::CommsInterface(thread_generation threads):
 }
 
 /** destructor*/
-CommsInterface::~CommsInterface() {}
+CommsInterface::~CommsInterface() { join_tx_rx_thread(); }
 
 void CommsInterface::loadNetworkInfo(const NetworkBrokerData& netInfo)
 {
