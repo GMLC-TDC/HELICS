@@ -16,6 +16,12 @@ insert_final_newline = true
 indent_style = space
 indent_size = 4
 
-[CMakeLists.txt]
+# HELICS CMakeLists.txt files in allowed subfolders (not ThirdParty)
+[{benchmarks,examples,scripts,src,tests}**CMakeLists.txt]
+indent_style = space
+indent_size = 4
+
+# HELICS Root CMakeLists.txt file (avoid matching inside ThirdParty folder)
+[./CMakeLists.txt]
 indent_style = space
 indent_size = 4
