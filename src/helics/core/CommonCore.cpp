@@ -2296,9 +2296,11 @@ void CommonCore::sendErrorToFederates(int error_code)
 {
     ActionMessage errorCom(CMD_ERROR);
     errorCom.messageID = error_code;
-	loopFederates.apply([&errorCom](auto &fed) {if ((fed) && (!fed.disconnected)) {
-		fed->addAction(errorCom);
-	}});
+    loopFederates.apply([&errorCom](auto& fed) {
+        if ((fed) && (!fed.disconnected)) {
+            fed->addAction(errorCom);
+        }
+    });
 }
 
 void CommonCore::transmitDelayedMessages(global_federate_id source)
@@ -2409,7 +2411,7 @@ void CommonCore::processCommand(ActionMessage&& command)
             break;
         case CMD_BROADCAST_DISCONNECT: {
             timeCoord->processTimeMessage(command);
-			loopFederates.apply([&command](auto &fed) {fed->addAction(command); });
+            loopFederates.apply([&command](auto& fed) { fed->addAction(command); });
             checkAndProcessDisconnect();
         } break;
         case CMD_STOP:
@@ -2682,7 +2684,7 @@ void CommonCore::processCommand(ActionMessage&& command)
             if (brokerState.compare_exchange_strong(
                     exp, broker_state_t::operating)) { // forward the grant to all federates
                 organizeFilterOperations();
-				loopFederates.apply([&command](auto &fed) {fed->addAction(command); });
+                loopFederates.apply([&command](auto& fed) { fed->addAction(command); });
                 timeCoord->enteringExecMode();
                 auto res = timeCoord->checkExecEntry();
                 if (res == message_processing_result::next_step) {
@@ -3170,27 +3172,28 @@ void CommonCore::checkDependencies()
 {
     bool isobs = false;
     bool issource = false;
-	auto checkdep = [this, &isobs, &issource](auto &fed) {if (fed->endpointCount() > 0) {
-		if (fed->getOptionFlag(defs::flags::observer)) {
-			timeCoord->removeDependency(fed->global_id);
-			ActionMessage rmdep(CMD_REMOVE_DEPENDENT);
+    auto checkdep = [this, &isobs, &issource](auto& fed) {
+        if (fed->endpointCount() > 0) {
+            if (fed->getOptionFlag(defs::flags::observer)) {
+                timeCoord->removeDependency(fed->global_id);
+                ActionMessage rmdep(CMD_REMOVE_DEPENDENT);
 
-			rmdep.source_id = global_broker_id_local;
-			rmdep.dest_id = fed->global_id.load();
-			fed->addAction(rmdep);
-			isobs = true;
-		}
-		else if (fed->getOptionFlag(defs::flags::source_only)) {
-			timeCoord->removeDependent(fed->global_id);
-			ActionMessage rmdep(CMD_REMOVE_DEPENDENCY);
+                rmdep.source_id = global_broker_id_local;
+                rmdep.dest_id = fed->global_id.load();
+                fed->addAction(rmdep);
+                isobs = true;
+            } else if (fed->getOptionFlag(defs::flags::source_only)) {
+                timeCoord->removeDependent(fed->global_id);
+                ActionMessage rmdep(CMD_REMOVE_DEPENDENCY);
 
-			rmdep.source_id = global_broker_id_local;
-			rmdep.dest_id = fed->global_id.load();
-			fed->addAction(rmdep);
-			issource = true;
-		}
-	}};
-	loopFederates.apply(checkdep);
+                rmdep.source_id = global_broker_id_local;
+                rmdep.dest_id = fed->global_id.load();
+                fed->addAction(rmdep);
+                issource = true;
+            }
+        }
+    };
+    loopFederates.apply(checkdep);
 
     // if the core has filters we need to be a timeCoordinator
     if (hasFilters) {
@@ -3406,13 +3409,15 @@ void CommonCore::processCommandsForCore(const ActionMessage& cmd)
                 }
                 ActionMessage bye(CMD_DISCONNECT_FED_ACK);
                 bye.source_id = parent_broker_id;
-				loopFederates.apply([&bye](auto &fed){auto state = fed->getState();
-				if ((HELICS_FINISHED == state) || (HELICS_ERROR == state)) {
-					return;
-				}
-				bye.dest_id = fed->global_id.load();
-				fed->addAction(bye); });
-                
+                loopFederates.apply([&bye](auto& fed) {
+                    auto state = fed->getState();
+                    if ((HELICS_FINISHED == state) || (HELICS_ERROR == state)) {
+                        return;
+                    }
+                    bye.dest_id = fed->global_id.load();
+                    fed->addAction(bye);
+                });
+
                 addActionMessage(CMD_STOP);
             } else {
                 checkAndProcessDisconnect();
