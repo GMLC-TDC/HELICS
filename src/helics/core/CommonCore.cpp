@@ -2119,7 +2119,7 @@ void CommonCore::processPriorityCommand(ActionMessage&& command)
         case CMD_REG_FED: {
             // this one in the core needs to be the thread-safe version
             auto fed = getFederate(command.name);
-            loopFederates.insert(command.name, nullptr, fed);
+            loopFederates.insert(command.name, no_search, fed);
         }
             if (global_broker_id_local != parent_broker_id) {
                 // forward on to Broker
@@ -2296,11 +2296,11 @@ void CommonCore::sendErrorToFederates(int error_code)
 {
     ActionMessage errorCom(CMD_ERROR);
     errorCom.messageID = error_code;
-    for (auto& fed : loopFederates) {
+    loopFederates.apply([&errorCom](auto& fed) {
         if ((fed) && (!fed.disconnected)) {
             fed->addAction(errorCom);
         }
-    }
+    });
 }
 
 void CommonCore::transmitDelayedMessages(global_federate_id source)
@@ -2411,9 +2411,7 @@ void CommonCore::processCommand(ActionMessage&& command)
             break;
         case CMD_BROADCAST_DISCONNECT: {
             timeCoord->processTimeMessage(command);
-            for (auto& fed : loopFederates) {
-                fed->addAction(command);
-            }
+            loopFederates.apply([&command](auto& fed) { fed->addAction(command); });
             checkAndProcessDisconnect();
         } break;
         case CMD_STOP:
@@ -2686,9 +2684,7 @@ void CommonCore::processCommand(ActionMessage&& command)
             if (brokerState.compare_exchange_strong(
                     exp, broker_state_t::operating)) { // forward the grant to all federates
                 organizeFilterOperations();
-                for (auto& fed : loopFederates) {
-                    fed->addAction(command);
-                }
+                loopFederates.apply([&command](auto& fed) { fed->addAction(command); });
                 timeCoord->enteringExecMode();
                 auto res = timeCoord->checkExecEntry();
                 if (res == message_processing_result::next_step) {
@@ -3176,7 +3172,7 @@ void CommonCore::checkDependencies()
 {
     bool isobs = false;
     bool issource = false;
-    for (auto& fed : loopFederates) {
+    auto checkdep = [this, &isobs, &issource](auto& fed) {
         if (fed->endpointCount() > 0) {
             if (fed->getOptionFlag(defs::flags::observer)) {
                 timeCoord->removeDependency(fed->global_id);
@@ -3196,7 +3192,8 @@ void CommonCore::checkDependencies()
                 issource = true;
             }
         }
-    }
+    };
+    loopFederates.apply(checkdep);
 
     // if the core has filters we need to be a timeCoordinator
     if (hasFilters) {
@@ -3412,14 +3409,14 @@ void CommonCore::processCommandsForCore(const ActionMessage& cmd)
                 }
                 ActionMessage bye(CMD_DISCONNECT_FED_ACK);
                 bye.source_id = parent_broker_id;
-                for (auto& fed : loopFederates) {
+                loopFederates.apply([&bye](auto& fed) {
                     auto state = fed->getState();
                     if ((HELICS_FINISHED == state) || (HELICS_ERROR == state)) {
-                        continue;
+                        return;
                     }
                     bye.dest_id = fed->global_id.load();
                     fed->addAction(bye);
-                }
+                });
 
                 addActionMessage(CMD_STOP);
             } else {

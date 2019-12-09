@@ -19,15 +19,7 @@ CommsInterface::CommsInterface(thread_generation threads):
 /** destructor*/
 CommsInterface::~CommsInterface()
 {
-    std::lock_guard<std::mutex> syncLock(threadSyncLock);
-    if (!singleThread) {
-        if (queue_watcher.joinable()) {
-            queue_watcher.join();
-        }
-    }
-    if (queue_transmitter.joinable()) {
-        queue_transmitter.join();
-    }
+    join_tx_rx_thread();
 }
 
 void CommsInterface::loadNetworkInfo(const NetworkBrokerData& netInfo)
@@ -227,18 +219,28 @@ bool CommsInterface::connect()
             logError(std::string("error in transmitter >") + e.what());
         }
     });
+    syncLock.unlock();
     txTrigger.waitActivation();
     rxTrigger.waitActivation();
     if (rx_status != connection_status::connected) {
         logError("receiver connection failure");
         if (tx_status == connection_status::connected) {
+            syncLock.lock();
             if (queue_transmitter.joinable()) {
+                syncLock.unlock();
                 closeTransmitter();
-                queue_transmitter.join();
+                syncLock.lock();
+                if (queue_transmitter.joinable()) {
+                    queue_transmitter.join();
+                }
             }
+            syncLock.unlock();
         }
         if (!singleThread) {
-            queue_watcher.join();
+            syncLock.lock();
+            if (queue_watcher.joinable()) {
+                queue_watcher.join();
+            }
         }
         return false;
     }
@@ -247,13 +249,22 @@ bool CommsInterface::connect()
         logError("transmitter connection failure");
         if (!singleThread) {
             if (rx_status == connection_status::connected) {
+                syncLock.lock();
                 if (queue_watcher.joinable()) {
+                    syncLock.unlock();
                     closeReceiver();
-                    queue_watcher.join();
+                    syncLock.lock();
+                    if (queue_watcher.joinable()) {
+                        queue_watcher.join();
+                    }
                 }
+                syncLock.unlock();
             }
         }
-        queue_transmitter.join();
+        syncLock.lock();
+        if (queue_transmitter.joinable()) {
+            queue_transmitter.join();
+        }
         return false;
     }
     return true;
@@ -273,6 +284,7 @@ void CommsInterface::disconnect()
         if (propertyLock()) {
             setRxStatus(connection_status::terminated);
             setTxStatus(connection_status::terminated);
+            join_tx_rx_thread();
             return;
         }
     }
@@ -334,6 +346,20 @@ void CommsInterface::disconnect()
             tx_status = connection_status::terminated;
             return;
         }
+    }
+    join_tx_rx_thread();
+}
+
+void CommsInterface::join_tx_rx_thread()
+{
+    std::lock_guard<std::mutex> syncLock(threadSyncLock);
+    if (!singleThread) {
+        if (queue_watcher.joinable()) {
+            queue_watcher.join();
+        }
+    }
+    if (queue_transmitter.joinable()) {
+        queue_transmitter.join();
     }
 }
 

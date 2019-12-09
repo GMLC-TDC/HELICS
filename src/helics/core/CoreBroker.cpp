@@ -262,7 +262,7 @@ void CoreBroker::processPriorityCommand(ActionMessage&& command)
                 transmit(getRoute(command.source_id), badName);
                 return;
             }
-            _federates.insert(command.name, nullptr, command.name);
+            _federates.insert(command.name, no_search, command.name);
             _federates.back().route = getRoute(command.source_id);
             _federates.back().parent = command.source_id;
             if (!isRootc) {
@@ -376,7 +376,7 @@ void CoreBroker::processPriorityCommand(ActionMessage&& command)
                 }
                 return;
             }
-            auto inserted = _brokers.insert(command.name, nullptr, command.name);
+            auto inserted = _brokers.insert(command.name, no_search, command.name);
             if (!inserted) {
                 route_id newroute;
                 bool route_created = false;
@@ -482,11 +482,12 @@ void CoreBroker::processPriorityCommand(ActionMessage&& command)
                 higher_broker_id = command.source_id;
                 timeCoord->source_id = global_broker_id_local;
                 transmitDelayedMessages();
-                for (auto& brk : _brokers) {
+                _brokers.apply([localid = global_broker_id_local](auto& brk) {
                     if (!brk._nonLocal) {
-                        brk.parent = global_broker_id_local;
+                        brk.parent = localid;
                     }
-                }
+                });
+
                 timeoutMon->setParentId(higher_broker_id);
                 timeoutMon->reset();
                 return;
@@ -620,26 +621,23 @@ void CoreBroker::transmitDelayedMessages()
 
 void CoreBroker::labelAsDisconnected(global_broker_id brkid)
 {
-    for (auto& brk : _brokers) {
-        if (brk.parent == brkid) {
-            brk.isDisconnected = true;
+    auto disconnect_procedure = [brkid](auto& obj) {
+        if (obj.parent == brkid) {
+            obj.isDisconnected = true;
         }
-    }
-    for (auto& fed : _federates) {
-        if (fed.parent == brkid) {
-            fed.isDisconnected = true;
-        }
-    }
+    };
+    _brokers.apply(disconnect_procedure);
+    _federates.apply(disconnect_procedure);
 }
 
 void CoreBroker::sendDisconnect()
 {
     ActionMessage bye(CMD_DISCONNECT);
     bye.source_id = global_broker_id_local;
-    for (auto& brk : _brokers) {
+    _brokers.apply([this, &bye](auto& brk) {
         if (!brk.isDisconnected) {
             if (brk.parent == global_broker_id_local) {
-                routeMessage(bye, brk.global_id);
+                this->routeMessage(bye, brk.global_id);
                 brk.isDisconnected = true;
             }
             if (hasTimeDependency) {
@@ -647,7 +645,7 @@ void CoreBroker::sendDisconnect()
                 timeCoord->removeDependent(brk.global_id);
             }
         }
-    }
+    });
     if (hasTimeDependency) {
         timeCoord->disconnect();
     }
@@ -899,17 +897,17 @@ void CoreBroker::processCommand(ActionMessage&& command)
         case CMD_DISCONNECT_BROKER_ACK:
             if ((command.dest_id == global_broker_id_local) &&
                 (command.source_id == higher_broker_id)) {
-                for (auto& brk : _brokers) {
+                _brokers.apply([this](auto& brk) {
                     if (!brk._sent_disconnect_ack) {
                         ActionMessage dis(
                             (brk._core) ? CMD_DISCONNECT_CORE_ACK : CMD_DISCONNECT_BROKER_ACK);
                         dis.source_id = global_broker_id_local;
                         dis.dest_id = brk.global_id;
-                        transmit(brk.route, dis);
+                        this->transmit(brk.route, dis);
                         brk._sent_disconnect_ack = true;
-                        removeRoute(brk.route);
+                        this->removeRoute(brk.route);
                     }
-                }
+                });
                 addActionMessage(CMD_STOP);
             }
             break;
