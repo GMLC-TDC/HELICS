@@ -47,7 +47,7 @@ aliases:
 jobs:
   helicsoctave:
     docker:
-      - image: helics/octave:latest
+      - image: helics/buildenv:octave
     environment:
       OCTAVETEST: "/root/project/tests/octave"
       CMAKE_FLAGS: "-DBUILD_OCTAVE_INTERFACE=ON -DHELICS_BUILD_TESTS=ON"
