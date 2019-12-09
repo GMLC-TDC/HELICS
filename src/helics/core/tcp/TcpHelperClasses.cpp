@@ -37,7 +37,8 @@ namespace tcp {
             if (!triggerhalt) {
                 socket_.async_receive(
                     asio::buffer(data.data() + residBufferSize, data.size() - residBufferSize),
-                    [ptr= shared_from_this()](const std::error_code& error, size_t bytes_transferred) {
+                    [ptr = shared_from_this()](
+                        const std::error_code& error, size_t bytes_transferred) {
                         ptr->handle_read(error, bytes_transferred);
                     });
                 if (triggerhalt) {

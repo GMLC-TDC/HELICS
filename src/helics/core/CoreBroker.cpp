@@ -482,10 +482,12 @@ void CoreBroker::processPriorityCommand(ActionMessage&& command)
                 higher_broker_id = command.source_id;
                 timeCoord->source_id = global_broker_id_local;
                 transmitDelayedMessages();
-				_brokers.apply([localid=global_broker_id_local](auto &brk) {if (!brk._nonLocal) {
-					brk.parent = localid;
-				}});
-                
+                _brokers.apply([localid = global_broker_id_local](auto& brk) {
+                    if (!brk._nonLocal) {
+                        brk.parent = localid;
+                    }
+                });
+
                 timeoutMon->setParentId(higher_broker_id);
                 timeoutMon->reset();
                 return;
@@ -619,18 +621,20 @@ void CoreBroker::transmitDelayedMessages()
 
 void CoreBroker::labelAsDisconnected(global_broker_id brkid)
 {
-	auto disconnect_procedure=[brkid](auto &obj){if (obj.parent == brkid) {
-		obj.isDisconnected = true;
-	}};
-	_brokers.apply(disconnect_procedure);
-	_federates.apply(disconnect_procedure);
+    auto disconnect_procedure = [brkid](auto& obj) {
+        if (obj.parent == brkid) {
+            obj.isDisconnected = true;
+        }
+    };
+    _brokers.apply(disconnect_procedure);
+    _federates.apply(disconnect_procedure);
 }
 
 void CoreBroker::sendDisconnect()
 {
     ActionMessage bye(CMD_DISCONNECT);
     bye.source_id = global_broker_id_local;
-	_brokers.apply([this,&bye](auto &brk){
+    _brokers.apply([this, &bye](auto& brk) {
         if (!brk.isDisconnected) {
             if (brk.parent == global_broker_id_local) {
                 this->routeMessage(bye, brk.global_id);
@@ -641,7 +645,7 @@ void CoreBroker::sendDisconnect()
                 timeCoord->removeDependent(brk.global_id);
             }
         }
-		});
+    });
     if (hasTimeDependency) {
         timeCoord->disconnect();
     }
@@ -893,7 +897,7 @@ void CoreBroker::processCommand(ActionMessage&& command)
         case CMD_DISCONNECT_BROKER_ACK:
             if ((command.dest_id == global_broker_id_local) &&
                 (command.source_id == higher_broker_id)) {
-                _brokers.apply([this](auto &brk){
+                _brokers.apply([this](auto& brk) {
                     if (!brk._sent_disconnect_ack) {
                         ActionMessage dis(
                             (brk._core) ? CMD_DISCONNECT_CORE_ACK : CMD_DISCONNECT_BROKER_ACK);
@@ -903,7 +907,7 @@ void CoreBroker::processCommand(ActionMessage&& command)
                         brk._sent_disconnect_ack = true;
                         this->removeRoute(brk.route);
                     }
-					});
+                });
                 addActionMessage(CMD_STOP);
             }
             break;

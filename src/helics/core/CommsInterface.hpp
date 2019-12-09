@@ -164,8 +164,9 @@ class CommsInterface {
     these functions should be called in a pair*/
     bool propertyLock();
     void propertyUnLock();
-	/** function to join the processing threads*/
-    void join_tx_rx_thread ();
+    /** function to join the processing threads*/
+    void join_tx_rx_thread();
+
   private:
     gmlc::concurrency::TripWireDetector
         tripDetector; //!< try to detect if everything is shutting down
