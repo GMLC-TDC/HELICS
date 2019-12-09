@@ -1,1 +1,5 @@
 * text=input
+
+*.jpg -text
+*.png -text
+*.mat -text
