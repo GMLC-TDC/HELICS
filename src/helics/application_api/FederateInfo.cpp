@@ -60,6 +60,11 @@ static const std::map<std::string, int> propStringsTranslations{
     {"source_only", helics_flag_source_only},
     {"sourceonly", helics_flag_source_only},
     {"source", helics_flag_source_only},
+    {"slow", helics_flag_slow_responding_federate},
+    {"slow_response", helics_flag_slow_responding_federate},
+	{"slow_responding", helics_flag_slow_responding_federate},
+    {"no_ping", helics_flag_slow_responding_federate},
+	{"disable_ping", helics_flag_slow_responding_federate},
     {"only_update_on_change", helics_flag_only_update_on_change},
     {"only_transmit_on_change", helics_flag_only_transmit_on_change},
     {"forward_compute", helics_flag_forward_compute},
@@ -107,6 +112,11 @@ static const std::set<std::string> validFlagOptions{"interruptible",
                                                     "strict_input_type_checking",
                                                     "ignore_unit_mismatch",
                                                     "buffer_data",
+                                                    "slow_response",
+	"slow_responding",
+	"disable_ping"
+                                                    "no_ping",
+                                                    "slow",
                                                     "required",
                                                     "optional"};
 
@@ -401,6 +411,7 @@ void FederateInfo::loadInfoFromArgs(std::vector<std::string>& args)
     coreType = app->getCoreType();
 }
 
+// function to load different formats easily
 static FederateInfo loadFederateInfoJson(const std::string& jsonString);
 static FederateInfo loadFederateInfoToml(const std::string& tomlString);
 

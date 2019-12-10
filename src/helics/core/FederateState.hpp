@@ -66,6 +66,7 @@ class FederateState {
     bool strict_input_type_checking{
         false}; //!< flag indicating that inputs should have strict type checking
     bool ignore_unit_mismatch{false}; //!< flag to ignore mismatching units
+	bool slow_responding{ false };  //!< flag indicating that a federate is likely to be slow in responding
     InterfaceInfo interfaceInformation; //!< the container for the interface information objects
 
   public:

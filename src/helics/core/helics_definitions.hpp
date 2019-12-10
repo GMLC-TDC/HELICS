@@ -24,6 +24,10 @@ namespace defs {
         uninterruptible = helics_flag_uninterruptible,
         /** flag indicating that a federate can be interrupted*/
         interruptible = helics_flag_interruptible,
+		/** flag specifying that a federate may be slow to respond to pings
+		If the federate goes offline there is no good way to detect it so use with caution
+		*/
+		slow_responding=helics_flag_slow_responding,
         /** flag indicating that a federate/interface is a signal generator only*/
         source_only = helics_flag_source_only,
         /** flag indicating a federate/interface should only transmit values if they have changed(binary equivalence)*/

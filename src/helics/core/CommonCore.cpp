@@ -680,6 +680,7 @@ Time CommonCore::getTimeProperty(local_federate_id federateID, int32_t property)
 int16_t CommonCore::getIntegerProperty(local_federate_id federateID, int32_t property) const
 {
     if (federateID == local_core_id) {
+		//TODO: PT add some code to actually get the properties from the core if appropriate
         return 0;
     }
     auto fed = getFederateAt(federateID);
@@ -711,6 +712,10 @@ void CommonCore::setFlagOption(local_federate_id federateID, int32_t flag, bool 
             }
             addActionMessage(cmd);
         }
+		else if (flag == defs::flags::slow_responding)
+		{
+
+		}
         return;
     }
 

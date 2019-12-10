@@ -31,6 +31,8 @@ enum operation_flags : uint16_t {
     nameless_interface_flag = 15, //!< flag indicating the interface is nameless
 };
 
+constexpr uint16_t slow_responding_flag = 14; //overload of extra_flag4 indicating a federate, core or broker is slow responding
+
 /** template function to set a flag in an object containing a flags field
 @tparam FlagContainer an object with a .flags field
 @tparam FlagIndex a type that can be used as part of a shift to index into a flag object

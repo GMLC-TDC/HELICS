@@ -50,14 +50,15 @@ class BasicBrokerInfo {
     global_broker_id global_id; //!< the global identifier for the broker
     route_id route; //!< the identifier for the route to take to the broker
     global_broker_id parent; //!< the id of the parent broker/core
-    bool _initRequested = false; //!< flag indicating the broker has requesting initialization
-    bool isDisconnected = false; //!< flag indicating that the broker has disconnected
-    bool _hasTimeDependency =
-        false; //!< flag indicating that a broker has endpoints it is coordinating
-    bool _core = false; //!< if set to true the broker is a core false is a broker;
-    bool _nonLocal = false; //!< indicator that the broker has a subbroker as a parent.
-    bool _route_key = false; //!< indicator that the broker has a unique route id
-    bool _sent_disconnect_ack = false; //!< indicator that the disconnect ack has been sent
+	bool _initRequested{ false }; //!< flag indicating the broker has requesting initialization
+	bool isDisconnected{ false }; //!< flag indicating that the broker has disconnected
+    bool _hasTimeDependency
+	{ false }; //!< flag indicating that a broker has endpoints it is coordinating
+	bool _core{ false }; //!< if set to true the broker is a core false is a broker;
+	bool _nonLocal{ false }; //!< indicator that the broker has a subbroker as a parent.
+	bool _route_key{ false }; //!< indicator that the broker has a unique route id
+	bool _sent_disconnect_ack{ false }; //!< indicator that the disconnect ack has been sent
+	bool _disable_ping{ false }; //!< indicator that the broker doesn't respond to pings
     std::string routeInfo; //!< string describing the connection information for the route
     explicit BasicBrokerInfo(const std::string& brokerName): name(brokerName){};
 };
