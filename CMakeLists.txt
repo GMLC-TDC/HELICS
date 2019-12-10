@@ -248,7 +248,7 @@ add_library(HELICS::compile_flags_target ALIAS compile_flags_target)
 add_library(HELICS::build_flags_target ALIAS build_flags_target)
 
 get_target_property(EXTRA_BUILD_FLAGS build_flags_target INTERFACE_COMPILE_OPTIONS)
-set(HELICS_BUILD_FLAGS_OUTPUT "${CMAKE_CXX_FLAGS} ${CMAKE_CXX_FLAGS_RELEASE} ${CMAKE_STATIC_LINKER_FLAGS} ${EXTRA_BUILD_FLAGS} ") 
+set(HELICS_BUILD_FLAGS_OUTPUT "${CMAKE_CXX_FLAGS} ${CMAKE_CXX_FLAGS_RELEASE} ${CMAKE_STATIC_LINKER_FLAGS} ${EXTRA_BUILD_FLAGS} ")
 
 if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
     if(NOT USE_LIBCXX)
@@ -958,14 +958,16 @@ if(HELICS_ENABLE_PACKAGE_BUILD)
             endif()
         endif()
     endif()
+    # cmake-format: off
     set(CPACK_PACKAGE_NAME "Helics")
     set(CPACK_PACKAGE_VENDOR "GMLC")
-    set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "HELICS")
+    set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Hierarchical Engine for Large-scale Infrastructure Co-Simulation (HELICS)")
     set(CPACK_PACKAGE_VERSION "${HELICS_VERSION}")
     set(CPACK_PACKAGE_VERSION_MAJOR ${HELICS_VERSION_MAJOR})
     set(CPACK_PACKAGE_VERSION_MINOR ${HELICS_VERSION_MINOR})
     set(CPACK_PACKAGE_VERSION_PATCH ${HELICS_VERSION_PATCH})
     set(CPACK_PACKAGE_INSTALL_REGISTRY_KEY "HELICS")
+    # cmake-format: on
 
     set(CPACK_COMPONENTS_ALL
         applications
@@ -982,8 +984,10 @@ if(HELICS_ENABLE_PACKAGE_BUILD)
     )
     if(WIN32)
         set(CPACK_RESOURCE_FILE_LICENSE "${HELICS_SOURCE_DIR}\\\\LICENSE")
+        set(CPACK_RESOURCE_FILE_README "${HELICS_SOURCE_DIR}\\\\README.md")
     else(WIN32)
         set(CPACK_RESOURCE_FILE_LICENSE "${HELICS_SOURCE_DIR}/LICENSE")
+        set(CPACK_RESOURCE_FILE_README "${HELICS_SOURCE_DIR}/README.md")
     endif(WIN32)
 
     set(CPACK_COMPONENT_APPLICATIONS_DISPLAY_NAME "Application")
@@ -1061,13 +1065,9 @@ if(HELICS_ENABLE_PACKAGE_BUILD)
     endif(WIN32)
 
     if(APPLE)
-        set(CPACK_BUNDLE_NAME "libhelics")
-        configure_file(
-            "${HELICS_SOURCE_DIR}/config/Info.plist.in"
-            "${CMAKE_CURRENT_BINARY_DIR}/Info.plist" @ONLY
-        )
-        set(CPACK_BUNDLE_PLIST "${CMAKE_CURRENT_BINARY_DIR}/Info.plist")
-        set(CPACK_BUNDLE_ICON "${HELICS_SOURCE_DIR}/docs/img/HELICS.ico")
+        set(CPACK_PACKAGE_FILE_NAME "${CPACK_PACKAGE_NAME}-${CPACK_PACKAGE_VERSION}-macOS")
+        set(CPACK_DMG_DISABLE_APPLICATIONS_SYMLINK ON)
+        set(CPACK_PACKAGE_ICON "${HELICS_SOURCE_DIR}/docs/img/HELICS.ico")
     endif(APPLE)
 
     set(CPACK_SOURCE_IGNORE_FILES "/Build*/;/build*/;/.git/")
