@@ -116,6 +116,7 @@ jobs:
             os: macos-latest
             arch: x64
             cpack_gen: TGZ
+            macos_target_ver: '10.10'
 
     steps:
     - name: Checkout event ref
@@ -133,6 +134,11 @@ jobs:
       with:
         python-version: '3.6'
         architecture: ${{ matrix.arch }}
+ 
+    # Setup a copy of the macOS 10.10 SDK
+    - name: Setup macOS 10.10 SDK
+      if: runner.os == 'macOS'
+      run: ./.github/workflows/setup-macos-10.10-sdk.sh
         
     # Compile HELICS and create the installer
     - name: Build installer
@@ -140,6 +146,7 @@ jobs:
         BUILD_ARCH: ${{ matrix.arch }}
         BUILD_GEN: ${{ matrix.cmake_gen }}
         MSVC_VER: ${{ matrix.msvc_ver }}
+        MACOSX_DEPLOYMENT_TARGET: ${{ matrix.macos_target_ver }}
         CPACK_GEN: ${{ matrix.cpack_gen }}
       shell: bash
       run: ./.github/workflows/release-build/installer-${{ runner.os }}.sh
@@ -182,6 +189,7 @@ jobs:
           - id: macos-x64
             os: macos-latest
             arch: x64
+            macos_target_ver: '10.10'
           - id: ubuntu-x64
             os: ubuntu-latest
             arch: x64
@@ -196,7 +204,12 @@ jobs:
       with:
         ref: develop
       if: github.event_name == 'schedule'
-        
+     
+    # Setup a copy of the macOS 10.10 SDK
+    - name: Setup macOS 10.10 SDK
+      if: runner.os == 'macOS'
+      run: ./.github/workflows/setup-macos-10.10-sdk.sh
+   
     # Compile HELICS and create the installer
     - name: Build shared library
       if: runner.os != 'Linux'
@@ -204,6 +217,7 @@ jobs:
         BUILD_ARCH: ${{ matrix.arch }}
         BUILD_GEN: ${{ matrix.cmake_gen }}
         MSVC_VER: ${{ matrix.msvc_ver }}
+        MACOSX_DEPLOYMENT_TARGET: ${{ matrix.macos_target_ver }}
       shell: bash
       run: ./.github/workflows/release-build/shared-library-${{ runner.os }}.sh
     
