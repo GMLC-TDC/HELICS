@@ -718,7 +718,12 @@ void CommonCore::setFlagOption(local_federate_id federateID, int32_t flag, bool 
         }
 		else if (flag == defs::flags::slow_responding)
 		{
-
+			ActionMessage cmd(CMD_CORE_CONFIGURE);
+			cmd.messageID = defs::flags::slow_responding;
+			if (flagValue) {
+				setActionFlag(cmd, indicator_flag);
+			}
+			addActionMessage(cmd);
 		}
         return;
     }
@@ -3371,6 +3376,9 @@ void CommonCore::processCoreConfigureCommands(ActionMessage& cmd)
         case defs::properties::console_log_level:
             setLogLevels(cmd.getExtraData(), fileLogLevel);
             break;
+		case defs::flags::slow_responding:
+			no_ping = checkActionFlag(cmd, indicator_flag);
+			break;
         case UPDATE_LOGGING_CALLBACK:
             if (checkActionFlag(cmd, empty_flag)) {
                 setLoggerFunction(nullptr);

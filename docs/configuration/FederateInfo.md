@@ -105,7 +105,7 @@ flag indicating values should be discarded if they are not changed from previous
 flag indicating that the federate should only grant when no more messages can be received at the current time
  - realtime = false
 flag indicating that the federate is required to operate in real time.  the federate must have a non-zero period
-- `slow_federate` = false
+- `slow_responding` = false
 flag indicating that the federate might be slow to respond to internal pings or take a long time between steps
 
 ## Other Controls
