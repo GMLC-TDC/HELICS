@@ -105,6 +105,10 @@ bool CommonCore::connect()
                 }
 
                 setActionFlag(m, core_flag);
+				if (no_ping)
+				{
+					setActionFlag(m, slow_responding_flag);
+				}
                 transmit(parent_route_id, m);
                 brokerState = broker_state_t::connected;
                 disconnection.activate();
@@ -2175,7 +2179,7 @@ void CommonCore::processPriorityCommand(ActionMessage&& command)
                 timeCoord->source_id = global_broker_id_local;
                 higher_broker_id = global_broker_id(command.source_id);
                 transmitDelayedMessages();
-                timeoutMon->setParentId(higher_broker_id);
+                timeoutMon->setParentId(higher_broker_id,checkActionFlag(command,slow_responding_flag));
                 timeoutMon->reset();
             }
             break;

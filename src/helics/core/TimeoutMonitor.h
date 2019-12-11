@@ -19,7 +19,7 @@ class ActionMessage;
 struct linkConnection {
     bool waitingForPingReply{false}; //!< indicator that the connection is waiting
     bool activeConnection{false}; //!< indicator that the connection is active
-	bool disablePing{ false };  //!< indicator that the connection doesn't respond to pings
+    bool disablePing{false}; //!< indicator that the connection doesn't respond to pings
     global_federate_id connection{0}; //!< the id of the connection
     decltype(std::chrono::steady_clock::now()) lastPing;
 };
@@ -39,7 +39,11 @@ class TimeoutMonitor {
     /** ping all a brokers sub connections*/
     void pingSub(CoreBroker* brk);
     /** set the parent id*/
-    void setParentId(global_broker_id parent_id) { parentConnection.connection = parent_id; };
+    void setParentId(global_broker_id parent_id, bool disable_ping = false)
+    {
+        parentConnection.connection = parent_id;
+        parentConnection.disablePing = disable_ping;
+    };
 
   private:
     std::chrono::milliseconds timeout{100000000}; //!< timeout for connections
