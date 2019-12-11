@@ -129,7 +129,10 @@ std::shared_ptr<helicsCLI11App> BrokerBase::generateBaseCLI()
         "--key,--broker_key",
         brokerKey,
         "specify a key to use for all connections to/from a broker");
-	hApp->add_flag("--no_ping,--slow_responding", no_ping, "specify that a broker might be slow or unresponsive to ping requests from other brokers");
+    hApp->add_flag(
+        "--no_ping,--slow_responding",
+        no_ping,
+        "specify that a broker might be slow or unresponsive to ping requests from other brokers");
     auto logging_group =
         hApp->add_option_group("logging", "Options related to file and message logging");
     logging_group->option_defaults()->ignore_underscore();
@@ -455,7 +458,7 @@ void BrokerBase::queueProcessingLoop()
         }
     };
     if (haltOperations) {
-		timerStop();
+        timerStop();
         mainLoopIsRunning.store(false);
         return;
     }
@@ -489,12 +492,11 @@ void BrokerBase::queueProcessingLoop()
                 messagesSinceLastTick = 0;
 // reschedule the timer
 #ifndef HELICS_DISABLE_ASIO
-				if (tickTimer > timeZero && !disable_timer)
-				{
-					ticktimer.expires_at(std::chrono::steady_clock::now() + tickTimer.to_ns());
-					active = std::make_pair(true, true);
-					ticktimer.async_wait(timerCallback);
-				}
+                if (tickTimer > timeZero && !disable_timer) {
+                    ticktimer.expires_at(std::chrono::steady_clock::now() + tickTimer.to_ns());
+                    active = std::make_pair(true, true);
+                    ticktimer.async_wait(timerCallback);
+                }
 #endif
                 break;
             case CMD_PING:
@@ -509,7 +511,7 @@ void BrokerBase::queueProcessingLoop()
             default:
                 break;
             case CMD_TERMINATE_IMMEDIATELY:
-				timerStop();
+                timerStop();
                 mainLoopIsRunning.store(false);
                 logDump();
                 {
@@ -526,7 +528,7 @@ void BrokerBase::queueProcessingLoop()
                 }
                 return; // immediate return
             case CMD_STOP:
-				timerStop();
+                timerStop();
                 if (!haltOperations) {
                     processCommand(std::move(command));
                     mainLoopIsRunning.store(false);

@@ -433,10 +433,9 @@ void CoreBroker::processPriorityCommand(ActionMessage&& command)
                 _brokers.addSearchTermForIndex(_brokers.back().global_id, _brokers.size() - 1);
                 auto global_brkid = _brokers.back().global_id;
                 auto route = _brokers.back().route;
-				if (checkActionFlag(command, slow_responding_flag))
-				{
-					_brokers.back()._disable_ping = true;
-				}
+                if (checkActionFlag(command, slow_responding_flag)) {
+                    _brokers.back()._disable_ping = true;
+                }
                 routing_table.emplace(global_brkid, route);
                 // don't bother with the broker_table for root broker
 
@@ -445,9 +444,9 @@ void CoreBroker::processPriorityCommand(ActionMessage&& command)
                 brokerReply.source_id = global_broker_id_local; // source is global root
                 brokerReply.dest_id = global_brkid; // the new id
                 brokerReply.name = command.name; // the identifier of the broker
-				if (no_ping) {
-					setActionFlag(brokerReply, slow_responding_flag);
-				}
+                if (no_ping) {
+                    setActionFlag(brokerReply, slow_responding_flag);
+                }
                 transmit(route, brokerReply);
                 LOG_CONNECTIONS(
                     global_broker_id_local,
@@ -498,7 +497,8 @@ void CoreBroker::processPriorityCommand(ActionMessage&& command)
                     }
                 });
 
-                timeoutMon->setParentId(higher_broker_id, checkActionFlag(command, slow_responding_flag));
+                timeoutMon->setParentId(
+                    higher_broker_id, checkActionFlag(command, slow_responding_flag));
                 timeoutMon->reset();
                 return;
             }
