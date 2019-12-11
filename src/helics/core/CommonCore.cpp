@@ -105,10 +105,9 @@ bool CommonCore::connect()
                 }
 
                 setActionFlag(m, core_flag);
-				if (no_ping)
-				{
-					setActionFlag(m, slow_responding_flag);
-				}
+                if (no_ping) {
+                    setActionFlag(m, slow_responding_flag);
+                }
                 transmit(parent_route_id, m);
                 brokerState = broker_state_t::connected;
                 disconnection.activate();
@@ -684,7 +683,7 @@ Time CommonCore::getTimeProperty(local_federate_id federateID, int32_t property)
 int16_t CommonCore::getIntegerProperty(local_federate_id federateID, int32_t property) const
 {
     if (federateID == local_core_id) {
-		//TODO: PT add some code to actually get the properties from the core if appropriate
+        //TODO: PT add some code to actually get the properties from the core if appropriate
         return 0;
     }
     auto fed = getFederateAt(federateID);
@@ -715,16 +714,14 @@ void CommonCore::setFlagOption(local_federate_id federateID, int32_t flag, bool 
                 setActionFlag(cmd, indicator_flag);
             }
             addActionMessage(cmd);
+        } else if (flag == defs::flags::slow_responding) {
+            ActionMessage cmd(CMD_CORE_CONFIGURE);
+            cmd.messageID = defs::flags::slow_responding;
+            if (flagValue) {
+                setActionFlag(cmd, indicator_flag);
+            }
+            addActionMessage(cmd);
         }
-		else if (flag == defs::flags::slow_responding)
-		{
-			ActionMessage cmd(CMD_CORE_CONFIGURE);
-			cmd.messageID = defs::flags::slow_responding;
-			if (flagValue) {
-				setActionFlag(cmd, indicator_flag);
-			}
-			addActionMessage(cmd);
-		}
         return;
     }
 
@@ -2184,7 +2181,8 @@ void CommonCore::processPriorityCommand(ActionMessage&& command)
                 timeCoord->source_id = global_broker_id_local;
                 higher_broker_id = global_broker_id(command.source_id);
                 transmitDelayedMessages();
-                timeoutMon->setParentId(higher_broker_id,checkActionFlag(command,slow_responding_flag));
+                timeoutMon->setParentId(
+                    higher_broker_id, checkActionFlag(command, slow_responding_flag));
                 timeoutMon->reset();
             }
             break;
@@ -3376,9 +3374,9 @@ void CommonCore::processCoreConfigureCommands(ActionMessage& cmd)
         case defs::properties::console_log_level:
             setLogLevels(cmd.getExtraData(), fileLogLevel);
             break;
-		case defs::flags::slow_responding:
-			no_ping = checkActionFlag(cmd, indicator_flag);
-			break;
+        case defs::flags::slow_responding:
+            no_ping = checkActionFlag(cmd, indicator_flag);
+            break;
         case UPDATE_LOGGING_CALLBACK:
             if (checkActionFlag(cmd, empty_flag)) {
                 setLoggerFunction(nullptr);

@@ -66,7 +66,7 @@ class BrokerBase {
     bool queueDisabled{
         false}; //!< flag indicating that the message queue should not be used and all functions
     //!< called directly instead of distinct thread
-	bool disable_timer{ false }; //!< turn off the timer/timeout subsystem completely
+    bool disable_timer{false}; //!< turn off the timer/timeout subsystem completely
   protected:
     std::string logFile; //!< the file to log message to
     std::unique_ptr<ForwardingTimeCoordinator> timeCoord; //!< object managing the time control
@@ -96,7 +96,7 @@ class BrokerBase {
     bool hasFilters{false}; //!< flag indicating filters come through the broker
     bool forwardTick{
         false}; //!< indicator that ticks should be forwarded to the command processor regardless
-	bool no_ping{ false }; //!< indicator that the broker is not very responsive to ping requests
+    bool no_ping{false}; //!< indicator that the broker is not very responsive to ping requests
 
     std::atomic<int> errorCode{0}; //!< storage for last error code
     std::string lastErrorString; //!< storage for last error string
