@@ -84,7 +84,7 @@ If you want to install in a custom location, you can add the the following argum
 Run the following:
 
 ```bash
-$ cmake -DBUILD_PYTHON_INTERFACE=ON -DCMAKE_INSTALL_PREFIX=/Users/$(whoami)/local/helics-2.1.0/ ..
+$ cmake -DBUILD_PYTHON_INTERFACE=ON -DCMAKE_INSTALL_PREFIX=$HOME/local/helics-2.1.0/ ..
 $ make -j8
 $ make install
 ```
@@ -92,7 +92,7 @@ $ make install
 Add the following to your `~/.bashrc` file.
 
 ```bash
-export PYTHONPATH=/Users/$(whoami)/local/helics-X.X.X/python:$PYTHONPATH
+export PYTHONPATH=$HOME/local/helics-X.X.X/python:$PYTHONPATH
 ```
 
 ### Building HELICS with MATLAB support
@@ -119,7 +119,7 @@ git clone https://github.com/GMLC-TDC/HELICS
 cd HELICS
 mkdir build-osx
 cd build-osx
-cmake -DBUILD_MATLAB_INTERFACE=ON -DCMAKE_INSTALL_PREFIX=/Users/$(whoami)/local/helics-develop/ ..
+cmake -DBUILD_MATLAB_INTERFACE=ON -DCMAKE_INSTALL_PREFIX=$HOME/local/helics-develop/ ..
 make -j8
 make install
 ```
@@ -130,7 +130,7 @@ If you have changed the C-interface and want to regenerate the SWIG MATLAB bindi
 To do that, you can follow the following instructions.
 
 - Install [SWIG with MATLAB](https://github.com/jaeandersson/swig/)
-- `./configure --prefix=/Users/$USER/local/swig_install; make; make install;`
+- `./configure --prefix=$HOME/local/swig_install; make; make install;`
 - Ensure that SWIG and MATLAB are in the PATH
 
 The below generates the MATLAB interface using SWIG.
@@ -167,7 +167,7 @@ Unzip the folder `boost_1_69_0` to any location, for example Downloads.
 
 ```bash
 $ cd ~/Downloads/boost_1_69_0
-$ ./bootstrap.sh --prefix=/ --prefix=/Users/$USER/local/boost-gcc-1.69.0
+$ ./bootstrap.sh --prefix=/ --prefix=$HOME/local/boost-gcc-1.69.0
 ```
 
 Open `project-config.jam` and changes the lines as follows:
@@ -199,7 +199,7 @@ This will install boost in the `~/local/boost-gcc-1.69.0` folder
 Next, you will need to build HELICS and tell it what the `BOOST_ROOT` is.
 
 ```bash
-$ cmake -DCMAKE_INSTALL_PREFIX="/Users/$USER/local/helics-gcc-X.X.X/" -DBOOST_ROOT="/Users/$USER/local/boost-gcc-1.69.0" -DBUILD_PYTHON_INTERFACE=ON -DCMAKE_C_COMPILER=/usr/local/Cellar/gcc/8.2.0/bin/gcc-8 -DCMAKE_CXX_COMPILER=/usr/local/Cellar/gcc/8.2.0/bin/g++-8 ../
+$ cmake -DCMAKE_INSTALL_PREFIX="$HOME/local/helics-gcc-X.X.X/" -DBOOST_ROOT="$HOME/local/boost-gcc-1.69.0" -DBUILD_PYTHON_INTERFACE=ON -DCMAKE_C_COMPILER=/usr/local/Cellar/gcc/8.2.0/bin/gcc-8 -DCMAKE_CXX_COMPILER=/usr/local/Cellar/gcc/8.2.0/bin/g++-8 ../
 $ make clean; make -j 4; make install
 ```
 
