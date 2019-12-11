@@ -164,6 +164,17 @@ TEST_F(flag_tests, type_mismatch_error2)
     vFed1->finalize();
 }
 
+TEST_F(flag_tests, slow_federate)
+{
+    //this flag doesn't do anything yet for federates, this is just to verify it is acknowledged and captured
+    SetupTest<helics::ValueFederate>("test", 1, 1.0);
+    auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
+    vFed1->setFlagOption(helics_flag_slow_responding);
+    vFed1->enterExecutingMode();
+    EXPECT_TRUE(vFed1->getFlagOption(helics_flag_slow_responding));
+    vFed1->finalize();
+}
+
 TEST_F(flag_tests, only_update_on_change_fedlevel)
 {
     SetupTest<helics::ValueFederate>("test", 1, 1.0);

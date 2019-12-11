@@ -189,9 +189,13 @@ void TimeoutMonitor::pingSub(CoreBroker* brk)
         if (cindex == connections.size()) {
             connections.emplace_back();
             connections[cindex].connection = brkr.global_id;
+            connections[cindex].disablePing = brkr._disable_ping;
         }
 
         if (!brkr.isDisconnected) {
+            if (connections[cindex].disablePing) {
+                continue;
+            }
             connections[cindex].activeConnection = true;
             connections[cindex].waitingForPingReply = true;
             connections[cindex].lastPing = now;

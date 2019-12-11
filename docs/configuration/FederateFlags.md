@@ -27,3 +27,8 @@ When an interface requests a target it tries to find a match in the federation. 
 #### strict_input_type_checking
 
 This applies to Input interface.  If enabled this flag tells the inputs to check that the type matches.
+
+#### slow_responding
+
+If specified on a federate it indicates the federate may be slow in responding, and to not disconnect the federate if things are slow.
+If applied to a core or broker, it is indicative that the broker doesn't respond to internal pings quickly so they cannot be used as a mechanism for timeout.  For federates this option doesn't do much but its role will likely be expanded as more robust timeout and coordination mechanics are developed.  

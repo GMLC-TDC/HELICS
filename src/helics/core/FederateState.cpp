@@ -191,6 +191,7 @@ std::string FederateState::generateConfig() const
     s << ",\n\"observer\":" << ((observer) ? truestr : falsestr);
     s << ",\n\"source_only\":" << ((source_only) ? truestr : falsestr);
     s << ",\n\"strict_input_type_checking\":" << ((source_only) ? truestr : falsestr);
+    s << ",\n\"slow_responding\":" << ((slow_responding) ? truestr : falsestr);
     if (rt_lag > timeZero) {
         s << ",\n\"rt_lag\":" << static_cast<double>(rt_lag);
     }
@@ -1336,6 +1337,9 @@ void FederateState::setOptionFlag(int optionFlag, bool value)
         case defs::flags::ignore_input_unit_mismatch:
             ignore_unit_mismatch = value;
             break;
+        case defs::flags::slow_responding:
+            slow_responding = value;
+            break;
         case defs::flags::realtime:
             if (value) {
                 if (state < HELICS_EXECUTING) {
@@ -1415,6 +1419,8 @@ bool FederateState::getOptionFlag(int optionFlag) const
             return observer;
         case defs::flags::source_only:
             return source_only;
+        case defs::flags::slow_responding:
+            return slow_responding;
         case defs::flags::connections_required:
             return ((interfaceFlags.load() & make_flags(required_flag)) != 0);
         case defs::flags::connections_optional:

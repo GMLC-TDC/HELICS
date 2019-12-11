@@ -129,6 +129,10 @@ std::shared_ptr<helicsCLI11App> BrokerBase::generateBaseCLI()
         "--key,--broker_key",
         brokerKey,
         "specify a key to use for all connections to/from a broker");
+    hApp->add_flag(
+        "--no_ping,--slow_responding",
+        no_ping,
+        "specify that a broker might be slow or unresponsive to ping requests from other brokers");
     auto logging_group =
         hApp->add_option_group("logging", "Options related to file and message logging");
     logging_group->option_defaults()->ignore_underscore();
@@ -169,6 +173,10 @@ std::shared_ptr<helicsCLI11App> BrokerBase::generateBaseCLI()
         tickTimer,
         "heartbeat time in ms, if there is no broker communication for 2 ticks then "
         "secondary actions are taken  (can also be entered as a time like '10s' or '45ms')");
+    timeout_group->add_flag(
+        "--disable_timer,--no_tick",
+        disable_timer,
+        "if set to true the timeout timer is disabled, cannot be re-enabled later");
     timeout_group->add_option(
         "--timeout",
         timeout,
@@ -416,7 +424,7 @@ void BrokerBase::queueProcessingLoop()
     auto timerCallback = [this, &active](const std::error_code& ec) {
         timerTickHandler(this, active, ec);
     };
-    if (tickTimer > timeZero) {
+    if (tickTimer > timeZero && !disable_timer) {
         if (tickTimer < Time(0.5)) {
             tickTimer = Time(0.5);
         }
@@ -424,7 +432,14 @@ void BrokerBase::queueProcessingLoop()
         ticktimer.expires_at(std::chrono::steady_clock::now() + tickTimer.to_ns());
         ticktimer.async_wait(timerCallback);
     }
+    auto timerStop = [&]() {
+        haltTimer(active, ticktimer);
+        contextLoop = nullptr;
+    };
+#else
+    auto timerStop = []() {};
 #endif
+
     global_broker_id_local = global_id.load();
     int messagesSinceLastTick = 0;
     auto logDump = [&, this]() {
@@ -443,10 +458,7 @@ void BrokerBase::queueProcessingLoop()
         }
     };
     if (haltOperations) {
-#ifndef HELICS_DISABLE_ASIO
-        haltTimer(active, ticktimer);
-        contextLoop = nullptr;
-#endif
+        timerStop();
         mainLoopIsRunning.store(false);
         return;
     }
@@ -480,9 +492,11 @@ void BrokerBase::queueProcessingLoop()
                 messagesSinceLastTick = 0;
 // reschedule the timer
 #ifndef HELICS_DISABLE_ASIO
-                ticktimer.expires_at(std::chrono::steady_clock::now() + tickTimer.to_ns());
-                active = std::make_pair(true, true);
-                ticktimer.async_wait(timerCallback);
+                if (tickTimer > timeZero && !disable_timer) {
+                    ticktimer.expires_at(std::chrono::steady_clock::now() + tickTimer.to_ns());
+                    active = std::make_pair(true, true);
+                    ticktimer.async_wait(timerCallback);
+                }
 #endif
                 break;
             case CMD_PING:
@@ -497,10 +511,7 @@ void BrokerBase::queueProcessingLoop()
             default:
                 break;
             case CMD_TERMINATE_IMMEDIATELY:
-#ifndef HELICS_DISABLE_ASIO
-                haltTimer(active, ticktimer);
-                contextLoop = nullptr;
-#endif
+                timerStop();
                 mainLoopIsRunning.store(false);
                 logDump();
                 {
@@ -517,10 +528,7 @@ void BrokerBase::queueProcessingLoop()
                 }
                 return; // immediate return
             case CMD_STOP:
-#ifndef HELICS_DISABLE_ASIO
-                haltTimer(active, ticktimer);
-                contextLoop = nullptr;
-#endif
+                timerStop();
                 if (!haltOperations) {
                     processCommand(std::move(command));
                     mainLoopIsRunning.store(false);

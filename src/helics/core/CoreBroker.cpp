@@ -320,6 +320,9 @@ void CoreBroker::processPriorityCommand(ActionMessage&& command)
                     brokerReply.source_id = global_broker_id_local; // source is global root
                     brokerReply.dest_id = brk->global_id; // the new id
                     brokerReply.name = command.name; // the identifier of the broker
+                    if (no_ping) {
+                        setActionFlag(brokerReply, slow_responding_flag);
+                    }
                     transmit(brk->route, brokerReply);
                     return;
                 }
@@ -430,6 +433,9 @@ void CoreBroker::processPriorityCommand(ActionMessage&& command)
                 _brokers.addSearchTermForIndex(_brokers.back().global_id, _brokers.size() - 1);
                 auto global_brkid = _brokers.back().global_id;
                 auto route = _brokers.back().route;
+                if (checkActionFlag(command, slow_responding_flag)) {
+                    _brokers.back()._disable_ping = true;
+                }
                 routing_table.emplace(global_brkid, route);
                 // don't bother with the broker_table for root broker
 
@@ -438,6 +444,9 @@ void CoreBroker::processPriorityCommand(ActionMessage&& command)
                 brokerReply.source_id = global_broker_id_local; // source is global root
                 brokerReply.dest_id = global_brkid; // the new id
                 brokerReply.name = command.name; // the identifier of the broker
+                if (no_ping) {
+                    setActionFlag(brokerReply, slow_responding_flag);
+                }
                 transmit(route, brokerReply);
                 LOG_CONNECTIONS(
                     global_broker_id_local,
@@ -489,6 +498,9 @@ void CoreBroker::processPriorityCommand(ActionMessage&& command)
                 });
 
                 timeoutMon->setParentId(higher_broker_id);
+                if (checkActionFlag(command, slow_responding_flag)) {
+                    timeoutMon->disableParentPing();
+                }
                 timeoutMon->reset();
                 return;
             }
@@ -1588,7 +1600,9 @@ bool CoreBroker::connect()
                     ActionMessage m(CMD_REG_BROKER);
                     m.source_id = global_federate_id{};
                     m.name = getIdentifier();
-
+                    if (no_ping) {
+                        setActionFlag(m, slow_responding_flag);
+                    }
                     if (!brokerKey.empty() && brokerKey != universalKey) {
                         m.setStringData(getAddress(), brokerKey);
                     } else {
