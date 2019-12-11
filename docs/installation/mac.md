@@ -65,45 +65,47 @@ Getting and building from source:
 2. Create a build folder. Run cmake and give it the path that HELICS
    was checked out into.
 
-```bash
-git clone https://github.com/GMLC-TDC/HELICS
-cd HELICS
-mkdir build
-cd build
-```
+    ```bash
+    git clone https://github.com/GMLC-TDC/HELICS
+    cd HELICS
+    mkdir build
+    cd build
+    ```
 
 ## Compile and Install
 
 There are a number of different options and approaches at this point depending on your needs, in particular with respect to programming language support.
 
 <div class="admonition note">
+
 Note: For any of these options, if you want to install in a custom location, you can add the following CMake argument: `-DCMAKE_INSTALL_PREFIX=/path/to/install/folder/`
 
 Keep in mind running HELICS commands like `helics_app` will not work from just any old random folder with a custom install folder.
 You will either need to run them from inside the `bin` subfolder of your custom install, or provide a more complete path to the command.
 To run HELICS commands from any folder, you must add the `bin` subfolder of your custom install to the `PATH` environment variable. See the
 first link in the [Useful Resources](#useful-resources) section for details.
+
 </div>
 
 ### Basic Install (without language bindings)
 
-1. Run `make`.
+Run the following:
 
-   ```bash
-   cmake ../
-   ccmake . # optional, to change install path or other configuration settings
-   make
-   make install
-   ```
+```bash
+cmake ../
+ccmake . # optional, to change install path or other configuration settings
+make
+make install
+```
 
 ### Building HELICS with python support
 
 Run the following:
 
 ```bash
-$ cmake -DBUILD_PYTHON_INTERFACE=ON -DCMAKE_INSTALL_PREFIX=$HOME/local/helics-2.1.0/ ..
-$ make -j8
-$ make install
+cmake -DBUILD_PYTHON_INTERFACE=ON -DCMAKE_INSTALL_PREFIX=$HOME/local/helics-2.1.0/ ..
+make -j8
+make install
 ```
 
 Add the following to your `~/.bashrc` file.
