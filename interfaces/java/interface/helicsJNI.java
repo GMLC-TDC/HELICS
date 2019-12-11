@@ -46,6 +46,7 @@ public class helicsJNI {
   public final static native int helics_flag_forward_compute_get();
   public final static native int helics_flag_realtime_get();
   public final static native int helics_flag_single_thread_federate_get();
+  public final static native int helics_flag_slow_responding_get();
   public final static native int helics_flag_delay_init_entry_get();
   public final static native int helics_flag_enable_init_entry_get();
   public final static native int helics_flag_ignore_time_mismatch_warnings_get();
