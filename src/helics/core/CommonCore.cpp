@@ -2181,8 +2181,10 @@ void CommonCore::processPriorityCommand(ActionMessage&& command)
                 timeCoord->source_id = global_broker_id_local;
                 higher_broker_id = global_broker_id(command.source_id);
                 transmitDelayedMessages();
-                timeoutMon->setParentId(
-                    higher_broker_id, checkActionFlag(command, slow_responding_flag));
+                timeoutMon->setParentId(higher_broker_id);
+                if (checkActionFlag(command, slow_responding_flag)) {
+                    timeoutMon->disableParentPing();
+                }
                 timeoutMon->reset();
             }
             break;

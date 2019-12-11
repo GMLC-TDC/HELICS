@@ -39,14 +39,16 @@ class TimeoutMonitor {
     /** ping all a brokers sub connections*/
     void pingSub(CoreBroker* brk);
     /** set the parent id*/
-    void setParentId(global_broker_id parent_id, bool disable_ping = false)
+    void setParentId(global_broker_id parent_id) { parentConnection.connection = parent_id; }
+    /** set the "pingability" of a parent connection*/
+    void disableParentPing(bool value = true)
     {
-        parentConnection.connection = parent_id;
-        parentConnection.disablePing = disable_ping;
-    };
+        parentConnection.disablePing = value;
+        parentConnection.waitingForPingReply = false;
+    }
 
   private:
-    std::chrono::milliseconds timeout{100000000}; //!< timeout for connections
+    std::chrono::milliseconds timeout{100'000'000}; //!< timeout for connections
     bool waitingForConnection{false}; //!< waiting for initial connection
     decltype(std::chrono::steady_clock::now()) startWaiting; //!< time that the waiting has started
     linkConnection parentConnection; //!< the connection information for the parent

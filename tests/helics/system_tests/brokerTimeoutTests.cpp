@@ -91,7 +91,7 @@ TEST(broker_timeout_tests, core_fail_timeout_no_ping_ci_skip)
     Fed2->finalize();
 }
 
-//this test is exactly like the previous one except the core was specified with no_ping so it won't fail
+//this test is similar in concept to the previous two but using --disable_timer flag
 TEST(broker_timeout_tests, core_fail_timeout_no_timer_ci_skip)
 {
     auto brk = helics::BrokerFactory::create(

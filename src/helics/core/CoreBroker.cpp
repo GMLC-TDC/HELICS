@@ -497,8 +497,10 @@ void CoreBroker::processPriorityCommand(ActionMessage&& command)
                     }
                 });
 
-                timeoutMon->setParentId(
-                    higher_broker_id, checkActionFlag(command, slow_responding_flag));
+                timeoutMon->setParentId(higher_broker_id);
+                if (checkActionFlag(command, slow_responding_flag)) {
+                    timeoutMon->disableParentPing();
+                }
                 timeoutMon->reset();
                 return;
             }
