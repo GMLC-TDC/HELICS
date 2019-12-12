@@ -48,3 +48,29 @@ macro(submod_update target)
      message(WARNING "SUBMODULE update has been disabled")
    endif()
 endmacro()
+
+function(check_submodule_status)
+    if (ENABLE_SUBMODULE_UPDATE)
+        execute_process(COMMAND ${GIT_EXECUTABLE} submodule status --recursive
+                WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+                RESULT_VARIABLE GIT_RESULT
+                OUTPUT_VARIABLE GIT_OUTPUT)
+
+        if (GIT_RESULT)
+            message(WARNING "Automatic submodule verification with `git submodule status --recursive` failed with error ${GIT_RESULT} and output ${GIT_OUTPUT}. Verify submodules before building.")
+        endif ()
+
+        if (WIN32 AND NOT (MSYS OR CYGWIN))
+            execute_process(COMMAND powershell "-c" "echo '${GIT_OUTPUT}' | Select-String -Pattern '^[-\\|+\\|U].*'"
+                    OUTPUT_VARIABLE SUBMODULE_STATUS
+                    )
+        else ()
+            execute_process(COMMAND bash "-c" "echo '${GIT_OUTPUT}' | grep '^[-\\|+\\|U].*'"
+                    OUTPUT_VARIABLE SUBMODULE_STATUS
+                    )
+        endif ()
+        if (NOT "${SUBMODULE_STATUS}" STREQUAL "")
+            message(WARNING "Submodules are not up to date. Update submodules by running `git submodule update --init --recursive` before building HELICS.")
+        endif ()
+    endif ()
+endfunction()

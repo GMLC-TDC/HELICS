@@ -385,6 +385,8 @@ if(NOT EXISTS "${PROJECT_SOURCE_DIR}/ThirdParty/toml11/toml/value.hpp")
     submod_update(ThirdParty/toml11)
 endif()
 
+check_submodule_status()
+
 include(GNUInstallDirs)
 
 # -------------------------------------------------------------
@@ -400,7 +402,7 @@ endif()
 # -------------------------------------------------------------
 
 set(toml11_BUILD_TEST OFF CACHE INTERNAL "")
-add_subdirectory(ThirdParty/toml11 EXCLUDE_FROM_ALL) 
+add_subdirectory(ThirdParty/toml11 EXCLUDE_FROM_ALL)
 
 # -------------------------------------------------------------
 # options for enabling specific core communication types
