@@ -93,6 +93,10 @@ TEST(error_tests, unavailable_core_type)
     auto brk = helicsCreateBroker("nng", "test", "", &err);
     EXPECT_NE(err.error_code, 0);
 
+    EXPECT_EQ(helicsIsCoreTypeAvailable("nng"), helics_false);
+    EXPECT_EQ(helicsIsCoreTypeAvailable(nullptr), helics_false);
+
+    EXPECT_EQ(helicsIsCoreTypeAvailable("blahblah"), helics_false);
     helicsCoreDestroy(core);
     helicsBrokerDestroy(brk);
 }

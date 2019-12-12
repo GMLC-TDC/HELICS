@@ -39,6 +39,7 @@ functions applying to a \ref helics_core object
  - \ref helicsCoreDataLink
  - \ref helicsCoreAddSourceFilterToEndpoint
  - \ref helicsCoreAddDestinationFilterToEndpoint
+ - \ref helicsCoreMakeConnections
  - \ref helicsCoreGetIdentifier
  - \ref helicsCoreGetAddress
  - \ref helicsCoreSetReadyToInit
@@ -59,6 +60,7 @@ Functions applying to a \ref helics_broker object
  - \ref helicsBrokerDataLink
  - \ref helicsBrokerAddSourceFilterToEndpoint
  - \ref helicsBrokerAddDestinationFilterToEndpoint
+ - \ref helicsBrokerMakeConnections
  - \ref helicsBrokerWaitForDisconnect
  - \ref helicsBrokerGetIdentifier
  - \ref helicsBrokerGetAddress
