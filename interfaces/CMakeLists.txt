@@ -74,10 +74,17 @@ else()
     set(swig_required OFF)
 endif()
 
-    # at some point in the future (HELICS 3) switch everything to use
-    # find_package(Python3 ...)
-	cmake_dependent_advanced_option(HELICS_USE_NEW_PYTHON_FIND "Use the FindPython Routine only available from cmake 3.12 and later" OFF "CMAKE_VERSION VERSION_GREATER 3.12;NOT HELICS_SWIG_GENERATE_INTERFACE_FILES_ONLY; BUILD_PYTHON_INTERFACE
-    OR BUILD_PYTHON2_INTERFACE" OFF)
+# cmake-format: off
+# at some point in the future (HELICS 3) switch everything to use
+# find_package(Python3 ...)
+cmake_dependent_advanced_option(
+    HELICS_USE_NEW_PYTHON_FIND
+    "Use the FindPython Routine only available from cmake 3.12 and later"
+    OFF
+    "CMAKE_VERSION VERSION_GREATER 3.12;NOT HELICS_SWIG_GENERATE_INTERFACE_FILES_ONLY;BUILD_PYTHON_INTERFACE OR BUILD_PYTHON2_INTERFACE"
+    OFF
+)
+# cmake-format: on
     
 
 cmake_dependent_option(
