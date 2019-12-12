@@ -86,7 +86,6 @@ TEST(evil_general_test,helicsCloseLibrary)
 TEST(evil_general_test,helicsCleanupLibrary)
 {
     //void helicsCleanupLibrary(void);
-    //void helicsCleanupLibrary(void);
     helicsCleanupLibrary();
 }
 
@@ -95,12 +94,15 @@ TEST(evil_general_test,helicsCleanupLibrary)
 TEST(evil_creation_test,helicsCreateCore)
 {
     //helics_core helicsCreateCore(const char* type, const char* name, const char* initString, helics_error* err);
-    //helics_core helicsCreateCore(const char* type, const char* name, const char* initString, helics_error* err);
     auto err=helicsErrorInitialize();
     err.error_code=45;
-    //auto res1=helicsCreateCore(const char* type, const char* name, const char* initString, &err);
+    auto res1=helicsCreateCore(nullptr, "name", "", &err);
+    EXPECT_TRUE(helicsCoreIsValid(res1) == helics_false);
     helicsErrorClear(&err);
-    //auto res2=helicsCreateCore(const char* type, const char* name, const char* initString, nullptr);
+    auto res2 = helicsCreateCore("invalid", "name", "", &err);
+    EXPECT_TRUE(helicsCoreIsValid(res2) == helics_false);
+    auto res3 = helicsCreateCore("invalid", "name", "", nullptr);
+    EXPECT_TRUE(helicsCoreIsValid(res3) == helics_false);
 }
 
 TEST(evil_creation_test,helicsCreateCoreFromArgs)
@@ -109,9 +111,13 @@ TEST(evil_creation_test,helicsCreateCoreFromArgs)
     //helics_core helicsCreateCoreFromArgs(const char* type, const char* name, int argc, const char* const* argv, helics_error* err);
     auto err=helicsErrorInitialize();
     err.error_code=45;
-    //auto res1=helicsCreateCoreFromArgs(const char* type, const char* name, int argc, const char* const* argv, &err);
+    auto res1=helicsCreateCoreFromArgs("bob", "bob", 0, nullptr, &err);
+    EXPECT_TRUE(helicsCoreIsValid(res1) == helics_false);
     helicsErrorClear(&err);
-    //auto res2=helicsCreateCoreFromArgs(const char* type, const char* name, int argc, const char* const* argv, nullptr);
+    auto res2 = helicsCreateCoreFromArgs("bob", "bob", 0, nullptr, &err);
+    EXPECT_EQ(helicsCoreIsValid(res2), helics_false);
+    auto res3 = helicsCreateCoreFromArgs("bob", "bob", 0, nullptr, nullptr);
+    EXPECT_EQ(helicsCoreIsValid(res3), helics_false);
 }
 
 TEST(evil_creation_test,helicsCreateBroker)
