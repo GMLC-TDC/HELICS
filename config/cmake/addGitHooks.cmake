@@ -15,7 +15,6 @@ function(set_git_hooks_disabled)
     message(STATUS "Git hooks disabled")
 endfunction()
 
-
 if (NOT DEFINED CLANG_FORMAT)
     find_program(CLANG_FORMAT clang-format)
 endif ()
@@ -42,17 +41,16 @@ endif ()
 
 mark_as_advanced(CLANG_FORMAT)
 
-cmake_dependent_advanced_option(HELICS_ENABLE_GIT_HOOKS "Activate git hooks to run clang-format on committed files." ON "CLANG_FORMAT" OFF)
-
-find_package(Git)
-
 if (HELICS_ENABLE_GIT_HOOKS AND NOT CLANG_FORMAT_VERSION_OK)
     message(WARNING
             "HELICS git hooks require clang-format version ${CLANG_FORMAT_MIN_VERSION} or higher."
             "\nInstall or update clang-format to use git hooks."
             "\nTo select a different clang-format exectuable, update the CLANG_FORMAT property in CMake.")
-    SET(HELICS_ENABLE_GIT_HOOKS OFF CACHE BOOL "Activate git hooks to run clang-format on committed files." FORCE)
 endif ()
+
+cmake_dependent_advanced_option(HELICS_ENABLE_GIT_HOOKS "Activate git hooks to run clang-format on committed files." ON "CLANG_FORMAT;CLANG_FORMAT_VERSION_OK" OFF)
+
+find_package(Git)
 
 if (GIT_FOUND AND NOT GIT_VERSION_STRING VERSION_LESS "2.9")
     if (HELICS_ENABLE_GIT_HOOKS)
