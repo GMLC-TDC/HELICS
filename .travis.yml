@@ -200,6 +200,7 @@ jobs:
         - BUILD_TYPE=RelWithDebInfo
     # Code coverage build
     - <<: *daily_linux
+      if: (type = cron) OR (branch =~ /(codecov)/) OR (commit_message =~ /(codecov)/)
       name: "GCC 6 Code Coverage"
       env:
         - MATRIX_EVAL="COMPILER=gcc && CC=gcc-6 && CXX=g++-6"
