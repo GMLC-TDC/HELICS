@@ -252,6 +252,12 @@ else()
                 helicsPYTHON
                 PROPERTIES PREFIX "_" OUTPUT_NAME "helics"
             )
+            
+            # Set the output library extension to .pyd on Windows
+            if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
+                set_property(TARGET helicsPYTHON PROPERTY SUFFIX ".pyd")
+            endif()
+
             target_link_libraries(helicsPYTHON PUBLIC helicsSharedLib)
 
             install(
