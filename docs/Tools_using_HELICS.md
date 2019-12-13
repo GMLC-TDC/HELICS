@@ -4,27 +4,34 @@ The following list of tools is a list of tools that have worked with HELICS at s
 
 ## Power systems Tools
 
-### Open Source Distribution system simulation
+### Distribution system simulation
 
 -   [GridLAB-D](https://www.gridlabd.org/), an open-source tool for distribution power-flow, DER models, basic house thermal and end-use load models, and more. HELICS support currently (8/15/2018) provided in the [`develop` branch](https://github.com/gridlab-d/gridlab-d/tree/develop) which you have to build yourself as described [here](https://github.com/GMLC-TDC/HELICS-Tutorial/tree/master/setup).
+-   [OpenDSS](https://smartgrid.epri.com/SimulationTool.aspx), an open-source tool for distribution powerflow, DER models, harmonics, and other capabilities traditionally found in commercial distribution analysis tools. There are two primary interfaces with HELICS support:
+    -  [OpenDSSDirect.py](https://github.com/dss-extensions/OpenDSSDirect.py) which provides a "direct" interface to interact with the OpenDSS engine enabling support for non-Windows (Linux, OSX) systems.
+    -  [PyDSS](https://github.com/NREL/PyDSS) which builds on OpenDSSDirect to provide enhanced advanced inverter models and significantly more robust convergence with high-penetration DER controls along with flexible support for user-defined controls and visualization.
+-   [Cyme](http://www.cyme.com/software/cymdist/) 
 
-### Open Source Transimission system simulation 
+
+### Transimission system simulation 
 -   [GridDyn](https://github.com/LLNL/GridDyn), an open-source transmission power flow and dynamics simulator. HELICS support currently (4/14/2018) provided through the [`cmake_updates` branch](https://github.com/LLNL/GridDyn/tree/cmake_update).
 -   [PSST](https://github.com/kdheepak/psst), an open-source python-based unit-commitment and dispatch market simulator. HELICS examples are included in the  [HELICS-Tutorial](https://github.com/GMLC-TDC/HELICS-Tutorial)
 -   [MATPOWER](http://www.pserc.cornell.edu/matpower/), an open-source Matlab based power flow and optimal power flow tool. HELICS support currently (4/14/2018) under development.
 -   [InterPSS](http://www.interpss.org/), a Java-based power systems simulator. HELICS support currently (4/14/2018) under development.
-
-### Commercial tools 
--   [Cyme](http://www.cyme.com/software/cymdist/) 
 -   [PSLF](https://github.com/GMLC-TDC/PSLF-wrapper) Some Level of PSLF support is available using the experimental python interface.
 -   [PSS/e](https://new.siemens.com/global/en/products/energy/services/transmission-distribution-smart-grid/consulting-and-planning/pss-software/pss-e.html)
 -   [Power World](https://www.powerworld.com/) PowerWorld Simulator is an interactive power system simulation package designed to simulate high voltage power system operation on a time frame ranging from several minutes to several days.
 
 
+### Electric Power Market simulation
+-   [FESTIV](https://github.com/NREL/FESTIV_MODEL) The Flexible Energy Scheduling Tool for Integrating Variable generation provides multi-timescale steady-state power system operations simulations that aims to replicate the full time spectrum of scheduling and reserve processes (multi-step commitment and dispatch plus simplified AGC) to meet energy and reliability needs of the bulk power system
+-   [Plexos](https://energyexemplar.com/solutions/plexos/) A commercial production cost simulator. Support via OpenPlexos is under development
+-   [MATPOWER](http://www.pserc.cornell.edu/matpower/) (described above) also includes basic optimal powerflow support.
+
 ## Communication Tools
 
+-   HELICS provides built-in support for simple communications manipulations such as delays, lossy channels, etc. through its built-in filters.
 -   [ns-3](https://www.nsnam.org/), a discrete-event communication network simulator. Supported via the [HELICS ns-3 module](https://github.com/GMLC-TDC/helics-ns3)
--   HELICS also includes built-in support for simple communications manipulations such as delays, lossy channels, etc. through its built-in filters.
 -  [OMNet++](https://omnetpp.org/)  OMNeT++ is a public-source, component-based, modular and open-architecture simulation environment with strong GUI support and an embeddable simulation kernel. Its primary application area is the simulation of communication networks, but it has been successfully used in other areas like the simulation of IT systems, queueing networks, hardware architectures and business processes as well.
   Early stage development with OMNET++ and HELICS is underway
 
@@ -36,5 +43,5 @@ The following list of tools is a list of tools that have worked with HELICS at s
 ## Optimization packages
 
 - [GAMS]()
-- []
+- [JuMP](https://www.juliaopt.org/) support is provided through the HELICS Julia interface
 
