@@ -102,7 +102,7 @@ elseif(NOT CMAKE_COMPILER_IS_GNUCXX)
 endif()
 
 set(
-    COVERAGE_COMPILER_FLAGS "-g --coverage -fprofile-arcs -ftest-coverage -fno-inline -fno-inline-small-functions -fno-default-inline"
+    COVERAGE_COMPILER_FLAGS "-g -O1 --coverage -fprofile-arcs -ftest-coverage -fno-inline -fno-inline-small-functions -fno-default-inline"
     CACHE INTERNAL ""
 )
 

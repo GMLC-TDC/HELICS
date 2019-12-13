@@ -123,23 +123,29 @@ TEST(evil_creation_test,helicsCreateCoreFromArgs)
 TEST(evil_creation_test,helicsCreateBroker)
 {
     //helics_broker helicsCreateBroker(const char* type, const char* name, const char* initString, helics_error* err);
-    //helics_broker helicsCreateBroker(const char* type, const char* name, const char* initString, helics_error* err);
     auto err=helicsErrorInitialize();
     err.error_code=45;
-    //auto res1=helicsCreateBroker(const char* type, const char* name, const char* initString, &err);
+    auto res1 = helicsCreateBroker(nullptr, "name", "", &err);
+    EXPECT_TRUE(helicsBrokerIsValid(res1) == helics_false);
     helicsErrorClear(&err);
-    //auto res2=helicsCreateBroker(const char* type, const char* name, const char* initString, nullptr);
+    auto res2 = helicsCreateBroker("invalid", "name", "", &err);
+    EXPECT_TRUE(helicsBrokerIsValid(res2) == helics_false);
+    auto res3 = helicsCreateBroker("invalid", "name", "", nullptr);
+    EXPECT_TRUE(helicsBrokerIsValid(res3) == helics_false);
 }
 
 TEST(evil_creation_test,helicsCreateBrokerFromArgs)
 {
     //helics_broker helicsCreateBrokerFromArgs(const char* type, const char* name, int argc, const char* const* argv, helics_error* err);
-    //helics_broker helicsCreateBrokerFromArgs(const char* type, const char* name, int argc, const char* const* argv, helics_error* err);
     auto err=helicsErrorInitialize();
     err.error_code=45;
-    //auto res1=helicsCreateBrokerFromArgs(const char* type, const char* name, int argc, const char* const* argv, &err);
+    auto res1 = helicsCreateBrokerFromArgs("bob", "bob", 0, nullptr, &err);
+    EXPECT_TRUE(helicsBrokerIsValid(res1) == helics_false);
     helicsErrorClear(&err);
-    //auto res2=helicsCreateBrokerFromArgs(const char* type, const char* name, int argc, const char* const* argv, nullptr);
+    auto res2 = helicsCreateBrokerFromArgs("bob", "bob", 0, nullptr, &err);
+    EXPECT_EQ(helicsBrokerIsValid(res2), helics_false);
+    auto res3 = helicsCreateBrokerFromArgs("bob", "bob", 0, nullptr, nullptr);
+    EXPECT_EQ(helicsBrokerIsValid(res3), helics_false);
 }
 
 TEST(evil_creation_test,helicsCreateValueFederate)
@@ -148,8 +154,14 @@ TEST(evil_creation_test,helicsCreateValueFederate)
     //helics_federate helicsCreateValueFederate(const char* fedName, helics_federate_info fi, helics_error* err);
     auto err=helicsErrorInitialize();
     err.error_code=45;
-    //auto res1=helicsCreateValueFederate(const char* fedName, helics_federate_info fi, &err);
+    auto res1=helicsCreateValueFederate("billy", nullptr, &err);
+    EXPECT_EQ(helicsFederateIsValid(res1), helics_false);
     helicsErrorClear(&err);
+
+    auto fi = helicsCreateFederateInfo();
+    helicsFederateInfoSetCoreType(fi, helics_core_type_nng,nullptr);
+    auto res2 = helicsCreateValueFederate("billy", fi, &err);
+    EXPECT_EQ(helicsFederateIsValid(res1), helics_false);
     //auto res2=helicsCreateValueFederate(const char* fedName, helics_federate_info fi, nullptr);
 }
 
