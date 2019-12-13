@@ -710,82 +710,199 @@ TEST(evil_broker_test, helicsBrokerSetLoggingCallback)
 //Functions applying to a \ref helics_federate_info object
 TEST(evil_fedInfo_test, helicsFederateInfoClone)
 {
-    //helics_federate_info helicsFederateInfoClone(helics_federate_info fi, helics_error* err);
+    char rdata[256];
+    helics_federate_info evil_fi = reinterpret_cast<helics_federate_info>(rdata);
+    auto err = helicsErrorInitialize();
+    err.error_code = 45;
+    auto res= helicsFederateInfoClone(nullptr, &err);
+    EXPECT_EQ(res, nullptr);
+    helicsErrorClear(&err);
+    auto res2= helicsFederateInfoClone(evil_fi, &err);
+    EXPECT_EQ(res2, nullptr);
+    EXPECT_NE(err.error_code, 0);
 }
 
 TEST(evil_fedInfo_test, helicsFederateInfoLoadFromArgs)
 {
-    //void helicsFederateInfoLoadFromArgs(helics_federate_info fi, int argc, const char* const* argv, helics_error* err);
+    char rdata[256];
+    helics_federate_info evil_fi = reinterpret_cast<helics_federate_info>(rdata);
+    auto err = helicsErrorInitialize();
+    err.error_code = 45;
+    helicsFederateInfoLoadFromArgs(nullptr, 0, nullptr, &err);
+    helicsErrorClear(&err);
+    helicsFederateInfoLoadFromArgs(evil_fi, 0, nullptr, &err);
+    EXPECT_NE(err.error_code, 0);
 }
 
 TEST(evil_fedInfo_test, helicsFederateInfoFree)
 {
-    //void helicsFederateInfoFree(helics_federate_info fi);
+    char rdata[256];
+    helics_federate_info evil_fi = reinterpret_cast<helics_federate_info>(rdata);
+    EXPECT_NO_THROW(helicsFederateInfoFree(nullptr));
+    EXPECT_NO_THROW(helicsFederateInfoFree(evil_fi));
 }
 
 TEST(evil_fedInfo_test, helicsFederateInfoSetCoreName)
 {
-    //void helicsFederateInfoSetCoreName(helics_federate_info fi, const char* corename, helics_error* err);
+    char rdata[256];
+    helics_federate_info evil_fi = reinterpret_cast<helics_federate_info>(rdata);
+    auto err = helicsErrorInitialize();
+    err.error_code = 45;
+    helicsFederateInfoSetCoreName(nullptr, "core", &err);
+    helicsErrorClear(&err);
+    helicsFederateInfoSetCoreName(evil_fi, "core", &err);
+    EXPECT_NE(err.error_code, 0);
 }
 
 TEST(evil_fedInfo_test, helicsFederateInfoSetCoreInitString)
 {
-    //void helicsFederateInfoSetCoreInitString(helics_federate_info fi, const char* coreInit, helics_error* err);
+    char rdata[256];
+    helics_federate_info evil_fi = reinterpret_cast<helics_federate_info>(rdata);
+    auto err = helicsErrorInitialize();
+    err.error_code = 45;
+    helicsFederateInfoSetCoreInitString(nullptr, "", &err);
+    helicsErrorClear(&err);
+    helicsFederateInfoSetCoreInitString(evil_fi, "", &err);
+    EXPECT_NE(err.error_code, 0);
 }
 
 TEST(evil_fedInfo_test, helicsFederateInfoSetBrokerInitString)
 {
-    //void helicsFederateInfoSetBrokerInitString(helics_federate_info fi, const char* brokerInit, helics_error* err);
+    char rdata[256];
+    helics_federate_info evil_fi = reinterpret_cast<helics_federate_info>(rdata);
+    auto err = helicsErrorInitialize();
+    err.error_code = 45;
+    helicsFederateInfoSetBrokerInitString(nullptr, "", &err);
+    helicsErrorClear(&err);
+    helicsFederateInfoSetBrokerInitString(evil_fi, "", &err);
+    EXPECT_NE(err.error_code, 0);
 }
 
 TEST(evil_fedInfo_test, helicsFederateInfoSetCoreType)
 {
-    //void helicsFederateInfoSetCoreType(helics_federate_info fi, int coretype, helics_error* err);
+    char rdata[256];
+    helics_federate_info evil_fi = reinterpret_cast<helics_federate_info>(rdata);
+    auto err = helicsErrorInitialize();
+    err.error_code = 45;
+    helicsFederateInfoSetCoreType(nullptr, -97, &err);
+    helicsErrorClear(&err);
+    helicsFederateInfoSetCoreType(evil_fi, -97, &err);
+    EXPECT_NE(err.error_code, 0);
 }
 
 TEST(evil_fedInfo_test, helicsFederateInfoSetCoreTypeFromString)
 {
-    //void helicsFederateInfoSetCoreTypeFromString(helics_federate_info fi, const char* coretype, helics_error* err);
+    char rdata[256];
+    helics_federate_info evil_fi = reinterpret_cast<helics_federate_info>(rdata);
+    auto err = helicsErrorInitialize();
+    err.error_code = 45;
+    helicsFederateInfoSetCoreTypeFromString(nullptr, "nng", &err);
+    helicsErrorClear(&err);
+    helicsFederateInfoSetCoreTypeFromString(evil_fi, "nng", &err);
+    EXPECT_NE(err.error_code, 0);
 }
 
 TEST(evil_fedInfo_test, helicsFederateInfoSetBroker)
 {
-    //void helicsFederateInfoSetBroker(helics_federate_info fi, const char* broker, helics_error* err);
+    char rdata[256];
+    helics_federate_info evil_fi = reinterpret_cast<helics_federate_info>(rdata);
+    auto err = helicsErrorInitialize();
+    err.error_code = 45;
+    helicsFederateInfoSetBroker(nullptr, nullptr, &err);
+    helicsErrorClear(&err);
+    helicsFederateInfoSetBroker(evil_fi, "10.0.0.1", &err);
+    EXPECT_NE(err.error_code, 0);
 }
 
 TEST(evil_fedInfo_test, helicsFederateInfoSetBrokerKey)
 {
-    //void helicsFederateInfoSetBrokerKey(helics_federate_info fi, const char* brokerkey, helics_error* err);
+    char rdata[256];
+    helics_federate_info evil_fi = reinterpret_cast<helics_federate_info>(rdata);
+    auto err = helicsErrorInitialize();
+    err.error_code = 45;
+    helicsFederateInfoSetBrokerKey(nullptr, "key", &err);
+    helicsErrorClear(&err);
+    helicsFederateInfoSetBrokerKey(evil_fi, "key", &err);
+    EXPECT_NE(err.error_code, 0);
 }
 
 TEST(evil_fedInfo_test, helicsFederateInfoSetBrokerPort)
 {
-    //void helicsFederateInfoSetBrokerPort(helics_federate_info fi, int brokerPort, helics_error* err);
+    char rdata[256];
+    helics_federate_info evil_fi = reinterpret_cast<helics_federate_info>(rdata);
+    auto err = helicsErrorInitialize();
+    err.error_code = 45;
+    helicsFederateInfoSetBrokerPort(nullptr, 9999, &err);
+    helicsErrorClear(&err);
+    helicsFederateInfoSetBrokerPort(nullptr, 9999, &err);
+    EXPECT_NE(err.error_code, 0);
+    helicsErrorClear(&err);
+    helicsFederateInfoSetBrokerPort(evil_fi, 9999, &err);
+    EXPECT_NE(err.error_code, 0);
 }
 
 TEST(evil_fedInfo_test, helicsFederateInfoSetLocalPort)
 {
-    //void helicsFederateInfoSetLocalPort(helics_federate_info fi, const char* localPort, helics_error* err);
+    char rdata[256];
+    helics_federate_info evil_fi = reinterpret_cast<helics_federate_info>(rdata);
+    auto err = helicsErrorInitialize();
+    err.error_code = 45;
+    helicsFederateInfoSetLocalPort(nullptr, "9999", &err);
+    helicsErrorClear(&err);
+    helicsFederateInfoSetLocalPort(nullptr, "9999", &err);
+    EXPECT_NE(err.error_code, 0);
+    helicsErrorClear(&err);
+    helicsFederateInfoSetLocalPort(evil_fi, "9999", &err);
+    EXPECT_NE(err.error_code, 0);
 }
 
 TEST(evil_fedInfo_test, helicsFederateInfoSetFlagOption)
 {
-    //void helicsFederateInfoSetFlagOption(helics_federate_info fi, int flag, helics_bool value, helics_error* err);
+    char rdata[256];
+    helics_federate_info evil_fi = reinterpret_cast<helics_federate_info>(rdata);
+    auto err = helicsErrorInitialize();
+    err.error_code = 45;
+    helicsFederateInfoSetFlagOption(nullptr, 9, helics_false, &err);
+    helicsErrorClear(&err);
+    helicsFederateInfoSetFlagOption(evil_fi, 9, helics_false, &err);
+    EXPECT_NE(err.error_code, 0);
 }
 
 TEST(evil_fedInfo_test, helicsFederateInfoSetSeparator)
 {
-    //void helicsFederateInfoSetSeparator(helics_federate_info fi, char separator, helics_error* err);
+    char rdata[256];
+    helics_federate_info evil_fi = reinterpret_cast<helics_federate_info>(rdata);
+    auto err = helicsErrorInitialize();
+    err.error_code = 45;
+    helicsFederateInfoSetSeparator(nullptr, '-', &err);
+    helicsErrorClear(&err);
+    helicsFederateInfoSetSeparator(evil_fi, '-', &err);
+    EXPECT_NE(err.error_code, 0);
 }
 
 TEST(evil_fedInfo_test, helicsFederateInfoSetTimeProperty)
 {
-    //void helicsFederateInfoSetTimeProperty(helics_federate_info fi, int timeProperty, helics_time propertyValue, helics_error* err);
+    char rdata[256];
+    helics_federate_info evil_fi = reinterpret_cast<helics_federate_info>(rdata);
+    auto err = helicsErrorInitialize();
+    err.error_code = 45;
+    helicsFederateInfoSetTimeProperty(nullptr, 99, 4.35, &err);
+    helicsErrorClear(&err);
+    helicsFederateInfoSetTimeProperty(evil_fi, 99, 4.35, &err);
+    EXPECT_NE(err.error_code, 0);
 }
 
 TEST(evil_fedInfo_test, helicsFederateInfoSetIntegerProperty)
 {
-    //void helicsFederateInfoSetIntegerProperty(helics_federate_info fi, int intProperty, int propertyValue, helics_error* err);
+    char rdata[256];
+    helics_federate_info evil_fi = reinterpret_cast<helics_federate_info>(rdata);
+    auto err = helicsErrorInitialize();
+    err.error_code = 45;
+    helicsFederateInfoSetIntegerProperty(nullptr, 987, -54, &err);
+    EXPECT_EQ(err.error_code, 45);
+    helicsErrorClear(&err);
+    helicsFederateInfoSetIntegerProperty(evil_fi, 987, -54, &err);
+    EXPECT_NE(err.error_code, 0);
 }
 
 //section Federate Functions
