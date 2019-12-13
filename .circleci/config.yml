@@ -25,7 +25,7 @@ aliases:
   - &run_helics_tests
     name: run_helics_tests
     command: |
-       /root/project/scripts/run-nighly-circleci-tests.sh
+       /root/project/scripts/run-circleci-tests.sh
        RESULT=$?
        exit $RESULT
 
