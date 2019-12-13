@@ -78,7 +78,7 @@ There are a number of different options and approaches at this point depending o
 
 <div class="admonition note">
 
-Note: For any of these options, if you want to install in a custom location, you can add the following CMake argument: `-DCMAKE_INSTALL_PREFIX=/path/to/install/folder/`
+Note: For any of these options, if you want to install in a custom location, you can add the following CMake argument: `-DCMAKE_INSTALL_PREFIX=/path/to/install/folder/`. There are also many other options, and you can check them out by running `ccmake .` in the `build` folder. 
 
 Keep in mind running HELICS commands like `helics_app` will not work from just any old random folder with a custom install folder.
 You will either need to run them from inside the `bin` subfolder of your custom install, or provide a more complete path to the command.
@@ -103,7 +103,7 @@ make install
 Run the following:
 
 ```bash
-cmake -DBUILD_PYTHON_INTERFACE=ON -DCMAKE_INSTALL_PREFIX=$HOME/local/helics-2.1.0/ ..
+cmake -DBUILD_PYTHON_INTERFACE=ON -DCMAKE_INSTALL_PREFIX=$HOME/local/helics-master/ ..
 make -j8
 make install
 ```
@@ -111,12 +111,12 @@ make install
 Add the following to your `~/.bashrc` file.
 
 ```bash
-export PYTHONPATH=$HOME/local/helics-X.X.X/python:$PYTHONPATH
+export PYTHONPATH=$HOME/local/helics-master/python:$PYTHONPATH
 ```
 
 ### Building HELICS with MATLAB support
 
-To install HELICS with MATLAB support, you will need to add `-DBUILD_MATLAB_INTERFACE=ON`.
+To install HELICS with MATLAB support, you will need to add run cmake with the `-DBUILD_MATLAB_INTERFACE=ON` option.
 
 The important thing to note is that the MATLAB binaries are in the PATH.
 Specifically, `mex` must be available in the PATH.
@@ -138,7 +138,7 @@ git clone https://github.com/GMLC-TDC/HELICS
 cd HELICS
 mkdir build-osx
 cd build-osx
-cmake -DBUILD_MATLAB_INTERFACE=ON -DCMAKE_INSTALL_PREFIX=$HOME/local/helics-develop/ ..
+cmake -DBUILD_MATLAB_INTERFACE=ON -DCMAKE_INSTALL_PREFIX=$HOME/local/helics-master/ ..
 make -j8
 make install
 ```
