@@ -701,7 +701,7 @@ int helicsInputGetRawValueSize(helics_input inp)
 {
     auto inpObj = verifyInput(inp, nullptr);
     if (inpObj == nullptr) {
-        return (-1);
+        return (0);
     }
     return static_cast<int>(inpObj->inputPtr->getRawSize());
 }
@@ -828,14 +828,14 @@ char helicsInputGetChar(helics_input inp, helics_error* err)
 {
     auto inpObj = verifyInput(inp, err);
     if (inpObj == nullptr) {
-        return -1;
+        return '\x15'; //NAK (negative acknowledgment) symbol
     }
     try {
         return inpObj->inputPtr->getValue<char>();
     }
     catch (...) {
         helicsErrorHandler(err);
-        return -1;
+        return '\x15'; //NAK (negative acknowledgment) symbol
     }
 }
 
@@ -843,10 +843,6 @@ void helicsInputGetComplex(helics_input inp, double* real, double* imag, helics_
 {
     auto inpObj = verifyInput(inp, err);
     if (inpObj == nullptr) {
-        return;
-    }
-    if ((real == nullptr) && (imag == nullptr)) {
-        // no errors here the caller just didn't want any values for some reason
         return;
     }
     try {
@@ -869,7 +865,7 @@ helics_complex helicsInputGetComplexObject(helics_input inp, helics_error* err)
 
     if (inpObj == nullptr) {
         // time invalid is just an invalid double
-        return {helics_time_invalid, 0.0};
+        return {helics_time_invalid, helics_time_invalid };
     }
 
     try {
@@ -878,7 +874,7 @@ helics_complex helicsInputGetComplexObject(helics_input inp, helics_error* err)
     }
     catch (...) {
         helicsErrorHandler(err);
-        return {helics_time_invalid, 0.0};
+        return {helics_time_invalid, helics_time_invalid };
     }
 }
 

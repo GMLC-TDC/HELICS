@@ -185,7 +185,7 @@ void helicsFederateInfoFree(helics_federate_info fi)
 {
     auto info = getFedInfo(fi, nullptr);
     if (info == nullptr) {
-        fprintf(stderr, "The helics_federate_info object is not valid\n");
+        //fprintf(stderr, "The helics_federate_info object is not valid\n");
         return;
     }
     info->uniqueKey = 0;
