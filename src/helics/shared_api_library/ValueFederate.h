@@ -427,24 +427,27 @@ HELICS_EXPORT helics_time helicsInputGetTime(helics_input ipt, helics_error* err
     @param[in,out] err a pointer to an error object for catching errors
     @endforcpponly
     @return the resulting character value
+    //NAK (negative acknowledgment) symbol returned on error
     */
 HELICS_EXPORT char helicsInputGetChar(helics_input ipt, helics_error* err);
 
 /** get a complex object from an input object
     @param ipt the input to get the data for
     @forcpponly
-    @param[in,out] err a helic error object, if the object is not empty the function is bypassed otherwise it is filled in if there is an
+    @param[in,out] err a helics error object, if the object is not empty the function is bypassed otherwise it is filled in if there is an
     @endforcpponly
     error
     @return a helics_complex structure with the value
     */
 HELICS_EXPORT helics_complex helicsInputGetComplexObject(helics_input ipt, helics_error* err);
+
 /** get a pair of double forming a complex number from a subscriptions
     @param ipt the input to get the data for
     @param[out] real memory location to place the real part of a value
     @param[out] imag memory location to place the imaginary part of a value
     @forcpponly
-    @param[in,out] err an error object that will contain an error code and string if any error occurred during the execution of the function
+    @param[in,out] err an error object that will contain an error code and string if any error occurred during the execution of the function.
+    On error the values will not be altered.
     @endforcpponly
     */
 HELICS_EXPORT void helicsInputGetComplex(helics_input ipt, double* real, double* imag, helics_error* err);

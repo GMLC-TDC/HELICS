@@ -588,27 +588,27 @@ helics_time helicsFederateRequestTimeIterative(
     helics_federate fed,
     helics_time requestTime,
     helics_iteration_request iterate,
-    helics_iteration_result* outIterate,
+    helics_iteration_result* outIteration,
     helics_error* err)
 {
     auto fedObj = getFed(fed, err);
     if (fedObj == nullptr) {
-        if (outIterate != nullptr) {
-            *outIterate = helics_iteration_result_error;
+        if (outIteration != nullptr) {
+            *outIteration = helics_iteration_result_error;
         }
         return helics_time_invalid;
     }
     try {
         auto val = fedObj->requestTimeIterative(requestTime, getIterationRequest(iterate));
-        if (outIterate != nullptr) {
-            *outIterate = getIterationStatus(val.state);
+        if (outIteration != nullptr) {
+            *outIteration = getIterationStatus(val.state);
         }
         return (val.grantedTime < helics::Time::maxVal()) ? static_cast<double>(val.grantedTime) : helics_time_maxtime;
     }
     catch (...) {
         helicsErrorHandler(err);
-        if (outIterate != nullptr) {
-            *outIterate = helics_iteration_result_error;
+        if (outIteration != nullptr) {
+            *outIteration = helics_iteration_result_error;
         }
         return helics_time_invalid;
     }
@@ -666,6 +666,9 @@ helics_time helicsFederateRequestTimeIterativeComplete(helics_federate fed, heli
 {
     auto fedObj = getFed(fed, err);
     if (fedObj == nullptr) {
+        if (outIteration != nullptr) {
+            *outIteration = helics_iteration_result_error;
+        }
         return helics_time_invalid;
     }
     try {
@@ -677,6 +680,9 @@ helics_time helicsFederateRequestTimeIterativeComplete(helics_federate fed, heli
     }
     catch (...) {
         helicsErrorHandler(err);
+        if (outIteration != nullptr) {
+            *outIteration = helics_iteration_result_error;
+        }
         return helics_time_invalid;
     }
 }

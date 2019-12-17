@@ -17,6 +17,7 @@ set(
     # test-message-federate_cpp.cpp
     # FederateTests.cpp
     TimingTests.cpp
+    evilInputTests.cpp
     # iterationTests.cpp
     QueryTests.cpp badInputTests.cpp comboConfigTests.cpp loggingTests.cpp
 )

@@ -728,7 +728,7 @@ HELICS_EXPORT helics_time helicsFederateRequestNextStep(helics_federate fed, hel
     @param fed the federate to make the request of
     @param requestTime the next desired time
     @param iterate the requested iteration mode
-    @param[out] outIterate  the iteration specification of the result
+    @param[out] outIteration  the iteration specification of the result
     @forcpponly
     @param[in,out] err an error object that will contain an error code and string if any error occurred during the execution of the function
     @endforcpponly
@@ -739,7 +739,7 @@ HELICS_EXPORT helics_time helicsFederateRequestTimeIterative(
     helics_federate fed,
     helics_time requestTime,
     helics_iteration_request iterate,
-    helics_iteration_result* outIterate,
+    helics_iteration_result* outIteration,
     helics_error* err);
 
 /** request the next time for federate execution in an asynchronous call

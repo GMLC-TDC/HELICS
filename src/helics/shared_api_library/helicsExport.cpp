@@ -185,7 +185,7 @@ void helicsFederateInfoFree(helics_federate_info fi)
 {
     auto info = getFedInfo(fi, nullptr);
     if (info == nullptr) {
-        fprintf(stderr, "The helics_federate_info object is not valid\n");
+        //fprintf(stderr, "The helics_federate_info object is not valid\n");
         return;
     }
     info->uniqueKey = 0;
@@ -1199,7 +1199,7 @@ void helicsQueryFree(helics_query query)
 {
     auto queryObj = getQueryObj(query, nullptr);
     if (queryObj == nullptr) {
-        fprintf(stderr, "invalid query object\n");
+        //  fprintf(stderr, "invalid query object\n");
         return;
     }
     queryObj->valid = 0;
