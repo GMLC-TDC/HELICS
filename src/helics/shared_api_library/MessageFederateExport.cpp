@@ -636,10 +636,8 @@ static constexpr char invalidMessageObject[] = "The message object was not valid
 helics::Message* getMessageObj(helics_message_object message, helics_error* err)
 {
     helics::Message* mess = reinterpret_cast<helics::Message*>(message);
-    if (mess == nullptr || mess->messageValidation != messageKeyCode)
-    {
-        if (err != nullptr)
-        {
+    if (mess == nullptr || mess->messageValidation != messageKeyCode) {
+        if (err != nullptr) {
             err->error_code = helics_error_invalid_argument;
             err->message = invalidMessageObject;
         }
@@ -738,23 +736,19 @@ void helicsMessageGetRawData(helics_message_object message, void* data, int maxM
     static constexpr char invalidInsufficient[] = "the given storage was not sufficient to store the message";
     auto mess = getMessageObj(message, err);
     if (mess == nullptr) {
-        if (actualSize != nullptr)
-        {
+        if (actualSize != nullptr) {
             *actualSize = 0;
         }
         return;
     }
-    if (data == nullptr || maxMessagelen <= 0)
-    {
-        if (actualSize != nullptr)
-        {
+    if (data == nullptr || maxMessagelen <= 0) {
+        if (actualSize != nullptr) {
             *actualSize = 0;
         }
         return;
     }
     if (static_cast<int>(mess->data.size()) > maxMessagelen) {
-        if (actualSize != nullptr)
-        {
+        if (actualSize != nullptr) {
             *actualSize = 0;
         }
         if (err != nullptr) {
@@ -765,8 +759,7 @@ void helicsMessageGetRawData(helics_message_object message, void* data, int maxM
     }
 
     memcpy(data, mess->data.data(), mess->data.size());
-    if (actualSize != nullptr)
-    {
+    if (actualSize != nullptr) {
         *actualSize = static_cast<int>(mess->data.size());
     }
     return;
@@ -798,7 +791,6 @@ void helicsMessageSetSource(helics_message_object message, const char* src, heli
     }
     if (message == nullptr) {
         if (err != nullptr) {
-            
         }
         return;
     }

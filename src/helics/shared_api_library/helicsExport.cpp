@@ -1199,7 +1199,7 @@ void helicsQueryFree(helics_query query)
 {
     auto queryObj = getQueryObj(query, nullptr);
     if (queryObj == nullptr) {
-      //  fprintf(stderr, "invalid query object\n");
+        //  fprintf(stderr, "invalid query object\n");
         return;
     }
     queryObj->valid = 0;
