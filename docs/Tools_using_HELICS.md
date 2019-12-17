@@ -28,6 +28,10 @@ The following list of tools is a list of tools that have worked with HELICS at s
 -   [Plexos](https://energyexemplar.com/solutions/plexos/) A commercial production cost simulator. Support via OpenPlexos is under development
 -   [MATPOWER](http://www.pserc.cornell.edu/matpower/) (described above) also includes basic optimal powerflow support.
 
+### Contingency Analysis tools
+- [CAPE](https://new.siemens.com/global/en/products/energy/services/transmission-distribution-smart-grid/consulting-and-planning/pss-software/psscape.html) protection system modeling (IN development)
+- [DCAT](https://www.pnnl.gov/main/publications/external/technical_reports/PNNL-26197.pdf) Dynamic contingency analysis tool
+
 ## Communication Tools
 
 -   HELICS provides built-in support for simple communications manipulations such as delays, lossy channels, etc. through its built-in filters.
@@ -42,6 +46,10 @@ The following list of tools is a list of tools that have worked with HELICS at s
 
 ## Optimization packages
 
-- [GAMS]()
+- [GAMS](https://www.gams.com/)
 - [JuMP](https://www.juliaopt.org/) support is provided through the HELICS Julia interface
 
+## Transportation modeling
+These are in development and are not operational yet
+- [Beam](http://beam.lbl.gov/)  An upcoming project will be developing a beam interface to HELICS. 
+- [Polaris](https://www.anl.gov/es/polaris-transportation-system-simulation-tool) An upcoming project will be developing a polaris interface to HELICS.
