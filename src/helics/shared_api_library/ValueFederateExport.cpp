@@ -865,7 +865,7 @@ helics_complex helicsInputGetComplexObject(helics_input inp, helics_error* err)
 
     if (inpObj == nullptr) {
         // time invalid is just an invalid double
-        return {helics_time_invalid, helics_time_invalid };
+        return {helics_time_invalid, helics_time_invalid};
     }
 
     try {
@@ -874,7 +874,7 @@ helics_complex helicsInputGetComplexObject(helics_input inp, helics_error* err)
     }
     catch (...) {
         helicsErrorHandler(err);
-        return {helics_time_invalid, helics_time_invalid };
+        return {helics_time_invalid, helics_time_invalid};
     }
 }
 
