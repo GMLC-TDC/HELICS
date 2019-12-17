@@ -16097,7 +16097,7 @@ static PyMethodDef SwigMethods[] = {
 		"   :param requestTime: the next desired time\n"
 		"   :type iterate: int\n"
 		"   :param iterate: the requested iteration mode\n"
-		"       outIterate  the iteration specification of the result\n"
+		"       outIteration  the iteration specification of the result\n"
 		"\n"
 		"   :rtype: float\n"
 		"   :return: the granted time, will return helics_time_maxtime if the simulation has terminated along with the appropriate iteration result\n"
@@ -16743,6 +16743,7 @@ static PyMethodDef SwigMethods[] = {
 		"\n"
 		"   :rtype: char\n"
 		"   :return: the resulting character value\n"
+		"   NAK (negative acknowledgment) symbol returned on error\n"
 		""},
 	 { "helicsInputGetComplexObject", _wrap_helicsInputGetComplexObject, METH_O, "\n"
 		"get a complex object from an input object\n"

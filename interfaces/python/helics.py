@@ -1233,7 +1233,7 @@ def helicsFederateRequestTimeIterative(fed: "helics_federate", requestTime: "hel
        :param requestTime: the next desired time
        :type iterate: int
        :param iterate: the requested iteration mode
-           outIterate  the iteration specification of the result
+           outIteration  the iteration specification of the result
 
        :rtype: float
        :return: the granted time, will return helics_time_maxtime if the simulation has terminated along with the appropriate iteration result
@@ -2092,6 +2092,7 @@ def helicsInputGetChar(ipt: "helics_input") -> "char":
 
        :rtype: char
        :return: the resulting character value
+       NAK (negative acknowledgment) symbol returned on error
     """
     return _helics.helicsInputGetChar(ipt)
 
