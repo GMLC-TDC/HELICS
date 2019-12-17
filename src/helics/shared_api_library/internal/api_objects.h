@@ -160,6 +160,7 @@ helics::ValueFederate* getValueFed(helics_federate fed, helics_error* err);
 helics::MessageFederate* getMessageFed(helics_federate fed, helics_error* err);
 helics::Core* getCore(helics_core core, helics_error* err);
 helics::Broker* getBroker(helics_broker broker, helics_error* err);
+helics::Message* getMessageObj(helics_message_object message, helics_error* err);
 
 std::shared_ptr<helics::Federate> getFedSharedPtr(helics_federate fed, helics_error* err);
 std::shared_ptr<helics::ValueFederate> getValueFedSharedPtr(helics_federate fed, helics_error* err);

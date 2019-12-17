@@ -144,8 +144,9 @@ inline bool operator!=(const data_block& db1, const data_block& db2)
 class Message {
   public:
     Time time = timeZero; //!< the event time the message is sent
-    std::uint16_t flags = 0; //!< message flags
-    int32_t messageID = 0; //!< the messageID for a message
+    std::uint16_t flags{ 0 }; //!< message flags
+    std::uint16_t messageValidation{ 0U };  //!< extra field for user object usage, not used by HELICS
+    int32_t messageID{ 0 }; //!< the messageID for a message
     data_block data; //!< the data packet for the message
     std::string dest; //!< the destination of the message
     std::string source; //!< the most recent source of the message
