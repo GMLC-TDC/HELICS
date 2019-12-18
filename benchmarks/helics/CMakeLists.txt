@@ -17,6 +17,7 @@ set(HELICS_BENCHMARKS
     echoMessageBenchmarks
     messageSendBenchmarks
     pholdBenchmarks
+    timingBenchmarks
 )
 
 # Only affects current directory, so safe
