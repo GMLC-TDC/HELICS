@@ -18,7 +18,7 @@ bool hasTomlExtension(const std::string& tomlString)
     return ((ext == "toml") || (ext == "TOML") || (ext == ".ini") || (ext == ".INI"));
 }
 
-toml::Value loadToml(const std::string& tomlString)
+toml::value loadToml(const std::string& tomlString)
 {
     if (tomlString.size() > 128) {
         try {
@@ -31,65 +31,53 @@ toml::Value loadToml(const std::string& tomlString)
     std::ifstream file(tomlString);
 
     if (file.is_open()) {
-        toml::ParseResult pr = toml::parse(file);
-        if (!pr.valid()) {
-            throw(std::invalid_argument(pr.errorReason));
-        }
-
-        return pr.value;
+        return toml::parse(file);
     }
     return loadTomlStr(tomlString);
 }
 
-toml::Value loadTomlStr(const std::string& tomlString)
+toml::value loadTomlStr(const std::string& tomlString)
 {
     std::istringstream tstring(tomlString);
-    toml::ParseResult pr = toml::parse(tstring);
-    if (pr.valid()) {
-        return pr.value;
-    }
-    throw(std::invalid_argument(pr.errorReason));
+    toml::value pr = toml::parse(tstring);
+    return pr;
 }
 
+static const std::string emptyString;
+
 /** read a time from a JSON value element*/
-helics::Time loadTomlTime(const toml::Value& timeElement, time_units defaultUnits)
+helics::Time loadTomlTime(const toml::value& timeElement, time_units defaultUnits)
 {
-    if (timeElement.is<toml::Table>()) {
-        auto units = timeElement.find("units");
-        if (units != nullptr) {
-            defaultUnits = gmlc::utilities::timeUnitsFromString(units->as<std::string>());
+    if (timeElement.is_table()) {
+        auto &units = toml::find_or<std::string>(timeElement,"units",emptyString);
+        if (!units.empty()) {
+            defaultUnits = gmlc::utilities::timeUnitsFromString(units);
         }
-        auto val = timeElement.find("value");
-        if (val != nullptr) {
-            if (val->is<int64_t>()) {
-                return {val->as<int64_t>(), defaultUnits};
+        toml::value emptyVal;
+        auto val = toml::find_or(timeElement,"value",emptyVal);
+        if (!val.is_uninitialized()) {
+            if (val.is_integer()) {
+                return {val.as_integer(), defaultUnits};
             }
-            return {val->as<double>() * toSecondMultiplier(defaultUnits)};
+            return {val.as_floating() * toSecondMultiplier(defaultUnits)};
         }
-    } else if (timeElement.is<int64_t>()) {
-        return {timeElement.as<int64_t>(), defaultUnits};
-    } else if (timeElement.is<double>()) {
-        return {timeElement.as<double>() * toSecondMultiplier(defaultUnits)};
-    } else if (timeElement.is<toml::Time>()) {
-        return {
-            static_cast<std::chrono::nanoseconds>(timeElement.as<toml::Time>().time_since_epoch())};
+    } else if (timeElement.is_integer()) {
+        return {timeElement.as_integer(), defaultUnits};
+    } else if (timeElement.is_floating()) {
+        return {timeElement.as_floating() * toSecondMultiplier(defaultUnits)};
+    } else if (timeElement.is_local_time()) {
+        return { toml::get<std::chrono::nanoseconds>(timeElement) };
     } else {
-        return gmlc::utilities::loadTimeFromString<helics::Time>(timeElement.as<std::string>());
+        return gmlc::utilities::loadTimeFromString<helics::Time>(timeElement.as_string());
     }
     return helics::Time::minVal();
 }
 
-std::string getKey(const toml::Value& element)
+std::string getKey(const toml::value& element)
 {
-    std::string retval;
-    auto mem = element.find("key");
-    if (mem != nullptr) {
-        retval = mem->as<std::string>();
-    } else {
-        auto name = element.find("name");
-        if (name != nullptr) {
-            retval = name->as<std::string>();
-        }
+    std::string retval = toml::find_or(element, "key", emptyString);
+    if (retval.empty()) {
+        retval = toml::find_or(element, "name", emptyString);
     }
     return retval;
 }

@@ -11,25 +11,27 @@ SPDX-License-Identifier: BSD-3-Clause
 
 namespace helics {
 template<typename Callable>
-void addTargets(const toml::Value& section, std::string targetName, Callable callback)
+void addTargets(const toml::value& section, std::string targetName, Callable callback)
 {
+    toml::value uval;
     // There should probably be a static_assert here but there isn't a nice type trait to check that
-    auto targets = section.find(targetName);
-    if (targets != nullptr) {
-        if (targets->is<toml::Array>()) {
-            auto& targetArray = targets->as<toml::Array>();
+    auto targets = toml::find_or(section, targetName, uval);
+    if (!targets.is_uninitialized()) {
+        if (targets.is_array()) {
+            auto& targetArray = targets.as_array();
             for (const auto& target : targetArray) {
-                callback(target.as<std::string>());
+                callback(target.as_string());
             }
         } else {
-            callback(targets->as<std::string>());
+            callback(targets.as_string());
         }
     }
     if (targetName.back() == 's') {
         targetName.pop_back();
-        auto target = section.find(targetName);
-        if (target != nullptr) {
-            callback(target->as<std::string>());
+        std::string target;
+        target = toml::find_or(section, targetName, target);
+        if (!target.empty()) {
+            callback(target);
         }
     }
 }
