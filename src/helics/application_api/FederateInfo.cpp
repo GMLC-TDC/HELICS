@@ -540,7 +540,7 @@ FederateInfo loadFederateInfoJson(const std::string& jsonString)
 FederateInfo loadFederateInfoToml(const std::string& tomlString)
 {
     FederateInfo fi;
-    toml::Value doc;
+    toml::value doc;
     try {
         doc = loadToml(tomlString);
     }
@@ -574,7 +574,7 @@ FederateInfo loadFederateInfoToml(const std::string& tomlString)
         callIfMember(doc, prop, flagCall);
     }
     if (isMember(doc, "flags")) {
-        loadFlags(fi, doc["flags"].as<std::string>());
+        loadFlags(fi, toml::find<std::string>(doc,"flags"));
     }
     replaceIfMember(doc, "autobroker", fi.autobroker);
     replaceIfMember(doc, "broker", fi.broker);
@@ -584,47 +584,47 @@ FederateInfo loadFederateInfoToml(const std::string& tomlString)
     if (isMember(doc, "port")) {
         if (fi.localport.empty()) {
             if (fi.brokerPort < 0) {
-                fi.brokerPort = doc["port"].as<int>();
+                fi.brokerPort = doc["port"].as_integer();
             } else {
-                fi.localport = doc["port"].as<std::string>();
+                fi.localport = doc["port"].as_string();
             }
         } else {
             if (fi.brokerPort < 0) {
-                fi.brokerPort = doc["port"].as<int>();
+                fi.brokerPort = doc["port"].as_integer();
             }
         }
     }
     if (isMember(doc, "separator")) {
-        auto sep = doc["separator"].as<std::string>();
+        std::string sep = doc["separator"].as_string();
         if (!sep.empty()) {
             fi.separator = sep[0];
         }
     }
     if (isMember(doc, "core")) {
         try {
-            fi.coreType = coreTypeFromString(doc["core"].as<std::string>());
+            fi.coreType = coreTypeFromString(doc["core"].as_string());
         }
         catch (const std::invalid_argument&) {
-            fi.coreName = doc["core"].as<std::string>();
+            fi.coreName = doc["core"].as_string();
         }
     }
     if (isMember(doc, "coreType")) {
         try {
-            fi.coreType = coreTypeFromString(doc["coreType"].as<std::string>());
+            fi.coreType = coreTypeFromString(doc["coreType"].as_string());
         }
         catch (const std::invalid_argument&) {
             std::cerr << "Unrecognized core type\n";
         }
     } else if (isMember(doc, "coretype")) {
         try {
-            fi.coreType = coreTypeFromString(doc["coretype"].as<std::string>());
+            fi.coreType = coreTypeFromString(doc["coretype"].as_string());
         }
         catch (const std::invalid_argument&) {
             std::cerr << "Unrecognized core type\n";
         }
     } else if (isMember(doc, "type")) {
         try {
-            fi.coreType = coreTypeFromString(doc["type"].as<std::string>());
+            fi.coreType = coreTypeFromString(doc["type"].as_string());
         }
         catch (const std::invalid_argument&) {
             std::cerr << "Unrecognized core type\n";
