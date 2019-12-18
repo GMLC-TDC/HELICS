@@ -887,13 +887,13 @@ public class helics {
    *     @param fed the federate to make the request of<br>
    *     @param requestTime the next desired time<br>
    *     @param iterate the requested iteration mode<br>
-   *     outIterate  the iteration specification of the result<br>
+   *     outIteration  the iteration specification of the result<br>
    * <br>
    *     @return the granted time, will return helics_time_maxtime if the simulation has terminated along with the appropriate iteration result<br>
    *     value
    */
-  public static double helicsFederateRequestTimeIterative(SWIGTYPE_p_void fed, double requestTime, helics_iteration_request iterate, int[] outIterate) {
-    return helicsJNI.helicsFederateRequestTimeIterative(SWIGTYPE_p_void.getCPtr(fed), requestTime, iterate.swigValue(), outIterate);
+  public static double helicsFederateRequestTimeIterative(SWIGTYPE_p_void fed, double requestTime, helics_iteration_request iterate, int[] outIteration) {
+    return helicsJNI.helicsFederateRequestTimeIterative(SWIGTYPE_p_void.getCPtr(fed), requestTime, iterate.swigValue(), outIteration);
   }
 
   /**
@@ -1658,7 +1658,8 @@ public class helics {
    *  get a single character value from an input<br>
    *     @param ipt the input to get the data for<br>
    * <br>
-   *     @return the resulting character value
+   *     @return the resulting character value<br>
+   * NAK (negative acknowledgment) symbol returned on error
    */
   public static char helicsInputGetChar(SWIGTYPE_p_void ipt) {
     return helicsJNI.helicsInputGetChar(SWIGTYPE_p_void.getCPtr(ipt));
