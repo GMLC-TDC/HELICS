@@ -28,7 +28,7 @@ toml::value loadToml(const std::string& tomlString)
             // just pass through this was an assumption
         }
     }
-    std::ifstream file(tomlString);
+    std::ifstream file(tomlString, std::ios_base::binary);
 
     if (file.is_open()) {
         return toml::parse(file);

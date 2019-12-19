@@ -579,7 +579,7 @@ FederateInfo loadFederateInfoToml(const std::string& tomlString)
     replaceIfMember(doc, "autobroker", fi.autobroker);
     replaceIfMember(doc, "broker", fi.broker);
     replaceIfMember(doc, "key", fi.key);
-    fi.brokerPort = getOrDefault(doc, "brokerport", fi.brokerPort);
+    fi.brokerPort = static_cast<int>(getOrDefault(doc, "brokerport", int64_t(fi.brokerPort)));
     replaceIfMember(doc, "localport", fi.localport);
     if (isMember(doc, "port")) {
         if (fi.localport.empty()) {

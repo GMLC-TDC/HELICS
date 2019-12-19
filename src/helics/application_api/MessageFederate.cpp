@@ -184,7 +184,7 @@ void MessageFederate::registerMessageInterfacesJson(const std::string& jsonStrin
 
 void MessageFederate::registerMessageInterfacesToml(const std::string& tomlString)
 {
-    toml::Value doc;
+    toml::value doc;
     try {
         doc = loadToml(tomlString);
     }
@@ -193,9 +193,10 @@ void MessageFederate::registerMessageInterfacesToml(const std::string& tomlStrin
     }
     bool defaultGlobal = false;
     replaceIfMember(doc, "defaultglobal", defaultGlobal);
-    auto epts = doc.find("endpoints");
-    if (epts != nullptr) {
-        auto& eptArray = epts->as<toml::Array>();
+    
+    if (isMember(doc,"endpoints")) {
+        auto epts = toml::find(doc,"endpoints");
+        auto& eptArray = epts.as_array();
         for (auto& ept : eptArray) {
             auto key = getKey(ept);
             auto type = getOrDefault(ept, "type", emptyStr);

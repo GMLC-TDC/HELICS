@@ -834,7 +834,7 @@ void Federate::registerFilterInterfacesJson(const std::string& jsonString)
 
 void Federate::registerFilterInterfacesToml(const std::string& tomlString)
 {
-    toml::Value doc;
+    toml::value doc;
     try {
         doc = loadToml(tomlString);
     }
@@ -842,9 +842,9 @@ void Federate::registerFilterInterfacesToml(const std::string& tomlString)
         throw(helics::InvalidParameter(ia.what()));
     }
 
-    auto filts = doc.find("filters");
-    if (filts != nullptr) {
-        auto& filtArray = filts->as<toml::Array>();
+    if (isMember(doc, "filters")) {
+        auto filts = toml::find(doc, "filters");
+        auto& filtArray = filts.as_array();
         for (const auto& filt : filtArray) {
             std::string key = getOrDefault(filt, "name", emptyStr);
             bool cloningflag = getOrDefault(filt, "cloning", false);
@@ -875,55 +875,61 @@ void Federate::registerFilterInterfacesToml(const std::string& tomlString)
                     static_cast<CloningFilter&>(filter).addDeliveryEndpoint(target);
                 });
             }
-            auto props = filt.find("properties");
-            if (props != nullptr) {
-                if (props->is<toml::Array>()) {
-                    auto& propArray = props->as<toml::Array>();
+                if (isMember(doc, "properties")) {
+                    auto props = toml::find(doc, "properties");
+                if (props.is_array()) {
+                    auto& propArray = props.as_array();
                     for (const auto& prop : propArray) {
-                        auto propname = prop.find("name");
-                        auto propval = prop.find("value");
+                        std::string propname;
+                        propname = toml::find_or(prop,"name",propname);
+                        toml::value uVal;
+                        auto propval = toml::find_or(prop,"value",uVal);
 
-                        if ((propname == nullptr) || (propval == nullptr)) {
+                        if ((propname.empty()) || (propval.is_uninitialized())) {
                             std::cerr
                                 << "properties must be specified with \"name\" and \"value\" fields\n";
                             continue;
                         }
-                        if (propval->isNumber()) {
-                            filter.set(propname->as<std::string>(), propval->as<double>());
+                        if (propval.is_floating()) {
+                            filter.set(propname, propval.as_floating());
                         } else {
                             filter.setString(
-                                propname->as<std::string>(), propval->as<std::string>());
+                                propname, propval.as_string());
                         }
                     }
                 } else {
-                    auto propname = props->find("name");
-                    auto propval = props->find("value");
+                    std::string propname;
+                    propname = toml::find_or(props, "name", propname);
+                    toml::value uVal;
+                    auto propval = toml::find_or(props, "value", uVal);
 
-                    if ((propname == nullptr) || (propval == nullptr)) {
+                    if ((propname.empty()) || (propval.is_uninitialized())) {
                         std::cerr
                             << "properties must be specified with \"name\" and \"value\" fields\n";
                         continue;
                     }
-                    if (propval->isNumber()) {
-                        filter.set(propname->as<std::string>(), propval->as<double>());
-                    } else {
-                        filter.setString(propname->as<std::string>(), propval->as<std::string>());
+                    if (propval.is_floating()) {
+                        filter.set(propname, propval.as_floating());
+                    }
+                    else {
+                        filter.setString(
+                            propname, propval.as_string());
                     }
                 }
             }
         }
     }
-    auto globals = doc.find("globals");
-    if (globals != nullptr) {
-        if (globals->is<toml::Array>()) {
-            for (auto& val : globals->as<toml::Array>()) {
+    if (isMember(doc, "globals")) {
+        auto globals = toml::find(doc, "globals");
+        if (globals.is_array()) {
+            for (auto& val : globals.as_array()) {
                 setGlobal(
-                    val.as<toml::Array>()[0].as<std::string>(),
-                    val.as<toml::Array>()[1].as<std::string>());
+                    val.as_array()[0].as_string(),
+                    val.as_array()[1].as_string());
             }
         } else {
-            for (const auto& val : globals->as<toml::Table>()) {
-                setGlobal(val.first, val.second.as<std::string>());
+            for (const auto& val : globals.as_table()) {
+                setGlobal(val.first, val.second.as_string());
             }
         }
     }
