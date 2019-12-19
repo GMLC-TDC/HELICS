@@ -23,4 +23,4 @@
 	url = https://github.com/LLNL/units.git
 [submodule "ThirdParty/toml11"]
 	path = ThirdParty/toml11
-	url = https://github.com/ToruNiina/toml11.git
+	url = https://github.com/GMLC-TDC/toml11.git
