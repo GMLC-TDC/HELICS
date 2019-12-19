@@ -36,8 +36,30 @@ std::string getKey(const toml::value& element);
 template<class X>
 inline X getOrDefault(const toml::value& element, const std::string& key, const X& defVal)
 {
-    return toml::find_or<X>(element,key,defVal)
+    return toml::find_or<X>(element, key, defVal);
 }
+
+inline std::string
+getOrDefault(const toml::value& element, const std::string& key, const std::string& defVal)
+{
+    return toml::find_or<std::string>(element, key, defVal);
+}
+
+inline double getOrDefault(const toml::value& element, const std::string& key, double defVal)
+{
+    return toml::find_or<double>(element, key, defVal);
+}
+
+inline bool getOrDefault(const toml::value& element, const std::string& key, bool defVal)
+{
+    return toml::find_or<bool>(element, key, defVal);
+}
+
+inline int64_t getOrDefault(const toml::value& element, const std::string& key, int64_t defVal)
+{
+    return toml::find_or<int64_t>(element, key, defVal);
+}
+
 
 inline void callIfMember(
     const toml::value& element,
@@ -76,7 +98,7 @@ inline void callIfMember(
     auto val = toml::find_or(element, key, uval);
     if (!val.is_uninitialized())
     {
-        call(key, tom::get<X>(val));
+        call(key, toml::get<X>(val));
     }
 }
 
@@ -96,11 +118,11 @@ template<class X>
 inline void replaceIfMember(const toml::value& element, const std::string& key, X& loc)
 {
     toml::value uval;
-    auto &val = toml::find_or(element, key, uval);
+    auto val = toml::find_or(element, key, uval);
 
     if (!val.is_uninitialized())
     {
-        loc = val->as<X>();
+        loc = toml::get<X>(val);
     }
 }
 

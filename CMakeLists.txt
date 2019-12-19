@@ -835,8 +835,6 @@ set(LICENSE_LIST
     "${PROJECT_SOURCE_DIR}/ThirdParty/units/LICENSE"
     "JsonCpp"
     "${PROJECT_SOURCE_DIR}/ThirdParty/jsoncpp/LICENSE"
-    "tinytoml"
-    "${PROJECT_SOURCE_DIR}/ThirdParty/toml/LICENSE"
     "toml11"
     "${PROJECT_SOURCE_DIR}/ThirdParty/toml11/LICENSE"
     "GMLC Utilities"
