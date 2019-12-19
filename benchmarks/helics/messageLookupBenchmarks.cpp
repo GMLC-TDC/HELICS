@@ -106,7 +106,7 @@ class messageGenerator {
     }
 };
 
-static void BM_mgen_singleCore(benchmark::State& state)
+static void BMmgen_singleCore(benchmark::State& state)
 {
     for (auto _ : state) {
         state.PauseTiming();
@@ -130,14 +130,14 @@ static void BM_mgen_singleCore(benchmark::State& state)
     }
 }
 // Register the function as a benchmark
-BENCHMARK(BM_mgen_singleCore)
+BENCHMARK(BMmgen_singleCore)
     ->RangeMultiplier(4)
     ->Range(1, 1 << 18)
     ->Unit(benchmark::TimeUnit::kMillisecond)
     ->Iterations(1)
     ->UseRealTime();
 
-static void BM_mgen_multiCore(benchmark::State& state, core_type cType)
+static void BMmgen_multiCore(benchmark::State& state, core_type cType)
 {
     for (auto _ : state) {
         if (state.range(0) < state.range(1) * 8) {
@@ -191,21 +191,21 @@ static void BM_mgen_multiCore(benchmark::State& state, core_type cType)
 }
 
 // Register the test core benchmarks
-BENCHMARK_CAPTURE(BM_mgen_multiCore, inprocCore, core_type::INPROC)
+BENCHMARK_CAPTURE(BMmgen_multiCore, inprocCore, core_type::INPROC)
     ->Unit(benchmark::TimeUnit::kMillisecond)
     ->Ranges({{32, 1 << 15}, {2, 64}})
     ->Iterations(1)
     ->UseRealTime();
 
 // Register the test core benchmarks
-BENCHMARK_CAPTURE(BM_mgen_multiCore, inprocCore_big2, core_type::INPROC)
+BENCHMARK_CAPTURE(BMmgen_multiCore, inprocCore_big2, core_type::INPROC)
     ->Unit(benchmark::TimeUnit::kMillisecond)
     ->Ranges({{1 << 17, 1 << 19}, {2, 2}})
     ->Iterations(1)
     ->UseRealTime();
 
 // Register the test core benchmarks
-BENCHMARK_CAPTURE(BM_mgen_multiCore, inprocCore_big8, core_type::INPROC)
+BENCHMARK_CAPTURE(BMmgen_multiCore, inprocCore_big8, core_type::INPROC)
     ->Unit(benchmark::TimeUnit::kMillisecond)
     ->Ranges({{1 << 17, 1 << 19}, {8, 8}})
     ->Iterations(1)

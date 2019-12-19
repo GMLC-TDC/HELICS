@@ -17,6 +17,7 @@ set(HELICS_BENCHMARKS
     echoMessageBenchmarks
     messageSendBenchmarks
     pholdBenchmarks
+    timingBenchmarks
 )
 
 # Only affects current directory, so safe
@@ -51,6 +52,7 @@ add_custom_target(RUN_ALL_BENCHMARKS
 				  COMMAND ringBenchmarks --benchmark_format=json ">${BM_RESULT_DIR}bm_ringResults${current_date}_${rname}.txt"
 				  COMMAND messageLookupBenchmarks --benchmark_format=json ">${BM_RESULT_DIR}bm_messageLookupResults${current_date}_${rname}.txt"
 				  COMMAND echoMessageBenchmarks --benchmark_format=json ">${BM_RESULT_DIR}bm_echoMessageResults${current_date}_${rname}.txt"
+                  COMMAND timingBenchmarks --benchmark_format=json ">${BM_RESULT_DIR}bm_timingResults${current_date}_${rname}.txt"
 				  COMMAND filterBenchmarks --benchmark_format=json ">${BM_RESULT_DIR}bm_filterResults${current_date}_${rname}.txt"
 				  COMMAND pholdBenchmarks --benchmark_format=json ">${BM_RESULT_DIR}bm_pholdResults${current_date}_${rname}.txt"
 				  COMMAND messageSendBenchmarks --benchmark_format=json ">${BM_RESULT_DIR}bm_messageSendResults${current_date}_${rname}.txt"
@@ -65,6 +67,7 @@ set_target_properties(RUN_ALL_BENCHMARKS PROPERTIES FOLDER benchmarks)
 add_custom_target(RUN_KEY_BENCHMARKS  
                   COMMAND conversionBenchmarks --benchmark_format=json ">${BM_RESULT_DIR}bmk_conversionResults${current_date}_${rname}.txt"
 				  COMMAND echoBenchmarks --benchmark_format=json --benchmark_filter=/4 ">${BM_RESULT_DIR}bmk_echoResults${current_date}_${rname}.txt"
+                  COMMAND timingBenchmarks --benchmark_format=json --benchmark_filter=/4 ">${BM_RESULT_DIR}bmk_timingResults${current_date}_${rname}.txt"
 				  COMMAND messageLookupBenchmarks --benchmark_format=json --benchmark_filter=/[0-9][0-9][0-9][0-9]/ ">${BM_RESULT_DIR}bmk_messageLookupResults${current_date}_${rname}.txt"
 				  COMMAND echoMessageBenchmarks --benchmark_format=json --benchmark_filter=/4 ">${BM_RESULT_DIR}bmk_echoMessageResults${current_date}_${rname}.txt"
 				  )
