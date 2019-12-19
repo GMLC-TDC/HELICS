@@ -10,7 +10,7 @@ SPDX-License-Identifier: BSD-3-Clause
 
 using namespace helics;
 
-static void BM_AM_toString(benchmark::State& state)
+static void BMtoString(benchmark::State& state)
 {
     ActionMessage obj(CMD_REG_FED);
     obj.name = "the name of the federate is really long";
@@ -22,9 +22,9 @@ static void BM_AM_toString(benchmark::State& state)
     }
 }
 // Register the function as a benchmark
-BENCHMARK(BM_AM_toString);
+BENCHMARK(BMtoString);
 
-static void BM_AM_FromString(benchmark::State& state)
+static void BMfromString(benchmark::State& state)
 {
     ActionMessage obj(CMD_REG_FED);
     obj.name = "the name of the federate is really long";
@@ -39,9 +39,9 @@ static void BM_AM_FromString(benchmark::State& state)
     }
 }
 // Register the function as a benchmark
-BENCHMARK(BM_AM_FromString);
+BENCHMARK(BMfromString);
 
-static void BM_AM_toString_time(benchmark::State& state)
+static void BMtoString_time(benchmark::State& state)
 {
     ActionMessage obj(CMD_TIME_REQUEST);
     std::string load;
@@ -51,9 +51,9 @@ static void BM_AM_toString_time(benchmark::State& state)
     }
 }
 // Register the function as a benchmark
-BENCHMARK(BM_AM_toString_time);
+BENCHMARK(BMtoString_time);
 
-static void BM_AM_FromString_time(benchmark::State& state)
+static void BMfromString_time(benchmark::State& state)
 {
     ActionMessage obj(CMD_TIME_REQUEST);
     std::string load;
@@ -66,9 +66,9 @@ static void BM_AM_FromString_time(benchmark::State& state)
     }
 }
 // Register the function as a benchmark
-BENCHMARK(BM_AM_FromString_time);
+BENCHMARK(BMfromString_time);
 
-static void BM_AM_packetize(benchmark::State& state)
+static void BMpacketize(benchmark::State& state)
 {
     ActionMessage obj(CMD_REG_FED);
     obj.name = "the name of the federate is really long";
@@ -80,9 +80,9 @@ static void BM_AM_packetize(benchmark::State& state)
     }
 }
 // Register the function as a benchmark
-BENCHMARK(BM_AM_packetize);
+BENCHMARK(BMpacketize);
 
-static void BM_AM_depacketize(benchmark::State& state)
+static void BMdepacketize(benchmark::State& state)
 {
     ActionMessage obj(CMD_REG_FED);
     obj.name = "the name of the federate is really long";
@@ -97,9 +97,9 @@ static void BM_AM_depacketize(benchmark::State& state)
     }
 }
 // Register the function as a benchmark
-BENCHMARK(BM_AM_depacketize);
+BENCHMARK(BMdepacketize);
 
-static void BM_AM_packetize_strings(benchmark::State& state)
+static void BMpacketizeStrings(benchmark::State& state)
 {
     ActionMessage obj(CMD_MULTI_MESSAGE);
     obj.name = "sstring";
@@ -113,9 +113,9 @@ static void BM_AM_packetize_strings(benchmark::State& state)
     }
 }
 // Register the function as a benchmark
-BENCHMARK(BM_AM_packetize_strings);
+BENCHMARK(BMpacketizeStrings);
 
-static void BM_AM_depacketize_strings(benchmark::State& state)
+static void BMdepacketizeStrings(benchmark::State& state)
 {
     ActionMessage obj(CMD_MULTI_MESSAGE);
     obj.name = "sstring";
@@ -132,6 +132,6 @@ static void BM_AM_depacketize_strings(benchmark::State& state)
     }
 }
 // Register the function as a benchmark
-BENCHMARK(BM_AM_depacketize_strings);
+BENCHMARK(BMdepacketizeStrings);
 
 HELICS_BENCHMARK_MAIN(actionMessageBenchmark);

@@ -101,7 +101,7 @@ class RingTransmit {
     }
 };
 
-static void BM_ring2_singleCore(benchmark::State& state)
+static void BMring2_singleCore(benchmark::State& state)
 {
     for (auto _ : state) {
         state.PauseTiming();
@@ -136,12 +136,12 @@ static void BM_ring2_singleCore(benchmark::State& state)
     }
 }
 // Register the function as a benchmark
-BENCHMARK(BM_ring2_singleCore)
+BENCHMARK(BMring2_singleCore)
     ->Unit(benchmark::TimeUnit::kMillisecond)
     ->UseRealTime()
     ->Iterations(3);
 
-static void BM_ring_multiCore(benchmark::State& state, core_type cType)
+static void BMring_multiCore(benchmark::State& state, core_type cType)
 {
     for (auto _ : state) {
         state.PauseTiming();
@@ -190,7 +190,7 @@ static void BM_ring_multiCore(benchmark::State& state, core_type cType)
 }
 
 // Register the test core benchmarks
-BENCHMARK_CAPTURE(BM_ring_multiCore, inprocCore, core_type::INPROC)
+BENCHMARK_CAPTURE(BMring_multiCore, inprocCore, core_type::INPROC)
     ->Unit(benchmark::TimeUnit::kMillisecond)
     ->Arg(2)
     ->Arg(3)
@@ -202,7 +202,7 @@ BENCHMARK_CAPTURE(BM_ring_multiCore, inprocCore, core_type::INPROC)
 
 #ifdef ENABLE_ZMQ_CORE
 // Register the ZMQ benchmarks
-BENCHMARK_CAPTURE(BM_ring_multiCore, zmqCore, core_type::ZMQ)
+BENCHMARK_CAPTURE(BMring_multiCore, zmqCore, core_type::ZMQ)
     ->Unit(benchmark::TimeUnit::kMillisecond)
     ->Arg(2)
     ->Arg(3)
@@ -212,7 +212,7 @@ BENCHMARK_CAPTURE(BM_ring_multiCore, zmqCore, core_type::ZMQ)
     ->UseRealTime();
 
 // Register the ZMQ benchmarks
-BENCHMARK_CAPTURE(BM_ring_multiCore, zmqssCore, core_type::ZMQ_SS)
+BENCHMARK_CAPTURE(BMring_multiCore, zmqssCore, core_type::ZMQ_SS)
     ->Unit(benchmark::TimeUnit::kMillisecond)
     ->Arg(2)
     ->Arg(3)
@@ -224,7 +224,7 @@ BENCHMARK_CAPTURE(BM_ring_multiCore, zmqssCore, core_type::ZMQ_SS)
 
 #ifdef ENABLE_IPC_CORE
 // Register the IPC benchmarks
-BENCHMARK_CAPTURE(BM_ring_multiCore, ipcCore, core_type::IPC)
+BENCHMARK_CAPTURE(BMring_multiCore, ipcCore, core_type::IPC)
     ->Unit(benchmark::TimeUnit::kMillisecond)
     ->Arg(2)
     ->Arg(3)
@@ -234,7 +234,7 @@ BENCHMARK_CAPTURE(BM_ring_multiCore, ipcCore, core_type::IPC)
 
 #ifdef ENABLE_TCP_CORE
 // Register the TCP benchmarks
-BENCHMARK_CAPTURE(BM_ring_multiCore, tcpCore, core_type::TCP)
+BENCHMARK_CAPTURE(BMring_multiCore, tcpCore, core_type::TCP)
     ->Unit(benchmark::TimeUnit::kMillisecond)
     ->Arg(2)
     ->Arg(3)
@@ -244,7 +244,7 @@ BENCHMARK_CAPTURE(BM_ring_multiCore, tcpCore, core_type::TCP)
     ->UseRealTime();
 
 // Register the TCP SS benchmarks
-BENCHMARK_CAPTURE(BM_ring_multiCore, tcpssCore, core_type::TCP_SS)
+BENCHMARK_CAPTURE(BMring_multiCore, tcpssCore, core_type::TCP_SS)
     ->Unit(benchmark::TimeUnit::kMillisecond)
     ->Arg(2)
     ->Arg(3)
@@ -257,7 +257,7 @@ BENCHMARK_CAPTURE(BM_ring_multiCore, tcpssCore, core_type::TCP_SS)
 
 #ifdef ENABLE_UDP_CORE
 // Register the UDP benchmarks
-BENCHMARK_CAPTURE(BM_ring_multiCore, udpCore, core_type::UDP)
+BENCHMARK_CAPTURE(BMring_multiCore, udpCore, core_type::UDP)
     ->Unit(benchmark::TimeUnit::kMillisecond)
     ->Arg(2)
     ->Arg(3)

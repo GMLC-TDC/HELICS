@@ -22,7 +22,7 @@ SPDX-License-Identifier: BSD-3-Clause
 // static constexpr helics::Time tend = 3600.0_t;  // simulation end time
 using namespace helics;
 
-static void BM_filter_singleCore(benchmark::State& state)
+static void BMfilter_singleCore(benchmark::State& state)
 {
     for (auto _ : state) {
         state.PauseTiming();
@@ -66,14 +66,14 @@ static void BM_filter_singleCore(benchmark::State& state)
     }
 }
 // Register the function as a benchmark
-BENCHMARK(BM_filter_singleCore)
+BENCHMARK(BMfilter_singleCore)
     ->RangeMultiplier(2)
     ->Ranges({{1, 32}, {1, 2}})
     ->Unit(benchmark::TimeUnit::kMillisecond)
     ->Iterations(1)
     ->UseRealTime();
 
-static void BM_filter_multiCore(benchmark::State& state, core_type cType)
+static void BMfilter_multiCore(benchmark::State& state, core_type cType)
 {
     for (auto _ : state) {
         state.PauseTiming();
@@ -135,14 +135,14 @@ static void BM_filter_multiCore(benchmark::State& state, core_type cType)
 
 static constexpr int64_t maxscale{1 << 5};
 // Register the inproc core benchmarks
-BENCHMARK_CAPTURE(BM_filter_multiCore, inprocCore, core_type::INPROC)
+BENCHMARK_CAPTURE(BMfilter_multiCore, inprocCore, core_type::INPROC)
     ->RangeMultiplier(2)
     ->Ranges({{1, maxscale * 2}, {1, 2}})
     ->Unit(benchmark::TimeUnit::kMillisecond)
     ->UseRealTime();
 #ifdef ENABLE_ZMQ_CORE
 // Register the ZMQ benchmarks
-BENCHMARK_CAPTURE(BM_filter_multiCore, zmqCore, core_type::ZMQ)
+BENCHMARK_CAPTURE(BMfilter_multiCore, zmqCore, core_type::ZMQ)
     ->RangeMultiplier(2)
     ->Ranges({{1, maxscale}, {1, 2}})
     ->Iterations(1)
@@ -150,7 +150,7 @@ BENCHMARK_CAPTURE(BM_filter_multiCore, zmqCore, core_type::ZMQ)
     ->UseRealTime();
 
 // Register the ZMQ benchmarks
-BENCHMARK_CAPTURE(BM_filter_multiCore, zmqssCore, core_type::ZMQ_SS)
+BENCHMARK_CAPTURE(BMfilter_multiCore, zmqssCore, core_type::ZMQ_SS)
     ->RangeMultiplier(2)
     ->Ranges({{1, maxscale}, {1, 2}})
     ->Iterations(1)
@@ -161,7 +161,7 @@ BENCHMARK_CAPTURE(BM_filter_multiCore, zmqssCore, core_type::ZMQ_SS)
 
 #ifdef ENABLE_IPC_CORE
 // Register the IPC benchmarks
-BENCHMARK_CAPTURE(BM_filter_multiCore, ipcCore, core_type::IPC)
+BENCHMARK_CAPTURE(BMfilter_multiCore, ipcCore, core_type::IPC)
     ->RangeMultiplier(2)
     ->Ranges({{1, maxscale}, {1, 2}})
     ->Iterations(1)
@@ -172,7 +172,7 @@ BENCHMARK_CAPTURE(BM_filter_multiCore, ipcCore, core_type::IPC)
 
 #ifdef ENABLE_TCP_CORE
 // Register the TCP benchmarks
-BENCHMARK_CAPTURE(BM_filter_multiCore, tcpCore, core_type::TCP)
+BENCHMARK_CAPTURE(BMfilter_multiCore, tcpCore, core_type::TCP)
     ->RangeMultiplier(2)
     ->Ranges({{1, maxscale}, {1, 2}})
     ->Iterations(1)
@@ -180,7 +180,7 @@ BENCHMARK_CAPTURE(BM_filter_multiCore, tcpCore, core_type::TCP)
     ->UseRealTime();
 
 // Register the TCP SS benchmarks
-BENCHMARK_CAPTURE(BM_filter_multiCore, tcpssCore, core_type::TCP_SS)
+BENCHMARK_CAPTURE(BMfilter_multiCore, tcpssCore, core_type::TCP_SS)
     ->RangeMultiplier(2)
     ->Ranges({{1, maxscale}, {1, 2}})
     ->Iterations(1)
@@ -191,7 +191,7 @@ BENCHMARK_CAPTURE(BM_filter_multiCore, tcpssCore, core_type::TCP_SS)
 
 #ifdef ENABLE_UDP_CORE
 // Register the UDP benchmarks
-BENCHMARK_CAPTURE(BM_filter_multiCore, udpCore, core_type::UDP)
+BENCHMARK_CAPTURE(BMfilter_multiCore, udpCore, core_type::UDP)
     ->RangeMultiplier(2)
     ->Ranges({{1, maxscale}, {1, 2}})
     ->Iterations(1)

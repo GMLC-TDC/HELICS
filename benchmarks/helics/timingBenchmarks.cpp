@@ -26,7 +26,7 @@ using helics::operator"" _t;
 // static constexpr helics::Time tend = 3600.0_t;  // simulation end time
 using namespace helics;
 /** class implementing the hub for an echo test*/
-class EchoHub {
+class TimingHub {
   public:
     helics::Time finalTime = helics::Time(100, time_units::ms); // final time
   private:
@@ -38,7 +38,7 @@ class EchoHub {
     bool readyToRun = false;
 
   public:
-    EchoHub() = default;
+    TimingHub() = default;
 
     void run(std::function<void()> callOnReady = {})
     {
@@ -80,19 +80,13 @@ class EchoHub {
     {
         auto cTime = 0.0_t;
         while (cTime <= finalTime) {
-            for (int ii = 0; ii < cnt_; ++ii) {
-                if (vFed->isUpdated(subs[ii])) {
-                    auto& val = vFed->getString(subs[ii]);
-                    pubs[ii].publish(val);
-                }
-            }
             cTime = vFed->requestTime(finalTime + 0.05);
         }
         vFed->finalize();
     }
 };
 
-class EchoLeaf {
+class TimingLeaf {
   private:
     std::unique_ptr<helics::ValueFederate> vFed;
     helics::Publication pub;
@@ -103,7 +97,7 @@ class EchoLeaf {
     bool readyToRun = false;
 
   public:
-    EchoLeaf() = default;
+    TimingLeaf() = default;
 
     void run(std::function<void()> callOnReady = {})
     {
@@ -141,27 +135,16 @@ class EchoLeaf {
         int cnt = 0;
         // this is  to make a fixed size string that is different for each federate but has sufficient length to
         // get beyond SSO
-        const std::string txstring = std::to_string(100000 + index_) + std::string(100, '1');
         const int iter = 5000;
         while (cnt <= iter + 1) {
             vFed->requestNextStep();
             ++cnt;
-            if (cnt <= iter) {
-                vFed->publish(pub, txstring);
-            }
-            if (vFed->isUpdated(sub)) {
-                auto& nstring = vFed->getString(sub);
-                if (nstring != txstring) {
-                    std::cout << "incorrect string\n";
-                    break;
-                }
-            }
         }
         vFed->finalize();
     }
 };
 
-static void BM_echo_singleCore(benchmark::State& state)
+static void BMtiming_singleCore(benchmark::State& state)
 {
     for (auto _ : state) {
         state.PauseTiming();
@@ -170,9 +153,9 @@ static void BM_echo_singleCore(benchmark::State& state)
         gmlc::concurrency::Barrier brr(static_cast<size_t>(feds) + 1);
         auto wcore = helics::CoreFactory::create(
             core_type::INPROC, std::string("--autobroker --federates=") + std::to_string(feds + 1));
-        EchoHub hub;
+        TimingHub hub;
         hub.initialize(wcore->getIdentifier(), feds);
-        std::vector<EchoLeaf> leafs(feds);
+        std::vector<TimingLeaf> leafs(feds);
         for (int ii = 0; ii < feds; ++ii) {
             leafs[ii].initialize(wcore->getIdentifier(), ii);
         }
@@ -180,7 +163,7 @@ static void BM_echo_singleCore(benchmark::State& state)
         std::vector<std::thread> threadlist(static_cast<size_t>(feds));
         for (int ii = 0; ii < feds; ++ii) {
             threadlist[ii] = std::thread(
-                [&](EchoLeaf& lf) { lf.run([&brr]() { brr.wait(); }); }, std::ref(leafs[ii]));
+                [&](TimingLeaf& lf) { lf.run([&brr]() { brr.wait(); }); }, std::ref(leafs[ii]));
         }
         hub.makeReady();
         brr.wait();
@@ -196,14 +179,14 @@ static void BM_echo_singleCore(benchmark::State& state)
     }
 }
 // Register the function as a benchmark
-BENCHMARK(BM_echo_singleCore)
+BENCHMARK(BMtiming_singleCore)
     ->RangeMultiplier(2)
     ->Range(1, 1 << 8)
     ->Unit(benchmark::TimeUnit::kMillisecond)
     ->Iterations(1)
     ->UseRealTime();
 
-static void BM_echo_multiCore(benchmark::State& state, core_type cType)
+static void BMtiming_multiCore(benchmark::State& state, core_type cType)
 {
     for (auto _ : state) {
         state.PauseTiming();
@@ -217,9 +200,9 @@ static void BM_echo_multiCore(benchmark::State& state, core_type cType)
         auto wcore =
             helics::CoreFactory::create(cType, std::string("--federates=1 --log_level=no_print"));
         // this is to delay until the threads are ready
-        EchoHub hub;
+        TimingHub hub;
         hub.initialize(wcore->getIdentifier(), feds);
-        std::vector<EchoLeaf> leafs(feds);
+        std::vector<TimingLeaf> leafs(feds);
         std::vector<std::shared_ptr<helics::Core>> cores(feds);
         for (int ii = 0; ii < feds; ++ii) {
             cores[ii] = helics::CoreFactory::create(cType, "-f 1 --log_level=no_print");
@@ -230,7 +213,7 @@ static void BM_echo_multiCore(benchmark::State& state, core_type cType)
         std::vector<std::thread> threadlist(static_cast<size_t>(feds));
         for (int ii = 0; ii < feds; ++ii) {
             threadlist[ii] = std::thread(
-                [&](EchoLeaf& lf) { lf.run([&brr]() { brr.wait(); }); }, std::ref(leafs[ii]));
+                [&](TimingLeaf& lf) { lf.run([&brr]() { brr.wait(); }); }, std::ref(leafs[ii]));
         }
         hub.makeReady();
         brr.wait();
@@ -252,7 +235,7 @@ static void BM_echo_multiCore(benchmark::State& state, core_type cType)
 
 static constexpr int64_t maxscale{1 << 4};
 // Register the inproc core benchmarks
-BENCHMARK_CAPTURE(BM_echo_multiCore, inprocCore, core_type::INPROC)
+BENCHMARK_CAPTURE(BMtiming_multiCore, inprocCore, core_type::INPROC)
     ->RangeMultiplier(2)
     ->Range(1, maxscale)
     ->Unit(benchmark::TimeUnit::kMillisecond)
@@ -260,7 +243,7 @@ BENCHMARK_CAPTURE(BM_echo_multiCore, inprocCore, core_type::INPROC)
 
 #ifdef ENABLE_ZMQ_CORE
 // Register the ZMQ benchmarks
-BENCHMARK_CAPTURE(BM_echo_multiCore, zmqCore, core_type::ZMQ)
+BENCHMARK_CAPTURE(BMtiming_multiCore, zmqCore, core_type::ZMQ)
     ->RangeMultiplier(2)
     ->Range(1, maxscale)
     ->Iterations(1)
@@ -268,7 +251,7 @@ BENCHMARK_CAPTURE(BM_echo_multiCore, zmqCore, core_type::ZMQ)
     ->UseRealTime();
 
 // Register the ZMQ benchmarks
-BENCHMARK_CAPTURE(BM_echo_multiCore, zmqssCore, core_type::ZMQ_SS)
+BENCHMARK_CAPTURE(BMtiming_multiCore, zmqssCore, core_type::ZMQ_SS)
     ->RangeMultiplier(2)
     ->Range(1, maxscale)
     ->Iterations(1)
@@ -279,7 +262,7 @@ BENCHMARK_CAPTURE(BM_echo_multiCore, zmqssCore, core_type::ZMQ_SS)
 
 #ifdef ENABLE_IPC_CORE
 // Register the IPC benchmarks
-BENCHMARK_CAPTURE(BM_echo_multiCore, ipcCore, core_type::IPC)
+BENCHMARK_CAPTURE(BMtiming_multiCore, ipcCore, core_type::IPC)
     ->RangeMultiplier(2)
     ->Range(1, maxscale)
     ->Iterations(1)
@@ -290,7 +273,7 @@ BENCHMARK_CAPTURE(BM_echo_multiCore, ipcCore, core_type::IPC)
 
 #ifdef ENABLE_TCP_CORE
 // Register the TCP benchmarks
-BENCHMARK_CAPTURE(BM_echo_multiCore, tcpCore, core_type::TCP)
+BENCHMARK_CAPTURE(BMtiming_multiCore, tcpCore, core_type::TCP)
     ->RangeMultiplier(2)
     ->Range(1, maxscale)
     ->Iterations(1)
@@ -298,7 +281,7 @@ BENCHMARK_CAPTURE(BM_echo_multiCore, tcpCore, core_type::TCP)
     ->UseRealTime();
 
 // Register the TCP SS benchmarks
-BENCHMARK_CAPTURE(BM_echo_multiCore, tcpssCore, core_type::TCP_SS)
+BENCHMARK_CAPTURE(BMtiming_multiCore, tcpssCore, core_type::TCP_SS)
     ->RangeMultiplier(2)
     ->Range(1, maxscale)
     ->Iterations(1)
@@ -309,7 +292,7 @@ BENCHMARK_CAPTURE(BM_echo_multiCore, tcpssCore, core_type::TCP_SS)
 
 #ifdef ENABLE_UDP_CORE
 // Register the UDP benchmarks
-BENCHMARK_CAPTURE(BM_echo_multiCore, udpCore, core_type::UDP)
+BENCHMARK_CAPTURE(BMtiming_multiCore, udpCore, core_type::UDP)
     ->RangeMultiplier(2)
     ->Range(1, 1 << 4)
     ->Iterations(1)
@@ -317,4 +300,4 @@ BENCHMARK_CAPTURE(BM_echo_multiCore, udpCore, core_type::UDP)
     ->UseRealTime();
 #endif
 
-HELICS_BENCHMARK_MAIN(echoBenchmark);
+HELICS_BENCHMARK_MAIN(timingBenchmark);
