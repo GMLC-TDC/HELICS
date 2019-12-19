@@ -41,7 +41,7 @@ static void BMfromString(benchmark::State& state)
 // Register the function as a benchmark
 BENCHMARK(BMfromString);
 
-static void BMtoString_time(benchmark::State& state)
+static void BMtoStringTime(benchmark::State& state)
 {
     ActionMessage obj(CMD_TIME_REQUEST);
     std::string load;
@@ -51,9 +51,9 @@ static void BMtoString_time(benchmark::State& state)
     }
 }
 // Register the function as a benchmark
-BENCHMARK(BMtoString_time);
+BENCHMARK(BMtoStringTime);
 
-static void BMfromString_time(benchmark::State& state)
+static void BMfromStringTime(benchmark::State& state)
 {
     ActionMessage obj(CMD_TIME_REQUEST);
     std::string load;
@@ -66,7 +66,7 @@ static void BMfromString_time(benchmark::State& state)
     }
 }
 // Register the function as a benchmark
-BENCHMARK(BMfromString_time);
+BENCHMARK(BMfromStringTime);
 
 static void BMpacketize(benchmark::State& state)
 {
