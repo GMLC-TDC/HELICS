@@ -149,7 +149,7 @@ if(MSVC)
     target_compile_options(build_flags_target INTERFACE /EHsc)
 
     if(${PROJECT_NAME}_ENABLE_EXTRA_COMPILER_WARNINGS)
-        target_compile_options(compile_flags_target INTERFACE /W4 /sdl /wd4244 /wd4503 )
+        target_compile_options(compile_flags_target INTERFACE /W4 /sdl /wd4244 /wd4503 /wd4592)
     endif(${PROJECT_NAME}_ENABLE_EXTRA_COMPILER_WARNINGS)
     get_win32_winnt(COPTION_WIN32_WINNT_DEFAULT)
     target_compile_options(compile_flags_target INTERFACE "-D_WIN32_WINNT=${COPTION_WIN32_WINNT_DEFAULT}")
