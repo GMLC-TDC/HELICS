@@ -112,7 +112,7 @@ if(${PROJECT_NAME}_ENABLE_EXTRA_COMPILER_WARNINGS)
         if(CMAKE_CXX_COMPILER_VERSION VERSION_GREATER 7.0)
             target_compile_options(
                 compile_flags_target
-                INTERFACE $<$<COMPILE_LANGUAGE:CXX>:-Wimplicit-fallthrough=2>
+                INTERFACE $<$<COMPILE_LANGUAGE:CXX>:-Wimplicit-fallthrough=2 -Wno-psabi>
             )
         endif()
         if(CMAKE_CXX_COMPILER_VERSION VERSION_GREATER 7.9)
@@ -123,7 +123,7 @@ if(${PROJECT_NAME}_ENABLE_EXTRA_COMPILER_WARNINGS)
         endif()
     endif()
     if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
-	 target_compile_options(
+        target_compile_options(
                 compile_flags_target
                 INTERFACE  $<$<COMPILE_LANGUAGE:CXX>:-Wshadow>
             )
@@ -140,7 +140,6 @@ endif(${PROJECT_NAME}_ENABLE_EXTRA_COMPILER_WARNINGS)
 # Extra definitions for visual studio
 # -------------------------------------------------------------
 if(MSVC)
-
     target_compile_options(
         compile_flags_target
         INTERFACE -D_CRT_SECURE_NO_WARNINGS -D_SCL_SECURE_NO_WARNINGS /MP
@@ -148,13 +147,13 @@ if(MSVC)
     # these next two should be global
     add_compile_options(/EHsc /MP)
     target_compile_options(build_flags_target INTERFACE /EHsc)
-	
+
     if(${PROJECT_NAME}_ENABLE_EXTRA_COMPILER_WARNINGS)
-        target_compile_options(compile_flags_target INTERFACE /W4 /sdl /wd4244 )
+        target_compile_options(compile_flags_target INTERFACE /W4 /sdl /wd4244 /wd4503 )
     endif(${PROJECT_NAME}_ENABLE_EXTRA_COMPILER_WARNINGS)
-	get_win32_winnt(COPTION_WIN32_WINNT_DEFAULT)
+    get_win32_winnt(COPTION_WIN32_WINNT_DEFAULT)
     target_compile_options(compile_flags_target INTERFACE "-D_WIN32_WINNT=${COPTION_WIN32_WINNT_DEFAULT}")
-	message(
+    message(
         STATUS
             "Detected _WIN32_WINNT from CMAKE_SYSTEM_VERSION: ${COPTION_WIN32_WINNT_DEFAULT}"
     )

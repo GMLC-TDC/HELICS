@@ -12,7 +12,14 @@ using the toml library
 */
 
 #include "../core/helics-time.hpp"
+#ifdef __GNUC__
+#    pragma GCC diagnostic push
+#    pragma GCC diagnostic ignored "-Wshadow"
+#endif
 #include "toml.hpp"
+#ifdef __GNUC__
+#    pragma GCC diagnostic pop
+#endif
 
 #include <functional>
 
@@ -40,7 +47,7 @@ inline X getOrDefault(const toml::value& element, const std::string& key, const 
 }
 
 inline std::string
-getOrDefault(const toml::value& element, const std::string& key, const std::string& defVal)
+    getOrDefault(const toml::value& element, const std::string& key, const std::string& defVal)
 {
     return toml::find_or<std::string>(element, key, defVal);
 }
@@ -60,16 +67,14 @@ inline int64_t getOrDefault(const toml::value& element, const std::string& key, 
     return toml::find_or<int64_t>(element, key, defVal);
 }
 
-
 inline void callIfMember(
     const toml::value& element,
     const std::string& key,
     const std::function<void(const std::string&)>& call)
 {
     const std::string empty;
-    auto &val = toml::find_or<std::string>(element, key,empty);
-    if (!val.empty())
-    {
+    auto& val = toml::find_or<std::string>(element, key, empty);
+    if (!val.empty()) {
         call(val);
     }
 }
@@ -81,9 +86,8 @@ inline void callIfMember(
 {
     toml::value uval;
     auto val = toml::find_or(element, key, uval);
-    
-    if (!val.is_uninitialized())
-    {
+
+    if (!val.is_uninitialized()) {
         call(key, loadTomlTime(val));
     }
 }
@@ -96,8 +100,7 @@ inline void callIfMember(
 {
     toml::value uval;
     auto val = toml::find_or(element, key, uval);
-    if (!val.is_uninitialized())
-    {
+    if (!val.is_uninitialized()) {
         call(key, toml::get<X>(val));
     }
 }
@@ -108,8 +111,7 @@ inline void
     toml::value uval;
     auto val = toml::find_or(element, key, uval);
 
-    if (!val.is_uninitialized())
-    {
+    if (!val.is_uninitialized()) {
         timeVal = loadTomlTime(val);
     }
 }
@@ -120,8 +122,7 @@ inline void replaceIfMember(const toml::value& element, const std::string& key, 
     toml::value uval;
     auto val = toml::find_or(element, key, uval);
 
-    if (!val.is_uninitialized())
-    {
+    if (!val.is_uninitialized()) {
         loc = toml::get<X>(val);
     }
 }
@@ -131,5 +132,5 @@ inline bool isMember(const toml::value& element, const std::string& key)
     toml::value uval;
     auto val = toml::find_or(element, key, uval);
 
-    return(!val.is_uninitialized());
+    return (!val.is_uninitialized());
 }
