@@ -875,15 +875,15 @@ void Federate::registerFilterInterfacesToml(const std::string& tomlString)
                     static_cast<CloningFilter&>(filter).addDeliveryEndpoint(target);
                 });
             }
-                if (isMember(doc, "properties")) {
-                    auto props = toml::find(doc, "properties");
+            if (isMember(doc, "properties")) {
+                auto props = toml::find(doc, "properties");
                 if (props.is_array()) {
                     auto& propArray = props.as_array();
                     for (const auto& prop : propArray) {
                         std::string propname;
-                        propname = toml::find_or(prop,"name",propname);
+                        propname = toml::find_or(prop, "name", propname);
                         toml::value uVal;
-                        auto propval = toml::find_or(prop,"value",uVal);
+                        auto propval = toml::find_or(prop, "value", uVal);
 
                         if ((propname.empty()) || (propval.is_uninitialized())) {
                             std::cerr
@@ -893,8 +893,7 @@ void Federate::registerFilterInterfacesToml(const std::string& tomlString)
                         if (propval.is_floating()) {
                             filter.set(propname, propval.as_floating());
                         } else {
-                            filter.setString(
-                                propname, propval.as_string());
+                            filter.setString(propname, propval.as_string());
                         }
                     }
                 } else {
@@ -910,10 +909,8 @@ void Federate::registerFilterInterfacesToml(const std::string& tomlString)
                     }
                     if (propval.is_floating()) {
                         filter.set(propname, propval.as_floating());
-                    }
-                    else {
-                        filter.setString(
-                            propname, propval.as_string());
+                    } else {
+                        filter.setString(propname, propval.as_string());
                     }
                 }
             }
@@ -923,9 +920,7 @@ void Federate::registerFilterInterfacesToml(const std::string& tomlString)
         auto globals = toml::find(doc, "globals");
         if (globals.is_array()) {
             for (auto& val : globals.as_array()) {
-                setGlobal(
-                    val.as_array()[0].as_string(),
-                    val.as_array()[1].as_string());
+                setGlobal(val.as_array()[0].as_string(), val.as_array()[1].as_string());
             }
         } else {
             for (const auto& val : globals.as_table()) {
