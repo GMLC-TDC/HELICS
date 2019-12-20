@@ -574,7 +574,7 @@ FederateInfo loadFederateInfoToml(const std::string& tomlString)
         callIfMember(doc, prop, flagCall);
     }
     if (isMember(doc, "flags")) {
-        loadFlags(fi, toml::find<std::string>(doc,"flags"));
+        loadFlags(fi, toml::find<std::string>(doc, "flags"));
     }
     replaceIfMember(doc, "autobroker", fi.autobroker);
     replaceIfMember(doc, "broker", fi.broker);

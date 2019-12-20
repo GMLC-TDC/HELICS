@@ -32,7 +32,7 @@ void makeConnectionsToml(brkX* brk, const std::string& file)
         throw(helics::InvalidParameter(ia.what()));
     }
 
-    auto conns = toml::find_or(doc,"connections",uVal);
+    auto conns = toml::find_or(doc, "connections", uVal);
     if (!conns.is_uninitialized()) {
         auto& connArray = conns.as_array();
         for (const auto& conn : connArray) {
@@ -54,14 +54,13 @@ void makeConnectionsToml(brkX* brk, const std::string& file)
             }
         }
     }
-        auto filts = toml::find_or(doc, "filters", uVal);
-        if (!filts.is_uninitialized()) {
+    auto filts = toml::find_or(doc, "filters", uVal);
+    if (!filts.is_uninitialized()) {
         auto& filtArray = filts.as_array();
         for (const auto& filt : filtArray) {
             if (filt.is_array()) {
                 auto& filtAct = filt.as_array();
-                brk->addSourceFilterToEndpoint(
-                    filtAct[0].as_string(), filtAct[1].as_string());
+                brk->addSourceFilterToEndpoint(filtAct[0].as_string(), filtAct[1].as_string());
             } else {
                 std::string fname = getOrDefault(filt, "filter", std::string());
                 if (!fname.empty()) {
@@ -80,13 +79,11 @@ void makeConnectionsToml(brkX* brk, const std::string& file)
             }
         }
     }
-        auto globals = toml::find_or(doc, "globals", uVal);
-        if (!globals.is_uninitialized()) {
+    auto globals = toml::find_or(doc, "globals", uVal);
+    if (!globals.is_uninitialized()) {
         if (globals.is_array()) {
             for (auto& val : globals.as_array()) {
-                brk->setGlobal(
-                    val.as_array()[0].as_string(),
-                    val.as_array()[1].as_string());
+                brk->setGlobal(val.as_array()[0].as_string(), val.as_array()[1].as_string());
             }
         } else {
             for (const auto& val : globals.as_table()) {

@@ -281,9 +281,9 @@ void ValueFederate::registerValueInterfacesToml(const std::string& tomlString)
     }
     bool defaultGlobal = false;
     replaceIfMember(doc, "defaultglobal", defaultGlobal);
-    
+
     if (isMember(doc, "publications")) {
-        auto pubs = toml::find(doc,"publications");
+        auto pubs = toml::find(doc, "publications");
         auto& pubArray = pubs.as_array();
         for (const auto& pub : pubArray) {
             auto key = getKey(pub);
