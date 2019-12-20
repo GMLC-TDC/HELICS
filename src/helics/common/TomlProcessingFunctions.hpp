@@ -40,33 +40,31 @@ helics::Time
 /** get a name or key from the element*/
 std::string getKey(const toml::value& element);
 
-template<class X>
-inline X getOrDefault(const toml::value& element, const std::string& key, const X& defVal)
-{
-    return toml::find_or<X>(element, key, defVal);
-}
-
+/** get a string value or use the default if it is not a member*/
 inline std::string
     getOrDefault(const toml::value& element, const std::string& key, const std::string& defVal)
 {
     return toml::find_or<std::string>(element, key, defVal);
 }
-
+/** get a double value or use the default if it is not a member*/
 inline double getOrDefault(const toml::value& element, const std::string& key, double defVal)
 {
     return toml::find_or<double>(element, key, defVal);
 }
 
+/** get a boolean value or use the default if it is not a member*/
 inline bool getOrDefault(const toml::value& element, const std::string& key, bool defVal)
 {
     return toml::find_or<bool>(element, key, defVal);
 }
 
+/** get an integer value or use the default if it is not a member*/
 inline int64_t getOrDefault(const toml::value& element, const std::string& key, int64_t defVal)
 {
     return toml::find_or<int64_t>(element, key, defVal);
 }
 
+/** call a function if a member element exists and pass the string to the invoked object*/
 inline void callIfMember(
     const toml::value& element,
     const std::string& key,
@@ -79,6 +77,7 @@ inline void callIfMember(
     }
 }
 
+/** call a function if a member element exists and pass a time to the invoked object*/
 inline void callIfMember(
     const toml::value& element,
     const std::string& key,
@@ -92,6 +91,7 @@ inline void callIfMember(
     }
 }
 
+/** call a function if a member element exists and pass a specific type to the invoked object*/
 template<class X>
 inline void callIfMember(
     const toml::value& element,
@@ -127,6 +127,7 @@ inline void replaceIfMember(const toml::value& element, const std::string& key, 
     }
 }
 
+/** check if a key is a member of a table object*/
 inline bool isMember(const toml::value& element, const std::string& key)
 {
     toml::value uval;
