@@ -49,12 +49,12 @@ static const std::string emptyString;
 helics::Time loadTomlTime(const toml::value& timeElement, time_units defaultUnits)
 {
     if (timeElement.is_table()) {
-        auto &units = toml::find_or<std::string>(timeElement,"units",emptyString);
+        auto& units = toml::find_or<std::string>(timeElement, "units", emptyString);
         if (!units.empty()) {
             defaultUnits = gmlc::utilities::timeUnitsFromString(units);
         }
         toml::value emptyVal;
-        auto val = toml::find_or(timeElement,"value",emptyVal);
+        auto val = toml::find_or(timeElement, "value", emptyVal);
         if (!val.is_uninitialized()) {
             if (val.is_integer()) {
                 return {val.as_integer(), defaultUnits};
@@ -66,7 +66,7 @@ helics::Time loadTomlTime(const toml::value& timeElement, time_units defaultUnit
     } else if (timeElement.is_floating()) {
         return {timeElement.as_floating() * toSecondMultiplier(defaultUnits)};
     } else if (timeElement.is_local_time()) {
-        return { toml::get<std::chrono::nanoseconds>(timeElement) };
+        return {toml::get<std::chrono::nanoseconds>(timeElement)};
     } else {
         return gmlc::utilities::loadTimeFromString<helics::Time>(timeElement.as_string());
     }

@@ -12,7 +12,7 @@ before_cache:
 
 env:
   global:
-    - MAKEFLAGS="-j 2"
+    - MAKEFLAGS="-j 4"
     - CMAKE_GENERATOR="Unix Makefiles"
 
 # Create aliases for some of shared build configuration
