@@ -71,7 +71,6 @@ if(${PROJECT_NAME}_ENABLE_EXTRA_COMPILER_WARNINGS)
         compile_flags_target
         INTERFACE
             $<$<COMPILE_LANGUAGE:CXX>:$<$<NOT:$<CXX_COMPILER_ID:MSVC>>:-Wextra
-            -Wshadow
             -Wstrict-aliasing=1
             -Wunreachable-code
             -Woverloaded-virtual
@@ -107,7 +106,7 @@ if(${PROJECT_NAME}_ENABLE_EXTRA_COMPILER_WARNINGS)
             target_compile_options(
                 compile_flags_target
                 INTERFACE
-                    $<$<COMPILE_LANGUAGE:CXX>:-Wduplicated-cond -Wnull-dereference>
+                    $<$<COMPILE_LANGUAGE:CXX>:-Wduplicated-cond -Wnull-dereference -Wshadow>
             )
         endif()
         if(CMAKE_CXX_COMPILER_VERSION VERSION_GREATER 7.0)
@@ -124,6 +123,10 @@ if(${PROJECT_NAME}_ENABLE_EXTRA_COMPILER_WARNINGS)
         endif()
     endif()
     if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+	 target_compile_options(
+                compile_flags_target
+                INTERFACE  $<$<COMPILE_LANGUAGE:CXX>:-Wshadow>
+            )
         if(CMAKE_CXX_COMPILER_VERSION VERSION_GREATER 6.0)
             target_compile_options(
                 compile_flags_target
