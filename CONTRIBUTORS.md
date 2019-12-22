@@ -33,7 +33,7 @@ If you would like to contribute to the HELICS project see [CONTRIBUTING](CONTRIB
 ## Used Libraries or Code
 
 ### [BOOST](https://www.boost.org)
-  Boost is used in a few places in the code. The IPC core uses the Boost.Interprocess library Some of the header-only Boost algorithms and other libraries are also used throughout the code. Some of the string parsing can optionally use boost spirit. Boost is licensed under the Boost Software License.  Boost can be removed entirely from the source code with the use of a cmake flag.
+  Boost is used in a few places in the code. The IPC core uses the Boost.Interprocess library. Some of the header-only Boost algorithms and other libraries are also used throughout the code. Some of the string parsing can optionally use boost spirit. Boost is licensed under the Boost Software License.  Boost can be removed entirely from the source code with the use of a cmake flag.
 
 ### [Asio](https://think-async.com/Asio)
   Asio is used for TCP and UDP communication, as well as resolving IP addresses. The Asio library is included as a submodule. Asio is licensed under the [Boost Software License](https://github.com/chriskohlhoff/asio/blob/master/asio/LICENSE_1_0.txt).
@@ -48,7 +48,7 @@ If you would like to contribute to the HELICS project see [CONTRIBUTING](CONTRIB
 CLI11 is a command line parser and was used as a replacement for boost::program_options. Some modifications used in HELICS were committed to the CLI11 library and others are in the process of doing so. The modified single header library is included in the HELICS source code. The project was created by Henry Schreiner. A modified version of the CLI11 header is included with a HELICS install,  Changes are currently being worked into upstream repositories.  CLI11 is available under a [3-Clause BSD](https://github.com/CLIUtils/CLI11/blob/master/LICENSE) license.
 
 ### [toml11](https://github.com/ToruNiina/toml11)
-  toml11 is a C\++11 header-only toml parser/encoder depending only on C++ standard library.  Compatible to the latest version of TOML v0.5.0. toml11 is licensed under [MIT](https://github.com/ToruNiina/toml11/blob/master/LICENSE) license. HELICS includes it through a submodule of a library [fork](https://github.com/GMLC-TDC/toml11) until the changes can be worked upstream.  
+  toml11 is a C\++11 header-only toml parser/encoder depending only on the C++ standard library.  Compatible with the latest version of TOML v0.5.0. toml11 is licensed under the [MIT](https://github.com/ToruNiina/toml11/blob/master/LICENSE) license. HELICS includes it through a submodule of a library [fork](https://github.com/GMLC-TDC/toml11) until the changes can be merged upstream.  
 
 ### [GridDyn](https://github.com/LLNL/GridDyn)
 GridDyn supports HELICS in experimental versions, and several components of GridDyn code were used in the development of HELICS, given they have several of the same authors.  
