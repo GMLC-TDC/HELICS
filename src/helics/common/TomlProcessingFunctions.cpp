@@ -24,23 +24,33 @@ toml::value loadToml(const std::string& tomlString)
         try {
             return loadTomlStr(tomlString);
         }
-        catch (const std::invalid_argument&) {
+        catch (const toml::syntax_error&) {
             // just pass through this was an assumption
         }
     }
     std::ifstream file(tomlString, std::ios_base::binary);
 
-    if (file.is_open()) {
-        return toml::parse(file);
+    try {
+        if (file.is_open()) {
+            return toml::parse(file);
+        }
+        return loadTomlStr(tomlString);
     }
-    return loadTomlStr(tomlString);
+    catch (const toml::syntax_error& se) {
+        throw(std::invalid_argument(se.what()));
+    }
 }
 
 toml::value loadTomlStr(const std::string& tomlString)
 {
-    std::istringstream tstring(tomlString);
-    toml::value pr = toml::parse(tstring);
-    return pr;
+    try {
+        std::istringstream tstring(tomlString);
+        toml::value pr = toml::parse(tstring);
+        return pr;
+    }
+    catch (const toml::syntax_error& se) {
+        throw(std::invalid_argument(se.what()));
+    }
 }
 
 static const std::string emptyString;
@@ -59,7 +69,11 @@ helics::Time loadTomlTime(const toml::value& timeElement, time_units defaultUnit
             if (val.is_integer()) {
                 return {val.as_integer(), defaultUnits};
             }
-            return {val.as_floating() * toSecondMultiplier(defaultUnits)};
+            if (val.is_floating()) {
+                return {val.as_floating() * toSecondMultiplier(defaultUnits)};
+            }
+            return gmlc::utilities::loadTimeFromString<helics::Time>(
+                tomlAsString(val) + " " + units);
         }
     } else if (timeElement.is_integer()) {
         return {timeElement.as_integer(), defaultUnits};
@@ -68,7 +82,7 @@ helics::Time loadTomlTime(const toml::value& timeElement, time_units defaultUnit
     } else if (timeElement.is_local_time()) {
         return {toml::get<std::chrono::nanoseconds>(timeElement)};
     } else {
-        return gmlc::utilities::loadTimeFromString<helics::Time>(timeElement.as_string());
+        return gmlc::utilities::loadTimeFromString<helics::Time>(tomlAsString(timeElement));
     }
     return helics::Time::minVal();
 }
@@ -81,3 +95,20 @@ std::string getKey(const toml::value& element)
     }
     return retval;
 }
+
+std::string tomlAsString(const toml::value& element)
+{
+    switch (element.type()) {
+        case toml::value_t::string:
+            return element.as_string(std::nothrow_t());
+        case toml::value_t::floating:
+            return std::to_string(element.as_floating(std::nothrow_t()));
+        case toml::value_t::integer:
+            return std::to_string(element.as_integer(std::nothrow_t()));
+        default: {
+            std::ostringstream str;
+            str << element;
+            return str.str();
+        }
+        }
+    }

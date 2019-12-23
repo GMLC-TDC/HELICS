@@ -196,6 +196,10 @@ void MessageFederate::registerMessageInterfacesToml(const std::string& tomlStrin
 
     if (isMember(doc, "endpoints")) {
         auto epts = toml::find(doc, "endpoints");
+        if (!epts.is_array())
+        {
+            throw(helics::InvalidParameter("endpoints section in toml file must be an array"));
+        }
         auto& eptArray = epts.as_array();
         for (auto& ept : eptArray) {
             auto key = getKey(ept);

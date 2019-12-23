@@ -284,6 +284,10 @@ void ValueFederate::registerValueInterfacesToml(const std::string& tomlString)
 
     if (isMember(doc, "publications")) {
         auto pubs = toml::find(doc, "publications");
+        if (!pubs.is_array())
+        {
+            throw(helics::InvalidParameter("filters section in yoml file must be an array"));
+        }
         auto& pubArray = pubs.as_array();
         for (const auto& pub : pubArray) {
             auto key = getKey(pub);
@@ -306,6 +310,10 @@ void ValueFederate::registerValueInterfacesToml(const std::string& tomlString)
     }
     if (isMember(doc, "subscriptions")) {
         auto subs = toml::find(doc, "subscriptions");
+        if (!subs.is_array())
+        {
+            throw(helics::InvalidParameter("subscriptions section in toml file must be an array"));
+        }
         auto& subArray = subs.as_array();
         for (const auto& sub : subArray) {
             auto key = getKey(sub);
@@ -324,6 +332,10 @@ void ValueFederate::registerValueInterfacesToml(const std::string& tomlString)
     }
     if (isMember(doc, "inputs")) {
         auto ipts = toml::find(doc, "inputs");
+        if (!ipts.is_array())
+        {
+            throw(helics::InvalidParameter("inputs section in toml file must be an array"));
+        }
         auto& iptArray = ipts.as_array();
         for (const auto& ipt : iptArray) {
             auto key = getKey(ipt);
