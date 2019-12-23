@@ -110,5 +110,5 @@ std::string tomlAsString(const toml::value& element)
             str << element;
             return str.str();
         }
-        }
     }
+}

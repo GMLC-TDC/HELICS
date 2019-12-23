@@ -844,8 +844,7 @@ void Federate::registerFilterInterfacesToml(const std::string& tomlString)
 
     if (isMember(doc, "filters")) {
         auto filts = toml::find(doc, "filters");
-        if (!filts.is_array())
-        {
+        if (!filts.is_array()) {
             throw(helics::InvalidParameter("filters section in toml file must be an array"));
         }
         auto& filtArray = filts.as_array();
