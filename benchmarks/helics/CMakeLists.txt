@@ -46,15 +46,25 @@ string(RANDOM rname)
 set(BM_RESULT_DIR )
 # add a custom target to run all the benchmarks in a consistent fashion
 add_custom_target(RUN_ALL_BENCHMARKS  
+                  COMMAND ${CMAKE_COMMAND} -E echo " running ActionMessageBenchmarks" 
                   COMMAND ActionMessageBenchmarks --benchmark_format=json ">${BM_RESULT_DIR}bm_ActionMessageResults${current_date}_${rname}.txt"
+                  COMMAND ${CMAKE_COMMAND} -E echo " running conversionBenchmarks" 
 				  COMMAND conversionBenchmarks --benchmark_format=json ">${BM_RESULT_DIR}bm_conversionResults${current_date}_${rname}.txt"
+                  COMMAND ${CMAKE_COMMAND} -E echo " running echoBenchmarks" 
 				  COMMAND echoBenchmarks --benchmark_format=json ">${BM_RESULT_DIR}bm_echoResults${current_date}_${rname}.txt"
+                  COMMAND ${CMAKE_COMMAND} -E echo " running ringBenchmarks" 
 				  COMMAND ringBenchmarks --benchmark_format=json ">${BM_RESULT_DIR}bm_ringResults${current_date}_${rname}.txt"
+                  COMMAND ${CMAKE_COMMAND} -E echo " running messageLookupBenchmarks" 
 				  COMMAND messageLookupBenchmarks --benchmark_format=json ">${BM_RESULT_DIR}bm_messageLookupResults${current_date}_${rname}.txt"
+                  COMMAND ${CMAKE_COMMAND} -E echo " running echoMessageBenchmarks" 
 				  COMMAND echoMessageBenchmarks --benchmark_format=json ">${BM_RESULT_DIR}bm_echoMessageResults${current_date}_${rname}.txt"
+                  COMMAND ${CMAKE_COMMAND} -E echo " running timingBenchmarks" 
                   COMMAND timingBenchmarks --benchmark_format=json ">${BM_RESULT_DIR}bm_timingResults${current_date}_${rname}.txt"
+                  COMMAND ${CMAKE_COMMAND} -E echo " running filterBenchmarks" 
 				  COMMAND filterBenchmarks --benchmark_format=json ">${BM_RESULT_DIR}bm_filterResults${current_date}_${rname}.txt"
+                  COMMAND ${CMAKE_COMMAND} -E echo " running pHoldBenchmarks" 
 				  COMMAND pholdBenchmarks --benchmark_format=json ">${BM_RESULT_DIR}bm_pholdResults${current_date}_${rname}.txt"
+                  COMMAND ${CMAKE_COMMAND} -E echo " running messageSendBenchmarks" 
 				  COMMAND messageSendBenchmarks --benchmark_format=json ">${BM_RESULT_DIR}bm_messageSendResults${current_date}_${rname}.txt"
 				  ) 
 
@@ -65,10 +75,15 @@ endforeach()
 set_target_properties(RUN_ALL_BENCHMARKS PROPERTIES FOLDER benchmarks)
 
 add_custom_target(RUN_KEY_BENCHMARKS  
+                  COMMAND ${CMAKE_COMMAND} -E echo " running conversionBenchmarks"  
                   COMMAND conversionBenchmarks --benchmark_format=json ">${BM_RESULT_DIR}bmk_conversionResults${current_date}_${rname}.txt"
+                  COMMAND ${CMAKE_COMMAND} -E echo " running echoBenchmarks with filter=/4"
 				  COMMAND echoBenchmarks --benchmark_format=json --benchmark_filter=/4 ">${BM_RESULT_DIR}bmk_echoResults${current_date}_${rname}.txt"
+                  COMMAND ${CMAKE_COMMAND} -E echo " running timingoBenchmarks with filter=/4"
                   COMMAND timingBenchmarks --benchmark_format=json --benchmark_filter=/4 ">${BM_RESULT_DIR}bmk_timingResults${current_date}_${rname}.txt"
-				  COMMAND messageLookupBenchmarks --benchmark_format=json --benchmark_filter=/[0-9][0-9][0-9][0-9]/ ">${BM_RESULT_DIR}bmk_messageLookupResults${current_date}_${rname}.txt"
+				  COMMAND ${CMAKE_COMMAND} -E echo " running messageLookupBenchmarks with filter=/[0-9][0-9][0-9][0-9]/"
+                  COMMAND messageLookupBenchmarks --benchmark_format=json --benchmark_filter=/[0-9][0-9][0-9][0-9]/ ">${BM_RESULT_DIR}bmk_messageLookupResults${current_date}_${rname}.txt"
+                  COMMAND ${CMAKE_COMMAND} -E echo " running echoMessageBenchmarks with filter=/4"
 				  COMMAND echoMessageBenchmarks --benchmark_format=json --benchmark_filter=/4 ">${BM_RESULT_DIR}bmk_echoMessageResults${current_date}_${rname}.txt"
 				  )
 

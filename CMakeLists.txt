@@ -381,6 +381,10 @@ if(NOT EXISTS "${PROJECT_SOURCE_DIR}/ThirdParty/units/units/units.hpp")
     submod_update(ThirdParty/units)
 endif()
 
+if(NOT EXISTS "${PROJECT_SOURCE_DIR}/ThirdParty/toml11/toml/value.hpp")
+    submod_update(ThirdParty/toml11)
+endif()
+
 include(GNUInstallDirs)
 
 # -------------------------------------------------------------
@@ -390,6 +394,13 @@ include(GNUInstallDirs)
 if(NOT HELICS_DISABLE_BOOST)
     include(addBoost)
 endif()
+
+# -------------------------------------------------------------
+# TOML11  add the toml interpreter
+# -------------------------------------------------------------
+
+set(toml11_BUILD_TEST OFF CACHE INTERNAL "")
+add_subdirectory(ThirdParty/toml11 EXCLUDE_FROM_ALL) 
 
 # -------------------------------------------------------------
 # options for enabling specific core communication types
@@ -524,6 +535,8 @@ target_include_directories(
 target_include_directories(
     helics_base SYSTEM INTERFACE $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/ThirdParty>
 )
+
+target_link_libraries(helics_base INTERFACE toml11::toml11)
 
 if(NOT HELICS_DISABLE_BOOST)
     target_include_directories(
@@ -822,8 +835,8 @@ set(LICENSE_LIST
     "${PROJECT_SOURCE_DIR}/ThirdParty/units/LICENSE"
     "JsonCpp"
     "${PROJECT_SOURCE_DIR}/ThirdParty/jsoncpp/LICENSE"
-    "tinytoml"
-    "${PROJECT_SOURCE_DIR}/ThirdParty/toml/LICENSE"
+    "toml11"
+    "${PROJECT_SOURCE_DIR}/ThirdParty/toml11/LICENSE"
     "GMLC Utilities"
     "${PROJECT_SOURCE_DIR}/ThirdParty/utilities/LICENSE"
 )
