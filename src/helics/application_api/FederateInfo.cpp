@@ -586,7 +586,7 @@ FederateInfo loadFederateInfoToml(const std::string& tomlString)
             if (fi.brokerPort < 0) {
                 fi.brokerPort = doc["port"].as_integer();
             } else {
-                fi.localport = doc["port"].as_string();
+                fi.localport = tomlAsString(doc["port"]);
             }
         } else {
             if (fi.brokerPort < 0) {
@@ -595,36 +595,36 @@ FederateInfo loadFederateInfoToml(const std::string& tomlString)
         }
     }
     if (isMember(doc, "separator")) {
-        std::string sep = doc["separator"].as_string();
+        std::string sep = tomlAsString(doc["separator"]);
         if (!sep.empty()) {
             fi.separator = sep[0];
         }
     }
     if (isMember(doc, "core")) {
         try {
-            fi.coreType = coreTypeFromString(doc["core"].as_string());
+            fi.coreType = coreTypeFromString(tomlAsString(doc["core"]));
         }
         catch (const std::invalid_argument&) {
-            fi.coreName = doc["core"].as_string();
+            fi.coreName = tomlAsString(doc["core"]);
         }
     }
     if (isMember(doc, "coreType")) {
         try {
-            fi.coreType = coreTypeFromString(doc["coreType"].as_string());
+            fi.coreType = coreTypeFromString(tomlAsString(doc["coreType"]));
         }
         catch (const std::invalid_argument&) {
             std::cerr << "Unrecognized core type\n";
         }
     } else if (isMember(doc, "coretype")) {
         try {
-            fi.coreType = coreTypeFromString(doc["coretype"].as_string());
+            fi.coreType = coreTypeFromString(tomlAsString(doc["coretype"]));
         }
         catch (const std::invalid_argument&) {
             std::cerr << "Unrecognized core type\n";
         }
     } else if (isMember(doc, "type")) {
         try {
-            fi.coreType = coreTypeFromString(doc["type"].as_string());
+            fi.coreType = coreTypeFromString(tomlAsString(doc["type"]));
         }
         catch (const std::invalid_argument&) {
             std::cerr << "Unrecognized core type\n";
