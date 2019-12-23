@@ -34,7 +34,7 @@ bool hasTomlExtension(const std::string& tomlString);
 toml::value loadTomlStr(const std::string& tomlString);
 
 /** get a toml value as a string*/
-std::string tomlAsString(const toml::value &element);
+std::string tomlAsString(const toml::value& element);
 
 /** read a time from a TOML value element*/
 helics::Time
