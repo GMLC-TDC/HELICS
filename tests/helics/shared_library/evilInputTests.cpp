@@ -402,7 +402,9 @@ TEST(evil_core_test, helicsCoreDisconnect)
     err.error_code = 45;
     helicsCoreDisconnect(nullptr, &err);
     helicsErrorClear(&err);
-    //auto res2=helicsCoreDisconnect(helics_core core, nullptr);
+    helicsCoreDisconnect(nullptr, &err);
+    EXPECT_NE(err.error_code, 0);
+    helicsErrorClear(&err);
     helicsCoreDisconnect(evil_core, &err);
     EXPECT_NE(err.error_code, 0);
 }
@@ -639,6 +641,10 @@ TEST(evil_broker_test, helicsBrokerDisconnect)
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     helicsBrokerDisconnect(nullptr, &err);
+
+    helicsErrorClear(&err);
+    helicsBrokerDisconnect(nullptr, &err);
+    EXPECT_NE(err.error_code, 0);
     helicsErrorClear(&err);
     //auto res2=helicsBrokerDisconnect(helics_core core, nullptr);
     helicsBrokerDisconnect(evil_broker, &err);
@@ -776,6 +782,10 @@ TEST(evil_fedInfo_test, helicsFederateInfoSetBrokerInitString)
     helicsErrorClear(&err);
     helicsFederateInfoSetBrokerInitString(evil_fi, "", &err);
     EXPECT_NE(err.error_code, 0);
+    auto fi = helicsCreateFederateInfo();
+    helicsErrorClear(&err);
+    helicsFederateInfoSetBrokerInitString(fi, nullptr, &err);
+    EXPECT_EQ(err.error_code, 0);
 }
 
 TEST(evil_fedInfo_test, helicsFederateInfoSetCoreType)
@@ -799,6 +809,13 @@ TEST(evil_fedInfo_test, helicsFederateInfoSetCoreTypeFromString)
     helicsFederateInfoSetCoreTypeFromString(nullptr, "nng", &err);
     helicsErrorClear(&err);
     helicsFederateInfoSetCoreTypeFromString(evil_fi, "nng", &err);
+    EXPECT_NE(err.error_code, 0);
+    auto fi = helicsCreateFederateInfo();
+    helicsErrorClear(&err);
+    helicsFederateInfoSetCoreTypeFromString(fi, nullptr, &err);
+    EXPECT_EQ(err.error_code, 0);
+
+    helicsFederateInfoSetCoreTypeFromString(fi, "evil_core", &err);
     EXPECT_NE(err.error_code, 0);
 }
 
@@ -824,6 +841,11 @@ TEST(evil_fedInfo_test, helicsFederateInfoSetBrokerKey)
     helicsErrorClear(&err);
     helicsFederateInfoSetBrokerKey(evil_fi, "key", &err);
     EXPECT_NE(err.error_code, 0);
+
+    auto fi = helicsCreateFederateInfo();
+    helicsErrorClear(&err);
+    helicsFederateInfoSetBrokerKey(fi, nullptr, &err);
+    EXPECT_EQ(err.error_code, 0);
 }
 
 TEST(evil_fedInfo_test, helicsFederateInfoSetBrokerPort)
@@ -839,6 +861,11 @@ TEST(evil_fedInfo_test, helicsFederateInfoSetBrokerPort)
     helicsErrorClear(&err);
     helicsFederateInfoSetBrokerPort(evil_fi, 9999, &err);
     EXPECT_NE(err.error_code, 0);
+
+    auto fi = helicsCreateFederateInfo();
+    helicsErrorClear(&err);
+    helicsFederateInfoSetBrokerPort(fi, 9999, &err);
+    EXPECT_EQ(err.error_code, 0);
 }
 
 TEST(evil_fedInfo_test, helicsFederateInfoSetLocalPort)
@@ -854,6 +881,11 @@ TEST(evil_fedInfo_test, helicsFederateInfoSetLocalPort)
     helicsErrorClear(&err);
     helicsFederateInfoSetLocalPort(evil_fi, "9999", &err);
     EXPECT_NE(err.error_code, 0);
+
+    auto fi = helicsCreateFederateInfo();
+    helicsErrorClear(&err);
+    helicsFederateInfoSetLocalPort(fi, nullptr, &err);
+    EXPECT_EQ(err.error_code, 0);
 }
 
 TEST(evil_fedInfo_test, helicsFederateInfoSetFlagOption)
@@ -866,6 +898,11 @@ TEST(evil_fedInfo_test, helicsFederateInfoSetFlagOption)
     helicsErrorClear(&err);
     helicsFederateInfoSetFlagOption(evil_fi, 9, helics_false, &err);
     EXPECT_NE(err.error_code, 0);
+
+    auto fi = helicsCreateFederateInfo();
+    helicsErrorClear(&err);
+    helicsFederateInfoSetFlagOption(fi, 0, helics_false, &err);
+    EXPECT_EQ(err.error_code, 0);
 }
 
 TEST(evil_fedInfo_test, helicsFederateInfoSetSeparator)
@@ -878,6 +915,11 @@ TEST(evil_fedInfo_test, helicsFederateInfoSetSeparator)
     helicsErrorClear(&err);
     helicsFederateInfoSetSeparator(evil_fi, '-', &err);
     EXPECT_NE(err.error_code, 0);
+
+    auto fi = helicsCreateFederateInfo();
+    helicsErrorClear(&err);
+    helicsFederateInfoSetSeparator(fi, '&', &err);
+    EXPECT_EQ(err.error_code, 0);
 }
 
 TEST(evil_fedInfo_test, helicsFederateInfoSetTimeProperty)

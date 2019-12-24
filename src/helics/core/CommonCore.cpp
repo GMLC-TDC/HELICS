@@ -1749,6 +1749,7 @@ void CommonCore::setLoggingCallback(
         ActionMessage loggerUpdate(CMD_CORE_CONFIGURE);
         loggerUpdate.messageID = UPDATE_LOGGING_CALLBACK;
         loggerUpdate.source_id = global_id.load();
+        loggerUpdate.dest_id = global_id.load();
         if (logFunction) {
             auto ii = getNextAirlockIndex();
             dataAirlocks[ii].load(std::move(logFunction));
