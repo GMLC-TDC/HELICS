@@ -222,8 +222,8 @@ void helicsFederateInfoSetCoreName(helics_federate_info fi, const char* corename
     try {
         hfi->coreName = AS_STRING(corename);
     }
-    catch (...) {
-        return helicsErrorHandler(err);
+    catch (...) { //LCOV_EXCL_LINE
+        return helicsErrorHandler(err); //LCOV_EXCL_LINE
     }
 }
 
@@ -236,8 +236,8 @@ void helicsFederateInfoSetCoreInitString(helics_federate_info fi, const char* co
     try {
         hfi->coreInitString = AS_STRING(coreinit);
     }
-    catch (...) {
-        return helicsErrorHandler(err);
+    catch (...) { //LCOV_EXCL_LINE
+        return helicsErrorHandler(err); //LCOV_EXCL_LINE
     }
 }
 
@@ -250,8 +250,8 @@ void helicsFederateInfoSetBrokerInitString(helics_federate_info fi, const char* 
     try {
         hfi->brokerInitString = AS_STRING(brokerinit);
     }
-    catch (...) {
-        return helicsErrorHandler(err);
+    catch (...) { //LCOV_EXCL_LINE
+        return helicsErrorHandler(err); //LCOV_EXCL_LINE
     }
 }
 
@@ -270,16 +270,19 @@ void helicsFederateInfoSetCoreTypeFromString(helics_federate_info fi, const char
     if (hfi == nullptr) {
         return;
     }
-    try {
-        if (coretype == nullptr) {
-            hfi->coreType = helics::core_type::DEFAULT;
-        } else {
-            hfi->coreType = helics::core::coreTypeFromString(coretype);
+    if (coretype == nullptr) {
+        hfi->coreType = helics::core_type::DEFAULT;
+        return;
+    }
+    auto ctype = helics::core::coreTypeFromString(coretype);
+    if (ctype == helics::core_type::UNRECOGNIZED) {
+        if (err != nullptr) {
+            err->error_code = helics_error_invalid_argument;
+            err->message = getMasterHolder()->addErrorString(std::string(coretype) + " is not a valid core type");
+            return;
         }
     }
-    catch (...) {
-        return helicsErrorHandler(err);
-    }
+    hfi->coreType = ctype;
 }
 
 void helicsFederateInfoSetBroker(helics_federate_info fi, const char* broker, helics_error* err)
@@ -291,8 +294,8 @@ void helicsFederateInfoSetBroker(helics_federate_info fi, const char* broker, he
     try {
         hfi->broker = AS_STRING(broker);
     }
-    catch (...) {
-        return helicsErrorHandler(err);
+    catch (...) { //LCOV_EXCL_LINE
+        return helicsErrorHandler(err); //LCOV_EXCL_LINE
     }
 }
 
@@ -305,8 +308,8 @@ void helicsFederateInfoSetBrokerKey(helics_federate_info fi, const char* brokerk
     try {
         hfi->key = AS_STRING(brokerkey);
     }
-    catch (...) {
-        return helicsErrorHandler(err);
+    catch (...) { //LCOV_EXCL_LINE
+        return helicsErrorHandler(err); //LCOV_EXCL_LINE
     }
 }
 
@@ -456,15 +459,6 @@ helics::Broker* getBroker(helics_broker broker, helics_error* err)
         return nullptr;
     }
     return brokerObj->brokerptr.get();
-}
-
-std::shared_ptr<helics::Broker> getBrokerSharedPtr(helics_broker broker, helics_error* err)
-{
-    auto brokerObj = helics::getBrokerObject(broker, err);
-    if (brokerObj == nullptr) {
-        return nullptr;
-    }
-    return brokerObj->brokerptr;
 }
 
 helics_core helicsCreateCore(const char* type, const char* name, const char* initString, helics_error* err)
