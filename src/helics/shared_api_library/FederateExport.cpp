@@ -655,7 +655,7 @@ void helicsFederateRequestTimeIterativeAsync(
         return;
     }
     try {
-        fedObj->requestTimeIterative(requestTime, getIterationRequest(iterate));
+        fedObj->requestTimeIterativeAsync(requestTime, getIterationRequest(iterate));
     }
     catch (...) {
         return helicsErrorHandler(err);

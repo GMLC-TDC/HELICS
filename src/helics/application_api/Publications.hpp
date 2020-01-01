@@ -271,7 +271,7 @@ class HELICS_CXX_EXPORT Publication {
     }
     /** set the level by which a value must have changed to actually publish the value
      */
-    void setMinimumChange(double deltaV)
+    void setMinimumChange(double deltaV) noexcept
     {
         if (delta < 0.0) {
             changeDetectionEnabled = true;
@@ -285,7 +285,7 @@ class HELICS_CXX_EXPORT Publication {
     if set to true the values will be published if there is sufficient change as specified in
     the call to setMinimumChange
     */
-    void enableChangeDetection(bool enabled = true) { changeDetectionEnabled = enabled; }
+    void enableChangeDetection(bool enabled = true) noexcept { changeDetectionEnabled = enabled; }
 
   private:
     /** implementation of the integer publications

@@ -1343,6 +1343,24 @@ void helicsPublicationSetOption(helics_publication pub, int option, helics_bool 
     }
 }
 
+void helicsPublicationSetMinimumChange(helics_publication pub, double tolerance, helics_error* err)
+{
+    auto pubObj = verifyPublication(pub, err);
+    if (pubObj == nullptr) {
+        return;
+    }
+    pubObj->pubPtr->setMinimumChange(tolerance);
+}
+
+void helicsInputSetMinimumChange(helics_input inp, double tolerance, helics_error* err)
+{
+    auto inpObj = verifyInput(inp, err);
+    if (inpObj == nullptr) {
+        return;
+    }
+    inpObj->inputPtr->setMinimumChange(tolerance);
+}
+
 helics_bool helicsInputIsUpdated(helics_input inp)
 {
     auto inpObj = verifyInput(inp, nullptr);
