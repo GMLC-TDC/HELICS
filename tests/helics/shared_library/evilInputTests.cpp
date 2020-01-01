@@ -2146,6 +2146,20 @@ TEST(evil_pub_test, helicsPublicationSetInfo)
     EXPECT_NE(err.error_code, 0);
 }
 
+TEST(evil_pub_test, helicsPublicationSetMinimumChange)
+{
+    //void helicsPublicationSetMinimumChange(helics_publication pub, double tolerance, helics_error* err);
+    char rdata[256];
+    helics_publication evil_pub = reinterpret_cast<helics_publication>(rdata);
+    auto err = helicsErrorInitialize();
+    err.error_code = 45;
+    helicsPublicationSetMinimumChange(nullptr, 12.0, &err);
+    helicsErrorClear(&err);
+    //auto res2=helicsPublicationSetInfo(helics_publication pub, const char* info, nullptr);
+    helicsPublicationSetMinimumChange(evil_pub, 1.0, &err);
+    EXPECT_NE(err.error_code, 0);
+}
+
 TEST(evil_pub_test, helicsPublicationGetOption)
 {
     //helics_bool helicsPublicationGetOption(helics_publication pub, int option);
@@ -2654,6 +2668,20 @@ TEST(evil_input_test, helicsInputSetInfo)
     helicsErrorClear(&err);
     //auto res2=helicsInputSetInfo(helics_input inp, const char* info, nullptr);
     helicsInputSetInfo(evil_input, "info", &err);
+    EXPECT_NE(err.error_code, 0);
+}
+
+TEST(evil_input_test, helicsInputSetMinimumChange)
+{
+    //void helicsInputSetMinimumChange(helics_input inp, double tolerance, helics_error* err);
+    char rdata[256];
+    helics_input evil_input = reinterpret_cast<helics_input>(rdata);
+    auto err = helicsErrorInitialize();
+    err.error_code = 45;
+    helicsInputSetMinimumChange(nullptr, 12.0, &err);
+    helicsErrorClear(&err);
+    //auto res2=helicsInputSetInfo(helics_input inp, const char* info, nullptr);
+    helicsInputSetMinimumChange(evil_input, 12.0, &err); 
     EXPECT_NE(err.error_code, 0);
 }
 

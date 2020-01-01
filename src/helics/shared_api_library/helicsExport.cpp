@@ -222,8 +222,8 @@ void helicsFederateInfoSetCoreName(helics_federate_info fi, const char* corename
     try {
         hfi->coreName = AS_STRING(corename);
     }
-    catch (...) { //LCOV_EXCL_LINE
-        return helicsErrorHandler(err); //LCOV_EXCL_LINE
+    catch (...) { // LCOV_EXCL_LINE
+        return helicsErrorHandler(err); // LCOV_EXCL_LINE
     }
 }
 
@@ -236,8 +236,8 @@ void helicsFederateInfoSetCoreInitString(helics_federate_info fi, const char* co
     try {
         hfi->coreInitString = AS_STRING(coreinit);
     }
-    catch (...) { //LCOV_EXCL_LINE
-        return helicsErrorHandler(err); //LCOV_EXCL_LINE
+    catch (...) { // LCOV_EXCL_LINE
+        return helicsErrorHandler(err); // LCOV_EXCL_LINE
     }
 }
 
@@ -250,8 +250,8 @@ void helicsFederateInfoSetBrokerInitString(helics_federate_info fi, const char* 
     try {
         hfi->brokerInitString = AS_STRING(brokerinit);
     }
-    catch (...) { //LCOV_EXCL_LINE
-        return helicsErrorHandler(err); //LCOV_EXCL_LINE
+    catch (...) { // LCOV_EXCL_LINE
+        return helicsErrorHandler(err); // LCOV_EXCL_LINE
     }
 }
 
@@ -294,8 +294,8 @@ void helicsFederateInfoSetBroker(helics_federate_info fi, const char* broker, he
     try {
         hfi->broker = AS_STRING(broker);
     }
-    catch (...) { //LCOV_EXCL_LINE
-        return helicsErrorHandler(err); //LCOV_EXCL_LINE
+    catch (...) { // LCOV_EXCL_LINE
+        return helicsErrorHandler(err); // LCOV_EXCL_LINE
     }
 }
 
@@ -308,8 +308,8 @@ void helicsFederateInfoSetBrokerKey(helics_federate_info fi, const char* brokerk
     try {
         hfi->key = AS_STRING(brokerkey);
     }
-    catch (...) { //LCOV_EXCL_LINE
-        return helicsErrorHandler(err); //LCOV_EXCL_LINE
+    catch (...) { // LCOV_EXCL_LINE
+        return helicsErrorHandler(err); // LCOV_EXCL_LINE
     }
 }
 

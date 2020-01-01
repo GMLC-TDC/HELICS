@@ -10,7 +10,6 @@
 set(
     c_shared_library_test_sources
     ctestFixtures.cpp shared-library-tests.cpp
-    # data_viewTests.cpp
     test-value-federate1.cpp test-value-federate2.cpp
     # ValueFederateTests2.cpp
     FilterTests.cpp test-message-federate.cpp
@@ -18,7 +17,7 @@ set(
     # FederateTests.cpp
     TimingTests.cpp
     evilInputTests.cpp
-    # iterationTests.cpp
+    iterationTests.cpp
     QueryTests.cpp badInputTests.cpp comboConfigTests.cpp loggingTests.cpp
 )
 
