@@ -2183,6 +2183,9 @@ TEST(evil_pub_test, helicsPublicationSetOption)
     //auto res2=helicsPublicationSetOption(helics_publication pub, int option, helics_bool val, nullptr);
     helicsPublicationSetOption(evil_pub, 45, helics_true, &err);
     EXPECT_NE(err.error_code, 0);
+    helicsErrorClear(&err);
+    helicsPublicationSetOption(nullptr, 45, helics_true, &err);
+    EXPECT_NE(err.error_code, 0);
 }
 
 //section Input interface Functions
@@ -2707,6 +2710,9 @@ TEST(evil_input_test, helicsInputSetOption)
     helicsErrorClear(&err);
     //auto res2=helicsInputSetOption(helics_input inp, int option, helics_bool value, nullptr);
     helicsInputSetOption(evil_input, 45, helics_true, &err);
+    EXPECT_NE(err.error_code, 0);
+    helicsErrorClear(&err);
+    helicsInputSetOption(nullptr, 45, helics_true, &err);
     EXPECT_NE(err.error_code, 0);
 }
 
