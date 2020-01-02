@@ -272,10 +272,9 @@ void helicsEndpointSendMessage(helics_endpoint endpoint, helics_message* message
             nmessage.time = message->time;
             nmessage.source = AS_STRING(message->source);
             nmessage.dest = AS_STRING(message->dest);
-            nmessage.original_dest =AS_STRING(message->original_dest);
+            nmessage.original_dest = AS_STRING(message->original_dest);
             nmessage.original_source = message->original_source;
-            if (message->data != nullptr && message->length > 0)
-            {
+            if (message->data != nullptr && message->length > 0) {
                 nmessage.data.assign(message->data, message->length);
             }
             endObj->endPtr->send(nmessage);
@@ -323,7 +322,7 @@ void helicsEndpointSubscribe(helics_endpoint endpoint, const char* key, helics_e
     catch (...) {
         helicsErrorHandler(err);
     }
-    // LCOV_EXCL_START
+    // LCOV_EXCL_STOP
 }
 
 helics_bool helicsFederateHasMessage(helics_federate fed)
@@ -756,19 +755,13 @@ void helicsMessageGetRawData(helics_message_object message, void* data, int maxM
 {
     static constexpr char invalidInsufficient[] = "the given storage was not sufficient to store the message";
     auto mess = getMessageObj(message, err);
-    if (mess == nullptr) {
+    if (mess == nullptr || mess->data.empty()) {
         if (actualSize != nullptr) {
             *actualSize = 0;
         }
         return;
     }
-    if (data == nullptr || maxMessagelen <= 0) {
-        if (actualSize != nullptr) {
-            *actualSize = 0;
-        }
-        return;
-    }
-    if (static_cast<int>(mess->data.size()) > maxMessagelen) {
+    if (data == nullptr || maxMessagelen <= 0 || static_cast<int>(mess->data.size()) > maxMessagelen) {
         if (actualSize != nullptr) {
             *actualSize = 0;
         }
@@ -808,11 +801,6 @@ void helicsMessageSetSource(helics_message_object message, const char* src, heli
 {
     auto mess = getMessageObj(message, err);
     if (mess == nullptr) {
-        return;
-    }
-    if (message == nullptr) {
-        if (err != nullptr) {
-        }
         return;
     }
     mess->source = AS_STRING(src);
@@ -857,7 +845,12 @@ void helicsMessageResize(helics_message_object message, int newSize, helics_erro
     if (mess == nullptr) {
         return;
     }
-    mess->data.resize(newSize);
+    try {
+        mess->data.resize(newSize);
+    }
+    catch (...) {
+        helicsErrorHandler(err);
+    }
 }
 
 void helicsMessageReserve(helics_message_object message, int reservedSize, helics_error* err)
@@ -866,7 +859,12 @@ void helicsMessageReserve(helics_message_object message, int reservedSize, helic
     if (mess == nullptr) {
         return;
     }
-    mess->data.reserve(reservedSize);
+    try {
+        mess->data.reserve(reservedSize);
+    }
+    catch (...) {
+        helicsErrorHandler(err);
+    }
 }
 
 void helicsMessageSetMessageID(helics_message_object message, int32_t messageID, helics_error* err)
