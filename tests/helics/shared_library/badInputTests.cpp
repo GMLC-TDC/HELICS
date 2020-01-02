@@ -149,18 +149,32 @@ TEST_F(function_tests, input_test)
 
     auto subid = helicsFederateRegisterInput(vFed1, "inp1", helics_data_type_double, "", nullptr);
     auto subid2 = helicsFederateRegisterInput(vFed1, "inp1", helics_data_type_double, "", &err);
+
+    
+   
     EXPECT_EQ(subid2, nullptr);
-    helicsInputAddTarget(subid, "pub1", nullptr);
     EXPECT_NE(err.error_code, 0);
     helicsErrorClear(&err);
+
+    helicsInputAddTarget(subid, "pub1", nullptr);
+   
+    auto vf2 = helicsFederateClone(vFed1, nullptr);
+    EXPECT_NE(vf2, nullptr);
+    EXPECT_STREQ(helicsFederateGetName(vFed1), helicsFederateGetName(vf2));
+
     helicsFederateSetTimeProperty(vFed1, helics_property_time_period, 1.0, nullptr);
+
+    auto ept1 = helicsFederateRegisterEndpoint(vFed1, "ept1", "", &err);
+    EXPECT_EQ(ept1, nullptr);
+    EXPECT_NE(err.error_code, 0);
+    helicsErrorClear(&err);
 
     helicsFederateEnterInitializingMode(vFed1, nullptr);
     
 
     helicsPublicationPublishDouble(pubid, 27.0, nullptr);
 
-    auto comp = helicsFederateEnterExecutingModeIterative(vFed1, helics_iteration_request_iterate_if_needed, nullptr);
+    auto comp = helicsFederateEnterExecutingModeIterative(vFed1, helics_iteration_request_force_iteration, nullptr);
     EXPECT_TRUE(comp == helics_iteration_result_iterating);
     auto val = helicsInputGetDouble(subid, nullptr);
     EXPECT_EQ(val, 27.0);
@@ -356,6 +370,14 @@ TEST_F(function_tests, typePub2)
     EXPECT_EQ(pubid2, nullptr);
 
     helicsFederateRegisterFromPublicationJSON(vFed1, "unknownfile.json", &err);
+    EXPECT_NE(err.error_code, 0);
+    helicsErrorClear(&err);
+
+    helicsFederateRegisterInterfaces(vFed1, "unknownfile.json", &err);
+    EXPECT_NE(err.error_code, 0);
+    helicsErrorClear(&err);
+
+    helicsFederateRegisterInterfaces(vFed1, nullptr, &err);
     EXPECT_NE(err.error_code, 0);
     helicsErrorClear(&err);
 
@@ -640,6 +662,11 @@ TEST_F(function_tests, messageFed)
 
     auto ept4 = helicsFederateGetEndpointByIndex(mFed1, 5, &err);
     EXPECT_EQ(ept4, nullptr);
+    EXPECT_NE(err.error_code, 0);
+    helicsErrorClear(&err);
+
+    auto subid = helicsFederateRegisterPublication(mFed1, "key", helics_data_type_double, "",&err);
+    EXPECT_EQ(subid, nullptr);
     EXPECT_NE(err.error_code, 0);
     helicsErrorClear(&err);
 
