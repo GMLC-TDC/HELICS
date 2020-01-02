@@ -3400,6 +3400,10 @@ TEST(evil_endpoint_test, helicsEndpointSetInfo)
     //auto res2=helicsEndpointSetInfo(nullptr, nullptr, nullptr);
     helicsEndpointSetInfo(evil_ept, "info", &err);
     EXPECT_NE(err.error_code, 0);
+    helicsErrorClear(&err);
+
+    helicsEndpointSetInfo(nullptr, "info", &err);
+    EXPECT_NE(err.error_code, 0);
 }
 
 TEST(evil_endpoint_test, helicsEndpointSetOption)
