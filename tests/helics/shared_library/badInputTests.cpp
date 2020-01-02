@@ -100,3 +100,426 @@ TEST(error_tests, unavailable_core_type)
     helicsCoreDestroy(core);
     helicsBrokerDestroy(brk);
 }
+
+struct function_tests : public FederateTestFixture, public ::testing::Test {
+};
+
+TEST_F(function_tests, execution_iteration_test)
+{
+    SetupTest(helicsCreateValueFederate, "test", 1);
+    auto vFed1 = GetFederateAt(0);
+    // register the publications
+
+    auto pubid = helicsFederateRegisterGlobalPublication(vFed1, "pub1", helics_data_type_double, "", nullptr);
+    auto pubid2 = helicsFederateRegisterGlobalPublication(vFed1, "pub1", helics_data_type_double, "", &err);
+    EXPECT_NE(err.error_code, 0);
+    EXPECT_EQ(pubid2, nullptr);
+    auto subid = helicsFederateRegisterSubscription(vFed1, "pub1", "", nullptr);
+    helicsErrorClear(&err);
+    helicsFederateSetTimeProperty(vFed1, helics_property_time_delta, -1.0, &err);
+    EXPECT_NE(err.error_code, 0);
+    helicsFederateSetTimeProperty(vFed1, helics_property_time_delta, 1.0, nullptr);
+
+    helicsFederateEnterInitializingMode(vFed1, nullptr);
+    helicsPublicationPublishDouble(pubid, 27.0, nullptr);
+
+    auto comp = helicsFederateEnterExecutingModeIterative(vFed1, helics_iteration_request_iterate_if_needed, nullptr);
+    EXPECT_TRUE(comp == helics_iteration_result_iterating);
+    auto val = helicsInputGetDouble(subid, nullptr);
+    EXPECT_EQ(val, 27.0);
+
+    comp = helicsFederateEnterExecutingModeIterative(vFed1, helics_iteration_request_iterate_if_needed, nullptr);
+
+    EXPECT_TRUE(comp == helics_iteration_result_next_step);
+
+    auto val2 = helicsInputGetDouble(subid, nullptr);
+
+    EXPECT_EQ(val2, val);
+    helicsFederateFinalize(vFed1, nullptr);
+}
+
+
+TEST_F(function_tests, input_test)
+{
+    SetupTest(helicsCreateValueFederate, "test", 1);
+    auto vFed1 = GetFederateAt(0);
+    // register the publications
+
+    auto pubid = helicsFederateRegisterGlobalPublication(vFed1, "pub1", helics_data_type_double, "", nullptr);
+
+    auto subid = helicsFederateRegisterInput(vFed1, "inp1", helics_data_type_double, "", nullptr);
+    auto subid2 = helicsFederateRegisterInput(vFed1, "inp1", helics_data_type_double, "", &err);
+    EXPECT_EQ(subid2, nullptr);
+    helicsInputAddTarget(subid, "pub1", nullptr);
+    EXPECT_NE(err.error_code, 0);
+    helicsErrorClear(&err);
+    helicsFederateSetTimeProperty(vFed1, helics_property_time_period, 1.0, nullptr);
+
+    helicsFederateEnterInitializingMode(vFed1, nullptr);
+    
+
+    helicsPublicationPublishDouble(pubid, 27.0, nullptr);
+
+    auto comp = helicsFederateEnterExecutingModeIterative(vFed1, helics_iteration_request_iterate_if_needed, nullptr);
+    EXPECT_TRUE(comp == helics_iteration_result_iterating);
+    auto val = helicsInputGetDouble(subid, nullptr);
+    EXPECT_EQ(val, 27.0);
+
+    comp = helicsFederateEnterExecutingModeIterative(vFed1, helics_iteration_request_iterate_if_needed, nullptr);
+
+    EXPECT_TRUE(comp == helics_iteration_result_next_step);
+
+    auto val2 = helicsInputGetDouble(subid, nullptr);
+    EXPECT_EQ(val2, val);
+    //expect error entering initializing Mode again
+    helicsFederateEnterInitializingMode(vFed1, &err);
+    EXPECT_NE(err.error_code, 0);
+    helicsErrorClear(&err);
+
+  
+    helicsFederateFinalize(vFed1, nullptr);
+}
+
+
+TEST_F(function_tests, raw)
+{
+    SetupTest(helicsCreateValueFederate, "test", 1);
+    auto vFed1 = GetFederateAt(0);
+    // register the publications
+
+    auto pubid = helicsFederateRegisterGlobalPublication(vFed1, "pub1", helics_data_type_raw, "", nullptr);
+
+    auto pubid2 = helicsFederateRegisterGlobalPublication(vFed1, "pub2", static_cast<helics_data_type>(6985), "", &err);
+    EXPECT_NE(err.error_code, 0);
+    helicsErrorClear(&err);
+    EXPECT_EQ(pubid2, nullptr);
+
+    auto subid = helicsFederateRegisterInput(vFed1, "inp1", helics_data_type_raw, "", nullptr);
+   
+    helicsInputAddTarget(subid, "pub1", nullptr);
+
+    helicsFederateSetTimeProperty(vFed1, helics_property_time_period, 1.0, nullptr);
+
+    helicsFederateEnterExecutingMode(vFed1, nullptr);
+
+    helicsPublicationPublishDouble(pubid, 27.0, nullptr);
+    helicsFederateRequestNextStep(vFed1, nullptr);
+    auto val = helicsInputGetDouble(subid, &err);
+    EXPECT_NE(val, 0.0);
+    EXPECT_NE(err.error_code, 0);
+    helicsErrorClear(&err);
+    auto val2 = helicsInputGetInteger(subid, &err);
+    EXPECT_NE(val2, 0);
+    EXPECT_NE(err.error_code, 0);
+    helicsErrorClear(&err);
+    char loc[50]="";
+    int sz{ 0 };
+    //named point can generate a string
+    helicsInputGetNamedPoint(subid, loc,50,&sz,&val,&err);
+    EXPECT_EQ(err.error_code, 0);
+
+    helicsFederateFinalize(vFed1, nullptr);
+}
+
+TEST_F(function_tests, raw2)
+{
+    SetupTest(helicsCreateValueFederate, "test", 1);
+    auto vFed1 = GetFederateAt(0);
+    // register the publications
+
+    auto pubid = helicsFederateRegisterPublication(vFed1, "pub1", helics_data_type_raw, "", nullptr);
+
+    auto pubid2 = helicsFederateRegisterPublication(vFed1, "pub2", static_cast<helics_data_type>(-6985), "", &err);
+    EXPECT_NE(err.error_code, 0);
+    helicsErrorClear(&err);
+    EXPECT_EQ(pubid2, nullptr);
+   
+
+    auto subid = helicsFederateRegisterGlobalInput(vFed1, "inp1", helics_data_type_raw, "", nullptr);
+    auto subid2 = helicsFederateRegisterGlobalInput(vFed1, "inp1", helics_data_type_raw, "", &err);
+    EXPECT_NE(err.error_code, 0);
+    EXPECT_EQ(subid2, nullptr);
+    helicsErrorClear(&err);
+
+    helicsInputAddTarget(subid, "fed0/pub1", nullptr);
+
+    helicsFederateSetTimeProperty(vFed1, helics_property_time_period, 1.0, nullptr);
+
+    helicsFederateEnterExecutingMode(vFed1, nullptr);
+
+    helicsPublicationPublishDouble(pubid, 27.0, nullptr);
+    helicsFederateRequestNextStep(vFed1, nullptr);
+    auto val = helicsInputGetComplexObject(subid, &err);
+    EXPECT_NE(val.real, 0.0);
+
+    helicsFederateFinalize(vFed1, nullptr);
+}
+
+TEST_F(function_tests, string)
+{
+    SetupTest(helicsCreateValueFederate, "test", 1);
+    auto vFed1 = GetFederateAt(0);
+    // register the publications
+
+    auto pubid = helicsFederateRegisterPublication(vFed1, "pub1", helics_data_type_string, "", nullptr);
+
+    auto pubid2 = helicsFederateRegisterPublication(vFed1, "pub1", helics_data_type_string, "", &err);
+    EXPECT_NE(err.error_code, 0);
+    helicsErrorClear(&err);
+    EXPECT_EQ(pubid2, nullptr);
+
+
+    auto subid = helicsFederateRegisterGlobalInput(vFed1, "inp1", helics_data_type_string, "", nullptr);
+    auto subid2 = helicsFederateRegisterGlobalInput(vFed1, "inp1", helics_data_type_string, "", &err);
+    EXPECT_NE(err.error_code, 0);
+    EXPECT_EQ(subid2, nullptr);
+    helicsErrorClear(&err);
+
+    helicsInputAddTarget(subid, "fed0/pub1", nullptr);
+
+    helicsFederateSetTimeProperty(vFed1, helics_property_time_period, 1.0, nullptr);
+
+    helicsFederateEnterExecutingMode(vFed1, nullptr);
+
+    helicsPublicationPublishDouble(pubid, 27.0, nullptr);
+    helicsFederateRequestNextStep(vFed1, nullptr);
+    char str[50] = "";
+    int actLen{ 0 };
+    helicsInputGetString(subid,str,50,&actLen, &err);
+    EXPECT_EQ(str[0], '2');
+    EXPECT_EQ(str[1], '7');
+
+    helicsFederateFinalize(vFed1, nullptr);
+}
+
+TEST_F(function_tests, typePub)
+{
+    SetupTest(helicsCreateValueFederate, "test", 1);
+    auto vFed1 = GetFederateAt(0);
+    // register the publications
+
+    auto pubid = helicsFederateRegisterTypePublication(vFed1, "pub1", "string", "", nullptr);
+
+    auto pubid2 = helicsFederateRegisterTypePublication(vFed1, "pub1", "string", "", &err);
+    EXPECT_NE(err.error_code, 0);
+    helicsErrorClear(&err);
+    EXPECT_EQ(pubid2, nullptr);
+
+
+    auto subid = helicsFederateRegisterGlobalTypeInput(vFed1, "inp1", "string", "", nullptr);
+    auto subid2 = helicsFederateRegisterGlobalTypeInput(vFed1, "inp1", "string", "", &err);
+    EXPECT_NE(err.error_code, 0);
+    EXPECT_EQ(subid2, nullptr);
+    helicsErrorClear(&err);
+
+    helicsInputAddTarget(subid, "fed0/pub1", nullptr);
+
+    helicsFederateSetTimeProperty(vFed1, helics_property_time_period, 1.0, nullptr);
+
+    helicsFederateEnterExecutingMode(vFed1, nullptr);
+
+    helicsPublicationPublishDouble(pubid, 27.0, nullptr);
+    helicsFederateRequestNextStep(vFed1, nullptr);
+    char str[50] = "";
+    int actLen{ 0 };
+    helicsInputGetString(subid, str, 50, &actLen, &err);
+    EXPECT_EQ(str[0], '2');
+    EXPECT_EQ(str[1], '7');
+
+    helicsFederateFinalize(vFed1, nullptr);
+}
+
+TEST_F(function_tests, typePub2)
+{
+    SetupTest(helicsCreateValueFederate, "test", 1);
+    auto vFed1 = GetFederateAt(0);
+    // register the publications
+
+    auto pubid = helicsFederateRegisterGlobalTypePublication(vFed1, "pub1", "string", "", nullptr);
+
+    auto pubid2 = helicsFederateRegisterGlobalTypePublication(vFed1, "pub1", "string", "", &err);
+    EXPECT_NE(err.error_code, 0);
+    helicsErrorClear(&err);
+    EXPECT_EQ(pubid2, nullptr);
+
+
+    auto subid = helicsFederateRegisterTypeInput(vFed1, "inp1", "string", "", nullptr);
+    auto subid2 = helicsFederateRegisterTypeInput(vFed1, "inp1", "string", "", &err);
+    EXPECT_NE(err.error_code, 0);
+    EXPECT_EQ(subid2, nullptr);
+    helicsErrorClear(&err);
+
+    helicsInputAddTarget(subid, "pub1", nullptr);
+
+    helicsFederateSetTimeProperty(vFed1, helics_property_time_period, 1.0, nullptr);
+
+    helicsFederateEnterExecutingMode(vFed1, nullptr);
+
+    helicsPublicationPublishDouble(pubid, 27.0, nullptr);
+    helicsFederateRequestNextStep(vFed1, nullptr);
+    char str[50] = "";
+    int actLen{ 0 };
+    helicsInputGetString(subid, str, 50, &actLen, &err);
+    EXPECT_EQ(str[0], '2');
+    EXPECT_EQ(str[1], '7');
+
+    helicsFederateFinalize(vFed1, nullptr);
+}
+
+TEST_F(function_tests, initError)
+{
+    SetupTest(helicsCreateValueFederate, "test", 1);
+    auto vFed1 = GetFederateAt(0);
+    // register the publications
+
+    helicsFederateRegisterGlobalTypePublication(vFed1, "pub1", "custom1", "", nullptr);
+
+    auto subid=helicsFederateRegisterTypeInput(vFed1, "inp1", "custom2", "", nullptr);
+
+    helicsInputAddTarget(subid, "pub1", nullptr);
+
+    helicsFederateSetTimeProperty(vFed1, helics_property_time_period, 1.0, nullptr);
+
+    helicsFederateEnterExecutingMode(vFed1, &err);
+    EXPECT_NE(err.error_code, 0);
+    helicsErrorClear(&err);
+
+    helicsFederateRequestNextStep(vFed1, &err);
+    EXPECT_NE(err.error_code, 0);
+    helicsErrorClear(&err);
+
+    helicsFederateFinalize(vFed1, nullptr);
+}
+
+TEST_F(function_tests, initError2)
+{
+    SetupTest(helicsCreateValueFederate, "test", 1);
+    auto vFed1 = GetFederateAt(0);
+    // register the publications
+
+    helicsFederateRegisterGlobalTypePublication(vFed1, "pub1", "custom1", "", nullptr);
+
+    auto subid = helicsFederateRegisterTypeInput(vFed1, "inp1", "custom2", "", nullptr);
+
+    helicsInputAddTarget(subid, "pub1", nullptr);
+
+    helicsFederateSetTimeProperty(vFed1, helics_property_time_period, 1.0, nullptr);
+
+    helicsFederateEnterInitializingMode(vFed1, &err);
+    EXPECT_NE(err.error_code, 0);
+    helicsErrorClear(&err);
+
+    helicsFederateRequestTimeAdvance(vFed1,0.1, &err);
+    EXPECT_NE(err.error_code, 0);
+    helicsErrorClear(&err);
+
+    helicsFederateFinalize(vFed1, nullptr);
+}
+
+TEST_F(function_tests, initError3)
+{
+    SetupTest(helicsCreateValueFederate, "test", 1);
+    auto vFed1 = GetFederateAt(0);
+    // register the publications
+
+    helicsFederateRegisterGlobalTypePublication(vFed1, "pub1", "custom1", "", nullptr);
+
+    auto subid = helicsFederateRegisterTypeInput(vFed1, "inp1", "custom2", "", nullptr);
+
+    helicsInputAddTarget(subid, "pub1", nullptr);
+
+    helicsFederateSetTimeProperty(vFed1, helics_property_time_period, 1.0, nullptr);
+
+    helicsFederateEnterInitializingModeAsync(vFed1, &err);
+    EXPECT_EQ(err.error_code, 0);
+    helicsFederateEnterInitializingModeComplete(vFed1, &err);
+    EXPECT_NE(err.error_code, 0);
+    helicsErrorClear(&err);
+    
+
+    helicsFederateFinalize(vFed1, nullptr);
+}
+
+
+TEST_F(function_tests, initError4)
+{
+    SetupTest(helicsCreateValueFederate, "test", 1);
+    auto vFed1 = GetFederateAt(0);
+    // register the publications
+
+    helicsFederateRegisterGlobalTypePublication(vFed1, "pub1", "custom1", "", nullptr);
+
+    auto subid = helicsFederateRegisterTypeInput(vFed1, "inp1", "custom2", "", nullptr);
+
+    helicsInputAddTarget(subid, "pub1", nullptr);
+
+    helicsFederateSetTimeProperty(vFed1, helics_property_time_period, 1.0, nullptr);
+
+    helicsFederateEnterExecutingModeAsync(vFed1, &err);
+    EXPECT_EQ(err.error_code, 0);
+    helicsFederateEnterExecutingModeComplete(vFed1, &err);
+    EXPECT_NE(err.error_code, 0); 
+    helicsErrorClear(&err);
+
+    helicsFederateRequestTimeIterative(vFed1, 1.0, helics_iteration_request_no_iteration, nullptr, &err);
+    EXPECT_NE(err.error_code, 0);
+    helicsErrorClear(&err);
+
+    helicsFederateFinalize(vFed1, nullptr);
+}
+
+TEST_F(function_tests, initError5)
+{
+    SetupTest(helicsCreateValueFederate, "test", 1);
+    auto vFed1 = GetFederateAt(0);
+    // register the publications
+
+    helicsFederateRegisterGlobalTypePublication(vFed1, "pub1", "custom1", "", nullptr);
+
+    auto subid = helicsFederateRegisterTypeInput(vFed1, "inp1", "custom2", "", nullptr);
+
+    helicsInputAddTarget(subid, "pub1", nullptr);
+
+    helicsFederateSetTimeProperty(vFed1, helics_property_time_period, 1.0, nullptr);
+
+    helicsFederateEnterExecutingModeIterative(vFed1,helics_iteration_request_no_iteration, &err);
+    EXPECT_NE(err.error_code, 0);
+    helicsErrorClear(&err);
+
+    helicsFederateRequestTimeIterativeAsync(vFed1, 1.0, helics_iteration_request_no_iteration, &err);
+    EXPECT_NE(err.error_code, 0);
+    helicsErrorClear(&err);
+
+    helicsFederateFinalize(vFed1, nullptr);
+}
+
+
+TEST_F(function_tests, initError6)
+{
+    SetupTest(helicsCreateValueFederate, "test", 1);
+    auto vFed1 = GetFederateAt(0);
+    // register the publications
+
+    helicsFederateRegisterGlobalTypePublication(vFed1, "pub1", "custom1", "", nullptr);
+
+    auto subid = helicsFederateRegisterTypeInput(vFed1, "inp1", "custom2", "", nullptr);
+
+    helicsInputAddTarget(subid, "pub1", nullptr);
+
+    helicsFederateSetTimeProperty(vFed1, helics_property_time_period, 1.0, nullptr);
+
+    helicsFederateEnterExecutingModeIterativeAsync(vFed1,helics_iteration_request_no_iteration, &err);
+    EXPECT_EQ(err.error_code, 0);
+    helicsFederateEnterExecutingModeIterativeComplete(vFed1, &err);
+    EXPECT_NE(err.error_code, 0);
+    helicsErrorClear(&err);
+
+    helicsFederateRequestTimeIterativeAsync(vFed1, 1.0, helics_iteration_request_no_iteration, &err);
+    EXPECT_NE(err.error_code, 0);
+    helicsErrorClear(&err);
+    helicsFederateRequestTimeIterativeComplete(vFed1, nullptr, &err);
+    EXPECT_NE(err.error_code, 0);
+    helicsErrorClear(&err);
+
+    helicsFederateFinalize(vFed1, nullptr);
+}
