@@ -119,7 +119,7 @@ helics_filter helicsCoreRegisterFilter(helics_core cr, helics_filter_type type, 
     return nullptr;
 }
 
-helics_filter helicsFederateRegisterCloningFilter(helics_federate fed, const char* deliveryEndpoint, helics_error* err)
+helics_filter helicsFederateRegisterCloningFilter(helics_federate fed, const char* name, helics_error* err)
 {
     auto fedObj = getFedSharedPtr(fed, err);
     if (!fedObj) {
@@ -128,7 +128,7 @@ helics_filter helicsFederateRegisterCloningFilter(helics_federate fed, const cha
 
     try {
         auto filt = std::make_unique<helics::FilterObject>();
-        filt->filtPtr = &helics::make_cloning_filter(helics::filter_types::clone, fedObj.get(), AS_STRING(deliveryEndpoint));
+        filt->filtPtr = &helics::make_cloning_filter(helics::filter_types::clone, fedObj.get(), std::string{},AS_STRING(name));
         filt->fedptr = std::move(fedObj);
         filt->cloning = true;
         auto ret = reinterpret_cast<helics_filter>(filt.get());
@@ -141,7 +141,7 @@ helics_filter helicsFederateRegisterCloningFilter(helics_federate fed, const cha
     return nullptr;
 }
 
-helics_filter helicsFederateRegisterGlobalCloningFilter(helics_federate fed, const char* deliveryEndpoint, helics_error* err)
+helics_filter helicsFederateRegisterGlobalCloningFilter(helics_federate fed, const char* name, helics_error* err)
 {
     auto fedObj = getFedSharedPtr(fed, err);
     if (!fedObj) {
@@ -151,7 +151,7 @@ helics_filter helicsFederateRegisterGlobalCloningFilter(helics_federate fed, con
     try {
         auto filt = std::make_unique<helics::FilterObject>();
         filt->filtPtr =
-            &helics::make_cloning_filter(helics::GLOBAL, helics::filter_types::clone, fedObj.get(), AS_STRING(deliveryEndpoint));
+            &helics::make_cloning_filter(helics::GLOBAL, helics::filter_types::clone, fedObj.get(), std::string{}, AS_STRING(name));
         filt->fedptr = std::move(fedObj);
         filt->cloning = true;
         auto ret = reinterpret_cast<helics_filter>(filt.get());
@@ -164,7 +164,7 @@ helics_filter helicsFederateRegisterGlobalCloningFilter(helics_federate fed, con
     return nullptr;
 }
 
-helics_filter helicsCoreRegisterCloningFilter(helics_core cr, const char* deliveryEndpoint, helics_error* err)
+helics_filter helicsCoreRegisterCloningFilter(helics_core cr, const char* name, helics_error* err)
 {
     auto core = getCoreSharedPtr(cr, err);
     if (!core) {
@@ -172,7 +172,7 @@ helics_filter helicsCoreRegisterCloningFilter(helics_core cr, const char* delive
     }
     try {
         auto filt = std::make_unique<helics::FilterObject>();
-        filt->uFilter = helics::make_cloning_filter(helics::filter_types::clone, core.get(), AS_STRING(deliveryEndpoint));
+        filt->uFilter = helics::make_cloning_filter(helics::filter_types::clone, core.get(), std::string{},AS_STRING(name));
         filt->filtPtr = filt->uFilter.get();
         filt->corePtr = std::move(core);
         filt->cloning = true;
@@ -211,10 +211,12 @@ helics_filter helicsFederateGetFilter(helics_federate fed, const char* name, hel
         federateAddFilter(fed, std::move(filt));
         return ret;
     }
+    // LCOV_EXCL_START
     catch (...) {
         helicsErrorHandler(err);
         return nullptr;
     }
+    // LCOV_EXCL_STOP
 }
 
 int helicsFederateGetFilterCount(helics_federate fed)
@@ -250,10 +252,12 @@ helics_filter helicsFederateGetFilterByIndex(helics_federate fed, int index, hel
         federateAddFilter(fed, std::move(filt));
         return ret;
     }
+    // LCOV_EXCL_START
     catch (...) {
         helicsErrorHandler(err);
         return nullptr;
     }
+    //LCOV_EXCL_STOP
 }
 
 static helics::Filter* getFilter(helics_filter filt, helics_error* err)
@@ -289,13 +293,8 @@ const char* helicsFilterGetName(helics_filter filt)
     if (filter == nullptr) {
         return emptyStr.c_str();
     }
-    try {
-        const auto& name = filter->getName();
-        return name.c_str();
-    }
-    catch (...) {
-        return emptyStr.c_str();
-    }
+    const auto& name = filter->getName();
+    return name.c_str();
 }
 
 void helicsFilterSet(helics_filter filt, const char* prop, double val, helics_error* err)
@@ -338,9 +337,11 @@ void helicsFilterAddDestinationTarget(helics_filter filt, const char* dest, heli
     try {
         cfilt->addDestinationTarget(dest);
     }
+    // LCOV_EXCL_START
     catch (...) {
         helicsErrorHandler(err);
     }
+    // LCOV_EXCL_STOP
 }
 
 void helicsFilterAddSourceTarget(helics_filter filt, const char* src, helics_error* err)
@@ -353,9 +354,11 @@ void helicsFilterAddSourceTarget(helics_filter filt, const char* src, helics_err
     try {
         cfilt->addSourceTarget(src);
     }
+    // LCOV_EXCL_START
     catch (...) {
         helicsErrorHandler(err);
     }
+    // LCOV_EXCL_STOP
 }
 
 void helicsFilterAddDeliveryEndpoint(helics_filter filt, const char* delivery, helics_error* err)
@@ -368,9 +371,11 @@ void helicsFilterAddDeliveryEndpoint(helics_filter filt, const char* delivery, h
     try {
         cfilt->addDeliveryEndpoint(delivery);
     }
+    // LCOV_EXCL_START
     catch (...) {
         helicsErrorHandler(err);
     }
+    // LCOV_EXCL_STOP
 }
 
 void helicsFilterRemoveTarget(helics_filter filt, const char* target, helics_error* err)
@@ -383,9 +388,11 @@ void helicsFilterRemoveTarget(helics_filter filt, const char* target, helics_err
     try {
         cfilt->removeTarget(target);
     }
+    // LCOV_EXCL_START
     catch (...) {
         helicsErrorHandler(err);
     }
+    // LCOV_EXCL_STOP
 }
 
 void helicsFilterRemoveDeliveryEndpoint(helics_filter filt, const char* delivery, helics_error* err)
@@ -398,9 +405,11 @@ void helicsFilterRemoveDeliveryEndpoint(helics_filter filt, const char* delivery
     try {
         cfilt->removeDeliveryEndpoint(delivery);
     }
+    // LCOV_EXCL_START
     catch (...) {
         helicsErrorHandler(err);
     }
+    // LCOV_EXCL_STOP
 }
 
 const char* helicsFilterGetInfo(helics_filter filt)
@@ -413,9 +422,11 @@ const char* helicsFilterGetInfo(helics_filter filt)
         const std::string& info = filtObj->filtPtr->getInfo();
         return info.c_str();
     }
+    // LCOV_EXCL_START
     catch (...) {
         return emptyStr.c_str();
     }
+    // LCOV_EXCL_STOP
 }
 
 void helicsFilterSetInfo(helics_filter filt, const char* info, helics_error* err)
@@ -427,9 +438,11 @@ void helicsFilterSetInfo(helics_filter filt, const char* info, helics_error* err
     try {
         filtObj->filtPtr->setInfo(AS_STRING(info));
     }
+    // LCOV_EXCL_START
     catch (...) {
         helicsErrorHandler(err);
     }
+    // LCOV_EXCL_STOP
 }
 
 void helicsFilterSetOption(helics_filter filt, int option, helics_bool value, helics_error* err)
@@ -441,9 +454,11 @@ void helicsFilterSetOption(helics_filter filt, int option, helics_bool value, he
     try {
         filtObj->filtPtr->setOption(option, (value == helics_true));
     }
+    // LCOV_EXCL_START
     catch (...) {
         helicsErrorHandler(err);
     }
+    // LCOV_EXCL_STOP
 }
 
 helics_bool helicsFilterGetOption(helics_filter filt, int option)
@@ -455,7 +470,9 @@ helics_bool helicsFilterGetOption(helics_filter filt, int option)
     try {
         return (filtObj->filtPtr->getOption(option)) ? helics_true : helics_false;
     }
+    // LCOV_EXCL_START
     catch (...) {
         return helics_false;
     }
+    // LCOV_EXCL_STOP
 }

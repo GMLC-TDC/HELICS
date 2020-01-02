@@ -27,7 +27,12 @@ Filter& FilterFederateManager::registerFilter(
         auto filt = std::make_unique<Filter>(fed, name, handle);
         Filter& f = *filt;
         auto filts = filters.lock();
-        filts->insert(name, std::move(filt));
+        if (name.empty()) {
+            filts->insert(coreObject->getHandleName(filt->getHandle()), std::move(filt));
+        }
+        else {
+            filts->insert(name, std::move(filt));
+        }
         return f;
     }
     throw(RegistrationFailure("Unable to register Filter"));
@@ -43,7 +48,11 @@ CloningFilter& FilterFederateManager::registerCloningFilter(
         auto filt = std::make_unique<CloningFilter>(fed, name, handle);
         CloningFilter& f = *filt;
         auto filts = filters.lock();
-        filts->insert(name, std::move(filt));
+        if (name.empty()) {
+            filts->insert(coreObject->getHandleName(filt->getHandle()), std::move(filt));
+        } else {
+            filts->insert(name, std::move(filt));
+        }
         return f;
     }
     throw(RegistrationFailure("Unable to register Filter"));

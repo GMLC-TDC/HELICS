@@ -521,7 +521,8 @@ TEST_F(filter_tests, clone_test)
     auto p2 = helicsFederateRegisterGlobalEndpoint(dFed, "dest", "", &err);
     auto p3 = helicsFederateRegisterGlobalEndpoint(dcFed, "cm", "", &err);
 
-    auto f1 = helicsFederateRegisterCloningFilter(dcFed, "cm", &err);
+    auto f1 = helicsFederateRegisterCloningFilter(dcFed, nullptr, &err);
+    CE(helicsFilterAddDeliveryEndpoint(f1, "cm",&err));
     EXPECT_TRUE(err.error_code == helics_ok);
     CE(helicsFilterAddSourceTarget(f1, "src", &err));
 
@@ -596,7 +597,8 @@ TEST_F(filter_tests, multi_clone_test)
     auto p4 = helicsFederateRegisterGlobalEndpoint(dcFed, "cm", "", &err);
     ASSERT_EQ(err.error_code, 0);
 
-    auto f1 = helicsFederateRegisterCloningFilter(dcFed, "cm", &err);
+    auto f1 = helicsFederateRegisterCloningFilter(dcFed, "", &err);
+    helicsFilterAddDeliveryEndpoint(f1, "cm", nullptr);
     ASSERT_EQ(err.error_code, 0);
     CE(helicsFilterAddSourceTarget(f1, "src", &err));
     CE(helicsFilterAddSourceTarget(f1, "src2", &err));

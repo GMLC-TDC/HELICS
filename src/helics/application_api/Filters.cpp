@@ -241,6 +241,23 @@ void Filter::removeTarget(const std::string& sourceName)
     corePtr->removeTarget(handle, sourceName);
 }
 
+void Filter::setOption(int32_t option, bool value)
+{
+    corePtr->setHandleOption(handle, option, value);
+}
+/** close a filter during an active simulation
+@details it is not necessary to call this function unless you are continuing the simulation after the close*/
+void Filter::close()
+{
+    corePtr->closeHandle(handle);
+}
+
+/** get the current value of a flag for the handle*/
+bool Filter::getOption(int32_t option) const
+{
+    return corePtr->getHandleOption(handle, option);
+}
+
 void CloningFilter::removeDeliveryEndpoint(const std::string& endpoint)
 {
     Filter::setString("remove delivery", endpoint);
@@ -329,7 +346,9 @@ CloningFilter& make_cloning_filter(
 {
     auto& dfilt = mFed->registerCloningFilter(name);
     addOperations(&dfilt, type, mFed->getCorePointer().get());
-    dfilt.addDeliveryEndpoint(delivery);
+    if (!delivery.empty()) {
+        dfilt.addDeliveryEndpoint(delivery);
+    }
     return dfilt;
 }
 
@@ -345,7 +364,9 @@ CloningFilter& make_cloning_filter(
         mFed->registerGlobalCloningFilter(name) :
         mFed->registerCloningFilter(name);
     addOperations(&dfilt, type, mFed->getCorePointer().get());
-    dfilt.addDeliveryEndpoint(delivery);
+    if (!delivery.empty()) {
+        dfilt.addDeliveryEndpoint(delivery);
+    }
     return dfilt;
 }
 
@@ -358,7 +379,9 @@ std::unique_ptr<CloningFilter> make_cloning_filter(
 {
     auto dfilt = std::make_unique<CloningFilter>(cr, name);
     addOperations(dfilt.get(), type, cr);
-    dfilt->addDeliveryEndpoint(delivery);
+    if (!delivery.empty()) {
+        dfilt->addDeliveryEndpoint(delivery);
+    }
     return dfilt;
 }
 
