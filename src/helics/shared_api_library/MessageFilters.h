@@ -48,25 +48,25 @@ HELICS_EXPORT helics_filter
     @details cloning filters copy a message and send it to multiple locations source and destination can be added
     through other functions
     @param fed the fed to register through
-    @param deliveryEndpoint the specified endpoint to deliver the message
+    @param name the name of the filter (can be NULL)
     @forcpponly
     @param[in,out] err a pointer to an error object for catching errors
     @endforcpponly
     @return a helics_filter object
     */
-HELICS_EXPORT helics_filter helicsFederateRegisterCloningFilter(helics_federate fed, const char* deliveryEndpoint, helics_error* err);
+HELICS_EXPORT helics_filter helicsFederateRegisterCloningFilter(helics_federate fed, const char* name, helics_error* err);
 
 /** create a global cloning Filter on the specified federate
     @details cloning filters copy a message and send it to multiple locations source and destination can be added
     through other functions
     @param fed the fed to register through
-    @param deliveryEndpoint the specified endpoint to deliver the message
+    @param name the name of the filter (can be NULL)
     @forcpponly
     @param[in,out] err a pointer to an error object for catching errors
     @endforcpponly
     @return a helics_filter object
     */
-HELICS_EXPORT helics_filter helicsFederateRegisterGlobalCloningFilter(helics_federate fed, const char* deliveryEndpoint, helics_error* err);
+HELICS_EXPORT helics_filter helicsFederateRegisterGlobalCloningFilter(helics_federate fed, const char* name, helics_error* err);
 
 /** create a source Filter on the specified core
     @details filters can be created through a federate or a core , linking through a federate allows
@@ -85,13 +85,13 @@ HELICS_EXPORT helics_filter helicsCoreRegisterFilter(helics_core core, helics_fi
     @details cloning filters copy a message and send it to multiple locations source and destination can be added
     through other functions
     @param core the core to register through
-    @param deliveryEndpoint the specified endpoint to deliver the message
+    @param name the name of the filter (can be NULL)
     @forcpponly
     @param[in,out] err a pointer to an error object for catching errors
     @endforcpponly
     @return a helics_filter object
     */
-HELICS_EXPORT helics_filter helicsCoreRegisterCloningFilter(helics_core core, const char* deliveryEndpoint, helics_error* err);
+HELICS_EXPORT helics_filter helicsCoreRegisterCloningFilter(helics_core core, const char* name, helics_error* err);
 
 /** get a the number of filters registered through a federate
     @param fed the federate object to use to get the filter

@@ -3573,6 +3573,9 @@ TEST(evil_filter_test, helicsFilterSet)
     //auto res2=helicsFilterSet(helics_filter filt, const char* prop, double val, nullptr);
     helicsFilterSet(evil_filt, "prop", 5.2, &err);
     EXPECT_NE(err.error_code, 0);
+    helicsErrorClear(&err);
+    helicsFilterSet(nullptr, "prop", 5.2, &err);
+    EXPECT_NE(err.error_code, 0);
 }
 
 TEST(evil_filter_test, helicsFilterSetString)
@@ -3656,6 +3659,9 @@ TEST(evil_filter_test, helicsFilterRemoveDeliveryEndpoint)
     helicsErrorClear(&err);
     //auto res2=helicsFilterRemoveDeliveryEndpoint(helics_filter filt, const char* deliveryEndpoint, nullptr);
     helicsFilterRemoveDeliveryEndpoint(evil_filt, "deliver", &err);
+    EXPECT_NE(err.error_code, 0);
+    helicsErrorClear(&err);
+    helicsFilterRemoveDeliveryEndpoint(nullptr, "deliver", &err);
     EXPECT_NE(err.error_code, 0);
 }
 
