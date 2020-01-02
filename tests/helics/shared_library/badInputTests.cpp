@@ -619,3 +619,174 @@ TEST_F(function_tests, initError6)
 
     helicsFederateFinalize(vFed1, nullptr);
 }
+
+
+TEST_F(function_tests, messageFed)
+{
+    SetupTest(helicsCreateMessageFederate, "test", 1);
+    auto mFed1 = GetFederateAt(0);
+
+    auto ept1=helicsFederateRegisterEndpoint(mFed1, "ept1", "", nullptr);
+    EXPECT_NE(ept1, nullptr);
+    auto ept2 = helicsFederateRegisterEndpoint(mFed1, "ept1", "", &err);
+    EXPECT_NE(err.error_code,0);
+    EXPECT_EQ(ept2, nullptr);
+    helicsErrorClear(&err);
+
+    auto ept3 = helicsFederateGetEndpoint(mFed1, "invalid", &err);
+    EXPECT_EQ(ept3, nullptr);
+    EXPECT_NE(err.error_code, 0);
+    helicsErrorClear(&err);
+
+    auto ept4 = helicsFederateGetEndpointByIndex(mFed1, 5, &err);
+    EXPECT_EQ(ept4, nullptr);
+    EXPECT_NE(err.error_code, 0);
+    helicsErrorClear(&err);
+
+    helicsFederateEnterExecutingMode(mFed1, nullptr);
+    helicsEndpointSetDefaultDestination(ept1, "fed0/ept1", nullptr);
+
+    helicsEndpointSendMessageRaw(ept1, nullptr, nullptr, 0, &err);
+
+    helicsEndpointSendMessageRaw(ept1, "fed0/ept1", nullptr, 0, &err);
+
+    helicsFederateRequestNextStep(mFed1, nullptr);
+    auto cnt = helicsEndpointPendingMessages(ept1);
+    EXPECT_EQ(cnt, 2);
+
+    helicsFederateFinalize(mFed1,nullptr);
+    helicsEndpointSendMessageRaw(ept1, "fed0/ept1", nullptr, 0, &err);
+    EXPECT_NE(err.error_code, 0);
+}
+
+
+TEST_F(function_tests, messageFed_event)
+{
+    SetupTest(helicsCreateMessageFederate, "test", 1);
+    auto mFed1 = GetFederateAt(0);
+
+    auto ept1 = helicsFederateRegisterGlobalEndpoint(mFed1, "ept1", "", nullptr);
+    EXPECT_NE(ept1, nullptr);
+    auto ept2 = helicsFederateRegisterGlobalEndpoint(mFed1, "ept1", "", &err);
+    EXPECT_NE(err.error_code, 0);
+    EXPECT_EQ(ept2, nullptr);
+    helicsErrorClear(&err);
+
+    helicsFederateEnterExecutingMode(mFed1, nullptr);
+    helicsEndpointSetDefaultDestination(ept1, "ept1", nullptr);
+
+    helicsEndpointSendEventRaw(ept1, nullptr, nullptr, 0,0.0, &err);
+
+    helicsEndpointSendEventRaw(ept1, "ept1", nullptr, 0,0.0, &err);
+
+    char data[5] = "test";
+    helicsEndpointSendEventRaw(ept1, nullptr, data, 4, 0.0, &err);
+    helicsFederateRequestNextStep(mFed1, nullptr);
+    auto cnt = helicsEndpointPendingMessages(ept1);
+    EXPECT_EQ(cnt, 3);
+
+    helicsFederateFinalize(mFed1, nullptr);
+    helicsEndpointSendEventRaw(ept1, nullptr, data,4, 0.0,&err);
+    EXPECT_NE(err.error_code, 0);
+}
+
+TEST_F(function_tests, messageFed_message)
+{
+    SetupTest(helicsCreateMessageFederate, "test", 1);
+    auto mFed1 = GetFederateAt(0);
+
+    auto ept1 = helicsFederateRegisterGlobalEndpoint(mFed1, "ept1", "", nullptr);
+    EXPECT_NE(ept1, nullptr);
+    auto ept2 = helicsFederateRegisterGlobalEndpoint(mFed1, "ept1", "", &err);
+    EXPECT_NE(err.error_code, 0);
+    EXPECT_EQ(ept2, nullptr);
+    helicsErrorClear(&err);
+
+    helicsFederateEnterExecutingMode(mFed1, nullptr);
+    helicsEndpointSetDefaultDestination(ept1, "ept1", nullptr);
+
+    helicsEndpointSendMessage(ept1, nullptr, &err);
+    EXPECT_NE(err.error_code, 0);
+    helicsErrorClear(&err);
+
+    helics_message mess0 = helicsEndpointGetMessage(ept1);
+    EXPECT_EQ(mess0.length, 0);
+
+    mess0 = helicsFederateGetMessage(mFed1);
+    EXPECT_EQ(mess0.length, 0);
+
+    helics_message mess1;
+
+    mess1.time = 0.0;
+    mess1.original_source = nullptr;
+    mess1.dest = nullptr;
+    mess1.data = nullptr;
+    mess1.length = 0;
+    mess1.source = nullptr;
+    mess1.original_dest = nullptr;
+    helicsEndpointSendMessage(ept1, &mess1, &err);
+    mess1.dest = "ept1";
+    helicsEndpointSendMessage(ept1, &mess1, &err);
+    mess1.original_source = "ept4";
+     
+    char data[5] = "test";
+    helicsEndpointSendMessage(ept1, &mess1, &err);
+
+    mess1.data = data;
+    mess1.length = 4;
+    helicsEndpointSendMessage(ept1, &mess1, &err);
+
+    helicsFederateRequestNextStep(mFed1, nullptr);
+    auto cnt = helicsEndpointPendingMessages(ept1);
+    EXPECT_EQ(cnt, 4);
+
+    helicsFederateFinalize(mFed1, nullptr);
+
+    helicsEndpointSendMessage(ept1, &mess1, &err);
+    EXPECT_NE(err.error_code, 0); 
+}
+
+TEST_F(function_tests, messageFed_message_object)
+{
+    SetupTest(helicsCreateMessageFederate, "test", 1);
+    auto mFed1 = GetFederateAt(0);
+
+    auto ept1 = helicsFederateRegisterGlobalEndpoint(mFed1, "ept1", "", nullptr);
+    EXPECT_NE(ept1, nullptr);
+    auto ept2 = helicsFederateRegisterGlobalEndpoint(mFed1, "ept1", "", &err);
+    EXPECT_NE(err.error_code, 0);
+    EXPECT_EQ(ept2, nullptr);
+    helicsErrorClear(&err);
+
+    helicsEndpointSubscribe(ept1, "key", nullptr);
+    helicsFederateEnterExecutingMode(mFed1, nullptr);
+    helicsEndpointSetDefaultDestination(ept1, "ept1", nullptr);
+    auto mess0 = helicsEndpointGetMessageObject(ept1);
+    EXPECT_EQ(helicsMessageGetRawDataSize(mess0), 0);
+
+    mess0 = helicsFederateGetMessageObject(mFed1);
+    EXPECT_EQ(helicsMessageGetRawDataSize(mess0), 0);
+
+    helicsEndpointSendMessageObject(ept1, nullptr, &err);
+    EXPECT_NE(err.error_code, 0);
+    helicsErrorClear(&err);
+
+    auto mess1 = helicsFederateCreateMessageObject(mFed1, nullptr);
+    helicsMessageSetDestination(mess1, "ept1", nullptr);
+    helicsEndpointSendMessageObject(ept1, mess1, &err);
+
+    helicsFederateRequestNextStep(mFed1, nullptr);
+    auto cnt = helicsEndpointPendingMessages(ept1);
+    EXPECT_EQ(cnt, 1);
+
+    auto m3 = helicsFederateGetMessageObject(mFed1);
+    EXPECT_NE(m3, nullptr);
+
+    helicsFederateFinalize(mFed1, nullptr);
+
+    helicsEndpointSendMessageObject(ept1, mess1, &err);
+    EXPECT_NE(err.error_code, 0);
+
+    helicsFederateClearMessages(mFed1);
+    helicsEndpointClearMessages(ept1);
+}

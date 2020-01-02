@@ -90,7 +90,7 @@ helics_endpoint helicsFederateRegisterGlobalEndpoint(helics_federate fed, const 
         return ret;
     }
     catch (...) {
-        return nullptr;
+        helicsErrorHandler(err);
     }
     return nullptr;
 }
@@ -121,10 +121,12 @@ helics_endpoint helicsFederateGetEndpoint(helics_federate fed, const char* name,
         addEndpoint(fed, std::move(end));
         return ret;
     }
+    // LCOV_EXCL_START
     catch (...) {
         helicsErrorHandler(err);
         return nullptr;
     }
+    // LCOV_EXCL_STOP
 }
 
 helics_endpoint helicsFederateGetEndpointByIndex(helics_federate fed, int index, helics_error* err)
@@ -149,10 +151,12 @@ helics_endpoint helicsFederateGetEndpointByIndex(helics_federate fed, int index,
         addEndpoint(fed, std::move(end));
         return ret;
     }
+    // LCOV_EXCL_START
     catch (...) {
         helicsErrorHandler(err);
         return nullptr;
     }
+    // LCOV_EXCL_STOP
 }
 
 void helicsEndpointSetDefaultDestination(helics_endpoint endpoint, const char* dest, helics_error* err)
@@ -165,9 +169,11 @@ void helicsEndpointSetDefaultDestination(helics_endpoint endpoint, const char* d
     try {
         endObj->endPtr->setDefaultDestination(dest);
     }
+    // LCOV_EXCL_START
     catch (...) {
         helicsErrorHandler(err);
     }
+    // LCOV_EXCL_STOP
 }
 
 const char* helicsEndpointGetDefaultDestination(helics_endpoint endpoint)
@@ -264,11 +270,14 @@ void helicsEndpointSendMessage(helics_endpoint endpoint, helics_message* message
         } else {
             helics::Message nmessage;
             nmessage.time = message->time;
-            nmessage.source = message->source;
-            nmessage.dest = message->dest;
-            nmessage.original_dest = message->original_dest;
+            nmessage.source = AS_STRING(message->source);
+            nmessage.dest = AS_STRING(message->dest);
+            nmessage.original_dest =AS_STRING(message->original_dest);
             nmessage.original_source = message->original_source;
-            nmessage.data.assign(message->data, message->length);
+            if (message->data != nullptr && message->length > 0)
+            {
+                nmessage.data.assign(message->data, message->length);
+            }
             endObj->endPtr->send(nmessage);
         }
     }
@@ -310,9 +319,11 @@ void helicsEndpointSubscribe(helics_endpoint endpoint, const char* key, helics_e
     try {
         endObj->endPtr->subscribe(key);
     }
+    // LCOV_EXCL_START
     catch (...) {
         helicsErrorHandler(err);
     }
+    // LCOV_EXCL_START
 }
 
 helics_bool helicsFederateHasMessage(helics_federate fed)
@@ -549,9 +560,11 @@ const char* helicsEndpointGetType(helics_endpoint endpoint)
         auto& type = endObj->endPtr->getType();
         return type.c_str();
     }
+    // LCOV_EXCL_START
     catch (...) {
         return nullcstr;
     }
+    // LCOV_EXCL_STOP
 }
 
 const char* helicsEndpointGetName(helics_endpoint endpoint)
@@ -584,9 +597,11 @@ const char* helicsEndpointGetInfo(helics_endpoint end)
         const std::string& info = endObj->endPtr->getInfo();
         return info.c_str();
     }
+    // LCOV_EXCL_START
     catch (...) {
         return emptyStr.c_str();
     }
+    // LCOV_EXCL_STOP
 }
 
 void helicsEndpointSetInfo(helics_endpoint end, const char* info, helics_error* err)
@@ -598,9 +613,11 @@ void helicsEndpointSetInfo(helics_endpoint end, const char* info, helics_error* 
     try {
         endObj->endPtr->setInfo(AS_STRING(info));
     }
+    // LCOV_EXCL_START
     catch (...) {
         helicsErrorHandler(err);
     }
+    // LCOV_EXCL_STOP
 }
 
 helics_bool helicsEndpointGetOption(helics_endpoint end, int option)
@@ -612,9 +629,11 @@ helics_bool helicsEndpointGetOption(helics_endpoint end, int option)
     try {
         return (endObj->endPtr->getOption(option)) ? helics_true : helics_false;
     }
+    // LCOV_EXCL_START
     catch (...) {
         return helics_false;
     }
+    // LCOV_EXCL_STOP
 }
 
 void helicsEndpointSetOption(helics_endpoint end, int option, helics_bool value, helics_error* err)
@@ -626,9 +645,11 @@ void helicsEndpointSetOption(helics_endpoint end, int option, helics_bool value,
     try {
         endObj->endPtr->setOption(option, (value == helics_true));
     }
+    // LCOV_EXCL_START
     catch (...) {
         helicsErrorHandler(err);
     }
+    // LCOV_EXCL_STOP
 }
 
 static constexpr char invalidMessageObject[] = "The message object was not valid";
