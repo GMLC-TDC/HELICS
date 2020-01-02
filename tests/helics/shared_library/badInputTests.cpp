@@ -195,7 +195,12 @@ TEST_F(function_tests, raw)
     EXPECT_EQ(pubid2, nullptr);
 
     auto subid = helicsFederateRegisterInput(vFed1, "inp1", helics_data_type_raw, "", nullptr);
-   
+
+    auto subid3 = helicsFederateRegisterInput(vFed1, "inp3", static_cast<helics_data_type>(-6985), "", &err);
+    EXPECT_NE(err.error_code, 0);
+    EXPECT_EQ(subid3, nullptr);
+    helicsErrorClear(&err);
+
     helicsInputAddTarget(subid, "pub1", nullptr);
 
     helicsFederateSetTimeProperty(vFed1, helics_property_time_period, 1.0, nullptr);
@@ -241,7 +246,12 @@ TEST_F(function_tests, raw2)
     EXPECT_EQ(subid2, nullptr);
     helicsErrorClear(&err);
 
-    helicsInputAddTarget(subid, "fed0/pub1", nullptr);
+    auto subid3 = helicsFederateRegisterGlobalInput(vFed1, "inp3", static_cast<helics_data_type>(-6985), "", &err);
+    EXPECT_NE(err.error_code, 0);
+    EXPECT_EQ(subid3, nullptr);
+    helicsErrorClear(&err);
+
+    helicsPublicationAddTarget(pubid, "inp1", nullptr);
 
     helicsFederateSetTimeProperty(vFed1, helics_property_time_period, 1.0, nullptr);
 
@@ -249,6 +259,9 @@ TEST_F(function_tests, raw2)
 
     helicsPublicationPublishDouble(pubid, 27.0, nullptr);
     helicsFederateRequestNextStep(vFed1, nullptr);
+
+    helicsInputGetRawValue(subid, nullptr, 5, nullptr, nullptr);
+    helicsInputGetString(subid, nullptr, 5, nullptr, nullptr);
     auto val = helicsInputGetComplexObject(subid, &err);
     EXPECT_NE(val.real, 0.0);
 
@@ -342,6 +355,9 @@ TEST_F(function_tests, typePub2)
     helicsErrorClear(&err);
     EXPECT_EQ(pubid2, nullptr);
 
+    helicsFederateRegisterFromPublicationJSON(vFed1, "unknownfile.json", &err);
+    EXPECT_NE(err.error_code, 0);
+    helicsErrorClear(&err);
 
     auto subid = helicsFederateRegisterTypeInput(vFed1, "inp1", "string", "", nullptr);
     auto subid2 = helicsFederateRegisterTypeInput(vFed1, "inp1", "string", "", &err);
@@ -355,15 +371,62 @@ TEST_F(function_tests, typePub2)
 
     helicsFederateEnterExecutingMode(vFed1, nullptr);
 
-    helicsPublicationPublishDouble(pubid, 27.0, nullptr);
+    helicsPublicationPublishTime(pubid, 27.0, nullptr);
+
+    helicsFederatePublishJSON(vFed1, "unknownfile.json", &err);
+    EXPECT_NE(err.error_code, 0);
+    helicsErrorClear(&err);
+
     helicsFederateRequestNextStep(vFed1, nullptr);
     char str[50] = "";
     int actLen{ 0 };
     helicsInputGetString(subid, str, 50, &actLen, &err);
     EXPECT_EQ(str[0], '2');
     EXPECT_EQ(str[1], '7');
+    helicsFederateClearUpdates(vFed1);
 
     helicsFederateFinalize(vFed1, nullptr);
+    //run a bunch of publish fails
+    helicsPublicationPublishRaw(pubid, str, actLen, &err);
+    EXPECT_NE(err.error_code, 0);
+    helicsErrorClear(&err);
+    helicsPublicationPublishString(pubid, str, &err);
+    EXPECT_NE(err.error_code, 0);
+    helicsErrorClear(&err);
+    helicsPublicationPublishInteger(pubid, 5, &err);
+    EXPECT_NE(err.error_code, 0);
+    helicsErrorClear(&err);
+    helicsPublicationPublishBoolean(pubid, helics_true, &err);
+    EXPECT_NE(err.error_code, 0);
+    helicsErrorClear(&err);
+    helicsPublicationPublishDouble(pubid, 39.2, &err);
+    EXPECT_NE(err.error_code, 0);
+    helicsErrorClear(&err);
+    helicsPublicationPublishTime(pubid, 19.2, &err);
+    EXPECT_NE(err.error_code, 0);
+    helicsErrorClear(&err);
+
+    helicsPublicationPublishChar(pubid, 'a', &err);
+    EXPECT_NE(err.error_code, 0);
+    helicsErrorClear(&err);
+
+    helicsPublicationPublishComplex(pubid, 2.5,-9.8, &err);
+    EXPECT_NE(err.error_code, 0);
+    helicsErrorClear(&err);
+
+    double r[2] = { 1.3,2.9 };
+    helicsPublicationPublishVector(pubid, r,2, &err);
+    EXPECT_NE(err.error_code, 0);
+    helicsErrorClear(&err);
+
+    helicsPublicationPublishVector(pubid, nullptr, 2, &err);
+    EXPECT_NE(err.error_code, 0);
+    helicsErrorClear(&err);
+
+    helicsPublicationPublishNamedPoint(pubid, nullptr, 2.0, &err);
+    EXPECT_NE(err.error_code, 0);
+    helicsErrorClear(&err);
+
 }
 
 TEST_F(function_tests, initError)
@@ -400,10 +463,28 @@ TEST_F(function_tests, initError2)
     helicsFederateRegisterGlobalTypePublication(vFed1, "pub1", "custom1", "", nullptr);
 
     auto subid = helicsFederateRegisterTypeInput(vFed1, "inp1", "custom2", "", nullptr);
+    auto k1 = helicsInputGetKey(subid);
+
+    auto inp2 = helicsFederateGetInput(vFed1, "inp1", &err);
+    EXPECT_EQ(err.error_code, 0);
+    auto k2 = helicsInputGetKey(inp2);
+    
+    EXPECT_STREQ(k1, k2);
+
+    auto inp3 = helicsFederateGetInputByIndex(vFed1, 0, &err);
+    EXPECT_EQ(err.error_code, 0);
+    auto k3 = helicsInputGetKey(inp3);
+
+    EXPECT_STREQ(k1, k3);
 
     helicsInputAddTarget(subid, "pub1", nullptr);
 
     helicsFederateSetTimeProperty(vFed1, helics_property_time_period, 1.0, nullptr);
+
+    auto pub3 = helicsFederateGetPublication(vFed1, "unknown", &err);
+    EXPECT_NE(err.error_code, 0);
+    helicsErrorClear(&err);
+    EXPECT_EQ(pub3, nullptr);
 
     helicsFederateEnterInitializingMode(vFed1, &err);
     EXPECT_NE(err.error_code, 0);
@@ -412,6 +493,16 @@ TEST_F(function_tests, initError2)
     helicsFederateRequestTimeAdvance(vFed1,0.1, &err);
     EXPECT_NE(err.error_code, 0);
     helicsErrorClear(&err);
+
+    auto inp4 = helicsFederateGetInput(vFed1, "unknown", &err);
+    EXPECT_NE(err.error_code, 0);
+    helicsErrorClear(&err);
+    EXPECT_EQ(inp4, nullptr);
+
+    auto inp5 = helicsFederateGetInputByIndex(vFed1, 4, &err);
+    EXPECT_NE(err.error_code, 0);
+    helicsErrorClear(&err);
+    EXPECT_EQ(inp5, nullptr);
 
     helicsFederateFinalize(vFed1, nullptr);
 }
@@ -427,6 +518,11 @@ TEST_F(function_tests, initError3)
     auto subid = helicsFederateRegisterTypeInput(vFed1, "inp1", "custom2", "", nullptr);
 
     helicsInputAddTarget(subid, "pub1", nullptr);
+
+    auto inp3 = helicsFederateGetSubscription(vFed1, "unknown", &err);
+    EXPECT_NE(err.error_code, 0);
+    helicsErrorClear(&err);
+    EXPECT_EQ(inp3, nullptr);
 
     helicsFederateSetTimeProperty(vFed1, helics_property_time_period, 1.0, nullptr);
 

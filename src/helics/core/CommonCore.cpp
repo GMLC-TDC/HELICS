@@ -3389,6 +3389,7 @@ void CommonCore::processCoreConfigureCommands(ActionMessage& cmd)
                     auto M = stx::any_cast<
                         std::function<void(int, const std::string&, const std::string&)>>(
                         std::move(*op));
+                    M(0, identifier, "logging callback activated");
                     setLoggerFunction(std::move(M));
                 }
             }

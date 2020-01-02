@@ -157,10 +157,11 @@ TEST(logging_tests, core_logging)
         auto* mp = reinterpret_cast<logblocktype*>(udata);
         mp->lock()->emplace_back(level, message);
     };
-
-    helicsCoreSetLoggingCallback(core, logg, &mlog, nullptr);
+    auto err = helicsErrorInitialize();
+    helicsCoreSetLoggingCallback(core, logg, &mlog, &err);
+    EXPECT_EQ(err.error_code, 0);
     helicsCoreDisconnect(core, nullptr);
-    helicsCleanupLibrary();
+    helicsCloseLibrary();
     EXPECT_FALSE(mlog.lock()->empty());
 }
 
@@ -176,9 +177,10 @@ TEST(logging_tests, broker_logging)
         auto* mp = reinterpret_cast<logblocktype*>(udata);
         mp->lock()->emplace_back(level, message);
     };
-
-    helicsBrokerSetLoggingCallback(broker, logg, &mlog, nullptr);
+    auto err = helicsErrorInitialize();
+    helicsBrokerSetLoggingCallback(broker, logg, &mlog, &err);
+    EXPECT_EQ(err.error_code, 0);
     helicsBrokerDisconnect(broker, nullptr);
-    helicsCleanupLibrary();
+    helicsCloseLibrary();
     EXPECT_FALSE(mlog.lock()->empty());
 }
