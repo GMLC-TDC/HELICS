@@ -522,7 +522,7 @@ TEST_F(filter_tests, clone_test)
     auto p3 = helicsFederateRegisterGlobalEndpoint(dcFed, "cm", "", &err);
 
     auto f1 = helicsFederateRegisterCloningFilter(dcFed, nullptr, &err);
-    CE(helicsFilterAddDeliveryEndpoint(f1, "cm",&err));
+    CE(helicsFilterAddDeliveryEndpoint(f1, "cm", &err));
     EXPECT_TRUE(err.error_code == helics_ok);
     CE(helicsFilterAddSourceTarget(f1, "src", &err));
 

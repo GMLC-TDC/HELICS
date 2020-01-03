@@ -347,7 +347,6 @@ INSTANTIATE_TEST_SUITE_P(
     ::testing::ValuesIn(core_types_simple));
 INSTANTIATE_TEST_SUITE_P(mfed_tests, mfed_type_tests, ::testing::ValuesIn(core_types));
 
-
 TEST(message_object, test1)
 {
     auto brk = helicsCreateBroker("zmq", "brk1", "", nullptr);
@@ -390,7 +389,7 @@ TEST(message_object, test1)
     helicsMessageGetRawData(m2, data, 20, &actSize, &err);
     EXPECT_EQ(err.error_code, 0);
     EXPECT_EQ(actSize, 8);
-    EXPECT_EQ(std::string(data,data+actSize), "raw data");
+    EXPECT_EQ(std::string(data, data + actSize), "raw data");
 
     EXPECT_EQ(helicsMessageIsValid(m2), helics_true);
 
@@ -409,11 +408,10 @@ TEST(message_object, test1)
     helicsErrorClear(&err);
 
     helicsMessageResize(m2, 500, nullptr);
-    auto s2=helicsMessageGetRawDataSize(m2);
+    auto s2 = helicsMessageGetRawDataSize(m2);
     EXPECT_EQ(s2, 500);
 
     helicsMessageReserve(m2, 2000, nullptr);
-
 
     helicsMessageAppendData(m2, " more data", 8, nullptr);
 
@@ -430,5 +428,5 @@ TEST(message_object, test1)
 
     helicsFederateFinalize(fed, nullptr);
     helicsFederateFinalize(fed2, nullptr);
-    helicsBrokerDisconnect(brk,nullptr);
+    helicsBrokerDisconnect(brk, nullptr);
 }

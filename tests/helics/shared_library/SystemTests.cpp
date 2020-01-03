@@ -9,19 +9,20 @@ SPDX-License-Identifier: BSD-3-Clause
 /** these test cases test out the value converters
  */
 #include "ctestFixtures.hpp"
+
 #include <thread>
 
 TEST(other_tests, broker_global_value)
 {
     auto err = helicsErrorInitialize();
-    auto brk = helicsCreateBroker("test", "gbroker", "--root",&err);
+    auto brk = helicsCreateBroker("test", "gbroker", "--root", &err);
     std::string globalVal = "this is a string constant that functions as a global";
     std::string globalVal2 = "this is a second string constant that functions as a global";
-    helicsBrokerSetGlobal(brk,"testglobal", globalVal.c_str(),&err);
+    helicsBrokerSetGlobal(brk, "testglobal", globalVal.c_str(), &err);
     auto q = helicsCreateQuery("global", "testglobal");
-    auto res = helicsQueryBrokerExecute(q,brk,&err);
+    auto res = helicsQueryBrokerExecute(q, brk, &err);
     EXPECT_EQ(res, globalVal);
-    helicsBrokerSetGlobal(brk,"testglobal2", globalVal2.c_str(),&err);
+    helicsBrokerSetGlobal(brk, "testglobal2", globalVal2.c_str(), &err);
     helicsQueryFree(q);
     q = helicsCreateQuery("global", "testglobal2");
     res = helicsQueryBrokerExecute(q, brk, &err);
@@ -43,17 +44,16 @@ TEST(other_tests, broker_global_value)
     EXPECT_NE(err.error_code, 0);
     helicsErrorClear(&err);
 
-    helicsBrokerDisconnect(brk,&err);
+    helicsBrokerDisconnect(brk, &err);
     helicsQueryFree(q);
-    EXPECT_EQ(helicsBrokerIsConnected(brk),helics_false);
+    EXPECT_EQ(helicsBrokerIsConnected(brk), helics_false);
 }
-
 
 TEST(other_tests, core_global_value)
 {
-    auto err = helicsErrorInitialize(); 
-    auto brk = helicsCreateBroker("test", "gbrokerc", "--root", &err); 
-   
+    auto err = helicsErrorInitialize();
+    auto brk = helicsCreateBroker("test", "gbrokerc", "--root", &err);
+
     auto cr = helicsCreateCore("test", "gcore", "--broker=gbrokerc", &err);
     EXPECT_EQ(err.error_code, 0);
     EXPECT_EQ(helicsCoreIsConnected(cr), helics_true);
@@ -61,7 +61,7 @@ TEST(other_tests, core_global_value)
     std::string globalVal2 = "this is a second string constant that functions as a global";
     helicsCoreSetGlobal(cr, "testglobal", globalVal.c_str(), &err);
     auto q = helicsCreateQuery("global", "testglobal");
-    auto res = helicsQueryCoreExecute(q, cr, &err); 
+    auto res = helicsQueryCoreExecute(q, cr, &err);
     EXPECT_EQ(res, globalVal);
     helicsCoreSetGlobal(cr, "testglobal2", globalVal2.c_str(), &err);
     helicsQueryFree(q);
@@ -87,7 +87,7 @@ TEST(other_tests, core_global_value)
 
     helicsCoreDisconnect(cr, &err);
     helicsBrokerDisconnect(brk, &err);
-   
+
     helicsQueryFree(q);
     EXPECT_EQ(helicsBrokerIsConnected(brk), helics_false);
 }
@@ -99,7 +99,7 @@ TEST(other_tests, federate_global_value)
 
     auto cr = helicsCreateCore("test", "gcore", "--broker=gbrokerc", &err);
 
-    char *argv[4];
+    char* argv[4];
     argv[0] = "";
     argv[1] = "--corename=gcore";
     argv[2] = "--type=test";
@@ -116,10 +116,10 @@ TEST(other_tests, federate_global_value)
 
     auto fi2 = helicsFederateInfoClone(fi, &err);
     EXPECT_NE(fi2, nullptr);
-    helicsFederateInfoLoadFromArgs(fi2, 4, argv, &err); 
+    helicsFederateInfoLoadFromArgs(fi2, 4, argv, &err);
     EXPECT_NE(err.error_code, 0);
     helicsErrorClear(&err);
-   
+
     std::string globalVal = "this is a string constant that functions as a global";
     std::string globalVal2 = "this is a second string constant that functions as a global";
     helicsFederateSetGlobal(fed, "testglobal", globalVal.c_str(), &err);
@@ -130,8 +130,7 @@ TEST(other_tests, federate_global_value)
     helicsQueryFree(q);
     q = helicsCreateQuery("global", "testglobal2");
     helicsQueryExecuteAsync(q, fed, &err);
-    while (helicsQueryIsCompleted(q) == helics_false)
-    {
+    while (helicsQueryIsCompleted(q) == helics_false) {
         std::this_thread::sleep_for(std::chrono::milliseconds(20));
     }
     res = helicsQueryExecuteComplete(q, &err);
@@ -166,14 +165,12 @@ TEST(other_tests, federate_global_value)
     EXPECT_EQ(helicsBrokerIsConnected(brk), helics_false);
 }
 
-
 TEST(other_tests, core_creation)
 {
-
     auto err = helicsErrorInitialize();
     auto brk = helicsCreateBroker("test", "gbrokerc", "--root", &err);
 
-    char *argv[4];
+    char* argv[4];
     argv[0] = "";
     argv[1] = "--name=gcore";
     argv[2] = "--timeout=2000";
@@ -189,7 +186,7 @@ TEST(other_tests, core_creation)
     auto cr2 = helicsCreateCoreFromArgs("test", nullptr, 4, argv, &err);
     EXPECT_NE(err.error_code, 0);
     helicsErrorClear(&err);
-    EXPECT_EQ(cr2, nullptr); 
+    EXPECT_EQ(cr2, nullptr);
 
     helicsCoreDisconnect(cr, &err);
     helicsBrokerDisconnect(brk, &err);
@@ -199,10 +196,9 @@ TEST(other_tests, core_creation)
 
 TEST(other_tests, broker_creation)
 {
-
     auto err = helicsErrorInitialize();
-    
-    char *argv[4];
+
+    char* argv[4];
     argv[0] = "";
     argv[1] = "--name=gbrokerc";
     argv[2] = "--timeout=2000";
@@ -224,4 +220,3 @@ TEST(other_tests, broker_creation)
 
     EXPECT_EQ(helicsBrokerIsConnected(brk), helics_false);
 }
-

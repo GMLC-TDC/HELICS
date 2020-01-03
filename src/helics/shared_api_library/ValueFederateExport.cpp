@@ -92,12 +92,12 @@ helics_input helicsFederateRegisterSubscription(helics_federate fed, const char*
         sub->inputPtr = &fedObj->registerSubscription(AS_STRING(key), AS_STRING(units));
         sub->fedptr = std::move(fedObj);
         auto ret = reinterpret_cast<helics_input>(sub.get());
-        addInput(fed, std::move(sub));  
+        addInput(fed, std::move(sub));
         return ret;
     }
     // LCOV_EXCL_START
     catch (...) {
-        helicsErrorHandler(err); 
+        helicsErrorHandler(err);
     }
     return nullptr;
     // LCOV_EXCL_STOP

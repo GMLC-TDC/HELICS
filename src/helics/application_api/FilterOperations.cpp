@@ -378,7 +378,8 @@ CloneFilterOperation::~CloneFilterOperation() = default;
 
 void CloneFilterOperation::set(const std::string& property, double /*val*/)
 {
-    throw(helics::InvalidParameter(std::string("property " + property + " is not a known property")));
+    throw(
+        helics::InvalidParameter(std::string("property " + property + " is not a known property")));
 }
 
 void CloneFilterOperation::setString(const std::string& property, const std::string& val)
@@ -402,10 +403,9 @@ void CloneFilterOperation::setString(const std::string& property, const std::str
         if (fnd != handle->cend()) {
             handle->erase(fnd);
         }
-    }
-    else
-    {
-        throw(helics::InvalidParameter(std::string("property " + property + " is not a known property")));
+    } else {
+        throw(helics::InvalidParameter(
+            std::string("property " + property + " is not a known property")));
     }
 }
 

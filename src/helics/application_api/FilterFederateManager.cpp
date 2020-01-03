@@ -29,8 +29,7 @@ Filter& FilterFederateManager::registerFilter(
         auto filts = filters.lock();
         if (name.empty()) {
             filts->insert(coreObject->getHandleName(filt->getHandle()), std::move(filt));
-        }
-        else {
+        } else {
             filts->insert(name, std::move(filt));
         }
         return f;
