@@ -31,14 +31,17 @@ TEST(other_tests, broker_global_value)
     res = helicsQueryBrokerExecute(nullptr, brk, &err);
     EXPECT_NE(err.error_code, 0);
     helicsErrorClear(&err);
+    EXPECT_STREQ("#invalid", res);
 
     res = helicsQueryBrokerExecute(q, nullptr, &err);
     EXPECT_NE(err.error_code, 0);
     helicsErrorClear(&err);
+    EXPECT_STREQ("#invalid", res);
 
     res = helicsQueryBrokerExecute(nullptr, nullptr, &err);
     EXPECT_NE(err.error_code, 0);
     helicsErrorClear(&err);
+    EXPECT_STREQ("#invalid", res);
 
     helicsBrokerSetGlobal(brk, nullptr, "v2", &err);
     EXPECT_NE(err.error_code, 0);
@@ -75,14 +78,17 @@ TEST(other_tests, core_global_value)
     res = helicsQueryCoreExecute(nullptr, cr, &err);
     EXPECT_NE(err.error_code, 0);
     helicsErrorClear(&err);
+    EXPECT_STREQ("#invalid", res);
 
     res = helicsQueryCoreExecute(q, nullptr, &err);
     EXPECT_NE(err.error_code, 0);
     helicsErrorClear(&err);
+    EXPECT_STREQ("#invalid", res);
 
     res = helicsQueryCoreExecute(nullptr, nullptr, &err);
     EXPECT_NE(err.error_code, 0);
     helicsErrorClear(&err);
+    EXPECT_STREQ("#invalid", res);
 
     helicsCoreSetGlobal(cr, nullptr, "v2", &err);
     EXPECT_NE(err.error_code, 0);
@@ -145,14 +151,17 @@ TEST(other_tests, federate_global_value)
     res = helicsQueryExecute(nullptr, fed, &err);
     EXPECT_NE(err.error_code, 0);
     helicsErrorClear(&err);
+    EXPECT_STREQ("#invalid", res);
 
     res = helicsQueryExecute(q, nullptr, &err);
     EXPECT_NE(err.error_code, 0);
     helicsErrorClear(&err);
+    EXPECT_STREQ("#invalid", res);
 
     res = helicsQueryExecute(nullptr, nullptr, &err);
     EXPECT_NE(err.error_code, 0);
     helicsErrorClear(&err);
+    EXPECT_STREQ("#invalid", res);
 
     helicsFederateSetGlobal(fed, nullptr, "v2", &err);
     EXPECT_NE(err.error_code, 0);

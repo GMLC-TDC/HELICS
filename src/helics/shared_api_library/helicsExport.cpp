@@ -174,7 +174,7 @@ void helicsErrorHandler(helics_error* err) noexcept
             err->error_code = helics_error_external_type;
             err->message = getMasterHolder()->addErrorString(exc.what());
         }
-        // LCOV_EXLC_START
+        // LCOV_EXCL_START
         catch (...) {
             err->error_code = helics_error_external_type;
             err->message = unknown_err_string;
