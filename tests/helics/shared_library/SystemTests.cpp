@@ -99,7 +99,7 @@ TEST(other_tests, federate_global_value)
 
     auto cr = helicsCreateCore("test", "gcore", "--broker=gbrokerc", &err);
 
-    char* argv[4];
+    const char* argv[4];
     argv[0] = "";
     argv[1] = "--corename=gcore";
     argv[2] = "--type=test";
@@ -170,7 +170,7 @@ TEST(other_tests, core_creation)
     auto err = helicsErrorInitialize();
     auto brk = helicsCreateBroker("test", "gbrokerc", "--root", &err);
 
-    char* argv[4];
+    const char* argv[4];
     argv[0] = "";
     argv[1] = "--name=gcore";
     argv[2] = "--timeout=2000";
@@ -198,7 +198,7 @@ TEST(other_tests, broker_creation)
 {
     auto err = helicsErrorInitialize();
 
-    char* argv[4];
+    const char* argv[4];
     argv[0] = "";
     argv[1] = "--name=gbrokerc";
     argv[2] = "--timeout=2000";
