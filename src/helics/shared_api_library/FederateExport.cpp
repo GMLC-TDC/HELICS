@@ -334,9 +334,11 @@ void helicsFederateFinalize(helics_federate fed, helics_error* err)
     try {
         fedObj->finalize();
     }
+    // LCOV_EXCL_START
     catch (...) {
         helicsErrorHandler(err);
     }
+    //LCOV_EXCL_STOP
 }
 
 void helicsFederateFinalizeAsync(helics_federate fed, helics_error* err)
@@ -348,9 +350,11 @@ void helicsFederateFinalizeAsync(helics_federate fed, helics_error* err)
     try {
         fedObj->finalizeAsync();
     }
+    // LCOV_EXCL_START
     catch (...) {
         helicsErrorHandler(err);
     }
+    // LCOV_EXCL_STOP
 }
 
 void helicsFederateFinalizeComplete(helics_federate fed, helics_error* err)
@@ -362,9 +366,11 @@ void helicsFederateFinalizeComplete(helics_federate fed, helics_error* err)
     try {
         fedObj->finalizeComplete();
     }
+    // LCOV_EXCL_START
     catch (...) {
         helicsErrorHandler(err);
     }
+    // LCOV_EXCL_STOP
 }
 
 /* initialization, execution, and time requests */
@@ -709,10 +715,12 @@ helics_federate_state helicsFederateGetState(helics_federate fed, helics_error* 
         auto FedMode = fedObj->getCurrentMode();
         return modeEnumConversions.at(FedMode);
     }
+    // LCOV_EXCL_START
     catch (...) {
         helicsErrorHandler(err);
         return helics_state_error;
     }
+    // LCOV_EXCL_STOP
 }
 
 const char* helicsFederateGetName(helics_federate fed)
@@ -778,10 +786,12 @@ helics_time helicsFederateGetTimeProperty(helics_federate fed, int timeProperty,
 
         return (T < helics::Time::maxVal()) ? static_cast<double>(T) : helics_time_maxtime;
     }
+    // LCOV_EXCL_START
     catch (...) {
         helicsErrorHandler(err);
         return helics_time_invalid;
     }
+    // LCOV_EXCL_STOP
 }
 
 helics_bool helicsFederateGetFlagOption(helics_federate fed, int flag, helics_error* err)
@@ -794,10 +804,12 @@ helics_bool helicsFederateGetFlagOption(helics_federate fed, int flag, helics_er
         bool res = fedObj->getFlagOption(flag);
         return (res) ? helics_true : helics_false;
     }
+    // LCOV_EXCL_START
     catch (...) {
         helicsErrorHandler(err);
         return helics_false;
     }
+    // LCOV_EXCL_STOP
 }
 
 int helicsFederateGetIntegerProperty(helics_federate fed, int intProperty, helics_error* err)
@@ -809,10 +821,12 @@ int helicsFederateGetIntegerProperty(helics_federate fed, int intProperty, helic
     try {
         return fedObj->getIntegerProperty(intProperty);
     }
+    // LCOV_EXCL_START
     catch (...) {
         helicsErrorHandler(err);
         return -101;
     }
+    // LCOV_EXCL_STOP
 }
 
 void helicsFederateSetSeparator(helics_federate fed, char separator, helics_error* err)

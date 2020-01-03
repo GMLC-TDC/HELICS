@@ -193,6 +193,16 @@ TEST_F(function_tests, input_test)
     EXPECT_NE(err.error_code, 0);
     helicsErrorClear(&err);
 
+    //expect error entering initializing Mode again
+    helicsFederateEnterInitializingModeAsync(vFed1, &err);
+    EXPECT_NE(err.error_code, 0);
+    helicsErrorClear(&err);
+
+    //expect error entering initializing Mode again
+    helicsFederateEnterInitializingModeComplete(vFed1, &err);
+    EXPECT_NE(err.error_code, 0);
+    helicsErrorClear(&err);
+
     helicsFederateFinalize(vFed1, nullptr);
 }
 
@@ -287,6 +297,13 @@ TEST_F(function_tests, raw2)
     EXPECT_NE(val.real, 0.0);
 
     helicsFederateFinalize(vFed1, nullptr);
+
+    helics_iteration_result res;
+    helicsFederateRequestTimeIterative(
+        vFed1, 1.0, helics_iteration_request_no_iteration, &res, &err);
+    EXPECT_EQ(err.error_code, 0);
+    helicsErrorClear(&err);
+    EXPECT_EQ(res, helics_iteration_result_halted);
 }
 
 TEST_F(function_tests, string)
@@ -400,7 +417,9 @@ TEST_F(function_tests, typePub2)
 
     helicsFederateSetTimeProperty(vFed1, helics_property_time_period, 1.0, nullptr);
 
-    helicsFederateEnterExecutingMode(vFed1, nullptr);
+    helicsFederateEnterExecutingModeIterativeAsync(vFed1, helics_iteration_request_no_iteration, nullptr);
+    auto res = helicsFederateEnterExecutingModeIterativeComplete(vFed1, nullptr);
+    EXPECT_EQ(res, helics_iteration_result_next_step);
 
     helicsPublicationPublishTime(pubid, 27.0, nullptr);
 
@@ -472,6 +491,20 @@ TEST_F(function_tests, initError)
     helicsInputAddTarget(subid, "pub1", nullptr);
 
     helicsFederateSetTimeProperty(vFed1, helics_property_time_period, 1.0, nullptr);
+
+    auto tm = helicsFederateRequestTime(vFed1, 2.0, &err);
+    EXPECT_NE(err.error_code, 0);
+    EXPECT_EQ(tm, helics_time_invalid);
+    helicsErrorClear(&err);
+
+    helicsFederateRequestTimeAsync(vFed1, 2.0, &err);
+    EXPECT_NE(err.error_code, 0);
+    helicsErrorClear(&err);
+
+    tm = helicsFederateRequestTimeComplete(vFed1, &err);
+    EXPECT_NE(err.error_code, 0);
+    EXPECT_EQ(tm, helics_time_invalid);
+    helicsErrorClear(&err);
 
     helicsFederateEnterExecutingMode(vFed1, &err);
     EXPECT_NE(err.error_code, 0);
@@ -581,16 +614,32 @@ TEST_F(function_tests, initError4)
 
     helicsFederateEnterExecutingModeAsync(vFed1, &err);
     EXPECT_EQ(err.error_code, 0);
+    
+
     helicsFederateEnterExecutingModeComplete(vFed1, &err);
     EXPECT_NE(err.error_code, 0);
     helicsErrorClear(&err);
 
+    helicsFederateIsAsyncOperationCompleted(vFed1, &err);
+    EXPECT_EQ(err.error_code, 0);
+
+    helics_iteration_result res;
     helicsFederateRequestTimeIterative(
-        vFed1, 1.0, helics_iteration_request_no_iteration, nullptr, &err);
+        vFed1, 1.0, helics_iteration_request_no_iteration, &res, &err);
+    EXPECT_NE(err.error_code, 0);
+    helicsErrorClear(&err);
+    EXPECT_EQ(res, helics_iteration_result_error);
+
+    helicsFederateFinalize(vFed1, nullptr);
+
+    helicsFederateEnterExecutingModeAsync(vFed1, &err);
     EXPECT_NE(err.error_code, 0);
     helicsErrorClear(&err);
 
-    helicsFederateFinalize(vFed1, nullptr);
+    helicsFederateEnterExecutingModeIterativeAsync(vFed1, helics_iteration_request_force_iteration, &err);
+    EXPECT_NE(err.error_code, 0);
+
+    
 }
 
 TEST_F(function_tests, initError5)
@@ -898,7 +947,7 @@ TEST_F(function_tests, filter_tests4)
     EXPECT_NE(err.error_code, 0);
     helicsErrorClear(&err);
 
-    auto ept1 = helicsFederateRegisterGlobalEndpoint(mFed1, "ept1", "", nullptr);
+    helicsFederateRegisterGlobalEndpoint(mFed1, "ept1", "", nullptr);
 
     helicsFilterAddDeliveryEndpoint(filt1, "ept1", nullptr);
     helicsFilterAddSourceTarget(filt1, "ept1", &err);

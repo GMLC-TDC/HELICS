@@ -1010,6 +1010,9 @@ TEST(evil_federate_test, helicsFederateFinalize)
     helicsErrorClear(&err);
     helicsFederateFinalize(evil_federate, &err);
     EXPECT_NE(err.error_code, 0);
+    helicsErrorClear(&err);
+    helicsFederateFinalize(nullptr, &err);
+    EXPECT_NE(err.error_code, 0);
 }
 
 TEST(evil_federate_test, helicsFederateFinalizeAsync)
