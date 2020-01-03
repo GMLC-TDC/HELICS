@@ -493,8 +493,7 @@ helics_core helicsCreateCore(const char* type, const char* name, const char* ini
         } else {
             core->coreptr = helics::CoreFactory::FindOrCreate(ct, nstring, AS_STRING(initString));
         }
-        if (!core->coreptr->isConnected())
-        {
+        if (!core->coreptr->isConnected()) {
             core->coreptr->connect();
         }
         auto retcore = reinterpret_cast<helics_core>(core.get());
@@ -530,8 +529,7 @@ helics_core helicsCreateCoreFromArgs(const char* type, const char* name, int arg
             args.emplace_back(argv[ii]);
         }
         core->coreptr = helics::CoreFactory::FindOrCreate(ct, AS_STRING(name), args);
-        if (!core->coreptr->isConnected())
-        {
+        if (!core->coreptr->isConnected()) {
             core->coreptr->connect();
         }
         auto retcore = reinterpret_cast<helics_core>(core.get());

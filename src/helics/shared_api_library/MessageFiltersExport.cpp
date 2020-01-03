@@ -128,7 +128,7 @@ helics_filter helicsFederateRegisterCloningFilter(helics_federate fed, const cha
 
     try {
         auto filt = std::make_unique<helics::FilterObject>();
-        filt->filtPtr = &helics::make_cloning_filter(helics::filter_types::clone, fedObj.get(), std::string{},AS_STRING(name));
+        filt->filtPtr = &helics::make_cloning_filter(helics::filter_types::clone, fedObj.get(), std::string{}, AS_STRING(name));
         filt->fedptr = std::move(fedObj);
         filt->cloning = true;
         auto ret = reinterpret_cast<helics_filter>(filt.get());
@@ -172,7 +172,7 @@ helics_filter helicsCoreRegisterCloningFilter(helics_core cr, const char* name, 
     }
     try {
         auto filt = std::make_unique<helics::FilterObject>();
-        filt->uFilter = helics::make_cloning_filter(helics::filter_types::clone, core.get(), std::string{},AS_STRING(name));
+        filt->uFilter = helics::make_cloning_filter(helics::filter_types::clone, core.get(), std::string{}, AS_STRING(name));
         filt->filtPtr = filt->uFilter.get();
         filt->corePtr = std::move(core);
         filt->cloning = true;

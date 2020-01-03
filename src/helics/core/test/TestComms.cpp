@@ -162,14 +162,14 @@ namespace testcore {
                                     foundRoute = true;
                                 }
                             }
-                            if (!foundRoute)
-                            {
+                            if (!foundRoute) {
                                 auto brk = BrokerFactory::findBroker(newroute);
 
                                 if (brk) {
                                     auto cbrk = std::dynamic_pointer_cast<CoreBroker>(brk);
                                     if (cbrk) {
-                                        routes.emplace(route_id{ cmd.getExtraData() }, std::move(cbrk));
+                                        routes.emplace(
+                                            route_id{cmd.getExtraData()}, std::move(cbrk));
                                         foundRoute = true;
                                     }
                                 }

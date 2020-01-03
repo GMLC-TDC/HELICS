@@ -2687,7 +2687,7 @@ TEST(evil_input_test, helicsInputSetMinimumChange)
     helicsInputSetMinimumChange(nullptr, 12.0, &err);
     helicsErrorClear(&err);
     //auto res2=helicsInputSetInfo(helics_input inp, const char* info, nullptr);
-    helicsInputSetMinimumChange(evil_input, 12.0, &err); 
+    helicsInputSetMinimumChange(evil_input, 12.0, &err);
     EXPECT_NE(err.error_code, 0);
 }
 

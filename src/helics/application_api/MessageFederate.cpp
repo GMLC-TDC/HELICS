@@ -279,8 +279,7 @@ void MessageFederate::sendMessage(
 {
     if ((currentMode == modes::executing) || (currentMode == modes::initializing)) {
         mfManager->sendMessage(source, dest, message);
-    }
-    else {
+    } else {
         throw(InvalidFunctionCall(
             "messages not allowed outside of execution and initialization mode"));
     }
@@ -294,36 +293,30 @@ void MessageFederate::sendMessage(
 {
     if ((currentMode == modes::executing) || (currentMode == modes::initializing)) {
         mfManager->sendMessage(source, dest, message, sendTime);
-    }
-    else {
+    } else {
         throw(InvalidFunctionCall(
             "messages not allowed outside of execution and initialization mode"));
     }
-    
 }
 
 void MessageFederate::sendMessage(const Endpoint& source, std::unique_ptr<Message> message)
 {
     if ((currentMode == modes::executing) || (currentMode == modes::initializing)) {
         mfManager->sendMessage(source, std::move(message));
-    }
-    else {
+    } else {
         throw(InvalidFunctionCall(
             "messages not allowed outside of execution and initialization mode"));
     }
-   
 }
 
 void MessageFederate::sendMessage(const Endpoint& source, const Message& message)
 {
     if ((currentMode == modes::executing) || (currentMode == modes::initializing)) {
         mfManager->sendMessage(source, std::make_unique<Message>(message));
-    }
-    else {
+    } else {
         throw(InvalidFunctionCall(
             "messages not allowed outside of execution and initialization mode"));
     }
-    
 }
 
 Endpoint& MessageFederate::getEndpoint(const std::string& eptName) const
