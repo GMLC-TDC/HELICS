@@ -48,7 +48,7 @@ TEST(other_tests, broker_global_value)
     helicsQueryFree(q);
     EXPECT_EQ(helicsBrokerIsConnected(brk), helics_false);
 }
-
+/*
 TEST(other_tests, core_global_value)
 {
     auto err = helicsErrorInitialize();
@@ -91,7 +91,7 @@ TEST(other_tests, core_global_value)
     helicsQueryFree(q);
     EXPECT_EQ(helicsBrokerIsConnected(brk), helics_false);
 }
-
+*/
 TEST(other_tests, federate_global_value)
 {
     auto err = helicsErrorInitialize();

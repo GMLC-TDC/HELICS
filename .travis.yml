@@ -279,6 +279,7 @@ script:
   - |
     if [[ "$SKIP_TEST_RUN" != "true" ]]; then
       echo "travis_wait ../scripts/run-ci-tests.sh ${CI_TEST_FLAGS}"
+      ctest -R shared-library-ci-tests --timeout 120 --verbose
       travis_wait $SHELL_CMD ../scripts/run-ci-tests.sh ${CI_TEST_FLAGS}
     else
       if [[ "$CORE_CI_TEST" == "true" ]]; then
