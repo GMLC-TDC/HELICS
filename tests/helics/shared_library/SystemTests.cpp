@@ -49,8 +49,6 @@ TEST(other_tests, broker_global_value)
     EXPECT_EQ(helicsBrokerIsConnected(brk), helics_false);
 }
 
-/*
-
 TEST(other_tests, core_global_value)
 {
     auto err = helicsErrorInitialize();
@@ -226,4 +224,4 @@ TEST(other_tests, broker_creation)
 
 }
 
-*/
+
