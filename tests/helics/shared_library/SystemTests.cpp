@@ -48,13 +48,16 @@ TEST(other_tests, broker_global_value)
     helicsQueryFree(q);
     EXPECT_EQ(helicsBrokerIsConnected(brk), helics_false);
 }
-/*
+
 TEST(other_tests, core_global_value)
 {
     auto err = helicsErrorInitialize();
     auto brk = helicsCreateBroker("test", "gbrokerc", "--root", &err);
 
     auto cr = helicsCreateCore("test", "gcore", "--broker=gbrokerc", &err);
+    EXPECT_EQ(err.error_code, 0);
+    auto connected = helicsCoreConnect(cr, &err);
+    EXPECT_EQ(connected, helics_true);
     EXPECT_EQ(err.error_code, 0);
     EXPECT_EQ(helicsCoreIsConnected(cr), helics_true);
     std::string globalVal = "this is a string constant that functions as a global";
@@ -91,7 +94,7 @@ TEST(other_tests, core_global_value)
     helicsQueryFree(q);
     EXPECT_EQ(helicsBrokerIsConnected(brk), helics_false);
 }
-*/
+
 TEST(other_tests, federate_global_value)
 {
     auto err = helicsErrorInitialize();

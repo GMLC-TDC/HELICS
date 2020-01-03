@@ -920,6 +920,26 @@ void helicsCoreSetReadyToInit(helics_core core, helics_error* err)
     cr->setCoreReadyToInit();
 }
 
+
+helics_bool helicsCoreConnect(helics_core core, helics_error* err)
+{
+    auto cr = getCore(core, err);
+    if (cr == nullptr) {
+        return helics_false;
+    }
+
+    try {
+        return (cr->connect()) ? helics_true : helics_false;
+    }
+    // LCOV_EXCL_START
+    catch (...) {
+        helicsErrorHandler(err);
+        return helics_false;
+    }
+    // LCOV_EXCL_STOP
+    
+}
+
 void helicsCoreDisconnect(helics_core core, helics_error* err)
 {
     auto cr = getCore(core, err);

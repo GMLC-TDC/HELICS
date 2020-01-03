@@ -393,6 +393,25 @@ TEST(evil_core_test, helicsCoreSetReadyToInit)
     EXPECT_NE(err.error_code, 0);
 }
 
+TEST(evil_core_test, helicsCoreConnect)
+{
+    //void helicsCoreConnect(helics_core core, helics_error* err);
+    char rdata[256];
+    helics_core evil_core = reinterpret_cast<helics_core>(rdata);
+    auto err = helicsErrorInitialize();
+    err.error_code = 45;
+    auto res=helicsCoreConnect(nullptr, &err);
+    helicsErrorClear(&err);
+    EXPECT_EQ(res, helics_false);
+    res = helicsCoreConnect(nullptr, &err);
+    EXPECT_NE(err.error_code, 0);
+    helicsErrorClear(&err);
+    EXPECT_EQ(res, helics_false);
+    res = helicsCoreConnect(evil_core, &err);
+    EXPECT_NE(err.error_code, 0);
+    EXPECT_EQ(res, helics_false);
+}
+
 TEST(evil_core_test, helicsCoreDisconnect)
 {
     //void helicsCoreDisconnect(helics_core core, helics_error* err);
