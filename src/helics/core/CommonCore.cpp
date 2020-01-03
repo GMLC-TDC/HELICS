@@ -51,8 +51,13 @@ void CommonCore::configure(const std::string& configureString)
     broker_state_t exp = broker_state_t::created;
     if (brokerState.compare_exchange_strong(exp, broker_state_t::configuring)) {
         // initialize the brokerbase
-        if (parseArgs(configureString) < 0) {
+        auto result = parseArgs(configureString);
+        if (result < 0) {
             brokerState = broker_state_t::created;
+            if (result == -4)
+            {
+                throw(helics::InvalidParameter("invalid arguments in command line"));
+            }
             return;
         }
         configureBase();
@@ -64,10 +69,15 @@ void CommonCore::configureFromArgs(int argc, char* argv[])
     broker_state_t exp = broker_state_t::created;
     if (brokerState.compare_exchange_strong(exp, broker_state_t::configuring)) {
         // initialize the brokerbase
-        if (parseArgs(argc, argv) < 0) {
-            brokerState = broker_state_t::created;
-            return;
-        }
+        auto result = parseArgs(argc, argv);
+            if (result < 0) {
+                brokerState = broker_state_t::created;
+                if (result == -4)
+                {
+                    throw(helics::InvalidParameter("invalid arguments in command line"));
+                }
+                return;
+            }
         configureBase();
     }
 }
@@ -77,8 +87,13 @@ void CommonCore::configureFromVector(std::vector<std::string> args)
     broker_state_t exp = broker_state_t::created;
     if (brokerState.compare_exchange_strong(exp, broker_state_t::configuring)) {
         // initialize the brokerbase
-        if (parseArgs(std::move(args)) < 0) {
+        auto result = parseArgs(std::move(args));
+        if (result< 0) {
             brokerState = broker_state_t::created;
+            if (result == -4)
+            {
+                throw(helics::InvalidParameter("invalid arguments in command line"));
+            }
             return;
         }
         configureBase();
@@ -2037,7 +2052,7 @@ std::string CommonCore::query(const std::string& target, const std::string& quer
         querycmd.messageID = index;
         querycmd.payload = queryStr;
         auto queryResult = ActiveQueries.getFuture(querycmd.messageID);
-        if (!global_id.load().isValid()) {
+        if (global_id.load() == parent_broker_id) {
             delayTransmitQueue.push(std::move(querycmd));
         } else {
             transmit(parent_route_id, querycmd);
@@ -2085,7 +2100,7 @@ std::string CommonCore::query(const std::string& target, const std::string& quer
     querycmd.payload = queryStr;
     querycmd.setStringData(target);
     auto queryResult = ActiveQueries.getFuture(querycmd.messageID);
-    if (!global_id.load().isValid()) {
+    if (global_id.load() == parent_broker_id) {
         delayTransmitQueue.push(std::move(querycmd));
     } else {
         transmit(parent_route_id, querycmd);
@@ -2102,7 +2117,7 @@ void CommonCore::setGlobal(const std::string& valueName, const std::string& valu
     querycmd.source_id = global_id.load();
     querycmd.payload = valueName;
     querycmd.setStringData(value);
-    if (!global_id.load().isValid()) {
+    if (global_id.load() == parent_broker_id) {
         delayTransmitQueue.push(std::move(querycmd));
     } else {
         transmit(parent_route_id, querycmd);

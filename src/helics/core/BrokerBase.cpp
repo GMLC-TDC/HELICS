@@ -199,6 +199,10 @@ int BrokerBase::parseArgs(int argc, char* argv[])
     app->add_subcommand(sApp);
     auto res = app->helics_parse(argc, argv);
     if (res != helicsCLI11App::parse_output::ok) {
+        if (res == helicsCLI11App::parse_output::parse_error)
+        {
+            return -4;
+        }
         return -1;
     }
     return 0;
@@ -211,6 +215,10 @@ int BrokerBase::parseArgs(std::vector<std::string> args)
     app->add_subcommand(sApp);
     auto res = app->helics_parse(std::move(args));
     if (res != helicsCLI11App::parse_output::ok) {
+        if (res == helicsCLI11App::parse_output::parse_error)
+        {
+            return -4;
+        }
         return -1;
     }
     return 0;
@@ -223,6 +231,10 @@ int BrokerBase::parseArgs(const std::string& initializationString)
     app->add_subcommand(sApp);
     auto res = app->helics_parse(initializationString);
     if (res != helicsCLI11App::parse_output::ok) {
+        if (res == helicsCLI11App::parse_output::parse_error)
+        {
+            return -4;
+        }
         return -1;
     }
     return 0;

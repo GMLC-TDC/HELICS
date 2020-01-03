@@ -375,16 +375,30 @@ std::unique_ptr<helicsCLI11App> FederateInfo::makeCLIApp()
 std::vector<std::string> FederateInfo::loadInfoFromArgs(const std::string& args)
 {
     auto app = makeCLIApp();
-    app->helics_parse(args);
-    coreType = app->getCoreType();
+    auto ret = app->helics_parse(args);
+    if (ret != helicsCLI11App::parse_output::ok)
+    {
+        coreType = app->getCoreType();
+    }
+    if (ret == helicsCLI11App::parse_output::parse_error)
+    {
+        throw helics::InvalidParameter("argument parsing failed");
+    }
     return app->remaining_for_passthrough();
 }
 
 std::vector<std::string> FederateInfo::loadInfoFromArgs(int argc, char* argv[])
 {
     auto app = makeCLIApp();
-    app->helics_parse(argc, argv);
-    coreType = app->getCoreType();
+    auto ret = app->helics_parse(argc,argv);
+    if (ret != helicsCLI11App::parse_output::ok)
+    {
+        coreType = app->getCoreType();
+    }
+    if (ret == helicsCLI11App::parse_output::parse_error)
+    {
+        throw helics::InvalidParameter("argument parsing failed");
+    }
     return app->remaining_for_passthrough();
 }
 
@@ -406,9 +420,15 @@ void FederateInfo::loadInfoFromArgs(std::vector<std::string>& args)
 {
     auto app = makeCLIApp();
     app->allow_extras();
-    app->helics_parse(args);
-
-    coreType = app->getCoreType();
+    auto ret=app->helics_parse(args);
+    if (ret != helicsCLI11App::parse_output::ok)
+    {
+        coreType = app->getCoreType();
+    }
+    if (ret == helicsCLI11App::parse_output::parse_error)
+    {
+        throw helics::InvalidParameter("argument parsing failed");
+    }
 }
 
 // function to load different formats easily
