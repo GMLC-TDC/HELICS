@@ -134,13 +134,11 @@ void helicsErrorHandler(helics_error* err) noexcept
             if (std::exception_ptr eptr = std::current_exception()) {
                 std::rethrow_exception(eptr);
             } else {
+                // LCOV_EXCL_START
                 err->error_code = helics_error_external_type;
                 err->message = unknown_err_string;
+                // LCOV_EXCL_STOP
             }
-        }
-        catch (const helics::InvalidIdentifier& iid) {
-            err->error_code = helics_error_invalid_object;
-            err->message = getMasterHolder()->addErrorString(iid.what());
         }
         catch (const helics::InvalidFunctionCall& ifc) {
             err->error_code = helics_error_invalid_function_call;
@@ -158,10 +156,16 @@ void helicsErrorHandler(helics_error* err) noexcept
             err->error_code = helics_error_connection_failure;
             err->message = getMasterHolder()->addErrorString(cf.what());
         }
+        // LCOV_EXCL_START
+        catch (const helics::InvalidIdentifier& iid) {
+            err->error_code = helics_error_invalid_object;
+            err->message = getMasterHolder()->addErrorString(iid.what());
+        }
         catch (const helics::HelicsSystemFailure& ht) {
             err->error_code = helics_error_system_failure;
             err->message = getMasterHolder()->addErrorString(ht.what());
         }
+        // LCOV_EXCL_STOP
         catch (const helics::HelicsException& he) {
             err->error_code = helics_error_other;
             err->message = getMasterHolder()->addErrorString(he.what());
@@ -170,15 +174,19 @@ void helicsErrorHandler(helics_error* err) noexcept
             err->error_code = helics_error_external_type;
             err->message = getMasterHolder()->addErrorString(exc.what());
         }
+        // LCOV_EXLC_START
         catch (...) {
             err->error_code = helics_error_external_type;
             err->message = unknown_err_string;
         }
+        // LCOV_EXCL_STOP
     }
+    // LCOV_EXCL_START
     catch (...) {
         err->error_code = helics_error_external_type;
         err->message = unknown_err_string;
     }
+    // LCOV_EXCL_STOP
 }
 
 void helicsFederateInfoFree(helics_federate_info fi)
@@ -485,7 +493,10 @@ helics_core helicsCreateCore(const char* type, const char* name, const char* ini
         } else {
             core->coreptr = helics::CoreFactory::FindOrCreate(ct, nstring, AS_STRING(initString));
         }
-
+        if (!core->coreptr->isConnected())
+        {
+            core->coreptr->connect();
+        }
         auto retcore = reinterpret_cast<helics_core>(core.get());
         getMasterHolder()->addCore(std::move(core));
         return retcore;
@@ -519,6 +530,10 @@ helics_core helicsCreateCoreFromArgs(const char* type, const char* name, int arg
             args.emplace_back(argv[ii]);
         }
         core->coreptr = helics::CoreFactory::FindOrCreate(ct, AS_STRING(name), args);
+        if (!core->coreptr->isConnected())
+        {
+            core->coreptr->connect();
+        }
         auto retcore = reinterpret_cast<helics_core>(core.get());
         getMasterHolder()->addCore(std::move(core));
 

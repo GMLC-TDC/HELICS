@@ -1535,8 +1535,13 @@ void CoreBroker::configure(const std::string& configureString)
 {
     broker_state_t exp = broker_state_t::created;
     if (brokerState.compare_exchange_strong(exp, broker_state_t::configuring)) {
-        if (parseArgs(configureString) < 0) {
+        auto result = parseArgs(configureString);
+        if (result < 0) {
             brokerState = broker_state_t::created;
+            if (result == -4)
+            {
+                throw(helics::InvalidParameter("invalid arguments in command line"));
+            }
             return;
         }
         configureBase();
@@ -1547,8 +1552,13 @@ void CoreBroker::configureFromArgs(int argc, char* argv[])
 {
     broker_state_t exp = broker_state_t::created;
     if (brokerState.compare_exchange_strong(exp, broker_state_t::configuring)) {
-        if (parseArgs(argc, argv) < 0) {
+        auto result = parseArgs(argc, argv);
+        if (result < 0) {
             brokerState = broker_state_t::created;
+            if (result == -4)
+            {
+                throw(helics::InvalidParameter("invalid arguments in command line"));
+            }
             return;
         }
         configureBase();
@@ -1559,8 +1569,13 @@ void CoreBroker::configureFromVector(std::vector<std::string> args)
 {
     broker_state_t exp = broker_state_t::created;
     if (brokerState.compare_exchange_strong(exp, broker_state_t::configuring)) {
-        if (parseArgs(std::move(args)) < 0) {
+        auto result = parseArgs(std::move(args));
+        if (result < 0) {
             brokerState = broker_state_t::created;
+            if (result == -4)
+            {
+                throw(helics::InvalidParameter("invalid arguments in command line"));
+            }
             return;
         }
         configureBase();
