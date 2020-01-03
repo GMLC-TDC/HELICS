@@ -338,7 +338,7 @@ void helicsFederateFinalize(helics_federate fed, helics_error* err)
     catch (...) {
         helicsErrorHandler(err);
     }
-    //LCOV_EXCL_STOP
+    // LCOV_EXCL_STOP
 }
 
 void helicsFederateFinalizeAsync(helics_federate fed, helics_error* err)

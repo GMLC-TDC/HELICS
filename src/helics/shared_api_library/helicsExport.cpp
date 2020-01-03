@@ -1118,7 +1118,7 @@ const char* helicsQueryCoreExecute(helics_query query, helics_core core, helics_
 
 const char* helicsQueryBrokerExecute(helics_query query, helics_broker broker, helics_error* err)
 {
-    auto brokerObj = getCore(broker, err);
+    auto brokerObj = getBroker(broker, err);
     if (brokerObj == nullptr) {
         return invalidStringConst;
     }
