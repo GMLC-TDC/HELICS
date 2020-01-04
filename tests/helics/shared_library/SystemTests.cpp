@@ -209,10 +209,9 @@ TEST(other_tests, core_creation)
     helicsErrorClear(&err);
     EXPECT_EQ(cr2, nullptr);
 
-    
     helicsBrokerDisconnect(brk, &err);
     helicsCoreDisconnect(cr, &err);
-    
+
     EXPECT_EQ(helicsBrokerIsConnected(brk), helics_false);
 }
 
@@ -240,7 +239,4 @@ TEST(other_tests, broker_creation)
     EXPECT_EQ(brk2, nullptr);
 
     helicsBrokerDisconnect(brk, &err);
-
 }
-
-

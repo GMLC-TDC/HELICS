@@ -257,7 +257,7 @@ TEST_F(function_tests, raw)
     helicsFederateFinalize(vFed1, nullptr);
 }
 
-// test registrations with invalid types 
+// test registrations with invalid types
 TEST_F(function_tests, raw2)
 {
     SetupTest(helicsCreateValueFederate, "test", 1);
@@ -537,7 +537,7 @@ TEST_F(function_tests, initError2)
     auto vFed1 = GetFederateAt(0);
     // register the publications
 
-     // the types here don't match which causes an error when initializing the federation
+    // the types here don't match which causes an error when initializing the federation
     helicsFederateRegisterGlobalTypePublication(vFed1, "pub1", "custom1", "", nullptr);
 
     auto subid = helicsFederateRegisterTypeInput(vFed1, "inp1", "custom2", "", nullptr);
@@ -560,13 +560,13 @@ TEST_F(function_tests, initError2)
 
     helicsFederateSetTimeProperty(vFed1, helics_property_time_period, 1.0, nullptr);
 
-    //unknown publication 
+    //unknown publication
     auto pub3 = helicsFederateGetPublication(vFed1, "unknown", &err);
     EXPECT_NE(err.error_code, 0);
     helicsErrorClear(&err);
     EXPECT_EQ(pub3, nullptr);
 
-    // error in this call from the mismatch 
+    // error in this call from the mismatch
     helicsFederateEnterInitializingMode(vFed1, &err);
     EXPECT_NE(err.error_code, 0);
     helicsErrorClear(&err);
@@ -596,7 +596,7 @@ TEST_F(function_tests, initError3)
     auto vFed1 = GetFederateAt(0);
     // register the publications
 
-      // the types here don't match which causes an error when initializing the federation
+    // the types here don't match which causes an error when initializing the federation
     helicsFederateRegisterGlobalTypePublication(vFed1, "pub1", "custom1", "", nullptr);
 
     auto subid = helicsFederateRegisterTypeInput(vFed1, "inp1", "custom2", "", nullptr);
@@ -693,7 +693,7 @@ TEST_F(function_tests, initError6)
     auto vFed1 = GetFederateAt(0);
     // register the publications
 
-      // the types here don't match which causes an error when initializing the federation
+    // the types here don't match which causes an error when initializing the federation
     helicsFederateRegisterGlobalTypePublication(vFed1, "pub1", "custom1", "", nullptr);
 
     auto subid = helicsFederateRegisterTypeInput(vFed1, "inp1", "custom2", "", nullptr);

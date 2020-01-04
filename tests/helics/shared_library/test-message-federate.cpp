@@ -347,7 +347,6 @@ INSTANTIATE_TEST_SUITE_P(
     ::testing::ValuesIn(core_types_simple));
 INSTANTIATE_TEST_SUITE_P(mfed_tests, mfed_type_tests, ::testing::ValuesIn(core_types));
 
-
 // a series of tests exercising the different aspects of message object setting and retrieval
 TEST(message_object, test1)
 {

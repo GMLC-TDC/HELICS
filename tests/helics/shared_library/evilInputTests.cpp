@@ -400,7 +400,7 @@ TEST(evil_core_test, helicsCoreConnect)
     helics_core evil_core = reinterpret_cast<helics_core>(rdata);
     auto err = helicsErrorInitialize();
     err.error_code = 45;
-    auto res=helicsCoreConnect(nullptr, &err);
+    auto res = helicsCoreConnect(nullptr, &err);
     helicsErrorClear(&err);
     EXPECT_EQ(res, helics_false);
     res = helicsCoreConnect(nullptr, &err);
