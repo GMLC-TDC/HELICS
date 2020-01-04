@@ -577,4 +577,46 @@ action_message_def::action_t BrokerBase::commandProcessor(ActionMessage& command
     return CMD_IGNORE;
 }
 
+// LCOV_EXCL_START
+const std::string &brokerStateName(BrokerBase::broker_state_t state)
+{
+    static const std::string createdString = "created";
+    static const std::string configuringString = "configuring";
+    static const std::string configuredString = "configured";
+    static const std::string connectingString = "connecting";
+    static const std::string connectedString = "connected";
+    static const std::string initializingString = "initializing";
+    static const std::string operatingString = "operating";
+    static const std::string terminatingString = "terminating";
+    static const std::string terminatedString = "terminated";
+    static const std::string erroredString = "error";
+    static const std::string otherString = "other";
+    switch (state)
+    {
+    case BrokerBase::broker_state_t::created:
+        return createdString;
+    case BrokerBase::broker_state_t::configuring:
+        return configuringString;
+    case BrokerBase::broker_state_t::configured:
+        return configuredString;
+    case BrokerBase::broker_state_t::connecting:
+        return connectingString;
+    case BrokerBase::broker_state_t::connected :
+        return connectedString;
+    case BrokerBase::broker_state_t::initializing:
+        return initializingString;
+    case BrokerBase::broker_state_t::operating:
+        return operatingString;
+    case BrokerBase::broker_state_t::terminating:
+        return terminatingString;
+    case BrokerBase::broker_state_t::terminated:
+        return terminatedString;
+    case BrokerBase::broker_state_t::errored:
+        return erroredString;
+    default:
+        return otherString;
+    }
+}
+// LCOV_EXCL_STOP
+
 } // namespace helics

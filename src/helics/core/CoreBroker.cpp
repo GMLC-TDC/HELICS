@@ -1704,9 +1704,18 @@ void CoreBroker::disconnect()
             global_id.load(),
             getIdentifier(),
             "waiting on disconnect: current state=" +
-                std::to_string(static_cast<int16_t>(brokerState.load())));
-        if (cnt == 5) {
+                brokerStateName(brokerState.load()));
+        if (cnt % 4==0) {
+            if (!isRunning())
+            {
+                LOG_WARNING(
+                    global_id.load(),
+                    getIdentifier(),
+                    "main loop is stopped but have not received disconnect notice, assuming disconnected");
+                return;
+            }
             addActionMessage(udisconnect);
+            
         }
     }
 }

@@ -184,8 +184,25 @@ void CommonCore::disconnect()
 {
     ActionMessage udisconnect(CMD_USER_DISCONNECT);
     addActionMessage(udisconnect);
+    int cnt{ 0 };
     while (!waitForDisconnect(std::chrono::milliseconds(200))) {
-        LOG_WARNING(global_id.load(), getIdentifier(), "waiting on disconnect");
+        ++cnt;
+        LOG_WARNING(
+            global_id.load(),
+            getIdentifier(),
+            "waiting on disconnect: current state=" +
+            brokerStateName(brokerState.load()));
+        if (cnt % 4 == 0) {
+            if (!isRunning())
+            {
+                LOG_WARNING(
+                    global_id.load(),
+                    getIdentifier(),
+                    "main loop is stopped but have not received disconnect notice, assuming disconnected");
+                return;
+            }
+            addActionMessage(udisconnect);
+        }
     }
 }
 
