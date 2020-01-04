@@ -51,7 +51,7 @@ class helicsCLI11App: public CLI::App {
         help_call,
         help_all_call,
         version_call,
-        parse_error=-4,
+        parse_error = -4,
     };
     bool quiet{false};
     parse_output last_output{parse_output::ok};

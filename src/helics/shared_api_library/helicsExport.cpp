@@ -493,7 +493,7 @@ helics_core helicsCreateCore(const char* type, const char* name, const char* ini
         } else {
             core->coreptr = helics::CoreFactory::FindOrCreate(ct, nstring, AS_STRING(initString));
         }
-        
+
         auto retcore = reinterpret_cast<helics_core>(core.get());
         getMasterHolder()->addCore(std::move(core));
         return retcore;
@@ -527,7 +527,7 @@ helics_core helicsCreateCoreFromArgs(const char* type, const char* name, int arg
             args.emplace_back(argv[ii]);
         }
         core->coreptr = helics::CoreFactory::FindOrCreate(ct, AS_STRING(name), args);
-        
+
         auto retcore = reinterpret_cast<helics_core>(core.get());
         getMasterHolder()->addCore(std::move(core));
 
@@ -920,7 +920,6 @@ void helicsCoreSetReadyToInit(helics_core core, helics_error* err)
     cr->setCoreReadyToInit();
 }
 
-
 helics_bool helicsCoreConnect(helics_core core, helics_error* err)
 {
     auto cr = getCore(core, err);
@@ -937,7 +936,6 @@ helics_bool helicsCoreConnect(helics_core core, helics_error* err)
         return helics_false;
     }
     // LCOV_EXCL_STOP
-    
 }
 
 void helicsCoreDisconnect(helics_core core, helics_error* err)
