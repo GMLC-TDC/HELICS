@@ -15,8 +15,7 @@ SPDX-License-Identifier: BSD-3-Clause
 struct iteration_tests: public FederateTestFixture, public ::testing::Test {
 };
 
-/** just a check that in the simple case we do actually get the time back we requested*/
-
+// run a simple iteration on a single federate to test out iterative calls
 TEST_F(iteration_tests, execution_iteration_test)
 {
     SetupTest(helicsCreateValueFederate, "test", 1);
@@ -47,6 +46,7 @@ TEST_F(iteration_tests, execution_iteration_test)
     EXPECT_EQ(val2, val);
 }
 
+// do an init iteration loop for convergence
 std::pair<double, int> runInitIterations(helics_federate vfed, int index, int total)
 {
     auto pub = helicsFederateRegisterPublication(vfed, "pub", helics_data_type_double, "", nullptr);
@@ -82,6 +82,7 @@ std::pair<double, int> runInitIterations(helics_federate vfed, int index, int to
     return {cval, itcount};
 }
 
+// a test with an iterative loop with a bunch of federates
 std::vector<std::pair<double, int>> run_iteration_round_robin(std::vector<helics_federate>& fedVec)
 {
     auto N = static_cast<int>(fedVec.size());
@@ -141,6 +142,7 @@ TEST_F(iteration_tests, execution_iteration_loop3)
     }
 }
 
+// perform an iterative loop with two federates
 TEST_F(iteration_tests, execution_iteration_test_2fed)
 {
     SetupTest(helicsCreateValueFederate, "test", 2, 1.0);
@@ -176,7 +178,6 @@ TEST_F(iteration_tests, execution_iteration_test_2fed)
 }
 
 /** just a check that in the simple case we do actually get the time back we requested*/
-
 TEST_F(iteration_tests, time_iteration_test)
 {
     SetupTest(helicsCreateValueFederate, "test", 1);
@@ -210,6 +211,7 @@ TEST_F(iteration_tests, time_iteration_test)
     EXPECT_EQ(val2, val);
 }
 
+// run a test of iteration with two federates
 TEST_F(iteration_tests, time_iteration_test_2fed)
 {
     SetupTest(helicsCreateValueFederate, "test", 2, 1.0);
@@ -251,6 +253,7 @@ TEST_F(iteration_tests, time_iteration_test_2fed)
     EXPECT_EQ(val2, val);
 }
 
+// force iteration a specific number of times and exercise some of the async calls
 TEST_F(iteration_tests, test_iteration_counter)
 {
     SetupTest(helicsCreateValueFederate, "test", 2, 1.0);

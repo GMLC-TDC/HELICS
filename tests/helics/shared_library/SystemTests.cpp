@@ -12,6 +12,7 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include <thread>
 
+// test generating a global from a broker and some of its error pathways
 TEST(other_tests, broker_global_value)
 {
     auto err = helicsErrorInitialize();
@@ -52,6 +53,7 @@ TEST(other_tests, broker_global_value)
     EXPECT_EQ(helicsBrokerIsConnected(brk), helics_false);
 }
 
+// test global value creation from a core and its error pathways
 TEST(other_tests, core_global_value)
 {
     auto err = helicsErrorInitialize();
@@ -101,6 +103,7 @@ TEST(other_tests, core_global_value)
     EXPECT_EQ(helicsBrokerIsConnected(brk), helics_false);
 }
 
+// test global value creation from a federate and some error pathways for queries and global creation
 TEST(other_tests, federate_global_value)
 {
     auto err = helicsErrorInitialize();
@@ -108,6 +111,7 @@ TEST(other_tests, federate_global_value)
 
     auto cr = helicsCreateCore("test", "gcore", "--broker=gbrokerc", &err);
 
+    // test creation of federateInfo from command line arguments
     const char* argv[4];
     argv[0] = "";
     argv[1] = "--corename=gcore";
@@ -121,7 +125,7 @@ TEST(other_tests, federate_global_value)
     auto fed = helicsCreateValueFederate("fed0", fi, &err);
     EXPECT_EQ(err.error_code, 0);
 
-    argv[3] = "--period=frogs"; //this is meant to generate an error
+    argv[3] = "--period=frogs"; //this is meant to generate an error in command line processing
 
     auto fi2 = helicsFederateInfoClone(fi, &err);
     EXPECT_NE(fi2, nullptr);
@@ -148,6 +152,7 @@ TEST(other_tests, federate_global_value)
     res = helicsQueryExecuteComplete(q, &err);
     EXPECT_EQ(res, globalVal2);
 
+    // a series of invalid query calls
     res = helicsQueryExecute(nullptr, fed, &err);
     EXPECT_NE(err.error_code, 0);
     helicsErrorClear(&err);
@@ -180,6 +185,7 @@ TEST(other_tests, federate_global_value)
     EXPECT_EQ(helicsBrokerIsConnected(brk), helics_false);
 }
 
+// test core creation from command line arguments
 TEST(other_tests, core_creation)
 {
     auto err = helicsErrorInitialize();
@@ -210,6 +216,7 @@ TEST(other_tests, core_creation)
     EXPECT_EQ(helicsBrokerIsConnected(brk), helics_false);
 }
 
+// test broker creation from command line arguments
 TEST(other_tests, broker_creation)
 {
     auto err = helicsErrorInitialize();

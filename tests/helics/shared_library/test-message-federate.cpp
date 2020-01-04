@@ -347,6 +347,8 @@ INSTANTIATE_TEST_SUITE_P(
     ::testing::ValuesIn(core_types_simple));
 INSTANTIATE_TEST_SUITE_P(mfed_tests, mfed_type_tests, ::testing::ValuesIn(core_types));
 
+
+// a series of tests exercising the different aspects of message object setting and retrieval
 TEST(message_object, test1)
 {
     auto brk = helicsCreateBroker("zmq", "brk1", "", nullptr);
@@ -370,6 +372,7 @@ TEST(message_object, test1)
     helicsMessageSetMessageID(m1, 10, nullptr);
     EXPECT_EQ(helicsMessageGetMessageID(m1), 10);
 
+    //89 is an invalid flag
     EXPECT_EQ(helicsMessageCheckFlag(m1, 89), helics_false);
 
     helicsMessageSetString(m2, "raw data", nullptr);
@@ -418,10 +421,11 @@ TEST(message_object, test1)
     s2 = helicsMessageGetRawDataSize(m2);
     EXPECT_EQ(s2, 508);
 
+    // this should generate an out of memory exception
     helicsMessageResize(m2, -8, &err);
     EXPECT_NE(err.error_code, 0);
     helicsErrorClear(&err);
-
+    // this should generate an out of memory exception
     helicsMessageReserve(m2, -2, &err);
     EXPECT_NE(err.error_code, 0);
     helicsErrorClear(&err);

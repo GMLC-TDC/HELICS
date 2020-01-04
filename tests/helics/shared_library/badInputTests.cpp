@@ -206,6 +206,7 @@ TEST_F(function_tests, input_test)
     helicsFederateFinalize(vFed1, nullptr);
 }
 
+// test registrations with invalid types and some improper getValue calls
 TEST_F(function_tests, raw)
 {
     SetupTest(helicsCreateValueFederate, "test", 1);
@@ -223,6 +224,7 @@ TEST_F(function_tests, raw)
 
     auto subid = helicsFederateRegisterInput(vFed1, "inp1", helics_data_type_raw, "", nullptr);
 
+    // this is just a random bad data type
     auto subid3 =
         helicsFederateRegisterInput(vFed1, "inp3", static_cast<helics_data_type>(-6985), "", &err);
     EXPECT_NE(err.error_code, 0);
@@ -237,6 +239,7 @@ TEST_F(function_tests, raw)
 
     helicsPublicationPublishDouble(pubid, 27.0, nullptr);
     helicsFederateRequestNextStep(vFed1, nullptr);
+    // doubles and ints are not recognized
     auto val = helicsInputGetDouble(subid, &err);
     EXPECT_NE(val, 0.0);
     EXPECT_NE(err.error_code, 0);
@@ -254,6 +257,7 @@ TEST_F(function_tests, raw)
     helicsFederateFinalize(vFed1, nullptr);
 }
 
+// test registrations with invalid types 
 TEST_F(function_tests, raw2)
 {
     SetupTest(helicsCreateValueFederate, "test", 1);
@@ -290,7 +294,7 @@ TEST_F(function_tests, raw2)
 
     helicsPublicationPublishDouble(pubid, 27.0, nullptr);
     helicsFederateRequestNextStep(vFed1, nullptr);
-
+    // we are just making sure these don't blow up and cause a seg fault
     helicsInputGetRawValue(subid, nullptr, 5, nullptr, nullptr);
     helicsInputGetString(subid, nullptr, 5, nullptr, nullptr);
     auto val = helicsInputGetComplexObject(subid, &err);
@@ -306,6 +310,7 @@ TEST_F(function_tests, raw2)
     EXPECT_EQ(res, helics_iteration_result_halted);
 }
 
+//check string conversions and duplicate publication errors
 TEST_F(function_tests, string)
 {
     SetupTest(helicsCreateValueFederate, "test", 1);
@@ -346,6 +351,7 @@ TEST_F(function_tests, string)
     helicsFederateFinalize(vFed1, nullptr);
 }
 
+//check duplicate publication and inputs error pathways
 TEST_F(function_tests, typePub)
 {
     SetupTest(helicsCreateValueFederate, "test", 1);
@@ -382,6 +388,7 @@ TEST_F(function_tests, typePub)
     helicsFederateFinalize(vFed1, nullptr);
 }
 
+//check duplicate GlobalTypePublications and inputs and failures in register interface functions
 TEST_F(function_tests, typePub2)
 {
     SetupTest(helicsCreateValueFederate, "test", 1);
@@ -478,6 +485,9 @@ TEST_F(function_tests, typePub2)
     EXPECT_NE(err.error_code, 0);
     helicsErrorClear(&err);
 }
+// the init error tests use a mismatch in the publication and input to
+// generate an error in the init calls so these tests go through a series of different ways
+// and functions that error can get propagated to test the error paths of the different functions
 
 TEST_F(function_tests, initError)
 {
@@ -485,6 +495,7 @@ TEST_F(function_tests, initError)
     auto vFed1 = GetFederateAt(0);
     // register the publications
 
+    // the types here don't match which causes an error when initializing the federation
     helicsFederateRegisterGlobalTypePublication(vFed1, "pub1", "custom1", "", nullptr);
 
     auto subid = helicsFederateRegisterTypeInput(vFed1, "inp1", "custom2", "", nullptr);
@@ -493,6 +504,7 @@ TEST_F(function_tests, initError)
 
     helicsFederateSetTimeProperty(vFed1, helics_property_time_period, 1.0, nullptr);
 
+    // we are still in init mode so the next series of call should all fail
     auto tm = helicsFederateRequestTime(vFed1, 2.0, &err);
     EXPECT_NE(err.error_code, 0);
     EXPECT_EQ(tm, helics_time_invalid);
@@ -507,6 +519,7 @@ TEST_F(function_tests, initError)
     EXPECT_EQ(tm, helics_time_invalid);
     helicsErrorClear(&err);
 
+    // this one will generate an error from the mismatch types
     helicsFederateEnterExecutingMode(vFed1, &err);
     EXPECT_NE(err.error_code, 0);
     helicsErrorClear(&err);
@@ -524,11 +537,13 @@ TEST_F(function_tests, initError2)
     auto vFed1 = GetFederateAt(0);
     // register the publications
 
+     // the types here don't match which causes an error when initializing the federation
     helicsFederateRegisterGlobalTypePublication(vFed1, "pub1", "custom1", "", nullptr);
 
     auto subid = helicsFederateRegisterTypeInput(vFed1, "inp1", "custom2", "", nullptr);
     auto k1 = helicsInputGetKey(subid);
 
+    // check some other calls
     auto inp2 = helicsFederateGetInput(vFed1, "inp1", &err);
     EXPECT_EQ(err.error_code, 0);
     auto k2 = helicsInputGetKey(inp2);
@@ -545,11 +560,13 @@ TEST_F(function_tests, initError2)
 
     helicsFederateSetTimeProperty(vFed1, helics_property_time_period, 1.0, nullptr);
 
+    //unknown publication 
     auto pub3 = helicsFederateGetPublication(vFed1, "unknown", &err);
     EXPECT_NE(err.error_code, 0);
     helicsErrorClear(&err);
     EXPECT_EQ(pub3, nullptr);
 
+    // error in this call from the mismatch 
     helicsFederateEnterInitializingMode(vFed1, &err);
     EXPECT_NE(err.error_code, 0);
     helicsErrorClear(&err);
@@ -558,11 +575,13 @@ TEST_F(function_tests, initError2)
     EXPECT_NE(err.error_code, 0);
     helicsErrorClear(&err);
 
+    //unknown input
     auto inp4 = helicsFederateGetInput(vFed1, "unknown", &err);
     EXPECT_NE(err.error_code, 0);
     helicsErrorClear(&err);
     EXPECT_EQ(inp4, nullptr);
 
+    //invalid input index
     auto inp5 = helicsFederateGetInputByIndex(vFed1, 4, &err);
     EXPECT_NE(err.error_code, 0);
     helicsErrorClear(&err);
@@ -577,6 +596,7 @@ TEST_F(function_tests, initError3)
     auto vFed1 = GetFederateAt(0);
     // register the publications
 
+      // the types here don't match which causes an error when initializing the federation
     helicsFederateRegisterGlobalTypePublication(vFed1, "pub1", "custom1", "", nullptr);
 
     auto subid = helicsFederateRegisterTypeInput(vFed1, "inp1", "custom2", "", nullptr);
@@ -673,6 +693,7 @@ TEST_F(function_tests, initError6)
     auto vFed1 = GetFederateAt(0);
     // register the publications
 
+      // the types here don't match which causes an error when initializing the federation
     helicsFederateRegisterGlobalTypePublication(vFed1, "pub1", "custom1", "", nullptr);
 
     auto subid = helicsFederateRegisterTypeInput(vFed1, "inp1", "custom2", "", nullptr);
@@ -699,18 +720,20 @@ TEST_F(function_tests, initError6)
     helicsFederateFinalize(vFed1, nullptr);
 }
 
+// the next series of tests out error paths and different functions related to the message federate
 TEST_F(function_tests, messageFed)
 {
     SetupTest(helicsCreateMessageFederate, "test", 1);
     auto mFed1 = GetFederateAt(0);
 
+    // duplicate names for endpoints are not allowed
     auto ept1 = helicsFederateRegisterEndpoint(mFed1, "ept1", "", nullptr);
     EXPECT_NE(ept1, nullptr);
     auto ept2 = helicsFederateRegisterEndpoint(mFed1, "ept1", "", &err);
     EXPECT_NE(err.error_code, 0);
     EXPECT_EQ(ept2, nullptr);
     helicsErrorClear(&err);
-
+    //not a valid endpoint
     auto ept3 = helicsFederateGetEndpoint(mFed1, "invalid", &err);
     EXPECT_EQ(ept3, nullptr);
     EXPECT_NE(err.error_code, 0);
@@ -720,7 +743,7 @@ TEST_F(function_tests, messageFed)
     EXPECT_EQ(ept4, nullptr);
     EXPECT_NE(err.error_code, 0);
     helicsErrorClear(&err);
-
+    // can't register a publication on a message federate
     auto subid = helicsFederateRegisterPublication(mFed1, "key", helics_data_type_double, "", &err);
     EXPECT_EQ(subid, nullptr);
     EXPECT_NE(err.error_code, 0);
@@ -729,11 +752,13 @@ TEST_F(function_tests, messageFed)
     helicsFederateEnterExecutingMode(mFed1, nullptr);
     helicsEndpointSetDefaultDestination(ept1, "fed0/ept1", nullptr);
 
+    //test out messages without specifying endpoints
     helicsEndpointSendMessageRaw(ept1, nullptr, nullptr, 0, &err);
 
     helicsEndpointSendMessageRaw(ept1, "fed0/ept1", nullptr, 0, &err);
 
     helicsFederateRequestNextStep(mFed1, nullptr);
+    //make sure the message got through
     auto cnt = helicsEndpointPendingMessages(ept1);
     EXPECT_EQ(cnt, 2);
 
@@ -755,6 +780,8 @@ TEST_F(function_tests, messageFed_event)
     helicsErrorClear(&err);
 
     helicsFederateEnterExecutingMode(mFed1, nullptr);
+
+    //send events without destinations
     helicsEndpointSetDefaultDestination(ept1, "ept1", nullptr);
 
     helicsEndpointSendEventRaw(ept1, nullptr, nullptr, 0, 0.0, &err);
@@ -768,6 +795,7 @@ TEST_F(function_tests, messageFed_event)
     EXPECT_EQ(cnt, 3);
 
     helicsFederateFinalize(mFed1, nullptr);
+    //  can't send an event after the federate is finalized
     helicsEndpointSendEventRaw(ept1, nullptr, data, 4, 0.0, &err);
     EXPECT_NE(err.error_code, 0);
 }
@@ -787,6 +815,7 @@ TEST_F(function_tests, messageFed_message)
     helicsFederateEnterExecutingMode(mFed1, nullptr);
     helicsEndpointSetDefaultDestination(ept1, "ept1", nullptr);
 
+    // if we are sending a message it can't be null
     helicsEndpointSendMessage(ept1, nullptr, &err);
     EXPECT_NE(err.error_code, 0);
     helicsErrorClear(&err);
@@ -797,6 +826,7 @@ TEST_F(function_tests, messageFed_message)
     mess0 = helicsFederateGetMessage(mFed1);
     EXPECT_EQ(mess0.length, 0);
 
+    //send a series of different messages testing different code paths
     helics_message mess1;
 
     mess1.time = 0.0;
@@ -823,11 +853,12 @@ TEST_F(function_tests, messageFed_message)
     EXPECT_EQ(cnt, 4);
 
     helicsFederateFinalize(mFed1, nullptr);
-
+    // can't send a message after the federate is finalized
     helicsEndpointSendMessage(ept1, &mess1, &err);
     EXPECT_NE(err.error_code, 0);
 }
 
+// test different paths for sending message objects
 TEST_F(function_tests, messageFed_message_object)
 {
     SetupTest(helicsCreateMessageFederate, "test", 1);
@@ -873,6 +904,7 @@ TEST_F(function_tests, messageFed_message_object)
     helicsEndpointClearMessages(ept1);
 }
 
+// test error paths for filters
 TEST_F(function_tests, filter_tests)
 {
     SetupTest(helicsCreateMessageFederate, "test", 1);
@@ -888,6 +920,7 @@ TEST_F(function_tests, filter_tests)
     helicsFederateFinalize(mFed1, nullptr);
 }
 
+// test some other filter creation functions and error paths
 TEST_F(function_tests, filter_tests2)
 {
     SetupTest(helicsCreateMessageFederate, "test", 1);
@@ -962,6 +995,7 @@ TEST_F(function_tests, filter_tests4)
     helicsFederateFinalize(mFed1, nullptr);
 }
 
+// test filter creation in a core and error pathways
 TEST_F(function_tests, filter_core_tests)
 {
     SetupTest(helicsCreateMessageFederate, "test", 1);
@@ -984,6 +1018,7 @@ TEST_F(function_tests, filter_core_tests)
     helicsCoreDestroy(cr);
 }
 
+// test cloning filter creation from a core and some error paths
 TEST_F(function_tests, filter_core_tests2)
 {
     SetupTest(helicsCreateMessageFederate, "test", 1);
