@@ -106,9 +106,17 @@ class BrokerBase {
     explicit BrokerBase(const std::string& broker_name, bool DisableQueue = false);
 
     virtual ~BrokerBase();
-
+    /** parse configuration information from command line arguments
+    @return 0 for OK, positive numbers for expected information calls and negative number for error
+    */
     int parseArgs(int argc, char* argv[]);
+    /** parse configuration information from a vector of command line like arguments
+    @return 0 for OK, positive numbers for expected information calls and negative number for error
+    */
     int parseArgs(std::vector<std::string> args);
+    /** parse configuration information from a string of command line like arguments
+    @return 0 for OK, positive numbers for expected information calls and negative number for error
+    */
     int parseArgs(const std::string& initializationString);
     /** configure the base of all brokers and cores
      */
@@ -191,6 +199,8 @@ class BrokerBase {
     friend class TimeoutMonitor;
     friend const std::string &brokerStateName(broker_state_t state);
 };
-/// helper function to generate the name of a state as a string
+
+/** helper function to generate the name of a state as a string
+*/
 const std::string &brokerStateName(BrokerBase::broker_state_t state);
 } // namespace helics
