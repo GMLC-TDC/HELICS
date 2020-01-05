@@ -15,6 +15,7 @@ else()
     include(UseJava)
 
     include_directories(${JAVA_INCLUDE_PATH})
+    include_directories(${JAVA_INCLUDE_PATH2})
     include_directories(${JNI_INCLUDE_DIRS})
 
     if(HELICS_ENABLE_SWIG AND SWIG_EXECUTABLE)
