@@ -455,6 +455,7 @@ void BrokerBase::queueProcessingLoop()
     }
     while (true) {
         auto command = actionQueue.pop();
+        ++messageCounter;
         if (dumplog) {
             dumpMessages.push_back(command);
         }
