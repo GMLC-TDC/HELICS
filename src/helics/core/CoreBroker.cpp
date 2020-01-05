@@ -1714,6 +1714,13 @@ void CoreBroker::disconnect()
                     "main loop is stopped but have not received disconnect notice, assuming disconnected");
                 return;
             }
+            else
+            {
+                LOG_WARNING(
+                    global_id.load(),
+                    getIdentifier(),
+                    fmt::format("sending disconnect again; total message count = {}",currentMessageCounter()));
+            }
             addActionMessage(udisconnect);
             
         }
