@@ -352,7 +352,7 @@ void BrokerBase::addActionMessage(ActionMessage&& m)
 #ifndef HELICS_DISABLE_ASIO
 using activeProtector = gmlc::libguarded::guarded<std::pair<bool, bool>>;
 
-static void haltTimer(
+static bool haltTimer(
     activeProtector& active,
     asio::steady_timer& tickTimer,
     std::atomic<bool>& step1,
@@ -364,20 +364,37 @@ static void haltTimer(
         if (p->second) {
             p->first = false;
             p.unlock();
-            step1 = true;
-            tickTimer.cancel();
+            auto cancelled=tickTimer.cancel();
+            if (cancelled == 0)
+            {
+                step1 = true;
+                TimerRunning = false;
+            }
         } else {
             TimerRunning = false;
         }
     }
-    if (TimerRunning) {
-        step2 = true;
-    }
+    int ii = 0;
     while (TimerRunning) {
-        std::this_thread::yield();
+        if (ii % 4 != 3)
+        {
+            std::this_thread::yield();
+        }
+        else
+        {
+
+            std::this_thread::sleep_for(std::chrono::milliseconds(40));
+        }
         auto res = active.load();
         TimerRunning = res.second;
+        ++ii;
+        if (ii == 100)
+        {
+            // assume the timer was never started so just exit and hope it doesn't somehow get called later and generate a seg fault.  
+            return false;
+        }
     }
+    return true;
 }
 
 static void
@@ -434,7 +451,11 @@ void BrokerBase::queueProcessingLoop()
         ticktimer.async_wait(timerCallback);
     }
     auto timerStop = [&, this]() {
-        haltTimer(active, ticktimer, stopPhase1, stopPhase2);
+        if (!haltTimer(active, ticktimer, stopPhase1, stopPhase2))
+        {
+            LOG_WARNING(global_broker_id_local,
+                identifier, "timer unable to cancel properly");
+        }
         contextLoop = nullptr;
     };
 #else

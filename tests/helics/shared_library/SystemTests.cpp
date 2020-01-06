@@ -15,7 +15,7 @@ SPDX-License-Identifier: BSD-3-Clause
 // test generating a global from a broker and some of its error pathways
 TEST(other_tests, broker_global_value)
 {
-    auto err = helicsErrorInitialize();
+    auto err = helicsErrorInitialize(); 
     auto brk = helicsCreateBroker("test", "gbroker", "--root", &err);
     std::string globalVal = "this is a string constant that functions as a global";
     std::string globalVal2 = "this is a second string constant that functions as a global";
