@@ -91,20 +91,21 @@ std::shared_ptr<helicsCLI11App> BrokerBase::generateCLI()
     return hApp;
 }
 
-static const std::map<std::string, int> log_level_map{{"none", helics_log_level_no_print},
-                                                      {"no_print", helics_log_level_no_print},
-                                                      {"error", helics_log_level_error},
-                                                      {"warning", helics_log_level_warning},
-                                                      {"summary", helics_log_level_summary},
-                                                      {"connections", helics_log_level_connections},
-                                                      /** connections+ interface definitions*/
-                                                      {"interfaces", helics_log_level_interfaces},
-                                                      /** interfaces + timing message*/
-                                                      {"timing", helics_log_level_timing},
-                                                      /** timing+ data transfer notices*/
-                                                      {"data", helics_log_level_data},
-                                                      /** all internal messages*/
-                                                      {"trace", helics_log_level_trace}};
+static const std::map<std::string, int> log_level_map{
+    {"none", helics_log_level_no_print},
+    {"no_print", helics_log_level_no_print},
+    {"error", helics_log_level_error},
+    {"warning", helics_log_level_warning},
+    {"summary", helics_log_level_summary},
+    {"connections", helics_log_level_connections},
+    /** connections+ interface definitions*/
+    {"interfaces", helics_log_level_interfaces},
+    /** interfaces + timing message*/
+    {"timing", helics_log_level_timing},
+    /** timing+ data transfer notices*/
+    {"data", helics_log_level_data},
+    /** all internal messages*/
+    {"trace", helics_log_level_trace}};
 
 std::shared_ptr<helicsCLI11App> BrokerBase::generateBaseCLI()
 {
@@ -351,7 +352,11 @@ void BrokerBase::addActionMessage(ActionMessage&& m)
 #ifndef HELICS_DISABLE_ASIO
 using activeProtector = gmlc::libguarded::guarded<std::pair<bool, bool>>;
 
-static void haltTimer(activeProtector& active, asio::steady_timer& tickTimer)
+static void haltTimer(
+    activeProtector& active,
+    asio::steady_timer& tickTimer,
+    std::atomic<bool>& step1,
+    std::atomic<bool>& step2)
 {
     bool TimerRunning = true;
     {
@@ -359,10 +364,14 @@ static void haltTimer(activeProtector& active, asio::steady_timer& tickTimer)
         if (p->second) {
             p->first = false;
             p.unlock();
+            step1 = true;
             tickTimer.cancel();
         } else {
             TimerRunning = false;
         }
+    }
+    if (TimerRunning) {
+        step2 = true;
     }
     while (TimerRunning) {
         std::this_thread::yield();
@@ -424,9 +433,8 @@ void BrokerBase::queueProcessingLoop()
         ticktimer.expires_at(std::chrono::steady_clock::now() + tickTimer.to_ns());
         ticktimer.async_wait(timerCallback);
     }
-    auto timerStop = [&]() {
-        haltTimer(active, ticktimer);
-        stopPhase1 = true;
+    auto timerStop = [&, this]() {
+        haltTimer(active, ticktimer, stopPhase1, stopPhase2);
         contextLoop = nullptr;
     };
 #else
@@ -522,7 +530,6 @@ void BrokerBase::queueProcessingLoop()
                 return; // immediate return
             case CMD_STOP:
                 timerStop();
-                stopPhase2 = true;
                 if (!haltOperations) {
                     processCommand(std::move(command));
                     mainLoopIsRunning.store(false);
