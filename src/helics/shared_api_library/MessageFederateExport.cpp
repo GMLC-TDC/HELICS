@@ -34,15 +34,8 @@ static constexpr char invalidEndpoint[] = "The given endpoint does not point to 
 static helics::EndpointObject* verifyEndpoint(helics_endpoint ept, helics_error* err)
 {
     HELICS_ERROR_CHECK(err, nullptr);
-    if (ept == nullptr) {
-        if (err != nullptr) {
-            err->error_code = helics_error_invalid_object;
-            err->message = invalidEndpoint;
-        }
-        return nullptr;
-    }
     auto endObj = reinterpret_cast<helics::EndpointObject*>(ept);
-    if (endObj->valid != EndpointValidationIdentifier) {
+    if (endObj==nullptr || endObj->valid != EndpointValidationIdentifier) {
         if (err != nullptr) {
             err->error_code = helics_error_invalid_object;
             err->message = invalidEndpoint;
@@ -655,6 +648,7 @@ static constexpr char invalidMessageObject[] = "The message object was not valid
 
 helics::Message* getMessageObj(helics_message_object message, helics_error* err)
 {
+    HELICS_ERROR_CHECK(err, nullptr);
     helics::Message* mess = reinterpret_cast<helics::Message*>(message);
     if (mess == nullptr || mess->messageValidation != messageKeyCode) {
         if (err != nullptr) {

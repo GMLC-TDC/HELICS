@@ -44,9 +44,11 @@ TEST(evil_general_test, helicsGetFederateByName)
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     auto res = helicsGetFederateByName(nullptr, &err);
+    EXPECT_EQ(err.error_code, 45);
     EXPECT_EQ(helicsFederateIsValid(res), helics_false);
 
     res = helicsGetFederateByName("bob", &err);
+    EXPECT_EQ(err.error_code, 45);
     EXPECT_EQ(helicsFederateIsValid(res), helics_false);
     helicsErrorClear(&err);
     res = helicsGetFederateByName(nullptr, &err);
@@ -96,6 +98,7 @@ TEST(evil_creation_test, helicsCreateCore)
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     auto res1 = helicsCreateCore(nullptr, "name", "", &err);
+    EXPECT_EQ(err.error_code, 45);
     EXPECT_TRUE(helicsCoreIsValid(res1) == helics_false);
     helicsErrorClear(&err);
     auto res2 = helicsCreateCore("invalid", "name", "", &err);
@@ -111,6 +114,7 @@ TEST(evil_creation_test, helicsCreateCoreFromArgs)
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     auto res1 = helicsCreateCoreFromArgs("bob", "bob", 0, nullptr, &err);
+    EXPECT_EQ(err.error_code, 45);
     EXPECT_TRUE(helicsCoreIsValid(res1) == helics_false);
     helicsErrorClear(&err);
     auto res2 = helicsCreateCoreFromArgs("bob", "bob", 0, nullptr, &err);
@@ -125,6 +129,7 @@ TEST(evil_creation_test, helicsCreateBroker)
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     auto res1 = helicsCreateBroker(nullptr, "name", "", &err);
+    EXPECT_EQ(err.error_code, 45);
     EXPECT_TRUE(helicsBrokerIsValid(res1) == helics_false);
     helicsErrorClear(&err);
     auto res2 = helicsCreateBroker("invalid", "name", "", &err);
@@ -139,6 +144,7 @@ TEST(evil_creation_test, helicsCreateBrokerFromArgs)
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     auto res1 = helicsCreateBrokerFromArgs("bob", "bob", 0, nullptr, &err);
+    EXPECT_EQ(err.error_code, 45);
     EXPECT_TRUE(helicsBrokerIsValid(res1) == helics_false);
     helicsErrorClear(&err);
     auto res2 = helicsCreateBrokerFromArgs("bob", "bob", 0, nullptr, &err);
@@ -154,6 +160,7 @@ TEST(evil_creation_test, helicsCreateValueFederate)
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     auto res1 = helicsCreateValueFederate("billy", nullptr, &err);
+    EXPECT_EQ(err.error_code, 45);
     EXPECT_EQ(helicsFederateIsValid(res1), helics_false);
     helicsErrorClear(&err);
 
@@ -170,6 +177,7 @@ TEST(evil_creation_test, helicsCreateValueFederateFromConfig)
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     auto res1 = helicsCreateValueFederateFromConfig("unknownfile.json", &err);
+    EXPECT_EQ(err.error_code, 45);
     helicsErrorClear(&err);
     EXPECT_EQ(helicsFederateIsValid(res1), helics_false);
     auto res2 = helicsCreateValueFederateFromConfig("unknownfile.json", &err);
@@ -184,6 +192,7 @@ TEST(evil_creation_test, helicsCreateMessageFederate)
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     auto res1 = helicsCreateMessageFederate("billy", nullptr, &err);
+    EXPECT_EQ(err.error_code, 45);
     EXPECT_EQ(helicsFederateIsValid(res1), helics_false);
     helicsErrorClear(&err);
 
@@ -199,6 +208,7 @@ TEST(evil_creation_test, helicsCreateMessageFederateFromConfig)
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     auto res1 = helicsCreateMessageFederateFromConfig("unknownfile.json", &err);
+    EXPECT_EQ(err.error_code, 45);
     helicsErrorClear(&err);
     EXPECT_EQ(helicsFederateIsValid(res1), helics_false);
     auto res2 = helicsCreateMessageFederateFromConfig("unknownfile.json", &err);
@@ -213,6 +223,7 @@ TEST(evil_creation_test, helicsCreateCombinationFederate)
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     auto res1 = helicsCreateCombinationFederate("billy", nullptr, &err);
+    EXPECT_EQ(err.error_code, 45);
     EXPECT_EQ(helicsFederateIsValid(res1), helics_false);
     helicsErrorClear(&err);
 
@@ -228,6 +239,7 @@ TEST(evil_creation_test, helicsCreateCombinationFederateFromConfig)
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     auto res1 = helicsCreateCombinationFederateFromConfig("unknownfile.json", &err);
+    EXPECT_EQ(err.error_code, 45);
     helicsErrorClear(&err);
     EXPECT_EQ(helicsFederateIsValid(res1), helics_false);
     auto res2 = helicsCreateCombinationFederateFromConfig("unknownfile.json", &err);
@@ -260,6 +272,7 @@ TEST(evil_core_test, helicsCoreClone)
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     auto res1 = helicsCoreClone(nullptr, &err);
+    EXPECT_EQ(err.error_code, 45);
     EXPECT_NE(helicsCoreIsValid(res1), helics_true);
     helicsErrorClear(&err);
     auto res2 = helicsCoreClone(evil_core, nullptr);
@@ -286,6 +299,7 @@ TEST(evil_core_test, helicsCoreWaitForDisconnect)
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     auto res1 = helicsCoreWaitForDisconnect(nullptr, 1, &err);
+    EXPECT_EQ(err.error_code, 45);
     EXPECT_EQ(res1, helics_true);
     helicsErrorClear(&err);
     auto res2 = helicsCoreWaitForDisconnect(nullptr, 1, nullptr);
@@ -313,6 +327,7 @@ TEST(evil_core_test, helicsCoreDataLink)
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     helicsCoreDataLink(nullptr, nullptr, nullptr, &err);
+    EXPECT_EQ(err.error_code, 45);
     helicsErrorClear(&err);
     //auto res2=helicsCoreDataLink(helics_core core, const char* source, const char* target, nullptr);
     helicsCoreDataLink(evil_core, "source", "target", &err);
@@ -327,6 +342,7 @@ TEST(evil_core_test, helicsCoreAddSourceFilterToEndpoint)
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     helicsCoreAddSourceFilterToEndpoint(nullptr, "filter", "ept", &err);
+    EXPECT_EQ(err.error_code, 45);
     helicsErrorClear(&err);
     //auto res2=helicsCoreAddSourceFilterToEndpoint(helics_core core, const char* filter, const char* endpoint, nullptr);
     helicsCoreAddSourceFilterToEndpoint(evil_core, "filter", "ept", &err);
@@ -341,6 +357,7 @@ TEST(evil_core_test, helicsCoreAddDestinationFilterToEndpoint)
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     helicsCoreAddDestinationFilterToEndpoint(nullptr, "filter", "ept", &err);
+    EXPECT_EQ(err.error_code, 45);
     helicsErrorClear(&err);
     //auto res2=helicsCoreAddDestinationFilterToEndpoint(helics_core core, const char* filter, const char* endpoint, nullptr);
     helicsCoreAddDestinationFilterToEndpoint(evil_core, "filter", "ept", &err);
@@ -355,6 +372,7 @@ TEST(evil_core_test, helicsCoreMakeConnections)
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     helicsCoreMakeConnections(nullptr, "invalidfile.json", &err);
+    EXPECT_EQ(err.error_code, 45);
     helicsErrorClear(&err);
     //auto res2=helicsCoreMakeConnections(helics_core core, const char* file, nullptr);
     helicsCoreMakeConnections(evil_core, "invalidfile", &err);
@@ -482,6 +500,7 @@ TEST(evil_core_test, helicsCoreSetLoggingCallback)
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     helicsCoreSetLoggingCallback(nullptr, nullptr, nullptr, &err);
+    EXPECT_EQ(err.error_code, 45);
     helicsErrorClear(&err);
     EXPECT_EQ(err.error_code, 0);
     //auto res2=helicsCoreSetLoggingCallback(     helics_core core,     void (*logger)(int loglevel, const char* identifier, const char* message, void* userData),     void* userdata,     nullptr);
@@ -497,6 +516,7 @@ TEST(evil_core_test, helicsCoreRegisterFilter)
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     auto res1 = helicsCoreRegisterFilter(nullptr, helics_filter_type_delay, "delay", &err);
+    EXPECT_EQ(err.error_code, 45);
     EXPECT_EQ(res1, nullptr);
     helicsErrorClear(&err);
     auto res2 = helicsCoreRegisterFilter(nullptr, helics_filter_type_delay, "delay", nullptr);
@@ -514,6 +534,7 @@ TEST(evil_core_test, helicsCoreRegisterCloningFilter)
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     auto res1 = helicsCoreRegisterCloningFilter(nullptr, "delivery", &err);
+    EXPECT_EQ(err.error_code, 45);
     EXPECT_EQ(res1, nullptr);
     helicsErrorClear(&err);
     auto res2 = helicsCoreRegisterCloningFilter(nullptr, "delivery", nullptr);
@@ -533,6 +554,7 @@ TEST(evil_broker_test, helicsBrokerClone)
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     auto res1 = helicsBrokerClone(nullptr, &err);
+    EXPECT_EQ(err.error_code, 45);
     EXPECT_NE(helicsBrokerIsValid(res1), helics_true);
     helicsErrorClear(&err);
     auto res2 = helicsBrokerClone(evil_broker, nullptr);
@@ -584,6 +606,7 @@ TEST(evil_broker_test, helicsBrokerAddSourceFilterToEndpoint)
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     helicsBrokerAddSourceFilterToEndpoint(nullptr, "filter", "ept", &err);
+    EXPECT_EQ(err.error_code, 45);
     helicsErrorClear(&err);
     //auto res2=helicsBrokerAddSourceFilterToEndpoint(helics_core core, const char* filter, const char* endpoint, nullptr);
     helicsBrokerAddSourceFilterToEndpoint(evil_broker, "filter", "ept", &err);
@@ -598,6 +621,7 @@ TEST(evil_broker_test, helicsBrokerAddDestinationFilterToEndpoint)
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     helicsBrokerAddDestinationFilterToEndpoint(nullptr, "filter", "ept", &err);
+    EXPECT_EQ(err.error_code, 45);
     helicsErrorClear(&err);
     //auto res2=helicsBrokerAddDestinationFilterToEndpoint(helics_core core, const char* filter, const char* endpoint, nullptr);
     helicsBrokerAddDestinationFilterToEndpoint(evil_broker, "filter", "ept", &err);
@@ -612,6 +636,7 @@ TEST(evil_broker_test, helicsBrokerMakeConnections)
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     helicsBrokerMakeConnections(nullptr, "invalidfile.json", &err);
+    EXPECT_EQ(err.error_code, 45);
     helicsErrorClear(&err);
     //auto res2=helicsBrokerMakeConnections(helics_core core, const char* file, nullptr);
     helicsBrokerMakeConnections(evil_broker, "invalidfile", &err);
@@ -626,6 +651,7 @@ TEST(evil_broker_test, helicsBrokerWaitForDisconnect)
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     auto res1 = helicsBrokerWaitForDisconnect(nullptr, 1, &err);
+    EXPECT_EQ(err.error_code, 45);
     EXPECT_EQ(res1, helics_true);
     helicsErrorClear(&err);
     auto res2 = helicsBrokerWaitForDisconnect(nullptr, 1, nullptr);
@@ -660,7 +686,7 @@ TEST(evil_broker_test, helicsBrokerDisconnect)
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     helicsBrokerDisconnect(nullptr, &err);
-
+    EXPECT_EQ(err.error_code, 45);
     helicsErrorClear(&err);
     helicsBrokerDisconnect(nullptr, &err);
     EXPECT_NE(err.error_code, 0);
@@ -696,6 +722,7 @@ TEST(evil_broker_test, helicsBrokerSetGlobal)
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     helicsBrokerSetGlobal(nullptr, "value", "value", &err);
+    EXPECT_EQ(err.error_code, 45);
     helicsErrorClear(&err);
     //auto res2=helicsBrokerSetGlobal(helics_core core, const char* valueName, const char* value, nullptr);
     helicsBrokerSetGlobal(evil_broker, "value", "value", &err);
@@ -710,6 +737,7 @@ TEST(evil_broker_test, helicsBrokerSetLogFile)
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     helicsBrokerSetLogFile(nullptr, "unknownfile.log", &err);
+    EXPECT_EQ(err.error_code, 45);
     helicsErrorClear(&err);
     //auto res2=helicsBrokerSetLogFile(helics_core core, const char* logFileName, nullptr);
     helicsBrokerSetLogFile(evil_broker, "unknownfile.log", &err);
@@ -724,6 +752,7 @@ TEST(evil_broker_test, helicsBrokerSetLoggingCallback)
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     helicsBrokerSetLoggingCallback(nullptr, nullptr, nullptr, &err);
+    EXPECT_EQ(err.error_code, 45);
     helicsErrorClear(&err);
     EXPECT_EQ(err.error_code, 0);
     //auto res2=helicsBrokerSetLoggingCallback(     helics_core core,     void (*logger)(int loglevel, const char* identifier, const char* message, void* userData),     void* userdata,     nullptr);
@@ -740,6 +769,7 @@ TEST(evil_fedInfo_test, helicsFederateInfoClone)
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     auto res = helicsFederateInfoClone(nullptr, &err);
+    EXPECT_EQ(err.error_code, 45);
     EXPECT_EQ(res, nullptr);
     helicsErrorClear(&err);
     auto res2 = helicsFederateInfoClone(evil_fi, &err);
@@ -754,6 +784,7 @@ TEST(evil_fedInfo_test, helicsFederateInfoLoadFromArgs)
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     helicsFederateInfoLoadFromArgs(nullptr, 0, nullptr, &err);
+    EXPECT_EQ(err.error_code, 45);
     helicsErrorClear(&err);
     helicsFederateInfoLoadFromArgs(evil_fi, 0, nullptr, &err);
     EXPECT_NE(err.error_code, 0);
@@ -774,6 +805,7 @@ TEST(evil_fedInfo_test, helicsFederateInfoSetCoreName)
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     helicsFederateInfoSetCoreName(nullptr, "core", &err);
+    EXPECT_EQ(err.error_code, 45);
     helicsErrorClear(&err);
     helicsFederateInfoSetCoreName(evil_fi, "core", &err);
     EXPECT_NE(err.error_code, 0);
@@ -786,6 +818,7 @@ TEST(evil_fedInfo_test, helicsFederateInfoSetCoreInitString)
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     helicsFederateInfoSetCoreInitString(nullptr, "", &err);
+    EXPECT_EQ(err.error_code, 45);
     helicsErrorClear(&err);
     helicsFederateInfoSetCoreInitString(evil_fi, "", &err);
     EXPECT_NE(err.error_code, 0);
@@ -798,6 +831,7 @@ TEST(evil_fedInfo_test, helicsFederateInfoSetBrokerInitString)
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     helicsFederateInfoSetBrokerInitString(nullptr, "", &err);
+    EXPECT_EQ(err.error_code, 45);
     helicsErrorClear(&err);
     helicsFederateInfoSetBrokerInitString(evil_fi, "", &err);
     EXPECT_NE(err.error_code, 0);
@@ -814,6 +848,7 @@ TEST(evil_fedInfo_test, helicsFederateInfoSetCoreType)
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     helicsFederateInfoSetCoreType(nullptr, -97, &err);
+    EXPECT_EQ(err.error_code, 45);
     helicsErrorClear(&err);
     helicsFederateInfoSetCoreType(evil_fi, -97, &err);
     EXPECT_NE(err.error_code, 0);
@@ -826,6 +861,7 @@ TEST(evil_fedInfo_test, helicsFederateInfoSetCoreTypeFromString)
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     helicsFederateInfoSetCoreTypeFromString(nullptr, "nng", &err);
+    EXPECT_EQ(err.error_code, 45);
     helicsErrorClear(&err);
     helicsFederateInfoSetCoreTypeFromString(evil_fi, "nng", &err);
     EXPECT_NE(err.error_code, 0);
@@ -845,6 +881,7 @@ TEST(evil_fedInfo_test, helicsFederateInfoSetBroker)
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     helicsFederateInfoSetBroker(nullptr, nullptr, &err);
+    EXPECT_EQ(err.error_code, 45);
     helicsErrorClear(&err);
     helicsFederateInfoSetBroker(evil_fi, "10.0.0.1", &err);
     EXPECT_NE(err.error_code, 0);
@@ -857,6 +894,7 @@ TEST(evil_fedInfo_test, helicsFederateInfoSetBrokerKey)
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     helicsFederateInfoSetBrokerKey(nullptr, "key", &err);
+    EXPECT_EQ(err.error_code, 45);
     helicsErrorClear(&err);
     helicsFederateInfoSetBrokerKey(evil_fi, "key", &err);
     EXPECT_NE(err.error_code, 0);
@@ -874,6 +912,7 @@ TEST(evil_fedInfo_test, helicsFederateInfoSetBrokerPort)
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     helicsFederateInfoSetBrokerPort(nullptr, 9999, &err);
+    EXPECT_EQ(err.error_code, 45);
     helicsErrorClear(&err);
     helicsFederateInfoSetBrokerPort(nullptr, 9999, &err);
     EXPECT_NE(err.error_code, 0);
@@ -894,6 +933,7 @@ TEST(evil_fedInfo_test, helicsFederateInfoSetLocalPort)
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     helicsFederateInfoSetLocalPort(nullptr, "9999", &err);
+    EXPECT_EQ(err.error_code, 45);
     helicsErrorClear(&err);
     helicsFederateInfoSetLocalPort(nullptr, "9999", &err);
     EXPECT_NE(err.error_code, 0);
@@ -914,6 +954,7 @@ TEST(evil_fedInfo_test, helicsFederateInfoSetFlagOption)
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     helicsFederateInfoSetFlagOption(nullptr, 9, helics_false, &err);
+    EXPECT_EQ(err.error_code, 45);
     helicsErrorClear(&err);
     helicsFederateInfoSetFlagOption(evil_fi, 9, helics_false, &err);
     EXPECT_NE(err.error_code, 0);
@@ -931,6 +972,7 @@ TEST(evil_fedInfo_test, helicsFederateInfoSetSeparator)
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     helicsFederateInfoSetSeparator(nullptr, '-', &err);
+    EXPECT_EQ(err.error_code, 45);
     helicsErrorClear(&err);
     helicsFederateInfoSetSeparator(evil_fi, '-', &err);
     EXPECT_NE(err.error_code, 0);
@@ -948,6 +990,7 @@ TEST(evil_fedInfo_test, helicsFederateInfoSetTimeProperty)
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     helicsFederateInfoSetTimeProperty(nullptr, 99, 4.35, &err);
+    EXPECT_EQ(err.error_code, 45);
     helicsErrorClear(&err);
     helicsFederateInfoSetTimeProperty(evil_fi, 99, 4.35, &err);
     EXPECT_NE(err.error_code, 0);
@@ -985,6 +1028,7 @@ TEST(evil_federate_test, helicsFederateClone)
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     auto res1 = helicsFederateClone(nullptr, &err);
+    EXPECT_EQ(err.error_code, 45);
     EXPECT_EQ(res1, nullptr);
     helicsErrorClear(&err);
     auto res2 = helicsFederateClone(nullptr, nullptr);
@@ -1012,6 +1056,7 @@ TEST(evil_federate_test, helicsFederateRegisterInterfaces)
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     helicsFederateRegisterInterfaces(nullptr, "invalidfile.txt", &err);
+    EXPECT_EQ(err.error_code, 45);
     helicsErrorClear(&err);
     //auto res2=helicsFederateRegisterInterfaces(helics_federate fed, const char* file, nullptr);
     helicsFederateRegisterInterfaces(evil_federate, "invalid_file.txt", &err);
@@ -1026,6 +1071,7 @@ TEST(evil_federate_test, helicsFederateFinalize)
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     helicsFederateFinalize(nullptr, &err);
+    EXPECT_EQ(err.error_code, 45);
     helicsErrorClear(&err);
     helicsFederateFinalize(evil_federate, &err);
     EXPECT_NE(err.error_code, 0);
@@ -1042,6 +1088,7 @@ TEST(evil_federate_test, helicsFederateFinalizeAsync)
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     helicsFederateFinalizeAsync(nullptr, &err);
+    EXPECT_EQ(err.error_code, 45);
     helicsErrorClear(&err);
     helicsFederateFinalizeAsync(evil_federate, &err);
     EXPECT_NE(err.error_code, 0);
@@ -1055,6 +1102,7 @@ TEST(evil_federate_test, helicsFederateFinalizeComplete)
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     helicsFederateFinalizeComplete(nullptr, &err);
+    EXPECT_EQ(err.error_code, 45);
     helicsErrorClear(&err);
     //auto res2=helicsFederateFinalizeComplete(helics_federate fed, nullptr);
     helicsFederateFinalizeComplete(evil_federate, &err);
@@ -1078,6 +1126,7 @@ TEST(evil_federate_test, helicsFederateEnterInitializingMode)
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     helicsFederateEnterInitializingMode(nullptr, &err);
+    EXPECT_EQ(err.error_code, 45);
     helicsErrorClear(&err);
     //auto res2=helicsFederateEnterInitializingMode(helics_federate fed, nullptr);
     helicsFederateEnterInitializingMode(evil_federate, &err);
@@ -1092,6 +1141,7 @@ TEST(evil_federate_test, helicsFederateEnterInitializingModeAsync)
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     helicsFederateEnterInitializingModeAsync(nullptr, &err);
+    EXPECT_EQ(err.error_code, 45);
     helicsErrorClear(&err);
     //auto res2=helicsFederateEnterInitializingModeAsync(helics_federate fed, nullptr);
     helicsFederateEnterInitializingModeAsync(evil_federate, &err);
@@ -1106,6 +1156,7 @@ TEST(evil_federate_test, helicsFederateIsAsyncOperationCompleted)
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     auto res1 = helicsFederateIsAsyncOperationCompleted(nullptr, &err);
+    EXPECT_EQ(err.error_code, 45);
     EXPECT_EQ(res1, helics_false);
     helicsErrorClear(&err);
     auto res2 = helicsFederateIsAsyncOperationCompleted(nullptr, nullptr);
@@ -1123,6 +1174,7 @@ TEST(evil_federate_test, helicsFederateEnterInitializingModeComplete)
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     helicsFederateEnterInitializingModeComplete(nullptr, &err);
+    EXPECT_EQ(err.error_code, 45);
     helicsErrorClear(&err);
     //auto res2=helicsFederateEnterInitializingModeComplete(helics_federate fed, nullptr);
     helicsFederateEnterInitializingModeComplete(evil_federate, &err);
@@ -1137,6 +1189,7 @@ TEST(evil_federate_test, helicsFederateEnterExecutingMode)
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     helicsFederateEnterExecutingMode(nullptr, &err);
+    EXPECT_EQ(err.error_code, 45);
     helicsErrorClear(&err);
     //auto res2=helicsFederateEnterExecutingMode(helics_federate fed, nullptr);
     helicsFederateEnterExecutingMode(evil_federate, &err);
@@ -1151,6 +1204,7 @@ TEST(evil_federate_test, helicsFederateEnterExecutingModeAsync)
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     helicsFederateEnterExecutingModeAsync(nullptr, &err);
+    EXPECT_EQ(err.error_code, 45);
     helicsErrorClear(&err);
     //auto res2=helicsFederateEnterExecutingModeAsync(helics_federate fed, nullptr);
     helicsFederateEnterExecutingModeAsync(evil_federate, &err);
@@ -1165,6 +1219,7 @@ TEST(evil_federate_test, helicsFederateEnterExecutingModeComplete)
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     helicsFederateEnterExecutingModeComplete(nullptr, &err);
+    EXPECT_EQ(err.error_code, 45);
     helicsErrorClear(&err);
     //auto res2=helicsFederateEnterExecutingModeComplete(helics_federate fed, nullptr);
     helicsFederateEnterExecutingModeComplete(evil_federate, &err);
@@ -1180,6 +1235,7 @@ TEST(evil_federate_test, helicsFederateEnterExecutingModeIterative)
     err.error_code = 45;
     auto res1 = helicsFederateEnterExecutingModeIterative(
         nullptr, helics_iteration_request_no_iteration, &err);
+    EXPECT_EQ(err.error_code, 45);
     EXPECT_EQ(res1, helics_iteration_result_error);
     helicsErrorClear(&err);
     auto res2 = helicsFederateEnterExecutingModeIterative(
@@ -1200,6 +1256,7 @@ TEST(evil_federate_test, helicsFederateEnterExecutingModeIterativeAsync)
     err.error_code = 45;
     helicsFederateEnterExecutingModeIterativeAsync(
         nullptr, helics_iteration_request_no_iteration, &err);
+    EXPECT_EQ(err.error_code, 45);
     helicsErrorClear(&err);
     //auto res2=helicsFederateEnterExecutingModeIterativeAsync(helics_federate fed, helics_iteration_request iterate, nullptr);
     helicsFederateEnterExecutingModeIterativeAsync(
@@ -1216,6 +1273,7 @@ TEST(evil_federate_test, helicsFederateEnterExecutingModeIterativeComplete)
     err.error_code = 45;
     auto res1 = helicsFederateEnterExecutingModeIterativeComplete(nullptr, &err);
     EXPECT_EQ(res1, helics_iteration_result_error);
+    EXPECT_EQ(err.error_code, 45);
     helicsErrorClear(&err);
     auto res2 = helicsFederateEnterExecutingModeIterativeComplete(nullptr, nullptr);
     EXPECT_EQ(res2, helics_iteration_result_error);
@@ -1232,6 +1290,7 @@ TEST(evil_federate_test, helicsFederateGetState)
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     auto res1 = helicsFederateGetState(nullptr, &err);
+    EXPECT_EQ(err.error_code, 45);
     EXPECT_EQ(res1, helics_state_error);
     helicsErrorClear(&err);
     auto res2 = helicsFederateGetState(nullptr, nullptr);
@@ -1248,6 +1307,7 @@ TEST(evil_federate_test, helicsFederateGetCoreObject)
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     auto res1 = helicsFederateGetCoreObject(nullptr, &err);
+    EXPECT_EQ(err.error_code, 45);
     EXPECT_EQ(res1, nullptr);
     helicsErrorClear(&err);
     auto res2 = helicsFederateGetCoreObject(nullptr, nullptr);
@@ -1265,6 +1325,7 @@ TEST(evil_federate_test, helicsFederateRequestTime)
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     auto res1 = helicsFederateRequestTime(nullptr, 1.0, &err);
+    EXPECT_EQ(err.error_code, 45);
     helicsErrorClear(&err);
     EXPECT_DOUBLE_EQ(res1, helics_time_invalid);
     auto res2 = helicsFederateRequestTime(nullptr, 1.0, nullptr);
@@ -1282,6 +1343,7 @@ TEST(evil_federate_test, helicsFederateRequestTimeAdvance)
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     auto res1 = helicsFederateRequestTimeAdvance(nullptr, 1.0, &err);
+    EXPECT_EQ(err.error_code, 45);
     EXPECT_DOUBLE_EQ(res1, helics_time_invalid);
     helicsErrorClear(&err);
     auto res2 = helicsFederateRequestTimeAdvance(nullptr, 1.0, nullptr);
@@ -1299,6 +1361,7 @@ TEST(evil_federate_test, helicsFederateRequestNextStep)
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     auto res1 = helicsFederateRequestNextStep(nullptr, &err);
+    EXPECT_EQ(err.error_code, 45);
     EXPECT_DOUBLE_EQ(res1, helics_time_invalid);
     helicsErrorClear(&err);
     auto res2 = helicsFederateRequestNextStep(nullptr, nullptr);
@@ -1318,6 +1381,7 @@ TEST(evil_federate_test, helicsFederateRequestTimeIterative)
     helics_iteration_result iteration{helics_iteration_result_iterating};
     auto res1 = helicsFederateRequestTimeIterative(
         nullptr, 1.0, helics_iteration_request_force_iteration, &iteration, &err);
+    EXPECT_EQ(err.error_code, 45);
     EXPECT_DOUBLE_EQ(res1, helics_time_invalid);
     EXPECT_EQ(iteration, helics_iteration_result_error);
     helicsErrorClear(&err);
@@ -1340,6 +1404,7 @@ TEST(evil_federate_test, helicsFederateRequestTimeAsync)
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     helicsFederateRequestTimeAsync(nullptr, 1.0, &err);
+    EXPECT_EQ(err.error_code, 45);
     helicsErrorClear(&err);
     //auto res2=helicsFederateRequestTimeAsync(helics_federate fed, helics_time requestTime, nullptr);
     helicsFederateRequestTimeAsync(evil_federate, 1.0, &err);
@@ -1354,6 +1419,7 @@ TEST(evil_federate_test, helicsFederateRequestTimeComplete)
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     auto res1 = helicsFederateRequestTimeComplete(nullptr, &err);
+    EXPECT_EQ(err.error_code, 45);
     EXPECT_DOUBLE_EQ(res1, helics_time_invalid);
     helicsErrorClear(&err);
     auto res2 = helicsFederateRequestTimeComplete(nullptr, nullptr);
@@ -1372,6 +1438,7 @@ TEST(evil_federate_test, helicsFederateRequestTimeIterativeAsync)
     err.error_code = 45;
     helicsFederateRequestTimeIterativeAsync(
         nullptr, 1.0, helics_iteration_request_force_iteration, &err);
+    EXPECT_EQ(err.error_code, 45);
     helicsErrorClear(&err);
     //auto res2=helicsFederateRequestTimeIterativeAsync(     helics_federate fed,     helics_time requestTime,     helics_iteration_request iterate,     nullptr);
     helicsFederateRequestTimeIterativeAsync(
@@ -1388,6 +1455,7 @@ TEST(evil_federate_test, helicsFederateRequestTimeIterativeComplete)
     err.error_code = 45;
     helics_iteration_result iteration{helics_iteration_result_iterating};
     auto res1 = helicsFederateRequestTimeIterativeComplete(nullptr, &iteration, &err);
+    EXPECT_EQ(err.error_code, 45);
     EXPECT_EQ(iteration, helics_iteration_result_error);
     EXPECT_DOUBLE_EQ(res1, helics_time_invalid);
     iteration = helics_iteration_result_iterating;
@@ -1419,6 +1487,7 @@ TEST(evil_federate_test, helicsFederateSetTimeProperty)
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     helicsFederateSetTimeProperty(nullptr, 1, 4.0, &err);
+    EXPECT_EQ(err.error_code, 45);
     helicsErrorClear(&err);
     //auto res2=helicsFederateSetTimeProperty(helics_federate fed, int timeProperty, helics_time time, nullptr);
     helicsFederateSetTimeProperty(evil_federate, 4, 1.0, &err);
@@ -1433,6 +1502,7 @@ TEST(evil_federate_test, helicsFederateSetFlagOption)
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     helicsFederateSetFlagOption(nullptr, 99, helics_false, &err);
+    EXPECT_EQ(err.error_code, 45);
     helicsErrorClear(&err);
     //auto res2=helicsFederateSetFlagOption(helics_federate fed, int flag, helics_bool flagValue, nullptr);
     helicsFederateSetFlagOption(evil_federate, 99, helics_true, &err);
@@ -1447,6 +1517,7 @@ TEST(evil_federate_test, helicsFederateSetSeparator)
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     helicsFederateSetSeparator(nullptr, '-', &err);
+    EXPECT_EQ(err.error_code, 45);
     helicsErrorClear(&err);
     //auto res2=helicsFederateSetSeparator(helics_federate fed, char separator, nullptr);
     helicsFederateSetSeparator(evil_federate, '-', &err);
@@ -1461,6 +1532,7 @@ TEST(evil_federate_test, helicsFederateSetIntegerProperty)
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     helicsFederateSetIntegerProperty(nullptr, 0, 99, &err);
+    EXPECT_EQ(err.error_code, 45);
     helicsErrorClear(&err);
     //auto res2=helicsFederateSetIntegerProperty(helics_federate fed, int intProperty, int propertyVal, nullptr);
     helicsFederateSetIntegerProperty(evil_federate, 99, 99, &err);
@@ -1475,6 +1547,7 @@ TEST(evil_federate_test, helicsFederateGetTimeProperty)
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     auto res1 = helicsFederateGetTimeProperty(nullptr, 99, &err);
+    EXPECT_EQ(err.error_code, 45);
     EXPECT_DOUBLE_EQ(res1, helics_time_invalid);
     helicsErrorClear(&err);
     auto res2 = helicsFederateGetTimeProperty(nullptr, 88, nullptr);
@@ -1492,6 +1565,7 @@ TEST(evil_federate_test, helicsFederateGetFlagOption)
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     auto res1 = helicsFederateGetFlagOption(nullptr, 1, &err);
+    EXPECT_EQ(err.error_code, 45);
     EXPECT_EQ(res1, helics_false);
     helicsErrorClear(&err);
     auto res2 = helicsFederateGetFlagOption(nullptr, 1, nullptr);
@@ -1509,6 +1583,7 @@ TEST(evil_federate_test, helicsFederateGetIntegerProperty)
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     auto res1 = helicsFederateGetIntegerProperty(nullptr, 99, &err);
+    EXPECT_EQ(err.error_code, 45);
     EXPECT_LT(res1, 0);
     helicsErrorClear(&err);
     auto res2 = helicsFederateGetIntegerProperty(nullptr, 20, nullptr);
@@ -1526,6 +1601,7 @@ TEST(evil_federate_test, helicsFederateGetCurrentTime)
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     auto res1 = helicsFederateGetCurrentTime(nullptr, &err);
+    EXPECT_EQ(err.error_code, 45);
     EXPECT_DOUBLE_EQ(res1, helics_time_invalid);
     helicsErrorClear(&err);
     auto res2 = helicsFederateGetCurrentTime(nullptr, nullptr);
@@ -1543,6 +1619,7 @@ TEST(evil_federate_test, helicsFederateSetGlobal)
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     helicsFederateSetGlobal(nullptr, nullptr, nullptr, &err);
+    EXPECT_EQ(err.error_code, 45);
     helicsErrorClear(&err);
     //auto res2=helicsFederateSetGlobal(helics_federate fed, const char* valueName, const char* value, nullptr);
     helicsFederateSetGlobal(evil_federate, "global", "glob", &err);
@@ -1557,6 +1634,7 @@ TEST(evil_federate_test, helicsFederateSetLogFile)
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     helicsFederateSetLogFile(nullptr, "unknownfile.txt", &err);
+    EXPECT_EQ(err.error_code, 45);
     helicsErrorClear(&err);
     //auto res2=helicsFederateSetLogFile(helics_federate fed, const char* logFile, nullptr);
     helicsFederateSetLogFile(evil_federate, "unknownfile.txt", &err);
@@ -1571,6 +1649,7 @@ TEST(evil_federate_test, helicsFederateLogErrorMessage)
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     helicsFederateLogErrorMessage(nullptr, "null log", &err);
+    EXPECT_EQ(err.error_code, 45);
     helicsErrorClear(&err);
     //auto res2=helicsFederateLogErrorMessage(helics_federate fed, const char* logmessage, nullptr);
     helicsFederateLogErrorMessage(evil_federate, "null log", &err);
@@ -1585,6 +1664,7 @@ TEST(evil_federate_test, helicsFederateLogWarningMessage)
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     helicsFederateLogWarningMessage(nullptr, "null log", &err);
+    EXPECT_EQ(err.error_code, 45);
     helicsErrorClear(&err);
     //auto res2=helicsFederateLogWarningMessage(helics_federate fed, const char* logmessage, nullptr);
     helicsFederateLogWarningMessage(evil_federate, "null log", &err);
@@ -1599,6 +1679,7 @@ TEST(evil_federate_test, helicsFederateLogInfoMessage)
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     helicsFederateLogInfoMessage(nullptr, "null log", &err);
+    EXPECT_EQ(err.error_code, 45);
     helicsErrorClear(&err);
     //auto res2=helicsFederateLogInfoMessage(helics_federate fed, "null log", nullptr);
     helicsFederateLogInfoMessage(evil_federate, "null log", &err);
@@ -1612,7 +1693,8 @@ TEST(evil_federate_test, helicsFederateLogDebugMessage)
     helics_federate evil_federate = reinterpret_cast<helics_federate>(rdata);
     auto err = helicsErrorInitialize();
     err.error_code = 45;
-    //auto res1=helicsFederateLogDebugMessage(nullptr, "null log", &err);
+    helicsFederateLogDebugMessage(nullptr, "null log", &err);
+    EXPECT_EQ(err.error_code, 45);
     helicsErrorClear(&err);
     //auto res2=helicsFederateLogDebugMessage(helics_federate fed, const char* logmessage, nullptr);
     helicsFederateLogDebugMessage(evil_federate, "null log", &err);
@@ -1627,6 +1709,7 @@ TEST(evil_federate_test, helicsFederateLogLevelMessage)
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     helicsFederateLogLevelMessage(nullptr, 0, "null log", &err);
+    EXPECT_EQ(err.error_code, 45);
     helicsErrorClear(&err);
     //auto res2=helicsFederateLogLevelMessage(helics_federate fed, int loglevel, const char* logmessage, nullptr);
     helicsFederateLogLevelMessage(evil_federate, 0, "null log", &err);
@@ -1641,6 +1724,7 @@ TEST(evil_federate_test, helicsFederateSetLoggingCallback)
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     helicsFederateSetLoggingCallback(nullptr, nullptr, nullptr, &err);
+    EXPECT_EQ(err.error_code, 45);
     helicsErrorClear(&err);
     //auto res2=helicsFederateSetLoggingCallback(     helics_federate fed,     void (*logger)(int loglevel, const char* identifier, const char* message, void* userData),     void* userdata,     nullptr);
     helicsFederateSetLoggingCallback(evil_federate, nullptr, nullptr, &err);
@@ -1657,6 +1741,7 @@ TEST(evil_value_federate_test, helicsFederateRegisterSubscription)
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     auto res1 = helicsFederateRegisterSubscription(nullptr, "key", nullptr, &err);
+    EXPECT_EQ(err.error_code, 45);
     EXPECT_EQ(res1, nullptr);
     helicsErrorClear(&err);
     auto res2 = helicsFederateRegisterSubscription(nullptr, nullptr, nullptr, nullptr);
@@ -1676,6 +1761,7 @@ TEST(evil_value_federate_test, helicsFederateRegisterPublication)
     auto res1 =
         helicsFederateRegisterPublication(nullptr, "key", helics_data_type_complex, nullptr, &err);
     EXPECT_EQ(res1, nullptr);
+    EXPECT_EQ(err.error_code, 45);
     helicsErrorClear(&err);
     auto res2 = helicsFederateRegisterPublication(
         nullptr, nullptr, helics_data_type_complex, nullptr, nullptr);
@@ -1694,6 +1780,7 @@ TEST(evil_value_federate_test, helicsFederateRegisterTypePublication)
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     auto res1 = helicsFederateRegisterTypePublication(nullptr, "key", "type", "", &err);
+    EXPECT_EQ(err.error_code, 45);
     EXPECT_EQ(res1, nullptr);
     helicsErrorClear(&err);
     auto res2 = helicsFederateRegisterTypePublication(nullptr, nullptr, nullptr, nullptr, nullptr);
@@ -1712,6 +1799,7 @@ TEST(evil_value_federate_test, helicsFederateRegisterGlobalPublication)
     err.error_code = 45;
     auto res1 =
         helicsFederateRegisterGlobalPublication(nullptr, "key", helics_data_type_any, "", &err);
+    EXPECT_EQ(err.error_code, 45);
     EXPECT_EQ(res1, nullptr);
     helicsErrorClear(&err);
     auto res2 = helicsFederateRegisterGlobalPublication(
@@ -1731,6 +1819,7 @@ TEST(evil_value_federate_test, helicsFederateRegisterGlobalTypePublication)
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     auto res1 = helicsFederateRegisterGlobalTypePublication(nullptr, "key", "type", "", &err);
+    EXPECT_EQ(err.error_code, 45);
     EXPECT_EQ(res1, nullptr);
     helicsErrorClear(&err);
     auto res2 =
@@ -1748,6 +1837,7 @@ TEST(evil_value_federate_test, helicsFederateRegisterInput)
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     auto res1 = helicsFederateRegisterInput(nullptr, "key", helics_data_type_any, "", &err);
+    EXPECT_EQ(err.error_code, 45);
     EXPECT_EQ(res1, nullptr);
     helicsErrorClear(&err);
     auto res2 =
@@ -1766,6 +1856,7 @@ TEST(evil_value_federate_test, helicsFederateRegisterTypeInput)
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     auto res1 = helicsFederateRegisterTypeInput(nullptr, "key", "type", "", &err);
+    EXPECT_EQ(err.error_code, 45);
     EXPECT_EQ(res1, nullptr);
     helicsErrorClear(&err);
     auto res2 = helicsFederateRegisterTypeInput(nullptr, nullptr, nullptr, nullptr, nullptr);
@@ -1783,6 +1874,7 @@ TEST(evil_value_federate_test, helicsFederateRegisterGlobalInput)
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     auto res1 = helicsFederateRegisterGlobalInput(nullptr, "key", helics_data_type_any, "", &err);
+    EXPECT_EQ(err.error_code, 45);
     EXPECT_EQ(res1, nullptr);
     helicsErrorClear(&err);
     auto res2 =
@@ -1802,6 +1894,7 @@ TEST(evil_value_federate_test, helicsFederateRegisterGlobalTypeInput)
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     auto res1 = helicsFederateRegisterGlobalTypeInput(nullptr, "key", "type", "", &err);
+    EXPECT_EQ(err.error_code, 45);
     EXPECT_EQ(res1, nullptr);
     helicsErrorClear(&err);
     auto res2 = helicsFederateRegisterGlobalTypeInput(nullptr, nullptr, nullptr, nullptr, nullptr);
@@ -1819,6 +1912,7 @@ TEST(evil_value_federate_test, helicsFederateGetPublication)
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     auto res1 = helicsFederateGetPublication(nullptr, "key", &err);
+    EXPECT_EQ(err.error_code, 45);
     EXPECT_EQ(res1, nullptr);
     helicsErrorClear(&err);
     auto res2 = helicsFederateGetPublication(nullptr, nullptr, nullptr);
@@ -1836,6 +1930,7 @@ TEST(evil_value_federate_test, helicsFederateGetPublicationByIndex)
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     auto res1 = helicsFederateGetPublicationByIndex(nullptr, 0, &err);
+    EXPECT_EQ(err.error_code, 45);
     EXPECT_EQ(res1, nullptr);
     helicsErrorClear(&err);
     auto res2 = helicsFederateGetPublicationByIndex(nullptr, 0, nullptr);
@@ -1853,6 +1948,7 @@ TEST(evil_value_federate_test, helicsFederateGetInput)
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     auto res1 = helicsFederateGetInput(nullptr, "key", &err);
+    EXPECT_EQ(err.error_code, 45);
     EXPECT_EQ(res1, nullptr);
     helicsErrorClear(&err);
     auto res2 = helicsFederateGetInput(nullptr, nullptr, nullptr);
@@ -1870,6 +1966,7 @@ TEST(evil_value_federate_test, helicsFederateGetInputByIndex)
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     auto res1 = helicsFederateGetInputByIndex(nullptr, 0, &err);
+    EXPECT_EQ(err.error_code, 45);
     EXPECT_EQ(res1, nullptr);
     helicsErrorClear(&err);
     auto res2 = helicsFederateGetInputByIndex(nullptr, 0, nullptr);
@@ -1887,6 +1984,7 @@ TEST(evil_value_federate_test, helicsFederateGetSubscription)
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     auto res1 = helicsFederateGetSubscription(nullptr, "key", &err);
+    EXPECT_EQ(err.error_code, 45);
     EXPECT_EQ(res1, nullptr);
     helicsErrorClear(&err);
     auto res2 = helicsFederateGetSubscription(nullptr, nullptr, nullptr);
@@ -1912,6 +2010,7 @@ TEST(evil_value_federate_test, helicsFederateRegisterFromPublicationJSON)
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     helicsFederateRegisterFromPublicationJSON(nullptr, "json.json", &err);
+    EXPECT_EQ(err.error_code, 45);
     helicsErrorClear(&err);
     //auto res2=helicsFederateRegisterFromPublicationJSON(helics_federate fed, const char* json, nullptr);
     helicsFederateRegisterFromPublicationJSON(evil_federate, "json.json", &err);
@@ -1926,6 +2025,7 @@ TEST(evil_value_federate_test, helicsFederatePublishJSON)
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     helicsFederatePublishJSON(nullptr, "json.json", &err);
+    EXPECT_EQ(err.error_code, 45);
     helicsErrorClear(&err);
     //auto res2=helicsFederatePublishJSON(helics_federate fed, const char* json, nullptr);
     helicsFederatePublishJSON(evil_federate, "json.json", &err);
@@ -1964,6 +2064,7 @@ TEST(evil_pub_test, helicsPublicationPublishRaw)
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     helicsPublicationPublishRaw(nullptr, nullptr, 85, &err);
+    EXPECT_EQ(err.error_code, 45);
     helicsErrorClear(&err);
     //auto res2=helicsPublicationPublishRaw(helics_publication pub, const void* data, int inputDataLength, nullptr);
     helicsPublicationPublishRaw(evil_pub, nullptr, 14654181, &err);
@@ -1978,6 +2079,7 @@ TEST(evil_pub_test, helicsPublicationPublishString)
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     helicsPublicationPublishString(nullptr, nullptr, &err);
+    EXPECT_EQ(err.error_code, 45);
     helicsErrorClear(&err);
     //auto res2=helicsPublicationPublishString(helics_publication pub, const char* str, nullptr);
     helicsPublicationPublishString(evil_pub, "String", &err);
@@ -1992,6 +2094,7 @@ TEST(evil_pub_test, helicsPublicationPublishInteger)
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     helicsPublicationPublishInteger(nullptr, 1, &err);
+    EXPECT_EQ(err.error_code, 45);
     helicsErrorClear(&err);
     //auto res2=helicsPublicationPublishInteger(helics_publication pub, int64_t val, nullptr);
     helicsPublicationPublishInteger(evil_pub, 1, &err);
@@ -2006,6 +2109,7 @@ TEST(evil_pub_test, helicsPublicationPublishBoolean)
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     helicsPublicationPublishBoolean(nullptr, 0, &err);
+    EXPECT_EQ(err.error_code, 45);
     helicsErrorClear(&err);
     //auto res2=helicsPublicationPublishBoolean(helics_publication pub, helics_bool val, nullptr);
     helicsPublicationPublishBoolean(evil_pub, 99, &err);
@@ -2020,6 +2124,7 @@ TEST(evil_pub_test, helicsPublicationPublishDouble)
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     helicsPublicationPublishDouble(nullptr, 1.7, &err);
+    EXPECT_EQ(err.error_code, 45);
     helicsErrorClear(&err);
     //auto res2=helicsPublicationPublishDouble(helics_publication pub, double val, nullptr);
     helicsPublicationPublishDouble(evil_pub, 2.0, &err);
@@ -2034,6 +2139,7 @@ TEST(evil_pub_test, helicsPublicationPublishTime)
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     helicsPublicationPublishTime(nullptr, 4.3, &err);
+    EXPECT_EQ(err.error_code, 45);
     helicsErrorClear(&err);
     //auto res2=helicsPublicationPublishTime(helics_publication pub, helics_time val, nullptr);
     helicsPublicationPublishTime(evil_pub, 5.0, &err);
@@ -2048,6 +2154,7 @@ TEST(evil_pub_test, helicsPublicationPublishChar)
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     helicsPublicationPublishChar(nullptr, '\0', &err);
+    EXPECT_EQ(err.error_code, 45);
     helicsErrorClear(&err);
     //auto res2=helicsPublicationPublishChar(helics_publication pub, char val, nullptr);
     helicsPublicationPublishChar(evil_pub, 'c', &err);
@@ -2062,6 +2169,7 @@ TEST(evil_pub_test, helicsPublicationPublishComplex)
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     helicsPublicationPublishComplex(nullptr, 2.0, -6.5, &err);
+    EXPECT_EQ(err.error_code, 45);
     helicsErrorClear(&err);
     //auto res2=helicsPublicationPublishComplex(helics_publication pub, double real, double imag, nullptr);
     helicsPublicationPublishComplex(evil_pub, 4.507, 11.3, &err);
@@ -2076,6 +2184,7 @@ TEST(evil_pub_test, helicsPublicationPublishVector)
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     helicsPublicationPublishVector(nullptr, nullptr, 99, &err);
+    EXPECT_EQ(err.error_code, 45);
     helicsErrorClear(&err);
     //auto res2=helicsPublicationPublishVector(helics_publication pub, const double* vectorInput, int vectorLength, nullptr);
     helicsPublicationPublishVector(evil_pub, nullptr, 99, &err);
@@ -2090,6 +2199,7 @@ TEST(evil_pub_test, helicsPublicationPublishNamedPoint)
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     helicsPublicationPublishNamedPoint(nullptr, "string", 5.0, &err);
+    EXPECT_EQ(err.error_code, 45);
     helicsErrorClear(&err);
     //auto res2=helicsPublicationPublishNamedPoint(helics_publication pub, const char* str, double val, nullptr);
     helicsPublicationPublishNamedPoint(evil_pub, "string", 5.0, &err);
@@ -2104,6 +2214,7 @@ TEST(evil_pub_test, helicsPublicationAddTarget)
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     helicsPublicationAddTarget(nullptr, "target", &err);
+    EXPECT_EQ(err.error_code, 45);
     helicsErrorClear(&err);
     //auto res2=helicsPublicationAddTarget(helics_publication pub, const char* target, nullptr);
     helicsPublicationAddTarget(evil_pub, "target", &err);
@@ -2162,6 +2273,7 @@ TEST(evil_pub_test, helicsPublicationSetInfo)
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     helicsPublicationSetInfo(nullptr, "info", &err);
+    EXPECT_EQ(err.error_code, 45);
     helicsErrorClear(&err);
     //auto res2=helicsPublicationSetInfo(helics_publication pub, const char* info, nullptr);
     helicsPublicationSetInfo(evil_pub, "", &err);
@@ -2176,6 +2288,7 @@ TEST(evil_pub_test, helicsPublicationSetMinimumChange)
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     helicsPublicationSetMinimumChange(nullptr, 12.0, &err);
+    EXPECT_EQ(err.error_code, 45);
     helicsErrorClear(&err);
     //auto res2=helicsPublicationSetInfo(helics_publication pub, const char* info, nullptr);
     helicsPublicationSetMinimumChange(evil_pub, 1.0, &err);
@@ -2201,6 +2314,7 @@ TEST(evil_pub_test, helicsPublicationSetOption)
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     helicsPublicationSetOption(nullptr, -10, helics_true, &err);
+    EXPECT_EQ(err.error_code, 45);
     helicsErrorClear(&err);
     //auto res2=helicsPublicationSetOption(helics_publication pub, int option, helics_bool val, nullptr);
     helicsPublicationSetOption(evil_pub, 45, helics_true, &err);
@@ -2220,6 +2334,7 @@ TEST(evil_input_test, helicsInputAddTarget)
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     helicsInputAddTarget(nullptr, nullptr, &err);
+    EXPECT_EQ(err.error_code, 45);
     helicsErrorClear(&err);
     //auto res2=helicsInputAddTarget(helics_input ipt, const char* target, nullptr);
     helicsInputAddTarget(evil_input, "target", &err);
@@ -2246,6 +2361,7 @@ TEST(evil_input_test, helicsInputGetRawValue)
     err.error_code = 45;
     int actLen = 99;
     helicsInputGetRawValue(nullptr, nullptr, 87, &actLen, &err);
+    EXPECT_EQ(err.error_code, 45);
     EXPECT_EQ(actLen, 0);
     helicsErrorClear(&err);
     actLen = 99;
@@ -2275,6 +2391,7 @@ TEST(evil_input_test, helicsInputGetString)
     err.error_code = 45;
     int actLen = 99;
     helicsInputGetString(nullptr, nullptr, 67, &actLen, &err);
+    EXPECT_EQ(err.error_code, 45);
     EXPECT_EQ(actLen, 0);
     helicsErrorClear(&err);
     //auto res2=helicsInputGetString(helics_input ipt, char* outputString, int maxStringLen, int* actualLength, nullptr);
@@ -2292,6 +2409,7 @@ TEST(evil_input_test, helicsInputGetInteger)
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     auto res1 = helicsInputGetInteger(nullptr, &err);
+    EXPECT_EQ(err.error_code, 45);
     EXPECT_EQ(res1, -101);
     helicsErrorClear(&err);
     auto res2 = helicsInputGetInteger(nullptr, nullptr);
@@ -2309,6 +2427,7 @@ TEST(evil_input_test, helicsInputGetBoolean)
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     auto res1 = helicsInputGetBoolean(nullptr, &err);
+    EXPECT_EQ(err.error_code, 45);
     EXPECT_EQ(res1, helics_false);
     helicsErrorClear(&err);
     auto res2 = helicsInputGetBoolean(nullptr, nullptr);
@@ -2326,6 +2445,7 @@ TEST(evil_input_test, helicsInputGetDouble)
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     auto res1 = helicsInputGetDouble(nullptr, &err);
+    EXPECT_EQ(err.error_code, 45);
     EXPECT_EQ(res1, helics_time_invalid);
     helicsErrorClear(&err);
     auto res2 = helicsInputGetDouble(nullptr, nullptr);
@@ -2343,6 +2463,7 @@ TEST(evil_input_test, helicsInputGetTime)
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     auto res1 = helicsInputGetTime(nullptr, &err);
+    EXPECT_EQ(err.error_code, 45);
     EXPECT_EQ(res1, helics_time_invalid);
     helicsErrorClear(&err);
     auto res2 = helicsInputGetTime(nullptr, nullptr);
@@ -2360,6 +2481,7 @@ TEST(evil_input_test, helicsInputGetChar)
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     char res1 = helicsInputGetChar(nullptr, &err);
+    EXPECT_EQ(err.error_code, 45);
     char tc = '\x15';
     EXPECT_TRUE(res1 == tc);
     helicsErrorClear(&err);
@@ -2378,6 +2500,7 @@ TEST(evil_input_test, helicsInputGetComplexObject)
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     auto res1 = helicsInputGetComplexObject(nullptr, &err);
+    EXPECT_EQ(err.error_code, 45);
     EXPECT_EQ(res1.real, helics_time_invalid);
     helicsErrorClear(&err);
     auto res2 = helicsInputGetComplexObject(nullptr, nullptr);
@@ -2395,6 +2518,7 @@ TEST(evil_input_test, helicsInputGetComplex)
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     helicsInputGetComplex(nullptr, nullptr, nullptr, &err);
+    EXPECT_EQ(err.error_code, 45);
     helicsErrorClear(&err);
     double v1 = 19.4;
     double v2 = 18.3;
@@ -2425,6 +2549,7 @@ TEST(evil_input_test, helicsInputGetVector)
     err.error_code = 45;
     int actLen = -56;
     helicsInputGetVector(nullptr, nullptr, 99, &actLen, &err);
+    EXPECT_EQ(err.error_code, 45);
     EXPECT_EQ(actLen, 0);
     helicsErrorClear(&err);
     //auto res2=helicsInputGetVector(helics_input ipt, double data[], int maxlen, int* actualSize, nullptr);
@@ -2443,6 +2568,7 @@ TEST(evil_input_test, helicsInputGetNamedPoint)
     int actLen = -56;
     double val = -15.0;
     helicsInputGetNamedPoint(nullptr, nullptr, 55, &actLen, &val, &err);
+    EXPECT_EQ(err.error_code, 45);
     EXPECT_EQ(actLen, 0);
     EXPECT_EQ(val, -15.0);
     helicsErrorClear(&err);
@@ -2462,6 +2588,7 @@ TEST(evil_input_test, helicsInputSetDefaultRaw)
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     helicsInputSetDefaultRaw(nullptr, nullptr, -87, &err);
+    EXPECT_EQ(err.error_code, 45);
     helicsErrorClear(&err);
     //auto res2=helicsInputSetDefaultRaw(helics_input ipt, const void* data, int inputDataLength, nullptr);
     helicsInputSetDefaultRaw(evil_input, nullptr, 15, &err);
@@ -2476,6 +2603,7 @@ TEST(evil_input_test, helicsInputSetDefaultString)
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     helicsInputSetDefaultString(nullptr, nullptr, &err);
+    EXPECT_EQ(err.error_code, 45);
     helicsErrorClear(&err);
     //auto res2=helicsInputSetDefaultString(helics_input ipt, const char* str, nullptr);
     helicsInputSetDefaultString(evil_input, "string", &err);
@@ -2490,6 +2618,7 @@ TEST(evil_input_test, helicsInputSetDefaultInteger)
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     helicsInputSetDefaultInteger(nullptr, -1798524456525, &err);
+    EXPECT_EQ(err.error_code, 45);
     helicsErrorClear(&err);
     //auto res2=helicsInputSetDefaultInteger(helics_input ipt, int64_t val, nullptr);
     helicsInputSetDefaultInteger(evil_input, 99, &err);
@@ -2504,6 +2633,7 @@ TEST(evil_input_test, helicsInputSetDefaultBoolean)
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     helicsInputSetDefaultBoolean(nullptr, helics_false, &err);
+    EXPECT_EQ(err.error_code, 45);
     helicsErrorClear(&err);
     //auto res2=helicsInputSetDefaultBoolean(helics_input ipt, helics_bool val, nullptr);
     helicsInputSetDefaultBoolean(evil_input, helics_true, &err);
@@ -2518,6 +2648,7 @@ TEST(evil_input_test, helicsInputSetDefaultTime)
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     helicsInputSetDefaultTime(nullptr, 5.7, &err);
+    EXPECT_EQ(err.error_code, 45);
     helicsErrorClear(&err);
     //auto res2=helicsInputSetDefaultTime(helics_input ipt, helics_time val, nullptr);
     helicsInputSetDefaultTime(evil_input, helics_time_invalid, &err);
@@ -2532,6 +2663,7 @@ TEST(evil_input_test, helicsInputSetDefaultChar)
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     helicsInputSetDefaultChar(nullptr, 'b', &err);
+    EXPECT_EQ(err.error_code, 45);
     helicsErrorClear(&err);
     //auto res2=helicsInputSetDefaultChar(helics_input ipt, char val, nullptr);
     helicsInputSetDefaultChar(evil_input, 'a', &err);
@@ -2546,6 +2678,7 @@ TEST(evil_input_test, helicsInputSetDefaultDouble)
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     helicsInputSetDefaultDouble(nullptr, 1.0, &err);
+    EXPECT_EQ(err.error_code, 45);
     helicsErrorClear(&err);
     //auto res2=helicsInputSetDefaultDouble(helics_input ipt, double val, nullptr);
     helicsInputSetDefaultDouble(evil_input, 1.0, &err);
@@ -2560,6 +2693,7 @@ TEST(evil_input_test, helicsInputSetDefaultComplex)
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     helicsInputSetDefaultComplex(nullptr, 1.0, 1.0, &err);
+    EXPECT_EQ(err.error_code, 45);
     helicsErrorClear(&err);
     //auto res2=helicsInputSetDefaultComplex(helics_input ipt, double real, double imag, nullptr);
     helicsInputSetDefaultComplex(evil_input, 1.0, 1.0, &err);
@@ -2574,6 +2708,7 @@ TEST(evil_input_test, helicsInputSetDefaultVector)
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     helicsInputSetDefaultVector(nullptr, nullptr, 28, &err);
+    EXPECT_EQ(err.error_code, 45);
     helicsErrorClear(&err);
     //auto res2=helicsInputSetDefaultVector(helics_input ipt, const double* vectorInput, int vectorLength, nullptr);
     helicsInputSetDefaultVector(evil_input, nullptr, 87, &err);
@@ -2588,6 +2723,7 @@ TEST(evil_input_test, helicsInputSetDefaultNamedPoint)
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     helicsInputSetDefaultNamedPoint(nullptr, nullptr, 0.0, &err);
+    EXPECT_EQ(err.error_code, 45);
     helicsErrorClear(&err);
     //auto res2=helicsInputSetDefaultNamedPoint(helics_input ipt, const char* str, double val, nullptr);
     helicsInputSetDefaultNamedPoint(evil_input, "string", 19, &err);
@@ -2690,6 +2826,7 @@ TEST(evil_input_test, helicsInputSetInfo)
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     helicsInputSetInfo(nullptr, nullptr, &err);
+    EXPECT_EQ(err.error_code, 45);
     helicsErrorClear(&err);
     //auto res2=helicsInputSetInfo(helics_input inp, const char* info, nullptr);
     helicsInputSetInfo(evil_input, "info", &err);
@@ -2704,6 +2841,7 @@ TEST(evil_input_test, helicsInputSetMinimumChange)
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     helicsInputSetMinimumChange(nullptr, 12.0, &err);
+    EXPECT_EQ(err.error_code, 45);
     helicsErrorClear(&err);
     //auto res2=helicsInputSetInfo(helics_input inp, const char* info, nullptr);
     helicsInputSetMinimumChange(evil_input, 12.0, &err);
@@ -2729,6 +2867,7 @@ TEST(evil_input_test, helicsInputSetOption)
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     helicsInputSetOption(nullptr, 0, helics_true, &err);
+    EXPECT_EQ(err.error_code, 45);
     helicsErrorClear(&err);
     //auto res2=helicsInputSetOption(helics_input inp, int option, helics_bool value, nullptr);
     helicsInputSetOption(evil_input, 45, helics_true, &err);
@@ -2779,6 +2918,7 @@ TEST(evil_message_fed_test, helicsFederateRegisterEndpoint)
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     auto res1 = helicsFederateRegisterEndpoint(nullptr, "name", "type", &err);
+    EXPECT_EQ(err.error_code, 45);
     EXPECT_EQ(res1, nullptr);
     helicsErrorClear(&err);
     auto res2 = helicsFederateRegisterEndpoint(nullptr, nullptr, nullptr, nullptr);
@@ -2796,6 +2936,7 @@ TEST(evil_message_fed_test, helicsFederateRegisterGlobalEndpoint)
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     auto res1 = helicsFederateRegisterGlobalEndpoint(nullptr, "name", "type", &err);
+    EXPECT_EQ(err.error_code, 45);
     EXPECT_EQ(res1, nullptr);
     helicsErrorClear(&err);
     auto res2 = helicsFederateRegisterGlobalEndpoint(nullptr, nullptr, nullptr, nullptr);
@@ -2813,6 +2954,7 @@ TEST(evil_message_fed_test, helicsFederateGetEndpoint)
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     auto res1 = helicsFederateGetEndpoint(nullptr, "name", &err);
+    EXPECT_EQ(err.error_code, 45);
     EXPECT_EQ(res1, nullptr);
     helicsErrorClear(&err);
     auto res2 = helicsFederateGetEndpoint(nullptr, nullptr, nullptr);
@@ -2830,6 +2972,7 @@ TEST(evil_message_fed_test, helicsFederateGetEndpointByIndex)
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     auto res1 = helicsFederateGetEndpointByIndex(nullptr, 0, &err);
+    EXPECT_EQ(err.error_code, 45);
     EXPECT_EQ(res1, nullptr);
     helicsErrorClear(&err);
     auto res2 = helicsFederateGetEndpointByIndex(nullptr, 0, nullptr);
@@ -2891,6 +3034,7 @@ TEST(evil_message_fed_test, helicsFederateCreateMessageObject)
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     auto res1 = helicsFederateCreateMessageObject(nullptr, &err);
+    EXPECT_EQ(err.error_code, 45);
     EXPECT_EQ(res1, nullptr);
     helicsErrorClear(&err);
     auto res2 = helicsFederateCreateMessageObject(nullptr, nullptr);
@@ -3029,7 +3173,8 @@ TEST(evil_message_object_test, helicsMessageGetRawData)
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     int actSize = 98;
-    helicsMessageGetRawData(nullptr, nullptr, 55, &actSize, &err);
+    helicsMessageGetRawData(nullptr, nullptr, 55, &actSize, &err); 
+    EXPECT_EQ(err.error_code, 45);
     EXPECT_EQ(actSize, 0);
     helicsErrorClear(&err);
     actSize = 45;
@@ -3058,6 +3203,7 @@ TEST(evil_message_object_test, helicsMessageSetSource)
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     helicsMessageSetSource(nullptr, "src", &err);
+    EXPECT_EQ(err.error_code, 45);
     helicsErrorClear(&err);
     //auto res2=helicsMessageSetSource(nullptr, const char* src, nullptr);
     helicsMessageSetSource(evil_mo, "src", &err);
@@ -3072,6 +3218,7 @@ TEST(evil_message_object_test, helicsMessageSetDestination)
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     helicsMessageSetDestination(nullptr, "dest", &err);
+    EXPECT_EQ(err.error_code, 45);
     helicsErrorClear(&err);
     //auto res2=helicsMessageSetDestination(nullptr, const char* dest, nullptr);
     helicsMessageSetDestination(evil_mo, "dest", &err);
@@ -3086,6 +3233,7 @@ TEST(evil_message_object_test, helicsMessageSetOriginalSource)
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     helicsMessageSetOriginalSource(nullptr, nullptr, &err);
+    EXPECT_EQ(err.error_code, 45);
     helicsErrorClear(&err);
     //auto res2=helicsMessageSetOriginalSource(nullptr, const char* src, nullptr);
     helicsMessageSetOriginalSource(evil_mo, "osrc", &err);
@@ -3100,6 +3248,7 @@ TEST(evil_message_object_test, helicsMessageSetOriginalDestination)
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     helicsMessageSetOriginalDestination(nullptr, nullptr, &err);
+    EXPECT_EQ(err.error_code, 45);
     helicsErrorClear(&err);
     //auto res2=helicsMessageSetOriginalDestination(nullptr, const char* dest, nullptr);
     helicsMessageSetOriginalDestination(evil_mo, "odest", &err);
@@ -3114,6 +3263,7 @@ TEST(evil_message_object_test, helicsMessageSetTime)
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     helicsMessageSetTime(nullptr, 1.0, &err);
+    EXPECT_EQ(err.error_code, 45);
     helicsErrorClear(&err);
     //auto res2=helicsMessageSetTime(nullptr, helics_time time, nullptr);
     helicsMessageSetTime(evil_mo, helics_time_invalid, &err);
@@ -3128,6 +3278,7 @@ TEST(evil_message_object_test, helicsMessageResize)
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     helicsMessageResize(nullptr, 5, &err);
+    EXPECT_EQ(err.error_code, 45);
     helicsErrorClear(&err);
     //auto res2=helicsMessageResize(nullptr, int newSize, nullptr);
     helicsMessageResize(evil_mo, 10, &err);
@@ -3142,6 +3293,7 @@ TEST(evil_message_object_test, helicsMessageReserve)
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     helicsMessageReserve(nullptr, 9999, &err);
+    EXPECT_EQ(err.error_code, 45);
     helicsErrorClear(&err);
     //auto res2=helicsMessageReserve(nullptr, int reserveSize, nullptr);
     helicsMessageReserve(evil_mo, 9999, &err);
@@ -3156,6 +3308,7 @@ TEST(evil_message_object_test, helicsMessageSetMessageID)
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     helicsMessageSetMessageID(nullptr, 1, &err);
+    EXPECT_EQ(err.error_code, 45);
     helicsErrorClear(&err);
     //auto res2=helicsMessageSetMessageID(nullptr, int32_t messageID, nullptr);
     helicsMessageSetMessageID(evil_mo, 15, &err);
@@ -3179,6 +3332,7 @@ TEST(evil_message_object_test, helicsMessageSetFlagOption)
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     helicsMessageSetFlagOption(nullptr, 5, helics_false, &err);
+    EXPECT_EQ(err.error_code, 45);
     helicsErrorClear(&err);
     //auto res2=helicsMessageSetFlagOption(nullptr, int flag, helics_bool flagValue, nullptr);
     helicsMessageSetFlagOption(evil_mo, 7, helics_true, &err);
@@ -3193,6 +3347,7 @@ TEST(evil_message_object_test, helicsMessageSetString)
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     helicsMessageSetString(nullptr, nullptr, &err);
+    EXPECT_EQ(err.error_code, 45);
     helicsErrorClear(&err);
     //auto res2=helicsMessageSetString(nullptr, const char* str, nullptr);
     helicsMessageSetString(evil_mo, "string", &err);
@@ -3207,6 +3362,7 @@ TEST(evil_message_object_test, helicsMessageSetData)
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     helicsMessageSetData(nullptr, nullptr, 99, &err);
+    EXPECT_EQ(err.error_code, 45);
     helicsErrorClear(&err);
     //auto res2=helicsMessageSetData(nullptr, nullptr, int inputDataLength, nullptr);
     helicsMessageSetData(evil_mo, rdata, 99, &err);
@@ -3221,6 +3377,7 @@ TEST(evil_message_object_test, helicsMessageAppendData)
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     helicsMessageAppendData(nullptr, nullptr, 89, &err);
+    EXPECT_EQ(err.error_code, 45);
     helicsErrorClear(&err);
     //auto res2=helicsMessageAppendData(nullptr, nullptr, int inputDataLength, nullptr);
     helicsMessageAppendData(evil_mo, rdata, 100, &err);
@@ -3237,6 +3394,7 @@ TEST(evil_endpoint_test, helicsEndpointSetDefaultDestination)
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     helicsEndpointSetDefaultDestination(nullptr, nullptr, &err);
+    EXPECT_EQ(err.error_code, 45);
     helicsErrorClear(&err);
     //auto res2=helicsEndpointSetDefaultDestination(nullptr, const char* dest, nullptr);
     helicsEndpointSetDefaultDestination(evil_ept, "dest", &err);
@@ -3262,6 +3420,7 @@ TEST(evil_endpoint_test, helicsEndpointSendMessageRaw)
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     helicsEndpointSendMessageRaw(nullptr, nullptr, nullptr, 45, &err);
+    EXPECT_EQ(err.error_code, 45);
     helicsErrorClear(&err);
     //auto res2=helicsEndpointSendMessageRaw(nullptr, nullptr, nullptr, int inputDataLength, nullptr);
     helicsEndpointSendMessageRaw(evil_ept, "dest", rdata, 200, &err);
@@ -3276,6 +3435,7 @@ TEST(evil_endpoint_test, helicsEndpointSendEventRaw)
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     helicsEndpointSendEventRaw(nullptr, nullptr, nullptr, 25, 3.5, &err);
+    EXPECT_EQ(err.error_code, 45);
     helicsErrorClear(&err);
     //auto res2=helicsEndpointSendEventRaw(     nullptr,    nullptr,    nullptr,     int inputDataLength,     helics_time time,     nullptr);
     helicsEndpointSendEventRaw(evil_ept, "dest", rdata, 56, 3.5, &err);
@@ -3290,6 +3450,7 @@ TEST(evil_endpoint_test, helicsEndpointSendMessage)
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     helicsEndpointSendMessage(nullptr, nullptr, &err);
+    EXPECT_EQ(err.error_code, 45);
     helicsErrorClear(&err);
     //auto res2=helicsEndpointSendMessage(nullptr, nullptr, nullptr);
     helicsEndpointSendMessage(evil_ept, nullptr, &err);
@@ -3304,6 +3465,7 @@ TEST(evil_endpoint_test, helicsEndpointSendMessageObject)
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     helicsEndpointSendMessageObject(nullptr, nullptr, &err);
+    EXPECT_EQ(err.error_code, 45);
     helicsErrorClear(&err);
     //auto res2=helicsEndpointSendMessageObject(nullptr, nullptr, nullptr);
     helicsEndpointSendMessageObject(evil_ept, nullptr, &err);
@@ -3318,6 +3480,7 @@ TEST(evil_endpoint_test, helicsEndpointSubscribe)
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     helicsEndpointSubscribe(nullptr, nullptr, &err);
+    EXPECT_EQ(err.error_code, 45);
     helicsErrorClear(&err);
     //auto res2=helicsEndpointSubscribe(nullptr, nullptr, nullptr);
     helicsEndpointSubscribe(evil_ept, "key", &err);
@@ -3418,6 +3581,7 @@ TEST(evil_endpoint_test, helicsEndpointSetInfo)
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     helicsEndpointSetInfo(nullptr, nullptr, &err);
+    EXPECT_EQ(err.error_code, 45);
     helicsErrorClear(&err);
     //auto res2=helicsEndpointSetInfo(nullptr, nullptr, nullptr);
     helicsEndpointSetInfo(evil_ept, "info", &err);
@@ -3436,6 +3600,7 @@ TEST(evil_endpoint_test, helicsEndpointSetOption)
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     helicsEndpointSetOption(nullptr, 5, helics_false, &err);
+    EXPECT_EQ(err.error_code, 45);
     helicsErrorClear(&err);
     //auto res2=helicsEndpointSetOption(nullptr, int option, helics_bool value, nullptr);
     helicsEndpointSetOption(evil_ept, 2, helics_true, &err);
@@ -3463,6 +3628,7 @@ TEST(evil_filter_fed_test, helicsFederateRegisterFilter)
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     auto res1 = helicsFederateRegisterFilter(nullptr, helics_filter_type_delay, "name", &err);
+    EXPECT_EQ(err.error_code, 45);
     EXPECT_EQ(res1, nullptr);
     helicsErrorClear(&err);
     auto res2 = helicsFederateRegisterFilter(nullptr, helics_filter_type_delay, nullptr, nullptr);
@@ -3480,6 +3646,7 @@ TEST(evil_filter_fed_test, helicsFederateRegisterGlobalFilter)
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     auto res1 = helicsFederateRegisterGlobalFilter(nullptr, helics_filter_type_delay, "name", &err);
+    EXPECT_EQ(err.error_code, 45);
     EXPECT_EQ(res1, nullptr);
     helicsErrorClear(&err);
     auto res2 =
@@ -3499,6 +3666,7 @@ TEST(evil_filter_fed_test, helicsFederateRegisterCloningFilter)
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     auto res1 = helicsFederateRegisterCloningFilter(nullptr, "deliver", &err);
+    EXPECT_EQ(err.error_code, 45);
     EXPECT_EQ(res1, nullptr);
     helicsErrorClear(&err);
     auto res2 = helicsFederateRegisterCloningFilter(nullptr, nullptr, nullptr);
@@ -3516,6 +3684,7 @@ TEST(evil_filter_fed_test, helicsFederateRegisterGlobalCloningFilter)
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     auto res1 = helicsFederateRegisterGlobalCloningFilter(nullptr, "deliver", &err);
+    EXPECT_EQ(err.error_code, 45);
     EXPECT_EQ(res1, nullptr);
     helicsErrorClear(&err);
     auto res2 = helicsFederateRegisterGlobalCloningFilter(nullptr, nullptr, nullptr);
@@ -3544,6 +3713,7 @@ TEST(evil_filter_fed_test, helicsFederateGetFilter)
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     auto res1 = helicsFederateGetFilter(nullptr, "name", &err);
+    EXPECT_EQ(err.error_code, 45);
     EXPECT_EQ(res1, nullptr);
     helicsErrorClear(&err);
     auto res2 = helicsFederateGetFilter(nullptr, nullptr, nullptr);
@@ -3561,6 +3731,7 @@ TEST(evil_filter_fed_test, helicsFederateGetFilterByIndex)
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     auto res1 = helicsFederateGetFilterByIndex(nullptr, 0, &err);
+    EXPECT_EQ(err.error_code, 45);
     EXPECT_EQ(res1, nullptr);
     helicsErrorClear(&err);
     auto res2 = helicsFederateGetFilterByIndex(nullptr, 0, nullptr);
@@ -3591,6 +3762,7 @@ TEST(evil_filter_test, helicsFilterSet)
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     helicsFilterSet(nullptr, nullptr, 5.3, &err);
+    EXPECT_EQ(err.error_code, 45);
     helicsErrorClear(&err);
     //auto res2=helicsFilterSet(helics_filter filt, const char* prop, double val, nullptr);
     helicsFilterSet(evil_filt, "prop", 5.2, &err);
@@ -3608,6 +3780,7 @@ TEST(evil_filter_test, helicsFilterSetString)
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     helicsFilterSetString(nullptr, nullptr, nullptr, &err);
+    EXPECT_EQ(err.error_code, 45);
     helicsErrorClear(&err);
     //auto res2=helicsFilterSetString(helics_filter filt, const char* prop, const char* val, nullptr);
     helicsFilterSetString(evil_filt, "prop", "val", &err);
@@ -3622,6 +3795,7 @@ TEST(evil_filter_test, helicsFilterAddDestinationTarget)
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     helicsFilterAddDestinationTarget(nullptr, nullptr, &err);
+    EXPECT_EQ(err.error_code, 45);
     helicsErrorClear(&err);
     //auto res2=helicsFilterAddDestinationTarget(helics_filter filt, const char* dest, nullptr);
     helicsFilterAddDestinationTarget(evil_filt, "dest", &err);
@@ -3636,6 +3810,7 @@ TEST(evil_filter_test, helicsFilterAddSourceTarget)
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     helicsFilterAddSourceTarget(nullptr, nullptr, &err);
+    EXPECT_EQ(err.error_code, 45);
     helicsErrorClear(&err);
     //auto res2=helicsFilterAddSourceTarget(helics_filter filt, const char* source, nullptr);
     helicsFilterAddSourceTarget(evil_filt, "source", &err);
@@ -3650,6 +3825,7 @@ TEST(evil_filter_test, helicsFilterAddDeliveryEndpoint)
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     helicsFilterAddDeliveryEndpoint(nullptr, nullptr, &err);
+    EXPECT_EQ(err.error_code, 45);
     helicsErrorClear(&err);
     //auto res2=helicsFilterAddDeliveryEndpoint(helics_filter filt, const char* deliveryEndpoint, nullptr);
     helicsFilterAddDeliveryEndpoint(evil_filt, "deliver", &err);
@@ -3664,6 +3840,7 @@ TEST(evil_filter_test, helicsFilterRemoveTarget)
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     helicsFilterRemoveTarget(nullptr, nullptr, &err);
+    EXPECT_EQ(err.error_code, 45);
     helicsErrorClear(&err);
     //auto res2=helicsFilterRemoveTarget(helics_filter filt, const char* target, nullptr);
     helicsFilterRemoveTarget(evil_filt, "target", &err);
@@ -3678,6 +3855,7 @@ TEST(evil_filter_test, helicsFilterRemoveDeliveryEndpoint)
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     helicsFilterRemoveDeliveryEndpoint(nullptr, nullptr, &err);
+    EXPECT_EQ(err.error_code, 45);
     helicsErrorClear(&err);
     //auto res2=helicsFilterRemoveDeliveryEndpoint(helics_filter filt, const char* deliveryEndpoint, nullptr);
     helicsFilterRemoveDeliveryEndpoint(evil_filt, "deliver", &err);
@@ -3706,6 +3884,7 @@ TEST(evil_filter_test, helicsFilterSetInfo)
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     helicsFilterSetInfo(nullptr, nullptr, &err);
+    EXPECT_EQ(err.error_code, 45);
     helicsErrorClear(&err);
     //auto res2=helicsFilterSetInfo(helics_filter filt, const char* info, nullptr);
     helicsFilterSetInfo(evil_filt, "info", &err);
@@ -3720,6 +3899,7 @@ TEST(evil_filter_test, helicsFilterSetOption)
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     helicsFilterSetOption(nullptr, 0, helics_true, &err);
+    EXPECT_EQ(err.error_code, 45);
     helicsErrorClear(&err);
     //auto res2=helicsFilterSetOption(helics_filter filt, int option, helics_bool value, nullptr);
     helicsFilterSetOption(evil_filt, 5, helics_true, &err);
@@ -3747,6 +3927,7 @@ TEST(evil_query_test, helicsQueryExecute)
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     auto res1 = helicsQueryExecute(nullptr, nullptr, &err);
+    EXPECT_EQ(err.error_code, 45);
     EXPECT_STREQ(res1, "#invalid");
     helicsErrorClear(&err);
     auto res2 = helicsQueryExecute(nullptr, nullptr, nullptr);
@@ -3764,6 +3945,7 @@ TEST(evil_query_test, helicsQueryCoreExecute)
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     auto res1 = helicsQueryCoreExecute(nullptr, nullptr, &err);
+    EXPECT_EQ(err.error_code, 45);
     EXPECT_STREQ(res1, "#invalid");
     helicsErrorClear(&err);
     auto res2 = helicsQueryCoreExecute(nullptr, nullptr, nullptr);
@@ -3781,6 +3963,7 @@ TEST(evil_query_test, helicsQueryBrokerExecute)
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     auto res1 = helicsQueryBrokerExecute(nullptr, nullptr, &err);
+    EXPECT_EQ(err.error_code, 45);
     EXPECT_STREQ(res1, "#invalid");
     helicsErrorClear(&err);
     auto res2 = helicsQueryBrokerExecute(nullptr, nullptr, nullptr);
@@ -3798,6 +3981,7 @@ TEST(evil_query_test, helicsQueryExecuteAsync)
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     helicsQueryExecuteAsync(nullptr, nullptr, &err);
+    EXPECT_EQ(err.error_code, 45);
     helicsErrorClear(&err);
     helicsQueryExecuteAsync(evil_query, evil_query, &err);
     EXPECT_NE(err.error_code, 0);
@@ -3811,6 +3995,7 @@ TEST(evil_query_test, helicsQueryExecuteComplete)
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     auto res1 = helicsQueryExecuteComplete(nullptr, &err);
+    EXPECT_EQ(err.error_code, 45);
     EXPECT_STREQ(res1, "#invalid");
     helicsErrorClear(&err);
     auto res2 = helicsQueryExecuteComplete(nullptr, nullptr);
