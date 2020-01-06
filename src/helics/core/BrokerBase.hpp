@@ -58,8 +58,6 @@ class BrokerBase {
 
     std::atomic<bool> haltOperations{
         false}; //!< flag indicating that no further message should be processed
-    std::atomic<bool> stopPhase1{false};
-    std::atomic<bool> stopPhase2{false};
 
   private:
     std::atomic<bool> mainLoopIsRunning{

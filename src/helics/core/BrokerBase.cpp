@@ -354,9 +354,7 @@ using activeProtector = gmlc::libguarded::guarded<std::pair<bool, bool>>;
 
 static bool haltTimer(
     activeProtector& active,
-    asio::steady_timer& tickTimer,
-    std::atomic<bool>& step1,
-    std::atomic<bool>& step2)
+    asio::steady_timer& tickTimer)
 {
     bool TimerRunning = true;
     {
@@ -367,7 +365,6 @@ static bool haltTimer(
             auto cancelled=tickTimer.cancel();
             if (cancelled == 0)
             {
-                step1 = true;
                 TimerRunning = false;
             }
         } else {
@@ -451,7 +448,7 @@ void BrokerBase::queueProcessingLoop()
         ticktimer.async_wait(timerCallback);
     }
     auto timerStop = [&, this]() {
-        if (!haltTimer(active, ticktimer, stopPhase1, stopPhase2))
+        if (!haltTimer(active, ticktimer))
         {
             LOG_WARNING(global_broker_id_local,
                 identifier, "timer unable to cancel properly");

@@ -926,7 +926,6 @@ void CoreBroker::processCommand(ActionMessage&& command)
         case CMD_USER_DISCONNECT:
             sendDisconnect();
             addActionMessage(CMD_STOP);
-            receivedDisconnect1 = true;
             break;
         case CMD_DISCONNECT_FED: {
             auto fed = _federates.find(command.source_id);
@@ -942,7 +941,6 @@ void CoreBroker::processCommand(ActionMessage&& command)
             }
         } break;
         case CMD_STOP:
-            receivedDisconnect2 = true;
             if (!allDisconnected()) { // only send a disconnect message if we haven't done so already
                 timeCoord->disconnect();
                 if (!isRootc) {
@@ -951,7 +949,6 @@ void CoreBroker::processCommand(ActionMessage&& command)
                     transmit(parent_route_id, m);
                 }
             }
-            receivedDisconnect3 = true;
             break;
         case CMD_BROADCAST_DISCONNECT: {
             timeCoord->processTimeMessage(command);
@@ -1719,13 +1716,8 @@ void CoreBroker::disconnect()
                     global_id.load(),
                     getIdentifier(),
                     fmt::format(
-                        "sending disconnect again; total message count = {}, rxdis1={}, rxdis2={} rxdis3={} stopPhase1={},stopPhase2={}",
-                        currentMessageCounter(),
-                        receivedDisconnect1.load(),
-                        receivedDisconnect2.load(),
-                        receivedDisconnect3.load(),
-                        stopPhase1.load(),
-                        stopPhase2.load()));
+                        "sending disconnect again; total message count = {}",
+                        currentMessageCounter()));
             }
             addActionMessage(udisconnect);
         }
