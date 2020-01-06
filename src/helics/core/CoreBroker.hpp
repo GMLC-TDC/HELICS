@@ -78,6 +78,9 @@ class CoreBroker: public Broker, public BrokerBase {
     std::atomic<bool> _isRoot{false}; //!< set to true if this object is a root broker
     bool isRootc{false};
     bool connectionEstablished{false}; //!< the setup has been received by the core loop thread
+    std::atomic<bool> receivedDisconnect1{false}; //!< indicator we have received disconnect
+    std::atomic<bool> receivedDisconnect2{false}; //!< indicator we have received disconnect part2
+    std::atomic<bool> receivedDisconnect3{false}; //!< indicator we have received disconnect part3
     int routeCount = 1; //!< counter for creating new routes;
     gmlc::containers::DualMappedVector<BasicFedInfo, std::string, global_federate_id>
         _federates; //!< container for all federates
