@@ -67,7 +67,8 @@ class BrokerBase {
         false}; //!< flag indicating that the message queue should not be used and all functions
     //!< called directly instead of distinct thread
     bool disable_timer{false}; //!< turn off the timer/timeout subsystem completely
-    std::atomic<std::size_t> messageCounter{ 0 }; //!< counter for the total number of message processed
+    std::atomic<std::size_t> messageCounter{
+        0}; //!< counter for the total number of message processed
   protected:
     std::string logFile; //!< the file to log message to
     std::unique_ptr<ForwardingTimeCoordinator> timeCoord; //!< object managing the time control
@@ -198,12 +199,15 @@ class BrokerBase {
     /** close all the threads*/
     void joinAllThreads();
     /** get the number of messages that have been processed internally*/
-    std::size_t currentMessageCounter()const { return messageCounter.load(std::memory_order_acquire); }
+    std::size_t currentMessageCounter() const
+    {
+        return messageCounter.load(std::memory_order_acquire);
+    }
     friend class TimeoutMonitor;
-    friend const std::string &brokerStateName(broker_state_t state);
+    friend const std::string& brokerStateName(broker_state_t state);
 };
 
 /** helper function to generate the name of a state as a string
 */
-const std::string &brokerStateName(BrokerBase::broker_state_t state);
+const std::string& brokerStateName(BrokerBase::broker_state_t state);
 } // namespace helics
