@@ -51,13 +51,13 @@ endmacro()
 
 function(check_submodule_status)
     if (ENABLE_SUBMODULE_UPDATE)
-        execute_process(COMMAND ${GIT_EXECUTABLE} submodule status --recursive
+        execute_process(COMMAND ${GIT_EXECUTABLE} submodule status
                 WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
                 RESULT_VARIABLE GIT_RESULT
                 OUTPUT_VARIABLE GIT_OUTPUT)
 
         if (GIT_RESULT)
-            message(WARNING "Automatic submodule verification with `git submodule status --recursive` failed with error ${GIT_RESULT} and output ${GIT_OUTPUT}. Verify submodules before building.")
+            message(WARNING "Automatic submodule verification with `git submodule status` failed with error ${GIT_RESULT} and output ${GIT_OUTPUT}. Verify submodules before building.")
         endif ()
 
         if (WIN32 AND NOT (MSYS OR CYGWIN))
@@ -70,7 +70,8 @@ function(check_submodule_status)
                     )
         endif ()
         if (NOT "${SUBMODULE_STATUS}" STREQUAL "")
-            message(WARNING "Submodules are not up to date. Update submodules by running `git submodule update --init --recursive` before building HELICS.")
+            message(WARNING "Submodules are not up to date. Update submodules by running `git submodule update --init` before building HELICS."
+            "\nOut of date submodules:\n ${SUBMODULE_STATUS}")
         endif ()
     endif ()
 endfunction()
