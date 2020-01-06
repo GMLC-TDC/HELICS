@@ -226,7 +226,7 @@ TEST(other_tests, broker_creation)
     argv[2] = "--timeout=2000";
     argv[3] = "--root";
 
-    auto brk = helicsCreateBrokerFromArgs("test", nullptr, 4, argv, &err);
+    auto brk = helicsCreateBrokerFromArgs("test", nullptr, 4, argv, &err); 
     EXPECT_EQ(err.error_code, 0);
     EXPECT_STREQ(helicsBrokerGetIdentifier(brk), "gbrokerc");
 

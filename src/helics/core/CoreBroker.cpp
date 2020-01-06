@@ -1703,26 +1703,23 @@ void CoreBroker::disconnect()
         LOG_WARNING(
             global_id.load(),
             getIdentifier(),
-            "waiting on disconnect: current state=" +
-                brokerStateName(brokerState.load()));
-        if (cnt % 4==0) {
-            if (!isRunning())
-            {
+            "waiting on disconnect: current state=" + brokerStateName(brokerState.load()));
+        if (cnt % 4 == 0) {
+            if (!isRunning()) {
                 LOG_WARNING(
                     global_id.load(),
                     getIdentifier(),
                     "main loop is stopped but have not received disconnect notice, assuming disconnected");
                 return;
-            }
-            else
-            {
+            } else {
                 LOG_WARNING(
                     global_id.load(),
                     getIdentifier(),
-                    fmt::format("sending disconnect again; total message count = {}",currentMessageCounter()));
+                    fmt::format(
+                        "sending disconnect again; total message count = {}",
+                        currentMessageCounter()));
             }
             addActionMessage(udisconnect);
-            
         }
     }
 }

@@ -358,6 +358,7 @@ static void haltTimer(activeProtector& active, asio::steady_timer& tickTimer)
         auto p = active.lock();
         if (p->second) {
             p->first = false;
+            p.unlock();
             tickTimer.cancel();
         } else {
             TimerRunning = false;
@@ -477,7 +478,6 @@ void BrokerBase::queueProcessingLoop()
                 }
                 if (messagesSinceLastTick == 0 || forwardTick) {
 #ifndef DISABLE_TICK
-
                     processCommand(std::move(command));
 #endif
                 }
@@ -558,7 +558,7 @@ action_message_def::action_t BrokerBase::commandProcessor(ActionMessage& command
                 NMess.from_string(command.getString(ii));
                 auto V = commandProcessor(NMess);
                 if (V != CMD_IGNORE) {
-                    // overwrite the abort command but ignore ticks in a multimessage context they shouldn't be there
+                    // overwrite the abort command but ignore ticks in a multi-message context they shouldn't be there
                     if (V != CMD_TICK) {
                         command = NMess;
                         return V;
@@ -579,7 +579,7 @@ action_message_def::action_t BrokerBase::commandProcessor(ActionMessage& command
 }
 
 // LCOV_EXCL_START
-const std::string &brokerStateName(BrokerBase::broker_state_t state)
+const std::string& brokerStateName(BrokerBase::broker_state_t state)
 {
     static const std::string createdString = "created";
     static const std::string configuringString = "configuring";
@@ -592,30 +592,29 @@ const std::string &brokerStateName(BrokerBase::broker_state_t state)
     static const std::string terminatedString = "terminated";
     static const std::string erroredString = "error";
     static const std::string otherString = "other";
-    switch (state)
-    {
-    case BrokerBase::broker_state_t::created:
-        return createdString;
-    case BrokerBase::broker_state_t::configuring:
-        return configuringString;
-    case BrokerBase::broker_state_t::configured:
-        return configuredString;
-    case BrokerBase::broker_state_t::connecting:
-        return connectingString;
-    case BrokerBase::broker_state_t::connected :
-        return connectedString;
-    case BrokerBase::broker_state_t::initializing:
-        return initializingString;
-    case BrokerBase::broker_state_t::operating:
-        return operatingString;
-    case BrokerBase::broker_state_t::terminating:
-        return terminatingString;
-    case BrokerBase::broker_state_t::terminated:
-        return terminatedString;
-    case BrokerBase::broker_state_t::errored:
-        return erroredString;
-    default:
-        return otherString;
+    switch (state) {
+        case BrokerBase::broker_state_t::created:
+            return createdString;
+        case BrokerBase::broker_state_t::configuring:
+            return configuringString;
+        case BrokerBase::broker_state_t::configured:
+            return configuredString;
+        case BrokerBase::broker_state_t::connecting:
+            return connectingString;
+        case BrokerBase::broker_state_t::connected:
+            return connectedString;
+        case BrokerBase::broker_state_t::initializing:
+            return initializingString;
+        case BrokerBase::broker_state_t::operating:
+            return operatingString;
+        case BrokerBase::broker_state_t::terminating:
+            return terminatingString;
+        case BrokerBase::broker_state_t::terminated:
+            return terminatedString;
+        case BrokerBase::broker_state_t::errored:
+            return erroredString;
+        default:
+            return otherString;
     }
 }
 // LCOV_EXCL_STOP

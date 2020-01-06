@@ -48,9 +48,9 @@ class helicsCLI11App: public CLI::App {
 
     enum class parse_output : int {
         ok = 0,
-        help_call=1,
-        help_all_call=2,
-        version_call=4,
+        help_call = 1,
+        help_all_call = 2,
+        version_call = 4,
         parse_error = -4,
     };
     bool quiet{false};
@@ -91,8 +91,7 @@ class helicsCLI11App: public CLI::App {
             last_output = parse_output::parse_error;
             return parse_output::parse_error;
         }
-        catch (...)
-        {
+        catch (...) {
             last_output = parse_output::parse_error;
             return parse_output::parse_error;
         }
