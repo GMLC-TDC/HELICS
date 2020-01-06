@@ -426,6 +426,7 @@ void BrokerBase::queueProcessingLoop()
     }
     auto timerStop = [&]() {
         haltTimer(active, ticktimer);
+        stopPhase1 = true;
         contextLoop = nullptr;
     };
 #else
@@ -521,6 +522,7 @@ void BrokerBase::queueProcessingLoop()
                 return; // immediate return
             case CMD_STOP:
                 timerStop();
+                stopPhase2 = true;
                 if (!haltOperations) {
                     processCommand(std::move(command));
                     mainLoopIsRunning.store(false);

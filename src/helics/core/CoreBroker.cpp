@@ -1719,11 +1719,13 @@ void CoreBroker::disconnect()
                     global_id.load(),
                     getIdentifier(),
                     fmt::format(
-                        "sending disconnect again; total message count = {}, rxdis1={}, rxdis2={} rxdis3={}",
+                        "sending disconnect again; total message count = {}, rxdis1={}, rxdis2={} rxdis3={} stopPhase1={},stopPhase2={}",
                         currentMessageCounter(),
                         receivedDisconnect1.load(),
                         receivedDisconnect2.load(),
-                        receivedDisconnect3.load()));
+                        receivedDisconnect3.load(),
+                        stopPhase1.load(),
+                        stopPhase2.load()));
             }
             addActionMessage(udisconnect);
         }
