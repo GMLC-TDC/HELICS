@@ -162,6 +162,7 @@ public class helicsJNI {
   public final static native String helicsBrokerGetAddress(long jarg1);
   public final static native String helicsCoreGetAddress(long jarg1);
   public final static native void helicsCoreSetReadyToInit(long jarg1);
+  public final static native int helicsCoreConnect(long jarg1);
   public final static native void helicsCoreDisconnect(long jarg1);
   public final static native long helicsGetFederateByName(String jarg1);
   public final static native void helicsBrokerDisconnect(long jarg1);
@@ -323,6 +324,8 @@ public class helicsJNI {
   public final static native void helicsInputSetOption(long jarg1, int jarg2, int jarg3);
   public final static native int helicsPublicationGetOption(long jarg1, int jarg2);
   public final static native void helicsPublicationSetOption(long jarg1, int jarg2, int jarg3);
+  public final static native void helicsPublicationSetMinimumChange(long jarg1, double jarg2);
+  public final static native void helicsInputSetMinimumChange(long jarg1, double jarg2);
   public final static native int helicsInputIsUpdated(long jarg1);
   public final static native double helicsInputLastUpdateTime(long jarg1);
   public final static native void helicsInputClearUpdate(long jarg1);
