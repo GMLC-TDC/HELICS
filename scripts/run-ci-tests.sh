@@ -118,10 +118,10 @@ else
     if [[ "$DISABLE_UNIT_TESTS" != "true" ]]; then
 	if [[ -n "${TEST_CONFIG}" ]]; then
         	echo "Running ${TEST_CONFIG} tests"
-        	ctest -VV -L ${TEST_CONFIG}
+        	ctest -L ${TEST_CONFIG} ${CTEST_OPTIONS}
 	else
 		echo "Running all tests"
-		ctest "${CTEST_OPTIONS}"
+		ctest ${CTEST_OPTIONS}
 	fi
     fi
 fi
