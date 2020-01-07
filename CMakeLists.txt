@@ -118,12 +118,12 @@ if(MSYS
     set(UNIX_LIKE TRUE)
 endif()
 
-# allow BOOST library inclusion to be turned off completely this will disable the IPC
+# allow BOOST library inclusion to be turned off completely; this option will disable the IPC
 # core
 option(HELICS_DISABLE_BOOST OFF "disable all references to the Boost C++ libraries")
 mark_as_advanced(HELICS_DISABLE_BOOST)
 
-# allow ASIO library inclusion to be turned off completely this will disable the UDP and
+# allow ASIO library inclusion to be turned off completely; this option will disable the UDP and
 # TCP core as well as the timeout detection and real-time features of HELICS
 option(HELICS_DISABLE_ASIO OFF "disable all references to the ASIO C++ libraries")
 mark_as_advanced(HELICS_DISABLE_ASIO)
@@ -301,7 +301,7 @@ if(HELICS_BUILD_TESTS AND HELICS_TEST_CODE_COVERAGE)
         include(CodeCoverage)
 
         set(COVERAGE_EXCLUDES 'usr/*' 'dependencies/*' 'ThirdParty/*' 'tests/*'
-                              'interfaces/*' 'examples/*'
+                              'interfaces/*' 'examples/*' 'benchmarks/*' 'scripts/*'
         )
         setup_target_for_coverage(
             NAME helics_coverage # New target name
