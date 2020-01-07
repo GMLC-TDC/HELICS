@@ -5,11 +5,12 @@ the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 #pragma once
+
 #include "helics/helics-config.h"
 
 #include <benchmark/benchmark.h>
 #include <iostream>
-#ifdef ENABLE_ZMQ_CORE
+#if defined(ENABLE_ZMQ_CORE) && !defined(USING_HELICS_C_SHARED_LIB)
 #    include "helics/core/zmq/ZmqCommsCommon.h"
 #endif
 
@@ -109,7 +110,7 @@ inline void printHELICSsystemInfo()
 {
     std::cout << "------------HELICS BUILD INFO -------------\nHELICS VERSION: "
               << HELICS_VERSION_STRING << '\n';
-#ifdef ENABLE_ZMQ_CORE
+#if defined(ENABLE_ZMQ_CORE) && !defined(USING_HELICS_C_SHARED_LIB)
     std::cout << "ZMQ VERSION: " << helics::hzmq::getZMQVersion() << '\n';
 #endif
     std::cout << "COMPILER INFO: " << HELICS_COMPILER_VERSION << '\n';
