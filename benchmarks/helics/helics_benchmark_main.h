@@ -10,6 +10,7 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include <benchmark/benchmark.h>
 #include <iostream>
+
 #if defined(ENABLE_ZMQ_CORE) && !defined(USING_HELICS_C_SHARED_LIB)
 #    include "helics/core/zmq/ZmqCommsCommon.h"
 #endif
@@ -55,6 +56,7 @@ inline std::string getCPUModel()
 #elif defined(__unix__)
 #    include <cstdio>
 #    include <cstdlib>
+#    include <cstring>
 inline std::string getCPUModel()
 { // Get the cpu from /proc/cpuinfo
     FILE* fp = fopen("/proc/cpuinfo", "r");
