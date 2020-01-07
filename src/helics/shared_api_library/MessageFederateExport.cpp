@@ -35,7 +35,7 @@ static helics::EndpointObject* verifyEndpoint(helics_endpoint ept, helics_error*
 {
     HELICS_ERROR_CHECK(err, nullptr);
     auto endObj = reinterpret_cast<helics::EndpointObject*>(ept);
-    if (endObj==nullptr || endObj->valid != EndpointValidationIdentifier) {
+    if (endObj == nullptr || endObj->valid != EndpointValidationIdentifier) {
         if (err != nullptr) {
             err->error_code = helics_error_invalid_object;
             err->message = invalidEndpoint;

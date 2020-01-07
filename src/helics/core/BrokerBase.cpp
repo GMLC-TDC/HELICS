@@ -91,21 +91,20 @@ std::shared_ptr<helicsCLI11App> BrokerBase::generateCLI()
     return hApp;
 }
 
-static const std::map<std::string, int> log_level_map{
-    {"none", helics_log_level_no_print},
-    {"no_print", helics_log_level_no_print},
-    {"error", helics_log_level_error},
-    {"warning", helics_log_level_warning},
-    {"summary", helics_log_level_summary},
-    {"connections", helics_log_level_connections},
-    /** connections+ interface definitions*/
-    {"interfaces", helics_log_level_interfaces},
-    /** interfaces + timing message*/
-    {"timing", helics_log_level_timing},
-    /** timing+ data transfer notices*/
-    {"data", helics_log_level_data},
-    /** all internal messages*/
-    {"trace", helics_log_level_trace}};
+static const std::map<std::string, int> log_level_map{{"none", helics_log_level_no_print},
+                                                      {"no_print", helics_log_level_no_print},
+                                                      {"error", helics_log_level_error},
+                                                      {"warning", helics_log_level_warning},
+                                                      {"summary", helics_log_level_summary},
+                                                      {"connections", helics_log_level_connections},
+                                                      /** connections+ interface definitions*/
+                                                      {"interfaces", helics_log_level_interfaces},
+                                                      /** interfaces + timing message*/
+                                                      {"timing", helics_log_level_timing},
+                                                      /** timing+ data transfer notices*/
+                                                      {"data", helics_log_level_data},
+                                                      /** all internal messages*/
+                                                      {"trace", helics_log_level_trace}};
 
 std::shared_ptr<helicsCLI11App> BrokerBase::generateBaseCLI()
 {
@@ -352,9 +351,7 @@ void BrokerBase::addActionMessage(ActionMessage&& m)
 #ifndef HELICS_DISABLE_ASIO
 using activeProtector = gmlc::libguarded::guarded<std::pair<bool, bool>>;
 
-static bool haltTimer(
-    activeProtector& active,
-    asio::steady_timer& tickTimer)
+static bool haltTimer(activeProtector& active, asio::steady_timer& tickTimer)
 {
     bool TimerRunning = true;
     {
@@ -362,9 +359,8 @@ static bool haltTimer(
         if (p->second) {
             p->first = false;
             p.unlock();
-            auto cancelled=tickTimer.cancel();
-            if (cancelled == 0)
-            {
+            auto cancelled = tickTimer.cancel();
+            if (cancelled == 0) {
                 TimerRunning = false;
             }
         } else {
@@ -373,21 +369,16 @@ static bool haltTimer(
     }
     int ii = 0;
     while (TimerRunning) {
-        if (ii % 4 != 3)
-        {
+        if (ii % 4 != 3) {
             std::this_thread::yield();
-        }
-        else
-        {
-
+        } else {
             std::this_thread::sleep_for(std::chrono::milliseconds(40));
         }
         auto res = active.load();
         TimerRunning = res.second;
         ++ii;
-        if (ii == 100)
-        {
-            // assume the timer was never started so just exit and hope it doesn't somehow get called later and generate a seg fault.  
+        if (ii == 100) {
+            // assume the timer was never started so just exit and hope it doesn't somehow get called later and generate a seg fault.
             return false;
         }
     }
@@ -448,10 +439,8 @@ void BrokerBase::queueProcessingLoop()
         ticktimer.async_wait(timerCallback);
     }
     auto timerStop = [&, this]() {
-        if (!haltTimer(active, ticktimer))
-        {
-            LOG_WARNING(global_broker_id_local,
-                identifier, "timer unable to cancel properly");
+        if (!haltTimer(active, ticktimer)) {
+            LOG_WARNING(global_broker_id_local, identifier, "timer unable to cancel properly");
         }
         contextLoop = nullptr;
     };

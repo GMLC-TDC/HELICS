@@ -638,7 +638,7 @@ TEST_F(function_tests, initError4)
 
     helicsFederateEnterExecutingModeComplete(vFed1, &err);
     EXPECT_NE(err.error_code, 0);
-    helicsErrorClear(&err); 
+    helicsErrorClear(&err);
 
     helicsFederateIsAsyncOperationCompleted(vFed1, &err);
     EXPECT_EQ(err.error_code, 0);
