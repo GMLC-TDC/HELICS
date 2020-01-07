@@ -46,7 +46,7 @@ These options effect the configuration of HELICS itself and how/what gets built 
 Options effect the connection of libraries used in HELICS and how they are linked.
 -   `HELICS_DISABLE_BOOST` : \[Default=OFF\] Completely turn off searching and inclusion of boost libraries.  This will disable the IPC core and few other features, possibly more in the future.  
 -   `HELICS_DISABLE_ASIO` : \[Default=OFF\] Completely turn off  inclusion of ASIO libraries.  This will disable all TCP and UDP cores, disable real time mode for HELICS, and disable all timeout features for the Library so **use with caution**.  
--   `ENABLE_SUBMODULE_UPDATE` : \[Default=ON\] Enable CMake to automatically download the submodules and update them if Unnecessary
+-   `HELICS_ENABLE_SUBMODULE_UPDATE` : \[Default=ON\] Enable CMake to automatically download the submodules and update them if necessary
 -   `HELICS_ENABLE_ERROR_ON_WARNING` :\[Default=OFF\] Turns on Werror or equivalent,  probably not useful for normal activity,  There isn't many warnings but left in to allow the possibility
 -   `HELICS_ENABLE_EXTRA_COMPILER_WARNINGS` : \[Default=ON\] Turn on higher levels of warnings in the compilers,  can be turned off if you didn't need or want the warning checks.
 -   `STATIC_STANDARD_LIB`:   \[Default=""\] link the standard library as a static library for no additional C++ system dependencies (recognized values are `default`, `static`, and `dynamic`, anything else is treated the same as `default`)

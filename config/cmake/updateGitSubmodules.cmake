@@ -12,15 +12,15 @@
 find_package(Git QUIET)
 if(GIT_FOUND AND (GIT_VERSION_STRING VERSION_GREATER "1.5.2"))
     if(EXISTS "${PROJECT_SOURCE_DIR}/.git")
-        option(ENABLE_SUBMODULE_UPDATE "Checkout and update git submodules" ON)
-		mark_as_advanced(ENABLE_SUBMODULE_UPDATE)
+        option(${PROJECT_NAME}_ENABLE_SUBMODULE_UPDATE "Checkout and update git submodules" ON)
+		mark_as_advanced(${PROJECT_NAME}_ENABLE_SUBMODULE_UPDATE)
     else()
         message(STATUS "${PROJECT_SOURCE_DIR} is not a Git repository. Clone ${PROJECT_NAME} with Git or ensure you get copies of all the Git submodules code.")
     endif()
 endif()
 
 macro(submod_update_all)
-  if (ENABLE_SUBMODULE_UPDATE)
+  if (${PROJECT_NAME}_ENABLE_SUBMODULE_UPDATE)
     message(STATUS "Git Submodule Update")
             execute_process(COMMAND ${GIT_EXECUTABLE} submodule update --init
                             WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
@@ -35,7 +35,7 @@ macro(submod_update_all)
 endmacro()
 
 macro(submod_update target)
-  if (ENABLE_SUBMODULE_UPDATE)
+  if (${PROJECT_NAME}_ENABLE_SUBMODULE_UPDATE)
      message(STATUS "Git Submodule Update ${target}")
      execute_process(COMMAND ${GIT_EXECUTABLE} submodule update --init -- ${target}
         WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
@@ -50,7 +50,7 @@ macro(submod_update target)
 endmacro()
 
 function(check_submodule_status)
-    if (ENABLE_SUBMODULE_UPDATE)
+    if (${PROJECT_NAME}_ENABLE_SUBMODULE_UPDATE)
         execute_process(COMMAND ${GIT_EXECUTABLE} submodule status
                 WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
                 RESULT_VARIABLE GIT_RESULT
