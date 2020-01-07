@@ -328,7 +328,15 @@ public class helics {
   }
 
   /**
-   *  get an identifier for the core<br>
+   *  connect a core to the federate based on current configuration<br>
+   *     @param core the core to connect
+   */
+  public static int helicsCoreConnect(SWIGTYPE_p_void core) {
+    return helicsJNI.helicsCoreConnect(SWIGTYPE_p_void.getCPtr(core));
+  }
+
+  /**
+   *  disconnect a core from the federation<br>
    *     @param core the core to query
    */
   public static void helicsCoreDisconnect(SWIGTYPE_p_void core) {
@@ -1981,6 +1989,24 @@ public class helics {
   }
 
   /**
+   *  set the minimum change detection tolerance<br>
+   *     @param pub the publication to modify<br>
+   *     @param tolerance the tolerance level for publication, values changing less than this value will not be published
+   */
+  public static void helicsPublicationSetMinimumChange(SWIGTYPE_p_void pub, double tolerance) {
+    helicsJNI.helicsPublicationSetMinimumChange(SWIGTYPE_p_void.getCPtr(pub), tolerance);
+  }
+
+  /**
+   *  set the minimum change detection tolerance<br>
+   *     @param inp the input to modify<br>
+   *     @param tolerance the tolerance level for registering an update, values changing less than this value will not show as being updated
+   */
+  public static void helicsInputSetMinimumChange(SWIGTYPE_p_void inp, double tolerance) {
+    helicsJNI.helicsInputSetMinimumChange(SWIGTYPE_p_void.getCPtr(inp), tolerance);
+  }
+
+  /**
    * check if a particular subscription was updated<br>
    *     @return true if it has been updated since the last value retrieval
    */
@@ -2560,12 +2586,12 @@ public class helics {
    *     cloning filters copy a message and send it to multiple locations source and destination can be added<br>
    *     through other functions<br>
    *     @param fed the fed to register through<br>
-   *     @param deliveryEndpoint the specified endpoint to deliver the message<br>
+   *     @param name the name of the filter (can be NULL)<br>
    * <br>
    *     @return a helics_filter object
    */
-  public static SWIGTYPE_p_void helicsFederateRegisterCloningFilter(SWIGTYPE_p_void fed, String deliveryEndpoint) {
-    long cPtr = helicsJNI.helicsFederateRegisterCloningFilter(SWIGTYPE_p_void.getCPtr(fed), deliveryEndpoint);
+  public static SWIGTYPE_p_void helicsFederateRegisterCloningFilter(SWIGTYPE_p_void fed, String name) {
+    long cPtr = helicsJNI.helicsFederateRegisterCloningFilter(SWIGTYPE_p_void.getCPtr(fed), name);
     return (cPtr == 0) ? null : new SWIGTYPE_p_void(cPtr, false);
   }
 
@@ -2574,12 +2600,12 @@ public class helics {
    *     cloning filters copy a message and send it to multiple locations source and destination can be added<br>
    *     through other functions<br>
    *     @param fed the fed to register through<br>
-   *     @param deliveryEndpoint the specified endpoint to deliver the message<br>
+   *     @param name the name of the filter (can be NULL)<br>
    * <br>
    *     @return a helics_filter object
    */
-  public static SWIGTYPE_p_void helicsFederateRegisterGlobalCloningFilter(SWIGTYPE_p_void fed, String deliveryEndpoint) {
-    long cPtr = helicsJNI.helicsFederateRegisterGlobalCloningFilter(SWIGTYPE_p_void.getCPtr(fed), deliveryEndpoint);
+  public static SWIGTYPE_p_void helicsFederateRegisterGlobalCloningFilter(SWIGTYPE_p_void fed, String name) {
+    long cPtr = helicsJNI.helicsFederateRegisterGlobalCloningFilter(SWIGTYPE_p_void.getCPtr(fed), name);
     return (cPtr == 0) ? null : new SWIGTYPE_p_void(cPtr, false);
   }
 
@@ -2603,12 +2629,12 @@ public class helics {
    *     cloning filters copy a message and send it to multiple locations source and destination can be added<br>
    *     through other functions<br>
    *     @param core the core to register through<br>
-   *     @param deliveryEndpoint the specified endpoint to deliver the message<br>
+   *     @param name the name of the filter (can be NULL)<br>
    * <br>
    *     @return a helics_filter object
    */
-  public static SWIGTYPE_p_void helicsCoreRegisterCloningFilter(SWIGTYPE_p_void core, String deliveryEndpoint) {
-    long cPtr = helicsJNI.helicsCoreRegisterCloningFilter(SWIGTYPE_p_void.getCPtr(core), deliveryEndpoint);
+  public static SWIGTYPE_p_void helicsCoreRegisterCloningFilter(SWIGTYPE_p_void core, String name) {
+    long cPtr = helicsJNI.helicsCoreRegisterCloningFilter(SWIGTYPE_p_void.getCPtr(core), name);
     return (cPtr == 0) ? null : new SWIGTYPE_p_void(cPtr, false);
   }
 
