@@ -3173,7 +3173,7 @@ TEST(evil_message_object_test, helicsMessageGetRawData)
     auto err = helicsErrorInitialize();
     err.error_code = 45;
     int actSize = 98;
-    helicsMessageGetRawData(nullptr, nullptr, 55, &actSize, &err); 
+    helicsMessageGetRawData(nullptr, nullptr, 55, &actSize, &err);
     EXPECT_EQ(err.error_code, 45);
     EXPECT_EQ(actSize, 0);
     helicsErrorClear(&err);
