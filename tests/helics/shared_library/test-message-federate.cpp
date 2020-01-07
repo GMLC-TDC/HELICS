@@ -346,3 +346,90 @@ INSTANTIATE_TEST_SUITE_P(
     mfed_simple_type_tests,
     ::testing::ValuesIn(core_types_simple));
 INSTANTIATE_TEST_SUITE_P(mfed_tests, mfed_type_tests, ::testing::ValuesIn(core_types));
+
+// a series of tests exercising the different aspects of message object setting and retrieval
+TEST(message_object, test1)
+{
+    auto brk = helicsCreateBroker("zmq", "brk1", "", nullptr);
+
+    auto fed = helicsCreateMessageFederate("fed1", nullptr, nullptr);
+
+    auto fed2 = helicsCreateCombinationFederate("fed2", nullptr, nullptr);
+
+    auto m1 = helicsFederateCreateMessageObject(fed, nullptr);
+    EXPECT_NE(m1, nullptr);
+
+    auto m2 = helicsFederateCreateMessageObject(fed2, nullptr);
+    EXPECT_NE(m2, nullptr);
+
+    helicsMessageSetOriginalDestination(m1, "a happy place", nullptr);
+    EXPECT_STREQ(helicsMessageGetOriginalDestination(m1), "a happy place");
+
+    helicsMessageSetOriginalSource(m1, "osource", nullptr);
+    EXPECT_STREQ(helicsMessageGetOriginalSource(m1), "osource");
+
+    helicsMessageSetMessageID(m1, 10, nullptr);
+    EXPECT_EQ(helicsMessageGetMessageID(m1), 10);
+
+    //89 is an invalid flag
+    EXPECT_EQ(helicsMessageCheckFlag(m1, 89), helics_false);
+
+    helicsMessageSetString(m2, "raw data", nullptr);
+    EXPECT_STREQ(helicsMessageGetString(m2), "raw data");
+
+    auto err = helicsErrorInitialize();
+
+    char data[20];
+    int actSize = 10;
+    helicsMessageGetRawData(m2, nullptr, 0, &actSize, &err);
+    EXPECT_NE(err.error_code, 0);
+    EXPECT_EQ(actSize, 0);
+    helicsErrorClear(&err);
+
+    EXPECT_EQ(helicsMessageGetRawDataPointer(nullptr), nullptr);
+
+    helicsMessageGetRawData(m2, data, 20, &actSize, &err);
+    EXPECT_EQ(err.error_code, 0);
+    EXPECT_EQ(actSize, 8);
+    EXPECT_EQ(std::string(data, data + actSize), "raw data");
+
+    EXPECT_EQ(helicsMessageIsValid(m2), helics_true);
+
+    helicsMessageSetSource(m1, "source", nullptr);
+    EXPECT_STREQ(helicsMessageGetSource(m1), "source");
+
+    helicsMessageSetFlagOption(m1, 4, helics_true, nullptr);
+    EXPECT_EQ(helicsMessageCheckFlag(m1, 4), helics_true);
+
+    helicsMessageSetFlagOption(m1, 4, helics_false, nullptr);
+    EXPECT_EQ(helicsMessageCheckFlag(m1, 4), helics_false);
+
+    helicsMessageSetFlagOption(m1, 22, helics_true, &err);
+    EXPECT_EQ(helicsMessageCheckFlag(m1, 22), helics_false);
+    EXPECT_NE(err.error_code, 0);
+    helicsErrorClear(&err);
+
+    helicsMessageResize(m2, 500, nullptr);
+    auto s2 = helicsMessageGetRawDataSize(m2);
+    EXPECT_EQ(s2, 500);
+
+    helicsMessageReserve(m2, 2000, nullptr);
+
+    helicsMessageAppendData(m2, " more data", 8, nullptr);
+
+    s2 = helicsMessageGetRawDataSize(m2);
+    EXPECT_EQ(s2, 508);
+
+    // this should generate an out of memory exception
+    helicsMessageResize(m2, -8, &err);
+    EXPECT_NE(err.error_code, 0);
+    helicsErrorClear(&err);
+    // this should generate an out of memory exception
+    helicsMessageReserve(m2, -2, &err);
+    EXPECT_NE(err.error_code, 0);
+    helicsErrorClear(&err);
+
+    helicsFederateFinalize(fed, nullptr);
+    helicsFederateFinalize(fed2, nullptr);
+    helicsBrokerDisconnect(brk, nullptr);
+}

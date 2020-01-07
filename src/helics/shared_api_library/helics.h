@@ -258,7 +258,15 @@ HELICS_EXPORT const char* helicsCoreGetAddress(helics_core core);
     */
 HELICS_EXPORT void helicsCoreSetReadyToInit(helics_core core, helics_error* err);
 
-/** get an identifier for the core
+/** connect a core to the federate based on current configuration
+    @param core the core to connect
+    @forcpponly
+    @param[in,out] err an error object that will contain an error code and string if any error occurred during the execution of the function
+    @endforcpponly
+    */
+HELICS_EXPORT helics_bool helicsCoreConnect(helics_core core, helics_error* err);
+
+/** disconnect a core from the federation
     @param core the core to query
     @forcpponly
     @param[in,out] err an error object that will contain an error code and string if any error occurred during the execution of the function

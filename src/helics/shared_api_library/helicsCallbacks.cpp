@@ -36,8 +36,8 @@ void helicsBrokerSetLoggingCallback(
             });
         }
     }
-    catch (...) {
-        helicsErrorHandler(err);
+    catch (...) { // LCOV_EXCL_LINE
+        helicsErrorHandler(err); // LCOV_EXCL_LINE
     }
 }
 
@@ -61,8 +61,8 @@ void helicsCoreSetLoggingCallback(
                 });
         }
     }
-    catch (...) {
-        helicsErrorHandler(err);
+    catch (...) { // LCOV_EXCL_LINE
+        helicsErrorHandler(err); // LCOV_EXCL_LINE
     }
 }
 
@@ -86,7 +86,7 @@ void helicsFederateSetLoggingCallback(
             });
         }
     }
-    catch (...) {
-        helicsErrorHandler(err);
+    catch (...) { // LCOV_EXCL_LINE
+        helicsErrorHandler(err); // LCOV_EXCL_LINE
     }
 }

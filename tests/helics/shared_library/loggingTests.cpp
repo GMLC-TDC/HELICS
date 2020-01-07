@@ -70,6 +70,7 @@ TEST(logging_tests, check_log_message_levels)
         auto* mp = reinterpret_cast<logblocktype*>(udata);
         mp->lock()->emplace_back(level, message);
     };
+    helicsFederateSetLoggingCallback(fed, nullptr, &mlog, &err);
 
     helicsFederateSetLoggingCallback(fed, logg, &mlog, &err);
 
@@ -93,7 +94,9 @@ TEST(logging_tests, check_log_message_levels)
             found_high = true;
         }
     }
-    EXPECT_TRUE(found_low && !found_high);
+    EXPECT_TRUE(found_low);
+    EXPECT_FALSE(found_high);
+
     helicsFederateFree(fed);
     helicsFederateInfoFree(fi);
 }
@@ -140,4 +143,44 @@ TEST(logging_tests, check_log_message_levels_high)
     EXPECT_TRUE(found_low && found_high);
     helicsFederateFree(fed);
     helicsFederateInfoFree(fi);
+}
+
+TEST(logging_tests, core_logging)
+{
+    auto core = helicsCreateCore("inproc", "ctype", "--autobroker --log_level=trace", nullptr);
+
+    helicsCoreSetLoggingCallback(core, nullptr, nullptr, nullptr);
+
+    logblocktype mlog;
+
+    auto logg = [](int level, const char*, const char* message, void* udata) {
+        auto* mp = reinterpret_cast<logblocktype*>(udata);
+        mp->lock()->emplace_back(level, message);
+    };
+    auto err = helicsErrorInitialize();
+    helicsCoreSetLoggingCallback(core, logg, &mlog, &err);
+    EXPECT_EQ(err.error_code, 0);
+    helicsCoreDisconnect(core, nullptr);
+    helicsCloseLibrary();
+    EXPECT_FALSE(mlog.lock()->empty());
+}
+
+TEST(logging_tests, broker_logging)
+{
+    auto broker = helicsCreateBroker("inproc", "btype", "--log_level=trace", nullptr);
+
+    helicsBrokerSetLoggingCallback(broker, nullptr, nullptr, nullptr);
+
+    logblocktype mlog;
+
+    auto logg = [](int level, const char*, const char* message, void* udata) {
+        auto* mp = reinterpret_cast<logblocktype*>(udata);
+        mp->lock()->emplace_back(level, message);
+    };
+    auto err = helicsErrorInitialize();
+    helicsBrokerSetLoggingCallback(broker, logg, &mlog, &err);
+    EXPECT_EQ(err.error_code, 0);
+    helicsBrokerDisconnect(broker, nullptr);
+    helicsCloseLibrary();
+    EXPECT_FALSE(mlog.lock()->empty());
 }
