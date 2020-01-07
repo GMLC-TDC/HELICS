@@ -20,6 +20,12 @@ SPDX-License-Identifier: BSD-3-Clause
 #    include "../core/zmq/ZmqCommsCommon.h"
 #endif
 
+#include "../common/AsioContextManager.h"
+
+#ifdef ENABLE_TCP_CORE
+#    include "../core/tcp/TcpHelperClasses.h"
+#endif
+
 namespace helics {
 namespace apps {
     BrokerServer::BrokerServer() noexcept:
@@ -63,6 +69,11 @@ namespace apps {
         if (zmq_ss_server) {
         }
 #endif
+#ifdef ENABLE_TCP_CORE
+        if (tcp_server) {
+            serverloops_.emplace_back([this]() { startTCPserver(); });
+        }
+#endif
     }
 
     bool BrokerServer::hasActiveBrokers() const { return BrokerFactory::brokersActive(); }
@@ -86,6 +97,11 @@ namespace apps {
 #ifdef ENABLE_ZMQ_CORE
         if (zmq_server) {
             closeZMQserver();
+        }
+#endif
+#ifdef ENABLE_TCP_CORE
+        if (tcp_server) {
+            closeTCPserver();
         }
 #endif
         exitall.store(true);
@@ -162,7 +178,6 @@ namespace apps {
         return rep;
     }
 
-    using portData = std::vector<std::tuple<int, bool, std::shared_ptr<Broker>>>;
 
     static int getOpenPort(portData& pd)
     {
@@ -292,7 +307,100 @@ namespace apps {
 
     void BrokerServer::closeZMQserver()
     {
-#ifdef ENABLE_ZMQ_CORE
+#ifdef ENABLE_TCP_CORE
+        auto ctx = ZmqContextManager::getContextPointer();
+        zmq::socket_t reqSocket(ctx->getContext(), ZMQ_REQ);
+        reqSocket.setsockopt(ZMQ_LINGER, 300);
+        std::string ext_interface = "tcp://127.0.0.1";
+        int port = DEFAULT_ZMQ_BROKER_PORT_NUMBER + 1;
+        if (config_->isMember("tcp")) {
+            auto V = (*config_)["tcp"];
+            replaceIfMember(V, "interface", ext_interface);
+            replaceIfMember(V, "port", port);
+        }
+        try {
+            reqSocket.connect(helics::makePortAddress(ext_interface, port));
+            reqSocket.send(std::string("close_server:") + server_name_);
+            reqSocket.close();
+        }
+        catch (const zmq::error_t&) {
+        }
+
+#endif
+    }
+
+    void BrokerServer::startTCPserver()
+    {
+        std::cerr << "starting tcp broker server\n";
+#ifdef ENABLE_TCP_CORE
+        std::string ext_interface = "tcp://*";
+        int port = DEFAULT_ZMQ_BROKER_PORT_NUMBER + 1;
+        std::chrono::milliseconds timeout(20000);
+        if (config_->isMember("tcp")) {
+            auto V = (*config_)["tcp"];
+            replaceIfMember(V, "interface", ext_interface);
+            replaceIfMember(V, "port", port);
+        }
+        auto &ctx = AsioContextManager::getContext();
+        zmq::socket_t repSocket(ctx->getContext(), ZMQ_REP);
+        repSocket.setsockopt(ZMQ_LINGER, 500);
+        auto bindsuccess = hzmq::bindzmqSocket(repSocket, ext_interface, port, timeout);
+        if (!bindsuccess) {
+            repSocket.close();
+            std::cout << "ZMQ server failed to start\n";
+            return;
+        }
+        zmq::pollitem_t poller;
+        poller.socket = static_cast<void*>(repSocket);
+        poller.events = ZMQ_POLLIN;
+
+        portData pdata;
+        for (int ii = 0; ii < 20; ++ii) {
+            pdata.emplace_back(DEFAULT_ZMQ_BROKER_PORT_NUMBER + 4 + ii * 2, false, nullptr);
+        }
+
+        int rc = 0;
+        while (rc >= 0) {
+            rc = zmq::poll(&poller, 1, std::chrono::milliseconds(5000));
+            if (rc < 0) {
+                std::cerr << "ZMQ broker connection error (2)" << std::endl;
+                break;
+            }
+            if (rc > 0) {
+                zmq::message_t msg;
+                repSocket.recv(msg);
+                auto sz = msg.size();
+                if (sz < 25) {
+                    if (std::string(static_cast<char*>(msg.data()), msg.size()) ==
+                        std::string("close_server:") + server_name_) {
+                        //      std::cerr << "received close server message" << std::endl;
+                        repSocket.send(msg, zmq::send_flags::none);
+                        break;
+                    } else {
+                        //    std::cerr << "received unrecognized message (ignoring)"
+                        //              << std::string (static_cast<char *> (msg.data ()), msg.size ()) << std::endl;
+                        repSocket.send("ignored");
+                        continue;
+                    }
+                } else {
+                    ActionMessage rxcmd(static_cast<char*>(msg.data()), msg.size());
+                   
+                }
+            }
+            if (exitall.load()) {
+                //    std::cerr << "exit all active" << std::endl;
+                break;
+            }
+        }
+        repSocket.close();
+        std::cerr << "exiting zmq broker server" << std::endl;
+
+#endif
+    }
+
+    void BrokerServer::closeTCPserver()
+    {
+#ifdef ENABLE_TCP_CORE
         auto ctx = ZmqContextManager::getContextPointer();
         zmq::socket_t reqSocket(ctx->getContext(), ZMQ_REQ);
         reqSocket.setsockopt(ZMQ_LINGER, 300);
@@ -312,6 +420,40 @@ namespace apps {
         }
 
 #endif
+    }
+        std::string BrokerServer::generateMessageResponse( const ActionMessage &rxcmd, portData &pdata)
+        {
+            //   std::cout << "received data length " << msg.size () << std::endl;
+            switch (rxcmd.action()) {
+            case CMD_PROTOCOL:
+            case CMD_PROTOCOL_PRIORITY:
+            case CMD_PROTOCOL_BIG:
+                switch (rxcmd.messageID) {
+                case REQUEST_PORTS: {
+                    auto pt = getOpenPort(pdata);
+                    if (pt > 0) {
+                        auto nbrk = findBroker(rxcmd, core_type::ZMQ, pt);
+                        if (nbrk.second) {
+                            assignPort(pdata, pt, nbrk.first);
+                        }
+                        auto mess = generateReply(rxcmd, nbrk.first);
+                        auto str = mess.to_string();
+                        repSocket.send(str);
+                    }
+                    else {
+                        ActionMessage rep(CMD_PROTOCOL);
+                        rep.messageID = DELAY;
+                        auto str = rep.to_string();
+                        repSocket.send(str);
+                    }
+                } break;
+                }
+                break;
+            default:
+                std::cout << "received unknown message " << msg.size() << std::endl;
+                repSocket.send("ignored");
+                break;
+            }
     }
 } // namespace apps
 } // namespace helics

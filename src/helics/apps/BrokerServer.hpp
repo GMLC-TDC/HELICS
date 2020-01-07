@@ -20,6 +20,9 @@ namespace helics {
 class ActionMessage;
 class helicsCLI11App;
 
+using portData = std::vector<std::tuple<int, bool, std::shared_ptr<Broker>>>;
+
+
 namespace apps {
     /** helper class defining some common functionality for brokers and cores that use different
 communication methods*/
@@ -59,11 +62,18 @@ communication methods*/
         void startZMQserver();
         /** close the ZMQ servers*/
         void closeZMQserver();
+        /** start the TCP server*/
+        void startTCPserver();
+        /** close the TCP server*/
+        void closeTCPserver();
+        /** generate a response message to a request*/
+        std::string generateMessageResponse(const ActionMessage &rxcmd, portData &pdata);
 
       private:
         bool zmq_server{false};
         bool zmq_ss_server{false};
         bool tcp_server{false};
+        bool tcp_ss_server{ false };
         bool udp_server{false};
         bool mpi_server{false};
         std::atomic<bool> exitall{false};
