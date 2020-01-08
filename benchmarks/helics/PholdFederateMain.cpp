@@ -6,6 +6,7 @@ SPDX-License-Identifier: BSD-3-Clause
 */
 
 #include "PholdFederate.hpp"
+#include "helics_benchmark_util.h"
 #include "helics/core/helicsCLI11.hpp"
 
 #include <iostream>
@@ -84,6 +85,8 @@ int main(int argc, char* argv[])
         }
         fed.setRandomSeed(rand_seed_uniform(rand_gen));
     }
+
+    printHELICSsystemInfo();
 
     fed.initialize(fi, index, max_index);
 

@@ -35,9 +35,13 @@ if [[ "${helics_bm_fed_exe}" == "" ]]; then
 fi
 command -v "${helics_bm_fed_exe}" || { echo >&2 "unable to find benchmark federate at ${helics_bm_fed_exe}; check for working build and set BUILD_PATH if needed"; exit 1; }
 
+# create an output folder for results
+output_folder="${BM_FED}-job-${SLURM_JOB_ID}"
+mkdir -p "${output_folder}"
+
 # Run info and srun job launch
 echo "Running broker on $HOSTNAME"
-"${BUILD_PATH}/src/helics/apps/helics_broker" --all -f "${SLURM_JOB_NUM_NODES}" --loglevel=5 &
+"${BUILD_PATH}/src/helics/apps/helics_broker" --all -f "${SLURM_JOB_NUM_NODES}" --loglevel=5 > "${output_folder}/helics-broker-out.txt" 2>&1 &
 
 # give some time for the broker to start up
 sleep 5
@@ -47,7 +51,7 @@ sleep 5
 for i in $(seq 1 "${SLURM_JOB_NUM_NODES}");
 do
     (( idx = i-1 ))
-    srun -N1 "${helics_bm_fed_exe}" --index="$idx" --max_index="${SLURM_JOB_NUM_NODES}" --broker="${HOSTNAME}" &
+    srun -N1 "${helics_bm_fed_exe}" --index="$idx" --max_index="${SLURM_JOB_NUM_NODES}" --broker="${HOSTNAME}" > "${output_folder}/${BM_FED}-${idx}-out.txt" 2>&1 &
 done
 
 wait
