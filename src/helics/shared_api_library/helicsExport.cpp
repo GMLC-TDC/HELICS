@@ -134,13 +134,11 @@ void helicsErrorHandler(helics_error* err) noexcept
             if (std::exception_ptr eptr = std::current_exception()) {
                 std::rethrow_exception(eptr);
             } else {
+                // LCOV_EXCL_START
                 err->error_code = helics_error_external_type;
                 err->message = unknown_err_string;
+                // LCOV_EXCL_STOP
             }
-        }
-        catch (const helics::InvalidIdentifier& iid) {
-            err->error_code = helics_error_invalid_object;
-            err->message = getMasterHolder()->addErrorString(iid.what());
         }
         catch (const helics::InvalidFunctionCall& ifc) {
             err->error_code = helics_error_invalid_function_call;
@@ -158,10 +156,16 @@ void helicsErrorHandler(helics_error* err) noexcept
             err->error_code = helics_error_connection_failure;
             err->message = getMasterHolder()->addErrorString(cf.what());
         }
+        // LCOV_EXCL_START
+        catch (const helics::InvalidIdentifier& iid) {
+            err->error_code = helics_error_invalid_object;
+            err->message = getMasterHolder()->addErrorString(iid.what());
+        }
         catch (const helics::HelicsSystemFailure& ht) {
             err->error_code = helics_error_system_failure;
             err->message = getMasterHolder()->addErrorString(ht.what());
         }
+        // LCOV_EXCL_STOP
         catch (const helics::HelicsException& he) {
             err->error_code = helics_error_other;
             err->message = getMasterHolder()->addErrorString(he.what());
@@ -170,15 +174,19 @@ void helicsErrorHandler(helics_error* err) noexcept
             err->error_code = helics_error_external_type;
             err->message = getMasterHolder()->addErrorString(exc.what());
         }
+        // LCOV_EXCL_START
         catch (...) {
             err->error_code = helics_error_external_type;
             err->message = unknown_err_string;
         }
+        // LCOV_EXCL_STOP
     }
+    // LCOV_EXCL_START
     catch (...) {
         err->error_code = helics_error_external_type;
         err->message = unknown_err_string;
     }
+    // LCOV_EXCL_STOP
 }
 
 void helicsFederateInfoFree(helics_federate_info fi)
@@ -222,8 +230,8 @@ void helicsFederateInfoSetCoreName(helics_federate_info fi, const char* corename
     try {
         hfi->coreName = AS_STRING(corename);
     }
-    catch (...) {
-        return helicsErrorHandler(err);
+    catch (...) { // LCOV_EXCL_LINE
+        return helicsErrorHandler(err); // LCOV_EXCL_LINE
     }
 }
 
@@ -236,8 +244,8 @@ void helicsFederateInfoSetCoreInitString(helics_federate_info fi, const char* co
     try {
         hfi->coreInitString = AS_STRING(coreinit);
     }
-    catch (...) {
-        return helicsErrorHandler(err);
+    catch (...) { // LCOV_EXCL_LINE
+        return helicsErrorHandler(err); // LCOV_EXCL_LINE
     }
 }
 
@@ -250,8 +258,8 @@ void helicsFederateInfoSetBrokerInitString(helics_federate_info fi, const char* 
     try {
         hfi->brokerInitString = AS_STRING(brokerinit);
     }
-    catch (...) {
-        return helicsErrorHandler(err);
+    catch (...) { // LCOV_EXCL_LINE
+        return helicsErrorHandler(err); // LCOV_EXCL_LINE
     }
 }
 
@@ -270,16 +278,19 @@ void helicsFederateInfoSetCoreTypeFromString(helics_federate_info fi, const char
     if (hfi == nullptr) {
         return;
     }
-    try {
-        if (coretype == nullptr) {
-            hfi->coreType = helics::core_type::DEFAULT;
-        } else {
-            hfi->coreType = helics::core::coreTypeFromString(coretype);
+    if (coretype == nullptr) {
+        hfi->coreType = helics::core_type::DEFAULT;
+        return;
+    }
+    auto ctype = helics::core::coreTypeFromString(coretype);
+    if (ctype == helics::core_type::UNRECOGNIZED) {
+        if (err != nullptr) {
+            err->error_code = helics_error_invalid_argument;
+            err->message = getMasterHolder()->addErrorString(std::string(coretype) + " is not a valid core type");
+            return;
         }
     }
-    catch (...) {
-        return helicsErrorHandler(err);
-    }
+    hfi->coreType = ctype;
 }
 
 void helicsFederateInfoSetBroker(helics_federate_info fi, const char* broker, helics_error* err)
@@ -291,8 +302,8 @@ void helicsFederateInfoSetBroker(helics_federate_info fi, const char* broker, he
     try {
         hfi->broker = AS_STRING(broker);
     }
-    catch (...) {
-        return helicsErrorHandler(err);
+    catch (...) { // LCOV_EXCL_LINE
+        return helicsErrorHandler(err); // LCOV_EXCL_LINE
     }
 }
 
@@ -305,8 +316,8 @@ void helicsFederateInfoSetBrokerKey(helics_federate_info fi, const char* brokerk
     try {
         hfi->key = AS_STRING(brokerkey);
     }
-    catch (...) {
-        return helicsErrorHandler(err);
+    catch (...) { // LCOV_EXCL_LINE
+        return helicsErrorHandler(err); // LCOV_EXCL_LINE
     }
 }
 
@@ -458,15 +469,6 @@ helics::Broker* getBroker(helics_broker broker, helics_error* err)
     return brokerObj->brokerptr.get();
 }
 
-std::shared_ptr<helics::Broker> getBrokerSharedPtr(helics_broker broker, helics_error* err)
-{
-    auto brokerObj = helics::getBrokerObject(broker, err);
-    if (brokerObj == nullptr) {
-        return nullptr;
-    }
-    return brokerObj->brokerptr;
-}
-
 helics_core helicsCreateCore(const char* type, const char* name, const char* initString, helics_error* err)
 {
     if ((err != nullptr) && (err->error_code != 0)) {
@@ -525,6 +527,7 @@ helics_core helicsCreateCoreFromArgs(const char* type, const char* name, int arg
             args.emplace_back(argv[ii]);
         }
         core->coreptr = helics::CoreFactory::FindOrCreate(ct, AS_STRING(name), args);
+
         auto retcore = reinterpret_cast<helics_core>(core.get());
         getMasterHolder()->addCore(std::move(core));
 
@@ -917,6 +920,24 @@ void helicsCoreSetReadyToInit(helics_core core, helics_error* err)
     cr->setCoreReadyToInit();
 }
 
+helics_bool helicsCoreConnect(helics_core core, helics_error* err)
+{
+    auto cr = getCore(core, err);
+    if (cr == nullptr) {
+        return helics_false;
+    }
+
+    try {
+        return (cr->connect()) ? helics_true : helics_false;
+    }
+    // LCOV_EXCL_START
+    catch (...) {
+        helicsErrorHandler(err);
+        return helics_false;
+    }
+    // LCOV_EXCL_STOP
+}
+
 void helicsCoreDisconnect(helics_core core, helics_error* err)
 {
     auto cr = getCore(core, err);
@@ -1124,7 +1145,7 @@ const char* helicsQueryCoreExecute(helics_query query, helics_core core, helics_
 
 const char* helicsQueryBrokerExecute(helics_query query, helics_broker broker, helics_error* err)
 {
-    auto brokerObj = getCore(broker, err);
+    auto brokerObj = getBroker(broker, err);
     if (brokerObj == nullptr) {
         return invalidStringConst;
     }

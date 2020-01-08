@@ -184,7 +184,7 @@ void MessageFederate::registerMessageInterfacesJson(const std::string& jsonStrin
 
 void MessageFederate::registerMessageInterfacesToml(const std::string& tomlString)
 {
-    toml::Value doc;
+    toml::value doc;
     try {
         doc = loadToml(tomlString);
     }
@@ -193,9 +193,13 @@ void MessageFederate::registerMessageInterfacesToml(const std::string& tomlStrin
     }
     bool defaultGlobal = false;
     replaceIfMember(doc, "defaultglobal", defaultGlobal);
-    auto epts = doc.find("endpoints");
-    if (epts != nullptr) {
-        auto& eptArray = epts->as<toml::Array>();
+
+    if (isMember(doc, "endpoints")) {
+        auto epts = toml::find(doc, "endpoints");
+        if (!epts.is_array()) {
+            throw(helics::InvalidParameter("endpoints section in toml file must be an array"));
+        }
+        auto& eptArray = epts.as_array();
         for (auto& ept : eptArray) {
             auto key = getKey(ept);
             auto type = getOrDefault(ept, "type", emptyStr);
@@ -273,7 +277,12 @@ void MessageFederate::sendMessage(
     const std::string& dest,
     const data_view& message)
 {
-    mfManager->sendMessage(source, dest, message);
+    if ((currentMode == modes::executing) || (currentMode == modes::initializing)) {
+        mfManager->sendMessage(source, dest, message);
+    } else {
+        throw(InvalidFunctionCall(
+            "messages not allowed outside of execution and initialization mode"));
+    }
 }
 
 void MessageFederate::sendMessage(
@@ -282,17 +291,32 @@ void MessageFederate::sendMessage(
     const data_view& message,
     Time sendTime)
 {
-    mfManager->sendMessage(source, dest, message, sendTime);
+    if ((currentMode == modes::executing) || (currentMode == modes::initializing)) {
+        mfManager->sendMessage(source, dest, message, sendTime);
+    } else {
+        throw(InvalidFunctionCall(
+            "messages not allowed outside of execution and initialization mode"));
+    }
 }
 
 void MessageFederate::sendMessage(const Endpoint& source, std::unique_ptr<Message> message)
 {
-    mfManager->sendMessage(source, std::move(message));
+    if ((currentMode == modes::executing) || (currentMode == modes::initializing)) {
+        mfManager->sendMessage(source, std::move(message));
+    } else {
+        throw(InvalidFunctionCall(
+            "messages not allowed outside of execution and initialization mode"));
+    }
 }
 
 void MessageFederate::sendMessage(const Endpoint& source, const Message& message)
 {
-    mfManager->sendMessage(source, std::make_unique<Message>(message));
+    if ((currentMode == modes::executing) || (currentMode == modes::initializing)) {
+        mfManager->sendMessage(source, std::make_unique<Message>(message));
+    } else {
+        throw(InvalidFunctionCall(
+            "messages not allowed outside of execution and initialization mode"));
+    }
 }
 
 Endpoint& MessageFederate::getEndpoint(const std::string& eptName) const

@@ -1138,6 +1138,7 @@ void CoreBroker::processBrokerConfigureCommands(ActionMessage& cmd)
                     auto M = stx::any_cast<
                         std::function<void(int, const std::string&, const std::string&)>>(
                         std::move(*op));
+                    M(0, identifier, "logging callback activated");
                     setLoggerFunction(std::move(M));
                 }
             }
@@ -1534,8 +1535,12 @@ void CoreBroker::configure(const std::string& configureString)
 {
     broker_state_t exp = broker_state_t::created;
     if (brokerState.compare_exchange_strong(exp, broker_state_t::configuring)) {
-        if (parseArgs(configureString) < 0) {
+        auto result = parseArgs(configureString);
+        if (result != 0) {
             brokerState = broker_state_t::created;
+            if (result < 0) {
+                throw(helics::InvalidParameter("invalid arguments in configure string"));
+            }
             return;
         }
         configureBase();
@@ -1546,8 +1551,12 @@ void CoreBroker::configureFromArgs(int argc, char* argv[])
 {
     broker_state_t exp = broker_state_t::created;
     if (brokerState.compare_exchange_strong(exp, broker_state_t::configuring)) {
-        if (parseArgs(argc, argv) < 0) {
+        auto result = parseArgs(argc, argv);
+        if (result != 0) {
             brokerState = broker_state_t::created;
+            if (result < 0) {
+                throw(helics::InvalidParameter("invalid arguments in command line"));
+            }
             return;
         }
         configureBase();
@@ -1558,8 +1567,12 @@ void CoreBroker::configureFromVector(std::vector<std::string> args)
 {
     broker_state_t exp = broker_state_t::created;
     if (brokerState.compare_exchange_strong(exp, broker_state_t::configuring)) {
-        if (parseArgs(std::move(args)) < 0) {
+        auto result = parseArgs(std::move(args));
+        if (result != 0) {
             brokerState = broker_state_t::created;
+            if (result < 0) {
+                throw(helics::InvalidParameter("invalid arguments in command line"));
+            }
             return;
         }
         configureBase();
@@ -1690,9 +1703,22 @@ void CoreBroker::disconnect()
         LOG_WARNING(
             global_id.load(),
             getIdentifier(),
-            "waiting on disconnect: current state=" +
-                std::to_string(static_cast<int16_t>(brokerState.load())));
-        if (cnt == 5) {
+            "waiting on disconnect: current state=" + brokerStateName(brokerState.load()));
+        if (cnt % 4 == 0) {
+            if (!isRunning()) {
+                LOG_WARNING(
+                    global_id.load(),
+                    getIdentifier(),
+                    "main loop is stopped but have not received disconnect notice, assuming disconnected");
+                return;
+            } else {
+                LOG_WARNING(
+                    global_id.load(),
+                    getIdentifier(),
+                    fmt::format(
+                        "sending disconnect again; total message count = {}",
+                        currentMessageCounter()));
+            }
             addActionMessage(udisconnect);
         }
     }

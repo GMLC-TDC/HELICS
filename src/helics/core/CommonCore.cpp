@@ -51,8 +51,12 @@ void CommonCore::configure(const std::string& configureString)
     broker_state_t exp = broker_state_t::created;
     if (brokerState.compare_exchange_strong(exp, broker_state_t::configuring)) {
         // initialize the brokerbase
-        if (parseArgs(configureString) < 0) {
+        auto result = parseArgs(configureString);
+        if (result != 0) {
             brokerState = broker_state_t::created;
+            if (result < 0) {
+                throw(helics::InvalidParameter("invalid arguments in configure string"));
+            }
             return;
         }
         configureBase();
@@ -64,8 +68,12 @@ void CommonCore::configureFromArgs(int argc, char* argv[])
     broker_state_t exp = broker_state_t::created;
     if (brokerState.compare_exchange_strong(exp, broker_state_t::configuring)) {
         // initialize the brokerbase
-        if (parseArgs(argc, argv) < 0) {
+        auto result = parseArgs(argc, argv);
+        if (result != 0) {
             brokerState = broker_state_t::created;
+            if (result < 0) {
+                throw(helics::InvalidParameter("invalid arguments in command line"));
+            }
             return;
         }
         configureBase();
@@ -77,8 +85,12 @@ void CommonCore::configureFromVector(std::vector<std::string> args)
     broker_state_t exp = broker_state_t::created;
     if (brokerState.compare_exchange_strong(exp, broker_state_t::configuring)) {
         // initialize the brokerbase
-        if (parseArgs(std::move(args)) < 0) {
+        auto result = parseArgs(std::move(args));
+        if (result != 0) {
             brokerState = broker_state_t::created;
+            if (result < 0) {
+                throw(helics::InvalidParameter("invalid arguments in arguments structure"));
+            }
             return;
         }
         configureBase();
@@ -172,8 +184,23 @@ void CommonCore::disconnect()
 {
     ActionMessage udisconnect(CMD_USER_DISCONNECT);
     addActionMessage(udisconnect);
+    int cnt{0};
     while (!waitForDisconnect(std::chrono::milliseconds(200))) {
-        LOG_WARNING(global_id.load(), getIdentifier(), "waiting on disconnect");
+        ++cnt;
+        LOG_WARNING(
+            global_id.load(),
+            getIdentifier(),
+            "waiting on disconnect: current state=" + brokerStateName(brokerState.load()));
+        if (cnt % 4 == 0) {
+            if (!isRunning()) {
+                LOG_WARNING(
+                    global_id.load(),
+                    getIdentifier(),
+                    "main loop is stopped but have not received disconnect notice, assuming disconnected");
+                return;
+            }
+            addActionMessage(udisconnect);
+        }
     }
 }
 
@@ -1749,6 +1776,7 @@ void CommonCore::setLoggingCallback(
         ActionMessage loggerUpdate(CMD_CORE_CONFIGURE);
         loggerUpdate.messageID = UPDATE_LOGGING_CALLBACK;
         loggerUpdate.source_id = global_id.load();
+        loggerUpdate.dest_id = global_id.load();
         if (logFunction) {
             auto ii = getNextAirlockIndex();
             dataAirlocks[ii].load(std::move(logFunction));
@@ -2036,7 +2064,7 @@ std::string CommonCore::query(const std::string& target, const std::string& quer
         querycmd.messageID = index;
         querycmd.payload = queryStr;
         auto queryResult = ActiveQueries.getFuture(querycmd.messageID);
-        if (!global_id.load().isValid()) {
+        if (global_id.load() == parent_broker_id) {
             delayTransmitQueue.push(std::move(querycmd));
         } else {
             transmit(parent_route_id, querycmd);
@@ -2084,7 +2112,7 @@ std::string CommonCore::query(const std::string& target, const std::string& quer
     querycmd.payload = queryStr;
     querycmd.setStringData(target);
     auto queryResult = ActiveQueries.getFuture(querycmd.messageID);
-    if (!global_id.load().isValid()) {
+    if (global_id.load() == parent_broker_id) {
         delayTransmitQueue.push(std::move(querycmd));
     } else {
         transmit(parent_route_id, querycmd);
@@ -2101,7 +2129,7 @@ void CommonCore::setGlobal(const std::string& valueName, const std::string& valu
     querycmd.source_id = global_id.load();
     querycmd.payload = valueName;
     querycmd.setStringData(value);
-    if (!global_id.load().isValid()) {
+    if (global_id.load() == parent_broker_id) {
         delayTransmitQueue.push(std::move(querycmd));
     } else {
         transmit(parent_route_id, querycmd);
@@ -3388,6 +3416,7 @@ void CommonCore::processCoreConfigureCommands(ActionMessage& cmd)
                     auto M = stx::any_cast<
                         std::function<void(int, const std::string&, const std::string&)>>(
                         std::move(*op));
+                    M(0, identifier, "logging callback activated");
                     setLoggerFunction(std::move(M));
                 }
             }

@@ -272,7 +272,7 @@ void ValueFederate::registerValueInterfacesJson(const std::string& jsonString)
 
 void ValueFederate::registerValueInterfacesToml(const std::string& tomlString)
 {
-    toml::Value doc;
+    toml::value doc;
     try {
         doc = loadToml(tomlString);
     }
@@ -281,9 +281,13 @@ void ValueFederate::registerValueInterfacesToml(const std::string& tomlString)
     }
     bool defaultGlobal = false;
     replaceIfMember(doc, "defaultglobal", defaultGlobal);
-    auto pubs = doc.find("publications");
-    if (pubs != nullptr) {
-        auto& pubArray = pubs->as<toml::Array>();
+
+    if (isMember(doc, "publications")) {
+        auto pubs = toml::find(doc, "publications");
+        if (!pubs.is_array()) {
+            throw(helics::InvalidParameter("filters section in yoml file must be an array"));
+        }
+        auto& pubArray = pubs.as_array();
         for (const auto& pub : pubArray) {
             auto key = getKey(pub);
 
@@ -303,9 +307,12 @@ void ValueFederate::registerValueInterfacesToml(const std::string& tomlString)
             loadOptions(this, pub, *pubObj);
         }
     }
-    auto subs = doc.find("subscriptions");
-    if (subs != nullptr) {
-        auto& subArray = subs->as<toml::Array>();
+    if (isMember(doc, "subscriptions")) {
+        auto subs = toml::find(doc, "subscriptions");
+        if (!subs.is_array()) {
+            throw(helics::InvalidParameter("subscriptions section in toml file must be an array"));
+        }
+        auto& subArray = subs.as_array();
         for (const auto& sub : subArray) {
             auto key = getKey(sub);
             Input* id = &vfManager->getSubscription(key);
@@ -321,9 +328,12 @@ void ValueFederate::registerValueInterfacesToml(const std::string& tomlString)
             loadOptions(this, sub, *id);
         }
     }
-    auto ipts = doc.find("inputs");
-    if (ipts != nullptr) {
-        auto& iptArray = ipts->as<toml::Array>();
+    if (isMember(doc, "inputs")) {
+        auto ipts = toml::find(doc, "inputs");
+        if (!ipts.is_array()) {
+            throw(helics::InvalidParameter("inputs section in toml file must be an array"));
+        }
+        auto& iptArray = ipts.as_array();
         for (const auto& ipt : iptArray) {
             auto key = getKey(ipt);
 

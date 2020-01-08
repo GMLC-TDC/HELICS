@@ -15,6 +15,7 @@ else()
     include(UseJava)
 
     include_directories(${JAVA_INCLUDE_PATH})
+    include_directories(${JAVA_INCLUDE_PATH2})
     include_directories(${JNI_INCLUDE_DIRS})
 
     if(HELICS_ENABLE_SWIG AND SWIG_EXECUTABLE)
@@ -82,12 +83,22 @@ else()
             ${CMAKE_CURRENT_SOURCE_DIR}/addLoadLibraryCommand.cmake
     )
 
+if (CMAKE_GENERATOR_PLATFORM)
     add_custom_command(
         TARGET "JNIhelics" POST_BUILD
-        COMMAND ${CMAKE_COMMAND} ARGS ..
+        COMMAND ${CMAKE_COMMAND} ARGS -G ${CMAKE_GENERATOR} -A ${CMAKE_GENERATOR_PLATFORM} ..
         WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/buildjar"
         VERBATIM
     )
+else()
+    add_custom_command(
+        TARGET "JNIhelics" POST_BUILD
+        COMMAND ${CMAKE_COMMAND} ARGS -G ${CMAKE_GENERATOR} ..
+        WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/buildjar"
+        VERBATIM
+    )
+endif()
+    
 
     add_custom_command(
         TARGET "JNIhelics" POST_BUILD

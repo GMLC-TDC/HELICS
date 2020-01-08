@@ -95,10 +95,12 @@ helics_input helicsFederateRegisterSubscription(helics_federate fed, const char*
         addInput(fed, std::move(sub));
         return ret;
     }
+    // LCOV_EXCL_START
     catch (...) {
         helicsErrorHandler(err);
     }
     return nullptr;
+    // LCOV_EXCL_STOP
 }
 
 helics_publication
@@ -389,10 +391,12 @@ helics_publication helicsFederateGetPublication(helics_federate fed, const char*
         addPublication(fed, std::move(pubObj));
         return ret;
     }
+    // LCOV_EXCL_START
     catch (...) {
         helicsErrorHandler(err);
         return nullptr;
     }
+    // LCOV_EXCL_STOP
 }
 
 helics_publication helicsFederateGetPublicationByIndex(helics_federate fed, int index, helics_error* err)
@@ -418,10 +422,12 @@ helics_publication helicsFederateGetPublicationByIndex(helics_federate fed, int 
         addPublication(fed, std::move(pub));
         return ret;
     }
+    // LCOV_EXCL_START
     catch (...) {
         helicsErrorHandler(err);
         return nullptr;
     }
+    // LCOV_EXCL_STOP
 }
 
 static constexpr char invalidInputName[] = "the specified input name is a not a recognized input";
@@ -450,10 +456,12 @@ helics_input helicsFederateGetInput(helics_federate fed, const char* key, helics
         addInput(fed, std::move(inp));
         return ret;
     }
+    // LCOV_EXCL_START
     catch (...) {
         helicsErrorHandler(err);
         return nullptr;
     }
+    // LCOV_EXCL_STOP
 }
 
 helics_input helicsFederateGetInputByIndex(helics_federate fed, int index, helics_error* err)
@@ -478,10 +486,12 @@ helics_input helicsFederateGetInputByIndex(helics_federate fed, int index, helic
         addInput(fed, std::move(inp));
         return ret;
     }
+    // LCOV_EXCL_START
     catch (...) {
         helicsErrorHandler(err);
         return nullptr;
     }
+    // LCOV_EXCL_STOP
 }
 
 static constexpr char invalidSubKey[] = "the specified subscription key is a not a recognized key";
@@ -507,10 +517,12 @@ helics_input helicsFederateGetSubscription(helics_federate fed, const char* key,
         addInput(fed, std::move(inp));
         return ret;
     }
+    // LCOV_EXCL_START
     catch (...) {
         helicsErrorHandler(err);
         return nullptr;
     }
+    // LCOV_EXCL_STOP
 }
 
 void helicsFederateClearUpdates(helics_federate fed)
@@ -522,8 +534,10 @@ void helicsFederateClearUpdates(helics_federate fed)
     try {
         fedObj->clearUpdates();
     }
+    // LCOV_EXCL_START
     catch (...) {
     }
+    // LCOV_EXCL_STOP
 }
 
 /* getting and publishing values */
@@ -854,9 +868,11 @@ void helicsInputGetComplex(helics_input inp, double* real, double* imag, helics_
             *imag = cval.imag();
         }
     }
+    // LCOV_EXCL_START
     catch (...) {
         helicsErrorHandler(err);
     }
+    // LCOV_EXCL_STOP
 }
 
 helics_complex helicsInputGetComplexObject(helics_input inp, helics_error* err)
@@ -872,10 +888,12 @@ helics_complex helicsInputGetComplexObject(helics_input inp, helics_error* err)
         auto cval = inpObj->inputPtr->getValue<std::complex<double>>();
         return {cval.real(), cval.imag()};
     }
+    // LCOV_EXCL_START
     catch (...) {
         helicsErrorHandler(err);
         return {helics_time_invalid, helics_time_invalid};
     }
+    // LCOV_EXCL_STOP
 }
 
 int helicsInputGetVectorSize(helics_input inp)
@@ -887,9 +905,11 @@ int helicsInputGetVectorSize(helics_input inp)
     try {
         return static_cast<int>(inpObj->inputPtr->getVectorSize());
     }
+    // LCOV_EXCL_START
     catch (...) {
         return 0;
     }
+    // LCOV_EXCL_STOP
 }
 
 int helicsInputGetStringSize(helics_input inp)
@@ -901,9 +921,11 @@ int helicsInputGetStringSize(helics_input inp)
     try {
         return static_cast<int>(inpObj->inputPtr->getStringSize()) + 1;
     }
+    // LCOV_EXCL_START
     catch (...) {
         return 0;
     }
+    // LCOV_EXCL_STOP
 }
 
 void helicsInputGetVector(helics_input inp, double data[], int maxlen, int* actualSize, helics_error* err)
@@ -982,9 +1004,11 @@ void helicsInputSetDefaultRaw(helics_input inp, const void* data, int dataLen, h
             inpObj->fedptr->setDefaultValue(*inpObj->inputPtr, helics::data_view(static_cast<const char*>(data), dataLen));
         }
     }
+    // LCOV_EXCL_START
     catch (...) {
         helicsErrorHandler(err);
     }
+    // LCOV_EXCL_STOP
 }
 
 void helicsInputSetDefaultString(helics_input inp, const char* str, helics_error* err)
@@ -996,9 +1020,11 @@ void helicsInputSetDefaultString(helics_input inp, const char* str, helics_error
     try {
         inpObj->inputPtr->setDefault(AS_STRING(str));
     }
+    // LCOV_EXCL_START
     catch (...) {
         helicsErrorHandler(err);
     }
+    // LCOV_EXCL_STOP
 }
 
 void helicsInputSetDefaultInteger(helics_input inp, int64_t val, helics_error* err)
@@ -1071,9 +1097,11 @@ void helicsInputSetDefaultVector(helics_input inp, const double* vectorInput, in
             inpObj->inputPtr->setDefault(std::vector<double>(vectorInput, vectorInput + vectorLength));
         }
     }
+    // LCOV_EXCL_START
     catch (...) {
         helicsErrorHandler(err);
     }
+    // LCOV_EXCL_STOP
 }
 
 void helicsInputSetDefaultNamedPoint(helics_input inp, const char* str, double val, helics_error* err)
@@ -1085,9 +1113,11 @@ void helicsInputSetDefaultNamedPoint(helics_input inp, const char* str, double v
     try {
         inpObj->inputPtr->setDefault(helics::NamedPoint(AS_STRING(str), val));
     }
+    // LCOV_EXCL_START
     catch (...) {
         helicsErrorHandler(err);
     }
+    // LCOV_EXCL_STOP
 }
 
 const char* helicsInputGetType(helics_input inp)
@@ -1101,9 +1131,11 @@ const char* helicsInputGetType(helics_input inp)
         const std::string& type = inpObj->inputPtr->getType();
         return type.c_str();
     }
+    // LCOV_EXCL_START
     catch (...) {
         return emptyStr.c_str();
     }
+    // LCOV_EXCL_STOP
 }
 
 const char* helicsInputGetPublicationType(helics_input ipt)
@@ -1117,9 +1149,11 @@ const char* helicsInputGetPublicationType(helics_input ipt)
         const std::string& type = inpObj->inputPtr->getPublicationType();
         return type.c_str();
     }
+    // LCOV_EXCL_START
     catch (...) {
         return emptyStr.c_str();
     }
+    // LCOV_EXCL_STOP
 }
 
 const char* helicsPublicationGetType(helics_publication pub)
@@ -1133,9 +1167,11 @@ const char* helicsPublicationGetType(helics_publication pub)
         const std::string& type = pubObj->pubPtr->getType();
         return type.c_str();
     }
+    // LCOV_EXCL_START
     catch (...) {
         return emptyStr.c_str();
     }
+    // LCOV_EXCL_STOP
 }
 
 const char* helicsInputGetKey(helics_input inp)
@@ -1149,9 +1185,11 @@ const char* helicsInputGetKey(helics_input inp)
         const std::string& key = inpObj->inputPtr->getKey();
         return key.c_str();
     }
+    // LCOV_EXCL_START
     catch (...) {
         return emptyStr.c_str();
     }
+    // LCOV_EXCL_STOP
 }
 
 const char* helicsSubscriptionGetKey(helics_input sub)
@@ -1165,9 +1203,11 @@ const char* helicsSubscriptionGetKey(helics_input sub)
         const std::string& key = inpObj->fedptr->getTarget(*(inpObj->inputPtr));
         return key.c_str();
     }
+    // LCOV_EXCL_START
     catch (...) {
         return emptyStr.c_str();
     }
+    // LCOV_EXCL_STOP
 }
 
 const char* helicsPublicationGetKey(helics_publication pub)
@@ -1180,9 +1220,11 @@ const char* helicsPublicationGetKey(helics_publication pub)
         const std::string& key = pubObj->pubPtr->getKey();
         return key.c_str();
     }
+    // LCOV_EXCL_START
     catch (...) {
         return emptyStr.c_str();
     }
+    // LCOV_EXCL_STOP
 }
 
 const char* helicsInputGetInjectionUnits(helics_input ipt)
@@ -1195,9 +1237,11 @@ const char* helicsInputGetInjectionUnits(helics_input ipt)
         const std::string& units = inpObj->inputPtr->getInjectionUnits();
         return units.c_str();
     }
+    // LCOV_EXCL_START
     catch (...) {
         return emptyStr.c_str();
     }
+    // LCOV_EXCL_STOP
 }
 
 const char* helicsInputGetExtractionUnits(helics_input ipt)
@@ -1210,9 +1254,11 @@ const char* helicsInputGetExtractionUnits(helics_input ipt)
         const std::string& units = inpObj->inputPtr->getUnits();
         return units.c_str();
     }
+    // LCOV_EXCL_START
     catch (...) {
         return emptyStr.c_str();
     }
+    // LCOV_EXCL_STOP
 }
 
 const char* helicsInputGetUnits(helics_input inp)
@@ -1240,9 +1286,11 @@ const char* helicsInputGetInfo(helics_input inp)
         const std::string& info = inpObj->inputPtr->getInfo();
         return info.c_str();
     }
+    // LCOV_EXCL_START
     catch (...) {
         return emptyStr.c_str();
     }
+    // LCOV_EXCL_STOP
 }
 
 void helicsInputSetInfo(helics_input inp, const char* info, helics_error* err)
@@ -1254,9 +1302,11 @@ void helicsInputSetInfo(helics_input inp, const char* info, helics_error* err)
     try {
         inpObj->inputPtr->setInfo(AS_STRING(info));
     }
+    // LCOV_EXCL_START
     catch (...) {
         helicsErrorHandler(err);
     }
+    // LCOV_EXCL_STOP
 }
 const char* helicsPublicationGetInfo(helics_publication pub)
 {
@@ -1268,9 +1318,11 @@ const char* helicsPublicationGetInfo(helics_publication pub)
         const std::string& info = pubObj->pubPtr->getInfo();
         return info.c_str();
     }
+    // LCOV_EXCL_START
     catch (...) {
         return emptyStr.c_str();
     }
+    // LCOV_EXCL_STOP
 }
 
 void helicsPublicationSetInfo(helics_publication pub, const char* info, helics_error* err)
@@ -1282,9 +1334,11 @@ void helicsPublicationSetInfo(helics_publication pub, const char* info, helics_e
     try {
         pubObj->pubPtr->setInfo(AS_STRING(info));
     }
+    // LCOV_EXCL_START
     catch (...) {
         helicsErrorHandler(err);
     }
+    // LCOV_EXCL_STOP
 }
 
 helics_bool helicsInputGetOption(helics_input inp, int option)
@@ -1296,9 +1350,11 @@ helics_bool helicsInputGetOption(helics_input inp, int option)
     try {
         return (inpObj->inputPtr->getOption(option)) ? helics_true : helics_false;
     }
+    // LCOV_EXCL_START
     catch (...) {
         return helics_false;
     }
+    // LCOV_EXCL_STOP
 }
 
 void helicsInputSetOption(helics_input inp, int option, helics_bool value, helics_error* err)
@@ -1310,9 +1366,11 @@ void helicsInputSetOption(helics_input inp, int option, helics_bool value, helic
     try {
         inpObj->inputPtr->setOption(option, (value == helics_true));
     }
+    // LCOV_EXCL_START
     catch (...) {
         helicsErrorHandler(err);
     }
+    // LCOV_EXCL_STOP
 }
 
 helics_bool helicsPublicationGetOption(helics_publication pub, int option)
@@ -1324,9 +1382,11 @@ helics_bool helicsPublicationGetOption(helics_publication pub, int option)
     try {
         return (pubObj->pubPtr->getOption(option)) ? helics_true : helics_false;
     }
+    // LCOV_EXCL_START
     catch (...) {
         return helics_false;
     }
+    // LCOV_EXCL_STOP
 }
 
 void helicsPublicationSetOption(helics_publication pub, int option, helics_bool value, helics_error* err)
@@ -1338,9 +1398,29 @@ void helicsPublicationSetOption(helics_publication pub, int option, helics_bool 
     try {
         pubObj->pubPtr->setOption(option, (value == helics_true));
     }
+    // LCOV_EXCL_START
     catch (...) {
         helicsErrorHandler(err);
     }
+    // LCOV_EXCL_STOP
+}
+
+void helicsPublicationSetMinimumChange(helics_publication pub, double tolerance, helics_error* err)
+{
+    auto pubObj = verifyPublication(pub, err);
+    if (pubObj == nullptr) {
+        return;
+    }
+    pubObj->pubPtr->setMinimumChange(tolerance);
+}
+
+void helicsInputSetMinimumChange(helics_input inp, double tolerance, helics_error* err)
+{
+    auto inpObj = verifyInput(inp, err);
+    if (inpObj == nullptr) {
+        return;
+    }
+    inpObj->inputPtr->setMinimumChange(tolerance);
 }
 
 helics_bool helicsInputIsUpdated(helics_input inp)
@@ -1364,9 +1444,11 @@ helics_time helicsInputLastUpdateTime(helics_input inp)
         auto time = inpObj->inputPtr->getLastUpdate();
         return static_cast<helics_time>(time);
     }
+    // LCOV_EXCL_START
     catch (...) {
         return helics_time_invalid;
     }
+    // LCOV_EXCL_STOP
 }
 
 void helicsInputClearUpdate(helics_input inp)
@@ -1378,8 +1460,10 @@ void helicsInputClearUpdate(helics_input inp)
     try {
         inpObj->inputPtr->clearUpdate();
     }
+    // LCOV_EXCL_START
     catch (...) {
     }
+    // LCOV_EXCL_STOP
 }
 
 int helicsFederateGetPublicationCount(helics_federate fed)

@@ -687,6 +687,7 @@ HELICS_EXPORT void helicsInputSetOption(helics_input inp, int option, helics_boo
     @param option the value to query see /ref helics_handle_options
     @return a string with the info field string*/
 HELICS_EXPORT helics_bool helicsPublicationGetOption(helics_publication pub, int option);
+
 /** set the data in the info field for an publication
     @param pub the publication to query
     @param option integer code for the option to set /ref helics_handle_options
@@ -696,6 +697,25 @@ HELICS_EXPORT helics_bool helicsPublicationGetOption(helics_publication pub, int
     @endforcpponly
     */
 HELICS_EXPORT void helicsPublicationSetOption(helics_publication pub, int option, helics_bool val, helics_error* err);
+
+/** set the minimum change detection tolerance
+    @param pub the publication to modify
+    @param tolerance the tolerance level for publication, values changing less than this value will not be published
+    @forcpponly
+    @param[in,out] err an error object to fill out in case of an error
+    @endforcpponly
+    */
+HELICS_EXPORT void helicsPublicationSetMinimumChange(helics_publication pub, double tolerance, helics_error* err);
+
+/** set the minimum change detection tolerance
+    @param inp the input to modify
+    @param tolerance the tolerance level for registering an update, values changing less than this value will not show as being updated
+    @forcpponly
+    @param[in,out] err an error object to fill out in case of an error
+    @endforcpponly
+    */
+HELICS_EXPORT void helicsInputSetMinimumChange(helics_input inp, double tolerance, helics_error* err);
+
 /**@}*/
 
 /** check if a particular subscription was updated

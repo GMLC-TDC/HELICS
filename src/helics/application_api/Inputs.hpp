@@ -302,7 +302,7 @@ class HELICS_CXX_EXPORT Input {
     /** set the minimum delta for change detection
     @param deltaV a double with the change in a value in order to register a different value
     */
-    void setMinimumChange(double deltaV)
+    void setMinimumChange(double deltaV) noexcept
     {
         // this first check enables change detection if it was disabled via negative delta
         if (delta < 0.0) {
@@ -317,7 +317,7 @@ class HELICS_CXX_EXPORT Input {
     /** enable change detection
     @param enabled (optional) set to false to disable change detection true(default) to enable it
     */
-    void enableChangeDetection(bool enabled = true) { changeDetectionEnabled = enabled; }
+    void enableChangeDetection(bool enabled = true) noexcept { changeDetectionEnabled = enabled; }
 
   private:
     /** deal with the callback from the application API*/

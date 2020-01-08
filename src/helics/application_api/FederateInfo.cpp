@@ -375,16 +375,24 @@ std::unique_ptr<helicsCLI11App> FederateInfo::makeCLIApp()
 std::vector<std::string> FederateInfo::loadInfoFromArgs(const std::string& args)
 {
     auto app = makeCLIApp();
-    app->helics_parse(args);
-    coreType = app->getCoreType();
+    auto ret = app->helics_parse(args);
+    if (ret == helicsCLI11App::parse_output::ok) {
+        coreType = app->getCoreType();
+    } else if (ret == helicsCLI11App::parse_output::parse_error) {
+        throw helics::InvalidParameter("argument parsing failed");
+    }
     return app->remaining_for_passthrough();
 }
 
 std::vector<std::string> FederateInfo::loadInfoFromArgs(int argc, char* argv[])
 {
     auto app = makeCLIApp();
-    app->helics_parse(argc, argv);
-    coreType = app->getCoreType();
+    auto ret = app->helics_parse(argc, argv);
+    if (ret == helicsCLI11App::parse_output::ok) {
+        coreType = app->getCoreType();
+    } else if (ret == helicsCLI11App::parse_output::parse_error) {
+        throw helics::InvalidParameter("argument parsing failed");
+    }
     return app->remaining_for_passthrough();
 }
 
@@ -406,9 +414,12 @@ void FederateInfo::loadInfoFromArgs(std::vector<std::string>& args)
 {
     auto app = makeCLIApp();
     app->allow_extras();
-    app->helics_parse(args);
-
-    coreType = app->getCoreType();
+    auto ret = app->helics_parse(args);
+    if (ret == helicsCLI11App::parse_output::ok) {
+        coreType = app->getCoreType();
+    } else if (ret == helicsCLI11App::parse_output::parse_error) {
+        throw helics::InvalidParameter("argument parsing failed");
+    }
 }
 
 // function to load different formats easily
@@ -540,7 +551,7 @@ FederateInfo loadFederateInfoJson(const std::string& jsonString)
 FederateInfo loadFederateInfoToml(const std::string& tomlString)
 {
     FederateInfo fi;
-    toml::Value doc;
+    toml::value doc;
     try {
         doc = loadToml(tomlString);
     }
@@ -574,57 +585,57 @@ FederateInfo loadFederateInfoToml(const std::string& tomlString)
         callIfMember(doc, prop, flagCall);
     }
     if (isMember(doc, "flags")) {
-        loadFlags(fi, doc["flags"].as<std::string>());
+        loadFlags(fi, toml::find<std::string>(doc, "flags"));
     }
     replaceIfMember(doc, "autobroker", fi.autobroker);
     replaceIfMember(doc, "broker", fi.broker);
     replaceIfMember(doc, "key", fi.key);
-    fi.brokerPort = getOrDefault(doc, "brokerport", fi.brokerPort);
+    fi.brokerPort = static_cast<int>(getOrDefault(doc, "brokerport", int64_t(fi.brokerPort)));
     replaceIfMember(doc, "localport", fi.localport);
     if (isMember(doc, "port")) {
         if (fi.localport.empty()) {
             if (fi.brokerPort < 0) {
-                fi.brokerPort = doc["port"].as<int>();
+                fi.brokerPort = doc["port"].as_integer();
             } else {
-                fi.localport = doc["port"].as<std::string>();
+                fi.localport = tomlAsString(doc["port"]);
             }
         } else {
             if (fi.brokerPort < 0) {
-                fi.brokerPort = doc["port"].as<int>();
+                fi.brokerPort = doc["port"].as_integer();
             }
         }
     }
     if (isMember(doc, "separator")) {
-        auto sep = doc["separator"].as<std::string>();
+        std::string sep = tomlAsString(doc["separator"]);
         if (!sep.empty()) {
             fi.separator = sep[0];
         }
     }
     if (isMember(doc, "core")) {
         try {
-            fi.coreType = coreTypeFromString(doc["core"].as<std::string>());
+            fi.coreType = coreTypeFromString(tomlAsString(doc["core"]));
         }
         catch (const std::invalid_argument&) {
-            fi.coreName = doc["core"].as<std::string>();
+            fi.coreName = tomlAsString(doc["core"]);
         }
     }
     if (isMember(doc, "coreType")) {
         try {
-            fi.coreType = coreTypeFromString(doc["coreType"].as<std::string>());
+            fi.coreType = coreTypeFromString(tomlAsString(doc["coreType"]));
         }
         catch (const std::invalid_argument&) {
             std::cerr << "Unrecognized core type\n";
         }
     } else if (isMember(doc, "coretype")) {
         try {
-            fi.coreType = coreTypeFromString(doc["coretype"].as<std::string>());
+            fi.coreType = coreTypeFromString(tomlAsString(doc["coretype"]));
         }
         catch (const std::invalid_argument&) {
             std::cerr << "Unrecognized core type\n";
         }
     } else if (isMember(doc, "type")) {
         try {
-            fi.coreType = coreTypeFromString(doc["type"].as<std::string>());
+            fi.coreType = coreTypeFromString(tomlAsString(doc["type"]));
         }
         catch (const std::invalid_argument&) {
             std::cerr << "Unrecognized core type\n";

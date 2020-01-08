@@ -198,10 +198,7 @@ int BrokerBase::parseArgs(int argc, char* argv[])
     auto sApp = generateCLI();
     app->add_subcommand(sApp);
     auto res = app->helics_parse(argc, argv);
-    if (res != helicsCLI11App::parse_output::ok) {
-        return -1;
-    }
-    return 0;
+    return static_cast<int>(res);
 }
 
 int BrokerBase::parseArgs(std::vector<std::string> args)
@@ -210,10 +207,7 @@ int BrokerBase::parseArgs(std::vector<std::string> args)
     auto sApp = generateCLI();
     app->add_subcommand(sApp);
     auto res = app->helics_parse(std::move(args));
-    if (res != helicsCLI11App::parse_output::ok) {
-        return -1;
-    }
-    return 0;
+    return static_cast<int>(res);
 }
 
 int BrokerBase::parseArgs(const std::string& initializationString)
@@ -222,10 +216,7 @@ int BrokerBase::parseArgs(const std::string& initializationString)
     auto sApp = generateCLI();
     app->add_subcommand(sApp);
     auto res = app->helics_parse(initializationString);
-    if (res != helicsCLI11App::parse_output::ok) {
-        return -1;
-    }
-    return 0;
+    return static_cast<int>(res);
 }
 
 void BrokerBase::configureBase()
@@ -360,23 +351,38 @@ void BrokerBase::addActionMessage(ActionMessage&& m)
 #ifndef HELICS_DISABLE_ASIO
 using activeProtector = gmlc::libguarded::guarded<std::pair<bool, bool>>;
 
-static void haltTimer(activeProtector& active, asio::steady_timer& tickTimer)
+static bool haltTimer(activeProtector& active, asio::steady_timer& tickTimer)
 {
     bool TimerRunning = true;
     {
         auto p = active.lock();
         if (p->second) {
             p->first = false;
-            tickTimer.cancel();
+            p.unlock();
+            auto cancelled = tickTimer.cancel();
+            if (cancelled == 0) {
+                TimerRunning = false;
+            }
         } else {
             TimerRunning = false;
         }
     }
+    int ii = 0;
     while (TimerRunning) {
-        std::this_thread::yield();
+        if (ii % 4 != 3) {
+            std::this_thread::yield();
+        } else {
+            std::this_thread::sleep_for(std::chrono::milliseconds(40));
+        }
         auto res = active.load();
         TimerRunning = res.second;
+        ++ii;
+        if (ii == 100) {
+            // assume the timer was never started so just exit and hope it doesn't somehow get called later and generate a seg fault.
+            return false;
+        }
     }
+    return true;
 }
 
 static void
@@ -432,8 +438,10 @@ void BrokerBase::queueProcessingLoop()
         ticktimer.expires_at(std::chrono::steady_clock::now() + tickTimer.to_ns());
         ticktimer.async_wait(timerCallback);
     }
-    auto timerStop = [&]() {
-        haltTimer(active, ticktimer);
+    auto timerStop = [&, this]() {
+        if (!haltTimer(active, ticktimer)) {
+            LOG_WARNING(global_broker_id_local, identifier, "timer unable to cancel properly");
+        }
         contextLoop = nullptr;
     };
 #else
@@ -464,6 +472,7 @@ void BrokerBase::queueProcessingLoop()
     }
     while (true) {
         auto command = actionQueue.pop();
+        ++messageCounter;
         if (dumplog) {
             dumpMessages.push_back(command);
         }
@@ -485,7 +494,6 @@ void BrokerBase::queueProcessingLoop()
                 }
                 if (messagesSinceLastTick == 0 || forwardTick) {
 #ifndef DISABLE_TICK
-
                     processCommand(std::move(command));
 #endif
                 }
@@ -566,7 +574,7 @@ action_message_def::action_t BrokerBase::commandProcessor(ActionMessage& command
                 NMess.from_string(command.getString(ii));
                 auto V = commandProcessor(NMess);
                 if (V != CMD_IGNORE) {
-                    // overwrite the abort command but ignore ticks in a multimessage context they shouldn't be there
+                    // overwrite the abort command but ignore ticks in a multi-message context they shouldn't be there
                     if (V != CMD_TICK) {
                         command = NMess;
                         return V;
@@ -585,5 +593,46 @@ action_message_def::action_t BrokerBase::commandProcessor(ActionMessage& command
     }
     return CMD_IGNORE;
 }
+
+// LCOV_EXCL_START
+const std::string& brokerStateName(BrokerBase::broker_state_t state)
+{
+    static const std::string createdString = "created";
+    static const std::string configuringString = "configuring";
+    static const std::string configuredString = "configured";
+    static const std::string connectingString = "connecting";
+    static const std::string connectedString = "connected";
+    static const std::string initializingString = "initializing";
+    static const std::string operatingString = "operating";
+    static const std::string terminatingString = "terminating";
+    static const std::string terminatedString = "terminated";
+    static const std::string erroredString = "error";
+    static const std::string otherString = "other";
+    switch (state) {
+        case BrokerBase::broker_state_t::created:
+            return createdString;
+        case BrokerBase::broker_state_t::configuring:
+            return configuringString;
+        case BrokerBase::broker_state_t::configured:
+            return configuredString;
+        case BrokerBase::broker_state_t::connecting:
+            return connectingString;
+        case BrokerBase::broker_state_t::connected:
+            return connectedString;
+        case BrokerBase::broker_state_t::initializing:
+            return initializingString;
+        case BrokerBase::broker_state_t::operating:
+            return operatingString;
+        case BrokerBase::broker_state_t::terminating:
+            return terminatingString;
+        case BrokerBase::broker_state_t::terminated:
+            return terminatedString;
+        case BrokerBase::broker_state_t::errored:
+            return erroredString;
+        default:
+            return otherString;
+    }
+}
+// LCOV_EXCL_STOP
 
 } // namespace helics

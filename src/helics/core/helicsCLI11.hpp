@@ -48,16 +48,16 @@ class helicsCLI11App: public CLI::App {
 
     enum class parse_output : int {
         ok = 0,
-        help_call,
-        help_all_call,
-        version_call,
-        parse_error,
+        help_call = 1,
+        help_all_call = 2,
+        version_call = 4,
+        parse_error = -4,
     };
     bool quiet{false};
     parse_output last_output{parse_output::ok};
 
     template<typename... Args>
-    parse_output helics_parse(Args&&... args)
+    parse_output helics_parse(Args&&... args) noexcept
     {
         try {
             parse(std::forward<Args>(args)...);
@@ -88,6 +88,10 @@ class helicsCLI11App: public CLI::App {
         }
         catch (const CLI::Error& ce) {
             CLI::App::exit(ce);
+            last_output = parse_output::parse_error;
+            return parse_output::parse_error;
+        }
+        catch (...) {
             last_output = parse_output::parse_error;
             return parse_output::parse_error;
         }
