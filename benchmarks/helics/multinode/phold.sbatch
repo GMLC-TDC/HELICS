@@ -42,7 +42,7 @@ fi
 command -v "${helics_bm_fed_exe}" || { echo >&2 "unable to find benchmark federate at ${helics_bm_fed_exe}; check for working build and set BUILD_PATH if needed"; exit 1; }
 
 # create an output folder for results
-output_folder="${BM_FED}-job-${SLURM_JOB_ID}"
+output_folder="${BM_FED}-${CORE_TYPE}-N${SLURM_JOB_NUM_NODES}-job-${SLURM_JOB_ID}"
 mkdir -p "${output_folder}"
 
 # Run info and srun job launch
