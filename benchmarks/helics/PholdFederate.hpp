@@ -47,17 +47,26 @@ class PholdFederate {
     std::uniform_real_distribution<double> rand_uniform_double;
     std::uniform_int_distribution<unsigned int> rand_uniform_int;
 
+    // callbacks for instrumenting the code
+    std::function<void()> callBeforeFinalize = nullptr;
+    std::function<void()> callAfterFinalize = nullptr;
+
     bool initialized{false};
     bool readyToRun{false};
 
   public:
     PholdFederate() = default;
 
+    // functions for setting parameters
     void setGenerateRandomSeed(bool b) { generateRandomSeed = b; };
     void setRandomSeed(unsigned int s) { seed = s; };
     void setRandomTimeMean(double mean) { randTimeMean_ = mean; };
     void setInitialEventCount(unsigned int count) { initEvCount_ = count; };
     void setLocalProbability(double p) { localProbability_ = p; };
+
+    // functions for setting callbacks
+    void setBeforeFinalizeCallback(std::function<void()> cb = nullptr) { callBeforeFinalize = cb; };
+    void setAfterFinalizeCallback(std::function<void()> cb = nullptr) { callAfterFinalize = cb; };
 
     void run(std::function<void()> callOnReady = nullptr)
     {
@@ -70,11 +79,17 @@ class PholdFederate {
 
     void initialize(const std::string& coreName, int index, int maxIndex)
     {
+        helics::FederateInfo fi;
+        fi.coreName = coreName;
+        initialize(fi, index, maxIndex);
+    }
+
+    void initialize(const helics::FederateInfo fi, int index, int maxIndex)
+    {
         std::string name = "phold_" + std::to_string(index);
         index_ = index;
         maxIndex_ = maxIndex;
-        helics::FederateInfo fi;
-        fi.coreName = coreName;
+
         mFed = std::make_unique<helics::MessageFederate>(name, fi);
         ept = &mFed->registerEndpoint("ept");
 
@@ -92,6 +107,17 @@ class PholdFederate {
             rand_uniform_int = std::uniform_int_distribution<unsigned int>(0, maxIndex_ - 2);
         }
         initialized = true;
+    }
+
+    void finalize()
+    {
+        if (callBeforeFinalize) {
+            callBeforeFinalize();
+        }
+        mFed->finalize();
+        if (callAfterFinalize) {
+            callAfterFinalize();
+        }
     }
 
     void makeReady()
@@ -141,6 +167,6 @@ class PholdFederate {
                 createNewEvent();
             }
         }
-        mFed->finalize();
+        finalize();
     }
 };

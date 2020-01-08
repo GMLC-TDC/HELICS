@@ -32,20 +32,23 @@ foreach(T ${HELICS_BENCHMARKS})
 
 endforeach()
 
+add_executable(PholdFederate PholdFederateMain.cpp)
+target_link_libraries(PholdFederate PUBLIC helics_application_api)
+
 target_sources(filterBenchmarks PUBLIC EchoMessage.hpp)
 target_sources(echoMessageBenchmarks PUBLIC EchoMessage.hpp)
 target_sources(pholdBenchmarks PUBLIC PholdFederate.hpp)
 
 copy_key_files_to_target_location(ActionMessageBenchmarks)
 
-string(TIMESTAMP current_date "%Y-%m-%d") 
+string(TIMESTAMP current_date "%Y-%m-%d")
 string(RANDOM rname)
 
 
 
 set(BM_RESULT_DIR )
 # add a custom target to run all the benchmarks in a consistent fashion
-add_custom_target(RUN_ALL_BENCHMARKS  
+add_custom_target(RUN_ALL_BENCHMARKS
                   COMMAND ActionMessageBenchmarks --benchmark_format=json ">${BM_RESULT_DIR}bm_ActionMessageResults${current_date}_${rname}.txt"
 				  COMMAND conversionBenchmarks --benchmark_format=json ">${BM_RESULT_DIR}bm_conversionResults${current_date}_${rname}.txt"
 				  COMMAND echoBenchmarks --benchmark_format=json ">${BM_RESULT_DIR}bm_echoResults${current_date}_${rname}.txt"
@@ -56,7 +59,7 @@ add_custom_target(RUN_ALL_BENCHMARKS
 				  COMMAND filterBenchmarks --benchmark_format=json ">${BM_RESULT_DIR}bm_filterResults${current_date}_${rname}.txt"
 				  COMMAND pholdBenchmarks --benchmark_format=json ">${BM_RESULT_DIR}bm_pholdResults${current_date}_${rname}.txt"
 				  COMMAND messageSendBenchmarks --benchmark_format=json ">${BM_RESULT_DIR}bm_messageSendResults${current_date}_${rname}.txt"
-				  ) 
+				  )
 
 foreach(T ${HELICS_BENCHMARKS})
 	add_dependencies(RUN_ALL_BENCHMARKS ${T})
@@ -64,7 +67,7 @@ endforeach()
 
 set_target_properties(RUN_ALL_BENCHMARKS PROPERTIES FOLDER benchmarks)
 
-add_custom_target(RUN_KEY_BENCHMARKS  
+add_custom_target(RUN_KEY_BENCHMARKS
                   COMMAND conversionBenchmarks --benchmark_format=json ">${BM_RESULT_DIR}bmk_conversionResults${current_date}_${rname}.txt"
 				  COMMAND echoBenchmarks --benchmark_format=json --benchmark_filter=/4 ">${BM_RESULT_DIR}bmk_echoResults${current_date}_${rname}.txt"
                   COMMAND timingBenchmarks --benchmark_format=json --benchmark_filter=/4 ">${BM_RESULT_DIR}bmk_timingResults${current_date}_${rname}.txt"
