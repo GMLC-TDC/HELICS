@@ -11,6 +11,12 @@ if [[ "${BM_FED}" == "" ]]; then
     BM_FED="PholdFederate"
 fi
 
+# set coretype to other cores using --export=CORE_TYPE='<type>' argument to sbatch
+if [[ "${CORE_TYPE}" == "" ]]; then
+    CORE_TYPE="zmq"
+fi
+echo "Running ${BM_FED} benchmark on ${SLURM_JOB_NUM_NODES} nodes with core type ${CORE_TYPE}"
+
 # set BUILD_PATH using sbatch argument --export=BUILD_PATH='<path>'
 # default path is to a folder named build in the root of the git repository
 if [[ "$BUILD_PATH" == "" ]]; then
@@ -41,7 +47,7 @@ mkdir -p "${output_folder}"
 
 # Run info and srun job launch
 echo "Running broker on $HOSTNAME"
-"${BUILD_PATH}/src/helics/apps/helics_broker" --all -f "${SLURM_JOB_NUM_NODES}" --loglevel=5 > "${output_folder}/helics-broker-out.txt" 2>&1 &
+"${BUILD_PATH}/src/helics/apps/helics_broker" --all -f "${SLURM_JOB_NUM_NODES}" --coretype "${CORE_TYPE}" --loglevel=5 > "${output_folder}/helics-broker-out.txt" 2>&1 &
 
 # give some time for the broker to start up
 sleep 5
@@ -51,7 +57,7 @@ sleep 5
 for i in $(seq 1 "${SLURM_JOB_NUM_NODES}");
 do
     (( idx = i-1 ))
-    srun -N1 "${helics_bm_fed_exe}" --index="$idx" --max_index="${SLURM_JOB_NUM_NODES}" --broker="${HOSTNAME}" > "${output_folder}/${BM_FED}-${idx}-out.txt" 2>&1 &
+    srun -N1 "${helics_bm_fed_exe}" --index="$idx" --max_index="${SLURM_JOB_NUM_NODES}" --broker="${HOSTNAME}" --coretype "${CORE_TYPE}" > "${output_folder}/${BM_FED}-${idx}-out.txt" 2>&1 &
 done
 
 wait
