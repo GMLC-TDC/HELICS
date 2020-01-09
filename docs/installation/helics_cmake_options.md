@@ -75,3 +75,4 @@ There are a few options in the CMake system that are not visible in the GUI they
 -   `HELICS_DISABLE_SYSTEM_CALL_TESTS` :  There are a few test that execute system calls, which could be problematic to compile or execute on certain platforms.  This option removes those tests from compilation.  
 -   `INSTALL_SYSTEM_LIBRARIES` : Install system libraries with the installation,  mainly useful for making a complete installer package with all needed libraries included.  
 =   `HELICS_INSTALL_PACKAGE_TESTS` : Set the find_package tests to only look for HELICS in the system install paths, and enable the package-config-tests
+-   `HELICS_SKIP_ZMQ_INSTALL`:  This is only relevant if ZMQ is built as part of the compilation process, but it skips the installation of zmq as part of HELICS install in that case.  

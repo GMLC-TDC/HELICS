@@ -121,7 +121,7 @@ else()
 endif() # ${PROJECT_NAME}_USE_SYSTEM_ZEROMQ_ONLY
 hide_variable(ZeroMQ_DIR)
 
-if(WIN32)
+if(WIN32 AND NOT MSYS AND NOT CYGWIN)
     if(TARGET libzmq)
         install(
             FILES $<TARGET_FILE:libzmq>
