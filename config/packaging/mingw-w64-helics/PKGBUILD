@@ -14,9 +14,10 @@ depends=("${MINGW_PACKAGE_PREFIX}-zeromq"
 makedepends=("${MINGW_PACKAGE_PREFIX}-gcc"
              "${MINGW_PACKAGE_PREFIX}-cmake"
              "${MINGW_PACKAGE_PREFIX}-zeromq"
+             make
              "${MINGW_PACKAGE_PREFIX}-boost"
              "${MINGW_PACKAGE_PREFIX}-python3")
-options=('staticlibs' '!strip' '!buildflags')
+options=('!staticlibs' '!strip')
 source=("${_realname}-${pkgver}.tar.gz"::"https://github.com/GMLC-TDC/HELICS/releases/download/v${pkgver}/HELICS-v${pkgver}-source.tar.gz")
 sha256sums=('ffc4c8fa8fa593186a64288849a69c707ed91820448ff965947e32cdd54f9308')
 
