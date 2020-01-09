@@ -808,7 +808,7 @@ void helicsCoreAddDestinationFilterToEndpoint(helics_core core, const char* filt
 {
     auto cr = getCore(core, err);
     if (cr == nullptr) {
-        return;
+        return; 
     }
     if ((filter == nullptr) || (endpoint == nullptr)) {
         if (err != nullptr) {
@@ -948,9 +948,11 @@ void helicsCoreDisconnect(helics_core core, helics_error* err)
     try {
         cr->disconnect();
     }
+    // LCOV_EXCL_START
     catch (...) {
         helicsErrorHandler(err);
     }
+    // LCOV_EXCL_STOP
 }
 
 helics_bool helicsBrokerWaitForDisconnect(helics_broker broker, int msToWait, helics_error* err)

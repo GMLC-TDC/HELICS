@@ -661,6 +661,13 @@ TEST_F(function_tests, initError4)
     EXPECT_NE(err.error_code, 0);
 }
 
+
+TEST_F(function_tests, version)
+{
+    auto b = helicsGetVersion();
+    EXPECT_NE(b, nullptr);
+}
+
 TEST_F(function_tests, initError5)
 {
     SetupTest(helicsCreateValueFederate, "test", 1);
@@ -716,6 +723,87 @@ TEST_F(function_tests, initError6)
     helicsFederateRequestTimeIterativeComplete(vFed1, nullptr, &err);
     EXPECT_NE(err.error_code, 0);
     helicsErrorClear(&err);
+
+    helicsFederateFinalize(vFed1, nullptr);
+}
+
+// Test the core data link function and Get Federate By Name function for functionality and errors
+TEST_F(function_tests, CoreLink)
+{
+    SetupTest(helicsCreateValueFederate, "test", 1);
+    auto vFed1 = GetFederateAt(0);
+    // register the publications
+
+    helicsFederateRegisterGlobalTypePublication(vFed1, "pub1", "custom1", "", nullptr);
+
+    helicsFederateRegisterTypeInput(vFed1, "inp1", "custom2", "", nullptr);
+
+    auto fed2 = helicsGetFederateByName(helicsFederateGetName(vFed1), &err);
+    EXPECT_EQ(err.error_code, 0);
+    EXPECT_NE(fed2, nullptr);
+    EXPECT_STREQ(helicsFederateGetName(fed2), helicsFederateGetName(vFed1));
+
+    auto fed3 = helicsGetFederateByName("fed_unknown", &err);
+    EXPECT_NE(err.error_code, 0);
+    EXPECT_EQ(fed3, nullptr);
+    helicsErrorClear(&err);
+    auto cr = helicsFederateGetCoreObject(vFed1, &err);
+    EXPECT_NE(cr, nullptr);
+    helicsCoreDataLink(cr, "pub1", "fed0/inp1", &err);
+
+    EXPECT_EQ(err.error_code, 0);
+
+    helicsCoreMakeConnections(cr, "non-file.json", &err);
+    EXPECT_NE(err.error_code, 0);
+    helicsErrorClear(&err);
+
+    helicsCoreDataLink(cr, "pub1", nullptr, &err);
+    EXPECT_NE(err.error_code, 0);
+    helicsErrorClear(&err);
+
+    auto cr2 = helicsCoreClone(cr, &err);
+    EXPECT_NE(cr2, nullptr);
+    EXPECT_STREQ(helicsCoreGetAddress(cr2), helicsCoreGetAddress(cr));
+
+    helicsFederateEnterExecutingMode(vFed1, &err);
+    EXPECT_NE(err.error_code, 0);
+    helicsErrorClear(&err);
+
+
+    helicsFederateFinalize(vFed1, nullptr);
+}
+
+// Test the core data link function and Get Federate By Name function for functionality and errors
+TEST_F(function_tests, BrokerLink)
+{
+    SetupTest(helicsCreateValueFederate, "test", 1);
+    auto vFed1 = GetFederateAt(0);
+    // register the publications
+
+    helicsFederateRegisterGlobalTypePublication(vFed1, "pub1", "custom1", "", nullptr);
+
+    helicsFederateRegisterTypeInput(vFed1, "inp1", "custom2", "", nullptr);
+
+    auto br = helicsBrokerClone(brokers[0], &err);
+    EXPECT_NE(br, nullptr);
+
+    
+    helicsBrokerDataLink(br, "pub1", "fed0/inp1", &err);
+
+    EXPECT_EQ(err.error_code, 0);
+
+    helicsBrokerDataLink(br, "pub1", nullptr, &err);
+    EXPECT_NE(err.error_code, 0);
+    helicsErrorClear(&err);
+
+    helicsBrokerMakeConnections(br, "non-file.json", &err);
+    EXPECT_NE(err.error_code, 0);
+    helicsErrorClear(&err);
+
+    helicsFederateEnterExecutingMode(vFed1, &err);
+    EXPECT_NE(err.error_code, 0);
+    helicsErrorClear(&err);
+
 
     helicsFederateFinalize(vFed1, nullptr);
 }

@@ -576,6 +576,315 @@ TEST_F(filter_tests, clone_test)
     EXPECT_TRUE(state == helics_state_finalize);
 }
 
+
+TEST_F(filter_tests, clone_test_connections)
+{
+    auto broker = AddBroker("test", 3);
+    AddFederates(helicsCreateMessageFederate, "test", 1, broker, 1.0, "source");
+    AddFederates(helicsCreateMessageFederate, "test", 1, broker, 1.0, "dest");
+    AddFederates(helicsCreateMessageFederate, "test", 1, broker, 1.0, "dest_clone");
+
+    auto sFed = GetFederateAt(0);
+    auto dFed = GetFederateAt(1);
+    auto dcFed = GetFederateAt(2);
+
+    auto p1 = helicsFederateRegisterGlobalEndpoint(sFed, "src", "", &err);
+    auto p2 = helicsFederateRegisterGlobalEndpoint(dFed, "dest", "", &err);
+    auto p3 = helicsFederateRegisterGlobalEndpoint(dcFed, "cm", "", &err);
+
+    auto f1 = helicsFederateRegisterGlobalCloningFilter(dcFed, "filt1", &err);
+    CE(helicsFilterAddDeliveryEndpoint(f1, "cm", &err));
+    EXPECT_TRUE(err.error_code == helics_ok);
+
+    auto cr = helicsFederateGetCoreObject(sFed, &err);
+     
+    CE(helicsCoreAddSourceFilterToEndpoint(cr, "filt1", "src", &err));
+
+    //error test
+    helicsCoreAddSourceFilterToEndpoint(cr, nullptr, "src", &err);
+    EXPECT_NE(err.error_code, 0);
+        helicsErrorClear(&err);
+
+    CE(helicsFederateEnterExecutingModeAsync(sFed, &err));
+    CE(helicsFederateEnterExecutingModeAsync(dcFed, &err));
+    CE(helicsFederateEnterExecutingMode(dFed, &err));
+    CE(helicsFederateEnterExecutingModeComplete(sFed, &err));
+    CE(helicsFederateEnterExecutingModeComplete(dcFed, &err));
+
+    CE(helics_federate_state state = helicsFederateGetState(sFed, &err));
+    EXPECT_TRUE(state == helics_state_execution);
+    std::string data(500, 'a');
+    CE(helicsEndpointSendMessageRaw(p1, "dest", data.c_str(), static_cast<int>(data.size()), &err));
+
+    CE(helicsFederateRequestTimeAsync(sFed, 1.0, &err));
+    CE(helicsFederateRequestTimeAsync(dcFed, 1.0, &err));
+    CE(helicsFederateRequestTime(dFed, 1.0, &err));
+    CE(helicsFederateRequestTimeComplete(sFed, &err));
+    CE(helicsFederateRequestTimeComplete(dcFed, &err));
+
+    auto res = helicsFederateHasMessage(dFed);
+    EXPECT_TRUE(res);
+
+    if (res) {
+        auto m2 = helicsEndpointGetMessage(p2);
+        EXPECT_STREQ(m2.source, "src");
+        EXPECT_STREQ(m2.original_source, "src");
+        EXPECT_STREQ(m2.dest, "dest");
+        EXPECT_EQ(m2.length, static_cast<int64_t>(data.size()));
+    }
+
+    // now check the message clone
+    res = helicsFederateHasMessage(dcFed);
+    EXPECT_TRUE(res);
+
+    if (res) {
+        auto m2 = helicsEndpointGetMessage(p3);
+        EXPECT_STREQ(m2.source, "src");
+        EXPECT_STREQ(m2.original_source, "src");
+        EXPECT_STREQ(m2.dest, "cm");
+        EXPECT_STREQ(m2.original_dest, "dest");
+        EXPECT_EQ(m2.length, static_cast<int64_t>(data.size()));
+    }
+
+    CE(helicsFederateFinalizeAsync(sFed, &err));
+    CE(helicsFederateFinalizeAsync(dFed, &err));
+    CE(helicsFederateFinalize(dcFed, &err));
+    CE(helicsFederateFinalizeComplete(sFed, &err));
+    CE(helicsFederateFinalizeComplete(dFed, &err));
+    CE(state = helicsFederateGetState(sFed, &err));
+    EXPECT_TRUE(state == helics_state_finalize);
+}
+
+TEST_F(filter_tests, clone_test_broker_connections)
+{
+    auto broker = AddBroker("test", 3);
+    AddFederates(helicsCreateMessageFederate, "test", 1, broker, 1.0, "source");
+    AddFederates(helicsCreateMessageFederate, "test", 1, broker, 1.0, "dest");
+    AddFederates(helicsCreateMessageFederate, "test", 1, broker, 1.0, "dest_clone");
+
+    auto sFed = GetFederateAt(0);
+    auto dFed = GetFederateAt(1);
+    auto dcFed = GetFederateAt(2);
+
+    auto p1 = helicsFederateRegisterGlobalEndpoint(sFed, "src", "", &err);
+    auto p2 = helicsFederateRegisterGlobalEndpoint(dFed, "dest", "", &err);
+    auto p3 = helicsFederateRegisterGlobalEndpoint(dcFed, "cm", "", &err);
+
+    auto f1 = helicsFederateRegisterGlobalCloningFilter(dcFed, "filt1", &err);
+    CE(helicsFilterAddDeliveryEndpoint(f1, "cm", &err));
+    EXPECT_TRUE(err.error_code == helics_ok);
+
+    CE(helicsBrokerAddSourceFilterToEndpoint(brokers[0], "filt1", "src", &err));
+
+    //error test
+    helicsBrokerAddSourceFilterToEndpoint(brokers[0], nullptr, "src", &err);
+    EXPECT_NE(err.error_code, 0);
+    helicsErrorClear(&err);
+
+    CE(helicsFederateEnterExecutingModeAsync(sFed, &err));
+    CE(helicsFederateEnterExecutingModeAsync(dcFed, &err));
+    CE(helicsFederateEnterExecutingMode(dFed, &err));
+    CE(helicsFederateEnterExecutingModeComplete(sFed, &err));
+    CE(helicsFederateEnterExecutingModeComplete(dcFed, &err));
+
+    CE(helics_federate_state state = helicsFederateGetState(sFed, &err));
+    EXPECT_TRUE(state == helics_state_execution);
+    std::string data(500, 'a');
+    CE(helicsEndpointSendMessageRaw(p1, "dest", data.c_str(), static_cast<int>(data.size()), &err));
+
+    CE(helicsFederateRequestTimeAsync(sFed, 1.0, &err));
+    CE(helicsFederateRequestTimeAsync(dcFed, 1.0, &err));
+    CE(helicsFederateRequestTime(dFed, 1.0, &err));
+    CE(helicsFederateRequestTimeComplete(sFed, &err));
+    CE(helicsFederateRequestTimeComplete(dcFed, &err));
+
+    auto res = helicsFederateHasMessage(dFed);
+    EXPECT_TRUE(res);
+
+    if (res) {
+        auto m2 = helicsEndpointGetMessage(p2);
+        EXPECT_STREQ(m2.source, "src");
+        EXPECT_STREQ(m2.original_source, "src");
+        EXPECT_STREQ(m2.dest, "dest");
+        EXPECT_EQ(m2.length, static_cast<int64_t>(data.size()));
+    }
+
+    // now check the message clone
+    res = helicsFederateHasMessage(dcFed);
+    EXPECT_TRUE(res);
+
+    if (res) {
+        auto m2 = helicsEndpointGetMessage(p3);
+        EXPECT_STREQ(m2.source, "src");
+        EXPECT_STREQ(m2.original_source, "src");
+        EXPECT_STREQ(m2.dest, "cm");
+        EXPECT_STREQ(m2.original_dest, "dest");
+        EXPECT_EQ(m2.length, static_cast<int64_t>(data.size()));
+    }
+
+    CE(helicsFederateFinalizeAsync(sFed, &err));
+    CE(helicsFederateFinalizeAsync(dFed, &err));
+    CE(helicsFederateFinalize(dcFed, &err));
+    CE(helicsFederateFinalizeComplete(sFed, &err));
+    CE(helicsFederateFinalizeComplete(dFed, &err));
+    CE(state = helicsFederateGetState(sFed, &err));
+    EXPECT_TRUE(state == helics_state_finalize);
+}
+
+TEST_F(filter_tests, clone_test_dest_connections)
+{
+    auto broker = AddBroker("test", 3);
+    AddFederates(helicsCreateMessageFederate, "test", 1, broker, 1.0, "source");
+    AddFederates(helicsCreateMessageFederate, "test", 1, broker, 1.0, "dest");
+    AddFederates(helicsCreateMessageFederate, "test", 1, broker, 1.0, "dest_clone");
+
+    auto sFed = GetFederateAt(0);
+    auto dFed = GetFederateAt(1);
+    auto dcFed = GetFederateAt(2);
+
+    auto p1 = helicsFederateRegisterGlobalEndpoint(sFed, "src", "", &err);
+    auto p2 = helicsFederateRegisterGlobalEndpoint(dFed, "dest", "", &err);
+    auto p3 = helicsFederateRegisterGlobalEndpoint(dcFed, "cm", "", &err);
+
+    auto f1 = helicsFederateRegisterGlobalCloningFilter(dcFed, "filt1", &err);
+    CE(helicsFilterAddDeliveryEndpoint(f1, "cm", &err));
+    EXPECT_TRUE(err.error_code == helics_ok);
+
+    auto cr = helicsFederateGetCoreObject(sFed, &err); 
+
+    CE(helicsCoreAddDestinationFilterToEndpoint(cr, "filt1", "dest", &err));
+
+    //error test
+    helicsCoreAddDestinationFilterToEndpoint(cr, nullptr, "dest", &err);
+    EXPECT_NE(err.error_code, 0);
+    helicsErrorClear(&err);
+
+    CE(helicsFederateEnterExecutingModeAsync(sFed, &err));
+    CE(helicsFederateEnterExecutingModeAsync(dcFed, &err));
+    CE(helicsFederateEnterExecutingMode(dFed, &err));
+    CE(helicsFederateEnterExecutingModeComplete(sFed, &err));
+    CE(helicsFederateEnterExecutingModeComplete(dcFed, &err));
+
+    CE(helics_federate_state state = helicsFederateGetState(sFed, &err));
+    EXPECT_TRUE(state == helics_state_execution);
+    std::string data(500, 'a');
+    CE(helicsEndpointSendMessageRaw(p1, "dest", data.c_str(), static_cast<int>(data.size()), &err));
+
+    CE(helicsFederateRequestTimeAsync(sFed, 1.0, &err));
+    CE(helicsFederateRequestTimeAsync(dcFed, 1.0, &err));
+    CE(helicsFederateRequestTime(dFed, 1.0, &err));
+    CE(helicsFederateRequestTimeComplete(sFed, &err));
+    CE(helicsFederateRequestTimeComplete(dcFed, &err));
+
+    auto res = helicsFederateHasMessage(dFed);
+    EXPECT_TRUE(res);
+
+    if (res) {
+        auto m2 = helicsEndpointGetMessage(p2);
+        EXPECT_STREQ(m2.source, "src");
+        EXPECT_STREQ(m2.original_source, "src");
+        EXPECT_STREQ(m2.dest, "dest");
+        EXPECT_EQ(m2.length, static_cast<int64_t>(data.size()));
+    }
+
+    // now check the message clone
+    res = helicsFederateHasMessage(dcFed);
+    EXPECT_TRUE(res);
+
+    if (res) {
+        auto m2 = helicsEndpointGetMessage(p3);
+        EXPECT_STREQ(m2.source, "src");
+        EXPECT_STREQ(m2.original_source, "src");
+        EXPECT_STREQ(m2.dest, "cm");
+        EXPECT_STREQ(m2.original_dest, "dest");
+        EXPECT_EQ(m2.length, static_cast<int64_t>(data.size()));
+    }
+
+    CE(helicsFederateFinalizeAsync(sFed, &err));
+    CE(helicsFederateFinalizeAsync(dFed, &err));
+    CE(helicsFederateFinalize(dcFed, &err));
+    CE(helicsFederateFinalizeComplete(sFed, &err));
+    CE(helicsFederateFinalizeComplete(dFed, &err));
+    CE(state = helicsFederateGetState(sFed, &err));
+    EXPECT_TRUE(state == helics_state_finalize);
+}
+
+TEST_F(filter_tests, clone_test_broker_dest_connections)
+{
+    auto broker = AddBroker("test", 3);
+    AddFederates(helicsCreateMessageFederate, "test", 1, broker, 1.0, "source");
+    AddFederates(helicsCreateMessageFederate, "test", 1, broker, 1.0, "dest");
+    AddFederates(helicsCreateMessageFederate, "test", 1, broker, 1.0, "dest_clone");
+
+    auto sFed = GetFederateAt(0);
+    auto dFed = GetFederateAt(1);
+    auto dcFed = GetFederateAt(2);
+
+    auto p1 = helicsFederateRegisterGlobalEndpoint(sFed, "src", "", &err);
+    auto p2 = helicsFederateRegisterGlobalEndpoint(dFed, "dest", "", &err);
+    auto p3 = helicsFederateRegisterGlobalEndpoint(dcFed, "cm", "", &err);
+
+    auto f1 = helicsFederateRegisterGlobalCloningFilter(dcFed, "filt1", &err);
+    CE(helicsFilterAddDeliveryEndpoint(f1, "cm", &err));
+    EXPECT_TRUE(err.error_code == helics_ok);
+
+    CE(helicsBrokerAddDestinationFilterToEndpoint(brokers[0], "filt1", "dest", &err));
+
+    //error test
+    helicsBrokerAddDestinationFilterToEndpoint(brokers[0], nullptr, "dest", &err);
+    EXPECT_NE(err.error_code, 0);
+    helicsErrorClear(&err);
+
+    CE(helicsFederateEnterExecutingModeAsync(sFed, &err));
+    CE(helicsFederateEnterExecutingModeAsync(dcFed, &err));
+    CE(helicsFederateEnterExecutingMode(dFed, &err));
+    CE(helicsFederateEnterExecutingModeComplete(sFed, &err));
+    CE(helicsFederateEnterExecutingModeComplete(dcFed, &err));
+
+    CE(helics_federate_state state = helicsFederateGetState(sFed, &err));
+    EXPECT_TRUE(state == helics_state_execution);
+    std::string data(500, 'a');
+    CE(helicsEndpointSendMessageRaw(p1, "dest", data.c_str(), static_cast<int>(data.size()), &err));
+
+    CE(helicsFederateRequestTimeAsync(sFed, 1.0, &err));
+    CE(helicsFederateRequestTimeAsync(dcFed, 1.0, &err));
+    CE(helicsFederateRequestTime(dFed, 1.0, &err));
+    CE(helicsFederateRequestTimeComplete(sFed, &err));
+    CE(helicsFederateRequestTimeComplete(dcFed, &err));
+
+    auto res = helicsFederateHasMessage(dFed);
+    EXPECT_TRUE(res);
+
+    if (res) {
+        auto m2 = helicsEndpointGetMessage(p2);
+        EXPECT_STREQ(m2.source, "src");
+        EXPECT_STREQ(m2.original_source, "src");
+        EXPECT_STREQ(m2.dest, "dest");
+        EXPECT_EQ(m2.length, static_cast<int64_t>(data.size()));
+    }
+
+    // now check the message clone
+    res = helicsFederateHasMessage(dcFed);
+    EXPECT_TRUE(res);
+
+    if (res) {
+        auto m2 = helicsEndpointGetMessage(p3);
+        EXPECT_STREQ(m2.source, "src");
+        EXPECT_STREQ(m2.original_source, "src");
+        EXPECT_STREQ(m2.dest, "cm");
+        EXPECT_STREQ(m2.original_dest, "dest");
+        EXPECT_EQ(m2.length, static_cast<int64_t>(data.size()));
+    }
+
+    CE(helicsFederateFinalizeAsync(sFed, &err));
+    CE(helicsFederateFinalizeAsync(dFed, &err));
+    CE(helicsFederateFinalize(dcFed, &err));
+    CE(helicsFederateFinalizeComplete(sFed, &err));
+    CE(helicsFederateFinalizeComplete(dFed, &err));
+    CE(state = helicsFederateGetState(sFed, &err));
+    EXPECT_TRUE(state == helics_state_finalize);
+}
+
 TEST_F(filter_tests, multi_clone_test)
 {
     auto broker = AddBroker("test", 4);
