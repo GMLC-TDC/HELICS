@@ -1982,6 +1982,10 @@ void CoreBroker::FindandNotifyFilterTargets(BasicHandleInfo& handleInfo)
         ActionMessage m(CMD_ADD_FILTER);
         m.setSource(handleInfo.handle);
         m.flags = target.second;
+        if (checkActionFlag(handleInfo, clone_flag))
+        {
+            setActionFlag(m, clone_flag);
+        }
         m.setDestination(target.first);
         if ((!handleInfo.type_in.empty()) || (!handleInfo.type_out.empty())) {
             m.setStringData(handleInfo.type_in, handleInfo.type_out);
@@ -2000,6 +2004,7 @@ void CoreBroker::FindandNotifyFilterTargets(BasicHandleInfo& handleInfo)
         ActionMessage m(CMD_ADD_NAMED_ENDPOINT);
         m.name = target;
         m.setSource(handleInfo.handle);
+        m.flags = handleInfo.flags;
         setActionFlag(m, destination_target);
         checkForNamedInterface(m);
     }
@@ -2008,6 +2013,7 @@ void CoreBroker::FindandNotifyFilterTargets(BasicHandleInfo& handleInfo)
     for (auto target : FiltSourceTargets) {
         ActionMessage m(CMD_ADD_NAMED_ENDPOINT);
         m.name = target;
+        m.flags = handleInfo.flags;
         m.setSource(handleInfo.handle);
         checkForNamedInterface(m);
     }
