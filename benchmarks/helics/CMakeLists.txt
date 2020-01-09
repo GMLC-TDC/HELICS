@@ -32,6 +32,9 @@ foreach(T ${HELICS_BENCHMARKS})
 
 endforeach()
 
+add_executable(PholdFederate PholdFederateMain.cpp)
+target_link_libraries(PholdFederate PUBLIC helics_application_api)
+
 add_executable(echoBenchmarks_c echoBenchmarks_c.cpp)
 target_link_libraries(echoBenchmarks_c PUBLIC helicsSharedLib)
 add_benchmark(echoBenchmarks_c)
