@@ -6,11 +6,11 @@ SPDX-License-Identifier: BSD-3-Clause
 */
 
 #include "PholdFederate.hpp"
-#include "helics_benchmark_util.h"
 #include "helics/core/helicsCLI11.hpp"
+#include "helics_benchmark_util.h"
 
-#include <iostream>
 #include <chrono>
+#include <iostream>
 #include <random>
 
 int main(int argc, char* argv[])
@@ -19,26 +19,34 @@ int main(int argc, char* argv[])
     int max_index = 0;
     unsigned int init_ev_count = 16; // starting number of events
     double local_prob = .9; // probability of local events
-    double rand_time_mean = .9; // * deltaTime, mean for exponential distribution used when picking event times
+    double rand_time_mean =
+        .9; // * deltaTime, mean for exponential distribution used when picking event times
     bool gen_rand_seed;
     unsigned int rand_seed;
 
     helics::helicsCLI11App app("phold benchmark federate");
 
     auto opt_index = app.add_option("--index", index, "the index of this phold federate");
-    auto opt_max_index = app.add_option("--max_index", max_index, "the maximum index given to a phold federate");
+    auto opt_max_index =
+        app.add_option("--max_index", max_index, "the maximum index given to a phold federate");
     opt_index->required();
     opt_max_index->required();
     opt_max_index->ignore_underscore();
 
-    auto opt_init_ev_count = app.add_option("--init_ev_count", init_ev_count, "the starting number of events");
-    auto opt_local_prob = app.add_option("--local_probability", local_prob, "the probability of local events");
-    auto opt_rand_time_mean = app.add_option("--rand_time_mean", rand_time_mean, "mean for the exponential distribution used when picking event times");
-    auto opt_gen_rand_seed = app.add_flag("--gen_rand_seed", gen_rand_seed, "enable generating a random seed");
+    auto opt_init_ev_count =
+        app.add_option("--init_ev_count", init_ev_count, "the starting number of events");
+    auto opt_local_prob =
+        app.add_option("--local_probability", local_prob, "the probability of local events");
+    auto opt_rand_time_mean = app.add_option(
+        "--rand_time_mean",
+        rand_time_mean,
+        "mean for the exponential distribution used when picking event times");
+    auto opt_gen_rand_seed =
+        app.add_flag("--gen_rand_seed", gen_rand_seed, "enable generating a random seed");
     auto opt_set_rand_seed = app.add_option("--set_rand_seed", rand_seed, "set the random seed");
-    
+
     app.allow_extras();
-    
+
     auto res = app.helics_parse(argc, argv);
     helics::FederateInfo fi;
 
@@ -54,7 +62,7 @@ int main(int argc, char* argv[])
     }
 
     fi.loadInfoFromArgs(app.remainArgs());
-   
+
     PholdFederate fed;
 
     if (*opt_init_ev_count) {
@@ -68,7 +76,7 @@ int main(int argc, char* argv[])
     if (*opt_rand_time_mean) {
         fed.setRandomTimeMean(rand_time_mean);
     }
-    
+
     if (*opt_gen_rand_seed) {
         fed.setGenerateRandomSeed(gen_rand_seed);
     } else {
@@ -98,7 +106,8 @@ int main(int argc, char* argv[])
     fed.run([&start_time]() { start_time = std::chrono::steady_clock::now(); });
 
     // print duration
-    auto elapsed = std::chrono::duration_cast<std::chrono::nanoseconds>(end_time-start_time).count();
+    auto elapsed =
+        std::chrono::duration_cast<std::chrono::nanoseconds>(end_time - start_time).count();
     std::cout << "ELAPSED TIME (ns): " << elapsed << std::endl;
     std::cout << "EVENT COUNT: " << fed.evCount << std::endl;
 }
