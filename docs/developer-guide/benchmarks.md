@@ -39,4 +39,10 @@ sending messages between 2 federates varying the message size and count
 ## Standardized Tests
 
 ### PHold
-    a standard PHOLD benchmark varying the number of federates.  
+    a standard PHOLD benchmark varying the number of federates.
+    
+## Multinode Benchmarks
+
+Some of the benchmarks above have multinode variants. These benchmarks will have a standalone binary for the federate used in the benchmark that can be run on each node. Any multinode benchmark run will require some setup to make it launch in your particular environment and knowing the basics for the job scheduler on your cluster will be very helpful.
+
+Any sbatch files for multinode benchmark runs in the repository are setup for running in the pdebug queue on LC's Quartz cluster. They are unlikely to work as is on other clusters, however they should work as a starting point for other clusters using slurm. The minimum changes required are likely to involve setting the queue/partition correctly and ensuring the right bank/account for charging CPU time is used.
