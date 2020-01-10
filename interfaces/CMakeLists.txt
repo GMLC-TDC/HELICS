@@ -85,7 +85,7 @@ cmake_dependent_advanced_option(
     OFF
 )
 # cmake-format: on
-    
+
 
 cmake_dependent_option(
     HELICS_ENABLE_SWIG
@@ -133,10 +133,23 @@ if(HELICS_ENABLE_SWIG OR swig_required)
     include(${SWIG_USE_FILE})
 endif()
 
-# these includes are for all the interface builds which use the shared library
-include_directories(${CMAKE_CURRENT_SOURCE_DIR})
-include_directories("${HELICS_SOURCE_DIR}/src/helics/shared_api_library")
-include_directories("${HELICS_BINARY_DIR}/src/helics/shared_api_library")
+# add base swig interface files as install option, regardless of current
+# interfaces built
+if(NOT HELICS_BINARY_ONLY_INSTALL AND NOT HELICS_DISABLE_C_SHARED_LIB)
+    install(
+        FILES helics.i
+        DESTINATION ${CMAKE_INSTALL_DATADIR}/helics/swig
+        COMPONENT swig
+    )
+endif()
+
+# cmake-format: off
+# add a helper variable for standalone interface swig builds
+set(HELICS_SWIG_INCLUDE_DIRS "${CMAKE_CURRENT_SOURCE_DIR}" "${HELICS_SOURCE_DIR}/src/helics/shared_api_library" "${HELICS_BINARY_DIR}/src/helics/shared_api_library")
+# cmake-format: on
+
+# TODO: remove this after all of the interfaces work as standalone builds
+include_directories(${HELICS_SWIG_INCLUDE_DIRS})
 
 if(BUILD_PYTHON_INTERFACE)
     add_subdirectory(python)

@@ -722,15 +722,6 @@ if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
 
     add_subdirectory(interfaces)
 
-    if(NOT HELICS_BINARY_ONLY_INSTALL AND NOT HELICS_DISABLE_C_SHARED_LIB)
-        # add base swig interface files as install option, regardless of current
-        # interfaces built
-        install(
-            FILES interfaces/helics.i interfaces/output.i
-            DESTINATION ${CMAKE_INSTALL_DATADIR}/helics/swig
-            COMPONENT swig
-        )
-    endif()
 
     add_subdirectory(docs)
 
