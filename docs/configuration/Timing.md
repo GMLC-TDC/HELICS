@@ -95,3 +95,6 @@ If set to true the federate uses `rt_lag` and `rt_lead` to match the time grants
 If the federate is running faster than real time this will insert additional delays.
 If the federate is running slower than real time this will cause a force grant, which can lead to non-deterministic behavior.
 `rt_lag` can be set to maxVal to disable force grant
+
+### restrictive-time-policy
+Using the option `restrictive-time-policy` forces HELICS to use a fully conservative mode in granting time.  This can be useful in situations beyond the current reach of the distributed time algorithms.  It is generally used in cases where it is known that some federate is executing and will trigger someone else, but most federates won't know who that might be.  This prevents extra messages from being sent and a potential for time skips.  It is not needed if some federates are periodic and execute every time step.  It is currently only used in few benchmarks using peculiar configurations.  The flag can be used for federates and for brokers and cores to force very conservative timing. 

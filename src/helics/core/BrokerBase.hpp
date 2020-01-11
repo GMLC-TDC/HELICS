@@ -59,7 +59,7 @@ class BrokerBase {
     std::atomic<bool> haltOperations{
         false}; //!< flag indicating that no further message should be processed
     bool
-        restrictive_time_policy; //!< flag indicating the broker should use a conservative time policy
+        restrictive_time_policy{ false }; //!< flag indicating the broker should use a conservative time policy
   private:
     std::atomic<bool> mainLoopIsRunning{
         false}; //!< flag indicating that the main processing loop is running
