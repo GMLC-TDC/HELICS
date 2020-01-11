@@ -77,7 +77,7 @@ class minTimeSet {
 };
 
 static minTimeSet generateMinTimeSet(
-    const TimeDependencies& dependencies,
+    const TimeDependencies& dependencies, bool restricted,
     global_federate_id ignore = global_federate_id())
 {
     minTimeSet mTime;
@@ -113,7 +113,7 @@ static minTimeSet generateMinTimeSet(
 
     mTime.minminDe = std::min(mTime.minDe, mTime.minminDe);
 
-    if (mTime.minminDe < Time::maxVal()) {
+    if (!restricted && mTime.minminDe < Time::maxVal()) {
         if (mTime.minminDe > mTime.minNext) {
             mTime.minNext = mTime.minminDe;
         }
@@ -123,7 +123,7 @@ static minTimeSet generateMinTimeSet(
 
 void ForwardingTimeCoordinator::updateTimeFactors()
 {
-    auto mTime = generateMinTimeSet(dependencies);
+    auto mTime = generateMinTimeSet(dependencies,restrictive_time_policy);
 
     bool update = (time_state != mTime.tState);
     time_state = mTime.tState;
@@ -139,8 +139,8 @@ void ForwardingTimeCoordinator::updateTimeFactors()
         time_minminDe = mTime.minminDe;
         update = true;
     }
-
-    if (time_minminDe < Time::maxVal()) {
+    
+    if (!restrictive_time_policy && time_minminDe < Time::maxVal()) {
         if (time_minminDe > time_next) {
             time_next = time_minminDe;
         }
@@ -289,7 +289,7 @@ ActionMessage ForwardingTimeCoordinator::generateTimeRequestIgnoreDependency(
     const ActionMessage& msg,
     global_federate_id iFed) const
 {
-    auto mTime = generateMinTimeSet(dependencies, iFed);
+    auto mTime = generateMinTimeSet(dependencies, restrictive_time_policy, iFed);
     ActionMessage nTime(msg);
 
     nTime.actionTime = mTime.minNext;

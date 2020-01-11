@@ -86,6 +86,7 @@ void TimeCoordinator::disconnect()
             sendMessageFunction(multi);
         }
     }
+    disconnected = true;
 }
 
 void TimeCoordinator::timeRequest(
@@ -183,7 +184,7 @@ void TimeCoordinator::updateValueTime(Time valueUpdateTime)
                 time_value = valueUpdateTime;
             }
         }
-        if (time_value < ptime) {
+        if (time_value < ptime && !disconnected) {
             if (updateNextExecutionTime()) {
                 sendTimeRequest();
             }
@@ -281,7 +282,7 @@ void TimeCoordinator::updateMessageTime(Time messageUpdateTime)
                 time_message = messageUpdateTime;
             }
         }
-        if (time_message < ptime) {
+        if (time_message < ptime && !disconnected) {
             if (updateNextExecutionTime()) {
                 sendTimeRequest();
             }

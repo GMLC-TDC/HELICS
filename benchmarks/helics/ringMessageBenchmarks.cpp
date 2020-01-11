@@ -22,11 +22,11 @@ SPDX-License-Identifier: BSD-3-Clause
 using helics::operator"" _t;
 // static constexpr helics::Time tend = 3600.0_t;  // simulation end time
 using namespace helics;
-/** class implementing the hub for an echo test*/
+/** class implementing a token ring using messages as the transmission mechanism*/
 class RingTransmitMessage {
   public:
     helics::Time deltaTime = helics::Time(10, time_units::ns); // sampling rate
-    helics::Time finalTime = helics::Time(100, time_units::ns); // final time
+    helics::Time finalTime = helics::Time(5000, time_units::ns); // final time
     int loopCount = 0;
 
   private:
@@ -51,7 +51,7 @@ class RingTransmitMessage {
         mainLoop();
     };
 
-    void initialize(const std::string& coreName, int index, int maxIndex, int message_size)
+    void initialize(const std::string& coreName, int index, int maxIndex)
     {
         std::string name = "ringlink_" + std::to_string(index);
         index_ = index;
@@ -59,9 +59,6 @@ class RingTransmitMessage {
         helics::FederateInfo fi;
         fi.coreName = coreName;
         fi.setFlagOption(helics_flag_restrictive_time_policy);
-        if (index == 0) {
-            // fi.setProperty (helics_property_int_log_level, helics_log_level_timing);
-        }
         mFed = std::make_unique<helics::MessageFederate>(name, fi);
         ept = &mFed->registerIndexedEndpoint("ept", index_);
         ept->setDefaultDestination(
@@ -108,12 +105,12 @@ static void BM_ringMessage2_singleCore(benchmark::State& state)
         int feds = 2;
         gmlc::concurrency::Barrier brr(feds);
         auto wcore =
-            helics::CoreFactory::create(core_type::TEST, std::string("--autobroker --federates=2"));
+            helics::CoreFactory::create(core_type::INPROC, std::string("--autobroker --federates=2 --restrictive_time_policy --brokerinit=\"--restrictive_time_policy\""));
 
         std::vector<RingTransmitMessage> links(feds);
         for (int ii = 0; ii < feds; ++ii) {
             links[ii].initialize(
-                wcore->getIdentifier(), ii, feds, static_cast<int>(state.range(0)));
+                wcore->getIdentifier(), ii, feds);
         }
 
         std::thread rthread(
@@ -128,9 +125,9 @@ static void BM_ringMessage2_singleCore(benchmark::State& state)
         state.PauseTiming();
         rthread.join();
 
-        if (links[0].loopCount != 10000) {
+        if (links[0].loopCount != 5000) {
             std::cout << "incorrect loop count received (" << links[0].loopCount
-                      << ") instead of 100000" << std::endl;
+                      << ") instead of 5000" << std::endl;
         }
         wcore.reset();
         cleanupHelicsLibrary();
@@ -139,10 +136,9 @@ static void BM_ringMessage2_singleCore(benchmark::State& state)
 }
 // Register the function as a benchmark
 BENCHMARK(BM_ringMessage2_singleCore)
-    ->Unit(benchmark::TimeUnit::kMillisecond)
-    ->UseRealTime()
-    ->Iterations(3)
-    ->Range(8, 8 << 6);
+->Unit(benchmark::TimeUnit::kMillisecond)
+->UseRealTime()
+->Iterations(3);
 
 static void BM_ringMessage_multiCore(benchmark::State& state, core_type cType)
 {
@@ -151,16 +147,16 @@ static void BM_ringMessage_multiCore(benchmark::State& state, core_type cType)
         int feds = static_cast<int>(state.range(0));
         gmlc::concurrency::Barrier brr(feds);
         auto broker = helics::BrokerFactory::create(
-            cType, std::string("--federates=") + std::to_string(feds));
+            cType, std::string("--restrictive_time_policy --federates=") + std::to_string(feds));
         broker->setLoggingLevel(0);
 
         std::vector<RingTransmitMessage> links(feds);
         std::vector<std::shared_ptr<Core>> cores(feds);
         for (int ii = 0; ii < feds; ++ii) {
             cores[ii] = helics::CoreFactory::create(
-                cType, std::string(" --federates=1 --broker=" + broker->getIdentifier()));
+                cType, std::string("--restrictive_time_policy --federates=1 --broker=" + broker->getIdentifier()));
             cores[ii]->connect();
-            links[ii].initialize(cores[ii]->getIdentifier(), ii, feds, 100);
+            links[ii].initialize(cores[ii]->getIdentifier(), ii, feds);
         }
         std::vector<std::thread> threadlist(feds - 1);
         for (int ii = 0; ii < feds - 1; ++ii) {
@@ -178,9 +174,9 @@ static void BM_ringMessage_multiCore(benchmark::State& state, core_type cType)
             thrd.join();
         }
 
-        if (links[0].loopCount != 10000) {
+        if (links[0].loopCount != 5000) {
             std::cout << "incorrect loop count received (" << links[0].loopCount
-                      << ") instead of 100000" << std::endl;
+                      << ") instead of 5000" << std::endl;
         }
         broker->disconnect();
         broker.reset();
@@ -191,7 +187,7 @@ static void BM_ringMessage_multiCore(benchmark::State& state, core_type cType)
 }
 
 // Register the test core benchmarks
-BENCHMARK_CAPTURE(BM_ringMessage_multiCore, testCore, core_type::TEST)
+BENCHMARK_CAPTURE(BM_ringMessage_multiCore, inprocCore, core_type::INPROC)
     ->Unit(benchmark::TimeUnit::kMillisecond)
     ->Arg(2)
     ->Arg(3)
@@ -199,33 +195,32 @@ BENCHMARK_CAPTURE(BM_ringMessage_multiCore, testCore, core_type::TEST)
     ->Arg(6)
     ->Arg(10)
     ->Arg(20)
-    ->Iterations(3)
     ->UseRealTime();
 
+#ifdef ENABLE_ZMQ_CORE
 // Register the ZMQ benchmarks
 BENCHMARK_CAPTURE(BM_ringMessage_multiCore, zmqCore, core_type::ZMQ)
     ->Unit(benchmark::TimeUnit::kMillisecond)
-    ->Iterations(3)
     ->Arg(2)
     ->Arg(3)
     ->Arg(4)
     ->Arg(6)
     ->Arg(10)
-    ->Arg(20)
     ->UseRealTime();
 
 // Register the ZMQ benchmarks
 BENCHMARK_CAPTURE(BM_ringMessage_multiCore, zmqssCore, core_type::ZMQ_SS)
     ->Unit(benchmark::TimeUnit::kMillisecond)
-    ->Iterations(3)
+    ->Iterations(1)
     ->Arg(2)
     ->Arg(3)
     ->Arg(4)
     ->Arg(6)
     ->Arg(10)
-    ->Arg(20)
     ->UseRealTime();
+#endif
 
+#ifdef ENABLE_IPC_CORE
 // Register the IPC benchmarks
 BENCHMARK_CAPTURE(BM_ringMessage_multiCore, ipcCore, core_type::IPC)
     ->Unit(benchmark::TimeUnit::kMillisecond)
@@ -233,10 +228,10 @@ BENCHMARK_CAPTURE(BM_ringMessage_multiCore, ipcCore, core_type::IPC)
     ->Arg(2)
     ->Arg(3)
     ->Arg(4)
-    ->Arg(10)
-    ->Arg(20)
     ->UseRealTime();
+#endif
 
+#ifdef ENABLE_TCP_CORE
 // Register the TCP benchmarks
 BENCHMARK_CAPTURE(BM_ringMessage_multiCore, tcpCore, core_type::TCP)
     ->Unit(benchmark::TimeUnit::kMillisecond)
@@ -246,7 +241,6 @@ BENCHMARK_CAPTURE(BM_ringMessage_multiCore, tcpCore, core_type::TCP)
     ->Arg(4)
     ->Arg(6)
     ->Arg(10)
-    ->Arg(20)
     ->UseRealTime();
 
 // Register the TCP SS benchmarks
@@ -258,10 +252,10 @@ BENCHMARK_CAPTURE(BM_ringMessage_multiCore, tcpssCore, core_type::TCP_SS)
     ->Arg(4)
     ->Arg(6)
     ->Arg(10)
-    ->Arg(20)
     ->UseRealTime();
-
+#endif
 // Register the UDP benchmarks
+#ifdef ENABLE_UDP_CORE
 BENCHMARK_CAPTURE(BM_ringMessage_multiCore, udpCore, core_type::UDP)
     ->Unit(benchmark::TimeUnit::kMillisecond)
     ->Iterations(3)
@@ -270,7 +264,6 @@ BENCHMARK_CAPTURE(BM_ringMessage_multiCore, udpCore, core_type::UDP)
     ->Arg(4)
     ->Arg(6)
     ->Arg(10)
-    ->Arg(20)
     ->UseRealTime();
-
+#endif
 HELICS_BENCHMARK_MAIN(ringMessageBenchmark);

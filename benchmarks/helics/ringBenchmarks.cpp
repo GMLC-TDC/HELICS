@@ -24,11 +24,11 @@ SPDX-License-Identifier: BSD-3-Clause
 using helics::operator"" _t;
 // static constexpr helics::Time tend = 3600.0_t;  // simulation end time
 using namespace helics;
-/** class implementing the hub for an echo test*/
+/** class implementing a token ring using a value being passed as the token*/
 class RingTransmit {
   public:
     helics::Time deltaTime = helics::Time(10, time_units::ns); // sampling rate
-    helics::Time finalTime = helics::Time(10000, time_units::ns); // final time
+    helics::Time finalTime = helics::Time(5000, time_units::ns); // final time
     int loopCount = 0;
 
   private:
@@ -126,9 +126,9 @@ static void BMring2_singleCore(benchmark::State& state)
         state.PauseTiming();
         rthread.join();
 
-        if (links[0].loopCount != 10000) {
+        if (links[0].loopCount != 5000) {
             std::cout << "incorrect loop count received (" << links[0].loopCount
-                      << ") instead of 100000" << std::endl;
+                      << ") instead of 5000" << std::endl;
         }
         wcore.reset();
         cleanupHelicsLibrary();
@@ -139,7 +139,7 @@ static void BMring2_singleCore(benchmark::State& state)
 BENCHMARK(BMring2_singleCore)
     ->Unit(benchmark::TimeUnit::kMillisecond)
     ->UseRealTime()
-    ->Iterations(3);
+    ->Iterations(1);
 
 static void BMring_multiCore(benchmark::State& state, core_type cType)
 {
@@ -177,9 +177,9 @@ static void BMring_multiCore(benchmark::State& state, core_type cType)
             thrd.join();
         }
 
-        if (links[0].loopCount != 10000) {
+        if (links[0].loopCount != 5000) {
             std::cout << "incorrect loop count received (" << links[0].loopCount
-                      << ") instead of 100000" << std::endl;
+                      << ") instead of 5000" << std::endl;
         }
         broker->disconnect();
         broker.reset();
