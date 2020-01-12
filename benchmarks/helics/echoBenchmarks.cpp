@@ -61,8 +61,8 @@ class EchoHub {
         pubs.reserve(cnt_);
         subs.reserve(cnt_);
         for (int ii = 0; ii < cnt_; ++ii) {
-            pubs.push_back (vFed->registerIndexedPublication<std::string> ("leafrx", ii));
-            subs.push_back (vFed->registerIndexedSubscription ("leafsend", ii));
+            pubs.push_back(vFed->registerIndexedPublication<std::string>("leafrx", ii));
+            subs.push_back(vFed->registerIndexedSubscription("leafsend", ii));
         }
         initialized = true;
     }
@@ -122,8 +122,8 @@ class EchoLeaf {
         helics::FederateInfo fi;
         fi.coreName = coreName;
         vFed = std::make_unique<helics::ValueFederate>(name, fi);
-        pub = vFed->registerIndexedPublication<std::string> ("leafsend", index_);
-        sub = vFed->registerIndexedSubscription ("leafrx", index_);
+        pub = vFed->registerIndexedPublication<std::string>("leafsend", index_);
+        sub = vFed->registerIndexedSubscription("leafrx", index_);
         initialized = true;
     }
 

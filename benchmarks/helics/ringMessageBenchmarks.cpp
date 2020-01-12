@@ -104,13 +104,14 @@ static void BM_ringMessage2_singleCore(benchmark::State& state)
         state.PauseTiming();
         int feds = 2;
         gmlc::concurrency::Barrier brr(feds);
-        auto wcore =
-            helics::CoreFactory::create(core_type::INPROC, std::string("--autobroker --federates=2 --restrictive_time_policy --brokerinit=\"--restrictive_time_policy\""));
+        auto wcore = helics::CoreFactory::create(
+            core_type::INPROC,
+            std::string(
+                "--autobroker --federates=2 --restrictive_time_policy --brokerinit=\"--restrictive_time_policy\""));
 
         std::vector<RingTransmitMessage> links(feds);
         for (int ii = 0; ii < feds; ++ii) {
-            links[ii].initialize(
-                wcore->getIdentifier(), ii, feds);
+            links[ii].initialize(wcore->getIdentifier(), ii, feds);
         }
 
         std::thread rthread(
@@ -136,9 +137,9 @@ static void BM_ringMessage2_singleCore(benchmark::State& state)
 }
 // Register the function as a benchmark
 BENCHMARK(BM_ringMessage2_singleCore)
-->Unit(benchmark::TimeUnit::kMillisecond)
-->UseRealTime()
-->Iterations(3);
+    ->Unit(benchmark::TimeUnit::kMillisecond)
+    ->UseRealTime()
+    ->Iterations(3);
 
 static void BM_ringMessage_multiCore(benchmark::State& state, core_type cType)
 {
@@ -154,7 +155,9 @@ static void BM_ringMessage_multiCore(benchmark::State& state, core_type cType)
         std::vector<std::shared_ptr<Core>> cores(feds);
         for (int ii = 0; ii < feds; ++ii) {
             cores[ii] = helics::CoreFactory::create(
-                cType, std::string("--restrictive_time_policy --federates=1 --broker=" + broker->getIdentifier()));
+                cType,
+                std::string(
+                    "--restrictive_time_policy --federates=1 --broker=" + broker->getIdentifier()));
             cores[ii]->connect();
             links[ii].initialize(cores[ii]->getIdentifier(), ii, feds);
         }
