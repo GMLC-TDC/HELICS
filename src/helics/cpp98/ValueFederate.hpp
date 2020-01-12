@@ -176,10 +176,11 @@ class ValueFederate: public virtual Federate {
     @param units  the optional units of the publication
     @return an identifier for use with this publication
     */
-    Publication registerIndexedPublication (const std::string &key,
-                                            int index1,
-                                            helics_data_type type,
-                                            const std::string &units = "")
+    Publication registerIndexedPublication(
+        const std::string& key,
+        int index1,
+        helics_data_type type,
+        const std::string& units = "")
     {
         std::string indexed_name = key + '_' + toStr(index1);
         return registerGlobalPublication(indexed_name, type, units);
@@ -195,11 +196,12 @@ class ValueFederate: public virtual Federate {
 	@param units  the optional units of the publication
     @return an identifier for use with this publication
     */
-    Publication registerIndexedPublication (const std::string &key,
-                                            int index1,
-                                            int index2,
-                                            helics_data_type type,
-                                            const std::string &units = std::string ())
+    Publication registerIndexedPublication(
+        const std::string& key,
+        int index1,
+        int index2,
+        helics_data_type type,
+        const std::string& units = std::string())
     {
         std::string indexed_name = key + '_' + toStr(index1) + '_' + toStr(index2);
         return registerGlobalPublication(indexed_name, type, units);
@@ -214,10 +216,11 @@ class ValueFederate: public virtual Federate {
     @param units  the optional units of the publication
     @return an identifier for use with this publication
     */
-    Publication registerPublicationIndexed(const std::string &key,
+    Publication registerPublicationIndexed(
+        const std::string& key,
         int index1,
         helics_data_type type,
-        const std::string &units = "")
+        const std::string& units = "")
     {
         return registerIndexedPublication(key, index1, type, units);
     }
@@ -232,11 +235,12 @@ class ValueFederate: public virtual Federate {
     @param units  the optional units of the publication
     @return an identifier for use with this publication
     */
-    Publication registerPublicationIndexed(const std::string &key,
+    Publication registerPublicationIndexed(
+        const std::string& key,
         int index1,
         int index2,
         helics_data_type type,
-        const std::string &units = std::string())
+        const std::string& units = std::string())
     {
         return registerIndexedPublication(key, index1, index2, type, units);
     }
@@ -276,7 +280,10 @@ class ValueFederate: public virtual Federate {
     @param units a string containing the requested units of the subscription output
     @return an input object getting the requested value
     */
-    Input registerIndexedSubscription (const std::string &name, int index1, const std::string &units = "")
+    Input registerIndexedSubscription(
+        const std::string& name,
+        int index1,
+        const std::string& units = "")
     {
         std::string indexed_name = name + '_' + toStr(index1);
         return registerSubscription(indexed_name, units);
@@ -289,8 +296,11 @@ class ValueFederate: public virtual Federate {
 	@param units a string containing the requested units of the subscription output
 	@return an input object getting the requested value
 	*/
-    Input
-    registerIndexedSubscription (const std::string &name, int index1, int index2, const std::string &units = "")
+    Input registerIndexedSubscription(
+        const std::string& name,
+        int index1,
+        int index2,
+        const std::string& units = "")
     {
         std::string indexed_name = name + '_' + toStr(index1) + '_' + toStr(index2);
         return registerSubscription(indexed_name, units);
@@ -302,9 +312,12 @@ class ValueFederate: public virtual Federate {
     @param units a string containing the requested units of the subscription output
     @return an input object getting the requested value
     */
-    Input registerSubscriptionIndexed(const std::string &name, int index1, const std::string &units = "")
+    Input registerSubscriptionIndexed(
+        const std::string& name,
+        int index1,
+        const std::string& units = "")
     {
-        return registerIndexedSubscription(name,index1,units);
+        return registerIndexedSubscription(name, index1, units);
     }
 
     /** register a 2D indexed subscription
@@ -314,8 +327,11 @@ class ValueFederate: public virtual Federate {
     @param units a string containing the requested units of the subscription output
     @return an input object getting the requested value
     */
-    Input
-        registerSubscriptionIndexed(const std::string &name, int index1, int index2, const std::string &units = "")
+    Input registerSubscriptionIndexed(
+        const std::string& name,
+        int index1,
+        int index2,
+        const std::string& units = "")
     {
         return registerSubscriptionIndexed(name, index1, index2, units);
     }

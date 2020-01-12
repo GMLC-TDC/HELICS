@@ -77,7 +77,8 @@ class minTimeSet {
 };
 
 static minTimeSet generateMinTimeSet(
-    const TimeDependencies& dependencies, bool restricted,
+    const TimeDependencies& dependencies,
+    bool restricted,
     global_federate_id ignore = global_federate_id())
 {
     minTimeSet mTime;
@@ -123,7 +124,7 @@ static minTimeSet generateMinTimeSet(
 
 void ForwardingTimeCoordinator::updateTimeFactors()
 {
-    auto mTime = generateMinTimeSet(dependencies,restrictive_time_policy);
+    auto mTime = generateMinTimeSet(dependencies, restrictive_time_policy);
 
     bool update = (time_state != mTime.tState);
     time_state = mTime.tState;
@@ -139,7 +140,7 @@ void ForwardingTimeCoordinator::updateTimeFactors()
         time_minminDe = mTime.minminDe;
         update = true;
     }
-    
+
     if (!restrictive_time_policy && time_minminDe < Time::maxVal()) {
         if (time_minminDe > time_next) {
             time_next = time_minminDe;
