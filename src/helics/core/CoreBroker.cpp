@@ -123,9 +123,8 @@ bool CoreBroker::verifyBrokerKey(ActionMessage& mess) const
 {
     if (mess.getStringData().size() > 1) {
         return verifyBrokerKey(mess.getString(1));
-    } else {
-        return brokerKey.empty();
     }
+    return brokerKey.empty();
 }
 /** verify the broker key contained in a string
 @return false if the keys do not match*/

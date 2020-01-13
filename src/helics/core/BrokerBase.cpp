@@ -133,6 +133,10 @@ std::shared_ptr<helicsCLI11App> BrokerBase::generateBaseCLI()
         "--no_ping,--slow_responding",
         no_ping,
         "specify that a broker might be slow or unresponsive to ping requests from other brokers");
+    hApp->add_flag(
+        "--conservative_time_policy,--restrictive_time_policy",
+        restrictive_time_policy,
+        "specify that a broker should use a conservative time policy in the time coordinator");
     auto logging_group =
         hApp->add_option_group("logging", "Options related to file and message logging");
     logging_group->option_defaults()->ignore_underscore();
@@ -233,6 +237,7 @@ void BrokerBase::configureBase()
 
     timeCoord = std::make_unique<ForwardingTimeCoordinator>();
     timeCoord->setMessageSender([this](const ActionMessage& msg) { addActionMessage(msg); });
+    timeCoord->restrictive_time_policy = restrictive_time_policy;
 
     loggingObj = std::make_unique<Logger>();
     if (!logFile.empty()) {

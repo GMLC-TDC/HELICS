@@ -128,7 +128,7 @@ mark_as_advanced(HELICS_DISABLE_BOOST)
 option(HELICS_DISABLE_ASIO OFF "disable all references to the ASIO C++ libraries")
 mark_as_advanced(HELICS_DISABLE_ASIO)
 
-# we want to acknowledge this flag since it is standard C++ but it can cause issues in
+# we want to acknowledge this flag since it is standard CMake but it can cause issues in
 # submodules so we need to set other variables
 if(NOT DEFINED BUILD_SHARED_LIBS)
     set(BUILD_SHARED_LIBS

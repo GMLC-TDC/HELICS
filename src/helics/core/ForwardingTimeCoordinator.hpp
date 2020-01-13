@@ -44,6 +44,8 @@ class ForwardingTimeCoordinator {
     bool executionMode{false}; //!< flag that the coordinator has entered the execution Mode
     bool iterating{false}; //!< flag indicating that the min dependency is iterating
     bool ignoreMinFed{false}; //!< flag indicating that minFed Controls should not be used
+    bool restrictive_time_policy{
+        false}; //!< flag indicating that a restrictive time policy should be used
   public:
     ForwardingTimeCoordinator() = default;
 

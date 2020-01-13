@@ -5,16 +5,14 @@ the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 
-#include "helics/application_api/Inputs.hpp"
-#include "helics/application_api/Publications.hpp"
-#include "helics/application_api/Subscriptions.hpp"
-#include "helics/application_api/ValueFederate.hpp"
+#include "helics/application_api/Endpoints.hpp"
+#include "helics/application_api/MessageFederate.hpp"
 #include "helics/core/ActionMessage.hpp"
 #include "helics/core/BrokerFactory.hpp"
 #include "helics/core/CoreFactory.hpp"
-#include "helics/helics-config.h"
 #include "helics_benchmark_main.h"
 
+#include <benchmark/benchmark.h>
 #include <chrono>
 #include <fstream>
 #include <gmlc/concurrency/Barrier.hpp>
@@ -24,25 +22,25 @@ SPDX-License-Identifier: BSD-3-Clause
 using helics::operator"" _t;
 // static constexpr helics::Time tend = 3600.0_t;  // simulation end time
 using namespace helics;
-/** class implementing a token ring using a value being passed as the token*/
-class RingTransmit {
+/** class implementing a token ring using messages as the transmission mechanism*/
+class RingTransmitMessage {
   public:
     helics::Time deltaTime = helics::Time(10, time_units::ns); // sampling rate
     helics::Time finalTime = helics::Time(5000, time_units::ns); // final time
     int loopCount = 0;
 
   private:
-    std::unique_ptr<helics::ValueFederate> vFed;
-    helics::Publication* pub = nullptr;
-    helics::Input* sub = nullptr;
+    std::unique_ptr<helics::MessageFederate> mFed;
+    helics::Endpoint* ept = nullptr;
 
     int index_ = 0;
     int maxIndex_ = 0;
+    int messageSize_ = 100;
     bool initialized{false};
     bool readyToRun{false};
 
   public:
-    RingTransmit() = default;
+    RingTransmitMessage() = default;
 
     void run(std::function<void()> callOnReady = nullptr)
     {
@@ -61,13 +59,10 @@ class RingTransmit {
         helics::FederateInfo fi;
         fi.coreName = coreName;
         fi.setFlagOption(helics_flag_restrictive_time_policy);
-        if (index == 0) {
-            // fi.setProperty (helics_property_int_log_level, helics_log_level_timing);
-        }
-        vFed = std::make_unique<helics::ValueFederate>(name, fi);
-        pub = &vFed->registerIndexedPublication<std::string>("pub", index_);
-        sub = &vFed->registerIndexedSubscription("pub", (index_ == 0) ? maxIndex_ - 1 : index_ - 1);
-
+        mFed = std::make_unique<helics::MessageFederate>(name, fi);
+        ept = &mFed->registerIndexedEndpoint("ept", index_);
+        ept->setDefaultDestination(
+            "ept_" + std::to_string((index_ == maxIndex_ - 1) ? 0 : (index_ + 1)));
         initialized = true;
     }
 
@@ -76,7 +71,7 @@ class RingTransmit {
         if (!initialized) {
             throw("must initialize first");
         }
-        vFed->enterExecutingMode();
+        mFed->enterExecutingMode();
         readyToRun = true;
     }
 
@@ -84,39 +79,44 @@ class RingTransmit {
     {
         if (index_ == 0) {
             std::string txstring(100, '1');
-            pub->publish(txstring);
+            ept->send(txstring);
             ++loopCount;
         }
         auto nextTime = deltaTime;
 
         while (nextTime < finalTime) {
-            nextTime = vFed->requestTime(finalTime);
-            if (vFed->isUpdated(*sub)) {
-                auto& nstring = vFed->getString(*sub);
-                vFed->publish(*pub, nstring);
+            nextTime = mFed->requestTime(finalTime);
+            if (ept->hasMessage()) {
+                auto m = mFed->getMessage(*ept);
+                m->dest = ept->getDefaultDestination();
+                m->source = ept->getName();
+                ept->send(std::move(m));
                 ++loopCount;
             }
         }
-        vFed->finalize();
+        mFed->finalize();
     }
 };
 
-static void BMring2_singleCore(benchmark::State& state)
+static void BM_ringMessage2_singleCore(benchmark::State& state)
 {
     for (auto _ : state) {
         state.PauseTiming();
         int feds = 2;
         gmlc::concurrency::Barrier brr(feds);
         auto wcore = helics::CoreFactory::create(
-            core_type::INPROC, std::string("--autobroker --federates=2"));
+            core_type::INPROC,
+            std::string(
+                "--autobroker --federates=2 --restrictive_time_policy --brokerinit=\"--restrictive_time_policy\""));
 
-        std::vector<RingTransmit> links(feds);
+        std::vector<RingTransmitMessage> links(feds);
         for (int ii = 0; ii < feds; ++ii) {
             links[ii].initialize(wcore->getIdentifier(), ii, feds);
         }
 
         std::thread rthread(
-            [&](RingTransmit& link) { link.run([&brr]() { brr.wait(); }); }, std::ref(links[1]));
+            [&](RingTransmitMessage& link) { link.run([&brr]() { brr.wait(); }); },
+            std::ref(links[1]));
 
         links[0].makeReady();
         brr.wait();
@@ -136,35 +136,35 @@ static void BMring2_singleCore(benchmark::State& state)
     }
 }
 // Register the function as a benchmark
-BENCHMARK(BMring2_singleCore)
+BENCHMARK(BM_ringMessage2_singleCore)
     ->Unit(benchmark::TimeUnit::kMillisecond)
     ->UseRealTime()
-    ->Iterations(1);
+    ->Iterations(3);
 
-static void BMring_multiCore(benchmark::State& state, core_type cType)
+static void BM_ringMessage_multiCore(benchmark::State& state, core_type cType)
 {
     for (auto _ : state) {
         state.PauseTiming();
         int feds = static_cast<int>(state.range(0));
         gmlc::concurrency::Barrier brr(feds);
         auto broker = helics::BrokerFactory::create(
-            cType, std::string("--federates=") + std::to_string(feds));
-        broker->setLoggingLevel(helics_log_level_no_print);
+            cType, std::string("--restrictive_time_policy --federates=") + std::to_string(feds));
+        broker->setLoggingLevel(0);
 
-        std::vector<RingTransmit> links(feds);
+        std::vector<RingTransmitMessage> links(feds);
         std::vector<std::shared_ptr<Core>> cores(feds);
         for (int ii = 0; ii < feds; ++ii) {
             cores[ii] = helics::CoreFactory::create(
                 cType,
                 std::string(
-                    "--log_level=no_print --federates=1 --broker=" + broker->getIdentifier()));
+                    "--restrictive_time_policy --federates=1 --broker=" + broker->getIdentifier()));
             cores[ii]->connect();
             links[ii].initialize(cores[ii]->getIdentifier(), ii, feds);
         }
         std::vector<std::thread> threadlist(feds - 1);
         for (int ii = 0; ii < feds - 1; ++ii) {
             threadlist[ii] = std::thread(
-                [&](RingTransmit& link) { link.run([&brr]() { brr.wait(); }); },
+                [&](RingTransmitMessage& link) { link.run([&brr]() { brr.wait(); }); },
                 std::ref(links[ii + 1]));
         }
 
@@ -190,7 +190,7 @@ static void BMring_multiCore(benchmark::State& state, core_type cType)
 }
 
 // Register the test core benchmarks
-BENCHMARK_CAPTURE(BMring_multiCore, inprocCore, core_type::INPROC)
+BENCHMARK_CAPTURE(BM_ringMessage_multiCore, inprocCore, core_type::INPROC)
     ->Unit(benchmark::TimeUnit::kMillisecond)
     ->Arg(2)
     ->Arg(3)
@@ -202,7 +202,7 @@ BENCHMARK_CAPTURE(BMring_multiCore, inprocCore, core_type::INPROC)
 
 #ifdef ENABLE_ZMQ_CORE
 // Register the ZMQ benchmarks
-BENCHMARK_CAPTURE(BMring_multiCore, zmqCore, core_type::ZMQ)
+BENCHMARK_CAPTURE(BM_ringMessage_multiCore, zmqCore, core_type::ZMQ)
     ->Unit(benchmark::TimeUnit::kMillisecond)
     ->Arg(2)
     ->Arg(3)
@@ -212,8 +212,9 @@ BENCHMARK_CAPTURE(BMring_multiCore, zmqCore, core_type::ZMQ)
     ->UseRealTime();
 
 // Register the ZMQ benchmarks
-BENCHMARK_CAPTURE(BMring_multiCore, zmqssCore, core_type::ZMQ_SS)
+BENCHMARK_CAPTURE(BM_ringMessage_multiCore, zmqssCore, core_type::ZMQ_SS)
     ->Unit(benchmark::TimeUnit::kMillisecond)
+    ->Iterations(1)
     ->Arg(2)
     ->Arg(3)
     ->Arg(4)
@@ -224,8 +225,9 @@ BENCHMARK_CAPTURE(BMring_multiCore, zmqssCore, core_type::ZMQ_SS)
 
 #ifdef ENABLE_IPC_CORE
 // Register the IPC benchmarks
-BENCHMARK_CAPTURE(BMring_multiCore, ipcCore, core_type::IPC)
+BENCHMARK_CAPTURE(BM_ringMessage_multiCore, ipcCore, core_type::IPC)
     ->Unit(benchmark::TimeUnit::kMillisecond)
+    ->Iterations(3)
     ->Arg(2)
     ->Arg(3)
     ->Arg(4)
@@ -234,8 +236,9 @@ BENCHMARK_CAPTURE(BMring_multiCore, ipcCore, core_type::IPC)
 
 #ifdef ENABLE_TCP_CORE
 // Register the TCP benchmarks
-BENCHMARK_CAPTURE(BMring_multiCore, tcpCore, core_type::TCP)
+BENCHMARK_CAPTURE(BM_ringMessage_multiCore, tcpCore, core_type::TCP)
     ->Unit(benchmark::TimeUnit::kMillisecond)
+    ->Iterations(3)
     ->Arg(2)
     ->Arg(3)
     ->Arg(4)
@@ -244,21 +247,21 @@ BENCHMARK_CAPTURE(BMring_multiCore, tcpCore, core_type::TCP)
     ->UseRealTime();
 
 // Register the TCP SS benchmarks
-BENCHMARK_CAPTURE(BMring_multiCore, tcpssCore, core_type::TCP_SS)
+BENCHMARK_CAPTURE(BM_ringMessage_multiCore, tcpssCore, core_type::TCP_SS)
     ->Unit(benchmark::TimeUnit::kMillisecond)
+    ->Iterations(3)
     ->Arg(2)
     ->Arg(3)
     ->Arg(4)
     ->Arg(6)
     ->Arg(10)
     ->UseRealTime();
-
 #endif
-
-#ifdef ENABLE_UDP_CORE
 // Register the UDP benchmarks
-BENCHMARK_CAPTURE(BMring_multiCore, udpCore, core_type::UDP)
+#ifdef ENABLE_UDP_CORE
+BENCHMARK_CAPTURE(BM_ringMessage_multiCore, udpCore, core_type::UDP)
     ->Unit(benchmark::TimeUnit::kMillisecond)
+    ->Iterations(3)
     ->Arg(2)
     ->Arg(3)
     ->Arg(4)
@@ -266,5 +269,4 @@ BENCHMARK_CAPTURE(BMring_multiCore, udpCore, core_type::UDP)
     ->Arg(10)
     ->UseRealTime();
 #endif
-
-HELICS_BENCHMARK_MAIN(ringBenchmark);
+HELICS_BENCHMARK_MAIN(ringMessageBenchmark);

@@ -74,16 +74,18 @@ class TimeCoordinator {
         sendMessageFunction; //!< callback used to send the messages
 
   public:
-    global_federate_id source_id = global_federate_id(
-        0); //!< the identifier for inserting into the source id field of any generated messages;
-    bool iterating = false; //!< indicator that the coordinator should be iterating if need be
-    bool checkingExec =
-        false; //!< flag indicating that the coordinator is trying to enter the exec mode
-    bool executionMode = false; //!< flag that the coordinator has entered the execution Mode
-    bool hasInitUpdates =
-        false; //!< flag indicating that a value or message was received during initialization stage
+    global_federate_id source_id{
+        0}; //!< the identifier for inserting into the source id field of any generated messages;
+    bool iterating{false}; //!< indicator that the coordinator should be iterating if need be
+    bool checkingExec{
+        false}; //!< flag indicating that the coordinator is trying to enter the exec mode
+    bool executionMode{false}; //!< flag that the coordinator has entered the execution Mode
+    bool hasInitUpdates{
+        false}; //!< flag indicating that a value or message was received during initialization stage
   private:
     std::atomic<int32_t> iteration{0}; //!< iteration counter
+    bool disconnected{false};
+
   public:
     /** default constructor*/
     TimeCoordinator();

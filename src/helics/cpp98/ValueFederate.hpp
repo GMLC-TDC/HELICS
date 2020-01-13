@@ -176,7 +176,7 @@ class ValueFederate: public virtual Federate {
     @param units  the optional units of the publication
     @return an identifier for use with this publication
     */
-    Publication registerPublicationIndexed(
+    Publication registerIndexedPublication(
         const std::string& key,
         int index1,
         helics_data_type type,
@@ -196,7 +196,7 @@ class ValueFederate: public virtual Federate {
 	@param units  the optional units of the publication
     @return an identifier for use with this publication
     */
-    Publication registerPublicationIndexed(
+    Publication registerIndexedPublication(
         const std::string& key,
         int index1,
         int index2,
@@ -205,6 +205,44 @@ class ValueFederate: public virtual Federate {
     {
         std::string indexed_name = key + '_' + toStr(index1) + '_' + toStr(index2);
         return registerGlobalPublication(indexed_name, type, units);
+    }
+
+    /** register a publication as part of an indexed structure
+    @details call is only valid in startup mode by default prepends the name with the federate name
+    the name is registered as a global structure with the index appended
+    @param key the name of the publication to register
+    @param index1 an index associated with the publication
+    @param type an enumeration value describing the type of the publication
+    @param units  the optional units of the publication
+    @return an identifier for use with this publication
+    */
+    Publication registerPublicationIndexed(
+        const std::string& key,
+        int index1,
+        helics_data_type type,
+        const std::string& units = "")
+    {
+        return registerIndexedPublication(key, index1, type, units);
+    }
+
+    /** register a publication as part of a 2 dimensional indexed structure
+    @details call is only valid in startup mode by default prepends the name with the federate name
+    the name is registered as a global structure with the indices appended
+    @param key the base name of the publication
+    @param index1 an index associated with the publication
+    @param index2 a second index
+    @param type an enumeration value describing the type of the publication
+    @param units  the optional units of the publication
+    @return an identifier for use with this publication
+    */
+    Publication registerPublicationIndexed(
+        const std::string& key,
+        int index1,
+        int index2,
+        helics_data_type type,
+        const std::string& units = std::string())
+    {
+        return registerIndexedPublication(key, index1, index2, type, units);
     }
     /** register publications   from a JSON output file or string
 	@details generates interface based on the data contained in a JSON file
@@ -226,6 +264,7 @@ class ValueFederate: public virtual Federate {
     {
         return Publication(helicsFederateGetPublicationByIndex(fed, index, hThrowOnError()));
     }
+
     /** Methods to register subscriptions **/
     Input registerSubscription(const std::string& name, const std::string& units = std::string())
     {
@@ -241,7 +280,7 @@ class ValueFederate: public virtual Federate {
     @param units a string containing the requested units of the subscription output
     @return an input object getting the requested value
     */
-    Input registerSubscriptionIndexed(
+    Input registerIndexedSubscription(
         const std::string& name,
         int index1,
         const std::string& units = "")
@@ -257,7 +296,7 @@ class ValueFederate: public virtual Federate {
 	@param units a string containing the requested units of the subscription output
 	@return an input object getting the requested value
 	*/
-    Input registerSubscriptionIndexed(
+    Input registerIndexedSubscription(
         const std::string& name,
         int index1,
         int index2,
@@ -266,6 +305,37 @@ class ValueFederate: public virtual Federate {
         std::string indexed_name = name + '_' + toStr(index1) + '_' + toStr(index2);
         return registerSubscription(indexed_name, units);
     }
+
+    /** register a !D indexed subscription
+    @param name the base name of the publication to subscribe to
+    @param index1 the first index of the value to subscribe to
+    @param units a string containing the requested units of the subscription output
+    @return an input object getting the requested value
+    */
+    Input registerSubscriptionIndexed(
+        const std::string& name,
+        int index1,
+        const std::string& units = "")
+    {
+        return registerIndexedSubscription(name, index1, units);
+    }
+
+    /** register a 2D indexed subscription
+    @param name the base name of the publication to subscribe to
+    @param index1 the first index of the value to subscribe to
+    @param index2 the second index of the value to subscribe to
+    @param units a string containing the requested units of the subscription output
+    @return an input object getting the requested value
+    */
+    Input registerSubscriptionIndexed(
+        const std::string& name,
+        int index1,
+        int index2,
+        const std::string& units = "")
+    {
+        return registerSubscriptionIndexed(name, index1, index2, units);
+    }
+
     /** get an input by index*/
     Input getInput(const std::string& name)
     {

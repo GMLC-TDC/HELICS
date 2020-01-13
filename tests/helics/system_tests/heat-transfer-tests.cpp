@@ -54,19 +54,19 @@ class HeatUnitBlock {
         fi.setProperty(helics_property_time_delta, deltaTime);
         fi.setFlagOption(helics_handle_option_connection_optional);
         vFed = std::make_unique<helics::ValueFederate>(name, fi);
-        pub = &vFed->registerPublicationIndexed<double>("temp", x, y);
+        pub = &vFed->registerIndexedPublication<double>("temp", x, y);
         if (x - 1 < 0) {
             sub[0] = &vFed->registerSubscription("temp_wall");
         } else {
-            sub[0] = &vFed->registerSubscriptionIndexed("temp", x - 1, y);
+            sub[0] = &vFed->registerIndexedSubscription("temp", x - 1, y);
         }
         sub[0]->setDefault(T);
-        sub[1] = &vFed->registerSubscriptionIndexed("temp", x + 1, y);
+        sub[1] = &vFed->registerIndexedSubscription("temp", x + 1, y);
         sub[1]->setDefault(-512.0);
 
-        sub[2] = &vFed->registerSubscriptionIndexed("temp", x, y - 1);
+        sub[2] = &vFed->registerIndexedSubscription("temp", x, y - 1);
         sub[2]->setDefault(-512.0);
-        sub[3] = &vFed->registerSubscriptionIndexed("temp", x, y + 1);
+        sub[3] = &vFed->registerIndexedSubscription("temp", x, y + 1);
         sub[3]->setDefault(-512.0);
         initialized = true;
     }

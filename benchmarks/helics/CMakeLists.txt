@@ -15,6 +15,7 @@ set(HELICS_BENCHMARKS
     messageLookupBenchmarks
     conversionBenchmarks
     echoMessageBenchmarks
+    ringMessageBenchmarks
     messageSendBenchmarks
     pholdBenchmarks
     timingBenchmarks
@@ -35,16 +36,17 @@ endforeach()
 add_executable(PholdFederate PholdFederateMain.cpp)
 target_link_libraries(PholdFederate PUBLIC helics_application_api)
 
-add_executable(echoBenchmarks_c echoBenchmarks_c.cpp)
-target_link_libraries(echoBenchmarks_c PUBLIC helicsSharedLib)
-add_benchmark(echoBenchmarks_c)
-set_target_properties(echoBenchmarks_c PROPERTIES FOLDER benchmarks)
-target_include_directories(
-    echoBenchmarks_c
-    PUBLIC ${HELICS_BINARY_DIR}/helics_generated_includes/
-)
-copy_key_files_to_target_location(echoBenchmarks_c)
-copy_shared_target(echoBenchmarks_c helicsSharedLib)
+if (NOT HELICS_DISABLE_C_SHARED_LIB)
+   add_executable(echoBenchmarks_c echoBenchmarks_c.cpp)
+   target_link_libraries(echoBenchmarks_c PUBLIC helicsSharedLib)
+   add_benchmark(echoBenchmarks_c)
+   set_target_properties(echoBenchmarks_c PROPERTIES FOLDER benchmarks)
+   target_include_directories(
+      echoBenchmarks_c
+      PUBLIC ${HELICS_BINARY_DIR}/helics_generated_includes/
+   )
+   copy_shared_target(echoBenchmarks_c helicsSharedLib)
+endif()
 
 target_sources(filterBenchmarks PUBLIC EchoMessage.hpp)
 target_sources(echoMessageBenchmarks PUBLIC EchoMessage.hpp)
@@ -56,41 +58,48 @@ string(TIMESTAMP current_date "%Y-%m-%d")
 string(RANDOM rname)
 
 set(BM_RESULT_DIR)
+set(BM_FORMAT --benchmark_format=json)
+if (NOT HELICS_DISABLE_C_SHARED_LIB)
+    set(HELICS_ECHO_C_COMMANDS COMMAND echoBenchmarks_c ${BM_FORMAT}
+            ">${BM_RESULT_DIR}bm_echo_cResults${current_date}_${rname}.txt")
+endif()
 # add a custom target to run all the benchmarks in a consistent fashion
 add_custom_target(
     RUN_ALL_BENCHMARKS
     COMMAND ${CMAKE_COMMAND} -E echo " running ActionMessageBenchmarks"
-    COMMAND ActionMessageBenchmarks --benchmark_format=json
+    COMMAND ActionMessageBenchmarks ${BM_FORMAT}
             ">${BM_RESULT_DIR}bm_ActionMessageResults${current_date}_${rname}.txt"
     COMMAND ${CMAKE_COMMAND} -E echo " running conversionBenchmarks"
-    COMMAND conversionBenchmarks --benchmark_format=json
+    COMMAND conversionBenchmarks ${BM_FORMAT}
             ">${BM_RESULT_DIR}bm_conversionResults${current_date}_${rname}.txt"
     COMMAND ${CMAKE_COMMAND} -E echo " running echoBenchmarks"
-    COMMAND echoBenchmarks --benchmark_format=json
+    COMMAND echoBenchmarks ${BM_FORMAT}
             ">${BM_RESULT_DIR}bm_echoResults${current_date}_${rname}.txt"
     COMMAND ${CMAKE_COMMAND} -E echo " running echoBenchmarks_c"
-    COMMAND echoBenchmarks_c --benchmark_format=json
-            ">${BM_RESULT_DIR}bm_echo_cResults${current_date}_${rname}.txt"
+    ${HELICS_ECHO_C_COMMANDS}
     COMMAND ${CMAKE_COMMAND} -E echo " running ringBenchmarks"
-    COMMAND ringBenchmarks --benchmark_format=json
+    COMMAND ringBenchmarks ${BM_FORMAT}
             ">${BM_RESULT_DIR}bm_ringResults${current_date}_${rname}.txt"
+    COMMAND ${CMAKE_COMMAND} -E echo " running ringMessageBenchmarks"
+    COMMAND ringMessageBenchmarks ${BM_FORMAT}
+            ">${BM_RESULT_DIR}bm_ringMessageResults${current_date}_${rname}.txt"
     COMMAND ${CMAKE_COMMAND} -E echo " running messageLookupBenchmarks"
-    COMMAND messageLookupBenchmarks --benchmark_format=json
+    COMMAND messageLookupBenchmarks ${BM_FORMAT}
             ">${BM_RESULT_DIR}bm_messageLookupResults${current_date}_${rname}.txt"
     COMMAND ${CMAKE_COMMAND} -E echo " running echoMessageBenchmarks"
-    COMMAND echoMessageBenchmarks --benchmark_format=json
+    COMMAND echoMessageBenchmarks ${BM_FORMAT}
             ">${BM_RESULT_DIR}bm_echoMessageResults${current_date}_${rname}.txt"
     COMMAND ${CMAKE_COMMAND} -E echo " running timingBenchmarks"
-    COMMAND timingBenchmarks --benchmark_format=json
+    COMMAND timingBenchmarks ${BM_FORMAT}
             ">${BM_RESULT_DIR}bm_timingResults${current_date}_${rname}.txt"
     COMMAND ${CMAKE_COMMAND} -E echo " running filterBenchmarks"
-    COMMAND filterBenchmarks --benchmark_format=json
+    COMMAND filterBenchmarks ${BM_FORMAT}
             ">${BM_RESULT_DIR}bm_filterResults${current_date}_${rname}.txt"
     COMMAND ${CMAKE_COMMAND} -E echo " running pHoldBenchmarks"
-    COMMAND pholdBenchmarks --benchmark_format=json
+    COMMAND pholdBenchmarks ${BM_FORMAT}
             ">${BM_RESULT_DIR}bm_pholdResults${current_date}_${rname}.txt"
     COMMAND ${CMAKE_COMMAND} -E echo " running messageSendBenchmarks"
-    COMMAND messageSendBenchmarks --benchmark_format=json
+    COMMAND messageSendBenchmarks ${BM_FORMAT}
             ">${BM_RESULT_DIR}bm_messageSendResults${current_date}_${rname}.txt"
 )
 
