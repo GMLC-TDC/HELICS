@@ -571,16 +571,24 @@ set(CMAKE_MACOSX_RPATH ON)
 # the build tree to the install RPATH
 set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 
+# Add the local directory to the rpath
 if(NOT APPLE)
-    set(CMAKE_INSTALL_RPATH $ORIGIN)
+    list(APPEND CMAKE_INSTALL_RPATH $ORIGIN)
+    list(APPEND CMAKE_INSTALL_RPATH
+                "\$ORIGIN/../${CMAKE_INSTALL_LIBDIR}"
+    )
+else()
+    list(APPEND CMAKE_INSTALL_RPATH "@loader_path/.")
+    list(APPEND CMAKE_INSTALL_RPATH "@executable_path/.")
 endif()
+
 
 # the RPATH to be used when installing, but only if it's not a system directory
 list(FIND CMAKE_PLATFORM_IMPLICIT_LINK_DIRECTORIES
           "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_BINDIR}" isSystemDir
 )
 if(isSystemDir STREQUAL "-1")
-    list(APPEND CMAKE_INSTALL_RPATH CMAKE_INSTALL_RPATH
+    list(APPEND CMAKE_INSTALL_RPATH
                 "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_BINDIR}"
     )
 endif()
@@ -590,16 +598,6 @@ list(FIND CMAKE_PLATFORM_IMPLICIT_LINK_DIRECTORIES
 )
 if(isSystemDir STREQUAL "-1")
     list(APPEND CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}")
-endif()
-
-# add the local directory to the rpath
-
-if(APPLE)
-    list(APPEND CMAKE_INSTALL_RPATH "@loader_path/.")
-    list(APPEND CMAKE_INSTALL_RPATH "@executable_path/.")
-else()
-    list(APPEND CMAKE_INSTALL_RPATH "./")
-    list(APPEND CMAKE_INSTALL_RPATH "./../${CMAKE_INSTALL_LIBDIR}")
 endif()
 
 if(NOT WIN32)
