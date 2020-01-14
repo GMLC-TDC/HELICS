@@ -370,7 +370,7 @@ bool FirewallFilterOperation::allowPassed(const Message* /*mess*/) const
 
 CloneFilterOperation::CloneFilterOperation(Core* core):
     coreptr(core),
-    op(std::make_shared<CloneOperator>([this](const Message* mess) { sendMessage(mess); }))
+    op(std::make_shared<CloneOperator>([this](const Message* mess) { return sendMessage(mess); }))
 {
 }
 
@@ -414,14 +414,15 @@ std::shared_ptr<FilterOperator> CloneFilterOperation::getOperator()
     return std::static_pointer_cast<FilterOperator>(op);
 }
 
-void CloneFilterOperation::sendMessage(const Message* mess) const
+std::vector<std::unique_ptr<Message>> CloneFilterOperation::sendMessage(const Message* mess) const
 {
+    std::vector<std::unique_ptr<Message>> messages;
     auto lock = deliveryAddresses.lock_shared();
     for (auto& add : *lock) {
-        auto m = std::make_unique<Message>(*mess);
-        m->original_dest = m->dest;
-        m->dest = add;
-        coreptr->sendMessage(direct_send_handle, std::move(m));
+        messages.push_back(std::make_unique<Message>(*mess));
+        messages.back()->original_dest = messages.back()->dest;
+        messages.back()->dest = add;
     }
+    return messages;
 }
 } // namespace helics
