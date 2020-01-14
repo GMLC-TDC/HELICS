@@ -102,6 +102,15 @@ else()
 endif()
 
 ###############################
+# Run SWIG only (no build)
+###############################
+# Swig doesn't need Python to generate the wrapper files
+if(HELICS_SWIG_GENERATE_INTERFACE_FILES_ONLY AND SWIG_EXECUTABLE)
+    include(${CMAKE_CURRENT_SOURCE_DIR}/pythonSwigGenerateOnly.cmake)
+    return()
+endif()
+
+###############################
 # Find Python libraries
 ###############################
 if(HELICS_USE_NEW_PYTHON_FIND)
@@ -128,14 +137,6 @@ else()
     set(HELICS_Python3_EXECUTABLE "${PYTHON_EXECUTABLE}")
     set(HELICS_Python3_INCLUDE_DIRS "${PYTHON_INCLUDE_DIRS}")
     set(HELICS_Python3_LIBRARIES "${PYTHON_LIBRARIES}")
-endif()
-
-###############################
-# Run SWIG only (no build)
-###############################
-if(HELICS_SWIG_GENERATE_INTERFACE_FILES_ONLY AND SWIG_EXECUTABLE)
-    include(${CMAKE_CURRENT_SOURCE_DIR}/pythonSwigGenerateOnly.cmake)
-    return()
 endif()
 
 ###############################
