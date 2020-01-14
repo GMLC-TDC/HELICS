@@ -98,18 +98,12 @@ jobs:
     name: Build ${{ matrix.os }} ${{ matrix.arch }} ${{ matrix.cpack_gen }} Installer
     strategy:
       matrix:
-        id: [windows-x64-nsis, windows-x64-zip, macos-x64-zip]
+        id: [windows-x64, macos-x64-zip]
         include:
-          - id: windows-x64-nsis
+          - id: windows-x64
             os: windows-latest
             arch: x64
-            cpack_gen: NSIS
-            cmake_gen: 'Visual Studio 16 2019'
-            msvc_ver: 'msvc2019'
-          - id: windows-x64-zip
-            os: windows-latest
-            arch: x64
-            cpack_gen: ZIP
+            cpack_gen: NSIS;ZIP
             cmake_gen: 'Visual Studio 16 2019'
             msvc_ver: 'msvc2019'
           - id: macos-x64-zip
@@ -157,8 +151,8 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         UPLOAD_URL: ${{ github.event.release.upload_url }}
       shell: bash
-      run: ./.github/workflows/upload-release-asset.sh "$(ls artifact/Helics-*)"
-      
+      run: for filename in artifact/Helics-*; do ./.github/workflows/upload-release-asset.sh "${filename}"; done
+
     # GitHub Actions combines artifacts uploaded with the same name
     - name: Upload artifact
       uses: actions/upload-artifact@v1
