@@ -86,7 +86,6 @@ cmake_dependent_advanced_option(
 )
 # cmake-format: on
 
-
 cmake_dependent_option(
     HELICS_ENABLE_SWIG
     "use swig to generate the interface files"
@@ -129,7 +128,7 @@ if(HELICS_ENABLE_SWIG OR swig_required)
         # examine its usage and implications for now leave it at the OLD
         cmake_policy(SET CMP0086 OLD)
     endif()
-    find_package(SWIG REQUIRED 3.0)
+    find_package(SWIG 3 REQUIRED)
     include(${SWIG_USE_FILE})
 endif()
 

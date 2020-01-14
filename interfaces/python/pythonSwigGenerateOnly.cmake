@@ -23,7 +23,7 @@ endif()
       "-I${CMAKE_SOURCE_DIR}/src/helics/shared_api_library"
       ${CMAKE_CURRENT_SOURCE_DIR}/helicsPython.i
     DEPENDS
-      ../helics.i
+      ${HELICS_SWIG_helics.i_FILE}
       ${CMAKE_CURRENT_SOURCE_DIR}/helicsPython.i
       ${SHARED_LIB_HEADERS}
       ${CMAKE_CURRENT_SOURCE_DIR}/python_maps.i

@@ -7,284 +7,272 @@
 # SPDX-License-Identifier: BSD-3-Clause
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-if(HELICS_SWIG_GENERATE_INTERFACE_FILES_ONLY)
-    include(${CMAKE_CURRENT_SOURCE_DIR}/pythonSwigGenerateOnly.cmake)
-else()
+cmake_minimum_required(VERSION 3.4)
+project(helicsPYTHON)
 
-    if(HELICS_USE_NEW_PYTHON_FIND)
-        find_package(Python3 COMPONENTS Interpreter Development)
-        if(HELICS_ENABLE_SWIG AND SWIG_EXECUTABLE)
+get_directory_property(hasParent PARENT_DIRECTORY)
 
-            # https://stackoverflow.com/a/3818084/5451769
-            if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX)
-                # Update if necessary
-                set(
-                    CMAKE_C_FLAGS
-                    "${CMAKE_C_FLAGS} -Wno-long-long -Wno-overlength-strings -Wno-ignored-attributes"
-                )
-            endif()
+if(NOT hasParent)
+    message(STATUS "Standalone Python interface build")
 
-            set(CMAKE_SWIG_FLAGS "-py3")
-
-            if(SWIG_VERSION VERSION_GREATER "4.0.0")
-                set(CMAKE_SWIG_FLAGS ${CMAKE_SWIG_FLAGS} "-doxygen")
-            endif()
-
-            set_property(SOURCE ../helics.i PROPERTY SWIG_MODULE_NAME helics)
-
-            swig_add_library(
-                helics
-                TYPE
-                MODULE
-                LANGUAGE
-                python
-                SOURCES
-                helicsPython.i
-            )
-
-            swig_link_libraries(helics helicsSharedLib)
-            if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
-                # https://groups.google.com/a/continuum.io/d/msg/anaconda/057P4uNWyCU/Ie
-                # m6Ot jBCQAJ
-                set_target_properties(
-                    _helics
-                    PROPERTIES LINK_FLAGS "-undefined dynamic_lookup"
-                )
-            else()
-                swig_link_libraries(helics ${Python3_LIBRARIES})
-            endif()
-
-            target_include_directories(_helics PRIVATE ${Python3_INCLUDE_DIRS})
-            if(MSVC)
-                target_compile_options(_helics PRIVATE "/wd4100")
-            else(MSVC)
-                target_compile_options(_helics PRIVATE "-Wno-long-long")
-            endif(MSVC)
-
-            set_target_properties(_helics PROPERTIES FOLDER interfaces)
-
-            install(
-                TARGETS
-                    _helics
-                    DESTINATION
-                    python
-                    COMPONENT
-                    python
-            )
-
-            copy_key_files_to_target_location(_helics)
-            copy_shared_target(_helics helicsSharedLib)
-
-        else()
-            message("Building without swig cmake ${CMAKE_VERSION}")
-            python3_add_library(helicsPYTHON MODULE helicsPython.c)
-
-            copy_key_files_to_target_location(helicsPYTHON PUBLIC)
-            copy_shared_target(helicsPYTHON helicsSharedLib)
-
-            # Set the output library name to _helics
-            set_target_properties(
-                helicsPYTHON
-                PROPERTIES PREFIX "_" OUTPUT_NAME "helics"
-            )
-            target_link_libraries(helicsPYTHON PUBLIC helicsSharedLib)
-
-            set_target_properties(helicsPYTHON PROPERTIES FOLDER interfaces)
-            install(
-                TARGETS
-                    helicsPYTHON
-                    DESTINATION
-                    python
-                    COMPONENT
-                    python
-            )
-
-            configure_file(${CMAKE_CURRENT_SOURCE_DIR}/setup.py.in
-                           ${CMAKE_CURRENT_BINARY_DIR}/setup.py)
-            configure_file(${CMAKE_CURRENT_SOURCE_DIR}/helics.py
-                           ${CMAKE_CURRENT_BINARY_DIR}/helics.py COPYONLY)
-
-        endif()
-    else()
-
-        set(
-            Python_ADDITIONAL_VERSIONS
-            3.4
-            3.5
-            3.6
-            3.7
-            3.8
-        )
-        if(NOT PYTHON_EXECUTABLE)
-            find_package(PythonInterp 3 REQUIRED)
-            if(PYTHONINTERP_FOUND)
-                set(Python_ADDITIONAL_VERSIONS "${PYTHON_VERSION_STRING}")
-            endif()
-        endif()
-        find_package(PythonLibs 3 REQUIRED)
-
-        if(HELICS_ENABLE_SWIG AND SWIG_EXECUTABLE)
-
-            # https://stackoverflow.com/a/3818084/5451769
-            if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX)
-                # Update if necessary
-                set(
-                    CMAKE_C_FLAGS
-                    "${CMAKE_C_FLAGS} -Wno-long-long -Wno-overlength-strings -Wno-ignored-attributes"
-                )
-            endif()
-
-            include_directories(${PYTHON_INCLUDE_DIRS})
-
-            set(CMAKE_SWIG_FLAGS "-py3")
-
-            if(SWIG_VERSION VERSION_GREATER "4.0.0")
-                set(CMAKE_SWIG_FLAGS ${CMAKE_SWIG_FLAGS} "-doxygen")
-            endif()
-
-            set_property(SOURCE ../helics.i PROPERTY SWIG_MODULE_NAME helics)
-
-            if(${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION} VERSION_GREATER 3.7)
-                swig_add_library(
-                    helics
-                    TYPE
-                    MODULE
-                    LANGUAGE
-                    python
-                    SOURCES
-                    helicsPython.i
-                )
-            else()
-                swig_add_module(helics python helicsPython.i)
-            endif()
-
-            swig_link_libraries(helics helicsSharedLib)
-            if(MSVC)
-                target_compile_options(_helics PRIVATE "/wd4100")
-            else(MSVC)
-                target_compile_options(_helics PRIVATE "-Wno-long-long")
-            endif(MSVC)
-            if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
-                # https://groups.google.com/a/continuum.io/d/msg/anaconda/057P4uNWyCU/Ie
-                # m6Ot jBCQAJ
-                set_target_properties(
-                    _helics
-                    PROPERTIES LINK_FLAGS "-undefined dynamic_lookup"
-                )
-            else()
-                swig_link_libraries(helics ${PYTHON_LIBRARIES})
-            endif()
-
-            set_target_properties(_helics PROPERTIES FOLDER interfaces)
-
-            # execute_process(COMMAND python -c "from distutils.sysconfig import
-            # get_python_lib; print get_python_lib()" OUTPUT_VARIABLE
-            # PYTHON_SITE_PACKAGES OUTPUT_STRIP_TRAILING_WHITESPACE)
-
-            install(
-                TARGETS
-                    _helics
-                    DESTINATION
-                    python
-                    COMPONENT
-                    python
-            )
-
-            copy_key_files_to_target_location(_helics)
-            copy_shared_target(_helics helicsSharedLib)
-
-        else()
-            message("Building without swig cmake ${CMAKE_VERSION}")
-
-            # convert to use the python3_add_library in HELICS 3
-
-            add_library(helicsPYTHON MODULE helicsPython.c)
-            # Add path to Python include directory
-            target_include_directories(helicsPYTHON PUBLIC ${PYTHON_INCLUDE_DIRS})
-
-            # Get list of libraries to link with for Python module
-            if(NOT MSVC)
-                execute_process(
-                    COMMAND
-                        ${PYTHON_EXECUTABLE} "-c"
-                        "from distutils import sysconfig; print(sysconfig.get_config_var('BLDSHARED').split(' ', 1)[1])"
-                    OUTPUT_VARIABLE pymodule_libs
-                )
-                # Clean-up leading and trailing whitespace
-                string(STRIP ${pymodule_libs} pymodule_libs)
-            else()
-                set(pymodule_libs "")
-            endif()
-            if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
-                # https://groups.google.com/a/continuum.io/d/msg/anaconda/057P4uNWyCU/Ie
-                # m6Ot jBCQAJ
-                set_target_properties(
-                    helicsPYTHON
-                    PROPERTIES LINK_FLAGS "-undefined dynamic_lookup"
-                )
-            else()
-                target_link_libraries(
-                    helicsPYTHON
-                    PUBLIC ${pymodule_libs} ${PYTHON_LIBRARIES}
-                )
-            endif()
-
-            if(NOT MSVC)
-                # Get list of compiler flags for compiling Python module
-                execute_process(
-                    COMMAND
-                        ${PYTHON_EXECUTABLE} "-c"
-                        "from distutils import sysconfig; print(sysconfig.get_config_var('CFLAGS').split(' ', 1)[1])"
-                    OUTPUT_VARIABLE pymodule_includes
-                )
-                # Clean-up leading and trailing whitespace, convert into a CMake
-                # ;-separated list
-                string(STRIP ${pymodule_includes} pymodule_includes)
-                string(REPLACE " " ";" pymodule_includes "${pymodule_includes}")
-                target_compile_options(helicsPYTHON PUBLIC ${pymodule_includes})
-
-                set_target_properties(helicsPYTHON PROPERTIES FOLDER interfaces)
-
-            endif()
-
-            copy_key_files_to_target_location(helicsPYTHON)
-            copy_shared_target(helicsPYTHON helicsSharedLib)
-
-            # Set the output library name to _helics
-            set_target_properties(
-                helicsPYTHON
-                PROPERTIES PREFIX "_" OUTPUT_NAME "helics"
-            )
-            
-            # Set the output library extension to .pyd on Windows
-            if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
-                set_property(TARGET helicsPYTHON PROPERTY SUFFIX ".pyd")
-            endif()
-
-            target_link_libraries(helicsPYTHON PUBLIC helicsSharedLib)
-
-            install(
-                TARGETS
-                    helicsPYTHON
-                    DESTINATION
-                    python
-                    COMPONENT
-                    python
-            )
-
-            configure_file(${CMAKE_CURRENT_SOURCE_DIR}/setup.py.in
-                           ${CMAKE_CURRENT_BINARY_DIR}/setup.py)
-            configure_file(${CMAKE_CURRENT_SOURCE_DIR}/helics.py
-                           ${CMAKE_CURRENT_BINARY_DIR}/helics.py COPYONLY)
-
-        endif()
+    # Setup options
+    option(HELICS_ENABLE_SWIG "Use SWIG to generate the Python interface files" ON)
+    option(HELICS_SWIG_GENERATE_INTERFACE_FILES_ONLY "Only generate the SWIG interface files" OFF)
+    if(NOT ${CMAKE_VERSION} VERSION_LESS 3.12)
+        option(HELICS_USE_NEW_PYTHON_FIND "Use the FindPython module added in CMake 3.12" OFF)
     endif()
 
-    install(
-        FILES ${CMAKE_CURRENT_BINARY_DIR}/helics.py
-        DESTINATION python
-        COMPONENT python
-    )
-    install_key_files_with_comp(python)
+    include(GNUInstallDirs)
 
-endif(HELICS_SWIG_GENERATE_INTERFACE_FILES_ONLY)
+    # Setup rpath
+    set(CMAKE_SKIP_BUILD_RPATH FALSE)
+    set(CMAKE_BUILD_WITH_INSTALL_RPATH FALSE)
+    set(CMAKE_MACOSX_RPATH ON)
+    set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
+
+    # Add the local directory to the rpath
+    if(NOT APPLE)
+        list(APPEND CMAKE_INSTALL_RPATH $ORIGIN)
+        list(APPEND CMAKE_INSTALL_RPATH
+                    "\$ORIGIN/../${CMAKE_INSTALL_LIBDIR}"
+        )
+    else()
+        list(APPEND CMAKE_INSTALL_RPATH "@loader_path/.")
+        list(APPEND CMAKE_INSTALL_RPATH "@executable_path/.")
+    endif()
+endif()
+
+###############################
+# Find required dependencies
+###############################
+# Find HELICS
+if(NOT hasParent OR NOT TARGET HELICS::helicsSharedLib)
+    find_package(HELICS 2 REQUIRED)
+endif()
+
+if(HELICS_ENABLE_SWIG OR HELICS_SWIG_GENERATE_INTERFACE_FILES_ONLY)
+    # Find SWIG
+    if(NOT DEFINED SWIG_FOUND OR SWIG_VERSION VERSION_LESS 3)
+        if(POLICY CMP0078)
+            cmake_policy(SET CMP0078 OLD)
+        endif()
+        if(POLICY CMP0086)
+            cmake_policy(SET CMP0086 OLD)
+        endif()
+        find_package(SWIG 3 REQUIRED)
+        include(${SWIG_USE_FILE})
+    endif()
+
+    # Find helics.i swig interface file
+    if(NOT HELICS_SWIG_helics.i_FILE)
+        foreach(TMPDIR IN LISTS HELICS_SWIG_INCLUDE_DIRS)
+            if(NOT HELICS_SWIG_helics.i_FILE)
+                if(EXISTS "${TMPDIR}/helics.i")
+                    # cmake-format: off
+                    set(HELICS_SWIG_helics.i_FILE "${TMPDIR}/helics.i" CACHE FILEPATH "Path to the helics.i file used by swig" FORCE)
+                    # cmake-format: on
+                endif()
+            endif()
+        endforeach()
+        if(NOT HELICS_SWIG_helics.i_FILE)
+            message(FATAL_ERROR "Unable to find helics.i file, required for swig to generate interfaces")
+        endif()
+    endif()
+endif()
+
+# CMake UseSWIG doesn't properly propagate include dirs when using target_link_libraries
+# This is also the only way that works with CMake < 3.12
+include_directories(${HELICS_SWIG_INCLUDE_DIRS})
+
+###############################
+# UseSWIG feature support
+###############################
+# This can be removed in HELICS 3 if the minimum CMake version is >= 3.12
+if(NOT CMAKE_VERSION VERSION_LESS 3.12)
+    set(USE_MODERNIZED_SWIG ON)
+else()
+    set(USE_MODERNIZED_SWIG OFF)
+endif()
+
+# This can be removed in HELICS 3 if the minimum CMake version is >= 3.8
+if(NOT CMAKE_VERSION VERSION_LESS 3.8)
+    set(USE_SWIG_ADD_LIBRARY ON)
+else()
+    set(USE_SWIG_ADD_LIBRARY OFF)
+endif()
+
+###############################
+# Find Python libraries
+###############################
+if(HELICS_USE_NEW_PYTHON_FIND)
+    find_package(Python3 COMPONENTS Interpreter Development)
+    set(HELICS_Python3_EXECUTABLE "${Python3_EXECUTABLE}")
+    set(HELICS_Python3_INCLUDE_DIRS "${Python3_INCLUDE_DIRS}")
+    set(HELICS_Python3_LIBRARIES "${Python3_LIBRARIES}")
+else()
+    set(
+        Python_ADDITIONAL_VERSIONS
+        3.4
+        3.5
+        3.6
+        3.7
+        3.8
+    )
+    if(NOT PYTHON_EXECUTABLE)
+        find_package(PythonInterp 3 REQUIRED)
+    endif()
+    if(PYTHONINTERP_FOUND)
+        set(Python_ADDITIONAL_VERSIONS "${PYTHON_VERSION_STRING}")
+    endif()
+    find_package(PythonLibs 3 REQUIRED)
+    set(HELICS_Python3_EXECUTABLE "${PYTHON_EXECUTABLE}")
+    set(HELICS_Python3_INCLUDE_DIRS "${PYTHON_INCLUDE_DIRS}")
+    set(HELICS_Python3_LIBRARIES "${PYTHON_LIBRARIES}")
+endif()
+
+###############################
+# Run SWIG only (no build)
+###############################
+if(HELICS_SWIG_GENERATE_INTERFACE_FILES_ONLY AND SWIG_EXECUTABLE)
+    include(${CMAKE_CURRENT_SOURCE_DIR}/pythonSwigGenerateOnly.cmake)
+    return()
+endif()
+
+###############################
+# Build the Python interface
+###############################
+if(HELICS_ENABLE_SWIG AND SWIG_EXECUTABLE)
+    # https://stackoverflow.com/a/3818084/5451769
+    if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX)
+        # Update if necessary
+        set(
+            CMAKE_C_FLAGS
+            "${CMAKE_C_FLAGS} -Wno-long-long -Wno-overlength-strings -Wno-ignored-attributes"
+        )
+    endif()
+
+    if(NOT USE_MODERNIZED_SWIG)
+        include_directories(${HELICS_Python3_INCLUDE_DIRS})
+        message(STATUS "Using old SWIG include_directories")
+    endif()
+
+    set(CMAKE_SWIG_FLAGS "-py3")
+
+    if(SWIG_VERSION VERSION_GREATER "4.0.0")
+        set(CMAKE_SWIG_FLAGS ${CMAKE_SWIG_FLAGS} "-doxygen")
+    endif()
+
+    if(USE_SWIG_ADD_LIBRARY)
+        swig_add_library(
+            helics
+            TYPE
+            MODULE
+            LANGUAGE
+            python
+            SOURCES
+            helicsPython.i
+        )
+    else()
+        swig_add_module(helics python helicsPython.i)
+        message(STATUS "Using old swig_add_module")
+    endif()
+
+    swig_link_libraries(helics HELICS::helicsSharedLib)
+
+    if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+        # https://groups.google.com/a/continuum.io/d/msg/anaconda/057P4uNWyCU/Ie
+        # m6Ot%20jBCQAJ
+        # https://github.com/GMLC-TDC/HELICS/commit/633b218f9351aa452d4#commitcomment-27055932
+        set_target_properties(
+            _helics
+            PROPERTIES LINK_FLAGS "-undefined dynamic_lookup"
+        )
+    else()
+        swig_link_libraries(helics ${HELICS_Python3_LIBRARIES})
+    endif()
+
+    if(USE_MODERNIZED_SWIG)
+        target_include_directories(_helics PRIVATE ${HELICS_Python3_INCLUDE_DIRS})
+        message(STATUS "Using new swig target_include_directories")
+    endif()
+
+    if(MSVC)
+        target_compile_options(_helics PRIVATE "/wd4100")
+    else(MSVC)
+        target_compile_options(_helics PRIVATE "-Wno-long-long")
+    endif(MSVC)
+
+    set_target_properties(_helics PROPERTIES FOLDER interfaces)
+
+    install(
+        TARGETS
+        _helics
+        DESTINATION
+        python
+        COMPONENT
+        python
+    )
+
+    set(HELICS_PYTHON_TARGET_NAME _helics)
+else()
+    message("Building without swig cmake ${CMAKE_VERSION}")
+
+    if(HELICS_USE_NEW_PYTHON_FIND)
+        python3_add_library(helicsPYTHON MODULE helicsPython.c)
+    else()
+        # Remove in HELICS 3
+        include(${CMAKE_CURRENT_SOURCE_DIR}/addHelicsPy3Lib.cmake)
+        helics_python3_add_library(helicsPYTHON helicsPython.c)
+    endif()
+
+    # Set the output library name to _helics
+    set_target_properties(
+        helicsPYTHON
+        PROPERTIES PREFIX "_" OUTPUT_NAME "helics"
+    )
+
+    target_link_libraries(helicsPYTHON PUBLIC HELICS::helicsSharedLib)
+    set_target_properties(helicsPYTHON PROPERTIES FOLDER interfaces)
+
+    install(
+        TARGETS
+        helicsPYTHON
+        DESTINATION
+        python
+        COMPONENT
+        python
+    )
+
+    set(HELICS_PYTHON_TARGET_NAME helicsPYTHON)
+
+    # TODO: check for when setup.py is used
+    configure_file(${CMAKE_CURRENT_SOURCE_DIR}/setup.py.in
+                   ${CMAKE_CURRENT_BINARY_DIR}/setup.py)
+    configure_file(${CMAKE_CURRENT_SOURCE_DIR}/helics.py
+                   ${CMAKE_CURRENT_BINARY_DIR}/helics.py COPYONLY)
+endif()
+
+
+install(
+    FILES ${CMAKE_CURRENT_BINARY_DIR}/helics.py
+    DESTINATION python
+    COMPONENT python
+)
+
+###############################
+# Install steps
+###############################
+# Copy/install commands for shared libraries are only needed on Windows, which doesn't support rpaths
+# Standalone interface builds for wheels will need the files to be copied to a different location anyway,
+# so not copying the files for now isn't a big loss
+if(WIN32)
+    if(COMMAND copy_key_files_to_target_location)
+        copy_key_files_to_target_location(${HELICS_PYTHON_TARGET_NAME})
+    endif()
+    if(COMMAND copy_shared_target)
+        copy_shared_target(${HELICS_PYTHON_TARGET_NAME} HELICS::helicsSharedLib)
+    endif()
+    if(COMMAND install_key_files_with_comp)
+        install_key_files_with_comp(python)
+    endif()
+endif()
