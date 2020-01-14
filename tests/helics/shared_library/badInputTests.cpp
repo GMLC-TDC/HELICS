@@ -295,7 +295,10 @@ TEST_F(function_tests, raw2)
     helicsPublicationPublishDouble(pubid, 27.0, nullptr);
     helicsFederateRequestNextStep(vFed1, nullptr);
     // we are just making sure these don't blow up and cause a seg fault
-    helicsInputGetRawValue(subid, nullptr, 5, nullptr, nullptr);
+    helicsInputGetRawValue(subid, nullptr, 5, nullptr, &err);
+    EXPECT_NE(err.error_code, 0);
+    helicsErrorClear(&err);
+
     helicsInputGetString(subid, nullptr, 5, nullptr, nullptr);
     auto val = helicsInputGetComplexObject(subid, &err);
     EXPECT_NE(val.real, 0.0);

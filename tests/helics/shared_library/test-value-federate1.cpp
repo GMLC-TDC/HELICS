@@ -892,7 +892,11 @@ TEST_P(vfed_simple_type_tests, test_info_field)
     EXPECT_STREQ(helicsPublicationGetInfo(pubid1), "pub1_test");
     EXPECT_STREQ(helicsPublicationGetInfo(pubid2), "pub2_test");
 
+    CE(auto cr = helicsFederateGetCoreObject(vFed, &err));
     CE(helicsFederateFinalize(vFed, &err));
+
+    CE(auto wait = helicsCoreWaitForDisconnect(cr, 70, &err));
+    EXPECT_EQ(wait, helics_true);
 }
 
 INSTANTIATE_TEST_SUITE_P(

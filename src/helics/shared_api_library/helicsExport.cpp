@@ -984,9 +984,11 @@ void helicsBrokerDisconnect(helics_broker broker, helics_error* err)
     try {
         brk->disconnect();
     }
+    // LCOV_EXCL_START
     catch (...) {
         return helicsErrorHandler(err);
     }
+    // LCOV_EXCL_STOP
 }
 
 void helicsFederateDestroy(helics_federate fed)
@@ -1139,10 +1141,12 @@ const char* helicsQueryCoreExecute(helics_query query, helics_core core, helics_
         queryObj->response = coreObj->query(queryObj->target, queryObj->query);
         return queryObj->response.c_str();
     }
+    // LCOV_EXCL_START
     catch (...) {
         helicsErrorHandler(err);
-        return invalidStringConst;
     }
+    return invalidStringConst;
+    // LCOV_EXCL_START
 }
 
 const char* helicsQueryBrokerExecute(helics_query query, helics_broker broker, helics_error* err)
@@ -1160,10 +1164,12 @@ const char* helicsQueryBrokerExecute(helics_query query, helics_broker broker, h
         queryObj->response = brokerObj->query(queryObj->target, queryObj->query);
         return queryObj->response.c_str();
     }
+    // LCOV_EXCL_START
     catch (...) {
         helicsErrorHandler(err);
     }
     return invalidStringConst;
+    // LCOV_EXCL_STOP
 }
 
 void helicsQueryExecuteAsync(helics_query query, helics_federate fed, helics_error* err)
@@ -1185,9 +1191,11 @@ void helicsQueryExecuteAsync(helics_query query, helics_federate fed, helics_err
         queryObj->activeAsync = true;
         queryObj->activeFed = fedObj;
     }
+    // LCOV_EXCL_START
     catch (...) {
         helicsErrorHandler(err);
     }
+    // LCOV_EXCL_STOP
 }
 
 const char* helicsQueryExecuteComplete(helics_query query, helics_error* err)
@@ -1242,7 +1250,7 @@ MasterObjectHolder::~MasterObjectHolder()
 {
 #ifdef ENABLE_ZMQ_CORE
     if (ZmqContextManager::setContextToLeakOnDelete()) {
-        ZmqContextManager::getContext().close();
+        ZmqContextManager::getContext().close(); // LCOV_EXCL_LINE
     }
 #endif
     helics::LoggingCore::setFastShutdown();

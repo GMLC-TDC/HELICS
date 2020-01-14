@@ -720,6 +720,20 @@ int helicsInputGetRawValueSize(helics_input inp)
     return static_cast<int>(inpObj->inputPtr->getRawSize());
 }
 
+
+bool checkOutArgString(const char* outputString, int maxlen, helics_error* err)
+{
+    static constexpr char invalidOutputString[] = "Output string location is invalid";
+    if ((outputString == nullptr) || (maxlen <= 0)) {
+        if (err != nullptr) {
+            err->error_code = helics_error_invalid_argument;
+            err->message = invalidOutputString;
+        }
+        return false;
+    }
+    return true;
+}
+
 void helicsInputGetRawValue(helics_input inp, void* data, int maxDatalen, int* actualSize, helics_error* err)
 {
     auto inpObj = verifyInput(inp, err);
