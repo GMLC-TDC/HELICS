@@ -1114,6 +1114,9 @@ void CommonCore::addDestinationTarget(interface_handle handle, const std::string
                     cmd.setStringData(handleInfo->type_in, handleInfo->type_out);
                 }
             }
+            if (checkActionFlag(*handleInfo, clone_flag)) {
+                setActionFlag(cmd, clone_flag);
+            }
             break;
         case handle_type::publication:
             cmd.setAction(CMD_ADD_NAMED_INPUT);
@@ -1149,6 +1152,9 @@ void CommonCore::addSourceTarget(interface_handle handle, const std::string& tar
                 if ((!handleInfo->type_in.empty()) || (!handleInfo->type_out.empty())) {
                     cmd.setStringData(handleInfo->type_in, handleInfo->type_out);
                 }
+            }
+            if (checkActionFlag(*handleInfo, clone_flag)) {
+                setActionFlag(cmd, clone_flag);
             }
             break;
         case handle_type::input:
@@ -2658,6 +2664,9 @@ void CommonCore::processCommand(ActionMessage&& command)
                 command.name = command.getString(targetStringLoc);
                 command.setAction(CMD_ADD_NAMED_ENDPOINT);
                 command.setSource(filt->handle);
+                if (checkActionFlag(*filt, clone_flag)) {
+                    setActionFlag(command, clone_flag);
+                }
                 checkForNamedInterface(command);
             } else {
                 auto ept = loopHandles.getEndpoint(command.getString(targetStringLoc));
@@ -2912,6 +2921,9 @@ void CommonCore::checkForNamedInterface(ActionMessage& command)
                 addTargetToInterface(command);
                 command.setAction(CMD_ADD_FILTER);
                 command.swapSourceDest();
+                if (checkActionFlag(*filt, clone_flag)) {
+                    setActionFlag(command, clone_flag);
+                }
                 addTargetToInterface(command);
             } else {
                 routeMessage(std::move(command));

@@ -90,12 +90,14 @@ std::unique_ptr<Message> MessageConditionalOperator::process(std::unique_ptr<Mes
     return message;
 }
 
-CloneOperator::CloneOperator(std::function<void(const Message*)> userCloneFunction):
+CloneOperator::CloneOperator(
+    std::function<std::vector<std::unique_ptr<Message>>(const Message*)> userCloneFunction):
     evalFunction(std::move(userCloneFunction))
 {
 }
 
-void CloneOperator::setCloneFunction(std::function<void(const Message*)> userCloneFunction)
+void CloneOperator::setCloneFunction(
+    std::function<std::vector<std::unique_ptr<Message>>(const Message*)> userCloneFunction)
 {
     evalFunction = std::move(userCloneFunction);
 }
@@ -103,9 +105,20 @@ void CloneOperator::setCloneFunction(std::function<void(const Message*)> userClo
 std::unique_ptr<Message> CloneOperator::process(std::unique_ptr<Message> message)
 {
     if (evalFunction) {
-        evalFunction(message.get());
+        auto res = evalFunction(message.get());
+        if (res.size() == 1) {
+            return std::move(res.front());
+        }
     }
     return message;
+}
+
+std::vector<std::unique_ptr<Message>> CloneOperator::processVector(std::unique_ptr<Message> message)
+{
+    if (evalFunction) {
+        return evalFunction(message.get());
+    }
+    return {};
 }
 
 FirewallOperator::FirewallOperator(std::function<bool(const Message*)> userCheckFunction):

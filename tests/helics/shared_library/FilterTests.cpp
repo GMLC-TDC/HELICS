@@ -605,7 +605,7 @@ TEST_F(filter_tests, clone_test_connections)
     EXPECT_NE(err.error_code, 0);
         helicsErrorClear(&err);
 
-    CE(helicsFederateEnterExecutingModeAsync(sFed, &err));
+    CE(helicsFederateEnterExecutingModeAsync(sFed, &err)); 
     CE(helicsFederateEnterExecutingModeAsync(dcFed, &err));
     CE(helicsFederateEnterExecutingMode(dFed, &err));
     CE(helicsFederateEnterExecutingModeComplete(sFed, &err));
@@ -740,7 +740,7 @@ TEST_F(filter_tests, clone_test_dest_connections)
 
     auto sFed = GetFederateAt(0);
     auto dFed = GetFederateAt(1);
-    auto dcFed = GetFederateAt(2);
+    auto dcFed = GetFederateAt(2); 
 
     auto p1 = helicsFederateRegisterGlobalEndpoint(sFed, "src", "", &err);
     auto p2 = helicsFederateRegisterGlobalEndpoint(dFed, "dest", "", &err);
