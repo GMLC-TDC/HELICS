@@ -34,18 +34,20 @@ TEST_P(query_tests, publication_queries)
     CE(std::string res(helicsQueryCoreExecute(q1, core, &err)));
 
     EXPECT_EQ(res, "[pub1;fed0/pub2]");
-
+    helicsQueryFree(q1);
+    q1 = helicsCreateQuery(nullptr, "publications");
     CE(std::string res2 = helicsQueryExecute(q1, vFed2, &err));
-    EXPECT_EQ(res2, "[pub1;fed0/pub2]");
+    EXPECT_EQ(res2, "[fed1/pub3]");
 
     helicsQueryFree(q1);
+    
     q1 = helicsCreateQuery("fed1", "isinit");
 
     CE(res = helicsQueryExecute(q1, vFed1, &err));
     EXPECT_EQ(res, "true");
     helicsQueryFree(q1);
 
-    q1 = helicsCreateQuery(nullptr, "publications");
+    q1 = helicsCreateQuery("fed1", "publications");
     CE(res = helicsQueryExecute(q1, vFed1, &err));
     EXPECT_EQ(res, "[fed1/pub3]");
     helicsQueryFree(q1);

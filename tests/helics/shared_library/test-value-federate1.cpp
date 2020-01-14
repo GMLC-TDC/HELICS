@@ -383,7 +383,7 @@ void runFederateTestComplex(
     EXPECT_EQ(val1_r, testValue1_r);
     EXPECT_EQ(val1_i, testValue1_i);
     // advance time
-    CE(gtime = helicsFederateRequestTime(vFed, 2.0, &err));
+    CE(gtime = helicsFederateRequestTimeAdvance(vFed, 1.0, &err));
     // make sure the value was updated
     EXPECT_EQ(gtime, 2.0);
 
@@ -896,6 +896,10 @@ TEST_P(vfed_simple_type_tests, test_info_field)
     CE(helicsFederateFinalize(vFed, &err));
 
     CE(auto wait = helicsCoreWaitForDisconnect(cr, 70, &err));
+    if (wait == helics_false)
+    {
+        wait = helicsCoreWaitForDisconnect(cr, 500, &err);
+    }
     EXPECT_EQ(wait, helics_true);
 }
 

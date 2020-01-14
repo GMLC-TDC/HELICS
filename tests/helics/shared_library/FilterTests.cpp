@@ -392,6 +392,10 @@ TEST_P(filter_type_tests, function2)
     helicsFilterAddSourceTarget(f2, "port2", nullptr);
     EXPECT_TRUE(f2 != NULL);
     CE(helicsFilterSet(f2, "delay", 2.5, &err));
+    //this is expected to fail since a regular filter doesn't have a delivery endpoint
+    helicsFilterAddDeliveryEndpoint(f2, "port1", &err);
+    EXPECT_NE(err.error_code, 0);
+    helicsErrorClear(&err);
 
     CE(helicsFederateEnterExecutingModeAsync(fFed, &err));
     CE(helicsFederateEnterExecutingMode(mFed, &err));

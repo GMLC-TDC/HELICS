@@ -167,8 +167,17 @@ TEST(evil_creation_test, helicsCreateValueFederate)
     auto fi = helicsCreateFederateInfo();
     helicsFederateInfoSetCoreType(fi, helics_core_type_nng, nullptr);
     auto res2 = helicsCreateValueFederate("billy", fi, &err);
+    EXPECT_NE(err.error_code, 0);
     EXPECT_EQ(helicsFederateIsValid(res2), helics_false);
+    helicsErrorClear(&err);
     //auto res2=helicsCreateValueFederate(const char* fedName, helics_federate_info fi, nullptr);
+
+    char rdata[256];
+    helics_federate_info evil_fi = reinterpret_cast<helics_federate_info>(rdata);
+    auto res3 = helicsCreateValueFederate("billy", evil_fi, &err);
+    EXPECT_NE(err.error_code, 0);
+    EXPECT_EQ(helicsFederateIsValid(res3), helics_false);
+
 }
 
 TEST(evil_creation_test, helicsCreateValueFederateFromConfig)
@@ -200,6 +209,13 @@ TEST(evil_creation_test, helicsCreateMessageFederate)
     helicsFederateInfoSetCoreType(fi, helics_core_type_nng, nullptr);
     auto res2 = helicsCreateMessageFederate("billy", fi, &err);
     EXPECT_EQ(helicsFederateIsValid(res2), helics_false);
+
+    char rdata[256];
+    helics_federate_info evil_fi = reinterpret_cast<helics_federate_info>(rdata);
+    auto res3 = helicsCreateMessageFederate("billy", evil_fi, &err);
+    EXPECT_NE(err.error_code, 0);
+    EXPECT_EQ(helicsFederateIsValid(res3), helics_false);
+
 }
 
 TEST(evil_creation_test, helicsCreateMessageFederateFromConfig)
@@ -231,6 +247,11 @@ TEST(evil_creation_test, helicsCreateCombinationFederate)
     helicsFederateInfoSetCoreType(fi, helics_core_type_nng, nullptr);
     auto res2 = helicsCreateCombinationFederate("billy", fi, &err);
     EXPECT_EQ(helicsFederateIsValid(res2), helics_false);
+    char rdata[256];
+    helics_federate_info evil_fi = reinterpret_cast<helics_federate_info>(rdata);
+    auto res3 = helicsCreateCombinationFederate("billy", evil_fi, &err);
+    EXPECT_NE(err.error_code, 0);
+    EXPECT_EQ(helicsFederateIsValid(res3), helics_false);
 }
 
 TEST(evil_creation_test, helicsCreateCombinationFederateFromConfig)

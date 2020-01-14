@@ -84,6 +84,15 @@ TEST_F(bad_input_tests, test_mistaken_finalize)
     helicsFederateFree(vFed1);
 }
 
+/** test simple creation and destruction*/
+TEST_F(bad_input_tests, test_creation)
+{
+    SetupTest(helicsCreateValueFederate, "zmq", 1);
+    
+    auto fed2 = helicsCreateValueFederate("fed3", nullptr, &err);
+    EXPECT_EQ(err.error_code, 0);
+}
+
 TEST(error_tests, unavailable_core_type)
 {
     auto err = helicsErrorInitialize();
@@ -374,6 +383,12 @@ TEST_F(function_tests, typePub)
     EXPECT_EQ(subid2, nullptr);
     helicsErrorClear(&err);
 
+    // value federate can't register endpoints
+    auto ept = helicsFederateRegisterEndpoint(vFed1, "ept1", nullptr, &err);
+    EXPECT_NE(err.error_code, 0);
+    helicsErrorClear(&err);
+    EXPECT_EQ(ept, nullptr);
+
     helicsInputAddTarget(subid, "fed0/pub1", nullptr);
 
     helicsFederateSetTimeProperty(vFed1, helics_property_time_period, 1.0, nullptr);
@@ -387,6 +402,9 @@ TEST_F(function_tests, typePub)
     helicsInputGetString(subid, str, 50, &actLen, &err);
     EXPECT_EQ(str[0], '2');
     EXPECT_EQ(str[1], '7');
+
+    auto messages = helicsFederatePendingMessages(vFed1);
+    EXPECT_EQ(messages, 0);
 
     helicsFederateFinalize(vFed1, nullptr);
 }
@@ -723,8 +741,10 @@ TEST_F(function_tests, initError6)
         vFed1, 1.0, helics_iteration_request_no_iteration, &err);
     EXPECT_NE(err.error_code, 0);
     helicsErrorClear(&err);
-    helicsFederateRequestTimeIterativeComplete(vFed1, nullptr, &err);
+    helics_iteration_result ires = helics_iteration_result_next_step;
+    helicsFederateRequestTimeIterativeComplete(vFed1, &ires, &err);
     EXPECT_NE(err.error_code, 0);
+    EXPECT_TRUE(ires == helics_iteration_result_error);
     helicsErrorClear(&err);
 
     helicsFederateFinalize(vFed1, nullptr);
@@ -852,6 +872,10 @@ TEST_F(function_tests, messageFed)
     //make sure the message got through
     auto cnt = helicsEndpointPendingMessages(ept1);
     EXPECT_EQ(cnt, 2);
+
+    //message Federates do not have publications so should be 0
+    cnt = helicsFederateGetPublicationCount(mFed1);
+    EXPECT_EQ(cnt, 0);
 
     helicsFederateFinalize(mFed1, nullptr);
     helicsEndpointSendMessageRaw(ept1, "fed0/ept1", nullptr, 0, &err);
