@@ -57,6 +57,12 @@ TEST_P(filter_type_tests, registration)
     auto f1_c = helicsFederateGetFilterByIndex(fFed, 2, &err);
     tmp = helicsFilterGetName(f1_c);
     EXPECT_STREQ(tmp, "filter0/c4");
+
+    auto f1_n = helicsFederateGetFilterByIndex(fFed, -2, &err);
+    EXPECT_NE(err.error_code, 0);
+    EXPECT_EQ(f1_n, nullptr);
+    helicsErrorClear(&err);
+
     CE(helicsFederateEnterExecutingModeAsync(fFed, &err));
     CE(helicsFederateEnterExecutingMode(mFed, &err));
     CE(helicsFederateEnterExecutingModeComplete(fFed, &err));

@@ -528,19 +528,6 @@ helics_message_object helicsEndpointGetLastMessage (helics_endpoint endpoint)
 }
 */
 
-bool checkOutArgString(const char* outputString, int maxlen, helics_error* err)
-{
-    static constexpr char invalidOutputString[] = "Output string location is invalid";
-    if ((outputString == nullptr) || (maxlen <= 0)) {
-        if (err != nullptr) {
-            err->error_code = helics_error_invalid_argument;
-            err->message = invalidOutputString;
-        }
-        return false;
-    }
-    return true;
-}
-
 const char* helicsEndpointGetType(helics_endpoint endpoint)
 {
     auto endObj = verifyEndpoint(endpoint, nullptr);

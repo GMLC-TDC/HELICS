@@ -230,9 +230,6 @@ int helicsFederateGetFilterCount(helics_federate fed)
 
 helics_filter helicsFederateGetFilterByIndex(helics_federate fed, int index, helics_error* err)
 {
-    if (index < 0) {
-        return nullptr;
-    }
     auto fedObj = getFedSharedPtr(fed, err);
     if (!fedObj) {
         return nullptr;
@@ -257,7 +254,7 @@ helics_filter helicsFederateGetFilterByIndex(helics_federate fed, int index, hel
         helicsErrorHandler(err);
         return nullptr;
     }
-    //LCOV_EXCL_STOP
+    // LCOV_EXCL_STOP
 }
 
 static helics::Filter* getFilter(helics_filter filt, helics_error* err)
