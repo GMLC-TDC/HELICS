@@ -763,7 +763,7 @@ TEST_F(filter_tests, clone_test_dest_connections)
     CE(helicsFederateEnterExecutingModeAsync(dcFed, &err));
     CE(helicsFederateEnterExecutingMode(dFed, &err));
     CE(helicsFederateEnterExecutingModeComplete(sFed, &err));
-    CE(helicsFederateEnterExecutingModeComplete(dcFed, &err));
+    CE(helicsFederateEnterExecutingModeComplete(dcFed, &err));  
 
     CE(helics_federate_state state = helicsFederateGetState(sFed, &err));
     EXPECT_TRUE(state == helics_state_execution);
@@ -788,6 +788,15 @@ TEST_F(filter_tests, clone_test_dest_connections)
     }
 
     // now check the message clone
+    res = helicsFederateHasMessage(dcFed);
+    if (res == helics_false)
+    {
+        CE(helicsFederateRequestTimeAsync(sFed, 2.0, &err));
+        CE(helicsFederateRequestTimeAsync(dcFed, 2.0, &err));
+        CE(helicsFederateRequestTime(dFed, 2.0, &err));
+        CE(helicsFederateRequestTimeComplete(sFed, &err));
+        CE(helicsFederateRequestTimeComplete(dcFed, &err));
+    }
     res = helicsFederateHasMessage(dcFed);
     EXPECT_TRUE(res);
 
@@ -853,6 +862,15 @@ TEST_F(filter_tests, clone_test_broker_dest_connections)
     CE(helicsFederateRequestTimeComplete(dcFed, &err));
 
     auto res = helicsFederateHasMessage(dFed);
+    if (res == helics_false)
+    {
+        CE(helicsFederateRequestTimeAsync(sFed, 2.0, &err));
+        CE(helicsFederateRequestTimeAsync(dcFed, 2.0, &err));
+        CE(helicsFederateRequestTime(dFed, 2.0, &err));
+        CE(helicsFederateRequestTimeComplete(sFed, &err));
+        CE(helicsFederateRequestTimeComplete(dcFed, &err));
+    }
+
     EXPECT_TRUE(res);
 
     if (res) {
