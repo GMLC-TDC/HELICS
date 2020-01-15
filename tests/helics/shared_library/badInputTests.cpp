@@ -190,6 +190,8 @@ TEST_F(function_tests, input_test)
     EXPECT_TRUE(comp == helics_iteration_result_iterating);
     auto val = helicsInputGetDouble(subid, nullptr);
     EXPECT_EQ(val, 27.0);
+    auto valt = helicsInputGetTime(subid, nullptr);
+    EXPECT_EQ(valt, 27.0);
 
     comp = helicsFederateEnterExecutingModeIterative(
         vFed1, helics_iteration_request_iterate_if_needed, nullptr);
@@ -254,6 +256,7 @@ TEST_F(function_tests, raw)
     EXPECT_NE(val, 0.0);
     EXPECT_NE(err.error_code, 0);
     helicsErrorClear(&err);
+    
     auto val2 = helicsInputGetInteger(subid, &err);
     EXPECT_NE(val2, 0);
     EXPECT_NE(err.error_code, 0);
