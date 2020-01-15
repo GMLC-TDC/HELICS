@@ -229,7 +229,7 @@ TEST_P(mfed_type_tests, send_receive_2fed)
     CE(auto epid = helicsFederateRegisterEndpoint(mFed1, "ep1", NULL, &err));
     CE(auto epid2 = helicsFederateRegisterGlobalEndpoint(mFed2, "ep2", "random", &err));
 
-    helicsEndpointSetOption(epid, helics_handle_option_ignore_interrupts,helics_true, &err);
+    helicsEndpointSetOption(epid, helics_handle_option_ignore_interrupts, helics_true, &err);
     EXPECT_EQ(err.error_code, 0);
 
     CE(helicsFederateSetTimeProperty(mFed1, helics_property_time_delta, 1.0, &err));
@@ -244,7 +244,7 @@ TEST_P(mfed_type_tests, send_receive_2fed)
     CE(helics_federate_state mFed2State = helicsFederateGetState(mFed2, &err));
     EXPECT_TRUE(mFed2State == helics_state_execution);
 
-    int val= helicsFederateGetIntegerProperty(mFed1, helics_property_int_console_log_level, &err);
+    int val = helicsFederateGetIntegerProperty(mFed1, helics_property_int_console_log_level, &err);
     EXPECT_EQ(val, 0);
 
     std::string data(500, 'a');
@@ -262,7 +262,7 @@ TEST_P(mfed_type_tests, send_receive_2fed)
     EXPECT_EQ(gtime, 1.0);
     EXPECT_EQ(time, 1.0);
 
-    auto opt_val=helicsEndpointGetOption(epid, helics_handle_option_ignore_interrupts);
+    auto opt_val = helicsEndpointGetOption(epid, helics_handle_option_ignore_interrupts);
     //someday this might get implemented but for now it isn't so we expect false
     EXPECT_EQ(opt_val, false);
 
@@ -428,7 +428,7 @@ TEST(message_object, test1)
     helicsMessageAppendData(m2, " more data", 8, nullptr);
 
     s2 = helicsMessageGetRawDataSize(m2);
-    EXPECT_EQ(s2, 508); 
+    EXPECT_EQ(s2, 508);
 
     // this should generate an out of memory exception
     helicsMessageResize(m2, -8, &err);

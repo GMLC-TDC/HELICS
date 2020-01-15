@@ -88,7 +88,7 @@ TEST_F(bad_input_tests, test_mistaken_finalize)
 TEST_F(bad_input_tests, test_creation)
 {
     SetupTest(helicsCreateValueFederate, "zmq", 1);
-    
+
     auto fed2 = helicsCreateValueFederate("fed3", nullptr, &err);
     EXPECT_EQ(err.error_code, 0);
     EXPECT_TRUE(helicsFederateIsValid(fed2) == helics_true);
@@ -256,7 +256,7 @@ TEST_F(function_tests, raw)
     EXPECT_NE(val, 0.0);
     EXPECT_NE(err.error_code, 0);
     helicsErrorClear(&err);
-    
+
     auto val2 = helicsInputGetInteger(subid, &err);
     EXPECT_NE(val2, 0);
     EXPECT_NE(err.error_code, 0);
@@ -686,7 +686,6 @@ TEST_F(function_tests, initError4)
     EXPECT_NE(err.error_code, 0);
 }
 
-
 TEST_F(function_tests, version)
 {
     auto b = helicsGetVersion();
@@ -707,7 +706,8 @@ TEST_F(function_tests, initError5)
 
     helicsFederateSetTimeProperty(vFed1, helics_property_time_period, 1.0, nullptr);
 
-    auto resIt=helicsFederateEnterExecutingModeIterative(vFed1, helics_iteration_request_no_iteration, &err);
+    auto resIt = helicsFederateEnterExecutingModeIterative(
+        vFed1, helics_iteration_request_no_iteration, &err);
     EXPECT_EQ(resIt, helics_iteration_result_error);
     EXPECT_NE(err.error_code, 0);
     helicsErrorClear(&err);
@@ -797,7 +797,6 @@ TEST_F(function_tests, CoreLink)
     EXPECT_NE(err.error_code, 0);
     helicsErrorClear(&err);
 
-
     helicsFederateFinalize(vFed1, nullptr);
 }
 
@@ -815,7 +814,6 @@ TEST_F(function_tests, BrokerLink)
     auto br = helicsBrokerClone(brokers[0], &err);
     EXPECT_NE(br, nullptr);
 
-    
     helicsBrokerDataLink(br, "pub1", "fed0/inp1", &err);
 
     EXPECT_EQ(err.error_code, 0);
@@ -831,7 +829,6 @@ TEST_F(function_tests, BrokerLink)
     helicsFederateEnterExecutingMode(vFed1, &err);
     EXPECT_NE(err.error_code, 0);
     helicsErrorClear(&err);
-
 
     helicsFederateFinalize(vFed1, nullptr);
 }

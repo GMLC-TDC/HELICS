@@ -171,7 +171,7 @@ TEST_F(timing_tests, timing_with_input_delay)
     CE(gtime = helicsFederateRequestTimeComplete(vFed1, &err));
     EXPECT_EQ(gtime, 1.9);
 
-    CE(auto tres=helicsFederateGetTimeProperty(vFed1, helics_property_time_period, &err));
+    CE(auto tres = helicsFederateGetTimeProperty(vFed1, helics_property_time_period, &err));
     EXPECT_DOUBLE_EQ(tres, 0.1);
 
     CE(gtime = helicsFederateRequestTimeComplete(vFed2, &err));
@@ -218,8 +218,8 @@ TEST_F(timing_tests, timing_with_period_change)
     // check that the request is only granted at the appropriate period
 
     EXPECT_EQ(gtime, 1.0);
-    CE(auto val=helicsFederateGetFlagOption(
-        vFed, helics_flag_ignore_time_mismatch_warnings, &err));
+    CE(auto val =
+           helicsFederateGetFlagOption(vFed, helics_flag_ignore_time_mismatch_warnings, &err));
 
     EXPECT_EQ(val, helics_true);
 

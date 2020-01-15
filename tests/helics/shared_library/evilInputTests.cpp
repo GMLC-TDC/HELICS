@@ -177,7 +177,6 @@ TEST(evil_creation_test, helicsCreateValueFederate)
     auto res3 = helicsCreateValueFederate("billy", evil_fi, &err);
     EXPECT_NE(err.error_code, 0);
     EXPECT_EQ(helicsFederateIsValid(res3), helics_false);
-
 }
 
 TEST(evil_creation_test, helicsCreateValueFederateFromConfig)
@@ -213,9 +212,8 @@ TEST(evil_creation_test, helicsCreateMessageFederate)
     char rdata[256];
     helics_federate_info evil_fi = reinterpret_cast<helics_federate_info>(rdata);
     auto res3 = helicsCreateMessageFederate("billy", evil_fi, &err);
-    EXPECT_NE(err.error_code, 0); 
+    EXPECT_NE(err.error_code, 0);
     EXPECT_EQ(helicsFederateIsValid(res3), helics_false);
-
 }
 
 TEST(evil_creation_test, helicsCreateMessageFederateFromConfig)

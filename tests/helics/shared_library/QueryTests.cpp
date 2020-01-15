@@ -40,7 +40,7 @@ TEST_P(query_tests, publication_queries)
     EXPECT_EQ(res2, "[fed1/pub3]");
 
     helicsQueryFree(q1);
-    
+
     q1 = helicsCreateQuery("fed1", "isinit");
 
     CE(res = helicsQueryExecute(q1, vFed1, &err));

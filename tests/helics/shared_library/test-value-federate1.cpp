@@ -22,7 +22,8 @@ class vfed_simple_type_tests:
 class vfed_type_tests: public ::testing::TestWithParam<const char*>, public FederateTestFixture {
 };
 
-class vfed_single_tests : public ::testing::Test, public FederateTestFixture {};
+class vfed_single_tests: public ::testing::Test, public FederateTestFixture {
+};
 
 /** test simple creation and destruction*/
 TEST_P(vfed_simple_type_tests, initialize_tests)
@@ -235,14 +236,14 @@ TEST_F(vfed_single_tests, subscription_and_publication_registration)
 
     CE(state = helicsFederateGetState(vFed1, &err));
     EXPECT_TRUE(state == helics_state_finalize);
-} 
+}
 
-TEST_F(vfed_single_tests, default_value_tests) 
+TEST_F(vfed_single_tests, default_value_tests)
 {
     SetupTest(helicsCreateValueFederate, "test", 1);
     auto vFed1 = GetFederateAt(0);
 
-    auto inp_raw1 = helicsFederateRegisterInput(vFed1, "key1", helics_data_type_raw,"raw", &err);
+    auto inp_raw1 = helicsFederateRegisterInput(vFed1, "key1", helics_data_type_raw, "raw", &err);
     auto inp_raw2 = helicsFederateRegisterInput(vFed1, "key2", helics_data_type_raw, "raw", &err);
 
     auto inp_bool = helicsFederateRegisterInput(vFed1, "key3", helics_data_type_boolean, "", &err);
@@ -253,17 +254,20 @@ TEST_F(vfed_single_tests, default_value_tests)
 
     auto inp_vect = helicsFederateRegisterInput(vFed1, "key6", helics_data_type_vector, "V", &err);
 
-    auto inp_double= helicsFederateRegisterInput(vFed1, "key7", helics_data_type_double, "kW", &err);
+    auto inp_double =
+        helicsFederateRegisterInput(vFed1, "key7", helics_data_type_double, "kW", &err);
 
-    auto inp_double2 = helicsFederateRegisterInput(vFed1, "key8", helics_data_type_double, "", &err);
+    auto inp_double2 =
+        helicsFederateRegisterInput(vFed1, "key8", helics_data_type_double, "", &err);
 
-    auto inp_np = helicsFederateRegisterInput(vFed1, "key9", helics_data_type_named_point, "", &err);
+    auto inp_np =
+        helicsFederateRegisterInput(vFed1, "key9", helics_data_type_named_point, "", &err);
 
     helicsInputSetMinimumChange(inp_double, 1100.0, &err);
     helicsInputSetDefaultDouble(inp_double, 10000.0, &err);
 
     helicsInputSetOption(inp_double2, helics_handle_option_connection_required, helics_true, &err);
-    
+
     //anonymous publication
     auto pub = helicsFederateRegisterPublication(vFed1, nullptr, helics_data_type_int, "MW", &err);
     helicsPublicationSetOption(pub, helics_handle_option_connection_required, helics_true, &err);
@@ -280,7 +284,7 @@ TEST_F(vfed_single_tests, default_value_tests)
     helicsInputSetDefaultTime(inp_time, 12.3, &err);
     helicsInputSetDefaultChar(inp_char, 'q', &err);
     //this should be ok since the data is NULL regardless of specified length
-    helicsInputSetDefaultVector(inp_vect, nullptr, 7,&err);
+    helicsInputSetDefaultVector(inp_vect, nullptr, 7, &err);
     helicsInputSetDefaultNamedPoint(inp_np, data, 15.7, &err);
 
     helicsFederateEnterExecutingMode(vFed1, &err);
@@ -304,13 +308,13 @@ TEST_F(vfed_single_tests, default_value_tests)
     optset = helicsPublicationGetOption(pub, helics_handle_option_connection_required);
     EXPECT_EQ(optset, helics_true);
     helicsPublicationPublishInteger(pub, 12, &err);
-     
+
     helicsFederateRequestNextStep(vFed1, &err);
     EXPECT_DOUBLE_EQ(helicsInputGetDouble(inp_double, &err), 12000.0);
     EXPECT_DOUBLE_EQ(helicsInputGetDouble(inp_double2, &err), 12.0);
 
     helicsPublicationPublishInteger(pub, 13, &err);
-     
+
     helicsFederateRequestNextStep(vFed1, &err);
     EXPECT_EQ(helicsInputIsUpdated(inp_double), helics_false);
     EXPECT_EQ(helicsInputIsUpdated(inp_double2), helics_true);
@@ -334,7 +338,7 @@ TEST_F(vfed_single_tests, default_value_tests)
     char out[8] = "";
     int actLen = 66;
     double rval = 19.0;
-    helicsInputGetNamedPoint(inp_np, nullptr, 5, &actLen,&rval, &err);
+    helicsInputGetNamedPoint(inp_np, nullptr, 5, &actLen, &rval, &err);
     EXPECT_EQ(err.error_code, 0);
     EXPECT_EQ(actLen, 0);
     EXPECT_DOUBLE_EQ(rval, 15.7);
@@ -345,7 +349,7 @@ TEST_F(vfed_single_tests, default_value_tests)
     EXPECT_EQ(actLen, 8);
     EXPECT_DOUBLE_EQ(rval, 15.7);
 
-    helicsFederateFinalize(vFed1,&err);
+    helicsFederateFinalize(vFed1, &err);
 }
 TEST_P(vfed_type_tests, single_transfer)
 {
@@ -1015,8 +1019,7 @@ TEST_P(vfed_simple_type_tests, test_info_field)
     CE(helicsFederateFinalize(vFed, &err));
 
     CE(auto wait = helicsCoreWaitForDisconnect(cr, 70, &err));
-    if (wait == helics_false)
-    {
+    if (wait == helics_false) {
         wait = helicsCoreWaitForDisconnect(cr, 500, &err);
     }
     EXPECT_EQ(wait, helics_true);

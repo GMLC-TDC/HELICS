@@ -186,26 +186,23 @@ TEST(logging_tests, broker_logging)
     EXPECT_FALSE(mlog.lock()->empty());
 }
 
-
 TEST(logging_tests, broker_logging_file)
 {
-    const char *lfile = "logb.txt";
+    const char* lfile = "logb.txt";
     ghc::filesystem::remove(lfile);
     auto err = helicsErrorInitialize();
     auto broker = helicsCreateBroker("inproc", "blog", "--log_level=trace", &err);
-    helicsBrokerSetLogFile(broker, lfile,&err);
+    helicsBrokerSetLogFile(broker, lfile, &err);
     helicsBrokerDisconnect(broker, &err);
     helicsCloseLibrary();
     EXPECT_TRUE(ghc::filesystem::exists(lfile));
     ghc::filesystem::remove(lfile);
     EXPECT_EQ(err.error_code, 0);
-
 }
-
 
 TEST(logging_tests, core_logging_file)
 {
-    const char *lfile = "logc.txt";
+    const char* lfile = "logc.txt";
     ghc::filesystem::remove(lfile);
     auto core = helicsCreateCore("inproc", "clog", "--autobroker --log_level=trace", nullptr);
 
@@ -219,13 +216,13 @@ TEST(logging_tests, core_logging_file)
 
 TEST(logging_tests, fed_logging_file)
 {
-    const char *lfile = "logf.txt";
+    const char* lfile = "logf.txt";
     ghc::filesystem::remove(lfile);
     auto core = helicsCreateCore("inproc", "clogf", "--autobroker --log_level=trace", nullptr);
 
     auto err = helicsErrorInitialize();
     auto fi = helicsCreateFederateInfo();
-    helicsFederateInfoSetCoreName(fi, "clogf",nullptr);
+    helicsFederateInfoSetCoreName(fi, "clogf", nullptr);
     auto fed = helicsCreateValueFederate("f1", fi, nullptr);
     helicsFederateSetLogFile(fed, lfile, nullptr);
 

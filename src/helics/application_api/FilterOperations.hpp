@@ -157,7 +157,7 @@ class CloneFilterOperation: public FilterOperations {
   private:
     /** run the send message function which copies the message and forwards to all destinations
     @param mess a message to clone*/
-    std::vector<std::unique_ptr<Message>>  sendMessage(const Message* mess) const;
+    std::vector<std::unique_ptr<Message>> sendMessage(const Message* mess) const;
 };
 
 } // namespace helics

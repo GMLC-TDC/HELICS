@@ -160,7 +160,6 @@ TEST(other_tests, federate_global_value)
     res = helicsQueryExecuteComplete(q2, &err);
     EXPECT_STREQ(res, "false");
 
-
     // a series of invalid query calls
     res = helicsQueryExecute(nullptr, fed, &err);
     EXPECT_NE(err.error_code, 0);

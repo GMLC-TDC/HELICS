@@ -195,8 +195,7 @@ class FilterOperator {
     {
         std::vector<std::unique_ptr<Message>> ret;
         auto res = process(std::move(message));
-        if (res)
-        {
+        if (res) {
             ret.push_back(std::move(res));
         }
         return ret;
