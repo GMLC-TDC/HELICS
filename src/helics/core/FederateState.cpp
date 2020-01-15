@@ -1429,6 +1429,8 @@ bool FederateState::getOptionFlag(int optionFlag) const
             return strict_input_type_checking;
         case defs::flags::ignore_input_unit_mismatch:
             return ignore_unit_mismatch;
+        case defs::flags::ignore_time_mismatch_warnings:
+            return ignore_time_mismatch_warnings;
         default:
             return timeCoord->getOptionFlag(optionFlag);
     }
