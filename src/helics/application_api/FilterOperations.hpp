@@ -141,14 +141,13 @@ class FirewallFilterOperation: public FilterOperations {
 /** filter for rerouting a packet to a particular endpoint*/
 class CloneFilterOperation: public FilterOperations {
   private:
-    Core* coreptr; //!< pointer to a core object
     std::shared_ptr<CloneOperator> op; //!< the actual operator
     shared_guarded<std::vector<std::string>>
         deliveryAddresses; //!< the endpoints to deliver the cloned data to
 
   public:
     /** this operation needs a pointer to a core to operate*/
-    explicit CloneFilterOperation(Core* core);
+    explicit CloneFilterOperation();
 
     ~CloneFilterOperation();
     virtual void set(const std::string& property, double val) override;

@@ -49,7 +49,7 @@ filter_types filterTypeFromString(const std::string& filterType) noexcept
     return filter_types::unrecognized;
 }
 
-void addOperations(Filter* filt, filter_types type, Core* cptr)
+void addOperations(Filter* filt, filter_types type, Core* /*cptr*/)
 {
     switch (type) {
         case filter_types::custom:
@@ -72,7 +72,7 @@ void addOperations(Filter* filt, filter_types type, Core* cptr)
             filt->setFilterOperations(std::move(op));
         } break;
         case filter_types::clone: {
-            auto op = std::make_shared<CloneFilterOperation>(cptr);
+            auto op = std::make_shared<CloneFilterOperation>();
             filt->setFilterOperations(std::move(op));
         } break;
         case filter_types::firewall: {
@@ -186,14 +186,14 @@ CloningFilter::CloningFilter(Core* cr, const std::string& filtName)
         handle = corePtr->registerCloningFilter(filtName, std::string(), std::string());
         name = filtName;
     }
-    setFilterOperations(std::make_shared<CloneFilterOperation>(cr));
+    setFilterOperations(std::make_shared<CloneFilterOperation>());
 }
 
 CloningFilter::CloningFilter(Federate* ffed, const std::string& filtName):
     Filter(ffed->registerCloningFilter(filtName))
 {
     if (corePtr != nullptr) {
-        setFilterOperations(std::make_shared<CloneFilterOperation>(corePtr));
+        setFilterOperations(std::make_shared<CloneFilterOperation>());
     }
 }
 
@@ -215,7 +215,7 @@ CloningFilter::CloningFilter(
             operator=(ffed->registerCloningFilter(filtName));
         }
 
-        setFilterOperations(std::make_shared<CloneFilterOperation>(corePtr));
+        setFilterOperations(std::make_shared<CloneFilterOperation>());
     }
 }
 
