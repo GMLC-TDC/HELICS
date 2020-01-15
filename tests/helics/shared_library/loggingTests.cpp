@@ -234,7 +234,7 @@ TEST(logging_tests, fed_logging_file)
     helicsFederateFinalize(fed, &err);
 
     helicsFederateSetLogFile(fed, "emptyfile.txt", nullptr);
-
+    helicsFederateInfoFree(fi);
     helicsCloseLibrary();
     EXPECT_TRUE(ghc::filesystem::exists(lfile));
     ghc::filesystem::remove(lfile);

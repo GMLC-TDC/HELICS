@@ -7,7 +7,9 @@ coverage:
   precision: 2
   round: down
   range: "50...95"
-
+  tests:
+    target: 100%
+    paths: "src/helics/shared_api_library/"
   status:
     project: yes
     patch: yes

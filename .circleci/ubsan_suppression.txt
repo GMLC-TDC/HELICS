@@ -1,0 +1,4 @@
+# This is a known purposeful leak and possible resulting race condition detection on closing of shared libraries
+
+# this test purposely generates some bad values for testing purposes
+enum:badInputTests.cpp
