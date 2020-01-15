@@ -368,8 +368,7 @@ bool FirewallFilterOperation::allowPassed(const Message* /*mess*/) const
     return true;
 }
 
-CloneFilterOperation::CloneFilterOperation(Core* core):
-    coreptr(core),
+CloneFilterOperation::CloneFilterOperation():
     op(std::make_shared<CloneOperator>([this](const Message* mess) { return sendMessage(mess); }))
 {
 }

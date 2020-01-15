@@ -127,6 +127,7 @@ class HELICS_CXX_EXPORT Filter {
   protected:
     /** set a filter operations object */
     void setFilterOperations(std::shared_ptr<FilterOperations> filterOps);
+    /** add a defined operation to a filter*/
     friend void addOperations(Filter* filt, filter_types type, Core* cptr);
 };
 

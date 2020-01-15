@@ -53,7 +53,9 @@ int main(int argc, char* argv[])
     if (res != helics::helicsCLI11App::parse_output::ok) {
         switch (res) {
             case helics::helicsCLI11App::parse_output::help_call:
+            case helics::helicsCLI11App::parse_output::help_all_call:
                 fi.loadInfoFromArgs("--help");
+                // FALLTHRU
             case helics::helicsCLI11App::parse_output::version_call:
                 return 0;
             default:
