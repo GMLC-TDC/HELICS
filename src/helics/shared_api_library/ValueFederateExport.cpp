@@ -986,26 +986,27 @@ void helicsInputGetNamedPoint(helics_input inp, char* outputString, int maxStrin
     if (inpObj == nullptr) {
         return;
     }
-    if (!checkOutArgString(outputString, maxStringLen, err)) {
-        return;
-    }
+    
     try {
         helics::NamedPoint np = inpObj->inputPtr->getValue<helics::NamedPoint>();
-        int length = std::min(static_cast<int>(np.name.size()), maxStringLen);
-        memcpy(outputString, np.name.data(), length);
+        if (outputString != nullptr && maxStringLen > 0)
+        {
+            int length = std::min(static_cast<int>(np.name.size()), maxStringLen);
+            memcpy(outputString, np.name.data(), length);
 
-        if (length == maxStringLen) {
-            outputString[maxStringLen - 1] = '\0';
-            if (actualLength != nullptr) {
-                *actualLength = maxStringLen;
+            if (length == maxStringLen) {
+                outputString[maxStringLen - 1] = '\0';
+                if (actualLength != nullptr) {
+                    *actualLength = maxStringLen;
+                }
             }
-        } else {
-            outputString[length] = '\0';
-            if (actualLength != nullptr) {
-                *actualLength = length + 1;
+            else {
+                outputString[length] = '\0';
+                if (actualLength != nullptr) {
+                    *actualLength = length + 1;
+                }
             }
         }
-
         if (val != nullptr) {
             *val = np.value;
         }

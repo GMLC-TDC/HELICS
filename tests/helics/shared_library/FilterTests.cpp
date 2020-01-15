@@ -801,6 +801,7 @@ TEST_F(filter_tests, clone_test_dest_connections)
     res = helicsFederateHasMessage(dcFed);
     if (res == helics_false)
     {
+        std::this_thread::sleep_for(std::chrono::milliseconds(50));
         CE(helicsFederateRequestTimeAsync(sFed, 2.0, &err));
         CE(helicsFederateRequestTimeAsync(dcFed, 2.0, &err));
         CE(helicsFederateRequestTime(dFed, 2.0, &err));
@@ -872,15 +873,6 @@ TEST_F(filter_tests, clone_test_broker_dest_connections)
     CE(helicsFederateRequestTimeComplete(dcFed, &err));
 
     auto res = helicsFederateHasMessage(dFed);
-    if (res == helics_false)
-    {
-        CE(helicsFederateRequestTimeAsync(sFed, 2.0, &err));
-        CE(helicsFederateRequestTimeAsync(dcFed, 2.0, &err));
-        CE(helicsFederateRequestTime(dFed, 2.0, &err));
-        CE(helicsFederateRequestTimeComplete(sFed, &err));
-        CE(helicsFederateRequestTimeComplete(dcFed, &err));
-    }
-
     EXPECT_TRUE(res);
 
     if (res) {
@@ -892,10 +884,23 @@ TEST_F(filter_tests, clone_test_broker_dest_connections)
     }
 
     // now check the message clone
-    res = helicsFederateHasMessage(dcFed);
-    EXPECT_TRUE(res);
+    auto res2 = helicsFederateHasMessage(dcFed);
 
-    if (res) {
+    if (res2==helics_false)
+    {
+        std::this_thread::sleep_for(std::chrono::milliseconds(50));
+        CE(helicsFederateRequestTimeAsync(sFed, 2.0, &err));
+        CE(helicsFederateRequestTimeAsync(dcFed, 2.0, &err));
+        CE(helicsFederateRequestTime(dFed, 2.0, &err));
+        CE(helicsFederateRequestTimeComplete(sFed, &err));
+        CE(helicsFederateRequestTimeComplete(dcFed, &err));
+        res2 = helicsFederateHasMessage(dcFed);
+    }
+
+    
+    EXPECT_TRUE(res2);
+
+    if (res2) {
         auto m2 = helicsEndpointGetMessage(p3);
         EXPECT_STREQ(m2.source, "src");
         EXPECT_STREQ(m2.original_source, "src");

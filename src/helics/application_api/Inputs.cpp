@@ -130,6 +130,11 @@ bool Input::checkUpdate(bool assumeUpdate)
                 if (type == helics::data_type::helics_double) {
                     defV val = doubleExtractAndConvert(dv, inputUnits, outputUnits);
                     valueExtract(val, newVal);
+                }
+                else if (type == helics::data_type::helics_int) {
+                    defV val;
+                    integerExtractAndConvert(val, dv, inputUnits, outputUnits);
+                    valueExtract(val, newVal);
                 } else {
                     valueExtract(dv, type, newVal);
                 }
@@ -266,6 +271,21 @@ double doubleExtractAndConvert(
         V = units::convert(V, *inputUnits, *outputUnits);
     }
     return V;
+}
+
+void integerExtractAndConvert(defV &store,
+    const data_view& dv,
+    const std::shared_ptr<units::precise_unit>& inputUnits,
+    const std::shared_ptr<units::precise_unit>& outputUnits)
+{
+    auto V = ValueConverter<int64_t>::interpret(dv);
+    if ((inputUnits) && (outputUnits)) {
+        store = units::convert(static_cast<double>(V), *inputUnits, *outputUnits);
+    }
+    else
+    {
+        store = V;
+    }
 }
 
 char Input::getValueChar()
