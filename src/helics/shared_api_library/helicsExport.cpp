@@ -562,7 +562,7 @@ void helicsCoreAddDestinationFilterToEndpoint(helics_core core, const char* filt
 {
     auto cr = getCore(core, err);
     if (cr == nullptr) {
-        return; 
+        return;
     }
     if ((filter == nullptr) || (endpoint == nullptr)) {
         if (err != nullptr) {

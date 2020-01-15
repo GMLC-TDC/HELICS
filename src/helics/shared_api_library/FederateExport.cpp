@@ -6,11 +6,11 @@ SPDX-License-Identifier: BSD-3-Clause
 */
 
 #include "../core/core-exceptions.hpp"
+#include "../core/coreTypeOperations.hpp"
 #include "../helics.hpp"
 #include "gmlc/concurrency/TripWire.hpp"
 #include "helics.h"
 #include "internal/api_objects.h"
-#include "../core/coreTypeOperations.hpp"
 
 #include <iostream>
 #include <map>
@@ -98,7 +98,6 @@ helics::MessageFederate* getMessageFed(helics_federate fed, helics_error* err)
     }
     // LCOV_EXCL_STOP
     return nullptr;
-    
 }
 
 std::shared_ptr<helics::Federate> getFedSharedPtr(helics_federate fed, helics_error* err)
@@ -393,20 +392,18 @@ void helicsFederateInfoSetIntegerProperty(helics_federate_info fi, int integerPr
     hfi->setProperty(integerProperty, propertyValue);
 }
 
-
 /* Creation and destruction of Federates */
 helics_federate helicsCreateValueFederate(const char* fedName, helics_federate_info fi, helics_error* err)
 {
     HELICS_ERROR_CHECK(err, nullptr);
     auto FedI = std::make_unique<helics::FedObject>();
-    
+
     try {
         if (fi == nullptr) {
             FedI->fedptr = std::make_shared<helics::ValueFederate>(AS_STRING(fedName), helics::FederateInfo());
         } else {
             auto hfi = getFedInfo(fi, err);
-            if (hfi == nullptr)
-            {
+            if (hfi == nullptr) {
                 return nullptr;
             }
             FedI->fedptr = std::make_shared<helics::ValueFederate>(AS_STRING(fedName), *hfi);
@@ -451,8 +448,7 @@ helics_federate helicsCreateMessageFederate(const char* fedName, helics_federate
             FedI->fedptr = std::make_shared<helics::MessageFederate>(AS_STRING(fedName), helics::FederateInfo());
         } else {
             auto hfi = getFedInfo(fi, err);
-            if (hfi == nullptr)
-            {
+            if (hfi == nullptr) {
                 return nullptr;
             }
             FedI->fedptr = std::make_shared<helics::MessageFederate>(AS_STRING(fedName), *hfi);
@@ -498,8 +494,7 @@ helics_federate helicsCreateCombinationFederate(const char* fedName, helics_fede
             FedI->fedptr = std::make_shared<helics::CombinationFederate>(AS_STRING(fedName), helics::FederateInfo());
         } else {
             auto hfi = getFedInfo(fi, err);
-            if (hfi == nullptr)
-            {
+            if (hfi == nullptr) {
                 return nullptr;
             }
             FedI->fedptr = std::make_shared<helics::CombinationFederate>(AS_STRING(fedName), *hfi);

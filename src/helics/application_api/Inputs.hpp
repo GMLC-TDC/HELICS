@@ -436,7 +436,8 @@ HELICS_CXX_EXPORT double doubleExtractAndConvert(
     const std::shared_ptr<units::precise_unit>& inputUnits,
     const std::shared_ptr<units::precise_unit>& outputUnits);
 
-HELICS_CXX_EXPORT void integerExtractAndConvert(defV &store,
+HELICS_CXX_EXPORT void integerExtractAndConvert(
+    defV& store,
     const data_view& dv,
     const std::shared_ptr<units::precise_unit>& inputUnits,
     const std::shared_ptr<units::precise_unit>& outputUnits);
@@ -526,10 +527,9 @@ void Input::getValue_impl(std::integral_constant<int, primaryType> /*V*/, X& out
         if (type == helics::data_type::helics_double) {
             defV val = doubleExtractAndConvert(dv, inputUnits, outputUnits);
             valueExtract(val, out);
-}
-        else if (type == helics::data_type::helics_int) {
+        } else if (type == helics::data_type::helics_int) {
             defV val;
-            integerExtractAndConvert(val,dv, inputUnits, outputUnits);
+            integerExtractAndConvert(val, dv, inputUnits, outputUnits);
             valueExtract(val, out);
         } else {
             valueExtract(dv, type, out);
@@ -584,8 +584,7 @@ const X& Input::getValueRef()
             if (type == helics::data_type::helics_double) {
                 defV val = doubleExtractAndConvert(dv, inputUnits, outputUnits);
                 valueExtract(val, out);
-            }
-            else if (type == helics::data_type::helics_int) {
+            } else if (type == helics::data_type::helics_int) {
                 defV val;
                 integerExtractAndConvert(val, dv, inputUnits, outputUnits);
                 valueExtract(val, out);

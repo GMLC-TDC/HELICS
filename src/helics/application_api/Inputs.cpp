@@ -130,8 +130,7 @@ bool Input::checkUpdate(bool assumeUpdate)
                 if (type == helics::data_type::helics_double) {
                     defV val = doubleExtractAndConvert(dv, inputUnits, outputUnits);
                     valueExtract(val, newVal);
-                }
-                else if (type == helics::data_type::helics_int) {
+                } else if (type == helics::data_type::helics_int) {
                     defV val;
                     integerExtractAndConvert(val, dv, inputUnits, outputUnits);
                     valueExtract(val, newVal);
@@ -273,7 +272,8 @@ double doubleExtractAndConvert(
     return V;
 }
 
-void integerExtractAndConvert(defV &store,
+void integerExtractAndConvert(
+    defV& store,
     const data_view& dv,
     const std::shared_ptr<units::precise_unit>& inputUnits,
     const std::shared_ptr<units::precise_unit>& outputUnits)
@@ -281,9 +281,7 @@ void integerExtractAndConvert(defV &store,
     auto V = ValueConverter<int64_t>::interpret(dv);
     if ((inputUnits) && (outputUnits)) {
         store = units::convert(static_cast<double>(V), *inputUnits, *outputUnits);
-    }
-    else
-    {
+    } else {
         store = V;
     }
 }
@@ -333,12 +331,11 @@ int Input::getValue(double* data, int maxsize)
 {
     auto V = getValueRef<std::vector<double>>();
     int length = 0;
-    if (data != nullptr && maxsize > 0)
-    {
+    if (data != nullptr && maxsize > 0) {
         length = std::min(static_cast<int>(V.size()), maxsize);
         std::memmove(data, V.data(), length * sizeof(double));
     }
-   
+
     hasUpdate = false;
     return length;
 }
@@ -347,14 +344,12 @@ int Input::getValue(char* str, int maxsize)
 {
     auto& S = getValueRef<std::string>();
     int length = 0;
-    if (str != nullptr && maxsize > 0)
-    {
+    if (str != nullptr && maxsize > 0) {
         length = std::min(static_cast<int>(S.size()), maxsize);
         memcpy(str, S.data(), length);
         if (length == maxsize) {
             str[maxsize - 1] = '\0';
-        }
-        else {
+        } else {
             str[length] = '\0';
             ++length;
         }

@@ -720,7 +720,6 @@ int helicsInputGetRawValueSize(helics_input inp)
     return static_cast<int>(inpObj->inputPtr->getRawSize());
 }
 
-
 bool checkOutArgString(const char* outputString, int maxlen, helics_error* err)
 {
     static constexpr char invalidOutputString[] = "Output string location is invalid";
@@ -988,11 +987,10 @@ void helicsInputGetNamedPoint(helics_input inp, char* outputString, int maxStrin
     if (inpObj == nullptr) {
         return;
     }
-    
+
     try {
         helics::NamedPoint np = inpObj->inputPtr->getValue<helics::NamedPoint>();
-        if (outputString != nullptr && maxStringLen > 0)
-        {
+        if (outputString != nullptr && maxStringLen > 0) {
             int length = std::min(static_cast<int>(np.name.size()), maxStringLen);
             memcpy(outputString, np.name.data(), length);
 
@@ -1001,8 +999,7 @@ void helicsInputGetNamedPoint(helics_input inp, char* outputString, int maxStrin
                 if (actualLength != nullptr) {
                     *actualLength = maxStringLen;
                 }
-            }
-            else {
+            } else {
                 outputString[length] = '\0';
                 if (actualLength != nullptr) {
                     *actualLength = length + 1;
