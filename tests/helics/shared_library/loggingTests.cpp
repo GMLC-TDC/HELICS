@@ -216,3 +216,26 @@ TEST(logging_tests, core_logging_file)
     EXPECT_TRUE(ghc::filesystem::exists(lfile));
     ghc::filesystem::remove(lfile);
 }
+
+TEST(logging_tests, fed_logging_file)
+{
+    const char *lfile = "logf.txt";
+    ghc::filesystem::remove(lfile);
+    auto core = helicsCreateCore("inproc", "clogf", "--autobroker --log_level=trace", nullptr);
+
+    auto err = helicsErrorInitialize();
+    auto fi = helicsCreateFederateInfo();
+    helicsFederateInfoSetCoreName(fi, "clogf",nullptr);
+    auto fed = helicsCreateValueFederate("f1", fi, nullptr);
+    helicsFederateSetLogFile(fed, lfile, nullptr);
+
+    helicsCoreSetLogFile(core, lfile, &err);
+    helicsCoreDisconnect(core, &err);
+    helicsFederateFinalize(fed, &err);
+
+    helicsFederateSetLogFile(fed, "emptyfile.txt", nullptr);
+
+    helicsCloseLibrary();
+    EXPECT_TRUE(ghc::filesystem::exists(lfile));
+    ghc::filesystem::remove(lfile);
+}

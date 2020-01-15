@@ -91,6 +91,7 @@ TEST_F(bad_input_tests, test_creation)
     
     auto fed2 = helicsCreateValueFederate("fed3", nullptr, &err);
     EXPECT_EQ(err.error_code, 0);
+    EXPECT_TRUE(helicsFederateIsValid(fed2) == helics_true);
 }
 
 TEST(error_tests, unavailable_core_type)
@@ -703,7 +704,8 @@ TEST_F(function_tests, initError5)
 
     helicsFederateSetTimeProperty(vFed1, helics_property_time_period, 1.0, nullptr);
 
-    helicsFederateEnterExecutingModeIterative(vFed1, helics_iteration_request_no_iteration, &err);
+    auto resIt=helicsFederateEnterExecutingModeIterative(vFed1, helics_iteration_request_no_iteration, &err);
+    EXPECT_EQ(resIt, helics_iteration_result_error);
     EXPECT_NE(err.error_code, 0);
     helicsErrorClear(&err);
 

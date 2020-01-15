@@ -732,7 +732,8 @@ static helics_iteration_result getIterationStatus(helics::iteration_result itera
             return helics_iteration_result_iterating;
         case helics::iteration_result::error:
         default:
-            return helics_iteration_result_error;
+            // most cases of this return error directly without going through this function
+            return helics_iteration_result_error; // LCOV_EXCL_LINE
         case helics::iteration_result::halted:
             return helics_iteration_result_halted;
     }
@@ -1150,12 +1151,14 @@ void helicsFederateSetLogFile(helics_federate fed, const char* logFile, helics_e
     try {
         if (cr) {
             cr->setLogFile(AS_STRING(logFile));
-        } else {
+            // LCOV_EXCL_START
+        } else { //this can theoretically happen but it we be pretty odd
             if (err != nullptr) {
                 err->error_code = helics_error_invalid_function_call;
                 err->message = invalidFederateCore;
             }
             return;
+            // LCOV_EXCL_START
         }
     }
     catch (...) {
