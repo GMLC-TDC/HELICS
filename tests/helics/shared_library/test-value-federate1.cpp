@@ -235,9 +235,9 @@ TEST_F(vfed_single_tests, subscription_and_publication_registration)
 
     CE(state = helicsFederateGetState(vFed1, &err));
     EXPECT_TRUE(state == helics_state_finalize);
-}
+} 
 
-TEST_F(vfed_single_tests, default_value_tests)
+TEST_F(vfed_single_tests, default_value_tests) 
 {
     SetupTest(helicsCreateValueFederate, "test", 1);
     auto vFed1 = GetFederateAt(0);
@@ -289,6 +289,14 @@ TEST_F(vfed_single_tests, default_value_tests)
     EXPECT_STREQ(helicsInputGetInjectionUnits(inp_double2), "MW");
     EXPECT_STREQ(helicsInputGetType(inp_double), "double");
     EXPECT_STREQ(helicsInputGetPublicationType(inp_double), "int64");
+
+    auto c2 = helicsInputGetChar(inp_char, &err);
+    EXPECT_EQ(c2, 'q');
+    int actSize = 56;
+    //this should not be an error
+    helicsInputGetVector(inp_vect, nullptr, 5, &actSize, &err);
+    EXPECT_EQ(err.error_code, 0);
+    EXPECT_EQ(actSize, 0);
 
     auto optset = helicsInputGetOption(inp_double2, helics_handle_option_connection_required);
     EXPECT_EQ(optset, helics_true);

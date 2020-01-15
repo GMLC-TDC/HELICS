@@ -332,8 +332,13 @@ char Input::getValueChar()
 int Input::getValue(double* data, int maxsize)
 {
     auto V = getValueRef<std::vector<double>>();
-    int length = std::min(static_cast<int>(V.size()), maxsize);
-    std::memmove(data, V.data(), length * sizeof(double));
+    int length = 0;
+    if (data != nullptr && maxsize > 0)
+    {
+        length = std::min(static_cast<int>(V.size()), maxsize);
+        std::memmove(data, V.data(), length * sizeof(double));
+    }
+   
     hasUpdate = false;
     return length;
 }
@@ -341,13 +346,18 @@ int Input::getValue(double* data, int maxsize)
 int Input::getValue(char* str, int maxsize)
 {
     auto& S = getValueRef<std::string>();
-    int length = std::min(static_cast<int>(S.size()), maxsize);
-    memcpy(str, S.data(), length);
-    if (length == maxsize) {
-        str[maxsize - 1] = '\0';
-    } else {
-        str[length] = '\0';
-        ++length;
+    int length = 0;
+    if (str != nullptr && maxsize > 0)
+    {
+        length = std::min(static_cast<int>(S.size()), maxsize);
+        memcpy(str, S.data(), length);
+        if (length == maxsize) {
+            str[maxsize - 1] = '\0';
+        }
+        else {
+            str[length] = '\0';
+            ++length;
+        }
     }
     hasUpdate = false;
     return length;
