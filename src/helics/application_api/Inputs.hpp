@@ -10,6 +10,8 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "ValueFederate.hpp"
 #include "helicsTypes.hpp"
 
+#include <memory>
+
 namespace units {
 class precise_unit;
 } // namespace units
@@ -434,6 +436,11 @@ HELICS_CXX_EXPORT double doubleExtractAndConvert(
     const std::shared_ptr<units::precise_unit>& inputUnits,
     const std::shared_ptr<units::precise_unit>& outputUnits);
 
+HELICS_CXX_EXPORT void integerExtractAndConvert(defV &store,
+    const data_view& dv,
+    const std::shared_ptr<units::precise_unit>& inputUnits,
+    const std::shared_ptr<units::precise_unit>& outputUnits);
+
 /** class to handle an input and extract a specific type
 @tparam X the class of the value associated with a input*/
 template<class X>
@@ -519,6 +526,11 @@ void Input::getValue_impl(std::integral_constant<int, primaryType> /*V*/, X& out
         if (type == helics::data_type::helics_double) {
             defV val = doubleExtractAndConvert(dv, inputUnits, outputUnits);
             valueExtract(val, out);
+}
+        else if (type == helics::data_type::helics_int) {
+            defV val;
+            integerExtractAndConvert(val,dv, inputUnits, outputUnits);
+            valueExtract(val, out);
         } else {
             valueExtract(dv, type, out);
         }
@@ -571,6 +583,11 @@ const X& Input::getValueRef()
             X out;
             if (type == helics::data_type::helics_double) {
                 defV val = doubleExtractAndConvert(dv, inputUnits, outputUnits);
+                valueExtract(val, out);
+            }
+            else if (type == helics::data_type::helics_int) {
+                defV val;
+                integerExtractAndConvert(val, dv, inputUnits, outputUnits);
                 valueExtract(val, out);
             } else {
                 valueExtract(dv, type, out);

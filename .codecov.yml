@@ -6,7 +6,7 @@ codecov:
 coverage:
   precision: 2
   round: down
-  range: "70...100"
+  range: "50...95"
 
   status:
     project: yes
@@ -35,3 +35,4 @@ ignore:
   - "**/logger.*"
   - "**/loggerCore.*"
   - "**/zmqHelper.*"
+  - "**/internal/api_objects.h"
