@@ -22,6 +22,8 @@ class vfed_simple_type_tests:
 class vfed_type_tests: public ::testing::TestWithParam<const char*>, public FederateTestFixture {
 };
 
+class vfed_single_tests : public ::testing::Test, public FederateTestFixture {};
+
 /** test simple creation and destruction*/
 TEST_P(vfed_simple_type_tests, initialize_tests)
 {
@@ -40,9 +42,9 @@ TEST_P(vfed_simple_type_tests, initialize_tests)
     EXPECT_TRUE(state == helics_state_finalize);
 }
 
-TEST_P(vfed_simple_type_tests, publication_registration)
+TEST_F(vfed_single_tests, publication_registration)
 {
-    SetupTest(helicsCreateValueFederate, GetParam(), 1);
+    SetupTest(helicsCreateValueFederate, "test", 1);
     auto vFed1 = GetFederateAt(0);
 
     auto pubid =
@@ -78,9 +80,9 @@ TEST_P(vfed_simple_type_tests, publication_registration)
     EXPECT_TRUE(state == helics_state_finalize);
 }
 
-TEST_P(vfed_simple_type_tests, publisher_registration)
+TEST_F(vfed_single_tests, publisher_registration)
 {
-    SetupTest(helicsCreateValueFederate, GetParam(), 1);
+    SetupTest(helicsCreateValueFederate, "test", 1);
     auto vFed1 = GetFederateAt(0);
 
     auto pubid =
@@ -116,9 +118,9 @@ TEST_P(vfed_simple_type_tests, publisher_registration)
     EXPECT_TRUE(state == helics_state_finalize);
 }
 
-TEST_P(vfed_simple_type_tests, subscription_registration)
+TEST_F(vfed_single_tests, subscription_registration)
 {
-    SetupTest(helicsCreateValueFederate, GetParam(), 1);
+    SetupTest(helicsCreateValueFederate, "test", 1);
     auto vFed1 = GetFederateAt(0);
 
     helicsFederateSetFlagOption(vFed1, helics_handle_option_connection_optional, helics_true, &err);
@@ -156,9 +158,9 @@ TEST_P(vfed_simple_type_tests, subscription_registration)
     EXPECT_TRUE(state == helics_state_finalize);
 }
 
-TEST_P(vfed_simple_type_tests, subscription_and_publication_registration)
+TEST_F(vfed_single_tests, subscription_and_publication_registration)
 {
-    SetupTest(helicsCreateValueFederate, GetParam(), 1);
+    SetupTest(helicsCreateValueFederate, "test", 1);
     auto vFed1 = GetFederateAt(0);
     helicsFederateSetFlagOption(vFed1, helics_handle_option_connection_optional, helics_true, &err);
     // register the publications
@@ -222,6 +224,13 @@ TEST_P(vfed_simple_type_tests, subscription_and_publication_registration)
     auto pubid_c = helicsFederateGetPublicationByIndex(vFed1, 1, &err);
     tmp = helicsPublicationGetUnits(pubid_c);
     EXPECT_STREQ(tmp, "volts");
+
+    //this one should be invalid
+    auto pubid_d = helicsFederateGetPublicationByIndex(vFed1, 5, &err);
+    EXPECT_NE(err.error_code, 0);
+    EXPECT_EQ(pubid_d, nullptr);
+    helicsErrorClear(&err);
+
     CE(helicsFederateFinalize(vFed1, &err));
 
     CE(state = helicsFederateGetState(vFed1, &err));

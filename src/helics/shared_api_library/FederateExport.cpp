@@ -1158,12 +1158,14 @@ void helicsFederateSetLogFile(helics_federate fed, const char* logFile, helics_e
                 err->message = invalidFederateCore;
             }
             return;
-            // LCOV_EXCL_START
+            // LCOV_EXCL_STOP
         }
     }
+    // LCOV_EXCL_START
     catch (...) {
         helicsErrorHandler(err);
     }
+    // LCOV_EXCL_STOP
 }
 
 void helicsFederateLogErrorMessage(helics_federate fed, const char* logmessage, helics_error* err)

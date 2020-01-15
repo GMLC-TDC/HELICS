@@ -761,9 +761,11 @@ void helicsInputGetRawValue(helics_input inp, void* data, int maxDatalen, int* a
         }
         return;
     }
+    // LCOV_EXCL_START
     catch (...) {
         helicsErrorHandler(err);
     }
+    // LCOV_EXCL_STOP
 }
 
 void helicsInputGetString(helics_input inp, char* outputString, int maxStringLen, int* actualLength, helics_error* err)
@@ -785,9 +787,11 @@ void helicsInputGetString(helics_input inp, char* outputString, int maxStringLen
             *actualLength = length;
         }
     }
+    // LCOV_EXCL_START
     catch (...) {
         helicsErrorHandler(err);
     }
+    // LCOV_EXCL_STOP
 }
 
 int64_t helicsInputGetInteger(helics_input inp, helics_error* err)
@@ -815,10 +819,12 @@ helics_bool helicsInputGetBoolean(helics_input inp, helics_error* err)
         bool boolval = inpObj->inputPtr->getValue<bool>();
         return (boolval) ? helics_true : helics_false;
     }
+    // LCOV_EXCL_START
     catch (...) {
         helicsErrorHandler(err);
         return helics_false;
     }
+    // LCOV_EXCL_STOP
 }
 
 double helicsInputGetDouble(helics_input inp, helics_error* err)
@@ -846,10 +852,12 @@ helics_time helicsInputGetTime(helics_input inp, helics_error* err)
         auto T = inpObj->inputPtr->getValue<helics::Time>();
         return static_cast<helics_time>(T);
     }
+    // LCOV_EXCL_START
     catch (...) {
         helicsErrorHandler(err);
         return helics_time_invalid;
     }
+    // LCOV_EXCL_STOP
 }
 
 char helicsInputGetChar(helics_input inp, helics_error* err)
@@ -861,10 +869,12 @@ char helicsInputGetChar(helics_input inp, helics_error* err)
     try {
         return inpObj->inputPtr->getValue<char>();
     }
+    // LCOV_EXCL_START
     catch (...) {
         helicsErrorHandler(err);
         return '\x15'; //NAK (negative acknowledgment) symbol
     }
+    // LCOV_EXCL_STOP
 }
 
 void helicsInputGetComplex(helics_input inp, double* real, double* imag, helics_error* err)
@@ -960,9 +970,11 @@ void helicsInputGetVector(helics_input inp, double data[], int maxlen, int* actu
             *actualSize = length;
         }
     }
+    // LCOV_EXCL_START
     catch (...) {
         helicsErrorHandler(err);
     }
+    // LCOV_EXCL_STOP
 }
 
 void helicsInputGetNamedPoint(helics_input inp, char* outputString, int maxStringLen, int* actualLength, double* val, helics_error* err)
@@ -1000,9 +1012,11 @@ void helicsInputGetNamedPoint(helics_input inp, char* outputString, int maxStrin
 
         return;
     }
+    // LCOV_EXCL_START
     catch (...) {
         helicsErrorHandler(err);
     }
+    // LCOV_EXCL_STOP
 }
 
 void helicsInputSetDefaultRaw(helics_input inp, const void* data, int dataLen, helics_error* err)
