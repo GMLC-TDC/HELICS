@@ -267,13 +267,26 @@ install(
 # Standalone interface builds for wheels will need the files to be copied to a different location anyway,
 # so not copying the files for now isn't a big loss
 if(WIN32)
+    # Realistically for bundling into a Python wheel, the dll should be given a unique name
+    # to avoid conflicts with other packages using a different version of the dll with the same name
+    add_custom_command(
+        TARGET ${HELICS_PYTHON_TARGET_NAME} POST_BUILD
+        COMMAND
+            ${CMAKE_COMMAND} -E copy_if_different # which executes "cmake - E
+                                                  # copy_if_different..."
+            "$<TARGET_FILE:HELICS::helicsSharedLib>" # <--this is in- file
+            "$<TARGET_FILE_DIR:${HELICS_PYTHON_TARGET_NAME}>/" # <--this is out- file path
+    )
     if(COMMAND copy_key_files_to_target_location)
         copy_key_files_to_target_location(${HELICS_PYTHON_TARGET_NAME})
     endif()
-    if(COMMAND copy_shared_target)
-        copy_shared_target(${HELICS_PYTHON_TARGET_NAME} HELICS::helicsSharedLib)
-    endif()
     if(COMMAND install_key_files_with_comp)
         install_key_files_with_comp(python)
+    else
+        install(
+            FILES $<TARGET_FILE:HELICS::helicsSharedLib>
+            DESTINATION python
+            COMPONENT python
+        )
     endif()
 endif()
