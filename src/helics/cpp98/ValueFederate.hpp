@@ -333,7 +333,7 @@ class ValueFederate: public virtual Federate {
         int index2,
         const std::string& units = "")
     {
-        return registerSubscriptionIndexed(name, index1, index2, units);
+        return registerIndexedSubscription(name, index1, index2, units);
     }
 
     /** get an input by index*/
