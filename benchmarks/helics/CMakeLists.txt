@@ -35,6 +35,8 @@ endforeach()
 
 add_executable(PholdFederate PholdFederateMain.cpp)
 target_link_libraries(PholdFederate PUBLIC helics_application_api)
+set_target_properties(PholdFederate PROPERTIES FOLDER benchmarks_multimachine)
+
 
 if (NOT HELICS_DISABLE_C_SHARED_LIB)
    add_executable(echoBenchmarks_c echoBenchmarks_c.cpp)
@@ -107,6 +109,10 @@ foreach(T ${HELICS_BENCHMARKS})
     add_dependencies(RUN_ALL_BENCHMARKS ${T})
 endforeach()
 
+if (NOT HELICS_DISABLE_C_SHARED_LIB)
+    add_dependencies(RUN_ALL_BENCHMARKS echoBenchmarks_c)
+endif()
+
 set_target_properties(RUN_ALL_BENCHMARKS PROPERTIES FOLDER benchmarks)
 
 add_custom_target(
@@ -133,7 +139,5 @@ add_custom_target(
 foreach(T ${HELICS_BENCHMARKS})
     add_dependencies(RUN_KEY_BENCHMARKS ${T})
 endforeach()
-
-add_dependencies(RUN_KEY_BENCHMARKS echoBenchmarks_c)
 
 set_target_properties(RUN_KEY_BENCHMARKS PROPERTIES FOLDER benchmarks)
