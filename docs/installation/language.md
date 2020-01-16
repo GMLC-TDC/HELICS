@@ -31,7 +31,7 @@ Out[2]: 'x.x.x (XXXX-XX-XX)'
 ```
 
 Note: If you already have a HELICS installation with the C shared library, it is possible to build the Python3 interface
-using the `interfaces/python` folder as a standalone CMake project. This can be much faster than rebuilding HELICS.
+using the `interfaces/python` folder as a standalone CMake project ("e.g. `cmake <path to interfaces/python folder>`"). This can be much faster than rebuilding HELICS.
 
 ## HELICS with Python2
 
