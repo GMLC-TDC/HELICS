@@ -284,7 +284,7 @@ if(WIN32)
         install_key_files_with_comp(python)
     else
         install(
-            FILES $<TARGET_FILE:HELICS::helicsSharedLib>
+            FILES "$<TARGET_FILE:HELICS::helicsSharedLib>"
             DESTINATION python
             COMPONENT python
         )
