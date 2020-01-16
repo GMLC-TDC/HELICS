@@ -282,7 +282,7 @@ if(WIN32)
     endif()
     if(COMMAND install_key_files_with_comp)
         install_key_files_with_comp(python)
-    else
+    else()
         install(
             FILES "$<TARGET_FILE:HELICS::helicsSharedLib>"
             DESTINATION python
