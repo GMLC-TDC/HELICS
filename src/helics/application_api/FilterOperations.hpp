@@ -141,14 +141,12 @@ class FirewallFilterOperation: public FilterOperations {
 /** filter for rerouting a packet to a particular endpoint*/
 class CloneFilterOperation: public FilterOperations {
   private:
-    Core* coreptr; //!< pointer to a core object
     std::shared_ptr<CloneOperator> op; //!< the actual operator
     shared_guarded<std::vector<std::string>>
         deliveryAddresses; //!< the endpoints to deliver the cloned data to
 
   public:
-    /** this operation needs a pointer to a core to operate*/
-    explicit CloneFilterOperation(Core* core);
+    explicit CloneFilterOperation();
 
     ~CloneFilterOperation();
     virtual void set(const std::string& property, double val) override;
@@ -158,7 +156,7 @@ class CloneFilterOperation: public FilterOperations {
   private:
     /** run the send message function which copies the message and forwards to all destinations
     @param mess a message to clone*/
-    void sendMessage(const Message* mess) const;
+    std::vector<std::unique_ptr<Message>> sendMessage(const Message* mess) const;
 };
 
 } // namespace helics

@@ -190,6 +190,16 @@ class FilterOperator {
     virtual ~FilterOperator() = default;
     /** filter the message either modify the message or generate a new one*/
     virtual std::unique_ptr<Message> process(std::unique_ptr<Message> message) = 0;
+    /** filter the message either modify the message or generate a new one*/
+    virtual std::vector<std::unique_ptr<Message>> processVector(std::unique_ptr<Message> message)
+    {
+        std::vector<std::unique_ptr<Message>> ret;
+        auto res = process(std::move(message));
+        if (res) {
+            ret.push_back(std::move(res));
+        }
+        return ret;
+    }
     /** make the operator work like one
     @details calls the process function*/
     std::unique_ptr<Message> operator()(std::unique_ptr<Message> message)

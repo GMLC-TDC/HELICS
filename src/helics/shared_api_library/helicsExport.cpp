@@ -33,6 +33,7 @@ const char* helicsGetVersion(void)
 static constexpr const char* nullstrPtr = "";
 
 const std::string emptyStr;
+static const std::string nullstr;
 
 helics_error helicsErrorInitialize(void)
 {
@@ -58,51 +59,6 @@ helics_bool helicsIsCoreTypeAvailable(const char* type)
     }
     auto coreType = helics::core::coreTypeFromString(type);
     return (helics::core::isCoreTypeAvailable(coreType)) ? helics_true : helics_false;
-}
-
-// random integer for validation purposes of endpoints
-static constexpr int FederateInfoValidationIdentifier = 0x6bfb'bce1;
-
-helics_federate_info helicsCreateFederateInfo()
-{
-    auto* fi = new helics::FederateInfo;
-    fi->uniqueKey = FederateInfoValidationIdentifier;
-    return reinterpret_cast<void*>(fi);
-}
-
-static const char* invalidFedInfoString = "helics Federate info object was not valid";
-
-static helics::FederateInfo* getFedInfo(helics_federate_info fi, helics_error* err)
-{
-    if ((err != nullptr) && (err->error_code != 0)) {
-        return nullptr;
-    }
-    if (fi == nullptr) {
-        if (err != nullptr) {
-            err->error_code = helics_error_invalid_object;
-            err->message = invalidFedInfoString;
-        }
-        return nullptr;
-    }
-    auto ptr = reinterpret_cast<helics::FederateInfo*>(fi);
-    if (ptr->uniqueKey != FederateInfoValidationIdentifier) {
-        if (err != nullptr) {
-            err->error_code = helics_error_invalid_object;
-            err->message = invalidFedInfoString;
-        }
-        return nullptr;
-    }
-    return ptr;
-}
-
-helics_federate_info helicsFederateInfoClone(helics_federate_info fi, helics_error* err)
-{
-    auto info = getFedInfo(fi, err);
-    if (info == nullptr) {
-        return nullptr;
-    }
-    auto* fi_new = new helics::FederateInfo(*info);
-    return reinterpret_cast<void*>(fi_new);
 }
 
 // typedef enum {
@@ -187,208 +143,6 @@ void helicsErrorHandler(helics_error* err) noexcept
         err->message = unknown_err_string;
     }
     // LCOV_EXCL_STOP
-}
-
-void helicsFederateInfoFree(helics_federate_info fi)
-{
-    auto info = getFedInfo(fi, nullptr);
-    if (info == nullptr) {
-        //fprintf(stderr, "The helics_federate_info object is not valid\n");
-        return;
-    }
-    info->uniqueKey = 0;
-    delete info;
-}
-
-static const std::string nullstr;
-
-void helicsFederateInfoLoadFromArgs(helics_federate_info fi, int argc, const char* const* argv, helics_error* err)
-{
-    auto hfi = getFedInfo(fi, err);
-    if (hfi == nullptr) {
-        return;
-    }
-    try {
-        std::vector<std::string> args;
-        args.reserve(static_cast<size_t>(argc) - 1);
-        for (int ii = argc - 1; ii > 0; --ii) {
-            args.emplace_back(argv[ii]);
-        }
-        hfi->loadInfoFromArgs(args);
-    }
-    catch (...) {
-        return helicsErrorHandler(err);
-    }
-}
-
-void helicsFederateInfoSetCoreName(helics_federate_info fi, const char* corename, helics_error* err)
-{
-    auto hfi = getFedInfo(fi, err);
-    if (hfi == nullptr) {
-        return;
-    }
-    try {
-        hfi->coreName = AS_STRING(corename);
-    }
-    catch (...) { // LCOV_EXCL_LINE
-        return helicsErrorHandler(err); // LCOV_EXCL_LINE
-    }
-}
-
-void helicsFederateInfoSetCoreInitString(helics_federate_info fi, const char* coreinit, helics_error* err)
-{
-    auto hfi = getFedInfo(fi, err);
-    if (hfi == nullptr) {
-        return;
-    }
-    try {
-        hfi->coreInitString = AS_STRING(coreinit);
-    }
-    catch (...) { // LCOV_EXCL_LINE
-        return helicsErrorHandler(err); // LCOV_EXCL_LINE
-    }
-}
-
-void helicsFederateInfoSetBrokerInitString(helics_federate_info fi, const char* brokerinit, helics_error* err)
-{
-    auto hfi = getFedInfo(fi, err);
-    if (hfi == nullptr) {
-        return;
-    }
-    try {
-        hfi->brokerInitString = AS_STRING(brokerinit);
-    }
-    catch (...) { // LCOV_EXCL_LINE
-        return helicsErrorHandler(err); // LCOV_EXCL_LINE
-    }
-}
-
-void helicsFederateInfoSetCoreType(helics_federate_info fi, int coretype, helics_error* err)
-{
-    auto hfi = getFedInfo(fi, err);
-    if (hfi == nullptr) {
-        return;
-    }
-    hfi->coreType = static_cast<helics::core_type>(coretype);
-}
-
-void helicsFederateInfoSetCoreTypeFromString(helics_federate_info fi, const char* coretype, helics_error* err)
-{
-    auto hfi = getFedInfo(fi, err);
-    if (hfi == nullptr) {
-        return;
-    }
-    if (coretype == nullptr) {
-        hfi->coreType = helics::core_type::DEFAULT;
-        return;
-    }
-    auto ctype = helics::core::coreTypeFromString(coretype);
-    if (ctype == helics::core_type::UNRECOGNIZED) {
-        if (err != nullptr) {
-            err->error_code = helics_error_invalid_argument;
-            err->message = getMasterHolder()->addErrorString(std::string(coretype) + " is not a valid core type");
-            return;
-        }
-    }
-    hfi->coreType = ctype;
-}
-
-void helicsFederateInfoSetBroker(helics_federate_info fi, const char* broker, helics_error* err)
-{
-    auto hfi = getFedInfo(fi, err);
-    if (hfi == nullptr) {
-        return;
-    }
-    try {
-        hfi->broker = AS_STRING(broker);
-    }
-    catch (...) { // LCOV_EXCL_LINE
-        return helicsErrorHandler(err); // LCOV_EXCL_LINE
-    }
-}
-
-void helicsFederateInfoSetBrokerKey(helics_federate_info fi, const char* brokerkey, helics_error* err)
-{
-    auto hfi = getFedInfo(fi, err);
-    if (hfi == nullptr) {
-        return;
-    }
-    try {
-        hfi->key = AS_STRING(brokerkey);
-    }
-    catch (...) { // LCOV_EXCL_LINE
-        return helicsErrorHandler(err); // LCOV_EXCL_LINE
-    }
-}
-
-void helicsFederateInfoSetBrokerPort(helics_federate_info fi, int brokerPort, helics_error* err)
-{
-    auto hfi = getFedInfo(fi, err);
-    if (hfi == nullptr) {
-        return;
-    }
-    hfi->brokerPort = brokerPort;
-}
-
-void helicsFederateInfoSetLocalPort(helics_federate_info fi, const char* localPort, helics_error* err)
-{
-    auto hfi = getFedInfo(fi, err);
-    if (hfi == nullptr) {
-        return;
-    }
-    hfi->localport = AS_STRING(localPort);
-}
-
-int helicsGetPropertyIndex(const char* val)
-{
-    if (val == nullptr) {
-        return -1;
-    }
-    return helics::getPropertyIndex(val);
-}
-
-int helicsGetOptionIndex(const char* val)
-{
-    if (val == nullptr) {
-        return -1;
-    }
-    return helics::getOptionIndex(val);
-}
-
-void helicsFederateInfoSetFlagOption(helics_federate_info fi, int flag, helics_bool value, helics_error* err)
-{
-    auto hfi = getFedInfo(fi, err);
-    if (hfi == nullptr) {
-        return;
-    }
-    hfi->setFlagOption(flag, (value != helics_false));
-}
-
-void helicsFederateInfoSetTimeProperty(helics_federate_info fi, int timeProperty, helics_time propertyValue, helics_error* err)
-{
-    auto hfi = getFedInfo(fi, err);
-    if (hfi == nullptr) {
-        return;
-    }
-    hfi->setProperty(timeProperty, propertyValue);
-}
-
-void helicsFederateInfoSetSeparator(helics_federate_info fi, char separator, helics_error* err)
-{
-    auto hfi = getFedInfo(fi, err);
-    if (hfi == nullptr) {
-        return;
-    }
-    hfi->separator = separator;
-}
-
-void helicsFederateInfoSetIntegerProperty(helics_federate_info fi, int integerProperty, int propertyValue, helics_error* err)
-{
-    auto hfi = getFedInfo(fi, err);
-    if (hfi == nullptr) {
-        return;
-    }
-    hfi->setProperty(integerProperty, propertyValue);
 }
 
 static constexpr char invalidCoreString[] = "core object is not valid";
@@ -948,9 +702,11 @@ void helicsCoreDisconnect(helics_core core, helics_error* err)
     try {
         cr->disconnect();
     }
+    // LCOV_EXCL_START
     catch (...) {
         helicsErrorHandler(err);
     }
+    // LCOV_EXCL_STOP
 }
 
 helics_bool helicsBrokerWaitForDisconnect(helics_broker broker, int msToWait, helics_error* err)
@@ -982,9 +738,11 @@ void helicsBrokerDisconnect(helics_broker broker, helics_error* err)
     try {
         brk->disconnect();
     }
+    // LCOV_EXCL_START
     catch (...) {
         return helicsErrorHandler(err);
     }
+    // LCOV_EXCL_STOP
 }
 
 void helicsFederateDestroy(helics_federate fed)
@@ -1137,10 +895,12 @@ const char* helicsQueryCoreExecute(helics_query query, helics_core core, helics_
         queryObj->response = coreObj->query(queryObj->target, queryObj->query);
         return queryObj->response.c_str();
     }
+    // LCOV_EXCL_START
     catch (...) {
         helicsErrorHandler(err);
-        return invalidStringConst;
     }
+    return invalidStringConst;
+    // LCOV_EXCL_START
 }
 
 const char* helicsQueryBrokerExecute(helics_query query, helics_broker broker, helics_error* err)
@@ -1158,10 +918,12 @@ const char* helicsQueryBrokerExecute(helics_query query, helics_broker broker, h
         queryObj->response = brokerObj->query(queryObj->target, queryObj->query);
         return queryObj->response.c_str();
     }
+    // LCOV_EXCL_START
     catch (...) {
         helicsErrorHandler(err);
     }
     return invalidStringConst;
+    // LCOV_EXCL_STOP
 }
 
 void helicsQueryExecuteAsync(helics_query query, helics_federate fed, helics_error* err)
@@ -1183,9 +945,11 @@ void helicsQueryExecuteAsync(helics_query query, helics_federate fed, helics_err
         queryObj->activeAsync = true;
         queryObj->activeFed = fedObj;
     }
+    // LCOV_EXCL_START
     catch (...) {
         helicsErrorHandler(err);
     }
+    // LCOV_EXCL_STOP
 }
 
 const char* helicsQueryExecuteComplete(helics_query query, helics_error* err)
@@ -1240,7 +1004,7 @@ MasterObjectHolder::~MasterObjectHolder()
 {
 #ifdef ENABLE_ZMQ_CORE
     if (ZmqContextManager::setContextToLeakOnDelete()) {
-        ZmqContextManager::getContext().close();
+        ZmqContextManager::getContext().close(); // LCOV_EXCL_LINE
     }
 #endif
     helics::LoggingCore::setFastShutdown();

@@ -34,11 +34,13 @@ TEST_P(query_tests, publication_queries)
     CE(std::string res(helicsQueryCoreExecute(q1, core, &err)));
 
     EXPECT_EQ(res, "[pub1;fed0/pub2]");
-
+    helicsQueryFree(q1);
+    q1 = helicsCreateQuery(nullptr, "publications");
     CE(std::string res2 = helicsQueryExecute(q1, vFed2, &err));
-    EXPECT_EQ(res2, "[pub1;fed0/pub2]");
+    EXPECT_EQ(res2, "[fed1/pub3]");
 
     helicsQueryFree(q1);
+
     q1 = helicsCreateQuery("fed1", "isinit");
 
     CE(res = helicsQueryExecute(q1, vFed1, &err));
@@ -78,6 +80,10 @@ TEST_P(query_tests, broker_queries)
     CE(helicsFederateEnterInitializingModeAsync(vFed1, &err));
     CE(helicsFederateEnterInitializingMode(vFed2, &err));
     CE(helicsFederateEnterInitializingModeComplete(vFed1, &err));
+    //expected to be false since it isn't associated with a asynchronous query
+    auto qcomplete = helicsQueryIsCompleted(q1);
+    EXPECT_EQ(qcomplete, helics_false);
+
     helicsQueryFree(q1);
     helicsCoreFree(core);
     CE(helicsFederateFinalizeAsync(vFed1, &err));

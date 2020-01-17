@@ -1114,6 +1114,9 @@ void CommonCore::addDestinationTarget(interface_handle handle, const std::string
                     cmd.setStringData(handleInfo->type_in, handleInfo->type_out);
                 }
             }
+            if (checkActionFlag(*handleInfo, clone_flag)) {
+                setActionFlag(cmd, clone_flag);
+            }
             break;
         case handle_type::publication:
             cmd.setAction(CMD_ADD_NAMED_INPUT);
@@ -1149,6 +1152,9 @@ void CommonCore::addSourceTarget(interface_handle handle, const std::string& tar
                 if ((!handleInfo->type_in.empty()) || (!handleInfo->type_out.empty())) {
                     cmd.setStringData(handleInfo->type_in, handleInfo->type_out);
                 }
+            }
+            if (checkActionFlag(*handleInfo, clone_flag)) {
+                setActionFlag(cmd, clone_flag);
             }
             break;
         case handle_type::input:
@@ -1641,10 +1647,15 @@ void CommonCore::deliverMessage(ActionMessage& message)
                                 global_handle(global_broker_id_local, clFilter->handle));
                             if (FiltI != nullptr) {
                                 if (FiltI->filterOp != nullptr) {
-                                    // this is a cloning filter the whole point is that it would not modify the message
-                                    // so the return is irrelevent
-                                    (void)(FiltI->filterOp->process(
-                                        createMessageFromCommand(message)));
+                                    // this is a cloning filter so it generates a bunch(?) of new messages
+                                    auto new_messages = FiltI->filterOp->processVector(
+                                        createMessageFromCommand(message));
+                                    for (auto& msg : new_messages) {
+                                        if (msg) {
+                                            ActionMessage cmd(std::move(msg));
+                                            deliverMessage(cmd);
+                                        }
+                                    }
                                 }
                             }
                         } else {
@@ -2658,6 +2669,9 @@ void CommonCore::processCommand(ActionMessage&& command)
                 command.name = command.getString(targetStringLoc);
                 command.setAction(CMD_ADD_NAMED_ENDPOINT);
                 command.setSource(filt->handle);
+                if (checkActionFlag(*filt, clone_flag)) {
+                    setActionFlag(command, clone_flag);
+                }
                 checkForNamedInterface(command);
             } else {
                 auto ept = loopHandles.getEndpoint(command.getString(targetStringLoc));
@@ -2912,6 +2926,9 @@ void CommonCore::checkForNamedInterface(ActionMessage& command)
                 addTargetToInterface(command);
                 command.setAction(CMD_ADD_FILTER);
                 command.swapSourceDest();
+                if (checkActionFlag(*filt, clone_flag)) {
+                    setActionFlag(command, clone_flag);
+                }
                 addTargetToInterface(command);
             } else {
                 routeMessage(std::move(command));
@@ -3701,8 +3718,15 @@ ActionMessage& CommonCore::processMessage(ActionMessage& m)
                 }
                 if (filt->core_id == global_broker_id_local) {
                     if (filt->cloning) {
-                        // cloning filter the return is not useful
-                        (void)(filt->filterOp->process(createMessageFromCommand(m)));
+                        // cloning filter returns a vector
+                        auto new_messages =
+                            filt->filterOp->processVector(createMessageFromCommand(m));
+                        for (auto& msg : new_messages) {
+                            if (msg) {
+                                ActionMessage cmd(std::move(msg));
+                                deliverMessage(cmd);
+                            }
+                        }
                     } else {
                         // deal with local source filters
                         auto tempMessage = createMessageFromCommand(std::move(m));
@@ -3872,7 +3896,14 @@ void CommonCore::processMessageFilter(ActionMessage& cmd)
         if (FiltI != nullptr) {
             if ((!checkActionFlag(*FiltI, disconnected_flag)) && (FiltI->filterOp)) {
                 if (FiltI->cloning) {
-                    (void)(FiltI->filterOp->process(createMessageFromCommand(std::move(cmd))));
+                    auto new_messages =
+                        FiltI->filterOp->processVector(createMessageFromCommand(std::move(cmd)));
+                    for (auto& msg : new_messages) {
+                        if (msg) {
+                            cmd = ActionMessage(std::move(msg));
+                            deliverMessage(cmd);
+                        }
+                    }
                 } else {
                     bool destFilter = (cmd.action() == CMD_SEND_FOR_DEST_FILTER_AND_RETURN);
                     bool returnToSender =

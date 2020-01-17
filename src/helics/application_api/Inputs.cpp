@@ -130,6 +130,10 @@ bool Input::checkUpdate(bool assumeUpdate)
                 if (type == helics::data_type::helics_double) {
                     defV val = doubleExtractAndConvert(dv, inputUnits, outputUnits);
                     valueExtract(val, newVal);
+                } else if (type == helics::data_type::helics_int) {
+                    defV val;
+                    integerExtractAndConvert(val, dv, inputUnits, outputUnits);
+                    valueExtract(val, newVal);
                 } else {
                     valueExtract(dv, type, newVal);
                 }
@@ -268,6 +272,20 @@ double doubleExtractAndConvert(
     return V;
 }
 
+void integerExtractAndConvert(
+    defV& store,
+    const data_view& dv,
+    const std::shared_ptr<units::precise_unit>& inputUnits,
+    const std::shared_ptr<units::precise_unit>& outputUnits)
+{
+    auto V = ValueConverter<int64_t>::interpret(dv);
+    if ((inputUnits) && (outputUnits)) {
+        store = units::convert(static_cast<double>(V), *inputUnits, *outputUnits);
+    } else {
+        store = V;
+    }
+}
+
 char Input::getValueChar()
 {
     if (fed->isUpdated(*this) || (hasUpdate && !changeDetectionEnabled)) {
@@ -312,8 +330,12 @@ char Input::getValueChar()
 int Input::getValue(double* data, int maxsize)
 {
     auto V = getValueRef<std::vector<double>>();
-    int length = std::min(static_cast<int>(V.size()), maxsize);
-    std::memmove(data, V.data(), length * sizeof(double));
+    int length = 0;
+    if (data != nullptr && maxsize > 0) {
+        length = std::min(static_cast<int>(V.size()), maxsize);
+        std::memmove(data, V.data(), length * sizeof(double));
+    }
+
     hasUpdate = false;
     return length;
 }
@@ -321,13 +343,16 @@ int Input::getValue(double* data, int maxsize)
 int Input::getValue(char* str, int maxsize)
 {
     auto& S = getValueRef<std::string>();
-    int length = std::min(static_cast<int>(S.size()), maxsize);
-    memcpy(str, S.data(), length);
-    if (length == maxsize) {
-        str[maxsize - 1] = '\0';
-    } else {
-        str[length] = '\0';
-        ++length;
+    int length = 0;
+    if (str != nullptr && maxsize > 0) {
+        length = std::min(static_cast<int>(S.size()), maxsize);
+        memcpy(str, S.data(), length);
+        if (length == maxsize) {
+            str[maxsize - 1] = '\0';
+        } else {
+            str[length] = '\0';
+            ++length;
+        }
     }
     hasUpdate = false;
     return length;

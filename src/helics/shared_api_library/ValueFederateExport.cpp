@@ -720,6 +720,19 @@ int helicsInputGetRawValueSize(helics_input inp)
     return static_cast<int>(inpObj->inputPtr->getRawSize());
 }
 
+bool checkOutArgString(const char* outputString, int maxlen, helics_error* err)
+{
+    static constexpr char invalidOutputString[] = "Output string location is invalid";
+    if ((outputString == nullptr) || (maxlen <= 0)) {
+        if (err != nullptr) {
+            err->error_code = helics_error_invalid_argument;
+            err->message = invalidOutputString;
+        }
+        return false;
+    }
+    return true;
+}
+
 void helicsInputGetRawValue(helics_input inp, void* data, int maxDatalen, int* actualSize, helics_error* err)
 {
     auto inpObj = verifyInput(inp, err);
@@ -747,9 +760,11 @@ void helicsInputGetRawValue(helics_input inp, void* data, int maxDatalen, int* a
         }
         return;
     }
+    // LCOV_EXCL_START
     catch (...) {
         helicsErrorHandler(err);
     }
+    // LCOV_EXCL_STOP
 }
 
 void helicsInputGetString(helics_input inp, char* outputString, int maxStringLen, int* actualLength, helics_error* err)
@@ -771,9 +786,11 @@ void helicsInputGetString(helics_input inp, char* outputString, int maxStringLen
             *actualLength = length;
         }
     }
+    // LCOV_EXCL_START
     catch (...) {
         helicsErrorHandler(err);
     }
+    // LCOV_EXCL_STOP
 }
 
 int64_t helicsInputGetInteger(helics_input inp, helics_error* err)
@@ -801,10 +818,12 @@ helics_bool helicsInputGetBoolean(helics_input inp, helics_error* err)
         bool boolval = inpObj->inputPtr->getValue<bool>();
         return (boolval) ? helics_true : helics_false;
     }
+    // LCOV_EXCL_START
     catch (...) {
         helicsErrorHandler(err);
         return helics_false;
     }
+    // LCOV_EXCL_STOP
 }
 
 double helicsInputGetDouble(helics_input inp, helics_error* err)
@@ -832,10 +851,12 @@ helics_time helicsInputGetTime(helics_input inp, helics_error* err)
         auto T = inpObj->inputPtr->getValue<helics::Time>();
         return static_cast<helics_time>(T);
     }
+    // LCOV_EXCL_START
     catch (...) {
         helicsErrorHandler(err);
         return helics_time_invalid;
     }
+    // LCOV_EXCL_STOP
 }
 
 char helicsInputGetChar(helics_input inp, helics_error* err)
@@ -847,10 +868,12 @@ char helicsInputGetChar(helics_input inp, helics_error* err)
     try {
         return inpObj->inputPtr->getValue<char>();
     }
+    // LCOV_EXCL_START
     catch (...) {
         helicsErrorHandler(err);
         return '\x15'; //NAK (negative acknowledgment) symbol
     }
+    // LCOV_EXCL_STOP
 }
 
 void helicsInputGetComplex(helics_input inp, double* real, double* imag, helics_error* err)
@@ -938,6 +961,8 @@ void helicsInputGetVector(helics_input inp, double data[], int maxlen, int* actu
         return;
     }
     if ((data == nullptr) || (maxlen <= 0)) {
+        inpObj->inputPtr->clearUpdate();
+        //this isn't an error, just no data retreived
         return;
     }
     try {
@@ -946,9 +971,11 @@ void helicsInputGetVector(helics_input inp, double data[], int maxlen, int* actu
             *actualSize = length;
         }
     }
+    // LCOV_EXCL_START
     catch (...) {
         helicsErrorHandler(err);
     }
+    // LCOV_EXCL_STOP
 }
 
 void helicsInputGetNamedPoint(helics_input inp, char* outputString, int maxStringLen, int* actualLength, double* val, helics_error* err)
@@ -960,35 +987,36 @@ void helicsInputGetNamedPoint(helics_input inp, char* outputString, int maxStrin
     if (inpObj == nullptr) {
         return;
     }
-    if (!checkOutArgString(outputString, maxStringLen, err)) {
-        return;
-    }
+
     try {
         helics::NamedPoint np = inpObj->inputPtr->getValue<helics::NamedPoint>();
-        int length = std::min(static_cast<int>(np.name.size()), maxStringLen);
-        memcpy(outputString, np.name.data(), length);
+        if (outputString != nullptr && maxStringLen > 0) {
+            int length = std::min(static_cast<int>(np.name.size()), maxStringLen);
+            memcpy(outputString, np.name.data(), length);
 
-        if (length == maxStringLen) {
-            outputString[maxStringLen - 1] = '\0';
-            if (actualLength != nullptr) {
-                *actualLength = maxStringLen;
-            }
-        } else {
-            outputString[length] = '\0';
-            if (actualLength != nullptr) {
-                *actualLength = length + 1;
+            if (length == maxStringLen) {
+                outputString[maxStringLen - 1] = '\0';
+                if (actualLength != nullptr) {
+                    *actualLength = maxStringLen;
+                }
+            } else {
+                outputString[length] = '\0';
+                if (actualLength != nullptr) {
+                    *actualLength = length + 1;
+                }
             }
         }
-
         if (val != nullptr) {
             *val = np.value;
         }
 
         return;
     }
+    // LCOV_EXCL_START
     catch (...) {
         helicsErrorHandler(err);
     }
+    // LCOV_EXCL_STOP
 }
 
 void helicsInputSetDefaultRaw(helics_input inp, const void* data, int dataLen, helics_error* err)

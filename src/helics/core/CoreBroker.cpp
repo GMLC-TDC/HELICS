@@ -1219,6 +1219,9 @@ void CoreBroker::checkForNamedInterface(ActionMessage& command)
                 if ((!filt->type_in.empty()) || (!filt->type_out.empty())) {
                     command.setStringData(filt->type_in, filt->type_out);
                 }
+                if (checkActionFlag(*filt, clone_flag)) {
+                    setActionFlag(command, clone_flag);
+                }
                 routeMessage(command);
                 foundInterface = true;
             }
@@ -1235,6 +1238,9 @@ void CoreBroker::checkForNamedInterface(ActionMessage& command)
                     if (filt != nullptr) {
                         if ((!filt->type_in.empty()) || (!filt->type_out.empty())) {
                             command.setStringData(filt->type_in, filt->type_out);
+                        }
+                        if (checkActionFlag(*filt, clone_flag)) {
+                            setActionFlag(command, clone_flag);
                         }
                     }
                     routeMessage(command);
@@ -1288,7 +1294,7 @@ void CoreBroker::checkForNamedInterface(ActionMessage& command)
                     if (!command.getStringData().empty()) {
                         auto filt = handles.findHandle(command.getSource());
                         if (filt == nullptr) {
-                            // an anonymous filter is adding and endpoint
+                            // an anonymous filter is adding an endpoint
                             auto& afilt = handles.addHandle(
                                 command.source_id,
                                 command.source_handle,
@@ -1964,7 +1970,6 @@ void CoreBroker::FindandNotifyEndpointTargets(BasicHandleInfo& handleInfo)
         // notify the endpoint about its filter
         m.setAction(CMD_ADD_FILTER);
         m.swapSourceDest();
-
         m.flags = target.second;
         transmit(getRoute(m.dest_id), m);
     }
@@ -1982,6 +1987,9 @@ void CoreBroker::FindandNotifyFilterTargets(BasicHandleInfo& handleInfo)
         ActionMessage m(CMD_ADD_FILTER);
         m.setSource(handleInfo.handle);
         m.flags = target.second;
+        if (checkActionFlag(handleInfo, clone_flag)) {
+            setActionFlag(m, clone_flag);
+        }
         m.setDestination(target.first);
         if ((!handleInfo.type_in.empty()) || (!handleInfo.type_out.empty())) {
             m.setStringData(handleInfo.type_in, handleInfo.type_out);
@@ -2000,7 +2008,11 @@ void CoreBroker::FindandNotifyFilterTargets(BasicHandleInfo& handleInfo)
         ActionMessage m(CMD_ADD_NAMED_ENDPOINT);
         m.name = target;
         m.setSource(handleInfo.handle);
+        m.flags = handleInfo.flags;
         setActionFlag(m, destination_target);
+        if (checkActionFlag(handleInfo, clone_flag)) {
+            setActionFlag(m, clone_flag);
+        }
         checkForNamedInterface(m);
     }
 
@@ -2008,7 +2020,11 @@ void CoreBroker::FindandNotifyFilterTargets(BasicHandleInfo& handleInfo)
     for (auto target : FiltSourceTargets) {
         ActionMessage m(CMD_ADD_NAMED_ENDPOINT);
         m.name = target;
+        m.flags = handleInfo.flags;
         m.setSource(handleInfo.handle);
+        if (checkActionFlag(handleInfo, clone_flag)) {
+            setActionFlag(m, clone_flag);
+        }
         checkForNamedInterface(m);
     }
     if (!(Handles.empty() && FiltDestTargets.empty() && FiltSourceTargets.empty())) {

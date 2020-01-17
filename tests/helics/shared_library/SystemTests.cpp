@@ -152,6 +152,14 @@ TEST(other_tests, federate_global_value)
     res = helicsQueryExecuteComplete(q, &err);
     EXPECT_EQ(res, globalVal2);
 
+    auto q2 = helicsCreateQuery(nullptr, "isinit");
+    helicsQueryExecuteAsync(q2, fed, &err);
+    while (helicsQueryIsCompleted(q2) == helics_false) {
+        std::this_thread::sleep_for(std::chrono::milliseconds(20));
+    }
+    res = helicsQueryExecuteComplete(q2, &err);
+    EXPECT_STREQ(res, "false");
+
     // a series of invalid query calls
     res = helicsQueryExecute(nullptr, fed, &err);
     EXPECT_NE(err.error_code, 0);
@@ -176,12 +184,17 @@ TEST(other_tests, federate_global_value)
     EXPECT_NE(err.error_code, 0);
     helicsErrorClear(&err);
 
+    helicsQueryExecuteAsync(nullptr, fed, &err);
+    EXPECT_NE(err.error_code, 0);
+    helicsErrorClear(&err);
+
     helicsFederateFinalize(fed, &err);
 
     helicsCoreDisconnect(cr, &err);
     helicsBrokerDisconnect(brk, &err);
 
     helicsQueryFree(q);
+    helicsQueryFree(q2);
     EXPECT_EQ(helicsBrokerIsConnected(brk), helics_false);
 }
 

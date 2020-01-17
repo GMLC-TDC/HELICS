@@ -224,10 +224,13 @@ TEST_P(mfed_type_tests, send_receive_2fed)
     SetupTest(helicsCreateMessageFederate, GetParam(), 2);
     auto mFed1 = GetFederateAt(0);
     auto mFed2 = GetFederateAt(1);
-    // mFed1->setLoggingLevel(4);
+    helicsFederateSetIntegerProperty(mFed1, helics_property_int_console_log_level, 0, &err);
     // mFed2->setLoggingLevel(4);
     CE(auto epid = helicsFederateRegisterEndpoint(mFed1, "ep1", NULL, &err));
     CE(auto epid2 = helicsFederateRegisterGlobalEndpoint(mFed2, "ep2", "random", &err));
+
+    helicsEndpointSetOption(epid, helics_handle_option_ignore_interrupts, helics_true, &err);
+    EXPECT_EQ(err.error_code, 0);
 
     CE(helicsFederateSetTimeProperty(mFed1, helics_property_time_delta, 1.0, &err));
     CE(helicsFederateSetTimeProperty(mFed2, helics_property_time_delta, 1.0, &err));
@@ -240,6 +243,9 @@ TEST_P(mfed_type_tests, send_receive_2fed)
     EXPECT_TRUE(mFed1State == helics_state_execution);
     CE(helics_federate_state mFed2State = helicsFederateGetState(mFed2, &err));
     EXPECT_TRUE(mFed2State == helics_state_execution);
+
+    int val = helicsFederateGetIntegerProperty(mFed1, helics_property_int_console_log_level, &err);
+    EXPECT_EQ(val, 0);
 
     std::string data(500, 'a');
     std::string data2(400, 'b');
@@ -255,6 +261,10 @@ TEST_P(mfed_type_tests, send_receive_2fed)
 
     EXPECT_EQ(gtime, 1.0);
     EXPECT_EQ(time, 1.0);
+
+    auto opt_val = helicsEndpointGetOption(epid, helics_handle_option_ignore_interrupts);
+    //someday this might get implemented but for now it isn't so we expect false
+    EXPECT_EQ(opt_val, false);
 
     auto res = helicsFederateHasMessage(mFed1);
     EXPECT_TRUE(res);

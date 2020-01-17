@@ -6,6 +6,7 @@ SPDX-License-Identifier: BSD-3-Clause
 */
 
 #include "../ThirdParty/concurrency/gmlc/libguarded/guarded.hpp"
+#include "../ThirdParty/helics/external/filesystem.hpp"
 
 #include <complex>
 #include <gtest/gtest.h>
@@ -183,4 +184,55 @@ TEST(logging_tests, broker_logging)
     helicsBrokerDisconnect(broker, nullptr);
     helicsCloseLibrary();
     EXPECT_FALSE(mlog.lock()->empty());
+}
+
+TEST(logging_tests, broker_logging_file)
+{
+    const char* lfile = "logb.txt";
+    ghc::filesystem::remove(lfile);
+    auto err = helicsErrorInitialize();
+    auto broker = helicsCreateBroker("inproc", "blog", "--log_level=trace", &err);
+    helicsBrokerSetLogFile(broker, lfile, &err);
+    helicsBrokerDisconnect(broker, &err);
+    helicsCloseLibrary();
+    EXPECT_TRUE(ghc::filesystem::exists(lfile));
+    ghc::filesystem::remove(lfile);
+    EXPECT_EQ(err.error_code, 0);
+}
+
+TEST(logging_tests, core_logging_file)
+{
+    const char* lfile = "logc.txt";
+    ghc::filesystem::remove(lfile);
+    auto core = helicsCreateCore("inproc", "clog", "--autobroker --log_level=trace", nullptr);
+
+    auto err = helicsErrorInitialize();
+    helicsCoreSetLogFile(core, lfile, &err);
+    helicsCoreDisconnect(core, &err);
+    helicsCloseLibrary();
+    EXPECT_TRUE(ghc::filesystem::exists(lfile));
+    ghc::filesystem::remove(lfile);
+}
+
+TEST(logging_tests, fed_logging_file)
+{
+    const char* lfile = "logf.txt";
+    ghc::filesystem::remove(lfile);
+    auto core = helicsCreateCore("inproc", "clogf", "--autobroker --log_level=trace", nullptr);
+
+    auto err = helicsErrorInitialize();
+    auto fi = helicsCreateFederateInfo();
+    helicsFederateInfoSetCoreName(fi, "clogf", nullptr);
+    auto fed = helicsCreateValueFederate("f1", fi, nullptr);
+    helicsFederateSetLogFile(fed, lfile, nullptr);
+
+    helicsCoreSetLogFile(core, lfile, &err);
+    helicsCoreDisconnect(core, &err);
+    helicsFederateFinalize(fed, &err);
+
+    helicsFederateSetLogFile(fed, "emptyfile.txt", nullptr);
+    helicsFederateInfoFree(fi);
+    helicsCloseLibrary();
+    EXPECT_TRUE(ghc::filesystem::exists(lfile));
+    ghc::filesystem::remove(lfile);
 }

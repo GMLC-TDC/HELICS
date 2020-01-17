@@ -95,14 +95,18 @@ class HELICS_CXX_EXPORT CloneOperator: public FilterOperator {
     /** default constructor*/
     CloneOperator() = default;
     /** set the function to modify the data of the message in the constructor*/
-    explicit CloneOperator(std::function<void(const Message*)> userCloneFunction);
+    explicit CloneOperator(
+        std::function<std::vector<std::unique_ptr<Message>>(const Message*)> userCloneFunction);
     /** set the function to modify the data of the message*/
-    void setCloneFunction(std::function<void(const Message*)> userCloneFunction);
+    void setCloneFunction(
+        std::function<std::vector<std::unique_ptr<Message>>(const Message*)> userCloneFunction);
 
   private:
-    std::function<void(const Message*)>
+    std::function<std::vector<std::unique_ptr<Message>>(const Message*)>
         evalFunction; //!< the function actually doing the processing
     virtual std::unique_ptr<Message> process(std::unique_ptr<Message> message) override;
+    virtual std::vector<std::unique_ptr<Message>>
+        processVector(std::unique_ptr<Message> message) override;
 };
 
 /** class defining an message operator that either passes the message or not

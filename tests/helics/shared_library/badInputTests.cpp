@@ -84,6 +84,16 @@ TEST_F(bad_input_tests, test_mistaken_finalize)
     helicsFederateFree(vFed1);
 }
 
+/** test simple creation and destruction*/
+TEST_F(bad_input_tests, test_creation)
+{
+    SetupTest(helicsCreateValueFederate, "zmq", 1);
+
+    auto fed2 = helicsCreateValueFederate("fed3", nullptr, &err);
+    EXPECT_EQ(err.error_code, 0);
+    EXPECT_TRUE(helicsFederateIsValid(fed2) == helics_true);
+}
+
 TEST(error_tests, unavailable_core_type)
 {
     auto err = helicsErrorInitialize();
@@ -180,6 +190,8 @@ TEST_F(function_tests, input_test)
     EXPECT_TRUE(comp == helics_iteration_result_iterating);
     auto val = helicsInputGetDouble(subid, nullptr);
     EXPECT_EQ(val, 27.0);
+    auto valt = helicsInputGetTime(subid, nullptr);
+    EXPECT_EQ(valt, 27.0);
 
     comp = helicsFederateEnterExecutingModeIterative(
         vFed1, helics_iteration_request_iterate_if_needed, nullptr);
@@ -244,6 +256,7 @@ TEST_F(function_tests, raw)
     EXPECT_NE(val, 0.0);
     EXPECT_NE(err.error_code, 0);
     helicsErrorClear(&err);
+
     auto val2 = helicsInputGetInteger(subid, &err);
     EXPECT_NE(val2, 0);
     EXPECT_NE(err.error_code, 0);
@@ -295,7 +308,10 @@ TEST_F(function_tests, raw2)
     helicsPublicationPublishDouble(pubid, 27.0, nullptr);
     helicsFederateRequestNextStep(vFed1, nullptr);
     // we are just making sure these don't blow up and cause a seg fault
-    helicsInputGetRawValue(subid, nullptr, 5, nullptr, nullptr);
+    helicsInputGetRawValue(subid, nullptr, 5, nullptr, &err);
+    EXPECT_NE(err.error_code, 0);
+    helicsErrorClear(&err);
+
     helicsInputGetString(subid, nullptr, 5, nullptr, nullptr);
     auto val = helicsInputGetComplexObject(subid, &err);
     EXPECT_NE(val.real, 0.0);
@@ -371,6 +387,12 @@ TEST_F(function_tests, typePub)
     EXPECT_EQ(subid2, nullptr);
     helicsErrorClear(&err);
 
+    // value federate can't register endpoints
+    auto ept = helicsFederateRegisterEndpoint(vFed1, "ept1", nullptr, &err);
+    EXPECT_NE(err.error_code, 0);
+    helicsErrorClear(&err);
+    EXPECT_EQ(ept, nullptr);
+
     helicsInputAddTarget(subid, "fed0/pub1", nullptr);
 
     helicsFederateSetTimeProperty(vFed1, helics_property_time_period, 1.0, nullptr);
@@ -384,6 +406,9 @@ TEST_F(function_tests, typePub)
     helicsInputGetString(subid, str, 50, &actLen, &err);
     EXPECT_EQ(str[0], '2');
     EXPECT_EQ(str[1], '7');
+
+    auto messages = helicsFederatePendingMessages(vFed1);
+    EXPECT_EQ(messages, 0);
 
     helicsFederateFinalize(vFed1, nullptr);
 }
@@ -661,6 +686,12 @@ TEST_F(function_tests, initError4)
     EXPECT_NE(err.error_code, 0);
 }
 
+TEST_F(function_tests, version)
+{
+    auto b = helicsGetVersion();
+    EXPECT_NE(b, nullptr);
+}
+
 TEST_F(function_tests, initError5)
 {
     SetupTest(helicsCreateValueFederate, "test", 1);
@@ -675,7 +706,9 @@ TEST_F(function_tests, initError5)
 
     helicsFederateSetTimeProperty(vFed1, helics_property_time_period, 1.0, nullptr);
 
-    helicsFederateEnterExecutingModeIterative(vFed1, helics_iteration_request_no_iteration, &err);
+    auto resIt = helicsFederateEnterExecutingModeIterative(
+        vFed1, helics_iteration_request_no_iteration, &err);
+    EXPECT_EQ(resIt, helics_iteration_result_error);
     EXPECT_NE(err.error_code, 0);
     helicsErrorClear(&err);
 
@@ -713,7 +746,87 @@ TEST_F(function_tests, initError6)
         vFed1, 1.0, helics_iteration_request_no_iteration, &err);
     EXPECT_NE(err.error_code, 0);
     helicsErrorClear(&err);
-    helicsFederateRequestTimeIterativeComplete(vFed1, nullptr, &err);
+    helics_iteration_result ires = helics_iteration_result_next_step;
+    helicsFederateRequestTimeIterativeComplete(vFed1, &ires, &err);
+    EXPECT_NE(err.error_code, 0);
+    EXPECT_TRUE(ires == helics_iteration_result_error);
+    helicsErrorClear(&err);
+
+    helicsFederateFinalize(vFed1, nullptr);
+}
+
+// Test the core data link function and Get Federate By Name function for functionality and errors
+TEST_F(function_tests, CoreLink)
+{
+    SetupTest(helicsCreateValueFederate, "test", 1);
+    auto vFed1 = GetFederateAt(0);
+    // register the publications
+
+    helicsFederateRegisterGlobalTypePublication(vFed1, "pub1", "custom1", "", nullptr);
+
+    helicsFederateRegisterTypeInput(vFed1, "inp1", "custom2", "", nullptr);
+
+    auto fed2 = helicsGetFederateByName(helicsFederateGetName(vFed1), &err);
+    EXPECT_EQ(err.error_code, 0);
+    EXPECT_NE(fed2, nullptr);
+    EXPECT_STREQ(helicsFederateGetName(fed2), helicsFederateGetName(vFed1));
+
+    auto fed3 = helicsGetFederateByName("fed_unknown", &err);
+    EXPECT_NE(err.error_code, 0);
+    EXPECT_EQ(fed3, nullptr);
+    helicsErrorClear(&err);
+    auto cr = helicsFederateGetCoreObject(vFed1, &err);
+    EXPECT_NE(cr, nullptr);
+    helicsCoreDataLink(cr, "pub1", "fed0/inp1", &err);
+
+    EXPECT_EQ(err.error_code, 0);
+
+    helicsCoreMakeConnections(cr, "non-file.json", &err);
+    EXPECT_NE(err.error_code, 0);
+    helicsErrorClear(&err);
+
+    helicsCoreDataLink(cr, "pub1", nullptr, &err);
+    EXPECT_NE(err.error_code, 0);
+    helicsErrorClear(&err);
+
+    auto cr2 = helicsCoreClone(cr, &err);
+    EXPECT_NE(cr2, nullptr);
+    EXPECT_STREQ(helicsCoreGetAddress(cr2), helicsCoreGetAddress(cr));
+
+    helicsFederateEnterExecutingMode(vFed1, &err);
+    EXPECT_NE(err.error_code, 0);
+    helicsErrorClear(&err);
+
+    helicsFederateFinalize(vFed1, nullptr);
+}
+
+// Test the core data link function and Get Federate By Name function for functionality and errors
+TEST_F(function_tests, BrokerLink)
+{
+    SetupTest(helicsCreateValueFederate, "test", 1);
+    auto vFed1 = GetFederateAt(0);
+    // register the publications
+
+    helicsFederateRegisterGlobalTypePublication(vFed1, "pub1", "custom1", "", nullptr);
+
+    helicsFederateRegisterTypeInput(vFed1, "inp1", "custom2", "", nullptr);
+
+    auto br = helicsBrokerClone(brokers[0], &err);
+    EXPECT_NE(br, nullptr);
+
+    helicsBrokerDataLink(br, "pub1", "fed0/inp1", &err);
+
+    EXPECT_EQ(err.error_code, 0);
+
+    helicsBrokerDataLink(br, "pub1", nullptr, &err);
+    EXPECT_NE(err.error_code, 0);
+    helicsErrorClear(&err);
+
+    helicsBrokerMakeConnections(br, "non-file.json", &err);
+    EXPECT_NE(err.error_code, 0);
+    helicsErrorClear(&err);
+
+    helicsFederateEnterExecutingMode(vFed1, &err);
     EXPECT_NE(err.error_code, 0);
     helicsErrorClear(&err);
 
@@ -761,6 +874,10 @@ TEST_F(function_tests, messageFed)
     //make sure the message got through
     auto cnt = helicsEndpointPendingMessages(ept1);
     EXPECT_EQ(cnt, 2);
+
+    //message Federates do not have publications so should be 0
+    cnt = helicsFederateGetPublicationCount(mFed1);
+    EXPECT_EQ(cnt, 0);
 
     helicsFederateFinalize(mFed1, nullptr);
     helicsEndpointSendMessageRaw(ept1, "fed0/ept1", nullptr, 0, &err);
