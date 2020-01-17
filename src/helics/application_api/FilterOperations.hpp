@@ -146,7 +146,6 @@ class CloneFilterOperation: public FilterOperations {
         deliveryAddresses; //!< the endpoints to deliver the cloned data to
 
   public:
-    /** this operation needs a pointer to a core to operate*/
     explicit CloneFilterOperation();
 
     ~CloneFilterOperation();
