@@ -128,7 +128,7 @@ function(git_clone)
     endif()
 
     if(NOT PARGS_QUIET)
-        message("${git_output}")
+        message(STATUS "${git_output}")
     endif()
 
     # now checkout the right commit
@@ -152,6 +152,6 @@ function(git_clone)
     endif()
 
     if(NOT PARGS_QUIET)
-        message("${git_output}")
+        message(STATUS "${git_output}")
     endif()
 endfunction()

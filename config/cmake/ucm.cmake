@@ -1,28 +1,11 @@
 #
 # ucm.cmake - useful cmake macros
 #
-#The MIT License (MIT)
+# Copyright (c) 2016 Viktor Kirilov
 #
-#Copyright (c) 2016 Viktor Kirilov
-#
-#Permission is hereby granted, free of charge, to any person obtaining a copy
-#of this software and associated documentation files (the "Software"), to deal
-#in the Software without restriction, including without limitation the rights
-#to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-#copies of the Software, and to permit persons to whom the Software is
-#furnished to do so, subject to the following conditions:
-#
-#The above copyright notice and this permission notice shall be included in all
-#copies or substantial portions of the Software.
-#
-#THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-#IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-#FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-#AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-#LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-#OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-#SOFTWARE.
-#
+# Distributed under the MIT Software License
+# See accompanying file LICENSE.txt or copy at
+# https://opensource.org/licenses/MIT
 #
 # The documentation can be found at the library's page:
 # https://github.com/onqtam/ucm
@@ -32,18 +15,17 @@ cmake_minimum_required(VERSION 2.8.12)
 include(CMakeParseArguments)
 
 # optionally include cotire - the git submodule might not be inited (or the user might have already included it)
-#if(NOT COMMAND cotire)
-#    include(${CMAKE_CURRENT_LIST_DIR}/../cotire/CMake/cotire.cmake OPTIONAL)
-#endif()
-#
-#if(COMMAND cotire AND "1.7.9" VERSION_LESS "${COTIRE_CMAKE_MODULE_VERSION}")
-#    set(ucm_with_cotire 1)
-#else()
-#    set(ucm_with_cotire 0)
-#endif()
-#
-#option(UCM_UNITY_BUILD          "Enable unity build for targets registered with the ucm_add_target() macro"                     OFF)
-#option(UCM_NO_COTIRE_FOLDER     "Do not use a cotire folder in the solution explorer for all unity and cotire related targets"  ON)
+if(NOT COMMAND cotire)
+    include(${CMAKE_CURRENT_LIST_DIR}/../cotire/CMake/cotire.cmake OPTIONAL)
+endif()
+
+if(COMMAND cotire AND "1.7.9" VERSION_LESS "${COTIRE_CMAKE_MODULE_VERSION}")
+    set(ucm_with_cotire 1)
+    option(UCM_UNITY_BUILD          "Enable unity build for targets registered with the ucm_add_target() macro"                     OFF)
+    option(UCM_NO_COTIRE_FOLDER     "Do not use a cotire folder in the solution explorer for all unity and cotire related targets"  ON)
+else()
+    set(ucm_with_cotire 0)
+endif()
 
 # ucm_add_flags
 # Adds compiler flags to CMAKE_<LANG>_FLAGS or to a specific config
@@ -257,7 +239,6 @@ macro(ucm_set_runtime)
     endif()
 endmacro()
 
-
 # ucm_set_embedded_debug on MSVC
 # Sets the runtime (static/dynamic) for msvc
 macro(ucm_set_embedded_debug)
@@ -293,11 +274,40 @@ endmacro()
 # Prints all compiler flags for all configurations
 macro(ucm_print_flags)
     ucm_gather_flags(1 flags_configs)
-    message("")
+    message(STATUS "")
     foreach(flags ${flags_configs})
-        message("${flags}: ${${flags}}")
+        message(STATUS "${flags}: ${${flags}}")
     endforeach()
-    message("")
+    message(STATUS "")
+endmacro()
+
+# ucm_set_xcode_attrib
+# Set xcode attributes - name value CONFIG config1 conifg2..
+macro(ucm_set_xcode_attrib)
+    cmake_parse_arguments(ARG "" "CLEAR" "CONFIG" ${ARGN})
+
+    if(NOT ARG_CONFIG)
+        set(ARG_CONFIG " ")
+    endif()
+
+    foreach(CONFIG ${ARG_CONFIG})
+        # determine to which attributes to add
+        if(${CONFIG} STREQUAL " ")
+            if(${ARG_CLEAR})
+                # clear the old flags
+                unset(CMAKE_XCODE_ATTRIBUTE_${ARGV0})
+            else()
+                set(CMAKE_XCODE_ATTRIBUTE_${ARGV0} ${ARGV1})
+            endif()
+        else()
+            if(${ARG_CLEAR})
+                # clear the old flags
+                unset(CMAKE_XCODE_ATTRIBUTE_${ARGV0}[variant=${CONFIG}])
+            else()
+                set(CMAKE_XCODE_ATTRIBUTE_${ARGV0}[variant=${CONFIG}] ${ARGV1})
+            endif()
+        endif()
+    endforeach()
 endmacro()
 
 # ucm_count_sources
