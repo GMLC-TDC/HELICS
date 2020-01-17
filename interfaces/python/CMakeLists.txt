@@ -216,7 +216,7 @@ if(HELICS_ENABLE_SWIG AND SWIG_EXECUTABLE)
 
     set(HELICS_PYTHON_TARGET_NAME _helics)
 else()
-    message("Building without swig cmake ${CMAKE_VERSION}")
+    message(STATUS "Building without swig")
 
     if(HELICS_USE_NEW_PYTHON_FIND)
         python3_add_library(helicsPYTHON MODULE helicsPython.c)
