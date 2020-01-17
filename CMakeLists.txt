@@ -578,8 +578,10 @@ if(NOT APPLE)
                 "\$ORIGIN/../${CMAKE_INSTALL_LIBDIR}"
     )
 else()
-    list(APPEND CMAKE_INSTALL_RPATH "@loader_path/.")
-    list(APPEND CMAKE_INSTALL_RPATH "@executable_path/.")
+    list(APPEND CMAKE_INSTALL_RPATH "@loader_path")
+    list(APPEND CMAKE_INSTALL_RPATH "@loader_path/../${CMAKE_INSTALL_LIBDIR}")
+    list(APPEND CMAKE_INSTALL_RPATH "@executable_path")
+    list(APPEND CMAKE_INSTALL_RPATH "@executable_path/../${CMAKE_INSTALL_LIBDIR}")
 endif()
 
 
