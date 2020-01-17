@@ -25,10 +25,12 @@ if(NOT hasParent)
     include(GNUInstallDirs)
 
     # Setup rpath
-    set(CMAKE_SKIP_BUILD_RPATH FALSE)
-    set(CMAKE_BUILD_WITH_INSTALL_RPATH FALSE)
-    set(CMAKE_MACOSX_RPATH ON)
-    set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
+    if(NOT DEFINED CMAKE_MACOSX_RPATH)
+        set(CMAKE_MACOSX_RPATH ON)
+    endif()
+    if(NOT DEFINED CMAKE_INSTALL_RPATH_USE_LINK_PATH)
+        set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
+    endif()
 
     # Add the local directory to the rpath
     if(NOT APPLE)
