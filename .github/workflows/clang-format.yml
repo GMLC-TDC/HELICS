@@ -18,8 +18,8 @@ on:
       - develop
 
 jobs:
-  build:
-    if: github.event.pull_request.draft != true
+  format:
+    if: github.event.pull_request.draft != true && github.event.pull_request.head.repo.full_name == github.repository
 #    if: github.event_name != 'issue_comment' || contains(github.event.comment.body, '/format')
     runs-on: ubuntu-latest
     container:
@@ -39,6 +39,7 @@ jobs:
       uses: actions/checkout@v1
       if: github.event_name == 'pull_request'
       with:
+        repository: ${{ github.event.pull_request.head.repo.full_name }}
         ref: ${{ github.head_ref }}
     - name: Run clang-format
       run: |
@@ -62,7 +63,7 @@ jobs:
       with:
         COMMIT_MSG: "Automated formatting of source files"
         PR_TITLE: "Automated formatting of source files"
-        PR_BODY: "Automated formatting of source files in commit https://github.com/${{ github.repository }}/commit/${{ github.sha }} from ${{ github.ref }}."
+        PR_BODY: "Automated formatting of source files in commit https://github.com/${{ github.event.pull_request.head.repo.full_name }}/commit/${{ github.sha }} from ${{ github.ref }}."
         GIT_EMAIL: "HELICS-bot@users.noreply.github.com"
         GIT_NAME: "HELICS-bot"
         BRANCH_PREFIX: "clang-format/"
