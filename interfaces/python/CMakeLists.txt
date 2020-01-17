@@ -25,10 +25,12 @@ if(NOT hasParent)
     include(GNUInstallDirs)
 
     # Setup rpath
-    set(CMAKE_SKIP_BUILD_RPATH FALSE)
-    set(CMAKE_BUILD_WITH_INSTALL_RPATH FALSE)
-    set(CMAKE_MACOSX_RPATH ON)
-    set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
+    if(NOT DEFINED CMAKE_MACOSX_RPATH)
+        set(CMAKE_MACOSX_RPATH ON)
+    endif()
+    if(NOT DEFINED CMAKE_INSTALL_RPATH_USE_LINK_PATH)
+        set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
+    endif()
 
     # Add the local directory to the rpath
     if(NOT APPLE)
@@ -37,8 +39,10 @@ if(NOT hasParent)
                     "\$ORIGIN/../${CMAKE_INSTALL_LIBDIR}"
         )
     else()
-        list(APPEND CMAKE_INSTALL_RPATH "@loader_path/.")
-        list(APPEND CMAKE_INSTALL_RPATH "@executable_path/.")
+        list(APPEND CMAKE_INSTALL_RPATH "@loader_path")
+        list(APPEND CMAKE_INSTALL_RPATH "@loader_path/../${CMAKE_INSTALL_LIBDIR}")
+        list(APPEND CMAKE_INSTALL_RPATH "@executable_path")
+        list(APPEND CMAKE_INSTALL_RPATH "@executable_path/../${CMAKE_INSTALL_LIBDIR}")
     endif()
 endif()
 
