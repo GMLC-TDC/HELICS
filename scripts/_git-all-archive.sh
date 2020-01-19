@@ -87,6 +87,39 @@ if (( $(ls repo-output-sub*.tar | wc -l) != 0  )); then
   rm -rf repo-output-sub*.tar
 fi
 
+# slim down the tar a bit by cleaning up stuff in ThirdParty modules
+rmdir_list=(
+    'units/FuzzTargets'
+    'units/ThirdParty'
+    'units/docs'
+    'units/test'
+    'units/.ci'
+    'units/.circleci'
+    'utilities/tests'
+    'utilities/.ci'
+    'toml11/tests'
+    'jsoncpp/test'
+    'jsoncpp/.travis_scripts'
+    'jsoncpp/devtools'
+    'jsoncpp/.github'
+    'jsoncpp/doc'
+    'fmtlib/doc'
+    'fmtlib/test'
+    'containers/benchmarks'
+    'containers/tests'
+    'containers/.ci'
+    'containers/.circleci'
+    'concurrency/tests'
+    'concurrency/benchmarks'
+    'concurrency/docs'
+    'concurrency/.ci'
+    'concurrency/.circleci'
+)
+for i in "${rmdir_list[@]}"
+do
+   tar --delete -f "${OUTPUT_BASENAME}.tar" "ThirdParty/$i" || true
+done
+
 # gzip the tar
 echo "> gzipping final tar"
 gzip --force --verbose "${OUTPUT_BASENAME}.tar"
