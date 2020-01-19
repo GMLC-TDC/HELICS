@@ -22,6 +22,8 @@ if(NOT hasParent)
         option(HELICS_USE_NEW_PYTHON_FIND "Use the FindPython module added in CMake 3.12" OFF)
     endif()
 
+    option(BUILD_PYTHON2_INTERFACE "Build the interface for Python2; requires SWIG" OFF)
+
     include(GNUInstallDirs)
 
     # Setup rpath
@@ -43,6 +45,22 @@ if(NOT hasParent)
         list(APPEND CMAKE_INSTALL_RPATH "@loader_path/../${CMAKE_INSTALL_LIBDIR}")
         list(APPEND CMAKE_INSTALL_RPATH "@executable_path")
         list(APPEND CMAKE_INSTALL_RPATH "@executable_path/../${CMAKE_INSTALL_LIBDIR}")
+    endif()
+endif()
+
+# Give the Python3 interface preferential treatment
+set(_py_ver 3)
+if(BUILD_PYTHON_INTERFACE AND BUILD_PYTHON2_INTERFACE)
+    message(WARNING "Python 2 interface will not be built since Python 3 is active")
+elseif(BUILD_PYTHON2_INTERFACE)
+    set(_py_ver 2)
+    # Require swig and don't allow only generating interface files for Python 2
+    if(NOT HELICS_ENABLE_SWIG)
+        message(SEND_ERROR "Python 2 build requires swig")
+        return()
+    elseif(HELICS_SWIG_GENERATE_INTERFACE_FILES_ONLY)
+        message(SEND_ERROR "Python 2 interface does not support only generating interface files")
+        return()
     endif()
 endif()
 
@@ -118,29 +136,33 @@ endif()
 # Find Python libraries
 ###############################
 if(HELICS_USE_NEW_PYTHON_FIND)
-    find_package(Python3 COMPONENTS Interpreter Development)
-    set(HELICS_Python3_EXECUTABLE "${Python3_EXECUTABLE}")
-    set(HELICS_Python3_INCLUDE_DIRS "${Python3_INCLUDE_DIRS}")
-    set(HELICS_Python3_LIBRARIES "${Python3_LIBRARIES}")
+    find_package(Python${_py_ver} COMPONENTS Interpreter Development)
+    set(HELICS_Python_EXECUTABLE "${Python${_py_ver}_EXECUTABLE}")
+    set(HELICS_Python_INCLUDE_DIRS "${Python${_py_ver}_INCLUDE_DIRS}")
+    set(HELICS_Python_LIBRARIES "${Python${_py_ver}_LIBRARIES}")
 else()
-    set(
-        Python_ADDITIONAL_VERSIONS
-        3.4
-        3.5
-        3.6
-        3.7
-        3.8
-    )
+    if(_py_ver EQUAL 3)
+        set(
+            Python_ADDITIONAL_VERSIONS
+            3.4
+            3.5
+            3.6
+            3.7
+            3.8
+        )
+    elseif(_py_ver EQUAL 2)
+        set(Python_ADDITIONAL_VERSIONS 2.7)
+    endif()
     if(NOT PYTHON_EXECUTABLE)
-        find_package(PythonInterp 3 REQUIRED)
+        find_package(PythonInterp ${_py_ver} REQUIRED)
     endif()
     if(PYTHONINTERP_FOUND)
         set(Python_ADDITIONAL_VERSIONS "${PYTHON_VERSION_STRING}")
     endif()
-    find_package(PythonLibs 3 REQUIRED)
-    set(HELICS_Python3_EXECUTABLE "${PYTHON_EXECUTABLE}")
-    set(HELICS_Python3_INCLUDE_DIRS "${PYTHON_INCLUDE_DIRS}")
-    set(HELICS_Python3_LIBRARIES "${PYTHON_LIBRARIES}")
+    find_package(PythonLibs ${_py_ver} REQUIRED)
+    set(HELICS_Python_EXECUTABLE "${PYTHON_EXECUTABLE}")
+    set(HELICS_Python_INCLUDE_DIRS "${PYTHON_INCLUDE_DIRS}")
+    set(HELICS_Python_LIBRARIES "${PYTHON_LIBRARIES}")
 endif()
 
 ###############################
@@ -157,14 +179,21 @@ if(HELICS_ENABLE_SWIG AND SWIG_EXECUTABLE)
     endif()
 
     if(NOT USE_MODERNIZED_SWIG)
-        include_directories(${HELICS_Python3_INCLUDE_DIRS})
+        include_directories(${HELICS_Python_INCLUDE_DIRS})
         message(STATUS "Using old SWIG include_directories")
     endif()
 
-    set(CMAKE_SWIG_FLAGS "-py3")
+    if(_py_ver EQUAL 3)
+        set(CMAKE_SWIG_FLAGS "-py3")
+    endif()
 
     if(SWIG_VERSION VERSION_GREATER "4.0.0")
         set(CMAKE_SWIG_FLAGS ${CMAKE_SWIG_FLAGS} "-doxygen")
+    endif()
+
+    set(_helicsPython.i_FILE "helicsPython.i")
+    if(_py_ver EQUAL 2)
+        set(_helicsPython.i_FILE "helicsPython2.i")
     endif()
 
     if(USE_SWIG_ADD_LIBRARY)
@@ -175,10 +204,10 @@ if(HELICS_ENABLE_SWIG AND SWIG_EXECUTABLE)
             LANGUAGE
             python
             SOURCES
-            helicsPython.i
+            ${_helicsPython.i_FILE}
         )
     else()
-        swig_add_module(helics python helicsPython.i)
+        swig_add_module(helics python ${_helicsPython.i_FILE})
         message(STATUS "Using old swig_add_module")
     endif()
 
@@ -193,11 +222,11 @@ if(HELICS_ENABLE_SWIG AND SWIG_EXECUTABLE)
             PROPERTIES LINK_FLAGS "-undefined dynamic_lookup"
         )
     else()
-        swig_link_libraries(helics ${HELICS_Python3_LIBRARIES})
+        swig_link_libraries(helics ${HELICS_Python_LIBRARIES})
     endif()
 
     if(USE_MODERNIZED_SWIG)
-        target_include_directories(_helics PRIVATE ${HELICS_Python3_INCLUDE_DIRS})
+        target_include_directories(_helics PRIVATE ${HELICS_Python_INCLUDE_DIRS})
         message(STATUS "Using new swig target_include_directories")
     endif()
 
