@@ -115,7 +115,7 @@ rmdir_list=(
 )
 for i in "${rmdir_list[@]}"
 do
-   tar --delete -f "${OUTPUT_BASENAME}.tar" "$i"
+   tar --delete -f "${OUTPUT_BASENAME}.tar" "ThirdParty/$i"
 done
 
 # gzip the tar
