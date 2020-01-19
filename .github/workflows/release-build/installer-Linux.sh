@@ -14,5 +14,3 @@ cpack_dir="${cpack_dir%/cmake}"
 "${cpack_dir}/cpack" -G "TGZ" -C Release -B "$(pwd)/../artifact"
 cd ../artifact || exit
 rm -rf _CPack_Packages
-ARCHIVE_FILE="$(ls Helics-*)"
-mv "$ARCHIVE_FILE" "${ARCHIVE_FILE/Helics-/Helics-shared-}"
