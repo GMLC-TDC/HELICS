@@ -98,7 +98,7 @@ jobs:
     name: Build ${{ matrix.os }} ${{ matrix.arch }} ${{ matrix.cpack_gen }} Installer
     strategy:
       matrix:
-        id: [windows-x64, macos-x64-zip]
+        id: [windows-x64, macos-x64-zip, linux-x64]
         include:
           - id: windows-x64
             os: windows-latest
@@ -111,6 +111,10 @@ jobs:
             arch: x64
             cpack_gen: ZIP
             macos_target_ver: '10.10'
+          - id: linux-x64
+            os: ubuntu-latest
+            arch: x64
+            cpack_gen: TGZ
 
     steps:
     - name: Checkout event ref
@@ -125,6 +129,7 @@ jobs:
       
     # Build with Python 3.6 interface
     - uses: actions/setup-python@v1
+      if: runner.os != 'Linux'
       with:
         python-version: '3.6'
         architecture: ${{ matrix.arch }}
@@ -136,6 +141,7 @@ jobs:
         
     # Compile HELICS and create the installer
     - name: Build installer
+      if: runner.os != 'Linux'
       env:
         BUILD_ARCH: ${{ matrix.arch }}
         BUILD_GEN: ${{ matrix.cmake_gen }}
@@ -144,7 +150,13 @@ jobs:
         CPACK_GEN: ${{ matrix.cpack_gen }}
       shell: bash
       run: ./.github/workflows/release-build/installer-${{ runner.os }}.sh
-        
+ 
+    - name: Build installer (container)
+      if: runner.os == 'Linux'
+      uses: ./.github/actions/linux-release-builder
+      with:
+        script: ./.github/workflows/release-build/installer-${{ runner.os }}.sh
+       
     - name: Upload installer to release
       if: github.event.action == 'published'
       env:
