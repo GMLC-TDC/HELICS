@@ -202,7 +202,7 @@ if(HELICS_ENABLE_SWIG AND SWIG_EXECUTABLE)
             helicsPython${_py_ver}.i
         )
     else()
-        swig_add_module(helics python helicsPython${_py_ver}.i})
+        swig_add_module(helics python helicsPython${_py_ver}.i)
         message(STATUS "Using old swig_add_module")
     endif()
 
