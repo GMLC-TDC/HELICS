@@ -191,11 +191,6 @@ if(HELICS_ENABLE_SWIG AND SWIG_EXECUTABLE)
         set(CMAKE_SWIG_FLAGS ${CMAKE_SWIG_FLAGS} "-doxygen")
     endif()
 
-    set(_helicsPython.i_FILE "helicsPython.i")
-    if(_py_ver EQUAL 2)
-        set(_helicsPython.i_FILE "helicsPython2.i")
-    endif()
-
     if(USE_SWIG_ADD_LIBRARY)
         swig_add_library(
             helics
@@ -204,10 +199,10 @@ if(HELICS_ENABLE_SWIG AND SWIG_EXECUTABLE)
             LANGUAGE
             python
             SOURCES
-            ${_helicsPython.i_FILE}
+            helicsPython${_py_ver}.i
         )
     else()
-        swig_add_module(helics python ${_helicsPython.i_FILE})
+        swig_add_module(helics python helicsPython${_py_ver}.i})
         message(STATUS "Using old swig_add_module")
     endif()
 
