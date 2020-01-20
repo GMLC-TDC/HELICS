@@ -4,6 +4,7 @@ set(CLANG_FORMAT_MIN_VERSION "7.0")
 function(set_git_hooks_enabled)
     execute_process(
             COMMAND ${GIT_EXECUTABLE} config --local core.hooksPath .githooks
+            WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
     )
     message(STATUS "Git hooks enabled")
 endfunction()
@@ -11,6 +12,7 @@ endfunction()
 function(set_git_hooks_disabled)
     execute_process(
             COMMAND ${GIT_EXECUTABLE} config --local --unset core.hooksPath
+            WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
     )
     message(STATUS "Git hooks disabled")
 endfunction()
