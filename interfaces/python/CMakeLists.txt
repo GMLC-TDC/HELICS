@@ -15,6 +15,11 @@ get_directory_property(hasParent PARENT_DIRECTORY)
 if(NOT hasParent)
     message(STATUS "Standalone Python interface build")
 
+    # find_package(<PackageName>) searches prefixes given in <PackageName>_ROOT CMake variable
+    if(POLICY CMP0074)
+        cmake_policy(SET CMP0074 NEW)
+    endif()
+
     # Setup options
     option(HELICS_ENABLE_SWIG "Use SWIG to generate the Python interface files" ON)
     option(HELICS_SWIG_GENERATE_INTERFACE_FILES_ONLY "Only generate the SWIG interface files" OFF)
