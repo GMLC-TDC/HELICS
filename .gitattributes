@@ -3,3 +3,12 @@
 *.jpg -text
 *.png -text
 *.mat -text
+
+*.cpp  diff=cpp
+*.hpp  diff=cpp
+*.c    diff=cpp
+*.h    diff=cpp
+*.py   diff=python
+*.java diff=java
+*.m    diff=matlab
+*.cs   diff=csharp
