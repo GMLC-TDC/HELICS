@@ -1,8 +1,8 @@
 * text=input
 
-*.jpg -text
-*.png -text
-*.mat -text
+*.jpg binary
+*.png binary
+*.mat binary
 
 *.cpp  diff=cpp
 *.hpp  diff=cpp
