@@ -7,6 +7,57 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 A note on future revisions.  
   Everything within a major version number should be code compatible (with the exception of experimental interfaces).  The most notable example of an experimental interface is the support for multiple source inputs.  The APIs to deal with this will change in future minor releases.  Everything within a single minor release should be network compatible with other federates on the same minor release number.  Compatibility across minor release numbers may be possible in some situations but we are not going to guarantee this as those components are subject to performance improvements and may need to be modified at some point.  Patch releases will be limited to bug fixes and other improvements not impacting the public API or network compatibility.  Check the [Public API](./docs/Public_API.md) for details on what is included and excluded from the public API and version stability.
 
+## \[2.4.0\] - 2020-01-30
+A few bug fixes, code coverage on the shared library increased to 100%,  library updates, Broker server  enhancements, and a lot of work on the build systems to enable easier releases and packaging
+
+### Changed
+-   filesystem include updated to 1.2.10
+-   CLI11 updated to 1.9
+-   fmt updated to 6.1.2
+-   variant header updated to latest release
+-   Update the units library
+-   The TOML interpreter used in HELICS was changed to [toml11](https://github.com/ToruNiina/toml11)
+-   Some unnecessary blocks were removed from the all source package
+-   some internal CMake options and messages were not using new format for message
+-   Major updates to the python modules build system including merging the python3 and python 2 builds into the same CMake generator
+-   CMake cleanup and formatting
+-   A series of changes to the build for more widely supported installations on linux and MacOS
+-   The .clang-format file was modified slightly and the entire code base reformatted to the new specification
+-   the metadata information for the benchmarks was updated
+-   The FilterOperator class was altered to include a vector output for use with cloning
+
+### Fixed
+-   macos Rpath information on the built binaries
+-   Some issues with swig include directories to allow it to work in other circumstances
+-   an issue with building the java interface in MSYS2
+-   an issue with the HELICS_USE_NEW_PYTHON_FIND
+-   Some thread sanitizer identified issues  
+-   A series of issues from static analyzers
+-   an issue in the shared library create core that could emit an exception
+-   A series of issues related to remote cloning filters not being inline
+
+### Added
+-   Several installers for Linux and Mac and builds for `pip install`
+-   Allow standalone builds for the python interface
+-   Added a Ring Message benchmark, like the ring Benchmark except using messages as the token
+-   Added a Multinode phold benchmark
+-   Added a c shared library echo benchmark
+-   git logic to check if the submodules are at the correct version
+-   an option for a githook to check the formatting
+-   a timing benchmark similar to the echo benchmark  
+-   a number of tests for the C shared library including evil tests for testing bad input
+-   Hooks to test the coverage builds
+-   a feature to mark a broker or federate as slow responding so it doesn't time out automatically
+-   EditorConfig and .gitattributes for cleaner diff and automatic editor configuration
+-   An incorrect call in the matlab swig code
+-   Automatic generation of Puli requests for source code formatting  
+-   Add metadata information to the benchmarks for automatic processing
+
+### Deprecated
+
+### Removed
+
+
 ## \[2.3.1\] - 2019-11-22
 Bug Fixes and some code refactoring, pkg-config files have been added to the installs
 ### Changed
@@ -14,22 +65,22 @@ Bug Fixes and some code refactoring, pkg-config files have been added to the ins
 -   `HELICS_ENABLE_SLOW_PACKAGING_TESTS` renamed to `HELICS_ENABLE_SUBPROJECT_TESTS` to better reflect usage
 -   filesystem library updated to clear up some warnings
 -   The CI system now runs Xcode9 as the oldest release
--   Automatic releases build system was changed to use scripts 
+-   Automatic releases build system was changed to use scripts
 
 ### Fixed
 -   Some documentation links in the docs
 -   Missing `helics-enums.h` header from the install if `HELICS_BUILD_CXX_SHARED_LIB` was not enabled
--  ZMQ install locations on Linux and macOS if ZMQ is used as a subproject without the HELICS_USE_ZMQ_STATIC_LIB option enabled
--   The linux shared library release build so it is compatible with a larger number of systems including older ones back to glibc 2.12. 
--  Fix some documentation and issues with using the STATIC_STANDARD_LIB CMake option
-  
+-   ZMQ install locations on Linux and macOS if ZMQ is used as a subproject without the HELICS_USE_ZMQ_STATIC_LIB option enabled
+-   The linux shared library release build so it is compatible with a larger number of systems including older ones back to glibc 2.12.
+-   Fix some documentation and issues with using the STATIC_STANDARD_LIB CMake option
+
 ### Added
 -   CMake option for `HELICS_DISABLE_ASIO` to completely remove the use the ASIO library, turns off the UDP, and TCP core types, all real-time capabilities, and timeout and heartbeat detection for cores and brokers.  ASIO doesn't support all version of cygwin.  
 -   pkg-config files for the shared libraries are now installed to `<prefix>/lib/pkg-config` on unix like systems  
 -   Tests and CI builds for installed CMake package files and pkg-config files
 
 ### Deprecated
--  Trying to install on linux/macos systems with cmake older than 3.13 and ZMQ used as a subproject with the shared library is no longer supported.  It is likely this use scenario was broken before, now it produces a warning.  
+-   Trying to install on linux/macos systems with cmake older than 3.13 and ZMQ used as a subproject with the shared library is no longer supported.  It is likely this use scenario was broken before, now it produces a warning.  
 
 ### Removed
 -   If `HELICS_BUILD_BENCHMARKS` is enabled, the option for `ENABLE_INPROC_CORE` will not show in the cmake-gui.
