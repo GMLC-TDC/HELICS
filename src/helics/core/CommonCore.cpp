@@ -2073,7 +2073,7 @@ std::string CommonCore::query(const std::string& target, const std::string& quer
         ActiveQueries.finishedWithValue(querycmd.messageID);
         return ret;
     }
-    if ((target == "root") || (target == "rootbroker")||target=="global") {
+    if (target == "root" || target == "rootbroker") {
         ActionMessage querycmd(CMD_BROKER_QUERY);
         querycmd.source_id = global_id.load();
         auto index = ++queryCounter;
