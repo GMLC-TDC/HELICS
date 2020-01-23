@@ -31,4 +31,5 @@ It is unclear if there will be a 2.6 release or the changes would just get rolle
 -   Remove deprecated functions
 -   Change values for log level enumerations
 -   Some additional renaming of CMake variables
+-   xSDK compatibility
 -   Renaming of the libraries and reorganization of the header locations
