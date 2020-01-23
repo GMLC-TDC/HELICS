@@ -1910,6 +1910,11 @@ std::string CommonCore::federateQuery(const FederateState* fed, const std::strin
     return fed->processQuery(queryStr);
 }
 
+void CommonCore::closeQueries()
+{
+    
+}
+
 std::string CommonCore::coreQuery(const std::string& queryStr) const
 {
     if (queryStr == "federates") {
@@ -2068,7 +2073,7 @@ std::string CommonCore::query(const std::string& target, const std::string& quer
         ActiveQueries.finishedWithValue(querycmd.messageID);
         return ret;
     }
-    if ((target == "root") || (target == "rootbroker")) {
+    if ((target == "root") || (target == "rootbroker")||target=="global") {
         ActionMessage querycmd(CMD_BROKER_QUERY);
         querycmd.source_id = global_id.load();
         auto index = ++queryCounter;
@@ -2480,6 +2485,7 @@ void CommonCore::processCommand(ActionMessage&& command)
                     transmit(parent_route_id, m);
                 }
             }
+            closeQueries();
             break;
 
         case CMD_EXEC_GRANT:

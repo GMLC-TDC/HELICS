@@ -342,6 +342,8 @@ class CommonCore: public Core, public BrokerBase {
     uint16_t getNextAirlockIndex();
     /** generate results for core queries*/
     std::string coreQuery(const std::string& queryStr) const;
+    /** close any open queries*/
+    void closeQueries();
 
   private:
     int32_t _global_federation_size = 0; //!< total size of the federation

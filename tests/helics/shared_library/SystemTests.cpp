@@ -95,9 +95,8 @@ TEST(other_tests, core_global_value)
     helicsCoreSetGlobal(cr, nullptr, "v2", &err);
     EXPECT_NE(err.error_code, 0);
     helicsErrorClear(&err);
-
-    helicsCoreDisconnect(cr, &err);
     helicsBrokerDisconnect(brk, &err);
+    helicsCoreDisconnect(cr, &err);
 
     helicsQueryFree(q);
     EXPECT_EQ(helicsBrokerIsConnected(brk), helics_false);

@@ -795,16 +795,14 @@ TEST_F(filter_tests, clone_test_dest_connections)
         EXPECT_STREQ(m2.dest, "dest");
         EXPECT_EQ(m2.length, static_cast<int64_t>(data.size()));
     }
+    CE(helicsFederateFinalizeAsync(sFed, &err));
+    CE(helicsFederateFinalizeAsync(dFed, &err));
 
     // now check the message clone
     res = helicsFederateHasMessage(dcFed);
     if (res == helics_false) {
         std::this_thread::sleep_for(std::chrono::milliseconds(50));
-        CE(helicsFederateRequestTimeAsync(sFed, 2.0, &err));
-        CE(helicsFederateRequestTimeAsync(dcFed, 2.0, &err));
-        CE(helicsFederateRequestTime(dFed, 2.0, &err));
-        CE(helicsFederateRequestTimeComplete(sFed, &err));
-        CE(helicsFederateRequestTimeComplete(dcFed, &err));
+        CE(helicsFederateRequestTime(dcFed, 2.0, &err));
     }
     res = helicsFederateHasMessage(dcFed);
     EXPECT_TRUE(res);
@@ -818,8 +816,7 @@ TEST_F(filter_tests, clone_test_dest_connections)
         EXPECT_EQ(m2.length, static_cast<int64_t>(data.size()));
     }
 
-    CE(helicsFederateFinalizeAsync(sFed, &err));
-    CE(helicsFederateFinalizeAsync(dFed, &err));
+   
     CE(helicsFederateFinalize(dcFed, &err));
     CE(helicsFederateFinalizeComplete(sFed, &err));
     CE(helicsFederateFinalizeComplete(dFed, &err));
@@ -880,17 +877,15 @@ TEST_F(filter_tests, clone_test_broker_dest_connections)
         EXPECT_STREQ(m2.dest, "dest");
         EXPECT_EQ(m2.length, static_cast<int64_t>(data.size()));
     }
+    CE(helicsFederateFinalizeAsync(sFed, &err));
+    CE(helicsFederateFinalizeAsync(dFed, &err));
 
     // now check the message clone
     auto res2 = helicsFederateHasMessage(dcFed);
 
     if (res2 == helics_false) {
         std::this_thread::sleep_for(std::chrono::milliseconds(50));
-        CE(helicsFederateRequestTimeAsync(sFed, 2.0, &err));
-        CE(helicsFederateRequestTimeAsync(dcFed, 2.0, &err));
-        CE(helicsFederateRequestTime(dFed, 2.0, &err));
-        CE(helicsFederateRequestTimeComplete(sFed, &err));
-        CE(helicsFederateRequestTimeComplete(dcFed, &err));
+        CE(helicsFederateRequestTime(dcFed, 2.0, &err));
         res2 = helicsFederateHasMessage(dcFed);
     }
 
@@ -905,8 +900,6 @@ TEST_F(filter_tests, clone_test_broker_dest_connections)
         EXPECT_EQ(m2.length, static_cast<int64_t>(data.size()));
     }
 
-    CE(helicsFederateFinalizeAsync(sFed, &err));
-    CE(helicsFederateFinalizeAsync(dFed, &err));
     CE(helicsFederateFinalize(dcFed, &err));
     CE(helicsFederateFinalizeComplete(sFed, &err));
     CE(helicsFederateFinalizeComplete(dFed, &err));
