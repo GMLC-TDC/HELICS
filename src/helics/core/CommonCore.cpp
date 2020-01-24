@@ -1910,13 +1910,27 @@ std::string CommonCore::federateQuery(const FederateState* fed, const std::strin
     return fed->processQuery(queryStr);
 }
 
-void CommonCore::closeQueries()
+void CommonCore::closeQueries() {}
+std::string CommonCore::quickCoreQueries(const std::string& queryStr) const
 {
-    
+    if ((queryStr == "queries") || (queryStr == "available_queries")) {
+        return "[isinit;isconnected;name;address;queries;address;federates;inputs;endpoints;"
+               "publications;filters;federate_map;dependency_graph;dependencies;dependson;dependents]";
+    }
+    if (queryStr == "isconnected") {
+        return (isConnected()) ? "true" : "false";
+    }
+    if (queryStr == "name") {
+        return getIdentifier();
+    }
+    return std::string{};
 }
-
 std::string CommonCore::coreQuery(const std::string& queryStr) const
 {
+    auto res = quickCoreQueries(queryStr);
+    if (!res.empty()) {
+        return res;
+    }
     if (queryStr == "federates") {
         return generateStringVector(loopFederates, [](const auto& fed) {
             return fed->getIdentifier();
@@ -1944,10 +1958,7 @@ std::string CommonCore::coreQuery(const std::string& queryStr) const
                 return ((filt->core_id == global_broker_id_local) && !filt->key.empty());
             });
     }
-    if ((queryStr == "queries") || (queryStr == "available_queries")) {
-        return "[isinit;isconnected;name;address;queries;address;federates;inputs;endpoints;"
-               "publications;filters;federate_map;dependency_graph;dependencies;dependson;dependents]";
-    }
+
     if (queryStr == "endpoints") {
         return generateStringVector_if(
             loopHandles,
@@ -1967,12 +1978,7 @@ std::string CommonCore::coreQuery(const std::string& queryStr) const
     if (queryStr == "isinit") {
         return (allInitReady()) ? "true" : "false";
     }
-    if (queryStr == "isconnected") {
-        return (isConnected()) ? "true" : "false";
-    }
-    if (queryStr == "name") {
-        return getIdentifier();
-    }
+
     if (queryStr == "address") {
         return getAddress();
     }
@@ -2042,9 +2048,19 @@ std::string CommonCore::coreQuery(const std::string& queryStr) const
 
 std::string CommonCore::query(const std::string& target, const std::string& queryStr)
 {
+    if (brokerState.load() >= broker_state_t::terminating) {
+        if ((target == "core") || (target == getIdentifier())) {
+            auto res = quickCoreQueries(queryStr);
+            if (!res.empty()) {
+                return res;
+            }
+        }
+        return "#disconnected";
+    }
     if ((target == "core") || (target == getIdentifier())) {
-        if (queryStr == "name") {
-            return getIdentifier();
+        auto res = quickCoreQueries(queryStr);
+        if (!res.empty()) {
+            return res;
         }
         if (queryStr == "address") {
             return getAddress();
