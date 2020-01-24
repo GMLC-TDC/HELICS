@@ -1910,7 +1910,6 @@ std::string CommonCore::federateQuery(const FederateState* fed, const std::strin
     return fed->processQuery(queryStr);
 }
 
-void CommonCore::closeQueries() {}
 std::string CommonCore::quickCoreQueries(const std::string& queryStr) const
 {
     if ((queryStr == "queries") || (queryStr == "available_queries")) {
@@ -2501,7 +2500,7 @@ void CommonCore::processCommand(ActionMessage&& command)
                     transmit(parent_route_id, m);
                 }
             }
-            closeQueries();
+            ActiveQueries.fulfillAllPromises("#disconnected");
             break;
 
         case CMD_EXEC_GRANT:

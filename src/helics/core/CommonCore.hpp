@@ -345,8 +345,6 @@ class CommonCore: public Core, public BrokerBase {
 
     /** generate results for some core queries that do not depend on the main processing loop running*/
     std::string quickCoreQueries(const std::string& queryStr) const;
-    /** close any open queries*/
-    void closeQueries();
 
   private:
     int32_t _global_federation_size = 0; //!< total size of the federation
