@@ -1,0 +1,28 @@
+helics_broker-term(1)
+=====================
+
+NAME
+----
+helics_broker-term - a broker with an interactive terminal window
+
+SYNOPSIS
+--------
+[verse]
+'helics_broker term' [-h|-?|--help]
+
+DESCRIPTION
+-----------
+The helics_broker term subcommand starts a broker and opens a terminal window
+for interacting with the broker. Run help in the terminal window to get a list
+of commands.
+
+OPTIONS
+-------
+-h::
+-?::
+--help::
+        Prints usage, options, and available subcommands.
+
+SEE ALSO
+--------
+helics_broker(1)

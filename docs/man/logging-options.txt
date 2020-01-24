@@ -1,0 +1,29 @@
+Logging
+~~~~~~~
+--force_logging_flush::
+        Flush the log after every message.
+
+--logfile <file>::
+        The file to log messages to.
+
+--loglevel <level>::
+        The level at which to log messages; higher values result in more detailed
+        logging. Use -1 for no logging. Named levels are connections(3), data(6),
+        error(0), interfaces(4), no_print(-1), none(-1), summary(2), timing(5),
+        trace(7), and warning(1).
+
+--fileloglevel <level>::
+        The level at which to log messages are sent to the file; higher values result
+        in more detailed logging. Use -1 for no logging. Named levels are
+        connections(3), data(6), error(0), interfaces(4), no_print(-1), none(-1),
+        summary(2), timing(5), trace(7), and warning(1).
+
+--consoleloglevel <level>::
+        The level at which to log messages are shown on the console; higher values result
+        in more detailed logging. Use -1 for no logging. Named levels are
+        connections(3), data(6), error(0), interfaces(4), no_print(-1), none(-1),
+        summary(2), timing(5), trace(7), and warning(1).
+
+--dumplog::
+        Capture a record of all messages and dump a complete log to file or console
+        on termination.
