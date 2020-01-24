@@ -948,6 +948,7 @@ void CoreBroker::processCommand(ActionMessage&& command)
                     transmit(parent_route_id, m);
                 }
             }
+            ActiveQueries.fulfillAllPromises("#disconnected");
             break;
         case CMD_BROADCAST_DISCONNECT: {
             timeCoord->processTimeMessage(command);

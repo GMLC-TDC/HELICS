@@ -765,8 +765,10 @@ TEST_F(filter_tests, clone_test_dest_connections)
 
     //error test
     helicsCoreAddDestinationFilterToEndpoint(cr, nullptr, "dest", &err);
+    
     EXPECT_NE(err.error_code, 0);
     helicsErrorClear(&err);
+    helicsCoreFree(cr);
 
     CE(helicsFederateEnterExecutingModeAsync(sFed, &err));
     CE(helicsFederateEnterExecutingModeAsync(dcFed, &err));
@@ -781,9 +783,9 @@ TEST_F(filter_tests, clone_test_dest_connections)
 
     CE(helicsFederateRequestTimeAsync(sFed, 1.0, &err));
     CE(helicsFederateRequestTimeAsync(dcFed, 1.0, &err));
-    CE(helicsFederateRequestTime(dFed, 1.0, &err));
+    CE(helicsFederateRequestTimeAsync(dFed, 1.0, &err));
     CE(helicsFederateRequestTimeComplete(sFed, &err));
-    CE(helicsFederateRequestTimeComplete(dcFed, &err));
+    CE(helicsFederateRequestTimeComplete(dFed, &err));
 
     auto res = helicsFederateHasMessage(dFed);
     EXPECT_TRUE(res);
@@ -798,6 +800,7 @@ TEST_F(filter_tests, clone_test_dest_connections)
     CE(helicsFederateFinalizeAsync(sFed, &err));
     CE(helicsFederateFinalizeAsync(dFed, &err));
 
+    CE(helicsFederateRequestTimeComplete(dcFed, &err));
     // now check the message clone
     res = helicsFederateHasMessage(dcFed);
     if (res == helics_false) {
