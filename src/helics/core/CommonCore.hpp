@@ -342,6 +342,9 @@ class CommonCore: public Core, public BrokerBase {
     uint16_t getNextAirlockIndex();
     /** generate results for core queries*/
     std::string coreQuery(const std::string& queryStr) const;
+
+    /** generate results for some core queries that do not depend on the main processing loop running*/
+    std::string quickCoreQueries(const std::string& queryStr) const;
     /** close any open queries*/
     void closeQueries();
 
