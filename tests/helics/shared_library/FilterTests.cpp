@@ -754,6 +754,7 @@ TEST_F(filter_tests, clone_test_dest_connections)
     auto p1 = helicsFederateRegisterGlobalEndpoint(sFed, "src", "", &err);
     auto p2 = helicsFederateRegisterGlobalEndpoint(dFed, "dest", "", &err);
     auto p3 = helicsFederateRegisterGlobalEndpoint(dcFed, "cm", "", &err);
+    
 
     auto f1 = helicsFederateRegisterGlobalCloningFilter(dcFed, "filt1", &err);
     CE(helicsFilterAddDeliveryEndpoint(f1, "cm", &err));
@@ -788,8 +789,10 @@ TEST_F(filter_tests, clone_test_dest_connections)
     CE(helicsFederateRequestTimeAsync(dFed, 1.0, &err));
     std::cout << "stage 3a" << std::endl;
     
-    CE(helicsFederateRequestTimeComplete(sFed, &err));
-    std::cout << "stage 3b" << std::endl;
+    CE(auto tout=helicsFederateRequestTimeComplete(sFed, &err));
+    CE(helicsFederateFinalizeAsync(sFed, &err));
+
+    std::cout << "stage 3b " <<tout<< std::endl;
     CE(helicsFederateRequestTimeComplete(dFed, &err));
     std::cout << "stage 4" << std::endl;
     auto res = helicsFederateHasMessage(dFed);
@@ -802,7 +805,7 @@ TEST_F(filter_tests, clone_test_dest_connections)
         EXPECT_STREQ(m2.dest, "dest");
         EXPECT_EQ(m2.length, static_cast<int64_t>(data.size()));
     }
-    CE(helicsFederateFinalizeAsync(sFed, &err));
+   
     CE(helicsFederateFinalizeAsync(dFed, &err));
     std::cout << "stage 5" << std::endl;
     CE(helicsFederateRequestTimeComplete(dcFed, &err));
