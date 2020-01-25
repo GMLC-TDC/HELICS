@@ -786,9 +786,12 @@ TEST_F(filter_tests, clone_test_dest_connections)
     CE(helicsFederateRequestTimeAsync(sFed, 1.0, &err));
     CE(helicsFederateRequestTimeAsync(dcFed, 1.0, &err));
     CE(helicsFederateRequestTimeAsync(dFed, 1.0, &err));
+    std::cout << "stage 3a" << std::endl;
+    
     CE(helicsFederateRequestTimeComplete(sFed, &err));
+    std::cout << "stage 3b" << std::endl;
     CE(helicsFederateRequestTimeComplete(dFed, &err));
-    std::cout << "stage 3" << std::endl;
+    std::cout << "stage 4" << std::endl;
     auto res = helicsFederateHasMessage(dFed);
     EXPECT_TRUE(res);
 
@@ -801,7 +804,7 @@ TEST_F(filter_tests, clone_test_dest_connections)
     }
     CE(helicsFederateFinalizeAsync(sFed, &err));
     CE(helicsFederateFinalizeAsync(dFed, &err));
-    std::cout << "stage 4" << std::endl;
+    std::cout << "stage 5" << std::endl;
     CE(helicsFederateRequestTimeComplete(dcFed, &err));
     // now check the message clone
     res = helicsFederateHasMessage(dcFed);
@@ -809,7 +812,7 @@ TEST_F(filter_tests, clone_test_dest_connections)
         std::this_thread::sleep_for(std::chrono::milliseconds(50));
         CE(helicsFederateRequestTime(dcFed, 2.0, &err));
     }
-    std::cout << "stage 5" << std::endl;
+    std::cout << "stage 6" << std::endl;
     res = helicsFederateHasMessage(dcFed);
     EXPECT_TRUE(res);
 
@@ -822,13 +825,13 @@ TEST_F(filter_tests, clone_test_dest_connections)
         EXPECT_EQ(m2.length, static_cast<int64_t>(data.size()));
     }
 
-    std::cout << "stage 6" << std::endl;
+    std::cout << "stage 7" << std::endl;
     CE(helicsFederateFinalize(dcFed, &err));
     CE(helicsFederateFinalizeComplete(sFed, &err));
-    std::cout << "stage 7" << std::endl;
+    std::cout << "stage 8" << std::endl;
     CE(helicsFederateFinalizeComplete(dFed, &err));
     CE(state = helicsFederateGetState(sFed, &err));
-    std::cout << "stage 8" << std::endl;
+    std::cout << "stage 9" << std::endl;
     EXPECT_TRUE(state == helics_state_finalize);
 }
 
