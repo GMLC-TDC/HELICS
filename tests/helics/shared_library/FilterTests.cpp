@@ -754,7 +754,6 @@ TEST_F(filter_tests, clone_test_dest_connections)
     auto p1 = helicsFederateRegisterGlobalEndpoint(sFed, "src", "", &err);
     auto p2 = helicsFederateRegisterGlobalEndpoint(dFed, "dest", "", &err);
     auto p3 = helicsFederateRegisterGlobalEndpoint(dcFed, "cm", "", &err);
-    
 
     auto f1 = helicsFederateRegisterGlobalCloningFilter(dcFed, "filt1", &err);
     CE(helicsFilterAddDeliveryEndpoint(f1, "cm", &err));
@@ -766,73 +765,63 @@ TEST_F(filter_tests, clone_test_dest_connections)
 
     //error test
     helicsCoreAddDestinationFilterToEndpoint(cr, nullptr, "dest", &err);
-    
+
     EXPECT_NE(err.error_code, 0);
     helicsErrorClear(&err);
     helicsCoreFree(cr);
-    std::cout << "stage 1" << std::endl;
 
     CE(helicsFederateEnterExecutingModeAsync(sFed, &err));
     CE(helicsFederateEnterExecutingModeAsync(dcFed, &err));
     CE(helicsFederateEnterExecutingMode(dFed, &err));
     CE(helicsFederateEnterExecutingModeComplete(sFed, &err));
     CE(helicsFederateEnterExecutingModeComplete(dcFed, &err));
-    std::cout << "stage 2" << std::endl;
 
     CE(helics_federate_state state = helicsFederateGetState(sFed, &err));
     EXPECT_TRUE(state == helics_state_execution);
     std::string data(500, 'a');
     CE(helicsEndpointSendMessageRaw(p1, "dest", data.c_str(), static_cast<int>(data.size()), &err));
 
-    CE(helicsFederateRequestTimeAsync(sFed, 1.0, &err));
-    CE(helicsFederateRequestTimeAsync(dcFed, 1.0, &err));
-    CE(helicsFederateRequestTimeAsync(dFed, 1.0, &err));
-    std::cout << "stage 3a" << std::endl;
-    
-    CE(auto tout=helicsFederateRequestTimeComplete(sFed, &err));
-    CE(helicsFederateFinalizeAsync(sFed, &err));
+    CE(helicsFederateFinalize(sFed, nullptr));
 
-    std::cout << "stage 3b " <<tout<< std::endl;
-    CE(helicsFederateRequestTimeComplete(dFed, &err));
-    std::cout << "stage 4" << std::endl;
-    auto res = helicsFederateHasMessage(dFed);
-    EXPECT_TRUE(res);
+    helics_message m2;
+    auto dFedExec = [&]() {
+        helicsFederateRequestTime(dFed, 1.0, nullptr);
+        m2 = helicsEndpointGetMessage(p2);
+        helicsFederateFinalize(dFed, nullptr);
+    };
 
-    if (res) {
-        auto m2 = helicsEndpointGetMessage(p2);
-        EXPECT_STREQ(m2.source, "src");
-        EXPECT_STREQ(m2.original_source, "src");
-        EXPECT_STREQ(m2.dest, "dest");
-        EXPECT_EQ(m2.length, static_cast<int64_t>(data.size()));
-    }
-   
-    CE(helicsFederateFinalizeAsync(dFed, &err));
-    std::cout << "stage 5" << std::endl;
-    CE(helicsFederateRequestTimeComplete(dcFed, &err));
-    // now check the message clone
-    res = helicsFederateHasMessage(dcFed);
-    if (res == helics_false) {
-        std::this_thread::sleep_for(std::chrono::milliseconds(50));
-        CE(helicsFederateRequestTime(dcFed, 2.0, &err));
-    }
-    std::cout << "stage 6" << std::endl;
-    res = helicsFederateHasMessage(dcFed);
-    EXPECT_TRUE(res);
+    helics_message m3;
+    auto dcFedExec = [&]() {
+        helicsFederateRequestTime(dcFed, 1.0, nullptr);
+        auto res = helicsFederateHasMessage(dcFed);
+        if (res == helics_false) {
+            std::this_thread::sleep_for(std::chrono::milliseconds(50));
+            helicsFederateRequestTime(dcFed, 2.0, nullptr);
+        }
+        m3 = helicsEndpointGetMessage(p3);
+    };
 
-    if (res) {
-        auto m2 = helicsEndpointGetMessage(p3);
-        EXPECT_STREQ(m2.source, "src");
-        EXPECT_STREQ(m2.original_source, "src");
-        EXPECT_STREQ(m2.dest, "cm");
-        EXPECT_STREQ(m2.original_dest, "dest");
-        EXPECT_EQ(m2.length, static_cast<int64_t>(data.size()));
-    }
+    auto threaddFed = std::thread(dFedExec);
+    auto threaddcFed = std::thread(dcFedExec);
 
-    std::cout << "stage 7" << std::endl;
-    CE(helicsFederateFinalize(dcFed, &err));
-    CE(helicsFederateFinalizeComplete(sFed, &err));
-    std::cout << "stage 8" << std::endl;
-    CE(helicsFederateFinalizeComplete(dFed, &err));
+    std::cout << "stage A" << std::endl;
+
+    threaddFed.join();
+    std::cout << "stage B" << std::endl;
+    EXPECT_STREQ(m2.source, "src");
+    EXPECT_STREQ(m2.original_source, "src");
+    EXPECT_STREQ(m2.dest, "dest");
+    EXPECT_EQ(m2.length, static_cast<int64_t>(data.size()));
+
+    threaddcFed.join();
+    std::cout << "stage C" << std::endl;
+
+    EXPECT_STREQ(m3.source, "src");
+    EXPECT_STREQ(m3.original_source, "src");
+    EXPECT_STREQ(m3.dest, "cm");
+    EXPECT_STREQ(m3.original_dest, "dest");
+    EXPECT_EQ(m3.length, static_cast<int64_t>(data.size()));
+
     CE(state = helicsFederateGetState(sFed, &err));
     std::cout << "stage 9" << std::endl;
     EXPECT_TRUE(state == helics_state_finalize);
