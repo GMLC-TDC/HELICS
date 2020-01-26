@@ -799,6 +799,7 @@ TEST_F(filter_tests, clone_test_dest_connections)
             helicsFederateRequestTime(dcFed, 4.0, nullptr);
         }
         m3 = helicsEndpointGetMessage(p3);
+        helicsFederateFinalize(dcFed, nullptr);
     };
 
     auto threaddFed = std::thread(dFedExec);
