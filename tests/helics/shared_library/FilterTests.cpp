@@ -740,8 +740,11 @@ TEST_F(filter_tests, clone_test_broker_connections)
     EXPECT_TRUE(state == helics_state_finalize);
 }
 
+// this tests using a remote core to connect an endpoint to a cloning destination filter
 TEST_F(filter_tests, clone_test_dest_connections)
 {
+    extraBrokerArgs = "--restrictive_time_policy";
+
     auto broker = AddBroker("test", 3);
     AddFederates(helicsCreateMessageFederate, "test", 1, broker, 1.0, "source");
     AddFederates(helicsCreateMessageFederate, "test", 1, broker, 1.0, "dest");
