@@ -745,7 +745,7 @@ TEST_F(filter_tests, clone_test_dest_connections)
     auto broker = AddBroker("test", 3);
     AddFederates(helicsCreateMessageFederate, "test", 1, broker, 1.0, "source");
     AddFederates(helicsCreateMessageFederate, "test", 1, broker, 1.0, "dest");
-    AddFederates(helicsCreateMessageFederate, "test", 1, broker, 1.0, "dest_clone");
+    AddFederates(helicsCreateMessageFederate, "test", 1, broker, 2.0, "dest_clone");
 
     auto sFed = GetFederateAt(0);
     auto dFed = GetFederateAt(1);
@@ -792,11 +792,11 @@ TEST_F(filter_tests, clone_test_dest_connections)
 
     helics_message m3;
     auto dcFedExec = [&]() {
-        helicsFederateRequestTime(dcFed, 1.0, nullptr);
+        helicsFederateRequestTime(dcFed, 2.0, nullptr);
         auto res = helicsFederateHasMessage(dcFed);
         if (res == helics_false) {
             std::this_thread::sleep_for(std::chrono::milliseconds(50));
-            helicsFederateRequestTime(dcFed, 2.0, nullptr);
+            helicsFederateRequestTime(dcFed, 4.0, nullptr);
         }
         m3 = helicsEndpointGetMessage(p3);
     };
