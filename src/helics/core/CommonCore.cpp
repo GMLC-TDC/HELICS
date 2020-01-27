@@ -1652,8 +1652,19 @@ void CommonCore::deliverMessage(ActionMessage& message)
                                         createMessageFromCommand(message));
                                     for (auto& msg : new_messages) {
                                         if (msg) {
-                                            ActionMessage cmd(std::move(msg));
-                                            deliverMessage(cmd);
+                                            if (msg->dest == localP->key) //in case the clone filter send to itself.  
+                                            {
+                                                ActionMessage cmd(std::move(msg));
+                                                cmd.dest_id = localP->handle.fed_id;
+                                                cmd.dest_handle = localP->handle.handle;
+                                                routeMessage(std::move(cmd));
+                                            }
+                                            else
+                                            {
+                                                ActionMessage cmd(std::move(msg));
+                                                deliverMessage(cmd);
+                                            }
+                                            
                                         }
                                     }
                                 }

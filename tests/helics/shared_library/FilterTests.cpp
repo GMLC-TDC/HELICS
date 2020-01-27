@@ -744,6 +744,7 @@ TEST_F(filter_tests, clone_test_broker_connections)
 TEST_F(filter_tests, clone_test_dest_connections)
 {
     extraBrokerArgs = "--restrictive_time_policy";
+    extraCoreArgs = "--restrictive_time_policy";
 
     auto broker = AddBroker("test", 3);
     AddFederates(helicsCreateMessageFederate, "test", 1, broker, 1.0, "source");
