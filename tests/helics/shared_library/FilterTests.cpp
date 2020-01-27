@@ -744,7 +744,7 @@ TEST_F(filter_tests, clone_test_broker_connections)
 TEST_F(filter_tests, clone_test_dest_connections)
 {
     extraBrokerArgs = "--restrictive_time_policy";
-    extraCoreArgs = "--restrictive_time_policy";
+    extraCoreArgs = "--log-level=trace";
 
     auto broker = AddBroker("test", 3);
     AddFederates(helicsCreateMessageFederate, "test", 1, broker, 1.0, "source");
@@ -754,7 +754,6 @@ TEST_F(filter_tests, clone_test_dest_connections)
     auto sFed = GetFederateAt(0);
     auto dFed = GetFederateAt(1);
     auto dcFed = GetFederateAt(2);
-    helicsFederateSetIntegerProperty(dFed, helics_property_int_log_level, 7, nullptr);
     auto p1 = helicsFederateRegisterGlobalEndpoint(sFed, "src", "", &err);
     auto p2 = helicsFederateRegisterGlobalEndpoint(dFed, "dest", "", &err);
     auto p3 = helicsFederateRegisterGlobalEndpoint(dcFed, "cm", "", &err);
