@@ -12,13 +12,13 @@ function(helics_python3_add_library HELICS_LIBNAME)
     add_library(${HELICS_LIBNAME} MODULE ${ARGN})
     
     # Add path to Python include directory
-    target_include_directories(${HELICS_LIBNAME} PUBLIC ${HELICS_Python3_INCLUDE_DIRS})
+    target_include_directories(${HELICS_LIBNAME} PUBLIC ${HELICS_Python_INCLUDE_DIRS})
     
     # Get list of libraries to link with for Python module
     if(NOT MSVC)
         execute_process(
             COMMAND
-                ${HELICS_Python3_EXECUTABLE} "-c"
+                ${HELICS_Python_EXECUTABLE} "-c"
                 "from distutils import sysconfig; print(sysconfig.get_config_var('BLDSHARED').split(' ', 1)[1])"
             OUTPUT_VARIABLE pymodule_libs
         )
@@ -39,7 +39,7 @@ function(helics_python3_add_library HELICS_LIBNAME)
     else()
         target_link_libraries(
             ${HELICS_LIBNAME}
-            PUBLIC ${pymodule_libs} ${HELICS_Python3_LIBRARIES}
+            PUBLIC ${pymodule_libs} ${HELICS_Python_LIBRARIES}
         )
     endif()
 
@@ -47,7 +47,7 @@ function(helics_python3_add_library HELICS_LIBNAME)
         # Get list of compiler flags for compiling Python module
         execute_process(
             COMMAND
-                ${HELICS_Python3_EXECUTABLE} "-c"
+                ${HELICS_Python_EXECUTABLE} "-c"
                 "from distutils import sysconfig; print(sysconfig.get_config_var('CFLAGS').split(' ', 1)[1])"
             OUTPUT_VARIABLE pymodule_includes
         )

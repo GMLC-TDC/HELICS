@@ -150,16 +150,8 @@ set(HELICS_SWIG_INCLUDE_DIRS "${CMAKE_CURRENT_SOURCE_DIR}" "${HELICS_SOURCE_DIR}
 # TODO: remove this after all of the interfaces work as standalone builds
 include_directories(${HELICS_SWIG_INCLUDE_DIRS})
 
-if(BUILD_PYTHON_INTERFACE)
+if(BUILD_PYTHON_INTERFACE OR BUILD_PYTHON2_INTERFACE)
     add_subdirectory(python)
-    if(BUILD_PYTHON2_INTERFACE)
-        message(
-            WARNING
-                "PYTHON2 interface will not be built since python 3 build is active"
-        )
-    endif()
-elseif(BUILD_PYTHON2_INTERFACE)
-    add_subdirectory(python2)
 endif()
 
 if(BUILD_JAVA_INTERFACE)
