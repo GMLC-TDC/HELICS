@@ -1,0 +1,41 @@
+helics_app-clone(1)
+===================
+
+NAME
+----
+helics_app-clone - clones input/output from a federate to a file for playback
+
+SYNOPSIS
+--------
+[verse]
+'helics_app clone' [-v|--version] [-h|-?|--help]
+    [--quiet] [--config-file <file>] [--local]
+    [--stop <time>] [--input <file>]
+    [--allow_iteration] [-o|--output <file>]
+    <capture>
+
+DESCRIPTION
+-----------
+The clone application provides an easy way to clone a federate for later playback.
+It can "capture" values or messages from a single federate and store them with
+timestamps for later playback. The output playback file for use with the
+helics_app-player(1) tries to match the original timing of messages, publications,
+and subscriptions as closely as possible.
+
+OPTIONS
+-------
+<capture>::
+        The name of the federate to clone.
+
+--allow_iteration::
+        Allow iteration on values.
+
+-o::
+--output <file>::
+        The output file to use for recording the data.
+        The default file used is clone.json if this option
+        isn't given.
+
+include::federate-apps-common-options.adoc[]
+
+include::federate-info-options.adoc[]

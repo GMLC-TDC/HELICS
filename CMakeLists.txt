@@ -885,6 +885,12 @@ install(
     COMPONENT libs
 )
 
+install(
+    DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/docs/man/manpage_out/
+    DESTINATION ${CMAKE_INSTALL_MANDIR}/man1
+    FILES_MATCHING PATTERN "*.1"
+)
+
 # -------------------------------------------------------------
 # pkg-config setup and install
 # -------------------------------------------------------------

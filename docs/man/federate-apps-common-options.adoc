@@ -1,0 +1,12 @@
+--input::
+        The primary input file.
+
+include::apps-common-options.adoc[]
+
+--local::
+        Specify otherwise unspecified endpoints and publications
+        as local. The publication and endpoint names will be
+        preprended the player name.
+
+--stop <time>::
+        The time to stop the app.

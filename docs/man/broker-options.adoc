@@ -1,0 +1,144 @@
+include::apps-common-options.adoc[]
+
+--root::
+        Specify that the broker is a root.
+
+-t::
+--type::
+--core::
+--coretype <type>::
+        The type of core to use. Options include zmq (default), zmqss,
+        tcp, tcpss, udp, ipc, mpi, and test.
+
+Network Connections
+~~~~~~~~~~~~~~~~~~~
+--local::
+--ipv4::
+--ipv6::
+--all::
+--external::
+        Specify the external interface to use, the default is --local.
+
+--brokeraddress <address>::
+        Location of the broker to use (e.g. ip address or hostname).
+
+--reuse_address::
+        Allow the server to reuse a bound address. Mostly useful for the
+        TCP core.
+
+--broker <identifier>::
+        Identifier for the broker, either the name or network address. Use
+        --broker_address or --brokername to explicitly set the network
+        address or name to search for the broker first by name.
+
+--brokername <name>::
+        The name of the broker to use.
+
+--maxsize <buffer size>::
+        The message buffer size to use. The default size is 4096.
+
+--maxcount <num msgs>::
+        The maximum number of messages to have in a queue. The default is
+        256.
+
+--networkretries <num>::
+        The maximum number of network retries. The default is 5.
+
+--osport::
+--use_os_port::
+        Specify that ports should be allocated by the host operating system.
+
+--autobroker::
+        Allow a broker to automatically be created if one is not available.
+
+--brokerinit <init str>::
+        The initialization string for the broker.
+
+--client::
+--server::
+        Specify that the network connection should be a server (wait for
+        connection) or client (making a connection).
+
+-p::
+--port <num>::
+        The port number to use. For automatically picking a port, use
+        -1.
+
+--interface::
+--localinterface <network interface>::
+        The local interface to use for the receive ports. Useful if
+        on systems that have multiple network cards.
+
+--brokerport <num>::
+        The port number to use to connect with the broker.
+
+--localport <num>::
+        The port number for the local receive port. Use -1 to pick
+        automatically, or -999 to have the os assign a port.
+
+--portstart <num>::
+        Starting port for automatic port definitions.
+
+All Core/Broker Types
+~~~~~~~~~~~~~~~~~~~~~
+-f::
+-m::
+--minfed::
+--federates::
+--minfederates <num>::
+        The minimum number of federates that will be connecting to the broker.
+
+-n::
+--name::
+--identifier <name>::
+        The name used to identify the broker.
+
+--maxiter::
+--maxiterations <num>::
+        The maximum number of iterations allowed for a timestep. Default is
+        10000 iterations.
+
+--minbroker::
+--minbrokers::
+--minbrokercount <num>::
+        The minimum number of core/brokers that need to be connected.
+
+--key::
+--broker_key <key>::
+        Specify a key to use to verify all connections to/from a broker.
+
+--no_ping::
+--slow_responding::
+        Specify that a broker might be slow or unresponsive to ping requests
+        from other brokers.
+
+--restrictive_time_policy::
+--conservative_time_policy::
+        Specify that a broker should use a conservative time policy in the time
+        coordinator.
+
+TCP Broker/Core
+~~~~~~~~~~~~~~~
+--connections <connections>::
+        Target link connections.
+
+--no_outgoing_connection::
+        Disable outgoing connections.
+
+MPI Broker/Core
+~~~~~~~~~~~~~~~
+--broker::
+--broker_address <mpi rank:tag>::
+        A broker "rank:tag" to connect to.
+
+--rank::
+--broker_rank <mpi rank>::
+        MPI rank of a broker using MPI to connect to.
+
+--tag::
+--broker_tag <mpi tag>::
+        MPI tag of a broker using MPI to connect to.
+
+include::loging-options.adoc[]
+
+include::timeout-options.adoc[]

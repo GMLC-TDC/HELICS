@@ -1,0 +1,67 @@
+    [--quiet] [--config-file <file>] [--local]
+    [--stop <time>] [--input <file>]
+    [--allow_iteration] [-o|--output <file>]
+    [--marker <seconds>] [--verbose] [--mapfile <file>]
+    [--clone <endpoint>] [--sourceclone <endpoint>]
+    [--destclone <endpoint>] [--endpoints <endpoint>]
+    [--capture <federate(s)>]
+    [--tag|--publication|--pub <publication>]
+
+
+DESCRIPTION
+-----------
+The recorder appliation provides an easy way to capture data from a federation.
+It acts as a federate that can "capture" values or messages from publications,
+direct endpoints, or cloned endpoints that were created by other federates.
+
+OPTIONS
+-------
+--allow_iteration::
+        Allow iteration on values.
+
+--marker <seconds>::
+        Print a statement indicating time advancement during the simulation
+        at the interval given by the argument (in seconds).
+
+--verbose::
+        Print all values captured to the screen.
+
+--mapfile <file>::
+        Write progress to a file for concurrent progress monitoring.
+
+-o::
+--output <file>::
+        The output file to use for recording the data.
+        The default file used is out.txt if this option
+        isn't given.
+
+--clone <endpoint>::
+        Add an endpoint to capture all messages (to and from). This argument
+        can be given multiple times.
+
+--sourceclone <endpoint>::
+        Add an endpoint to capture all the messages it sends. This argument
+        can be given multiple times.
+
+--destclone <endpoint>::
+        Add an endpoint to capture all messages it receives. This argument
+        can be given multiple times.
+
+--endpoints <endpoint>::
+        Endpoints to capture messages for. This argument can be given multiple
+        times.
+
+--capture <federate>::
+        Federate to capture all publications from. This argument can be given
+        multiple times. Comma or semicolon separated lists (e.g. fed1;fed2) are
+        also supported.
+
+--tag::
+--pub::
+--publication <publication>::
+        Publications (tags) to capture values from. This argument can be given
+        multiple times.
+
+include::federate-apps-common-options.adoc[]
+
+include::federate-info-options.adoc[]

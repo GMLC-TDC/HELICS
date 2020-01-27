@@ -1,0 +1,268 @@
+'\" t
+.\"     Title: helics_app-broker
+.\"    Author: [FIXME: author] [see http://docbook.sf.net/el/author]
+.\" Generator: DocBook XSL Stylesheets v1.78.1 <http://docbook.sf.net/>
+.\"      Date: 01/24/2020
+.\"    Manual: \ \&
+.\"    Source: \ \&
+.\"  Language: English
+.\"
+.TH "HELICS_APP\-BROKER" "1" "01/24/2020" "\ \&" "\ \&"
+.\" -----------------------------------------------------------------
+.\" * Define some portability stuff
+.\" -----------------------------------------------------------------
+.\" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.\" http://bugs.debian.org/507673
+.\" http://lists.gnu.org/archive/html/groff/2009-02/msg00013.html
+.\" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.ie \n(.g .ds Aq \(aq
+.el       .ds Aq '
+.\" -----------------------------------------------------------------
+.\" * set default formatting
+.\" -----------------------------------------------------------------
+.\" disable hyphenation
+.nh
+.\" disable justification (adjust text to left margin only)
+.ad l
+.\" -----------------------------------------------------------------
+.\" * MAIN CONTENT STARTS HERE *
+.\" -----------------------------------------------------------------
+.SH "NAME"
+helics_app-broker \- intermediary or root in the HELICS hierarchy
+.SH "SYNOPSIS"
+.sp
+.nf
+\fIhelics_app broker\fR [\-v|\-\-version] [\-h|\-?|\-\-help]
+    [\-\-quiet] [\-\-config\-file <file>] [\-t|\-\-core|\-\-type|\-\-coretype <type>]
+    [\-f|\-m|\-\-federates|\-\-minfederates|\-\-minfed <num>]
+    [\-n|\-\-name|\-\-identifier <name>] [\-\-maxiter|\-\-maxiterations <num>]
+    [\-\-minbroker|\-\-minbrokers|\-\-minbrokercount <num>]
+    [\-\-key|\-\-broker_key <key>] [\-\-no_ping|\-\-slow_responding]
+    [\-\-conservative_time_policy|\-\-restrictive_time_policy]
+    [\-\-local|\-\-ipv4|\-\-ipv6|\-\-all|\-\-external] [\-\-brokeraddress <address>]
+    [\-\-reuse_address] [\-\-broker <identifier>] [\-\-brokername <name>]
+    [\-\-maxsize <buffer size>] [\-\-maxcount <num msgs>] [\-\-networkretries <num>]
+    [\-\-osport|\-\-use_os_port] [\-\-autobroker] [\-\-brokerinit <init str>]
+    [\-\-client|\-\-server] [\-p|\-\-port <num>] [\-\-brokerport <num>] [\-\-localport <num>]
+    [\-\-portstart <num>] [\-\-interface|\-\-localinterface <network interface>] [\-\-root]
+    [\-\-force_logging_flush] [\-\-logfile <file>] [\-\-loglevel <level>]
+    [\-\-fileloglevel <level>] [\-\-consoleloglevel <level>] [\-\-dumplog]
+    [\-\-tick <time(ms)>] [\-\-disable_timer|\-\-no_tick] [\-\-timeout <time(ms)>]
+    [\-\-networktimeout <time(ms)>]
+.fi
+.SH "DESCRIPTION"
+.sp
+The broker application functions as an intermediary or root in the HELICS hierarchy\&. The broker can be run through helics_app or helics_broker\&.
+.SH "OPTIONS"
+.PP
+\-v, \-\-version
+.RS 4
+Prints the HELICS version used\&.
+.RE
+.PP
+\-h, \-?, \-\-help
+.RS 4
+Prints usage, options, and available subcommands\&.
+.RE
+.PP
+\-\-config\-file <file>
+.RS 4
+The base command line argument configuration file\&. A file named helics_config\&.ini is the default\&.
+.RE
+.PP
+\-\-quiet
+.RS 4
+Silence most printed output\&.
+.RE
+.PP
+\-\-root
+.RS 4
+Specify that the broker is a root\&.
+.RE
+.PP
+\-t, \-\-type, \-\-core, \-\-coretype <type>
+.RS 4
+The type of core to use\&. Options include zmq (default), zmqss, tcp, tcpss, udp, ipc, mpi, and test\&.
+.RE
+.SS "Network Connections"
+.PP
+\-\-local, \-\-ipv4, \-\-ipv6, \-\-all, \-\-external
+.RS 4
+Specify the external interface to use, the default is \-\-local\&.
+.RE
+.PP
+\-\-brokeraddress <address>
+.RS 4
+Location of the broker to use (e\&.g\&. ip address or hostname)\&.
+.RE
+.PP
+\-\-reuse_address
+.RS 4
+Allow the server to reuse a bound address\&. Mostly useful for the TCP core\&.
+.RE
+.PP
+\-\-broker <identifier>
+.RS 4
+Identifier for the broker, either the name or network address\&. Use \-\-broker_address or \-\-brokername to explicitly set the network address or name to search for the broker first by name\&.
+.RE
+.PP
+\-\-brokername <name>
+.RS 4
+The name of the broker to use\&.
+.RE
+.PP
+\-\-maxsize <buffer size>
+.RS 4
+The message buffer size to use\&. The default size is 4096\&.
+.RE
+.PP
+\-\-maxcount <num msgs>
+.RS 4
+The maximum number of messages to have in a queue\&. The default is 256\&.
+.RE
+.PP
+\-\-networkretries <num>
+.RS 4
+The maximum number of network retries\&. The default is 5\&.
+.RE
+.PP
+\-\-osport, \-\-use_os_port
+.RS 4
+Specify that ports should be allocated by the host operating system\&.
+.RE
+.PP
+\-\-autobroker
+.RS 4
+Allow a broker to automatically be created if one is not available\&.
+.RE
+.PP
+\-\-brokerinit <init str>
+.RS 4
+The initialization string for the broker\&.
+.RE
+.PP
+\-\-client, \-\-server
+.RS 4
+Specify that the network connection should be a server (wait for connection) or client (making a connection)\&.
+.RE
+.PP
+\-p, \-\-port <num>
+.RS 4
+The port number to use\&. For automatically picking a port, use \-1\&.
+.RE
+.PP
+\-\-interface, \-\-localinterface <network interface>
+.RS 4
+The local interface to use for the receive ports\&. Useful if on systems that have multiple network cards\&.
+.RE
+.PP
+\-\-brokerport <num>
+.RS 4
+The port number to use to connect with the broker\&.
+.RE
+.PP
+\-\-localport <num>
+.RS 4
+The port number for the local receive port\&. Use \-1 to pick automatically, or \-999 to have the os assign a port\&.
+.RE
+.PP
+\-\-portstart <num>
+.RS 4
+Starting port for automatic port definitions\&.
+.RE
+.SS "All Core/Broker Types"
+.PP
+\-f, \-m, \-\-minfed, \-\-federates, \-\-minfederates <num>
+.RS 4
+The minimum number of federates that will be connecting to the broker\&.
+.RE
+.PP
+\-n, \-\-name, \-\-identifier <name>
+.RS 4
+The name used to identify the broker\&.
+.RE
+.PP
+\-\-maxiter, \-\-maxiterations <num>
+.RS 4
+The maximum number of iterations allowed for a timestep\&. Default is 10000 iterations\&.
+.RE
+.PP
+\-\-minbroker, \-\-minbrokers, \-\-minbrokercount <num>
+.RS 4
+The minimum number of core/brokers that need to be connected\&.
+.RE
+.PP
+\-\-key, \-\-broker_key <key>
+.RS 4
+Specify a key to use to verify all connections to/from a broker\&.
+.RE
+.PP
+\-\-no_ping, \-\-slow_responding
+.RS 4
+Specify that a broker might be slow or unresponsive to ping requests from other brokers\&.
+.RE
+.PP
+\-\-restrictive_time_policy, \-\-conservative_time_policy
+.RS 4
+Specify that a broker should use a conservative time policy in the time coordinator\&.
+.RE
+.SS "TCP Broker/Core"
+.PP
+\-\-connections <connections>
+.RS 4
+Target link connections\&.
+.RE
+.PP
+\-\-no_outgoing_connection
+.RS 4
+Disable outgoing connections\&.
+.RE
+.SS "MPI Broker/Core"
+.PP
+\-\-broker, \-\-broker_address <mpi rank:tag>
+.RS 4
+A broker "rank:tag" to connect to\&.
+.RE
+.PP
+\-\-rank, \-\-broker_rank <mpi rank>
+.RS 4
+MPI rank of a broker using MPI to connect to\&.
+.RE
+.PP
+\-\-tag, \-\-broker_tag <mpi tag>
+.RS 4
+MPI tag of a broker using MPI to connect to\&.
+.RE
+.SS "Timeout"
+.PP
+\-\-tick <time(ms)>
+.RS 4
+Heartbeat time in ms, if there is no broker communication for 2 ticks then secondary actions are taken\&. Can be entered as a time like
+\fI10s\fR
+or
+\fI45ms\fR\&. Default unit is ms\&.
+.RE
+.PP
+\-\-no_tick, \-\-disable_timer
+.RS 4
+Disables the timeout timer\&. Cannot be re\-enabled later\&.
+.RE
+.PP
+\-\-timeout <time(ms)>
+.RS 4
+Time to wait to establish a network connection, or for a connection to communicate\&. Can be entered as a time like
+\fI10s\fR
+or
+\fI45ms\fR\&. Default unit is ms\&.
+.RE
+.PP
+\-\-networktimeout <time(ms)>
+.RS 4
+Time to wait for a broker connection\&. Can be entered as a time like
+\fI10s\fR
+or
+\fI45ms\fR\&. Default unit is ms\&.
+.RE
+.SH "SEE ALSO"
+.sp
+helics_broker(1)

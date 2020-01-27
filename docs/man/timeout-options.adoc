@@ -1,0 +1,19 @@
+Timeout
+~~~~~~~
+--tick <time(ms)>::
+        Heartbeat time in ms, if there is no broker communication for 2 ticks then
+        secondary actions are taken. Can be entered as a time like '10s' or '45ms'.
+        Default unit is ms.
+
+--no_tick::
+--disable_timer::
+        Disables the timeout timer. Cannot be re-enabled later.
+
+--timeout <time(ms)>::
+        Time to wait to establish a network connection, or for a connection to
+        communicate. Can be entered as a time like '10s' or '45ms'. Default unit
+        is ms.
+
+--networktimeout <time(ms)>::
+        Time to wait for a broker connection. Can be entered as a time like '10s'
+        or '45ms'. Default unit is ms.

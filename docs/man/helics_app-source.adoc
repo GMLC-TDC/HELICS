@@ -1,0 +1,31 @@
+helics_app-source(1)
+====================
+
+NAME
+----
+helics_app-source - generates signals according to a mathematical function
+
+SYNOPSIS
+--------
+[verse]
+'helics_app source' [-v|--version] [-h|-?|--help]
+    [--quiet] [--config-file <file>] [--local]
+    [--stop <time>] [--input <file>]
+    [--default_period <time>] <input>
+
+DESCRIPTION
+-----------
+The source application generates signals for other federates. It is similar
+to the player except that it generates signals using a mathematical function
+like sine, ramp, pulse, or random walk. This can be useful for sending probing
+signals or testing the response of a federate to various stimuli.
+
+OPTIONS
+-------
+--default_period <time>::
+        The default time period for publications.
+
+<input>::
+include::federate-apps-common-options.adoc[]
+
+include::federate-info-options.adoc[]
