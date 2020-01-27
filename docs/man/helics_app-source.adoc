@@ -26,6 +26,6 @@ OPTIONS
         The default time period for publications.
 
 <input>::
-include::federate-apps-common-options.txt[]
+include::federate-apps-common-options.adoc[]
 
-include::federate-info-options.txt[]
+include::federate-info-options.adoc[]

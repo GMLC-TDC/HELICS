@@ -1,4 +1,4 @@
-include::apps-common-options.txt[]
+include::apps-common-options.adoc[]
 
 --root::
         Specify that the broker is a root.
@@ -139,6 +139,6 @@ MPI Broker/Core
 --broker_tag <mpi tag>::
         MPI tag of a broker using MPI to connect to.
 
-include::loging-options.txt[]
+include::loging-options.adoc[]
 
-include::timeout-options.txt[]
+include::timeout-options.adoc[]

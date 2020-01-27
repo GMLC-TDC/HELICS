@@ -1,14 +1,14 @@
-helics_app-broker(1)
-====================
+helics_broker(1)
+================
 
 NAME
 ----
-helics_app-broker - intermediary or root in the HELICS hierarchy
+helics_broker - intermediary or root in the HELICS hierarchy
 
 SYNOPSIS
 --------
 [verse]
-'helics_app broker' [-v|--version] [-h|-?|--help]
+'helics_broker' [-v|--version] [-h|-?|--help]
     [--quiet] [--config-file <file>] [-t|--core|--type|--coretype <type>]
     [-f|-m|--federates|--minfederates|--minfed <num>]
     [-n|--name|--identifier <name>] [--maxiter|--maxiterations <num>]
@@ -21,8 +21,9 @@ SYNOPSIS
     [--osport|--use_os_port] [--autobroker] [--brokerinit <init str>]
     [--client|--server] [-p|--port <num>] [--brokerport <num>] [--localport <num>]
     [--portstart <num>] [--interface|--localinterface <network interface>] [--root]
-include::logging-synopsis.txt[]
-include::timeout-synopsis.txt[]
+    [--autorestart]
+include::logging-synopsis.adoc[]
+include::timeout-synopsis.adoc[]
 
 DESCRIPTION
 -----------
@@ -31,8 +32,18 @@ hierarchy. The broker can be run through helics_app or helics_broker.
 
 OPTIONS
 -------
-include::broker-options.txt[]
+--autorestart::
+        Start a continually regenerating broker. There is a 3 second countdown
+        on broker completion to halt the program via ctrl-C (SIGINT).
+
+include::broker-options.adoc[]
+
+SUBCOMMANDS
+-----------
+helics_broker-term(1)::
+       Starts a broker and opens a terminal control window for the broker. Run
+       the help command in a terminal for more commands.
 
 SEE ALSO
 --------
-helics_broker(1)
+helics_broker-term(1), helics_app-broker(1)

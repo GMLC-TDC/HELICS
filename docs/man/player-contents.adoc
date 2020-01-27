@@ -23,6 +23,6 @@ OPTIONS
          default unit for timestamps is seconds.
 
 <input>::
-include::federate-apps-common-options.txt[]
+include::federate-apps-common-options.adoc[]
 
-include::federate-info-options.txt[]
+include::federate-info-options.adoc[]

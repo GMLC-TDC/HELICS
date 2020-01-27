@@ -9,4 +9,4 @@ SYNOPSIS
 --------
 [verse]
 'helics_app recorder' [-v|--version] [-h|-?|--help]
-include::recorder-contents.txt[]
+include::recorder-contents.adoc[]

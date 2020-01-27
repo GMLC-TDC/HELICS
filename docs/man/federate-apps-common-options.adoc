@@ -1,7 +1,7 @@
 --input::
         The primary input file.
 
-include::apps-common-options.txt[]
+include::apps-common-options.adoc[]
 
 --local::
         Specify otherwise unspecified endpoints and publications

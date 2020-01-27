@@ -9,4 +9,4 @@ SYNOPSIS
 --------
 [verse]
 'helics_app player' [-v|--version] [-h|-?|--help]
-include::player-contents.txt[]
+include::player-contents.adoc[]

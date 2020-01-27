@@ -63,6 +63,6 @@ OPTIONS
         Publications (tags) to capture values from. This argument can be given
         multiple times.
 
-include::federate-apps-common-options.txt[]
+include::federate-apps-common-options.adoc[]
 
-include::federate-info-options.txt[]
+include::federate-info-options.adoc[]

@@ -23,6 +23,6 @@ OPTIONS
 delay::
         The delay to use for echoing the message.
 
-include::federate-apps-common-options.txt[]
+include::federate-apps-common-options.adoc[]
 
-include::federate-info-options.txt[]
+include::federate-info-options.adoc[]

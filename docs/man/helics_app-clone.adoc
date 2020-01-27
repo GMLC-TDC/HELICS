@@ -36,6 +36,6 @@ OPTIONS
         The default file used is clone.json if this option
         isn't given.
 
-include::federate-apps-common-options.txt[]
+include::federate-apps-common-options.adoc[]
 
-include::federate-info-options.txt[]
+include::federate-info-options.adoc[]
