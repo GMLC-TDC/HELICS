@@ -24,12 +24,12 @@ endif()
       "${SWIG_EXECUTABLE}" "-python" "-py3" -o "helicsPython.c" "${SWIG_DOXYGEN_FLAG}"
       "-I${CMAKE_SOURCE_DIR}/src/helics/shared_api_library"
       "-I${helics.i_INCLUDE_DIR}"
-      ${CMAKE_CURRENT_SOURCE_DIR}/helicsPython.i
+      ${CMAKE_CURRENT_SOURCE_DIR}/helicsPython3.i
     DEPENDS
       ${HELICS_SWIG_helics.i_FILE}
-      ${CMAKE_CURRENT_SOURCE_DIR}/helicsPython.i
+      ${CMAKE_CURRENT_SOURCE_DIR}/helicsPython3.i
       ${SHARED_LIB_HEADERS}
-      ${CMAKE_CURRENT_SOURCE_DIR}/python_maps.i
+      ${CMAKE_CURRENT_SOURCE_DIR}/python_maps3.i
   )
 
   if(HELICS_OVERWRITE_INTERFACE_FILES)
