@@ -790,6 +790,7 @@ TEST_F(filter_tests, clone_test_dest_connections)
     helics_message m2;
     auto dFedExec = [&]() {
         helicsFederateRequestTime(dFed, 1.0, nullptr);
+        std::cout << "dfed Got time" << std::endl;
         m2 = helicsEndpointGetMessage(p2);
         helicsFederateFinalize(dFed, nullptr);
     };
@@ -811,13 +812,6 @@ TEST_F(filter_tests, clone_test_dest_connections)
 
     std::cout << "stage A" << std::endl;
 
-    threaddFed.join();
-    std::cout << "stage B" << std::endl;
-    EXPECT_STREQ(m2.source, "src");
-    EXPECT_STREQ(m2.original_source, "src");
-    EXPECT_STREQ(m2.dest, "dest");
-    EXPECT_EQ(m2.length, static_cast<int64_t>(data.size()));
-
     threaddcFed.join();
     std::cout << "stage C" << std::endl;
 
@@ -826,6 +820,15 @@ TEST_F(filter_tests, clone_test_dest_connections)
     EXPECT_STREQ(m3.dest, "cm");
     EXPECT_STREQ(m3.original_dest, "dest");
     EXPECT_EQ(m3.length, static_cast<int64_t>(data.size()));
+
+    threaddFed.join();
+    std::cout << "stage B" << std::endl;
+    EXPECT_STREQ(m2.source, "src");
+    EXPECT_STREQ(m2.original_source, "src");
+    EXPECT_STREQ(m2.dest, "dest");
+    EXPECT_EQ(m2.length, static_cast<int64_t>(data.size()));
+
+    
 
     CE(state = helicsFederateGetState(sFed, &err));
     std::cout << "stage 9" << std::endl;
