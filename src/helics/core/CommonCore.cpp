@@ -1996,7 +1996,7 @@ std::string CommonCore::federateQuery(const FederateState* fed, const std::strin
 std::string CommonCore::quickCoreQueries(const std::string& queryStr) const
 {
     if ((queryStr == "queries") || (queryStr == "available_queries")) {
-        return "[isinit;isconnected;name;address;queries;address;federates;inputs;endpoints;filtered_endpoints"
+        return "[isinit;isconnected;name;address;queries;address;federates;inputs;endpoints;filtered_endpoints;"
                "publications;filters;federate_map;dependency_graph;dependencies;dependson;dependents]";
     }
     if (queryStr == "isconnected") {
