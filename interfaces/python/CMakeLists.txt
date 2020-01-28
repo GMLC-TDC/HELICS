@@ -134,7 +134,7 @@ endif()
 # Swig doesn't need Python to generate the wrapper files
 if(HELICS_SWIG_GENERATE_INTERFACE_FILES_ONLY AND SWIG_EXECUTABLE)
     if(NOT hasParent)
-        message(FATAL_ERROR "SWIG generate interface files only must be run using the root HELICS CMakeLists.txt file")
+        message(FATAL_ERROR "`HELICS_SWIG_GENERATE_INTERFACE_FILES_ONLY`  can only be used when building from the root HELICS CMakeLists.txt file")
     endif()
     include(${CMAKE_CURRENT_SOURCE_DIR}/pythonSwigGenerateOnly.cmake)
     return()
