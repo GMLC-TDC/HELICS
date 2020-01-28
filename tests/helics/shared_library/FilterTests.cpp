@@ -743,8 +743,6 @@ TEST_F(filter_tests, clone_test_broker_connections)
 // this tests using a remote core to connect an endpoint to a cloning destination filter
 TEST_F(filter_tests, clone_test_dest_connections)
 {
-    extraBrokerArgs = "--restrictive_time_policy";
-
     auto broker = AddBroker("test", 3);
     AddFederates(helicsCreateMessageFederate, "test", 1, broker, 1.0, "source");
     AddFederates(helicsCreateMessageFederate, "test", 1, broker, 1.0, "dest");
@@ -779,8 +777,10 @@ TEST_F(filter_tests, clone_test_dest_connections)
     CE(helicsFederateEnterExecutingModeComplete(dcFed, &err));
 
     auto q = helicsCreateQuery("", "filtered_endpoints");
-    auto res = helicsQueryExecute(q, dFed, nullptr);
-    std::cout << res << std::endl;
+    std::string filteredEndpoints = helicsQueryExecute(q, dFed, nullptr);
+    std::cout << filteredEndpoints << std::endl;
+    EXPECT_TRUE(filteredEndpoints.find("cloningdestFilter") != std::string::npos);
+    helicsQueryFree(q);
 
     CE(helics_federate_state state = helicsFederateGetState(sFed, &err));
     EXPECT_TRUE(state == helics_state_execution);
@@ -793,7 +793,6 @@ TEST_F(filter_tests, clone_test_dest_connections)
     auto dFedExec = [&]() {
         
         helicsFederateRequestTime(dFed, 1.0, nullptr);
-        std::cout << "dfed Got time" << std::endl;
         m2 = helicsEndpointGetMessage(p2);
         helicsFederateFinalize(dFed, nullptr);
     };
@@ -813,17 +812,13 @@ TEST_F(filter_tests, clone_test_dest_connections)
     auto threaddFed = std::thread(dFedExec);
     auto threaddcFed = std::thread(dcFedExec);
 
-    std::cout << "stage A" << std::endl;
-
     threaddFed.join();
-    std::cout << "stage B" << std::endl;
     EXPECT_STREQ(m2.source, "src");
     EXPECT_STREQ(m2.original_source, "src");
     EXPECT_STREQ(m2.dest, "dest");
     EXPECT_EQ(m2.length, static_cast<int64_t>(data.size()));
 
     threaddcFed.join();
-    std::cout << "stage C" << std::endl;
 
     EXPECT_STREQ(m3.source, "src");
     EXPECT_STREQ(m3.original_source, "src");
@@ -832,7 +827,6 @@ TEST_F(filter_tests, clone_test_dest_connections)
     EXPECT_EQ(m3.length, static_cast<int64_t>(data.size()));
 
     CE(state = helicsFederateGetState(sFed, &err));
-    std::cout << "stage 9" << std::endl;
     EXPECT_TRUE(state == helics_state_finalize);
 }
 

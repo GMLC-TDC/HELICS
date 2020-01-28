@@ -1930,6 +1930,26 @@ std::string CommonCore::federateQuery(const FederateState* fed, const std::strin
             eptBlock["name"] = ep->key;
             eptBlock["id"] = ep->handle.handle.baseValue();
             if (fc->hasSourceFilters) {
+                std::string srcFilters = "[";
+                for (auto& fcc : fc->sourceFilters) {
+                    if (!fcc->key.empty()) {
+                        srcFilters.append(fcc->key);
+                    }
+                    else {
+                        srcFilters += std::to_string(fcc->core_id.baseValue()) + ':' +
+                            std::to_string(fcc->handle.baseValue());
+                    }
+                    if (checkActionFlag(*fcc, clone_flag))
+                    {
+                        srcFilters.append("(cloning)");
+                    }
+                    srcFilters.push_back(',');
+                }
+                if (srcFilters.back() == ',') {
+                    srcFilters.pop_back();
+                }
+                srcFilters.push_back(']');
+                eptBlock["srcFilters"] = srcFilters;
             }
             if (fc->hasDestFilters) {
                 if (fc->destFilter != nullptr) {
@@ -1956,7 +1976,7 @@ std::string CommonCore::federateQuery(const FederateState* fed, const std::strin
                         dcloningFilter.pop_back();
                     }
                     dcloningFilter.push_back(']');
-                    eptBlock["cloningdest"] = dcloningFilter;
+                    eptBlock["cloningdestFilter"] = dcloningFilter;
                 }
             }
             base["endpoints"].append(eptBlock);
@@ -1964,7 +1984,7 @@ std::string CommonCore::federateQuery(const FederateState* fed, const std::strin
         return generateJsonString(base);
     }
     if ((queryStr == "queries") || (queryStr == "available_queries")) {
-        return std::string("[exists;isinit;state;queries;") + fed->processQuery(queryStr) + "]";
+        return std::string("[exists;isinit;state;queries;filtered_endpoints;") + fed->processQuery(queryStr) + "]";
     }
     return fed->processQuery(queryStr);
 }
