@@ -346,6 +346,9 @@ class CommonCore: public Core, public BrokerBase {
     /** generate results for some core queries that do not depend on the main processing loop running*/
     std::string quickCoreQueries(const std::string& queryStr) const;
 
+    /** generate the filteredEndpoint query results for a particular federate*/
+    std::string filteredEndpointQuery(const FederateState* fed) const;
+
   private:
     int32_t _global_federation_size = 0; //!< total size of the federation
     std::atomic<int16_t> delayInitCounter{

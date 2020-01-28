@@ -618,7 +618,16 @@ TEST_F(filter_tests, clone_test_connections)
     CE(helicsFederateEnterExecutingModeAsync(dcFed, &err));
     CE(helicsFederateEnterExecutingMode(dFed, &err));
     CE(helicsFederateEnterExecutingModeComplete(sFed, &err));
-    CE(helicsFederateEnterExecutingModeComplete(dcFed, &err));
+    CE(helicsFederateEnterExecutingModeComplete(dcFed, &err)); 
+
+
+    //this is testing the filtered_endpoints query for cloning source filters
+    auto q = helicsCreateQuery("", "filtered_endpoints");
+    std::string filteredEndpoints = helicsQueryExecute(q, sFed, nullptr);
+    std::cout << filteredEndpoints << std::endl;
+    EXPECT_TRUE(filteredEndpoints.find("(cloning)") != std::string::npos);
+    EXPECT_TRUE(filteredEndpoints.find("srcFilters") != std::string::npos);
+    helicsQueryFree(q);
 
     CE(helics_federate_state state = helicsFederateGetState(sFed, &err));
     EXPECT_TRUE(state == helics_state_execution);
