@@ -618,8 +618,7 @@ TEST_F(filter_tests, clone_test_connections)
     CE(helicsFederateEnterExecutingModeAsync(dcFed, &err));
     CE(helicsFederateEnterExecutingMode(dFed, &err));
     CE(helicsFederateEnterExecutingModeComplete(sFed, &err));
-    CE(helicsFederateEnterExecutingModeComplete(dcFed, &err)); 
-
+    CE(helicsFederateEnterExecutingModeComplete(dcFed, &err));
 
     //this is testing the filtered_endpoints query for cloning source filters
     auto q = helicsCreateQuery("", "filtered_endpoints");
@@ -774,10 +773,10 @@ TEST_F(filter_tests, clone_test_dest_connections)
 
     //error test
     helicsCoreAddDestinationFilterToEndpoint(cr, nullptr, "dest", &err);
-     
+
     EXPECT_NE(err.error_code, 0);
     helicsErrorClear(&err);
-    helicsCoreFree(cr); 
+    helicsCoreFree(cr);
 
     CE(helicsFederateEnterExecutingModeAsync(sFed, &err));
     CE(helicsFederateEnterExecutingModeAsync(dcFed, &err));
@@ -800,7 +799,6 @@ TEST_F(filter_tests, clone_test_dest_connections)
 
     helics_message m2;
     auto dFedExec = [&]() {
-        
         helicsFederateRequestTime(dFed, 1.0, nullptr);
         m2 = helicsEndpointGetMessage(p2);
         helicsFederateFinalize(dFed, nullptr);
