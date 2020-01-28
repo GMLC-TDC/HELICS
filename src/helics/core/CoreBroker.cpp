@@ -869,6 +869,9 @@ void CoreBroker::processCommand(ActionMessage&& command)
                 command.name = command.getString(targetStringLoc);
                 command.setAction(CMD_ADD_NAMED_ENDPOINT);
                 command.setSource(filt->handle);
+                if (checkActionFlag(*filt, clone_flag)) {
+                    setActionFlag(command, clone_flag);
+                }
                 checkForNamedInterface(command);
             } else {
                 auto ept = handles.getEndpoint(command.getString(targetStringLoc));
@@ -948,6 +951,7 @@ void CoreBroker::processCommand(ActionMessage&& command)
                     transmit(parent_route_id, m);
                 }
             }
+            ActiveQueries.fulfillAllPromises("#disconnected");
             break;
         case CMD_BROADCAST_DISCONNECT: {
             timeCoord->processTimeMessage(command);

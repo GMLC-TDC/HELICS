@@ -99,7 +99,7 @@ class CoreBroker: public Broker, public BrokerBase {
     std::unordered_map<std::string, std::string> global_values; //!< storage for global values
     std::mutex name_mutex_; //!< mutex lock for name and identifier
     std::atomic<int> queryCounter{1}; // counter for active queries going to the local API
-    gmlc::concurrency::DelayedObjects<std::string> ActiveQueries; //!< holder for
+    gmlc::concurrency::DelayedObjects<std::string> ActiveQueries; //!< holder for active queries
     JsonMapBuilder fedMap; //!< builder for the federate_map
     std::vector<ActionMessage> fedMapRequestors; //!< list of requesters for the active federate map
     JsonMapBuilder depMap; //!< builder for the dependency graph

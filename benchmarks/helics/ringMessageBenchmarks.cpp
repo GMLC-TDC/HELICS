@@ -35,7 +35,6 @@ class RingTransmitMessage {
 
     int index_ = 0;
     int maxIndex_ = 0;
-    int messageSize_ = 100;
     bool initialized{false};
     bool readyToRun{false};
 

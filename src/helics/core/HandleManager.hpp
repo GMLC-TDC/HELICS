@@ -80,6 +80,10 @@ class HandleManager {
     /** get an endpoint by index
     @return nullptr if the index doesn't point to a valid endpoint*/
     BasicHandleInfo* getEndpoint(interface_handle handle);
+    /** get a const endpoint by index
+    @return nullptr if the index doesn't point to a valid endpoint*/
+    const BasicHandleInfo* getEndpoint(interface_handle handle) const;
+    /** get a const filter by name*/
     const BasicHandleInfo* getFilter(const std::string& name) const;
     BasicHandleInfo* getFilter(const std::string& name);
     // auto getFilters (const std::string &name) const { return filters.equal_range (name); }
