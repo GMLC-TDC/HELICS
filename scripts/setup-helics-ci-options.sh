@@ -89,6 +89,12 @@ TEST_FLAGS_ARR=("$TEST_TYPE")
 if [[ "$CI_TEST_CONFIG" ]]; then
     TEST_FLAGS_ARR+=("$CI_TEST_CONFIG")
 fi
+if [[ "$CI_TEST_MATCH" ]]; then
+    TEST_FLAGS_ARR+=("--match-tests" "$CI_TEST_MATCH")
+fi
+if [[ "$CI_TEST_EXCLUDE" ]]; then
+    TEST_FLAGS_ARR+=("--exclude-tests" "$CI_TEST_EXCLUDE")
+fi
 
 # Valgrind options
 if [[ "$RUN_VALGRIND" ]]; then
