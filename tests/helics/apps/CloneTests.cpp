@@ -255,7 +255,7 @@ TEST(clone_tests, simple_clone_test_sub)
     vfed2.finalize();
     vfed.finalize();
     fut.get();
-    
+
     auto cnt = c1.pointCount();
     EXPECT_EQ(cnt, 3u);
     auto icnt = c1.accessUnderlyingFederate().getInputCount();
