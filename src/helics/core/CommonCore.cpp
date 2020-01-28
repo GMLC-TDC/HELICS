@@ -1915,6 +1915,66 @@ std::string CommonCore::federateQuery(const FederateState* fed, const std::strin
     if (queryStr == "state") {
         return std::to_string(static_cast<int>(fed->getState()));
     }
+    if (queryStr == "filtered_endpoints")
+    {
+        Json::Value base;
+        base["name"] = getIdentifier();
+        base["id"] = global_broker_id_local.baseValue();
+        base["endpoints"] = Json::arrayValue;
+        for (auto &filt : filterCoord)
+        {
+            auto fc = filt.second.get();
+            auto ep = loopHandles.getEndpoint(filt.first);
+            if (ep->getFederateId() != fed->global_id)
+            {
+                continue;
+            }
+            Json::Value eptBlock;
+
+            eptBlock["name"] = ep->key;
+            eptBlock["id"] = ep->handle.handle.baseValue();
+            if (fc->hasSourceFilters)
+            {
+
+            }
+            if (fc->hasDestFilters)
+            {
+                if (fc->destFilter != nullptr)
+                {
+                    if (!fc->destFilter->key.empty())
+                    {
+                        eptBlock["destFilter"] = fc->destFilter->key;
+                    }
+                    else
+                    {
+                        eptBlock["destFilter"] = std::to_string(fc->destFilter->core_id.baseValue()) + ':' + std::to_string(fc->destFilter->handle.baseValue());
+                    } 
+                }
+                std::string dcloningFilter = "[";
+                for (auto &fcc : fc->cloningDestFilters)
+                {
+                    if (!fcc->key.empty())
+                    {
+                        dcloningFilter.append(fcc->key);
+                    }
+                    else
+                    {
+                        dcloningFilter += std::to_string(fcc->core_id.baseValue()) + ':' + std::to_string(fcc->handle.baseValue());
+                    }
+                    dcloningFilter.push_back(',');
+                }
+                if (dcloningFilter.back() == ',')
+                {
+                    dcloningFilter.pop_back();
+                }
+                dcloningFilter.push_back(']');
+                eptBlock["cloningdest"] = dcloningFilter;
+
+            }
+            base["endpoints"].append(eptBlock);
+        }
+        return generateJsonString(base);
+    }
     if ((queryStr == "queries") || (queryStr == "available_queries")) {
         return std::string("[exists;isinit;state;queries;") + fed->processQuery(queryStr) + "]";
     }
@@ -1985,6 +2045,7 @@ std::string CommonCore::coreQuery(const std::string& queryStr) const
             return std::to_string(dep.baseValue());
         });
     }
+    
     if (queryStr == "isinit") {
         return (allInitReady()) ? "true" : "false";
     }

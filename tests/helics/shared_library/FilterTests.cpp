@@ -744,7 +744,6 @@ TEST_F(filter_tests, clone_test_broker_connections)
 TEST_F(filter_tests, clone_test_dest_connections)
 {
     extraBrokerArgs = "--restrictive_time_policy";
-    extraCoreArgs = "--log-level=trace";
 
     auto broker = AddBroker("test", 3);
     AddFederates(helicsCreateMessageFederate, "test", 1, broker, 1.0, "source");
@@ -768,16 +767,20 @@ TEST_F(filter_tests, clone_test_dest_connections)
 
     //error test
     helicsCoreAddDestinationFilterToEndpoint(cr, nullptr, "dest", &err);
-
+     
     EXPECT_NE(err.error_code, 0);
     helicsErrorClear(&err);
-    helicsCoreFree(cr);
+    helicsCoreFree(cr); 
 
     CE(helicsFederateEnterExecutingModeAsync(sFed, &err));
     CE(helicsFederateEnterExecutingModeAsync(dcFed, &err));
     CE(helicsFederateEnterExecutingMode(dFed, &err));
     CE(helicsFederateEnterExecutingModeComplete(sFed, &err));
     CE(helicsFederateEnterExecutingModeComplete(dcFed, &err));
+
+    auto q = helicsCreateQuery("", "filtered_endpoints");
+    auto res = helicsQueryExecute(q, dFed, nullptr);
+    std::cout << res << std::endl;
 
     CE(helics_federate_state state = helicsFederateGetState(sFed, &err));
     EXPECT_TRUE(state == helics_state_execution);

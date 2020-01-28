@@ -228,6 +228,19 @@ BasicHandleInfo* HandleManager::getEndpoint(interface_handle handle)
     return nullptr;
 }
 
+const BasicHandleInfo* HandleManager::getEndpoint(interface_handle handle) const
+{
+    auto index = handle.baseValue();
+    if (isValidIndex(index, handles)) {
+        auto& hand = handles[index];
+        if (hand.handleType == handle_type::endpoint) {
+            return &hand;
+        }
+    }
+
+    return nullptr;
+}
+
 BasicHandleInfo* HandleManager::getPublication(const std::string& name)
 {
     auto fnd = publications.find(name);
