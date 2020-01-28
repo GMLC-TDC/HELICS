@@ -61,8 +61,24 @@ function(helics_python3_add_library HELICS_LIBNAME)
         set_target_properties(${HELICS_LIBNAME} PROPERTIES FOLDER interfaces)
     endif()
 
-    # Set the output library extension to .pyd on Windows
-    if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
+    # This will get the correct extension for a Python module
+    # On Windows it is always .pyd
+    # On other platforms it will include the right platform tag
+    # - Old Python versions will just return .so
+    # - New Python versions will return a tag such as .cpython-37m-x86_64-linux-gnu.so
+    execute_process(
+        COMMAND
+            ${HELICS_Python_EXECUTABLE} "-c"
+            "import sysconfig; ext_suffix=sysconfig.get_config_var('EXT_SUFFIX'); print(ext_suffix if ext_suffix is not None else sysconfig.get_config_var('SO'))"
+        RESULT_VARIABLE pymodule_rc
+        OUTPUT_VARIABLE pymodule_extsuffix
+        OUTPUT_STRIP_TRAILING_WHITESPACE
+    )
+
+    if("${pymodule_rc}" STREQUAL "0")
+        set_property(TARGET ${HELICS_LIBNAME} PROPERTY SUFFIX "${pymodule_extsuffix}")
+    elseif(CMAKE_SYSTEM_NAME STREQUAL "Windows")
+        # Ensure Windows uses .pyd
         set_property(TARGET ${HELICS_LIBNAME} PROPERTY SUFFIX ".pyd")
     endif()
 endfunction()
