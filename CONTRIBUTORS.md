@@ -83,7 +83,7 @@ HELICS makes use of `C++17` headers, but due to `C++14` compatibility requiremen
 ### [mpark/variant](https://github.com/mpark/variant)
 This variant was chosen for compatibility with C++17 over boost variant and better cross platform support than some of the other versions available. The single header version is included with the source. [Boost Software License](https://github.com/mpark/variant/blob/master/LICENSE.md).
 
-### [gulrak/filesystem](https://github.com/mpark/variant)
+### [gulrak/filesystem](https://github.com/gulrak/filesystem)
 A single-header standalone variant of the filesystem library is used to avoid compiled libraries in boost. The single header version is included with the source and is released with a [BSD-3 clause](https://github.com/gulrak/filesystem/blob/master/LICENSE) license.
 
 ### cmake scripts
