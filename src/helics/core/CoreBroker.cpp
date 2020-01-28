@@ -869,8 +869,8 @@ void CoreBroker::processCommand(ActionMessage&& command)
                 command.name = command.getString(targetStringLoc);
                 command.setAction(CMD_ADD_NAMED_ENDPOINT);
                 command.setSource(filt->handle);
-                if (checkActionFlag(filt, clone_flag)) {
-                    setActionFlag(filt, clone_flag);
+                if (checkActionFlag(*filt, clone_flag)) {
+                    setActionFlag(command, clone_flag);
                 }
                 checkForNamedInterface(command);
             } else {
