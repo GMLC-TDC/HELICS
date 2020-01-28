@@ -1652,19 +1652,18 @@ void CommonCore::deliverMessage(ActionMessage& message)
                                         createMessageFromCommand(message));
                                     for (auto& msg : new_messages) {
                                         if (msg) {
-                                            if (msg->dest == localP->key) //in case the clone filter send to itself.  
+                                            if (msg->dest ==
+                                                localP
+                                                    ->key) //in case the clone filter send to itself.
                                             {
                                                 ActionMessage cmd(std::move(msg));
                                                 cmd.dest_id = localP->handle.fed_id;
                                                 cmd.dest_handle = localP->handle.handle;
                                                 routeMessage(std::move(cmd));
-                                            }
-                                            else
-                                            {
+                                            } else {
                                                 ActionMessage cmd(std::move(msg));
                                                 deliverMessage(cmd);
                                             }
-                                            
                                         }
                                     }
                                 }
@@ -1915,61 +1914,50 @@ std::string CommonCore::federateQuery(const FederateState* fed, const std::strin
     if (queryStr == "state") {
         return std::to_string(static_cast<int>(fed->getState()));
     }
-    if (queryStr == "filtered_endpoints")
-    {
+    if (queryStr == "filtered_endpoints") {
         Json::Value base;
         base["name"] = getIdentifier();
         base["id"] = global_broker_id_local.baseValue();
         base["endpoints"] = Json::arrayValue;
-        for (auto &filt : filterCoord)
-        {
+        for (auto& filt : filterCoord) {
             auto fc = filt.second.get();
             auto ep = loopHandles.getEndpoint(filt.first);
-            if (ep->getFederateId() != fed->global_id)
-            {
+            if (ep->getFederateId() != fed->global_id) {
                 continue;
             }
             Json::Value eptBlock;
 
             eptBlock["name"] = ep->key;
             eptBlock["id"] = ep->handle.handle.baseValue();
-            if (fc->hasSourceFilters)
-            {
-
+            if (fc->hasSourceFilters) {
             }
-            if (fc->hasDestFilters)
-            {
-                if (fc->destFilter != nullptr)
-                {
-                    if (!fc->destFilter->key.empty())
-                    {
+            if (fc->hasDestFilters) {
+                if (fc->destFilter != nullptr) {
+                    if (!fc->destFilter->key.empty()) {
                         eptBlock["destFilter"] = fc->destFilter->key;
+                    } else {
+                        eptBlock["destFilter"] =
+                            std::to_string(fc->destFilter->core_id.baseValue()) + ':' +
+                            std::to_string(fc->destFilter->handle.baseValue());
                     }
-                    else
-                    {
-                        eptBlock["destFilter"] = std::to_string(fc->destFilter->core_id.baseValue()) + ':' + std::to_string(fc->destFilter->handle.baseValue());
-                    } 
                 }
-                std::string dcloningFilter = "[";
-                for (auto &fcc : fc->cloningDestFilters)
-                {
-                    if (!fcc->key.empty())
-                    {
-                        dcloningFilter.append(fcc->key);
+                if (!fc->cloningDestFilters.empty()) {
+                    std::string dcloningFilter = "[";
+                    for (auto& fcc : fc->cloningDestFilters) {
+                        if (!fcc->key.empty()) {
+                            dcloningFilter.append(fcc->key);
+                        } else {
+                            dcloningFilter += std::to_string(fcc->core_id.baseValue()) + ':' +
+                                std::to_string(fcc->handle.baseValue());
+                        }
+                        dcloningFilter.push_back(',');
                     }
-                    else
-                    {
-                        dcloningFilter += std::to_string(fcc->core_id.baseValue()) + ':' + std::to_string(fcc->handle.baseValue());
+                    if (dcloningFilter.back() == ',') {
+                        dcloningFilter.pop_back();
                     }
-                    dcloningFilter.push_back(',');
+                    dcloningFilter.push_back(']');
+                    eptBlock["cloningdest"] = dcloningFilter;
                 }
-                if (dcloningFilter.back() == ',')
-                {
-                    dcloningFilter.pop_back();
-                }
-                dcloningFilter.push_back(']');
-                eptBlock["cloningdest"] = dcloningFilter;
-
             }
             base["endpoints"].append(eptBlock);
         }
@@ -2045,7 +2033,7 @@ std::string CommonCore::coreQuery(const std::string& queryStr) const
             return std::to_string(dep.baseValue());
         });
     }
-    
+
     if (queryStr == "isinit") {
         return (allInitReady()) ? "true" : "false";
     }
