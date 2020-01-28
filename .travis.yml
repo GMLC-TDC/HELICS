@@ -70,6 +70,7 @@ jobs:
       env:
         - MATRIX_EVAL="COMPILER=clang && BUILD_TYPE=Release && TRAVIS_XCODE_VERSION=102"
         - HOMEBREW_NO_AUTO_UPDATE=1
+        - CI_TEST_EXCLUDE="application-api-ci-tests|system-ci-tests"
       osx_image: xcode10.2
 
     # XCode 9.4, OS X 10.13
