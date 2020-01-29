@@ -25,6 +25,9 @@ if(HELICS_BUILD_APP_LIBRARY)
 	set(helics_apps_broker_headers 
 		 MultiBroker.hpp
 		 BrokerServer.hpp
+         zmqBrokerServer.hpp
+         tcpBrokerServer.hpp
+         TypedBrokerServer.hpp
 		 )
 
     set(helics_apps_private_headers PrecHelper.hpp SignalGenerators.hpp)
@@ -45,6 +48,9 @@ if(HELICS_BUILD_APP_LIBRARY)
 	set(helics_apps_broker_files
 		MultiBroker.cpp
 		BrokerServer.cpp
+        zmqBrokerServer.cpp
+        tcpBrokerServer.cpp
+        TypedBrokerServer.cpp
 	)
 
     add_library(helics_apps STATIC ../helics_apps.hpp ${helics_apps_library_files}
