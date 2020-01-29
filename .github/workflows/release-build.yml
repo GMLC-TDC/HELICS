@@ -110,7 +110,7 @@ jobs:
             os: macos-latest
             arch: x64
             cpack_gen: ZIP
-            macos_target_ver: '10.10'
+            macos_target_ver: '10.9'
           - id: linux-x64
             os: ubuntu-latest
             arch: x64
@@ -134,10 +134,10 @@ jobs:
         python-version: '3.6'
         architecture: ${{ matrix.arch }}
  
-    # Setup a copy of the macOS 10.10 SDK
-    - name: Setup macOS 10.10 SDK
+    # Setup a copy of the macOS SDK
+    - name: Setup macOS SDK
       if: runner.os == 'macOS'
-      run: ./.github/workflows/setup-macos-10.10-sdk.sh
+      run: ./.github/workflows/setup-macos-10.9-sdk.sh
         
     # Compile HELICS and create the installer
     - name: Build installer
