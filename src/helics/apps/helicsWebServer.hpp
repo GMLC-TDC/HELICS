@@ -34,9 +34,10 @@ namespace apps {
         std::mutex threadGuard;
         const Json::Value* config_{nullptr};
         const std::string name_;
-        std::string httpAddress_{"0.0.0.0"};
-        unsigned short httpPort_{ 80 };
-
+        std::string httpAddress_{"127.0.0.1"};
+        int httpPort_{ 80 };
+        std::string websocketAddress_{ "127.0.0.1" };
+        int websocketPort_{ 80 };
         bool http_enabled_{false};
         bool websocket_enabled_{false};
     };

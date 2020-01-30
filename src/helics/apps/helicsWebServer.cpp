@@ -40,6 +40,9 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <vector>
 
 #include "helicsWebServer.hpp"
+#include "../common/JsonProcessingFunctions.hpp"
+#include "../core/BrokerFactory.hpp"
+
 
 namespace beast = boost::beast; // from <boost/beast.hpp>
 namespace http = beast::http; // from <boost/beast/http.hpp>
@@ -60,9 +63,6 @@ static std::string loadFile(const std::string& fileName)
 }
 
 static const std::string index_page = loadFile("index.html");
-static const std::string response_page = loadFile("convert.html");
-static const std::string response_json =
-"{\n\"measurement\":\"$M1$\",\n\"units\":\"$U1$\",\n\"value\":\"$VALUE$\"\n}";
 
 //decode a uri to clean up a string, convert character codes in a uri to the original character
 static std::string uri_decode(beast::string_view str)
@@ -200,41 +200,7 @@ void handle_request(http::request<Body, http::basic_fields<Allocator>>&& req, Se
     };
 
     // generate a conversion response
-    auto const conversion_response =
-        [&req](const std::string& value, const std::string& M1, const std::string& U1) {
-        http::response<http::string_body> res{ http::status::ok, req.version() };
-        res.set(http::field::server, BOOST_BEAST_VERSION_STRING);
-        res.set(http::field::content_type, "text/html");
-        res.keep_alive(req.keep_alive());
-        auto resp = response_page;
-        auto v = resp.find("$M1$");
-        while (v != std::string::npos) {
-            resp.replace(v, 4, M1);
-            v = resp.find("$M1$");
-        }
-
-        v = resp.find("$U1$", v + 4);
-        while (v != std::string::npos) {
-            resp.replace(v, 4, U1);
-            v = resp.find("$U1$");
-        }
-        v = resp.find("$VALUE$", v + 4);
-        while (v != std::string::npos) {
-            resp.replace(v, 7, value);
-            v = resp.find("$VALUE$");
-        }
-
-        if (req.method() != http::verb::head) {
-            res.body() = resp;
-            res.prepare_payload();
-        }
-        else {
-            res.set(http::field::content_length, resp.size());
-        }
-        return res;
-    };
-    // generate a conversion response
-    auto const conversion_response_trivial = [&req](const std::string& value) {
+    auto const response_text = [&req](const std::string& value) {
         http::response<http::string_body> res{ http::status::ok, req.version() };
         res.set(http::field::server, BOOST_BEAST_VERSION_STRING);
         res.set(http::field::content_type, "text/plain");
@@ -250,20 +216,12 @@ void handle_request(http::request<Body, http::basic_fields<Allocator>>&& req, Se
     };
 
     // generate a conversion response
-    auto const conversion_response_json =
-        [&req](const std::string& value, const std::string& M1, const std::string& U1) {
+    auto const response_json =
+        [&req](const std::string& resp) {
         http::response<http::string_body> res{ http::status::ok, req.version() };
         res.set(http::field::server, BOOST_BEAST_VERSION_STRING);
         res.set(http::field::content_type, "application/json");
         res.keep_alive(req.keep_alive());
-        auto resp = response_json;
-        auto v = resp.find("$M1$");
-        resp.replace(v, 4, M1);
-        v = resp.find("$U1$", v + 4);
-        resp.replace(v, 4, U1);
-        v = resp.find("$VALUE$", v + 4);
-        resp.replace(v, 7, value);
-
         if (req.method() != http::verb::head) {
             res.body() = resp;
             res.prepare_payload();
@@ -288,26 +246,54 @@ void handle_request(http::request<Body, http::basic_fields<Allocator>>&& req, Se
         return send(main_page());
     }
 
-    if (target.compare(0, 8, "/convert") != 0) {
-        return send(not_found(target));
-    }
-
     auto reqpr = process_request_parameters(target, req.body());
-    std::string measurement;
-    std::string toUnits;
+    std::string query;
+    std::string targetObj;
     auto& fields = reqpr.second;
-    if (fields.find("measurement") != fields.end()) {
-        measurement = fields["measurement"];
-        if (measurement.size() > 256) {
-            return send(bad_request("measurement string size exceeds limits of 256 characters"));
+    if (fields.find("query") != fields.end()) {
+        query = fields["query"];
+    }
+    if (fields.find("target") != fields.end()) {
+        targetObj = fields["target"];
+    }
+    std::shared_ptr<helics::Broker> brkr;
+    if (target == "query")
+    {
+        if (query == "brokers" && targetObj.empty())
+        {
+            auto brks = helics::BrokerFactory::getAllBrokers();
+            Json::Value base;
+            base["brokers"] = Json::arrayValue;
+            for (auto& brk : brks) {
+                    Json::Value brokerBlock;
+
+                    brokerBlock["name"] = brk->getIdentifier();
+                    brokerBlock["address"] = brk->getAddress();
+                    brokerBlock["isConnected"] = brk->isConnected();
+                    brokerBlock["isOpen"] = brk->isOpenToNewFederates();
+                    brokerBlock["isRoot"] = brk->isRoot();
+                    base["brokers"].append(brokerBlock);
+            }
+            return send(response_json(generateJsonString(base)));
+        }
+        else if (targetObj.empty())
+        {
+            auto brks = helics::BrokerFactory::getAllBrokers();
+            for (auto& brk : brks) {
+                if (brk->isConnected())
+                {
+                    brkr = brk;
+                }
+            }
+        }
+        else
+        {
+            brkr = helics::BrokerFactory::findBroker(targetObj)
         }
     }
-    if (fields.find("units") != fields.end()) {
-        toUnits = fields["units"];
-        if (toUnits.size() > 256) {
-            return send(
-                bad_request("conversion units string size exceeds limits of 256 characters"));
-        }
+    else
+    {
+        brkr = helics::BrokerFactory::findBroker(target)
     }
     
     return send(bad_request("#unknown"));
@@ -503,21 +489,47 @@ namespace helics
 {
     namespace apps
     {
+        void WebServer::startServer(const Json::Value* val)
+        {
+            std::cerr << "starting broker web server\n";
+            config_ = val;
+
+            std::lock_guard<std::mutex> tlock(threadGuard);
+            mainLoopThread = std::thread([this]() { mainLoop(); });
+            mainLoopThread.detach();
+        }
+
+        /** stop the server*/
+        void WebServer::stopServer()
+        {
+            
+        }
+
         void WebServer::mainLoop()
         {
             
-
+            
             // The io_context is required for all I/O
             net::io_context ioc{ 1 };
             if (http_enabled_)
             {
+                if (config_->isMember("http")) {
+                    auto V = (*config_)["http"];
+                    replaceIfMember(V, "interface", httpAddress_);
+                    replaceIfMember(V, "port", httpPort_);
+                }
                 auto const address = net::ip::make_address(httpAddress_);
                 // Create and launch a listening port
-                std::make_shared<listener>(ioc, tcp::endpoint{ address, httpPort_ })->run();
+                std::make_shared<listener>(ioc, tcp::endpoint{ address, static_cast<unsigned short>(httpPort_) })->run();
             }
            
             if (websocket_enabled_)
             {
+                if (config_->isMember("websocket")) {
+                    auto V = (*config_)["websocket"];
+                    replaceIfMember(V, "interface", websocketAddress_);
+                    replaceIfMember(V, "port", httpPort_);
+                }
 
             }
             // Run the I/O service
