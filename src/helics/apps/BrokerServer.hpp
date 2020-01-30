@@ -24,6 +24,7 @@ using portData = std::vector<std::tuple<int, bool, std::shared_ptr<Broker>>>;
 
 
 namespace apps {
+    class TypedBrokerServer;
     /** helper class defining some common functionality for brokers and cores that use different
 communication methods*/
     class BrokerServer {
@@ -58,29 +59,19 @@ communication methods*/
       private:
         /** generate an argument processing app*/
         std::unique_ptr<helicsCLI11App> generateArgProcessing();
-        /** start the ZMQ servers*/
-        void startZMQserver();
-        /** close the ZMQ servers*/
-        void closeZMQserver();
-        /** start the TCP server*/
-        void startTCPserver();
-        /** close the TCP server*/
-        void closeTCPserver();
-        /** generate a response message to a request*/
-        std::string generateMessageResponse(const ActionMessage &rxcmd, portData &pdata);
 
       private:
         bool zmq_server{false};
         bool zmq_ss_server{false};
         bool tcp_server{false};
-        bool tcp_ss_server{ false };
         bool udp_server{false};
         bool mpi_server{false};
+        bool http_server{ false };
+        bool websocket_server{ false };
         std::atomic<bool> exitall{false};
-
+        std::vector<std::unique_ptr<TypedBrokerServer>> servers;
         std::string configFile_;
         std::string server_name_;
-        std::vector<std::thread> serverloops_;
         std::unique_ptr<Json::Value> config_;
 
       public:

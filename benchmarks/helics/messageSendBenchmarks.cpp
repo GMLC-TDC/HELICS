@@ -242,8 +242,9 @@ BENCHMARK_CAPTURE (BMsendMessage, multiCore/ipcCore, core_type::IPC)
     // clang-format on
     //->RangeMultiplier (2)
     ->Ranges({{1, 1 << 11}, {1, 1}}) // msg size of 4096 bytes causes Boost transmit error
-    ->Ranges({{1, 1 << 11},
-              {1, 1 << 9}}) // msg count has a much bigger effect on time taken (increasing size had
+    ->Ranges(
+        {{1, 1},
+         {1, 1 << 9}}) // msg count has a much bigger effect on time taken (increasing size had
     // no noticeable effect on times)
     ->Iterations(1)
     ->Unit(benchmark::TimeUnit::kMillisecond)
@@ -288,8 +289,9 @@ BENCHMARK_CAPTURE(BMsendMessage, multiCore/tcpssCore, core_type::TCP_SS)
 BENCHMARK_CAPTURE(BMsendMessage, multiCore/udpCore, core_type::UDP)
     // clang-format on
     //->RangeMultiplier (2)
-    ->Ranges({{1, 1 << 15},
-              {1, 1}}) // msg size of 65536 bytes causes error/terminate, though somewhere about 8K
+    ->Ranges(
+        {{1, 1 << 15},
+         {1, 1}}) // msg size of 65536 bytes causes error/terminate, though somewhere about 8K
     // the benchmark time drops from several ms to <1ms
     ->Ranges(
         {{1, 1},

@@ -9,6 +9,10 @@
 
 if(HELICS_BUILD_APP_LIBRARY)
 
+    cmake_dependent_option(
+        HELICS_ENABLE_WEBSERVER "Enable a webserver app structure to be embedded with the broker server" OFF
+        "NOT HELICS_DISABLE_BOOST;Boost_VERSION VERSION_GREATER 1.69" OFF
+    )
     set(
         helics_apps_public_headers
         Player.hpp
@@ -26,10 +30,10 @@ if(HELICS_BUILD_APP_LIBRARY)
 		 MultiBroker.hpp
 		 BrokerServer.hpp
          zmqBrokerServer.hpp
-         tcpBrokerServer.hpp
+         AsioBrokerServer.hpp
          TypedBrokerServer.hpp
 		 )
-
+     
     set(helics_apps_private_headers PrecHelper.hpp SignalGenerators.hpp)
 
     set(
@@ -49,9 +53,15 @@ if(HELICS_BUILD_APP_LIBRARY)
 		MultiBroker.cpp
 		BrokerServer.cpp
         zmqBrokerServer.cpp
-        tcpBrokerServer.cpp
+        AsioBrokerServer.cpp
         TypedBrokerServer.cpp
 	)
+    
+    if (HELICS_ENABLE_WEBSERVER)
+        list(APPEND helics_apps_broker_files helicsWebServer.cpp)
+        list(APPEND helics_apps_broker_headers helicsWebServer.hpp)
+    endif()
+
 
     add_library(helics_apps STATIC ../helics_apps.hpp ${helics_apps_library_files}
                                    ${helics_apps_public_headers} ${helics_apps_broker_headers}

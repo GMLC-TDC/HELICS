@@ -22,7 +22,6 @@ namespace helics {
         class TypedBrokerServer
         {
         public:
-            virtual ~TypedBrokerServer() = default;
             /** start the server*/
             virtual void startServer(const Json::Value *val) = 0;
             /** stop the server*/
