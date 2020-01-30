@@ -17,6 +17,7 @@ namespace zmq
 {
     class socket_t;
     class message_t;
+    class context_t;
 }
 
 namespace helics {
@@ -42,13 +43,13 @@ namespace helics {
             };
 
             void mainLoop();
-            std::unique_ptr<zmq::socket_t> zmqBrokerServer::loadZMQsocket();
-            std::unique_ptr<zmq::socket_t> zmqBrokerServer::loadZMQSSsocket();
+            std::unique_ptr<zmq::socket_t> zmqBrokerServer::loadZMQsocket(zmq::context_t &ctx);
+            std::unique_ptr<zmq::socket_t> zmqBrokerServer::loadZMQSSsocket(zmq::context_t &ctx);
 
             zmqServerData generateZMQServerData();
             zmqServerData generateZMQSSServerData();
 
-            std::string generateResponseToMessage(zmq::message_t &msg, portData &pdata);
+            std::string generateResponseToMessage(zmq::message_t &msg, portData &pdata, core_type ctype);
 
             std::thread mainLoopThread;
             std::mutex threadGuard;

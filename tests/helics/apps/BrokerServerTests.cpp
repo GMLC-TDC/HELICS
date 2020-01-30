@@ -146,12 +146,12 @@ TEST(broker_server_tests, startup_tests_zmqss)
     EXPECT_TRUE(!active);
     brks.startServers();
 
-    auto cr = helics::CoreFactory::create(helics::core_type::ZMQ_SS, "--brokername=fred");
+    auto cr = helics::CoreFactory::create(helics::core_type::ZMQ_SS, "--brokername=fredss");
     EXPECT_TRUE(cr->isConfigured());
     cr->connect();
     EXPECT_TRUE(cr->isConnected());
 
-    auto cr2 = helics::CoreFactory::create(helics::core_type::ZMQ_SS, "--brokername=fred2");
+    auto cr2 = helics::CoreFactory::create(helics::core_type::ZMQ_SS, "--brokername=fred2ss");
     EXPECT_TRUE(cr2->isConfigured());
     cr2->connect();
     EXPECT_TRUE(cr2->isConnected());
