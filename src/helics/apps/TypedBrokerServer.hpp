@@ -22,10 +22,12 @@ namespace helics {
         class TypedBrokerServer
         {
         public:
+            virtual ~TypedBrokerServer() = default;
             /** start the server*/
             virtual void startServer(const Json::Value *val) = 0;
             /** stop the server*/
             virtual void stopServer() = 0;
+            
         protected:
             /** generate a reply to a message*/
             static ActionMessage generateMessageResponse(const ActionMessage &rxcmd, portData &pdata, core_type ctype);

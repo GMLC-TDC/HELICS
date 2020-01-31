@@ -56,7 +56,7 @@ namespace helics
 
         std::shared_ptr<tcp::TcpServer> AsioBrokerServer::loadTCPserver(asio::io_context &ioctx)
         {
-            std::string ext_interface = "tcp://0.0.0.0";
+            std::string ext_interface = "0.0.0.0";
             int tcpport = DEFAULT_TCP_BROKER_PORT_NUMBER;
             std::chrono::milliseconds timeout(20000);
             if (config_->isMember("tcp")) {
@@ -75,7 +75,7 @@ namespace helics
 
         void AsioBrokerServer::loadUDPsocket(asio::io_context& ioctx)
         {
-            std::string ext_interface = "udp://0.0.0.0";
+            std::string ext_interface = "0.0.0.0";
             int zmqport = DEFAULT_UDP_BROKER_PORT_NUMBER;
             std::chrono::milliseconds timeout(20000);
             if (config_->isMember("udp")) {
@@ -105,7 +105,7 @@ namespace helics
 
         void AsioBrokerServer::startServer(const Json::Value *val)
         {
-            std::cerr << "starting asio broker server\n";
+            std::cout << "starting asio broker server\n";
             config_ = val;
 
             std::lock_guard<std::mutex> tlock(threadGuard);
@@ -115,11 +115,12 @@ namespace helics
         void AsioBrokerServer::stopServer()
         {
             std::lock_guard<std::mutex> tlock(threadGuard);
-            mainLoopThread.join();
             if (tcp_enabled_)
             {
                 tcpserver->close();
             }
+            mainLoopThread.join();
+            std::cout << "exiting asio broker server" << std::endl;
         }
 
         void AsioBrokerServer::mainLoop()
