@@ -168,8 +168,13 @@ void NetworkCommsInterface::setFlag(const std::string& flag, bool val)
             useOsPortAllocation = val;
             propertyUnLock();
         }
+    } else if (flag == "noack_connect") {
+        if (propertyLock()) {
+            noAckConnection = val;
+            propertyUnLock();
+        }
     } else {
-        NetworkCommsInterface::setFlag(flag, val);
+        logWarning(std::string("unrecognized flag :") + flag);
     }
 }
 
@@ -194,6 +199,12 @@ ActionMessage NetworkCommsInterface::generateReplyToIncomingMessage(ActionMessag
                 portReply.counter = cmd.counter;
                 return portReply;
             } break;
+            case CONNECTION_REQUEST: {
+                ActionMessage connAck(CMD_PROTOCOL);
+                connAck.messageID = CONNECTION_ACK;
+                return connAck;
+            }
+            break;
             default:
                 break;
         }

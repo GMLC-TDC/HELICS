@@ -35,7 +35,6 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <cstdlib>
 #include <fstream>
 #include <functional>
-#include <iomanip>
 #include <iostream>
 #include <memory>
 #include <sstream>
@@ -48,13 +47,6 @@ namespace beast = boost::beast; // from <boost/beast.hpp>
 namespace http = beast::http; // from <boost/beast/http.hpp>
 namespace net = boost::asio; // from <boost/asio.hpp>
 using tcp = boost::asio::ip::tcp; // from <boost/asio/ip/tcp.hpp>
-
-static std::string as_string(double val)
-{
-    std::ostringstream str;
-    str << std::setprecision(6) << val;
-    return str.str();
-}
 
 static std::string loadFile(const std::string& fileName)
 {

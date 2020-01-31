@@ -173,7 +173,7 @@ namespace apps {
         }
 
         std::vector<zmq::pollitem_t> poller;
-        for (size_t ii = 0; ii < sockets.size(); ++ii) {
+        for (std::size_t ii = 0; ii < sockets.size(); ++ii) {
             poller.emplace_back();
             poller.back().socket = static_cast<void*>(*sockets[ii]);
             poller.back().events = ZMQ_POLLIN;
@@ -196,7 +196,7 @@ namespace apps {
             }
             if (rc > 0) {
                 zmq::message_t msg;
-                for (int ii = 0; ii < poller.size(); ++ii) {
+                for (std::size_t ii = 0; ii < poller.size(); ++ii) {
                     if ((poller[ii].revents & ZMQ_POLLIN) != 0) {
                         handleMessage[ii](sockets[ii].get(), data[ii].ports);
                     }
