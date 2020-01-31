@@ -79,13 +79,10 @@ TEST(TcpCore, tcpComms_broker_test_transmit)
     server->setDataCall(
         [&data,
          &counter,
-         &len](helics::tcp::TcpConnection::pointer p, const char* data_rec, size_t data_Size) {
+         &len](helics::tcp::TcpConnection::pointer , const char* data_rec, size_t data_Size) {
             std::copy(data_rec, data_rec + data_Size, data.begin());
             len = data_Size;
             ++counter;
-            helics::ActionMessage m(helics::action_message_def::action_t::cmd_protocol);
-            m.messageID = CONNECTION_ACK;
-            p->send(m.packetize());
             return data_Size;
         });
     ASSERT_TRUE(server->isReady());
@@ -95,6 +92,7 @@ TEST(TcpCore, tcpComms_broker_test_transmit)
     comm.setBrokerPort(DEFAULT_TCP_BROKER_PORT_NUMBER);
     comm.setPortNumber(TCP_SECONDARY_PORT);
     comm.setName("tests");
+    comm.setFlag("noack_connect", true);
     bool connected = comm.connect();
     EXPECT_TRUE(connected) << "connection has failed-bb";
     if (connected) {
@@ -157,6 +155,7 @@ TEST(TcpCore, tcpComms_rx)
     comm.setBrokerPort(DEFAULT_TCP_BROKER_PORT_NUMBER);
     comm.setPortNumber(TCP_SECONDARY_PORT);
     comm.setName("tests");
+    comm.setFlag("noack_connect", true);
 
     bool connected = comm.connect();
     ASSERT_TRUE(connected);
@@ -420,7 +419,7 @@ TEST(TcpCore, tcpCore_initialization)
     std::this_thread::sleep_for(300ms);
     std::atomic<int> counter{0};
     std::string initializationString =
-        "-f 1 --brokerport=24160  --port=24180 --local_interface=localhost --name=core1";
+        "-f 1 --brokerport=24160  --port=24180 --local_interface=localhost --name=core1 --noack_connect";
     auto core = helics::CoreFactory::create(helics::core_type::TCP, initializationString);
 
     ASSERT_TRUE(core);

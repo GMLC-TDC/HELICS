@@ -192,16 +192,7 @@ namespace tcp {
         if (errorMessage.empty()) {
             ActionMessage m(data, bytes_received);
             if (isProtocolCommand(m)) {
-                if (m.messageID == PORT_DEFINITIONS) {
-                    rxMessageQueue.push(m);
-                } else if (m.messageID == DISCONNECT) {
-                    txQueue.emplace(control_route, m);
-                } else if (m.messageID == NEW_BROKER_INFORMATION) {
-                    txQueue.emplace(control_route, m);
-                } else if (m.messageID == DELAY) {
-                    std::this_thread::sleep_for(std::chrono::seconds(2));
-                    txQueue.emplace(control_route, m);
-                }
+                txQueue.emplace(control_route, m);
             }
         } else {
             logError(errorMessage);
@@ -256,6 +247,10 @@ namespace tcp {
                 
                 std::chrono::milliseconds cumsleep{0};
                 bool connectionEstablished{ false };
+                if (PortNumber > 0 && NetworkCommsInterface::noAckConnection)
+                {
+                    connectionEstablished = true;
+                }
                 while (!connectionEstablished) {
 
                     ActionMessage m(CMD_PROTOCOL_PRIORITY);

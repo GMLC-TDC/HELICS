@@ -429,6 +429,9 @@ void CommsInterface::setFlag(const std::string& flag, bool val)
     if (flag == "server_mode") {
         setServerMode(val);
     }
+ else {
+ logWarning(std::string("unrecognized flag :") + flag);
+    }
 }
 
 void CommsInterface::setTimeout(std::chrono::milliseconds timeOut)

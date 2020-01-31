@@ -57,6 +57,7 @@ class NetworkBrokerData {
     bool use_os_port{ false }; //!< specify that any automatic port allocation should use operating system allocation
     bool autobroker{ false }; //!< flag for specifying an automatic broker generation
     bool appendNameToAddress{ false }; //!< flag indicating that the name should be appended to the address
+    bool noAckConnection{ false }; //!< flag indicating that a connection ack message is not required for broker connections
     server_mode_options server_mode{ server_mode_options::unspecified }; //!< setup a server mode
   public:
     NetworkBrokerData() = default;

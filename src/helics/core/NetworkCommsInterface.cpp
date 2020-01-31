@@ -120,6 +120,7 @@ void NetworkCommsInterface::loadNetworkInfo(const NetworkBrokerData& netInfo)
     }
     useOsPortAllocation = netInfo.use_os_port;
     appendNameToAddress = netInfo.appendNameToAddress;
+    noAckConnection = netInfo.noAckConnection;
     propertyUnLock();
 }
 
@@ -174,7 +175,7 @@ void NetworkCommsInterface::setFlag(const std::string& flag, bool val)
             propertyUnLock();
         }
     } else {
-        logWarning(std::string("unrecognized flag :") + flag);
+        CommsInterface::setFlag(flag, val);
     }
 }
 
