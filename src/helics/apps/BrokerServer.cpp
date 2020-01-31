@@ -6,7 +6,6 @@ SPDX-License-Identifier: BSD-3-Clause
 */
 
 #include "BrokerServer.hpp"
-
 #include "../common/JsonProcessingFunctions.hpp"
 #include "../core/ActionMessage.hpp"
 #include "../core/BrokerFactory.hpp"
@@ -91,9 +90,9 @@ namespace apps {
             }
             if (websocket_server)
             {
-               webs->enableWebsocketServer(true);
+               webs->enableWebSocketServer(true);
             }
-            servers.push_back(std::move(webss));
+            servers.push_back(std::move(webs));
 #endif
         }
         for (auto& server : servers) {

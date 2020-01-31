@@ -31,6 +31,7 @@ namespace zeromq {
         /** construct from with a core name*/
         ZmqCoreSS(const std::string& core_name);
 
+        virtual std::string generateLocalAddressString() const override;
       private:
         virtual bool brokerConnect() override;
     };

@@ -20,6 +20,11 @@ SPDX-License-Identifier: BSD-3-Clause
 //
 //------------------------------------------------------------------------------
 
+#include "helicsWebServer.hpp"
+
+#include "../common/JsonProcessingFunctions.hpp"
+#include "../core/BrokerFactory.hpp"
+
 #include <algorithm>
 #include <boost/asio/strand.hpp>
 #include <boost/beast/core.hpp>
@@ -38,11 +43,6 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <string>
 #include <thread>
 #include <vector>
-
-#include "helicsWebServer.hpp"
-#include "../common/JsonProcessingFunctions.hpp"
-#include "../core/BrokerFactory.hpp"
-
 
 namespace beast = boost::beast; // from <boost/beast.hpp>
 namespace http = beast::http; // from <boost/beast/http.hpp>
@@ -76,15 +76,13 @@ static std::string uri_decode(beast::string_view str)
                 ret.push_back(' ');
             else
                 ret.push_back(str[ii]);
-        }
-        else {
+        } else {
             unsigned int spchar;
             auto converted = sscanf(std::string(str.substr(ii + 1, 2)).c_str(), "%x", &spchar);
             if (converted == 1) {
                 ret.push_back(static_cast<char>(spchar));
                 ii = ii + 2;
-            }
-            else {
+            } else {
                 ret.push_back(str[ii]);
             }
         }
@@ -94,7 +92,7 @@ static std::string uri_decode(beast::string_view str)
 
 // function to extract the request parameters and clean up the target
 static std::pair<beast::string_view, boost::container::flat_map<beast::string_view, std::string>>
-process_request_parameters(beast::string_view target, beast::string_view body)
+    process_request_parameters(beast::string_view target, beast::string_view body)
 {
     std::pair<beast::string_view, boost::container::flat_map<beast::string_view, std::string>>
         results;
@@ -102,8 +100,7 @@ process_request_parameters(beast::string_view target, beast::string_view body)
     if (param_mark != beast::string_view::npos) {
         results.first = target.substr(1, param_mark - 1);
         target = target.substr(param_mark + 1);
-    }
-    else {
+    } else {
         results.first = target;
         target.clear();
     }
@@ -142,6 +139,52 @@ process_request_parameters(beast::string_view target, beast::string_view body)
     return results;
 }
 
+void partitionTarget(
+    beast::string_view target,
+    std::string& brokerName,
+    std::string& query,
+    std::string& targetObj)
+{
+    if (target.back() == '/') {
+        target.remove_suffix(1);
+    }
+    if (!target.empty()&&target.front() == '/') {
+        target.remove_prefix(1);
+    }
+    auto slashLoc = target.find('/');
+    if (slashLoc == beast::string_view::npos) {
+        brokerName = target.to_string();
+        return;
+    }
+    brokerName = target.substr(0, slashLoc).to_string();
+    auto tstr = target.substr(slashLoc + 1);
+    slashLoc = tstr.find('/');
+    if (slashLoc == beast::string_view::npos) {
+        targetObj = tstr.to_string();
+        return;
+    }
+    targetObj = tstr.substr(0, slashLoc).to_string();
+    query = tstr.substr(slashLoc + 1).to_string();    
+}
+
+std::string getBrokerList()
+{
+    auto brks = helics::BrokerFactory::getAllBrokers();
+    Json::Value base;
+    base["brokers"] = Json::arrayValue;
+    for (auto& brk : brks) {
+        Json::Value brokerBlock;
+
+        brokerBlock["name"] = brk->getIdentifier();
+        brokerBlock["address"] = brk->getAddress();
+        brokerBlock["isConnected"] = brk->isConnected();
+        brokerBlock["isOpen"] = brk->isOpenToNewFederates();
+        brokerBlock["isRoot"] = brk->isRoot();
+        base["brokers"].append(brokerBlock);
+    }
+    return generateJsonString(base);
+}
+
 // This function produces an HTTP response for the given
 // request. The type of the response object depends on the
 // contents of the request, so the interface requires the
@@ -151,7 +194,7 @@ void handle_request(http::request<Body, http::basic_fields<Allocator>>&& req, Se
 {
     // Returns a bad request response
     auto const bad_request = [&req](beast::string_view why) {
-        http::response<http::string_body> res{ http::status::bad_request, req.version() };
+        http::response<http::string_body> res{http::status::bad_request, req.version()};
         res.set(http::field::server, BOOST_BEAST_VERSION_STRING);
         res.set(http::field::content_type, "text/html");
         res.keep_alive(req.keep_alive());
@@ -162,7 +205,7 @@ void handle_request(http::request<Body, http::basic_fields<Allocator>>&& req, Se
 
     // Returns a not found response
     auto const not_found = [&req](beast::string_view target) {
-        http::response<http::string_body> res{ http::status::not_found, req.version() };
+        http::response<http::string_body> res{http::status::not_found, req.version()};
         res.set(http::field::server, BOOST_BEAST_VERSION_STRING);
         res.set(http::field::content_type, "text/html");
         res.keep_alive(req.keep_alive());
@@ -185,15 +228,14 @@ void handle_request(http::request<Body, http::basic_fields<Allocator>>&& req, Se
     */
     // generate the main page
     auto const main_page = [&req]() {
-        http::response<http::string_body> res{ http::status::ok, req.version() };
+        http::response<http::string_body> res{http::status::ok, req.version()};
         res.set(http::field::server, BOOST_BEAST_VERSION_STRING);
         res.set(http::field::content_type, "text/html");
         res.keep_alive(req.keep_alive());
         if (req.method() != http::verb::head) {
             res.body() = index_page;
             res.prepare_payload();
-        }
-        else {
+        } else {
             res.set(http::field::content_length, index_page.size());
         }
         return res;
@@ -201,32 +243,29 @@ void handle_request(http::request<Body, http::basic_fields<Allocator>>&& req, Se
 
     // generate a conversion response
     auto const response_text = [&req](const std::string& value) {
-        http::response<http::string_body> res{ http::status::ok, req.version() };
+        http::response<http::string_body> res{http::status::ok, req.version()};
         res.set(http::field::server, BOOST_BEAST_VERSION_STRING);
         res.set(http::field::content_type, "text/plain");
         res.keep_alive(req.keep_alive());
         if (req.method() != http::verb::head) {
             res.body() = value;
             res.prepare_payload();
-        }
-        else {
+        } else {
             res.set(http::field::content_length, value.size());
         }
         return res;
     };
 
     // generate a conversion response
-    auto const response_json =
-        [&req](const std::string& resp) {
-        http::response<http::string_body> res{ http::status::ok, req.version() };
+    auto const response_json = [&req](const std::string& resp) {
+        http::response<http::string_body> res{http::status::ok, req.version()};
         res.set(http::field::server, BOOST_BEAST_VERSION_STRING);
         res.set(http::field::content_type, "application/json");
         res.keep_alive(req.keep_alive());
         if (req.method() != http::verb::head) {
             res.body() = resp;
             res.prepare_payload();
-        }
-        else {
+        } else {
             res.set(http::field::content_length, resp.size());
         }
 
@@ -234,12 +273,12 @@ void handle_request(http::request<Body, http::basic_fields<Allocator>>&& req, Se
     };
 
     switch (req.method()) {
-    case http::verb::head:
-    case http::verb::post:
-    case http::verb::get:
-        break;
-    default:
-        return send(bad_request("Unknown HTTP-method"));
+        case http::verb::head:
+        case http::verb::post:
+        case http::verb::get:
+            break;
+        default:
+            return send(bad_request("Unknown HTTP-method"));
     }
     beast::string_view target(req.target());
     if (target == "/" || target == "/index.html") {
@@ -249,53 +288,67 @@ void handle_request(http::request<Body, http::basic_fields<Allocator>>&& req, Se
     auto reqpr = process_request_parameters(target, req.body());
     std::string query;
     std::string targetObj;
-    auto& fields = reqpr.second;
-    if (fields.find("query") != fields.end()) {
-        query = fields["query"];
-    }
-    if (fields.find("target") != fields.end()) {
-        targetObj = fields["target"];
-    }
-    std::shared_ptr<helics::Broker> brkr;
-    if (target == "query")
-    {
-        if (query == "brokers" && targetObj.empty())
-        {
-            auto brks = helics::BrokerFactory::getAllBrokers();
-            Json::Value base;
-            base["brokers"] = Json::arrayValue;
-            for (auto& brk : brks) {
-                    Json::Value brokerBlock;
+    std::string brokerName;
 
-                    brokerBlock["name"] = brk->getIdentifier();
-                    brokerBlock["address"] = brk->getAddress();
-                    brokerBlock["isConnected"] = brk->isConnected();
-                    brokerBlock["isOpen"] = brk->isOpenToNewFederates();
-                    brokerBlock["isRoot"] = brk->isRoot();
-                    base["brokers"].append(brokerBlock);
-            }
-            return send(response_json(generateJsonString(base)));
+    partitionTarget(target, brokerName, query, targetObj);
+
+    auto& fields = reqpr.second;
+    if (query.empty()) {
+        if (fields.find("query") != fields.end()) {
+            query = fields["query"];
         }
-        else if (targetObj.empty())
-        {
-            auto brks = helics::BrokerFactory::getAllBrokers();
-            for (auto& brk : brks) {
-                if (brk->isConnected())
-                {
-                    brkr = brk;
-                }
+    }
+    if (targetObj.empty()) {
+        if (fields.find("target") != fields.end()) {
+            targetObj = fields["target"];
+        }
+    }
+    if (brokerName.empty()||brokerName=="query") {
+        if (fields.find("broker") != fields.end()) {
+            targetObj = fields["broker"];
+        }
+    }
+    if (brokerName == "query" && target == "brokers")
+    {
+        brokerName == "brokers";
+    }
+    if (brokerName == "brokers")
+    {
+        return send(response_json(getBrokerList()));
+    }
+    std::shared_ptr<helics::Broker> brkr = helics::BrokerFactory::findBroker(brokerName);
+    if (!brkr)
+    {
+        auto brks = helics::BrokerFactory::getAllBrokers();
+        for (auto& brk : brks) {
+            if (brk->isConnected()) {
+                brkr = brk;
             }
+        }
+        query = targetObj;
+        targetObj = brokerName;
+    }
+    else if (query.empty() && !targetObj.empty())
+    {
+        query = targetObj;
+        targetObj = "root";
+    }
+    if (targetObj.empty())
+    {
+        targetObj = "root";
+    }
+    if (brkr) {
+        auto res = brkr->query(targetObj, query);
+        if (res.front() == '{')
+        {
+            send(response_json(res));
         }
         else
         {
-            brkr = helics::BrokerFactory::findBroker(targetObj)
+            send(response_text(res));
         }
+        return;
     }
-    else
-    {
-        brkr = helics::BrokerFactory::findBroker(target)
-    }
-    
     return send(bad_request("#unknown"));
 }
 
@@ -308,13 +361,13 @@ void fail(beast::error_code ec, char const* what)
 }
 
 // Handles an HTTP server connection
-class session : public std::enable_shared_from_this<session> {
+class session: public std::enable_shared_from_this<session> {
     // This is the C++11 equivalent of a generic lambda.
     // The function object is used to send an HTTP message.
     struct send_lambda {
         session& self_;
 
-        explicit send_lambda(session& self) : self_(self) {}
+        explicit send_lambda(session& self): self_(self) {}
 
         template<bool isRequest, class Body, class Fields>
         void operator()(http::message<isRequest, Body, Fields>&& msg) const
@@ -343,9 +396,9 @@ class session : public std::enable_shared_from_this<session> {
     std::shared_ptr<void> res_;
     send_lambda lambda_;
 
-public:
+  public:
     // Take ownership of the stream
-    explicit session(tcp::socket&& socket) : stream_(std::move(socket)), lambda_(*this) {}
+    explicit session(tcp::socket&& socket): stream_(std::move(socket)), lambda_(*this) {}
 
     // Start the asynchronous operation
     void run() { do_read(); }
@@ -417,12 +470,12 @@ public:
 //------------------------------------------------------------------------------
 
 // Accepts incoming connections and launches the sessions
-class listener : public std::enable_shared_from_this<listener> {
+class listener: public std::enable_shared_from_this<listener> {
     net::io_context& ioc_;
     tcp::acceptor acceptor_;
 
-public:
-    listener(net::io_context& ioc, tcp::endpoint endpoint) :
+  public:
+    listener(net::io_context& ioc, tcp::endpoint endpoint):
         ioc_(ioc), acceptor_(net::make_strand(ioc))
     {
         beast::error_code ec;
@@ -459,7 +512,7 @@ public:
     // Start accepting incoming connections
     void run() { do_accept(); }
 
-private:
+  private:
     void do_accept()
     {
         // The new connection gets its own strand
@@ -472,8 +525,7 @@ private:
     {
         if (ec) {
             fail(ec, "accept");
-        }
-        else {
+        } else {
             // Create the session and run it
             std::make_shared<session>(std::move(socket))->run();
         }
@@ -485,57 +537,48 @@ private:
 
 //------------------------------------------------------------------------------
 
-namespace helics
-{
-    namespace apps
+namespace helics {
+namespace apps {
+    void WebServer::startServer(const Json::Value* val)
     {
-        void WebServer::startServer(const Json::Value* val)
-        {
-            std::cerr << "starting broker web server\n";
-            config_ = val;
+        std::cerr << "starting broker web server\n";
+        config_ = val;
 
-            std::lock_guard<std::mutex> tlock(threadGuard);
-            mainLoopThread = std::thread([this]() { mainLoop(); });
-            mainLoopThread.detach();
-        }
-
-        /** stop the server*/
-        void WebServer::stopServer()
-        {
-            
-        }
-
-        void WebServer::mainLoop()
-        {
-            
-            
-            // The io_context is required for all I/O
-            net::io_context ioc{ 1 };
-            if (http_enabled_)
-            {
-                if (config_->isMember("http")) {
-                    auto V = (*config_)["http"];
-                    replaceIfMember(V, "interface", httpAddress_);
-                    replaceIfMember(V, "port", httpPort_);
-                }
-                auto const address = net::ip::make_address(httpAddress_);
-                // Create and launch a listening port
-                std::make_shared<listener>(ioc, tcp::endpoint{ address, static_cast<unsigned short>(httpPort_) })->run();
-            }
-           
-            if (websocket_enabled_)
-            {
-                if (config_->isMember("websocket")) {
-                    auto V = (*config_)["websocket"];
-                    replaceIfMember(V, "interface", websocketAddress_);
-                    replaceIfMember(V, "port", httpPort_);
-                }
-
-            }
-            // Run the I/O service
-            ioc.run();
-
-        }
-
+        std::lock_guard<std::mutex> tlock(threadGuard);
+        mainLoopThread = std::thread([this]() { mainLoop(); });
+        mainLoopThread.detach();
     }
-}
+
+    /** stop the server*/
+    void WebServer::stopServer() {}
+
+    void WebServer::mainLoop()
+    {
+        // The io_context is required for all I/O
+        net::io_context ioc{1};
+        if (http_enabled_) {
+            if (config_->isMember("http")) {
+                auto V = (*config_)["http"];
+                replaceIfMember(V, "interface", httpAddress_);
+                replaceIfMember(V, "port", httpPort_);
+            }
+            auto const address = net::ip::make_address(httpAddress_);
+            // Create and launch a listening port
+            std::make_shared<listener>(
+                ioc, tcp::endpoint{address, static_cast<unsigned short>(httpPort_)})
+                ->run();
+        }
+
+        if (websocket_enabled_) {
+            if (config_->isMember("websocket")) {
+                auto V = (*config_)["websocket"];
+                replaceIfMember(V, "interface", websocketAddress_);
+                replaceIfMember(V, "port", httpPort_);
+            }
+        }
+        // Run the I/O service
+        ioc.run();
+    }
+
+} // namespace apps
+} // namespace helics

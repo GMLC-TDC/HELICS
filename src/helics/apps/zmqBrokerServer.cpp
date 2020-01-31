@@ -129,9 +129,9 @@ namespace apps {
             }
         } else {
             ActionMessage rxcmd(static_cast<char*>(msg.data()), msg.size());
-            auto str = generateMessageResponse(rxcmd, pdata,ctype);
-            if (!str.empty()) {
-                return str;
+            auto rep= generateMessageResponse(rxcmd, pdata,ctype);
+            if (rep.action()!=CMD_IGNORE) {
+                return rep.to_string();
             }
         }
         std::cout << "received unknown message of length " << msg.size() << std::endl;

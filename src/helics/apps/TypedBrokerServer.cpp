@@ -61,7 +61,7 @@ namespace apps {
         return {brk, newbrk};
     }
 
-    std::string
+    ActionMessage 
         TypedBrokerServer::generateMessageResponse(const ActionMessage& rxcmd, portData& pdata, core_type ctype)
     {
         //   std::cout << "received data length " << msg.size () << std::endl;
@@ -79,12 +79,11 @@ namespace apps {
                             if (nbrk.second) {
                                 assignPort(pdata, pt, nbrk.first);
                             }
-                            auto mess = generatePortRequestReply(rxcmd, nbrk.first);
-                            return mess.to_string();
+                            return generatePortRequestReply(rxcmd, nbrk.first);
                         } else {
                             ActionMessage rep(CMD_PROTOCOL);
                             rep.messageID = DELAY;
-                            return rep.to_string();
+                            return rep;
                         }
                     } break;
                 }
@@ -94,7 +93,7 @@ namespace apps {
                 // repSocket.send("ignored");
                 break;
         }
-        return std::string{};
+        return CMD_IGNORE;
     }
     /** get an open port for broker to start*/
     int TypedBrokerServer::getOpenPort(portData& pd)

@@ -28,7 +28,7 @@ namespace helics {
             virtual void stopServer() = 0;
         protected:
             /** generate a reply to a message*/
-            static std::string generateMessageResponse(const ActionMessage &rxcmd, portData &pdata, core_type ctype);
+            static ActionMessage generateMessageResponse(const ActionMessage &rxcmd, portData &pdata, core_type ctype);
             /** get an open port for broker to start*/
             static int getOpenPort(portData& pd);
             /* assign a port in the portData structure*/

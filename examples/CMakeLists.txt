@@ -16,6 +16,7 @@ endif()
 
 if(HELICS_BUILD_APP_LIBRARY)
     add_subdirectory(comboFederates1)
+    add_subdirectory(BrokerServerTestCase)
 endif()
 
 if(NOT HELICS_DISABLE_C_SHARED_LIB)

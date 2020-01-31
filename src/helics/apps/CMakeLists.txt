@@ -70,6 +70,10 @@ if(HELICS_BUILD_APP_LIBRARY)
     target_link_libraries(helics_apps PUBLIC helics_application_api)
     target_link_libraries(helics_apps PRIVATE HELICS::compile_flags_target fmt::fmt)
     
+    if (HELICS_ENABLE_WEBSERVER)
+        target_compile_definitions(helics_apps PUBLIC HELICS_ENABLE_WEBSERVER=1)
+        target_compile_definitions(helics_apps PUBLIC BOOST_DATE_TIME_NO_LIB)
+    endif()
     # add and alias library to match the find_package
     add_library(HELICS::apps ALIAS helics_apps)
 

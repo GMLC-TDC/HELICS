@@ -40,6 +40,14 @@ namespace zeromq {
         netInfo.server_mode = NetworkBrokerData::server_mode_options::server_deactivated;
     }
 
+    std::string ZmqCoreSS::generateLocalAddressString() const
+    {
+        auto res = NetworkCore::generateLocalAddressString();
+        res.push_back('/');
+        res.append(getIdentifier());
+        return res;
+    }
+
     bool ZmqCoreSS::brokerConnect()
     {
         ZmqContextManager::startContext();

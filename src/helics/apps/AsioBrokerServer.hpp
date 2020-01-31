@@ -11,8 +11,15 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "TypedBrokerServer.hpp"
 #include <thread>
 #include <mutex>
+#include "helics/common/AsioContextManager.h"
 
 namespace helics {
+    namespace tcp
+    {
+        class TcpServer;
+        class TcpConnection;
+    }
+    
     class Broker;
     namespace apps {
 
@@ -29,11 +36,27 @@ namespace helics {
             void enableTcpServer(bool enabled) { tcp_enabled_ = enabled; }
             void enableUdpServer(bool enabled) { udp_enabled_ = enabled; };
         private:
+
             void mainLoop();
+            std::shared_ptr<tcp::TcpServer> loadTCPserver(asio::io_context &ioctx);
+            void loadUDPsocket(asio::io_context &ioctx);
+
+            void loadTCPServerData(portData &pdata);
+            void loadUDPServerData(portData &pdata);
+
+            //std::string generateResponseToMessage(zmq::message_t &msg, portData &pdata, core_type ctype);
+            std::size_t  tcpDataReceive(
+                std::shared_ptr<tcp::TcpConnection> connection,
+                const char* data,
+                size_t bytes_received);
 
             std::thread mainLoopThread;
             std::mutex threadGuard;
 
+            portData tcpPortData;
+            std::shared_ptr<tcp::TcpServer> tcpserver;
+
+            portData udpPortData;
             const Json::Value *config_{ nullptr };
             const std::string name_;
             bool tcp_enabled_{ false };
