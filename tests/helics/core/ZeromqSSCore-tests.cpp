@@ -192,7 +192,7 @@ TEST(ZMQSSCore, initialization)
     EXPECT_TRUE(connected);
 
     if (connected) {
-        int cnt = 0;
+        int cnt{ 0 };
         while (counter == 0) {
             std::this_thread::sleep_for(100ms);
             ++cnt;
@@ -203,26 +203,7 @@ TEST(ZMQSSCore, initialization)
         EXPECT_GE(counter, 1);
         std::unique_lock<std::mutex> mLock(msgLock);
         if (!msgs.empty()) {
-            auto rM = msgs.at(0);
-            mLock.unlock();
-            EXPECT_EQ(rM.name, "core1");
-            // std::cout << "rM.name: " << rM.name << std::endl;
-            EXPECT_TRUE(rM.action() == helics::action_message_def::action_t::cmd_protocol);
-        } else {
-            mLock.unlock();
-        }
-        cnt = 0;
-        while (counter == 1) {
-            std::this_thread::sleep_for(100ms);
-            ++cnt;
-            if (cnt > 30) {
-                break;
-            }
-        }
-        EXPECT_GE(counter, 2);
-        mLock.lock();
-        if (!msgs.empty()) {
-            auto rM2 = msgs.at(1);
+            auto rM2 = msgs.at(0);
             mLock.unlock();
             EXPECT_EQ(rM2.name, "core1");
             // std::cout << "rM.name: " << rM2.name << std::endl;

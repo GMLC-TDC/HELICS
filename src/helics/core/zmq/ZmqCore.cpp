@@ -33,19 +33,13 @@ namespace zeromq {
     ZmqCoreSS::ZmqCoreSS() noexcept
     {
         netInfo.server_mode = NetworkBrokerData::server_mode_options::server_deactivated;
+        netInfo.appendNameToAddress = true;
     }
 
     ZmqCoreSS::ZmqCoreSS(const std::string& core_name): NetworkCore(core_name)
     {
         netInfo.server_mode = NetworkBrokerData::server_mode_options::server_deactivated;
-    }
-
-    std::string ZmqCoreSS::generateLocalAddressString() const
-    {
-        auto res = NetworkCore::generateLocalAddressString();
-        res.push_back('/');
-        res.append(getIdentifier());
-        return res;
+        netInfo.appendNameToAddress = true;
     }
 
     bool ZmqCoreSS::brokerConnect()

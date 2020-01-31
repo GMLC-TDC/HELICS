@@ -82,7 +82,7 @@ namespace apps {
 
         if (http_server || websocket_server)
         {
-#if HELICS_ENABLE_WEBSERVER
+#ifdef HELICS_ENABLE_WEBSERVER
             auto webs = std::make_unique<WebServer>(server_name_);
             if (http_server)
             {

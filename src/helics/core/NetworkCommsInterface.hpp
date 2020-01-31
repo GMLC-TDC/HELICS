@@ -53,14 +53,15 @@ class NetworkCommsInterface: public CommsInterface {
     virtual void setFlag(const std::string& flag, bool val) override;
 
   protected:
-    int brokerPort = -1;
+      int brokerPort{ -1 };
     std::atomic<int> PortNumber{-1};
-    bool autoPortNumber = true;
-    bool useOsPortAllocation = false; //!< use the operating system to allocate a port number
+    bool autoPortNumber{ true };
+    bool useOsPortAllocation{ false }; //!< use the operating system to allocate a port number
+    bool appendNameToAddress{ false }; //!< flag to append the name to the network address
     const interface_type networkType;
-    interface_networks network = interface_networks::ipv4;
+    interface_networks network{ interface_networks::ipv4 };
     std::atomic<bool> hasBroker{false};
-    int maxRetries = 5; // the maximum number of network retries
+    int maxRetries{ 5 }; // the maximum number of network retries
 
   private:
     PortAllocator openPorts; //!< a structure to deal with port allocations

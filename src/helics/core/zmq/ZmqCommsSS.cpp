@@ -52,6 +52,7 @@ namespace zeromq {
     ZmqCommsSS::ZmqCommsSS() noexcept:
         NetworkCommsInterface(interface_type::ip, CommsInterface::thread_generation::single)
     {
+        appendNameToAddress = true;
     }
 
     /** destructor*/
@@ -258,26 +259,17 @@ namespace zeromq {
                 }
                 break;
             case NEW_ROUTE:
-                try {
                     for (auto& mc : connection_info) {
                         if (mc.second == cmd.payload) {
                             routes.emplace(route_id(cmd.getExtraData()), mc.first);
                             break;
                         }
                     }
-                }
-                catch (const zmq::error_t& e) {
-                    // TODO:: do something???
-                    logError(
-                        std::string("unable to connect route") + cmd.payload + "::" + e.what());
-                }
                 break;
             case REMOVE_ROUTE:
                 routes.erase(route_id(cmd.getExtraData()));
                 break;
             case CLOSE_RECEIVER:
-                close_tx = true;
-                break;
             case DISCONNECT:
                 close_tx = true;
                 break;

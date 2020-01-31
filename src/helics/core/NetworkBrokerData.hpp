@@ -46,18 +46,18 @@ class NetworkBrokerData {
     std::string brokerAddress; //!< the address or domain name of the broker
     std::string localInterface; //!< the interface to use for the local connection
     std::string brokerInitString; //!< a string containing arguments for the broker initialization
-    int portNumber = -1; //!< the port number for the local interface
-    int brokerPort = -1; //!< the port number to use for the main broker interface
-    int portStart = -1; //!< the starting port for automatic port definitions
-    int maxMessageSize = 16 * 256; //!< maximum message size
-    int maxMessageCount = 256; //!< maximum message count
-    int maxRetries = 5; //!< the maximum number of retries to establish a network connection
-    interface_networks interfaceNetwork = interface_networks::local;
-    bool reuse_address = false; //!< allow reuse of binding address
-    bool use_os_port =
-        false; //!< specify that any automatic port allocation should use operating system allocation
-    bool autobroker = false; //!< flag for specifying an automatic broker generation
-    server_mode_options server_mode = server_mode_options::unspecified; //!< setup a server mode
+    int portNumber{ -1 }; //!< the port number for the local interface
+    int brokerPort{ -1 }; //!< the port number to use for the main broker interface
+    int portStart{ -1 }; //!< the starting port for automatic port definitions
+    int maxMessageSize{ 16 * 256 }; //!< maximum message size
+    int maxMessageCount{ 256 }; //!< maximum message count
+    int maxRetries{ 5 }; //!< the maximum number of retries to establish a network connection
+    interface_networks interfaceNetwork{ interface_networks::local };
+    bool reuse_address{ false }; //!< allow reuse of binding address
+    bool use_os_port{ false }; //!< specify that any automatic port allocation should use operating system allocation
+    bool autobroker{ false }; //!< flag for specifying an automatic broker generation
+    bool appendNameToAddress{ false }; //!< flag indicating that the name should be appended to the address
+    server_mode_options server_mode{ server_mode_options::unspecified }; //!< setup a server mode
   public:
     NetworkBrokerData() = default;
     /** constructor from the allowed type*/

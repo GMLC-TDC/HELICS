@@ -119,6 +119,7 @@ void NetworkCommsInterface::loadNetworkInfo(const NetworkBrokerData& netInfo)
         autoPortNumber = false;
     }
     useOsPortAllocation = netInfo.use_os_port;
+    appendNameToAddress = netInfo.appendNameToAddress;
     propertyUnLock();
 }
 
@@ -206,13 +207,23 @@ std::string NetworkCommsInterface::getAddress() const
     if ((PortNumber < 0) && (!serverMode)) {
         return name;
     }
+    std::string address;
     if ((localTargetAddress == "tcp://*") || (localTargetAddress == "tcp://0.0.0.0")) {
-        return makePortAddress("tcp://127.0.0.1", PortNumber);
+        address=makePortAddress("tcp://127.0.0.1", PortNumber);
     }
-    if ((localTargetAddress == "*") || (localTargetAddress == "0.0.0.0")) {
-        return makePortAddress("127.0.0.1", PortNumber);
+    else if ((localTargetAddress == "*") || (localTargetAddress == "0.0.0.0")) {
+        address=makePortAddress("127.0.0.1", PortNumber);
     }
-    return makePortAddress(localTargetAddress, PortNumber);
+    else
+    {
+        address= makePortAddress(localTargetAddress, PortNumber);
+    }
+    if (appendNameToAddress)
+    {
+        address.push_back('/');
+        address.append(name);
+    }
+    return address;
 }
 
 ActionMessage NetworkCommsInterface::generatePortRequest(int cnt) const

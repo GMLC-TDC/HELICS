@@ -12,6 +12,11 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "../core/helicsCLI11.hpp"
 #include "gmlc/utilities/stringOps.h"
 
+
+#ifdef HELICS_ENABLE_WEBSERVER
+#include "../apps/helicsWebServer.hpp"
+#endif
+
 #include <iostream>
 #include <thread>
 
@@ -20,9 +25,10 @@ void terminalFunction(std::vector<std::string> args);
 
 int main(int argc, char* argv[])
 {
-    int ret = 0;
-    bool runterminal = false;
-    bool autorestart = false;
+    int ret{ 0 };
+    bool runterminal{ false };
+    bool autorestart{ false };
+    bool http_webserver{ false };
 
     helics::helicsCLI11App cmdLine("helics broker command line");
     auto term =
@@ -38,6 +44,12 @@ int main(int argc, char* argv[])
         autorestart,
         "helics_broker autorestart <broker args ...> will start a continually regenerating broker "
         "there is a 3 second countdown on broker completion to halt the program via ctrl-C\n");
+#ifdef HELICS_ENABLE_WEBSERVER
+    cmdLine.add_flag(
+        "--http",
+        http_webserver,
+        "start an http webserver that can respond to queries on the broker");
+#endif
     cmdLine
         .footer(
             "helics_broker <broker args ..> starts a broker with the given args and waits for it to "
@@ -59,6 +71,15 @@ int main(int argc, char* argv[])
                 return static_cast<int>(res);
         }
     }
+#ifdef HELICS_ENABLE_WEBSERVER
+    std::unique_ptr<helics::apps::WebServer> webserver;
+    if (http_webserver)
+    {
+        webserver = std::make_unique<helics::apps::WebServer>();
+        webserver->enableHttpServer(true);
+        webserver->startServer(nullptr);
+    }
+#endif
     try {
         if (runterminal) {
             terminalFunction(cmdLine.remaining_for_passthrough());
@@ -89,7 +110,12 @@ int main(int argc, char* argv[])
         std::cerr << he.what() << std::endl;
         ret = -4;
     }
+#ifdef HELICS_ENABLE_WEBSERVER
+    if (webserver)
+    {
 
+    }
+#endif
     helics::cleanupHelicsLibrary();
     return ret;
 }

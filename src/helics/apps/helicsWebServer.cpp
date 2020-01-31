@@ -537,12 +537,21 @@ class listener: public std::enable_shared_from_this<listener> {
 
 //------------------------------------------------------------------------------
 
+const Json::Value null;
+
 namespace helics {
 namespace apps {
     void WebServer::startServer(const Json::Value* val)
     {
         std::cerr << "starting broker web server\n";
-        config_ = val;
+        if (val == nullptr)
+        {
+            config_ = &null;
+        }
+        else
+        {
+            config_ = val;
+        }
 
         std::lock_guard<std::mutex> tlock(threadGuard);
         mainLoopThread = std::thread([this]() { mainLoop(); });

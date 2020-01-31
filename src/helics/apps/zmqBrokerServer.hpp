@@ -43,8 +43,8 @@ namespace helics {
             };
 
             void mainLoop();
-            std::unique_ptr<zmq::socket_t> zmqBrokerServer::loadZMQsocket(zmq::context_t &ctx);
-            std::unique_ptr<zmq::socket_t> zmqBrokerServer::loadZMQSSsocket(zmq::context_t &ctx);
+            std::unique_ptr<zmq::socket_t> loadZMQsocket(zmq::context_t &ctx);
+            std::unique_ptr<zmq::socket_t> loadZMQSSsocket(zmq::context_t &ctx);
 
             zmqServerData generateZMQServerData();
             zmqServerData generateZMQSSServerData();
