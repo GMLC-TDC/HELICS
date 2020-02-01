@@ -140,7 +140,7 @@ void partitionTarget(
     if (target.back() == '/') {
         target.remove_suffix(1);
     }
-    if (!target.empty()&&target.front() == '/') {
+    if (!target.empty() && target.front() == '/') {
         target.remove_prefix(1);
     }
     auto slashLoc = target.find('/');
@@ -156,7 +156,7 @@ void partitionTarget(
         return;
     }
     targetObj = tstr.substr(0, slashLoc).to_string();
-    query = tstr.substr(slashLoc + 1).to_string();    
+    query = tstr.substr(slashLoc + 1).to_string();
 }
 
 std::string getBrokerList()
@@ -295,22 +295,19 @@ void handle_request(http::request<Body, http::basic_fields<Allocator>>&& req, Se
             targetObj = fields["target"];
         }
     }
-    if (brokerName.empty()||brokerName=="query") {
+    if (brokerName.empty() || brokerName == "query") {
         if (fields.find("broker") != fields.end()) {
             targetObj = fields["broker"];
         }
     }
-    if (brokerName == "query" && target == "brokers")
-    {
+    if (brokerName == "query" && target == "brokers") {
         brokerName == "brokers";
     }
-    if (brokerName == "brokers")
-    {
+    if (brokerName == "brokers") {
         return send(response_json(getBrokerList()));
     }
     std::shared_ptr<helics::Broker> brkr = helics::BrokerFactory::findBroker(brokerName);
-    if (!brkr)
-    {
+    if (!brkr) {
         auto brks = helics::BrokerFactory::getAllBrokers();
         for (auto& brk : brks) {
             if (brk->isConnected()) {
@@ -319,24 +316,18 @@ void handle_request(http::request<Body, http::basic_fields<Allocator>>&& req, Se
         }
         query = targetObj;
         targetObj = brokerName;
-    }
-    else if (query.empty() && !targetObj.empty())
-    {
+    } else if (query.empty() && !targetObj.empty()) {
         query = targetObj;
         targetObj = "root";
     }
-    if (targetObj.empty())
-    {
+    if (targetObj.empty()) {
         targetObj = "root";
     }
     if (brkr) {
         auto res = brkr->query(targetObj, query);
-        if (res.front() == '{')
-        {
+        if (res.front() == '{') {
             send(response_json(res));
-        }
-        else
-        {
+        } else {
             send(response_text(res));
         }
         return;
@@ -536,12 +527,9 @@ namespace apps {
     void WebServer::startServer(const Json::Value* val)
     {
         std::cerr << "starting broker web server\n";
-        if (val == nullptr)
-        {
+        if (val == nullptr) {
             config_ = &null;
-        }
-        else
-        {
+        } else {
             config_ = val;
         }
 

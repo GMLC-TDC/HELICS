@@ -33,15 +33,14 @@ namespace apps {
         std::string brkinit;
         bool newbrk{false};
         auto& strs = rx.getStringData();
-            if (!strs.empty()) {
-                brkname = strs[0];
-            }
-            if (strs.size() > 1) {
-                brkinit = strs[1] + " --external --localport=" + std::to_string(startPort);
-            }
-            else {
-                brkinit = "--external --localport=" + std::to_string(startPort);
-            }
+        if (!strs.empty()) {
+            brkname = strs[0];
+        }
+        if (strs.size() > 1) {
+            brkinit = strs[1] + " --external --localport=" + std::to_string(startPort);
+        } else {
+            brkinit = "--external --localport=" + std::to_string(startPort);
+        }
         std::shared_ptr<Broker> brk;
         if (brkname.empty()) {
             brk = BrokerFactory::findJoinableBrokerOfType(ctype);
@@ -61,8 +60,10 @@ namespace apps {
         return {brk, newbrk};
     }
 
-    ActionMessage 
-        TypedBrokerServer::generateMessageResponse(const ActionMessage& rxcmd, portData& pdata, core_type ctype)
+    ActionMessage TypedBrokerServer::generateMessageResponse(
+        const ActionMessage& rxcmd,
+        portData& pdata,
+        core_type ctype)
     {
         //   std::cout << "received data length " << msg.size () << std::endl;
         switch (rxcmd.action()) {
@@ -71,8 +72,7 @@ namespace apps {
             case CMD_PROTOCOL_BIG:
                 switch (rxcmd.messageID) {
                     case REQUEST_PORTS:
-                    case CONNECTION_INFORMATION:
-                    {
+                    case CONNECTION_INFORMATION: {
                         auto pt = getOpenPort(pdata);
                         if (pt > 0) {
                             auto nbrk = findBroker(rxcmd, ctype, pt);

@@ -39,7 +39,7 @@ namespace apps {
       private:
         void mainLoop();
         std::shared_ptr<tcp::TcpServer> loadTCPserver(asio::io_context& ioctx);
-        void loadUDPsocket(asio::io_context& ioctx);
+        std::shared_ptr<udp::UdpServer> loadUDPserver(asio::io_context& ioctx);
 
         void loadTCPServerData(portData& pdata);
         void loadUDPServerData(portData& pdata);
@@ -49,13 +49,17 @@ namespace apps {
             std::shared_ptr<tcp::TcpConnection> connection,
             const char* data,
             size_t bytes_received);
+        bool udpDataReceive(
+            std::shared_ptr<udp::UdpServer> server,
+            const char* data,
+            size_t bytes_received);
 
         std::thread mainLoopThread;
         std::mutex threadGuard;
 
         portData tcpPortData;
         std::shared_ptr<tcp::TcpServer> tcpserver;
-
+        std::shared_ptr<udp::UdpServer> udpserver;
         portData udpPortData;
         const Json::Value* config_{nullptr};
         const std::string name_;

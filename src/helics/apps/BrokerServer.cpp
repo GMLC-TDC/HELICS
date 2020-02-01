@@ -6,16 +6,16 @@ SPDX-License-Identifier: BSD-3-Clause
 */
 
 #include "BrokerServer.hpp"
+
 #include "../common/JsonProcessingFunctions.hpp"
 #include "../core/ActionMessage.hpp"
 #include "../core/BrokerFactory.hpp"
 #include "../core/helicsCLI11.hpp"
-#include "gmlc/utilities/stringOps.h"
-
-#include "zmqBrokerServer.hpp"
 #include "AsioBrokerServer.hpp"
+#include "gmlc/utilities/stringOps.h"
+#include "zmqBrokerServer.hpp"
 #ifdef HELICS_ENABLE_WEBSERVER
-#include "helicsWebServer.hpp"
+#    include "helicsWebServer.hpp"
 #endif
 
 namespace helics {
@@ -53,44 +53,35 @@ namespace apps {
         } else {
             config_ = std::make_unique<Json::Value>();
         }
-        if (zmq_server || zmq_ss_server)
-        {
+        if (zmq_server || zmq_ss_server) {
             auto zmqs = std::make_unique<zmqBrokerServer>(server_name_);
-            if (zmq_server)
-            {
+            if (zmq_server) {
                 zmqs->enableZmqServer(true);
             }
-            if (zmq_ss_server)
-            {
+            if (zmq_ss_server) {
                 zmqs->enableZmqSsServer(true);
             }
             servers.push_back(std::move(zmqs));
         }
-        if (tcp_server || udp_server)
-        {
+        if (tcp_server || udp_server) {
             auto asios = std::make_unique<AsioBrokerServer>(server_name_);
-            if (tcp_server)
-            {
+            if (tcp_server) {
                 asios->enableTcpServer(true);
             }
-            if (udp_server)
-            {
+            if (udp_server) {
                 asios->enableUdpServer(true);
             }
             servers.push_back(std::move(asios));
         }
 
-        if (http_server || websocket_server)
-        {
+        if (http_server || websocket_server) {
 #ifdef HELICS_ENABLE_WEBSERVER
             auto webs = std::make_unique<WebServer>(server_name_);
-            if (http_server)
-            {
+            if (http_server) {
                 webs->enableHttpServer(true);
             }
-            if (websocket_server)
-            {
-               webs->enableWebSocketServer(true);
+            if (websocket_server) {
+                webs->enableWebSocketServer(true);
             }
             servers.push_back(std::move(webs));
 #endif
@@ -122,7 +113,7 @@ namespace apps {
             server->stopServer();
         }
         servers.clear();
-    }  
+    }
 
     std::unique_ptr<helicsCLI11App> BrokerServer::generateArgProcessing()
     {
@@ -138,8 +129,10 @@ namespace apps {
         app->add_flag("--tcp,-t", tcp_server, "start a broker-server for the tcp comms in helics");
         app->add_flag("--udp,-u", udp_server, "start a broker-server for the udp comms in helics");
         app->add_flag("--mpi", mpi_server, "start a broker-server for the mpi comms in helics");
-        app->add_flag("--http", http_server, "start a webserver to respond to http rest api requests");
-        app->add_flag("--websocket", websocket_server, "start a websocket to respond to api requests");
+        app->add_flag(
+            "--http", http_server, "start a webserver to respond to http rest api requests");
+        app->add_flag(
+            "--websocket", websocket_server, "start a websocket to respond to api requests");
         app->add_option(
             "config,--config,--server-config",
             configFile_,

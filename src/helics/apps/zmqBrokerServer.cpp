@@ -58,7 +58,7 @@ namespace apps {
 #endif
     }
 
-    std::unique_ptr<zmq::socket_t> zmqBrokerServer::loadZMQsocket(zmq::context_t &ctx)
+    std::unique_ptr<zmq::socket_t> zmqBrokerServer::loadZMQsocket(zmq::context_t& ctx)
     {
         std::string ext_interface = "tcp://*";
         int zmqport = DEFAULT_ZMQ_BROKER_PORT_NUMBER + 1;
@@ -68,7 +68,7 @@ namespace apps {
             replaceIfMember(V, "interface", ext_interface);
             replaceIfMember(V, "port", zmqport);
         }
-        auto repSocket=std::make_unique<zmq::socket_t>(ctx, ZMQ_REP);
+        auto repSocket = std::make_unique<zmq::socket_t>(ctx, ZMQ_REP);
         repSocket->setsockopt(ZMQ_LINGER, 500);
         auto bindsuccess = hzmq::bindzmqSocket(*repSocket, ext_interface, zmqport, timeout);
         if (!bindsuccess) {
@@ -79,7 +79,7 @@ namespace apps {
         return repSocket;
     }
 
-    std::unique_ptr<zmq::socket_t> zmqBrokerServer::loadZMQSSsocket(zmq::context_t &ctx)
+    std::unique_ptr<zmq::socket_t> zmqBrokerServer::loadZMQSSsocket(zmq::context_t& ctx)
     {
         std::string ext_interface = "tcp://*";
         int zmqport = DEFAULT_ZMQSS_BROKER_PORT_NUMBER;
@@ -118,7 +118,10 @@ namespace apps {
         return pdata;
     }
 
-    std::string zmqBrokerServer::generateResponseToMessage(zmq::message_t& msg, portData& pdata,core_type ctype)
+    std::string zmqBrokerServer::generateResponseToMessage(
+        zmq::message_t& msg,
+        portData& pdata,
+        core_type ctype)
     {
         auto sz = msg.size();
         if (sz < 25) {
@@ -129,8 +132,8 @@ namespace apps {
             }
         } else {
             ActionMessage rxcmd(static_cast<char*>(msg.data()), msg.size());
-            auto rep= generateMessageResponse(rxcmd, pdata,ctype);
-            if (rep.action()!=CMD_IGNORE) {
+            auto rep = generateMessageResponse(rxcmd, pdata, ctype);
+            if (rep.action() != CMD_IGNORE) {
                 return rep.to_string();
             }
         }
@@ -152,7 +155,7 @@ namespace apps {
             handleMessage.push_back([this](zmq::socket_t* skt, portData& pdata) {
                 zmq::message_t msg;
                 skt->recv(msg);
-                std::string response = generateResponseToMessage(msg, pdata,core_type::ZMQ);
+                std::string response = generateResponseToMessage(msg, pdata, core_type::ZMQ);
                 skt->send(response);
             });
         }
@@ -165,11 +168,11 @@ namespace apps {
                 zmq::message_t msg2;
                 skt->recv(msg1); //should be null
                 skt->recv(msg2);
-                std::string response = generateResponseToMessage(msg2, pdata,core_type::ZMQ_SS);
+                std::string response = generateResponseToMessage(msg2, pdata, core_type::ZMQ_SS);
                 skt->send(msg1, zmq::send_flags::sndmore);
                 skt->send(std::string{}, zmq::send_flags::sndmore);
                 skt->send(response, zmq::send_flags::dontwait);
-                });
+            });
         }
 
         std::vector<zmq::pollitem_t> poller;
@@ -181,12 +184,10 @@ namespace apps {
 
         int rc = 0;
         while (rc >= 0) {
-            try
-            {
+            try {
                 rc = zmq::poll(poller, std::chrono::milliseconds(5000));
             }
-            catch (const zmq::error_t &e)
-            {
+            catch (const zmq::error_t& e) {
                 std::cout << e.what() << std::endl;
                 return;
             }
@@ -202,13 +203,12 @@ namespace apps {
                     }
                 }
             }
-              if (exitAll.load()) {
-                 break;
+            if (exitAll.load()) {
+                break;
             }
         }
 
-        for (auto &skt : sockets)
-        {
+        for (auto& skt : sockets) {
             skt->close();
         }
         sockets.clear();
