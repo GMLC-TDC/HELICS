@@ -28,6 +28,12 @@ namespace udp {
                 asio::ip::udp::endpoint(asio::ip::address::from_string(interface), static_cast<uint16_t>(portNum)));
         }
 
+        ~UdpServer()
+        {
+            stop_receive();
+            socket_.close();
+        }
+
         void start_receive()
         {
             socket_.async_receive_from(
@@ -36,6 +42,10 @@ namespace udp {
                 [this](const asio::error_code& error, std::size_t bytes) {
                     handle_receive(error, bytes);
                 });
+        }
+        void stop_receive()
+        {
+            socket_.cancel();
         }
         /** set the callback for the data object*/
         void setDataCall(
@@ -195,6 +205,9 @@ namespace apps {
         if (tcp_enabled_) {
             tcpserver->close();
         }
+        if (udp_enabled_) {
+            udpserver->stop_receive();
+        }
         mainLoopThread.join();
         std::cout << "exiting asio broker server" << std::endl;
     }
@@ -220,7 +233,7 @@ namespace apps {
                 });
 
             loadUDPServerData(udpPortData);
-            tcpserver->start();
+            udpserver->start_receive();
         }
     }
 } // namespace apps

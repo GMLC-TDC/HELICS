@@ -202,8 +202,12 @@ namespace udp {
                     if (error) {
                         logError(
                             fmt::format("error in initial send to broker {}", error.message()));
-                        PortNumber = -1;
-                        promisePort.set_value(-1);
+                        if (PortNumber.load() <= 0)
+                        {
+                            PortNumber = -1;
+                            promisePort.set_value(-1);
+                        }
+                        
                         setTxStatus(connection_status::error);
                         return;
                     }
@@ -223,15 +227,29 @@ namespace udp {
                         ++retries;
                         if (retries > maxRetries) {
                             logError("the max number of retries has been exceeded");
-                            PortNumber = -1;
-                            promisePort.set_value(-1);
+                            if (PortNumber.load() <= 0)
+                            {
+                                PortNumber = -1;
+                                promisePort.set_value(-1);
+                            }
                             setTxStatus(connection_status::error);
                             return;
                         } else {
                             continue;
                         }
                     }
-                    auto len = transmitSocket.receive_from(asio::buffer(rx), brk);
+                    auto len = transmitSocket.receive_from(asio::buffer(rx), brk, 0, error);
+                    if (error) {
+                        logError(
+                            fmt::format("error in initial receive broker {}", error.message()));
+                        if (PortNumber.load() <= 0)
+                        {
+                            PortNumber = -1;
+                            promisePort.set_value(-1);
+                        }
+                        setTxStatus(connection_status::error);
+                        return;
+                    }
                     m = ActionMessage(rx.data(), len);
                     if (isProtocolCommand(m)) {
                         if (m.messageID == PORT_DEFINITIONS) {
@@ -260,8 +278,11 @@ namespace udp {
                         } else if (m.messageID == DELAY) {
                             std::this_thread::sleep_for(std::chrono::seconds(2));
                         } else if (m.messageID == DISCONNECT) {
-                            PortNumber = -1;
-                            promisePort.set_value(-1);
+                            if (PortNumber <= 0)
+                            {
+                                PortNumber = -1;
+                                promisePort.set_value(-1);
+                            }
                             setTxStatus(connection_status::terminated);
                             return;
                         }
