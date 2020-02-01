@@ -16,9 +16,16 @@ SPDX-License-Identifier: BSD-3-Clause
 
 using namespace helics;
 
-TEST(broker_server_tests, startup_tests_zmq)
+
+class BrokerServerTests :
+    public ::testing::TestWithParam<std::pair<const char *, core_type>>
+     {
+};
+
+
+TEST_P(BrokerServerTests, startup_tests)
 {
-    apps::BrokerServer brks(std::vector<std::string>{"--zmq"});
+    apps::BrokerServer brks(std::vector<std::string>{GetParam().first});
     bool active = brks.hasActiveBrokers();
     if (active) {
         std::this_thread::sleep_for(std::chrono::milliseconds(300));
@@ -27,12 +34,12 @@ TEST(broker_server_tests, startup_tests_zmq)
     EXPECT_TRUE(!active);
     brks.startServers();
 
-    auto cr = helics::CoreFactory::create(helics::core_type::ZMQ, "--brokername=fred");
+    auto cr = helics::CoreFactory::create(GetParam().second, "--brokername=fred");
     EXPECT_TRUE(cr->isConfigured());
     cr->connect();
     EXPECT_TRUE(cr->isConnected());
 
-    auto cr2 = helics::CoreFactory::create(helics::core_type::ZMQ, "--brokername=fred2");
+    auto cr2 = helics::CoreFactory::create(GetParam().second, "--brokername=fred2");
     EXPECT_TRUE(cr2->isConfigured());
     cr2->connect();
     EXPECT_TRUE(cr2->isConnected());
@@ -56,12 +63,12 @@ TEST(broker_server_tests, startup_tests_zmq)
     cleanupHelicsLibrary();
 }
 
-TEST(broker_server_tests, execution_tests_zmq)
+TEST_P(BrokerServerTests, execution_tests)
 {
-    apps::BrokerServer brks(std::vector<std::string>{"--zmq"});
+    apps::BrokerServer brks(std::vector<std::string>{GetParam().first});
     brks.startServers();
 
-    FederateInfo fi(core_type::ZMQ);
+    FederateInfo fi(GetParam().second);
     fi.coreName = "c1";
     fi.brokerInitString = "-f 2";
     auto fed1 = ValueFederate("fed1", fi);
@@ -81,12 +88,12 @@ TEST(broker_server_tests, execution_tests_zmq)
     cleanupHelicsLibrary();
 }
 
-TEST(broker_server_tests, execution_tests_duplicate_zmq)
+TEST_P(BrokerServerTests, execution_tests_duplicate)
 {
-    apps::BrokerServer brks(std::vector<std::string>{"--zmq"});
+    apps::BrokerServer brks(std::vector<std::string>{GetParam().first});
     brks.startServers();
 
-    FederateInfo fi(core_type::ZMQ);
+    FederateInfo fi(GetParam().second);
     fi.coreName = "c1b";
 
     auto fed1 = ValueFederate("fed1", fi);
@@ -101,7 +108,7 @@ TEST(broker_server_tests, execution_tests_duplicate_zmq)
     fed1.enterExecutingModeComplete();
 
     fi.coreName = "c3b";
-    // this would test two ZMQ co-sim executing simultaneously
+    // this would test two co-sims executing simultaneously
     auto fed3 = ValueFederate("fed3", fi);
     auto& pub3 = fed3.registerGlobalPublication("key1", "double");
     fi.coreName = "c4b";
@@ -134,360 +141,6 @@ TEST(broker_server_tests, execution_tests_duplicate_zmq)
     cleanupHelicsLibrary();
 }
 
+const std::vector<std::pair<const char *, core_type>> tvals{ {"--zmq",core_type::ZMQ},{"--zmqss",core_type::ZMQ_SS},{"--tcp",core_type::TCP},{"--udp",core_type::UDP} };
 
-TEST(broker_server_tests, startup_tests_zmqss)
-{
-    apps::BrokerServer brks(std::vector<std::string>{"--zmqss"});
-    bool active = brks.hasActiveBrokers();
-    if (active) {
-        std::this_thread::sleep_for(std::chrono::milliseconds(300));
-        active = brks.hasActiveBrokers();
-    }
-    EXPECT_TRUE(!active);
-    brks.startServers();
-
-    auto cr = helics::CoreFactory::create(helics::core_type::ZMQ_SS, "--brokername=fredss");
-    EXPECT_TRUE(cr->isConfigured());
-    cr->connect();
-    EXPECT_TRUE(cr->isConnected());
-
-    auto cr2 = helics::CoreFactory::create(helics::core_type::ZMQ_SS, "--brokername=fred2ss");
-    EXPECT_TRUE(cr2->isConfigured());
-    cr2->connect();
-    EXPECT_TRUE(cr2->isConnected());
-
-    auto objs = helics::BrokerFactory::getAllBrokers();
-    EXPECT_EQ(objs.size(), 2u);
-
-    brks.forceTerminate();
-    cr->disconnect();
-    cr2->disconnect();
-    auto crdisconnect = cr->waitForDisconnect(std::chrono::milliseconds(1000));
-    auto cr2disconnect = cr2->waitForDisconnect(std::chrono::milliseconds(1000));
-    if (!crdisconnect) {
-        crdisconnect = cr->waitForDisconnect(std::chrono::milliseconds(1000));
-    }
-    if (!cr2) {
-        cr2disconnect = cr2->waitForDisconnect(std::chrono::milliseconds(1000));
-    }
-    EXPECT_TRUE(crdisconnect);
-    EXPECT_TRUE(cr2disconnect);
-    cleanupHelicsLibrary();
-}
-
-TEST(broker_server_tests, execution_tests_zmqss)
-{
-    apps::BrokerServer brks(std::vector<std::string>{"--zmqss"});
-    brks.startServers();
-
-    FederateInfo fi(core_type::ZMQ_SS);
-    fi.coreName = "c1";
-    fi.brokerInitString = "-f 2";
-    auto fed1 = ValueFederate("fed1", fi);
-    fed1.registerGlobalPublication("key1", "double");
-    fi.coreName = "c2";
-    std::this_thread::sleep_for(std::chrono::milliseconds(200));
-    auto fed2 = ValueFederate("fed2", fi);
-    auto& sub = fed2.registerSubscription("key1");
-    sub.setOption(helics_handle_option_connection_required);
-    fed1.enterExecutingModeAsync();
-    EXPECT_NO_THROW(fed2.enterExecutingMode());
-    fed1.enterExecutingModeComplete();
-
-    fed1.finalize();
-    fed2.finalize();
-    brks.forceTerminate();
-    cleanupHelicsLibrary();
-}
-
-TEST(broker_server_tests, execution_tests_duplicate_zmqss)
-{
-    apps::BrokerServer brks(std::vector<std::string>{"--zmqss"});
-    brks.startServers();
-
-    FederateInfo fi(core_type::ZMQ_SS);
-    fi.coreName = "c1b";
-
-    auto fed1 = ValueFederate("fed1", fi);
-    auto& pub1 = fed1.registerGlobalPublication("key1", "double");
-    fi.coreName = "c2b";
-    std::this_thread::sleep_for(std::chrono::milliseconds(200));
-    auto fed2 = ValueFederate("fed2", fi);
-    auto& sub2 = fed2.registerSubscription("key1");
-    sub2.setOption(helics_handle_option_connection_required);
-    fed1.enterExecutingModeAsync();
-    EXPECT_NO_THROW(fed2.enterExecutingMode());
-    fed1.enterExecutingModeComplete();
-
-    fi.coreName = "c3b";
-    // this would test two ZMQ co-sim executing simultaneously
-    auto fed3 = ValueFederate("fed3", fi);
-    auto& pub3 = fed3.registerGlobalPublication("key1", "double");
-    fi.coreName = "c4b";
-    std::this_thread::sleep_for(std::chrono::milliseconds(200));
-    auto fed4 = ValueFederate("fed4", fi);
-    auto& sub4 = fed4.registerSubscription("key1");
-    sub4.setOption(helics_handle_option_connection_required);
-    fed3.enterExecutingModeAsync();
-    EXPECT_NO_THROW(fed4.enterExecutingMode());
-    fed3.enterExecutingModeComplete();
-
-    pub1.publish(27.5);
-    pub3.publish(30.6);
-
-    fed3.requestTimeAsync(1.0);
-    fed4.requestTime(1.0);
-    fed3.requestTimeComplete();
-
-    fed1.requestTimeAsync(1.0);
-    fed2.requestTime(1.0);
-    fed1.requestTimeComplete();
-
-    EXPECT_EQ(sub2.getValue<double>(), 27.5);
-    EXPECT_EQ(sub4.getValue<double>(), 30.6);
-    fed1.finalize();
-    fed2.finalize();
-    fed3.finalize();
-    fed4.finalize();
-    brks.forceTerminate();
-    cleanupHelicsLibrary();
-}
-
-
-
-TEST(broker_server_tests, startup_tests_tcp)
-{
-    apps::BrokerServer brks(std::vector<std::string>{"--tcp"});
-    bool active = brks.hasActiveBrokers();
-    if (active) {
-        std::this_thread::sleep_for(std::chrono::milliseconds(300));
-        active = brks.hasActiveBrokers();
-    }
-    EXPECT_TRUE(!active);
-    brks.startServers();
-
-    auto cr = helics::CoreFactory::create(helics::core_type::TCP, "--brokername=fredss");
-    EXPECT_TRUE(cr->isConfigured());
-    cr->connect();
-    EXPECT_TRUE(cr->isConnected());
-
-    auto cr2 = helics::CoreFactory::create(helics::core_type::TCP, "--brokername=fred2ss");
-    EXPECT_TRUE(cr2->isConfigured());
-    cr2->connect();
-    EXPECT_TRUE(cr2->isConnected());
-
-    auto objs = helics::BrokerFactory::getAllBrokers();
-    EXPECT_EQ(objs.size(), 2u);
-
-    brks.forceTerminate();
-    cr->disconnect();
-    cr2->disconnect();
-    auto crdisconnect = cr->waitForDisconnect(std::chrono::milliseconds(1000));
-    auto cr2disconnect = cr2->waitForDisconnect(std::chrono::milliseconds(1000));
-    if (!crdisconnect) {
-        crdisconnect = cr->waitForDisconnect(std::chrono::milliseconds(1000));
-    }
-    if (!cr2) {
-        cr2disconnect = cr2->waitForDisconnect(std::chrono::milliseconds(1000));
-    }
-    EXPECT_TRUE(crdisconnect);
-    EXPECT_TRUE(cr2disconnect);
-    cleanupHelicsLibrary();
-}
-
-TEST(broker_server_tests, execution_tests_tcp)
-{
-    apps::BrokerServer brks(std::vector<std::string>{"--tcp"});
-    brks.startServers();
-
-    FederateInfo fi(core_type::TCP);
-    fi.coreName = "c1";
-    fi.brokerInitString = "-f 2";
-    auto fed1 = ValueFederate("fed1", fi);
-    fed1.registerGlobalPublication("key1", "double");
-    fi.coreName = "c2";
-    std::this_thread::sleep_for(std::chrono::milliseconds(200));
-    auto fed2 = ValueFederate("fed2", fi);
-    auto& sub = fed2.registerSubscription("key1");
-    sub.setOption(helics_handle_option_connection_required);
-    fed1.enterExecutingModeAsync();
-    EXPECT_NO_THROW(fed2.enterExecutingMode());
-    fed1.enterExecutingModeComplete();
-
-    fed1.finalize();
-    fed2.finalize();
-    brks.forceTerminate();
-    cleanupHelicsLibrary();
-}
-
-TEST(broker_server_tests, execution_tests_duplicate_tcp)
-{
-    apps::BrokerServer brks(std::vector<std::string>{"--tcp"});
-    brks.startServers();
-
-    FederateInfo fi(core_type::TCP);
-    fi.coreName = "c1b";
-
-    auto fed1 = ValueFederate("fed1", fi);
-    auto& pub1 = fed1.registerGlobalPublication("key1", "double");
-    fi.coreName = "c2b";
-    std::this_thread::sleep_for(std::chrono::milliseconds(200));
-    auto fed2 = ValueFederate("fed2", fi);
-    auto& sub2 = fed2.registerSubscription("key1");
-    sub2.setOption(helics_handle_option_connection_required);
-    fed1.enterExecutingModeAsync();
-    EXPECT_NO_THROW(fed2.enterExecutingMode());
-    fed1.enterExecutingModeComplete();
-
-    fi.coreName = "c3b";
-    // this would test two ZMQ co-sim executing simultaneously
-    auto fed3 = ValueFederate("fed3", fi);
-    auto& pub3 = fed3.registerGlobalPublication("key1", "double");
-    fi.coreName = "c4b";
-    std::this_thread::sleep_for(std::chrono::milliseconds(200));
-    auto fed4 = ValueFederate("fed4", fi);
-    auto& sub4 = fed4.registerSubscription("key1");
-    sub4.setOption(helics_handle_option_connection_required);
-    fed3.enterExecutingModeAsync();
-    EXPECT_NO_THROW(fed4.enterExecutingMode());
-    fed3.enterExecutingModeComplete();
-
-    pub1.publish(27.5);
-    pub3.publish(30.6);
-
-    fed3.requestTimeAsync(1.0);
-    fed4.requestTime(1.0);
-    fed3.requestTimeComplete();
-
-    fed1.requestTimeAsync(1.0);
-    fed2.requestTime(1.0);
-    fed1.requestTimeComplete();
-
-    EXPECT_EQ(sub2.getValue<double>(), 27.5);
-    EXPECT_EQ(sub4.getValue<double>(), 30.6);
-    fed1.finalize();
-    fed2.finalize();
-    fed3.finalize();
-    fed4.finalize();
-    brks.forceTerminate();
-    cleanupHelicsLibrary();
-}
-
-
-TEST(broker_server_tests, startup_tests_udp)
-{
-    apps::BrokerServer brks(std::vector<std::string>{"--udp"});
-    bool active = brks.hasActiveBrokers();
-    if (active) {
-        std::this_thread::sleep_for(std::chrono::milliseconds(300));
-        active = brks.hasActiveBrokers();
-    }
-    EXPECT_TRUE(!active);
-    brks.startServers();
-
-    auto cr = helics::CoreFactory::create(helics::core_type::UDP, "--brokername=fredss");
-    EXPECT_TRUE(cr->isConfigured());
-    cr->connect();
-    EXPECT_TRUE(cr->isConnected());
-
-    auto cr2 = helics::CoreFactory::create(helics::core_type::UDP, "--brokername=fred2ss");
-    EXPECT_TRUE(cr2->isConfigured());
-    cr2->connect();
-    EXPECT_TRUE(cr2->isConnected());
-
-    auto objs = helics::BrokerFactory::getAllBrokers();
-    EXPECT_EQ(objs.size(), 2u);
-
-    brks.forceTerminate();
-    cr->disconnect();
-    cr2->disconnect();
-    auto crdisconnect = cr->waitForDisconnect(std::chrono::milliseconds(1000));
-    auto cr2disconnect = cr2->waitForDisconnect(std::chrono::milliseconds(1000));
-    if (!crdisconnect) {
-        crdisconnect = cr->waitForDisconnect(std::chrono::milliseconds(1000));
-    }
-    if (!cr2) {
-        cr2disconnect = cr2->waitForDisconnect(std::chrono::milliseconds(1000));
-    }
-    EXPECT_TRUE(crdisconnect);
-    EXPECT_TRUE(cr2disconnect);
-    cleanupHelicsLibrary();
-}
-
-TEST(broker_server_tests, execution_tests_udp)
-{
-    apps::BrokerServer brks(std::vector<std::string>{"--udp"});
-    brks.startServers();
-
-    FederateInfo fi(core_type::UDP);
-    fi.coreName = "c1";
-    fi.brokerInitString = "-f 2";
-    auto fed1 = ValueFederate("fed1", fi);
-    fed1.registerGlobalPublication("key1", "double");
-    fi.coreName = "c2";
-    std::this_thread::sleep_for(std::chrono::milliseconds(200));
-    auto fed2 = ValueFederate("fed2", fi);
-    auto& sub = fed2.registerSubscription("key1");
-    sub.setOption(helics_handle_option_connection_required);
-    fed1.enterExecutingModeAsync();
-    EXPECT_NO_THROW(fed2.enterExecutingMode());
-    fed1.enterExecutingModeComplete();
-
-    fed1.finalize();
-    fed2.finalize();
-    brks.forceTerminate();
-    cleanupHelicsLibrary();
-}
-
-TEST(broker_server_tests, execution_tests_duplicate_udp)
-{
-    apps::BrokerServer brks(std::vector<std::string>{"--udp"});
-    brks.startServers();
-
-    FederateInfo fi(core_type::UDP);
-    fi.coreName = "c1b";
-
-    auto fed1 = ValueFederate("fed1", fi);
-    auto& pub1 = fed1.registerGlobalPublication("key1", "double");
-    fi.coreName = "c2b";
-    std::this_thread::sleep_for(std::chrono::milliseconds(200));
-    auto fed2 = ValueFederate("fed2", fi);
-    auto& sub2 = fed2.registerSubscription("key1");
-    sub2.setOption(helics_handle_option_connection_required);
-    fed1.enterExecutingModeAsync();
-    EXPECT_NO_THROW(fed2.enterExecutingMode());
-    fed1.enterExecutingModeComplete();
-
-    fi.coreName = "c3b";
-    // this would test two ZMQ co-sim executing simultaneously
-    auto fed3 = ValueFederate("fed3", fi);
-    auto& pub3 = fed3.registerGlobalPublication("key1", "double");
-    fi.coreName = "c4b";
-    std::this_thread::sleep_for(std::chrono::milliseconds(200));
-    auto fed4 = ValueFederate("fed4", fi);
-    auto& sub4 = fed4.registerSubscription("key1");
-    sub4.setOption(helics_handle_option_connection_required);
-    fed3.enterExecutingModeAsync();
-    EXPECT_NO_THROW(fed4.enterExecutingMode());
-    fed3.enterExecutingModeComplete();
-
-    pub1.publish(27.5);
-    pub3.publish(30.6);
-
-    fed3.requestTimeAsync(1.0);
-    fed4.requestTime(1.0);
-    fed3.requestTimeComplete();
-
-    fed1.requestTimeAsync(1.0);
-    fed2.requestTime(1.0);
-    fed1.requestTimeComplete();
-
-    EXPECT_EQ(sub2.getValue<double>(), 27.5);
-    EXPECT_EQ(sub4.getValue<double>(), 30.6);
-    fed1.finalize();
-    fed2.finalize();
-    fed3.finalize();
-    fed4.finalize();
-    brks.forceTerminate();
-    cleanupHelicsLibrary();
-}
+INSTANTIATE_TEST_SUITE_P(broker_server_tests, BrokerServerTests, ::testing::ValuesIn(tvals));

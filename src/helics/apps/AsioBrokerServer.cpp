@@ -190,11 +190,19 @@ namespace apps {
         }
     }
 
+
+    static const Json::Value null;
+
     void AsioBrokerServer::startServer(const Json::Value* val)
     {
-        std::cout << "starting asio broker server\n";
-        config_ = val;
-
+        config_ = (val != nullptr) ?val: &null;
+       
+        if (tcp_enabled_) {
+            std::cout << "starting tcp broker server\n";
+        }
+        if (udp_enabled_) {
+            std::cout << "starting udp broker server\n";
+        }
         std::lock_guard<std::mutex> tlock(threadGuard);
         mainLoopThread = std::thread([this]() { mainLoop(); });
     }
@@ -203,13 +211,14 @@ namespace apps {
     {
         std::lock_guard<std::mutex> tlock(threadGuard);
         if (tcp_enabled_) {
+            std::cout << "stopping tcp broker server\n";
             tcpserver->close();
         }
         if (udp_enabled_) {
+            std::cout << "stopping udp broker server\n";
             udpserver->stop_receive();
         }
         mainLoopThread.join();
-        std::cout << "exiting asio broker server" << std::endl;
     }
 
     void AsioBrokerServer::mainLoop()

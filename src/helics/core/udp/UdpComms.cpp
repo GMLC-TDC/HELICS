@@ -211,7 +211,7 @@ namespace udp {
                         setTxStatus(connection_status::error);
                         return;
                     }
-                    const auto startTime{ std::chrono::steady_clock::now() };
+                    const decltype(std::chrono::steady_clock::now()) startTime{ std::chrono::steady_clock::now() };
                     bool timeout{ false };
                     std::this_thread::yield();
                     std::vector<char> rx(128);
