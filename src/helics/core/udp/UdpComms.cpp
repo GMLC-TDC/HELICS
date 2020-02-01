@@ -189,10 +189,14 @@ namespace udp {
                     udpnet(interfaceNetwork), brokerTargetAddress, std::to_string(brokerPort));
                 // Setup the control socket for comms with the receiver
                 broker_endpoint = *resolver.resolve(query);
-                int retries = 0;
-                while (PortNumber <= 0) {
+                int retries{0};
+                bool connectionEstablished{false};
+                if (PortNumber.load() > 0 && NetworkCommsInterface::noAckConnection) {
+                    connectionEstablished = true;
+                }
+                while (!connectionEstablished) {
                     ActionMessage m(CMD_PROTOCOL_PRIORITY);
-                    m.messageID = REQUEST_PORTS;
+                    m.messageID = (PortNumber <= 0) ? REQUEST_PORTS : CONNECTION_REQUEST;
                     m.setStringData(brokerName, brokerInitString);
                     transmitSocket.send_to(asio::buffer(m.to_string()), broker_endpoint, 0, error);
                     if (error) {
@@ -233,6 +237,28 @@ namespace udp {
                         if (m.messageID == PORT_DEFINITIONS) {
                             loadPortDefinitions(m);
                             promisePort.set_value(PortNumber);
+                            connectionEstablished = true;
+                        } else if (m.messageID == CONNECTION_ACK) {
+                            if (PortNumber.load() > 0) {
+                                connectionEstablished = true;
+                                continue;
+                            }
+                        } else if (m.messageID == NEW_BROKER_INFORMATION) {
+                            logMessage("got new broker information");
+                            auto brkprt = extractInterfaceandPort(m.getString(0));
+                            brokerPort = brkprt.second;
+                            if (brkprt.first != "?") {
+                                brokerTargetAddress = brkprt.first;
+                            }
+                            udp::resolver::query query(
+                                udpnet(interfaceNetwork),
+                                brokerTargetAddress,
+                                std::to_string(brokerPort));
+                            // Setup the control socket for comms with the receiver
+                            broker_endpoint = *resolver.resolve(query);
+                            continue;
+                        } else if (m.messageID == DELAY) {
+                            std::this_thread::sleep_for(std::chrono::seconds(2));
                         } else if (m.messageID == DISCONNECT) {
                             PortNumber = -1;
                             promisePort.set_value(-1);
