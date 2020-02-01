@@ -11,14 +11,61 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "../core/networkDefaults.hpp"
 #include "../core/NetworkBrokerData.hpp"
 
-#ifdef ENABLE_TCP_CORE
-#    include "../core/tcp/TcpHelperClasses.h"
-#endif
+#include "../core/tcp/TcpHelperClasses.h"
 
 #include "../common/AsioContextManager.h"
+#include <asio/ip/udp.hpp>
+
+#include <array>
 
 namespace helics
 {
+    namespace udp
+    {
+        class UdpServer: public std::enable_shared_from_this<UdpServer>
+        {
+        public:
+            UdpServer(asio::io_context& io_context,int portNum)
+                : socket_(io_context, asio::ip::udp::endpoint(asio::ip::udp::v4(), portNum))
+            {
+                
+            }
+
+        
+            void start_receive()
+            {
+                socket_.async_receive_from(
+                    asio::buffer(recv_buffer_), remote_endpoint_, [this](const asio::error_code& error, std::size_t bytes) {handle_receive(error, bytes); });
+            }
+        private:
+            void handle_receive(const asio::error_code& error,
+                std::size_t bytes_transferred)
+            {
+                if (!error)
+                {
+                    ActionMessage m(recv_buffer_.data(), static_cast<int>(bytes_transferred));
+                    if (isProtocolCommand(m)) {
+                        // if the reply is not ignored respond with it otherwise
+                        // forward the original message on to the receiver to handle
+                       // auto rep = generateMessageResponse(m, tcpPortData, core_type::UDP);
+                      //  if (rep.action() != CMD_IGNORE) {
+                      //      try {
+                      //          socket_.send_to(asio::buffer(rep.to_string()), remote_endpoint_);
+                       //     }
+                       //     catch (const std::system_error&) {
+                       //     }
+                      //  }
+
+                    }
+                    start_receive();
+                }
+            }
+
+            asio::ip::udp::socket socket_;
+            asio::ip::udp::endpoint remote_endpoint_;
+            std::array<char, 1024> recv_buffer_;
+        };
+    }
     namespace apps
     {
 

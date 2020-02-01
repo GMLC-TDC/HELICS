@@ -207,8 +207,8 @@ namespace udp {
                         setTxStatus(connection_status::error);
                         return;
                     }
-                    auto startTime = std::chrono::steady_clock::now();
-                    bool timeout = false;
+                    const auto startTime{ std::chrono::steady_clock::now() };
+                    bool timeout{ false };
                     std::this_thread::yield();
                     std::vector<char> rx(128);
                     udp::endpoint brk;
@@ -250,7 +250,7 @@ namespace udp {
                             if (brkprt.first != "?") {
                                 brokerTargetAddress = brkprt.first;
                             }
-                            udp::resolver::query query(
+                            query=udp::resolver::query (
                                 udpnet(interfaceNetwork),
                                 brokerTargetAddress,
                                 std::to_string(brokerPort));

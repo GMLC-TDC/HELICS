@@ -7,60 +7,60 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #pragma once
 
-
 #include "TypedBrokerServer.hpp"
-#include <thread>
-#include <mutex>
 #include "helics/common/AsioContextManager.h"
 
+#include <mutex>
+#include <thread>
+
 namespace helics {
-    namespace tcp
-    {
-        class TcpServer;
-        class TcpConnection;
-    }
-    
-    class Broker;
-    namespace apps {
-
-        /** a virtual class to use as a base for broker servers of various types*/
-        class AsioBrokerServer :public TypedBrokerServer
-        {
-        public:
-            AsioBrokerServer() = default;
-            AsioBrokerServer(std::string server_name) :name_(std::move(server_name)) {}
-            /** start the server*/
-            virtual void startServer(const Json::Value *val) override;
-            /** stop the server*/
-            virtual void stopServer() override;
-            void enableTcpServer(bool enabled) { tcp_enabled_ = enabled; }
-            void enableUdpServer(bool enabled) { udp_enabled_ = enabled; };
-        private:
-
-            void mainLoop();
-            std::shared_ptr<tcp::TcpServer> loadTCPserver(asio::io_context &ioctx);
-            void loadUDPsocket(asio::io_context &ioctx);
-
-            void loadTCPServerData(portData &pdata);
-            void loadUDPServerData(portData &pdata);
-
-            //std::string generateResponseToMessage(zmq::message_t &msg, portData &pdata, core_type ctype);
-            std::size_t  tcpDataReceive(
-                std::shared_ptr<tcp::TcpConnection> connection,
-                const char* data,
-                size_t bytes_received);
-
-            std::thread mainLoopThread;
-            std::mutex threadGuard;
-
-            portData tcpPortData;
-            std::shared_ptr<tcp::TcpServer> tcpserver;
-
-            portData udpPortData;
-            const Json::Value *config_{ nullptr };
-            const std::string name_;
-            bool tcp_enabled_{ false };
-            bool udp_enabled_{ false };
-        };
-    }
+namespace tcp {
+    class TcpServer;
+    class TcpConnection;
+} // namespace tcp
+namespace udp {
+    class UdpServer;
 }
+class Broker;
+namespace apps {
+
+    /** a virtual class to use as a base for broker servers of various types*/
+    class AsioBrokerServer: public TypedBrokerServer {
+      public:
+        AsioBrokerServer() = default;
+        AsioBrokerServer(std::string server_name): name_(std::move(server_name)) {}
+        /** start the server*/
+        virtual void startServer(const Json::Value* val) override;
+        /** stop the server*/
+        virtual void stopServer() override;
+        void enableTcpServer(bool enabled) { tcp_enabled_ = enabled; }
+        void enableUdpServer(bool enabled) { udp_enabled_ = enabled; };
+
+      private:
+        void mainLoop();
+        std::shared_ptr<tcp::TcpServer> loadTCPserver(asio::io_context& ioctx);
+        void loadUDPsocket(asio::io_context& ioctx);
+
+        void loadTCPServerData(portData& pdata);
+        void loadUDPServerData(portData& pdata);
+
+        //std::string generateResponseToMessage(zmq::message_t &msg, portData &pdata, core_type ctype);
+        std::size_t tcpDataReceive(
+            std::shared_ptr<tcp::TcpConnection> connection,
+            const char* data,
+            size_t bytes_received);
+
+        std::thread mainLoopThread;
+        std::mutex threadGuard;
+
+        portData tcpPortData;
+        std::shared_ptr<tcp::TcpServer> tcpserver;
+
+        portData udpPortData;
+        const Json::Value* config_{nullptr};
+        const std::string name_;
+        bool tcp_enabled_{false};
+        bool udp_enabled_{false};
+    };
+} // namespace apps
+} // namespace helics
