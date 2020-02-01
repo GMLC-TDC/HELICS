@@ -16,12 +16,8 @@ SPDX-License-Identifier: BSD-3-Clause
 
 using namespace helics;
 
-
-class BrokerServerTests :
-    public ::testing::TestWithParam<std::pair<const char *, core_type>>
-     {
+class BrokerServerTests: public ::testing::TestWithParam<std::pair<const char*, core_type>> {
 };
-
 
 TEST_P(BrokerServerTests, startup_tests)
 {
@@ -141,6 +137,9 @@ TEST_P(BrokerServerTests, execution_tests_duplicate)
     cleanupHelicsLibrary();
 }
 
-const std::vector<std::pair<const char *, core_type>> tvals{ {"--zmq",core_type::ZMQ},{"--zmqss",core_type::ZMQ_SS},{"--tcp",core_type::TCP},{"--udp",core_type::UDP} };
+const std::vector<std::pair<const char*, core_type>> tvals{{"--zmq", core_type::ZMQ},
+                                                           {"--zmqss", core_type::ZMQ_SS},
+                                                           {"--tcp", core_type::TCP},
+                                                           {"--udp", core_type::UDP}};
 
 INSTANTIATE_TEST_SUITE_P(broker_server_tests, BrokerServerTests, ::testing::ValuesIn(tvals));

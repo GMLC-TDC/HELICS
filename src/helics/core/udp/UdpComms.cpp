@@ -202,17 +202,17 @@ namespace udp {
                     if (error) {
                         logError(
                             fmt::format("error in initial send to broker {}", error.message()));
-                        if (PortNumber.load() <= 0)
-                        {
+                        if (PortNumber.load() <= 0) {
                             PortNumber = -1;
                             promisePort.set_value(-1);
                         }
-                        
+
                         setTxStatus(connection_status::error);
                         return;
                     }
-                    const decltype(std::chrono::steady_clock::now()) startTime{ std::chrono::steady_clock::now() };
-                    bool timeout{ false };
+                    const decltype(std::chrono::steady_clock::now()) startTime{
+                        std::chrono::steady_clock::now()};
+                    bool timeout{false};
                     std::this_thread::yield();
                     std::vector<char> rx(128);
                     udp::endpoint brk;
@@ -227,8 +227,7 @@ namespace udp {
                         ++retries;
                         if (retries > maxRetries) {
                             logError("the max number of retries has been exceeded");
-                            if (PortNumber.load() <= 0)
-                            {
+                            if (PortNumber.load() <= 0) {
                                 PortNumber = -1;
                                 promisePort.set_value(-1);
                             }
@@ -242,8 +241,7 @@ namespace udp {
                     if (error) {
                         logError(
                             fmt::format("error in initial receive broker {}", error.message()));
-                        if (PortNumber.load() <= 0)
-                        {
+                        if (PortNumber.load() <= 0) {
                             PortNumber = -1;
                             promisePort.set_value(-1);
                         }
@@ -268,7 +266,7 @@ namespace udp {
                             if (brkprt.first != "?") {
                                 brokerTargetAddress = brkprt.first;
                             }
-                            query=udp::resolver::query (
+                            query = udp::resolver::query(
                                 udpnet(interfaceNetwork),
                                 brokerTargetAddress,
                                 std::to_string(brokerPort));
@@ -278,8 +276,7 @@ namespace udp {
                         } else if (m.messageID == DELAY) {
                             std::this_thread::sleep_for(std::chrono::seconds(2));
                         } else if (m.messageID == DISCONNECT) {
-                            if (PortNumber <= 0)
-                            {
+                            if (PortNumber <= 0) {
                                 PortNumber = -1;
                                 promisePort.set_value(-1);
                             }

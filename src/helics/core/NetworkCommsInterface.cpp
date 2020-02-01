@@ -204,8 +204,7 @@ ActionMessage NetworkCommsInterface::generateReplyToIncomingMessage(ActionMessag
                 ActionMessage connAck(CMD_PROTOCOL);
                 connAck.messageID = CONNECTION_ACK;
                 return connAck;
-            }
-            break;
+            } break;
             default:
                 break;
         }
@@ -221,17 +220,13 @@ std::string NetworkCommsInterface::getAddress() const
     }
     std::string address;
     if ((localTargetAddress == "tcp://*") || (localTargetAddress == "tcp://0.0.0.0")) {
-        address=makePortAddress("tcp://127.0.0.1", PortNumber);
+        address = makePortAddress("tcp://127.0.0.1", PortNumber);
+    } else if ((localTargetAddress == "*") || (localTargetAddress == "0.0.0.0")) {
+        address = makePortAddress("127.0.0.1", PortNumber);
+    } else {
+        address = makePortAddress(localTargetAddress, PortNumber);
     }
-    else if ((localTargetAddress == "*") || (localTargetAddress == "0.0.0.0")) {
-        address=makePortAddress("127.0.0.1", PortNumber);
-    }
-    else
-    {
-        address= makePortAddress(localTargetAddress, PortNumber);
-    }
-    if (appendNameToAddress)
-    {
+    if (appendNameToAddress) {
         address.push_back('/');
         address.append(name);
     }

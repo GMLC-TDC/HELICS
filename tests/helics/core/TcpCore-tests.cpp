@@ -79,7 +79,7 @@ TEST(TcpCore, tcpComms_broker_test_transmit)
     server->setDataCall(
         [&data,
          &counter,
-         &len](helics::tcp::TcpConnection::pointer , const char* data_rec, size_t data_Size) {
+         &len](helics::tcp::TcpConnection::pointer, const char* data_rec, size_t data_Size) {
             std::copy(data_rec, data_rec + data_Size, data.begin());
             len = data_Size;
             ++counter;
