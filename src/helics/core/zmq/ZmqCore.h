@@ -30,6 +30,7 @@ namespace zeromq {
         ZmqCoreSS() noexcept;
         /** construct from with a core name*/
         ZmqCoreSS(const std::string& core_name);
+
       private:
         virtual bool brokerConnect() override;
     };

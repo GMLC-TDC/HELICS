@@ -56,13 +56,11 @@ namespace zeromq {
     return code for required action 0=NONE, -1 TERMINATE*/
         int replyToIncomingMessage(zmq::message_t& msg, zmq::socket_t& sock);
 
-        int initializeConnectionToBroker(
-            zmq::socket_t& brokerConnection);
+        int initializeConnectionToBroker(zmq::socket_t& brokerConnection);
 
         int initializeBrokerConnections(
             zmq::socket_t& brokerSocket,
             zmq::socket_t& brokerConnection);
-
     };
 
 } // namespace zeromq

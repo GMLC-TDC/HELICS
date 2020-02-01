@@ -26,12 +26,10 @@ namespace apps {
     {
         config_ = (val != nullptr) ? val : &null;
 #ifdef ENABLE_ZMQ_CORE
-        if (zmq_enabled_)
-        {
+        if (zmq_enabled_) {
             std::cout << "starting zmq broker server\n";
         }
-        if (zmqss_enabled_)
-        {
+        if (zmqss_enabled_) {
             std::cout << "starting zmq ss broker server\n";
         }
         std::lock_guard<std::mutex> tlock(threadGuard);
@@ -43,32 +41,29 @@ namespace apps {
     {
         exitAll.store(true);
 #ifdef ENABLE_ZMQ_CORE
-        if (!zmq_enabled_ && !zmqss_enabled_)
-        {
+        if (!zmq_enabled_ && !zmqss_enabled_) {
             return;
         }
         auto ctx = ZmqContextManager::getContextPointer();
         zmq::socket_t reqSocket(ctx->getContext(), ZMQ_REQ);
         reqSocket.setsockopt(ZMQ_LINGER, 300);
         std::string ext_interface = "tcp://127.0.0.1";
-        int port = (zmq_enabled_) ? DEFAULT_ZMQ_BROKER_PORT_NUMBER + 1 : DEFAULT_ZMQSS_BROKER_PORT_NUMBER;
-        if (zmq_enabled_)
-        {
+        int port =
+            (zmq_enabled_) ? DEFAULT_ZMQ_BROKER_PORT_NUMBER + 1 : DEFAULT_ZMQSS_BROKER_PORT_NUMBER;
+        if (zmq_enabled_) {
             if (config_->isMember("zmq")) {
                 auto V = (*config_)["zmq"];
                 replaceIfMember(V, "interface", ext_interface);
                 replaceIfMember(V, "port", port);
             }
-        }
-        else
-        {
+        } else {
             if (config_->isMember("zmqss")) {
                 auto V = (*config_)["zmqss"];
                 replaceIfMember(V, "interface", ext_interface);
                 replaceIfMember(V, "port", port);
             }
         }
-       
+
         try {
             reqSocket.connect(helics::makePortAddress(ext_interface, port));
             reqSocket.send(std::string("close_server:") + name_);
@@ -78,12 +73,10 @@ namespace apps {
         }
 
         std::lock_guard<std::mutex> tlock(threadGuard);
-        if (zmq_enabled_)
-        {
+        if (zmq_enabled_) {
             std::cout << "stopping zmq broker server\n";
         }
-        if (zmqss_enabled_)
-        {
+        if (zmqss_enabled_) {
             std::cout << "stopping zmq ss broker server\n";
         }
         mainLoopThread.join();

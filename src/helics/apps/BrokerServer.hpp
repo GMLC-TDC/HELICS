@@ -22,7 +22,6 @@ class helicsCLI11App;
 
 using portData = std::vector<std::tuple<int, bool, std::shared_ptr<Broker>>>;
 
-
 namespace apps {
     class TypedBrokerServer;
     /** helper class defining some common functionality for brokers and cores that use different
@@ -66,8 +65,8 @@ communication methods*/
         bool tcp_server{false};
         bool udp_server{false};
         bool mpi_server{false};
-        bool http_server{ false };
-        bool websocket_server{ false };
+        bool http_server{false};
+        bool websocket_server{false};
         std::atomic<bool> exitall{false};
         std::vector<std::unique_ptr<TypedBrokerServer>> servers;
         std::string configFile_;

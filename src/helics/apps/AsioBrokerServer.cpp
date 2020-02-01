@@ -21,11 +21,12 @@ namespace helics {
 namespace udp {
     class UdpServer: public std::enable_shared_from_this<UdpServer> {
       public:
-        UdpServer(asio::io_context& io_context, std::string &interface, unsigned short portNum):socket_(io_context)
+        UdpServer(asio::io_context& io_context, std::string& interface, unsigned short portNum):
+            socket_(io_context)
         {
             socket_.open(asio::ip::udp::v4());
-            socket_.bind(
-                asio::ip::udp::endpoint(asio::ip::address::from_string(interface), static_cast<uint16_t>(portNum)));
+            socket_.bind(asio::ip::udp::endpoint(
+                asio::ip::address::from_string(interface), static_cast<uint16_t>(portNum)));
         }
 
         ~UdpServer()
@@ -43,10 +44,7 @@ namespace udp {
                     handle_receive(error, bytes);
                 });
         }
-        void stop_receive()
-        {
-            socket_.cancel();
-        }
+        void stop_receive() { socket_.cancel(); }
         /** set the callback for the data object*/
         void setDataCall(
             std::function<bool(std::shared_ptr<UdpServer>, const char*, size_t)> dataFunc)
@@ -54,23 +52,21 @@ namespace udp {
             dataCall = std::move(dataFunc);
         }
 
-        void send_to(const std::string &message,asio::ip::udp::endpoint ept)
+        void send_to(const std::string& message, asio::ip::udp::endpoint ept)
         {
             socket_.send_to(asio::buffer(message), ept);
         }
-        void reply(const std::string &message)
+        void reply(const std::string& message)
         {
             socket_.send_to(asio::buffer(message), remote_endpoint_);
         }
+
       private:
         void handle_receive(const asio::error_code& error, std::size_t bytes_transferred)
         {
             if (!error) {
                 if (dataCall) {
-                    bool ret = dataCall(
-                        shared_from_this(),
-                        recv_buffer_.data(),
-                        bytes_transferred);
+                    bool ret = dataCall(shared_from_this(), recv_buffer_.data(), bytes_transferred);
                     if (ret) {
                         start_receive();
                     }
@@ -122,27 +118,24 @@ namespace apps {
         const char* data,
         size_t bytes_received)
     {
-            ActionMessage m(data, static_cast<int>(bytes_received));
-            if (isProtocolCommand(m)) {
-                // if the reply is not ignored respond with it otherwise
-                // forward the original message on to the receiver to handle
-                auto rep = generateMessageResponse(m, udpPortData, core_type::UDP);
-                if (rep.action() != CMD_IGNORE) {
-                    try {
-                        server->reply(rep.to_string());
-                    }
-                    catch (const std::system_error&) {
-                        return false;
-                    }
+        ActionMessage m(data, static_cast<int>(bytes_received));
+        if (isProtocolCommand(m)) {
+            // if the reply is not ignored respond with it otherwise
+            // forward the original message on to the receiver to handle
+            auto rep = generateMessageResponse(m, udpPortData, core_type::UDP);
+            if (rep.action() != CMD_IGNORE) {
+                try {
+                    server->reply(rep.to_string());
                 }
-            }
-            else if (bytes_received == 5)
-            {
-                if (std::string(data, bytes_received) == "close")
-                {
+                catch (const std::system_error&) {
                     return false;
                 }
             }
+        } else if (bytes_received == 5) {
+            if (std::string(data, bytes_received) == "close") {
+                return false;
+            }
+        }
 
         return true;
     }
@@ -190,13 +183,12 @@ namespace apps {
         }
     }
 
-
     static const Json::Value null;
 
     void AsioBrokerServer::startServer(const Json::Value* val)
     {
-        config_ = (val != nullptr) ?val: &null;
-       
+        config_ = (val != nullptr) ? val : &null;
+
         if (tcp_enabled_) {
             std::cout << "starting tcp broker server\n";
         }

@@ -192,7 +192,7 @@ TEST(ZMQSSCore, initialization)
     EXPECT_TRUE(connected);
 
     if (connected) {
-        int cnt{ 0 };
+        int cnt{0};
         while (counter == 0) {
             std::this_thread::sleep_for(100ms);
             ++cnt;
