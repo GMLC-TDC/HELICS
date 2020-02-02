@@ -41,7 +41,7 @@ The following list of tools is a list of tools that have worked with HELICS at s
 -   HELICS provides built-in support for simple communications manipulations such as delays, lossy channels, etc. through its built-in filters.
 -   [ns-3](https://www.nsnam.org/), a discrete-event communication network simulator. Supported via the [HELICS ns-3 module](https://github.com/GMLC-TDC/helics-ns3)
 -   [OMNet++](https://omnetpp.org/)  OMNeT++ is a public-source, component-based, modular and open-architecture simulation environment with strong GUI support and an embeddable simulation kernel. Its primary application area is the simulation of communication networks, but it has been successfully used in other areas like the simulation of IT systems, queueing networks, hardware architectures and business processes as well.
-  Early stage development with OMNET++ and HELICS is underway
+  Early stage development with OMNET++ and HELICS is underway and a prototype example is available in [HELICS-omnetpp](https://github.com/GMLC-TDC/helics-omnetpp)
 
 ## Gas Pipeline Modeling
 
