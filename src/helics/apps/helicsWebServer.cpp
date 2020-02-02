@@ -526,7 +526,7 @@ namespace helics {
 namespace apps {
     void WebServer::startServer(const Json::Value* val)
     {
-        std::cout << "starting broker web server\n";
+        logMessage("starting broker web server");
         config_ = (val != nullptr) ? val : &null;
 
         std::lock_guard<std::mutex> tlock(threadGuard);

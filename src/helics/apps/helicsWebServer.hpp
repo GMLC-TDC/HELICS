@@ -19,7 +19,7 @@ namespace apps {
     class WebServer: public TypedBrokerServer {
       public:
         WebServer() = default;
-        WebServer(std::string server_name): name_(std::move(server_name)) {}
+        explicit WebServer(std::string server_name): name_(std::move(server_name)) {}
         /** start the server*/
         virtual void startServer(const Json::Value* val) override;
         /** stop the server*/

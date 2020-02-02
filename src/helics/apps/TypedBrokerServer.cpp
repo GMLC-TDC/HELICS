@@ -10,6 +10,8 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "../core/ActionMessage.hpp"
 #include "../core/BrokerFactory.hpp"
 #include "../core/NetworkBrokerData.hpp"
+#include "../common/loggerCore.hpp"
+
 
 namespace helics {
 namespace apps {
@@ -124,5 +126,9 @@ namespace apps {
         }
     }
 
+    void TypedBrokerServer::logMessage(std::string message)
+    {
+
+    }
 } // namespace apps
 } // namespace helics

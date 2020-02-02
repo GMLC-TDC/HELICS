@@ -27,10 +27,10 @@ namespace apps {
         config_ = (val != nullptr) ? val : &null;
 #ifdef ENABLE_ZMQ_CORE
         if (zmq_enabled_) {
-            std::cout << "starting zmq broker server\n";
+            logMessage("starting zmq broker server");
         }
         if (zmqss_enabled_) {
-            std::cout << "starting zmq ss broker server\n";
+            logMessage("starting zmq ss broker server");
         }
         std::lock_guard<std::mutex> tlock(threadGuard);
         mainLoopThread = std::thread([this]() { mainLoop(); });
@@ -45,7 +45,7 @@ namespace apps {
             return;
         }
         auto ctx = ZmqContextManager::getContextPointer();
-        zmq::socket_t reqSocket(ctx->getContext(), ZMQ_REQ);
+        zmq::socket_t reqSocket(ctx->getContext(), (zmq_enabled_)?ZMQ_REQ:ZMQ_DEALER);
         reqSocket.setsockopt(ZMQ_LINGER, 300);
         std::string ext_interface = "tcp://127.0.0.1";
         int port =
@@ -74,10 +74,10 @@ namespace apps {
 
         std::lock_guard<std::mutex> tlock(threadGuard);
         if (zmq_enabled_) {
-            std::cout << "stopping zmq broker server\n";
+            logMessage("stopping zmq broker server");
         }
         if (zmqss_enabled_) {
-            std::cout << "stopping zmq ss broker server\n";
+            logMessage("stopping zmq ss broker server");
         }
         mainLoopThread.join();
 #endif
@@ -98,7 +98,7 @@ namespace apps {
         auto bindsuccess = hzmq::bindzmqSocket(*repSocket, ext_interface, zmqport, timeout);
         if (!bindsuccess) {
             repSocket->close();
-            std::cout << "ZMQ server failed to start\n";
+            logMessage("ZMQ server failed to start");
             return nullptr;
         }
         return repSocket;
@@ -119,7 +119,7 @@ namespace apps {
         auto bindsuccess = hzmq::bindzmqSocket(*repSocket, ext_interface, zmqport, timeout);
         if (!bindsuccess) {
             repSocket->close();
-            std::cout << "ZMQSS server failed to start\n";
+            logMessage("ZMQSS server failed to start");
             return nullptr;
         }
         return repSocket;
@@ -162,7 +162,7 @@ namespace apps {
                 return rep.to_string();
             }
         }
-        std::cout << "received unknown message of length " << msg.size() << std::endl;
+        logMessage( "received unknown message of length "+std::to_string( msg.size()));
         return "ignored";
     }
     void zmqBrokerServer::mainLoop()
@@ -213,7 +213,7 @@ namespace apps {
                 rc = zmq::poll(poller, std::chrono::milliseconds(5000));
             }
             catch (const zmq::error_t& e) {
-                std::cout << e.what() << std::endl;
+                logMessage(e.what());
                 return;
             }
             if (rc < 0) {

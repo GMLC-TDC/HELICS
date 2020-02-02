@@ -34,6 +34,8 @@ namespace apps {
         static int getOpenPort(portData& pd);
         /* assign a port in the portData structure*/
         static void assignPort(portData& pd, int pnumber, std::shared_ptr<Broker>& brk);
+        /* log a message to the console */
+        static void logMessage(std::string message);
     };
 } // namespace apps
 } // namespace helics

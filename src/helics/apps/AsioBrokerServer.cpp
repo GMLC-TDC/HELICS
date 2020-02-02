@@ -190,10 +190,10 @@ namespace apps {
         config_ = (val != nullptr) ? val : &null;
 
         if (tcp_enabled_) {
-            std::cout << "starting tcp broker server\n";
+            logMessage("starting tcp broker server");
         }
         if (udp_enabled_) {
-            std::cout << "starting udp broker server\n";
+            logMessage("starting udp broker server");
         }
         std::lock_guard<std::mutex> tlock(threadGuard);
         mainLoopThread = std::thread([this]() { mainLoop(); });
@@ -203,11 +203,11 @@ namespace apps {
     {
         std::lock_guard<std::mutex> tlock(threadGuard);
         if (tcp_enabled_) {
-            std::cout << "stopping tcp broker server\n";
+            logMessage("stopping tcp broker server");
             tcpserver->close();
         }
         if (udp_enabled_) {
-            std::cout << "stopping udp broker server\n";
+            logMessage("stopping udp broker server");
             udpserver->stop_receive();
         }
         mainLoopThread.join();

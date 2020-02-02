@@ -28,7 +28,7 @@ namespace apps {
     class AsioBrokerServer: public TypedBrokerServer {
       public:
         AsioBrokerServer() = default;
-        AsioBrokerServer(std::string server_name): name_(std::move(server_name)) {}
+        explicit AsioBrokerServer(std::string server_name): name_(std::move(server_name)) {}
         /** start the server*/
         virtual void startServer(const Json::Value* val) override;
         /** stop the server*/
