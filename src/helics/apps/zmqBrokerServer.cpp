@@ -45,7 +45,7 @@ namespace apps {
             return;
         }
         auto ctx = ZmqContextManager::getContextPointer();
-        zmq::socket_t reqSocket(ctx->getContext(), (zmq_enabled_)?ZMQ_REQ:ZMQ_DEALER);
+        zmq::socket_t reqSocket(ctx->getContext(), (zmq_enabled_) ? ZMQ_REQ : ZMQ_DEALER);
         reqSocket.setsockopt(ZMQ_LINGER, 300);
         std::string ext_interface = "tcp://127.0.0.1";
         int port =
@@ -162,7 +162,7 @@ namespace apps {
                 return rep.to_string();
             }
         }
-        logMessage( "received unknown message of length "+std::to_string( msg.size()));
+        logMessage("received unknown message of length " + std::to_string(msg.size()));
         return "ignored";
     }
     void zmqBrokerServer::mainLoop()
