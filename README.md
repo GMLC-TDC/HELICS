@@ -41,6 +41,18 @@
 </table>
 
 
+## Table of contents
+
+-   [Introduction](#introduction)
+-   [Installers](#installers)
+-   [Getting Started](#getting-started)
+-   [Documentation](#documentation)
+-   [Docker](#docker)
+-   [Tools with HELICS support](#tools-with-helics-support)
+-   [Contributing](#contributing)
+-   [Release](#release)
+
+
 ## Introduction
 
 Welcome to the repository for the Hierarchical Engine for Large-scale Infrastructure Co-Simulation (HELICS). HELICS provides an open-source, general-purpose, modular, highly-scalable co-simulation framework that runs cross-platform (Linux, Windows, and Mac OS X). It is not a modeling tool by itself, but rather an integration tool that enables multiple existing simulation tools (and/or multiple instances of the same tool), known as "federates," to exchange data during runtime and stay synchronized in time such that together they act as one large simulation, or "federation". This enables bringing together established (or new/emerging) off-the-shelf tools from multiple domains to form a complex software-simulation without having to change the individual tools (known as "black-box" modeling). All that is required is for someone to write a thin interface layer for each tool that interfaces with existing simulation time control and data value updating, such as through an existing scripting interface. Moreover, the HELICS community has a growing ecosystem of established interfaces for popular tools, such that many users can simply mix and match existing tools with their own data and run complex co-simulations with minimal coding.
@@ -110,19 +122,7 @@ Thankfully the HELICS API is designed to be minimally invasive and make it strai
 
 We are always looking for help adding support for more tools, so please contact us if you have any additions.
 
-### Power systems Tools
-
--   [GridLAB-D](https://www.gridlabd.org/), an open-source tool for distribution power-flow, DER models, basic house thermal and end-use load models, and more. HELICS support currently (8/15/2018) provided in the [`develop` branch](https://github.com/gridlab-d/gridlab-d/tree/develop) which you have to build yourself as described [here](https://github.com/GMLC-TDC/HELICS-Tutorial/tree/master/setup).
--   [GridDyn](https://github.com/LLNL/GridDyn), an open-source transmission power flow and dynamics simulator. HELICS support currently (4/14/2018) provided through the [`cmake_updates` branch](https://github.com/LLNL/GridDyn/tree/cmake_update).
--   [PSST](https://github.com/kdheepak/psst), an open-source python-based unit-commitment and dispatch market simulator. HELICS examples are included in the  [HELICS-Tutorial](https://github.com/GMLC-TDC/HELICS-Tutorial)
--   [MATPOWER](http://www.pserc.cornell.edu/matpower/), an open-source Matlab based power flow and optimal power flow tool. HELICS support currently (4/14/2018) under development.
--   [InterPSS](http://www.interpss.org/), a Java-based power systems simulator. HELICS support currently (4/14/2018) under development.
--   Commercial tools that have interacted with HELICS, include Power World, PSS/e, PSLF, and Cyme.
-
-### Communication Tools
-
--   [ns-3](https://www.nsnam.org/), a discrete-event communication network simulator. Supported via the [HELICS ns-3 module](https://github.com/GMLC-TDC/helics-ns3)
--   HELICS also includes built-in support for simple communications manipulations such as delays, lossy channels, etc. through its built-in filters.
+[Tools](docs/Tools_using_HELICS.md)
 
 ### HELICS helper Apps
 
