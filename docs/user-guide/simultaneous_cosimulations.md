@@ -2,7 +2,7 @@
 Sometimes it is necessary or desirable to be able to execute multiple simultaneous simulations on a single computer system.  Either for increased parallelism or from multiple users or as part of a larger coordinated execution for sensitivity analysis or uncertainty quantification.  HELICS includes a number of different options for managing this and making it easier.  
 
 ## General Notes
-HELICS starts with some default port numbers for network communication, so only a single broker(per core type) with default options is allowed to be running on a single computer at a given time.  This is the general restriction on running multiple simultaneous co-simulations.  It is not allowed to have multiple default brokers running at the same time, the network ports will interfere and the co-simulation will fail.  
+HELICS starts with some default port numbers for network communication, so only a single broker (per core type) with default options is allowed to be running on a single computer at a given time.  This is the general restriction on running multiple simultaneous co-simulations.  It is not allowed to have multiple default brokers running at the same time, the network ports will interfere and the co-simulation will fail.  
 
 There are a number of ways around this and some tools to assist in checking and coordinating.  
 
@@ -13,7 +13,7 @@ helics_broker --type=zmq --port=20200 &
 helics_broker --type=zmq --port=20400 &
 ```
 
-will start up two brokers on separate port numbers.  Federates connecting to the broker would need to specify the `--brokerport=X` to connect with the appropriate broker.    These brokers operate independently of eachother.   The port numbers assigned to the cores and federates can also be user assigned but if left to default will be automatically assigned by the broker and should not interfere with each other.  
+will start up two brokers on separate port numbers.  Federates connecting to the broker would need to specify the `--brokerport=X` to connect with the appropriate broker.    These brokers operate independently of each other.   The port numbers assigned to the cores and federates can also be user assigned but if left to default will be automatically assigned by the broker and should not interfere with each other.  
 
 ## Use Broker server
 For zmq core types it is possible to use the broker server.
