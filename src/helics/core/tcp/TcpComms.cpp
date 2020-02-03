@@ -244,7 +244,7 @@ namespace tcp {
             }
             //monitor the total waiting time before connections
             std::chrono::milliseconds cumulativeSleep{0};
-            const std::chrono::milliseconds popTimeout{ 200 };
+            const std::chrono::milliseconds popTimeout{200};
 
             bool connectionEstablished{false};
             if (PortNumber > 0 && NetworkCommsInterface::noAckConnection) {
@@ -318,9 +318,7 @@ namespace tcp {
                     } else {
                         logWarning("unexpected message received in transmit queue");
                     }
-                }
-                else
-                {
+                } else {
                     cumulativeSleep += popTimeout;
                     if (cumulativeSleep >= connectionTimeout) {
                         brokerConnection->cancel();
@@ -328,8 +326,6 @@ namespace tcp {
                         return terminate(connection_status::error);
                     }
                 }
-                
-               
             }
         }
         catch (std::exception& e) {
