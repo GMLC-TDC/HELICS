@@ -8,7 +8,7 @@ A note on future revisions.
   Everything within a major version number should be code compatible (with the exception of experimental interfaces).  The most notable example of an experimental interface is the support for multiple source inputs.  The APIs to deal with this will change in future minor releases.  Everything within a single minor release should be network compatible with other federates on the same minor release number.  Compatibility across minor release numbers may be possible in some situations but we are not going to guarantee this as those components are subject to performance improvements and may need to be modified at some point.  Patch releases will be limited to bug fixes and other improvements not impacting the public API or network compatibility.  Check the [Public API](./docs/Public_API.md) for details on what is included and excluded from the public API and version stability.
 
 ## [2.4.0][] - 2020-02-03
-A few bug fixes, code coverage on the shared library increased to 100%,  library updates, Broker server  enhancements including a REST API, and a lot of work on the build systems to enable easier releases and packaging
+A few bug fixes, code coverage on the shared library increased to 100%,  library updates, Broker server  enhancements including an http REST API, and a lot of work on the build systems to enable easier releases and packaging.
 
 ### Changed
 -   filesystem include updated to 1.2.10
@@ -36,7 +36,8 @@ A few bug fixes, code coverage on the shared library increased to 100%,  library
 -   A series of issues from static analyzers
 -   an issue in the shared library create core that could emit an exception
 -   A series of issues related to remote cloning filters not being inline
--   several issues with the zmqss core type it is not backwards compatible with <2.4 brokers
+-   Several issues with the zmqss core type it is not backwards compatible with <2.4 brokers
+-   The [code coverage](https://codecov.io/gh/GMLC-TDC/HELICS) on the C shared library was increased to 100% and a number of small bugs fixed as a result. The overall coverage increased to 71.5%
 
 ### Added
 -   Several installers for Linux and Mac and builds for `pip install`
@@ -46,19 +47,21 @@ A few bug fixes, code coverage on the shared library increased to 100%,  library
 -   Added a c shared library echo benchmark
 -   git logic to check if the submodules are at the correct version
 -   an option for a githook to check the formatting
+-   git warning if the submodule versions are not at the correct version
 -   a timing benchmark similar to the echo benchmark  
 -   a number of tests for the C shared library including evil tests for testing bad input
 -   Hooks to test the coverage builds
 -   a feature to mark a broker or federate as slow responding so it doesn't time out automatically
 -   EditorConfig and .gitattributes for cleaner diff and automatic editor configuration
--   An incorrect call in the Matlab swig code
+-   An incorrect call in the Matlab swig code was fixed
 -   Automatic generation of pull requests for source code formatting  
 -   Add metadata information to the benchmarks for automatic processing
 -   Broker server functionality for tcp core, zmqss core, and udp core
 -   An experimental web server that can be used with the broker server or the broker executables. (requires boost 1.70+ to build)  
 -   man pages for the helics applications
- 
+
 ### Deprecated
+-   The `ZMQ_SS` is not generally compatible between 2.3 and 2.4 Minor releases due to bug fixes.  
 
 ### Removed
 
