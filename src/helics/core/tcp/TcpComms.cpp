@@ -242,8 +242,10 @@ namespace tcp {
                         connectionTimeout);
                 }
             }
+            //monitor the total waiting time before connections
+            std::chrono::milliseconds cumulativeSleep{0};
+            const std::chrono::milliseconds popTimeout{ 200 };
 
-            std::chrono::milliseconds cumsleep{0};
             bool connectionEstablished{false};
             if (PortNumber > 0 && NetworkCommsInterface::noAckConnection) {
                 connectionEstablished = true;
@@ -272,7 +274,7 @@ namespace tcp {
                             }
                         }
                     });
-                auto mess = txQueue.pop(std::chrono::milliseconds(100));
+                auto mess = txQueue.pop(popTimeout);
                 if (mess) {
                     if (isProtocolCommand(mess->second)) {
                         if (mess->second.messageID == PORT_DEFINITIONS) {
@@ -317,12 +319,17 @@ namespace tcp {
                         logWarning("unexpected message received in transmit queue");
                     }
                 }
-                cumsleep += std::chrono::milliseconds(100);
-                if (cumsleep >= connectionTimeout) {
-                    brokerConnection->cancel();
-                    logError("port number query to broker timed out");
-                    return terminate(connection_status::error);
+                else
+                {
+                    cumulativeSleep += popTimeout;
+                    if (cumulativeSleep >= connectionTimeout) {
+                        brokerConnection->cancel();
+                        logError("port number query to broker timed out");
+                        return terminate(connection_status::error);
+                    }
                 }
+                
+               
             }
         }
         catch (std::exception& e) {
