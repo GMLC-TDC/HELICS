@@ -181,6 +181,8 @@ static const std::map<std::string, int> log_level_map{{"none", helics_log_level_
                                                       {"timing", helics_log_level_timing},
                                                       /** timing+ data transfer notices*/
                                                       {"data", helics_log_level_data},
+                                                      /** same as data*/
+                                                      {"debug", helics_log_level_data},
                                                       /** all internal messages*/
                                                       {"trace", helics_log_level_trace}};
 
@@ -475,12 +477,32 @@ FederateInfo loadFederateInfoJson(const std::string& jsonString)
             fi.setProperty(propStringsTranslations.at(fname), arg);
         };
 
+    std::function<void(const std::string&)> logTranslations = [&](const std::string& arg) {
+        auto valf = log_level_map.find(arg);
+        if (valf != log_level_map.end()) {
+            fi.setProperty(helics_property_int_log_level, valf->second);
+        } else {
+            throw(helics::InvalidIdentifier(arg + " is not a valid log level"));
+        }
+    };
+
     for (auto& prop : validTimeProperties) {
         callIfMember(doc, prop, timeCall);
     }
 
-    for (auto& prop : validIntProperties) {
-        callIfMember(doc, prop, intCall);
+    if (!callIfMember(doc, "max_iterations", intCall)) {
+        callIfMember(doc, "maxiterations", intCall);
+    }
+
+    bool lfound = callIfMember(doc, "log_level", intCall);
+    if (!lfound) {
+        lfound = callIfMember(doc, "loglevel", intCall);
+    }
+    if (!lfound) {
+        lfound = callIfMember(doc, "log_level", logTranslations);
+    }
+    if (!lfound) {
+        lfound = callIfMember(doc, "loglevel", logTranslations);
     }
 
     for (auto& prop : validFlagOptions) {
@@ -581,12 +603,32 @@ FederateInfo loadFederateInfoToml(const std::string& tomlString)
             fi.setProperty(propStringsTranslations.at(fname), arg);
         };
 
+    std::function<void(const std::string&)> logTranslations = [&](const std::string& arg) {
+        auto valf = log_level_map.find(arg);
+        if (valf != log_level_map.end()) {
+            fi.setProperty(helics_property_int_log_level, valf->second);
+        } else {
+            throw(helics::InvalidIdentifier(arg + " is not a valid log level"));
+        }
+    };
+
     for (auto& prop : validTimeProperties) {
         callIfMember(doc, prop, timeCall);
     }
 
-    for (auto& prop : validIntProperties) {
-        callIfMember(doc, prop, intCall);
+    if (!callIfMember(doc, "max_iterations", intCall)) {
+        callIfMember(doc, "maxiterations", intCall);
+    }
+
+    bool lfound = callIfMember(doc, "log_level", intCall);
+    if (!lfound) {
+        lfound = callIfMember(doc, "loglevel", intCall);
+    }
+    if (!lfound) {
+        lfound = callIfMember(doc, "log_level", logTranslations);
+    }
+    if (!lfound) {
+        lfound = callIfMember(doc, "loglevel", logTranslations);
     }
 
     for (auto& prop : validFlagOptions) {

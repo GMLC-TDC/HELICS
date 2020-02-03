@@ -68,7 +68,7 @@ inline int64_t getOrDefault(const toml::value& element, const std::string& key, 
 }
 
 /** call a function if a member element exists and pass the string to the invoked object*/
-inline void callIfMember(
+inline bool callIfMember(
     const toml::value& element,
     const std::string& key,
     const std::function<void(const std::string&)>& call)
@@ -77,11 +77,13 @@ inline void callIfMember(
     auto& val = toml::find_or<std::string>(element, key, empty);
     if (!val.empty()) {
         call(val);
+        return true;
     }
+    return false;
 }
 
 /** call a function if a member element exists and pass a time to the invoked object*/
-inline void callIfMember(
+inline bool callIfMember(
     const toml::value& element,
     const std::string& key,
     const std::function<void(const std::string&, helics::Time)>& call)
@@ -91,12 +93,14 @@ inline void callIfMember(
 
     if (!val.is_uninitialized()) {
         call(key, loadTomlTime(val));
+        return true;
     }
+    return false;
 }
 
 /** call a function if a member element exists and pass a specific type to the invoked object*/
 template<class X>
-inline void callIfMember(
+inline bool callIfMember(
     const toml::value& element,
     const std::string& key,
     const std::function<void(const std::string&, X)>& call)
@@ -105,7 +109,9 @@ inline void callIfMember(
     auto val = toml::find_or(element, key, uval);
     if (!val.is_uninitialized()) {
         call(key, toml::get<X>(val));
+        return true;
     }
+    return false;
 }
 
 inline void
