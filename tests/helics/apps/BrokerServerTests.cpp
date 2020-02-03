@@ -1,5 +1,5 @@
 /*
-Copyright © 2017-2019,
+Copyright Â© 2017-2019,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
 the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
@@ -16,9 +16,12 @@ SPDX-License-Identifier: BSD-3-Clause
 
 using namespace helics;
 
-TEST(broker_server_tests, startup_tests)
+class BrokerServerTests: public ::testing::TestWithParam<std::pair<const char*, core_type>> {
+};
+
+TEST_P(BrokerServerTests, startup_tests)
 {
-    apps::BrokerServer brks(std::vector<std::string>{"--zmq"});
+    apps::BrokerServer brks(std::vector<std::string>{GetParam().first});
     bool active = brks.hasActiveBrokers();
     if (active) {
         std::this_thread::sleep_for(std::chrono::milliseconds(300));
@@ -27,12 +30,12 @@ TEST(broker_server_tests, startup_tests)
     EXPECT_TRUE(!active);
     brks.startServers();
 
-    auto cr = helics::CoreFactory::create(helics::core_type::ZMQ, "--brokername=fred");
+    auto cr = helics::CoreFactory::create(GetParam().second, "--brokername=fred");
     EXPECT_TRUE(cr->isConfigured());
     cr->connect();
     EXPECT_TRUE(cr->isConnected());
 
-    auto cr2 = helics::CoreFactory::create(helics::core_type::ZMQ, "--brokername=fred2");
+    auto cr2 = helics::CoreFactory::create(GetParam().second, "--brokername=fred2");
     EXPECT_TRUE(cr2->isConfigured());
     cr2->connect();
     EXPECT_TRUE(cr2->isConnected());
@@ -56,12 +59,12 @@ TEST(broker_server_tests, startup_tests)
     cleanupHelicsLibrary();
 }
 
-TEST(broker_server_tests, execution_tests)
+TEST_P(BrokerServerTests, execution_tests)
 {
-    apps::BrokerServer brks(std::vector<std::string>{"--zmq"});
+    apps::BrokerServer brks(std::vector<std::string>{GetParam().first});
     brks.startServers();
 
-    FederateInfo fi(core_type::ZMQ);
+    FederateInfo fi(GetParam().second);
     fi.coreName = "c1";
     fi.brokerInitString = "-f 2";
     auto fed1 = ValueFederate("fed1", fi);
@@ -81,12 +84,12 @@ TEST(broker_server_tests, execution_tests)
     cleanupHelicsLibrary();
 }
 
-TEST(broker_server_tests, execution_tests_duplicate)
+TEST_P(BrokerServerTests, execution_tests_duplicate)
 {
-    apps::BrokerServer brks(std::vector<std::string>{"--zmq"});
+    apps::BrokerServer brks(std::vector<std::string>{GetParam().first});
     brks.startServers();
 
-    FederateInfo fi(core_type::ZMQ);
+    FederateInfo fi(GetParam().second);
     fi.coreName = "c1b";
 
     auto fed1 = ValueFederate("fed1", fi);
@@ -101,7 +104,7 @@ TEST(broker_server_tests, execution_tests_duplicate)
     fed1.enterExecutingModeComplete();
 
     fi.coreName = "c3b";
-    // this would test two ZMQ co-sim executing simultaneously
+    // this would test two co-sims executing simultaneously
     auto fed3 = ValueFederate("fed3", fi);
     auto& pub3 = fed3.registerGlobalPublication("key1", "double");
     fi.coreName = "c4b";
@@ -133,3 +136,10 @@ TEST(broker_server_tests, execution_tests_duplicate)
     brks.forceTerminate();
     cleanupHelicsLibrary();
 }
+
+const std::vector<std::pair<const char*, core_type>> tvals{{"--zmq", core_type::ZMQ},
+                                                           {"--zmqss", core_type::ZMQ_SS},
+                                                           {"--tcp", core_type::TCP},
+                                                           {"--udp", core_type::UDP}};
+
+INSTANTIATE_TEST_SUITE_P(broker_server_tests, BrokerServerTests, ::testing::ValuesIn(tvals));

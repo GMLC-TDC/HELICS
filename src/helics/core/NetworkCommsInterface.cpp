@@ -119,6 +119,8 @@ void NetworkCommsInterface::loadNetworkInfo(const NetworkBrokerData& netInfo)
         autoPortNumber = false;
     }
     useOsPortAllocation = netInfo.use_os_port;
+    appendNameToAddress = netInfo.appendNameToAddress;
+    noAckConnection = netInfo.noAckConnection;
     propertyUnLock();
 }
 
@@ -167,8 +169,13 @@ void NetworkCommsInterface::setFlag(const std::string& flag, bool val)
             useOsPortAllocation = val;
             propertyUnLock();
         }
+    } else if (flag == "noack_connect") {
+        if (propertyLock()) {
+            noAckConnection = val;
+            propertyUnLock();
+        }
     } else {
-        NetworkCommsInterface::setFlag(flag, val);
+        CommsInterface::setFlag(flag, val);
     }
 }
 
@@ -193,6 +200,11 @@ ActionMessage NetworkCommsInterface::generateReplyToIncomingMessage(ActionMessag
                 portReply.counter = cmd.counter;
                 return portReply;
             } break;
+            case CONNECTION_REQUEST: {
+                ActionMessage connAck(CMD_PROTOCOL);
+                connAck.messageID = CONNECTION_ACK;
+                return connAck;
+            } break;
             default:
                 break;
         }
@@ -206,13 +218,19 @@ std::string NetworkCommsInterface::getAddress() const
     if ((PortNumber < 0) && (!serverMode)) {
         return name;
     }
+    std::string address;
     if ((localTargetAddress == "tcp://*") || (localTargetAddress == "tcp://0.0.0.0")) {
-        return makePortAddress("tcp://127.0.0.1", PortNumber);
+        address = makePortAddress("tcp://127.0.0.1", PortNumber);
+    } else if ((localTargetAddress == "*") || (localTargetAddress == "0.0.0.0")) {
+        address = makePortAddress("127.0.0.1", PortNumber);
+    } else {
+        address = makePortAddress(localTargetAddress, PortNumber);
     }
-    if ((localTargetAddress == "*") || (localTargetAddress == "0.0.0.0")) {
-        return makePortAddress("127.0.0.1", PortNumber);
+    if (appendNameToAddress) {
+        address.push_back('/');
+        address.append(name);
     }
-    return makePortAddress(localTargetAddress, PortNumber);
+    return address;
 }
 
 ActionMessage NetworkCommsInterface::generatePortRequest(int cnt) const

@@ -29,7 +29,7 @@ using helics::Core;
 #define TCP_BROKER_PORT_STRING "24160"
 #define TCP_SECONDARY_PORT 24180
 
-TEST(TcpCore_tests, tcpComms_broker_test)
+TEST(TcpCore, tcpComms_broker)
 {
     std::atomic<int> counter{0};
     std::string host = "localhost";
@@ -52,17 +52,17 @@ TEST(TcpCore_tests, tcpComms_broker_test)
     comm.setCallback([&counter](helics::ActionMessage /*m*/) { ++counter; });
     comm.setBrokerPort(DEFAULT_TCP_BROKER_PORT_NUMBER);
     comm.setName("tests");
-    comm.setTimeout(400ms);
+    comm.setTimeout(200ms);
     bool connected = comm.connect();
     EXPECT_TRUE(!connected);
-    EXPECT_EQ(counter, 1);
+    EXPECT_GE(counter, 1);
     comm.disconnect();
     server->close();
 
     std::this_thread::sleep_for(100ms);
 }
 
-TEST(TcpCore_tests, tcpComms_broker_test_transmit)
+TEST(TcpCore, tcpComms_broker_test_transmit)
 {
     std::this_thread::sleep_for(300ms);
     std::atomic<int> counter{0};
@@ -92,8 +92,9 @@ TEST(TcpCore_tests, tcpComms_broker_test_transmit)
     comm.setBrokerPort(DEFAULT_TCP_BROKER_PORT_NUMBER);
     comm.setPortNumber(TCP_SECONDARY_PORT);
     comm.setName("tests");
+    comm.setFlag("noack_connect", true);
     bool connected = comm.connect();
-    EXPECT_TRUE(connected) << "connection has failedbb";
+    EXPECT_TRUE(connected) << "connection has failed-bb";
     if (connected) {
         comm.transmit(helics::parent_route_id, helics::CMD_IGNORE);
 
@@ -117,7 +118,7 @@ TEST(TcpCore_tests, tcpComms_broker_test_transmit)
     std::this_thread::sleep_for(100ms);
 }
 
-TEST(TcpCore_tests, tcpComms_rx_test)
+TEST(TcpCore, tcpComms_rx)
 {
     std::this_thread::sleep_for(300ms);
     std::atomic<int> ServerCounter{0};
@@ -154,6 +155,7 @@ TEST(TcpCore_tests, tcpComms_rx_test)
     comm.setBrokerPort(DEFAULT_TCP_BROKER_PORT_NUMBER);
     comm.setPortNumber(TCP_SECONDARY_PORT);
     comm.setName("tests");
+    comm.setFlag("noack_connect", true);
 
     bool connected = comm.connect();
     ASSERT_TRUE(connected);
@@ -179,7 +181,7 @@ TEST(TcpCore_tests, tcpComms_rx_test)
     std::this_thread::sleep_for(200ms);
 }
 
-TEST(TcpCore_tests, test_tcpServerConnections1)
+TEST(TcpCore, tcpServerConnections1)
 {
     std::atomic<int> counter{0};
     std::string host = "127.0.0.1";
@@ -266,7 +268,7 @@ TEST(TcpCore_tests, test_tcpServerConnections1)
     server->close();
 }
 
-TEST(TcpCore_tests, tcpComm_transmit_through)
+TEST(TcpCore, tcpComm_transmit_through)
 {
     std::this_thread::sleep_for(300ms);
     std::atomic<int> counter{0};
@@ -323,7 +325,7 @@ TEST(TcpCore_tests, tcpComm_transmit_through)
     std::this_thread::sleep_for(100ms);
 }
 
-TEST(TcpCore_tests, tcpComm_transmit_add_route)
+TEST(TcpCore, tcpComm_transmit_add_route)
 {
     std::this_thread::sleep_for(300ms);
     std::atomic<int> counter{0};
@@ -412,12 +414,12 @@ TEST(TcpCore_tests, tcpComm_transmit_add_route)
     std::this_thread::sleep_for(100ms);
 }
 
-TEST(TcpCore_tests, tcpCore_initialization_test)
+TEST(TcpCore, tcpCore_initialization)
 {
     std::this_thread::sleep_for(300ms);
     std::atomic<int> counter{0};
     std::string initializationString =
-        "-f 1 --brokerport=24160  --port=24180 --local_interface=localhost --name=core1";
+        "-f 1 --brokerport=24160  --port=24180 --local_interface=localhost --name=core1 --noack_connect";
     auto core = helics::CoreFactory::create(helics::core_type::TCP, initializationString);
 
     ASSERT_TRUE(core);
@@ -474,7 +476,7 @@ TEST(TcpCore_tests, tcpCore_initialization_test)
 also tests the automatic port determination for cores
 */
 
-TEST(TcpCore_tests, tcpCore_core_broker_default_test)
+TEST(TcpCore, tcpCore_core_broker_default)
 {
     std::this_thread::sleep_for(300ms);
     std::string initializationString = "--reuse_address";

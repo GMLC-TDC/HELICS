@@ -38,7 +38,7 @@ namespace tcp {
     {
         if (flag == "reuse_address") {
             if (propertyLock()) {
-                useOsPortAllocation = val;
+                reuse_address = val;
                 propertyUnLock();
             }
         } else {
@@ -191,16 +191,7 @@ namespace tcp {
         if (errorMessage.empty()) {
             ActionMessage m(data, bytes_received);
             if (isProtocolCommand(m)) {
-                if (m.messageID == PORT_DEFINITIONS) {
-                    rxMessageQueue.push(m);
-                } else if (m.messageID == DISCONNECT) {
-                    txQueue.emplace(control_route, m);
-                } else if (m.messageID == NEW_BROKER_INFORMATION) {
-                    txQueue.emplace(control_route, m);
-                } else if (m.messageID == DELAY) {
-                    std::this_thread::sleep_for(std::chrono::seconds(2));
-                    txQueue.emplace(control_route, m);
-                }
+                txQueue.emplace(control_route, m);
             }
         } else {
             logError(errorMessage);
@@ -251,9 +242,18 @@ namespace tcp {
                         connectionTimeout);
                 }
             }
-            if (PortNumber <= 0) {
+            //monitor the total waiting time before connections
+            std::chrono::milliseconds cumulativeSleep{0};
+            const std::chrono::milliseconds popTimeout{200};
+
+            bool connectionEstablished{false};
+            if (PortNumber > 0 && NetworkCommsInterface::noAckConnection) {
+                connectionEstablished = true;
+            }
+            while (!connectionEstablished) {
                 ActionMessage m(CMD_PROTOCOL_PRIORITY);
-                m.messageID = REQUEST_PORTS;
+                m.messageID = (PortNumber <= 0) ? REQUEST_PORTS : CONNECTION_REQUEST;
+
                 m.setStringData(brokerName, brokerInitString);
                 try {
                     brokerConnection->send(m.packetize());
@@ -274,27 +274,53 @@ namespace tcp {
                             }
                         }
                     });
-                std::chrono::milliseconds cumsleep{0};
-                while (PortNumber < 0) {
-                    auto mess = txQueue.pop(std::chrono::milliseconds(100));
-                    if (mess) {
-                        if (isProtocolCommand(mess->second)) {
-                            if (mess->second.messageID == PORT_DEFINITIONS) {
+                auto mess = txQueue.pop(popTimeout);
+                if (mess) {
+                    if (isProtocolCommand(mess->second)) {
+                        if (mess->second.messageID == PORT_DEFINITIONS) {
+                            if (PortNumber <= 0) {
                                 rxMessageQueue.push(mess->second);
-                                break;
+                                connectionEstablished = true;
+                                continue;
                             }
-                            if (mess->second.messageID == DISCONNECT) {
-                                return terminate(connection_status::terminated);
-                            }
-                            if (mess->second.messageID == DELAY) {
-                            }
-                            rxMessageQueue.push(mess->second);
-                        } else {
-                            logWarning("unexpected message received in transmit queue");
                         }
+                        if (mess->second.messageID == CONNECTION_ACK) {
+                            if (PortNumber > 0) {
+                                connectionEstablished = true;
+                                continue;
+                            }
+                        }
+                        if (mess->second.messageID == DISCONNECT) {
+                            return terminate(connection_status::terminated);
+                        }
+                        if (mess->second.messageID == NEW_BROKER_INFORMATION) {
+                            logMessage("got new broker information");
+                            brokerConnection->close();
+
+                            auto brkprt = extractInterfaceandPort(mess->second.getString(0));
+                            brokerPort = brkprt.second;
+                            if (brkprt.first != "?") {
+                                brokerTargetAddress = brkprt.first;
+                            }
+                            brokerConnection = makeConnection(
+                                ioctx->getBaseContext(),
+                                brokerTargetAddress,
+                                std::to_string(brokerPort),
+                                maxMessageSize,
+                                connectionTimeout);
+                            continue;
+                        }
+                        if (mess->second.messageID == DELAY) {
+                            std::this_thread::sleep_for(std::chrono::seconds(2));
+                            continue;
+                        }
+                        rxMessageQueue.push(mess->second);
+                    } else {
+                        logWarning("unexpected message received in transmit queue");
                     }
-                    cumsleep += std::chrono::milliseconds(100);
-                    if (cumsleep >= connectionTimeout) {
+                } else {
+                    cumulativeSleep += popTimeout;
+                    if (cumulativeSleep >= connectionTimeout) {
                         brokerConnection->cancel();
                         logError("port number query to broker timed out");
                         return terminate(connection_status::error);

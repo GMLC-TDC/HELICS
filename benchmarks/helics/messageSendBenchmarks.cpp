@@ -242,7 +242,7 @@ BENCHMARK_CAPTURE (BMsendMessage, multiCore/ipcCore, core_type::IPC)
     // clang-format on
     //->RangeMultiplier (2)
     ->Ranges({{1, 1 << 11}, {1, 1}}) // msg size of 4096 bytes causes Boost transmit error
-    ->Ranges({{1, 1 << 11},
+    ->Ranges({{1, 1},
               {1, 1 << 9}}) // msg count has a much bigger effect on time taken (increasing size had
     // no noticeable effect on times)
     ->Iterations(1)

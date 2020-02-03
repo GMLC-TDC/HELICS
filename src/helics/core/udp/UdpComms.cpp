@@ -189,22 +189,30 @@ namespace udp {
                     udpnet(interfaceNetwork), brokerTargetAddress, std::to_string(brokerPort));
                 // Setup the control socket for comms with the receiver
                 broker_endpoint = *resolver.resolve(query);
-                int retries = 0;
-                while (PortNumber <= 0) {
+                int retries{0};
+                bool connectionEstablished{false};
+                if (PortNumber.load() > 0 && NetworkCommsInterface::noAckConnection) {
+                    connectionEstablished = true;
+                }
+                while (!connectionEstablished) {
                     ActionMessage m(CMD_PROTOCOL_PRIORITY);
-                    m.messageID = REQUEST_PORTS;
+                    m.messageID = (PortNumber <= 0) ? REQUEST_PORTS : CONNECTION_REQUEST;
                     m.setStringData(brokerName, brokerInitString);
                     transmitSocket.send_to(asio::buffer(m.to_string()), broker_endpoint, 0, error);
                     if (error) {
                         logError(
                             fmt::format("error in initial send to broker {}", error.message()));
-                        PortNumber = -1;
-                        promisePort.set_value(-1);
+                        if (PortNumber.load() <= 0) {
+                            PortNumber = -1;
+                            promisePort.set_value(-1);
+                        }
+
                         setTxStatus(connection_status::error);
                         return;
                     }
-                    auto startTime = std::chrono::steady_clock::now();
-                    bool timeout = false;
+                    const decltype(std::chrono::steady_clock::now()) startTime{
+                        std::chrono::steady_clock::now()};
+                    bool timeout{false};
                     std::this_thread::yield();
                     std::vector<char> rx(128);
                     udp::endpoint brk;
@@ -219,23 +227,59 @@ namespace udp {
                         ++retries;
                         if (retries > maxRetries) {
                             logError("the max number of retries has been exceeded");
-                            PortNumber = -1;
-                            promisePort.set_value(-1);
+                            if (PortNumber.load() <= 0) {
+                                PortNumber = -1;
+                                promisePort.set_value(-1);
+                            }
                             setTxStatus(connection_status::error);
                             return;
                         } else {
                             continue;
                         }
                     }
-                    auto len = transmitSocket.receive_from(asio::buffer(rx), brk);
+                    auto len = transmitSocket.receive_from(asio::buffer(rx), brk, 0, error);
+                    if (error) {
+                        logError(
+                            fmt::format("error in initial receive broker {}", error.message()));
+                        if (PortNumber.load() <= 0) {
+                            PortNumber = -1;
+                            promisePort.set_value(-1);
+                        }
+                        setTxStatus(connection_status::error);
+                        return;
+                    }
                     m = ActionMessage(rx.data(), len);
                     if (isProtocolCommand(m)) {
                         if (m.messageID == PORT_DEFINITIONS) {
                             loadPortDefinitions(m);
                             promisePort.set_value(PortNumber);
+                            connectionEstablished = true;
+                        } else if (m.messageID == CONNECTION_ACK) {
+                            if (PortNumber.load() > 0) {
+                                connectionEstablished = true;
+                                continue;
+                            }
+                        } else if (m.messageID == NEW_BROKER_INFORMATION) {
+                            logMessage("got new broker information");
+                            auto brkprt = extractInterfaceandPort(m.getString(0));
+                            brokerPort = brkprt.second;
+                            if (brkprt.first != "?") {
+                                brokerTargetAddress = brkprt.first;
+                            }
+                            query = udp::resolver::query(
+                                udpnet(interfaceNetwork),
+                                brokerTargetAddress,
+                                std::to_string(brokerPort));
+                            // Setup the control socket for comms with the receiver
+                            broker_endpoint = *resolver.resolve(query);
+                            continue;
+                        } else if (m.messageID == DELAY) {
+                            std::this_thread::sleep_for(std::chrono::seconds(2));
                         } else if (m.messageID == DISCONNECT) {
-                            PortNumber = -1;
-                            promisePort.set_value(-1);
+                            if (PortNumber <= 0) {
+                                PortNumber = -1;
+                                promisePort.set_value(-1);
+                            }
                             setTxStatus(connection_status::terminated);
                             return;
                         }
