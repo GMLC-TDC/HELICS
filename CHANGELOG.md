@@ -17,7 +17,7 @@ A few bug fixes, code coverage on the shared library increased to 100%,  library
 -   variant header updated to latest release
 -   Update the units library (v0.3.0)
 -   The TOML interpreter used in HELICS was changed to [toml11](https://github.com/ToruNiina/toml11)
--   Some unnecessary blocks were removed from the all source package
+-   Some unnecessary files were removed from the all source package
 -   some internal CMake options and messages were not using new format for message
 -   Major updates to the python modules build system including merging the python3 and python 2 builds into the same CMake generator
 -   CMake cleanup and formatting
@@ -28,10 +28,10 @@ A few bug fixes, code coverage on the shared library increased to 100%,  library
 -   TCP and UDP core types are not by default backwards compatible with <2.4 brokers.  The flag "--noack_connect" will need to be passed as part of the coreinitialization string to allow this to work if need be.  ZMQ_SS cores are not considered interoperable with <2.4 brokers due to a number of bugs.  In a few select cases it might still work.  
 
 ### Fixed
--   macos Rpath information on the built binaries
+-   macOS rpath information on the built binaries
 -   Some issues with swig include directories to allow it to work in other circumstances
 -   an issue with building the java interface in MSYS2
--   an issue with the HELICS_USE_NEW_PYTHON_FIND
+-   an issue with the `HELICS_USE_NEW_PYTHON_FIND` CMake option
 -   Some thread sanitizer identified issues  
 -   A series of issues from static analyzers
 -   an issue in the shared library create core that could emit an exception
@@ -52,7 +52,7 @@ A few bug fixes, code coverage on the shared library increased to 100%,  library
 -   a feature to mark a broker or federate as slow responding so it doesn't time out automatically
 -   EditorConfig and .gitattributes for cleaner diff and automatic editor configuration
 -   An incorrect call in the Matlab swig code
--   Automatic generation of Puli requests for source code formatting  
+-   Automatic generation of pull requests for source code formatting  
 -   Add metadata information to the benchmarks for automatic processing
 -   Broker server functionality for tcp core, zmqss core, and udp core
 -   An experimental web server that can be used with the broker server or the broker executables. (requires boost 1.70+ to build)  

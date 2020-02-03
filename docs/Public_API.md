@@ -41,7 +41,7 @@ The public API includes the following
     *   helicsVersion.hpp
     *   federate_id.hpp
     *   helics_definitions.hpp
-    *   NOTE:  core headers in the public API are headers that need to be available for the Application API public headers.  The core api can be used more directly if static linking but applications are generally recommended to use the application API or other higher level API's
+    *   NOTE:  core headers in the public API are headers that need to be available for the Application API public headers.  The core api can be used more directly with static linking but applications are generally recommended to use the application API or other higher level API's
 
 
 *   C Shared Library headers (c)
