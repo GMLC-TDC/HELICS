@@ -56,7 +56,8 @@ A few bug fixes, code coverage on the shared library increased to 100%,  library
 -   Add metadata information to the benchmarks for automatic processing
 -   Broker server functionality for tcp core, zmqss core, and udp core
 -   An experimental web server that can be used with the broker server or the broker executables. (requires boost 1.70+ to build)  
-
+-   man pages for the helics applications
+ 
 ### Deprecated
 
 ### Removed
