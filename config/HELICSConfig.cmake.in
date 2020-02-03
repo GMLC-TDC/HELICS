@@ -4,7 +4,7 @@
 #   HELICS_FOUND - true if HELICS found on the system
 #   HELICS_INCLUDE_DIR - the directory containing HELICS headers for the C shared library if available
 #   HELICS_C_SHARED_LIBRARY - the C shared library
-# 	HELICS_CXX_SHARED_LIBRARY -the C++ shared library
+#   HELICS_CXX_SHARED_LIBRARY -the C++ shared library
 #   It also creates the following targets if they are available (not all are always built depending on the configuration)
 #   HELICS::helicsSharedLib for the C based shared library
 #   HELICS::helics-shared for C++ based shared libary
