@@ -84,6 +84,8 @@ namespace apps {
                 webs->enableWebSocketServer(true);
             }
             servers.push_back(std::move(webs));
+#else
+            std::cout << "Webserver not enabled" << std::endl;
 #endif
         }
         for (auto& server : servers) {
@@ -130,7 +132,7 @@ namespace apps {
         app->add_flag("--udp,-u", udp_server, "start a broker-server for the udp comms in helics");
         app->add_flag("--mpi", mpi_server, "start a broker-server for the mpi comms in helics");
         app->add_flag(
-            "--http", http_server, "start a webserver to respond to http rest api requests");
+            "--http,--web", http_server, "start a webserver to respond to http rest api requests");
         app->add_flag(
             "--websocket", websocket_server, "start a websocket to respond to api requests");
         app->add_option(

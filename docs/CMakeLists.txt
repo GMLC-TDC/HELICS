@@ -30,7 +30,7 @@ if(MSVC)
 
     add_custom_target(helics_docs SOURCES ${doc_sources})
 
-    file(GLOB user_guide_sources user-guide/*.md)
+    file(GLOB user_guide_sources user-guide/*.md) 
 
     add_custom_target(helics_user_guide SOURCES ${user_guide_sources})
 

@@ -16,11 +16,46 @@ helics_broker --type=zmq --port=20400 &
 will start up two brokers on separate port numbers.  Federates connecting to the broker would need to specify the `--brokerport=X` to connect with the appropriate broker.    These brokers operate independently of each other.   The port numbers assigned to the cores and federates can also be user assigned but if left to default will be automatically assigned by the broker and should not interfere with each other.  
 
 ## Use Broker server
-For zmq core types it is possible to use the broker server.
+For the zmq, zmqss, tcp, and udp core types it is possible to use the broker server.
 ```sh
-helics_broker_server --type=ZMQ
+helics_broker_server --zmq 
+helics_broker_server --zmqss 
+helics_broker_server --tcp
+helics_broker_server --udp
 ```
-The broker server runs continuously on the default port and will automatically generate brokers on separate ports and direct federates which broker to use.  It will also generate brokers as needed so the `helics_broker` does not need to be restarted for every run.  This currently only works with ZMQ brokers but will be extended to other broker types soon.  
+
+multiple broker servers can be run simulataneously
+```sh
+helics_broker_server --zmq --tcp --udp
+```
+The broker server currently has a default timeout of 30 minutes on the default port and will automatically generate brokers on separate ports and direct federates which broker to use. The duration of the server can be controlled via 
+
+```sh
+helics_broker_server --zmq --duration=24hours 
+```
+
+ It will also generate brokers as needed so the `helics_broker` does not need to be restarted for every run.
+
+By default the servers will use the default ports and all interfaces.  This can be configured through a configuration file
+
+```sh
+helics_broker_server --zmq --duration=24hours --config=broker_config.json 
+```
+
+this is a json file.  The sections in the json file include the server type For example
+```json
+{
+    "zmq":{
+        "interface":"tcp://127.0.0.1"
+    },
+    "tcp":{
+        "interface":"127.0.0.1",
+        "port":9568
+    }
+}
+```
+
+There is also [webserver](./running_interaction.md) that can be run with the other broker servers.  
 
 ## Use of keys
 If there are multiple users and you want to verify that a specific broker can only be used with federates you control.  It is possible to add a key to the broker that is required to be supplied with the federates to connect to the broker.  **NOTE:** *this is not a cryptographic key, it is just a string that is not programmatically accessible to others.*  
