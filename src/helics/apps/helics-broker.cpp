@@ -41,7 +41,7 @@ int main(int argc, char* argv[])
     cmdLine.add_flag(
         "--autorestart",
         autorestart,
-        "helics_broker autorestart <broker args ...> will start a continually regenerating broker "
+        "helics_broker --autorestart <broker args ...> will start a continually regenerating broker "
         "there is a 3 second countdown on broker completion to halt the program via ctrl-C\n");
     cmdLine.add_flag(
         "--http",
