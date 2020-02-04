@@ -36,5 +36,5 @@ There are a number of classes of HELICS users:
 *   [Installation](../installation/index.html) -  Instructions on how to install HELICS
 *   [C API](../c-api-reference/index.html)
 *   [Developer's Guide](../developer-guide/index.html) - Details on how the software is assembled and some of the underlying components.
-*   [Existing Tools](../Tools_using_Helics.md) for list of the existing tools using HELICS and some under development. 
+*   [Existing Tools](../Tools_using_Helics.md) - List of the existing tools using HELICS and some under development. 
 *   [Youtube Channel](https://www.youtube.com/channel/UCPa81c4BVXEYXt2EShTzbcg/featured) - Throughout the development of HELICS, developers and users have given mini-tutorials providing overviews of the work they have been doing. Due to its nature, many of the specifics of the content are out of date but many of the general concepts of HELICS haven't changed. A good, broad overview of the project as a whole.

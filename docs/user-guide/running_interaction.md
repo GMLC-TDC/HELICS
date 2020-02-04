@@ -27,7 +27,7 @@ helics_broker_server --http --zmq --config broker_server_config.json
 the configuration will then make the webserver accessible on any interface on port 8080.  
 
 ## Making queries
-The running webserver will start a process that can respond to http request. It can accept GET or POST requests as a REST API.   
+The running webserver will start a process that can respond to http requests. It can accept GET or POST requests as a REST API.   
 
 As a demo case there is a brokerServerTestCase executable built as part of the HELICS_EXAMPLES.   Running this example starts a webserver on the localhost using port 80.  
 
@@ -133,6 +133,6 @@ POST requests can also be made using a similar format.
 Currently any query is accessible through this interface.  Queries have a target and a query.  The target is some named object in the federation and the query is a question.  The available queries are listed [HERE](queries.md).  More are expected to be added.  
 
 ## Notes
-This is an experimental interface and is subject to change and improvments.  Suggestions are welcome.  Also a websocket version of this is expected in the next release to allow websockets to connect.  
+This is an experimental interface and is subject to change and improvements.  Suggestions are welcome.  Also a websocket version of this is expected in the next release to allow websockets to connect.  
 
 The most likely use case for this will be as a component for a more sophisticated control interface, so a more user friendly setup will be using the webserver as a backend for control, debugging, information, and visualization of a running co-simulation.  
