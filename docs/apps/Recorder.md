@@ -56,7 +56,7 @@ configuration:
   --clone arg            existing endpoints to clone all packets to and from
   --capture arg          capture all the publications of a particular federate
                          capture="fed1;fed2"  supports multiple arguments or a
-                         comma separated list
+                         semicolon/comma separated list
   -o [ --output ] arg    the output file for recording the data
   --allow_iteration      allow iteration on values
   --verbose              print all value results to the screen

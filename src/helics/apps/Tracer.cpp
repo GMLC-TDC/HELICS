@@ -502,7 +502,7 @@ namespace apps {
             ->add_option(
                 "--capture",
                 "capture all the publications of a particular federate capture=\"fed1;fed2\"  "
-                "supports multiple arguments or a comma separated list")
+                "supports multiple arguments or a semicolon/comma separated list")
             ->each([this](const std::string& capt) {
                 auto captFeds = stringOps::splitlineQuotes(capt);
                 for (auto& captFed : captFeds) {
