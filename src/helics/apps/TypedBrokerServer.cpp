@@ -125,6 +125,9 @@ namespace apps {
         }
     }
 
-    void TypedBrokerServer::logMessage(std::string message) {}
+    void TypedBrokerServer::logMessage(std::string message)
+    {
+        LoggerManager::logMessage(std::move(message));
+    }
 } // namespace apps
 } // namespace helics
