@@ -278,11 +278,9 @@ void handle_request(http::request<Body, http::basic_fields<Allocator>>&& req, Se
     }
 
     auto reqpr = process_request_parameters(target, req.body());
-    std::string query;
-    std::string targetObj;
-    std::string brokerName;
+    std::string brokerName, query, targetObj;
 
-    partitionTarget(target, brokerName, query, targetObj);
+    partitionTarget(reqpr.first, brokerName, query, targetObj);
 
     auto& fields = reqpr.second;
     if (query.empty()) {
@@ -297,7 +295,7 @@ void handle_request(http::request<Body, http::basic_fields<Allocator>>&& req, Se
     }
     if (brokerName.empty() || brokerName == "query") {
         if (fields.find("broker") != fields.end()) {
-            targetObj = fields["broker"];
+            brokerName = fields["broker"];
         }
     }
     if (brokerName == "query" && target == "brokers") {
