@@ -15,7 +15,7 @@ If you would like to contribute to the HELICS project see [CONTRIBUTING](CONTRIB
 
 ### Lawrence Livermore National Lab
 -   [Ryan Mast](https://github.com/nightlark)
--   Steve Smith
+-   [Steve Smith](https://github.com/smithsg84)
 -   [Philip Top](https://github.com/phlptp)
 -   [Denis Nadeau](https://github.com/dnadeau4)
 -   [Ben Salazar](https://github.com/salazar33)
