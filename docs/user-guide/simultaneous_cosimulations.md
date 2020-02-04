@@ -7,13 +7,14 @@ HELICS starts with some default port numbers for network communication, so only 
 There are a number of ways around this and some tools to assist in checking and coordinating.  
 
 ## Specify port numbers
-The manual approach works fine.  All the network core types accept user specified port numbers.
+The manual approach works fine.  All the network core types accept user specified port numbers.  The following script will start up two brokers on separate port numbers:
+
 ```sh
 helics_broker --type=zmq --port=20200 &
 helics_broker --type=zmq --port=20400 &
 ```
 
-will start up two brokers on separate port numbers.  Federates connecting to the broker would need to specify the `--brokerport=X` to connect with the appropriate broker.    These brokers operate independently of each other.   The port numbers assigned to the cores and federates can also be user assigned but if left to default will be automatically assigned by the broker and should not interfere with each other.  
+ Federates connecting to the broker would need to specify the `--brokerport=X` to connect with the appropriate broker.    These brokers operate independently of each other.   The port numbers assigned to the cores and federates can also be user assigned but if left to default will be automatically assigned by the broker and should not interfere with each other.  
 
 ## Use Broker server
 For the zmq, zmqss, tcp, and udp core types it is possible to use the broker server.

@@ -135,4 +135,4 @@ Currently any query is accessible through this interface.  Queries have a target
 ## Notes
 This is an experimental interface and is subject to change and improvements.  Suggestions are welcome.  Also a websocket version of this is expected in the next release to allow websockets to connect.  
 
-The most likely use case for this will be as a component for a more sophisticated control interface, so a more user friendly setup will be using the webserver as a backend for control, debugging, information, and visualization of a running co-simulation.  
+The most likely use case for this will be as a component for a more sophisticated control interface, so a more user friendly setup will be using the webserver as a back-end for control, debugging, information, and visualization of a running co-simulation.  
