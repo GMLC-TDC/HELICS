@@ -195,29 +195,6 @@ void handle_request(http::request<Body, http::basic_fields<Allocator>>&& req, Se
         return res;
     };
 
-    // Returns a not found response
-    auto const not_found = [&req](beast::string_view target) {
-        http::response<http::string_body> res{http::status::not_found, req.version()};
-        res.set(http::field::server, BOOST_BEAST_VERSION_STRING);
-        res.set(http::field::content_type, "text/html");
-        res.keep_alive(req.keep_alive());
-        res.body() = std::string(target) + "' was not found.";
-        res.prepare_payload();
-        return res;
-    };
-
-    // Returns a server error response
-    /*
-    auto const server_error = [&req](beast::string_view what) {
-        http::response<http::string_body> res{http::status::internal_server_error, req.version()};
-        res.set(http::field::server, BOOST_BEAST_VERSION_STRING);
-        res.set(http::field::content_type, "text/html");
-        res.keep_alive(req.keep_alive());
-        res.body() = "An error occurred: '" + std::string(what) + "'";
-        res.prepare_payload();
-        return res;
-    };
-    */
     // generate the main page
     auto const main_page = [&req]() {
         http::response<http::string_body> res{http::status::ok, req.version()};
