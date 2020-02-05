@@ -25,7 +25,7 @@ aliases:
   - &run_helics_tests
     name: run_helics_tests
     command: |
-       /root/project/scripts/run-nighly-circleci-tests.sh
+       /root/project/scripts/run-circleci-tests.sh
        RESULT=$?
        exit $RESULT
 
@@ -36,11 +36,18 @@ aliases:
        make install
        ctest -V -R find-package-tests
        ctest -V -R package-config-tests
+       
+  - &run_benchmarks
+    name: run_benchmarks
+    command: |
+       mkdir /tmp/bm_results
+       cd build
+       make RUN_KEY_BENCHMARKS
 
 jobs:
   helicsoctave:
     docker:
-      - image: helics/octave:latest
+      - image: helics/buildenv:octave
     environment:
       OCTAVETEST: "/root/project/tests/octave"
       CMAKE_FLAGS: "-DBUILD_OCTAVE_INTERFACE=ON -DHELICS_BUILD_TESTS=ON"
@@ -54,7 +61,7 @@ jobs:
       - image: helics/clang-tsan:latest
     environment:
       CMAKE_FLAGS: '-DCMAKE_CXX_COMPILER=clang++ -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_FLAGS="-fsanitize=thread -stdlib=libc++ -L/root/develop/libcxx_tsan/lib -lc++abi -I/root/develop/libcxx_tsan/include -I/root/develop/libcxx_tsan/include/c++/v1 -Wno-unused-command-line-argument -g -O1 -Wl,-rpath=/root/develop/libcxx_tsan/lib"  -DHELICS_BUILD_TESTS=ON -DHELICS_ZMQ_SUBPROJECT=ON  -DHELICS_ZMQ_FORCE_SUBPROJECT=ON -DHELICS_DISABLE_SYSTEM_CALL_TESTS=ON'
-      TSAN_OPTIONS: 'second_deadlock_stack=1 suppressions=/root/project/.circleci/tsan_suppression.txt'
+      TSAN_OPTIONS: 'second_deadlock_stack=1 suppressions=/root/project/.circleci/tsan_suppression.txt history_size=4'
 
     steps:
       - checkout
@@ -67,7 +74,7 @@ jobs:
     environment:
       CMAKE_FLAGS: '-DCMAKE_CXX_COMPILER=clang++ -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_FLAGS="-fsanitize=undefined,address -fsanitize-address-use-after-scope -stdlib=libc++ -L/root/develop/libcxx_asan/lib -lc++abi -I/root/develop/libcxx_asan/include -I/root/develop/libcxx_asan/include/c++/v1 -Wno-unused-command-line-argument -fno-omit-frame-pointer -g -O1 -Wl,-rpath=/root/develop/libcxx_asan/lib -fsanitize-blacklist=/root/project/.circleci/asan_blacklist.txt"  -DHELICS_BUILD_TESTS=ON -DHELICS_ZMQ_SUBPROJECT=ON  -DHELICS_ZMQ_FORCE_SUBPROJECT=ON'
       LSAN_OPTIONS: 'suppressions=/root/project/.circleci/leak_suppression.txt'
-      UBSAN_OPTIONS: 'print_stacktrace=1'
+      UBSAN_OPTIONS: 'print_stacktrace=1 suppressions=/root/project/.circleci/ubsan_suppression.txt'
 
     steps:
       - checkout
@@ -104,6 +111,19 @@ jobs:
       - checkout
       - run: *setup_helics
       - run: *run_installer_tests
+      
+  benchmarkjob:
+    docker:
+      - image: helics/buildenv:builder
+    environment:
+      CMAKE_FLAGS: '-DHELICS_BUILD_BENCHMARKS=ON -DBM_RESULT_DIR=/tmp/bm_results/ -DHELICS_DISABLE_C_SHARED_LIB=ON'
+    steps:
+      - checkout
+      - run: *setup_helics
+      - run: *run_benchmarks
+
+      - store_artifacts:
+          path: /tmp/bm_results
 
 workflows:
   version: 2
@@ -118,7 +138,7 @@ workflows:
   nightly:
     triggers:
       - schedule:
-          cron: "0 0 * * *"
+          cron: "0 8 * * *"
           filters:
             branches:
               only:
@@ -128,4 +148,14 @@ workflows:
       - helicsMSan
       - helicsASan
       - helicsTSan
+  benchmark:
+    triggers:
+      - schedule:
+          cron: "17 9 * * 0,2,5"
+          filters:
+            branches:
+              only:
+                - develop
+    jobs:
+      - benchmarkjob
 

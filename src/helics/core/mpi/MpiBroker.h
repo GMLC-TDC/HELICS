@@ -10,35 +10,32 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "../CommsBroker.hpp"
 #include "../CoreBroker.hpp"
 
-namespace helics
-{
-namespace mpi
-{
-class MpiComms;
-/** broker object implementing mpi communications for HELICS*/
-class MpiBroker final : public CommsBroker<MpiComms, CoreBroker>
-{
-  public:
-    /** default constructor*/
-    explicit MpiBroker (bool rootBroker = false) noexcept;
-    explicit MpiBroker (const std::string &broker_name);
+namespace helics {
+namespace mpi {
+    class MpiComms;
+    /** broker object implementing mpi communications for HELICS*/
+    class MpiBroker final: public CommsBroker<MpiComms, CoreBroker> {
+      public:
+        /** default constructor*/
+        explicit MpiBroker(bool rootBroker = false) noexcept;
+        explicit MpiBroker(const std::string& broker_name);
 
-  protected:
-    virtual std::shared_ptr<helicsCLI11App> generateCLI () override;
+      protected:
+        virtual std::shared_ptr<helicsCLI11App> generateCLI() override;
 
-  public:
-    /**destructor*/
-    virtual ~MpiBroker ();
+      public:
+        /**destructor*/
+        virtual ~MpiBroker();
 
-    virtual std::string generateLocalAddressString () const override;
-    static void displayHelp (bool local_only = false);
+        virtual std::string generateLocalAddressString() const override;
+        static void displayHelp(bool local_only = false);
 
-  private:
-    virtual bool brokerConnect () override;
-    mutable std::mutex dataMutex;  //!< mutex protecting the configuration information
-    std::string brokerAddress;  //!< the mpi rank:tag of the parent broker
-    int brokerRank{0};
-    int brokerTag{0};
-};
-}  // namespace mpi
-}  // namespace helics
+      private:
+        virtual bool brokerConnect() override;
+        mutable std::mutex dataMutex; //!< mutex protecting the configuration information
+        std::string brokerAddress; //!< the mpi rank:tag of the parent broker
+        int brokerRank{0};
+        int brokerTag{0};
+    };
+} // namespace mpi
+} // namespace helics

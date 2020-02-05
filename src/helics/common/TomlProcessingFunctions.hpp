@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2017-2019,
+Copyright (c) 2017-2020,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
 the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
@@ -12,86 +12,135 @@ using the toml library
 */
 
 #include "../core/helics-time.hpp"
-#include "toml/toml.h"
+#ifdef __GNUC__
+#    pragma GCC diagnostic push
+#    pragma GCC diagnostic ignored "-Wshadow"
+#endif
+#include "toml.hpp"
+#ifdef __GNUC__
+#    pragma GCC diagnostic pop
+#endif
+
 #include <functional>
 
 /** load a TOML string or filename that points to a TOML file and return a
 toml::Value to the root object
 */
-toml::Value loadToml (const std::string &tomlString);
+toml::value loadToml(const std::string& tomlString);
 
-bool hasTomlExtension (const std::string &tomlString);
+bool hasTomlExtension(const std::string& tomlString);
 /** load a TOML object in a string
  */
-toml::Value loadTomlStr (const std::string &tomlString);
+toml::value loadTomlStr(const std::string& tomlString);
+
+/** get a toml value as a string*/
+std::string tomlAsString(const toml::value& element);
 
 /** read a time from a TOML value element*/
-helics::Time loadTomlTime (const toml::Value &timeElement, time_units defaultUnits = time_units::sec);
+helics::Time
+    loadTomlTime(const toml::value& timeElement, time_units defaultUnits = time_units::sec);
 
 /** get a name or key from the element*/
-std::string getKey (const toml::Value &element);
+std::string getKey(const toml::value& element);
 
-template <class X>
-inline X getOrDefault (const toml::Value &element, const std::string &key, const X &defVal)
+/** get a string value or use the default if it is not a member*/
+inline std::string
+    getOrDefault(const toml::value& element, const std::string& key, const std::string& defVal)
 {
-    auto val = element.find (key);
-    return (val != nullptr) ? val->as<X> () : defVal;
+    return toml::find_or<std::string>(element, key, defVal);
+}
+/** get a double value or use the default if it is not a member*/
+inline double getOrDefault(const toml::value& element, const std::string& key, double defVal)
+{
+    return toml::find_or<double>(element, key, defVal);
 }
 
-inline void callIfMember (const toml::Value &element,
-                          const std::string &key,
-                          const std::function<void (const std::string &)> &call)
+/** get a boolean value or use the default if it is not a member*/
+inline bool getOrDefault(const toml::value& element, const std::string& key, bool defVal)
 {
-    auto val = element.find (key);
-    if (val != nullptr)
-    {
-        call (val->as<std::string> ());
+    return toml::find_or<bool>(element, key, defVal);
+}
+
+/** get an integer value or use the default if it is not a member*/
+inline int64_t getOrDefault(const toml::value& element, const std::string& key, int64_t defVal)
+{
+    return toml::find_or<int64_t>(element, key, defVal);
+}
+
+/** call a function if a member element exists and pass the string to the invoked object*/
+inline bool callIfMember(
+    const toml::value& element,
+    const std::string& key,
+    const std::function<void(const std::string&)>& call)
+{
+    const std::string empty;
+    auto& val = toml::find_or<std::string>(element, key, empty);
+    if (!val.empty()) {
+        call(val);
+        return true;
+    }
+    return false;
+}
+
+/** call a function if a member element exists and pass a time to the invoked object*/
+inline bool callIfMember(
+    const toml::value& element,
+    const std::string& key,
+    const std::function<void(const std::string&, helics::Time)>& call)
+{
+    toml::value uval;
+    auto val = toml::find_or(element, key, uval);
+
+    if (!val.is_uninitialized()) {
+        call(key, loadTomlTime(val));
+        return true;
+    }
+    return false;
+}
+
+/** call a function if a member element exists and pass a specific type to the invoked object*/
+template<class X>
+inline bool callIfMember(
+    const toml::value& element,
+    const std::string& key,
+    const std::function<void(const std::string&, X)>& call)
+{
+    toml::value uval;
+    auto val = toml::find_or(element, key, uval);
+    if (!val.is_uninitialized()) {
+        call(key, toml::get<X>(val));
+        return true;
+    }
+    return false;
+}
+
+inline void
+    replaceIfMember(const toml::value& element, const std::string& key, helics::Time& timeVal)
+{
+    toml::value uval;
+    auto val = toml::find_or(element, key, uval);
+
+    if (!val.is_uninitialized()) {
+        timeVal = loadTomlTime(val);
     }
 }
 
-inline void callIfMember (const toml::Value &element,
-                          const std::string &key,
-                          const std::function<void (const std::string &, helics::Time)> &call)
+template<class X>
+inline void replaceIfMember(const toml::value& element, const std::string& key, X& loc)
 {
-    auto val = element.find (key);
-    if (val != nullptr)
-    {
-        call (key, loadTomlTime (*val));
+    toml::value uval;
+    auto val = toml::find_or(element, key, uval);
+
+    if (!val.is_uninitialized()) {
+        loc = toml::get<X>(val);
     }
 }
 
-template <class X>
-inline void callIfMember (const toml::Value &element,
-                          const std::string &key,
-                          const std::function<void (const std::string &, X)> &call)
+/** check if a key is a member of a table object*/
+inline bool isMember(const toml::value& element, const std::string& key)
 {
-    auto val = element.find (key);
-    if (val != nullptr)
-    {
-        call (key, val->as<X> ());
-    }
-}
+    toml::value uval;
+    auto val = toml::find_or(element, key, uval);
 
-inline void replaceIfMember (const toml::Value &element, const std::string &key, helics::Time &timeVal)
-{
-    auto val = element.find (key);
-    if (val != nullptr)
-    {
-        timeVal = loadTomlTime (*val);
-    }
-}
-
-template <class X>
-inline void replaceIfMember (const toml::Value &element, const std::string &key, X &loc)
-{
-    auto val = element.find (key);
-    if (val != nullptr)
-    {
-        loc = val->as<X> ();
-    }
-}
-
-inline bool isMember (const toml::Value &element, const std::string &key)
-{
-    return (element.find (key) != nullptr);
+    return (!val.is_uninitialized());
 }

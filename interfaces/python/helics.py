@@ -157,6 +157,11 @@ helics_flag_realtime = _helics.helics_flag_realtime
 r""" flag indicating that a federate needs to run in real time"""
 helics_flag_single_thread_federate = _helics.helics_flag_single_thread_federate
 r""" flag indicating that the federate will only interact on a single thread"""
+helics_flag_slow_responding = _helics.helics_flag_slow_responding
+r"""
+    flag specifying that a federate, core, or broker may be slow to respond to pings
+    	If the federate goes offline there is no good way to detect it so use with caution
+    """
 helics_flag_delay_init_entry = _helics.helics_flag_delay_init_entry
 r""" used to delay a core from entering initialization mode even if it would otherwise be ready"""
 helics_flag_enable_init_entry = _helics.helics_flag_enable_init_entry
@@ -661,9 +666,17 @@ def helicsCoreSetReadyToInit(core: "helics_core") -> "void":
     """
     return _helics.helicsCoreSetReadyToInit(core)
 
+def helicsCoreConnect(core: "helics_core") -> "helics_bool":
+    r"""
+    connect a core to the federate based on current configuration
+       :type core: void
+       :param core: the core to connect
+    """
+    return _helics.helicsCoreConnect(core)
+
 def helicsCoreDisconnect(core: "helics_core") -> "void":
     r"""
-    get an identifier for the core
+    disconnect a core from the federation
        :type core: void
        :param core: the core to query
     """
@@ -1228,7 +1241,7 @@ def helicsFederateRequestTimeIterative(fed: "helics_federate", requestTime: "hel
        :param requestTime: the next desired time
        :type iterate: int
        :param iterate: the requested iteration mode
-           outIterate  the iteration specification of the result
+           outIteration  the iteration specification of the result
 
        :rtype: float
        :return: the granted time, will return helics_time_maxtime if the simulation has terminated along with the appropriate iteration result
@@ -2087,6 +2100,7 @@ def helicsInputGetChar(ipt: "helics_input") -> "char":
 
        :rtype: char
        :return: the resulting character value
+       NAK (negative acknowledgment) symbol returned on error
     """
     return _helics.helicsInputGetChar(ipt)
 
@@ -2442,6 +2456,26 @@ def helicsPublicationSetOption(pub: "helics_publication", option: "int", val: "h
        :param val: the value to set the option to
     """
     return _helics.helicsPublicationSetOption(pub, option, val)
+
+def helicsPublicationSetMinimumChange(pub: "helics_publication", tolerance: "double") -> "void":
+    r"""
+    set the minimum change detection tolerance
+       :type pub: void
+       :param pub: the publication to modify
+       :type tolerance: float
+       :param tolerance: the tolerance level for publication, values changing less than this value will not be published
+    """
+    return _helics.helicsPublicationSetMinimumChange(pub, tolerance)
+
+def helicsInputSetMinimumChange(inp: "helics_input", tolerance: "double") -> "void":
+    r"""
+    set the minimum change detection tolerance
+       :type inp: void
+       :param inp: the input to modify
+       :type tolerance: float
+       :param tolerance: the tolerance level for registering an update, values changing less than this value will not show as being updated
+    """
+    return _helics.helicsInputSetMinimumChange(inp, tolerance)
 
 def helicsInputIsUpdated(ipt: "helics_input") -> "helics_bool":
     r"""
@@ -3067,35 +3101,35 @@ def helicsFederateRegisterGlobalFilter(fed: "helics_federate", type: "helics_fil
     """
     return _helics.helicsFederateRegisterGlobalFilter(fed, type, name)
 
-def helicsFederateRegisterCloningFilter(fed: "helics_federate", deliveryEndpoint: "char const *") -> "helics_filter":
+def helicsFederateRegisterCloningFilter(fed: "helics_federate", name: "char const *") -> "helics_filter":
     r"""
     create a cloning Filter on the specified federate
        cloning filters copy a message and send it to multiple locations source and destination can be added
        through other functions
        :type fed: void
        :param fed: the fed to register through
-       :type deliveryEndpoint: string
-       :param deliveryEndpoint: the specified endpoint to deliver the message
+       :type name: string
+       :param name: the name of the filter (can be NULL)
 
        :rtype: void
        :return: a helics_filter object
     """
-    return _helics.helicsFederateRegisterCloningFilter(fed, deliveryEndpoint)
+    return _helics.helicsFederateRegisterCloningFilter(fed, name)
 
-def helicsFederateRegisterGlobalCloningFilter(fed: "helics_federate", deliveryEndpoint: "char const *") -> "helics_filter":
+def helicsFederateRegisterGlobalCloningFilter(fed: "helics_federate", name: "char const *") -> "helics_filter":
     r"""
     create a global cloning Filter on the specified federate
        cloning filters copy a message and send it to multiple locations source and destination can be added
        through other functions
        :type fed: void
        :param fed: the fed to register through
-       :type deliveryEndpoint: string
-       :param deliveryEndpoint: the specified endpoint to deliver the message
+       :type name: string
+       :param name: the name of the filter (can be NULL)
 
        :rtype: void
        :return: a helics_filter object
     """
-    return _helics.helicsFederateRegisterGlobalCloningFilter(fed, deliveryEndpoint)
+    return _helics.helicsFederateRegisterGlobalCloningFilter(fed, name)
 
 def helicsCoreRegisterFilter(core: "helics_core", type: "helics_filter_type", name: "char const *") -> "helics_filter":
     r"""
@@ -3114,20 +3148,20 @@ def helicsCoreRegisterFilter(core: "helics_core", type: "helics_filter_type", na
     """
     return _helics.helicsCoreRegisterFilter(core, type, name)
 
-def helicsCoreRegisterCloningFilter(core: "helics_core", deliveryEndpoint: "char const *") -> "helics_filter":
+def helicsCoreRegisterCloningFilter(core: "helics_core", name: "char const *") -> "helics_filter":
     r"""
     create a cloning Filter on the specified core
        cloning filters copy a message and send it to multiple locations source and destination can be added
        through other functions
        :type core: void
        :param core: the core to register through
-       :type deliveryEndpoint: string
-       :param deliveryEndpoint: the specified endpoint to deliver the message
+       :type name: string
+       :param name: the name of the filter (can be NULL)
 
        :rtype: void
        :return: a helics_filter object
     """
-    return _helics.helicsCoreRegisterCloningFilter(core, deliveryEndpoint)
+    return _helics.helicsCoreRegisterCloningFilter(core, name)
 
 def helicsFederateGetFilterCount(fed: "helics_federate") -> "int":
     r"""

@@ -39,7 +39,7 @@ jobs:
     
   - task: UsePythonVersion@0
     inputs:
-      versionSpec: '3.4'
+      versionSpec: '3.5'
       architecture: $(langArch)
     condition: ne( variables['imageName'], 'vs2015-win2012r2' )
     

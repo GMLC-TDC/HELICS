@@ -1,0 +1,28 @@
+    [--quiet] [--config-file <file>] [--local]
+    [--stop <time>] [--input <file>]
+    [--marker <seconds>] [--datatype <type>]
+    [--time_units <unit>]
+    <input>
+
+DESCRIPTION
+-----------
+The player application provides an easy way to generate data in a
+federation by using recorded values from an input file.
+
+OPTIONS
+-------
+--marker <seconds>::
+        Print a statement indicating time advancement during the simulation
+        at the interval given by the argument (in seconds).
+
+--datatype <type>::
+         The data type to use for the publication.
+
+--time_units <unit>::
+         The default units on the timestamps used for file based input. The
+         default unit for timestamps is seconds.
+
+<input>::
+include::federate-apps-common-options.adoc[]
+
+include::federate-info-options.adoc[]

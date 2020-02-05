@@ -1,5 +1,5 @@
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-# Copyright (c) 2017-2019, Battelle Memorial Institute; Lawrence Livermore
+# Copyright (c) 2017-2020, Battelle Memorial Institute; Lawrence Livermore
 # National Security, LLC; Alliance for Sustainable Energy, LLC.
 # See the top-level NOTICE for additional details.
 # All rights reserved.
@@ -9,6 +9,10 @@
 
 if(HELICS_BUILD_APP_LIBRARY)
 
+    cmake_dependent_option(
+        HELICS_ENABLE_WEBSERVER "Enable a webserver app structure to be embedded with the broker server" OFF
+        "NOT HELICS_DISABLE_BOOST;Boost_VERSION VERSION_GREATER 1.69" OFF
+    )
     set(
         helics_apps_public_headers
         Player.hpp
@@ -25,8 +29,11 @@ if(HELICS_BUILD_APP_LIBRARY)
 	set(helics_apps_broker_headers 
 		 MultiBroker.hpp
 		 BrokerServer.hpp
+         zmqBrokerServer.hpp
+         AsioBrokerServer.hpp
+         TypedBrokerServer.hpp
 		 )
-
+     
     set(helics_apps_private_headers PrecHelper.hpp SignalGenerators.hpp)
 
     set(
@@ -45,7 +52,16 @@ if(HELICS_BUILD_APP_LIBRARY)
 	set(helics_apps_broker_files
 		MultiBroker.cpp
 		BrokerServer.cpp
+        zmqBrokerServer.cpp
+        AsioBrokerServer.cpp
+        TypedBrokerServer.cpp
 	)
+    
+    if (HELICS_ENABLE_WEBSERVER)
+        list(APPEND helics_apps_broker_files helicsWebServer.cpp)
+        list(APPEND helics_apps_broker_headers helicsWebServer.hpp)
+    endif()
+
 
     add_library(helics_apps STATIC ../helics_apps.hpp ${helics_apps_library_files}
                                    ${helics_apps_public_headers} ${helics_apps_broker_headers}
@@ -54,6 +70,10 @@ if(HELICS_BUILD_APP_LIBRARY)
     target_link_libraries(helics_apps PUBLIC helics_application_api)
     target_link_libraries(helics_apps PRIVATE HELICS::compile_flags_target fmt::fmt)
     
+    if (HELICS_ENABLE_WEBSERVER)
+        target_compile_definitions(helics_apps PUBLIC HELICS_ENABLE_WEBSERVER=1)
+        target_compile_definitions(helics_apps PUBLIC BOOST_DATE_TIME_NO_LIB)
+    endif()
     # add and alias library to match the find_package
     add_library(HELICS::apps ALIAS helics_apps)
 

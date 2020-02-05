@@ -1,5 +1,5 @@
 # ~~~
-# Copyright (c) 2017-2019, Battelle Memorial Institute; Lawrence Livermore
+# Copyright (c) 2017-2020, Battelle Memorial Institute; Lawrence Livermore
 # National Security, LLC; Alliance for Sustainable Energy, LLC.
 # See the top-level NOTICE for additional details.
 # All rights reserved.
@@ -10,7 +10,7 @@
 cmake_minimum_required(VERSION 3.4)
 cmake_policy(VERSION 3.4)
 
-project(HELICS VERSION 2.3.1)
+project(HELICS VERSION 2.4.0)
 
 if(POLICY CMP0069)
     # Policy CMP0069 INTERPROCEDURAL OPTIMIZATION, just use the new policy since this
@@ -23,12 +23,17 @@ if(POLICY CMP0074)
     cmake_policy(SET CMP0074 NEW)
 endif()
 
+if(POLICY CMP0076)
+    # Policy CMP0074 target_sources now converts relative paths to absolute
+    cmake_policy(SET CMP0076 NEW)
+endif()
+
 # -----------------------------------------------------------------------------
 # HELICS Version number
 # -----------------------------------------------------------------------------
 set(HELICS_VERSION_BUILD)
 # use ISO date YYYY-MM-DD
-set(HELICS_DATE "2019-11-22")
+set(HELICS_DATE "2020-02-04")
 
 set(HELICS_VERSION_UNDERSCORE
     "${HELICS_VERSION_MAJOR}_${HELICS_VERSION_MINOR}_${HELICS_VERSION_PATCH}"
@@ -39,6 +44,9 @@ if(HELICS_VERSION_BUILD)
         "${HELICS_VERSION_UNDERSCORE}-${HELICS_VERSION_BUILD}"
     )
 endif()
+
+set(HELICS_COMPILER_VERSION "${CMAKE_GENERATOR} ${CMAKE_GENERATOR_PLATFORM} ${CMAKE_SYSTEM}:${CMAKE_CXX_COMPILER_ID}-${CMAKE_CXX_COMPILER_VERSION}")
+message(STATUS "SYSTEM INFO -> ${HELICS_COMPILER_VERSION}")
 
 # -----------------------------------------------------------------------------
 # set the module path and include some common macros
@@ -110,17 +118,17 @@ if(MSYS
     set(UNIX_LIKE TRUE)
 endif()
 
-# allow BOOST library inclusion to be turned off completely this will disable the IPC
+# allow BOOST library inclusion to be turned off completely; this option will disable the IPC
 # core
 option(HELICS_DISABLE_BOOST OFF "disable all references to the Boost C++ libraries")
 mark_as_advanced(HELICS_DISABLE_BOOST)
 
-# allow ASIO library inclusion to be turned off completely this will disable the UDP and
+# allow ASIO library inclusion to be turned off completely; this option will disable the UDP and
 # TCP core as well as the timeout detection and real-time features of HELICS
 option(HELICS_DISABLE_ASIO OFF "disable all references to the ASIO C++ libraries")
 mark_as_advanced(HELICS_DISABLE_ASIO)
 
-# we want to acknowledge this flag since it is standard C++ but it can cause issues in
+# we want to acknowledge this flag since it is standard CMake but it can cause issues in
 # submodules so we need to set other variables
 if(NOT DEFINED BUILD_SHARED_LIBS)
     set(BUILD_SHARED_LIBS
@@ -157,7 +165,7 @@ cmake_dependent_option(
 
 cmake_dependent_option(
     HELICS_BUILD_BENCHMARKS "Build HELICS Benchmarks" OFF
-    "CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME" OFF
+    "CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME;CMAKE_VERSION VERSION_GREATER 3.5" OFF
 )
 
 cmake_dependent_advanced_option(
@@ -239,6 +247,9 @@ endif()
 add_library(HELICS::compile_flags_target ALIAS compile_flags_target)
 add_library(HELICS::build_flags_target ALIAS build_flags_target)
 
+get_target_property(EXTRA_BUILD_FLAGS build_flags_target INTERFACE_COMPILE_OPTIONS)
+set(HELICS_BUILD_FLAGS_OUTPUT "${CMAKE_CXX_FLAGS} ${CMAKE_CXX_FLAGS_RELEASE} ${CMAKE_STATIC_LINKER_FLAGS} ${EXTRA_BUILD_FLAGS} ")
+
 if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
     if(NOT USE_LIBCXX)
         show_variable(
@@ -290,7 +301,7 @@ if(HELICS_BUILD_TESTS AND HELICS_TEST_CODE_COVERAGE)
         include(CodeCoverage)
 
         set(COVERAGE_EXCLUDES 'usr/*' 'dependencies/*' 'ThirdParty/*' 'tests/*'
-                              'interfaces/*' 'examples/*'
+                              'interfaces/*' 'examples/*' 'benchmarks/*' 'scripts/*'
         )
         setup_target_for_coverage(
             NAME helics_coverage # New target name
@@ -370,6 +381,12 @@ if(NOT EXISTS "${PROJECT_SOURCE_DIR}/ThirdParty/units/units/units.hpp")
     submod_update(ThirdParty/units)
 endif()
 
+if(NOT EXISTS "${PROJECT_SOURCE_DIR}/ThirdParty/toml11/toml/value.hpp")
+    submod_update(ThirdParty/toml11)
+endif()
+
+check_submodule_status()
+
 include(GNUInstallDirs)
 
 # -------------------------------------------------------------
@@ -379,6 +396,15 @@ include(GNUInstallDirs)
 if(NOT HELICS_DISABLE_BOOST)
     include(addBoost)
 endif()
+
+# -------------------------------------------------------------
+# TOML11  add the toml interpreter
+# -------------------------------------------------------------
+
+set(toml11_BUILD_TEST OFF CACHE INTERNAL "")
+set(toml11_TEST_WITH_ASAN OFF CACHE INTERNAL "")
+set(toml11_TEST_WITH_UBSAN OFF CACHE INTERNAL "")
+add_subdirectory(ThirdParty/toml11 EXCLUDE_FROM_ALL)
 
 # -------------------------------------------------------------
 # options for enabling specific core communication types
@@ -514,6 +540,8 @@ target_include_directories(
     helics_base SYSTEM INTERFACE $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/ThirdParty>
 )
 
+target_link_libraries(helics_base INTERFACE toml11::toml11)
+
 if(NOT HELICS_DISABLE_BOOST)
     target_include_directories(
         helics_base SYSTEM INTERFACE $<BUILD_INTERFACE:${Boost_INCLUDE_DIR}>
@@ -533,28 +561,36 @@ endif()
 # -------------------------------------------------------------
 # setting the RPATH
 # -------------------------------------------------------------
-# use, i.e. don't skip the full RPATH for the build tree
-set(CMAKE_SKIP_BUILD_RPATH FALSE)
-
-# when building, don't use the install RPATH already (but later on when installing)
-set(CMAKE_BUILD_WITH_INSTALL_RPATH FALSE)
-
-set(CMAKE_MACOSX_RPATH ON)
+if(NOT DEFINED CMAKE_MACOSX_RPATH)
+    set(CMAKE_MACOSX_RPATH ON)
+endif()
 
 # add the automatically determined parts of the RPATH which point to directories outside
 # the build tree to the install RPATH
-set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
-
-if(NOT APPLE)
-    set(CMAKE_INSTALL_RPATH $ORIGIN)
+if(NOT DEFINED CMAKE_INSTALL_RPATH_USE_LINK_PATH)
+    set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 endif()
+
+# Add the local directory to the rpath
+if(NOT APPLE)
+    list(APPEND CMAKE_INSTALL_RPATH $ORIGIN)
+    list(APPEND CMAKE_INSTALL_RPATH
+                "\$ORIGIN/../${CMAKE_INSTALL_LIBDIR}"
+    )
+else()
+    list(APPEND CMAKE_INSTALL_RPATH "@loader_path")
+    list(APPEND CMAKE_INSTALL_RPATH "@loader_path/../${CMAKE_INSTALL_LIBDIR}")
+    list(APPEND CMAKE_INSTALL_RPATH "@executable_path")
+    list(APPEND CMAKE_INSTALL_RPATH "@executable_path/../${CMAKE_INSTALL_LIBDIR}")
+endif()
+
 
 # the RPATH to be used when installing, but only if it's not a system directory
 list(FIND CMAKE_PLATFORM_IMPLICIT_LINK_DIRECTORIES
           "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_BINDIR}" isSystemDir
 )
 if(isSystemDir STREQUAL "-1")
-    list(APPEND CMAKE_INSTALL_RPATH CMAKE_INSTALL_RPATH
+    list(APPEND CMAKE_INSTALL_RPATH
                 "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_BINDIR}"
     )
 endif()
@@ -564,16 +600,6 @@ list(FIND CMAKE_PLATFORM_IMPLICIT_LINK_DIRECTORIES
 )
 if(isSystemDir STREQUAL "-1")
     list(APPEND CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}")
-endif()
-
-# add the local directory to the rpath
-
-if(APPLE)
-    list(APPEND CMAKE_INSTALL_RPATH "@loader_path/.")
-    list(APPEND CMAKE_INSTALL_RPATH "@executable_path/.")
-else()
-    list(APPEND CMAKE_INSTALL_RPATH "./")
-    list(APPEND CMAKE_INSTALL_RPATH "./../${CMAKE_INSTALL_LIBDIR}")
 endif()
 
 if(NOT WIN32)
@@ -696,15 +722,6 @@ if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
 
     add_subdirectory(interfaces)
 
-    if(NOT HELICS_BINARY_ONLY_INSTALL AND NOT HELICS_DISABLE_C_SHARED_LIB)
-        # add base swig interface files as install option, regardless of current
-        # interfaces built
-        install(
-            FILES interfaces/helics.i interfaces/output.i
-            DESTINATION ${CMAKE_INSTALL_DATADIR}/helics/swig
-            COMPONENT swig
-        )
-    endif()
 
     add_subdirectory(docs)
 
@@ -811,8 +828,8 @@ set(LICENSE_LIST
     "${PROJECT_SOURCE_DIR}/ThirdParty/units/LICENSE"
     "JsonCpp"
     "${PROJECT_SOURCE_DIR}/ThirdParty/jsoncpp/LICENSE"
-    "tinytoml"
-    "${PROJECT_SOURCE_DIR}/ThirdParty/toml/LICENSE"
+    "toml11"
+    "${PROJECT_SOURCE_DIR}/ThirdParty/toml11/LICENSE"
     "GMLC Utilities"
     "${PROJECT_SOURCE_DIR}/ThirdParty/utilities/LICENSE"
 )
@@ -868,6 +885,12 @@ install(
           ${PROJECT_BINARY_DIR}/THIRDPARTY_LICENSES
     DESTINATION ${CMAKE_INSTALL_DOCDIR}
     COMPONENT libs
+)
+
+install(
+    DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/docs/man/manpage_out/
+    DESTINATION ${CMAKE_INSTALL_MANDIR}/man1
+    FILES_MATCHING PATTERN "*.1"
 )
 
 # -------------------------------------------------------------
@@ -947,14 +970,18 @@ if(HELICS_ENABLE_PACKAGE_BUILD)
             endif()
         endif()
     endif()
+    # cmake-format: off
     set(CPACK_PACKAGE_NAME "Helics")
     set(CPACK_PACKAGE_VENDOR "GMLC")
-    set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "HELICS")
-    set(CPACK_PACKAGE_VERSION "${HELICS_VERSION}")
+	set(CPACK_PACKAGE_CONTACT "helicsdevelopers@helics.org")
+    set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Hierarchical Engine for Large-scale Infrastructure Co-Simulation (HELICS)")
+	set(CPACK_PACKAGE_DESCRIPTION_FILE "${${PROJECT_NAME}_SOURCE_DIR}/docs/description.txt")
+    set(CPACK_PACKAGE_VERSION ${HELICS_VERSION})
     set(CPACK_PACKAGE_VERSION_MAJOR ${HELICS_VERSION_MAJOR})
     set(CPACK_PACKAGE_VERSION_MINOR ${HELICS_VERSION_MINOR})
     set(CPACK_PACKAGE_VERSION_PATCH ${HELICS_VERSION_PATCH})
     set(CPACK_PACKAGE_INSTALL_REGISTRY_KEY "HELICS")
+    # cmake-format: on
 
     set(CPACK_COMPONENTS_ALL
         applications
@@ -971,8 +998,10 @@ if(HELICS_ENABLE_PACKAGE_BUILD)
     )
     if(WIN32)
         set(CPACK_RESOURCE_FILE_LICENSE "${HELICS_SOURCE_DIR}\\\\LICENSE")
+        set(CPACK_RESOURCE_FILE_README "${HELICS_SOURCE_DIR}\\\\README.md")
     else(WIN32)
         set(CPACK_RESOURCE_FILE_LICENSE "${HELICS_SOURCE_DIR}/LICENSE")
+        set(CPACK_RESOURCE_FILE_README "${HELICS_SOURCE_DIR}/README.md")
     endif(WIN32)
 
     set(CPACK_COMPONENT_APPLICATIONS_DISPLAY_NAME "Application")
@@ -1050,14 +1079,17 @@ if(HELICS_ENABLE_PACKAGE_BUILD)
     endif(WIN32)
 
     if(APPLE)
-        set(CPACK_BUNDLE_NAME "libhelics")
-        configure_file(
-            "${HELICS_SOURCE_DIR}/config/Info.plist.in"
-            "${CMAKE_CURRENT_BINARY_DIR}/Info.plist" @ONLY
-        )
-        set(CPACK_BUNDLE_PLIST "${CMAKE_CURRENT_BINARY_DIR}/Info.plist")
-        set(CPACK_BUNDLE_ICON "${HELICS_SOURCE_DIR}/docs/img/HELICS.ico")
-    endif(APPLE)
+        set(CPACK_SYSTEM_NAME "macOS-${CMAKE_SYSTEM_PROCESSOR}")
+        set(CPACK_DMG_DISABLE_APPLICATIONS_SYMLINK ON)
+        set(CPACK_PACKAGE_ICON "${HELICS_SOURCE_DIR}/docs/img/HELICS.ico")
+    elseif(NOT WIN32 AND NOT CYGWIN)
+        set(CPACK_SYSTEM_NAME "${CMAKE_SYSTEM_NAME}-${CMAKE_SYSTEM_PROCESSOR}")
+    endif()
+
+	#for debian
+	set(CPACK_DEBIAN_PACKAGE_ARCHITECTURE "all")
+    set(CPACK_DEBIAN_COMPRESSION_TYPE "xz")
+    set(CPACK_DEBIAN_PACKAGE_NAME "helics-dev")
 
     set(CPACK_SOURCE_IGNORE_FILES "/Build*/;/build*/;/.git/")
     # THIS LINE MUST BE LAST IN THE CPACK SECTION
@@ -1074,3 +1106,10 @@ if(NOT CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
         )
     endif()
 endif()
+
+# -------------------------------------------------------------
+# Git Hooks
+# -------------------------------------------------------------
+if (CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
+    include(addGitHooks)
+endif ()

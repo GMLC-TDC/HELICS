@@ -1,0 +1,15 @@
+-v::
+--version::
+        Prints the HELICS version used.
+
+-h::
+-?::
+--help::
+        Prints usage, options, and available subcommands.
+
+--config-file <file>::
+        The base command line argument configuration file.
+        A file named helics_config.ini is the default.
+
+--quiet::
+        Silence most printed output.

@@ -10,6 +10,16 @@
 - MPI-2 implementation (if MPI support is
   needed)
 
+## Useful Resources
+
+Some basics on using the macOS Terminal (or any Unix/Linux shell) will be useful to fully understand this guide. Articles and tutorials you may find useful include:
+
+- [How to add a new path to PATH](http://osxdaily.com/2014/08/14/add-new-path-to-path-command-line/)
+- [Getting to Understand Linux Shell(s)](https://medium.com/coding-blocks/getting-to-understand-linux-shell-s-start-up-scripts-and-the-environments-path-variable-fc672107b2d7)
+- [Paths - where's my command](https://developer.ibm.com/tutorials/l-lpic1-103-1/#paths-where-s-my-command-)
+- [Unix/Linux for Beginners](https://www.tutorialspoint.com/unix/unix-environment.htm)
+- [Settling into Unix](http://matt.might.net/articles/settling-into-unix/).
+
 ## Setup
 
 *Note*: Keep in mind that your cmake version should be newer than the boost version. If you have an older cmake, you may want an older boost version. Alternatively, you can choose to upgrade your version of cmake.
@@ -51,53 +61,62 @@ To set up your environment:
 
 Getting and building from source:
 
-1. Use `git clone` to to check out a copy of HELICS.
+1. Use `git clone` to check out a copy of HELICS.
 2. Create a build folder. Run cmake and give it the path that HELICS
    was checked out into.
 
-```bash
-git clone https://github.com/GMLC-TDC/HELICS
-cd HELICS
-mkdir build
-cd build
-```
+    ```bash
+    git clone https://github.com/GMLC-TDC/HELICS
+    cd HELICS
+    mkdir build
+    cd build
+    ```
 
 ## Compile and Install
 
-There are a number of different options and approaches at this point depending on your needs, in particular with respect to programming language support:
+There are a number of different options and approaches at this point depending on your needs, in particular with respect to programming language support.
+
+<div class="admonition note">
+
+Note: For any of these options, if you want to install in a custom location, you can add the following CMake argument: `-DCMAKE_INSTALL_PREFIX=/path/to/install/folder/`. There are also many other options, and you can check them out by running `ccmake .` in the `build` folder. 
+
+Keep in mind running HELICS commands like `helics_app` will not work from just any old random folder with a custom install folder.
+You will either need to run them from inside the `bin` subfolder of your custom install, or provide a more complete path to the command.
+To run HELICS commands from any folder, you must add the `bin` subfolder of your custom install to the `PATH` environment variable. See the
+first link in the [Useful Resources](#useful-resources) section for details.
+
+</div>
 
 ### Basic Install (without language bindings)
 
-1. Run `make`.
+Run the following:
 
-   ```bash
-   cmake ../
-   ccmake . # optional, to change install path or other configuration settings
-   make
-   make install
-   ```
-
-If you want to install in a custom location, you can add the the following argument: `-DCMAKE_INSTALL_PREFIX=/path/to/folder/`
+```bash
+cmake ../
+ccmake . # optional, to change install path or other configuration settings
+make
+make install
+```
 
 ### Building HELICS with python support
 
 Run the following:
 
 ```bash
-$ cmake -DBUILD_PYTHON_INTERFACE=ON -DCMAKE_INSTALL_PREFIX=/Users/$(whoami)/local/helics-2.1.0/ ..
-$ make -j8
-$ make install
+cmake -DBUILD_PYTHON_INTERFACE=ON -DCMAKE_INSTALL_PREFIX=$HOME/local/helics-master/ ..
+make -j8
+make install
 ```
 
 Add the following to your `~/.bashrc` file.
 
 ```bash
-export PYTHONPATH=/Users/$(whoami)/local/helics-X.X.X/python:$PYTHONPATH
+export PYTHONPATH=$HOME/local/helics-master/python:$PYTHONPATH
 ```
 
 ### Building HELICS with MATLAB support
 
-To install HELICS with MATLAB support, you will need to add `-DBUILD_MATLAB_INTERFACE=ON`.
+To install HELICS with MATLAB support, you will need to add run cmake with the `-DBUILD_MATLAB_INTERFACE=ON` option.
 
 The important thing to note is that the MATLAB binaries are in the PATH.
 Specifically, `mex` must be available in the PATH.
@@ -119,7 +138,7 @@ git clone https://github.com/GMLC-TDC/HELICS
 cd HELICS
 mkdir build-osx
 cd build-osx
-cmake -DBUILD_MATLAB_INTERFACE=ON -DCMAKE_INSTALL_PREFIX=/Users/$(whoami)/local/helics-develop/ ..
+cmake -DBUILD_MATLAB_INTERFACE=ON -DCMAKE_INSTALL_PREFIX=$HOME/local/helics-master/ ..
 make -j8
 make install
 ```
@@ -130,7 +149,7 @@ If you have changed the C-interface and want to regenerate the SWIG MATLAB bindi
 To do that, you can follow the following instructions.
 
 - Install [SWIG with MATLAB](https://github.com/jaeandersson/swig/)
-- `./configure --prefix=/Users/$USER/local/swig_install; make; make install;`
+- `./configure --prefix=$HOME/local/swig_install; make; make install;`
 - Ensure that SWIG and MATLAB are in the PATH
 
 The below generates the MATLAB interface using SWIG.
@@ -167,7 +186,7 @@ Unzip the folder `boost_1_69_0` to any location, for example Downloads.
 
 ```bash
 $ cd ~/Downloads/boost_1_69_0
-$ ./bootstrap.sh --prefix=/ --prefix=/Users/$USER/local/boost-gcc-1.69.0
+$ ./bootstrap.sh --prefix=/ --prefix=$HOME/local/boost-gcc-1.69.0
 ```
 
 Open `project-config.jam` and changes the lines as follows:
@@ -199,7 +218,7 @@ This will install boost in the `~/local/boost-gcc-1.69.0` folder
 Next, you will need to build HELICS and tell it what the `BOOST_ROOT` is.
 
 ```bash
-$ cmake -DCMAKE_INSTALL_PREFIX="/Users/$USER/local/helics-gcc-X.X.X/" -DBOOST_ROOT="/Users/$USER/local/boost-gcc-1.69.0" -DBUILD_PYTHON_INTERFACE=ON -DCMAKE_C_COMPILER=/usr/local/Cellar/gcc/8.2.0/bin/gcc-8 -DCMAKE_CXX_COMPILER=/usr/local/Cellar/gcc/8.2.0/bin/g++-8 ../
+$ cmake -DCMAKE_INSTALL_PREFIX="$HOME/local/helics-gcc-X.X.X/" -DBOOST_ROOT="$HOME/local/boost-gcc-1.69.0" -DBUILD_PYTHON_INTERFACE=ON -DCMAKE_C_COMPILER=/usr/local/Cellar/gcc/8.2.0/bin/gcc-8 -DCMAKE_CXX_COMPILER=/usr/local/Cellar/gcc/8.2.0/bin/g++-8 ../
 $ make clean; make -j 4; make install
 ```
 
@@ -255,7 +274,7 @@ and running
 
 <div class="admonition note">
 
-Note: See https://github.com/GMLC-TDC/HELICS/issues/763 if your installation doesn't point the dylib to the correct location.
+Note: See [https://github.com/GMLC-TDC/HELICS/issues/763](https://github.com/GMLC-TDC/HELICS/issues/763) if your installation doesn't point the dylib to the correct location.
 
 </div>
 

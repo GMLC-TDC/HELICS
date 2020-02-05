@@ -12,8 +12,10 @@ shift
 # Function to run example and a broker
 function launch_federation_with_broker () {
     # Create a temporary file for broker output
-    local broker_output=$(mktemp)
-    local broker_returncode=$(mktemp)
+    local broker_output
+    broker_output=$(mktemp)
+    local broker_returncode
+    broker_returncode=$(mktemp)
 
     local helics_broker=$1
     shift
@@ -23,7 +25,7 @@ function launch_federation_with_broker () {
     for arg in "$@";
     do
         if [[ "${arg}" == "--args" ]]; then
-            let num_federates=num_federates-2
+            (( num_federates=num_federates-2 ))
         fi
     done
 
@@ -32,9 +34,9 @@ function launch_federation_with_broker () {
         echo "Launching ${helics_broker} with ${num_federates} federate(s)"
     fi
     {
-        echo "${helics_broker}" > ${broker_output} ;
-        timeout ${timeout_len} ${helics_broker} ${num_federates} >> ${broker_output} ;
-        echo "${helics_broker} exitcode:$?" > ${broker_returncode} ;
+        echo "${helics_broker}" > "${broker_output}" ;
+        timeout "${timeout_len}" "${helics_broker}" "${num_federates}" >> "${broker_output}" ;
+        echo "${helics_broker} exitcode:$?" > "${broker_returncode}" ;
     } &
 
     # Store the pid of the broker
@@ -43,19 +45,19 @@ function launch_federation_with_broker () {
 
     # Wait for the broker to finish running (until timeout is reached)
     wait ${broker_pid}
-    if $(grep -q 124 ${broker_returncode}); then
+    if grep -q 124 "${broker_returncode}"; then
         if [[ ${VERBOSE+x} ]]; then
-            echo "ERROR Broker exceeded timeout ($(cat $broker_returncode))"
+            echo "ERROR Broker exceeded timeout ($(cat "$broker_returncode"))"
         fi
         test_exit_status=1
     fi
 
     if [[ "$VERBOSE" == "all" ]]; then
         echo "-----Broker Output-----"
-        echo "$(cat ${broker_output})"
+        cat "${broker_output}"
     fi
-    rm ${broker_output}
-    rm ${broker_returncode}
+    rm "${broker_output}"
+    rm "${broker_returncode}"
 }
 
 # Function to launch the example federation
@@ -101,16 +103,16 @@ function launch_federation () {
         # Create temp file for federate output
         output_file=$(mktemp)
         returncode_file=$(mktemp)
-        outputfiles+=(${output_file})
-        returncodes+=(${returncode_file})
+        outputfiles+=("${output_file}")
+        returncodes+=("${returncode_file}")
         # Launch federate
         if [[ ${VERBOSE+x} ]]; then
             echo "Launching ${fed}"
         fi
         {
-            echo "${fed}" > ${output_file} ;
-            timeout ${timeout_len} ${fed} >> ${output_file} ;
-            echo "${fed} exitcode:$?" > ${returncode_file} ;
+            echo "${fed}" > "${output_file}" ;
+            timeout "${timeout_len}" "${fed}" >> "${output_file}" ;
+            echo "${fed} exitcode:$?" > "${returncode_file}" ;
         } &
         pids+=($!)
     done
@@ -119,33 +121,33 @@ function launch_federation () {
     wait "${pids[@]}"
 
     # Cleanup return code files, check for non-zero return codes
-    for returncode_file in ${returncodes[@]}
+    for returncode_file in "${returncodes[@]}"
     do
-        if $(grep -q 124 ${returncode_file}); then
+        if grep -q 124 "${returncode_file}"; then
             if [[ ${VERBOSE+x} ]]; then
-                echo "ERROR Federate exceeded timeout ($(cat $returncode_file))"
+                echo "ERROR Federate exceeded timeout ($(cat "$returncode_file)")"
             fi
             test_exit_status=1
         fi
-        rm ${returncode_file}
+        rm "${returncode_file}"
     done
 
     # Cleanup output files
-    for output_file in ${outputfiles[@]};
+    for output_file in "${outputfiles[@]}";
     do
         if [[ "$VERBOSE" == "all" ]]; then
             echo "-----Federate Output-----"
-            echo "$(cat $output_file)"
+            cat "$output_file"
         fi
 
         # Check for "key output" indicating failure
-        if $(grep -inr error ${output_file}); then
+        if grep -inr error "${output_file}"; then
             if [[ ${VERBOSE+x} ]]; then
                 echo "ERROR Problem occurred during federate execution"
             fi
             test_exit_status=1
         fi
-        rm ${output_file}
+        rm "${output_file}"
     done
 }
 

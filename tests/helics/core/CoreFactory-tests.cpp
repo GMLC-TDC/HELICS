@@ -1,32 +1,32 @@
 /*
-Copyright (c) 2017-2019,
+Copyright (c) 2017-2020,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
 the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
-#include "gtest/gtest.h"
-
 #include "helics/core/CommonCore.hpp"
 #include "helics/core/CoreFactory.hpp"
 #include "helics/core/coreTypeOperations.hpp"
 #include "helics/helics-config.h"
 
-#ifdef ENABLE_ZMQ_CORE
-TEST (CoreFactory_tests, ZmqCore_test)
-{
-    EXPECT_EQ (helics::core::isCoreTypeAvailable (helics::core_type::ZMQ), true);
+#include "gtest/gtest.h"
 
-    auto core = helics::CoreFactory::create (helics::core_type::ZMQ, "");
-    ASSERT_TRUE (core);
-    core->disconnect ();
+#ifdef ENABLE_ZMQ_CORE
+TEST(CoreFactory_tests, ZmqCore_test)
+{
+    EXPECT_EQ(helics::core::isCoreTypeAvailable(helics::core_type::ZMQ), true);
+
+    auto core = helics::CoreFactory::create(helics::core_type::ZMQ, "");
+    ASSERT_TRUE(core);
+    core->disconnect();
     core = nullptr;
 }
-#else  // ENABLE_ZMQ_CORE
-TEST (CoreFactory_tests, ZmqCore_test)
+#else // ENABLE_ZMQ_CORE
+TEST(CoreFactory_tests, ZmqCore_test)
 {
-    EXPECT_EQ (helics::core::isCoreTypeAvailable (helics::core_type::ZMQ), false);
+    EXPECT_EQ(helics::core::isCoreTypeAvailable(helics::core_type::ZMQ), false);
 }
-#endif  // ENABLE_ZMQ_CORE
+#endif // ENABLE_ZMQ_CORE
 
 /*
 #ifdef ENABLE_MPI_CORE
@@ -47,91 +47,91 @@ TEST(CoreFactory_tests,MpiCore_test)
 #endif  // ENABLE_MPI_CORE
 */
 
-TEST (CoreFactory_tests, TestCore_test)
+TEST(CoreFactory_tests, TestCore_test)
 {
-    EXPECT_EQ (helics::core::isCoreTypeAvailable (helics::core_type::TEST), true);
+    EXPECT_EQ(helics::core::isCoreTypeAvailable(helics::core_type::TEST), true);
 
-    auto core = helics::CoreFactory::create (helics::core_type::TEST, "");
-    ASSERT_TRUE (core);
-    core->disconnect ();
+    auto core = helics::CoreFactory::create(helics::core_type::TEST, "");
+    ASSERT_TRUE(core);
+    core->disconnect();
     core = nullptr;
 }
 #ifdef ENABLE_IPC_CORE
-TEST (CoreFactory_tests, InterprocessCore_test)
+TEST(CoreFactory_tests, InterprocessCore_test)
 {
-    EXPECT_EQ (helics::core::isCoreTypeAvailable (helics::core_type::INTERPROCESS), true);
-    EXPECT_EQ (helics::core::isCoreTypeAvailable (helics::core_type::IPC), true);
+    EXPECT_EQ(helics::core::isCoreTypeAvailable(helics::core_type::INTERPROCESS), true);
+    EXPECT_EQ(helics::core::isCoreTypeAvailable(helics::core_type::IPC), true);
 
-    auto core = helics::CoreFactory::create (helics::core_type::INTERPROCESS, "");
-    ASSERT_TRUE (core);
-    core->disconnect ();
+    auto core = helics::CoreFactory::create(helics::core_type::INTERPROCESS, "");
+    ASSERT_TRUE(core);
+    core->disconnect();
     core = nullptr;
     // make sure the OS has the chance to clean up a file
-    std::this_thread::sleep_for (std::chrono::milliseconds (100));
-    auto core2 = helics::CoreFactory::create (helics::core_type::IPC, "");
-    ASSERT_TRUE (core2);
-    core2->disconnect ();
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    auto core2 = helics::CoreFactory::create(helics::core_type::IPC, "");
+    ASSERT_TRUE(core2);
+    core2->disconnect();
     core2 = nullptr;
 }
 #else
-TEST (CoreFactory_tests, InterprocessCore_test)
+TEST(CoreFactory_tests, InterprocessCore_test)
 {
-    EXPECT_EQ (helics::core::isCoreTypeAvailable (helics::core_type::INTERPROCESS), false);
-    EXPECT_EQ (helics::core::isCoreTypeAvailable (helics::core_type::IPC), false);
+    EXPECT_EQ(helics::core::isCoreTypeAvailable(helics::core_type::INTERPROCESS), false);
+    EXPECT_EQ(helics::core::isCoreTypeAvailable(helics::core_type::IPC), false);
 }
 #endif
 #ifdef ENABLE_TCP_CORE
-TEST (CoreFactory_tests, tcpCore_test)
+TEST(CoreFactory_tests, tcpCore_test)
 {
-    EXPECT_EQ (helics::core::isCoreTypeAvailable (helics::core_type::TCP), true);
+    EXPECT_EQ(helics::core::isCoreTypeAvailable(helics::core_type::TCP), true);
 
-    auto core = helics::CoreFactory::create (helics::core_type::TCP, "");
-    ASSERT_TRUE (core);
-    core->disconnect ();
+    auto core = helics::CoreFactory::create(helics::core_type::TCP, "");
+    ASSERT_TRUE(core);
+    core->disconnect();
     core = nullptr;
 }
 #else
-TEST (CoreFactory_tests, tcpCore_test)
+TEST(CoreFactory_tests, tcpCore_test)
 {
-    EXPECT_EQ (helics::core::isCoreTypeAvailable (helics::core_type::TCP), false);
+    EXPECT_EQ(helics::core::isCoreTypeAvailable(helics::core_type::TCP), false);
 }
 #endif
 
 #ifdef ENABLE_TCP_CORE
-TEST (CoreFactory_tests, tcpSSCore_test)
+TEST(CoreFactory_tests, tcpSSCore_test)
 {
-    EXPECT_EQ (helics::core::isCoreTypeAvailable (helics::core_type::TCP_SS), true);
+    EXPECT_EQ(helics::core::isCoreTypeAvailable(helics::core_type::TCP_SS), true);
 
-    auto core = helics::CoreFactory::create (helics::core_type::TCP_SS, "");
-    ASSERT_TRUE (core);
-    core->disconnect ();
+    auto core = helics::CoreFactory::create(helics::core_type::TCP_SS, "");
+    ASSERT_TRUE(core);
+    core->disconnect();
     core = nullptr;
 }
 #else
-TEST (CoreFactory_tests, tcpSSCore_test)
+TEST(CoreFactory_tests, tcpSSCore_test)
 {
-    EXPECT_EQ (helics::core::isCoreTypeAvailable (helics::core_type::TCP_SS), false);
+    EXPECT_EQ(helics::core::isCoreTypeAvailable(helics::core_type::TCP_SS), false);
 }
 #endif
 
 #ifdef ENABLE_UDP_CORE
-TEST (CoreFactory_tests, udpCore_test)
+TEST(CoreFactory_tests, udpCore_test)
 {
-    EXPECT_EQ (helics::core::isCoreTypeAvailable (helics::core_type::UDP), true);
+    EXPECT_EQ(helics::core::isCoreTypeAvailable(helics::core_type::UDP), true);
 
-    auto core = helics::CoreFactory::create (helics::core_type::UDP, "");
-    ASSERT_TRUE (core != nullptr);
-    core->disconnect ();
+    auto core = helics::CoreFactory::create(helics::core_type::UDP, "");
+    ASSERT_TRUE(core != nullptr);
+    core->disconnect();
     core = nullptr;
 
-    auto core2 = helics::CoreFactory::create (helics::core_type::UDP, "");
-    ASSERT_TRUE (core2 != nullptr);
-    core2->disconnect ();
+    auto core2 = helics::CoreFactory::create(helics::core_type::UDP, "");
+    ASSERT_TRUE(core2 != nullptr);
+    core2->disconnect();
     core2 = nullptr;
 }
 #else
-TEST (CoreFactory_tests, udpCore_test)
+TEST(CoreFactory_tests, udpCore_test)
 {
-    EXPECT_EQ (helics::core::isCoreTypeAvailable (helics::core_type::UDP), false);
+    EXPECT_EQ(helics::core::isCoreTypeAvailable(helics::core_type::UDP), false);
 }
 #endif

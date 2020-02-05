@@ -1,0 +1,71 @@
+name: Format source code
+
+on:
+#  issue_comment:
+#    types: [created]
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+  push:
+    paths:
+      - '.github/workflows/clang-format.yml'
+      - '.clang-format'
+      - '**.[ch]pp'
+      - '**.[ch]'
+      - '!ThirdParty/**'
+      - '!interfaces/**'
+    branches: 
+      - master
+      - develop
+
+jobs:
+  format:
+    if: github.event.pull_request.draft != true && github.event.pull_request.head.repo.full_name == github.repository
+#    if: github.event_name != 'issue_comment' || contains(github.event.comment.body, '/format')
+    runs-on: ubuntu-latest
+    container:
+      image: helics/buildenv:clang-format
+    
+    steps:
+#    - uses: actions/github-script@0.3.0
+#      if: github.event_name == 'issue_comment'
+#      with:
+#        github-token: ${{secrets.GITHUB_TOKEN}}
+#        script: |
+#          github.issues.createComment({...context.issue, body: 'Okay, commit https://github.com/${{ github.repository }}/commit/${{ github.sha }} is being formatted. A PR with the changes will be open soon! :sunglasses:'})
+    - name: Checkout event Ref
+      uses: actions/checkout@v1
+      if: github.event_name != 'pull_request'
+    - name: Checkout PR Head Ref
+      uses: actions/checkout@v1
+      if: github.event_name == 'pull_request'
+      with:
+        repository: ${{ github.event.pull_request.head.repo.full_name }}
+        ref: ${{ github.head_ref }}
+    - name: Run clang-format
+      run: |
+        clang-format --version
+        find * | grep -v -e "^ThirdParty" -e "^interfaces" | grep -E ".*\.[ch](p{2})?$" | xargs clang-format -i -style=file
+        
+    - name: Stage changed source files
+      shell: bash --noprofile --norc {0}
+      run: |
+        git diff --name-only | grep -E ".*\.[h|c](p{2})?$"
+        if [[ "$?" == "0" ]];
+        then
+          git add *.cpp *.hpp *.c *.h
+        fi
+        exit 0
+        
+    - name: Create/update a file update PR with no hash
+      uses: ./.github/actions/create-file-update-pr
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        COMMIT_MSG: "Automated formatting of source files"
+        PR_TITLE: "Automated formatting of source files"
+        PR_BODY: "Automated formatting of source files in commit https://github.com/${{ github.event.pull_request.head.repo.full_name }}/commit/${{ github.sha }} from ${{ github.ref }}."
+        GIT_EMAIL: "HELICS-bot@users.noreply.github.com"
+        GIT_NAME: "HELICS-bot"
+        BRANCH_PREFIX: "clang-format/"
+        NO_HASH: "true"
+        REPLACE_BRANCH: "true"

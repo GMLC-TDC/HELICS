@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2017-2019,
+Copyright (c) 2017-2020,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
 the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
@@ -12,51 +12,50 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "../shared_api_library/MessageFilters.h"
 #include "../shared_api_library/helics.h"
 #include "config.hpp"
+
 #include <stdexcept>
 #include <string>
 
-namespace helicscpp
-{
-class Core
-{
+namespace helicscpp {
+class Core {
   public:
     /** Default constructor*/
-    Core () HELICS_NOTHROW : core (HELICS_NULL_POINTER){};
+    Core() HELICS_NOTHROW: core(HELICS_NULL_POINTER){};
     /** construct with type, core name and initialization string */
-    Core (const std::string &type, const std::string &name, const std::string &initString)
+    Core(const std::string& type, const std::string& name, const std::string& initString)
     {
-        core = helicsCreateCore (type.c_str (), name.c_str (), initString.c_str (), hThrowOnError ());
+        core = helicsCreateCore(type.c_str(), name.c_str(), initString.c_str(), hThrowOnError());
     }
     /** construct with type, core name and command line arguments */
-    Core (const std::string &type, const std::string &name, int argc, char **argv)
+    Core(const std::string& type, const std::string& name, int argc, char** argv)
     {
-        core = helicsCreateCoreFromArgs (type.c_str (), name.c_str (), argc, argv, hThrowOnError ());
+        core = helicsCreateCoreFromArgs(type.c_str(), name.c_str(), argc, argv, hThrowOnError());
     }
     /** destructor*/
-    ~Core () { helicsCoreFree (core); }
+    ~Core() { helicsCoreFree(core); }
     /** implicit operator so the object can be used with the c api functions natively*/
-    operator helics_core () { return core; }
+    operator helics_core() { return core; }
     /** explicitly get the base helics_core object*/
-    helics_core baseObject () const { return core; }
+    helics_core baseObject() const { return core; }
     /** check if the core is connected to the broker*/
-    bool isConnected () const { return (helicsCoreIsConnected (core) != helics_false); }
+    bool isConnected() const { return (helicsCoreIsConnected(core) != helics_false); }
     /** copy constructor*/
-    Core (const Core &cr) { core = helicsCoreClone (cr.core, hThrowOnError ()); }
+    Core(const Core& cr) { core = helicsCoreClone(cr.core, hThrowOnError()); }
     /** copy assignment*/
-	Core &operator= (const Core &cr)
+    Core& operator=(const Core& cr)
     {
-        core = helicsCoreClone (cr.core, hThrowOnError ());
+        core = helicsCoreClone(cr.core, hThrowOnError());
         return *this;
     }
 #ifdef HELICS_HAS_RVALUE_REFS
     /** move constructor*/
-    Core (Core &&cr) HELICS_NOTHROW
+    Core(Core&& cr) HELICS_NOTHROW
     {
         core = cr.core;
         cr.core = HELICS_NULL_POINTER;
     }
     /** move assignment*/
-    Core &operator= (Core &&cr) HELICS_NOTHROW
+    Core& operator=(Core&& cr) HELICS_NOTHROW
     {
         core = cr.core;
         cr.core = HELICS_NULL_POINTER;
@@ -66,25 +65,25 @@ class Core
     /** set the core to ready to enter init
    @details this function only needs to be called for cores that don't have any federates but may
    have filters for cores with federates it won't do anything*/
-    void setReadyToInit () { helicsCoreSetReadyToInit (core, hThrowOnError ()); }
-    
-	/**
+    void setReadyToInit() { helicsCoreSetReadyToInit(core, hThrowOnError()); }
+
+    /**
      * disconnect the core from its broker
      */
-	void disconnect () { helicsCoreDisconnect (core, hThrowOnError ()); }
+    void disconnect() { helicsCoreDisconnect(core, hThrowOnError()); }
     /** waits in the current thread until the broker is disconnected
     @param msToWait  the timeout to wait for disconnect (-1) implies no timeout
     @return true if the disconnect was successful false if it timed out
      */
-    bool waitForDisconnect (int msToWait = -1)
+    bool waitForDisconnect(int msToWait = -1)
     {
-        return (helicsCoreWaitForDisconnect (core, msToWait, hThrowOnError ()) != helics_false);
+        return (helicsCoreWaitForDisconnect(core, msToWait, hThrowOnError()) != helics_false);
     }
     /** get an identifier string for the core
      */
-    const char *getIdentifier () const { return helicsCoreGetIdentifier (core); }
+    const char* getIdentifier() const { return helicsCoreGetIdentifier(core); }
     /** get the connection network or connection address for the core*/
-    const char *getAddress () const { return helicsCoreGetAddress (core); }
+    const char* getAddress() const { return helicsCoreGetAddress(core); }
     /** create a destination Filter on the specified federate
     @details filters can be created through a federate or a core , linking through a federate allows
     a few extra features of name matching to function on the federate interface but otherwise equivalent behavior
@@ -92,9 +91,9 @@ class Core
     @param name the name of the filter (can be NULL)
     @return a helics_filter object
     */
-    Filter registerFilter (helics_filter_type type, const std::string &name = std::string ())
+    Filter registerFilter(helics_filter_type type, const std::string& name = std::string())
     {
-        return Filter (helicsCoreRegisterFilter (core, type, name.c_str (), hThrowOnError ()));
+        return Filter(helicsCoreRegisterFilter(core, type, name.c_str(), hThrowOnError()));
     }
 
     /** create a cloning Filter on the specified federate
@@ -103,23 +102,24 @@ class Core
     @param deliveryEndpoint the specified endpoint to deliver the message
     @return a helics_filter object
     */
-    CloningFilter registerCloningFilter (const std::string &deliveryEndpoint)
+    CloningFilter registerCloningFilter(const std::string& deliveryEndpoint)
     {
-        return CloningFilter (helicsCoreRegisterCloningFilter (core, deliveryEndpoint.c_str (), hThrowOnError ()));
+        return CloningFilter(
+            helicsCoreRegisterCloningFilter(core, deliveryEndpoint.c_str(), hThrowOnError()));
     }
 
     /** set a global federation value
     @param valueName the name of the global value to set
     @param value actual value of the global variable
     */
-    void setGlobal (const std::string &valueName, const std::string &value)
+    void setGlobal(const std::string& valueName, const std::string& value)
     {
-        helicsCoreSetGlobal (core, valueName.c_str (), value.c_str (), hThrowOnError ());
+        helicsCoreSetGlobal(core, valueName.c_str(), value.c_str(), hThrowOnError());
     }
 
   protected:
-    helics_core core;  //!< reference to the underlying core object
+    helics_core core; //!< reference to the underlying core object
 };
 
-}  // namespace helicscpp
+} // namespace helicscpp
 #endif

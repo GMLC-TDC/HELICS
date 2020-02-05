@@ -4,7 +4,7 @@
 #   HELICS_FOUND - true if HELICS found on the system
 #   HELICS_INCLUDE_DIR - the directory containing HELICS headers for the C shared library if available
 #   HELICS_C_SHARED_LIBRARY - the C shared library
-# 	HELICS_CXX_SHARED_LIBRARY -the C++ shared library
+#   HELICS_CXX_SHARED_LIBRARY -the C++ shared library
 #   It also creates the following targets if they are available (not all are always built depending on the configuration)
 #   HELICS::helicsSharedLib for the C based shared library
 #   HELICS::helics-shared for C++ based shared libary
@@ -35,9 +35,17 @@ if (@HELICS_BUILD_CXX_SHARED_LIB@)
 endif()
 
 if (NOT @HELICS_DISABLE_C_SHARED_LIB@)
-	get_target_property(${PN}_INCLUDE_DIRS HELICS::helicsSharedLib INTERFACE_INCLUDE_DIRECTORIES)
-	message(STATUS "HELICS_INCLUDE DIR HELICS: ${HELICS_INCLUDE_DIR}")
+    get_target_property(${PN}_INCLUDE_DIRS HELICS::helicsSharedLib INTERFACE_INCLUDE_DIRECTORIES)
+    message(STATUS "HELICS_INCLUDE_DIRS HELICS: ${HELICS_INCLUDE_DIRS}")
     message(STATUS "HELICS_C_SHARED_LIBRARY: ${HELICS_C_SHARED_LIBRARY}")
+
+    if (EXISTS "${PACKAGE_PREFIX_DIR}/@CMAKE_INSTALL_DATADIR@/helics/swig/helics.i")
+        set(${PN}_SWIG_INCLUDE_DIRS "${PACKAGE_PREFIX_DIR}/@CMAKE_INSTALL_DATADIR@/helics/swig")
+        foreach(TMPDIR IN LISTS ${PN}_INCLUDE_DIRS)
+            list(APPEND ${PN}_SWIG_INCLUDE_DIRS "${TMPDIR}/helics/shared_api_library")
+        endforeach()
+        message(STATUS "HELICS_SWIG_INCLUDE_DIRS: ${HELICS_SWIG_INCLUDE_DIRS}")
+    endif()
 endif()
 
 check_required_components(${PN})

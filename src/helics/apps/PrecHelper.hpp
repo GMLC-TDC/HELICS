@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2017-2019,
+Copyright (c) 2017-2020,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
 the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
@@ -7,13 +7,12 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include "../application_api/helicsTypes.hpp"
 
-namespace helics
-{
+namespace helics {
 class FederateInfo;
-}  // namespace helics
+} // namespace helics
 
-helics::data_type getType (const std::string &typeString);
+helics::data_type getType(const std::string& typeString);
 
-char typeCharacter (helics::data_type type);
+char typeCharacter(helics::data_type type);
 
-bool isBinaryData (helics::data_block &data);
+bool isBinaryData(helics::data_block& data);

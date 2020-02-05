@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2017-2019,
+Copyright (c) 2017-2020,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
 the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
@@ -17,7 +17,9 @@ SPDX-License-Identifier: BSD-3-Clause
  */
 
 #include "zmqHelper.h"
+
 #include "cppzmq/zmq.hpp"
+
 #include <cctype>
 #include <map>
 using namespace zmq;
@@ -40,31 +42,38 @@ pull = ZMQ_PULL,
     */
 
 /* *INDENT-OFF* */
-static const std::map<std::string, zmq::socket_type> socketMap{
-  {"req", socket_type::req},       {"request", socket_type::req},   {"rep", socket_type::rep},
-  {"reply", socket_type::rep},     {"dealer", socket_type::dealer}, {"router", socket_type::router},
-  {"pub", socket_type::pub},       {"publish", socket_type::pub},   {"sub", socket_type::sub},
-  {"subscribe", socket_type::sub}, {"xpub", socket_type::xpub},     {"xsub", socket_type::xsub},
-  {"push", socket_type::push},     {"pull", socket_type::pull},     {"pair", socket_type::pair},
-  {"stream", socket_type::stream}};
+static const std::map<std::string, zmq::socket_type> socketMap{{"req", socket_type::req},
+                                                               {"request", socket_type::req},
+                                                               {"rep", socket_type::rep},
+                                                               {"reply", socket_type::rep},
+                                                               {"dealer", socket_type::dealer},
+                                                               {"router", socket_type::router},
+                                                               {"pub", socket_type::pub},
+                                                               {"publish", socket_type::pub},
+                                                               {"sub", socket_type::sub},
+                                                               {"subscribe", socket_type::sub},
+                                                               {"xpub", socket_type::xpub},
+                                                               {"xsub", socket_type::xsub},
+                                                               {"push", socket_type::push},
+                                                               {"pull", socket_type::pull},
+                                                               {"pair", socket_type::pair},
+                                                               {"stream", socket_type::stream}};
 /* *INDENT-ON* */
 
-socket_type socketTypeFromString (const std::string &socketType)
+socket_type socketTypeFromString(const std::string& socketType)
 {
-    auto fnd = socketMap.find (socketType);
-    if (fnd != socketMap.end ())
-    {
+    auto fnd = socketMap.find(socketType);
+    if (fnd != socketMap.end()) {
         return fnd->second;
     }
 
     /* try making it lower case*/
-    std::string lowerCase (socketType);
-    std::transform (socketType.cbegin (), socketType.cend (), lowerCase.begin (), ::tolower);
-    fnd = socketMap.find (lowerCase);
-    if (fnd != socketMap.end ())
-    {
+    std::string lowerCase(socketType);
+    std::transform(socketType.cbegin(), socketType.cend(), lowerCase.begin(), ::tolower);
+    fnd = socketMap.find(lowerCase);
+    if (fnd != socketMap.end()) {
         return fnd->second;
     }
-    assert (false);  // NEED to make this a throw operation instead once exceptions are integrated
+    assert(false); // NEED to make this a throw operation instead once exceptions are integrated
     return socket_type::req;
 }

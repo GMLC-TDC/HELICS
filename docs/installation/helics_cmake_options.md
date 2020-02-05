@@ -6,6 +6,7 @@
 -   `HELICS_BUILD_APP_LIBRARY` :  \[Default=ON\] Tell HELICS to build the [app]() Library
 -   `HELICS_BUILD_APP_EXECUTABLES` : \[Default=ON\] Build some executables associated with the apps
 -   `HELICS_BUILD_BENCHMARKS` :  \[Default=OFF\] Build some timing benchmarks associated with HELICS
+-   `HELICS_ENABLE_WEBSERVER` :  \[Default=OFF\] Build the webserver as part of the `helics_broker_server` requires boost 1.70 or higher.  
 -   `HELICS_BUILD_CXX_SHARED_LIB` :  \[Default=OFF\] Build C++ shared libraries of the Application API C++ interface to HELICS and if `HELICS_BUILD_APP_LIBRARY` is also enabled another C++ shared library with the APP library
 -   `HELICS_BUILD_EXAMPLES` :  \[Default=OFF\] Build a few select examples using HELICS,  this is mostly for testing purposes.  The main examples repo is [here](https://github.com/GMLC-TDC/HELICS-Examples)
 -   `HELICS_BUILD_TESTS` :  \[Default=OFF\] Build the HELICS unit and system test executables.
@@ -44,14 +45,15 @@ These options effect the configuration of HELICS itself and how/what gets built 
 
 ### Build configuration Options
 Options effect the connection of libraries used in HELICS and how they are linked.
--   `HELICS_DISABLE_BOOST` : \[Default=OFF\] Completely turn off searching and inclusion of boost libraries.  This will disable the IPC core and few other features, possibly more in the future.  
+-   `HELICS_DISABLE_BOOST` : \[Default=OFF\] Completely turn off searching and inclusion of boost libraries.  This will disable the IPC core, disable the webserver and few other features, possibly more in the future.  
 -   `HELICS_DISABLE_ASIO` : \[Default=OFF\] Completely turn off  inclusion of ASIO libraries.  This will disable all TCP and UDP cores, disable real time mode for HELICS, and disable all timeout features for the Library so **use with caution**.  
--   `ENABLE_SUBMODULE_UPDATE` : \[Default=ON\] Enable CMake to automatically download the submodules and update them if Unnecessary
+-   `HELICS_ENABLE_SUBMODULE_UPDATE` : \[Default=ON\] Enable CMake to automatically download the submodules and update them if necessary
 -   `HELICS_ENABLE_ERROR_ON_WARNING` :\[Default=OFF\] Turns on Werror or equivalent,  probably not useful for normal activity,  There isn't many warnings but left in to allow the possibility
 -   `HELICS_ENABLE_EXTRA_COMPILER_WARNINGS` : \[Default=ON\] Turn on higher levels of warnings in the compilers,  can be turned off if you didn't need or want the warning checks.
 -   `STATIC_STANDARD_LIB`:   \[Default=""\] link the standard library as a static library for no additional C++ system dependencies (recognized values are `default`, `static`, and `dynamic`, anything else is treated the same as `default`)
 -   `HELICS_ENABLE_SWIG`:    \[Default=OFF\] Conditional option if `BUILD_MATLAB_INTERACE` or `BUILD_PYTHON_INTERFACE` or `BUILD_JAVA_INTERACE` is selected and no other option that requires swig is used.  This enables swig usage in cases where it would not otherwise be necessary.
 -   `HELICS_USE_NEW_PYTHON_FIND`:  \[Default=OFF\] If python is required, this option can be set to use newer FindPython routines from CMake, if CMake version in use is >=3.12,  This does change the variables that need to be set to link to a specific python, but can be helpful in some situations with newer python versions.   
+-   `HELICS_ENABLE_GIT_HOOKS`:  install a git hook to check clang format before a push
 -   `Boost_NO_BOOST_CMAKE`: \[Default=OFF\] This is an option related to the Boost find module, but is occasionally needed if a specific version of boost is desired and there is a system copy of BoostConfig.cmake.  So if an incorrect version of boost is being found even when `BOOST_ROOT` is being specified this option might need to be set to `ON`.  
 
 #### ZeroMQ related Options
@@ -75,3 +77,4 @@ There are a few options in the CMake system that are not visible in the GUI they
 -   `HELICS_DISABLE_SYSTEM_CALL_TESTS` :  There are a few test that execute system calls, which could be problematic to compile or execute on certain platforms.  This option removes those tests from compilation.  
 -   `INSTALL_SYSTEM_LIBRARIES` : Install system libraries with the installation,  mainly useful for making a complete installer package with all needed libraries included.  
 =   `HELICS_INSTALL_PACKAGE_TESTS` : Set the find_package tests to only look for HELICS in the system install paths, and enable the package-config-tests
+-   `HELICS_SKIP_ZMQ_INSTALL`:  This is only relevant if ZMQ is built as part of the compilation process, but it skips the installation of zmq as part of HELICS install in that case.  

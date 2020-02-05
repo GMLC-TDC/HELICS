@@ -1,4 +1,5 @@
-#
+#!/bin/bash
+
 # Copyright (c) 2017-2019,
 # Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
 # the top-level NOTICE for additional details. All rights reserved.
@@ -47,10 +48,23 @@ shift $((OPTIND - 1))
 echo "> creating root archive"
 export ROOT_ARCHIVE_DIR="$(pwd)"
 
-git checkout $tag
+# Checkout a tag if provided
+if [[ -n "$tag" ]];
+then
+  git checkout "$tag"
+fi
+
+# Get git submodule source code
 git submodule update --init
-OUTPUT_BASENAME="Helics-${release}-source"
+
+# Set the output name based on if a release name was provided
+OUTPUT_BASENAME="Helics-source"
+if [[ -n "$release" ]];
+then
+  OUTPUT_BASENAME="Helics-${release}-source"
+fi
 export OUTPUT_FILE="${OUTPUT_BASENAME}.tar.gz"
+
 # create root archive
 git archive --verbose --format "tar" --output "${ROOT_ARCHIVE_DIR}/${OUTPUT_BASENAME}.tar" "$(git rev-parse --abbrev-ref HEAD)"
 
@@ -64,7 +78,7 @@ if (( $(ls repo-output-sub*.tar | wc -l) != 0  )); then
   echo
   echo "> combining all tars"
   for archivetar in $(ls repo-output-sub*.tar); do
-    echo $archivetar
+    echo "$archivetar"
     tar --concatenate --file="${OUTPUT_BASENAME}.tar" "$archivetar"
   done
 
@@ -72,6 +86,39 @@ if (( $(ls repo-output-sub*.tar | wc -l) != 0  )); then
   echo "> removing all sub tars"
   rm -rf repo-output-sub*.tar
 fi
+
+# slim down the tar a bit by cleaning up stuff in ThirdParty modules
+rmdir_list=(
+    'units/FuzzTargets'
+    'units/ThirdParty'
+    'units/docs'
+    'units/test'
+    'units/.ci'
+    'units/.circleci'
+    'utilities/tests'
+    'utilities/.ci'
+    'toml11/tests'
+    'jsoncpp/test'
+    'jsoncpp/.travis_scripts'
+    'jsoncpp/devtools'
+    'jsoncpp/.github'
+    'jsoncpp/doc'
+    'fmtlib/doc'
+    'fmtlib/test'
+    'containers/benchmarks'
+    'containers/tests'
+    'containers/.ci'
+    'containers/.circleci'
+    'concurrency/tests'
+    'concurrency/benchmarks'
+    'concurrency/docs'
+    'concurrency/.ci'
+    'concurrency/.circleci'
+)
+for i in "${rmdir_list[@]}"
+do
+   tar --delete -f "${OUTPUT_BASENAME}.tar" "ThirdParty/$i" || true
+done
 
 # gzip the tar
 echo "> gzipping final tar"

@@ -7,35 +7,94 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 A note on future revisions.  
   Everything within a major version number should be code compatible (with the exception of experimental interfaces).  The most notable example of an experimental interface is the support for multiple source inputs.  The APIs to deal with this will change in future minor releases.  Everything within a single minor release should be network compatible with other federates on the same minor release number.  Compatibility across minor release numbers may be possible in some situations but we are not going to guarantee this as those components are subject to performance improvements and may need to be modified at some point.  Patch releases will be limited to bug fixes and other improvements not impacting the public API or network compatibility.  Check the [Public API](./docs/Public_API.md) for details on what is included and excluded from the public API and version stability.
 
-## \[2.3.1\] - 2019-11-22
+## [2.4.0][] - 2020-02-04
+A few bug fixes, code coverage on the shared library increased to 100%,  library updates, Broker server  enhancements including an http REST API, and a lot of work on the build systems to enable easier releases and packaging.
+
+### Changed
+-   filesystem include updated to 1.2.10
+-   CLI11 updated to 1.9
+-   fmt updated to 6.1.2
+-   variant header updated to latest release
+-   Update the units library (v0.3.0)
+-   The TOML interpreter used in HELICS was changed to [toml11](https://github.com/ToruNiina/toml11)
+-   Some unnecessary files were removed from the all source package
+-   some internal CMake options and messages were not using new format for message
+-   Major updates to the python modules build system including merging the python3 and python 2 builds into the same CMake generator
+-   CMake cleanup and formatting
+-   A series of changes to the build for more widely supported installations on Linux and MacOS
+-   The .clang-format file was modified slightly and the entire code base reformatted to the new specification
+-   the metadata information for the benchmarks was updated
+-   The FilterOperator class was altered to include a vector output for use with cloning
+-   TCP and UDP core types are not by default backwards compatible with <2.4 brokers.  The flag "--noack_connect" will need to be passed as part of the coreinitialization string to allow this to work if need be.  ZMQ_SS cores are not considered interoperable with <2.4 brokers due to a number of bugs.  In a few select cases it might still work.  
+
+### Fixed
+-   macOS rpath information on the built binaries
+-   Some issues with swig include directories to allow it to work in other circumstances
+-   an issue with building the java interface in MSYS2
+-   an issue with the `HELICS_USE_NEW_PYTHON_FIND` CMake option
+-   Some thread sanitizer identified issues  
+-   A series of issues from static analyzers
+-   an issue in the shared library create core that could emit an exception
+-   A series of issues related to remote cloning filters not being inline
+-   Several issues with the zmqss core type it is not backwards compatible with <2.4 brokers
+-   The [code coverage](https://codecov.io/gh/GMLC-TDC/HELICS) on the C shared library was increased to 100% and a number of small bugs fixed as a result. The overall coverage increased to 71.5%
+
+### Added
+-   Several installers for Linux and Mac and builds for `pip install`
+-   Allow standalone builds for the python interface
+-   Added a Ring Message benchmark, like the ring Benchmark except using messages as the token
+-   Added a Multinode phold benchmark
+-   Added a c shared library echo benchmark
+-   git logic to check if the submodules are at the correct version
+-   an option for a githook to check the formatting
+-   git warning if the submodule versions are not at the correct version
+-   a timing benchmark similar to the echo benchmark  
+-   a number of tests for the C shared library including evil tests for testing bad input
+-   Hooks to test the coverage builds
+-   a feature to mark a broker or federate as slow responding so it doesn't time out automatically
+-   EditorConfig and .gitattributes for cleaner diff and automatic editor configuration
+-   An incorrect call in the Matlab swig code was fixed
+-   Automatic generation of pull requests for source code formatting  
+-   Add metadata information to the benchmarks for automatic processing
+-   Broker server functionality for tcp core, zmqss core, and udp core
+-   An experimental web server that can be used with the broker server or the broker executables. (requires boost 1.70+ to build)  
+-   man pages for the helics applications
+
+### Deprecated
+-   The `ZMQ_SS` is not generally compatible between 2.3 and 2.4 Minor releases due to bug fixes.  
+
+### Removed
+
+
+## [2.3.1][] - 2019-11-22
 Bug Fixes and some code refactoring, pkg-config files have been added to the installs
 ### Changed
 -   Default installation path for MSYS2 is now configured to be part of the system path, typically `/mingw64/`  or `/mingw32/`
 -   `HELICS_ENABLE_SLOW_PACKAGING_TESTS` renamed to `HELICS_ENABLE_SUBPROJECT_TESTS` to better reflect usage
 -   filesystem library updated to clear up some warnings
 -   The CI system now runs Xcode9 as the oldest release
--   Automatic releases build system was changed to use scripts 
+-   Automatic releases build system was changed to use scripts
 
 ### Fixed
 -   Some documentation links in the docs
 -   Missing `helics-enums.h` header from the install if `HELICS_BUILD_CXX_SHARED_LIB` was not enabled
--  ZMQ install locations on Linux and macOS if ZMQ is used as a subproject without the HELICS_USE_ZMQ_STATIC_LIB option enabled
--   The linux shared library release build so it is compatible with a larger number of systems including older ones back to glibc 2.12. 
--  Fix some documentation and issues with using the STATIC_STANDARD_LIB CMake option
-  
+-   ZMQ install locations on Linux and macOS if ZMQ is used as a subproject without the HELICS_USE_ZMQ_STATIC_LIB option enabled
+-   The linux shared library release build so it is compatible with a larger number of systems including older ones back to glibc 2.12.
+-   Fix some documentation and issues with using the STATIC_STANDARD_LIB CMake option
+
 ### Added
 -   CMake option for `HELICS_DISABLE_ASIO` to completely remove the use the ASIO library, turns off the UDP, and TCP core types, all real-time capabilities, and timeout and heartbeat detection for cores and brokers.  ASIO doesn't support all version of cygwin.  
 -   pkg-config files for the shared libraries are now installed to `<prefix>/lib/pkg-config` on unix like systems  
 -   Tests and CI builds for installed CMake package files and pkg-config files
 
 ### Deprecated
--  Trying to install on linux/macos systems with cmake older than 3.13 and ZMQ used as a subproject with the shared library is no longer supported.  It is likely this use scenario was broken before, now it produces a warning.  
+-   Trying to install on linux/macos systems with cmake older than 3.13 and ZMQ used as a subproject with the shared library is no longer supported.  It is likely this use scenario was broken before, now it produces a warning.  
 
 ### Removed
 -   If `HELICS_BUILD_BENCHMARKS` is enabled, the option for `ENABLE_INPROC_CORE` will not show in the cmake-gui.
 -   If `HELICS_BUILD_TESTS` is enabled, the option for `ENABLE_TEST_CORE` will not show in the cmake-gui.
 
-## \[2.3.0\] - 2019-11-12
+## [2.3.0][] - 2019-11-12
 Minor release with lots of CMake updates and build changes and a few fixes and additions.  The biggest change is in the C++ shared library and complete removal of boost\:\:test.
 ### Changed
 -   Converted the shared_library_tests and application_api tests to use Google test instead of Boost test
@@ -98,7 +157,7 @@ Minor release with lots of CMake updates and build changes and a few fixes and a
 -   JSONCPP, Utilities, and units libraries are no longer installed in any form, libraries or headers.  
 -   CMake option to install CEREAL headers (they are now required, but are in a different location)
 
-## \[2.2.2\] - 2019-10-27
+## [2.2.2][] - 2019-10-27
 Bug fix release
 
 ### Fixed
@@ -108,7 +167,7 @@ Bug fix release
 
 
 
-## \[2.2.1\] - 2019-09-27
+## [2.2.1][] - 2019-09-27
 Minor release with bug fixes and a few additional features
 ### Changed
 -   helics apps tests is converted to use Google test and is now being run through the sanitizers
@@ -140,7 +199,7 @@ Minor release with bug fixes and a few additional features
 -   The included build files for the Octave interface have been removed.  It is now required to use swig to build these files.  The interface file was only valid for Octave 4.2 and had potential to break in later versions.  Given the 3 versions of octave in common use it was deemed prudent to just remove the included file and require swig to generate the correct interface, this may be added back in the next release if more testing shows this to not be an issue.    
 
 
-## \[2.2.0\] - 2019-08-26
+## [2.2.0][] - 2019-08-26
 Minor release with some updates to the networking portion of HELICS and some API additions.
 
 ### Changed
@@ -166,7 +225,7 @@ Minor release with some updates to the networking portion of HELICS and some API
 ### Removed
 -   ENABLE_SWIG option in CMake as always ON.  This option will only appear for interfaces that have existing build files.  For swig generated interfaces that do not have prebuilt files (octave, python2, and C#) this option will no longer appear as swig is required.  
 
-## \[2.1.1\] - 2019-07-15
+## [2.1.1][] - 2019-07-15
 Minor release which fixes a few bugs and add some JSON related input and queries
 
 ### Changed
@@ -198,7 +257,7 @@ Minor release which fixes a few bugs and add some JSON related input and queries
 -   libguarded and several concurrency related structures as they are now in a standalone repository that is included through submodules
 
 
-## \[2.1.0\] - 2019-06-27
+## [2.1.0][] - 2019-06-27
 The main focus of this minor release is cleaning up the build system and extracting required compiled libraries from the HELICS build process, no changes in the C API, and a few additions and deprecations in the C++ API related to command line arguments.  
 
 ### Changed
@@ -232,7 +291,7 @@ The main focus of this minor release is cleaning up the build system and extract
 ### Removed
 -   tested support of XCode 6.4 and 7.3;  these probably still work but we are not testing them anymore.
 
-## \[2.0.0\] - 2019-02-12
+## [2.0.0][] - 2019-02-12
 
 This is a major revision so this changelog will not capture all the changes that have been made in detail. Some highlights:
 -   major revision to the API including
@@ -254,7 +313,7 @@ This is a major revision so this changelog will not capture all the changes that
 -   License file changed to match BSD-3-clause exactly(terms are the same but the file had some extra disclaimers in it, now it matches the standard BSD-3-clause license)
 -   tag source files with appropriate licensing information
 
-## \[1.3.1\] - 2018-09-23
+## [1.3.1][] - 2018-09-23
 
 ### Changed
 -   wait_for_Broker now uses a condition variable instead of sleep and checking repeatedly
@@ -272,7 +331,7 @@ This is a major revision so this changelog will not capture all the changes that
 -   comm objects now can use the same logging system as the rest of HELICS
 
 
-## \[1.3.0\] - 2018-07-31
+## [1.3.0][] - 2018-07-31
 
 ### Changed
 -   some CMake options have been removed (BUILD_BROKER)
@@ -302,7 +361,7 @@ This is a major revision so this changelog will not capture all the changes that
 ### Removed
 -   Most examples are now located in [HELICS-Examples](https://github.com/GMLC-TDC/HELICS-Examples)
 
-## \[1.2.1\] - 2018-06-30
+## [1.2.1][] - 2018-06-30
 
 ### Fixed
 -   bug in the conversion of named points from strings
@@ -322,7 +381,7 @@ This is a major revision so this changelog will not capture all the changes that
 -   conversion of doubles into the internal time base now rounds to the nearest ns instead of truncating
 -   unify CMake scripts to use lower case commands
 
-## \[1.2.0\] - 2018-06-18
+## [1.2.0][] - 2018-06-18
 
 ### Fixed
 -   issue with various filter types and random drop filters
@@ -345,7 +404,7 @@ This is a major revision so this changelog will not capture all the changes that
 -   additional filter tests and query tests
 -   realtime mode for HELICS specified by activating the realtime flag, and specifying rt_lag and rt_lead  the federate will then delay grant or force_grant based on computer clock to match wall time.
 
-## \[1.1.1\] - 2018-05-25
+## [1.1.1][] - 2018-05-25
 
 ### Added
 -   BrokerApp as a slightly more convenient runner to Brokers
@@ -375,7 +434,7 @@ This is a major revision so this changelog will not capture all the changes that
 ### Removed
 -   installation of HELICSImport.cmake  this is now redundant with updated HELICSConfig.cmake
 
-## \[1.1.0\] - 2018-05-09
+## [1.1.0][] - 2018-05-09
 
 ### Added
 -   namedpoint functions in the C++ for publications and subscriptions, and corresponding functions in the C interface and language API's
@@ -393,12 +452,12 @@ This is a major revision so this changelog will not capture all the changes that
 -   better error checking in the C interface
 -   fixes for occasionally failing tests
 
-## \[1.0.3\] - 2018-04-28
+## [1.0.3][] - 2018-04-28
 
 ### Fixed
 -   Fix bug preventing federates from terminating if its dependencies are disconnected and using purely interrupt driven timing, such as a recorder
 
-## \[1.0.2\] - 2018-04-27
+## [1.0.2][] - 2018-04-27
 
 ### Fixed
 -   Bug not allowing command line parameters separate from the command if a positional argument was in usage
@@ -406,7 +465,7 @@ This is a major revision so this changelog will not capture all the changes that
 -   added python2 interface option (this will be available but not fully capable going forward)
 -   A few more race conditions fixed from clang thread-sanitizer
 
-## \[1.0.1\] - 2018-04-22
+## [1.0.1][] - 2018-04-22
 
 ### Fixed
 -   Allow Boost 1.67 usage
@@ -414,3 +473,22 @@ This is a major revision so this changelog will not capture all the changes that
 -   Clang tidy and static analyzer fixes
 -   fix some potential race conditions spotted by clang thread-sanitizer
 -   Fix some documentation to better match recent updates
+
+[1.0.1]: https://github.com/GMLC-TDC/HELICS/releases/tag/v1.0.1
+[1.0.2]: https://github.com/GMLC-TDC/HELICS/releases/tag/v1.0.2
+[1.0.3]: https://github.com/GMLC-TDC/HELICS/releases/tag/v1.0.3
+[1.1.0]: https://github.com/GMLC-TDC/HELICS/releases/tag/v1.1.0
+[1.1.1]: https://github.com/GMLC-TDC/HELICS/releases/tag/v1.1.1
+[1.2.0]: https://github.com/GMLC-TDC/HELICS/releases/tag/v1.2.0
+[1.2.1]: https://github.com/GMLC-TDC/HELICS/releases/tag/v1.2.1
+[1.3.0]: https://github.com/GMLC-TDC/HELICS/releases/tag/v1.3.0
+[1.3.1]: https://github.com/GMLC-TDC/HELICS/releases/tag/v1.3.1
+[2.0.0]: https://github.com/GMLC-TDC/HELICS/releases/tag/v2.0.0
+[2.1.0]: https://github.com/GMLC-TDC/HELICS/releases/tag/v2.1.0
+[2.1.1]: https://github.com/GMLC-TDC/HELICS/releases/tag/v2.1.1
+[2.2.0]: https://github.com/GMLC-TDC/HELICS/releases/tag/v2.2.0
+[2.2.1]: https://github.com/GMLC-TDC/HELICS/releases/tag/v2.2.1
+[2.2.2]: https://github.com/GMLC-TDC/HELICS/releases/tag/v2.2.2
+[2.3.0]: https://github.com/GMLC-TDC/HELICS/releases/tag/v2.3.0
+[2.3.1]: https://github.com/GMLC-TDC/HELICS/releases/tag/v2.3.1
+[2.4.0]: https://github.com/GMLC-TDC/HELICS/releases/tag/v2.4.0

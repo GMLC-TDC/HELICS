@@ -1,5 +1,5 @@
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-# Copyright (c) 2017-2019, Battelle Memorial Institute; Lawrence Livermore
+# Copyright (c) 2017-2020, Battelle Memorial Institute; Lawrence Livermore
 # National Security, LLC; Alliance for Sustainable Energy, LLC.
 # See the top-level NOTICE for additional details.
 # All rights reserved.
@@ -16,6 +16,7 @@ endif()
 
 if(HELICS_BUILD_APP_LIBRARY)
     add_subdirectory(comboFederates1)
+    add_subdirectory(BrokerServerTestCase)
 endif()
 
 if(NOT HELICS_DISABLE_C_SHARED_LIB)

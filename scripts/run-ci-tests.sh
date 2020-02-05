@@ -1,7 +1,15 @@
 #!/bin/bash
 
-for i in "$@"
+if [[ "$SET_MSYS_PATH" == "true" ]]; then
+    export PATH="/c/tools/msys64/mingw64/bin:$PATH"
+    echo "$PATH"
+fi
+
+test_match_regex='.*'
+test_exclude_regex=''
+while [[ $# -gt 0 ]]
 do
+    i="$1"
     case $i in
         --valgrind)
             echo "Running Valgrind tests"
@@ -42,11 +50,20 @@ do
         --ctest-verbose)
             CTEST_OPTIONS+=" --verbose"
             ;;
+        --match-tests)
+            test_match_regex="$2"
+            shift # get past the value
+            ;;
+        --exclude-tests)
+            test_exclude_regex="$2"
+            shift # get past the value
+            ;;
         *)
             TEST_CONFIG=$i
             TEST_CONFIG_GIVEN=true
             ;;
     esac
+    shift # get past the argument
 done
 
 #if [[ "$RUN_CACHEGRIND" == "true" ]]; then
@@ -66,7 +83,7 @@ else
     export CTEST_OUTPUT_ON_FAILURE=true
 
     if [[ "$TEST_CONFIG_GIVEN" == "true" ]]; then
-        test_label=$(tr '[:upper:]' '[:lower:]' <<< $TEST_CONFIG)
+        test_label=$(tr '[:upper:]' '[:lower:]' <<< "$TEST_CONFIG")
         case "${test_label}" in
 	    # Recognize aliases/case-insensitive versions of some values for TEST_CONFIG
             *daily*)
@@ -112,11 +129,11 @@ else
     # Run the CI tests last so that the execution status is used for the pass/fail status shown
     if [[ "$DISABLE_UNIT_TESTS" != "true" ]]; then
 	if [[ -n "${TEST_CONFIG}" ]]; then
-        	echo "Running ${TEST_CONFIG} tests"
-        	ctest -L ${TEST_CONFIG} ${CTEST_OPTIONS}
+        	echo "Running ${TEST_CONFIG} tests with filters exclude ${test_exclude_regex} and ${test_match_regex}"
+        	ctest -E "${test_exclude_regex}" -R "${test_match_regex}" -L ${TEST_CONFIG} ${CTEST_OPTIONS}
 	else
-		echo "Running all tests"
-		ctest ${CTEST_OPTIONS}
+		echo "Running tests matching ${test_match_regex} but not matching ${test_exclude_regex}"
+		ctest ${CTEST_OPTIONS} -E "${test_exclude_regex}" -R "${test_match_regex}"
 	fi
     fi
 fi

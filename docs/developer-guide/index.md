@@ -9,6 +9,7 @@ Developer Guide
    swig
    tests
    docs
+   benchmarks
    continuous-integration
    ../Public_API
 ```

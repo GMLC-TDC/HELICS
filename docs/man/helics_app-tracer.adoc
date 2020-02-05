@@ -1,0 +1,68 @@
+helics_app-tracer(1)
+====================
+
+NAME
+----
+helics_app-tracer - display data from endpoints and publications in a federation
+
+SYNOPSIS
+--------
+[verse]
+'helics_app tracer' [-v|--version] [-h|-?|--help]
+    [--quiet] [--config-file <file>] [--local]
+    [--stop <time>] [--input <file>]
+    [--allow_iteration] [--print] [--skiplog]
+    [--clone <endpoint>] [--sourceclone <endpoint>]
+    [--destclone <endpoint>] [--endpoints <endpoint>]
+    [--capture <federate(s)>]
+    [--tag|--publication|--pub <publication>]
+
+
+DESCRIPTION
+-----------
+The tracer application provides an easy way to display data from a federation.
+It acts as a federate that can "capture" values from specific publications and
+messages from direct or cloned endpoints which exist elsewhere and display them.
+The main use is as a visual indicator of what's happening and a monitoring app.
+
+OPTIONS
+-------
+--allow_iteration::
+        Allow iteration on values.
+
+--print::
+        Print messages to the screen.
+
+--skiplog::
+        Print messages to the screen through cout.
+
+--clone <endpoint>::
+        Add an endpoint to capture all messages (to and from). This argument
+        can be given multiple times.
+
+--sourceclone <endpoint>::
+        Add an endpoint to capture all the messages it sends. This argument
+        can be given multiple times.
+
+--destclone <endpoint>::
+        Add an endpoint to capture all messages it receives. This argument
+        can be given multiple times.
+
+--endpoints <endpoint>::
+        Endpoints to capture messages for. This argument can be given multiple
+        times.
+
+--capture <federate>::
+        Federate to capture all publications from. This argument can be given
+        multiple times. Comma or semicolon separated lists (e.g. fed1;fed2) are
+        also supported.
+
+--tag::
+--pub::
+--publication <publication>::
+        Publications (tags) to capture values from. This argument can be given
+        multiple times.
+
+include::federate-apps-common-options.adoc[]
+
+include::federate-info-options.adoc[]

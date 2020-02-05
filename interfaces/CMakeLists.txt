@@ -1,5 +1,5 @@
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-# Copyright (c) 2017-2019, Battelle Memorial Institute; Lawrence Livermore
+# Copyright (c) 2017-2020, Battelle Memorial Institute; Lawrence Livermore
 # National Security, LLC; Alliance for Sustainable Energy, LLC.
 # See the top-level NOTICE for additional details.
 # All rights reserved.
@@ -74,11 +74,17 @@ else()
     set(swig_required OFF)
 endif()
 
-    # at some point in the future (HELICS 3) switch everything to use
-    # find_package(Python3 ...)
-	cmake_dependent_advanced_option(HELICS_USE_NEW_PYTHON_FIND "Use the FindPython Routine only available from cmake 3.12 and later" OFF "CMAKE_VERSION VERSION_GREATER 3.12;NOT HELICS_SWIG_GENERATE_INTERFACE_FILES_ONLY; BUILD_PYTHON_INTERFACE
-    OR BUILD_PYTHON2_INTERFACE" OFF)
-    
+# cmake-format: off
+# at some point in the future (HELICS 3) switch everything to use
+# find_package(Python3 ...)
+cmake_dependent_advanced_option(
+    HELICS_USE_NEW_PYTHON_FIND
+    "Use the FindPython Routine only available from cmake 3.12 and later"
+    OFF
+    "CMAKE_VERSION VERSION_GREATER 3.12;NOT HELICS_SWIG_GENERATE_INTERFACE_FILES_ONLY;BUILD_PYTHON_INTERFACE OR BUILD_PYTHON2_INTERFACE"
+    OFF
+)
+# cmake-format: on
 
 cmake_dependent_option(
     HELICS_ENABLE_SWIG
@@ -122,25 +128,30 @@ if(HELICS_ENABLE_SWIG OR swig_required)
         # examine its usage and implications for now leave it at the OLD
         cmake_policy(SET CMP0086 OLD)
     endif()
-    find_package(SWIG REQUIRED 3.0)
+    find_package(SWIG 3 REQUIRED)
     include(${SWIG_USE_FILE})
 endif()
 
-# these includes are for all the interface builds which use the shared library
-include_directories(${CMAKE_CURRENT_SOURCE_DIR})
-include_directories("${HELICS_SOURCE_DIR}/src/helics/shared_api_library")
-include_directories("${HELICS_BINARY_DIR}/src/helics/shared_api_library")
+# add base swig interface files as install option, regardless of current
+# interfaces built
+if(NOT HELICS_BINARY_ONLY_INSTALL AND NOT HELICS_DISABLE_C_SHARED_LIB)
+    install(
+        FILES helics.i
+        DESTINATION ${CMAKE_INSTALL_DATADIR}/helics/swig
+        COMPONENT swig
+    )
+endif()
 
-if(BUILD_PYTHON_INTERFACE)
+# cmake-format: off
+# add a helper variable for standalone interface swig builds
+set(HELICS_SWIG_INCLUDE_DIRS "${CMAKE_CURRENT_SOURCE_DIR}" "${HELICS_SOURCE_DIR}/src/helics/shared_api_library" "${HELICS_BINARY_DIR}/src/helics/shared_api_library")
+# cmake-format: on
+
+# TODO: remove this after all of the interfaces work as standalone builds
+include_directories(${HELICS_SWIG_INCLUDE_DIRS})
+
+if(BUILD_PYTHON_INTERFACE OR BUILD_PYTHON2_INTERFACE)
     add_subdirectory(python)
-    if(BUILD_PYTHON2_INTERFACE)
-        message(
-            WARNING
-                "PYTHON2 interface will not be built since python 3 build is active"
-        )
-    endif()
-elseif(BUILD_PYTHON2_INTERFACE)
-    add_subdirectory(python2)
 endif()
 
 if(BUILD_JAVA_INTERFACE)

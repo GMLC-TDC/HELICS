@@ -1,16 +1,16 @@
 /*
-Copyright (c) 2017-2019,
+Copyright (c) 2017-2020,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
 the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 
 #include "CommsBroker.hpp"
-#include "CommsBroker_impl.hpp"
-#include "helics/helics-config.h"
 
 #include "CommonCore.hpp"
+#include "CommsBroker_impl.hpp"
 #include "CoreBroker.hpp"
+#include "helics/helics-config.h"
 
 #ifdef ENABLE_IPC_CORE
 #    include "ipc/IpcComms.h"
@@ -42,8 +42,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #    include "mpi/MpiComms.h"
 #endif
 
-namespace helics
-{
+namespace helics {
 #ifdef ENABLE_IPC_CORE
 template class CommsBroker<ipc::IpcComms, CoreBroker>;
 template class CommsBroker<ipc::IpcComms, CommonCore>;
@@ -82,4 +81,4 @@ template class CommsBroker<inproc::InprocComms, CoreBroker>;
 template class CommsBroker<mpi::MpiComms, CoreBroker>;
 template class CommsBroker<mpi::MpiComms, CommonCore>;
 #endif
-}  // namespace helics
+} // namespace helics

@@ -1,0 +1,14 @@
+* text=input
+
+*.jpg binary
+*.png binary
+*.mat binary
+
+*.cpp  diff=cpp
+*.hpp  diff=cpp
+*.c    diff=cpp
+*.h    diff=cpp
+*.py   diff=python
+*.java diff=java
+*.m    diff=matlab
+*.cs   diff=csharp

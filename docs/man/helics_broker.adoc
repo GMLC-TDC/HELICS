@@ -1,0 +1,49 @@
+helics_broker(1)
+================
+
+NAME
+----
+helics_broker - intermediary or root in the HELICS hierarchy
+
+SYNOPSIS
+--------
+[verse]
+'helics_broker' [-v|--version] [-h|-?|--help]
+    [--quiet] [--config-file <file>] [-t|--core|--type|--coretype <type>]
+    [-f|-m|--federates|--minfederates|--minfed <num>]
+    [-n|--name|--identifier <name>] [--maxiter|--maxiterations <num>]
+    [--minbroker|--minbrokers|--minbrokercount <num>]
+    [--key|--broker_key <key>] [--no_ping|--slow_responding]
+    [--conservative_time_policy|--restrictive_time_policy]
+    [--local|--ipv4|--ipv6|--all|--external] [--brokeraddress <address>]
+    [--reuse_address] [--broker <identifier>] [--brokername <name>]
+    [--maxsize <buffer size>] [--maxcount <num msgs>] [--networkretries <num>]
+    [--osport|--use_os_port] [--autobroker] [--brokerinit <init str>]
+    [--client|--server] [-p|--port <num>] [--brokerport <num>] [--localport <num>]
+    [--portstart <num>] [--interface|--localinterface <network interface>] [--root]
+    [--autorestart]
+include::logging-synopsis.adoc[]
+include::timeout-synopsis.adoc[]
+
+DESCRIPTION
+-----------
+The broker application functions as an intermediary or root in the HELICS
+hierarchy. The broker can be run through helics_app or helics_broker.
+
+OPTIONS
+-------
+--autorestart::
+        Start a continually regenerating broker. There is a 3 second countdown
+        on broker completion to halt the program via ctrl-C (SIGINT).
+
+include::broker-options.adoc[]
+
+SUBCOMMANDS
+-----------
+helics_broker-term(1)::
+       Starts a broker and opens a terminal control window for the broker. Run
+       the help command in a terminal for more commands.
+
+SEE ALSO
+--------
+helics_broker-term(1), helics_app-broker(1)

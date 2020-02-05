@@ -1,114 +1,114 @@
 /*
-Copyright (c) 2017-2019,
+Copyright (c) 2017-2020,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
 the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 
 #include "TomlProcessingFunctions.hpp"
-#include "../utilities/timeStringOps.hpp"
+
 #include "../core/helics-time.hpp"
+#include "../utilities/timeStringOps.hpp"
+
 #include <fstream>
 
-bool hasTomlExtension (const std::string &tomlString)
+bool hasTomlExtension(const std::string& tomlString)
 {
-    auto ext = tomlString.substr (tomlString.length () - 4);
+    auto ext = tomlString.substr(tomlString.length() - 4);
     return ((ext == "toml") || (ext == "TOML") || (ext == ".ini") || (ext == ".INI"));
 }
 
-toml::Value loadToml (const std::string &tomlString)
+toml::value loadToml(const std::string& tomlString)
 {
-    if (tomlString.size () > 128)
-    {
-        try
-        {
-            return loadTomlStr (tomlString);
+    if (tomlString.size() > 128) {
+        try {
+            return loadTomlStr(tomlString);
         }
-        catch (const std::invalid_argument &)
-        {
+        catch (const toml::syntax_error&) {
             // just pass through this was an assumption
         }
     }
-    std::ifstream file (tomlString);
+    std::ifstream file(tomlString, std::ios_base::binary);
 
-    if (file.is_open ())
-    {
-        toml::ParseResult pr = toml::parse (file);
-        if (!pr.valid ())
-        {
-            throw (std::invalid_argument (pr.errorReason));
+    try {
+        if (file.is_open()) {
+            return toml::parse(file);
         }
-
-        return pr.value;
+        return loadTomlStr(tomlString);
     }
-    return loadTomlStr (tomlString);
+    catch (const toml::syntax_error& se) {
+        throw(std::invalid_argument(se.what()));
+    }
 }
 
-toml::Value loadTomlStr (const std::string &tomlString)
+toml::value loadTomlStr(const std::string& tomlString)
 {
-    std::istringstream tstring (tomlString);
-    toml::ParseResult pr = toml::parse (tstring);
-    if (pr.valid ())
-    {
-        return pr.value;
+    try {
+        std::istringstream tstring(tomlString);
+        toml::value pr = toml::parse(tstring);
+        return pr;
     }
-    throw (std::invalid_argument (pr.errorReason));
+    catch (const toml::syntax_error& se) {
+        throw(std::invalid_argument(se.what()));
+    }
 }
+
+static const std::string emptyString;
 
 /** read a time from a JSON value element*/
-helics::Time loadTomlTime (const toml::Value &timeElement, time_units defaultUnits)
+helics::Time loadTomlTime(const toml::value& timeElement, time_units defaultUnits)
 {
-    if (timeElement.is<toml::Table> ())
-    {
-        auto units = timeElement.find ("units");
-        if (units != nullptr)
-        {
-            defaultUnits = gmlc::utilities::timeUnitsFromString (units->as<std::string> ());
+    if (timeElement.is_table()) {
+        auto& units = toml::find_or<std::string>(timeElement, "units", emptyString);
+        if (!units.empty()) {
+            defaultUnits = gmlc::utilities::timeUnitsFromString(units);
         }
-        auto val = timeElement.find ("value");
-        if (val != nullptr)
-        {
-            if (val->is<int64_t> ())
-            {
-                return {val->as<int64_t> (), defaultUnits};
+        toml::value emptyVal;
+        auto val = toml::find_or(timeElement, "value", emptyVal);
+        if (!val.is_uninitialized()) {
+            if (val.is_integer()) {
+                return {val.as_integer(), defaultUnits};
             }
-            return {val->as<double> () * toSecondMultiplier (defaultUnits)};
+            if (val.is_floating()) {
+                return {val.as_floating() * toSecondMultiplier(defaultUnits)};
+            }
+            return gmlc::utilities::loadTimeFromString<helics::Time>(
+                tomlAsString(val) + " " + units);
         }
+    } else if (timeElement.is_integer()) {
+        return {timeElement.as_integer(), defaultUnits};
+    } else if (timeElement.is_floating()) {
+        return {timeElement.as_floating() * toSecondMultiplier(defaultUnits)};
+    } else if (timeElement.is_local_time()) {
+        return {toml::get<std::chrono::nanoseconds>(timeElement)};
+    } else {
+        return gmlc::utilities::loadTimeFromString<helics::Time>(tomlAsString(timeElement));
     }
-    else if (timeElement.is<int64_t> ())
-    {
-        return {timeElement.as<int64_t> (), defaultUnits};
-    }
-    else if (timeElement.is<double> ())
-    {
-        return {timeElement.as<double> () * toSecondMultiplier (defaultUnits)};
-    }
-    else if (timeElement.is<toml::Time> ())
-    {
-        return {static_cast<std::chrono::nanoseconds> (timeElement.as<toml::Time> ().time_since_epoch ())};
-    }
-    else
-    {
-        return gmlc::utilities::loadTimeFromString<helics::Time> (timeElement.as<std::string> ());
-    }
-    return helics::Time::minVal ();
+    return helics::Time::minVal();
 }
 
-std::string getKey (const toml::Value &element)
+std::string getKey(const toml::value& element)
 {
-    std::string retval;
-    auto mem = element.find ("key");
-    if (mem != nullptr)
-    {
-        retval = mem->as<std::string> ();
-    }
-    else
-    {
-        auto name = element.find ("name");
-        if (name != nullptr)
-        {
-            retval = name->as<std::string> ();
-        }
+    std::string retval = toml::find_or(element, "key", emptyString);
+    if (retval.empty()) {
+        retval = toml::find_or(element, "name", emptyString);
     }
     return retval;
+}
+
+std::string tomlAsString(const toml::value& element)
+{
+    switch (element.type()) {
+        case toml::value_t::string:
+            return element.as_string(std::nothrow_t());
+        case toml::value_t::floating:
+            return std::to_string(element.as_floating(std::nothrow_t()));
+        case toml::value_t::integer:
+            return std::to_string(element.as_integer(std::nothrow_t()));
+        default: {
+            std::ostringstream str;
+            str << element;
+            return str.str();
+        }
+    }
 }

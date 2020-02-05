@@ -1,0 +1,67 @@
+helics_app(1)
+=============
+
+NAME
+----
+helics_app - a collection of HELICS apps
+
+SYNOPSIS
+--------
+[verse]
+'helics_app' [-v|--version] [-h|-?|--help]
+    [--quiet] [--config-file=<file>]
+    <command> [<args>]
+
+DESCRIPTION
+-----------
+The helics_app executable provides a common
+executable for running any of the other HELICS
+app.
+
+OPTIONS
+-------
+-v::
+--version::
+        Prints the HELICS version that 'helics_app' uses.
+
+-h::
+-?::
+--help::
+        Prints usage, options, and available subcommands.
+
+--config-file=<file>::
+        The base configuration file. The default file used
+        is helics_config.ini
+
+--quiet::
+        Silence most printed output.
+
+SUBCOMMANDS
+-----------
+helics_app-player(1)::
+        Generates signals from prescribed data from a file.
+
+helics_app-recorder(1)::
+        Captures data on interfaces and records them to a file.
+
+helics_app-clone(1)::
+        Copies another federate and records it to a file.
+
+helics_app-echo(1)::
+        Echoes received messages back to their source.
+
+helics_app-source(1)::
+        Signal generator from defined patterns such as sine waves.
+
+helics_app-tracer(1)::
+        Displays data from a federation.
+
+helics_app-broker(1)::
+        Similar to the helics_broker(1) app, but without the terminal.
+
+SEE ALSO
+--------
+helics_app-player(1), helics_app-recorder(1),
+helics_app-clone(1), helics_app-echo(1),
+helics_app-source(1), helics_app-tracer(1),
+helics_app-broker(1)

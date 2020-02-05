@@ -1,0 +1,12 @@
+helics_player(1)
+================
+
+NAME
+----
+helics_player - replays data from an input file into a federation
+
+SYNOPSIS
+--------
+[verse]
+'helics_player' [-v|--version] [-h|-?|--help]
+include::player-contents.adoc[]

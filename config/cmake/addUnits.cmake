@@ -1,5 +1,5 @@
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-# Copyright (c) 2017-2019, Battelle Memorial Institute; Lawrence Livermore
+# Copyright (c) 2017-2020, Battelle Memorial Institute; Lawrence Livermore
 # National Security, LLC; Alliance for Sustainable Energy, LLC.
 # See the top-level NOTICE for additional details.
 # All rights reserved.
@@ -17,6 +17,7 @@ endif()
 set(UNITS_BUILD_OBJECT_LIBRARY OFF CACHE INTERNAL "")
 set(UNITS_BUILD_STATIC_LIBRARY ON CACHE INTERNAL "")
 set(UNITS_BUILD_SHARED_LIBRARY OFF CACHE INTERNAL "")
+set(UNITS_BUILD_WEBSERVER OFF CACHE INTERNAL "")
 
 add_subdirectory("${PROJECT_SOURCE_DIR}/ThirdParty/units"
                  "${PROJECT_BINARY_DIR}/ThirdParty/units")

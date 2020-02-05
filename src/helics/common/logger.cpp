@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2017-2019,
+Copyright (c) 2017-2020,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
 the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
@@ -17,155 +17,159 @@ SPDX-License-Identifier: BSD-3-Clause
  */
 
 #include "logger.h"
+
 #include "loggerCore.hpp"
 
 #include <iostream>
 
-namespace helics
+namespace helics {
+Logger::Logger(): logCore(LoggerManager::getLoggerCore())
 {
-Logger::Logger () : logCore (LoggerManager::getLoggerCore ())
-{
-    coreIndex = logCore->addFileProcessor ([this] (std::string &&message) { logFunction (std::move (message)); });
+    coreIndex = logCore->addFileProcessor(
+        [this](std::string&& message) { logFunction(std::move(message)); });
 }
-Logger::Logger (std::shared_ptr<LoggingCore> core) : logCore (std::move (core))
+Logger::Logger(std::shared_ptr<LoggingCore> core): logCore(std::move(core))
 {
-    coreIndex = logCore->addFileProcessor ([this] (std::string &&message) { logFunction (std::move (message)); });
+    coreIndex = logCore->addFileProcessor(
+        [this](std::string&& message) { logFunction(std::move(message)); });
 }
 
-Logger::~Logger () { logCore->haltOperations (coreIndex); }
-void Logger::openFile (const std::string &file)
+Logger::~Logger()
 {
-    std::lock_guard<std::mutex> fLock (fileLock);
-    if (outFile.is_open ())
-    {
-        outFile.close ();
+    logCore->haltOperations(coreIndex);
+}
+void Logger::openFile(const std::string& file)
+{
+    std::lock_guard<std::mutex> fLock(fileLock);
+    if (outFile.is_open()) {
+        outFile.close();
     }
-    outFile.open (file.c_str ());
-    hasFile.store (outFile.is_open ());
+    outFile.open(file.c_str());
+    hasFile.store(outFile.is_open());
 }
 
-void Logger::closeFile ()
+void Logger::closeFile()
 {
-    std::lock_guard<std::mutex> fLock (fileLock);
-    if (outFile.is_open ())
-    {
-        outFile.close ();
+    std::lock_guard<std::mutex> fLock(fileLock);
+    if (outFile.is_open()) {
+        outFile.close();
     }
-    hasFile.store (false);
+    hasFile.store(false);
 }
 
-void Logger::startLogging (int cLevel, int fLevel)
+void Logger::startLogging(int cLevel, int fLevel)
 {
     consoleLevel = cLevel;
     fileLevel = fLevel;
-    halted.store (false);
+    halted.store(false);
 }
 
-void Logger::haltLogging ()
+void Logger::haltLogging()
 {
     bool exp = false;
-    if (halted.compare_exchange_strong (exp, true))
-    {
-        logCore->addMessage (coreIndex, "!!>close");
+    if (halted.compare_exchange_strong(exp, true)) {
+        logCore->addMessage(coreIndex, "!!>close");
     }
 }
-void Logger::changeLevels (int cLevel, int fLevel)
+void Logger::changeLevels(int cLevel, int fLevel)
 {
     consoleLevel = cLevel;
     fileLevel = fLevel;
 }
 
-void Logger::log (int level, std::string logMessage)
+void Logger::log(int level, std::string logMessage)
 {
-    if (!halted)
-    {
-        logMessage.push_back ((level <= fileLevel) ? '^' : '~');
-        logMessage.push_back ((level <= consoleLevel) ? '$' : '-');
+    if (!halted) {
+        logMessage.push_back((level <= fileLevel) ? '^' : '~');
+        logMessage.push_back((level <= consoleLevel) ? '$' : '-');
 
-        logCore->addMessage (coreIndex, std::move (logMessage));
+        logCore->addMessage(coreIndex, std::move(logMessage));
     }
 }
 
-void Logger::flush () { logCore->addMessage (coreIndex, "!!>flush"); }
-bool Logger::isRunning () const { return (!halted); }
-
-void Logger::logFunction (std::string &&message)
+void Logger::flush()
 {
-    if (hasFile.load ())
-    {
-        std::lock_guard<std::mutex> fLock (fileLock);
-        if (message.size () > 3)
-        {
-            if (message.compare (0, 3, "!!>") == 0)
-            {
-                if (message.compare (3, 5, "flush") == 0)
-                {
-                    if (outFile.is_open ())
-                    {
-                        outFile.flush ();
+    logCore->addMessage(coreIndex, "!!>flush");
+}
+bool Logger::isRunning() const
+{
+    return (!halted);
+}
+
+void Logger::logFunction(std::string&& message)
+{
+    if (hasFile.load()) {
+        std::lock_guard<std::mutex> fLock(fileLock);
+        if (message.size() > 3) {
+            if (message.compare(0, 3, "!!>") == 0) {
+                if (message.compare(3, 5, "flush") == 0) {
+                    if (outFile.is_open()) {
+                        outFile.flush();
                     }
                 }
-                if (message.compare (3, 5, "close") == 0)
-                {
-                    if (outFile.is_open ())
-                    {
-                        outFile.close ();
+                if (message.compare(3, 5, "close") == 0) {
+                    if (outFile.is_open()) {
+                        outFile.close();
                     }
                 }
             }
         }
 
-        if (outFile.is_open ())
-        {
+        if (outFile.is_open()) {
             outFile << message << '\n';
         }
     }
 }
 
-LoggerNoThread::LoggerNoThread () = default;
+LoggerNoThread::LoggerNoThread() = default;
 
-LoggerNoThread::LoggerNoThread (const std::shared_ptr<LoggingCore> & /*core*/) {}
+LoggerNoThread::LoggerNoThread(const std::shared_ptr<LoggingCore>& /*core*/) {}
 
-void LoggerNoThread::openFile (const std::string &file) { outFile.open (file.c_str ()); }
+void LoggerNoThread::openFile(const std::string& file)
+{
+    outFile.open(file.c_str());
+}
 
-void LoggerNoThread::closeFile () { outFile.close (); }
+void LoggerNoThread::closeFile()
+{
+    outFile.close();
+}
 
-void LoggerNoThread::startLogging (int cLevel, int fLevel)
+void LoggerNoThread::startLogging(int cLevel, int fLevel)
 {
     consoleLevel = cLevel;
     fileLevel = fLevel;
 }
 
-void LoggerNoThread::changeLevels (int cLevel, int fLevel)
+void LoggerNoThread::changeLevels(int cLevel, int fLevel)
 {
     consoleLevel = cLevel;
     fileLevel = fLevel;
 }
 
-void LoggerNoThread::log (int level, const std::string &logMessage)
+void LoggerNoThread::log(int level, const std::string& logMessage)
 {
-    if (level < consoleLevel)
-    {
+    if (level < consoleLevel) {
         std::cout << logMessage << '\n';
     }
-    if (level < fileLevel)
-    {
-        if (outFile.is_open ())
-        {
+    if (level < fileLevel) {
+        if (outFile.is_open()) {
             outFile << logMessage << '\n';
         }
     }
 }
 
-void LoggerNoThread::flush ()
+void LoggerNoThread::flush()
 {
-    if (outFile.is_open ())
-    {
-        outFile.flush ();
+    if (outFile.is_open()) {
+        outFile.flush();
     }
-    std::cout.flush ();
+    std::cout.flush();
 }
 
-bool LoggerNoThread::isRunning () const { return true; }
+bool LoggerNoThread::isRunning() const
+{
+    return true;
+}
 
-}  // namespace helics
+} // namespace helics

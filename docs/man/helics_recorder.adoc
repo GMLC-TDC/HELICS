@@ -1,0 +1,12 @@
+helics_app-recorder(1)
+======================
+
+NAME
+----
+helics_app-recorder - records data from a federation
+
+SYNOPSIS
+--------
+[verse]
+'helics_app recorder' [-v|--version] [-h|-?|--help]
+include::recorder-contents.adoc[]

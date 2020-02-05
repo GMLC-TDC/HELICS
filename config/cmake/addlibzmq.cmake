@@ -1,5 +1,5 @@
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-# Copyright (c) 2019, Battelle Memorial Institute; Lawrence Livermore
+# Copyright (c) 2019-2020, Battelle Memorial Institute; Lawrence Livermore
 # National Security, LLC; Alliance for Sustainable Energy, LLC.
 # See the top-level NOTICE for additional details.
 # All rights reserved.
@@ -11,7 +11,7 @@
 # This file is used to add libzmq to a project
 #
 
-if(HELICS_USE_ZMQ_STATIC_LIBRARY)
+if(${PROJECT_NAME}_USE_ZMQ_STATIC_LIBRARY)
     set(zmq_static_build ON)
     set(zmq_shared_build OFF)
 else()
@@ -20,9 +20,9 @@ else()
 endif()
 
 if(MINGW)
-    set(HELICS_LIBZMQ_VERSION v4.3.1)
+    set(${PROJECT_NAME}_LIBZMQ_VERSION v4.3.1)
 else()
-    set(HELICS_LIBZMQ_VERSION v4.3.2)
+    set(${PROJECT_NAME}_LIBZMQ_VERSION v4.3.2)
 endif()
 
 string(TOLOWER "libzmq" lcName)
@@ -38,7 +38,7 @@ if(NOT CMAKE_VERSION VERSION_LESS 3.11)
     fetchcontent_declare(
         libzmq
         GIT_REPOSITORY https://github.com/zeromq/libzmq.git
-        GIT_TAG ${HELICS_LIBZMQ_VERSION}
+        GIT_TAG ${${PROJECT_NAME}_LIBZMQ_VERSION}
     )
 
     fetchcontent_getproperties(libzmq)
@@ -74,7 +74,7 @@ else() # CMake <3.11
         GIT_URL
         https://github.com/zeromq/libzmq.git
         GIT_TAG
-        ${HELICS_LIBZMQ_VERSION}
+        ${${PROJECT_NAME}_LIBZMQ_VERSION}
         DIRECTORY
         ${PROJECT_BINARY_DIR}/_deps
     )
@@ -112,7 +112,7 @@ set(WITH_DOCS
     OFF
     CACHE INTERNAL ""
 )
-set(HELICS_ZMQ_LOCAL_BUILD
+set(${PROJECT_NAME}_ZMQ_LOCAL_BUILD
     ON
     CACHE INTERNAL ""
 )
@@ -153,7 +153,7 @@ add_subdirectory(${${lcName}_SOURCE_DIR} ${${lcName}_BINARY_DIR} EXCLUDE_FROM_AL
 
 set(ZeroMQ_FOUND TRUE)
 
-if(HELICS_USE_ZMQ_STATIC_LIBRARY)
+if(${PROJECT_NAME}_USE_ZMQ_STATIC_LIBRARY)
     set_target_properties(libzmq-static PROPERTIES FOLDER "Extern")
     target_compile_options(
         libzmq-static PRIVATE $<$<NOT:$<CXX_COMPILER_ID:MSVC>>:-fPIC>
@@ -183,17 +183,17 @@ hide_variable(ENABLE_INTRINSICS)
 
 hide_variable(ZMQ_WIN32_WINNT)
 
-if(HELICS_USE_ZMQ_STATIC_LIBRARY)
+if(${PROJECT_NAME}_USE_ZMQ_STATIC_LIBRARY)
     set(zmq_target_output "libzmq-static")
 else()
     set(zmq_target_output "libzmq")
 endif()
 
-if(HELICS_BUILD_CXX_SHARED_LIB OR NOT HELICS_DISABLE_C_SHARED_LIB)
+if(${PROJECT_NAME}_BUILD_CXX_SHARED_LIB OR NOT ${PROJECT_NAME}_DISABLE_C_SHARED_LIB)
 
-    if(NOT HELICS_USE_ZMQ_STATIC_LIBRARY)
+    if(NOT ${PROJECT_NAME}_USE_ZMQ_STATIC_LIBRARY AND NOT ${PROJECT_NAME}_SKIP_ZMQ_INSTALL)
         set_target_properties(${zmq_target_output} PROPERTIES PUBLIC_HEADER "")
-        if(NOT ${CMAKE_VERSION} VERSION_LESS "3.13")
+        if(NOT CMAKE_VERSION VERSION_LESS "3.13")
             install(
                 TARGETS ${zmq_target_output}
                 RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
@@ -210,12 +210,12 @@ if(HELICS_BUILD_CXX_SHARED_LIB OR NOT HELICS_DISABLE_C_SHARED_LIB)
         else()
             message(
                 WARNING
-                    "Update to CMake 3.13+ or enable the HELICS_USE_ZMQ_STATIC_LIBRARY CMake option to install when using ZMQ as a subproject"
+                    "Update to CMake 3.13+ or enable the ${PROJECT_NAME}_USE_ZMQ_STATIC_LIBRARY CMake option to install when using ZMQ as a subproject"
             )
         endif()
         if(MSVC
            AND NOT EMBEDDED_DEBUG_INFO
-           AND NOT HELICS_BINARY_ONLY_INSTALL
+           AND NOT ${PROJECT_NAME}_BINARY_ONLY_INSTALL
         )
             install(
                 FILES $<TARGET_PDB_FILE:${zmq_target_output}>
@@ -224,7 +224,7 @@ if(HELICS_BUILD_CXX_SHARED_LIB OR NOT HELICS_DISABLE_C_SHARED_LIB)
                 COMPONENT libs
             )
         endif()
-        if(MSVC AND NOT HELICS_BINARY_ONLY_INSTALL)
+        if(MSVC AND NOT ${PROJECT_NAME}_BINARY_ONLY_INSTALL)
             install(
                 FILES $<TARGET_LINKER_FILE:${zmq_target_output}>
                 DESTINATION ${CMAKE_INSTALL_LIBDIR}

@@ -1,5 +1,5 @@
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-# Copyright (c) 2017-2019, Battelle Memorial Institute; Lawrence Livermore
+# Copyright (c) 2017-2020, Battelle Memorial Institute; Lawrence Livermore
 # National Security, LLC; Alliance for Sustainable Energy, LLC.
 # See the top-level NOTICE for additional details.
 # All rights reserved.
@@ -15,6 +15,7 @@ if(WIN32 AND NOT UNIX_LIKE)
 
     set(
         boost_versions
+        boost_1_72_0
         boost_1_71_0
         boost_1_70_0
         boost_1_69_0
@@ -86,7 +87,7 @@ if(NOT BOOST_REQUIRED_LIBRARIES)
     set(BOOST_REQUIRED_LIBRARIES)
 endif()
 
-# Minimum version of Boost required for building HELICS
+# Minimum version of Boost required for building a project
 set(BOOST_MINIMUM_VERSION 1.58)
 
 if(BOOST_REQUIRED_LIBRARIES)

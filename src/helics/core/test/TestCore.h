@@ -1,18 +1,16 @@
 /*
-Copyright (c) 2017-2019,
+Copyright (c) 2017-2020,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
 the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 #include "../NetworkCore.hpp"
 
-namespace helics
-{
-namespace testcore
-{
-class TestComms;
-/** implementation for the core that can only communicate in process*/
-using TestCore = NetworkCore<TestComms, interface_type::inproc>;
+namespace helics {
+namespace testcore {
+    class TestComms;
+    /** implementation for the core that can only communicate in process*/
+    using TestCore = NetworkCore<TestComms, interface_type::inproc>;
 
-}  // namespace testcore
-}  // namespace helics
+} // namespace testcore
+} // namespace helics

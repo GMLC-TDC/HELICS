@@ -1,9 +1,13 @@
 Style Guide
 ===========
 
-The goal of the style guide is to describe in detail naming conventions
-for developing HELICS. Style conventions are encapsulated in the
-.clang\_format files in the project
+The goal of the style guide is to describe in detail naming conventions for
+developing HELICS. Style conventions are encapsulated in the .clang\_format
+files in the project.
+
+We have an EditorConfig file that has basic formatting rules code editors and
+IDEs can use. See [https://editorconfig.org/](https://editorconfig.org/#download)
+for how to setup support in your preferred editor or IDE.
 
 Naming Conventions
 ------------------

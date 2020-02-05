@@ -45,31 +45,33 @@ Answers to queries can be
 The following queries are defined for federates.  Federates may specify a callback function which allows arbitrary user defined Queries.  The queries defined here are available inside of HELICS.
 
 ```eval_rst
-+-------------------+------------------------------------------------------------+
-| queryString       | Description                                                |
-+===================+============================================================+
-| ``name``          | the identifier of the federate [string]                    |
-+-------------------+------------------------------------------------------------+
-| ``exists``        | Basic query if the federate exists in the Federation [T/F] |
-+-------------------+------------------------------------------------------------+
-| ``isinit``        | If the federate has entered init mode [T/F]                |
-+-------------------+------------------------------------------------------------+
-| ``state``         | Current state of the federate as a string [string]         |
-+-------------------+------------------------------------------------------------+
-| ``publications``  | current publications of a federate [sv]                    |
-+-------------------+------------------------------------------------------------+
-| ``subscriptions`` | current subscriptions of a federate [sv]                   |
-+-------------------+------------------------------------------------------------+
-| ``inputs``        | current inputs of a federate [sv]                          |
-+-------------------+------------------------------------------------------------+
-| ``endpoints``     | current endpoints of a federate [sv]                       |
-+-------------------+------------------------------------------------------------+
-| ``dependencies``  | list of the objects this federate depends on [sv]          |
-+-------------------+------------------------------------------------------------+
-| ``dependents``    | list of dependent objects [sv]                             |
-+-------------------+------------------------------------------------------------+
-| ``queries``       | list of available queries [sv]                             |
-+-------------------+------------------------------------------------------------+
++--------------------+------------------------------------------------------------+
+| queryString        | Description                                                |
++====================+============================================================+
+| ``name``           | the identifier of the federate [string]                    |
++--------------------+------------------------------------------------------------+
+| ``exists``         | Basic query if the federate exists in the Federation [T/F] |
++--------------------+------------------------------------------------------------+
+| ``isinit``         | If the federate has entered init mode [T/F]                |
++--------------------+------------------------------------------------------------+
+| ``state``          | Current state of the federate as a string [string]         |
++--------------------+------------------------------------------------------------+
+| ``publications``   | current publications of a federate [sv]                    |
++--------------------+------------------------------------------------------------+
+| ``subscriptions``  | current subscriptions of a federate [sv]                   |
++--------------------+------------------------------------------------------------+
+| ``inputs``         | current inputs of a federate [sv]                          |
++--------------------+------------------------------------------------------------+
+| ``endpoints``      | current endpoints of a federate [sv]                       |
++--------------------+------------------------------------------------------------+
+| ``dependencies``   | list of the objects this federate depends on [sv]          |
++--------------------+------------------------------------------------------------+
+| ``dependents``     | list of dependent objects [sv]                             |
++--------------------+------------------------------------------------------------+
+|``endpoint_filters``| data structure containing the filters on endpoints[JSON]   |
++--------------------+------------------------------------------------------------+
+| ``queries``        | list of available queries [sv]                             |
++--------------------+------------------------------------------------------------+
 ```
 
 ### Local Federate Queries
@@ -125,7 +127,9 @@ The following queries will be answered by a core.
 | ``federate_map``     | a Hierarchical map of the federates contained in a core [JSON]                      |
 +----------------------+-------------------------------------------------------------------------------------+
 | ``dependency_graph`` | a representation of the dependencies in the core and its contained federates [JSON] |
-+-------------------+----------------------------------------------------------------------------------------+
++----------------------+-------------------------------------------------------------------------------------+
+|``endpoint_filters``  | data structure containing the filters on endpoints for the core[JSON]               |
++----------------------+-------------------------------------------------------------------------------------+
 | ``queries``          | list of dependent objects [sv]                                                      |
 +----------------------+-------------------------------------------------------------------------------------+
 ```
@@ -174,7 +178,7 @@ The Following queries will be answered by a broker.
 `federate_map` and `dependency_graph` when called from the root broker will generate a JSON string containing the entire structure of the federation.  This can take some time to assemble since all members must be queried.
 
 ## Usage Notes
-Queries that must traverse the network travel along priority paths.  The calls are blocking but they do not wait for time advancement from any federate and take priority over regular communication.
+Queries that must traverse the network travel along priority paths.  The calls are blocking, but they do not wait for time advancement from any federate and take priority over regular communication.
 
 #### Application API
 There are two basic calls in the application API as part of a [federate object](../doxygen/classhelics_1_1Federate.html)
@@ -200,6 +204,6 @@ Queries in the C api work similarly but the mechanics are different.
 The basic operation is to create a query using [`helicsQueryCreate(target,query)`](../doxygen/helics_8h.html#ac290df999ec7e7527cb4337c5d3b1461)
 
 This function returns a query object that can be used in one of the execute functions to generate results.
-It can be called asynchronously on a federate.
+It can be called asynchronously on a federate.  The target field may be empty if the query is intended to be used on a local federate, in which case the target is assumed to be the federate itself.  
 A query must be freed after use.
-The interface api's (python, matlab, Java, etc) will work similarly.
+The interface api's (python, matlab, octave, Java, etc) will work similarly.

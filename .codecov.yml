@@ -6,8 +6,10 @@ codecov:
 coverage:
   precision: 2
   round: down
-  range: "70...100"
-
+  range: "50...95"
+  tests:
+    target: 100%
+    paths: "src/helics/shared_api_library/"
   status:
     project: yes
     patch: yes
@@ -31,10 +33,8 @@ ignore:
   - "examples"
   - "tests"
   - "interfaces"
+  - "src/helics/core/mpi"
   - "**/logger.*"
-  - "**/charMapper.*"
-  - "**/stringOps.*"
-  - "**/base64.*"
+  - "**/loggerCore.*"
   - "**/zmqHelper.*"
-  - "cppzmq/**"
-  - "**/generic_string_ops.hpp"
+  - "**/internal/api_objects.h"

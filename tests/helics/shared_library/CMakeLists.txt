@@ -1,5 +1,5 @@
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-# Copyright (c) 2017-2019, Battelle Memorial Institute; Lawrence Livermore
+# Copyright (c) 2017-2020, Battelle Memorial Institute; Lawrence Livermore
 # National Security, LLC; Alliance for Sustainable Energy, LLC.
 # See the top-level NOTICE for additional details.
 # All rights reserved.
@@ -9,21 +9,26 @@
 
 set(
     c_shared_library_test_sources
-    ctestFixtures.cpp shared-library-tests.cpp
-    # data_viewTests.cpp
-    test-value-federate1.cpp test-value-federate2.cpp
-    # ValueFederateTests2.cpp
-    FilterTests.cpp test-message-federate.cpp
-    # test-message-federate_cpp.cpp
-    # FederateTests.cpp
+    ctestFixtures.cpp 
+    shared-library-tests.cpp
+    test-value-federate1.cpp 
+    test-value-federate2.cpp
+    FilterTests.cpp 
+    test-message-federate.cpp
+    SystemTests.cpp
     TimingTests.cpp
-    # iterationTests.cpp
-    QueryTests.cpp badInputTests.cpp comboConfigTests.cpp loggingTests.cpp
+    evilInputTests.cpp
+    iterationTests.cpp
+    QueryTests.cpp 
+    badInputTests.cpp 
+    comboConfigTests.cpp 
+    loggingTests.cpp
 )
 
 set(
     cpp_shared_library_test_sources
-    cpptestFixtures.cpp cppshared-library-tests.cpp
+    cpptestFixtures.cpp 
+    cppshared-library-tests.cpp
     # test-value-federate1_cpp.cpp
     test-value-federate2_cpp.cpp
     # FilterTests_cpp.cpp

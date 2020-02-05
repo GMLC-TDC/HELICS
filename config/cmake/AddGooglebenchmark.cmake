@@ -1,5 +1,5 @@
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-# Copyright (c) 2017-2019, Battelle Memorial Institute; Lawrence Livermore
+# Copyright (c) 2017-2020, Battelle Memorial Institute; Lawrence Livermore
 # National Security, LLC; Alliance for Sustainable Energy, LLC.
 # See the top-level NOTICE for additional details.
 # All rights reserved.
@@ -55,6 +55,8 @@ endif()
 set(BENCHMARK_ENABLE_GTEST_TESTS OFF CACHE INTERNAL "")
 set(BENCHMARK_ENABLE_TESTING OFF CACHE INTERNAL "Suppressing benchmark's tests")
 set(BENCHMARK_ENABLE_INSTALL OFF CACHE INTERNAL "" )
+set(BENCHMARK_DOWNLOAD_DEPENDENCIES ON CACHE INTERNAL "")
+set(BENCHMARK_ENABLE_ASSEMBLY_TESTS OFF CACHE INTERNAL "")
 # tell google benchmarks to use std regex since we only compile on compilers with std regex
 set(HAVE_STD_REGEX ON CACHE INTERNAL "" )
 set(HAVE_POSIX_REGEX OFF CACHE INTERNAL "" )
@@ -62,8 +64,17 @@ set(HAVE_GNU_POSIX_REGEX OFF CACHE INTERNAL "" )
 add_subdirectory(${${gbName}_SOURCE_DIR} ${${gbName}_BINARY_DIR} EXCLUDE_FROM_ALL)
 
 # Target must already exist
-macro(add_benchmark TESTNAME)
+macro(add_benchmark_with_main TESTNAME)
     target_link_libraries(${TESTNAME} PUBLIC benchmark benchmark_main Threads::Threads)
+    if(WIN32)
+        target_link_libraries(${TESTNAME} PUBLIC shlwapi)
+    endif()
+    set_target_properties(${TESTNAME} PROPERTIES FOLDER "benchmarks")
+
+endmacro()
+
+macro(add_benchmark TESTNAME)
+    target_link_libraries(${TESTNAME} PUBLIC benchmark Threads::Threads)
     if(WIN32)
         target_link_libraries(${TESTNAME} PUBLIC shlwapi)
     endif()

@@ -5187,6 +5187,47 @@ fail:
 }
 
 
+SWIGINTERN PyObject *_wrap_helicsCoreConnect(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  helics_core arg1 = (helics_core) 0 ;
+  helics_error *arg2 = (helics_error *) 0 ;
+  int res1 ;
+  helics_error etemp2 ;
+  PyObject *swig_obj[1] ;
+  helics_bool result;
+  
+  {
+    etemp2=helicsErrorInitialize();
+    arg2=&etemp2;
+  }
+  if (!args) SWIG_fail;
+  swig_obj[0] = args;
+  res1 = SWIG_ConvertPtr(swig_obj[0],SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsCoreConnect" "', argument " "1"" of type '" "helics_core""'"); 
+  }
+  result = (helics_bool)helicsCoreConnect(arg1,arg2);
+  resultobj = SWIG_From_int((int)(result));
+  {
+    if (arg2->error_code!=helics_ok)
+    {
+      throwHelicsPythonException(arg2);
+      return NULL;
+    }
+  }
+  return resultobj;
+fail:
+  {
+    if (arg2->error_code!=helics_ok)
+    {
+      throwHelicsPythonException(arg2);
+      return NULL;
+    }
+  }
+  return NULL;
+}
+
+
 SWIGINTERN PyObject *_wrap_helicsCoreDisconnect(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   helics_core arg1 = (helics_core) 0 ;
@@ -12374,6 +12415,100 @@ fail:
 }
 
 
+SWIGINTERN PyObject *_wrap_helicsPublicationSetMinimumChange(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  helics_publication arg1 = (helics_publication) 0 ;
+  double arg2 ;
+  helics_error *arg3 = (helics_error *) 0 ;
+  int res1 ;
+  double val2 ;
+  int ecode2 = 0 ;
+  helics_error etemp3 ;
+  PyObject *swig_obj[2] ;
+  
+  {
+    etemp3=helicsErrorInitialize();
+    arg3=&etemp3;
+  }
+  if (!SWIG_Python_UnpackTuple(args, "helicsPublicationSetMinimumChange", 2, 2, swig_obj)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(swig_obj[0],SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsPublicationSetMinimumChange" "', argument " "1"" of type '" "helics_publication""'"); 
+  }
+  ecode2 = SWIG_AsVal_double(swig_obj[1], &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "helicsPublicationSetMinimumChange" "', argument " "2"" of type '" "double""'");
+  } 
+  arg2 = (double)(val2);
+  helicsPublicationSetMinimumChange(arg1,arg2,arg3);
+  resultobj = SWIG_Py_Void();
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsPythonException(arg3);
+      return NULL;
+    }
+  }
+  return resultobj;
+fail:
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsPythonException(arg3);
+      return NULL;
+    }
+  }
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_helicsInputSetMinimumChange(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  helics_input arg1 = (helics_input) 0 ;
+  double arg2 ;
+  helics_error *arg3 = (helics_error *) 0 ;
+  int res1 ;
+  double val2 ;
+  int ecode2 = 0 ;
+  helics_error etemp3 ;
+  PyObject *swig_obj[2] ;
+  
+  {
+    etemp3=helicsErrorInitialize();
+    arg3=&etemp3;
+  }
+  if (!SWIG_Python_UnpackTuple(args, "helicsInputSetMinimumChange", 2, 2, swig_obj)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(swig_obj[0],SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsInputSetMinimumChange" "', argument " "1"" of type '" "helics_input""'"); 
+  }
+  ecode2 = SWIG_AsVal_double(swig_obj[1], &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "helicsInputSetMinimumChange" "', argument " "2"" of type '" "double""'");
+  } 
+  arg2 = (double)(val2);
+  helicsInputSetMinimumChange(arg1,arg2,arg3);
+  resultobj = SWIG_Py_Void();
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsPythonException(arg3);
+      return NULL;
+    }
+  }
+  return resultobj;
+fail:
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsPythonException(arg3);
+      return NULL;
+    }
+  }
+  return NULL;
+}
+
+
 SWIGINTERN PyObject *_wrap_helicsInputIsUpdated(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   helics_input arg1 = (helics_input) 0 ;
@@ -15699,8 +15834,13 @@ static PyMethodDef SwigMethods[] = {
 		"   :type core: void\n"
 		"   :param core: the core object to enable init values for\n"
 		""},
+	 { "helicsCoreConnect", _wrap_helicsCoreConnect, METH_O, "\n"
+		"connect a core to the federate based on current configuration\n"
+		"   :type core: void\n"
+		"   :param core: the core to connect\n"
+		""},
 	 { "helicsCoreDisconnect", _wrap_helicsCoreDisconnect, METH_O, "\n"
-		"get an identifier for the core\n"
+		"disconnect a core from the federation\n"
 		"   :type core: void\n"
 		"   :param core: the core to query\n"
 		""},
@@ -16097,7 +16237,7 @@ static PyMethodDef SwigMethods[] = {
 		"   :param requestTime: the next desired time\n"
 		"   :type iterate: int\n"
 		"   :param iterate: the requested iteration mode\n"
-		"       outIterate  the iteration specification of the result\n"
+		"       outIteration  the iteration specification of the result\n"
 		"\n"
 		"   :rtype: float\n"
 		"   :return: the granted time, will return helics_time_maxtime if the simulation has terminated along with the appropriate iteration result\n"
@@ -16743,6 +16883,7 @@ static PyMethodDef SwigMethods[] = {
 		"\n"
 		"   :rtype: char\n"
 		"   :return: the resulting character value\n"
+		"   NAK (negative acknowledgment) symbol returned on error\n"
 		""},
 	 { "helicsInputGetComplexObject", _wrap_helicsInputGetComplexObject, METH_O, "\n"
 		"get a complex object from an input object\n"
@@ -16997,6 +17138,20 @@ static PyMethodDef SwigMethods[] = {
 		"   :param option: integer code for the option to set /ref helics_handle_options\n"
 		"   :type val: int\n"
 		"   :param val: the value to set the option to\n"
+		""},
+	 { "helicsPublicationSetMinimumChange", _wrap_helicsPublicationSetMinimumChange, METH_VARARGS, "\n"
+		"set the minimum change detection tolerance\n"
+		"   :type pub: void\n"
+		"   :param pub: the publication to modify\n"
+		"   :type tolerance: float\n"
+		"   :param tolerance: the tolerance level for publication, values changing less than this value will not be published\n"
+		""},
+	 { "helicsInputSetMinimumChange", _wrap_helicsInputSetMinimumChange, METH_VARARGS, "\n"
+		"set the minimum change detection tolerance\n"
+		"   :type inp: void\n"
+		"   :param inp: the input to modify\n"
+		"   :type tolerance: float\n"
+		"   :param tolerance: the tolerance level for registering an update, values changing less than this value will not show as being updated\n"
 		""},
 	 { "helicsInputIsUpdated", _wrap_helicsInputIsUpdated, METH_O, "\n"
 		"check if a particular subscription was updated\n"
@@ -17451,8 +17606,8 @@ static PyMethodDef SwigMethods[] = {
 		"   through other functions\n"
 		"   :type fed: void\n"
 		"   :param fed: the fed to register through\n"
-		"   :type deliveryEndpoint: string\n"
-		"   :param deliveryEndpoint: the specified endpoint to deliver the message\n"
+		"   :type name: string\n"
+		"   :param name: the name of the filter (can be NULL)\n"
 		"\n"
 		"   :rtype: void\n"
 		"   :return: a helics_filter object\n"
@@ -17463,8 +17618,8 @@ static PyMethodDef SwigMethods[] = {
 		"   through other functions\n"
 		"   :type fed: void\n"
 		"   :param fed: the fed to register through\n"
-		"   :type deliveryEndpoint: string\n"
-		"   :param deliveryEndpoint: the specified endpoint to deliver the message\n"
+		"   :type name: string\n"
+		"   :param name: the name of the filter (can be NULL)\n"
 		"\n"
 		"   :rtype: void\n"
 		"   :return: a helics_filter object\n"
@@ -17489,8 +17644,8 @@ static PyMethodDef SwigMethods[] = {
 		"   through other functions\n"
 		"   :type core: void\n"
 		"   :param core: the core to register through\n"
-		"   :type deliveryEndpoint: string\n"
-		"   :param deliveryEndpoint: the specified endpoint to deliver the message\n"
+		"   :type name: string\n"
+		"   :param name: the name of the filter (can be NULL)\n"
 		"\n"
 		"   :rtype: void\n"
 		"   :return: a helics_filter object\n"
@@ -18487,6 +18642,7 @@ SWIG_init(void) {
   SWIG_Python_SetConstant(d, "helics_flag_forward_compute",SWIG_From_int((int)(helics_flag_forward_compute)));
   SWIG_Python_SetConstant(d, "helics_flag_realtime",SWIG_From_int((int)(helics_flag_realtime)));
   SWIG_Python_SetConstant(d, "helics_flag_single_thread_federate",SWIG_From_int((int)(helics_flag_single_thread_federate)));
+  SWIG_Python_SetConstant(d, "helics_flag_slow_responding",SWIG_From_int((int)(helics_flag_slow_responding)));
   SWIG_Python_SetConstant(d, "helics_flag_delay_init_entry",SWIG_From_int((int)(helics_flag_delay_init_entry)));
   SWIG_Python_SetConstant(d, "helics_flag_enable_init_entry",SWIG_From_int((int)(helics_flag_enable_init_entry)));
   SWIG_Python_SetConstant(d, "helics_flag_ignore_time_mismatch_warnings",SWIG_From_int((int)(helics_flag_ignore_time_mismatch_warnings)));

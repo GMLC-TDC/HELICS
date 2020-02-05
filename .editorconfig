@@ -1,0 +1,27 @@
+root = true
+
+[*]
+end_of_line = lf
+
+# HELICS C/C++ source files
+[{benchmarks,examples,src,tests}/**.{cpp,hpp,c,h}]
+indent_style = space
+indent_size = 4
+charset = utf-8
+trim_trailing_whitespace = true
+insert_final_newline = true
+
+# HELICS Python source files
+[{benchmarks,examples,scripts,tests}/**.py]
+indent_style = space
+indent_size = 4
+
+# HELICS CMakeLists.txt files in allowed subfolders (not ThirdParty)
+[{benchmarks,examples,scripts,src,tests}**CMakeLists.txt]
+indent_style = space
+indent_size = 4
+
+# HELICS Root CMakeLists.txt file (avoid matching inside ThirdParty folder)
+[./CMakeLists.txt]
+indent_style = space
+indent_size = 4
