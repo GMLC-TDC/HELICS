@@ -44,7 +44,7 @@ docker build -t clang-test -f config/Docker/Dockerfile-HELICS-apps --build-arg M
 In addition to this, the HELICS-apps Dockerfile for the HELICS apps currently accepts an ENABLE_GITHUB argument (defaults to false) that when set to true will replace the copied current source directory with a copy of the HELICS source code checked out from GitHub. Due Docker not allowing conditional copy commands, it is recommended to run the docker build from a relatively empty working directory. It will also take a GIT_BRANCH argument (defaults to develop) that can be used to control which GitHub branch or tagged version gets checked out.
 
 ```bash
-docker build -t helics-apps-test -f config/Docker/Dockerfile-HELICS-apps --build-arg ENABLE_GITHUB=true --build-arg GIT_BRANCH=v2.3.1 .
+docker build -t helics-apps-test -f config/Docker/Dockerfile-HELICS-apps --build-arg ENABLE_GITHUB=true --build-arg GIT_BRANCH=v2.4.0 .
 ```
 
 Working with dockerhub
