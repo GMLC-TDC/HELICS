@@ -170,6 +170,12 @@ std::shared_ptr<Broker> makeBroker(core_type type, const std::string& name)
             throw(HelicsException("tcp single socket broker type is not available"));
 #endif
             break;
+        case core_type::NNG:
+        case core_type::WEBSOCKET:
+        case core_type::HTTP:
+            throw(HelicsException("core type is not available"));
+        case core_type::NULLCORE:
+            throw(HelicsException("nullcore is explicitly not available nor will ever be"));
         default:
             throw(HelicsException("unrecognized broker type"));
     }

@@ -67,8 +67,8 @@ std::shared_ptr<Core> makeCore(core_type type, const std::string& name)
 #                ifdef ENABLE_IPC_CORE
         type = core_type::IPC;
 #                else
-#                    ifdef ENABLE_TEST_CORE
-        type = core_type::TEST;
+#                    ifdef ENABLE_INPROC_CORE
+        type = core_type::INPROC;
 #                    else
         type = core_type::UNRECOGNIZED;
 #                    endif // ENABLE_TEST_CORE
@@ -182,6 +182,12 @@ std::shared_ptr<Core> makeCore(core_type type, const std::string& name)
             throw(HelicsException("TCP single socket core is not available"));
 #endif
             break;
+        case core_type::NNG:
+        case core_type::WEBSOCKET:
+        case core_type::HTTP:
+            throw(HelicsException("core type is not available"));
+        case core_type::NULLCORE:
+            throw(HelicsException("the nullcore explicitly doesn't exist"));
         default:
             throw(HelicsException("unrecognized core type"));
     }

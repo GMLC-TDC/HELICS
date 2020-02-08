@@ -59,8 +59,9 @@ TEST_P(filter_single_type_test, message_filter_registration)
 
     mFed->finalizeAsync();
     // std::this_thread::sleep_for (std::chrono::milliseconds (50));
-    auto& f3 = fFed->registerFilter();
+    auto& f3 = fFed->registerCloningFilter();
     fFed->addSourceTarget(f3, "filter0/fout");
+    f3.addDestinationTarget("port2");
     EXPECT_TRUE(f3.getHandle() != f2.getHandle());
     fFed->finalize();
     // std::cout << "fFed returned\n";

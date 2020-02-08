@@ -102,6 +102,7 @@ TEST_P(valuefed_add_single_type_tests_ci_skip, publisher_registration)
     helics::Publication pubid(vFed1.get(), "pub1", helics::helicsType<std::string>());
     helics::PublicationT<int> pubid2(helics::GLOBAL, vFed1.get(), "pub2");
 
+    vFed1->setSeparator('-');
     helics::Publication pubid3(vFed1.get(), "pub3", helics::helicsType<double>(), "V");
     vFed1->enterExecutingMode();
 
@@ -112,7 +113,7 @@ TEST_P(valuefed_add_single_type_tests_ci_skip, publisher_registration)
     EXPECT_EQ(sv, "fed0/pub1");
     EXPECT_EQ(sv2, "pub2");
     auto pub3name = pubid3.getKey();
-    EXPECT_EQ(pub3name, "fed0/pub3");
+    EXPECT_EQ(pub3name, "fed0-pub3");
 
     EXPECT_EQ(pubid3.getType(), "double");
     EXPECT_EQ(pubid3.getUnits(), "V");
@@ -285,7 +286,7 @@ TEST_P(valuefed_add_single_type_tests_ci_skip, single_transfer)
 
     EXPECT_EQ(s, "string1");
     // advance time
-    gtime = vFed1->requestTime(2.0);
+    gtime = vFed1->requestTimeAdvance(1.0);
     // make sure the value was updated
     EXPECT_EQ(gtime, 2.0);
     s = vFed1->getString(subid);
