@@ -117,7 +117,7 @@ TEST_P(valuefed_add_single_type_tests_ci_skip, publisher_registration)
 
     EXPECT_EQ(pubid3.getType(), "double");
     EXPECT_EQ(pubid3.getUnits(), "V");
-
+    vFed1->setSeparator('/');
     EXPECT_TRUE(vFed1->getPublication("pub1").getHandle() == pubid.getHandle());
     EXPECT_TRUE(vFed1->getPublication("pub2").getHandle() == pubid2.getHandle());
     EXPECT_TRUE(vFed1->getPublication("fed0/pub1").getHandle() == pubid.getHandle());
