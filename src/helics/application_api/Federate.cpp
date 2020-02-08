@@ -55,10 +55,6 @@ Federate::Federate(const std::string& fedName, const FederateInfo& fi): name(fed
             }
         }
     }
-    if (!coreObject) {
-        throw(RegistrationFailure(
-            "Unable to connect to specified core: unable to create specified core"));
-    }
     /** make sure the core is connected */
     if (!coreObject->isConnected()) {
         coreObject->connect();
@@ -102,10 +98,6 @@ Federate::Federate(
         }
     }
 
-    if (!coreObject) {
-        currentMode = modes::error;
-        return;
-    }
     /** make sure the core is connected */
     if (!coreObject->isConnected()) {
         coreObject->connect();
@@ -114,27 +106,33 @@ Federate::Federate(
         name = fi.defName;
     }
     fedID = coreObject->registerFederate(name, fi);
-    if (!fedID.isValid()) {
-        currentMode = modes::error;
-        return;
-    }
     nameSegmentSeparator = fi.separator;
     currentTime = coreObject->getCurrentTime(fedID);
     asyncCallInfo = std::make_unique<shared_guarded_m<AsyncFedCallInfo>>();
     fManager = std::make_unique<FilterFederateManager>(coreObject.get(), this, fedID);
 }
 
-Federate::Federate(const std::string& configString):
-    Federate(std::string{}, loadFederateInfo(configString))
+static bool looksLikeFile(const std::string& configString)
 {
-    registerFilterInterfaces(configString);
+    if (hasTomlExtension(configString)) {
+        return true;
+    }
+    if ((hasJsonExtension(configString)) ||
+        (configString.find_first_of('{') != std::string::npos)) {
+        return true;
+    }
+    return false;
 }
 
 Federate::Federate(const std::string& fedName, const std::string& configString):
     Federate(fedName, loadFederateInfo(configString))
 {
-    registerFilterInterfaces(configString);
+    if (looksLikeFile(configString)) {
+        registerFilterInterfaces(configString);
+    }
 }
+
+Federate::Federate(const std::string& configString): Federate(std::string{}, configString) {}
 
 Federate::Federate() noexcept
 {
@@ -174,25 +172,31 @@ Federate::~Federate()
         try {
             finalize();
         }
+        // LCOV_EXCL_START
         catch (...) // do not allow a throw inside the destructor
         {
         }
+        // LCOV_EXCL_STOP
     }
 }
 
 void Federate::enterInitializingMode()
 {
     auto cm = currentMode.load();
-    if (cm == modes::startup) {
-        coreObject->enterInitializingMode(fedID);
-        currentMode = modes::initializing;
-        currentTime = coreObject->getCurrentTime(fedID);
-        startupToInitializeStateTransition();
-    } else if (cm == modes::pending_init) {
-        enterInitializingModeComplete();
-    } else if (cm != modes::initializing) // if we are already in initialization do nothing
-    {
-        throw(InvalidFunctionCall("cannot transition from current mode to initializing mode"));
+    switch (cm) {
+        case modes::startup:
+            coreObject->enterInitializingMode(fedID);
+            currentMode = modes::initializing;
+            currentTime = coreObject->getCurrentTime(fedID);
+            startupToInitializeStateTransition();
+            break;
+        case modes::pending_init:
+            enterInitializingModeComplete();
+            break;
+        case modes::initializing:
+            break;
+        default:
+            throw(InvalidFunctionCall("cannot transition from current mode to initializing mode"));
     }
 }
 
@@ -236,7 +240,8 @@ bool Federate::isAsyncOperationCompleted() const
 void Federate::enterInitializingModeComplete()
 {
     switch (currentMode) {
-        case modes::pending_init: {
+        case modes::pending_init:
+        {
             auto asyncInfo = asyncCallInfo->lock();
             try {
                 asyncInfo->initFuture.get();
@@ -315,6 +320,7 @@ void Federate::enterExecutingModeAsync(iteration_request iterate)
         case modes::startup: {
             auto eExecFunc = [this, iterate]() {
                 coreObject->enterInitializingMode(fedID);
+                currentTime = coreObject->getCurrentTime(fedID);
                 startupToInitializeStateTransition();
                 return coreObject->enterExecutingMode(fedID, iterate);
             };
@@ -347,14 +353,14 @@ void Federate::enterExecutingModeAsync(iteration_request iterate)
 
 iteration_result Federate::enterExecutingModeComplete()
 {
-    if (currentMode != modes::pending_exec) {
-        throw(InvalidFunctionCall(
-            "cannot call finalize function without first calling async function"));
-    }
-    auto asyncInfo = asyncCallInfo->lock();
-    try {
-        auto res = asyncInfo->execFuture.get();
-        switch (res) {
+    switch (currentMode.load())
+    {
+    case modes::pending_exec:
+    {
+        auto asyncInfo = asyncCallInfo->lock();
+        try {
+            auto res = asyncInfo->execFuture.get();
+            switch (res) {
             case iteration_result::next_step:
                 currentMode = modes::executing;
                 currentTime = timeZero;
@@ -370,14 +376,19 @@ iteration_result Federate::enterExecutingModeComplete()
             case iteration_result::halted:
                 currentMode = modes::finalize;
                 break;
-        }
+            }
 
-        return res;
+            return res;
+        }
+        catch (const std::exception&) {
+            currentMode = modes::error;
+            throw;
+        }
     }
-    catch (const std::exception&) {
-        currentMode = modes::error;
-        throw;
-    }
+    default:
+        return enterExecutingMode();
+   }
+    
 }
 
 void Federate::setProperty(int32_t option, double timeValue)
@@ -457,7 +468,7 @@ void Federate::finalize()
             finalizeComplete();
             return;
         default:
-            throw(InvalidFunctionCall("cannot call finalize in present state"));
+            throw(InvalidFunctionCall("cannot call finalize in present state")); // LCOV_EXCL_LINE
     }
     coreObject->finalize(fedID);
     if (fManager) {
