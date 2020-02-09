@@ -529,31 +529,44 @@ void Federate::finalizeComplete()
 
 void Federate::disconnect()
 {
-    if (coreObject) {
-        coreObject->finalize(fedID);
-    }
-    currentMode = modes::finalize;
+    finalize();
     coreObject = nullptr;
 }
 
 void Federate::error(int errorcode)
 {
-    currentMode = modes::error;
-    if (!coreObject) {
-        throw(
-            InvalidFunctionCall("cannot generate error on uninitialized or disconnected Federate"));
-    }
     std::string errorString = "error " + std::to_string(errorcode) + " in federate " + name;
-    coreObject->logMessage(fedID, errorcode, errorString);
+    error(errorcode, errorString);
 }
 
 void Federate::error(int errorcode, const std::string& message)
 {
-    currentMode = modes::error;
+    
     if (!coreObject) {
         throw(
             InvalidFunctionCall("cannot generate error on uninitialized or disconnected Federate"));
     }
+    // deal with pending operations first
+        switch (currentMode.load()) {
+        case modes::pending_init:
+            enterInitializingModeComplete();
+            break;
+        case modes::pending_exec:
+            enterExecutingModeComplete();
+            break;
+        case modes::pending_time:
+            requestTimeComplete();
+            break;
+        case modes::pending_iterative_time:
+            requestTimeIterativeComplete();
+            break;
+        case modes::pending_finalize:
+            finalizeComplete();
+            break;
+        default:
+            break;
+    }
+    currentMode = modes::error;
     coreObject->logMessage(fedID, errorcode, message);
 }
 
