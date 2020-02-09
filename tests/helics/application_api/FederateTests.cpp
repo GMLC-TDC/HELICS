@@ -400,6 +400,49 @@ TEST(federate_tests, enterExec)
 
 }
 
+TEST(federate_tests, enterExecAsync)
+{
+    helics::FederateInfo fi(helics::core_type::INPROC);
+    fi.coreName = "core_full";
+    fi.coreInitString = "-f 1 --autobroker";
+
+    auto Fed1 = std::make_shared<helics::Federate>("fed1", fi);
+    
+    Fed1->enterExecutingModeAsync();
+    EXPECT_NO_THROW(Fed1->enterExecutingModeAsync());
+    EXPECT_NO_THROW(Fed1->finalize());
+}
+
+TEST(federate_tests, enterExecAsyncIterative)
+{
+    helics::FederateInfo fi(helics::core_type::INPROC);
+    fi.coreName = "core_full";
+    fi.coreInitString = "-f 1 --autobroker";
+
+    auto Fed1 = std::make_shared<helics::Federate>("fed1", fi);
+
+    Fed1->enterExecutingModeAsync(helics::iteration_request::force_iteration);
+    EXPECT_NO_THROW(Fed1->enterExecutingModeAsync());
+    EXPECT_NO_THROW(Fed1->finalizeAsync());
+    EXPECT_NO_THROW(Fed1->finalizeAsync());
+    EXPECT_NO_THROW(Fed1->finalize());
+}
+
+TEST(federate_tests, forceError)
+{
+    helics::FederateInfo fi(helics::core_type::INPROC);
+    fi.coreName = "core_full";
+    fi.coreInitString = "-f 1 --autobroker";
+
+    auto Fed1 = std::make_shared<helics::Federate>("fed1", fi);
+
+    Fed1->enterExecutingModeAsync(helics::iteration_request::force_iteration);
+    Fed1->error(9827);
+
+    EXPECT_THROW(Fed1->enterInitializingMode(), helics::InvalidFunctionCall);
+    EXPECT_THROW(Fed1->enterExecutingMode(), helics::InvalidFunctionCall);
+}
+
 static constexpr const char* simple_global_files[] = {"example_globals1.json",
                                                       "example_globals1.toml",
                                                       "example_globals2.json"};
