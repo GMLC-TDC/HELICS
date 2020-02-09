@@ -229,6 +229,7 @@ TEST(federate_tests, multiple_federates_async_calls)
 
     Fed1->enterInitializingModeAsync();
     Fed2->enterInitializingMode();
+    EXPECT_NO_THROW(Fed2->enterInitializingMode());
 
     auto c1 = Fed1->getCorePointer();
     auto c2 = Fed2->getCorePointer();
@@ -356,7 +357,7 @@ TEST(federate_tests, enterInit)
     EXPECT_NO_THROW(Fed1->enterInitializingModeComplete());
 
     EXPECT_EQ(Fed1->getCurrentMode(), helics::Federate::modes::initializing);
-    Fed1->finalize();
+    EXPECT_NO_THROW(Fed1->finalize());
 
 }
 
