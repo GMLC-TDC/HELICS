@@ -184,11 +184,19 @@ void Federate::enterInitializingMode()
 {
     auto cm = currentMode.load();
     switch (cm) {
-        case modes::startup:
+    case modes::startup:
+        try
+        {
             coreObject->enterInitializingMode(fedID);
             currentMode = modes::initializing;
             currentTime = coreObject->getCurrentTime(fedID);
             startupToInitializeStateTransition();
+        }
+        catch (const HelicsException &)
+        {
+            currentMode = modes::error;
+            throw;
+            }
             break;
         case modes::pending_init:
             enterInitializingModeComplete();
@@ -202,8 +210,9 @@ void Federate::enterInitializingMode()
 
 void Federate::enterInitializingModeAsync()
 {
-    auto asyncInfo = asyncCallInfo->lock();
+    
     if (currentMode == modes::startup) {
+        auto asyncInfo = asyncCallInfo->lock();
         currentMode = modes::pending_init;
         asyncInfo->initFuture =
             std::async(std::launch::async, [this]() { coreObject->enterInitializingMode(fedID); });
@@ -217,7 +226,7 @@ void Federate::enterInitializingModeAsync()
 
 bool Federate::isAsyncOperationCompleted() const
 {
-    constexpr std::chrono::seconds wait_delay(0);
+    constexpr std::chrono::seconds wait_delay{ 0 };
     auto ready = std::future_status::ready;
 
     auto asyncInfo = asyncCallInfo->lock_shared();
@@ -239,7 +248,7 @@ bool Federate::isAsyncOperationCompleted() const
 
 void Federate::enterInitializingModeComplete()
 {
-    switch (currentMode) {
+    switch (currentMode.load()) {
         case modes::pending_init:
         {
             auto asyncInfo = asyncCallInfo->lock();
@@ -262,7 +271,7 @@ void Federate::enterInitializingModeComplete()
         default:
             throw(InvalidFunctionCall(
                 "cannot call Initialization Complete function without first calling "
-                "enterInitializingModeAsync function"));
+                "enterInitializingModeAsync function or being in startup mode"));
     }
 }
 
