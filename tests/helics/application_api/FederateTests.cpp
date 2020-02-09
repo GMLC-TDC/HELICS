@@ -11,7 +11,6 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helics/core/Core.hpp"
 #include "helics/core/core-exceptions.hpp"
 #include "helics/application_api/CoreApp.hpp"
-
 #include <future>
 #include <gtest/gtest.h>
 /** these test cases test out the value converters
@@ -345,7 +344,7 @@ TEST(federate_tests, from_string2)
 TEST(federate_tests, enterInit)
 {
     helics::FederateInfo fi(helics::core_type::INPROC);
-    fi.coreName = "core_full";
+    fi.coreName = "core_full_a";
     fi.coreInitString = "-f 1 --autobroker";
 
     auto Fed1 = std::make_shared<helics::Federate>("fed1", fi);
@@ -364,7 +363,7 @@ TEST(federate_tests, enterInit)
 TEST(federate_tests, enterInitComplete)
 {
     helics::FederateInfo fi(helics::core_type::INPROC);
-    fi.coreName = "core_full";
+    fi.coreName = "core_full_b";
     fi.coreInitString = "-f 1 --autobroker";
 
     auto Fed1 = std::make_shared<helics::Federate>("fed1", fi);
@@ -381,7 +380,7 @@ TEST(federate_tests, enterInitComplete)
 TEST(federate_tests, enterExec)
 {
     helics::FederateInfo fi(helics::core_type::INPROC);
-    fi.coreName = "core_full";
+    fi.coreName = "core_full_c";
     fi.coreInitString = "-f 1 --autobroker";
 
     auto Fed1 = std::make_shared<helics::Federate>("fed1", fi);
@@ -403,7 +402,7 @@ TEST(federate_tests, enterExec)
 TEST(federate_tests, enterExecAsync)
 {
     helics::FederateInfo fi(helics::core_type::INPROC);
-    fi.coreName = "core_full";
+    fi.coreName = "core_full_d";
     fi.coreInitString = "-f 1 --autobroker";
 
     auto Fed1 = std::make_shared<helics::Federate>("fed1", fi);
@@ -416,7 +415,7 @@ TEST(federate_tests, enterExecAsync)
 TEST(federate_tests, enterExecAsyncIterative)
 {
     helics::FederateInfo fi(helics::core_type::INPROC);
-    fi.coreName = "core_full";
+    fi.coreName = "core_full_e";
     fi.coreInitString = "-f 1 --autobroker";
 
     auto Fed1 = std::make_shared<helics::Federate>("fed1", fi);
@@ -431,7 +430,7 @@ TEST(federate_tests, enterExecAsyncIterative)
 TEST(federate_tests, forceError)
 {
     helics::FederateInfo fi(helics::core_type::INPROC);
-    fi.coreName = "core_full";
+    fi.coreName = "core_full_f";
     fi.coreInitString = "-f 1 --autobroker";
 
     auto Fed1 = std::make_shared<helics::Federate>("fed1", fi);
@@ -441,6 +440,36 @@ TEST(federate_tests, forceError)
 
     EXPECT_THROW(Fed1->enterInitializingMode(), helics::InvalidFunctionCall);
     EXPECT_THROW(Fed1->enterExecutingMode(), helics::InvalidFunctionCall);
+
+    Fed1->getCorePointer()->disconnect();
+
+}
+
+TEST(federate_tests, error_after_disconnect)
+{
+    helics::FederateInfo fi(helics::core_type::INPROC);
+    fi.coreName = "core_full_g";
+    fi.coreInitString = "-f 1 --autobroker";
+
+    auto Fed1 = std::make_shared<helics::Federate>("fed1", fi);
+    auto &f1 = Fed1->registerGlobalFilter("filt1", "type1", "type2");
+    Fed1->enterExecutingMode();
+    Fed1->disconnect();
+
+    const auto &Fedref = *Fed1;
+    auto &fb = Fedref.getFilter(0);
+    auto &fb2 = Fedref.getFilter("filt1");
+    auto &fb3 = Fedref.getFilter("notafilter");
+    auto &fb4 = Fed1->getFilter("filt1");
+    
+    EXPECT_THROW(Fed1->setGlobal("global1", "global1"), helics::InvalidFunctionCall);
+    EXPECT_THROW(Fed1->addSourceTarget(f1,"ept"), helics::InvalidFunctionCall);
+
+    EXPECT_THROW(Fed1->addDestinationTarget(f1, "ept"), helics::InvalidFunctionCall);
+    EXPECT_THROW(Fed1->setFilterOperator(f1, {}), helics::InvalidFunctionCall);
+
+    EXPECT_THROW(Fed1->setInterfaceOption(helics::interface_handle{ 0 }, 0, false), helics::InvalidFunctionCall);
+    EXPECT_THROW(Fed1->setInfo(helics::interface_handle{ 0 }, "information"), helics::InvalidFunctionCall);
 }
 
 static constexpr const char* simple_global_files[] = {"example_globals1.json",
