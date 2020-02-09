@@ -210,15 +210,17 @@ void Federate::enterInitializingMode()
 
 void Federate::enterInitializingModeAsync()
 {
-    
-    if (currentMode == modes::startup) {
+    auto cm = currentMode.load();
+    if (cm == modes::startup) {
         auto asyncInfo = asyncCallInfo->lock();
-        currentMode = modes::pending_init;
-        asyncInfo->initFuture =
-            std::async(std::launch::async, [this]() { coreObject->enterInitializingMode(fedID); });
-    } else if (currentMode == modes::pending_init) {
+        if (currentMode.compare_exchange_strong(cm, modes::pending_init))
+        {
+            asyncInfo->initFuture =
+                std::async(std::launch::async, [this]() { coreObject->enterInitializingMode(fedID); });
+        }
+    } else if (cm == modes::pending_init) {
         return;
-    } else if (currentMode != modes::initializing) // if we are already in initialization do nothing
+    } else if (cm != modes::initializing) // if we are already in initialization do nothing
     {
         throw(InvalidFunctionCall("cannot transition from current mode to initializing mode"));
     }
@@ -230,7 +232,7 @@ bool Federate::isAsyncOperationCompleted() const
     auto ready = std::future_status::ready;
 
     auto asyncInfo = asyncCallInfo->lock_shared();
-    switch (currentMode) {
+    switch (currentMode.load()) {
         case modes::pending_init:
             return (asyncInfo->initFuture.wait_for(wait_delay) == ready);
         case modes::pending_exec:
