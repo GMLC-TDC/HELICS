@@ -437,17 +437,7 @@ iteration_result FederateState::enterExecutingMode(iteration_request iterate)
         // timeCoord->enteringExecMode (iterate);
         ActionMessage exec(CMD_EXEC_REQUEST);
         exec.source_id = global_id.load();
-        switch (iterate) {
-            case iteration_request::force_iteration:
-                setActionFlag(exec, iteration_requested_flag);
-                setActionFlag(exec, required_flag);
-                break;
-            case iteration_request::iterate_if_needed:
-                setActionFlag(exec, iteration_requested_flag);
-                break;
-            case iteration_request::no_iterations:
-                break;
-        }
+        setIterationFlags(exec, iterate);
 
         addAction(exec);
 
@@ -528,18 +518,7 @@ iteration_time FederateState::requestTime(Time nextTime, iteration_request itera
         ActionMessage treq(CMD_TIME_REQUEST);
         treq.source_id = global_id.load();
         treq.actionTime = nextTime;
-        switch (iterate) {
-            case iteration_request::force_iteration:
-                setActionFlag(treq, iteration_requested_flag);
-                setActionFlag(treq, required_flag);
-                break;
-            case iteration_request::iterate_if_needed:
-                setActionFlag(treq, iteration_requested_flag);
-                break;
-            case iteration_request::no_iterations:
-                break;
-        }
-
+        setIterationFlags(treq, iterate);
         addAction(treq);
         LOG_TRACE(timeCoord->printTimeStatus());
 // timeCoord->timeRequest (nextTime, iterate, nextValueTime (), nextMessageTime ());
