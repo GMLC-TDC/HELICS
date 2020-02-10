@@ -472,13 +472,18 @@ TEST(federate_tests, enterRequestTimeAsyncIterative)
     }
     EXPECT_TRUE(Fed1->isAsyncOperationCompleted());
     EXPECT_NO_THROW(Fed1->enterExecutingMode());
+    EXPECT_EQ(Fed1->getCurrentTime(), 1.0);
     EXPECT_EQ(Fed1->getCurrentMode(), helics::Federate::modes::executing);
 
-    Fed1->requestTimeIterativeAsync(1.0, helics::iteration_request::force_iteration);
+    Fed1->requestTimeIterativeAsync(37.0, helics::iteration_request::force_iteration);
     while (!Fed1->isAsyncOperationCompleted())
     {
         std::this_thread::sleep_for(std::chrono::milliseconds(50));
     }
+    auto itime=Fed1->requestTimeIterativeComplete();
+    EXPECT_EQ(itime.grantedTime, 1.0);
+    EXPECT_EQ(itime.state, helics::iteration_result::iterating);
+    Fed1->requestTimeIterativeAsync(1.0, helics::iteration_request::force_iteration);
     Fed1->finalizeAsync();
     while (!Fed1->isAsyncOperationCompleted())
     {
