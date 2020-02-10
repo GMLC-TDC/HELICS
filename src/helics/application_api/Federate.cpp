@@ -913,8 +913,8 @@ void Federate::registerFilterInterfacesToml(const std::string& tomlString)
                     static_cast<CloningFilter&>(filter).addDeliveryEndpoint(target);
                 });
             }
-            if (isMember(doc, "properties")) {
-                auto props = toml::find(doc, "properties");
+            if (isMember(filt, "properties")) {
+                auto props = toml::find(filt, "properties");
                 if (props.is_array()) {
                     auto& propArray = props.as_array();
                     for (const auto& prop : propArray) {

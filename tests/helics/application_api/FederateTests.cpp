@@ -307,7 +307,7 @@ TEST(federate_tests, coreApp)
 
 TEST(federate_tests, core_ptr)
 {
-    helics::FederateInfo fi(helics::core_type::INPROC);
+    helics::FederateInfo fi(helics::core_type::TEST);
     fi.coreName = "core_ptr";
     fi.coreInitString = "-f 1 --autobroker";
 
@@ -315,6 +315,16 @@ TEST(federate_tests, core_ptr)
     Fed1->enterExecutingMode();
 
     EXPECT_THROW(auto fed2 = std::make_shared<helics::Federate>("fed2",nullptr, fi), helics::RegistrationFailure);
+    Fed1->finalize();
+}
+
+TEST(federate_tests, core_ptr_no_name)
+{
+    helics::FederateInfo fi(helics::core_type::TEST);
+    fi.coreInitString = "-f 1 --autobroker";
+
+    auto Fed1 = std::make_shared<helics::Federate>(std::string{}, nullptr, fi);
+    Fed1->enterExecutingMode();
     Fed1->finalize();
 }
 
@@ -329,6 +339,22 @@ TEST(federate_tests, from_string)
     Fed1->finalize();
     c1.reset();
 
+}
+
+TEST(federate_tests, from_file1)
+{
+    auto fstr1 = std::string(TEST_DIR) + "example_filters.json";
+    auto Fed1 = std::make_shared<helics::Federate>(fstr1);
+    EXPECT_NO_THROW(Fed1->enterExecutingMode());
+    Fed1->finalize();
+}
+
+TEST(federate_tests, from_file2)
+{
+    auto fstr2 = std::string(TEST_DIR) + "example_filters.toml";
+    auto Fed1 = std::make_shared<helics::Federate>(fstr2);
+    EXPECT_NO_THROW(Fed1->enterExecutingMode());
+    Fed1->finalize();
 }
 
 TEST(federate_tests, from_string2)
@@ -422,9 +448,44 @@ TEST(federate_tests, enterExecAsyncIterative)
 
     Fed1->enterExecutingModeAsync(helics::iteration_request::force_iteration);
     EXPECT_NO_THROW(Fed1->enterExecutingModeAsync());
+    auto res = Fed1->enterExecutingModeComplete();
+    EXPECT_EQ(res, helics::iteration_result::iterating);
+    EXPECT_EQ(Fed1->getCurrentMode(), helics::Federate::modes::initializing);
     EXPECT_NO_THROW(Fed1->finalizeAsync());
     EXPECT_NO_THROW(Fed1->finalizeAsync());
     EXPECT_NO_THROW(Fed1->finalize());
+}
+
+TEST(federate_tests, enterRequestTimeAsyncIterative)
+{
+    helics::FederateInfo fi(helics::core_type::INPROC);
+    fi.coreName = "core_full_e";
+    fi.coreInitString = "-f 1 --autobroker";
+
+    auto Fed1 = std::make_shared<helics::Federate>("fed1", fi);
+
+    Fed1->enterExecutingMode();
+    Fed1->requestTimeAsync(1.0);
+    while (!Fed1->isAsyncOperationCompleted())
+    {
+        std::this_thread::sleep_for(std::chrono::milliseconds(50));
+    }
+    EXPECT_TRUE(Fed1->isAsyncOperationCompleted());
+    EXPECT_NO_THROW(Fed1->enterExecutingMode());
+    EXPECT_EQ(Fed1->getCurrentMode(), helics::Federate::modes::executing);
+
+    Fed1->requestTimeIterativeAsync(1.0, helics::iteration_request::force_iteration);
+    while (!Fed1->isAsyncOperationCompleted())
+    {
+        std::this_thread::sleep_for(std::chrono::milliseconds(50));
+    }
+    Fed1->finalizeAsync();
+    while (!Fed1->isAsyncOperationCompleted())
+    {
+        std::this_thread::sleep_for(std::chrono::milliseconds(50));
+    }
+    EXPECT_TRUE(Fed1->isAsyncOperationCompleted());
+    Fed1->finalizeComplete();
 }
 
 TEST(federate_tests, forceError)
@@ -470,6 +531,7 @@ TEST(federate_tests, error_after_disconnect)
 
     EXPECT_THROW(Fed1->setInterfaceOption(helics::interface_handle{ 0 }, 0, false), helics::InvalidFunctionCall);
     EXPECT_THROW(Fed1->setInfo(helics::interface_handle{ 0 }, "information"), helics::InvalidFunctionCall);
+    EXPECT_THROW(Fed1->error(99), helics::InvalidFunctionCall);
 }
 
 static constexpr const char* simple_global_files[] = {"example_globals1.json",
