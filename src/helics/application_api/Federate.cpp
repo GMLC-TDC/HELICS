@@ -184,18 +184,16 @@ void Federate::enterInitializingMode()
 {
     auto cm = currentMode.load();
     switch (cm) {
-    case modes::startup:
-        try
-        {
-            coreObject->enterInitializingMode(fedID);
-            currentMode = modes::initializing;
-            currentTime = coreObject->getCurrentTime(fedID);
-            startupToInitializeStateTransition();
-        }
-        catch (const HelicsException &)
-        {
-            currentMode = modes::error;
-            throw;
+        case modes::startup:
+            try {
+                coreObject->enterInitializingMode(fedID);
+                currentMode = modes::initializing;
+                currentTime = coreObject->getCurrentTime(fedID);
+                startupToInitializeStateTransition();
+            }
+            catch (const HelicsException&) {
+                currentMode = modes::error;
+                throw;
             }
             break;
         case modes::pending_init:
@@ -213,10 +211,10 @@ void Federate::enterInitializingModeAsync()
     auto cm = currentMode.load();
     if (cm == modes::startup) {
         auto asyncInfo = asyncCallInfo->lock();
-        if (currentMode.compare_exchange_strong(cm, modes::pending_init))
-        {
-            asyncInfo->initFuture =
-                std::async(std::launch::async, [this]() { coreObject->enterInitializingMode(fedID); });
+        if (currentMode.compare_exchange_strong(cm, modes::pending_init)) {
+            asyncInfo->initFuture = std::async(std::launch::async, [this]() {
+                coreObject->enterInitializingMode(fedID);
+            });
         }
     } else if (cm == modes::pending_init) {
         return;
@@ -228,7 +226,7 @@ void Federate::enterInitializingModeAsync()
 
 bool Federate::isAsyncOperationCompleted() const
 {
-    constexpr std::chrono::seconds wait_delay{ 0 };
+    constexpr std::chrono::seconds wait_delay{0};
     auto ready = std::future_status::ready;
 
     auto asyncInfo = asyncCallInfo->lock_shared();
@@ -251,8 +249,7 @@ bool Federate::isAsyncOperationCompleted() const
 void Federate::enterInitializingModeComplete()
 {
     switch (currentMode.load()) {
-        case modes::pending_init:
-        {
+        case modes::pending_init: {
             auto asyncInfo = asyncCallInfo->lock();
             try {
                 asyncInfo->initFuture.get();
@@ -299,8 +296,10 @@ iteration_result Federate::enterExecutingMode(iteration_request iterate)
                     updateTime(getCurrentTime(), getCurrentTime());
                     break;
                 case iteration_result::error:
+                    // LCOV_EXCL_START
                     currentMode = modes::error;
                     break;
+                    // LCOV_EXCL_STOP
                 case iteration_result::halted:
                     currentMode = modes::finalize;
                     break;
@@ -315,9 +314,11 @@ iteration_result Federate::enterExecutingMode(iteration_request iterate)
         case modes::pending_time:
             requestTimeComplete();
             break;
-        case modes::
-            pending_iterative_time: // since this isn't guaranteed to progress it shouldn't be called in
-            // this fashion
+        case modes::pending_iterative_time: {
+            auto result = requestTimeIterativeComplete();
+            return (result.state == iteration_result::iterating) ? iteration_result::next_step :
+                                                                   result.state;
+        }
         default:
             throw(InvalidFunctionCall("cannot transition from current state to execution state"));
             break;
@@ -354,7 +355,9 @@ void Federate::enterExecutingModeAsync(iteration_request iterate)
         case modes::pending_exec:
             break;
         case modes::executing:
-            // already in this state --> do nothing
+        case modes::pending_time:
+        case modes::pending_iterative_time:
+            // we are already in or executing a function that would achieve this request
             break;
         default:
             throw(InvalidFunctionCall("cannot transition from current state to execution state"));
@@ -364,42 +367,41 @@ void Federate::enterExecutingModeAsync(iteration_request iterate)
 
 iteration_result Federate::enterExecutingModeComplete()
 {
-    switch (currentMode.load())
-    {
-    case modes::pending_exec:
-    {
-        auto asyncInfo = asyncCallInfo->lock();
-        try {
-            auto res = asyncInfo->execFuture.get();
-            switch (res) {
-            case iteration_result::next_step:
-                currentMode = modes::executing;
-                currentTime = timeZero;
-                initializeToExecuteStateTransition();
-                break;
-            case iteration_result::iterating:
-                currentMode = modes::initializing;
-                updateTime(getCurrentTime(), getCurrentTime());
-                break;
-            case iteration_result::error:
-                currentMode = modes::error;
-                break;
-            case iteration_result::halted:
-                currentMode = modes::finalize;
-                break;
-            }
+    switch (currentMode.load()) {
+        case modes::pending_exec: {
+            auto asyncInfo = asyncCallInfo->lock();
+            try {
+                auto res = asyncInfo->execFuture.get();
+                switch (res) {
+                    case iteration_result::next_step:
+                        currentMode = modes::executing;
+                        currentTime = timeZero;
+                        initializeToExecuteStateTransition();
+                        break;
+                    case iteration_result::iterating:
+                        currentMode = modes::initializing;
+                        updateTime(getCurrentTime(), getCurrentTime());
+                        break;
+                    case iteration_result::error:
+                        // LCOV_EXCL_START
+                        currentMode = modes::error;
+                        break;
+                        // LCOV_EXCL_STOP
+                    case iteration_result::halted:
+                        currentMode = modes::finalize;
+                        break;
+                }
 
-            return res;
+                return res;
+            }
+            catch (const std::exception&) {
+                currentMode = modes::error;
+                throw;
+            }
         }
-        catch (const std::exception&) {
-            currentMode = modes::error;
-            throw;
-        }
+        default:
+            return enterExecutingMode();
     }
-    default:
-        return enterExecutingMode();
-   }
-    
 }
 
 void Federate::setProperty(int32_t option, double timeValue)
@@ -543,13 +545,12 @@ void Federate::error(int errorcode)
 
 void Federate::error(int errorcode, const std::string& message)
 {
-    
     if (!coreObject) {
         throw(
             InvalidFunctionCall("cannot generate error on uninitialized or disconnected Federate"));
     }
     // deal with pending operations first
-        switch (currentMode.load()) {
+    switch (currentMode.load()) {
         case modes::pending_init:
             enterInitializingModeComplete();
             break;
@@ -615,8 +616,10 @@ iteration_time Federate::requestTimeIterative(Time nextInternalTimeStep, iterati
                 currentMode = modes::finalize;
                 break;
             case iteration_result::error:
+                // LCOV_EXCL_START
                 currentMode = modes::error;
                 break;
+                // LCOV_EXCL_STOP
         }
         return iterativeTime;
     }
@@ -693,8 +696,10 @@ iteration_time Federate::requestTimeIterativeComplete()
                 currentMode = modes::finalize;
                 break;
             case iteration_result::error:
+                // LCOV_EXCL_START
                 currentMode = modes::error;
                 break;
+                // LCOV_EXCL_STOP
         }
         return iterativeTime;
     }

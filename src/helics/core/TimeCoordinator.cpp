@@ -53,6 +53,8 @@ void TimeCoordinator::enteringExecMode(iteration_request mode)
 
 void TimeCoordinator::disconnect()
 {
+    time_granted = Time::maxVal();
+    time_grantBase = Time::maxVal();
     if (sendMessageFunction) {
         std::set<global_federate_id> connections(dependents.begin(), dependents.end());
         for (auto dep : dependencies) {
