@@ -373,6 +373,12 @@ TEST(federate_tests, from_file2)
     Fed1->finalize();
 }
 
+TEST(federate_tests, from_file5)
+{
+    auto fstr2 = "non_existing.toml";
+    EXPECT_THROW(std::make_shared<helics::Federate>(fstr2), helics::InvalidParameter);
+}
+
 TEST(federate_tests, from_string2)
 {
     auto Fed1 = std::make_shared<helics::Federate>("--name=fed1 --type=TEST --corename core_init --coreinitstring='-f 1 --autobroker'");
