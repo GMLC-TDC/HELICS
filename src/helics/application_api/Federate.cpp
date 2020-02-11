@@ -832,7 +832,7 @@ void Federate::registerFilterInterfacesJson(const std::string& jsonString)
                 auto props = filt["properties"];
                 if (props.isArray()) {
                     for (const auto& prop : props) {
-                        if ((!prop.isMember("name")) && (!prop.isMember("value"))) {
+                        if ((!prop.isMember("name")) || (!prop.isMember("value"))) {
                             std::cerr
                                 << "properties must be specified with \"name\" and \"value\" fields\n";
                             continue;
@@ -844,7 +844,7 @@ void Federate::registerFilterInterfacesJson(const std::string& jsonString)
                         }
                     }
                 } else {
-                    if ((!props.isMember("name")) && (!props.isMember("value"))) {
+                    if ((!props.isMember("name")) || (!props.isMember("value"))) {
                         std::cerr
                             << "properties must be specified with \"name\" and \"value\" fields\n";
                         continue;

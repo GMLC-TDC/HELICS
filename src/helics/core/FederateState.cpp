@@ -814,7 +814,7 @@ message_processing_result FederateState::processActionMessage(ActionMessage& cmd
                 LOG_TIMING("Granting Initialization");
                 timeGranted_mode = true;
                 int pcode = checkInterfaces();
-                if (pcode != 0) {
+                if (pcode != defs::errors::ok) {
                     return message_processing_result::error;
                 }
                 return message_processing_result::next_step;
