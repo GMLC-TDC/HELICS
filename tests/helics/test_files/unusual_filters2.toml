@@ -19,4 +19,4 @@ output_delay=0 #the propagation delay for federates to send data
 input_delay=0 #the input delay for external data to propagate to federates
 separator=":" # set the character separator for local interfaces
 
-filters="things";
+filters="things"
