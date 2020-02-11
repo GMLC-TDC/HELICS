@@ -352,6 +352,8 @@ TEST(federate_tests, from_file1)
 
 TEST(federate_tests, from_file3)
 {
+    helics::BrokerFactory::terminateAllBrokers();
+    helics::CoreFactory::terminateAllCores();
     auto fstr1 = std::string(TEST_DIR) + "example_unusual_filters.json";
     auto Fed1 = std::make_shared<helics::Federate>(fstr1);
     EXPECT_THROW(Fed1->enterExecutingMode(), helics::HelicsException);
@@ -361,6 +363,8 @@ TEST(federate_tests, from_file3)
 
 TEST(federate_tests, from_file4)
 {
+    helics::BrokerFactory::terminateAllBrokers();
+    helics::CoreFactory::terminateAllCores();
     auto fstr1 = std::string(TEST_DIR) + "example_unusual_filters2.json";
     auto Fed1 = std::make_shared<helics::Federate>(fstr1);
     EXPECT_NO_THROW(Fed1->enterExecutingMode());
@@ -369,8 +373,8 @@ TEST(federate_tests, from_file4)
 
 TEST(federate_tests, from_file2)
 {
-    helics::CoreFactory::terminateAllCores();
     helics::BrokerFactory::terminateAllBrokers();
+    helics::CoreFactory::terminateAllCores();
     auto fstr2 = std::string(TEST_DIR) + "example_filters.toml";
     auto Fed1 = std::make_shared<helics::Federate>(fstr2);
     EXPECT_NO_THROW(Fed1->enterExecutingMode());
@@ -379,6 +383,8 @@ TEST(federate_tests, from_file2)
 
 TEST(federate_tests, from_file5)
 {
+    helics::BrokerFactory::terminateAllBrokers();
+    helics::CoreFactory::terminateAllCores();
     auto fstr2 = "non_existing.toml";
     EXPECT_THROW(std::make_shared<helics::Federate>(fstr2), helics::InvalidParameter);
     
@@ -386,7 +392,9 @@ TEST(federate_tests, from_file5)
 
 TEST(federate_tests, from_file6)
 {
+    helics::BrokerFactory::terminateAllBrokers();
     helics::CoreFactory::terminateAllCores();
+    
     auto fstr2 = std::string(TEST_DIR) + "example_filters.toml";
     auto Fed1 = std::make_shared<helics::Federate>(fstr2);
     EXPECT_THROW(Fed1->registerFilterInterfaces("non_existing.toml"), helics::InvalidParameter);
@@ -394,6 +402,7 @@ TEST(federate_tests, from_file6)
 
 TEST(federate_tests, from_file7)
 {
+    helics::BrokerFactory::terminateAllBrokers();
     helics::CoreFactory::terminateAllCores();
     auto fstr3 = std::string(TEST_DIR) + "example_unusual_filters3.json";
     auto Fed1 = std::make_shared<helics::Federate>(fstr3);
@@ -403,6 +412,8 @@ TEST(federate_tests, from_file7)
 
 TEST(federate_tests, from_file8)
 {
+    helics::BrokerFactory::terminateAllBrokers();
+    helics::CoreFactory::terminateAllCores();
     auto fstr3 = std::string(TEST_DIR) + "unusual_filters.toml";
     auto Fed1 = std::make_shared<helics::Federate>(fstr3);
     EXPECT_NO_THROW(Fed1->enterExecutingMode());
@@ -411,11 +422,15 @@ TEST(federate_tests, from_file8)
 
 TEST(federate_tests, from_file9)
 {
+    helics::BrokerFactory::terminateAllBrokers();
+    helics::CoreFactory::terminateAllCores();
     auto fstr4 = std::string(TEST_DIR) + "example_filters.toml";
     auto Fed1 = std::make_shared<helics::Federate>(fstr4);
     EXPECT_NO_THROW(Fed1->enterExecutingMode());
     EXPECT_THROW(Fed1->registerFilterInterfaces(std::string(TEST_DIR) + "unusual_filters2.toml"), helics::InvalidParameter);
     Fed1->finalize();
+    helics::BrokerFactory::terminateAllBrokers();
+    helics::CoreFactory::terminateAllCores();
 }
 
 TEST(federate_tests, from_string2)
@@ -844,6 +859,7 @@ TEST(federate_tests, queryTest1)
     EXPECT_EQ(qres.front(), '#');
 
     EXPECT_FALSE(Fed1->isQueryCompleted(helics::query_id_t{ 2 }));
+    EXPECT_NO_THROW(Fed1->logMessage(10, "test log message"));
 }
 
 TEST(federate_tests, forceErrorPendingTimeIterativeAsync)
