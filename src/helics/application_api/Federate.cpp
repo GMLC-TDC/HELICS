@@ -847,9 +847,8 @@ void Federate::registerFilterInterfacesJson(const std::string& jsonString)
                     if ((!props.isMember("name")) || (!props.isMember("value"))) {
                         std::cerr
                             << "properties must be specified with \"name\" and \"value\" fields\n";
-                        continue;
                     }
-                    if (props["value"].isDouble()) {
+                    else if (props["value"].isDouble()) {
                         filter.set(props["name"].asString(), props["value"].asDouble());
                     } else {
                         filter.setString(props["name"].asString(), props["value"].asString());
@@ -948,9 +947,8 @@ void Federate::registerFilterInterfacesToml(const std::string& tomlString)
                     if ((propname.empty()) || (propval.is_uninitialized())) {
                         std::cerr
                             << "properties must be specified with \"name\" and \"value\" fields\n";
-                        continue;
                     }
-                    if (propval.is_floating()) {
+                    else if (propval.is_floating()) {
                         filter.set(propname, propval.as_floating());
                     } else {
                         filter.setString(propname, propval.as_string());

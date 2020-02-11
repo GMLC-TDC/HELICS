@@ -356,6 +356,7 @@ TEST(federate_tests, from_file3)
     auto Fed1 = std::make_shared<helics::Federate>(fstr1);
     EXPECT_THROW(Fed1->enterExecutingMode(), helics::HelicsException);
     Fed1->finalize();
+    Fed1->getCorePointer()->disconnect();
 }
 
 TEST(federate_tests, from_file4)
@@ -378,6 +379,7 @@ TEST(federate_tests, from_file5)
 {
     auto fstr2 = "non_existing.toml";
     EXPECT_THROW(std::make_shared<helics::Federate>(fstr2), helics::InvalidParameter);
+    
 }
 
 TEST(federate_tests, from_file6)
