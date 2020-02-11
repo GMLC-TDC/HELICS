@@ -1242,7 +1242,7 @@ void Federate::logMessage(int level, const std::string& message) const
     {
         coreObject->logMessage(fedID, level, message);
     }
-    else if (level < helics_log_level_warning)
+    else if (level <= helics_log_level_warning)
     {
         std::cerr << message << std::endl;
     }
