@@ -66,7 +66,7 @@ name="ept2" # the name of the endpoint
 	delivery="ept2"  #for cloning filters this is the delivery address
 	cloning=true  #specify that this is cloning filter
 	[[filters.properties]]  #additional properties for filters are specified in a property array or object if there is just a single one
-		namer="destination"  #destination adds a cloning filter for all messages delivered to a particular
+		bnhb="destination"  #destination adds a cloning filter for all messages delivered to a particular
 		value="ept1"	#the value here the endpoint that will have its messages cloned
 	[[filters.properties]]
 		name="source"  #source adds a cloning filter for all messages send from a particular endpoint
