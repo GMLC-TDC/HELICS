@@ -7,7 +7,7 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include "helics/application_api/Federate.hpp"
 #include "helics/core/BrokerFactory.hpp"
-//#include "helics/core/CoreFactory.hpp"
+#include "helics/core/CoreFactory.hpp"
 #include "helics/core/Core.hpp"
 #include "helics/core/core-exceptions.hpp"
 #include "helics/application_api/CoreApp.hpp"
@@ -369,6 +369,8 @@ TEST(federate_tests, from_file4)
 
 TEST(federate_tests, from_file2)
 {
+    helics::CoreFactory::terminateAllCores();
+    helics::BrokerFactory::terminateAllBrokers();
     auto fstr2 = std::string(TEST_DIR) + "example_filters.toml";
     auto Fed1 = std::make_shared<helics::Federate>(fstr2);
     EXPECT_NO_THROW(Fed1->enterExecutingMode());
@@ -384,6 +386,7 @@ TEST(federate_tests, from_file5)
 
 TEST(federate_tests, from_file6)
 {
+    helics::CoreFactory::terminateAllCores();
     auto fstr2 = std::string(TEST_DIR) + "example_filters.toml";
     auto Fed1 = std::make_shared<helics::Federate>(fstr2);
     EXPECT_THROW(Fed1->registerFilterInterfaces("non_existing.toml"), helics::InvalidParameter);
@@ -391,6 +394,7 @@ TEST(federate_tests, from_file6)
 
 TEST(federate_tests, from_file7)
 {
+    helics::CoreFactory::terminateAllCores();
     auto fstr3 = std::string(TEST_DIR) + "example_unusual_filters3.json";
     auto Fed1 = std::make_shared<helics::Federate>(fstr3);
     EXPECT_NO_THROW(Fed1->enterExecutingMode());

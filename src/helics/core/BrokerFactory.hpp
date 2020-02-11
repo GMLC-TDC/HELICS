@@ -88,5 +88,8 @@ registered or when the clean up function is called this prevents some odd thread
 
     /** display the help listing for a particular core_type*/
     void displayHelp(core_type type = core_type::UNRECOGNIZED);
+
+    /** terminate all running Brokers*/
+    void terminateAllBrokers();
 } // namespace BrokerFactory
 } // namespace helics
