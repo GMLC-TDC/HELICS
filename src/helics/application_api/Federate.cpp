@@ -44,8 +44,8 @@ Federate::Federate(const std::string& fedName, const FederateInfo& fi): name(fed
         coreObject =
             CoreFactory::FindOrCreate(fi.coreType, fi.coreName, generateFullCoreInitString(fi));
         if (!coreObject->isOpenToNewFederates()) {
-            logWarningMessage("found core object is not open");
             coreObject = nullptr;
+            logWarningMessage("found core object is not open");
             CoreFactory::cleanUpCores(200ms);
             coreObject =
                 CoreFactory::FindOrCreate(fi.coreType, fi.coreName, generateFullCoreInitString(fi));
@@ -1238,7 +1238,18 @@ std::string const& Federate::getInfo(interface_handle handle)
 
 void Federate::logMessage(int level, const std::string& message) const
 {
-    coreObject->logMessage(fedID, level, message);
+    if (coreObject)
+    {
+        coreObject->logMessage(fedID, level, message);
+    }
+    else if (level < helics_log_level_warning)
+    {
+        std::cerr << message << std::endl;
+    }
+    else
+    {
+        std::cout << message << std::endl;
+    }
 }
 
 } // namespace helics
