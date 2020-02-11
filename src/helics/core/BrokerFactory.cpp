@@ -370,8 +370,7 @@ need be without issue*/
     void terminateAllBrokers()
     {
         auto brokers = getAllBrokers();
-        for (auto &brk : brokers)
-        {
+        for (auto& brk : brokers) {
             brk->disconnect();
         }
         cleanUpBrokers(std::chrono::milliseconds(250));

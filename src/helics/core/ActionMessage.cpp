@@ -805,18 +805,18 @@ int appendMessage(ActionMessage& m, const ActionMessage& newMessage)
     return (-1);
 }
 
-void setIterationFlags(ActionMessage &command, iteration_request iterate)
+void setIterationFlags(ActionMessage& command, iteration_request iterate)
 {
     switch (iterate) {
-    case iteration_request::force_iteration:
-        setActionFlag(command, iteration_requested_flag);
-        setActionFlag(command, required_flag);
-        break;
-    case iteration_request::iterate_if_needed:
-        setActionFlag(command, iteration_requested_flag);
-        break;
-    case iteration_request::no_iterations:
-        break;
+        case iteration_request::force_iteration:
+            setActionFlag(command, iteration_requested_flag);
+            setActionFlag(command, required_flag);
+            break;
+        case iteration_request::iterate_if_needed:
+            setActionFlag(command, iteration_requested_flag);
+            break;
+        case iteration_request::no_iterations:
+            break;
     }
 }
 } // namespace helics

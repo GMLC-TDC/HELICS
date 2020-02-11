@@ -445,13 +445,9 @@ FederateInfo loadFederateInfo(const std::string& configString)
         (hasJsonExtension(configString)) ||
         (configString.find_first_of('{') != std::string::npos)) {
         ret = loadFederateInfoJson(configString);
-    }
-    else if (configString.find("--") != std::string::npos)
-    {
+    } else if (configString.find("--") != std::string::npos) {
         ret.loadInfoFromArgsIgnoreOutput(configString);
-    }
-    else
-    {
+    } else {
         ret.defName = configString;
     }
     return ret;

@@ -45,7 +45,7 @@ void TimeCoordinator::enteringExecMode(iteration_request mode)
     checkingExec = true;
     ActionMessage execreq(CMD_EXEC_REQUEST);
     execreq.source_id = source_id;
-    if (iterating!=iteration_request::no_iterations) {
+    if (iterating != iteration_request::no_iterations) {
         setIterationFlags(execreq, iterating);
     }
     transmitTimingMessage(execreq);
@@ -139,7 +139,8 @@ bool TimeCoordinator::updateNextExecutionTime()
         }
         time_exec = std::min(time_requested, time_exec);
         if (time_exec <= time_granted) {
-            time_exec = (iterating==iteration_request::no_iterations) ? getNextPossibleTime(): time_granted;
+            time_exec = (iterating == iteration_request::no_iterations) ? getNextPossibleTime() :
+                                                                          time_granted;
         }
         if ((time_exec - time_granted) > timeZero) {
             time_exec = generateAllowedTime(time_exec);
@@ -151,7 +152,8 @@ bool TimeCoordinator::updateNextExecutionTime()
 
 void TimeCoordinator::updateNextPossibleEventTime()
 {
-    time_next = (iterating == iteration_request::no_iterations) ? getNextPossibleTime() : time_granted;
+    time_next =
+        (iterating == iteration_request::no_iterations) ? getNextPossibleTime() : time_granted;
 
     if (info.uninterruptible) {
         time_next = time_requested;
@@ -177,7 +179,7 @@ void TimeCoordinator::updateValueTime(Time valueUpdateTime)
     }
     if (valueUpdateTime < time_value) {
         auto ptime = time_value;
-        if (iterating!=iteration_request::no_iterations) {
+        if (iterating != iteration_request::no_iterations) {
             time_value = (valueUpdateTime <= time_granted) ? time_granted : valueUpdateTime;
         } else {
             auto nextPossibleTime = getNextPossibleTime();
@@ -275,7 +277,7 @@ void TimeCoordinator::updateMessageTime(Time messageUpdateTime)
 
     if (messageUpdateTime < time_message) {
         auto ptime = time_message;
-        if (iterating!=iteration_request::no_iterations) {
+        if (iterating != iteration_request::no_iterations) {
             time_message = (messageUpdateTime <= time_granted) ? time_granted : messageUpdateTime;
         } else {
             auto nextPossibleTime = getNextPossibleTime();
@@ -357,7 +359,8 @@ message_processing_result TimeCoordinator::checkTimeGrant()
     if (time_block <= time_exec) {
         return message_processing_result::continue_processing;
     }
-    if ((iterating==iteration_request::no_iterations) || (time_exec > time_granted && iterating==iteration_request::iterate_if_needed)) {
+    if ((iterating == iteration_request::no_iterations) ||
+        (time_exec > time_granted && iterating == iteration_request::iterate_if_needed)) {
         iteration = 0;
         if (time_allow > time_exec) {
             updateTimeGrant();
@@ -404,7 +407,7 @@ void TimeCoordinator::sendTimeRequest() const
     upd.Te = (time_exec != Time::maxVal()) ? time_exec + info.outputDelay : time_exec;
     upd.Tdemin = (time_minDe < time_next) ? time_next : time_minDe;
 
-    if (iterating!=iteration_request::no_iterations) {
+    if (iterating != iteration_request::no_iterations) {
         setIterationFlags(upd, iterating);
         upd.counter = iteration;
     }
@@ -415,8 +418,7 @@ void TimeCoordinator::sendTimeRequest() const
 
 void TimeCoordinator::updateTimeGrant()
 {
-    if (iterating != iteration_request::force_iteration)
-    {
+    if (iterating != iteration_request::force_iteration) {
         time_granted = time_exec;
         time_grantBase = time_granted;
     }
@@ -424,7 +426,7 @@ void TimeCoordinator::updateTimeGrant()
     treq.source_id = source_id;
     treq.actionTime = time_granted;
     treq.counter = iteration;
-    if (iterating!=iteration_request::no_iterations) {
+    if (iterating != iteration_request::no_iterations) {
         dependencies.resetIteratingTimeRequests(time_exec);
     }
     transmitTimingMessage(treq);
@@ -530,31 +532,27 @@ message_processing_result TimeCoordinator::checkExecEntry()
     if (time_block <= timeZero) {
         return ret;
     }
-    if (!dependencies.checkIfReadyForExecEntry(iterating!=iteration_request::no_iterations)) {
+    if (!dependencies.checkIfReadyForExecEntry(iterating != iteration_request::no_iterations)) {
         return ret;
     }
-    switch (iterating)
-    {
-    case iteration_request::no_iterations:
-        ret = message_processing_result::next_step;
-        break;
-    case iteration_request::iterate_if_needed:
-        if (hasInitUpdates) {
-            if (iteration >= info.maxIterations) {
+    switch (iterating) {
+        case iteration_request::no_iterations:
+            ret = message_processing_result::next_step;
+            break;
+        case iteration_request::iterate_if_needed:
+            if (hasInitUpdates) {
+                if (iteration >= info.maxIterations) {
+                    ret = message_processing_result::next_step;
+                } else {
+                    ret = message_processing_result::iterating;
+                }
+            } else {
                 ret = message_processing_result::next_step;
             }
-            else {
-                ret = message_processing_result::iterating;
-            }
-        }
-        else {
-            ret = message_processing_result::
-                next_step;
-        }
-        break;
-    case iteration_request::force_iteration:
-        ret = message_processing_result::iterating;
-        break;
+            break;
+        case iteration_request::force_iteration:
+            ret = message_processing_result::iterating;
+            break;
     }
 
     if (ret == message_processing_result::next_step) {
@@ -631,7 +629,7 @@ message_process_result TimeCoordinator::processTimeMessage(const ActionMessage& 
                 if (dep->Tnext > time_exec) {
                     return message_process_result::delay_processing;
                 }
-                if ((iterating!=iteration_request::no_iterations) && (time_exec == dep->Tnext)) {
+                if ((iterating != iteration_request::no_iterations) && (time_exec == dep->Tnext)) {
                     return message_process_result::delay_processing;
                 }
                 break;

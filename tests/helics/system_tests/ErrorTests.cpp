@@ -179,11 +179,11 @@ TEST_F(error_tests, duplicate_publication_names2)
         gotException = true;
         EXPECT_TRUE(fed1->getCurrentMode() == helics::Federate::modes::error);
         //this should do nothing
-        EXPECT_THROW(fed1->enterExecutingMode(),helics::InvalidFunctionCall);
+        EXPECT_THROW(fed1->enterExecutingMode(), helics::InvalidFunctionCall);
         EXPECT_TRUE(fed1->getCurrentMode() == helics::Federate::modes::error);
     }
     EXPECT_TRUE(gotException);
-    
+
     fed1->finalize();
     fed2->finalize();
     broker->disconnect();

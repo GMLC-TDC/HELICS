@@ -312,6 +312,6 @@ int appendMessage(ActionMessage& m, const ActionMessage& newMessage);
 std::string errorMessageString(const ActionMessage& command);
 
 /** set the flags for an iteration request*/
-void setIterationFlags(ActionMessage &command, iteration_request iterate);
+void setIterationFlags(ActionMessage& command, iteration_request iterate);
 
 } // namespace helics
