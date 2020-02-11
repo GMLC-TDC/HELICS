@@ -21,7 +21,6 @@ class BrokerServerTests: public ::testing::TestWithParam<std::pair<const char*, 
 
 TEST_P(BrokerServerTests, startup_tests)
 {
-    
     apps::BrokerServer brks(std::vector<std::string>{GetParam().first});
 
     brks.forceTerminate();

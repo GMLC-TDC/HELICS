@@ -468,8 +468,7 @@ without issue*/
     void terminateAllCores()
     {
         auto brokers = searchableCores.getObjects();
-        for (auto &brk : brokers)
-        {
+        for (auto& brk : brokers) {
             brk->disconnect();
         }
         cleanUpCores(std::chrono::milliseconds(250));

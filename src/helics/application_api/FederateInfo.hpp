@@ -80,9 +80,9 @@ class HELICS_CXX_EXPORT FederateInfo: public CoreFederateInfo {
     @param argv an array of char * pointers to the arguments
     */
     void loadInfoFromArgsIgnoreOutput(int argc, char* argv[]);
+
   private:
     std::unique_ptr<helicsCLI11App> makeCLIApp();
-   
 };
 
 /** generate a FederateInfo object from a config file (JSON, TOML)

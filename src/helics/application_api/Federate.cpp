@@ -847,8 +847,7 @@ void Federate::registerFilterInterfacesJson(const std::string& jsonString)
                     if ((!props.isMember("name")) || (!props.isMember("value"))) {
                         std::cerr
                             << "properties must be specified with \"name\" and \"value\" fields\n";
-                    }
-                    else if (props["value"].isDouble()) {
+                    } else if (props["value"].isDouble()) {
                         filter.set(props["name"].asString(), props["value"].asDouble());
                     } else {
                         filter.setString(props["name"].asString(), props["value"].asString());
@@ -947,8 +946,7 @@ void Federate::registerFilterInterfacesToml(const std::string& tomlString)
                     if ((propname.empty()) || (propval.is_uninitialized())) {
                         std::cerr
                             << "properties must be specified with \"name\" and \"value\" fields\n";
-                    }
-                    else if (propval.is_floating()) {
+                    } else if (propval.is_floating()) {
                         filter.set(propname, propval.as_floating());
                     } else {
                         filter.setString(propname, propval.as_string());
@@ -1238,16 +1236,11 @@ std::string const& Federate::getInfo(interface_handle handle)
 
 void Federate::logMessage(int level, const std::string& message) const
 {
-    if (coreObject)
-    {
+    if (coreObject) {
         coreObject->logMessage(fedID, level, message);
-    }
-    else if (level <= helics_log_level_warning)
-    {
+    } else if (level <= helics_log_level_warning) {
         std::cerr << message << std::endl;
-    }
-    else
-    {
+    } else {
         std::cout << message << std::endl;
     }
 }
