@@ -260,14 +260,14 @@ need be without issue*/
         delayedDestroyer(destroyerCallFirst); //!< the object handling the delayed destruction
 
     static gmlc::concurrency::SearchableObjectHolder<Broker>
-        searchableObjects; //!< the object managing the searchable objects
+        searchableBrokers; //!< the object managing the searchable objects
 
     // this will trip the line when it is destroyed at global destruction time
     static gmlc::concurrency::TripWireTrigger tripTrigger;
 
     std::shared_ptr<Broker> findBroker(const std::string& brokerName)
     {
-        return searchableObjects.findObject(brokerName);
+        return searchableBrokers.findObject(brokerName);
     }
 
     static bool isJoinableBrokerOfType(core_type type, const std::shared_ptr<Broker>& ptr)
@@ -335,24 +335,24 @@ need be without issue*/
 
     std::shared_ptr<Broker> findJoinableBrokerOfType(core_type type)
     {
-        return searchableObjects.findObject(
+        return searchableBrokers.findObject(
             [type](auto& ptr) { return isJoinableBrokerForType(type, ptr); });
     }
 
-    std::vector<std::shared_ptr<Broker>> getAllBrokers() { return searchableObjects.getObjects(); }
+    std::vector<std::shared_ptr<Broker>> getAllBrokers() { return searchableBrokers.getObjects(); }
 
-    bool brokersActive() { return !searchableObjects.empty(); }
+    bool brokersActive() { return !searchableBrokers.empty(); }
 
     bool registerBroker(const std::shared_ptr<Broker>& broker)
     {
         bool registered = false;
         if (broker) {
-            registered = searchableObjects.addObject(broker->getIdentifier(), broker);
+            registered = searchableBrokers.addObject(broker->getIdentifier(), broker);
         }
         cleanUpBrokers();
         if ((!registered) && (broker)) {
             std::this_thread::sleep_for(std::chrono::milliseconds(200));
-            registered = searchableObjects.addObject(broker->getIdentifier(), broker);
+            registered = searchableBrokers.addObject(broker->getIdentifier(), broker);
         }
         if (registered) {
             delayedDestroyer.addObjectsToBeDestroyed(broker);
@@ -367,15 +367,25 @@ need be without issue*/
         return delayedDestroyer.destroyObjects(delay);
     }
 
+    void terminateAllBrokers()
+    {
+        auto brokers = getAllBrokers();
+        for (auto &brk : brokers)
+        {
+            brk->disconnect();
+        }
+        cleanUpBrokers(std::chrono::milliseconds(250));
+    }
+
     bool copyBrokerIdentifier(const std::string& copyFromName, const std::string& copyToName)
     {
-        return searchableObjects.copyObject(copyFromName, copyToName);
+        return searchableBrokers.copyObject(copyFromName, copyToName);
     }
 
     void unregisterBroker(const std::string& name)
     {
-        if (!searchableObjects.removeObject(name)) {
-            searchableObjects.removeObject(
+        if (!searchableBrokers.removeObject(name)) {
+            searchableBrokers.removeObject(
                 [&name](auto& obj) { return (obj->getIdentifier() == name); });
         }
     }

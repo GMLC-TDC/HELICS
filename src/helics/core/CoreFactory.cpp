@@ -359,14 +359,14 @@ without issue*/
         delayedDestroyer(destroyerCallFirst); //!< the object handling the delayed destruction
 
     static gmlc::concurrency::SearchableObjectHolder<CommonCore>
-        searchableObjects; //!< the object managing the searchable objects
+        searchableCores; //!< the object managing the searchable cores
 
     // this will trip the line when it is destroyed at global destruction time
     static gmlc::concurrency::TripWireTrigger tripTrigger;
 
     std::shared_ptr<Core> findCore(const std::string& name)
     {
-        return searchableObjects.findObject(name);
+        return searchableCores.findObject(name);
     }
 
     static bool isJoinableCoreOfType(core_type type, const std::shared_ptr<CommonCore>& ptr)
@@ -440,7 +440,7 @@ without issue*/
 
     std::shared_ptr<Core> findJoinableCoreOfType(core_type type)
     {
-        return searchableObjects.findObject(
+        return searchableCores.findObject(
             [type](auto& ptr) { return isJoinableCoreForType(type, ptr); });
     }
 
@@ -449,7 +449,7 @@ without issue*/
         bool res = false;
         auto tcore = std::dynamic_pointer_cast<CommonCore>(core);
         if (tcore) {
-            res = searchableObjects.addObject(tcore->getIdentifier(), tcore);
+            res = searchableCores.addObject(tcore->getIdentifier(), tcore);
         }
         cleanUpCores();
         if (res) {
@@ -465,15 +465,25 @@ without issue*/
         return delayedDestroyer.destroyObjects(delay);
     }
 
+    void terminateAllCores()
+    {
+        auto brokers = searchableCores.getObjects();
+        for (auto &brk : brokers)
+        {
+            brk->disconnect();
+        }
+        cleanUpCores(std::chrono::milliseconds(250));
+    }
+
     bool copyCoreIdentifier(const std::string& copyFromName, const std::string& copyToName)
     {
-        return searchableObjects.copyObject(copyFromName, copyToName);
+        return searchableCores.copyObject(copyFromName, copyToName);
     }
 
     void unregisterCore(const std::string& name)
     {
-        if (!searchableObjects.removeObject(name)) {
-            searchableObjects.removeObject(
+        if (!searchableCores.removeObject(name)) {
+            searchableCores.removeObject(
                 [&name](auto& obj) { return (obj->getIdentifier() == name); });
         }
     }
