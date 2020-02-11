@@ -13,6 +13,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helics/application_api/CoreApp.hpp"
 #include <future>
 #include <gtest/gtest.h>
+#include "helics/application_api/Filters.hpp"
 /** these test cases test out the value converters
  */
 
@@ -882,7 +883,11 @@ TEST(federate_tests, error_after_disconnect)
     auto &fb2 = Fedref.getFilter("filt1");
     auto &fb3 = Fedref.getFilter("notafilter");
     auto &fb4 = Fed1->getFilter("filt1");
-    
+    EXPECT_EQ(Fed1->getInterfaceName(fb), Fed1->getInterfaceName(f1));
+    EXPECT_EQ(Fed1->getInterfaceName(fb2), Fed1->getInterfaceName(f1));
+    EXPECT_EQ(Fed1->getInterfaceName(fb4), Fed1->getInterfaceName(f1));
+    EXPECT_FALSE(fb3.isValid());
+
     EXPECT_THROW(Fed1->setGlobal("global1", "global1"), helics::InvalidFunctionCall);
     EXPECT_THROW(Fed1->addSourceTarget(f1,"ept"), helics::InvalidFunctionCall);
 

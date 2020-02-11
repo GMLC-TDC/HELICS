@@ -118,6 +118,7 @@ static std::unique_ptr<CommsInterface>
         case core_type::NNG:
         case core_type::UNRECOGNIZED:
         case core_type::WEBSOCKET:
+        case core_type::NULLCORE:
             break;
     }
     if (comm) {
