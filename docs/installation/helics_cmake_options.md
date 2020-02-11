@@ -45,7 +45,7 @@ These options effect the configuration of HELICS itself and how/what gets built 
 ### Build configuration Options
 Options effect the connection of libraries used in HELICS and how they are linked.
 -   `HELICS_DISABLE_BOOST` : \[Default=OFF\] Completely turn off searching and inclusion of boost libraries.  This will disable the IPC core, disable the webserver and few other features, possibly more in the future.  
--   `HELICS_DISABLE_WEBSERVER` :  \[Default=OFF\] Disable building the webserver part of the `helics_broker_server` and `helics_broker` The webserver requires boost 1.70 or higher and `HELICS_DISABLE_BOOST` will take precedence.  
+-   `HELICS_DISABLE_WEBSERVER` :  \[Default=OFF\] Disable building the webserver part of the `helics_broker_server` and `helics_broker`. The webserver requires boost 1.70 or higher and `HELICS_DISABLE_BOOST` will take precedence.  
 -   `HELICS_DISABLE_ASIO` : \[Default=OFF\] Completely turn off  inclusion of ASIO libraries.  This will disable all TCP and UDP cores, disable real time mode for HELICS, and disable all timeout features for the Library so **use with caution**.  
 -   `HELICS_ENABLE_SUBMODULE_UPDATE` : \[Default=ON\] Enable CMake to automatically download the submodules and update them if necessary
 -   `HELICS_ENABLE_ERROR_ON_WARNING` :\[Default=OFF\] Turns on Werror or equivalent,  probably not useful for normal activity,  There isn't many warnings but left in to allow the possibility

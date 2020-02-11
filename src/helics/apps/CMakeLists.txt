@@ -10,7 +10,7 @@
 if(HELICS_BUILD_APP_LIBRARY)
 
     cmake_dependent_advanced_option(
-        HELICS_DISABLE_WEBSERVER "Enable a webserver app structure to be embedded with the broker server" OFF
+        HELICS_DISABLE_WEBSERVER "Disable the embedded webserver app structure in the broker server" OFF
         "NOT HELICS_DISABLE_BOOST;Boost_VERSION VERSION_GREATER 1.69" ON
     )
     set(

@@ -17,7 +17,7 @@ Increased code coverage and additional bug fixes.
 ### Fixed
 
 ### Added
--   `HELICS_DISABLE_WEBSERVER` option to turn off building of the webserver.  If is off by default so the webserver will build by default if Boost is enabled and is version 1.70 or higher
+-   `HELICS_DISABLE_WEBSERVER` option to turn off building of the webserver.  It will build by default if Boost is enabled and is version 1.70 or higher; otherwise it is off by default.
 
 ### Deprecated 
 
