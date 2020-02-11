@@ -6,7 +6,6 @@
 -   `HELICS_BUILD_APP_LIBRARY` :  \[Default=ON\] Tell HELICS to build the [app]() Library
 -   `HELICS_BUILD_APP_EXECUTABLES` : \[Default=ON\] Build some executables associated with the apps
 -   `HELICS_BUILD_BENCHMARKS` :  \[Default=OFF\] Build some timing benchmarks associated with HELICS
--   `HELICS_ENABLE_WEBSERVER` :  \[Default=OFF\] Build the webserver as part of the `helics_broker_server` requires boost 1.70 or higher.  
 -   `HELICS_BUILD_CXX_SHARED_LIB` :  \[Default=OFF\] Build C++ shared libraries of the Application API C++ interface to HELICS and if `HELICS_BUILD_APP_LIBRARY` is also enabled another C++ shared library with the APP library
 -   `HELICS_BUILD_EXAMPLES` :  \[Default=OFF\] Build a few select examples using HELICS,  this is mostly for testing purposes.  The main examples repo is [here](https://github.com/GMLC-TDC/HELICS-Examples)
 -   `HELICS_BUILD_TESTS` :  \[Default=OFF\] Build the HELICS unit and system test executables.
@@ -46,6 +45,7 @@ These options effect the configuration of HELICS itself and how/what gets built 
 ### Build configuration Options
 Options effect the connection of libraries used in HELICS and how they are linked.
 -   `HELICS_DISABLE_BOOST` : \[Default=OFF\] Completely turn off searching and inclusion of boost libraries.  This will disable the IPC core, disable the webserver and few other features, possibly more in the future.  
+-   `HELICS_DISABLE_WEBSERVER` :  \[Default=OFF\] Disable building the webserver part of the `helics_broker_server` and `helics_broker` The webserver requires boost 1.70 or higher and `HELICS_DISABLE_BOOST` will take precedence.  
 -   `HELICS_DISABLE_ASIO` : \[Default=OFF\] Completely turn off  inclusion of ASIO libraries.  This will disable all TCP and UDP cores, disable real time mode for HELICS, and disable all timeout features for the Library so **use with caution**.  
 -   `HELICS_ENABLE_SUBMODULE_UPDATE` : \[Default=ON\] Enable CMake to automatically download the submodules and update them if necessary
 -   `HELICS_ENABLE_ERROR_ON_WARNING` :\[Default=OFF\] Turns on Werror or equivalent,  probably not useful for normal activity,  There isn't many warnings but left in to allow the possibility
