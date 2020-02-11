@@ -397,9 +397,18 @@ TEST(federate_tests, from_file7)
 
 TEST(federate_tests, from_file8)
 {
-    auto fstr3 = std::string(TEST_DIR) + "example_filters.toml";
+    auto fstr3 = std::string(TEST_DIR) + "unusual_filters.toml";
     auto Fed1 = std::make_shared<helics::Federate>(fstr3);
     EXPECT_NO_THROW(Fed1->enterExecutingMode());
+    Fed1->finalize();
+}
+
+TEST(federate_tests, from_file9)
+{
+    auto fstr4 = std::string(TEST_DIR) + "example_filters.toml";
+    auto Fed1 = std::make_shared<helics::Federate>(fstr4);
+    EXPECT_NO_THROW(Fed1->enterExecutingMode());
+    EXPECT_THROW(Fed1->registerFilterInterfaces(std::string(TEST_DIR) + "unusual_filters2.toml"), helics::InvalidParameter);
     Fed1->finalize();
 }
 

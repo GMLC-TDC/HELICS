@@ -48,10 +48,14 @@
 	"operation":"delay", //currently valid operations are "delay","clone","cloning","timedelay","randomdelay","randomdrop","reroute","redirect","custom"
 	"info":"this is an information string for use by the application",
 	"properties":  //additional properties for filters are specified in a property array or object if there is just a single one
-	{
+	[{
         "value":0.2,  //times default to seconds though units can also be specified "200 ms" or similar
 		"name":"delay"  //A delay filter just has a single property
-	}
+	},
+    {
+        "value":0.3,  //times default to seconds though units can also be specified "200 ms" or similar
+		"name":"delay"  //A delay filter just has a single property
+	}]
 },
 {
 	"name":"filtername2",  //filters can have names (optional)

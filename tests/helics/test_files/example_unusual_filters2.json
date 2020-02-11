@@ -60,7 +60,7 @@
 	"operation":"blahblah", //currently valid operations are "delay","clone","cloning","timedelay","randomdelay","randomdrop","reroute","redirect","custom"
 	"properties":  //additional properties for filters are specified in a property array or object if there is just a single one
 	{
-		"name":"newdestination",  //A reroute filter takes a new destination
+		"bname":"newdestination",  //A reroute filter takes a new destination
 		"value":"ept1"	//the value here is the endpoint that should be the new destination
 	}
 },
