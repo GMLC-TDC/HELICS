@@ -379,6 +379,29 @@ TEST(federate_tests, from_file5)
     EXPECT_THROW(std::make_shared<helics::Federate>(fstr2), helics::InvalidParameter);
 }
 
+TEST(federate_tests, from_file6)
+{
+    auto fstr2 = std::string(TEST_DIR) + "example_filters.toml";
+    auto Fed1 = std::make_shared<helics::Federate>(fstr2);
+    EXPECT_THROW(Fed1->registerFilterInterfaces("non_existing.toml"), helics::InvalidParameter);
+}
+
+TEST(federate_tests, from_file7)
+{
+    auto fstr3 = std::string(TEST_DIR) + "example_unusual_filters3.json";
+    auto Fed1 = std::make_shared<helics::Federate>(fstr3);
+    EXPECT_NO_THROW(Fed1->enterExecutingMode());
+    Fed1->finalize();
+}
+
+TEST(federate_tests, from_file8)
+{
+    auto fstr3 = std::string(TEST_DIR) + "example_filters.toml";
+    auto Fed1 = std::make_shared<helics::Federate>(fstr3);
+    EXPECT_NO_THROW(Fed1->enterExecutingMode());
+    Fed1->finalize();
+}
+
 TEST(federate_tests, from_string2)
 {
     auto Fed1 = std::make_shared<helics::Federate>("--name=fed1 --type=TEST --corename core_init --coreinitstring='-f 1 --autobroker'");
@@ -686,6 +709,21 @@ TEST(federate_tests, enterEnterInitAsyncFinalizeAsync)
     EXPECT_EQ(Fed1->getCurrentMode(), helics::Federate::modes::finalize);
 }
 
+
+TEST(federate_tests, enterExecPendingTimeIterative)
+{
+    helics::FederateInfo fi(helics::core_type::TEST);
+    fi.coreName = "core_full_epa";
+    fi.coreInitString = "-f 1 --autobroker";
+
+    auto Fed1 = std::make_shared<helics::Federate>("fed1", fi);
+    Fed1->enterExecutingMode();
+    Fed1->requestTimeIterativeAsync(2.0, helics::iteration_request::force_iteration);
+    auto it=Fed1->enterExecutingMode();
+    EXPECT_EQ(it, helics::iteration_result::next_step);
+    Fed1->finalizeComplete();
+    EXPECT_EQ(Fed1->getCurrentMode(), helics::Federate::modes::finalize);
+}
 
 TEST(federate_tests, forceErrorExec)
 {
