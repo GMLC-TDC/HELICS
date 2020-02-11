@@ -9,9 +9,9 @@
 
 if(HELICS_BUILD_APP_LIBRARY)
 
-    cmake_dependent_option(
-        HELICS_ENABLE_WEBSERVER "Enable a webserver app structure to be embedded with the broker server" OFF
-        "NOT HELICS_DISABLE_BOOST;Boost_VERSION VERSION_GREATER 1.69" OFF
+    cmake_dependent_advanced_option(
+        HELICS_DISABLE_WEBSERVER "Disable the embedded webserver app structure in the broker server" OFF
+        "NOT HELICS_DISABLE_BOOST;Boost_VERSION VERSION_GREATER 1.69" ON
     )
     set(
         helics_apps_public_headers
@@ -57,7 +57,8 @@ if(HELICS_BUILD_APP_LIBRARY)
         TypedBrokerServer.cpp
 	)
     
-    if (HELICS_ENABLE_WEBSERVER)
+    if (BOOST_VERSION_LEVEL GREATER 69 AND NOT (HELICS_DISABLE_WEBSERVER OR HELICS_DISABLE_BOOST))
+        message(STATUS "Building webserver Boost version ${Boost_VERSION} ${BOOST_VERSION_LEVEL}")
         list(APPEND helics_apps_broker_files helicsWebServer.cpp)
         list(APPEND helics_apps_broker_headers helicsWebServer.hpp)
     endif()
@@ -70,7 +71,7 @@ if(HELICS_BUILD_APP_LIBRARY)
     target_link_libraries(helics_apps PUBLIC helics_application_api)
     target_link_libraries(helics_apps PRIVATE HELICS::compile_flags_target fmt::fmt)
     
-    if (HELICS_ENABLE_WEBSERVER)
+    if (BOOST_VERSION_LEVEL GREATER 69 AND NOT (HELICS_DISABLE_WEBSERVER OR HELICS_DISABLE_BOOST))
         target_compile_definitions(helics_apps PUBLIC HELICS_ENABLE_WEBSERVER=1)
         target_compile_definitions(helics_apps PUBLIC BOOST_DATE_TIME_NO_LIB)
     endif()
