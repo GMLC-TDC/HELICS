@@ -23,6 +23,7 @@ public class helicsJNI {
   public final static native int helics_core_type_http_get();
   public final static native int helics_core_type_websocket_get();
   public final static native int helics_core_type_inproc_get();
+  public final static native int helics_core_type_null_get();
   public final static native int helics_data_type_string_get();
   public final static native int helics_data_type_double_get();
   public final static native int helics_data_type_int_get();
