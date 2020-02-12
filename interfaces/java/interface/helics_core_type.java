@@ -71,6 +71,10 @@ public final class helics_core_type {
    *                                    it is pretty similar to the test core but stripped from the "test" components
    */
   public final static helics_core_type helics_core_type_inproc = new helics_core_type("helics_core_type_inproc", helicsJNI.helics_core_type_inproc_get());
+  /**
+   *  an explicit core type that is recognized but explicitly doesn't exist, for testing and a few other assorted reasons
+   */
+  public final static helics_core_type helics_core_type_null = new helics_core_type("helics_core_type_null", helicsJNI.helics_core_type_null_get());
 
   public final int swigValue() {
     return swigValue;
@@ -106,7 +110,7 @@ public final class helics_core_type {
     swigNext = this.swigValue+1;
   }
 
-  private static helics_core_type[] swigValues = { helics_core_type_default, helics_core_type_zmq, helics_core_type_mpi, helics_core_type_test, helics_core_type_interprocess, helics_core_type_ipc, helics_core_type_tcp, helics_core_type_udp, helics_core_type_zmq_test, helics_core_type_nng, helics_core_type_tcp_ss, helics_core_type_http, helics_core_type_websocket, helics_core_type_inproc };
+  private static helics_core_type[] swigValues = { helics_core_type_default, helics_core_type_zmq, helics_core_type_mpi, helics_core_type_test, helics_core_type_interprocess, helics_core_type_ipc, helics_core_type_tcp, helics_core_type_udp, helics_core_type_zmq_test, helics_core_type_nng, helics_core_type_tcp_ss, helics_core_type_http, helics_core_type_websocket, helics_core_type_inproc, helics_core_type_null };
   private static int swigNext = 0;
   private final int swigValue;
   private final String swigName;

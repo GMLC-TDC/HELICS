@@ -18619,6 +18619,7 @@ SWIG_init(void) {
   SWIG_Python_SetConstant(d, "helics_core_type_http",SWIG_From_int((int)(helics_core_type_http)));
   SWIG_Python_SetConstant(d, "helics_core_type_websocket",SWIG_From_int((int)(helics_core_type_websocket)));
   SWIG_Python_SetConstant(d, "helics_core_type_inproc",SWIG_From_int((int)(helics_core_type_inproc)));
+  SWIG_Python_SetConstant(d, "helics_core_type_null",SWIG_From_int((int)(helics_core_type_null)));
   SWIG_Python_SetConstant(d, "helics_data_type_string",SWIG_From_int((int)(helics_data_type_string)));
   SWIG_Python_SetConstant(d, "helics_data_type_double",SWIG_From_int((int)(helics_data_type_double)));
   SWIG_Python_SetConstant(d, "helics_data_type_int",SWIG_From_int((int)(helics_data_type_int)));

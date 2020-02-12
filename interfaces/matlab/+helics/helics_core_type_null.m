@@ -1,7 +1,7 @@
-function v = helics_data_type_time()
+function v = helics_core_type_null()
   persistent vInitialized;
   if isempty(vInitialized)
-    vInitialized = helicsMEX(0, 23);
+    vInitialized = helicsMEX(0, 14);
   end
   v = vInitialized;
 end
