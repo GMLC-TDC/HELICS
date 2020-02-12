@@ -14,16 +14,20 @@ Increased code coverage and additional bug fixes.
 ### Changed
 -   The helics webserver will build by default if the conditions are met
 -   Update filesystem library to [v1.3.0](https://github.com/gulrak/filesystem/releases/tag/v1.3.0)
+-   The behavior of the Federate *Complete operations to be uniform and consistent
 
 ### Fixed
+-   Issue with iterative requests that were not being honored if the federate was acting in isolation
+-   A few pathways which would allow segmentation faults if a federate was disconnected and particular functions were called
 
 ### Added
 -   `HELICS_DISABLE_WEBSERVER` option to turn off building of the webserver.  It will build by default if Boost is enabled and is version 1.70 or higher; otherwise it is disabled.
+-   A series of test for Federate.cpp to increase coverage on that file to 100% 
 
 ### Deprecated 
 
 ### Removed
--   `HELICS_ENABLE_WEBSERVER` option to enable the webserver
+-   `HELICS_ENABLE_WEBSERVER` option to enable the webserver.  This option was added as experimental in 2.4.0 
 
 
 ## [2.4.0][] - 2020-02-04
