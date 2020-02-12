@@ -41,8 +41,10 @@ typedef enum {
     helics_core_type_http = 12, /*!< a core type using http for communication*/
     helics_core_type_websocket = 14, /*!< a core using websockets for communication*/
     helics_core_type_inproc =
-        18 /*!< an in process core type for handling communications in shared memory
+        18, /*!< an in process core type for handling communications in shared memory
                                    it is pretty similar to the test core but stripped from the "test" components*/
+    helics_core_type_null =
+        66 /*!< an explicit core type that is recognized but explicitly doesn't exist, for testing and a few other assorted reasons*/
 } helics_core_type;
 
 /** enumeration of allowable data types for publications and inputs*/

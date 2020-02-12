@@ -880,10 +880,10 @@ TEST(evil_fedInfo_test, helicsFederateInfoSetCoreTypeFromString)
     helics_federate_info evil_fi = reinterpret_cast<helics_federate_info>(rdata);
     auto err = helicsErrorInitialize();
     err.error_code = 45;
-    helicsFederateInfoSetCoreTypeFromString(nullptr, "nng", &err);
+    helicsFederateInfoSetCoreTypeFromString(nullptr, "null", &err);
     EXPECT_EQ(err.error_code, 45);
     helicsErrorClear(&err);
-    helicsFederateInfoSetCoreTypeFromString(evil_fi, "nng", &err);
+    helicsFederateInfoSetCoreTypeFromString(evil_fi, "nullcore", &err);
     EXPECT_NE(err.error_code, 0);
     auto fi = helicsCreateFederateInfo();
     helicsErrorClear(&err);
