@@ -12,12 +12,13 @@ Increased code coverage and additional bug fixes.
 
 
 ### Changed
--   the helics webserver will build by default if the conditions are met
+-   The helics webserver will build by default if the conditions are met
+-   Update filesystem library to [v1.3.0](https://github.com/gulrak/filesystem/releases/tag/v1.3.0)
 
 ### Fixed
 
 ### Added
--   `HELICS_DISABLE_WEBSERVER` option to turn off building of the webserver.  It will build by default if Boost is enabled and is version 1.70 or higher; otherwise it is off by default.
+-   `HELICS_DISABLE_WEBSERVER` option to turn off building of the webserver.  It will build by default if Boost is enabled and is version 1.70 or higher; otherwise it is disabled.
 
 ### Deprecated 
 
