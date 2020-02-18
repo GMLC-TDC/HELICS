@@ -7,8 +7,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "Federate.hpp"
 
 #include "../common/GuardedTypes.hpp"
-#include "../common/JsonProcessingFunctions.hpp"
-#include "../common/TomlProcessingFunctions.hpp"
+#include "../common/configFileHelpers.hpp"
 #include "../common/addTargets.hpp"
 #include "../core/BrokerFactory.hpp"
 #include "../core/Core.hpp"
@@ -110,18 +109,6 @@ Federate::Federate(
     currentTime = coreObject->getCurrentTime(fedID);
     asyncCallInfo = std::make_unique<shared_guarded_m<AsyncFedCallInfo>>();
     fManager = std::make_unique<FilterFederateManager>(coreObject.get(), this, fedID);
-}
-
-static bool looksLikeFile(const std::string& configString)
-{
-    if (hasTomlExtension(configString)) {
-        return true;
-    }
-    if ((hasJsonExtension(configString)) ||
-        (configString.find_first_of('{') != std::string::npos)) {
-        return true;
-    }
-    return false;
 }
 
 Federate::Federate(const std::string& fedName, const std::string& configString):
@@ -731,7 +718,14 @@ void Federate::registerFilterInterfaces(const std::string& configString)
     if (hasTomlExtension(configString)) {
         registerFilterInterfacesToml(configString);
     } else {
-        registerFilterInterfacesJson(configString);
+        try
+        {
+            registerFilterInterfacesJson(configString);
+        }
+        catch (const std::invalid_argument &e)
+        {
+            throw(helics::InvalidParameter(e.what()));
+        }
     }
 }
 

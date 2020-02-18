@@ -28,6 +28,7 @@ class HELICS_CXX_EXPORT ValueFederate:
     @param fi  a federate information structure
     */
     ValueFederate(const std::string& fedName, const FederateInfo& fi);
+
     /**constructor taking a core and a federate information structure, sore information in fi is ignored
     @param fedName the name of the federate, can be empty to use the name from fi or an auto generated one
     @param core a shared ptr to a core to join
@@ -37,11 +38,20 @@ class HELICS_CXX_EXPORT ValueFederate:
         const std::string& fedName,
         const std::shared_ptr<Core>& core,
         const FederateInfo& fi);
+
+    /**constructor taking a CoreApp and a federate information structure
+    @param fedName the name of the federate can be empty to use a name from the federateInfo
+    @param core a CoreApp with the core to connect to.
+    @param fi  a federate information structure
+    */
+    ValueFederate(const std::string& fedName, CoreApp& core, const FederateInfo& fi);
+
     /**constructor taking a string with the required information
     @param configString can be either a JSON file a TOML file (with extension TOML) or a string containing JSON
     code
     */
     explicit ValueFederate(const std::string& configString);
+
     /**constructor taking a string with the required information
     @param fedName the name of the federate, can be empty to use the name from the configString
     @param configString can be either a JSON file a TOML file (with extension TOML) or a string containing JSON
@@ -55,6 +65,10 @@ class HELICS_CXX_EXPORT ValueFederate:
     /** special constructor called by child class to initialize the class vs the default constructor
      */
     explicit ValueFederate(bool res);
+
+    /** this is an overload for the string operation top deconflict with the bool version 
+     */
+    explicit ValueFederate(const char *configString);
 
   public:
     /** federate is not copyable*/
