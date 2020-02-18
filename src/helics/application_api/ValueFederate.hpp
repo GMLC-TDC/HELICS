@@ -496,21 +496,20 @@ class HELICS_CXX_EXPORT ValueFederate:
     @param target the name of the publication to remove
     */
     void removeTarget(const Input& inp, const std::string& target);
+
     /** add a 1-d Indexed target to an interface
    @details call is only valid in startup mode, register an optional subscription for a 1D array of values
    @param iObject an interface object to add the target to
    @param target the name of the target
    @param index1 the index into a 1 dimensional array of values
-   @param units the optional units on the subscription
    */
     template<class iType>
-    void addTargetIndexed(
+    void addIndexedTarget(
         const iType& iObject,
         const std::string& target,
-        int index1,
-        const std::string& units = std::string())
+        int index1)
     {
-        addTarget(iObject, target + '_' + std::to_string(index1), units);
+        addTarget(iObject, target + '_' + std::to_string(index1));
     }
 
     /** add an indexed target to an interface
@@ -519,18 +518,16 @@ class HELICS_CXX_EXPORT ValueFederate:
     @param target the name of the target
     @param index1 the first index of a 2-D value structure
     @param index2 the 2nd index of a 2-D value structure
-    @param units the optional units on the subscription
     */
     template<class iType>
-    void addTargetIndexed(
+    void addIndexedTarget(
         const iType& iObject,
         const std::string& target,
         int index1,
-        int index2,
-        const std::string& units = std::string())
+        int index2)
     {
         addTarget(
-            iObject, target + '_' + std::to_string(index1) + '_' + std::to_string(index2), units);
+            iObject, target + '_' + std::to_string(index1) + '_' + std::to_string(index2));
     }
 
     /** check if a given subscription has an update

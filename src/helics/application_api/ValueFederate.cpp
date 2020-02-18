@@ -6,8 +6,8 @@ SPDX-License-Identifier: BSD-3-Clause
 */
 #include "ValueFederate.hpp"
 
-#include "../common/configFileHelpers.hpp"
 #include "../common/addTargets.hpp"
+#include "../common/configFileHelpers.hpp"
 #include "../core/Core.hpp"
 #include "../core/core-exceptions.hpp"
 #include "../core/helics_definitions.hpp"
@@ -37,18 +37,17 @@ ValueFederate::ValueFederate(
     vfManager = std::make_unique<ValueFederateManager>(coreObject.get(), this, getID());
 }
 
-ValueFederate::ValueFederate(const std::string& fedName, CoreApp& core, const FederateInfo& fi) :
+ValueFederate::ValueFederate(const std::string& fedName, CoreApp& core, const FederateInfo& fi):
     Federate(fedName, core, fi)
 {
     vfManager = std::make_unique<ValueFederateManager>(coreObject.get(), this, getID());
 }
 
-ValueFederate::ValueFederate(const std::string& fedName, const std::string& configString) :
+ValueFederate::ValueFederate(const std::string& fedName, const std::string& configString):
     Federate(fedName, loadFederateInfo(configString))
 {
     vfManager = std::make_unique<ValueFederateManager>(coreObject.get(), this, getID());
-    if (looksLikeFile(configString))
-    {
+    if (looksLikeFile(configString)) {
         ValueFederate::registerInterfaces(configString);
     }
 }
@@ -58,12 +57,10 @@ ValueFederate::ValueFederate(const std::string& configString):
 {
 }
 
-
-ValueFederate::ValueFederate(const char *configString) :
-    ValueFederate(std::string{}, std::string{ configString })
+ValueFederate::ValueFederate(const char* configString):
+    ValueFederate(std::string{}, std::string{configString})
 {
 }
-
 
 ValueFederate::ValueFederate() = default;
 
@@ -238,12 +235,11 @@ void ValueFederate::registerValueInterfacesJson(const std::string& jsonString)
                 bool global = getOrDefault(pub, "global", defaultGlobal);
                 if (global) {
                     pubAct = &registerGlobalPublication(key, type, units);
-                }
-                else {
+                } else {
                     pubAct = &registerPublication(key, type, units);
                 }
             }
-            
+
             loadOptions(this, pub, *pubAct);
         }
     }
@@ -256,7 +252,6 @@ void ValueFederate::registerValueInterfacesJson(const std::string& jsonString)
                 auto type = getOrDefault(sub, "type", emptyStr);
                 auto units = getOrDefault(sub, "units", emptyStr);
                 subAct = &registerInput(emptyStr, type, units);
-                
             }
             subAct->addTarget(key);
             loadOptions(this, sub, *subAct);
@@ -274,12 +269,11 @@ void ValueFederate::registerValueInterfacesJson(const std::string& jsonString)
                 bool global = getOrDefault(ipt, "global", defaultGlobal);
                 if (global) {
                     inp = &registerGlobalInput(key, type, units);
-                }
-                else {
+                } else {
                     inp = &registerInput(key, type, units);
                 }
             }
-           
+
             loadOptions(this, ipt, *inp);
         }
     }
@@ -300,7 +294,7 @@ void ValueFederate::registerValueInterfacesToml(const std::string& tomlString)
     if (isMember(doc, "publications")) {
         auto pubs = toml::find(doc, "publications");
         if (!pubs.is_array()) {
-            throw(helics::InvalidParameter("filters section in yoml file must be an array"));
+            throw(helics::InvalidParameter("publications section in toml file must be an array"));
         }
         auto& pubArray = pubs.as_array();
         for (const auto& pub : pubArray) {
@@ -313,8 +307,7 @@ void ValueFederate::registerValueInterfacesToml(const std::string& tomlString)
                 bool global = getOrDefault(pub, "global", defaultGlobal);
                 if (global) {
                     pubObj = &registerGlobalPublication(key, type, units);
-                }
-                else {
+                } else {
                     pubObj = &registerPublication(key, type, units);
                 }
             }
@@ -357,12 +350,11 @@ void ValueFederate::registerValueInterfacesToml(const std::string& tomlString)
                 bool global = getOrDefault(ipt, "global", defaultGlobal);
                 if (global) {
                     id = &registerGlobalInput(key, type, units);
-                }
-                else {
+                } else {
                     id = &registerInput(key, type, units);
                 }
             }
-           
+
             loadOptions(this, ipt, *id);
         }
     }
@@ -411,35 +403,31 @@ static void generateData(
     char separator,
     Json::Value val)
 {
-    if (val.isObject()) {
-        auto mn = val.getMemberNames();
-        for (auto& name : mn) {
-            auto so = val[name];
-            if (so.isObject()) {
-                generateData(vpairs, prefix + name + separator, separator, so);
-            } else {
-                if (so.isDouble()) {
-                    vpairs.emplace_back(prefix + name, so.asDouble());
-                } else {
-                    vpairs.emplace_back(prefix + name, so.asString());
-                }
-            }
-        }
-    } else {
-        if (val.isDouble()) {
-            vpairs.emplace_back(prefix, val.asDouble());
+    auto mn = val.getMemberNames();
+    for (auto& name : mn) {
+        auto so = val[name];
+        if (so.isObject()) {
+            generateData(vpairs, prefix + name + separator, separator, so);
         } else {
-            vpairs.emplace_back(prefix, val.asString());
+            if (so.isDouble()) {
+                vpairs.emplace_back(prefix + name, so.asDouble());
+            } else {
+                vpairs.emplace_back(prefix + name, so.asString());
+            }
         }
     }
 }
 
 void ValueFederate::registerFromPublicationJSON(const std::string& jsonString)
 {
-    auto jv = [&]() {try { return loadJson(jsonString); }
-    catch (const std::invalid_argument &) {
-        throw(helics::InvalidParameter("unable to load file or string"));
-    }}();
+    auto jv = [&]() {
+        try {
+            return loadJson(jsonString);
+        }
+        catch (const std::invalid_argument&) {
+            throw(helics::InvalidParameter("unable to load file or string"));
+        }
+    }();
 
     std::vector<std::pair<std::string, dvalue>> vpairs;
     generateData(vpairs, "", nameSegmentSeparator, jv);
@@ -460,10 +448,14 @@ void ValueFederate::registerFromPublicationJSON(const std::string& jsonString)
 
 void ValueFederate::publishJSON(const std::string& jsonString)
 {
-    auto jv = [&]() {try { return loadJson(jsonString); }
-    catch (const std::invalid_argument &) {
-        throw(helics::InvalidParameter("unable to load file or string"));
-    }}();
+    auto jv = [&]() {
+        try {
+            return loadJson(jsonString);
+        }
+        catch (const std::invalid_argument&) {
+            throw(helics::InvalidParameter("unable to load file or string"));
+        }
+    }();
     std::vector<std::pair<std::string, dvalue>> vpairs;
     generateData(vpairs, "", nameSegmentSeparator, jv);
 

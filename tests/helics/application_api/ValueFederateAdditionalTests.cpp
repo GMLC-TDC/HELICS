@@ -6,12 +6,12 @@ SPDX-License-Identifier: BSD-3-Clause
 */
 
 #include "ValueFederateTestTemplates.hpp"
+#include "helics/application_api/CoreApp.hpp"
 #include "helics/application_api/Publications.hpp"
 #include "helics/application_api/Subscriptions.hpp"
 #include "helics/application_api/ValueFederate.hpp"
-#include "helics/application_api/CoreApp.hpp"
-#include "helics/core/CoreFactory.hpp"
 #include "helics/core/BrokerFactory.hpp"
+#include "helics/core/CoreFactory.hpp"
 #include "testFixtures.hpp"
 
 #include <future>
@@ -605,6 +605,21 @@ TEST_P(valuefed_add_configfile_tests, file_load)
     vFed.disconnect();
 }
 
+TEST(valuefed_json_tests, file_loadb)
+{
+    helics::ValueFederate vFed(std::string(TEST_DIR) + "example_value_fed_testb.json");
+
+    EXPECT_EQ(vFed.getName(), "valueFed2");
+
+    EXPECT_EQ(vFed.getInputCount(), 3);
+    EXPECT_EQ(vFed.getPublicationCount(), 2);
+    auto& id = vFed.getPublication("primary");
+
+    EXPECT_EQ(id.getName(), "valueFed2/pub2");
+    
+    vFed.disconnect();
+}
+
 INSTANTIATE_TEST_SUITE_P(
     valuefed_tests,
     valuefed_add_configfile_tests,
@@ -680,6 +695,36 @@ TEST(valuefed_json_tests, test_json_register_publish)
     vFed.disconnect();
 }
 
+TEST(valuefed_json_tests, test_json_register_publish_error)
+{
+    helics::FederateInfo fi(helics::core_type::TEST);
+    fi.separator = '/';
+    fi.coreInitString = "--autobroker";
+    helics::ValueFederate vFed("test2", fi);
+
+    vFed.registerPublication<double>("pub1");
+    //this tests an already registered publication
+    vFed.registerFromPublicationJSON(std::string(TEST_DIR) + "example_pub_input1.json");
+    auto& s1 = vFed.registerSubscription("test2/pub1");
+    auto& s2 = vFed.registerSubscription("test2/pub2");
+    auto& s3 = vFed.registerSubscription("test2/group1/pubA");
+    auto& s4 = vFed.registerSubscription("test2/group1/pubB");
+
+    EXPECT_NO_THROW(vFed.registerFromPublicationJSON("{\"pub3\":45}"));
+    auto & s5 = vFed.registerSubscription("test2/pub3");
+    vFed.enterExecutingMode();
+
+    vFed.publishJSON(std::string(TEST_DIR) + "example_pub_input1.json");
+    EXPECT_NO_THROW(vFed.publishJSON("{\"pub3\":45}"));
+    vFed.requestTime(1.0);
+    EXPECT_EQ(s1.getValue<double>(), 99.9);
+    EXPECT_EQ(s2.getValue<std::string>(), "things");
+    EXPECT_EQ(s3.getValue<double>(), 45.7);
+    EXPECT_EQ(s4.getValue<std::string>(), "count");
+    EXPECT_EQ(s5.getValue<double>(), 45.0);
+    vFed.disconnect();
+}
+
 INSTANTIATE_TEST_SUITE_P(
     valuefed_tests,
     valuefed_add_single_type_tests_ci_skip,
@@ -692,8 +737,6 @@ INSTANTIATE_TEST_SUITE_P(
     valuefed_tests,
     valuefed_add_all_type_tests_ci_skip,
     ::testing::ValuesIn(core_types_all));
-
-
 
 TEST(valuefederate, coreApp)
 {
@@ -743,11 +786,11 @@ TEST(valuefederate, pubAlias)
     fi.coreInitString = "-f 1 --autobroker";
 
     auto Fed1 = std::make_shared<helics::ValueFederate>("vfed1", fi);
-    auto &pub1 = Fed1->registerPublication<double>("", "parsecs");
+    auto& pub1 = Fed1->registerPublication<double>("", "parsecs");
 
     Fed1->addAlias(pub1, "localPub");
 
-    auto &pub_a = Fed1->getPublication("localPub");
+    auto& pub_a = Fed1->getPublication("localPub");
 
     EXPECT_EQ(pub_a.getUnits(), pub1.getUnits());
     EXPECT_EQ(pub_a.getUnits(), "parsecs");
@@ -771,7 +814,6 @@ TEST(valuefederate, regJsonFailures)
     Fed1->finalize();
 }
 
-
 TEST(valuefederate, getInputs)
 {
     helics::FederateInfo fi(helics::core_type::TEST);
@@ -780,17 +822,17 @@ TEST(valuefederate, getInputs)
 
     auto Fed1 = std::make_shared<helics::ValueFederate>("vfed1", fi);
 
-    auto &id1=Fed1->registerInput("inp1", "double", "V");
+    auto& id1 = Fed1->registerInput("inp1", "double", "V");
 
     Fed1->enterExecutingMode();
 
-    auto &ip2 = Fed1->getInput("inp1");
+    auto& ip2 = Fed1->getInput("inp1");
     EXPECT_TRUE(ip2.isValid());
     EXPECT_EQ(ip2.getName(), id1.getName());
 
-    auto &cFed = *Fed1;
+    auto& cFed = *Fed1;
 
-    auto &ip3 = cFed.getInput(0);
+    auto& ip3 = cFed.getInput(0);
     EXPECT_TRUE(ip3.isValid());
     EXPECT_EQ(ip3.getName(), id1.getName());
     Fed1->finalize();
@@ -804,29 +846,27 @@ TEST(valuefederate, indexed_inputs)
 
     auto Fed1 = std::make_shared<helics::ValueFederate>("vfed1", fi);
 
-    auto &id0 = Fed1->registerIndexedInput<double>("inp", 0, "V");
-    auto &id1 = Fed1->registerIndexedInput<double>("inp", 1, "V");
+    auto& id0 = Fed1->registerIndexedInput<double>("inp", 0, "V");
+    auto& id1 = Fed1->registerIndexedInput<double>("inp", 1, "V");
 
-    auto &id2 = Fed1->registerIndexedInput<double>("inp", 1,1, "A");
+    auto& id2 = Fed1->registerIndexedInput<double>("inp", 1, 1, "A");
 
     Fed1->enterExecutingMode();
 
-    auto &ip2 = Fed1->getInput("inp",0);
+    auto& ip2 = Fed1->getInput("inp", 0);
     EXPECT_TRUE(ip2.isValid());
     EXPECT_EQ(ip2.getName(), id0.getName());
 
-    auto &ip3 = Fed1->getInput("inp", 1);
+    auto& ip3 = Fed1->getInput("inp", 1);
     EXPECT_TRUE(ip3.isValid());
     EXPECT_EQ(ip3.getName(), id1.getName());
 
-    auto &ip4 = Fed1->getInput("inp", 1,1);
+    auto& ip4 = Fed1->getInput("inp", 1, 1);
     EXPECT_TRUE(ip4.isValid());
     EXPECT_EQ(ip4.getName(), id2.getName());
 
     Fed1->finalize();
 }
-
-
 
 TEST(valuefederate, indexed_pubs)
 {
@@ -836,41 +876,45 @@ TEST(valuefederate, indexed_pubs)
 
     auto Fed1 = std::make_shared<helics::ValueFederate>("vfed1", fi);
 
-    auto &pz = Fed1->registerGlobalPublication<double>("pubg", "volt*meters");
+    auto& pz = Fed1->registerGlobalPublication<double>("pubg", "volt*meters");
 
-    auto &p0 = Fed1->registerIndexedPublication<double>("pub", 0, "V");
-    auto &p1 = Fed1->registerIndexedPublication<double>("pub", 1, "V");
+    auto& p0 = Fed1->registerIndexedPublication<double>("pub", 0, "V");
+    auto& p1 = Fed1->registerIndexedPublication<double>("pub", 1, "V");
 
-    auto &p2 = Fed1->registerIndexedPublication<double>("pub", 1, 1, "A");
+    auto& p2 = Fed1->registerIndexedPublication<double>("pub", 1, 1, "A");
+
+    Fed1->registerSubscription("pubg");
 
     Fed1->enterExecutingMode();
 
-    auto &ip2 = Fed1->getPublication("pub", 0);
+    auto& ip2 = Fed1->getPublication("pub", 0);
     EXPECT_TRUE(ip2.isValid());
     EXPECT_EQ(ip2.getName(), p0.getName());
 
-    auto &ip3 = Fed1->getPublication("pub", 1);
+    auto& ip3 = Fed1->getPublication("pub", 1);
     EXPECT_TRUE(ip3.isValid());
     EXPECT_EQ(ip3.getName(), p1.getName());
 
-    auto &ip4 = Fed1->getPublication("pub", 1, 1);
+    auto& ip4 = Fed1->getPublication("pub", 1, 1);
     EXPECT_TRUE(ip4.isValid());
     EXPECT_EQ(ip4.getName(), p2.getName());
 
+    const auto& cFed = *Fed1;
 
-    auto &cFed = *Fed1;
-
-    auto &pg3 = cFed.getPublication(0);
+    auto& pg3 = cFed.getPublication(0);
     EXPECT_TRUE(pg3.isValid());
     EXPECT_EQ(pg3.getName(), pz.getName());
 
-    auto &pg4 = cFed.getPublication("pubg");
+    auto& pg4 = cFed.getPublication("pubg");
     EXPECT_TRUE(pg4.isValid());
     EXPECT_EQ(pg4.getName(), pz.getName());
 
+    auto & gs = cFed.getSubscription("pubg");
+    EXPECT_TRUE(gs.isValid());
+    EXPECT_EQ(gs.getTarget(), "pubg");
+
     Fed1->finalize();
 }
-
 
 TEST(valuefederate, update_query)
 {
@@ -879,11 +923,15 @@ TEST(valuefederate, update_query)
     fi.coreInitString = "-f 1 --autobroker";
 
     auto Fed1 = std::make_shared<helics::ValueFederate>("vfed1", fi);
-    auto &p1=Fed1->registerGlobalPublication<int64_t>("pub1");
-    auto &p2=Fed1->registerGlobalPublication<int64_t>("pub2");
+    auto& p1 = Fed1->registerIndexedPublication<int64_t>("pub", 1);
+    auto& p2 = Fed1->registerIndexedPublication<int64_t>("pub", 2);
+    auto& p3 = Fed1->registerIndexedPublication<int64_t>("pubb", 1, 1);
+    
 
-    auto &s1 = Fed1->registerSubscription("pub1");
-    auto &s2 = Fed1->registerSubscription("pub2");
+    auto& s1 = Fed1->registerIndexedSubscription("pub", 1);
+    auto& s2 = Fed1->registerIndexedSubscription("pub", 2);
+    auto& s3 = Fed1->registerIndexedSubscription("pubb", 1, 1);
+
 
     Fed1->enterExecutingMode();
     p1.publish(5);
@@ -910,6 +958,57 @@ TEST(valuefederate, update_query)
     ASSERT_EQ(upd.size(), 2U);
     EXPECT_EQ(upd[0], 0);
 
-    Fed1->finalize();
+    p1.publish(8);
+    p2.publish(9);
+    p3.publish(10);
+    Fed1->requestNextStep();
 
+    upd = Fed1->queryUpdates();
+    EXPECT_TRUE(s1.isUpdated());
+    EXPECT_TRUE(s2.isUpdated());
+    EXPECT_TRUE(s3.isUpdated());
+
+    Fed1->clearUpdates();
+    ASSERT_EQ(upd.size(), 3U);
+    EXPECT_EQ(upd[0], 0);
+    Fed1->requestNextStep();
+
+    upd = Fed1->queryUpdates();
+    EXPECT_EQ(upd.size(), 0U);
+
+    
+
+    Fed1->finalize();
+}
+
+TEST(valuefederate, indexed_targets)
+{
+    helics::FederateInfo fi(helics::core_type::TEST);
+    fi.coreName = "core_ind_target";
+    fi.coreInitString = "-f 1 --autobroker";
+
+    auto Fed1 = std::make_shared<helics::ValueFederate>("vfed1", fi);
+    auto& p1 = Fed1->registerIndexedPublication<int64_t>("pub", 1);
+    auto& p2 = Fed1->registerIndexedPublication<int64_t>("pub", 2);
+    auto& p3 = Fed1->registerIndexedPublication<int64_t>("pubb", 1, 1);
+
+    auto& s1 = Fed1->registerInput<int64_t>("");
+    auto& s2 = Fed1->registerInput<int64_t>("");
+    auto& s3 = Fed1->registerInput<int64_t>("");
+
+    Fed1->addIndexedTarget(s1, "pub", 1);
+    Fed1->addIndexedTarget(s2, "pub", 2);
+    Fed1->addIndexedTarget(s3, "pubb", 1, 1);
+    Fed1->enterExecutingMode();
+
+    p1.publish(8);
+    p2.publish(9);
+    p3.publish(10);
+    Fed1->requestNextStep();
+
+    EXPECT_EQ(s1.getValue<int64_t>(), 8);
+    EXPECT_EQ(s2.getValue<int64_t>(), 9);
+    EXPECT_EQ(s3.getValue<int64_t>(), 10);
+
+    Fed1->finalize();
 }
