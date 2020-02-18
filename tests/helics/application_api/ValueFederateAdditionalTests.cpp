@@ -629,6 +629,7 @@ TEST(valuefed_json_tests, json_publish)
 {
     helics::FederateInfo fi(helics::core_type::TEST);
     fi.separator = '/';
+    fi.coreName = "json_test2";
     fi.coreInitString = "--autobroker";
     helics::ValueFederate vFed("test2", fi);
     vFed.registerGlobalPublication<double>("pub1");
@@ -668,6 +669,7 @@ TEST(valuefed_json_tests, test_json_register_publish)
 {
     helics::FederateInfo fi(helics::core_type::TEST);
     fi.separator = '/';
+    fi.coreName = "core_pub_json";
     fi.coreInitString = "--autobroker";
     helics::ValueFederate vFed("test2", fi);
 
@@ -777,6 +779,23 @@ TEST(valuefederate, from_file_bad2)
     helics::CoreFactory::terminateAllCores();
     auto fstr2 = "non_existing.toml";
     EXPECT_THROW(std::make_shared<helics::ValueFederate>(fstr2), helics::InvalidParameter);
+}
+
+TEST(valuefederate, from_file_bad3)
+{
+    helics::BrokerFactory::terminateAllBrokers();
+    helics::CoreFactory::terminateAllCores();
+
+    helics::FederateInfo fi(helics::core_type::TEST);
+    fi.coreName = "core_bad_toml";
+    fi.coreInitString = "-f 1 --autobroker";
+
+    auto Fed1 = std::make_shared<helics::ValueFederate>("vfedb", fi);
+
+    auto fstr2 = "non_existing.toml";
+    EXPECT_THROW(Fed1->registerInterfaces(fstr2), helics::InvalidParameter);
+    Fed1->finalize();
+
 }
 
 TEST(valuefederate, pubAlias)
