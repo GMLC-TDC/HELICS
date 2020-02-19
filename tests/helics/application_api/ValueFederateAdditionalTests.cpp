@@ -622,6 +622,29 @@ TEST(valuefed_json_tests, file_loadb)
     helics::CoreFactory::terminateAllCores();
 }
 
+
+TEST(valuefederate, toml_file_loadb)
+{
+    helics::ValueFederate vFed(std::string(TEST_DIR) + "example_value_fed_testb.toml");
+
+    EXPECT_EQ(vFed.getName(), "valueFed_toml");
+
+    EXPECT_EQ(vFed.getInputCount(), 3);
+    EXPECT_EQ(vFed.getPublicationCount(), 2);
+    auto& id = vFed.getPublication("primary");
+
+    EXPECT_EQ(id.getName(), "valueFed_toml/pub2");
+    vFed.enterExecutingMode();
+    vFed.disconnect();
+}
+
+TEST(valuefederate, toml_file_bad)
+{
+    EXPECT_THROW(helics::ValueFederate vFed(std::string(TEST_DIR) + "example_value_fed_bad.toml"), helics::InvalidParameter);
+    helics::BrokerFactory::terminateAllBrokers();
+    helics::CoreFactory::terminateAllCores();
+}
+
 INSTANTIATE_TEST_SUITE_P(
     valuefed_tests,
     valuefed_add_configfile_tests,
