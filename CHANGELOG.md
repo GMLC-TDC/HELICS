@@ -15,14 +15,17 @@ Increased code coverage and additional bug fixes.
 -   The helics webserver will build by default if the conditions are met
 -   Update filesystem library to [v1.3.0](https://github.com/gulrak/filesystem/releases/tag/v1.3.0)
 -   The behavior of the Federate *Complete operations to be uniform and consistent
+-   Configuration of flags and targets for interfaces in json and toml files can be done in multiple sections
 
 ### Fixed
 -   Issue with iterative requests that were not being honored if the federate was acting in isolation
 -   A few pathways which would allow segmentation faults if a federate was disconnected and particular functions were called
+-   ValueFederate add indexedTargets, the function template would not work is was written and was unusable.  
 
 ### Added
 -   `HELICS_DISABLE_WEBSERVER` option to turn off building of the webserver.  It will build by default if Boost is enabled and is version 1.70 or higher; otherwise it is disabled.
 -   A series of test for Federate.cpp to increase coverage on that file to 100% 
+-   A series of tests for ValueFederate.*pp to increase coverage on that file to 100%
 
 ### Deprecated 
 
