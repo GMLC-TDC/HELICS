@@ -618,6 +618,8 @@ TEST(valuefed_json_tests, file_loadb)
     EXPECT_EQ(id.getName(), "valueFed2/pub2");
     
     vFed.disconnect();
+    helics::BrokerFactory::terminateAllBrokers();
+    helics::CoreFactory::terminateAllCores();
 }
 
 INSTANTIATE_TEST_SUITE_P(
@@ -627,6 +629,8 @@ INSTANTIATE_TEST_SUITE_P(
 
 TEST(valuefed_json_tests, json_publish)
 {
+    helics::BrokerFactory::terminateAllBrokers();
+    helics::CoreFactory::terminateAllCores();
     helics::FederateInfo fi(helics::core_type::TEST);
     fi.separator = '/';
     fi.coreName = "json_test2";
@@ -667,6 +671,8 @@ TEST(valuefed_json_tests, json_publish)
 
 TEST(valuefed_json_tests, test_json_register_publish)
 {
+    helics::BrokerFactory::terminateAllBrokers();
+    helics::CoreFactory::terminateAllCores();
     helics::FederateInfo fi(helics::core_type::TEST);
     fi.separator = '/';
     fi.coreName = "core_pub_json";
