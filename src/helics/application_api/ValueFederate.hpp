@@ -68,7 +68,7 @@ class HELICS_CXX_EXPORT ValueFederate:
 
     /** this is an overload for the string operation top deconflict with the bool version 
      */
-    explicit ValueFederate(const char *configString);
+    explicit ValueFederate(const char* configString);
 
   public:
     /** federate is not copyable*/
@@ -504,10 +504,7 @@ class HELICS_CXX_EXPORT ValueFederate:
    @param index1 the index into a 1 dimensional array of values
    */
     template<class iType>
-    void addIndexedTarget(
-        const iType& iObject,
-        const std::string& target,
-        int index1)
+    void addIndexedTarget(const iType& iObject, const std::string& target, int index1)
     {
         addTarget(iObject, target + '_' + std::to_string(index1));
     }
@@ -520,14 +517,9 @@ class HELICS_CXX_EXPORT ValueFederate:
     @param index2 the 2nd index of a 2-D value structure
     */
     template<class iType>
-    void addIndexedTarget(
-        const iType& iObject,
-        const std::string& target,
-        int index1,
-        int index2)
+    void addIndexedTarget(const iType& iObject, const std::string& target, int index1, int index2)
     {
-        addTarget(
-            iObject, target + '_' + std::to_string(index1) + '_' + std::to_string(index2));
+        addTarget(iObject, target + '_' + std::to_string(index1) + '_' + std::to_string(index2));
     }
 
     /** check if a given subscription has an update
