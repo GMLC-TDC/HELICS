@@ -801,11 +801,16 @@ TEST(valuefederate, from_file_bad3)
     auto fstr2 = "non_existing.toml";
     EXPECT_THROW(Fed1->registerInterfaces(fstr2), helics::InvalidParameter);
     Fed1->finalize();
+    helics::BrokerFactory::terminateAllBrokers();
+    helics::CoreFactory::terminateAllCores();
 
 }
 
 TEST(valuefederate, pubAlias)
 {
+    helics::BrokerFactory::terminateAllBrokers();
+    helics::CoreFactory::terminateAllCores();
+
     helics::FederateInfo fi(helics::core_type::TEST);
     fi.coreName = "core_alias";
     fi.coreInitString = "-f 1 --autobroker";
