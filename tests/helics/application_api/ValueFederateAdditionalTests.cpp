@@ -860,11 +860,15 @@ TEST(valuefederate, getInputs)
     EXPECT_TRUE(ip2.isValid());
     EXPECT_EQ(ip2.getName(), id1.getName());
 
-    auto& cFed = *Fed1;
+    const auto& cFed = *Fed1;
 
     auto& ip3 = cFed.getInput(0);
     EXPECT_TRUE(ip3.isValid());
     EXPECT_EQ(ip3.getName(), id1.getName());
+
+    auto& ip4 = cFed.getInput("inp1");
+    EXPECT_TRUE(ip4.isValid());
+    EXPECT_EQ(ip4.getName(), id1.getName());
     Fed1->finalize();
 }
 
@@ -908,6 +912,8 @@ TEST(valuefederate, indexed_pubs)
 
     auto& pz = Fed1->registerGlobalPublication<double>("pubg", "volt*meters");
 
+    auto& plocal = Fed1->registerPublication<double>("publocal", "W");
+
     auto& p0 = Fed1->registerIndexedPublication<double>("pub", 0, "V");
     auto& p1 = Fed1->registerIndexedPublication<double>("pub", 1, "V");
 
@@ -942,6 +948,10 @@ TEST(valuefederate, indexed_pubs)
     auto & gs = cFed.getSubscription("pubg");
     EXPECT_TRUE(gs.isValid());
     EXPECT_EQ(gs.getTarget(), "pubg");
+
+    auto& pg5 = cFed.getPublication("publocal");
+    EXPECT_TRUE(pg5.isValid());
+    EXPECT_EQ(pg5.getName(), plocal.getName());
 
     Fed1->finalize();
 }
