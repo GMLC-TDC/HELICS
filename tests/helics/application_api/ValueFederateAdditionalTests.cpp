@@ -876,7 +876,6 @@ TEST(valuefederate, getInputs)
     auto Fed1 = std::make_shared<helics::ValueFederate>("vfed1", fi);
 
     auto& id1 = Fed1->registerInput("inp1", "double", "V");
-
     Fed1->enterExecutingMode();
 
     auto& ip2 = Fed1->getInput("inp1");
@@ -892,6 +891,10 @@ TEST(valuefederate, getInputs)
     auto& ip4 = cFed.getInput("inp1");
     EXPECT_TRUE(ip4.isValid());
     EXPECT_EQ(ip4.getName(), id1.getName());
+
+    auto& ip5 = cFed.getInput("vfed1/inp1");
+    EXPECT_TRUE(ip5.isValid());
+    EXPECT_EQ(ip5.getName(), id1.getName());
     Fed1->finalize();
 }
 
