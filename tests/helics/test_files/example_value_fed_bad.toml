@@ -1,5 +1,4 @@
-#this is a toml configuration file for HELICS value federate
-#example toml configuration file for a value federate all arguments are optional
+#this is a incorrect toml file for testing some file checks.  The publications should be an array instead of a single value
 
 name="vFed_toml" # the name of the federate
 
