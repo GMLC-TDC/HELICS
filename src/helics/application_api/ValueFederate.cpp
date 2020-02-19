@@ -318,7 +318,8 @@ void ValueFederate::registerValueInterfacesToml(const std::string& tomlString)
         auto subs = toml::find(doc, "subscriptions");
         if (!subs.is_array()) {
             //this line is tested in the publications section so not really necessary to check again since it is an expensive test
-            throw(helics::InvalidParameter("subscriptions section in toml file must be an array")); // LCOV_EXCL_LINE
+            throw(helics::InvalidParameter(
+                "subscriptions section in toml file must be an array")); // LCOV_EXCL_LINE
         }
         auto& subArray = subs.as_array();
         for (const auto& sub : subArray) {
@@ -338,7 +339,8 @@ void ValueFederate::registerValueInterfacesToml(const std::string& tomlString)
     if (isMember(doc, "inputs")) {
         auto ipts = toml::find(doc, "inputs");
         if (!ipts.is_array()) {
-            throw(helics::InvalidParameter("inputs section in toml file must be an array")); // LCOV_EXCL_LINE
+            throw(helics::InvalidParameter(
+                "inputs section in toml file must be an array")); // LCOV_EXCL_LINE
         }
         auto& iptArray = ipts.as_array();
         for (const auto& ipt : iptArray) {

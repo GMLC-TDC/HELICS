@@ -616,12 +616,11 @@ TEST(valuefed_json_tests, file_loadb)
     auto& id = vFed.getPublication("primary");
 
     EXPECT_EQ(id.getName(), "valueFed2/pub2");
-    
+
     vFed.disconnect();
     helics::BrokerFactory::terminateAllBrokers();
     helics::CoreFactory::terminateAllCores();
 }
-
 
 TEST(valuefederate, toml_file_loadb)
 {
@@ -640,7 +639,9 @@ TEST(valuefederate, toml_file_loadb)
 
 TEST(valuefederate, toml_file_bad)
 {
-    EXPECT_THROW(helics::ValueFederate vFed(std::string(TEST_DIR) + "example_value_fed_bad.toml"), helics::InvalidParameter);
+    EXPECT_THROW(
+        helics::ValueFederate vFed(std::string(TEST_DIR) + "example_value_fed_bad.toml"),
+        helics::InvalidParameter);
     helics::BrokerFactory::terminateAllBrokers();
     helics::CoreFactory::terminateAllCores();
 }
@@ -742,7 +743,7 @@ TEST(valuefed_json_tests, test_json_register_publish_error)
     auto& s4 = vFed.registerSubscription("test2/group1/pubB");
 
     EXPECT_NO_THROW(vFed.registerFromPublicationJSON("{\"pub3\":45}"));
-    auto & s5 = vFed.registerSubscription("test2/pub3");
+    auto& s5 = vFed.registerSubscription("test2/pub3");
     vFed.enterExecutingMode();
 
     vFed.publishJSON(std::string(TEST_DIR) + "example_pub_input1.json");
@@ -826,7 +827,6 @@ TEST(valuefederate, from_file_bad3)
     Fed1->finalize();
     helics::BrokerFactory::terminateAllBrokers();
     helics::CoreFactory::terminateAllCores();
-
 }
 
 TEST(valuefederate, pubAlias)
@@ -971,7 +971,7 @@ TEST(valuefederate, indexed_pubs)
     EXPECT_TRUE(pg4.isValid());
     EXPECT_EQ(pg4.getName(), pz.getName());
 
-    auto & gs = cFed.getSubscription("pubg");
+    auto& gs = cFed.getSubscription("pubg");
     EXPECT_TRUE(gs.isValid());
     EXPECT_EQ(gs.getTarget(), "pubg");
 
@@ -992,12 +992,10 @@ TEST(valuefederate, update_query)
     auto& p1 = Fed1->registerIndexedPublication<int64_t>("pub", 1);
     auto& p2 = Fed1->registerIndexedPublication<int64_t>("pub", 2);
     auto& p3 = Fed1->registerIndexedPublication<int64_t>("pubb", 1, 1);
-    
 
     auto& s1 = Fed1->registerIndexedSubscription("pub", 1);
     auto& s2 = Fed1->registerIndexedSubscription("pub", 2);
     auto& s3 = Fed1->registerIndexedSubscription("pubb", 1, 1);
-
 
     Fed1->enterExecutingMode();
     p1.publish(5);
@@ -1041,8 +1039,6 @@ TEST(valuefederate, update_query)
 
     upd = Fed1->queryUpdates();
     EXPECT_EQ(upd.size(), 0U);
-
-    
 
     Fed1->finalize();
 }
