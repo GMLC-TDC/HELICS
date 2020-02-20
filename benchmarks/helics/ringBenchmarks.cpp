@@ -5,11 +5,7 @@ the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 
-#include "helics/application_api/Inputs.hpp"
-#include "helics/application_api/Publications.hpp"
-#include "helics/application_api/Subscriptions.hpp"
-#include "helics/application_api/ValueFederate.hpp"
-#include "helics/core/ActionMessage.hpp"
+#include "RingTransmitFederate.hpp"
 #include "helics/core/BrokerFactory.hpp"
 #include "helics/core/CoreFactory.hpp"
 #include "helics/helics-config.h"
@@ -20,86 +16,6 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <gmlc/concurrency/Barrier.hpp>
 #include <iostream>
 #include <thread>
-
-using helics::operator"" _t;
-// static constexpr helics::Time tend = 3600.0_t;  // simulation end time
-using namespace helics;
-/** class implementing a token ring using a value being passed as the token*/
-class RingTransmit {
-  public:
-    helics::Time deltaTime = helics::Time(10, time_units::ns); // sampling rate
-    helics::Time finalTime = helics::Time(5000, time_units::ns); // final time
-    int loopCount = 0;
-
-  private:
-    std::unique_ptr<helics::ValueFederate> vFed;
-    helics::Publication* pub = nullptr;
-    helics::Input* sub = nullptr;
-
-    int index_ = 0;
-    int maxIndex_ = 0;
-    bool initialized{false};
-    bool readyToRun{false};
-
-  public:
-    RingTransmit() = default;
-
-    void run(std::function<void()> callOnReady = nullptr)
-    {
-        makeReady();
-        if (callOnReady) {
-            callOnReady();
-        }
-        mainLoop();
-    };
-
-    void initialize(const std::string& coreName, int index, int maxIndex)
-    {
-        std::string name = "ringlink_" + std::to_string(index);
-        index_ = index;
-        maxIndex_ = maxIndex;
-        helics::FederateInfo fi;
-        fi.coreName = coreName;
-        fi.setFlagOption(helics_flag_restrictive_time_policy);
-        if (index == 0) {
-            // fi.setProperty (helics_property_int_log_level, helics_log_level_timing);
-        }
-        vFed = std::make_unique<helics::ValueFederate>(name, fi);
-        pub = &vFed->registerIndexedPublication<std::string>("pub", index_);
-        sub = &vFed->registerIndexedSubscription("pub", (index_ == 0) ? maxIndex_ - 1 : index_ - 1);
-
-        initialized = true;
-    }
-
-    void makeReady()
-    {
-        if (!initialized) {
-            throw("must initialize first");
-        }
-        vFed->enterExecutingMode();
-        readyToRun = true;
-    }
-
-    void mainLoop()
-    {
-        if (index_ == 0) {
-            std::string txstring(100, '1');
-            pub->publish(txstring);
-            ++loopCount;
-        }
-        auto nextTime = deltaTime;
-
-        while (nextTime < finalTime) {
-            nextTime = vFed->requestTime(finalTime);
-            if (vFed->isUpdated(*sub)) {
-                auto& nstring = vFed->getString(*sub);
-                vFed->publish(*pub, nstring);
-                ++loopCount;
-            }
-        }
-        vFed->finalize();
-    }
-};
 
 static void BMring2_singleCore(benchmark::State& state)
 {
@@ -112,7 +28,8 @@ static void BMring2_singleCore(benchmark::State& state)
 
         std::vector<RingTransmit> links(feds);
         for (int ii = 0; ii < feds; ++ii) {
-            links[ii].initialize(wcore->getIdentifier(), ii, feds);
+            std::string bmInit = "--index=" + std::to_string(ii) + " --max_index=" + std::to_string(feds);
+            links[ii].initialize(wcore->getIdentifier(), bmInit);
         }
 
         std::thread rthread(
@@ -159,7 +76,8 @@ static void BMring_multiCore(benchmark::State& state, core_type cType)
                 std::string(
                     "--log_level=no_print --federates=1 --broker=" + broker->getIdentifier()));
             cores[ii]->connect();
-            links[ii].initialize(cores[ii]->getIdentifier(), ii, feds);
+            std::string bmInit = "--index=" + std::to_string(ii) + " --max_index=" + std::to_string(feds);
+            links[ii].initialize(cores[ii]->getIdentifier(), bmInit);
         }
         std::vector<std::thread> threadlist(feds - 1);
         for (int ii = 0; ii < feds - 1; ++ii) {

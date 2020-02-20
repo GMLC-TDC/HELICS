@@ -21,6 +21,16 @@ set(HELICS_BENCHMARKS
     timingBenchmarks
 )
 
+set(HELICS_MULTINODE_BENCHMARKS
+    PholdFederate
+    MessageExchangeFederate
+    RingTransmitFederate
+    EchoHubFederate
+    EchoLeafFederate
+    EchoMessageHubFederate
+    EchoMessageLeafFederate
+)
+
 # Only affects current directory, so safe
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 
@@ -33,10 +43,12 @@ foreach(T ${HELICS_BENCHMARKS})
 
 endforeach()
 
-add_executable(PholdFederate PholdFederateMain.cpp)
-target_link_libraries(PholdFederate PUBLIC helics_application_api)
-set_target_properties(PholdFederate PROPERTIES FOLDER benchmarks_multimachine)
-
+foreach(T ${HELICS_MULTINODE_BENCHMARKS})
+    add_executable(${T} ${T}Main.cpp)
+    target_link_libraries(${T} PUBLIC helics_application_api)
+    set_target_properties(${T} PROPERTIES FOLDER benchmarks_multimachine)
+    target_sources(${T} PUBLIC ${T}.hpp)
+endforeach()
 
 if (NOT HELICS_DISABLE_C_SHARED_LIB)
    add_executable(echoBenchmarks_c echoBenchmarks_c.cpp)
@@ -50,9 +62,13 @@ if (NOT HELICS_DISABLE_C_SHARED_LIB)
    copy_shared_target(echoBenchmarks_c helicsSharedLib)
 endif()
 
-target_sources(filterBenchmarks PUBLIC EchoMessage.hpp)
-target_sources(echoMessageBenchmarks PUBLIC EchoMessage.hpp)
+target_sources(echoBenchmarks PUBLIC EchoHubFederate.hpp EchoLeafFederate.hpp)
+target_sources(filterBenchmarks PUBLIC EchoMessageHubFederate.hpp EchoMessageLeafFederate.hpp)
+target_sources(echoMessageBenchmarks PUBLIC EchoMessageHubFederate.hpp EchoMessageLeafFederate.hpp)
 target_sources(pholdBenchmarks PUBLIC PholdFederate.hpp)
+target_sources(messageSendBenchmarks PUBLIC MessageExchangeFederate.hpp)
+target_sources(ringBenchmarks PUBLIC RingTransmitFederate.hpp)
+target_sources(ringMessageBenchmarks PUBLIC RingTransmitMessageFederate.hpp)
 
 copy_key_files_to_target_location(ActionMessageBenchmarks)
 
