@@ -20,12 +20,13 @@ Increased code coverage and additional bug fixes.
 ### Fixed
 -   Issue with iterative requests that were not being honored if the federate was acting in isolation
 -   A few pathways which would allow segmentation faults if a federate was disconnected and particular functions were called
--   ValueFederate add indexedTargets, the function template would not work is was written and was unusable.  
+-   ValueFederate `addIndexedTargets`, the function template would not work as was written and was unusable, it is now tested and operational.
 
 ### Added
 -   `HELICS_DISABLE_WEBSERVER` option to turn off building of the webserver.  It will build by default if Boost is enabled and is version 1.70 or higher; otherwise it is disabled.
 -   A series of test for Federate.cpp to increase coverage on that file to 100% 
 -   A series of tests for ValueFederate.*pp to increase coverage on that file to 100%
+-   Docker image for a helics builder which includes build tools and the helics installation 
 
 ### Deprecated 
 
