@@ -1,5 +1,5 @@
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-# Copyright (c) 2017-2019, Battelle Memorial Institute; Lawrence Livermore
+# Copyright (c) 2017-2020, Battelle Memorial Institute; Lawrence Livermore
 # National Security, LLC; Alliance for Sustainable Energy, LLC.
 # See the top-level NOTICE for additional details.
 # All rights reserved.
@@ -30,7 +30,7 @@ if(MSVC)
 
     add_custom_target(helics_docs SOURCES ${doc_sources})
 
-    file(GLOB user_guide_sources user-guide/*.md)
+    file(GLOB user_guide_sources user-guide/*.md) 
 
     add_custom_target(helics_user_guide SOURCES ${user_guide_sources})
 

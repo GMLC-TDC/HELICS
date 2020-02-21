@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2017-2019,
+Copyright (c) 2017-2020,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
 the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
@@ -125,6 +125,7 @@ void terminalFunction(std::vector<std::string> args)
                       << " open:" << brk->isOpenToNewFederates() << '\n';
         }
     };
+    auto newBroker = []() {};
     /*
     auto restartBroker = [&broker, &args] (std::vector<std::string> broker_args, bool force) {
         if (!broker_args.empty ())
@@ -200,6 +201,8 @@ void terminalFunction(std::vector<std::string> args)
     termProg.add_subcommand("ls", "list all brokers")->callback(lsbrokers);
     termProg.add_subcommand("terminate", "terminate the broker servers")
         ->callback(closeBrokerServer);
+    termProg.add_subcommand("broker", "create a new broker with the given arguments")
+        ->callback(newBroker);
 
     termProg
         .add_subcommand(

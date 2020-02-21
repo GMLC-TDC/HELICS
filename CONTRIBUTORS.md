@@ -3,37 +3,39 @@ This file describes the contributors to the HELICS library and the software used
 If you would like to contribute to the HELICS project see [CONTRIBUTING](CONTRIBUTING.md)
 ## Individual contributors
 ### Pacific Northwest National Lab
--   Jeff Daily (Now AMD)
--   Andy Fisher
--   Jason Fuller
--   Shwetha Niddodi
--   Monish Mukherjee
--   Jacob Hansen
--   Marc Eberlein
--   Shrirang Abhyankar
+-   [Jeff Daily](https://github.com/jeffdaily) (Now AMD)
+-   [Andy Fisher](https://github.com/afisher1)
+-   [Jason Fuller](https://github.com/jcfuller1)
+-   [Shwetha Niddodi](https://github.com/shwethanidd)
+-   [Trevor Hardy](https://github.com/trevorhardy)
+-   [Monish Mukherjee](https://github.com/MuMonish)
+-   [Jacob Hansen](https://github.com/Jacobhansens)
+-   [Marc Eberlein](https://github.com/eberleim)
+-   [Shrirang Abhyankar](https://github.com/abhyshr)
 
 ### Lawrence Livermore National Lab
--   Ryan Mast
--   Steve Smith
--   Philip Top
--   Denis Nadeau
--   Ben Salazar
+-   [Ryan Mast](https://github.com/nightlark)
+-   [Steve Smith](https://github.com/smithsg84)
+-   [Philip Top](https://github.com/phlptp)
+-   [Denis Nadeau](https://github.com/dnadeau4)
+-   [Ben Salazar](https://github.com/salazar33)
 
 ### National Renewable Energy Lab
--   Himanshu Jain
--   Dheepak Krishnamurthy
--   Bryan Palmintier
--   Bryan Richardson
--   Matt Irish
+-   [Himanshu Jain](https://github.com/HimanshuJain17)
+-   [Dheepak Krishnamurthy](https://github.com/kdheepak)
+-   [Bryan Palmintier](https://github.com/bpalmintier)
+-   [Bryan Richardson](https://github.com/activeshadow)
+-   [Matt Irish](https://github.com/mattirish)
 
 ### Argonne National Lab
--   Shrirang Abhyankar (now PNNL)
--   Karthikeyan Balasubramaniam
+-   [Shrirang Abhyankar](https://github.com/abhyshr) (now PNNL)
+-   [Karthikeyan Balasubramaniam](https://github.com/karthikbalasu)
+-   [Manoj Kumar Cebol Sundarrajan](https://github.com/manoj1511)
 
 ## Used Libraries or Code
 
 ### [BOOST](https://www.boost.org)
-  Boost is used in a few places in the code. The IPC core uses the Boost.Interprocess library. Some of the header-only Boost algorithms and other libraries are also used throughout the code. Some of the string parsing can optionally use boost spirit. Boost is licensed under the Boost Software License.  Boost can be removed entirely from the source code with the use of a cmake flag.
+  Boost is used in a few places in the code. The IPC core uses the Boost.Interprocess library. Some of the header-only Boost algorithms and other libraries are also used throughout the code. Some of the string parsing can optionally use boost spirit. The webserver that is part of the broker_server uses Boost::Beast from Boost 1.70 or higher. Boost is licensed under the Boost Software License.  Boost can be removed entirely from the source code with the use of a cmake flag.
 
 ### [Asio](https://think-async.com/Asio)
   Asio is used for TCP and UDP communication, as well as resolving IP addresses. The Asio library is included as a submodule. Asio is licensed under the [Boost Software License](https://github.com/chriskohlhoff/asio/blob/master/asio/LICENSE_1_0.txt).
@@ -78,19 +80,19 @@ The cereal library is used for serialization of messages sent around inside HELI
 While not used directly, much of the inspiration for HELICS comes from three separate projects at the different National Labs. These include FNCS at PNNL, FSKIT at LLNL(unreleased), and IGMS(unreleased) at NREL. The lessons learned from these three co-simulation platforms was fed directly into the design of HELICS, and the hope that the combination and partnership is better than any one lab could have accomplished on their own.
 
 ### [c++17 headers](https://github.com/tcbrindle/cpp17_headers)
-HELICS makes use of `C++17` headers, but due to `C++14` compatibility requirements these are not available on all supported compilers.  So included library headers are used from @tcbrindle including std\::any, and std\::string_view; std\::optional is used via [containers](https://github.com/GMLC-TDC/containers). These fall under the boost license, this library is an aggregate from a number of different sources, see the readme at the above link for more details. The Boost versions of these libraries are not used due to incompatibilities through different boost versions that HELICS supports, so a single stable source was used. When the minimum boost version and compiler is updated this code will likely be removed.
+HELICS makes use of `C++17` headers, but due to `C++14` compatibility requirements these are not available on all supported compilers.  So included library headers are used from @tcbrindle including std\::any, and std\::string_view; std\::optional is used via [containers](https://github.com/GMLC-TDC/containers). These fall under the boost license, this library is an aggregate from a number of different sources, see the [README](https://github.com/tcbrindle/cpp17_headers/blob/master/README.md) for more details. The Boost versions of these libraries are not used due to incompatibilities through different boost versions that HELICS supports, so a single stable source was used. When the minimum boost version and compiler is updated this code will likely be removed.
 
 ### [mpark/variant](https://github.com/mpark/variant)
 This variant was chosen for compatibility with C++17 over boost variant and better cross platform support than some of the other versions available. The single header version is included with the source. [Boost Software License](https://github.com/mpark/variant/blob/master/LICENSE.md).
 
-### [gulrak/filesystem](https://github.com/mpark/variant)
-A single-header standalone variant of the filesystem library is used to avoid compiled libraries in boost. The single header version is included with the source and is released with a [BSD-3 clause](https://github.com/gulrak/filesystem/blob/master/LICENSE) license.
+### [gulrak/filesystem](https://github.com/gulrak/filesystem)
+A single-header standalone variant of the filesystem library(v1.3.0) is used to avoid compiled libraries in boost. The single header version is included with the source and is released with a [MIT](https://github.com/gulrak/filesystem/blob/master/LICENSE) license (used as of HELICS 2.4.1) prior versions had a BSD-3-Clause license.  
 
-### cmake scripts
-Several cmake scripts came from other sources and were either used or modified for use in HELICS.
+### CMake scripts
+Several CMake scripts came from other sources and were either used or modified for use in HELICS.
 -   Lars Bilke [CodeCoverage.cmake](https://github.com/bilke/cmake-modules/blob/master/CodeCoverage.cmake)
 -   NATIONAL HEART, LUNG, AND BLOOD INSTITUTE  FindOctave.cmake
 -   clang-format, clang-tidy scripts were created using tips from [Emmanuel Fleury](http://www.labri.fr/perso/fleury/posts/programming/using-clang-tidy-and-clang-format.html)
--   Viktor Kirilov, useful cmake macros [ucm](https://github.com/onqtam/ucm)  particularly for the set_runtime macro to use static runtime libraries
+-   Viktor Kirilov, useful CMake macros [ucm](https://github.com/onqtam/ucm)  particularly for the set_runtime macro to use static runtime libraries
 -   scripts for cloning get repositories are included from [tschuchortdev/cmake_git_clone](https://github.com/tschuchortdev/cmake_git_clone) used with [MIT](https://github.com/tschuchortdev/cmake_git_clone/blob/master/LICENSE.TXT) License
 -   Some scripts for including google test were borrowed and modified from [CLI11](https://github.com/CLIUtils/CLI11)

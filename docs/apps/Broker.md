@@ -9,7 +9,7 @@ Command line arguments
 ----------
 ```
 helics_broker term <broker args...> will start a broker and open a terminal control window for the broker run help in a terminal for more commands
-helics_broker autorestart <broker args ...> will start a continually regenerating broker there is a 3 second countdown on broker completion to halt the program via ctrl-C
+helics_broker --autorestart <broker args ...> will start a continually regenerating broker there is a 3 second countdown on broker completion to halt the program via ctrl-C
 helics_broker <broker args ..> just starts a broker with the given args and waits for it to complete
 allowed options:
 

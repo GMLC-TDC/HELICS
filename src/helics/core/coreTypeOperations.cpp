@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2017-2019,
+Copyright (c) 2017-2020,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
 the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
@@ -44,6 +44,8 @@ namespace core {
                 return "inproc_";
             case core_type::WEBSOCKET:
                 return "websocket_";
+            case core_type::NULLCORE:
+                return "null_";
             default:
                 return std::string();
         }
@@ -95,6 +97,9 @@ namespace core {
         {"web", core_type::WEBSOCKET},
         {"inproc", core_type::INPROC},
         {"nng", core_type::NNG},
+        {"null", core_type::NULLCORE},
+        {"nullcore", core_type::NULLCORE},
+        {"none", core_type::NULLCORE},
         {"http", core_type::HTTP},
         {"HTTP", core_type::HTTP},
         {"web", core_type::HTTP},
@@ -149,6 +154,9 @@ namespace core {
         }
         if (type.compare(0, 3, "web") == 0) {
             return core_type::WEBSOCKET;
+        }
+        if (type.compare(0, 4, "null") == 0) {
+            return core_type::NULLCORE;
         }
         return core_type::UNRECOGNIZED;
     }
@@ -233,6 +241,8 @@ namespace core {
             case core_type::WEBSOCKET:
                 available = false;
                 break;
+            case core_type::NULLCORE:
+                available = false;
             default:
                 break;
         }

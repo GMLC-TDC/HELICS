@@ -1,0 +1,24 @@
+#This is not a valid configuration file for HELICS.  The Filter section needs to be an array
+# This file is for testing some error handling inside HELICS
+
+name="filterFed_bad" # the name of the federate
+
+#possible flags
+observer=false  # indicator that the federate does not send anything
+rollback= false # indicator that the federate can use rollback -NOTE= not used at present
+only_update_on_change=false #indicator that the federate should only indicate updated values on change
+only_transmit_on_change=false  #indicator that the federate should only publish if the value changed
+source_only=false  #indicator that the federate is only a source and is not expected to receive anything
+uninterruptible=false #indicator that the federate should only return requested times
+coretype="test" #the type of the core "test","zmq","udp","icp","tcp","mpi"
+corename="tomlcoreb" #this matters most for icp and test cores, can be empty
+coreinit="--autobroker" # the initialization string for the core in the form of a command line arguments
+max_iterations=10 #the maximum number of iterations for a time step
+period=  1.0 #the period with which federate may return time
+offset= 0.0 # the offset shift in the period
+time_delta=0.0 # the minimum time between subsequent return times
+output_delay=0 #the propagation delay for federates to send data
+input_delay=0 #the input delay for external data to propagate to federates
+separator=":" # set the character separator for local interfaces
+
+filters="things"

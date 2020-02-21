@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2017-2019,
+Copyright (c) 2017-2020,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
 the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
@@ -88,5 +88,8 @@ registered or when the clean up function is called this prevents some odd thread
 
     /** display the help listing for a particular core_type*/
     void displayHelp(core_type type = core_type::UNRECOGNIZED);
+
+    /** terminate all running Brokers*/
+    void terminateAllBrokers();
 } // namespace BrokerFactory
 } // namespace helics

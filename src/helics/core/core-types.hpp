@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2017-2019,
+Copyright (c) 2017-2020,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
 the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
@@ -49,6 +49,7 @@ enum class core_type : int {
     HTTP = helics_core_type_http, //!< core/broker using web traffic
     WEBSOCKET = helics_core_type_websocket, //!< core/broker using web sockets
     INPROC = helics_core_type_inproc, //!< core/broker using a stripped down in process core type
+    NULLCORE = helics_core_type_null, //!< explicit core type that doesn't exist
     UNRECOGNIZED = 22, //!< unknown
 
 };

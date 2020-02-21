@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2017-2019,
+Copyright (c) 2017-2020,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
 the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
@@ -342,6 +342,12 @@ class CommonCore: public Core, public BrokerBase {
     uint16_t getNextAirlockIndex();
     /** generate results for core queries*/
     std::string coreQuery(const std::string& queryStr) const;
+
+    /** generate results for some core queries that do not depend on the main processing loop running*/
+    std::string quickCoreQueries(const std::string& queryStr) const;
+
+    /** generate the filteredEndpoint query results for a particular federate*/
+    std::string filteredEndpointQuery(const FederateState* fed) const;
 
   private:
     int32_t _global_federation_size = 0; //!< total size of the federation

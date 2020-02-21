@@ -70,6 +70,7 @@ jobs:
       env:
         - MATRIX_EVAL="COMPILER=clang && BUILD_TYPE=Release && TRAVIS_XCODE_VERSION=102"
         - HOMEBREW_NO_AUTO_UPDATE=1
+        - CI_TEST_EXCLUDE="application-api-ci-tests|system-ci-tests"
       osx_image: xcode10.2
 
     # XCode 9.4, OS X 10.13
@@ -167,8 +168,7 @@ jobs:
       if: (branch = develop AND type IN (cron)) OR (branch = master AND type IN (push, pull_request)) OR (branch =~ /(mingw)/) OR (commit_message =~ /(mingw)/)
       env:
         - DISABLE_INTERFACES="Python,Java"
-        - SKIP_TEST_RUN=true
-        - CORE_CI_TEST=true
+        - CI_TEST_MATCH="core-ci-tests"
         - ZMQ_SUBPROJECT=true
         - ZMQ_FORCE_SUBPROJECT=true
         - DISABLE_EXAMPLES=true
@@ -186,8 +186,7 @@ jobs:
       if: (branch = develop AND type IN (cron)) OR (branch = master AND type IN (push, pull_request)) OR (branch =~ /(msys)/) OR (commit_message =~ /(msys)/)
       env:
         - DISABLE_INTERFACES="Python,Java"
-        - SKIP_TEST_RUN=true
-        - CORE_CI_TEST=true
+        - CI_TEST_MATCH="core-ci-tests"
         - DISABLE_EXAMPLES=true
         - CMAKE_GENERATOR="MSYS Makefiles"
         - SET_MSYS_PATH=true
@@ -280,10 +279,6 @@ script:
     if [[ "$SKIP_TEST_RUN" != "true" ]]; then
       echo "travis_wait ../scripts/run-ci-tests.sh ${CI_TEST_FLAGS}"
       travis_wait $SHELL_CMD ../scripts/run-ci-tests.sh ${CI_TEST_FLAGS}
-    else
-      if [[ "$CORE_CI_TEST" == "true" ]]; then
-      travis_wait $SHELL_CMD ../scripts/run-core-ci-tests.sh
-      fi
     fi
 
   # Gather coverage results

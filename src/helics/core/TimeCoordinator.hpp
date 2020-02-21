@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2017-2019,
+Copyright (c) 2017-2020,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
 the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
@@ -76,7 +76,9 @@ class TimeCoordinator {
   public:
     global_federate_id source_id{
         0}; //!< the identifier for inserting into the source id field of any generated messages;
-    bool iterating{false}; //!< indicator that the coordinator should be iterating if need be
+    iteration_request iterating{
+        iteration_request::
+            no_iterations}; //!< indicator that the coordinator should be iterating if need be
     bool checkingExec{
         false}; //!< flag indicating that the coordinator is trying to enter the exec mode
     bool executionMode{false}; //!< flag that the coordinator has entered the execution Mode

@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2017-2019,
+Copyright (c) 2017-2020,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
 the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
@@ -242,7 +242,7 @@ BENCHMARK_CAPTURE (BMsendMessage, multiCore/ipcCore, core_type::IPC)
     // clang-format on
     //->RangeMultiplier (2)
     ->Ranges({{1, 1 << 11}, {1, 1}}) // msg size of 4096 bytes causes Boost transmit error
-    ->Ranges({{1, 1 << 11},
+    ->Ranges({{1, 1},
               {1, 1 << 9}}) // msg count has a much bigger effect on time taken (increasing size had
     // no noticeable effect on times)
     ->Iterations(1)

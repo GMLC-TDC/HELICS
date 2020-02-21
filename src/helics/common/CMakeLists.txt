@@ -1,5 +1,5 @@
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-# Copyright (c) 2017-2019, Battelle Memorial Institute; Lawrence Livermore
+# Copyright (c) 2017-2020, Battelle Memorial Institute; Lawrence Livermore
 # National Security, LLC; Alliance for Sustainable Energy, LLC.
 # See the top-level NOTICE for additional details.
 # All rights reserved.
@@ -18,6 +18,7 @@ set(
     fmt_format.h
     fmt_ostream.h
     addTargets.hpp
+    configFileHelpers.hpp
 )
 
 set(
@@ -27,6 +28,7 @@ set(
     TomlProcessingFunctions.cpp
     logger.cpp
     loggerCore.cpp
+    configFileHelpers.cpp
 )
 
 set(zmq_headers zmqContextManager.h zmqHelper.h

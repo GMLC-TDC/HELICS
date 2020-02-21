@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2017-2019,
+Copyright (c) 2017-2020,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
 the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
@@ -28,7 +28,7 @@ using helics::Core;
 
 const std::string host = "tcp://127.0.0.1";
 
-TEST(ZMQSSCore_tests, zmqSSComm_transmit)
+TEST(ZMQSSCore, transmit)
 {
     std::this_thread::sleep_for(400ms);
     std::atomic<int> counter{0};
@@ -72,7 +72,7 @@ TEST(ZMQSSCore_tests, zmqSSComm_transmit)
     if (counter2 != 1) {
         std::this_thread::sleep_for(500ms);
     }
-    ASSERT_EQ(counter2, 2);
+    ASSERT_EQ(counter2, 1);
     EXPECT_TRUE(act2.lock()->action() == helics::action_message_def::action_t::cmd_ack);
 
     comm2.disconnect();
@@ -83,7 +83,7 @@ TEST(ZMQSSCore_tests, zmqSSComm_transmit)
     std::this_thread::sleep_for(100ms);
 }
 
-TEST(ZMQSSCore_tests, zmqSSComm_addroute)
+TEST(ZMQSSCore, addroute)
 {
     std::this_thread::sleep_for(400ms);
     std::atomic<int> counter{0};
@@ -142,10 +142,10 @@ TEST(ZMQSSCore_tests, zmqSSComm_addroute)
     ASSERT_TRUE(connected2);
     comm.transmit(helics::parent_route_id, helics::CMD_ACK);
     std::this_thread::sleep_for(250ms);
-    if (counter3 != 3) {
+    if (counter3 != 1) {
         std::this_thread::sleep_for(500ms);
     }
-    ASSERT_EQ(counter3, 3);
+    ASSERT_EQ(counter3, 1);
     comm3.addRoute(helics::route_id(2), comm2.getAddress());
     comm3.transmit(helics::route_id(2), helics::CMD_ACK);
     std::this_thread::sleep_for(250ms);
@@ -164,7 +164,7 @@ TEST(ZMQSSCore_tests, zmqSSComm_addroute)
     std::this_thread::sleep_for(100ms);
 }
 
-TEST(ZMQSSCore_tests, zmqSSCore_initialization_test)
+TEST(ZMQSSCore, initialization)
 {
     std::atomic<int> counter{0};
     std::vector<helics::ActionMessage> msgs;
@@ -192,7 +192,7 @@ TEST(ZMQSSCore_tests, zmqSSCore_initialization_test)
     EXPECT_TRUE(connected);
 
     if (connected) {
-        int cnt = 0;
+        int cnt{0};
         while (counter == 0) {
             std::this_thread::sleep_for(100ms);
             ++cnt;
@@ -203,26 +203,7 @@ TEST(ZMQSSCore_tests, zmqSSCore_initialization_test)
         EXPECT_GE(counter, 1);
         std::unique_lock<std::mutex> mLock(msgLock);
         if (!msgs.empty()) {
-            auto rM = msgs.at(0);
-            mLock.unlock();
-            EXPECT_EQ(rM.name, "core1");
-            // std::cout << "rM.name: " << rM.name << std::endl;
-            EXPECT_TRUE(rM.action() == helics::action_message_def::action_t::cmd_protocol);
-        } else {
-            mLock.unlock();
-        }
-        cnt = 0;
-        while (counter == 1) {
-            std::this_thread::sleep_for(100ms);
-            ++cnt;
-            if (cnt > 30) {
-                break;
-            }
-        }
-        EXPECT_GE(counter, 2);
-        mLock.lock();
-        if (!msgs.empty()) {
-            auto rM2 = msgs.at(1);
+            auto rM2 = msgs.at(0);
             mLock.unlock();
             EXPECT_EQ(rM2.name, "core1");
             // std::cout << "rM.name: " << rM2.name << std::endl;
@@ -241,7 +222,7 @@ TEST(ZMQSSCore_tests, zmqSSCore_initialization_test)
 /** test case checks default values and makes sure they all mesh together
 also tests the automatic port determination for cores
 */
-TEST(ZMQSSCore_tests, zmqSSCore_core_broker_default_test)
+TEST(ZMQSSCore, core_broker_default)
 {
     std::string initializationString = "-f 1";
 

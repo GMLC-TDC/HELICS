@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2017-2019,
+Copyright (c) 2017-2020,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
 the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
@@ -803,5 +803,20 @@ int appendMessage(ActionMessage& m, const ActionMessage& newMessage)
         }
     }
     return (-1);
+}
+
+void setIterationFlags(ActionMessage& command, iteration_request iterate)
+{
+    switch (iterate) {
+        case iteration_request::force_iteration:
+            setActionFlag(command, iteration_requested_flag);
+            setActionFlag(command, required_flag);
+            break;
+        case iteration_request::iterate_if_needed:
+            setActionFlag(command, iteration_requested_flag);
+            break;
+        case iteration_request::no_iterations:
+            break;
+    }
 }
 } // namespace helics

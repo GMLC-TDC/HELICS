@@ -1,5 +1,5 @@
 # ~~~
-# Copyright (c) 2017-2019, Battelle Memorial Institute; Lawrence Livermore
+# Copyright (c) 2017-2020, Battelle Memorial Institute; Lawrence Livermore
 # National Security, LLC; Alliance for Sustainable Energy, LLC.
 # See the top-level NOTICE for additional details.
 # All rights reserved.
@@ -10,7 +10,7 @@
 cmake_minimum_required(VERSION 3.4)
 cmake_policy(VERSION 3.4)
 
-project(HELICS VERSION 2.3.1)
+project(HELICS VERSION 2.4.0)
 
 if(POLICY CMP0069)
     # Policy CMP0069 INTERPROCEDURAL OPTIMIZATION, just use the new policy since this
@@ -33,7 +33,7 @@ endif()
 # -----------------------------------------------------------------------------
 set(HELICS_VERSION_BUILD)
 # use ISO date YYYY-MM-DD
-set(HELICS_DATE "2019-11-22")
+set(HELICS_DATE "2020-02-04")
 
 set(HELICS_VERSION_UNDERSCORE
     "${HELICS_VERSION_MAJOR}_${HELICS_VERSION_MINOR}_${HELICS_VERSION_PATCH}"
@@ -402,6 +402,8 @@ endif()
 # -------------------------------------------------------------
 
 set(toml11_BUILD_TEST OFF CACHE INTERNAL "")
+set(toml11_TEST_WITH_ASAN OFF CACHE INTERNAL "")
+set(toml11_TEST_WITH_UBSAN OFF CACHE INTERNAL "")
 add_subdirectory(ThirdParty/toml11 EXCLUDE_FROM_ALL)
 
 # -------------------------------------------------------------

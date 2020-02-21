@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2017-2019,
+Copyright (c) 2017-2020,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
 the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
@@ -255,11 +255,12 @@ TEST(clone_tests, simple_clone_test_sub)
     vfed2.finalize();
     vfed.finalize();
     fut.get();
-    c1.finalize();
+
     auto cnt = c1.pointCount();
     EXPECT_EQ(cnt, 3u);
     auto icnt = c1.accessUnderlyingFederate().getInputCount();
     EXPECT_EQ(icnt, 2);
+    c1.finalize();
     c1.saveFile("subtest.json");
 
     ASSERT_TRUE(ghc::filesystem::exists("subtest.json"));

@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2017-2019,
+Copyright (c) 2017-2020,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
 the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
@@ -59,8 +59,9 @@ TEST_P(filter_single_type_test, message_filter_registration)
 
     mFed->finalizeAsync();
     // std::this_thread::sleep_for (std::chrono::milliseconds (50));
-    auto& f3 = fFed->registerFilter();
+    auto& f3 = fFed->registerCloningFilter();
     fFed->addSourceTarget(f3, "filter0/fout");
+    f3.addDestinationTarget("port2");
     EXPECT_TRUE(f3.getHandle() != f2.getHandle());
     fFed->finalize();
     // std::cout << "fFed returned\n";

@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2017-2019,
+Copyright (c) 2017-2020,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
 the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
@@ -311,6 +311,8 @@ across different compilers*/
 #define NEW_ROUTE 233
 #define REMOVE_ROUTE 244
 #define CONNECTION_INFORMATION 299
+#define CONNECTION_REQUEST 301
+#define CONNECTION_ACK 304
 #define NEW_BROKER_INFORMATION 333
 #define DISCONNECT 2523
 #define DISCONNECT_ERROR 2623

@@ -1,14 +1,13 @@
 /*
-Copyright (c) 2017-2019,
+Copyright (c) 2017-2020,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
 the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 #include "ValueFederate.hpp"
 
-#include "../common/JsonProcessingFunctions.hpp"
-#include "../common/TomlProcessingFunctions.hpp"
 #include "../common/addTargets.hpp"
+#include "../common/configFileHelpers.hpp"
 #include "../core/Core.hpp"
 #include "../core/core-exceptions.hpp"
 #include "../core/helics_definitions.hpp"
@@ -37,18 +36,30 @@ ValueFederate::ValueFederate(
 {
     vfManager = std::make_unique<ValueFederateManager>(coreObject.get(), this, getID());
 }
-ValueFederate::ValueFederate(const std::string& configString):
-    Federate(std::string(), loadFederateInfo(configString))
+
+ValueFederate::ValueFederate(const std::string& fedName, CoreApp& core, const FederateInfo& fi):
+    Federate(fedName, core, fi)
 {
     vfManager = std::make_unique<ValueFederateManager>(coreObject.get(), this, getID());
-    ValueFederate::registerInterfaces(configString);
 }
 
 ValueFederate::ValueFederate(const std::string& fedName, const std::string& configString):
     Federate(fedName, loadFederateInfo(configString))
 {
     vfManager = std::make_unique<ValueFederateManager>(coreObject.get(), this, getID());
-    ValueFederate::registerInterfaces(configString);
+    if (looksLikeFile(configString)) {
+        ValueFederate::registerInterfaces(configString);
+    }
+}
+
+ValueFederate::ValueFederate(const std::string& configString):
+    ValueFederate(std::string{}, configString)
+{
+}
+
+ValueFederate::ValueFederate(const char* configString):
+    ValueFederate(std::string{}, std::string{configString})
+{
 }
 
 ValueFederate::ValueFederate() = default;
@@ -218,17 +229,17 @@ void ValueFederate::registerValueInterfacesJson(const std::string& jsonString)
             auto key = getKey(pub);
 
             Publication* pubAct = &vfManager->getPublication(key);
-            if (pubAct->isValid()) {
-                continue;
+            if (!pubAct->isValid()) {
+                auto type = getOrDefault(pub, "type", emptyStr);
+                auto units = getOrDefault(pub, "units", emptyStr);
+                bool global = getOrDefault(pub, "global", defaultGlobal);
+                if (global) {
+                    pubAct = &registerGlobalPublication(key, type, units);
+                } else {
+                    pubAct = &registerPublication(key, type, units);
+                }
             }
-            auto type = getOrDefault(pub, "type", emptyStr);
-            auto units = getOrDefault(pub, "units", emptyStr);
-            bool global = getOrDefault(pub, "global", defaultGlobal);
-            if (global) {
-                pubAct = &registerGlobalPublication(key, type, units);
-            } else {
-                pubAct = &registerPublication(key, type, units);
-            }
+
             loadOptions(this, pub, *pubAct);
         }
     }
@@ -236,16 +247,14 @@ void ValueFederate::registerValueInterfacesJson(const std::string& jsonString)
         auto subs = doc["subscriptions"];
         for (const auto& sub : subs) {
             auto key = getKey(sub);
-            auto& subAct = vfManager->getSubscription(key);
-            if (subAct.isValid()) {
-                continue;
+            auto subAct = &vfManager->getSubscription(key);
+            if (!subAct->isValid()) {
+                auto type = getOrDefault(sub, "type", emptyStr);
+                auto units = getOrDefault(sub, "units", emptyStr);
+                subAct = &registerInput(emptyStr, type, units);
             }
-            auto type = getOrDefault(sub, "type", emptyStr);
-            auto units = getOrDefault(sub, "units", emptyStr);
-            auto& subNew = registerInput(emptyStr, type, units);
-            subNew.addTarget(key);
-
-            loadOptions(this, sub, subNew);
+            subAct->addTarget(key);
+            loadOptions(this, sub, *subAct);
         }
     }
     if (doc.isMember("inputs")) {
@@ -254,17 +263,17 @@ void ValueFederate::registerValueInterfacesJson(const std::string& jsonString)
             auto key = getKey(ipt);
 
             Input* inp = &vfManager->getInput(key);
-            if (inp->isValid()) {
-                continue;
+            if (!inp->isValid()) {
+                auto type = getOrDefault(ipt, "type", emptyStr);
+                auto units = getOrDefault(ipt, "units", emptyStr);
+                bool global = getOrDefault(ipt, "global", defaultGlobal);
+                if (global) {
+                    inp = &registerGlobalInput(key, type, units);
+                } else {
+                    inp = &registerInput(key, type, units);
+                }
             }
-            auto type = getOrDefault(ipt, "type", emptyStr);
-            auto units = getOrDefault(ipt, "units", emptyStr);
-            bool global = getOrDefault(ipt, "global", defaultGlobal);
-            if (global) {
-                inp = &registerGlobalInput(key, type, units);
-            } else {
-                inp = &registerInput(key, type, units);
-            }
+
             loadOptions(this, ipt, *inp);
         }
     }
@@ -285,24 +294,22 @@ void ValueFederate::registerValueInterfacesToml(const std::string& tomlString)
     if (isMember(doc, "publications")) {
         auto pubs = toml::find(doc, "publications");
         if (!pubs.is_array()) {
-            throw(helics::InvalidParameter("filters section in yoml file must be an array"));
+            throw(helics::InvalidParameter("publications section in toml file must be an array"));
         }
         auto& pubArray = pubs.as_array();
         for (const auto& pub : pubArray) {
             auto key = getKey(pub);
 
-            auto id = vfManager->getPublication(key);
-            if (id.isValid()) {
-                continue;
-            }
-            auto type = getOrDefault(pub, "type", emptyStr);
-            auto units = getOrDefault(pub, "units", emptyStr);
-            bool global = getOrDefault(pub, "global", defaultGlobal);
-            Publication* pubObj = nullptr;
-            if (global) {
-                pubObj = &registerGlobalPublication(key, type, units);
-            } else {
-                pubObj = &registerPublication(key, type, units);
+            Publication* pubObj = &vfManager->getPublication(key);
+            if (!pubObj->isValid()) {
+                auto type = getOrDefault(pub, "type", emptyStr);
+                auto units = getOrDefault(pub, "units", emptyStr);
+                bool global = getOrDefault(pub, "global", defaultGlobal);
+                if (global) {
+                    pubObj = &registerGlobalPublication(key, type, units);
+                } else {
+                    pubObj = &registerPublication(key, type, units);
+                }
             }
             loadOptions(this, pub, *pubObj);
         }
@@ -310,19 +317,20 @@ void ValueFederate::registerValueInterfacesToml(const std::string& tomlString)
     if (isMember(doc, "subscriptions")) {
         auto subs = toml::find(doc, "subscriptions");
         if (!subs.is_array()) {
-            throw(helics::InvalidParameter("subscriptions section in toml file must be an array"));
+            //this line is tested in the publications section so not really necessary to check again since it is an expensive test
+            throw(helics::InvalidParameter(
+                "subscriptions section in toml file must be an array")); // LCOV_EXCL_LINE
         }
         auto& subArray = subs.as_array();
         for (const auto& sub : subArray) {
             auto key = getKey(sub);
             Input* id = &vfManager->getSubscription(key);
-            if (id->isValid()) {
-                continue;
-            }
-            auto type = getOrDefault(sub, "type", emptyStr);
-            auto units = getOrDefault(sub, "units", emptyStr);
+            if (!id->isValid()) {
+                auto type = getOrDefault(sub, "type", emptyStr);
+                auto units = getOrDefault(sub, "units", emptyStr);
 
-            id = &registerInput(emptyStr, type, units);
+                id = &registerInput(emptyStr, type, units);
+            }
             id->addTarget(key);
 
             loadOptions(this, sub, *id);
@@ -331,24 +339,25 @@ void ValueFederate::registerValueInterfacesToml(const std::string& tomlString)
     if (isMember(doc, "inputs")) {
         auto ipts = toml::find(doc, "inputs");
         if (!ipts.is_array()) {
-            throw(helics::InvalidParameter("inputs section in toml file must be an array"));
+            throw(helics::InvalidParameter(
+                "inputs section in toml file must be an array")); // LCOV_EXCL_LINE
         }
         auto& iptArray = ipts.as_array();
         for (const auto& ipt : iptArray) {
             auto key = getKey(ipt);
 
             Input* id = &vfManager->getInput(key);
-            if (id->isValid()) {
-                continue;
+            if (!id->isValid()) {
+                auto type = getOrDefault(ipt, "type", emptyStr);
+                auto units = getOrDefault(ipt, "units", emptyStr);
+                bool global = getOrDefault(ipt, "global", defaultGlobal);
+                if (global) {
+                    id = &registerGlobalInput(key, type, units);
+                } else {
+                    id = &registerInput(key, type, units);
+                }
             }
-            auto type = getOrDefault(ipt, "type", emptyStr);
-            auto units = getOrDefault(ipt, "units", emptyStr);
-            bool global = getOrDefault(ipt, "global", defaultGlobal);
-            if (global) {
-                id = &registerGlobalInput(key, type, units);
-            } else {
-                id = &registerInput(key, type, units);
-            }
+
             loadOptions(this, ipt, *id);
         }
     }
@@ -397,35 +406,31 @@ static void generateData(
     char separator,
     Json::Value val)
 {
-    if (val.isObject()) {
-        auto mn = val.getMemberNames();
-        for (auto& name : mn) {
-            auto so = val[name];
-            if (so.isObject()) {
-                generateData(vpairs, prefix + name + separator, separator, so);
-            } else {
-                if (so.isDouble()) {
-                    vpairs.emplace_back(prefix + name, so.asDouble());
-                } else {
-                    vpairs.emplace_back(prefix + name, so.asString());
-                }
-            }
-        }
-    } else {
-        if (val.isDouble()) {
-            vpairs.emplace_back(prefix, val.asDouble());
+    auto mn = val.getMemberNames();
+    for (auto& name : mn) {
+        auto so = val[name];
+        if (so.isObject()) {
+            generateData(vpairs, prefix + name + separator, separator, so);
         } else {
-            vpairs.emplace_back(prefix, val.asString());
+            if (so.isDouble()) {
+                vpairs.emplace_back(prefix + name, so.asDouble());
+            } else {
+                vpairs.emplace_back(prefix + name, so.asString());
+            }
         }
     }
 }
 
 void ValueFederate::registerFromPublicationJSON(const std::string& jsonString)
 {
-    auto jv = loadJson(jsonString);
-    if (jv.isNull()) {
-        throw(helics::InvalidParameter("unable to load file or string"));
-    }
+    auto jv = [&]() {
+        try {
+            return loadJson(jsonString);
+        }
+        catch (const std::invalid_argument&) {
+            throw(helics::InvalidParameter("unable to load file or string"));
+        }
+    }();
 
     std::vector<std::pair<std::string, dvalue>> vpairs;
     generateData(vpairs, "", nameSegmentSeparator, jv);
@@ -446,10 +451,14 @@ void ValueFederate::registerFromPublicationJSON(const std::string& jsonString)
 
 void ValueFederate::publishJSON(const std::string& jsonString)
 {
-    auto jv = loadJson(jsonString);
-    if (jv.isNull()) {
-        throw(helics::InvalidParameter("unable to load file or string"));
-    }
+    auto jv = [&]() {
+        try {
+            return loadJson(jsonString);
+        }
+        catch (const std::invalid_argument&) {
+            throw(helics::InvalidParameter("unable to load file or string"));
+        }
+    }();
     std::vector<std::pair<std::string, dvalue>> vpairs;
     generateData(vpairs, "", nameSegmentSeparator, jv);
 

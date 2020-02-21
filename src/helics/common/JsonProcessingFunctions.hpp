@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2017-2019,
+Copyright (c) 2017-2020,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
 the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
@@ -60,44 +60,52 @@ inline int64_t getOrDefault(const Json::Value& element, const std::string& key, 
     return (element.isMember(key)) ? element[key].asInt64() : defVal;
 }
 
-inline void callIfMember(
+inline bool callIfMember(
     const Json::Value& element,
     const std::string& key,
     const std::function<void(const std::string&, helics::Time)>& call)
 {
     if (element.isMember(key)) {
         call(key, loadJsonTime(element[key]));
+        return true;
     }
+    return false;
 }
 
-inline void callIfMember(
+inline bool callIfMember(
     const Json::Value& element,
     const std::string& key,
     const std::function<void(const std::string&, bool)>& call)
 {
     if (element.isMember(key)) {
         call(key, element[key].asBool());
+        return true;
     }
+    return false;
 }
 
-inline void callIfMember(
+inline bool callIfMember(
     const Json::Value& element,
     const std::string& key,
     const std::function<void(const std::string&, int)>& call)
 {
     if (element.isMember(key)) {
         call(key, element[key].asInt());
+        return true;
     }
+    return false;
 }
 
-inline void callIfMember(
+inline bool callIfMember(
     const Json::Value& element,
     const std::string& key,
     const std::function<void(const std::string&)>& call)
 {
     if (element.isMember(key)) {
         call(element[key].asString());
+        return true;
     }
+    return false;
 }
 
 inline void

@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2017-2019,
+Copyright (c) 2017-2020,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
 the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
@@ -20,7 +20,7 @@ SPDX-License-Identifier: BSD-3-Clause
 
 /** these test cases test out the value federates
  */
-class valuefed_single_type_tests:
+class valuefed_single_type:
     public ::testing::TestWithParam<const char*>,
     public FederateTestFixture {
 };
@@ -33,7 +33,7 @@ class valuefed_all_type_tests:
 class valuefed_tests: public ::testing::Test, public FederateTestFixture {
 };
 
-TEST_P(valuefed_single_type_tests, subscriber_and_publisher_registration)
+TEST_P(valuefed_single_type, subscriber_and_publisher_registration)
 {
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
     using namespace helics;
@@ -87,7 +87,7 @@ TEST_P(valuefed_single_type_tests, subscriber_and_publisher_registration)
     EXPECT_TRUE(vFed1->getCurrentMode() == Federate::modes::finalize);
 }
 
-TEST_P(valuefed_single_type_tests, single_transfer_publisher)
+TEST_P(valuefed_single_type, single_transfer_publisher)
 {
     SetupTest<helics::ValueFederate>(GetParam(), 1);
     auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
@@ -486,7 +486,7 @@ TEST_F(valuefed_tests, dual_transfer_core_link_json_string)
     EXPECT_TRUE(res);
 }
 
-TEST_P(valuefed_single_type_tests, init_publish)
+TEST_P(valuefed_single_type, init_publish)
 {
     SetupTest<helics::ValueFederate>(GetParam(), 1);
     auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
@@ -529,7 +529,7 @@ TEST_P(valuefed_single_type_tests, init_publish)
     vFed1->finalize();
 }
 
-TEST_P(valuefed_single_type_tests, block_send_receive)
+TEST_P(valuefed_single_type, block_send_receive)
 {
     SetupTest<helics::ValueFederate>(GetParam(), 1);
     auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
@@ -554,7 +554,7 @@ TEST_P(valuefed_single_type_tests, block_send_receive)
 
 /** test the all callback*/
 
-TEST_P(valuefed_single_type_tests, all_callback)
+TEST_P(valuefed_single_type, all_callback)
 {
     SetupTest<helics::ValueFederate>(GetParam(), 1, 1.0);
     auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
@@ -616,7 +616,7 @@ TEST_P(valuefed_single_type_tests, all_callback)
     vFed1->finalize();
 }
 
-TEST_P(valuefed_single_type_tests, transfer_close)
+TEST_P(valuefed_single_type, transfer_close)
 {
     SetupTest<helics::ValueFederate>(GetParam(), 1);
     auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
@@ -661,7 +661,7 @@ TEST_P(valuefed_single_type_tests, transfer_close)
     vFed1->finalize();
 }
 
-TEST_P(valuefed_single_type_tests, transfer_remove_target)
+TEST_P(valuefed_single_type, transfer_remove_target)
 {
     SetupTest<helics::ValueFederate>(GetParam(), 1);
     auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
@@ -899,7 +899,7 @@ TEST_F(valuefed_tests, rem_target_single_test)
     vFed2->finalize();
 }
 
-TEST_P(valuefed_single_type_tests, dual_transfer_remove_target_input)
+TEST_P(valuefed_single_type, dual_transfer_remove_target_input)
 {
     SetupTest<helics::ValueFederate>(GetParam(), 2);
     auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
@@ -963,7 +963,7 @@ TEST_P(valuefed_single_type_tests, dual_transfer_remove_target_input)
 
 INSTANTIATE_TEST_SUITE_P(
     valuefed_key_tests,
-    valuefed_single_type_tests,
+    valuefed_single_type,
     ::testing::ValuesIn(core_types_single));
 INSTANTIATE_TEST_SUITE_P(
     valuefed_key_tests,

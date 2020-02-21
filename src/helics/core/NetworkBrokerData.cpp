@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2017-2019,
+Copyright (c) 2017-2020,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
 the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
@@ -49,6 +49,12 @@ std::shared_ptr<helicsCLI11App>
         "--reuse_address",
         reuse_address,
         "allow the server to reuse a bound address, mostly useful for tcp cores");
+    nbparser
+        ->add_flag(
+            "--noack,--noack_connect",
+            noAckConnection,
+            "specify that a connection_ack message is not required to be connected with a broker")
+        ->ignore_underscore();
     nbparser->add_option_function<std::string>(
         "--broker",
         [this, localAddress](std::string addr) {

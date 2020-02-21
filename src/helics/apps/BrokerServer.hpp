@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2017-2019,
+Copyright (c) 2017-2020,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
 the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
@@ -20,7 +20,10 @@ namespace helics {
 class ActionMessage;
 class helicsCLI11App;
 
+using portData = std::vector<std::tuple<int, bool, std::shared_ptr<Broker>>>;
+
 namespace apps {
+    class TypedBrokerServer;
     /** helper class defining some common functionality for brokers and cores that use different
 communication methods*/
     class BrokerServer {
@@ -55,10 +58,6 @@ communication methods*/
       private:
         /** generate an argument processing app*/
         std::unique_ptr<helicsCLI11App> generateArgProcessing();
-        /** start the ZMQ servers*/
-        void startZMQserver();
-        /** close the ZMQ servers*/
-        void closeZMQserver();
 
       private:
         bool zmq_server{false};
@@ -66,11 +65,12 @@ communication methods*/
         bool tcp_server{false};
         bool udp_server{false};
         bool mpi_server{false};
+        bool http_server{false};
+        bool websocket_server{false};
         std::atomic<bool> exitall{false};
-
+        std::vector<std::unique_ptr<TypedBrokerServer>> servers;
         std::string configFile_;
         std::string server_name_;
-        std::vector<std::thread> serverloops_;
         std::unique_ptr<Json::Value> config_;
 
       public:

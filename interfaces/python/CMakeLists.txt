@@ -1,5 +1,5 @@
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-# Copyright (c) 2017-2019, Battelle Memorial Institute; Lawrence Livermore
+# Copyright (c) 2017-2020, Battelle Memorial Institute; Lawrence Livermore
 # National Security, LLC; Alliance for Sustainable Energy, LLC.
 # See the top-level NOTICE for additional details.
 # All rights reserved.
@@ -15,9 +15,14 @@ get_directory_property(hasParent PARENT_DIRECTORY)
 if(NOT hasParent)
     message(STATUS "Standalone Python interface build")
 
+    # find_package(<PackageName>) searches prefixes given in <PackageName>_ROOT CMake variable
+    if(POLICY CMP0074)
+        cmake_policy(SET CMP0074 NEW)
+    endif()
+
     # Setup options
     option(HELICS_ENABLE_SWIG "Use SWIG to generate the Python interface files" ON)
-    option(HELICS_SWIG_GENERATE_INTERFACE_FILES_ONLY "Only generate the SWIG interface files" OFF)
+    #option(HELICS_SWIG_GENERATE_INTERFACE_FILES_ONLY "Only generate the SWIG interface files" OFF)
     if(NOT ${CMAKE_VERSION} VERSION_LESS 3.12)
         option(HELICS_USE_NEW_PYTHON_FIND "Use the FindPython module added in CMake 3.12" OFF)
     endif()
@@ -128,6 +133,9 @@ endif()
 ###############################
 # Swig doesn't need Python to generate the wrapper files
 if(HELICS_SWIG_GENERATE_INTERFACE_FILES_ONLY AND SWIG_EXECUTABLE)
+    if(NOT hasParent)
+        message(FATAL_ERROR "`HELICS_SWIG_GENERATE_INTERFACE_FILES_ONLY`  can only be used when building from the root HELICS CMakeLists.txt file")
+    endif()
     include(${CMAKE_CURRENT_SOURCE_DIR}/pythonSwigGenerateOnly.cmake)
     return()
 endif()

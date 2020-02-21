@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2017-2019,
+Copyright (c) 2017-2020,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
 the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
@@ -67,8 +67,8 @@ std::shared_ptr<Core> makeCore(core_type type, const std::string& name)
 #                ifdef ENABLE_IPC_CORE
         type = core_type::IPC;
 #                else
-#                    ifdef ENABLE_TEST_CORE
-        type = core_type::TEST;
+#                    ifdef ENABLE_INPROC_CORE
+        type = core_type::INPROC;
 #                    else
         type = core_type::UNRECOGNIZED;
 #                    endif // ENABLE_TEST_CORE
@@ -182,6 +182,12 @@ std::shared_ptr<Core> makeCore(core_type type, const std::string& name)
             throw(HelicsException("TCP single socket core is not available"));
 #endif
             break;
+        case core_type::NNG:
+        case core_type::WEBSOCKET:
+        case core_type::HTTP:
+            throw(HelicsException("core type is not available"));
+        case core_type::NULLCORE:
+            throw(HelicsException("the nullcore explicitly doesn't exist"));
         default:
             throw(HelicsException("unrecognized core type"));
     }
@@ -353,14 +359,14 @@ without issue*/
         delayedDestroyer(destroyerCallFirst); //!< the object handling the delayed destruction
 
     static gmlc::concurrency::SearchableObjectHolder<CommonCore>
-        searchableObjects; //!< the object managing the searchable objects
+        searchableCores; //!< the object managing the searchable cores
 
     // this will trip the line when it is destroyed at global destruction time
     static gmlc::concurrency::TripWireTrigger tripTrigger;
 
     std::shared_ptr<Core> findCore(const std::string& name)
     {
-        return searchableObjects.findObject(name);
+        return searchableCores.findObject(name);
     }
 
     static bool isJoinableCoreOfType(core_type type, const std::shared_ptr<CommonCore>& ptr)
@@ -434,7 +440,7 @@ without issue*/
 
     std::shared_ptr<Core> findJoinableCoreOfType(core_type type)
     {
-        return searchableObjects.findObject(
+        return searchableCores.findObject(
             [type](auto& ptr) { return isJoinableCoreForType(type, ptr); });
     }
 
@@ -443,7 +449,7 @@ without issue*/
         bool res = false;
         auto tcore = std::dynamic_pointer_cast<CommonCore>(core);
         if (tcore) {
-            res = searchableObjects.addObject(tcore->getIdentifier(), tcore);
+            res = searchableCores.addObject(tcore->getIdentifier(), tcore);
         }
         cleanUpCores();
         if (res) {
@@ -459,15 +465,24 @@ without issue*/
         return delayedDestroyer.destroyObjects(delay);
     }
 
+    void terminateAllCores()
+    {
+        auto brokers = searchableCores.getObjects();
+        for (auto& brk : brokers) {
+            brk->disconnect();
+        }
+        cleanUpCores(std::chrono::milliseconds(250));
+    }
+
     bool copyCoreIdentifier(const std::string& copyFromName, const std::string& copyToName)
     {
-        return searchableObjects.copyObject(copyFromName, copyToName);
+        return searchableCores.copyObject(copyFromName, copyToName);
     }
 
     void unregisterCore(const std::string& name)
     {
-        if (!searchableObjects.removeObject(name)) {
-            searchableObjects.removeObject(
+        if (!searchableCores.removeObject(name)) {
+            searchableCores.removeObject(
                 [&name](auto& obj) { return (obj->getIdentifier() == name); });
         }
     }

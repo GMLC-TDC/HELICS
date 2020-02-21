@@ -4,13 +4,7 @@
 # 2. run git submodule update --init after a normal git clone
 # 3. download and extract a tar file from a HELICS release that includes submodules
 
-FROM ubuntu:19.04 as builder
-
-# Installs dependencies needed for building, with headers needed for development
-RUN apt-get update && apt-get install -y \
-  libzmq5-dev \
-  g++ \
-  cmake git
+FROM helics/buildenv:tumbleweed-builder as builder
 
 # Copies the current directory from the host to use as the source code for building HELICS
 COPY . /root/HELICS
@@ -30,8 +24,8 @@ RUN if [ "${ENABLE_GITHUB-}" = "true" ]; then rm -rf HELICS && git clone --depth
 
 # Generates the makefiles for building HELICS without tests, examples, C shared library, or the IPC core
 # Build type is set to release for the optimized binaries (and smaller size)
-RUN mkdir build && cd build && cmake -DHELICS_BUILD_TESTS=OFF -DHELICS_DISABLE_BOOST=ON \
-  -DHELICS_BUILD_EXAMPLES=OFF -DHELICS_DISABLE_C_SHARED_LIB=ON \
+RUN mkdir build && cd build && cmake -DHELICS_BUILD_TESTS=OFF \
+  -DHELICS_BUILD_EXAMPLES=OFF -DHELICS_DISABLE_C_SHARED_LIB=ON -DENABLE_IPC_CORE=OFF \
   -DCMAKE_BUILD_TYPE=Release -DHELICS_BINARY_ONLY_INSTALL=ON -DCMAKE_INTERPROCEDURAL_OPTIMIZATION=ON \
   -DCMAKE_INSTALL_PREFIX=/root/develop/helics-install /root/HELICS
 
@@ -41,10 +35,10 @@ RUN cd build && make -j${MAKE_PARALLEL:-2} install
 ##############################################################################
 
 # Create final image with the HELICS apps
-FROM ubuntu:19.04
+FROM opensuse/tumbleweed:latest
 
 # Install the runtime libraries needed for ZeroMQ without development files
-RUN apt-get update && apt-get install -y libzmq5 && apt-get clean
+RUN zypper mr -d openSUSE-Tumbleweed-Update && zypper install -y libzmq5 && zypper clean -a
 
 # Copy the HELICS install from the builder image stage above to a location in the PATH env var
 COPY --from=builder /root/develop/helics-install /usr

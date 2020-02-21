@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2017-2019,
+Copyright (c) 2017-2020,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
 the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
@@ -58,29 +58,31 @@ class HELICS_CXX_EXPORT FederateInfo: public CoreFederateInfo {
     explicit FederateInfo(std::vector<std::string>& args);
     /** load a federateInfo object from command line arguments outside the constructor
    @param args a string containing the command line arguments
+   @return a vector of strings containing the unused arguments
    */
     std::vector<std::string> loadInfoFromArgs(const std::string& args);
     /** load a federateInfo object from command line arguments outside the constructor
     @param argc the number of arguments
     @param argv an array of char * pointers to the arguments
+    @return a vector of strings containing the unused arguments
     */
     std::vector<std::string> loadInfoFromArgs(int argc, char* argv[]);
     /** load a federateInfo object from command line arguments contained in a vector
     @param[in,out] args a vector of arguments to load.  The unused arguments will be returned in the vector
     */
     void loadInfoFromArgs(std::vector<std::string>& args);
-
-  private:
-    std::unique_ptr<helicsCLI11App> makeCLIApp();
     /** load a federateInfo object from command line arguments outside the constructor
-  @param args a string containing the command line arguments
-  */
+ @param args a string containing the command line arguments
+ */
     void loadInfoFromArgsIgnoreOutput(const std::string& args);
     /** load a federateInfo object from command line arguments outside the constructor
     @param argc the number of arguments
     @param argv an array of char * pointers to the arguments
     */
     void loadInfoFromArgsIgnoreOutput(int argc, char* argv[]);
+
+  private:
+    std::unique_ptr<helicsCLI11App> makeCLIApp();
 };
 
 /** generate a FederateInfo object from a config file (JSON, TOML)

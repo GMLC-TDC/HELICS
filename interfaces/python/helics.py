@@ -98,6 +98,8 @@ r"""
     an in process core type for handling communications in shared memory
                                       it is pretty similar to the test core but stripped from the "test" components
     """
+helics_core_type_null = _helics.helics_core_type_null
+r""" an explicit core type that is recognized but explicitly doesn't exist, for testing and a few other assorted reasons"""
 helics_data_type_string = _helics.helics_data_type_string
 r""" a sequence of characters"""
 helics_data_type_double = _helics.helics_data_type_double

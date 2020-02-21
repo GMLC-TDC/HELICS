@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2017-2019,
+Copyright (c) 2017-2020,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
 the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
@@ -216,6 +216,19 @@ const BasicHandleInfo* HandleManager::getEndpoint(const std::string& name) const
 }
 
 BasicHandleInfo* HandleManager::getEndpoint(interface_handle handle)
+{
+    auto index = handle.baseValue();
+    if (isValidIndex(index, handles)) {
+        auto& hand = handles[index];
+        if (hand.handleType == handle_type::endpoint) {
+            return &hand;
+        }
+    }
+
+    return nullptr;
+}
+
+const BasicHandleInfo* HandleManager::getEndpoint(interface_handle handle) const
 {
     auto index = handle.baseValue();
     if (isValidIndex(index, handles)) {

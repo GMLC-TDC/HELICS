@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2017-2019,
+Copyright (c) 2017-2020,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
 the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
@@ -97,13 +97,13 @@ TEST_F(bad_input_tests, test_creation)
 TEST(error_tests, unavailable_core_type)
 {
     auto err = helicsErrorInitialize();
-    auto core = helicsCreateCore("nng", "test", "", &err);
+    auto core = helicsCreateCore("nullcore", "test", "", &err);
     EXPECT_NE(err.error_code, 0);
     helicsErrorClear(&err);
-    auto brk = helicsCreateBroker("nng", "test", "", &err);
+    auto brk = helicsCreateBroker("null", "test", "", &err);
     EXPECT_NE(err.error_code, 0);
 
-    EXPECT_EQ(helicsIsCoreTypeAvailable("nng"), helics_false);
+    EXPECT_EQ(helicsIsCoreTypeAvailable("null"), helics_false);
     EXPECT_EQ(helicsIsCoreTypeAvailable(nullptr), helics_false);
 
     EXPECT_EQ(helicsIsCoreTypeAvailable("blahblah"), helics_false);

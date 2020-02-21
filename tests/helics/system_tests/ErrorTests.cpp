@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2017-2019,
+Copyright (c) 2017-2020,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
 the top-level NOTICE for additional details. All rights reserved. SPDX-License-Identifier: BSD-3-Clause
 */
@@ -166,6 +166,10 @@ TEST_F(error_tests, duplicate_publication_names2)
     }
     catch (const helics::RegistrationFailure&) {
         gotException = true;
+        EXPECT_TRUE(fed2->getCurrentMode() == helics::Federate::modes::error);
+        //this should do nothing
+        EXPECT_THROW(fed2->enterExecutingMode(), helics::InvalidFunctionCall);
+        EXPECT_TRUE(fed2->getCurrentMode() == helics::Federate::modes::error);
     }
 
     try {
@@ -173,8 +177,13 @@ TEST_F(error_tests, duplicate_publication_names2)
     }
     catch (const helics::RegistrationFailure&) {
         gotException = true;
+        EXPECT_TRUE(fed1->getCurrentMode() == helics::Federate::modes::error);
+        //this should do nothing
+        EXPECT_THROW(fed1->enterExecutingMode(), helics::InvalidFunctionCall);
+        EXPECT_TRUE(fed1->getCurrentMode() == helics::Federate::modes::error);
     }
     EXPECT_TRUE(gotException);
+
     fed1->finalize();
     fed2->finalize();
     broker->disconnect();

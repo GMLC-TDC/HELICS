@@ -1,9 +1,19 @@
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# Copyright (c) 2017-2020, Battelle Memorial Institute; Lawrence Livermore
+# National Security, LLC; Alliance for Sustainable Energy, LLC.
+# See the top-level NOTICE for additional details.
+# All rights reserved.
+#
+# SPDX-License-Identifier: BSD-3-Clause
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 cmake_minimum_required(VERSION 2.8.7)
 set(CLANG_FORMAT_MIN_VERSION "7.0")
 
 function(set_git_hooks_enabled)
     execute_process(
             COMMAND ${GIT_EXECUTABLE} config --local core.hooksPath .githooks
+            WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
     )
     message(STATUS "Git hooks enabled")
 endfunction()
@@ -11,6 +21,7 @@ endfunction()
 function(set_git_hooks_disabled)
     execute_process(
             COMMAND ${GIT_EXECUTABLE} config --local --unset core.hooksPath
+            WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
     )
     message(STATUS "Git hooks disabled")
 endfunction()
@@ -54,7 +65,12 @@ else ()
     set(GIT_REPO_FOUND OFF)
 endif ()
 
-cmake_dependent_advanced_option(HELICS_ENABLE_GIT_HOOKS "Activate git hooks to run clang-format on committed files." ON "GIT_REPO_FOUND;CLANG_FORMAT;CLANG_FORMAT_VERSION_OK" OFF)
+if (WIN32)
+    #there are a lot of potential issues doing this on windows, but the option should be available if desired
+    cmake_dependent_advanced_option(HELICS_ENABLE_GIT_HOOKS "Activate git hooks to run clang-format on committed files." OFF "GIT_REPO_FOUND;CLANG_FORMAT;CLANG_FORMAT_VERSION_OK" OFF)
+else()
+    cmake_dependent_advanced_option(HELICS_ENABLE_GIT_HOOKS "Activate git hooks to run clang-format on committed files." ON "GIT_REPO_FOUND;CLANG_FORMAT;CLANG_FORMAT_VERSION_OK" OFF)
+endif()
 
 find_package(Git)
 

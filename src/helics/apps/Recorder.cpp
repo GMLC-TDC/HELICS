@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2017-2019,
+Copyright (c) 2017-2020,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
 the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
@@ -654,7 +654,7 @@ namespace apps {
             ->add_option(
                 "--capture",
                 "capture all the publications of a particular federate capture=\"fed1;fed2\"  "
-                "supports multiple arguments or a comma separated list")
+                "supports multiple arguments or a semicolon/comma separated list")
             ->each([this](const std::string& capt) {
                 auto captFeds = stringOps::splitlineQuotes(capt);
                 for (auto& captFed : captFeds) {

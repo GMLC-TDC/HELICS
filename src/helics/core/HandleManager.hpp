@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2017-2019,
+Copyright (c) 2017-2020,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
 the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
@@ -80,6 +80,10 @@ class HandleManager {
     /** get an endpoint by index
     @return nullptr if the index doesn't point to a valid endpoint*/
     BasicHandleInfo* getEndpoint(interface_handle handle);
+    /** get a const endpoint by index
+    @return nullptr if the index doesn't point to a valid endpoint*/
+    const BasicHandleInfo* getEndpoint(interface_handle handle) const;
+    /** get a const filter by name*/
     const BasicHandleInfo* getFilter(const std::string& name) const;
     BasicHandleInfo* getFilter(const std::string& name);
     // auto getFilters (const std::string &name) const { return filters.equal_range (name); }

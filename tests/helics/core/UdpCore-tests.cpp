@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2017-2019,
+Copyright (c) 2017-2020,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
 the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
@@ -26,7 +26,7 @@ using helics::Core;
 
 #define UDP_BROKER_PORT 23901
 #define UDP_SECONDARY_PORT 23905
-TEST(UdpCore_tests, udpComms_broker_test)
+TEST(UdpCore, udpComms_broker)
 {
     std::atomic<int> counter{0};
     std::string host = "localhost";
@@ -40,6 +40,7 @@ TEST(UdpCore_tests, udpComms_broker_test)
     comm.setCallback([&counter](helics::ActionMessage /*m*/) { ++counter; });
     comm.setBrokerPort(UDP_BROKER_PORT);
     comm.setName("tests");
+
     auto confut = std::async(std::launch::async, [&comm]() { return comm.connect(); });
 
     std::vector<char> data(1024);
@@ -63,7 +64,7 @@ TEST(UdpCore_tests, udpComms_broker_test)
     std::this_thread::sleep_for(100ms);
 }
 
-TEST(UdpCore_tests, udpComms_broker_test_transmit)
+TEST(UdpCore, udpComms_broker_test_transmit)
 {
     std::this_thread::sleep_for(std::chrono::milliseconds(500));
     std::atomic<int> counter{0};
@@ -79,6 +80,7 @@ TEST(UdpCore_tests, udpComms_broker_test_transmit)
     comm.setBrokerPort(UDP_BROKER_PORT);
     comm.setPortNumber(UDP_SECONDARY_PORT);
     comm.setName("tests");
+    comm.setFlag("noack_connect", true);
     bool connected = comm.connect();
     ASSERT_TRUE(connected);
     comm.transmit(helics::parent_route_id, helics::CMD_IGNORE);
@@ -97,7 +99,7 @@ TEST(UdpCore_tests, udpComms_broker_test_transmit)
     std::this_thread::sleep_for(100ms);
 }
 
-TEST(UdpCore_tests, udpComms_rx_test)
+TEST(UdpCore, udpComms_rx)
 {
     std::this_thread::sleep_for(std::chrono::milliseconds(500));
     std::atomic<int> counter{0};
@@ -119,7 +121,7 @@ TEST(UdpCore_tests, udpComms_rx_test)
     comm.setBrokerPort(UDP_BROKER_PORT);
     comm.setPortNumber(23903);
     comm.setName("tests");
-
+    comm.setFlag("noack_connect", true);
     bool connected = comm.connect();
     ASSERT_TRUE(connected);
 
@@ -141,7 +143,7 @@ TEST(UdpCore_tests, udpComms_rx_test)
     std::this_thread::sleep_for(100ms);
 }
 
-TEST(UdpCore_tests, udpComm_transmit_through)
+TEST(UdpCore, udpComm_transmit_through)
 {
     std::this_thread::sleep_for(std::chrono::milliseconds(500));
     std::atomic<int> counter{0};
@@ -192,7 +194,7 @@ TEST(UdpCore_tests, udpComm_transmit_through)
     std::this_thread::sleep_for(100ms);
 }
 
-TEST(UdpCore_tests, udpComm_transmit_add_route)
+TEST(UdpCore, udpComm_transmit_add_route)
 {
     std::this_thread::sleep_for(std::chrono::milliseconds(500));
     std::atomic<int> counter{0};
@@ -283,11 +285,11 @@ TEST(UdpCore_tests, udpComm_transmit_add_route)
     std::this_thread::sleep_for(100ms);
 }
 
-TEST(UdpCore_tests, udpCore_initialization_test)
+TEST(UdpCore, udpCore_initialization)
 {
     std::this_thread::sleep_for(std::chrono::milliseconds(500));
     std::string initializationString =
-        "-f 1 --brokerport=23901  --port=23950 --local_interface=localhost --name=core1";
+        "-f 1 --brokerport=23901  --port=23950 --local_interface=localhost --name=core1 --noack_connect";
     auto core = helics::CoreFactory::create(helics::core_type::UDP, initializationString);
 
     ASSERT_TRUE(core != nullptr);
@@ -325,7 +327,7 @@ TEST(UdpCore_tests, udpCore_initialization_test)
 also tests the automatic port determination for cores
 */
 
-TEST(UdpCore_tests, udpCore_core_broker_default_test)
+TEST(UdpCore, udpCore_core_broker_default)
 {
     std::this_thread::sleep_for(500ms);
     std::string initializationString = "-f 1";

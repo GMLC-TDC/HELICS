@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2017-2019,
+Copyright (c) 2017-2020,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
 the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
@@ -620,6 +620,14 @@ TEST_F(filter_tests, clone_test_connections)
     CE(helicsFederateEnterExecutingModeComplete(sFed, &err));
     CE(helicsFederateEnterExecutingModeComplete(dcFed, &err));
 
+    //this is testing the filtered_endpoints query for cloning source filters
+    auto q = helicsCreateQuery("", "filtered_endpoints");
+    std::string filteredEndpoints = helicsQueryExecute(q, sFed, nullptr);
+    std::cout << filteredEndpoints << std::endl;
+    EXPECT_TRUE(filteredEndpoints.find("(cloning)") != std::string::npos);
+    EXPECT_TRUE(filteredEndpoints.find("srcFilters") != std::string::npos);
+    helicsQueryFree(q);
+
     CE(helics_federate_state state = helicsFederateGetState(sFed, &err));
     EXPECT_TRUE(state == helics_state_execution);
     std::string data(500, 'a');
@@ -740,17 +748,17 @@ TEST_F(filter_tests, clone_test_broker_connections)
     EXPECT_TRUE(state == helics_state_finalize);
 }
 
+// this tests using a remote core to connect an endpoint to a cloning destination filter
 TEST_F(filter_tests, clone_test_dest_connections)
 {
     auto broker = AddBroker("test", 3);
     AddFederates(helicsCreateMessageFederate, "test", 1, broker, 1.0, "source");
     AddFederates(helicsCreateMessageFederate, "test", 1, broker, 1.0, "dest");
-    AddFederates(helicsCreateMessageFederate, "test", 1, broker, 1.0, "dest_clone");
+    AddFederates(helicsCreateMessageFederate, "test", 1, broker, 2.0, "dest_clone");
 
     auto sFed = GetFederateAt(0);
     auto dFed = GetFederateAt(1);
     auto dcFed = GetFederateAt(2);
-
     auto p1 = helicsFederateRegisterGlobalEndpoint(sFed, "src", "", &err);
     auto p2 = helicsFederateRegisterGlobalEndpoint(dFed, "dest", "", &err);
     auto p3 = helicsFederateRegisterGlobalEndpoint(dcFed, "cm", "", &err);
@@ -765,8 +773,10 @@ TEST_F(filter_tests, clone_test_dest_connections)
 
     //error test
     helicsCoreAddDestinationFilterToEndpoint(cr, nullptr, "dest", &err);
+
     EXPECT_NE(err.error_code, 0);
     helicsErrorClear(&err);
+    helicsCoreFree(cr);
 
     CE(helicsFederateEnterExecutingModeAsync(sFed, &err));
     CE(helicsFederateEnterExecutingModeAsync(dcFed, &err));
@@ -774,55 +784,55 @@ TEST_F(filter_tests, clone_test_dest_connections)
     CE(helicsFederateEnterExecutingModeComplete(sFed, &err));
     CE(helicsFederateEnterExecutingModeComplete(dcFed, &err));
 
+    auto q = helicsCreateQuery("", "filtered_endpoints");
+    std::string filteredEndpoints = helicsQueryExecute(q, dFed, nullptr);
+    std::cout << filteredEndpoints << std::endl;
+    EXPECT_TRUE(filteredEndpoints.find("cloningdestFilter") != std::string::npos);
+    helicsQueryFree(q);
+
     CE(helics_federate_state state = helicsFederateGetState(sFed, &err));
     EXPECT_TRUE(state == helics_state_execution);
     std::string data(500, 'a');
     CE(helicsEndpointSendMessageRaw(p1, "dest", data.c_str(), static_cast<int>(data.size()), &err));
 
-    CE(helicsFederateRequestTimeAsync(sFed, 1.0, &err));
-    CE(helicsFederateRequestTimeAsync(dcFed, 1.0, &err));
-    CE(helicsFederateRequestTime(dFed, 1.0, &err));
-    CE(helicsFederateRequestTimeComplete(sFed, &err));
-    CE(helicsFederateRequestTimeComplete(dcFed, &err));
+    CE(helicsFederateFinalize(sFed, nullptr));
 
-    auto res = helicsFederateHasMessage(dFed);
-    EXPECT_TRUE(res);
+    helics_message m2;
+    auto dFedExec = [&]() {
+        helicsFederateRequestTime(dFed, 1.0, nullptr);
+        m2 = helicsEndpointGetMessage(p2);
+        helicsFederateFinalize(dFed, nullptr);
+    };
 
-    if (res) {
-        auto m2 = helicsEndpointGetMessage(p2);
-        EXPECT_STREQ(m2.source, "src");
-        EXPECT_STREQ(m2.original_source, "src");
-        EXPECT_STREQ(m2.dest, "dest");
-        EXPECT_EQ(m2.length, static_cast<int64_t>(data.size()));
-    }
+    helics_message m3;
+    auto dcFedExec = [&]() {
+        helicsFederateRequestTime(dcFed, 2.0, nullptr);
+        auto res = helicsFederateHasMessage(dcFed);
+        if (res == helics_false) {
+            std::this_thread::sleep_for(std::chrono::milliseconds(50));
+            helicsFederateRequestTime(dcFed, 4.0, nullptr);
+        }
+        m3 = helicsEndpointGetMessage(p3);
+        helicsFederateFinalize(dcFed, nullptr);
+    };
 
-    // now check the message clone
-    res = helicsFederateHasMessage(dcFed);
-    if (res == helics_false) {
-        std::this_thread::sleep_for(std::chrono::milliseconds(50));
-        CE(helicsFederateRequestTimeAsync(sFed, 2.0, &err));
-        CE(helicsFederateRequestTimeAsync(dcFed, 2.0, &err));
-        CE(helicsFederateRequestTime(dFed, 2.0, &err));
-        CE(helicsFederateRequestTimeComplete(sFed, &err));
-        CE(helicsFederateRequestTimeComplete(dcFed, &err));
-    }
-    res = helicsFederateHasMessage(dcFed);
-    EXPECT_TRUE(res);
+    auto threaddFed = std::thread(dFedExec);
+    auto threaddcFed = std::thread(dcFedExec);
 
-    if (res) {
-        auto m2 = helicsEndpointGetMessage(p3);
-        EXPECT_STREQ(m2.source, "src");
-        EXPECT_STREQ(m2.original_source, "src");
-        EXPECT_STREQ(m2.dest, "cm");
-        EXPECT_STREQ(m2.original_dest, "dest");
-        EXPECT_EQ(m2.length, static_cast<int64_t>(data.size()));
-    }
+    threaddFed.join();
+    EXPECT_STREQ(m2.source, "src");
+    EXPECT_STREQ(m2.original_source, "src");
+    EXPECT_STREQ(m2.dest, "dest");
+    EXPECT_EQ(m2.length, static_cast<int64_t>(data.size()));
 
-    CE(helicsFederateFinalizeAsync(sFed, &err));
-    CE(helicsFederateFinalizeAsync(dFed, &err));
-    CE(helicsFederateFinalize(dcFed, &err));
-    CE(helicsFederateFinalizeComplete(sFed, &err));
-    CE(helicsFederateFinalizeComplete(dFed, &err));
+    threaddcFed.join();
+
+    EXPECT_STREQ(m3.source, "src");
+    EXPECT_STREQ(m3.original_source, "src");
+    EXPECT_STREQ(m3.dest, "cm");
+    EXPECT_STREQ(m3.original_dest, "dest");
+    EXPECT_EQ(m3.length, static_cast<int64_t>(data.size()));
+
     CE(state = helicsFederateGetState(sFed, &err));
     EXPECT_TRUE(state == helics_state_finalize);
 }
@@ -880,17 +890,15 @@ TEST_F(filter_tests, clone_test_broker_dest_connections)
         EXPECT_STREQ(m2.dest, "dest");
         EXPECT_EQ(m2.length, static_cast<int64_t>(data.size()));
     }
+    CE(helicsFederateFinalizeAsync(sFed, &err));
+    CE(helicsFederateFinalizeAsync(dFed, &err));
 
     // now check the message clone
     auto res2 = helicsFederateHasMessage(dcFed);
 
     if (res2 == helics_false) {
         std::this_thread::sleep_for(std::chrono::milliseconds(50));
-        CE(helicsFederateRequestTimeAsync(sFed, 2.0, &err));
-        CE(helicsFederateRequestTimeAsync(dcFed, 2.0, &err));
-        CE(helicsFederateRequestTime(dFed, 2.0, &err));
-        CE(helicsFederateRequestTimeComplete(sFed, &err));
-        CE(helicsFederateRequestTimeComplete(dcFed, &err));
+        CE(helicsFederateRequestTime(dcFed, 2.0, &err));
         res2 = helicsFederateHasMessage(dcFed);
     }
 
@@ -905,8 +913,6 @@ TEST_F(filter_tests, clone_test_broker_dest_connections)
         EXPECT_EQ(m2.length, static_cast<int64_t>(data.size()));
     }
 
-    CE(helicsFederateFinalizeAsync(sFed, &err));
-    CE(helicsFederateFinalizeAsync(dFed, &err));
     CE(helicsFederateFinalize(dcFed, &err));
     CE(helicsFederateFinalizeComplete(sFed, &err));
     CE(helicsFederateFinalizeComplete(dFed, &err));
