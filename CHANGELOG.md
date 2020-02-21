@@ -31,7 +31,8 @@ Increased code coverage and additional bug fixes.
 ### Deprecated 
 
 ### Removed
--   `HELICS_ENABLE_WEBSERVER` option to enable the webserver.  This option was added as experimental in 2.4.0 
+-   `HELICS_ENABLE_WEBSERVER` option to enable the webserver.  This option was added as experimental in 2.4.0
+-   VS2015 Windows Server 2012 CI build is removed. Azure Pipelines is [removing the image](https://devblogs.microsoft.com/devops/removing-older-images-in-azure-pipelines-hosted-pools/) because it is outdated and sees little use.  VS2015 is still tested through Appveyor for the time being.
 
 
 ## [2.4.0][] - 2020-02-04
