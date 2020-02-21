@@ -28,6 +28,7 @@ jobs:
   - task: UsePythonVersion@0
     inputs:
       versionSpec: '3.5'
+      addToPath: true
       architecture: $(langArch)
     
   - bash: pip3 install pytest
