@@ -29,6 +29,8 @@ set(HELICS_MULTINODE_BENCHMARKS
     EchoLeafFederate
     EchoMessageHubFederate
     EchoMessageLeafFederate
+    TimingHubFederate
+    TimingLeafFederate
 )
 
 # Only affects current directory, so safe
@@ -69,6 +71,7 @@ target_sources(pholdBenchmarks PUBLIC PholdFederate.hpp)
 target_sources(messageSendBenchmarks PUBLIC MessageExchangeFederate.hpp)
 target_sources(ringBenchmarks PUBLIC RingTransmitFederate.hpp)
 target_sources(ringMessageBenchmarks PUBLIC RingTransmitMessageFederate.hpp)
+target_sources(timingBenchmarks PUBLIC TimingHubFederate.hpp TimingLeafFederate.hpp)
 
 copy_key_files_to_target_location(ActionMessageBenchmarks)
 
