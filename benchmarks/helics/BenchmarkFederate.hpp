@@ -23,6 +23,12 @@ using namespace helics;
 /** class implementing common functionality for benchmarks */
 class BenchmarkFederate {
   public:
+      enum class OutputFormat {
+          PLAIN_TEXT,
+//          JSON
+      };
+
+  public:
     // getters and setters for parameters
     void setDeltaTime(helics::Time dt) { deltaTime = dt; }
     helics::Time getDeltaTime() { return deltaTime; }
@@ -38,6 +44,8 @@ class BenchmarkFederate {
     void setBeforeFinalizeCallback(std::function<void()> cb = {}) { callBeforeFinalize = cb; }
     void setAfterFinalizeCallback(std::function<void()> cb = {}) { callAfterFinalize = cb; }
 
+    void setOutputFormat(OutputFormat f) { result_format = f; }
+
     // protected to give derived classes more control
   protected:
     class Result {
@@ -47,6 +55,9 @@ class BenchmarkFederate {
         std::string value;
     };
     std::vector<Result> results;
+
+    // Output format type
+    OutputFormat result_format = OutputFormat::PLAIN_TEXT;
 
     // parameters most benchmark federates need
     helics::Time deltaTime=helics::Time(10, time_units::ns); // sampling rate
@@ -84,19 +95,9 @@ class BenchmarkFederate {
   public:
     BenchmarkFederate() : BenchmarkFederate("") {}
 
-    BenchmarkFederate(std::string name, helics::Time dt, helics::Time ft, int i, int max_i) : BenchmarkFederate(name)
-    {
-        deltaTime = dt;
-        finalTime = ft;
-        index = i;
-        maxIndex = max_i;
-    }
-    
     // TODO add JSON output format option    
-    BenchmarkFederate(std::string name)
+    explicit BenchmarkFederate(std::string name) : app(std::make_unique<helics::helicsCLI11App>(name))
     {
-        // Setup up basic CLI11 with options all benchmark feds need to support
-        app = std::make_unique<helics::helicsCLI11App>(name);
         app->allow_extras();
 
         // add common time options (optional)
@@ -170,7 +171,9 @@ class BenchmarkFederate {
     void printResults()
     {
         for (auto r : results) {
-            std::cout << r.name << ": " << r.value << std::endl;
+            if (result_format == OutputFormat::PLAIN_TEXT) {
+                std::cout << r.name << ": " << r.value << std::endl;
+            }
         }
     }
 
@@ -225,19 +228,6 @@ class BenchmarkFederate {
         initialized = true;
         return 0;
     }
-
-    /*int parseArgs(int argc, char** argv)
-    {
-        auto res = app->helics_parse(argc, argv);
-        return handleCLI11Result(res);
-    }
-
-    int parseArgs(std::string initstr)
-    {
-        auto res = app->helics_parse(initstr);
-        return handleCLI11Result(res);
-    }*/
-
 
     template<typename ... Args>
     int parseArgs(Args ... args)

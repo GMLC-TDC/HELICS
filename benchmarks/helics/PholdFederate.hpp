@@ -20,7 +20,7 @@ class PholdFederate : public BenchmarkFederate   {
     int evCount = 0; // number of events handled by this federate
 
   private:
-    helics::Endpoint* ept;
+    helics::Endpoint* ept = nullptr;
 
     // values from paper "Warp Speed: Executing Time Warp on 1,966,080 Cores"
     // 16 circulating events per LP (also ran with 8 events per LP)
