@@ -15,19 +15,24 @@ Increased code coverage and additional bug fixes.
 -   The helics webserver will build by default if the conditions are met
 -   Update filesystem library to [v1.3.0](https://github.com/gulrak/filesystem/releases/tag/v1.3.0)
 -   The behavior of the Federate *Complete operations to be uniform and consistent
+-   Configuration of flags and targets for interfaces in json and toml files can be done in multiple sections
 
 ### Fixed
 -   Issue with iterative requests that were not being honored if the federate was acting in isolation
 -   A few pathways which would allow segmentation faults if a federate was disconnected and particular functions were called
+-   ValueFederate `addIndexedTargets`, the function template would not work as was written and was unusable, it is now tested and operational.
 
 ### Added
 -   `HELICS_DISABLE_WEBSERVER` option to turn off building of the webserver.  It will build by default if Boost is enabled and is version 1.70 or higher; otherwise it is disabled.
 -   A series of test for Federate.cpp to increase coverage on that file to 100% 
+-   A series of tests for ValueFederate.*pp to increase coverage on that file to 100%
+-   Docker image for a helics builder which includes build tools and the helics installation 
 
 ### Deprecated 
 
 ### Removed
--   `HELICS_ENABLE_WEBSERVER` option to enable the webserver.  This option was added as experimental in 2.4.0 
+-   `HELICS_ENABLE_WEBSERVER` option to enable the webserver.  This option was added as experimental in 2.4.0
+-   VS2015 Windows Server 2012 CI build is removed. Azure Pipelines is [removing the image](https://devblogs.microsoft.com/devops/removing-older-images-in-azure-pipelines-hosted-pools/) because it is outdated and sees little use.  VS2015 is still tested through Appveyor for the time being.
 
 
 ## [2.4.0][] - 2020-02-04

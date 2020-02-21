@@ -28,6 +28,7 @@ class HELICS_CXX_EXPORT ValueFederate:
     @param fi  a federate information structure
     */
     ValueFederate(const std::string& fedName, const FederateInfo& fi);
+
     /**constructor taking a core and a federate information structure, sore information in fi is ignored
     @param fedName the name of the federate, can be empty to use the name from fi or an auto generated one
     @param core a shared ptr to a core to join
@@ -37,11 +38,20 @@ class HELICS_CXX_EXPORT ValueFederate:
         const std::string& fedName,
         const std::shared_ptr<Core>& core,
         const FederateInfo& fi);
+
+    /**constructor taking a CoreApp and a federate information structure
+    @param fedName the name of the federate can be empty to use a name from the federateInfo
+    @param core a CoreApp with the core to connect to.
+    @param fi  a federate information structure
+    */
+    ValueFederate(const std::string& fedName, CoreApp& core, const FederateInfo& fi);
+
     /**constructor taking a string with the required information
     @param configString can be either a JSON file a TOML file (with extension TOML) or a string containing JSON
     code
     */
     explicit ValueFederate(const std::string& configString);
+
     /**constructor taking a string with the required information
     @param fedName the name of the federate, can be empty to use the name from the configString
     @param configString can be either a JSON file a TOML file (with extension TOML) or a string containing JSON
@@ -55,6 +65,10 @@ class HELICS_CXX_EXPORT ValueFederate:
     /** special constructor called by child class to initialize the class vs the default constructor
      */
     explicit ValueFederate(bool res);
+
+    /** this is an overload for the string operation top deconflict with the bool version 
+     */
+    explicit ValueFederate(const char* configString);
 
   public:
     /** federate is not copyable*/
@@ -482,21 +496,17 @@ class HELICS_CXX_EXPORT ValueFederate:
     @param target the name of the publication to remove
     */
     void removeTarget(const Input& inp, const std::string& target);
+
     /** add a 1-d Indexed target to an interface
    @details call is only valid in startup mode, register an optional subscription for a 1D array of values
    @param iObject an interface object to add the target to
    @param target the name of the target
    @param index1 the index into a 1 dimensional array of values
-   @param units the optional units on the subscription
    */
     template<class iType>
-    void addTargetIndexed(
-        const iType& iObject,
-        const std::string& target,
-        int index1,
-        const std::string& units = std::string())
+    void addIndexedTarget(const iType& iObject, const std::string& target, int index1)
     {
-        addTarget(iObject, target + '_' + std::to_string(index1), units);
+        addTarget(iObject, target + '_' + std::to_string(index1));
     }
 
     /** add an indexed target to an interface
@@ -505,18 +515,11 @@ class HELICS_CXX_EXPORT ValueFederate:
     @param target the name of the target
     @param index1 the first index of a 2-D value structure
     @param index2 the 2nd index of a 2-D value structure
-    @param units the optional units on the subscription
     */
     template<class iType>
-    void addTargetIndexed(
-        const iType& iObject,
-        const std::string& target,
-        int index1,
-        int index2,
-        const std::string& units = std::string())
+    void addIndexedTarget(const iType& iObject, const std::string& target, int index1, int index2)
     {
-        addTarget(
-            iObject, target + '_' + std::to_string(index1) + '_' + std::to_string(index2), units);
+        addTarget(iObject, target + '_' + std::to_string(index1) + '_' + std::to_string(index2));
     }
 
     /** check if a given subscription has an update

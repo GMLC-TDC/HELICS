@@ -1,0 +1,23 @@
+#this is a incorrect toml file for testing some file checks.  The publications should be an array instead of a single value
+
+name="vFed_toml" # the name of the federate
+
+coretype="test" #the type of the core "test","zmq","udp","icp","tcp","mpi"
+corename="toml_test_bad"  #this matters most for icp and test cores, can be empty
+coreinit="--autobroker" # the initialization string for the core in the form of a command line arguments
+period=  1.0 #the period with which federate may return time
+
+#subscriptions used in the federate (also example of inline table
+#set required to true to make helics issue a warning if the publication is not found
+#example of inline tables (be careful it falls under the most recent [section] or [[table]]
+subscriptions=[
+{key="pub1",  required=true},
+  # shortcut is a naming shortcut for the publication for later retrieval
+{key="vFed_toml/pub2", shortcut="pubshortcut", info="this is an information string for use by the application"}
+]
+
+inputs=[
+{key="ipt2",  type="double",flags="optional", target="pub1", global=true}
+]  #specify an input with a target
+
+publications="bad_pub"

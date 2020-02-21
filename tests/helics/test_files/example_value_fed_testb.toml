@@ -1,0 +1,37 @@
+#this is a toml configuration file for HELICS value federate
+#example toml configuration file for a value federate all arguments are optional
+
+name="valueFed_toml" # the name of the federate
+
+coretype="test" #the type of the core "test","zmq","udp","icp","tcp","mpi"
+corename="toml_testb"  #this matters most for icp and test cores, can be empty
+coreinit="--autobroker" # the initialization string for the core in the form of a command line arguments
+period=  1.0 #the period with which federate may return time
+
+#subscriptions used in the federate (also example of inline table
+#set required to true to make helics issue a warning if the publication is not found
+#example of inline tables (be careful it falls under the most recent [section] or [[table]]
+subscriptions=[
+{key="pub1",  required=true},
+  # shortcut is a naming shortcut for the publication for later retrieval
+{key="valueFed_toml/pub2", shortcut="pubshortcut", info="this is an information string for use by the application"}
+]
+
+inputs=[
+{key="ipt2",  type="double",flags="optional", target="pub1", global=true}
+]  #specify an input with a target
+
+
+#Publications used in the federate
+[[publications]]
+key="pub1" # the name of the publication
+ type="double" # the type assocaited with a publication (optional)
+ unit="m"  # the units associated with a publication (optional)
+ global=true #set to true to make the key global (default is false in which case the publication is prepended with the federate name)
+ info="this is an information string for use by the application"
+
+[[publications]]
+key="pub2" # the name of the publication
+ type="double" # the type assocaited with a publication (optional)
+ alias="primary"
+ #no global=true implies this will have the federate name prepended like valueFed/pub2

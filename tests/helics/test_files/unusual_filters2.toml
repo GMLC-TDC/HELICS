@@ -1,5 +1,7 @@
-#example toml configuration file for a message federate that also creates some filters
-name="filterFed" # the name of the federate
+#This is not a valid configuration file for HELICS.  The Filter section needs to be an array
+# This file is for testing some error handling inside HELICS
+
+name="filterFed_bad" # the name of the federate
 
 #possible flags
 observer=false  # indicator that the federate does not send anything
