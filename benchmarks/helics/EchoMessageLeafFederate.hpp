@@ -11,22 +11,16 @@ SPDX-License-Identifier: BSD-3-Clause
 
 using helics::operator"" _t;
 /* class implementing a leaf for the echo message benchmark*/
-class EchoMessageLeaf : public BenchmarkFederate {
+class EchoMessageLeaf: public BenchmarkFederate {
   private:
     helics::Endpoint ept;
 
   public:
-    EchoMessageLeaf() : BenchmarkFederate("echo message leaf benchmark federate") {}
+    EchoMessageLeaf(): BenchmarkFederate("echo message leaf benchmark federate") {}
 
-    void setupArgumentParsing() override
-    {
-        opt_index->required();
-    }
+    void setupArgumentParsing() override { opt_index->required(); }
 
-    std::string getName() override
-    {
-        return "echoleaf_" + std::to_string(index);
-    }
+    std::string getName() override { return "echoleaf_" + std::to_string(index); }
 
     void doFedInit() override
     {

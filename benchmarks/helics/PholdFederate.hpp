@@ -15,7 +15,7 @@ SPDX-License-Identifier: BSD-3-Clause
 
 using namespace helics;
 /** class implementing a federate for the PHOLD benchmark*/
-class PholdFederate : public BenchmarkFederate   {
+class PholdFederate: public BenchmarkFederate {
   public:
     int evCount = 0; // number of events handled by this federate
 
@@ -44,7 +44,7 @@ class PholdFederate : public BenchmarkFederate   {
 
   public:
     // TODO: output cluster name in a summary file, along with node count and feds per node
-    PholdFederate() : BenchmarkFederate("phold benchmark federate") {}
+    PholdFederate(): BenchmarkFederate("phold benchmark federate") {}
 
     // functions for setting parameters
     void setGenerateRandomSeed(bool b) { generateRandomSeed = b; };
@@ -57,20 +57,18 @@ class PholdFederate : public BenchmarkFederate   {
     // functions for setting callbacks
     void setBeforeFinalizeCallback(std::function<void()> cb = nullptr) { callBeforeFinalize = cb; };
     void setAfterFinalizeCallback(std::function<void()> cb = nullptr) { callAfterFinalize = cb; };
-    
-    std::string getName() override
-    {
-        return "phold_" + std::to_string(index);
-    }
+
+    std::string getName() override { return "phold_" + std::to_string(index); }
 
     void setupArgumentParsing() override
     {
         app->add_option("--init_ev_count", initEvCount_, "the starting number of events");
-        app->add_option("--local_probability", localProbability_, "the probability of local events");
         app->add_option(
-                "--rand_time_mean",
-                randTimeMean_,
-                "mean for the exponential distribution used when picking event times");
+            "--local_probability", localProbability_, "the probability of local events");
+        app->add_option(
+            "--rand_time_mean",
+            randTimeMean_,
+            "mean for the exponential distribution used when picking event times");
         app->add_flag("--gen_rand_seed", generateRandomSeed, "enable generating a random seed");
         app->add_option("--set_rand_seed", seed, "set the random seed");
         app->add_option("--set_phold_lookahead", lookahead_, "set the lookahead used by phold");
@@ -103,10 +101,7 @@ class PholdFederate : public BenchmarkFederate   {
         }
     }
 
-    void doFedInit() override
-    {
-        ept = &fed->registerEndpoint("ept");
-    }
+    void doFedInit() override { ept = &fed->registerEndpoint("ept"); }
 
     void doMakeReady() override
     {

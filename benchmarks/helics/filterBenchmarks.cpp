@@ -99,7 +99,7 @@ static void BMfilter_multiCore(benchmark::State& state, core_type cType)
         for (int ii = 0; ii < feds; ++ii) {
             cores[ii] = helics::CoreFactory::create(cType, "-f 1 --log_level=no_print");
             cores[ii]->connect();
-            std::string bmInit = "--index=" + std::to_string(ii);      
+            std::string bmInit = "--index=" + std::to_string(ii);
             leafs[ii].initialize(cores[ii]->getIdentifier(), bmInit);
         }
         filtcore->connect();

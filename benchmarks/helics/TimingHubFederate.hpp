@@ -14,25 +14,23 @@ SPDX-License-Identifier: BSD-3-Clause
 using helics::operator"" _t;
 using namespace helics;
 /** class implementing the hub for a timing test*/
-class TimingHub : public BenchmarkFederate {
+class TimingHub: public BenchmarkFederate {
   private:
     std::vector<helics::Publication> pubs;
     std::vector<helics::Input> subs;
     int cnt = 10;
 
   public:
-    TimingHub() : BenchmarkFederate("timing hub benchmark federate") {}
+    TimingHub(): BenchmarkFederate("timing hub benchmark federate") {}
 
-    std::string getName() override
-    {
-        return "echohub";
-    }
+    std::string getName() override { return "echohub"; }
 
     void setupArgumentParsing() override
     {
         finalTime = helics::Time(100, time_units::ms);
-    
-        app->add_option("--num_leafs", cnt, "the number of echoleaf federates to expect")->required();
+
+        app->add_option("--num_leafs", cnt, "the number of echoleaf federates to expect")
+            ->required();
     }
 
     void doFedInit() override

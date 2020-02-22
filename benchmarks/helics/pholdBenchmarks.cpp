@@ -33,9 +33,10 @@ static void BMphold_singleCore(benchmark::State& state)
             std::string("--autobroker --federates=") + std::to_string(fed_count));
         std::vector<PholdFederate> feds(fed_count);
         for (int ii = 0; ii < fed_count; ++ii) {
-            // phold federate default seed values are deterministic, based on index 
+            // phold federate default seed values are deterministic, based on index
             feds[ii].setGenerateRandomSeed(false);
-            std::string bmInit = "--index=" + std::to_string(ii) + " --max_index=" + std::to_string(fed_count);
+            std::string bmInit =
+                "--index=" + std::to_string(ii) + " --max_index=" + std::to_string(fed_count);
             feds[ii].initialize(wcore->getIdentifier(), bmInit);
         }
 
@@ -92,9 +93,10 @@ static void BMphold_multiCore(benchmark::State& state, core_type cType)
             cores[ii] = helics::CoreFactory::create(cType, "-f 1 --log_level=no_print");
             cores[ii]->connect();
 
-            // phold federate default seed values are deterministic, based on index 
+            // phold federate default seed values are deterministic, based on index
             feds[ii].setGenerateRandomSeed(false);
-            std::string bmInit = "--index=" + std::to_string(ii) + " --max_index=" + std::to_string(fed_count);
+            std::string bmInit =
+                "--index=" + std::to_string(ii) + " --max_index=" + std::to_string(fed_count);
             feds[ii].initialize(cores[ii]->getIdentifier(), bmInit);
         }
 

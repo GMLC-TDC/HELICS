@@ -14,7 +14,7 @@ SPDX-License-Identifier: BSD-3-Clause
 using helics::operator"" _t;
 using namespace helics;
 /** class implementing a token ring using a value being passed as the token*/
-class RingTransmit : public BenchmarkFederate {
+class RingTransmit: public BenchmarkFederate {
   public:
     int loopCount = 0;
 
@@ -23,12 +23,9 @@ class RingTransmit : public BenchmarkFederate {
     helics::Input* sub = nullptr;
 
   public:
-    RingTransmit() : BenchmarkFederate("ring transmit benchmark federate") {}
+    RingTransmit(): BenchmarkFederate("ring transmit benchmark federate") {}
 
-    std::string getName() override
-    {
-        return "ringlink_" + std::to_string(index);
-    }
+    std::string getName() override { return "ringlink_" + std::to_string(index); }
 
     void setupArgumentParsing() override
     {

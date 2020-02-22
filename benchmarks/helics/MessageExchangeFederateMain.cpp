@@ -16,8 +16,7 @@ int main(int argc, char* argv[])
     MessageExchangeFederate fed;
 
     int rc = fed.initialize(fi, argc, argv);
-    if (rc != 0)
-    {
+    if (rc != 0) {
         exit(rc);
     }
 
