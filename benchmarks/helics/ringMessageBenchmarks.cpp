@@ -30,7 +30,8 @@ static void BM_ringMessage2_singleCore(benchmark::State& state)
 
         std::vector<RingTransmitMessage> links(feds);
         for (int ii = 0; ii < feds; ++ii) {
-            std::string bmInit = "--index=" + std::to_string(ii) + " --max_index=" + std::to_string(feds);
+            std::string bmInit =
+                "--index=" + std::to_string(ii) + " --max_index=" + std::to_string(feds);
             links[ii].initialize(wcore->getIdentifier(), bmInit);
         }
 
@@ -79,7 +80,8 @@ static void BM_ringMessage_multiCore(benchmark::State& state, core_type cType)
                 std::string(
                     "--restrictive_time_policy --federates=1 --broker=" + broker->getIdentifier()));
             cores[ii]->connect();
-            std::string bmInit = "--index=" + std::to_string(ii) + " --max_index=" + std::to_string(feds);
+            std::string bmInit =
+                "--index=" + std::to_string(ii) + " --max_index=" + std::to_string(feds);
             links[ii].initialize(cores[ii]->getIdentifier(), bmInit);
         }
         std::vector<std::thread> threadlist(feds - 1);

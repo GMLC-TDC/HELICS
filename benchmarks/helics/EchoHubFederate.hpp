@@ -12,27 +12,25 @@ SPDX-License-Identifier: BSD-3-Clause
 
 using helics::operator"" _t;
 /** class implementing the hub for an echo test*/
-class EchoHub : public BenchmarkFederate {
+class EchoHub: public BenchmarkFederate {
   private:
-      std::vector<helics::Publication> pubs;
-      std::vector<helics::Input> subs;
-      int cnt = 10;
+    std::vector<helics::Publication> pubs;
+    std::vector<helics::Input> subs;
+    int cnt = 10;
 
   public:
-    EchoHub() : BenchmarkFederate("echo hub benchmark federate") {}
+    EchoHub(): BenchmarkFederate("echo hub benchmark federate") {}
 
     void setupArgumentParsing() override
     {
         // default final time for this benchmark
         finalTime = helics::Time(100, time_units::ms);
-    
-        app->add_option("--num_leafs", cnt, "the number of echoleaf federates to expect")->required();
+
+        app->add_option("--num_leafs", cnt, "the number of echoleaf federates to expect")
+            ->required();
     }
 
-    std::string getName() override
-    {
-        return "echohub";
-    }
+    std::string getName() override { return "echohub"; }
 
     void doFedInit() override
     {

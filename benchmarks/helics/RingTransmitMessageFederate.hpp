@@ -13,7 +13,7 @@ SPDX-License-Identifier: BSD-3-Clause
 using helics::operator"" _t;
 using namespace helics;
 /** class implementing a token ring using messages as the transmission mechanism*/
-class RingTransmitMessage : public BenchmarkFederate {
+class RingTransmitMessage: public BenchmarkFederate {
   public:
     int loopCount = 0;
 
@@ -21,12 +21,9 @@ class RingTransmitMessage : public BenchmarkFederate {
     helics::Endpoint* ept = nullptr;
 
   public:
-    RingTransmitMessage() : BenchmarkFederate("ring transmit message benchmark federate") {}
+    RingTransmitMessage(): BenchmarkFederate("ring transmit message benchmark federate") {}
 
-    std::string getName() override
-    {
-        return "ringlink_" + std::to_string(index);
-    }
+    std::string getName() override { return "ringlink_" + std::to_string(index); }
 
     void setupArgumentParsing() override
     {
@@ -70,4 +67,3 @@ class RingTransmitMessage : public BenchmarkFederate {
         }
     }
 };
-

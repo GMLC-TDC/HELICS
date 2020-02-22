@@ -11,12 +11,12 @@ SPDX-License-Identifier: BSD-3-Clause
 
 using helics::operator"" _t;
 /** class implementing the hub for an echo test*/
-class EchoMessageHub : public BenchmarkFederate {
+class EchoMessageHub: public BenchmarkFederate {
   private:
     helics::Endpoint ept;
 
   public:
-    EchoMessageHub() : BenchmarkFederate("echo message hub benchmark federate") {}
+    EchoMessageHub(): BenchmarkFederate("echo message hub benchmark federate") {}
 
     void setupArgumentParsing() override
     {
@@ -24,15 +24,9 @@ class EchoMessageHub : public BenchmarkFederate {
         finalTime = helics::Time(100, time_units::ms);
     }
 
-    std::string getName() override
-    {
-        return "echohub";
-    }
+    std::string getName() override { return "echohub"; }
 
-    void doFedInit() override
-    {
-        ept = fed->registerGlobalEndpoint("echo");
-    }
+    void doFedInit() override { ept = fed->registerGlobalEndpoint("echo"); }
 
     void doMainLoop() override
     {

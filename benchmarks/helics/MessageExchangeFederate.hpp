@@ -13,22 +13,19 @@ SPDX-License-Identifier: BSD-3-Clause
 
 using helics::operator"" _t;
 /** class implementing a federate that sends messages to another (and vice versa)*/
-class MessageExchangeFederate : public BenchmarkFederate {
+class MessageExchangeFederate: public BenchmarkFederate {
   private:
     helics::Endpoint ept;
 
-    int msgCount=0;
-    int msgSize=0;
+    int msgCount = 0;
+    int msgSize = 0;
     std::string msg;
     std::string dest;
 
   public:
-    MessageExchangeFederate() : BenchmarkFederate("message exchange benchmark federate") {}
+    MessageExchangeFederate(): BenchmarkFederate("message exchange benchmark federate") {}
 
-    std::string getName() override
-    {
-        return "msgExchange_" + std::to_string(index);
-    }
+    std::string getName() override { return "msgExchange_" + std::to_string(index); }
 
     void setupArgumentParsing() override
     {
@@ -40,7 +37,7 @@ class MessageExchangeFederate : public BenchmarkFederate {
         app->add_option("--msg_count", msgCount, "the number of messages to send")->required();
         app->add_option("--msg_size", msgSize, "the size of the messages to send")->required();
     }
- 
+
     void doParamInit(helics::FederateInfo& /*fi*/) override
     {
         // set the destination to the other federate in the pair
@@ -50,10 +47,7 @@ class MessageExchangeFederate : public BenchmarkFederate {
         msg = std::string(msgSize, '0');
     }
 
-    void doFedInit() override
-    {
-        ept = fed->registerEndpoint("ept");
-    }
+    void doFedInit() override { ept = fed->registerEndpoint("ept"); }
 
     void doMainLoop() override
     {
@@ -71,4 +65,3 @@ class MessageExchangeFederate : public BenchmarkFederate {
         }
     }
 };
-

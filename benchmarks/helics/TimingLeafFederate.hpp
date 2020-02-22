@@ -14,23 +14,17 @@ SPDX-License-Identifier: BSD-3-Clause
 using helics::operator"" _t;
 using namespace helics;
 /** class implementing the leaf for a timing test*/
-class TimingLeaf : public BenchmarkFederate {
+class TimingLeaf: public BenchmarkFederate {
   private:
     helics::Publication pub;
     helics::Input sub;
 
   public:
-    TimingLeaf() : BenchmarkFederate("timing leaf benchmark federate") {}
+    TimingLeaf(): BenchmarkFederate("timing leaf benchmark federate") {}
 
-    std::string getName() override
-    {
-        return "echoleaf_" + std::to_string(index);
-    }
+    std::string getName() override { return "echoleaf_" + std::to_string(index); }
 
-    void setupArgumentParsing() override
-    {
-        opt_index->required();
-    }
+    void setupArgumentParsing() override { opt_index->required(); }
 
     void doFedInit() override
     {

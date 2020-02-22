@@ -50,7 +50,9 @@ static void BMsendMessage(benchmark::State& state, core_type cType, bool singleC
                 std::string("--log_level=no_print --federates=") + std::to_string(wcore_fed_count));
         }
         for (int ii = 0; ii < fed_count; ++ii) {
-            std::string bmInit = "--index=" + std::to_string(ii) + " --msg_size=" + std::to_string(msg_size) + " --msg_count=" + std::to_string(msg_count);
+            std::string bmInit = "--index=" + std::to_string(ii) +
+                " --msg_size=" + std::to_string(msg_size) +
+                " --msg_count=" + std::to_string(msg_count);
             if (!singleCore) {
                 cores[ii] = helics::CoreFactory::create(cType, "-f 1 --log_level=no_print");
                 cores[ii]->connect();

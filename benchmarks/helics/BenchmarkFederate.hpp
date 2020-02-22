@@ -10,23 +10,23 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include "helics/application_api/CombinationFederate.hpp"
 #include "helics/core/ActionMessage.hpp"
-#include "helics/helics-config.h"
 #include "helics/core/helicsCLI11.hpp"
+#include "helics/helics-config.h"
 #include "helics_benchmark_util.h"
 
 #include <iostream>
-#include <sstream>
 #include <memory>
+#include <sstream>
 #include <vector>
 
 using namespace helics;
 /** class implementing common functionality for benchmarks */
 class BenchmarkFederate {
   public:
-      enum class OutputFormat {
-          PLAIN_TEXT,
-//          JSON
-      };
+    enum class OutputFormat {
+        PLAIN_TEXT,
+        //          JSON
+    };
 
   public:
     // getters and setters for parameters
@@ -74,7 +74,7 @@ class BenchmarkFederate {
     // protected to give derived classes more control
   protected:
     class Result {
-        public:
+      public:
         std::string name;
         std::string key;
         std::string value;
@@ -84,22 +84,25 @@ class BenchmarkFederate {
     OutputFormat result_format = OutputFormat::PLAIN_TEXT; //!< output format for printing results
 
     // parameters most benchmark federates need
-    helics::Time deltaTime=helics::Time(10, time_units::ns); //<! sampling rate
-    helics::Time finalTime=helics::Time(10000, time_units::ns); //<! final time
-    int index=0; //<! the index for an instance of the benchmark federate
-    int maxIndex=0; //<! the maximum index + 1 given to a benchmark federate in a run
+    helics::Time deltaTime = helics::Time(10, time_units::ns); //<! sampling rate
+    helics::Time finalTime = helics::Time(10000, time_units::ns); //<! final time
+    int index = 0; //<! the index for an instance of the benchmark federate
+    int maxIndex = 0; //<! the maximum index + 1 given to a benchmark federate in a run
 
     // CLI11 Options for derived classes to change them if needed (e.g. set required)
-    CLI::Option *opt_delta_time; //<! the CLI11 option for --delta_time
-    CLI::Option *opt_final_time; //<! the CLI11 option for --final_time
-    CLI::Option *opt_index; //<! the CLI11 option for --index
-    CLI::Option *opt_max_index; //<! the CLI11 option for --max_index
+    CLI::Option* opt_delta_time; //<! the CLI11 option for --delta_time
+    CLI::Option* opt_final_time; //<! the CLI11 option for --final_time
+    CLI::Option* opt_index; //<! the CLI11 option for --index
+    CLI::Option* opt_max_index; //<! the CLI11 option for --max_index
 
     // callbacks for more control when timing code
-    std::function<void()> callBeforeFinalize = nullptr; //<! callback function immediately before helics finalize()
-    std::function<void()> callAfterFinalize = nullptr; //<! callback function immediately after helics finalize()
+    std::function<void()> callBeforeFinalize =
+        nullptr; //<! callback function immediately before helics finalize()
+    std::function<void()> callAfterFinalize =
+        nullptr; //<! callback function immediately after helics finalize()
 
-    std::unique_ptr<helics::CombinationFederate> fed; //<! the federate object to use in derived classes
+    std::unique_ptr<helics::CombinationFederate>
+        fed; //<! the federate object to use in derived classes
 
     // Command line options
     std::unique_ptr<helics::helicsCLI11App> app; //<! the CLI11 app object to use in derived classes
@@ -114,7 +117,7 @@ class BenchmarkFederate {
     /** initialization steps after command line options have been parsed, but before the federate object is created
      * @param fi a reference to a helics::FederateInfo object that can be used to change how the federate object is made
      */
-    virtual void doParamInit(helics::FederateInfo& fi) { (void) fi; }
+    virtual void doParamInit(helics::FederateInfo& fi) { (void)fi; }
     /** initialization that needs to happen after the federate object is created, such as creating endpoints and inputs*/
     virtual void doFedInit() {}
     /** initialization that requires the federation to be set up, but before timing starts, like creating initial events*/
@@ -125,17 +128,19 @@ class BenchmarkFederate {
     virtual std::string getName() { return ""; }
 
   public:
-    BenchmarkFederate() : BenchmarkFederate("") {}
+    BenchmarkFederate(): BenchmarkFederate("") {}
 
     /** constructor taking a name for the benchmark app
      * @param name the name of the benchmark federate, shown by CLI11 --help option
      */
-    explicit BenchmarkFederate(const std::string& name) : app(std::make_unique<helics::helicsCLI11App>(name))
+    explicit BenchmarkFederate(const std::string& name):
+        app(std::make_unique<helics::helicsCLI11App>(name))
     {
         app->allow_extras();
 
         // add common time options (optional)
-        opt_delta_time = app->add_option("--delta_time", deltaTime, "the sampling rate/timestep size");
+        opt_delta_time =
+            app->add_option("--delta_time", deltaTime, "the sampling rate/timestep size");
         opt_final_time =
             app->add_option("--final_time", finalTime, "final/stop time for the benchmark");
         opt_delta_time->ignore_underscore();
@@ -148,7 +153,12 @@ class BenchmarkFederate {
         opt_max_index->ignore_underscore();
 
         // add a flag for printing system info
-        app->add_flag_function("--print_systeminfo", [](int count){ if (count) printHELICSsystemInfo(); }, "prints the HELICS system info");
+        app->add_flag_function(
+            "--print_systeminfo",
+            [](int count) {
+                if (count) printHELICSsystemInfo();
+            },
+            "prints the HELICS system info");
     }
 
     /** starts execution of the federation
@@ -279,12 +289,9 @@ class BenchmarkFederate {
     }
 
     /** do the main loop for the benchmark -- callbacks for extra timing info could be added here*/
-    void execute()
-    {
-        doMainLoop();
-    }
+    void execute() { doMainLoop(); }
 
-    /** internal initialization function that handles federate info arguments and calling derived class virtual functions*/ 
+    /** internal initialization function that handles federate info arguments and calling derived class virtual functions*/
     int internalInitialize(helics::FederateInfo fi, int parseResult)
     {
         if (parseResult != 0) {
@@ -302,10 +309,10 @@ class BenchmarkFederate {
     }
 
     /** parse arguments with CLI11 and handle standard help and version arguments*/
-    template<typename ... Args>
-    int parseArgs(Args ... args)
+    template<typename... Args>
+    int parseArgs(Args... args)
     {
-        auto res = app->helics_parse(args ...);
+        auto res = app->helics_parse(args...);
 
         helics::FederateInfo fi;
         if (res != helics::helicsCLI11App::parse_output::ok) {

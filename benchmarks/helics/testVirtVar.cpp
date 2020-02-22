@@ -7,6 +7,8 @@ class A {
     virtual void doInitialize(Args... args);
 };
 
-public static void main(int argc, char** argv) {
+public
+static void main(int argc, char** argv)
+{
     printf("Hello World\n");
 }
