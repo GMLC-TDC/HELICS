@@ -239,6 +239,8 @@ if(HELICS_ENABLE_SWIG AND SWIG_EXECUTABLE)
         target_compile_options(${SWIG_MODULE_helics_REAL_NAME} PRIVATE "-Wno-long-long")
     endif(MSVC)
 
+	message(STATUS "swig target is ${SWIG_MODULE_helics_REAL_NAME}")
+
     set_target_properties(${SWIG_MODULE_helics_REAL_NAME} PROPERTIES FOLDER interfaces)
 
     install(
@@ -250,7 +252,7 @@ if(HELICS_ENABLE_SWIG AND SWIG_EXECUTABLE)
         python
     )
 
-    set(HELICS_PYTHON_TARGET_NAME _helics)
+    set(HELICS_PYTHON_TARGET_NAME ${SWIG_MODULE_helics_REAL_NAME})
 else()
     message(STATUS "Building without swig")
 
