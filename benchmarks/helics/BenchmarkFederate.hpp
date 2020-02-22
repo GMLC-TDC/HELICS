@@ -130,7 +130,7 @@ class BenchmarkFederate {
     /** constructor taking a name for the benchmark app
      * @param name the name of the benchmark federate, shown by CLI11 --help option
      */
-    explicit BenchmarkFederate(std::string name) : app(std::make_unique<helics::helicsCLI11App>(name))
+    explicit BenchmarkFederate(const std::string& name) : app(std::make_unique<helics::helicsCLI11App>(name))
     {
         app->allow_extras();
 
