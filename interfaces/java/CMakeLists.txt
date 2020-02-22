@@ -21,17 +21,17 @@ else()
     if(HELICS_ENABLE_SWIG AND SWIG_EXECUTABLE)
         # Enable generation using swig
 
-        set_property(SOURCE helicsJava.i PROPERTY SWIG_MODULE_NAME JNIhelics)
+        set_property(SOURCE helicsJava.i PROPERTY SWIG_MODULE_NAME helics)
 
         set(CMAKE_SWIG_FLAGS "-package;com.java.helics")
 
-        if(SWIG_VERSION VERSION_GREATER "4.0.0")
+        if(SWIG_VERSION VERSION_GREATER 4.0.0)
             set(CMAKE_SWIG_FLAGS ${CMAKE_SWIG_FLAGS} "-doxygen")
         endif()
 
         if(${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION} VERSION_GREATER 3.7)
             swig_add_library(
-                JNIhelics
+                helicsJava
                 TYPE
                 MODULE
                 LANGUAGE
@@ -40,18 +40,19 @@ else()
                 helicsJava.i
             )
         else()
-            swig_add_module(JNIhelics java helicsJava.i)
+            swig_add_module(helicsJava java helicsJava.i)
         endif()
 
-        swig_link_libraries(JNIhelics helicsSharedLib)
-        swig_link_libraries(JNIhelics ${JAVA_LIBRARIES})
+        swig_link_libraries(helicsJava helicsSharedLib)
+        swig_link_libraries(helicsJava ${JAVA_LIBRARIES})
 
-        set_target_properties(${SWIG_MODULE_JNIhelics_REAL_NAME} PROPERTIES FOLDER interfaces)
+        set_target_properties(${SWIG_MODULE_helicsJava_REAL_NAME} PROPERTIES FOLDER interfaces)
         # get rid of some annoying warnings coming from swig generated code
         if(NOT MSVC)
-            target_compile_options(${SWIG_MODULE_JNIhelics_REAL_NAME} PRIVATE "-Wno-strict-aliasing")
+            target_compile_options(${SWIG_MODULE_helicsJava_REAL_NAME} PRIVATE "-Wno-strict-aliasing")
         endif()
-		set(HELICS_JAVA_TARGET_NAME ${SWIG_MODULE_JNIhelics_REAL_NAME})
+		set(HELICS_JAVA_TARGET_NAME ${SWIG_MODULE_helicsJava_REAL_NAME} CACHE STRING "")
+		message(STATUS "java target is ${SWIG_MODULE_helicsJava_REAL_NAME}")
     else()
 
         file(
@@ -62,10 +63,10 @@ else()
             # Update if necessary
             set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-long-long")
         endif()
-        add_library(JNIhelics SHARED interface/helicsJava.c)
-        target_link_libraries(JNIhelics helicsSharedLib ${JAVA_LIBRARIES})
-        set_target_properties(JNIhelics PROPERTIES FOLDER interfaces)
-		set(HELICS_JAVA_TARGET_NAME JNIhelics)
+        add_library(helicsJava SHARED interface/helicsJava.c)
+        target_link_libraries(helicsJava helicsSharedLib ${JAVA_LIBRARIES})
+        set_target_properties(helicsJava PROPERTIES FOLDER interfaces)
+		set(HELICS_JAVA_TARGET_NAME helicsJava CACHE STRING "")
     endif() # HELICS_ENABLE_SWIG
 
     configure_file(MakeJarCMakeLists.txt.in ${CMAKE_CURRENT_BINARY_DIR}/CMakeLists.txt
@@ -73,7 +74,7 @@ else()
 
     file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/buildjar/)
 
-    # -D ADDITIONAL_JAR_FILES=$<TARGET_FILE:helicsSharedLib>;$<TARGET_FILE:JNIhelics>
+    # -D ADDITIONAL_JAR_FILES=$<TARGET_FILE:helicsSharedLib>;$<TARGET_FILE:helicsJava>
     add_custom_command(
         TARGET ${HELICS_JAVA_TARGET_NAME} POST_BUILD
         COMMAND

@@ -23,7 +23,7 @@ add_custom_target(
     ${CMAKE_CURRENT_BINARY_DIR}
     ${CMAKE_CURRENT_SOURCE_DIR}/HelloWorld.java
     DEPENDS
-        JNIhelics
+        ${HELICS_JAVA_TARGET_NAME}
         ${CMAKE_BINARY_DIR}/interfaces/java/buildjar/helics-${HELICS_VERSION}.jar
     COMMENT "Building HelloWorld.java"
     VERBATIM
@@ -39,7 +39,7 @@ add_custom_target(
     ${CMAKE_CURRENT_BINARY_DIR}
     ${CMAKE_CURRENT_SOURCE_DIR}/JavaHelicsApiTests.java
     DEPENDS
-        JNIhelics
+        ${HELICS_JAVA_TARGET_NAME}
         ${CMAKE_BINARY_DIR}/interfaces/java/buildjar/helics-${HELICS_VERSION}.jar
     COMMENT "Building JavaHelicsApiTests.java"
     VERBATIM
@@ -60,7 +60,7 @@ add_test(
     NAME Java_hello_world_test
     COMMAND
         ${Java_JAVA_EXECUTABLE}
-        -Djava.library.path=$<TARGET_FILE_DIR:JNIhelics>
+        -Djava.library.path=$<TARGET_FILE_DIR:${HELICS_JAVA_TARGET_NAME}>
         -classpath
         "${java_test_classpath}"
         HelloWorld
@@ -70,7 +70,7 @@ add_test(
     NAME Java_Helics_Api_tests
     COMMAND
         ${Java_JAVA_EXECUTABLE}
-        -Djava.library.path=$<TARGET_FILE_DIR:JNIhelics>
+        -Djava.library.path=$<TARGET_FILE_DIR:${HELICS_JAVA_TARGET_NAME}>
         -classpath
         "${java_test_classpath}"
         JavaHelicsApiTests
