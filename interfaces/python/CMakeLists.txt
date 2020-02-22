@@ -16,9 +16,9 @@ if(NOT hasParent)
     message(STATUS "Standalone Python interface build")
 
     # find_package(<PackageName>) searches prefixes given in <PackageName>_ROOT CMake variable
-    if(POLICY CMP0074)
-        cmake_policy(SET CMP0074 NEW)
-    endif()
+    #if(POLICY CMP0074)
+    #    cmake_policy(SET CMP0074 NEW)
+    #endif()
 
     # Setup options
     option(HELICS_ENABLE_SWIG "Use SWIG to generate the Python interface files" ON)
@@ -80,12 +80,12 @@ endif()
 if(HELICS_ENABLE_SWIG OR HELICS_SWIG_GENERATE_INTERFACE_FILES_ONLY)
     # Find SWIG
     if(NOT DEFINED SWIG_FOUND OR SWIG_VERSION VERSION_LESS 3)
-        if(POLICY CMP0078)
-            cmake_policy(SET CMP0078 OLD)
-        endif()
-        if(POLICY CMP0086)
-            cmake_policy(SET CMP0086 OLD)
-        endif()
+       # if(POLICY CMP0078)
+       #     cmake_policy(SET CMP0078 OLD)
+       # endif()
+       # if(POLICY CMP0086)
+       #     cmake_policy(SET CMP0086 OLD)
+       # endif()
         find_package(SWIG 3 REQUIRED)
         include(${SWIG_USE_FILE})
     endif()
@@ -229,21 +229,21 @@ if(HELICS_ENABLE_SWIG AND SWIG_EXECUTABLE)
     endif()
 
     if(USE_MODERNIZED_SWIG)
-        target_include_directories(_helics PRIVATE ${HELICS_Python_INCLUDE_DIRS})
+        target_include_directories(${SWIG_MODULE_helics_REAL_NAME} PRIVATE ${HELICS_Python_INCLUDE_DIRS})
         message(STATUS "Using new swig target_include_directories")
     endif()
 
     if(MSVC)
-        target_compile_options(_helics PRIVATE "/wd4100")
+        target_compile_options(${SWIG_MODULE_helics_REAL_NAME} PRIVATE "/wd4100")
     else(MSVC)
-        target_compile_options(_helics PRIVATE "-Wno-long-long")
+        target_compile_options(${SWIG_MODULE_helics_REAL_NAME} PRIVATE "-Wno-long-long")
     endif(MSVC)
 
-    set_target_properties(_helics PROPERTIES FOLDER interfaces)
+    set_target_properties(${SWIG_MODULE_helics_REAL_NAME} PROPERTIES FOLDER interfaces)
 
     install(
         TARGETS
-        _helics
+        ${SWIG_MODULE_helics_REAL_NAME}
         DESTINATION
         python
         COMPONENT
