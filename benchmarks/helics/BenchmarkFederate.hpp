@@ -254,7 +254,7 @@ class BenchmarkFederate {
      * @param value the value of the result (must support printing with iostream)
      */
     template<class T>
-    void addResult(std::string name, std::string key, T value)
+    void addResult(const std::string& name, const std::string& key, T value)
     {
         std::ostringstream s;
         s << value;
@@ -266,7 +266,7 @@ class BenchmarkFederate {
      * @param key the short key name of the result
      * @param value a string representation of the result
      */
-    void addResult(std::string name, std::string key, std::string value)
+    void addResult(const std::string& name, const std::string& key, std::string value)
     {
         Result r;
         r.name = name;
