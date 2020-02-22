@@ -51,8 +51,9 @@ else()
         if(NOT MSVC)
             target_compile_options(${SWIG_MODULE_helicsJava_REAL_NAME} PRIVATE "-Wno-strict-aliasing")
         endif()
-		set(HELICS_JAVA_TARGET_NAME ${SWIG_MODULE_helicsJava_REAL_NAME} CACHE STRING "")
+		add_library(helics::java ALIAS ${SWIG_MODULE_helicsJava_REAL_NAME})
 		message(STATUS "java target is ${SWIG_MODULE_helicsJava_REAL_NAME}")
+		set(HELICS_JAVA_TARGET ${SWIG_MODULE_helicsJava_REAL_NAME})
     else()
 
         file(
@@ -66,7 +67,8 @@ else()
         add_library(helicsJava SHARED interface/helicsJava.c)
         target_link_libraries(helicsJava helicsSharedLib ${JAVA_LIBRARIES})
         set_target_properties(helicsJava PROPERTIES FOLDER interfaces)
-		set(HELICS_JAVA_TARGET_NAME helicsJava CACHE STRING "")
+		add_library(helics::java ALIAS helicsJava)
+		set(HELICS_JAVA_TARGET helicsJava)
     endif() # HELICS_ENABLE_SWIG
 
     configure_file(MakeJarCMakeLists.txt.in ${CMAKE_CURRENT_BINARY_DIR}/CMakeLists.txt
@@ -76,25 +78,25 @@ else()
 
     # -D ADDITIONAL_JAR_FILES=$<TARGET_FILE:helicsSharedLib>;$<TARGET_FILE:helicsJava>
     add_custom_command(
-        TARGET ${HELICS_JAVA_TARGET_NAME} POST_BUILD
+        TARGET ${HELICS_JAVA_TARGET} POST_BUILD
         COMMAND
             ${CMAKE_COMMAND}
             -D
-            LIBRARY_FILE=$<TARGET_FILE:${HELICS_JAVA_TARGET_NAME}>
+            LIBRARY_FILE=$<TARGET_FILE:${HELICS_JAVA_TARGET}>
             -P
             ${CMAKE_CURRENT_SOURCE_DIR}/addLoadLibraryCommand.cmake
     )
 
 if (CMAKE_GENERATOR_PLATFORM)
     add_custom_command(
-        TARGET ${HELICS_JAVA_TARGET_NAME} POST_BUILD
+        TARGET ${HELICS_JAVA_TARGET} POST_BUILD
         COMMAND ${CMAKE_COMMAND} ARGS -G ${CMAKE_GENERATOR} -A ${CMAKE_GENERATOR_PLATFORM} ..
         WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/buildjar"
         VERBATIM
     )
 else()
     add_custom_command(
-        TARGET ${HELICS_JAVA_TARGET_NAME} POST_BUILD
+        TARGET ${HELICS_JAVA_TARGET} POST_BUILD
         COMMAND ${CMAKE_COMMAND} ARGS -G ${CMAKE_GENERATOR} ..
         WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/buildjar"
         VERBATIM
@@ -103,7 +105,7 @@ endif()
     
 
     add_custom_command(
-        TARGET ${HELICS_JAVA_TARGET_NAME} POST_BUILD
+        TARGET ${HELICS_JAVA_TARGET} POST_BUILD
         COMMAND
             ${CMAKE_COMMAND}
             ARGS
@@ -116,8 +118,8 @@ endif()
         VERBATIM
     )
 
-    copy_key_files_to_target_location(${HELICS_JAVA_TARGET_NAME})
-    copy_shared_target(${HELICS_JAVA_TARGET_NAME} helicsSharedLib)
+    copy_key_files_to_target_location(${HELICS_JAVA_TARGET})
+    copy_shared_target(${HELICS_JAVA_TARGET} helicsSharedLib)
 
     install(
         FILES ${CMAKE_CURRENT_BINARY_DIR}/buildjar/helics-${HELICS_VERSION}.jar
@@ -134,7 +136,7 @@ endif()
     install_key_files_with_comp(java)
     install(
         TARGETS
-            ${HELICS_JAVA_TARGET_NAME}
+            ${HELICS_JAVA_TARGET}
             DESTINATION
             java
             COMPONENT
