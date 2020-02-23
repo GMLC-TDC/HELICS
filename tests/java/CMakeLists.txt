@@ -23,7 +23,7 @@ add_custom_target(
     ${CMAKE_CURRENT_BINARY_DIR}
     ${CMAKE_CURRENT_SOURCE_DIR}/HelloWorld.java
     DEPENDS
-        ${HELICS_JAVA_TARGET_NAME}
+        helics::java
         ${CMAKE_BINARY_DIR}/interfaces/java/buildjar/helics-${HELICS_VERSION}.jar
     COMMENT "Building HelloWorld.java"
     VERBATIM
