@@ -15,11 +15,6 @@ get_directory_property(hasParent PARENT_DIRECTORY)
 if(NOT hasParent)
     message(STATUS "Standalone Python interface build")
 
-    # find_package(<PackageName>) searches prefixes given in <PackageName>_ROOT CMake variable
-    #if(POLICY CMP0074)
-    #    cmake_policy(SET CMP0074 NEW)
-    #endif()
-
     # Setup options
     option(HELICS_ENABLE_SWIG "Use SWIG to generate the Python interface files" ON)
     #option(HELICS_SWIG_GENERATE_INTERFACE_FILES_ONLY "Only generate the SWIG interface files" OFF)
@@ -80,12 +75,6 @@ endif()
 if(HELICS_ENABLE_SWIG OR HELICS_SWIG_GENERATE_INTERFACE_FILES_ONLY)
     # Find SWIG
     if(NOT DEFINED SWIG_FOUND OR SWIG_VERSION VERSION_LESS 3)
-       # if(POLICY CMP0078)
-       #     cmake_policy(SET CMP0078 OLD)
-       # endif()
-       # if(POLICY CMP0086)
-       #     cmake_policy(SET CMP0086 OLD)
-       # endif()
         find_package(SWIG 3 REQUIRED)
         include(${SWIG_USE_FILE})
     endif()
