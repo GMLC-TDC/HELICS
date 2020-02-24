@@ -31,6 +31,5 @@ int main(int argc, char* argv[])
     auto elapsed =
         std::chrono::duration_cast<std::chrono::nanoseconds>(end_time - start_time).count();
     fed.addResult<decltype(elapsed)>("ELAPSED TIME (ns)", "real_time", elapsed);
-    fed.addResult("EVENT COUNT", "EvCount", std::to_string(fed.evCount));
     fed.printResults();
 }

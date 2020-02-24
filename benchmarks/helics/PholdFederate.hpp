@@ -74,6 +74,11 @@ class PholdFederate: public BenchmarkFederate {
         app->add_option("--set_phold_lookahead", lookahead_, "set the lookahead used by phold");
     }
 
+    void doAddBenchmarkResults() override
+    {
+        addResult("EVENT COUNT", "EvCount", std::to_string(evCount));
+    }
+
     void doParamInit(helics::FederateInfo& /*fi*/) override
     {
         if (app->get_option("--set_rand_seed")->count() == 0) {

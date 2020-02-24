@@ -124,6 +124,8 @@ class BenchmarkFederate {
     virtual void doMainLoop() {}
     /** returns the federate name (should be unique within the federation*/
     virtual std::string getName() { return ""; }
+    /** allows a federate to add custom results to get printed when running in standalone mode*/
+    virtual void doAddBenchmarkResults() {}
 
   public:
     BenchmarkFederate(): BenchmarkFederate("") {}
@@ -239,6 +241,7 @@ class BenchmarkFederate {
     /** print formatted results from the simulation*/
     void printResults()
     {
+        doAddBenchmarkResults();
         for (auto r : results) {
             if (result_format == OutputFormat::PLAIN_TEXT) {
                 std::cout << r.name << ": " << r.value << std::endl;
@@ -290,11 +293,11 @@ class BenchmarkFederate {
     void execute() { doMainLoop(); }
 
     /** internal initialization function that handles federate info arguments and calling derived class virtual functions*/
-    int internalInitialize(helics::FederateInfo fi, int parseResult)
+    int internalInitialize(helics::FederateInfo fi, int parseArgsResult)
     {
-        if (parseResult != 0) {
+        if (parseArgsResult != 0) {
             initialized = false;
-            return parseResult;
+            return parseArgsResult;
         }
         fi.loadInfoFromArgs(app->remainArgs());
 
