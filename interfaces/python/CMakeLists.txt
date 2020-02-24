@@ -15,6 +15,12 @@ get_directory_property(hasParent PARENT_DIRECTORY)
 if(NOT hasParent)
     message(STATUS "Standalone Python interface build")
 
+	if(CMAKE_VERSION VERSION_LESS 3.16)
+       cmake_policy(VERSION ${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION})
+    else()
+       cmake_policy(VERSION 3.16)
+    endif()
+
     # Setup options
     option(HELICS_ENABLE_SWIG "Use SWIG to generate the Python interface files" ON)
     #option(HELICS_SWIG_GENERATE_INTERFACE_FILES_ONLY "Only generate the SWIG interface files" OFF)
