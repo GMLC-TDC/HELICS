@@ -42,7 +42,7 @@ class PholdFederate: public BenchmarkFederate {
 
   public:
     // TODO: output cluster name in a summary file, along with node count and feds per node
-    PholdFederate(): BenchmarkFederate("phold benchmark federate") {}
+    PholdFederate(): BenchmarkFederate("PHOLD") {}
 
     // functions for setting parameters
     void setGenerateRandomSeed(bool b) { generateRandomSeed = b; };

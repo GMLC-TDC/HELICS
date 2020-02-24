@@ -21,7 +21,7 @@ class RingTransmitMessage: public BenchmarkFederate {
     helics::Endpoint* ept{nullptr};
 
   public:
-    RingTransmitMessage(): BenchmarkFederate("ring transmit message benchmark federate") {}
+    RingTransmitMessage(): BenchmarkFederate("RingTransmitMessage") {}
 
     std::string getName() override { return "ringlink_" + std::to_string(index); }
 

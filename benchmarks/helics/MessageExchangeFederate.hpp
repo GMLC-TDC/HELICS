@@ -23,7 +23,7 @@ class MessageExchangeFederate: public BenchmarkFederate {
     std::string dest;
 
   public:
-    MessageExchangeFederate(): BenchmarkFederate("message exchange benchmark federate") {}
+    MessageExchangeFederate(): BenchmarkFederate("MessageExchange") {}
 
     std::string getName() override { return "msgExchange_" + std::to_string(index); }
 

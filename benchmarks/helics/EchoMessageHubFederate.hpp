@@ -16,7 +16,7 @@ class EchoMessageHub: public BenchmarkFederate {
     helics::Endpoint ept;
 
   public:
-    EchoMessageHub(): BenchmarkFederate("echo message hub benchmark federate") {}
+    EchoMessageHub(): BenchmarkFederate("EchoMessageHub") {}
 
     void setupArgumentParsing() override
     {

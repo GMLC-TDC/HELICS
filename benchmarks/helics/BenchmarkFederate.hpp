@@ -82,6 +82,7 @@ class BenchmarkFederate {
     OutputFormat result_format{OutputFormat::PLAIN_TEXT}; //!< output format for printing results
 
     // parameters most benchmark federates need
+    std::string benchmarkName; //<! the name of the benchmark federate
     helics::Time deltaTime{helics::Time(10, time_units::ns)}; //<! sampling rate
     helics::Time finalTime{helics::Time(10000, time_units::ns)}; //<! final time
     int index{0}; //<! the index for an instance of the benchmark federate
@@ -132,8 +133,9 @@ class BenchmarkFederate {
      * @param name the name of the benchmark federate, shown by CLI11 --help option
      */
     explicit BenchmarkFederate(const std::string& name):
-        app(std::make_unique<helics::helicsCLI11App>(name))
+        benchmarkName(name), app(std::make_unique<helics::helicsCLI11App>(name+" Benchmark Federate"))
     {
+        addResult("BENCHMARK FEDERATE TYPE", "benchmark_federate_type", name);
         app->allow_extras();
 
         // add common time options (optional)
@@ -178,51 +180,29 @@ class BenchmarkFederate {
         }
     }
 
-    /** initialize function intended for standalone federates, parses options and sets up parameters
+    /** initialize function parses options and sets up parameters
      * @param coreName the name of the core to connect to
-     * @param argc the number of arguments
-     * @param argv pointers to the arguments
+     * @param args command line argument format supported by CLI11 (argc/argv, string, or vector of strings)
      * @return 0 on success, non-zero indicates failure
      */
-    int initialize(const std::string& coreName, int argc, char** argv)
+    template<typename... Args>
+    int initialize(const std::string& coreName, Args... args)
     {
         helics::FederateInfo fi;
         fi.coreName = coreName;
-        return initialize(fi, argc, argv);
+        return initialize(fi, args...);
     }
 
-    /** initialize function intended for standalone federates, parses options and sets up parameters
+    /** initialize function parses options and sets up parameters
      * @param fi a helics::FederateInfo object
-     * @param argc the number of arguments
-     * @param argv points to the arguments
+     * @param args command line argument format supported by CLI11 (argc/argv, string, or vector of strings) 
      * @return 0 on success, non-zero indicates failure
      */
-    int initialize(const helics::FederateInfo fi, int argc, char** argv)
+    template<typename... Args>
+    int initialize(const helics::FederateInfo fi, Args... args)
     {
         setupArgumentParsing();
-        return internalInitialize(fi, parseArgs(argc, argv));
-    }
-
-    /** initialize function intended for googlebenchmarks, parses options and sets up parameters
-     * @param coreName the name of the core to connect to
-     * @param initstr an initialization string of arguments
-     * @return 0 on success, non-zero indicates failure
-     */
-    int initialize(const std::string& coreName, const std::string& initstr = "")
-    {
-        helics::FederateInfo fi;
-        fi.coreName = coreName;
-        return initialize(fi, initstr);
-    }
-
-    /** initialize function intended for googlebenchmarks, parses options and sets up parameters
-     * @param fi a helics::FederateInfo object
-     * @param initstr an initialization string of arguments
-     */
-    int initialize(const helics::FederateInfo fi, const std::string& initstr = "")
-    {
-        setupArgumentParsing();
-        return internalInitialize(fi, parseArgs(initstr));
+        return internalInitialize(fi, parseArgs(args...));
     }
 
     /** make the federate ready to run; enter execution mode and setup initial state*/

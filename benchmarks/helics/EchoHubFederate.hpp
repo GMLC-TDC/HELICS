@@ -19,7 +19,7 @@ class EchoHub: public BenchmarkFederate  {
     int num_leafs{10};
 
   public:
-    EchoHub(): BenchmarkFederate("echo hub benchmark federate") {}
+    EchoHub(): BenchmarkFederate("EchoHub") {}
 
     void setupArgumentParsing() override
     {

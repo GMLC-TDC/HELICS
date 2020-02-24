@@ -20,7 +20,7 @@ class TimingLeaf: public BenchmarkFederate {
     helics::Input sub;
 
   public:
-    TimingLeaf(): BenchmarkFederate("timing leaf benchmark federate") {}
+    TimingLeaf(): BenchmarkFederate("TimingLeaf") {}
 
     std::string getName() override { return "echoleaf_" + std::to_string(index); }
 

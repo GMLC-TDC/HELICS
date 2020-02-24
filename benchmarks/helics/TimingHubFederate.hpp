@@ -21,7 +21,7 @@ class TimingHub: public BenchmarkFederate {
     int num_leafs = 10;
 
   public:
-    TimingHub(): BenchmarkFederate("timing hub benchmark federate") {}
+    TimingHub(): BenchmarkFederate("TimingHub") {}
 
     std::string getName() override { return "echohub"; }
 

@@ -23,7 +23,7 @@ class RingTransmit: public BenchmarkFederate {
     helics::Input* sub = nullptr;
 
   public:
-    RingTransmit(): BenchmarkFederate("ring transmit benchmark federate") {}
+    RingTransmit(): BenchmarkFederate("RingTransmit") {}
 
     std::string getName() override { return "ringlink_" + std::to_string(index); }
 

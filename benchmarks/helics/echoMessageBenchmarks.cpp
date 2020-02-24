@@ -32,7 +32,7 @@ static void BMecho_singleCore(benchmark::State& state)
         auto wcore = helics::CoreFactory::create(
             core_type::INPROC, std::string("--autobroker --federates=") + std::to_string(feds + 1));
         EchoMessageHub hub;
-        hub.initialize(wcore->getIdentifier());
+        hub.initialize(wcore->getIdentifier(), "");
         std::vector<EchoMessageLeaf> leafs(feds);
         for (int ii = 0; ii < feds; ++ii) {
             std::string bmInit = "--index=" + std::to_string(ii);
@@ -81,7 +81,7 @@ static void BMecho_multiCore(benchmark::State& state, core_type cType)
             helics::CoreFactory::create(cType, std::string("--federates=1 --log_level=no_print"));
         // this is to delay until the threads are ready
         EchoMessageHub hub;
-        hub.initialize(wcore->getIdentifier());
+        hub.initialize(wcore->getIdentifier(), "");
         std::vector<EchoMessageLeaf> leafs(feds);
         std::vector<std::shared_ptr<helics::Core>> cores(feds);
         for (int ii = 0; ii < feds; ++ii) {

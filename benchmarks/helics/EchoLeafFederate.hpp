@@ -18,7 +18,7 @@ class EchoLeaf: public BenchmarkFederate {
     helics::Input sub;
 
   public:
-    EchoLeaf(): BenchmarkFederate("echo leaf benchmark federate") {}
+    EchoLeaf(): BenchmarkFederate("EchoLeaf") {}
 
     void setupArgumentParsing() override { opt_index->required(); }
 

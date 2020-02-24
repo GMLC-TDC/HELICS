@@ -16,7 +16,7 @@ class EchoMessageLeaf: public BenchmarkFederate {
     helics::Endpoint ept;
 
   public:
-    EchoMessageLeaf(): BenchmarkFederate("echo message leaf benchmark federate") {}
+    EchoMessageLeaf(): BenchmarkFederate("EchoMessageLeaf") {}
 
     void setupArgumentParsing() override { opt_index->required(); }
 
