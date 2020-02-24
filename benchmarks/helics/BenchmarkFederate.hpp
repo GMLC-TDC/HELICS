@@ -4,9 +4,7 @@ Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance
 the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
-
-#ifndef BENCHMARKFEDERATE_H
-#define BENCHMARKFEDERATE_H
+#pragma once
 
 #include "helics/application_api/CombinationFederate.hpp"
 #include "helics/core/ActionMessage.hpp"
@@ -60,11 +58,11 @@ class BenchmarkFederate {
      * the helics finalize() call
      * @param cb a function that takes no arguments and returns void
      */
-    void setBeforeFinalizeCallback(std::function<void()> cb = {}) { callBeforeFinalize = cb; }
+    void setBeforeFinalizeCallback(std::function<void()> cb = {}) { callBeforeFinalize = std::move(cb); }
     /** sets a callback function to all after the helics finalize() call completes
      * @param cb a function that takes no arguments and returns void
      */
-    void setAfterFinalizeCallback(std::function<void()> cb = {}) { callAfterFinalize = cb; }
+    void setAfterFinalizeCallback(std::function<void()> cb = {}) { callAfterFinalize = std::move(cb); }
 
     /** sets the output format to use when printing results
      * @param f format to print results in
@@ -210,7 +208,7 @@ class BenchmarkFederate {
      * @param initstr an initialization string of arguments
      * @return 0 on success, non-zero indicates failure
      */
-    int initialize(const std::string& coreName, std::string initstr = "")
+    int initialize(const std::string& coreName, const std::string& initstr = "")
     {
         helics::FederateInfo fi;
         fi.coreName = coreName;
@@ -221,7 +219,7 @@ class BenchmarkFederate {
      * @param fi a helics::FederateInfo object
      * @param initstr an initialization string of arguments
      */
-    int initialize(const helics::FederateInfo fi, std::string initstr = "")
+    int initialize(const helics::FederateInfo fi, const std::string& initstr = "")
     {
         setupArgumentParsing();
         return internalInitialize(fi, parseArgs(initstr));
@@ -266,7 +264,7 @@ class BenchmarkFederate {
      * @param key the short key name of the result
      * @param value a string representation of the result
      */
-    void addResult(const std::string& name, const std::string& key, std::string value)
+    void addResult(const std::string& name, const std::string& key, const std::string& value)
     {
         Result r;
         r.name = name;
@@ -331,4 +329,3 @@ class BenchmarkFederate {
     }
 };
 
-#endif // BENCHMARKFEDERATE_H
