@@ -17,8 +17,8 @@ class MessageExchangeFederate: public BenchmarkFederate {
   private:
     helics::Endpoint ept;
 
-    int msgCount = 0;
-    int msgSize = 0;
+    int msgCount{0};
+    int msgSize{0};
     std::string msg;
     std::string dest;
 

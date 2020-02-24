@@ -12,11 +12,11 @@ SPDX-License-Identifier: BSD-3-Clause
 
 using helics::operator"" _t;
 /** class implementing the hub for an echo test*/
-class EchoHub: public BenchmarkFederate {
+class EchoHub: public BenchmarkFederate  {
   private:
     std::vector<helics::Publication> pubs;
     std::vector<helics::Input> subs;
-    int cnt = 10;
+    int num_leafs{10};
 
   public:
     EchoHub(): BenchmarkFederate("echo hub benchmark federate") {}
@@ -26,17 +26,16 @@ class EchoHub: public BenchmarkFederate {
         // default final time for this benchmark
         finalTime = helics::Time(100, time_units::ms);
 
-        app->add_option("--num_leafs", cnt, "the number of echoleaf federates to expect")
-            ->required();
+        app->add_option("--num_leafs", num_leafs, "the number of echoleaf federates to expect", true);
     }
 
     std::string getName() override { return "echohub"; }
 
     void doFedInit() override
     {
-        pubs.reserve(cnt);
-        subs.reserve(cnt);
-        for (int ii = 0; ii < cnt; ++ii) {
+        pubs.reserve(num_leafs);
+        subs.reserve(num_leafs);
+        for (int ii = 0; ii < num_leafs; ++ii) {
             pubs.push_back(fed->registerIndexedPublication<std::string>("leafrx", ii));
             subs.push_back(fed->registerIndexedSubscription("leafsend", ii));
         }
@@ -46,7 +45,7 @@ class EchoHub: public BenchmarkFederate {
     {
         auto cTime = 0.0_t;
         while (cTime <= finalTime) {
-            for (int ii = 0; ii < cnt; ++ii) {
+            for (int ii = 0; ii < num_leafs; ++ii) {
                 if (fed->isUpdated(subs[ii])) {
                     auto& val = fed->getString(subs[ii]);
                     pubs[ii].publish(val);

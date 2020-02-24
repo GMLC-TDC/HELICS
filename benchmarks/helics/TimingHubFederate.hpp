@@ -18,7 +18,7 @@ class TimingHub: public BenchmarkFederate {
   private:
     std::vector<helics::Publication> pubs;
     std::vector<helics::Input> subs;
-    int cnt = 10;
+    int num_leafs = 10;
 
   public:
     TimingHub(): BenchmarkFederate("timing hub benchmark federate") {}
@@ -29,15 +29,14 @@ class TimingHub: public BenchmarkFederate {
     {
         finalTime = helics::Time(100, time_units::ms);
 
-        app->add_option("--num_leafs", cnt, "the number of echoleaf federates to expect")
-            ->required();
+        app->add_option("--num_leafs", num_leafs, "the number of timingleaf federates to expect", true);
     }
 
     void doFedInit() override
     {
-        pubs.reserve(cnt);
-        subs.reserve(cnt);
-        for (int ii = 0; ii < cnt; ++ii) {
+        pubs.reserve(num_leafs);
+        subs.reserve(num_leafs);
+        for (int ii = 0; ii < num_leafs; ++ii) {
             pubs.push_back(fed->registerPublicationIndexed<std::string>("leafrx", ii));
             subs.push_back(fed->registerSubscriptionIndexed("leafsend", ii));
         }

@@ -17,26 +17,24 @@ using namespace helics;
 /** class implementing a federate for the PHOLD benchmark*/
 class PholdFederate: public BenchmarkFederate {
   public:
-    int evCount = 0; // number of events handled by this federate
+    int evCount{0}; // number of events handled by this federate
 
   private:
-    helics::Endpoint* ept = nullptr;
+    helics::Endpoint* ept{nullptr};
 
     // values from paper "Warp Speed: Executing Time Warp on 1,966,080 Cores"
     // 16 circulating events per LP (also ran with 8 events per LP)
     // 10% remote communications (also ran with 25%, 50%, and 100% remote communications)
     // mean exponential distribution of 0.90
     // optional lookahead of .1 (to prevent arbitrarily small increases in time with conservative simulators)
-    unsigned int initEvCount_ = 16; // starting number of events
-    double localProbability_ = .9; // probability of local events
-    double randTimeMean_ =
-        deltaTime * .9; // mean for the exponential distribution used when picking event times
-    double lookahead_ = deltaTime * .1;
+    unsigned int initEvCount_{16}; // starting number of events
+    double localProbability_{.9}; // probability of local events
+    double randTimeMean_{deltaTime * .9}; // mean for the exponential distribution used when picking event times
+    double lookahead_{deltaTime * .1};
 
     // classes related to the exponential and uniform distribution random number generator
-    bool generateRandomSeed = false;
-    unsigned int seed =
-        0xABad5eed; // some suggestions for seed choice were that not having a majority of the bits as 0 is better
+    bool generateRandomSeed{false};
+    unsigned int seed{0xABad5eed}; // some suggestions for seed choice were that not having a majority of the bits as 0 is better
     std::mt19937 rand_gen;
     std::exponential_distribution<double> rand_exp;
     std::uniform_real_distribution<double> rand_uniform_double;

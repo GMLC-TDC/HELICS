@@ -15,10 +15,10 @@ using namespace helics;
 /** class implementing a token ring using messages as the transmission mechanism*/
 class RingTransmitMessage: public BenchmarkFederate {
   public:
-    int loopCount = 0;
+    int loopCount{0};
 
   private:
-    helics::Endpoint* ept = nullptr;
+    helics::Endpoint* ept{nullptr};
 
   public:
     RingTransmitMessage(): BenchmarkFederate("ring transmit message benchmark federate") {}

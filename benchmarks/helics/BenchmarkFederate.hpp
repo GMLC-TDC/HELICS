@@ -79,25 +79,23 @@ class BenchmarkFederate {
     };
     std::vector<Result> results; //!< a vector of output results to print
 
-    OutputFormat result_format = OutputFormat::PLAIN_TEXT; //!< output format for printing results
+    OutputFormat result_format{OutputFormat::PLAIN_TEXT}; //!< output format for printing results
 
     // parameters most benchmark federates need
-    helics::Time deltaTime = helics::Time(10, time_units::ns); //<! sampling rate
-    helics::Time finalTime = helics::Time(10000, time_units::ns); //<! final time
-    int index = 0; //<! the index for an instance of the benchmark federate
-    int maxIndex = 0; //<! the maximum index + 1 given to a benchmark federate in a run
+    helics::Time deltaTime{helics::Time(10, time_units::ns)}; //<! sampling rate
+    helics::Time finalTime{helics::Time(10000, time_units::ns)}; //<! final time
+    int index{0}; //<! the index for an instance of the benchmark federate
+    int maxIndex{0}; //<! the maximum index + 1 given to a benchmark federate in a run
 
     // CLI11 Options for derived classes to change them if needed (e.g. set required)
-    CLI::Option* opt_delta_time; //<! the CLI11 option for --delta_time
-    CLI::Option* opt_final_time; //<! the CLI11 option for --final_time
-    CLI::Option* opt_index; //<! the CLI11 option for --index
-    CLI::Option* opt_max_index; //<! the CLI11 option for --max_index
+    CLI::Option* opt_delta_time{nullptr}; //<! the CLI11 option for --delta_time
+    CLI::Option* opt_final_time{nullptr}; //<! the CLI11 option for --final_time
+    CLI::Option* opt_index{nullptr}; //<! the CLI11 option for --index
+    CLI::Option* opt_max_index{nullptr}; //<! the CLI11 option for --max_index
 
     // callbacks for more control when timing code
-    std::function<void()> callBeforeFinalize =
-        nullptr; //<! callback function immediately before helics finalize()
-    std::function<void()> callAfterFinalize =
-        nullptr; //<! callback function immediately after helics finalize()
+    std::function<void()> callBeforeFinalize{nullptr}; //<! callback function immediately before helics finalize()
+    std::function<void()> callAfterFinalize{nullptr}; //<! callback function immediately after helics finalize()
 
     std::unique_ptr<helics::CombinationFederate>
         fed; //<! the federate object to use in derived classes
