@@ -39,7 +39,7 @@ void addBM(helics::helicsCLI11App& app, std::string name, std::string descriptio
 
 int main(int argc, char* argv[])
 {
-    helics::helicsCLI11App app("simple execution for all the different HELICS apps", "helics_app");
+    helics::helicsCLI11App app("HELICS benchmark federates for use in multinode benchmark setups", "helics_benchmarks");
     app.ignore_case()->prefix_command();
     addBM<EchoHub>(app, "echohub", "Echo Hub benchmark federate");
     addBM<EchoLeaf>(app, "echoleaf", "Echo Leaf benchmark federate");
