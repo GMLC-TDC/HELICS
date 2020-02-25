@@ -80,7 +80,9 @@ static const std::map<std::string, int> propStringsTranslations{
     {"buffer_data", helics_handle_option_buffer_data},
     {"required", helics_handle_option_connection_required},
     {"optional", helics_handle_option_connection_optional},
-    {"wait_for_current_time", helics_flag_wait_for_current_time_update}};
+    {"wait_for_current_time", helics_flag_wait_for_current_time_update},
+    {"terminate_on_error",helics_flag_terminate_on_error},
+    {"terminateonerror", helics_flag_terminate_on_error}};
 
 static const std::set<std::string> validTimeProperties{"period",
                                                        "timedelta",
@@ -126,7 +128,9 @@ static const std::set<std::string> validFlagOptions{"interruptible",
                                                     "no_ping",
                                                     "slow",
                                                     "required",
-                                                    "optional"};
+                                                    "optional",
+"terminate_on_error",
+"terminateonerror" };
 
 static const std::map<std::string, int> optionStringsTranslations{
     {"buffer", helics_handle_option_buffer_data},

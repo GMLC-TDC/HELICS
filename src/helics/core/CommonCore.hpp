@@ -68,7 +68,8 @@ class CommonCore: public Core, public BrokerBase {
     virtual void configureFromVector(std::vector<std::string> args) override final;
     virtual bool isConfigured() const override final;
     virtual bool isOpenToNewFederates() const override final;
-    virtual void error(local_federate_id federateID, int errorID = -1) override final;
+    virtual void globalError(local_federate_id federateID, int errorCode,const std::string &error_string) override final;
+    virtual void localError(local_federate_id federateID, int errorCode, const std::string &error_string) override final;
     virtual void finalize(local_federate_id federateID) override final;
     virtual void enterInitializingMode(local_federate_id federateID) override final;
     virtual void setCoreReadyToInit() override final;

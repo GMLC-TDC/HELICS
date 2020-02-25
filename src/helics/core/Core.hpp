@@ -126,10 +126,25 @@ class Core {
     virtual const std::string& getIdentifier() const = 0;
     /** get the connection network or connection address for the core*/
     virtual const std::string& getAddress() const = 0;
+    
+    /**
+    * Federate has encountered a global error and the federation should halt.
+    @param federateID the federate
+    */
+    virtual void globalError(local_federate_id federateID, int32_t errorCode, const std::string &error_string) = 0;
+
+    /**
+    * Federate has encountered a local error and should be disconnected.
+    */
+    virtual void localError(local_federate_id federateID, int32_t errorCode, const std::string &error_string) = 0;
+
     /**
      * Federate has encountered an unrecoverable error.
      */
-    virtual void error(local_federate_id federateID, int32_t errorCode = -1) = 0;
+    void error(local_federate_id federateID, int32_t errorCode = -1)
+    {
+        globalError(federateID, errorCode, "");
+    }
 
     /**
      * Federate has completed.
@@ -140,7 +155,7 @@ class Core {
     virtual void finalize(local_federate_id federateID) = 0;
 
     /**
-     * Federates may be in four Modes.
+     * Federates may be in five Modes.
      *    -# Startup
      *       Configuration of the federate.
      *       State begins when registerFederate() is invoked and ends when enterInitializingMode() is invoked.
@@ -152,6 +167,8 @@ class Core {
      *       State begins when enterExecutingMode() is invoked and ends when finalize() is invoked.
      *    -# Finalized
      *       state after finalize is invoked.
+     *    -# Error
+     *       state invoked after an error is called.
      */
 
     /**

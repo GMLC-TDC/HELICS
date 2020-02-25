@@ -589,6 +589,22 @@ void helicsFederateRegisterInterfaces(helics_federate fed, const char* file, hel
     }
 }
 
+void helicsFederateError(helics_federate fed, int error_code, const char* error_string)
+{
+    auto fedObj = getFed(fed, nullptr);
+    if (fedObj == nullptr) {
+        return;
+    }
+    if (error_string == nullptr)
+    {
+        fedObj->error(error_code);
+    }
+    else
+    {
+        fedObj->error(error_code, error_string);
+    }
+}
+
 void helicsFederateFinalize(helics_federate fed, helics_error* err)
 {
     auto fedObj = getFed(fed, err);

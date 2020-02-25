@@ -192,6 +192,11 @@ std::shared_ptr<helicsCLI11App> BrokerBase::generateBaseCLI()
         networkTimeout,
         "time to wait for a broker connection default unit is in ms(can also be entered as a time "
         "like '10s' or '45ms') ");
+    timeout_group->add_option(
+        "--errordelay,--errortimeout",
+        errorDelay,
+        "time to wait after an error state before terminating "
+        "like '10s' or '45ms') ")->default_str(std::to_string(static_cast<double>(errorDelay)));
 
     return hApp;
 }

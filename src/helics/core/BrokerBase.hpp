@@ -44,6 +44,7 @@ class BrokerBase {
     Time tickTimer{5.0}; //!< the length of each heartbeat tick
     Time timeout{30.0}; //!< timeout to wait to establish a broker connection before giving up
     Time networkTimeout{-1.0}; //!< timeout to establish a socket connection before giving up
+    Time errorDelay{ 10.0 };  //!< time to delay before terminating after error state
     std::string identifier; //!< an identifier for the broker
     std::string
         brokerKey; //!< a key that all joining federates must have to connect if empty no key is required
