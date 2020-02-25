@@ -164,9 +164,7 @@ class BenchmarkFederate {
         // add a flag for printing system info
         app->add_flag_callback(
             "--print_systeminfo",
-            []() {
-                printHELICSsystemInfo();
-            },
+            []() { printHELICSsystemInfo(); },
             "prints the HELICS system info");
     }
 
