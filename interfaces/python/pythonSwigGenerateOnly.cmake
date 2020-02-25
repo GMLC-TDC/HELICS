@@ -36,7 +36,7 @@ endif()
     add_custom_target(
       pyfile_overwrite ALL
       COMMAND
-        ${CMAKE_COMMAND} -D TARGET_DIR=${CMAKE_CURRENT_SOURCE_DIR} -P
+        ${CMAKE_COMMAND} -D TARGET_DIR=${CMAKE_CURRENT_SOURCE_DIR}/interface -P
         ${CMAKE_CURRENT_SOURCE_DIR}/overwritePythonFiles.cmake
       DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/helicsPython.c
     )

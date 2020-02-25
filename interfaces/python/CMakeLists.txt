@@ -251,12 +251,17 @@ if(HELICS_ENABLE_SWIG AND SWIG_EXECUTABLE)
 else()
     message(STATUS "Building without swig")
 
+    file(
+        COPY ${CMAKE_CURRENT_SOURCE_DIR}/interface/
+        DESTINATION ${CMAKE_CURRENT_BINARY_DIR}
+    )
+
     if(HELICS_USE_NEW_PYTHON_FIND)
-        python3_add_library(helicsPYTHON MODULE helicsPython.c)
+        python3_add_library(helicsPYTHON MODULE interface/helicsPython.c)
     else()
         # Remove in HELICS 3
         include(${CMAKE_CURRENT_SOURCE_DIR}/addHelicsPy3Lib.cmake)
-        helics_python3_add_library(helicsPYTHON helicsPython.c)
+        helics_python3_add_library(helicsPYTHON interface/helicsPython.c)
     endif()
 
     # Set the output library name to _helics
@@ -282,8 +287,6 @@ else()
     # TODO: check for when setup.py is used
     configure_file(${CMAKE_CURRENT_SOURCE_DIR}/setup.py.in
                    ${CMAKE_CURRENT_BINARY_DIR}/setup.py)
-    configure_file(${CMAKE_CURRENT_SOURCE_DIR}/helics.py
-                   ${CMAKE_CURRENT_BINARY_DIR}/helics.py COPYONLY)
 endif()
 
 
