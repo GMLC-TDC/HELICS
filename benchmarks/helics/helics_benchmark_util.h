@@ -10,6 +10,7 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include <iostream>
 #include <string>
+#include <thread>
 
 #if defined(ENABLE_ZMQ_CORE) && !defined(USING_HELICS_C_SHARED_LIB)
 #    include "helics/core/zmq/ZmqCommsCommon.h"
@@ -111,5 +112,6 @@ inline void printHELICSsystemInfo()
     if (!cpumodel.empty()) {
         std::cout << "CPU MODEL: " << cpumodel << '\n';
     }
+    std::cout << "NUM CPU:" << std::thread::hardware_concurrency() << '\n';
     std::cout << "-------------------------------------------" << std::endl;
 }

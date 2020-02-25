@@ -16,6 +16,7 @@ Increased code coverage and additional bug fixes.
 -   Update filesystem library to [v1.3.0](https://github.com/gulrak/filesystem/releases/tag/v1.3.0)
 -   The behavior of the Federate *Complete operations to be uniform and consistent
 -   Configuration of flags and targets for interfaces in json and toml files can be done in multiple sections
+-   The benchmark federates have been changed to use a common base benchmark federate class for more consistent behavior
 
 ### Fixed
 -   Issue with iterative requests that were not being honored if the federate was acting in isolation
@@ -27,6 +28,7 @@ Increased code coverage and additional bug fixes.
 -   A series of test for Federate.cpp to increase coverage on that file to 100% 
 -   A series of tests for ValueFederate.*pp to increase coverage on that file to 100%
 -   Docker image for a helics builder which includes build tools and the helics installation 
+-   Standalone benchmark federates for use in multinode benchmark runs
 
 ### Deprecated 
 
