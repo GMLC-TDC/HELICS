@@ -153,10 +153,10 @@ class BenchmarkFederate {
         opt_max_index->ignore_underscore();
 
         // add a flag for printing system info
-        app->add_flag_function(
+        app->add_flag_callback(
             "--print_systeminfo",
-            [](int count) {
-                if (count) printHELICSsystemInfo();
+            []() {
+                printHELICSsystemInfo();
             },
             "prints the HELICS system info");
     }
