@@ -45,11 +45,11 @@ foreach(T ${HELICS_BENCHMARKS})
 
 endforeach()
 
+add_executable(helics_benchmarks BenchmarkMain.cpp)
+target_link_libraries(helics_benchmarks PUBLIC helics_application_api)
+set_target_properties(helics_benchmarks PROPERTIES FOLDER benchmarks_multimachine)
 foreach(T ${HELICS_MULTINODE_BENCHMARKS})
-    add_executable(${T} ${T}Main.cpp)
-    target_link_libraries(${T} PUBLIC helics_application_api)
-    set_target_properties(${T} PROPERTIES FOLDER benchmarks_multimachine)
-    target_sources(${T} PUBLIC ${T}.hpp)
+    target_sources(helics_benchmarks PUBLIC ${T}.hpp)
 endforeach()
 
 if (NOT HELICS_DISABLE_C_SHARED_LIB)
@@ -63,15 +63,6 @@ if (NOT HELICS_DISABLE_C_SHARED_LIB)
    )
    copy_shared_target(echoBenchmarks_c helicsSharedLib)
 endif()
-
-target_sources(echoBenchmarks PUBLIC EchoHubFederate.hpp EchoLeafFederate.hpp)
-target_sources(filterBenchmarks PUBLIC EchoMessageHubFederate.hpp EchoMessageLeafFederate.hpp)
-target_sources(echoMessageBenchmarks PUBLIC EchoMessageHubFederate.hpp EchoMessageLeafFederate.hpp)
-target_sources(pholdBenchmarks PUBLIC PholdFederate.hpp)
-target_sources(messageSendBenchmarks PUBLIC MessageExchangeFederate.hpp)
-target_sources(ringBenchmarks PUBLIC RingTransmitFederate.hpp)
-target_sources(ringMessageBenchmarks PUBLIC RingTransmitMessageFederate.hpp)
-target_sources(timingBenchmarks PUBLIC TimingHubFederate.hpp TimingLeafFederate.hpp)
 
 copy_key_files_to_target_location(ActionMessageBenchmarks)
 
