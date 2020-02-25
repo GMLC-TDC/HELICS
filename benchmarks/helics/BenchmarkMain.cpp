@@ -5,9 +5,7 @@ the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 
-#include "helics/core/helicsCLI11.hpp"
 #include "BenchmarkFederate.hpp"
-
 #include "EchoHubFederate.hpp"
 #include "EchoLeafFederate.hpp"
 #include "EchoMessageHubFederate.hpp"
@@ -18,19 +16,18 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "RingTransmitMessageFederate.hpp"
 #include "TimingHubFederate.hpp"
 #include "TimingLeafFederate.hpp"
+#include "helics/core/helicsCLI11.hpp"
 
 #include <chrono>
 #include <iostream>
 
 std::shared_ptr<BenchmarkFederate> fed;
 
-template <class T>
+template<class T>
 void addBM(helics::helicsCLI11App& app, std::string name, std::string description)
 {
     app.add_subcommand(name, description)
-        ->callback([]() {
-            fed = std::make_shared<T>();
-        })
+        ->callback([]() { fed = std::make_shared<T>(); })
         ->footer([] {
             T().initialize("", "--help");
             return std::string{};
@@ -39,7 +36,8 @@ void addBM(helics::helicsCLI11App& app, std::string name, std::string descriptio
 
 int main(int argc, char* argv[])
 {
-    helics::helicsCLI11App app("simple execution for all the different HELICS apps", "helics_app");
+    helics::helicsCLI11App app(
+        "HELICS benchmark federates for use in multinode benchmark setups", "helics_benchmarks");
     app.ignore_case()->prefix_command()->ignore_underscore();
     addBM<EchoHub>(app, "echohub", "Echo Hub benchmark federate");
     addBM<EchoLeaf>(app, "echoleaf", "Echo Leaf benchmark federate");
@@ -47,18 +45,18 @@ int main(int argc, char* argv[])
     addBM<EchoMessageLeaf>(app, "echomessageleaf", "Echo Message Leaf benchmark federate");
 
     addBM<MessageExchangeFederate>(app, "messageexchange", "Message Exchange benchmark federate");
-    
+
     addBM<PholdFederate>(app, "phold", "PHOLD benchmark federate");
 
     addBM<RingTransmit>(app, "ringtransmit", "Ring Transmit benchmark federate");
-    addBM<RingTransmitMessage>(app, "ringtransmitmessage", "Ring Transmit Message benchmark federate");
-    
+    addBM<RingTransmitMessage>(
+        app, "ringtransmitmessage", "Ring Transmit Message benchmark federate");
+
     addBM<TimingHub>(app, "timinghub", "Timing Hub benchmark federate");
     addBM<TimingLeaf>(app, "timingleaf", "Timing Leaf benchmark federate");
 
     auto ret = app.helics_parse(argc, argv);
-    if (ret != helics::helicsCLI11App::parse_output::ok)
-    {
+    if (ret != helics::helicsCLI11App::parse_output::ok) {
         switch (ret) {
             case helics::helicsCLI11App::parse_output::help_call:
             case helics::helicsCLI11App::parse_output::help_all_call:

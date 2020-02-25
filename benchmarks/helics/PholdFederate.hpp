@@ -29,12 +29,14 @@ class PholdFederate: public BenchmarkFederate {
     // optional lookahead of .1 (to prevent arbitrarily small increases in time with conservative simulators)
     unsigned int initEvCount_{16}; // starting number of events
     double localProbability_{.9}; // probability of local events
-    double randTimeMean_{deltaTime * .9}; // mean for the exponential distribution used when picking event times
+    double randTimeMean_{deltaTime *
+                         .9}; // mean for the exponential distribution used when picking event times
     double lookahead_{deltaTime * .1};
 
     // classes related to the exponential and uniform distribution random number generator
     bool generateRandomSeed{false};
-    unsigned int seed{0xABad5eed}; // some suggestions for seed choice were that not having a majority of the bits as 0 is better
+    unsigned int seed{
+        0xABad5eed}; // some suggestions for seed choice were that not having a majority of the bits as 0 is better
     std::mt19937 rand_gen;
     std::exponential_distribution<double> rand_exp;
     std::uniform_real_distribution<double> rand_uniform_double;
