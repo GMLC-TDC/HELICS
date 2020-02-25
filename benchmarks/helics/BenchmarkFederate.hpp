@@ -87,18 +87,19 @@ class BenchmarkFederate {
 
     OutputFormat result_format{OutputFormat::PLAIN_TEXT}; //!< output format for printing results
 
+    // variables to track current state, mainly for gbenchmark piecewise setup
+    bool initialized{false};
+    bool readyToRun{false};
+
     // parameters most benchmark federates need
     std::string benchmarkName; //<! the name of the benchmark federate
-    helics::Time deltaTime{helics::Time(10, time_units::ns)}; //<! sampling rate
-    helics::Time finalTime{helics::Time(10000, time_units::ns)}; //<! final time
     int index{0}; //<! the index for an instance of the benchmark federate
     int maxIndex{0}; //<! the maximum index + 1 given to a benchmark federate in a run
+    helics::Time deltaTime{helics::Time(10, time_units::ns)}; //<! sampling rate
+    helics::Time finalTime{helics::Time(10000, time_units::ns)}; //<! final time
 
-    // CLI11 Options for derived classes to change them if needed (e.g. set required)
-    CLI::Option* opt_delta_time{nullptr}; //<! the CLI11 option for --delta_time
-    CLI::Option* opt_final_time{nullptr}; //<! the CLI11 option for --final_time
-    CLI::Option* opt_index{nullptr}; //<! the CLI11 option for --index
-    CLI::Option* opt_max_index{nullptr}; //<! the CLI11 option for --max_index
+    std::unique_ptr<helics::CombinationFederate>
+        fed; //<! the federate object to use in derived classes
 
     // callbacks for more control when timing code
     std::function<void()> callBeforeFinalize{
@@ -106,15 +107,14 @@ class BenchmarkFederate {
     std::function<void()> callAfterFinalize{
         nullptr}; //<! callback function immediately after helics finalize()
 
-    std::unique_ptr<helics::CombinationFederate>
-        fed; //<! the federate object to use in derived classes
+    // CLI11 Options for derived classes to change them if needed (e.g. set required)
+    CLI::Option* opt_delta_time{nullptr}; //<! the CLI11 option for --delta_time
+    CLI::Option* opt_final_time{nullptr}; //<! the CLI11 option for --final_time
+    CLI::Option* opt_index{nullptr}; //<! the CLI11 option for --index
+    CLI::Option* opt_max_index{nullptr}; //<! the CLI11 option for --max_index
 
     // Command line options
     std::unique_ptr<helics::helicsCLI11App> app; //<! the CLI11 app object to use in derived classes
-
-    // variables to track current state, mainly for gbenchmark piecewise setup
-    bool initialized{false};
-    bool readyToRun{false};
 
     // functions to be overriden by derived benchmark classes
     /** set/override default base parameter values before arguments are parsed, and modify CLI11 options for default arguments*/
