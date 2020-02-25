@@ -58,11 +58,17 @@ class BenchmarkFederate {
      * the helics finalize() call
      * @param cb a function that takes no arguments and returns void
      */
-    void setBeforeFinalizeCallback(std::function<void()> cb = {}) { callBeforeFinalize = std::move(cb); }
+    void setBeforeFinalizeCallback(std::function<void()> cb = {})
+    {
+        callBeforeFinalize = std::move(cb);
+    }
     /** sets a callback function to all after the helics finalize() call completes
      * @param cb a function that takes no arguments and returns void
      */
-    void setAfterFinalizeCallback(std::function<void()> cb = {}) { callAfterFinalize = std::move(cb); }
+    void setAfterFinalizeCallback(std::function<void()> cb = {})
+    {
+        callAfterFinalize = std::move(cb);
+    }
 
     /** sets the output format to use when printing results
      * @param f format to print results in
@@ -95,8 +101,10 @@ class BenchmarkFederate {
     CLI::Option* opt_max_index{nullptr}; //<! the CLI11 option for --max_index
 
     // callbacks for more control when timing code
-    std::function<void()> callBeforeFinalize{nullptr}; //<! callback function immediately before helics finalize()
-    std::function<void()> callAfterFinalize{nullptr}; //<! callback function immediately after helics finalize()
+    std::function<void()> callBeforeFinalize{
+        nullptr}; //<! callback function immediately before helics finalize()
+    std::function<void()> callAfterFinalize{
+        nullptr}; //<! callback function immediately after helics finalize()
 
     std::unique_ptr<helics::CombinationFederate>
         fed; //<! the federate object to use in derived classes
@@ -133,7 +141,8 @@ class BenchmarkFederate {
      * @param name the name of the benchmark federate, shown by CLI11 --help option
      */
     explicit BenchmarkFederate(const std::string& name):
-        benchmarkName(name), app(std::make_unique<helics::helicsCLI11App>(name+" Benchmark Federate"))
+        benchmarkName(name),
+        app(std::make_unique<helics::helicsCLI11App>(name + " Benchmark Federate"))
     {
         addResult("BENCHMARK FEDERATE TYPE", "benchmark_federate_type", name);
         app->allow_extras();
@@ -309,4 +318,3 @@ class BenchmarkFederate {
         return static_cast<int>(res);
     }
 };
-
