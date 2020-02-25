@@ -8,32 +8,24 @@
 # ~~~
 
 cmake_minimum_required(VERSION 3.4)
-cmake_policy(VERSION 3.4)
-
-project(HELICS VERSION 2.4.0)
-
-if(POLICY CMP0069)
-    # Policy CMP0069 INTERPROCEDURAL OPTIMIZATION, just use the new policy since this
-    # isn't used for old systems
-    cmake_policy(SET CMP0069 NEW)
+# Make sure users don't get warnings on a tested (3.4 to 3.16) version
+# of CMake. For most of the policies, the new version is better (hence the change).
+# We don't use the 3.0...3.16 syntax because of a bug in MSVC 15.7
+# built-in and modified CMake 3.11
+if(CMAKE_VERSION VERSION_LESS 3.16)
+    cmake_policy(VERSION ${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION})
+else()
+    cmake_policy(VERSION 3.16)
 endif()
 
-if(POLICY CMP0074)
-    # Policy CMP0074 find_package uses <PackageName>_ROOT variables
-    cmake_policy(SET CMP0074 NEW)
-endif()
-
-if(POLICY CMP0076)
-    # Policy CMP0074 target_sources now converts relative paths to absolute
-    cmake_policy(SET CMP0076 NEW)
-endif()
+project(HELICS VERSION 2.4.1)
 
 # -----------------------------------------------------------------------------
 # HELICS Version number
 # -----------------------------------------------------------------------------
 set(HELICS_VERSION_BUILD)
 # use ISO date YYYY-MM-DD
-set(HELICS_DATE "2020-02-04")
+set(HELICS_DATE "2020-02-21")
 
 set(HELICS_VERSION_UNDERSCORE
     "${HELICS_VERSION_MAJOR}_${HELICS_VERSION_MINOR}_${HELICS_VERSION_PATCH}"
