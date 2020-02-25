@@ -35,8 +35,6 @@ class TimingLeaf: public BenchmarkFederate {
     void doMainLoop() override
     {
         int cnt = 0;
-        // this is  to make a fixed size string that is different for each federate but has sufficient length to
-        // get beyond SSO
         const int iter = 5000;
         while (cnt <= iter + 1) {
             fed->requestNextStep();
