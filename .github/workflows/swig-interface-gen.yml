@@ -31,12 +31,8 @@ jobs:
     - name: Stage changed interface files
       shell: bash --noprofile --norc {0}
       run: |
-        git diff --name-only | grep -E 'interfaces/*'
-        if [[ "$?" == "0" ]];
-        then
-          git add interfaces/
-        fi
-        exit 0
+        rm -rf interfaces/*/interface/*
+        git add interfaces/
     - uses: ./.github/actions/create-file-update-pr
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
