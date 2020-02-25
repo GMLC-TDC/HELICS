@@ -38,19 +38,19 @@ else()
                 "${CMAKE_COMMAND}"
                 -E
                 copy
-                ${CMAKE_CURRENT_SOURCE_DIR}/helicsMEX.cpp
+                ${CMAKE_CURRENT_SOURCE_DIR}/interface/helicsMEX.cpp
                 ${CMAKE_CURRENT_BINARY_DIR}/helicsMEX.cpp
-            DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/helicsMEX.cpp
+            DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/interface/helicsMEX.cpp
         )
         install(
-            DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/+helics
+            DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/interface/+helics
             DESTINATION matlab
             COMPONENT matlab
         )
 
-        file(GLOB MATLAB_FILES ${CMAKE_CURRENT_SOURCE_DIR}/*.m)
+        file(GLOB MATLAB_FILES ${CMAKE_CURRENT_SOURCE_DIR}/interface/*.m)
         install(
-            DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/+helics
+            DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/interface/+helics
             DESTINATION matlab
             COMPONENT matlab
         )
