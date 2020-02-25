@@ -84,15 +84,15 @@ cmake_dependent_advanced_option(
     "CMAKE_VERSION VERSION_GREATER 3.12;NOT HELICS_SWIG_GENERATE_INTERFACE_FILES_ONLY;BUILD_PYTHON_INTERFACE OR BUILD_PYTHON2_INTERFACE"
     OFF
 )
-# cmake-format: on
 
 cmake_dependent_option(
     HELICS_ENABLE_SWIG
     "use swig to generate the interface files"
     OFF
-    "BUILD_PYTHON_INTERFACE OR BUILD_MATLAB_INTERFACE OR BUILD_JAVA_INTERFACE"
-    OFF
+    "BUILD_PYTHON_INTERFACE OR BUILD_MATLAB_INTERFACE OR BUILD_JAVA_INTERFACE;NOT swig_required"
+    ${swig_required}
 )
+# cmake-format: on
 
 if(HELICS_ENABLE_SWIG OR swig_required)
     if(WIN32 AND NOT MSYS)
