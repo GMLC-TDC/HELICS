@@ -570,12 +570,22 @@ HELICS_EXPORT void helicsFederateInfoSetIntegerProperty(helics_federate_info fi,
     */
 HELICS_EXPORT void helicsFederateRegisterInterfaces(helics_federate fed, const char* file, helics_error* err);
 
-/** generate an error state in a federate
+/** generate a global Error from a federate
+A global error halts the co-simulation completely
 @param fed the federate to create an error in
 @param error_code the integer code for the error
 @param error_string a string describing the error
 */
-HELICS_EXPORT void helicsFederateError(helics_federate fed, int error_code, const char* error_string);
+HELICS_EXPORT void helicsFederateGlobalError(helics_federate fed, int error_code, const char* error_string);
+
+/** generate a local error in a federate
+this will propagate through the co-simulation but not necessarily halt the co-simulation, it has a similar effect to finalize but does
+allow some interaction with a core for a brief time. 
+@param fed the federate to create an error in
+@param error_code the integer code for the error
+@param error_string a string describing the error
+*/
+HELICS_EXPORT void helicsFederateLocalError(helics_federate fed, int error_code, const char* error_string);
 
 /** finalize the federate this function halts all communication in the federate and disconnects it from the core
      */

@@ -345,9 +345,10 @@ void CommonCore::globalError(local_federate_id federateID, int error_code, const
     if (fed == nullptr) {
         throw(InvalidIdentifier("federateID not valid error"));
     }
-    ActionMessage m(CMD_ERROR);
+    ActionMessage m(CMD_GLOBAL_ERROR);
     m.source_id = fed->global_id.load();
     m.messageID = error_code;
+    m.payload = error_string;
     addActionMessage(m);
     fed->addAction(m);
     iteration_result ret = iteration_result::next_step;
@@ -365,9 +366,10 @@ void CommonCore::localError(local_federate_id federateID, int error_code, const 
     if (fed == nullptr) {
         throw(InvalidIdentifier("federateID not valid error"));
     }
-    ActionMessage m(CMD_ERROR);
+    ActionMessage m(CMD_LOCAL_ERROR);
     m.source_id = fed->global_id.load();
     m.messageID = error_code;
+    m.payload = error_string;
     addActionMessage(m);
     fed->addAction(m);
     iteration_result ret = iteration_result::next_step;
@@ -2760,16 +2762,22 @@ void CommonCore::processCommand(ActionMessage&& command)
                     command.source_id == parent_broker_id) {
                     sendErrorToFederates(command.messageID);
                     brokerState = broker_state_t::errored;
-                } else {
+                }
+                else {
                     sendToLogger(
                         parent_broker_id,
                         log_level::error,
                         getFederateNameNoThrow(command.source_id),
                         command.payload);
                 }
-            } else {
+            }
+            else {
                 routeMessage(command);
             }
+            break;
+        case CMD_GLOBAL_ERROR:
+            setErrorState(command.messageID, command.payload);
+        case CMD_LOCAL_ERROR:
             break;
         case CMD_DATA_LINK: {
             auto pub = loopHandles.getPublication(command.name);

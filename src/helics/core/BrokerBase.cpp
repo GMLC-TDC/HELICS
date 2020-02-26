@@ -289,6 +289,7 @@ void BrokerBase::setErrorState(int eCode, const std::string& estring)
     lastErrorString = estring;
     errorCode = eCode;
     brokerState.store(broker_state_t::errored);
+    sendToLogger(global_id.load(), helics_log_level_error, identifier, estring);
 }
 
 void BrokerBase::setLoggingFile(const std::string& lfile)
