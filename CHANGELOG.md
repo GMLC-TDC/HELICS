@@ -24,11 +24,12 @@ Increased code coverage and additional bug fixes.
 
 ### Added
 -   `HELICS_DISABLE_WEBSERVER` option to turn off building of the webserver.  It will build by default if Boost is enabled and is version 1.70 or higher; otherwise it is disabled.
--   A series of test for Federate.cpp to increase coverage on that file to 100% 
+-   A series of test for Federate.cpp to increase coverage on that file to 100%
 -   A series of tests for ValueFederate.*pp to increase coverage on that file to 100%
--   Docker image for a helics builder which includes build tools and the helics installation 
+-   Docker image for a helics builder which includes build tools and the helics installation
+-   helics can be installed on [MSYS2](https://helics.readthedocs.io/en/latest/installation/windows.html#msys2) using pacman.
 
-### Deprecated 
+### Deprecated
 
 ### Removed
 -   `HELICS_ENABLE_WEBSERVER` option to enable the webserver.  This option was added as experimental in 2.4.0

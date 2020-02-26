@@ -5,21 +5,19 @@ pkgbase=mingw-w64-${_realname}
 pkgname="${MINGW_PACKAGE_PREFIX}-${_realname}"
 pkgver=2.4.0
 pkgrel=1
-pkgdesc="Hiearchical Engine for Large-scale Infrastructure Co-Simulation (mingw-w64)"
+pkgdesc="Hierarchical Engine for Large-scale Infrastructure Co-Simulation (mingw-w64)"
 arch=('any')
 url="https://github.com/GMLC-TDC/HELICS"
-license=('BSD-3-clause')
+license=('BSD')
 depends=("${MINGW_PACKAGE_PREFIX}-zeromq"
-         "${MINGW_PACKAGE_PREFIX}-python3")
+         )
 makedepends=("${MINGW_PACKAGE_PREFIX}-gcc"
              "${MINGW_PACKAGE_PREFIX}-cmake"
              "${MINGW_PACKAGE_PREFIX}-zeromq"
-             make
-             "${MINGW_PACKAGE_PREFIX}-boost"
-             "${MINGW_PACKAGE_PREFIX}-python3")
+             "${MINGW_PACKAGE_PREFIX}-boost")
 options=('!staticlibs' '!strip')
 source=("${_realname}-${pkgver}.tar.gz"::"https://github.com/GMLC-TDC/HELICS/releases/download/v${pkgver}/HELICS-v${pkgver}-source.tar.gz")
-sha256sums=('ffc4c8fa8fa593186a64288849a69c707ed91820448ff965947e32cdd54f9308')
+sha256sums=('8de39728c7bb03be0bde0d506acc827bea732eddb7bb46892027b777b10dab27')
 
 #prepare() {
 #  mkdir -p test
@@ -41,7 +39,7 @@ build() {
     -G"MSYS Makefiles" \
     -DCMAKE_INSTALL_PREFIX=${MINGW_PREFIX} \
     -DBUILD_SHARED_LIBS=ON \
-    -DBUILD_PYTHON_INTERFACE=ON\
+    -DHELICS_ENABLE_SUBMODULE_UPDATE=OFF\
     ${extra_config} \
     ..
 
