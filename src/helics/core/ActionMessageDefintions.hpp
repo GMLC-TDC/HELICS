@@ -83,6 +83,8 @@ across different compilers*/
         cmd_log = 55, //!< log a message with the root broker
         cmd_warning = 9990, //!< indicate some sort of warning
         cmd_error = 10000, //!< indicate an error with a federate
+        cmd_local_error = 10003, //!< indicate a local error within a federate/core/broker
+        cmd_global_error = 1005, //!< indicate a global error with a federate/core/broker and the federation should terminate
         cmd_invalid = 1010101, //!< indicates that command has generated an invalid state
         cmd_send_route = 75, //!< command to define a route information
         cmd_search_dependency = 1464, //!< command to add a dependency by name
@@ -235,6 +237,8 @@ across different compilers*/
 #define CMD_LOG action_message_def::action_t::cmd_log
 #define CMD_WARNING action_message_def::action_t::cmd_warning
 #define CMD_ERROR action_message_def::action_t::cmd_error
+#define CMD_GLOBAL_ERROR action_message_def::action_t::cmd_global_error
+#define CMD_LOCAL_ERROR action_message_def::action_t::cmd_local_error
 #define CMD_RESEND action_message_def::action_t::cmd_resend
 
 #define CMD_REG_PUB action_message_def::action_t::cmd_reg_pub
