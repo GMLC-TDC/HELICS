@@ -339,7 +339,7 @@ bool CommonCore::isOpenToNewFederates() const
 {
     return ((brokerState != broker_state_t::created) && (brokerState < broker_state_t::operating));
 }
-void CommonCore::error(local_federate_id federateID, int errorID)
+void CommonCore::globalError(local_federate_id federateID, int error_code, const std::string &error_string)
 {
     auto fed = getFederateAt(federateID);
     if (fed == nullptr) {
@@ -347,7 +347,27 @@ void CommonCore::error(local_federate_id federateID, int errorID)
     }
     ActionMessage m(CMD_ERROR);
     m.source_id = fed->global_id.load();
-    m.messageID = errorID;
+    m.messageID = error_code;
+    addActionMessage(m);
+    fed->addAction(m);
+    iteration_result ret = iteration_result::next_step;
+    while (ret != iteration_result::error) {
+        ret = fed->genericUnspecifiedQueueProcess();
+        if (ret == iteration_result::halted) {
+            break;
+        }
+    }
+}
+
+void CommonCore::localError(local_federate_id federateID, int error_code, const std::string &error_string)
+{
+    auto fed = getFederateAt(federateID);
+    if (fed == nullptr) {
+        throw(InvalidIdentifier("federateID not valid error"));
+    }
+    ActionMessage m(CMD_ERROR);
+    m.source_id = fed->global_id.load();
+    m.messageID = error_code;
     addActionMessage(m);
     fed->addAction(m);
     iteration_result ret = iteration_result::next_step;
