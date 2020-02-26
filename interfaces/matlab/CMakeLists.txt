@@ -50,6 +50,14 @@ else()
 
         file(GLOB MATLAB_FILES ${CMAKE_CURRENT_SOURCE_DIR}/*.m)
         file(GLOB MATLAB_GENERATED_FILES ${CMAKE_CURRENT_SOURCE_DIR}/interface/*.m)
+        file(
+            COPY ${CMAKE_CURRENT_SOURCE_DIR}/interface/
+            DESTINATION ${CMAKE_CURRENT_BINARY_DIR}
+        )
+        file(
+            COPY ${MATLAB_FILES}
+            DESTINATION ${CMAKE_CURRENT_BINARY_DIR}
+        )
         install(
             DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/interface/+helics
             DESTINATION matlab
@@ -161,7 +169,9 @@ else()
                 -nodisplay
                 -nosplash
                 -r
-                "\"run('${CMAKE_CURRENT_BINARY_DIR}/mkhelicsMEXFile.m');quit;\""
+                mkhelicsMEXFile
+            WORKING_DIRECTORY
+                ${CMAKE_CURRENT_BINARY_DIR}
             DEPENDS
                 ${CMAKE_CURRENT_BINARY_DIR}/mkhelicsMEXFile.m helicsSharedLib
                 ${CMAKE_CURRENT_BINARY_DIR}/helicsMEX.cpp
