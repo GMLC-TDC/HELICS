@@ -48,13 +48,15 @@ else()
             COMPONENT matlab
         )
 
-        file(GLOB MATLAB_FILES ${CMAKE_CURRENT_SOURCE_DIR}/interface/*.m)
+        file(GLOB MATLAB_FILES ${CMAKE_CURRENT_SOURCE_DIR}/*.m)
+        file(GLOB MATLAB_GENERATED_FILES ${CMAKE_CURRENT_SOURCE_DIR}/interface/*.m)
         install(
             DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/interface/+helics
             DESTINATION matlab
             COMPONENT matlab
         )
         install(FILES ${MATLAB_FILES} DESTINATION matlab COMPONENT matlab)
+        install(FILES ${MATLAB_GENERATED_FILES} DESTINATION matlab COMPONENT matlab)
     else()
 
         file(GLOB SHARED_LIB_HEADERS
