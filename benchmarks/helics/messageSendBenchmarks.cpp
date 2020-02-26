@@ -5,6 +5,7 @@ the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 
+#include "MessageExchangeFederate.hpp"
 #include "helics/core/BrokerFactory.hpp"
 #include "helics/core/CoreFactory.hpp"
 #include "helics/helics-config.h"
@@ -19,90 +20,6 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <thread>
 
 using namespace helics;
-
-// headers used by the MessageExchangeFederate class
-#include "helics/application_api/Endpoints.hpp"
-#include "helics/application_api/MessageFederate.hpp"
-#include "helics/core/ActionMessage.hpp"
-
-using helics::operator"" _t;
-// static constexpr helics::Time tend = 3600.0_t;  // simulation end time
-/** class implementing a federate that sends messages to another (and vice versa)*/
-class MessageExchangeFederate {
-  public:
-    helics::Time deltaTime = helics::Time(10, time_units::ns); // sampling rate
-    helics::Time finalTime = helics::Time(10, time_units::ns); // final time
-  private:
-    std::unique_ptr<helics::MessageFederate> mFed;
-    helics::Endpoint ept;
-    bool initialized = false;
-    bool readyToRun = false;
-
-    int msgCount;
-    std::string msg;
-    std::string dest;
-
-  public:
-    MessageExchangeFederate() = default;
-
-    void run(std::function<void()> callOnReady = {}, std::function<void()> callOnEnd = {})
-    {
-        if (!readyToRun) {
-            makeReady();
-        }
-        if (callOnReady) {
-            callOnReady();
-        }
-        mainLoop();
-        if (callOnEnd) {
-            callOnEnd();
-        }
-    };
-
-    void initialize(const std::string& coreName, int i, int msg_size, int msg_count)
-    {
-        std::string name = "msgExchange_" + std::to_string(i);
-        helics::FederateInfo fi;
-        fi.coreName = coreName;
-        mFed = std::make_unique<helics::MessageFederate>(name, fi);
-        ept = mFed->registerEndpoint("ept");
-
-        // set the destination to the other federate in the pair
-        dest = "msgExchange_" + std::to_string((i + 1) % 2) + "/ept";
-
-        // create a message string to send
-        msg = std::string(msg_size, '0');
-        msgCount = msg_count;
-
-        initialized = true;
-    }
-
-    void makeReady()
-    {
-        if (!initialized) {
-            throw("must initialize first");
-        }
-        mFed->enterExecutingMode();
-        readyToRun = true;
-    }
-
-    void mainLoop()
-    {
-        auto cTime = 0.0_t;
-        while (cTime < finalTime) {
-            while (ept.hasMessage()) {
-                ept.getMessage();
-            }
-
-            for (int i = 0; i < msgCount; i++) {
-                ept.send(dest, msg);
-            }
-
-            cTime = mFed->requestTimeAdvance(deltaTime);
-        }
-        mFed->finalize();
-    }
-};
 
 static void BMsendMessage(benchmark::State& state, core_type cType, bool singleCore = false)
 {
@@ -133,12 +50,15 @@ static void BMsendMessage(benchmark::State& state, core_type cType, bool singleC
                 std::string("--log_level=no_print --federates=") + std::to_string(wcore_fed_count));
         }
         for (int ii = 0; ii < fed_count; ++ii) {
+            std::string bmInit = "--index=" + std::to_string(ii) +
+                " --msg_size=" + std::to_string(msg_size) +
+                " --msg_count=" + std::to_string(msg_count);
             if (!singleCore) {
                 cores[ii] = helics::CoreFactory::create(cType, "-f 1 --log_level=no_print");
                 cores[ii]->connect();
-                feds[ii].initialize(cores[ii]->getIdentifier(), ii, msg_size, msg_count);
+                feds[ii].initialize(cores[ii]->getIdentifier(), bmInit);
             } else {
-                feds[ii].initialize(wcore->getIdentifier(), ii, msg_size, msg_count);
+                feds[ii].initialize(wcore->getIdentifier(), bmInit);
             }
         }
 

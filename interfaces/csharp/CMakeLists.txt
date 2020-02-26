@@ -27,23 +27,23 @@ if(SWIG_EXECUTABLE)
 
     swig_link_libraries(CShelics helicsSharedLib)
 
-    set_target_properties(CShelics PROPERTIES FOLDER interfaces)
+    set_target_properties(${SWIG_MODULE_CShelics_REAL_NAME} PROPERTIES FOLDER interfaces)
 
 else()
     message(SEND_ERROR "C# interface build requires swig")
 endif() # SWIG_EXECUTABLE
 
 # Set the output library name to _helics
-set_target_properties(CShelics PROPERTIES DEBUG_POSTFIX "")
+set_target_properties(${SWIG_MODULE_CShelics_REAL_NAME} PROPERTIES DEBUG_POSTFIX "")
 
-copy_key_files_to_target_location(CShelics)
-copy_shared_target(CShelics helicsSharedLib)
+copy_key_files_to_target_location(${SWIG_MODULE_CShelics_REAL_NAME})
+copy_shared_target(${SWIG_MODULE_CShelics_REAL_NAME} helicsSharedLib)
 
 install_key_files_with_comp(csharp)
 
 install(
     TARGETS
-        CShelics
+        ${SWIG_MODULE_CShelics_REAL_NAME}
         DESTINATION
         csharp
         COMPONENT

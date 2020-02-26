@@ -5,9 +5,7 @@ the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 
-#include "helics/application_api/Endpoints.hpp"
-#include "helics/application_api/MessageFederate.hpp"
-#include "helics/core/ActionMessage.hpp"
+#include "RingTransmitMessageFederate.hpp"
 #include "helics/core/BrokerFactory.hpp"
 #include "helics/core/CoreFactory.hpp"
 #include "helics_benchmark_main.h"
@@ -18,84 +16,6 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <gmlc/concurrency/Barrier.hpp>
 #include <iostream>
 #include <thread>
-
-using helics::operator"" _t;
-// static constexpr helics::Time tend = 3600.0_t;  // simulation end time
-using namespace helics;
-/** class implementing a token ring using messages as the transmission mechanism*/
-class RingTransmitMessage {
-  public:
-    helics::Time deltaTime = helics::Time(10, time_units::ns); // sampling rate
-    helics::Time finalTime = helics::Time(5000, time_units::ns); // final time
-    int loopCount = 0;
-
-  private:
-    std::unique_ptr<helics::MessageFederate> mFed;
-    helics::Endpoint* ept = nullptr;
-
-    int index_ = 0;
-    int maxIndex_ = 0;
-    bool initialized{false};
-    bool readyToRun{false};
-
-  public:
-    RingTransmitMessage() = default;
-
-    void run(std::function<void()> callOnReady = nullptr)
-    {
-        makeReady();
-        if (callOnReady) {
-            callOnReady();
-        }
-        mainLoop();
-    };
-
-    void initialize(const std::string& coreName, int index, int maxIndex)
-    {
-        std::string name = "ringlink_" + std::to_string(index);
-        index_ = index;
-        maxIndex_ = maxIndex;
-        helics::FederateInfo fi;
-        fi.coreName = coreName;
-        fi.setFlagOption(helics_flag_restrictive_time_policy);
-        mFed = std::make_unique<helics::MessageFederate>(name, fi);
-        ept = &mFed->registerIndexedEndpoint("ept", index_);
-        ept->setDefaultDestination(
-            "ept_" + std::to_string((index_ == maxIndex_ - 1) ? 0 : (index_ + 1)));
-        initialized = true;
-    }
-
-    void makeReady()
-    {
-        if (!initialized) {
-            throw("must initialize first");
-        }
-        mFed->enterExecutingMode();
-        readyToRun = true;
-    }
-
-    void mainLoop()
-    {
-        if (index_ == 0) {
-            std::string txstring(100, '1');
-            ept->send(txstring);
-            ++loopCount;
-        }
-        auto nextTime = deltaTime;
-
-        while (nextTime < finalTime) {
-            nextTime = mFed->requestTime(finalTime);
-            if (ept->hasMessage()) {
-                auto m = mFed->getMessage(*ept);
-                m->dest = ept->getDefaultDestination();
-                m->source = ept->getName();
-                ept->send(std::move(m));
-                ++loopCount;
-            }
-        }
-        mFed->finalize();
-    }
-};
 
 static void BM_ringMessage2_singleCore(benchmark::State& state)
 {
@@ -110,7 +30,9 @@ static void BM_ringMessage2_singleCore(benchmark::State& state)
 
         std::vector<RingTransmitMessage> links(feds);
         for (int ii = 0; ii < feds; ++ii) {
-            links[ii].initialize(wcore->getIdentifier(), ii, feds);
+            std::string bmInit =
+                "--index=" + std::to_string(ii) + " --max_index=" + std::to_string(feds);
+            links[ii].initialize(wcore->getIdentifier(), bmInit);
         }
 
         std::thread rthread(
@@ -158,7 +80,9 @@ static void BM_ringMessage_multiCore(benchmark::State& state, core_type cType)
                 std::string(
                     "--restrictive_time_policy --federates=1 --broker=" + broker->getIdentifier()));
             cores[ii]->connect();
-            links[ii].initialize(cores[ii]->getIdentifier(), ii, feds);
+            std::string bmInit =
+                "--index=" + std::to_string(ii) + " --max_index=" + std::to_string(feds);
+            links[ii].initialize(cores[ii]->getIdentifier(), bmInit);
         }
         std::vector<std::thread> threadlist(feds - 1);
         for (int ii = 0; ii < feds - 1; ++ii) {
