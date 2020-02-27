@@ -71,7 +71,16 @@ bool DependencyInfo::ProcessMessage(const ActionMessage& m)
             Tnext = Time::maxVal();
             Te = Time::maxVal();
             Tdemin = Time::maxVal();
-            minFed = global_federate_id();
+            minFed = global_federate_id{};
+            break;
+        case CMD_LOCAL_ERROR:
+        case CMD_GLOBAL_ERROR:
+            time_state = time_state_t::error;
+            //   printf("%d disconnect from %d\n", fedID, m.source_id);
+            Tnext = Time::maxVal();
+            Te = Time::maxVal();
+            Tdemin = Time::maxVal();
+            minFed = global_federate_id{};
             break;
         case CMD_SEND_MESSAGE:
             if (time_state == time_state_t::time_granted) {

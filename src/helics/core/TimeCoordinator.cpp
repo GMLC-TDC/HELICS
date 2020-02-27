@@ -607,6 +607,8 @@ message_process_result TimeCoordinator::processTimeMessage(const ActionMessage& 
         case CMD_DISCONNECT_CORE:
         case CMD_DISCONNECT_FED:
         case CMD_DISCONNECT_BROKER:
+        case CMD_GLOBAL_ERROR:
+        case CMD_LOCAL_ERROR:
             // this command requires removing dependents as well as dealing with dependency processing
             removeDependent(global_federate_id(cmd.source_id));
             break;
