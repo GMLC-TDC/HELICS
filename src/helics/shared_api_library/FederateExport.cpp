@@ -597,7 +597,23 @@ void helicsFederateGlobalError(helics_federate fed, int error_code, const char* 
     }
     try
     {
-        fedObj->
+        fedObj->globalError(error_code, AS_STRING(error_string));
+    }
+    catch (...)
+    {
+
+    }
+}
+
+void helicsFederateLocalError(helics_federate fed, int error_code, const char* error_string)
+{
+    auto fedObj = getFed(fed, nullptr);
+    if (fedObj == nullptr) {
+        return;
+    }
+    try
+    {
+        fedObj->localError(error_code, AS_STRING(error_string));
     }
     catch (...)
     {

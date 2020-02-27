@@ -530,6 +530,29 @@ void Federate::error(int errorcode)
     error(errorcode, errorString);
 }
 
+void Federate::completeOperation()
+{
+    switch (currentMode.load()) {
+    case modes::pending_init:
+        enterInitializingModeComplete();
+        break;
+    case modes::pending_exec:
+        enterExecutingModeComplete();
+        break;
+    case modes::pending_time:
+        requestTimeComplete();
+        break;
+    case modes::pending_iterative_time:
+        requestTimeIterativeComplete();
+        break;
+    case modes::pending_finalize:
+        finalizeComplete();
+        break;
+    default:
+        break;
+    }
+}
+
 void Federate::error(int errorcode, const std::string& message)
 {
     if (!coreObject) {
@@ -537,25 +560,7 @@ void Federate::error(int errorcode, const std::string& message)
             InvalidFunctionCall("cannot generate error on uninitialized or disconnected Federate"));
     }
     // deal with pending operations first
-    switch (currentMode.load()) {
-        case modes::pending_init:
-            enterInitializingModeComplete();
-            break;
-        case modes::pending_exec:
-            enterExecutingModeComplete();
-            break;
-        case modes::pending_time:
-            requestTimeComplete();
-            break;
-        case modes::pending_iterative_time:
-            requestTimeIterativeComplete();
-            break;
-        case modes::pending_finalize:
-            finalizeComplete();
-            break;
-        default:
-            break;
-    }
+    completeOperation();
     currentMode = modes::error;
     coreObject->logMessage(fedID, errorcode, message);
 }
@@ -566,26 +571,7 @@ void Federate::localError(int errorcode, const std::string& message)
         throw(
             InvalidFunctionCall("cannot generate a federation error on uninitialized or disconnected Federate"));
     }
-    // deal with pending operations first
-    switch (currentMode.load()) {
-    case modes::pending_init:
-        enterInitializingModeComplete();
-        break;
-    case modes::pending_exec:
-        enterExecutingModeComplete();
-        break;
-    case modes::pending_time:
-        requestTimeComplete();
-        break;
-    case modes::pending_iterative_time:
-        requestTimeIterativeComplete();
-        break;
-    case modes::pending_finalize:
-        finalizeComplete();
-        break;
-    default:
-        break;
-    }
+    completeOperation();
     currentMode = modes::error;
     coreObject->localError(fedID, errorcode, message);
 }
@@ -596,26 +582,7 @@ void Federate::globalError(int errorcode, const std::string& message)
         throw(
             InvalidFunctionCall("cannot generate a federation error on uninitialized or disconnected Federate"));
     }
-    // deal with pending operations first
-    switch (currentMode.load()) {
-    case modes::pending_init:
-        enterInitializingModeComplete();
-        break;
-    case modes::pending_exec:
-        enterExecutingModeComplete();
-        break;
-    case modes::pending_time:
-        requestTimeComplete();
-        break;
-    case modes::pending_iterative_time:
-        requestTimeIterativeComplete();
-        break;
-    case modes::pending_finalize:
-        finalizeComplete();
-        break;
-    default:
-        break;
-    }
+    completeOperation();
     currentMode = modes::error;
     coreObject->globalError(fedID, errorcode, message);
 }

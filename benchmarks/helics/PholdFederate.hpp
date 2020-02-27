@@ -82,12 +82,12 @@ class PholdFederate: public BenchmarkFederate {
     void doParamInit(helics::FederateInfo& /*fi*/) override
     {
         if (app->get_option("--set_rand_seed")->count() == 0) {
-            std::mt19937 rand_gen(0x600d5eed);
+            std::mt19937 random_engine(0x600d5eed);
             std::uniform_int_distribution<unsigned int> rand_seed_uniform;
             for (int i = 0; i < index; i++) {
-                rand_seed_uniform(rand_gen);
+                rand_seed_uniform(random_engine);
             }
-            setRandomSeed(rand_seed_uniform(rand_gen));
+            setRandomSeed(rand_seed_uniform(random_engine));
         }
 
         // set up based on given params

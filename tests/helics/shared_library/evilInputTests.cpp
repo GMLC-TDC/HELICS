@@ -1083,6 +1083,30 @@ TEST(evil_federate_test, helicsFederateRegisterInterfaces)
     EXPECT_NE(err.error_code, 0);
 }
 
+TEST(evil_federate_test, helicsFederateLocalError)
+{
+    //void helicsFederateLocalError(helics_federate fed, int error_code, const char *error_message);
+    char rdata[256];
+    helics_federate evil_federate = reinterpret_cast<helics_federate>(rdata);
+  
+    EXPECT_NO_THROW(helicsFederateLocalError(nullptr, 4,nullptr));
+    
+    EXPECT_NO_THROW(helicsFederateLocalError(evil_federate, -25,"error_message"));
+    
+}
+
+TEST(evil_federate_test, helicsFederateGlobalError)
+{
+    //void helicsFederateLocalError(helics_federate fed, int error_code, const char *error_message);
+    char rdata[256];
+    helics_federate evil_federate = reinterpret_cast<helics_federate>(rdata);
+
+    EXPECT_NO_THROW(helicsFederateGlobalError(nullptr, 4, nullptr));
+
+    EXPECT_NO_THROW(helicsFederateGlobalError(evil_federate, -25, "error_message"));
+
+}
+
 TEST(evil_federate_test, helicsFederateFinalize)
 {
     //void helicsFederateFinalize(helics_federate fed, helics_error* err);

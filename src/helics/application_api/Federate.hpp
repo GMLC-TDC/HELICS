@@ -564,6 +564,8 @@ class HELICS_CXX_EXPORT Federate {
     {
         logMessage(helics_log_level_data, message);
     }
+    /** call to complete async operation with no output*/
+    void completeOperation();
 
   private:
     /** register filter interfaces defined in  file or string
