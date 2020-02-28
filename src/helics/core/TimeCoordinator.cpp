@@ -91,6 +91,49 @@ void TimeCoordinator::disconnect()
     disconnected = true;
 }
 
+void TimeCoordinator::localError()
+{
+    time_granted = Time::maxVal();
+    time_grantBase = Time::maxVal();
+    if (sendMessageFunction) {
+        std::set<global_federate_id> connections(dependents.begin(), dependents.end());
+        for (auto dep : dependencies) {
+            if (dep.Tnext < Time::maxVal()) {
+                connections.insert(dep.fedID);
+            }
+        }
+        if (connections.empty()) {
+            return;
+        }
+        ActionMessage bye(CMD_LOCAL_ERROR);
+
+        bye.source_id = source_id;
+        if (connections.size() == 1) {
+            bye.dest_id = *connections.begin();
+            if (bye.dest_id == source_id) {
+                processTimeMessage(bye);
+            }
+            else {
+                sendMessageFunction(bye);
+            }
+        }
+        else {
+            ActionMessage multi(CMD_MULTI_MESSAGE);
+            for (auto fed : connections) {
+                bye.dest_id = fed;
+                if (fed == source_id) {
+                    processTimeMessage(bye);
+                }
+                else {
+                    appendMessage(multi, bye);
+                }
+            }
+            sendMessageFunction(multi);
+        }
+    }
+    disconnected = true;
+}
+
 void TimeCoordinator::timeRequest(
     Time nextTime,
     iteration_request iterate,

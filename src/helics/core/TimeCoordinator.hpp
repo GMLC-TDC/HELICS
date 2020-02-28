@@ -207,6 +207,8 @@ class TimeCoordinator {
     message_processing_result checkTimeGrant();
     /** disconnect*/
     void disconnect();
+    /** generate a local Error*/
+    void localError();
     /** generate a string with the current time status*/
     std::string printTimeStatus() const;
     /** return true if there are active dependencies*/

@@ -2757,6 +2757,7 @@ void CommonCore::processCommand(ActionMessage&& command)
             }
             break;
         case CMD_ERROR:
+        case CMD_LOCAL_ERROR:
             if (command.dest_id == global_broker_id_local) {
                 if (command.source_id == higher_broker_id ||
                     command.source_id == parent_broker_id) {
@@ -2777,7 +2778,6 @@ void CommonCore::processCommand(ActionMessage&& command)
             break;
         case CMD_GLOBAL_ERROR:
             setErrorState(command.messageID, command.payload);
-        case CMD_LOCAL_ERROR:
             break;
         case CMD_DATA_LINK: {
             auto pub = loopHandles.getPublication(command.name);
