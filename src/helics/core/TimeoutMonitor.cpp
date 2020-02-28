@@ -19,12 +19,13 @@ void TimeoutMonitor::tick(CommonCore* core)
         if (now - parentConnection.lastPing > timeout) {
             // try to reset the connection to the broker
             // brokerReconnect()
+            const std::string message{ "core lost connection with broker" };
             core->sendToLogger(
                 core->global_broker_id_local,
                 log_level::error,
                 core->getIdentifier(),
-                "core lost connection with broker");
-            core->sendErrorToFederates(-5);
+                message);
+            core->sendErrorToFederates(-5,message);
             core->processDisconnect();
             core->brokerState = BrokerBase::broker_state_t::errored;
             core->addActionMessage(CMD_STOP);

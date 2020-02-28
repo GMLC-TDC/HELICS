@@ -1413,7 +1413,7 @@ void CoreBroker::addPublication(ActionMessage& m)
 {
     // detect duplicate publications
     if (handles.getPublication(m.name) != nullptr) {
-        ActionMessage eret(CMD_ERROR, global_broker_id_local, m.source_id);
+        ActionMessage eret(CMD_LOCAL_ERROR, global_broker_id_local, m.source_id);
         eret.dest_handle = m.source_handle;
         eret.messageID = defs::errors::registration_failure;
         eret.payload = "Duplicate publication names (" + m.name + ")";

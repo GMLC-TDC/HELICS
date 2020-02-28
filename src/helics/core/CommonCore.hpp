@@ -449,8 +449,8 @@ class CommonCore: public Core, public BrokerBase {
     */
     std::string federateQuery(const FederateState* fed, const std::string& queryStr) const;
 
-    /** send an error code to all the federates*/
-    void sendErrorToFederates(int error_code);
+    /** send an error code and message to all the federates*/
+    void sendErrorToFederates(int error_code, const std::string &message);
     /** check for a disconnect and take actions if the object can disconnect*/
     bool checkAndProcessDisconnect();
     /** send a disconnect message to time dependencies and child federates*/

@@ -683,7 +683,7 @@ const std::vector<interface_handle>& FederateState::getEvents() const
     return events;
 }
 
-message_processing_result FederateState::processDelayQueue()
+message_processing_result FederateState::processDelayQueue() noexcept
 {
     delayedFederates.clear();
     auto ret_code = message_processing_result::continue_processing;
@@ -749,7 +749,7 @@ bool FederateState::messageShouldBeDelayed(const ActionMessage& cmd) const
     }
 }
 
-message_processing_result FederateState::processQueue()
+message_processing_result FederateState::processQueue() noexcept
 {
     if (state == HELICS_FINISHED) {
         return message_processing_result::halted;
@@ -775,7 +775,8 @@ message_processing_result FederateState::processQueue()
     {
         if (!initError)
         {
-           
+            if (parent_ != nullptr)
+            {
             ActionMessage gError(CMD_LOCAL_ERROR);
             if (terminate_on_error)
             {
@@ -789,8 +790,7 @@ message_processing_result FederateState::processQueue()
             gError.dest_id = parent_broker_id;
             gError.messageID = errorCode;
             gError.payload = errorString;
-            if (parent_ != nullptr)
-            {
+            
                 parent_->addActionMessage(std::move(gError));
             }
         }
@@ -1084,7 +1084,7 @@ message_processing_result FederateState::processActionMessage(ActionMessage& cmd
         case CMD_ERROR:
         case CMD_LOCAL_ERROR:
         case CMD_GLOBAL_ERROR:
-            if (cmd.source_id == global_id.load()) {
+            if (cmd.source_id == global_id.load()||cmd.source_id==parent_broker_id||cmd.source_id==root_broker_id) {
                 if ((state != HELICS_FINISHED) && (state != HELICS_TERMINATING)) {
                     if (cmd.action() != CMD_GLOBAL_ERROR)
                     {

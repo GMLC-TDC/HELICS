@@ -93,6 +93,10 @@ void TimeCoordinator::disconnect()
 
 void TimeCoordinator::localError()
 {
+    if (disconnected)
+    {
+        return;
+    }
     time_granted = Time::maxVal();
     time_grantBase = Time::maxVal();
     if (sendMessageFunction) {

@@ -142,8 +142,7 @@ std::shared_ptr<helicsCLI11App> BrokerBase::generateBaseCLI()
     logging_group->option_defaults()->ignore_underscore();
     logging_group->add_flag(
         "--force_logging_flush", forceLoggingFlush, "flush the log after every message");
-    logging_group->add_option("--logfile", logFile, "the file to log the messages to")
-        ->ignore_underscore();
+    logging_group->add_option("--logfile", logFile, "the file to log the messages to");
     logging_group
         ->add_option_function<int>(
             "--loglevel,--log-level",
@@ -172,6 +171,7 @@ std::shared_ptr<helicsCLI11App> BrokerBase::generateBaseCLI()
 
     auto timeout_group =
         hApp->add_option_group("timeouts", "Options related to network and process timeouts");
+    timeout_group->option_defaults()->ignore_underscore()->ignore_case();
     timeout_group->add_option(
         "--tick",
         tickTimer,

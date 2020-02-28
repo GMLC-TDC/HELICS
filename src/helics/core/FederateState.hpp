@@ -227,7 +227,7 @@ class FederateState {
     4. a break event is encountered
     @return a convergence state value with an indicator of return reason and state of convergence
     */
-    message_processing_result processQueue();
+    message_processing_result processQueue() noexcept;
 
     /** process the federate delayed Message queue until a returnable event or it is empty
     @details processQueue will process messages until one of 3 things occur
@@ -237,7 +237,7 @@ class FederateState {
     4. a break event is encountered
     @return a convergence state value with an indicator of return reason and state of convergence
     */
-    message_processing_result processDelayQueue();
+    message_processing_result processDelayQueue() noexcept;
     /** process a single message
     @return a convergence state value with an indicator of return reason and state of convergence
     */

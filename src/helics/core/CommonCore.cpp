@@ -2474,10 +2474,11 @@ void CommonCore::errorRespondDelayedMessages(const std::string& estring)
     }
 }
 
-void CommonCore::sendErrorToFederates(int error_code)
+void CommonCore::sendErrorToFederates(int error_code, const std::string &message)
 {
-    ActionMessage errorCom(CMD_ERROR);
+    ActionMessage errorCom(CMD_LOCAL_ERROR);
     errorCom.messageID = error_code;
+    errorCom.payload = message;
     loopFederates.apply([&errorCom](auto& fed) {
         if ((fed) && (!fed.disconnected)) {
             fed->addAction(errorCom);
@@ -2760,8 +2761,8 @@ void CommonCore::processCommand(ActionMessage&& command)
         case CMD_LOCAL_ERROR:
             if (command.dest_id == global_broker_id_local) {
                 if (command.source_id == higher_broker_id ||
-                    command.source_id == parent_broker_id) {
-                    sendErrorToFederates(command.messageID);
+                    command.source_id == parent_broker_id || command.source_id==root_broker_id) {
+                    sendErrorToFederates(command.messageID,command.payload);
                     brokerState = broker_state_t::errored;
                 }
                 else {
@@ -2770,6 +2771,7 @@ void CommonCore::processCommand(ActionMessage&& command)
                         log_level::error,
                         getFederateNameNoThrow(command.source_id),
                         command.payload);
+                    //TODO::PT check error here?
                 }
             }
             else {
