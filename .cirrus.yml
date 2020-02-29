@@ -5,6 +5,8 @@ task:
   install_script: |
     pkg install -y cmake libzmq4 boost-libs ninja
   build_script: |
+    git --version
+    git submodule update --init
     mkdir build && cd build
     cmake -GNinja -DHELICS_BUILD_TESTS=ON -DHELICS_BUILD_EXAMPLES=ON ..
     cmake --build .
