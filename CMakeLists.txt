@@ -377,6 +377,10 @@ if(NOT EXISTS "${PROJECT_SOURCE_DIR}/ThirdParty/toml11/toml/value.hpp")
     submod_update(ThirdParty/toml11)
 endif()
 
+if(NOT EXISTS "${PROJECT_SOURCE_DIR}/ThirdParty/netif/gmlc/netif/NetIF.hpp")
+    submod_update(ThirdParty/netif)
+endif()
+
 check_submodule_status()
 
 include(GNUInstallDirs)
@@ -824,6 +828,8 @@ set(LICENSE_LIST
     "${PROJECT_SOURCE_DIR}/ThirdParty/toml11/LICENSE"
     "GMLC Utilities"
     "${PROJECT_SOURCE_DIR}/ThirdParty/utilities/LICENSE"
+    "netif"
+    "${PROJECT_SOURCE_DIR}/ThirdParty/netif/LICENSE"
 )
 
 if(NOT CMAKE_VERSION VERSION_LESS 3.11)

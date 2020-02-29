@@ -17,6 +17,7 @@ Increased code coverage and additional bug fixes.
 -   The behavior of the Federate *Complete operations to be uniform and consistent
 -   Configuration of flags and targets for interfaces in json and toml files can be done in multiple sections
 -   The benchmark federates have been changed to use a common base benchmark federate class for more consistent behavior
+-   Switched to including netif as a git submodule
 
 ### Fixed
 -   Issue with iterative requests that were not being honored if the federate was acting in isolation
