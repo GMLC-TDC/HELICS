@@ -55,6 +55,9 @@ All PR's and branches trigger a set of builds using Docker images on Circle-CI.
 ## Drone
 -  64 bit and 32 bit builds on ARM processors
 
+## Cirrus CI
+-  FreeBSD 12.1 build
+
 ## Read the docs
 -  Build the docs for the website and test on every commit
 

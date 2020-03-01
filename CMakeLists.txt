@@ -413,9 +413,13 @@ cmake_dependent_advanced_option(
 cmake_dependent_advanced_option(
     ENABLE_UDP_CORE "Enable UDP core types" ON "NOT HELICS_DISABLE_ASIO" OFF
 )
+if("${CMAKE_SYSTEM_NAME}" MATCHES ".*BSD")
+    set(SYSTEM_IS_BSD ON)
+endif()
+
 cmake_dependent_advanced_option(
     ENABLE_IPC_CORE "Enable Interprocess communication types" ON
-    "NOT HELICS_DISABLE_BOOST" OFF
+    "NOT HELICS_DISABLE_BOOST;NOT SYSTEM_IS_BSD" OFF
 )
 cmake_dependent_advanced_option(
     ENABLE_TEST_CORE "Enable test inprocess core type" OFF "NOT HELICS_BUILD_TESTS" ON

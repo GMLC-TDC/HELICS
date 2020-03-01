@@ -31,6 +31,7 @@ Increased code coverage and additional bug fixes.
 -   Docker image for a helics builder which includes build tools and the helics installation
 -   helics can be installed on [MSYS2](https://helics.readthedocs.io/en/latest/installation/windows.html#msys2) using pacman.
 -   Standalone benchmark federates for use in multinode benchmark runs
+-   A FreeBSD 12.1 CI build using Cirrus CI
 
 ### Deprecated
 
