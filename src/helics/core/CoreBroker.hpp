@@ -31,6 +31,18 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <unordered_map>
 
 namespace helics {
+
+    /** enumeration of possible states of a remote federate or broker*/
+    enum class connection_state :std::uint8_t
+    {
+        connected=0,
+        init_requested=1,
+        operating=2,
+        error=5,
+        request_disconnect=48,
+        disconnected=50
+    };
+
 /** class defining the common information for a federate*/
 class BasicFedInfo {
   public:
@@ -38,7 +50,7 @@ class BasicFedInfo {
     global_federate_id global_id; //!< the identification code for the federate
     route_id route; //!< the routing information for data to be sent to the federate
     global_broker_id parent; //!< the id of the parent broker/core
-    bool isDisconnected = false; //!< flag indicating the federate is disconnected
+    connection_state state{ connection_state::connected };
     explicit BasicFedInfo(const std::string& fedname): name(fedname){};
 };
 
@@ -50,15 +62,17 @@ class BasicBrokerInfo {
     global_broker_id global_id; //!< the global identifier for the broker
     route_id route; //!< the identifier for the route to take to the broker
     global_broker_id parent; //!< the id of the parent broker/core
-    bool _initRequested{false}; //!< flag indicating the broker has requesting initialization
-    bool isDisconnected{false}; //!< flag indicating that the broker has disconnected
+
+    connection_state state{ connection_state::connected }; //!< specify the current status of the broker
+
     bool _hasTimeDependency{
-        false}; //!< flag indicating that a broker has endpoints it is coordinating
+        false}; //!< flag indicating that a broker has general endpoints it is coordinating
     bool _core{false}; //!< if set to true the broker is a core false is a broker;
     bool _nonLocal{false}; //!< indicator that the broker has a subbroker as a parent.
     bool _route_key{false}; //!< indicator that the broker has a unique route id
     bool _sent_disconnect_ack{false}; //!< indicator that the disconnect ack has been sent
     bool _disable_ping{false}; //!< indicator that the broker doesn't respond to pings
+    // 1 byte gap
     std::string routeInfo; //!< string describing the connection information for the route
     explicit BasicBrokerInfo(const std::string& brokerName): name(brokerName){};
 };

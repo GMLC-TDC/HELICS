@@ -527,7 +527,7 @@ void CoreBroker::processPriorityCommand(ActionMessage&& command)
         case CMD_PRIORITY_DISCONNECT: {
             auto brk = getBrokerById(global_broker_id(command.source_id));
             if (brk != nullptr) {
-                brk->isDisconnected = true;
+                brk->state = connection_state::disconnected;
             }
             if (allDisconnected()) {
                 if (!isRootc) {
@@ -634,7 +634,7 @@ void CoreBroker::labelAsDisconnected(global_broker_id brkid)
 {
     auto disconnect_procedure = [brkid](auto& obj) {
         if (obj.parent == brkid) {
-            obj.isDisconnected = true;
+            obj.state = connection_state::disconnected;
         }
     };
     _brokers.apply(disconnect_procedure);
@@ -646,10 +646,10 @@ void CoreBroker::sendDisconnect()
     ActionMessage bye(CMD_DISCONNECT);
     bye.source_id = global_broker_id_local;
     _brokers.apply([this, &bye](auto& brk) {
-        if (!brk.isDisconnected) {
+        if (brk.state<connection_state::disconnected) {
             if (brk.parent == global_broker_id_local) {
                 this->routeMessage(bye, brk.global_id);
-                brk.isDisconnected = true;
+                brk.state = connection_state::disconnected;
             }
             if (hasTimeDependency) {
                 timeCoord->removeDependency(brk.global_id);
@@ -730,10 +730,10 @@ void CoreBroker::processCommand(ActionMessage&& command)
                 bool partDisconnected{false};
                 bool ignore{false};
                 for (auto& brk : _brokers) {
-                    if (brk.isDisconnected) {
+                    if (brk.state==connection_state::disconnected) {
                         partDisconnected = true;
                     }
-                    if (brk.isDisconnected && brk.global_id == command.source_id) {
+                    if (brk.state == connection_state::disconnected && brk.global_id == command.source_id) {
                         // the broker in question is already disconnected, ignore this
                         ignore = true;
                         break;
@@ -780,7 +780,7 @@ void CoreBroker::processCommand(ActionMessage&& command)
         case CMD_INIT: {
             auto brk = getBrokerById(static_cast<global_broker_id>(command.source_id));
             if (brk != nullptr) {
-                brk->_initRequested = true;
+                brk->state=connection_state::init_requested;
             }
             if (allInitReady()) {
                 if (isRootc) {
@@ -802,7 +802,7 @@ void CoreBroker::processCommand(ActionMessage&& command)
             }
             auto brk = getBrokerById(global_broker_id(command.source_id));
             if (brk != nullptr) {
-                brk->_initRequested = false;
+                brk->state = connection_state::connected;
             }
         } break;
         case CMD_INIT_GRANT:
@@ -932,7 +932,7 @@ void CoreBroker::processCommand(ActionMessage&& command)
         case CMD_DISCONNECT_FED: {
             auto fed = _federates.find(command.source_id);
             if (fed != _federates.end()) {
-                fed->isDisconnected = true;
+                fed->state=connection_state::disconnected;
             }
             if (!isRootc) {
                 transmit(parent_route_id, command);
@@ -1161,7 +1161,7 @@ void CoreBroker::checkForNamedInterface(ActionMessage& command)
             auto pub = handles.getPublication(command.name);
             if (pub != nullptr) {
                 auto fed = _federates.find(pub->getFederateId());
-                if (!fed->isDisconnected) {
+                if (fed->state<connection_state::error) {
                     command.setAction(CMD_ADD_SUBSCRIBER);
                     command.setDestination(pub->handle);
                     command.name.clear();
@@ -1186,7 +1186,7 @@ void CoreBroker::checkForNamedInterface(ActionMessage& command)
             auto inp = handles.getInput(command.name);
             if (inp != nullptr) {
                 auto fed = _federates.find(inp->getFederateId());
-                if (!fed->isDisconnected) {
+                if (fed->state < connection_state::error) {
                     command.setAction(CMD_ADD_PUBLISHER);
                     command.setDestination(inp->handle);
                     auto pub = handles.findHandle(command.getSource());
@@ -1234,7 +1234,7 @@ void CoreBroker::checkForNamedInterface(ActionMessage& command)
             auto ept = handles.getEndpoint(command.name);
             if (ept != nullptr) {
                 auto fed = _federates.find(ept->getFederateId());
-                if (!fed->isDisconnected) {
+                if (fed->state < connection_state::error) {
                     command.setAction(CMD_ADD_FILTER);
                     command.setDestination(ept->handle);
                     command.name.clear();
@@ -1797,7 +1797,7 @@ void CoreBroker::routeMessage(ActionMessage&& cmd)
 void CoreBroker::broadcast(ActionMessage& cmd)
 {
     for (auto& broker : _brokers) {
-        if ((!broker._nonLocal) && (!broker.isDisconnected)) {
+        if ((!broker._nonLocal) && (broker.state<connection_state::disconnected)) {
             cmd.dest_id = broker.global_id;
             transmit(broker.route, cmd);
         }
@@ -2147,7 +2147,7 @@ void CoreBroker::processDisconnect(ActionMessage& command)
 
 void CoreBroker::disconnectBroker(BasicBrokerInfo& brk)
 {
-    brk.isDisconnected = true;
+    brk.state=connection_state::disconnected;
     if (brokerState < broker_state_t::operating) {
         if (isRootc) {
             ActionMessage dis(CMD_BROADCAST_DISCONNECT);
@@ -2758,14 +2758,14 @@ bool CoreBroker::allInitReady() const
     }
 
     return std::all_of(_brokers.begin(), _brokers.end(), [](const auto& brk) {
-        return ((brk._nonLocal) || (brk._initRequested));
+        return ((brk._nonLocal) || (brk.state==connection_state::init_requested));
     });
 }
 
 bool CoreBroker::allDisconnected() const
 {
     return std::all_of(_brokers.begin(), _brokers.end(), [](const auto& brk) {
-        return ((brk._nonLocal) || (brk.isDisconnected));
+        return ((brk._nonLocal) || (brk.state>=connection_state::disconnected));
     });
 }
 
