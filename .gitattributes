@@ -1,5 +1,8 @@
 * text=input
 
+*.md eol=lf
+*.json eol=lf
+
 *.jpg binary
 *.png binary
 *.mat binary
