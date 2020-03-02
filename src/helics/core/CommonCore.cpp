@@ -2787,6 +2787,11 @@ void CommonCore::processCommand(ActionMessage&& command)
             break;
         case CMD_GLOBAL_ERROR:
             setErrorState(command.messageID, command.payload);
+            sendErrorToFederates(command.messageID, command.payload);
+            if (!(command.source_id == higher_broker_id || command.source_id == root_broker_id))
+            {
+                transmit(parent_route_id, std::move(command));
+            }
             break;
         case CMD_DATA_LINK: {
             auto pub = loopHandles.getPublication(command.name);

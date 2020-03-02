@@ -199,7 +199,7 @@ TEST_F(error_tests, duplicate_publication_names_auto_terminate)
     auto fed2 = GetFederateAs<helics::ValueFederate>(1);
 
     fed1->setFlagOption(helics_flag_terminate_on_error);
-
+    fed2->setFlagOption(helics_flag_terminate_on_error);
     fed1->registerGlobalPublication("testkey", "");
     fed1->enterInitializingModeAsync();
 

@@ -297,7 +297,7 @@ void BrokerBase::setErrorState(int eCode, const std::string& estring)
         brokerState.store(broker_state_t::errored);
         if (errorDelay <= timeZero)
         {
-            ActionMessage halt(CMD_DISCONNECT,global_id.load(),global_id.load());
+            ActionMessage halt(CMD_USER_DISCONNECT,global_id.load(),global_id.load());
             addActionMessage(halt);
         }
         else

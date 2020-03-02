@@ -755,7 +755,7 @@ message_processing_result FederateState::processQueue() noexcept
         return message_processing_result::halted;
     }
     auto initError = (state == HELICS_ERROR);
-
+    bool error_cmd{ false };
     // process the delay Queue first
     auto ret_code = processDelayQueue();
 
@@ -770,10 +770,14 @@ message_processing_result FederateState::processQueue() noexcept
         if (ret_code == message_processing_result::delay_message) {
             delayQueues[static_cast<global_federate_id>(cmd.source_id)].push_back(cmd);
         }
+        if (ret_code == message_processing_result::error && cmd.action() == CMD_GLOBAL_ERROR)
+        {
+            error_cmd = true;
+        }
     }
     if (ret_code == message_processing_result::error && state == HELICS_ERROR)
     {
-        if (!initError)
+        if (!initError  && !error_cmd)
         {
             if (parent_ != nullptr)
             {
