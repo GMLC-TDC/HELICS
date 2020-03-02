@@ -1022,28 +1022,8 @@ void CoreBroker::processCommand(ActionMessage&& command)
             break;
         case CMD_ERROR:
         case CMD_LOCAL_ERROR:
-            if (isRootc || command.dest_id == global_broker_id_local||command.dest_id==parent_broker_id) {
-                sendToLogger(command.source_id, log_level::error, std::string(), command.payload);
-                if (command.source_id == parent_broker_id) {
-                    broadcast(command);
-                }
-                brokerState = broker_state_t::errored;
-            }
-            else {
-                transmit(parent_route_id, command);
-            }
-            break;
         case CMD_GLOBAL_ERROR:
-            if (isRootc || command.dest_id == global_broker_id_local) {
-                sendToLogger(command.source_id, log_level::error, std::string(), command.payload);
-                if (command.source_id == parent_broker_id) {
-                    broadcast(command);
-                }
-                brokerState = broker_state_t::errored;
-            }
-            else {
-                transmit(parent_route_id, command);
-            }
+            processError(command);
             break;
         case CMD_REG_PUB:
             if ((!isRootc) && (command.dest_id != parent_broker_id)) {
@@ -2047,6 +2027,67 @@ void CoreBroker::FindandNotifyFilterTargets(BasicHandleInfo& handleInfo)
     }
     if (!(Handles.empty() && FiltDestTargets.empty() && FiltSourceTargets.empty())) {
         unknownHandles.clearFilter(handleInfo.key);
+    }
+}
+
+void CoreBroker::processError(ActionMessage& command)
+{
+    sendToLogger(command.source_id, log_level::error, std::string(), command.payload);
+    if (command.source_id == global_broker_id_local)
+    {
+        brokerState = broker_state_t::errored;
+        broadcast(command);
+        if (!isRootc)
+        {
+            command.setAction(CMD_LOCAL_ERROR);
+            transmit(parent_route_id, std::move(command));
+        }
+        return;
+    }
+
+    if (command.source_id == parent_broker_id || command.source_id == root_broker_id)
+    {
+        brokerState = broker_state_t::errored;
+        broadcast(command);
+    }
+
+    auto brk = getBrokerById(global_broker_id(command.source_id));
+    if (brk == nullptr)
+    {
+        auto fed = _federates.find(command.source_id);
+        if (fed != _federates.end())
+        {
+            fed->state = connection_state::error;
+        }
+    }
+    else
+    {
+        brk->state = connection_state::error;
+    }
+    
+    switch (command.action()) {
+    case CMD_LOCAL_ERROR:
+    case CMD_ERROR:
+
+        if (!(isRootc || command.dest_id == global_broker_id_local || command.dest_id == parent_broker_id)) {
+            transmit(parent_route_id, command);
+        }
+        if (hasTimeDependency)
+        {
+
+        }
+        break;
+    case CMD_GLOBAL_ERROR:
+        brk->state = connection_state::error;
+        if (!(isRootc || command.dest_id == global_broker_id_local || command.dest_id == parent_broker_id)) {
+            transmit(parent_route_id, command);
+        }
+        else
+        {
+            command.source_id = global_broker_id_local;
+            broadcast(command);
+        }
+        break;
     }
 }
 

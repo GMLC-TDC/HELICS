@@ -262,7 +262,7 @@ class CoreBroker: public Broker, public BrokerBase {
     */
     bool allInitReady() const;
     /** get a value for the summary connection status of all the connected systems*/
-    connection_state CoreBroker::getAllConnectionState() const;
+    connection_state getAllConnectionState() const;
 
     /** set the local identification string for the broker*/
     void setIdentifier(const std::string& name);
@@ -298,6 +298,8 @@ class CoreBroker: public Broker, public BrokerBase {
     void FindandNotifyEndpointTargets(BasicHandleInfo& handleInfo);
     /** process a disconnect message*/
     void processDisconnect(ActionMessage& command);
+    /** process an error message*/
+    void processError(ActionMessage& command);
     /** disconnect a broker/core*/
     void disconnectBroker(BasicBrokerInfo& brk);
     /** run a check for a named interface*/

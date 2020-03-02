@@ -137,6 +137,10 @@ std::shared_ptr<helicsCLI11App> BrokerBase::generateBaseCLI()
         "--conservative_time_policy,--restrictive_time_policy",
         restrictive_time_policy,
         "specify that a broker should use a conservative time policy in the time coordinator");
+    hApp->add_flag(
+        "--terminate_on_error,--halt_on_error",
+        terminate_on_error,
+        "specify that a broker should cause the federation to terminate on an error");
     auto logging_group =
         hApp->add_option_group("logging", "Options related to file and message logging");
     logging_group->option_defaults()->ignore_underscore();
