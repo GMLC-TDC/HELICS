@@ -319,14 +319,14 @@ const BasicHandleInfo* CommonCore::getLocalEndpoint(const std::string& name) con
     return handles.read([&name](auto& hand) { return hand.getEndpoint(name); });
 }
 
-bool CommonCore::isLocal(global_federate_id global_fedid) const
+bool CommonCore::isLocal(global_federate_id global_id) const
 {
-    return (loopFederates.find(global_fedid) != loopFederates.end());
+    return (loopFederates.find(global_id) != loopFederates.end());
 }
 
-route_id CommonCore::getRoute(global_federate_id global_fedid) const
+route_id CommonCore::getRoute(global_federate_id global_id) const
 {
-    auto fnd = routing_table.find(global_fedid);
+    auto fnd = routing_table.find(global_id);
     return (fnd != routing_table.end()) ? fnd->second : parent_route_id;
 }
 

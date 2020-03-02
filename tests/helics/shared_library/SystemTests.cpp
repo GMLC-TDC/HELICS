@@ -56,6 +56,7 @@ TEST(other_tests, broker_global_value)
 // test global value creation from a core and its error pathways
 TEST(other_tests, core_global_value)
 {
+    helicsCloseLibrary();
     auto err = helicsErrorInitialize();
     auto brk = helicsCreateBroker("test", "gbrokerc", "--root", &err);
 
