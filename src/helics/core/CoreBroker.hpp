@@ -38,7 +38,7 @@ namespace helics {
         connected=0,
         init_requested=1,
         operating=2,
-        error=5,
+        error=40,
         request_disconnect=48,
         disconnected=50
     };
@@ -261,7 +261,9 @@ class CoreBroker: public Broker, public BrokerBase {
     @return true if everyone is ready, false otherwise
     */
     bool allInitReady() const;
-    bool allDisconnected() const;
+    /** get a value for the summary connection status of all the connected systems*/
+    connection_state CoreBroker::getAllConnectionState() const;
+
     /** set the local identification string for the broker*/
     void setIdentifier(const std::string& name);
     /** get the local identification for the broker*/
