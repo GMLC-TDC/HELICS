@@ -194,7 +194,7 @@ Total Installed Size:  65.78 MiB
 :: Proceed with installation? [Y/n] y
 
 ```
-you will be asked to proceed with installation, answering `y` will install helics and the required dependencies.  
+you will be asked to proceed with installation, answering `y` will install HELICS and the required dependencies.  
 
 ```bash
 $ helics_broker --version
@@ -206,6 +206,18 @@ The helics apps and libraries are now installed, and can be updated when HELICS 
 ```bash
 $ pacman -Sy mingw32/mingw-w64-i686-helics
 ```
+
+if you are installing both the 32 and 64 bit versions or just want a simpler command to type
+```bash
+$ pacboy -Sy helics
+```
+
+if the python interface is needed on MSYS2 it can be installed through pip but requires some setup first.
+```bash
+$export CMAKE_GENERATOR="MSYS Makefiles"
+$pip install helics  
+```
+This will install the HELICS python extension in the correct location.  The pacman package should be installed first  
 
 ### Building HELICS From Source on Windows with MSYS2 ###
 
