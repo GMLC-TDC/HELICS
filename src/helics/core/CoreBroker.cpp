@@ -1403,6 +1403,24 @@ void CoreBroker::addLocalInfo(BasicHandleInfo& handleInfo, const ActionMessage& 
     handleInfo.flags = m.flags;
 }
 
+void CoreBroker::propagateError(ActionMessage &&cmd)
+{
+    LOG_ERROR(global_broker_id_local, getIdentifier(), cmd.payload);
+    if (cmd.action() == CMD_LOCAL_ERROR)
+    {
+        if (terminate_on_error)
+        {
+            LOG_ERROR(global_broker_id_local, getIdentifier(), "Error Escalation: Federation terminating");
+            cmd.setAction(CMD_GLOBAL_ERROR);
+            setErrorState(cmd.messageID, cmd.payload);
+            broadcast(cmd);
+            transmitToParent(std::move(cmd));
+            return;
+        }
+    }
+    routeMessage(std::move(cmd));
+}
+
 void CoreBroker::addPublication(ActionMessage& m)
 {
     // detect duplicate publications
@@ -1411,7 +1429,7 @@ void CoreBroker::addPublication(ActionMessage& m)
         eret.dest_handle = m.source_handle;
         eret.messageID = defs::errors::registration_failure;
         eret.payload = "Duplicate publication names (" + m.name + ")";
-        routeMessage(eret);
+        propagateError(std::move(eret));
         return;
     }
     auto& pub = handles.addHandle(
@@ -1433,11 +1451,11 @@ void CoreBroker::addInput(ActionMessage& m)
 {
     // detect duplicate publications
     if (handles.getInput(m.name) != nullptr) {
-        ActionMessage eret(CMD_ERROR, global_broker_id_local, m.source_id);
+        ActionMessage eret(CMD_LOCAL_ERROR, global_broker_id_local, m.source_id);
         eret.dest_handle = m.source_handle;
         eret.messageID = defs::errors::registration_failure;
         eret.payload = "Duplicate input names (" + m.name + ")";
-        routeMessage(eret);
+        propagateError(std::move(eret));
         return;
     }
     auto& inp = handles.addHandle(
@@ -1455,11 +1473,11 @@ void CoreBroker::addEndpoint(ActionMessage& m)
 {
     // detect duplicate endpoints
     if (handles.getEndpoint(m.name) != nullptr) {
-        ActionMessage eret(CMD_ERROR, global_broker_id_local, m.source_id);
+        ActionMessage eret(CMD_LOCAL_ERROR, global_broker_id_local, m.source_id);
         eret.dest_handle = m.source_handle;
         eret.messageID = defs::errors::registration_failure;
         eret.payload = "Duplicate endpoint names (" + m.name + ")";
-        routeMessage(eret);
+        propagateError(std::move(eret));
         return;
     }
     auto& ept = handles.addHandle(
@@ -1492,11 +1510,11 @@ void CoreBroker::addFilter(ActionMessage& m)
 {
     // detect duplicate endpoints
     if (handles.getFilter(m.name) != nullptr) {
-        ActionMessage eret(CMD_ERROR, global_broker_id_local, m.source_id);
+        ActionMessage eret(CMD_LOCAL_ERROR, global_broker_id_local, m.source_id);
         eret.dest_handle = m.source_handle;
         eret.messageID = defs::errors::registration_failure;
         eret.payload = "Duplicate filter names (" + m.name + ")";
-        routeMessage(eret);
+        propagateError(std::move(eret));
         return;
     }
 
@@ -2084,6 +2102,7 @@ void CoreBroker::processError(ActionMessage& command)
         }
         break;
     case CMD_GLOBAL_ERROR:
+        setErrorState(command.messageID, command.payload);
         if (!(isRootc || command.dest_id == global_broker_id_local || command.dest_id == parent_broker_id)) {
             transmit(parent_route_id, command);
         }

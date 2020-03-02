@@ -188,7 +188,7 @@ TEST_F(error_tests, duplicate_publication_names2)
     fed2->finalize();
     broker->disconnect();
 }
-/*
+
 TEST_F(error_tests, duplicate_publication_names_auto_terminate)
 {
     auto broker = AddBroker("test", "-f 2 --error_timeout=0");
@@ -231,7 +231,7 @@ TEST_F(error_tests, duplicate_publication_names_auto_terminate)
 
     broker->waitForDisconnect();
 }
-*/
+
 TEST_F(error_tests, duplicate_publication_names3)
 {
     auto broker = AddBroker("test", 1);

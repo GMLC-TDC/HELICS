@@ -2588,6 +2588,13 @@ void CommonCore::processCommand(ActionMessage&& command)
                     transmit(parent_route_id, m);
                 }
             }
+            else if (brokerState == broker_state_t::errored)
+            { //we are disconnecting in an error state
+                sendDisconnect();
+                ActionMessage m(CMD_DISCONNECT);
+                m.source_id = global_broker_id_local;
+                transmit(parent_route_id, m);
+            }
             addActionMessage(CMD_STOP);
             // we can't just fall through since this may have generated other messages that need to be forwarded or
             // processed

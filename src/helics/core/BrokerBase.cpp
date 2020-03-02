@@ -292,7 +292,21 @@ void BrokerBase::setErrorState(int eCode, const std::string& estring)
 {
     lastErrorString = estring;
     errorCode = eCode;
-    brokerState.store(broker_state_t::errored);
+    if (brokerState.load() != broker_state_t::errored)
+    {
+        brokerState.store(broker_state_t::errored);
+        if (errorDelay <= timeZero)
+        {
+            ActionMessage halt(CMD_DISCONNECT,global_id.load(),global_id.load());
+            addActionMessage(halt);
+        }
+        else
+        {
+            errorTimeStart = std::chrono::steady_clock::now();
+            ActionMessage(CMD_ERROR_CHECK, global_id.load(), global_id.load());
+        }
+    }
+    
     sendToLogger(global_id.load(), helics_log_level_error, identifier, estring);
 }
 
@@ -507,6 +521,37 @@ void BrokerBase::queueProcessingLoop()
                     contextLoop = serv->startContextLoop();
 #endif
                 }
+                // deal with error state timeout
+                if (brokerState.load() == broker_state_t::errored)
+                {
+                    auto ctime = std::chrono::steady_clock::now();
+                    auto td = ctime - errorTimeStart;
+                    if (td >= errorDelay.to_ms())
+                    {
+                        command.setAction(CMD_USER_DISCONNECT);
+                        addActionMessage(command);
+                    }
+                    else
+                    {
+#ifndef HELICS_DISABLE_ASIO
+                        if (!disable_timer) {
+                            ticktimer.expires_at(errorTimeStart + errorDelay.to_ns());
+                            active = std::make_pair(true, true);
+                            ticktimer.async_wait(timerCallback);
+                        }
+                        else
+                        {
+                            command.setAction(CMD_ERROR_CHECK);
+                            addActionMessage(command);
+                        }
+#else
+                        command.setAction(CMD_ERROR_CHECK);
+                        addActionMessage(command);
+#endif
+                    }
+                    break;
+                    
+                }
                 if (messagesSinceLastTick == 0 || forwardTick) {
 #ifndef DISABLE_TICK
                     processCommand(std::move(command));
@@ -521,6 +566,31 @@ void BrokerBase::queueProcessingLoop()
                     ticktimer.async_wait(timerCallback);
                 }
 #endif
+                break;
+            case CMD_ERROR_CHECK:
+                if (brokerState.load() == broker_state_t::errored)
+                {
+                    auto ctime = std::chrono::steady_clock::now();
+                    auto td = ctime - errorTimeStart;
+                    if (td > errorDelay.to_ms())
+                    {
+                        command.setAction(CMD_USER_DISCONNECT);
+                        addActionMessage(command);
+                    }
+                    else
+                    {
+#ifndef HELICS_DISABLE_ASIO
+                        if (tickTimer > td*2 || disable_timer)
+                        {
+                            std::this_thread::sleep_for(std::chrono::milliseconds(200));
+                            addActionMessage(command);
+                        }
+#else
+                        std::this_thread::sleep_for(std::chrono::milliseconds(200));
+                        addActionMessage(command);
+#endif
+                    }
+                }
                 break;
             case CMD_PING:
                 // ping is processed normally but doesn't count as an actual message for timeout purposes unless it
@@ -582,6 +652,7 @@ action_message_def::action_t BrokerBase::commandProcessor(ActionMessage& command
         case CMD_STOP:
         case CMD_TICK:
         case CMD_PING:
+        case CMD_ERROR_CHECK:
             return command.action();
         case CMD_MULTI_MESSAGE:
             for (int ii = 0; ii < command.counter; ++ii) {

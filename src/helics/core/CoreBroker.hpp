@@ -157,7 +157,8 @@ class CoreBroker: public Broker, public BrokerBase {
     void routeMessage(ActionMessage&& cmd);
     /** transmit a message to the parent or root */
     void transmitToParent(ActionMessage&& cmd);
-
+    /** propagate an error message or escalate it depending on settings*/
+    void propagateError(ActionMessage &&cmd);
     /** broadcast a message to all immediate brokers*/
     void broadcast(ActionMessage& cmd);
     /**/
