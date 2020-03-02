@@ -2068,17 +2068,22 @@ void CoreBroker::processError(ActionMessage& command)
     switch (command.action()) {
     case CMD_LOCAL_ERROR:
     case CMD_ERROR:
-
+        if (terminate_on_error)
+        {
+            //upgrade the error to a global error and reprocess
+            command.setAction(CMD_GLOBAL_ERROR);
+            processError(command);
+            return;
+        }
         if (!(isRootc || command.dest_id == global_broker_id_local || command.dest_id == parent_broker_id)) {
             transmit(parent_route_id, command);
         }
         if (hasTimeDependency)
         {
-
+            timeCoord->processTimeMessage(command);
         }
         break;
     case CMD_GLOBAL_ERROR:
-        brk->state = connection_state::error;
         if (!(isRootc || command.dest_id == global_broker_id_local || command.dest_id == parent_broker_id)) {
             transmit(parent_route_id, command);
         }
@@ -2087,6 +2092,8 @@ void CoreBroker::processError(ActionMessage& command)
             command.source_id = global_broker_id_local;
             broadcast(command);
         }
+        break;
+    default:
         break;
     }
 }
