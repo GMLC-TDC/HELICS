@@ -751,21 +751,11 @@ void CommonCore::setFlagOption(local_federate_id federateID, int32_t flag, bool 
             } else {
                 ActionMessage cmd(CMD_CORE_CONFIGURE);
                 cmd.messageID = defs::flags::delay_init_entry;
-                if (flagValue) {
-                    setActionFlag(cmd, indicator_flag);
-                }
                 addActionMessage(cmd);
             }
-        } else if (flag == defs::flags::enable_init_entry) {
+        } else{
             ActionMessage cmd(CMD_CORE_CONFIGURE);
-            cmd.messageID = defs::flags::enable_init_entry;
-            if (flagValue) {
-                setActionFlag(cmd, indicator_flag);
-            }
-            addActionMessage(cmd);
-        } else if (flag == defs::flags::slow_responding) {
-            ActionMessage cmd(CMD_CORE_CONFIGURE);
-            cmd.messageID = defs::flags::slow_responding;
+            cmd.messageID = flag;
             if (flagValue) {
                 setActionFlag(cmd, indicator_flag);
             }
@@ -2771,6 +2761,7 @@ void CommonCore::processCommand(ActionMessage&& command)
                     command.source_id == parent_broker_id || command.source_id==root_broker_id) {
                     sendErrorToFederates(command.messageID,command.payload);
                     brokerState = broker_state_t::errored;
+                    
                 }
                 else {
                     sendToLogger(
@@ -2778,10 +2769,45 @@ void CommonCore::processCommand(ActionMessage&& command)
                         log_level::error,
                         getFederateNameNoThrow(command.source_id),
                         command.payload);
-                    //TODO::PT check error here?
+                    if (hasTimeDependency)
+                    {
+                        timeCoord->processTimeMessage(command);
+                    }
+                }
+                if (terminate_on_error)
+                {
+                    if (brokerState != broker_state_t::errored)
+                    {
+                        sendErrorToFederates(command.messageID, command.payload);
+                        brokerState = broker_state_t::errored;
+                    }
+                    command.setAction(CMD_GLOBAL_ERROR);
+                    command.source_id = global_broker_id_local;
+                    command.dest_id = root_broker_id;
+                    transmit(parent_route_id, std::move(command));
                 }
             }
             else {
+                if (command.dest_id == parent_broker_id)
+                {
+                    if (terminate_on_error)
+                    {
+                        if (brokerState != broker_state_t::errored)
+                        {
+                            sendErrorToFederates(command.messageID, command.payload);
+                            brokerState = broker_state_t::errored;
+                        }
+                        command.setAction(CMD_GLOBAL_ERROR);
+                        command.source_id = global_broker_id_local;
+                        command.dest_id = root_broker_id;
+                        transmit(parent_route_id, std::move(command));
+                        break;
+                    }
+                    else
+                    {
+
+                    }
+                }
                 routeMessage(command);
             }
             break;
@@ -3571,6 +3597,9 @@ void CommonCore::processCoreConfigureCommands(ActionMessage& cmd)
         case defs::properties::console_log_level:
             setLogLevels(cmd.getExtraData(), fileLogLevel);
             break;
+        case defs::flags::terminate_on_error:
+            terminate_on_error = checkActionFlag(cmd, indicator_flag);
+            break;
         case defs::flags::slow_responding:
             no_ping = checkActionFlag(cmd, indicator_flag);
             break;
@@ -3597,6 +3626,9 @@ void CommonCore::processCoreConfigureCommands(ActionMessage& cmd)
                 FiltI->filterOp = std::move(M);
             }
         } break;
+        default:
+            LOG_WARNING(global_broker_id_local, identifier,"unrecognized configure option passed to core ");
+                break;
     }
 }
 

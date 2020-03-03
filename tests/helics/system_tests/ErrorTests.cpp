@@ -212,8 +212,44 @@ TEST_F(error_tests, duplicate_publication_names_auto_terminate)
     catch (const helics::RegistrationFailure&) {
         gotException = true;
         EXPECT_TRUE(fed2->getCurrentMode() == helics::Federate::modes::error);
-        //this should do nothing
-        EXPECT_THROW(fed2->enterExecutingMode(), helics::InvalidFunctionCall);
+    }
+
+    try {
+        fed1->enterInitializingModeComplete();
+    }
+    catch (const helics::RegistrationFailure&) {
+        gotException = true;
+        EXPECT_TRUE(fed1->getCurrentMode() == helics::Federate::modes::error);
+    }
+    EXPECT_TRUE(gotException);
+
+    broker->waitForDisconnect();
+}
+
+
+TEST_F(error_tests, duplicate_publication_names_auto_terminate_core)
+{
+    auto broker = AddBroker("test", "-f 2 --error_timeout=0");
+    AddFederates<helics::ValueFederate>("test", 1, broker, 1.0, "fed");
+    AddFederates<helics::ValueFederate>("test", 1, broker, 1.0, "fed");
+
+    auto fed1 = GetFederateAs<helics::ValueFederate>(0);
+    auto fed2 = GetFederateAs<helics::ValueFederate>(1);
+
+    fed1->getCorePointer()->setFlagOption(helics::local_core_id,helics_flag_terminate_on_error,true);
+    fed2->getCorePointer()->setFlagOption(helics::local_core_id, helics_flag_terminate_on_error, true);
+
+    fed1->registerGlobalPublication("testkey", "");
+    fed1->enterInitializingModeAsync();
+
+    fed2->registerGlobalPublication("testkey", "");
+
+    bool gotException = false;
+    try {
+        fed2->enterInitializingMode();
+    }
+    catch (const helics::RegistrationFailure&) {
+        gotException = true;
         EXPECT_TRUE(fed2->getCurrentMode() == helics::Federate::modes::error);
     }
 
@@ -223,8 +259,41 @@ TEST_F(error_tests, duplicate_publication_names_auto_terminate)
     catch (const helics::RegistrationFailure&) {
         gotException = true;
         EXPECT_TRUE(fed1->getCurrentMode() == helics::Federate::modes::error);
-        //this should do nothing
-        EXPECT_THROW(fed1->enterExecutingMode(), helics::InvalidFunctionCall);
+    }
+    EXPECT_TRUE(gotException);
+
+    broker->waitForDisconnect();
+}
+
+TEST_F(error_tests, duplicate_publication_names_auto_terminate_broker)
+{
+    auto broker = AddBroker("test", "-f 2 --error_timeout=0 --terminate_on_error");
+    AddFederates<helics::ValueFederate>("test", 1, broker, 1.0, "fed");
+    AddFederates<helics::ValueFederate>("test", 1, broker, 1.0, "fed");
+
+    auto fed1 = GetFederateAs<helics::ValueFederate>(0);
+    auto fed2 = GetFederateAs<helics::ValueFederate>(1);
+
+
+    fed1->registerGlobalPublication("testkey", "");
+    fed1->enterInitializingModeAsync();
+
+    fed2->registerGlobalPublication("testkey", "");
+
+    bool gotException = false;
+    try {
+        fed2->enterInitializingMode();
+    }
+    catch (const helics::RegistrationFailure&) {
+        gotException = true;
+        EXPECT_TRUE(fed2->getCurrentMode() == helics::Federate::modes::error);
+    }
+
+    try {
+        fed1->enterInitializingModeComplete();
+    }
+    catch (const helics::RegistrationFailure&) {
+        gotException = true;
         EXPECT_TRUE(fed1->getCurrentMode() == helics::Federate::modes::error);
     }
     EXPECT_TRUE(gotException);
