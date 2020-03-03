@@ -412,18 +412,24 @@ bool CommonCore::allInitReady() const
 bool CommonCore::allDisconnected() const
 {
     // all federates must have hit finished state
-    auto afed = allFedDisconnected();
+    auto afed = (minFederateState() == operation_state::disconnected);
     if ((hasTimeDependency) || (hasFilters)) {
         return (afed) && (!timeCoord->hasActiveTimeDependencies());
     }
     return (afed);
 }
 
-bool CommonCore::allFedDisconnected() const
+operation_state CommonCore::minFederateState() const
 {
-    // all federates must have hit finished state
-    auto pred = [](const auto& fed) { return fed.disconnected; };
-    return std::all_of(loopFederates.begin(), loopFederates.end(), pred);
+    operation_state op{ operation_state::disconnected };
+    for (auto &fed : loopFederates)
+    {
+        if (fed.state < op)
+        {
+            op = fed.state;
+        }
+    }
+    return op;
 }
 
 void CommonCore::setCoreReadyToInit()
@@ -2477,10 +2483,11 @@ void CommonCore::errorRespondDelayedMessages(const std::string& estring)
 void CommonCore::sendErrorToFederates(int error_code, const std::string &message)
 {
     ActionMessage errorCom(CMD_LOCAL_ERROR);
+    errorCom.source_id = global_broker_id_local;
     errorCom.messageID = error_code;
     errorCom.payload = message;
     loopFederates.apply([&errorCom](auto& fed) {
-        if ((fed) && (!fed.disconnected)) {
+        if ((fed) && (fed.state==operation_state::operating)) {
             fed->addAction(errorCom);
         }
     });
@@ -2668,12 +2675,12 @@ void CommonCore::processCommand(ActionMessage&& command)
                     if (fed == loopFederates.end()) {
                         return;
                     }
-                    fed->disconnected = true;
+                    fed->state=operation_state::disconnected;
                     auto cstate = brokerState.load();
                     if ((!checkAndProcessDisconnect()) || (cstate < broker_state_t::operating)) {
                         command.setAction(CMD_DISCONNECT_FED);
                         transmit(parent_route_id, command);
-                        if (!allFedDisconnected()) {
+                        if (minFederateState()!=operation_state::disconnected) {
                             command.setAction(CMD_DISCONNECT_FED_ACK);
                             command.dest_id = command.source_id;
                             command.source_id = parent_broker_id;
@@ -2770,7 +2777,7 @@ void CommonCore::processCommand(ActionMessage&& command)
                 if (command.source_id == higher_broker_id ||
                     command.source_id == parent_broker_id || command.source_id==root_broker_id) {
                     sendErrorToFederates(command.messageID,command.payload);
-                    brokerState = broker_state_t::errored;
+                    setErrorState(command.messageID, command.payload);
                 }
                 else {
                     sendToLogger(
@@ -2778,7 +2785,9 @@ void CommonCore::processCommand(ActionMessage&& command)
                         log_level::error,
                         getFederateNameNoThrow(command.source_id),
                         command.payload);
-                    //TODO::PT check error here?
+                    auto fed = loopFederates.find(command.source_id);
+                    fed->state = operation_state::error;
+
                 }
             }
             else {

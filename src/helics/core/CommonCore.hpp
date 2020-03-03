@@ -35,12 +35,19 @@ class FilterCoordinator;
 class FilterInfo;
 class TimeoutMonitor;
 enum class handle_type : char;
+/** enumeration of possible operating conditions for a federate*/
+enum class operation_state : std::uint8_t
+{
+    operating = 0,
+    error = 5,
+    disconnected=10
+};
 
 /** helper class for containing some wrapper around a federate for the core*/
 class FedInfo {
   public:
     FederateState* fed = nullptr;
-    bool disconnected = false;
+    operation_state state{ operation_state::operating };
 
     constexpr FedInfo() = default;
     constexpr explicit FedInfo(FederateState* newfed) noexcept: fed(newfed){};
@@ -271,8 +278,8 @@ class CommonCore: public Core, public BrokerBase {
     bool allInitReady() const;
     /** check if all connections are disconnected (feds and time dependencies)*/
     bool allDisconnected() const;
-    /** check if all federates have said good-bye*/
-    bool allFedDisconnected() const;
+    /** get the minimum operating state of the connected federates*/
+    operation_state minFederateState() const;
 
   private:
     /** get the federate Information from the federateID*/
