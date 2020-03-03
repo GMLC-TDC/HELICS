@@ -308,7 +308,4 @@ jobs:
           curl -X POST --header 'authorization: Bearer ${{ secrets.HELICS_BOT_TOKEN }}' \
                --url https://api.github.com/repos/GMLC-TDC/helics-packaging/dispatches \
                --header 'content-type: application/json' \
-               --data '{"event_type":"helics-version-update", \
-                      "client_payload":{"repository":"${HELICS_REPO}", \
-                      "tag_name":"${HELICS_VERSION}", \
-                      "version":"${HELICS_VERSION#v}" }}'
+               --data "{\"event_type\":\"helics-version-update\",\"client_payload\":{\"repository\":\"${HELICS_REPO}\",\"tag_name\":\"${HELICS_VERSION}\",\"version\":\"${HELICS_VERSION#v}\"}}"
