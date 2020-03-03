@@ -367,8 +367,8 @@ TEST_F(error_tests, missing_required_pub_with_default)
     EXPECT_THROW(fed2->enterInitializingMode(), helics::ConnectionFailure);
     // this is definitely not how you would normally do this,
     // we are calling finalize while an async call is active, this should result in finalize throwing since it was
-    // a global connection failure
-    EXPECT_THROW(fed1->finalize(), helics::ConnectionFailure);
+    // a global connection failure,  depending on how things go this will be a registration failure or a connection failure
+    EXPECT_THROW(fed1->finalize(), helics::HelicsException);
     fed2->finalize();
     broker->disconnect();
 }
