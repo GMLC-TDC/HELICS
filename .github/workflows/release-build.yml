@@ -301,7 +301,7 @@ jobs:
     runs-on: ubuntu-latest
     if: github.event.action == 'published'
     steps:
-      - name: Send helics-packaging a helics-version-update-event
+      - name: Send event to helics-packaging
         run: |
           HELICS_REPO="${{ github.repository }}"
           HELICS_VERSION="${{ github.event.release.tag_name }}"
