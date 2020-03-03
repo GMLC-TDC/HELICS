@@ -277,8 +277,7 @@ TEST_P(mfed_type_tests, send_receive_2fed)
     // ASSERT_TRUE(M1);
     EXPECT_EQ(M1.length, 400);
     EXPECT_NE(M1.data, nullptr);
-    if (M1.data != nullptr)
-    {
+    if (M1.data != nullptr) {
         EXPECT_EQ(M1.data[245], 'b');
     }
 
@@ -286,8 +285,7 @@ TEST_P(mfed_type_tests, send_receive_2fed)
     // ASSERT_TRUE(M2);
     EXPECT_EQ(M2.length, 500);
     EXPECT_NE(M2.data, nullptr);
-    if (M2.data != nullptr)
-    {
+    if (M2.data != nullptr) {
         EXPECT_EQ(M2.data[245], 'a');
     }
     CE(helicsFederateFinalizeAsync(mFed1, &err));

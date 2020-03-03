@@ -39,7 +39,10 @@ namespace apps {
     @param core a pointer to core object which the federate can join
     @param fi  a federate information structure
     */
-        Clone(const std::string& appName, const std::shared_ptr<Core>& core, const FederateInfo& fi);
+        Clone(
+            const std::string& appName,
+            const std::shared_ptr<Core>& core,
+            const FederateInfo& fi);
 
         /**constructor taking a federate information structure and using the given core
     @param appName the name of the federate (can be empty to use defaults from fi)
