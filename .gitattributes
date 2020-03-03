@@ -1,7 +1,9 @@
 * text=input
 
-*.md eol=lf
-*.json eol=lf
+*.bat text eol=crlf
+*.md text eol=lf
+*.json text eol=lf
+*.player text eol=lf
 
 *.jpg binary
 *.png binary
