@@ -284,7 +284,7 @@ TEST_F(error_tests, duplicate_publication_names_auto_terminate_broker)
     try {
         fed2->enterInitializingMode();
     }
-    catch (const helics::RegistrationFailure&) {
+    catch (const helics::HelicsException&) {
         gotException = true;
         EXPECT_TRUE(fed2->getCurrentMode() == helics::Federate::modes::error);
     }
@@ -292,7 +292,7 @@ TEST_F(error_tests, duplicate_publication_names_auto_terminate_broker)
     try {
         fed1->enterInitializingModeComplete();
     }
-    catch (const helics::RegistrationFailure&) {
+    catch (const helics::HelicsException&) {
         gotException = true;
         EXPECT_TRUE(fed1->getCurrentMode() == helics::Federate::modes::error);
     }
