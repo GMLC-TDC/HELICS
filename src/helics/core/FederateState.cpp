@@ -1088,7 +1088,7 @@ message_processing_result FederateState::processActionMessage(ActionMessage& cmd
         case CMD_ERROR:
         case CMD_LOCAL_ERROR:
         case CMD_GLOBAL_ERROR:
-            if (cmd.source_id == global_id.load()||cmd.source_id==parent_broker_id||cmd.source_id==root_broker_id) {
+            if (cmd.action()==CMD_GLOBAL_ERROR||cmd.source_id == global_id.load()||cmd.source_id==parent_broker_id||cmd.source_id==root_broker_id || cmd.dest_id != global_id) {
                 if ((state != HELICS_FINISHED) && (state != HELICS_TERMINATING)) {
                     if (cmd.action() != CMD_GLOBAL_ERROR)
                     {
@@ -1109,7 +1109,7 @@ message_processing_result FederateState::processActionMessage(ActionMessage& cmd
                     return message_processing_result::error;
                 }
             }
-            else {
+            else{
                 switch (timeCoord->processTimeMessage(cmd)) {
                 case message_process_result::delay_processing:
                     addFederateToDelay(global_federate_id(cmd.source_id));
