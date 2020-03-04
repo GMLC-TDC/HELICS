@@ -33,6 +33,7 @@ Increased code coverage and additional bug fixes.
 -   Standalone benchmark federates for use in multinode benchmark runs
 -   A FreeBSD 12.1 CI build using Cirrus CI
 -   Sending an event from GitHub Actions release builds to trigger updating additional HELICS packages when a new release is made
+-   A 32-bit Windows zip install archive for releases
 
 ### Deprecated
 
