@@ -4,11 +4,8 @@
 This document contains tentative plans for changes and improvements of note in upcoming versions of the HELICS library.  All dates are approximate and subject to change, but this is a snapshot of the current planning thoughts. See the [projects](https://github.com/GMLC-TDC/HELICS/projects) for additional details
 
 
-## \[2.5\] ~ 2020-04-30
+## \[2.5\] ~ 2020-05-01
 -   Multi-broker to allow multiple communication cores to be connected in the same federation
--   Single thread cores(probably not)
--   Plugin architecture for user defined cores (possible)
--   SSL capable core (probably not)
 -   Some dynamic federation support
 -   C API callbacks for custom filters
 -   improved REST API support
@@ -20,7 +17,8 @@ This document contains tentative plans for changes and improvements of note in u
 -   Debugging tools (Global time synchronization points)
 -   Additional package manager integration
 -   Performance improvements and tests
--   Increased code Coverage
+-   Increased code Coverage (target 80%)
+-   Deprecate C api message structure
 
 ## \[2.6\] ~ 2020-07-31
 It is unclear if there will be a 2.6 release or the changes would just get rolled into a 3.0 release.  If there is it would be the last of the 2.X series and would likely be released in late July, 2020.
@@ -31,6 +29,9 @@ It is unclear if there will be a 2.6 release or the changes would just get rolle
 -   Full Dynamic Federation support
 -   Much more general debugging support
 -   Targeted endpoints
+-   SSL capable core
+-   Single thread cores
+-   Plugin architecture for user defined cores
 -   Remove deprecated functions
 -   Change values for log level enumerations
 -   Some additional renaming of CMake variables

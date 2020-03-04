@@ -76,5 +76,6 @@ There are a few options in the CMake system that are not visible in the GUI they
 -   `HELICS_OVERWRITE_INTERFACE_FILES` : Instruct CMake to take the generated files, and overwrite the existing interface files for the given language, only applies to python, Matlab, and Java.  This is used in the generation of the interface files for releases and the git repo.  It is only active is `HELICS_SWIG_GENERATE_INTERFACE_FILES_ONLY` is enabled.  
 -   `HELICS_DISABLE_SYSTEM_CALL_TESTS` :  There are a few test that execute system calls, which could be problematic to compile or execute on certain platforms.  This option removes those tests from compilation.  
 -   `INSTALL_SYSTEM_LIBRARIES` : Install system libraries with the installation,  mainly useful for making a complete installer package with all needed libraries included.  
-=   `HELICS_INSTALL_PACKAGE_TESTS` : Set the find_package tests to only look for HELICS in the system install paths, and enable the package-config-tests
+-   `HELICS_INSTALL_PACKAGE_TESTS` : Set the find_package tests to only look for HELICS in the system install paths, and enable the package-config-tests
+-   `HELICS_DISABLE_GIT_OPERATIONS` : will turn off any of the helper tools that require git, this is useful in a couple cases for building packages and other situations where updates shouldn't be checked and no modifications should be made.  
 -   `HELICS_SKIP_ZMQ_INSTALL`:  This is only relevant if ZMQ is built as part of the compilation process, but it skips the installation of zmq as part of HELICS install in that case.  

@@ -623,7 +623,7 @@ TEST_F(filter_tests, clone_test_connections)
     //this is testing the filtered_endpoints query for cloning source filters
     auto q = helicsCreateQuery("", "filtered_endpoints");
     std::string filteredEndpoints = helicsQueryExecute(q, sFed, nullptr);
-    std::cout << filteredEndpoints << std::endl;
+    //std::cout << filteredEndpoints << std::endl;
     EXPECT_TRUE(filteredEndpoints.find("(cloning)") != std::string::npos);
     EXPECT_TRUE(filteredEndpoints.find("srcFilters") != std::string::npos);
     helicsQueryFree(q);
@@ -786,7 +786,7 @@ TEST_F(filter_tests, clone_test_dest_connections)
 
     auto q = helicsCreateQuery("", "filtered_endpoints");
     std::string filteredEndpoints = helicsQueryExecute(q, dFed, nullptr);
-    std::cout << filteredEndpoints << std::endl;
+    //std::cout << filteredEndpoints << std::endl;
     EXPECT_TRUE(filteredEndpoints.find("cloningdestFilter") != std::string::npos);
     helicsQueryFree(q);
 

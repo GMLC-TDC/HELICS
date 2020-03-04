@@ -25,7 +25,7 @@ project(HELICS VERSION 2.4.1)
 # -----------------------------------------------------------------------------
 set(HELICS_VERSION_BUILD)
 # use ISO date YYYY-MM-DD
-set(HELICS_DATE "2020-02-21")
+set(HELICS_DATE "2020-03-05")
 
 set(HELICS_VERSION_UNDERSCORE
     "${HELICS_VERSION_MAJOR}_${HELICS_VERSION_MINOR}_${HELICS_VERSION_PATCH}"
@@ -53,9 +53,11 @@ else()
     get_property(helics-use-folders GLOBAL PROPERTY USE_FOLDERS)
 endif()
 
-# generate a version description based on git tags
-include(version_describe)
-git_version_describe(${HELICS_SOURCE_DIR} HELICS_VERSION_DESCRIPTION)
+if (NOT HELICS_DISABLE_GIT_OPERATIONS)
+   # generate a version description based on git tags
+   include(version_describe)
+   git_version_describe(${HELICS_SOURCE_DIR} HELICS_VERSION_DESCRIPTION)
+endif()
 
 if(HELICS_VERSION_DESCRIPTION)
     message(STATUS "helics version tag description is ${HELICS_VERSION_DESCRIPTION}")
@@ -335,9 +337,11 @@ if(HELICS_GENERATE_DOXYGEN_DOC)
     endif(DOXYGEN_FOUND)
 endif(HELICS_GENERATE_DOXYGEN_DOC)
 
+
 # -------------------------------------------------------------
 # Update git submodules
 # -------------------------------------------------------------
+if (NOT HELICS_DISABLE_GIT_OPERATIONS)
 include(updateGitSubmodules)
 if(NOT EXISTS "${PROJECT_SOURCE_DIR}/ThirdParty/fmtlib/CMakeLists.txt")
     submod_update(ThirdParty/fmtlib)
@@ -383,6 +387,7 @@ endif()
 
 check_submodule_status()
 
+endif() # NOT HELICS_DISABLE_GIT_OPERATIONS
 include(GNUInstallDirs)
 
 # -------------------------------------------------------------
@@ -1112,6 +1117,8 @@ endif()
 # -------------------------------------------------------------
 # Git Hooks
 # -------------------------------------------------------------
-if (CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
-    include(addGitHooks)
-endif ()
+if (NOT HELICS_DISABLE_GIT_OPERATIONS)
+   if (CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
+      include(addGitHooks)
+   endif ()
+endif()

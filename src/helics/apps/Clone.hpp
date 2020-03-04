@@ -23,10 +23,10 @@ namespace apps {
     class HELICS_CXX_EXPORT Clone: public App {
       public:
         /** construct from a FederateInfo structure
-    @param name the name of the Recorder, can be left empty for the default or to pull from the federateInfo object
+    @param appName the name of the Recorder, can be left empty for the default or to pull from the federateInfo object
     @param fi  a federate information structure
     */
-        Clone(const std::string& name, FederateInfo& fi);
+        Clone(const std::string& appName, FederateInfo& fi);
         /** construct from command line arguments in a vector
    @param args the command line arguments to pass in a reverse vector
    */
@@ -35,24 +35,27 @@ namespace apps {
         Clone(int argc, char* argv[]);
 
         /**constructor taking a federate information structure and using the given core
-    @param name the name of the Recorder, can be left empty for the default or to pull from the federateInfo object
+    @param appName the name of the Recorder, can be left empty for the default or to pull from the federateInfo object
     @param core a pointer to core object which the federate can join
     @param fi  a federate information structure
     */
-        Clone(const std::string& name, const std::shared_ptr<Core>& core, const FederateInfo& fi);
+        Clone(
+            const std::string& appName,
+            const std::shared_ptr<Core>& core,
+            const FederateInfo& fi);
 
         /**constructor taking a federate information structure and using the given core
-    @param name the name of the federate (can be empty to use defaults from fi)
+    @param appName the name of the federate (can be empty to use defaults from fi)
     @param core a coreApp object that can be joined
     @param fi  a federate information structure
     */
-        Clone(const std::string& name, CoreApp& core, const FederateInfo& fi);
+        Clone(const std::string& appName, CoreApp& core, const FederateInfo& fi);
 
         /**constructor taking a file with the required information
-    @param name the name of the app
-    @param file a file defining the federate information in JSon or text
+    @param appName the name of the app
+    @param jsonString a file or json string defining the federate information in JSON or text
     */
-        Clone(const std::string& name, const std::string& file);
+        Clone(const std::string& appName, const std::string& jsonString);
         /** move construction*/
         Clone(Clone&& other_recorder) = default;
         /** move assignment*/

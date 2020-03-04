@@ -103,9 +103,9 @@ class FederateState {
         delayQueues; //!< queue for delaying processing of messages for a time
     std::vector<interface_handle> events; //!< list of value events to process
     std::vector<global_federate_id> delayedFederates; //!< list of federates to delay messages from
-    Time time_granted{ startupTime }; //!< the most recent granted time;
-    Time allowed_send_time{ startupTime }; //!< the next time a message can be sent;
-    mutable std::atomic_flag processing= ATOMIC_FLAG_INIT; //!< the federate is processing
+    Time time_granted{startupTime}; //!< the most recent granted time;
+    Time allowed_send_time{startupTime}; //!< the next time a message can be sent;
+    mutable std::atomic_flag processing = ATOMIC_FLAG_INIT; //!< the federate is processing
   private:
     /** a logging function for logging or printing messages*/
     std::function<void(int, const std::string&, const std::string&)>

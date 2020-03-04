@@ -417,13 +417,13 @@ class CommonCore: public Core, public BrokerBase {
         uint16_t flags = 0);
 
     /** check if a global id represents a local federate
-    @param global_id the federate global id
+    @param global_fedid the identifier for the federate
     @return true if it is a local federate*/
-    bool isLocal(global_federate_id global_id) const;
+    bool isLocal(global_federate_id global_fedid) const;
     /** get a route id for a non-local federate
-    @param global_id the federate global id
+    @param global_fedid the identifier for the federate
     @return parent_route if unknown, otherwise returns the route_id*/
-    route_id getRoute(global_federate_id global_id) const;
+    route_id getRoute(global_federate_id global_fedid) const;
     /** process a message for potential additions to the filter ordering
     @param cmd the message to process
     */

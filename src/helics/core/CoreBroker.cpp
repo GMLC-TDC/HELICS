@@ -575,6 +575,7 @@ void CoreBroker::processPriorityCommand(ActionMessage&& command)
                     delayTransmitQueue.push(command);
                 }
             }
+            break;
         default:
             // must not have been a priority command
             break;

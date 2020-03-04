@@ -276,7 +276,7 @@ void handle_request(http::request<Body, http::basic_fields<Allocator>>&& req, Se
         }
     }
     if (brokerName == "query" && target == "brokers") {
-        brokerName == "brokers";
+        brokerName = "brokers";
     }
     if (brokerName == "brokers") {
         return send(response_json(getBrokerList()));

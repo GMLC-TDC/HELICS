@@ -7,9 +7,9 @@ on:
     types: published
 
 jobs:
-################################
+#####################################
 # Create all submodules archive
-################################
+#####################################
   create-all-submodule-archive:
     name: Create all submodule archive
     runs-on: ubuntu-latest
@@ -33,9 +33,9 @@ jobs:
         name: all-submodules-archive
         path: artifact
         
-################################
+#####################################
 # Build MSVC archives
-################################
+#####################################
   build-windows-msvc:
     runs-on: ${{ matrix.os }}
     strategy:
@@ -90,9 +90,9 @@ jobs:
         name: ${{ runner.os }}-installers
         path: artifact
         
-################################
+#####################################
 # Build installers
-################################
+#####################################
   build-installers:
     runs-on: ${{ matrix.os }}
     name: Build ${{ matrix.os }} ${{ matrix.arch }} ${{ matrix.cpack_gen }} Installer
@@ -172,9 +172,9 @@ jobs:
         name: ${{ runner.os }}-installers
         path: artifact
       
-################################
+#####################################
 # Build shared libraries
-################################
+#####################################
   build-sharedlibs:
     runs-on: ${{ matrix.os }}
     name: Build ${{ matrix.os }} ${{ matrix.arch }} Shared Library
@@ -248,9 +248,9 @@ jobs:
         name: ${{ runner.os }}-installers
         path: artifact
         
-################################
+#####################################
 # Generate SHA-256 file
-################################
+#####################################
   generate-sha256:
     name: Calculate SHA256 for release assets
     needs: [create-all-submodule-archive, build-installers, build-sharedlibs, build-windows-msvc]
@@ -291,3 +291,21 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         UPLOAD_URL: ${{ github.event.release.upload_url }}
       run: ./.github/workflows/upload-release-asset.sh "artifacts/Helics-$(git rev-parse --abbrev-ref "${GITHUB_REF}")-SHA-256.txt"
+
+#####################################
+# Send helics-version-update event(s)
+#####################################
+  send-version-update-event:
+    name: Send helics-version-update event(s)
+    needs: [generate-sha256]
+    runs-on: ubuntu-latest
+    if: github.event.action == 'published'
+    steps:
+      - name: Send event to helics-packaging
+        run: |
+          HELICS_REPO="${{ github.repository }}"
+          HELICS_VERSION="${{ github.event.release.tag_name }}"
+          curl -X POST --header 'authorization: Bearer ${{ secrets.HELICS_BOT_TOKEN }}' \
+               --url https://api.github.com/repos/GMLC-TDC/helics-packaging/dispatches \
+               --header 'content-type: application/json' \
+               --data "{\"event_type\":\"helics-version-update\",\"client_payload\":{\"repository\":\"${HELICS_REPO}\",\"tag_name\":\"${HELICS_VERSION}\",\"version\":\"${HELICS_VERSION#v}\"}}"

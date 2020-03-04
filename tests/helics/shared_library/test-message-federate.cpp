@@ -275,15 +275,19 @@ TEST_P(mfed_type_tests, send_receive_2fed)
 
     auto M1 = helicsEndpointGetMessage(epid);
     // ASSERT_TRUE(M1);
-    ASSERT_EQ(M1.length, 400);
-    ASSERT_NE(M1.data, nullptr);
-    EXPECT_EQ(M1.data[245], 'b');
+    EXPECT_EQ(M1.length, 400);
+    EXPECT_NE(M1.data, nullptr);
+    if (M1.data != nullptr) {
+        EXPECT_EQ(M1.data[245], 'b');
+    }
 
     auto M2 = helicsEndpointGetMessage(epid2);
     // ASSERT_TRUE(M2);
-    ASSERT_EQ(M2.length, 500);
-    ASSERT_NE(M2.data, nullptr);
-    EXPECT_EQ(M2.data[245], 'a');
+    EXPECT_EQ(M2.length, 500);
+    EXPECT_NE(M2.data, nullptr);
+    if (M2.data != nullptr) {
+        EXPECT_EQ(M2.data[245], 'a');
+    }
     CE(helicsFederateFinalizeAsync(mFed1, &err));
     CE(helicsFederateFinalize(mFed2, &err));
     CE(helicsFederateFinalizeComplete(mFed1, &err));
