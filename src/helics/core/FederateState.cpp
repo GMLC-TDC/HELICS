@@ -755,7 +755,7 @@ message_processing_result FederateState::processQueue() noexcept
         return message_processing_result::halted;
     }
     auto initError = (state == HELICS_ERROR);
-    bool error_cmd{ false };
+    bool error_cmd{false};
     // process the delay Queue first
     auto ret_code = processDelayQueue();
 
@@ -770,37 +770,29 @@ message_processing_result FederateState::processQueue() noexcept
         if (ret_code == message_processing_result::delay_message) {
             delayQueues[static_cast<global_federate_id>(cmd.source_id)].push_back(cmd);
         }
-        if (ret_code == message_processing_result::error && cmd.action() == CMD_GLOBAL_ERROR)
-        {
+        if (ret_code == message_processing_result::error && cmd.action() == CMD_GLOBAL_ERROR) {
             error_cmd = true;
         }
     }
-    if (ret_code == message_processing_result::error && state == HELICS_ERROR)
-    {
-        if (!initError  && !error_cmd)
-        {
-            if (parent_ != nullptr)
-            {
-            ActionMessage gError(CMD_LOCAL_ERROR);
-            if (terminate_on_error)
-            {
-                gError.setAction(CMD_GLOBAL_ERROR);
-            }
-            else
-            {
-                timeCoord->localError();
-            }
-            gError.source_id = global_id.load();
-            gError.dest_id = parent_broker_id;
-            gError.messageID = errorCode;
-            gError.payload = errorString;
-            
+    if (ret_code == message_processing_result::error && state == HELICS_ERROR) {
+        if (!initError && !error_cmd) {
+            if (parent_ != nullptr) {
+                ActionMessage gError(CMD_LOCAL_ERROR);
+                if (terminate_on_error) {
+                    gError.setAction(CMD_GLOBAL_ERROR);
+                } else {
+                    timeCoord->localError();
+                }
+                gError.source_id = global_id.load();
+                gError.dest_id = parent_broker_id;
+                gError.messageID = errorCode;
+                gError.payload = errorString;
+
                 parent_->addActionMessage(std::move(gError));
             }
         }
     }
-    if (initError)
-    {
+    if (initError) {
         ret_code = message_processing_result::error;
     }
     return ret_code;
@@ -1089,10 +1081,11 @@ message_processing_result FederateState::processActionMessage(ActionMessage& cmd
         case CMD_ERROR:
         case CMD_LOCAL_ERROR:
         case CMD_GLOBAL_ERROR:
-            if (cmd.action()==CMD_GLOBAL_ERROR||cmd.source_id == global_id.load()||cmd.source_id==parent_broker_id||cmd.source_id==root_broker_id || cmd.dest_id != global_id) {
+            if (cmd.action() == CMD_GLOBAL_ERROR || cmd.source_id == global_id.load() ||
+                cmd.source_id == parent_broker_id || cmd.source_id == root_broker_id ||
+                cmd.dest_id != global_id) {
                 if ((state != HELICS_FINISHED) && (state != HELICS_TERMINATING)) {
-                    if (cmd.action() != CMD_GLOBAL_ERROR)
-                    {
+                    if (cmd.action() != CMD_GLOBAL_ERROR) {
                         timeCoord->localError();
                     }
                     setState(HELICS_ERROR);
@@ -1101,24 +1094,22 @@ message_processing_result FederateState::processActionMessage(ActionMessage& cmd
                         if (errorString == "unknown") {
                             errorString += " code:" + std::to_string(cmd.messageID);
                         }
-                    }
-                    else {
+                    } else {
                         errorString = cmd.payload;
                     }
                     errorCode = cmd.messageID;
                     LOG_ERROR(errorString);
                     return message_processing_result::error;
                 }
-            }
-            else{
+            } else {
                 switch (timeCoord->processTimeMessage(cmd)) {
-                case message_process_result::delay_processing:
-                    addFederateToDelay(global_federate_id(cmd.source_id));
-                    return message_processing_result::delay_message;
-                case message_process_result::no_effect:
-                    return message_processing_result::continue_processing;
-                default:
-                    break;
+                    case message_process_result::delay_processing:
+                        addFederateToDelay(global_federate_id(cmd.source_id));
+                        return message_processing_result::delay_message;
+                    case message_process_result::no_effect:
+                        return message_processing_result::continue_processing;
+                    default:
+                        break;
                 }
                 if (state != HELICS_EXECUTING) {
                     break;
@@ -1134,7 +1125,7 @@ message_processing_result FederateState::processActionMessage(ActionMessage& cmd
                 }
             }
             break;
-            
+
         case CMD_ADD_PUBLISHER: {
             auto subI = interfaceInformation.getInput(cmd.dest_handle);
             if (subI != nullptr) {

@@ -291,12 +291,12 @@ inline bool isDisconnectCommand(const ActionMessage& command) noexcept
 inline bool isErrorCommand(const ActionMessage& command) noexcept
 {
     switch (command.action()) {
-    case CMD_ERROR:
-    case CMD_LOCAL_ERROR:
-    case CMD_GLOBAL_ERROR:
-        return true;
-    default:
-        return false;
+        case CMD_ERROR:
+        case CMD_LOCAL_ERROR:
+        case CMD_GLOBAL_ERROR:
+            return true;
+        default:
+            return false;
     }
 }
 

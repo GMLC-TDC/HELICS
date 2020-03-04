@@ -84,8 +84,9 @@ across different compilers*/
         cmd_warning = 9990, //!< indicate some sort of warning
         cmd_error = 10000, //!< indicate an error with a federate
         cmd_local_error = 10003, //!< indicate a local error within a federate/core/broker
-        cmd_global_error = 10005, //!< indicate a global error with a federate/core/broker and the federation should terminate
-        cmd_error_check = 10001,  //!< check some status for error and error timeouts
+        cmd_global_error =
+            10005, //!< indicate a global error with a federate/core/broker and the federation should terminate
+        cmd_error_check = 10001, //!< check some status for error and error timeouts
         cmd_invalid = 1010101, //!< indicates that command has generated an invalid state
         cmd_send_route = 75, //!< command to define a route information
         cmd_search_dependency = 1464, //!< command to add a dependency by name

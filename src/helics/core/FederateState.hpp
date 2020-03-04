@@ -88,7 +88,8 @@ class FederateState {
     bool iterating{false}; //!< the federate is iterating at a time step
     bool timeGranted_mode{
         false}; //!< indicator if the federate is in a granted state or a requested state waiting to grant
-    bool terminate_on_error{ false }; //!< indicator that if the federate encounters a configuration error it should cause a co-simulation abort
+    bool terminate_on_error{
+        false}; //!< indicator that if the federate encounters a configuration error it should cause a co-simulation abort
     int logLevel{1}; //!< the level of logging used in the federate
 
     //   std::vector<ActionMessage> messLog;

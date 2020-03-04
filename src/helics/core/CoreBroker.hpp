@@ -32,16 +32,15 @@ SPDX-License-Identifier: BSD-3-Clause
 
 namespace helics {
 
-    /** enumeration of possible states of a remote federate or broker*/
-    enum class connection_state :std::uint8_t
-    {
-        connected=0,
-        init_requested=1,
-        operating=2,
-        error=40,
-        request_disconnect=48,
-        disconnected=50
-    };
+/** enumeration of possible states of a remote federate or broker*/
+enum class connection_state : std::uint8_t {
+    connected = 0,
+    init_requested = 1,
+    operating = 2,
+    error = 40,
+    request_disconnect = 48,
+    disconnected = 50
+};
 
 /** class defining the common information for a federate*/
 class BasicFedInfo {
@@ -50,7 +49,7 @@ class BasicFedInfo {
     global_federate_id global_id; //!< the identification code for the federate
     route_id route; //!< the routing information for data to be sent to the federate
     global_broker_id parent; //!< the id of the parent broker/core
-    connection_state state{ connection_state::connected };
+    connection_state state{connection_state::connected};
     explicit BasicFedInfo(const std::string& fedname): name(fedname){};
 };
 
@@ -63,7 +62,8 @@ class BasicBrokerInfo {
     route_id route; //!< the identifier for the route to take to the broker
     global_broker_id parent; //!< the id of the parent broker/core
 
-    connection_state state{ connection_state::connected }; //!< specify the current status of the broker
+    connection_state state{
+        connection_state::connected}; //!< specify the current status of the broker
 
     bool _hasTimeDependency{
         false}; //!< flag indicating that a broker has general endpoints it is coordinating
@@ -158,7 +158,7 @@ class CoreBroker: public Broker, public BrokerBase {
     /** transmit a message to the parent or root */
     void transmitToParent(ActionMessage&& cmd);
     /** propagate an error message or escalate it depending on settings*/
-    void propagateError(ActionMessage &&cmd);
+    void propagateError(ActionMessage&& cmd);
     /** broadcast a message to all immediate brokers*/
     void broadcast(ActionMessage& cmd);
     /**/

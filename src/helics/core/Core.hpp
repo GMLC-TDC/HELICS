@@ -126,17 +126,23 @@ class Core {
     virtual const std::string& getIdentifier() const = 0;
     /** get the connection network or connection address for the core*/
     virtual const std::string& getAddress() const = 0;
-    
+
     /**
     * Federate has encountered a global error and the federation should halt.
     @param federateID the federate
     */
-    virtual void globalError(local_federate_id federateID, int32_t errorCode, const std::string &error_string) = 0;
+    virtual void globalError(
+        local_federate_id federateID,
+        int32_t errorCode,
+        const std::string& error_string) = 0;
 
     /**
     * Federate has encountered a local error and should be disconnected.
     */
-    virtual void localError(local_federate_id federateID, int32_t errorCode, const std::string &error_string) = 0;
+    virtual void localError(
+        local_federate_id federateID,
+        int32_t errorCode,
+        const std::string& error_string) = 0;
 
     /**
      * Federate has encountered an unrecoverable error.
