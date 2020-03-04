@@ -397,6 +397,7 @@ TEST(federate_tests, from_file6)
     auto fstr2 = std::string(TEST_DIR) + "example_filters.toml";
     auto Fed1 = std::make_shared<helics::Federate>(fstr2);
     EXPECT_THROW(Fed1->registerFilterInterfaces("non_existing.toml"), helics::InvalidParameter);
+    EXPECT_THROW(Fed1->registerFilterInterfaces("non_existing.json"), helics::InvalidParameter);
 }
 
 TEST(federate_tests, from_file7)

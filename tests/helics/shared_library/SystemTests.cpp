@@ -263,7 +263,7 @@ TEST(federate_tests, federateGeneratedLocalError)
     helicsFederateInfoSetCoreInitString(fi,"-f 1 --autobroker --error_timeout=0",nullptr);
 
     auto fed1 = helicsCreateValueFederate("fed1", fi, nullptr);
-
+    helicsFederateInfoFree(fi);
     helicsFederateEnterExecutingMode(fed1, nullptr);
 
     helicsFederateRequestTime(fed1, 2.0, nullptr);
@@ -287,7 +287,7 @@ TEST(federate_tests, federateGeneratedGlobalError)
     helicsFederateInfoSetCoreInitString(fi,"-f 1 --autobroker --error_timeout=0",nullptr);
 
     auto fed1 = helicsCreateValueFederate("fed1", fi, nullptr);
-
+    helicsFederateInfoFree(fi);
     helicsFederateEnterExecutingMode(fed1, nullptr);
 
     helicsFederateRequestTime(fed1, 2.0, nullptr);
