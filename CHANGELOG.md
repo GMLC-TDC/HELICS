@@ -18,6 +18,7 @@ Increased code coverage and additional bug fixes.  The error propagation in HELI
 -   Configuration of flags and targets for interfaces in json and toml files can be done in multiple sections
 -   The benchmark federates have been changed to use a common base benchmark federate class for more consistent behavior
 -   Switched to including netif as a git submodule
+-   Updated the GitHub actions (clang-format, swig interface updates, and release builds) to use actions/checkout@v2
 
 ### Fixed
 -   Issue with iterative requests that were not being honored if the federate was acting in isolation
@@ -35,6 +36,7 @@ Increased code coverage and additional bug fixes.  The error propagation in HELI
 -   Sending an event from GitHub Actions release builds to trigger updating additional HELICS packages when a new release is made
 -  `localError`, and `GlobalError` function calls the Federate API and in the C++ and sharedLibrary.  
 -  `helics_terminate_on_error` flag to escalate what would be a local error into a global one that will halt the co-simulation.  This flag can be specified through the flag to federates or to brokers and cores through a command line option `--terminate_on_error` 
+-   A 32-bit Windows zip install archive for releases
 
 ### Deprecated
 
