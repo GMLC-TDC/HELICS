@@ -98,7 +98,7 @@ jobs:
     name: Build ${{ matrix.os }} ${{ matrix.arch }} ${{ matrix.cpack_gen }} Installer
     strategy:
       matrix:
-        id: [windows-x64, macos-x64-zip, linux-x64]
+        id: [windows-x64, windows-x86, macos-x64, linux-x64]
         include:
           - id: windows-x64
             os: windows-latest
@@ -106,7 +106,13 @@ jobs:
             cpack_gen: NSIS;ZIP
             cmake_gen: 'Visual Studio 16 2019'
             msvc_ver: 'msvc2019'
-          - id: macos-x64-zip
+          - id: windows-x86
+            os: windows-latest
+            arch: x86
+            cpack_gen: ZIP
+            cmake_gen: 'Visual Studio 16 2019'
+            msvc_ver: 'msvc2019'
+          - id: macos-x64
             os: macos-latest
             arch: x64
             cpack_gen: ZIP
