@@ -815,6 +815,44 @@ TEST(federate_tests, forceErrorPendingTimeAsync)
     Fed1->getCorePointer()->disconnect();
 }
 
+TEST(federate_tests, federateGeneratedLocalError)
+{
+    helics::FederateInfo fi(helics::core_type::TEST);
+    fi.coreName = "core_full_le";
+    fi.coreInitString = "-f 1 --autobroker";
+
+    auto Fed1 = std::make_shared<helics::Federate>("fed1", fi);
+
+    Fed1->enterExecutingMode();
+    Fed1->localError(9827,"user generated error");
+
+    EXPECT_THROW(Fed1->requestTime(3.0), helics::HelicsException);
+
+    Fed1->getCorePointer()->disconnect();
+    Fed1->disconnect();
+    EXPECT_THROW(Fed1->localError(9827, "user generated error2"), helics::InvalidFunctionCall);
+}
+
+TEST(federate_tests, federateGeneratedGlobalError)
+{
+    helics::FederateInfo fi(helics::core_type::TEST);
+    fi.coreName = "core_full_ge";
+    fi.coreInitString = "-f 1 --autobroker --error_timeout=0";
+
+    auto Fed1 = std::make_shared<helics::Federate>("fed1", fi);
+
+    Fed1->enterExecutingMode();
+    Fed1->requestTimeAsync(2.0);
+    Fed1->globalError(9827, "user generated global error");
+
+    EXPECT_THROW(Fed1->requestTime(3.0), helics::HelicsException);
+
+    EXPECT_TRUE(Fed1->getCorePointer()->waitForDisconnect(std::chrono::milliseconds(300)));
+    
+    Fed1->disconnect();
+    EXPECT_THROW(Fed1->globalError(9827, "user generated global error2"), helics::InvalidFunctionCall);
+}
+
 TEST(federate_tests, queryTest1)
 {
     helics::FederateInfo fi(helics::core_type::TEST);
