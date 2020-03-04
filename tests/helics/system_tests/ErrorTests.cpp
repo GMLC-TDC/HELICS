@@ -444,7 +444,7 @@ TEST_F(error_tests, missing_required_pub_with_default)
 
 TEST_F(error_tests, mismatched_units)
 {
-    auto broker = AddBroker("test", 2);
+    auto broker = AddBroker("test", 3);
 
     AddFederates<helics::ValueFederate>("test", 3, broker, 1.0, "fed");
 
@@ -466,6 +466,38 @@ TEST_F(error_tests, mismatched_units)
     fed2->finalize();
     fed3->finalize();
     broker->disconnect();
+}
+
+
+TEST_F(error_tests, mismatched_units_terminate_on_error)
+{
+    auto broker = AddBroker("test", "-f 3 --error_timeout=0");
+
+    AddFederates<helics::ValueFederate>("test", 3, broker, 1.0, "fed");
+
+    auto fed1 = GetFederateAs<helics::ValueFederate>(0);
+    auto fed2 = GetFederateAs<helics::ValueFederate>(1);
+    auto fed3 = GetFederateAs<helics::ValueFederate>(2);
+
+    fed1->registerGlobalPublication("t1", "double", "V");
+    fed2->setFlagOption(helics_flag_terminate_on_error);
+    fed2->registerSubscription("t1", "m");
+    auto& sub = fed3->registerSubscription("t1", "m");
+    sub.setOption(helics::defs::options::ignore_unit_mismatch);
+    fed1->enterExecutingModeAsync();
+    fed2->enterExecutingModeAsync();
+    try
+    {
+        fed3->enterExecutingMode();
+        fed1->enterExecutingModeComplete();
+    }
+    catch (const helics::HelicsException &)
+    {
+        ;
+    }
+    EXPECT_THROW(fed2->enterExecutingModeComplete(), helics::ConnectionFailure);
+
+    EXPECT_TRUE(broker->waitForDisconnect(std::chrono::milliseconds(500)));
 }
 
 class error_tests_type: public ::testing::TestWithParam<const char*>, public FederateTestFixture {

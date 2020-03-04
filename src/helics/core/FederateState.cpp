@@ -846,6 +846,7 @@ message_processing_result FederateState::processActionMessage(ActionMessage& cmd
                 timeGranted_mode = true;
                 int pcode = checkInterfaces();
                 if (pcode != defs::errors::ok) {
+                    setState(HELICS_ERROR);
                     return message_processing_result::error;
                 }
                 return message_processing_result::next_step;
