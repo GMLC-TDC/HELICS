@@ -8,7 +8,7 @@ A note on future revisions.
   Everything within a major version number should be code compatible (with the exception of experimental interfaces).  The most notable example of an experimental interface is the support for multiple source inputs.  The APIs to deal with this will change in future minor releases.  Everything within a single minor release should be network compatible with other federates on the same minor release number.  Compatibility across minor release numbers may be possible in some situations but we are not going to guarantee this as those components are subject to performance improvements and may need to be modified at some point.  Patch releases will be limited to bug fixes and other improvements not impacting the public API or network compatibility.  Check the [Public API](./docs/Public_API.md) for details on what is included and excluded from the public API and version stability.
 
 ## [2.4.1][] - 2020-03-04
-Increased code coverage and additional bug fixes.
+Increased code coverage and additional bug fixes.  The error propagation in HELICS was improved such that local errors can be escaled to global errors, and a federate can define errors coming from the federate that are handled appropriately and can halt a co-simulation.  
 
 
 ### Changed
@@ -26,13 +26,15 @@ Increased code coverage and additional bug fixes.
 
 ### Added
 -   `HELICS_DISABLE_WEBSERVER` option to turn off building of the webserver.  It will build by default if Boost is enabled and is version 1.70 or higher; otherwise it is disabled.
--   A series of test for Federate.cpp to increase coverage on that file to 100%
+-   A series of tests for Federate.cpp to increase coverage on that file to 100%
 -   A series of tests for ValueFederate.*pp to increase coverage on that file to 100%
 -   Docker image for a helics builder which includes build tools and the helics installation
 -   helics can be installed on [MSYS2](https://helics.readthedocs.io/en/latest/installation/windows.html#msys2) using pacman.
 -   Standalone benchmark federates for use in multinode benchmark runs
 -   A FreeBSD 12.1 CI build using Cirrus CI
 -   Sending an event from GitHub Actions release builds to trigger updating additional HELICS packages when a new release is made
+-  `localError`, and `GlobalError` function calls the Federate API and in the C++ and sharedLibrary.  
+-  `helics_terminate_on_error` flag to escalate what would be a local error into a global one that will halt the co-simulation.  This flag can be specified through the flag to federates or to brokers and cores through a command line option `--terminate_on_error` 
 
 ### Deprecated
 

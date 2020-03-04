@@ -12,6 +12,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helics/core/Core.hpp"
 #include "helics/core/CoreFactory.hpp"
 #include "helics/core/core-exceptions.hpp"
+#include "helics/core/helics_definitions.hpp"
 
 #include <future>
 #include <gtest/gtest.h>
@@ -853,6 +854,27 @@ TEST(federate_tests, federateGeneratedGlobalError)
     Fed1->disconnect();
     EXPECT_THROW(Fed1->globalError(9827, "user generated global error2"), helics::InvalidFunctionCall);
 }
+
+TEST(federate_tests, federateGeneratedlocalErrorEscalation)
+{
+    helics::FederateInfo fi(helics::core_type::TEST);
+    fi.coreName = "core_full_ge";
+    fi.coreInitString = "-f 1 --autobroker --error_timeout=0";
+
+    auto Fed1 = std::make_shared<helics::Federate>("fed1", fi);
+    Fed1->setFlagOption(helics::defs::flags::terminate_on_error);
+    Fed1->enterExecutingMode();
+    Fed1->requestTimeAsync(2.0);
+    Fed1->localError(9827, "user generated global error");
+
+    EXPECT_THROW(Fed1->requestTime(3.0), helics::HelicsException);
+
+    EXPECT_TRUE(Fed1->getCorePointer()->waitForDisconnect(std::chrono::milliseconds(300)));
+
+    Fed1->disconnect();
+    EXPECT_THROW(Fed1->globalError(9827, "user generated global error2"), helics::InvalidFunctionCall);
+}
+
 
 TEST(federate_tests, queryTest1)
 {
