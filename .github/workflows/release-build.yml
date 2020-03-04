@@ -15,7 +15,7 @@ jobs:
     runs-on: ubuntu-latest
     if: github.event.action == 'published'
     steps:
-    - uses: actions/checkout@v1
+    - uses: actions/checkout@v2
       
     - name: Create archive
       # Creates the archive then moves it to an artifact subfolder
@@ -51,11 +51,11 @@ jobs:
             msvc_ver: 'msvc2019'
     steps:
     - name: Checkout event ref
-      uses: actions/checkout@v1
+      uses: actions/checkout@v2
       if: github.event.action == 'published'
     
     - name: Checkout develop branch
-      uses: actions/checkout@v1
+      uses: actions/checkout@v2
       with:
         ref: develop
       if: github.event_name == 'schedule'
@@ -118,11 +118,11 @@ jobs:
 
     steps:
     - name: Checkout event ref
-      uses: actions/checkout@v1
+      uses: actions/checkout@v2
       if: github.event.action == 'published'
     
     - name: Checkout develop branch
-      uses: actions/checkout@v1
+      uses: actions/checkout@v2
       with:
         ref: develop
       if: github.event_name == 'schedule'
@@ -202,11 +202,11 @@ jobs:
 
     steps:
     - name: Checkout event ref
-      uses: actions/checkout@v1
+      uses: actions/checkout@v2
       if: github.event.action == 'published'
     
     - name: Checkout develop branch
-      uses: actions/checkout@v1
+      uses: actions/checkout@v2
       with:
         ref: develop
       if: github.event_name == 'schedule'
@@ -257,7 +257,7 @@ jobs:
     runs-on: ubuntu-latest
     if: github.event.action == 'published'
     steps:
-    - uses: actions/checkout@v1
+    - uses: actions/checkout@v2
       
     - name: Get all submodules archive
       uses: actions/download-artifact@v1
