@@ -93,8 +93,7 @@ void TimeCoordinator::disconnect()
 
 void TimeCoordinator::localError()
 {
-    if (disconnected)
-    {
+    if (disconnected) {
         return;
     }
     time_granted = Time::maxVal();
@@ -116,19 +115,16 @@ void TimeCoordinator::localError()
             bye.dest_id = *connections.begin();
             if (bye.dest_id == source_id) {
                 processTimeMessage(bye);
-            }
-            else {
+            } else {
                 sendMessageFunction(bye);
             }
-        }
-        else {
+        } else {
             ActionMessage multi(CMD_MULTI_MESSAGE);
             for (auto fed : connections) {
                 bye.dest_id = fed;
                 if (fed == source_id) {
                     processTimeMessage(bye);
-                }
-                else {
+                } else {
                     appendMessage(multi, bye);
                 }
             }

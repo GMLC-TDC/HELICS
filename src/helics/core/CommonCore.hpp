@@ -36,18 +36,13 @@ class FilterInfo;
 class TimeoutMonitor;
 enum class handle_type : char;
 /** enumeration of possible operating conditions for a federate*/
-enum class operation_state : std::uint8_t
-{
-    operating = 0,
-    error = 5,
-    disconnected=10
-};
+enum class operation_state : std::uint8_t { operating = 0, error = 5, disconnected = 10 };
 
 /** helper class for containing some wrapper around a federate for the core*/
 class FedInfo {
   public:
     FederateState* fed = nullptr;
-    operation_state state{ operation_state::operating };
+    operation_state state{operation_state::operating};
 
     constexpr FedInfo() = default;
     constexpr explicit FedInfo(FederateState* newfed) noexcept: fed(newfed){};
@@ -75,8 +70,12 @@ class CommonCore: public Core, public BrokerBase {
     virtual void configureFromVector(std::vector<std::string> args) override final;
     virtual bool isConfigured() const override final;
     virtual bool isOpenToNewFederates() const override final;
-    virtual void globalError(local_federate_id federateID, int errorCode,const std::string &error_string) override final;
-    virtual void localError(local_federate_id federateID, int errorCode, const std::string &error_string) override final;
+    virtual void
+        globalError(local_federate_id federateID, int errorCode, const std::string& error_string)
+            override final;
+    virtual void
+        localError(local_federate_id federateID, int errorCode, const std::string& error_string)
+            override final;
     virtual void finalize(local_federate_id federateID) override final;
     virtual void enterInitializingMode(local_federate_id federateID) override final;
     virtual void setCoreReadyToInit() override final;
@@ -457,7 +456,7 @@ class CommonCore: public Core, public BrokerBase {
     std::string federateQuery(const FederateState* fed, const std::string& queryStr) const;
 
     /** send an error code and message to all the federates*/
-    void sendErrorToFederates(int error_code, const std::string &message);
+    void sendErrorToFederates(int error_code, const std::string& message);
     /** check for a disconnect and take actions if the object can disconnect*/
     bool checkAndProcessDisconnect();
     /** send a disconnect message to time dependencies and child federates*/

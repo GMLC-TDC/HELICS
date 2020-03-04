@@ -196,11 +196,13 @@ std::shared_ptr<helicsCLI11App> BrokerBase::generateBaseCLI()
         networkTimeout,
         "time to wait for a broker connection default unit is in ms(can also be entered as a time "
         "like '10s' or '45ms') ");
-    timeout_group->add_option(
-        "--errordelay,--errortimeout",
-        errorDelay,
-        "time to wait after an error state before terminating "
-        "like '10s' or '45ms') ")->default_str(std::to_string(static_cast<double>(errorDelay)));
+    timeout_group
+        ->add_option(
+            "--errordelay,--errortimeout",
+            errorDelay,
+            "time to wait after an error state before terminating "
+            "like '10s' or '45ms') ")
+        ->default_str(std::to_string(static_cast<double>(errorDelay)));
 
     return hApp;
 }
@@ -292,21 +294,17 @@ void BrokerBase::setErrorState(int eCode, const std::string& estring)
 {
     lastErrorString = estring;
     errorCode = eCode;
-    if (brokerState.load() != broker_state_t::errored)
-    {
+    if (brokerState.load() != broker_state_t::errored) {
         brokerState.store(broker_state_t::errored);
-        if (errorDelay <= timeZero)
-        {
-            ActionMessage halt(CMD_USER_DISCONNECT,global_id.load(),global_id.load());
+        if (errorDelay <= timeZero) {
+            ActionMessage halt(CMD_USER_DISCONNECT, global_id.load(), global_id.load());
             addActionMessage(halt);
-        }
-        else
-        {
+        } else {
             errorTimeStart = std::chrono::steady_clock::now();
             ActionMessage(CMD_ERROR_CHECK, global_id.load(), global_id.load());
         }
     }
-    
+
     sendToLogger(global_id.load(), helics_log_level_error, identifier, estring);
 }
 
@@ -522,25 +520,19 @@ void BrokerBase::queueProcessingLoop()
 #endif
                 }
                 // deal with error state timeout
-                if (brokerState.load() == broker_state_t::errored)
-                {
+                if (brokerState.load() == broker_state_t::errored) {
                     auto ctime = std::chrono::steady_clock::now();
                     auto td = ctime - errorTimeStart;
-                    if (td >= errorDelay.to_ms())
-                    {
+                    if (td >= errorDelay.to_ms()) {
                         command.setAction(CMD_USER_DISCONNECT);
                         addActionMessage(command);
-                    }
-                    else
-                    {
+                    } else {
 #ifndef HELICS_DISABLE_ASIO
                         if (!disable_timer) {
                             ticktimer.expires_at(errorTimeStart + errorDelay.to_ns());
                             active = std::make_pair(true, true);
                             ticktimer.async_wait(timerCallback);
-                        }
-                        else
-                        {
+                        } else {
                             command.setAction(CMD_ERROR_CHECK);
                             addActionMessage(command);
                         }
@@ -550,7 +542,6 @@ void BrokerBase::queueProcessingLoop()
 #endif
                     }
                     break;
-                    
                 }
                 if (messagesSinceLastTick == 0 || forwardTick) {
 #ifndef DISABLE_TICK
@@ -568,20 +559,15 @@ void BrokerBase::queueProcessingLoop()
 #endif
                 break;
             case CMD_ERROR_CHECK:
-                if (brokerState.load() == broker_state_t::errored)
-                {
+                if (brokerState.load() == broker_state_t::errored) {
                     auto ctime = std::chrono::steady_clock::now();
                     auto td = ctime - errorTimeStart;
-                    if (td > errorDelay.to_ms())
-                    {
+                    if (td > errorDelay.to_ms()) {
                         command.setAction(CMD_USER_DISCONNECT);
                         addActionMessage(command);
-                    }
-                    else
-                    {
+                    } else {
 #ifndef HELICS_DISABLE_ASIO
-                        if (tickTimer > td*2 || disable_timer)
-                        {
+                        if (tickTimer > td * 2 || disable_timer) {
                             std::this_thread::sleep_for(std::chrono::milliseconds(200));
                             addActionMessage(command);
                         }

@@ -254,13 +254,12 @@ TEST(other_tests, broker_creation)
     helicsBrokerDisconnect(brk, &err);
 }
 
-
 TEST(federate_tests, federateGeneratedLocalError)
 {
     auto fi = helicsCreateFederateInfo();
     helicsFederateInfoSetCoreType(fi, helics_core_type_test, nullptr);
-    helicsFederateInfoSetCoreName(fi,"core_full_le",nullptr);
-    helicsFederateInfoSetCoreInitString(fi,"-f 1 --autobroker --error_timeout=0",nullptr);
+    helicsFederateInfoSetCoreName(fi, "core_full_le", nullptr);
+    helicsFederateInfoSetCoreInitString(fi, "-f 1 --autobroker --error_timeout=0", nullptr);
 
     auto fed1 = helicsCreateValueFederate("fed1", fi, nullptr);
     helicsFederateInfoFree(fi);
@@ -273,7 +272,7 @@ TEST(federate_tests, federateGeneratedLocalError)
     helicsFederateRequestTime(fed1, 3.0, &err);
     EXPECT_NE(err.error_code, 0);
 
-    auto cr = helicsFederateGetCoreObject(fed1,nullptr);
+    auto cr = helicsFederateGetCoreObject(fed1, nullptr);
     helicsCoreDisconnect(cr, nullptr);
     helicsCoreFree(cr);
     helicsFederateDestroy(fed1);
@@ -283,8 +282,8 @@ TEST(federate_tests, federateGeneratedGlobalError)
 {
     auto fi = helicsCreateFederateInfo();
     helicsFederateInfoSetCoreType(fi, helics_core_type_test, nullptr);
-    helicsFederateInfoSetCoreName(fi,"core_full_ge",nullptr);
-    helicsFederateInfoSetCoreInitString(fi,"-f 1 --autobroker --error_timeout=0",nullptr);
+    helicsFederateInfoSetCoreName(fi, "core_full_ge", nullptr);
+    helicsFederateInfoSetCoreInitString(fi, "-f 1 --autobroker --error_timeout=0", nullptr);
 
     auto fed1 = helicsCreateValueFederate("fed1", fi, nullptr);
     helicsFederateInfoFree(fi);
@@ -292,7 +291,7 @@ TEST(federate_tests, federateGeneratedGlobalError)
 
     helicsFederateRequestTime(fed1, 2.0, nullptr);
     helicsFederateGlobalError(fed1, 9827, "user generated global error");
-   
+
     auto err = helicsErrorInitialize();
     helicsFederateRequestTime(fed1, 3.0, &err);
     EXPECT_NE(err.error_code, 0);

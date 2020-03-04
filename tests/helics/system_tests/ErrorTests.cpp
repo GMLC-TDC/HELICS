@@ -226,7 +226,6 @@ TEST_F(error_tests, duplicate_publication_names_auto_terminate)
     broker->waitForDisconnect();
 }
 
-
 TEST_F(error_tests, duplicate_publication_names_auto_terminate_core)
 {
     auto broker = AddBroker("test", "-f 2 --error_timeout=0");
@@ -236,8 +235,10 @@ TEST_F(error_tests, duplicate_publication_names_auto_terminate_core)
     auto fed1 = GetFederateAs<helics::ValueFederate>(0);
     auto fed2 = GetFederateAs<helics::ValueFederate>(1);
 
-    fed1->getCorePointer()->setFlagOption(helics::local_core_id,helics_flag_terminate_on_error,true);
-    fed2->getCorePointer()->setFlagOption(helics::local_core_id, helics_flag_terminate_on_error, true);
+    fed1->getCorePointer()->setFlagOption(
+        helics::local_core_id, helics_flag_terminate_on_error, true);
+    fed2->getCorePointer()->setFlagOption(
+        helics::local_core_id, helics_flag_terminate_on_error, true);
 
     fed1->registerGlobalPublication("testkey", "");
     fed1->enterInitializingModeAsync();
@@ -273,7 +274,6 @@ TEST_F(error_tests, duplicate_publication_names_auto_terminate_broker)
 
     auto fed1 = GetFederateAs<helics::ValueFederate>(0);
     auto fed2 = GetFederateAs<helics::ValueFederate>(1);
-
 
     fed1->registerGlobalPublication("testkey", "");
     fed1->enterInitializingModeAsync();
@@ -468,7 +468,6 @@ TEST_F(error_tests, mismatched_units)
     broker->disconnect();
 }
 
-
 TEST_F(error_tests, mismatched_units_terminate_on_error)
 {
     auto broker = AddBroker("test", "-f 3 --error_timeout=0");
@@ -486,13 +485,11 @@ TEST_F(error_tests, mismatched_units_terminate_on_error)
     sub.setOption(helics::defs::options::ignore_unit_mismatch);
     fed1->enterExecutingModeAsync();
     fed2->enterExecutingModeAsync();
-    try
-    {
+    try {
         fed3->enterExecutingMode();
         fed1->enterExecutingModeComplete();
     }
-    catch (const helics::HelicsException &)
-    {
+    catch (const helics::HelicsException&) {
         ;
     }
     EXPECT_THROW(fed2->enterExecutingModeComplete(), helics::ConnectionFailure);

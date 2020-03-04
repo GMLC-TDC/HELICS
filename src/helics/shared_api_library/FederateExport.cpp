@@ -595,14 +595,11 @@ void helicsFederateGlobalError(helics_federate fed, int error_code, const char* 
     if (fedObj == nullptr) {
         return;
     }
-    try
-    {
+    try {
         fedObj->globalError(error_code, AS_STRING(error_string));
     }
     // LCOV_EXCL_START
-    catch (...)
-    {
-
+    catch (...) {
     }
     // LCOV_EXCL_STOP
 }
@@ -613,14 +610,11 @@ void helicsFederateLocalError(helics_federate fed, int error_code, const char* e
     if (fedObj == nullptr) {
         return;
     }
-    try
-    {
+    try {
         fedObj->localError(error_code, AS_STRING(error_string));
     }
     // LCOV_EXCL_START
-    catch (...)
-    {
-
+    catch (...) {
     }
     // LCOV_EXCL_STOP
 }

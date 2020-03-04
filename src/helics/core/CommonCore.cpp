@@ -339,7 +339,10 @@ bool CommonCore::isOpenToNewFederates() const
 {
     return ((brokerState != broker_state_t::created) && (brokerState < broker_state_t::operating));
 }
-void CommonCore::globalError(local_federate_id federateID, int error_code, const std::string &error_string)
+void CommonCore::globalError(
+    local_federate_id federateID,
+    int error_code,
+    const std::string& error_string)
 {
     auto fed = getFederateAt(federateID);
     if (fed == nullptr) {
@@ -360,7 +363,10 @@ void CommonCore::globalError(local_federate_id federateID, int error_code, const
     }
 }
 
-void CommonCore::localError(local_federate_id federateID, int error_code, const std::string &error_string)
+void CommonCore::localError(
+    local_federate_id federateID,
+    int error_code,
+    const std::string& error_string)
 {
     auto fed = getFederateAt(federateID);
     if (fed == nullptr) {
@@ -421,11 +427,9 @@ bool CommonCore::allDisconnected() const
 
 operation_state CommonCore::minFederateState() const
 {
-    operation_state op{ operation_state::disconnected };
-    for (auto &fed : loopFederates)
-    {
-        if (fed.state < op)
-        {
+    operation_state op{operation_state::disconnected};
+    for (auto& fed : loopFederates) {
+        if (fed.state < op) {
             op = fed.state;
         }
     }
@@ -759,7 +763,7 @@ void CommonCore::setFlagOption(local_federate_id federateID, int32_t flag, bool 
                 cmd.messageID = defs::flags::delay_init_entry;
                 addActionMessage(cmd);
             }
-        } else{
+        } else {
             ActionMessage cmd(CMD_CORE_CONFIGURE);
             cmd.messageID = flag;
             if (flagValue) {
@@ -2470,14 +2474,14 @@ void CommonCore::errorRespondDelayedMessages(const std::string& estring)
     }
 }
 
-void CommonCore::sendErrorToFederates(int error_code, const std::string &message)
+void CommonCore::sendErrorToFederates(int error_code, const std::string& message)
 {
     ActionMessage errorCom(CMD_LOCAL_ERROR);
     errorCom.source_id = global_broker_id_local;
     errorCom.messageID = error_code;
     errorCom.payload = message;
     loopFederates.apply([&errorCom](auto& fed) {
-        if ((fed) && (fed.state==operation_state::operating)) {
+        if ((fed) && (fed.state == operation_state::operating)) {
             fed->addAction(errorCom);
         }
     });
@@ -2584,9 +2588,8 @@ void CommonCore::processCommand(ActionMessage&& command)
                     m.source_id = global_broker_id_local;
                     transmit(parent_route_id, m);
                 }
-            }
-            else if (brokerState == broker_state_t::errored)
-            { //we are disconnecting in an error state
+            } else if (
+                brokerState == broker_state_t::errored) { //we are disconnecting in an error state
                 sendDisconnect();
                 ActionMessage m(CMD_DISCONNECT);
                 m.source_id = global_broker_id_local;
@@ -2665,12 +2668,12 @@ void CommonCore::processCommand(ActionMessage&& command)
                     if (fed == loopFederates.end()) {
                         return;
                     }
-                    fed->state=operation_state::disconnected;
+                    fed->state = operation_state::disconnected;
                     auto cstate = brokerState.load();
                     if ((!checkAndProcessDisconnect()) || (cstate < broker_state_t::operating)) {
                         command.setAction(CMD_DISCONNECT_FED);
                         transmit(parent_route_id, command);
-                        if (minFederateState()!=operation_state::disconnected) {
+                        if (minFederateState() != operation_state::disconnected) {
                             command.setAction(CMD_DISCONNECT_FED_ACK);
                             command.dest_id = command.source_id;
                             command.source_id = parent_broker_id;
@@ -2765,12 +2768,11 @@ void CommonCore::processCommand(ActionMessage&& command)
         case CMD_LOCAL_ERROR:
             if (command.dest_id == global_broker_id_local) {
                 if (command.source_id == higher_broker_id ||
-                    command.source_id == parent_broker_id || command.source_id==root_broker_id) {
-                    sendErrorToFederates(command.messageID,command.payload);
+                    command.source_id == parent_broker_id || command.source_id == root_broker_id) {
+                    sendErrorToFederates(command.messageID, command.payload);
                     setErrorState(command.messageID, command.payload);
-                    
-                }
-                else {
+
+                } else {
                     sendToLogger(
                         parent_broker_id,
                         log_level::error,
@@ -2779,15 +2781,12 @@ void CommonCore::processCommand(ActionMessage&& command)
                     auto fed = loopFederates.find(command.source_id);
                     fed->state = operation_state::error;
 
-                    if (hasTimeDependency)
-                    {
+                    if (hasTimeDependency) {
                         timeCoord->processTimeMessage(command);
                     }
                 }
-                if (terminate_on_error)
-                {
-                    if (brokerState != broker_state_t::errored)
-                    {
+                if (terminate_on_error) {
+                    if (brokerState != broker_state_t::errored) {
                         sendErrorToFederates(command.messageID, command.payload);
                         brokerState = broker_state_t::errored;
                     }
@@ -2796,14 +2795,10 @@ void CommonCore::processCommand(ActionMessage&& command)
                     command.dest_id = root_broker_id;
                     transmit(parent_route_id, std::move(command));
                 }
-            }
-            else {
-                if (command.dest_id == parent_broker_id)
-                {
-                    if (terminate_on_error)
-                    {
-                        if (brokerState != broker_state_t::errored)
-                        {
+            } else {
+                if (command.dest_id == parent_broker_id) {
+                    if (terminate_on_error) {
+                        if (brokerState != broker_state_t::errored) {
                             sendErrorToFederates(command.messageID, command.payload);
                             brokerState = broker_state_t::errored;
                         }
@@ -2812,10 +2807,7 @@ void CommonCore::processCommand(ActionMessage&& command)
                         command.dest_id = root_broker_id;
                         transmit(parent_route_id, std::move(command));
                         break;
-                    }
-                    else
-                    {
-
+                    } else {
                     }
                 }
                 routeMessage(command);
@@ -2824,8 +2816,7 @@ void CommonCore::processCommand(ActionMessage&& command)
         case CMD_GLOBAL_ERROR:
             setErrorState(command.messageID, command.payload);
             sendErrorToFederates(command.messageID, command.payload);
-            if (!(command.source_id == higher_broker_id || command.source_id == root_broker_id))
-            {
+            if (!(command.source_id == higher_broker_id || command.source_id == root_broker_id)) {
                 transmit(parent_route_id, std::move(command));
             }
             break;
@@ -3637,8 +3628,11 @@ void CommonCore::processCoreConfigureCommands(ActionMessage& cmd)
             }
         } break;
         default:
-            LOG_WARNING(global_broker_id_local, identifier,"unrecognized configure option passed to core ");
-                break;
+            LOG_WARNING(
+                global_broker_id_local,
+                identifier,
+                "unrecognized configure option passed to core ");
+            break;
     }
 }
 
