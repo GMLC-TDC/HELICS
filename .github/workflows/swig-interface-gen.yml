@@ -14,7 +14,7 @@ jobs:
       image: helics/buildenv:interface-gen
     
     steps:
-    - uses: actions/checkout@v1
+    - uses: actions/checkout@v2
     - name: Run SWIG
       run: |
         rm -rf interfaces/*/interface/*
