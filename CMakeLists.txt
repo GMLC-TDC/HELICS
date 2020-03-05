@@ -991,16 +991,16 @@ if(HELICS_ENABLE_PACKAGE_BUILD)
     # cmake-format: on
 
     set(CPACK_COMPONENTS_ALL
+        Runtime
         applications
         headers
         libs
-        Runtime
+        swig
         matlab
         python
         java
         octave
         csharp
-        swig
         cereal
     )
     if(WIN32)
@@ -1011,18 +1011,36 @@ if(HELICS_ENABLE_PACKAGE_BUILD)
         set(CPACK_RESOURCE_FILE_README "${HELICS_SOURCE_DIR}/README.md")
     endif(WIN32)
 
-    set(CPACK_COMPONENT_APPLICATIONS_DISPLAY_NAME "Application")
+    set(CPACK_COMPONENT_APPLICATIONS_DISPLAY_NAME "Applications")
     set(CPACK_COMPONENT_LIBS_DISPLAY_NAME "Libraries")
     set(CPACK_COMPONENT_HEADERS_DISPLAY_NAME "Headers")
     set(CPACK_COMPONENT_RUNTIME_DISPLAY_NAME "Runtime Libraries")
+    set(CPACK_COMPONENT_SWIG_DISPLAY_NAME "SWIG")
+    set(CPACK_COMPONENT_JAVA_DISPLAY_NAME "Java")
+    set(CPACK_COMPONENT_PYTHON_DISPLAY_NAME "Python")
+    set(CPACK_COMPONENT_MATLAB_DISPLAY_NAME "MATLAB")
+    set(CPACK_COMPONENT_OCTAVE_DISPLAY_NAME "Octave")
+    set(CPACK_COMPONENT_CSHARP_DISPLAY_NAME "C#")
 
+    set(CPACK_COMPONENT_GROUP_INTERFACES_DISPLAY_NAME "Interfaces")
+    set(CPACK_COMPONENT_GROUP_INTERFACES_DESCRIPTION
+        "Additional language interfaces for HELICS"
+    )
+    set(CPACK_COMPONENT_SWIG_GROUP interfaces)
     set(CPACK_COMPONENT_MATLAB_GROUP interfaces)
     set(CPACK_COMPONENT_JAVA_GROUP interfaces)
     set(CPACK_COMPONENT_OCTAVE_GROUP interfaces)
     set(CPACK_COMPONENT_PYTHON_GROUP interfaces)
     set(CPACK_COMPONENT_CSHARP_GROUP interfaces)
 
-    set(CPACK_COMPONENT_APPLICATION_DESCRIPTION
+    set(CPACK_COMPONENT_GROUP_DEVELOPMENT_DISPLAY_NAME "Development")
+    set(CPACK_COMPONENT_GROUP_DEVELOPMENT_DESCRIPTION
+        "Files needed to build applications that use HELICS"
+    )
+    set(CPACK_COMPONENT_HEADERS_GROUP development)
+    set(CPACK_COMPONENT_LIBS_GROUP development)
+
+    set(CPACK_COMPONENT_APPLICATIONS_DESCRIPTION
         "Executables and helper applications for HELICS"
     )
     set(CPACK_COMPONENT_LIBS_DESCRIPTION
@@ -1036,12 +1054,15 @@ if(HELICS_ENABLE_PACKAGE_BUILD)
         "cereal C++11 serialization library [no support for other language interfaces]"
     )
     set(CPACK_COMPONENT_SWIG_DESCRIPTION
-        "Basic swig interface files for HELICS for building 3rd party language interfaces"
+        "SWIG files needed for building 3rd party language interfaces (requires Development Headers)"
     )
-    set(CPACK_COMPONENT_GROUP_INTERFACES_DESCRIPTION
-        "additional language interfaces for HELICS"
-    )
+    set(CPACK_COMPONENT_PYTHON_DESCRIPTION "Python language interface")
+    set(CPACK_COMPONENT_JAVA_DESCRIPTION "Java language interface")
+    set(CPACK_COMPONENT_MATLAB_DESCRIPTION "MATLAB language interface")
+    set(CPACK_COMPONENT_OCTAVE_DESCRIPTION "Octave language interface")
+    set(CPACK_COMPONENT_CSHARP_DESCRIPTION "C# language interface")
 
+    set(CPACK_COMPONENT_SWIG_DEPENDS headers)
     set(CPACK_COMPONENT_LIBS_DEPENDS headers)
     set(CPACK_COMPONENT_RUNTIME_REQUIRED ON)
 
@@ -1061,6 +1082,10 @@ if(HELICS_ENABLE_PACKAGE_BUILD)
     endif()
 
     if(WIN32)
+        # title at the top of the installer
+        set(CPACK_NSIS_PACKAGE_NAME "HELICS v${HELICS_VERSION}")
+        # name shown in the add/remove program control panel
+        set(CPACK_NSIS_DISPLAY_NAME "HELICS v${HELICS_VERSION}")
         set(CPACK_PACKAGE_ICON "${HELICS_SOURCE_DIR}\\\\docs\\\\img\\\\HELICS.ico")
         set(CPACK_NSIS_MUI_ICON "${HELICS_SOURCE_DIR}/docs/img/HELICS.ico")
         set(CPACK_NSIS_INSTALL_ROOT "C:\\\\local")
@@ -1073,11 +1098,13 @@ if(HELICS_ENABLE_PACKAGE_BUILD)
         set(CPACK_NSIS_EXECUTABLES_DIRECTORY ${CMAKE_INSTALL_BINDIR})
         set(CPACK_NSIS_MENU_LINKS
             "https://www.github.com/GMLC-TDC/HELICS"
-            "HELICS Github"
+            "HELICS GitHub"
             "https://helics.readthedocs.io/en/latest"
-            "Helics Documentation"
+            "HELICS Documentation"
             "https://www.helics.org"
-            "Helics Web page"
+            "HELICS Website"
+            "https://gitter.im/GMLC-TDC/HELICS"
+            "HELICS Gitter Chat"
             "https://www.youtube.com/channel/UCPa81c4BVXEYXt2EShTzbcg"
             "TDC YouTube channel"
         )

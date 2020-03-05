@@ -19,6 +19,7 @@ Increased code coverage and additional bug fixes.
 -   The benchmark federates have been changed to use a common base benchmark federate class for more consistent behavior
 -   Switched to including netif as a git submodule
 -   Updated the GitHub actions (clang-format, swig interface updates, and release builds) to use actions/checkout@v2
+-   Cleaned up the Windows installer (better component names/descriptions and groups, link to Gitter, and require installing Headers to install SWIG)
 
 ### Fixed
 -   Issue with iterative requests that were not being honored if the federate was acting in isolation
