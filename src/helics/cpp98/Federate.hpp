@@ -504,7 +504,7 @@ class Federate {
 
     /** generate a local federate error
     @param error_code an error code to give to the error
-    @param error_string a string message associated wit the error
+    @param error_string a string message associated with the error
     */
     void localError(int error_code, const std::string& error_string)
     {
@@ -513,7 +513,7 @@ class Federate {
 
     /** generate a global error to terminate the federation
     @param error_code an error code to give to the error
-    @param error_string a string message associated wit the error
+    @param error_string a string message associated with the error
     */
     void globalError(int error_code, const std::string& error_string)
     {
