@@ -6708,6 +6708,82 @@ fail:
 }
 
 
+SWIGINTERN PyObject *_wrap_helicsFederateGlobalError(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  helics_federate arg1 = (helics_federate) 0 ;
+  int arg2 ;
+  char *arg3 = (char *) 0 ;
+  int res1 ;
+  int val2 ;
+  int ecode2 = 0 ;
+  int res3 ;
+  char *buf3 = 0 ;
+  int alloc3 = 0 ;
+  PyObject *swig_obj[3] ;
+  
+  if (!SWIG_Python_UnpackTuple(args, "helicsFederateGlobalError", 3, 3, swig_obj)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(swig_obj[0],SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateGlobalError" "', argument " "1"" of type '" "helics_federate""'"); 
+  }
+  ecode2 = SWIG_AsVal_int(swig_obj[1], &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "helicsFederateGlobalError" "', argument " "2"" of type '" "int""'");
+  } 
+  arg2 = (int)(val2);
+  res3 = SWIG_AsCharPtrAndSize(swig_obj[2], &buf3, NULL, &alloc3);
+  if (!SWIG_IsOK(res3)) {
+    SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "helicsFederateGlobalError" "', argument " "3"" of type '" "char const *""'");
+  }
+  arg3 = (char *)(buf3);
+  helicsFederateGlobalError(arg1,arg2,(char const *)arg3);
+  resultobj = SWIG_Py_Void();
+  if (alloc3 == SWIG_NEWOBJ) free((char*)buf3);
+  return resultobj;
+fail:
+  if (alloc3 == SWIG_NEWOBJ) free((char*)buf3);
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_helicsFederateLocalError(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  helics_federate arg1 = (helics_federate) 0 ;
+  int arg2 ;
+  char *arg3 = (char *) 0 ;
+  int res1 ;
+  int val2 ;
+  int ecode2 = 0 ;
+  int res3 ;
+  char *buf3 = 0 ;
+  int alloc3 = 0 ;
+  PyObject *swig_obj[3] ;
+  
+  if (!SWIG_Python_UnpackTuple(args, "helicsFederateLocalError", 3, 3, swig_obj)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(swig_obj[0],SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateLocalError" "', argument " "1"" of type '" "helics_federate""'"); 
+  }
+  ecode2 = SWIG_AsVal_int(swig_obj[1], &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "helicsFederateLocalError" "', argument " "2"" of type '" "int""'");
+  } 
+  arg2 = (int)(val2);
+  res3 = SWIG_AsCharPtrAndSize(swig_obj[2], &buf3, NULL, &alloc3);
+  if (!SWIG_IsOK(res3)) {
+    SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "helicsFederateLocalError" "', argument " "3"" of type '" "char const *""'");
+  }
+  arg3 = (char *)(buf3);
+  helicsFederateLocalError(arg1,arg2,(char const *)arg3);
+  resultobj = SWIG_Py_Void();
+  if (alloc3 == SWIG_NEWOBJ) free((char*)buf3);
+  return resultobj;
+fail:
+  if (alloc3 == SWIG_NEWOBJ) free((char*)buf3);
+  return NULL;
+}
+
+
 SWIGINTERN PyObject *_wrap_helicsFederateFinalize(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   helics_federate arg1 = (helics_federate) 0 ;
@@ -16095,6 +16171,27 @@ static PyMethodDef SwigMethods[] = {
 		"   :type file: string\n"
 		"   :param file: the name of a file to load the interfaces from either JSON, or TOML\n"
 		""},
+	 { "helicsFederateGlobalError", _wrap_helicsFederateGlobalError, METH_VARARGS, "\n"
+		" generate a global Error from a federate\n"
+		"A global error halts the co-simulation completely\n"
+		":type fed: void\n"
+		":param fed: the federate to create an error in\n"
+		":type error_code: int\n"
+		":param error_code: the integer code for the error\n"
+		":type error_string: string\n"
+		":param error_string: a string describing the error\n"
+		""},
+	 { "helicsFederateLocalError", _wrap_helicsFederateLocalError, METH_VARARGS, "\n"
+		" generate a local error in a federate\n"
+		"this will propagate through the co-simulation but not necessarily halt the co-simulation, it has a similar effect to finalize but does\n"
+		"allow some interaction with a core for a brief time.\n"
+		":type fed: void\n"
+		":param fed: the federate to create an error in\n"
+		":type error_code: int\n"
+		":param error_code: the integer code for the error\n"
+		":type error_string: string\n"
+		":param error_string: a string describing the error\n"
+		""},
 	 { "helicsFederateFinalize", _wrap_helicsFederateFinalize, METH_O, " finalize the federate this function halts all communication in the federate and disconnects it from the core"},
 	 { "helicsFederateFinalizeAsync", _wrap_helicsFederateFinalizeAsync, METH_O, " finalize the federate in an async call"},
 	 { "helicsFederateFinalizeComplete", _wrap_helicsFederateFinalizeComplete, METH_O, " complete the asynchronous finalize call"},
@@ -18647,6 +18744,7 @@ SWIG_init(void) {
   SWIG_Python_SetConstant(d, "helics_flag_delay_init_entry",SWIG_From_int((int)(helics_flag_delay_init_entry)));
   SWIG_Python_SetConstant(d, "helics_flag_enable_init_entry",SWIG_From_int((int)(helics_flag_enable_init_entry)));
   SWIG_Python_SetConstant(d, "helics_flag_ignore_time_mismatch_warnings",SWIG_From_int((int)(helics_flag_ignore_time_mismatch_warnings)));
+  SWIG_Python_SetConstant(d, "helics_flag_terminate_on_error",SWIG_From_int((int)(helics_flag_terminate_on_error)));
   SWIG_Python_SetConstant(d, "helics_log_level_no_print",SWIG_From_int((int)(helics_log_level_no_print)));
   SWIG_Python_SetConstant(d, "helics_log_level_error",SWIG_From_int((int)(helics_log_level_error)));
   SWIG_Python_SetConstant(d, "helics_log_level_warning",SWIG_From_int((int)(helics_log_level_warning)));
@@ -18669,6 +18767,7 @@ SWIG_init(void) {
   SWIG_Python_SetConstant(d, "helics_error_execution_failure",SWIG_From_int((int)(helics_error_execution_failure)));
   SWIG_Python_SetConstant(d, "helics_error_insufficient_space",SWIG_From_int((int)(helics_error_insufficient_space)));
   SWIG_Python_SetConstant(d, "helics_error_other",SWIG_From_int((int)(helics_error_other)));
+  SWIG_Python_SetConstant(d, "helics_error_fatal",SWIG_From_int((int)(helics_error_fatal)));
   SWIG_Python_SetConstant(d, "helics_error_external_type",SWIG_From_int((int)(helics_error_external_type)));
   SWIG_Python_SetConstant(d, "helics_property_time_delta",SWIG_From_int((int)(helics_property_time_delta)));
   SWIG_Python_SetConstant(d, "helics_property_time_period",SWIG_From_int((int)(helics_property_time_period)));

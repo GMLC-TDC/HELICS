@@ -725,6 +725,18 @@ SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_helics_1flag_1ignore_1tim
 }
 
 
+SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_helics_1flag_1terminate_1on_1error_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  helics_federate_flags result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (helics_federate_flags)helics_flag_terminate_on_error;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
 SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_helics_1log_1level_1no_1print_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
   helics_log_levels result;
@@ -984,6 +996,18 @@ SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_helics_1error_1other_1get
   (void)jenv;
   (void)jcls;
   result = (helics_error_types)helics_error_other;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_helics_1error_1fatal_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  helics_error_types result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (helics_error_types)helics_error_fatal;
   jresult = (jint)result; 
   return jresult;
 }
@@ -3561,6 +3585,44 @@ SWIGEXPORT void JNICALL Java_com_java_helics_helicsJNI_helicsFederateRegisterInt
       (*jenv)->ThrowNew(jenv, clazz, arg3->message);
     }
   }
+}
+
+
+SWIGEXPORT void JNICALL Java_com_java_helics_helicsJNI_helicsFederateGlobalError(JNIEnv *jenv, jclass jcls, jlong jarg1, jint jarg2, jstring jarg3) {
+  helics_federate arg1 = (helics_federate) 0 ;
+  int arg2 ;
+  char *arg3 = (char *) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = *(helics_federate *)&jarg1; 
+  arg2 = (int)jarg2; 
+  arg3 = 0;
+  if (jarg3) {
+    arg3 = (char *)(*jenv)->GetStringUTFChars(jenv, jarg3, 0);
+    if (!arg3) return ;
+  }
+  helicsFederateGlobalError(arg1,arg2,(char const *)arg3);
+  if (arg3) (*jenv)->ReleaseStringUTFChars(jenv, jarg3, (const char *)arg3);
+}
+
+
+SWIGEXPORT void JNICALL Java_com_java_helics_helicsJNI_helicsFederateLocalError(JNIEnv *jenv, jclass jcls, jlong jarg1, jint jarg2, jstring jarg3) {
+  helics_federate arg1 = (helics_federate) 0 ;
+  int arg2 ;
+  char *arg3 = (char *) 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = *(helics_federate *)&jarg1; 
+  arg2 = (int)jarg2; 
+  arg3 = 0;
+  if (jarg3) {
+    arg3 = (char *)(*jenv)->GetStringUTFChars(jenv, jarg3, 0);
+    if (!arg3) return ;
+  }
+  helicsFederateLocalError(arg1,arg2,(char const *)arg3);
+  if (arg3) (*jenv)->ReleaseStringUTFChars(jenv, jarg3, (const char *)arg3);
 }
 
 
