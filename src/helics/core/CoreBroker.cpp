@@ -2362,6 +2362,55 @@ std::string CoreBroker::generateQueryAnswer(const std::string& request)
     if (request == "brokers") {
         return generateStringVector(_brokers, [](auto& brk) { return brk.name; });
     }
+    if (request == "current_state")
+    {
+        Json::Value base;
+        base["name"] = getIdentifier();
+        base["id"] = global_broker_id_local.baseValue();
+        base["state"] = brokerStateName(brokerState.load());
+        base["federates"] = Json::arrayValue;
+        for (auto &fed : _federates)
+        {
+            Json::Value fedstate;
+            fedstate[fed.name] = (fed.isDisconnected) ? std::string("disconnected") : std::string("connected");
+            
+            base["federates"].append(std::move(fedstate));
+        }
+        base["brokers"] = Json::arrayValue;
+        for (auto &brk : _brokers)
+        {
+            Json::Value brkstate;
+            brkstate[brk.name] = (brk.isDisconnected) ? std::string("disconnected") : std::string("connected");
+            base["brokers"].append(std::move(brkstate));
+        }
+        return generateJsonString(base);
+    }
+    if (request == "current_time")
+    {
+        if (hasTimeDependency)
+        {
+            return timeCoord->printTimeStatus();
+        }
+        else
+        {
+            return "#na";
+        }
+    }
+    if (request == "current_time")
+    {
+        if (hasTimeDependency)
+        {
+            return timeCoord->printTimeStatus();
+        }
+        else
+        {
+            return "#na";
+        }
+    }
+    if (request == "global_time")
+    {
+       
+    }
     if (request == "inputs") {
         return generateStringVector_if(
             handles,
