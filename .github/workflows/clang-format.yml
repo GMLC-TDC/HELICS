@@ -33,10 +33,10 @@ jobs:
 #        script: |
 #          github.issues.createComment({...context.issue, body: 'Okay, commit https://github.com/${{ github.repository }}/commit/${{ github.sha }} is being formatted. A PR with the changes will be open soon! :sunglasses:'})
     - name: Checkout event Ref
-      uses: actions/checkout@v1
+      uses: actions/checkout@v2
       if: github.event_name != 'pull_request'
     - name: Checkout PR Head Ref
-      uses: actions/checkout@v1
+      uses: actions/checkout@v2
       if: github.event_name == 'pull_request'
       with:
         repository: ${{ github.event.pull_request.head.repo.full_name }}

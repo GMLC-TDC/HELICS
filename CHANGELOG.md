@@ -18,6 +18,7 @@ Increased code coverage and additional bug fixes.
 -   Configuration of flags and targets for interfaces in json and toml files can be done in multiple sections
 -   The benchmark federates have been changed to use a common base benchmark federate class for more consistent behavior
 -   Switched to including netif as a git submodule
+-   Updated the GitHub actions (clang-format, swig interface updates, and release builds) to use actions/checkout@v2
 -   Cleaned up the Windows installer (better component names/descriptions and groups, link to Gitter, and require installing Headers to install SWIG)
 
 ### Fixed
@@ -34,6 +35,7 @@ Increased code coverage and additional bug fixes.
 -   Standalone benchmark federates for use in multinode benchmark runs
 -   A FreeBSD 12.1 CI build using Cirrus CI
 -   Sending an event from GitHub Actions release builds to trigger updating additional HELICS packages when a new release is made
+-   A 32-bit Windows zip install archive for releases
 
 ### Deprecated
 

@@ -15,7 +15,7 @@ jobs:
     runs-on: ubuntu-latest
     if: github.event.action == 'published'
     steps:
-    - uses: actions/checkout@v1
+    - uses: actions/checkout@v2
       
     - name: Create archive
       # Creates the archive then moves it to an artifact subfolder
@@ -51,11 +51,11 @@ jobs:
             msvc_ver: 'msvc2019'
     steps:
     - name: Checkout event ref
-      uses: actions/checkout@v1
+      uses: actions/checkout@v2
       if: github.event.action == 'published'
     
     - name: Checkout develop branch
-      uses: actions/checkout@v1
+      uses: actions/checkout@v2
       with:
         ref: develop
       if: github.event_name == 'schedule'
@@ -98,7 +98,7 @@ jobs:
     name: Build ${{ matrix.os }} ${{ matrix.arch }} ${{ matrix.cpack_gen }} Installer
     strategy:
       matrix:
-        id: [windows-x64, macos-x64-zip, linux-x64]
+        id: [windows-x64, windows-x86, macos-x64, linux-x64]
         include:
           - id: windows-x64
             os: windows-latest
@@ -106,7 +106,13 @@ jobs:
             cpack_gen: NSIS;ZIP
             cmake_gen: 'Visual Studio 16 2019'
             msvc_ver: 'msvc2019'
-          - id: macos-x64-zip
+          - id: windows-x86
+            os: windows-latest
+            arch: x86
+            cpack_gen: ZIP
+            cmake_gen: 'Visual Studio 16 2019'
+            msvc_ver: 'msvc2019'
+          - id: macos-x64
             os: macos-latest
             arch: x64
             cpack_gen: ZIP
@@ -118,11 +124,11 @@ jobs:
 
     steps:
     - name: Checkout event ref
-      uses: actions/checkout@v1
+      uses: actions/checkout@v2
       if: github.event.action == 'published'
     
     - name: Checkout develop branch
-      uses: actions/checkout@v1
+      uses: actions/checkout@v2
       with:
         ref: develop
       if: github.event_name == 'schedule'
@@ -202,11 +208,11 @@ jobs:
 
     steps:
     - name: Checkout event ref
-      uses: actions/checkout@v1
+      uses: actions/checkout@v2
       if: github.event.action == 'published'
     
     - name: Checkout develop branch
-      uses: actions/checkout@v1
+      uses: actions/checkout@v2
       with:
         ref: develop
       if: github.event_name == 'schedule'
@@ -257,7 +263,7 @@ jobs:
     runs-on: ubuntu-latest
     if: github.event.action == 'published'
     steps:
-    - uses: actions/checkout@v1
+    - uses: actions/checkout@v2
       
     - name: Get all submodules archive
       uses: actions/download-artifact@v1
