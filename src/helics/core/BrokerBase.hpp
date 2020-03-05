@@ -44,6 +44,7 @@ class BrokerBase {
     Time tickTimer{5.0}; //!< the length of each heartbeat tick
     Time timeout{30.0}; //!< timeout to wait to establish a broker connection before giving up
     Time networkTimeout{-1.0}; //!< timeout to establish a socket connection before giving up
+    Time errorDelay{10.0}; //!< time to delay before terminating after error state
     std::string identifier; //!< an identifier for the broker
     std::string
         brokerKey; //!< a key that all joining federates must have to connect if empty no key is required
@@ -60,6 +61,8 @@ class BrokerBase {
         false}; //!< flag indicating that no further message should be processed
     bool restrictive_time_policy{
         false}; //!< flag indicating the broker should use a conservative time policy
+    bool terminate_on_error{
+        false}; //!< flag indicating that the federation should halt on any error
   private:
     std::atomic<bool> mainLoopIsRunning{
         false}; //!< flag indicating that the main processing loop is running
@@ -101,7 +104,8 @@ class BrokerBase {
     bool forwardTick{
         false}; //!< indicator that ticks should be forwarded to the command processor regardless
     bool no_ping{false}; //!< indicator that the broker is not very responsive to ping requests
-
+    decltype(std::chrono::steady_clock::now())
+        errorTimeStart; //!< time when the error condition started related to the errorDelay
     std::atomic<int> errorCode{0}; //!< storage for last error code
     std::string lastErrorString; //!< storage for last error string
 

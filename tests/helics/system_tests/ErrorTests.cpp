@@ -189,6 +189,118 @@ TEST_F(error_tests, duplicate_publication_names2)
     broker->disconnect();
 }
 
+TEST_F(error_tests, duplicate_publication_names_auto_terminate)
+{
+    auto broker = AddBroker("test", "-f 2 --error_timeout=0");
+    AddFederates<helics::ValueFederate>("test", 1, broker, 1.0, "fed");
+    AddFederates<helics::ValueFederate>("test", 1, broker, 1.0, "fed");
+
+    auto fed1 = GetFederateAs<helics::ValueFederate>(0);
+    auto fed2 = GetFederateAs<helics::ValueFederate>(1);
+
+    fed1->setFlagOption(helics_flag_terminate_on_error);
+    fed2->setFlagOption(helics_flag_terminate_on_error);
+    fed1->registerGlobalPublication("testkey", "");
+    fed1->enterInitializingModeAsync();
+
+    fed2->registerGlobalPublication("testkey", "");
+
+    bool gotException = false;
+    try {
+        fed2->enterInitializingMode();
+    }
+    catch (const helics::RegistrationFailure&) {
+        gotException = true;
+        EXPECT_TRUE(fed2->getCurrentMode() == helics::Federate::modes::error);
+    }
+
+    try {
+        fed1->enterInitializingModeComplete();
+    }
+    catch (const helics::RegistrationFailure&) {
+        gotException = true;
+        EXPECT_TRUE(fed1->getCurrentMode() == helics::Federate::modes::error);
+    }
+    EXPECT_TRUE(gotException);
+
+    broker->waitForDisconnect();
+}
+
+TEST_F(error_tests, duplicate_publication_names_auto_terminate_core)
+{
+    auto broker = AddBroker("test", "-f 2 --error_timeout=0");
+    AddFederates<helics::ValueFederate>("test", 1, broker, 1.0, "fed");
+    AddFederates<helics::ValueFederate>("test", 1, broker, 1.0, "fed");
+
+    auto fed1 = GetFederateAs<helics::ValueFederate>(0);
+    auto fed2 = GetFederateAs<helics::ValueFederate>(1);
+
+    fed1->getCorePointer()->setFlagOption(
+        helics::local_core_id, helics_flag_terminate_on_error, true);
+    fed2->getCorePointer()->setFlagOption(
+        helics::local_core_id, helics_flag_terminate_on_error, true);
+
+    fed1->registerGlobalPublication("testkey", "");
+    fed1->enterInitializingModeAsync();
+
+    fed2->registerGlobalPublication("testkey", "");
+
+    bool gotException = false;
+    try {
+        fed2->enterInitializingMode();
+    }
+    catch (const helics::RegistrationFailure&) {
+        gotException = true;
+        EXPECT_TRUE(fed2->getCurrentMode() == helics::Federate::modes::error);
+    }
+
+    try {
+        fed1->enterInitializingModeComplete();
+    }
+    catch (const helics::RegistrationFailure&) {
+        gotException = true;
+        EXPECT_TRUE(fed1->getCurrentMode() == helics::Federate::modes::error);
+    }
+    EXPECT_TRUE(gotException);
+
+    broker->waitForDisconnect();
+}
+
+TEST_F(error_tests, duplicate_publication_names_auto_terminate_broker)
+{
+    auto broker = AddBroker("test", "-f 2 --error_timeout=0 --terminate_on_error");
+    AddFederates<helics::ValueFederate>("test", 1, broker, 1.0, "fed");
+    AddFederates<helics::ValueFederate>("test", 1, broker, 1.0, "fed");
+
+    auto fed1 = GetFederateAs<helics::ValueFederate>(0);
+    auto fed2 = GetFederateAs<helics::ValueFederate>(1);
+
+    fed1->registerGlobalPublication("testkey", "");
+    fed1->enterInitializingModeAsync();
+
+    fed2->registerGlobalPublication("testkey", "");
+
+    bool gotException = false;
+    try {
+        fed2->enterInitializingMode();
+    }
+    catch (const helics::HelicsException&) {
+        gotException = true;
+        EXPECT_TRUE(fed2->getCurrentMode() == helics::Federate::modes::error);
+    }
+
+    try {
+        fed1->enterInitializingModeComplete();
+    }
+    catch (const helics::HelicsException&) {
+        gotException = true;
+        EXPECT_TRUE(fed1->getCurrentMode() == helics::Federate::modes::error);
+    }
+    EXPECT_TRUE(gotException);
+
+    broker->waitForDisconnect();
+}
+
 TEST_F(error_tests, duplicate_publication_names3)
 {
     auto broker = AddBroker("test", 1);
@@ -324,15 +436,15 @@ TEST_F(error_tests, missing_required_pub_with_default)
     EXPECT_THROW(fed2->enterInitializingMode(), helics::ConnectionFailure);
     // this is definitely not how you would normally do this,
     // we are calling finalize while an async call is active, this should result in finalize throwing since it was
-    // a global connection failure
-    EXPECT_THROW(fed1->finalize(), helics::ConnectionFailure);
+    // a global connection failure,  depending on how things go this will be a registration failure or a connection failure
+    EXPECT_THROW(fed1->finalize(), helics::HelicsException);
     fed2->finalize();
     broker->disconnect();
 }
 
 TEST_F(error_tests, mismatched_units)
 {
-    auto broker = AddBroker("test", 2);
+    auto broker = AddBroker("test", 3);
 
     AddFederates<helics::ValueFederate>("test", 3, broker, 1.0, "fed");
 
@@ -354,6 +466,35 @@ TEST_F(error_tests, mismatched_units)
     fed2->finalize();
     fed3->finalize();
     broker->disconnect();
+}
+
+TEST_F(error_tests, mismatched_units_terminate_on_error)
+{
+    auto broker = AddBroker("test", "-f 3 --error_timeout=0");
+
+    AddFederates<helics::ValueFederate>("test", 3, broker, 1.0, "fed");
+
+    auto fed1 = GetFederateAs<helics::ValueFederate>(0);
+    auto fed2 = GetFederateAs<helics::ValueFederate>(1);
+    auto fed3 = GetFederateAs<helics::ValueFederate>(2);
+
+    fed1->registerGlobalPublication("t1", "double", "V");
+    fed2->setFlagOption(helics_flag_terminate_on_error);
+    fed2->registerSubscription("t1", "m");
+    auto& sub = fed3->registerSubscription("t1", "m");
+    sub.setOption(helics::defs::options::ignore_unit_mismatch);
+    fed1->enterExecutingModeAsync();
+    fed2->enterExecutingModeAsync();
+    try {
+        fed3->enterExecutingMode();
+        fed1->enterExecutingModeComplete();
+    }
+    catch (const helics::HelicsException&) {
+        ;
+    }
+    EXPECT_THROW(fed2->enterExecutingModeComplete(), helics::ConnectionFailure);
+
+    EXPECT_TRUE(broker->waitForDisconnect(std::chrono::milliseconds(500)));
 }
 
 class error_tests_type: public ::testing::TestWithParam<const char*>, public FederateTestFixture {

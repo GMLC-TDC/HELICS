@@ -166,6 +166,13 @@ class HELICS_CXX_EXPORT Federate {
     /** specify the simulator had an error with error code and message
      */
     void error(int errorcode, const std::string& message);
+    /** specify the simulator had a local error with error code and message
+    */
+    void localError(int errorcode, const std::string& message);
+
+    /** specify the simulator had a local error with error code and message
+    */
+    void globalError(int errorcode, const std::string& message);
 
     /** specify a separator to use for naming separation between the federate name and the interface name
      setSeparator('.') will result in future registrations of local endpoints such as fedName.endpoint
@@ -557,6 +564,8 @@ class HELICS_CXX_EXPORT Federate {
     {
         logMessage(helics_log_level_data, message);
     }
+    /** call to complete async operation with no output*/
+    void completeOperation();
 
   private:
     /** register filter interfaces defined in  file or string

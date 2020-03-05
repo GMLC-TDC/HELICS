@@ -502,6 +502,24 @@ class Federate {
         helicsFederateSetGlobal(fed, valueName.c_str(), value.c_str(), hThrowOnError());
     }
 
+    /** generate a local federate error
+    @param error_code an error code to give to the error
+    @param error_string a string message associated with the error
+    */
+    void localError(int error_code, const std::string& error_string)
+    {
+        helicsFederateLocalError(fed, error_code, error_string.c_str());
+    }
+
+    /** generate a global error to terminate the federation
+    @param error_code an error code to give to the error
+    @param error_string a string message associated with the error
+    */
+    void globalError(int error_code, const std::string& error_string)
+    {
+        helicsFederateGlobalError(fed, error_code, error_string.c_str());
+    }
+
     /** log an error message*/
     void logErrorMessage(const std::string& message)
     {

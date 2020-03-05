@@ -88,7 +88,8 @@ class FederateState {
     bool iterating{false}; //!< the federate is iterating at a time step
     bool timeGranted_mode{
         false}; //!< indicator if the federate is in a granted state or a requested state waiting to grant
-    // 1 byte free
+    bool terminate_on_error{
+        false}; //!< indicator that if the federate encounters a configuration error it should cause a co-simulation abort
     int logLevel{1}; //!< the level of logging used in the federate
 
     //   std::vector<ActionMessage> messLog;
@@ -213,7 +214,7 @@ class FederateState {
     /** locks the processing so FederateState can be used with lock_guard*/
     void lock() { sleeplock(); }
 
-    /** trys to lock the processing return true if successful and false if not*/
+    /** tries to lock the processing return true if successful and false if not*/
     bool try_lock() const { return !processing.test_and_set(); }
     /** unlocks the processing*/
     void unlock() const { processing.clear(std::memory_order_release); }
@@ -227,7 +228,7 @@ class FederateState {
     4. a break event is encountered
     @return a convergence state value with an indicator of return reason and state of convergence
     */
-    message_processing_result processQueue();
+    message_processing_result processQueue() noexcept;
 
     /** process the federate delayed Message queue until a returnable event or it is empty
     @details processQueue will process messages until one of 3 things occur
@@ -237,7 +238,7 @@ class FederateState {
     4. a break event is encountered
     @return a convergence state value with an indicator of return reason and state of convergence
     */
-    message_processing_result processDelayQueue();
+    message_processing_result processDelayQueue() noexcept;
     /** process a single message
     @return a convergence state value with an indicator of return reason and state of convergence
     */

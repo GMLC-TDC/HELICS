@@ -235,6 +235,9 @@ inline bool isTimingCommand(const ActionMessage& command) noexcept
         case CMD_EXEC_REQUEST:
         case CMD_PRIORITY_DISCONNECT:
         case CMD_TERMINATE_IMMEDIATELY:
+        case CMD_ERROR:
+        case CMD_LOCAL_ERROR:
+        case CMD_GLOBAL_ERROR:
             return true;
         default:
             return false;
@@ -279,6 +282,19 @@ inline bool isDisconnectCommand(const ActionMessage& command) noexcept
             return true;
         case CMD_TIME_GRANT:
             return (command.actionTime == Time::maxVal());
+        default:
+            return false;
+    }
+}
+
+/** check if a command is a disconnect command*/
+inline bool isErrorCommand(const ActionMessage& command) noexcept
+{
+    switch (command.action()) {
+        case CMD_ERROR:
+        case CMD_LOCAL_ERROR:
+        case CMD_GLOBAL_ERROR:
+            return true;
         default:
             return false;
     }

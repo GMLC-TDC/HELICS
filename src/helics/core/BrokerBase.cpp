@@ -137,13 +137,16 @@ std::shared_ptr<helicsCLI11App> BrokerBase::generateBaseCLI()
         "--conservative_time_policy,--restrictive_time_policy",
         restrictive_time_policy,
         "specify that a broker should use a conservative time policy in the time coordinator");
+    hApp->add_flag(
+        "--terminate_on_error,--halt_on_error",
+        terminate_on_error,
+        "specify that a broker should cause the federation to terminate on an error");
     auto logging_group =
         hApp->add_option_group("logging", "Options related to file and message logging");
     logging_group->option_defaults()->ignore_underscore();
     logging_group->add_flag(
         "--force_logging_flush", forceLoggingFlush, "flush the log after every message");
-    logging_group->add_option("--logfile", logFile, "the file to log the messages to")
-        ->ignore_underscore();
+    logging_group->add_option("--logfile", logFile, "the file to log the messages to");
     logging_group
         ->add_option_function<int>(
             "--loglevel,--log-level",
@@ -172,6 +175,7 @@ std::shared_ptr<helicsCLI11App> BrokerBase::generateBaseCLI()
 
     auto timeout_group =
         hApp->add_option_group("timeouts", "Options related to network and process timeouts");
+    timeout_group->option_defaults()->ignore_underscore()->ignore_case();
     timeout_group->add_option(
         "--tick",
         tickTimer,
@@ -192,6 +196,13 @@ std::shared_ptr<helicsCLI11App> BrokerBase::generateBaseCLI()
         networkTimeout,
         "time to wait for a broker connection default unit is in ms(can also be entered as a time "
         "like '10s' or '45ms') ");
+    timeout_group
+        ->add_option(
+            "--errordelay,--errortimeout",
+            errorDelay,
+            "time to wait after an error state before terminating "
+            "like '10s' or '45ms') ")
+        ->default_str(std::to_string(static_cast<double>(errorDelay)));
 
     return hApp;
 }
@@ -283,7 +294,18 @@ void BrokerBase::setErrorState(int eCode, const std::string& estring)
 {
     lastErrorString = estring;
     errorCode = eCode;
-    brokerState.store(broker_state_t::errored);
+    if (brokerState.load() != broker_state_t::errored) {
+        brokerState.store(broker_state_t::errored);
+        if (errorDelay <= timeZero) {
+            ActionMessage halt(CMD_USER_DISCONNECT, global_id.load(), global_id.load());
+            addActionMessage(halt);
+        } else {
+            errorTimeStart = std::chrono::steady_clock::now();
+            ActionMessage(CMD_ERROR_CHECK, global_id.load(), global_id.load());
+        }
+    }
+
+    sendToLogger(global_id.load(), helics_log_level_error, identifier, estring);
 }
 
 void BrokerBase::setLoggingFile(const std::string& lfile)
@@ -497,6 +519,30 @@ void BrokerBase::queueProcessingLoop()
                     contextLoop = serv->startContextLoop();
 #endif
                 }
+                // deal with error state timeout
+                if (brokerState.load() == broker_state_t::errored) {
+                    auto ctime = std::chrono::steady_clock::now();
+                    auto td = ctime - errorTimeStart;
+                    if (td >= errorDelay.to_ms()) {
+                        command.setAction(CMD_USER_DISCONNECT);
+                        addActionMessage(command);
+                    } else {
+#ifndef HELICS_DISABLE_ASIO
+                        if (!disable_timer) {
+                            ticktimer.expires_at(errorTimeStart + errorDelay.to_ns());
+                            active = std::make_pair(true, true);
+                            ticktimer.async_wait(timerCallback);
+                        } else {
+                            command.setAction(CMD_ERROR_CHECK);
+                            addActionMessage(command);
+                        }
+#else
+                        command.setAction(CMD_ERROR_CHECK);
+                        addActionMessage(command);
+#endif
+                    }
+                    break;
+                }
                 if (messagesSinceLastTick == 0 || forwardTick) {
 #ifndef DISABLE_TICK
                     processCommand(std::move(command));
@@ -511,6 +557,26 @@ void BrokerBase::queueProcessingLoop()
                     ticktimer.async_wait(timerCallback);
                 }
 #endif
+                break;
+            case CMD_ERROR_CHECK:
+                if (brokerState.load() == broker_state_t::errored) {
+                    auto ctime = std::chrono::steady_clock::now();
+                    auto td = ctime - errorTimeStart;
+                    if (td > errorDelay.to_ms()) {
+                        command.setAction(CMD_USER_DISCONNECT);
+                        addActionMessage(command);
+                    } else {
+#ifndef HELICS_DISABLE_ASIO
+                        if (tickTimer > td * 2 || disable_timer) {
+                            std::this_thread::sleep_for(std::chrono::milliseconds(200));
+                            addActionMessage(command);
+                        }
+#else
+                        std::this_thread::sleep_for(std::chrono::milliseconds(200));
+                        addActionMessage(command);
+#endif
+                    }
+                }
                 break;
             case CMD_PING:
                 // ping is processed normally but doesn't count as an actual message for timeout purposes unless it
@@ -572,6 +638,7 @@ action_message_def::action_t BrokerBase::commandProcessor(ActionMessage& command
         case CMD_STOP:
         case CMD_TICK:
         case CMD_PING:
+        case CMD_ERROR_CHECK:
             return command.action();
         case CMD_MULTI_MESSAGE:
             for (int ii = 0; ii < command.counter; ++ii) {

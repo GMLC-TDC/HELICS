@@ -24,6 +24,7 @@ class DependencyInfo {
         time_granted = 3,
         time_requested_iterative = 4,
         time_requested = 5,
+        error = 7
     };
 
     global_federate_id fedID{}; //!< identifier for the dependency

@@ -116,7 +116,9 @@ typedef enum {
     /** used to clear the HELICS_DELAY_INIT_ENTRY flag in cores*/
     helics_flag_enable_init_entry = 47,
     /** used to not display warnings on mismatched requested times*/
-    helics_flag_ignore_time_mismatch_warnings = 67
+    helics_flag_ignore_time_mismatch_warnings = 67,
+    /** specify that a federate error should terminate the federation*/
+    helics_flag_terminate_on_error = 72
 } helics_federate_flags;
 
 /** log level definitions
@@ -164,6 +166,7 @@ typedef enum {
     helics_error_insufficient_space =
         (-18), /*!< insufficient space is available to store requested data*/
     helics_error_other = -101, /*!< the function produced a helics error of some other type */
+    helics_error_fatal = -404, /*!< global fatal error for federation */
     helics_error_external_type = -203 /*!< an unknown non-helics error was produced*/
 } helics_error_types;
 

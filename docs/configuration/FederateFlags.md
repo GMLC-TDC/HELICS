@@ -32,3 +32,7 @@ This applies to Input interface.  If enabled this flag tells the inputs to check
 
 If specified on a federate it indicates the federate may be slow in responding, and to not disconnect the federate if things are slow.
 If applied to a core or broker, it is indicative that the broker doesn't respond to internal pings quickly so they cannot be used as a mechanism for timeout.  For federates this option doesn't do much but its role will likely be expanded as more robust timeout and coordination mechanics are developed.  
+
+#### terminate on error
+
+If the `terminate_on_error` flag is set then a federate encountering an internal error will trigger a global error and cause the entire federation to abort.  If the flag is not set then errors will only be local.  Errors of this nature are typically the result of configuration errors.  For example having a required publication that is not used or incompatible units or types on publications and subscriptions.  
