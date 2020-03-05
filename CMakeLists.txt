@@ -1046,12 +1046,18 @@ if(HELICS_ENABLE_PACKAGE_BUILD)
         "Headers for linking and compiling with HELICS"
     )
     set(CPACK_COMPONENT_RUNTIME_DESCRIPTION "Runtime libraries for HELICS")
+    set(CPACK_COMPONENT_APPLICATION_DESCRIPTION "HELICS applications (helics_broker, helics_apps, etc)")
     set(CPACK_COMPONENT_CEREAL_DESCRIPTION
         "cereal C++11 serialization library [no support for other language interfaces]"
     )
     set(CPACK_COMPONENT_SWIG_DESCRIPTION
-        "Basic swig interface files for HELICS for building 3rd party language interfaces"
+        "Basic SWIG interface files for building 3rd party language interfaces (requires Development Headers)"
     )
+    set(CPACK_COMPONENT_PYTHON_DESCRIPTION "Python language interface")
+    set(CPACK_COMPONENT_JAVA_DESCRIPTION "Java language interface")
+    set(CPACK_COMPONENT_MATLAB_DESCRIPTION "MATLAB language interface")
+    set(CPACK_COMPONENT_OCTAVE_DESCRIPTION "Octave language interface")
+    set(CPACK_COMPONENT_CSHARP_DESCRIPTION "C# language interface")
 
     set(CPACK_COMPONENT_SWIG_DEPENDS headers)
     set(CPACK_COMPONENT_LIBS_DEPENDS headers)
