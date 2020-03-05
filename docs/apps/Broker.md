@@ -112,13 +112,15 @@ configuration:
                          connected (ignored in cores)
   --identifier arg       name of the core/broker
   --tick arg             number of milliseconds per tick counter if there is no
-                         broker communication for 2 ticks then               secondary actions are taken  (can also be           entered as a time like '10s' or '45ms')
+                         broker communication for 2 ticks then secondary actions
+                         are taken (can also be entered as a time like '10s' or '45ms')
   --dumplog              capture a record of all messages and dump a complete log to file or console on termination
-  --terminate_on_error   Specify that the co-simulation should                             terminate if any error occurs
+  --terminate_on_error   Specify that the co-simulation should terminate if any error occurs
   --timeout arg          milliseconds to wait for a broker connection (can also
                          be entered as a time like '10s' or '45ms')
 
-  --error_timeout arg    milliseconds to wait before disconnecting   after an error (can also be entered as a time like '10s' or '45ms')
+  --error_timeout arg    milliseconds to wait before disconnecting after an error
+                         (can also be entered as a time like '10s' or '45ms')
 
 ```
 

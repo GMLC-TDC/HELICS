@@ -114,7 +114,7 @@ All Core/Broker Types
 
 --terminate_on_error::
         Specify that a broker should treat all errors as global errors and terminate
-		the co-simulation if an error is encountered
+        the co-simulation if an error is encountered
 
 --restrictive_time_policy::
 --conservative_time_policy::
