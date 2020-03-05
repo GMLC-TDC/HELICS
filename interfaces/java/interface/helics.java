@@ -695,6 +695,29 @@ public class helics {
   }
 
   /**
+   *  generate a global Error from a federate<br>
+   * A global error halts the co-simulation completely<br>
+   * @param fed the federate to create an error in<br>
+   * @param error_code the integer code for the error<br>
+   * @param error_string a string describing the error
+   */
+  public static void helicsFederateGlobalError(SWIGTYPE_p_void fed, int error_code, String error_string) {
+    helicsJNI.helicsFederateGlobalError(SWIGTYPE_p_void.getCPtr(fed), error_code, error_string);
+  }
+
+  /**
+   *  generate a local error in a federate<br>
+   * this will propagate through the co-simulation but not necessarily halt the co-simulation, it has a similar effect to finalize but does<br>
+   * allow some interaction with a core for a brief time. <br>
+   * @param fed the federate to create an error in<br>
+   * @param error_code the integer code for the error<br>
+   * @param error_string a string describing the error
+   */
+  public static void helicsFederateLocalError(SWIGTYPE_p_void fed, int error_code, String error_string) {
+    helicsJNI.helicsFederateLocalError(SWIGTYPE_p_void.getCPtr(fed), error_code, error_string);
+  }
+
+  /**
    *  finalize the federate this function halts all communication in the federate and disconnects it from the core
    */
   public static void helicsFederateFinalize(SWIGTYPE_p_void fed) {

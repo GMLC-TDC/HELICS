@@ -65,6 +65,10 @@ public final class helics_error_types {
    */
   public final static helics_error_types helics_error_other = new helics_error_types("helics_error_other", helicsJNI.helics_error_other_get());
   /**
+   *  global fatal error for federation 
+   */
+  public final static helics_error_types helics_error_fatal = new helics_error_types("helics_error_fatal", helicsJNI.helics_error_fatal_get());
+  /**
    *  an unknown non-helics error was produced
    */
   public final static helics_error_types helics_error_external_type = new helics_error_types("helics_error_external_type", helicsJNI.helics_error_external_type_get());
@@ -103,7 +107,7 @@ public final class helics_error_types {
     swigNext = this.swigValue+1;
   }
 
-  private static helics_error_types[] swigValues = { helics_ok, helics_error_registration_failure, helics_error_connection_failure, helics_error_invalid_object, helics_error_invalid_argument, helics_error_discard, helics_error_system_failure, helics_warning, helics_error_invalid_state_transition, helics_error_invalid_function_call, helics_error_execution_failure, helics_error_insufficient_space, helics_error_other, helics_error_external_type };
+  private static helics_error_types[] swigValues = { helics_ok, helics_error_registration_failure, helics_error_connection_failure, helics_error_invalid_object, helics_error_invalid_argument, helics_error_discard, helics_error_system_failure, helics_warning, helics_error_invalid_state_transition, helics_error_invalid_function_call, helics_error_execution_failure, helics_error_insufficient_space, helics_error_other, helics_error_fatal, helics_error_external_type };
   private static int swigNext = 0;
   private final int swigValue;
   private final String swigName;

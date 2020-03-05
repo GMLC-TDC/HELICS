@@ -1,3 +1,3 @@
 function varargout = helicsFederateRegisterFromPublicationJSON(varargin)
-  [varargout{1:nargout}] = helicsMEX(164, varargin{:});
+  [varargout{1:nargout}] = helicsMEX(166, varargin{:});
 end

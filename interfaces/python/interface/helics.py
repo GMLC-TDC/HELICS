@@ -170,6 +170,8 @@ helics_flag_enable_init_entry = _helics.helics_flag_enable_init_entry
 r""" used to clear the HELICS_DELAY_INIT_ENTRY flag in cores"""
 helics_flag_ignore_time_mismatch_warnings = _helics.helics_flag_ignore_time_mismatch_warnings
 r""" used to not display warnings on mismatched requested times"""
+helics_flag_terminate_on_error = _helics.helics_flag_terminate_on_error
+r""" specify that a federate error should terminate the federation"""
 helics_log_level_no_print = _helics.helics_log_level_no_print
 r""" don't print anything except a few catastrophic errors"""
 helics_log_level_error = _helics.helics_log_level_error
@@ -214,6 +216,8 @@ helics_error_insufficient_space = _helics.helics_error_insufficient_space
 r""" insufficient space is available to store requested data"""
 helics_error_other = _helics.helics_error_other
 r""" the function produced a helics error of some other type"""
+helics_error_fatal = _helics.helics_error_fatal
+r""" global fatal error for federation"""
 helics_error_external_type = _helics.helics_error_external_type
 r""" an unknown non-helics error was produced"""
 helics_property_time_delta = _helics.helics_property_time_delta
@@ -1039,6 +1043,33 @@ def helicsFederateRegisterInterfaces(fed: "helics_federate", file: "char const *
        :param file: the name of a file to load the interfaces from either JSON, or TOML
     """
     return _helics.helicsFederateRegisterInterfaces(fed, file)
+
+def helicsFederateGlobalError(fed: "helics_federate", error_code: "int", error_string: "char const *") -> "void":
+    r"""
+     generate a global Error from a federate
+    A global error halts the co-simulation completely
+    :type fed: void
+    :param fed: the federate to create an error in
+    :type error_code: int
+    :param error_code: the integer code for the error
+    :type error_string: string
+    :param error_string: a string describing the error
+    """
+    return _helics.helicsFederateGlobalError(fed, error_code, error_string)
+
+def helicsFederateLocalError(fed: "helics_federate", error_code: "int", error_string: "char const *") -> "void":
+    r"""
+     generate a local error in a federate
+    this will propagate through the co-simulation but not necessarily halt the co-simulation, it has a similar effect to finalize but does
+    allow some interaction with a core for a brief time.
+    :type fed: void
+    :param fed: the federate to create an error in
+    :type error_code: int
+    :param error_code: the integer code for the error
+    :type error_string: string
+    :param error_string: a string describing the error
+    """
+    return _helics.helicsFederateLocalError(fed, error_code, error_string)
 
 def helicsFederateFinalize(fed: "helics_federate") -> "void":
     r""" finalize the federate this function halts all communication in the federate and disconnects it from the core"""

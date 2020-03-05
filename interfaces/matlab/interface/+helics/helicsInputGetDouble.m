@@ -1,3 +1,3 @@
 function varargout = helicsInputGetDouble(varargin)
-  [varargout{1:nargout}] = helicsMEX(184, varargin{:});
+  [varargout{1:nargout}] = helicsMEX(186, varargin{:});
 end
