@@ -1022,10 +1022,8 @@ if(HELICS_ENABLE_PACKAGE_BUILD)
     set(CPACK_COMPONENT_OCTAVE_DISPLAY_NAME "Octave")
     set(CPACK_COMPONENT_CSHARP_DISPLAY_NAME "C#")
 
-    cpack_add_component_group(interfaces
-        DISPLAY_NAME "Interfaces"
-        DESCRIPTION  "Additional language interfaces for HELICS"
-    )
+    set(CPACK_COMPONENT_GROUP_INTERFACES_DISPLAY_NAME "Interfaces")
+    set(CPACK_COMPONENT_GROUP_INTERFACES_DESCRIPTION "Additional language interfaces for HELICS")
     set(CPACK_COMPONENT_SWIG_GROUP interfaces)
     set(CPACK_COMPONENT_MATLAB_GROUP interfaces)
     set(CPACK_COMPONENT_JAVA_GROUP interfaces)
@@ -1033,10 +1031,8 @@ if(HELICS_ENABLE_PACKAGE_BUILD)
     set(CPACK_COMPONENT_PYTHON_GROUP interfaces)
     set(CPACK_COMPONENT_CSHARP_GROUP interfaces)
 
-    cpack_add_component_group(development
-        DISPLAY_NAME "Development"
-        DESCRIPTION  "Files needed to build applications that use HELICS"
-    )
+    set(CPACK_COMPONENT_GROUP_DEVELOPMENT_DISPLAY_NAME "Development")
+    set(CPACK_COMPONENT_GROUP_DEVELOPMENT_DESCRIPTION "Files needed to build applications that use HELICS")
     set(CPACK_COMPONENT_HEADERS_GROUP development)
     set(CPACK_COMPONENT_LIBS_GROUP development)
 
