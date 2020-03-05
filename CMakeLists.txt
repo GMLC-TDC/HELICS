@@ -1011,7 +1011,7 @@ if(HELICS_ENABLE_PACKAGE_BUILD)
         set(CPACK_RESOURCE_FILE_README "${HELICS_SOURCE_DIR}/README.md")
     endif(WIN32)
 
-    set(CPACK_COMPONENT_APPLICATIONS_DISPLAY_NAME "Application")
+    set(CPACK_COMPONENT_APPLICATIONS_DISPLAY_NAME "Applications")
     set(CPACK_COMPONENT_LIBS_DISPLAY_NAME "Libraries")
     set(CPACK_COMPONENT_HEADERS_DISPLAY_NAME "Headers")
     set(CPACK_COMPONENT_RUNTIME_DISPLAY_NAME "Runtime Libraries")
@@ -1023,7 +1023,9 @@ if(HELICS_ENABLE_PACKAGE_BUILD)
     set(CPACK_COMPONENT_CSHARP_DISPLAY_NAME "C#")
 
     set(CPACK_COMPONENT_GROUP_INTERFACES_DISPLAY_NAME "Interfaces")
-    set(CPACK_COMPONENT_GROUP_INTERFACES_DESCRIPTION "Additional language interfaces for HELICS")
+    set(CPACK_COMPONENT_GROUP_INTERFACES_DESCRIPTION
+        "Additional language interfaces for HELICS"
+    )
     set(CPACK_COMPONENT_SWIG_GROUP interfaces)
     set(CPACK_COMPONENT_MATLAB_GROUP interfaces)
     set(CPACK_COMPONENT_JAVA_GROUP interfaces)
@@ -1032,11 +1034,13 @@ if(HELICS_ENABLE_PACKAGE_BUILD)
     set(CPACK_COMPONENT_CSHARP_GROUP interfaces)
 
     set(CPACK_COMPONENT_GROUP_DEVELOPMENT_DISPLAY_NAME "Development")
-    set(CPACK_COMPONENT_GROUP_DEVELOPMENT_DESCRIPTION "Files needed to build applications that use HELICS")
+    set(CPACK_COMPONENT_GROUP_DEVELOPMENT_DESCRIPTION
+        "Files needed to build applications that use HELICS"
+    )
     set(CPACK_COMPONENT_HEADERS_GROUP development)
     set(CPACK_COMPONENT_LIBS_GROUP development)
 
-    set(CPACK_COMPONENT_APPLICATION_DESCRIPTION
+    set(CPACK_COMPONENT_APPLICATIONS_DESCRIPTION
         "Executables and helper applications for HELICS"
     )
     set(CPACK_COMPONENT_LIBS_DESCRIPTION
@@ -1046,12 +1050,11 @@ if(HELICS_ENABLE_PACKAGE_BUILD)
         "Headers for linking and compiling with HELICS"
     )
     set(CPACK_COMPONENT_RUNTIME_DESCRIPTION "Runtime libraries for HELICS")
-    set(CPACK_COMPONENT_APPLICATION_DESCRIPTION "HELICS applications (helics_broker, helics_apps, etc)")
     set(CPACK_COMPONENT_CEREAL_DESCRIPTION
         "cereal C++11 serialization library [no support for other language interfaces]"
     )
     set(CPACK_COMPONENT_SWIG_DESCRIPTION
-        "Basic SWIG interface files for building 3rd party language interfaces (requires Development Headers)"
+        "SWIG files needed for building 3rd party language interfaces (requires Development Headers)"
     )
     set(CPACK_COMPONENT_PYTHON_DESCRIPTION "Python language interface")
     set(CPACK_COMPONENT_JAVA_DESCRIPTION "Java language interface")
