@@ -2865,13 +2865,11 @@ void CommonCore::processCommand(ActionMessage&& command)
                         command.dest_id = root_broker_id;
                         transmit(parent_route_id, std::move(command));
                         break;
-                    } else if (command.source_id.isValid()){
+                    } else if (command.source_id.isValid()) {
                         auto fed = loopFederates.find(command.source_id);
-                        if (fed != loopFederates.end())
-                        {
+                        if (fed != loopFederates.end()) {
                             fed->state = operation_state::error;
                         }
-                        
                     }
                 }
                 routeMessage(command);

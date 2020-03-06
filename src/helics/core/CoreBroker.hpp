@@ -117,7 +117,8 @@ class CoreBroker: public Broker, public BrokerBase {
     JsonMapBuilder fedMap; //!< builder for the federate_map
     std::vector<ActionMessage> fedMapRequestors; //!< list of requesters for the active federate map
     JsonMapBuilder currentTimeMap; //!< builder for the current time graph
-    std::vector<ActionMessage> ctimeRequestors; //!< list of requesters for the active current time status
+    std::vector<ActionMessage>
+        ctimeRequestors; //!< list of requesters for the active current time status
     JsonMapBuilder depMap; //!< builder for the dependency graph
     std::vector<ActionMessage> depMapRequestors; //!< list of requesters for the dependency graph
     JsonMapBuilder dataflowMap; //!< builder for the dependency graph

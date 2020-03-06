@@ -1012,17 +1012,13 @@ std::string Federate::query(const std::string& queryStr)
     std::string res;
     if (queryStr == "name") {
         res = getName();
-    }
-    else if (queryStr == "corename") {
+    } else if (queryStr == "corename") {
         if (coreObject) {
             res = coreObject->getIdentifier();
-        }
-        else {
+        } else {
             res = "#unknown";
         }
-    }
-    else if (queryStr == "time")
-    {
+    } else if (queryStr == "time") {
         res = std::to_string(currentTime);
     } else {
         res = localQuery(queryStr);

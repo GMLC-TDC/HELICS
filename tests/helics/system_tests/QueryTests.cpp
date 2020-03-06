@@ -12,8 +12,8 @@ the top-level NOTICE for additional details. All rights reserved. SPDX-License-I
 #include "helics/application_api/queryFunctions.hpp"
 #include "helics/common/JsonProcessingFunctions.hpp"
 
-#include <thread>
 #include "gtest/gtest.h"
+#include <thread>
 
 struct query_tests: public FederateTestFixture, public ::testing::Test {
 };
