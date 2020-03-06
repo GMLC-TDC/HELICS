@@ -132,7 +132,7 @@ The following queries will be answered by a core.
 +----------------------+-------------------------------------------------------------------------------------+
 | ``federation_state`` | a structure with the current known status of the brokers and federates [JSON]       |
 +----------------------+-------------------------------------------------------------------------------------+
-| ``current_time``     | if a time is computed locally that time sequence is returns otherwise #na [JSON]    |
+| ``current_time``     | if a time is computed locally that time sequence is returned, otherwise #na [JSON]    |
 +----------------------+-------------------------------------------------------------------------------------+
 | ``global_time``      | get a structure with the current time status of all the federates/cores [JSON]      |
 +----------------------+-------------------------------------------------------------------------------------+
@@ -179,7 +179,7 @@ The Following queries will be answered by a broker.
 +----------------------+-------------------------------------------------------------------------------------+
 | ``federation_state`` | a structure with the current known status of the brokers and federates [JSON]       |
 +----------------------+-------------------------------------------------------------------------------------+
-| ``current_time``     | if a time is computed locally that time sequence is returns otherwise #na [string]  |
+| ``current_time``     | if a time is computed locally that time sequence is returned, otherwise #na [string]  |
 +----------------------+-------------------------------------------------------------------------------------+
 | ``global_time``      | get a structure with the current time status of all the federates/cores [JSON]      |
 +----------------------+-------------------------------------------------------------------------------------+
