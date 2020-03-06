@@ -305,6 +305,8 @@ class CoreBroker: public Broker, public BrokerBase {
     void processError(ActionMessage& command);
     /** disconnect a broker/core*/
     void disconnectBroker(BasicBrokerInfo& brk);
+    /** mark this broker and all other that have this as a parent as disconnected*/
+    void markAsDisconnected(global_broker_id brkid);
     /** run a check for a named interface*/
     void checkForNamedInterface(ActionMessage& command);
     /** remove a named target from an interface*/
