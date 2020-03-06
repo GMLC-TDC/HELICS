@@ -968,6 +968,7 @@ TEST(federate_tests, error_after_disconnect)
 
     EXPECT_THROW(Fed1->setGlobal("global1", "global1"), helics::InvalidFunctionCall);
     EXPECT_THROW(Fed1->addSourceTarget(f1, "ept"), helics::InvalidFunctionCall);
+    EXPECT_THROW(Fed1->addDependency("otherFed"), helics::InvalidFunctionCall);
 
     EXPECT_THROW(Fed1->addDestinationTarget(f1, "ept"), helics::InvalidFunctionCall);
     EXPECT_THROW(Fed1->setFilterOperator(f1, {}), helics::InvalidFunctionCall);

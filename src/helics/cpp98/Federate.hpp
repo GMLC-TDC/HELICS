@@ -502,6 +502,15 @@ class Federate {
         helicsFederateSetGlobal(fed, valueName.c_str(), value.c_str(), hThrowOnError());
     }
 
+    /** add a dependency for this federate
+     @details adds an additional internal time dependency for the federate
+     @param federateName the name of the federate to add a dependency on
+     */
+    void addDependency(const std::string& fedName)
+    {
+        helicsFederateAddDependency(fed, fedName.c_str(), hThrowOnError());
+    }
+
     /** generate a local federate error
     @param error_code an error code to give to the error
     @param error_string a string message associated with the error
