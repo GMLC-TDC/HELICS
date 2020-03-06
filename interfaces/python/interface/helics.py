@@ -1448,6 +1448,16 @@ def helicsFederateSetGlobal(fed: "helics_federate", valueName: "char const *", v
     """
     return _helics.helicsFederateSetGlobal(fed, valueName, value)
 
+def helicsFederateAddDependency(fed: "helics_federate", fedName: "char const *") -> "void":
+    r"""
+    add a time dependency for a federate.  The federate will depend on the given named federate for time synchronization
+       :type fed: void
+       :param fed: the federate to add the dependency for
+       :type fedName: string
+       :param fedName: the name of the federate to depend on
+    """
+    return _helics.helicsFederateAddDependency(fed, fedName)
+
 def helicsFederateSetLogFile(fed: "helics_federate", logFile: "char const *") -> "void":
     r"""
     set the logging file for a federate(actually on the core associated with a federate)

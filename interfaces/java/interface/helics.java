@@ -1073,6 +1073,15 @@ public class helics {
   }
 
   /**
+   *  add a time dependency for a federate.  The federate will depend on the given named federate for time synchronization<br>
+   *     @param fed the federate to add the dependency for<br>
+   *     @param fedName the name of the federate to depend on
+   */
+  public static void helicsFederateAddDependency(SWIGTYPE_p_void fed, String fedName) {
+    helicsJNI.helicsFederateAddDependency(SWIGTYPE_p_void.getCPtr(fed), fedName);
+  }
+
+  /**
    *  set the logging file for a federate(actually on the core associated with a federate)<br>
    *     @param fed the federate to set the log file for<br>
    *     @param logFile the name of the log file
