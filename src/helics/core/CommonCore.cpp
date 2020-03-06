@@ -2025,7 +2025,7 @@ std::string CommonCore::federateQuery(const FederateState* fed, const std::strin
         return filteredEndpointQuery(fed);
     }
     if ((queryStr == "queries") || (queryStr == "available_queries")) {
-        return std::string("[exists;isinit;state;queries;filtered_endpoints;") +
+        return std::string("[exists;isinit;state;queries;filtered_endpoints;current_time;") +
             fed->processQuery(queryStr) + "]";
     }
     return fed->processQuery(queryStr);
@@ -2042,13 +2042,6 @@ std::string CommonCore::quickCoreQueries(const std::string& queryStr) const
     }
     if (queryStr == "name") {
         return getIdentifier();
-    }
-    if (queryStr == "current_time") {
-        if (hasTimeDependency) {
-            return timeCoord->printTimeStatus();
-        } else {
-            return "{}";
-        }
     }
     return std::string{};
 }
@@ -2113,6 +2106,13 @@ std::string CommonCore::coreQuery(const std::string& queryStr) const
     if (queryStr == "filtered_endpoints") {
         return filteredEndpointQuery(nullptr);
     }
+    if (queryStr == "current_time") {
+        if (hasTimeDependency) {
+            return timeCoord->printTimeStatus();
+        } else {
+            return "{}";
+        }
+    }
     if (queryStr == "current_state") {
         Json::Value base;
         base["name"] = getIdentifier();
@@ -2134,8 +2134,7 @@ std::string CommonCore::coreQuery(const std::string& queryStr) const
         block["id"] = global_broker_id_local.baseValue();
         block["parent"] = higher_broker_id.baseValue();
         block["federates"] = Json::arrayValue;
-        if (hasTimeDependency)
-        {
+        if (hasTimeDependency) {
             block["next_time"] = static_cast<double>(timeCoord->getNextTime());
         }
         for (auto fed : loopFederates) {

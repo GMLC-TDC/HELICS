@@ -1021,7 +1021,7 @@ std::string Federate::query(const std::string& queryStr)
             res = "#unknown";
         }
     }
-    else if (queryStr == "current_time")
+    else if (queryStr == "time")
     {
         res = std::to_string(currentTime);
     } else {
