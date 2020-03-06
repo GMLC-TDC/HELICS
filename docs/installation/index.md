@@ -14,10 +14,19 @@ Get the latest installers from [GitHub Releases](https://github.com/GMLC-TDC/HEL
 
 OR
 
-Use conda to install helics:
+Use conda to install the HELICS Python interface and apps:
 
 ```bash
 conda install -c gmlc-tdc helics
+```
+
+OR
+
+Use pip to install the HELICS Python interface and apps:
+
+```bash
+pip install helics
+pip install helics-apps
 ```
 
 ### Using an installer for your operating system
