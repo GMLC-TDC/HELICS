@@ -43,6 +43,7 @@ functions applying to a \ref helics_core object
  - \ref helicsCoreGetIdentifier
  - \ref helicsCoreGetAddress
  - \ref helicsCoreSetReadyToInit
+ - \ref helicsCoreConnect
  - \ref helicsCoreDisconnect
  - \ref helicsCoreDestroy
  - \ref helicsCoreFree
@@ -180,6 +181,7 @@ functions applying to a \ref helics_publication object
  - \ref helicsPublicationSetInfo
  - \ref helicsPublicationGetOption
  - \ref helicsPublicationSetOption
+ - \ref helicsPublicationSetMinimumChange
 
  \section input Input interface Functions 
 functions applying to a \ref helics_input object
@@ -219,6 +221,7 @@ functions applying to a \ref helics_input object
  - \ref helicsInputSetInfo
  - \ref helicsInputGetOption
  - \ref helicsInputSetOption
+ - \ref helicsInputSetMinimumChange
  - \ref helicsInputIsUpdated
  - \ref helicsInputLastUpdateTime
  - \ref helicsInputClearUpdate

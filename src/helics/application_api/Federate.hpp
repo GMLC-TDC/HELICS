@@ -332,6 +332,13 @@ class HELICS_CXX_EXPORT Federate {
     @param value the value of the global
     */
     void setGlobal(const std::string& valueName, const std::string& value);
+
+    /** add a dependency for this federate
+    @details adds an additional internal time dependency for the federate
+    @param federateName the name of the federate to add a dependency on
+    */
+    void addDependency(const std::string& fedName);
+
     /** define a named global filter interface
     @param filterName the name of the globally visible filter
     @param inputType the inputType which the filter can handle

@@ -1161,7 +1161,40 @@ void helicsFederateSetGlobal(helics_federate fed, const char* valueName, const c
         }
         return;
     }
-    fedObj->setGlobal(valueName, AS_STRING(value));
+    try
+    {
+        fedObj->setGlobal(valueName, AS_STRING(value));
+    }
+    // LCOV_EXCL_START
+    catch (...) {
+        helicsErrorHandler(err);
+    }
+    // LCOV_EXCL_STOP
+}
+
+static constexpr char invalidFedNameString[] = "Federate name for dependency cannot be null";
+void helicsFederateAddDependency(helics_federate fed, const char* fedName, helics_error* err)
+{
+    auto fedObj = getFed(fed, err);
+    if (fedObj == nullptr) {
+        return;
+    }
+    if (fedName == nullptr) {
+        if (err != nullptr) {
+            err->error_code = helics_error_invalid_argument;
+            err->message = invalidFedNameString;
+        }
+        return;
+    }
+    try
+    {
+        fedObj->addDependency(fedName);
+    }
+    // LCOV_EXCL_START
+    catch (...) {
+        helicsErrorHandler(err);
+    }
+    // LCOV_EXCL_STOP
 }
 
 static constexpr char invalidFederateCore[] = "Federate core is not connected";

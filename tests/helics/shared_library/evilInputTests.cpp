@@ -1668,6 +1668,21 @@ TEST(evil_federate_test, helicsFederateSetGlobal)
     EXPECT_NE(err.error_code, 0);
 }
 
+TEST(evil_federate_test, helicsFederateAddDependency)
+{
+    //void helicsFederateAddDependency(helics_federate fed, const char* fedName, helics_error* err);
+    char rdata[256];
+    helics_federate evil_federate = reinterpret_cast<helics_federate>(rdata);
+    auto err = helicsErrorInitialize();
+    err.error_code = 45;
+    helicsFederateAddDependency(nullptr, nullptr, &err);
+    EXPECT_EQ(err.error_code, 45);
+    helicsErrorClear(&err);
+    //auto res2=helicsFederateSetGlobal(helics_federate fed, const char* valueName, const char* value, nullptr);
+    helicsFederateAddDependency(evil_federate, "fed", &err);
+    EXPECT_NE(err.error_code, 0);
+}
+
 TEST(evil_federate_test, helicsFederateSetLogFile)
 {
     //void helicsFederateSetLogFile(helics_federate fed, const char* logFile, helics_error* err);
