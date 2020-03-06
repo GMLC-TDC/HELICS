@@ -38,6 +38,7 @@ Increased code coverage and additional bug fixes.  The error propagation in HELI
 -  `localError`, and `GlobalError` function calls the Federate API and in the C++ and sharedLibrary.  
 -  `helics_terminate_on_error` flag to escalate what would be a local error into a global one that will halt the co-simulation.  This flag can be specified through the flag to federates or to brokers and cores through a command line option `--terminate_on_error` 
 -   A 32-bit Windows zip install archive for releases
+-   Support for a 'helics-release-build' event trigger to the release build GitHub Actions workflow
 
 ### Deprecated
 
