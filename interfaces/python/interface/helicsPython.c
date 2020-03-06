@@ -8311,6 +8311,56 @@ fail:
 }
 
 
+SWIGINTERN PyObject *_wrap_helicsFederateAddDependency(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  helics_federate arg1 = (helics_federate) 0 ;
+  char *arg2 = (char *) 0 ;
+  helics_error *arg3 = (helics_error *) 0 ;
+  int res1 ;
+  int res2 ;
+  char *buf2 = 0 ;
+  int alloc2 = 0 ;
+  helics_error etemp3 ;
+  PyObject *swig_obj[2] ;
+  
+  {
+    etemp3=helicsErrorInitialize();
+    arg3=&etemp3;
+  }
+  if (!SWIG_Python_UnpackTuple(args, "helicsFederateAddDependency", 2, 2, swig_obj)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(swig_obj[0],SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateAddDependency" "', argument " "1"" of type '" "helics_federate""'"); 
+  }
+  res2 = SWIG_AsCharPtrAndSize(swig_obj[1], &buf2, NULL, &alloc2);
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsFederateAddDependency" "', argument " "2"" of type '" "char const *""'");
+  }
+  arg2 = (char *)(buf2);
+  helicsFederateAddDependency(arg1,(char const *)arg2,arg3);
+  resultobj = SWIG_Py_Void();
+  if (alloc2 == SWIG_NEWOBJ) free((char*)buf2);
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsPythonException(arg3);
+      return NULL;
+    }
+  }
+  return resultobj;
+fail:
+  if (alloc2 == SWIG_NEWOBJ) free((char*)buf2);
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsPythonException(arg3);
+      return NULL;
+    }
+  }
+  return NULL;
+}
+
+
 SWIGINTERN PyObject *_wrap_helicsFederateSetLogFile(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   helics_federate arg1 = (helics_federate) 0 ;
@@ -16463,6 +16513,13 @@ static PyMethodDef SwigMethods[] = {
 		"   :param valueName: the name of the global to set\n"
 		"   :type value: string\n"
 		"   :param value: the value of the global\n"
+		""},
+	 { "helicsFederateAddDependency", _wrap_helicsFederateAddDependency, METH_VARARGS, "\n"
+		"add a time dependency for a federate.  The federate will depend on the given named federate for time synchronization\n"
+		"   :type fed: void\n"
+		"   :param fed: the federate to add the dependency for\n"
+		"   :type fedName: string\n"
+		"   :param fedName: the name of the federate to depend on\n"
 		""},
 	 { "helicsFederateSetLogFile", _wrap_helicsFederateSetLogFile, METH_VARARGS, "\n"
 		"set the logging file for a federate(actually on the core associated with a federate)\n"

@@ -239,6 +239,7 @@ public class helicsJNI {
   public final static native int helicsFederateGetIntegerProperty(long jarg1, int jarg2);
   public final static native double helicsFederateGetCurrentTime(long jarg1);
   public final static native void helicsFederateSetGlobal(long jarg1, String jarg2, String jarg3);
+  public final static native void helicsFederateAddDependency(long jarg1, String jarg2);
   public final static native void helicsFederateSetLogFile(long jarg1, String jarg2);
   public final static native void helicsFederateLogErrorMessage(long jarg1, String jarg2);
   public final static native void helicsFederateLogWarningMessage(long jarg1, String jarg2);
