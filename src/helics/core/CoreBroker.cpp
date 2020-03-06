@@ -2247,38 +2247,28 @@ void CoreBroker::processDisconnect(ActionMessage& command)
 
 void CoreBroker::markAsDisconnected(global_broker_id brkid)
 {
-    bool isCore{ false };
-    for (size_t ii = 0; ii < _brokers.size(); ++ii)
-    {
-        auto &brk = _brokers[ii];
-        if (brk.global_id == brkid)
-        {
-            if (brk.state != connection_state::error)
-            {
+    bool isCore{false};
+    for (size_t ii = 0; ii < _brokers.size(); ++ii) {
+        auto& brk = _brokers[ii];
+        if (brk.global_id == brkid) {
+            if (brk.state != connection_state::error) {
                 brk.state = connection_state::disconnected;
                 isCore = brk._core;
             }
-            
         }
-        if (brk.parent == brkid)
-        {
-            if (brk.state != connection_state::error)
-            {
+        if (brk.parent == brkid) {
+            if (brk.state != connection_state::error) {
                 brk.state = connection_state::disconnected;
                 markAsDisconnected(brk.global_id);
             }
         }
-   }
-    if (isCore)
-    {
-        for (size_t ii = 0; ii < _federates.size(); ++ii)
-        {
-            auto &fed = _federates[ii];
-            
-            if (fed.parent == brkid)
-            {
-                if (fed.state != connection_state::error)
-                {
+    }
+    if (isCore) {
+        for (size_t ii = 0; ii < _federates.size(); ++ii) {
+            auto& fed = _federates[ii];
+
+            if (fed.parent == brkid) {
+                if (fed.state != connection_state::error) {
                     fed.state = connection_state::disconnected;
                 }
             }
@@ -2401,7 +2391,7 @@ std::string CoreBroker::generateQueryAnswer(const std::string& request)
     if ((request == "queries") || (request == "available_queries")) {
         return "[isinit;isconnected;name;address;queries;address;counts;summary;federates;brokers;inputs;endpoints;"
                "publications;filters;federate_map;dependency_graph;dependencies;dependson;dependents;"
-            "current_time;current_state;global_time]";
+               "current_time;current_state;global_time]";
     }
     if (request == "address") {
         return getAddress();
@@ -2443,20 +2433,15 @@ std::string CoreBroker::generateQueryAnswer(const std::string& request)
         base["brokers"] = Json::arrayValue;
         base["cores"] = Json::arrayValue;
         for (auto& brk : _brokers) {
-           
             Json::Value brkstate;
             brkstate["state"] = state_string(brk.state);
             brkstate["name"] = brk.name;
             brkstate["id"] = brk.global_id.baseValue();
-            if (brk._core)
-            {
+            if (brk._core) {
                 base["cores"].append(std::move(brkstate));
-            }
-            else
-            {
+            } else {
                 base["brokers"].append(std::move(brkstate));
             }
-            
         }
         return generateJsonString(base);
     }

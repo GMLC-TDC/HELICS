@@ -2121,8 +2121,9 @@ std::string CommonCore::coreQuery(const std::string& queryStr) const
         base["federates"] = Json::arrayValue;
         for (auto& fed : loopFederates) {
             Json::Value fedstate;
-            fedstate[fed->getIdentifier()] = state_string(fed.state);
-
+            fedstate["state"] = state_string(fed.state);
+            fedstate["id"] = fed.fed->global_id.load().baseValue();
+            fedstate["name"] = fed.fed->getIdentifier();
             base["federates"].append(std::move(fedstate));
         }
         return generateJsonString(base);
@@ -2865,6 +2866,8 @@ void CommonCore::processCommand(ActionMessage&& command)
                         transmit(parent_route_id, std::move(command));
                         break;
                     } else {
+                        auto fed = loopFederates.find(command.source_id);
+                        fed->state = operation_state::error;
                     }
                 }
                 routeMessage(command);

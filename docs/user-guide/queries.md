@@ -91,6 +91,8 @@ The following queries are defined for federates but can only be queried on the l
 +---------------------------+------------------------------------------------------------+
 | ``values``                | current values of all inputs [JSON]                        |
 +---------------------------+------------------------------------------------------------+
+| ``time``                  | the current granted time [string]                          |
++---------------------------+------------------------------------------------------------+
 ```
 
 Other strings may be defined for specific federates.

@@ -12,6 +12,7 @@ the top-level NOTICE for additional details. All rights reserved. SPDX-License-I
 #include "helics/application_api/queryFunctions.hpp"
 #include "helics/common/JsonProcessingFunctions.hpp"
 
+#include <thread>
 #include "gtest/gtest.h"
 
 struct query_tests: public FederateTestFixture, public ::testing::Test {
@@ -201,14 +202,13 @@ TEST_F(query_tests, dependency_graph)
     helics::cleanupHelicsLibrary();
 }
 
-
 TEST_F(query_tests, global_time)
 {
     SetupTest<helics::ValueFederate>("test_3", 2);
     auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
     auto vFed2 = GetFederateAs<helics::ValueFederate>(1);
     auto core = vFed1->getCorePointer();
-    
+
     vFed1->enterExecutingModeAsync();
     vFed2->enterExecutingMode();
     vFed1->enterExecutingModeComplete();
@@ -245,13 +245,12 @@ TEST_F(query_tests, global_time)
     helics::cleanupHelicsLibrary();
 }
 
-
 TEST_F(query_tests, current_time)
 {
     SetupTest<helics::MessageFederate>("test_3", 2);
     auto mFed1 = GetFederateAs<helics::MessageFederate>(0);
     auto mFed2 = GetFederateAs<helics::MessageFederate>(1);
-    
+
     mFed1->registerEndpoint("ept1");
     mFed2->registerEndpoint("ept2");
 
@@ -276,7 +275,6 @@ TEST_F(query_tests, current_time)
     EXPECT_EQ(res, "{}");
 }
 
-
 TEST_F(query_tests, current_state)
 {
     SetupTest<helics::ValueFederate>("test_2", 2);
@@ -294,7 +292,6 @@ TEST_F(query_tests, current_state)
     EXPECT_EQ(val["federates"].size(), 2u);
     EXPECT_EQ(val["cores"].size(), 2u);
     EXPECT_STREQ(val["federates"][0]["state"].asCString(), "connected");
-
 
     vFed1->localError(-3, "test error");
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
@@ -318,7 +315,39 @@ TEST_F(query_tests, current_state)
     EXPECT_STREQ(val["federates"][1]["state"].asCString(), "disconnected");
     EXPECT_STREQ(val["cores"][1]["state"].asCString(), "disconnected");
     core = nullptr;
-    
+
+    vFed1->finalize();
+    helics::cleanupHelicsLibrary();
+}
+
+TEST_F(query_tests, current_state_core)
+{
+    SetupTest<helics::ValueFederate>("test_2", 2);
+    auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
+    auto vFed2 = GetFederateAs<helics::ValueFederate>(1);
+    auto core = vFed1->getCorePointer();
+
+    vFed1->enterExecutingModeAsync();
+    vFed2->enterExecutingMode();
+    vFed1->enterExecutingModeComplete();
+
+    auto res = vFed1->query("core", "current_state");
+
+    auto val = loadJsonStr(res);
+    EXPECT_EQ(val["federates"].size(), 1u);
+    EXPECT_STREQ(val["federates"][0]["state"].asCString(), "connected");
+
+    vFed1->localError(-3, "test error");
+    EXPECT_THROW(vFed1->requestTime(1.0), helics::HelicsException);
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    res = vFed1->query("core", "current_state");
+
+    val = loadJsonStr(res);
+    EXPECT_EQ(val["federates"].size(), 1u);
+    EXPECT_STREQ(val["federates"][0]["state"].asCString(), "error");
+
+    vFed2->finalize();
+
     vFed1->finalize();
     helics::cleanupHelicsLibrary();
 }
