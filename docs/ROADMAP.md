@@ -21,7 +21,7 @@ This document contains tentative plans for changes and improvements of note in u
 
 ## \[2.6\] ~ 2020-07-15
 This will be the last of the 2.X series releases, there will likely be at least one patch release after this before fully moving to 3.0
--   Internal text based(probably JSON) message format option for general backwards compatibility
+-   Internal text based (probably JSON) message format option for general backwards compatibility
 -   Debugging tools
 -   Additional package manager integration
 -   Performance improvements and tests
