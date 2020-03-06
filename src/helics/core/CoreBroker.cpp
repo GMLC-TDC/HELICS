@@ -2542,6 +2542,16 @@ std::string CoreBroker::generateQueryAnswer(const std::string& request)
     return "#invalid";
 }
 
+//enumeration of subqueries that cascade and need multiple levels of processing
+static enum subqueries:std::uint16_t
+{
+    general_query=0,
+    federate_map=2,
+    dependency_graph=4,
+    current_time_map=6,
+    data_flow_graph=8
+};
+
 std::string CoreBroker::getNameList(std::string gidString) const
 {
     if (gidString.back() == ']') {
@@ -2582,7 +2592,7 @@ void CoreBroker::initializeFederateMap()
     ActionMessage queryReq(CMD_BROKER_QUERY);
     queryReq.payload = "federate_map";
     queryReq.source_id = global_broker_id_local;
-    queryReq.counter = 2; // indicating which processing to use
+    queryReq.counter = federate_map; // indicating which processing to use
     bool hasCores = false;
     for (auto& broker : _brokers) {
         if (broker.parent == global_broker_id_local) {
@@ -2615,7 +2625,7 @@ void CoreBroker::initializeDependencyGraph()
     ActionMessage queryReq(CMD_BROKER_QUERY);
     queryReq.payload = "dependency_graph";
     queryReq.source_id = global_broker_id_local;
-    queryReq.counter = 4; // indicating which processing to use
+    queryReq.counter = dependency_graph; // indicating which processing to use
     bool hasCores = false;
     for (auto& broker : _brokers) {
         int index;
@@ -2645,6 +2655,7 @@ void CoreBroker::initializeDependencyGraph()
 
 void CoreBroker::initializeDataFlowGraph()
 {
+    //TODO:: this query is not fully formed yet and is a work in progress
     Json::Value& base = depMap.getJValue();
     base["name"] = getIdentifier();
     base["id"] = global_broker_id_local.baseValue();
@@ -2655,7 +2666,7 @@ void CoreBroker::initializeDataFlowGraph()
     ActionMessage queryReq(CMD_BROKER_QUERY);
     queryReq.payload = "dependency_graph";
     queryReq.source_id = global_broker_id_local;
-    queryReq.counter = 4; // indicating which processing to use
+    queryReq.counter = dependency_graph; // indicating which processing to use
     bool hasCores = false;
     for (auto& broker : _brokers) {
         int index;
@@ -2695,7 +2706,7 @@ void CoreBroker::initializeCurrentTimeMap()
     ActionMessage queryReq(CMD_BROKER_QUERY);
     queryReq.payload = "global_time";
     queryReq.source_id = global_broker_id_local;
-    queryReq.counter = 6; // indicating which processing to use
+    queryReq.counter = current_time_map; // indicating which processing to use
     bool hasCores = false;
     for (auto& broker : _brokers) {
         if (broker._nonLocal) {
@@ -2819,11 +2830,11 @@ void CoreBroker::processQuery(const ActionMessage& m)
 void CoreBroker::processQueryResponse(const ActionMessage& m)
 {
     switch (m.counter) {
-        case 0:
+        case general_query:
         default:
             ActiveQueries.setDelayedValue(m.messageID, m.payload);
             break;
-        case 2:
+        case federate_map:
             if (fedMap.addComponent(m.payload, m.messageID)) {
                 if (fedMapRequestors.size() == 1) {
                     if (fedMapRequestors.front().dest_id == global_broker_id_local) {
@@ -2847,7 +2858,7 @@ void CoreBroker::processQueryResponse(const ActionMessage& m)
                 fedMapRequestors.clear();
             }
             break;
-        case 4:
+        case dependency_graph:
             if (depMap.addComponent(m.payload, m.messageID)) {
                 if (depMapRequestors.size() == 1) {
                     if (depMapRequestors.front().dest_id == global_broker_id_local) {
@@ -2871,7 +2882,7 @@ void CoreBroker::processQueryResponse(const ActionMessage& m)
                 depMapRequestors.clear();
             }
             break;
-        case 6:
+        case current_time_map:
             if (currentTimeMap.addComponent(m.payload, m.messageID)) {
                 if (ctimeRequestors.size() == 1) {
                     if (ctimeRequestors.front().dest_id == global_broker_id_local) {
