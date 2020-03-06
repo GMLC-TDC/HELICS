@@ -1102,8 +1102,7 @@ void Federate::addDependency(const std::string& fedName)
 {
     if (coreObject) {
         coreObject->addDependency(fedID, fedName);
-    }
-    else {
+    } else {
         throw(InvalidFunctionCall(
             "addDependency cannot be called on uninitialized federate or after finalize call"));
     }

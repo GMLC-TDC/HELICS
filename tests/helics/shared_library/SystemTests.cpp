@@ -231,13 +231,13 @@ TEST(other_tests, federate_add_dependency)
     EXPECT_EQ(err.error_code, 0);
 
     helicsFederateEnterExecutingModeAsync(fed1, &err);
-    helicsFederateEnterExecutingMode(fed2,&err);
+    helicsFederateEnterExecutingMode(fed2, &err);
     helicsFederateEnterExecutingModeComplete(fed1, &err);
 
     helicsFederateInfoFree(fi);
     helicsFederateInfoFree(fi2);
-    helicsFederateFinalize(fed1,&err);
-    helicsFederateFinalize(fed2,&err);
+    helicsFederateFinalize(fed1, &err);
+    helicsFederateFinalize(fed2, &err);
     helicsBrokerFree(brk);
     helicsCoreFree(cr);
 }
