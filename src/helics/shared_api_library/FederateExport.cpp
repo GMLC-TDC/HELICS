@@ -1161,8 +1161,7 @@ void helicsFederateSetGlobal(helics_federate fed, const char* valueName, const c
         }
         return;
     }
-    try
-    {
+    try {
         fedObj->setGlobal(valueName, AS_STRING(value));
     }
     // LCOV_EXCL_START
@@ -1186,8 +1185,7 @@ void helicsFederateAddDependency(helics_federate fed, const char* fedName, helic
         }
         return;
     }
-    try
-    {
+    try {
         fedObj->addDependency(fedName);
     }
     // LCOV_EXCL_START
