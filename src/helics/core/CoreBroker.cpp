@@ -2543,13 +2543,12 @@ std::string CoreBroker::generateQueryAnswer(const std::string& request)
 }
 
 //enumeration of subqueries that cascade and need multiple levels of processing
-static enum subqueries:std::uint16_t
-{
-    general_query=0,
-    federate_map=2,
-    dependency_graph=4,
-    current_time_map=6,
-    data_flow_graph=8
+static enum subqueries: std::uint16_t {
+    general_query = 0,
+    federate_map = 2,
+    dependency_graph = 4,
+    current_time_map = 6,
+    data_flow_graph = 8
 };
 
 std::string CoreBroker::getNameList(std::string gidString) const
