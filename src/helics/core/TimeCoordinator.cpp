@@ -738,24 +738,24 @@ void TimeCoordinator::processDependencyUpdateMessage(const ActionMessage& cmd)
 {
     switch (cmd.action()) {
         case CMD_ADD_DEPENDENCY:
-            addDependency(global_federate_id(cmd.source_id));
+            addDependency(cmd.source_id);
             break;
         case CMD_REMOVE_DEPENDENCY:
-            removeDependency(global_federate_id(cmd.source_id));
+            removeDependency(cmd.source_id);
             break;
         case CMD_ADD_DEPENDENT:
-            addDependent(global_federate_id(cmd.source_id));
+            addDependent(cmd.source_id);
             break;
         case CMD_REMOVE_DEPENDENT:
-            removeDependent(global_federate_id(cmd.source_id));
+            removeDependent(cmd.source_id);
             break;
         case CMD_ADD_INTERDEPENDENCY:
-            addDependency(global_federate_id(cmd.source_id));
-            addDependent(global_federate_id(cmd.source_id));
+            addDependency(cmd.source_id);
+            addDependent(cmd.source_id);
             break;
         case CMD_REMOVE_INTERDEPENDENCY:
-            removeDependency(global_federate_id(cmd.source_id));
-            removeDependent(global_federate_id(cmd.source_id));
+            removeDependency(cmd.source_id);
+            removeDependent(cmd.source_id);
             break;
         default:
             break;

@@ -1096,7 +1096,17 @@ void Federate::setGlobal(const std::string& valueName, const std::string& value)
         coreObject->setGlobal(valueName, value);
     } else {
         throw(InvalidFunctionCall(
-            "set set Global cannot be called on uninitialized federate or after finalize call"));
+            " setGlobal cannot be called on uninitialized federate or after finalize call"));
+    }
+}
+
+void Federate::addDependency(const std::string& fedName)
+{
+    if (coreObject) {
+        coreObject->addDependency(fedID, fedName);
+    } else {
+        throw(InvalidFunctionCall(
+            "addDependency cannot be called on uninitialized federate or after finalize call"));
     }
 }
 

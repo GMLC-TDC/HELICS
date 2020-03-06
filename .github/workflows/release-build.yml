@@ -1,6 +1,11 @@
 name: Build release artifacts
 
 on:
+  # Handles a 'helics-release-build' dispatch event type
+  # The event payload should contain these fields:
+  # packages - a list of which packages to build (everything, archive, msvc, installer, sharedlib)
+  # commit (optional) - the commit-ish to do a release build with
+  repository_dispatch:
   schedule:
     - cron: '15 09 * * *' # Run at in the early hours of the morning (UTC)
   release:
@@ -13,15 +18,25 @@ jobs:
   create-all-submodule-archive:
     name: Create all submodule archive
     runs-on: ubuntu-latest
-    if: github.event.action == 'published'
+    if: (github.event.action == 'published') || (github.event.action == 'helics-release-build' && (contains(github.event.client_payload.packages, 'archive') || contains(github.event.client_payload.packages, 'everything')))
     steps:
-    - uses: actions/checkout@v2
+    - name: Checkout event ref
+      uses: actions/checkout@v2
+      with:
+        ref: ${{ github.event.client_payload.commit }}
+      if: github.event.action == 'published' || github.event.action == 'helics-release-build'
       
     - name: Create archive
+      if: github.event.action != 'helics-release-build'
       # Creates the archive then moves it to an artifact subfolder
       run: ./scripts/_git-all-archive.sh -l "$(git rev-parse --abbrev-ref "${GITHUB_REF}")" && mkdir artifact && mv "Helics-$(git rev-parse --abbrev-ref "${GITHUB_REF}")-source.tar.gz" artifact/
-      
+    - name: Create archive (no version)
+      if: github.event.action == 'helics-release-build'
+      # Creates the archive then moves it to an artifact subfolder
+      run: ./scripts/_git-all-archive.sh && mkdir artifact && mv "Helics-source.tar.gz" artifact/
+     
     - name: Upload archive to release
+      if: github.event.action != 'helics-release-build'
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         UPLOAD_URL: ${{ github.event.release.upload_url }}
@@ -38,6 +53,7 @@ jobs:
 #####################################
   build-windows-msvc:
     runs-on: ${{ matrix.os }}
+    if: (github.event.action != 'helics-release-build') || (contains(github.event.client_payload.packages, 'msvc') || contains(github.event.client_payload.packages, 'everything'))
     strategy:
       matrix:
         os: [windows-2016, windows-latest]
@@ -52,7 +68,9 @@ jobs:
     steps:
     - name: Checkout event ref
       uses: actions/checkout@v2
-      if: github.event.action == 'published'
+      with:
+        ref: ${{ github.event.client_payload.commit }}
+      if: github.event.action == 'published' || github.event.action == 'helics-release-build'
     
     - name: Checkout develop branch
       uses: actions/checkout@v2
@@ -96,6 +114,7 @@ jobs:
   build-installers:
     runs-on: ${{ matrix.os }}
     name: Build ${{ matrix.os }} ${{ matrix.arch }} ${{ matrix.cpack_gen }} Installer
+    if: (github.event.action != 'helics-release-build') || (contains(github.event.client_payload.packages, 'installer') || contains(github.event.client_payload.packages, 'everything'))
     strategy:
       matrix:
         id: [windows-x64, windows-x86, macos-x64, linux-x64]
@@ -125,7 +144,9 @@ jobs:
     steps:
     - name: Checkout event ref
       uses: actions/checkout@v2
-      if: github.event.action == 'published'
+      with:
+        ref: ${{ github.event.client_payload.commit }}
+      if: github.event.action == 'published' || github.event.action == 'helics-release-build'
     
     - name: Checkout develop branch
       uses: actions/checkout@v2
@@ -183,6 +204,7 @@ jobs:
 #####################################
   build-sharedlibs:
     runs-on: ${{ matrix.os }}
+    if: (github.event.action != 'helics-release-build') || (contains(github.event.client_payload.packages, 'sharedlib') || contains(github.event.client_payload.packages, 'everything'))
     name: Build ${{ matrix.os }} ${{ matrix.arch }} Shared Library
     strategy:
       matrix:
@@ -209,7 +231,9 @@ jobs:
     steps:
     - name: Checkout event ref
       uses: actions/checkout@v2
-      if: github.event.action == 'published'
+      with:
+        ref: ${{ github.event.client_payload.commit }}
+      if: github.event.action == 'published' || github.event.action == 'helics-release-build'
     
     - name: Checkout develop branch
       uses: actions/checkout@v2

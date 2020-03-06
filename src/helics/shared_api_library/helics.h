@@ -909,6 +909,15 @@ HELICS_EXPORT helics_time helicsFederateGetCurrentTime(helics_federate fed, heli
     */
 HELICS_EXPORT void helicsFederateSetGlobal(helics_federate fed, const char* valueName, const char* value, helics_error* err);
 
+/** add a time dependency for a federate.  The federate will depend on the given named federate for time synchronization
+    @param fed the federate to add the dependency for
+    @param fedName the name of the federate to depend on
+    @forcpponly
+    @param[in,out] err a pointer to an error object for catching errors
+    @endforcpponly
+    */
+HELICS_EXPORT void helicsFederateAddDependency(helics_federate fed, const char* fedName, helics_error* err);
+
 /** set the logging file for a federate(actually on the core associated with a federate)
     @param fed the federate to set the log file for
     @param logFile the name of the log file
