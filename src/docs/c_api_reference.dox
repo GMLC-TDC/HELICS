@@ -97,6 +97,8 @@ Functions applying to all \ref helics_federate objects
  - \ref helicsFederateClone
  - \ref helicsFederateIsValid
  - \ref helicsFederateRegisterInterfaces
+ - \ref helicsFederateGlobalError
+ - \ref helicsFederateLocalError
  - \ref helicsFederateFinalize
  - \ref helicsFederateFinalizeAsync
  - \ref helicsFederateFinalizeComplete
@@ -131,6 +133,7 @@ Functions applying to all \ref helics_federate objects
  - \ref helicsFederateGetIntegerProperty
  - \ref helicsFederateGetCurrentTime
  - \ref helicsFederateSetGlobal
+ - \ref helicsFederateAddDependency
  - \ref helicsFederateSetLogFile
  - \ref helicsFederateLogErrorMessage
  - \ref helicsFederateLogWarningMessage
