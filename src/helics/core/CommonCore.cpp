@@ -36,6 +36,22 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <functional>
 
 namespace helics {
+
+const std::string& state_string(operation_state state)
+{
+    static const std::string c1{"connected"};
+    static const std::string estate{"error"};
+    static const std::string dis{"disconnected"};
+    switch (state) {
+        case operation_state::operating:
+            return c1;
+        case operation_state::disconnected:
+            return dis;
+        case operation_state::error:
+        default:
+            return estate;
+    }
+}
 // timeoutMon is a unique_ptr
 CommonCore::CommonCore() noexcept: timeoutMon(new TimeoutMonitor) {}
 
@@ -2019,13 +2035,20 @@ std::string CommonCore::quickCoreQueries(const std::string& queryStr) const
 {
     if ((queryStr == "queries") || (queryStr == "available_queries")) {
         return "[isinit;isconnected;name;address;queries;address;federates;inputs;endpoints;filtered_endpoints;"
-               "publications;filters;federate_map;dependency_graph;dependencies;dependson;dependents]";
+               "publications;filters;federate_map;dependency_graph;dependencies;dependson;dependents;current_time;global_time;current_state]";
     }
     if (queryStr == "isconnected") {
         return (isConnected()) ? "true" : "false";
     }
     if (queryStr == "name") {
         return getIdentifier();
+    }
+    if (queryStr == "current_time") {
+        if (hasTimeDependency) {
+            return timeCoord->printTimeStatus();
+        } else {
+            return "{}";
+        }
     }
     return std::string{};
 }
@@ -2089,6 +2112,41 @@ std::string CommonCore::coreQuery(const std::string& queryStr) const
     }
     if (queryStr == "filtered_endpoints") {
         return filteredEndpointQuery(nullptr);
+    }
+    if (queryStr == "current_state") {
+        Json::Value base;
+        base["name"] = getIdentifier();
+        base["id"] = global_broker_id_local.baseValue();
+        base["state"] = brokerStateName(brokerState.load());
+        base["federates"] = Json::arrayValue;
+        for (auto& fed : loopFederates) {
+            Json::Value fedstate;
+            fedstate[fed->getIdentifier()] = state_string(fed.state);
+
+            base["federates"].append(std::move(fedstate));
+        }
+        return generateJsonString(base);
+    }
+
+    if (queryStr == "global_time") {
+        Json::Value block;
+        block["name"] = getIdentifier();
+        block["id"] = global_broker_id_local.baseValue();
+        block["parent"] = higher_broker_id.baseValue();
+        block["federates"] = Json::arrayValue;
+        if (hasTimeDependency)
+        {
+            block["next_time"] = static_cast<double>(timeCoord->getNextTime());
+        }
+        for (auto fed : loopFederates) {
+            Json::Value fedBlock;
+            fedBlock["name"] = fed->getIdentifier();
+            fedBlock["id"] = fed->global_id.load().baseValue();
+            fedBlock["granted_time"] = static_cast<double>(fed->grantedTime());
+            fedBlock["send_time"] = static_cast<double>(fed->nextAllowedSendTime());
+            block["federates"].append(fedBlock);
+        }
+        return generateJsonString(block);
     }
     if (queryStr == "dependencies") {
         Json::Value base;

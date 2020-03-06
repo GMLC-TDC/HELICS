@@ -27,6 +27,29 @@ using namespace std::string_literals;
 
 constexpr char universalKey[] = "**";
 
+const std::string& state_string(connection_state state)
+{
+    static const std::string c1{ "connected" };
+    static const std::string init{ "init_requested" };
+    static const std::string operating{ "operating" };
+    static const std::string estate{ "error" };
+    static const std::string dis{ "disconnected" };
+    switch (state) {
+    case connection_state::operating:
+        return operating;
+    case connection_state::init_requested:
+        return init;
+    case connection_state::connected:
+        return c1;
+    case connection_state::request_disconnect:
+    case connection_state::disconnected:
+        return dis;
+    case connection_state::error:
+    default:
+        return estate;
+    }
+}
+
 CoreBroker::~CoreBroker()
 {
     std::lock_guard<std::mutex> lock(name_mutex_);
@@ -2372,7 +2395,7 @@ std::string CoreBroker::generateQueryAnswer(const std::string& request)
         for (auto &fed : _federates)
         {
             Json::Value fedstate;
-            fedstate[fed.name] = (fed.isDisconnected) ? std::string("disconnected") : std::string("connected");
+            fedstate[fed.name] = state_string(fed.state);
             
             base["federates"].append(std::move(fedstate));
         }
@@ -2380,7 +2403,7 @@ std::string CoreBroker::generateQueryAnswer(const std::string& request)
         for (auto &brk : _brokers)
         {
             Json::Value brkstate;
-            brkstate[brk.name] = (brk.isDisconnected) ? std::string("disconnected") : std::string("connected");
+            brkstate[brk.name] = state_string(brk.state);
             base["brokers"].append(std::move(brkstate));
         }
         return generateJsonString(base);
@@ -2393,23 +2416,19 @@ std::string CoreBroker::generateQueryAnswer(const std::string& request)
         }
         else
         {
-            return "#na";
-        }
-    }
-    if (request == "current_time")
-    {
-        if (hasTimeDependency)
-        {
-            return timeCoord->printTimeStatus();
-        }
-        else
-        {
-            return "#na";
+            return "{}";
         }
     }
     if (request == "global_time")
     {
-       
+        if (currentTimeMap.isActive()) {
+            return "#wait";
+        }
+        initializeCurrentTimeMap();
+        if (currentTimeMap.isCompleted()) {
+            return currentTimeMap.generate();
+        }
+        return "#wait";
     }
     if (request == "inputs") {
         return generateStringVector_if(
@@ -2632,6 +2651,42 @@ void CoreBroker::initializeDataFlowGraph()
     }
 }
 
+void CoreBroker::initializeCurrentTimeMap()
+{
+    Json::Value& base = currentTimeMap.getJValue();
+    base["name"] = getIdentifier();
+    base["id"] = global_broker_id_local.baseValue();
+    if (!isRootc) {
+        base["parent"] = higher_broker_id.baseValue();
+    }
+    base["brokers"] = Json::arrayValue;
+    ActionMessage queryReq(CMD_BROKER_QUERY);
+    queryReq.payload = "global_time";
+    queryReq.source_id = global_broker_id_local;
+    queryReq.counter = 6; // indicating which processing to use
+    bool hasCores = false;
+    for (auto& broker : _brokers) {
+        if (broker._nonLocal)
+        {
+            continue;
+        }
+        int index;
+        if (broker._core) {
+            if (!hasCores) {
+                hasCores = true;
+                base["cores"] = Json::arrayValue;
+            }
+            index = currentTimeMap.generatePlaceHolder("cores");
+        }
+        else {
+            index = currentTimeMap.generatePlaceHolder("brokers");
+        }
+        queryReq.messageID = index;
+        queryReq.dest_id = broker.global_id;
+        transmit(broker.route, queryReq);
+    }
+}
+
 void CoreBroker::processLocalQuery(const ActionMessage& m)
 {
     ActionMessage queryRep(CMD_QUERY_REPLY);
@@ -2645,8 +2700,12 @@ void CoreBroker::processLocalQuery(const ActionMessage& m)
             depMapRequestors.push_back(queryRep);
         } else if (m.payload == "federate_map") {
             fedMapRequestors.push_back(queryRep);
-        } else if (m.payload == "data_flow_graph") {
+        }
+        else if (m.payload == "data_flow_graph") {
             dataflowMapRequestors.push_back(queryRep);
+        } else if (m.payload=="global_time")
+        {
+            ctimeRequestors.push_back(queryRep);
         }
     } else if (queryRep.dest_id == global_broker_id_local) {
         ActiveQueries.setDelayedValue(m.messageID, queryRep.payload);
@@ -2782,6 +2841,34 @@ void CoreBroker::processQueryResponse(const ActionMessage& m)
                     }
                 }
                 depMapRequestors.clear();
+            }
+            break;
+        case 6:
+            if (currentTimeMap.addComponent(m.payload, m.messageID)) {
+                if (ctimeRequestors.size() == 1) {
+                    if (ctimeRequestors.front().dest_id == global_broker_id_local) {
+                        ActiveQueries.setDelayedValue(
+                            ctimeRequestors.front().messageID, currentTimeMap.generate());
+                    }
+                    else {
+                        ctimeRequestors.front().payload = currentTimeMap.generate();
+                        routeMessage(std::move(ctimeRequestors.front()));
+                    }
+                }
+                else {
+                    auto str = currentTimeMap.generate();
+                    for (auto& resp : ctimeRequestors) {
+                        if (resp.dest_id == global_broker_id_local) {
+                            ActiveQueries.setDelayedValue(resp.messageID, str);
+                        }
+                        else {
+                            resp.payload = str;
+                            routeMessage(std::move(resp));
+                        }
+                    }
+                }
+                ctimeRequestors.clear();
+                currentTimeMap.reset();
             }
             break;
     }

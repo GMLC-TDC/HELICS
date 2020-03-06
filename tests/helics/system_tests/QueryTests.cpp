@@ -201,6 +201,50 @@ TEST_F(query_tests, test_dependency_graph)
     helics::cleanupHelicsLibrary();
 }
 
+
+TEST_F(query_tests, test_global_time)
+{
+    SetupTest<helics::ValueFederate>("test_3", 2);
+    auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
+    auto vFed2 = GetFederateAs<helics::ValueFederate>(1);
+    auto core = vFed1->getCorePointer();
+    
+    vFed1->enterExecutingModeAsync();
+    vFed2->enterExecutingMode();
+    vFed1->enterExecutingModeComplete();
+
+    auto res = core->query("root", "global_time");
+
+    auto val = loadJsonStr(res);
+    EXPECT_EQ(val["cores"].size(), 0u);
+    EXPECT_EQ(val["brokers"].size(), 1u);
+    ASSERT_EQ(val["brokers"][0]["cores"].size(), 2u);
+    EXPECT_EQ(val["brokers"][0]["cores"][0]["federates"].size(), 1u);
+    EXPECT_EQ(val["brokers"][0]["cores"][1]["federates"].size(), 1u);
+    EXPECT_EQ(val["brokers"][0]["cores"][0]["federates"][0]["send_time"].asDouble(), 0.0);
+    EXPECT_EQ(val["brokers"][0]["cores"][0]["federates"][0]["granted_time"].asDouble(), 0.0);
+
+    vFed2->requestTimeAsync(1.0);
+    vFed1->requestTime(1.0);
+    vFed2->requestTimeComplete();
+
+    res = core->query("root", "global_time");
+
+    val = loadJsonStr(res);
+    EXPECT_EQ(val["cores"].size(), 0u);
+    EXPECT_EQ(val["brokers"].size(), 1u);
+    ASSERT_EQ(val["brokers"][0]["cores"].size(), 2u);
+    EXPECT_EQ(val["brokers"][0]["cores"][0]["federates"].size(), 1u);
+    EXPECT_EQ(val["brokers"][0]["cores"][1]["federates"].size(), 1u);
+    EXPECT_EQ(val["brokers"][0]["cores"][0]["federates"][0]["send_time"].asDouble(), 1.0);
+    EXPECT_EQ(val["brokers"][0]["cores"][0]["federates"][0]["granted_time"].asDouble(), 1.0);
+
+    core = nullptr;
+    vFed1->finalize();
+    vFed2->finalize();
+    helics::cleanupHelicsLibrary();
+}
+
 TEST_F(query_tests, test_updates_indices)
 {
     SetupTest<helics::ValueFederate>("test", 1);

@@ -1657,6 +1657,10 @@ std::string FederateState::processQueryActual(const std::string& query) const
             return std::to_string(dep.baseValue());
         });
     }
+    if (query == "current_time")
+    {
+        timeCoord->printTimeStatus();
+    }
     if (query == "timeconfig") {
         std::ostringstream s;
         s << "{\n" << timeCoord->generateConfig();

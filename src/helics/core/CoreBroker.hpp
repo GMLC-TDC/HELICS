@@ -116,6 +116,8 @@ class CoreBroker: public Broker, public BrokerBase {
     gmlc::concurrency::DelayedObjects<std::string> ActiveQueries; //!< holder for active queries
     JsonMapBuilder fedMap; //!< builder for the federate_map
     std::vector<ActionMessage> fedMapRequestors; //!< list of requesters for the active federate map
+    JsonMapBuilder currentTimeMap; //!< builder for the current time graph
+    std::vector<ActionMessage> ctimeRequestors; //!< list of requesters for the active current time status
     JsonMapBuilder depMap; //!< builder for the dependency graph
     std::vector<ActionMessage> depMapRequestors; //!< list of requesters for the dependency graph
     JsonMapBuilder dataflowMap; //!< builder for the dependency graph
@@ -339,6 +341,8 @@ class CoreBroker: public Broker, public BrokerBase {
     void initializeDependencyGraph();
     /** generate a json string containing the data flow information for all federation object*/
     void initializeDataFlowGraph();
+    /** generate a json string containing the time information for the federation */
+    void initializeCurrentTimeMap();
 
     /** send an error code to all direct cores*/
     void sendErrorToImmediateBrokers(int error_code);

@@ -68,7 +68,7 @@ The following queries are defined for federates.  Federates may specify a callba
 +--------------------+------------------------------------------------------------+
 | ``dependents``     | list of dependent objects [sv]                             |
 +--------------------+------------------------------------------------------------+
-| ``current_time``   | the current time of the federate [string]                  |
+| ``current_time``   | the current time of the federate [JSON]                    |
 +--------------------+------------------------------------------------------------+
 |``endpoint_filters``| data structure containing the filters on endpoints[JSON]   |
 +--------------------+------------------------------------------------------------+
@@ -130,7 +130,7 @@ The following queries will be answered by a core.
 +----------------------+-------------------------------------------------------------------------------------+
 | ``federation_state`` | a structure with the current known status of the brokers and federates [JSON]       |
 +----------------------+-------------------------------------------------------------------------------------+
-| ``current_time``     | if a time is computed locally that time sequence is returns otherwise #na [string]  |
+| ``current_time``     | if a time is computed locally that time sequence is returns otherwise #na [JSON]    |
 +----------------------+-------------------------------------------------------------------------------------+
 | ``global_time``      | get a structure with the current time status of all the federates/cores [JSON]      |
 +----------------------+-------------------------------------------------------------------------------------+

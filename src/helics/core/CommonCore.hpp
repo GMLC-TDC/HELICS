@@ -38,6 +38,9 @@ enum class handle_type : char;
 /** enumeration of possible operating conditions for a federate*/
 enum class operation_state : std::uint8_t { operating = 0, error = 5, disconnected = 10 };
 
+/** function to print string for the state*/
+const std::string &state_string(operation_state state);
+
 /** helper class for containing some wrapper around a federate for the core*/
 class FedInfo {
   public:
