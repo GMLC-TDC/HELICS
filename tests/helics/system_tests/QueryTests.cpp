@@ -325,7 +325,6 @@ TEST_F(query_tests, current_state_core)
     SetupTest<helics::ValueFederate>("test_2", 2);
     auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
     auto vFed2 = GetFederateAs<helics::ValueFederate>(1);
-    auto core = vFed1->getCorePointer();
 
     vFed1->enterExecutingModeAsync();
     vFed2->enterExecutingMode();
