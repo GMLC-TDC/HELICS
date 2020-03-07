@@ -33,14 +33,18 @@ MessageFederate::MessageFederate(const std::string& configString):
     Federate(std::string(), loadFederateInfo(configString))
 {
     mfManager = std::make_unique<MessageFederateManager>(coreObject.get(), this, getID());
-    MessageFederate::registerInterfaces(configString);
+	if (looksLikeFile(configString)) {
+		MessageFederate::registerInterfaces(configString);
+	}
 }
 
 MessageFederate::MessageFederate(const std::string& fedName, const std::string& configString):
     Federate(fedName, loadFederateInfo(configString))
 {
     mfManager = std::make_unique<MessageFederateManager>(coreObject.get(), this, getID());
-    MessageFederate::registerInterfaces(configString);
+	if (looksLikeFile(configString)) {
+		MessageFederate::registerInterfaces(configString);
+	}
 }
 
 MessageFederate::MessageFederate()
