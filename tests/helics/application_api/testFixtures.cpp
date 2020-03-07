@@ -6,6 +6,7 @@ SPDX-License-Identifier: BSD-3-Clause
 */
 #include "testFixtures.hpp"
 
+#include "helics/common/loggerCore.hpp"
 #include "helics/core/BrokerFactory.hpp"
 #include "helics/core/CoreFactory.hpp"
 
@@ -70,7 +71,7 @@ FederateTestFixture::~FederateTestFixture()
         }
 
         if (broker->isConnected()) {
-            std::cout << "forcing disconnect\n";
+            helics::LoggerManager::logMessage("forcing disconnect");
             broker->disconnect();
         }
     }

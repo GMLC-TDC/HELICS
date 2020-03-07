@@ -5,11 +5,8 @@ the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 
-#include "helics/application_api/Inputs.hpp"
-#include "helics/application_api/Publications.hpp"
-#include "helics/application_api/Subscriptions.hpp"
-#include "helics/application_api/ValueFederate.hpp"
-#include "helics/core/ActionMessage.hpp"
+#include "TimingHubFederate.hpp"
+#include "TimingLeafFederate.hpp"
 #include "helics/core/BrokerFactory.hpp"
 #include "helics/core/CoreFactory.hpp"
 #include "helics/helics-config.h"
@@ -22,128 +19,6 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <iostream>
 #include <thread>
 
-using helics::operator"" _t;
-// static constexpr helics::Time tend = 3600.0_t;  // simulation end time
-using namespace helics;
-/** class implementing the hub for an echo test*/
-class TimingHub {
-  public:
-    helics::Time finalTime = helics::Time(100, time_units::ms); // final time
-  private:
-    std::unique_ptr<helics::ValueFederate> vFed;
-    std::vector<helics::Publication> pubs;
-    std::vector<helics::Input> subs;
-    int cnt_ = 10;
-    bool initialized = false;
-    bool readyToRun = false;
-
-  public:
-    TimingHub() = default;
-
-    void run(std::function<void()> callOnReady = {})
-    {
-        if (!readyToRun) {
-            makeReady();
-        }
-        if (callOnReady) {
-            callOnReady();
-        }
-        mainLoop();
-    };
-
-    void initialize(const std::string& coreName, int cnt)
-    {
-        cnt_ = cnt;
-        std::string name = "echohub";
-        helics::FederateInfo fi;
-        fi.coreName = coreName;
-        vFed = std::make_unique<helics::ValueFederate>(name, fi);
-        pubs.reserve(cnt_);
-        subs.reserve(cnt_);
-        for (int ii = 0; ii < cnt_; ++ii) {
-            pubs.push_back(vFed->registerPublicationIndexed<std::string>("leafrx", ii));
-            subs.push_back(vFed->registerSubscriptionIndexed("leafsend", ii));
-        }
-        initialized = true;
-    }
-
-    void makeReady()
-    {
-        if (!initialized) {
-            throw("must initialize first");
-        }
-        vFed->enterExecutingMode();
-        readyToRun = true;
-    }
-
-    void mainLoop()
-    {
-        auto cTime = 0.0_t;
-        while (cTime <= finalTime) {
-            cTime = vFed->requestTime(finalTime + 0.05);
-        }
-        vFed->finalize();
-    }
-};
-
-class TimingLeaf {
-  private:
-    std::unique_ptr<helics::ValueFederate> vFed;
-    helics::Publication pub;
-    helics::Input sub;
-
-    int index_ = 0;
-    bool initialized = false;
-    bool readyToRun = false;
-
-  public:
-    TimingLeaf() = default;
-
-    void run(std::function<void()> callOnReady = {})
-    {
-        if (!readyToRun) {
-            makeReady();
-        }
-        if (callOnReady) {
-            callOnReady();
-        }
-        mainLoop();
-    };
-    void initialize(const std::string& coreName, int index)
-    {
-        std::string name = "echoleaf_" + std::to_string(index);
-        index_ = index;
-        helics::FederateInfo fi;
-        fi.coreName = coreName;
-        vFed = std::make_unique<helics::ValueFederate>(name, fi);
-        pub = vFed->registerPublicationIndexed<std::string>("leafsend", index_);
-        sub = vFed->registerSubscriptionIndexed("leafrx", index_);
-        initialized = true;
-    }
-
-    void makeReady()
-    {
-        if (!initialized) {
-            throw("must initialize first");
-        }
-        vFed->enterExecutingMode();
-        readyToRun = true;
-    }
-
-    void mainLoop()
-    {
-        int cnt = 0;
-        // this is  to make a fixed size string that is different for each federate but has sufficient length to
-        // get beyond SSO
-        const int iter = 5000;
-        while (cnt <= iter + 1) {
-            vFed->requestNextStep();
-            ++cnt;
-        }
-        vFed->finalize();
-    }
-};
-
 static void BMtiming_singleCore(benchmark::State& state)
 {
     for (auto _ : state) {
@@ -154,10 +29,12 @@ static void BMtiming_singleCore(benchmark::State& state)
         auto wcore = helics::CoreFactory::create(
             core_type::INPROC, std::string("--autobroker --federates=") + std::to_string(feds + 1));
         TimingHub hub;
-        hub.initialize(wcore->getIdentifier(), feds);
+        std::string bmInit = "--num_leafs=" + std::to_string(feds);
+        hub.initialize(wcore->getIdentifier(), bmInit);
         std::vector<TimingLeaf> leafs(feds);
         for (int ii = 0; ii < feds; ++ii) {
-            leafs[ii].initialize(wcore->getIdentifier(), ii);
+            bmInit = "--index=" + std::to_string(ii);
+            leafs[ii].initialize(wcore->getIdentifier(), bmInit);
         }
 
         std::vector<std::thread> threadlist(static_cast<size_t>(feds));
@@ -201,13 +78,15 @@ static void BMtiming_multiCore(benchmark::State& state, core_type cType)
             helics::CoreFactory::create(cType, std::string("--federates=1 --log_level=no_print"));
         // this is to delay until the threads are ready
         TimingHub hub;
-        hub.initialize(wcore->getIdentifier(), feds);
+        std::string bmInit = "--num_leafs=" + std::to_string(feds);
+        hub.initialize(wcore->getIdentifier(), bmInit);
         std::vector<TimingLeaf> leafs(feds);
         std::vector<std::shared_ptr<helics::Core>> cores(feds);
         for (int ii = 0; ii < feds; ++ii) {
             cores[ii] = helics::CoreFactory::create(cType, "-f 1 --log_level=no_print");
             cores[ii]->connect();
-            leafs[ii].initialize(cores[ii]->getIdentifier(), ii);
+            bmInit = "--index=" + std::to_string(ii);
+            leafs[ii].initialize(cores[ii]->getIdentifier(), bmInit);
         }
 
         std::vector<std::thread> threadlist(static_cast<size_t>(feds));

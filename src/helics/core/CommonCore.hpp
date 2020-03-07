@@ -35,12 +35,17 @@ class FilterCoordinator;
 class FilterInfo;
 class TimeoutMonitor;
 enum class handle_type : char;
+/** enumeration of possible operating conditions for a federate*/
+enum class operation_state : std::uint8_t { operating = 0, error = 5, disconnected = 10 };
+
+/** function to print string for the state*/
+const std::string& state_string(operation_state state);
 
 /** helper class for containing some wrapper around a federate for the core*/
 class FedInfo {
   public:
     FederateState* fed = nullptr;
-    bool disconnected = false;
+    operation_state state{operation_state::operating};
 
     constexpr FedInfo() = default;
     constexpr explicit FedInfo(FederateState* newfed) noexcept: fed(newfed){};
@@ -68,7 +73,12 @@ class CommonCore: public Core, public BrokerBase {
     virtual void configureFromVector(std::vector<std::string> args) override final;
     virtual bool isConfigured() const override final;
     virtual bool isOpenToNewFederates() const override final;
-    virtual void error(local_federate_id federateID, int errorID = -1) override final;
+    virtual void
+        globalError(local_federate_id federateID, int errorCode, const std::string& error_string)
+            override final;
+    virtual void
+        localError(local_federate_id federateID, int errorCode, const std::string& error_string)
+            override final;
     virtual void finalize(local_federate_id federateID) override final;
     virtual void enterInitializingMode(local_federate_id federateID) override final;
     virtual void setCoreReadyToInit() override final;
@@ -270,8 +280,8 @@ class CommonCore: public Core, public BrokerBase {
     bool allInitReady() const;
     /** check if all connections are disconnected (feds and time dependencies)*/
     bool allDisconnected() const;
-    /** check if all federates have said good-bye*/
-    bool allFedDisconnected() const;
+    /** get the minimum operating state of the connected federates*/
+    operation_state minFederateState() const;
 
   private:
     /** get the federate Information from the federateID*/
@@ -409,13 +419,13 @@ class CommonCore: public Core, public BrokerBase {
         uint16_t flags = 0);
 
     /** check if a global id represents a local federate
-    @param global_id the federate global id
+    @param global_fedid the identifier for the federate
     @return true if it is a local federate*/
-    bool isLocal(global_federate_id global_id) const;
+    bool isLocal(global_federate_id global_fedid) const;
     /** get a route id for a non-local federate
-    @param global_id the federate global id
+    @param global_fedid the identifier for the federate
     @return parent_route if unknown, otherwise returns the route_id*/
-    route_id getRoute(global_federate_id global_id) const;
+    route_id getRoute(global_federate_id global_fedid) const;
     /** process a message for potential additions to the filter ordering
     @param cmd the message to process
     */
@@ -448,8 +458,8 @@ class CommonCore: public Core, public BrokerBase {
     */
     std::string federateQuery(const FederateState* fed, const std::string& queryStr) const;
 
-    /** send an error code to all the federates*/
-    void sendErrorToFederates(int error_code);
+    /** send an error code and message to all the federates*/
+    void sendErrorToFederates(int error_code, const std::string& message);
     /** check for a disconnect and take actions if the object can disconnect*/
     bool checkAndProcessDisconnect();
     /** send a disconnect message to time dependencies and child federates*/

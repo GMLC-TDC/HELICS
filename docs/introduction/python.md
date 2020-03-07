@@ -8,12 +8,10 @@ We will create a simple `pi-exchange` federation in Python with 2 federates.
 
 Before we run the Python `pi-exchange` federation, it is necessary to ensure that we have Python installed and that we have the HELICS Python built successfully and correctly on the machine.
 
-We recommend using Anaconda3/Miniconda3, although this should work with most versions of Python.
-To make an interface that is similar across different languages, we use SWIG to generate the Python bindings to the `helicsSharedLib` shared library.
+We recommend using pip with Python (version 2.7 or 3.5+) or Anaconda3/Miniconda3 to install a copy of the HELICS Python interface, although this should work with most versions of Python if you build the interface yourself using SWIG to generate the Python bindings to the `helicsSharedLib` shared library.
 SWIG claims to be compatible with most Python versions, dating back to Python 2.0. And recommends that for the best results, one should consider using Python 2.3 or newer.
 
-HELICS can also be built from source and linked with the required Python version.
-See the page on the Installation instructions for more information regarding this.
+See the Installation instructions page for more information regarding this.
 
 **Create a federations directory**
 

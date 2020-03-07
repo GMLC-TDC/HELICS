@@ -144,7 +144,7 @@ namespace apps {
     {
         std::string ext_interface = "0.0.0.0";
         int tcpport = DEFAULT_TCP_BROKER_PORT_NUMBER;
-        std::chrono::milliseconds timeout(20000);
+        //std::chrono::milliseconds timeout(20000);
         if (config_->isMember("tcp")) {
             auto V = (*config_)["tcp"];
             replaceIfMember(V, "interface", ext_interface);
@@ -159,7 +159,7 @@ namespace apps {
     {
         std::string ext_interface = "0.0.0.0";
         int udpport = DEFAULT_UDP_BROKER_PORT_NUMBER;
-        std::chrono::milliseconds timeout(20000);
+        //std::chrono::milliseconds timeout(20000);
         if (config_->isMember("udp")) {
             auto V = (*config_)["udp"];
             replaceIfMember(V, "interface", ext_interface);

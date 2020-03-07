@@ -76,7 +76,9 @@ class TimeCoordinator {
   public:
     global_federate_id source_id{
         0}; //!< the identifier for inserting into the source id field of any generated messages;
-    bool iterating{false}; //!< indicator that the coordinator should be iterating if need be
+    iteration_request iterating{
+        iteration_request::
+            no_iterations}; //!< indicator that the coordinator should be iterating if need be
     bool checkingExec{
         false}; //!< flag indicating that the coordinator is trying to enter the exec mode
     bool executionMode{false}; //!< flag that the coordinator has entered the execution Mode
@@ -205,6 +207,8 @@ class TimeCoordinator {
     message_processing_result checkTimeGrant();
     /** disconnect*/
     void disconnect();
+    /** generate a local Error*/
+    void localError();
     /** generate a string with the current time status*/
     std::string printTimeStatus() const;
     /** return true if there are active dependencies*/

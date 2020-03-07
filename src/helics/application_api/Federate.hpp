@@ -166,6 +166,13 @@ class HELICS_CXX_EXPORT Federate {
     /** specify the simulator had an error with error code and message
      */
     void error(int errorcode, const std::string& message);
+    /** specify the simulator had a local error with error code and message
+    */
+    void localError(int errorcode, const std::string& message);
+
+    /** specify the simulator had a local error with error code and message
+    */
+    void globalError(int errorcode, const std::string& message);
 
     /** specify a separator to use for naming separation between the federate name and the interface name
      setSeparator('.') will result in future registrations of local endpoints such as fedName.endpoint
@@ -325,6 +332,13 @@ class HELICS_CXX_EXPORT Federate {
     @param value the value of the global
     */
     void setGlobal(const std::string& valueName, const std::string& value);
+
+    /** add a dependency for this federate
+    @details adds an additional internal time dependency for the federate
+    @param federateName the name of the federate to add a dependency on
+    */
+    void addDependency(const std::string& fedName);
+
     /** define a named global filter interface
     @param filterName the name of the globally visible filter
     @param inputType the inputType which the filter can handle
@@ -557,6 +571,8 @@ class HELICS_CXX_EXPORT Federate {
     {
         logMessage(helics_log_level_data, message);
     }
+    /** call to complete async operation with no output*/
+    void completeOperation();
 
   private:
     /** register filter interfaces defined in  file or string

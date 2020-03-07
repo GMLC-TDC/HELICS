@@ -1,6 +1,10 @@
 # Windows Installation #
 
-## Requirements ##
+## Windows Installers ##
+
+Windows installers are available with the different [releases](https://github.com/GMLC-TDC/HELICS/releases).  The release includes zip archives with static libraries containing both the Debug version and Release version for several versions of Visual Studio. There is also an installer and zip file for getting the HELICS apps and shared library along with pre-built Python 3.6 and Java 1.8 interfaces. There is also an archive with just the C shared library and headers, intended for use with 3rd party interfaces.
+
+## Build Requirements ##
 
 -   Microsoft Visual C++ 2015 or newer (MS Build Tools also works)
 -   CMake 3.4 or newer(CMake should be newer than the Visual Studio and Boost version you are using)
@@ -14,8 +18,8 @@
 
 To set up your environment:
 
-1. Install Microsoft Visual C++ 2015 or newer (2017 or later is recommended)[MSVC](https://visualstudio.microsoft.com/)
-2. Install
+1.  Install Microsoft Visual C++ 2015 or newer (2017 or later is recommended)[MSVC](https://visualstudio.microsoft.com/)
+2.  Install
    [Boost](https://www.boost.org/doc/libs/1_70_0/more/getting_started/windows.html)
     [Windows downloads](https://dl.bintray.com/boostorg/release/1.70.0/binaries/)
    1.61 or later recommended (core library should build with 1.58,
@@ -26,80 +30,76 @@ To set up your environment:
    Building with Visual Studio 2017 will require boost 1.65.1 or newer and CMake 3.9
     or newer.  Use 14.0 versions for Visual Studio 2015, 14.1 files for Visual studio 2017.  Visual studio 2019 will require CMake 3.14 or later.  
     Boost 1.70 with CMake 3.14+ is the current recommended configuration.
-3. *Optional* Only if you need a global Install of ZeroMQ [ZeroMQ](http://zeromq.org/build:_start).
+3.  *Optional* Only if you need a global Install of ZeroMQ [ZeroMQ](http://zeromq.org/build:_start).
    We **highly recommend skipping** this step and running CMake with the
    `HELICS_ZMQ_SUBPROJECT=ON` option enabled(which is default on windows) to automatically set up a project-only
    copy of ZeroMQ. The ZeroMQ Windows installer is **very**
    outdated and will not work with new versions of Visual Studio.  The CMake generator from ZeroMQ on windows is also functional and can be used to store ZMQ in another location that will need to be specified for HELICS.
-4. *Optional* Install
+4.  *Optional* Install
    [MS-MPI](https://msdn.microsoft.com/en-us/library/bb524831(v=vs.85).aspx)
    if you need MPI support.
-5. *Optional* Install
+5.  *Optional* Install
    [SWIG](http://www.swig.org/download.html)
    if you wish to generate the interface libraries, appropriate build files are included in the repository so it shouldn't be necessary to regenerate unless the libraries are modified.  If you want to generate the MATLAB interface a modified version of swig is necessary see [MATLAB Swig](../introduction/matlab).  For Matlab, Python 3, and Java swig is not necessary.  For Octave, Python2, and C\# swig install is necessary.  The simplest way to install swig is to use [chocolatey](https://chocolatey.org/) and use
-   ```
-   choco install swig
-   ```
+```shell
+     choco install swig
+```
    from windows power shell.  
-6. Open a Visual Studio Command Prompt, and go to your working
+6.  Open a Visual Studio Command Prompt, and go to your working
     directory.
 7.  Make sure *CMake* and *git* are available in the Command Prompt.
     If they aren't, add them to the system PATH variable.
 
 Getting and building from source:
 
-1. Set up your environment.
-2. Open a command prompt. Use git clone to check out a copy of
-   HELICS.
+1.  Set up your environment.
+2.  Open a command prompt. Use git clone to check out a copy of
+    HELICS.
 
-   ```bash
-   git clone https://github.com/GMLC-TDC/HELICS.git
-   ```
+    ```bash
+    git clone https://github.com/GMLC-TDC/HELICS.git
+    ```
 
-3. Go to the checked out HELICS project folder (the default folder
-   name is HELICS). Create a build folder and open the build
-   folder. Alternatively, cmake-gui can be used.
+3.  Go to the checked out HELICS project folder (the default folder
+    name is HELICS). Create a build folder and open the build
+    folder. Alternatively, cmake-gui can be used.
 
-   ```bash
-   cd HELICS
-   mkdir build
-   cd build
-   ```
+    ```bash
+    cd HELICS
+    mkdir build
+    cd build
+    ```
 
-4. Run CMake. It should automatically detect where MPI is installed
-   if the system path variables are set up correctly, otherwise you
-   will have to set the CMake path manually. ZMQ_LOCAL_BUILD is set to ON
-   so ZeroMQ will automatically be built unless the option is changed.
+4.  Run CMake. It should automatically detect where MPI is installed
+    if the system path variables are set up correctly, otherwise you
+    will have to set the CMake path manually. ZMQ_LOCAL_BUILD is set to ON
+    so ZeroMQ will automatically be built unless the option is changed.
 
-   ```bash
-   CMake ..
-   ```
+    ```bash
+    CMake ..
+    ```
 
-   If you need CMake to use a generator other than the default (ex:
-   selecting between a 32-bit or 64-bit project), the -G option can be
-   used to specify one of the generators listed by CMake --help. For
-   Visual Studio 2017, the generator name would be
-   `Visual Studio 15 2017 [arch]`, where \[arch\] is optional and can be
-   either Win64 for a 64-bit project, or left out to generate a 32-bit
-   project. To avoid problems when building later, this should match the
-   version of the Boost libraries you are using.
+    If you need CMake to use a generator other than the default (ex:
+    selecting between a 32-bit or 64-bit project), the -G option can be
+    used to specify one of the generators listed by CMake --help. For
+    Visual Studio 2017, the generator name would be
+    `Visual Studio 15 2017 [arch]`, where \[arch\] is optional and can be
+    either Win64 for a 64-bit project, or left out to generate a 32-bit
+    project. To avoid problems when building later, this should match the
+    version of the Boost libraries you are using.
 
-   If you installed boost into the root of the C or D drives with the
-   default location (or the BOOST\_INSTALL\_PATH environment variable has been set),
-   CMake should automatically detect their location. Otherwise the
-   location will need to be manually given to CMake.
-   NOTE: CMake 3.14 and later separate the architecture into a separate field for the generator
+    If you installed boost into the root of the C or D drives with the
+    default location (or the BOOST\_INSTALL\_PATH environment variable has been set),
+    CMake should automatically detect their location. Otherwise the
+    location will need to be manually given to CMake.
+    NOTE: CMake 3.14 and later separate the architecture into a separate field for the generator
 
-5. Open the Visual Studio solution generated by CMake. Under the
-   *Build* menu, select *Build the Solution*. Alternatively, in the
-   MSBuild command prompt, run the command msbuild HELICS.sln from
-   the build folder to compile the entire solution. HELICS.sln can be
-   replaced with the name of one of the projects to build only that
-   part of HELICS.
-
-## Windows Installers ##
-
-Windows installers are available with the different [releases](https://github.com/GMLC-TDC/HELICS/releases).  The release includes zip archives with static libraries containing both the Debug version and Release version for several versions of Visual Studio. There is also an installer and zip file for getting the HELICS apps and shared library along with pre-built Python 3.6 and Java 1.8 interfaces. There is also an archive with just the C shared library and headers, intended for use with 3rd party interfaces.
+5.  Open the Visual Studio solution generated by CMake. Under the
+    *Build* menu, select *Build the Solution*. Alternatively, in the
+    MSBuild command prompt, run the command msbuild HELICS.sln from
+    the build folder to compile the entire solution. HELICS.sln can be
+    replaced with the name of one of the projects to build only that
+    part of HELICS.
 
 ## Testing ##
 
@@ -164,15 +164,64 @@ Out[2]: 'x.x.x (20XX-XX-XX)'
 
 ![](../img/windows-python-success.png)
 
-## Building HELICS From Source on Windows with MSYS2 ##
+## MSYS2 ##
 
-### Overview ###
+MSYS2 provides a Linux like terminal environment on your Windows system. MSYS2 can be installed from [here](https://www.msys2.org/). Once MSYS2 has been installed start up msys2.exe. Follow first time updates as described on the MSYS2 website.
 
-This section will layout the setting up of MSYS2 to compile and install HELICS. This guide will describe all the packages and install instructions for a 64bit build.
+### Using pacman package manager ###
+HELICS is available on the Mingw-32 and Mingw-64 environments through the MSYS2 repositories.  From the MINGW64 shell
+```bash
+$ pacman -Sy mingw64/mingw-w64-x86_64-helics
+:: Synchronizing package databases...
+ mingw32               453.3 KiB  2.86 MiB/s 00:00 [#####################] 100%
+ mingw32.sig           119.0   B  0.00   B/s 00:00 [#####################] 100%
+ mingw64               456.0 KiB  2.77 MiB/s 00:00 [#####################] 100%
+ mingw64.sig           119.0   B  0.00   B/s 00:00 [#####################] 100%
+ msys                  185.9 KiB  1804 KiB/s 00:00 [#####################] 100%
+ msys.sig              119.0   B  0.00   B/s 00:00 [#####################] 100%
+resolving dependencies...
+looking for conflicting packages...
 
-### Setting up MSYS2 ###
+Packages (8) mingw-w64-x86_64-gcc-libs-9.2.0-2  mingw-w64-x86_64-gmp-6.2.0-1
+             mingw-w64-x86_64-libsodium-1.0.18-1
+             mingw-w64-x86_64-libwinpthread-git-8.0.0.5574.33e5a2ac-1
+             mingw-w64-x86_64-mpc-1.1.0-1  mingw-w64-x86_64-mpfr-4.0.2-2
+             mingw-w64-x86_64-zeromq-4.3.2-1  mingw-w64-x86_64-helics-2.4.0-1
 
-MSYS2 provides a Linux like terminal environment on your Windows system. MSYS2 can be installed from [here](https://www.msys2.org/). Once MSYS2 has been installed start up msys2.exe. Follow first time updates as described on the MSYS2 website. After MSYS2 has been successfully updated Some packages need to be installed in order to configure and build HELICS. The following packages need to be installed:
+Total Download Size:    9.17 MiB
+Total Installed Size:  65.78 MiB
+
+:: Proceed with installation? [Y/n] y
+
+```
+you will be asked to proceed with installation, answering `y` will install HELICS and the required dependencies.  
+
+```bash
+$ helics_broker --version
+2.4.0-master-dirty (2020-02-16)
+
+```
+The helics apps and libraries are now installed, and can be updated when HELICS gets an update. For the MINGw32 use
+
+```bash
+$ pacman -Sy mingw32/mingw-w64-i686-helics
+```
+
+if you are installing both the 32 and 64 bit versions or just want a simpler command to type
+```bash
+$ pacboy -Sy helics
+```
+
+if the python interface is needed on MSYS2 it can be installed through pip but requires some setup first.
+```bash
+$export CMAKE_GENERATOR="MSYS Makefiles"
+$pip install helics  
+```
+This will install the HELICS python extension in the correct location.  The pacman package should be installed first  
+
+### Building HELICS From Source on Windows with MSYS2 ###
+
+After MSYS2 has been successfully updated Some packages need to be installed in order to configure and build HELICS. The following packages need to be installed:
 -   base-devel
 -   mingw-w64-x86_64-toolchain
 -   git
@@ -190,7 +239,7 @@ For base-devel and mingw-w64-x86_64-toolchain you may have to hit enter for inst
 $ export PATH=$PATH:/mingw64/bin
 ```
 
-### Download HELICS Source Code ###
+#### Download HELICS Source Code ####
 
 Now that the MSYS2 environment has been setup and all prerequisite packages have been installed the source code can be compiled and installed. The HELICS source code can be cloned from GitHub by performing the following:
 ```bash
@@ -198,7 +247,7 @@ $ git clone https://github.com/GMLC-TDC/HELICS.git
 ```
 git will clone the source code into a folder in the current working directory called HELICS. This path will be referred to by this guide as HELICS_ROOT_DIR.
 
-### Compiling HELICS From Source ###
+#### Compiling HELICS From Source ####
 
 Change directories to HELICS_ROOT_DIR. Create a directory called helics-build. This can be accomplished by using the mkdir command. cd into this directory. Now type the following:
 ```bash
@@ -231,10 +280,10 @@ $ make install
 unless you changed the value of CMake_INSTALL_PREFIX everything the default install location /usr/local/helics_2_1_0. This install path will be referred to as HELICS_INSTALL for the sections related to GridLab-D.
 If you want to build Gridlab-d on Windows with HELICS see [Building with HELICS](http://gridlab-d.shoutwiki.com/wiki/Building_GridLAB-D_on_Windows_with_MSYS2#Building_with_the_HELICS_Library).  Please use branch feature/1179 to build with HELICS 2.1 or later instead of the branch listed.  
 
-### Compiling with clang
-Clang does not work to compile on MSYS2 at this time.  It has in the past but there are various issues with the clang standard library on MSYS yet so this will be updated if the situation changes. It is getting closer as of (10/12/2019) Mostly it compiles when linked with Libc++ and libc++abi, but there seems to be some missing functions as of yet, so cannot be used other than for some warning checks.    
+#### Compiling with clang ####
+Clang does not work to compile on MSYS2 at this time.  It has in the past but there are various issues with the clang standard library on MSYS yet so this will be updated if the situation changes. It is getting closer as of (1/30/2020) Mostly it compiles when linked with Libc++ and libc++abi, but there seems to be some missing functions as of yet, so cannot be used other than for some warning checks.    
 
-## Building with mingw
+## Building with mingw ##
 HELICS can also be built with the standalone MinGW
 
 -   We assume you have MinGW installed or know how to install it.
@@ -242,10 +291,10 @@ HELICS can also be built with the standalone MinGW
 -   Run CMake to configure and generate build files, using "MinGW Makefiles" as the generator,
 -   Run mingw32-make -j  to build
 
-## Building with cygwin
+## Building with cygwin ##
 
-Cygwin is another unix like environment on Windows.  It has some peculiarities.
-HELICS will only build on the 32 bit version due to incompatibilities with ASIO and the 64 bit build.  But it does build on the 32 bit versions.
+Cygwin is another UNIX like environment on Windows.  It has some peculiarities.
+HELICS will only build on the 32 bit version due to incompatibilities with ASIO and the 64 bit build.  But it does build on the 32 bit versions completely and on the 64 bit version if `HELICS_DISABLE_ASIO=ON` is set
 Also the helics-config utility does not get built due to an incompatibility with the filesystem header.  
 
 -   required packages include CMake, libboost-devel, make, gcc, g++, libzmq(if using zmq)

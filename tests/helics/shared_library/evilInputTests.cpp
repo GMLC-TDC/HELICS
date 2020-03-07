@@ -880,10 +880,10 @@ TEST(evil_fedInfo_test, helicsFederateInfoSetCoreTypeFromString)
     helics_federate_info evil_fi = reinterpret_cast<helics_federate_info>(rdata);
     auto err = helicsErrorInitialize();
     err.error_code = 45;
-    helicsFederateInfoSetCoreTypeFromString(nullptr, "nng", &err);
+    helicsFederateInfoSetCoreTypeFromString(nullptr, "null", &err);
     EXPECT_EQ(err.error_code, 45);
     helicsErrorClear(&err);
-    helicsFederateInfoSetCoreTypeFromString(evil_fi, "nng", &err);
+    helicsFederateInfoSetCoreTypeFromString(evil_fi, "nullcore", &err);
     EXPECT_NE(err.error_code, 0);
     auto fi = helicsCreateFederateInfo();
     helicsErrorClear(&err);
@@ -1081,6 +1081,28 @@ TEST(evil_federate_test, helicsFederateRegisterInterfaces)
     //auto res2=helicsFederateRegisterInterfaces(helics_federate fed, const char* file, nullptr);
     helicsFederateRegisterInterfaces(evil_federate, "invalid_file.txt", &err);
     EXPECT_NE(err.error_code, 0);
+}
+
+TEST(evil_federate_test, helicsFederateLocalError)
+{
+    //void helicsFederateLocalError(helics_federate fed, int error_code, const char *error_message);
+    char rdata[256];
+    helics_federate evil_federate = reinterpret_cast<helics_federate>(rdata);
+
+    EXPECT_NO_THROW(helicsFederateLocalError(nullptr, 4, nullptr));
+
+    EXPECT_NO_THROW(helicsFederateLocalError(evil_federate, -25, "error_message"));
+}
+
+TEST(evil_federate_test, helicsFederateGlobalError)
+{
+    //void helicsFederateLocalError(helics_federate fed, int error_code, const char *error_message);
+    char rdata[256];
+    helics_federate evil_federate = reinterpret_cast<helics_federate>(rdata);
+
+    EXPECT_NO_THROW(helicsFederateGlobalError(nullptr, 4, nullptr));
+
+    EXPECT_NO_THROW(helicsFederateGlobalError(evil_federate, -25, "error_message"));
 }
 
 TEST(evil_federate_test, helicsFederateFinalize)
@@ -1643,6 +1665,21 @@ TEST(evil_federate_test, helicsFederateSetGlobal)
     helicsErrorClear(&err);
     //auto res2=helicsFederateSetGlobal(helics_federate fed, const char* valueName, const char* value, nullptr);
     helicsFederateSetGlobal(evil_federate, "global", "glob", &err);
+    EXPECT_NE(err.error_code, 0);
+}
+
+TEST(evil_federate_test, helicsFederateAddDependency)
+{
+    //void helicsFederateAddDependency(helics_federate fed, const char* fedName, helics_error* err);
+    char rdata[256];
+    helics_federate evil_federate = reinterpret_cast<helics_federate>(rdata);
+    auto err = helicsErrorInitialize();
+    err.error_code = 45;
+    helicsFederateAddDependency(nullptr, nullptr, &err);
+    EXPECT_EQ(err.error_code, 45);
+    helicsErrorClear(&err);
+    //auto res2=helicsFederateSetGlobal(helics_federate fed, const char* valueName, const char* value, nullptr);
+    helicsFederateAddDependency(evil_federate, "fed", &err);
     EXPECT_NE(err.error_code, 0);
 }
 

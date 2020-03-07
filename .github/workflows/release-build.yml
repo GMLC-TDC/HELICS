@@ -1,27 +1,42 @@
 name: Build release artifacts
 
 on:
+  # Handles a 'helics-release-build' dispatch event type
+  # The event payload should contain these fields:
+  # packages - a list of which packages to build (everything, archive, msvc, installer, sharedlib)
+  # commit (optional) - the commit-ish to do a release build with
+  repository_dispatch:
   schedule:
     - cron: '15 09 * * *' # Run at in the early hours of the morning (UTC)
   release:
     types: published
 
 jobs:
-################################
+#####################################
 # Create all submodules archive
-################################
+#####################################
   create-all-submodule-archive:
     name: Create all submodule archive
     runs-on: ubuntu-latest
-    if: github.event.action == 'published'
+    if: (github.event.action == 'published') || (github.event.action == 'helics-release-build' && (contains(github.event.client_payload.packages, 'archive') || contains(github.event.client_payload.packages, 'everything')))
     steps:
-    - uses: actions/checkout@v1
+    - name: Checkout event ref
+      uses: actions/checkout@v2
+      with:
+        ref: ${{ github.event.client_payload.commit }}
+      if: github.event.action == 'published' || github.event.action == 'helics-release-build'
       
     - name: Create archive
+      if: github.event.action != 'helics-release-build'
       # Creates the archive then moves it to an artifact subfolder
       run: ./scripts/_git-all-archive.sh -l "$(git rev-parse --abbrev-ref "${GITHUB_REF}")" && mkdir artifact && mv "Helics-$(git rev-parse --abbrev-ref "${GITHUB_REF}")-source.tar.gz" artifact/
-      
+    - name: Create archive (no version)
+      if: github.event.action == 'helics-release-build'
+      # Creates the archive then moves it to an artifact subfolder
+      run: ./scripts/_git-all-archive.sh && mkdir artifact && mv "Helics-source.tar.gz" artifact/
+     
     - name: Upload archive to release
+      if: github.event.action != 'helics-release-build'
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         UPLOAD_URL: ${{ github.event.release.upload_url }}
@@ -33,11 +48,12 @@ jobs:
         name: all-submodules-archive
         path: artifact
         
-################################
+#####################################
 # Build MSVC archives
-################################
+#####################################
   build-windows-msvc:
     runs-on: ${{ matrix.os }}
+    if: (github.event.action != 'helics-release-build') || (contains(github.event.client_payload.packages, 'msvc') || contains(github.event.client_payload.packages, 'everything'))
     strategy:
       matrix:
         os: [windows-2016, windows-latest]
@@ -51,11 +67,13 @@ jobs:
             msvc_ver: 'msvc2019'
     steps:
     - name: Checkout event ref
-      uses: actions/checkout@v1
-      if: github.event.action == 'published'
+      uses: actions/checkout@v2
+      with:
+        ref: ${{ github.event.client_payload.commit }}
+      if: github.event.action == 'published' || github.event.action == 'helics-release-build'
     
     - name: Checkout develop branch
-      uses: actions/checkout@v1
+      uses: actions/checkout@v2
       with:
         ref: develop
       if: github.event_name == 'schedule'
@@ -90,15 +108,16 @@ jobs:
         name: ${{ runner.os }}-installers
         path: artifact
         
-################################
+#####################################
 # Build installers
-################################
+#####################################
   build-installers:
     runs-on: ${{ matrix.os }}
     name: Build ${{ matrix.os }} ${{ matrix.arch }} ${{ matrix.cpack_gen }} Installer
+    if: (github.event.action != 'helics-release-build') || (contains(github.event.client_payload.packages, 'installer') || contains(github.event.client_payload.packages, 'everything'))
     strategy:
       matrix:
-        id: [windows-x64, macos-x64-zip, linux-x64]
+        id: [windows-x64, windows-x86, macos-x64, linux-x64]
         include:
           - id: windows-x64
             os: windows-latest
@@ -106,7 +125,13 @@ jobs:
             cpack_gen: NSIS;ZIP
             cmake_gen: 'Visual Studio 16 2019'
             msvc_ver: 'msvc2019'
-          - id: macos-x64-zip
+          - id: windows-x86
+            os: windows-latest
+            arch: x86
+            cpack_gen: ZIP
+            cmake_gen: 'Visual Studio 16 2019'
+            msvc_ver: 'msvc2019'
+          - id: macos-x64
             os: macos-latest
             arch: x64
             cpack_gen: ZIP
@@ -118,11 +143,13 @@ jobs:
 
     steps:
     - name: Checkout event ref
-      uses: actions/checkout@v1
-      if: github.event.action == 'published'
+      uses: actions/checkout@v2
+      with:
+        ref: ${{ github.event.client_payload.commit }}
+      if: github.event.action == 'published' || github.event.action == 'helics-release-build'
     
     - name: Checkout develop branch
-      uses: actions/checkout@v1
+      uses: actions/checkout@v2
       with:
         ref: develop
       if: github.event_name == 'schedule'
@@ -172,11 +199,12 @@ jobs:
         name: ${{ runner.os }}-installers
         path: artifact
       
-################################
+#####################################
 # Build shared libraries
-################################
+#####################################
   build-sharedlibs:
     runs-on: ${{ matrix.os }}
+    if: (github.event.action != 'helics-release-build') || (contains(github.event.client_payload.packages, 'sharedlib') || contains(github.event.client_payload.packages, 'everything'))
     name: Build ${{ matrix.os }} ${{ matrix.arch }} Shared Library
     strategy:
       matrix:
@@ -202,11 +230,13 @@ jobs:
 
     steps:
     - name: Checkout event ref
-      uses: actions/checkout@v1
-      if: github.event.action == 'published'
+      uses: actions/checkout@v2
+      with:
+        ref: ${{ github.event.client_payload.commit }}
+      if: github.event.action == 'published' || github.event.action == 'helics-release-build'
     
     - name: Checkout develop branch
-      uses: actions/checkout@v1
+      uses: actions/checkout@v2
       with:
         ref: develop
       if: github.event_name == 'schedule'
@@ -248,16 +278,16 @@ jobs:
         name: ${{ runner.os }}-installers
         path: artifact
         
-################################
+#####################################
 # Generate SHA-256 file
-################################
+#####################################
   generate-sha256:
     name: Calculate SHA256 for release assets
     needs: [create-all-submodule-archive, build-installers, build-sharedlibs, build-windows-msvc]
     runs-on: ubuntu-latest
     if: github.event.action == 'published'
     steps:
-    - uses: actions/checkout@v1
+    - uses: actions/checkout@v2
       
     - name: Get all submodules archive
       uses: actions/download-artifact@v1
@@ -291,3 +321,21 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         UPLOAD_URL: ${{ github.event.release.upload_url }}
       run: ./.github/workflows/upload-release-asset.sh "artifacts/Helics-$(git rev-parse --abbrev-ref "${GITHUB_REF}")-SHA-256.txt"
+
+#####################################
+# Send helics-version-update event(s)
+#####################################
+  send-version-update-event:
+    name: Send helics-version-update event(s)
+    needs: [generate-sha256]
+    runs-on: ubuntu-latest
+    if: github.event.action == 'published'
+    steps:
+      - name: Send event to helics-packaging
+        run: |
+          HELICS_REPO="${{ github.repository }}"
+          HELICS_VERSION="${{ github.event.release.tag_name }}"
+          curl -X POST --header 'authorization: Bearer ${{ secrets.HELICS_BOT_TOKEN }}' \
+               --url https://api.github.com/repos/GMLC-TDC/helics-packaging/dispatches \
+               --header 'content-type: application/json' \
+               --data "{\"event_type\":\"helics-version-update\",\"client_payload\":{\"repository\":\"${HELICS_REPO}\",\"tag_name\":\"${HELICS_VERSION}\",\"version\":\"${HELICS_VERSION#v}\"}}"

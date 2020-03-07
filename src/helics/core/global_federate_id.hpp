@@ -10,17 +10,17 @@ SPDX-License-Identifier: BSD-3-Clause
 
 namespace helics {
 /** a shift in the global federate id numbers to allow discrimination between local ids and global ones
-this value allows 131072 federates to be available in each core
-1,878,917,120 allowable federates in the system and
-268,435,455 brokers allowed  if we need more than that this, program has been phenomenally successful beyond
-all wildest imaginations and we can probably afford to change these to 64 bit numbers to accommodate
-*/
+    this value allows 131072 federates to be available in each core
+    1,878,917,120 allowable federates in the system and
+    268,435,455 brokers allowed  if we need more than that this, program has been phenomenally successful beyond
+    all wildest imaginations and we can probably afford to change these to 64 bit numbers to accommodate
+    */
 constexpr identififier_base_type global_federate_id_shift = 0x0002'0000;
 /** a shift in the global id index to discriminate between global ids of brokers vs federates*/
 constexpr identififier_base_type global_broker_id_shift = 0x7000'0000;
 
 /** class holding a globally unique identifier for brokers
-@details the class is fully compatible with global_federate_id*/
+    @details the class is fully compatible with global_federate_id*/
 class global_broker_id {
   public:
     using base_type = identififier_base_type;
@@ -52,10 +52,12 @@ class global_broker_id {
 };
 
 /** constant to use for indicating that a command is for the core itself from the Core Public API*/
-constexpr global_broker_id parent_broker_id(0);
+constexpr global_broker_id parent_broker_id{0};
+/** constant to use for indicating the id of the root broker*/
+constexpr global_broker_id root_broker_id{1};
 
 /** stream operator for a federate_id
- */
+     */
 std::ostream& operator<<(std::ostream& os, global_broker_id id);
 /** class holder a globally unique identifier for federates*/
 class global_federate_id {
@@ -100,16 +102,16 @@ class global_federate_id {
     /** return true if the broker_id is a valid broker id code*/
     bool isValid() const { return (gid != invalid_global_fed_id); }
     /** generate a local offset index
-    @details the global_id is shifted by a certain amount*/
+        @details the global_id is shifted by a certain amount*/
     constexpr base_type localIndex() const { return gid - global_federate_id_shift; }
 
   private:
-    base_type gid = invalid_global_fed_id; //!< the underlying index value
     static constexpr base_type invalid_global_fed_id{-2'010'000'000};
+    base_type gid{invalid_global_fed_id}; //!< the underlying index value
 };
 
 /** stream operator for a federate_id
- */
+     */
 std::ostream& operator<<(std::ostream& os, global_federate_id id);
 
 /** class merging a global id and handle together */
@@ -123,7 +125,7 @@ class global_handle {
     constexpr global_handle(global_federate_id fed, interface_handle hand):
         fed_id(fed), handle(hand){};
     /** convert to a uint64_t
-    @details for use in maps and other things*/
+        @details for use in maps and other things*/
     explicit operator uint64_t() const
     {
         auto key = static_cast<uint64_t>(fed_id.baseValue()) << 32U;
@@ -150,7 +152,7 @@ class global_handle {
 };
 
 /** stream operator for a federate_id
- */
+     */
 std::ostream& operator<<(std::ostream& os, global_handle id);
 
 /** class defining a specific type for labeling a route*/
@@ -173,12 +175,12 @@ class route_id {
     bool isValid() const { return (rid != invalid_route_id); }
 
   private:
-    base_type rid = invalid_route_id; //!< the underlying index value
     static constexpr base_type invalid_route_id{-1'295'148'000};
+    base_type rid{invalid_route_id}; //!< the underlying index value
 };
 
-constexpr route_id parent_route_id(0);
-constexpr route_id control_route(-1);
+constexpr route_id parent_route_id{0};
+constexpr route_id control_route{-1};
 
 /** stream operator for a route_id
  */

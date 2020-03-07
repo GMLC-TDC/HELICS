@@ -86,7 +86,10 @@ HELICS makes use of `C++17` headers, but due to `C++14` compatibility requiremen
 This variant was chosen for compatibility with C++17 over boost variant and better cross platform support than some of the other versions available. The single header version is included with the source. [Boost Software License](https://github.com/mpark/variant/blob/master/LICENSE.md).
 
 ### [gulrak/filesystem](https://github.com/gulrak/filesystem)
-A single-header standalone variant of the filesystem library is used to avoid compiled libraries in boost. The single header version is included with the source and is released with a [BSD-3 clause](https://github.com/gulrak/filesystem/blob/master/LICENSE) license.
+A single-header standalone variant of the filesystem library(v1.3.0) is used to avoid compiled libraries in boost. The single header version is included with the source and is released with a [MIT](https://github.com/gulrak/filesystem/blob/master/LICENSE) license (used as of HELICS 2.4.1) prior versions had a BSD-3-Clause license.  
+
+### [gmlc/netif](https://github.com/GMLC-TDC/netif)  
+A header-only library for getting a list of network interfaces in a cross-platform way.  It is included in HELICS as a submodule and is released under a [BSD-3 clause](https://github.com/GMLC-TDC/netif/blob/master/LICENSE) license.
 
 ### CMake scripts
 Several CMake scripts came from other sources and were either used or modified for use in HELICS.

@@ -7,6 +7,50 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 A note on future revisions.  
   Everything within a major version number should be code compatible (with the exception of experimental interfaces).  The most notable example of an experimental interface is the support for multiple source inputs.  The APIs to deal with this will change in future minor releases.  Everything within a single minor release should be network compatible with other federates on the same minor release number.  Compatibility across minor release numbers may be possible in some situations but we are not going to guarantee this as those components are subject to performance improvements and may need to be modified at some point.  Patch releases will be limited to bug fixes and other improvements not impacting the public API or network compatibility.  Check the [Public API](./docs/Public_API.md) for details on what is included and excluded from the public API and version stability.
 
+## [2.4.1][] - 2020-03-06
+Increased code coverage and additional bug fixes.  The error propagation in HELICS was improved such that local errors can be escalated to global errors, and a federate can define errors coming from the federate that are handled appropriately and can halt a co-simulation.  
+
+
+### Changed
+-   The helics webserver will build by default if the conditions are met
+-   Update filesystem library to [v1.3.0](https://github.com/gulrak/filesystem/releases/tag/v1.3.0)
+-   The behavior of the `Federate*Complete` slightly modified to be uniform and consistent, no API changes
+-   Configuration of flags and targets for interfaces in JSON and TOML files can be done in multiple sections
+-   The benchmark federates have been changed to use a common base benchmark federate class for more consistent behavior
+-   Switched to including netif as a git submodule
+-   the `error` Function in the C++ API is now the same as `localError` previously it was primary useful for logging and didn't do much, and will be deprecated in the next release.   
+-   Updated the GitHub actions (clang-format, swig interface updates, and release builds) to use actions/checkout@v2
+-   Cleaned up the Windows installer (better component names/descriptions and groups, link to Gitter, and require installing Headers to install SWIG)
+-   Updated the HELICS apps manpages with new options
+
+### Fixed
+-   Issue with iterative requests that were not being honored if the federate was acting in isolation
+-   A few pathways which would allow segmentation faults if a federate was disconnected and particular functions were called
+-   ValueFederate `addIndexedTargets`, the function template would not work as was written and was unusable, it is now tested and operational.
+
+### Added
+-   `HELICS_DISABLE_WEBSERVER` option to turn off building of the webserver.  It will build by default if Boost is enabled and is version 1.70 or higher; otherwise it is disabled.
+-   A series of tests for Federate.cpp to increase coverage on that file to 100%
+-   A series of tests for ValueFederate.*pp to increase coverage on that file to 100%
+-   Docker image for a helics builder which includes build tools and the helics installation
+-   helics can be installed on [MSYS2](https://helics.readthedocs.io/en/latest/installation/windows.html#msys2) using pacman.
+-   Standalone benchmark federates for use in multinode benchmark runs
+-   A FreeBSD 12.1 CI build using Cirrus CI
+-   Sending an event from GitHub Actions release builds to trigger updating additional HELICS packages when a new release is made
+-  `localError`, and `GlobalError` function calls the Federate API and in the C++ and sharedLibrary.  
+-  `helics_terminate_on_error` flag to escalate what would be a local error into a global one that will halt the co-simulation.  This flag can be specified through the flag to federates or to brokers and cores through a command line option `--terminate_on_error` 
+-   `addDependency` function was added to the C++ Federate API and shared library API, it can add a direct dependency between federates manually.  
+-   A 32-bit Windows zip install archive for releases
+-   "global_time", "current_time", and "state" queries for brokers and cores, and "current_time" query for federates.
+-   Support for a 'helics-release-build' event trigger to the release build GitHub Actions workflow
+
+### Deprecated
+
+### Removed
+-   `HELICS_ENABLE_WEBSERVER` option to enable the webserver.  This option was added as experimental in 2.4.0
+-   VS2015 Windows Server 2012 CI build is removed. Azure Pipelines is [removing the image](https://devblogs.microsoft.com/devops/removing-older-images-in-azure-pipelines-hosted-pools/) because it is outdated and sees little use.  VS2015 is still tested through Appveyor for the time being.
+
+
 ## [2.4.0][] - 2020-02-04
 A few bug fixes, code coverage on the shared library increased to 100%,  library updates, Broker server  enhancements including an http REST API, and a lot of work on the build systems to enable easier releases and packaging.
 
@@ -492,3 +536,4 @@ This is a major revision so this changelog will not capture all the changes that
 [2.3.0]: https://github.com/GMLC-TDC/HELICS/releases/tag/v2.3.0
 [2.3.1]: https://github.com/GMLC-TDC/HELICS/releases/tag/v2.3.1
 [2.4.0]: https://github.com/GMLC-TDC/HELICS/releases/tag/v2.4.0
+[2.4.1]: https://github.com/GMLC-TDC/HELICS/releases/tag/v2.4.1

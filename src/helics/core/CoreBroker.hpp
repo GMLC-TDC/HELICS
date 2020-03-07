@@ -31,6 +31,17 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <unordered_map>
 
 namespace helics {
+
+/** enumeration of possible states of a remote federate or broker*/
+enum class connection_state : std::uint8_t {
+    connected = 0,
+    init_requested = 1,
+    operating = 2,
+    error = 40,
+    request_disconnect = 48,
+    disconnected = 50
+};
+
 /** class defining the common information for a federate*/
 class BasicFedInfo {
   public:
@@ -38,7 +49,7 @@ class BasicFedInfo {
     global_federate_id global_id; //!< the identification code for the federate
     route_id route; //!< the routing information for data to be sent to the federate
     global_broker_id parent; //!< the id of the parent broker/core
-    bool isDisconnected = false; //!< flag indicating the federate is disconnected
+    connection_state state{connection_state::connected};
     explicit BasicFedInfo(const std::string& fedname): name(fedname){};
 };
 
@@ -50,15 +61,18 @@ class BasicBrokerInfo {
     global_broker_id global_id; //!< the global identifier for the broker
     route_id route; //!< the identifier for the route to take to the broker
     global_broker_id parent; //!< the id of the parent broker/core
-    bool _initRequested{false}; //!< flag indicating the broker has requesting initialization
-    bool isDisconnected{false}; //!< flag indicating that the broker has disconnected
+
+    connection_state state{
+        connection_state::connected}; //!< specify the current status of the broker
+
     bool _hasTimeDependency{
-        false}; //!< flag indicating that a broker has endpoints it is coordinating
+        false}; //!< flag indicating that a broker has general endpoints it is coordinating
     bool _core{false}; //!< if set to true the broker is a core false is a broker;
     bool _nonLocal{false}; //!< indicator that the broker has a subbroker as a parent.
     bool _route_key{false}; //!< indicator that the broker has a unique route id
     bool _sent_disconnect_ack{false}; //!< indicator that the disconnect ack has been sent
     bool _disable_ping{false}; //!< indicator that the broker doesn't respond to pings
+    // 1 byte gap
     std::string routeInfo; //!< string describing the connection information for the route
     explicit BasicBrokerInfo(const std::string& brokerName): name(brokerName){};
 };
@@ -102,6 +116,9 @@ class CoreBroker: public Broker, public BrokerBase {
     gmlc::concurrency::DelayedObjects<std::string> ActiveQueries; //!< holder for active queries
     JsonMapBuilder fedMap; //!< builder for the federate_map
     std::vector<ActionMessage> fedMapRequestors; //!< list of requesters for the active federate map
+    JsonMapBuilder currentTimeMap; //!< builder for the current time graph
+    std::vector<ActionMessage>
+        ctimeRequestors; //!< list of requesters for the active current time status
     JsonMapBuilder depMap; //!< builder for the dependency graph
     std::vector<ActionMessage> depMapRequestors; //!< list of requesters for the dependency graph
     JsonMapBuilder dataflowMap; //!< builder for the dependency graph
@@ -143,7 +160,8 @@ class CoreBroker: public Broker, public BrokerBase {
     void routeMessage(ActionMessage&& cmd);
     /** transmit a message to the parent or root */
     void transmitToParent(ActionMessage&& cmd);
-
+    /** propagate an error message or escalate it depending on settings*/
+    void propagateError(ActionMessage&& cmd);
     /** broadcast a message to all immediate brokers*/
     void broadcast(ActionMessage& cmd);
     /**/
@@ -247,7 +265,9 @@ class CoreBroker: public Broker, public BrokerBase {
     @return true if everyone is ready, false otherwise
     */
     bool allInitReady() const;
-    bool allDisconnected() const;
+    /** get a value for the summary connection status of all the connected systems*/
+    connection_state getAllConnectionState() const;
+
     /** set the local identification string for the broker*/
     void setIdentifier(const std::string& name);
     /** get the local identification for the broker*/
@@ -282,8 +302,12 @@ class CoreBroker: public Broker, public BrokerBase {
     void FindandNotifyEndpointTargets(BasicHandleInfo& handleInfo);
     /** process a disconnect message*/
     void processDisconnect(ActionMessage& command);
+    /** process an error message*/
+    void processError(ActionMessage& command);
     /** disconnect a broker/core*/
     void disconnectBroker(BasicBrokerInfo& brk);
+    /** mark this broker and all other that have this as a parent as disconnected*/
+    void markAsDisconnected(global_broker_id brkid);
     /** run a check for a named interface*/
     void checkForNamedInterface(ActionMessage& command);
     /** remove a named target from an interface*/
@@ -320,6 +344,8 @@ class CoreBroker: public Broker, public BrokerBase {
     void initializeDependencyGraph();
     /** generate a json string containing the data flow information for all federation object*/
     void initializeDataFlowGraph();
+    /** generate a json string containing the time information for the federation */
+    void initializeCurrentTimeMap();
 
     /** send an error code to all direct cores*/
     void sendErrorToImmediateBrokers(int error_code);

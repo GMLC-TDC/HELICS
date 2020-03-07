@@ -23,6 +23,7 @@ public class helicsJNI {
   public final static native int helics_core_type_http_get();
   public final static native int helics_core_type_websocket_get();
   public final static native int helics_core_type_inproc_get();
+  public final static native int helics_core_type_null_get();
   public final static native int helics_data_type_string_get();
   public final static native int helics_data_type_double_get();
   public final static native int helics_data_type_int_get();
@@ -50,6 +51,7 @@ public class helicsJNI {
   public final static native int helics_flag_delay_init_entry_get();
   public final static native int helics_flag_enable_init_entry_get();
   public final static native int helics_flag_ignore_time_mismatch_warnings_get();
+  public final static native int helics_flag_terminate_on_error_get();
   public final static native int helics_log_level_no_print_get();
   public final static native int helics_log_level_error_get();
   public final static native int helics_log_level_warning_get();
@@ -72,6 +74,7 @@ public class helicsJNI {
   public final static native int helics_error_execution_failure_get();
   public final static native int helics_error_insufficient_space_get();
   public final static native int helics_error_other_get();
+  public final static native int helics_error_fatal_get();
   public final static native int helics_error_external_type_get();
   public final static native int helics_property_time_delta_get();
   public final static native int helics_property_time_period_get();
@@ -199,6 +202,8 @@ public class helicsJNI {
   public final static native void helicsFederateInfoSetTimeProperty(long jarg1, int jarg2, double jarg3);
   public final static native void helicsFederateInfoSetIntegerProperty(long jarg1, int jarg2, int jarg3);
   public final static native void helicsFederateRegisterInterfaces(long jarg1, String jarg2);
+  public final static native void helicsFederateGlobalError(long jarg1, int jarg2, String jarg3);
+  public final static native void helicsFederateLocalError(long jarg1, int jarg2, String jarg3);
   public final static native void helicsFederateFinalize(long jarg1);
   public final static native void helicsFederateFinalizeAsync(long jarg1);
   public final static native void helicsFederateFinalizeComplete(long jarg1);
@@ -234,6 +239,7 @@ public class helicsJNI {
   public final static native int helicsFederateGetIntegerProperty(long jarg1, int jarg2);
   public final static native double helicsFederateGetCurrentTime(long jarg1);
   public final static native void helicsFederateSetGlobal(long jarg1, String jarg2, String jarg3);
+  public final static native void helicsFederateAddDependency(long jarg1, String jarg2);
   public final static native void helicsFederateSetLogFile(long jarg1, String jarg2);
   public final static native void helicsFederateLogErrorMessage(long jarg1, String jarg2);
   public final static native void helicsFederateLogWarningMessage(long jarg1, String jarg2);

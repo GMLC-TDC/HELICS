@@ -68,6 +68,8 @@ The following queries are defined for federates.  Federates may specify a callba
 +--------------------+------------------------------------------------------------+
 | ``dependents``     | list of dependent objects [sv]                             |
 +--------------------+------------------------------------------------------------+
+| ``current_time``   | the current time of the federate [JSON]                    |
++--------------------+------------------------------------------------------------+
 |``endpoint_filters``| data structure containing the filters on endpoints[JSON]   |
 +--------------------+------------------------------------------------------------+
 | ``queries``        | list of available queries [sv]                             |
@@ -88,6 +90,8 @@ The following queries are defined for federates but can only be queried on the l
 | ``updates``               | values of all currently updated inputs [JSON]              |
 +---------------------------+------------------------------------------------------------+
 | ``values``                | current values of all inputs [JSON]                        |
++---------------------------+------------------------------------------------------------+
+| ``time``                  | the current granted time [string]                          |
 +---------------------------+------------------------------------------------------------+
 ```
 
@@ -125,6 +129,12 @@ The following queries will be answered by a core.
 | ``dependencies``     | structure containing dependency information [JSON]                                  |
 +----------------------+-------------------------------------------------------------------------------------+
 | ``federate_map``     | a Hierarchical map of the federates contained in a core [JSON]                      |
++----------------------+-------------------------------------------------------------------------------------+
+| ``federation_state`` | a structure with the current known status of the brokers and federates [JSON]       |
++----------------------+-------------------------------------------------------------------------------------+
+| ``current_time``     | if a time is computed locally that time sequence is returned, otherwise #na [JSON]    |
++----------------------+-------------------------------------------------------------------------------------+
+| ``global_time``      | get a structure with the current time status of all the federates/cores [JSON]      |
 +----------------------+-------------------------------------------------------------------------------------+
 | ``dependency_graph`` | a representation of the dependencies in the core and its contained federates [JSON] |
 +----------------------+-------------------------------------------------------------------------------------+
@@ -166,6 +176,12 @@ The Following queries will be answered by a broker.
 | ``dependents``       | list of dependent objects [sv]                                                      |
 +----------------------+-------------------------------------------------------------------------------------+
 | ``counts``           | a simple count of the number of brokers, federates, and handles [JSON]              |
++----------------------+-------------------------------------------------------------------------------------+
+| ``federation_state`` | a structure with the current known status of the brokers and federates [JSON]       |
++----------------------+-------------------------------------------------------------------------------------+
+| ``current_time``     | if a time is computed locally that time sequence is returned, otherwise #na [string]  |
++----------------------+-------------------------------------------------------------------------------------+
+| ``global_time``      | get a structure with the current time status of all the federates/cores [JSON]      |
 +----------------------+-------------------------------------------------------------------------------------+
 | ``federate_map``     | a Hierarchical map of the federates contained in a broker [JSON]                    |
 +----------------------+-------------------------------------------------------------------------------------+

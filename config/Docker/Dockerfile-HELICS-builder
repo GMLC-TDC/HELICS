@@ -1,0 +1,40 @@
+# The docker build command should be run from the root folder of the HELICS source code repository with submodules cloned
+# Some of the possible ways to get a working directory are:
+# 1. clone the repository with git clone --recurse-submodules
+# 2. run git submodule update --init after a normal git clone
+# 3. download and extract a tar file from a HELICS release that includes submodules
+
+FROM helics/buildenv:gcc8-builder as builder
+
+# Copies the current directory from the host to use as the source code for building HELICS
+COPY . /root/HELICS
+WORKDIR /root
+
+# Sets the number of threads for make to use
+ARG MAKE_PARALLEL
+
+# Set ENABLE_GITHUB to true if you have only downloaded this Dockerfile without the rest of the HELICS source code repository
+# For users, it is recommended to just pull an already built Docker image from Docker Hub (building can take up to 30 minutes)
+ARG ENABLE_GITHUB=false
+ARG GIT_BRANCH=develop
+
+# Remove the copied source directory and replace it with a GitHub clone
+# The git clone part of this line shows how to recursively clone a specific branch from a git repository
+RUN if [ "${ENABLE_GITHUB-}" = "true" ]; then rm -rf HELICS && git clone --depth 1 --recurse-submodules --branch $GIT_BRANCH https://github.com/GMLC-TDC/HELICS; fi
+
+# Generates the makefiles for building HELICS without tests, examples, C shared library, or the IPC core
+# Build type is set to release for the optimized binaries (and smaller size)
+RUN mkdir build && cd build && cmake -DHELICS_BUILD_TESTS=OFF -DHELICS_BUILD_CXX_SHARED_LIB=ON\
+  -DHELICS_BUILD_EXAMPLES=OFF -DCMAKE_BUILD_TYPE=Release \
+  -DCMAKE_INSTALL_PREFIX=/root/develop/helics-install /root/HELICS
+
+# Compile and install HELICS to a temporary prefix (for easy copying to the final image)
+RUN cd build && make -j${MAKE_PARALLEL:-2} install
+
+##############################################################################
+
+# Create final image with the HELICS libraries ready to link
+FROM helics/buildenv:gcc8-builder
+
+# Copy the HELICS install from the builder image stage above to a location in the PATH env var
+COPY --from=builder /root/develop/helics-install /usr

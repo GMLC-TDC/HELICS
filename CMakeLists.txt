@@ -8,32 +8,24 @@
 # ~~~
 
 cmake_minimum_required(VERSION 3.4)
-cmake_policy(VERSION 3.4)
-
-project(HELICS VERSION 2.4.0)
-
-if(POLICY CMP0069)
-    # Policy CMP0069 INTERPROCEDURAL OPTIMIZATION, just use the new policy since this
-    # isn't used for old systems
-    cmake_policy(SET CMP0069 NEW)
+# Make sure users don't get warnings on a tested (3.4 to 3.16) version
+# of CMake. For most of the policies, the new version is better (hence the change).
+# We don't use the 3.0...3.16 syntax because of a bug in MSVC 15.7
+# built-in and modified CMake 3.11
+if(CMAKE_VERSION VERSION_LESS 3.16)
+    cmake_policy(VERSION ${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION})
+else()
+    cmake_policy(VERSION 3.16)
 endif()
 
-if(POLICY CMP0074)
-    # Policy CMP0074 find_package uses <PackageName>_ROOT variables
-    cmake_policy(SET CMP0074 NEW)
-endif()
-
-if(POLICY CMP0076)
-    # Policy CMP0074 target_sources now converts relative paths to absolute
-    cmake_policy(SET CMP0076 NEW)
-endif()
+project(HELICS VERSION 2.4.1)
 
 # -----------------------------------------------------------------------------
 # HELICS Version number
 # -----------------------------------------------------------------------------
 set(HELICS_VERSION_BUILD)
 # use ISO date YYYY-MM-DD
-set(HELICS_DATE "2020-02-04")
+set(HELICS_DATE "2020-03-06")
 
 set(HELICS_VERSION_UNDERSCORE
     "${HELICS_VERSION_MAJOR}_${HELICS_VERSION_MINOR}_${HELICS_VERSION_PATCH}"
@@ -61,9 +53,11 @@ else()
     get_property(helics-use-folders GLOBAL PROPERTY USE_FOLDERS)
 endif()
 
-# generate a version description based on git tags
-include(version_describe)
-git_version_describe(${HELICS_SOURCE_DIR} HELICS_VERSION_DESCRIPTION)
+if (NOT HELICS_DISABLE_GIT_OPERATIONS)
+   # generate a version description based on git tags
+   include(version_describe)
+   git_version_describe(${HELICS_SOURCE_DIR} HELICS_VERSION_DESCRIPTION)
+endif()
 
 if(HELICS_VERSION_DESCRIPTION)
     message(STATUS "helics version tag description is ${HELICS_VERSION_DESCRIPTION}")
@@ -343,9 +337,11 @@ if(HELICS_GENERATE_DOXYGEN_DOC)
     endif(DOXYGEN_FOUND)
 endif(HELICS_GENERATE_DOXYGEN_DOC)
 
+
 # -------------------------------------------------------------
 # Update git submodules
 # -------------------------------------------------------------
+if (NOT HELICS_DISABLE_GIT_OPERATIONS)
 include(updateGitSubmodules)
 if(NOT EXISTS "${PROJECT_SOURCE_DIR}/ThirdParty/fmtlib/CMakeLists.txt")
     submod_update(ThirdParty/fmtlib)
@@ -385,8 +381,13 @@ if(NOT EXISTS "${PROJECT_SOURCE_DIR}/ThirdParty/toml11/toml/value.hpp")
     submod_update(ThirdParty/toml11)
 endif()
 
+if(NOT EXISTS "${PROJECT_SOURCE_DIR}/ThirdParty/netif/gmlc/netif/NetIF.hpp")
+    submod_update(ThirdParty/netif)
+endif()
+
 check_submodule_status()
 
+endif() # NOT HELICS_DISABLE_GIT_OPERATIONS
 include(GNUInstallDirs)
 
 # -------------------------------------------------------------
@@ -417,9 +418,13 @@ cmake_dependent_advanced_option(
 cmake_dependent_advanced_option(
     ENABLE_UDP_CORE "Enable UDP core types" ON "NOT HELICS_DISABLE_ASIO" OFF
 )
+if("${CMAKE_SYSTEM_NAME}" MATCHES ".*BSD")
+    set(SYSTEM_IS_BSD ON)
+endif()
+
 cmake_dependent_advanced_option(
     ENABLE_IPC_CORE "Enable Interprocess communication types" ON
-    "NOT HELICS_DISABLE_BOOST" OFF
+    "NOT HELICS_DISABLE_BOOST;NOT SYSTEM_IS_BSD" OFF
 )
 cmake_dependent_advanced_option(
     ENABLE_TEST_CORE "Enable test inprocess core type" OFF "NOT HELICS_BUILD_TESTS" ON
@@ -832,6 +837,8 @@ set(LICENSE_LIST
     "${PROJECT_SOURCE_DIR}/ThirdParty/toml11/LICENSE"
     "GMLC Utilities"
     "${PROJECT_SOURCE_DIR}/ThirdParty/utilities/LICENSE"
+    "netif"
+    "${PROJECT_SOURCE_DIR}/ThirdParty/netif/LICENSE"
 )
 
 if(NOT CMAKE_VERSION VERSION_LESS 3.11)
@@ -984,16 +991,16 @@ if(HELICS_ENABLE_PACKAGE_BUILD)
     # cmake-format: on
 
     set(CPACK_COMPONENTS_ALL
+        Runtime
         applications
         headers
         libs
-        Runtime
+        swig
         matlab
         python
         java
         octave
         csharp
-        swig
         cereal
     )
     if(WIN32)
@@ -1004,18 +1011,36 @@ if(HELICS_ENABLE_PACKAGE_BUILD)
         set(CPACK_RESOURCE_FILE_README "${HELICS_SOURCE_DIR}/README.md")
     endif(WIN32)
 
-    set(CPACK_COMPONENT_APPLICATIONS_DISPLAY_NAME "Application")
+    set(CPACK_COMPONENT_APPLICATIONS_DISPLAY_NAME "Applications")
     set(CPACK_COMPONENT_LIBS_DISPLAY_NAME "Libraries")
     set(CPACK_COMPONENT_HEADERS_DISPLAY_NAME "Headers")
     set(CPACK_COMPONENT_RUNTIME_DISPLAY_NAME "Runtime Libraries")
+    set(CPACK_COMPONENT_SWIG_DISPLAY_NAME "SWIG")
+    set(CPACK_COMPONENT_JAVA_DISPLAY_NAME "Java")
+    set(CPACK_COMPONENT_PYTHON_DISPLAY_NAME "Python")
+    set(CPACK_COMPONENT_MATLAB_DISPLAY_NAME "MATLAB")
+    set(CPACK_COMPONENT_OCTAVE_DISPLAY_NAME "Octave")
+    set(CPACK_COMPONENT_CSHARP_DISPLAY_NAME "C#")
 
+    set(CPACK_COMPONENT_GROUP_INTERFACES_DISPLAY_NAME "Interfaces")
+    set(CPACK_COMPONENT_GROUP_INTERFACES_DESCRIPTION
+        "Additional language interfaces for HELICS"
+    )
+    set(CPACK_COMPONENT_SWIG_GROUP interfaces)
     set(CPACK_COMPONENT_MATLAB_GROUP interfaces)
     set(CPACK_COMPONENT_JAVA_GROUP interfaces)
     set(CPACK_COMPONENT_OCTAVE_GROUP interfaces)
     set(CPACK_COMPONENT_PYTHON_GROUP interfaces)
     set(CPACK_COMPONENT_CSHARP_GROUP interfaces)
 
-    set(CPACK_COMPONENT_APPLICATION_DESCRIPTION
+    set(CPACK_COMPONENT_GROUP_DEVELOPMENT_DISPLAY_NAME "Development")
+    set(CPACK_COMPONENT_GROUP_DEVELOPMENT_DESCRIPTION
+        "Files needed to build applications that use HELICS"
+    )
+    set(CPACK_COMPONENT_HEADERS_GROUP development)
+    set(CPACK_COMPONENT_LIBS_GROUP development)
+
+    set(CPACK_COMPONENT_APPLICATIONS_DESCRIPTION
         "Executables and helper applications for HELICS"
     )
     set(CPACK_COMPONENT_LIBS_DESCRIPTION
@@ -1029,12 +1054,15 @@ if(HELICS_ENABLE_PACKAGE_BUILD)
         "cereal C++11 serialization library [no support for other language interfaces]"
     )
     set(CPACK_COMPONENT_SWIG_DESCRIPTION
-        "Basic swig interface files for HELICS for building 3rd party language interfaces"
+        "SWIG files needed for building 3rd party language interfaces (requires Development Headers)"
     )
-    set(CPACK_COMPONENT_GROUP_INTERFACES_DESCRIPTION
-        "additional language interfaces for HELICS"
-    )
+    set(CPACK_COMPONENT_PYTHON_DESCRIPTION "Python language interface")
+    set(CPACK_COMPONENT_JAVA_DESCRIPTION "Java language interface")
+    set(CPACK_COMPONENT_MATLAB_DESCRIPTION "MATLAB language interface")
+    set(CPACK_COMPONENT_OCTAVE_DESCRIPTION "Octave language interface")
+    set(CPACK_COMPONENT_CSHARP_DESCRIPTION "C# language interface")
 
+    set(CPACK_COMPONENT_SWIG_DEPENDS headers)
     set(CPACK_COMPONENT_LIBS_DEPENDS headers)
     set(CPACK_COMPONENT_RUNTIME_REQUIRED ON)
 
@@ -1054,6 +1082,10 @@ if(HELICS_ENABLE_PACKAGE_BUILD)
     endif()
 
     if(WIN32)
+        # title at the top of the installer
+        set(CPACK_NSIS_PACKAGE_NAME "HELICS v${HELICS_VERSION}")
+        # name shown in the add/remove program control panel
+        set(CPACK_NSIS_DISPLAY_NAME "HELICS v${HELICS_VERSION}")
         set(CPACK_PACKAGE_ICON "${HELICS_SOURCE_DIR}\\\\docs\\\\img\\\\HELICS.ico")
         set(CPACK_NSIS_MUI_ICON "${HELICS_SOURCE_DIR}/docs/img/HELICS.ico")
         set(CPACK_NSIS_INSTALL_ROOT "C:\\\\local")
@@ -1066,11 +1098,13 @@ if(HELICS_ENABLE_PACKAGE_BUILD)
         set(CPACK_NSIS_EXECUTABLES_DIRECTORY ${CMAKE_INSTALL_BINDIR})
         set(CPACK_NSIS_MENU_LINKS
             "https://www.github.com/GMLC-TDC/HELICS"
-            "HELICS Github"
+            "HELICS GitHub"
             "https://helics.readthedocs.io/en/latest"
-            "Helics Documentation"
+            "HELICS Documentation"
             "https://www.helics.org"
-            "Helics Web page"
+            "HELICS Website"
+            "https://gitter.im/GMLC-TDC/HELICS"
+            "HELICS Gitter Chat"
             "https://www.youtube.com/channel/UCPa81c4BVXEYXt2EShTzbcg"
             "TDC YouTube channel"
         )
@@ -1110,6 +1144,8 @@ endif()
 # -------------------------------------------------------------
 # Git Hooks
 # -------------------------------------------------------------
-if (CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
-    include(addGitHooks)
-endif ()
+if (NOT HELICS_DISABLE_GIT_OPERATIONS)
+   if (CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
+      include(addGitHooks)
+   endif ()
+endif()

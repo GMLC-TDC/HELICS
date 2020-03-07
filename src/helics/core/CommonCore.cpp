@@ -36,6 +36,22 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <functional>
 
 namespace helics {
+
+const std::string& state_string(operation_state state)
+{
+    static const std::string c1{"connected"};
+    static const std::string estate{"error"};
+    static const std::string dis{"disconnected"};
+    switch (state) {
+        case operation_state::operating:
+            return c1;
+        case operation_state::disconnected:
+            return dis;
+        case operation_state::error:
+        default:
+            return estate;
+    }
+}
 // timeoutMon is a unique_ptr
 CommonCore::CommonCore() noexcept: timeoutMon(new TimeoutMonitor) {}
 
@@ -339,15 +355,43 @@ bool CommonCore::isOpenToNewFederates() const
 {
     return ((brokerState != broker_state_t::created) && (brokerState < broker_state_t::operating));
 }
-void CommonCore::error(local_federate_id federateID, int errorID)
+void CommonCore::globalError(
+    local_federate_id federateID,
+    int error_code,
+    const std::string& error_string)
 {
     auto fed = getFederateAt(federateID);
     if (fed == nullptr) {
         throw(InvalidIdentifier("federateID not valid error"));
     }
-    ActionMessage m(CMD_ERROR);
+    ActionMessage m(CMD_GLOBAL_ERROR);
     m.source_id = fed->global_id.load();
-    m.messageID = errorID;
+    m.messageID = error_code;
+    m.payload = error_string;
+    addActionMessage(m);
+    fed->addAction(m);
+    iteration_result ret = iteration_result::next_step;
+    while (ret != iteration_result::error) {
+        ret = fed->genericUnspecifiedQueueProcess();
+        if (ret == iteration_result::halted) {
+            break;
+        }
+    }
+}
+
+void CommonCore::localError(
+    local_federate_id federateID,
+    int error_code,
+    const std::string& error_string)
+{
+    auto fed = getFederateAt(federateID);
+    if (fed == nullptr) {
+        throw(InvalidIdentifier("federateID not valid error"));
+    }
+    ActionMessage m(CMD_LOCAL_ERROR);
+    m.source_id = fed->global_id.load();
+    m.messageID = error_code;
+    m.payload = error_string;
     addActionMessage(m);
     fed->addAction(m);
     iteration_result ret = iteration_result::next_step;
@@ -390,18 +434,22 @@ bool CommonCore::allInitReady() const
 bool CommonCore::allDisconnected() const
 {
     // all federates must have hit finished state
-    auto afed = allFedDisconnected();
+    auto afed = (minFederateState() == operation_state::disconnected);
     if ((hasTimeDependency) || (hasFilters)) {
         return (afed) && (!timeCoord->hasActiveTimeDependencies());
     }
     return (afed);
 }
 
-bool CommonCore::allFedDisconnected() const
+operation_state CommonCore::minFederateState() const
 {
-    // all federates must have hit finished state
-    auto pred = [](const auto& fed) { return fed.disconnected; };
-    return std::all_of(loopFederates.begin(), loopFederates.end(), pred);
+    operation_state op{operation_state::disconnected};
+    for (auto& fed : loopFederates) {
+        if (fed.state < op) {
+            op = fed.state;
+        }
+    }
+    return op;
 }
 
 void CommonCore::setCoreReadyToInit()
@@ -729,21 +777,11 @@ void CommonCore::setFlagOption(local_federate_id federateID, int32_t flag, bool 
             } else {
                 ActionMessage cmd(CMD_CORE_CONFIGURE);
                 cmd.messageID = defs::flags::delay_init_entry;
-                if (flagValue) {
-                    setActionFlag(cmd, indicator_flag);
-                }
                 addActionMessage(cmd);
             }
-        } else if (flag == defs::flags::enable_init_entry) {
+        } else {
             ActionMessage cmd(CMD_CORE_CONFIGURE);
-            cmd.messageID = defs::flags::enable_init_entry;
-            if (flagValue) {
-                setActionFlag(cmd, indicator_flag);
-            }
-            addActionMessage(cmd);
-        } else if (flag == defs::flags::slow_responding) {
-            ActionMessage cmd(CMD_CORE_CONFIGURE);
-            cmd.messageID = defs::flags::slow_responding;
+            cmd.messageID = flag;
             if (flagValue) {
                 setActionFlag(cmd, indicator_flag);
             }
@@ -1987,7 +2025,7 @@ std::string CommonCore::federateQuery(const FederateState* fed, const std::strin
         return filteredEndpointQuery(fed);
     }
     if ((queryStr == "queries") || (queryStr == "available_queries")) {
-        return std::string("[exists;isinit;state;queries;filtered_endpoints;") +
+        return std::string("[exists;isinit;state;queries;filtered_endpoints;current_time;") +
             fed->processQuery(queryStr) + "]";
     }
     return fed->processQuery(queryStr);
@@ -1997,7 +2035,7 @@ std::string CommonCore::quickCoreQueries(const std::string& queryStr) const
 {
     if ((queryStr == "queries") || (queryStr == "available_queries")) {
         return "[isinit;isconnected;name;address;queries;address;federates;inputs;endpoints;filtered_endpoints;"
-               "publications;filters;federate_map;dependency_graph;dependencies;dependson;dependents]";
+               "publications;filters;federate_map;dependency_graph;dependencies;dependson;dependents;current_time;global_time;current_state]";
     }
     if (queryStr == "isconnected") {
         return (isConnected()) ? "true" : "false";
@@ -2067,6 +2105,48 @@ std::string CommonCore::coreQuery(const std::string& queryStr) const
     }
     if (queryStr == "filtered_endpoints") {
         return filteredEndpointQuery(nullptr);
+    }
+    if (queryStr == "current_time") {
+        if (hasTimeDependency) {
+            return timeCoord->printTimeStatus();
+        } else {
+            return "{}";
+        }
+    }
+    if (queryStr == "current_state") {
+        Json::Value base;
+        base["name"] = getIdentifier();
+        base["id"] = global_broker_id_local.baseValue();
+        base["state"] = brokerStateName(brokerState.load());
+        base["federates"] = Json::arrayValue;
+        for (auto& fed : loopFederates) {
+            Json::Value fedstate;
+            fedstate["state"] = state_string(fed.state);
+            fedstate["id"] = fed.fed->global_id.load().baseValue();
+            fedstate["name"] = fed.fed->getIdentifier();
+            base["federates"].append(std::move(fedstate));
+        }
+        return generateJsonString(base);
+    }
+
+    if (queryStr == "global_time") {
+        Json::Value block;
+        block["name"] = getIdentifier();
+        block["id"] = global_broker_id_local.baseValue();
+        block["parent"] = higher_broker_id.baseValue();
+        block["federates"] = Json::arrayValue;
+        if (hasTimeDependency) {
+            block["next_time"] = static_cast<double>(timeCoord->getNextTime());
+        }
+        for (auto fed : loopFederates) {
+            Json::Value fedBlock;
+            fedBlock["name"] = fed->getIdentifier();
+            fedBlock["id"] = fed->global_id.load().baseValue();
+            fedBlock["granted_time"] = static_cast<double>(fed->grantedTime());
+            fedBlock["send_time"] = static_cast<double>(fed->nextAllowedSendTime());
+            block["federates"].append(fedBlock);
+        }
+        return generateJsonString(block);
     }
     if (queryStr == "dependencies") {
         Json::Value base;
@@ -2452,12 +2532,14 @@ void CommonCore::errorRespondDelayedMessages(const std::string& estring)
     }
 }
 
-void CommonCore::sendErrorToFederates(int error_code)
+void CommonCore::sendErrorToFederates(int error_code, const std::string& message)
 {
-    ActionMessage errorCom(CMD_ERROR);
+    ActionMessage errorCom(CMD_LOCAL_ERROR);
+    errorCom.source_id = global_broker_id_local;
     errorCom.messageID = error_code;
+    errorCom.payload = message;
     loopFederates.apply([&errorCom](auto& fed) {
-        if ((fed) && (!fed.disconnected)) {
+        if ((fed) && (fed.state == operation_state::operating)) {
             fed->addAction(errorCom);
         }
     });
@@ -2564,6 +2646,12 @@ void CommonCore::processCommand(ActionMessage&& command)
                     m.source_id = global_broker_id_local;
                     transmit(parent_route_id, m);
                 }
+            } else if (
+                brokerState == broker_state_t::errored) { //we are disconnecting in an error state
+                sendDisconnect();
+                ActionMessage m(CMD_DISCONNECT);
+                m.source_id = global_broker_id_local;
+                transmit(parent_route_id, m);
             }
             addActionMessage(CMD_STOP);
             // we can't just fall through since this may have generated other messages that need to be forwarded or
@@ -2638,12 +2726,12 @@ void CommonCore::processCommand(ActionMessage&& command)
                     if (fed == loopFederates.end()) {
                         return;
                     }
-                    fed->disconnected = true;
+                    fed->state = operation_state::disconnected;
                     auto cstate = brokerState.load();
                     if ((!checkAndProcessDisconnect()) || (cstate < broker_state_t::operating)) {
                         command.setAction(CMD_DISCONNECT_FED);
                         transmit(parent_route_id, command);
-                        if (!allFedDisconnected()) {
+                        if (minFederateState() != operation_state::disconnected) {
                             command.setAction(CMD_DISCONNECT_FED_ACK);
                             command.dest_id = command.source_id;
                             command.source_id = parent_broker_id;
@@ -2735,20 +2823,63 @@ void CommonCore::processCommand(ActionMessage&& command)
             }
             break;
         case CMD_ERROR:
+        case CMD_LOCAL_ERROR:
             if (command.dest_id == global_broker_id_local) {
                 if (command.source_id == higher_broker_id ||
-                    command.source_id == parent_broker_id) {
-                    sendErrorToFederates(command.messageID);
-                    brokerState = broker_state_t::errored;
+                    command.source_id == parent_broker_id || command.source_id == root_broker_id) {
+                    sendErrorToFederates(command.messageID, command.payload);
+                    setErrorState(command.messageID, command.payload);
+
                 } else {
                     sendToLogger(
                         parent_broker_id,
                         log_level::error,
                         getFederateNameNoThrow(command.source_id),
                         command.payload);
+                    auto fed = loopFederates.find(command.source_id);
+                    fed->state = operation_state::error;
+
+                    if (hasTimeDependency) {
+                        timeCoord->processTimeMessage(command);
+                    }
+                }
+                if (terminate_on_error) {
+                    if (brokerState != broker_state_t::errored) {
+                        sendErrorToFederates(command.messageID, command.payload);
+                        brokerState = broker_state_t::errored;
+                    }
+                    command.setAction(CMD_GLOBAL_ERROR);
+                    command.source_id = global_broker_id_local;
+                    command.dest_id = root_broker_id;
+                    transmit(parent_route_id, std::move(command));
                 }
             } else {
+                if (command.dest_id == parent_broker_id) {
+                    if (terminate_on_error) {
+                        if (brokerState != broker_state_t::errored) {
+                            sendErrorToFederates(command.messageID, command.payload);
+                            brokerState = broker_state_t::errored;
+                        }
+                        command.setAction(CMD_GLOBAL_ERROR);
+                        command.source_id = global_broker_id_local;
+                        command.dest_id = root_broker_id;
+                        transmit(parent_route_id, std::move(command));
+                        break;
+                    } else if (command.source_id.isValid()) {
+                        auto fed = loopFederates.find(command.source_id);
+                        if (fed != loopFederates.end()) {
+                            fed->state = operation_state::error;
+                        }
+                    }
+                }
                 routeMessage(command);
+            }
+            break;
+        case CMD_GLOBAL_ERROR:
+            setErrorState(command.messageID, command.payload);
+            sendErrorToFederates(command.messageID, command.payload);
+            if (!(command.source_id == higher_broker_id || command.source_id == root_broker_id)) {
+                transmit(parent_route_id, std::move(command));
             }
             break;
         case CMD_DATA_LINK: {
@@ -3529,6 +3660,9 @@ void CommonCore::processCoreConfigureCommands(ActionMessage& cmd)
         case defs::properties::console_log_level:
             setLogLevels(cmd.getExtraData(), fileLogLevel);
             break;
+        case defs::flags::terminate_on_error:
+            terminate_on_error = checkActionFlag(cmd, indicator_flag);
+            break;
         case defs::flags::slow_responding:
             no_ping = checkActionFlag(cmd, indicator_flag);
             break;
@@ -3555,6 +3689,12 @@ void CommonCore::processCoreConfigureCommands(ActionMessage& cmd)
                 FiltI->filterOp = std::move(M);
             }
         } break;
+        default:
+            LOG_WARNING(
+                global_broker_id_local,
+                identifier,
+                "unrecognized configure option passed to core ");
+            break;
     }
 }
 

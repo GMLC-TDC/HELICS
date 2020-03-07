@@ -32,8 +32,6 @@ elseif(APPLE)
             "\"run('${CMAKE_CURRENT_BINARY_DIR}/runTests.m');quit;\""
     )
 else()
-
-else()
     configure_file(runTestsUNIX.m.in runTests.m)
     add_test(
         NAME matlab_tests

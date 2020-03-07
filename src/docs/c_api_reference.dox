@@ -43,6 +43,7 @@ functions applying to a \ref helics_core object
  - \ref helicsCoreGetIdentifier
  - \ref helicsCoreGetAddress
  - \ref helicsCoreSetReadyToInit
+ - \ref helicsCoreConnect
  - \ref helicsCoreDisconnect
  - \ref helicsCoreDestroy
  - \ref helicsCoreFree
@@ -96,6 +97,8 @@ Functions applying to all \ref helics_federate objects
  - \ref helicsFederateClone
  - \ref helicsFederateIsValid
  - \ref helicsFederateRegisterInterfaces
+ - \ref helicsFederateGlobalError
+ - \ref helicsFederateLocalError
  - \ref helicsFederateFinalize
  - \ref helicsFederateFinalizeAsync
  - \ref helicsFederateFinalizeComplete
@@ -130,6 +133,7 @@ Functions applying to all \ref helics_federate objects
  - \ref helicsFederateGetIntegerProperty
  - \ref helicsFederateGetCurrentTime
  - \ref helicsFederateSetGlobal
+ - \ref helicsFederateAddDependency
  - \ref helicsFederateSetLogFile
  - \ref helicsFederateLogErrorMessage
  - \ref helicsFederateLogWarningMessage
@@ -180,6 +184,7 @@ functions applying to a \ref helics_publication object
  - \ref helicsPublicationSetInfo
  - \ref helicsPublicationGetOption
  - \ref helicsPublicationSetOption
+ - \ref helicsPublicationSetMinimumChange
 
  \section input Input interface Functions 
 functions applying to a \ref helics_input object
@@ -219,6 +224,7 @@ functions applying to a \ref helics_input object
  - \ref helicsInputSetInfo
  - \ref helicsInputGetOption
  - \ref helicsInputSetOption
+ - \ref helicsInputSetMinimumChange
  - \ref helicsInputIsUpdated
  - \ref helicsInputLastUpdateTime
  - \ref helicsInputClearUpdate

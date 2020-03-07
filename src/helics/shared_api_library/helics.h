@@ -569,6 +569,24 @@ HELICS_EXPORT void helicsFederateInfoSetIntegerProperty(helics_federate_info fi,
     @endforcpponly
     */
 HELICS_EXPORT void helicsFederateRegisterInterfaces(helics_federate fed, const char* file, helics_error* err);
+
+/** generate a global Error from a federate
+A global error halts the co-simulation completely
+@param fed the federate to create an error in
+@param error_code the integer code for the error
+@param error_string a string describing the error
+*/
+HELICS_EXPORT void helicsFederateGlobalError(helics_federate fed, int error_code, const char* error_string);
+
+/** generate a local error in a federate
+this will propagate through the co-simulation but not necessarily halt the co-simulation, it has a similar effect to finalize but does
+allow some interaction with a core for a brief time. 
+@param fed the federate to create an error in
+@param error_code the integer code for the error
+@param error_string a string describing the error
+*/
+HELICS_EXPORT void helicsFederateLocalError(helics_federate fed, int error_code, const char* error_string);
+
 /** finalize the federate this function halts all communication in the federate and disconnects it from the core
      */
 HELICS_EXPORT void helicsFederateFinalize(helics_federate fed, helics_error* err);
@@ -890,6 +908,15 @@ HELICS_EXPORT helics_time helicsFederateGetCurrentTime(helics_federate fed, heli
     @endforcpponly
     */
 HELICS_EXPORT void helicsFederateSetGlobal(helics_federate fed, const char* valueName, const char* value, helics_error* err);
+
+/** add a time dependency for a federate.  The federate will depend on the given named federate for time synchronization
+    @param fed the federate to add the dependency for
+    @param fedName the name of the federate to depend on
+    @forcpponly
+    @param[in,out] err a pointer to an error object for catching errors
+    @endforcpponly
+    */
+HELICS_EXPORT void helicsFederateAddDependency(helics_federate fed, const char* fedName, helics_error* err);
 
 /** set the logging file for a federate(actually on the core associated with a federate)
     @param fed the federate to set the log file for

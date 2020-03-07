@@ -16,7 +16,6 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <fstream>
 #include <gmlc/concurrency/Barrier.hpp>
 #include <iostream>
-#include <random>
 #include <thread>
 
 // static constexpr helics::Time tend = 3600.0_t;  // simulation end time
@@ -33,13 +32,12 @@ static void BMphold_singleCore(benchmark::State& state)
             core_type::INPROC,
             std::string("--autobroker --federates=") + std::to_string(fed_count));
         std::vector<PholdFederate> feds(fed_count);
-        std::mt19937 rand_gen(0x600d5eed);
-        std::uniform_int_distribution<unsigned int> rand_seed;
         for (int ii = 0; ii < fed_count; ++ii) {
-            // set seeds for federates to deterministic values, but not all the same
+            // phold federate default seed values are deterministic, based on index
             feds[ii].setGenerateRandomSeed(false);
-            feds[ii].setRandomSeed(rand_seed(rand_gen));
-            feds[ii].initialize(wcore->getIdentifier(), ii, fed_count);
+            std::string bmInit =
+                "--index=" + std::to_string(ii) + " --max_index=" + std::to_string(fed_count);
+            feds[ii].initialize(wcore->getIdentifier(), bmInit);
         }
 
         std::vector<std::thread> threadlist(static_cast<size_t>(fed_count - 1));
@@ -50,7 +48,7 @@ static void BMphold_singleCore(benchmark::State& state)
         feds[0].makeReady();
         brr.wait();
         state.ResumeTiming();
-        feds[0].run([]() {});
+        feds[0].run();
         state.PauseTiming();
         for (auto& thrd : threadlist) {
             thrd.join();
@@ -91,16 +89,15 @@ static void BMphold_multiCore(benchmark::State& state, core_type cType)
         std::vector<PholdFederate> feds(fed_count);
         std::vector<std::shared_ptr<helics::Core>> cores(fed_count);
 
-        std::mt19937 rand_gen(0x600d5eed);
-        std::uniform_int_distribution<unsigned int> rand_seed;
         for (int ii = 0; ii < fed_count; ++ii) {
             cores[ii] = helics::CoreFactory::create(cType, "-f 1 --log_level=no_print");
             cores[ii]->connect();
 
-            // set seeds for federates to deterministic values, but not all the same
+            // phold federate default seed values are deterministic, based on index
             feds[ii].setGenerateRandomSeed(false);
-            feds[ii].setRandomSeed(rand_seed(rand_gen));
-            feds[ii].initialize(cores[ii]->getIdentifier(), ii, fed_count);
+            std::string bmInit =
+                "--index=" + std::to_string(ii) + " --max_index=" + std::to_string(fed_count);
+            feds[ii].initialize(cores[ii]->getIdentifier(), bmInit);
         }
 
         std::vector<std::thread> threadlist(static_cast<size_t>(fed_count - 1));
@@ -111,7 +108,7 @@ static void BMphold_multiCore(benchmark::State& state, core_type cType)
         feds[0].makeReady();
         brr.wait();
         state.ResumeTiming();
-        feds[0].run([]() {});
+        feds[0].run();
         state.PauseTiming();
         for (auto& thrd : threadlist) {
             thrd.join();

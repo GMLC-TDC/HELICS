@@ -1,0 +1,13 @@
+freebsd_instance:
+  image_family: freebsd-12-1
+
+task:
+  install_script: |
+    pkg install -y cmake libzmq4 ninja git
+  build_script: |
+    mkdir build && cd build
+    cmake -GNinja -DHELICS_BUILD_TESTS=ON -DHELICS_BUILD_EXAMPLES=ON ..
+    cmake --build .
+  test_script: |
+    cd build
+    ctest --output-on-failure --timeout 480 -C Release -L "SystemCI"

@@ -56,6 +56,7 @@ TEST(other_tests, broker_global_value)
 // test global value creation from a core and its error pathways
 TEST(other_tests, core_global_value)
 {
+    helicsCloseLibrary();
     auto err = helicsErrorInitialize();
     auto brk = helicsCreateBroker("test", "gbrokerc", "--root", &err);
 
@@ -197,6 +198,50 @@ TEST(other_tests, federate_global_value)
     EXPECT_EQ(helicsBrokerIsConnected(brk), helics_false);
 }
 
+// test global value creation from a federate and some error pathways for queries and global creation
+TEST(other_tests, federate_add_dependency)
+{
+    auto err = helicsErrorInitialize();
+    auto brk = helicsCreateBroker("test", "gbrokerd", "--root", &err);
+
+    auto cr = helicsCreateCore("test", "dcore", "--broker=gbrokerd", &err);
+
+    // test creation of federateInfo from command line arguments
+    const char* argv[4];
+    argv[0] = "";
+    argv[1] = "--corename=dcore";
+    argv[2] = "--type=test";
+    argv[3] = "--period=1.0";
+
+    auto fi = helicsCreateFederateInfo();
+    helicsFederateInfoLoadFromArgs(fi, 4, argv, &err);
+    helicsFederateInfoSetFlagOption(fi, helics_flag_source_only, true, &err);
+
+    auto fed1 = helicsCreateMessageFederate("fed1", fi, &err);
+    EXPECT_EQ(err.error_code, 0);
+
+    auto fi2 = helicsCreateFederateInfo();
+    helicsFederateInfoLoadFromArgs(fi2, 4, argv, &err);
+    auto fed2 = helicsCreateMessageFederate("fed2", fi2, &err);
+    helicsFederateRegisterGlobalEndpoint(fed2, "ept2", nullptr, &err);
+
+    helicsFederateRegisterGlobalEndpoint(fed1, "ept1", nullptr, &err);
+
+    helicsFederateAddDependency(fed1, "fed2", &err);
+    EXPECT_EQ(err.error_code, 0);
+
+    helicsFederateEnterExecutingModeAsync(fed1, &err);
+    helicsFederateEnterExecutingMode(fed2, &err);
+    helicsFederateEnterExecutingModeComplete(fed1, &err);
+
+    helicsFederateInfoFree(fi);
+    helicsFederateInfoFree(fi2);
+    helicsFederateFinalize(fed1, &err);
+    helicsFederateFinalize(fed2, &err);
+    helicsBrokerFree(brk);
+    helicsCoreFree(cr);
+}
+
 // test core creation from command line arguments
 TEST(other_tests, core_creation)
 {
@@ -251,4 +296,49 @@ TEST(other_tests, broker_creation)
     EXPECT_EQ(brk2, nullptr);
 
     helicsBrokerDisconnect(brk, &err);
+}
+
+TEST(federate_tests, federateGeneratedLocalError)
+{
+    auto fi = helicsCreateFederateInfo();
+    helicsFederateInfoSetCoreType(fi, helics_core_type_test, nullptr);
+    helicsFederateInfoSetCoreName(fi, "core_full_le", nullptr);
+    helicsFederateInfoSetCoreInitString(fi, "-f 1 --autobroker --error_timeout=0", nullptr);
+
+    auto fed1 = helicsCreateValueFederate("fed1", fi, nullptr);
+    helicsFederateInfoFree(fi);
+    helicsFederateEnterExecutingMode(fed1, nullptr);
+
+    helicsFederateRequestTime(fed1, 2.0, nullptr);
+    helicsFederateLocalError(fed1, 9827, "user generated error");
+
+    auto err = helicsErrorInitialize();
+    helicsFederateRequestTime(fed1, 3.0, &err);
+    EXPECT_NE(err.error_code, 0);
+
+    auto cr = helicsFederateGetCoreObject(fed1, nullptr);
+    helicsCoreDisconnect(cr, nullptr);
+    helicsCoreFree(cr);
+    helicsFederateDestroy(fed1);
+}
+
+TEST(federate_tests, federateGeneratedGlobalError)
+{
+    auto fi = helicsCreateFederateInfo();
+    helicsFederateInfoSetCoreType(fi, helics_core_type_test, nullptr);
+    helicsFederateInfoSetCoreName(fi, "core_full_ge", nullptr);
+    helicsFederateInfoSetCoreInitString(fi, "-f 1 --autobroker --error_timeout=0", nullptr);
+
+    auto fed1 = helicsCreateValueFederate("fed1", fi, nullptr);
+    helicsFederateInfoFree(fi);
+    helicsFederateEnterExecutingMode(fed1, nullptr);
+
+    helicsFederateRequestTime(fed1, 2.0, nullptr);
+    helicsFederateGlobalError(fed1, 9827, "user generated global error");
+
+    auto err = helicsErrorInitialize();
+    helicsFederateRequestTime(fed1, 3.0, &err);
+    EXPECT_NE(err.error_code, 0);
+
+    helicsFederateDestroy(fed1);
 }

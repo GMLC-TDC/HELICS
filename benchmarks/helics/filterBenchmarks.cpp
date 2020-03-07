@@ -5,7 +5,8 @@ the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 
-#include "EchoMessage.hpp"
+#include "EchoMessageHubFederate.hpp"
+#include "EchoMessageLeafFederate.hpp"
 #include "helics/application_api/Filters.hpp"
 #include "helics/core/BrokerFactory.hpp"
 #include "helics/core/CoreFactory.hpp"
@@ -32,10 +33,11 @@ static void BMfilter_singleCore(benchmark::State& state)
         auto wcore = helics::CoreFactory::create(
             core_type::INPROC, std::string("--autobroker --federates=") + std::to_string(feds + 1));
         EchoMessageHub hub;
-        hub.initialize(wcore->getIdentifier());
+        hub.initialize(wcore->getIdentifier(), "");
         std::vector<EchoMessageLeaf> leafs(feds);
         for (int ii = 0; ii < feds; ++ii) {
-            leafs[ii].initialize(wcore->getIdentifier(), ii);
+            std::string bmInit = "--index=" + std::to_string(ii);
+            leafs[ii].initialize(wcore->getIdentifier(), bmInit);
         }
         auto filt1 = make_filter(helics::filter_types::delay, wcore.get());
         // either add a source filter on Echo or a destination Filter on Echo
@@ -91,13 +93,14 @@ static void BMfilter_multiCore(benchmark::State& state, core_type cType)
             helics::CoreFactory::create(cType, std::string{"--federates=0 --log_level=no_print"});
         // this is to delay until the threads are ready
         EchoMessageHub hub;
-        hub.initialize(wcore->getIdentifier());
+        hub.initialize(wcore->getIdentifier(), "");
         std::vector<EchoMessageLeaf> leafs(feds);
         std::vector<std::shared_ptr<helics::Core>> cores(feds);
         for (int ii = 0; ii < feds; ++ii) {
             cores[ii] = helics::CoreFactory::create(cType, "-f 1 --log_level=no_print");
             cores[ii]->connect();
-            leafs[ii].initialize(cores[ii]->getIdentifier(), ii);
+            std::string bmInit = "--index=" + std::to_string(ii);
+            leafs[ii].initialize(cores[ii]->getIdentifier(), bmInit);
         }
         filtcore->connect();
         auto filt1 = make_filter(helics::filter_types::delay, filtcore.get());

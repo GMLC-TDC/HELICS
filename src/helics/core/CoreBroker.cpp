@@ -27,6 +27,29 @@ using namespace std::string_literals;
 
 constexpr char universalKey[] = "**";
 
+const std::string& state_string(connection_state state)
+{
+    static const std::string c1{"connected"};
+    static const std::string init{"init_requested"};
+    static const std::string operating{"operating"};
+    static const std::string estate{"error"};
+    static const std::string dis{"disconnected"};
+    switch (state) {
+        case connection_state::operating:
+            return operating;
+        case connection_state::init_requested:
+            return init;
+        case connection_state::connected:
+            return c1;
+        case connection_state::request_disconnect:
+        case connection_state::disconnected:
+            return dis;
+        case connection_state::error:
+        default:
+            return estate;
+    }
+}
+
 CoreBroker::~CoreBroker()
 {
     std::lock_guard<std::mutex> lock(name_mutex_);
@@ -527,9 +550,9 @@ void CoreBroker::processPriorityCommand(ActionMessage&& command)
         case CMD_PRIORITY_DISCONNECT: {
             auto brk = getBrokerById(global_broker_id(command.source_id));
             if (brk != nullptr) {
-                brk->isDisconnected = true;
+                brk->state = connection_state::disconnected;
             }
-            if (allDisconnected()) {
+            if (getAllConnectionState() >= connection_state::disconnected) {
                 if (!isRootc) {
                     ActionMessage dis(CMD_PRIORITY_DISCONNECT);
                     dis.source_id = global_broker_id_local;
@@ -575,6 +598,7 @@ void CoreBroker::processPriorityCommand(ActionMessage&& command)
                     delayTransmitQueue.push(command);
                 }
             }
+            break;
         default:
             // must not have been a priority command
             break;
@@ -634,7 +658,7 @@ void CoreBroker::labelAsDisconnected(global_broker_id brkid)
 {
     auto disconnect_procedure = [brkid](auto& obj) {
         if (obj.parent == brkid) {
-            obj.isDisconnected = true;
+            obj.state = connection_state::disconnected;
         }
     };
     _brokers.apply(disconnect_procedure);
@@ -646,10 +670,10 @@ void CoreBroker::sendDisconnect()
     ActionMessage bye(CMD_DISCONNECT);
     bye.source_id = global_broker_id_local;
     _brokers.apply([this, &bye](auto& brk) {
-        if (!brk.isDisconnected) {
+        if (brk.state < connection_state::disconnected) {
             if (brk.parent == global_broker_id_local) {
                 this->routeMessage(bye, brk.global_id);
-                brk.isDisconnected = true;
+                brk.state = connection_state::disconnected;
             }
             if (hasTimeDependency) {
                 timeCoord->removeDependency(brk.global_id);
@@ -730,10 +754,11 @@ void CoreBroker::processCommand(ActionMessage&& command)
                 bool partDisconnected{false};
                 bool ignore{false};
                 for (auto& brk : _brokers) {
-                    if (brk.isDisconnected) {
+                    if (brk.state == connection_state::disconnected) {
                         partDisconnected = true;
                     }
-                    if (brk.isDisconnected && brk.global_id == command.source_id) {
+                    if (brk.state == connection_state::disconnected &&
+                        brk.global_id == command.source_id) {
                         // the broker in question is already disconnected, ignore this
                         ignore = true;
                         break;
@@ -780,7 +805,7 @@ void CoreBroker::processCommand(ActionMessage&& command)
         case CMD_INIT: {
             auto brk = getBrokerById(static_cast<global_broker_id>(command.source_id));
             if (brk != nullptr) {
-                brk->_initRequested = true;
+                brk->state = connection_state::init_requested;
             }
             if (allInitReady()) {
                 if (isRootc) {
@@ -802,7 +827,7 @@ void CoreBroker::processCommand(ActionMessage&& command)
             }
             auto brk = getBrokerById(global_broker_id(command.source_id));
             if (brk != nullptr) {
-                brk->_initRequested = false;
+                brk->state = connection_state::connected;
             }
         } break;
         case CMD_INIT_GRANT:
@@ -932,7 +957,7 @@ void CoreBroker::processCommand(ActionMessage&& command)
         case CMD_DISCONNECT_FED: {
             auto fed = _federates.find(command.source_id);
             if (fed != _federates.end()) {
-                fed->isDisconnected = true;
+                fed->state = connection_state::disconnected;
             }
             if (!isRootc) {
                 transmit(parent_route_id, command);
@@ -943,7 +968,9 @@ void CoreBroker::processCommand(ActionMessage&& command)
             }
         } break;
         case CMD_STOP:
-            if (!allDisconnected()) { // only send a disconnect message if we haven't done so already
+            if ((getAllConnectionState() <
+                 connection_state::
+                     disconnected)) { // only send a disconnect message if we haven't done so already
                 timeCoord->disconnect();
                 if (!isRootc) {
                     ActionMessage m(CMD_DISCONNECT);
@@ -1021,15 +1048,9 @@ void CoreBroker::processCommand(ActionMessage&& command)
             }
             break;
         case CMD_ERROR:
-            if (isRootc || command.dest_id == global_broker_id_local) {
-                sendToLogger(command.source_id, log_level::error, std::string(), command.payload);
-                if (command.source_id == parent_broker_id) {
-                    broadcast(command);
-                }
-                brokerState = broker_state_t::errored;
-            } else {
-                transmit(parent_route_id, command);
-            }
+        case CMD_LOCAL_ERROR:
+        case CMD_GLOBAL_ERROR:
+            processError(command);
             break;
         case CMD_REG_PUB:
             if ((!isRootc) && (command.dest_id != parent_broker_id)) {
@@ -1161,7 +1182,7 @@ void CoreBroker::checkForNamedInterface(ActionMessage& command)
             auto pub = handles.getPublication(command.name);
             if (pub != nullptr) {
                 auto fed = _federates.find(pub->getFederateId());
-                if (!fed->isDisconnected) {
+                if (fed->state < connection_state::error) {
                     command.setAction(CMD_ADD_SUBSCRIBER);
                     command.setDestination(pub->handle);
                     command.name.clear();
@@ -1186,7 +1207,7 @@ void CoreBroker::checkForNamedInterface(ActionMessage& command)
             auto inp = handles.getInput(command.name);
             if (inp != nullptr) {
                 auto fed = _federates.find(inp->getFederateId());
-                if (!fed->isDisconnected) {
+                if (fed->state < connection_state::error) {
                     command.setAction(CMD_ADD_PUBLISHER);
                     command.setDestination(inp->handle);
                     auto pub = handles.findHandle(command.getSource());
@@ -1234,7 +1255,7 @@ void CoreBroker::checkForNamedInterface(ActionMessage& command)
             auto ept = handles.getEndpoint(command.name);
             if (ept != nullptr) {
                 auto fed = _federates.find(ept->getFederateId());
-                if (!fed->isDisconnected) {
+                if (fed->state < connection_state::error) {
                     command.setAction(CMD_ADD_FILTER);
                     command.setDestination(ept->handle);
                     command.name.clear();
@@ -1409,15 +1430,34 @@ void CoreBroker::addLocalInfo(BasicHandleInfo& handleInfo, const ActionMessage& 
     handleInfo.flags = m.flags;
 }
 
+void CoreBroker::propagateError(ActionMessage&& cmd)
+{
+    LOG_ERROR(global_broker_id_local, getIdentifier(), cmd.payload);
+    if (cmd.action() == CMD_LOCAL_ERROR) {
+        if (terminate_on_error) {
+            LOG_ERROR(
+                global_broker_id_local,
+                getIdentifier(),
+                "Error Escalation: Federation terminating");
+            cmd.setAction(CMD_GLOBAL_ERROR);
+            setErrorState(cmd.messageID, cmd.payload);
+            broadcast(cmd);
+            transmitToParent(std::move(cmd));
+            return;
+        }
+    }
+    routeMessage(std::move(cmd));
+}
+
 void CoreBroker::addPublication(ActionMessage& m)
 {
     // detect duplicate publications
     if (handles.getPublication(m.name) != nullptr) {
-        ActionMessage eret(CMD_ERROR, global_broker_id_local, m.source_id);
+        ActionMessage eret(CMD_LOCAL_ERROR, global_broker_id_local, m.source_id);
         eret.dest_handle = m.source_handle;
         eret.messageID = defs::errors::registration_failure;
         eret.payload = "Duplicate publication names (" + m.name + ")";
-        routeMessage(eret);
+        propagateError(std::move(eret));
         return;
     }
     auto& pub = handles.addHandle(
@@ -1439,11 +1479,11 @@ void CoreBroker::addInput(ActionMessage& m)
 {
     // detect duplicate publications
     if (handles.getInput(m.name) != nullptr) {
-        ActionMessage eret(CMD_ERROR, global_broker_id_local, m.source_id);
+        ActionMessage eret(CMD_LOCAL_ERROR, global_broker_id_local, m.source_id);
         eret.dest_handle = m.source_handle;
         eret.messageID = defs::errors::registration_failure;
         eret.payload = "Duplicate input names (" + m.name + ")";
-        routeMessage(eret);
+        propagateError(std::move(eret));
         return;
     }
     auto& inp = handles.addHandle(
@@ -1461,11 +1501,11 @@ void CoreBroker::addEndpoint(ActionMessage& m)
 {
     // detect duplicate endpoints
     if (handles.getEndpoint(m.name) != nullptr) {
-        ActionMessage eret(CMD_ERROR, global_broker_id_local, m.source_id);
+        ActionMessage eret(CMD_LOCAL_ERROR, global_broker_id_local, m.source_id);
         eret.dest_handle = m.source_handle;
         eret.messageID = defs::errors::registration_failure;
         eret.payload = "Duplicate endpoint names (" + m.name + ")";
-        routeMessage(eret);
+        propagateError(std::move(eret));
         return;
     }
     auto& ept = handles.addHandle(
@@ -1498,11 +1538,11 @@ void CoreBroker::addFilter(ActionMessage& m)
 {
     // detect duplicate endpoints
     if (handles.getFilter(m.name) != nullptr) {
-        ActionMessage eret(CMD_ERROR, global_broker_id_local, m.source_id);
+        ActionMessage eret(CMD_LOCAL_ERROR, global_broker_id_local, m.source_id);
         eret.dest_handle = m.source_handle;
         eret.messageID = defs::errors::registration_failure;
         eret.payload = "Duplicate filter names (" + m.name + ")";
-        routeMessage(eret);
+        propagateError(std::move(eret));
         return;
     }
 
@@ -1797,7 +1837,7 @@ void CoreBroker::routeMessage(ActionMessage&& cmd)
 void CoreBroker::broadcast(ActionMessage& cmd)
 {
     for (auto& broker : _brokers) {
-        if ((!broker._nonLocal) && (!broker.isDisconnected)) {
+        if ((!broker._nonLocal) && (broker.state < connection_state::disconnected)) {
             cmd.dest_id = broker.global_id;
             transmit(broker.route, cmd);
         }
@@ -2036,6 +2076,66 @@ void CoreBroker::FindandNotifyFilterTargets(BasicHandleInfo& handleInfo)
     }
 }
 
+void CoreBroker::processError(ActionMessage& command)
+{
+    sendToLogger(command.source_id, log_level::error, std::string(), command.payload);
+    if (command.source_id == global_broker_id_local) {
+        brokerState = broker_state_t::errored;
+        broadcast(command);
+        if (!isRootc) {
+            command.setAction(CMD_LOCAL_ERROR);
+            transmit(parent_route_id, std::move(command));
+        }
+        return;
+    }
+
+    if (command.source_id == parent_broker_id || command.source_id == root_broker_id) {
+        brokerState = broker_state_t::errored;
+        broadcast(command);
+    }
+
+    auto brk = getBrokerById(global_broker_id(command.source_id));
+    if (brk == nullptr) {
+        auto fed = _federates.find(command.source_id);
+        if (fed != _federates.end()) {
+            fed->state = connection_state::error;
+        }
+    } else {
+        brk->state = connection_state::error;
+    }
+
+    switch (command.action()) {
+        case CMD_LOCAL_ERROR:
+        case CMD_ERROR:
+            if (terminate_on_error) {
+                //upgrade the error to a global error and reprocess
+                command.setAction(CMD_GLOBAL_ERROR);
+                processError(command);
+                return;
+            }
+            if (!(isRootc || command.dest_id == global_broker_id_local ||
+                  command.dest_id == parent_broker_id)) {
+                transmit(parent_route_id, command);
+            }
+            if (hasTimeDependency) {
+                timeCoord->processTimeMessage(command);
+            }
+            break;
+        case CMD_GLOBAL_ERROR:
+            setErrorState(command.messageID, command.payload);
+            if (!(isRootc || command.dest_id == global_broker_id_local ||
+                  command.dest_id == parent_broker_id)) {
+                transmit(parent_route_id, command);
+            } else {
+                command.source_id = global_broker_id_local;
+                broadcast(command);
+            }
+            break;
+        default:
+            break;
+    }
+}
+
 void CoreBroker::processDisconnect(ActionMessage& command)
 {
     auto brk = getBrokerById(global_broker_id(command.source_id));
@@ -2080,7 +2180,7 @@ void CoreBroker::processDisconnect(ActionMessage& command)
                     disconnectBroker(*brk);
                 }
 
-                if (allDisconnected()) {
+                if ((getAllConnectionState() >= connection_state::disconnected)) {
                     timeCoord->disconnect();
                     if (!isRootc) {
                         ActionMessage dis(CMD_DISCONNECT);
@@ -2145,9 +2245,40 @@ void CoreBroker::processDisconnect(ActionMessage& command)
     }
 }
 
+void CoreBroker::markAsDisconnected(global_broker_id brkid)
+{
+    bool isCore{false};
+    for (size_t ii = 0; ii < _brokers.size(); ++ii) {
+        auto& brk = _brokers[ii];
+        if (brk.global_id == brkid) {
+            if (brk.state != connection_state::error) {
+                brk.state = connection_state::disconnected;
+                isCore = brk._core;
+            }
+        }
+        if (brk.parent == brkid) {
+            if (brk.state != connection_state::error) {
+                brk.state = connection_state::disconnected;
+                markAsDisconnected(brk.global_id);
+            }
+        }
+    }
+    if (isCore) {
+        for (size_t ii = 0; ii < _federates.size(); ++ii) {
+            auto& fed = _federates[ii];
+
+            if (fed.parent == brkid) {
+                if (fed.state != connection_state::error) {
+                    fed.state = connection_state::disconnected;
+                }
+            }
+        }
+    }
+}
+
 void CoreBroker::disconnectBroker(BasicBrokerInfo& brk)
 {
-    brk.isDisconnected = true;
+    markAsDisconnected(brk.global_id);
     if (brokerState < broker_state_t::operating) {
         if (isRootc) {
             ActionMessage dis(CMD_BROADCAST_DISCONNECT);
@@ -2259,7 +2390,8 @@ std::string CoreBroker::generateQueryAnswer(const std::string& request)
     }
     if ((request == "queries") || (request == "available_queries")) {
         return "[isinit;isconnected;name;address;queries;address;counts;summary;federates;brokers;inputs;endpoints;"
-               "publications;filters;federate_map;dependency_graph;dependencies;dependson;dependents]";
+               "publications;filters;federate_map;dependency_graph;dependencies;dependson;dependents;"
+               "current_time;current_state;global_time]";
     }
     if (request == "address") {
         return getAddress();
@@ -2284,6 +2416,51 @@ std::string CoreBroker::generateQueryAnswer(const std::string& request)
     }
     if (request == "brokers") {
         return generateStringVector(_brokers, [](auto& brk) { return brk.name; });
+    }
+    if (request == "current_state") {
+        Json::Value base;
+        base["name"] = getIdentifier();
+        base["id"] = global_broker_id_local.baseValue();
+        base["state"] = brokerStateName(brokerState.load());
+        base["federates"] = Json::arrayValue;
+        for (auto& fed : _federates) {
+            Json::Value fedstate;
+            fedstate["name"] = fed.name;
+            fedstate["state"] = state_string(fed.state);
+            fedstate["id"] = fed.global_id.baseValue();
+            base["federates"].append(std::move(fedstate));
+        }
+        base["brokers"] = Json::arrayValue;
+        base["cores"] = Json::arrayValue;
+        for (auto& brk : _brokers) {
+            Json::Value brkstate;
+            brkstate["state"] = state_string(brk.state);
+            brkstate["name"] = brk.name;
+            brkstate["id"] = brk.global_id.baseValue();
+            if (brk._core) {
+                base["cores"].append(std::move(brkstate));
+            } else {
+                base["brokers"].append(std::move(brkstate));
+            }
+        }
+        return generateJsonString(base);
+    }
+    if (request == "current_time") {
+        if (hasTimeDependency) {
+            return timeCoord->printTimeStatus();
+        } else {
+            return "{}";
+        }
+    }
+    if (request == "global_time") {
+        if (currentTimeMap.isActive()) {
+            return "#wait";
+        }
+        initializeCurrentTimeMap();
+        if (currentTimeMap.isCompleted()) {
+            return currentTimeMap.generate();
+        }
+        return "#wait";
     }
     if (request == "inputs") {
         return generateStringVector_if(
@@ -2365,6 +2542,15 @@ std::string CoreBroker::generateQueryAnswer(const std::string& request)
     return "#invalid";
 }
 
+//enumeration of subqueries that cascade and need multiple levels of processing
+enum subqueries : std::uint16_t {
+    general_query = 0,
+    federate_map = 2,
+    dependency_graph = 4,
+    current_time_map = 6,
+    data_flow_graph = 8
+};
+
 std::string CoreBroker::getNameList(std::string gidString) const
 {
     if (gidString.back() == ']') {
@@ -2405,7 +2591,7 @@ void CoreBroker::initializeFederateMap()
     ActionMessage queryReq(CMD_BROKER_QUERY);
     queryReq.payload = "federate_map";
     queryReq.source_id = global_broker_id_local;
-    queryReq.counter = 2; // indicating which processing to use
+    queryReq.counter = federate_map; // indicating which processing to use
     bool hasCores = false;
     for (auto& broker : _brokers) {
         if (broker.parent == global_broker_id_local) {
@@ -2438,7 +2624,7 @@ void CoreBroker::initializeDependencyGraph()
     ActionMessage queryReq(CMD_BROKER_QUERY);
     queryReq.payload = "dependency_graph";
     queryReq.source_id = global_broker_id_local;
-    queryReq.counter = 4; // indicating which processing to use
+    queryReq.counter = dependency_graph; // indicating which processing to use
     bool hasCores = false;
     for (auto& broker : _brokers) {
         int index;
@@ -2468,6 +2654,7 @@ void CoreBroker::initializeDependencyGraph()
 
 void CoreBroker::initializeDataFlowGraph()
 {
+    //TODO:: this query is not fully formed yet and is a work in progress
     Json::Value& base = depMap.getJValue();
     base["name"] = getIdentifier();
     base["id"] = global_broker_id_local.baseValue();
@@ -2478,7 +2665,7 @@ void CoreBroker::initializeDataFlowGraph()
     ActionMessage queryReq(CMD_BROKER_QUERY);
     queryReq.payload = "dependency_graph";
     queryReq.source_id = global_broker_id_local;
-    queryReq.counter = 4; // indicating which processing to use
+    queryReq.counter = dependency_graph; // indicating which processing to use
     bool hasCores = false;
     for (auto& broker : _brokers) {
         int index;
@@ -2506,6 +2693,40 @@ void CoreBroker::initializeDataFlowGraph()
     }
 }
 
+void CoreBroker::initializeCurrentTimeMap()
+{
+    Json::Value& base = currentTimeMap.getJValue();
+    base["name"] = getIdentifier();
+    base["id"] = global_broker_id_local.baseValue();
+    if (!isRootc) {
+        base["parent"] = higher_broker_id.baseValue();
+    }
+    base["brokers"] = Json::arrayValue;
+    ActionMessage queryReq(CMD_BROKER_QUERY);
+    queryReq.payload = "global_time";
+    queryReq.source_id = global_broker_id_local;
+    queryReq.counter = current_time_map; // indicating which processing to use
+    bool hasCores = false;
+    for (auto& broker : _brokers) {
+        if (broker._nonLocal) {
+            continue;
+        }
+        int index;
+        if (broker._core) {
+            if (!hasCores) {
+                hasCores = true;
+                base["cores"] = Json::arrayValue;
+            }
+            index = currentTimeMap.generatePlaceHolder("cores");
+        } else {
+            index = currentTimeMap.generatePlaceHolder("brokers");
+        }
+        queryReq.messageID = index;
+        queryReq.dest_id = broker.global_id;
+        transmit(broker.route, queryReq);
+    }
+}
+
 void CoreBroker::processLocalQuery(const ActionMessage& m)
 {
     ActionMessage queryRep(CMD_QUERY_REPLY);
@@ -2521,6 +2742,8 @@ void CoreBroker::processLocalQuery(const ActionMessage& m)
             fedMapRequestors.push_back(queryRep);
         } else if (m.payload == "data_flow_graph") {
             dataflowMapRequestors.push_back(queryRep);
+        } else if (m.payload == "global_time") {
+            ctimeRequestors.push_back(queryRep);
         }
     } else if (queryRep.dest_id == global_broker_id_local) {
         ActiveQueries.setDelayedValue(m.messageID, queryRep.payload);
@@ -2606,11 +2829,11 @@ void CoreBroker::processQuery(const ActionMessage& m)
 void CoreBroker::processQueryResponse(const ActionMessage& m)
 {
     switch (m.counter) {
-        case 0:
+        case general_query:
         default:
             ActiveQueries.setDelayedValue(m.messageID, m.payload);
             break;
-        case 2:
+        case federate_map:
             if (fedMap.addComponent(m.payload, m.messageID)) {
                 if (fedMapRequestors.size() == 1) {
                     if (fedMapRequestors.front().dest_id == global_broker_id_local) {
@@ -2634,7 +2857,7 @@ void CoreBroker::processQueryResponse(const ActionMessage& m)
                 fedMapRequestors.clear();
             }
             break;
-        case 4:
+        case dependency_graph:
             if (depMap.addComponent(m.payload, m.messageID)) {
                 if (depMapRequestors.size() == 1) {
                     if (depMapRequestors.front().dest_id == global_broker_id_local) {
@@ -2656,6 +2879,31 @@ void CoreBroker::processQueryResponse(const ActionMessage& m)
                     }
                 }
                 depMapRequestors.clear();
+            }
+            break;
+        case current_time_map:
+            if (currentTimeMap.addComponent(m.payload, m.messageID)) {
+                if (ctimeRequestors.size() == 1) {
+                    if (ctimeRequestors.front().dest_id == global_broker_id_local) {
+                        ActiveQueries.setDelayedValue(
+                            ctimeRequestors.front().messageID, currentTimeMap.generate());
+                    } else {
+                        ctimeRequestors.front().payload = currentTimeMap.generate();
+                        routeMessage(std::move(ctimeRequestors.front()));
+                    }
+                } else {
+                    auto str = currentTimeMap.generate();
+                    for (auto& resp : ctimeRequestors) {
+                        if (resp.dest_id == global_broker_id_local) {
+                            ActiveQueries.setDelayedValue(resp.messageID, str);
+                        } else {
+                            resp.payload = str;
+                            routeMessage(std::move(resp));
+                        }
+                    }
+                }
+                ctimeRequestors.clear();
+                currentTimeMap.reset();
             }
             break;
     }
@@ -2747,6 +2995,23 @@ void CoreBroker::checkDependencies()
         routeMessage(adddep, fedid);
     }
 }
+
+connection_state CoreBroker::getAllConnectionState() const
+{
+    connection_state res = connection_state::disconnected;
+    int cnt{0};
+    for (auto& brk : _brokers) {
+        if (brk._nonLocal) {
+            continue;
+        }
+        ++cnt;
+        if (brk.state < res) {
+            res = brk.state;
+        }
+    }
+    return (cnt > 0) ? res : connection_state::connected;
+}
+
 bool CoreBroker::allInitReady() const
 {
     // the federate count must be greater than the min size
@@ -2756,17 +3021,10 @@ bool CoreBroker::allInitReady() const
     if (static_cast<decltype(minBrokerCount)>(_brokers.size()) < minBrokerCount) {
         return false;
     }
-
-    return std::all_of(_brokers.begin(), _brokers.end(), [](const auto& brk) {
-        return ((brk._nonLocal) || (brk._initRequested));
-    });
-}
-
-bool CoreBroker::allDisconnected() const
-{
-    return std::all_of(_brokers.begin(), _brokers.end(), [](const auto& brk) {
-        return ((brk._nonLocal) || (brk.isDisconnected));
-    });
+    return getAllConnectionState() >= connection_state::init_requested;
+    //return std::all_of(_brokers.begin(), _brokers.end(), [](const auto& brk) {
+    //   return ((brk._nonLocal) || (brk.state==connection_state::init_requested));
+    //});
 }
 
 } // namespace helics

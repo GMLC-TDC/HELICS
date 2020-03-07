@@ -18,6 +18,7 @@ set(
     fmt_format.h
     fmt_ostream.h
     addTargets.hpp
+    configFileHelpers.hpp
 )
 
 set(
@@ -27,6 +28,7 @@ set(
     TomlProcessingFunctions.cpp
     logger.cpp
     loggerCore.cpp
+    configFileHelpers.cpp
 )
 
 set(zmq_headers zmqContextManager.h zmqHelper.h

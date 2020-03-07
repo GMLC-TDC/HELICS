@@ -14,9 +14,10 @@ jobs:
       image: helics/buildenv:interface-gen
     
     steps:
-    - uses: actions/checkout@v1
+    - uses: actions/checkout@v2
     - name: Run SWIG
       run: |
+        rm -rf interfaces/*/interface/*
         mkdir build_matlab
         pushd build_matlab
         cmake -DBUILD_MATLAB_INTERFACE=ON -DHELICS_SWIG_GENERATE_INTERFACE_FILES_ONLY=ON -DHELICS_OVERWRITE_INTERFACE_FILES=ON -DHELICS_BUILD_EXAMPLES=OFF -DENABLE_ZMQ_CORE=OFF -DHELICS_BUILD_TESTS=OFF -DHELICS_BUILD_APP_EXECUTABLES=OFF -DHELICS_DISABLE_BOOST=ON -DHELICS_ENABLE_SWIG=ON -DSWIG_EXECUTABLE=/root/swig-matlab/bin/swig ..
@@ -30,13 +31,7 @@ jobs:
         popd
     - name: Stage changed interface files
       shell: bash --noprofile --norc {0}
-      run: |
-        git diff --name-only | grep -E 'interfaces/*'
-        if [[ "$?" == "0" ]];
-        then
-          git add interfaces/
-        fi
-        exit 0
+      run: git add interfaces/
     - uses: ./.github/actions/create-file-update-pr
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

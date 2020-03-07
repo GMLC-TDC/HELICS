@@ -112,6 +112,10 @@ All Core/Broker Types
         Specify that a broker might be slow or unresponsive to ping requests
         from other brokers.
 
+--terminate_on_error::
+        Specify that a broker should treat all errors as global errors and terminate
+        the co-simulation if an error is encountered
+
 --restrictive_time_policy::
 --conservative_time_policy::
         Specify that a broker should use a conservative time policy in the time

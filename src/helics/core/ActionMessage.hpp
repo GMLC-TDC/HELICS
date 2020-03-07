@@ -235,6 +235,9 @@ inline bool isTimingCommand(const ActionMessage& command) noexcept
         case CMD_EXEC_REQUEST:
         case CMD_PRIORITY_DISCONNECT:
         case CMD_TERMINATE_IMMEDIATELY:
+        case CMD_ERROR:
+        case CMD_LOCAL_ERROR:
+        case CMD_GLOBAL_ERROR:
             return true;
         default:
             return false;
@@ -284,6 +287,19 @@ inline bool isDisconnectCommand(const ActionMessage& command) noexcept
     }
 }
 
+/** check if a command is a disconnect command*/
+inline bool isErrorCommand(const ActionMessage& command) noexcept
+{
+    switch (command.action()) {
+        case CMD_ERROR:
+        case CMD_LOCAL_ERROR:
+        case CMD_GLOBAL_ERROR:
+            return true;
+        default:
+            return false;
+    }
+}
+
 /** check if a command is a valid command*/
 inline bool isValidCommand(const ActionMessage& command) noexcept
 {
@@ -305,10 +321,13 @@ std::ostream& operator<<(std::ostream& os, const ActionMessage& command);
 @return the integer location of the message in the stringData section*/
 int appendMessage(ActionMessage& m, const ActionMessage& newMessage);
 
-/** generate a string reprenting an error from an ActionMessage
+/** generate a string representing an error from an ActionMessage
 @param command the command to generate the error string for
 @return a string describing the error, if the string is not an error the string is empty
 */
 std::string errorMessageString(const ActionMessage& command);
+
+/** set the flags for an iteration request*/
+void setIterationFlags(ActionMessage& command, iteration_request iterate);
 
 } // namespace helics

@@ -197,7 +197,8 @@ void ForwardingTimeCoordinator::sendTimeRequest() const
 std::string ForwardingTimeCoordinator::printTimeStatus() const
 {
     return fmt::format(
-        " minDe={} minminDe={}",
+        R"raw({{"time_next":{}, "minDe":{}, "minminDe":{}}})raw",
+        static_cast<double>(time_next),
         static_cast<double>(time_minDe),
         static_cast<double>(time_minminDe));
 }

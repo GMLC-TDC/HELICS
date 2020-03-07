@@ -22,8 +22,13 @@ class BrokerServerTests: public ::testing::TestWithParam<std::pair<const char*, 
 TEST_P(BrokerServerTests, startup_tests)
 {
     apps::BrokerServer brks(std::vector<std::string>{GetParam().first});
+
+    brks.forceTerminate();
+    cleanupHelicsLibrary();
+
     bool active = brks.hasActiveBrokers();
     if (active) {
+        cleanupHelicsLibrary();
         std::this_thread::sleep_for(std::chrono::milliseconds(300));
         active = brks.hasActiveBrokers();
     }

@@ -41,18 +41,20 @@ void TimeCoordinator::enteringExecMode(iteration_request mode)
     if (executionMode) {
         return;
     }
-    iterating = (mode != iteration_request::no_iterations);
+    iterating = mode;
     checkingExec = true;
     ActionMessage execreq(CMD_EXEC_REQUEST);
     execreq.source_id = source_id;
-    if (iterating) {
-        setActionFlag(execreq, iteration_requested_flag);
+    if (iterating != iteration_request::no_iterations) {
+        setIterationFlags(execreq, iterating);
     }
     transmitTimingMessage(execreq);
 }
 
 void TimeCoordinator::disconnect()
 {
+    time_granted = Time::maxVal();
+    time_grantBase = Time::maxVal();
     if (sendMessageFunction) {
         std::set<global_federate_id> connections(dependents.begin(), dependents.end());
         for (auto dep : dependencies) {
@@ -89,15 +91,59 @@ void TimeCoordinator::disconnect()
     disconnected = true;
 }
 
+void TimeCoordinator::localError()
+{
+    if (disconnected) {
+        return;
+    }
+    time_granted = Time::maxVal();
+    time_grantBase = Time::maxVal();
+    if (sendMessageFunction) {
+        std::set<global_federate_id> connections(dependents.begin(), dependents.end());
+        for (auto dep : dependencies) {
+            if (dep.Tnext < Time::maxVal()) {
+                connections.insert(dep.fedID);
+            }
+        }
+        if (connections.empty()) {
+            return;
+        }
+        ActionMessage bye(CMD_LOCAL_ERROR);
+
+        bye.source_id = source_id;
+        if (connections.size() == 1) {
+            bye.dest_id = *connections.begin();
+            if (bye.dest_id == source_id) {
+                processTimeMessage(bye);
+            } else {
+                sendMessageFunction(bye);
+            }
+        } else {
+            ActionMessage multi(CMD_MULTI_MESSAGE);
+            for (auto fed : connections) {
+                bye.dest_id = fed;
+                if (fed == source_id) {
+                    processTimeMessage(bye);
+                } else {
+                    appendMessage(multi, bye);
+                }
+            }
+            sendMessageFunction(multi);
+        }
+    }
+    disconnected = true;
+}
+
 void TimeCoordinator::timeRequest(
     Time nextTime,
     iteration_request iterate,
     Time newValueTime,
     Time newMessageTime)
 {
-    iterating = (iterate != iteration_request::no_iterations);
-    if (iterating) {
-        if (nextTime < time_granted) {
+    iterating = iterate;
+
+    if (iterating != iteration_request::no_iterations) {
+        if (nextTime < time_granted || iterating == iteration_request::force_iteration) {
             nextTime = time_granted;
         }
     } else {
@@ -136,7 +182,8 @@ bool TimeCoordinator::updateNextExecutionTime()
         }
         time_exec = std::min(time_requested, time_exec);
         if (time_exec <= time_granted) {
-            time_exec = (iterating) ? time_granted : getNextPossibleTime();
+            time_exec = (iterating == iteration_request::no_iterations) ? getNextPossibleTime() :
+                                                                          time_granted;
         }
         if ((time_exec - time_granted) > timeZero) {
             time_exec = generateAllowedTime(time_exec);
@@ -148,7 +195,8 @@ bool TimeCoordinator::updateNextExecutionTime()
 
 void TimeCoordinator::updateNextPossibleEventTime()
 {
-    time_next = (!iterating) ? getNextPossibleTime() : time_granted;
+    time_next =
+        (iterating == iteration_request::no_iterations) ? getNextPossibleTime() : time_granted;
 
     if (info.uninterruptible) {
         time_next = time_requested;
@@ -174,7 +222,7 @@ void TimeCoordinator::updateValueTime(Time valueUpdateTime)
     }
     if (valueUpdateTime < time_value) {
         auto ptime = time_value;
-        if (iterating) {
+        if (iterating != iteration_request::no_iterations) {
             time_value = (valueUpdateTime <= time_granted) ? time_granted : valueUpdateTime;
         } else {
             auto nextPossibleTime = getNextPossibleTime();
@@ -272,7 +320,7 @@ void TimeCoordinator::updateMessageTime(Time messageUpdateTime)
 
     if (messageUpdateTime < time_message) {
         auto ptime = time_message;
-        if (iterating) {
+        if (iterating != iteration_request::no_iterations) {
             time_message = (messageUpdateTime <= time_granted) ? time_granted : messageUpdateTime;
         } else {
             auto nextPossibleTime = getNextPossibleTime();
@@ -354,7 +402,8 @@ message_processing_result TimeCoordinator::checkTimeGrant()
     if (time_block <= time_exec) {
         return message_processing_result::continue_processing;
     }
-    if ((!iterating) || (time_exec > time_granted)) {
+    if ((iterating == iteration_request::no_iterations) ||
+        (time_exec > time_granted && iterating == iteration_request::iterate_if_needed)) {
         iteration = 0;
         if (time_allow > time_exec) {
             updateTimeGrant();
@@ -401,8 +450,8 @@ void TimeCoordinator::sendTimeRequest() const
     upd.Te = (time_exec != Time::maxVal()) ? time_exec + info.outputDelay : time_exec;
     upd.Tdemin = (time_minDe < time_next) ? time_next : time_minDe;
 
-    if (iterating) {
-        setActionFlag(upd, iteration_requested_flag);
+    if (iterating != iteration_request::no_iterations) {
+        setIterationFlags(upd, iterating);
         upd.counter = iteration;
     }
     transmitTimingMessage(upd);
@@ -412,14 +461,15 @@ void TimeCoordinator::sendTimeRequest() const
 
 void TimeCoordinator::updateTimeGrant()
 {
-    time_granted = time_exec;
-    time_grantBase = time_granted;
-
+    if (iterating != iteration_request::force_iteration) {
+        time_granted = time_exec;
+        time_grantBase = time_granted;
+    }
     ActionMessage treq(CMD_TIME_GRANT);
     treq.source_id = source_id;
     treq.actionTime = time_granted;
     treq.counter = iteration;
-    if (iterating) {
+    if (iterating != iteration_request::no_iterations) {
         dependencies.resetIteratingTimeRequests(time_exec);
     }
     transmitTimingMessage(treq);
@@ -430,7 +480,8 @@ void TimeCoordinator::updateTimeGrant()
 std::string TimeCoordinator::printTimeStatus() const
 {
     return fmt::format(
-        "exec={} allow={}, value={}, message={}, minDe={} minminDe={}",
+        R"raw({{"granted_time":{}, "exec":{}, "allow":{}, "value":{}, "message":{}, "minDe":{}, "minminDe":{}}})raw",
+        static_cast<double>(time_granted),
         static_cast<double>(time_exec),
         static_cast<double>(time_allow),
         static_cast<double>(time_value),
@@ -525,22 +576,27 @@ message_processing_result TimeCoordinator::checkExecEntry()
     if (time_block <= timeZero) {
         return ret;
     }
-    if (!dependencies.checkIfReadyForExecEntry(iterating)) {
+    if (!dependencies.checkIfReadyForExecEntry(iterating != iteration_request::no_iterations)) {
         return ret;
     }
-    if (iterating) {
-        if (hasInitUpdates) {
-            if (iteration >= info.maxIterations) {
-                ret = message_processing_result::next_step;
+    switch (iterating) {
+        case iteration_request::no_iterations:
+            ret = message_processing_result::next_step;
+            break;
+        case iteration_request::iterate_if_needed:
+            if (hasInitUpdates) {
+                if (iteration >= info.maxIterations) {
+                    ret = message_processing_result::next_step;
+                } else {
+                    ret = message_processing_result::iterating;
+                }
             } else {
-                ret = message_processing_result::iterating;
+                ret = message_processing_result::next_step;
             }
-        } else {
-            ret = message_processing_result::
-                next_step; // todo add a check for updates and iteration limit
-        }
-    } else {
-        ret = message_processing_result::next_step;
+            break;
+        case iteration_request::force_iteration:
+            ret = message_processing_result::iterating;
+            break;
     }
 
     if (ret == message_processing_result::next_step) {
@@ -595,6 +651,8 @@ message_process_result TimeCoordinator::processTimeMessage(const ActionMessage& 
         case CMD_DISCONNECT_CORE:
         case CMD_DISCONNECT_FED:
         case CMD_DISCONNECT_BROKER:
+        case CMD_GLOBAL_ERROR:
+        case CMD_LOCAL_ERROR:
             // this command requires removing dependents as well as dealing with dependency processing
             removeDependent(global_federate_id(cmd.source_id));
             break;
@@ -617,12 +675,12 @@ message_process_result TimeCoordinator::processTimeMessage(const ActionMessage& 
                 if (dep->Tnext > time_exec) {
                     return message_process_result::delay_processing;
                 }
-                if ((iterating) && (time_exec == dep->Tnext)) {
+                if ((iterating != iteration_request::no_iterations) && (time_exec == dep->Tnext)) {
                     return message_process_result::delay_processing;
                 }
                 break;
             case DependencyInfo::time_state_t::exec_requested_iterative:
-                if ((iterating) && (checkingExec)) {
+                if ((iterating != iteration_request::no_iterations) && (checkingExec)) {
                     return message_process_result::delay_processing;
                 }
                 break;
@@ -680,24 +738,24 @@ void TimeCoordinator::processDependencyUpdateMessage(const ActionMessage& cmd)
 {
     switch (cmd.action()) {
         case CMD_ADD_DEPENDENCY:
-            addDependency(global_federate_id(cmd.source_id));
+            addDependency(cmd.source_id);
             break;
         case CMD_REMOVE_DEPENDENCY:
-            removeDependency(global_federate_id(cmd.source_id));
+            removeDependency(cmd.source_id);
             break;
         case CMD_ADD_DEPENDENT:
-            addDependent(global_federate_id(cmd.source_id));
+            addDependent(cmd.source_id);
             break;
         case CMD_REMOVE_DEPENDENT:
-            removeDependent(global_federate_id(cmd.source_id));
+            removeDependent(cmd.source_id);
             break;
         case CMD_ADD_INTERDEPENDENCY:
-            addDependency(global_federate_id(cmd.source_id));
-            addDependent(global_federate_id(cmd.source_id));
+            addDependency(cmd.source_id);
+            addDependent(cmd.source_id);
             break;
         case CMD_REMOVE_INTERDEPENDENCY:
-            removeDependency(global_federate_id(cmd.source_id));
-            removeDependent(global_federate_id(cmd.source_id));
+            removeDependency(cmd.source_id);
+            removeDependent(cmd.source_id);
             break;
         default:
             break;
