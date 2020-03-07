@@ -216,7 +216,7 @@ if(HELICS_ENABLE_SWIG AND SWIG_EXECUTABLE)
         # m6Ot%20jBCQAJ
         # https://github.com/GMLC-TDC/HELICS/commit/633b218f9351aa452d4#commitcomment-27055932
         set_target_properties(
-            _helics
+            ${SWIG_MODULE_helics_REAL_NAME}
             PROPERTIES LINK_FLAGS "-undefined dynamic_lookup"
         )
     else()
