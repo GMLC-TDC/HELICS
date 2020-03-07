@@ -1018,6 +1018,8 @@ std::string Federate::query(const std::string& queryStr)
         } else {
             res = "#unknown";
         }
+    } else if (queryStr == "time") {
+        res = std::to_string(currentTime);
     } else {
         res = localQuery(queryStr);
     }
