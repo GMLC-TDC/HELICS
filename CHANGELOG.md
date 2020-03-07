@@ -21,6 +21,7 @@ Increased code coverage and additional bug fixes.  The error propagation in HELI
 -   the `error` Function in the C++ API is now the same as `localError` previously it was primary useful for logging and didn't do much, and will be deprecated in the next release.   
 -   Updated the GitHub actions (clang-format, swig interface updates, and release builds) to use actions/checkout@v2
 -   Cleaned up the Windows installer (better component names/descriptions and groups, link to Gitter, and require installing Headers to install SWIG)
+-   Updated the HELICS apps manpages with new options
 
 ### Fixed
 -   Issue with iterative requests that were not being honored if the federate was acting in isolation

@@ -2,12 +2,12 @@
 .\"     Title: helics_app-broker
 .\"    Author: [FIXME: author] [see http://docbook.sf.net/el/author]
 .\" Generator: DocBook XSL Stylesheets v1.78.1 <http://docbook.sf.net/>
-.\"      Date: 01/24/2020
+.\"      Date: 03/06/2020
 .\"    Manual: \ \&
 .\"    Source: \ \&
 .\"  Language: English
 .\"
-.TH "HELICS_APP\-BROKER" "1" "01/24/2020" "\ \&" "\ \&"
+.TH "HELICS_APP\-BROKER" "1" "03/06/2020" "\ \&" "\ \&"
 .\" -----------------------------------------------------------------
 .\" * Define some portability stuff
 .\" -----------------------------------------------------------------
@@ -202,6 +202,11 @@ Specify a key to use to verify all connections to/from a broker\&.
 Specify that a broker might be slow or unresponsive to ping requests from other brokers\&.
 .RE
 .PP
+\-\-terminate_on_error
+.RS 4
+Specify that a broker should treat all errors as global errors and terminate the co\-simulation if an error is encountered
+.RE
+.PP
 \-\-restrictive_time_policy, \-\-conservative_time_policy
 .RS 4
 Specify that a broker should use a conservative time policy in the time coordinator\&.
@@ -259,6 +264,14 @@ or
 \-\-networktimeout <time(ms)>
 .RS 4
 Time to wait for a broker connection\&. Can be entered as a time like
+\fI10s\fR
+or
+\fI45ms\fR\&. Default unit is ms\&.
+.RE
+.PP
+\-\-errortimeout <time(ms)>
+.RS 4
+Time to wait after an error has occured before disconnecting\&. Can be entered as a time like
 \fI10s\fR
 or
 \fI45ms\fR\&. Default unit is ms\&.
