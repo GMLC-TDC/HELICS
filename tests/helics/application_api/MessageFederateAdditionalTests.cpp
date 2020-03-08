@@ -576,7 +576,8 @@ TEST_F(mfed_tests, send_message1)
 TEST(messageFederate, constructor1)
 {
 	helics::MessageFederate mf1("fed1", "--type=test --autobroker --corename=mfc");
-
+    //try out loading a file
+	EXPECT_THROW(helics::MessageFederate mf2(std::string("not_available.json")), helics::HelicsException);
 	helics::MessageFederate mf2;
     //test move assignment
 	mf2 = std::move(mf1);
@@ -617,5 +618,20 @@ TEST(messageFederate, constructor2)
 	mf1.finalize();
 
 	cr.reset();
+
+}
+
+TEST(messageFederate, constructor3)
+{
+	helics::MessageFederate mf1("fed1", std::string(TEST_DIR) + "example_message_fed_testb.json");
+
+	mf1.setProperty(helics_property_int_log_level, helics_log_level_error);
+
+	mf1.registerGlobalFilter("filt1");
+	mf1.registerGlobalFilter("filt2");
+
+	EXPECT_THROW(mf1.registerInterfaces(std::string(TEST_DIR) + "example_message_fed_bad.toml"), helics::HelicsException);
+	EXPECT_NO_THROW(mf1.enterExecutingMode());
+	mf1.finalize();
 
 }
