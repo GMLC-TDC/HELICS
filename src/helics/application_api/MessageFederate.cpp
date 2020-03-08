@@ -30,6 +30,12 @@ MessageFederate::MessageFederate(
     mfManager = std::make_unique<MessageFederateManager>(coreObject.get(), this, getID());
 }
 
+MessageFederate::MessageFederate(const std::string& fedName, CoreApp& core, const FederateInfo& fi) :
+	Federate(fedName, core, fi)
+{
+	mfManager = std::make_unique<MessageFederateManager>(coreObject.get(), this, getID());
+}
+
 MessageFederate::MessageFederate(const std::string& fedName, const std::string& configString) :
 	Federate(fedName, loadFederateInfo(configString))
 {

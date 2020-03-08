@@ -9,6 +9,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helics/application_api/Filters.hpp"
 #include "helics/application_api/MessageFederate.hpp"
 #include "helics/core/core-exceptions.hpp"
+#include "helics/application_api/CoreApp.hpp"
 #include "testFixtures.hpp"
 
 #include <future>
@@ -622,6 +623,25 @@ TEST(messageFederate, constructor2)
 }
 
 TEST(messageFederate, constructor3)
+{
+	helics::CoreApp cr("--type=test --name=cb2 --autobroker");
+	EXPECT_TRUE(cr.isConnected());
+	helics::FederateInfo fi(helics::core_type::TEST);
+	fi.setProperty(helics_property_int_log_level, helics_log_level_error);
+	helics::MessageFederate mf1("fed1", cr, fi);
+
+	mf1.registerInterfaces(std::string(TEST_DIR) + "example_message_fed_testb.json");
+
+	mf1.registerGlobalFilter("filt1");
+	mf1.registerGlobalFilter("filt2");
+
+	EXPECT_NO_THROW(mf1.enterExecutingMode());
+	mf1.finalize();
+	EXPECT_NO_THROW(cr.getCopyofCorePointer()->waitForDisconnect());
+
+}
+
+TEST(messageFederate, constructor4)
 {
 	helics::MessageFederate mf1("fed1", std::string(TEST_DIR) + "example_message_fed_testb.json");
 
