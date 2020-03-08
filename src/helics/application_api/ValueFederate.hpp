@@ -52,10 +52,10 @@ class HELICS_CXX_EXPORT ValueFederate:
     */
     explicit ValueFederate(const std::string& configString);
 
-    /**constructor taking a string with the required information
+    /**constructor taking a name and a string with the required information
     @param fedName the name of the federate, can be empty to use the name from the configString
     @param configString can be either a JSON file a TOML file (with extension TOML) or a string containing JSON
-    code
+    code or a string with command line arguments
     */
     ValueFederate(const std::string& fedName, const std::string& configString);
 

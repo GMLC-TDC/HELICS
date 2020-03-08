@@ -16,11 +16,13 @@ class HELICS_CXX_EXPORT CombinationFederate: public ValueFederate, public Messag
   public:
     /** default constructor*/
     CombinationFederate();
+
     /**constructor taking a federate information structure and using the default core
     @param fedName the name of the federate, may be left empty to use a default or one found in fi
     @param fi  a federate information structure
     */
     explicit CombinationFederate(const std::string& fedName, const FederateInfo& fi);
+
     /**constructor taking a federate information structure and using the given core
     @param fedName the name of the federate, may be left empty to use a default or one found in fi
     @param core a pointer to core object which the federate can join
@@ -37,15 +39,19 @@ class HELICS_CXX_EXPORT CombinationFederate: public ValueFederate, public Messag
     @param fi  a federate information structure
     */
     CombinationFederate(const std::string& fedName, CoreApp& core, const FederateInfo& fi);
+
+	/**constructor taking a federate name and a file with the required information
+	@param fedName the name of the federate, can be empty to use the name from the configString
+    @param configString can be either a JSON file a TOML file (with extension TOML) or a string containing JSON
+    code or a string with command line arguments
+	*/
+	CombinationFederate(const std::string& name, const std::string& configString);
+
     /**constructor taking a file with the required information
-    @param configString a file or formatted String defining the federate information
+     @param configString can be either a JSON file a TOML file (with extension TOML) or a string containing JSON
+    code or a string with command line arguments
     */
-    explicit CombinationFederate(const std::string& configString);
-    /**constructor taking a federate name and a file with the required information
-    @param name the name of the federate, may be left empty to use a default or one found in configString
-    @param configString a file or formatted String defining the federate information
-    */
-    CombinationFederate(const std::string& name, const std::string& configString);
+	explicit CombinationFederate(const std::string& configString);
 
     /** move construction*/
     CombinationFederate(CombinationFederate&& fed) noexcept;

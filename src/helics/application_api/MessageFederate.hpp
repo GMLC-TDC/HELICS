@@ -46,6 +46,7 @@ class HELICS_CXX_EXPORT MessageFederate:
 	explicit MessageFederate(const std::string& configString);
 
 	/**constructor taking a string as const char * with the required information
+    @details; this constructor is to deconflict with the bool overload which can be triggered if a string literal is passed on some platforms
 	@param configString can be either a JSON file, TOML file or a string containing JSON code, or command line arguments
     it can also be just the federate name
 	*/

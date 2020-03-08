@@ -40,7 +40,7 @@ MessageFederate::MessageFederate(const std::string& fedName, const std::string& 
 }
 
 MessageFederate::MessageFederate(const std::string& configString):
-	MessageFederate(std::string{}, loadFederateInfo(configString))
+	MessageFederate(std::string{}, configString)
 {
 }
 
