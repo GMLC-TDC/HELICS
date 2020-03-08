@@ -5,11 +5,11 @@ the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 
+#include "helics/application_api/CoreApp.hpp"
 #include "helics/application_api/Endpoints.hpp"
 #include "helics/application_api/Filters.hpp"
 #include "helics/application_api/MessageFederate.hpp"
 #include "helics/core/core-exceptions.hpp"
-#include "helics/application_api/CoreApp.hpp"
 #include "testFixtures.hpp"
 
 #include <future>
@@ -34,7 +34,7 @@ class mfed_add_all_type_tests:
     public FederateTestFixture {
 };
 
-class mfed_tests : public ::testing::Test, public FederateTestFixture {
+class mfed_tests: public ::testing::Test, public FederateTestFixture {
 };
 
 TEST_P(mfed_add_single_type_tests, initialize_tests)
@@ -544,115 +544,123 @@ INSTANTIATE_TEST_SUITE_P(
     mfed_file_filter_config_files,
     ::testing::ValuesIn(filter_config_files));
 
-
 TEST_F(mfed_tests, send_message1)
 {
-	SetupTest<helics::MessageFederate>("test", 1);
-	auto mFed1 = GetFederateAs<helics::MessageFederate>(0);
+    SetupTest<helics::MessageFederate>("test", 1);
+    auto mFed1 = GetFederateAs<helics::MessageFederate>(0);
 
-	auto& ep1 = mFed1->registerGlobalEndpoint("ep1");
-	auto& ep2 = mFed1->registerGlobalEndpoint("ep2");
+    auto& ep1 = mFed1->registerGlobalEndpoint("ep1");
+    auto& ep2 = mFed1->registerGlobalEndpoint("ep2");
 
-	const std::string message1{ "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ" };
-	mFed1->enterExecutingMode();
+    const std::string message1{"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"};
+    mFed1->enterExecutingMode();
 
-	mFed1->sendMessage(ep1, "ep2", message1.c_str(), 26);
+    mFed1->sendMessage(ep1, "ep2", message1.c_str(), 26);
 
-	mFed1->requestNextStep();
+    mFed1->requestNextStep();
 
-	auto m1=ep2.getMessage();
-	EXPECT_EQ(m1->data.size(), 26U);
+    auto m1 = ep2.getMessage();
+    EXPECT_EQ(m1->data.size(), 26U);
 
-	mFed1->sendMessage(ep1, "ep2", message1.c_str(), 31,1.7);
+    mFed1->sendMessage(ep1, "ep2", message1.c_str(), 31, 1.7);
 
-	auto res = mFed1->requestTime(2.0);
-	EXPECT_EQ(res, 1.7);
-	m1 = ep2.getMessage();
-	EXPECT_EQ(m1->data.size(), 31U);
+    auto res = mFed1->requestTime(2.0);
+    EXPECT_EQ(res, 1.7);
+    m1 = ep2.getMessage();
+    EXPECT_EQ(m1->data.size(), 31U);
 
-	mFed1->finalize();
-
+    mFed1->finalize();
 }
 
 TEST(messageFederate, constructor1)
 {
-	helics::MessageFederate mf1("fed1", "--type=test --autobroker --corename=mfc");
+    helics::MessageFederate mf1("fed1", "--type=test --autobroker --corename=mfc");
     //try out loading a file
-	EXPECT_THROW(helics::MessageFederate mf2(std::string("not_available.json")), helics::HelicsException);
-	helics::MessageFederate mf2;
+    EXPECT_THROW(
+        helics::MessageFederate mf2(std::string("not_available.json")), helics::HelicsException);
+    helics::MessageFederate mf2;
     //test move assignment
-	mf2 = std::move(mf1);
+    mf2 = std::move(mf1);
 
-	EXPECT_FALSE(mf2.hasMessage());
-	EXPECT_EQ(mf2.pendingMessages(), 0);
+    EXPECT_FALSE(mf2.hasMessage());
+    EXPECT_EQ(mf2.pendingMessages(), 0);
 
-	EXPECT_FALSE(mf2.getMessage());
+    EXPECT_FALSE(mf2.getMessage());
 
-	auto ept1 = mf2.registerEndpoint();
-	EXPECT_FALSE(mf2.hasMessage(ept1));
-	EXPECT_EQ(mf2.pendingMessages(ept1), 0);
-	auto m1=mf2.getMessage(ept1);
-	EXPECT_FALSE(m1);
+    auto ept1 = mf2.registerEndpoint();
+    EXPECT_FALSE(mf2.hasMessage(ept1));
+    EXPECT_EQ(mf2.pendingMessages(ept1), 0);
+    auto m1 = mf2.getMessage(ept1);
+    EXPECT_FALSE(m1);
 
-	EXPECT_THROW(mf2.sendMessage(ept1, std::move(m1)),helics::InvalidFunctionCall);
+    EXPECT_THROW(mf2.sendMessage(ept1, std::move(m1)), helics::InvalidFunctionCall);
 
-	mf2.enterExecutingMode();
-	mf2.finalize();
+    mf2.enterExecutingMode();
+    mf2.finalize();
 
-	EXPECT_THROW(mf2.registerInterfaces("invalid.toml"), helics::InvalidParameter);
-
+    EXPECT_THROW(mf2.registerInterfaces("invalid.toml"), helics::InvalidParameter);
 }
 
 TEST(messageFederate, constructor2)
 {
-	auto cr = helics::CoreFactory::create(helics::core_type::TEST, "--name=cb --autobroker");
-	helics::FederateInfo fi(helics::core_type::TEST);
-	fi.setProperty(helics_property_int_log_level, helics_log_level_error);
-	helics::MessageFederate mf1("fed1", cr,fi );
+    auto cr = helics::CoreFactory::create(helics::core_type::TEST, "--name=cb --autobroker");
+    helics::FederateInfo fi(helics::core_type::TEST);
+    fi.setProperty(helics_property_int_log_level, helics_log_level_error);
+    helics::MessageFederate mf1("fed1", cr, fi);
 
-	mf1.registerInterfaces(std::string(TEST_DIR) + "example_message_fed_testb.json");
+    mf1.registerInterfaces(std::string(TEST_DIR) + "example_message_fed_testb.json");
 
-	mf1.registerGlobalFilter("filt1");
-	mf1.registerGlobalFilter("filt2");
+    mf1.registerGlobalFilter("filt1");
+    mf1.registerGlobalFilter("filt2");
 
-	EXPECT_NO_THROW(mf1.enterExecutingMode());
-	mf1.finalize();
+    EXPECT_NO_THROW(mf1.enterExecutingMode());
+    mf1.finalize();
 
-	cr.reset();
-
+    cr.reset();
 }
 
 TEST(messageFederate, constructor3)
 {
-	helics::CoreApp cr("--type=test --name=cb2 --autobroker");
+    helics::CoreApp cr("--type=test --name=cb2 --autobroker");
 
-	helics::FederateInfo fi(helics::core_type::TEST);
-	fi.setProperty(helics_property_int_log_level, helics_log_level_error);
-	helics::MessageFederate mf1("fed1", cr, fi);
+    helics::FederateInfo fi(helics::core_type::TEST);
+    fi.setProperty(helics_property_int_log_level, helics_log_level_error);
+    helics::MessageFederate mf1("fed1", cr, fi);
 
-	mf1.registerInterfaces(std::string(TEST_DIR) + "example_message_fed_testb.json");
-	EXPECT_TRUE(cr.isConnected());
+    mf1.registerInterfaces(std::string(TEST_DIR) + "example_message_fed_testb.json");
+    EXPECT_TRUE(cr.isConnected());
 
-	mf1.registerGlobalFilter("filt1");
-	mf1.registerGlobalFilter("filt2");
+    mf1.registerGlobalFilter("filt1");
+    mf1.registerGlobalFilter("filt2");
 
-	EXPECT_NO_THROW(mf1.enterExecutingMode());
-	mf1.finalize();
-	EXPECT_NO_THROW(cr.getCopyofCorePointer()->waitForDisconnect());
-
+    EXPECT_NO_THROW(mf1.enterExecutingMode());
+    mf1.finalize();
+    EXPECT_NO_THROW(cr.getCopyofCorePointer()->waitForDisconnect());
 }
 
 TEST(messageFederate, constructor4)
 {
-	helics::MessageFederate mf1("fed1", std::string(TEST_DIR) + "example_message_fed_testb.json");
+    helics::MessageFederate mf1("fed1", std::string(TEST_DIR) + "example_message_fed_testb.json");
 
-	mf1.setProperty(helics_property_int_log_level, helics_log_level_error);
+    mf1.setProperty(helics_property_int_log_level, helics_log_level_error);
 
-	mf1.registerGlobalFilter("filt1");
-	mf1.registerGlobalFilter("filt2");
+    mf1.registerGlobalFilter("filt1");
+    mf1.registerGlobalFilter("filt2");
 
-	EXPECT_THROW(mf1.registerInterfaces(std::string(TEST_DIR) + "example_message_fed_bad.toml"), helics::HelicsException);
-	EXPECT_NO_THROW(mf1.enterExecutingMode());
-	mf1.finalize();
+    EXPECT_THROW(
+        mf1.registerInterfaces(std::string(TEST_DIR) + "example_message_fed_bad.toml"),
+        helics::HelicsException);
+    EXPECT_NO_THROW(mf1.enterExecutingMode());
+    mf1.finalize();
+}
 
+TEST(messageFederate, constructor5)
+{
+    helics::MessageFederate mf1("--type=test --autobroker --corename=mfc5 --name=fedmd");
+    //try out loading a file
+
+    EXPECT_EQ(mf1.getName(), "fedmd");
+    EXPECT_EQ(mf1.getCorePointer()->getIdentifier(), "mfc5");
+    mf1.enterExecutingMode();
+    mf1.finalize();
 }

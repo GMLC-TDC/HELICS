@@ -64,9 +64,9 @@ TEST_P(filter_single_type_test, message_filter_registration)
     f3.addDestinationTarget("port2");
     EXPECT_TRUE(f3.getHandle() != f2.getHandle());
 
-	auto& f4 = fFed->registerFilter();
-	fFed->addSourceTarget(f4, "filter0/fout");
-	EXPECT_TRUE(f4.getHandle() != f3.getHandle());
+    auto& f4 = fFed->registerFilter();
+    fFed->addSourceTarget(f4, "filter0/fout");
+    EXPECT_TRUE(f4.getHandle() != f3.getHandle());
     fFed->finalize();
     // std::cout << "fFed returned\n";
     mFed->finalizeComplete();
