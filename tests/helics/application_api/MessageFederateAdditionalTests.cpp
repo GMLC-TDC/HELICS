@@ -625,12 +625,13 @@ TEST(messageFederate, constructor2)
 TEST(messageFederate, constructor3)
 {
 	helics::CoreApp cr("--type=test --name=cb2 --autobroker");
-	EXPECT_TRUE(cr.isConnected());
+
 	helics::FederateInfo fi(helics::core_type::TEST);
 	fi.setProperty(helics_property_int_log_level, helics_log_level_error);
 	helics::MessageFederate mf1("fed1", cr, fi);
 
 	mf1.registerInterfaces(std::string(TEST_DIR) + "example_message_fed_testb.json");
+	EXPECT_TRUE(cr.isConnected());
 
 	mf1.registerGlobalFilter("filt1");
 	mf1.registerGlobalFilter("filt2");
