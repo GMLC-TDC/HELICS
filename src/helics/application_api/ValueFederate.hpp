@@ -29,7 +29,7 @@ class HELICS_CXX_EXPORT ValueFederate:
     */
     ValueFederate(const std::string& fedName, const FederateInfo& fi);
 
-    /**constructor taking a core and a federate information structure, sore information in fi is ignored
+    /**constructor taking a core and a federate information structure, core information in fi is ignored
     @param fedName the name of the federate, can be empty to use the name from fi or an auto generated one
     @param core a shared ptr to a core to join
     @param fi  a federate information structure

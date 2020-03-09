@@ -24,7 +24,7 @@ class HELICS_CXX_EXPORT MessageFederate:
     @param fi  a federate information structure
     */
     MessageFederate(const std::string& fedName, const FederateInfo& fi);
-    /**constructor taking a core and a federate information structure, sore information in fi is ignored
+    /**constructor taking a core and a federate information structure, core information in fi is ignored
     @param fedName the name of the messageFederate, can be left empty to use a default or one from fi
     @param core a shared ptr to a core to join
     @param fi  a federate information structure
@@ -34,7 +34,7 @@ class HELICS_CXX_EXPORT MessageFederate:
         const std::shared_ptr<Core>& core,
         const FederateInfo& fi);
 
-    /**constructor taking a core and a federate information structure, sore information in fi is ignored
+    /**constructor taking a core and a federate information structure, core information in fi is ignored
 	@param fedName the name of the messageFederate, can be left empty to use a default or one from fi
 	@param core a CoreApp object representing the core to connect to
 	@param fi  a federate information structure
