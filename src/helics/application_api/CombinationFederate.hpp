@@ -40,18 +40,18 @@ class HELICS_CXX_EXPORT CombinationFederate: public ValueFederate, public Messag
     */
     CombinationFederate(const std::string& fedName, CoreApp& core, const FederateInfo& fi);
 
-	/**constructor taking a federate name and a file with the required information
+    /**constructor taking a federate name and a file with the required information
 	@param fedName the name of the federate, can be empty to use the name from the configString
     @param configString can be either a JSON file a TOML file (with extension TOML) or a string containing JSON
     code or a string with command line arguments
 	*/
-	CombinationFederate(const std::string& name, const std::string& configString);
+    CombinationFederate(const std::string& name, const std::string& configString);
 
     /**constructor taking a file with the required information
      @param configString can be either a JSON file a TOML file (with extension TOML) or a string containing JSON
     code or a string with command line arguments
     */
-	explicit CombinationFederate(const std::string& configString);
+    explicit CombinationFederate(const std::string& configString);
 
     /** move construction*/
     CombinationFederate(CombinationFederate&& fed) noexcept;
