@@ -6,6 +6,7 @@ SPDX-License-Identifier: BSD-3-Clause
 */
 
 #include "helics/application_api/CombinationFederate.hpp"
+#include "helics/application_api/CoreApp.hpp"
 #include "helics/application_api/Endpoints.hpp"
 #include "helics/application_api/Publications.hpp"
 #include "helics/core/BrokerFactory.hpp"
@@ -311,3 +312,34 @@ INSTANTIATE_TEST_SUITE_P(
     combofed_tests,
     combofed_file_load_tests,
     ::testing::ValuesIn(combo_config_files));
+
+TEST(comboFederate, constructor2)
+{
+    auto cr = helics::CoreFactory::create(helics::core_type::TEST, "--name=mf --autobroker");
+    helics::FederateInfo fi(helics::core_type::TEST);
+    fi.setProperty(helics_property_int_log_level, helics_log_level_error);
+    helics::CombinationFederate mf1("fed1", cr, fi);
+
+    mf1.registerGlobalFilter("filt1");
+    mf1.registerGlobalFilter("filt2");
+
+    EXPECT_NO_THROW(mf1.enterExecutingMode());
+    mf1.finalize();
+
+    cr.reset();
+}
+
+TEST(comboFederate, constructor3)
+{
+    helics::CoreApp cr(helics::core_type::TEST, "--name=mf2 --autobroker");
+    helics::FederateInfo fi(helics::core_type::TEST);
+    fi.setProperty(helics_property_int_log_level, helics_log_level_error);
+    helics::CombinationFederate mf1("fed1", cr, fi);
+
+    mf1.registerGlobalFilter("filt1");
+    mf1.registerGlobalFilter("filt2");
+
+    EXPECT_NO_THROW(mf1.enterExecutingMode());
+    mf1.finalize();
+    EXPECT_TRUE(cr.waitForDisconnect(std::chrono::milliseconds(500)));
+}

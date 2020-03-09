@@ -1299,7 +1299,7 @@ void FederateState::setInterfaceProperty(const ActionMessage& cmd)
             }
             break;
         case 'e':
-            used = interfaceInformation.setInputProperty(
+            used = interfaceInformation.setEndpointProperty(
                 cmd.dest_handle, cmd.messageID, checkActionFlag(cmd, indicator_flag));
             if (!used) {
                 auto ept = interfaceInformation.getEndpoint(cmd.dest_handle);
