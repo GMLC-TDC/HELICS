@@ -8,6 +8,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "../core/core-exceptions.hpp"
 #include "../helics.hpp"
 #include "MessageFilters.h"
+#include "helicsCallbacks.h"
 #include "internal/api_objects.h"
 
 #include <memory>
@@ -472,4 +473,32 @@ helics_bool helicsFilterGetOption(helics_filter filt, int option)
         return helics_false;
     }
     // LCOV_EXCL_STOP
+}
+
+
+void helicsFilterSetCustomCallback(
+    helics_filter filt,
+    helics_message_object(*filtCall)(helics_message_object message, void* userData),
+    void* userdata,
+    helics_error* err)
+{
+    auto filter = getFilter(filt, err);
+    if (filter == nullptr) {
+        return;
+    }
+    auto op = std::make_shared<helics::CustomMessageOperator>();
+    op->setMessageFunction([filtCall, userdata](std::unique_ptr<helics::Message> mess) {
+        return nullptr;
+        });
+    try {
+        if (filtCall == nullptr) {
+            filter->setOperator(std::move(op));
+        }
+        else {
+            filter->setOperator(std::move(op));
+        }
+    }
+    catch (...) { // LCOV_EXCL_LINE
+        helicsErrorHandler(err); // LCOV_EXCL_LINE
+    }
 }

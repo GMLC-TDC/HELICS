@@ -17,6 +17,7 @@ Increased code coverage and additional bug fixes.
 
 ### Added
 -   A series of tests for MessageFederate.cpp to increase coverage on that file to 100%
+-   Callbacks for custom filters in the C shared library
 
 ### Deprecated
 
