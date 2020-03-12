@@ -65,7 +65,7 @@ HELICS_EXPORT void helicsFederateSetLoggingCallback(
     helics_error* err);
 
 
-/** set the callback for a custom filter
+/** set a general callback for a custom filter
     @details add a custom filter callback for creating a custom filter operation in the C shared library
     @param filter the filter object to set the callback for
     @param filtCall a callback with signature helics_message_object(helics_message_object, void *);
@@ -75,9 +75,10 @@ HELICS_EXPORT void helicsFederateSetLoggingCallback(
     */
 HELICS_EXPORT void helicsFilterSetCustomCallback(
     helics_filter filter,
-    helics_message_object(*filtCall)(helics_message_object message, void* userData),
+    void(*filtCall)(helics_message_object message, void* userData),
     void* userdata,
     helics_error* err);
+
 
 #ifdef __cplusplus
 } /* end of extern "C" { */

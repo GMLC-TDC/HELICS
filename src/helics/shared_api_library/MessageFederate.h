@@ -416,6 +416,7 @@ HELICS_EXPORT void helicsMessageSetString(helics_message_object message, const c
     @endforcpponly
     */
 HELICS_EXPORT void helicsMessageSetData(helics_message_object message, const void* data, int inputDataLength, helics_error* err);
+
 /** append data to the payload
     @param message the message object in question
     @param data a string containing the message data to append
@@ -425,6 +426,15 @@ HELICS_EXPORT void helicsMessageSetData(helics_message_object message, const voi
     @endforcpponly
     */
 HELICS_EXPORT void helicsMessageAppendData(helics_message_object message, const void* data, int inputDataLength, helics_error* err);
+
+/** copy a message object
+    @param source_message the message object to copy from
+    @param dest_message the message object to copy to
+    @forcpponly
+    @param[in,out] err an error object to fill out in case of an error
+    @endforcpponly
+    */
+HELICS_EXPORT void helicsMessageCopy(helics_message_object source_message, helics_message_object dest_message, helics_error *err);
 
 /**@}*/
 #ifdef __cplusplus
