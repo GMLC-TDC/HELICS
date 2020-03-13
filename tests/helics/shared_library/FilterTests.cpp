@@ -1077,10 +1077,16 @@ TEST_F(filter_tests, callback_test)
     EXPECT_EQ(err.error_code, helics_ok);
      
     auto f1 = helicsFederateRegisterFilter(fFed, helics_filter_type_custom, "filter1", &err);
+    auto f2 = helicsFederateRegisterFilter(mFed, helics_filter_type_delay, "dfilter", &err);
+
     EXPECT_EQ(err.error_code, helics_ok);
     CE(helicsFilterAddSourceTarget(f1, "port1", &err));
     CE(helicsFilterSetCustomCallback(f1, filterFunc1, nullptr, &err));
     EXPECT_EQ(err.error_code, 0);
+
+    helicsFilterSetCustomCallback(f2, filterFunc1, nullptr, &err);
+    EXPECT_NE(err.error_code, 0);
+    helicsErrorClear(&err);
 
     CE(helicsFederateEnterExecutingModeAsync(fFed, &err));
     CE(helicsFederateEnterExecutingMode(mFed, &err));

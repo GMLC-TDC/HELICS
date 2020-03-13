@@ -364,11 +364,14 @@ INSTANTIATE_TEST_SUITE_P(mfed_tests, mfed_type_tests, ::testing::ValuesIn(core_t
 // a series of tests exercising the different aspects of message object setting and retrieval
 TEST(message_object, test1)
 {
-    auto brk = helicsCreateBroker("zmq", "brk1", "", nullptr);
+    auto brk = helicsCreateBroker("test", "brk1", "", nullptr);
 
-    auto fed = helicsCreateMessageFederate("fed1", nullptr, nullptr);
+    auto fi = helicsCreateFederateInfo();
+    helicsFederateInfoSetCoreType(fi, helics_core_type_test, nullptr);
 
-    auto fed2 = helicsCreateCombinationFederate("fed2", nullptr, nullptr);
+    auto fed = helicsCreateMessageFederate("fed1", fi, nullptr);
+
+    auto fed2 = helicsCreateCombinationFederate("fed2", fi, nullptr);
 
     auto m1 = helicsFederateCreateMessageObject(fed, nullptr);
     EXPECT_NE(m1, nullptr);
@@ -445,5 +448,62 @@ TEST(message_object, test1)
 
     helicsFederateFinalize(fed, nullptr);
     helicsFederateFinalize(fed2, nullptr);
+    helicsBrokerDisconnect(brk, nullptr);
+}
+
+
+TEST(message_object, copy)
+{
+    auto brk = helicsCreateBroker("test", "brk1", "", nullptr);
+
+    auto fi = helicsCreateFederateInfo();
+    helicsFederateInfoSetCoreType(fi, helics_core_type_test, nullptr);
+    auto fed = helicsCreateMessageFederate("fed1", fi, nullptr);
+
+
+    auto m1 = helicsFederateCreateMessageObject(fed, nullptr);
+    EXPECT_NE(m1, nullptr);
+
+    auto m2 = helicsFederateCreateMessageObject(fed, nullptr);
+    EXPECT_NE(m2, nullptr);
+
+    helicsMessageSetDestination(m1, "a small town", nullptr);
+    helicsMessageSetSource(m1, "toledo", nullptr);
+
+    helicsMessageSetOriginalDestination(m1, "a happy place", nullptr);
+    helicsMessageSetOriginalSource(m1, "osource", nullptr);
+    helicsMessageSetMessageID(m1, 10, nullptr);
+    helicsMessageSetFlagOption(m1, 4, helics_true, nullptr);
+    helicsMessageSetString(m1, "raw data", nullptr);
+    helicsMessageSetTime(m1, 3.65, nullptr);
+    auto err = helicsErrorInitialize();
+
+    helicsMessageCopy(m1, m2, &err);
+    EXPECT_EQ(err.error_code, 0);
+
+    EXPECT_STREQ(helicsMessageGetString(m2), "raw data");
+    EXPECT_STREQ(helicsMessageGetOriginalSource(m2), "osource");
+    EXPECT_STREQ(helicsMessageGetSource(m2), "toledo");
+    EXPECT_STREQ(helicsMessageGetDestination(m2), "a small town");
+    EXPECT_EQ(helicsMessageGetMessageID(m2), 10);
+    EXPECT_DOUBLE_EQ(helicsMessageGetTime(m2), 3.65);
+
+    EXPECT_STREQ(helicsMessageGetOriginalDestination(m2), "a happy place");
+
+    char data[20];
+    int actSize = 10;
+
+    helicsMessageGetRawData(m2, data, 20, &actSize, &err);
+    EXPECT_EQ(err.error_code, 0);
+    EXPECT_EQ(actSize, 8);
+    EXPECT_EQ(std::string(data, data + actSize), "raw data");
+
+    EXPECT_EQ(helicsMessageIsValid(m2), helics_true);
+
+    
+    EXPECT_EQ(helicsMessageCheckFlag(m2, 4), helics_true);
+
+    helicsFederateEnterExecutingMode(fed, nullptr);
+    helicsFederateFinalize(fed, nullptr);
     helicsBrokerDisconnect(brk, nullptr);
 }

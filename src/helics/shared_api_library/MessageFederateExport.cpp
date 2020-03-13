@@ -932,12 +932,12 @@ void helicsMessageCopy(helics_message_object source_message, helics_message_obje
     if (mess_dest == nullptr) {
         return;
     }
-    mess_src->data = mess_dest->data;
-    mess_src->dest = mess_dest->dest;
-    mess_src->original_source = mess_dest->original_source;
-    mess_src->source = mess_dest->source;
-    mess_src->original_dest = mess_dest->original_dest;
-    mess_src->time = mess_dest->time;
-    mess_src->messageID = mess_dest->messageID;
-    mess_src->flags = mess_dest->flags;
+    mess_dest->data = mess_src->data;
+    mess_dest->dest = mess_src->dest;
+    mess_dest->original_source = mess_src->original_source;
+    mess_dest->source = mess_src->source;
+    mess_dest->original_dest = mess_src->original_dest;
+    mess_dest->time = mess_src->time;
+    mess_dest->messageID = mess_src->messageID;
+    mess_dest->flags = mess_src->flags;
 }
