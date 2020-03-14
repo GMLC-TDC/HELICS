@@ -460,7 +460,7 @@ TEST(message_object, copy)
     helicsFederateInfoSetCoreType(fi, helics_core_type_test, nullptr);
     auto fed = helicsCreateMessageFederate("fed1", fi, nullptr);
 
-
+	helicsFederateInfoFree(fi);
     auto m1 = helicsFederateCreateMessageObject(fed, nullptr);
     EXPECT_NE(m1, nullptr);
 
@@ -480,6 +480,10 @@ TEST(message_object, copy)
 
     helicsMessageCopy(m1, m2, &err);
     EXPECT_EQ(err.error_code, 0);
+
+	helicsMessageCopy(m1, nullptr, &err);
+	EXPECT_NE(err.error_code, 0);
+	helicsErrorClear(&err);
 
     EXPECT_STREQ(helicsMessageGetString(m2), "raw data");
     EXPECT_STREQ(helicsMessageGetOriginalSource(m2), "osource");

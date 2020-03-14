@@ -501,17 +501,16 @@ void helicsFilterSetCustomCallback(
         return;
     }
     auto op = std::make_shared<helics::CustomMessageOperator>();
-    op->setMessageFunction([filtCall, userdata](std::unique_ptr<helics::Message> message) {
-        auto ms = createMessageObject(message);
-        filtCall(ms, userdata);
-        return message;
-    });
+		op->setMessageFunction([filtCall, userdata](std::unique_ptr<helics::Message> message) {
+			auto ms = createMessageObject(message);
+			if (filtCall != nullptr)
+			{
+				filtCall(ms, userdata);
+			}
+			return message;
+			});
     try {
-        if (filtCall == nullptr) {
-            fObj->filtPtr->setOperator(std::move(op));
-        } else {
-            fObj->filtPtr->setOperator(std::move(op));
-        }
+         fObj->filtPtr->setOperator(std::move(op));
     }
     catch (...) { // LCOV_EXCL_LINE
         helicsErrorHandler(err); // LCOV_EXCL_LINE
