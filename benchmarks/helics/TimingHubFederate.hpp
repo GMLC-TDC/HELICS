@@ -23,7 +23,7 @@ class TimingHub: public BenchmarkFederate {
   public:
     TimingHub(): BenchmarkFederate("TimingHub") {}
 
-    std::string getName() override { return "echohub"; }
+    std::string getName() override { return "timinghub"; }
 
     void setupArgumentParsing() override
     {
