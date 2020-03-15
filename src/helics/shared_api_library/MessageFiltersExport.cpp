@@ -273,7 +273,6 @@ static helics::Filter* getFilter(helics_filter filt, helics_error* err)
 
 static helics::CloningFilter* getCloningFilter(helics_filter filt, helics_error* err)
 {
-    
     auto fObj = getFilterObj(filt, err);
     if (fObj == nullptr) {
         return nullptr;
@@ -487,12 +486,11 @@ void helicsFilterSetCustomCallback(
     helics_error* err)
 {
     auto fObj = getFilterObj(filt, err);
-    if (fObj == nullptr || fObj->filtPtr==nullptr) {
+    if (fObj == nullptr || fObj->filtPtr == nullptr) {
         return;
     }
 
-    if (!fObj->custom)
-    {
+    if (!fObj->custom) {
         if (err != nullptr) {
             static constexpr char nonCustomFilterString[] = "filter must be a custom filter to specify callback";
             err->error_code = helics_error_invalid_object;
@@ -501,16 +499,15 @@ void helicsFilterSetCustomCallback(
         return;
     }
     auto op = std::make_shared<helics::CustomMessageOperator>();
-		op->setMessageFunction([filtCall, userdata](std::unique_ptr<helics::Message> message) {
-			auto ms = createMessageObject(message);
-			if (filtCall != nullptr)
-			{
-				filtCall(ms, userdata);
-			}
-			return message;
-			});
+    op->setMessageFunction([filtCall, userdata](std::unique_ptr<helics::Message> message) {
+        auto ms = createMessageObject(message);
+        if (filtCall != nullptr) {
+            filtCall(ms, userdata);
+        }
+        return message;
+    });
     try {
-         fObj->filtPtr->setOperator(std::move(op));
+        fObj->filtPtr->setOperator(std::move(op));
     }
     catch (...) { // LCOV_EXCL_LINE
         helicsErrorHandler(err); // LCOV_EXCL_LINE

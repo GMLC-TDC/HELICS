@@ -142,16 +142,18 @@ class HELICS_CXX_EXPORT FirewallOperator: public FilterOperator {
 };
 
 /** class defining a message operator that can operate on any part of a message*/
-class HELICS_CXX_EXPORT CustomMessageOperator : public FilterOperator {
-public:
+class HELICS_CXX_EXPORT CustomMessageOperator: public FilterOperator {
+  public:
     /** default constructor*/
     CustomMessageOperator() = default;
     /** set the function to modify the data of the message in the constructor*/
-    explicit CustomMessageOperator(std::function<std::unique_ptr<Message>(std::unique_ptr<Message>)> userMessageFunction);
+    explicit CustomMessageOperator(
+        std::function<std::unique_ptr<Message>(std::unique_ptr<Message>)> userMessageFunction);
     /** set the function to modify the data of the message*/
-    void setMessageFunction(std::function<std::unique_ptr<Message>(std::unique_ptr<Message>)> userMessageFunction);
+    void setMessageFunction(
+        std::function<std::unique_ptr<Message>(std::unique_ptr<Message>)> userMessageFunction);
 
-private:
+  private:
     std::function<std::unique_ptr<Message>(std::unique_ptr<Message>)>
         messageFunction; //!< the function actually doing the processing
     virtual std::unique_ptr<Message> process(std::unique_ptr<Message> message) override;

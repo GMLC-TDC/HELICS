@@ -434,7 +434,7 @@ HELICS_EXPORT void helicsMessageAppendData(helics_message_object message, const 
     @param[in,out] err an error object to fill out in case of an error
     @endforcpponly
     */
-HELICS_EXPORT void helicsMessageCopy(helics_message_object source_message, helics_message_object dest_message, helics_error *err);
+HELICS_EXPORT void helicsMessageCopy(helics_message_object source_message, helics_message_object dest_message, helics_error* err);
 
 /**@}*/
 #ifdef __cplusplus

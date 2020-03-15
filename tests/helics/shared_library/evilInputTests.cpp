@@ -3101,7 +3101,6 @@ TEST(evil_message_fed_test, helicsFederateCreateMessageObject)
     EXPECT_NE(err.error_code, 0);
 }
 
-
 TEST(evil_message_fed_test, helicsFederateClearMessages)
 {
     //void helicsFederateClearMessages(helics_federate fed);
@@ -3280,7 +3279,7 @@ TEST(evil_message_object_test, helicsMessageCopy)
     helicsErrorClear(&err);
     helicsMessageCopy(nullptr, nullptr, &err);
     EXPECT_NE(err.error_code, 0);
-    
+
     helicsMessageCopy(evil_mo, evil_mo, &err);
     EXPECT_NE(err.error_code, 0);
 }

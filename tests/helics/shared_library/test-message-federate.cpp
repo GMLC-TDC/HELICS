@@ -451,7 +451,6 @@ TEST(message_object, test1)
     helicsBrokerDisconnect(brk, nullptr);
 }
 
-
 TEST(message_object, copy)
 {
     auto brk = helicsCreateBroker("test", "brk1", "", nullptr);
@@ -460,7 +459,7 @@ TEST(message_object, copy)
     helicsFederateInfoSetCoreType(fi, helics_core_type_test, nullptr);
     auto fed = helicsCreateMessageFederate("fed1", fi, nullptr);
 
-	helicsFederateInfoFree(fi);
+    helicsFederateInfoFree(fi);
     auto m1 = helicsFederateCreateMessageObject(fed, nullptr);
     EXPECT_NE(m1, nullptr);
 
@@ -481,9 +480,9 @@ TEST(message_object, copy)
     helicsMessageCopy(m1, m2, &err);
     EXPECT_EQ(err.error_code, 0);
 
-	helicsMessageCopy(m1, nullptr, &err);
-	EXPECT_NE(err.error_code, 0);
-	helicsErrorClear(&err);
+    helicsMessageCopy(m1, nullptr, &err);
+    EXPECT_NE(err.error_code, 0);
+    helicsErrorClear(&err);
 
     EXPECT_STREQ(helicsMessageGetString(m2), "raw data");
     EXPECT_STREQ(helicsMessageGetOriginalSource(m2), "osource");
@@ -504,7 +503,6 @@ TEST(message_object, copy)
 
     EXPECT_EQ(helicsMessageIsValid(m2), helics_true);
 
-    
     EXPECT_EQ(helicsMessageCheckFlag(m2, 4), helics_true);
 
     helicsFederateEnterExecutingMode(fed, nullptr);
