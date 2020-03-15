@@ -445,7 +445,7 @@ TEST(message_object, test1)
     helicsMessageReserve(m2, -2, &err);
     EXPECT_NE(err.error_code, 0);
     helicsErrorClear(&err);
-
+    helicsFederateInfoFree(fi);
     helicsFederateFinalize(fed, nullptr);
     helicsFederateFinalize(fed2, nullptr);
     helicsBrokerDisconnect(brk, nullptr);
