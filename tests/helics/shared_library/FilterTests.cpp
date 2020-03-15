@@ -1055,9 +1055,9 @@ TEST_F(filter_tests, file_load)
     // mFed.disconnect ();
 }
 
-static void filterFunc1(helics_message_object mess, void *)
+static void filterFunc1(helics_message_object mess, void*)
 {
-    auto time=helicsMessageGetTime(mess);
+    auto time = helicsMessageGetTime(mess);
     helicsMessageSetTime(mess, time + 2.5, nullptr);
 }
 
@@ -1069,13 +1069,13 @@ TEST_F(filter_tests, callback_test)
 
     auto fFed = GetFederateAt(0);
     auto mFed = GetFederateAt(1);
-     
+
     CE(helicsFederateSetFlagOption(
         mFed, helics_flag_ignore_time_mismatch_warnings, helics_true, &err));
     auto p1 = helicsFederateRegisterGlobalEndpoint(mFed, "port1", nullptr, &err);
     auto p2 = helicsFederateRegisterGlobalEndpoint(mFed, "port2", "", &err);
     EXPECT_EQ(err.error_code, helics_ok);
-     
+
     auto f1 = helicsFederateRegisterFilter(fFed, helics_filter_type_custom, "filter1", &err);
     auto f2 = helicsFederateRegisterFilter(mFed, helics_filter_type_delay, "dfilter", &err);
 

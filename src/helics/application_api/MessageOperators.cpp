@@ -169,7 +169,7 @@ std::unique_ptr<Message> FirewallOperator::process(std::unique_ptr<Message> mess
 }
 
 CustomMessageOperator::CustomMessageOperator(
-    std::function<std::unique_ptr<Message>(std::unique_ptr<Message>)> userMessageFunction) :
+    std::function<std::unique_ptr<Message>(std::unique_ptr<Message>)> userMessageFunction):
     messageFunction(std::move(userMessageFunction))
 {
 }
