@@ -51,6 +51,7 @@ TEST(other_tests, broker_global_value)
     helicsBrokerDisconnect(brk, &err);
     helicsQueryFree(q);
     EXPECT_EQ(helicsBrokerIsConnected(brk), helics_false);
+    helicsBrokerFree(brk);
 }
 
 // test global value creation from a core and its error pathways

@@ -2412,6 +2412,7 @@ void CommonCore::processPriorityCommand(ActionMessage&& command)
                     timeoutMon->disableParentPing();
                 }
                 timeoutMon->reset();
+                addActionMessage(CMD_DELAY_TRANSMIT);
             }
             break;
         case CMD_FED_ACK: {
@@ -2616,6 +2617,9 @@ void CommonCore::processCommand(ActionMessage&& command)
                     transmit(parent_route_id, m);
                 }
             }
+            break;
+        case CMD_DELAY_TRANSMIT:
+            transmitDelayedMessages();
             break;
         case CMD_CHECK_CONNECTIONS: {
             auto res = checkAndProcessDisconnect();
