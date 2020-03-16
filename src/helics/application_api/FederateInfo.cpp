@@ -87,21 +87,29 @@ static const std::map<std::string, int> propStringsTranslations{
 static const std::set<std::string> validTimeProperties{"period",
                                                        "timedelta",
                                                        "time_delta",
+    "timeDelta",
                                                        "offset",
                                                        "rtlead",
+    "rtLead",
                                                        "rtlag",
+    "rtLag",
                                                        "rttolerance",
+    "rtTolerance",
                                                        "rt_lead",
                                                        "rt_lag",
                                                        "rt_tolerance",
                                                        "inputdelay",
+    "inputDelay",
                                                        "outputdelay",
+    "outputDelay",
                                                        "input_delay",
                                                        "output_delay"};
 
 static const std::set<std::string> validIntProperties{"max_iterations",
                                                       "loglevel",
                                                       "log_level",
+    "logLevel",
+    "maxIterations",
                                                       "maxiterations"};
 
 static const std::set<std::string> validFlagOptions{"interruptible",
@@ -109,10 +117,12 @@ static const std::set<std::string> validFlagOptions{"interruptible",
                                                     "observer",
                                                     "source_only",
                                                     "sourceonly",
+    "sourceOnly",
                                                     "only_update_on_change",
                                                     "only_transmit_on_change",
                                                     "forward_compute",
                                                     "realtime",
+    "realTime",
                                                     "delayed_update",
                                                     "wait_for_current_time",
                                                     "strict_input_type_checking",
@@ -256,7 +266,7 @@ using namespace std::string_literals;
 std::unique_ptr<helicsCLI11App> FederateInfo::makeCLIApp()
 {
     auto app = std::make_unique<helicsCLI11App>("Federate Info Parsing");
-
+    app->option_defaults()->ignore_case();
     app->add_option("--name,-n", defName, "name of the federate");
     app->add_option("--corename", coreName, "the name of the core to create or find")
         ->ignore_underscore();
