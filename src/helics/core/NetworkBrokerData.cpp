@@ -421,7 +421,10 @@ std::string getLocalExternalAddressV4(const std::string& server)
     std::vector<std::string> resolved_addresses;
 #ifndef HELICS_DISABLE_ASIO
     asio::ip::tcp::resolver::query query(asio::ip::tcp::v4(), asio::ip::host_name(), "");
-    asio::ip::tcp::resolver::iterator it = resolver.resolve(query);
+    asio::ip::tcp::resolver::iterator it = resolver.resolve(query, ec);
+    if (ec) {
+        return getLocalExternalAddressV4();
+    }
     // asio::ip::tcp::endpoint endpoint = *it;
 
     while (it != end) {
