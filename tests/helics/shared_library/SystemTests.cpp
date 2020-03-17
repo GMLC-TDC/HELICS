@@ -78,22 +78,22 @@ TEST(other_tests, core_global_value)
     q = helicsCreateQuery("global", "testglobal2");
     res = helicsQueryCoreExecute(q, cr, &err);
     EXPECT_EQ(res, globalVal2);
-
+    printf("query 1");
     res = helicsQueryCoreExecute(nullptr, cr, &err);
     EXPECT_NE(err.error_code, 0);
     helicsErrorClear(&err);
     EXPECT_STREQ("#invalid", res);
-
+    printf("query 2");
     res = helicsQueryCoreExecute(q, nullptr, &err);
     EXPECT_NE(err.error_code, 0);
     helicsErrorClear(&err);
     EXPECT_STREQ("#invalid", res);
-
+    printf("query 3");
     res = helicsQueryCoreExecute(nullptr, nullptr, &err);
     EXPECT_NE(err.error_code, 0);
     helicsErrorClear(&err);
     EXPECT_STREQ("#invalid", res);
-
+    printf("query 4");
     helicsCoreSetGlobal(cr, nullptr, "v2", &err);
     EXPECT_NE(err.error_code, 0);
     helicsErrorClear(&err);
