@@ -27,8 +27,8 @@ File based configuration looks primarily at an "endpoints" JSON array
     "only_transmit_on_change":false,  //indicator that the federate should only publish if the value changed
     "source_only":false,  //indicator that the federate is only a source and is not expected to receive anything
     "uninterruptible":false, //indicator that the federate should only return requested times
-    "coreType":"test", //the type of the core "test","zmq","udp","icp","tcp","mpi"
-    "coreName":"the name of the core",  //this matters most for icp and test cores, can be empty
+    "coreType":"test", //the type of the core "test","zmq","udp","ipc","tcp","mpi"
+    "coreName":"the name of the core",  //this matters most for ipc and test cores, can be empty
     "coreInit":"1", // the initialization string for the core in the form of a command line arguments
     "maxIterations":10, //the maximum number of iterations for a time step
     "period":  1.0, //the period with which federate may return time
