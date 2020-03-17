@@ -71,10 +71,13 @@ TEST(other_tests, core_global_value)
     std::string globalVal2 = "this is a second string constant that functions as a global";
     helicsCoreSetGlobal(cr, "testglobal", globalVal.c_str(), &err);
     auto q = helicsCreateQuery("global", "testglobal");
+    printf("query -1");
     auto res = helicsQueryCoreExecute(q, cr, &err);
     EXPECT_EQ(res, globalVal);
+    printf("set global");
     helicsCoreSetGlobal(cr, "testglobal2", globalVal2.c_str(), &err);
     helicsQueryFree(q);
+    printf("query 0");
     q = helicsCreateQuery("global", "testglobal2");
     res = helicsQueryCoreExecute(q, cr, &err);
     EXPECT_EQ(res, globalVal2);
