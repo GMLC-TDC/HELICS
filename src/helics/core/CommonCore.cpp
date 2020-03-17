@@ -2284,14 +2284,11 @@ std::string CommonCore::query(const std::string& target, const std::string& quer
 void CommonCore::setGlobal(const std::string& valueName, const std::string& value)
 {
     ActionMessage querycmd(CMD_SET_GLOBAL);
-    querycmd.source_id = global_id.load();
+    querycmd.dest_id = root_broker_id;
+    querycmd.source_id = direct_core_id;
     querycmd.payload = valueName;
     querycmd.setStringData(value);
-    if (global_id.load() == parent_broker_id) {
-        delayTransmitQueue.push(std::move(querycmd));
-    } else {
-        transmit(parent_route_id, querycmd);
-    }
+    addActionMessage(std::move(querycmd));
 }
 
 void CommonCore::processPriorityCommand(ActionMessage&& command)
@@ -2372,7 +2369,6 @@ void CommonCore::processPriorityCommand(ActionMessage&& command)
                     timeoutMon->disableParentPing();
                 }
                 timeoutMon->reset();
-                addActionMessage(CMD_DELAY_TRANSMIT);
             }
             break;
         case CMD_FED_ACK: {
@@ -2487,6 +2483,16 @@ void CommonCore::processPriorityCommand(ActionMessage&& command)
         case CMD_PRIORITY_ACK:
         case CMD_ROUTE_ACK:
             break;
+        case CMD_SET_GLOBAL:
+            if (global_broker_id_local != parent_broker_id) {
+                // forward on to Broker
+                command.source_id = global_broker_id_local;
+                transmit(parent_route_id, std::move(command));
+            }
+            else {
+                // this will get processed when this core is assigned a global id
+                delayTransmitQueue.push(std::move(command));
+            }
         default: {
             if (!isPriorityCommand(command)) {
                 processCommand(std::move(command));
@@ -2608,9 +2614,6 @@ void CommonCore::processCommand(ActionMessage&& command)
                     transmit(parent_route_id, m);
                 }
             }
-            break;
-        case CMD_DELAY_TRANSMIT:
-            transmitDelayedMessages();
             break;
         case CMD_CHECK_CONNECTIONS: {
             auto res = checkAndProcessDisconnect();
