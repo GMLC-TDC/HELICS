@@ -2759,7 +2759,7 @@ void CoreBroker::processQuery(ActionMessage& m)
         processLocalQuery(m);
     } else if ((isRootc) && ((target == "root") || (target == "federation"))) {
         processLocalQuery(m);
-    } else if (target == "gid_to_name") {
+    } else if ((isRootc) && (target == "gid_to_name")) {
         ActionMessage queryResp(CMD_QUERY_REPLY);
         queryResp.dest_id = m.source_id;
         queryResp.source_id = global_broker_id_local;
@@ -2770,7 +2770,7 @@ void CoreBroker::processQuery(ActionMessage& m)
         } else {
             transmit(getRoute(queryResp.dest_id), queryResp);
         }
-    } else if (target == "global") {
+    } else if ((isRootc) && (target == "global")) {
         ActionMessage queryResp(CMD_QUERY_REPLY);
         queryResp.dest_id = m.source_id;
         queryResp.source_id = global_broker_id_local;

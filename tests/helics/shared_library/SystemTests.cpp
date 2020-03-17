@@ -58,21 +58,17 @@ TEST(other_tests, broker_global_value)
 TEST(other_tests, core_global_value)
 {
     helicsCloseLibrary();
-    std::cout << "prior" << std::endl;
     auto err = helicsErrorInitialize();
     auto brk = helicsCreateBroker("test", "gbrokerc", "--root", &err);
 
     auto cr = helicsCreateCore("test", "gcore", "--broker=gbrokerc", &err);
     EXPECT_EQ(err.error_code, 0);
-    std::cout << "created" << std::endl;
     auto connected = helicsCoreConnect(cr, &err);
     EXPECT_EQ(connected, helics_true);
-    std::cout << "connected" << std::endl;
     EXPECT_EQ(err.error_code, 0);
     EXPECT_EQ(helicsCoreIsConnected(cr), helics_true);
     std::string globalVal = "this is a string constant that functions as a global";
     std::string globalVal2 = "this is a second string constant that functions as a global";
-    std::cout << "set global" << std::endl;
     helicsCoreSetGlobal(cr, "testglobal", globalVal.c_str(), &err);
     auto q = helicsCreateQuery("global", "testglobal");
     std::cout << "query -1" << std::endl;

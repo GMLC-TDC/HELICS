@@ -2439,6 +2439,7 @@ void CommonCore::processPriorityCommand(ActionMessage&& command)
                 }
                 else {
                     // this will get processed when this core is assigned a global id
+                    command.source_id = direct_core_id;
                     delayTransmitQueue.push(std::move(command));
                 }
             }
@@ -2508,7 +2509,7 @@ void CommonCore::transmitDelayedMessages()
 {
     auto msg = delayTransmitQueue.pop();
     while (msg) {
-        if (msg->source_id == parent_broker_id) {
+        if (msg->source_id == parent_broker_id||msg->source_id==direct_core_id) {
             msg->source_id = global_broker_id_local;
         }
         routeMessage(*msg);
