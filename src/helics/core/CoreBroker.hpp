@@ -313,7 +313,7 @@ class CoreBroker: public Broker, public BrokerBase {
     /** remove a named target from an interface*/
     void removeNamedTarget(ActionMessage& command);
     /** answer a query or route the message the appropriate location*/
-    void processQuery(const ActionMessage& m);
+    void processQuery(ActionMessage& m);
     /** answer a query or route the message the appropriate location*/
     void processQueryResponse(const ActionMessage& m);
     /** generate an answer to a local query*/

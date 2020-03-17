@@ -2223,6 +2223,14 @@ std::string CommonCore::query(const std::string& target, const std::string& quer
         }
         return "#disconnected";
     }
+    ActionMessage querycmd(CMD_QUERY);
+    querycmd.source_id = direct_core_id;
+    querycmd.dest_id = parent_broker_id;
+    querycmd.payload = queryStr;
+    auto index = ++queryCounter;
+    querycmd.messageID = index;
+    querycmd.setStringData(target);
+
     if ((target == "core") || (target == getIdentifier())) {
         auto res = quickCoreQueries(queryStr);
         if (!res.empty()) {
@@ -2231,91 +2239,43 @@ std::string CommonCore::query(const std::string& target, const std::string& quer
         if (queryStr == "address") {
             return getAddress();
         }
-        ActionMessage querycmd(CMD_BROKER_QUERY);
-        querycmd.source_id = global_id.load();
-        querycmd.dest_id = global_id.load();
-        auto index = ++queryCounter;
-        querycmd.messageID = index;
-        querycmd.payload = queryStr;
-        auto queryResult = ActiveQueries.getFuture(index);
-        addActionMessage(std::move(querycmd));
-        auto ret = queryResult.get();
-        ActiveQueries.finishedWithValue(index);
-        return ret;
+        querycmd.setAction(CMD_BROKER_QUERY);
+        querycmd.dest_id = direct_core_id;
     }
-    if ((target == "parent") || (target == "broker")) {
-        ActionMessage querycmd(CMD_BROKER_QUERY);
-        querycmd.source_id = global_id.load();
-        querycmd.dest_id = higher_broker_id;
-        querycmd.messageID = ++queryCounter;
-        querycmd.payload = queryStr;
-        auto queryResult = ActiveQueries.getFuture(querycmd.messageID);
-        addActionMessage(querycmd);
-        auto ret = queryResult.get();
-        ActiveQueries.finishedWithValue(querycmd.messageID);
-        return ret;
-    }
-    if (target == "root" || target == "rootbroker") {
-        ActionMessage querycmd(CMD_BROKER_QUERY);
-        querycmd.source_id = global_id.load();
-        auto index = ++queryCounter;
-        querycmd.messageID = index;
-        querycmd.payload = queryStr;
-        auto queryResult = ActiveQueries.getFuture(querycmd.messageID);
-        if (global_id.load() == parent_broker_id) {
-            delayTransmitQueue.push(std::move(querycmd));
-        } else {
-            transmit(parent_route_id, querycmd);
-        }
-        auto ret = queryResult.get();
-        ActiveQueries.finishedWithValue(index);
-        return ret;
-    }
-    // default into a federate query
-    auto fed = (target != "federate") ? getFederate(target) : getFederateAt(local_federate_id(0));
-    if (fed != nullptr) {
-        std::string ret = federateQuery(fed, queryStr);
-        if (ret != "#wait") {
-            return ret;
-        }
-        ActionMessage fedquerycmd(CMD_QUERY);
-        fedquerycmd.source_id = global_id.load();
-        fedquerycmd.dest_id = fed->global_id;
-        auto index = ++queryCounter;
-        fedquerycmd.messageID = index;
-        fedquerycmd.payload = queryStr;
-        fedquerycmd.setStringData(target);
-        auto queryResult = ActiveQueries.getFuture(fedquerycmd.messageID);
-        fed->addAction(std::move(fedquerycmd));
-        std::future_status status = std::future_status::timeout;
-        while (status == std::future_status::timeout) {
-            status = queryResult.wait_for(std::chrono::milliseconds(50));
-            if (status == std::future_status::ready) {
-                auto qres = queryResult.get();
-                ActiveQueries.finishedWithValue(index);
-                return qres;
-            }
-            ret = federateQuery(fed, queryStr);
+    if (querycmd.dest_id != direct_core_id)
+    {
+        // default into a federate query
+        auto fed = (target != "federate") ? getFederate(target) : getFederateAt(local_federate_id(0));
+        if (fed != nullptr) {
+            std::string ret = federateQuery(fed, queryStr);
             if (ret != "#wait") {
-                ActiveQueries.finishedWithValue(index);
                 return ret;
             }
+
+            querycmd.dest_id = fed->global_id;
+            
+            auto queryResult = ActiveQueries.getFuture(querycmd.messageID);
+            fed->addAction(std::move(querycmd));
+            std::future_status status = std::future_status::timeout;
+            while (status == std::future_status::timeout) {
+                status = queryResult.wait_for(std::chrono::milliseconds(50));
+                if (status == std::future_status::ready) {
+                    auto qres = queryResult.get();
+                    ActiveQueries.finishedWithValue(index);
+                    return qres;
+                }
+                // federate query may need to wait or can get the result now
+                ret = federateQuery(fed, queryStr);
+                if (ret != "#wait") {
+                    ActiveQueries.finishedWithValue(index);
+                    return ret;
+                }
+            }
         }
     }
-
-    ActionMessage querycmd(CMD_QUERY);
-    querycmd.source_id = global_id.load();
-    auto index = ++queryCounter;
-    querycmd.messageID = index;
-    querycmd.payload = queryStr;
-    querycmd.setStringData(target);
+    
     auto queryResult = ActiveQueries.getFuture(querycmd.messageID);
-    if (global_id.load() == parent_broker_id) {
-        delayTransmitQueue.push(std::move(querycmd));
-    } else {
-        transmit(parent_route_id, querycmd);
-    }
-
+    addActionMessage(std::move(querycmd));
     auto ret = queryResult.get();
     ActiveQueries.finishedWithValue(index);
     return ret;
@@ -2443,9 +2403,9 @@ void CommonCore::processPriorityCommand(ActionMessage&& command)
             checkAndProcessDisconnect();
             break;
         case CMD_BROKER_QUERY:
-            if (command.dest_id == global_broker_id_local) {
+            if (command.dest_id == global_broker_id_local||command.dest_id==direct_core_id) {
                 std::string repStr = coreQuery(command.payload);
-                if (command.source_id == global_broker_id_local) {
+                if (command.source_id == direct_core_id) {
                     ActiveQueries.setDelayedValue(command.messageID, std::move(repStr));
                 } else {
                     ActionMessage queryResp(CMD_QUERY_REPLY);
@@ -2461,32 +2421,63 @@ void CommonCore::processPriorityCommand(ActionMessage&& command)
             }
             break;
         case CMD_QUERY: {
-            std::string repStr;
-            ActionMessage queryResp(CMD_QUERY_REPLY);
-            queryResp.dest_id = command.source_id;
-            queryResp.source_id = command.dest_id;
-            queryResp.messageID = command.messageID;
-            queryResp.counter = command.counter;
-            const std::string& target = command.getString(targetStringLoc);
-            if (target == getIdentifier()) {
-                queryResp.source_id = global_broker_id_local;
-                repStr = query(target, command.payload);
-            } else {
-                auto fedptr = getFederateCore(target);
-                repStr = federateQuery(fedptr, command.payload);
-                if (repStr == "#wait") {
-                    if (fedptr != nullptr) {
-                        command.dest_id = fedptr->global_id;
-                        fedptr->addAction(std::move(command));
-                        break;
-                    } else {
-                        repStr = "#error";
-                    }
+            if (command.dest_id == parent_broker_id)
+            {
+                auto &target = command.getString(targetStringLoc);
+                if (target == "root" || target == "federation")
+                {
+                    command.setAction(CMD_BROKER_QUERY);
+                    command.dest_id=root_broker_id;
+                    command.clearStringData();
+                }
+                else if (target == "parent" || target == "broker")
+                {
+                    command.setAction(CMD_BROKER_QUERY);
+                    command.dest_id = higher_broker_id;
+                    command.clearStringData();
+                }
+                if (global_broker_id_local != parent_broker_id) {
+                    // forward on to Broker
+                    command.source_id = global_broker_id_local;
+                    transmit(parent_route_id, std::move(command));
+                }
+                else {
+                    // this will get processed when this core is assigned a global id
+                    delayTransmitQueue.push(std::move(command));
                 }
             }
+            else
+            {
+                std::string repStr;
+                ActionMessage queryResp(CMD_QUERY_REPLY);
+                queryResp.dest_id = command.source_id;
+                queryResp.source_id = command.dest_id;
+                queryResp.messageID = command.messageID;
+                queryResp.counter = command.counter;
+                const std::string& target = command.getString(targetStringLoc);
+                if (target == getIdentifier()) {
+                    queryResp.source_id = global_broker_id_local;
+                    repStr = coreQuery(command.payload);
+                }
+                else {
+                    auto fedptr = getFederateCore(target);
+                    repStr = federateQuery(fedptr, command.payload);
+                    if (repStr == "#wait") {
+                        if (fedptr != nullptr) {
+                            command.dest_id = fedptr->global_id;
+                            fedptr->addAction(std::move(command));
+                            break;
+                        }
+                        else {
+                            repStr = "#error";
+                        }
+                    }
+                }
 
-            queryResp.payload = std::move(repStr);
-            transmit(getRoute(queryResp.dest_id), queryResp);
+                queryResp.payload = std::move(repStr);
+                transmit(getRoute(queryResp.dest_id), queryResp);
+            }
+            
         } break;
         case CMD_QUERY_REPLY:
             if (command.dest_id == global_broker_id_local) {

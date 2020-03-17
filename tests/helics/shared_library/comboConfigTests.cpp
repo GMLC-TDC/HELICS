@@ -19,7 +19,7 @@ TEST_F(config_tests, control_file_test)
     EXPECT_TRUE(nullptr != broker);
 
     std::string testFile(TEST_DIR);
-    testFile.append("Control_test.json"); 
+    testFile.append("Control_test.json");  
 
     auto cfed = helicsCreateCombinationFederateFromConfig(testFile.c_str(), &err);
 

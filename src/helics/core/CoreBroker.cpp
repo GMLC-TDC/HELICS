@@ -2752,7 +2752,7 @@ void CoreBroker::processLocalQuery(const ActionMessage& m)
     }
 }
 
-void CoreBroker::processQuery(const ActionMessage& m)
+void CoreBroker::processQuery(ActionMessage& m)
 {
     auto& target = m.getString(targetStringLoc);
     if ((target == getIdentifier()) || (target == "broker")) {
@@ -2802,6 +2802,7 @@ void CoreBroker::processQuery(const ActionMessage& m)
         auto fed = _federates.find(target);
         if (fed != _federates.end()) {
             route = fed->route;
+            m.dest_id = fed->parent;
         } else {
             auto broker = _brokers.find(target);
             if (broker != _brokers.end()) {
