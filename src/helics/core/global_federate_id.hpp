@@ -110,7 +110,7 @@ class global_federate_id {
     base_type gid{invalid_global_fed_id}; //!< the underlying index value
 };
 /** identifier to target the local core even if the global id hasn't been assigned yet*/
-constexpr global_federate_id direct_core_id{ -235262 };
+constexpr global_federate_id direct_core_id{-235262};
 
 /** stream operator for a federate_id
      */
