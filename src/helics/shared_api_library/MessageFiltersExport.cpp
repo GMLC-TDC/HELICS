@@ -7,7 +7,9 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include "../core/core-exceptions.hpp"
 #include "../helics.hpp"
+#include "MessageFederate.h"
 #include "MessageFilters.h"
+#include "helicsCallbacks.h"
 #include "internal/api_objects.h"
 
 #include <memory>
@@ -65,6 +67,7 @@ helics_filter helicsFederateRegisterFilter(helics_federate fed, helics_filter_ty
         auto filt = std::make_unique<helics::FilterObject>();
         filt->filtPtr = &helics::make_filter(static_cast<helics::filter_types>(type), fedObj.get(), AS_STRING(name));
         filt->fedptr = std::move(fedObj);
+        filt->custom = (type == helics_filter_type_custom);
         auto ret = reinterpret_cast<helics_filter>(filt.get());
         federateAddFilter(fed, std::move(filt));
         return ret;
@@ -88,6 +91,7 @@ helics_filter helicsFederateRegisterGlobalFilter(helics_federate fed, helics_fil
         filt->filtPtr = &helics::make_filter(
             helics::interface_visibility::global, static_cast<helics::filter_types>(type), fedObj.get(), AS_STRING(name));
         filt->fedptr = std::move(fedObj);
+        filt->custom = (type == helics_filter_type_custom);
         auto ret = reinterpret_cast<helics_filter>(filt.get());
         federateAddFilter(fed, std::move(filt));
         return ret;
@@ -109,6 +113,7 @@ helics_filter helicsCoreRegisterFilter(helics_core cr, helics_filter_type type, 
         filt->uFilter = helics::make_filter(static_cast<helics::filter_types>(type), core.get(), AS_STRING(name));
         filt->filtPtr = filt->uFilter.get();
         filt->corePtr = std::move(core);
+        filt->custom = (type == helics_filter_type_custom);
         auto ret = reinterpret_cast<helics_filter>(filt.get());
         coreAddFilter(cr, std::move(filt));
         return ret;
@@ -268,13 +273,13 @@ static helics::Filter* getFilter(helics_filter filt, helics_error* err)
 
 static helics::CloningFilter* getCloningFilter(helics_filter filt, helics_error* err)
 {
-    static constexpr char nonCloningFilterString[] = "filter must be a cloning filter";
     auto fObj = getFilterObj(filt, err);
     if (fObj == nullptr) {
         return nullptr;
     }
     if (!fObj->cloning) {
         if (err != nullptr) {
+            static constexpr char nonCloningFilterString[] = "filter must be a cloning filter";
             err->error_code = helics_error_invalid_object;
             err->message = nonCloningFilterString;
         }
@@ -472,4 +477,39 @@ helics_bool helicsFilterGetOption(helics_filter filt, int option)
         return helics_false;
     }
     // LCOV_EXCL_STOP
+}
+
+void helicsFilterSetCustomCallback(
+    helics_filter filt,
+    void (*filtCall)(helics_message_object message, void* userData),
+    void* userdata,
+    helics_error* err)
+{
+    auto fObj = getFilterObj(filt, err);
+    if (fObj == nullptr || fObj->filtPtr == nullptr) {
+        return;
+    }
+
+    if (!fObj->custom) {
+        if (err != nullptr) {
+            static constexpr char nonCustomFilterString[] = "filter must be a custom filter to specify callback";
+            err->error_code = helics_error_invalid_object;
+            err->message = nonCustomFilterString;
+        }
+        return;
+    }
+    auto op = std::make_shared<helics::CustomMessageOperator>();
+    op->setMessageFunction([filtCall, userdata](std::unique_ptr<helics::Message> message) {
+        auto ms = createMessageObject(message);
+        if (filtCall != nullptr) {
+            filtCall(ms, userdata);
+        }
+        return message;
+    });
+    try {
+        fObj->filtPtr->setOperator(std::move(op));
+    }
+    catch (...) { // LCOV_EXCL_LINE
+        helicsErrorHandler(err); // LCOV_EXCL_LINE
+    }
 }

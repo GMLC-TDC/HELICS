@@ -3267,6 +3267,23 @@ TEST(evil_message_object_test, helicsMessageSetSource)
     EXPECT_NE(err.error_code, 0);
 }
 
+TEST(evil_message_object_test, helicsMessageCopy)
+{
+    //void helicsMessageSetSource(helics_message_object message, const char* src, helics_error* err);
+    char rdata[256];
+    helics_message_object evil_mo = reinterpret_cast<helics_message_object>(rdata);
+    auto err = helicsErrorInitialize();
+    err.error_code = 45;
+    helicsMessageCopy(nullptr, nullptr, &err);
+    EXPECT_EQ(err.error_code, 45);
+    helicsErrorClear(&err);
+    helicsMessageCopy(nullptr, nullptr, &err);
+    EXPECT_NE(err.error_code, 0);
+
+    helicsMessageCopy(evil_mo, evil_mo, &err);
+    EXPECT_NE(err.error_code, 0);
+}
+
 TEST(evil_message_object_test, helicsMessageSetDestination)
 {
     //void helicsMessageSetDestination(helics_message_object message, const char* dest, helics_error* err);
@@ -3972,6 +3989,23 @@ TEST(evil_filter_test, helicsFilterGetOption)
     EXPECT_EQ(res1, helics_false);
     auto res2 = helicsFilterGetOption(evil_filt, 5);
     EXPECT_EQ(res2, helics_false);
+}
+
+TEST(evil_filter_test, helicsFilterSetCallback)
+{
+    //void helicsFilterSetCustomCallback(helics_filter filt, callback, void *userdata, helics_error* err);
+    char rdata[256];
+    helics_filter evil_filt = reinterpret_cast<helics_filter>(rdata);
+    auto err = helicsErrorInitialize();
+    err.error_code = 45;
+    helicsFilterSetCustomCallback(nullptr, nullptr, nullptr, &err);
+    EXPECT_EQ(err.error_code, 45);
+    helicsErrorClear(&err);
+    helicsFilterSetCustomCallback(nullptr, nullptr, nullptr, &err);
+    EXPECT_NE(err.error_code, 0);
+    helicsErrorClear(&err);
+    helicsFilterSetCustomCallback(evil_filt, nullptr, nullptr, &err);
+    EXPECT_NE(err.error_code, 0);
 }
 
 //section Query Functions

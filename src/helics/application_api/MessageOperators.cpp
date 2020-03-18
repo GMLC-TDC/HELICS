@@ -168,4 +168,24 @@ std::unique_ptr<Message> FirewallOperator::process(std::unique_ptr<Message> mess
     return message;
 }
 
+CustomMessageOperator::CustomMessageOperator(
+    std::function<std::unique_ptr<Message>(std::unique_ptr<Message>)> userMessageFunction):
+    messageFunction(std::move(userMessageFunction))
+{
+}
+
+void CustomMessageOperator::setMessageFunction(
+    std::function<std::unique_ptr<Message>(std::unique_ptr<Message>)> userMessageFunction)
+{
+    messageFunction = std::move(userMessageFunction);
+}
+
+std::unique_ptr<Message> CustomMessageOperator::process(std::unique_ptr<Message> message)
+{
+    if (messageFunction) {
+        return messageFunction(std::move(message));
+    }
+    return message;
+}
+
 } // namespace helics
