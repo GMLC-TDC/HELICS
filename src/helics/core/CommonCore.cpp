@@ -2494,6 +2494,7 @@ void CommonCore::processPriorityCommand(ActionMessage&& command)
                 // this will get processed when this core is assigned a global id
                 delayTransmitQueue.push(std::move(command));
             }
+            break;
         default: {
             if (!isPriorityCommand(command)) {
                 processCommand(std::move(command));
