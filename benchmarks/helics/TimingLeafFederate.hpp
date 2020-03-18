@@ -22,7 +22,7 @@ class TimingLeaf: public BenchmarkFederate {
   public:
     TimingLeaf(): BenchmarkFederate("TimingLeaf") {}
 
-    std::string getName() override { return "echoleaf_" + std::to_string(index); }
+    std::string getName() override { return "timingleaf_" + std::to_string(index); }
 
     void setupArgumentParsing() override { opt_index->required(); }
 
