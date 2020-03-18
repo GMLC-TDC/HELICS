@@ -389,6 +389,7 @@ public class helicsJNI {
   public final static native void helicsMessageSetString(long jarg1, String jarg2);
   public final static native void helicsMessageSetData(long jarg1, long jarg2, int jarg3);
   public final static native void helicsMessageAppendData(long jarg1, long jarg2, int jarg3);
+  public final static native void helicsMessageCopy(long jarg1, long jarg2);
   public final static native long helicsFederateRegisterFilter(long jarg1, int jarg2, String jarg3);
   public final static native long helicsFederateRegisterGlobalFilter(long jarg1, int jarg2, String jarg3);
   public final static native long helicsFederateRegisterCloningFilter(long jarg1, String jarg2);

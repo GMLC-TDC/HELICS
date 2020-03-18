@@ -14712,6 +14712,51 @@ fail:
 }
 
 
+SWIGINTERN PyObject *_wrap_helicsMessageCopy(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  helics_message_object arg1 = (helics_message_object) 0 ;
+  helics_message_object arg2 = (helics_message_object) 0 ;
+  helics_error *arg3 = (helics_error *) 0 ;
+  int res1 ;
+  int res2 ;
+  helics_error etemp3 ;
+  PyObject *swig_obj[2] ;
+  
+  {
+    etemp3=helicsErrorInitialize();
+    arg3=&etemp3;
+  }
+  if (!SWIG_Python_UnpackTuple(args, "helicsMessageCopy", 2, 2, swig_obj)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(swig_obj[0],SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsMessageCopy" "', argument " "1"" of type '" "helics_message_object""'"); 
+  }
+  res2 = SWIG_ConvertPtr(swig_obj[1],SWIG_as_voidptrptr(&arg2), 0, 0);
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsMessageCopy" "', argument " "2"" of type '" "helics_message_object""'"); 
+  }
+  helicsMessageCopy(arg1,arg2,arg3);
+  resultobj = SWIG_Py_Void();
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsPythonException(arg3);
+      return NULL;
+    }
+  }
+  return resultobj;
+fail:
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsPythonException(arg3);
+      return NULL;
+    }
+  }
+  return NULL;
+}
+
+
 SWIGINTERN PyObject *_wrap_helicsFederateRegisterFilter(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   helics_federate arg1 = (helics_federate) 0 ;
@@ -17725,6 +17770,13 @@ static PyMethodDef SwigMethods[] = {
 		"   :param data: a string containing the message data to append\n"
 		"   :type inputDataLength: int\n"
 		"   :param inputDataLength:  the length of the data to input\n"
+		""},
+	 { "helicsMessageCopy", _wrap_helicsMessageCopy, METH_VARARGS, "\n"
+		"copy a message object\n"
+		"   :type source_message: void\n"
+		"   :param source_message: the message object to copy from\n"
+		"   :type dest_message: void\n"
+		"   :param dest_message: the message object to copy to\n"
 		""},
 	 { "helicsFederateRegisterFilter", _wrap_helicsFederateRegisterFilter, METH_VARARGS, "\n"
 		"create a source Filter on the specified federate\n"

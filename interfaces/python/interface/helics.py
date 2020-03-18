@@ -3110,6 +3110,16 @@ def helicsMessageAppendData(message: "helics_message_object", data: "void const 
     """
     return _helics.helicsMessageAppendData(message, data)
 
+def helicsMessageCopy(source_message: "helics_message_object", dest_message: "helics_message_object") -> "void":
+    r"""
+    copy a message object
+       :type source_message: void
+       :param source_message: the message object to copy from
+       :type dest_message: void
+       :param dest_message: the message object to copy to
+    """
+    return _helics.helicsMessageCopy(source_message, dest_message)
+
 def helicsFederateRegisterFilter(fed: "helics_federate", type: "helics_filter_type", name: "char const *") -> "helics_filter":
     r"""
     create a source Filter on the specified federate
