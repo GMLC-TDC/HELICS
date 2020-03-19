@@ -23,6 +23,8 @@ class JsonMapBuilder {
   public:
     JsonMapBuilder() noexcept;
     ~JsonMapBuilder();
+    JsonMapBuilder(JsonMapBuilder &&map) = default;
+    JsonMapBuilder &operator=(JsonMapBuilder &&map) = default;
     /** get the underlying json object*/
     Json::Value& getJValue();
     /** check if the map has completed*/
