@@ -83,6 +83,8 @@ namespace apps {
 #endif
     }
 
+#ifdef ENABLE_ZMQ_CORE
+
     std::unique_ptr<zmq::socket_t> zmqBrokerServer::loadZMQsocket(zmq::context_t& ctx)
     {
         std::string ext_interface = "tcp://*";
@@ -165,6 +167,9 @@ namespace apps {
         logMessage("received unknown message of length " + std::to_string(msg.size()));
         return "ignored";
     }
+
+#endif
+
     void zmqBrokerServer::mainLoop()
     {
 #ifdef ENABLE_ZMQ_CORE

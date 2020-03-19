@@ -512,7 +512,9 @@ TEST_P(error_tests_type, test_duplicate_broker_name)
 
 INSTANTIATE_TEST_SUITE_P(error_tests, error_tests_type, ::testing::ValuesIn(core_types_simple));
 
-constexpr const char* networkCores[] = {ZMQTEST UDPTEST};
+#if defined(ENABLE_ZMQ_CORE) || defined(ENABLE_UDP_CORE) || defined(ENABLE_TCP_CORE)
+
+constexpr const char* networkCores[] = {ZMQTEST UDPTEST TCPTEST};
 
 class network_error_tests:
     public ::testing::TestWithParam<const char*>,
@@ -546,3 +548,5 @@ TEST_P(network_error_tests, test_broker_recovery)
 }
 
 INSTANTIATE_TEST_SUITE_P(error_tests, network_error_tests, ::testing::ValuesIn(networkCores));
+
+#endif
