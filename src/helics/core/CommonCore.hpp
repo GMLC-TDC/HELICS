@@ -21,6 +21,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helics-time.hpp"
 #include "helics/external/any.hpp"
 #include "helics/helics-config.h"
+#include "json/forwards.h"
 
 #include <array>
 #include <atomic>
@@ -350,6 +351,8 @@ class CommonCore: public Core, public BrokerBase {
     bool checkForLocalPublication(ActionMessage& cmd);
     /** get an index for an airlock function is threadsafe*/
     uint16_t getNextAirlockIndex();
+    /** load the basic core info into a JSON object*/
+    void loadBasicJsonInfo(Json::Value &base, const std::function<void(Json::Value &fedval, const FedInfo &fed)> &fedLoader) const;
     /** generate results for core queries*/
     std::string coreQuery(const std::string& queryStr) const;
 

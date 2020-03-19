@@ -2035,7 +2035,7 @@ std::string CommonCore::quickCoreQueries(const std::string& queryStr) const
 {
     if ((queryStr == "queries") || (queryStr == "available_queries")) {
         return "[isinit;isconnected;name;address;queries;address;federates;inputs;endpoints;filtered_endpoints;"
-               "publications;filters;federate_map;dependency_graph;dependencies;dependson;dependents;current_time;global_time;current_state]";
+               "publications;filters;federate_map;dependency_graph;data_flow_graph;dependencies;dependson;dependents;current_time;global_time;current_state]";
     }
     if (queryStr == "isconnected") {
         return (isConnected()) ? "true" : "false";
@@ -2045,6 +2045,27 @@ std::string CommonCore::quickCoreQueries(const std::string& queryStr) const
     }
     return std::string{};
 }
+
+void CommonCore::loadBasicJsonInfo(
+    Json::Value& base,
+    const std::function<void(Json::Value& fedval, const FedInfo& fed)>& fedLoader) const
+{
+    base["name"] = getIdentifier();
+    base["id"] = global_broker_id_local.baseValue();
+    base["parent"] = higher_broker_id.baseValue();
+    if (fedLoader) {
+        base["federates"] = Json::arrayValue;
+        for (auto& fed : loopFederates) {
+            Json::Value fedval;
+            fedval["id"] = fed.fed->global_id.load().baseValue();
+            fedval["name"] = fed.fed->getIdentifier();
+            fedval["parent"] = global_broker_id_local.baseValue();
+            fedLoader(fedval, fed);
+            base["federates"].append(std::move(fedval));
+        }
+    }
+}
+
 std::string CommonCore::coreQuery(const std::string& queryStr) const
 {
     auto res = quickCoreQueries(queryStr);
@@ -2115,44 +2136,28 @@ std::string CommonCore::coreQuery(const std::string& queryStr) const
     }
     if (queryStr == "current_state") {
         Json::Value base;
-        base["name"] = getIdentifier();
-        base["id"] = global_broker_id_local.baseValue();
+        loadBasicJsonInfo(base, [](Json::Value& val, const FedInfo& fed) {
+            val["state"] = state_string(fed.state);
+        });
         base["state"] = brokerStateName(brokerState.load());
-        base["federates"] = Json::arrayValue;
-        for (auto& fed : loopFederates) {
-            Json::Value fedstate;
-            fedstate["state"] = state_string(fed.state);
-            fedstate["id"] = fed.fed->global_id.load().baseValue();
-            fedstate["name"] = fed.fed->getIdentifier();
-            base["federates"].append(std::move(fedstate));
-        }
+
         return generateJsonString(base);
     }
 
     if (queryStr == "global_time") {
-        Json::Value block;
-        block["name"] = getIdentifier();
-        block["id"] = global_broker_id_local.baseValue();
-        block["parent"] = higher_broker_id.baseValue();
-        block["federates"] = Json::arrayValue;
+        Json::Value base;
+        loadBasicJsonInfo(base, [](Json::Value& val, const FedInfo& fed) {
+            val["granted_time"] = static_cast<double>(fed->grantedTime());
+            val["send_time"] = static_cast<double>(fed->nextAllowedSendTime());
+        });
         if (hasTimeDependency) {
-            block["next_time"] = static_cast<double>(timeCoord->getNextTime());
+            base["next_time"] = static_cast<double>(timeCoord->getNextTime());
         }
-        for (auto fed : loopFederates) {
-            Json::Value fedBlock;
-            fedBlock["name"] = fed->getIdentifier();
-            fedBlock["id"] = fed->global_id.load().baseValue();
-            fedBlock["granted_time"] = static_cast<double>(fed->grantedTime());
-            fedBlock["send_time"] = static_cast<double>(fed->nextAllowedSendTime());
-            block["federates"].append(fedBlock);
-        }
-        return generateJsonString(block);
+        return generateJsonString(base);
     }
     if (queryStr == "dependencies") {
         Json::Value base;
-        base["name"] = getIdentifier();
-        base["id"] = global_broker_id_local.baseValue();
-        base["parent"] = higher_broker_id.baseValue();
+        loadBasicJsonInfo(base, nullptr);
         base["dependents"] = Json::arrayValue;
         for (auto& dep : timeCoord->getDependents()) {
             base["dependents"].append(dep.baseValue());
@@ -2164,50 +2169,51 @@ std::string CommonCore::coreQuery(const std::string& queryStr) const
         return generateJsonString(base);
     }
     if (queryStr == "federate_map") {
-        Json::Value block;
-        block["name"] = getIdentifier();
-        block["id"] = global_broker_id_local.baseValue();
-        block["parent"] = higher_broker_id.baseValue();
-        block["federates"] = Json::arrayValue;
-        for (auto fed : loopFederates) {
-            Json::Value fedBlock;
-            fedBlock["name"] = fed->getIdentifier();
-            fedBlock["id"] = fed->global_id.load().baseValue();
-            fedBlock["parent"] = global_broker_id_local.baseValue();
-            block["federates"].append(fedBlock);
-        }
-        return generateJsonString(block);
+        Json::Value base;
+        loadBasicJsonInfo(base, [](Json::Value&, const FedInfo&) {});
+        return generateJsonString(base);
     }
     if (queryStr == "dependency_graph") {
-        Json::Value block;
-        block["name"] = getIdentifier();
-        block["id"] = global_broker_id_local.baseValue();
-        block["parent"] = higher_broker_id.baseValue();
-        block["federates"] = Json::arrayValue;
-        block["dependents"] = Json::arrayValue;
-        for (auto& dep : timeCoord->getDependents()) {
-            block["dependents"].append(dep.baseValue());
-        }
-        block["dependencies"] = Json::arrayValue;
-        for (auto& dep : timeCoord->getDependencies()) {
-            block["dependencies"].append(dep.baseValue());
-        }
-        for (auto fed : loopFederates) {
-            Json::Value fedBlock;
-            fedBlock["name"] = fed->getIdentifier();
-            fedBlock["id"] = fed->global_id.load().baseValue();
-            fedBlock["parent"] = global_broker_id_local.baseValue();
-            fedBlock["dependencies"] = Json::arrayValue;
+        Json::Value base;
+        loadBasicJsonInfo(base, [](Json::Value& val, const FedInfo& fed) {
+            val["dependencies"] = Json::arrayValue;
             for (auto& dep : fed->getDependencies()) {
-                fedBlock["dependencies"].append(dep.baseValue());
+                val["dependencies"].append(dep.baseValue());
             }
-            fedBlock["dependents"] = Json::arrayValue;
+            val["dependents"] = Json::arrayValue;
             for (auto& dep : fed->getDependents()) {
-                fedBlock["dependents"].append(dep.baseValue());
+                val["dependents"].append(dep.baseValue());
             }
-            block["federates"].append(fedBlock);
+        });
+        if (hasTimeDependency) {
+            base["dependents"] = Json::arrayValue;
+            for (auto& dep : timeCoord->getDependents()) {
+                base["dependents"].append(dep.baseValue());
+            }
+            base["dependencies"] = Json::arrayValue;
+            for (auto& dep : timeCoord->getDependencies()) {
+                base["dependencies"].append(dep.baseValue());
+            }
         }
-        return generateJsonString(block);
+        return generateJsonString(base);
+    }
+    if (queryStr == "data_flow_graph") {
+        Json::Value base;
+        loadBasicJsonInfo(base, nullptr);
+        base["filters"] = Json::arrayValue;
+        for (auto &filt : filters)
+        {
+            Json::Value filter;
+            filter["id"] = filt->handle.baseValue();
+            filter["name"] = filt->key;
+            filter["cloning"] = filt->cloning;
+            filter["source_targets"] = generateStringVector(filt->sourceTargets, [](auto& dep) {
+                return std::to_string(dep.fed_id.baseValue())+"::"+ std::to_string(dep.handle.baseValue()); });
+            filter["dest_targets"] = generateStringVector(filt->destTargets, [](auto& dep) {
+                return std::to_string(dep.fed_id.baseValue()) + "::" + std::to_string(dep.handle.baseValue()); });
+            base["filters"].append(std::move(filter));
+        }
+        return generateJsonString(base);
     }
     return "#invalid";
 }
@@ -2410,6 +2416,7 @@ void CommonCore::processPriorityCommand(ActionMessage&& command)
             addRoute(route_id(command.getExtraData()), command.payload);
             break;
         case CMD_PRIORITY_DISCONNECT:
+            checkAndProcessDisconnect();
             checkAndProcessDisconnect();
             break;
         case CMD_BROKER_QUERY:
