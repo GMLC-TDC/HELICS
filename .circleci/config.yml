@@ -154,6 +154,8 @@ workflows:
       - helicsTSan
       - helicsInstall1
       - helicsInstall2
+      - helicsTumbleweed
+      - helicsNoZmq
   nightly:
     triggers:
       - schedule:
