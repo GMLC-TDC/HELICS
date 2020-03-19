@@ -2280,10 +2280,10 @@ std::string CommonCore::query(const std::string& target, const std::string& quer
         }
     }
 
-    auto queryResult = ActiveQueries.getFuture(querycmd.messageID);
+    auto queryResult = activeQueries.getFuture(querycmd.messageID);
     addActionMessage(std::move(querycmd));
     auto ret = queryResult.get();
-    ActiveQueries.finishedWithValue(index);
+    activeQueries.finishedWithValue(index);
     return ret;
 }
 
@@ -2423,7 +2423,7 @@ void CommonCore::processPriorityCommand(ActionMessage&& command)
             if (command.dest_id == global_broker_id_local || command.dest_id == direct_core_id) {
                 std::string repStr = coreQuery(command.payload);
                 if (command.source_id == direct_core_id) {
-                    ActiveQueries.setDelayedValue(command.messageID, std::move(repStr));
+                    activeQueries.setDelayedValue(command.messageID, std::move(repStr));
                 } else {
                     ActionMessage queryResp(CMD_QUERY_REPLY);
                     queryResp.dest_id = command.source_id;
@@ -2490,7 +2490,7 @@ void CommonCore::processPriorityCommand(ActionMessage&& command)
         } break;
         case CMD_QUERY_REPLY:
             if (command.dest_id == global_broker_id_local) {
-                ActiveQueries.setDelayedValue(command.messageID, command.payload);
+                activeQueries.setDelayedValue(command.messageID, command.payload);
             }
             break;
         case CMD_PRIORITY_ACK:
@@ -2536,7 +2536,7 @@ void CommonCore::errorRespondDelayedMessages(const std::string& estring)
         if ((*msg).action() == CMD_QUERY ||
             (*msg).action() ==
                 CMD_BROKER_QUERY) { // deal with in flight queries that will block unless a response is given
-            ActiveQueries.setDelayedValue((*msg).messageID, std::string("#error:") + estring);
+            activeQueries.setDelayedValue((*msg).messageID, std::string("#error:") + estring);
         }
         // else other message which might get into here shouldn't need any action, just drop them
         msg = delayTransmitQueue.pop();
@@ -2686,7 +2686,7 @@ void CommonCore::processCommand(ActionMessage&& command)
                     transmit(parent_route_id, m);
                 }
             }
-            ActiveQueries.fulfillAllPromises("#disconnected");
+            activeQueries.fulfillAllPromises("#disconnected");
             break;
 
         case CMD_EXEC_GRANT:

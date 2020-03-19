@@ -6,6 +6,7 @@ SPDX-License-Identifier: BSD-3-Clause
 */
 #pragma once
 
+#include "../common/JsonBuilder.hpp"
 #include "../common/GuardedTypes.hpp"
 #include "ActionMessage.hpp"
 #include "BrokerBase.hpp"
@@ -387,8 +388,9 @@ class CommonCore: public Core, public BrokerBase {
         delayedTimingMessages; //!< delayedTimingMessages from ongoing Filter actions
     std::atomic<int> queryCounter{
         1}; //!< counter for queries start at 1 so the default value isn't used
-    gmlc::concurrency::DelayedObjects<std::string> ActiveQueries; //!< holder for active queries
-
+    gmlc::concurrency::DelayedObjects<std::string> activeQueries; //!< holder for active queries
+     /// holder for the query map builder information
+    std::vector < std::tuple< JsonMapBuilder, std::vector<ActionMessage>, bool>> mapBuilders;
     std::map<interface_handle, std::unique_ptr<FilterCoordinator>>
         filterCoord; //!< map of all local filters
     // The interface_handle used is here is usually referencing an endpoint
