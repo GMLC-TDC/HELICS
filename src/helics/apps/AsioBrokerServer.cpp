@@ -12,10 +12,10 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "../core/NetworkBrokerData.hpp"
 #include "../core/networkDefaults.hpp"
 #ifdef ENABLE_TCP_CORE
-#include "../core/tcp/TcpHelperClasses.h"
+#    include "../core/tcp/TcpHelperClasses.h"
 #endif
 #ifdef ENABLE_UDP_CORE
-#include <asio/ip/udp.hpp>
+#    include <asio/ip/udp.hpp>
 #endif
 
 #include <array>
@@ -194,8 +194,8 @@ namespace apps {
         }
     }
 
-#endif  // ENABLE_UDP_CORE
-    
+#endif // ENABLE_UDP_CORE
+
     static const Json::Value null;
 
     void AsioBrokerServer::startServer(const Json::Value* val)
