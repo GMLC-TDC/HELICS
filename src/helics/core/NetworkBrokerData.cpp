@@ -357,7 +357,7 @@ std::string getLocalExternalAddressV4()
 
     if (!ec) {
         asio::ip::tcp::endpoint endpoint = *it;
-        auto resolved_address = endpoint.address().to_string();
+        resolved_address = endpoint.address().to_string();
     }
 #endif
     auto interface_addresses = gmlc::netif::getInterfaceAddressesV4();
