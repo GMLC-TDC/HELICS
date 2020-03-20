@@ -8,19 +8,26 @@ SPDX-License-Identifier: BSD-3-Clause
 #pragma once
 
 #include "TypedBrokerServer.hpp"
-#include "helics/common/AsioContextManager.h"
 
-#include <mutex>
-#include <thread>
+#if defined(ENABLE_TCP_CORE) || defined(ENABLE_UDP_CORE)
+
+#    include "helics/common/AsioContextManager.h"
+
+#    include <mutex>
+#    include <thread>
 
 namespace helics {
+#    ifdef ENABLE_TCP_CORE
 namespace tcp {
     class TcpServer;
     class TcpConnection;
 } // namespace tcp
+#    endif
+#    ifdef ENABLE_UDP_CORE
 namespace udp {
     class UdpServer;
 }
+#    endif
 class Broker;
 namespace apps {
 
@@ -38,29 +45,31 @@ namespace apps {
 
       private:
         void mainLoop();
+#    ifdef ENABLE_TCP_CORE
         std::shared_ptr<tcp::TcpServer> loadTCPserver(asio::io_context& ioctx);
-        std::shared_ptr<udp::UdpServer> loadUDPserver(asio::io_context& ioctx);
-
         void loadTCPServerData(portData& pdata);
-        void loadUDPServerData(portData& pdata);
-
-        //std::string generateResponseToMessage(zmq::message_t &msg, portData &pdata, core_type ctype);
         std::size_t tcpDataReceive(
             std::shared_ptr<tcp::TcpConnection> connection,
             const char* data,
             size_t bytes_received);
+        std::shared_ptr<tcp::TcpServer> tcpserver;
+        portData tcpPortData;
+#    endif
+#    ifdef ENABLE_UDP_CORE
+        std::shared_ptr<udp::UdpServer> loadUDPserver(asio::io_context& ioctx);
+        void loadUDPServerData(portData& pdata);
+
         bool udpDataReceive(
             std::shared_ptr<udp::UdpServer> server,
             const char* data,
             size_t bytes_received);
+        std::shared_ptr<udp::UdpServer> udpserver;
+        portData udpPortData;
+#    endif
 
         std::thread mainLoopThread;
         std::mutex threadGuard;
 
-        portData tcpPortData;
-        std::shared_ptr<tcp::TcpServer> tcpserver;
-        std::shared_ptr<udp::UdpServer> udpserver;
-        portData udpPortData;
         const Json::Value* config_{nullptr};
         const std::string name_;
         bool tcp_enabled_{false};
@@ -68,3 +77,16 @@ namespace apps {
     };
 } // namespace apps
 } // namespace helics
+
+#else
+/** a virtual class to use as a base for broker servers of various types*/
+class AsioBrokerServer: public TypedBrokerServer {
+  public:
+    AsioBrokerServer() = default;
+    explicit AsioBrokerServer(std::string /*server_name*/) {}
+    /** start the server*/
+    virtual void startServer(const Json::Value* /*val*/) override {}
+    /** stop the server*/
+    virtual void stopServer() override {}
+}
+#endif

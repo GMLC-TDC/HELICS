@@ -535,6 +535,7 @@ TEST_F(query_tests, update_values_all)
     helics::cleanupHelicsLibrary();
 }
 
+#ifdef ENABLE_ZMQ_CORE
 TEST_F(query_tests, query_subscriptions)
 {
     SetupTest<helics::ValueFederate>("zmq2", 2);
@@ -602,3 +603,5 @@ TEST_F(query_tests, queries_query)
     vFed2->finalize();
     helics::cleanupHelicsLibrary();
 }
+
+#endif

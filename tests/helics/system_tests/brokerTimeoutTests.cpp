@@ -164,6 +164,7 @@ TEST(broker_timeout_tests, core_fail_error)
     Fed1->finalize();
 }
 
+#ifdef ENABLE_ZMQ_CORE
 TEST(broker_timeout_tests, maintain_connection_ci_skip)
 {
     auto brk = helics::BrokerFactory::create(helics::core_type::ZMQ, "--timeout=100ms");
@@ -189,3 +190,4 @@ TEST(broker_timeout_tests, maintain_connection_ci_skip)
     Fed1->finalize();
     brk->waitForDisconnect();
 }
+#endif

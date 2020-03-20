@@ -467,6 +467,7 @@ if(UNIX AND NOT APPLE)
     target_link_libraries(helics_base INTERFACE rt)
 endif()
 
+target_compile_definitions(helics_base INTERFACE "CLI11_HAS_FILESYSTEM=0")
 # -------------------------------------------------------------
 # add some additional libraries for MINGW and MSYS
 # -------------------------------------------------------------
