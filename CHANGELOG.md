@@ -11,6 +11,7 @@ A note on future revisions.
 Increased code coverage and additional bug fixes.
 
 ### Changed
+-   Update toml11 library to 3.3.1 with some warning fixes for C++17
 
 ### Fixed
 -   MacOS build with python 2.7 failure
@@ -54,8 +55,8 @@ Increased code coverage and additional bug fixes.  The error propagation in HELI
 -   Standalone benchmark federates for use in multinode benchmark runs
 -   A FreeBSD 12.1 CI build using Cirrus CI
 -   Sending an event from GitHub Actions release builds to trigger updating additional HELICS packages when a new release is made
--  `localError`, and `GlobalError` function calls the Federate API and in the C++ and sharedLibrary.  
--  `helics_terminate_on_error` flag to escalate what would be a local error into a global one that will halt the co-simulation.  This flag can be specified through the flag to federates or to brokers and cores through a command line option `--terminate_on_error`
+-   `localError`, and `GlobalError` function calls the Federate API and in the C++ and sharedLibrary.  
+-   `helics_terminate_on_error` flag to escalate what would be a local error into a global one that will halt the co-simulation.  This flag can be specified through the flag to federates or to brokers and cores through a command line option `--terminate_on_error`
 -   `addDependency` function was added to the C++ Federate API and shared library API, it can add a direct dependency between federates manually.  
 -   A 32-bit Windows zip install archive for releases
 -   "global_time", "current_time", and "state" queries for brokers and cores, and "current_time" query for federates.
