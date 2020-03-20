@@ -512,10 +512,11 @@ TEST_P(error_tests_type, test_duplicate_broker_name)
 
 INSTANTIATE_TEST_SUITE_P(error_tests, error_tests_type, ::testing::ValuesIn(core_types_simple));
 
-#if defined(ENABLE_ZMQ_CORE) || defined(ENABLE_UDP_CORE) || defined(ENABLE_TCP_CORE)
+#if defined(ENABLE_ZMQ_CORE) || defined(ENABLE_UDP_CORE)
 
-constexpr const char* networkCores[] = {ZMQTEST UDPTEST TCPTEST};
+constexpr const char* networkCores[] = {ZMQTEST UDPTEST};
 
+// TCP core is odd for this test and doesn't work on all platforms due to the way TCP handles ports duplication
 class network_error_tests:
     public ::testing::TestWithParam<const char*>,
     public FederateTestFixture {
