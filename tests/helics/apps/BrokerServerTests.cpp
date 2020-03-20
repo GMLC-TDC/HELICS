@@ -22,8 +22,7 @@ class BrokerServerTests: public ::testing::TestWithParam<std::pair<const char*, 
 
 TEST_P(BrokerServerTests, startup_tests)
 {
-    if (!core::isCoreTypeAvailable(GetParam().second))
-    {
+    if (!core::isCoreTypeAvailable(GetParam().second)) {
         return;
     }
     apps::BrokerServer brks(std::vector<std::string>{GetParam().first});
@@ -71,8 +70,7 @@ TEST_P(BrokerServerTests, startup_tests)
 
 TEST_P(BrokerServerTests, execution_tests)
 {
-    if (!core::isCoreTypeAvailable(GetParam().second))
-    {
+    if (!core::isCoreTypeAvailable(GetParam().second)) {
         return;
     }
     apps::BrokerServer brks(std::vector<std::string>{GetParam().first});
@@ -100,8 +98,7 @@ TEST_P(BrokerServerTests, execution_tests)
 
 TEST_P(BrokerServerTests, execution_tests_duplicate)
 {
-    if (!core::isCoreTypeAvailable(GetParam().second))
-    {
+    if (!core::isCoreTypeAvailable(GetParam().second)) {
         return;
     }
     apps::BrokerServer brks(std::vector<std::string>{GetParam().first});

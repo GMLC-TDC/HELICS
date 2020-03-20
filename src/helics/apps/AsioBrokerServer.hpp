@@ -11,23 +11,23 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #if defined(ENABLE_TCP_CORE) || defined(ENABLE_UDP_CORE)
 
-#include "helics/common/AsioContextManager.h"
+#    include "helics/common/AsioContextManager.h"
 
-#include <mutex>
-#include <thread>
+#    include <mutex>
+#    include <thread>
 
 namespace helics {
-#ifdef ENABLE_TCP_CORE
+#    ifdef ENABLE_TCP_CORE
 namespace tcp {
     class TcpServer;
     class TcpConnection;
 } // namespace tcp
-#endif
-#ifdef ENABLE_UDP_CORE
+#    endif
+#    ifdef ENABLE_UDP_CORE
 namespace udp {
     class UdpServer;
 }
-#endif
+#    endif
 class Broker;
 namespace apps {
 
@@ -45,7 +45,7 @@ namespace apps {
 
       private:
         void mainLoop();
-#ifdef ENABLE_TCP_CORE
+#    ifdef ENABLE_TCP_CORE
         std::shared_ptr<tcp::TcpServer> loadTCPserver(asio::io_context& ioctx);
         void loadTCPServerData(portData& pdata);
         std::size_t tcpDataReceive(
@@ -54,18 +54,18 @@ namespace apps {
             size_t bytes_received);
         std::shared_ptr<tcp::TcpServer> tcpserver;
         portData tcpPortData;
-#endif
-#ifdef ENABLE_UDP_CORE
+#    endif
+#    ifdef ENABLE_UDP_CORE
         std::shared_ptr<udp::UdpServer> loadUDPserver(asio::io_context& ioctx);
         void loadUDPServerData(portData& pdata);
-       
+
         bool udpDataReceive(
             std::shared_ptr<udp::UdpServer> server,
             const char* data,
             size_t bytes_received);
         std::shared_ptr<udp::UdpServer> udpserver;
         portData udpPortData;
-#endif
+#    endif
 
         std::thread mainLoopThread;
         std::mutex threadGuard;
@@ -80,8 +80,8 @@ namespace apps {
 
 #else
 /** a virtual class to use as a base for broker servers of various types*/
-class AsioBrokerServer : public TypedBrokerServer {
-public:
+class AsioBrokerServer: public TypedBrokerServer {
+  public:
     AsioBrokerServer() = default;
     explicit AsioBrokerServer(std::string /*server_name*/) {}
     /** start the server*/
