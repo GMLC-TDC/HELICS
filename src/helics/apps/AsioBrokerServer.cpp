@@ -11,13 +11,19 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "../common/JsonProcessingFunctions.hpp"
 #include "../core/NetworkBrokerData.hpp"
 #include "../core/networkDefaults.hpp"
+#ifdef ENABLE_TCP_CORE
 #include "../core/tcp/TcpHelperClasses.h"
+#endif
+#ifdef ENABLE_UDP_CORE
+#include <asio/ip/udp.hpp>
+#endif
 
 #include <array>
-#include <asio/ip/udp.hpp>
 #include <iostream>
 
 namespace helics {
+
+#ifdef ENABLE_UDP_CORE
 namespace udp {
     class UdpServer: public std::enable_shared_from_this<UdpServer> {
       public:
@@ -80,8 +86,10 @@ namespace udp {
         std::function<bool(std::shared_ptr<UdpServer>, const char*, size_t)> dataCall;
     };
 } // namespace udp
-namespace apps {
+#endif
 
+namespace apps {
+#ifdef ENABLE_TCP_CORE
     std::size_t AsioBrokerServer::tcpDataReceive(
         std::shared_ptr<tcp::TcpConnection> connection,
         const char* data,
@@ -113,6 +121,31 @@ namespace apps {
         return used_total;
     }
 
+    std::shared_ptr<tcp::TcpServer> AsioBrokerServer::loadTCPserver(asio::io_context& ioctx)
+    {
+        std::string ext_interface = "0.0.0.0";
+        int tcpport = DEFAULT_TCP_BROKER_PORT_NUMBER;
+        //std::chrono::milliseconds timeout(20000);
+        if (config_->isMember("tcp")) {
+            auto V = (*config_)["tcp"];
+            replaceIfMember(V, "interface", ext_interface);
+            replaceIfMember(V, "port", tcpport);
+        }
+        auto server = helics::tcp::TcpServer::create(
+            ioctx, ext_interface, static_cast<uint16_t>(tcpport), true, 2048);
+        return server;
+    }
+
+    void AsioBrokerServer::loadTCPServerData(portData& pdata)
+    {
+        pdata.clear();
+        for (int ii = 0; ii < 20; ++ii) {
+            pdata.emplace_back(DEFAULT_TCP_BROKER_PORT_NUMBER + 4 + ii, false, nullptr);
+        }
+    }
+#endif // ENABLE_TCP_CORE
+
+#ifdef ENABLE_UDP_CORE
     bool AsioBrokerServer::udpDataReceive(
         std::shared_ptr<udp::UdpServer> server,
         const char* data,
@@ -140,21 +173,6 @@ namespace apps {
         return true;
     }
 
-    std::shared_ptr<tcp::TcpServer> AsioBrokerServer::loadTCPserver(asio::io_context& ioctx)
-    {
-        std::string ext_interface = "0.0.0.0";
-        int tcpport = DEFAULT_TCP_BROKER_PORT_NUMBER;
-        //std::chrono::milliseconds timeout(20000);
-        if (config_->isMember("tcp")) {
-            auto V = (*config_)["tcp"];
-            replaceIfMember(V, "interface", ext_interface);
-            replaceIfMember(V, "port", tcpport);
-        }
-        auto server = helics::tcp::TcpServer::create(
-            ioctx, ext_interface, static_cast<uint16_t>(tcpport), true, 2048);
-        return server;
-    }
-
     std::shared_ptr<udp::UdpServer> AsioBrokerServer::loadUDPserver(asio::io_context& ioctx)
     {
         std::string ext_interface = "0.0.0.0";
@@ -167,13 +185,6 @@ namespace apps {
         }
         return std::make_shared<udp::UdpServer>(ioctx, ext_interface, udpport);
     }
-    void AsioBrokerServer::loadTCPServerData(portData& pdata)
-    {
-        pdata.clear();
-        for (int ii = 0; ii < 20; ++ii) {
-            pdata.emplace_back(DEFAULT_TCP_BROKER_PORT_NUMBER + 4 + ii, false, nullptr);
-        }
-    }
 
     void AsioBrokerServer::loadUDPServerData(portData& pdata)
     {
@@ -183,6 +194,8 @@ namespace apps {
         }
     }
 
+#endif  // ENABLE_UDP_CORE
+    
     static const Json::Value null;
 
     void AsioBrokerServer::startServer(const Json::Value* val)
@@ -203,12 +216,16 @@ namespace apps {
     {
         std::lock_guard<std::mutex> tlock(threadGuard);
         if (tcp_enabled_) {
+#ifdef ENABLE_TCP_CORE
             logMessage("stopping tcp broker server");
             tcpserver->close();
+#endif
         }
         if (udp_enabled_) {
+#ifdef ENABLE_UDP_CORE
             logMessage("stopping udp broker server");
             udpserver->stop_receive();
+#endif
         }
         mainLoopThread.join();
     }
@@ -216,6 +233,7 @@ namespace apps {
     void AsioBrokerServer::mainLoop()
     {
         auto ioctx = AsioContextManager::getContextPointer();
+#ifdef ENABLE_TCP_CORE
         if (tcp_enabled_) {
             tcpserver = loadTCPserver(ioctx->getBaseContext());
             tcpserver->setDataCall(
@@ -226,6 +244,8 @@ namespace apps {
             loadTCPServerData(tcpPortData);
             tcpserver->start();
         }
+#endif
+#ifdef ENABLE_UDP_CORE
         if (udp_enabled_) {
             udpserver = loadUDPserver(ioctx->getBaseContext());
             udpserver->setDataCall(
@@ -236,6 +256,7 @@ namespace apps {
             loadUDPServerData(udpPortData);
             udpserver->start_receive();
         }
+#endif
     }
 } // namespace apps
 } // namespace helics
