@@ -18,6 +18,8 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helics/core/core-exceptions.hpp"
 #include <cstdio>
 #include <future>
+#include "helics/core/BrokerFactory.hpp"
+#include "helics/core/CoreFactory.hpp"
 
 TEST(CoreAppTests, constructor1)
 {
@@ -131,7 +133,7 @@ TEST(CoreAppTests, constructor7)
     helics::CoreApp App(helics::core_type::TEST, "core7", std::vector<std::string>{"--autobroker"});
 
     EXPECT_THROW(helics::CoreApp App2("core9"), helics::ConnectionFailure);
-
+    App.forceTerminate();
 }
 
 TEST(CoreAppTests, constructor8)
@@ -167,4 +169,17 @@ TEST(CoreAppTests, constructor9)
     EXPECT_EQ(App2.getIdentifier(), "core9");
     App2.forceTerminate();
     EXPECT_FALSE(App2.isConnected());
+}
+
+TEST(CoreAppTests, null)
+{
+    helics::CoreApp app;
+    EXPECT_FALSE(app.isOpenToNewFederates());
+    EXPECT_FALSE(app.isConnected());
+    EXPECT_FALSE(app.connect());
+    EXPECT_NO_THROW(app.forceTerminate());
+    EXPECT_TRUE(app.getAddress().empty());
+    EXPECT_TRUE(app.getIdentifier().empty());
+    helics::BrokerFactory::terminateAllBrokers();
+    helics::CoreFactory::terminateAllCores();
 }

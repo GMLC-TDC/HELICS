@@ -75,6 +75,8 @@ class HELICS_CXX_EXPORT CoreApp {
     */
     CoreApp(core_type ctype, const std::string& coreName, const std::string& argString);
 
+    /** create a CoreApp from a core pointer*/
+    explicit CoreApp(std::shared_ptr<Core> cr);
     /** check if the Core is running*/
     bool isConnected() const;
 

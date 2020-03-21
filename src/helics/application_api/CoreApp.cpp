@@ -82,6 +82,14 @@ CoreApp::CoreApp(const std::string& argString)
     }
 }
 
+CoreApp::CoreApp(std::shared_ptr<Core> cr):core(std::move(cr))
+{
+    if (core)
+    {
+        name = core->getIdentifier();
+    }
+}
+
 std::unique_ptr<helicsCLI11App> CoreApp::generateParser()
 {
     auto app = std::make_unique<helicsCLI11App>("Broker application");
