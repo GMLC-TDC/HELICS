@@ -77,6 +77,10 @@ class HELICS_CXX_EXPORT CoreApp {
 
     /** check if the Core is running*/
     bool isConnected() const;
+
+    /** connect the Core to its broker*/
+    bool connect();
+
     /** check if the broker is ready to accept new federates or cores
      */
     bool isOpenToNewFederates() const;
@@ -96,12 +100,14 @@ class HELICS_CXX_EXPORT CoreApp {
     const std::string& getIdentifier() const;
     /** get the network address of the core*/
     const std::string& getAddress() const;
+
     /** make a query at the core
     @param target the target of the query "federation", "parent", "core","broker" or a specific named object
     @param queryStr the query to make
     @return a string containing the query results
     */
     std::string query(const std::string& target, const std::string& queryStr);
+
     /** set a federation global value
     @details this overwrites any previous value for this name
     globals can be queried with a target of "global" and queryStr of the value to Query
@@ -130,7 +136,8 @@ class HELICS_CXX_EXPORT CoreApp {
   private:
     void processArgs(std::unique_ptr<helicsCLI11App>& app);
     std::unique_ptr<helicsCLI11App> generateParser();
-    std::shared_ptr<Core> core; //!< the actual endpoint objects
+
+    std::shared_ptr<Core> core; //!< the actual core object
     std::string name; //!< the name of the core
 };
 
