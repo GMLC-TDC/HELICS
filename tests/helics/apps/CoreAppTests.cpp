@@ -197,6 +197,7 @@ TEST(CoreAppTests, null)
     EXPECT_NO_THROW(app.forceTerminate());
     EXPECT_TRUE(app.getAddress().empty());
     EXPECT_TRUE(app.getIdentifier().empty());
+    EXPECT_TRUE(app.waitForDisconnect());
     helics::BrokerFactory::terminateAllBrokers();
     helics::CoreFactory::terminateAllCores();
 }

@@ -9,6 +9,8 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helics/application_api/Publications.hpp"
 #include "helics/application_api/Subscriptions.hpp"
 #include "helics/application_api/ValueFederate.hpp"
+#include "helics/application_api/CoreApp.hpp"
+#include "helics/application_api/BrokerApp.hpp"
 
 #include <future>
 #include <gtest/gtest.h>
@@ -264,6 +266,39 @@ TEST_P(valuefed_all_type_tests, dual_transfer_broker_link)
 
     auto& broker = brokers[0];
     broker->dataLink("pub1", "inp1");
+    // register the publications
+    auto& pubid = vFed1->registerGlobalPublication<std::string>("pub1");
+
+    auto& inpid = vFed2->registerGlobalInput<std::string>("inp1");
+    bool res = dual_transfer_test(vFed1, vFed2, pubid, inpid);
+    EXPECT_TRUE(res);
+}
+
+
+TEST_F(valuefed_tests, dual_transfer_brokerApp_link)
+{
+    SetupTest<helics::ValueFederate>("test", 2);
+    auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
+    auto vFed2 = GetFederateAs<helics::ValueFederate>(1);
+
+    helics::BrokerApp brk(brokers[0]);
+    brk.dataLink("pub1", "inp1");
+    // register the publications
+    auto& pubid = vFed1->registerGlobalPublication<std::string>("pub1");
+
+    auto& inpid = vFed2->registerGlobalInput<std::string>("inp1");
+    bool res = dual_transfer_test(vFed1, vFed2, pubid, inpid);
+    EXPECT_TRUE(res);
+}
+
+TEST_F(valuefed_tests, dual_transfer_coreApp_link)
+{
+    SetupTest<helics::ValueFederate>("test", 2);
+    auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
+    auto vFed2 = GetFederateAs<helics::ValueFederate>(1);
+
+    helics::CoreApp cr(vFed1->getCorePointer());
+    cr.dataLink("pub1", "inp1");
     // register the publications
     auto& pubid = vFed1->registerGlobalPublication<std::string>("pub1");
 

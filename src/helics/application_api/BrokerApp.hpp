@@ -74,6 +74,9 @@ class HELICS_CXX_EXPORT BrokerApp {
     */
     BrokerApp(core_type ctype, const std::string& brokerName, const std::string& argString);
 
+    /** create a BrokerApp from a broker pointer*/
+    explicit BrokerApp(std::shared_ptr<Broker> brk);
+
     /** check if the Broker is running*/
     bool isConnected() const;
     /** connect the broker to the network*/
