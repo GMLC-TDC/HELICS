@@ -135,6 +135,8 @@ class HELICS_CXX_EXPORT CoreApp {
     /** get a copy of the core pointer*/
     std::shared_ptr<Core> getCopyofCorePointer() const { return core; }
 
+    /** reset the app to default state*/
+    void reset();
   private:
     void processArgs(std::unique_ptr<helicsCLI11App>& app);
     std::unique_ptr<helicsCLI11App> generateParser();

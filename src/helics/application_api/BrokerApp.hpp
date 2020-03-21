@@ -76,6 +76,8 @@ class HELICS_CXX_EXPORT BrokerApp {
 
     /** check if the Broker is running*/
     bool isConnected() const;
+    /** connect the broker to the network*/
+    bool connect(); 
     /** check if the broker is ready to accept new federates or cores
      */
     bool isOpenToNewFederates() const;

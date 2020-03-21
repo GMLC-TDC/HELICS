@@ -140,6 +140,11 @@ bool BrokerApp::isConnected() const
     return ((broker) && (broker->isConnected()));
 }
 
+bool BrokerApp::connect()
+{
+    return ((broker) && (broker->connect()));
+}
+
 bool BrokerApp::isOpenToNewFederates() const
 {
     return ((broker) && (broker->isOpenToNewFederates()));

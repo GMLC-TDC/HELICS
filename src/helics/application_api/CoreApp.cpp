@@ -121,8 +121,10 @@ void CoreApp::processArgs(std::unique_ptr<helicsCLI11App>& app)
         if (!name.empty()) {
             core = CoreFactory::findCore(name);
             if (core) {
+                // LCOV_EXCL_START
                 name = core->getIdentifier();
                 return;
+                // LCOV_EXCL_STOP
             }
         }
     }
@@ -236,6 +238,12 @@ void CoreApp::setReadyToInit()
     if (core) {
         core->setCoreReadyToInit();
     }
+}
+
+void CoreApp::reset()
+{
+    core.reset();
+    name.clear();
 }
 
 } // namespace helics
