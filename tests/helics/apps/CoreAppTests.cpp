@@ -310,9 +310,11 @@ TEST(CoreAppTests, readyToInit)
     c1.setReadyToInit();
 
     helics::Federate fedb("fedb", c2);
+    std::cout << "entering EXEC" << std::endl;
     fedb.enterExecutingMode();
     fedb.finalize();
     c1->disconnect();
+    b.forceTerminate();
     EXPECT_TRUE(b.waitForDisconnect(std::chrono::milliseconds(500)));
     helics::BrokerFactory::terminateAllBrokers();
     helics::CoreFactory::terminateAllCores();
