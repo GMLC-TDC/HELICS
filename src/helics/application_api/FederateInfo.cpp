@@ -443,7 +443,7 @@ static FederateInfo loadFederateInfoToml(const std::string& tomlString);
 FederateInfo loadFederateInfo(const std::string& configString)
 {
     FederateInfo ret;
-    if (hasTomlExtension(configString)) { 
+    if (hasTomlExtension(configString)) {
         ret = loadFederateInfoToml(configString);
     } else if (
         (hasJsonExtension(configString)) ||

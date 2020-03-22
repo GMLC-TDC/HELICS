@@ -137,6 +137,7 @@ class HELICS_CXX_EXPORT CoreApp {
 
     /** reset the app to default state*/
     void reset();
+
   private:
     void processArgs(std::unique_ptr<helicsCLI11App>& app);
     std::unique_ptr<helicsCLI11App> generateParser();

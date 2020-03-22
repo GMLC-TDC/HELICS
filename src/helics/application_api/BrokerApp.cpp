@@ -91,7 +91,8 @@ BrokerApp::BrokerApp(const std::string& argString)
     }
 }
 
-BrokerApp::BrokerApp(std::shared_ptr<Broker> brk) :broker(std::move(brk)) {
+BrokerApp::BrokerApp(std::shared_ptr<Broker> brk): broker(std::move(brk))
+{
     if (broker) {
         name = broker->getIdentifier();
     }

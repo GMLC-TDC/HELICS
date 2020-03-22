@@ -82,10 +82,9 @@ CoreApp::CoreApp(const std::string& argString)
     }
 }
 
-CoreApp::CoreApp(std::shared_ptr<Core> cr):core(std::move(cr))
+CoreApp::CoreApp(std::shared_ptr<Core> cr): core(std::move(cr))
 {
-    if (core)
-    {
+    if (core) {
         name = core->getIdentifier();
     }
 }
@@ -114,8 +113,7 @@ void CoreApp::processArgs(std::unique_ptr<helicsCLI11App>& app)
         core = CoreFactory::create(app->getCoreType(), name, remArgs);
     }
     catch (...) {
-        if (!remArgs.empty())
-        {
+        if (!remArgs.empty()) {
             name = remArgs.front();
         }
         if (!name.empty()) {

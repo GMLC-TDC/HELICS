@@ -5,13 +5,13 @@ the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 
+#include "helics/application_api/BrokerApp.hpp"
+#include "helics/application_api/CoreApp.hpp"
 #include "helics/application_api/Endpoints.hpp"
 #include "helics/application_api/Federate.hpp"
 #include "helics/application_api/Filters.hpp"
 #include "helics/application_api/MessageFederate.hpp"
 #include "helics/application_api/MessageOperators.hpp"
-#include "helics/application_api/CoreApp.hpp"
-#include "helics/application_api/BrokerApp.hpp"
 
 #ifndef HELICS_SHARED_LIBRARY
 #    include "helics/core/Broker.hpp"
@@ -34,7 +34,7 @@ class filter_all_type_test:
     public FederateTestFixture {
 };
 
-class filter_tests : public ::testing::Test, public FederateTestFixture {
+class filter_tests: public ::testing::Test, public FederateTestFixture {
 };
 
 /** test registration of filters*/
