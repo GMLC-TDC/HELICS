@@ -310,7 +310,6 @@ TEST(CoreAppTests, readyToInit)
     c1.setReadyToInit();
 
     helics::Federate fedb("fedb", c2);
-    std::cout << "entering EXEC" << std::endl;
     fedb.enterExecutingMode();
     fedb.finalize();
     c1->disconnect();

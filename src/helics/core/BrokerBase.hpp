@@ -36,7 +36,7 @@ class BrokerBase {
     std::atomic<int32_t> maxLogLevel{1}; //!< the logging level to use levels >=this will be ignored
     int32_t consoleLogLevel{1}; //!< the logging level for console display
     int32_t fileLogLevel{1}; //!< the logging level for logging to a file
-    int32_t minFederateCount{0}; //!< the minimum number of federates that must connect before entering init mode
+    int32_t minFederateCount{1}; //!< the minimum number of federates that must connect before entering init mode
     int32_t minBrokerCount{0}; //!< the minimum number of brokers that must connect before entering init mode
     int32_t maxIterationCount{10000}; //!< the maximum number of iterative loops that are allowed
     Time tickTimer{5.0}; //!< the length of each heartbeat tick
