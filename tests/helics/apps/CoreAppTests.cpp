@@ -14,13 +14,12 @@ SPDX-License-Identifier: BSD-3-Clause
 #    include "helics/external/filesystem.hpp"
 #endif
 
-#include "helics/application_api/CoreApp.hpp"
 #include "helics/application_api/BrokerApp.hpp"
+#include "helics/application_api/CoreApp.hpp"
 #include "helics/application_api/Federate.hpp"
 #include "helics/core/BrokerFactory.hpp"
 #include "helics/core/CoreFactory.hpp"
 #include "helics/core/core-exceptions.hpp"
-#include "helics/application_api/Federate.hpp"
 
 #include <cstdio>
 #include <future>
@@ -71,13 +70,12 @@ TEST(CoreAppTests, constructor3)
 
 TEST(CoreAppTests, constructor4)
 {
-    constexpr char* name = "constructor4";
-    std::vector<std::string> args{"--autobroker", "--name", "core4"};
+    std::vector<std::string> args{"constructor4", "--autobroker", "--name", "core4"};
     char* argv[4];
-    argv[0] = name;
-    argv[1] = &(args[0][0]);
-    argv[2] = &(args[1][0]);
-    argv[3] = &(args[2][0]);
+    argv[0] = &(args[0][0]);
+    argv[1] = &(args[1][0]);
+    argv[2] = &(args[2][0]);
+    argv[3] = &(args[3][0]);
 
     helics::CoreApp App(helics::core_type::TEST, 4, argv);
 
@@ -93,15 +91,15 @@ TEST(CoreAppTests, constructor4)
 
 TEST(CoreAppTests, constructor5)
 {
-    constexpr char* name = "constructor4";
-    std::vector<std::string> args{"--autobroker", "--name", "core5", "--type", "test"};
+    std::vector<std::string> args{
+        "constructor4", "--autobroker", "--name", "core5", "--type", "test"};
     char* argv[6];
-    argv[0] = name;
-    argv[1] = &(args[0][0]);
-    argv[2] = &(args[1][0]);
-    argv[3] = &(args[2][0]);
-    argv[4] = &(args[3][0]);
-    argv[5] = &(args[4][0]);
+    argv[0] = &(args[0][0]);
+    argv[1] = &(args[1][0]);
+    argv[2] = &(args[2][0]);
+    argv[3] = &(args[3][0]);
+    argv[4] = &(args[4][0]);
+    argv[5] = &(args[5][0]);
 
     helics::CoreApp App(6, argv);
 
@@ -247,7 +245,6 @@ TEST(CoreAppTests, file_logging_p2)
     EXPECT_TRUE(res);
 }
 
-
 TEST(CoreAppTests, core_global_file_ci_skip)
 {
     helics::BrokerFactory::terminateAllBrokers();
@@ -289,7 +286,6 @@ TEST(CoreAppTests, core_global_file_ci_skip)
     str1 = brk.query("global", "global2");
     EXPECT_EQ(str1, "this is another global value");
 
-
     auto str3 = Fed1->query("global", "all");
     EXPECT_NE(str3, "#invalid");
     Fed1->finalize();
@@ -297,7 +293,6 @@ TEST(CoreAppTests, core_global_file_ci_skip)
     app.reset();
     brk.waitForDisconnect();
 }
-
 
 TEST(CoreAppTests, readyToInit)
 {
