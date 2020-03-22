@@ -252,7 +252,7 @@ TEST(CoreAppTests, core_global_file_ci_skip)
     helics::BrokerFactory::terminateAllBrokers();
     helics::BrokerApp brk(helics::core_type::TEST, "be1", "-f2");
     brk.connect();
-
+    brk.setGlobal("GlobalB", "excited");
     helics::FederateInfo fi(helics::core_type::TEST);
     fi.coreName = "core_globale3";
     fi.coreInitString = "-f 1";
@@ -264,6 +264,7 @@ TEST(CoreAppTests, core_global_file_ci_skip)
     helics::CoreApp app(Fed1->getCorePointer());
     auto testFile = std::string(GLOBAL_TEST_DIR) + "example_globals1.json";
     app.makeConnections(testFile);
+    app.setGlobal("GlobalC", "excited_too");
     Fed1->enterInitializingModeAsync();
     Fed2->enterInitializingMode();
 
@@ -273,10 +274,10 @@ TEST(CoreAppTests, core_global_file_ci_skip)
     EXPECT_EQ(str1, "this is a global1 value");
     str1 = Fed2->query("global", "global1");
     EXPECT_EQ(str1, "this is a global1 value");
-    str1 = app.query("global", "global1");
-    EXPECT_EQ(str1, "this is a global1 value");
-    str1 = brk.query("global", "global1");
-    EXPECT_EQ(str1, "this is a global1 value");
+    str1 = app.query("global", "GlobalB");
+    EXPECT_EQ(str1, "excited");
+    str1 = brk.query("global", "GlobalC");
+    EXPECT_EQ(str1, "excited_too");
 
     str1 = Fed1->query("global", "global2");
     EXPECT_EQ(str1, "this is another global value");
@@ -287,8 +288,6 @@ TEST(CoreAppTests, core_global_file_ci_skip)
     str1 = brk.query("global", "global2");
     EXPECT_EQ(str1, "this is another global value");
 
-    auto str2 = Fed1->query("global", "list");
-    EXPECT_TRUE((str2 == "[global1;global2]") || (str2 == "[global2;global1]"));
 
     auto str3 = Fed1->query("global", "all");
     EXPECT_NE(str3, "#invalid");
