@@ -20,6 +20,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helics/core/BrokerFactory.hpp"
 #include "helics/core/CoreFactory.hpp"
 #include "helics/core/core-exceptions.hpp"
+#include "helics/application_api/Federate.hpp"
 
 #include <cstdio>
 #include <future>
@@ -295,4 +296,24 @@ TEST(CoreAppTests, core_global_file_ci_skip)
     Fed2->finalize();
     app.reset();
     brk.waitForDisconnect();
+}
+
+
+TEST(CoreAppTests, readyToInit)
+{
+    helics::BrokerApp b(helics::core_type::TEST, "brkt1", "-f1");
+    EXPECT_TRUE(b.connect());
+    helics::CoreApp c1(helics::core_type::TEST, "--broker=brkt1 --name=core1b");
+    helics::CoreApp c2(helics::core_type::TEST, "--broker=brkt1 --name=core2b");
+    EXPECT_TRUE(c1.connect());
+    EXPECT_TRUE(c2.connect());
+    c1.setReadyToInit();
+
+    helics::Federate fedb("fedb", c2);
+    fedb.enterExecutingMode();
+    fedb.finalize();
+    c1->disconnect();
+    EXPECT_TRUE(b.waitForDisconnect(std::chrono::milliseconds(500)));
+    helics::BrokerFactory::terminateAllBrokers();
+    helics::CoreFactory::terminateAllCores();
 }
