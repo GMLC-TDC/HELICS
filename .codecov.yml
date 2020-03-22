@@ -7,9 +7,6 @@ coverage:
   precision: 2
   round: down
   range: "50...95"
-  tests:
-    target: 100%
-    paths: "src/helics/shared_api_library/"
   status:
     project: yes
     patch: yes
@@ -37,4 +34,4 @@ ignore:
   - "**/logger.*"
   - "**/loggerCore.*"
   - "**/zmqHelper.*"
-  - "**/internal/api_objects.h"
+  - "src/helics/shared_api_library/internal/api_objects.h"

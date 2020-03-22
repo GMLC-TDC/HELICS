@@ -91,6 +91,13 @@ BrokerApp::BrokerApp(const std::string& argString)
     }
 }
 
+BrokerApp::BrokerApp(std::shared_ptr<Broker> brk): broker(std::move(brk))
+{
+    if (broker) {
+        name = broker->getIdentifier();
+    }
+}
+
 bool BrokerApp::waitForDisconnect(std::chrono::milliseconds waitTime)
 {
     if (broker) {
@@ -138,6 +145,11 @@ void BrokerApp::processArgs(std::unique_ptr<helicsCLI11App>& app)
 bool BrokerApp::isConnected() const
 {
     return ((broker) && (broker->isConnected()));
+}
+
+bool BrokerApp::connect()
+{
+    return ((broker) && (broker->connect()));
 }
 
 bool BrokerApp::isOpenToNewFederates() const

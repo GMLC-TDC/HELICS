@@ -84,14 +84,17 @@ class HELICS_CXX_EXPORT Federate {
     @param core a shared pointer to a core object, the pointer will be copied
     @param fi  a federate information structure
     */
-    Federate(const std::string& fedname, const std::shared_ptr<Core>& core, const FederateInfo& fi);
+    Federate(
+        const std::string& fedname,
+        const std::shared_ptr<Core>& core,
+        const FederateInfo& fi = FederateInfo{});
 
     /**constructor taking a CoreApp and a federate information structure
     @param fedname the name of the federate can be empty to use a name from the federateInfo
     @param core a CoreApp with the core core connect to.
     @param fi  a federate information structure
     */
-    Federate(const std::string& fedname, CoreApp& core, const FederateInfo& fi);
+    Federate(const std::string& fedname, CoreApp& core, const FederateInfo& fi = FederateInfo{});
     /**constructor taking a file with the required information
     @param configString can be either a JSON file or a string containing JSON code or a TOML file
     */

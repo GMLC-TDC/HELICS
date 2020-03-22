@@ -3634,8 +3634,8 @@ void CommonCore::processCoreConfigureCommands(ActionMessage& cmd)
 {
     switch (cmd.messageID) {
         case defs::flags::enable_init_entry:
-            if (delayInitCounter <= 1) {
-                delayInitCounter = 0;
+            --delayInitCounter;
+            if (delayInitCounter <= 0) {
                 if (allInitReady()) {
                     broker_state_t exp = broker_state_t::connected;
                     if (brokerState.compare_exchange_strong(
@@ -3647,8 +3647,6 @@ void CommonCore::processCoreConfigureCommands(ActionMessage& cmd)
                         transmit(parent_route_id, cmd);
                     }
                 }
-            } else {
-                --delayInitCounter;
             }
             break;
         case defs::properties::log_level:

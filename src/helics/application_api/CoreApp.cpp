@@ -82,6 +82,13 @@ CoreApp::CoreApp(const std::string& argString)
     }
 }
 
+CoreApp::CoreApp(std::shared_ptr<Core> cr): core(std::move(cr))
+{
+    if (core) {
+        name = core->getIdentifier();
+    }
+}
+
 std::unique_ptr<helicsCLI11App> CoreApp::generateParser()
 {
     auto app = std::make_unique<helicsCLI11App>("Broker application");
@@ -94,7 +101,7 @@ std::unique_ptr<helicsCLI11App> CoreApp::generateParser()
     app->footer([app_p]() {
         auto coreType = helics::core::coreTypeFromString((*app_p)["--core"]->as<std::string>());
         CoreFactory::displayHelp(coreType);
-        return std::string();
+        return std::string{};
     });
     return app;
 }
@@ -105,12 +112,17 @@ void CoreApp::processArgs(std::unique_ptr<helicsCLI11App>& app)
     try {
         core = CoreFactory::create(app->getCoreType(), name, remArgs);
     }
-    catch (const helics::RegistrationFailure&) {
+    catch (...) {
+        if (!remArgs.empty()) {
+            name = remArgs.front();
+        }
         if (!name.empty()) {
             core = CoreFactory::findCore(name);
             if (core) {
+                // LCOV_EXCL_START
                 name = core->getIdentifier();
                 return;
+                // LCOV_EXCL_STOP
             }
         }
     }
@@ -122,6 +134,11 @@ void CoreApp::processArgs(std::unique_ptr<helicsCLI11App>& app)
 bool CoreApp::isConnected() const
 {
     return ((core) && (core->isConnected()));
+}
+
+bool CoreApp::connect()
+{
+    return (core) ? core->connect() : false;
 }
 
 bool CoreApp::isOpenToNewFederates() const
@@ -219,6 +236,12 @@ void CoreApp::setReadyToInit()
     if (core) {
         core->setCoreReadyToInit();
     }
+}
+
+void CoreApp::reset()
+{
+    core.reset();
+    name.clear();
 }
 
 } // namespace helics
