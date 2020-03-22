@@ -303,7 +303,7 @@ TEST(CoreAppTests, readyToInit)
 {
     helics::BrokerApp b(helics::core_type::TEST, "brkt1", "-f1");
     EXPECT_TRUE(b.connect());
-    helics::CoreApp c1(helics::core_type::TEST, "--broker=brkt1 --name=core1b");
+    helics::CoreApp c1(helics::core_type::TEST, "--broker=brkt1 --name=core1b -f0");
     helics::CoreApp c2(helics::core_type::TEST, "--broker=brkt1 --name=core2b");
     EXPECT_TRUE(c1.connect());
     EXPECT_TRUE(c2.connect());

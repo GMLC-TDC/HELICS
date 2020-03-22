@@ -422,7 +422,7 @@ bool CommonCore::allInitReady() const
         return false;
     }
     // the federate count must be greater than the min size
-    if (static_cast<decltype(minFederateCount)>(loopFederates.size()) < minFederateCount+delayInitCounter) {
+    if (static_cast<decltype(minFederateCount)>(loopFederates.size()) < minFederateCount) {
         return false;
     }
     // all federates must be requesting init
