@@ -6,11 +6,11 @@ SPDX-License-Identifier: BSD-3-Clause
 */
 
 #include "ValueFederateTestTemplates.hpp"
+#include "helics/application_api/BrokerApp.hpp"
+#include "helics/application_api/CoreApp.hpp"
 #include "helics/application_api/Publications.hpp"
 #include "helics/application_api/Subscriptions.hpp"
 #include "helics/application_api/ValueFederate.hpp"
-#include "helics/application_api/CoreApp.hpp"
-#include "helics/application_api/BrokerApp.hpp"
 
 #include <future>
 #include <gtest/gtest.h>
@@ -273,7 +273,6 @@ TEST_P(valuefed_all_type_tests, dual_transfer_broker_link)
     bool res = dual_transfer_test(vFed1, vFed2, pubid, inpid);
     EXPECT_TRUE(res);
 }
-
 
 TEST_F(valuefed_tests, dual_transfer_brokerApp_link)
 {
