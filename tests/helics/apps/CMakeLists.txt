@@ -22,6 +22,7 @@ set(
     CloneTests.cpp
     BrokerServerTests.cpp
     CoreAppTests.cpp
+    BrokerAppTests.cpp
     exeTestHelper.h
 )
 
