@@ -51,6 +51,7 @@ TEST(other_tests, broker_global_value)
     helicsBrokerDisconnect(brk, &err);
     helicsQueryFree(q);
     EXPECT_EQ(helicsBrokerIsConnected(brk), helics_false);
+    helicsBrokerFree(brk);
 }
 
 // test global value creation from a core and its error pathways
@@ -77,22 +78,18 @@ TEST(other_tests, core_global_value)
     q = helicsCreateQuery("global", "testglobal2");
     res = helicsQueryCoreExecute(q, cr, &err);
     EXPECT_EQ(res, globalVal2);
-
     res = helicsQueryCoreExecute(nullptr, cr, &err);
     EXPECT_NE(err.error_code, 0);
     helicsErrorClear(&err);
     EXPECT_STREQ("#invalid", res);
-
     res = helicsQueryCoreExecute(q, nullptr, &err);
     EXPECT_NE(err.error_code, 0);
     helicsErrorClear(&err);
     EXPECT_STREQ("#invalid", res);
-
     res = helicsQueryCoreExecute(nullptr, nullptr, &err);
     EXPECT_NE(err.error_code, 0);
     helicsErrorClear(&err);
     EXPECT_STREQ("#invalid", res);
-
     helicsCoreSetGlobal(cr, nullptr, "v2", &err);
     EXPECT_NE(err.error_code, 0);
     helicsErrorClear(&err);

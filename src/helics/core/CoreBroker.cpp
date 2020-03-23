@@ -2752,14 +2752,14 @@ void CoreBroker::processLocalQuery(const ActionMessage& m)
     }
 }
 
-void CoreBroker::processQuery(const ActionMessage& m)
+void CoreBroker::processQuery(ActionMessage& m)
 {
     auto& target = m.getString(targetStringLoc);
     if ((target == getIdentifier()) || (target == "broker")) {
         processLocalQuery(m);
     } else if ((isRootc) && ((target == "root") || (target == "federation"))) {
         processLocalQuery(m);
-    } else if (target == "gid_to_name") {
+    } else if ((isRootc) && (target == "gid_to_name")) {
         ActionMessage queryResp(CMD_QUERY_REPLY);
         queryResp.dest_id = m.source_id;
         queryResp.source_id = global_broker_id_local;
@@ -2770,7 +2770,7 @@ void CoreBroker::processQuery(const ActionMessage& m)
         } else {
             transmit(getRoute(queryResp.dest_id), queryResp);
         }
-    } else if (target == "global") {
+    } else if ((isRootc) && (target == "global")) {
         ActionMessage queryResp(CMD_QUERY_REPLY);
         queryResp.dest_id = m.source_id;
         queryResp.source_id = global_broker_id_local;
@@ -2802,6 +2802,7 @@ void CoreBroker::processQuery(const ActionMessage& m)
         auto fed = _federates.find(target);
         if (fed != _federates.end()) {
             route = fed->route;
+            m.dest_id = fed->parent;
         } else {
             auto broker = _brokers.find(target);
             if (broker != _brokers.end()) {

@@ -346,22 +346,27 @@ auto matchcount(InputIt1 first1, InputIt1 last1, InputIt2 first2, InputIt2 last2
 
 std::string getLocalExternalAddressV4()
 {
+    std::string resolved_address;
 #ifndef HELICS_DISABLE_ASIO
     auto srv = AsioContextManager::getContextPointer();
 
     asio::ip::tcp::resolver resolver(srv->getBaseContext());
     asio::ip::tcp::resolver::query query(asio::ip::tcp::v4(), asio::ip::host_name(), "");
-    asio::ip::tcp::resolver::iterator it = resolver.resolve(query);
-    asio::ip::tcp::endpoint endpoint = *it;
+    std::error_code ec;
+    asio::ip::tcp::resolver::iterator it = resolver.resolve(query, ec);
 
-    auto resolved_address = endpoint.address().to_string();
-#else
-    std::string resolved_address;
+    if (!ec) {
+        asio::ip::tcp::endpoint endpoint = *it;
+        resolved_address = endpoint.address().to_string();
+    }
 #endif
     auto interface_addresses = gmlc::netif::getInterfaceAddressesV4();
 
     // Return the resolved address if no interface addresses were found
     if (interface_addresses.empty()) {
+        if (resolved_address.empty()) {
+            return "0.0.0.0";
+        }
         return resolved_address;
     }
 
@@ -421,7 +426,10 @@ std::string getLocalExternalAddressV4(const std::string& server)
     std::vector<std::string> resolved_addresses;
 #ifndef HELICS_DISABLE_ASIO
     asio::ip::tcp::resolver::query query(asio::ip::tcp::v4(), asio::ip::host_name(), "");
-    asio::ip::tcp::resolver::iterator it = resolver.resolve(query);
+    asio::ip::tcp::resolver::iterator it = resolver.resolve(query, ec);
+    if (ec) {
+        return getLocalExternalAddressV4();
+    }
     // asio::ip::tcp::endpoint endpoint = *it;
 
     while (it != end) {

@@ -298,7 +298,7 @@ class CommonCore: public Core, public BrokerBase {
     std::map<global_federate_id, route_id>
         routing_table; //!< map for external routes  <global federate id, route id>
     gmlc::containers::SimpleQueue<ActionMessage>
-        delayTransmitQueue; //!< FIFO queue for transmissions to the root that need to be delays for a certain time
+        delayTransmitQueue; //!< FIFO queue for transmissions to the root that need to be delayed for a certain time
     std::unordered_map<std::string, route_id>
         knownExternalEndpoints; //!< external map for all known external endpoints with names and route
 

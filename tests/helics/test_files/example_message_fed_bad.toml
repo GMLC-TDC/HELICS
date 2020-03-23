@@ -2,8 +2,8 @@
 
 name="mFed_toml" # the name of the federate
 
-coretype="test" #the type of the core "test","zmq","udp","icp","tcp","mpi"
-corename="toml_testm_bad"  #this matters most for icp and test cores, can be empty
+coretype="test" #the type of the core "test","zmq","udp","ipc","tcp","mpi"
+corename="toml_testm_bad"  #this matters most for ipc and test cores, can be empty
 coreinit="--autobroker" # the initialization string for the core in the form of a command line arguments
 period=  1.0 #the period with which federate may return time
 
