@@ -2412,12 +2412,11 @@ void CommonCore::processPriorityCommand(ActionMessage&& command)
                     timeoutMon->disableParentPing();
                 }
                 timeoutMon->reset();
-                if (delayInitCounter < 0 && minFederateCount==0)
-                {
+                if (delayInitCounter < 0 && minFederateCount == 0) {
                     if (allInitReady()) {
-
                         broker_state_t exp = broker_state_t::connected;
-                        if (brokerState.compare_exchange_strong(exp, broker_state_t::initializing)) {
+                        if (brokerState.compare_exchange_strong(
+                                exp, broker_state_t::initializing)) {
                             // make sure we only do this once
                             ActionMessage init(CMD_INIT);
                             checkDependencies();
