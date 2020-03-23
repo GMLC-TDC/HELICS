@@ -38,8 +38,7 @@ TEST(BrokerAppTests, constructor1)
 
 TEST(BrokerAppTests, constructor2)
 {
-    helics::BrokerApp App(
-        helics::core_type::TEST, std::vector<std::string>{ "brk2", "--name"});
+    helics::BrokerApp App(helics::core_type::TEST, std::vector<std::string>{"brk2", "--name"});
 
     EXPECT_TRUE(App.connect());
     EXPECT_TRUE(App.isConnected());
@@ -51,8 +50,7 @@ TEST(BrokerAppTests, constructor2)
 
 TEST(BrokerAppTests, constructor3)
 {
-    helics::BrokerApp App(
-        std::vector<std::string>{ "brk3", "--name", "test", "--type"});
+    helics::BrokerApp App(std::vector<std::string>{"brk3", "--name", "test", "--type"});
 
     EXPECT_TRUE(App.connect());
     EXPECT_TRUE(App.isConnected());
@@ -64,7 +62,7 @@ TEST(BrokerAppTests, constructor3)
 
 TEST(BrokerAppTests, constructor4)
 {
-    std::vector<std::string> args{"constructor4",  "--name", "brk4"};
+    std::vector<std::string> args{"constructor4", "--name", "brk4"};
     char* argv[3];
     argv[0] = &(args[0][0]);
     argv[1] = &(args[1][0]);
@@ -82,8 +80,7 @@ TEST(BrokerAppTests, constructor4)
 
 TEST(BrokerAppTests, constructor5)
 {
-    std::vector<std::string> args{
-        "constructor4", "--name", "brk5", "--type", "test"};
+    std::vector<std::string> args{"constructor4", "--name", "brk5", "--type", "test"};
     char* argv[5];
     argv[0] = &(args[0][0]);
     argv[1] = &(args[1][0]);
@@ -146,8 +143,7 @@ TEST(BrokerAppTests, constructor9)
 
 TEST(BrokerAppTests, constructor10)
 {
-    helics::BrokerApp App(
-        helics::core_type::TEST, "brk10", std::vector<std::string>{});
+    helics::BrokerApp App(helics::core_type::TEST, "brk10", std::vector<std::string>{});
 
     helics::BrokerApp App2(App.getCopyofBrokerPointer());
     EXPECT_TRUE(App2.isConnected());
@@ -155,6 +151,27 @@ TEST(BrokerAppTests, constructor10)
     EXPECT_EQ(App2.getCopyofBrokerPointer().get(), App.getCopyofBrokerPointer().get());
     App2.forceTerminate();
     EXPECT_FALSE(App.isConnected());
+}
+
+TEST(BrokerAppTests, constructor11)
+{
+    helics::BrokerApp App(helics::core_type::TEST, "brk11", std::vector<std::string>{});
+
+    helics::BrokerApp App2(helics::core_type::TEST, "brk11", std::vector<std::string>{});
+
+    EXPECT_TRUE(App2.isConnected());
+    // App2 should point to the same core
+    EXPECT_EQ(App2.getCopyofBrokerPointer().get(), App.getCopyofBrokerPointer().get());
+    App2.forceTerminate();
+    EXPECT_FALSE(App.isConnected());
+}
+
+TEST(BrokerAppTests, constructor12)
+{
+    EXPECT_THROW(helics::BrokerApp(helics::core_type::NULLCORE, "brk12", std::vector<std::string>{}), helics::HelicsException);
+#ifdef ENABLE_ZMQ_CORE
+    EXPECT_THROW(helics::BrokerApp(helics::core_type::ZMQ, "brk12", std::vector<std::string>{"10.7.5.5","--interface"}), helics::ConnectionFailure);
+#endif
 }
 
 TEST(BrokerAppTests, null)
