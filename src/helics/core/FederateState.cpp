@@ -6,6 +6,7 @@ SPDX-License-Identifier: BSD-3-Clause
 */
 #include "FederateState.hpp"
 
+#include "../common/JsonProcessingFunctions.hpp"
 #include "CommonCore.hpp"
 #include "CoreFederateInfo.hpp"
 #include "EndpointInfo.hpp"
@@ -1679,6 +1680,13 @@ std::string FederateState::processQueryActual(const std::string& query) const
         return generateStringVector(timeCoord->getDependents(), [](auto& dep) {
             return std::to_string(dep.baseValue());
         });
+    }
+    if (query == "data_flow_graph") {
+        Json::Value base;
+        base["name"] = getIdentifier();
+        base["id"] = global_id.load().baseValue();
+        interfaceInformation.GenerateDataFlowGraph(base);
+        return generateJsonString(base);
     }
     if (queryCallback) {
         return queryCallback(query);
