@@ -2415,12 +2415,15 @@ void CommonCore::processPriorityCommand(ActionMessage&& command)
                 if (delayInitCounter < 0 && minFederateCount==0)
                 {
                     if (allInitReady()) {
+
                         broker_state_t exp = broker_state_t::connected;
-                        if (brokerState.compare_exchange_strong(
-                            exp, broker_state_t::initializing)) { // make sure we only do this once
+                        if (brokerState.compare_exchange_strong(exp, broker_state_t::initializing)) {
+                            // make sure we only do this once
+                            ActionMessage init(CMD_INIT);
                             checkDependencies();
-                            command.source_id = global_broker_id_local;
-                            transmit(parent_route_id, command);
+                            init.source_id = global_broker_id_local;
+                            init.dest_id = parent_broker_id;
+                            transmit(parent_route_id, init);
                         }
                     }
                 }
