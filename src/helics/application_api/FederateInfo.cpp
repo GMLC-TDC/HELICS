@@ -211,10 +211,23 @@ static void loadFlags(FederateInfo& fi, const std::string& flags)
             fi.autobroker = true;
             continue;
         }
+        if (flg.empty())
+        {
+            continue;
+        }
         auto loc = validFlagOptions.find(flg);
         if (loc != validFlagOptions.end()) {
             fi.setFlagOption(propStringsTranslations.at(flg), true);
-        } else {
+        }
+        else {
+            if (flg.front() == '-')
+            {
+                loc = validFlagOptions.find(flg.substr(1));
+                if (loc != validFlagOptions.end()) {
+                    fi.setFlagOption(propStringsTranslations.at(flg.substr(1)), false);
+                }
+                continue;
+            }
             try {
                 auto val = std::stoi(flg);
                 fi.setFlagOption(val, (val > 0));
@@ -371,22 +384,19 @@ std::unique_ptr<helicsCLI11App> FederateInfo::makeCLIApp()
         ->check(CLI::PositiveNumber);
     app->add_option_function<int>(
            "--loglevel,--log-level",
-           [this](int val) { setProperty(helics_property_time_output_delay, val); },
+           [this](int val) { setProperty(helics_property_int_log_level, val); },
            "the logging level of a federate")
         ->ignore_underscore()
         ->transform(
             CLI::CheckedTransformer(&log_level_map, CLI::ignore_case, CLI::ignore_underscore));
 
-    app->add_option(
-           "--separator",
-           [this](CLI::results_t res) {
-               if (res[0].size() != 1) return false;
-               separator = res[0][0];
-               return true;
-           },
-           "separator character for local federates")
+    app->add_option("--separator", [this](CLI::results_t res) {
+        if (res[0].size() != 1) return false;
+        separator = res[0][0];
+        return true;
+        }, "separator character for local federates")
         ->default_str(std::string(1, separator))
-        ->type_size(1)
+            ->type_size(1)
         ->type_name("CHAR");
     app->add_option("--flags,-f,--flag", "named flag for the federate")
         ->type_size(-1)
@@ -426,14 +436,20 @@ std::vector<std::string> FederateInfo::loadInfoFromArgs(int argc, char* argv[])
 void FederateInfo::loadInfoFromArgsIgnoreOutput(const std::string& args)
 {
     auto app = makeCLIApp();
-    app->helics_parse(args);
+    auto ret=app->helics_parse(args);
+    if (ret == helicsCLI11App::parse_output::parse_error) {
+        throw helics::InvalidParameter("argument parsing failed");
+    }
     coreType = app->getCoreType();
 }
 
 void FederateInfo::loadInfoFromArgsIgnoreOutput(int argc, char* argv[])
 {
     auto app = makeCLIApp();
-    app->helics_parse(argc, argv);
+    auto ret=app->helics_parse(argc, argv);
+    if (ret == helicsCLI11App::parse_output::parse_error) {
+        throw helics::InvalidParameter("argument parsing failed");
+    }
     coreType = app->getCoreType();
 }
 
