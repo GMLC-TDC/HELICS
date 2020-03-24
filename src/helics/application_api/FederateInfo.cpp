@@ -528,10 +528,17 @@ FederateInfo loadFederateInfoJson(const std::string& jsonString)
     if (!callIfMember(doc, "max_iterations", intCall)) {
         callIfMember(doc, "maxiterations", intCall);
     }
-
-    bool lfound = callIfMember(doc, "log_level", intCall);
-    if (!lfound) {
-        lfound = callIfMember(doc, "loglevel", intCall);
+    bool lfound{ false };
+    try
+    {
+        lfound = callIfMember(doc, "log_level", intCall);
+        if (!lfound) {
+            lfound = callIfMember(doc, "loglevel", intCall);
+        }
+    }
+    catch (...)
+    {
+        // ignore errors here
     }
     if (!lfound) {
         lfound = callIfMember(doc, "log_level", logTranslations);
@@ -654,17 +661,24 @@ FederateInfo loadFederateInfoToml(const std::string& tomlString)
     if (!callIfMember(doc, "max_iterations", intCall)) {
         callIfMember(doc, "maxiterations", intCall);
     }
-
-    bool lfound = callIfMember(doc, "log_level", intCall);
-    if (!lfound) {
-        lfound = callIfMember(doc, "loglevel", intCall);
+    bool lfound{ false };
+    try
+    {
+        lfound = callIfMember(doc, "log_level", intCall);
+        if (!lfound) {
+            lfound = callIfMember(doc, "loglevel", intCall);
+        }
     }
-    if (!lfound) {
-        lfound = callIfMember(doc, "log_level", logTranslations);
+    catch (...)
+    {
+        if (!lfound) {
+            lfound = callIfMember(doc, "log_level", logTranslations);
+        }
+        if (!lfound) {
+            lfound = callIfMember(doc, "loglevel", logTranslations);
+        }
     }
-    if (!lfound) {
-        lfound = callIfMember(doc, "loglevel", logTranslations);
-    }
+    
 
     for (auto& prop : validFlagOptions) {
         callIfMember(doc, prop, flagCall);
