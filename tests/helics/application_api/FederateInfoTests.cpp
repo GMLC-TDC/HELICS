@@ -173,7 +173,7 @@ TEST(federateInfo, loadinfoError)
 }
 
 
-TEST(federateInfo, loadinfoProps)
+TEST(federateInfo, loadinfoPropsJson)
 {
 
     auto f1 = helics::loadFederateInfo("{\"separator\":\":\"}");
@@ -199,4 +199,51 @@ TEST(federateInfo, loadinfoProps)
     f1 = helics::loadFederateInfo("{\"localport\":5005,\"port\":5000}");
     EXPECT_EQ(f1.brokerPort, 5000);
     EXPECT_EQ(f1.localport, "5005");
+}
+
+TEST(federateInfo, loadinfoPropsToml)
+{
+
+    auto f1 = helics::loadFederateInfo("\"separator\"=\":\"");
+    EXPECT_EQ(f1.separator, ':');
+    f1 = helics::loadFederateInfo("\"core\"=\"zmq\"");
+    EXPECT_EQ(f1.coreType, helics::core_type::ZMQ);
+    f1 = helics::loadFederateInfo("\"core\"=\"fred\"");
+    EXPECT_EQ(f1.coreName, "fred");
+    EXPECT_THROW(helics::loadFederateInfo("\"coreType\"=\"fred\""), helics::InvalidIdentifier);
+    EXPECT_THROW(helics::loadFederateInfo("\"coretype\"=\"fred\""), helics::InvalidIdentifier);
+    EXPECT_THROW(helics::loadFederateInfo("\"type\"=\"fred\""), helics::InvalidIdentifier);
+
+    f1 = helics::loadFederateInfo("\"flags\"=\"autobroker,source_only\"");
+    EXPECT_EQ(f1.flagProps.size(), 1U);
+    EXPECT_TRUE(f1.autobroker);
+
+    f1 = helics::loadFederateInfo("\"port\"=5000");
+    EXPECT_EQ(f1.brokerPort, 5000);
+    f1 = helics::loadFederateInfo("\"brokerport\"=5005\n\"port\"=5000");
+    EXPECT_EQ(f1.brokerPort, 5005);
+    EXPECT_EQ(f1.localport, "5000");
+
+    f1 = helics::loadFederateInfo("\"localport\"=5005\n\"port\"=5000");
+    EXPECT_EQ(f1.brokerPort, 5000);
+    EXPECT_EQ(f1.localport, "5005");
+}
+
+TEST(federateInfo, initString)
+{
+    helics::FederateInfo fi;
+    fi.brokerPort = 6700;
+    fi.localport = "5000";
+    fi.key = "key";
+    fi.broker = "broker2";
+    fi.brokerInitString = "-f3";
+    helics::FederateInfo f3(helics::generateFullCoreInitString(fi));
+
+    EXPECT_EQ(fi.brokerPort, f3.brokerPort);
+    EXPECT_EQ(fi.localport, f3.localport);
+    EXPECT_EQ(fi.key, f3.key);
+    EXPECT_EQ(fi.autobroker, f3.autobroker);
+    EXPECT_EQ(fi.broker, f3.broker);
+
+    EXPECT_TRUE(f3.brokerInitString.find(fi.brokerInitString) != std::string::npos);
 }

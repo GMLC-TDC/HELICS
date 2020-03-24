@@ -298,14 +298,16 @@ TEST(CoreAppTests, readyToInit)
 {
     helics::BrokerApp b(helics::core_type::TEST, "brkt1", "-f1");
     EXPECT_TRUE(b.connect());
-    helics::CoreApp c1(helics::core_type::TEST, "--broker=brkt1 --name=core1b -f0");
-    helics::CoreApp c2(helics::core_type::TEST, "--broker=brkt1 --name=core2b");
+    helics::CoreApp c1(helics::core_type::TEST, "--broker=brkt1 --name=core1b");
     EXPECT_TRUE(c1.connect());
-    EXPECT_TRUE(c2.connect());
-    c1.setReadyToInit();
+    c1.haltInit();
 
-    helics::Federate fedb("fedb", c2);
-    fedb.enterExecutingMode();
+    helics::Federate fedb("fedb", c1);
+    fedb.enterExecutingModeAsync();
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    EXPECT_FALSE(fedb.isAsyncOperationCompleted());
+    c1.setReadyToInit();
+    fedb.enterExecutingModeComplete();
     fedb.finalize();
     c1->disconnect();
     b.forceTerminate();

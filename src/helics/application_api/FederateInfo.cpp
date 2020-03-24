@@ -213,7 +213,7 @@ static void loadFlags(FederateInfo& fi, const std::string& flags)
         }
         if (flg.empty())
         {
-            continue;
+            continue;  // LCOV_EXCL_LINE
         }
         auto loc = validFlagOptions.find(flg);
         if (loc != validFlagOptions.end()) {
@@ -476,8 +476,13 @@ FederateInfo loadFederateInfo(const std::string& configString)
         (hasJsonExtension(configString)) ||
         (configString.find_first_of('{') != std::string::npos)) {
         ret = loadFederateInfoJson(configString);
-    } else if (configString.find("--") != std::string::npos) {
+    }
+    else if (configString.find("--") != std::string::npos) {
         ret.loadInfoFromArgsIgnoreOutput(configString);
+    }
+    else if (configString.find("=") != std::string::npos)
+    {
+        ret = loadFederateInfoToml(configString);
     } else {
         ret.defName = configString;
     }
@@ -721,33 +726,45 @@ FederateInfo loadFederateInfoToml(const std::string& tomlString)
         }
     }
     if (isMember(doc, "core")) {
-        try {
-            fi.coreType = coreTypeFromString(tomlAsString(doc["core"]));
+        auto ct = coreTypeFromString(tomlAsString(doc["core"]));
+        if (ct != core_type::UNRECOGNIZED)
+        {
+            fi.coreType = ct;
         }
-        catch (const std::invalid_argument&) {
+        else
+        {
             fi.coreName = tomlAsString(doc["core"]);
         }
     }
     if (isMember(doc, "coreType")) {
-        try {
-            fi.coreType = coreTypeFromString(tomlAsString(doc["coreType"]));
+        auto ct=coreTypeFromString(tomlAsString(doc["coreType"]));
+        if (ct != core_type::UNRECOGNIZED)
+        {
+            fi.coreType = ct;
         }
-        catch (const std::invalid_argument&) {
-            std::cerr << "Unrecognized core type\n";
+        else
+        {
+            throw(helics::InvalidIdentifier(tomlAsString(doc["coreType"]) + " is not a valid core type"));
         }
     } else if (isMember(doc, "coretype")) {
-        try {
-            fi.coreType = coreTypeFromString(tomlAsString(doc["coretype"]));
+        auto ct = coreTypeFromString(tomlAsString(doc["coretype"]));
+        if (ct != core_type::UNRECOGNIZED)
+        {
+            fi.coreType = ct;
         }
-        catch (const std::invalid_argument&) {
-            std::cerr << "Unrecognized core type\n";
+        else
+        {
+            throw(helics::InvalidIdentifier(tomlAsString(doc["coretype"]) + " is not a valid core type"));
         }
     } else if (isMember(doc, "type")) {
-        try {
-            fi.coreType = coreTypeFromString(tomlAsString(doc["type"]));
+        auto ct = coreTypeFromString(tomlAsString(doc["type"]));
+        if (ct != core_type::UNRECOGNIZED)
+        {
+            fi.coreType = ct;
         }
-        catch (const std::invalid_argument&) {
-            std::cerr << "Unrecognized core type\n";
+        else
+        {
+            throw(helics::InvalidIdentifier(tomlAsString(doc["type"]) + " is not a valid core type"));
         }
     }
     replaceIfMember(doc, "name", fi.defName);

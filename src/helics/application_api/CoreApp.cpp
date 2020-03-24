@@ -237,6 +237,12 @@ void CoreApp::setReadyToInit()
         core->setCoreReadyToInit();
     }
 }
+void CoreApp::haltInit()
+{
+    if (core) {
+        core->setFlagOption(local_core_id, helics_flag_delay_init_entry,true);
+    }
+}
 
 void CoreApp::reset()
 {
