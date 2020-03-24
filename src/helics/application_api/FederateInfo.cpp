@@ -230,7 +230,7 @@ static void loadFlags(FederateInfo& fi, const std::string& flags)
             }
             try {
                 auto val = std::stoi(flg);
-                fi.setFlagOption(val, (val > 0));
+                fi.setFlagOption(std::abs(val), (val > 0));
             }
             catch (const std::invalid_argument&) {
                 std::cerr << "unrecognized flag " << flg << std::endl;
@@ -345,26 +345,24 @@ std::unique_ptr<helicsCLI11App> FederateInfo::makeCLIApp()
            "The minimum time between time grants for a Federate (default in ms)")
         ->ignore_underscore();
     auto rtgroup = app->add_option_group("realtime");
+    rtgroup->option_defaults()->ignore_underscore()->ignore_case();
     rtgroup
         ->add_option_function<Time>(
             "--rtlag",
             [this](Time val) { setProperty(helics_property_time_rt_lag, val); },
             "the amount of the time the federate is allowed to lag realtime before "
-            "corrective action is taken (default in ms)")
-        ->ignore_underscore();
+            "corrective action is taken (default in ms)");
     rtgroup
         ->add_option_function<Time>(
             "--rtlead",
             [this](Time val) { setProperty(helics_property_time_rt_lead, val); },
             "the amount of the time the federate is allowed to lead realtime before "
-            "corrective action is taken (default in ms)")
-        ->ignore_underscore();
+            "corrective action is taken (default in ms)");
     rtgroup
         ->add_option_function<Time>(
             "--rttolerance",
             [this](Time val) { setProperty(helics_property_time_rt_tolerance, val); },
-            "the time tolerance of the real time mode (default in ms)")
-        ->ignore_underscore();
+            "the time tolerance of the real time mode (default in ms)");
 
     app->add_option_function<Time>(
            "--inputdelay",
@@ -579,34 +577,46 @@ FederateInfo loadFederateInfoJson(const std::string& jsonString)
         }
     }
     if (doc.isMember("core")) {
-        try {
-            fi.coreType = coreTypeFromString(doc["core"].asString());
-        }
-        catch (const std::invalid_argument&) {
+        auto ct = coreTypeFromString(doc["core"].asString());
+        if (ct != core_type::UNRECOGNIZED)
+        {
+            fi.coreType = ct;
+        }else
+        {
             fi.coreName = doc["core"].asString();
         }
     }
     if (doc.isMember("coreType")) {
-        try {
-            fi.coreType = coreTypeFromString(doc["coreType"].asString());
+        auto ct = coreTypeFromString(doc["coreType"].asString());
+        if (ct != core_type::UNRECOGNIZED)
+        {
+            fi.coreType = ct;
         }
-        catch (const std::invalid_argument&) {
-            std::cerr << "Unrecognized core type\n";
+        else
+        {
+            throw(helics::InvalidIdentifier(doc["coreType"].asString() + " is not a valid core type"));
         }
     } else if (doc.isMember("coretype")) {
-        try {
-            fi.coreType = coreTypeFromString(doc["coretype"].asString());
+        auto ct = coreTypeFromString(doc["coretype"].asString());
+        if (ct != core_type::UNRECOGNIZED)
+        {
+            fi.coreType = ct;
         }
-        catch (const std::invalid_argument&) {
-            std::cerr << "Unrecognized core type\n";
+        else
+        {
+            throw(helics::InvalidIdentifier(doc["coretype"].asString() + " is not a valid core type"));
         }
+
     } else if (doc.isMember("type")) {
-        try {
-            fi.coreType = coreTypeFromString(doc["type"].asString());
+        auto ct = coreTypeFromString(doc["type"].asString());
+        if (ct != core_type::UNRECOGNIZED)
+        {
+            fi.coreType = ct;
         }
-        catch (const std::invalid_argument&) {
-            std::cerr << "Unrecognized core type\n";
-        }
+    else
+    {
+        throw(helics::InvalidIdentifier(doc["type"].asString() + " is not a valid core type"));
+    }
     }
     replaceIfMember(doc, "name", fi.defName);
     replaceIfMember(doc, "coreName", fi.coreName);
