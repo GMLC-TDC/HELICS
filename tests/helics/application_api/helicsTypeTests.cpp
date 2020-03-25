@@ -22,7 +22,6 @@ TEST(helics_types, complex_empty_string)
     auto v2 = getComplexFromString(std::string{});
     EXPECT_GT(std::abs(v.real()), 1e40);
     EXPECT_EQ(v, v2);
-
 }
 
 TEST(helics_types, complex_vector_string)
@@ -48,7 +47,6 @@ TEST(helics_types, complex_vector_string)
     v = getComplexFromString("v0[]");
     EXPECT_GT(std::abs(v.real()), 1e40);
     EXPECT_EQ(v.imag(), 0);
-
 }
 
 TEST(helics_types, complex_cvector_string)
@@ -69,22 +67,18 @@ TEST(helics_types, complex_cvector_string)
     v = getComplexFromString("c1[1]");
     EXPECT_EQ(v.real(), 1);
     EXPECT_EQ(v.imag(), 0);
-
 }
 
 TEST(helics_types, double_string)
 {
     auto v = getDoubleFromString(std::string{});
     EXPECT_GT(std::abs(v), 1e40);
-
 }
-
 
 TEST(helics_types, vector_string)
 {
     auto v = helicsGetVector(std::string{});
     EXPECT_TRUE(v.empty());
-
 }
 
 TEST(helics_types, cvector_string)
@@ -92,6 +86,6 @@ TEST(helics_types, cvector_string)
     auto v = helicsGetComplexVector(std::string{});
     EXPECT_TRUE(v.empty());
     v = helicsGetComplexVector("c[1+4j,2-3j,invalid]");
-    ASSERT_EQ(v.size(),3U);
+    ASSERT_EQ(v.size(), 3U);
     EXPECT_EQ(v[2], invalidValue<std::complex<double>>());
 }
