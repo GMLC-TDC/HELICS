@@ -196,3 +196,31 @@ TEST(type_conversion_tests, namedpoint_conversion_tests)
     EXPECT_EQ(t1.name, t2.name);
     EXPECT_NEAR(t1.value, t2.value, 0.00001);
 }
+
+TEST(type_conversion_tests, bool_conversion_tests)
+{
+    bool val{false};
+    EXPECT_TRUE(checkTypeConversion1(std::string{"false"}, val));
+    EXPECT_TRUE(checkTypeConversion1(std::string{"0"}, val));
+    EXPECT_TRUE(checkTypeConversion1(std::string{"F"}, val));
+    EXPECT_TRUE(checkTypeConversion1(0.0F, val));
+    EXPECT_TRUE(checkTypeConversion1(0.0, val));
+    EXPECT_TRUE(checkTypeConversion1(NamedPoint{"value", 0.0}, val));
+    EXPECT_TRUE(checkTypeConversion1(std::vector<double>{0.0}, val));
+    EXPECT_TRUE(checkTypeConversion1(std::vector<double>{}, val));
+    EXPECT_TRUE(checkTypeConversion1(std::complex<double>{0.0, 0.0}, val));
+    EXPECT_TRUE(checkTypeConversion1(std::vector<std::complex<double>>{{0.0, 0.0}}, val));
+    EXPECT_TRUE(checkTypeConversion1(std::vector<std::complex<double>>{}, val));
+    val = true;
+    EXPECT_TRUE(checkTypeConversion1(std::string{"on"}, val));
+    EXPECT_TRUE(checkTypeConversion1(std::string{"1"}, val));
+    EXPECT_TRUE(checkTypeConversion1(std::string{"Y"}, val));
+
+    EXPECT_TRUE(checkTypeConversion1(1.0F, val));
+    EXPECT_TRUE(checkTypeConversion1(1.0, val));
+    EXPECT_TRUE(checkTypeConversion1(NamedPoint{"value", 1.0}, val));
+    EXPECT_TRUE(checkTypeConversion1(std::vector<double>{1.0}, val));
+    EXPECT_TRUE(checkTypeConversion1(std::vector<double>{0.0, 1.0}, val));
+    EXPECT_TRUE(checkTypeConversion1(std::complex<double>{0.0, 1.0}, val));
+    EXPECT_TRUE(checkTypeConversion1(std::complex<double>{0.0, -0.5}, val));
+}

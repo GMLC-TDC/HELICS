@@ -28,6 +28,7 @@ set(
     CombinationFederateTests.cpp
     ValueFederateSingleTransfer.cpp
     ValueFederateDualTransfer.cpp
+    helicsTypeTests.cpp
     LoggingTests.cpp
     FederateInfoTests.cpp
 )
