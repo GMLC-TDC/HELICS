@@ -29,6 +29,7 @@ set(
     ValueFederateSingleTransfer.cpp
     ValueFederateDualTransfer.cpp
     LoggingTests.cpp
+    FederateInfoTests.cpp
 )
 
 if(ENABLE_ZMQ_CORE)

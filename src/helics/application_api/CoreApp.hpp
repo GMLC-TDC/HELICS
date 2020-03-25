@@ -124,6 +124,8 @@ class HELICS_CXX_EXPORT CoreApp {
     void setLoggingLevel(int loglevel);
     /** tell the core that is ready to enter initialization mode*/
     void setReadyToInit();
+    /** tell the core to pause init even if otherwise ready*/
+    void haltInit();
 #ifdef HELICS_CXX_STATIC_DEFINE
     /** overload the -> operator so core functions can be called if needed
      */

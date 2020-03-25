@@ -125,6 +125,16 @@ inline void
     }
 }
 
+inline void replaceIfMember(const toml::value& element, const std::string& key, std::string& loc)
+{
+    toml::value uval;
+    auto val = toml::find_or(element, key, uval);
+
+    if (!val.is_uninitialized()) {
+        loc = tomlAsString(val);
+    }
+}
+
 template<class X>
 inline void replaceIfMember(const toml::value& element, const std::string& key, X& loc)
 {
