@@ -211,17 +211,14 @@ static void loadFlags(FederateInfo& fi, const std::string& flags)
             fi.autobroker = true;
             continue;
         }
-        if (flg.empty())
-        {
-            continue;  // LCOV_EXCL_LINE
+        if (flg.empty()) {
+            continue; // LCOV_EXCL_LINE
         }
         auto loc = validFlagOptions.find(flg);
         if (loc != validFlagOptions.end()) {
             fi.setFlagOption(propStringsTranslations.at(flg), true);
-        }
-        else {
-            if (flg.front() == '-')
-            {
+        } else {
+            if (flg.front() == '-') {
                 loc = validFlagOptions.find(flg.substr(1));
                 if (loc != validFlagOptions.end()) {
                     fi.setFlagOption(propStringsTranslations.at(flg.substr(1)), false);
@@ -346,23 +343,20 @@ std::unique_ptr<helicsCLI11App> FederateInfo::makeCLIApp()
         ->ignore_underscore();
     auto rtgroup = app->add_option_group("realtime");
     rtgroup->option_defaults()->ignore_underscore()->ignore_case();
-    rtgroup
-        ->add_option_function<Time>(
-            "--rtlag",
-            [this](Time val) { setProperty(helics_property_time_rt_lag, val); },
-            "the amount of the time the federate is allowed to lag realtime before "
-            "corrective action is taken (default in ms)");
-    rtgroup
-        ->add_option_function<Time>(
-            "--rtlead",
-            [this](Time val) { setProperty(helics_property_time_rt_lead, val); },
-            "the amount of the time the federate is allowed to lead realtime before "
-            "corrective action is taken (default in ms)");
-    rtgroup
-        ->add_option_function<Time>(
-            "--rttolerance",
-            [this](Time val) { setProperty(helics_property_time_rt_tolerance, val); },
-            "the time tolerance of the real time mode (default in ms)");
+    rtgroup->add_option_function<Time>(
+        "--rtlag",
+        [this](Time val) { setProperty(helics_property_time_rt_lag, val); },
+        "the amount of the time the federate is allowed to lag realtime before "
+        "corrective action is taken (default in ms)");
+    rtgroup->add_option_function<Time>(
+        "--rtlead",
+        [this](Time val) { setProperty(helics_property_time_rt_lead, val); },
+        "the amount of the time the federate is allowed to lead realtime before "
+        "corrective action is taken (default in ms)");
+    rtgroup->add_option_function<Time>(
+        "--rttolerance",
+        [this](Time val) { setProperty(helics_property_time_rt_tolerance, val); },
+        "the time tolerance of the real time mode (default in ms)");
 
     app->add_option_function<Time>(
            "--inputdelay",
@@ -388,13 +382,16 @@ std::unique_ptr<helicsCLI11App> FederateInfo::makeCLIApp()
         ->transform(
             CLI::CheckedTransformer(&log_level_map, CLI::ignore_case, CLI::ignore_underscore));
 
-    app->add_option("--separator", [this](CLI::results_t res) {
-        if (res[0].size() != 1) return false;
-        separator = res[0][0];
-        return true;
-        }, "separator character for local federates")
+    app->add_option(
+           "--separator",
+           [this](CLI::results_t res) {
+               if (res[0].size() != 1) return false;
+               separator = res[0][0];
+               return true;
+           },
+           "separator character for local federates")
         ->default_str(std::string(1, separator))
-            ->type_size(1)
+        ->type_size(1)
         ->type_name("CHAR");
     app->add_option("--flags,-f,--flag", "named flag for the federate")
         ->type_size(-1)
@@ -434,7 +431,7 @@ std::vector<std::string> FederateInfo::loadInfoFromArgs(int argc, char* argv[])
 void FederateInfo::loadInfoFromArgsIgnoreOutput(const std::string& args)
 {
     auto app = makeCLIApp();
-    auto ret=app->helics_parse(args);
+    auto ret = app->helics_parse(args);
     if (ret == helicsCLI11App::parse_output::parse_error) {
         throw helics::InvalidParameter("argument parsing failed");
     }
@@ -444,7 +441,7 @@ void FederateInfo::loadInfoFromArgsIgnoreOutput(const std::string& args)
 void FederateInfo::loadInfoFromArgsIgnoreOutput(int argc, char* argv[])
 {
     auto app = makeCLIApp();
-    auto ret=app->helics_parse(argc, argv);
+    auto ret = app->helics_parse(argc, argv);
     if (ret == helicsCLI11App::parse_output::parse_error) {
         throw helics::InvalidParameter("argument parsing failed");
     }
@@ -476,12 +473,9 @@ FederateInfo loadFederateInfo(const std::string& configString)
         (hasJsonExtension(configString)) ||
         (configString.find_first_of('{') != std::string::npos)) {
         ret = loadFederateInfoJson(configString);
-    }
-    else if (configString.find("--") != std::string::npos) {
+    } else if (configString.find("--") != std::string::npos) {
         ret.loadInfoFromArgsIgnoreOutput(configString);
-    }
-    else if (configString.find("=") != std::string::npos)
-    {
+    } else if (configString.find("=") != std::string::npos) {
         ret = loadFederateInfoToml(configString);
     } else {
         ret.defName = configString;
@@ -531,16 +525,14 @@ FederateInfo loadFederateInfoJson(const std::string& jsonString)
     if (!callIfMember(doc, "max_iterations", intCall)) {
         callIfMember(doc, "maxiterations", intCall);
     }
-    bool lfound{ false };
-    try
-    {
+    bool lfound{false};
+    try {
         lfound = callIfMember(doc, "log_level", intCall);
         if (!lfound) {
             lfound = callIfMember(doc, "loglevel", intCall);
         }
     }
-    catch (...)
-    {
+    catch (...) {
         // ignore errors here
     }
     if (!lfound) {
@@ -583,45 +575,36 @@ FederateInfo loadFederateInfoJson(const std::string& jsonString)
     }
     if (doc.isMember("core")) {
         auto ct = coreTypeFromString(doc["core"].asString());
-        if (ct != core_type::UNRECOGNIZED)
-        {
+        if (ct != core_type::UNRECOGNIZED) {
             fi.coreType = ct;
-        }else
-        {
+        } else {
             fi.coreName = doc["core"].asString();
         }
     }
     if (doc.isMember("coreType")) {
         auto ct = coreTypeFromString(doc["coreType"].asString());
-        if (ct != core_type::UNRECOGNIZED)
-        {
+        if (ct != core_type::UNRECOGNIZED) {
             fi.coreType = ct;
-        }
-        else
-        {
-            throw(helics::InvalidIdentifier(doc["coreType"].asString() + " is not a valid core type"));
+        } else {
+            throw(helics::InvalidIdentifier(
+                doc["coreType"].asString() + " is not a valid core type"));
         }
     } else if (doc.isMember("coretype")) {
         auto ct = coreTypeFromString(doc["coretype"].asString());
-        if (ct != core_type::UNRECOGNIZED)
-        {
+        if (ct != core_type::UNRECOGNIZED) {
             fi.coreType = ct;
-        }
-        else
-        {
-            throw(helics::InvalidIdentifier(doc["coretype"].asString() + " is not a valid core type"));
+        } else {
+            throw(helics::InvalidIdentifier(
+                doc["coretype"].asString() + " is not a valid core type"));
         }
 
     } else if (doc.isMember("type")) {
         auto ct = coreTypeFromString(doc["type"].asString());
-        if (ct != core_type::UNRECOGNIZED)
-        {
+        if (ct != core_type::UNRECOGNIZED) {
             fi.coreType = ct;
+        } else {
+            throw(helics::InvalidIdentifier(doc["type"].asString() + " is not a valid core type"));
         }
-    else
-    {
-        throw(helics::InvalidIdentifier(doc["type"].asString() + " is not a valid core type"));
-    }
     }
     replaceIfMember(doc, "name", fi.defName);
     replaceIfMember(doc, "coreName", fi.coreName);
@@ -676,16 +659,14 @@ FederateInfo loadFederateInfoToml(const std::string& tomlString)
     if (!callIfMember(doc, "max_iterations", intCall)) {
         callIfMember(doc, "maxiterations", intCall);
     }
-    bool lfound{ false };
-    try
-    {
+    bool lfound{false};
+    try {
         lfound = callIfMember(doc, "log_level", intCall);
         if (!lfound) {
             lfound = callIfMember(doc, "loglevel", intCall);
         }
     }
-    catch (...)
-    {
+    catch (...) {
         if (!lfound) {
             lfound = callIfMember(doc, "log_level", logTranslations);
         }
@@ -693,7 +674,6 @@ FederateInfo loadFederateInfoToml(const std::string& tomlString)
             lfound = callIfMember(doc, "loglevel", logTranslations);
         }
     }
-    
 
     for (auto& prop : validFlagOptions) {
         callIfMember(doc, prop, flagCall);
@@ -727,44 +707,35 @@ FederateInfo loadFederateInfoToml(const std::string& tomlString)
     }
     if (isMember(doc, "core")) {
         auto ct = coreTypeFromString(tomlAsString(doc["core"]));
-        if (ct != core_type::UNRECOGNIZED)
-        {
+        if (ct != core_type::UNRECOGNIZED) {
             fi.coreType = ct;
-        }
-        else
-        {
+        } else {
             fi.coreName = tomlAsString(doc["core"]);
         }
     }
     if (isMember(doc, "coreType")) {
-        auto ct=coreTypeFromString(tomlAsString(doc["coreType"]));
-        if (ct != core_type::UNRECOGNIZED)
-        {
+        auto ct = coreTypeFromString(tomlAsString(doc["coreType"]));
+        if (ct != core_type::UNRECOGNIZED) {
             fi.coreType = ct;
-        }
-        else
-        {
-            throw(helics::InvalidIdentifier(tomlAsString(doc["coreType"]) + " is not a valid core type"));
+        } else {
+            throw(helics::InvalidIdentifier(
+                tomlAsString(doc["coreType"]) + " is not a valid core type"));
         }
     } else if (isMember(doc, "coretype")) {
         auto ct = coreTypeFromString(tomlAsString(doc["coretype"]));
-        if (ct != core_type::UNRECOGNIZED)
-        {
+        if (ct != core_type::UNRECOGNIZED) {
             fi.coreType = ct;
-        }
-        else
-        {
-            throw(helics::InvalidIdentifier(tomlAsString(doc["coretype"]) + " is not a valid core type"));
+        } else {
+            throw(helics::InvalidIdentifier(
+                tomlAsString(doc["coretype"]) + " is not a valid core type"));
         }
     } else if (isMember(doc, "type")) {
         auto ct = coreTypeFromString(tomlAsString(doc["type"]));
-        if (ct != core_type::UNRECOGNIZED)
-        {
+        if (ct != core_type::UNRECOGNIZED) {
             fi.coreType = ct;
-        }
-        else
-        {
-            throw(helics::InvalidIdentifier(tomlAsString(doc["type"]) + " is not a valid core type"));
+        } else {
+            throw(
+                helics::InvalidIdentifier(tomlAsString(doc["type"]) + " is not a valid core type"));
         }
     }
     replaceIfMember(doc, "name", fi.defName);

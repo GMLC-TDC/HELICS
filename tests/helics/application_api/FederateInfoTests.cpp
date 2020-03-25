@@ -7,8 +7,8 @@ SPDX-License-Identifier: BSD-3-Clause
 */
 
 #include "helics/application_api/FederateInfo.hpp"
-#include "helics/core/helics_definitions.hpp"
 #include "helics/core/core-exceptions.hpp"
+#include "helics/core/helics_definitions.hpp"
 
 #include "gtest/gtest.h"
 #include <chrono>
@@ -25,8 +25,13 @@ TEST(federateInfo, constructor1)
 
 TEST(federateInfo, constructor2)
 {
-    std::vector<std::string> args{
-        "constructor2", "--name", "f2", "--type", "inproc", "--flags", "realtime,,source_only;autobroker"};
+    std::vector<std::string> args{"constructor2",
+                                  "--name",
+                                  "f2",
+                                  "--type",
+                                  "inproc",
+                                  "--flags",
+                                  "realtime,,source_only;autobroker"};
     char* argv[7];
     for (size_t ii = 0; ii < args.size(); ++ii) {
         argv[ii] = &(args[ii][0]);
@@ -42,7 +47,7 @@ TEST(federateInfo, constructor2)
 TEST(federateInfo, constructor_error)
 {
     std::vector<std::string> args{
-        "constructor2", "--name", "f2", "--type", "inproc", "--brokerport=hippity_hopity" };
+        "constructor2", "--name", "f2", "--type", "inproc", "--brokerport=hippity_hopity"};
     char* argv[6];
     for (size_t ii = 0; ii < args.size(); ++ii) {
         argv[ii] = &(args[ii][0]);
@@ -92,17 +97,17 @@ TEST(federateInfo, loadArgs2)
 TEST(federateInfo, loadArgs_error)
 {
     helics::FederateInfo f1;
-    EXPECT_NO_THROW(f1.loadInfoFromArgs(
-        "--name f3 --type ipc --flags unrecognized --port=5000"));
+    EXPECT_NO_THROW(f1.loadInfoFromArgs("--name f3 --type ipc --flags unrecognized --port=5000"));
 
-    EXPECT_THROW(f1.loadInfoFromArgs(
-        "--name f3 --type ipc --brokerport=hippity_hopity"), helics::InvalidParameter);
+    EXPECT_THROW(
+        f1.loadInfoFromArgs("--name f3 --type ipc --brokerport=hippity_hopity"),
+        helics::InvalidParameter);
 }
 
 TEST(federateInfo, loadArgs_error2)
 {
     std::vector<std::string> args{
-        "constructor2", "--name", "f2", "--type", "zmq", "--brokerport=hippity_hopity" };
+        "constructor2", "--name", "f2", "--type", "zmq", "--brokerport=hippity_hopity"};
     char* argv[6];
     for (size_t ii = 0; ii < args.size(); ++ii) {
         argv[ii] = &(args[ii][0]);
@@ -114,7 +119,8 @@ TEST(federateInfo, loadArgs_error2)
 
 TEST(federateInfo, constructor4)
 {
-    helics::FederateInfo f1{"--log_level=no_print --brokerport=5000 --port=5005 --offset=5 --time_delta=45ms --max_iterations 10"};
+    helics::FederateInfo f1{
+        "--log_level=no_print --brokerport=5000 --port=5005 --offset=5 --time_delta=45ms --max_iterations 10"};
     EXPECT_EQ(f1.brokerPort, 5000);
     EXPECT_EQ(f1.localport, "5005");
     EXPECT_EQ(f1.intProps.size(), 2);
@@ -165,17 +171,14 @@ TEST(federateInfo, option_index)
     EXPECT_EQ(helics::getOptionIndex("un_interruptible"), helics_handle_option_ignore_interrupts);
 }
 
-
 TEST(federateInfo, loadinfoError)
 {
-    
-    EXPECT_THROW(helics::loadFederateInfo("{\"log_level\":\"whatever\"}"), helics::InvalidIdentifier);
+    EXPECT_THROW(
+        helics::loadFederateInfo("{\"log_level\":\"whatever\"}"), helics::InvalidIdentifier);
 }
-
 
 TEST(federateInfo, loadinfoPropsJson)
 {
-
     auto f1 = helics::loadFederateInfo("{\"separator\":\":\"}");
     EXPECT_EQ(f1.separator, ':');
     f1 = helics::loadFederateInfo("{\"core\":\"zmq\"}");
@@ -199,11 +202,19 @@ TEST(federateInfo, loadinfoPropsJson)
     f1 = helics::loadFederateInfo("{\"localport\":5005,\"port\":5000}");
     EXPECT_EQ(f1.brokerPort, 5000);
     EXPECT_EQ(f1.localport, "5005");
+
+    f1 = helics::loadFederateInfo("{\"loglevel\":5}");
+    EXPECT_EQ(f1.intProps.size(), 1U);
+    EXPECT_EQ(f1.intProps[0].second, 5);
+
+    f1 = helics::loadFederateInfo("{\"loglevel\":\"summary\"}");
+    EXPECT_EQ(f1.intProps.size(), 1U);
+    EXPECT_EQ(f1.intProps[0].second, 2);
+    EXPECT_THROW(helics::loadFederateInfo("{\"loglevel\":\"unknown\"}"), helics::InvalidIdentifier);
 }
 
 TEST(federateInfo, loadinfoPropsToml)
 {
-
     auto f1 = helics::loadFederateInfo("\"separator\"=\":\"");
     EXPECT_EQ(f1.separator, ':');
     f1 = helics::loadFederateInfo("\"core\"=\"zmq\"");
@@ -213,6 +224,12 @@ TEST(federateInfo, loadinfoPropsToml)
     EXPECT_THROW(helics::loadFederateInfo("\"coreType\"=\"fred\""), helics::InvalidIdentifier);
     EXPECT_THROW(helics::loadFederateInfo("\"coretype\"=\"fred\""), helics::InvalidIdentifier);
     EXPECT_THROW(helics::loadFederateInfo("\"type\"=\"fred\""), helics::InvalidIdentifier);
+
+    f1 = helics::loadFederateInfo("\"coreType\"=\"web\"");
+    EXPECT_EQ(f1.coreType, helics::core_type::WEBSOCKET);
+
+    f1 = helics::loadFederateInfo("\"type\"=\"UDP\"");
+    EXPECT_EQ(f1.coreType, helics::core_type::UDP);
 
     f1 = helics::loadFederateInfo("\"flags\"=\"autobroker,source_only\"");
     EXPECT_EQ(f1.flagProps.size(), 1U);
@@ -227,6 +244,15 @@ TEST(federateInfo, loadinfoPropsToml)
     f1 = helics::loadFederateInfo("\"localport\"=5005\n\"port\"=5000");
     EXPECT_EQ(f1.brokerPort, 5000);
     EXPECT_EQ(f1.localport, "5005");
+
+    f1 = helics::loadFederateInfo("\"loglevel\"=5");
+    EXPECT_EQ(f1.intProps.size(), 1U);
+    EXPECT_EQ(f1.intProps[0].second, 5);
+
+    f1 = helics::loadFederateInfo("\"loglevel\"=\"summary\"");
+    EXPECT_EQ(f1.intProps.size(), 1U);
+    EXPECT_EQ(f1.intProps[0].second, 2);
+    EXPECT_THROW(helics::loadFederateInfo("\"loglevel\"=\"unknown\""), helics::InvalidIdentifier);
 }
 
 TEST(federateInfo, initString)
