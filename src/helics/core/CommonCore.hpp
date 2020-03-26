@@ -6,8 +6,8 @@ SPDX-License-Identifier: BSD-3-Clause
 */
 #pragma once
 
-#include "../common/JsonBuilder.hpp"
 #include "../common/GuardedTypes.hpp"
+#include "../common/JsonBuilder.hpp"
 #include "ActionMessage.hpp"
 #include "BrokerBase.hpp"
 #include "Core.hpp"
@@ -22,8 +22,8 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helics-time.hpp"
 #include "helics/external/any.hpp"
 #include "helics/helics-config.h"
-#include "json/forwards.h"
 
+#include "json/forwards.h"
 #include <array>
 #include <atomic>
 #include <set>
@@ -355,9 +355,11 @@ class CommonCore: public Core, public BrokerBase {
     /** get an index for an airlock function is threadsafe*/
     uint16_t getNextAirlockIndex();
     /** load the basic core info into a JSON object*/
-    void loadBasicJsonInfo(Json::Value &base, const std::function<void(Json::Value &fedval, const FedInfo &fed)> &fedLoader) const;
+    void loadBasicJsonInfo(
+        Json::Value& base,
+        const std::function<void(Json::Value& fedval, const FedInfo& fed)>& fedLoader) const;
     /** generate a mapbuilder for the federates*/
-    void initializeMapBuilder(const std::string &request, std::uint16_t index, bool reset) const;
+    void initializeMapBuilder(const std::string& request, std::uint16_t index, bool reset) const;
     /** generate results for core queries*/
     std::string coreQuery(const std::string& queryStr) const;
 
@@ -393,8 +395,8 @@ class CommonCore: public Core, public BrokerBase {
     std::atomic<int> queryCounter{
         1}; //!< counter for queries start at 1 so the default value isn't used
     gmlc::concurrency::DelayedObjects<std::string> activeQueries; //!< holder for active queries
-     /// holder for the query map builder information
-    mutable std::vector < std::tuple< JsonMapBuilder, std::vector<ActionMessage>, bool>> mapBuilders;
+        /// holder for the query map builder information
+    mutable std::vector<std::tuple<JsonMapBuilder, std::vector<ActionMessage>, bool>> mapBuilders;
     std::map<interface_handle, std::unique_ptr<FilterCoordinator>>
         filterCoord; //!< map of all local filters
     // The interface_handle used is here is usually referencing an endpoint

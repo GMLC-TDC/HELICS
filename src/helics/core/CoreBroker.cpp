@@ -2384,12 +2384,11 @@ enum subqueries : std::uint16_t {
     data_flow_graph = 4
 };
 
-static const std::map<std::string, std::pair<std::uint16_t, bool>> mapIndex
-{
-    {"global_time",{current_time_map,true}},
-    {"federate_map",{federate_map,false}},
-    {"dependency_graph",{dependency_graph,false}},
-    {"data_flow_graph",{data_flow_graph ,false}},
+static const std::map<std::string, std::pair<std::uint16_t, bool>> mapIndex{
+    {"global_time", {current_time_map, true}},
+    {"federate_map", {federate_map, false}},
+    {"dependency_graph", {dependency_graph, false}},
+    {"data_flow_graph", {data_flow_graph, false}},
 };
 
 std::string CoreBroker::generateQueryAnswer(const std::string& request)
@@ -2469,27 +2468,24 @@ std::string CoreBroker::generateQueryAnswer(const std::string& request)
         }
     }
     auto mi = mapIndex.find(request);
-    if (mi != mapIndex.end())
-    {
+    if (mi != mapIndex.end()) {
         auto index = mi->second.first;
-        if (isValidIndex(index, mapBuilders) && !mi->second.second)
-        {
+        if (isValidIndex(index, mapBuilders) && !mi->second.second) {
             if (std::get<0>(mapBuilders[index]).isCompleted()) {
                 return std::get<0>(mapBuilders[index]).generate();
             }
-            if (std::get<0>(mapBuilders[index]).isActive())
-            {
+            if (std::get<0>(mapBuilders[index]).isActive()) {
                 return "#wait";
             }
         }
 
-        initializeMapBuilder(request,index,mi->second.second);
+        initializeMapBuilder(request, index, mi->second.second);
         if (std::get<0>(mapBuilders[index]).isCompleted()) {
             return std::get<0>(mapBuilders[index]).generate();
         }
         return "#wait";
     }
-    
+
     if (request == "inputs") {
         return generateStringVector_if(
             handles,
@@ -2514,7 +2510,7 @@ std::string CoreBroker::generateQueryAnswer(const std::string& request)
             [](auto& handle) { return handle.key; },
             [](auto& handle) { return (handle.handleType == handle_type::endpoint); });
     }
-    
+
     if (request == "dependson") {
         return generateStringVector(timeCoord->getDependencies(), [](const auto& dep) {
             return std::to_string(dep.baseValue());
@@ -2573,16 +2569,15 @@ std::string CoreBroker::getNameList(std::string gidString) const
     gidString.push_back(']');
     return gidString;
 }
-void CoreBroker::initializeMapBuilder(const std::string &request, std::uint16_t index, bool reset)
+void CoreBroker::initializeMapBuilder(const std::string& request, std::uint16_t index, bool reset)
 {
-    if (!isValidIndex(index, mapBuilders))
-    {
+    if (!isValidIndex(index, mapBuilders)) {
         mapBuilders.resize(index + 1);
     }
     std::get<2>(mapBuilders[index]) = reset;
-    auto &builder = std::get<0>(mapBuilders[index]);
+    auto& builder = std::get<0>(mapBuilders[index]);
     builder.reset();
-    Json::Value& base =builder.getJValue();
+    Json::Value& base = builder.getJValue();
     base["name"] = getIdentifier();
     base["id"] = global_broker_id_local.baseValue();
     if (!isRootc) {
@@ -2603,8 +2598,7 @@ void CoreBroker::initializeMapBuilder(const std::string &request, std::uint16_t 
                     base["cores"] = Json::arrayValue;
                 }
                 brkindex = builder.generatePlaceHolder("cores");
-            }
-            else {
+            } else {
                 brkindex = builder.generatePlaceHolder("brokers");
             }
             queryReq.messageID = brkindex;
@@ -2612,26 +2606,23 @@ void CoreBroker::initializeMapBuilder(const std::string &request, std::uint16_t 
             transmit(broker.route, queryReq);
         }
     }
-    switch (index)
-    {
-    case federate_map:
-    break;
-    case current_time_map:
-        break;
-    case dependency_graph:
-    {
-        base["dependents"] = Json::arrayValue;
-        for (auto& dep : timeCoord->getDependents()) {
-            base["dependents"].append(dep.baseValue());
-        }
-        base["dependencies"] = Json::arrayValue;
-        for (auto& dep : timeCoord->getDependencies()) {
-            base["dependencies"].append(dep.baseValue());
-        }
-    }
-    break;
-    case data_flow_graph:
-        break; 
+    switch (index) {
+        case federate_map:
+            break;
+        case current_time_map:
+            break;
+        case dependency_graph: {
+            base["dependents"] = Json::arrayValue;
+            for (auto& dep : timeCoord->getDependents()) {
+                base["dependents"].append(dep.baseValue());
+            }
+            base["dependencies"] = Json::arrayValue;
+            for (auto& dep : timeCoord->getDependencies()) {
+                base["dependencies"].append(dep.baseValue());
+            }
+        } break;
+        case data_flow_graph:
+            break;
     }
 }
 
@@ -2729,39 +2720,32 @@ void CoreBroker::processQuery(ActionMessage& m)
 
 void CoreBroker::processQueryResponse(const ActionMessage& m)
 {
-    if (m.counter == general_query)
-    {
+    if (m.counter == general_query) {
         activeQueries.setDelayedValue(m.messageID, m.payload);
         return;
     }
-    if (isValidIndex(m.counter, mapBuilders))
-    {
-        auto &builder = std::get<0>(mapBuilders[m.counter]);
-        auto &requestors = std::get<1>(mapBuilders[m.counter]);
-        if (builder.addComponent(m.payload, m.messageID)){
+    if (isValidIndex(m.counter, mapBuilders)) {
+        auto& builder = std::get<0>(mapBuilders[m.counter]);
+        auto& requestors = std::get<1>(mapBuilders[m.counter]);
+        if (builder.addComponent(m.payload, m.messageID)) {
             auto str = builder.generate();
-            for (int ii = 0; ii < static_cast<int>(requestors.size()) - 1; ++ii)
-            {
+            for (int ii = 0; ii < static_cast<int>(requestors.size()) - 1; ++ii) {
                 if (requestors[ii].dest_id == global_broker_id_local) {
                     activeQueries.setDelayedValue(requestors[ii].messageID, str);
-                }
-                else {
+                } else {
                     requestors[ii].payload = str;
                     routeMessage(std::move(requestors[ii]));
                 }
             }
             if (requestors.back().dest_id == global_broker_id_local) {
-                    activeQueries.setDelayedValue(
-                        requestors.back().messageID, std::move(str));
-                }
-                else {
-                    requestors.back().payload = std::move(str);
-                    routeMessage(std::move(requestors.back()));
-                }
-            
+                activeQueries.setDelayedValue(requestors.back().messageID, std::move(str));
+            } else {
+                requestors.back().payload = std::move(str);
+                routeMessage(std::move(requestors.back()));
+            }
+
             requestors.clear();
-            if (std::get<2>(mapBuilders[m.counter]))
-            {
+            if (std::get<2>(mapBuilders[m.counter])) {
                 builder.reset();
             }
         }

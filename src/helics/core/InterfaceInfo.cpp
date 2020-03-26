@@ -6,9 +6,9 @@ SPDX-License-Identifier: BSD-3-Clause
 */
 #include "InterfaceInfo.hpp"
 
+#include "../common/JsonProcessingFunctions.hpp"
 #include "../common/fmt_format.h"
 #include "helics_definitions.hpp"
-#include "../common/JsonProcessingFunctions.hpp"
 
 #include <sstream>
 
@@ -328,7 +328,7 @@ std::vector<std::pair<int, std::string>> InterfaceInfo::checkInterfacesForIssues
     return issues;
 }
 
-void InterfaceInfo::generateInferfaceConfig(Json::Value &base) const
+void InterfaceInfo::generateInferfaceConfig(Json::Value& base) const
 {
     auto ihandle = inputs.lock_shared();
     if (ihandle->size() > 0) {
@@ -338,7 +338,7 @@ void InterfaceInfo::generateInferfaceConfig(Json::Value &base) const
                 Json::Value ibase;
                 ibase["key"] = ipt->key;
                 if (!ipt->type.empty()) {
-                    ibase["type"]=ipt->type;
+                    ibase["type"] = ipt->type;
                 }
                 if (!ipt->units.empty()) {
                     ibase["units"] = ipt->units;
@@ -356,10 +356,10 @@ void InterfaceInfo::generateInferfaceConfig(Json::Value &base) const
                 Json::Value pbase;
                 pbase["key"] = pub->key;
                 if (!pub->type.empty()) {
-                    pbase["type"] =pub->type;
+                    pbase["type"] = pub->type;
                 }
                 if (!pub->units.empty()) {
-                   pbase["units"] = pub->units;
+                    pbase["units"] = pub->units;
                 }
                 base["publications"].append(std::move(pbase));
             }
@@ -382,10 +382,10 @@ void InterfaceInfo::generateInferfaceConfig(Json::Value &base) const
         }
     }
     phandle.unlock();
-    base["extra"]="configuration";
+    base["extra"] = "configuration";
 }
 
-void InterfaceInfo::GenerateDataFlowGraph(Json::Value &base) const
+void InterfaceInfo::GenerateDataFlowGraph(Json::Value& base) const
 {
     auto ihandle = inputs.lock_shared();
     if (ihandle->size() > 0) {
@@ -397,11 +397,9 @@ void InterfaceInfo::GenerateDataFlowGraph(Json::Value &base) const
             }
             ibase["federate"] = ipt->id.fed_id.baseValue();
             ibase["handle"] = ipt->id.handle.baseValue();
-            if (!ipt->input_sources.empty())
-            {
+            if (!ipt->input_sources.empty()) {
                 ibase["sources"] = Json::arrayValue;
-                for (auto &source : ipt->input_sources)
-                {
+                for (auto& source : ipt->input_sources) {
                     Json::Value sid;
                     sid["federate"] = source.fed_id.baseValue();
                     sid["handle"] = source.handle.baseValue();
@@ -416,25 +414,22 @@ void InterfaceInfo::GenerateDataFlowGraph(Json::Value &base) const
     if (phandle->size() > 0) {
         base["publications"] = Json::arrayValue;
         for (auto& pub : phandle) {
-            
-                Json::Value pbase;
-                if (!pub->key.empty()) {
-                    pbase["key"] = pub->key;
+            Json::Value pbase;
+            if (!pub->key.empty()) {
+                pbase["key"] = pub->key;
+            }
+            pbase["federate"] = pub->id.fed_id.baseValue();
+            pbase["handle"] = pub->id.handle.baseValue();
+            if (!pub->subscribers.empty()) {
+                pbase["targets"] = Json::arrayValue;
+                for (auto& target : pub->subscribers) {
+                    Json::Value sid;
+                    sid["federate"] = target.fed_id.baseValue();
+                    sid["handle"] = target.handle.baseValue();
+                    pbase["targets"].append(sid);
                 }
-                pbase["federate"] = pub->id.fed_id.baseValue();
-                pbase["handle"] = pub->id.handle.baseValue();
-                if (!pub->subscribers.empty())
-                {
-                    pbase["targets"] = Json::arrayValue;
-                    for (auto &target : pub->subscribers)
-                    {
-                        Json::Value sid;
-                        sid["federate"] = target.fed_id.baseValue();
-                        sid["handle"] = target.handle.baseValue();
-                        pbase["targets"].append(sid);
-                    }
-                }
-                base["publications"].append(std::move(pbase));
+            }
+            base["publications"].append(std::move(pbase));
         }
     }
     phandle.unlock();
@@ -443,17 +438,16 @@ void InterfaceInfo::GenerateDataFlowGraph(Json::Value &base) const
     if (ehandle->size() > 0) {
         base["endpoints"] = Json::arrayValue;
         for (auto& ept : ehandle) {
-            
-                Json::Value ebase;
-                ebase["federate"] = ept->id.fed_id.baseValue();
-                ebase["handle"] = ept->id.handle.baseValue();
-                if (!ept->key.empty()) {
-                    ebase["key"] = ept->key;
-                }
-                base["endpoints"].append(std::move(ebase));
+            Json::Value ebase;
+            ebase["federate"] = ept->id.fed_id.baseValue();
+            ebase["handle"] = ept->id.handle.baseValue();
+            if (!ept->key.empty()) {
+                ebase["key"] = ept->key;
+            }
+            base["endpoints"].append(std::move(ebase));
         }
     }
-   ehandle.unlock();
+    ehandle.unlock();
 }
 
 } // namespace helics

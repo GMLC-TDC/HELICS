@@ -11,8 +11,8 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "PublicationInfo.hpp"
 #include "federate_id_extra.hpp"
 #include "gmlc/containers/DualMappedPointerVector.hpp"
-#include "json/forwards.h"
 
+#include "json/forwards.h"
 #include <atomic>
 
 /** @file container for keeping the set of different interfaces information for a federate
@@ -77,9 +77,10 @@ class InterfaceInfo {
     /** check the interfaces for specific issues*/
     std::vector<std::pair<int, std::string>> checkInterfacesForIssues();
     /** generate a configuration script for the interfaces*/
-    void generateInferfaceConfig(Json::Value &base) const;
+    void generateInferfaceConfig(Json::Value& base) const;
     /** load a dependency graph for the interfaces*/
-    void GenerateDataFlowGraph(Json::Value &base) const;
+    void GenerateDataFlowGraph(Json::Value& base) const;
+
   private:
     std::atomic<global_federate_id> global_id;
     bool only_update_on_change{
