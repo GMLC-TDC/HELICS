@@ -342,6 +342,8 @@ class CommonCore: public Core, public BrokerBase {
 
     /** check if we can remove some dependencies*/
     void checkDependencies();
+    /** deal with a query response addressed to this core*/
+    void processQueryResponse(const ActionMessage& m);
 
     /** handle command with the core itself as a destination at the core*/
     void processCommandsForCore(const ActionMessage& cmd);
@@ -354,6 +356,8 @@ class CommonCore: public Core, public BrokerBase {
     uint16_t getNextAirlockIndex();
     /** load the basic core info into a JSON object*/
     void loadBasicJsonInfo(Json::Value &base, const std::function<void(Json::Value &fedval, const FedInfo &fed)> &fedLoader) const;
+    /** generate a mapbuilder for the federates*/
+    void initializeMapBuilder(const std::string &request, std::uint16_t index, bool reset) const;
     /** generate results for core queries*/
     std::string coreQuery(const std::string& queryStr) const;
 
@@ -390,7 +394,7 @@ class CommonCore: public Core, public BrokerBase {
         1}; //!< counter for queries start at 1 so the default value isn't used
     gmlc::concurrency::DelayedObjects<std::string> activeQueries; //!< holder for active queries
      /// holder for the query map builder information
-    std::vector < std::tuple< JsonMapBuilder, std::vector<ActionMessage>, bool>> mapBuilders;
+    mutable std::vector < std::tuple< JsonMapBuilder, std::vector<ActionMessage>, bool>> mapBuilders;
     std::map<interface_handle, std::unique_ptr<FilterCoordinator>>
         filterCoord; //!< map of all local filters
     // The interface_handle used is here is usually referencing an endpoint

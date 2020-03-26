@@ -2578,7 +2578,6 @@ void CoreBroker::initializeMapBuilder(const std::string &request, std::uint16_t 
     if (!isValidIndex(index, mapBuilders))
     {
         mapBuilders.resize(index + 1);
-
     }
     std::get<2>(mapBuilders[index]) = reset;
     auto &builder = std::get<0>(mapBuilders[index]);

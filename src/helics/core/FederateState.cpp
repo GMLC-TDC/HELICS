@@ -1620,17 +1620,17 @@ std::string FederateState::processQueryActual(const std::string& query) const
     if (query == "publications") {
         return generateStringVector(interfaceInformation.getPublications(), [](auto& pub) {
             return pub->key;
-        });
+            });
     }
     if (query == "inputs") {
         return generateStringVector(interfaceInformation.getInputs(), [](auto& inp) {
             return inp->key;
-        });
+            });
     }
     if (query == "endpoints") {
         return generateStringVector(interfaceInformation.getEndpoints(), [](auto& ept) {
             return ept->key;
-        });
+            });
     }
     if (query == "interfaces") {
         return "{" + interfaceInformation.generateInferfaceConfig() + "}";
@@ -1656,7 +1656,7 @@ std::string FederateState::processQueryActual(const std::string& query) const
     if (query == "dependencies") {
         return generateStringVector(timeCoord->getDependencies(), [](auto& dep) {
             return std::to_string(dep.baseValue());
-        });
+            });
     }
     if (query == "current_time") {
         return timeCoord->printTimeStatus();
@@ -1679,13 +1679,40 @@ std::string FederateState::processQueryActual(const std::string& query) const
     if (query == "dependents") {
         return generateStringVector(timeCoord->getDependents(), [](auto& dep) {
             return std::to_string(dep.baseValue());
-        });
+            });
     }
     if (query == "data_flow_graph") {
         Json::Value base;
         base["name"] = getIdentifier();
         base["id"] = global_id.load().baseValue();
+        base["parent"] = parent_->getGlobalId().baseValue();
         interfaceInformation.GenerateDataFlowGraph(base);
+        return generateJsonString(base);
+    }
+    if (query == "global_time")
+    {
+        Json::Value base;
+        base["name"] = getIdentifier();
+        base["id"] = global_id.load().baseValue();
+        base["parent"] = parent_->getGlobalId().baseValue();
+        base["granted_time"] = static_cast<double>(timeCoord->getGrantedTime());
+        base["send_time"] = static_cast<double>(timeCoord->allowedSendTime());
+        return generateJsonString(base);
+    }
+    if (query == "dependency_graph")
+    {
+        Json::Value base;
+        base["name"] = getIdentifier();
+        base["id"] = global_id.load().baseValue();
+        base["parent"] = parent_->getGlobalId().baseValue();
+        base["dependents"] = Json::arrayValue;
+        for (auto& dep : timeCoord->getDependents()) {
+            base["dependents"].append(dep.baseValue());
+        }
+        base["dependencies"] = Json::arrayValue;
+        for (auto& dep : timeCoord->getDependencies()) {
+            base["dependencies"].append(dep.baseValue());
+        }
         return generateJsonString(base);
     }
     if (queryCallback) {

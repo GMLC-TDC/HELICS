@@ -1924,6 +1924,21 @@ void CommonCore::setIdentifier(const std::string& name)
     }
 }
 
+//enumeration of subqueries that cascade and need multiple levels of processing
+enum subqueries : std::uint16_t {
+    general_query = 0,
+    current_time_map = 2,
+    dependency_graph = 3,
+    data_flow_graph = 4
+};
+
+static const std::map<std::string, std::pair<std::uint16_t, bool>> mapIndex
+{
+    {"global_time",{current_time_map,true}},
+    {"dependency_graph",{dependency_graph,false}},
+    {"data_flow_graph",{current_time_map,false}},
+};
+
 void CommonCore::setQueryCallback(
     local_federate_id federateID,
     std::function<std::string(const std::string&)> queryFunction)
@@ -2066,6 +2081,85 @@ void CommonCore::loadBasicJsonInfo(
     }
 }
 
+void CommonCore::initializeMapBuilder(const std::string &request, std::uint16_t index, bool reset) const
+{
+    if (!isValidIndex(index, mapBuilders))
+    {
+        mapBuilders.resize(index + 1);
+    }
+    std::get<2>(mapBuilders[index]) = reset;
+    auto &builder = std::get<0>(mapBuilders[index]);
+    builder.reset();
+    Json::Value& base = builder.getJValue();
+    base["name"] = getIdentifier();
+    base["id"] = global_broker_id_local.baseValue();
+    base["parent"] = higher_broker_id.baseValue();
+    base["brokers"] = Json::arrayValue;
+    ActionMessage queryReq(CMD_BROKER_QUERY);
+    queryReq.payload = request;
+    queryReq.source_id = global_broker_id_local;
+    queryReq.counter = index; // indicating which processing to use
+    if (loopFederates.size()>0)
+    {
+        base["federates"] = Json::arrayValue;
+        for (auto& fed : loopFederates) {
+            int brkindex = builder.generatePlaceHolder("federates");
+            std::string ret = federateQuery(fed.fed, request);
+            if (ret == "#wait") {
+                queryReq.messageID = brkindex;
+                queryReq.dest_id = fed.fed->global_id;
+                fed.fed->addAction(queryReq);
+            }
+            else
+            {
+                builder.addComponent(ret, brkindex);
+            }
+        }
+    }
+   
+    switch (index)
+    {
+    case current_time_map:
+        if (hasTimeDependency) {
+            base["next_time"] = static_cast<double>(timeCoord->getNextTime());
+        }
+        break;
+    case dependency_graph:
+    {
+        if (hasTimeDependency)
+        {
+            base["dependents"] = Json::arrayValue;
+            for (auto& dep : timeCoord->getDependents()) {
+                base["dependents"].append(dep.baseValue());
+            }
+            base["dependencies"] = Json::arrayValue;
+            for (auto& dep : timeCoord->getDependencies()) {
+                base["dependencies"].append(dep.baseValue());
+            }
+        }
+    }
+    break;
+    case data_flow_graph:
+        if (filters.size() > 0)
+        {
+            base["filters"] = Json::arrayValue;
+            for (auto &filt : filters)
+            {
+                Json::Value filter;
+                filter["id"] = filt->handle.baseValue();
+                filter["name"] = filt->key;
+                filter["cloning"] = filt->cloning;
+                filter["source_targets"] = generateStringVector(filt->sourceTargets, [](auto& dep) {
+                    return std::to_string(dep.fed_id.baseValue()) + "::" + std::to_string(dep.handle.baseValue()); });
+                filter["dest_targets"] = generateStringVector(filt->destTargets, [](auto& dep) {
+                    return std::to_string(dep.fed_id.baseValue()) + "::" + std::to_string(dep.handle.baseValue()); });
+                base["filters"].append(std::move(filter));
+            }
+        }
+        break;
+    }
+}
+
 std::string CommonCore::coreQuery(const std::string& queryStr) const
 {
     auto res = quickCoreQueries(queryStr);
@@ -2143,16 +2237,34 @@ std::string CommonCore::coreQuery(const std::string& queryStr) const
 
         return generateJsonString(base);
     }
+    auto mi = mapIndex.find(queryStr);
+    if (mi != mapIndex.end())
+    {
+        auto index = mi->second.first;
+        if (isValidIndex(index, mapBuilders) && !mi->second.second)
+        {
+            if (std::get<0>(mapBuilders[index]).isCompleted()) {
+                return std::get<0>(mapBuilders[index]).generate();
+            }
+            if (std::get<0>(mapBuilders[index]).isActive())
+            {
+                return "#wait";
+            }
+        }
 
+        initializeMapBuilder(queryStr, index, mi->second.second);
+        if (std::get<0>(mapBuilders[index]).isCompleted()) {
+            return std::get<0>(mapBuilders[index]).generate();
+        }
+        return "#wait";
+    }
     if (queryStr == "global_time") {
         Json::Value base;
         loadBasicJsonInfo(base, [](Json::Value& val, const FedInfo& fed) {
             val["granted_time"] = static_cast<double>(fed->grantedTime());
             val["send_time"] = static_cast<double>(fed->nextAllowedSendTime());
         });
-        if (hasTimeDependency) {
-            base["next_time"] = static_cast<double>(timeCoord->getNextTime());
-        }
+        
         return generateJsonString(base);
     }
     if (queryStr == "dependencies") {
@@ -2171,48 +2283,6 @@ std::string CommonCore::coreQuery(const std::string& queryStr) const
     if (queryStr == "federate_map") {
         Json::Value base;
         loadBasicJsonInfo(base, [](Json::Value&, const FedInfo&) {});
-        return generateJsonString(base);
-    }
-    if (queryStr == "dependency_graph") {
-        Json::Value base;
-        loadBasicJsonInfo(base, [](Json::Value& val, const FedInfo& fed) {
-            val["dependencies"] = Json::arrayValue;
-            for (auto& dep : fed->getDependencies()) {
-                val["dependencies"].append(dep.baseValue());
-            }
-            val["dependents"] = Json::arrayValue;
-            for (auto& dep : fed->getDependents()) {
-                val["dependents"].append(dep.baseValue());
-            }
-        });
-        if (hasTimeDependency) {
-            base["dependents"] = Json::arrayValue;
-            for (auto& dep : timeCoord->getDependents()) {
-                base["dependents"].append(dep.baseValue());
-            }
-            base["dependencies"] = Json::arrayValue;
-            for (auto& dep : timeCoord->getDependencies()) {
-                base["dependencies"].append(dep.baseValue());
-            }
-        }
-        return generateJsonString(base);
-    }
-    if (queryStr == "data_flow_graph") {
-        Json::Value base;
-        loadBasicJsonInfo(base, nullptr);
-        base["filters"] = Json::arrayValue;
-        for (auto &filt : filters)
-        {
-            Json::Value filter;
-            filter["id"] = filt->handle.baseValue();
-            filter["name"] = filt->key;
-            filter["cloning"] = filt->cloning;
-            filter["source_targets"] = generateStringVector(filt->sourceTargets, [](auto& dep) {
-                return std::to_string(dep.fed_id.baseValue())+"::"+ std::to_string(dep.handle.baseValue()); });
-            filter["dest_targets"] = generateStringVector(filt->destTargets, [](auto& dep) {
-                return std::to_string(dep.fed_id.baseValue()) + "::" + std::to_string(dep.handle.baseValue()); });
-            base["filters"].append(std::move(filter));
-        }
         return generateJsonString(base);
     }
     return "#invalid";
@@ -2260,20 +2330,20 @@ std::string CommonCore::query(const std::string& target, const std::string& quer
 
             querycmd.dest_id = fed->global_id;
 
-            auto queryResult = ActiveQueries.getFuture(querycmd.messageID);
+            auto queryResult = activeQueries.getFuture(querycmd.messageID);
             fed->addAction(std::move(querycmd));
             std::future_status status = std::future_status::timeout;
             while (status == std::future_status::timeout) {
                 status = queryResult.wait_for(std::chrono::milliseconds(50));
                 if (status == std::future_status::ready) {
                     auto qres = queryResult.get();
-                    ActiveQueries.finishedWithValue(index);
+                    activeQueries.finishedWithValue(index);
                     return qres;
                 }
                 // federate query may need to wait or can get the result now
                 ret = federateQuery(fed, queryStr);
                 if (ret != "#wait") {
-                    ActiveQueries.finishedWithValue(index);
+                    activeQueries.finishedWithValue(index);
                     return ret;
                 }
             }
@@ -3472,6 +3542,47 @@ void CommonCore::processFilterInfo(ActionMessage& command)
             auto endhandle = loopHandles.getEndpoint(command.dest_handle);
             if (endhandle != nullptr) {
                 setActionFlag(*endhandle, has_source_filter_flag);
+            }
+        }
+    }
+}
+
+void CommonCore::processQueryResponse(const ActionMessage& m)
+{
+    if (m.counter == general_query)
+    {
+        activeQueries.setDelayedValue(m.messageID, m.payload);
+        return;
+    }
+    if (isValidIndex(m.counter, mapBuilders))
+    {
+        auto &builder = std::get<0>(mapBuilders[m.counter]);
+        auto &requestors = std::get<1>(mapBuilders[m.counter]);
+        if (builder.addComponent(m.payload, m.messageID)) {
+            auto str = builder.generate();
+            for (int ii = 0; ii < static_cast<int>(requestors.size()) - 1; ++ii)
+            {
+                if (requestors[ii].dest_id == global_broker_id_local) {
+                    activeQueries.setDelayedValue(requestors[ii].messageID, str);
+                }
+                else {
+                    requestors[ii].payload = str;
+                    routeMessage(std::move(requestors[ii]));
+                }
+            }
+            if (requestors.back().dest_id == global_broker_id_local) {
+                activeQueries.setDelayedValue(
+                    requestors.back().messageID, std::move(str));
+            }
+            else {
+                requestors.back().payload = std::move(str);
+                routeMessage(std::move(requestors.back()));
+            }
+
+            requestors.clear();
+            if (std::get<2>(mapBuilders[m.counter]))
+            {
+                builder.reset();
             }
         }
     }

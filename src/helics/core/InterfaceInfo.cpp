@@ -441,7 +441,6 @@ void InterfaceInfo::GenerateDataFlowGraph(Json::Value &base) const
                 if (!ept->key.empty()) {
                     ebase["key"] = ept->key;
                 }
-                
                 base["endpoints"].append(std::move(ebase));
         }
     }
