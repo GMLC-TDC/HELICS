@@ -423,6 +423,17 @@ void InterfaceInfo::GenerateDataFlowGraph(Json::Value &base) const
                 }
                 pbase["federate"] = pub->id.fed_id.baseValue();
                 pbase["handle"] = pub->id.handle.baseValue();
+                if (!pub->subscribers.empty())
+                {
+                    pbase["targets"] = Json::arrayValue;
+                    for (auto &target : pub->subscribers)
+                    {
+                        Json::Value sid;
+                        sid["federate"] = target.fed_id.baseValue();
+                        sid["handle"] = target.handle.baseValue();
+                        pbase["targets"].append(sid);
+                    }
+                }
                 base["publications"].append(std::move(pbase));
         }
     }

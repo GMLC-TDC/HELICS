@@ -1936,7 +1936,7 @@ static const std::map<std::string, std::pair<std::uint16_t, bool>> mapIndex
 {
     {"global_time",{current_time_map,true}},
     {"dependency_graph",{dependency_graph,false}},
-    {"data_flow_graph",{current_time_map,false}},
+    {"data_flow_graph",{data_flow_graph,false} },
 };
 
 void CommonCore::setQueryCallback(
@@ -2095,7 +2095,7 @@ void CommonCore::initializeMapBuilder(const std::string &request, std::uint16_t 
     base["id"] = global_broker_id_local.baseValue();
     base["parent"] = higher_broker_id.baseValue();
     base["brokers"] = Json::arrayValue;
-    ActionMessage queryReq(CMD_BROKER_QUERY);
+    ActionMessage queryReq(CMD_QUERY);
     queryReq.payload = request;
     queryReq.source_id = global_broker_id_local;
     queryReq.counter = index; // indicating which processing to use
@@ -2492,17 +2492,30 @@ void CommonCore::processPriorityCommand(ActionMessage&& command)
         case CMD_BROKER_QUERY:
             if (command.dest_id == global_broker_id_local || command.dest_id == direct_core_id) {
                 std::string repStr = coreQuery(command.payload);
-                if (command.source_id == direct_core_id) {
-                    activeQueries.setDelayedValue(command.messageID, std::move(repStr));
-                } else {
+                if (repStr != "#wait")
+                {
+                    if (command.source_id == direct_core_id) {
+                        activeQueries.setDelayedValue(command.messageID, std::move(repStr));
+                    }
+                    else {
+                        ActionMessage queryResp(CMD_QUERY_REPLY);
+                        queryResp.dest_id = command.source_id;
+                        queryResp.source_id = global_broker_id_local;
+                        queryResp.messageID = command.messageID;
+                        queryResp.payload = std::move(repStr);
+                        queryResp.counter = command.counter;
+                        transmit(getRoute(queryResp.dest_id), queryResp);
+                    }
+                }
+                else {
                     ActionMessage queryResp(CMD_QUERY_REPLY);
                     queryResp.dest_id = command.source_id;
                     queryResp.source_id = global_broker_id_local;
                     queryResp.messageID = command.messageID;
-                    queryResp.payload = std::move(repStr);
                     queryResp.counter = command.counter;
-                    transmit(getRoute(queryResp.dest_id), queryResp);
+                    std::get<1>(mapBuilders[mapIndex.at(command.payload).first]).push_back(queryResp);
                 }
+                
             } else {
                 routeMessage(std::move(command));
             }
@@ -2560,7 +2573,10 @@ void CommonCore::processPriorityCommand(ActionMessage&& command)
         } break;
         case CMD_QUERY_REPLY:
             if (command.dest_id == global_broker_id_local) {
-                activeQueries.setDelayedValue(command.messageID, command.payload);
+                processQueryResponse(command);
+            }
+            else {
+                transmit(getRoute(command.dest_id), command);
             }
             break;
         case CMD_PRIORITY_ACK:
@@ -3570,7 +3586,7 @@ void CommonCore::processQueryResponse(const ActionMessage& m)
                     routeMessage(std::move(requestors[ii]));
                 }
             }
-            if (requestors.back().dest_id == global_broker_id_local) {
+            if (requestors.back().dest_id == global_broker_id_local || requestors.back().dest_id == direct_core_id) {
                 activeQueries.setDelayedValue(
                     requestors.back().messageID, std::move(str));
             }

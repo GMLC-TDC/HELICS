@@ -2389,7 +2389,7 @@ static const std::map<std::string, std::pair<std::uint16_t, bool>> mapIndex
     {"global_time",{current_time_map,true}},
     {"federate_map",{federate_map,false}},
     {"dependency_graph",{dependency_graph,false}},
-    {"data_flow_graph",{current_time_map,false}},
+    {"data_flow_graph",{data_flow_graph ,false}},
 };
 
 std::string CoreBroker::generateQueryAnswer(const std::string& request)
@@ -2631,7 +2631,7 @@ void CoreBroker::initializeMapBuilder(const std::string &request, std::uint16_t 
     }
     break;
     case data_flow_graph:
-        break;
+        break; 
     }
 }
 
