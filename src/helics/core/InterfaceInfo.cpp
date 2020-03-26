@@ -328,9 +328,8 @@ std::vector<std::pair<int, std::string>> InterfaceInfo::checkInterfacesForIssues
     return issues;
 }
 
-std::string InterfaceInfo::generateInferfaceConfig() const
+void InterfaceInfo::generateInferfaceConfig(Json::Value &base) const
 {
-    Json::Value base;
     auto ihandle = inputs.lock_shared();
     if (ihandle->size() > 0) {
         base["inputs"] = Json::arrayValue;
@@ -384,7 +383,6 @@ std::string InterfaceInfo::generateInferfaceConfig() const
     }
     phandle.unlock();
     base["extra"]="configuration";
-    return generateJsonString(base);
 }
 
 void InterfaceInfo::GenerateDataFlowGraph(Json::Value &base) const

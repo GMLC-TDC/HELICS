@@ -77,7 +77,7 @@ class InterfaceInfo {
     /** check the interfaces for specific issues*/
     std::vector<std::pair<int, std::string>> checkInterfacesForIssues();
     /** generate a configuration script for the interfaces*/
-    std::string generateInferfaceConfig() const;
+    void InterfaceInfo::generateInferfaceConfig(Json::Value &base) const;
     /** load a dependency graph for the interfaces*/
     void GenerateDataFlowGraph(Json::Value &base) const;
   private:
