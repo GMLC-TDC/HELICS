@@ -180,10 +180,9 @@ bool FederateState::checkAndSetValue(interface_handle pub_id, const char* data, 
     return res;
 }
 
-void FederateState::generateConfig(Json::Value &base) const
+void FederateState::generateConfig(Json::Value& base) const
 {
-
-    base["only_transmit_on_change"]=only_transmit_on_change;
+    base["only_transmit_on_change"] = only_transmit_on_change;
     base["realtime"] = realtime;
     base["observer"] = observer;
     base["source_only"] = source_only;
@@ -1615,17 +1614,17 @@ std::string FederateState::processQueryActual(const std::string& query) const
     if (query == "publications") {
         return generateStringVector(interfaceInformation.getPublications(), [](auto& pub) {
             return pub->key;
-            });
+        });
     }
     if (query == "inputs") {
         return generateStringVector(interfaceInformation.getInputs(), [](auto& inp) {
             return inp->key;
-            });
+        });
     }
     if (query == "endpoints") {
         return generateStringVector(interfaceInformation.getEndpoints(), [](auto& ept) {
             return ept->key;
-            });
+        });
     }
     if (query == "interfaces") {
         Json::Value base;
@@ -1653,7 +1652,7 @@ std::string FederateState::processQueryActual(const std::string& query) const
     if (query == "dependencies") {
         return generateStringVector(timeCoord->getDependencies(), [](auto& dep) {
             return std::to_string(dep.baseValue());
-            });
+        });
     }
     if (query == "current_time") {
         return timeCoord->printTimeStatus();
@@ -1674,7 +1673,7 @@ std::string FederateState::processQueryActual(const std::string& query) const
     if (query == "dependents") {
         return generateStringVector(timeCoord->getDependents(), [](auto& dep) {
             return std::to_string(dep.baseValue());
-            });
+        });
     }
     if (query == "data_flow_graph") {
         Json::Value base;
@@ -1684,8 +1683,7 @@ std::string FederateState::processQueryActual(const std::string& query) const
         interfaceInformation.GenerateDataFlowGraph(base);
         return generateJsonString(base);
     }
-    if (query == "global_time")
-    {
+    if (query == "global_time") {
         Json::Value base;
         base["name"] = getIdentifier();
         base["id"] = global_id.load().baseValue();
@@ -1694,8 +1692,7 @@ std::string FederateState::processQueryActual(const std::string& query) const
         base["send_time"] = static_cast<double>(timeCoord->allowedSendTime());
         return generateJsonString(base);
     }
-    if (query == "dependency_graph")
-    {
+    if (query == "dependency_graph") {
         Json::Value base;
         base["name"] = getIdentifier();
         base["id"] = global_id.load().baseValue();

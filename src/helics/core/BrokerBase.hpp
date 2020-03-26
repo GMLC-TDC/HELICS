@@ -154,6 +154,7 @@ class BrokerBase {
     void setLogLevels(int32_t consoleLevel, int32_t fileLevel);
     /** get the internal global broker id*/
     global_broker_id getGlobalId() const { return global_id.load(); }
+
   private:
     /** start main broker loop*/
     void queueProcessingLoop();

@@ -6,11 +6,12 @@ SPDX-License-Identifier: BSD-3-Clause
 */
 
 #include "TimeCoordinator.hpp"
-#include "json/json.h"
+
 #include "../common/fmt_format.h"
 #include "flagOperations.hpp"
 #include "helics_definitions.hpp"
 
+#include "json/json.h"
 #include <algorithm>
 #include <set>
 
@@ -239,7 +240,7 @@ void TimeCoordinator::updateValueTime(Time valueUpdateTime)
     }
 }
 
-void TimeCoordinator::generateConfig(Json::Value &base) const
+void TimeCoordinator::generateConfig(Json::Value& base) const
 {
     base["uninterruptible"] = info.uninterruptible;
     base["wait_for_current_time_updates"] = info.wait_for_current_time_updates;
@@ -247,19 +248,19 @@ void TimeCoordinator::generateConfig(Json::Value &base) const
     base["max_iterations"] = info.maxIterations;
 
     if (info.period > timeZero) {
-        base["period"]=static_cast<double>(info.period);
+        base["period"] = static_cast<double>(info.period);
     }
     if (info.offset != timeZero) {
-        base["offset"]=static_cast<double>(info.offset);
+        base["offset"] = static_cast<double>(info.offset);
     }
     if (info.timeDelta > Time::epsilon()) {
-        base["time_delta"]= static_cast<double>(info.timeDelta);
+        base["time_delta"] = static_cast<double>(info.timeDelta);
     }
     if (info.outputDelay > timeZero) {
-        base["output_delay"]= static_cast<double>(info.outputDelay);
+        base["output_delay"] = static_cast<double>(info.outputDelay);
     }
     if (info.inputDelay > timeZero) {
-        base["intput_delay"]=static_cast<double>(info.inputDelay);
+        base["intput_delay"] = static_cast<double>(info.inputDelay);
     }
 }
 
