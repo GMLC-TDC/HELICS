@@ -21,6 +21,7 @@ Increased code coverage and additional bug fixes.
 -   An issue with host name resolution on some systems with restricted DNS lookup
 -   Allow camelCase in file parameters from JSON
 -   Fixed linking error with default OpenMPI Spack package
+-   Fixed timing benchmark federate name
 
 ### Added
 -   A series of tests for MessageFederate.cpp to increase coverage on that file to 100%
