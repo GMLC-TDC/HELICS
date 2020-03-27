@@ -16,6 +16,7 @@ Increased code coverage and additional bug fixes.
 ### Fixed
 -   MacOS build with python 2.7 failure
 -   Fixed some issues with the build/test process if the `ENABLE_ZMQ_CORE=OFF`
+-   Fixed linking error with default OpenMPI Spack package
 
 ### Added
 -   A series of tests for MessageFederate.cpp to increase coverage on that file to 100%

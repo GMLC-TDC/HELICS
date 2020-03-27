@@ -95,3 +95,37 @@ if(MPI_C_FOUND AND NOT TARGET MPI::MPI_C)
         PROPERTIES INTERFACE_COMPILE_DEFINITIONS "${MPI_C_COMPILE_DEFINITIONS}"
     )
 endif()
+if(MPI_CXX_FOUND AND NOT TARGET MPI::MPI_CXX)
+    add_library(MPI::MPI_CXX INTERFACE IMPORTED)
+    set_property(TARGET MPI::MPI_CXX PROPERTY INTERFACE_LINK_LIBRARIES "")
+    if(MPI_CXX_LIBRARIES)
+        set_property(
+            TARGET MPI::MPI_CXX
+            APPEND
+            PROPERTY INTERFACE_LINK_LIBRARIES "${MPI_CXX_LIBRARIES}"
+        )
+    endif()
+    if(MPI_CXX_LINK_FLAGS)
+        string(STRIP "${MPI_CXX_LINK_FLAGS}" trimmed_mpi_cxx_flags)
+        set_property(
+            TARGET MPI::MPI_CXX
+            APPEND
+            PROPERTY INTERFACE_LINK_LIBRARIES "${trimmed_mpi_cxx_flags}"
+        )
+    endif()
+    set_target_properties(
+        MPI::MPI_CXX
+        PROPERTIES
+            INTERFACE_INCLUDE_DIRECTORIES
+            "${MPI_CXX_INCLUDE_DIR};${MPI_CXX_HEADER_DIR};${MPI_CXX_ADDITIONAL_INCLUDE_DIRS};${MPI_CXX_INCLUDE_PATH}"
+    )
+    set_target_properties(
+        MPI::MPI_CXX
+        PROPERTIES INTERFACE_COMPILE_OPTIONS "${MPI_CXX_COMPILE_OPTIONS}"
+    )
+    set_target_properties(
+        MPI::MPI_CXX
+        PROPERTIES INTERFACE_COMPILE_DEFINITIONS "${MPI_CXX_COMPILE_DEFINITIONS}"
+    )
+
+endif()
