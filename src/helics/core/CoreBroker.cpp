@@ -978,7 +978,7 @@ void CoreBroker::processCommand(ActionMessage&& command)
                     transmit(parent_route_id, m);
                 }
             }
-            ActiveQueries.fulfillAllPromises("#disconnected");
+            activeQueries.fulfillAllPromises("#disconnected");
             break;
         case CMD_BROADCAST_DISCONNECT: {
             timeCoord->processTimeMessage(command);
@@ -2320,10 +2320,10 @@ std::string CoreBroker::query(const std::string& target, const std::string& quer
         auto index = ++queryCounter;
         querycmd.messageID = index;
         querycmd.payload = queryStr;
-        auto queryResult = ActiveQueries.getFuture(index);
+        auto queryResult = activeQueries.getFuture(index);
         addActionMessage(std::move(querycmd));
         auto ret = queryResult.get();
-        ActiveQueries.finishedWithValue(index);
+        activeQueries.finishedWithValue(index);
         return ret;
     } else if (target == "parent") {
         if (isRootc) {
@@ -2333,10 +2333,10 @@ std::string CoreBroker::query(const std::string& target, const std::string& quer
         querycmd.source_id = gid;
         querycmd.messageID = ++queryCounter;
         querycmd.payload = queryStr;
-        auto queryResult = ActiveQueries.getFuture(querycmd.messageID);
+        auto queryResult = activeQueries.getFuture(querycmd.messageID);
         addActionMessage(querycmd);
         auto ret = queryResult.get();
-        ActiveQueries.finishedWithValue(querycmd.messageID);
+        activeQueries.finishedWithValue(querycmd.messageID);
         return ret;
     } else if ((target == "root") || (target == "rootbroker")) {
         ActionMessage querycmd(CMD_BROKER_QUERY);
@@ -2344,11 +2344,11 @@ std::string CoreBroker::query(const std::string& target, const std::string& quer
         auto index = ++queryCounter;
         querycmd.messageID = index;
         querycmd.payload = queryStr;
-        auto queryResult = ActiveQueries.getFuture(querycmd.messageID);
+        auto queryResult = activeQueries.getFuture(querycmd.messageID);
         transmitToParent(std::move(querycmd));
 
         auto ret = queryResult.get();
-        ActiveQueries.finishedWithValue(index);
+        activeQueries.finishedWithValue(index);
         return ret;
     } else {
         ActionMessage querycmd(CMD_QUERY);
@@ -2357,11 +2357,11 @@ std::string CoreBroker::query(const std::string& target, const std::string& quer
         querycmd.messageID = index;
         querycmd.payload = queryStr;
         querycmd.setStringData(target);
-        auto queryResult = ActiveQueries.getFuture(querycmd.messageID);
+        auto queryResult = activeQueries.getFuture(querycmd.messageID);
         transmitToParent(std::move(querycmd));
 
         auto ret = queryResult.get();
-        ActiveQueries.finishedWithValue(index);
+        activeQueries.finishedWithValue(index);
         return ret;
     }
     //  return "#invalid";
@@ -2375,6 +2375,21 @@ void CoreBroker::setGlobal(const std::string& valueName, const std::string& valu
     querycmd.setStringData(value);
     transmitToParent(std::move(querycmd));
 }
+//enumeration of subqueries that cascade and need multiple levels of processing
+enum subqueries : std::uint16_t {
+    general_query = 0,
+    federate_map = 1,
+    current_time_map = 2,
+    dependency_graph = 3,
+    data_flow_graph = 4
+};
+
+static const std::map<std::string, std::pair<std::uint16_t, bool>> mapIndex{
+    {"global_time", {current_time_map, true}},
+    {"federate_map", {federate_map, false}},
+    {"dependency_graph", {dependency_graph, false}},
+    {"data_flow_graph", {data_flow_graph, false}},
+};
 
 std::string CoreBroker::generateQueryAnswer(const std::string& request)
 {
@@ -2390,7 +2405,7 @@ std::string CoreBroker::generateQueryAnswer(const std::string& request)
     }
     if ((request == "queries") || (request == "available_queries")) {
         return "[isinit;isconnected;name;address;queries;address;counts;summary;federates;brokers;inputs;endpoints;"
-               "publications;filters;federate_map;dependency_graph;dependencies;dependson;dependents;"
+               "publications;filters;federate_map;dependency_graph;data_flow_graph;dependencies;dependson;dependents;"
                "current_time;current_state;global_time]";
     }
     if (request == "address") {
@@ -2452,16 +2467,25 @@ std::string CoreBroker::generateQueryAnswer(const std::string& request)
             return "{}";
         }
     }
-    if (request == "global_time") {
-        if (currentTimeMap.isActive()) {
-            return "#wait";
+    auto mi = mapIndex.find(request);
+    if (mi != mapIndex.end()) {
+        auto index = mi->second.first;
+        if (isValidIndex(index, mapBuilders) && !mi->second.second) {
+            if (std::get<0>(mapBuilders[index]).isCompleted()) {
+                return std::get<0>(mapBuilders[index]).generate();
+            }
+            if (std::get<0>(mapBuilders[index]).isActive()) {
+                return "#wait";
+            }
         }
-        initializeCurrentTimeMap();
-        if (currentTimeMap.isCompleted()) {
-            return currentTimeMap.generate();
+
+        initializeMapBuilder(request, index, mi->second.second);
+        if (std::get<0>(mapBuilders[index]).isCompleted()) {
+            return std::get<0>(mapBuilders[index]).generate();
         }
         return "#wait";
     }
+
     if (request == "inputs") {
         return generateStringVector_if(
             handles,
@@ -2486,32 +2510,7 @@ std::string CoreBroker::generateQueryAnswer(const std::string& request)
             [](auto& handle) { return handle.key; },
             [](auto& handle) { return (handle.handleType == handle_type::endpoint); });
     }
-    if (request == "federate_map") {
-        if (fedMap.isCompleted()) {
-            return fedMap.generate();
-        }
-        if (fedMap.isActive()) {
-            return "#wait";
-        }
-        initializeFederateMap();
-        if (fedMap.isCompleted()) {
-            return fedMap.generate();
-        }
-        return "#wait";
-    }
-    if (request == "dependency_graph") {
-        if (depMap.isCompleted()) {
-            return depMap.generate();
-        }
-        if (depMap.isActive()) {
-            return "#wait";
-        }
-        initializeDependencyGraph();
-        if (depMap.isCompleted()) {
-            return depMap.generate();
-        }
-        return "#wait";
-    }
+
     if (request == "dependson") {
         return generateStringVector(timeCoord->getDependencies(), [](const auto& dep) {
             return std::to_string(dep.baseValue());
@@ -2542,15 +2541,6 @@ std::string CoreBroker::generateQueryAnswer(const std::string& request)
     return "#invalid";
 }
 
-//enumeration of subqueries that cascade and need multiple levels of processing
-enum subqueries : std::uint16_t {
-    general_query = 0,
-    federate_map = 2,
-    dependency_graph = 4,
-    current_time_map = 6,
-    data_flow_graph = 8
-};
-
 std::string CoreBroker::getNameList(std::string gidString) const
 {
     if (gidString.back() == ']') {
@@ -2579,9 +2569,15 @@ std::string CoreBroker::getNameList(std::string gidString) const
     gidString.push_back(']');
     return gidString;
 }
-void CoreBroker::initializeFederateMap()
+void CoreBroker::initializeMapBuilder(const std::string& request, std::uint16_t index, bool reset)
 {
-    Json::Value& base = fedMap.getJValue();
+    if (!isValidIndex(index, mapBuilders)) {
+        mapBuilders.resize(index + 1);
+    }
+    std::get<2>(mapBuilders[index]) = reset;
+    auto& builder = std::get<0>(mapBuilders[index]);
+    builder.reset();
+    Json::Value& base = builder.getJValue();
     base["name"] = getIdentifier();
     base["id"] = global_broker_id_local.baseValue();
     if (!isRootc) {
@@ -2589,141 +2585,44 @@ void CoreBroker::initializeFederateMap()
     }
     base["brokers"] = Json::arrayValue;
     ActionMessage queryReq(CMD_BROKER_QUERY);
-    queryReq.payload = "federate_map";
+    queryReq.payload = request;
     queryReq.source_id = global_broker_id_local;
-    queryReq.counter = federate_map; // indicating which processing to use
+    queryReq.counter = index; // indicating which processing to use
     bool hasCores = false;
     for (auto& broker : _brokers) {
         if (broker.parent == global_broker_id_local) {
-            int index;
+            int brkindex;
             if (broker._core) {
                 if (!hasCores) {
                     hasCores = true;
                     base["cores"] = Json::arrayValue;
                 }
-                index = fedMap.generatePlaceHolder("cores");
+                brkindex = builder.generatePlaceHolder("cores");
             } else {
-                index = fedMap.generatePlaceHolder("brokers");
+                brkindex = builder.generatePlaceHolder("brokers");
             }
-            queryReq.messageID = index;
+            queryReq.messageID = brkindex;
             queryReq.dest_id = broker.global_id;
             transmit(broker.route, queryReq);
         }
     }
-}
-
-void CoreBroker::initializeDependencyGraph()
-{
-    Json::Value& base = depMap.getJValue();
-    base["name"] = getIdentifier();
-    base["id"] = global_broker_id_local.baseValue();
-    if (!isRootc) {
-        base["parent"] = higher_broker_id.baseValue();
-    }
-    base["brokers"] = Json::arrayValue;
-    ActionMessage queryReq(CMD_BROKER_QUERY);
-    queryReq.payload = "dependency_graph";
-    queryReq.source_id = global_broker_id_local;
-    queryReq.counter = dependency_graph; // indicating which processing to use
-    bool hasCores = false;
-    for (auto& broker : _brokers) {
-        int index;
-        if (broker._core) {
-            if (!hasCores) {
-                hasCores = true;
-                base["cores"] = Json::arrayValue;
+    switch (index) {
+        case federate_map:
+            break;
+        case current_time_map:
+            break;
+        case dependency_graph: {
+            base["dependents"] = Json::arrayValue;
+            for (auto& dep : timeCoord->getDependents()) {
+                base["dependents"].append(dep.baseValue());
             }
-            index = depMap.generatePlaceHolder("cores");
-        } else {
-            index = depMap.generatePlaceHolder("brokers");
-        }
-        queryReq.messageID = index;
-        queryReq.dest_id = broker.global_id;
-        transmit(broker.route, queryReq);
-    }
-
-    base["dependents"] = Json::arrayValue;
-    for (auto& dep : timeCoord->getDependents()) {
-        base["dependents"].append(dep.baseValue());
-    }
-    base["dependencies"] = Json::arrayValue;
-    for (auto& dep : timeCoord->getDependencies()) {
-        base["dependencies"].append(dep.baseValue());
-    }
-}
-
-void CoreBroker::initializeDataFlowGraph()
-{
-    //TODO:: this query is not fully formed yet and is a work in progress
-    Json::Value& base = depMap.getJValue();
-    base["name"] = getIdentifier();
-    base["id"] = global_broker_id_local.baseValue();
-    if (!isRootc) {
-        base["parent"] = higher_broker_id.baseValue();
-    }
-    base["brokers"] = Json::arrayValue;
-    ActionMessage queryReq(CMD_BROKER_QUERY);
-    queryReq.payload = "dependency_graph";
-    queryReq.source_id = global_broker_id_local;
-    queryReq.counter = dependency_graph; // indicating which processing to use
-    bool hasCores = false;
-    for (auto& broker : _brokers) {
-        int index;
-        if (broker._core) {
-            if (!hasCores) {
-                hasCores = true;
-                base["cores"] = Json::arrayValue;
+            base["dependencies"] = Json::arrayValue;
+            for (auto& dep : timeCoord->getDependencies()) {
+                base["dependencies"].append(dep.baseValue());
             }
-            index = depMap.generatePlaceHolder("cores");
-        } else {
-            index = depMap.generatePlaceHolder("brokers");
-        }
-        queryReq.messageID = index;
-        queryReq.dest_id = broker.global_id;
-        transmit(broker.route, queryReq);
-    }
-
-    base["dependents"] = Json::arrayValue;
-    for (auto& dep : timeCoord->getDependents()) {
-        base["dependents"].append(dep.baseValue());
-    }
-    base["dependencies"] = Json::arrayValue;
-    for (auto& dep : timeCoord->getDependencies()) {
-        base["dependencies"].append(dep.baseValue());
-    }
-}
-
-void CoreBroker::initializeCurrentTimeMap()
-{
-    Json::Value& base = currentTimeMap.getJValue();
-    base["name"] = getIdentifier();
-    base["id"] = global_broker_id_local.baseValue();
-    if (!isRootc) {
-        base["parent"] = higher_broker_id.baseValue();
-    }
-    base["brokers"] = Json::arrayValue;
-    ActionMessage queryReq(CMD_BROKER_QUERY);
-    queryReq.payload = "global_time";
-    queryReq.source_id = global_broker_id_local;
-    queryReq.counter = current_time_map; // indicating which processing to use
-    bool hasCores = false;
-    for (auto& broker : _brokers) {
-        if (broker._nonLocal) {
-            continue;
-        }
-        int index;
-        if (broker._core) {
-            if (!hasCores) {
-                hasCores = true;
-                base["cores"] = Json::arrayValue;
-            }
-            index = currentTimeMap.generatePlaceHolder("cores");
-        } else {
-            index = currentTimeMap.generatePlaceHolder("brokers");
-        }
-        queryReq.messageID = index;
-        queryReq.dest_id = broker.global_id;
-        transmit(broker.route, queryReq);
+        } break;
+        case data_flow_graph:
+            break;
     }
 }
 
@@ -2736,17 +2635,9 @@ void CoreBroker::processLocalQuery(const ActionMessage& m)
     queryRep.payload = generateQueryAnswer(m.payload);
     queryRep.counter = m.counter;
     if (queryRep.payload == "#wait") {
-        if (m.payload == "dependency_graph") {
-            depMapRequestors.push_back(queryRep);
-        } else if (m.payload == "federate_map") {
-            fedMapRequestors.push_back(queryRep);
-        } else if (m.payload == "data_flow_graph") {
-            dataflowMapRequestors.push_back(queryRep);
-        } else if (m.payload == "global_time") {
-            ctimeRequestors.push_back(queryRep);
-        }
+        std::get<1>(mapBuilders[mapIndex.at(m.payload).first]).push_back(queryRep);
     } else if (queryRep.dest_id == global_broker_id_local) {
-        ActiveQueries.setDelayedValue(m.messageID, queryRep.payload);
+        activeQueries.setDelayedValue(m.messageID, queryRep.payload);
     } else {
         routeMessage(std::move(queryRep), m.source_id);
     }
@@ -2766,7 +2657,7 @@ void CoreBroker::processQuery(ActionMessage& m)
         queryResp.messageID = m.messageID;
         queryResp.payload = getNameList(m.payload);
         if (queryResp.dest_id == global_broker_id_local) {
-            ActiveQueries.setDelayedValue(m.messageID, queryResp.payload);
+            activeQueries.setDelayedValue(m.messageID, queryResp.payload);
         } else {
             transmit(getRoute(queryResp.dest_id), queryResp);
         }
@@ -2793,7 +2684,7 @@ void CoreBroker::processQuery(ActionMessage& m)
             queryResp.payload = "#invalid";
         }
         if (queryResp.dest_id == global_broker_id_local) {
-            ActiveQueries.setDelayedValue(m.messageID, queryResp.payload);
+            activeQueries.setDelayedValue(m.messageID, queryResp.payload);
         } else {
             transmit(getRoute(queryResp.dest_id), queryResp);
         }
@@ -2817,7 +2708,7 @@ void CoreBroker::processQuery(ActionMessage& m)
 
             queryResp.payload = "#invalid";
             if (queryResp.dest_id == global_broker_id_local) {
-                ActiveQueries.setDelayedValue(m.messageID, queryResp.payload);
+                activeQueries.setDelayedValue(m.messageID, queryResp.payload);
             } else {
                 transmit(getRoute(queryResp.dest_id), queryResp);
             }
@@ -2829,84 +2720,35 @@ void CoreBroker::processQuery(ActionMessage& m)
 
 void CoreBroker::processQueryResponse(const ActionMessage& m)
 {
-    switch (m.counter) {
-        case general_query:
-        default:
-            ActiveQueries.setDelayedValue(m.messageID, m.payload);
-            break;
-        case federate_map:
-            if (fedMap.addComponent(m.payload, m.messageID)) {
-                if (fedMapRequestors.size() == 1) {
-                    if (fedMapRequestors.front().dest_id == global_broker_id_local) {
-                        ActiveQueries.setDelayedValue(
-                            fedMapRequestors.front().messageID, fedMap.generate());
-                    } else {
-                        fedMapRequestors.front().payload = fedMap.generate();
-                        routeMessage(fedMapRequestors.front());
-                    }
+    if (m.counter == general_query) {
+        activeQueries.setDelayedValue(m.messageID, m.payload);
+        return;
+    }
+    if (isValidIndex(m.counter, mapBuilders)) {
+        auto& builder = std::get<0>(mapBuilders[m.counter]);
+        auto& requestors = std::get<1>(mapBuilders[m.counter]);
+        if (builder.addComponent(m.payload, m.messageID)) {
+            auto str = builder.generate();
+            for (int ii = 0; ii < static_cast<int>(requestors.size()) - 1; ++ii) {
+                if (requestors[ii].dest_id == global_broker_id_local) {
+                    activeQueries.setDelayedValue(requestors[ii].messageID, str);
                 } else {
-                    auto str = fedMap.generate();
-                    for (auto& resp : fedMapRequestors) {
-                        if (resp.dest_id == global_broker_id_local) {
-                            ActiveQueries.setDelayedValue(resp.messageID, str);
-                        } else {
-                            resp.payload = str;
-                            routeMessage(resp);
-                        }
-                    }
+                    requestors[ii].payload = str;
+                    routeMessage(std::move(requestors[ii]));
                 }
-                fedMapRequestors.clear();
             }
-            break;
-        case dependency_graph:
-            if (depMap.addComponent(m.payload, m.messageID)) {
-                if (depMapRequestors.size() == 1) {
-                    if (depMapRequestors.front().dest_id == global_broker_id_local) {
-                        ActiveQueries.setDelayedValue(
-                            depMapRequestors.front().messageID, depMap.generate());
-                    } else {
-                        depMapRequestors.front().payload = depMap.generate();
-                        routeMessage(std::move(depMapRequestors.front()));
-                    }
-                } else {
-                    auto str = depMap.generate();
-                    for (auto& resp : depMapRequestors) {
-                        if (resp.dest_id == global_broker_id_local) {
-                            ActiveQueries.setDelayedValue(resp.messageID, str);
-                        } else {
-                            resp.payload = str;
-                            routeMessage(std::move(resp));
-                        }
-                    }
-                }
-                depMapRequestors.clear();
+            if (requestors.back().dest_id == global_broker_id_local) {
+                activeQueries.setDelayedValue(requestors.back().messageID, std::move(str));
+            } else {
+                requestors.back().payload = std::move(str);
+                routeMessage(std::move(requestors.back()));
             }
-            break;
-        case current_time_map:
-            if (currentTimeMap.addComponent(m.payload, m.messageID)) {
-                if (ctimeRequestors.size() == 1) {
-                    if (ctimeRequestors.front().dest_id == global_broker_id_local) {
-                        ActiveQueries.setDelayedValue(
-                            ctimeRequestors.front().messageID, currentTimeMap.generate());
-                    } else {
-                        ctimeRequestors.front().payload = currentTimeMap.generate();
-                        routeMessage(std::move(ctimeRequestors.front()));
-                    }
-                } else {
-                    auto str = currentTimeMap.generate();
-                    for (auto& resp : ctimeRequestors) {
-                        if (resp.dest_id == global_broker_id_local) {
-                            ActiveQueries.setDelayedValue(resp.messageID, str);
-                        } else {
-                            resp.payload = str;
-                            routeMessage(std::move(resp));
-                        }
-                    }
-                }
-                ctimeRequestors.clear();
-                currentTimeMap.reset();
+
+            requestors.clear();
+            if (std::get<2>(mapBuilders[m.counter])) {
+                builder.reset();
             }
-            break;
+        }
     }
 }
 

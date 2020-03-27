@@ -126,7 +126,7 @@ class FederateState {
     /** add a federate to the delayed list*/
     void addFederateToDelay(global_federate_id id);
     /** generate a component of json config string*/
-    std::string generateConfig() const;
+    void generateConfig(Json::Value& base) const;
 
   public:
     /** reset the federate to created state*/

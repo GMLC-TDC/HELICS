@@ -6,6 +6,7 @@ SPDX-License-Identifier: BSD-3-Clause
 */
 #include "FederateState.hpp"
 
+#include "../common/JsonProcessingFunctions.hpp"
 #include "CommonCore.hpp"
 #include "CoreFederateInfo.hpp"
 #include "EndpointInfo.hpp"
@@ -20,7 +21,6 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <algorithm>
 #include <chrono>
 #include <mutex>
-#include <sstream>
 #include <thread>
 
 #ifndef HELICS_DISABLE_ASIO
@@ -180,25 +180,20 @@ bool FederateState::checkAndSetValue(interface_handle pub_id, const char* data, 
     return res;
 }
 
-std::string FederateState::generateConfig() const
+void FederateState::generateConfig(Json::Value& base) const
 {
-    static const std::string truestr{"true"};
-    static const std::string falsestr{"false"};
-
-    std::stringstream s;
-    s << "\"only_transmit_on_change\":" << ((only_transmit_on_change) ? truestr : falsestr);
-    s << ",\n\"realtime\":" << ((realtime) ? truestr : falsestr);
-    s << ",\n\"observer\":" << ((observer) ? truestr : falsestr);
-    s << ",\n\"source_only\":" << ((source_only) ? truestr : falsestr);
-    s << ",\n\"strict_input_type_checking\":" << ((source_only) ? truestr : falsestr);
-    s << ",\n\"slow_responding\":" << ((slow_responding) ? truestr : falsestr);
+    base["only_transmit_on_change"] = only_transmit_on_change;
+    base["realtime"] = realtime;
+    base["observer"] = observer;
+    base["source_only"] = source_only;
+    base["strict_input_type_checking"] = source_only;
+    base["slow_responding"] = slow_responding;
     if (rt_lag > timeZero) {
-        s << ",\n\"rt_lag\":" << static_cast<double>(rt_lag);
+        base["rt_lag"] = static_cast<double>(rt_lag);
     }
     if (rt_lead > timeZero) {
-        s << ",\n\"rt_lead\":" << static_cast<double>(rt_lead);
+        base["rt_lead"] = static_cast<double>(rt_lead);
     }
-    return s.str();
 }
 
 uint64_t FederateState::getQueueSize(interface_handle handle_) const
@@ -1632,7 +1627,9 @@ std::string FederateState::processQueryActual(const std::string& query) const
         });
     }
     if (query == "interfaces") {
-        return "{" + interfaceInformation.generateInferfaceConfig() + "}";
+        Json::Value base;
+        interfaceInformation.generateInferfaceConfig(base);
+        return generateJsonString(base);
     }
     if (query == "subscriptions") {
         std::ostringstream s;
@@ -1661,24 +1658,54 @@ std::string FederateState::processQueryActual(const std::string& query) const
         return timeCoord->printTimeStatus();
     }
     if (query == "timeconfig") {
-        std::ostringstream s;
-        s << "{\n" << timeCoord->generateConfig();
-        s << ",\n" << generateConfig();
-        s << "}";
-        return s.str();
+        Json::Value base;
+        timeCoord->generateConfig(base);
+        generateConfig(base);
+        return generateJsonString(base);
     }
     if (query == "config") {
-        std::ostringstream s;
-        s << "{\n" << timeCoord->generateConfig();
-        s << ",\n" << generateConfig();
-        s << ",\n" << interfaceInformation.generateInferfaceConfig();
-        s << "}";
-        return s.str();
+        Json::Value base;
+        timeCoord->generateConfig(base);
+        generateConfig(base);
+        interfaceInformation.generateInferfaceConfig(base);
+        return generateJsonString(base);
     }
     if (query == "dependents") {
         return generateStringVector(timeCoord->getDependents(), [](auto& dep) {
             return std::to_string(dep.baseValue());
         });
+    }
+    if (query == "data_flow_graph") {
+        Json::Value base;
+        base["name"] = getIdentifier();
+        base["id"] = global_id.load().baseValue();
+        base["parent"] = parent_->getGlobalId().baseValue();
+        interfaceInformation.GenerateDataFlowGraph(base);
+        return generateJsonString(base);
+    }
+    if (query == "global_time") {
+        Json::Value base;
+        base["name"] = getIdentifier();
+        base["id"] = global_id.load().baseValue();
+        base["parent"] = parent_->getGlobalId().baseValue();
+        base["granted_time"] = static_cast<double>(timeCoord->getGrantedTime());
+        base["send_time"] = static_cast<double>(timeCoord->allowedSendTime());
+        return generateJsonString(base);
+    }
+    if (query == "dependency_graph") {
+        Json::Value base;
+        base["name"] = getIdentifier();
+        base["id"] = global_id.load().baseValue();
+        base["parent"] = parent_->getGlobalId().baseValue();
+        base["dependents"] = Json::arrayValue;
+        for (auto& dep : timeCoord->getDependents()) {
+            base["dependents"].append(dep.baseValue());
+        }
+        base["dependencies"] = Json::arrayValue;
+        for (auto& dep : timeCoord->getDependencies()) {
+            base["dependencies"].append(dep.baseValue());
+        }
+        return generateJsonString(base);
     }
     if (queryCallback) {
         return queryCallback(query);

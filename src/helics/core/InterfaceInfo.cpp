@@ -6,6 +6,7 @@ SPDX-License-Identifier: BSD-3-Clause
 */
 #include "InterfaceInfo.hpp"
 
+#include "../common/JsonProcessingFunctions.hpp"
 #include "../common/fmt_format.h"
 #include "helics_definitions.hpp"
 
@@ -327,75 +328,126 @@ std::vector<std::pair<int, std::string>> InterfaceInfo::checkInterfacesForIssues
     return issues;
 }
 
-std::string InterfaceInfo::generateInferfaceConfig() const
+void InterfaceInfo::generateInferfaceConfig(Json::Value& base) const
 {
-    std::ostringstream s;
-
     auto ihandle = inputs.lock_shared();
     if (ihandle->size() > 0) {
-        s << "\"inputs\":[";
-        bool first = true;
+        base["inputs"] = Json::arrayValue;
         for (auto& ipt : ihandle) {
             if (!ipt->key.empty()) {
-                if (!first) {
-                    s << ',';
-                }
-                first = false;
-                s << "{\n \"key\":\"" << ipt->key << "\"";
+                Json::Value ibase;
+                ibase["key"] = ipt->key;
                 if (!ipt->type.empty()) {
-                    s << ",\n \"type\":\"" << ipt->type << "\"";
+                    ibase["type"] = ipt->type;
                 }
                 if (!ipt->units.empty()) {
-                    s << ",\n \"units\":\"" << ipt->units << "\"";
+                    ibase["units"] = ipt->units;
                 }
-                s << "\n}";
+                base["inputs"].append(std::move(ibase));
             }
         }
-        s << "],";
     }
     ihandle.unlock();
     auto phandle = publications.lock();
     if (phandle->size() > 0) {
-        s << "\n\"publications\":[";
-        bool first = true;
+        base["publications"] = Json::arrayValue;
         for (auto& pub : phandle) {
-            if (!first) {
-                s << ',';
+            if (!pub->key.empty()) {
+                Json::Value pbase;
+                pbase["key"] = pub->key;
+                if (!pub->type.empty()) {
+                    pbase["type"] = pub->type;
+                }
+                if (!pub->units.empty()) {
+                    pbase["units"] = pub->units;
+                }
+                base["publications"].append(std::move(pbase));
             }
-            first = false;
-            s << "{\n \"key\":\"" << pub->key << "\"";
-            if (!pub->type.empty()) {
-                s << ",\n \"type\":\"" << pub->type << "\"";
-            }
-            if (!pub->units.empty()) {
-                s << ",\n \"units\":\"" << pub->units << "\"";
-            }
-            s << "\n}";
         }
-        s << "],";
     }
     phandle.unlock();
 
     auto ehandle = endpoints.lock_shared();
     if (ehandle->size() > 0) {
-        s << "\n\"endpoints\":[";
-        bool first = true;
+        base["endpoints"] = Json::arrayValue;
         for (auto& ept : ehandle) {
-            if (!first) {
-                s << ',';
+            if (!ept->key.empty()) {
+                Json::Value ebase;
+                ebase["key"] = ept->key;
+                if (!ept->type.empty()) {
+                    ebase["type"] = ept->type;
+                }
+                base["endpoints"].append(std::move(ebase));
             }
-            first = false;
-
-            s << "{\n \"key\":\"" << ept->key << "\"";
-            if (!ept->type.empty()) {
-                s << ",\n \"type\":\"" << ept->type << "\"";
-            }
-            s << "\n}";
         }
-        s << "\n],";
     }
     phandle.unlock();
-    s << "\n\"extra\":\"configuration\"";
-    return s.str();
+    base["extra"] = "configuration";
 }
+
+void InterfaceInfo::GenerateDataFlowGraph(Json::Value& base) const
+{
+    auto ihandle = inputs.lock_shared();
+    if (ihandle->size() > 0) {
+        base["inputs"] = Json::arrayValue;
+        for (auto& ipt : ihandle) {
+            Json::Value ibase;
+            if (!ipt->key.empty()) {
+                ibase["key"] = ipt->key;
+            }
+            ibase["federate"] = ipt->id.fed_id.baseValue();
+            ibase["handle"] = ipt->id.handle.baseValue();
+            if (!ipt->input_sources.empty()) {
+                ibase["sources"] = Json::arrayValue;
+                for (auto& source : ipt->input_sources) {
+                    Json::Value sid;
+                    sid["federate"] = source.fed_id.baseValue();
+                    sid["handle"] = source.handle.baseValue();
+                    ibase["sources"].append(sid);
+                }
+            }
+            base["inputs"].append(std::move(ibase));
+        }
+    }
+    ihandle.unlock();
+    auto phandle = publications.lock();
+    if (phandle->size() > 0) {
+        base["publications"] = Json::arrayValue;
+        for (auto& pub : phandle) {
+            Json::Value pbase;
+            if (!pub->key.empty()) {
+                pbase["key"] = pub->key;
+            }
+            pbase["federate"] = pub->id.fed_id.baseValue();
+            pbase["handle"] = pub->id.handle.baseValue();
+            if (!pub->subscribers.empty()) {
+                pbase["targets"] = Json::arrayValue;
+                for (auto& target : pub->subscribers) {
+                    Json::Value sid;
+                    sid["federate"] = target.fed_id.baseValue();
+                    sid["handle"] = target.handle.baseValue();
+                    pbase["targets"].append(sid);
+                }
+            }
+            base["publications"].append(std::move(pbase));
+        }
+    }
+    phandle.unlock();
+
+    auto ehandle = endpoints.lock_shared();
+    if (ehandle->size() > 0) {
+        base["endpoints"] = Json::arrayValue;
+        for (auto& ept : ehandle) {
+            Json::Value ebase;
+            ebase["federate"] = ept->id.fed_id.baseValue();
+            ebase["handle"] = ept->id.handle.baseValue();
+            if (!ept->key.empty()) {
+                ebase["key"] = ept->key;
+            }
+            base["endpoints"].append(std::move(ebase));
+        }
+    }
+    ehandle.unlock();
+}
+
 } // namespace helics

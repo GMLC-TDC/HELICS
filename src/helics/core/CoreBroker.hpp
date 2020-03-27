@@ -113,17 +113,9 @@ class CoreBroker: public Broker, public BrokerBase {
     std::unordered_map<std::string, std::string> global_values; //!< storage for global values
     std::mutex name_mutex_; //!< mutex lock for name and identifier
     std::atomic<int> queryCounter{1}; // counter for active queries going to the local API
-    gmlc::concurrency::DelayedObjects<std::string> ActiveQueries; //!< holder for active queries
-    JsonMapBuilder fedMap; //!< builder for the federate_map
-    std::vector<ActionMessage> fedMapRequestors; //!< list of requesters for the active federate map
-    JsonMapBuilder currentTimeMap; //!< builder for the current time graph
-    std::vector<ActionMessage>
-        ctimeRequestors; //!< list of requesters for the active current time status
-    JsonMapBuilder depMap; //!< builder for the dependency graph
-    std::vector<ActionMessage> depMapRequestors; //!< list of requesters for the dependency graph
-    JsonMapBuilder dataflowMap; //!< builder for the dependency graph
-    std::vector<ActionMessage>
-        dataflowMapRequestors; //!< list of requesters for the dependency graph
+    gmlc::concurrency::DelayedObjects<std::string> activeQueries; //!< holder for active queries
+    /// holder for the query map builder information
+    std::vector<std::tuple<JsonMapBuilder, std::vector<ActionMessage>, bool>> mapBuilders;
 
     std::vector<ActionMessage> earlyMessages; //!< list of messages that came before connection
     gmlc::concurrency::TriggerVariable disconnection; //!< controller for the disconnection process
@@ -338,14 +330,8 @@ class CoreBroker: public Broker, public BrokerBase {
     void addFilter(ActionMessage& m);
 
     //   bool updateSourceFilterOperator (ActionMessage &m);
-    /** generate a JSON string containing the federate/broker/Core Map*/
-    void initializeFederateMap();
-    /** generate a JSON string containing the dependency information for all federation object*/
-    void initializeDependencyGraph();
-    /** generate a json string containing the data flow information for all federation object*/
-    void initializeDataFlowGraph();
-    /** generate a json string containing the time information for the federation */
-    void initializeCurrentTimeMap();
+    /** generate a JSON string containing one of the data Maps*/
+    void initializeMapBuilder(const std::string& request, std::uint16_t index, bool reset);
 
     /** send an error code to all direct cores*/
     void sendErrorToImmediateBrokers(int error_code);

@@ -11,9 +11,9 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "flagOperations.hpp"
 #include "helics_definitions.hpp"
 
+#include "json/json.h"
 #include <algorithm>
 #include <set>
-#include <sstream>
 
 namespace helics {
 static auto nullMessageFunction = [](const ActionMessage&) {};
@@ -240,33 +240,30 @@ void TimeCoordinator::updateValueTime(Time valueUpdateTime)
     }
 }
 
-std::string TimeCoordinator::generateConfig() const
+void TimeCoordinator::generateConfig(Json::Value& base) const
 {
-    std::stringstream s;
-    s << "\"uninterruptible\":" << ((info.uninterruptible) ? " true,\n" : "false,\n");
-    s << "\"wait_for_current_time_updates\":"
-      << ((info.wait_for_current_time_updates) ? " true,\n" : "false,\n");
-    if (info.restrictive_time_policy) {
-        s << "\"restrictive_time_policy\":true,\n";
-    }
-    s << "\"max_iterations\":" << info.maxIterations;
+    base["uninterruptible"] = info.uninterruptible;
+    base["wait_for_current_time_updates"] = info.wait_for_current_time_updates;
+    base["restrictive_time_policy"] = info.restrictive_time_policy;
+    base["max_iterations"] = info.maxIterations;
+
     if (info.period > timeZero) {
-        s << ",\n\"period\":" << static_cast<double>(info.period);
+        base["period"] = static_cast<double>(info.period);
     }
     if (info.offset != timeZero) {
-        s << ",\n\"offset\":" << static_cast<double>(info.offset);
+        base["offset"] = static_cast<double>(info.offset);
     }
     if (info.timeDelta > Time::epsilon()) {
-        s << ",\n\"time_delta\":" << static_cast<double>(info.timeDelta);
+        base["time_delta"] = static_cast<double>(info.timeDelta);
     }
     if (info.outputDelay > timeZero) {
-        s << ",\n\"output_delay\":" << static_cast<double>(info.outputDelay);
+        base["output_delay"] = static_cast<double>(info.outputDelay);
     }
     if (info.inputDelay > timeZero) {
-        s << ",\n\"intput_delay\":" << static_cast<double>(info.inputDelay);
+        base["intput_delay"] = static_cast<double>(info.inputDelay);
     }
-    return s.str();
 }
+
 bool TimeCoordinator::hasActiveTimeDependencies() const
 {
     return dependencies.hasActiveTimeDependencies();

@@ -39,12 +39,22 @@ int JsonMapBuilder::generatePlaceHolder(const std::string& location)
     return index;
 }
 
-bool JsonMapBuilder::addComponent(const std::string& info, int index)
+bool JsonMapBuilder::addComponent(const std::string& info, int index) noexcept
 {
     auto loc = missing_components.find(index);
     if (loc != missing_components.end()) {
-        auto element = loadJsonStr(info);
-        (*jMap)[loc->second].append(element);
+        if (info == "#invalid") {
+            (*jMap)[loc->second].append(Json::Value{});
+        } else {
+            try {
+                auto element = loadJsonStr(info);
+                (*jMap)[loc->second].append(element);
+            }
+            catch (const std::invalid_argument&) {
+                (*jMap)[loc->second].append(Json::Value{});
+            }
+        }
+
         missing_components.erase(loc);
 
         return missing_components.empty();
