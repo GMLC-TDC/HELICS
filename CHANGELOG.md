@@ -28,7 +28,7 @@ Increased code coverage and additional bug fixes.
 -   A few additional tests of helics supports types and conversions
 -   CoreApp has a connect() and reset() method and constructor from a Core shared pointer
 -   BrokerApp has a connect() method and constructor from a Broker shared pointer
--   added a data_flow_graph query which gets all the connections in a federation
+-   Added a data_flow_graph query which gets all the connections in a federation
 
 ### Deprecated
 
