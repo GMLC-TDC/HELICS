@@ -20,6 +20,7 @@ Increased code coverage and additional bug fixes.
 -   Fixed a potential issue with queries if they are triggered before the connection ack
 -   An issue with host name resolution on some systems with restricted DNS lookup
 -   Allow camelCase in file parameters from JSON
+-   Fixed linking error with default OpenMPI Spack package
 
 ### Added
 -   A series of tests for MessageFederate.cpp to increase coverage on that file to 100%
