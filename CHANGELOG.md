@@ -12,14 +12,23 @@ Increased code coverage and additional bug fixes.
 
 ### Changed
 -   Update toml11 library to 3.3.1 with some warning fixes for C++17
+-   The query handling in the core library was cleaned up to be more extensible and uniform
 
 ### Fixed
 -   MacOS build with python 2.7 failure
 -   Fixed some issues with the build/test process if the `ENABLE_ZMQ_CORE=OFF`
+-   Fixed a potential issue with queries if they are triggered before the connection ack
+-   An issue with host name resolution on some systems with restricted DNS lookup
+-   Allow camelCase in file parameters from JSON
 
 ### Added
 -   A series of tests for MessageFederate.cpp to increase coverage on that file to 100%
 -   Callbacks for custom filters in the C shared library
+-   A series of tests for CoreApp, BrokerApp, and FederateInfo and a few fixes for them
+-   A few additional tests of helics supports types and conversions
+-   CoreApp has a connect() and reset() method and constructor from a Core shared pointer
+-   BrokerApp has a connect() method and constructor from a Broker shared pointer
+-   added a data_flow_graph query which gets all the connections in a federation
 
 ### Deprecated
 
