@@ -1,12 +1,11 @@
-Queries
-=======
+# Queries
 
 Queries are asynchronous means within HELICS of asking for and receiving information from other federate components.
 Brokers, Federates, and Cores all have query functions.  Federates are also able to define a callback for answering custom queries.
 
 The general function appears like
 ```
-std::string query (const std::string &target, const std::string &queryStr)
+std::string query(const std::string& target, const std::string& queryStr)
 ```
 
 ## Targets
@@ -20,6 +19,8 @@ A target is specified, and can be one of the following.  A federate named one of
 | ``broker``                               | The first broker encountered in the hierarchy from the caller                         |
 +------------------------------------------+---------------------------------------------------------------------------------------+
 | ``root``, ``federation``, ``rootbroker`` | The root broker of the federation                                                     |
++------------------------------------------+---------------------------------------------------------------------------------------+
+| ``global``                               | Retrieve the data associated with a global variable                                   |
 +------------------------------------------+---------------------------------------------------------------------------------------+
 | ``parent``                               | The parent of the caller                                                              |
 +------------------------------------------+---------------------------------------------------------------------------------------+
@@ -36,10 +37,10 @@ A target is specified, and can be one of the following.  A federate named one of
 The queryStr is a specific data to request, there are a number of different things that can be queried from the system.
 Unrecognized queries or targets return `#invalid`
 Answers to queries can be
- - "true"/"false" [T/F]
- - a single string  `"answer"` [string]
- - a vector of strings delimited by ``';'`` `[answer1;answer2;answer3]` [sv]
- - a JSON string [JSON]
+-   "true"/"false" \[T/F\]
+-   a single string  `"answer"` \[string\]
+-   a vector of strings delimited by ``';'`` `[answer1;answer2;answer3]` \[sv\]
+-   a JSON string \[JSON\]
 
 ### Federate Queries
 The following queries are defined for federates.  Federates may specify a callback function which allows arbitrary user defined Queries.  The queries defined here are available inside of HELICS.
@@ -71,6 +72,10 @@ The following queries are defined for federates.  Federates may specify a callba
 | ``current_time``   | the current time of the federate [JSON]                    |
 +--------------------+------------------------------------------------------------+
 |``endpoint_filters``| data structure containing the filters on endpoints[JSON]   |
++--------------------+------------------------------------------------------------+
+|``dependency_graph``| a graph of the dependencies in a federation [JSON]         |
++--------------------+------------------------------------------------------------+
+|``data_flow_graph`` | a structure with all the data connections [JSON]           |
 +--------------------+------------------------------------------------------------+
 | ``queries``        | list of available queries [sv]                             |
 +--------------------+------------------------------------------------------------+
@@ -132,11 +137,13 @@ The following queries will be answered by a core.
 +----------------------+-------------------------------------------------------------------------------------+
 | ``federation_state`` | a structure with the current known status of the brokers and federates [JSON]       |
 +----------------------+-------------------------------------------------------------------------------------+
-| ``current_time``     | if a time is computed locally that time sequence is returned, otherwise #na [JSON]    |
+| ``current_time``     | if a time is computed locally that time sequence is returned, otherwise #na [JSON]  |
 +----------------------+-------------------------------------------------------------------------------------+
 | ``global_time``      | get a structure with the current time status of all the federates/cores [JSON]      |
 +----------------------+-------------------------------------------------------------------------------------+
 | ``dependency_graph`` | a representation of the dependencies in the core and its contained federates [JSON] |
++----------------------+-------------------------------------------------------------------------------------+
+| ``data_flow_graph``  | a representation of the data connections from all interfaces in a federation [JSON] |
 +----------------------+-------------------------------------------------------------------------------------+
 |``endpoint_filters``  | data structure containing the filters on endpoints for the core[JSON]               |
 +----------------------+-------------------------------------------------------------------------------------+
@@ -179,7 +186,7 @@ The Following queries will be answered by a broker.
 +----------------------+-------------------------------------------------------------------------------------+
 | ``federation_state`` | a structure with the current known status of the brokers and federates [JSON]       |
 +----------------------+-------------------------------------------------------------------------------------+
-| ``current_time``     | if a time is computed locally that time sequence is returned, otherwise #na [string]  |
+| ``current_time``     | if a time is computed locally that time sequence is returned, otherwise #na [string]|
 +----------------------+-------------------------------------------------------------------------------------+
 | ``global_time``      | get a structure with the current time status of all the federates/cores [JSON]      |
 +----------------------+-------------------------------------------------------------------------------------+
@@ -187,34 +194,36 @@ The Following queries will be answered by a broker.
 +----------------------+-------------------------------------------------------------------------------------+
 | ``dependency_graph`` | a representation of the dependencies in the broker and all contained members [JSON] |
 +----------------------+-------------------------------------------------------------------------------------+
+| ``data_flow_graph``  | a representation of the data connections from all interfaces in a federation [JSON] |
++----------------------+-------------------------------------------------------------------------------------+
 | ``queries``          | list of dependent objects [sv]                                                      |
 +----------------------+-------------------------------------------------------------------------------------+
 ```
 
-`federate_map` and `dependency_graph` when called from the root broker will generate a JSON string containing the entire structure of the federation.  This can take some time to assemble since all members must be queried.
+`federate_map`, `dependency_graph`, `global_time`, and `data_flow_graph` when called with the root broker as a target will generate a JSON string containing the entire structure of the federation.  This can take some time to assemble since all members must be queried.
 
 ## Usage Notes
 Queries that must traverse the network travel along priority paths.  The calls are blocking, but they do not wait for time advancement from any federate and take priority over regular communication.
 
-#### Application API
+### Application API
 There are two basic calls in the application API as part of a [federate object](../doxygen/classhelics_1_1Federate.html)
 In addition to the call described above a second version without the target
 ```
-std::string 	query (const std::string &queryStr)
+std::string 	query(const std::string& queryStr)
 ```
 
 make the query of the current federate.
 an asynchronous version is also available.
 
 ```
-query_id_t 	queryAsync (const std::string &target, const std::string &queryStr)
+query_id_t 	queryAsync(const std::string& target, const std::string& queryStr)
 ```
 
 This call returns a `query_id_t` that can be use in `queryComplete` and `isQueryComplet` functions.
 
 In the header [`<helics\queryFunctions.hpp>`](../doxygen/queryFunctions_8hpp.html) a few helper functions are defined to vectorize query results and some utility functions to wait for a federate to enter init, or wait for a federate to join the federation.
 
-#### C-api and interface API's.
+### C-api and interface API's.
 
 Queries in the C api work similarly but the mechanics are different.
 The basic operation is to create a query using [`helicsQueryCreate(target,query)`](../doxygen/helics_8h.html#ac290df999ec7e7527cb4337c5d3b1461)
