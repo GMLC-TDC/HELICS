@@ -8,7 +8,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "MpiComms.h"
 
 #include "../../common/fmt_format.h"
-#include "../ActionMessage.hpp"
+#include "../../core/ActionMessage.hpp"
 #include "MpiService.h"
 
 #include <boost/scope_exit.hpp>

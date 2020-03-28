@@ -7,7 +7,7 @@ SPDX-License-Identifier: BSD-3-Clause
 */
 #pragma once
 
-#include "../ActionMessage.hpp"
+#include "../../core/ActionMessage.hpp"
 #include "MpiComms.h"
 #include "gmlc/containers/BlockingQueue.hpp"
 #include "helics/helics-config.h"
