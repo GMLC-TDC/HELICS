@@ -41,7 +41,7 @@ add_library(
     ${helics_shared_private_headers}
 )
 
-target_link_libraries(helics-shared PRIVATE helics_core)
+target_link_libraries(helics-shared PRIVATE helics_network)
 target_compile_definitions(
     helics-shared PRIVATE helics_shared_EXPORTS PUBLIC HELICS_SHARED_LIBRARY
 )

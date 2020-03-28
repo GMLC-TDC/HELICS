@@ -79,6 +79,8 @@ namespace helics {
 #ifdef ENABLE_IPC_CORE
     static auto ipcc = CoreFactory::addCoreType<ipc::IpcCore>("ipc", static_cast<int>(core_type::IPC));
     static auto ipcb = BrokerFactory::addBrokerType<ipc::IpcBroker>("ipc", static_cast<int>(core_type::IPC));
+    static auto ipcc2 = CoreFactory::addCoreType<ipc::IpcCore>("interprocess", static_cast<int>(core_type::INTERPROCESS));
+    static auto ipcb2 = BrokerFactory::addBrokerType<ipc::IpcBroker>("interprocess", static_cast<int>(core_type::INTERPROCESS));
 #endif
 
 #ifdef ENABLE_INPROC_CORE

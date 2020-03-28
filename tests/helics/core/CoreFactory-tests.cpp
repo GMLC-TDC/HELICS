@@ -8,8 +8,10 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helics/core/CoreFactory.hpp"
 #include "helics/core/coreTypeOperations.hpp"
 #include "helics/helics-config.h"
-
+#include "helics/network/loadCores.hpp"
 #include "gtest/gtest.h"
+
+static const bool ld = helics::loadCores();
 
 #ifdef ENABLE_ZMQ_CORE
 TEST(CoreFactory_tests, ZmqCore_test)

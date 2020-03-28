@@ -27,13 +27,48 @@ namespace helics {
 namespace CoreFactory {
     static const std::string emptyString;
 
-    static gmlc::
-        libguarded::shared_guarded<std::vector<std::tuple<int, std::string, std::shared_ptr<CoreBuilder>>>> builders;
+    using BuildT = std::tuple<int, std::string, std::shared_ptr<CoreBuilder>>;
+
+    class MasterCoreBuilder
+    {
+    public:
+        static void addBuilder(std::shared_ptr<CoreBuilder> cb, const std::string& name, int code)
+        {
+            instance()->builders.emplace_back(code, name, std::move(cb));
+        }
+        static std::shared_ptr<CoreBuilder> &getBuilder(int code)
+        {
+            for (auto &bb : instance()->builders)
+            {
+                if (std::get<0>(bb) == code)
+                {
+                    return std::get<2>(bb);
+                }
+            }
+            throw(HelicsException("core type is not available"));
+        }
+        static std::shared_ptr<CoreBuilder> &getIndexedBuilder(std::size_t index)
+        {
+            auto &blder = instance();
+            if (blder->builders.size() < index)
+            {
+                return std::get<2>(blder->builders[index]);
+            }
+            throw(HelicsException("core type is not available"));
+        }
+        static std::shared_ptr<MasterCoreBuilder> &instance()
+        {
+            static std::shared_ptr<MasterCoreBuilder> iptr(new MasterCoreBuilder());
+            return iptr;
+        }
+    private:
+        MasterCoreBuilder() = default;
+        std::vector<BuildT> builders;
+    };
 
     void defineCoreBuilder(std::shared_ptr<CoreBuilder> cb, const std::string& name, int code)
     {
-        auto lk = builders.lock();
-        lk->emplace_back(code, name, std::move(cb));
+        MasterCoreBuilder::addBuilder(std::move(cb), name, code);
     }
 
     std::shared_ptr<Core> makeCore(core_type type, const std::string& name)
@@ -44,18 +79,9 @@ namespace CoreFactory {
         }
         if (type == core_type::DEFAULT)
         {
-            return std::get<2>(builders.lock_shared()->front())->build(name);
+            return MasterCoreBuilder::getIndexedBuilder(0)->build(name);
         }
-        auto buildersb = builders.lock_shared();
-        for (auto &bb : buildersb)
-        {
-            auto cd = std::get<0>(bb);
-            if (cd == static_cast<int>(type))
-            {
-                return std::get<2>(bb)->build(name);
-            }
-        }
-        return nullptr;
+        return MasterCoreBuilder::getBuilder(static_cast<int>(type))->build(name);
     }
 
     std::shared_ptr<Core> create(const std::string& initializationString)
@@ -239,16 +265,15 @@ without issue*/
         if (!ptr->isOpenToNewFederates()) {
             return false;
         }
-            auto buildersb = builders.lock_shared();
-            for (auto &bb : buildersb)
-            {
-                auto cd = std::get<0>(bb);
-                if (cd == static_cast<int>(type))
-                {
-                    return std::get<2>(bb)->checkType(ptr.get());
-                }
-            }
+        try
+        {
+            return MasterCoreBuilder::getBuilder(static_cast<int>(type))->checkType(ptr.get());
+        }
+        catch (const helics::HelicsException &)
+        {
+            // the error will throw if the MasterCoreBuilder can't find the core type, in which case it is open yet so return true
             return true;
+        }
     }
 
     static bool isJoinableCoreForType(core_type type, const std::shared_ptr<Core>& ptr)

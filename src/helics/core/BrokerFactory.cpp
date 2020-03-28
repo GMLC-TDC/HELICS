@@ -12,7 +12,6 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "core-exceptions.hpp"
 #include "core-types.hpp"
 #include "gmlc/concurrency/DelayedDestructor.hpp"
-#include "gmlc/libguarded/shared_guarded.hpp"
 #include "gmlc/concurrency/SearchableObjectHolder.hpp"
 #include "gmlc/concurrency/TripWire.hpp"
 #include "helics/helics-config.h"
@@ -24,13 +23,48 @@ static const std::string emptyString;
 
 namespace BrokerFactory {
 
-    static gmlc::
-        libguarded::shared_guarded<std::vector<std::tuple<int,std::string,std::shared_ptr<BrokerBuilder>>>> builders;
+    using BuildT = std::tuple<int, std::string, std::shared_ptr<BrokerBuilder>>;
 
+    class MasterBrokerBuilder
+    {
+    public:
+        static void addBuilder(std::shared_ptr<BrokerBuilder> cb, const std::string& name, int code)
+        {
+            instance()->builders.emplace_back(code, name, std::move(cb));
+        }
+        static std::shared_ptr<BrokerBuilder> &getBuilder(int code)
+        {
+            for (auto &bb : instance()->builders)
+            {
+                if (std::get<0>(bb) == code)
+                {
+                    return std::get<2>(bb);
+                }
+            }
+            throw(HelicsException("core type is not available"));
+        }
+        static std::shared_ptr<BrokerBuilder> &getIndexedBuilder(std::size_t index)
+        {
+            auto &blder = instance();
+            if (blder->builders.size() < index)
+            {
+                return std::get<2>(blder->builders[index]);
+            }
+            throw(HelicsException("core type is not available"));
+        }
+        static std::shared_ptr<MasterBrokerBuilder> &instance()
+        {
+            static std::shared_ptr<MasterBrokerBuilder> iptr(new MasterBrokerBuilder());
+            return iptr;
+        }
+    private:
+        MasterBrokerBuilder() = default;
+        std::vector<BuildT> builders;
+    };
+    
     void defineBrokerBuilder(std::shared_ptr<BrokerBuilder> cb, const std::string& name, int code)
     {
-        auto lk = builders.lock();
-        lk->emplace_back(code, name, std::move(cb));
+        MasterBrokerBuilder::addBuilder(std::move(cb), name, code);
     }
 
     std::shared_ptr<Broker> makeBroker(core_type type, const std::string& name)
@@ -41,18 +75,9 @@ namespace BrokerFactory {
         }
         if (type == core_type::DEFAULT)
         {
-            return std::get<2>(builders.lock_shared()->front())->build(name);
+            return MasterBrokerBuilder::getIndexedBuilder(0)->build(name);
         }
-        auto buildersb = builders.lock_shared();
-        for (auto &bb : buildersb)
-        {
-            auto cd = std::get<0>(bb);
-            if ( cd == static_cast<int>(type))
-            {
-                std::get<2>(bb)->build(name);
-            }
-        }
-        return nullptr;
+        return MasterBrokerBuilder::getBuilder(static_cast<int>(type))->build(name);
     }
 
     std::shared_ptr<Broker> create(core_type type, const std::string& configureString)
@@ -144,19 +169,17 @@ need be without issue*/
 
     static bool isJoinableBrokerOfType(core_type type, const std::shared_ptr<Broker>& ptr)
     {
-        if (ptr->isOpenToNewFederates()) {
-                auto buildersb = builders.lock_shared();
-                for (auto &bb : buildersb)
-                {
-                    auto cd = std::get<0>(bb);
-                    if (cd == static_cast<int>(type))
-                    {
-                        return std::get<2>(bb)->checkType(ptr.get());
-                    }
-                }
-                return true;
+        if (!ptr->isOpenToNewFederates()) {
+            return false;
         }
-        return false;
+        try
+        {
+            return MasterBrokerBuilder::getBuilder(static_cast<int>(type))->checkType(ptr.get());
+        }
+        catch (const helics::HelicsException &)
+        {
+            return true;
+        }
     }
 
     static bool isJoinableBrokerForType(core_type type, const std::shared_ptr<Broker>& ptr)

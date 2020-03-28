@@ -19,11 +19,14 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "FilterFederateManager.hpp"
 #include "Filters.hpp"
 #include "helics/helics-config.h"
-
+#include "../network/loadCores.hpp"
 #include <cassert>
 #include <iostream>
 
 namespace helics {
+    //a key link that does very little yet, but forces linking to a particular file
+    static const auto ldcores = loadCores();
+
 using namespace std::literals::chrono_literals;
 void cleanupHelicsLibrary()
 {

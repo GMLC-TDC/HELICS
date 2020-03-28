@@ -9,6 +9,9 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "gtest/gtest.h"
 #include <helics/core/BrokerFactory.hpp>
 #include <helics/core/CoreFactory.hpp>
+#include <helics/network/loadCores.hpp>
+
+static const bool ld = helics::loadCores();
 
 struct globalTestConfig: public ::testing::Environment {
     virtual void TearDown() override
