@@ -194,11 +194,11 @@ const std::regex creg(
 std::complex<double> helicsGetComplex(const std::string& val)
 {
     if (val.empty()) {
-        return {-1e49, -1e49};
+        return invalidValue<std::complex<double>>();
     }
     std::smatch m;
-    double re = -1e49;
-    double im = 0.0;
+    double re{invalidValue<double>()};
+    double im{0.0};
     std::regex_search(val, m, creg);
     try {
         if (m.size() == 9) {
@@ -223,7 +223,7 @@ std::complex<double> helicsGetComplex(const std::string& val)
         }
     }
     catch (const std::invalid_argument&) {
-        re = -1e49;
+        re = invalidValue<double>();
     }
     return {re, im};
 }
@@ -341,7 +341,7 @@ NamedPoint helicsGetNamedPoint(const std::string& val)
             return {val, std::nan("0")};
         }
         auto V = helicsGetComplex(val);
-        if (V.real() < invalidDouble) {
+        if (V.real() <= invalidDouble) {
             return {val, std::nan("0")};
         }
         if (V.imag() == 0) {
@@ -386,7 +386,7 @@ std::complex<double> getComplexFromString(const std::string& val)
     if (val.empty()) {
         return invalidValue<std::complex<double>>();
     }
-    if ((val.front() == 'v') || (val.front() == 'c')) {
+    if ((val.front() == 'v') || (val.front() == 'c') || val.front() == '[') {
         auto V = helicsGetVector(val);
         if (V.empty()) {
             return invalidValue<std::complex<double>>();
@@ -396,13 +396,6 @@ std::complex<double> getComplexFromString(const std::string& val)
         }
         return {V[0], V[1]};
     }
-    if (val.front() == 'c') {
-        auto cv = helicsGetComplexVector(val);
-        if (cv.empty()) {
-            return invalidValue<std::complex<double>>();
-        }
-        return cv.front();
-    }
     return helicsGetComplex(val);
 }
 
@@ -411,7 +404,7 @@ double getDoubleFromString(const std::string& val)
     if (val.empty()) {
         return invalidValue<double>();
     }
-    if ((val.front() == 'v') || (val.front() == 'c')) {
+    if (val.front() == 'v' || val.front() == '[') {
         auto V = helicsGetVector(val);
         return vectorNorm(V);
     }
@@ -426,8 +419,9 @@ void helicsGetVector(const std::string& val, std::vector<double>& data)
 {
     if (val.empty()) {
         data.resize(0);
+        return;
     }
-    if (val.front() == 'v') {
+    if (val.front() == 'v' || val.front() == '[') {
         auto sz = readSize(val);
         if (sz > 0) {
             data.reserve(sz);
@@ -439,7 +433,7 @@ void helicsGetVector(const std::string& val, std::vector<double>& data)
 
             std::string vstr = val.substr(fb + 1, nc - fb - 1);
             stringOps::trimString(vstr);
-            auto V = numeric_conversion<double>(vstr, -1e49);
+            auto V = numeric_conversion<double>(vstr, invalidValue<double>());
             data.push_back(V);
 
             fb = nc;
@@ -473,6 +467,7 @@ void helicsGetComplexVector(const std::string& val, std::vector<std::complex<dou
 {
     if (val.empty()) {
         data.resize(0);
+        return;
     }
     if (val.front() == 'v') {
         auto sz = readSize(val);
@@ -492,7 +487,7 @@ void helicsGetComplexVector(const std::string& val, std::vector<std::complex<dou
                 data.emplace_back(V1, V2);
             }
             catch (const std::invalid_argument&) {
-                data.emplace_back(-1e49);
+                data.push_back(invalidValue<std::complex<double>>());
             }
             fb = nc;
         }

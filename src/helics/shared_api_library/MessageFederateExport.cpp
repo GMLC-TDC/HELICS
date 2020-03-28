@@ -647,6 +647,15 @@ helics::Message* getMessageObj(helics_message_object message, helics_error* err)
     return mess;
 }
 
+helics_message_object createMessageObject(std::unique_ptr<helics::Message>& message)
+{
+    if (message) {
+        message->messageValidation = messageKeyCode;
+    }
+    helics_message_object mess = message.get();
+    return mess;
+}
+
 const char* helicsMessageGetSource(helics_message_object message)
 {
     auto mess = getMessageObj(message, nullptr);
@@ -911,4 +920,24 @@ void helicsMessageAppendData(helics_message_object message, const void* data, in
         return;
     }
     mess->data.append(static_cast<const char*>(data), inputDataLength);
+}
+
+void helicsMessageCopy(helics_message_object source_message, helics_message_object dest_message, helics_error* err)
+{
+    auto mess_src = getMessageObj(source_message, err);
+    if (mess_src == nullptr) {
+        return;
+    }
+    auto mess_dest = getMessageObj(dest_message, err);
+    if (mess_dest == nullptr) {
+        return;
+    }
+    mess_dest->data = mess_src->data;
+    mess_dest->dest = mess_src->dest;
+    mess_dest->original_source = mess_src->original_source;
+    mess_dest->source = mess_src->source;
+    mess_dest->original_dest = mess_src->original_dest;
+    mess_dest->time = mess_src->time;
+    mess_dest->messageID = mess_src->messageID;
+    mess_dest->flags = mess_src->flags;
 }

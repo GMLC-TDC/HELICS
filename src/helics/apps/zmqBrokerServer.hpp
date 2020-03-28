@@ -13,11 +13,14 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <mutex>
 #include <thread>
 
+#ifdef ENABLE_ZMQ_CORE
 namespace zmq {
 class socket_t;
 class message_t;
 class context_t;
 } // namespace zmq
+
+#endif
 
 namespace helics {
 class Broker;
@@ -41,6 +44,7 @@ namespace apps {
         };
 
         void mainLoop();
+#ifdef ENABLE_ZMQ_CORE
         std::unique_ptr<zmq::socket_t> loadZMQsocket(zmq::context_t& ctx);
         std::unique_ptr<zmq::socket_t> loadZMQSSsocket(zmq::context_t& ctx);
 
@@ -49,7 +53,7 @@ namespace apps {
 
         std::string
             generateResponseToMessage(zmq::message_t& msg, portData& pdata, core_type ctype);
-
+#endif
         std::thread mainLoopThread;
         std::mutex threadGuard;
         const Json::Value* config_{nullptr};

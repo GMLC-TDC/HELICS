@@ -56,7 +56,6 @@ across different compilers*/
         cmd_ping_priority = -298, //!< request for an Echo response on priority channel
         cmd_ping_reply = 299, //!< response to a ping request
         cmd_broker_ping = 306, //!< ping to send to a broker to also ping subbrokers and cores
-
         cmd_init = 10, //!< request entry to init mode
         cmd_init_grant = 11, //!< grant entry to initialization mode
         cmd_init_not_ready = 12, //!< retract an init ready command

@@ -10,6 +10,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "ActionMessage.hpp"
 #include "TimeDependencies.hpp"
 
+#include "json/forwards.h"
 #include <atomic>
 #include <deque>
 #include <functional>
@@ -214,6 +215,6 @@ class TimeCoordinator {
     /** return true if there are active dependencies*/
     bool hasActiveTimeDependencies() const;
     /** generate a configuration string(JSON)*/
-    std::string generateConfig() const;
+    void generateConfig(Json::Value& base) const;
 };
 } // namespace helics

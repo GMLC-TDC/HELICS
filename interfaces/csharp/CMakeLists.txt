@@ -10,7 +10,7 @@
 if(SWIG_EXECUTABLE)
     # Enable generation using swig
 
-    set_property(SOURCE helicsCsharp.i PROPERTY SWIG_MODULE_NAME csharp)
+    set_property(SOURCE helicsCsharp.i PROPERTY SWIG_MODULE_NAME helics)
     # set_source_files_properties(helicsCsharp.i PROPERTIES SWIG_FLAGS
     # "-outfile;helics.cs")
     set(CMAKE_SWIG_FLAGS "-outfile;helics.cs;-namespace;gmlc")

@@ -1,5 +1,5 @@
 /*
-Copyright © 2017-2019,
+Copyright (c) 2017-2020,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
 the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
@@ -195,4 +195,32 @@ TEST(type_conversion_tests, namedpoint_conversion_tests)
     auto t2 = helicsGetNamedPoint(s);
     EXPECT_EQ(t1.name, t2.name);
     EXPECT_NEAR(t1.value, t2.value, 0.00001);
+}
+
+TEST(type_conversion_tests, bool_conversion_tests)
+{
+    bool val{false};
+    EXPECT_TRUE(checkTypeConversion1(std::string{"false"}, val));
+    EXPECT_TRUE(checkTypeConversion1(std::string{"0"}, val));
+    EXPECT_TRUE(checkTypeConversion1(std::string{"F"}, val));
+    EXPECT_TRUE(checkTypeConversion1(0.0F, val));
+    EXPECT_TRUE(checkTypeConversion1(0.0, val));
+    EXPECT_TRUE(checkTypeConversion1(NamedPoint{"value", 0.0}, val));
+    EXPECT_TRUE(checkTypeConversion1(std::vector<double>{0.0}, val));
+    EXPECT_TRUE(checkTypeConversion1(std::vector<double>{}, val));
+    EXPECT_TRUE(checkTypeConversion1(std::complex<double>{0.0, 0.0}, val));
+    EXPECT_TRUE(checkTypeConversion1(std::vector<std::complex<double>>{{0.0, 0.0}}, val));
+    EXPECT_TRUE(checkTypeConversion1(std::vector<std::complex<double>>{}, val));
+    val = true;
+    EXPECT_TRUE(checkTypeConversion1(std::string{"on"}, val));
+    EXPECT_TRUE(checkTypeConversion1(std::string{"1"}, val));
+    EXPECT_TRUE(checkTypeConversion1(std::string{"Y"}, val));
+
+    EXPECT_TRUE(checkTypeConversion1(1.0F, val));
+    EXPECT_TRUE(checkTypeConversion1(1.0, val));
+    EXPECT_TRUE(checkTypeConversion1(NamedPoint{"value", 1.0}, val));
+    EXPECT_TRUE(checkTypeConversion1(std::vector<double>{1.0}, val));
+    EXPECT_TRUE(checkTypeConversion1(std::vector<double>{0.0, 1.0}, val));
+    EXPECT_TRUE(checkTypeConversion1(std::complex<double>{0.0, 1.0}, val));
+    EXPECT_TRUE(checkTypeConversion1(std::complex<double>{0.0, -0.5}, val));
 }

@@ -102,22 +102,22 @@ namespace CoreFactory {
 @return a pointer to the created core
 */
     HELICS_SHARED_DEPRECATED_CORE std::shared_ptr<Core>
-        create(core_type type, const std::string& core_name, int argc, char* argv[])
+        create(core_type type, const std::string& coreName, int argc, char* argv[])
     {
-        CoreApp cr(type, core_name, argc, argv);
+        CoreApp cr(type, coreName, argc, argv);
         return cr.getCopyofCorePointer();
     }
 
     /** create a core from a type, name, and arguments
 @param type the type of core to create
-@param core_name the name for the core
+@param coreName the name for the core
 @param args a vector of reversed command line arguments
 @return a pointer to the created core
 */
     HELICS_SHARED_DEPRECATED_CORE std::shared_ptr<Core>
-        create(core_type type, const std::string& core_name, std::vector<std::string> args)
+        create(core_type type, const std::string& coreName, std::vector<std::string> args)
     {
-        CoreApp cr(type, core_name, args);
+        CoreApp cr(type, coreName, args);
         return cr.getCopyofCorePointer();
     }
 
@@ -146,7 +146,7 @@ namespace CoreFactory {
     HELICS_SHARED_DEPRECATED_CORE std::shared_ptr<Core>
         FindOrCreate(core_type type, const std::string& coreName, std::vector<std::string> args)
     {
-        CoreApp cr(type, core_name, args);
+        CoreApp cr(type, coreName, args);
         return cr.getCopyofCorePointer();
     }
 

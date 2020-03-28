@@ -21,6 +21,8 @@ set(
     SourceTests.cpp
     CloneTests.cpp
     BrokerServerTests.cpp
+    CoreAppTests.cpp
+    BrokerAppTests.cpp
     exeTestHelper.h
 )
 
@@ -34,6 +36,8 @@ target_include_directories(helics_apps-tests PRIVATE ${PROJECT_SOURCE_DIR}/src)
 
 target_compile_definitions(helics_apps-tests PRIVATE
                            "-DTEST_DIR=\"${CMAKE_CURRENT_SOURCE_DIR}/test_files/\"")
+target_compile_definitions(helics_apps-tests PRIVATE
+                           "-DGLOBAL_TEST_DIR=\"${CMAKE_CURRENT_SOURCE_DIR}/../test_files/\"")
 target_compile_definitions(helics_apps-tests PRIVATE
                            "-DHELICS_BUILD_LOC=\"${HELICS_BINARY_DIR}/src/helics/\"")
 target_compile_definitions(

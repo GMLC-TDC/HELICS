@@ -53,11 +53,14 @@ if(HELICS_BUILD_APP_LIBRARY)
 		MultiBroker.cpp
 		BrokerServer.cpp
         zmqBrokerServer.cpp
-        AsioBrokerServer.cpp
         TypedBrokerServer.cpp
 	)
     
-    if (BOOST_VERSION_LEVEL GREATER 69 AND NOT (HELICS_DISABLE_WEBSERVER OR HELICS_DISABLE_BOOST))
+    if (NOT HELICS_DISABLE_ASIO)
+        list(APPEND helics_apps_broker_files  AsioBrokerServer.cpp)
+    endif()
+
+    if (BOOST_VERSION_LEVEL GREATER 69 AND NOT (HELICS_DISABLE_WEBSERVER OR HELICS_DISABLE_BOOST OR HELICS_DISABLE_ASIO))
         message(STATUS "Building webserver Boost version ${Boost_VERSION} ${BOOST_VERSION_LEVEL}")
         list(APPEND helics_apps_broker_files helicsWebServer.cpp)
         list(APPEND helics_apps_broker_headers helicsWebServer.hpp)
@@ -71,8 +74,7 @@ if(HELICS_BUILD_APP_LIBRARY)
     target_link_libraries(helics_apps PUBLIC helics_application_api)
     target_link_libraries(helics_apps PRIVATE HELICS::compile_flags_target fmt::fmt)
     
-    if (BOOST_VERSION_LEVEL GREATER 69 AND NOT (HELICS_DISABLE_WEBSERVER OR HELICS_DISABLE_BOOST))
-        target_compile_definitions(helics_apps PUBLIC HELICS_ENABLE_WEBSERVER=1)
+    if (BOOST_VERSION_LEVEL GREATER 69 AND NOT (HELICS_DISABLE_WEBSERVER OR HELICS_DISABLE_BOOST OR HELICS_DISABLE_ASIO))
         target_compile_definitions(helics_apps PUBLIC BOOST_DATE_TIME_NO_LIB)
     endif()
     # add and alias library to match the find_package

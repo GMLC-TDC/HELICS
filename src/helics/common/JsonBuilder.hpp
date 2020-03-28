@@ -23,6 +23,8 @@ class JsonMapBuilder {
   public:
     JsonMapBuilder() noexcept;
     ~JsonMapBuilder();
+    JsonMapBuilder(JsonMapBuilder&& map) = default;
+    JsonMapBuilder& operator=(JsonMapBuilder&& map) = default;
     /** get the underlying json object*/
     Json::Value& getJValue();
     /** check if the map has completed*/
@@ -34,7 +36,7 @@ class JsonMapBuilder {
     @param index the index of the place holder
     @return true if successfully added
     */
-    bool addComponent(const std::string& info, int index);
+    bool addComponent(const std::string& info, int index) noexcept;
     /** generate a new location to fill in later
     @return the index value of the location for use in addComponent*/
     int generatePlaceHolder(const std::string& location);

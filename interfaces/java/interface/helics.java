@@ -2584,6 +2584,15 @@ public class helics {
   }
 
   /**
+   *  copy a message object<br>
+   *     @param source_message the message object to copy from<br>
+   *     @param dest_message the message object to copy to
+   */
+  public static void helicsMessageCopy(SWIGTYPE_p_void source_message, SWIGTYPE_p_void dest_message) {
+    helicsJNI.helicsMessageCopy(SWIGTYPE_p_void.getCPtr(source_message), SWIGTYPE_p_void.getCPtr(dest_message));
+  }
+
+  /**
    *  create a source Filter on the specified federate<br>
    *     filters can be created through a federate or a core , linking through a federate allows<br>
    *     a few extra features of name matching to function on the federate interface but otherwise equivalent behavior<br>

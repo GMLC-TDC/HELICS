@@ -12777,6 +12777,51 @@ fail:
 }
 
 
+int _wrap_helicsMessageCopy(int resc, mxArray *resv[], int argc, mxArray *argv[]) {
+  helics_message_object arg1 = (helics_message_object) 0 ;
+  helics_message_object arg2 = (helics_message_object) 0 ;
+  helics_error *arg3 = (helics_error *) 0 ;
+  int res1 ;
+  int res2 ;
+  helics_error etemp3 ;
+  mxArray * _out;
+  
+  {
+    etemp3=helicsErrorInitialize();
+    arg3=&etemp3;
+  }
+  if (!SWIG_check_num_args("helicsMessageCopy",argc,2,2,0)) {
+    SWIG_fail;
+  }
+  res1 = SWIG_ConvertPtr(argv[0],SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsMessageCopy" "', argument " "1"" of type '" "helics_message_object""'"); 
+  }
+  res2 = SWIG_ConvertPtr(argv[1],SWIG_as_voidptrptr(&arg2), 0, 0);
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "helicsMessageCopy" "', argument " "2"" of type '" "helics_message_object""'"); 
+  }
+  helicsMessageCopy(arg1,arg2,arg3);
+  _out = (mxArray*)0;
+  if (_out) --resc, *resv++ = _out;
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsMatlabError(arg3);
+    }
+  }
+  return 0;
+fail:
+  {
+    if (arg3->error_code!=helics_ok)
+    {
+      throwHelicsMatlabError(arg3);
+    }
+  }
+  return 1;
+}
+
+
 int _wrap_helicsFederateRegisterFilter(int resc, mxArray *resv[], int argc, mxArray *argv[]) {
   helics_federate arg1 = (helics_federate) 0 ;
   helics_filter_type arg2 ;
@@ -14669,27 +14714,28 @@ SWIGINTERN const char* SwigFunctionName(int fcn_id) {
   case 278: return "_wrap_helicsMessageSetString";
   case 279: return "_wrap_helicsMessageSetData";
   case 280: return "_wrap_helicsMessageAppendData";
-  case 281: return "_wrap_helicsFederateRegisterFilter";
-  case 282: return "_wrap_helicsFederateRegisterGlobalFilter";
-  case 283: return "_wrap_helicsFederateRegisterCloningFilter";
-  case 284: return "_wrap_helicsFederateRegisterGlobalCloningFilter";
-  case 285: return "_wrap_helicsCoreRegisterFilter";
-  case 286: return "_wrap_helicsCoreRegisterCloningFilter";
-  case 287: return "_wrap_helicsFederateGetFilterCount";
-  case 288: return "_wrap_helicsFederateGetFilter";
-  case 289: return "_wrap_helicsFederateGetFilterByIndex";
-  case 290: return "_wrap_helicsFilterGetName";
-  case 291: return "_wrap_helicsFilterSet";
-  case 292: return "_wrap_helicsFilterSetString";
-  case 293: return "_wrap_helicsFilterAddDestinationTarget";
-  case 294: return "_wrap_helicsFilterAddSourceTarget";
-  case 295: return "_wrap_helicsFilterAddDeliveryEndpoint";
-  case 296: return "_wrap_helicsFilterRemoveTarget";
-  case 297: return "_wrap_helicsFilterRemoveDeliveryEndpoint";
-  case 298: return "_wrap_helicsFilterGetInfo";
-  case 299: return "_wrap_helicsFilterSetInfo";
-  case 300: return "_wrap_helicsFilterSetOption";
-  case 301: return "_wrap_helicsFilterGetOption";
+  case 281: return "_wrap_helicsMessageCopy";
+  case 282: return "_wrap_helicsFederateRegisterFilter";
+  case 283: return "_wrap_helicsFederateRegisterGlobalFilter";
+  case 284: return "_wrap_helicsFederateRegisterCloningFilter";
+  case 285: return "_wrap_helicsFederateRegisterGlobalCloningFilter";
+  case 286: return "_wrap_helicsCoreRegisterFilter";
+  case 287: return "_wrap_helicsCoreRegisterCloningFilter";
+  case 288: return "_wrap_helicsFederateGetFilterCount";
+  case 289: return "_wrap_helicsFederateGetFilter";
+  case 290: return "_wrap_helicsFederateGetFilterByIndex";
+  case 291: return "_wrap_helicsFilterGetName";
+  case 292: return "_wrap_helicsFilterSet";
+  case 293: return "_wrap_helicsFilterSetString";
+  case 294: return "_wrap_helicsFilterAddDestinationTarget";
+  case 295: return "_wrap_helicsFilterAddSourceTarget";
+  case 296: return "_wrap_helicsFilterAddDeliveryEndpoint";
+  case 297: return "_wrap_helicsFilterRemoveTarget";
+  case 298: return "_wrap_helicsFilterRemoveDeliveryEndpoint";
+  case 299: return "_wrap_helicsFilterGetInfo";
+  case 300: return "_wrap_helicsFilterSetInfo";
+  case 301: return "_wrap_helicsFilterSetOption";
+  case 302: return "_wrap_helicsFilterGetOption";
   default: return 0;
   }
 }
@@ -15027,27 +15073,28 @@ void mexFunction(int resc, mxArray *resv[], int argc, const mxArray *argv[]) {
   case 278: flag=_wrap_helicsMessageSetString(resc,resv,argc,(mxArray**)(argv)); break;
   case 279: flag=_wrap_helicsMessageSetData(resc,resv,argc,(mxArray**)(argv)); break;
   case 280: flag=_wrap_helicsMessageAppendData(resc,resv,argc,(mxArray**)(argv)); break;
-  case 281: flag=_wrap_helicsFederateRegisterFilter(resc,resv,argc,(mxArray**)(argv)); break;
-  case 282: flag=_wrap_helicsFederateRegisterGlobalFilter(resc,resv,argc,(mxArray**)(argv)); break;
-  case 283: flag=_wrap_helicsFederateRegisterCloningFilter(resc,resv,argc,(mxArray**)(argv)); break;
-  case 284: flag=_wrap_helicsFederateRegisterGlobalCloningFilter(resc,resv,argc,(mxArray**)(argv)); break;
-  case 285: flag=_wrap_helicsCoreRegisterFilter(resc,resv,argc,(mxArray**)(argv)); break;
-  case 286: flag=_wrap_helicsCoreRegisterCloningFilter(resc,resv,argc,(mxArray**)(argv)); break;
-  case 287: flag=_wrap_helicsFederateGetFilterCount(resc,resv,argc,(mxArray**)(argv)); break;
-  case 288: flag=_wrap_helicsFederateGetFilter(resc,resv,argc,(mxArray**)(argv)); break;
-  case 289: flag=_wrap_helicsFederateGetFilterByIndex(resc,resv,argc,(mxArray**)(argv)); break;
-  case 290: flag=_wrap_helicsFilterGetName(resc,resv,argc,(mxArray**)(argv)); break;
-  case 291: flag=_wrap_helicsFilterSet(resc,resv,argc,(mxArray**)(argv)); break;
-  case 292: flag=_wrap_helicsFilterSetString(resc,resv,argc,(mxArray**)(argv)); break;
-  case 293: flag=_wrap_helicsFilterAddDestinationTarget(resc,resv,argc,(mxArray**)(argv)); break;
-  case 294: flag=_wrap_helicsFilterAddSourceTarget(resc,resv,argc,(mxArray**)(argv)); break;
-  case 295: flag=_wrap_helicsFilterAddDeliveryEndpoint(resc,resv,argc,(mxArray**)(argv)); break;
-  case 296: flag=_wrap_helicsFilterRemoveTarget(resc,resv,argc,(mxArray**)(argv)); break;
-  case 297: flag=_wrap_helicsFilterRemoveDeliveryEndpoint(resc,resv,argc,(mxArray**)(argv)); break;
-  case 298: flag=_wrap_helicsFilterGetInfo(resc,resv,argc,(mxArray**)(argv)); break;
-  case 299: flag=_wrap_helicsFilterSetInfo(resc,resv,argc,(mxArray**)(argv)); break;
-  case 300: flag=_wrap_helicsFilterSetOption(resc,resv,argc,(mxArray**)(argv)); break;
-  case 301: flag=_wrap_helicsFilterGetOption(resc,resv,argc,(mxArray**)(argv)); break;
+  case 281: flag=_wrap_helicsMessageCopy(resc,resv,argc,(mxArray**)(argv)); break;
+  case 282: flag=_wrap_helicsFederateRegisterFilter(resc,resv,argc,(mxArray**)(argv)); break;
+  case 283: flag=_wrap_helicsFederateRegisterGlobalFilter(resc,resv,argc,(mxArray**)(argv)); break;
+  case 284: flag=_wrap_helicsFederateRegisterCloningFilter(resc,resv,argc,(mxArray**)(argv)); break;
+  case 285: flag=_wrap_helicsFederateRegisterGlobalCloningFilter(resc,resv,argc,(mxArray**)(argv)); break;
+  case 286: flag=_wrap_helicsCoreRegisterFilter(resc,resv,argc,(mxArray**)(argv)); break;
+  case 287: flag=_wrap_helicsCoreRegisterCloningFilter(resc,resv,argc,(mxArray**)(argv)); break;
+  case 288: flag=_wrap_helicsFederateGetFilterCount(resc,resv,argc,(mxArray**)(argv)); break;
+  case 289: flag=_wrap_helicsFederateGetFilter(resc,resv,argc,(mxArray**)(argv)); break;
+  case 290: flag=_wrap_helicsFederateGetFilterByIndex(resc,resv,argc,(mxArray**)(argv)); break;
+  case 291: flag=_wrap_helicsFilterGetName(resc,resv,argc,(mxArray**)(argv)); break;
+  case 292: flag=_wrap_helicsFilterSet(resc,resv,argc,(mxArray**)(argv)); break;
+  case 293: flag=_wrap_helicsFilterSetString(resc,resv,argc,(mxArray**)(argv)); break;
+  case 294: flag=_wrap_helicsFilterAddDestinationTarget(resc,resv,argc,(mxArray**)(argv)); break;
+  case 295: flag=_wrap_helicsFilterAddSourceTarget(resc,resv,argc,(mxArray**)(argv)); break;
+  case 296: flag=_wrap_helicsFilterAddDeliveryEndpoint(resc,resv,argc,(mxArray**)(argv)); break;
+  case 297: flag=_wrap_helicsFilterRemoveTarget(resc,resv,argc,(mxArray**)(argv)); break;
+  case 298: flag=_wrap_helicsFilterRemoveDeliveryEndpoint(resc,resv,argc,(mxArray**)(argv)); break;
+  case 299: flag=_wrap_helicsFilterGetInfo(resc,resv,argc,(mxArray**)(argv)); break;
+  case 300: flag=_wrap_helicsFilterSetInfo(resc,resv,argc,(mxArray**)(argv)); break;
+  case 301: flag=_wrap_helicsFilterSetOption(resc,resv,argc,(mxArray**)(argv)); break;
+  case 302: flag=_wrap_helicsFilterGetOption(resc,resv,argc,(mxArray**)(argv)); break;
   default: flag=1, SWIG_Error(SWIG_RuntimeError, "No function id %d.", fcn_id);
   }
   if (flag) {

@@ -7,12 +7,41 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 A note on future revisions.  
   Everything within a major version number should be code compatible (with the exception of experimental interfaces).  The most notable example of an experimental interface is the support for multiple source inputs.  The APIs to deal with this will change in future minor releases.  Everything within a single minor release should be network compatible with other federates on the same minor release number.  Compatibility across minor release numbers may be possible in some situations but we are not going to guarantee this as those components are subject to performance improvements and may need to be modified at some point.  Patch releases will be limited to bug fixes and other improvements not impacting the public API or network compatibility.  Check the [Public API](./docs/Public_API.md) for details on what is included and excluded from the public API and version stability.
 
+## [2.4.2][] - 2020-03-27
+Increased code coverage and additional bug fixes.
+
+### Changed
+-   Update toml11 library to 3.3.1 with some warning fixes for C++17
+-   The query handling in the core library was cleaned up to be more extensible and uniform
+
+### Fixed
+-   MacOS build with python 2.7 failure
+-   Fixed some issues with the build/test process if the `ENABLE_ZMQ_CORE=OFF`
+-   Fixed a potential issue with queries if they are triggered before the connection ack
+-   An issue with host name resolution on some systems with restricted DNS lookup
+-   Allow camelCase in file parameters from JSON
+-   Fixed linking error with default OpenMPI Spack package
+-   Fixed timing benchmark federate name
+
+### Added
+-   A series of tests for MessageFederate.cpp to increase coverage on that file to 100%
+-   Callbacks for custom filters in the C shared library
+-   A series of tests for CoreApp, BrokerApp, and FederateInfo and a few fixes for them
+-   A few additional tests of helics supports types and conversions
+-   CoreApp has a connect() and reset() method and constructor from a Core shared pointer
+-   BrokerApp has a connect() method and constructor from a Broker shared pointer
+-   Added a data_flow_graph query which gets all the connections in a federation
+
+### Deprecated
+
+### Removed
+
 ## [2.4.1][] - 2020-03-06
 Increased code coverage and additional bug fixes.  The error propagation in HELICS was improved such that local errors can be escalated to global errors, and a federate can define errors coming from the federate that are handled appropriately and can halt a co-simulation.  
 
 
 ### Changed
--   The helics webserver will build by default if the conditions are met
+-   The HELICS webserver will build by default if the conditions are met
 -   Update filesystem library to [v1.3.0](https://github.com/gulrak/filesystem/releases/tag/v1.3.0)
 -   The behavior of the `Federate*Complete` slightly modified to be uniform and consistent, no API changes
 -   Configuration of flags and targets for interfaces in JSON and TOML files can be done in multiple sections
@@ -37,8 +66,8 @@ Increased code coverage and additional bug fixes.  The error propagation in HELI
 -   Standalone benchmark federates for use in multinode benchmark runs
 -   A FreeBSD 12.1 CI build using Cirrus CI
 -   Sending an event from GitHub Actions release builds to trigger updating additional HELICS packages when a new release is made
--  `localError`, and `GlobalError` function calls the Federate API and in the C++ and sharedLibrary.  
--  `helics_terminate_on_error` flag to escalate what would be a local error into a global one that will halt the co-simulation.  This flag can be specified through the flag to federates or to brokers and cores through a command line option `--terminate_on_error` 
+-   `localError`, and `GlobalError` function calls the Federate API and in the C++ and sharedLibrary.  
+-   `helics_terminate_on_error` flag to escalate what would be a local error into a global one that will halt the co-simulation.  This flag can be specified through the flag to federates or to brokers and cores through a command line option `--terminate_on_error`
 -   `addDependency` function was added to the C++ Federate API and shared library API, it can add a direct dependency between federates manually.  
 -   A 32-bit Windows zip install archive for releases
 -   "global_time", "current_time", and "state" queries for brokers and cores, and "current_time" query for federates.
@@ -537,3 +566,4 @@ This is a major revision so this changelog will not capture all the changes that
 [2.3.1]: https://github.com/GMLC-TDC/HELICS/releases/tag/v2.3.1
 [2.4.0]: https://github.com/GMLC-TDC/HELICS/releases/tag/v2.4.0
 [2.4.1]: https://github.com/GMLC-TDC/HELICS/releases/tag/v2.4.1
+[2.4.2]: https://github.com/GMLC-TDC/HELICS/releases/tag/v2.4.2

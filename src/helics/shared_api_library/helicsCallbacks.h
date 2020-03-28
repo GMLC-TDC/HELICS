@@ -21,11 +21,10 @@ extern "C" {
 /** set the logging callback to a broker
     @details add a logging callback function for the C The logging callback will be called when
     a message flows into a broker from the core or from a broker
-    @param broker the broker object in which to create a subscription must have been create with helicsCreateValueFederate or
-    helicsCreateCombinationFederate
+    @param broker the broker object in which to set the callback
     @param logger a callback with signature void(int, const char *, const char *, void *);
     the function arguments are loglevel,  an identifier, and a message string, and a pointer to user data
-    @param userdata a point to user data that is passed to the function when executing
+    @param userdata a pointer to user data that is passed to the function when executing
     @param[in,out] err a pointer to an error object for catching errors
     */
 HELICS_EXPORT void helicsBrokerSetLoggingCallback(
@@ -37,11 +36,10 @@ HELICS_EXPORT void helicsBrokerSetLoggingCallback(
 /** set the logging callback for a core
     @details add a logging callback function for the C The logging callback will be called when
     a message flows into a core from the core or from a broker
-    @param core the core object in which to create a subscription must have been create with helicsCreateValueFederate or
-    helicsCreateCombinationFederate
+    @param core the core object in which to set the callback
     @param logger a callback with signature void(int, const char *, const char *, void *);
     the function arguments are loglevel,  an identifier, and a message string
-    @param userdata a point to user data that is passed to the function when executing
+    @param userdata a pointer to user data that is passed to the function when executing
     @param[in,out] err a pointer to an error object for catching errors
     */
 HELICS_EXPORT void helicsCoreSetLoggingCallback(
@@ -57,12 +55,26 @@ HELICS_EXPORT void helicsCoreSetLoggingCallback(
        helicsCreateCombinationFederate
        @param logger a callback with signature void(int, const char *, const char *, void *);
         the function arguments are loglevel,  an identifier string, and a message string, and a pointer to user data
-        @param userdata a point to user data that is passed to the function when executing
+        @param userdata a pointer to user data that is passed to the function when executing
         @param[in,out] err a pointer to an error object for catching errors
        */
 HELICS_EXPORT void helicsFederateSetLoggingCallback(
     helics_federate fed,
     void (*logger)(int loglevel, const char* identifier, const char* message, void* userData),
+    void* userdata,
+    helics_error* err);
+
+/** set a general callback for a custom filter
+    @details add a custom filter callback for creating a custom filter operation in the C shared library
+    @param filter the filter object to set the callback for
+    @param filtCall a callback with signature helics_message_object(helics_message_object, void *);
+    the function arguments are message,  the message to filter, and a pointer to user data. The filter should return a new message
+    @param userdata a pointer to user data that is passed to the function when executing
+    @param[in,out] err a pointer to an error object for catching errors
+    */
+HELICS_EXPORT void helicsFilterSetCustomCallback(
+    helics_filter filter,
+    void (*filtCall)(helics_message_object message, void* userData),
     void* userdata,
     helics_error* err);
 

@@ -17,7 +17,7 @@
   "time_delta": 0.0, // the minimum time between subsequent return times
   "output_delay": 0, //the propagation delay for federates to send data
   "input_delay": 0, //the input delay for external data to propagate to federates
-  "log_level": 1,  //specify the log level
+  "log_level": "summary",  //specify the log level (either a number or string)
 
   //Publications used in the federate
   "publications": [

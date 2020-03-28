@@ -101,6 +101,25 @@ jobs:
       - checkout
       - run: *setup_helics
       - run: *run_installer_tests
+      
+  helicsNoZmq:
+    docker:
+      - image: helics/buildenv:gcc8-builder
+    environment:
+      CMAKE_FLAGS: '-DHELICS_BUILD_CXX_SHARED_LIB=ON -DENABLE_ZMQ_CORE=OFF -DENABLE_IPC_CORE=OFF -DHELICS_BUILD_TESTS=ON -DCMAKE_CXX_STANDARD=17'
+    steps:
+      - checkout
+      - run: *setup_helics
+      - run: *run_helics_tests
+      
+  helicsTumbleweed:
+    docker:
+      - image: helics/buildenv:tumbleweed-builder
+    environment:
+      CMAKE_FLAGS: '-DHELICS_BUILD_CXX_SHARED_LIB=ON -DENABLE_ZMQ_CORE=OFF -DENABLE_IPC_CORE=OFF -DENABLE_UDP_CORE=OFF -DHELICS_BUILD_TESTS=ON -DCMAKE_CXX_STANDARD=17'
+    steps:
+      - checkout
+      - run: *setup_helics
 
   helicsInstall2:
     docker:
@@ -148,6 +167,8 @@ workflows:
       - helicsMSan
       - helicsASan
       - helicsTSan
+      - helicsTumbleweed
+      - helicsNoZmq
   benchmark:
     triggers:
       - schedule:

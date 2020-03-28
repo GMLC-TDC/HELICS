@@ -5,6 +5,8 @@ the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 
+#include "helics/application_api/BrokerApp.hpp"
+#include "helics/application_api/CoreApp.hpp"
 #include "helics/application_api/Endpoints.hpp"
 #include "helics/application_api/Federate.hpp"
 #include "helics/application_api/Filters.hpp"
@@ -30,6 +32,9 @@ class filter_single_type_test:
 class filter_all_type_test:
     public ::testing::TestWithParam<const char*>,
     public FederateTestFixture {
+};
+
+class filter_tests: public ::testing::Test, public FederateTestFixture {
 };
 
 /** test registration of filters*/
@@ -63,6 +68,10 @@ TEST_P(filter_single_type_test, message_filter_registration)
     fFed->addSourceTarget(f3, "filter0/fout");
     f3.addDestinationTarget("port2");
     EXPECT_TRUE(f3.getHandle() != f2.getHandle());
+
+    auto& f4 = fFed->registerFilter();
+    fFed->addSourceTarget(f4, "filter0/fout");
+    EXPECT_TRUE(f4.getHandle() != f3.getHandle());
     fFed->finalize();
     // std::cout << "fFed returned\n";
     mFed->finalizeComplete();
@@ -571,6 +580,68 @@ TEST_P(filter_single_type_test, message_filter_function_two_stage_broker_filter_
 
     broker->addSourceFilterToEndpoint("filter1", "port1");
     broker->addDestinationFilterToEndpoint("filter2", "port2");
+
+    auto& f1 = fFed->registerGlobalFilter("filter1");
+
+    EXPECT_TRUE(f1.getHandle().isValid());
+
+    auto& f2 = fFed2->registerGlobalFilter("filter2");
+
+    EXPECT_TRUE(f2.getHandle().isValid());
+
+    bool res = two_stage_filter_test(mFed, fFed, fFed2, p1, p2, f1, f2);
+    EXPECT_TRUE(res);
+}
+
+TEST_F(filter_tests, message_filter_function_two_stage_brokerApp_filter_link)
+{
+    auto broker = AddBroker("test", 3);
+    AddFederates<helics::MessageFederate>("test", 1, broker, 1.0, "filter");
+    AddFederates<helics::MessageFederate>("test", 1, broker, 1.0, "filter2");
+    AddFederates<helics::MessageFederate>("test", 1, broker, 1.0, "message");
+
+    auto fFed = GetFederateAs<helics::MessageFederate>(0);
+    auto fFed2 = GetFederateAs<helics::MessageFederate>(1);
+    auto mFed = GetFederateAs<helics::MessageFederate>(2);
+
+    auto& p1 = mFed->registerGlobalEndpoint("port1");
+    auto& p2 = mFed->registerGlobalEndpoint("port2");
+    std::this_thread::sleep_for(std::chrono::milliseconds(200));
+
+    helics::BrokerApp brk(broker);
+    brk.addSourceFilterToEndpoint("filter1", "port1");
+    brk.addDestinationFilterToEndpoint("filter2", "port2");
+
+    auto& f1 = fFed->registerGlobalFilter("filter1");
+
+    EXPECT_TRUE(f1.getHandle().isValid());
+
+    auto& f2 = fFed2->registerGlobalFilter("filter2");
+
+    EXPECT_TRUE(f2.getHandle().isValid());
+
+    bool res = two_stage_filter_test(mFed, fFed, fFed2, p1, p2, f1, f2);
+    EXPECT_TRUE(res);
+}
+
+TEST_F(filter_tests, message_filter_function_two_stage_coreApp_filter_link)
+{
+    auto broker = AddBroker("test", 3);
+    AddFederates<helics::MessageFederate>("test", 1, broker, 1.0, "filter");
+    AddFederates<helics::MessageFederate>("test", 1, broker, 1.0, "filter2");
+    AddFederates<helics::MessageFederate>("test", 1, broker, 1.0, "message");
+
+    auto fFed = GetFederateAs<helics::MessageFederate>(0);
+    auto fFed2 = GetFederateAs<helics::MessageFederate>(1);
+    auto mFed = GetFederateAs<helics::MessageFederate>(2);
+
+    auto& p1 = mFed->registerGlobalEndpoint("port1");
+    auto& p2 = mFed->registerGlobalEndpoint("port2");
+    std::this_thread::sleep_for(std::chrono::milliseconds(200));
+
+    helics::CoreApp cr(mFed->getCorePointer());
+    cr.addSourceFilterToEndpoint("filter1", "port1");
+    cr.addDestinationFilterToEndpoint("filter2", "port2");
 
     auto& f1 = fFed->registerGlobalFilter("filter1");
 

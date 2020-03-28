@@ -55,6 +55,8 @@ static void loadTypeSpecificArgs(
             tsparse.allow_extras();
             tsparse.helics_parse(std::move(args));
         } break;
+#else
+        (void)args;
 #endif
         case core_type::MPI:
             break;

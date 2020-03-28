@@ -37,71 +37,82 @@ static const std::map<std::string, int> propStringsTranslations{
     {"period", helics_property_time_period},
     {"timedelta", helics_property_time_delta},
     {"time_delta", helics_property_time_delta},
+    {"timeDelta", helics_property_time_delta},
     {"delta", helics_property_time_delta},
     {"offset", helics_property_time_offset},
     {"rtlead", helics_property_time_rt_lead},
     {"rtlag", helics_property_time_rt_lag},
     {"rttolerance", helics_property_time_rt_tolerance},
+    {"rtLead", helics_property_time_rt_lead},
+    {"rtLag", helics_property_time_rt_lag},
+    {"rtTolerance", helics_property_time_rt_tolerance},
     {"rt_lead", helics_property_time_rt_lead},
     {"rt_lag", helics_property_time_rt_lag},
     {"rt_tolerance", helics_property_time_rt_tolerance},
     {"inputdelay", helics_property_time_input_delay},
     {"outputdelay", helics_property_time_output_delay},
+    {"inputDelay", helics_property_time_input_delay},
+    {"outputDelay", helics_property_time_output_delay},
     {"input_delay", helics_property_time_input_delay},
     {"output_delay", helics_property_time_output_delay},
     {"max_iterations", helics_property_int_max_iterations},
     {"loglevel", helics_property_int_log_level},
     {"log_level", helics_property_int_log_level},
     {"maxiterations", helics_property_int_max_iterations},
+    {"logLevel", helics_property_int_log_level},
+    {"maxIterations", helics_property_int_max_iterations},
     {"iterations", helics_property_int_max_iterations},
     {"interruptible", helics_flag_interruptible},
     {"uninterruptible", helics_flag_uninterruptible},
     {"observer", helics_flag_observer},
     {"source_only", helics_flag_source_only},
     {"sourceonly", helics_flag_source_only},
+    {"sourceOnly", helics_flag_source_only},
     {"source", helics_flag_source_only},
     {"slow", helics_flag_slow_responding},
     {"slow_response", helics_flag_slow_responding},
     {"slow_responding", helics_flag_slow_responding},
+    {"slowResponding", helics_flag_slow_responding},
     {"no_ping", helics_flag_slow_responding},
     {"disable_ping", helics_flag_slow_responding},
     {"only_update_on_change", helics_flag_only_update_on_change},
     {"only_transmit_on_change", helics_flag_only_transmit_on_change},
     {"forward_compute", helics_flag_forward_compute},
     {"realtime", helics_flag_realtime},
+    {"realTime", helics_flag_realtime},
     {"restrictive_time_policy", helics_flag_restrictive_time_policy},
     {"conservative_time_policy", helics_flag_restrictive_time_policy},
     {"restrictive_time", helics_flag_restrictive_time_policy},
     {"conservative_time", helics_flag_restrictive_time_policy},
+    {"restrictiveTime", helics_flag_restrictive_time_policy},
+    {"conservativeTime", helics_flag_restrictive_time_policy},
     {"ignore_time_mismatch", helics_flag_ignore_time_mismatch_warnings},
     {"delayed_update", helics_flag_wait_for_current_time_update},
+    {"delayedUpdate", helics_flag_wait_for_current_time_update},
     {"strict_input_type_checking", helics_handle_option_strict_type_checking},
     {"ignore_unit_mismatch", helics_handle_option_ignore_unit_mismatch},
     {"buffer_data", helics_handle_option_buffer_data},
+    {"bufferData", helics_handle_option_buffer_data},
     {"required", helics_handle_option_connection_required},
     {"optional", helics_handle_option_connection_optional},
     {"wait_for_current_time", helics_flag_wait_for_current_time_update},
     {"terminate_on_error", helics_flag_terminate_on_error},
+    {"terminateOnError", helics_flag_terminate_on_error},
     {"terminateonerror", helics_flag_terminate_on_error}};
 
-static const std::set<std::string> validTimeProperties{"period",
-                                                       "timedelta",
-                                                       "time_delta",
-                                                       "offset",
-                                                       "rtlead",
-                                                       "rtlag",
-                                                       "rttolerance",
-                                                       "rt_lead",
-                                                       "rt_lag",
-                                                       "rt_tolerance",
-                                                       "inputdelay",
-                                                       "outputdelay",
-                                                       "input_delay",
-                                                       "output_delay"};
+static const std::set<std::string> validTimeProperties{"period",      "timedelta",    "time_delta",
+                                                       "timeDelta",   "offset",       "rtlead",
+                                                       "rtLead",      "rtlag",        "rtLag",
+                                                       "rttolerance", "rtTolerance",  "rt_lead",
+                                                       "rt_lag",      "rt_tolerance", "inputdelay",
+                                                       "inputDelay",  "outputdelay",  "outputDelay",
+                                                       "input_delay", "output_delay"};
 
 static const std::set<std::string> validIntProperties{"max_iterations",
                                                       "loglevel",
                                                       "log_level",
+                                                      "logLevel",
+                                                      "maxIterations",
                                                       "maxiterations"};
 
 static const std::set<std::string> validFlagOptions{"interruptible",
@@ -109,10 +120,12 @@ static const std::set<std::string> validFlagOptions{"interruptible",
                                                     "observer",
                                                     "source_only",
                                                     "sourceonly",
+                                                    "sourceOnly",
                                                     "only_update_on_change",
                                                     "only_transmit_on_change",
                                                     "forward_compute",
                                                     "realtime",
+                                                    "realTime",
                                                     "delayed_update",
                                                     "wait_for_current_time",
                                                     "strict_input_type_checking",
@@ -198,13 +211,23 @@ static void loadFlags(FederateInfo& fi, const std::string& flags)
             fi.autobroker = true;
             continue;
         }
+        if (flg.empty()) {
+            continue; // LCOV_EXCL_LINE
+        }
         auto loc = validFlagOptions.find(flg);
         if (loc != validFlagOptions.end()) {
             fi.setFlagOption(propStringsTranslations.at(flg), true);
         } else {
+            if (flg.front() == '-') {
+                loc = validFlagOptions.find(flg.substr(1));
+                if (loc != validFlagOptions.end()) {
+                    fi.setFlagOption(propStringsTranslations.at(flg.substr(1)), false);
+                }
+                continue;
+            }
             try {
                 auto val = std::stoi(flg);
-                fi.setFlagOption(val, (val > 0));
+                fi.setFlagOption(std::abs(val), (val > 0));
             }
             catch (const std::invalid_argument&) {
                 std::cerr << "unrecognized flag " << flg << std::endl;
@@ -256,7 +279,7 @@ using namespace std::string_literals;
 std::unique_ptr<helicsCLI11App> FederateInfo::makeCLIApp()
 {
     auto app = std::make_unique<helicsCLI11App>("Federate Info Parsing");
-
+    app->option_defaults()->ignore_case();
     app->add_option("--name,-n", defName, "name of the federate");
     app->add_option("--corename", coreName, "the name of the core to create or find")
         ->ignore_underscore();
@@ -319,26 +342,21 @@ std::unique_ptr<helicsCLI11App> FederateInfo::makeCLIApp()
            "The minimum time between time grants for a Federate (default in ms)")
         ->ignore_underscore();
     auto rtgroup = app->add_option_group("realtime");
-    rtgroup
-        ->add_option_function<Time>(
-            "--rtlag",
-            [this](Time val) { setProperty(helics_property_time_rt_lag, val); },
-            "the amount of the time the federate is allowed to lag realtime before "
-            "corrective action is taken (default in ms)")
-        ->ignore_underscore();
-    rtgroup
-        ->add_option_function<Time>(
-            "--rtlead",
-            [this](Time val) { setProperty(helics_property_time_rt_lead, val); },
-            "the amount of the time the federate is allowed to lead realtime before "
-            "corrective action is taken (default in ms)")
-        ->ignore_underscore();
-    rtgroup
-        ->add_option_function<Time>(
-            "--rttolerance",
-            [this](Time val) { setProperty(helics_property_time_rt_tolerance, val); },
-            "the time tolerance of the real time mode (default in ms)")
-        ->ignore_underscore();
+    rtgroup->option_defaults()->ignore_underscore()->ignore_case();
+    rtgroup->add_option_function<Time>(
+        "--rtlag",
+        [this](Time val) { setProperty(helics_property_time_rt_lag, val); },
+        "the amount of the time the federate is allowed to lag realtime before "
+        "corrective action is taken (default in ms)");
+    rtgroup->add_option_function<Time>(
+        "--rtlead",
+        [this](Time val) { setProperty(helics_property_time_rt_lead, val); },
+        "the amount of the time the federate is allowed to lead realtime before "
+        "corrective action is taken (default in ms)");
+    rtgroup->add_option_function<Time>(
+        "--rttolerance",
+        [this](Time val) { setProperty(helics_property_time_rt_tolerance, val); },
+        "the time tolerance of the real time mode (default in ms)");
 
     app->add_option_function<Time>(
            "--inputdelay",
@@ -358,7 +376,7 @@ std::unique_ptr<helicsCLI11App> FederateInfo::makeCLIApp()
         ->check(CLI::PositiveNumber);
     app->add_option_function<int>(
            "--loglevel,--log-level",
-           [this](int val) { setProperty(helics_property_time_output_delay, val); },
+           [this](int val) { setProperty(helics_property_int_log_level, val); },
            "the logging level of a federate")
         ->ignore_underscore()
         ->transform(
@@ -413,14 +431,20 @@ std::vector<std::string> FederateInfo::loadInfoFromArgs(int argc, char* argv[])
 void FederateInfo::loadInfoFromArgsIgnoreOutput(const std::string& args)
 {
     auto app = makeCLIApp();
-    app->helics_parse(args);
+    auto ret = app->helics_parse(args);
+    if (ret == helicsCLI11App::parse_output::parse_error) {
+        throw helics::InvalidParameter("argument parsing failed");
+    }
     coreType = app->getCoreType();
 }
 
 void FederateInfo::loadInfoFromArgsIgnoreOutput(int argc, char* argv[])
 {
     auto app = makeCLIApp();
-    app->helics_parse(argc, argv);
+    auto ret = app->helics_parse(argc, argv);
+    if (ret == helicsCLI11App::parse_output::parse_error) {
+        throw helics::InvalidParameter("argument parsing failed");
+    }
     coreType = app->getCoreType();
 }
 
@@ -451,6 +475,8 @@ FederateInfo loadFederateInfo(const std::string& configString)
         ret = loadFederateInfoJson(configString);
     } else if (configString.find("--") != std::string::npos) {
         ret.loadInfoFromArgsIgnoreOutput(configString);
+    } else if (configString.find("=") != std::string::npos) {
+        ret = loadFederateInfoToml(configString);
     } else {
         ret.defName = configString;
     }
@@ -499,10 +525,15 @@ FederateInfo loadFederateInfoJson(const std::string& jsonString)
     if (!callIfMember(doc, "max_iterations", intCall)) {
         callIfMember(doc, "maxiterations", intCall);
     }
-
-    bool lfound = callIfMember(doc, "log_level", intCall);
-    if (!lfound) {
-        lfound = callIfMember(doc, "loglevel", intCall);
+    bool lfound{false};
+    try {
+        lfound = callIfMember(doc, "log_level", intCall);
+        if (!lfound) {
+            lfound = callIfMember(doc, "loglevel", intCall);
+        }
+    }
+    catch (...) {
+        // ignore errors here
     }
     if (!lfound) {
         lfound = callIfMember(doc, "log_level", logTranslations);
@@ -543,33 +574,36 @@ FederateInfo loadFederateInfoJson(const std::string& jsonString)
         }
     }
     if (doc.isMember("core")) {
-        try {
-            fi.coreType = coreTypeFromString(doc["core"].asString());
-        }
-        catch (const std::invalid_argument&) {
+        auto ct = coreTypeFromString(doc["core"].asString());
+        if (ct != core_type::UNRECOGNIZED) {
+            fi.coreType = ct;
+        } else {
             fi.coreName = doc["core"].asString();
         }
     }
     if (doc.isMember("coreType")) {
-        try {
-            fi.coreType = coreTypeFromString(doc["coreType"].asString());
-        }
-        catch (const std::invalid_argument&) {
-            std::cerr << "Unrecognized core type\n";
+        auto ct = coreTypeFromString(doc["coreType"].asString());
+        if (ct != core_type::UNRECOGNIZED) {
+            fi.coreType = ct;
+        } else {
+            throw(helics::InvalidIdentifier(
+                doc["coreType"].asString() + " is not a valid core type"));
         }
     } else if (doc.isMember("coretype")) {
-        try {
-            fi.coreType = coreTypeFromString(doc["coretype"].asString());
+        auto ct = coreTypeFromString(doc["coretype"].asString());
+        if (ct != core_type::UNRECOGNIZED) {
+            fi.coreType = ct;
+        } else {
+            throw(helics::InvalidIdentifier(
+                doc["coretype"].asString() + " is not a valid core type"));
         }
-        catch (const std::invalid_argument&) {
-            std::cerr << "Unrecognized core type\n";
-        }
+
     } else if (doc.isMember("type")) {
-        try {
-            fi.coreType = coreTypeFromString(doc["type"].asString());
-        }
-        catch (const std::invalid_argument&) {
-            std::cerr << "Unrecognized core type\n";
+        auto ct = coreTypeFromString(doc["type"].asString());
+        if (ct != core_type::UNRECOGNIZED) {
+            fi.coreType = ct;
+        } else {
+            throw(helics::InvalidIdentifier(doc["type"].asString() + " is not a valid core type"));
         }
     }
     replaceIfMember(doc, "name", fi.defName);
@@ -625,16 +659,20 @@ FederateInfo loadFederateInfoToml(const std::string& tomlString)
     if (!callIfMember(doc, "max_iterations", intCall)) {
         callIfMember(doc, "maxiterations", intCall);
     }
-
-    bool lfound = callIfMember(doc, "log_level", intCall);
-    if (!lfound) {
-        lfound = callIfMember(doc, "loglevel", intCall);
+    bool lfound{false};
+    try {
+        lfound = callIfMember(doc, "log_level", intCall);
+        if (!lfound) {
+            lfound = callIfMember(doc, "loglevel", intCall);
+        }
     }
-    if (!lfound) {
-        lfound = callIfMember(doc, "log_level", logTranslations);
-    }
-    if (!lfound) {
-        lfound = callIfMember(doc, "loglevel", logTranslations);
+    catch (...) {
+        if (!lfound) {
+            lfound = callIfMember(doc, "log_level", logTranslations);
+        }
+        if (!lfound) {
+            lfound = callIfMember(doc, "loglevel", logTranslations);
+        }
     }
 
     for (auto& prop : validFlagOptions) {
@@ -668,33 +706,36 @@ FederateInfo loadFederateInfoToml(const std::string& tomlString)
         }
     }
     if (isMember(doc, "core")) {
-        try {
-            fi.coreType = coreTypeFromString(tomlAsString(doc["core"]));
-        }
-        catch (const std::invalid_argument&) {
+        auto ct = coreTypeFromString(tomlAsString(doc["core"]));
+        if (ct != core_type::UNRECOGNIZED) {
+            fi.coreType = ct;
+        } else {
             fi.coreName = tomlAsString(doc["core"]);
         }
     }
     if (isMember(doc, "coreType")) {
-        try {
-            fi.coreType = coreTypeFromString(tomlAsString(doc["coreType"]));
-        }
-        catch (const std::invalid_argument&) {
-            std::cerr << "Unrecognized core type\n";
+        auto ct = coreTypeFromString(tomlAsString(doc["coreType"]));
+        if (ct != core_type::UNRECOGNIZED) {
+            fi.coreType = ct;
+        } else {
+            throw(helics::InvalidIdentifier(
+                tomlAsString(doc["coreType"]) + " is not a valid core type"));
         }
     } else if (isMember(doc, "coretype")) {
-        try {
-            fi.coreType = coreTypeFromString(tomlAsString(doc["coretype"]));
-        }
-        catch (const std::invalid_argument&) {
-            std::cerr << "Unrecognized core type\n";
+        auto ct = coreTypeFromString(tomlAsString(doc["coretype"]));
+        if (ct != core_type::UNRECOGNIZED) {
+            fi.coreType = ct;
+        } else {
+            throw(helics::InvalidIdentifier(
+                tomlAsString(doc["coretype"]) + " is not a valid core type"));
         }
     } else if (isMember(doc, "type")) {
-        try {
-            fi.coreType = coreTypeFromString(tomlAsString(doc["type"]));
-        }
-        catch (const std::invalid_argument&) {
-            std::cerr << "Unrecognized core type\n";
+        auto ct = coreTypeFromString(tomlAsString(doc["type"]));
+        if (ct != core_type::UNRECOGNIZED) {
+            fi.coreType = ct;
+        } else {
+            throw(
+                helics::InvalidIdentifier(tomlAsString(doc["type"]) + " is not a valid core type"));
         }
     }
     replaceIfMember(doc, "name", fi.defName);

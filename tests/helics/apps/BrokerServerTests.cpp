@@ -1,5 +1,5 @@
 /*
-Copyright © 2017-2019,
+Copyright (c) 2017-2020,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See
 the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
@@ -9,6 +9,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helics/core/BrokerFactory.hpp"
 #include "helics/core/Core.hpp"
 #include "helics/core/CoreFactory.hpp"
+#include "helics/core/coreTypeOperations.hpp"
 #include "helics/helics.hpp"
 
 #include "gtest/gtest.h"
@@ -21,6 +22,9 @@ class BrokerServerTests: public ::testing::TestWithParam<std::pair<const char*, 
 
 TEST_P(BrokerServerTests, startup_tests)
 {
+    if (!core::isCoreTypeAvailable(GetParam().second)) {
+        return;
+    }
     apps::BrokerServer brks(std::vector<std::string>{GetParam().first});
 
     brks.forceTerminate();
@@ -66,6 +70,9 @@ TEST_P(BrokerServerTests, startup_tests)
 
 TEST_P(BrokerServerTests, execution_tests)
 {
+    if (!core::isCoreTypeAvailable(GetParam().second)) {
+        return;
+    }
     apps::BrokerServer brks(std::vector<std::string>{GetParam().first});
     brks.startServers();
 
@@ -91,6 +98,9 @@ TEST_P(BrokerServerTests, execution_tests)
 
 TEST_P(BrokerServerTests, execution_tests_duplicate)
 {
+    if (!core::isCoreTypeAvailable(GetParam().second)) {
+        return;
+    }
     apps::BrokerServer brks(std::vector<std::string>{GetParam().first});
     brks.startServers();
 
