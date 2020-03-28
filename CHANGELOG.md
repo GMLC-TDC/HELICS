@@ -11,7 +11,7 @@ A note on future revisions.
 Some library reorganization
 
 ### Changed
--   Split the helics core library into a separate core and networking library
+-   Split the helics core library into a separate core and network library
 
 ### Fixed
 

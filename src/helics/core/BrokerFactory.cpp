@@ -23,16 +23,19 @@ static const std::string emptyString;
 
 namespace BrokerFactory {
 
-    using BuildT = std::tuple<int, std::string, std::shared_ptr<BrokerBuilder>>;
-
+    /*** class to holder the set of builders
+    @details this doesn't work as a global since it tends to get initialized after some of the things that call it
+    so it needs to be a static member of function call*/
     class MasterBrokerBuilder
     {
     public:
+        using BuildT = std::tuple<int, std::string, std::shared_ptr<BrokerBuilder>>;
+
         static void addBuilder(std::shared_ptr<BrokerBuilder> cb, const std::string& name, int code)
         {
             instance()->builders.emplace_back(code, name, std::move(cb));
         }
-        static std::shared_ptr<BrokerBuilder> &getBuilder(int code)
+        static const std::shared_ptr<BrokerBuilder> &getBuilder(int code)
         {
             for (auto &bb : instance()->builders)
             {
@@ -43,7 +46,7 @@ namespace BrokerFactory {
             }
             throw(HelicsException("core type is not available"));
         }
-        static std::shared_ptr<BrokerBuilder> &getIndexedBuilder(std::size_t index)
+        static const std::shared_ptr<BrokerBuilder> &getIndexedBuilder(std::size_t index)
         {
             auto &blder = instance();
             if (blder->builders.size() <= index)
@@ -52,14 +55,16 @@ namespace BrokerFactory {
             }
             return std::get<2>(blder->builders[index]);
         }
-        static std::shared_ptr<MasterBrokerBuilder> &instance()
+        static const std::shared_ptr<MasterBrokerBuilder> &instance()
         {
             static std::shared_ptr<MasterBrokerBuilder> iptr(new MasterBrokerBuilder());
             return iptr;
         }
     private:
+        /** private constructor since we only really want one of them
+        accessed through the instance static member*/
         MasterBrokerBuilder() = default;
-        std::vector<BuildT> builders;
+        std::vector<BuildT> builders; //!< container for the builders
     };
     
     void defineBrokerBuilder(std::shared_ptr<BrokerBuilder> cb, const std::string& name, int code)

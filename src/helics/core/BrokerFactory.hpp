@@ -50,7 +50,7 @@ namespace BrokerFactory {
         }
     };
 
-    /** defineCoreBuilder */
+    /** define a new Broker Builder from the builder give a name and build code*/
     void defineBrokerBuilder(std::shared_ptr<BrokerBuilder> cb, const std::string &name, int code);
 
     /** template function to create a builder and link it into the library*/

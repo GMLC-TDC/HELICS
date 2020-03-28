@@ -52,7 +52,7 @@ namespace CoreFactory {
         }
     };
    
-    /** defineCoreBuilder */
+    //** define a new Core Builder from the builder give a name and build code*/
     void defineCoreBuilder(std::shared_ptr<CoreBuilder> cb, const std::string& coreTypeName, int code);
 
     /** template function to create a builder and link it into the library*/
