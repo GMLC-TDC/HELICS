@@ -7,7 +7,7 @@ SPDX-License-Identifier: BSD-3-Clause
 */
 #include "MpiCore.h"
 
-#include "../helicsCLI11.hpp"
+#include "../../core/helicsCLI11.hpp"
 #include "MpiComms.h"
 
 #include <mpi.h>
