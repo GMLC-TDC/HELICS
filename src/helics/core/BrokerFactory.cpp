@@ -12,177 +12,49 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "core-exceptions.hpp"
 #include "core-types.hpp"
 #include "gmlc/concurrency/DelayedDestructor.hpp"
+#include "gmlc/libguarded/shared_guarded.hpp"
 #include "gmlc/concurrency/SearchableObjectHolder.hpp"
 #include "gmlc/concurrency/TripWire.hpp"
 #include "helics/helics-config.h"
-
-#ifdef ENABLE_ZMQ_CORE
-#    include "zmq/ZmqBroker.h"
-#endif
-
-#ifdef ENABLE_MPI_CORE
-#    include "mpi/MpiBroker.h"
-#endif
-
-#ifdef ENABLE_TEST_CORE
-#    include "test/TestBroker.h"
-#endif
-
-#ifdef ENABLE_IPC_CORE
-#    include "ipc/IpcBroker.h"
-#endif
-
-#ifdef ENABLE_UDP_CORE
-#    include "udp/UdpBroker.h"
-#endif
-
-#ifdef ENABLE_TCP_CORE
-#    include "tcp/TcpBroker.h"
-#endif
-
-#ifdef ENABLE_INPROC_CORE
-#    include "inproc/InprocBroker.h"
-#endif
-
+#include "CoreBroker.hpp"
 #include <cassert>
 
 namespace helics {
-const std::string emptyString;
-std::shared_ptr<Broker> makeBroker(core_type type, const std::string& name)
-{
-    std::shared_ptr<Broker> broker;
-
-    if (type == core_type::DEFAULT) {
-#ifdef ENABLE_ZMQ_CORE
-        type = core_type::ZMQ;
-#else
-#    ifdef ENABLE_TCP_CORE
-        type = core_type::TCP;
-#    else
-#        ifdef ENABLE_MPI_CORE
-        type = core_type::MPI;
-#        else
-        type = core_type::UDP;
-#        endif
-#    endif
-#endif
-    }
-
-    switch (type) {
-        case core_type::ZMQ:
-#ifdef ENABLE_ZMQ_CORE
-            if (name.empty()) {
-                broker = std::make_shared<zeromq::ZmqBroker>();
-            } else {
-                broker = std::make_shared<zeromq::ZmqBroker>(name);
-            }
-
-#else
-            throw(HelicsException("ZMQ broker type is not available"));
-#endif
-            break;
-        case core_type::ZMQ_SS:
-#ifdef ENABLE_ZMQ_CORE
-            if (name.empty()) {
-                broker = std::make_shared<zeromq::ZmqBrokerSS>();
-            } else {
-                broker = std::make_shared<zeromq::ZmqBrokerSS>(name);
-            }
-#else
-            throw(HelicsException("ZMQ single socket broker type is not available"));
-#endif
-            break;
-        case core_type::MPI:
-#ifdef ENABLE_MPI_CORE
-            if (name.empty()) {
-                broker = std::make_shared<mpi::MpiBroker>();
-            } else {
-                broker = std::make_shared<mpi::MpiBroker>(name);
-            }
-#else
-            throw(HelicsException("mpi broker type is not available"));
-#endif
-            break;
-        case core_type::TEST:
-#ifdef ENABLE_TEST_CORE
-            if (name.empty()) {
-                broker = std::make_shared<testcore::TestBroker>();
-            } else {
-                broker = std::make_shared<testcore::TestBroker>(name);
-            }
-            break;
-#else
-            throw(HelicsException("Test broker type is not available"));
-#endif
-        case core_type::INPROC:
-#ifdef ENABLE_INPROC_CORE
-            if (name.empty()) {
-                broker = std::make_shared<inproc::InprocBroker>();
-            } else {
-                broker = std::make_shared<inproc::InprocBroker>(name);
-            }
-            break;
-#else
-            throw(HelicsException("in process broker type is not available"));
-#endif
-        case core_type::INTERPROCESS:
-        case core_type::IPC:
-#ifdef ENABLE_IPC_CORE
-            if (name.empty()) {
-                broker = std::make_shared<ipc::IpcBroker>();
-            } else {
-                broker = std::make_shared<ipc::IpcBroker>(name);
-            }
-            break;
-#else
-            throw(HelicsException("ipc broker type is not available"));
-#endif
-        case core_type::UDP:
-#ifdef ENABLE_UDP_CORE
-            if (name.empty()) {
-                broker = std::make_shared<udp::UdpBroker>();
-            } else {
-                broker = std::make_shared<udp::UdpBroker>(name);
-            }
-            break;
-#else
-            throw(HelicsException("udp broker type is not available"));
-#endif
-        case core_type::TCP:
-#ifdef ENABLE_TCP_CORE
-            if (name.empty()) {
-                broker = std::make_shared<tcp::TcpBroker>();
-            } else {
-                broker = std::make_shared<tcp::TcpBroker>(name);
-            }
-#else
-            throw(HelicsException("tcp broker type is not available"));
-#endif
-            break;
-        case core_type::TCP_SS:
-#ifdef ENABLE_TCP_CORE
-            if (name.empty()) {
-                broker = std::make_shared<tcp::TcpBrokerSS>();
-            } else {
-                broker = std::make_shared<tcp::TcpBrokerSS>(name);
-            }
-#else
-            throw(HelicsException("tcp single socket broker type is not available"));
-#endif
-            break;
-        case core_type::NNG:
-        case core_type::WEBSOCKET:
-        case core_type::HTTP:
-            throw(HelicsException("core type is not available"));
-        case core_type::NULLCORE:
-            throw(HelicsException("nullcore is explicitly not available nor will ever be"));
-        default:
-            throw(HelicsException("unrecognized broker type"));
-    }
-    return broker;
-}
+static const std::string emptyString;
 
 namespace BrokerFactory {
+
+    static gmlc::
+        libguarded::shared_guarded<std::vector<std::tuple<int,std::string,std::shared_ptr<BrokerBuilder>>>> builders;
+
+    void defineBrokerBuilder(std::shared_ptr<BrokerBuilder> cb, const std::string& name, int code)
+    {
+        auto lk = builders.lock();
+        lk->emplace_back(code, name, std::move(cb));
+    }
+
+    std::shared_ptr<Broker> makeBroker(core_type type, const std::string& name)
+    {
+        if (type == core_type::NULLCORE)
+        {
+            throw(HelicsException("nullcore is explicitly not available nor will ever be"));
+        }
+        if (type == core_type::DEFAULT)
+        {
+            return std::get<2>(builders.lock_shared()->front())->build(name);
+        }
+        auto buildersb = builders.lock_shared();
+        for (auto &bb : buildersb)
+        {
+            auto cd = std::get<0>(bb);
+            if ( cd == static_cast<int>(type))
+            {
+                std::get<2>(bb)->build(name);
+            }
+        }
+        return nullptr;
+    }
+
     std::shared_ptr<Broker> create(core_type type, const std::string& configureString)
     {
         return create(type, emptyString, configureString);
@@ -273,53 +145,16 @@ need be without issue*/
     static bool isJoinableBrokerOfType(core_type type, const std::shared_ptr<Broker>& ptr)
     {
         if (ptr->isOpenToNewFederates()) {
-            switch (type) {
-                case core_type::ZMQ:
-#ifdef ENABLE_ZMQ_CORE
-                    return (dynamic_cast<zeromq::ZmqBroker*>(ptr.get()) != nullptr);
-#else
-                    break;
-#endif
-                case core_type::MPI:
-#ifdef ENABLE_MPI_CORE
-                    return (dynamic_cast<mpi::MpiBroker*>(ptr.get()) != nullptr);
-#else
-                    break;
-#endif
-                case core_type::TEST:
-#ifdef ENABLE_TEST_CORE
-                    return (dynamic_cast<testcore::TestBroker*>(ptr.get()) != nullptr);
-#else
-                    return false;
-#endif
-                case core_type::INPROC:
-#ifdef ENABLE_INPROC_CORE
-                    return (dynamic_cast<inproc::InprocBroker*>(ptr.get()) != nullptr);
-#else
-                    return false;
-#endif
-                case core_type::INTERPROCESS:
-                case core_type::IPC:
-#ifdef ENABLE_IPC_CORE
-                    return (dynamic_cast<ipc::IpcBroker*>(ptr.get()) != nullptr);
-#else
-                    return false;
-#endif
-                case core_type::UDP:
-#ifdef ENABLE_UDP_CORE
-                    return (dynamic_cast<udp::UdpBroker*>(ptr.get()) != nullptr);
-#else
-                    return false;
-#endif
-                case core_type::TCP:
-#ifdef ENABLE_TCP_CORE
-                    return (dynamic_cast<tcp::TcpBroker*>(ptr.get()) != nullptr);
-#else
-                    return false;
-#endif
-                default:
-                    return true;
-            }
+                auto buildersb = builders.lock_shared();
+                for (auto &bb : buildersb)
+                {
+                    auto cd = std::get<0>(bb);
+                    if (cd == static_cast<int>(type))
+                    {
+                        return std::get<2>(bb)->checkType(ptr.get());
+                    }
+                }
+                return true;
         }
         return false;
     }

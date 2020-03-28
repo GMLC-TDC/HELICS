@@ -34,6 +34,7 @@ target_include_directories(
 
 add_subdirectory(common)
 add_subdirectory(core)
+add_subdirectory(network)
 add_subdirectory(application_api)
 
 if(HELICS_BUILD_CXX_SHARED_LIB)

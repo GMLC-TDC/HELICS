@@ -13,7 +13,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <thread>
 
 #if defined(ENABLE_ZMQ_CORE) && !defined(USING_HELICS_C_SHARED_LIB)
-#    include "helics/core/zmq/ZmqCommsCommon.h"
+#    include "helics/network/zmq/ZmqCommsCommon.h"
 #endif
 
 #if defined(_WIN32) || defined(WIN32)
