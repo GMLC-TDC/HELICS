@@ -67,8 +67,8 @@ namespace helics {
 #endif
 
 #ifdef ENABLE_MPI_CORE
-    static auto iprcc = CoreFactory::addCoreType<mpi::MpiCore>("mpi", static_cast<int>(core_type::MPI));
-    static auto iprcb = BrokerFactory::addBrokerType<mpi::MpiBroker>("mpi", static_cast<int>(core_type::MPI));
+    static auto mpic = CoreFactory::addCoreType<mpi::MpiCore>("mpi", static_cast<int>(core_type::MPI));
+    static auto mpib = BrokerFactory::addBrokerType<mpi::MpiBroker>("mpi", static_cast<int>(core_type::MPI));
 #endif
 
 #ifdef ENABLE_UDP_CORE

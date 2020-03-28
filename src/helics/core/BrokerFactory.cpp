@@ -46,11 +46,11 @@ namespace BrokerFactory {
         static std::shared_ptr<BrokerBuilder> &getIndexedBuilder(std::size_t index)
         {
             auto &blder = instance();
-            if (blder->builders.size() < index)
+            if (blder->builders.size() <= index)
             {
-                return std::get<2>(blder->builders[index]);
+                throw(HelicsException("broker type index is not available"));
             }
-            throw(HelicsException("core type is not available"));
+            return std::get<2>(blder->builders[index]);
         }
         static std::shared_ptr<MasterBrokerBuilder> &instance()
         {

@@ -50,11 +50,11 @@ namespace CoreFactory {
         static std::shared_ptr<CoreBuilder> &getIndexedBuilder(std::size_t index)
         {
             auto &blder = instance();
-            if (blder->builders.size() < index)
+            if (blder->builders.size() <= index)
             {
-                return std::get<2>(blder->builders[index]);
+                throw(HelicsException("core type index is not available"));
             }
-            throw(HelicsException("core type is not available"));
+            return std::get<2>(blder->builders[index]);
         }
         static std::shared_ptr<MasterCoreBuilder> &instance()
         {
