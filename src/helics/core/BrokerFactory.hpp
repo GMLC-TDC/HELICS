@@ -34,7 +34,7 @@ namespace BrokerFactory {
 
     /** template for making a Broker builder*/
     template <class BrokerTYPE>
-    class BrokerTypeBuilder :public BrokerBuilder
+    class BrokerTypeBuilder final :public BrokerBuilder
     {
     public:
         static_assert(std::is_base_of<Broker, BrokerTYPE>::value, "Type does not inherit from helics::Core");

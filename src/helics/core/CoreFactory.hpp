@@ -36,7 +36,7 @@ namespace CoreFactory {
 
     /** template for making a Core builder*/
     template <class CoreTYPE>
-    class CoreTypeBuilder:public CoreBuilder
+    class CoreTypeBuilder final:public CoreBuilder
     {
     public:
         static_assert(std::is_base_of<Core, CoreTYPE>::value, "Type does not inherit from helics::Core");
