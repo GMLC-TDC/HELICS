@@ -6,8 +6,8 @@ SPDX-License-Identifier: BSD-3-Clause
 */
 #pragma once
 
-#include "NetworkCore.hpp"
 #include "../core/helicsCLI11.hpp"
+#include "NetworkCore.hpp"
 
 namespace helics {
 constexpr const char* defBrokerInterface[] = {"127.0.0.1",

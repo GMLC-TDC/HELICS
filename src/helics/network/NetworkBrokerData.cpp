@@ -7,8 +7,8 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include "NetworkBrokerData.hpp"
 
-#include "helics/core/BrokerFactory.hpp"
 #include "gmlc/netif/NetIF.hpp"
+#include "helics/core/BrokerFactory.hpp"
 #include "helics/core/helicsCLI11.hpp"
 
 #ifndef HELICS_DISABLE_ASIO

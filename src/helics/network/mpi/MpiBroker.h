@@ -7,8 +7,8 @@ SPDX-License-Identifier: BSD-3-Clause
 */
 #pragma once
 
-#include "../CommsBroker.hpp"
 #include "../../core/CoreBroker.hpp"
+#include "../CommsBroker.hpp"
 
 namespace helics {
 namespace mpi {

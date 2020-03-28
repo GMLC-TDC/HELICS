@@ -6,8 +6,8 @@ SPDX-License-Identifier: BSD-3-Clause
 */
 #pragma once
 
-#include "helics/core/ActionMessage.hpp"
 #include "gmlc/containers/extra/optional.hpp"
+#include "helics/core/ActionMessage.hpp"
 
 #include <algorithm>
 #include <boost/interprocess/ipc/message_queue.hpp>

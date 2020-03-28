@@ -8,15 +8,14 @@ SPDX-License-Identifier: BSD-3-Clause
 #define ENABLE_TRIPWIRE
 
 #include "CoreFactory.hpp"
-#include "gmlc/libguarded/shared_guarded.hpp"
+
+#include "CommonCore.hpp"
 #include "core-exceptions.hpp"
 #include "core-types.hpp"
-#include "helics/helics-config.h"
-#include "CommonCore.hpp"
-
 #include "gmlc/concurrency/DelayedDestructor.hpp"
 #include "gmlc/concurrency/SearchableObjectHolder.hpp"
-
+#include "gmlc/libguarded/shared_guarded.hpp"
+#include "helics/helics-config.h"
 #include "helicsCLI11.hpp"
 
 #include <cassert>
@@ -27,45 +26,41 @@ namespace helics {
 namespace CoreFactory {
     static const std::string emptyString;
 
-    
     /*** class to holder the set of builders
    @details this doesn't work as a global since it tends to get initialized after some of the things that call it
    so it needs to be a static member of function call*/
-    class MasterCoreBuilder
-    {
-    public:
+    class MasterCoreBuilder {
+      public:
         using BuildT = std::tuple<int, std::string, std::shared_ptr<CoreBuilder>>;
 
         static void addBuilder(std::shared_ptr<CoreBuilder> cb, const std::string& name, int code)
         {
             instance()->builders.emplace_back(code, name, std::move(cb));
         }
-        static const std::shared_ptr<CoreBuilder> &getBuilder(int code)
+        static const std::shared_ptr<CoreBuilder>& getBuilder(int code)
         {
-            for (auto &bb : instance()->builders)
-            {
-                if (std::get<0>(bb) == code)
-                {
+            for (auto& bb : instance()->builders) {
+                if (std::get<0>(bb) == code) {
                     return std::get<2>(bb);
                 }
             }
             throw(HelicsException("core type is not available"));
         }
-        static const std::shared_ptr<CoreBuilder> &getIndexedBuilder(std::size_t index)
+        static const std::shared_ptr<CoreBuilder>& getIndexedBuilder(std::size_t index)
         {
-            auto &blder = instance();
-            if (blder->builders.size() <= index)
-            {
+            auto& blder = instance();
+            if (blder->builders.size() <= index) {
                 throw(HelicsException("core type index is not available"));
             }
             return std::get<2>(blder->builders[index]);
         }
-        static const std::shared_ptr<MasterCoreBuilder> &instance()
+        static const std::shared_ptr<MasterCoreBuilder>& instance()
         {
             static std::shared_ptr<MasterCoreBuilder> iptr(new MasterCoreBuilder());
             return iptr;
         }
-    private:
+
+      private:
         /** private constructor since we only really want one of them
         accessed through the instance static member*/
         MasterCoreBuilder() = default;
@@ -79,12 +74,10 @@ namespace CoreFactory {
 
     std::shared_ptr<Core> makeCore(core_type type, const std::string& name)
     {
-        if (type == core_type::NULLCORE)
-        {
+        if (type == core_type::NULLCORE) {
             throw(HelicsException("nullcore is explicitly not available nor will ever be"));
         }
-        if (type == core_type::DEFAULT)
-        {
+        if (type == core_type::DEFAULT) {
             return MasterCoreBuilder::getIndexedBuilder(0)->build(name);
         }
         return MasterCoreBuilder::getBuilder(static_cast<int>(type))->build(name);
@@ -237,10 +230,9 @@ namespace CoreFactory {
 
     /** lambda function to join cores before the destruction happens to avoid potential problematic calls in the
  * loops*/
-    static auto destroyerCallFirst = [](std::shared_ptr<Core> &core) {
-        auto ccore = dynamic_cast<CommonCore *>(core.get());
-        if (ccore != nullptr)
-        {
+    static auto destroyerCallFirst = [](std::shared_ptr<Core>& core) {
+        auto ccore = dynamic_cast<CommonCore*>(core.get());
+        if (ccore != nullptr) {
             ccore->processDisconnect(true);
             ccore->joinAllThreads();
         }
@@ -271,12 +263,10 @@ without issue*/
         if (!ptr->isOpenToNewFederates()) {
             return false;
         }
-        try
-        {
+        try {
             return MasterCoreBuilder::getBuilder(static_cast<int>(type))->checkType(ptr.get());
         }
-        catch (const helics::HelicsException &)
-        {
+        catch (const helics::HelicsException&) {
             // the error will throw if the MasterCoreBuilder can't find the core type, in which case it is open yet so return true
             return true;
         }

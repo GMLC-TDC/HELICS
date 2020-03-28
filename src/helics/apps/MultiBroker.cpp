@@ -29,8 +29,8 @@ SPDX-License-Identifier: BSD-3-Clause
 #ifdef ENABLE_IPC_CORE
 #    include "../network/ipc/IpcComms.h"
 #endif
-#include "../network/NetworkBrokerData.hpp"
 #include "../core/helicsCLI11.hpp"
+#include "../network/NetworkBrokerData.hpp"
 
 using namespace std::string_literals;
 

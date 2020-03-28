@@ -6,8 +6,8 @@ SPDX-License-Identifier: BSD-3-Clause
 */
 #include "TcpCore.h"
 
-#include "../NetworkCore_impl.hpp"
 #include "../../core/helicsCLI11.hpp"
+#include "../NetworkCore_impl.hpp"
 #include "TcpComms.h"
 #include "TcpCommsSS.h"
 

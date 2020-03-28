@@ -7,8 +7,8 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "NetworkCommsInterface.hpp"
 
 #include "../common/fmt_format.h"
-#include "helics/core/ActionMessage.hpp"
 #include "NetworkBrokerData.hpp"
+#include "helics/core/ActionMessage.hpp"
 
 #include <memory>
 
