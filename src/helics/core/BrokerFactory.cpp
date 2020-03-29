@@ -9,13 +9,14 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include "BrokerFactory.hpp"
 
+#include "CoreBroker.hpp"
 #include "core-exceptions.hpp"
 #include "core-types.hpp"
 #include "gmlc/concurrency/DelayedDestructor.hpp"
 #include "gmlc/concurrency/SearchableObjectHolder.hpp"
 #include "gmlc/concurrency/TripWire.hpp"
 #include "helics/helics-config.h"
-#include "CoreBroker.hpp"
+
 #include <cassert>
 
 namespace helics {
@@ -26,47 +27,44 @@ namespace BrokerFactory {
     /*** class to holder the set of builders
     @details this doesn't work as a global since it tends to get initialized after some of the things that call it
     so it needs to be a static member of function call*/
-    class MasterBrokerBuilder
-    {
-    public:
+    class MasterBrokerBuilder {
+      public:
         using BuildT = std::tuple<int, std::string, std::shared_ptr<BrokerBuilder>>;
 
         static void addBuilder(std::shared_ptr<BrokerBuilder> cb, const std::string& name, int code)
         {
             instance()->builders.emplace_back(code, name, std::move(cb));
         }
-        static const std::shared_ptr<BrokerBuilder> &getBuilder(int code)
+        static const std::shared_ptr<BrokerBuilder>& getBuilder(int code)
         {
-            for (auto &bb : instance()->builders)
-            {
-                if (std::get<0>(bb) == code)
-                {
+            for (auto& bb : instance()->builders) {
+                if (std::get<0>(bb) == code) {
                     return std::get<2>(bb);
                 }
             }
             throw(HelicsException("core type is not available"));
         }
-        static const std::shared_ptr<BrokerBuilder> &getIndexedBuilder(std::size_t index)
+        static const std::shared_ptr<BrokerBuilder>& getIndexedBuilder(std::size_t index)
         {
-            auto &blder = instance();
-            if (blder->builders.size() <= index)
-            {
+            auto& blder = instance();
+            if (blder->builders.size() <= index) {
                 throw(HelicsException("broker type index is not available"));
             }
             return std::get<2>(blder->builders[index]);
         }
-        static const std::shared_ptr<MasterBrokerBuilder> &instance()
+        static const std::shared_ptr<MasterBrokerBuilder>& instance()
         {
             static std::shared_ptr<MasterBrokerBuilder> iptr(new MasterBrokerBuilder());
             return iptr;
         }
-    private:
+
+      private:
         /** private constructor since we only really want one of them
         accessed through the instance static member*/
         MasterBrokerBuilder() = default;
         std::vector<BuildT> builders; //!< container for the builders
     };
-    
+
     void defineBrokerBuilder(std::shared_ptr<BrokerBuilder> cb, const std::string& name, int code)
     {
         MasterBrokerBuilder::addBuilder(std::move(cb), name, code);
@@ -74,12 +72,10 @@ namespace BrokerFactory {
 
     std::shared_ptr<Broker> makeBroker(core_type type, const std::string& name)
     {
-        if (type == core_type::NULLCORE)
-        {
+        if (type == core_type::NULLCORE) {
             throw(HelicsException("nullcore is explicitly not available nor will ever be"));
         }
-        if (type == core_type::DEFAULT)
-        {
+        if (type == core_type::DEFAULT) {
             return MasterBrokerBuilder::getIndexedBuilder(0)->build(name);
         }
         return MasterBrokerBuilder::getBuilder(static_cast<int>(type))->build(name);
@@ -177,12 +173,10 @@ need be without issue*/
         if (!ptr->isOpenToNewFederates()) {
             return false;
         }
-        try
-        {
+        try {
             return MasterBrokerBuilder::getBuilder(static_cast<int>(type))->checkType(ptr.get());
         }
-        catch (const helics::HelicsException &)
-        {
+        catch (const helics::HelicsException&) {
             return true;
         }
     }

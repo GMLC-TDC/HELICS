@@ -8,11 +8,11 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include "Core.hpp"
 #include "core-types.hpp"
-#include <type_traits>
 
 #include <chrono>
 #include <memory>
 #include <string>
+#include <type_traits>
 #include <vector>
 
 namespace helics {
@@ -24,43 +24,46 @@ namespace helics {
 
 namespace CoreFactory {
     /** builder for cores*/
-    class CoreBuilder
-    {
-    public:
+    class CoreBuilder {
+      public:
         virtual std::shared_ptr<Core> build(const std::string& name) = 0;
         /** check if a Core is of the correct type
         return true if the type is compatible
         */
-        virtual bool checkType(Core *cr)const { return (cr!=nullptr); }
+        virtual bool checkType(Core* cr) const { return (cr != nullptr); }
     };
 
     /** template for making a Core builder*/
-    template <class CoreTYPE>
-    class CoreTypeBuilder final:public CoreBuilder
-    {
-    public:
-        static_assert(std::is_base_of<Core, CoreTYPE>::value, "Type does not inherit from helics::Core");
+    template<class CoreTYPE>
+    class CoreTypeBuilder final: public CoreBuilder {
+      public:
+        static_assert(
+            std::is_base_of<Core, CoreTYPE>::value,
+            "Type does not inherit from helics::Core");
 
         using core_build_type = CoreTYPE;
         virtual std::shared_ptr<Core> build(const std::string& name) override
         {
             return std::make_shared<CoreTYPE>(name);
         }
-        virtual bool checkType(Core *cr)const override
+        virtual bool checkType(Core* cr) const override
         {
-            return dynamic_cast<CoreTYPE *>(cr) != nullptr;
+            return dynamic_cast<CoreTYPE*>(cr) != nullptr;
         }
     };
-   
+
     //** define a new Core Builder from the builder give a name and build code*/
-    void defineCoreBuilder(std::shared_ptr<CoreBuilder> cb, const std::string& coreTypeName, int code);
+    void defineCoreBuilder(
+        std::shared_ptr<CoreBuilder> cb,
+        const std::string& coreTypeName,
+        int code);
 
     /** template function to create a builder and link it into the library*/
-    template  <class CoreTYPE>
-    std::shared_ptr<CoreBuilder> addCoreType(const std::string &coreTypeName, int code)
+    template<class CoreTYPE>
+    std::shared_ptr<CoreBuilder> addCoreType(const std::string& coreTypeName, int code)
     {
         auto bld = std::make_shared<CoreTypeBuilder<CoreTYPE>>();
-        std::shared_ptr < CoreBuilder > cbld= std::static_pointer_cast<CoreBuilder>(bld);
+        std::shared_ptr<CoreBuilder> cbld = std::static_pointer_cast<CoreBuilder>(bld);
         defineCoreBuilder(cbld, coreTypeName, code);
         return cbld;
     }

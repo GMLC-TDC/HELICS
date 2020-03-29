@@ -7,9 +7,9 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include "CommsBroker.hpp"
 
-#include "helics/core/CoreBroker.hpp"
 #include "CommsBroker_impl.hpp"
 #include "helics/core/CommonCore.hpp"
+#include "helics/core/CoreBroker.hpp"
 #include "helics/helics-config.h"
 
 #ifdef ENABLE_IPC_CORE

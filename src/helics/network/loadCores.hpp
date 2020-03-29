@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-3-Clause
 */
 #pragma once
 
-namespace helics
-{
-    /** load the available core and Broker types into the factory*/
-    bool loadCores();
-}
+namespace helics {
+/** load the available core and Broker types into the factory*/
+bool loadCores();
+} // namespace helics
