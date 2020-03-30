@@ -26,7 +26,7 @@ namespace helics {
 namespace CoreFactory {
     static const std::string emptyString;
 
-    /*** class to holder the set of builders
+    /*** class to hold the set of builders
    @details this doesn't work as a global since it tends to get initialized after some of the things that call it
    so it needs to be a static member of function call*/
     class MasterCoreBuilder {
