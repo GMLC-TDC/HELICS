@@ -13,8 +13,8 @@ the top-level NOTICE for additional details. All rights reserved. SPDX-License-I
 /** these test cases test out the value converters
  */
 #include "helics/application_api.hpp"
-#include "helics/core/test/TestComms.h"
-#include "helics/core/test/TestCore.h"
+#include "helics/network/test/TestComms.h"
+#include "helics/network/test/TestCore.h"
 
 #include <future>
 

@@ -7,30 +7,30 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include "MultiBroker.hpp"
 
-#include "../core/CommsInterface.hpp"
+#include "../network/CommsInterface.hpp"
 
 #include <atomic>
 #include <mutex>
 #include <thread>
 #ifdef ENABLE_UDP_CORE
-#    include "../core/udp/UdpComms.h"
+#    include "../network/udp/UdpComms.h"
 #endif
 #ifdef ENABLE_TCP_CORE
-#    include "../core/tcp/TcpComms.h"
-#    include "../core/tcp/TcpCommsSS.h"
+#    include "../network/tcp/TcpComms.h"
+#    include "../network/tcp/TcpCommsSS.h"
 #endif
 #ifdef ENABLE_ZMQ_CORE
-#    include "../core/zmq/ZmqComms.h"
-#    include "../core/zmq/ZmqCommsSS.h"
+#    include "../network/zmq/ZmqComms.h"
+#    include "../network/zmq/ZmqCommsSS.h"
 #endif
 #ifdef ENABLE_MPI_CORE
-#    include "../core/mpi/MpiComms.h"
+#    include "../network/mpi/MpiComms.h"
 #endif
 #ifdef ENABLE_IPC_CORE
-#    include "../core/ipc/IpcComms.h"
+#    include "../network/ipc/IpcComms.h"
 #endif
-#include "../core/NetworkBrokerData.hpp"
 #include "../core/helicsCLI11.hpp"
+#include "../network/NetworkBrokerData.hpp"
 
 using namespace std::string_literals;
 

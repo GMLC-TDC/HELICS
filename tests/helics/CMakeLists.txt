@@ -17,6 +17,7 @@ target_link_libraries(helics_test_base INTERFACE gtest gtest_main gmock)
 target_link_libraries(helics_test_base INTERFACE compile_flags_target)
 
 add_subdirectory(core)
+add_subdirectory(network)
 add_subdirectory(common)
 add_subdirectory(system_tests)
 

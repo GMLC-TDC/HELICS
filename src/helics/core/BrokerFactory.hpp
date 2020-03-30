@@ -12,6 +12,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <chrono>
 #include <memory>
 #include <string>
+#include <type_traits>
 #include <vector>
 
 namespace helics {
@@ -19,6 +20,48 @@ namespace helics {
  * Factory for building Core API instances.
  */
 namespace BrokerFactory {
+
+    class BrokerBuilder {
+      public:
+        /** build a new broker of the builder type*/
+        virtual std::shared_ptr<Broker> build(const std::string& name) = 0;
+        /** check if a broker is of the correct type
+        return true if the type is compatible
+        */
+        virtual bool checkType(Broker* brk) const { return (brk != nullptr); }
+    };
+
+    /** template for making a Broker builder*/
+    template<class BrokerTYPE>
+    class BrokerTypeBuilder final: public BrokerBuilder {
+      public:
+        static_assert(
+            std::is_base_of<Broker, BrokerTYPE>::value,
+            "Type does not inherit from helics::Core");
+
+        using broker_build_type = BrokerTYPE;
+        virtual std::shared_ptr<Broker> build(const std::string& name) override
+        {
+            return std::make_shared<BrokerTYPE>(name);
+        }
+        virtual bool checkType(Broker* brk) const override
+        {
+            return dynamic_cast<BrokerTYPE*>(brk) != nullptr;
+        }
+    };
+
+    /** define a new Broker Builder from the builder give a name and build code*/
+    void defineBrokerBuilder(std::shared_ptr<BrokerBuilder> cb, const std::string& name, int code);
+
+    /** template function to create a builder and link it into the library*/
+    template<class BrokerTYPE>
+    std::shared_ptr<BrokerBuilder> addBrokerType(const std::string& brokerTypeName, int code)
+    {
+        auto bld = std::make_shared<BrokerTypeBuilder<BrokerTYPE>>();
+        std::shared_ptr<BrokerBuilder> bbld = std::static_pointer_cast<BrokerBuilder>(bld);
+        defineBrokerBuilder(bbld, brokerTypeName, code);
+        return bbld;
+    }
     /**
  * Creates a Broker object of the specified type.
  *

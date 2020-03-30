@@ -4,198 +4,84 @@ Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance
 the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
+
 #define ENABLE_TRIPWIRE
 
 #include "CoreFactory.hpp"
 
+#include "CommonCore.hpp"
 #include "core-exceptions.hpp"
 #include "core-types.hpp"
-#include "helics/helics-config.h"
-#ifdef ENABLE_ZMQ_CORE
-#    include "zmq/ZmqCore.h"
-#endif
-
-#ifdef ENABLE_MPI_CORE
-#    include "mpi/MpiCore.h"
-#endif
-
 #include "gmlc/concurrency/DelayedDestructor.hpp"
 #include "gmlc/concurrency/SearchableObjectHolder.hpp"
-
-#ifdef ENABLE_TEST_CORE
-#    include "test/TestCore.h"
-#endif
-
-#ifdef ENABLE_IPC_CORE
-#    include "ipc/IpcCore.h"
-#endif
-
-#ifdef ENABLE_UDP_CORE
-#    include "udp/UdpCore.h"
-#endif
-
-#ifdef ENABLE_TCP_CORE
-#    include "tcp/TcpCore.h"
-#endif
-
-#ifdef ENABLE_INPROC_CORE
-#    include "inproc/InprocCore.h"
-#endif
-
+#include "gmlc/libguarded/shared_guarded.hpp"
+#include "helics/helics-config.h"
 #include "helicsCLI11.hpp"
 
 #include <cassert>
 #include <cstring>
 
 namespace helics {
-std::shared_ptr<Core> makeCore(core_type type, const std::string& name)
-{
-    std::shared_ptr<Core> core;
-    if (type == core_type::DEFAULT) {
-#ifdef ENABLE_ZMQ_CORE
-        type = core_type::ZMQ;
-#else
-#    ifdef ENABLE_TCP_CORE
-        type = core_type::TCP;
-#    else
-#        ifdef ENABLE_UDP_CORE
-        type = core_type::UDP;
-#        else
-#            ifdef ENABLE_MPI_CORE
-        type = core_type::MPI;
-#            else
-#                ifdef ENABLE_IPC_CORE
-        type = core_type::IPC;
-#                else
-#                    ifdef ENABLE_INPROC_CORE
-        type = core_type::INPROC;
-#                    else
-        type = core_type::UNRECOGNIZED;
-#                    endif // ENABLE_TEST_CORE
-#                endif // ENABLE_IPC_CORE
-#            endif // ENABLE_MPI_CORE
-#        endif // ENABLE_UDP_CORE
-#    endif // ENABLE_TCP_CORE
-#endif // ENABLE_ZMQ_CORE
-    }
-
-    switch (type) {
-        case core_type::ZMQ:
-#ifdef ENABLE_ZMQ_CORE
-            if (name.empty()) {
-                core = std::make_shared<zeromq::ZmqCore>();
-            } else {
-                core = std::make_shared<zeromq::ZmqCore>(name);
-            }
-
-#else
-            throw(HelicsException("ZMQ core is not available"));
-#endif
-            break;
-        case core_type::ZMQ_SS:
-#ifdef ENABLE_ZMQ_CORE
-            if (name.empty()) {
-                core = std::make_shared<zeromq::ZmqCoreSS>();
-            } else {
-                core = std::make_shared<zeromq::ZmqCoreSS>(name);
-            }
-
-#else
-            throw(HelicsException("ZMQ core is not available"));
-#endif
-            break;
-        case core_type::MPI:
-#ifdef ENABLE_MPI_CORE
-            if (name.empty()) {
-                core = std::make_shared<mpi::MpiCore>();
-            } else {
-                core = std::make_shared<mpi::MpiCore>(name);
-            }
-#else
-            throw(HelicsException("MPI core is not available"));
-#endif
-            break;
-        case core_type::TEST:
-#ifdef ENABLE_TEST_CORE
-            if (name.empty()) {
-                core = std::make_shared<testcore::TestCore>();
-            } else {
-                core = std::make_shared<testcore::TestCore>(name);
-            }
-            break;
-#else
-            throw(HelicsException("TEST core is not available"));
-#endif
-        case core_type::INPROC:
-#ifdef ENABLE_INPROC_CORE
-            if (name.empty()) {
-                core = std::make_shared<inproc::InprocCore>();
-            } else {
-                core = std::make_shared<inproc::InprocCore>(name);
-            }
-            break;
-#else
-            throw(HelicsException("Inproc core is not available"));
-#endif
-        case core_type::INTERPROCESS:
-        case core_type::IPC:
-#ifdef ENABLE_IPC_CORE
-            if (name.empty()) {
-                core = std::make_shared<ipc::IpcCore>();
-            } else {
-                core = std::make_shared<ipc::IpcCore>(name);
-            }
-            break;
-#else
-            throw(HelicsException("IPC core is not available"));
-#endif
-        case core_type::UDP:
-#ifdef ENABLE_UDP_CORE
-            if (name.empty()) {
-                core = std::make_shared<udp::UdpCore>();
-            } else {
-                core = std::make_shared<udp::UdpCore>(name);
-            }
-            break;
-#else
-            throw(HelicsException("UDP core is not available"));
-#endif
-        case core_type::TCP:
-#ifdef ENABLE_TCP_CORE
-            if (name.empty()) {
-                core = std::make_shared<tcp::TcpCore>();
-            } else {
-                core = std::make_shared<tcp::TcpCore>(name);
-            }
-#else
-            throw(HelicsException("TCP core is not available"));
-#endif
-            break;
-        case core_type::TCP_SS:
-#ifdef ENABLE_TCP_CORE
-            if (name.empty()) {
-                core = std::make_shared<tcp::TcpCoreSS>();
-            } else {
-                core = std::make_shared<tcp::TcpCoreSS>(name);
-            }
-#else
-            throw(HelicsException("TCP single socket core is not available"));
-#endif
-            break;
-        case core_type::NNG:
-        case core_type::WEBSOCKET:
-        case core_type::HTTP:
-            throw(HelicsException("core type is not available"));
-        case core_type::NULLCORE:
-            throw(HelicsException("the nullcore explicitly doesn't exist"));
-        default:
-            throw(HelicsException("unrecognized core type"));
-    }
-    return core;
-}
 
 namespace CoreFactory {
     static const std::string emptyString;
+
+    /*** class to hold the set of builders
+   @details this doesn't work as a global since it tends to get initialized after some of the things that call it
+   so it needs to be a static member of function call*/
+    class MasterCoreBuilder {
+      public:
+        using BuildT = std::tuple<int, std::string, std::shared_ptr<CoreBuilder>>;
+
+        static void addBuilder(std::shared_ptr<CoreBuilder> cb, const std::string& name, int code)
+        {
+            instance()->builders.emplace_back(code, name, std::move(cb));
+        }
+        static const std::shared_ptr<CoreBuilder>& getBuilder(int code)
+        {
+            for (auto& bb : instance()->builders) {
+                if (std::get<0>(bb) == code) {
+                    return std::get<2>(bb);
+                }
+            }
+            throw(HelicsException("core type is not available"));
+        }
+        static const std::shared_ptr<CoreBuilder>& getIndexedBuilder(std::size_t index)
+        {
+            auto& blder = instance();
+            if (blder->builders.size() <= index) {
+                throw(HelicsException("core type index is not available"));
+            }
+            return std::get<2>(blder->builders[index]);
+        }
+        static const std::shared_ptr<MasterCoreBuilder>& instance()
+        {
+            static std::shared_ptr<MasterCoreBuilder> iptr(new MasterCoreBuilder());
+            return iptr;
+        }
+
+      private:
+        /** private constructor since we only really want one of them
+        accessed through the instance static member*/
+        MasterCoreBuilder() = default;
+        std::vector<BuildT> builders; //!< container for the different builders
+    };
+
+    void defineCoreBuilder(std::shared_ptr<CoreBuilder> cb, const std::string& name, int code)
+    {
+        MasterCoreBuilder::addBuilder(std::move(cb), name, code);
+    }
+
+    std::shared_ptr<Core> makeCore(core_type type, const std::string& name)
+    {
+        if (type == core_type::NULLCORE) {
+            throw(HelicsException("nullcore is explicitly not available nor will ever be"));
+        }
+        if (type == core_type::DEFAULT) {
+            return MasterCoreBuilder::getIndexedBuilder(0)->build(name);
+        }
+        return MasterCoreBuilder::getBuilder(static_cast<int>(type))->build(name);
+    }
 
     std::shared_ptr<Core> create(const std::string& initializationString)
     {
@@ -344,9 +230,12 @@ namespace CoreFactory {
 
     /** lambda function to join cores before the destruction happens to avoid potential problematic calls in the
  * loops*/
-    static auto destroyerCallFirst = [](auto& core) {
-        core->processDisconnect(true);
-        core->joinAllThreads();
+    static auto destroyerCallFirst = [](std::shared_ptr<Core>& core) {
+        auto ccore = dynamic_cast<CommonCore*>(core.get());
+        if (ccore != nullptr) {
+            ccore->processDisconnect(true);
+            ccore->joinAllThreads();
+        }
     };
 
     /** so the problem this is addressing is that unregister can potentially cause a destructor to fire
@@ -355,10 +244,10 @@ can do the unregister operation and destroy itself meaning it is unable to join 
 what we do is delay the destruction until it is called in a different thread which allows the destructor to fire if
 need be
 without issue*/
-    static gmlc::concurrency::DelayedDestructor<CommonCore>
+    static gmlc::concurrency::DelayedDestructor<Core>
         delayedDestroyer(destroyerCallFirst); //!< the object handling the delayed destruction
 
-    static gmlc::concurrency::SearchableObjectHolder<CommonCore>
+    static gmlc::concurrency::SearchableObjectHolder<Core>
         searchableCores; //!< the object managing the searchable cores
 
     // this will trip the line when it is destroyed at global destruction time
@@ -369,67 +258,21 @@ without issue*/
         return searchableCores.findObject(name);
     }
 
-    static bool isJoinableCoreOfType(core_type type, const std::shared_ptr<CommonCore>& ptr)
+    static bool isJoinableCoreOfType(core_type type, const std::shared_ptr<Core>& ptr)
     {
-        if (ptr->isOpenToNewFederates()) {
-            switch (type) {
-                case core_type::ZMQ:
-#ifdef ENABLE_ZMQ_CORE
-                    return (dynamic_cast<zeromq::ZmqCore*>(ptr.get()) != nullptr);
-#else
-                    break;
-#endif
-                case core_type::MPI:
-#ifdef ENABLE_MPI_CORE
-                    return (dynamic_cast<mpi::MpiCore*>(ptr.get()) != nullptr);
-#else
-                    break;
-#endif
-                case core_type::TEST:
-#ifdef ENABLE_TEST_CORE
-                    return (dynamic_cast<testcore::TestCore*>(ptr.get()) != nullptr);
-#else
-                    break;
-#endif
-                case core_type::INPROC:
-#ifdef ENABLE_INPROC_CORE
-                    return (dynamic_cast<inproc::InprocCore*>(ptr.get()) != nullptr);
-#else
-                    break;
-#endif
-                case core_type::INTERPROCESS:
-                case core_type::IPC:
-#ifdef ENABLE_IPC_CORE
-                    return (dynamic_cast<ipc::IpcCore*>(ptr.get()) != nullptr);
-#else
-                    break;
-#endif
-                case core_type::UDP:
-#ifdef ENABLE_UDP_CORE
-                    return (dynamic_cast<udp::UdpCore*>(ptr.get()) != nullptr);
-#else
-                    break;
-#endif
-                case core_type::TCP:
-#ifdef ENABLE_TCP_CORE
-                    return (dynamic_cast<tcp::TcpCore*>(ptr.get()) != nullptr);
-#else
-                    break;
-#endif
-                case core_type::TCP_SS:
-#ifdef ENABLE_TCP_CORE
-                    return (dynamic_cast<tcp::TcpCoreSS*>(ptr.get()) != nullptr);
-#else
-                    break;
-#endif
-                default:
-                    return true;
-            }
+        if (!ptr->isOpenToNewFederates()) {
+            return false;
         }
-        return false;
+        try {
+            return MasterCoreBuilder::getBuilder(static_cast<int>(type))->checkType(ptr.get());
+        }
+        catch (const helics::HelicsException&) {
+            // the error will throw if the MasterCoreBuilder can't find the core type, in which case it is open yet so return true
+            return true;
+        }
     }
 
-    static bool isJoinableCoreForType(core_type type, const std::shared_ptr<CommonCore>& ptr)
+    static bool isJoinableCoreForType(core_type type, const std::shared_ptr<Core>& ptr)
     {
         if (type == core_type::INPROC || type == core_type::TEST) {
             return isJoinableCoreOfType(core_type::INPROC, ptr) ||
@@ -447,13 +290,12 @@ without issue*/
     bool registerCore(const std::shared_ptr<Core>& core)
     {
         bool res = false;
-        auto tcore = std::dynamic_pointer_cast<CommonCore>(core);
-        if (tcore) {
-            res = searchableCores.addObject(tcore->getIdentifier(), tcore);
+        if (core) {
+            res = searchableCores.addObject(core->getIdentifier(), core);
         }
         cleanUpCores();
         if (res) {
-            delayedDestroyer.addObjectsToBeDestroyed(tcore);
+            delayedDestroyer.addObjectsToBeDestroyed(core);
         }
         return res;
     }

@@ -45,7 +45,7 @@ class HELICS_CXX_EXPORT CombinationFederate: public ValueFederate, public Messag
     @param configString can be either a JSON file a TOML file (with extension TOML) or a string containing JSON
     code or a string with command line arguments
 	*/
-    CombinationFederate(const std::string& name, const std::string& configString);
+    CombinationFederate(const std::string& fedName, const std::string& configString);
 
     /**constructor taking a file with the required information
      @param configString can be either a JSON file a TOML file (with extension TOML) or a string containing JSON
