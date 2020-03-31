@@ -3061,17 +3061,6 @@ TEST(evil_message_fed_test, helicsFederatePendingMessages)
     EXPECT_EQ(res2, 0);
 }
 
-TEST(evil_message_fed_test, helicsFederateGetMessage)
-{
-    //helics_message helicsFederateGetMessage(helics_federate fed);
-    char rdata[256];
-    helics_federate evil_federate = reinterpret_cast<helics_federate>(rdata);
-    auto res1 = helicsFederateGetMessage(nullptr);
-    EXPECT_EQ(res1.data, nullptr);
-    auto res2 = helicsFederateGetMessage(evil_federate);
-    EXPECT_EQ(res2.data, nullptr);
-}
-
 TEST(evil_message_fed_test, helicsFederateGetMessageObject)
 {
     //helics_message_object helicsFederateGetMessageObject(helics_federate fed);
@@ -3516,21 +3505,6 @@ TEST(evil_endpoint_test, helicsEndpointSendEventRaw)
     EXPECT_NE(err.error_code, 0);
 }
 
-TEST(evil_endpoint_test, helicsEndpointSendMessage)
-{
-    //void helicsEndpointSendMessage(helics_endpoint endpoint, helics_message* message, helics_error* err);
-    char rdata[256];
-    helics_endpoint evil_ept = reinterpret_cast<helics_endpoint>(rdata);
-    auto err = helicsErrorInitialize();
-    err.error_code = 45;
-    helicsEndpointSendMessage(nullptr, nullptr, &err);
-    EXPECT_EQ(err.error_code, 45);
-    helicsErrorClear(&err);
-    //auto res2=helicsEndpointSendMessage(nullptr, nullptr, nullptr);
-    helicsEndpointSendMessage(evil_ept, nullptr, &err);
-    EXPECT_NE(err.error_code, 0);
-}
-
 TEST(evil_endpoint_test, helicsEndpointSendMessageObject)
 {
     //void helicsEndpointSendMessageObject(helics_endpoint endpoint, helics_message_object message, helics_error* err);
@@ -3583,16 +3557,6 @@ TEST(evil_endpoint_test, helicsEndpointPendingMessages)
     EXPECT_EQ(res2, 0);
 }
 
-TEST(evil_endpoint_test, helicsEndpointGetMessage)
-{
-    //helics_message helicsEndpointGetMessage(helics_endpoint endpoint);
-    char rdata[256];
-    helics_endpoint evil_ept = reinterpret_cast<helics_endpoint>(rdata);
-    auto res1 = helicsEndpointGetMessage(nullptr);
-    EXPECT_EQ(res1.data, nullptr);
-    auto res2 = helicsEndpointGetMessage(evil_ept);
-    EXPECT_EQ(res2.data, nullptr);
-}
 
 TEST(evil_endpoint_test, helicsEndpointGetMessageObject)
 {

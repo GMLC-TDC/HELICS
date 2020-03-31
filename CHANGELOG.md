@@ -19,6 +19,7 @@ Some library reorganization
 ### Added
 
 ### Deprecated
+-   in the C shared library `helicsFederateGetMessage`, `helicsEndpointGetMessage`, and `helicsEndpointSendMessage` are deprecated in favor of the object version These will be removed in HELICS 3.0
 
 ### Removed
 

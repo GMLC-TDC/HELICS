@@ -105,11 +105,12 @@ TEST_P(mfed_simple_type_tests, send_receive)
     res = helicsEndpointHasMessage(epid2);
     EXPECT_TRUE(res);
 
-    auto M = helicsEndpointGetMessage(epid2);
+    auto M = helicsEndpointGetMessageObject(epid2);
     // ASSERT_TRUE (M);
-    ASSERT_EQ(M.length, 500);
-    if (M.data != nullptr) {
-        EXPECT_EQ(M.data[245], 'a');
+    ASSERT_EQ(helicsMessageGetRawDataSize(M), 500);
+    char* dptr = reinterpret_cast<char *>(helicsMessageGetRawDataPointer(M));
+    if (dptr != nullptr) {
+        EXPECT_EQ(dptr[245], 'a');
     } else {
         ASSERT_TRUE(false) << "data is nullptr";
     }
@@ -273,20 +274,22 @@ TEST_P(mfed_type_tests, send_receive_2fed)
     res = helicsEndpointHasMessage(epid2);
     EXPECT_TRUE(res);
 
-    auto M1 = helicsEndpointGetMessage(epid);
+    auto M1 = helicsEndpointGetMessageObject(epid);
     // ASSERT_TRUE(M1);
-    EXPECT_EQ(M1.length, 400);
-    EXPECT_NE(M1.data, nullptr);
-    if (M1.data != nullptr) {
-        EXPECT_EQ(M1.data[245], 'b');
+    EXPECT_EQ(helicsMessageGetRawDataSize(M1), 400);
+    auto dptr = static_cast<char *>(helicsMessageGetRawDataPointer(M1));
+    EXPECT_NE(dptr, nullptr);
+    if (dptr != nullptr) {
+        EXPECT_EQ(dptr[245], 'b');
     }
 
-    auto M2 = helicsEndpointGetMessage(epid2);
+    auto M2 = helicsEndpointGetMessageObject(epid2);
     // ASSERT_TRUE(M2);
-    EXPECT_EQ(M2.length, 500);
-    EXPECT_NE(M2.data, nullptr);
-    if (M2.data != nullptr) {
-        EXPECT_EQ(M2.data[245], 'a');
+    EXPECT_EQ(helicsMessageGetRawDataSize(M2), 500);
+    dptr = static_cast<char *>(helicsMessageGetRawDataPointer(M2));
+    EXPECT_NE(dptr, nullptr);
+    if (dptr != nullptr) {
+        EXPECT_EQ(dptr[245], 'a');
     }
     CE(helicsFederateFinalizeAsync(mFed1, &err));
     CE(helicsFederateFinalize(mFed2, &err));

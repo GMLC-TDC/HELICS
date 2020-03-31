@@ -165,7 +165,7 @@ HELICS_EXPORT void helicsEndpointSendEventRaw(
 
 /**
  * Send a message object from a specific endpoint.
- *
+ * @deprecated use helicsEndpointSendMessageObject_instead
  * @param endpoint The endpoint to send the data from.
  * @param message The actual message to send.
  * @forcpponly
@@ -173,7 +173,8 @@ HELICS_EXPORT void helicsEndpointSendEventRaw(
  * @endforcpponly
  */
 
-HELICS_EXPORT void helicsEndpointSendMessage(helics_endpoint endpoint, helics_message* message, helics_error* err);
+HELICS_DEPRECATED_EXPORT void helicsEndpointSendMessage(helics_endpoint endpoint, helics_message* message, helics_error* err);
+
 /**
  * Send a message object from a specific endpoint.
  *
@@ -230,12 +231,12 @@ HELICS_EXPORT int helicsEndpointPendingMessages(helics_endpoint endpoint);
 
 /**
  * Receive a packet from a particular endpoint.
- *
+ * @deprecated(use helicsGetMessageObject instead)
  * @param[in] endpoint The identifier for the endpoint.
  *
  * @return A message object.
  */
-HELICS_EXPORT helics_message helicsEndpointGetMessage(helics_endpoint endpoint);
+HELICS_DEPRECATED_EXPORT helics_message helicsEndpointGetMessage(helics_endpoint endpoint);
 
 /**
  * Receive a packet from a particular endpoint.
@@ -248,14 +249,14 @@ HELICS_EXPORT helics_message_object helicsEndpointGetMessageObject(helics_endpoi
 
 /**
  * Receive a communication message for any endpoint in the federate.
- *
+ * @deprecated
  * @details The return order will be in order of endpoint creation.
  *          So all messages that are available for the first endpoint, then all for the second, and so on.
  *          Within a single endpoint, the messages are ordered by time, then source_id, then order of arrival.
  *
  * @return A unique_ptr to a Message object containing the message data.
  */
-HELICS_EXPORT helics_message helicsFederateGetMessage(helics_federate fed);
+HELICS_DEPRECATED_EXPORT helics_message helicsFederateGetMessage(helics_federate fed);
 
 /**
  * Receive a communication message for any endpoint in the federate.

@@ -353,6 +353,10 @@ int helicsEndpointPendingMessages(helics_endpoint endpoint)
     }
     return static_cast<int>(endObj->endPtr->pendingMessages());
 }
+static constexpr uint16_t messageKeyCode = 0xB3;
+
+
+// LCOV_EXCL_START
 
 static helics_message emptyMessage()
 {
@@ -368,8 +372,6 @@ static helics_message emptyMessage()
     empty.flags = 0;
     return empty;
 }
-
-static constexpr uint16_t messageKeyCode = 0xB3;
 
 helics_message helicsEndpointGetMessage(helics_endpoint endpoint)
 {
@@ -394,24 +396,6 @@ helics_message helicsEndpointGetMessage(helics_endpoint endpoint)
         return mess;
     }
     return emptyMessage();
-}
-
-helics_message_object helicsEndpointGetMessageObject(helics_endpoint endpoint)
-{
-    auto endObj = verifyEndpoint(endpoint, nullptr);
-    if (endObj == nullptr) {
-        return nullptr;
-    }
-
-    auto message = endObj->endPtr->getMessage();
-
-    if (message) {
-        message->messageValidation = messageKeyCode;
-        helics_message_object mess = message.get();
-        endObj->messages.push_back(std::move(message));
-        return mess;
-    }
-    return nullptr;
 }
 
 helics_message helicsFederateGetMessage(helics_federate fed)
@@ -440,6 +424,25 @@ helics_message helicsFederateGetMessage(helics_federate fed)
         return mess;
     }
     return emptyMessage();
+}
+// LCOV_EXCL_STOP
+
+helics_message_object helicsEndpointGetMessageObject(helics_endpoint endpoint)
+{
+    auto endObj = verifyEndpoint(endpoint, nullptr);
+    if (endObj == nullptr) {
+        return nullptr;
+    }
+
+    auto message = endObj->endPtr->getMessage();
+
+    if (message) {
+        message->messageValidation = messageKeyCode;
+        helics_message_object mess = message.get();
+        endObj->messages.push_back(std::move(message));
+        return mess;
+    }
+    return nullptr;
 }
 
 helics_message_object helicsFederateGetMessageObject(helics_federate fed)

@@ -18,14 +18,14 @@ else()
     cmake_policy(VERSION 3.16)
 endif()
 
-project(HELICS VERSION 2.4.2)
+project(HELICS VERSION 2.5.0)
 
 # -----------------------------------------------------------------------------
 # HELICS Version number
 # -----------------------------------------------------------------------------
 set(HELICS_VERSION_BUILD)
 # use ISO date YYYY-MM-DD
-set(HELICS_DATE "2020-03-27")
+set(HELICS_DATE "2020-03-31")
 
 set(HELICS_VERSION_UNDERSCORE
     "${HELICS_VERSION_MAJOR}_${HELICS_VERSION_MINOR}_${HELICS_VERSION_PATCH}"
