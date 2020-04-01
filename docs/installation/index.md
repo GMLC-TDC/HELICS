@@ -37,6 +37,8 @@ Use Spack (requires Spack develop branch or versions released after v0.14.1) on 
 spack install helics
 ```
 
+For more information on supported options (e.g. using a custom HELICS build with MPI support), see the [package managers](https://helics.readthedocs.io/en/latest/installation/package_manager.html) page for more details, or the documentation for your package manager.
+
 ### Using an installer for your operating system
 
 Download pre-compiled libraries from the [releases page](https://github.com/GMLC-TDC/HELICS/releases/latest) and add them to your path.
