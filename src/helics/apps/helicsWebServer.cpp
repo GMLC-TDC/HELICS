@@ -24,12 +24,15 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include "../common/JsonProcessingFunctions.hpp"
 #include "../core/BrokerFactory.hpp"
+#include "../core/coreTypeOperations.hpp"
 
 #include <algorithm>
 #include <boost/asio/strand.hpp>
 #include <boost/beast/core.hpp>
 #include <boost/beast/http.hpp>
+#include <boost/beast/websocket.hpp>
 #include <boost/beast/version.hpp>
+#include <boost/asio/dispatch.hpp>
 #include <boost/config.hpp>
 #include <boost/container/flat_map.hpp>
 #include <cstdlib>
@@ -45,6 +48,7 @@ SPDX-License-Identifier: BSD-3-Clause
 
 namespace beast = boost::beast; // from <boost/beast.hpp>
 namespace http = beast::http; // from <boost/beast/http.hpp>
+namespace websocket = beast::websocket; // from <boost/beast/websocket.hpp>
 namespace net = boost::asio; // from <boost/asio.hpp>
 using tcp = boost::asio::ip::tcp; // from <boost/asio/ip/tcp.hpp>
 
@@ -177,6 +181,126 @@ std::string getBrokerList()
     return generateJsonString(base);
 }
 
+// Report a failure
+static void fail(beast::error_code ec, char const* what)
+{
+    std::cerr << what << ": " << ec.message() << "\n";
+}
+
+// Echoes back all received WebSocket messages
+class WebSocketsession : public std::enable_shared_from_this<WebSocketsession>
+{
+    websocket::stream<beast::tcp_stream> ws_;
+    beast::flat_buffer buffer_;
+
+public:
+    // Take ownership of the socket
+    explicit
+        WebSocketsession(tcp::socket&& socket)
+        : ws_(std::move(socket))
+    {
+    }
+
+    // Get on the correct executor
+    void
+        run()
+    {
+        // We need to be executing within a strand to perform async operations
+        // on the I/O objects in this session. Although not strictly necessary
+        // for single-threaded contexts, this example code is written to be
+        // thread-safe by default.
+        net::dispatch(ws_.get_executor(),
+            beast::bind_front_handler(
+                &WebSocketsession::on_run,
+                shared_from_this()));
+    }
+
+    // Start the asynchronous operation
+    void
+        on_run()
+    {
+        // Set suggested timeout settings for the websocket
+        ws_.set_option(
+            websocket::stream_base::timeout::suggested(
+                beast::role_type::server));
+
+        // Set a decorator to change the Server of the handshake
+        ws_.set_option(websocket::stream_base::decorator(
+            [](websocket::response_type& res)
+            {
+                res.set(http::field::server,
+                    std::string(BOOST_BEAST_VERSION_STRING) +
+                    " websocket-server-async");
+            }));
+        // Accept the websocket handshake
+        ws_.async_accept(
+            beast::bind_front_handler(
+                &WebSocketsession::on_accept,
+                shared_from_this()));
+    }
+
+    void
+        on_accept(beast::error_code ec)
+    {
+        if (ec)
+            return fail(ec, "accept");
+
+        // Read a message
+        do_read();
+    }
+
+    void
+        do_read()
+    {
+        // Read a message into our buffer
+        ws_.async_read(
+            buffer_,
+            beast::bind_front_handler(
+                &WebSocketsession::on_read,
+                shared_from_this()));
+    }
+
+    void
+        on_read(
+            beast::error_code ec,
+            std::size_t bytes_transferred)
+    {
+        boost::ignore_unused(bytes_transferred);
+
+        // This indicates that the session was closed
+        if (ec == websocket::error::closed)
+            return;
+
+        if (ec)
+            fail(ec, "read");
+
+        // Echo the message
+        ws_.text(ws_.got_text());
+        ws_.async_write(
+            buffer_.data(),
+            beast::bind_front_handler(
+                &WebSocketsession::on_write,
+                shared_from_this()));
+    }
+
+    void
+        on_write(
+            beast::error_code ec,
+            std::size_t bytes_transferred)
+    {
+        boost::ignore_unused(bytes_transferred);
+
+        if (ec)
+            return fail(ec, "write");
+
+        // Clear the buffer
+        buffer_.consume(buffer_.size());
+
+        // Do another read
+        do_read();
+    }
+};
+
 // This function produces an HTTP response for the given
 // request. The type of the response object depends on the
 // contents of the request, so the interface requires the
@@ -241,14 +365,21 @@ void handle_request(http::request<Body, http::basic_fields<Allocator>>&& req, Se
         return res;
     };
 
+    bool brokerOps{ false };
+
     switch (req.method()) {
         case http::verb::head:
-        case http::verb::post:
         case http::verb::get:
+            break;
+        case http::verb::post:
+        case http::verb::put:
+        case http::verb::delete_:
+            brokerOps = true;
             break;
         default:
             return send(bad_request("Unknown HTTP-method"));
     }
+    
     beast::string_view target(req.target());
     if (target == "/" || target == "/index.html") {
         return send(main_page());
@@ -282,7 +413,50 @@ void handle_request(http::request<Body, http::basic_fields<Allocator>>&& req, Se
         return send(response_json(getBrokerList()));
     }
     std::shared_ptr<helics::Broker> brkr = helics::BrokerFactory::findBroker(brokerName);
+    if (brokerOps)
+    {
+        if (req.method() == http::verb::put || req.method() == http::verb::post)
+        {
+            if (brkr)
+            {
+                return send(bad_request(brokerName +" already exists"));
+            }
+            std::string start_args;
+            std::string type;
+            if (fields.find("args") != fields.end()) {
+                start_args = fields["args"];
+            }
+            if (fields.find("type") != fields.end()) {
+                type = fields["type"];
+            }
+            helics::core_type ctype{ helics::core_type::DEFAULT };
+            if (!type.empty())
+            {
+                ctype= helics::core::coreTypeFromString(type);
+                if (!helics::core::isCoreTypeAvailable(ctype))
+                {
+                    return send(bad_request(type + " already exists"));
+                }
+            }
+            brkr = helics::BrokerFactory::create(ctype, brokerName, start_args);
+            if (!brkr)
+            {
+                return send(bad_request("unable to create broker"));
+            }
+            return send(main_page());
+        }
+        if (req.method() == http::verb::delete_)
+        {
+            if (!brkr)
+            {
+                return send(bad_request(brokerName + " not found"));
+            }
+            brkr->disconnect();
+            return send(main_page());
+        }
+    }
     if (!brkr) {
+        
         auto brks = helics::BrokerFactory::getAllBrokers();
         for (auto& brk : brks) {
             if (brk->isConnected()) {
@@ -312,20 +486,16 @@ void handle_request(http::request<Body, http::basic_fields<Allocator>>&& req, Se
 
 //------------------------------------------------------------------------------
 
-// Report a failure
-void fail(beast::error_code ec, char const* what)
-{
-    std::cerr << what << ": " << ec.message() << "\n";
-}
+
 
 // Handles an HTTP server connection
-class session: public std::enable_shared_from_this<session> {
+class httpSession: public std::enable_shared_from_this<httpSession> {
     // This is the C++11 equivalent of a generic lambda.
     // The function object is used to send an HTTP message.
     struct send_lambda {
-        session& self_;
+        httpSession& self_;
 
-        explicit send_lambda(session& self): self_(self) {}
+        explicit send_lambda(httpSession& self): self_(self) {}
 
         template<bool isRequest, class Body, class Fields>
         void operator()(http::message<isRequest, Body, Fields>&& msg) const
@@ -344,7 +514,7 @@ class session: public std::enable_shared_from_this<session> {
                 self_.stream_,
                 *sp,
                 beast::bind_front_handler(
-                    &session::on_write, self_.shared_from_this(), sp->need_eof()));
+                    &httpSession::on_write, self_.shared_from_this(), sp->need_eof()));
         }
     };
 
@@ -356,7 +526,7 @@ class session: public std::enable_shared_from_this<session> {
 
   public:
     // Take ownership of the stream
-    explicit session(tcp::socket&& socket): stream_(std::move(socket)), lambda_(*this) {}
+    explicit httpSession(tcp::socket&& socket): stream_(std::move(socket)), lambda_(*this) {}
 
     // Start the asynchronous operation
     void run() { do_read(); }
@@ -375,7 +545,7 @@ class session: public std::enable_shared_from_this<session> {
             stream_,
             buffer_,
             req_,
-            beast::bind_front_handler(&session::on_read, shared_from_this()));
+            beast::bind_front_handler(&httpSession::on_read, shared_from_this()));
     }
 
     void on_read(beast::error_code ec, std::size_t bytes_transferred)
@@ -431,10 +601,10 @@ class session: public std::enable_shared_from_this<session> {
 class listener: public std::enable_shared_from_this<listener> {
     net::io_context& ioc_;
     tcp::acceptor acceptor_;
-
+    bool websocket_{ false };
   public:
-    listener(net::io_context& ioc, tcp::endpoint endpoint):
-        ioc_(ioc), acceptor_(net::make_strand(ioc))
+      listener(net::io_context& ioc, tcp::endpoint endpoint, bool webs = false) :
+          ioc_(ioc), acceptor_(net::make_strand(ioc)), websocket_{ webs }
     {
         beast::error_code ec;
 
@@ -484,8 +654,16 @@ class listener: public std::enable_shared_from_this<listener> {
         if (ec) {
             fail(ec, "accept");
         } else {
-            // Create the session and run it
-            std::make_shared<session>(std::move(socket))->run();
+            if (websocket_)
+            {
+                // Create the session and run it
+                std::make_shared<WebSocketsession>(std::move(socket))->run();
+            }
+            else
+            {
+                // Create the session and run it
+                std::make_shared<httpSession>(std::move(socket))->run();
+            }
         }
 
         // Accept another connection
@@ -533,8 +711,13 @@ namespace apps {
             if (config_->isMember("websocket")) {
                 auto V = (*config_)["websocket"];
                 replaceIfMember(V, "interface", websocketAddress_);
-                replaceIfMember(V, "port", httpPort_);
+                replaceIfMember(V, "port", websocketPort_);
             }
+            auto const address = net::ip::make_address(websocketAddress_);
+            // Create and launch a listening port
+            std::make_shared<listener>(
+                ioc, tcp::endpoint{ address, static_cast<unsigned short>(websocketPort_)}, true)
+                ->run();
         }
         // Run the I/O service
         ioc.run();
