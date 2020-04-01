@@ -1,6 +1,7 @@
 %include "typemaps.i"
 #define HELICS_EXPORT
 #define HELICS_DEPRECATED
+#define HELICS_DEPRECATED_EXPORT
 
 #pragma SWIG nowarn=451
 

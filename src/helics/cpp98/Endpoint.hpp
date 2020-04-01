@@ -85,6 +85,15 @@ namespace helicscpp {
             return helicsMessageGetString(mo);
         }
 
+        helics_time time() const
+        {
+            return helicsMessageGetTime(mo);
+        }
+
+        void time(helics_time val)
+        {
+            return helicsMessageSetTime(mo,val,hThrowOnError());
+        }
     private:
         helics_message_object mo;
     };
