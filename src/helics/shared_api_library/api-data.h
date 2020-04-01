@@ -136,7 +136,7 @@ typedef struct helics_complex {
 /**
  *  Message_t mapped to a c compatible structure
  *
- * @details this will be deprecated in HELICS 2.3 and removed in HELICS 3.0
+ * @details use of this structure is deprecated in HELICS 2.5 and removed in HELICS 3.0
  */
 typedef struct helics_message {
     helics_time time; /*!< message time */

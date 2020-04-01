@@ -355,6 +355,58 @@ int helicsEndpointPendingMessages(helics_endpoint endpoint)
 }
 static constexpr uint16_t messageKeyCode = 0xB3;
 
+namespace helics
+{
+
+    Message *MessageHolder::addMessage(std::unique_ptr<helics::Message> &mess)
+    {
+        if (!mess)
+        {
+            return nullptr;
+        }
+        Message *m = mess.get();
+        if (!freeMessageSlots.empty())
+        {
+            auto index = freeMessageSlots.back();
+            freeMessageSlots.pop_back();
+            mess->counter = index;
+            messages[index] = std::move(mess);
+        }
+        else
+        {
+            messages.push_back(std::move(mess));
+            messages.back()->counter = static_cast<int32_t>(messages.size());
+        }
+        return m;
+    }
+    Message *MessageHolder::newMessage()
+    {
+        if (!freeMessageSlots.empty())
+        {
+            auto index = freeMessageSlots.back();
+            freeMessageSlots.pop_back();
+            messages[index] = std::make_unique<Message>();
+            messages[index]->counter = index;
+            return messages[index].get();
+        }
+            messages.push_back(std::make_unique<Message>());
+            messages.back()->counter = static_cast<int32_t>(messages.size());
+            return messages.back().get();
+    }
+
+    std::unique_ptr<Message> MessageHolder::extractMessage(int index)
+    {
+        if (isValidIndex(index, messages))
+        {
+            if (messages[index])
+            {
+                return std::move(messages[index]);
+            }
+        }
+        return nullptr;
+    }
+
+} // namespace helics
 
 // LCOV_EXCL_START
 

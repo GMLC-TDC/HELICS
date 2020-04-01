@@ -64,6 +64,16 @@ class InputObject;
 class PublicationObject;
 class EndpointObject;
 
+class MessageHolder {
+private:
+    std::vector<std::unique_ptr<Message>> messages;
+    std::vector<int> freeMessageSlots;
+public:
+    Message *addMessage(std::unique_ptr<Message> &mess);
+    Message *newMessage();
+    std::unique_ptr<Message> extractMessage(int index);
+    
+};
 /** object wrapping a federate for the c-api*/
 class FedObject {
   public:
@@ -71,7 +81,7 @@ class FedObject {
     int index = -2;
     int valid = 0;
     std::shared_ptr<Federate> fedptr;
-    std::vector<std::unique_ptr<Message>> messages;
+    MessageHolder messages;
     std::vector<std::unique_ptr<InputObject>> inputs;
     std::vector<std::unique_ptr<PublicationObject>> pubs;
     std::vector<std::unique_ptr<EndpointObject>> epts;
@@ -103,7 +113,7 @@ class EndpointObject {
   public:
     Endpoint* endPtr = nullptr;
     std::shared_ptr<MessageFederate> fedptr;
-    std::vector<std::unique_ptr<Message>> messages;
+    MessageHolder messages;
     int valid = 0;
 };
 
