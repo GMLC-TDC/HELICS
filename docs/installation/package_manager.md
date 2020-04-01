@@ -27,3 +27,26 @@ If you are on an unsupported OS or Python version, you will need to install a co
 Depending on your OS, there could be a copy in the package manager, or you may need to build HELICS from source.
 From there, you can use `pip install helics` as above (NOTE: `pip install helics-apps` *will not work*, your package manager or HELICS build from source should install these).
 The [source distributions section of the PyPI page](https://pypi.org/project/helics/) has some additional useful information on this process.
+
+## Install using Spack (macOS, Linux)
+
+Install Spack (a HELICS package is included in the Spack develop branch and Spack releases after v0.14.1).
+
+Run the following command to install HELICS (this may take a while, Spack builds all dependencies from source!):
+
+```bash
+spack install helics
+```
+
+To get a list of installation options, run:
+
+```bash
+spack info helics
+```
+
+To enable or disable options, use `+`, `-`, and `~`. For example, to build with MPI support on the command run would be:
+
+```bash
+spack install helics +mpi
+```
+

@@ -73,7 +73,15 @@ Each [release](https://github.com/GMLC-TDC/HELICS/releases/latest) comes with a 
 
 ### Conda
 
-Some support to Conda is provided see [conda install](https://helics.readthedocs.io/en/latest/installation/package_manager.html#install-using-conda-windows-macos-linux) for the Instructions.  It is  supported through a separate [repo](https://github.com/GMLC-TDC/helics-conda).
+Some support to Conda is provided see [conda install](https://helics.readthedocs.io/en/latest/installation/package_manager.html#install-using-conda-windows-macos-linux) for the instructions.  It is  supported through a separate [repo](https://github.com/GMLC-TDC/helics-conda).
+
+### pip
+
+Support for installing the Python interface and HELICS apps is provided with pip, see [pip install](https://helics.readthedocs.io/en/latest/installation/package_manager.html#install-using-pip-windows-macos-linux-other) for the instructions. The files used to build the pip package are in a separate [repo](https://github.com/GMLC-TDC/helics-packaging).
+
+### Spack
+
+HELICS can be installed on Linux (and macOS) using Spack, a package manager aimed at HPC environments. See [spack install](https://helics.readthedocs.io/en/latest/installation/package_manager.html#install-using-spack-macos-linux) for the instructions.
 
 ## Build from Source Instructions
 

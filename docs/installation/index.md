@@ -29,6 +29,14 @@ pip install helics
 pip install helics-apps
 ```
 
+OR
+
+Use Spack (requires Spack develop branch or versions released after v0.14.1) on HPC systems (Linux/macOS) to install C/C++ HELICS components and apps:
+
+```bash
+spack install helics
+```
+
 ### Using an installer for your operating system
 
 Download pre-compiled libraries from the [releases page](https://github.com/GMLC-TDC/HELICS/releases/latest) and add them to your path.
