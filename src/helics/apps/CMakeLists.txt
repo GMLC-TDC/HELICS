@@ -22,8 +22,8 @@ if(HELICS_BUILD_APP_LIBRARY)
         Tracer.hpp
         helicsApp.hpp
         Clone.hpp
-		CoreApp.hpp
-		BrokerApp.hpp
+        CoreApp.hpp
+        BrokerApp.hpp
     )
 
 	set(helics_apps_broker_headers 

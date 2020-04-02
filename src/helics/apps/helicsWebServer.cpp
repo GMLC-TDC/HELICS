@@ -46,11 +46,24 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <thread>
 #include <vector>
 
+
 namespace beast = boost::beast; // from <boost/beast.hpp>
 namespace http = beast::http; // from <boost/beast/http.hpp>
 namespace websocket = beast::websocket; // from <boost/beast/websocket.hpp>
 namespace net = boost::asio; // from <boost/asio.hpp>
 using tcp = boost::asio::ip::tcp; // from <boost/asio/ip/tcp.hpp>
+
+
+namespace helics
+{
+    namespace apps {
+        class IocWrapper
+        {
+        public:
+            net::io_context ioc{ 1 };
+        };
+    } // namespace apps
+} //namespace helics
 
 static std::string loadFile(const std::string& fileName)
 {
@@ -681,19 +694,35 @@ namespace apps {
     {
         logMessage("starting broker web server");
         config_ = (val != nullptr) ? val : &null;
+        bool exp{ false };
+        if (running.compare_exchange_strong(exp, true))
+        {
+            // The io_context is required for all I/O
+            context = std::make_shared<IocWrapper>();
 
-        std::lock_guard<std::mutex> tlock(threadGuard);
-        mainLoopThread = std::thread([this]() { mainLoop(); });
-        mainLoopThread.detach();
+            std::lock_guard<std::mutex> tlock(threadGuard);
+
+            mainLoopThread = std::thread([this]() { mainLoop(); });
+            mainLoopThread.detach();
+        }
+        
     }
 
     /** stop the server*/
-    void WebServer::stopServer() {}
+    void WebServer::stopServer()
+    {
+        bool exp{ true };
+        if (running.compare_exchange_strong(exp, false))
+        {
+            logMessage("stopping broker web server");
+            std::lock_guard<std::mutex> tlock(threadGuard);
+            context->ioc.stop();
+        }
+        
+    }
 
     void WebServer::mainLoop()
     {
-        // The io_context is required for all I/O
-        net::io_context ioc{1};
         if (http_enabled_) {
             if (config_->isMember("http")) {
                 auto V = (*config_)["http"];
@@ -703,7 +732,7 @@ namespace apps {
             auto const address = net::ip::make_address(httpAddress_);
             // Create and launch a listening port
             std::make_shared<listener>(
-                ioc, tcp::endpoint{address, static_cast<unsigned short>(httpPort_)})
+                context->ioc, tcp::endpoint{address, static_cast<unsigned short>(httpPort_)})
                 ->run();
         }
 
@@ -716,11 +745,15 @@ namespace apps {
             auto const address = net::ip::make_address(websocketAddress_);
             // Create and launch a listening port
             std::make_shared<listener>(
-                ioc, tcp::endpoint{ address, static_cast<unsigned short>(websocketPort_)}, true)
+                context->ioc, tcp::endpoint{ address, static_cast<unsigned short>(websocketPort_)}, true)
                 ->run();
         }
         // Run the I/O service
-        ioc.run();
+        if (running.load())
+        {
+            context->ioc.run();
+        }
+       
     }
 
 } // namespace apps

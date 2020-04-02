@@ -11,9 +11,13 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include <mutex>
 #include <thread>
+#include <memory>
+#include <atomic>
 
 namespace helics {
 namespace apps {
+
+    class IocWrapper;
 
     /** a virtual class to use as a base for broker servers of various types*/
     class WebServer: public TypedBrokerServer {
@@ -24,14 +28,17 @@ namespace apps {
         virtual void startServer(const Json::Value* val) override;
         /** stop the server*/
         virtual void stopServer() override;
+        /** enable the HTTP server*/
         void enableHttpServer(bool enabled) { http_enabled_ = enabled; }
+        /** enable the websocket server*/
         void enableWebSocketServer(bool enabled) { websocket_enabled_ = enabled; };
 
       private:
         void mainLoop();
-
+        std::shared_ptr<IocWrapper> context;
         std::thread mainLoopThread;
         std::mutex threadGuard;
+        std::atomic<bool> running{ false };
         const Json::Value* config_{nullptr};
         const std::string name_;
         std::string httpAddress_{"127.0.0.1"};
