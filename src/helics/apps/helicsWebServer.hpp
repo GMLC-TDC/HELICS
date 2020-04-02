@@ -35,10 +35,12 @@ namespace apps {
 
       private:
         void mainLoop();
+
+        std::atomic<bool> running{ false };
         std::shared_ptr<IocWrapper> context;
         std::thread mainLoopThread;
         std::mutex threadGuard;
-        std::atomic<bool> running{ false };
+        
         const Json::Value* config_{nullptr};
         const std::string name_;
         std::string httpAddress_{"127.0.0.1"};
@@ -47,6 +49,7 @@ namespace apps {
         int websocketPort_{80};
         bool http_enabled_{false};
         bool websocket_enabled_{false};
+        std::atomic<bool> executing{ false };
     };
 } // namespace apps
 } // namespace helics

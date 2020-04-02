@@ -704,6 +704,11 @@ namespace apps {
 
             mainLoopThread = std::thread([this]() { mainLoop(); });
             mainLoopThread.detach();
+            std::this_thread::yield();
+            while (!executing)
+            {
+                std::this_thread::sleep_for(std::chrono::milliseconds(50));
+            }
         }
         
     }
@@ -723,6 +728,7 @@ namespace apps {
 
     void WebServer::mainLoop()
     {
+        
         if (http_enabled_) {
             if (config_->isMember("http")) {
                 auto V = (*config_)["http"];
@@ -748,12 +754,13 @@ namespace apps {
                 context->ioc, tcp::endpoint{ address, static_cast<unsigned short>(websocketPort_)}, true)
                 ->run();
         }
+        executing.store(true);
         // Run the I/O service
         if (running.load())
         {
             context->ioc.run();
         }
-       
+        executing.store(false);
     }
 
 } // namespace apps
