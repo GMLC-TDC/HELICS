@@ -485,6 +485,10 @@ void handle_request(http::request<Body, http::basic_fields<Allocator>>&& req, Se
     if (targetObj.empty()) {
         targetObj = "root";
     }
+    if (query.empty())
+    {
+        query=
+    }
     if (brkr) {
         auto res = brkr->query(targetObj, query);
         if (res.front() == '{') {
