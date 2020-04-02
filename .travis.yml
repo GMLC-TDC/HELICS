@@ -111,7 +111,7 @@ jobs:
         apt:
           sources:
             - sourceline: "ppa:ubuntu-toolchain-r/test"
-            - sourceline: "deb http://apt.llvm.org/trusty/ llvm-toolchain-trusty-5.0 main"
+            - llvm-toolchain-trusty-5.0
           packages:
             - libstdc++-6-dev
             - clang-5.0
@@ -151,7 +151,7 @@ jobs:
         apt:
           sources:
             - sourceline: "ppa:ubuntu-toolchain-r/test"
-            - sourceline: "deb http://apt.llvm.org/trusty/ llvm-toolchain-precise-3.6 main"
+            - llvm-toolchain-precise-3.6
           packages:
             - clang-3.6
             - libzmq3-dev
