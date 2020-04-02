@@ -32,7 +32,7 @@ _basic_env:
   addons:
     apt:
       sources:
-        - ubuntu-toolchain-r-test
+        - sourceline: "ppa:ubuntu-toolchain-r/test"
       packages:
         - g++-6
         - valgrind
@@ -92,7 +92,7 @@ jobs:
       addons:
         apt:
           sources:
-            - ubuntu-toolchain-r-test
+            - sourceline: "ppa:ubuntu-toolchain-r/test"
           packages:
             - g++-6
             - libzmq3-dev
@@ -110,8 +110,8 @@ jobs:
       addons:
         apt:
           sources:
-            - ubuntu-toolchain-r-test
-            - llvm-toolchain-trusty-5.0
+            - sourceline: "ppa:ubuntu-toolchain-r/test"
+            - sourceline: "deb http://apt.llvm.org/trusty/ llvm-toolchain-trusty-5.0 main"
           packages:
             - libstdc++-6-dev
             - clang-5.0
@@ -130,7 +130,7 @@ jobs:
       addons:
         apt:
           sources:
-            - ubuntu-toolchain-r-test
+            - sourceline: "ppa:ubuntu-toolchain-r/test"
           packages:
             - g++-4.9
             - libzmq3-dev
@@ -150,8 +150,8 @@ jobs:
       addons:
         apt:
           sources:
-            - ubuntu-toolchain-r-test
-            - llvm-toolchain-precise-3.6
+            - sourceline: "ppa:ubuntu-toolchain-r/test"
+            - sourceline: "deb http://apt.llvm.org/trusty/ llvm-toolchain-precise-3.6 main"
           packages:
             - clang-3.6
             - libzmq3-dev
