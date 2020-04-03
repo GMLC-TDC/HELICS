@@ -72,7 +72,7 @@ static std::string loadFile(const std::string& fileName)
 }
 
 static const std::string index_page = loadFile("index.html");
-
+static const std::string emptyString;
 //decode a uri to clean up a string, convert character codes in a uri to the original character
 static std::string uri_decode(beast::string_view str)
 {
@@ -107,7 +107,7 @@ static std::pair<beast::string_view, boost::container::flat_map<beast::string_vi
         results;
     auto param_mark = target.find('?');
     if (param_mark != beast::string_view::npos) {
-        results.first = target.substr(1, param_mark - 1);
+        results.first = target.substr(0, param_mark);
         target = target.substr(param_mark + 1);
     } else {
         results.first = target;
@@ -174,6 +174,10 @@ void partitionTarget(
     }
     targetObj = tstr.substr(0, slashLoc).to_string();
     query = tstr.substr(slashLoc + 1).to_string();
+    if (targetObj == "query")
+    {
+        targetObj.clear();
+    }
 }
 
 std::string getBrokerList()
@@ -242,8 +246,7 @@ public:
             [](websocket::response_type& res)
             {
                 res.set(http::field::server,
-                    std::string(BOOST_BEAST_VERSION_STRING) +
-                    " websocket-server-async");
+                    std::string("HELICS_WEB_SERVER" HELICS_VERSION_STRING));
             }));
         // Accept the websocket handshake
         ws_.async_accept(
@@ -323,8 +326,19 @@ void handle_request(http::request<Body, http::basic_fields<Allocator>>&& req, Se
 {
     // Returns a bad request response
     auto const bad_request = [&req](beast::string_view why) {
-        http::response<http::string_body> res{http::status::bad_request, req.version()};
-        res.set(http::field::server, BOOST_BEAST_VERSION_STRING);
+        http::response<http::string_body> res{ http::status::bad_request, req.version() };
+        res.set(http::field::server, "HELICS_WEB_SERVER" HELICS_VERSION_STRING);
+        res.set(http::field::content_type, "text/html");
+        res.keep_alive(req.keep_alive());
+        res.body() = std::string(why);
+        res.prepare_payload();
+        return res;
+    };
+
+    // Returns a bad request response
+    auto const not_found = [&req](beast::string_view why) {
+        http::response<http::string_body> res{ http::status::not_found, req.version() };
+        res.set(http::field::server, "HELICS_WEB_SERVER" HELICS_VERSION_STRING);
         res.set(http::field::content_type, "text/html");
         res.keep_alive(req.keep_alive());
         res.body() = std::string(why);
@@ -334,14 +348,15 @@ void handle_request(http::request<Body, http::basic_fields<Allocator>>&& req, Se
 
     // generate the main page
     auto const main_page = [&req]() {
-        http::response<http::string_body> res{http::status::ok, req.version()};
-        res.set(http::field::server, BOOST_BEAST_VERSION_STRING);
+        http::response<http::string_body> res{ http::status::ok, req.version() };
+        res.set(http::field::server, "HELICS_WEB_SERVER" HELICS_VERSION_STRING);
         res.set(http::field::content_type, "text/html");
         res.keep_alive(req.keep_alive());
         if (req.method() != http::verb::head) {
             res.body() = index_page;
             res.prepare_payload();
-        } else {
+        }
+        else {
             res.set(http::field::content_length, index_page.size());
         }
         return res;
@@ -349,14 +364,15 @@ void handle_request(http::request<Body, http::basic_fields<Allocator>>&& req, Se
 
     // generate a conversion response
     auto const response_text = [&req](const std::string& value) {
-        http::response<http::string_body> res{http::status::ok, req.version()};
-        res.set(http::field::server, BOOST_BEAST_VERSION_STRING);
+        http::response<http::string_body> res{ http::status::ok, req.version() };
+        res.set(http::field::server, "HELICS_WEB_SERVER" HELICS_VERSION_STRING);
         res.set(http::field::content_type, "text/plain");
         res.keep_alive(req.keep_alive());
         if (req.method() != http::verb::head) {
             res.body() = value;
             res.prepare_payload();
-        } else {
+        }
+        else {
             res.set(http::field::content_length, value.size());
         }
         return res;
@@ -364,14 +380,15 @@ void handle_request(http::request<Body, http::basic_fields<Allocator>>&& req, Se
 
     // generate a conversion response
     auto const response_json = [&req](const std::string& resp) {
-        http::response<http::string_body> res{http::status::ok, req.version()};
-        res.set(http::field::server, BOOST_BEAST_VERSION_STRING);
+        http::response<http::string_body> res{ http::status::ok, req.version() };
+        res.set(http::field::server, "HELICS_WEB_SERVER" HELICS_VERSION_STRING);
         res.set(http::field::content_type, "application/json");
         res.keep_alive(req.keep_alive());
         if (req.method() != http::verb::head) {
             res.body() = resp;
             res.prepare_payload();
-        } else {
+        }
+        else {
             res.set(http::field::content_length, resp.size());
         }
 
@@ -381,20 +398,21 @@ void handle_request(http::request<Body, http::basic_fields<Allocator>>&& req, Se
     bool brokerOps{ false };
 
     switch (req.method()) {
-        case http::verb::head:
-        case http::verb::get:
-            break;
-        case http::verb::post:
-        case http::verb::put:
-        case http::verb::delete_:
-            brokerOps = true;
-            break;
-        default:
-            return send(bad_request("Unknown HTTP-method"));
+    case http::verb::head:
+    case http::verb::search:
+    case http::verb::get:
+        break;
+    case http::verb::post:
+    case http::verb::put:
+    case http::verb::delete_:
+        brokerOps = true;
+        break;
+    default:
+        return send(bad_request("Unknown HTTP-method"));
     }
-    
+
     beast::string_view target(req.target());
-    if (target == "/" || target == "/index.html") {
+    if (target == "/index.html"|| (target=="/" && !(req.payload_size()))) {
         return send(main_page());
     }
 
@@ -414,7 +432,7 @@ void handle_request(http::request<Body, http::basic_fields<Allocator>>&& req, Se
             targetObj = fields["target"];
         }
     }
-    if (brokerName.empty() || brokerName == "query") {
+    if (brokerName.empty() || brokerName == "query"||brokerName=="delete") {
         if (fields.find("broker") != fields.end()) {
             brokerName = fields["broker"];
         }
@@ -448,7 +466,7 @@ void handle_request(http::request<Body, http::basic_fields<Allocator>>&& req, Se
                 ctype= helics::core::coreTypeFromString(type);
                 if (!helics::core::isCoreTypeAvailable(ctype))
                 {
-                    return send(bad_request(type + " already exists"));
+                    return send(bad_request(type + " is not available"));
                 }
             }
             brkr = helics::BrokerFactory::create(ctype, brokerName, start_args);
@@ -468,6 +486,7 @@ void handle_request(http::request<Body, http::basic_fields<Allocator>>&& req, Se
             return send(main_page());
         }
     }
+    bool autoquery{ false };
     if (!brkr) {
         
         auto brks = helics::BrokerFactory::getAllBrokers();
@@ -480,6 +499,7 @@ void handle_request(http::request<Body, http::basic_fields<Allocator>>&& req, Se
         targetObj = brokerName;
     } else if (query.empty() && !targetObj.empty()) {
         query = targetObj;
+        autoquery = true;
         targetObj = "root";
     }
     if (targetObj.empty()) {
@@ -487,14 +507,37 @@ void handle_request(http::request<Body, http::basic_fields<Allocator>>&& req, Se
     }
     if (query.empty())
     {
-        query=
+        query = "current_state";
     }
     if (brkr) {
         auto res = brkr->query(targetObj, query);
         if (res.front() == '{') {
             send(response_json(res));
         } else {
-            send(response_text(res));
+            if (res == "#invalid")
+            {
+                if (autoquery)
+                {
+                    res = brkr->query(query, "current_state");
+                        if (res == "#invalid")
+                        {
+                            send(not_found("target not found"));
+                        }
+                        else
+                        {
+                            send(response_json(res));
+                        }
+                }
+                else
+                {
+                    send(not_found("query was not valid"));
+                }
+            }
+            else
+            {
+                send(response_text(res));
+            }
+            
         }
         return;
     }

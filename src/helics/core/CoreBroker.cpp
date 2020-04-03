@@ -2701,6 +2701,7 @@ void CoreBroker::processQuery(ActionMessage& m)
             auto broker = _brokers.find(target);
             if (broker != _brokers.end()) {
                 route = broker->route;
+                m.dest_id = broker->global_id;
             }
         }
         if ((route == parent_route_id) && (isRootc)) {
