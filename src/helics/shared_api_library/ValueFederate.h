@@ -208,7 +208,7 @@ HELICS_EXPORT helics_publication
  * @param fed The value federate object to use to get the publication.
  * @param key The name of the publication.
  * @forcpponly
- * @param[in,out] err the error object to complete if there is an error
+ * @param[in,out] err The error object to complete if there is an error
  * @endforcpponly
  *
  * @return A helics_publication object, the object will not be valid and err will contain an error code if no publication with the.
@@ -235,7 +235,7 @@ HELICS_EXPORT helics_publication helicsFederateGetPublicationByIndex(helics_fede
  * @param fed The value federate object to use to get the publication.
  * @param key The name of the input.
  * @forcpponly
- * @param[in,out] err the error object to complete if there is an error
+ * @param[in,out] err The error object to complete if there is an error
  * @endforcpponly
  *
  * @return A helics_input object, the object will not be valid and err will contain an error code if no input with the specified.
@@ -262,7 +262,7 @@ HELICS_EXPORT helics_input helicsFederateGetInputByIndex(helics_federate fed, in
  * @param fed The value federate object to use to get the publication.
  * @param key The name of the publication that a subscription is targeting.
  * @forcpponly
- * @param[in,out] err the error object to complete if there is an error
+ * @param[in,out] err The error object to complete if there is an error
  * @endforcpponly
  *
  * @return A helics_input object, the object will not be valid and err will contain an error code if no input with the specified.
@@ -312,7 +312,7 @@ HELICS_EXPORT void helicsPublicationPublishRaw(helics_publication pub, const voi
  * Publish a string.
  *
  * @param pub The publication to publish for.
- * @param str A pointer to a NULL terminated string.
+ * @param str The string to publish.
  * @forcpponly
  * @param[in,out] err A pointer to an error object for catching errors
  * @endforcpponly
@@ -334,7 +334,7 @@ HELICS_EXPORT void helicsPublicationPublishInteger(helics_publication pub, int64
  * Publish a Boolean Value.
  *
  * @param pub The publication to publish for.
- * @param val The boolean value to publish either helics_true or helics_false.
+ * @param val The boolean value to publish.
  * @forcpponly
  * @param[in,out] err A pointer to an error object for catching errors
  * @endforcpponly
@@ -391,8 +391,8 @@ HELICS_EXPORT void helicsPublicationPublishComplex(helics_publication pub, doubl
  *
  * @param pub The publication to publish for.
  * @param vectorInput A pointer to an array of double data.
- * @param vectorLength The number of points to publish.
  * @forcpponly
+ * @param vectorLength The number of points to publish.
  * @param[in,out] err A pointer to an error object for catching errors
  * @endforcpponly
  */
@@ -402,8 +402,8 @@ HELICS_EXPORT void helicsPublicationPublishVector(helics_publication pub, const 
  * Publish a named point.
  *
  * @param pub The publication to publish for.
- * @param str A pointer a null terminated string.
- * @param val A double val to publish.
+ * @param str A string for the name to publish.
+ * @param val A double for the value to publish.
  * @forcpponly
  * @param[in,out] err A pointer to an error object for catching errors
  * @endforcpponly
@@ -452,12 +452,16 @@ HELICS_EXPORT int helicsInputGetRawValueSize(helics_input ipt);
  * Get the raw data for the latest value of a subscription.
  *
  * @param ipt The input to get the data for.
- * @param[out] data the memory location of the data
- * @param maxDatalen The maximum size of information that data can hold.
- * @param[out] actualSize  the actual length of data copied to data
  * @forcpponly
+ * @param[out] data The memory location of the data
+ * @param maxDatalen The maximum size of information that data can hold.
+ * @param[out] actualSize The actual length of data copied to data
  * @param[in,out] err A pointer to an error object for catching errors
  * @endforcpponly
+ *
+ * @beginPythonOnly
+ * @returns raw string data
+ * @endPythonOnly
  */
 HELICS_EXPORT void helicsInputGetRawValue(helics_input ipt, void* data, int maxDatalen, int* actualSize, helics_error* err);
 
@@ -472,12 +476,16 @@ HELICS_EXPORT int helicsInputGetStringSize(helics_input ipt);
  * Get a string value from a subscription.
  *
  * @param ipt The input to get the data for.
- * @param[out] outputString storage for copying a null terminated string
- * @param maxStringLen The maximum size of information that str can hold.
- * @param[out] actualLength the actual length of the string
  * @forcpponly
- * @param[in,out] err error term for capturing errors
+ * @param[out] outputString Storage for copying a null terminated string.
+ * @param maxStringLen The maximum size of information that str can hold.
+ * @param[out] actualLength The actual length of the string.
+ * @param[in,out] err Error term for capturing errors.
  * @endforcpponly
+ *
+ * @beginPythonOnly
+ * @returns A string data
+ * @endPythonOnly
  */
 HELICS_EXPORT void helicsInputGetString(helics_input ipt, char* outputString, int maxStringLen, int* actualLength, helics_error* err);
 
@@ -559,12 +567,16 @@ HELICS_EXPORT helics_complex helicsInputGetComplexObject(helics_input ipt, helic
  * Get a pair of double forming a complex number from a subscriptions.
  *
  * @param ipt The input to get the data for.
+ * @forcpponly
  * @param[out] real Memory location to place the real part of a value
  * @param[out] imag Memory location to place the imaginary part of a value
- * @forcpponly
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
  * On error the values will not be altered.
  * @endforcpponly
+ *
+ * @beginPythonOnly
+ * @return a pair of floating point values that represent the real and imag values
+ * @endPythonOnly
  */
 HELICS_EXPORT void helicsInputGetComplex(helics_input ipt, double* real, double* imag, helics_error* err);
 
@@ -580,11 +592,15 @@ HELICS_EXPORT int helicsInputGetVectorSize(helics_input ipt);
  *
  * @param ipt The input to get the result for.
  * @forcpponly
- * @param[out] data the location to store the data
+ * @param[out] data The location to store the data
  * @param maxlen The maximum size of the vector.
- * @param[out] actualSize location to place the actual length of the resulting vector
+ * @param[out] ActualSize location to place the actual length of the resulting vector
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function
  * @endforcpponly
+ *
+ * @beginPythonOnly
+ * @return a list of floating point values
+ * @endPythonOnly
  */
 HELICS_EXPORT void helicsInputGetVector(helics_input ipt, double data[], int maxlen, int* actualSize, helics_error* err);
 
@@ -593,12 +609,16 @@ HELICS_EXPORT void helicsInputGetVector(helics_input ipt, double data[], int max
  *
  * @param ipt The input to get the result for.
  * @forcpponly
- * @param[out] outputString storage for copying a null terminated string
+ * @param[out] outputString Storage for copying a null terminated string
  * @param maxStringLen The maximum size of information that str can hold.
- * @param[out] actualLength the actual length of the string
- * @param[out] val the double value for the named point
+ * @param[out] actualLength The actual length of the string
+ * @param[out] val The double value for the named point
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function
  * @endforcpponly
+ *
+ * @beginPythonOnly
+ * @return a string and a double value for the named point
+ * @endPythonOnly
  */
 HELICS_EXPORT void
     helicsInputGetNamedPoint(helics_input ipt, char* outputString, int maxStringLen, int* actualLength, double* val, helics_error* err);
@@ -616,8 +636,8 @@ HELICS_EXPORT void
  *
  * @param ipt The input to set the default for.
  * @param data A pointer to the raw data to use for the default.
- * @param inputDataLength The size of the raw data.
  * @forcpponly
+ * @param inputDataLength The size of the raw data.
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function
  * @endforcpponly
  */

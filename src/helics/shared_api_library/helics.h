@@ -62,7 +62,10 @@ HELICS_EXPORT helics_bool helicsIsCoreTypeAvailable(const char* type);
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
  * @endforcpponly
  *
- * @return A helics_core object. If the core is invalid, err will contain the corresponding error message.
+ * @return A helics_core object.
+ * @forcpponly
+ * If the core is invalid, err will contain the corresponding error message.
+ * @endforcpponly
  */
 HELICS_EXPORT helics_core helicsCreateCore(const char* type, const char* name, const char* initString, helics_error* err);
 
@@ -71,8 +74,10 @@ HELICS_EXPORT helics_core helicsCreateCore(const char* type, const char* name, c
  *
  * @param type The type of the core to create.
  * @param name The name of the core. It can be a nullptr or empty string to have a name automatically assigned.
+ * @forcpponly
  * @param argc The number of arguments.
- * @param argv The string values from a command line.
+ * @endforcpponly
+ * @param argv The list of string values from a command line.
  * @forcpponly
  * @param[in,out] err An error object that will contain an error code and string.
  *                    If any error occurred during the execution of the function.
@@ -127,8 +132,10 @@ HELICS_EXPORT helics_broker helicsCreateBroker(const char* type, const char* nam
  *
  * @param type The type of the core to create.
  * @param name The name of the core. It can be a nullptr or empty string to have a name automatically assigned.
+ * @forcpponly
  * @param argc The number of arguments.
- * @param argv The string values from a command line.
+ * @endforcpponly
+ * @param argv The list of string values from a command line.
  * @forcpponly
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
  * @endforcpponly
@@ -729,10 +736,12 @@ HELICS_EXPORT void helicsFederateInfoSetSeparator(helics_federate_info fi, char 
 HELICS_EXPORT void
     helicsFederateInfoSetTimeProperty(helics_federate_info fi, int timeProperty, helics_time propertyValue, helics_error* err);
 
+// TODO: what are known properties. The docstring should reference all properties that can be passed here.
 /**
  * Set an integer property for a federate.
  *
- * @details Some known properties are.
+ * @details Set known properties.
+ *
  * @param fi The federateInfo object to alter.
  * @param intProperty An int identifying the property.
  * @param propertyValue The value to set the property to.
@@ -1005,13 +1014,17 @@ HELICS_EXPORT helics_time helicsFederateRequestNextStep(helics_federate fed, hel
  * @param fed The federate to make the request of.
  * @param requestTime The next desired time.
  * @param iterate The requested iteration mode.
+ * @forcpponly
  * @param[out] outIteration  the iteration specification of the result.
+ * @endforcpponly
  * @forcpponly
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
  * @endforcpponly
  *
  * @return The granted time, will return helics_time_maxtime if the simulation has terminated along with the appropriate iteration result.
- * Value
+ * @beginPythonOnly
+ * This function also returns the iteration specification of the result.
+ * @endPythonOnly
  */
 HELICS_EXPORT helics_time helicsFederateRequestTimeIterative(
     helics_federate fed,
@@ -1068,12 +1081,15 @@ HELICS_EXPORT void helicsFederateRequestTimeIterativeAsync(
  * Complete an iterative time request asynchronous call.
  *
  * @param fed The federate to make the request of.
- * @param[out] outIterate  the iteration specification of the result.
  * @forcpponly
+ * @param[out] outIterate The iteration specification of the result.
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
  * @endforcpponly
  *
  * @return The granted time, will return helics_time_maxtime if the simulation has terminated.
+ * @beginPythonOnly
+ * This function also returns the iteration specification of the result.
+ * @endPythonOnly
  */
 HELICS_EXPORT helics_time
     helicsFederateRequestTimeIterativeComplete(helics_federate fed, helics_iteration_result* outIterate, helics_error* err);
@@ -1154,7 +1170,7 @@ HELICS_EXPORT helics_time helicsFederateGetTimeProperty(helics_federate fed, int
  * @param fed The federate to get the flag for.
  * @param flag The flag to query.
  * @forcpponly
- * @param[in,out] err a pointer to an error object for catching errors.
+ * @param[in,out] err A pointer to an error object for catching errors.
  * @endforcpponly
  *
  * @return The value of the flag.
@@ -1167,7 +1183,7 @@ HELICS_EXPORT helics_bool helicsFederateGetFlagOption(helics_federate fed, int f
  * @param fed The federate to get the flag for.
  * @param intProperty A code for the property to set /ref helics_handle_options.
  * @forcpponly
- * @param[in,out] err a pointer to an error object for catching errors.
+ * @param[in,out] err A pointer to an error object for catching errors.
  * @endforcpponly
  *
  * @return The value of the property.
@@ -1179,7 +1195,7 @@ HELICS_EXPORT int helicsFederateGetIntegerProperty(helics_federate fed, int intP
  *
  * @param fed The federate object to query.
  * @forcpponly
- * @param[in,out] err a pointer to an error object for catching errors.
+ * @param[in,out] err A pointer to an error object for catching errors.
  * @endforcpponly
  *
  * @return The current time of the federate.
@@ -1194,7 +1210,7 @@ HELICS_EXPORT helics_time helicsFederateGetCurrentTime(helics_federate fed, heli
  * @param valueName The name of the global to set.
  * @param value The value of the global.
  * @forcpponly
- * @param[in,out] err a pointer to an error object for catching errors.
+ * @param[in,out] err A pointer to an error object for catching errors.
  * @endforcpponly
  */
 HELICS_EXPORT void helicsFederateSetGlobal(helics_federate fed, const char* valueName, const char* value, helics_error* err);
@@ -1205,7 +1221,7 @@ HELICS_EXPORT void helicsFederateSetGlobal(helics_federate fed, const char* valu
  * @param fed The federate to add the dependency for.
  * @param fedName The name of the federate to depend on.
  * @forcpponly
- * @param[in,out] err a pointer to an error object for catching errors.
+ * @param[in,out] err A pointer to an error object for catching errors.
  * @endforcpponly
  */
 HELICS_EXPORT void helicsFederateAddDependency(helics_federate fed, const char* fedName, helics_error* err);
@@ -1216,7 +1232,7 @@ HELICS_EXPORT void helicsFederateAddDependency(helics_federate fed, const char* 
  * @param fed The federate to set the log file for.
  * @param logFile The name of the log file.
  * @forcpponly
- * @param[in,out] err a pointer to an error object for catching errors.
+ * @param[in,out] err A pointer to an error object for catching errors.
  * @endforcpponly
  */
 HELICS_EXPORT void helicsFederateSetLogFile(helics_federate fed, const char* logFile, helics_error* err);
@@ -1227,7 +1243,7 @@ HELICS_EXPORT void helicsFederateSetLogFile(helics_federate fed, const char* log
  * @param fed The federate to set the global through.
  * @param logmessage The message to put in the log.
  * @forcpponly
- * @param[in,out] err a pointer to an error object for catching errors.
+ * @param[in,out] err A pointer to an error object for catching errors.
  * @endforcpponly
  */
 HELICS_EXPORT void helicsFederateLogErrorMessage(helics_federate fed, const char* logmessage, helics_error* err);
@@ -1238,7 +1254,7 @@ HELICS_EXPORT void helicsFederateLogErrorMessage(helics_federate fed, const char
  * @param fed The federate to set the global through.
  * @param logmessage The message to put in the log.
  * @forcpponly
- * @param[in,out] err a pointer to an error object for catching errors.
+ * @param[in,out] err A pointer to an error object for catching errors.
  * @endforcpponly
  */
 HELICS_EXPORT void helicsFederateLogWarningMessage(helics_federate fed, const char* logmessage, helics_error* err);
@@ -1249,7 +1265,7 @@ HELICS_EXPORT void helicsFederateLogWarningMessage(helics_federate fed, const ch
  * @param fed The federate to set the global through.
  * @param logmessage The message to put in the log.
  * @forcpponly
- * @param[in,out] err a pointer to an error object for catching errors.
+ * @param[in,out] err A pointer to an error object for catching errors.
  * @endforcpponly
  */
 HELICS_EXPORT void helicsFederateLogInfoMessage(helics_federate fed, const char* logmessage, helics_error* err);
@@ -1260,7 +1276,7 @@ HELICS_EXPORT void helicsFederateLogInfoMessage(helics_federate fed, const char*
  * @param fed The federate to set the global through.
  * @param logmessage The message to put in the log.
  * @forcpponly
- * @param[in,out] err a pointer to an error object for catching errors.
+ * @param[in,out] err A pointer to an error object for catching errors.
  * @endforcpponly
  */
 HELICS_EXPORT void helicsFederateLogDebugMessage(helics_federate fed, const char* logmessage, helics_error* err);
@@ -1272,7 +1288,7 @@ HELICS_EXPORT void helicsFederateLogDebugMessage(helics_federate fed, const char
  * @param loglevel The level of the message to log see /ref helics_log_levels.
  * @param logmessage The message to put in the log.
  * @forcpponly
- * @param[in,out] err a pointer to an error object for catching errors.
+ * @param[in,out] err A pointer to an error object for catching errors.
  * @endforcpponly
  */
 HELICS_EXPORT void helicsFederateLogLevelMessage(helics_federate fed, int loglevel, const char* logmessage, helics_error* err);

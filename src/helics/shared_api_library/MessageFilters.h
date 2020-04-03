@@ -134,7 +134,7 @@ HELICS_EXPORT int helicsFederateGetFilterCount(helics_federate fed);
  * @param fed The federate object to use to get the filter.
  * @param name The name of the filter.
  * @forcpponly
- * @param[in,out] err the error object to complete if there is an error.
+ * @param[in,out] err The error object to complete if there is an error.
  * @endforcpponly
  *
  * @return A helics_filter object, the object will not be valid and err will contain an error code if no filter with the specified.

@@ -352,6 +352,7 @@ HELICS_EXPORT helics_bool helicsEndpointGetOption(helics_endpoint end, int optio
  * Get the source endpoint of a message.
  *
  * @param message The message object in question.
+ *
  * @return A string with the source endpoint.
  */
 HELICS_EXPORT const char* helicsMessageGetSource(helics_message_object message);
@@ -360,6 +361,7 @@ HELICS_EXPORT const char* helicsMessageGetSource(helics_message_object message);
  * Get the destination endpoint of a message.
  *
  * @param message The message object in question.
+ *
  * @return A string with the destination endpoint.
  */
 HELICS_EXPORT const char* helicsMessageGetDestination(helics_message_object message);
@@ -368,6 +370,7 @@ HELICS_EXPORT const char* helicsMessageGetDestination(helics_message_object mess
  * Get the original source endpoint of a message, the source may have modified by filters or other actions.
  *
  * @param message The message object in question.
+ *
  * @return A string with the source of a message.
  */
 HELICS_EXPORT const char* helicsMessageGetOriginalSource(helics_message_object message);
@@ -376,6 +379,7 @@ HELICS_EXPORT const char* helicsMessageGetOriginalSource(helics_message_object m
  * Get the original destination endpoint of a message, the destination may have been modified by filters or other actions.
  *
  * @param message The message object in question.
+ *
  * @return A string with the original destination of a message.
  */
 HELICS_EXPORT const char* helicsMessageGetOriginalDestination(helics_message_object message);
@@ -384,6 +388,7 @@ HELICS_EXPORT const char* helicsMessageGetOriginalDestination(helics_message_obj
  * Get the helics time associated with a message.
  *
  * @param message The message object in question.
+ *
  * @return The time associated with a message.
  */
 HELICS_EXPORT helics_time helicsMessageGetTime(helics_message_object message);
@@ -392,6 +397,7 @@ HELICS_EXPORT helics_time helicsMessageGetTime(helics_message_object message);
  * Get the payload of a message as a string.
  *
  * @param message The message object in question.
+ *
  * @return A string representing the payload of a message.
  */
 HELICS_EXPORT const char* helicsMessageGetString(helics_message_object message);
@@ -400,6 +406,7 @@ HELICS_EXPORT const char* helicsMessageGetString(helics_message_object message);
  * Get the messageID of a message.
  *
  * @param message The message object in question.
+ *
  * @return The messageID.
  */
 HELICS_EXPORT int helicsMessageGetMessageID(helics_message_object message);
@@ -409,6 +416,7 @@ HELICS_EXPORT int helicsMessageGetMessageID(helics_message_object message);
  *
  * @param message The message object in question.
  * @param flag The flag to check should be between [0,15].
+ *
  * @return The flags associated with a message.
  */
 HELICS_EXPORT helics_bool helicsMessageCheckFlag(helics_message_object message, int flag);
@@ -417,6 +425,7 @@ HELICS_EXPORT helics_bool helicsMessageCheckFlag(helics_message_object message, 
  * Get the size of the data payload in bytes.
  *
  * @param message The message object in question.
+ *
  * @return The size of the data payload.
  */
 HELICS_EXPORT int helicsMessageGetRawDataSize(helics_message_object message);
@@ -425,12 +434,16 @@ HELICS_EXPORT int helicsMessageGetRawDataSize(helics_message_object message);
  * Get the raw data for a message object.
  *
  * @param message A message object to get the data for.
- * @param[out] data the memory location of the data.
+ * @forcpponly
+ * @param[out] data The memory location of the data.
  * @param maxMessagelen The maximum size of information that data can hold.
  * @param[out] actualSize The actual length of data copied to data.
- * @forcpponly
  * @param[in,out] err A pointer to an error object for catching erro
  * @endforcpponly
+ *
+ * @beginPythonOnly
+ * @returns raw string data
+ * @endPythonOnly
  */
 HELICS_EXPORT void
     helicsMessageGetRawData(helics_message_object message, void* data, int maxMessagelen, int* actualSize, helics_error* err);
