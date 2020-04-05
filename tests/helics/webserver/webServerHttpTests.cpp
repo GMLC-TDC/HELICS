@@ -125,7 +125,7 @@ class httpTest: public ::testing::Test {
         return res.body();
     }
 
-    void sendPost(const std::string& target, const std::string& body)
+    std::string sendPost(const std::string& target, const std::string& body)
     {
         // Set up an HTTP POST message
         http::request<http::string_body> req{http::verb::post, target, 11};
@@ -148,6 +148,10 @@ class httpTest: public ::testing::Test {
 
         // Receive the HTTP response
         http::read(*stream, buffer, res);
+        if (res.result() == http::status::not_found) {
+            return "#invalid";
+        }
+        return res.body();
     }
 
     void sendDelete(const std::string& target, const std::string& body)
@@ -367,4 +371,44 @@ TEST_F(httpTest, deleteBroker)
     val = loadJson(result);
     EXPECT_TRUE(val["brokers"].isArray());
     EXPECT_EQ(val["brokers"].size(), 1U);
+}
+
+
+TEST_F(httpTest, coreJson)
+{
+    auto result = sendGet("brk2/cr1");
+
+    Json::Value v1;
+    v1["query"] = "current_state";
+    auto result2 = sendSearchBody("brk2/cr1", generateJsonString(v1));
+    EXPECT_EQ(result, result2);
+
+    v1["target"] = "cr1";
+
+    result2 = sendSearchBody("brk2", generateJsonString(v1));
+    EXPECT_EQ(result, result2);
+    v1["broker"] = "brk2";
+    result2 = sendSearchBody("/", generateJsonString(v1));
+    EXPECT_EQ(result, result2);
+
+    result2 = sendSearchBody("query", generateJsonString(v1));
+    EXPECT_EQ(result, result2);
+
+    result2 = sendPost("query", generateJsonString(v1));
+    EXPECT_EQ(result, result2);
+
+  
+}
+
+TEST_F(httpTest, deleteJson)
+{
+    
+    Json::Value v1;
+    v1["broker"] = "brk2";
+    sendPost("delete", generateJsonString(v1));
+    auto result = sendGet("brokers");
+    EXPECT_FALSE(result.empty());
+    auto val = loadJson(result);
+    EXPECT_TRUE(val["brokers"].isArray());
+    EXPECT_EQ(val["brokers"].size(), 0U);
 }
