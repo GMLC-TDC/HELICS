@@ -115,8 +115,7 @@ class httpTest: public ::testing::Test {
         }
         // Send the HTTP request to the remote host
         http::write(*stream, req);
-        if (command == http::verb::head)
-        {
+        if (command == http::verb::head) {
             // Declare a container to hold the response
             http::response_parser<http::empty_body> res;
             res.skip(true);
@@ -249,8 +248,8 @@ TEST_F(httpTest, garbage)
 
 TEST_F(httpTest, bad_request)
 {
-    auto result = sendCommand(http::verb::copy,"/search/brk2","");
-    EXPECT_TRUE(result.find("Unknown")!=std::string::npos);
+    auto result = sendCommand(http::verb::copy, "/search/brk2", "");
+    EXPECT_TRUE(result.find("Unknown") != std::string::npos);
 }
 
 TEST_F(httpTest, not_found)
@@ -258,7 +257,7 @@ TEST_F(httpTest, not_found)
     auto result = sendGet("/broker7");
     EXPECT_TRUE(result.find("not") != std::string::npos);
 
-    result = sendGet( "/brk2/ch5");
+    result = sendGet("/brk2/ch5");
     EXPECT_TRUE(result.find("not found") != std::string::npos);
 }
 
@@ -302,7 +301,7 @@ TEST_F(httpTest, coreBody)
 {
     auto result = sendGet("brk2/cr1");
 
-    auto result2 = sendCommand(http::verb::search,"brk2/cr1", "query=current_state");
+    auto result2 = sendCommand(http::verb::search, "brk2/cr1", "query=current_state");
     EXPECT_EQ(result, result2);
     result2 = sendCommand(http::verb::search, "/brk2/cr1", "query=current_state");
     EXPECT_EQ(result, result2);
@@ -315,14 +314,18 @@ TEST_F(httpTest, coreBody)
     result2 = sendCommand(http::verb::search, "/", "broker=brk2&query=current_state&target=cr1");
     EXPECT_EQ(result, result2);
 
-    result2 = sendCommand(http::verb::search, "query", "broker=brk2&query=current_state&target=cr1");
+    result2 =
+        sendCommand(http::verb::search, "query", "broker=brk2&query=current_state&target=cr1");
     EXPECT_EQ(result, result2);
-    result2 = sendCommand(http::verb::search, "/query", "broker=brk2&query=current_state&target=cr1");
+    result2 =
+        sendCommand(http::verb::search, "/query", "broker=brk2&query=current_state&target=cr1");
     EXPECT_EQ(result, result2);
-    result2 = sendCommand(http::verb::search, "/query/", "broker=brk2&query=current_state&target=cr1");
+    result2 =
+        sendCommand(http::verb::search, "/query/", "broker=brk2&query=current_state&target=cr1");
     EXPECT_EQ(result, result2);
 
-    result2 = sendCommand(http::verb::head, "/query/?broker=brk2&query=current_state&target=cr1","");
+    result2 =
+        sendCommand(http::verb::head, "/query/?broker=brk2&query=current_state&target=cr1", "");
     EXPECT_EQ(std::to_string(result.size()), result2);
 
     result2 = sendCommand(http::verb::search, "/cr1", "broker=brk2&query=current_state");
@@ -334,7 +337,7 @@ TEST_F(httpTest, coreBody)
 
 TEST_F(httpTest, post)
 {
-    sendCommand(http::verb::post,"brk3", "type=TCP");
+    sendCommand(http::verb::post, "brk3", "type=TCP");
     auto result = sendGet("brokers");
     EXPECT_FALSE(result.empty());
     auto val = loadJson(result);
@@ -343,16 +346,15 @@ TEST_F(httpTest, post)
     EXPECT_STREQ(val["brokers"][2]["name"].asCString(), "brk3");
 }
 
-
 TEST_F(httpTest, deleteBroker)
 {
-    sendCommand(http::verb::delete_,"brk3","");
+    sendCommand(http::verb::delete_, "brk3", "");
     auto result = sendGet("brokers");
     EXPECT_FALSE(result.empty());
     auto val = loadJson(result);
     EXPECT_TRUE(val["brokers"].isArray());
     EXPECT_EQ(val["brokers"].size(), 2U);
-    sendCommand(http::verb::delete_,"/delete", "broker=brk1");
+    sendCommand(http::verb::delete_, "/delete", "broker=brk1");
     result = sendGet("brokers");
     EXPECT_FALSE(result.empty());
     val = loadJson(result);
@@ -360,14 +362,13 @@ TEST_F(httpTest, deleteBroker)
     EXPECT_EQ(val["brokers"].size(), 1U);
 }
 
-
 TEST_F(httpTest, coreJson)
 {
     auto result = sendGet("brk2/cr1");
 
     Json::Value v1;
     v1["query"] = "current_state";
-    auto result2 = sendCommand(http::verb::search,"brk2/cr1", generateJsonString(v1));
+    auto result2 = sendCommand(http::verb::search, "brk2/cr1", generateJsonString(v1));
     EXPECT_EQ(result, result2);
 
     v1["target"] = "cr1";
@@ -381,18 +382,15 @@ TEST_F(httpTest, coreJson)
     result2 = sendCommand(http::verb::search, "query", generateJsonString(v1));
     EXPECT_EQ(result, result2);
 
-    result2 = sendCommand(http::verb::post,"query", generateJsonString(v1));
+    result2 = sendCommand(http::verb::post, "query", generateJsonString(v1));
     EXPECT_EQ(result, result2);
-
-  
 }
 
 TEST_F(httpTest, deleteJson)
 {
-    
     Json::Value v1;
     v1["broker"] = "brk2";
-    sendCommand(http::verb::post,"delete", generateJsonString(v1));
+    sendCommand(http::verb::post, "delete", generateJsonString(v1));
     auto result = sendGet("brokers");
     EXPECT_FALSE(result.empty());
     auto val = loadJson(result);

@@ -218,7 +218,7 @@ std::pair<return_val, std::string> generateResults(
     if (command == cmd::unknown) {
         if (fields.find("command") != fields.end()) {
             auto cmdstr = fields.at("command");
-            if (cmdstr == "query"||cmdstr=="search") {
+            if (cmdstr == "query" || cmdstr == "search") {
                 command = cmd::query;
             }
             if (cmdstr == "create") {
@@ -235,7 +235,7 @@ std::pair<return_val, std::string> generateResults(
     if (command == cmd::create && brokerName == "create") {
         brokerName.clear();
     }
-    if (command == cmd::remove && (brokerName == "delete"||brokerName=="remove")) {
+    if (command == cmd::remove && (brokerName == "delete" || brokerName == "remove")) {
         brokerName.clear();
     }
     if (command == cmd::query && (brokerName == "query" || brokerName == "search")) {
@@ -262,7 +262,8 @@ std::pair<return_val, std::string> generateResults(
     if (brokerName == "brokers" || (brokerName.empty() && query == "brokers")) {
         return {return_val::ok, getBrokerList()};
     }
-    std::shared_ptr<helics::Broker> brkr = helics::BrokerFactory::findBroker((!brokerName.empty()) ? brokerName:target.to_string());
+    std::shared_ptr<helics::Broker> brkr =
+        helics::BrokerFactory::findBroker((!brokerName.empty()) ? brokerName : target.to_string());
     if (command == cmd::create) {
         if (brkr) {
             return {return_val::bad_request, brokerName + " already exists"};
@@ -570,13 +571,13 @@ void handle_request(http::request<Body, http::basic_fields<Allocator>>&& req, Se
     partitionTarget(reqpr.first, brokerName, query, targetObj);
 
     if (method == http::verb::post) {
-        if (brokerName == "delete"||brokerName=="remove") {
+        if (brokerName == "delete" || brokerName == "remove") {
             command = cmd::remove;
             brokerName.clear();
         } else if (brokerName == "create") {
             command = cmd::create;
             brokerName.clear();
-        } else if (brokerName == "query"||brokerName=="search") {
+        } else if (brokerName == "query" || brokerName == "search") {
             command = cmd::query;
             brokerName.clear();
         }
