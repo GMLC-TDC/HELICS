@@ -144,26 +144,26 @@ jobs:
         - TEST_TYPE=Packaging
       after_script: ${TRAVIS_BUILD_DIR}/scripts/upload-ci-artifact.sh
 
-    - <<: *linux_base
-      name: "Clang 3.6"
-      if: (branch = develop AND type IN (pull_request, cron)) OR (branch = master AND type IN (push, pull_request))
-      compiler: clang
-      addons:
-        apt:
-          sources:
-            - sourceline: "ppa:ubuntu-toolchain-r/test"
-            - sourceline: "deb http://apt.llvm.org/trusty/ llvm-toolchain-precise-3.6 main"
-              key_url: "https://apt.llvm.org/llvm-snapshot.gpg.key"
-          packages:
-            - clang-3.6
-            - libzmq3-dev
-      env:
-        - MATRIX_EVAL="COMPILER=clang && CC='clang-3.6' && CXX='clang++-3.6'"
-        - CCACHE_CPP2=yes
-        - USE_SWIG=true
-        - CI_BOOST_VERSION=1.58.0
-        - SKIP_TEST_RUN=true
-        - JOB_OPTION_FLAGS="-DHELICS_DISABLE_BOOST=ON"
+#    - <<: *linux_base
+#      name: "Clang 3.6"
+#      if: (branch = develop AND type IN (pull_request, cron)) OR (branch = master AND type IN (push, pull_request))
+#      compiler: clang
+#      addons:
+#        apt:
+#          sources:
+#            - sourceline: "ppa:ubuntu-toolchain-r/test"
+#            - sourceline: "deb http://apt.llvm.org/trusty/ llvm-toolchain-precise-3.6 main"
+#              key_url: "https://apt.llvm.org/llvm-snapshot.gpg.key"
+#          packages:
+#            - clang-3.6
+#            - libzmq3-dev
+#      env:
+#        - MATRIX_EVAL="COMPILER=clang && CC='clang-3.6' && CXX='clang++-3.6'"
+#        - CCACHE_CPP2=yes
+#        - USE_SWIG=true
+#        - CI_BOOST_VERSION=1.58.0
+#        - SKIP_TEST_RUN=true
+#        - JOB_OPTION_FLAGS="-DHELICS_DISABLE_BOOST=ON"
 
     - os: windows
       name: "MinGW"
