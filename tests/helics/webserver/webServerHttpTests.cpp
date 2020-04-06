@@ -52,7 +52,7 @@ class httpTest: public ::testing::Test {
         config["http"] = Json::objectValue;
         config["http"]["port"] = 26242;
 
-        webs->startServer(nullptr);
+        webs->startServer(&config);
 
         // These objects perform our I/O
         tcp::resolver resolver(ioc);
@@ -74,6 +74,7 @@ class httpTest: public ::testing::Test {
         stream->socket().shutdown(tcp::socket::shutdown_both, ec);
         webs->stopServer();
         helics::BrokerFactory::terminateAllBrokers();
+        stream.reset();
     }
 
     // You can define per-test set-up logic as usual.

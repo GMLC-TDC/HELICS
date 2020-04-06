@@ -86,6 +86,7 @@ class webTest: public ::testing::Test {
         stream->close(websocket::close_code::normal);
         webs->stopServer();
         helics::BrokerFactory::terminateAllBrokers();
+        stream.reset();
     }
 
     std::string sendText(const std::string& message)
