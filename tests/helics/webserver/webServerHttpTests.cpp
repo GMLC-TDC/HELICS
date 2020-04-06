@@ -115,7 +115,15 @@ class httpTest: public ::testing::Test {
         }
         // Send the HTTP request to the remote host
         http::write(*stream, req);
-
+        if (command == http::verb::head)
+        {
+            // Declare a container to hold the response
+            http::response_parser<http::empty_body> res;
+            res.skip(true);
+            // Receive the HTTP response
+            http::read(*stream, buffer, res);
+            return std::to_string(*res.content_length());
+        }
         // Declare a container to hold the response
         http::response<http::string_body> res;
 
@@ -313,6 +321,9 @@ TEST_F(httpTest, coreBody)
     EXPECT_EQ(result, result2);
     result2 = sendCommand(http::verb::search, "/query/", "broker=brk2&query=current_state&target=cr1");
     EXPECT_EQ(result, result2);
+
+    result2 = sendCommand(http::verb::head, "/query/?broker=brk2&query=current_state&target=cr1","");
+    EXPECT_EQ(std::to_string(result.size()), result2);
 
     result2 = sendCommand(http::verb::search, "/cr1", "broker=brk2&query=current_state");
     EXPECT_EQ(result, result2);
