@@ -2418,9 +2418,9 @@ std::string CoreBroker::generateQueryAnswer(const std::string& request)
         if (!isRootc) {
             base["parent"] = higher_broker_id.baseValue();
         }
-        base["brokers"] = _brokers.size();
-        base["federates"] = _federates.size();
-        base["handles"] = handles.size();
+        base["brokers"] = static_cast<int>(_brokers.size());
+        base["federates"] = static_cast<int>(_federates.size());
+        base["handles"] = static_cast<int>(handles.size());
         return generateJsonString(base);
     }
     if (request == "summary") {

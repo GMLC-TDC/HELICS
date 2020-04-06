@@ -21,7 +21,7 @@ set_property(
     TEST helics_webserver-tests
     PROPERTY
         LABELS
-        webserver
+        webserver Continuous Coverage
 )
 
 copy_key_files_to_target_location(helics_webserver-tests)
