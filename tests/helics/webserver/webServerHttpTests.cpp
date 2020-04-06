@@ -242,6 +242,12 @@ TEST_F(httpTest, garbage)
     EXPECT_EQ(result, "#invalid");
 }
 
+TEST_F(httpTest, bad_request)
+{
+    auto result = sendCommand(http::verb::copy,"/search/brk2","");
+    EXPECT_TRUE(result.find("Unknown")!=std::string::npos);
+}
+
 TEST_F(httpTest, core)
 {
     auto cr = addCore(helics::core_type::TEST, "--name=cr1 -f2");
@@ -253,11 +259,14 @@ TEST_F(httpTest, core)
     EXPECT_EQ(val["cores"].size(), 1U);
     EXPECT_STREQ(val["cores"][0]["name"].asCString(), "cr1");
 
+    auto result2 = sendCommand(http::verb::search, "/search/brk2", "query=current_state");
+    EXPECT_EQ(result, result2);
+
     result = sendGet("brk2/cr1");
     val = loadJson(result);
     EXPECT_STREQ(val["name"].asCString(), "cr1");
 
-    auto result2 = sendGet("brk2/cr1/current_state");
+    result2 = sendGet("brk2/cr1/current_state");
     EXPECT_EQ(result, result2);
 
     result2 = sendGet("brk2/cr1?query=current_state");
@@ -285,7 +294,8 @@ TEST_F(httpTest, coreBody)
     EXPECT_EQ(result, result2);
     result2 = sendCommand(http::verb::search, "/brk2/cr1/", "query=current_state");
     EXPECT_EQ(result, result2);
-
+    result2 = sendCommand(http::verb::search, "//brk2/cr1/", "query=current_state");
+    EXPECT_EQ(result, result2);
     result2 = sendCommand(http::verb::search, "brk2", "query=current_state&target=cr1");
     EXPECT_EQ(result, result2);
     result2 = sendCommand(http::verb::search, "/", "broker=brk2&query=current_state&target=cr1");
@@ -345,7 +355,7 @@ TEST_F(httpTest, coreJson)
 
     v1["target"] = "cr1";
 
-    result2 = sendCommand(http::verb::search, "search/brk2", generateJsonString(v1));
+    result2 = sendCommand(http::verb::search, "brk2", generateJsonString(v1));
     EXPECT_EQ(result, result2);
     v1["broker"] = "brk2";
     result2 = sendCommand(http::verb::search, "/", generateJsonString(v1));

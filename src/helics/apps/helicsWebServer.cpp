@@ -179,9 +179,6 @@ void partitionTarget(
     }
     targetObj = tstr.substr(0, slashLoc).to_string();
     query = tstr.substr(slashLoc + 1).to_string();
-    if (targetObj == "query") {
-        targetObj.clear();
-    }
 }
 
 std::string getBrokerList()
@@ -241,7 +238,9 @@ std::pair<return_val, std::string> generateResults(
     if (command == cmd::remove && (brokerName == "delete"||brokerName=="remove")) {
         brokerName.clear();
     }
-
+    if (command == cmd::query && (brokerName == "query" || brokerName == "search")) {
+        brokerName.clear();
+    }
     if (query.empty()) {
         if (fields.find("query") != fields.end()) {
             query = fields.at("query");
@@ -252,18 +251,18 @@ std::pair<return_val, std::string> generateResults(
             target = fields.at("target");
         }
     }
-    if (brokerName.empty() || brokerName == "query"||brokerName=="search") {
+    if (brokerName.empty()) {
         if (fields.find("broker") != fields.end()) {
             brokerName = fields.at("broker");
         }
     }
-    if (brokerName == "query" && target == "brokers") {
+    if (brokerName.empty() && target == "brokers") {
         brokerName = "brokers";
     }
     if (brokerName == "brokers" || (brokerName.empty() && query == "brokers")) {
         return {return_val::ok, getBrokerList()};
     }
-    std::shared_ptr<helics::Broker> brkr = helics::BrokerFactory::findBroker(brokerName);
+    std::shared_ptr<helics::Broker> brkr = helics::BrokerFactory::findBroker((!brokerName.empty()) ? brokerName:target.to_string());
     if (command == cmd::create) {
         if (brkr) {
             return {return_val::bad_request, brokerName + " already exists"};
@@ -550,10 +549,9 @@ void handle_request(http::request<Body, http::basic_fields<Allocator>>&& req, Se
         case http::verb::get:
             break;
         case http::verb::post:
-            command = cmd::create;
-            break;
         case http::verb::put:
             command = cmd::create;
+            break;
         case http::verb::delete_:
             command = cmd::remove;
             break;
