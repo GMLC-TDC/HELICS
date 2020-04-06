@@ -51,7 +51,7 @@ class webTest: public ::testing::Test {
         webs = std::make_shared<helics::apps::WebServer>();
         webs->enableWebSocketServer(true);
         config["websocket"] = Json::objectValue;
-        config["websocket"]["port"] = 8080;
+        config["websocket"]["port"] = 26247;
         webs->startServer(&config);
 
         // These objects perform our I/O
@@ -59,7 +59,7 @@ class webTest: public ::testing::Test {
         stream = std::make_unique<websocket::stream<tcp::socket>>(ioc);
 
         // Look up the domain name
-        auto const results = resolver.resolve(localhost, "8080");
+        auto const results = resolver.resolve(localhost, "26247");
 
         // Make the connection on the IP address we get from a lookup
         net::connect(stream->next_layer(), results.begin(), results.end());
@@ -85,6 +85,7 @@ class webTest: public ::testing::Test {
         // Close the WebSocket connection
         stream->close(websocket::close_code::normal);
         webs->stopServer();
+        helics::BrokerFactory::terminateAllBrokers();
     }
 
     std::string sendText(const std::string& message)

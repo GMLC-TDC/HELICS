@@ -49,6 +49,9 @@ class httpTest: public ::testing::Test {
         helics::loadCores();
         webs = std::make_shared<helics::apps::WebServer>();
         webs->enableHttpServer(true);
+        config["http"] = Json::objectValue;
+        config["http"]["port"] = 26242;
+
         webs->startServer(nullptr);
 
         // These objects perform our I/O
@@ -56,7 +59,7 @@ class httpTest: public ::testing::Test {
         stream = std::make_unique<beast::tcp_stream>(ioc);
 
         // Look up the domain name
-        auto const results = resolver.resolve(localhost, "80");
+        auto const results = resolver.resolve(localhost, "26242");
 
         // Make the connection on the IP address we get from a lookup
         stream->connect(results);
@@ -70,6 +73,7 @@ class httpTest: public ::testing::Test {
         beast::error_code ec;
         stream->socket().shutdown(tcp::socket::shutdown_both, ec);
         webs->stopServer();
+        helics::BrokerFactory::terminateAllBrokers();
     }
 
     // You can define per-test set-up logic as usual.
@@ -222,6 +226,8 @@ class httpTest: public ::testing::Test {
 
     static std::vector<std::shared_ptr<helics::Broker>> brks;
     static std::vector<std::shared_ptr<helics::Core>> cores;
+
+    static Json::Value config;
 };
 
 std::shared_ptr<helics::apps::WebServer> httpTest::webs;
@@ -230,6 +236,7 @@ std::vector<std::shared_ptr<helics::Core>> httpTest::cores;
 beast::flat_buffer httpTest::buffer;
 std::unique_ptr<beast::tcp_stream> httpTest::stream;
 net::io_context httpTest::ioc;
+Json::Value httpTest::config;
 
 TEST_F(httpTest, test1)
 {
