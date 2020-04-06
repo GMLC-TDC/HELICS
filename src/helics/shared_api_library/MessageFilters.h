@@ -28,7 +28,7 @@ extern "C" {
  *
  * @param fed The federate to register through.
  * @param type The type of filter to create /ref helics_filter_type.
- * @param name The name of the filter (can be NULL)
+ * @param name The name of the filter (can be NULL).
  * @forcpponly
  * @param[in,out] err A pointer to an error object for catching errors.
  * @endforcpponly
