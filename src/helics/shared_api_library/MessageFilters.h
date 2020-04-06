@@ -6,9 +6,9 @@ SPDX-License-Identifier: BSD-3-Clause
 */
 
 /**
- * @file.
+ * @file
  *
-@brief functions related the message filters for the C api
+@brief Functions related to message filters for the C api
 */
 
 #ifndef HELICS_APISHARED_MESSAGE_FILTER_FEDERATE_FUNCTIONS_H_
@@ -26,7 +26,7 @@ extern "C" {
  * @details Filters can be created through a federate or a core, linking through a federate allows
  *          a few extra features of name matching to function on the federate interface but otherwise equivalent behavior
  *
- * @param fed The fed to register through.
+ * @param fed The federate to register through.
  * @param type The type of filter to create /ref helics_filter_type.
  * @param name The name of the filter (can be NULL)
  * @forcpponly
@@ -37,12 +37,12 @@ extern "C" {
  */
 HELICS_EXPORT helics_filter helicsFederateRegisterFilter(helics_federate fed, helics_filter_type type, const char* name, helics_error* err);
 /**
- * Create a globl source filter through a federate.
+ * Create a global source filter through a federate.
  *
  * @details Filters can be created through a federate or a core, linking through a federate allows
  *          a few extra features of name matching to function on the federate interface but otherwise equivalent behavior.
  *
- * @param fed The fed to register through.
+ * @param fed The federate to register through.
  * @param type The type of filter to create /ref helics_filter_type.
  * @param name The name of the filter (can be NULL).
  * @forcpponly
@@ -55,12 +55,12 @@ HELICS_EXPORT helics_filter
     helicsFederateRegisterGlobalFilter(helics_federate fed, helics_filter_type type, const char* name, helics_error* err);
 
 /**
- * Create a cloning Filter on the specified federate..
+ * Create a cloning Filter on the specified federate.
  *
- * @details Cloning filters copy a message and send it to multiple locations source and destination can be added
+ * @details Cloning filters copy a message and send it to multiple locations, source and destination can be added
  *          through other functions.
  *
- * @param fed The fed to register through.
+ * @param fed The federate to register through.
  * @param name The name of the filter (can be NULL).
  * @forcpponly
  * @param[in,out] err A pointer to an error object for catching errors.
@@ -73,10 +73,10 @@ HELICS_EXPORT helics_filter helicsFederateRegisterCloningFilter(helics_federate 
 /**
  * Create a global cloning Filter on the specified federate.
  *
- * @details Cloning filters copy a message and send it to multiple locations source and destination can be added
+ * @details Cloning filters copy a message and send it to multiple locations, source and destination can be added
  *          through other functions.
  *
- * @param fed The fed to register through.
+ * @param fed The federate to register through.
  * @param name The name of the filter (can be NULL).
  * @forcpponly
  * @param[in,out] err A pointer to an error object for catching errors.
@@ -106,7 +106,7 @@ HELICS_EXPORT helics_filter helicsCoreRegisterFilter(helics_core core, helics_fi
 /**
  * Create a cloning Filter on the specified core.
  *
- * @details Cloning filters copy a message and send it to multiple locations source and destination can be added
+ * @details Cloning filters copy a message and send it to multiple locations, source and destination can be added
  *          through other functions.
  *
  * @param core The core to register through.
@@ -120,7 +120,7 @@ HELICS_EXPORT helics_filter helicsCoreRegisterFilter(helics_core core, helics_fi
 HELICS_EXPORT helics_filter helicsCoreRegisterCloningFilter(helics_core core, const char* name, helics_error* err);
 
 /**
- * Get a the number of filters registered through a federate.
+ * Get the number of filters registered through a federate.
  *
  * @param fed The federate object to use to get the filter.
  *
@@ -129,7 +129,7 @@ HELICS_EXPORT helics_filter helicsCoreRegisterCloningFilter(helics_core core, co
 HELICS_EXPORT int helicsFederateGetFilterCount(helics_federate fed);
 
 /**
- * Get a filter by its name typically already created via registerInterfaces file or something of that nature.
+ * Get a filter by its name, typically already created via registerInterfaces file or something of that nature.
  *
  * @param fed The federate object to use to get the filter.
  * @param name The name of the filter.
@@ -137,12 +137,11 @@ HELICS_EXPORT int helicsFederateGetFilterCount(helics_federate fed);
  * @param[in,out] err The error object to complete if there is an error.
  * @endforcpponly
  *
- * @return A helics_filter object, the object will not be valid and err will contain an error code if no filter with the specified.
- * name exists
+ * @return A helics_filter object, the object will not be valid and err will contain an error code if no filter with the specified name exists.
  */
 HELICS_EXPORT helics_filter helicsFederateGetFilter(helics_federate fed, const char* name, helics_error* err);
 /**
- * Get a filter by its index typically already created via registerInterfaces file or something of that nature.
+ * Get a filter by its index, typically already created via registerInterfaces file or something of that nature.
  *
  * @param fed The federate object in which to create a publication.
  * @param index The index of the publication to get.
@@ -150,7 +149,7 @@ HELICS_EXPORT helics_filter helicsFederateGetFilter(helics_federate fed, const c
  * @param[in,out] err A pointer to an error object for catching errors.
  * @endforcpponly
  *
- * @return A helics_filter, which will be NULL if an invalid index.
+ * @return A helics_filter, which will be NULL if an invalid index is given.
  */
 HELICS_EXPORT helics_filter helicsFederateGetFilterByIndex(helics_federate fed, int index, helics_error* err);
 
@@ -168,7 +167,7 @@ HELICS_EXPORT const char* helicsFilterGetName(helics_filter filt);
  *
  * @param filt The filter to modify.
  * @param prop A string containing the property to set.
- * @param val A numerical value of the property.
+ * @param val A numerical value for the property.
  * @forcpponly
  * @param[in,out] err A pointer to an error object for catching errors.
  * @endforcpponly
@@ -191,7 +190,7 @@ HELICS_EXPORT void helicsFilterSetString(helics_filter filt, const char* prop, c
  * Add a destination target to a filter.
  *
  * @details All messages going to a destination are copied to the delivery address(es).
- * @param filt The given filter to add a destination target.
+ * @param filt The given filter to add a destination target to.
  * @param dest The name of the endpoint to add as a destination target.
  * @forcpponly
  * @param[in,out] err A pointer to an error object for catching errors.
@@ -247,7 +246,7 @@ HELICS_EXPORT void helicsFilterRemoveTarget(helics_filter filt, const char* targ
  * Remove a delivery destination from a cloning filter.
  *
  * @param filt The given filter (must be a cloning filter).
- * @param deliveryEndpoint A string with the deliverEndpoint to remove.
+ * @param deliveryEndpoint A string with the delivery endpoint to remove.
  * @forcpponly
  * @param[in,out] err A pointer to an error object for catching errors.
  * @endforcpponly
@@ -255,7 +254,7 @@ HELICS_EXPORT void helicsFilterRemoveTarget(helics_filter filt, const char* targ
 HELICS_EXPORT void helicsFilterRemoveDeliveryEndpoint(helics_filter filt, const char* deliveryEndpoint, helics_error* err);
 
 /**
- * Get the data in the info field of an filter.
+ * Get the data in the info field of a filter.
  *
  * @param filt The given filter.
  *
@@ -263,7 +262,7 @@ HELICS_EXPORT void helicsFilterRemoveDeliveryEndpoint(helics_filter filt, const 
  */
 HELICS_EXPORT const char* helicsFilterGetInfo(helics_filter filt);
 /**
- * Set the data in the info field for an filter.
+ * Set the data in the info field for a filter.
  *
  * @param filt The given filter.
  * @param info The string to set.
@@ -274,7 +273,7 @@ HELICS_EXPORT const char* helicsFilterGetInfo(helics_filter filt);
 HELICS_EXPORT void helicsFilterSetInfo(helics_filter filt, const char* info, helics_error* err);
 
 /**
- * Set the data in the info field for an filter.
+ * Set the data in the info field for a filter.
  *
  * @param filt The given filter.
  * @param option The option to set /ref helics_handle_options.
@@ -287,7 +286,7 @@ HELICS_EXPORT void helicsFilterSetInfo(helics_filter filt, const char* info, hel
 HELICS_EXPORT void helicsFilterSetOption(helics_filter filt, int option, helics_bool value, helics_error* err);
 
 /**
- * Get a handle option for the filter..
+ * Get a handle option for the filter.
  *
  * @param filt The given filter to query.
  * @param option The option to query /ref helics_handle_options.

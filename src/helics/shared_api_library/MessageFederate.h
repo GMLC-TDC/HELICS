@@ -7,7 +7,7 @@ SPDX-License-Identifier: BSD-3-Clause
 
 /**
  * @file
- * @brief functions related the message federates for the C api
+ * @brief Functions related to message federates for the C api
  */
 
 #ifndef HELICS_APISHARED_MESSAGE_FEDERATE_FUNCTIONS_H_
@@ -30,7 +30,7 @@ extern "C" {
  * @param fed The federate object in which to create an endpoint must have been created
  *           with helicsCreateMessageFederate or helicsCreateCombinationFederate.
  * @param name The identifier for the endpoint. This will be prepended with the federate name for the global identifier.
- * @param type A string describing the expected type of the publication may be NULL.
+ * @param type A string describing the expected type of the publication (may be NULL).
  * @forcpponly
  * @param[in,out] err A pointer to an error object for catching errors.
  * @endforcpponly
@@ -48,7 +48,7 @@ HELICS_EXPORT helics_endpoint helicsFederateRegisterEndpoint(helics_federate fed
  * @param fed The federate object in which to create an endpoint must have been created
               with helicsCreateMessageFederate or helicsCreateCombinationFederate.
  * @param name The identifier for the endpoint, the given name is the global identifier.
- * @param type A string describing the expected type of the publication may be NULL.
+ * @param type A string describing the expected type of the publication (may be NULL).
  * @forcpponly
  * @param[in,out] err A pointer to an error object for catching errors.
  * @endforcpponly
@@ -58,12 +58,12 @@ HELICS_EXPORT helics_endpoint
     helicsFederateRegisterGlobalEndpoint(helics_federate fed, const char* name, const char* type, helics_error* err);
 
 /**
- * Get an endpoint object from a name
+ * Get an endpoint object from a name.
  *
  * @param fed The message federate object to use to get the endpoint.
  * @param name The name of the endpoint.
  * @forcpponly
- * @param[in,out] err the error object to complete if there is an error.
+ * @param[in,out] err The error object to complete if there is an error.
  * @endforcpponly
  *
  * @return A helics_endpoint object.
@@ -74,7 +74,7 @@ HELICS_EXPORT helics_endpoint
 HELICS_EXPORT helics_endpoint helicsFederateGetEndpoint(helics_federate fed, const char* name, helics_error* err);
 
 /**
- * Get an endpoint by its index typically already created via registerInterfaces file or something of that nature.
+ * Get an endpoint by its index, typically already created via registerInterfaces file or something of that nature.
  *
  * @param fed The federate object in which to create a publication.
  * @param index The index of the publication to get.
@@ -84,7 +84,7 @@ HELICS_EXPORT helics_endpoint helicsFederateGetEndpoint(helics_federate fed, con
  *
  * @return A helics_endpoint.
  * @forcpponly
- *         It will be NULL if an invalid index.
+ *         It will be NULL if given an invalid index.
  * @endforcpponly
  */
 HELICS_EXPORT helics_endpoint helicsFederateGetEndpointByIndex(helics_federate fed, int index, helics_error* err);
@@ -117,7 +117,7 @@ HELICS_EXPORT const char* helicsEndpointGetDefaultDestination(helics_endpoint en
  * @param data The data to send.
  * @forcpponly
  * @param inputDataLength The length of the data to send.
- * @param[in,out] err A pointer to an error object for catching errors
+ * @param[in,out] err A pointer to an error object for catching errors.
  * @endforcpponly
  */
 HELICS_EXPORT void
@@ -127,7 +127,7 @@ HELICS_EXPORT void
  * Send a message at a specific time to the specified destination.
  *
  * @param endpoint The endpoint to send the data from.
- * @param dest The target destination (nullptr to use the default destination.
+ * @param dest The target destination (nullptr to use the default destination).
  * @param data The data to send.
  * @forcpponly
  * @param inputDataLength The length of the data to send.
@@ -181,9 +181,9 @@ HELICS_EXPORT void helicsEndpointSubscribe(helics_endpoint endpoint, const char*
 /**
  * Check if the federate has any outstanding messages.
  *
- * @param fed The federate to check if it has.
+ * @param fed The federate to check.
  *
- * @return helics_true if the federate has a message waiting helics_false otherwise.
+ * @return helics_true if the federate has a message waiting, helics_false otherwise.
  */
 HELICS_EXPORT helics_bool helicsFederateHasMessage(helics_federate fed);
 
@@ -199,12 +199,12 @@ HELICS_EXPORT helics_bool helicsEndpointHasMessage(helics_endpoint endpoint);
 /**
  * Returns the number of pending receives for the specified destination endpoint.
  *
- * @param fed The federate to get the number of waiting messages.
+ * @param fed The federate to get the number of waiting messages from.
  */
 HELICS_EXPORT int helicsFederatePendingMessages(helics_federate fed);
 
 /**
- * Returns the number of pending receives for all endpoints of particular federate.
+ * Returns the number of pending receives for all endpoints of a particular federate.
  *
  * @param endpoint The endpoint to query.
  */
@@ -213,7 +213,7 @@ HELICS_EXPORT int helicsEndpointPendingMessages(helics_endpoint endpoint);
 /**
  * Receive a packet from a particular endpoint.
  *
- * @param[in] endpoint the identifier for the endpoint.
+ * @param[in] endpoint The identifier for the endpoint.
  *
  * @return A message object.
  */
@@ -222,7 +222,7 @@ HELICS_EXPORT helics_message helicsEndpointGetMessage(helics_endpoint endpoint);
 /**
  * Receive a packet from a particular endpoint.
  *
- * @param[in] endpoint the identifier for the endpoint.
+ * @param[in] endpoint The identifier for the endpoint.
  *
  * @return A message object.
  */
@@ -235,7 +235,7 @@ HELICS_EXPORT helics_message_object helicsEndpointGetMessageObject(helics_endpoi
  *          So all messages that are available for the first endpoint, then all for the second, and so on.
  *          Within a single endpoint, the messages are ordered by time, then source_id, then order of arrival.
  *
- * @return A unique_ptr to a Message object containing the message data
+ * @return A unique_ptr to a Message object containing the message data.
  */
 HELICS_EXPORT helics_message helicsFederateGetMessage(helics_federate fed);
 
@@ -244,7 +244,7 @@ HELICS_EXPORT helics_message helicsFederateGetMessage(helics_federate fed);
  *
  * @details The return order will be in order of endpoint creation.
  *          So all messages that are available for the first endpoint, then all for the second, and so on.
- *          Within a single endpoint, the messages are ordered by time, then source_id, then order of arrival
+ *          Within a single endpoint, the messages are ordered by time, then source_id, then order of arrival.
  *
  * @return A helics_message_object which references the data in the message
  */
@@ -255,7 +255,7 @@ HELICS_EXPORT helics_message_object helicsFederateGetMessageObject(helics_federa
  *
  * @details The message is empty and isValid will return false since there is no data associated with the message yet.
  *
- * @return A helics_message_object containing the message data
+ * @return A helics_message_object containing the message data.
  */
 HELICS_EXPORT helics_message_object helicsFederateCreateMessageObject(helics_federate fed, helics_error* err);
 
@@ -264,7 +264,7 @@ HELICS_EXPORT helics_message_object helicsFederateCreateMessageObject(helics_fed
  *
  * @details This clears messages retrieved through helicsFederateGetMessage or helicsFederateGetMessageObject
  *
- * @param fed The federate to clear the message for
+ * @param fed The federate to clear the message for.
  */
 HELICS_EXPORT void helicsFederateClearMessages(helics_federate fed);
 
@@ -287,7 +287,7 @@ HELICS_EXPORT const char* helicsEndpointGetType(helics_endpoint endpoint);
 /**
  * Get the name of an endpoint.
  *
- * @param endpoint the endpoint object in question.
+ * @param endpoint The endpoint object in question.
  *
  * @return The name of the endpoint.
  */
@@ -298,21 +298,21 @@ HELICS_EXPORT const char* helicsEndpointGetName(helics_endpoint endpoint);
  *
  * @param fed The message federate to query.
  *
- * @return (-1) if fed was not a valid federate otherwise returns the number of endpoints
+ * @return (-1) if fed was not a valid federate, otherwise returns the number of endpoints.
  */
 HELICS_EXPORT int helicsFederateGetEndpointCount(helics_federate fed);
 
 /**
- * Get the data in the info field of an filter.
+ * Get the data in the info field of a filter.
  *
  * @param end The filter to query.
  *
- * @return A string with the info field string
+ * @return A string with the info field string.
  */
 HELICS_EXPORT const char* helicsEndpointGetInfo(helics_endpoint end);
 
 /**
- * Set the data in the info field for an filter.
+ * Set the data in the info field for a filter.
  *
  * @param end The endpoint to query.
  * @param info The string to set.
@@ -327,7 +327,7 @@ HELICS_EXPORT void helicsEndpointSetInfo(helics_endpoint end, const char* info, 
  *
  * @param end The endpoint to modify.
  * @param option Integer code for the option to set /ref helics_handle_options.
- * @param value The value to set the option.
+ * @param value The value to set the option to.
  * @forcpponly
  * @param[in,out] err An error object to fill out in case of an error.
  * @endforcpponly
@@ -343,8 +343,8 @@ HELICS_EXPORT void helicsEndpointSetOption(helics_endpoint end, int option, heli
 HELICS_EXPORT helics_bool helicsEndpointGetOption(helics_endpoint end, int option);
 
 /**
- * \defgroup message operation functions
- * @details Functions for working with helics message envelopes
+ * \defgroup Message operation functions
+ * @details Functions for working with helics message envelopes.
  * @{
  */
 
@@ -367,7 +367,7 @@ HELICS_EXPORT const char* helicsMessageGetSource(helics_message_object message);
 HELICS_EXPORT const char* helicsMessageGetDestination(helics_message_object message);
 
 /**
- * Get the original source endpoint of a message, the source may have modified by filters or other actions.
+ * Get the original source endpoint of a message, the source may have been modified by filters or other actions.
  *
  * @param message The message object in question.
  *
@@ -438,11 +438,11 @@ HELICS_EXPORT int helicsMessageGetRawDataSize(helics_message_object message);
  * @param[out] data The memory location of the data.
  * @param maxMessagelen The maximum size of information that data can hold.
  * @param[out] actualSize The actual length of data copied to data.
- * @param[in,out] err A pointer to an error object for catching erro
+ * @param[in,out] err A pointer to an error object for catching errors.
  * @endforcpponly
  *
  * @beginPythonOnly
- * @returns raw string data
+ * @returns Raw string data.
  * @endPythonOnly
  */
 HELICS_EXPORT void
@@ -524,7 +524,7 @@ HELICS_EXPORT void helicsMessageSetTime(helics_message_object message, helics_ti
 /**
  * Resize the data buffer for a message.
  *
- * @details The message data buffer will be resized there is no guarantees on what is in the buffer in newly allocated space
+ * @details The message data buffer will be resized. There are no guarantees on what is in the buffer in newly allocated space.
  *          If the allocated space is not sufficient new allocations will occur.
  *
  * @param message The message object in question.
@@ -586,7 +586,7 @@ HELICS_EXPORT void helicsMessageSetFlagOption(helics_message_object message, int
  * @param message The message object in question.
  * @param str A string containing the message data.
  * @forcpponly
- * @param[in,out] err An error object to fill out in case of an error
+ * @param[in,out] err An error object to fill out in case of an error.
  * @endforcpponly
  */
 HELICS_EXPORT void helicsMessageSetString(helics_message_object message, const char* str, helics_error* err);

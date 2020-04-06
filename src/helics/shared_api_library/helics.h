@@ -47,7 +47,7 @@ HELICS_EXPORT void helicsErrorClear(helics_error* err);
  *
  * @param type A string representing a core type.
  *
- * @details Options include "test", "zmq", "udp", "ipc", "interprocess", "tcp", "default", "mpi".
+ * @details Options include "zmq", "udp", "ipc", "interprocess", "tcp", "default", "mpi".
  */
 HELICS_EXPORT helics_bool helicsIsCoreTypeAvailable(const char* type);
 
@@ -57,7 +57,7 @@ HELICS_EXPORT helics_bool helicsIsCoreTypeAvailable(const char* type);
  * @param type The type of the core to create.
  * @param name The name of the core. It can be a nullptr or empty string to have a name automatically assigned.
  * @param initString An initialization string to send to the core. The format is similar to command line arguments.
- *                   Typical options include a broker name, the broker address, the number of federates etc.
+ *                   Typical options include a broker name, the broker address, the number of federates, etc.
  * @forcpponly
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
  * @endforcpponly
@@ -79,8 +79,8 @@ HELICS_EXPORT helics_core helicsCreateCore(const char* type, const char* name, c
  * @endforcpponly
  * @param argv The list of string values from a command line.
  * @forcpponly
- * @param[in,out] err An error object that will contain an error code and string.
- *                    If any error occurred during the execution of the function.
+ * @param[in,out] err An error object that will contain an error code and string
+ *                    if any error occurred during the execution of the function.
  * @endforcpponly
  *
  * @return A helics_core object.
@@ -91,7 +91,7 @@ HELICS_EXPORT helics_core
 /**
  * Create a new reference to an existing core.
  *
- * @details This will create a new broker object that references the existing broker it must be freed as well.
+ * @details This will create a new broker object that references the existing broker. The new broker object must be freed as well.
  *
  * @param core An existing helics_core.
  * @forcpponly
@@ -115,7 +115,7 @@ HELICS_EXPORT helics_bool helicsCoreIsValid(helics_core core);
  * @param type The type of the broker to create.
  * @param name The name of the broker. It can be a nullptr or empty string to have a name automatically assigned.
  * @param initString An initialization string to send to the core-the format is similar to command line arguments.
- *                   Typical options include a broker address  --broker="XSSAF" if this is a subbroker or the number of federates or the address
+ *                   Typical options include a broker address such as --broker="XSSAF" if this is a subbroker, or the number of federates, or the address.
  * @forcpponly
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
  * @endforcpponly
@@ -155,23 +155,23 @@ HELICS_EXPORT helics_broker
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
  * @endforcpponly
  *
- * @return A new reference to the same broker
+ * @return A new reference to the same broker.
  */
 HELICS_EXPORT helics_broker helicsBrokerClone(helics_broker broker, helics_error* err);
 
 /**
  * Check if a broker object is a valid object.
  *
- * @param broker The helics_broker object to test
+ * @param broker The helics_broker object to test.
  */
 HELICS_EXPORT helics_bool helicsBrokerIsValid(helics_broker broker);
 
 /**
  * Check if a broker is connected.
  *
- * @details A connected broker implies is attached to cores or cores could reach out to communicate.
+ * @details A connected broker implies it is attached to cores or cores could reach out to communicate.
  *
- * @return helics_false if not connected
+ * @return helics_false if not connected.
  */
 HELICS_EXPORT helics_bool helicsBrokerIsConnected(helics_broker broker);
 
@@ -251,7 +251,7 @@ HELICS_EXPORT helics_bool helicsBrokerWaitForDisconnect(helics_broker broker, in
 /**
  * Check if a core is connected.
  *
- * @details A connected core implies is attached to federate or federates could be attached to it
+ * @details A connected core implies it is attached to federates or federates could be attached to it
  *
  * Return helics_false if not connected, helics_true if it is connected.
  */
@@ -262,7 +262,7 @@ HELICS_EXPORT helics_bool helicsCoreIsConnected(helics_core core);
  *
  * @param core The core to generate the connection from.
  * @param source The name of the publication (cannot be NULL).
- * @param target The named of the target to send the publication data (cannot be NULL).
+ * @param target The name of the target to send the publication data (cannot be NULL).
  * @forcpponly
  * @param[in,out] err A helics_error object, can be NULL if the errors are to be ignored.
  * @endforcpponly
@@ -343,8 +343,8 @@ HELICS_EXPORT const char* helicsCoreGetAddress(helics_core core);
 /**
  * Set the core to ready for init.
  *
- * @details This function is used for cores that have filters but no federates so there needs to be.
- *          A direct signal to the core to trigger the federation initialization.
+ * @details This function is used for cores that have filters but no federates so there needs to be
+ *          a direct signal to the core to trigger the federation initialization.
  *
  * @param core The core object to enable init values for.
  * @forcpponly
@@ -376,8 +376,8 @@ HELICS_EXPORT void helicsCoreDisconnect(helics_core core, helics_error* err);
 /**
  * Get an existing federate object from a core by name.
  *
- * @details The federate must have been created by one of the other functions and at least one of the objects referencing the created.
- *          Federate must still be active in the process.
+ * @details The federate must have been created by one of the other functions and at least one of the objects referencing the created
+ *          federate must still be active in the process.
  *
  * @param fedName The name of the federate to retrieve.
  * @forcpponly
@@ -399,7 +399,7 @@ HELICS_EXPORT helics_federate helicsGetFederateByName(const char* fedName, helic
 HELICS_EXPORT void helicsBrokerDisconnect(helics_broker broker, helics_error* err);
 
 /**
- * Disconnect and free a broker.
+ * Disconnect and free a federate.
  */
 HELICS_EXPORT void helicsFederateDestroy(helics_federate fed);
 
@@ -502,7 +502,7 @@ HELICS_EXPORT helics_federate helicsCreateMessageFederateFromConfig(const char* 
 HELICS_EXPORT helics_federate helicsCreateCombinationFederate(const char* fedName, helics_federate_info fi, helics_error* err);
 
 /**
- * Create a combination federate from a JSON file or JSON string.
+ * Create a combination federate from a JSON file or JSON string or TOML file.
  *
  * @details Combination federates are both value federates and message federates, objects can be used in all functions
  *          that take a helics_federate, helics_message_federate or helics_federate object as an argument
@@ -519,7 +519,7 @@ HELICS_EXPORT helics_federate helicsCreateCombinationFederateFromConfig(const ch
 /**
  * Create a new reference to an existing federate.
  *
- * @details This will create a new helics_federate object that references the existing federate it must be freed as well.
+ * @details This will create a new helics_federate object that references the existing federate. The new object must be freed as well.
  *
  * @param fed An existing helics_federate.
  * @forcpponly
@@ -550,7 +550,7 @@ HELICS_EXPORT helics_federate_info helicsCreateFederateInfo(void);
 HELICS_EXPORT helics_federate_info helicsFederateInfoClone(helics_federate_info fi, helics_error* err);
 
 /**
- * Load a federate info from command line arguments.
+ * Load federate info from command line arguments.
  *
  * @param fi A federateInfo object.
  * @param argc The number of command line arguments.
@@ -657,7 +657,7 @@ HELICS_EXPORT void helicsFederateInfoSetBrokerKey(helics_federate_info fi, const
  * Set the port to use for the broker.
  *
  * @details This is only used if the core is automatically created, the broker information will be transferred to the core for connection.
- * This will only be useful for network broker connections
+ * This will only be useful for network broker connections.
  * @param fi The federate info object to alter.
  * @param brokerPort The integer port number to use for connection with a broker.
  * @forcpponly
@@ -679,21 +679,20 @@ HELICS_EXPORT void helicsFederateInfoSetBrokerPort(helics_federate_info fi, int 
 HELICS_EXPORT void helicsFederateInfoSetLocalPort(helics_federate_info fi, const char* localPort, helics_error* err);
 
 /**
- * Get a property index for use in /ref helicsFederateInfoSetFlagOption, /ref helicsFederateInfoSetTimeProperty.
- *
- * HelicsFederateInfoSetIntegerProperty
+ * Get a property index for use in /ref helicsFederateInfoSetFlagOption, /ref helicsFederateInfoSetTimeProperty,
+ * or /ref helicsFederateInfoSetIntegerProperty
  * @param val A string with the property name.
- * @return An int with the property code (-1) if not a valid property.
+ * @return An int with the property code or (-1) if not a valid property.
  */
 HELICS_EXPORT int helicsGetPropertyIndex(const char* val);
 
 /**
- * Get an option index for use in /ref helicsPublicationSetOption, /ref helicsInputSetOption, /ref helicsEndpointSetOption, /ref
- * HelicsFilterSetOption, and the corresponding get functions
+ * Get an option index for use in /ref helicsPublicationSetOption, /ref helicsInputSetOption, /ref helicsEndpointSetOption,
+ * /ref helicsFilterSetOption, and the corresponding get functions.
  *
  * @param val A string with the option name.
  *
- * @return An int with the option index (-1) if not a valid property.
+ * @return An int with the option index or (-1) if not a valid property.
  */
 HELICS_EXPORT int helicsGetOptionIndex(const char* val);
 
@@ -714,7 +713,7 @@ HELICS_EXPORT void helicsFederateInfoSetFlagOption(helics_federate_info fi, int 
  * Set the separator character in the info structure.
  *
  * @details The separator character is the separation character for local publications/endpoints in creating their global name.
- * For example if the separator character is '/'  then a local endpoint would have a globally reachable name of fedName/localName
+ * For example if the separator character is '/'  then a local endpoint would have a globally reachable name of fedName/localName.
  * @param fi The federate info object to alter.
  * @param separator The character to use as a separator.
  * @forcpponly
@@ -763,9 +762,9 @@ HELICS_EXPORT void helicsFederateInfoSetIntegerProperty(helics_federate_info fi,
 HELICS_EXPORT void helicsFederateRegisterInterfaces(helics_federate fed, const char* file, helics_error* err);
 
 /**
- * Generate a global Error from a federate.
+ * Generate a global error from a federate.
  *
- * @details A global error halts the co-simulation completely
+ * @details A global error halts the co-simulation completely.
  *
  * @param fed The federate to create an error in.
  * @param error_code The integer code for the error.
@@ -785,7 +784,7 @@ HELICS_EXPORT void helicsFederateGlobalError(helics_federate fed, int error_code
 HELICS_EXPORT void helicsFederateLocalError(helics_federate fed, int error_code, const char* error_string);
 
 /**
- * Finalize the federate this function halts all communication in the federate and disconnects it from the core.
+ * Finalize the federate. This function halts all communication in the federate and disconnects it from the core.
  */
 HELICS_EXPORT void helicsFederateFinalize(helics_federate fed, helics_error* err);
 
@@ -806,7 +805,7 @@ HELICS_EXPORT void helicsFederateFree(helics_federate fed);
 
 /**
  * Call when done using the helics library.
- * This function will ensure the threads are closed properly if possible this should be the last call before exiting.
+ * This function will ensure the threads are closed properly. If possible this should be the last call before exiting.
  */
 HELICS_EXPORT void helicsCloseLibrary(void);
 
@@ -864,8 +863,8 @@ HELICS_EXPORT void helicsFederateEnterInitializingModeComplete(helics_federate f
 /**
  * Request that the federate enter the Execution mode.
  *
- * @details This call is blocking until granted entry by the core object for an asynchronous alternative call.
- *          /ref helicsFederateEnterExecutingModeAsync on return from this call the federate will be at time 0
+ * @details This call is blocking until granted entry by the core object. On return from this call the federate will be at time 0.
+ *          For an asynchronous alternative call see /ref helicsFederateEnterExecutingModeAsync.
  *
  * @param fed A federate to change modes.
  * @forcpponly
@@ -877,8 +876,7 @@ HELICS_EXPORT void helicsFederateEnterExecutingMode(helics_federate fed, helics_
 /**
  * Request that the federate enter the Execution mode.
  *
- * @details This call is non-blocking and will return immediately call /ref helicsFederateEnterExecutingModeComplete to finish the call.
- *          Sequence /ref helicsFederateEnterExecutingModeComplete
+ * @details This call is non-blocking and will return immediately. Call /ref helicsFederateEnterExecutingModeComplete to finish the call sequence.
  *
  * @param fed The federate object to complete the call.
  * @forcpponly
@@ -888,7 +886,7 @@ HELICS_EXPORT void helicsFederateEnterExecutingMode(helics_federate fed, helics_
 HELICS_EXPORT void helicsFederateEnterExecutingModeAsync(helics_federate fed, helics_error* err);
 
 /**
- * Complete the call to /ref EnterExecutingModeAsync.
+ * Complete the call to /ref helicsFederateEnterExecutingModeAsync.
  *
  * @param fed The federate object to complete the call.
  * @forcpponly
@@ -900,8 +898,8 @@ HELICS_EXPORT void helicsFederateEnterExecutingModeComplete(helics_federate fed,
 /**
  * Request an iterative time.
  *
- * @details This call allows for finer grain control of the iterative process then /ref helicsFederateRequestTime it takes a time and.
- *          Iteration request and return a time and iteration status
+ * @details This call allows for finer grain control of the iterative process than /ref helicsFederateRequestTime. It takes a time and
+ *          iteration request, and returns a time and iteration status.
  *
  * @param fed The federate to make the request of.
  * @param iterate The requested iteration mode.
@@ -917,8 +915,8 @@ HELICS_EXPORT helics_iteration_result
 /**
  * Request an iterative entry to the execution mode.
  *
- * @details This call allows for finer grain control of the iterative process then /ref helicsFederateRequestTime it takes a time and
- *          Iteration request and returns a time and iteration status
+ * @details This call allows for finer grain control of the iterative process than /ref helicsFederateRequestTime. It takes a time and
+ *          iteration request, and returns a time and iteration status
  *
  * @param fed The federate to make the request of.
  * @param iterate The requested iteration mode.
@@ -929,7 +927,7 @@ HELICS_EXPORT helics_iteration_result
 HELICS_EXPORT void helicsFederateEnterExecutingModeIterativeAsync(helics_federate fed, helics_iteration_request iterate, helics_error* err);
 
 /**
- * Complete the asynchronous iterative call into ExecutionModel.
+ * Complete the asynchronous iterative call into ExecutionMode.
  *
  * @param fed The federate to make the request of.
  * @forcpponly
@@ -943,7 +941,7 @@ HELICS_EXPORT helics_iteration_result helicsFederateEnterExecutingModeIterativeC
 /**
  * Get the current state of a federate.
  *
- * @param fed The fed to query.
+ * @param fed The federate to query.
  * @forcpponly
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
  * @endforcpponly
@@ -993,8 +991,8 @@ HELICS_EXPORT helics_time helicsFederateRequestTimeAdvance(helics_federate fed, 
 /**
  * Request the next time step for federate execution.
  *
- * @details Feds should have setup the period or minDelta for this to work well but it will request the next time step which is the current.
- * Time plus the minimum time step
+ * @details Feds should have setup the period or minDelta for this to work well but it will request the next time step which is the current
+ * time plus the minimum time step.
  *
  * @param fed The federate to make the request of.
  * @forcpponly
@@ -1008,14 +1006,14 @@ HELICS_EXPORT helics_time helicsFederateRequestNextStep(helics_federate fed, hel
 /**
  * Request an iterative time.
  *
- * @details This call allows for finer grain control of the iterative process then /ref helicsFederateRequestTime it takes a time and and.
- * Iteration request and return a time and iteration status
+ * @details This call allows for finer grain control of the iterative process than /ref helicsFederateRequestTime. It takes a time and and
+ * iteration request, and returns a time and iteration status.
  *
  * @param fed The federate to make the request of.
  * @param requestTime The next desired time.
  * @param iterate The requested iteration mode.
  * @forcpponly
- * @param[out] outIteration  the iteration specification of the result.
+ * @param[out] outIteration  The iteration specification of the result.
  * @endforcpponly
  * @forcpponly
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
@@ -1061,8 +1059,8 @@ HELICS_EXPORT helics_time helicsFederateRequestTimeComplete(helics_federate fed,
 /**
  * Request an iterative time through an asynchronous call.
  *
- * @details This call allows for finer grain control of the iterative process then /ref helicsFederateRequestTime it takes a time an.
- * Iteration request and returns a time and iteration status call /ref helicsFederateRequestTimeIterativeComplete to finish the process
+ * @details This call allows for finer grain control of the iterative process than /ref helicsFederateRequestTime. It takes a time and
+ * iteration request, and returns a time and iteration status. Call /ref helicsFederateRequestTimeIterativeComplete to finish the process.
  *
  * @param fed The federate to make the request of.
  * @param requestTime The next desired time.
@@ -1106,7 +1104,7 @@ HELICS_EXPORT const char* helicsFederateGetName(helics_federate fed);
 /**
  * Set a time based property for a federate.
  *
- * @param fed The federate object set the property for.
+ * @param fed The federate object to set the property for.
  * @param timeProperty A integer code for a time property.
  * @param time The requested value of the property.
  * @forcpponly
@@ -1120,7 +1118,7 @@ HELICS_EXPORT void helicsFederateSetTimeProperty(helics_federate fed, int timePr
  *
  * @param fed The federate to alter a flag for.
  * @param flag The flag to change.
- * @param flagValue The new value of the flag 0 for false !=0 for true.
+ * @param flagValue The new value of the flag. 0 for false, !=0 for true.
  * @forcpponly
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
  * @endforcpponly
@@ -1131,7 +1129,7 @@ HELICS_EXPORT void helicsFederateSetFlagOption(helics_federate fed, int flag, he
  * Set the separator character in a federate.
  *
  * @details The separator character is the separation character for local publications/endpoints in creating their global name.
- *          For example if the separator character is '/' then a local endpoint would have a globally reachable name of fedName/localName
+ *          For example if the separator character is '/' then a local endpoint would have a globally reachable name of fedName/localName.
  *
  * @param fed The federate info object to alter.
  * @param separator The character to use as a separator.
@@ -1227,7 +1225,7 @@ HELICS_EXPORT void helicsFederateSetGlobal(helics_federate fed, const char* valu
 HELICS_EXPORT void helicsFederateAddDependency(helics_federate fed, const char* fedName, helics_error* err);
 
 /**
- * Set the logging file for a federate(actually on the core associated with a federate).
+ * Set the logging file for a federate (actually on the core associated with a federate).
  *
  * @param fed The federate to set the log file for.
  * @param logFile The name of the log file.
@@ -1240,7 +1238,7 @@ HELICS_EXPORT void helicsFederateSetLogFile(helics_federate fed, const char* log
 /**
  * Log an error message through a federate.
  *
- * @param fed The federate to set the global through.
+ * @param fed The federate to log the error message through.
  * @param logmessage The message to put in the log.
  * @forcpponly
  * @param[in,out] err A pointer to an error object for catching errors.
@@ -1251,7 +1249,7 @@ HELICS_EXPORT void helicsFederateLogErrorMessage(helics_federate fed, const char
 /**
  * Log a warning message through a federate.
  *
- * @param fed The federate to set the global through.
+ * @param fed The federate to log the warning message through.
  * @param logmessage The message to put in the log.
  * @forcpponly
  * @param[in,out] err A pointer to an error object for catching errors.
@@ -1260,9 +1258,9 @@ HELICS_EXPORT void helicsFederateLogErrorMessage(helics_federate fed, const char
 HELICS_EXPORT void helicsFederateLogWarningMessage(helics_federate fed, const char* logmessage, helics_error* err);
 
 /**
- * Log a message through a federate.
+ * Log an info message through a federate.
  *
- * @param fed The federate to set the global through.
+ * @param fed The federate to log the info message through.
  * @param logmessage The message to put in the log.
  * @forcpponly
  * @param[in,out] err A pointer to an error object for catching errors.
@@ -1271,9 +1269,9 @@ HELICS_EXPORT void helicsFederateLogWarningMessage(helics_federate fed, const ch
 HELICS_EXPORT void helicsFederateLogInfoMessage(helics_federate fed, const char* logmessage, helics_error* err);
 
 /**
- * Log a message through a federate.
+ * Log a debug message through a federate.
  *
- * @param fed The federate to set the global through.
+ * @param fed The federate to log the debug message through.
  * @param logmessage The message to put in the log.
  * @forcpponly
  * @param[in,out] err A pointer to an error object for catching errors.
@@ -1284,7 +1282,7 @@ HELICS_EXPORT void helicsFederateLogDebugMessage(helics_federate fed, const char
 /**
  * Log a message through a federate.
  *
- * @param fed The federate to set the global through.
+ * @param fed The federate to log the message through.
  * @param loglevel The level of the message to log see /ref helics_log_levels.
  * @param logmessage The message to put in the log.
  * @forcpponly
@@ -1322,9 +1320,9 @@ HELICS_EXPORT void helicsCoreSetGlobal(helics_core core, const char* valueName, 
 HELICS_EXPORT void helicsBrokerSetGlobal(helics_broker broker, const char* valueName, const char* value, helics_error* err);
 
 /**
- * Set a the log file on a core.
+ * Set the log file on a core.
  *
- * @param core The core to set the global through.
+ * @param core The core to set the log file for.
  * @param logFileName The name of the file to log to.
  * @forcpponly
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
@@ -1333,9 +1331,9 @@ HELICS_EXPORT void helicsBrokerSetGlobal(helics_broker broker, const char* value
 HELICS_EXPORT void helicsCoreSetLogFile(helics_core core, const char* logFileName, helics_error* err);
 
 /**
- * Set a the log file on a broker.
+ * Set the log file on a broker.
  *
- * @param broker The broker to set the global through.
+ * @param broker The broker to set the log file for.
  * @param logFileName The name of the file to log to.
  * @forcpponly
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
@@ -1364,8 +1362,8 @@ HELICS_EXPORT helics_query helicsCreateQuery(const char* target, const char* que
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
  * @endforcpponly
  *
- * @return A pointer to a string.  the string will remain valid until the query is freed or executed again.
- *         The return will be nullptr if fed or query is an invalid object, the return string will be "#invalid" if the query itself was invalid
+ * @return A pointer to a string.  The string will remain valid until the query is freed or executed again.
+ *         The return will be nullptr if fed or query is an invalid object, the return string will be "#invalid" if the query itself was invalid.
  */
 HELICS_EXPORT const char* helicsQueryExecute(helics_query query, helics_federate fed, helics_error* err);
 
@@ -1380,8 +1378,8 @@ HELICS_EXPORT const char* helicsQueryExecute(helics_query query, helics_federate
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
  * @endforcpponly
  *
- * @return A pointer to a string.  the string will remain valid until the query is freed or executed again.
- *         The return will be nullptr if fed or query is an invalid object, the return string will be "#invalid" if the query itself was invalid
+ * @return A pointer to a string.  The string will remain valid until the query is freed or executed again.
+ *         The return will be nullptr if core or query is an invalid object, the return string will be "#invalid" if the query itself was invalid.
  */
 HELICS_EXPORT const char* helicsQueryCoreExecute(helics_query query, helics_core core, helics_error* err);
 
@@ -1396,8 +1394,8 @@ HELICS_EXPORT const char* helicsQueryCoreExecute(helics_query query, helics_core
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
  * @endforcpponly
  *
- * @return A pointer to a string.  the string will remain valid until the query is freed or executed again.
- *         The return will be nullptr if fed or query is an invalid object, the return string will be "#invalid" if the query itself was invalid
+ * @return A pointer to a string.  The string will remain valid until the query is freed or executed again.
+ *         The return will be nullptr if broker or query is an invalid object, the return string will be "#invalid" if the query itself was invalid
  */
 HELICS_EXPORT const char* helicsQueryBrokerExecute(helics_query query, helics_broker broker, helics_error* err);
 
@@ -1434,8 +1432,8 @@ HELICS_EXPORT const char* helicsQueryExecuteComplete(helics_query query, helics_
  *
  * @param query The query object to check if completed.
  *
- * @return Will return helics_true if an asynchronous query has complete or a regular query call was made with a result.
- *         And false if an asynchronous query has not completed or is invalid
+ * @return Will return helics_true if an asynchronous query has completed or a regular query call was made with a result,
+ *         and false if an asynchronous query has not completed or is invalid
  */
 HELICS_EXPORT helics_bool helicsQueryIsCompleted(helics_query query);
 

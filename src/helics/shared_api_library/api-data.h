@@ -10,7 +10,7 @@ SPDX-License-Identifier: BSD-3-Clause
 
 /**
  * @file
- * @brief data structures for the C-API
+ * @brief Data structures for the C api
  */
 
 #include "../helics_enums.h"
@@ -154,7 +154,7 @@ typedef struct helics_message {
 /**
  * helics error object
  *
- * if error_code==0 there is no error, if error_code!=0 there is an error and message will contain a string
+ * if error_code==0 there is no error, if error_code!=0 there is an error and message will contain a string,
  * otherwise it will be an empty string
  */
 typedef struct helics_error {
