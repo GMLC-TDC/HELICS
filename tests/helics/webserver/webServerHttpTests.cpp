@@ -95,9 +95,6 @@ class httpTest: public ::testing::Test {
 
         // Receive the HTTP response
         http::read(*stream, buffer, res);
-        if (res.result() == http::status::not_found) {
-            return "#invalid";
-        }
         return res.body();
     }
 
@@ -239,13 +236,22 @@ TEST_F(httpTest, singleNonJson)
 TEST_F(httpTest, garbage)
 {
     auto result = sendGet("garbage");
-    EXPECT_EQ(result, "#invalid");
+    EXPECT_TRUE(result.find("not") != std::string::npos);
 }
 
 TEST_F(httpTest, bad_request)
 {
     auto result = sendCommand(http::verb::copy,"/search/brk2","");
     EXPECT_TRUE(result.find("Unknown")!=std::string::npos);
+}
+
+TEST_F(httpTest, not_found)
+{
+    auto result = sendGet("/broker7");
+    EXPECT_TRUE(result.find("not") != std::string::npos);
+
+    result = sendGet( "/brk2/ch5");
+    EXPECT_TRUE(result.find("not found") != std::string::npos);
 }
 
 TEST_F(httpTest, core)

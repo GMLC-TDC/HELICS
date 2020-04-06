@@ -275,19 +275,24 @@ TEST_F(webTest, create)
     create["command"] = "create";
     create["broker"] = "brk3";
     create["type"] = "TCP";
+    create["args"] = "-f1";
 
-    auto result = sendText(generateJsonString(create));
+    sendText(generateJsonString(create));
 
     Json::Value query;
     query["command"] = "query";
     query["broker"] = "brokers";
-    result = sendText(generateJsonString(query));
+    auto result = sendText(generateJsonString(query));
 
     EXPECT_FALSE(result.empty());
     auto val = loadJson(result);
     EXPECT_TRUE(val["brokers"].isArray());
     EXPECT_EQ(val["brokers"].size(), 3U);
     EXPECT_STREQ(val["brokers"][2]["name"].asCString(), "brk3");
+
+    result=sendText(generateJsonString(create));
+    val = loadJson(result);
+    EXPECT_NE(val["status"].asInt(), 0);
 }
 
 

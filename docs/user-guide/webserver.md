@@ -16,7 +16,7 @@ The web server is configured by default on the localhost address port 80.  If yo
     "http":{
         "port":8080,
         "interface":"0.0.0.0"
-    }
+    },
     "webscoket":{
         "port":8008,
         "interface":"0.0.0.0"
@@ -215,5 +215,14 @@ Currently any query is accessible through this interface.  Queries have a target
 ## Json
 for both the websockets and REST api they can accept arguments in JSON format.
 For the REST API the parameters can be a combination of arguments in the URI and JSON in the body of the request
+For example
+```json
+{
+    "command":"search",
+    "broker":"broker1",
+    "target":"federate0",
+    "query":"current_state"
+}
+```
 
 The most likely use case for this will be as a component for a more sophisticated control interface, so a more user friendly setup will be using the webserver as a back-end for control, debugging, information, and visualization of a running co-simulation.  
