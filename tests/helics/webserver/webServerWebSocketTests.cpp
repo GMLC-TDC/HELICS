@@ -293,6 +293,13 @@ TEST_F(webTest, create)
     result=sendText(generateJsonString(create));
     val = loadJson(result);
     EXPECT_NE(val["status"].asInt(), 0);
+
+    create["type"] = "NULLCORE";
+    create["broker"] = "brk_null";
+    result = sendText(generateJsonString(create));
+    val = loadJson(result);
+    EXPECT_NE(val["status"].asInt(), 0);
+    EXPECT_TRUE(result.find("not available") != std::string::npos);
 }
 
 
