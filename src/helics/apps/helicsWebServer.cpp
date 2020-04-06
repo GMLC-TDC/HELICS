@@ -221,7 +221,7 @@ std::pair<return_val, std::string> generateResults(
     if (command == cmd::unknown) {
         if (fields.find("command") != fields.end()) {
             auto cmdstr = fields.at("command");
-            if (cmdstr == "query") {
+            if (cmdstr == "query"||cmdstr=="search") {
                 command = cmd::query;
             }
             if (cmdstr == "create") {
@@ -238,7 +238,7 @@ std::pair<return_val, std::string> generateResults(
     if (command == cmd::create && brokerName == "create") {
         brokerName.clear();
     }
-    if (command == cmd::remove && brokerName == "delete") {
+    if (command == cmd::remove && (brokerName == "delete"||brokerName=="remove")) {
         brokerName.clear();
     }
 
@@ -252,7 +252,7 @@ std::pair<return_val, std::string> generateResults(
             target = fields.at("target");
         }
     }
-    if (brokerName.empty() || brokerName == "query") {
+    if (brokerName.empty() || brokerName == "query"||brokerName=="search") {
         if (fields.find("broker") != fields.end()) {
             brokerName = fields.at("broker");
         }
@@ -338,11 +338,14 @@ std::pair<return_val, std::string> generateResults(
     return {return_val::not_found, "query not recognized"};
 }
 
+// LCOV_EXCL_START
 // Report a failure
 static void fail(beast::error_code ec, char const* what)
 {
     std::cerr << what << ": " << ec.message() << "\n";
 }
+
+// LCOV_EXCL_STOP
 
 // Echoes back all received WebSocket messages
 class WebSocketsession: public std::enable_shared_from_this<WebSocketsession> {
@@ -569,13 +572,13 @@ void handle_request(http::request<Body, http::basic_fields<Allocator>>&& req, Se
     partitionTarget(reqpr.first, brokerName, query, targetObj);
 
     if (method == http::verb::post) {
-        if (brokerName == "delete") {
+        if (brokerName == "delete"||brokerName=="remove") {
             command = cmd::remove;
             brokerName.clear();
         } else if (brokerName == "create") {
             command = cmd::create;
             brokerName.clear();
-        } else if (brokerName == "query") {
+        } else if (brokerName == "query"||brokerName=="search") {
             command = cmd::query;
             brokerName.clear();
         }

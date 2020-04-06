@@ -229,6 +229,20 @@ TEST_F(webTest, garbage)
     EXPECT_NE(val["status"].asInt(),0);
 }
 
+
+TEST_F(webTest, singleNonJson)
+{
+    Json::Value query;
+    query["command"] = "query";
+    query["broker"] = "brk1";
+    query["query"] = "isconnected";
+    auto result = sendText(generateJsonString(query));
+    EXPECT_FALSE(result.empty());
+    auto val = loadJson(result);
+    EXPECT_EQ(val["status"].asInt(), 0);
+    EXPECT_STREQ(val["value"].asCString(), "true");
+}
+
 TEST_F(webTest, core)
 {
     auto cr = addCore(helics::core_type::TEST, "--name=cr1 -f2");
