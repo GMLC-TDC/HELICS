@@ -1366,7 +1366,9 @@ HELICS_EXPORT helics_query helicsCreateQuery(const char* target, const char* que
  * @endforcpponly
  *
  * @return A pointer to a string.  The string will remain valid until the query is freed or executed again.
+ * @forcpponly
  *         The return will be nullptr if fed or query is an invalid object, the return string will be "#invalid" if the query itself was invalid.
+ * @endforcpponly
  */
 HELICS_EXPORT const char* helicsQueryExecute(helics_query query, helics_federate fed, helics_error* err);
 
@@ -1382,7 +1384,9 @@ HELICS_EXPORT const char* helicsQueryExecute(helics_query query, helics_federate
  * @endforcpponly
  *
  * @return A pointer to a string.  The string will remain valid until the query is freed or executed again.
+ * @forcpponly
  *         The return will be nullptr if core or query is an invalid object, the return string will be "#invalid" if the query itself was invalid.
+ * @endforcpponly
  */
 HELICS_EXPORT const char* helicsQueryCoreExecute(helics_query query, helics_core core, helics_error* err);
 
@@ -1398,7 +1402,9 @@ HELICS_EXPORT const char* helicsQueryCoreExecute(helics_query query, helics_core
  * @endforcpponly
  *
  * @return A pointer to a string.  The string will remain valid until the query is freed or executed again.
+ * @forcpponly
  *         The return will be nullptr if broker or query is an invalid object, the return string will be "#invalid" if the query itself was invalid
+ * @endforcpponly
  */
 HELICS_EXPORT const char* helicsQueryBrokerExecute(helics_query query, helics_broker broker, helics_error* err);
 
@@ -1424,7 +1430,9 @@ HELICS_EXPORT void helicsQueryExecuteAsync(helics_query query, helics_federate f
  * @endforcpponly
  *
  * @return A pointer to a string. The string will remain valid until the query is freed or executed again.
+ * @forcpponly
  *         The return will be nullptr if query is an invalid object
+ * @endforcpponly
  */
 HELICS_EXPORT const char* helicsQueryExecuteComplete(helics_query query, helics_error* err);
 

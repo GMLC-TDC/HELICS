@@ -35,7 +35,10 @@ extern "C" {
  * @param[in,out] err A pointer to an error object for catching errors.
  * @endforcpponly
  *
- * @return An object containing the endpoint, nullptr on failure.
+ * @return An object containing the endpoint.
+ * @forcpponly
+ *         nullptr on failure.
+ * @endforcpponly
  */
 HELICS_EXPORT helics_endpoint helicsFederateRegisterEndpoint(helics_federate fed, const char* name, const char* type, helics_error* err);
 
@@ -52,7 +55,10 @@ HELICS_EXPORT helics_endpoint helicsFederateRegisterEndpoint(helics_federate fed
  * @forcpponly
  * @param[in,out] err A pointer to an error object for catching errors.
  * @endforcpponly
- * @return An object containing the endpoint, nullptr on failure.
+ * @return An object containing the endpoint.
+ * @forcpponly
+ *         nullptr on failure.
+ * @endforcpponly
  */
 HELICS_EXPORT helics_endpoint
     helicsFederateRegisterGlobalEndpoint(helics_federate fed, const char* name, const char* type, helics_error* err);
@@ -113,7 +119,13 @@ HELICS_EXPORT const char* helicsEndpointGetDefaultDestination(helics_endpoint en
  * Send a message to the specified destination.
  *
  * @param endpoint The endpoint to send the data from.
- * @param dest The target destination (nullptr to use the default destination).
+ * @param dest The target destination.
+ * @forcpponly
+ *             nullptr to use the default destination.
+ * @endforcpponly
+ * @beginpythononly
+ *             "" to use the default destination.
+ * @endpythononly
  * @param data The data to send.
  * @forcpponly
  * @param inputDataLength The length of the data to send.
@@ -127,7 +139,13 @@ HELICS_EXPORT void
  * Send a message at a specific time to the specified destination.
  *
  * @param endpoint The endpoint to send the data from.
- * @param dest The target destination (nullptr to use the default destination).
+ * @param dest The target destination.
+ * @forcpponly
+ *             nullptr to use the default destination.
+ * @endforcpponly
+ * @beginpythononly
+ *             "" to use the default destination.
+ * @endpythononly
  * @param data The data to send.
  * @forcpponly
  * @param inputDataLength The length of the data to send.
