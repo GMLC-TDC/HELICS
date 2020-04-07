@@ -246,7 +246,7 @@ HELICS_EXPORT helics_message helicsFederateGetMessage(helics_federate fed);
  *          So all messages that are available for the first endpoint, then all for the second, and so on.
  *          Within a single endpoint, the messages are ordered by time, then source_id, then order of arrival.
  *
- * @return A helics_message_object which references the data in the message
+ * @return A helics_message_object which references the data in the message.
  */
 HELICS_EXPORT helics_message_object helicsFederateGetMessageObject(helics_federate fed);
 

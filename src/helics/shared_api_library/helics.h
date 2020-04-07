@@ -64,7 +64,7 @@ HELICS_EXPORT helics_bool helicsIsCoreTypeAvailable(const char* type);
  *
  * @return A helics_core object.
  * @forcpponly
- * If the core is invalid, err will contain the corresponding error message.
+ * If the core is invalid, err will contain the corresponding error message and the returned object will be NULL.
  * @endforcpponly
  */
 HELICS_EXPORT helics_core helicsCreateCore(const char* type, const char* name, const char* initString, helics_error* err);
@@ -244,6 +244,7 @@ HELICS_EXPORT helics_bool helicsCoreWaitForDisconnect(helics_core core, int msTo
  * @forcpponly
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
  * @endforcpponly
+ *
  * @return helics_true if the disconnect was successful, helics_false if there was a timeout.
  */
 HELICS_EXPORT helics_bool helicsBrokerWaitForDisconnect(helics_broker broker, int msToWait, helics_error* err);
@@ -253,7 +254,7 @@ HELICS_EXPORT helics_bool helicsBrokerWaitForDisconnect(helics_broker broker, in
  *
  * @details A connected core implies it is attached to federates or federates could be attached to it
  *
- * Return helics_false if not connected, helics_true if it is connected.
+ * @return helics_false if not connected, helics_true if it is connected.
  */
 HELICS_EXPORT helics_bool helicsCoreIsConnected(helics_core core);
 
@@ -325,7 +326,7 @@ HELICS_EXPORT const char* helicsCoreGetIdentifier(helics_core core);
 /**
  * Get the network address associated with a broker.
  *
- * @param Broker The broker to query.
+ * @param broker The broker to query.
  *
  * @return A string with the network address of the broker.
  */
@@ -360,6 +361,8 @@ HELICS_EXPORT void helicsCoreSetReadyToInit(helics_core core, helics_error* err)
  * @forcpponly
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
  * @endforcpponly
+ *
+ * @return helics_false if not connected, helics_true if it is connected.
  */
 HELICS_EXPORT helics_bool helicsCoreConnect(helics_core core, helics_error* err);
 
@@ -971,8 +974,8 @@ HELICS_EXPORT helics_core helicsFederateGetCoreObject(helics_federate fed, helic
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
  * @endforcpponly
  *
- * @return The time granted to the federate, will return helics_time_maxtime if the simulation has terminated.
- * Invalid*/
+ * @return The time granted to the federate, will return helics_time_maxtime if the simulation has terminated or is invalid.
+ */
 HELICS_EXPORT helics_time helicsFederateRequestTime(helics_federate fed, helics_time requestTime, helics_error* err);
 
 /**
@@ -984,8 +987,8 @@ HELICS_EXPORT helics_time helicsFederateRequestTime(helics_federate fed, helics_
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
  * @endforcpponly
  *
- * @return The time granted to the federate, will return helics_time_maxtime if the simulation has terminated.
- * Invalid*/
+ * @return The time granted to the federate, will return helics_time_maxtime if the simulation has terminated or is invalid
+ */
 HELICS_EXPORT helics_time helicsFederateRequestTimeAdvance(helics_federate fed, helics_time timeDelta, helics_error* err);
 
 /**
@@ -999,8 +1002,8 @@ HELICS_EXPORT helics_time helicsFederateRequestTimeAdvance(helics_federate fed, 
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
  * @endforcpponly
  *
- * @return The time granted to the federate, will return helics_time_maxtime if the simulation has terminated.
- * Invalid*/
+ * @return The time granted to the federate, will return helics_time_maxtime if the simulation has terminated or is invalid
+ */
 HELICS_EXPORT helics_time helicsFederateRequestNextStep(helics_federate fed, helics_error* err);
 
 /**

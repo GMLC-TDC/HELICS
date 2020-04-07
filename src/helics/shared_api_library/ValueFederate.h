@@ -559,6 +559,7 @@ HELICS_EXPORT char helicsInputGetChar(helics_input ipt, helics_error* err);
  * @forcpponly
  * @param[in,out] err A helics error object, if the object is not empty the function is bypassed otherwise it is filled in if there is an error.
  * @endforcpponly
+ *
  * @return A helics_complex structure with the value.
  */
 HELICS_EXPORT helics_complex helicsInputGetComplexObject(helics_input ipt, helics_error* err);
@@ -774,6 +775,7 @@ HELICS_EXPORT const char* helicsInputGetPublicationType(helics_input ipt);
  * Get the type of a publication.
  *
  * @param pub The publication to query.
+ *
  * @return A void enumeration, helics_ok if everything worked.
  */
 HELICS_EXPORT const char* helicsPublicationGetType(helics_publication pub);
