@@ -9,7 +9,7 @@
 package com.java.helics;
 
 /**
- *  enumeration of the different iteration results
+ * enumeration of the different iteration results
  */
 public final class helics_iteration_request {
   /**
