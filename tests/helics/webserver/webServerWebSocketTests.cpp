@@ -39,7 +39,7 @@ namespace http = beast::http; // from <boost/beast/http.hpp>
 namespace net = boost::asio; // from <boost/asio.hpp>
 using tcp = boost::asio::ip::tcp; // from <boost/asio/ip/tcp.hpp>
 
-const std::string localhost{ "localhost" };
+const std::string localhost{"localhost"};
 
 class webTest: public ::testing::Test {
   protected:
@@ -65,23 +65,21 @@ class webTest: public ::testing::Test {
         net::connect(stream->next_layer(), results.begin(), results.end());
 
         // Set a decorator to change the User-Agent of the handshake
-        stream->set_option(websocket::stream_base::decorator(
-            [](websocket::request_type& req)
-            {
-                req.set(http::field::user_agent,
-                    std::string(HELICS_VERSION_STRING) +
-                    " helics-websocket-test");
-            }));
+        stream->set_option(websocket::stream_base::decorator([](websocket::request_type& req) {
+            req.set(
+                http::field::user_agent,
+                std::string(HELICS_VERSION_STRING) + " helics-websocket-test");
+        }));
 
         // Perform the websocket handshake
         stream->handshake(localhost, "/");
-
     }
 
     // Per-test-suite tear-down.
     // Called after the last test in this test suite.
     // Can be omitted if not needed.
-    static void TearDownTestSuite() {
+    static void TearDownTestSuite()
+    {
         // Close the WebSocket connection
         stream->close(websocket::close_code::normal);
         webs->stopServer();
@@ -94,11 +92,11 @@ class webTest: public ::testing::Test {
         // Send the message
         stream->write(net::buffer(message));
         // Receive the HTTP response
-         // Clear the buffer
+        // Clear the buffer
         buffer.consume(buffer.size());
 
         stream->read(buffer);
-        std::string result{ boost::asio::buffer_cast<const char*>(buffer.data()),buffer.size() };
+        std::string result{boost::asio::buffer_cast<const char*>(buffer.data()), buffer.size()};
         if (result.empty()) {
             return "#invalid";
         }
@@ -136,7 +134,7 @@ class webTest: public ::testing::Test {
     // You can define per-test tear-down logic as usual.
     virtual void TearDown() {}
 
-private:
+  private:
     // Some expensive resource shared by all tests.
     static std::shared_ptr<helics::apps::WebServer> webs;
     static net::io_context ioc;
@@ -149,8 +147,6 @@ private:
     static std::vector<std::shared_ptr<helics::Broker>> brks;
     static std::vector<std::shared_ptr<helics::Core>> cores;
     static Json::Value config;
-
-
 };
 
 std::shared_ptr<helics::apps::WebServer> webTest::webs;
@@ -158,10 +154,9 @@ std::shared_ptr<helics::apps::WebServer> webTest::webs;
 std::vector<std::shared_ptr<helics::Broker>> webTest::brks;
 std::vector<std::shared_ptr<helics::Core>> webTest::cores;
 beast::flat_buffer webTest::buffer;
-std::unique_ptr< websocket::stream<tcp::socket>> webTest::stream;
+std::unique_ptr<websocket::stream<tcp::socket>> webTest::stream;
 net::io_context webTest::ioc;
 Json::Value webTest::config;
-
 
 TEST_F(webTest, test1)
 {
@@ -174,7 +169,6 @@ TEST_F(webTest, test1)
     EXPECT_TRUE(val["brokers"].isArray());
     EXPECT_EQ(val["brokers"].size(), 0U);
 }
-
 
 TEST_F(webTest, single)
 {
@@ -226,9 +220,8 @@ TEST_F(webTest, garbage)
 {
     auto result = sendText("garbage");
     auto val = loadJson(result);
-    EXPECT_NE(val["status"].asInt(),0);
+    EXPECT_NE(val["status"].asInt(), 0);
 }
-
 
 TEST_F(webTest, singleNonJson)
 {
@@ -265,9 +258,7 @@ TEST_F(webTest, core)
 
     auto result2 = sendText(generateJsonString(query));
     EXPECT_EQ(result, result2);
-
 }
-
 
 TEST_F(webTest, create)
 {
@@ -290,7 +281,7 @@ TEST_F(webTest, create)
     EXPECT_EQ(val["brokers"].size(), 3U);
     EXPECT_STREQ(val["brokers"][2]["name"].asCString(), "brk3");
 
-    result=sendText(generateJsonString(create));
+    result = sendText(generateJsonString(create));
     val = loadJson(result);
     EXPECT_NE(val["status"].asInt(), 0);
 
@@ -301,7 +292,6 @@ TEST_F(webTest, create)
     EXPECT_NE(val["status"].asInt(), 0);
     EXPECT_TRUE(result.find("not available") != std::string::npos);
 }
-
 
 TEST_F(webTest, deleteBroker)
 {
@@ -329,7 +319,6 @@ TEST_F(webTest, deleteBroker)
 
 TEST_F(webTest, deleteJson)
 {
-
     Json::Value v1;
     v1["command"] = "delete";
     v1["broker"] = "brk3";
