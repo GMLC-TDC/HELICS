@@ -10,6 +10,7 @@ package com.java.helics;
 
 /**
  *  Message_t mapped to a c compatible structure<br>
+ * <br>
  * this will be deprecated in HELICS 2.3 and removed in HELICS 3.0
  */
 public class helics_message {
@@ -83,28 +84,28 @@ public class helics_message {
   }
 
   /**
-   *  message identification information
+   *  message identification information 
    */
   public void setMessageID(SWIGTYPE_p_int32_t value) {
     helicsJNI.helics_message_messageID_set(swigCPtr, this, SWIGTYPE_p_int32_t.getCPtr(value));
   }
 
   /**
-   *  message identification information
+   *  message identification information 
    */
   public SWIGTYPE_p_int32_t getMessageID() {
     return new SWIGTYPE_p_int32_t(helicsJNI.helics_message_messageID_get(swigCPtr, this), true);
   }
 
   /**
-   *  flags related to the message
+   *  flags related to the message 
    */
   public void setFlags(SWIGTYPE_p_int16_t value) {
     helicsJNI.helics_message_flags_set(swigCPtr, this, SWIGTYPE_p_int16_t.getCPtr(value));
   }
 
   /**
-   *  flags related to the message
+   *  flags related to the message 
    */
   public SWIGTYPE_p_int16_t getFlags() {
     return new SWIGTYPE_p_int16_t(helicsJNI.helics_message_flags_get(swigCPtr, this), true);

@@ -346,6 +346,7 @@ helics_false = cvar.helics_false
 class helics_message(object):
     r"""
      Message_t mapped to a c compatible structure
+
     this will be deprecated in HELICS 2.3 and removed in HELICS 3.0
     """
 
@@ -370,3015 +371,3436 @@ _helics.helics_message_swigregister(helics_message)
 
 
 def helicsGetVersion() -> "char const *":
-    r""" get a version string for HELICS"""
+    r"""Get a version string for HELICS."""
     return _helics.helicsGetVersion()
 
 def helicsIsCoreTypeAvailable(type: "char const *") -> "helics_bool":
     r"""
     Returns true if core/broker type specified is available in current compilation.
-         :type type: string
-         :param type: a string representing a core type
-         possible options include "test","zmq","udp","ipc","interprocess","tcp","default", "mpi"
+
+    :type type: string
+    :param type: A string representing a core type.
+
+    Options include "zmq", "udp", "ipc", "interprocess", "tcp", "default", "mpi".
     """
     return _helics.helicsIsCoreTypeAvailable(type)
 
 def helicsCreateCore(type: "char const *", name: "char const *", initString: "char const *") -> "helics_core":
     r"""
-    create a core object
-       :type type: string
-       :param type: the type of the core to create
-       :type name: string
-       :param name: the name of the core , may be a nullptr or empty string to have a name automatically assigned
-       :type initString: string
-       :param initString: an initialization string to send to the core-the format is similar to command line arguments
-           typical options include a broker address  --broker="XSSAF" or the number of federates or the address
+    Create a core object.
 
-       :rtype: void
-       :return: a helics_core object if the core is invalid err will contain some indication
+    :type type: string
+    :param type: The type of the core to create.
+    :type name: string
+    :param name: The name of the core. It can be a nullptr or empty string to have a name automatically assigned.
+    :type initString: string
+    :param initString: An initialization string to send to the core. The format is similar to command line arguments.
+                          Typical options include a broker name, the broker address, the number of federates, etc.
+
+
+    :rtype: void
+    :return: A helics_core object.
     """
     return _helics.helicsCreateCore(type, name, initString)
 
 def helicsCreateCoreFromArgs(type: "char const *", name: "char const *", argc: "int") -> "helics_core":
     r"""
-    create a core object by passing command line arguments
-       :type type: string
-       :param type: the type of the core to create
-       :type name: string
-       :param name: the name of the core , may be a nullptr or empty string to have a name automatically assigned
-       :type argc: int
-       :param argc: the number of arguments
-       :type argv: string
-       :param argv: the string values from a command line
+    Create a core object by passing command line arguments.
 
-       :rtype: void
-       :return: a helics_core object
+    :type type: string
+    :param type: The type of the core to create.
+    :type name: string
+    :param name: The name of the core. It can be a nullptr or empty string to have a name automatically assigned.
+
+    :type argv: string
+    :param argv: The list of string values from a command line.
+
+
+    :rtype: void
+    :return: A helics_core object.
     """
     return _helics.helicsCreateCoreFromArgs(type, name, argc)
 
 def helicsCoreClone(core: "helics_core") -> "helics_core":
     r"""
-    create a new reference to an existing core
-       this will create a new broker object that references the existing broker it must be freed as well
-       :type core: void
-       :param core: an existing helics_core
+    Create a new reference to an existing core.
 
-       :rtype: void
-       :return: a new reference to the same broker
+    This will create a new broker object that references the existing broker. The new broker object must be freed as well.
+
+    :type core: void
+    :param core: An existing helics_core.
+
+
+    :rtype: void
+    :return: A new reference to the same broker.
     """
     return _helics.helicsCoreClone(core)
 
 def helicsCoreIsValid(core: "helics_core") -> "helics_bool":
     r"""
-    check if a core object is a valid object
-       :type core: void
-       :param core: the helics_core object to test
+    Check if a core object is a valid object.
+
+    :type core: void
+    :param core: The helics_core object to test.
     """
     return _helics.helicsCoreIsValid(core)
 
 def helicsCreateBroker(type: "char const *", name: "char const *", initString: "char const *") -> "helics_broker":
     r"""
-    create a broker object
-       :type type: string
-       :param type: the type of the broker to create
-       :type name: string
-       :param name: the name of the broker , may be a nullptr or empty string to have a name automatically assigned
-       :type initString: string
-       :param initString: an initialization string to send to the core-the format is similar to command line arguments
-           typical options include a broker address  --broker="XSSAF" if this is a subbroker or the number of federates or the address
+    Create a broker object.
 
-       :rtype: void
-       :return: a helics_broker object, will be NULL if there was an error indicated in the err object
+    :type type: string
+    :param type: The type of the broker to create.
+    :type name: string
+    :param name: The name of the broker. It can be a nullptr or empty string to have a name automatically assigned.
+    :type initString: string
+    :param initString: An initialization string to send to the core-the format is similar to command line arguments.
+                          Typical options include a broker address such as --broker="XSSAF" if this is a subbroker, or the number of federates, or the address.
+
+
+    :rtype: void
+    :return: A helics_broker object.
     """
     return _helics.helicsCreateBroker(type, name, initString)
 
 def helicsCreateBrokerFromArgs(type: "char const *", name: "char const *", argc: "int") -> "helics_broker":
     r"""
-    create a core object by passing command line arguments
-       :type type: string
-       :param type: the type of the core to create
-       :type name: string
-       :param name: the name of the core , may be a nullptr or empty string to have a name automatically assigned
-       :type argc: int
-       :param argc: the number of arguments
-       :type argv: string
-       :param argv: the string values from a command line
+    Create a core object by passing command line arguments.
 
-       :rtype: void
-       :return: a helics_core object
+    :type type: string
+    :param type: The type of the core to create.
+    :type name: string
+    :param name: The name of the core. It can be a nullptr or empty string to have a name automatically assigned.
+
+    :type argv: string
+    :param argv: The list of string values from a command line.
+
+
+    :rtype: void
+    :return: A helics_core object.
     """
     return _helics.helicsCreateBrokerFromArgs(type, name, argc)
 
 def helicsBrokerClone(broker: "helics_broker") -> "helics_broker":
     r"""
-    create a new reference to an existing broker
-       this will create a new broker object that references the existing broker it must be freed as well
-       :type broker: void
-       :param broker: an existing helics_broker
+    Create a new reference to an existing broker.
 
-       :rtype: void
-       :return: a new reference to the same broker
+    This will create a new broker object that references the existing broker it must be freed as well.
+
+    :type broker: void
+    :param broker: An existing helics_broker.
+
+
+    :rtype: void
+    :return: A new reference to the same broker.
     """
     return _helics.helicsBrokerClone(broker)
 
 def helicsBrokerIsValid(broker: "helics_broker") -> "helics_bool":
     r"""
-    check if a broker object is a valid object
-       :type broker: void
-       :param broker: the helics_broker object to test
+    Check if a broker object is a valid object.
+
+    :type broker: void
+    :param broker: The helics_broker object to test.
     """
     return _helics.helicsBrokerIsValid(broker)
 
 def helicsBrokerIsConnected(broker: "helics_broker") -> "helics_bool":
     r"""
-    check if a broker is connected
-     a connected broker implies is attached to cores or cores could reach out to communicate
-     return 0 if not connected , something else if it is connected
+    Check if a broker is connected.
+
+    A connected broker implies it is attached to cores or cores could reach out to communicate.
+
+    :rtype: int
+    :return: helics_false if not connected.
     """
     return _helics.helicsBrokerIsConnected(broker)
 
 def helicsBrokerDataLink(broker: "helics_broker", source: "char const *", target: "char const *") -> "void":
     r"""
-    link a named publication and named input using a broker
-       :type broker: void
-       :param broker: the broker to generate the connection from
-       :type source: string
-       :param source: the name of the publication (cannot be NULL)
-       :type target: string
-       :param target: the name of the target to send the publication data (cannot be NULL)
+    Link a named publication and named input using a broker.
+
+    :type broker: void
+    :param broker: The broker to generate the connection from.
+    :type source: string
+    :param source: The name of the publication (cannot be NULL).
+    :type target: string
+    :param target: The name of the target to send the publication data (cannot be NULL).
     """
     return _helics.helicsBrokerDataLink(broker, source, target)
 
 def helicsBrokerAddSourceFilterToEndpoint(broker: "helics_broker", filter: "char const *", endpoint: "char const *") -> "void":
     r"""
-    link a named filter to a source endpoint
-       :type broker: void
-       :param broker: the broker to generate the connection from
-       :type filter: string
-       :param filter: the name of the filter (cannot be NULL)
-       :type endpoint: string
-       :param endpoint: the name of the endpoint to filter the data from (cannot be NULL)
+    Link a named filter to a source endpoint.
+
+    :type broker: void
+    :param broker: The broker to generate the connection from.
+    :type filter: string
+    :param filter: The name of the filter (cannot be NULL).
+    :type endpoint: string
+    :param endpoint: The name of the endpoint to filter the data from (cannot be NULL).
     """
     return _helics.helicsBrokerAddSourceFilterToEndpoint(broker, filter, endpoint)
 
 def helicsBrokerAddDestinationFilterToEndpoint(broker: "helics_broker", filter: "char const *", endpoint: "char const *") -> "void":
     r"""
-    link a named filter to a destination endpoint
-       :type broker: void
-       :param broker: the broker to generate the connection from
-       :type filter: string
-       :param filter: the name of the filter (cannot be NULL)
-       :type endpoint: string
-       :param endpoint: the name of the endpoint to filter the data going to (cannot be NULL)
+    Link a named filter to a destination endpoint.
+
+    :type broker: void
+    :param broker: The broker to generate the connection from.
+    :type filter: string
+    :param filter: The name of the filter (cannot be NULL).
+    :type endpoint: string
+    :param endpoint: The name of the endpoint to filter the data going to (cannot be NULL).
     """
     return _helics.helicsBrokerAddDestinationFilterToEndpoint(broker, filter, endpoint)
 
 def helicsBrokerMakeConnections(broker: "helics_broker", file: "char const *") -> "void":
     r"""
-    load a file containing connection information
-       :type broker: void
-       :param broker: the broker to generate the connections from
-       :type file: string
-       :param file: a JSON or TOML file containing connection information
+    Load a file containing connection information.
+
+    :type broker: void
+    :param broker: The broker to generate the connections from.
+    :type file: string
+    :param file: A JSON or TOML file containing connection information.
     """
     return _helics.helicsBrokerMakeConnections(broker, file)
 
 def helicsCoreWaitForDisconnect(core: "helics_core", msToWait: "int") -> "helics_bool":
     r"""
-    wait for the core to disconnect
-     :type core: void
-     :param core: the core to wait for
-     :type msToWait: int
-     :param msToWait: the time out in millisecond (<0 for infinite timeout)
+    Wait for the core to disconnect.
 
-     :rtype: int
-     :return: helics_true if the disconnect was successful,  helics_false if there was a timeout
+    :type core: void
+    :param core: The core to wait for.
+    :type msToWait: int
+    :param msToWait: The time out in millisecond (<0 for infinite timeout).
+
+
+    :rtype: int
+    :return: helics_true if the disconnect was successful, helics_false if there was a timeout.
     """
     return _helics.helicsCoreWaitForDisconnect(core, msToWait)
 
 def helicsBrokerWaitForDisconnect(broker: "helics_broker", msToWait: "int") -> "helics_bool":
     r"""
-    wait for the broker to disconnect
+    Wait for the broker to disconnect.
+
     :type broker: void
-    :param broker: the broker to wait for
+    :param broker: The broker to wait for.
     :type msToWait: int
-    :param msToWait: the time out in millisecond (<0 for infinite timeout)
+    :param msToWait: The time out in millisecond (<0 for infinite timeout).
+
 
     :rtype: int
-    :return: helics_true if the disconnect was successful,  helics_false if there was a timeout
+    :return: helics_true if the disconnect was successful, helics_false if there was a timeout.
     """
     return _helics.helicsBrokerWaitForDisconnect(broker, msToWait)
 
 def helicsCoreIsConnected(core: "helics_core") -> "helics_bool":
     r"""
-    check if a core is connected
-       a connected core implies is attached to federate or federates could be attached to it
-       return helics_false if not connected, helics_true if it is connected
+    Check if a core is connected.
+
+    A connected core implies it is attached to federates or federates could be attached to it
+
+    :rtype: int
+    :return: helics_false if not connected, helics_true if it is connected.
     """
     return _helics.helicsCoreIsConnected(core)
 
 def helicsCoreDataLink(core: "helics_core", source: "char const *", target: "char const *") -> "void":
     r"""
-    link a named publication and named input using a core
-       :type core: void
-       :param core: the core to generate the connection from
-       :type source: string
-       :param source: the name of the publication (cannot be NULL)
-       :type target: string
-       :param target: the named of the target to send the publication data (cannot be NULL)
+    Link a named publication and named input using a core.
+
+    :type core: void
+    :param core: The core to generate the connection from.
+    :type source: string
+    :param source: The name of the publication (cannot be NULL).
+    :type target: string
+    :param target: The name of the target to send the publication data (cannot be NULL).
     """
     return _helics.helicsCoreDataLink(core, source, target)
 
 def helicsCoreAddSourceFilterToEndpoint(core: "helics_core", filter: "char const *", endpoint: "char const *") -> "void":
     r"""
-    link a named filter to a source endpoint
-       :type core: void
-       :param core: the core to generate the connection from
-       :type filter: string
-       :param filter: the name of the filter (cannot be NULL)
-       :type endpoint: string
-       :param endpoint: the name of the endpoint to filter the data from (cannot be NULL)
+    Link a named filter to a source endpoint.
+
+    :type core: void
+    :param core: The core to generate the connection from.
+    :type filter: string
+    :param filter: The name of the filter (cannot be NULL).
+    :type endpoint: string
+    :param endpoint: The name of the endpoint to filter the data from (cannot be NULL).
     """
     return _helics.helicsCoreAddSourceFilterToEndpoint(core, filter, endpoint)
 
 def helicsCoreAddDestinationFilterToEndpoint(core: "helics_core", filter: "char const *", endpoint: "char const *") -> "void":
     r"""
-    link a named filter to a destination endpoint
-       :type core: void
-       :param core: the core to generate the connection from
-       :type filter: string
-       :param filter: the name of the filter (cannot be NULL)
-       :type endpoint: string
-       :param endpoint: the name of the endpoint to filter the data going to (cannot be NULL)
+    Link a named filter to a destination endpoint.
+
+    :type core: void
+    :param core: The core to generate the connection from.
+    :type filter: string
+    :param filter: The name of the filter (cannot be NULL).
+    :type endpoint: string
+    :param endpoint: The name of the endpoint to filter the data going to (cannot be NULL).
     """
     return _helics.helicsCoreAddDestinationFilterToEndpoint(core, filter, endpoint)
 
 def helicsCoreMakeConnections(core: "helics_core", file: "char const *") -> "void":
     r"""
-    load a file containing connection information
-       :type core: void
-       :param core: the core to generate the connections from
-       :type file: string
-       :param file: a JSON or TOML file containing connection information
+    Load a file containing connection information.
+
+    :type core: void
+    :param core: The core to generate the connections from.
+    :type file: string
+    :param file: A JSON or TOML file containing connection information.
     """
     return _helics.helicsCoreMakeConnections(core, file)
 
 def helicsBrokerGetIdentifier(broker: "helics_broker") -> "char const *":
     r"""
-    get an identifier for the broker
-       :type broker: void
-       :param broker: the broker to query
-       :rtype: string
-       :return: a string containing the identifier for the broker
+    Get an identifier for the broker.
+
+    :type broker: void
+    :param broker: The broker to query.
+
+    :rtype: string
+    :return: A string containing the identifier for the broker.
     """
     return _helics.helicsBrokerGetIdentifier(broker)
 
 def helicsCoreGetIdentifier(core: "helics_core") -> "char const *":
     r"""
-    get an identifier for the core
-       :type core: void
-       :param core: the core to query
-       :rtype: string
-       :return: a string with the identifier of the core
+    Get an identifier for the core.
+
+    :type core: void
+    :param core: The core to query.
+
+    :rtype: string
+    :return: A string with the identifier of the core.
     """
     return _helics.helicsCoreGetIdentifier(core)
 
 def helicsBrokerGetAddress(broker: "helics_broker") -> "char const *":
     r"""
-    get the network address associated with a broker
-       :type broker: void
-       :param broker: the broker to query
-       :rtype: string
-       :return: a string with the network address of the broker
+    Get the network address associated with a broker.
+
+    :type broker: void
+    :param broker: The broker to query.
+
+    :rtype: string
+    :return: A string with the network address of the broker.
     """
     return _helics.helicsBrokerGetAddress(broker)
 
 def helicsCoreGetAddress(core: "helics_core") -> "char const *":
     r"""
-    get the network address associated with a core
-       :type core: void
-       :param core: the core to query
-       :rtype: string
-       :return: a string with the network address of the broker
+    Get the network address associated with a core.
+
+    :type core: void
+    :param core: The core to query.
+
+    :rtype: string
+    :return: A string with the network address of the broker.
     """
     return _helics.helicsCoreGetAddress(core)
 
 def helicsCoreSetReadyToInit(core: "helics_core") -> "void":
     r"""
-    set the core to ready for init
-       this function is used for cores that have filters but no federates so there needs to be
-       a direct signal to the core to trigger the federation initialization
-       :type core: void
-       :param core: the core object to enable init values for
+    Set the core to ready for init.
+
+    This function is used for cores that have filters but no federates so there needs to be
+             a direct signal to the core to trigger the federation initialization.
+
+    :type core: void
+    :param core: The core object to enable init values for.
     """
     return _helics.helicsCoreSetReadyToInit(core)
 
 def helicsCoreConnect(core: "helics_core") -> "helics_bool":
     r"""
-    connect a core to the federate based on current configuration
-       :type core: void
-       :param core: the core to connect
+    Connect a core to the federate based on current configuration.
+
+    :type core: void
+    :param core: The core to connect.
+
+
+    :rtype: int
+    :return: helics_false if not connected, helics_true if it is connected.
     """
     return _helics.helicsCoreConnect(core)
 
 def helicsCoreDisconnect(core: "helics_core") -> "void":
     r"""
-    disconnect a core from the federation
-       :type core: void
-       :param core: the core to query
+    Disconnect a core from the federation.
+
+    :type core: void
+    :param core: The core to query.
     """
     return _helics.helicsCoreDisconnect(core)
 
 def helicsGetFederateByName(fedName: "char const *") -> "helics_federate":
     r"""
-    get an existing federate object from a core by name
-       the federate must have been created by one of the other functions and at least one of the objects referencing the created
-       federate must still be active in the process
-       :type fedName: string
-       :param fedName: the name of the federate to retrieve
+    Get an existing federate object from a core by name.
 
-       :rtype: void
-       :return: NULL if no fed is available by that name otherwise a helics_federate with that name
+    The federate must have been created by one of the other functions and at least one of the objects referencing the created
+             federate must still be active in the process.
+
+    :type fedName: string
+    :param fedName: The name of the federate to retrieve.
+
+
+    :rtype: void
+    :return: NULL if no fed is available by that name otherwise a helics_federate with that name.
     """
     return _helics.helicsGetFederateByName(fedName)
 
 def helicsBrokerDisconnect(broker: "helics_broker") -> "void":
     r"""
-    disconnect a broker
-       :type broker: void
-       :param broker: the broker to disconnect
+    Disconnect a broker.
+
+    :type broker: void
+    :param broker: The broker to disconnect.
     """
     return _helics.helicsBrokerDisconnect(broker)
 
 def helicsFederateDestroy(fed: "helics_federate") -> "void":
-    r""" disconnect and free a broker"""
+    r"""Disconnect and free a federate."""
     return _helics.helicsFederateDestroy(fed)
 
 def helicsBrokerDestroy(broker: "helics_broker") -> "void":
-    r""" disconnect and free a broker"""
+    r"""Disconnect and free a broker."""
     return _helics.helicsBrokerDestroy(broker)
 
 def helicsCoreDestroy(core: "helics_core") -> "void":
-    r""" disconnect and free a core"""
+    r"""Disconnect and free a core."""
     return _helics.helicsCoreDestroy(core)
 
 def helicsCoreFree(core: "helics_core") -> "void":
-    r""" release the memory associated with a core"""
+    r"""Release the memory associated with a core."""
     return _helics.helicsCoreFree(core)
 
 def helicsBrokerFree(broker: "helics_broker") -> "void":
-    r""" release the memory associated with a broker"""
+    r"""Release the memory associated with a broker."""
     return _helics.helicsBrokerFree(broker)
 
 def helicsCreateValueFederate(fedName: "char const *", fi: "helics_federate_info") -> "helics_federate":
     r"""
-    create a value federate from a federate info object
-       helics_federate objects can be used in all functions that take a helics_federate or helics_federate object as an argument
-       :type fedName: string
-       :param fedName: the name of the federate to create, can NULL or an empty string to use the default name from fi or an assigned name
-       :type fi: void
-       :param fi: the federate info object that contains details on the federate
+    Create a value federate from a federate info object.
 
-       :rtype: void
-       :return: an opaque value federate object
+    helics_federate objects can be used in all functions that take a helics_federate or helics_federate object as an argument.
+
+    :type fedName: string
+    :param fedName: The name of the federate to create, can NULL or an empty string to use the default name from fi or an assigned name.
+    :type fi: void
+    :param fi: The federate info object that contains details on the federate.
+
+
+    :rtype: void
+    :return: An opaque value federate object.
     """
     return _helics.helicsCreateValueFederate(fedName, fi)
 
 def helicsCreateValueFederateFromConfig(configFile: "char const *") -> "helics_federate":
     r"""
-    create a value federate from a JSON file, JSON string, or TOML file
-       helics_federate objects can be used in all functions that take a helics_federate or helics_federate object as an argument
-       :type configFile: string
-       :param configFile:  a JSON file or a JSON string or TOML file that contains setup and configuration information
+    Create a value federate from a JSON file, JSON string, or TOML file.
 
-       :rtype: void
-       :return: an opaque value federate object
+    helics_federate objects can be used in all functions that take a helics_federate or helics_federate object as an argument.
+
+    :type configFile: string
+    :param configFile: A JSON file or a JSON string or TOML file that contains setup and configuration information.
+
+
+    :rtype: void
+    :return: An opaque value federate object.
     """
     return _helics.helicsCreateValueFederateFromConfig(configFile)
 
 def helicsCreateMessageFederate(fedName: "char const *", fi: "helics_federate_info") -> "helics_federate":
     r"""
-    create a message federate from a federate info object
-       helics_message_federate objects can be used in all functions that take a helics_message_federate or helics_federate object as
-       an argument
-       :type fedName: string
-       :param fedName: the name of the federate to create
-       :type fi: void
-       :param fi: the federate info object that contains details on the federate
+    Create a message federate from a federate info object.
 
-       :rtype: void
-       :return: an opaque message federate object
+    helics_message_federate objects can be used in all functions that take a helics_message_federate or helics_federate object as an argument.
+
+    :type fedName: string
+    :param fedName: The name of the federate to create.
+    :type fi: void
+    :param fi: The federate info object that contains details on the federate.
+
+
+    :rtype: void
+    :return: An opaque message federate object.
     """
     return _helics.helicsCreateMessageFederate(fedName, fi)
 
 def helicsCreateMessageFederateFromConfig(configFile: "char const *") -> "helics_federate":
     r"""
-    create a message federate from a JSON file or JSON string or TOML file
-       helics_message_federate objects can be used in all functions that take a helics_message_federate or helics_federate object as
-       an argument
-       :type configFile: string
-       :param configFile:  a Config(JSON,TOML) file or a JSON string that contains setup and configuration information
+    Create a message federate from a JSON file or JSON string or TOML file.
 
-       :rtype: void
-       :return: an opaque message federate object
+    helics_message_federate objects can be used in all functions that take a helics_message_federate or helics_federate object as an argument.
+
+    :type configFile: string
+    :param configFile: A Config(JSON,TOML) file or a JSON string that contains setup and configuration information.
+
+
+    :rtype: void
+    :return: An opaque message federate object.
     """
     return _helics.helicsCreateMessageFederateFromConfig(configFile)
 
 def helicsCreateCombinationFederate(fedName: "char const *", fi: "helics_federate_info") -> "helics_federate":
     r"""
-    create a combination federate from a federate info object
-       combination federates are both value federates and message federates, objects can be used in all functions that take a
-       helics_federate, helics_message_federate or helics_federate object as an argument
-       :type fedName: string
-       :param fedName: a string with the name of the federate, can be NULL or an empty string to pull the default name from fi
-       :type fi: void
-       :param fi: the federate info object that contains details on the federate
+    Create a combination federate from a federate info object.
 
-       :rtype: void
-       :return: an opaque value federate object nullptr if the object creation failed
+    Combination federates are both value federates and message federates, objects can be used in all functions
+                         that take a helics_federate, helics_message_federate or helics_federate object as an argument
+
+    :type fedName: string
+    :param fedName: A string with the name of the federate, can be NULL or an empty string to pull the default name from fi.
+    :type fi: void
+    :param fi: The federate info object that contains details on the federate.
+
+
+    :rtype: void
+    :return: An opaque value federate object nullptr if the object creation failed.
     """
     return _helics.helicsCreateCombinationFederate(fedName, fi)
 
 def helicsCreateCombinationFederateFromConfig(configFile: "char const *") -> "helics_federate":
     r"""
-    create a combination federate from a JSON file or JSON string
-       combination federates are both value federates and message federates, objects can be used in all functions that take a
-       helics_federate, helics_message_federate or helics_federate object as an argument
-       :type configFile: string
-       :param configFile:  a JSON file or a JSON string or TOML file that contains setup and configuration information
+    Create a combination federate from a JSON file or JSON string or TOML file.
 
-       :rtype: void
-       :return: an opaque combination federate object
+    Combination federates are both value federates and message federates, objects can be used in all functions
+             that take a helics_federate, helics_message_federate or helics_federate object as an argument
+
+    :type configFile: string
+    :param configFile: A JSON file or a JSON string or TOML file that contains setup and configuration information.
+
+
+    :rtype: void
+    :return: An opaque combination federate object.
     """
     return _helics.helicsCreateCombinationFederateFromConfig(configFile)
 
 def helicsFederateClone(fed: "helics_federate") -> "helics_federate":
     r"""
-    create a new reference to an existing federate
-       this will create a new helics_federate object that references the existing federate it must be freed as well
-       :type fed: void
-       :param fed: an existing helics_federate
+    Create a new reference to an existing federate.
 
-       :rtype: void
-       :return: a new reference to the same federate
+    This will create a new helics_federate object that references the existing federate. The new object must be freed as well.
+
+    :type fed: void
+    :param fed: An existing helics_federate.
+
+
+    :rtype: void
+    :return: A new reference to the same federate.
     """
     return _helics.helicsFederateClone(fed)
 
 def helicsCreateFederateInfo() -> "helics_federate_info":
     r"""
-    create a federate info object for specifying federate information when constructing a federate
-       :rtype: void
-       :return: a helics_federate_info object which is a reference to the created object
+    Create a federate info object for specifying federate information when constructing a federate.
+
+    :rtype: void
+    :return: A helics_federate_info object which is a reference to the created object.
     """
     return _helics.helicsCreateFederateInfo()
 
 def helicsFederateInfoClone(fi: "helics_federate_info") -> "helics_federate_info":
     r"""
-    create a federate info object from an existing one and clone the information
-       :type fi: void
-       :param fi: a federateInfo object to duplicate
+    Create a federate info object from an existing one and clone the information.
 
-        :rtype: void
-        :return: a helics_federate_info object which is a reference to the created object
+    :type fi: void
+    :param fi: A federateInfo object to duplicate.
+
+
+     :rtype: void
+     :return: A helics_federate_info object which is a reference to the created object.
     """
     return _helics.helicsFederateInfoClone(fi)
 
 def helicsFederateInfoLoadFromArgs(fi: "helics_federate_info", argc: "int") -> "void":
     r"""
-    load a federate info from command line arguments
-        :type fi: void
-        :param fi: a federateInfo object
-        :type argc: int
-        :param argc: the number of command line arguments
-        :type argv: string
-        :param argv: an array of strings from the command line
+    Load federate info from command line arguments.
+
+    :type fi: void
+    :param fi: A federateInfo object.
+    :type argc: int
+    :param argc: The number of command line arguments.
+    :type argv: string
+    :param argv: An array of strings from the command line.
     """
     return _helics.helicsFederateInfoLoadFromArgs(fi, argc)
 
 def helicsFederateInfoFree(fi: "helics_federate_info") -> "void":
-    r""" delete the memory associated with a federate info object"""
+    r"""Delete the memory associated with a federate info object."""
     return _helics.helicsFederateInfoFree(fi)
 
 def helicsFederateIsValid(fed: "helics_federate") -> "helics_bool":
     r"""
-    check if a federate_object is valid
-       :rtype: int
-       :return: helics_true if the federate is a valid active federate, helics_false otherwise
+    Check if a federate_object is valid.
+
+    :rtype: int
+    :return: helics_true if the federate is a valid active federate, helics_false otherwise
     """
     return _helics.helicsFederateIsValid(fed)
 
 def helicsFederateInfoSetCoreName(fi: "helics_federate_info", corename: "char const *") -> "void":
     r"""
-    set the name of the core to link to for a federate
-     :type fi: void
-     :param fi: the federate info object to alter
-     :type corename: string
-     :param corename: the identifier for a core to link to
+    Set the name of the core to link to for a federate.
+
+    :type fi: void
+    :param fi: The federate info object to alter.
+    :type corename: string
+    :param corename: The identifier for a core to link to.
     """
     return _helics.helicsFederateInfoSetCoreName(fi, corename)
 
 def helicsFederateInfoSetCoreInitString(fi: "helics_federate_info", coreInit: "char const *") -> "void":
     r"""
-    set the initialization string for the core usually in the form of command line arguments
-       :type fi: void
-       :param fi: the federate info object to alter
-       :type coreInit: string
-       :param coreInit: a string containing command line arguments to be passed to the core
+    Set the initialization string for the core usually in the form of command line arguments.
+
+    :type fi: void
+    :param fi: The federate info object to alter.
+    :type coreInit: string
+    :param coreInit: A string containing command line arguments to be passed to the core.
     """
     return _helics.helicsFederateInfoSetCoreInitString(fi, coreInit)
 
 def helicsFederateInfoSetBrokerInitString(fi: "helics_federate_info", brokerInit: "char const *") -> "void":
     r"""
-    set the initialization string that a core will pass to a generated broker usually in the form of command line arguments
-       :type fi: void
-       :param fi: the federate info object to alter
-       :type brokerInit: string
-       :param brokerInit: a string with command line arguments for a generated broker
+    Set the initialization string that a core will pass to a generated broker usually in the form of command line arguments.
+
+    :type fi: void
+    :param fi: The federate info object to alter.
+    :type brokerInit: string
+    :param brokerInit: A string with command line arguments for a generated broker.
     """
     return _helics.helicsFederateInfoSetBrokerInitString(fi, brokerInit)
 
 def helicsFederateInfoSetCoreType(fi: "helics_federate_info", coretype: "int") -> "void":
     r"""
-    set the core type by integer code
-       valid values available by definitions in api-data.h
-       :type fi: void
-       :param fi: the federate info object to alter
-       :type coretype: int
-       :param coretype: an numerical code for a core type see /ref helics_core_type
+    Set the core type by integer code.
+
+    Valid values available by definitions in api-data.h.
+    :type fi: void
+    :param fi: The federate info object to alter.
+    :type coretype: int
+    :param coretype: An numerical code for a core type see /ref helics_core_type.
     """
     return _helics.helicsFederateInfoSetCoreType(fi, coretype)
 
 def helicsFederateInfoSetCoreTypeFromString(fi: "helics_federate_info", coretype: "char const *") -> "void":
     r"""
-    set the core type from a string
-       :type fi: void
-       :param fi: the federate info object to alter
-       :type coretype: string
-       :param coretype: a string naming a core type
+    Set the core type from a string.
+
+    :type fi: void
+    :param fi: The federate info object to alter.
+    :type coretype: string
+    :param coretype: A string naming a core type.
     """
     return _helics.helicsFederateInfoSetCoreTypeFromString(fi, coretype)
 
 def helicsFederateInfoSetBroker(fi: "helics_federate_info", broker: "char const *") -> "void":
     r"""
-    set the name or connection information for a broker
-       this is only used if the core is automatically created, the broker information will be transferred to the core for connection
-       :type fi: void
-       :param fi: the federate info object to alter
-       :type broker: string
-       :param broker: a string which defines the connection information for a broker either a name or an address
+    Set the name or connection information for a broker.
+
+    This is only used if the core is automatically created, the broker information will be transferred to the core for connection.
+    :type fi: void
+    :param fi: The federate info object to alter.
+    :type broker: string
+    :param broker: A string which defines the connection information for a broker either a name or an address.
     """
     return _helics.helicsFederateInfoSetBroker(fi, broker)
 
 def helicsFederateInfoSetBrokerKey(fi: "helics_federate_info", brokerkey: "char const *") -> "void":
     r"""
-    set the key for a broker connection
-       this is only used if the core is automatically created, the broker information will be transferred to the core for connection
-       :type fi: void
-       :param fi: the federate info object to alter
-       :type brokerkey: string
-       :param brokerkey: a string containing a key for the broker to connect
+    Set the key for a broker connection.
+
+    This is only used if the core is automatically created, the broker information will be transferred to the core for connection.
+    :type fi: void
+    :param fi: The federate info object to alter.
+    :type brokerkey: string
+    :param brokerkey: A string containing a key for the broker to connect.
     """
     return _helics.helicsFederateInfoSetBrokerKey(fi, brokerkey)
 
 def helicsFederateInfoSetBrokerPort(fi: "helics_federate_info", brokerPort: "int") -> "void":
     r"""
-    set the port to use for the broker
-       this is only used if the core is automatically created, the broker information will be transferred to the core for connection
-       this will only be useful for network broker connections
-       :type fi: void
-       :param fi: the federate info object to alter
-       :type brokerPort: int
-       :param brokerPort: the integer port number to use for connection with a broker
+    Set the port to use for the broker.
+
+    This is only used if the core is automatically created, the broker information will be transferred to the core for connection.
+    This will only be useful for network broker connections.
+    :type fi: void
+    :param fi: The federate info object to alter.
+    :type brokerPort: int
+    :param brokerPort: The integer port number to use for connection with a broker.
     """
     return _helics.helicsFederateInfoSetBrokerPort(fi, brokerPort)
 
 def helicsFederateInfoSetLocalPort(fi: "helics_federate_info", localPort: "char const *") -> "void":
     r"""
-    set the local port to use
-       this is only used if the core is automatically created, the port information will be transferred to the core for connection
-       :type fi: void
-       :param fi: the federate info object to alter
-       :type localPort: string
-       :param localPort: a string with the port information to use as the local server port can be a number or "auto" or "os_local"
+    Set the local port to use.
+
+    This is only used if the core is automatically created, the port information will be transferred to the core for connection.
+    :type fi: void
+    :param fi: The federate info object to alter.
+    :type localPort: string
+    :param localPort: A string with the port information to use as the local server port can be a number or "auto" or "os_local".
     """
     return _helics.helicsFederateInfoSetLocalPort(fi, localPort)
 
 def helicsGetPropertyIndex(val: "char const *") -> "int":
     r"""
-    get a property index for use in /ref helicsFederateInfoSetFlagOption, /ref helicsFederateInfoSetTimeProperty,
-       helicsFederateInfoSetIntegerProperty
-       :type val: string
-       :param val: a string with the property name
-       :rtype: int
-       :return: an int with the property code (-1) if not a valid property
+    Get a property index for use in /ref helicsFederateInfoSetFlagOption, /ref helicsFederateInfoSetTimeProperty,
+    or /ref helicsFederateInfoSetIntegerProperty
+    :type val: string
+    :param val: A string with the property name.
+    :rtype: int
+    :return: An int with the property code or (-1) if not a valid property.
     """
     return _helics.helicsGetPropertyIndex(val)
 
 def helicsGetOptionIndex(val: "char const *") -> "int":
     r"""
-    get an option index for use in /ref helicsPublicationSetOption, /ref helicsInputSetOption, /ref helicsEndpointSetOption, /ref
-       helicsFilterSetOption, and the corresponding get functions
-       :type val: string
-       :param val: a string with the option name
-       :rtype: int
-       :return: an int with the option index (-1) if not a valid property
+    Get an option index for use in /ref helicsPublicationSetOption, /ref helicsInputSetOption, /ref helicsEndpointSetOption,
+    /ref helicsFilterSetOption, and the corresponding get functions.
+
+    :type val: string
+    :param val: A string with the option name.
+
+    :rtype: int
+    :return: An int with the option index or (-1) if not a valid property.
     """
     return _helics.helicsGetOptionIndex(val)
 
 def helicsFederateInfoSetFlagOption(fi: "helics_federate_info", flag: "int", value: "helics_bool") -> "void":
     r"""
-    set a flag in the info structure
-       valid flags are available /ref helics_federate_flags
-       :type fi: void
-       :param fi: the federate info object to alter
-       :type flag: int
-       :param flag: a numerical index for a flag
-       :type value: int
-       :param value: the desired value of the flag helics_true or helics_false
+    Set a flag in the info structure.
+
+    Valid flags are available /ref helics_federate_flags.
+    :type fi: void
+    :param fi: The federate info object to alter.
+    :type flag: int
+    :param flag: A numerical index for a flag.
+    :type value: int
+    :param value: The desired value of the flag helics_true or helics_false.
     """
     return _helics.helicsFederateInfoSetFlagOption(fi, flag, value)
 
 def helicsFederateInfoSetSeparator(fi: "helics_federate_info", separator: "char") -> "void":
     r"""
-    set the separator character in the info structure
-       the separator character is the separation character for local publications/endpoints in creating their global name
-       for example if the separator character is '/'  then a local endpoint would have a globally reachable name of fedName/localName
-       :type fi: void
-       :param fi: the federate info object to alter
-       :type separator: char
-       :param separator: the character to use as a separator
+    Set the separator character in the info structure.
+
+    The separator character is the separation character for local publications/endpoints in creating their global name.
+    For example if the separator character is '/'  then a local endpoint would have a globally reachable name of fedName/localName.
+    :type fi: void
+    :param fi: The federate info object to alter.
+    :type separator: char
+    :param separator: The character to use as a separator.
     """
     return _helics.helicsFederateInfoSetSeparator(fi, separator)
 
 def helicsFederateInfoSetTimeProperty(fi: "helics_federate_info", timeProperty: "int", propertyValue: "helics_time") -> "void":
     r"""
-    set the output delay for a federate
-       :type fi: void
-       :param fi: the federate info object to alter
-       :type timeProperty: int
-       :param timeProperty: an integer representation of the time based property to set see /ref helics_properties
-       :type propertyValue: float
-       :param propertyValue: the value of the property to set the timeProperty to
+    Set the output delay for a federate.
+
+    :type fi: void
+    :param fi: The federate info object to alter.
+    :type timeProperty: int
+    :param timeProperty: An integer representation of the time based property to set see /ref helics_properties.
+    :type propertyValue: float
+    :param propertyValue: The value of the property to set the timeProperty to.
     """
     return _helics.helicsFederateInfoSetTimeProperty(fi, timeProperty, propertyValue)
 
 def helicsFederateInfoSetIntegerProperty(fi: "helics_federate_info", intProperty: "int", propertyValue: "int") -> "void":
     r"""
-    set an integer property for a federate
-       some known properties are
-       :type fi: void
-       :param fi: the federateInfo object to alter
-       :type intProperty: int
-       :param intProperty: an int identifying the property
-       :type propertyValue: int
-       :param propertyValue: the value to set the property to
+    Set an integer property for a federate.
+
+    Set known properties.
+
+    :type fi: void
+    :param fi: The federateInfo object to alter.
+    :type intProperty: int
+    :param intProperty: An int identifying the property.
+    :type propertyValue: int
+    :param propertyValue: The value to set the property to.
     """
     return _helics.helicsFederateInfoSetIntegerProperty(fi, intProperty, propertyValue)
 
 def helicsFederateRegisterInterfaces(fed: "helics_federate", file: "char const *") -> "void":
     r"""
-    load interfaces from a file
-       :type fed: void
-       :param fed: the federate to which to load interfaces
-       :type file: string
-       :param file: the name of a file to load the interfaces from either JSON, or TOML
+    Load interfaces from a file.
+
+    :type fed: void
+    :param fed: The federate to which to load interfaces.
+    :type file: string
+    :param file: The name of a file to load the interfaces from either JSON, or TOML.
     """
     return _helics.helicsFederateRegisterInterfaces(fed, file)
 
 def helicsFederateGlobalError(fed: "helics_federate", error_code: "int", error_string: "char const *") -> "void":
     r"""
-     generate a global Error from a federate
-    A global error halts the co-simulation completely
+    Generate a global error from a federate.
+
+    A global error halts the co-simulation completely.
+
     :type fed: void
-    :param fed: the federate to create an error in
+    :param fed: The federate to create an error in.
     :type error_code: int
-    :param error_code: the integer code for the error
+    :param error_code: The integer code for the error.
     :type error_string: string
-    :param error_string: a string describing the error
+    :param error_string: A string describing the error.
     """
     return _helics.helicsFederateGlobalError(fed, error_code, error_string)
 
 def helicsFederateLocalError(fed: "helics_federate", error_code: "int", error_string: "char const *") -> "void":
     r"""
-     generate a local error in a federate
-    this will propagate through the co-simulation but not necessarily halt the co-simulation, it has a similar effect to finalize but does
-    allow some interaction with a core for a brief time.
+    Generate a local error in a federate.
+
+    This will propagate through the co-simulation but not necessarily halt the co-simulation, it has a similar effect to finalize but does
+             allow some interaction with a core for a brief time.
     :type fed: void
-    :param fed: the federate to create an error in
+    :param fed: The federate to create an error in.
     :type error_code: int
-    :param error_code: the integer code for the error
+    :param error_code: The integer code for the error.
     :type error_string: string
-    :param error_string: a string describing the error
+    :param error_string: A string describing the error.
     """
     return _helics.helicsFederateLocalError(fed, error_code, error_string)
 
 def helicsFederateFinalize(fed: "helics_federate") -> "void":
-    r""" finalize the federate this function halts all communication in the federate and disconnects it from the core"""
+    r"""Finalize the federate. This function halts all communication in the federate and disconnects it from the core."""
     return _helics.helicsFederateFinalize(fed)
 
 def helicsFederateFinalizeAsync(fed: "helics_federate") -> "void":
-    r""" finalize the federate in an async call"""
+    r"""Finalize the federate in an async call."""
     return _helics.helicsFederateFinalizeAsync(fed)
 
 def helicsFederateFinalizeComplete(fed: "helics_federate") -> "void":
-    r""" complete the asynchronous finalize call"""
+    r"""Complete the asynchronous finalize call."""
     return _helics.helicsFederateFinalizeComplete(fed)
 
 def helicsFederateFree(fed: "helics_federate") -> "void":
-    r""" release the memory associated withe a federate"""
+    r"""Release the memory associated withe a federate."""
     return _helics.helicsFederateFree(fed)
 
 def helicsCloseLibrary() -> "void":
     r"""
-    call when done using the helics library,  this function will ensure the threads are closed properly if possible
-       this should be the last call before exiting,
+    Call when done using the helics library.
+    This function will ensure the threads are closed properly. If possible this should be the last call before exiting.
     """
     return _helics.helicsCloseLibrary()
 
 def helicsFederateEnterInitializingMode(fed: "helics_federate") -> "void":
     r"""
-    enter the initialization state of a federate
-       the initialization state allows initial values to be set and received if the iteration is requested on entry to
-       the execution state
-       This is a blocking call and will block until the core allows it to proceed
-       :type fed: void
-       :param fed: the federate to operate on
+    Enter the initialization state of a federate.
+
+    The initialization state allows initial values to be set and received if the iteration is requested on entry to the execution state.
+             This is a blocking call and will block until the core allows it to proceed.
+
+    :type fed: void
+    :param fed: The federate to operate on.
     """
     return _helics.helicsFederateEnterInitializingMode(fed)
 
 def helicsFederateEnterInitializingModeAsync(fed: "helics_federate") -> "void":
     r"""
-    non blocking alternative to 'helicsFederateEnterInitializingMode'
-       the function helicsFederateEnterInitializationModeFinalize must be called to finish the operation
-       :type fed: void
-       :param fed: the federate to operate on
+    Non blocking alternative to 'helicsFederateEnterInitializingMode'.
+
+    The function helicsFederateEnterInitializationModeFinalize must be called to finish the operation.
+
+    :type fed: void
+    :param fed: The federate to operate on.
     """
     return _helics.helicsFederateEnterInitializingModeAsync(fed)
 
 def helicsFederateIsAsyncOperationCompleted(fed: "helics_federate") -> "helics_bool":
     r"""
-    check if the current Asynchronous operation has completed
-       :type fed: void
-       :param fed: the federate to operate on
+    Check if the current Asynchronous operation has completed.
 
-       :rtype: int
-       :return: helics_false if not completed, helics_true if completed
+    :type fed: void
+    :param fed: The federate to operate on.
+
+
+    :rtype: int
+    :return: helics_false if not completed, helics_true if completed.
     """
     return _helics.helicsFederateIsAsyncOperationCompleted(fed)
 
 def helicsFederateEnterInitializingModeComplete(fed: "helics_federate") -> "void":
     r"""
-    finalize the entry to initialize mode that was initiated with /ref heliceEnterInitializingModeAsync
-       :type fed: void
-       :param fed: the federate desiring to complete the initialization step
+    Finalize the entry to initialize mode that was initiated with /ref heliceEnterInitializingModeAsync.
+
+    :type fed: void
+    :param fed: The federate desiring to complete the initialization step.
     """
     return _helics.helicsFederateEnterInitializingModeComplete(fed)
 
 def helicsFederateEnterExecutingMode(fed: "helics_federate") -> "void":
     r"""
-     request that the federate enter the Execution mode
-        this call is blocking until granted entry by the core object for an asynchronous alternative call
-    ref helicsFederateEnterExecutingModeAsync  on return from this call the federate will be at time 0
-        :type fed: void
-        :param fed: a federate to change modes
+    Request that the federate enter the Execution mode.
+
+    This call is blocking until granted entry by the core object. On return from this call the federate will be at time 0.
+             For an asynchronous alternative call see /ref helicsFederateEnterExecutingModeAsync.
+
+    :type fed: void
+    :param fed: A federate to change modes.
     """
     return _helics.helicsFederateEnterExecutingMode(fed)
 
 def helicsFederateEnterExecutingModeAsync(fed: "helics_federate") -> "void":
     r"""
-    request that the federate enter the Execution mode
-       this call is non-blocking and will return immediately call /ref helicsFederateEnterExecutingModeComplete to finish the call
-       sequence /ref helicsFederateEnterExecutingModeComplete
-       :type fed: void
-       :param fed: the federate object to complete the call
+    Request that the federate enter the Execution mode.
+
+    This call is non-blocking and will return immediately. Call /ref helicsFederateEnterExecutingModeComplete to finish the call sequence.
+
+    :type fed: void
+    :param fed: The federate object to complete the call.
     """
     return _helics.helicsFederateEnterExecutingModeAsync(fed)
 
 def helicsFederateEnterExecutingModeComplete(fed: "helics_federate") -> "void":
     r"""
-    complete the call to /ref EnterExecutingModeAsync
-       :type fed: void
-       :param fed: the federate object to complete the call
+    Complete the call to /ref helicsFederateEnterExecutingModeAsync.
+
+    :type fed: void
+    :param fed: The federate object to complete the call.
     """
     return _helics.helicsFederateEnterExecutingModeComplete(fed)
 
 def helicsFederateEnterExecutingModeIterative(fed: "helics_federate", iterate: "helics_iteration_request") -> "helics_iteration_result":
     r"""
-    request an iterative time
-       this call allows for finer grain control of the iterative process then /ref helicsFederateRequestTime it takes a time and
-       iteration request and return a time and iteration status
-       :type fed: void
-       :param fed: the federate to make the request of
-       :type iterate: int
-       :param iterate: the requested iteration mode
+    Request an iterative time.
 
-       :rtype: int
-       :return: an iteration structure with field containing the time and iteration status
+    This call allows for finer grain control of the iterative process than /ref helicsFederateRequestTime. It takes a time and
+             iteration request, and returns a time and iteration status.
+
+    :type fed: void
+    :param fed: The federate to make the request of.
+    :type iterate: int
+    :param iterate: The requested iteration mode.
+
+
+    :rtype: int
+    :return: An iteration structure with field containing the time and iteration status.
     """
     return _helics.helicsFederateEnterExecutingModeIterative(fed, iterate)
 
 def helicsFederateEnterExecutingModeIterativeAsync(fed: "helics_federate", iterate: "helics_iteration_request") -> "void":
     r"""
-    request an iterative entry to the execution mode
-       this call allows for finer grain control of the iterative process then /ref helicsFederateRequestTime it takes a time and and
-       iteration request and return a time and iteration status
-       :type fed: void
-       :param fed: the federate to make the request of
-       :type iterate: int
-       :param iterate: the requested iteration mode
+    Request an iterative entry to the execution mode.
+
+    This call allows for finer grain control of the iterative process than /ref helicsFederateRequestTime. It takes a time and
+             iteration request, and returns a time and iteration status
+
+    :type fed: void
+    :param fed: The federate to make the request of.
+    :type iterate: int
+    :param iterate: The requested iteration mode.
     """
     return _helics.helicsFederateEnterExecutingModeIterativeAsync(fed, iterate)
 
 def helicsFederateEnterExecutingModeIterativeComplete(fed: "helics_federate") -> "helics_iteration_result":
     r"""
-    complete the asynchronous iterative call into ExecutionModel
-       :type fed: void
-       :param fed: the federate to make the request of
+    Complete the asynchronous iterative call into ExecutionMode.
 
-       :rtype: int
-       :return: an iteration object containing the iteration time and iteration_status
+    :type fed: void
+    :param fed: The federate to make the request of.
+
+
+    :rtype: int
+    :return: An iteration object containing the iteration time and iteration_status.
     """
     return _helics.helicsFederateEnterExecutingModeIterativeComplete(fed)
 
 def helicsFederateGetState(fed: "helics_federate") -> "helics_federate_state":
     r"""
-    get the current state of a federate
-       :type fed: void
-       :param fed: the fed to query
+    Get the current state of a federate.
 
-       :rtype: int
-       :return: state the resulting state if void return helics_ok
+    :type fed: void
+    :param fed: The federate to query.
+
+
+    :rtype: int
+    :return: State the resulting state if void return helics_ok.
     """
     return _helics.helicsFederateGetState(fed)
 
 def helicsFederateGetCoreObject(fed: "helics_federate") -> "helics_core":
     r"""
-    get the core object associated with a federate
-       :type fed: void
-       :param fed: a federate object
+    Get the core object associated with a federate.
 
-       :rtype: void
-       :return: a core object, nullptr if invalid
+    :type fed: void
+    :param fed: A federate object.
+
+
+    :rtype: void
+    :return: A core object, nullptr if invalid.
     """
     return _helics.helicsFederateGetCoreObject(fed)
 
 def helicsFederateRequestTime(fed: "helics_federate", requestTime: "helics_time") -> "helics_time":
     r"""
-    request the next time for federate execution
-       :type fed: void
-       :param fed: the federate to make the request of
-       :type requestTime: float
-       :param requestTime: the next requested time
+    Request the next time for federate execution.
 
-       :rtype: float
-       :return: the time granted to the federate, will return helics_time_maxtime if the simulation has terminated
-           invalid
+    :type fed: void
+    :param fed: The federate to make the request of.
+    :type requestTime: float
+    :param requestTime: The next requested time.
+
+
+    :rtype: float
+    :return: The time granted to the federate, will return helics_time_maxtime if the simulation has terminated or is invalid.
     """
     return _helics.helicsFederateRequestTime(fed, requestTime)
 
 def helicsFederateRequestTimeAdvance(fed: "helics_federate", timeDelta: "helics_time") -> "helics_time":
     r"""
-    request the next time for federate execution
-       :type fed: void
-       :param fed: the federate to make the request of
-       :type timeDelta: float
-       :param timeDelta: the requested amount of time to advance
+    Request the next time for federate execution.
 
-       :rtype: float
-       :return: the time granted to the federate, will return helics_time_maxtime if the simulation has terminated
-           invalid
+    :type fed: void
+    :param fed: The federate to make the request of.
+    :type timeDelta: float
+    :param timeDelta: The requested amount of time to advance.
+
+
+    :rtype: float
+    :return: The time granted to the federate, will return helics_time_maxtime if the simulation has terminated or is invalid
     """
     return _helics.helicsFederateRequestTimeAdvance(fed, timeDelta)
 
 def helicsFederateRequestNextStep(fed: "helics_federate") -> "helics_time":
     r"""
-    request the next time step for federate execution
-       feds should have setup the period or minDelta for this to work well but it will request the next time step which is the current
-       time plus the minimum time step
-       :type fed: void
-       :param fed: the federate to make the request of
+    Request the next time step for federate execution.
 
-       :rtype: float
-       :return: the time granted to the federate, will return helics_time_maxtime if the simulation has terminated
-           invalid
+    Feds should have setup the period or minDelta for this to work well but it will request the next time step which is the current
+    time plus the minimum time step.
+
+    :type fed: void
+    :param fed: The federate to make the request of.
+
+
+    :rtype: float
+    :return: The time granted to the federate, will return helics_time_maxtime if the simulation has terminated or is invalid
     """
     return _helics.helicsFederateRequestNextStep(fed)
 
 def helicsFederateRequestTimeIterative(fed: "helics_federate", requestTime: "helics_time", iterate: "helics_iteration_request") -> "helics_iteration_result *":
     r"""
-    request an iterative time
-       this call allows for finer grain control of the iterative process then /ref helicsFederateRequestTime it takes a time and and
-       iteration request and return a time and iteration status
-       :type fed: void
-       :param fed: the federate to make the request of
-       :type requestTime: float
-       :param requestTime: the next desired time
-       :type iterate: int
-       :param iterate: the requested iteration mode
-           outIteration  the iteration specification of the result
+    Request an iterative time.
 
-       :rtype: float
-       :return: the granted time, will return helics_time_maxtime if the simulation has terminated along with the appropriate iteration result
-           value
+    This call allows for finer grain control of the iterative process than /ref helicsFederateRequestTime. It takes a time and and
+    iteration request, and returns a time and iteration status.
+
+    :type fed: void
+    :param fed: The federate to make the request of.
+    :type requestTime: float
+    :param requestTime: The next desired time.
+    :type iterate: int
+    :param iterate: The requested iteration mode.
+
+
+
+    :rtype: float
+    :return: The granted time, will return helics_time_maxtime if the simulation has terminated along with the appropriate iteration result.
+
+    This function also returns the iteration specification of the result.
     """
     return _helics.helicsFederateRequestTimeIterative(fed, requestTime, iterate)
 
 def helicsFederateRequestTimeAsync(fed: "helics_federate", requestTime: "helics_time") -> "void":
     r"""
-    request the next time for federate execution in an asynchronous call
-       call /ref helicsFederateRequestTimeComplete to finish the call
-       :type fed: void
-       :param fed: the federate to make the request of
-       :type requestTime: float
-       :param requestTime: the next requested time
+    Request the next time for federate execution in an asynchronous call.
+
+    Call /ref helicsFederateRequestTimeComplete to finish the call.
+
+    :type fed: void
+    :param fed: The federate to make the request of.
+    :type requestTime: float
+    :param requestTime: The next requested time.
     """
     return _helics.helicsFederateRequestTimeAsync(fed, requestTime)
 
 def helicsFederateRequestTimeComplete(fed: "helics_federate") -> "helics_time":
     r"""
-    complete an asynchronous requestTime call
-       :type fed: void
-       :param fed: the federate to make the request of
+    Complete an asynchronous requestTime call.
 
-       :rtype: float
-       :return: the time granted to the federate, will return helics_time_maxtime if the simulation has terminated
+    :type fed: void
+    :param fed: The federate to make the request of.
+
+
+    :rtype: float
+    :return: The time granted to the federate, will return helics_time_maxtime if the simulation has terminated.
     """
     return _helics.helicsFederateRequestTimeComplete(fed)
 
 def helicsFederateRequestTimeIterativeAsync(fed: "helics_federate", requestTime: "helics_time", iterate: "helics_iteration_request") -> "void":
     r"""
-    request an iterative time through an asynchronous call
-       this call allows for finer grain control of the iterative process then /ref helicsFederateRequestTime it takes a time an
-       iteration request and returns a time and iteration status call /ref helicsFederateRequestTimeIterativeComplete to finish the process
-       :type fed: void
-       :param fed: the federate to make the request of
-       :type requestTime: float
-       :param requestTime: the next desired time
-       :type iterate: int
-       :param iterate: the requested iteration mode
+    Request an iterative time through an asynchronous call.
+
+    This call allows for finer grain control of the iterative process than /ref helicsFederateRequestTime. It takes a time and
+    iteration request, and returns a time and iteration status. Call /ref helicsFederateRequestTimeIterativeComplete to finish the process.
+
+    :type fed: void
+    :param fed: The federate to make the request of.
+    :type requestTime: float
+    :param requestTime: The next desired time.
+    :type iterate: int
+    :param iterate: The requested iteration mode.
     """
     return _helics.helicsFederateRequestTimeIterativeAsync(fed, requestTime, iterate)
 
 def helicsFederateRequestTimeIterativeComplete(fed: "helics_federate") -> "helics_iteration_result *":
     r"""
-    complete an iterative time request asynchronous call
-       :type fed: void
-       :param fed: the federate to make the request of
-           outIterate  the iteration specification of the result
+    Complete an iterative time request asynchronous call.
 
-       :rtype: float
-       :return: the granted time, will return helics_time_maxtime if the simulation has terminated
+    :type fed: void
+    :param fed: The federate to make the request of.
+
+
+    :rtype: float
+    :return: The granted time, will return helics_time_maxtime if the simulation has terminated.
+
+    This function also returns the iteration specification of the result.
     """
     return _helics.helicsFederateRequestTimeIterativeComplete(fed)
 
 def helicsFederateGetName(fed: "helics_federate") -> "char const *":
     r"""
-    get the name of the federate
-       :type fed: void
-       :param fed: the federate object to query
-       :rtype: string
-       :return: a pointer to a string with the name
+    Get the name of the federate.
+
+    :type fed: void
+    :param fed: The federate object to query.
+
+    :rtype: string
+    :return: A pointer to a string with the name.
     """
     return _helics.helicsFederateGetName(fed)
 
 def helicsFederateSetTimeProperty(fed: "helics_federate", timeProperty: "int", time: "helics_time") -> "void":
     r"""
-    set a time based property for a federate
-       :type fed: void
-       :param fed: the federate object set the property for
-       :type timeProperty: int
-       :param timeProperty: a integer code for a time property
-       :type time: float
-       :param time: the requested value of the property
+    Set a time based property for a federate.
+
+    :type fed: void
+    :param fed: The federate object to set the property for.
+    :type timeProperty: int
+    :param timeProperty: A integer code for a time property.
+    :type time: float
+    :param time: The requested value of the property.
     """
     return _helics.helicsFederateSetTimeProperty(fed, timeProperty, time)
 
 def helicsFederateSetFlagOption(fed: "helics_federate", flag: "int", flagValue: "helics_bool") -> "void":
     r"""
-    set a flag for the federate
-       :type fed: void
-       :param fed: the federate to alter a flag for
-       :type flag: int
-       :param flag: the flag to change
-       :type flagValue: int
-       :param flagValue: the new value of the flag 0 for false !=0 for true
+    Set a flag for the federate.
+
+    :type fed: void
+    :param fed: The federate to alter a flag for.
+    :type flag: int
+    :param flag: The flag to change.
+    :type flagValue: int
+    :param flagValue: The new value of the flag. 0 for false, !=0 for true.
     """
     return _helics.helicsFederateSetFlagOption(fed, flag, flagValue)
 
 def helicsFederateSetSeparator(fed: "helics_federate", separator: "char") -> "void":
     r"""
-    set the separator character in a federate
-       the separator character is the separation character for local publications/endpoints in creating their global name
-       for example if the separator character is '/'  then a local endpoint would have a globally reachable name of fedName/localName
-       :type fed: void
-       :param fed: the federate info object to alter
-       :type separator: char
-       :param separator: the character to use as a separator
+    Set the separator character in a federate.
+
+    The separator character is the separation character for local publications/endpoints in creating their global name.
+             For example if the separator character is '/' then a local endpoint would have a globally reachable name of fedName/localName.
+
+    :type fed: void
+    :param fed: The federate info object to alter.
+    :type separator: char
+    :param separator: The character to use as a separator.
     """
     return _helics.helicsFederateSetSeparator(fed, separator)
 
 def helicsFederateSetIntegerProperty(fed: "helics_federate", intProperty: "int", propertyVal: "int") -> "void":
     r"""
-    set an integer based property of a federate
-      :type fed: void
-      :param fed: the federate to change the property for
-      :type intProperty: int
-      :param intProperty: the property to set
-      :type propertyVal: int
-      :param propertyVal: the value of the property
+    Set an integer based property of a federate.
+
+    :type fed: void
+    :param fed: The federate to change the property for.
+    :type intProperty: int
+    :param intProperty: The property to set.
+    :type propertyVal: int
+    :param propertyVal: The value of the property.
     """
     return _helics.helicsFederateSetIntegerProperty(fed, intProperty, propertyVal)
 
 def helicsFederateGetTimeProperty(fed: "helics_federate", timeProperty: "int") -> "helics_time":
     r"""
-    get the current value of a time based property in a federate
-       :type fed: void
-       :param fed: the federate query
-       :type timeProperty: int
-       :param timeProperty: the property to query
+    Get the current value of a time based property in a federate.
+
+    :type fed: void
+    :param fed: The federate query.
+    :type timeProperty: int
+    :param timeProperty: The property to query.
     """
     return _helics.helicsFederateGetTimeProperty(fed, timeProperty)
 
 def helicsFederateGetFlagOption(fed: "helics_federate", flag: "int") -> "helics_bool":
     r"""
-    get a flag value for a federate
-       :type fed: void
-       :param fed: the federate to get the flag for
-       :type flag: int
-       :param flag: the flag to query
+    Get a flag value for a federate.
 
-       :rtype: int
-       :return: the value of the flag
+    :type fed: void
+    :param fed: The federate to get the flag for.
+    :type flag: int
+    :param flag: The flag to query.
+
+
+    :rtype: int
+    :return: The value of the flag.
     """
     return _helics.helicsFederateGetFlagOption(fed, flag)
 
 def helicsFederateGetIntegerProperty(fed: "helics_federate", intProperty: "int") -> "int":
     r"""
-    Get the current value of an integer property (such as a logging level)
-      :type fed: void
-      :param fed: the federate to get the flag for
-      :type intProperty: int
-      :param intProperty: a code for the property to set /ref helics_handle_options
+    Get the current value of an integer property (such as a logging level).
 
-      :rtype: int
-      :return: the value of the property
+    :type fed: void
+    :param fed: The federate to get the flag for.
+    :type intProperty: int
+    :param intProperty: A code for the property to set /ref helics_handle_options.
+
+
+    :rtype: int
+    :return: The value of the property.
     """
     return _helics.helicsFederateGetIntegerProperty(fed, intProperty)
 
 def helicsFederateGetCurrentTime(fed: "helics_federate") -> "helics_time":
     r"""
-    get the current time of the federate
-       :type fed: void
-       :param fed: the federate object to query
+    Get the current time of the federate.
 
-       :rtype: float
-       :return: the current time of the federate
+    :type fed: void
+    :param fed: The federate object to query.
+
+
+    :rtype: float
+    :return: The current time of the federate.
     """
     return _helics.helicsFederateGetCurrentTime(fed)
 
 def helicsFederateSetGlobal(fed: "helics_federate", valueName: "char const *", value: "char const *") -> "void":
     r"""
-    set a federation global value through a federate
-       this overwrites any previous value for this name
-       :type fed: void
-       :param fed: the federate to set the global through
-       :type valueName: string
-       :param valueName: the name of the global to set
-       :type value: string
-       :param value: the value of the global
+    Set a federation global value through a federate.
+
+    This overwrites any previous value for this name.
+    :type fed: void
+    :param fed: The federate to set the global through.
+    :type valueName: string
+    :param valueName: The name of the global to set.
+    :type value: string
+    :param value: The value of the global.
     """
     return _helics.helicsFederateSetGlobal(fed, valueName, value)
 
 def helicsFederateAddDependency(fed: "helics_federate", fedName: "char const *") -> "void":
     r"""
-    add a time dependency for a federate.  The federate will depend on the given named federate for time synchronization
-       :type fed: void
-       :param fed: the federate to add the dependency for
-       :type fedName: string
-       :param fedName: the name of the federate to depend on
+    Add a time dependency for a federate. The federate will depend on the given named federate for time synchronization.
+
+    :type fed: void
+    :param fed: The federate to add the dependency for.
+    :type fedName: string
+    :param fedName: The name of the federate to depend on.
     """
     return _helics.helicsFederateAddDependency(fed, fedName)
 
 def helicsFederateSetLogFile(fed: "helics_federate", logFile: "char const *") -> "void":
     r"""
-    set the logging file for a federate(actually on the core associated with a federate)
-       :type fed: void
-       :param fed: the federate to set the log file for
-       :type logFile: string
-       :param logFile: the name of the log file
+    Set the logging file for a federate (actually on the core associated with a federate).
+
+    :type fed: void
+    :param fed: The federate to set the log file for.
+    :type logFile: string
+    :param logFile: The name of the log file.
     """
     return _helics.helicsFederateSetLogFile(fed, logFile)
 
 def helicsFederateLogErrorMessage(fed: "helics_federate", logmessage: "char const *") -> "void":
     r"""
-    log an error message through a federate
-       :type fed: void
-       :param fed: the federate to set the global through
-       :type logmessage: string
-       :param logmessage: the message to put in the log
+    Log an error message through a federate.
+
+    :type fed: void
+    :param fed: The federate to log the error message through.
+    :type logmessage: string
+    :param logmessage: The message to put in the log.
     """
     return _helics.helicsFederateLogErrorMessage(fed, logmessage)
 
 def helicsFederateLogWarningMessage(fed: "helics_federate", logmessage: "char const *") -> "void":
     r"""
-    log a warning message through a federate
-       :type fed: void
-       :param fed: the federate to set the global through
-       :type logmessage: string
-       :param logmessage: the message to put in the log
+    Log a warning message through a federate.
+
+    :type fed: void
+    :param fed: The federate to log the warning message through.
+    :type logmessage: string
+    :param logmessage: The message to put in the log.
     """
     return _helics.helicsFederateLogWarningMessage(fed, logmessage)
 
 def helicsFederateLogInfoMessage(fed: "helics_federate", logmessage: "char const *") -> "void":
     r"""
-    log a message through a federate
-       :type fed: void
-       :param fed: the federate to set the global through
-       :type logmessage: string
-       :param logmessage: the message to put in the log
+    Log an info message through a federate.
+
+    :type fed: void
+    :param fed: The federate to log the info message through.
+    :type logmessage: string
+    :param logmessage: The message to put in the log.
     """
     return _helics.helicsFederateLogInfoMessage(fed, logmessage)
 
 def helicsFederateLogDebugMessage(fed: "helics_federate", logmessage: "char const *") -> "void":
     r"""
-    log a message through a federate
-       :type fed: void
-       :param fed: the federate to set the global through
-       :type logmessage: string
-       :param logmessage: the message to put in the log
+    Log a debug message through a federate.
+
+    :type fed: void
+    :param fed: The federate to log the debug message through.
+    :type logmessage: string
+    :param logmessage: The message to put in the log.
     """
     return _helics.helicsFederateLogDebugMessage(fed, logmessage)
 
 def helicsFederateLogLevelMessage(fed: "helics_federate", loglevel: "int", logmessage: "char const *") -> "void":
     r"""
-    log a message through a federate
-       :type fed: void
-       :param fed: the federate to set the global through
-       :type loglevel: int
-       :param loglevel: the level of the message to log see /ref helics_log_levels
-       :type logmessage: string
-       :param logmessage: the message to put in the log
+    Log a message through a federate.
+
+    :type fed: void
+    :param fed: The federate to log the message through.
+    :type loglevel: int
+    :param loglevel: The level of the message to log see /ref helics_log_levels.
+    :type logmessage: string
+    :param logmessage: The message to put in the log.
     """
     return _helics.helicsFederateLogLevelMessage(fed, loglevel, logmessage)
 
 def helicsCoreSetGlobal(core: "helics_core", valueName: "char const *", value: "char const *") -> "void":
     r"""
-    set a global value in a core
-       this overwrites any previous value for this name
-       :type core: void
-       :param core: the core to set the global through
-       :type valueName: string
-       :param valueName: the name of the global to set
-       :type value: string
-       :param value: the value of the global
+    Set a global value in a core.
+
+    This overwrites any previous value for this name.
+
+    :type core: void
+    :param core: The core to set the global through.
+    :type valueName: string
+    :param valueName: The name of the global to set.
+    :type value: string
+    :param value: The value of the global.
     """
     return _helics.helicsCoreSetGlobal(core, valueName, value)
 
 def helicsBrokerSetGlobal(broker: "helics_broker", valueName: "char const *", value: "char const *") -> "void":
     r"""
-    set a federation global value
-       this overwrites any previous value for this name
-       :type broker: void
-       :param broker: the broker to set the global through
-       :type valueName: string
-       :param valueName: the name of the global to set
-       :type value: string
-       :param value: the value of the global
+    Set a federation global value.
+
+    This overwrites any previous value for this name.
+
+    :type broker: void
+    :param broker: The broker to set the global through.
+    :type valueName: string
+    :param valueName: The name of the global to set.
+    :type value: string
+    :param value: The value of the global.
     """
     return _helics.helicsBrokerSetGlobal(broker, valueName, value)
 
 def helicsCoreSetLogFile(core: "helics_core", logFileName: "char const *") -> "void":
     r"""
-    set a the log file on a core
-       :type core: void
-       :param core: the core to set the global through
-       :type logFileName: string
-       :param logFileName: the name of the file to log to
+    Set the log file on a core.
+
+    :type core: void
+    :param core: The core to set the log file for.
+    :type logFileName: string
+    :param logFileName: The name of the file to log to.
     """
     return _helics.helicsCoreSetLogFile(core, logFileName)
 
 def helicsBrokerSetLogFile(broker: "helics_broker", logFileName: "char const *") -> "void":
     r"""
-    set a the log file on a broker
-       :type broker: void
-       :param broker: the broker to set the global through
-       :type logFileName: string
-       :param logFileName: the name of the file to log to
+    Set the log file on a broker.
+
+    :type broker: void
+    :param broker: The broker to set the log file for.
+    :type logFileName: string
+    :param logFileName: The name of the file to log to.
     """
     return _helics.helicsBrokerSetLogFile(broker, logFileName)
 
 def helicsCreateQuery(target: "char const *", query: "char const *") -> "helics_query":
     r"""
-    create a query object
-       a query object consists of a target and query string
-       :type target: string
-       :param target: the name of the target to query
-       :type query: string
-       :param query: the query to make of the target
+    Create a query object.
+
+    A query object consists of a target and query string.
+
+    :type target: string
+    :param target: The name of the target to query.
+    :type query: string
+    :param query: The query to make of the target.
     """
     return _helics.helicsCreateQuery(target, query)
 
 def helicsQueryExecute(query: "helics_query", fed: "helics_federate") -> "char const *":
     r"""
-    Execute a query
-       the call will block until the query finishes which may require communication or other delays
-       :type query: void
-       :param query: the query object to use in the query
-       :type fed: void
-       :param fed: a federate to send the query through
+    Execute a query.
 
-       :rtype: string
-       :return: a pointer to a string.  the string will remain valid until the query is freed or executed again
-           the return will be nullptr if fed or query is an invalid object, the return string will be "#invalid" if the query itself was invalid
+    The call will block until the query finishes which may require communication or other delays.
+
+    :type query: void
+    :param query: The query object to use in the query.
+    :type fed: void
+    :param fed: A federate to send the query through.
+
+
+    :rtype: string
+    :return: A pointer to a string.  The string will remain valid until the query is freed or executed again.
     """
     return _helics.helicsQueryExecute(query, fed)
 
 def helicsQueryCoreExecute(query: "helics_query", core: "helics_core") -> "char const *":
     r"""
-    Execute a query directly on a core
-       the call will block until the query finishes which may require communication or other delays
-       :type query: void
-       :param query: the query object to use in the query
-       :type core: void
-       :param core: the core to send the query to
+    Execute a query directly on a core.
 
-       :rtype: string
-       :return: a pointer to a string.  the string will remain valid until the query is freed or executed again
-           the return will be nullptr if fed or query is an invalid object, the return string will be "#invalid" if the query itself was invalid
+    The call will block until the query finishes which may require communication or other delays.
+
+    :type query: void
+    :param query: The query object to use in the query.
+    :type core: void
+    :param core: The core to send the query to.
+
+
+    :rtype: string
+    :return: A pointer to a string.  The string will remain valid until the query is freed or executed again.
     """
     return _helics.helicsQueryCoreExecute(query, core)
 
 def helicsQueryBrokerExecute(query: "helics_query", broker: "helics_broker") -> "char const *":
     r"""
-    Execute a query directly on a broker
-       the call will block until the query finishes which may require communication or other delays
-       :type query: void
-       :param query: the query object to use in the query
-       :type broker: void
-       :param broker: the broker to send the query to
+    Execute a query directly on a broker.
 
-       :rtype: string
-       :return: a pointer to a string.  the string will remain valid until the query is freed or executed again
-           the return will be nullptr if fed or query is an invalid object, the return string will be "#invalid" if the query itself was invalid
+    The call will block until the query finishes which may require communication or other delays.
+
+    :type query: void
+    :param query: The query object to use in the query.
+    :type broker: void
+    :param broker: The broker to send the query to.
+
+
+    :rtype: string
+    :return: A pointer to a string.  The string will remain valid until the query is freed or executed again.
     """
     return _helics.helicsQueryBrokerExecute(query, broker)
 
 def helicsQueryExecuteAsync(query: "helics_query", fed: "helics_federate") -> "void":
     r"""
-    Execute a query in a non-blocking call
-       :type query: void
-       :param query: the query object to use in the query
-       :type fed: void
-       :param fed: a federate to send the query through
+    Execute a query in a non-blocking call.
+
+    :type query: void
+    :param query: The query object to use in the query.
+    :type fed: void
+    :param fed: A federate to send the query through.
     """
     return _helics.helicsQueryExecuteAsync(query, fed)
 
 def helicsQueryExecuteComplete(query: "helics_query") -> "char const *":
     r"""
-    complete the return from a query called with /ref helicsExecuteQueryAsync
-       the function will block until the query completes /ref isQueryComplete can be called to determine if a query has completed or
-       not
-       :type query: void
-       :param query: the query object to complete execution of
+    Complete the return from a query called with /ref helicsExecuteQueryAsync.
 
-       :rtype: string
-       :return: a pointer to a string.  the string will remain valid until the query is freed or executed again
-           the return will be nullptr if query is an invalid object
+    The function will block until the query completes /ref isQueryComplete can be called to determine if a query has completed or not.
+
+    :type query: void
+    :param query: The query object to complete execution of.
+
+
+    :rtype: string
+    :return: A pointer to a string. The string will remain valid until the query is freed or executed again.
     """
     return _helics.helicsQueryExecuteComplete(query)
 
 def helicsQueryIsCompleted(query: "helics_query") -> "helics_bool":
     r"""
-    check if an asynchronously executed query has completed
-       this function should usually be called after a QueryExecuteAsync function has been called
-       :type query: void
-       :param query: the query object to check if completed
-       :rtype: int
-       :return: will return helics_true if an asynchronous query has complete or a regular query call was made with a result
-           and false if an asynchronous query has not completed or is invalid
+    Check if an asynchronously executed query has completed.
+
+    This function should usually be called after a QueryExecuteAsync function has been called.
+
+    :type query: void
+    :param query: The query object to check if completed.
+
+    :rtype: int
+    :return: Will return helics_true if an asynchronous query has completed or a regular query call was made with a result,
+                and false if an asynchronous query has not completed or is invalid
     """
     return _helics.helicsQueryIsCompleted(query)
 
 def helicsQueryFree(query: "helics_query") -> "void":
-    r""" free the memory associated with a query object"""
+    r"""Free the memory associated with a query object."""
     return _helics.helicsQueryFree(query)
 
 def helicsCleanupLibrary() -> "void":
     r"""
-    function to do some housekeeping work
-       this runs some cleanup routines and tries to close out any residual thread that haven't been shutdown
-       yet
+    Function to do some housekeeping work.
+
+    This runs some cleanup routines and tries to close out any residual thread that haven't been shutdown yet.
     """
     return _helics.helicsCleanupLibrary()
 
 def helicsFederateRegisterSubscription(fed: "helics_federate", key: "char const *", units: "char const *") -> "helics_input":
     r"""
-    create a subscription
-       the subscription becomes part of the federate and is destroyed when the federate is freed so there are no separate free
-       functions for subscriptions and publications
-       :type fed: void
-       :param fed: the federate object in which to create a subscription must have been create with helicsCreateValueFederate or
-           helicsCreateCombinationFederate
-       :type key: string
-       :param key: the identifier matching a publication to get a subscription for
-       :type units: string
-       :param units: a string listing the units of the subscription maybe NULL
+    sub/pub registration
 
-       :rtype: void
-       :return: an object containing the subscription
+    Create a subscription.
+
+    The subscription becomes part of the federate and is destroyed when the federate is freed so there are no separate free
+    functions for subscriptions and publications.
+
+    :type fed: void
+    :param fed: The federate object in which to create a subscription, must have been created with /ref helicsCreateValueFederate or
+        /ref helicsCreateCombinationFederate.
+    :type key: string
+    :param key: The identifier matching a publication to get a subscription for.
+    :type units: string
+    :param units: A string listing the units of the subscription (may be NULL).
+
+
+    :rtype: void
+    :return: An object containing the subscription.
     """
     return _helics.helicsFederateRegisterSubscription(fed, key, units)
 
 def helicsFederateRegisterPublication(fed: "helics_federate", key: "char const *", type: "helics_data_type", units: "char const *") -> "helics_publication":
     r"""
-    register a publication with a a known type
-       the publication becomes part of the federate and is destroyed when the federate is freed so there are no separate free
-       functions for subscriptions and publications
-       :type fed: void
-       :param fed: the federate object in which to create a publication
-       :type key: string
-       :param key: the identifier for the publication the global publication key will be prepended with the federate name
-       :type type: int
-       :param type: a code identifying the type of the input see /ref helics_data_type for available options
-       :type units: string
-       :param units: a string listing the units of the subscription maybe NULL
+    Register a publication with a known type.
 
-       :rtype: void
-       :return: an object containing the publication
+    The publication becomes part of the federate and is destroyed when the federate is freed so there are no separate free
+    functions for subscriptions and publications.
+
+    :type fed: void
+    :param fed: The federate object in which to create a publication.
+    :type key: string
+    :param key: The identifier for the publication the global publication key will be prepended with the federate name.
+    :type type: int
+    :param type: A code identifying the type of the input see /ref helics_data_type for available options.
+    :type units: string
+    :param units: A string listing the units of the subscription (may be NULL).
+
+
+    :rtype: void
+    :return: An object containing the publication.
     """
     return _helics.helicsFederateRegisterPublication(fed, key, type, units)
 
 def helicsFederateRegisterTypePublication(fed: "helics_federate", key: "char const *", type: "char const *", units: "char const *") -> "helics_publication":
     r"""
-    register a publication with a defined type
-       the publication becomes part of the federate and is destroyed when the federate is freed so there are no separate free
-       functions for subscriptions and publications
-       :type fed: void
-       :param fed: the federate object in which to create a publication
-       :type key: string
-       :param key: the identifier for the publication
-       :type type: string
-       :param type: a string labeling the type of the publication
-       :type units: string
-       :param units: a string listing the units of the subscription maybe NULL
+    Register a publication with a defined type.
 
-       :rtype: void
-       :return: an object containing the publication
+    The publication becomes part of the federate and is destroyed when the federate is freed so there are no separate free
+    functions for subscriptions and publications.
+
+    :type fed: void
+    :param fed: The federate object in which to create a publication.
+    :type key: string
+    :param key: The identifier for the publication.
+    :type type: string
+    :param type: A string labeling the type of the publication.
+    :type units: string
+    :param units: A string listing the units of the subscription (may be NULL).
+
+
+    :rtype: void
+    :return: An object containing the publication.
     """
     return _helics.helicsFederateRegisterTypePublication(fed, key, type, units)
 
 def helicsFederateRegisterGlobalPublication(fed: "helics_federate", key: "char const *", type: "helics_data_type", units: "char const *") -> "helics_publication":
     r"""
-    register a global named publication with an arbitrary type
-       the publication becomes part of the federate and is destroyed when the federate is freed so there are no separate free
-       functions for subscriptions and publications
-       :type fed: void
-       :param fed: the federate object in which to create a publication
-       :type key: string
-       :param key: the identifier for the publication
-       :type type: int
-       :param type: a code identifying the type of the input see /ref helics_data_type for available options
-       :type units: string
-       :param units: a string listing the units of the subscription maybe NULL
+    Register a global named publication with an arbitrary type.
 
-       :rtype: void
-       :return: an object containing the publication
+    The publication becomes part of the federate and is destroyed when the federate is freed so there are no separate free
+    functions for subscriptions and publications.
+
+    :type fed: void
+    :param fed: The federate object in which to create a publication.
+    :type key: string
+    :param key: The identifier for the publication.
+    :type type: int
+    :param type: A code identifying the type of the input see /ref helics_data_type for available options.
+    :type units: string
+    :param units: A string listing the units of the subscription (may be NULL).
+
+
+    :rtype: void
+    :return: An object containing the publication.
     """
     return _helics.helicsFederateRegisterGlobalPublication(fed, key, type, units)
 
 def helicsFederateRegisterGlobalTypePublication(fed: "helics_federate", key: "char const *", type: "char const *", units: "char const *") -> "helics_publication":
     r"""
-    register a global publication with a defined type
-       the publication becomes part of the federate and is destroyed when the federate is freed so there are no separate free
-       functions for subscriptions and publications
-       :type fed: void
-       :param fed: the federate object in which to create a publication
-       :type key: string
-       :param key: the identifier for the publication
-       :type type: string
-       :param type: a string describing the expected type of the publication
-       :type units: string
-       :param units: a string listing the units of the subscription maybe NULL
+    Register a global publication with a defined type.
 
-       :rtype: void
-       :return: an object containing the publication
+    The publication becomes part of the federate and is destroyed when the federate is freed so there are no separate free
+    functions for subscriptions and publications.
+
+    :type fed: void
+    :param fed: The federate object in which to create a publication.
+    :type key: string
+    :param key: The identifier for the publication.
+    :type type: string
+    :param type: A string describing the expected type of the publication.
+    :type units: string
+    :param units: A string listing the units of the subscription (may be NULL).
+
+
+    :rtype: void
+    :return: An object containing the publication.
     """
     return _helics.helicsFederateRegisterGlobalTypePublication(fed, key, type, units)
 
 def helicsFederateRegisterInput(fed: "helics_federate", key: "char const *", type: "helics_data_type", units: "char const *") -> "helics_input":
     r"""
-    register a named input
-       the input becomes part of the federate and is destroyed when the federate is freed so there are no separate free
-       functions for subscriptions, inputs, and publications
-       :type fed: void
-       :param fed: the federate object in which to create an input
-       :type key: string
-       :param key: the identifier for the publication the global input key will be prepended with the federate name
-       :type type: int
-       :param type: a code identifying the type of the input see /ref helics_data_type for available options
-       :type units: string
-       :param units: a string listing the units of the input maybe NULL
+    Register a named input.
 
-       :rtype: void
-       :return: an object containing the input
+    The input becomes part of the federate and is destroyed when the federate is freed so there are no separate free
+    functions for subscriptions, inputs, and publications.
+
+    :type fed: void
+    :param fed: The federate object in which to create an input.
+    :type key: string
+    :param key: The identifier for the publication the global input key will be prepended with the federate name.
+    :type type: int
+    :param type: A code identifying the type of the input see /ref helics_data_type for available options.
+    :type units: string
+    :param units: A string listing the units of the input (may be NULL).
+
+
+    :rtype: void
+    :return: An object containing the input.
     """
     return _helics.helicsFederateRegisterInput(fed, key, type, units)
 
 def helicsFederateRegisterTypeInput(fed: "helics_federate", key: "char const *", type: "char const *", units: "char const *") -> "helics_input":
     r"""
-    register an input with a defined type
-       the input becomes part of the federate and is destroyed when the federate is freed so there are no separate free
-       functions for subscriptions, inputs and publications
-       :type fed: void
-       :param fed: the federate object in which to create an input
-       :type key: string
-       :param key: the identifier for the input
-       :type type: string
-       :param type: a string describing the expected type of the input
-       :type units: string
-       :param units: a string listing the units of the input maybe NULL
+    Register an input with a defined type.
 
-       :rtype: void
-       :return: an object containing the publication
+    The input becomes part of the federate and is destroyed when the federate is freed so there are no separate free
+    functions for subscriptions, inputs, and publications.
+
+    :type fed: void
+    :param fed: The federate object in which to create an input.
+    :type key: string
+    :param key: The identifier for the input.
+    :type type: string
+    :param type: A string describing the expected type of the input.
+    :type units: string
+    :param units: A string listing the units of the input maybe NULL.
+
+
+    :rtype: void
+    :return: An object containing the publication.
     """
     return _helics.helicsFederateRegisterTypeInput(fed, key, type, units)
 
 def helicsFederateRegisterGlobalInput(fed: "helics_federate", key: "char const *", type: "helics_data_type", units: "char const *") -> "helics_publication":
     r"""
-    register a global named input
-       the publication becomes part of the federate and is destroyed when the federate is freed so there are no separate free
-       functions for subscriptions and publications
-       :type fed: void
-       :param fed: the federate object in which to create a publication
-       :type key: string
-       :param key: the identifier for the publication
-       :type type: int
-       :param type: a code identifying the type of the input see /ref helics_data_type for available options
-       :type units: string
-       :param units: a string listing the units of the subscription maybe NULL
+    Register a global named input.
 
-       :rtype: void
-       :return: an object containing the publication
+    The publication becomes part of the federate and is destroyed when the federate is freed so there are no separate free
+    functions for subscriptions and publications.
+
+    :type fed: void
+    :param fed: The federate object in which to create a publication.
+    :type key: string
+    :param key: The identifier for the publication.
+    :type type: int
+    :param type: A code identifying the type of the input see /ref helics_data_type for available options.
+    :type units: string
+    :param units: A string listing the units of the subscription maybe NULL.
+
+
+    :rtype: void
+    :return: An object containing the publication.
     """
     return _helics.helicsFederateRegisterGlobalInput(fed, key, type, units)
 
 def helicsFederateRegisterGlobalTypeInput(fed: "helics_federate", key: "char const *", type: "char const *", units: "char const *") -> "helics_publication":
     r"""
-    register a global publication with an arbitrary type
-       the publication becomes part of the federate and is destroyed when the federate is freed so there are no separate free
-       functions for subscriptions and publications
-       :type fed: void
-       :param fed: the federate object in which to create a publication
-       :type key: string
-       :param key: the identifier for the publication
-      :type type: string
-      :param type: a string defining the type of the input
-       :type units: string
-       :param units: a string listing the units of the subscription maybe NULL
+    Register a global publication with an arbitrary type.
 
-       :rtype: void
-       :return: an object containing the publication
+    The publication becomes part of the federate and is destroyed when the federate is freed so there are no separate free
+    functions for subscriptions and publications.
+
+    :type fed: void
+    :param fed: The federate object in which to create a publication.
+    :type key: string
+    :param key: The identifier for the publication.
+    :type type: string
+    :param type: A string defining the type of the input.
+    :type units: string
+    :param units: A string listing the units of the subscription maybe NULL.
+
+
+    :rtype: void
+    :return: An object containing the publication.
     """
     return _helics.helicsFederateRegisterGlobalTypeInput(fed, key, type, units)
 
 def helicsFederateGetPublication(fed: "helics_federate", key: "char const *") -> "helics_publication":
     r"""
-    get a publication object from a key
-       :type fed: void
-       :param fed: the value federate object to use to get the publication
-       :type key: string
-       :param key: the name of the publication
+    Get a publication object from a key.
 
-       :rtype: void
-       :return: a helics_publication object, the object will not be valid and err will contain an error code if no publication with the
-           specified key exists
+    :type fed: void
+    :param fed: The value federate object to use to get the publication.
+    :type key: string
+    :param key: The name of the publication.
+
+
+    :rtype: void
+    :return: A helics_publication object, the object will not be valid and err will contain an error code if no publication with the
+        specified key exists.
     """
     return _helics.helicsFederateGetPublication(fed, key)
 
 def helicsFederateGetPublicationByIndex(fed: "helics_federate", index: "int") -> "helics_publication":
     r"""
-    get a publication by its index typically already created via registerInterfaces file or something of that nature
-       :type fed: void
-       :param fed: the federate object in which to create a publication
-       :type index: int
-       :param index: the index of the publication to get
+    Get a publication by its index, typically already created via registerInterfaces file or something of that nature.
 
-       :rtype: void
-       :return: a helics_publication
+    :type fed: void
+    :param fed: The federate object in which to create a publication.
+    :type index: int
+    :param index: The index of the publication to get.
+
+
+    :rtype: void
+    :return: A helics_publication.
     """
     return _helics.helicsFederateGetPublicationByIndex(fed, index)
 
 def helicsFederateGetInput(fed: "helics_federate", key: "char const *") -> "helics_input":
     r"""
-    get an input object from a key
-       :type fed: void
-       :param fed: the value federate object to use to get the publication
-       :type key: string
-       :param key: the name of the input
+    Get an input object from a key.
 
-       :rtype: void
-       :return: a helics_input object, the object will not be valid and err will contain an error code if no input with the specified
-           key exists
+    :type fed: void
+    :param fed: The value federate object to use to get the publication.
+    :type key: string
+    :param key: The name of the input.
+
+
+    :rtype: void
+    :return: A helics_input object, the object will not be valid and err will contain an error code if no input with the specified
+        key exists.
     """
     return _helics.helicsFederateGetInput(fed, key)
 
 def helicsFederateGetInputByIndex(fed: "helics_federate", index: "int") -> "helics_input":
     r"""
-    get an input by its index typically already created via registerInterfaces file or something of that nature
-       :type fed: void
-       :param fed: the federate object in which to create a publication
-       :type index: int
-       :param index: the index of the publication to get
+    Get an input by its index, typically already created via registerInterfaces file or something of that nature.
 
-       :rtype: void
-       :return: a helics_input, which will be NULL if an invalid index
+    :type fed: void
+    :param fed: The federate object in which to create a publication.
+    :type index: int
+    :param index: The index of the publication to get.
+
+
+    :rtype: void
+    :return: A helics_input, which will be NULL if an invalid index.
     """
     return _helics.helicsFederateGetInputByIndex(fed, index)
 
 def helicsFederateGetSubscription(fed: "helics_federate", key: "char const *") -> "helics_input":
     r"""
-    get an input object from a subscription target
-       :type fed: void
-       :param fed: the value federate object to use to get the publication
-       :type key: string
-       :param key: the name of the publication that a subscription is targeting
+    Get an input object from a subscription target.
 
-       :rtype: void
-       :return: a helics_input object, the object will not be valid and err will contain an error code if no input with the specified
-           key exists
+    :type fed: void
+    :param fed: The value federate object to use to get the publication.
+    :type key: string
+    :param key: The name of the publication that a subscription is targeting.
+
+
+    :rtype: void
+    :return: A helics_input object, the object will not be valid and err will contain an error code if no input with the specified
+        key exists.
     """
     return _helics.helicsFederateGetSubscription(fed, key)
 
 def helicsFederateClearUpdates(fed: "helics_federate") -> "void":
-    r""" clear all the update flags from a federates inputs"""
+    r"""Clear all the update flags from a federates inputs."""
     return _helics.helicsFederateClearUpdates(fed)
 
 def helicsFederateRegisterFromPublicationJSON(fed: "helics_federate", json: "char const *") -> "void":
     r"""
-    register the publications via  JSON publication string
-       this would be the same JSON that would be used to publish data
+    Register the publications via JSON publication string.
+
+    This would be the same JSON that would be used to publish data.
     """
     return _helics.helicsFederateRegisterFromPublicationJSON(fed, json)
 
 def helicsFederatePublishJSON(fed: "helics_federate", json: "char const *") -> "void":
-    r""" publish data contained in a json file or string"""
+    r"""Publish data contained in a json file or string."""
     return _helics.helicsFederatePublishJSON(fed, json)
 
 def helicsPublicationPublishRaw(pub: "helics_publication", data: "void const *") -> "int":
     r"""
-    publish raw data from a char * and length
-       :type pub: void
-       :param pub: the publication to publish for
-       :type data: void
-       :param data: a pointer to the raw data
-       :type inputDataLength: int
-       :param inputDataLength: the size in bytes of the data to publish
+    Publish raw data from a char * and length.
+
+    :type pub: void
+    :param pub: The publication to publish for.
+    :type data: void
+    :param data: A pointer to the raw data.
+    :type inputDataLength: int
+    :param inputDataLength: The size in bytes of the data to publish.
     """
     return _helics.helicsPublicationPublishRaw(pub, data)
 
 def helicsPublicationPublishString(pub: "helics_publication", str: "char const *") -> "void":
     r"""
-    publish a string
-       :type pub: void
-       :param pub: the publication to publish for
-       :type str: string
-       :param str: a pointer to a NULL terminated string
+    Publish a string.
+
+    :type pub: void
+    :param pub: The publication to publish for.
+    :type str: string
+    :param str: The string to publish.
     """
     return _helics.helicsPublicationPublishString(pub, str)
 
 def helicsPublicationPublishInteger(pub: "helics_publication", val: "int64_t") -> "void":
     r"""
-    publish an integer value
-       :type pub: void
-       :param pub: the publication to publish for
-       :type val: int
-       :param val: the numerical value to publish
+    Publish an integer value.
+
+    :type pub: void
+    :param pub: The publication to publish for.
+    :type val: int
+    :param val: The numerical value to publish.
     """
     return _helics.helicsPublicationPublishInteger(pub, val)
 
 def helicsPublicationPublishBoolean(pub: "helics_publication", val: "helics_bool") -> "void":
     r"""
-    publish a Boolean Value
-       :type pub: void
-       :param pub: the publication to publish for
-       :type val: int
-       :param val: the boolean value to publish either helics_true or helics_false
+    Publish a Boolean Value.
+
+    :type pub: void
+    :param pub: The publication to publish for.
+    :type val: int
+    :param val: The boolean value to publish.
     """
     return _helics.helicsPublicationPublishBoolean(pub, val)
 
 def helicsPublicationPublishDouble(pub: "helics_publication", val: "double") -> "void":
     r"""
-    publish a double floating point value
-       :type pub: void
-       :param pub: the publication to publish for
-       :type val: float
-       :param val: the numerical value to publish
+    Publish a double floating point value.
+
+    :type pub: void
+    :param pub: The publication to publish for.
+    :type val: float
+    :param val: The numerical value to publish.
     """
     return _helics.helicsPublicationPublishDouble(pub, val)
 
 def helicsPublicationPublishTime(pub: "helics_publication", val: "helics_time") -> "void":
     r"""
-    publish a time value
-       :type pub: void
-       :param pub: the publication to publish for
-       :type val: float
-       :param val: the numerical value to publish
+    Publish a time value.
+
+    :type pub: void
+    :param pub: The publication to publish for.
+    :type val: float
+    :param val: The numerical value to publish.
     """
     return _helics.helicsPublicationPublishTime(pub, val)
 
 def helicsPublicationPublishChar(pub: "helics_publication", val: "char") -> "void":
     r"""
-    publish a single character
-       :type pub: void
-       :param pub: the publication to publish for
-       :type val: char
-       :param val: the numerical value to publish
+    Publish a single character.
+
+    :type pub: void
+    :param pub: The publication to publish for.
+    :type val: char
+    :param val: The numerical value to publish.
     """
     return _helics.helicsPublicationPublishChar(pub, val)
 
 def helicsPublicationPublishComplex(pub: "helics_publication", real: "double", imag: "double") -> "void":
     r"""
-    publish a complex value (or pair of values)
-       :type pub: void
-       :param pub: the publication to publish for
-       :type real: float
-       :param real: the real part of a complex number to publish
-       :type imag: float
-       :param imag: the imaginary part of a complex number to publish
+    Publish a complex value (or pair of values).
+
+    :type pub: void
+    :param pub: The publication to publish for.
+    :type real: float
+    :param real: The real part of a complex number to publish.
+    :type imag: float
+    :param imag: The imaginary part of a complex number to publish.
     """
     return _helics.helicsPublicationPublishComplex(pub, real, imag)
 
 def helicsPublicationPublishVector(pub: "helics_publication", vectorInput: "double const *") -> "int":
     r"""
-    publish a vector of doubles
-       :type pub: void
-       :param pub: the publication to publish for
-       :type vectorInput: float
-       :param vectorInput: a pointer to an array of double data
-       :type vectorLength: int
-       :param vectorLength: the number of points to publish
+    Publish a vector of doubles.
+
+    :type pub: void
+    :param pub: The publication to publish for.
+    :type vectorInput: float
+    :param vectorInput: A pointer to an array of double data.
     """
     return _helics.helicsPublicationPublishVector(pub, vectorInput)
 
 def helicsPublicationPublishNamedPoint(pub: "helics_publication", str: "char const *", val: "double") -> "void":
     r"""
-    publish a named point
-       :type pub: void
-       :param pub: the publication to publish for
-       :type str: string
-       :param str: a pointer a null terminated string
-       :type val: float
-       :param val: a double val to publish
+    Publish a named point.
+
+    :type pub: void
+    :param pub: The publication to publish for.
+    :type str: string
+    :param str: A string for the name to publish.
+    :type val: float
+    :param val: A double for the value to publish.
     """
     return _helics.helicsPublicationPublishNamedPoint(pub, str, val)
 
 def helicsPublicationAddTarget(pub: "helics_publication", target: "char const *") -> "void":
     r"""
-    add a named input to the list of targets a publication publishes to
-       :type pub: void
-       :param pub: the publication to add the target for
-       :type target: string
-       :param target: the name of an input that the data should be sent to
+    Add a named input to the list of targets a publication publishes to.
+
+    :type pub: void
+    :param pub: The publication to add the target for.
+    :type target: string
+    :param target: The name of an input that the data should be sent to.
     """
     return _helics.helicsPublicationAddTarget(pub, target)
 
 def helicsInputAddTarget(ipt: "helics_input", target: "char const *") -> "void":
     r"""
-    add a publication to the list of data that an input subscribes to
-       :type ipt: void
-       :param ipt: the named input to modify
-       :type target: string
-       :param target: the name of a publication that an input should subscribe to
+    Add a publication to the list of data that an input subscribes to.
+
+    :type ipt: void
+    :param ipt: The named input to modify.
+    :type target: string
+    :param target: The name of a publication that an input should subscribe to.
     """
     return _helics.helicsInputAddTarget(ipt, target)
 
 def helicsInputGetRawValueSize(ipt: "helics_input") -> "int":
     r"""
-    get the size of the raw value for subscription
-        :rtype: int
-        :return: the size of the raw data/string in bytes
+    Get the size of the raw value for subscription.
+
+    :rtype: int
+    :return: the size of the raw data/string in bytes
     """
     return _helics.helicsInputGetRawValueSize(ipt)
 
 def helicsInputGetRawValue(ipt: "helics_input") -> "int *":
     r"""
-    get the raw data for the latest value of a subscription
-       :type ipt: void
-       :param ipt: the input to get the data for
-           data the memory location of the data
-       :type maxDatalen: int
-       :param maxDatalen: the maximum size of information that data can hold
-           actualSize  the actual length of data copied to data
+    Get the raw data for the latest value of a subscription.
+
+    :type ipt: void
+    :param ipt: The input to get the data for.
+
+
+
+    :rtype: void
+    :return: raw string data
     """
     return _helics.helicsInputGetRawValue(ipt)
 
 def helicsInputGetStringSize(ipt: "helics_input") -> "int":
     r"""
-    get the size of a value for subscription assuming return as a string
-       :rtype: int
-       :return: the size of the string
+    Get the size of a value for subscription assuming return as a string.
+
+    :rtype: int
+    :return: The size of the string.
     """
     return _helics.helicsInputGetStringSize(ipt)
 
 def helicsInputGetString(ipt: "helics_input") -> "int *":
     r"""
-    get a string value from a subscription
-       :type ipt: void
-       :param ipt: the input to get the data for
-           outputString storage for copying a null terminated string
-       :type maxStringLen: int
-       :param maxStringLen: the maximum size of information that str can hold
-           actualLength the actual length of the string
+    Get a string value from a subscription.
+
+    :type ipt: void
+    :param ipt: The input to get the data for.
+
+
+
+    :rtype: void
+    :return: A string data
     """
     return _helics.helicsInputGetString(ipt)
 
 def helicsInputGetInteger(ipt: "helics_input") -> "int64_t":
     r"""
-    get an integer value from a subscription
-       :type ipt: void
-       :param ipt: the input to get the data for
+    Get an integer value from a subscription.
 
-       :rtype: int
-       :return: an int64_t value with the current value of the input
+    :type ipt: void
+    :param ipt: The input to get the data for.
+
+
+    :rtype: int
+    :return: An int64_t value with the current value of the input.
     """
     return _helics.helicsInputGetInteger(ipt)
 
 def helicsInputGetBoolean(ipt: "helics_input") -> "helics_bool":
     r"""
-    get a boolean value from a subscription
-       :type ipt: void
-       :param ipt: the input to get the data for
+    Get a boolean value from a subscription.
 
-       :rtype: int
-       :return: a boolean value of current input value
+    :type ipt: void
+    :param ipt: The input to get the data for.
+
+
+    :rtype: int
+    :return: A boolean value of current input value.
     """
     return _helics.helicsInputGetBoolean(ipt)
 
 def helicsInputGetDouble(ipt: "helics_input") -> "double":
     r"""
-    get a double value from a subscription
-       :type ipt: void
-       :param ipt: the input to get the data for
+    Get a double value from a subscription.
 
-       :rtype: float
-       :return: the double value of the input
+    :type ipt: void
+    :param ipt: The input to get the data for.
+
+
+    :rtype: float
+    :return: The double value of the input.
     """
     return _helics.helicsInputGetDouble(ipt)
 
 def helicsInputGetTime(ipt: "helics_input") -> "helics_time":
     r"""
-    get a double value from a subscription
-       :type ipt: void
-       :param ipt: the input to get the data for
+    Get a time value from a subscription.
 
-       :rtype: float
-       :return: the resulting double value
+    :type ipt: void
+    :param ipt: The input to get the data for.
+
+
+    :rtype: float
+    :return: The resulting time value.
     """
     return _helics.helicsInputGetTime(ipt)
 
 def helicsInputGetChar(ipt: "helics_input") -> "char":
     r"""
-    get a single character value from an input
-       :type ipt: void
-       :param ipt: the input to get the data for
+    Get a single character value from an input.
 
-       :rtype: char
-       :return: the resulting character value
-       NAK (negative acknowledgment) symbol returned on error
+    :type ipt: void
+    :param ipt: The input to get the data for.
+
+
+    :rtype: char
+    :return: The resulting character value.
     """
     return _helics.helicsInputGetChar(ipt)
 
 def helicsInputGetComplexObject(ipt: "helics_input") -> "helics_complex":
     r"""
-    get a complex object from an input object
-       :type ipt: void
-       :param ipt: the input to get the data for
+    Get a complex object from an input object.
 
-           error
-       :rtype: :py:class:`helics_complex`
-       :return: a helics_complex structure with the value
+    :type ipt: void
+    :param ipt: The input to get the data for.
+
+
+    :rtype: :py:class:`helics_complex`
+    :return: A helics_complex structure with the value.
     """
     return _helics.helicsInputGetComplexObject(ipt)
 
 def helicsInputGetComplex(ipt: "helics_input") -> "double *, double *":
     r"""
-    get a pair of double forming a complex number from a subscriptions
-       :type ipt: void
-       :param ipt: the input to get the data for
-           real memory location to place the real part of a value
-           imag memory location to place the imaginary part of a value
+    Get a pair of double forming a complex number from a subscriptions.
+
+    :type ipt: void
+    :param ipt: The input to get the data for.
+
+
+
+    :rtype: void
+    :return: a pair of floating point values that represent the real and imag values
     """
     return _helics.helicsInputGetComplex(ipt)
 
 def helicsInputGetVectorSize(ipt: "helics_input") -> "int":
     r"""
-    get the size of a value for subscription assuming return as an array of doubles
-       :rtype: int
-       :return: the number of double in a return vector
+    Get the size of a value for subscription assuming return as an array of doubles.
+
+    :rtype: int
+    :return: The number of double in a returned vector.
     """
     return _helics.helicsInputGetVectorSize(ipt)
 
 def helicsInputGetVector(ipt: "helics_input") -> "int *":
     r"""
-    get a vector from a subscription
-       :type ipt: void
-       :param ipt: the input to get the result for
-           data the location to store the data
-       :type maxlen: int
-       :param maxlen: the maximum size of the vector
-           actualSize location to place the actual length of the resulting vector
+    Get a vector from a subscription.
+
+    :type ipt: void
+    :param ipt: The input to get the result for.
+
+
+
+    :rtype: void
+    :return: a list of floating point values
     """
     return _helics.helicsInputGetVector(ipt)
 
 def helicsInputGetNamedPoint(ipt: "helics_input") -> "int *, double *":
     r"""
-    get a named point from a subscription
-       :type ipt: void
-       :param ipt: the input to get the result for
-           outputString storage for copying a null terminated string
-       :type maxStringLen: int
-       :param maxStringLen: the maximum size of information that str can hold
-           actualLength the actual length of the string
-           val the double value for the named point
+    Get a named point from a subscription.
+
+    :type ipt: void
+    :param ipt: The input to get the result for.
+
+
+
+    :rtype: void
+    :return: a string and a double value for the named point
     """
     return _helics.helicsInputGetNamedPoint(ipt)
 
 def helicsInputSetDefaultRaw(ipt: "helics_input", data: "void const *") -> "int":
     r"""
-    set the default as a raw data array
-        :type ipt: void
-        :param ipt: the input to set the default for
-        :type data: void
-        :param data: a pointer to the raw data to use for the default
-        :type inputDataLength: int
-        :param inputDataLength: the size of the raw data
+    Set the default as a raw data array.
+
+    :type ipt: void
+    :param ipt: The input to set the default for.
+    :type data: void
+    :param data: A pointer to the raw data to use for the default.
     """
     return _helics.helicsInputSetDefaultRaw(ipt, data)
 
 def helicsInputSetDefaultString(ipt: "helics_input", str: "char const *") -> "void":
     r"""
-    set the default as a string
-       :type ipt: void
-       :param ipt: the input to set the default for
-       :type str: string
-       :param str: a pointer to the default string
+    Set the default as a string.
+
+    :type ipt: void
+    :param ipt: The input to set the default for.
+    :type str: string
+    :param str: A pointer to the default string.
     """
     return _helics.helicsInputSetDefaultString(ipt, str)
 
 def helicsInputSetDefaultInteger(ipt: "helics_input", val: "int64_t") -> "void":
     r"""
-    set the default as an integer
-       :type ipt: void
-       :param ipt: the input to set the default for
-       :type val: int
-       :param val: the default integer
+    Set the default as an integer.
+
+    :type ipt: void
+    :param ipt: The input to set the default for.
+    :type val: int
+    :param val: The default integer.
     """
     return _helics.helicsInputSetDefaultInteger(ipt, val)
 
 def helicsInputSetDefaultBoolean(ipt: "helics_input", val: "helics_bool") -> "void":
     r"""
-    set the default as a boolean
-       :type ipt: void
-       :param ipt: the input to set the default for
-       :type val: int
-       :param val: the default boolean value
+    Set the default as a boolean.
+
+    :type ipt: void
+    :param ipt: The input to set the default for.
+    :type val: int
+    :param val: The default boolean value.
     """
     return _helics.helicsInputSetDefaultBoolean(ipt, val)
 
 def helicsInputSetDefaultTime(ipt: "helics_input", val: "helics_time") -> "void":
     r"""
-    set the default as a double
-       :type ipt: void
-       :param ipt: the input to set the default for
-       :type val: float
-       :param val: the default double value
+    Set the default as a time.
 
-           function
+    :type ipt: void
+    :param ipt: The input to set the default for.
+    :type val: float
+    :param val: The default time value.
     """
     return _helics.helicsInputSetDefaultTime(ipt, val)
 
 def helicsInputSetDefaultChar(ipt: "helics_input", val: "char") -> "void":
     r"""
-    set the default as a double
-       :type ipt: void
-       :param ipt: the input to set the default for
-       :type val: char
-       :param val: the default double value
+    Set the default as a char.
+
+    :type ipt: void
+    :param ipt: The input to set the default for.
+    :type val: char
+    :param val: The default char value.
     """
     return _helics.helicsInputSetDefaultChar(ipt, val)
 
 def helicsInputSetDefaultDouble(ipt: "helics_input", val: "double") -> "void":
     r"""
-    set the default as a double
-       :type ipt: void
-       :param ipt: the input to set the default for
-       :type val: float
-       :param val: the default double value
+    Set the default as a double.
+
+    :type ipt: void
+    :param ipt: The input to set the default for.
+    :type val: float
+    :param val: The default double value.
     """
     return _helics.helicsInputSetDefaultDouble(ipt, val)
 
 def helicsInputSetDefaultComplex(ipt: "helics_input", real: "double", imag: "double") -> "void":
     r"""
-    set the default as a complex number
-       :type ipt: void
-       :param ipt: the input to set the default for
-       :type real: float
-       :param real: the default real value
-       :type imag: float
-       :param imag: the default imaginary value
+    Set the default as a complex number.
+
+    :type ipt: void
+    :param ipt: The input to set the default for.
+    :type real: float
+    :param real: The default real value.
+    :type imag: float
+    :param imag: The default imaginary value.
     """
     return _helics.helicsInputSetDefaultComplex(ipt, real, imag)
 
 def helicsInputSetDefaultVector(ipt: "helics_input", vectorInput: "double const *") -> "int":
     r"""
-    set the default as a vector of doubles
-       :type ipt: void
-       :param ipt: the input to set the default for
-       :type vectorInput: float
-       :param vectorInput: a pointer to an array of double data
-       :type vectorLength: int
-       :param vectorLength: the number of points to publish
+    Set the default as a vector of doubles.
+
+    :type ipt: void
+    :param ipt: The input to set the default for.
+    :type vectorInput: float
+    :param vectorInput: A pointer to an array of double data.
+    :type vectorLength: int
+    :param vectorLength: The number of points to publish.
     """
     return _helics.helicsInputSetDefaultVector(ipt, vectorInput)
 
 def helicsInputSetDefaultNamedPoint(ipt: "helics_input", str: "char const *", val: "double") -> "void":
     r"""
-    set the default as a NamedPoint
-       :type ipt: void
-       :param ipt: the input to set the default for
-       :type str: string
-       :param str: a pointer to a string representing the name
-       :type val: float
-       :param val: a double value for the value of the named point
+    Set the default as a NamedPoint.
+
+    :type ipt: void
+    :param ipt: The input to set the default for.
+    :type str: string
+    :param str: A pointer to a string representing the name.
+    :type val: float
+    :param val: A double value for the value of the named point.
     """
     return _helics.helicsInputSetDefaultNamedPoint(ipt, str, val)
 
 def helicsInputGetType(ipt: "helics_input") -> "char const *":
     r"""
-    get the type of an input
-        :type ipt: void
-        :param ipt: the input to query
-        :rtype: string
-        :return: a void enumeration, helics_ok if everything worked
+    Get the type of an input.
+
+    :type ipt: void
+    :param ipt: The input to query.
+
+    :rtype: string
+    :return: A void enumeration, helics_ok if everything worked.
     """
     return _helics.helicsInputGetType(ipt)
 
 def helicsInputGetPublicationType(ipt: "helics_input") -> "char const *":
     r"""
-    get the type of the publisher to an input is sending
-       :type ipt: void
-       :param ipt: the input to query
-       :rtype: string
-       :return: a const char * with the type name
+    Get the type the publisher to an input is sending.
+
+    :type ipt: void
+    :param ipt: The input to query.
+
+    :rtype: string
+    :return: A const char * with the type name.
     """
     return _helics.helicsInputGetPublicationType(ipt)
 
 def helicsPublicationGetType(pub: "helics_publication") -> "char const *":
     r"""
-    get the type of a publication
-       :type pub: void
-       :param pub: the publication to query
-       :rtype: string
-       :return: a void enumeration, helics_ok if everything worked
+    Get the type of a publication.
+
+    :type pub: void
+    :param pub: The publication to query.
+
+    :rtype: string
+    :return: A void enumeration, helics_ok if everything worked.
     """
     return _helics.helicsPublicationGetType(pub)
 
 def helicsInputGetKey(ipt: "helics_input") -> "char const *":
     r"""
-    get the key of an input
-       :type ipt: void
-       :param ipt: the input to query
-       :rtype: string
-       :return: a void enumeration, helics_ok if everything worked
+    Get the key of an input.
+
+    :type ipt: void
+    :param ipt: The input to query.
+
+    :rtype: string
+    :return: A void enumeration, helics_ok if everything worked.
     """
     return _helics.helicsInputGetKey(ipt)
 
 def helicsSubscriptionGetKey(ipt: "helics_input") -> "char const *":
     r"""
-    get the key of a subscription
-       :rtype: string
-       :return: a const char with the subscription key
+    Get the key of a subscription.
+
+    :rtype: string
+    :return: A const char with the subscription key.
     """
     return _helics.helicsSubscriptionGetKey(ipt)
 
 def helicsPublicationGetKey(pub: "helics_publication") -> "char const *":
     r"""
-    get the key of a publication
-       this will be the global key used to identify the publication to the federation
-       :type pub: void
-       :param pub: the publication to query
-       :rtype: string
-       :return: a void enumeration, helics_ok if everything worked
+    Get the key of a publication.
+
+    This will be the global key used to identify the publication to the federation.
+
+    :type pub: void
+    :param pub: The publication to query.
+
+    :rtype: string
+    :return: A void enumeration, helics_ok if everything worked.
     """
     return _helics.helicsPublicationGetKey(pub)
 
 def helicsInputGetUnits(ipt: "helics_input") -> "char const *":
     r"""
-    get the units of an input
-       :type ipt: void
-       :param ipt: the input to query
-       :rtype: string
-       :return: a void enumeration, helics_ok if everything worked
+    Get the units of an input.
+
+    :type ipt: void
+    :param ipt: The input to query.
+
+    :rtype: string
+    :return: A void enumeration, helics_ok if everything worked.
     """
     return _helics.helicsInputGetUnits(ipt)
 
 def helicsInputGetInjectionUnits(ipt: "helics_input") -> "char const *":
     r"""
-    get the units of the publication that an input is linked to
-       :type ipt: void
-       :param ipt: the input to query
-       :rtype: string
-       :return: a void enumeration, helics_ok if everything worked
+    Get the units of the publication that an input is linked to.
+
+    :type ipt: void
+    :param ipt: The input to query.
+
+    :rtype: string
+    :return: A void enumeration, helics_ok if everything worked.
     """
     return _helics.helicsInputGetInjectionUnits(ipt)
 
 def helicsInputGetExtractionUnits(ipt: "helics_input") -> "char const *":
     r"""
-    get the units of an input
-       :  the same as helicsInputGetUnits
-       :type ipt: void
-       :param ipt: the input to query
-       :rtype: string
-       :return: a void enumeration, helics_ok if everything worked
+    Get the units of an input.
+
+    The same as helicsInputGetUnits.
+
+    :type ipt: void
+    :param ipt: The input to query.
+
+    :rtype: string
+    :return: A void enumeration, helics_ok if everything worked.
     """
     return _helics.helicsInputGetExtractionUnits(ipt)
 
 def helicsPublicationGetUnits(pub: "helics_publication") -> "char const *":
     r"""
-    get the units of a publication
-       :type pub: void
-       :param pub: the publication to query
-       :rtype: string
-       :return: a void enumeration, helics_ok if everything worked
+    Get the units of a publication.
+
+    :type pub: void
+    :param pub: The publication to query.
+
+    :rtype: string
+    :return: A void enumeration, helics_ok if everything worked.
     """
     return _helics.helicsPublicationGetUnits(pub)
 
 def helicsInputGetInfo(inp: "helics_input") -> "char const *":
     r"""
-    get the data in the info field of an input
-       :type inp: void
-       :param inp: the input to query
-       :rtype: string
-       :return: a string with the info field string
+    Get the data in the info field of an input.
+
+    :type inp: void
+    :param inp: The input to query.
+
+    :rtype: string
+    :return: A string with the info field string.
     """
     return _helics.helicsInputGetInfo(inp)
 
 def helicsInputSetInfo(inp: "helics_input", info: "char const *") -> "void":
     r"""
-    set the data in the info field for an input
-       :type inp: void
-       :param inp: the input to query
-       :type info: string
-       :param info: the string to set
+    Set the data in the info field for an input.
+
+    :type inp: void
+    :param inp: The input to query.
+    :type info: string
+    :param info: The string to set.
     """
     return _helics.helicsInputSetInfo(inp, info)
 
 def helicsPublicationGetInfo(pub: "helics_publication") -> "char const *":
     r"""
-    get the data in the info field of an publication
-       :type pub: void
-       :param pub: the publication to query
-       :rtype: string
-       :return: a string with the info field string
+    Get the data in the info field of an publication.
+
+    :type pub: void
+    :param pub: The publication to query.
+
+    :rtype: string
+    :return: A string with the info field string.
     """
     return _helics.helicsPublicationGetInfo(pub)
 
 def helicsPublicationSetInfo(pub: "helics_publication", info: "char const *") -> "void":
     r"""
-    set the data in the info field for an publication
-       :type pub: void
-       :param pub: the publication to set the info field for
-       :type info: string
-       :param info: the string to set
+    Set the data in the info field for a publication.
+
+    :type pub: void
+    :param pub: The publication to set the info field for.
+    :type info: string
+    :param info: The string to set.
     """
     return _helics.helicsPublicationSetInfo(pub, info)
 
 def helicsInputGetOption(inp: "helics_input", option: "int") -> "helics_bool":
     r"""
-    get the data in the info field of an input
-       :type inp: void
-       :param inp: the input to query
-       :type option: int
-       :param option: integer representation of the option in question see /ref helics_handle_options
-       :rtype: int
-       :return: a string with the info field string
+    Get the data in the info field of an input.
+
+    :type inp: void
+    :param inp: The input to query.
+    :type option: int
+    :param option: Integer representation of the option in question see /ref helics_handle_options.
+
+    :rtype: int
+    :return: A string with the info field string.
     """
     return _helics.helicsInputGetOption(inp, option)
 
 def helicsInputSetOption(inp: "helics_input", option: "int", value: "helics_bool") -> "void":
     r"""
-    set the data in the info field for an input
-       :type inp: void
-       :param inp: the input to query
-       :type option: int
-       :param option: the option to set for the input /ref helics_handle_options
-       :type value: int
-       :param value: the value to set the option to
+    Set the data in the info field for an input.
+
+    :type inp: void
+    :param inp: The input to query.
+    :type option: int
+    :param option: The option to set for the input /ref helics_handle_options.
+    :type value: int
+    :param value: The value to set the option to.
     """
     return _helics.helicsInputSetOption(inp, option, value)
 
 def helicsPublicationGetOption(pub: "helics_publication", option: "int") -> "helics_bool":
     r"""
-    get the data in the info field of an publication
-       :type pub: void
-       :param pub: the publication to query
-       :type option: int
-       :param option: the value to query see /ref helics_handle_options
-       :rtype: int
-       :return: a string with the info field string
+    Get the data in the info field of a publication.
+
+    :type pub: void
+    :param pub: The publication to query.
+    :type option: int
+    :param option: The value to query see /ref helics_handle_options.
+
+    :rtype: int
+    :return: A string with the info field string.
     """
     return _helics.helicsPublicationGetOption(pub, option)
 
 def helicsPublicationSetOption(pub: "helics_publication", option: "int", val: "helics_bool") -> "void":
     r"""
-    set the data in the info field for an publication
-       :type pub: void
-       :param pub: the publication to query
-       :type option: int
-       :param option: integer code for the option to set /ref helics_handle_options
-       :type val: int
-       :param val: the value to set the option to
+    Set the data in the info field for a publication.
+
+    :type pub: void
+    :param pub: The publication to query.
+    :type option: int
+    :param option: Integer code for the option to set /ref helics_handle_options.
+    :type val: int
+    :param val: The value to set the option to.
     """
     return _helics.helicsPublicationSetOption(pub, option, val)
 
 def helicsPublicationSetMinimumChange(pub: "helics_publication", tolerance: "double") -> "void":
     r"""
-    set the minimum change detection tolerance
-       :type pub: void
-       :param pub: the publication to modify
-       :type tolerance: float
-       :param tolerance: the tolerance level for publication, values changing less than this value will not be published
+    Set the minimum change detection tolerance.
+
+    :type pub: void
+    :param pub: The publication to modify.
+    :type tolerance: float
+    :param tolerance: The tolerance level for publication, values changing less than this value will not be published.
     """
     return _helics.helicsPublicationSetMinimumChange(pub, tolerance)
 
 def helicsInputSetMinimumChange(inp: "helics_input", tolerance: "double") -> "void":
     r"""
-    set the minimum change detection tolerance
-       :type inp: void
-       :param inp: the input to modify
-       :type tolerance: float
-       :param tolerance: the tolerance level for registering an update, values changing less than this value will not show as being updated
+    Set the minimum change detection tolerance.
+
+    :type inp: void
+    :param inp: The input to modify.
+    :type tolerance: float
+    :param tolerance: The tolerance level for registering an update, values changing less than this value will not show as being updated.
     """
     return _helics.helicsInputSetMinimumChange(inp, tolerance)
 
 def helicsInputIsUpdated(ipt: "helics_input") -> "helics_bool":
     r"""
-    check if a particular subscription was updated
-        :rtype: int
-        :return: true if it has been updated since the last value retrieval
+    Check if a particular subscription was updated.
+
+    :rtype: int
+    :return: helics_true if it has been updated since the last value retrieval.
     """
     return _helics.helicsInputIsUpdated(ipt)
 
 def helicsInputLastUpdateTime(ipt: "helics_input") -> "helics_time":
-    r""" get the last time a subscription was updated"""
+    r"""Get the last time a subscription was updated."""
     return _helics.helicsInputLastUpdateTime(ipt)
 
 def helicsInputClearUpdate(ipt: "helics_input") -> "void":
-    r""" clear the updated flag from an input"""
+    r"""Clear the updated flag from an input."""
     return _helics.helicsInputClearUpdate(ipt)
 
 def helicsFederateGetPublicationCount(fed: "helics_federate") -> "int":
     r"""
-    get the number of publications in a federate
-       :rtype: int
-       :return: (-1) if fed was not a valid federate otherwise returns the number of publications
+    Get the number of publications in a federate.
+
+    :rtype: int
+    :return: (-1) if fed was not a valid federate otherwise returns the number of publications.
     """
     return _helics.helicsFederateGetPublicationCount(fed)
 
 def helicsFederateGetInputCount(fed: "helics_federate") -> "int":
     r"""
-    get the number of subscriptions in a federate
-       :rtype: int
-       :return: (-1) if fed was not a valid federate otherwise returns the number of subscriptions
+    Get the number of subscriptions in a federate.
+
+    :rtype: int
+    :return: (-1) if fed was not a valid federate otherwise returns the number of subscriptions.
     """
     return _helics.helicsFederateGetInputCount(fed)
 
 def helicsFederateRegisterEndpoint(fed: "helics_federate", name: "char const *", type: "char const *") -> "helics_endpoint":
     r"""
-    create an endpoint
-       the endpoint becomes part of the federate and is destroyed when the federate is freed so there are no separate free functions
-       for endpoints
-       :type fed: void
-       :param fed: the federate object in which to create an endpoint must have been create with helicsCreateMessageFederate or
-           helicsCreateCombinationFederate
-       :type name: string
-       :param name: the identifier for the endpoint,  this will be prepended with the federate name for the global identifier
-       :type type: string
-       :param type: a string describing the expected type of the publication may be NULL
+    Create an endpoint.
 
-       :rtype: void
-       :return: an object containing the endpoint, nullptr on failure
+    The endpoint becomes part of the federate and is destroyed when the federate is freed
+             so there are no separate free functions for endpoints.
+
+    :type fed: void
+    :param fed: The federate object in which to create an endpoint must have been created
+                  with helicsCreateMessageFederate or helicsCreateCombinationFederate.
+    :type name: string
+    :param name: The identifier for the endpoint. This will be prepended with the federate name for the global identifier.
+    :type type: string
+    :param type: A string describing the expected type of the publication (may be NULL).
+
+
+    :rtype: void
+    :return: An object containing the endpoint.
     """
     return _helics.helicsFederateRegisterEndpoint(fed, name, type)
 
 def helicsFederateRegisterGlobalEndpoint(fed: "helics_federate", name: "char const *", type: "char const *") -> "helics_endpoint":
     r"""
-    create an endpoint
-       the endpoint becomes part of the federate and is destroyed when the federate is freed so there are no separate free functions
-       for endpoints
-       :type fed: void
-       :param fed: the federate object in which to create an endpoint must have been create with helicsCreateMessageFederate or
-           helicsCreateCombinationFederate
-       :type name: string
-       :param name: the identifier for the endpoint,  the given name is the global identifier
-       :type type: string
-       :param type: a string describing the expected type of the publication may be NULL
+    Create an endpoint.
 
-       :rtype: void
-       :return: an object containing the endpoint, nullptr on failure
+    The endpoint becomes part of the federate and is destroyed when the federate is freed
+             so there are no separate free functions for endpoints.
+
+    :type fed: void
+    :param fed: The federate object in which to create an endpoint must have been created
+                      with helicsCreateMessageFederate or helicsCreateCombinationFederate.
+    :type name: string
+    :param name: The identifier for the endpoint, the given name is the global identifier.
+    :type type: string
+    :param type: A string describing the expected type of the publication (may be NULL).
+
+    :rtype: void
+    :return: An object containing the endpoint.
     """
     return _helics.helicsFederateRegisterGlobalEndpoint(fed, name, type)
 
 def helicsFederateGetEndpoint(fed: "helics_federate", name: "char const *") -> "helics_endpoint":
     r"""
-    get an endpoint object from a name
-       :type fed: void
-       :param fed: the message federate object to use to get the endpoint
-       :type name: string
-       :param name: the name of the endpoint
+    Get an endpoint object from a name.
 
-       :rtype: void
-       :return: a helics_endpoint object, the object will not be valid and err will contain an error code if no endpoint with the specified
-           name exists
+    :type fed: void
+    :param fed: The message federate object to use to get the endpoint.
+    :type name: string
+    :param name: The name of the endpoint.
+
+
+    :rtype: void
+    :return: A helics_endpoint object.
     """
     return _helics.helicsFederateGetEndpoint(fed, name)
 
 def helicsFederateGetEndpointByIndex(fed: "helics_federate", index: "int") -> "helics_endpoint":
     r"""
-    get an endpoint by its index typically already created via registerInterfaces file or something of that nature
+    Get an endpoint by its index, typically already created via registerInterfaces file or something of that nature.
 
-       :type fed: void
-       :param fed: the federate object in which to create a publication
-       :type index: int
-       :param index: the index of the publication to get
+    :type fed: void
+    :param fed: The federate object in which to create a publication.
+    :type index: int
+    :param index: The index of the publication to get.
 
-       :rtype: void
-       :return: a helics_endpoint, which will be NULL if an invalid index
+
+    :rtype: void
+    :return: A helics_endpoint.
     """
     return _helics.helicsFederateGetEndpointByIndex(fed, index)
 
 def helicsEndpointSetDefaultDestination(endpoint: "helics_endpoint", dest: "char const *") -> "void":
     r"""
-    set the default destination for an endpoint if no other endpoint is given
-       :type endpoint: void
-       :param endpoint: the endpoint to set the destination for
-       :type dest: string
-       :param dest: a string naming the desired default endpoint
+    Set the default destination for an endpoint if no other endpoint is given.
+
+    :type endpoint: void
+    :param endpoint: The endpoint to set the destination for.
+    :type dest: string
+    :param dest: A string naming the desired default endpoint.
     """
     return _helics.helicsEndpointSetDefaultDestination(endpoint, dest)
 
 def helicsEndpointGetDefaultDestination(endpoint: "helics_endpoint") -> "char const *":
     r"""
-    get the default destination for an endpoint
-       :type endpoint: void
-       :param endpoint: the endpoint to set the destination for
-       :rtype: string
-       :return: a string with the default destination
+    Get the default destination for an endpoint.
+
+    :type endpoint: void
+    :param endpoint: The endpoint to set the destination for.
+
+    :rtype: string
+    :return: A string with the default destination.
     """
     return _helics.helicsEndpointGetDefaultDestination(endpoint)
 
 def helicsEndpointSendMessageRaw(endpoint: "helics_endpoint", dest: "char const *", data: "void const *") -> "int":
     r"""
-    send a message to the specified destination
-       :type endpoint: void
-       :param endpoint: the endpoint to send the data from
-       :type dest: string
-       :param dest: the target destination (nullptr to use the default destination)
-       :type data: void
-       :param data: the data to send
-       :type inputDataLength: int
-       :param inputDataLength: the length of the data to send
+    Send a message to the specified destination.
+
+    :type endpoint: void
+    :param endpoint: The endpoint to send the data from.
+    :type dest: string
+    :param dest: The target destination.
+
+
+                "" to use the default destination.
+
+    :type data: void
+    :param data: The data to send.
     """
     return _helics.helicsEndpointSendMessageRaw(endpoint, dest, data)
 
 def helicsEndpointSendEventRaw(endpoint: "helics_endpoint", dest: "char const *", data: "void const *", time: "helics_time") -> "int":
     r"""
-    send a message at a specific time to the specified destination
-       :type endpoint: void
-       :param endpoint: the endpoint to send the data from
-       :type dest: string
-       :param dest: the target destination (nullptr to use the default destination
-       :type data: void
-       :param data: the data to send
-       :type inputDataLength: int
-       :param inputDataLength: the length of the data to send
-       :type time: float
-       :param time: the time the message should be sent
+    Send a message at a specific time to the specified destination.
+
+    :type endpoint: void
+    :param endpoint: The endpoint to send the data from.
+    :type dest: string
+    :param dest: The target destination.
+
+
+                "" to use the default destination.
+
+    :type data: void
+    :param data: The data to send.
+
+    :type time: float
+    :param time: The time the message should be sent.
     """
     return _helics.helicsEndpointSendEventRaw(endpoint, dest, data, time)
 
 def helicsEndpointSendMessage(endpoint: "helics_endpoint", message: "helics_message") -> "void":
     r"""
-    send a message object from a specific endpoint
-       :type endpoint: void
-       :param endpoint: the endpoint to send the data from
-       :type message: :py:class:`helics_message`
-       :param message: the actual message to send
+    Send a message object from a specific endpoint.
+
+    :type endpoint: void
+    :param endpoint: The endpoint to send the data from.
+    :type message: :py:class:`helics_message`
+    :param message: The actual message to send.
     """
     return _helics.helicsEndpointSendMessage(endpoint, message)
 
 def helicsEndpointSendMessageObject(endpoint: "helics_endpoint", message: "helics_message_object") -> "void":
     r"""
-    send a message object from a specific endpoint
-       :type endpoint: void
-       :param endpoint: the endpoint to send the data from
-       :type message: void
-       :param message: the actual message to send
+    Send a message object from a specific endpoint.
+
+    :type endpoint: void
+    :param endpoint: The endpoint to send the data from.
+    :type message: void
+    :param message: The actual message to send.
     """
     return _helics.helicsEndpointSendMessageObject(endpoint, message)
 
 def helicsEndpointSubscribe(endpoint: "helics_endpoint", key: "char const *") -> "void":
     r"""
-    subscribe an endpoint to a publication
-       :type endpoint: void
-       :param endpoint: the endpoint to use
-       :type key: string
-       :param key: the name of the publication
+    Subscribe an endpoint to a publication.
+
+    :type endpoint: void
+    :param endpoint: The endpoint to use.
+    :type key: string
+    :param key: The name of the publication.
     """
     return _helics.helicsEndpointSubscribe(endpoint, key)
 
 def helicsFederateHasMessage(fed: "helics_federate") -> "helics_bool":
     r"""
-    check if the federate has any outstanding messages
-       :type fed: void
-       :param fed: the federate to check if it has
-       :rtype: int
-       :return: helics_true if the federate has a message waiting helics_false otherwise
+    Check if the federate has any outstanding messages.
+
+    :type fed: void
+    :param fed: The federate to check.
+
+    :rtype: int
+    :return: helics_true if the federate has a message waiting, helics_false otherwise.
     """
     return _helics.helicsFederateHasMessage(fed)
 
 def helicsEndpointHasMessage(endpoint: "helics_endpoint") -> "helics_bool":
     r"""
-    check if a given endpoint has any unread messages
-       :type endpoint: void
-       :param endpoint: the endpoint to check
-       :rtype: int
-       :return: helics_true if the endpoint has a message, helics_false otherwise
+    Check if a given endpoint has any unread messages.
+
+    :type endpoint: void
+    :param endpoint: The endpoint to check.
+
+    :rtype: int
+    :return: helics_true if the endpoint has a message, helics_false otherwise.
     """
     return _helics.helicsEndpointHasMessage(endpoint)
 
 def helicsFederatePendingMessages(fed: "helics_federate") -> "int":
     r"""
     Returns the number of pending receives for the specified destination endpoint.
-         :type fed: void
-         :param fed: the federate to get the number of waiting messages
+
+    :type fed: void
+    :param fed: The federate to get the number of waiting messages from.
     """
     return _helics.helicsFederatePendingMessages(fed)
 
 def helicsEndpointPendingMessages(endpoint: "helics_endpoint") -> "int":
     r"""
-    Returns the number of pending receives for all endpoints of particular federate.
-         :type endpoint: void
-         :param endpoint: the endpoint to query
+    Returns the number of pending receives for all endpoints of a particular federate.
+
+    :type endpoint: void
+    :param endpoint: The endpoint to query.
     """
     return _helics.helicsEndpointPendingMessages(endpoint)
 
 def helicsEndpointGetMessage(endpoint: "helics_endpoint") -> "helics_message":
     r"""
-    receive a packet from a particular endpoint
-       endpoint the identifier for the endpoint
-       :rtype: :py:class:`helics_message`
-       :return: a message object
+    Receive a packet from a particular endpoint.
+
+    endpoint The identifier for the endpoint.
+
+    :rtype: :py:class:`helics_message`
+    :return: A message object.
     """
     return _helics.helicsEndpointGetMessage(endpoint)
 
 def helicsEndpointGetMessageObject(endpoint: "helics_endpoint") -> "helics_message_object":
     r"""
-    receive a packet from a particular endpoint
-       endpoint the identifier for the endpoint
-       :rtype: void
-       :return: a message object
+    Receive a packet from a particular endpoint.
+
+    endpoint The identifier for the endpoint.
+
+    :rtype: void
+    :return: A message object.
     """
     return _helics.helicsEndpointGetMessageObject(endpoint)
 
 def helicsFederateGetMessage(fed: "helics_federate") -> "helics_message":
     r"""
-    receive a communication message for any endpoint in the federate
-       the return order will be in order of endpoint creation.
-       So all messages that are available for the first endpoint, then all for the second, and so on
-       within a single endpoint the messages are ordered by time, then source_id, then order of arrival
-       :rtype: :py:class:`helics_message`
-       :return: a unique_ptr to a Message object containing the message data
+    Receive a communication message for any endpoint in the federate.
+
+    The return order will be in order of endpoint creation.
+             So all messages that are available for the first endpoint, then all for the second, and so on.
+             Within a single endpoint, the messages are ordered by time, then source_id, then order of arrival.
+
+    :rtype: :py:class:`helics_message`
+    :return: A unique_ptr to a Message object containing the message data.
     """
     return _helics.helicsFederateGetMessage(fed)
 
 def helicsFederateGetMessageObject(fed: "helics_federate") -> "helics_message_object":
     r"""
-    receive a communication message for any endpoint in the federate
-        the return order will be in order of endpoint creation.
-       So all messages that are available for the first endpoint, then all for the second, and so on
-       within a single endpoint the messages are ordered by time, then source_id, then order of arrival
-       :rtype: void
-       :return: a helics_message_object which references the data in the message
+    Receive a communication message for any endpoint in the federate.
+
+    The return order will be in order of endpoint creation.
+             So all messages that are available for the first endpoint, then all for the second, and so on.
+             Within a single endpoint, the messages are ordered by time, then source_id, then order of arrival.
+
+    :rtype: void
+    :return: A helics_message_object which references the data in the message.
     """
     return _helics.helicsFederateGetMessageObject(fed)
 
 def helicsFederateCreateMessageObject(fed: "helics_federate") -> "helics_message_object":
     r"""
-    create a new empty message object
-       , the message is empty and isValid will return false since there is no data associated with the message yet.
-       :rtype: void
-       :return: a helics_message_object containing the message data
+    Create a new empty message object.
+
+    The message is empty and isValid will return false since there is no data associated with the message yet.
+
+    :rtype: void
+    :return: A helics_message_object containing the message data.
     """
     return _helics.helicsFederateCreateMessageObject(fed)
 
 def helicsFederateClearMessages(fed: "helics_federate") -> "void":
     r"""
-    clear all stored messages from a federate
-       this clears messages retrieved through helicsFederateGetMessage or helicsFederateGetMessageObject
-       :type fed: void
-       :param fed: the federate to clear the message for
+    Clear all stored messages from a federate.
+
+    This clears messages retrieved through helicsFederateGetMessage or helicsFederateGetMessageObject
+
+    :type fed: void
+    :param fed: The federate to clear the message for.
     """
     return _helics.helicsFederateClearMessages(fed)
 
 def helicsEndpointClearMessages(endpoint: "helics_endpoint") -> "void":
     r"""
-    clear all message from an endpoint
-       :type endpoint: void
-       :param endpoint:  the endpoint object to operate on
+    Clear all message from an endpoint.
+
+    :type endpoint: void
+    :param endpoint: The endpoint object to operate on.
     """
     return _helics.helicsEndpointClearMessages(endpoint)
 
 def helicsEndpointGetType(endpoint: "helics_endpoint") -> "char const *":
     r"""
-    get the type specified for an endpoint
-       :type endpoint: void
-       :param endpoint:  the endpoint object in question
-       :rtype: string
-       :return: the defined type of the endpoint
+    Get the type specified for an endpoint.
+
+    :type endpoint: void
+    :param endpoint: The endpoint object in question.
+
+    :rtype: string
+    :return: The defined type of the endpoint.
     """
     return _helics.helicsEndpointGetType(endpoint)
 
 def helicsEndpointGetName(endpoint: "helics_endpoint") -> "char const *":
     r"""
-    get the name of an endpoint
-       :type endpoint: void
-       :param endpoint:  the endpoint object in question
-       :rtype: string
-       :return: the name of the endpoint
+    Get the name of an endpoint.
+
+    :type endpoint: void
+    :param endpoint: The endpoint object in question.
+
+    :rtype: string
+    :return: The name of the endpoint.
     """
     return _helics.helicsEndpointGetName(endpoint)
 
 def helicsFederateGetEndpointCount(fed: "helics_federate") -> "int":
     r"""
-    get the number of endpoints in a federate
-       :type fed: void
-       :param fed: the message federate to query
-       :rtype: int
-       :return: (-1) if fed was not a valid federate otherwise returns the number of endpoints
+    Get the number of endpoints in a federate.
+
+    :type fed: void
+    :param fed: The message federate to query.
+
+    :rtype: int
+    :return: (-1) if fed was not a valid federate, otherwise returns the number of endpoints.
     """
     return _helics.helicsFederateGetEndpointCount(fed)
 
 def helicsEndpointGetInfo(end: "helics_endpoint") -> "char const *":
     r"""
-    get the data in the info field of an filter
-       :type end: void
-       :param end: the filter to query
-       :rtype: string
-       :return: a string with the info field string
+    Get the data in the info field of a filter.
+
+    :type end: void
+    :param end: The filter to query.
+
+    :rtype: string
+    :return: A string with the info field string.
     """
     return _helics.helicsEndpointGetInfo(end)
 
 def helicsEndpointSetInfo(end: "helics_endpoint", info: "char const *") -> "void":
     r"""
-    set the data in the info field for an filter
-       :type end: void
-       :param end: the endpoint to query
-       :type info: string
-       :param info: the string to set
+    Set the data in the info field for a filter.
+
+    :type end: void
+    :param end: The endpoint to query.
+    :type info: string
+    :param info: The string to set.
     """
     return _helics.helicsEndpointSetInfo(end, info)
 
 def helicsEndpointSetOption(end: "helics_endpoint", option: "int", value: "helics_bool") -> "void":
     r"""
-    set a handle option on an endpoint
-       :type end: void
-       :param end: the endpoint to modify
-       :type option: int
-       :param option: integer code for the option to set /ref helics_handle_options
-       :type value: int
-       :param value: the value to set the option
+    Set a handle option on an endpoint.
+
+    :type end: void
+    :param end: The endpoint to modify.
+    :type option: int
+    :param option: Integer code for the option to set /ref helics_handle_options.
+    :type value: int
+    :param value: The value to set the option to.
     """
     return _helics.helicsEndpointSetOption(end, option, value)
 
 def helicsEndpointGetOption(end: "helics_endpoint", option: "int") -> "helics_bool":
     r"""
-    set a handle option on an endpoint
-       :type end: void
-       :param end: the endpoint to modify
-       :type option: int
-       :param option: integer code for the option to set /ref helics_handle_options
+    Set a handle option on an endpoint.
+
+    :type end: void
+    :param end: The endpoint to modify.
+    :type option: int
+    :param option: Integer code for the option to set /ref helics_handle_options.
     """
     return _helics.helicsEndpointGetOption(end, option)
 
 def helicsMessageGetSource(message: "helics_message_object") -> "char const *":
     r"""
-    get the source endpoint of a message
-       :type message: void
-       :param message: the message object in question
-       :rtype: string
-       :return: a string with the source endpoint
+    Get the source endpoint of a message.
+
+    :type message: void
+    :param message: The message object in question.
+
+    :rtype: string
+    :return: A string with the source endpoint.
     """
     return _helics.helicsMessageGetSource(message)
 
 def helicsMessageGetDestination(message: "helics_message_object") -> "char const *":
     r"""
-    get the destination endpoint of a message
-       :type message: void
-       :param message: the message object in question
-       :rtype: string
-       :return: a string with the destination endpoint
+    Get the destination endpoint of a message.
+
+    :type message: void
+    :param message: The message object in question.
+
+    :rtype: string
+    :return: A string with the destination endpoint.
     """
     return _helics.helicsMessageGetDestination(message)
 
 def helicsMessageGetOriginalSource(message: "helics_message_object") -> "char const *":
     r"""
-    get the original source endpoint of a message, the source may have modified by filters or other actions
-       :type message: void
-       :param message: the message object in question
-       :rtype: string
-       :return: a string with the source of a message
+    Get the original source endpoint of a message, the source may have been modified by filters or other actions.
+
+    :type message: void
+    :param message: The message object in question.
+
+    :rtype: string
+    :return: A string with the source of a message.
     """
     return _helics.helicsMessageGetOriginalSource(message)
 
 def helicsMessageGetOriginalDestination(message: "helics_message_object") -> "char const *":
     r"""
-    get the original destination endpoint of a message, the destination may have been modified by filters or other actions
-       :type message: void
-       :param message: the message object in question
-       :rtype: string
-       :return: a string with the original destination of a message
+    Get the original destination endpoint of a message, the destination may have been modified by filters or other actions.
+
+    :type message: void
+    :param message: The message object in question.
+
+    :rtype: string
+    :return: A string with the original destination of a message.
     """
     return _helics.helicsMessageGetOriginalDestination(message)
 
 def helicsMessageGetTime(message: "helics_message_object") -> "helics_time":
     r"""
-    get the helics time associated with a message
-       :type message: void
-       :param message: the message object in question
-       :rtype: float
-       :return: the time associated with a message
+    Get the helics time associated with a message.
+
+    :type message: void
+    :param message: The message object in question.
+
+    :rtype: float
+    :return: The time associated with a message.
     """
     return _helics.helicsMessageGetTime(message)
 
 def helicsMessageGetString(message: "helics_message_object") -> "char const *":
     r"""
-    get the payload of a message as a string
-       :type message: void
-       :param message: the message object in question
-       :rtype: string
-       :return: a string representing the payload of a message
+    Get the payload of a message as a string.
+
+    :type message: void
+    :param message: The message object in question.
+
+    :rtype: string
+    :return: A string representing the payload of a message.
     """
     return _helics.helicsMessageGetString(message)
 
 def helicsMessageGetMessageID(message: "helics_message_object") -> "int":
     r"""
-    get the messageID of a message
-       :type message: void
-       :param message: the message object in question
-       :rtype: int
-       :return: the messageID
+    Get the messageID of a message.
+
+    :type message: void
+    :param message: The message object in question.
+
+    :rtype: int
+    :return: The messageID.
     """
     return _helics.helicsMessageGetMessageID(message)
 
 def helicsMessageCheckFlag(message: "helics_message_object", flag: "int") -> "helics_bool":
     r"""
-    check if a flag is set on a message
-       :type message: void
-       :param message: the message object in question
-       :type flag: int
-       :param flag: the flag to check should be between [0,15]
-       :rtype: int
-       :return: the flags associated with a message
+    Check if a flag is set on a message.
+
+    :type message: void
+    :param message: The message object in question.
+    :type flag: int
+    :param flag: The flag to check should be between [0,15].
+
+    :rtype: int
+    :return: The flags associated with a message.
     """
     return _helics.helicsMessageCheckFlag(message, flag)
 
 def helicsMessageGetRawDataSize(message: "helics_message_object") -> "int":
     r"""
-    get the size of the data payload in bytes
-       :type message: void
-       :param message: the message object in question
-       :rtype: int
-       :return: the size of the data payload
+    Get the size of the data payload in bytes.
+
+    :type message: void
+    :param message: The message object in question.
+
+    :rtype: int
+    :return: The size of the data payload.
     """
     return _helics.helicsMessageGetRawDataSize(message)
 
 def helicsMessageGetRawData(message: "helics_message_object") -> "int *":
     r"""
-    get the raw data for a message object
-       :type message: void
-       :param message: a message object to get the data for
-           data the memory location of the data
-       :type maxMessagelen: int
-       :param maxMessagelen: the maximum size of information that data can hold
-           actualSize  the actual length of data copied to data
+    Get the raw data for a message object.
+
+    :type message: void
+    :param message: A message object to get the data for.
+
+
+
+    :rtype: void
+    :return: Raw string data.
     """
     return _helics.helicsMessageGetRawData(message)
 
 def helicsMessageIsValid(message: "helics_message_object") -> "helics_bool":
     r"""
-    a check if the message contains a valid payload
-       :type message: void
-       :param message: the message object in question
-       :rtype: int
-       :return: true if the message contains a payload
+    A check if the message contains a valid payload.
+
+    :type message: void
+    :param message: The message object in question.
+
+    :rtype: int
+    :return: helics_true if the message contains a payload.
     """
     return _helics.helicsMessageIsValid(message)
 
 def helicsMessageSetSource(message: "helics_message_object", src: "char const *") -> "void":
     r"""
-    set the source of a message
-       :type message: void
-       :param message: the message object in question
-       :type src: string
-       :param src: a string containing the source
+    Set the source of a message.
+
+    :type message: void
+    :param message: The message object in question.
+    :type src: string
+    :param src: A string containing the source.
     """
     return _helics.helicsMessageSetSource(message, src)
 
 def helicsMessageSetDestination(message: "helics_message_object", dest: "char const *") -> "void":
     r"""
-    set the destination of a message
-       :type message: void
-       :param message: the message object in question
-       :type dest: string
-       :param dest: a string containing the new destination
+    Set the destination of a message.
+
+    :type message: void
+    :param message: The message object in question.
+    :type dest: string
+    :param dest: A string containing the new destination.
     """
     return _helics.helicsMessageSetDestination(message, dest)
 
 def helicsMessageSetOriginalSource(message: "helics_message_object", src: "char const *") -> "void":
     r"""
-    set the original source of a message
-       :type message: void
-       :param message: the message object in question
-       :type src: string
-       :param src: a string containing the new original source
+    Set the original source of a message.
+
+    :type message: void
+    :param message: The message object in question.
+    :type src: string
+    :param src: A string containing the new original source.
     """
     return _helics.helicsMessageSetOriginalSource(message, src)
 
 def helicsMessageSetOriginalDestination(message: "helics_message_object", dest: "char const *") -> "void":
     r"""
-    set the original destination of a message
-       :type message: void
-       :param message: the message object in question
-       :type dest: string
-       :param dest: a string containing the new original source
+    Set the original destination of a message.
+
+    :type message: void
+    :param message: The message object in question.
+    :type dest: string
+    :param dest: A string containing the new original source.
     """
     return _helics.helicsMessageSetOriginalDestination(message, dest)
 
 def helicsMessageSetTime(message: "helics_message_object", time: "helics_time") -> "void":
     r"""
-    set the delivery time for a message
-       :type message: void
-       :param message: the message object in question
-       :type time: float
-       :param time: the time the message should be delivered
+    Set the delivery time for a message.
+
+    :type message: void
+    :param message: The message object in question.
+    :type time: float
+    :param time: The time the message should be delivered.
     """
     return _helics.helicsMessageSetTime(message, time)
 
 def helicsMessageReserve(message: "helics_message_object", reserveSize: "int") -> "void":
     r"""
-    reserve space in a buffer but don't actually resize
-       the message data buffer will be reserved but not resized
-       :type message: void
-       :param message: the message object in question
-       :type reserveSize: int
-       :param reserveSize: the number of bytes to reserve in the message object
+    Reserve space in a buffer but don't actually resize.
+
+    The message data buffer will be reserved but not resized.
+
+    :type message: void
+    :param message: The message object in question.
+    :type reserveSize: int
+    :param reserveSize: The number of bytes to reserve in the message object.
     """
     return _helics.helicsMessageReserve(message, reserveSize)
 
 def helicsMessageSetMessageID(message: "helics_message_object", messageID: "int32_t") -> "void":
     r"""
-    set the message ID for the message
-       normally this is not needed and the core of HELICS will adjust as needed
-       :type message: void
-       :param message: the message object in question
-       :type messageID: int32_t
-       :param messageID: a new message ID
+    Set the message ID for the message.
+
+    Normally this is not needed and the core of HELICS will adjust as needed.
+
+    :type message: void
+    :param message: The message object in question.
+    :type messageID: int32_t
+    :param messageID: A new message ID.
     """
     return _helics.helicsMessageSetMessageID(message, messageID)
 
 def helicsMessageClearFlags(message: "helics_message_object") -> "void":
     r"""
-    clear the flags of a message
-       :type message: void
-       :param message: the message object in question
+    Clear the flags of a message.
+
+    :type message: void
+    :param message: The message object in question
     """
     return _helics.helicsMessageClearFlags(message)
 
 def helicsMessageSetFlagOption(message: "helics_message_object", flag: "int", flagValue: "helics_bool") -> "void":
     r"""
-    set a flag on a message
-       :type message: void
-       :param message: the message object in question
-       :type flag: int
-       :param flag: an index of a flag to set on the message
-       :type flagValue: int
-       :param flagValue: the desired value of the flag
+    Set a flag on a message.
+
+    :type message: void
+    :param message: The message object in question.
+    :type flag: int
+    :param flag: An index of a flag to set on the message.
+    :type flagValue: int
+    :param flagValue: The desired value of the flag.
     """
     return _helics.helicsMessageSetFlagOption(message, flag, flagValue)
 
 def helicsMessageSetString(message: "helics_message_object", str: "char const *") -> "void":
     r"""
-    set the data payload of a message as a string
-       :type message: void
-       :param message: the message object in question
-       :type str: string
-       :param str: a string containing the message data
+    Set the data payload of a message as a string.
+
+    :type message: void
+    :param message: The message object in question.
+    :type str: string
+    :param str: A string containing the message data.
     """
     return _helics.helicsMessageSetString(message, str)
 
 def helicsMessageSetData(message: "helics_message_object", data: "void const *") -> "int":
     r"""
-    set the data payload of a message as raw data
-       :type message: void
-       :param message: the message object in question
-       :type data: void
-       :param data: a string containing the message data
-       :type inputDataLength: int
-       :param inputDataLength:  the length of the data to input
+    Set the data payload of a message as raw data.
+
+    :type message: void
+    :param message: The message object in question.
+    :type data: void
+    :param data: A string containing the message data.
+    :type inputDataLength: int
+    :param inputDataLength: The length of the data to input.
     """
     return _helics.helicsMessageSetData(message, data)
 
 def helicsMessageAppendData(message: "helics_message_object", data: "void const *") -> "int":
     r"""
-    append data to the payload
-       :type message: void
-       :param message: the message object in question
-       :type data: void
-       :param data: a string containing the message data to append
-       :type inputDataLength: int
-       :param inputDataLength:  the length of the data to input
+    Append data to the payload.
+
+    :type message: void
+    :param message: The message object in question.
+    :type data: void
+    :param data: A string containing the message data to append.
+    :type inputDataLength: int
+    :param inputDataLength: The length of the data to input.
     """
     return _helics.helicsMessageAppendData(message, data)
 
 def helicsMessageCopy(source_message: "helics_message_object", dest_message: "helics_message_object") -> "void":
     r"""
-    copy a message object
-       :type source_message: void
-       :param source_message: the message object to copy from
-       :type dest_message: void
-       :param dest_message: the message object to copy to
+    Copy a message object.
+
+    :type source_message: void
+    :param source_message: The message object to copy from.
+    :type dest_message: void
+    :param dest_message: The message object to copy to.
     """
     return _helics.helicsMessageCopy(source_message, dest_message)
 
 def helicsFederateRegisterFilter(fed: "helics_federate", type: "helics_filter_type", name: "char const *") -> "helics_filter":
     r"""
-    create a source Filter on the specified federate
-       filters can be created through a federate or a core , linking through a federate allows
-       a few extra features of name matching to function on the federate interface but otherwise equivalent behavior
-       :type fed: void
-       :param fed: the fed to register through
-      :type type: int
-      :param type: the type of filter to create /ref helics_filter_type
-       :type name: string
-       :param name: the name of the filter (can be NULL)
+    Create a source Filter on the specified federate.
 
-       :rtype: void
-       :return: a helics_filter object
+    Filters can be created through a federate or a core, linking through a federate allows
+             a few extra features of name matching to function on the federate interface but otherwise equivalent behavior
+
+    :type fed: void
+    :param fed: The federate to register through.
+    :type type: int
+    :param type: The type of filter to create /ref helics_filter_type.
+    :type name: string
+    :param name: The name of the filter (can be NULL).
+
+
+    :rtype: void
+    :return: A helics_filter object.
     """
     return _helics.helicsFederateRegisterFilter(fed, type, name)
 
 def helicsFederateRegisterGlobalFilter(fed: "helics_federate", type: "helics_filter_type", name: "char const *") -> "helics_filter":
     r"""
-    create a globl source filter through a federate
-       filters can be created through a federate or a core , linking through a federate allows
-       a few extra features of name matching to function on the federate interface but otherwise equivalent behavior
-       :type fed: void
-       :param fed: the fed to register through
-       :type type: int
-       :param type: the type of filter to create /ref helics_filter_type
-       :type name: string
-       :param name: the name of the filter (can be NULL)
+    Create a global source filter through a federate.
 
-       :rtype: void
-       :return: a helics_filter object
+    Filters can be created through a federate or a core, linking through a federate allows
+             a few extra features of name matching to function on the federate interface but otherwise equivalent behavior.
+
+    :type fed: void
+    :param fed: The federate to register through.
+    :type type: int
+    :param type: The type of filter to create /ref helics_filter_type.
+    :type name: string
+    :param name: The name of the filter (can be NULL).
+
+
+    :rtype: void
+    :return: A helics_filter object.
     """
     return _helics.helicsFederateRegisterGlobalFilter(fed, type, name)
 
 def helicsFederateRegisterCloningFilter(fed: "helics_federate", name: "char const *") -> "helics_filter":
     r"""
-    create a cloning Filter on the specified federate
-       cloning filters copy a message and send it to multiple locations source and destination can be added
-       through other functions
-       :type fed: void
-       :param fed: the fed to register through
-       :type name: string
-       :param name: the name of the filter (can be NULL)
+    Create a cloning Filter on the specified federate.
 
-       :rtype: void
-       :return: a helics_filter object
+    Cloning filters copy a message and send it to multiple locations, source and destination can be added
+             through other functions.
+
+    :type fed: void
+    :param fed: The federate to register through.
+    :type name: string
+    :param name: The name of the filter (can be NULL).
+
+
+    :rtype: void
+    :return: A helics_filter object.
     """
     return _helics.helicsFederateRegisterCloningFilter(fed, name)
 
 def helicsFederateRegisterGlobalCloningFilter(fed: "helics_federate", name: "char const *") -> "helics_filter":
     r"""
-    create a global cloning Filter on the specified federate
-       cloning filters copy a message and send it to multiple locations source and destination can be added
-       through other functions
-       :type fed: void
-       :param fed: the fed to register through
-       :type name: string
-       :param name: the name of the filter (can be NULL)
+    Create a global cloning Filter on the specified federate.
 
-       :rtype: void
-       :return: a helics_filter object
+    Cloning filters copy a message and send it to multiple locations, source and destination can be added
+             through other functions.
+
+    :type fed: void
+    :param fed: The federate to register through.
+    :type name: string
+    :param name: The name of the filter (can be NULL).
+
+
+    :rtype: void
+    :return: A helics_filter object.
     """
     return _helics.helicsFederateRegisterGlobalCloningFilter(fed, name)
 
 def helicsCoreRegisterFilter(core: "helics_core", type: "helics_filter_type", name: "char const *") -> "helics_filter":
     r"""
-    create a source Filter on the specified core
-       filters can be created through a federate or a core , linking through a federate allows
-       a few extra features of name matching to function on the federate interface but otherwise equivalent behavior
-       :type core: void
-       :param core: the core to register through
-       :type type: int
-       :param type: the type of filter to create /ref helics_filter_type
-       :type name: string
-       :param name: the name of the filter (can be NULL)
+    Create a source Filter on the specified core.
 
-       :rtype: void
-       :return: a helics_filter object
+    Filters can be created through a federate or a core, linking through a federate allows
+             a few extra features of name matching to function on the federate interface but otherwise equivalent behavior.
+
+    :type core: void
+    :param core: The core to register through.
+    :type type: int
+    :param type: The type of filter to create /ref helics_filter_type.
+    :type name: string
+    :param name: The name of the filter (can be NULL).
+
+
+    :rtype: void
+    :return: A helics_filter object.
     """
     return _helics.helicsCoreRegisterFilter(core, type, name)
 
 def helicsCoreRegisterCloningFilter(core: "helics_core", name: "char const *") -> "helics_filter":
     r"""
-    create a cloning Filter on the specified core
-       cloning filters copy a message and send it to multiple locations source and destination can be added
-       through other functions
-       :type core: void
-       :param core: the core to register through
-       :type name: string
-       :param name: the name of the filter (can be NULL)
+    Create a cloning Filter on the specified core.
 
-       :rtype: void
-       :return: a helics_filter object
+    Cloning filters copy a message and send it to multiple locations, source and destination can be added
+             through other functions.
+
+    :type core: void
+    :param core: The core to register through.
+    :type name: string
+    :param name: The name of the filter (can be NULL).
+
+
+    :rtype: void
+    :return: A helics_filter object.
     """
     return _helics.helicsCoreRegisterCloningFilter(core, name)
 
 def helicsFederateGetFilterCount(fed: "helics_federate") -> "int":
     r"""
-    get a the number of filters registered through a federate
-       :type fed: void
-       :param fed: the federate object to use to get the filter
-       :rtype: int
-       :return: a count of the number of filters registered through a federate
+    Get the number of filters registered through a federate.
+
+    :type fed: void
+    :param fed: The federate object to use to get the filter.
+
+    :rtype: int
+    :return: A count of the number of filters registered through a federate.
     """
     return _helics.helicsFederateGetFilterCount(fed)
 
 def helicsFederateGetFilter(fed: "helics_federate", name: "char const *") -> "helics_filter":
     r"""
-    get a filter by its name typically already created via registerInterfaces file or something of that nature
-       :type fed: void
-       :param fed: the federate object to use to get the filter
-       :type name: string
-       :param name: the name of the filter
+    Get a filter by its name, typically already created via registerInterfaces file or something of that nature.
 
-       :rtype: void
-       :return: a helics_filter object, the object will not be valid and err will contain an error code if no filter with the specified
-           name exists
+    :type fed: void
+    :param fed: The federate object to use to get the filter.
+    :type name: string
+    :param name: The name of the filter.
+
+
+    :rtype: void
+    :return: A helics_filter object, the object will not be valid and err will contain an error code if no filter with the specified name exists.
     """
     return _helics.helicsFederateGetFilter(fed, name)
 
 def helicsFederateGetFilterByIndex(fed: "helics_federate", index: "int") -> "helics_filter":
     r"""
-    get a filter by its index typically already created via registerInterfaces file or something of that nature
-       :type fed: void
-       :param fed: the federate object in which to create a publication
-       :type index: int
-       :param index: the index of the publication to get
+    Get a filter by its index, typically already created via registerInterfaces file or something of that nature.
 
-       :rtype: void
-       :return: a helics_filter, which will be NULL if an invalid index
+    :type fed: void
+    :param fed: The federate object in which to create a publication.
+    :type index: int
+    :param index: The index of the publication to get.
+
+
+    :rtype: void
+    :return: A helics_filter, which will be NULL if an invalid index is given.
     """
     return _helics.helicsFederateGetFilterByIndex(fed, index)
 
 def helicsFilterGetName(filt: "helics_filter") -> "char const *":
     r"""
-    get the name of the filter and store in the given string
-       :type filt: void
-       :param filt: the given filter
-       :rtype: string
-       :return: a string with the name of the filter
+    Get the name of the filter and store in the given string.
+
+    :type filt: void
+    :param filt: The given filter.
+
+    :rtype: string
+    :return: A string with the name of the filter.
     """
     return _helics.helicsFilterGetName(filt)
 
 def helicsFilterSet(filt: "helics_filter", prop: "char const *", val: "double") -> "void":
     r"""
-    set a property on a filter
-       :type filt: void
-       :param filt: the filter to modify
-       :type prop: string
-       :param prop: a string containing the property to set
-       :type val: float
-       :param val: a numerical value of the property
+    Set a property on a filter.
+
+    :type filt: void
+    :param filt: The filter to modify.
+    :type prop: string
+    :param prop: A string containing the property to set.
+    :type val: float
+    :param val: A numerical value for the property.
     """
     return _helics.helicsFilterSet(filt, prop, val)
 
 def helicsFilterSetString(filt: "helics_filter", prop: "char const *", val: "char const *") -> "void":
     r"""
-    set a string property on a filter
-       :type filt: void
-       :param filt: the filter to modify
-       :type prop: string
-       :param prop: a string containing the property to set
-       :type val: string
-       :param val: a string containing the new value
+    Set a string property on a filter.
+
+    :type filt: void
+    :param filt: The filter to modify.
+    :type prop: string
+    :param prop: A string containing the property to set.
+    :type val: string
+    :param val: A string containing the new value.
     """
     return _helics.helicsFilterSetString(filt, prop, val)
 
 def helicsFilterAddDestinationTarget(filt: "helics_filter", dest: "char const *") -> "void":
     r"""
-    add a destination target to a filter
-       all messages going to a destination are copied to the delivery address(es)
-       :type filt: void
-       :param filt: the given filter to add a destination target
-       :type dest: string
-       :param dest: the name of the endpoint to add as a destination target
+    Add a destination target to a filter.
+
+    All messages going to a destination are copied to the delivery address(es).
+    :type filt: void
+    :param filt: The given filter to add a destination target to.
+    :type dest: string
+    :param dest: The name of the endpoint to add as a destination target.
     """
     return _helics.helicsFilterAddDestinationTarget(filt, dest)
 
 def helicsFilterAddSourceTarget(filt: "helics_filter", source: "char const *") -> "void":
     r"""
-    add a source target to a filter
-       all messages coming from a source are copied to the delivery address(es)
-       :type filt: void
-       :param filt: the given filter
-       :type source: string
-       :param source: the name of the endpoint to add as a source target
+    Add a source target to a filter.
+
+    All messages coming from a source are copied to the delivery address(es).
+
+    :type filt: void
+    :param filt: The given filter.
+    :type source: string
+    :param source: The name of the endpoint to add as a source target.
     """
     return _helics.helicsFilterAddSourceTarget(filt, source)
 
 def helicsFilterAddDeliveryEndpoint(filt: "helics_filter", deliveryEndpoint: "char const *") -> "void":
     r"""
-    add a delivery endpoint to a cloning filter
-       all cloned messages are sent to the delivery address(es)
-       :type filt: void
-       :param filt: the given filter
-       :type deliveryEndpoint: string
-       :param deliveryEndpoint: the name of the endpoint to deliver messages to
+    Add a delivery endpoint to a cloning filter.
+
+    All cloned messages are sent to the delivery address(es).
+
+    :type filt: void
+    :param filt: The given filter.
+    :type deliveryEndpoint: string
+    :param deliveryEndpoint: The name of the endpoint to deliver messages to.
     """
     return _helics.helicsFilterAddDeliveryEndpoint(filt, deliveryEndpoint)
 
 def helicsFilterRemoveTarget(filt: "helics_filter", target: "char const *") -> "void":
     r"""
-    remove a destination target from a filter
-       :type filt: void
-       :param filt: the given filter
-       :type target: string
-       :param target: the named endpoint to remove as a target
+    Remove a destination target from a filter.
+
+    :type filt: void
+    :param filt: The given filter.
+    :type target: string
+    :param target: The named endpoint to remove as a target.
     """
     return _helics.helicsFilterRemoveTarget(filt, target)
 
 def helicsFilterRemoveDeliveryEndpoint(filt: "helics_filter", deliveryEndpoint: "char const *") -> "void":
     r"""
-    remove a delivery destination from a cloning filter
-       :type filt: void
-       :param filt: the given filter (must be a cloning filter)
-       :type deliveryEndpoint: string
-       :param deliveryEndpoint: a string with the deliverEndpoint to remove
+    Remove a delivery destination from a cloning filter.
+
+    :type filt: void
+    :param filt: The given filter (must be a cloning filter).
+    :type deliveryEndpoint: string
+    :param deliveryEndpoint: A string with the delivery endpoint to remove.
     """
     return _helics.helicsFilterRemoveDeliveryEndpoint(filt, deliveryEndpoint)
 
 def helicsFilterGetInfo(filt: "helics_filter") -> "char const *":
     r"""
-    get the data in the info field of an filter
-       :type filt: void
-       :param filt: the given filter
-       :rtype: string
-       :return: a string with the info field string
+    Get the data in the info field of a filter.
+
+    :type filt: void
+    :param filt: The given filter.
+
+    :rtype: string
+    :return: A string with the info field string.
     """
     return _helics.helicsFilterGetInfo(filt)
 
 def helicsFilterSetInfo(filt: "helics_filter", info: "char const *") -> "void":
     r"""
-    set the data in the info field for an filter
-       :type filt: void
-       :param filt: the given filter
-       :type info: string
-       :param info: the string to set
+    Set the data in the info field for a filter.
+
+    :type filt: void
+    :param filt: The given filter.
+    :type info: string
+    :param info: The string to set.
     """
     return _helics.helicsFilterSetInfo(filt, info)
 
 def helicsFilterSetOption(filt: "helics_filter", option: "int", value: "helics_bool") -> "void":
     r"""
-    set the data in the info field for an filter
-       :type filt: void
-       :param filt: the given filter
-       :type option: int
-       :param option: the option to set /ref helics_handle_options
-       :type value: int
-       :param value: the value of the option (helics_true or helics_false)
+    Set the data in the info field for a filter.
+
+    :type filt: void
+    :param filt: The given filter.
+    :type option: int
+    :param option: The option to set /ref helics_handle_options.
+    :type value: int
+    :param value: The value of the option (helics_true or helics_false).
     """
     return _helics.helicsFilterSetOption(filt, option, value)
 
 def helicsFilterGetOption(filt: "helics_filter", option: "int") -> "helics_bool":
     r"""
-    get a handle option for the filter
-       :type filt: void
-       :param filt: the given filter to query
-       :type option: int
-       :param option: the option to query /ref helics_handle_options
+    Get a handle option for the filter.
+
+    :type filt: void
+    :param filt: The given filter to query.
+    :type option: int
+    :param option: The option to query /ref helics_handle_options.
     """
     return _helics.helicsFilterGetOption(filt, option)
 

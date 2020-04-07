@@ -9,7 +9,7 @@
 package com.java.helics;
 
 /**
- *  enumeration of possible return values from an iterative time request
+ * enumeration of possible return values from an iterative time request
  */
 public final class helics_iteration_result {
   /**
