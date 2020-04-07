@@ -12,6 +12,7 @@ Some library reorganization
 
 ### Changed
 -   Split the helics core library into a separate core and network library
+-   Update FMT library to version 6.2.0
 
 ### Fixed
 
