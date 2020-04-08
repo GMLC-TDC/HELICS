@@ -20,6 +20,13 @@ namespace helics
             Json::Value config;
             if (Json::parseFromStream(rbuilder, input, &config, &errs))
             {
+                if (!keyPaths.empty())
+                {
+                    for (auto &kp : keyPaths)
+                    {
+                        config = config[kp];
+                    }
+                }
                 return _from_config(config);
             }
         }
