@@ -1,0 +1,15 @@
+name: Static Analyzers
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  cpplint:
+    runs-on: ubuntu-latest
+    container: sharaku/cpplint:latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Run cpplint
+      run: cpplint --filter=-whitespace,-readability/multiline_comment,-build/c++11 --counting=detailed --recursive examples benchmarks src tests
