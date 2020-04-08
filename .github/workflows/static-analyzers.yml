@@ -12,4 +12,4 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: Run cpplint
-      run: cpplint --filter=-whitespace,-readability/multiline_comment,-build/c++11 --counting=detailed --recursive examples benchmarks src tests
+      run: cpplint --counting=detailed --recursive examples benchmarks src tests
