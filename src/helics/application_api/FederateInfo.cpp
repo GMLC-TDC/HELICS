@@ -282,30 +282,30 @@ std::unique_ptr<helicsCLI11App> FederateInfo::makeCLIApp()
     auto app = std::make_unique<helicsCLI11App>("Federate Info Parsing");
     app->option_defaults()->ignore_case();
     app->allow_config_extras(CLI::config_extras_mode::ignore_all);
-    app->set_config("--config-file,--config,config", "helicsConfig.ini", "specify a configuration file");
-    auto fmtr = std::make_shared< HelicsConfigJSON>();
+    app->set_config(
+        "--config-file,--config,config", "helicsConfig.ini", "specify a configuration file");
+    auto fmtr = std::make_shared<HelicsConfigJSON>();
     fmtr->maxLayers(0);
     app->config_formatter(std::move(fmtr));
     app->add_option("--name,-n", defName, "name of the federate");
     auto og = app->add_option_group("network type")->immediate_callback();
     og->add_option_function<std::string>(
-        "--core",
-        [this](const std::string& val) {
-            coreType = coreTypeFromString(val);
-            if (coreType == core_type::UNRECOGNIZED)
-                coreName = val;
-        },
-        "type or name of the core to connect to")
+          "--core",
+          [this](const std::string& val) {
+              coreType = coreTypeFromString(val);
+              if (coreType == core_type::UNRECOGNIZED) coreName = val;
+          },
+          "type or name of the core to connect to")
         ->default_str("(" + to_string(coreType) + ")");
-        og->add_option_function<std::string>(
-            "--coretype,-t,--type",
-            [this](const std::string& val) {
-                coreType = coreTypeFromString(val);
-                if (coreType == core_type::UNRECOGNIZED)
-                    throw CLI::ValidationError(val + " is NOT a recognized core type");
-            },
-            "type  of the core to connect to")
-            ->default_str("(" + to_string(coreType) + ")");
+    og->add_option_function<std::string>(
+          "--coretype,-t,--type",
+          [this](const std::string& val) {
+              coreType = coreTypeFromString(val);
+              if (coreType == core_type::UNRECOGNIZED)
+                  throw CLI::ValidationError(val + " is NOT a recognized core type");
+          },
+          "type  of the core to connect to")
+        ->default_str("(" + to_string(coreType) + ")");
     app->add_option("--corename", coreName, "the name of the core to create or find")
         ->ignore_underscore();
     app->add_option(
@@ -353,45 +353,56 @@ std::unique_ptr<helicsCLI11App> FederateInfo::makeCLIApp()
         key,
         "specify a key to use to match a broker should match the broker key");
     app->add_option_function<Time>(
-        "--offset",
-        [this](Time val) { setProperty(helics_property_time_offset, val); },
-        "the offset of the time steps (default in ms)")->configurable(false);
+           "--offset",
+           [this](Time val) { setProperty(helics_property_time_offset, val); },
+           "the offset of the time steps (default in ms)")
+        ->configurable(false);
     app->add_option_function<Time>(
-        "--period",
-        [this](Time val) { setProperty(helics_property_time_period, val); },
-        "the execution cycle of the federate (default in ms)")->configurable(false);
+           "--period",
+           [this](Time val) { setProperty(helics_property_time_period, val); },
+           "the execution cycle of the federate (default in ms)")
+        ->configurable(false);
     app->add_option_function<Time>(
            "--timedelta",
            [this](Time val) { setProperty(helics_property_time_delta, val); },
            "The minimum time between time grants for a Federate (default in ms)")
-        ->ignore_underscore()->configurable(false);
+        ->ignore_underscore()
+        ->configurable(false);
     auto rtgroup = app->add_option_group("realtime");
     rtgroup->option_defaults()->ignore_underscore();
-    rtgroup->add_option_function<Time>(
-        "--rtlag",
-        [this](Time val) { setProperty(helics_property_time_rt_lag, val); },
-        "the amount of the time the federate is allowed to lag realtime before "
-        "corrective action is taken (default in ms)")->configurable(false);
-    rtgroup->add_option_function<Time>(
-        "--rtlead",
-        [this](Time val) { setProperty(helics_property_time_rt_lead, val); },
-        "the amount of the time the federate is allowed to lead realtime before "
-        "corrective action is taken (default in ms)")->configurable(false);
-    rtgroup->add_option_function<Time>(
-        "--rttolerance",
-        [this](Time val) { setProperty(helics_property_time_rt_tolerance, val); },
-        "the time tolerance of the real time mode (default in ms)")->configurable(false);
+    rtgroup
+        ->add_option_function<Time>(
+            "--rtlag",
+            [this](Time val) { setProperty(helics_property_time_rt_lag, val); },
+            "the amount of the time the federate is allowed to lag realtime before "
+            "corrective action is taken (default in ms)")
+        ->configurable(false);
+    rtgroup
+        ->add_option_function<Time>(
+            "--rtlead",
+            [this](Time val) { setProperty(helics_property_time_rt_lead, val); },
+            "the amount of the time the federate is allowed to lead realtime before "
+            "corrective action is taken (default in ms)")
+        ->configurable(false);
+    rtgroup
+        ->add_option_function<Time>(
+            "--rttolerance",
+            [this](Time val) { setProperty(helics_property_time_rt_tolerance, val); },
+            "the time tolerance of the real time mode (default in ms)")
+        ->configurable(false);
 
     app->add_option_function<Time>(
            "--inputdelay",
            [this](Time val) { setProperty(helics_property_time_input_delay, val); },
            "the input delay on incoming communication of the federate (default in ms)")
-        ->ignore_underscore()->configurable(false);
+        ->ignore_underscore()
+        ->configurable(false);
     app->add_option_function<Time>(
            "--outputdelay",
            [this](Time val) { setProperty(helics_property_time_output_delay, val); },
            "the output delay for outgoing communication of the federate (default in ms)")
-        ->ignore_underscore()->configurable(false);
+        ->ignore_underscore()
+        ->configurable(false);
     app->add_option_function<int>(
            "--maxiterations",
            [this](int val) { setProperty(helics_property_int_max_iterations, val); },
@@ -406,10 +417,7 @@ std::unique_ptr<helicsCLI11App> FederateInfo::makeCLIApp()
         ->transform(
             CLI::CheckedTransformer(&log_level_map, CLI::ignore_case, CLI::ignore_underscore));
 
-    app->add_option(
-        "--separator",
-        separator,
-        "separator character for local federates")
+    app->add_option("--separator", separator, "separator character for local federates")
         ->default_str(std::string(1, separator));
     app->add_option("--flags,-f,--flag", "named flag for the federate")
         ->type_size(-1)
@@ -426,10 +434,10 @@ std::vector<std::string> FederateInfo::loadInfoFromArgs(const std::string& args)
 {
     auto app = makeCLIApp();
     auto ret = app->helics_parse(args);
-   if (ret == helicsCLI11App::parse_output::parse_error) {
+    if (ret == helicsCLI11App::parse_output::parse_error) {
         throw helics::InvalidParameter("argument parsing failed");
     }
-   config_additional(app.get());
+    config_additional(app.get());
     return app->remainArgs();
 }
 
@@ -452,7 +460,6 @@ void FederateInfo::loadInfoFromArgsIgnoreOutput(const std::string& args)
         throw helics::InvalidParameter("argument parsing failed");
     }
     config_additional(app.get());
-    
 }
 
 void FederateInfo::loadInfoFromArgsIgnoreOutput(int argc, char* argv[])
@@ -476,17 +483,14 @@ void FederateInfo::loadInfoFromArgs(std::vector<std::string>& args)
     config_additional(app.get());
 }
 
-void FederateInfo::config_additional(helicsCLI11App *app)
+void FederateInfo::config_additional(helicsCLI11App* app)
 {
     auto opt = app->get_option("--config");
-    if (opt->count() > 0)
-    {
+    if (opt->count() > 0) {
         auto configString = opt->as<std::string>();
         if (hasTomlExtension(configString)) {
-            loadInfoFromToml(configString,false);
-        }
-        else if (hasJsonExtension(configString))
-        {
+            loadInfoFromToml(configString, false);
+        } else if (hasJsonExtension(configString)) {
             loadInfoFromJson(configString, false);
         }
     }
@@ -495,7 +499,7 @@ void FederateInfo::config_additional(helicsCLI11App *app)
 FederateInfo loadFederateInfo(const std::string& configString)
 {
     FederateInfo ret;
-    
+
     if (hasTomlExtension(configString)) {
         ret.loadInfoFromToml(configString);
     } else if (
@@ -514,7 +518,6 @@ FederateInfo loadFederateInfo(const std::string& configString)
 
 void FederateInfo::loadInfoFromJson(const std::string& jsonString, bool runArgParser)
 {
-
     Json::Value doc;
     try {
         doc = loadJson(jsonString);
@@ -523,7 +526,6 @@ void FederateInfo::loadInfoFromJson(const std::string& jsonString, bool runArgPa
         throw(helics::InvalidParameter(ia.what()));
     }
 
-
     std::function<void(const std::string&, Time)> timeCall =
         [this](const std::string& fname, Time arg) {
             setProperty(propStringsTranslations.at(fname), arg);
@@ -532,31 +534,25 @@ void FederateInfo::loadInfoFromJson(const std::string& jsonString, bool runArgPa
     for (auto& prop : validTimeProperties) {
         callIfMember(doc, prop, timeCall);
     }
-    if (runArgParser)
-    {
+    if (runArgParser) {
         auto app = makeCLIApp();
         app->allow_extras();
-        try
-        {
-        if (jsonString.find('{') != std::string::npos)
-        {
-            std::istringstream jstring(jsonString);
-            app->parse_from_stream(jstring);
+        try {
+            if (jsonString.find('{') != std::string::npos) {
+                std::istringstream jstring(jsonString);
+                app->parse_from_stream(jstring);
+            } else {
+                std::ifstream file(jsonString);
+                app->parse_from_stream(file);
+            }
         }
-        else
-        {
-            std::ifstream file(jsonString);
-            app->parse_from_stream(file);
-        }
-        }
-        catch (const CLI::Error &e)
-        {
+        catch (const CLI::Error& e) {
             throw(InvalidIdentifier(e.what()));
         }
     }
 }
 
-void FederateInfo::loadInfoFromToml(const std::string& tomlString,bool runArgParser)
+void FederateInfo::loadInfoFromToml(const std::string& tomlString, bool runArgParser)
 {
     toml::value doc;
     try {
@@ -565,7 +561,6 @@ void FederateInfo::loadInfoFromToml(const std::string& tomlString,bool runArgPar
     catch (const std::invalid_argument& ia) {
         throw(helics::InvalidParameter(ia.what()));
     }
-    
 
     std::function<void(const std::string&, Time)> timeCall =
         [this](const std::string& fname, Time arg) {
@@ -575,31 +570,24 @@ void FederateInfo::loadInfoFromToml(const std::string& tomlString,bool runArgPar
     for (auto& prop : validTimeProperties) {
         callIfMember(doc, prop, timeCall);
     }
-    if (runArgParser)
-    {
+    if (runArgParser) {
         auto app = makeCLIApp();
         app->allow_extras();
         auto dptr = std::static_pointer_cast<HelicsConfigJSON>(app->get_config_formatter_base());
         dptr->skipJson(true);
-        try
-        {
-            if (tomlString.find('=') != std::string::npos)
-            {
+        try {
+            if (tomlString.find('=') != std::string::npos) {
                 std::istringstream tstring(tomlString);
                 app->parse_from_stream(tstring);
-            }
-            else
-            {
+            } else {
                 std::ifstream file(tomlString);
                 app->parse_from_stream(file);
             }
         }
-        catch (const CLI::Error &e)
-        {
+        catch (const CLI::Error& e) {
             throw(InvalidIdentifier(e.what()));
         }
     }
-    
 }
 
 std::string generateFullCoreInitString(const FederateInfo& fi)
