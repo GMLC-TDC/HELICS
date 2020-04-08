@@ -429,7 +429,8 @@ std::vector<std::string> FederateInfo::loadInfoFromArgs(const std::string& args)
    if (ret == helicsCLI11App::parse_output::parse_error) {
         throw helics::InvalidParameter("argument parsing failed");
     }
-    return app->remaining_for_passthrough();
+   config_additional(app.get());
+    return app->remainArgs();
 }
 
 std::vector<std::string> FederateInfo::loadInfoFromArgs(int argc, char* argv[])
@@ -439,7 +440,8 @@ std::vector<std::string> FederateInfo::loadInfoFromArgs(int argc, char* argv[])
     if (ret == helicsCLI11App::parse_output::parse_error) {
         throw helics::InvalidParameter("argument parsing failed");
     }
-    return app->remaining_for_passthrough();
+    config_additional(app.get());
+    return app->remainArgs();
 }
 
 void FederateInfo::loadInfoFromArgsIgnoreOutput(const std::string& args)
@@ -449,6 +451,8 @@ void FederateInfo::loadInfoFromArgsIgnoreOutput(const std::string& args)
     if (ret == helicsCLI11App::parse_output::parse_error) {
         throw helics::InvalidParameter("argument parsing failed");
     }
+    config_additional(app.get());
+    
 }
 
 void FederateInfo::loadInfoFromArgsIgnoreOutput(int argc, char* argv[])
@@ -458,6 +462,7 @@ void FederateInfo::loadInfoFromArgsIgnoreOutput(int argc, char* argv[])
     if (ret == helicsCLI11App::parse_output::parse_error) {
         throw helics::InvalidParameter("argument parsing failed");
     }
+    config_additional(app.get());
 }
 
 void FederateInfo::loadInfoFromArgs(std::vector<std::string>& args)
@@ -465,13 +470,27 @@ void FederateInfo::loadInfoFromArgs(std::vector<std::string>& args)
     auto app = makeCLIApp();
     app->allow_extras();
     auto ret = app->helics_parse(args);
-    if (ret == helicsCLI11App::parse_output::ok) {
-        coreType = app->getCoreType();
-    } else if (ret == helicsCLI11App::parse_output::parse_error) {
+    if (ret == helicsCLI11App::parse_output::parse_error) {
         throw helics::InvalidParameter("argument parsing failed");
     }
+    config_additional(app.get());
 }
 
+void FederateInfo::config_additional(helicsCLI11App *app)
+{
+    auto opt = app->get_option("--config");
+    if (opt->count() > 0)
+    {
+        auto configString = opt->as<std::string>();
+        if (hasTomlExtension(configString)) {
+            loadInfoFromToml(configString,false);
+        }
+        else if (hasJsonExtension(configString))
+        {
+            loadInfoFromJson(configString, false);
+        }
+    }
+}
 
 FederateInfo loadFederateInfo(const std::string& configString)
 {

@@ -92,6 +92,8 @@ class HELICS_CXX_EXPORT FederateInfo: public CoreFederateInfo {
     void loadInfoFromJson(const std::string &json, bool runArgParser = true);
   private:
     std::unique_ptr<helicsCLI11App> makeCLIApp();
+    /** do some additional configuration from config files */
+    void config_additional(helicsCLI11App *app);
 };
 
 /** generate a FederateInfo object from a config file or string (JSON, TOML)

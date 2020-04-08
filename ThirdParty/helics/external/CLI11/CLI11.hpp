@@ -8441,6 +8441,11 @@ inline std::vector<ConfigItem> ConfigBase::from_config(std::istream &input) cons
         if(pos != std::string::npos) {
             name = detail::trim_copy(line.substr(0, pos));
             std::string item = detail::trim_copy(line.substr(pos + 1));
+            auto cloc = item.find(commentChar);
+            if(cloc != std::string::npos) {
+                item.erase(cloc, std::string::npos);
+                detail::trim(item);
+            }
             if(item.size() > 1 && item.front() == aStart && item.back() == aEnd) {
                 items_buffer = detail::split_up(item.substr(1, item.length() - 2), aSep);
             } else if((isDefaultArray || isINIArray) && item.find_first_of(aSep) != std::string::npos) {
@@ -8452,6 +8457,12 @@ inline std::vector<ConfigItem> ConfigBase::from_config(std::istream &input) cons
             }
         } else {
             name = detail::trim_copy(line);
+            auto cloc = name.find(commentChar);
+            if(cloc != std::string::npos) {
+                name.erase(cloc, std::string::npos);
+                detail::trim(name);
+            }
+
             items_buffer = {"true"};
         }
         if(name.find('.') == std::string::npos) {
@@ -8463,8 +8474,7 @@ inline std::vector<ConfigItem> ConfigBase::from_config(std::istream &input) cons
         }
 
         std::vector<std::string> parents = detail::generate_parents(section, name);
-        if (parents.size() > maxLayers_)
-        {
+        if(parents.size() > maxLayers_) {
             continue;
         }
         if(!output.empty() && name == output.back().name && parents == output.back().parents) {
