@@ -16,16 +16,14 @@ namespace helics
     class HelicsConfigJSON : public CLI::ConfigBase {
     public:
 
-
         std::vector<CLI::ConfigItem> from_config(std::istream &input) const override final;
 
         /// Internal parser for the configuration
         std::vector<CLI::ConfigItem>
             _from_config(Json::Value j, std::string name = "", std::vector<std::string> prefix = {}) const;
-        /// Set the maximum recursive levels to process
-        void set_max_level(std::size_t max_levels) { max_levels = max_levels; }
+        void skipJson(bool skj = true) { skip_json_ = skj; }
     private:
-        std::size_t max_levels_{ 100 };
+        bool skip_json_{ false };
     };
 
 }

@@ -6,7 +6,7 @@ SPDX-License-Identifier: BSD-3-Clause
 */
 
 #include "helicsCLI11JsonConfig.hpp"
-#include "json/json.h"
+#include "../common/JsonProcessingFunctions.hpp"
 
 namespace helics
 {
@@ -15,11 +15,13 @@ namespace helics
         Json::CharReaderBuilder rbuilder;
         rbuilder["collectComments"] = false;
         std::string errs;
-
-        Json::Value config;
-        if (Json::parseFromStream(rbuilder, input, &config, &errs))
+        if (!skip_json_)
         {
-            return _from_config(config);
+            Json::Value config;
+            if (Json::parseFromStream(rbuilder, input, &config, &errs))
+            {
+                return _from_config(config);
+            }
         }
         return ConfigBase::from_config(input);
         
@@ -30,7 +32,7 @@ namespace helics
         std::vector<CLI::ConfigItem> results;
 
         if (j.isObject()) {
-            if (prefix.size() > max_levels_)
+            if (prefix.size() > maxLayers_)
             {
                 return results;
             }
@@ -61,8 +63,17 @@ namespace helics
                 res.inputs = { j.asString() };
             }
             else if (j.isArray()) {
-                for (Json::ArrayIndex ii=0;ii<j.size();++ii)
-                    res.inputs.push_back(j[ii].asString());
+                for (Json::ArrayIndex ii = 0; ii < j.size(); ++ii)
+                {
+                    if (j[ii].isString())
+                    {
+                        res.inputs.push_back(j[ii].asString());
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }
             }
             else {
                 throw CLI::ConversionError("Failed to convert " + name);

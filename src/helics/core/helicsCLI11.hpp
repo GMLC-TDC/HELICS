@@ -41,7 +41,7 @@ class helicsCLI11App: public CLI::App {
     {
         set_help_flag("-h,-?,--help", "Print this help message and exit");
         set_config("--config-file", "helics_config.ini", "specify base configuration file");
-        add_flag_callback("--version,-v", []() { throw(CLI::Success{}); });
+        version(helics::versionString);
         add_option_group("quiet")->immediate_callback()->add_flag(
             "--quiet", quiet, "silence most print output");
     }
@@ -79,9 +79,9 @@ class helicsCLI11App: public CLI::App {
             last_output = parse_output::help_all_call;
             return parse_output::help_all_call;
         }
-        catch (const CLI::Success&) {
+        catch (const CLI::CallForVersion& ca) {
             if (!quiet) {
-                std::cout << helics::versionString << '\n';
+                std::cout << ca.what() << '\n';
             }
             last_output = parse_output::version_call;
             return parse_output::version_call;

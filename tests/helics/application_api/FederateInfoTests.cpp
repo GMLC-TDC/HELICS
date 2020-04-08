@@ -150,7 +150,7 @@ TEST(federateInfo, constructor7)
 
 TEST(federateInfo, constructor_fail)
 {
-    EXPECT_THROW(helics::FederateInfo f1{"--inputdelay=2 --separator=45"}, std::exception);
+    EXPECT_THROW(helics::FederateInfo f1{"--inputdelay=2 --separator=cbc"}, std::exception);
 }
 
 TEST(federateInfo, property_index)

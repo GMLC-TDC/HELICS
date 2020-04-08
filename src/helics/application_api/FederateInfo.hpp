@@ -81,6 +81,15 @@ class HELICS_CXX_EXPORT FederateInfo: public CoreFederateInfo {
     */
     void loadInfoFromArgsIgnoreOutput(int argc, char* argv[]);
 
+    /** load a federateInfo object from a toml string either a file or toml string
+    @param toml a string containing the name of the toml file or toml contents
+    */
+    void loadInfoFromToml(const std::string &toml, bool runArgParser=true);
+
+    /** load a federateInfo object from a JSON string either a file or JSON string
+  @param json a string containing the name of the JSON file or JSON contents
+  */
+    void loadInfoFromJson(const std::string &json, bool runArgParser = true);
   private:
     std::unique_ptr<helicsCLI11App> makeCLIApp();
 };
