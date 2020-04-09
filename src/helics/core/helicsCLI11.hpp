@@ -89,9 +89,9 @@ class helicsCLI11App: public CLI::App {
             last_output = parse_output::help_all_call;
             return parse_output::help_all_call;
         }
-        catch (const CLI::CallForVersion& ca) {
+        catch (const CLI::CallForVersion& cv) {
             if (!quiet) {
-                std::cout << ca.what() << '\n';
+                exit(cv);
             }
             last_output = parse_output::version_call;
             return parse_output::version_call;

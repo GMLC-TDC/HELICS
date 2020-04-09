@@ -7162,7 +7162,7 @@ class App {
 
         for(App_p &sub : subcommands_) {
             // process the priority option_groups first
-            if(sub->get_name().empty() && sub->parse_complete_callback_) {
+            if(sub->get_name().empty() && (sub->parse_complete_callback_||sub->immediate_callback_)) {
                 if(sub->count_all() > 0) {
                     sub->_process_callbacks();
                     sub->run_callback();
