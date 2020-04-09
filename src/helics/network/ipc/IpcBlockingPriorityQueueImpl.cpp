@@ -44,7 +44,7 @@ namespace ipc {
             scoped_lock<interprocess_mutex> pushLock(m_pushLock); // second pushLock
             pullData.clear();
             pushData.clear();
-            //TODO add the priority block
+            //TODO(PT): add the priority block
             queueEmptyFlag = true;
         }
 

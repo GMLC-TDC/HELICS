@@ -132,7 +132,7 @@ void ValueFederateManager::addTarget(const Input& inp, const std::string& target
 
 void ValueFederateManager::removeTarget(const Publication& pub, const std::string& target)
 {
-    // TODO:: erase from targetID's
+    // TODO(PT): erase from targetID's
     coreObject->removeTarget(pub.handle, target);
 }
 
@@ -147,7 +147,7 @@ void ValueFederateManager::removeTarget(const Input& inp, const std::string& tar
             break;
         }
     }
-    // TODO:: erase from targetID's
+    // TODO(PT): erase from targetID's
 }
 
 void ValueFederateManager::setDefaultValue(const Input& inp, const data_view& block)

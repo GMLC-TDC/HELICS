@@ -342,7 +342,7 @@ namespace udp {
                                     route_id{cmd.getExtraData()}, *resolver.resolve(queryNew));
                             }
                             catch (std::exception&) {
-                                // TODO:: do something???
+                                // TODO(someone): do something???
                             }
                             processed = true;
                         } break;
