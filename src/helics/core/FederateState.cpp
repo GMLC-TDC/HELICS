@@ -1657,6 +1657,18 @@ std::string FederateState::processQueryActual(const std::string& query) const
     if (query == "current_time") {
         return timeCoord->printTimeStatus();
     }
+    if (query == "current_state") {
+        Json::Value base;
+        base["name"] = getIdentifier();
+        base["id"] = global_id.load().baseValue();
+        base["parent"] = parent_->getGlobalId().baseValue();
+        base["state"] = static_cast<int>(state.load());
+        base["publications"] = publicationCount();
+        base["input"] = inputCount();
+        base["endpoints"] = endpointCount();
+        base["granted_time"] = static_cast<double>(grantedTime());
+        return generateJsonString(base);
+    }
     if (query == "timeconfig") {
         Json::Value base;
         timeCoord->generateConfig(base);

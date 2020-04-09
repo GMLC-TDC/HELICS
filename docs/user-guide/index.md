@@ -24,7 +24,7 @@ There are a number of classes of HELICS users:
 *   **Reiteration (forthcoming)** - Discussion of why reiteration is used and how to successfully execute it in HELICS
 *   [**Queries**](./queries.md) - How queries can be used to get information on HELICS brokers, federates, and cores
 *   [**Logging**](./logging.md) - Discussion of logging within HELICS and how to control it.  
-*   [**Getting Information from a running simulation**](./running_interaction.md) - Getting live information from a running co-simulation.  
+*   [**Getting Information from a running simulation**](./webserver.md) - Getting live information from a running co-simulation through a webserver.  
 *   [**Integrating a New Simulator**](./simulator_integration.md) - General overview of the process by which a simulator is integrated with HELICS including usage of the common APIs
 *   **Trouble-Shooting HELICS Co-Simulations (forthcoming)** - What to do when the co-simulations don't seem to be working correctly.
 *   [**Simultaneous co-simulations**](./simultaneous_cosimulations.md) - Options for running multiple independent co-simulations on a single system
@@ -36,5 +36,5 @@ There are a number of classes of HELICS users:
 *   [Installation](../installation/index.html) -  Instructions on how to install HELICS
 *   [C API](../c-api-reference/index.html)
 *   [Developer's Guide](../developer-guide/index.html) - Details on how the software is assembled and some of the underlying components.
-*   [Existing Tools](../Tools_using_HELICS.md) - List of the existing tools using HELICS and some under development. 
+*   [Existing Tools](../Tools_using_HELICS.md) - List of the existing tools using HELICS and some under development.
 *   [Youtube Channel](https://www.youtube.com/channel/UCPa81c4BVXEYXt2EShTzbcg/featured) - Throughout the development of HELICS, developers and users have given mini-tutorials providing overviews of the work they have been doing. Due to its nature, many of the specifics of the content are out of date but many of the general concepts of HELICS haven't changed. A good, broad overview of the project as a whole.

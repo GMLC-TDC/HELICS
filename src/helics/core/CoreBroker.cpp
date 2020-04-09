@@ -2412,16 +2412,16 @@ std::string CoreBroker::generateQueryAnswer(const std::string& request)
         return getAddress();
     }
     if (request == "counts") {
-        std::string cnts = "{\"brokers\":";
-        cnts += std::to_string(_brokers.size());
-        cnts += ",\n";
-        cnts += "\"federates\":";
-        cnts += std::to_string(_federates.size());
-        cnts += ",\n";
-        cnts += "\"handles\":";
-        cnts += std::to_string(handles.size());
-        cnts += '}';
-        return cnts;
+        Json::Value base;
+        base["name"] = getIdentifier();
+        base["id"] = global_broker_id_local.baseValue();
+        if (!isRootc) {
+            base["parent"] = higher_broker_id.baseValue();
+        }
+        base["brokers"] = static_cast<int>(_brokers.size());
+        base["federates"] = static_cast<int>(_federates.size());
+        base["handles"] = static_cast<int>(handles.size());
+        return generateJsonString(base);
     }
     if (request == "summary") {
         return generateFederationSummary();
@@ -2436,6 +2436,9 @@ std::string CoreBroker::generateQueryAnswer(const std::string& request)
         Json::Value base;
         base["name"] = getIdentifier();
         base["id"] = global_broker_id_local.baseValue();
+        if (!isRootc) {
+            base["parent"] = higher_broker_id.baseValue();
+        }
         base["state"] = brokerStateName(brokerState.load());
         base["federates"] = Json::arrayValue;
         for (auto& fed : _federates) {
@@ -2698,6 +2701,7 @@ void CoreBroker::processQuery(ActionMessage& m)
             auto broker = _brokers.find(target);
             if (broker != _brokers.end()) {
                 route = broker->route;
+                m.dest_id = broker->global_id;
             }
         }
         if ((route == parent_route_id) && (isRootc)) {
