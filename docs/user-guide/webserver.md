@@ -1,6 +1,6 @@
 # Interacting with a Running Simulation
 
-Starting in HELICS 2.4 there is a webserver that can be run with the broker_server  or helics_broker_server.  This requires using a boost version >=1.70.  The Webserver can be disabled by the `HELICS_DISABLE_BOOST=ON` or `HELICS_DISABLE_WEBSERVER=ON` options being set.  
+Starting in HELICS 2.4 there is a webserver that can be run with the helics_broker or helics_broker_server.  This requires using a boost version >=1.70.  The Webserver can be disabled by the `HELICS_DISABLE_BOOST=ON` or `HELICS_DISABLE_WEBSERVER=ON` options being set.  
 
 ## Startup
 The webserver can be started with the option `--http` to start a restful interface using HTTP, or `--web` to start a server using websockets.  For example to run a broker server with zmq and the webserver active for 30 minutes.  The `--duration` is optional and the default is 30 minutes but any time can be specified.  
