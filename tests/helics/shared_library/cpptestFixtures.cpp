@@ -8,6 +8,8 @@ top-level NOTICE for additional details. and the Lawrence Livermore National Lab
 Livermore National Security, LLC.
 
 */
+#pragma once
+
 #include "cpptestFixtures.hpp"
 
 #include "../src/helics/cpp98/Broker.hpp"
