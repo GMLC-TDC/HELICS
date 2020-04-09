@@ -525,7 +525,7 @@ namespace apps {
             auto const address = net::ip::make_address(httpAddress_);
             // Create and launch a listening port
             std::make_shared<listener>(
-                ioc, tcp::endpoint{address, static_cast<unsigned short>(httpPort_)})
+                ioc, tcp::endpoint{address, static_cast<std::uint16_t>(httpPort_)})
                 ->run();
         }
 
