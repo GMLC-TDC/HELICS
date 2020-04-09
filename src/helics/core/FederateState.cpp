@@ -148,7 +148,7 @@ void FederateState::reset()
     state = HELICS_CREATED;
     queue.clear();
     delayQueues.clear();
-    // TODO:: this probably needs to do a lot more
+    // TODO(PT): this probably needs to do a lot more
 }
 /** reset the federate to the initializing state*/
 void FederateState::reInit()
@@ -156,7 +156,7 @@ void FederateState::reInit()
     state = HELICS_INITIALIZING;
     queue.clear();
     delayQueues.clear();
-    // TODO:: this needs to reset a bunch of stuff as well as check a few things
+    // TODO(PT): this needs to reset a bunch of stuff as well as check a few things
 }
 federate_state FederateState::getState() const
 {

@@ -435,7 +435,7 @@ class PublicationT: public Publication {
     */
     void publish(const X& val, const std::string& units)
     {
-        // TODO:: figure out units
+        // TODO(PT): figure out units
         (void)(units);
         Publication::publish(val);
     }

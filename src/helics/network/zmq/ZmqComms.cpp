@@ -463,7 +463,7 @@ namespace zeromq {
                                 routes.emplace(route_id{cmd.getExtraData()}, std::move(zsock));
                             }
                             catch (const zmq::error_t& e) {
-                                // TODO:: do something???
+                                // TODO(PT): do something???
                                 logError(
                                     std::string("unable to connect route") + cmd.payload +
                                     "::" + e.what());
