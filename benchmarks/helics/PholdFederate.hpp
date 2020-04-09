@@ -43,7 +43,7 @@ class PholdFederate: public BenchmarkFederate {
     std::uniform_int_distribution<unsigned int> rand_uniform_int;
 
   public:
-    // TODO: output cluster name in a summary file, along with node count and feds per node
+    // TODO(@nightlark): output cluster name in a summary file, along with node count and feds per node
     PholdFederate(): BenchmarkFederate("PHOLD") {}
 
     // functions for setting parameters
