@@ -25,10 +25,10 @@ jobs:
       shell: bash
       run: |
         FILES_URL="$(jq -r '.pull_request._links.self.href' "$GITHUB_EVENT_PATH")/files"
-        FILES=$(curl -s -X GET -G $FILES_URL | jq -r '.[] | .filename')
+        FILES=$(curl -s -X GET -G "$FILES_URL" | jq -r '.[] | .filename')
         echo "====Files Changed in PR===="
         echo "$FILES"
-        filecount=$(echo "$FILES" | grep -E '\.(cpp|hpp|c|h)$' | wc -l)
+        filecount=$(echo "$FILES" | grep -c -E '\.(cpp|hpp|c|h)$')
         echo "Total changed: $filecount"
         tidyerr=0
         if (( filecount > 0 && filecount <= 20 )); then
