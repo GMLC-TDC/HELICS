@@ -13,3 +13,25 @@ jobs:
     - uses: actions/checkout@v2
     - name: Run cpplint
       run: cpplint --counting=detailed --recursive examples benchmarks src tests
+
+  clang-tidy:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    container: helics/buildenv:clang-extra-tools
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Run clang-tidy on changed files
+      shell: bash
+      run: |
+        FILES_URL="$(jq -r '.pull_request._links.self.href' "$GITHUB_EVENT_PATH")/files"
+        FILES=$(curl -s -X GET -G $FILES_URL | jq -r '.[] | .filename')
+        mkdir build && cd build
+        cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ -DHELICS_BUILD_BENCHMARKS=ON -DHELICS_BUILD_EXAMPLES=ON -DHELICS_BUILD_TESTS=ON ..
+        cd ..
+        while read -r line ; do
+          if echo "$line" | grep -E '\.(cpp|hpp|c|h)$'; then
+            python3 /usr/share/clang/run-clang-tidy.py "$line" -p build -quiet
+            echo "Exit code: $?"
+          fi
+        done <<< "$FILES"
