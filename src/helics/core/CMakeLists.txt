@@ -30,6 +30,7 @@ set(
     federate_id.cpp
     TimeoutMonitor.cpp
     coreTypeOperations.cpp
+    helicsCLI11JsonConfig.cpp
 )
 
 set(
@@ -78,6 +79,7 @@ set(
     UnknownHandleManager.hpp
     queryHelpers.hpp
     fileConnections.hpp
+    helicsCLI11JsonConfig.hpp
     ../helics_enums.h
 )
 

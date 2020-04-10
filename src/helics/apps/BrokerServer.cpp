@@ -144,6 +144,7 @@ namespace apps {
         app->add_flag(
             "--websocket", websocket_server, "start a websocket to respond to api requests");
 #endif
+        app->set_config();
         app->add_option(
             "config,--config,--server-config",
             configFile_,
