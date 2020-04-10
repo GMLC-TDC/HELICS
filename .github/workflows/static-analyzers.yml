@@ -28,7 +28,7 @@ jobs:
         FILES=$(curl -s -X GET -G "$FILES_URL" | jq -r '.[] | .filename')
         echo "====Files Changed in PR===="
         echo "$FILES"
-        filecount=$(echo "$FILES" | grep -c -E '\.(cpp|hpp|c|h)$')
+        filecount=$(echo "$FILES" | grep -c -E '\.(cpp|hpp|c|h)$' || true)
         echo "Total changed: $filecount"
         tidyerr=0
         if (( filecount > 0 && filecount <= 20 )); then
