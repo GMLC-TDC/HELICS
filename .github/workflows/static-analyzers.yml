@@ -27,7 +27,7 @@ jobs:
         FILES_URL="$(jq -r '.pull_request._links.self.href' "$GITHUB_EVENT_PATH")/files"
         FILES=$(curl -s -X GET -G $FILES_URL | jq -r '.[] | .filename')
         filecount=$(echo "$FILES" | grep -E '\.(cpp|hpp|c|h)$' | wc -l)
-        if (( filecount <= 20 )); then
+        if (( filecount > 0 && filecount <= 20 )); then
           mkdir build && cd build
           cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ -DHELICS_BUILD_BENCHMARKS=ON -DHELICS_BUILD_EXAMPLES=ON -DHELICS_BUILD_TESTS=ON ..
           cd ..
