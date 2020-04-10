@@ -28,25 +28,19 @@ jobs:
         FILES=$(curl -s -X GET -G $FILES_URL | jq -r '.[] | .filename')
         filecount=$(echo "$FILES" | grep -E '\.(cpp|hpp|c|h)$' | wc -l)
         if (( filecount <= 20 )); then
-          echo "less than 20 files changed"
-        fi
-        prtitle="$(jq -r '.pull_request.title')"
-        echo "PR Title: $prtitle"
-        if [[ "$prtitle" != "Automated*" ]]; then
-          echo "this is okay to run, it isn't automated"
-        fi
-        mkdir build && cd build
-        cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ -DHELICS_BUILD_BENCHMARKS=ON -DHELICS_BUILD_EXAMPLES=ON -DHELICS_BUILD_TESTS=ON ..
-        cd ..
-        tidyerr=0
-        while read -r line ; do
-          if echo "$line" | grep -E '\.(cpp|hpp|c|h)$'; then
-            python3 /usr/share/clang/run-clang-tidy.py "$line" -p build -quiet
-            rc=$?
-            echo "clang-tidy exit code: $rc"
-            if [[ "$rc" != "0" ]]; then
-              tidyerr=1
+          mkdir build && cd build
+          cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ -DHELICS_BUILD_BENCHMARKS=ON -DHELICS_BUILD_EXAMPLES=ON -DHELICS_BUILD_TESTS=ON ..
+          cd ..
+          tidyerr=0
+          while read -r line ; do
+            if echo "$line" | grep -E '\.(cpp|hpp|c|h)$'; then
+              python3 /usr/share/clang/run-clang-tidy.py "$line" -p build -quiet
+              rc=$?
+              echo "clang-tidy exit code: $rc"
+              if [[ "$rc" != "0" ]]; then
+                tidyerr=1
+              fi
             fi
-          fi
-        done <<< "$FILES"
-        exit $tidyerr
+          done <<< "$FILES"
+          exit $tidyerr
+        fi
