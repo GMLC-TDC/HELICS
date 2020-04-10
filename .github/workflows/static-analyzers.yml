@@ -29,9 +29,15 @@ jobs:
         mkdir build && cd build
         cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ -DHELICS_BUILD_BENCHMARKS=ON -DHELICS_BUILD_EXAMPLES=ON -DHELICS_BUILD_TESTS=ON ..
         cd ..
+        tidyerr=0
         while read -r line ; do
           if echo "$line" | grep -E '\.(cpp|hpp|c|h)$'; then
             python3 /usr/share/clang/run-clang-tidy.py "$line" -p build -quiet
-            echo "Exit code: $?"
+            rc=$?
+            echo "clang-tidy exit code: $rc"
+            if [[ "$rc" != "0" ]]; then
+              tidyerr=1
+            fi
           fi
         done <<< "$FILES"
+        exit $tidyerr
