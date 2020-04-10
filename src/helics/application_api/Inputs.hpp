@@ -598,7 +598,7 @@ const X& Input::getValueRef()
             valueExtract(dv, type, lastValue);
         }
     } else {
-        // TODO:: PT make some logic that it can get the raw data from the core again if it was converted already
+        // TODO(PT): make some logic that it can get the raw data from the core again if it was converted already
     }
 
     return getValueRefImpl<remove_cv_ref<X>>(lastValue);

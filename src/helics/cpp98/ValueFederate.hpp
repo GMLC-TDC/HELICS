@@ -350,7 +350,7 @@ class ValueFederate: public virtual Federate {
     int getInputCount() const { return helicsFederateGetInputCount(fed); }
     /** get the number of publications in this federate*/
     int getPublicationCount() const { return helicsFederateGetPublicationCount(fed); }
-    // TODO: use c api to implement this method... callbacks too?
+    // TODO(PT): use c api to implement this method... callbacks too?
     /** Get a list of all subscriptions with updates since the last call **/
     std::vector<helics_input> queryUpdates() { return std::vector<helics_input>(); }
 

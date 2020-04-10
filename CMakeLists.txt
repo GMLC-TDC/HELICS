@@ -621,7 +621,7 @@ if(NOT WIN32)
         get_filename_component(zmqdir ${zmqlibfile} DIRECTORY)
         # message(STATUS "zmqdir path =${zmqdir}")
         if(APPLE)
-            # TODO: Make sure it works for building ZMQ from source automatically using
+            # TODO(@nightlark): Make sure it works for building ZMQ from source automatically using
             # CMake
             list(APPEND CMAKE_INSTALL_RPATH ${ZeroMQ_INSTALL_PATH}/lib)
             list(APPEND CMAKE_BUILD_RPATH ${ZeroMQ_INSTALL_PATH}/lib)

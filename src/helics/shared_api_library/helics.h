@@ -738,7 +738,7 @@ HELICS_EXPORT void helicsFederateInfoSetSeparator(helics_federate_info fi, char 
 HELICS_EXPORT void
     helicsFederateInfoSetTimeProperty(helics_federate_info fi, int timeProperty, helics_time propertyValue, helics_error* err);
 
-// TODO: what are known properties. The docstring should reference all properties that can be passed here.
+// TODO(Dheepak): what are known properties. The docstring should reference all properties that can be passed here.
 /**
  * Set an integer property for a federate.
  *

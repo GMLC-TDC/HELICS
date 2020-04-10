@@ -27,12 +27,12 @@ namespace helics {
 namespace udp {
     class UdpServer: public std::enable_shared_from_this<UdpServer> {
       public:
-        UdpServer(asio::io_context& io_context, std::string& interface, unsigned short portNum):
+        UdpServer(asio::io_context& io_context, std::string& interface, std::uint16_t portNum):
             socket_(io_context)
         {
             socket_.open(asio::ip::udp::v4());
-            socket_.bind(asio::ip::udp::endpoint(
-                asio::ip::address::from_string(interface), static_cast<uint16_t>(portNum)));
+            socket_.bind(
+                asio::ip::udp::endpoint(asio::ip::address::from_string(interface), portNum));
         }
 
         ~UdpServer()

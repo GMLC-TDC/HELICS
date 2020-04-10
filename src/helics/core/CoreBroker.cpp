@@ -424,7 +424,7 @@ void CoreBroker::processPriorityCommand(ActionMessage&& command)
                 return;
             }
             if ((!command.source_id.isValid()) || (command.source_id == parent_broker_id)) {
-                // TODO PT:: this will need to be updated when we enable mesh routing
+                // TODO(PT): this will need to be updated when we enable mesh routing
                 _brokers.back().route = route_id{routeCount++};
                 addRoute(_brokers.back().route, command.getString(targetStringLoc));
                 _brokers.back().parent = global_broker_id_local;
@@ -789,8 +789,8 @@ void CoreBroker::processCommand(ActionMessage&& command)
                         elink.messageID = defs::errors::connection_failure;
                         broadcast(elink);
                         brokerState = broker_state_t::errored;
-                        addActionMessage(
-                            CMD_USER_DISCONNECT); // TODO::PT this needs something better but this does
+                        addActionMessage(CMD_USER_DISCONNECT);
+                        // TODO(PT): this needs something better but this does
                         // what is needed for now
                     } else {
                         // pass it up the chain let the root deal with it

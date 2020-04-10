@@ -97,7 +97,7 @@ TEST(federate_tests, broker_disconnect_test_ci_skip)
 }
 
 #ifdef ENABLE_ZMQ_CORE
-// TODO PT:: make this work for all test types
+// TODO(PT): make this work for all test types
 TEST(federate_tests, bad_broker_error_zmq_ci_skip)
 {
     helics::FederateInfo fi(helics::core_type::ZMQ);

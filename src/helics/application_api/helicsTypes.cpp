@@ -106,14 +106,14 @@ static const std::unordered_map<std::string, data_type> typeMap{
     {typeid(float).name(), data_type::helics_double},
     {typeid(char).name(), data_type::helics_string},
     {typeid(unsigned char).name(), data_type::helics_int},
-    {typeid(short).name(), data_type::helics_int},
-    {typeid(unsigned short).name(), data_type::helics_int},
+    {typeid(short).name(), data_type::helics_int}, // NOLINT
+    {typeid(unsigned short).name(), data_type::helics_int}, // NOLINT
     {typeid(int).name(), data_type::helics_int},
     {typeid(unsigned int).name(), data_type::helics_int},
-    {typeid(long).name(), data_type::helics_int},
-    {typeid(unsigned long).name(), data_type::helics_int},
-    {typeid(long long).name(), data_type::helics_int},
-    {typeid(unsigned long long).name(), data_type::helics_int},
+    {typeid(long).name(), data_type::helics_int}, // NOLINT
+    {typeid(unsigned long).name(), data_type::helics_int}, // NOLINT
+    {typeid(long long).name(), data_type::helics_int}, // NOLINT
+    {typeid(unsigned long long).name(), data_type::helics_int}, // NOLINT
     {typeid(int64_t).name(), data_type::helics_int},
     {typeid(uint64_t).name(), data_type::helics_int},
     {typeid(int32_t).name(), data_type::helics_int},

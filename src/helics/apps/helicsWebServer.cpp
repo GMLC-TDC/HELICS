@@ -831,7 +831,7 @@ namespace apps {
             auto const address = net::ip::make_address(httpAddress_);
             // Create and launch a listening port
             std::make_shared<listener>(
-                context->ioc, tcp::endpoint{address, static_cast<unsigned short>(httpPort_)})
+                context->ioc, tcp::endpoint{address, static_cast<std::uint16_t>(httpPort_)})
                 ->run();
         }
 
@@ -845,7 +845,7 @@ namespace apps {
             // Create and launch a listening port
             std::make_shared<listener>(
                 context->ioc,
-                tcp::endpoint{address, static_cast<unsigned short>(websocketPort_)},
+                tcp::endpoint{address, static_cast<std::uint16_t>(websocketPort_)},
                 true)
                 ->run();
         }

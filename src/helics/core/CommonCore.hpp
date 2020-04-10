@@ -229,7 +229,7 @@ class CommonCore: public Core, public BrokerBase {
         std::chrono::milliseconds msToWait = std::chrono::milliseconds(0)) const override final;
     /** unregister the core from any process find functions*/
     void unregister();
-    /** TODO figure out how to make this non-public, it needs to be called in a lambda function, may need a helper
+    /**TODO(PT): figure out how to make this non-public, it needs to be called in a lambda function, may need a helper
      * class of some sort*/
     virtual void processDisconnect(bool skipUnregister = false) override final;
 
