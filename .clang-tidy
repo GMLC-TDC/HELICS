@@ -1,7 +1,68 @@
 ---
-Checks:         '*,-hicpp-vararg,-hicpp-explicit-conversions, -hicpp-special-member-functions, -fuchsia-*,-modernize-use-override,-hicpp-no-array-decay,-cppcoreguidelines-pro-bounds-array-to-pointer-decay,-llvm-include-order,-llvm-header-guard,-hicpp-use-override,-readability-redundant-declaration,-misc-unused-parameters,-modernize-use-override,-cppcoreguidelines-pro-type-vararg,-google-default-arguments,-google-runtime-references,-google-readability-todo,-google-readability-namespace-comments,-clang-analyzer-alpha.core.CastToStruct,-clang-diagnostic-pragma-once-outside-header,-google-build-using-namespace,-cppcoreguidelines-pro-type-static-cast-downcast,-cppcoreguidelines-pro-bounds-pointer-arithmetic,-cert-err58-cpp,-cppcoreguidelines-pro-bounds-constant-array-index,-cppcoreguidelines-pro-type-reinterpret-cast,-misc-misplaced-widening-cast,-clang-analyzer-alpha.deadcode.UnreachableCode'
-WarningsAsErrors: ''
-HeaderFilterRegex: ''
+FormatStyle: file
+
+Checks: '
+-*,
+google-*,
+-google-runtime-int,
+-google-runtime-references,
+llvm-include-order,
+llvm-namespace-comment,
+modernize*,
+-modernize-use-trailing-return-type,
+hicpp-*,
+-hicpp-use-equals-default,
+-hicpp-explicit-conversions,
+clang-analyzer-*,
+bugprone-*,
+-bugprone-narrowing-conversions,
+misc-*,
+cppcoreguidelines-*,
+-cppcoreguidelines-narrowing-conversions,
+-cppcoreguidelines-avoid-magic-numbers,
+-cppcoreguidelines-special-member-functions,
+-cppcoreguidelines-macro-usage,
+-cppcoreguidelines-pro-bounds-pointer-arithmetic,
+-cppcoreguidelines-pro-bounds-constant-array-index,
+cert-*,
+-cert-err58-cpp,
+portability-*,
+readability-*,
+-readability-magic-numbers,
+performance-*
+'
+
+WarningsAsErrors: '
+-*,
+google-*,
+-google-runtime-int,
+-google-runtime-references,
+llvm-include-order,
+llvm-namespace-comment,
+modernize*,
+-modernize-use-trailing-return-type,
+hicpp-*,
+-hicpp-use-equals-default,
+-hicpp-explicit-conversions,
+clang-analyzer-*,
+bugprone-*,
+-bugprone-narrowing-conversions,
+misc-*,
+cppcoreguidelines-*,
+-cppcoreguidelines-narrowing-conversions,
+-cppcoreguidelines-avoid-magic-numbers,
+-cppcoreguidelines-special-member-functions,
+-cppcoreguidelines-macro-usage,
+-cppcoreguidelines-pro-bounds-pointer-arithmetic,
+-cppcoreguidelines-pro-bounds-constant-array-index,
+portability-*,
+readability-*,
+-readability-magic-numbers,
+performance-*
+'
+
+HeaderFilterRegex: '.*h*'
+
 AnalyzeTemporaryDtors: false
 CheckOptions:
   - key:             cert-dcl59-cpp.HeaderFileExtensions
