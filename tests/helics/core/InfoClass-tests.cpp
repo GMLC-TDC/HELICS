@@ -327,5 +327,5 @@ TEST(InfoClass_tests, inputinfo_test)
 
     subI.updateTimeNextIteration(2.0);
     ret_data = subI.getData(0);
-    EXPECT_TRUE(ret_data->to_string() == "time one");
+    EXPECT_EQ(ret_data->to_string(),"time one");
 }

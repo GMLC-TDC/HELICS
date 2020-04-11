@@ -148,7 +148,7 @@ TEST_F(filter_tests, core_filter_reg)
 
     helicsFilterRemoveDeliveryEndpoint(cloningFilter1, "ep3", &err);
     int core1IsConnected = helicsCoreIsConnected(core1);
-    EXPECT_TRUE(core1IsConnected != 0);
+    EXPECT_EQ(core1IsConnected,0);
     helicsCoreSetReadyToInit(core1, &err);
     helicsCoreDisconnect(core1, &err);
     helicsCoreDisconnect(core2, &err);
