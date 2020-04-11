@@ -643,7 +643,7 @@ TEST_F(filter_tests, clone_test_connections)
     auto res = helicsFederateHasMessage(dFed);
     EXPECT_EQ(res,helics_true);
 
-    if (res) {
+    if (res==helics_true) {
         auto m2 = helicsEndpointGetMessage(p2);
         EXPECT_STREQ(m2.source, "src");
         EXPECT_STREQ(m2.original_source, "src");
@@ -882,9 +882,9 @@ TEST_F(filter_tests, clone_test_broker_dest_connections)
     CE(helicsFederateRequestTimeComplete(dcFed, &err));
 
     auto res = helicsFederateHasMessage(dFed);
-    EXPECT_TRUE(res);
+    EXPECT_EQ(res,helics_true);
 
-    if (res) {
+    if (res==helics_true) {
         auto m2 = helicsEndpointGetMessage(p2);
         EXPECT_STREQ(m2.source, "src");
         EXPECT_STREQ(m2.original_source, "src");

@@ -163,45 +163,45 @@ namespace core {
     }
 
 #ifndef ENABLE_ZMQ_CORE
-    bool constexpr zmq_availability{ false };
+    static bool constexpr zmq_availability{ false };
 #else
-    bool constexpr zmq_availability{ true };
+    static bool constexpr zmq_availability{ true };
 #endif
 
 #ifndef ENABLE_MPI_CORE
-    bool constexpr mpi_availability{ false };
+    static bool constexpr mpi_availability{ false };
 #else
-    bool constexpr mip_availability{ false };
+    static bool constexpr mpi_availability{ false };
 #endif
 
 #ifndef ENABLE_TCP_CORE
-    bool constexpr tcp_availability{ false };
+    static bool constexpr tcp_availability{ false };
 #else
-    bool constexpr tcp_availability{ false };
+    static bool constexpr tcp_availability{ true };
 #endif
 
 #ifndef ENABLE_UDP_CORE
-    bool constexpr udp_availability{ false };
+    static bool constexpr udp_availability{ false };
 #else
-    bool constexpr udp_availability{ false };
+    static bool constexpr udp_availability{ true };
 #endif
 
 #ifndef ENABLE_IPC_CORE
-    bool constexpr ipc_availability{ false };
+    static bool constexpr ipc_availability{ false };
 #else
-    bool constexpr ipc_availability{ false };
+    static bool constexpr ipc_availability{ true };
 #endif
 
 #ifndef ENABLE_TEST_CORE
-    bool constexpr test_availability{ false };
+    static bool constexpr test_availability{ false };
 #else
-    bool constexpr test_availability{ false };
+    static bool constexpr test_availability{ true };
 #endif
 
 #ifndef ENABLE_INPROC_CORE
-    bool constexpr inproc_availability{ false };
+    static bool constexpr inproc_availability{ false };
 #else
-    bool constexpr inproc_availability{ false };
+    static bool constexpr inproc_availability{ true };
 #endif
 
     bool isCoreTypeAvailable(core_type type) noexcept

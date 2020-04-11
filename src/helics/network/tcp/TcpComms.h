@@ -61,7 +61,7 @@ namespace tcp {
     @return a the number of bytes used by the function
     */
         size_t dataReceive(
-            std::shared_ptr<TcpConnection> connection,
+            TcpConnection* connection,
             const char* data,
             size_t bytes_received);
 

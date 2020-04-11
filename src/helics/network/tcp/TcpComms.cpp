@@ -64,7 +64,7 @@ namespace tcp {
     }
 
     size_t TcpComms::dataReceive(
-        std::shared_ptr<TcpConnection> connection,
+        TcpConnection* connection,
         const char* data,
         size_t bytes_received)
     {
@@ -156,7 +156,7 @@ namespace tcp {
         auto contextLoop = ioctx->startContextLoop();
         server->setDataCall(
             [this](TcpConnection::pointer connection, const char* data, size_t datasize) {
-                return dataReceive(connection, data, datasize);
+                return dataReceive(connection.get(), data, datasize);
             });
         CommsInterface* ci = this;
         server->setErrorCall([ci](TcpConnection::pointer connection, const std::error_code& error) {
@@ -364,7 +364,8 @@ namespace tcp {
         setTxStatus(connection_status::connected);
 
         //  std::vector<ActionMessage> txlist;
-        while (true) {
+        bool processing{ true };
+        while (processing) {
             route_id rid;
             ActionMessage cmd;
 
@@ -400,7 +401,9 @@ namespace tcp {
                             processed = true;
                             break;
                         case DISCONNECT:
-                            goto CLOSE_TX_LOOP; // break out of loop
+                            processing = false;
+                            processed = true;
+                            break;
                     }
                 }
             }
@@ -470,7 +473,6 @@ namespace tcp {
                 }
             }
         }
-    CLOSE_TX_LOOP:
         for (auto& rt : routes) {
             rt.second->close();
         }
