@@ -3569,15 +3569,6 @@ TEST(evil_endpoint_test, helicsEndpointGetMessageObject)
     EXPECT_EQ(res2, nullptr);
 }
 
-TEST(evil_endpoint_test, helicsEndpointClearMessages)
-{
-    //void helicsEndpointClearMessages(helics_endpoint endpoint);
-    char rdata[256];
-    helics_endpoint evil_ept = reinterpret_cast<helics_endpoint>(rdata);
-    EXPECT_NO_THROW(helicsEndpointClearMessages(nullptr));
-    EXPECT_NO_THROW(helicsEndpointClearMessages(evil_ept));
-}
-
 TEST(evil_endpoint_test, helicsEndpointGetType)
 {
     //const char*  helicsEndpointGetType(helics_endpoint endpoint);

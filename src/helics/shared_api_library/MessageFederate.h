@@ -179,12 +179,24 @@ HELICS_DEPRECATED_EXPORT void helicsEndpointSendMessage(helics_endpoint endpoint
  * Send a message object from a specific endpoint.
  *
  * @param endpoint The endpoint to send the data from.
- * @param message The actual message to send.
+ * @param message The actual message to send which will be copied
  * @forcpponly
  * @param[in,out] err A pointer to an error object for catching errors.
  * @endforcpponly
  */
 HELICS_EXPORT void helicsEndpointSendMessageObject(helics_endpoint endpoint, helics_message_object message, helics_error* err);
+
+/**
+ * Send a message object from a specific endpoint, the message will not be copied and the message object will no longer be valid
+ * After the call
+ *
+ * @param endpoint The endpoint to send the data from.
+ * @param message The actual message to send which will be copied
+ * @forcpponly
+ * @param[in,out] err A pointer to an error object for catching errors.
+ * @endforcpponly
+ */
+HELICS_EXPORT void helicsEndpointSendMessageObjectZeroCopy(helics_endpoint endpoint, helics_message_object message, helics_error* err);
 
 /**
  * Subscribe an endpoint to a publication.
@@ -231,7 +243,10 @@ HELICS_EXPORT int helicsEndpointPendingMessages(helics_endpoint endpoint);
 
 /**
  * Receive a packet from a particular endpoint.
- * @deprecated(use helicsGetMessageObject instead)
+  *
+ * @deprecated This function is deprecated and will be removed in Helics 3.0
+ *             use helicsEndpointGetMessageObject instead
+ *
  * @param[in] endpoint The identifier for the endpoint.
  *
  * @return A message object.
@@ -249,7 +264,10 @@ HELICS_EXPORT helics_message_object helicsEndpointGetMessageObject(helics_endpoi
 
 /**
  * Receive a communication message for any endpoint in the federate.
- * @deprecated
+ *
+ * @deprecated This function is deprecated and will be removed in Helics 3.0
+ *             use helicsFederateGetMessageObject instead
+ *
  * @details The return order will be in order of endpoint creation.
  *          So all messages that are available for the first endpoint, then all for the second, and so on.
  *          Within a single endpoint, the messages are ordered by time, then source_id, then order of arrival.
@@ -290,9 +308,12 @@ HELICS_EXPORT void helicsFederateClearMessages(helics_federate fed);
 /**
  * Clear all message from an endpoint.
  *
+ * @deprecated This function does nothing and can be removed, use helicsFederateClearMessages to free all messages,
+ *             or helicsMessageFree to clear an individual message
+ * 
  * @param endpoint The endpoint object to operate on.
  */
-HELICS_EXPORT void helicsEndpointClearMessages(helics_endpoint endpoint);
+HELICS_DEPRECATED_EXPORT void helicsEndpointClearMessages(helics_endpoint endpoint);
 
 /**
  * Get the type specified for an endpoint.

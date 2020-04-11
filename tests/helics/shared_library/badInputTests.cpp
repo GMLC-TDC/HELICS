@@ -1014,7 +1014,6 @@ TEST_F(function_tests, messageFed_message_object)
     EXPECT_NE(err.error_code, 0);
 
     helicsFederateClearMessages(mFed1);
-    helicsEndpointClearMessages(ept1);
 }
 
 // test error paths for filters
