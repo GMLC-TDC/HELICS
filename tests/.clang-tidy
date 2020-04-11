@@ -9,7 +9,7 @@ google-*,
 -google-runtime-int,
 -google-runtime-references,
 -google-build-using-namespace,
--google-readability-avoid-underscore-in-googletest-name
+-google-readability-avoid-underscore-in-googletest-name,
 llvm-include-order,
 llvm-namespace-comment,
 modernize*,
@@ -31,8 +31,8 @@ WarningsAsErrors: '
 google-*,
 -google-runtime-int,
 -google-runtime-references,
--google-build-using-namespace
--google-readability-avoid-underscore-in-googletest-name
+-google-build-using-namespace,
+-google-readability-avoid-underscore-in-googletest-name,
 llvm-include-order,
 llvm-namespace-comment,
 modernize*,

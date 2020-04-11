@@ -49,17 +49,17 @@ namespace tcp {
     /** destructor*/
     TcpComms::~TcpComms() { disconnect(); }
 
-    int TcpComms::processIncomingMessage(ActionMessage&& M)
+    int TcpComms::processIncomingMessage(ActionMessage&& cmd)
     {
-        if (isProtocolCommand(M)) {
-            switch (M.messageID) {
+        if (isProtocolCommand(cmd)) {
+            switch (cmd.messageID) {
                 case CLOSE_RECEIVER:
                     return (-1);
                 default:
                     break;
             }
         }
-        ActionCallback(std::move(M));
+        ActionCallback(std::move(cmd));
         return 0;
     }
 
@@ -232,7 +232,7 @@ namespace tcp {
                     logWarning(
                         "initial connection to broker timed out exceeding max number of retries ");
                     return terminate(connection_status::error);
-                } else {
+                } 
                     std::this_thread::yield();
                     brokerConnection = makeConnection(
                         ioctx->getBaseContext(),
@@ -240,7 +240,6 @@ namespace tcp {
                         std::to_string(brokerPort),
                         maxMessageSize,
                         connectionTimeout);
-                }
             }
             //monitor the total waiting time before connections
             std::chrono::milliseconds cumulativeSleep{0};
