@@ -116,7 +116,7 @@ TEST(ftc_tests, dependent_test_message)
     ftc.processDependencyUpdateMessage(addDep);
     addDep.source_id = fed3;
     ftc.processDependencyUpdateMessage(addDep);
-    auto& deps = ftc.getDependents();
+    const auto& deps = ftc.getDependents();
     EXPECT_EQ(deps.size(),2U);
     EXPECT_TRUE(deps[0] == fed2);
     EXPECT_TRUE(deps[1] == fed3);

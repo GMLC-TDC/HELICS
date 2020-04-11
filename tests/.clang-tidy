@@ -23,6 +23,7 @@ cert-*,
 portability-*,
 readability-*,
 -readability-magic-numbers,
+-readability-qualified-auto,
 performance-*
 '
 
@@ -44,6 +45,7 @@ bugprone-*,
 portability-*,
 readability-*,
 -readability-magic-numbers,
+-readability-qualified-auto,
 performance-*
 '
 

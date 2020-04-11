@@ -239,7 +239,7 @@ TEST_P(filter_simple_type_tests, function_mObj)
     auto f1 = helicsFederateRegisterFilter(fFed, helics_filter_type_delay, "filter1", &err);
     EXPECT_EQ(err.error_code, helics_ok);
     CE(helicsFilterAddSourceTarget(f1, "port1", &err));
-    EXPECT_TRUE(f1 != NULL);
+    EXPECT_TRUE(f1 != nullptr);
     CE(helicsFilterSet(f1, "delay", 2.5, &err));
 
     CE(helicsFederateEnterExecutingModeAsync(fFed, &err));
@@ -903,9 +903,9 @@ TEST_F(filter_tests, clone_test_broker_dest_connections)
         res2 = helicsFederateHasMessage(dcFed);
     }
 
-    EXPECT_TRUE(res2);
+    EXPECT_EQ(res2,helics_true);
 
-    if (res2) {
+    if (res2==helics_true) {
         auto m2 = helicsEndpointGetMessage(p3);
         EXPECT_STREQ(m2.source, "src");
         EXPECT_STREQ(m2.original_source, "src");

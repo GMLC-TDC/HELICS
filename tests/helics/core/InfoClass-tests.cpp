@@ -311,7 +311,7 @@ TEST(InfoClass_tests, inputinfo_test)
     subI.updateTimeInclusive(helics::timeZero);
     ret_data = subI.getData(0);
 
-    EXPECT_EQ(ret_data->size(), 11u);
+    EXPECT_EQ(ret_data->size(), 11U);
     EXPECT_EQ(ret_data->to_string(), hello_data->to_string());
 
     auto time_one_data = std::make_shared<helics::data_block>("time one");
