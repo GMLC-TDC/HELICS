@@ -13,3 +13,14 @@ jobs:
     - uses: actions/checkout@v2
     - name: Run cpplint
       run: cpplint --counting=detailed --recursive examples benchmarks src tests
+
+  clang-tidy:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    container: helics/buildenv:clang-extra-tools
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Run clang-tidy on changed files
+      shell: bash
+      run: ./.github/workflows/run-clang-tidy-pr.sh
