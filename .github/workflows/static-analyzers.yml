@@ -7,7 +7,7 @@ on:
 jobs:
   cpplint:
     runs-on: ubuntu-latest
-    container: sharaku/cpplint:latest
+    container: helics/buildenv:cpplint
 
     steps:
     - uses: actions/checkout@v2
