@@ -6,6 +6,7 @@ SPDX-License-Identifier: BSD-3-Clause
 */
 
 #include "global_federate_id.hpp"
+#include "federate_id.hpp"
 
 #include <iostream>
 
