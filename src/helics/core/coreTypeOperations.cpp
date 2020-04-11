@@ -163,45 +163,45 @@ namespace core {
     }
 
 #ifndef ENABLE_ZMQ_CORE
-#    define ZMQ_AVAILABILITY false
+    bool constexpr zmq_availability{ false };
 #else
-#    define ZMQ_AVAILABILITY true
+    bool constexpr zmq_availability{ true };
 #endif
 
 #ifndef ENABLE_MPI_CORE
-#    define MPI_AVAILABILITY false
+    bool constexpr mpi_availability{ false };
 #else
-#    define MPI_AVAILABILITY true
+    bool constexpr mip_availability{ false };
 #endif
 
 #ifndef ENABLE_TCP_CORE
-#    define TCP_AVAILABILITY false
+    bool constexpr tcp_availability{ false };
 #else
-#    define TCP_AVAILABILITY true
+    bool constexpr tcp_availability{ false };
 #endif
 
 #ifndef ENABLE_UDP_CORE
-#    define UDP_AVAILABILITY false
+    bool constexpr udp_availability{ false };
 #else
-#    define UDP_AVAILABILITY true
+    bool constexpr udp_availability{ false };
 #endif
 
 #ifndef ENABLE_IPC_CORE
-#    define IPC_AVAILABILITY false
+    bool constexpr ipc_availability{ false };
 #else
-#    define IPC_AVAILABILITY true
+    bool constexpr ipc_availability{ false };
 #endif
 
 #ifndef ENABLE_TEST_CORE
-#    define TEST_AVAILABILITY false
+    bool constexpr test_availability{ false };
 #else
-#    define TEST_AVAILABILITY true
+    bool constexpr test_availability{ false };
 #endif
 
 #ifndef ENABLE_INPROC_CORE
-#    define INPROC_AVAILABILITY false
+    bool constexpr inproc_availability{ false };
 #else
-#    define INPROC_AVAILABILITY true
+    bool constexpr inproc_availability{ false };
 #endif
 
     bool isCoreTypeAvailable(core_type type) noexcept
@@ -211,39 +211,36 @@ namespace core {
         switch (type) {
             case core_type::ZMQ:
             case core_type::ZMQ_SS:
-                available = ZMQ_AVAILABILITY;
+                available = zmq_availability;
                 break;
             case core_type::MPI:
-                available = MPI_AVAILABILITY;
+                available = mpi_availability;
                 break;
             case core_type::TEST:
-                available = TEST_AVAILABILITY;
+                available = test_availability;
                 break;
             case core_type::INTERPROCESS:
             case core_type::IPC:
-                available = IPC_AVAILABILITY;
+                available = ipc_availability;
                 break;
             case core_type::UDP:
-                available = UDP_AVAILABILITY;
+                available = udp_availability;
                 break;
             case core_type::TCP:
-                available = TCP_AVAILABILITY;
-                break;
             case core_type::TCP_SS:
-                available = TCP_AVAILABILITY;
+                available = tcp_availability;
                 break;
             case core_type::DEFAULT: // default should always be available
                 available = true;
                 break;
             case core_type::INPROC:
-                available = INPROC_AVAILABILITY;
+                available = inproc_availability;
                 break;
             case core_type::HTTP:
             case core_type::WEBSOCKET:
-                available = false;
-                break;
             case core_type::NULLCORE:
                 available = false;
+                break;
             default:
                 break;
         }

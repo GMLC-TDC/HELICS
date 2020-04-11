@@ -18,7 +18,6 @@ SPDX-License-Identifier: BSD-3-Clause
 
 namespace helics {
 namespace tcp {
-    using asio::ip::tcp;
     TcpCommsSS::TcpCommsSS() noexcept:
         NetworkCommsInterface(interface_type::tcp, CommsInterface::thread_generation::single)
     {
@@ -67,17 +66,17 @@ namespace tcp {
         }
     }
 
-    int TcpCommsSS::processIncomingMessage(ActionMessage&& M)
+    int TcpCommsSS::processIncomingMessage(ActionMessage&& cmd)
     {
-        if (isProtocolCommand(M)) {
-            switch (M.messageID) {
+        if (isProtocolCommand(cmd)) {
+            switch (cmd.messageID) {
                 case CLOSE_RECEIVER:
                     return (-1);
                 default:
                     break;
             }
         }
-        ActionCallback(std::move(M));
+        ActionCallback(std::move(cmd));
         return 0;
     }
 
@@ -144,11 +143,11 @@ namespace tcp {
         auto contextLoop = ioctx->startContextLoop();
         auto dataCall =
             [this](TcpConnection::pointer connection, const char* data, size_t datasize) {
-                return dataReceive(connection, data, datasize);
+                return dataReceive(std::move(connection), data, datasize);
             };
         CommsInterface* ci = this;
         auto errorCall = [ci](TcpConnection::pointer connection, const std::error_code& error) {
-            return commErrorHandler(ci, connection, error);
+            return commErrorHandler(ci, std::move(connection), error);
         };
 
         if (serverMode) {
