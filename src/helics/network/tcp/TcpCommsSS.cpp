@@ -81,7 +81,7 @@ namespace tcp {
     }
 
     size_t TcpCommsSS::dataReceive(
-        std::shared_ptr<TcpConnection> connection,
+        TcpConnection *connection,
         const char* data,
         size_t bytes_received)
     {
@@ -143,11 +143,11 @@ namespace tcp {
         auto contextLoop = ioctx->startContextLoop();
         auto dataCall =
             [this](TcpConnection::pointer connection, const char* data, size_t datasize) {
-                return dataReceive(std::move(connection), data, datasize);
+                return dataReceive(connection.get(), data, datasize);
             };
         CommsInterface* ci = this;
         auto errorCall = [ci](TcpConnection::pointer connection, const std::error_code& error) {
-            return commErrorHandler(ci, std::move(connection), error);
+            return commErrorHandler(ci, connection.get(), error);
         };
 
         if (serverMode) {

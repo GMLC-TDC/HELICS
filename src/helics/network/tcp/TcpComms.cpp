@@ -160,7 +160,7 @@ namespace tcp {
             });
         CommsInterface* ci = this;
         server->setErrorCall([ci](TcpConnection::pointer connection, const std::error_code& error) {
-            return commErrorHandler(ci, connection, error);
+            return commErrorHandler(ci, connection.get(), error);
         });
         server->start();
         setRxStatus(connection_status::connected);
