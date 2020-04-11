@@ -159,7 +159,7 @@ TEST_F(filter_tests, core_filter_reg)
 
 TEST_P(filter_type_tests, message_filter_function)
 {
-    auto broker = AddBroker(GetParam(), 2);
+    helics_broker broker = AddBroker(GetParam(), 2);
     AddFederates(helicsCreateMessageFederate, GetParam(), 1, broker, 1.0, "filter");
     AddFederates(helicsCreateMessageFederate, GetParam(), 1, broker, 1.0, "message");
 
@@ -223,7 +223,7 @@ TEST_P(filter_type_tests, message_filter_function)
 
 TEST_P(filter_simple_type_tests, function_mObj)
 {
-    auto broker = AddBroker(GetParam(), 2);
+    helics_broker broker = AddBroker(GetParam(), 2);
     AddFederates(helicsCreateMessageFederate, GetParam(), 1, broker, 1.0, "filter");
     AddFederates(helicsCreateMessageFederate, GetParam(), 1, broker, 1.0, "message");
 
@@ -289,7 +289,7 @@ The filter operator delays the message by 2.5 seconds meaning it should arrive b
 */
 TEST_P(filter_type_tests, function_two_stage)
 {
-    auto broker = AddBroker(GetParam(), 3);
+    helics_broker broker = AddBroker(GetParam(), 3);
     AddFederates(helicsCreateMessageFederate, GetParam(), 1, broker, 1.0, "filter");
     AddFederates(helicsCreateMessageFederate, GetParam(), 1, broker, 1.0, "filter2");
     AddFederates(helicsCreateMessageFederate, GetParam(), 1, broker, 1.0, "message");
@@ -373,7 +373,7 @@ The filter operator delays the message by 2.5 seconds meaning it should arrive b
 
 TEST_P(filter_type_tests, function2)
 {
-    auto broker = AddBroker(GetParam(), 2);
+    helics_broker broker = AddBroker(GetParam(), 2);
     AddFederates(helicsCreateMessageFederate, GetParam(), 1, broker, 1.0, "filter");
     AddFederates(helicsCreateMessageFederate, GetParam(), 1, broker, 1.0, "message");
 
@@ -446,7 +446,7 @@ TEST_P(filter_type_tests, function2)
 
 TEST_P(filter_type_tests, message_filter_function3)
 {
-    auto broker = AddBroker(GetParam(), 2);
+    helics_broker broker = AddBroker(GetParam(), 2);
     AddFederates(helicsCreateMessageFederate, GetParam(), 1, broker, 1.0, "filter");
     AddFederates(helicsCreateMessageFederate, GetParam(), 1, broker, 1.0, "message");
 
@@ -519,7 +519,7 @@ TEST_P(filter_type_tests, message_filter_function3)
 
 TEST_F(filter_tests, clone_test)
 {
-    auto broker = AddBroker("test", 3);
+    helics_broker broker = AddBroker("test", 3);
     AddFederates(helicsCreateMessageFederate, "test", 1, broker, 1.0, "source");
     AddFederates(helicsCreateMessageFederate, "test", 1, broker, 1.0, "dest");
     AddFederates(helicsCreateMessageFederate, "test", 1, broker, 1.0, "dest_clone");
@@ -589,7 +589,7 @@ TEST_F(filter_tests, clone_test)
 
 TEST_F(filter_tests, clone_test_connections)
 {
-    auto broker = AddBroker("test", 3);
+    helics_broker broker = AddBroker("test", 3);
     AddFederates(helicsCreateMessageFederate, "test", 1, broker, 1.0, "source");
     AddFederates(helicsCreateMessageFederate, "test", 1, broker, 1.0, "dest");
     AddFederates(helicsCreateMessageFederate, "test", 1, broker, 1.0, "dest_clone");
@@ -675,7 +675,7 @@ TEST_F(filter_tests, clone_test_connections)
 
 TEST_F(filter_tests, clone_test_broker_connections)
 {
-    auto broker = AddBroker("test", 3);
+    helics_broker broker = AddBroker("test", 3);
     AddFederates(helicsCreateMessageFederate, "test", 1, broker, 1.0, "source");
     AddFederates(helicsCreateMessageFederate, "test", 1, broker, 1.0, "dest");
     AddFederates(helicsCreateMessageFederate, "test", 1, broker, 1.0, "dest_clone");
@@ -752,7 +752,7 @@ TEST_F(filter_tests, clone_test_broker_connections)
 // this tests using a remote core to connect an endpoint to a cloning destination filter
 TEST_F(filter_tests, clone_test_dest_connections)
 {
-    auto broker = AddBroker("test", 3);
+    helics_broker broker = AddBroker("test", 3);
     AddFederates(helicsCreateMessageFederate, "test", 1, broker, 1.0, "source");
     AddFederates(helicsCreateMessageFederate, "test", 1, broker, 1.0, "dest");
     AddFederates(helicsCreateMessageFederate, "test", 1, broker, 2.0, "dest_clone");
@@ -840,7 +840,7 @@ TEST_F(filter_tests, clone_test_dest_connections)
 
 TEST_F(filter_tests, clone_test_broker_dest_connections)
 {
-    auto broker = AddBroker("test", 3);
+    helics_broker broker = AddBroker("test", 3);
     AddFederates(helicsCreateMessageFederate, "test", 1, broker, 1.0, "source");
     AddFederates(helicsCreateMessageFederate, "test", 1, broker, 1.0, "dest");
     AddFederates(helicsCreateMessageFederate, "test", 1, broker, 1.0, "dest_clone");
@@ -923,7 +923,7 @@ TEST_F(filter_tests, clone_test_broker_dest_connections)
 
 TEST_F(filter_tests, multi_clone_test)
 {
-    auto broker = AddBroker("test", 4);
+    helics_broker broker = AddBroker("test", 4);
     AddFederates(helicsCreateMessageFederate, "test", 2, broker, 1.0, "source");
     AddFederates(helicsCreateMessageFederate, "test", 1, broker, 1.0, "dest");
     AddFederates(helicsCreateMessageFederate, "test", 1, broker, 1.0, "dest_clone");
@@ -999,9 +999,9 @@ TEST_F(filter_tests, multi_clone_test)
     mcnt = helicsEndpointPendingMessages(p4);
     EXPECT_EQ(mcnt, 2);
     res = helicsFederateHasMessage(dcFed);
-    EXPECT_TRUE(res);
+    EXPECT_EQ(res,helics_true);
 
-    if (res) {
+    if (res!=helics_false) {
         auto m2 = helicsFederateGetMessage(dcFed);
         EXPECT_STREQ(m2.source, "src");
         EXPECT_STREQ(m2.original_source, "src");
@@ -1009,9 +1009,9 @@ TEST_F(filter_tests, multi_clone_test)
         EXPECT_STREQ(m2.original_dest, "dest");
         EXPECT_EQ(m2.length, static_cast<int64_t>(data.size()));
         res = helicsFederateHasMessage(dcFed);
-        EXPECT_TRUE(res);
+        EXPECT_EQ(res,helics_true);
 
-        if (res) {
+        if (res!=helics_false) {
             m2 = helicsFederateGetMessage(dcFed);
             EXPECT_STREQ(m2.source, "src2");
             EXPECT_STREQ(m2.original_source, "src2");
@@ -1063,7 +1063,7 @@ static void filterFunc1(helics_message_object mess, void*)
 
 TEST_F(filter_tests, callback_test)
 {
-    auto broker = AddBroker("test", 2);
+    helics_broker broker = AddBroker("test", 2);
     AddFederates(helicsCreateMessageFederate, "test", 1, broker, 1.0, "filter");
     AddFederates(helicsCreateMessageFederate, "test", 1, broker, 1.0, "message");
 
