@@ -96,7 +96,7 @@ TEST(ftc_tests, dependent_tests)
     EXPECT_TRUE(deps[1] == fed3);
 
     ftc.removeDependent(fed2);
-    EXPECT_TRUE(deps.size() == 1);
+    EXPECT_EQ(deps.size(),1U);
     EXPECT_TRUE(deps[0] == fed3);
     // remove same one
     ftc.removeDependent(fed2);

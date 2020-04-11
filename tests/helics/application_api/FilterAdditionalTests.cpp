@@ -535,7 +535,7 @@ TEST_P(filter_type_tests, message_random_delay_object_ci_skip)
         }
     }
     EXPECT_EQ(count, 1);
-    EXPECT_TRUE(actual_delay <= 4);
+    EXPECT_LE(actual_delay,4);
 
     mFed->finalizeAsync();
     fFed->finalize();
