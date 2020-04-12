@@ -80,10 +80,8 @@ namespace tcp {
         return 0;
     }
 
-    size_t TcpCommsSS::dataReceive(
-        TcpConnection *connection,
-        const char* data,
-        size_t bytes_received)
+    size_t
+        TcpCommsSS::dataReceive(TcpConnection* connection, const char* data, size_t bytes_received)
     {
         size_t used_total = 0;
         while (used_total < bytes_received) {
@@ -142,13 +140,14 @@ namespace tcp {
         auto ioctx = AsioContextManager::getContextPointer();
         auto contextLoop = ioctx->startContextLoop();
         auto dataCall =
-            [this](const TcpConnection::pointer &connection, const char* data, size_t datasize) {
+            [this](const TcpConnection::pointer& connection, const char* data, size_t datasize) {
                 return dataReceive(connection.get(), data, datasize);
             };
         CommsInterface* ci = this;
-        auto errorCall = [ci](const TcpConnection::pointer &connection, const std::error_code& error) {
-            return commErrorHandler(ci, connection.get(), error);
-        };
+        auto errorCall =
+            [ci](const TcpConnection::pointer& connection, const std::error_code& error) {
+                return commErrorHandler(ci, connection.get(), error);
+            };
 
         if (serverMode) {
             server = TcpServer::create(

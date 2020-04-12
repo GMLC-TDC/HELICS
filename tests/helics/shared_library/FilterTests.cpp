@@ -641,9 +641,9 @@ TEST_F(filter_tests, clone_test_connections)
     CE(helicsFederateRequestTimeComplete(dcFed, &err));
 
     auto res = helicsFederateHasMessage(dFed);
-    EXPECT_EQ(res,helics_true);
+    EXPECT_EQ(res, helics_true);
 
-    if (res==helics_true) {
+    if (res == helics_true) {
         auto m2 = helicsEndpointGetMessage(p2);
         EXPECT_STREQ(m2.source, "src");
         EXPECT_STREQ(m2.original_source, "src");
@@ -653,9 +653,9 @@ TEST_F(filter_tests, clone_test_connections)
 
     // now check the message clone
     res = helicsFederateHasMessage(dcFed);
-    EXPECT_EQ(res,helics_true);
+    EXPECT_EQ(res, helics_true);
 
-    if (res==helics_true) {
+    if (res == helics_true) {
         auto m2 = helicsEndpointGetMessage(p3);
         EXPECT_STREQ(m2.source, "src");
         EXPECT_STREQ(m2.original_source, "src");
@@ -717,9 +717,9 @@ TEST_F(filter_tests, clone_test_broker_connections)
     CE(helicsFederateRequestTimeComplete(dcFed, &err));
 
     auto res = helicsFederateHasMessage(dFed);
-    EXPECT_EQ(res,helics_true);
+    EXPECT_EQ(res, helics_true);
 
-    if (res==helics_true) {
+    if (res == helics_true) {
         auto m2 = helicsEndpointGetMessage(p2);
         EXPECT_STREQ(m2.source, "src");
         EXPECT_STREQ(m2.original_source, "src");
@@ -729,9 +729,9 @@ TEST_F(filter_tests, clone_test_broker_connections)
 
     // now check the message clone
     res = helicsFederateHasMessage(dcFed);
-    EXPECT_EQ(res,helics_true);
+    EXPECT_EQ(res, helics_true);
 
-    if (res==helics_true) {
+    if (res == helics_true) {
         auto m2 = helicsEndpointGetMessage(p3);
         EXPECT_STREQ(m2.source, "src");
         EXPECT_STREQ(m2.original_source, "src");
@@ -882,9 +882,9 @@ TEST_F(filter_tests, clone_test_broker_dest_connections)
     CE(helicsFederateRequestTimeComplete(dcFed, &err));
 
     auto res = helicsFederateHasMessage(dFed);
-    EXPECT_EQ(res,helics_true);
+    EXPECT_EQ(res, helics_true);
 
-    if (res==helics_true) {
+    if (res == helics_true) {
         auto m2 = helicsEndpointGetMessage(p2);
         EXPECT_STREQ(m2.source, "src");
         EXPECT_STREQ(m2.original_source, "src");
@@ -975,18 +975,18 @@ TEST_F(filter_tests, multi_clone_test)
     auto mcnt = helicsEndpointPendingMessages(p3);
     EXPECT_EQ(mcnt, 2);
     auto res = helicsFederateHasMessage(dFed);
-    EXPECT_EQ(res,helics_true);
+    EXPECT_EQ(res, helics_true);
 
-    if (res==helics_true) {
+    if (res == helics_true) {
         auto m2 = helicsEndpointGetMessage(p3);
         EXPECT_STREQ(m2.source, "src");
         EXPECT_STREQ(m2.original_source, "src");
         EXPECT_STREQ(m2.dest, "dest");
         EXPECT_EQ(m2.length, static_cast<int64_t>(data.size()));
         res = helicsFederateHasMessage(dFed);
-        EXPECT_EQ(res,helics_true);
+        EXPECT_EQ(res, helics_true);
 
-        if (res==helics_true) {
+        if (res == helics_true) {
             m2 = helicsFederateGetMessage(dFed);
             EXPECT_STREQ(m2.source, "src2");
             EXPECT_STREQ(m2.original_source, "src2");

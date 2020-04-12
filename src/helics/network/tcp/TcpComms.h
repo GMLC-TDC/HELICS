@@ -60,10 +60,7 @@ namespace tcp {
     @param bytes_received the length of the received data
     @return a the number of bytes used by the function
     */
-        size_t dataReceive(
-            TcpConnection* connection,
-            const char* data,
-            size_t bytes_received);
+        size_t dataReceive(TcpConnection* connection, const char* data, size_t bytes_received);
 
         //  bool errorHandle()
     };
