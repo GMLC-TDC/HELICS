@@ -415,8 +415,8 @@ namespace helics
         }
         else
         {
+            mess->counter = static_cast<int32_t>(messages.size());
             messages.push_back(std::move(mess));
-            messages.back()->counter = static_cast<int32_t>(messages.size());
         }
         return m;
     }
@@ -432,8 +432,9 @@ namespace helics
             messages[index]->backReference = static_cast<void *>(this);
             return messages[index].get();
         }
+        
             messages.push_back(std::make_unique<Message>());
-            messages.back()->counter = static_cast<int32_t>(messages.size());
+            messages.back()->counter = static_cast<int32_t>(messages.size()) - 1;
             messages.back()->backReference = static_cast<void *>(this);
             return messages.back().get();
     }
@@ -519,9 +520,6 @@ helics_message helicsFederateGetMessage(helics_federate fed)
     if (mFed == nullptr) {
         return emptyMessage();
     }
-
-    auto fedObj = helics::getFedObject(fed, nullptr);
-
     auto message = mFed->getMessage();
 
     if (message) {
@@ -550,12 +548,11 @@ helics_message_object helicsEndpointGetMessageObject(helics_endpoint endpoint)
 
     auto message = endObj->endPtr->getMessage();
 
-    if (message) {
-        message->messageValidation = messageKeyCode;
-        helics_message_object mess = message.get();
-        return endObj->fed->messages.addMessage(message);
+    if (!message) {
+        return nullptr;
     }
-    return nullptr;
+    message->messageValidation = messageKeyCode;
+    return endObj->fed->messages.addMessage(message);
 }
 
 helics_message_object helicsFederateGetMessageObject(helics_federate fed)
@@ -569,12 +566,11 @@ helics_message_object helicsFederateGetMessageObject(helics_federate fed)
 
     auto message = mFed->getMessage();
 
-    if (message) {
-        message->messageValidation = messageKeyCode;
-        helics_message_object mess = message.get();
-        return fedObj->messages.addMessage(message);
+    if (!message) {
+        return nullptr;
     }
-    return nullptr;
+        message->messageValidation = messageKeyCode;
+        return fedObj->messages.addMessage(message);
 }
 
 helics_message_object helicsFederateCreateMessageObject(helics_federate fed, helics_error* err)
@@ -588,7 +584,7 @@ helics_message_object helicsFederateCreateMessageObject(helics_federate fed, hel
 
 helics_message_object helicsEndpointCreateMessageObject(helics_endpoint endpoint, helics_error* err)
 {
-    auto endObj = verifyEndpoint(endpoint, nullptr);
+    auto endObj = verifyEndpoint(endpoint, err);
     if (endObj == nullptr) {
         return nullptr;
     }
@@ -604,10 +600,7 @@ void helicsFederateClearMessages(helics_federate fed)
     fedObj->messages.clear();
 }
 
-/** clear all message from an endpoint
-@param endpoint  the endpoint object to operate on
-*/
-void helicsEndpointClearMessages(helics_endpoint endpoint)
+void helicsEndpointClearMessages(helics_endpoint /*endpoint*/)
 {
 
 }

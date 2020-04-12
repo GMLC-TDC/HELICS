@@ -953,13 +953,13 @@ TEST_F(function_tests, messageFed_messageObject)
     helicsMessageSetSource(mess1, nullptr, nullptr);
     helicsMessageSetOriginalDestination(mess1, nullptr, nullptr);
     helicsEndpointSendMessageObject(ept1, mess1, &err);
-    helicsMessageSetDestination(mess1, "ept1", nullptr);
+    helicsMessageSetDestination(mess1, "ept1", nullptr); 
     helicsEndpointSendMessageObject(ept1, mess1, &err);
     helicsMessageSetOriginalSource(mess1, "ept4", nullptr);
     helicsEndpointSendMessageObject(ept1, mess1, &err);
     helicsMessageSetString(mess1, "test", nullptr);
     
-    helicsEndpointSendMessageObject(ept1, mess1, &err);
+    helicsEndpointSendMessageObjectZeroCopy(ept1, mess1, &err); 
 
     helicsFederateRequestNextStep(mFed1, nullptr);
     auto cnt = helicsEndpointPendingMessages(ept1);
