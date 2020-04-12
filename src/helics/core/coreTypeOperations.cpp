@@ -172,7 +172,7 @@ namespace core {
 #ifndef ENABLE_MPI_CORE
     static bool constexpr mpi_availability{false};
 #else
-    static bool constexpr mpi_availability{false};
+    static bool constexpr mpi_availability{true};
 #endif
 
 #ifndef ENABLE_TCP_CORE
